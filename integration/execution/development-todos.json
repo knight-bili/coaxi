@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-13",
+  "policy": "研发可修问题由研发继续处理，不列为客户资源阻塞",
+  "items": [
+    {
+      "id": "DEV-HOST-WEB-LIVE-API",
+      "task": "I01-T03/I02-T01",
+      "status": "pending",
+      "file": "scripts/lib/host-web-live.test.mjs:52",
+      "problem": "原生Web验收脚本仍调用camp.composerDraft.get/save，当前锁定Host拒绝该调用；需按当前真实编辑器合同修正夹具并复验，不能伪造消息或放宽准入",
+      "owner": "研发",
+      "evidence": "本次真实Host创建夹具阶段调用被拒绝；当前导航测试通过合法threads.create建立活跃空Thread，未覆盖发送消息"
+    }
+  ]
+}

@@ -4322,6 +4322,7 @@ export function BusinessApp({
       if (viewRef.current === 'compose') desktopNavigation.captureCurrentEntry().update({ kind: 'quick_chat', projectPath: project?.projectPath ?? null })
     }}
     onOpenProjectHome={(project) => {
+      setError(null)
       setMobileConversationDrawerOpen(false)
       void desktopNavigation.push({ kind: 'quick_chat', projectPath: project.projectPath })
     }}

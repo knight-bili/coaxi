@@ -33,14 +33,14 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "I02-T01生产BusinessApp与真实隔离Host的工程进入、重开、失效及迟到响应联调",
-    "I02-T01剩余导航与首次使用行为核查",
-    "I02-T02成员与Provider",
+    "I02-T01补齐项目启动器、会话地图、通知及首次使用剩余差异",
+    "I02-T02先盘点独立测试Runtime，再融合成员与Provider",
     "I02-T03 Skills/MCP",
     "按原依赖推进I03至I12"
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "component_verified_live_host_pending",
-  "evidence": "i02-navigation-result.json"
+  "current_slice_status": "component_and_real_host_navigation_verified_task_in_progress",
+  "evidence": "i02-navigation-result.json",
+  "live_evidence": "i02-navigation-live-result.json"
 }

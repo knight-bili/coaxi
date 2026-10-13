@@ -7,7 +7,7 @@ export const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
 // Used only by the real Host acceptance commands. Each caller owns an isolated
 // profile and process; this helper never attaches to a user's existing browser.
 export async function launchAcceptanceBrowser({ executable, args, env = process.env }) {
-  const child = spawn(executable, args, { env, stdio: ['ignore', 'pipe', 'pipe'] })
+  const child = spawn(executable, args, { env, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] })
   // Crashpad may inherit stderr beyond Chrome's lifetime. Wait for our process,
   // then close the log pipes instead of waiting indefinitely for that descendant.
   let launchError
@@ -19,12 +19,15 @@ export async function launchAcceptanceBrowser({ executable, args, env = process.
   const collect = chunk => { log = (log + chunk).slice(-65_000) }
   child.stdout.on('data', collect)
   child.stderr.on('data', collect)
-  let socket
+  let socket, gracefulClose
   const close = async () => {
-    socket?.close()
-    child.kill('SIGTERM')
     const timer = setTimeout(() => child.kill('SIGKILL'), 15_000)
-    try { await closed } finally { clearTimeout(timer); child.stdout.destroy(); child.stderr.destroy() }
+    try {
+      if (gracefulClose && socket?.readyState === WebSocket.OPEN) {
+        await gracefulClose().catch(() => { child.kill('SIGTERM') })
+      } else child.kill('SIGTERM')
+      await closed
+    } finally { clearTimeout(timer); socket?.close(); child.stdout.destroy(); child.stderr.destroy() }
   }
   try {
     let port
@@ -53,8 +56,10 @@ export async function launchAcceptanceBrowser({ executable, args, env = process.
     const errors = []
     const responses = []
     const fileChoosers = []
+    const protocolListeners = new Set()
     socket.addEventListener('message', event => {
       const message = JSON.parse(String(event.data))
+      if (message.method) for (const listener of protocolListeners) listener(message)
       const request = pending.get(message.id)
       if (request) {
         pending.delete(message.id)
@@ -84,6 +89,7 @@ export async function launchAcceptanceBrowser({ executable, args, env = process.
       pending.set(requestId, { resolve, reject, timer })
       socket.send(JSON.stringify({ id: requestId, method, params }))
     })
+    gracefulClose = () => send('Browser.close')
     await send('Page.enable')
     await send('Runtime.enable')
     await send('Network.enable')
@@ -95,6 +101,7 @@ export async function launchAcceptanceBrowser({ executable, args, env = process.
     }
     return {
       send, evaluate, errors, responses, fileChoosers, close,
+      onProtocolEvent(listener) { protocolListeners.add(listener); return () => protocolListeners.delete(listener) },
       async key(key) {
         const params = { key, code: key, windowsVirtualKeyCode: key === 'Enter' ? 13 : 27 }
         await send('Input.dispatchKeyEvent', { type: 'keyDown', ...params })

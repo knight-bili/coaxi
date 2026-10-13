@@ -2,7 +2,7 @@
   "date": "2026-10-13",
   "task": "I02-T01",
   "slice": "project_home_navigation",
-  "status": "component_verified_live_host_pending",
+  "status": "component_and_real_host_navigation_verified_task_in_progress",
   "unitTests": {
     "passed": 41,
     "failed": 0
@@ -30,14 +30,20 @@
   "webBuild": "passed",
   "executionWebBuild": "passed",
   "electronCodeBuild": "passed",
-  "liveCoreNavigation": "not_run",
+  "liveCoreNavigation": {
+    "status": "passed",
+    "checks": 11,
+    "evidence": "i02-navigation-live-result.json",
+    "runtime": "not_started"
+  },
   "realAgent": "not_run",
   "fusionAcceptanceCases": "not_run",
   "selfReview": {
     "history": "不同工程不去重，后退/前进保留路径",
     "path": "Core核实后采用规范路径，存储路径准入校验",
     "race": "提交前检查最新导航意图，失败/取代不提交工程偏好",
-    "authority": "无第二业务数据库/Thread/Run；Core公共RestorableLocation未扩展"
+    "authority": "无第二业务数据库/Thread/Run；Core公共RestorableLocation未扩展",
+    "errorRecovery": "目录恢复后成功进入，旧错误已清除；失败时不改变历史"
   },
   "failures": [
     {
@@ -50,5 +56,10 @@
       "result": "原始夹具在折叠场景后100秒超时",
       "limit": "不是同一失败断言稳定复现"
     }
-  ]
+  ],
+  "currentRegression": {
+    "files": 3,
+    "passed": 37,
+    "failed": 0
+  }
 }
