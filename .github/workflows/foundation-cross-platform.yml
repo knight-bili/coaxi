@@ -9,19 +9,64 @@ on:
       - 'tools/integration/fetch-locked-source.py'
       - 'tools/integration/record-ci-stage.py'
   workflow_dispatch:
+    inputs:
+      target:
+        description: Platform to validate
+        type: choice
+        default: all
+        options: [all, macos, ios, android]
 
 permissions:
   contents: read
 
-concurrency:
-  group: foundation-cross-platform-${{ github.ref }}
-  cancel-in-progress: false
-
 jobs:
+  scope:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      macos: ${{ steps.scope.outputs.macos }}
+      ios: ${{ steps.scope.outputs.ios }}
+      android: ${{ steps.scope.outputs.android }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: scope
+        env:
+          REQUESTED_TARGET: ${{ inputs.target }}
+          BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          python3 - <<'PY'
+          import os,re,subprocess
+          targets={'macos','ios','android'}
+          requested=os.environ['REQUESTED_TARGET']
+          if requested:
+              selected=targets if requested=='all' else {requested}
+          else:
+              before=os.environ['BEFORE_SHA']
+              if not re.fullmatch(r'[0-9a-f]{40}',before) or before=='0'*40:
+                  selected=targets
+              else:
+                  paths=set(subprocess.check_output(['git','diff','--name-only',before,os.environ['GITHUB_SHA']],text=True).splitlines())
+                  scripts={f'tools/integration/ci-{name}.sh':name for name in targets}
+                  selected={name for p,name in scripts.items() if p in paths}
+                  shared={'tools/integration/fetch-locked-source.py','tools/integration/record-ci-stage.py'}
+                  if paths & shared or not selected:
+                      selected=targets
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output:
+              for name in sorted(targets):output.write(f'{name}={str(name in selected).lower()}\n')
+          print('Selected platforms: '+','.join(sorted(selected)))
+          PY
   macos:
+    needs: scope
+    if: needs.scope.outputs.macos == 'true'
     name: ${{ matrix.app }} macOS ${{ matrix.arch }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 90
+    concurrency:
+      group: foundation-macos-${{ github.ref }}-${{ matrix.app }}-${{ matrix.arch }}
+      cancel-in-progress: false
     strategy:
       fail-fast: false
       matrix:
@@ -83,9 +128,14 @@ jobs:
           retention-days: 3
 
   ios:
+    needs: scope
+    if: needs.scope.outputs.ios == 'true'
     name: Codeg iOS simulator
     runs-on: macos-26
     timeout-minutes: 40
+    concurrency:
+      group: foundation-ios-${{ github.ref }}
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
@@ -106,9 +156,14 @@ jobs:
           retention-days: 3
 
   android:
+    needs: scope
+    if: needs.scope.outputs.android == 'true'
     name: Codeg Android build tests emulator
     runs-on: ubuntu-24.04
     timeout-minutes: 50
+    concurrency:
+      group: foundation-android-${{ github.ref }}
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:

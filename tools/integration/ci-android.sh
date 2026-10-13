@@ -30,8 +30,13 @@ Path(sys.argv[2]).write_text(json.dumps(counts,indent=2))
 PY
 mark passed
 stage=emulator_launch
+export ANDROID_USER_HOME="$RUNNER_TEMP/foundation-android-config"
+export ANDROID_AVD_HOME="$RUNNER_TEMP/foundation-avds"
+mkdir -p "$ANDROID_USER_HOME" "$ANDROID_AVD_HOME"
 "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'system-images;android-36;google_apis;x86_64' 'emulator' > "$evidence/sdk-install.log" 2>&1
-echo no | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd -n foundation-api36 -k 'system-images;android-36;google_apis;x86_64' --device pixel_6 > "$evidence/avd.log" 2>&1
+echo no | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd -n foundation-api36 -p "$ANDROID_AVD_HOME/foundation-api36.avd" -k 'system-images;android-36;google_apis;x86_64' --device pixel_6 > "$evidence/avd.log" 2>&1
+"$ANDROID_HOME/emulator/emulator" -list-avds > "$evidence/avd-list.txt"
+grep -Fx foundation-api36 "$evidence/avd-list.txt"
 test -e /dev/kvm
 sudo chmod 666 /dev/kvm
 "$ANDROID_HOME/emulator/emulator" -avd foundation-api36 -port 5554 -no-window -no-audio -no-snapshot -no-boot-anim -gpu swiftshader_indirect > "$evidence/emulator.log" 2>&1 &
