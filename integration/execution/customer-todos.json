@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "policy": "客户允许先登记待办并推进独立工作；不削减范围或假通过，最后补齐必要验收",
   "items": [
     {"id":"INPUT-MAC","resource":"RES-MAC","required_for":"I08及平台最终验收","need":"实际Mac的权限、硬件和安装交互验收方式","status":"deferred","software_workaround":"GitHub两款双架构源码编译已验证"},
@@ -9,6 +9,7 @@
     {"id":"INPUT-RUNTIME","resource":"RES-RUNTIME","required_for":"I02首次真实运行及I04/I06/I12完整准入","need":"研发先核实本机可用Runtime；缺少的独立测试认证/模型额度由客户补齐","status":"pending_developer_inventory","software_workaround":"先实现成员、Provider、Skills/MCP配置和不依赖认证的协议/生命周期测试，不能代替真实AI执行"},
     {"id":"INPUT-CHANNEL","resource":"RES-CHANNEL","required_for":"I10渠道端到端验收","need":"飞书/Lark/钉钉的专用测试组织、Bot及客户授权身份","status":"deferred","software_workaround":"先实现共用合同和隔离运输测试，不使用个人日常凭据"},
     {"id":"INPUT-SIGN","resource":"RES-SIGN","required_for":"I11正式分发","need":"桌面/移动发布签名、Apple分发账号和费用决策","status":"deferred","software_workaround":"先开发预览包及模拟器验证，不采购或发布"},
-    {"id":"INPUT-ACCEPTANCE","required_for":"main阶段合入及I12客户最终验收","need":"客户验收阶段PR与最终MVP","status":"deferred","software_workaround":"按依赖建立阶段分支和草稿PR继续开发；保持main人工验收控制"}
+    {"id":"INPUT-ACCEPTANCE","required_for":"main阶段合入及I12客户最终验收","need":"客户验收阶段PR与最终MVP","status":"deferred","software_workaround":"按依赖建立阶段分支和草稿PR继续开发；保持main人工验收控制"},
+    {"id":"INPUT-GITHUB-CI","required_for":"Mac/Linux及GitHub原生验证","need":"核查GitHub账户付款或Actions支出限制；由客户处理账号与费用决定后补运行","status":"deferred_account_billing","evidence":{"head":"2797a000756d0640a02db0e4e60d10a879f046b6","run":38461101658,"checkRun":115516171718,"annotation":"The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"},"software_workaround":"已找到本机E盘现有MSVC，通过VS子进程开发环境进行Windows编译/迁移测试；Mac/Linux仍待补，不自动购买或修改账户额度，不重复调度被拒作业"}
   ]
 }

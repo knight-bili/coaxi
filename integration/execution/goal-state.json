@@ -14,7 +14,7 @@
   "current_branch": "phase/i02-workbench",
   "base_branch": "phase/i01-foundation",
   "current_task": "I02-T02",
-  "current_slice": "Gemini Core类型/协议/模型权限/迁移已实现，Rust与原生验证中",
+  "current_slice": "Gemini Core接入及本机MSVC编译验证；GitHub付款限制记待办",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,9 +33,9 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "核查Core integration编译/默认与迁移测试，修实际失败",
-    "核查Mac启动60s观察和完整原生夹具",
-    "Gemini实际运行/工具/恢复资格；继续Hermes/OpenClaw、T01/T03及I03-I12"
+    "继续当前本机Cargo操作，不因镜像队列超时重启；完成后运行Gemini/迁移owner",
+    "继续不依赖GitHub的成员/Provider与T01/T03开发",
+    "后续处理GitHub付款/支出限制，补Mac/Linux/原生资格；再依原计划推进I03-I12"
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",

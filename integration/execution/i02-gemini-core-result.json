@@ -2,7 +2,7 @@
   "schema_version": 1,
   "date": "2026-10-14",
   "task": "I02-T02",
-  "status": "compile_failures_repaired_new_native_validation_pending",
+  "status": "compile_fix_local_MSVC_validation_running_GitHub_billing_deferred",
   "scope": "Gemini_Core_catalog_ACP_models_permissions_Skills_MCP_mapping_and_schema147",
   "source": [
     {
@@ -102,7 +102,7 @@
     "typecheck": "passed",
     "parameterTests": {
       "files": 2,
-      "passed": 37,
+      "passed": 38,
       "failed": 0
     },
     "webExecutionWebDesktopCodeBuild": "passed",
@@ -151,7 +151,7 @@
     "arm64": "cancelled/assertions not_run"
   },
   "limits": {
-    "RustCompile": "failed_previous_revision_new_fix_pending",
+    "RustCompile": "local_command_running_after_source_fix",
     "RustTests": "pending_CI",
     "nativeMacReady": "not_passed",
     "actualModel": "not_run",
@@ -179,5 +179,21 @@
       ],
       "action": "补齐已发现类型及生产生命周期接入；仍须新编译与迁移执行验证"
     }
-  ]
+  ],
+  "localCompiler": {
+    "status": "running",
+    "developmentEnvironment": "现有VS2022子进程环境，未安装/修改全局配置",
+    "linker": "E:/software/encoding/studio/.net/ide/VC/Tools/MSVC/14.42.34433/bin/Hostx64/x64/link.exe",
+    "operation": "cargo check --workspace --all-targets",
+    "log": "work/i02/gemini-local-cargo-check.log",
+    "currentStage": "tuna index remote queue; observed 53 to 47",
+    "qualification": "尚未编译完，未授予真实Runtime资格"
+  },
+  "githubBilling": {
+    "run": 38461101658,
+    "checkRun": 115516171718,
+    "status": "job_not_started",
+    "reason": "近期付款失败或支出限制，GitHub注释未进一步区分；源码编译未执行",
+    "customerTodo": "INPUT-GITHUB-CI"
+  }
 }

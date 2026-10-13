@@ -324,6 +324,7 @@ describe('member runtime parameters', () => {
     ['qoder-cli', '权限模式', 'bypass_permissions'],
     ['codebuddy-cli', '权限模式', 'bypassPermissions'],
     ['qwen-code', '审批模式', 'yolo'],
+    ['gemini-cli', '权限模式', 'yolo'],
     ['trae-cn-cli', '权限模式', 'bypass_permissions'],
     ['kimi-code-cli', '权限模式', 'yolo'],
     ['cline-cli', '执行模式', 'act'],
