@@ -10,7 +10,7 @@
 | Rovai Windows原生Server CI | 全部成功 | 构建main提交9d1ad55；development-preview，不是正式发布 |
 | 原生包ZIP与manifest | 通过 | SHA256一致，213个文件逐项校验 |
 | 本机真实Host HTTP/SSE/SQLite | 12项通过 | 新隔离数据根，无真实AI执行；明细见windows-host-result.json |
-| Codeg Windows原生Server | 重新构建中 | 初次CI工具版本路径冲突已修；不改供体packageManager |
+| Codeg Windows原生Server | CI构建和隔离认证健康检查通过 | 不改固定供体源码；未启动真实AI，本机未运行Codeg桌面 |
 | 本地Rust原生编译 | 未通过 | MSVC link.exe缺失，用户全局环境未修改 |
 | 旧数据导入/回滚 | 6项设计夹具 | 尚未执行迁移，不以空库检查替代历史升级 |
 | Mac/移动设备 | 设备实测暂挂 | 用户稍后提供ADB；没有使用旧设备 |
@@ -29,3 +29,5 @@ I00复核发现的固定ID校验和提交差异校验缺口已修，私有仓凭
 资源逐项状态、负责人和最迟使用阶段见resource-status.json；基准日期是排期约束，客户未承诺设备到位日期，等待将顺延有关测试。
 
 迁移身份自审发现设计示例误用普通UUID，已改为源合同合法Thread示例，并直接复用源isThreadId校验。合法示例通过，普通UUID、错误UUID版本和大写拼写均拒绝。生产对象仍须从Core创建命令取得身份。storage-map.json核对8项Codeg实体与7张实际Core表的字段，只读schema，不含业务数据。
+
+Codeg源Server结果见codeg-server-result.json，工作流38382011684完整成功。GitHub artifact摘要是平台提供值，下载后的EXE另记SHA256；没有把两者混成相同文件的校验。
