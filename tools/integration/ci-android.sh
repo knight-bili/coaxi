@@ -43,8 +43,13 @@ PY
 export ANDROID_USER_HOME="$RUNNER_TEMP/foundation-android-config"
 export ANDROID_AVD_HOME="$RUNNER_TEMP/foundation-avds"
 mkdir -p "$ANDROID_USER_HOME" "$ANDROID_AVD_HOME"
-"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'system-images;android-36;google_apis;x86_64' 'emulator' > "$evidence/sdk-install.log" 2>&1
-echo no | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd -n foundation-api36 -p "$ANDROID_AVD_HOME/foundation-api36.avd" -k 'system-images;android-36;google_apis;x86_64' --device pixel_6 > "$evidence/avd.log" 2>&1
+image='system-images;android-36;default;x86_64'
+printf '%s\n' "$image" > "$evidence/system-image.txt"
+"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "$image" 'emulator' 'platform-tools' > "$evidence/sdk-install.log" 2>&1
+export PATH="$ANDROID_HOME/platform-tools:$PATH"
+test -x "$ANDROID_HOME/platform-tools/adb"
+adb version > "$evidence/adb-version.txt"
+echo no | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd -n foundation-api36 -p "$ANDROID_AVD_HOME/foundation-api36.avd" -k "$image" --device pixel_6 > "$evidence/avd.log" 2>&1
 python3 - "$ANDROID_AVD_HOME/foundation-api36.avd/config.ini" <<'PY'
 from pathlib import Path
 import sys
@@ -61,7 +66,9 @@ df -h "$RUNNER_TEMP" > "$evidence/space-before-emulator.txt"
 emulator_pid=$!
 trap 'kill "$emulator_pid" >/dev/null 2>&1 || true' EXIT
 export ANDROID_SERIAL=emulator-5554
-timeout 300s bash -c 'adb wait-for-device; until [[ "$(adb shell getprop sys.boot_completed | tr -d "\r")" == 1 ]]; do sleep 2; done'
+sleep 5
+kill -0 "$emulator_pid"
+timeout 300s bash -e -c 'adb wait-for-device; until [[ "$(adb shell getprop sys.boot_completed | tr -d "\r")" == 1 ]]; do sleep 2; done'
 adb install "$evidence/app-debug.apk" > "$evidence/install.txt"
 adb shell am start -W -n app.codeg.android.debug/app.codeg.android.MainActivity > "$evidence/launch.txt"
 sleep 5
