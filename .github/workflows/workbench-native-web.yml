@@ -14,7 +14,7 @@ permissions:
 
 concurrency:
   group: workbench-native-web-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   native-web:
@@ -54,6 +54,10 @@ jobs:
           "$ROVAI_REVIEW_CHROME" --version
       - name: Install locked dependencies
         run: pnpm install --frozen-lockfile
+      - name: Verify isolated pinned Gemini ACP without credentials
+        run: |
+          npm install --prefix "$RUNNER_TEMP/gemini-runtime-0.60.0" --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org @google/gemini-cli@0.60.0
+          node tools/integration/smoke-gemini-acp.mjs "$RUNNER_TEMP/gemini-runtime-0.60.0/node_modules/@google/gemini-cli" "$ROVAI_HOST_WEB_LIVE_OUTPUT/gemini"
       - name: Compile Core and shared production pages
         run: |
           pnpm core:build:debug
@@ -69,6 +73,8 @@ jobs:
           name: workbench-native-web-${{ matrix.arch }}
           path: |
             ${{ env.ROVAI_HOST_WEB_LIVE_OUTPUT }}/native-test.log
+            ${{ env.ROVAI_HOST_WEB_LIVE_OUTPUT }}/desktop-startup-state.json
+            ${{ env.ROVAI_HOST_WEB_LIVE_OUTPUT }}/desktop-startup-failure.png
             ${{ env.ROVAI_HOST_WEB_LIVE_OUTPUT }}/desktop-web-live.json
             ${{ env.ROVAI_HOST_WEB_LIVE_OUTPUT }}/desktop-day.png
             ${{ env.ROVAI_HOST_WEB_LIVE_OUTPUT }}/desktop-night.png
@@ -76,5 +82,6 @@ jobs:
             ${{ env.ROVAI_HOST_WEB_LIVE_OUTPUT }}/web-night.png
             ${{ env.ROVAI_HOST_WEB_LIVE_OUTPUT }}/web-independent-input.png
             ${{ env.ROVAI_HOST_WEB_LIVE_OUTPUT }}/web-after-reauth.png
+            ${{ env.ROVAI_HOST_WEB_LIVE_OUTPUT }}/gemini/*/result.json
           if-no-files-found: warn
           retention-days: 3

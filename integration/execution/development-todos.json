@@ -6,11 +6,11 @@
     {
       "id": "DEV-HOST-WEB-LIVE-API",
       "task": "I01-T03/I02-T01",
-      "status": "source_rewritten_native_Mac_CI_pending",
+      "status": "native_Mac_startup_failure_diagnostics_added_retry_pending",
       "file": "scripts/lib/host-web-live.test.mjs:52",
-      "problem": "旧SQL草稿和未公开Pending已移除，改为当前客户端快照与阅读记录无撤回；完整Mac夹具和等待投递撤回成功仍需实际运行",
+      "problem": "Mac x64源码编译通过，但真实Desktop启动等待ready失败；已补安全Supervisor取证，下一次按错误码修复；ARM取消未运行断言",
       "owner": "研发",
-      "evidence": "i02-native-fixture-repair-result.json；Windows生产Web+真实Host19项通过，原生脚本仅语法通过；专用双Mac CI等待运行"
+      "evidence": "i02-native-fixture-repair-result.json：38447189169/115468536548，native-test.log已下载；不扩大timeout或放宽断言假通过"
     },
     {
       "id": "DEV-WEB-LEGACY-DRAFT-RECOVERY",

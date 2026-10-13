@@ -13,8 +13,8 @@
   "authorization": "客户要求持续自动推进；本项目阶段提交、推送及草稿PR自动执行；main合并与正式发布仍由客户控制",
   "current_branch": "phase/i02-workbench",
   "base_branch": "phase/i01-foundation",
-  "current_task": "I02-T01",
-  "current_slice": "工程导航整改及21种Runtime融合准入盘点",
+  "current_task": "I02-T02",
+  "current_slice": "Gemini原生协议证据与Core适配准备；Mac启动失败取证",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,10 +33,9 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "运行双Mac原生Desktop/Web夹具并按真实失败修复",
-    "I02-T02移植Core缺少的Gemini/Hermes/OpenClaw，准备隔离Runtime证明",
-    "补齐I02-T01导航差异及附件/异常退出恢复",
-    "I02-T03 Skills/MCP",
+    "核查补充取证后的Mac启动状态并修复真正原因",
+    "沿已验证Gemini模型/权限/认证/恢复合同接Core，完成Hermes/OpenClaw适配",
+    "补T01导航差异/附件/异常退出；T03 Skills/MCP",
     "按原依赖推进I03至I12"
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
@@ -47,5 +46,6 @@
   "legacy_evidence": "i02-legacy-draft-result.json",
   "draft_restart_evidence": "i02-draft-restart-result.json",
   "runtime_inventory_evidence": "i02-runtime-inventory-result.json",
-  "native_fixture_evidence": "i02-native-fixture-repair-result.json"
+  "native_fixture_evidence": "i02-native-fixture-repair-result.json",
+  "gemini_native_evidence": "i02-gemini-native-result.json"
 }

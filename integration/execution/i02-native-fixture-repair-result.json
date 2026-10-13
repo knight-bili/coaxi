@@ -2,11 +2,11 @@
   "schema_version": 1,
   "date": "2026-10-14",
   "task": "I02-T01",
-  "status": "source_rewritten_native_Mac_CI_pending",
+  "status": "native_Mac_startup_failure_diagnostics_added_retry_pending",
   "files": [
     {
       "file": "scripts/lib/host-web-live.test.mjs",
-      "sha256": "61c3bcbee9d969bb076c3685c72378e2bd93867b244df8fd09300603f6462f52"
+      "sha256": "6b9a149711789ee66b5beb17a8e1aa133eba42674bfebea40726d162023436f7"
     },
     {
       "file": "apps/desktop/src/renderer/src/ThreadWorkspace.tsx",
@@ -18,14 +18,16 @@
     },
     {
       "file": ".github/workflows/workbench-native-web.yml",
-      "sha256": "7ee3f1a823ae8932eaa547347a65f65b0dbdac34b5074917867c4f8cf7d99e0a"
+      "sha256": "41177d868f1b16858d92c409f536d6ff905d2087cbb35d593d98c364436bbbdb"
     }
   ],
   "changes": [
     "移除退役Core public草稿与未公开Pending的直接SQL写入",
     "Desktop及两个Web编辑身份按当前客户端快照检查独立正文",
     "阅读记录无投递时不显示等待/撤回；拒绝命令保持消息及所有草稿",
-    "保留重新认证DOM身份、附件、管理页、文件预览引用及双主题断言"
+    "保留重新认证DOM身份、附件、管理页、文件预览引用及双主题断言",
+    "启动失败时采集仅含状态/阶段/错误码的Supervisor快照和启动页，保持ready断言与原超时预算",
+    "双Mac工作流同时执行独立Gemini初始化/空认证拒绝探测；只上传无凭据result"
   ],
   "passed": {
     "liveCoreProductionWebChecks": 19,
@@ -74,5 +76,22 @@
       "sha256": "8e76b8d96706f712f3f68e5890ad27d89a3fdb36576107ec7d7dc4d908e2cd47",
       "review": "无待处理回执和撤回按钮，容量错误后的草稿仍在输入框"
     }
-  ]
+  ],
+  "nativeMacCI": {
+    "runId": 38447189169,
+    "head": "1292c8883e3ac5453c6bfd9ed4477258723fc65c",
+    "x64": {
+      "jobId": 115468536548,
+      "sourceBuild": "passed",
+      "fixture": "failed",
+      "stage": "native startup",
+      "failure": "fullCoreState ready等待超时；原日志无Supervisor状态，尚不能确定Core原因"
+    },
+    "arm64": {
+      "jobId": 115468537049,
+      "status": "cancelled",
+      "assertions": "not_run",
+      "cancellationReason": "not_established"
+    }
+  }
 }

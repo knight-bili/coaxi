@@ -186,7 +186,13 @@
       "authentication": "not_checked",
       "actualInference": "not_run",
       "coreAdapter": "not_in_current_Core_AdapterKind",
-      "version": null
+      "version": null,
+      "isolatedNativeProbe": {
+        "version": "0.60.0",
+        "status": "6_checks_passed_bootstrap_rejection_only",
+        "coreAdapter": "not_implemented",
+        "evidence": "i02-gemini-native-result.json"
+      }
     },
     {
       "id": "grok",

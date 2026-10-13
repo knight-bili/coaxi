@@ -293,6 +293,12 @@ test('actual Desktop and browser share Camp geometry while three drafts and reau
     await writeFile(join(output, 'desktop-web-live.json'), JSON.stringify({ ...evidence, coreAliveAfterWebStop: true }, null, 2))
     console.log(JSON.stringify({ ...evidence, coreAliveAfterWebStop: true }))
   } catch (error) {
+    if (desktop && stage === 'native startup') {
+      const startup = await desktop.evaluate(`window.rovai.supervisor.getSnapshot().then(s=>({schemaVersion:s.schemaVersion,runtimeMode:s.runtimeMode,fullCoreState:s.fullCoreState,authorityKind:s.authorityState.kind,startupPhase:s.startupPhase,lastErrorCode:s.lastError?.code??null,subsystems:s.coreSubsystems.map(item=>({id:item.id,state:item.state,errorCode:item.error?.code??null}))}))`).catch(() => null)
+      await writeFile(join(output, 'desktop-startup-state.json'), JSON.stringify({ stage, snapshot: startup }, null, 2))
+      await desktop.capture(join(output, 'desktop-startup-failure.png')).catch(() => undefined)
+      console.log(JSON.stringify({ stage, startup }))
+    }
     if (web) await web.capture(join(output, 'web-failure.png')).catch(() => undefined)
     throw new Error(`Live acceptance at ${stage}: ${error.message}`, { cause: error })
   } finally {

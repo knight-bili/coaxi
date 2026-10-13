@@ -22,3 +22,9 @@
 当前本机仅发现 Codex、Claude Code、OpenClaw 三个入口。Codex 登录状态已只读核实有效，未复制凭据；其余认证未检查。18个入口没有出现在当前 PATH，不能推断未安装。全部21种 Core 准入及真实模型验证仍为 `not_run`，Mac/Linux 与客户实机仍须补齐。
 
 等待投递撤回成功路径依赖可控的领取前窗口，保留在 [研发待办](development-todos.json)。阅读记录没有投递；正式发布的快速领取试验产生了一条失败 Run，没有真实模型运行证明。不能以这两种数据替代撤回成功、真实流式或恢复验收。
+
+## Gemini固定版本的已验证输入
+
+固定Codeg使用@google/gemini-cli@0.60.0，官方tag对应733edcb597ce690ac2e2fe3b3b3690b60a4c8f27。已在独立安装和GEMINI_CLI_HOME验证真实--acp --skip-trust进程：initialize返回协议1、gemini-cli/0.60.0及四种认证方法；刻意空认证的session/new返回-32000，没有成功Session。强制独立文件凭据存储、未继承认证环境，进程正常退出。见[i02-gemini-native-result.json](i02-gemini-native-result.json)。
+
+上游session/new/load成功响应包含models.availableModels/currentModelId和modes.availableModes/currentModeId；plan仅在原生启用时出现。Core需沿已有ACP模型映射及会话生命周期接入，产品启动使用已验证的两个参数，不能复用Qwen的--mcp-config启动参数而假定Gemini支持。初始化中的loadSession/图片音频/MCP是宣告，真实模型、流式、停止、恢复和工具均未通过；Core仍未增加gemini-cli，移植任务保持实施中。
