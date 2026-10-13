@@ -14,7 +14,7 @@
   "current_branch": "phase/i02-workbench",
   "base_branch": "phase/i01-foundation",
   "current_task": "I02-T02",
-  "current_slice": "Gemini Core接入及本机MSVC编译验证；GitHub付款限制记待办",
+  "current_slice": "Gemini Core本机编译、499默认回归与32扩展检查通过；继续Hermes移植与T01/T03，跨平台和真实资格待补",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,9 +33,9 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "继续当前本机Cargo操作，不因镜像队列超时重启；完成后运行Gemini/迁移owner",
-    "继续不依赖GitHub的成员/Provider与T01/T03开发",
-    "后续处理GitHub付款/支出限制，补Mac/Linux/原生资格；再依原计划推进I03-I12"
+    "Hermes固定源码与桥接来源已核对，沿Core接入；继续T01/T03和OpenClaw",
+    "GitHub恢复后执行Unix原生模型方法owner、Mac/Linux及Desktop ready资格",
+    "补真实模型/停止恢复/MCP与客户资源；沿I03-I12推进"
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
@@ -47,5 +47,6 @@
   "runtime_inventory_evidence": "i02-runtime-inventory-result.json",
   "native_fixture_evidence": "i02-native-fixture-repair-result.json",
   "gemini_native_evidence": "i02-gemini-native-result.json",
-  "gemini_core_evidence": "i02-gemini-core-result.json"
+  "gemini_core_evidence": "i02-gemini-core-result.json",
+  "hermes_source_evidence": "i02-hermes-source-result.json"
 }

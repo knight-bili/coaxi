@@ -434,7 +434,7 @@
   ],
   "currentFusion": {
     "sourceDeclaredAdapters": 19,
-    "status": "Rust_validation_pending",
+    "status": "Windows_Rust_compile_and_regressions_passed_real_qualification_pending",
     "remainingPorts": [
       "hermes",
       "open_claw"

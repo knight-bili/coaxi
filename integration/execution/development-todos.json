@@ -32,8 +32,8 @@
     {
       "id": "DEV-CORE-RUNTIME-UNION",
       "task": "I02-T02",
-      "status": "gemini_source_implemented_Rust_validation_pending",
-      "problem": "Gemini Core与共享客户端已接入源码、schema147原子迁移；Rust/真实资格待验，Hermes/OpenClaw继续待移植",
+      "status": "gemini_Windows_Rust_regressions_passed_real_and_cross_platform_pending",
+      "problem": "Gemini Core/schema147与共享客户端已接入，Windows编译/迁移/499默认与32扩展检查通过；Unix原生配置和真实资格待补，Hermes/OpenClaw继续移植",
       "evidence": "i02-gemini-core-result.json；21来源不删减，未把旧平台资格或bootstrap当真实执行",
       "owner": "研发"
     }

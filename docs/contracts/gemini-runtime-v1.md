@@ -15,7 +15,7 @@ last_updated: 2026-10-14
 
 AdapterKind 为 `gemini-cli`，发现命令 `gemini`，显式程序覆盖键 `ROVAI_GEMINI_BIN`。本批依据固定 Codeg 的 `@google/gemini-cli@0.60.0` 和官方同名 tag。ACP 启动为 `--acp --skip-trust`；模型用当前用户选择的原生模型 ID，权限使用 `approval_mode`。配置与 MCP 投递不写全局 settings；后者经既有 ACP session/new/load 合同附加，来源同名服务器被当前投递覆盖。
 
-模型目录从已认证 Session 的 `models.availableModels/currentModelId` 读取，不从初始化宣告虚构模型。权限模式只采用原生 Session 实际提供的 `default`、`auto_edit`、`yolo` 和条件性 `plan`；未提供 plan 时不在有效权限目录展示。缺失、重复或不支持的模式拒绝 Ready，不能悄悄套用其他产品的权限配置。
+模型目录从已认证 Session 的 `models.availableModels/currentModelId` 读取，不从初始化宣告虚构模型。显式模型在启动参数 `--model` 之外，经原生 `session/set_model` 确认；不能发送来源未实现的 `session/set_config_option`。原生拒绝后不切换替代模型或新建替代 Session。权限模式只采用原生 Session 实际提供的 `default`、`auto_edit`、`yolo` 和条件性 `plan`；未提供 plan 时不在有效权限目录展示。缺失、重复或不支持的模式拒绝 Ready，不能悄悄套用其他产品的权限配置。
 
 会话恢复、取消、结构化批准、首次正文 Charter 和显式公屏发送沿 [Runtime Launch v60](runtime-launch-and-verification-v60.md) 及当前 ACP 实现。只有实际验证后才能授予平台运行资格；本批初始化/空认证拒绝不等于真实模型、流式、停止、恢复或工具已可用。压缩检测保持未验证禁用，后续须按实际原生信号补齐。
 

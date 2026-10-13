@@ -4817,7 +4817,7 @@ impl AcpRuntime {
                 // CodeBuddy omits it from set_config_option's built-in choices.
             } else if matches!(
                 self.host.adapter_kind,
-                AdapterKind::KiroCli | AdapterKind::GrokBuild
+                AdapterKind::KiroCli | AdapterKind::GrokBuild | AdapterKind::GeminiCli
             ) {
                 self.set_model(&session_id, model).await?;
             } else {
@@ -8540,6 +8540,107 @@ mod route_policy_tests {
             &mcp_request
         ));
     }
+
+    #[test]
+    fn acp_bypass_modes_auto_allow_protocol_permission_requests() {
+        let automatic = [
+            (
+                AdapterKind::ClineCli,
+                json!({"mode":"act","auto_approve":"true"}),
+            ),
+            (AdapterKind::OpencodeCli, json!({"permission": "allow"})),
+            (AdapterKind::CopilotCli, json!({"allow_all": "on"})),
+            (AdapterKind::KiroCli, json!({"trust_all_tools": "on"})),
+            (
+                AdapterKind::QoderCli,
+                json!({"permission_mode": "bypass_permissions"}),
+            ),
+            (
+                AdapterKind::CodebuddyCli,
+                json!({"permission_mode": "bypassPermissions"}),
+            ),
+            (AdapterKind::QwenCode, json!({"approval_mode": "yolo"})),
+            (AdapterKind::GeminiCli, json!({"approval_mode": "yolo"})),
+            (
+                AdapterKind::TraeCnCli,
+                json!({"permission_mode": "bypass_permissions"}),
+            ),
+            (
+                AdapterKind::CursorAgent,
+                json!({"execution_mode": "agent", "approval_policy": "force"}),
+            ),
+            (AdapterKind::KimiCodeCli, json!({"permission_mode": "yolo"})),
+            (
+                AdapterKind::GrokBuild,
+                json!({"permission_mode": "bypassPermissions"}),
+            ),
+        ];
+        for (adapter_kind, permissions) in automatic {
+            assert!(
+                automatically_allows_permission_requests(adapter_kind, &permissions),
+                "{} bypass mode must not create a second Core authorization",
+                adapter_kind.as_str()
+            );
+        }
+
+        let interactive = [
+            (
+                AdapterKind::ClineCli,
+                json!({"mode":"act","auto_approve":"false"}),
+            ),
+            (
+                AdapterKind::ClineCli,
+                json!({"mode":"plan","auto_approve":"true"}),
+            ),
+            (
+                AdapterKind::DeepseekHarness,
+                json!({"approval_policy": "ask"}),
+            ),
+            // Native `never` rejects escalation; it is not an ACP bypass mode.
+            (
+                AdapterKind::DeepseekHarness,
+                json!({"approval_policy": "never"}),
+            ),
+            (AdapterKind::OpencodeCli, json!({"permission": "ask"})),
+            (AdapterKind::CopilotCli, json!({"allow_all": "off"})),
+            (AdapterKind::KiroCli, json!({"trust_all_tools": "off"})),
+            (AdapterKind::QoderCli, json!({"permission_mode": "default"})),
+            (
+                AdapterKind::CodebuddyCli,
+                json!({"permission_mode": "default"}),
+            ),
+            (AdapterKind::QwenCode, json!({"approval_mode": "default"})),
+            (AdapterKind::GeminiCli, json!({"approval_mode": "default"})),
+            (
+                AdapterKind::GeminiCli,
+                json!({"approval_mode": "auto_edit"}),
+            ),
+            (AdapterKind::GeminiCli, json!({"approval_mode": "plan"})),
+            (
+                AdapterKind::TraeCnCli,
+                json!({"permission_mode": "default"}),
+            ),
+            (
+                AdapterKind::CursorAgent,
+                json!({"execution_mode": "agent", "approval_policy": "default"}),
+            ),
+            (
+                AdapterKind::KimiCodeCli,
+                json!({"permission_mode": "default"}),
+            ),
+            (
+                AdapterKind::GrokBuild,
+                json!({"permission_mode": "default"}),
+            ),
+        ];
+        for (adapter_kind, permissions) in interactive {
+            assert!(
+                !automatically_allows_permission_requests(adapter_kind, &permissions),
+                "{} interactive mode must preserve its ACP permission request",
+                adapter_kind.as_str()
+            );
+        }
+    }
 }
 
 #[cfg(all(test, feature = "extended-tests"))]
@@ -11885,7 +11986,12 @@ while IFS= read -r ignored; do :; done
 
     #[tokio::test]
     async fn real_acp_session_catalog_rejects_a_missing_explicit_model_without_fallback() {
-        for configuration_rejected in [false, true] {
+        for (adapter_kind, configuration_rejected) in [
+            (AdapterKind::TraeCnCli, false),
+            (AdapterKind::TraeCnCli, true),
+            (AdapterKind::GeminiCli, false),
+            (AdapterKind::GeminiCli, true),
+        ] {
             let root = std::env::temp_dir().join(format!(
                 "rovai-acp-live-model-validation-{}",
                 uuid::Uuid::new_v4()
@@ -11894,17 +12000,32 @@ while IFS= read -r ignored; do :; done
             let executable = root.join("traecli");
             make_executable(
                 &executable,
-                r#"#!/bin/sh
+                &r#"#!/bin/sh
 IFS= read -r initialize || exit 1
 printf '%s\n' '{"jsonrpc":"2.0","id":1,"result":{"protocolVersion":1,"agentCapabilities":{}}}'
 IFS= read -r session || exit 1
 printf '%s\n' '{"jsonrpc":"2.0","id":2,"result":{"modes":{"currentModeId":"default","availableModes":[{"id":"default","name":"Default"}]},"sessionId":"session-live-model","models":{"currentModelId":"trae-default","availableModels":[{"modelId":"trae-default","name":"TRAE Default"}]}}}'
 IFS= read -r configuration || exit 1
-printf '%s\n' '{"jsonrpc":"2.0","id":3,"error":{"code":-32602,"message":"configuration refused after successful resume"}}'
+case "$configuration" in
+    *'__NATIVE_MODEL_METHOD__'*) printf '%s\n' '{"jsonrpc":"2.0","id":3,"error":{"code":-32602,"message":"configuration refused after successful resume"}}' ;;
+    *) printf '%s\n' '{"jsonrpc":"2.0","id":3,"error":{"code":-32601,"message":"wrong native model method"}}' ;;
+esac
 while IFS= read -r ignored; do :; done
-"#,
+"#
+                .replace(
+                    "__NATIVE_MODEL_METHOD__",
+                    if adapter_kind == AdapterKind::GeminiCli {
+                        "session/set_model"
+                    } else {
+                        "session/set_config_option"
+                    },
+                ),
             );
-            let frozen = frozen_trae_runtime(&executable);
+            let mut frozen = frozen_trae_runtime(&executable);
+            frozen.adapter_kind = adapter_kind;
+            if adapter_kind == AdapterKind::GeminiCli {
+                frozen.permissions.values = json!({"approval_mode": "yolo"});
+            }
             let workspace =
                 AgentRunWorkspace::runtime_managed_path(root.to_string_lossy().to_string());
             let (incoming, _receiver) = mpsc::unbounded_channel();
@@ -14041,100 +14162,6 @@ while IFS= read -r ignored; do :; done
             approval_result(&request, "reject").expect("denial should map"),
             json!({"outcome": {"outcome": "selected", "optionId": "reject"}})
         );
-    }
-
-    #[test]
-    fn acp_bypass_modes_auto_allow_protocol_permission_requests() {
-        let automatic = [
-            (
-                AdapterKind::ClineCli,
-                json!({"mode":"act","auto_approve":"true"}),
-            ),
-            (AdapterKind::OpencodeCli, json!({"permission": "allow"})),
-            (AdapterKind::CopilotCli, json!({"allow_all": "on"})),
-            (AdapterKind::KiroCli, json!({"trust_all_tools": "on"})),
-            (
-                AdapterKind::QoderCli,
-                json!({"permission_mode": "bypass_permissions"}),
-            ),
-            (
-                AdapterKind::CodebuddyCli,
-                json!({"permission_mode": "bypassPermissions"}),
-            ),
-            (AdapterKind::QwenCode, json!({"approval_mode": "yolo"})),
-            (
-                AdapterKind::TraeCnCli,
-                json!({"permission_mode": "bypass_permissions"}),
-            ),
-            (
-                AdapterKind::CursorAgent,
-                json!({"execution_mode": "agent", "approval_policy": "force"}),
-            ),
-            (AdapterKind::KimiCodeCli, json!({"permission_mode": "yolo"})),
-            (
-                AdapterKind::GrokBuild,
-                json!({"permission_mode": "bypassPermissions"}),
-            ),
-        ];
-        for (adapter_kind, permissions) in automatic {
-            assert!(
-                automatically_allows_permission_requests(adapter_kind, &permissions),
-                "{} bypass mode must not create a second Core authorization",
-                adapter_kind.as_str()
-            );
-        }
-
-        let interactive = [
-            (
-                AdapterKind::ClineCli,
-                json!({"mode":"act","auto_approve":"false"}),
-            ),
-            (
-                AdapterKind::ClineCli,
-                json!({"mode":"plan","auto_approve":"true"}),
-            ),
-            (
-                AdapterKind::DeepseekHarness,
-                json!({"approval_policy": "ask"}),
-            ),
-            // Native `never` rejects escalation; it is not an ACP bypass mode.
-            (
-                AdapterKind::DeepseekHarness,
-                json!({"approval_policy": "never"}),
-            ),
-            (AdapterKind::OpencodeCli, json!({"permission": "ask"})),
-            (AdapterKind::CopilotCli, json!({"allow_all": "off"})),
-            (AdapterKind::KiroCli, json!({"trust_all_tools": "off"})),
-            (AdapterKind::QoderCli, json!({"permission_mode": "default"})),
-            (
-                AdapterKind::CodebuddyCli,
-                json!({"permission_mode": "default"}),
-            ),
-            (AdapterKind::QwenCode, json!({"approval_mode": "default"})),
-            (
-                AdapterKind::TraeCnCli,
-                json!({"permission_mode": "default"}),
-            ),
-            (
-                AdapterKind::CursorAgent,
-                json!({"execution_mode": "agent", "approval_policy": "default"}),
-            ),
-            (
-                AdapterKind::KimiCodeCli,
-                json!({"permission_mode": "default"}),
-            ),
-            (
-                AdapterKind::GrokBuild,
-                json!({"permission_mode": "default"}),
-            ),
-        ];
-        for (adapter_kind, permissions) in interactive {
-            assert!(
-                !automatically_allows_permission_requests(adapter_kind, &permissions),
-                "{} interactive mode must preserve its ACP permission request",
-                adapter_kind.as_str()
-            );
-        }
     }
 
     #[test]

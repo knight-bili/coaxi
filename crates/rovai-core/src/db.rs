@@ -41455,9 +41455,10 @@ mod tests {
             let (mut database, directory) = crate::test_support::seeded_runtime_database();
             user_anchors::downgrade_for_test(database.connection());
             let native_description = if version == 186 {
+                let project_path = directory.to_string_lossy();
                 let created = crate::mission::MissionService::default().create(&mut database, &crate::command::CommandEnvelope {
                     command_id: "main-185-migration".into(), actor: crate::command::ActorRef::User{user_id:"local_user".into()}, camp_id:None, expected_versions:vec![],execution_epoch:None,
-                    payload: serde_json::from_value(serde_json::json!({"title":"Preserved", "descriptionContent":[{"kind":"text","text":"literal @名字\n"},{"kind":"member_mention","agentId":"agent_1"}], "projectPath":"/tmp", "projectBindingKind":"directory", "memberAgentIds":["agent_1"], "defaultLeadAgentId":"agent_1"})).unwrap(),
+                    payload: serde_json::from_value(serde_json::json!({"title":"Preserved", "descriptionContent":[{"kind":"text","text":"literal @名字\n"},{"kind":"member_mention","agentId":"agent_1"}], "projectPath":project_path, "projectBindingKind":"directory", "memberAgentIds":["agent_1"], "defaultLeadAgentId":"agent_1"})).unwrap(),
                 }).unwrap();
                 let id = created.result.payload["missionId"]
                     .as_str()
