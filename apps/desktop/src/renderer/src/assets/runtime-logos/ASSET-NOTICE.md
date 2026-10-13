@@ -68,5 +68,5 @@ Hermes Agent: `hermes-agent.svg` is copied without changes from
 `spacering-net/codeg` commit `aff1e6c278453ed8d0b96a5f664edcdca621aa3f`,
 `docs/images/agents/hermes-agent.svg` (Codeg MIT license retained in
 `integration/licenses/codeg/`). SHA256:
-`dd886d1aa4526db9b1e44f34f47c828d3606c5140d69143eea086801208b6e68`.
+`f660a2312f42c1d9d21daa5c7dfe1d666901030a42a469edc014678314d0ec8a`.
 The monochrome glyph uses Rovai's existing theme-colored Runtime mask.

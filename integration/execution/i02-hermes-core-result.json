@@ -30,7 +30,7 @@
       },
       {
         "file": "apps/desktop/src/renderer/src/assets/runtime-logos/ASSET-NOTICE.md",
-        "sha256": "f184d2b3581e9f424929a3a7bc2af308ec89d91883c22dc264f9b25cae06f03e"
+        "sha256": "0976cd89d699f4c27b943e3c0da2be27ed068ce7347f2a01e51dd5c62df5a79b"
       },
       {
         "file": "apps/desktop/src/renderer/src/runtime-products.ts",
@@ -130,7 +130,7 @@
       },
       {
         "file": "apps/desktop/src/renderer/src/assets/runtime-logos/hermes-agent.svg",
-        "sha256": "dd886d1aa4526db9b1e44f34f47c828d3606c5140d69143eea086801208b6e68"
+        "sha256": "f660a2312f42c1d9d21daa5c7dfe1d666901030a42a469edc014678314d0ec8a"
       },
       {
         "file": "docs/contracts/hermes-runtime-v1.md",
@@ -140,7 +140,13 @@
         "file": "tools/integration/smoke-hermes-acp.mjs",
         "sha256": "723372c5d538578f4d4c6c85f7ec674253bd17982c835cfabb7179607dd3b9fc"
       }
-    ]
+    ],
+    "logo": {
+      "file": "apps/desktop/src/renderer/src/assets/runtime-logos/hermes-agent.svg",
+      "gitBlobMatchesFixedSource": true,
+      "sha256": "f660a2312f42c1d9d21daa5c7dfe1d666901030a42a469edc014678314d0ec8a",
+      "lineEndings": "repository_LF"
+    }
   },
   "implemented": {
     "kind": "hermes-cli",
