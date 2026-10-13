@@ -6,11 +6,20 @@
     {
       "id": "DEV-HOST-WEB-LIVE-API",
       "task": "I01-T03/I02-T01",
-      "status": "pending",
+      "status": "message_contract_corrected_remaining_fixture_rewrite_pending",
       "file": "scripts/lib/host-web-live.test.mjs:52",
-      "problem": "原生Web验收脚本仍调用camp.composerDraft.get/save，当前锁定Host拒绝该调用；需按当前真实编辑器合同修正夹具并复验，不能伪造消息或放宽准入",
+      "problem": "消息初始化已改用threads.create/thread.messages.send，真实Host验证记录及回放；原生Mac脚本仍断言旧Core草稿SQL并注入已退役的未公开Pending，需按当前客户端草稿和已公开消息撤回合同重写并实际运行",
       "owner": "研发",
-      "evidence": "本次真实Host创建夹具阶段调用被拒绝；当前导航测试通过合法threads.create建立活跃空Thread，未覆盖发送消息"
+      "evidence": "真实Host接收八条受控用户消息，相同命令回放不重复，生产页面读取通过；完整Mac夹具未运行，不能把合同修正标记为整个夹具通过"
+    },
+    {
+      "id": "DEV-WEB-LEGACY-DRAFT-RECOVERY",
+      "task": "I02-T01/I12兼容整改",
+      "status": "pending",
+      "file": "apps/desktop/src/renderer/src/camp-composer-local-store.ts",
+      "problem": "旧Web origin共享草稿缺编辑身份，修复隔离后不能自动转给任一标签；旧记录保留，需设计并实现显式恢复，同时补测草稿的完整浏览器退出/恢复",
+      "owner": "研发",
+      "evidence": "同一浏览器两标签串读已复现并修复；当前验证同一编辑身份下刷新恢复，未声称完整浏览器重开能恢复旧草稿"
     }
   ]
 }

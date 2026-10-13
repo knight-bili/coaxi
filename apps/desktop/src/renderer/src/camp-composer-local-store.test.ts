@@ -6,7 +6,8 @@ import {
   loadLocalThreadComposerDraft,
   materializeLocalContinuation,
   nextLocalThreadComposerDraftAfterSend,
-  saveLocalThreadComposerDraft
+  saveLocalThreadComposerDraft,
+  threadComposerDraftStorage
 } from './camp-composer-local-store'
 
 class MemoryStorage implements Pick<Storage, 'getItem' | 'setItem' | 'removeItem'> {
@@ -28,6 +29,20 @@ const members = [
 ] as ThreadSnapshot['members']
 
 describe('local Thread Composer drafts', () => {
+  it('restores the same editor snapshot without reading another editor or deleting its draft', () => {
+    const entriesA = new Map<string, unknown>(), entriesB = new Map<string, unknown>()
+    const recovery = (entries: Map<string, unknown>) => ({ get: (key: string) => entries.get(key), set: (key: string, value: unknown) => value === null ? entries.delete(key) : entries.set(key, value) })
+    const a = threadComposerDraftStorage(recovery(entriesA))!
+    const b = threadComposerDraftStorage(recovery(entriesB))!
+    const draft = { ...emptyLocalThreadComposerDraft('same-thread'), body: 'private A', content: { version: 2 as const, segments: [{ kind: 'text' as const, text: 'private A' }] } }
+    saveLocalThreadComposerDraft(draft, a)
+    expect(loadLocalThreadComposerDraft('same-thread', b)).toBeNull()
+    const restoredA = threadComposerDraftStorage(recovery(entriesA))!
+    expect(loadLocalThreadComposerDraft('same-thread', restoredA)).toEqual(draft)
+    clearLocalThreadComposerDraft('same-thread', b)
+    expect(loadLocalThreadComposerDraft('same-thread', restoredA)).toEqual(draft)
+    expect(threadComposerDraftStorage()).toBeUndefined()
+  })
   it('keeps independent unsent state for each Thread and clears only the selected Thread', () => {
     const storage = new MemoryStorage()
     const campA: ThreadComposerDraftView = {

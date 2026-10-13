@@ -67,6 +67,23 @@ try {
     projects[name] = { path: workspace.projectPath, threadId }
   }
   record('real_core_fixture_created', { threads: 2, activation: 'active', messages: 0, runtimeConfigured: false })
+  stage = 'seed_current_message_contract'
+  const recordedMessages = []
+  for (let index = 1; index <= 8; index++) {
+    const params = { commandId: crypto.randomUUID(), threadId: projects['I02-工程-B'].threadId,
+      content: { version: 2, segments: [{ kind: 'text', text: `Controlled Host record ${index}.\n\n**真实记录**保留结构化文本。` }] },
+      sourceAttachments: [], quotes: [], replyToThreadMessageId: null, execution: null }
+    const sent = await call('thread.messages.send', params)
+    assert.equal(sent.commandResult.status, 'applied')
+    assert(sent.commandResult.payload.threadMessageId)
+    recordedMessages.push(sent.commandResult.payload.threadMessageId)
+    if (index === 1) {
+      const replay = await call('thread.messages.send', params)
+      assert.equal(replay.replayed, true)
+      assert.equal(replay.commandResult.payload.threadMessageId, recordedMessages[0])
+    }
+  }
+  record('current_message_contract_records_eight_messages_and_replays_once', { recordedMessages: 8, execution: null })
   stage = 'production_web_login'
   const env = { ...process.env }; delete env.ELECTRON_RUN_AS_NODE
   const launchBrowser = () => launchAcceptanceBrowser({ executable: browserBinary, args: ['--headless=new', '--no-first-run', '--no-default-browser-check', '--disable-background-networking', `--user-data-dir=${profile}`, '--remote-debugging-port=0', 'about:blank'], env })
@@ -195,7 +212,44 @@ try {
   record('production_browser_restart_restores_current_project', { login: needsLogin ? 'reauthenticated' : 'restored' })
   stage = 'capture'
   await browser.capture(path.join(output, 'project-B-real-host.png'))
-  finalResult = { status: 'passed', scope: 'production_web_real_host_navigation_no_runtime', stage, checks, screenshots: ['project-B-real-host.png'],
+  stage = 'production_thread_messages'
+  await browser.click(`document.querySelector('.quick-chat-continue-row')`)
+  await browser.wait(`document.querySelectorAll('[data-quote-owner="thread:${projects['I02-工程-B'].threadId}"][data-message-quote-body]').length === 8`)
+  for (let index = 0; index < recordedMessages.length; index++) {
+    const body = await browser.evaluate(`document.querySelector('[data-message-quote-body="${recordedMessages[index]}"]').textContent`)
+    assert(body.includes(`Controlled Host record ${index + 1}.`))
+    assert(body.includes('真实记录'))
+  }
+  assert.equal(browser.errors.length, 0)
+  record('production_thread_renders_real_recorded_messages')
+  await browser.capture(path.join(output, 'thread-real-host.png'))
+  stage = 'same_browser_tab_drafts'
+  const editor = `document.querySelector('.conversation-controls [contenteditable=true]')`
+  await browser.wait(`Boolean(${editor}) && ${editor}.getAttribute('contenteditable') === 'true'`)
+  await browser.click(editor)
+  await browser.send('Input.insertText', { text: 'I02_TAB_A_UNSENT' })
+  const storedDraft = `JSON.parse(sessionStorage.getItem('rovai.web.edits.v1') ?? 'null')?.entries?.['rovai.camp-composer-draft.v1:${projects['I02-工程-B'].threadId}']`
+  await browser.wait(`(${storedDraft})?.includes('I02_TAB_A_UNSENT') === true`)
+  const secondPage = await browser.newPage(origin)
+  await browser.wait(home('I02-工程-B'))
+  await browser.wait(`document.querySelectorAll('.quick-chat-continue-row').length === 1`)
+  await browser.click(`document.querySelector('.quick-chat-continue-row')`)
+  await browser.wait(`Boolean(${editor})`)
+  assert.equal(await browser.evaluate(`${editor}.textContent`), '', '同一浏览器的另一标签不能读到A的未发送文字')
+  await browser.click(editor)
+  await browser.send('Input.insertText', { text: 'I02_TAB_B_UNSENT' })
+  await browser.wait(`${editor}.textContent === 'I02_TAB_B_UNSENT'`)
+  await browser.wait(`(${storedDraft})?.includes('I02_TAB_B_UNSENT') === true`)
+  await browser.send('Page.reload')
+  await browser.wait(`${editor}?.textContent === 'I02_TAB_B_UNSENT'`)
+  browser.usePage()
+  assert.equal(await browser.evaluate(`${editor}.textContent`), 'I02_TAB_A_UNSENT')
+  await browser.send('Page.reload')
+  await browser.wait(`${editor}?.textContent === 'I02_TAB_A_UNSENT'`)
+  browser.usePage(secondPage)
+  assert.equal(await browser.evaluate(`${editor}.textContent`), 'I02_TAB_B_UNSENT')
+  record('same_browser_tabs_keep_unsent_text_private_and_restore_after_reload')
+  finalResult = { status: 'passed', scope: 'production_web_real_host_navigation_and_recorded_messages_no_runtime', stage, checks, screenshots: ['project-B-real-host.png', 'thread-real-host.png'],
     realAgent: 'not_run', customerAcceptance: 'not_run', profile, dataDir, skillRoot, mcpConfigPath: mcp }
 } catch (error) {
   const errorText = error instanceof Error ? String(error) : JSON.stringify({ code: error?.code, message: error?.message })

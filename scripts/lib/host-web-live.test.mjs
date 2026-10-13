@@ -45,13 +45,14 @@ test('actual Desktop and browser share Camp geometry while three drafts and reau
     await writeFile(join(projectPath, 'guide.md'), '# Images\n\n![Inline fixture](./inline.png)\n\n[Child guide](./child.md#details)')
     await writeFile(join(projectPath, 'child.md'), '# Details\n\nCHILD_GUIDE_MARKER')
     await writeFile(join(projectPath, 'inline.png'), Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScLbtAAAAABJRU5ErkJggg==', 'base64'))
-    const projectWorkspace = { projectPath, name: 'owner-project' } // Fixture path; actual browser inspection below uses HTTP/Core.
-    const created = await request('camps.create', { commandId: crypto.randomUUID(), name: 'Desktop and Web live parity', workspace: projectWorkspace, memberAgentIds: [profiles[0].agentId], defaultLeadAgentId: profiles[0].agentId, collaborationMode: 'peer' })
+    const projectWorkspace = await request('workspaces.inspect', { path: projectPath })
+    const created = await request('threads.create', { commandId: crypto.randomUUID(), name: 'Desktop and Web live parity', workspace: { projectPath: projectWorkspace.projectPath }, memberAgentIds: [profiles[0].agentId], defaultLeadAgentId: profiles[0].agentId, collaborationMode: 'peer' })
     assert.equal(created.status, 'applied', JSON.stringify(created)); const threadId = created.payload.threadId
     for (let i = 1; i <= 8; i++) {
-      const draft = await request('camp.composerDraft.get', { threadId })
-      const saved = await request('camp.composerDraft.save', { threadId, expectedRevision: draft.revision, content: { version: 2, segments: [{ kind: 'text', text: `Controlled Host record ${i}.\n\n**Shared production Camp** preserves message structure and reading position.\n\n\`commandId\` belongs to Rust Host.\n\n${i === 1 ? '[Preview guide](./guide.md#images)' : ''}` }] } })
-      await request('camp.messages.send', { commandId: crypto.randomUUID(), threadId, draftRevision: saved.revision, execution: null })
+      const sent = await request('thread.messages.send', { commandId: crypto.randomUUID(), threadId,
+        content: { version: 2, segments: [{ kind: 'text', text: `Controlled Host record ${i}.\n\n**Shared production Camp** preserves message structure and reading position.\n\n\`commandId\` belongs to Rust Host.\n\n${i === 1 ? '[Preview guide](./guide.md#images)' : ''}` }] },
+        sourceAttachments: [], quotes: [], replyToThreadMessageId: null, execution: null })
+      assert.equal(sent.commandResult.status, 'applied', JSON.stringify(sent))
     }
     const choose = async browser => {
       console.log(JSON.stringify({ stage: 'show acceptance surface', surface: browser === desktop ? 'desktop' : 'browser', visibility: await browser.evaluate('document.visibilityState') }))

@@ -88,7 +88,7 @@ import {
   type VisibleNotificationSources
 } from './ThreadWorkspace'
 import { composerDocumentToStructuredContent } from './composer-document'
-import { clearLocalThreadComposerDraft } from './camp-composer-local-store'
+import { clearLocalThreadComposerDraft, threadComposerDraftStorage } from './camp-composer-local-store'
 import {
   ThreadNavigation,
   type NavigationSettingsSection
@@ -3801,7 +3801,7 @@ export function BusinessApp({
       setNavigation(nextNavigation)
     }
     setPinnedThreadItems((current) => current.filter((thread) => thread.id !== threadId))
-    clearLocalThreadComposerDraft(threadId)
+    clearLocalThreadComposerDraft(threadId, threadComposerDraftStorage(client.editingRecovery))
     forgetMemberCreationDraft(threadId)
     const discardComposerAttachments = client.composerAttachments.discard?.(threadId)
     if (discardComposerAttachments) void discardComposerAttachments.catch(() => undefined)
@@ -3828,7 +3828,7 @@ export function BusinessApp({
       throw new Error(commandFailureMessage(result))
     }
     if (result.status !== 'rejected') {
-      clearLocalThreadComposerDraft(draft.threadId)
+      clearLocalThreadComposerDraft(draft.threadId, threadComposerDraftStorage(client.editingRecovery))
       campSnapshotCache.current.delete(draft.threadId)
       forgetMemberCreationDraft(draft.threadId)
     }

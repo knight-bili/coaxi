@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "I02-T01补齐项目启动器、会话地图、通知及首次使用剩余差异",
+    "I02-T01按当前合同改写原生Web夹具、补显式旧草稿恢复并核查剩余导航差异",
     "I02-T02先盘点独立测试Runtime，再融合成员与Provider",
     "I02-T03 Skills/MCP",
     "按原依赖推进I03至I12"

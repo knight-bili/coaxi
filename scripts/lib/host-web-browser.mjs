@@ -52,6 +52,7 @@ export async function launchAcceptanceBrowser({ executable, args, env = process.
       socket.addEventListener('error', reject, { once: true })
     })
     let id = 0
+    let activeSession = null
     const pending = new Map()
     const errors = []
     const responses = []
@@ -83,13 +84,13 @@ export async function launchAcceptanceBrowser({ executable, args, env = process.
       }
       pending.clear()
     })
-    const send = (method, params = {}) => new Promise((resolve, reject) => {
+    const send = (method, params = {}, sessionId = activeSession) => new Promise((resolve, reject) => {
       const requestId = ++id
       const timer = setTimeout(() => { pending.delete(requestId); reject(Error(`CDP timed out: ${method}`)) }, 20_000)
       pending.set(requestId, { resolve, reject, timer })
-      socket.send(JSON.stringify({ id: requestId, method, params }))
+      socket.send(JSON.stringify({ id: requestId, method, params, ...(sessionId ? { sessionId } : {}) }))
     })
-    gracefulClose = () => send('Browser.close')
+    gracefulClose = () => send('Browser.close', {}, null)
     await send('Page.enable')
     await send('Runtime.enable')
     await send('Network.enable')
@@ -102,6 +103,17 @@ export async function launchAcceptanceBrowser({ executable, args, env = process.
     return {
       send, evaluate, errors, responses, fileChoosers, close,
       onProtocolEvent(listener) { protocolListeners.add(listener); return () => protocolListeners.delete(listener) },
+      usePage(sessionId = null) { activeSession = sessionId },
+      async newPage(url) {
+        const { targetId } = await send('Target.createTarget', { url }, null)
+        const { sessionId } = await send('Target.attachToTarget', { targetId, flatten: true }, null)
+        activeSession = sessionId
+        await send('Page.enable')
+        await send('Runtime.enable')
+        await send('Network.enable')
+        await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 920, deviceScaleFactor: 1, mobile: false })
+        return sessionId
+      },
       async key(key) {
         const params = { key, code: key, windowsVirtualKeyCode: key === 'Enter' ? 13 : 27 }
         await send('Input.dispatchKeyEvent', { type: 'keyDown', ...params })

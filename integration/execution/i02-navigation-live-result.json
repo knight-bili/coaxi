@@ -3,21 +3,37 @@
   "date": "2026-10-13",
   "task": "I02-T01",
   "status": "passed",
-  "scope": "production_web_real_host_navigation_no_runtime",
+  "scope": "production_web_real_host_navigation_and_recorded_messages_no_runtime",
   "source": {
-    "parentCommit": "4d2a40216aa08bd58347418fbc349a30ea4ef044",
+    "parentCommit": "e98093893884ed3e95012d63f7f20d00a11e2739",
     "testedWorkingTreeChanges": [
       {
         "file": "apps/desktop/src/renderer/src/BusinessApp.tsx",
-        "sha256": "d881b32900d4432d8309143e96fee3227bb3da8ad3b5e1f9060b3bc07a55b36a"
+        "sha256": "5d7ca16be17fd3e0f961cd97c24eb0e7814cd8a6a8ca7290ade79441d89dba40"
+      },
+      {
+        "file": "apps/desktop/src/renderer/src/ThreadWorkspace.tsx",
+        "sha256": "819638f80f0dbb73d82008f6dfa25b00954076c67357908772ad3ab2b022d4b8"
+      },
+      {
+        "file": "apps/desktop/src/renderer/src/camp-composer-local-store.ts",
+        "sha256": "9797eb5db76d9b9f17de3fb918c7d362e854ddb424cde6e6a21927f1f261a769"
+      },
+      {
+        "file": "apps/desktop/src/renderer/src/pending-thread-draft.ts",
+        "sha256": "4ab6df9f88d7e3c89d89cac0e432e11a5ad4f8b48303aec91f2424e27078783f"
       },
       {
         "file": "scripts/lib/host-web-browser.mjs",
-        "sha256": "9ef88550d73dd26f2826bc976e607bcde95946bae091961d643257c070a9f4a4"
+        "sha256": "35cf3bc5c96cc46a349861f6ce6e8d4c50665dc43773a96e65a1f3f9c31ccf53"
+      },
+      {
+        "file": "scripts/lib/host-web-live.test.mjs",
+        "sha256": "45f990edd7c9210d536290f41a748a9f0b9159e02476075f66af694e33dbbadc"
       },
       {
         "file": "tools/integration/smoke-workbench-live.mjs",
-        "sha256": "1e66df809d33dad2b9ed69b4f24fd878f76ae702c1b95d4c9b00ff8b76f9232d"
+        "sha256": "f9fe43e5a6d6df6ce90b1f3f6b0d38aa498e055b0eb02e0850d3a864e5e1ea50"
       }
     ],
     "coreBinary": {
@@ -174,100 +190,100 @@
         "sha256": "24a7719ff1d38588f4889f8d0f6bca90690f58436a048ef8e3c644aabf1aaffd"
       },
       {
-        "file": "assets/index-7Z2FnwCw.js",
-        "sha256": "013c7100a2dabed7f919f86ec286ad38f7d18d3c580d102e956ba90edaa2cd77"
+        "file": "assets/index--FrQItxB.js",
+        "sha256": "c036fa8ffff7a6249da955cc6062c05a4872a8658977a54d3bbb6f014cf60548"
       },
       {
-        "file": "assets/index-BH9uuIRO.js",
-        "sha256": "4839dc9279fd2603127b8d07a2129355207a69e00e4d27f9f67115942f73fbb5"
+        "file": "assets/index-B-bMwhIE.js",
+        "sha256": "839a0e3dbdda48d01089bc371b3802c313eaa8b8d69eb113e36cbe3d4cda623e"
       },
       {
-        "file": "assets/index-BQFgSJrE.js",
-        "sha256": "378fcedf726b1752a3fe70e58aac1791cd51396ed51ddbef382c89a1b833fee8"
+        "file": "assets/index-B33o2497.js",
+        "sha256": "7e1aeaf6628020458e1702ba7816d83e852b8e05f88b7d5b3e9d555b383b204c"
       },
       {
-        "file": "assets/index-BS2s8enU.js",
-        "sha256": "9baee86199b91f53b0a6c3d0230aa844bfe36a1711c226b2f2767573bc8c4132"
+        "file": "assets/index-B8vOwA_y.js",
+        "sha256": "a3be8e45d5b66f2818bab427b3944b153d0e73219f0846fd405cc4dde5c8a88f"
       },
       {
-        "file": "assets/index-BSf2LIGq.js",
-        "sha256": "17531ac9d6c684c577b4e85cca443461ec35129b73ecf59ad09a7f09e65f36f8"
+        "file": "assets/index-BJ73FR4m.js",
+        "sha256": "abe61bfeaa21fc5a44e69dfe78e9b084f8de8170734b0682f37869bb97f77c1f"
       },
       {
-        "file": "assets/index-BfWQJsq8.js",
-        "sha256": "d21abb1e5e1352c7633cdf9a880ccdc8d466cfc59246133d1f35a55e2e44508f"
+        "file": "assets/index-BOIfwDaA.js",
+        "sha256": "8d1e52267fd3d90e3223cdf8f3e55ea0f1c0bc2fdfe56848b7327f00fd7fbb81"
       },
       {
-        "file": "assets/index-BhJu_mLH.js",
-        "sha256": "860fe806c42b3ba0b635025f92c6b7d4bdec88214026ab8e7d9549ba23183f2a"
-      },
-      {
-        "file": "assets/index-BnwDzJ2g.js",
-        "sha256": "99d35db0d826a71cfaa667008decc4d3655430b10362638c6bf65ef5287fdac3"
+        "file": "assets/index-B_E4EiDj.js",
+        "sha256": "537ba6f0685a98e3a2029b370df4bdcf8ed2c2d9f59fc0253511bdc8807c507d"
       },
       {
         "file": "assets/index-BrN3LyPI.css",
         "sha256": "d3093ccc428dbb97c481a9c9b9740a60cbb19f16a7ebeb4bc5a411fcd9eff30d"
       },
       {
-        "file": "assets/index-BvikC0tH.js",
-        "sha256": "8d1ad79ce882e42171799e127d0723fec15e4e5e0b04813f6aeea7173b6a188b"
+        "file": "assets/index-BsZleFve.js",
+        "sha256": "76f0a29bbb981d81698fdda9da24fefe9b9aed719390e009624733f6d5b17a70"
       },
       {
-        "file": "assets/index-ByWsfom4.js",
-        "sha256": "d234f9c29cbe758beba98f4f1499aae0c97ef34d1f5dcc6654beb725eaac7583"
+        "file": "assets/index-C10vlMQE.js",
+        "sha256": "d1f28a1e4520c035ac799929fa699ee18dce36c22364c2e6d2732c3013e6a8a7"
       },
       {
-        "file": "assets/index-CKdGkIzZ.js",
-        "sha256": "1fb3646101bbc54f9f24f03d9c3a466b12aaae9996c24e508ad75e80370e5858"
+        "file": "assets/index-C42IDYtF.js",
+        "sha256": "c00076c816381bcb275f53322ab6f8d01c86e76e627a43e34ce4c295e1aa654c"
       },
       {
-        "file": "assets/index-CLlY8CY5.js",
-        "sha256": "64b05d2e479a2f6cae0981c73db9b187e50d671f04424649cd303431121eb78b"
+        "file": "assets/index-C63ZgnRL.js",
+        "sha256": "ac0b00cfafbeee3a6959010a0274be4ef93bc1eba59ef9b59b24a7a5c04fd4a9"
       },
       {
-        "file": "assets/index-CjfL5lxN.js",
-        "sha256": "d04014d992991d823e8c137f71e3fd83f27cd3015088cb366ae30b8a2c7f9422"
+        "file": "assets/index-CCm3NSOP.js",
+        "sha256": "a26577848505b172da435936e11d73323ac075f13ceaea935d487704c4d6d752"
       },
       {
-        "file": "assets/index-DIPAPYlH.js",
-        "sha256": "f06429e48b723937d79f2036a83222334f7f486bcb7a24be01ab9c71e1d9e264"
+        "file": "assets/index-CcMm59GP.js",
+        "sha256": "3248449c3b19f476464e3f1666024f327f76b603a4785fc6e6342f09ddce33e2"
       },
       {
-        "file": "assets/index-DK6EioWv.js",
-        "sha256": "a26598e86cbc86b66faafef66ab4d4e9ae01994efbe93a3e829d9a5d796c7ba8"
+        "file": "assets/index-CkRl64pH.js",
+        "sha256": "0f4ac9e00809c265bab7f1753c83eea31d2558b0106113bdb42bb589f4d8549a"
       },
       {
-        "file": "assets/index-DKEy5lSR.js",
-        "sha256": "31e0a5955b2af900fc82c417548494c318342f7cef0add6953242fc25f16d071"
+        "file": "assets/index-CndE8S0_.js",
+        "sha256": "be8ff882eb2122e71020dfe4faab967f8a4920200db23d49b5eb1d2d08a3251f"
       },
       {
-        "file": "assets/index-DQgw4Nbe.js",
-        "sha256": "60e2b8a7e72b112eeaa33cfbac5a7acc67bd7800b73d37e951b0088fbff32919"
+        "file": "assets/index-D3bPiN5O.js",
+        "sha256": "6e4de1e822fd8a50e73f8affdecf8f417b4f8003f0fcdbdde71a55eb421f9427"
       },
       {
-        "file": "assets/index-DUFuDVow.js",
-        "sha256": "564c58b464935973cafda0b67677739f32eb6b5ec424da2478cecf39fbb131cd"
+        "file": "assets/index-DCw3txvV.js",
+        "sha256": "8eca1599cf063359ed54f847c04f367770ca0d1a36c96e17cae7b2f15d95c5e3"
       },
       {
-        "file": "assets/index-R2i7errs.js",
-        "sha256": "7a071f7191c3d81fac4faeca22da03801b7185af401e17fde298425e95e5da9e"
+        "file": "assets/index-DDdx_nqo.js",
+        "sha256": "8e46e842e648df615b1b0c76510c25f958b8c389d809447d8e20eb284e965638"
       },
       {
-        "file": "assets/index-d_yVPNUn.js",
-        "sha256": "201609de317b556758dfa1e9d0a38df84b576baa0bb821a79ce9e513eba7cbe5"
+        "file": "assets/index-DJeCF6M0.js",
+        "sha256": "c52bb5dddb8ff37504124422d27e51e80b4ecd565229fd4b26f48f3f88e473e2"
       },
       {
-        "file": "assets/index-uocWyXvb.js",
-        "sha256": "8364e88a752275ad607397294c4bdf932ab185503073067ac6165dc7f6adee23"
+        "file": "assets/index-DZQ00gVy.js",
+        "sha256": "a98dafba6723df16b9f04860381a1577bf4d2564efeaae66a407409f300ae243"
       },
       {
-        "file": "assets/index-vvMp3VPS.js",
-        "sha256": "c7cc5592213da986fb9e3171c43586aa2640559ea455635024aed3cc7b698003"
+        "file": "assets/index-DvTcZ4lM.js",
+        "sha256": "b8687810ee6f4673e36621cf77dfabe3bda2d1482c016d21269e5fecdb1337b5"
       },
       {
-        "file": "assets/index-zwbdoPp4.js",
-        "sha256": "18183834dd5950db14b60de33101a15c8d3ec22efc0dd81ffac9cabf795f4057"
+        "file": "assets/index-DzqmVVS_.js",
+        "sha256": "8a6d2d672caec14535e2a595551372b1cf182f17eb713d3830da80bb78de2d63"
+      },
+      {
+        "file": "assets/index-T31I237L.js",
+        "sha256": "a62b380133e39708ca477c1c1988aaffba9bf540e07368f652c5fa7d81ae8d61"
       },
       {
         "file": "assets/javascript-iXu5QeM3.js",
@@ -528,6 +544,12 @@
       "runtimeConfigured": false
     },
     {
+      "id": "current_message_contract_records_eight_messages_and_replays_once",
+      "status": "passed",
+      "recordedMessages": 8,
+      "execution": null
+    },
+    {
       "id": "production_web_authenticated_no_desktop_mock",
       "status": "passed"
     },
@@ -565,22 +587,36 @@
       "login": "restored"
     },
     {
+      "id": "production_thread_renders_real_recorded_messages",
+      "status": "passed"
+    },
+    {
+      "id": "same_browser_tabs_keep_unsent_text_private_and_restore_after_reload",
+      "status": "passed"
+    },
+    {
       "id": "isolated_database_integrity_and_zero_agent_runs",
       "status": "passed"
     }
   ],
   "screenshot": {
     "file": "I02_工程首页_真实Core验收.png",
-    "sha256": "996f97344394c8804b9900c3fb11e5d2f0e5b8bffc3b1490bd0c250281b9d2cb",
+    "sha256": "95457041c547d6359399d27f639abe003f40498205f2a38083ed6610ccbd4cc2",
     "review": "已核查重新打开后的稳定页面；当前工程、高亮和工程内对话一致，无其他工程对话"
   },
+  "threadScreenshot": {
+    "file": "I02_对话消息_真实Core验收.png",
+    "sha256": "32e1acc838e5566f1823cc53b885f68f5d10316d6f02ea32bd627a0c3226b03d",
+    "review": "八条受控用户消息能在生产Thread读取；截图含等待投递，未启动AI运行"
+  },
   "regression": {
-    "files": 3,
-    "passed": 37,
+    "files": 5,
+    "passed": 33,
     "failed": 0
   },
   "typecheck": "passed",
   "webBuild": "passed",
+  "electronCodeBuild": "passed",
   "selfReview": {
     "isolation": "独立Windows私有Core根/技能/MCP/浏览器；未使用日常数据",
     "authority": "合法Core API创建两条空Thread，未直接写库；无第二业务权威",
@@ -602,6 +638,11 @@
       "stage": "browser_restart_driver",
       "before": "验收工具强制终止浏览器可能丢失未落盘的最新偏好",
       "after": "改用Browser.close正常退出，重新打开验证通过"
+    },
+    {
+      "stage": "same_browser_tab_drafts",
+      "before": "标签B能读取标签A的I02_TAB_A_UNSENT文字，原断言确切失败",
+      "after": "Web文字接入既有编辑身份恢复存储，两个标签分别输入和刷新后保持私有；清理、Pending保存和发送回执也沿同一存储"
     }
   ],
   "limits": {
@@ -610,6 +651,9 @@
     "fusionAcceptanceCases": "not_run",
     "desktopProcessRestart": "not_run",
     "hostProcessRestart": "not_run",
+    "draftBrowserProcessRestart": "not_run",
+    "nativeMacFixture": "消息初始化合同已修正，旧SQL/未公开Pending场景尚待改写，完整Mac夹具未运行",
+    "unscopedWebLegacyDraft": "不自动归属，不删除旧记录；需补显式恢复流程",
     "productStage": "I02-T01仍实施中",
     "captureFailures": "此前CDP截图超时记录保留在工作日志，本记录只引用完整成功的这一轮"
   }

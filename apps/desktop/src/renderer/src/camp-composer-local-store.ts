@@ -6,6 +6,7 @@ import type {
   ComposerDocument,
   MessageQuoteSnapshot
 } from '@contracts'
+import type { EditingRecovery } from './camp-client'
 
 const STORAGE_PREFIX = 'rovai.camp-composer-draft.v1:'
 const MAX_STORED_DRAFT_BYTES = 4 * 1024 * 1024
@@ -14,6 +15,15 @@ const MAX_ATTACHMENTS = 10
 const MAX_QUOTES = 32
 
 type DraftStorage = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>
+
+export function threadComposerDraftStorage(recovery?: EditingRecovery): DraftStorage | undefined {
+  if (!recovery) return undefined
+  return {
+    getItem(key) { const value = recovery.get(key); return typeof value === 'string' ? value : null },
+    setItem(key, value) { recovery.set(key, value) },
+    removeItem(key) { recovery.set(key, null) }
+  }
+}
 
 function object(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)

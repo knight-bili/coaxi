@@ -108,7 +108,8 @@ import {
   loadLocalThreadComposerDraft,
   materializeLocalContinuation,
   nextLocalThreadComposerDraftAfterSend,
-  saveLocalThreadComposerDraft
+  saveLocalThreadComposerDraft,
+  threadComposerDraftStorage
 } from './camp-composer-local-store'
 import {
   DraftMutationCoordinator,
@@ -1812,6 +1813,7 @@ export function ThreadWorkspace({
   const activationStateRef = useRef(snapshot.thread.activationState)
   const memberCreationRef = useRef(memberCreation)
   memberCreationRef.current = memberCreation
+  const composerStorage = useMemo(() => threadComposerDraftStorage(client.editingRecovery), [client.editingRecovery])
   const pendingDraftPersistence = useRef<PendingThreadDraftPersistence | null>(null)
   if (!pendingDraftPersistence.current) pendingDraftPersistence.current = new PendingThreadDraftPersistence(client)
   const pendingThreadLeaveRef = useRef(onPendingThreadLeave)
@@ -1830,7 +1832,7 @@ export function ThreadWorkspace({
           ? initialComposerDraftRef.current
           : null
         let draft = (activationStateRef.current === 'active' || !memberCreationRef.current
-          ? loadLocalThreadComposerDraft(threadId)
+          ? loadLocalThreadComposerDraft(threadId, composerStorage)
           : null) ?? initial ?? emptyLocalComposerDraft(threadId)
         if (draft.attachments.length > 0 && client.composerAttachments.restore) {
           draft = {
@@ -1897,7 +1899,7 @@ export function ThreadWorkspace({
         if (draft && activationStateRef.current === 'pending') pendingDraftChangeRef.current?.(draft)
         if (draft && activationStateRef.current === 'active') {
           try {
-            saveLocalThreadComposerDraft(draft)
+            saveLocalThreadComposerDraft(draft, composerStorage)
             setComposerPersistenceError(null)
           } catch (error) {
             setComposerPersistenceError(
@@ -4069,7 +4071,7 @@ export function ThreadWorkspace({
         })
         // The accepted response can arrive before the Active projection. Clear the
         // persisted first input immediately so reopening cannot resurrect a sent draft.
-        saveLocalThreadComposerDraft(nextDraft)
+        saveLocalThreadComposerDraft(nextDraft, composerStorage)
         if (draftThreadId.current === threadId) {
           draftCoordinator.acceptAuthoritativeDraft(nextDraft)
           initializedComposerRoute.current = {
