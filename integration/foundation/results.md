@@ -6,13 +6,14 @@
 |---|---|---|
 | 两应用本地前端类型检查 | 通过 | 不等于运行和产品验收 |
 | Codeg静态Web构建 | 通过 | 固定供体版本，未接Rovai Core |
-| Rovai Web、Execution Web、Electron构建 | 通过 | Electron尚未运行UI |
+| Rovai Web、Execution Web、Electron构建 | 通过 | 完整融合应用UI尚未验收，桌面组件CI另列 |
 | Rovai Windows原生Server CI | 全部成功 | 构建main提交9d1ad55；development-preview，不是正式发布 |
 | 原生包ZIP与manifest | 通过 | SHA256一致，213个文件逐项校验 |
 | 本机真实Host HTTP/SSE/SQLite | 12项通过 | 新隔离数据根，无真实AI执行；明细见windows-host-result.json |
 | Codeg Windows原生Server | CI构建和隔离认证健康检查通过 | 不改固定供体源码；未启动真实AI，本机未运行Codeg桌面 |
 | 本地Rust原生编译 | 未通过 | MSVC link.exe缺失，用户全局环境未修改 |
-| 旧数据导入/回滚 | 6项设计夹具 | 尚未执行迁移，不以空库检查替代历史升级 |
+| 迁移基础 | 9项真实Core夹具通过 | 归一化记录、Thread空壳、回执、停机快照；实际Codeg旧库及历史消息导入未实现 |
+| Windows桌面组件 | 61项单元检查与3项真实Electron夹具通过 | 关闭/托盘/桥接；未启动Core，不等于完整产品UI验收 |
 | Mac/移动设备 | 设备实测暂挂 | 用户稍后提供ADB；没有使用旧设备 |
 | 融合产品验收 | 尚未开始 | 81来源簇对应324场景仍not_run |
 
@@ -31,3 +32,5 @@ I00复核发现的固定ID校验和提交差异校验缺口已修，私有仓凭
 迁移身份自审发现设计示例误用普通UUID，已改为源合同合法Thread示例，并直接复用源isThreadId校验。合法示例通过，普通UUID、错误UUID版本和大写拼写均拒绝。生产对象仍须从Core创建命令取得身份。storage-map.json核对8项Codeg实体与7张实际Core表的字段，只读schema，不含业务数据。
 
 Codeg源Server结果见codeg-server-result.json，工作流38382011684完整成功。GitHub artifact摘要是平台提供值，下载后的EXE另记SHA256；没有把两者混成相同文件的校验。
+
+客户已明确先做不依赖Mac和移动真机的工作。当前可推进顺序见available-software-queue.md；迁移执行边界及Windows规范路径、私有ACL整改见migration-checks.md。9项实际结果见migration-runtime-result.json，Windows组件CI见windows-desktop-result.json。

@@ -12,3 +12,6 @@ I00经客户授权再次自审，修复范围校验和私有仓CI后完整门禁
 - [关键源存储与映射设计](storage-map.json)：8项Codeg实体、7张隔离Core实际表的列元数据；不代表已部署迁移。
 
 - [Codeg源Server实测证据](codeg-server-result.json)。
+- [可执行迁移基础夹具](migration-checks.md)、[9项真实Core结果](migration-runtime-result.json)。
+- [Windows桌面组件证据](windows-desktop-result.json)：61项单元检查、3项真实Electron夹具；未启动Core，不代表完整产品UI验收。
+- [当前可推进的软件顺序](available-software-queue.md)：设备待补，I02导航及I03画布按原依赖准备移植。

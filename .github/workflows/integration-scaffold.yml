@@ -37,6 +37,7 @@ jobs:
           node tools/integration/verify-scaffold.mjs
           node tools/integration/verify-foundation.mjs
           node --check tools/integration/smoke-foundation.mjs
+          node --check tools/integration/smoke-migration-fixtures.mjs
       - name: Validate existing documentation governance
         env:
           DOCS_BASE_REF: ${{ github.event.pull_request.base.sha }}
