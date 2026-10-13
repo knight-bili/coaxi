@@ -3,7 +3,7 @@
   "source":"codeg",
   "sourceHost":"isolated-fixture-host",
   "sourceRecord":{"folderId":1,"conversationId":7,"agentType":"codex","clientMessageId":"fixture-message-1"},
-  "intendedMapping":{"publicThreadRef":"00000000-0000-4000-8000-000000000007","scopeKeys":["sourceHost","agentType","conversationId"],"nativeSessionRef":"Runtime内部记录，不冒充公共Thread","worktreeCreatedAutomatically":false},
+  "intendedMapping":{"publicThreadRef":"rvcamp_01h47kvsy5fk1shh6w1g60eecf","idAllocation":"仅为合法格式的设计示例；生产导入使用Core创建命令返回的threadId，不复用此示例","scopeKeys":["sourceHost","agentType","conversationId"],"nativeSessionRef":"Runtime内部记录，不冒充公共Thread","worktreeCreatedAutomatically":false},
   "cases":[
     {"id":"first_import","expected":"创建来源映射及对应Core对象，来源文件不变","status":"not_run"},
     {"id":"same_record_reimport","expected":"按来源scope和hash去重，不重复Thread或消息","status":"not_run"},

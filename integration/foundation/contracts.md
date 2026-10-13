@@ -20,6 +20,7 @@ ActorRef的type为user、agent或system；嵌套字段仍为user_id、agent_id�
 Codeg现有客户端POST /api/<name>及WebSocket事件，不直接等价于Rovai Host的operation/params与SSE。其acp_prompt携带connectionId、blocks、folderId、conversationId和clientMessageId；ACP connection不是Core Run身份。
 兼容层在I06/I10按具体操作建立白名单映射，先完成Host会话认证，再调用统一Core。仅改变URL或改字段名不算移植完成。错误、审批、停止、分叉和插话必须保持源支持行为。
 legacy整数folder/conversation身份以sourceHost、Runtime和来源记录为作用域；公共Thread使用Core身份。导入映射必须显式、去重和可追溯，不能把同名目录或数字ID直接作为另一Host的对象。
+公共Thread沿用现有rvcamp_加26位Crockford Base32的UUIDv7身份；不能暴露普通UUID作为别名。迁移必须使用Core创建命令返回的threadId，设计夹具中的合法格式示例不代表已创建对象。物理camp表和内部Conversation保持原有身份边界，禁止额外建立重复的公共Thread表。
 
 ## 工程与工具服务
 

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import ts from 'typescript';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..');
 const text=(p)=>readFileSync(path.join(root,p),'utf8');
@@ -34,4 +35,9 @@ assert(cases.some(x=>x.path==='request' && !operations.includes(x.body.operation
 const migration=json('integration/foundation/migration-fixtures.json');
 assert.equal(migration.kind,'design_fixture_not_a_production_migration');
 assert(migration.intendedMapping.scopeKeys.includes('sourceHost') && migration.cases.every(x=>x.status==='not_run'));
+// 直接执行源合同里的身份校验，保留其UUIDv7和RFC variant检查。
+const identitySource='export const THREAD_ID_PATTERN'+text('packages/contracts/src/index.ts').split('export const THREAD_ID_PATTERN')[1].split('/** Legacy input helper;')[0];
+const identityJs=ts.transpileModule(identitySource,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText;
+const {isThreadId}=await import(`data:text/javascript,${encodeURIComponent(identityJs)}`);
+assert(isThreadId(migration.intendedMapping.publicThreadRef),'导入目标必须是Core公共Thread身份，不能使用普通UUID或供应商Session');
 console.log(JSON.stringify({status:'passed',kind:'source_contract_and_fixture_consistency',canonicalOperations:operations.length,httpCases:cases.length,migrationDesignCases:migration.cases.length,liveHostExecution:'not_run_by_this_checker'}));
