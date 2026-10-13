@@ -54,8 +54,9 @@ python3 - "$ANDROID_AVD_HOME/foundation-api36.avd/config.ini" <<'PY'
 from pathlib import Path
 import sys
 p=Path(sys.argv[1])
-lines=[line for line in p.read_text().splitlines() if not line.startswith('disk.dataPartition.size=')]
-p.write_text('\n'.join(lines+['disk.dataPartition.size=2048M'])+'\n')
+settings={'disk.dataPartition.size':'2048M','hw.lcd.width':'720','hw.lcd.height':'1280','hw.lcd.density':'320','hw.ramSize':'2048','hw.cpu.ncore':'2'}
+lines=[line for line in p.read_text().splitlines() if line.partition('=')[0] not in settings]
+p.write_text('\n'.join(lines+[f'{key}={value}' for key,value in settings.items()])+'\n')
 PY
 "$ANDROID_HOME/emulator/emulator" -list-avds > "$evidence/avd-list.txt"
 grep -Fx foundation-api36 "$evidence/avd-list.txt"
@@ -69,15 +70,46 @@ export ANDROID_SERIAL=emulator-5554
 sleep 5
 kill -0 "$emulator_pid"
 timeout 300s bash -e -c 'adb wait-for-device; until [[ "$(adb shell getprop sys.boot_completed | tr -d "\r")" == 1 ]]; do sleep 2; done'
+sleep 30
+adb shell input keyevent 82
 adb install "$evidence/app-debug.apk" > "$evidence/install.txt"
 adb shell am start -W -n app.codeg.android.debug/app.codeg.android.MainActivity > "$evidence/launch.txt"
 sleep 5
 adb shell pidof app.codeg.android.debug > "$evidence/app-process.txt"
 adb shell uiautomator dump /sdcard/foundation-window.xml > "$evidence/ui-dump.log"
 adb pull /sdcard/foundation-window.xml "$evidence/startup.xml" > "$evidence/ui-pull.log" 2>&1
+adb exec-out screencap -p > "$evidence/startup.png"
+adb shell dumpsys activity activities > "$evidence/activities.txt"
+adb logcat -d -b crash > "$evidence/crash-log.txt"
+python3 - "$evidence/startup.xml" "$evidence/system-ui-recovery.json" <<'PY'
+import json,re,subprocess,sys,xml.etree.ElementTree as E
+nodes=list(E.parse(sys.argv[1]).iter('node'))
+system_anr=any(n.get('package')=='android' and n.get('resource-id')=='android:id/alertTitle' and n.get('text')=="System UI isn't responding" for n in nodes)
+wait=next((n for n in nodes if n.get('package')=='android' and n.get('resource-id')=='android:id/aerr_wait'),None)
+recovered=system_anr and wait is not None
+if recovered:
+    x1,y1,x2,y2=map(int,re.findall(r'\d+',wait.get('bounds','')))
+    subprocess.run(['adb','shell','input','tap',str((x1+x2)//2),str((y1+y2)//2)],check=True)
+with open(sys.argv[2],'w') as output:json.dump({'systemUiAnrObserved':system_anr,'systemWaitTapped':recovered},output)
+PY
+if python3 - "$evidence/system-ui-recovery.json" <<'PY'
+import json,sys
+sys.exit(0 if json.load(open(sys.argv[1]))['systemWaitTapped'] else 1)
+PY
+then
+  cp "$evidence/startup.xml" "$evidence/system-ui-blocked.xml"
+  cp "$evidence/startup.png" "$evidence/system-ui-blocked.png"
+  sleep 30
+  adb shell am start -W -n app.codeg.android.debug/app.codeg.android.MainActivity >> "$evidence/launch.txt"
+  adb shell uiautomator dump /sdcard/foundation-window.xml >> "$evidence/ui-dump.log"
+  adb pull /sdcard/foundation-window.xml "$evidence/startup.xml" >> "$evidence/ui-pull.log" 2>&1
+  adb exec-out screencap -p > "$evidence/startup.png"
+fi
 python3 - "$evidence/startup.xml" <<'PY'
 import sys,xml.etree.ElementTree as E
-assert any(n.get('package')=='app.codeg.android.debug' for n in E.parse(sys.argv[1]).iter('node')),'Application is not foreground'
+nodes=list(E.parse(sys.argv[1]).iter('node'))
+assert any(n.get('package')=='app.codeg.android.debug' for n in nodes),'Application is not foreground'
+assert not any(n.get('resource-id')=='android:id/alertTitle' for n in nodes),'Application or system error dialog present'
 PY
-adb exec-out screencap -p > "$evidence/startup.png"
+adb shell pidof app.codeg.android.debug > "$evidence/app-process.txt"
 mark passed
