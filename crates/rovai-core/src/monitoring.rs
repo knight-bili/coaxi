@@ -2109,6 +2109,7 @@ fn eligible_mask(runtime: AdapterKind, _runtime_version: Option<&str>) -> i64 {
         }
         AdapterKind::KimiCodeCli => full_tokens & !ELIGIBLE_REASONING_OUTPUT,
         AdapterKind::CursorAgent => 0,
+        AdapterKind::GeminiCli => ELIGIBLE_PROMPT_INPUT_TOTAL | ELIGIBLE_OUTPUT,
     }
 }
 
@@ -3646,13 +3647,22 @@ pub fn parse_acp_usage_message(
         return Vec::new();
     }
     let usage = params
-        .pointer(if adapter_kind == AdapterKind::CommandCodeCli {
-            "/result/_meta/usage"
-        } else {
-            "/result/usage"
+        .pointer(match adapter_kind {
+            AdapterKind::CommandCodeCli => "/result/_meta/usage",
+            AdapterKind::GeminiCli => "/result/_meta/quota/token_count",
+            _ => "/result/usage",
         })
         .unwrap_or(&Value::Null);
     let (dialect_id, input_semantics, fields) = match adapter_kind {
+        AdapterKind::GeminiCli => (
+            "gemini-acp-prompt-quota-v1",
+            RuntimeInputSemantics::CacheInclusiveTotal,
+            RuntimeUsageFields {
+                input_tokens: integer_at_any(usage, &["/input_tokens"]),
+                output_tokens: integer_at_any(usage, &["/output_tokens"]),
+                ..Default::default()
+            },
+        ),
         AdapterKind::OpencodeCli => {
             // V2 separates reasoning from output and both cache buckets from
             // input. totalTokens covers this root prompt, not delegated Sessions.
@@ -5112,6 +5122,17 @@ mod tests {
 
     #[test]
     fn runtime_parsers_emit_sparse_usage_without_antigravity_inference() {
+        let gemini = parse_acp_usage_message(
+            AdapterKind::GeminiCli,
+            Some("0.60.0"),
+            "rovai/acp_prompt_completed",
+            &json!({"sessionId":"root", "promptId":"gemini-prompt", "result":{"_meta":{"quota":{"token_count":{"input_tokens":100,"output_tokens":12}}}}}),
+        );
+        assert_eq!(gemini.len(), 1);
+        assert_eq!(gemini[0].fields.input_tokens, Some(100));
+        assert_eq!(gemini[0].fields.output_tokens, Some(12));
+        assert_eq!(gemini[0].fields.cache_read_input_tokens, None);
+        assert_eq!(gemini[0].cost, None);
         let root_prompt = json!({"sessionId":"root", "promptId":"prompt-1", "result":{"usage":{
             "inputTokens":100,"cachedReadTokens":40,"cachedWriteTokens":20,
             "outputTokens":10,"thoughtTokens":5,"totalTokens":175}}});

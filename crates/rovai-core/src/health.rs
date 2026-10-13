@@ -1570,6 +1570,7 @@ async fn acp_probe_at(
             | AdapterKind::QoderCli
             | AdapterKind::CodebuddyCli
             | AdapterKind::QwenCode
+            | AdapterKind::GeminiCli
             | AdapterKind::TraeCnCli
             | AdapterKind::GrokBuild
             | AdapterKind::DeepseekHarness
@@ -2716,6 +2717,9 @@ pub fn configure_acp_command(
         AdapterKind::QwenCode => {
             command.arg("--acp");
         }
+        AdapterKind::GeminiCli => {
+            command.args(["--acp", "--skip-trust"]);
+        }
         AdapterKind::TraeCnCli => {
             command.args(["acp", "serve"]);
         }
@@ -2944,7 +2948,10 @@ fn acp_required_capabilities(kind: AdapterKind) -> Vec<String> {
     .map(str::to_string)
     .collect::<Vec<_>>();
     capabilities.push(
-        if matches!(kind, AdapterKind::KiroCli | AdapterKind::GrokBuild) {
+        if matches!(
+            kind,
+            AdapterKind::KiroCli | AdapterKind::GrokBuild | AdapterKind::GeminiCli
+        ) {
             "session.set_model"
         } else {
             "session.set_config_option"
@@ -3704,6 +3711,7 @@ pub fn find_adapter(kind: AdapterKind) -> Option<PathBuf> {
             &["ROVAI_QWEN_BIN", "HORIZONWARD_QWEN_BIN", "LUMEN_QWEN_BIN"][..],
             "qwen",
         ),
+        AdapterKind::GeminiCli => (&["ROVAI_GEMINI_BIN"][..], "gemini"),
         AdapterKind::TraeCnCli => (
             &[
                 "ROVAI_TRAE_CN_BIN",
@@ -4116,6 +4124,7 @@ while IFS= read -r ignored; do :; done
         assert_eq!(arguments(AdapterKind::QoderCli), ["--acp"]);
         assert_eq!(arguments(AdapterKind::CodebuddyCli), ["--acp"]);
         assert_eq!(arguments(AdapterKind::QwenCode), ["--acp"]);
+        assert_eq!(arguments(AdapterKind::GeminiCli), ["--acp", "--skip-trust"]);
         assert_eq!(arguments(AdapterKind::TraeCnCli), ["acp", "serve"]);
         assert_eq!(arguments(AdapterKind::CursorAgent), ["acp"]);
         assert_eq!(arguments(AdapterKind::KimiCodeCli), ["acp"]);

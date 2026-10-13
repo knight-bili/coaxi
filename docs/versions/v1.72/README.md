@@ -632,3 +632,10 @@ User 于 2026-10-09 确认[完整方案及补充边界 r1](model-context-change-
 新建降级，绑定成功前保留旧目标，输入接收/取消/执行代次保护不变。当前边界见
 [Runtime Launch v60](../../contracts/runtime-launch-and-verification-v60.md)，实施与验收见
 [实施记录](implementation-plan.md#同类-cli-优先恢复原生会话2026-10-12)。
+
+## 融合期 Gemini Runtime 接入（2026-10-14）
+
+按一期21种Runtime来源并集，在Core和共享客户端增加`gemini-cli`，使用固定Codeg/官方0.60.0的ACP合同。
+Migration197扩展Runtime/Skills闭集并发布schema147，保留旧行与旧来源证据；新平台资格待真实验证。
+当前边界见[Gemini Runtime v1](../../contracts/gemini-runtime-v1.md)，实施状态见
+[融合记录](../../../integration/execution/i02-runtime-port.md)。这一增量不表示一期或Runtime已经验收。

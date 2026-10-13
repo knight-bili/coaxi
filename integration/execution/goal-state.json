@@ -14,7 +14,7 @@
   "current_branch": "phase/i02-workbench",
   "base_branch": "phase/i01-foundation",
   "current_task": "I02-T02",
-  "current_slice": "Gemini原生协议证据与Core适配准备；Mac启动失败取证",
+  "current_slice": "Gemini Core类型/协议/模型权限/迁移已实现，Rust与原生验证中",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,10 +33,9 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "核查补充取证后的Mac启动状态并修复真正原因",
-    "沿已验证Gemini模型/权限/认证/恢复合同接Core，完成Hermes/OpenClaw适配",
-    "补T01导航差异/附件/异常退出；T03 Skills/MCP",
-    "按原依赖推进I03至I12"
+    "核查Core integration编译/默认与迁移测试，修实际失败",
+    "核查Mac启动60s观察和完整原生夹具",
+    "Gemini实际运行/工具/恢复资格；继续Hermes/OpenClaw、T01/T03及I03-I12"
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
@@ -47,5 +46,6 @@
   "draft_restart_evidence": "i02-draft-restart-result.json",
   "runtime_inventory_evidence": "i02-runtime-inventory-result.json",
   "native_fixture_evidence": "i02-native-fixture-repair-result.json",
-  "gemini_native_evidence": "i02-gemini-native-result.json"
+  "gemini_native_evidence": "i02-gemini-native-result.json",
+  "gemini_core_evidence": "i02-gemini-core-result.json"
 }

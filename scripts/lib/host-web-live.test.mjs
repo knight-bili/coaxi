@@ -30,7 +30,10 @@ test('actual Desktop and browser share Camp geometry while three drafts and reau
   try {
     desktop = await launchBrowser('desktop', userData)
     await desktop.wait(`Boolean(window.rovai?.request)`)
-    await desktop.wait(`window.rovai.supervisor.getSnapshot().then(s=>s.fullCoreState==='ready')`)
+    // Fresh Debug authority initialization was still progressing at the old
+    // generic 12s UI deadline on CI. Keep the ready predicate, but give this
+    // startup boundary its own bounded observation window.
+    await desktop.wait(`window.rovai.supervisor.getSnapshot().then(s=>s.fullCoreState==='ready')`, 60_000)
     const request = (method, params = {}) => desktop.evaluate(`window.rovai.request(${JSON.stringify(method)},${JSON.stringify(params)})`)
     const info = await request('app.info'); assert.ok(info.dataDir.startsWith(userData)); console.log(JSON.stringify({ stage: 'desktop-ready', data: info.dataDir }))
     stage = 'native onboarding'

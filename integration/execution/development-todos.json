@@ -32,9 +32,9 @@
     {
       "id": "DEV-CORE-RUNTIME-UNION",
       "task": "I02-T02",
-      "status": "source_gap_confirmed_design_in_progress",
-      "problem": "21种来源Runtime中Core当前18个AdapterKind；Gemini/Hermes/OpenClaw需要在Core内移植，OpenClaw还有Node版本及无原生MCP兼容问题",
-      "evidence": "i02-runtime-inventory-result.json；不启动Codeg第二套执行权威",
+      "status": "gemini_source_implemented_Rust_validation_pending",
+      "problem": "Gemini Core与共享客户端已接入源码、schema147原子迁移；Rust/真实资格待验，Hermes/OpenClaw继续待移植",
+      "evidence": "i02-gemini-core-result.json；21来源不删减，未把旧平台资格或bootstrap当真实执行",
       "owner": "研发"
     }
   ]

@@ -46,6 +46,7 @@ pub enum AdapterKind {
     QoderCli,
     CodebuddyCli,
     QwenCode,
+    GeminiCli,
     TraeCnCli,
     CursorAgent,
     KimiCodeCli,
@@ -99,7 +100,7 @@ impl MissingSendRecoveryMode {
 }
 
 impl AdapterKind {
-    pub const ALL: [Self; 18] = [
+    pub const ALL: [Self; 19] = [
         Self::CodexCli,
         Self::Pi,
         Self::OpencodeCli,
@@ -112,6 +113,7 @@ impl AdapterKind {
         Self::QoderCli,
         Self::CodebuddyCli,
         Self::QwenCode,
+        Self::GeminiCli,
         Self::TraeCnCli,
         Self::CursorAgent,
         Self::KimiCodeCli,
@@ -133,6 +135,7 @@ impl AdapterKind {
             Self::QoderCli => "qoder-cli",
             Self::CodebuddyCli => "codebuddy-cli",
             Self::QwenCode => "qwen-code",
+            Self::GeminiCli => "gemini-cli",
             Self::TraeCnCli => "trae-cn-cli",
             Self::CursorAgent => "cursor-agent",
             Self::KimiCodeCli => "kimi-code-cli",
@@ -156,6 +159,7 @@ impl AdapterKind {
             Self::QoderCli => "qodercli",
             Self::CodebuddyCli => "codebuddy",
             Self::QwenCode => "qwen",
+            Self::GeminiCli => "gemini",
             Self::TraeCnCli => "traecli",
             Self::CursorAgent => "cursor-agent",
             Self::KimiCodeCli => "kimi",
@@ -189,6 +193,7 @@ impl AdapterKind {
             Self::QoderCli => &["qodercli"],
             Self::CodebuddyCli => &["codebuddy"],
             Self::QwenCode => &["qwen"],
+            Self::GeminiCli => &["gemini"],
             Self::TraeCnCli => &["traecli"],
             Self::AntigravityApp => &["agy"],
         }
@@ -207,6 +212,7 @@ impl AdapterKind {
             Self::QoderCli => "Qoder",
             Self::CodebuddyCli => "CodeBuddy",
             Self::QwenCode => "Qwen Code",
+            Self::GeminiCli => "Gemini CLI",
             Self::TraeCnCli => "TRAE CLI",
             Self::CursorAgent => "Cursor Agent",
             Self::KimiCodeCli => "Kimi Code",
@@ -228,6 +234,7 @@ impl AdapterKind {
                 | Self::QoderCli
                 | Self::CodebuddyCli
                 | Self::QwenCode
+                | Self::GeminiCli
                 | Self::TraeCnCli
                 | Self::CursorAgent
                 | Self::KimiCodeCli
@@ -250,6 +257,7 @@ impl AdapterKind {
             Self::QoderCli => "ROVAI_QODER_BIN",
             Self::CodebuddyCli => "ROVAI_CODEBUDDY_BIN",
             Self::QwenCode => "ROVAI_QWEN_BIN",
+            Self::GeminiCli => "ROVAI_GEMINI_BIN",
             Self::TraeCnCli => "ROVAI_TRAE_CN_BIN",
             Self::CursorAgent => "ROVAI_CURSOR_BIN",
             Self::KimiCodeCli => "ROVAI_KIMI_BIN",
@@ -278,6 +286,7 @@ impl AdapterKind {
             | Self::QoderCli
             | Self::CodebuddyCli
             | Self::QwenCode
+            | Self::GeminiCli
             | Self::TraeCnCli
             | Self::CursorAgent
             | Self::KimiCodeCli
@@ -304,6 +313,7 @@ impl AdapterKind {
             | Self::QoderCli
             | Self::CodebuddyCli
             | Self::QwenCode
+            | Self::GeminiCli
             | Self::TraeCnCli
             | Self::KimiCodeCli
             | Self::GrokBuild
@@ -331,6 +341,7 @@ impl FromStr for AdapterKind {
             "qoder-cli" => Ok(Self::QoderCli),
             "codebuddy-cli" => Ok(Self::CodebuddyCli),
             "qwen-code" => Ok(Self::QwenCode),
+            "gemini-cli" => Ok(Self::GeminiCli),
             "trae-cn-cli" => Ok(Self::TraeCnCli),
             "cursor-agent" => Ok(Self::CursorAgent),
             "kimi-code-cli" => Ok(Self::KimiCodeCli),

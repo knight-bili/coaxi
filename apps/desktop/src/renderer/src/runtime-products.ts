@@ -15,6 +15,7 @@ import openCodeLogo from './assets/runtime-logos/opencode.svg'
 import piLogo from './assets/runtime-logos/pi.svg'
 import qoderLogo from './assets/runtime-logos/qoder-color.svg'
 import qwenLogo from './assets/runtime-logos/qwen-color.svg'
+import geminiLogo from './assets/runtime-logos/gemini-cli.svg'
 import traeLogo from './assets/runtime-logos/trae-color.svg'
 
 const PRODUCT_RUNTIMES: AdapterKind[] = [
@@ -26,6 +27,7 @@ const PRODUCT_RUNTIMES: AdapterKind[] = [
   'qoder-cli',
   'codebuddy-cli',
   'qwen-code',
+  'gemini-cli',
   'trae-cn-cli',
   'cursor-agent',
   'kimi-code-cli',
@@ -53,6 +55,7 @@ export const PRODUCT_RUNTIME_LOGOS: Record<AdapterKind, string> = {
   'qoder-cli': qoderLogo,
   'codebuddy-cli': codeBuddyLogo,
   'qwen-code': qwenLogo,
+  'gemini-cli': geminiLogo,
   'trae-cn-cli': traeLogo,
   'cursor-agent': cursorLogo,
   'kimi-code-cli': kimiLogo,
@@ -75,6 +78,7 @@ export function adapterLabel(kind: AdapterKind): string {
     'qoder-cli': 'Qoder',
     'codebuddy-cli': 'CodeBuddy',
     'qwen-code': 'Qwen Code',
+    'gemini-cli': 'Gemini CLI',
     'trae-cn-cli': 'TRAE CLI',
     'cursor-agent': 'Cursor Agent',
     'kimi-code-cli': 'Kimi Code',

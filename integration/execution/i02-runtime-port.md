@@ -1,5 +1,10 @@
 # I02-T02 Runtime 移植边界
 
+当前源码正在加入Gemini Core类型与共享设置页，并以Migration197从schema146扩展到147；Core目录变为19种，
+Hermes/OpenClaw继续待移植。下方18种是本批前的固定来源盘点，不应误读为新源码现状。
+Gemini平台资格仍为未验证，Core编译与迁移回滚由新Core integration检查；真实模型/停止/恢复/工具未通过。
+规范见[Gemini Runtime v1](../../docs/contracts/gemini-runtime-v1.md)。
+
 2026-10-14。盘点结果见 [i02-runtime-inventory-result.json](i02-runtime-inventory-result.json)。这是源码差异和研发顺序，不代表 Runtime 已通过准入或执行。
 
 一期保留规划中的21种 Runtime。当前 Rovai Core 的 `AdapterKind::ALL` 声明18种；Codeg另有 Gemini、Hermes、OpenClaw。不能把三种来源入口删掉，也不能启动 Codeg 的 Tauri 执行层形成第二个业务权威。移植发生在 Core 的 Runtime 适配、Host 合同和共享成员设置页面内。

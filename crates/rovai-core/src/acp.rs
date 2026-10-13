@@ -6217,6 +6217,28 @@ fn configure_runtime_command(
         .as_object()
         .context("ACP permission configuration must be an object")?;
     match runtime.adapter_kind {
+        AdapterKind::GeminiCli => {
+            let configured = values
+                .get("approval_mode")
+                .and_then(Value::as_str)
+                .context("Gemini CLI requires approval_mode")?;
+            health::configure_acp_command(
+                command,
+                runtime.adapter_kind,
+                false,
+                runtime.reported_version.as_deref(),
+            )?;
+            let read_only = permission_semantics == PermissionSemantics::CoreEnforcedV1
+                && workspace.access == "read_only";
+            command
+                .arg("--approval-mode")
+                .arg(if read_only { "plan" } else { configured });
+            if runtime.model.source != "runtime_default" {
+                command.arg("--model").arg(&runtime.model.model_id);
+            }
+            // Gemini merges ACP session MCP entries into its native config;
+            // it does not use Qwen's --mcp-config launch option.
+        }
         AdapterKind::CommandCodeCli => {
             crate::command_code_acp::configure_host(
                 command,

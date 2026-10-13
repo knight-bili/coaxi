@@ -146,6 +146,7 @@ pub const fn charter_delivery_mode_for_adapter(adapter_kind: AdapterKind) -> Cha
         | AdapterKind::QoderCli
         | AdapterKind::CodebuddyCli
         | AdapterKind::QwenCode
+        | AdapterKind::GeminiCli
         | AdapterKind::TraeCnCli
         | AdapterKind::CursorAgent
         | AdapterKind::KimiCodeCli => CharterDeliveryMode::FirstPayload,

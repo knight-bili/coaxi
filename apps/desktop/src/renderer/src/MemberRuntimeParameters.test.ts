@@ -579,6 +579,7 @@ function runtimePermissionDefaults(kind: AdapterKind): Record<string, unknown> {
     case 'codebuddy-cli':
       return { permission_mode: 'bypassPermissions' }
     case 'qwen-code':
+    case 'gemini-cli':
       return { approval_mode: 'yolo' }
     case 'trae-cn-cli':
       return { permission_mode: 'bypass_permissions' }

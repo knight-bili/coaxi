@@ -185,7 +185,7 @@
       "coreAdmission": "not_run",
       "authentication": "not_checked",
       "actualInference": "not_run",
-      "coreAdapter": "not_in_current_Core_AdapterKind",
+      "coreAdapter": "source_added_qualification_and_Rust_validation_pending",
       "version": null,
       "isolatedNativeProbe": {
         "version": "0.60.0",
@@ -431,5 +431,14 @@
       "sourceSupportsMcpServers": false,
       "action": "使用独立版本/Node运行根；先设计Core工具能力兼容，不升级全局安装或伪装MCP已接入"
     }
-  ]
+  ],
+  "currentFusion": {
+    "sourceDeclaredAdapters": 19,
+    "status": "Rust_validation_pending",
+    "remainingPorts": [
+      "hermes",
+      "open_claw"
+    ],
+    "evidence": "i02-gemini-core-result.json"
+  }
 }

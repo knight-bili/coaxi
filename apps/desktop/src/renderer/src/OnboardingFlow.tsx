@@ -23,7 +23,7 @@ import {
 import { MemberPortrait } from './MemberPortrait'
 import { builtinMemberPresetsForLanguage, type BuiltinMemberPreset } from './member-presets'
 import { useInterfaceLanguage, useUiText , uiAttribute } from './interface-language'
-import { VISIBLE_PRODUCT_RUNTIMES } from './runtime-products'
+import { VISIBLE_PRODUCT_RUNTIMES, PRODUCT_RUNTIME_LOGOS } from './runtime-products'
 import {
   runtimeAvailabilityPresentation,
   runtimePlatformAdmissionAllowsUse,
@@ -69,6 +69,7 @@ const RUNTIME_LOGOS: Record<AdapterKind, string> = {
   'qoder-cli': qoderLogo,
   'codebuddy-cli': codeBuddyLogo,
   'qwen-code': qwenLogo,
+  'gemini-cli': PRODUCT_RUNTIME_LOGOS['gemini-cli'],
   'trae-cn-cli': traeLogo,
   'cursor-agent': cursorLogo,
   'kimi-code-cli': kimiLogo,
@@ -90,6 +91,7 @@ const RUNTIME_LABELS: Record<AdapterKind, string> = {
   'qoder-cli': 'Qoder',
   'codebuddy-cli': 'CodeBuddy',
   'qwen-code': 'Qwen Code',
+  'gemini-cli': 'Gemini CLI',
   'trae-cn-cli': 'TRAE CLI',
   'cursor-agent': 'Cursor Agent',
   'kimi-code-cli': 'Kimi Code',

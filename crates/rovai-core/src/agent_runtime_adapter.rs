@@ -383,6 +383,7 @@ pub enum SkillDeliveryGroupKey {
     Qoder,
     Codebuddy,
     Qwen,
+    Gemini,
     Trae,
     Cursor,
     Kimi,
@@ -394,7 +395,7 @@ pub enum SkillDeliveryGroupKey {
 }
 
 impl SkillDeliveryGroupKey {
-    pub const ALL: [Self; 18] = [
+    pub const ALL: [Self; 19] = [
         Self::Codex,
         Self::Pi,
         Self::Opencode,
@@ -405,6 +406,7 @@ impl SkillDeliveryGroupKey {
         Self::Qoder,
         Self::Codebuddy,
         Self::Qwen,
+        Self::Gemini,
         Self::Trae,
         Self::Cursor,
         Self::Kimi,
@@ -427,6 +429,7 @@ impl SkillDeliveryGroupKey {
             Self::Qoder => "qoder",
             Self::Codebuddy => "codebuddy",
             Self::Qwen => "qwen",
+            Self::Gemini => "gemini",
             Self::Trae => "trae",
             Self::Cursor => "cursor",
             Self::Kimi => "kimi",
@@ -450,6 +453,7 @@ impl SkillDeliveryGroupKey {
             Self::Qoder => Path::new(".qoder/skills"),
             Self::Codebuddy => Path::new(".codebuddy/skills"),
             Self::Qwen => Path::new(".qwen/skills"),
+            Self::Gemini => Path::new(".gemini/skills"),
             Self::Trae => Path::new(".trae/skills"),
             Self::Cursor => Path::new(".cursor/skills"),
             Self::Kimi => Path::new(".kimi-code/skills"),
@@ -477,6 +481,7 @@ impl std::str::FromStr for SkillDeliveryGroupKey {
             "qoder" => Ok(Self::Qoder),
             "codebuddy" => Ok(Self::Codebuddy),
             "qwen" => Ok(Self::Qwen),
+            "gemini" => Ok(Self::Gemini),
             "trae" => Ok(Self::Trae),
             "cursor" => Ok(Self::Cursor),
             "kimi" => Ok(Self::Kimi),
@@ -729,6 +734,13 @@ impl AgentRuntimeAdapterRegistry {
         kind: AdapterKind,
         platform: HostPlatformKey,
     ) -> RuntimePlatformAdmission {
+        if kind == AdapterKind::GeminiCli {
+            return RuntimePlatformAdmission::not_qualified(
+                kind,
+                platform,
+                RuntimePlatformAdmissionReasonCode::QualificationEvidenceMissing,
+            );
+        }
         if platform == HostPlatformKey::LinuxX64
             && matches!(
                 kind,
@@ -929,6 +941,7 @@ impl AgentRuntimeAdapterRegistry {
             AdapterKind::QwenCode => json!({
                 "approval_mode": "yolo",
             }),
+            AdapterKind::GeminiCli => json!({"approval_mode": "yolo"}),
             AdapterKind::TraeCnCli => json!({
                 "permission_mode": "bypass_permissions",
             }),
@@ -966,6 +979,7 @@ impl AgentRuntimeAdapterRegistry {
             | AdapterKind::QoderCli
             | AdapterKind::CodebuddyCli
             | AdapterKind::QwenCode
+            | AdapterKind::GeminiCli
             | AdapterKind::TraeCnCli
             | AdapterKind::CursorAgent
             | AdapterKind::KimiCodeCli
@@ -1020,6 +1034,10 @@ impl AgentRuntimeAdapterRegistry {
                 [SkillDeliveryGroupKey::Qwen],
                 SkillDiscoveryVerification::Verified,
             ),
+            AdapterKind::GeminiCli => native_skill_discovery(
+                [SkillDeliveryGroupKey::Gemini],
+                SkillDiscoveryVerification::DocumentationOnly,
+            ),
             AdapterKind::TraeCnCli => native_skill_discovery(
                 [SkillDeliveryGroupKey::Trae],
                 SkillDiscoveryVerification::Verified,
@@ -1051,6 +1069,7 @@ impl AgentRuntimeAdapterRegistry {
             | AdapterKind::QoderCli
             | AdapterKind::CodebuddyCli
             | AdapterKind::QwenCode
+            | AdapterKind::GeminiCli
             | AdapterKind::TraeCnCli
             | AdapterKind::KimiCodeCli
             | AdapterKind::ZcodeApp
@@ -1095,6 +1114,16 @@ impl AgentRuntimeAdapterRegistry {
             AdapterKind::QwenCode => {
                 acp_capability_snapshot(observation, qwen_permission_options())
             }
+            AdapterKind::GeminiCli => {
+                let options = observation
+                    .session_result
+                    .as_ref()
+                    .filter(|_| observation.probe_status == "ready")
+                    .map(gemini_session_permission_options)
+                    .transpose()?
+                    .unwrap_or_default();
+                acp_capability_snapshot(observation, options)
+            }
             AdapterKind::TraeCnCli => {
                 let permission_options = observation
                     .session_result
@@ -1134,6 +1163,7 @@ impl AgentRuntimeAdapterRegistry {
             AdapterKind::QoderCli => qoder_permission_options(),
             AdapterKind::CodebuddyCli => codebuddy_permission_options(),
             AdapterKind::QwenCode => qwen_permission_options(),
+            AdapterKind::GeminiCli => gemini_permission_options(),
             AdapterKind::AntigravityApp => antigravity_permission_options(),
             AdapterKind::TraeCnCli => trae_static_permission_options(),
             AdapterKind::CursorAgent => cursor_permission_options(),
@@ -3156,6 +3186,59 @@ fn qwen_permission_options() -> Vec<PermissionOptionDescriptor> {
     }]
 }
 
+fn gemini_permission_options() -> Vec<PermissionOptionDescriptor> {
+    vec![PermissionOptionDescriptor {
+        key: "approval_mode".to_string(),
+        label: "approval-mode".to_string(),
+        description: "Gemini CLI's native approval mode for this ACP Agent Host.".to_string(),
+        value_type: "enum".to_string(),
+        choices: ["default", "auto_edit", "yolo", "plan"]
+            .into_iter()
+            .map(|value| choice(value, value))
+            .collect(),
+        recommended_value: json!("default"),
+        scope: RuntimeOptionScope::Host,
+        risk: "elevated".to_string(),
+        supported: true,
+        required: true,
+        unsupported_reason: None,
+    }]
+}
+
+fn gemini_session_permission_options(session: &Value) -> Result<Vec<PermissionOptionDescriptor>> {
+    let modes = session
+        .pointer("/modes/availableModes")
+        .and_then(Value::as_array)
+        .context("Gemini session did not return native approval modes")?;
+    let mut choices = Vec::new();
+    let mut ids = BTreeSet::new();
+    for mode in modes {
+        let id = mode
+            .get("id")
+            .and_then(Value::as_str)
+            .context("Gemini approval mode has no id")?;
+        anyhow::ensure!(
+            ["default", "auto_edit", "yolo", "plan"].contains(&id),
+            "Gemini returned an unsupported native approval mode"
+        );
+        anyhow::ensure!(
+            ids.insert(id.to_string()),
+            "Gemini returned duplicate native approval modes"
+        );
+        choices.push(choice(
+            id,
+            mode.get("name").and_then(Value::as_str).unwrap_or(id),
+        ));
+    }
+    anyhow::ensure!(
+        ids.contains("default") && ids.contains("yolo"),
+        "Gemini native approval modes are incomplete"
+    );
+    let mut options = gemini_permission_options();
+    options[0].choices = choices;
+    Ok(options)
+}
+
 fn cursor_permission_options() -> Vec<PermissionOptionDescriptor> {
     vec![
         PermissionOptionDescriptor {
@@ -3787,6 +3870,7 @@ mod tests {
                 json!({"permission_mode": "bypassPermissions"}),
             ),
             (AdapterKind::QwenCode, json!({"approval_mode": "yolo"})),
+            (AdapterKind::GeminiCli, json!({"approval_mode": "yolo"})),
             (
                 AdapterKind::TraeCnCli,
                 json!({"permission_mode": "bypass_permissions"}),
@@ -4886,6 +4970,67 @@ mod tests {
     }
 
     #[test]
+    fn gemini_catalog_uses_native_modes_without_inventing_plan_or_platform_qualification() {
+        let registry = AgentRuntimeAdapterRegistry::default();
+        let mut session = json!({
+            "sessionId":"gemini-test", "models":{"currentModelId":"auto", "availableModels":[{"modelId":"auto", "name":"Auto"}]},
+            "modes":{"availableModes":[{"id":"default","name":"Default"},{"id":"auto_edit","name":"Auto Edit"},{"id":"yolo","name":"YOLO"}]}
+        });
+        let snapshot = |session: Value| {
+            registry.acp_capability_snapshot(AcpProbeObservation {
+                adapter_kind: AdapterKind::GeminiCli,
+                reported_version: Some("0.60.0".into()),
+                executable_fingerprint: Some("sha256:fixture".into()),
+                authentication_status: "authenticated".into(),
+                probe_status: "ready".into(),
+                capabilities: vec![],
+                initialize_result: Some(
+                    json!({"protocolVersion":1,"agentCapabilities":{"loadSession":true}}),
+                ),
+                session_result: Some(session),
+                attempted_at: "2026-10-14T00:00:00Z".into(),
+                last_error: None,
+            })
+        };
+        let base = snapshot(session.clone()).unwrap();
+        assert_eq!(base.models[0].id, "auto");
+        assert!(
+            !base.permission_options[0]
+                .choices
+                .iter()
+                .any(|choice| choice.value == "plan")
+        );
+        session["modes"]["availableModes"]
+            .as_array_mut()
+            .unwrap()
+            .push(json!({"id":"plan","name":"Plan"}));
+        assert!(
+            snapshot(session.clone()).unwrap().permission_options[0]
+                .choices
+                .iter()
+                .any(|choice| choice.value == "plan")
+        );
+        for bad in [
+            json!([]),
+            json!([{"id":"default"},{"id":"default"},{"id":"yolo"}]),
+            json!([{"id":"default"},{"id":"unsupported"},{"id":"yolo"}]),
+        ] {
+            session["modes"]["availableModes"] = bad;
+            assert!(snapshot(session.clone()).is_err());
+        }
+        for platform in HostPlatformKey::ALL {
+            assert_eq!(
+                registry.platform_admission(AdapterKind::GeminiCli, platform),
+                RuntimePlatformAdmission::not_qualified(
+                    AdapterKind::GeminiCli,
+                    platform,
+                    RuntimePlatformAdmissionReasonCode::QualificationEvidenceMissing
+                )
+            );
+        }
+    }
+
+    #[test]
     fn acp_host_permissions_replace_the_host_but_not_the_conversation_binding() {
         let registry = AgentRuntimeAdapterRegistry::default();
         let descriptors = copilot_permission_options();
@@ -5255,6 +5400,11 @@ mod tests {
                 AdapterKind::QwenCode,
                 &[SkillDeliveryGroupKey::Qwen],
                 SkillDiscoveryVerification::Verified,
+            ),
+            (
+                AdapterKind::GeminiCli,
+                &[SkillDeliveryGroupKey::Gemini],
+                SkillDiscoveryVerification::DocumentationOnly,
             ),
             (
                 AdapterKind::TraeCnCli,

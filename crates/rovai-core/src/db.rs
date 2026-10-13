@@ -341,7 +341,7 @@ impl MainThreadMigrationSource {
 }
 
 pub(crate) const CURRENT_DATA_CONTRACT_VERSION: &str = "v1.72";
-pub(crate) const CURRENT_PROJECTION_SCHEMA_VERSION: i64 = 146;
+pub(crate) const CURRENT_PROJECTION_SCHEMA_VERSION: i64 = 147;
 const V147_MIGRATION_SOURCE_DATA_CONTRACT_VERSION: &str = "v1.54";
 const V147_MIGRATION_SOURCE_PROJECTION_SCHEMA_VERSION: i64 = 96;
 const V145_MIGRATION_SOURCE_DATA_CONTRACT_VERSION: &str = "v1.53";
@@ -837,7 +837,7 @@ impl CurrentMigrationState {
             let mut previous = *self;
             previous.v196 = false;
             return contract == CURRENT_DATA_CONTRACT_VERSION
-                && schema == CURRENT_PROJECTION_SCHEMA_VERSION
+                && schema == 146
                 && self.v195
                 && previous.admits("v1.72", 145, classifier);
         }
@@ -3351,12 +3351,12 @@ pub(crate) fn classify_database_contract(
     // Current databases do not re-prove every historical migration's SQL text.
     // Older layouts retain their migration-specific source recognition below.
     if marker.contract_version == CURRENT_DATA_CONTRACT_VERSION
-        && matches!(marker.projection_schema_version, 145 | 146)
+        && matches!(marker.projection_schema_version, 145 | 146 | 147)
     {
-        let expected_migration = if marker.projection_schema_version == 146 {
-            196
-        } else {
-            195
+        let expected_migration = match marker.projection_schema_version {
+            147 => 197,
+            146 => 196,
+            _ => 195,
         };
         let completed: bool = connection.query_row(
             "SELECT EXISTS(SELECT 1 FROM schema_migration WHERE version=?1)",
@@ -3366,8 +3366,10 @@ pub(crate) fn classify_database_contract(
         let valid = completed
             && marker.classifier_version == V147_CLASSIFIER_VERSION
             && simplification::current_structure_matches(connection)?
-            && (marker.projection_schema_version != 146
-                || simplification::schema_matches(connection)?);
+            && (marker.projection_schema_version < 146
+                || simplification::schema_matches(connection)?)
+            && (marker.projection_schema_version != 147
+                || gemini_runtime_schema_matches(connection)?);
         return Ok(if !valid {
             DatabaseContractClassification::Unknown(Some(marker))
         } else if marker.projection_schema_version == CURRENT_PROJECTION_SCHEMA_VERSION {
@@ -4964,6 +4966,66 @@ fn rewrite_command_code_runtime_closed_sets(tx: &Transaction<'_>, reverse: bool)
                 table,
                 if reverse { new } else { old },
                 if reverse { old } else { new },
+            )?;
+        }
+    }
+    for (_, sql) in triggers {
+        tx.execute_batch(&sql)?;
+    }
+    Ok(())
+}
+
+fn gemini_runtime_schema_matches(connection: &Connection) -> rusqlite::Result<bool> {
+    for (tables, token) in [
+        (&DSH_RUNTIME_TABLES[..], "'gemini-cli'"),
+        (&DSH_SKILL_TABLES[..], "'gemini'"),
+    ] {
+        for table in tables {
+            let sql: Option<String> = connection
+                .query_row(
+                    "SELECT sql FROM sqlite_master WHERE type='table' AND name=?1",
+                    [table],
+                    |row| row.get(0),
+                )
+                .optional()?;
+            if sql.is_none_or(|sql| !sql.contains(token)) {
+                return Ok(false);
+            }
+        }
+    }
+    Ok(true)
+}
+
+fn rewrite_gemini_runtime_closed_sets(tx: &Transaction<'_>, reverse: bool) -> Result<()> {
+    let triggers = {
+        let mut statement = tx.prepare("SELECT name,sql FROM sqlite_master WHERE type='trigger' AND sql IS NOT NULL ORDER BY name")?;
+        statement
+            .query_map([], |row| {
+                Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))
+            })?
+            .collect::<rusqlite::Result<Vec<_>>>()?
+    };
+    for (name, _) in &triggers {
+        tx.execute_batch(&format!("DROP TRIGGER \"{}\"", name.replace('"', "\"\"")))?;
+    }
+    for (tables, old, expanded) in [
+        (
+            &DSH_RUNTIME_TABLES[..],
+            "'command-code-cli'",
+            "'command-code-cli', 'gemini-cli'",
+        ),
+        (
+            &DSH_SKILL_TABLES[..],
+            "'command_code'",
+            "'command_code', 'gemini'",
+        ),
+    ] {
+        for table in tables {
+            expand_closed_set(
+                tx,
+                table,
+                if reverse { expanded } else { old },
+                if reverse { old } else { expanded },
             )?;
         }
     }
@@ -8945,6 +9007,9 @@ impl Database {
             if !self.schema_migration_applied(196)? {
                 migration_step!("migration_196", simplification::migrate(self));
             }
+            if !self.schema_migration_applied(197)? {
+                migration_step!("migration_197", self.migrate_gemini_runtime());
+            }
             if let Err(error) =
                 crate::notification::maintain_notification_episode_retention(self.connection())
             {
@@ -9752,11 +9817,71 @@ impl Database {
         if !self.schema_migration_applied(196)? {
             migration_step!("migration_196", simplification::migrate(self));
         }
+        if !self.schema_migration_applied(197)? {
+            migration_step!("migration_197", self.migrate_gemini_runtime());
+        }
         if let Err(error) =
             crate::notification::maintain_notification_episode_retention(self.connection())
         {
             eprintln!("Notification Episode startup retention failed: {error:#}");
         }
+        Ok(())
+    }
+
+    fn migrate_gemini_runtime(&mut self) -> Result<()> {
+        self.connection.execute_batch("PRAGMA foreign_keys=OFF;")?;
+        let result = (|| -> Result<()> {
+            let tx = self
+                .connection
+                .transaction_with_behavior(TransactionBehavior::Immediate)?;
+            anyhow::ensure!(
+                matches!(classify_database_contract(&tx)?,
+                DatabaseContractClassification::SupportedMigrationSource(ref marker)
+                    if marker.contract_version == "v1.72" && marker.projection_schema_version == 146),
+                "Gemini runtime migration requires v1.72/schema 146"
+            );
+            let tables = DSH_RUNTIME_TABLES
+                .iter()
+                .chain(DSH_SKILL_TABLES.iter())
+                .copied()
+                .collect::<Vec<_>>();
+            let counts = tables
+                .iter()
+                .map(|table| {
+                    tx.query_row(&format!("SELECT COUNT(*) FROM \"{table}\""), [], |row| {
+                        row.get::<_, i64>(0)
+                    })
+                })
+                .collect::<rusqlite::Result<Vec<_>>>()?;
+            rewrite_gemini_runtime_closed_sets(&tx, false)?;
+            anyhow::ensure!(
+                gemini_runtime_schema_matches(&tx)?,
+                "Gemini runtime closed sets are incomplete"
+            );
+            for (table, count) in tables.iter().zip(counts) {
+                anyhow::ensure!(
+                    tx.query_row(&format!("SELECT COUNT(*) FROM \"{table}\""), [], |row| row
+                        .get::<_, i64>(
+                        0
+                    ))? == count,
+                    "Gemini runtime migration changed existing {table} rows"
+                );
+            }
+            tx.execute_batch("INSERT INTO schema_migration(version,applied_at) VALUES(197,datetime('now')); UPDATE rovai_data_contract SET projection_schema_version=147,updated_at=datetime('now') WHERE singleton=1;")?;
+            validate_migration_foreign_keys(&tx, &tables)?;
+            anyhow::ensure!(
+                matches!(
+                    classify_database_contract(&tx)?,
+                    DatabaseContractClassification::Current(_)
+                ),
+                "Gemini runtime schema admission failed"
+            );
+            tx.commit()?;
+            Ok(())
+        })();
+        let foreign_keys = self.connection.execute_batch("PRAGMA foreign_keys=ON;");
+        result?;
+        foreign_keys?;
         Ok(())
     }
 
@@ -39451,6 +39576,96 @@ mod tests {
     use super::*;
 
     #[test]
+    fn gemini_runtime_schema_146_upgrade_preserves_all_rows_and_rolls_back_atomically() {
+        let (mut database, directory) = crate::test_support::seeded_runtime_database();
+        database
+            .connection()
+            .execute_batch("PRAGMA foreign_keys=OFF;")
+            .unwrap();
+        {
+            let tx = database.connection().unchecked_transaction().unwrap();
+            rewrite_gemini_runtime_closed_sets(&tx, true).unwrap();
+            tx.execute_batch("DELETE FROM schema_migration WHERE version=197; UPDATE rovai_data_contract SET projection_schema_version=146 WHERE singleton=1;").unwrap();
+            tx.commit().unwrap();
+        }
+        database
+            .connection()
+            .execute_batch("PRAGMA foreign_keys=ON;")
+            .unwrap();
+        let snapshot = |connection: &Connection| {
+            DSH_RUNTIME_TABLES
+                .iter()
+                .chain(DSH_SKILL_TABLES.iter())
+                .map(|table| {
+                    let mut columns = connection
+                        .prepare(&format!("PRAGMA table_info('{table}')"))
+                        .unwrap();
+                    let names = columns
+                        .query_map([], |row| row.get::<_, String>(1))
+                        .unwrap()
+                        .collect::<rusqlite::Result<Vec<_>>>()
+                        .unwrap();
+                    let order = names
+                        .iter()
+                        .map(|name| format!("\"{}\"", name.replace('"', "\"\"")))
+                        .collect::<Vec<_>>()
+                        .join(",");
+                    let mut query = connection
+                        .prepare(&format!("SELECT * FROM \"{table}\" ORDER BY {order}"))
+                        .unwrap();
+                    let count = query.column_count();
+                    query
+                        .query_map([], |row| {
+                            (0..count)
+                                .map(|index| row.get::<_, rusqlite::types::Value>(index))
+                                .collect::<rusqlite::Result<Vec<_>>>()
+                        })
+                        .unwrap()
+                        .collect::<rusqlite::Result<Vec<_>>>()
+                        .unwrap()
+                })
+                .collect::<Vec<_>>()
+        };
+        let before = snapshot(database.connection());
+        assert!(
+            matches!(classify_database_contract(database.connection()).unwrap(), DatabaseContractClassification::SupportedMigrationSource(ref marker) if marker.projection_schema_version==146)
+        );
+        database.connection().execute_batch("CREATE TEMP TRIGGER reject_gemini_receipt BEFORE INSERT ON schema_migration WHEN NEW.version=197 BEGIN SELECT RAISE(ABORT,'gemini rollback fixture'); END;").unwrap();
+        assert!(
+            database
+                .migrate_gemini_runtime()
+                .unwrap_err()
+                .to_string()
+                .contains("gemini rollback fixture")
+        );
+        assert_eq!(snapshot(database.connection()), before);
+        assert!(!gemini_runtime_schema_matches(database.connection()).unwrap());
+        assert!(!database.schema_migration_applied(197).unwrap());
+        assert_eq!(
+            database
+                .connection()
+                .query_row("PRAGMA foreign_keys", [], |row| row.get::<_, i64>(0))
+                .unwrap(),
+            1
+        );
+        database
+            .connection()
+            .execute_batch("DROP TRIGGER reject_gemini_receipt;")
+            .unwrap();
+        database.migrate_gemini_runtime().unwrap();
+        assert_eq!(snapshot(database.connection()), before);
+        assert!(
+            matches!(classify_database_contract(database.connection()).unwrap(), DatabaseContractClassification::Current(ref marker) if marker.projection_schema_version==147)
+        );
+        drop(database);
+        let reopened = Database::open(&directory).unwrap();
+        assert_eq!(snapshot(reopened.connection()), before);
+        assert!(reopened.schema_migration_applied(197).unwrap());
+        drop(reopened);
+        std::fs::remove_dir_all(directory).unwrap();
+    }
+
+    #[test]
     fn session_context_migration_upgrades_schema_127_and_rolls_back_atomically() {
         let directory =
             std::env::temp_dir().join(format!("rovai-context-migration-{}", Uuid::new_v4()));
@@ -41709,9 +41924,9 @@ mod tests {
             ),
             ("v1.68/schema 122 before Skills rebuild", "v1.68", 122, 172),
             (
-                "current",
+                "v1.72/schema 146 before Gemini catalog",
                 CURRENT_DATA_CONTRACT_VERSION,
-                CURRENT_PROJECTION_SCHEMA_VERSION,
+                146,
                 196,
             ),
             (

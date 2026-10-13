@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-14",
+  "task": "I02-T02",
+  "status": "source_implemented_Rust_compile_and_regressions_pending",
+  "scope": "Gemini_Core_catalog_ACP_models_permissions_Skills_MCP_mapping_and_schema147",
+  "source": [
+    {
+      "file": "crates/rovai-core/src/agent_profile.rs",
+      "sha256": "5a3f25993a366b941d26a236b15cfa80146957ed3ff80d8cb58ff27f62d4eb4e"
+    },
+    {
+      "file": "crates/rovai-core/src/agent_runtime_adapter.rs",
+      "sha256": "00e722ad157c6ec6bf2bb917389d7ce2b8367411efba3321b8f927fb73c0a857"
+    },
+    {
+      "file": "crates/rovai-core/src/acp.rs",
+      "sha256": "56ab4a5f701e80798fc1a2bc8b91806d621bbe5e2ec46fa4700c529d2888e3f2"
+    },
+    {
+      "file": "crates/rovai-core/src/health.rs",
+      "sha256": "27d4d9541bb4624407efbc93056340140efa1bee598827282ec34e044e0fe615"
+    },
+    {
+      "file": "crates/rovai-core/src/db.rs",
+      "sha256": "abf5a087fc10c53f09117dc4ea10df54c924062b37b96870e317b066fa6874da"
+    },
+    {
+      "file": "crates/rovai-core/src/native_skills.rs",
+      "sha256": "f38cce6912a355f65f356dce132617b363dcc2f012ef9a9d545d4dfba926e621"
+    },
+    {
+      "file": "crates/rovai-core/src/context.rs",
+      "sha256": "bedb480481cf8170e4dcfdf8412b4740daf9371eac6f78566a1e26ba6b9a8e62"
+    },
+    {
+      "file": "crates/rovai-core/src/monitoring.rs",
+      "sha256": "d00459a7baccbecc065dcd41bbc456a74b5c9f4bfdbf7cf3e9cd6f0d848d8d9c"
+    },
+    {
+      "file": "crates/rovai-core/src/compaction.rs",
+      "sha256": "5165ea7c37cff29435a53157cf4dd7ddd234192537b45ab80bdd8f28bfb65c77"
+    },
+    {
+      "file": "crates/rovai-core/src/runtime_platform_admission.rs",
+      "sha256": "6e2488fd98e3b3b522ac597b3537c9ba2573fb41b5b32605c0974c43adc0dda4"
+    },
+    {
+      "file": "packages/contracts/src/index.ts",
+      "sha256": "fbc55fec1038a913b16e43568d7c6173fadf6448244137e0606d678c8cd41548"
+    },
+    {
+      "file": "apps/desktop/src/renderer/src/MemberRuntimeParameters.tsx",
+      "sha256": "8f0e2ae3825303bafb3c2e8b6d6fd9f87b91230bcc1614207b3842c3ba5f1cee"
+    },
+    {
+      "file": "apps/desktop/src/renderer/src/runtime-products.ts",
+      "sha256": "4a046f32601c9db2ffe426ed9727d07e2be9766e811aa613bcab00a1c65f2e5c"
+    }
+  ],
+  "implemented": {
+    "kind": "gemini-cli",
+    "CoreCatalog": 19,
+    "sourceUnion": 21,
+    "nativeArgs": [
+      "--acp",
+      "--skip-trust"
+    ],
+    "nativeModelSelection": "--model",
+    "modelCatalog": "认证后session.models",
+    "permissions": "native modes；不虚构plan",
+    "mcp": "ACP additive/RovaiWins映射；真实工具未验证",
+    "skills": ".gemini/skills及.agents/skills；GEMINI_CLI_HOME作用域",
+    "usage": "_meta.quota.token_count输入/输出；未知缓存/金额保持缺失",
+    "migration": {
+      "id": 197,
+      "sourceSchema": 146,
+      "targetSchema": 147,
+      "closedSetTables": 7,
+      "existingData": "设计逐值保持/rollback/reopen，执行结果待CI"
+    },
+    "contract": "docs/contracts/gemini-runtime-v1.md",
+    "remainingAdapters": [
+      "hermes",
+      "open_claw"
+    ]
+  },
+  "checked": {
+    "typecheck": "passed",
+    "parameterTests": {
+      "files": 2,
+      "passed": 37,
+      "failed": 0
+    },
+    "webExecutionWebDesktopCodeBuild": "passed",
+    "cargoFormat": "passed",
+    "workflowActionlint": "passed",
+    "docsGovernance": "passed",
+    "planningAndProtocolConsistency": "passed"
+  },
+  "selfReview": {
+    "authority": "没有Codeg第二套执行/数据库；Core继续管理Run、权限与Session",
+    "persistence": "七表原CHECK拒绝新Kind，加入原子迁移及新schema读写屏障；历史I01/schema146证据不改写",
+    "catalog": "plan仅在native实际提供；丢失/重复/未知mode拒绝Ready",
+    "qualification": "Gemini四平台均未赋予运行资格；六项native bootstrap不等于模型/停止/恢复/MCP",
+    "nativeStartup": "Mac实际仍initializing_authority/no error，首个ready观察由通用12s改为独立60s；仍只接受ready，其余交互预算不变"
+  },
+  "RustTestAdmission": {
+    "existingOwnersExtended": [
+      "成员最大权限默认值",
+      "Skills来源矩阵",
+      "Native ACP启动参数",
+      "平台资格闭集",
+      "稀疏Usage parser"
+    ],
+    "newOwners": [
+      {
+        "name": "gemini_catalog_uses_native_modes_without_inventing_plan_or_platform_qualification",
+        "tier": "pure default",
+        "why": "新产品native条件模式、重复/未知拒绝及资格边界；已有Host权限变更owner不拥有这些失败语义"
+      },
+      {
+        "name": "gemini_runtime_schema_146_upgrade_preserves_all_rows_and_rolls_back_atomically",
+        "tier": "extended SQLite",
+        "why": "新schema146->147七表迁移、receipt rollback/FK及重开；旧catalog owner先退役mission/continuation结构，不适合当该精确来源夹具",
+        "assertions": "七表每列逐值快照；故障注入失败回滚；外键恢复；成功与重开保持原值"
+      }
+    ]
+  },
+  "nativeMacPrior": {
+    "runId": 38452306276,
+    "x64": "源码构建/Gemini6通过；Desktop启动ready未完成",
+    "snapshot": {
+      "state": "starting",
+      "phase": "initializing_authority",
+      "lastError": null
+    },
+    "arm64": "cancelled/assertions not_run"
+  },
+  "limits": {
+    "RustCompile": "pending_CI",
+    "RustTests": "pending_CI",
+    "nativeMacReady": "not_passed",
+    "actualModel": "not_run",
+    "cancellation": "not_run",
+    "resume": "not_run",
+    "MCP": "not_run",
+    "abruptCrash": "not_run",
+    "customerAcceptance": "not_run",
+    "full324FusionCases": "not_run"
+  }
+}

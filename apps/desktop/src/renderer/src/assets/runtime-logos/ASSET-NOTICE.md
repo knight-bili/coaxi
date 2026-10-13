@@ -1,5 +1,9 @@
 # Runtime Logo Asset Notice
 
+`gemini-cli.svg` 来自固定 Codeg 源码的 `docs/images/agents/gemini-cli.svg`，
+提交 `aff1e6c278453ed8d0b96a5f664edcdca621aa3f`，字节保持不变。
+Codeg 的 Apache-2.0 许可与 NOTICE 已保留在 `integration/licenses/`；该图标用于标识原产品。
+
 The runtime product logos in this directory come from
 [`@lobehub/icons-static-svg`](https://www.npmjs.com/package/@lobehub/icons-static-svg) version
 `1.94.0`. The source project is [Lobe Icons](https://github.com/lobehub/lobe-icons).
