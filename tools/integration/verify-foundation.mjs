@@ -14,6 +14,17 @@ assert.equal(contract.hostWebProtocolVersion,Number(web.match(/HOST_WEB_PROTOCOL
 assert.equal(contract.coreDataContractVersion,db.match(/CURRENT_DATA_CONTRACT_VERSION: &str = "([^"]+)"/)[1]);
 assert.equal(contract.coreProjectionSchemaVersion,Number(db.match(/CURRENT_PROJECTION_SCHEMA_VERSION: i64 = (\d+)/)[1]));
 assert.deepEqual(contract.canonicalWebOperations,operations);
+const command=text('crates/rovai-core/src/command.rs');
+const envelope=command.split('pub struct CommandEnvelope<P> {')[1].split('\n}')[0];
+const camelCase=(field)=>field.replace(/_([a-z])/g,(_,letter)=>letter.toUpperCase());
+assert.deepEqual(contract.coreEnvelopeFields,Array.from(envelope.matchAll(/pub (\w+):/g),x=>camelCase(x[1])));
+assert.match(envelope,/expected_versions: Vec<ExpectedVersion>/);
+assert.match(command,/serde\(tag = "type", rename_all = "snake_case"\)/);
+const request=web.split('struct OperationRequest {')[1].split('\n}')[0];
+assert.deepEqual(contract.webOperationRequestFields,Array.from(request.matchAll(/^\s*(\w+):/gm),x=>x[1]));
+assert.match(web,/#\[serde\(deny_unknown_fields\)\]\s*struct OperationRequest/);
+const source=json('integration/sources.lock.json').sources.find(x=>x.id==='rovai-ai');
+assert.equal(contract.sourceCommit,source.commit);
 const cases=json('integration/foundation/protocol-cases.json');
 assert.equal(new Set(cases.map(x=>x.id)).size,cases.length);
 assert(cases.some(x=>x.saveSession && x.body.protocolVersion===contract.hostWebProtocolVersion));
