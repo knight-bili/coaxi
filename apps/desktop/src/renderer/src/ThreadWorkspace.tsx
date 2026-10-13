@@ -1533,6 +1533,7 @@ export function emptyThreadRuntimeSummary(
 
 export function QuickChatWorkspace({
   agents,
+  project = null,
   recentThreads,
   firstRunThreadId = null,
   onOpenThread,
@@ -1541,6 +1542,7 @@ export function QuickChatWorkspace({
   onOpenRuntimeSettings
 }: {
   agents: AgentProfile[]
+  project?: { name: string; projectPath: string } | null
   recentThreads: NavigationThreadItem[]
   firstRunThreadId?: string | null
   onOpenThread(thread: NavigationThreadItem): void
@@ -1553,9 +1555,10 @@ export function QuickChatWorkspace({
     runtimeReadiness: agent.runtimeReadiness.status
   }))
   return (
-    <section className="workspace-shell new-conversation-workspace quick-chat-workspace" aria-label={uiAttribute("快速对话")}>
+    <section className="workspace-shell new-conversation-workspace quick-chat-workspace" aria-label={project ? uiAttribute('工程首页') : uiAttribute("快速对话")}>
       <div className="new-conversation-main">
         <div className="new-conversation-stage">
+          {project && <header className="project-home-heading"><h2>{project.name}</h2><p className="quick-chat-subline" title={project.projectPath}>{project.projectPath}</p></header>}
           {recentThreads.length === 0 && <>
           <svg className="quick-chat-mark" data-brand-mark="horizon" data-brand-layout="separated" width="96" height="66" viewBox="0 0 72 56" aria-hidden="true">
             <path d="M36 4 L39.6 16.7 L53.9 20.4 L39.6 24.1 L36 36.8 L32.4 24.1 L18.1 20.4 L32.4 16.7 Z" fill="currentColor" />

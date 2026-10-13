@@ -2131,6 +2131,7 @@ export function BusinessApp({
       setCurrentProject(fallback)
       setCurrentWorkspaceHint(null)
       persistCurrentProject(fallback)
+      if (viewRef.current === 'compose') desktopNavigation.captureCurrentEntry().update({ kind: 'quick_chat', projectPath: null })
       return undefined
     }
     if (currentProjectAccess === 'clear_hint') {
@@ -2151,13 +2152,15 @@ export function BusinessApp({
       setCurrentProject(fallback)
       setCurrentWorkspaceHint(null)
       persistCurrentProject(fallback)
+      if (viewRef.current === 'compose') desktopNavigation.captureCurrentEntry().update({ kind: 'quick_chat', projectPath: null })
     })
     return () => { cancelled = true }
   }, [
     currentProjectAccess,
     currentProject.kind,
     currentProjectPath,
-    currentWorkspaceHint?.projectPath
+    currentWorkspaceHint?.projectPath,
+    desktopNavigation
   ])
 
   const startupPrerequisitesReady = generalPreferences !== null
@@ -2328,9 +2331,9 @@ export function BusinessApp({
       ? { kind: 'camp', threadId: activeThreadId }
       : view === 'members' ? { kind: 'members', agentId: restoredMemberId(selectedMemberId, agents), tab: memberTab }
       : view === 'memory' ? memoryTarget
-      : { kind: 'quick_chat' }
+      : { kind: 'quick_chat', projectPath: currentProject.kind === 'directory' ? currentProject.projectPath : null }
     desktopNavigation.reset(target)
-  }, [startupStatus, desktopNavigation, view, activeThreadId, selectedMemberId, agents, memberTab, memoryTarget])
+  }, [startupStatus, desktopNavigation, view, activeThreadId, selectedMemberId, agents, memberTab, memoryTarget, currentProject])
 
   useEffect(() => {
     if (startupStatus !== 'resolved' || view !== 'compose') return
@@ -2883,7 +2886,7 @@ export function BusinessApp({
       : nextView === 'missions' ? { kind: 'missions' }
       : nextView === 'camp' && activeThreadId ? { kind: 'camp', threadId: activeThreadId }
       : nextView === 'settings' ? { kind: 'settings', section: settingsSection }
-      : { kind: 'quick_chat' }
+      : { kind: 'quick_chat', projectPath: currentProject.kind === 'directory' ? currentProject.projectPath : null }
     void (mobile ? desktopNavigation.replace(target) : desktopNavigation.push(target))
   }
 
@@ -2948,7 +2951,18 @@ export function BusinessApp({
       if (target.kind === 'settings' && viewRef.current !== 'settings') {
         lastMainTarget.current = previous.entries[previous.index] ?? { kind: 'quick_chat' }
       }
-      if (!transaction.commit()) return
+      let resolvedTarget = target
+      let projectWorkspace: WorkspaceInspection | null = null
+      if (target.kind === 'quick_chat' && target.projectPath) {
+        if (removedProjectKeys.has(projectTargetKey(target.projectPath))) {
+          resolvedTarget = { kind: 'quick_chat', projectPath: null }
+        } else {
+          projectWorkspace = await client.request<WorkspaceInspection>('workspaces.inspect', { path: target.projectPath })
+          if (!transaction.isCurrent()) return
+          resolvedTarget = { kind: 'quick_chat', projectPath: projectWorkspace.projectPath }
+        }
+      }
+      if (!transaction.commit(resolvedTarget)) return
       context?.beforeCommit?.()
       setNotificationFocus(null)
       switch (target.kind) {
@@ -2960,7 +2974,11 @@ export function BusinessApp({
         case 'memory': setMemoryTarget(target); setView('memory'); break
         case 'automations': setView('automations'); break
         case 'missions': setView('missions'); break
-        case 'quick_chat': setView('compose'); break
+        case 'quick_chat':
+          if (target.projectPath !== undefined) chooseCurrentProject(projectWorkspace
+            ? { kind: 'directory', projectPath: projectWorkspace.projectPath }
+            : { kind: 'quick_chat' }, projectWorkspace)
+          setView('compose'); break
       }
     }
     const leave = async (): Promise<void> => {
@@ -4301,6 +4319,11 @@ export function BusinessApp({
           : { kind: 'quick_chat' },
         project ? { name: project.name, projectPath: project.projectPath } : null
       )
+      if (viewRef.current === 'compose') desktopNavigation.captureCurrentEntry().update({ kind: 'quick_chat', projectPath: project?.projectPath ?? null })
+    }}
+    onOpenProjectHome={(project) => {
+      setMobileConversationDrawerOpen(false)
+      void desktopNavigation.push({ kind: 'quick_chat', projectPath: project.projectPath })
     }}
     onCreateInProject={(project) => {
       setMobileConversationDrawerOpen(false)
@@ -4460,8 +4483,9 @@ export function BusinessApp({
         {!startupGateVisible && view === 'compose' && (
           <QuickChatWorkspace
             agents={agents}
+            project={selectedCurrentProject}
             firstRunThreadId={firstRunThreadId}
-            recentThreads={visibleNavigation ? allNavigationThreads(visibleNavigation).slice(0, 5) : []}
+            recentThreads={visibleNavigation ? (selectedCurrentProject?.recentThreads ?? allNavigationThreads(visibleNavigation)).slice(0, 5) : []}
             onOpenThread={chooseThread}
             onNewConversation={beginNewConversation}
             onOpenMembers={() => chooseView('members')}

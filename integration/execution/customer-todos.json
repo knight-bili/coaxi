@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-13",
+  "policy": "客户允许先登记待办并推进独立工作；不削减范围或假通过，最后补齐必要验收",
+  "items": [
+    {"id":"INPUT-MAC","resource":"RES-MAC","required_for":"I08及平台最终验收","need":"实际Mac的权限、硬件和安装交互验收方式","status":"deferred","software_workaround":"GitHub两款双架构源码编译已验证"},
+    {"id":"INPUT-IOS","resource":"RES-IOS","required_for":"I10及原生移动最终验收","need":"iPhone/iPad实际安装、触控、后台和网络验收设备","status":"deferred","software_workaround":"iPhone模拟器源码构建及启动已验证，iPad和真机未验收"},
+    {"id":"INPUT-ANDROID","resource":"RES-ANDROID","required_for":"I10及原生移动最终验收","need":"客户指定可使用的ADB连接及实际设备","status":"deferred","software_workaround":"API36 AOSP模拟器源码构建/176单测/启动已验证，不使用旧ADB设备"},
+    {"id":"INPUT-RUNTIME","resource":"RES-RUNTIME","required_for":"I02首次真实运行及I04/I06/I12完整准入","need":"研发先核实本机可用Runtime；缺少的独立测试认证/模型额度由客户补齐","status":"pending_developer_inventory","software_workaround":"先实现成员、Provider、Skills/MCP配置和不依赖认证的协议/生命周期测试，不能代替真实AI执行"},
+    {"id":"INPUT-CHANNEL","resource":"RES-CHANNEL","required_for":"I10渠道端到端验收","need":"飞书/Lark/钉钉的专用测试组织、Bot及客户授权身份","status":"deferred","software_workaround":"先实现共用合同和隔离运输测试，不使用个人日常凭据"},
+    {"id":"INPUT-SIGN","resource":"RES-SIGN","required_for":"I11正式分发","need":"桌面/移动发布签名、Apple分发账号和费用决策","status":"deferred","software_workaround":"先开发预览包及模拟器验证，不采购或发布"},
+    {"id":"INPUT-ACCEPTANCE","required_for":"main阶段合入及I12客户最终验收","need":"客户验收阶段PR与最终MVP","status":"deferred","software_workaround":"按依赖建立阶段分支和草稿PR继续开发；保持main人工验收控制"}
+  ]
+}
