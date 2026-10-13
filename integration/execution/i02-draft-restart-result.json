@@ -4,7 +4,7 @@
   "status": "passed",
   "scope": "production_web_public_body_normal_browser_restart_and_actual_quota",
   "source": {
-    "parentCommit": "9047972dac18896c3598abc46ed01a6150a330a0",
+    "parentCommit": "06f8bb649e600d8f3d42ed296e071a40f90ab597",
     "files": [
       {
         "file": "apps/desktop/src/renderer/src/BusinessApp.tsx",
@@ -12,7 +12,7 @@
       },
       {
         "file": "apps/desktop/src/renderer/src/ThreadWorkspace.tsx",
-        "sha256": "9bab08a39ee4c3979b98694619ecb5d3d025c21f8f6e68b24cddb5a36b68bd7e"
+        "sha256": "81ef864bae600ccce55d257a02be6b32dd97eb082a25c51ff308ed710afc1fc9"
       },
       {
         "file": "apps/desktop/src/renderer/src/camp-client.tsx",
@@ -40,11 +40,11 @@
       },
       {
         "file": "scripts/lib/host-web-live.test.mjs",
-        "sha256": "45f990edd7c9210d536290f41a748a9f0b9159e02476075f66af694e33dbbadc"
+        "sha256": "61c3bcbee9d969bb076c3685c72378e2bd93867b244df8fd09300603f6462f52"
       },
       {
         "file": "tools/integration/smoke-workbench-live.mjs",
-        "sha256": "e4c9d8211ebc2606e55c5df87f1ffa3420b829f3e0f7b625af1e587730bb1b80"
+        "sha256": "a402a72f07e3218158a0289adfe065729ad4ecabcd0449fc250e39ffa8f4be37"
       }
     ],
     "coreBinary": {
@@ -103,11 +103,11 @@
   "screenshots": [
     {
       "file": "saved-draft-picker.png",
-      "sha256": "7ccf4e541a00575ee62e085f2a2181e056c89611ae9ee447df680eb10e54957a"
+      "sha256": "0c7cb5c88aba0cb55eea274c1925661eb8ea0e14163fda0fa0e1309224fa45d3"
     },
     {
       "file": "saved-draft-restored.png",
-      "sha256": "5b7e250412e162043392eb92dac2dd3aae1617a5d05011beb8b3fe7c06137ea0"
+      "sha256": "9cb1888bbfbc22162c943ca7e01b1924c8531ffd359044b2ebf35918ccc51565"
     }
   ],
   "review": "两份文字及保存时间分别展示，选择A后仅A进入当前编辑器；最终两张截图已核查",

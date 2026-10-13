@@ -31,6 +31,9 @@ Web 公共 Thread 正文快照按当前 Host origin、已验证 Owner 和编辑�
   Scheduler claim 后才出现真实 Run，并由真实 Run 接管后续状态与停止语义。当前队员的前次 Run 已有清理请求
   而尚无 ACK 时，排队卡与队员入口显示“等待上次执行清理”；超过 Windows 单次预算后显示
   “上次执行清理未确认，正在重试”。清理完成后恢复正常状态，后继自动领取。
+- `execution:null` 发布的阅读记录没有 Principal 投递，不能仅凭 `addressedAgentIds` 显示“待处理”。
+  Renderer 只在当前消息可撤回，或已有真实 Thread Turn/Run 时派生用户消息处理回执；阅读记录不显示撤回入口。
+  Core 拒绝该记录的撤回时，消息和客户端草稿保持原值。等待投递的撤回成功路径仍按 Core 的首次 claim 边界验收。
 - 执行区“停止”只 CAS 当前精确 Run。没有公屏通用停止、队列暂停/恢复、Camp 全部停止或手工放行入口；终态后队列按正常规则继续。
 - accepted/outcome-unknown 对用户显示普通红色失败，不显示“结果未知”产品状态；诊断和 evidence 仍保留内部真实分类。旧执行尚未隔离时，后继消息继续显示等待，不制造必败 Run。
 - 本地用户消息仅在首次目标 claim 前显示撤回；成功后时间线可显示“你撤回了一条消息”。Agent 主动读取可在 claim 前看到原文，撤回后 `camp.read` 仅在原序号返回 `Message withdrawn` 状态项，搜索不再命中原文。

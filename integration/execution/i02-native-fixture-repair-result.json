@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-14",
+  "task": "I02-T01",
+  "status": "source_rewritten_native_Mac_CI_pending",
+  "files": [
+    {
+      "file": "scripts/lib/host-web-live.test.mjs",
+      "sha256": "61c3bcbee9d969bb076c3685c72378e2bd93867b244df8fd09300603f6462f52"
+    },
+    {
+      "file": "apps/desktop/src/renderer/src/ThreadWorkspace.tsx",
+      "sha256": "81ef864bae600ccce55d257a02be6b32dd97eb082a25c51ff308ed710afc1fc9"
+    },
+    {
+      "file": "tools/integration/smoke-workbench-live.mjs",
+      "sha256": "a402a72f07e3218158a0289adfe065729ad4ecabcd0449fc250e39ffa8f4be37"
+    },
+    {
+      "file": ".github/workflows/workbench-native-web.yml",
+      "sha256": "a2ce6bca247938c019b2b2169fae3ebe94a13f45d8bb21fb23a05c77028367a4"
+    }
+  ],
+  "changes": [
+    "移除退役Core public草稿与未公开Pending的直接SQL写入",
+    "Desktop及两个Web编辑身份按当前客户端快照检查独立正文",
+    "阅读记录无投递时不显示等待/撤回；拒绝命令保持消息及所有草稿",
+    "保留重新认证DOM身份、附件、管理页、文件预览引用及双主题断言"
+  ],
+  "passed": {
+    "liveCoreProductionWebChecks": 19,
+    "readingRecordAgentRuns": 0,
+    "databaseIntegrity": "ok",
+    "typecheck": true,
+    "webExecutionWebDesktopCodeBuild": true,
+    "nativeScriptSyntax": true,
+    "workflowYamlParsing": true
+  },
+  "selfReview": "回执不能仅由寻址成员推导；当前可撤回资格或真实Turn/Run才支撑状态。合法Core API建数据，最后SQL只读核查。没有用旧表注入、假Run或宽松断言使测试通过。",
+  "beforeFailures": [
+    {
+      "id": "execution_null_is_not_queued",
+      "result": "recall_state=ineligible且Principal delivery为0",
+      "action": "纠正旧证据中的等待投递表述"
+    },
+    {
+      "id": "delivery_claim_race",
+      "fixture": "live-lyFUxH",
+      "result": "正式发布被快速领取；数据库真实出现1条failed Run，未获得可撤回等待窗口",
+      "actualInference": "not_verified",
+      "action": "等待状态撤回正向场景保留研发待办，不能记为真实AI通过"
+    }
+  ],
+  "limits": {
+    "nativeMacSuite": "not_run_CI_pending",
+    "waitingDeliveryWithdrawalSuccess": "not_run",
+    "realRuntime": "not_run",
+    "customerAcceptance": "not_run",
+    "fullFusionCases": "not_run"
+  },
+  "githubWorkflow": ".github/workflows/workbench-native-web.yml",
+  "liveEvidence": "i02-navigation-live-result.json",
+  "screenshots": [
+    {
+      "file": "I02_阅读记录撤回拒绝验证.png",
+      "sha256": "8e76b8d96706f712f3f68e5890ad27d89a3fdb36576107ec7d7dc4d908e2cd47",
+      "review": "无待处理回执和撤回按钮，容量错误后的草稿仍在输入框"
+    }
+  ]
+}

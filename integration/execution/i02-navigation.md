@@ -14,7 +14,7 @@ Windows隐藏窗口首次在旧的菜单淡入断言处失败；未改断言或�
 
 真实回归发现“目录恢复后进入成功但旧错误残留”，在工程进入动作开始清除旧错误，原失败断言随后通过。浏览器验收工具改为正常退出后重开，避免强制终止导致刚保存的偏好尚未落盘；重开后还等待真实对话投影加载，截图不取启动中间态。数据库完整性为ok，agent_run为0；当前类型检查、Web构建及37项定向回归通过。截图已人工核查，完整原始证据保留工作区，提交记录只含哈希、检查结果和限制，不提交凭据、数据库或浏览器配置。
 
-继续验证时通过当前thread.messages.send提交八条受控用户消息，execution为null；相同commandId再次提交回放原记录，没有重复消息。生产Thread页读取八条消息，截图显示待领取投递，agent_run仍为0，不能称为真实AI执行。
+继续验证时通过当前thread.messages.send提交八条受控用户消息，execution为null；相同commandId再次提交回放原记录，没有重复消息。生产Thread页读取八条消息，这些execution:null阅读记录没有Principal投递；此前截图的待处理提示是Renderer错误推导，已纠正，不能作为等待投递或真实AI证据。
 
 同一浏览器两标签的实际测试复现了未发送文字串读：标签B读取到标签A的I02_TAB_A_UNSENT。Web公共Thread正文原来仍读写origin共享localStorage，现在接入既有Host/Owner/editor作用域的editingRecovery；正文加载、Active及Pending保存、发送回执替换、删除/丢弃均使用同一个存储适配。Desktop仍使用原本机存储，没有新增Core表或公共API。双标签分别输入并刷新后保留私有文字，原失败断言通过；该批5个测试文件33项回归、类型检查、Web/ExecutionWeb/Electron代码构建通过。
 
@@ -28,4 +28,6 @@ Windows隐藏窗口首次在旧的菜单淡入断言处失败；未改断言或�
 
 复跑使用tools/integration/smoke-workbench-live.mjs，设置绝对路径ROVAI_HOST_BIN、ROVAI_WEB_UI、WORKBENCH_EVIDENCE_ROOT、WORKBENCH_BROWSER_BIN；只支持本次新建隔离数据根。Windows由Host原生prepare命令建立私有根，明确独立skill library和MCP路径。浏览器应使用支持当前CDP的Chrome/Chromium，无真实AI运行。
 
-I02-T01仍进行中，桌面进程/Host进程重开及实际AI执行未验证，324融合场景仍not_run。后续补齐项目启动器、会话地图、通知及首次使用差异，再推进成员/Provider、Skills/MCP；原生Mac脚本已修正消息初始化合同，但旧SQL草稿及未公开Pending夹具还需按当前客户端存储和已发布消息撤回合同改写，完整夹具未运行。研发问题记入development-todos.json，不转为客户资源阻塞。缺少的客户资源见customer-todos.json，不阻塞独立开发。
+I02-T01仍进行中，桌面进程/Host进程重开及实际AI执行未验证，324融合场景仍not_run。后续补齐项目启动器、会话地图、通知及首次使用差异，再推进成员/Provider、Skills/MCP；原生Mac脚本已移除旧SQL草稿及未公开Pending夹具，按当前客户端快照和阅读记录无撤回改写；完整双Mac夹具由专用GitHub工作流运行，结果尚待核实。研发问题记入development-todos.json，不转为客户资源阻塞。缺少的客户资源见customer-todos.json，不阻塞独立开发。
+
+2026-10-14继续整改：真实生产Web与锁定Windows Host完整19项检查通过。新增检查核实execution:null记录没有投递/Turn/Run，不显示待处理或撤回；Core返回message.withdraw_too_late后消息、当前输入与全部草稿快照保持原值。源码构建、类型与文档治理通过；等待投递撤回成功和真实Runtime尚未运行。见[i02-native-fixture-repair-result.json](i02-native-fixture-repair-result.json)、[21种Runtime盘点](i02-runtime-inventory-result.json)与[移植顺序](i02-runtime-port.md)。Core当前18种AdapterKind，Gemini/Hermes/OpenClaw三种源码差异进入I02-T02，完整范围不删减。

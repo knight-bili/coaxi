@@ -14,7 +14,7 @@
   "current_branch": "phase/i02-workbench",
   "base_branch": "phase/i01-foundation",
   "current_task": "I02-T01",
-  "current_slice": "工程导航、Web私有正文快照与选择恢复",
+  "current_slice": "工程导航整改及21种Runtime融合准入盘点",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,8 +33,9 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "I02-T01重写旧Mac夹具、补附件/异常退出恢复并核查剩余导航差异",
-    "I02-T02先盘点独立测试Runtime，再融合成员与Provider",
+    "运行双Mac原生Desktop/Web夹具并按真实失败修复",
+    "I02-T02移植Core缺少的Gemini/Hermes/OpenClaw，准备隔离Runtime证明",
+    "补齐I02-T01导航差异及附件/异常退出恢复",
     "I02-T03 Skills/MCP",
     "按原依赖推进I03至I12"
   ],
@@ -44,5 +45,7 @@
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-navigation-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
-  "draft_restart_evidence": "i02-draft-restart-result.json"
+  "draft_restart_evidence": "i02-draft-restart-result.json",
+  "runtime_inventory_evidence": "i02-runtime-inventory-result.json",
+  "native_fixture_evidence": "i02-native-fixture-repair-result.json"
 }

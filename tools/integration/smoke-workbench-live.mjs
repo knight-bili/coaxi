@@ -287,7 +287,33 @@ try {
   await browser.reload()
   await browser.wait(`${editor}?.textContent === ${JSON.stringify(savedInput)} && document.querySelector('.web-login-overlay') === null`)
   record('actual_browser_quota_preserves_input_and_previous_snapshot_then_retries')
-  finalResult = { status: 'passed', scope: 'production_web_real_host_navigation_and_recorded_messages_no_runtime', stage, checks, screenshots: ['project-B-real-host.png', 'thread-real-host.png', 'saved-draft-picker.png', 'saved-draft-restored.png'],
+  stage = 'record_only_withdrawal_guard'
+  const messageId = recordedMessages.at(-1)
+  const readPublication = () => {
+    const db = new DatabaseSync(path.join(dataDir, 'rovai.sqlite'), { readOnly: true })
+    try { return { message: db.prepare('select id,body,version,recall_state from camp_message where id=?').get(messageId), deliveries: db.prepare('select status from camp_message_delivery where message_id=?').all(messageId) } }
+    finally { db.close() }
+  }
+  const beforePublication = readPublication()
+  assert(beforePublication.message.body.includes('Controlled Host record 8.'))
+  assert.equal(beforePublication.message.recall_state, 'ineligible')
+  assert.equal(beforePublication.deliveries.length, 0)
+  await writeFile(path.join(output, 'publication-before-withdrawal.json'), JSON.stringify(beforePublication, null, 2))
+  const beforeDrafts = await browser.evaluate(snapshots)
+  assert.equal(await browser.evaluate(`document.querySelectorAll('.user-message-withdraw').length`), 0)
+  assert.equal(await browser.evaluate(`document.querySelectorAll('.user-message-receipt-row').length`), 0, '未创建投递/Turn/Run的阅读记录不能显示等待投递')
+  record('record_only_message_has_no_delivery_or_withdraw_ui')
+  const rejected = await call('thread.messages.withdraw', { commandId: crypto.randomUUID(), command: { threadId: projects['I02-工程-B'].threadId, messageId, expectedVersion: beforePublication.message.version } })
+  assert.equal(rejected.status, 'rejected')
+  assert.equal(rejected.code, 'message.withdraw_too_late')
+  const afterPublication = readPublication()
+  assert.deepEqual(afterPublication, beforePublication)
+  assert.equal(await browser.evaluate(`${editor}.textContent`), savedInput)
+  assert.deepEqual(await browser.evaluate(snapshots), beforeDrafts)
+  record('ineligible_withdrawal_rejected_and_keeps_publication_and_client_drafts')
+  await writeFile(path.join(output, 'publication-after-withdrawal.json'), JSON.stringify(afterPublication, null, 2))
+  await browser.capture(path.join(output, 'record-only-refusal.png'))
+  finalResult = { status: 'passed', scope: 'production_web_real_host_navigation_and_recorded_messages_no_runtime', stage, checks, screenshots: ['project-B-real-host.png', 'thread-real-host.png', 'saved-draft-picker.png', 'saved-draft-restored.png', 'record-only-refusal.png'],
     realAgent: 'not_run', customerAcceptance: 'not_run', profile, dataDir, skillRoot, mcpConfigPath: mcp }
 } catch (error) {
   const errorText = error instanceof Error ? String(error) : JSON.stringify({ code: error?.code, message: error?.message })

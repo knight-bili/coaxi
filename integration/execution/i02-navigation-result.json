@@ -32,7 +32,7 @@
   "electronCodeBuild": "passed",
   "liveCoreNavigation": {
     "status": "passed",
-    "checks": 17,
+    "checks": 19,
     "evidence": "i02-navigation-live-result.json",
     "runtime": "not_started"
   },

@@ -7952,7 +7952,8 @@ function UserMessageDeliveryReceipt({
   onOpenExecution(run: AgentRunView, trigger: HTMLButtonElement): void
   onWithdraw?(): void
 }): JSX.Element | null {
-  if (message.id.startsWith('optimistic:') || message.addressedAgentIds.length === 0) return null
+  if (message.id.startsWith('optimistic:') || message.addressedAgentIds.length === 0
+    || (!message.canWithdraw && !message.threadTurnId && runs.length === 0)) return null
   const runByAgentId = new Map<string, AgentRunView>()
   for (const run of runs.slice().sort((left, right) => right.createdAt.localeCompare(left.createdAt))) {
     if (!runByAgentId.has(run.agentId)) runByAgentId.set(run.agentId, run)

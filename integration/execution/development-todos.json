@@ -6,11 +6,11 @@
     {
       "id": "DEV-HOST-WEB-LIVE-API",
       "task": "I01-T03/I02-T01",
-      "status": "message_contract_corrected_remaining_fixture_rewrite_pending",
+      "status": "source_rewritten_native_Mac_CI_pending",
       "file": "scripts/lib/host-web-live.test.mjs:52",
-      "problem": "消息初始化已改用threads.create/thread.messages.send，真实Host验证记录及回放；原生Mac脚本仍断言旧Core草稿SQL并注入已退役的未公开Pending，需按当前客户端草稿和已公开消息撤回合同重写并实际运行",
+      "problem": "旧SQL草稿和未公开Pending已移除，改为当前客户端快照与阅读记录无撤回；完整Mac夹具和等待投递撤回成功仍需实际运行",
       "owner": "研发",
-      "evidence": "真实Host接收八条受控用户消息，相同命令回放不重复，生产页面读取通过；完整Mac夹具未运行，不能把合同修正标记为整个夹具通过"
+      "evidence": "i02-native-fixture-repair-result.json；Windows生产Web+真实Host19项通过，原生脚本仅语法通过；专用双Mac CI等待运行"
     },
     {
       "id": "DEV-WEB-LEGACY-DRAFT-RECOVERY",
@@ -19,7 +19,23 @@
       "file": "apps/desktop/src/renderer/src/camp-composer-local-store.ts",
       "problem": "旧版显式恢复、正常浏览器退出后公共正文恢复及真实quota已验证；真实旧附件、异常退出与全平台仍需补齐",
       "owner": "研发",
-      "evidence": "i02-draft-restart-result.json：完整生产流程17检查，关闭进程后两份各自存在、明确选一份、真实quota保留及重试通过；旧版实际数据5项保持"
+      "evidence": "i02-draft-restart-result.json：完整生产流程19检查，关闭进程后两份各自存在、明确选一份、真实quota保留及重试通过；旧版实际数据5项保持"
+    },
+    {
+      "id": "DEV-WAITING-DELIVERY-WITHDRAWAL",
+      "task": "I02-T01/I12",
+      "status": "pending_controlled_runtime_fixture",
+      "problem": "真实等待投递的撤回成功路径需受控Runtime保持领取前窗口，不能用execution:null阅读记录或直接SQL注入代替",
+      "evidence": "live-lyFUxH受控试验出现1条failed Run；拒绝路径19项通过；成功路径未运行",
+      "owner": "研发"
+    },
+    {
+      "id": "DEV-CORE-RUNTIME-UNION",
+      "task": "I02-T02",
+      "status": "source_gap_confirmed_design_in_progress",
+      "problem": "21种来源Runtime中Core当前18个AdapterKind；Gemini/Hermes/OpenClaw需要在Core内移植，OpenClaw还有Node版本及无原生MCP兼容问题",
+      "evidence": "i02-runtime-inventory-result.json；不启动Codeg第二套执行权威",
+      "owner": "研发"
     }
   ]
 }
