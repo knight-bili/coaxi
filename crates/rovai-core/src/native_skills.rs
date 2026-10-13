@@ -570,6 +570,9 @@ fn user_roots(
             paths.push(root.join(".gemini/skills"));
             paths.push(root.join(".agents/skills"));
         }
+        AdapterKind::HermesCli => paths.push(
+            configured_root("HERMES_HOME", home.join(".hermes"), configuration).join("skills"),
+        ),
         AdapterKind::TraeCnCli => paths.extend(
             [
                 ".traecli/skills",
@@ -656,6 +659,7 @@ fn project_roots(adapter: AdapterKind, project: &Path) -> Vec<(&'static str, Pat
         AdapterKind::CodebuddyCli => &[".codebuddy/skills"],
         AdapterKind::QwenCode => &[".qwen/skills"],
         AdapterKind::GeminiCli => &[".gemini/skills", ".agents/skills"],
+        AdapterKind::HermesCli => &[".hermes/skills", ".agents/skills"],
         AdapterKind::TraeCnCli => &[".traecli/skills", ".trae/skills", ".agents/skills"],
         AdapterKind::CursorAgent => &[
             ".cursor/skills",

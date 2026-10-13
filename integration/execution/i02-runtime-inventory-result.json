@@ -433,12 +433,11 @@
     }
   ],
   "currentFusion": {
-    "sourceDeclaredAdapters": 19,
-    "status": "Windows_Rust_compile_and_regressions_passed_real_qualification_pending",
+    "sourceDeclaredAdapters": 20,
+    "status": "Windows_source_checked_Gemini_Hermes_real_qualification_pending",
     "remainingPorts": [
-      "hermes",
       "open_claw"
     ],
-    "evidence": "i02-gemini-core-result.json"
+    "evidence": "i02-hermes-core-result.json"
   }
 }

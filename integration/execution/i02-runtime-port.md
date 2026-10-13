@@ -1,20 +1,20 @@
 # I02-T02 Runtime 移植边界
 
-当前源码已加入Gemini Core类型与共享设置页，并以Migration197从schema146扩展到147；Core目录变为19种，
-Hermes/OpenClaw继续待移植。下方18种是本批前的固定来源盘点，不应误读为新源码现状。
-Gemini平台资格仍为未验证。Windows本机编译、完整默认499项及扩展32项检查已通过，包含迁移回滚和原数据重开；Unix原生模型方法回归、跨平台及真实模型/停止/恢复/工具待补。证据见[i02-gemini-core-result.json](i02-gemini-core-result.json)。
-规范见[Gemini Runtime v1](../../docs/contracts/gemini-runtime-v1.md)。
+当前融合源码目录为20种：Gemini与Hermes已接入Core和共享客户端，Migration197保留146→147，新增198从147升级148。
+OpenClaw继续移植。下方18种是固定来源盘点，不应误读为当前目录；完整目标21种不减。
+Windows完整默认499项、扩展47项、成员设置37项及Hermes真实安全原生协议9项已通过；真实模型/停止/恢复/工具与跨平台资格待补。
+证据见[i02-hermes-core-result.json](i02-hermes-core-result.json)，前批Gemini证据保留[i02-gemini-core-result.json](i02-gemini-core-result.json)。规范见[Gemini Runtime v1](../../docs/contracts/gemini-runtime-v1.md)与[Hermes Runtime v1](../../docs/contracts/hermes-runtime-v1.md)。
 
 2026-10-14。盘点结果见 [i02-runtime-inventory-result.json](i02-runtime-inventory-result.json)。这是源码差异和研发顺序，不代表 Runtime 已通过准入或执行。
 
-一期保留规划中的21种 Runtime。固定 Rovai 来源的 `AdapterKind::ALL` 声明18种；Codeg另有 Gemini、Hermes、OpenClaw。当前融合源码已加入 Gemini，目录为19种，另外两种仍待移植。不能删掉来源入口，也不能启动 Codeg 的 Tauri 执行层形成第二个业务权威。移植发生在 Core 的 Runtime 适配、Host 合同和共享成员设置页面内。
+一期保留规划中的21种 Runtime。固定 Rovai 来源的 `AdapterKind::ALL` 声明18种；Codeg另有 Gemini、Hermes、OpenClaw。融合源码已加入前两种，OpenClaw仍待移植。不能删掉来源入口，也不能启动 Codeg 的 Tauri 执行层形成第二个业务权威。移植发生在 Core 的 Runtime 适配、Host 合同和共享成员设置页面内。
 
 | 来源 | 当前源码差异 | 下一步实现及验收 |
 | --- | --- | --- |
 | Core 已声明18种 | 发现、产品检查、模型目录、成员配置和执行合同已有骨架；源码声明不等于本机准入 | 保留原 AdapterKind 与成员配置；使用隔离安装/环境测试发现、模型、权限、真实流式、停止、恢复、工具及错误路径 |
 | Gemini | 固定 Core 来源缺少该产品；融合源码已加入目录、专用ACP实例、生命周期、模型/权限/Skills映射和schema147迁移 | 先完成真实Rust编译、迁移保留/回滚及既有合同回归，再验证发现、认证、模型执行、停止恢复与工具；共享成员设置已接入，运行资格仍未授予 |
-| Hermes | Codeg 使用固定社区 npm bridge，对官方源码版本和独立 Python 环境有约束 | 保留来源和固定版本证明，独立安装根及依赖，不等同于任意 `hermes` 同名命令；补 Core ACP 路径、工具、模型与会话生命周期 |
-| OpenClaw | Codeg 固定2026.9.8；本机2026.6.10。来源 Node 门槛24.16/26.1，本机工作区24.9；来源不支持非空 ACP `mcpServers` | 独立 Node/产品版本，先明确工具能力边界及 Core 内兼容方式；不升级全局产品、不发送来源拒绝的 MCP 条目，不把空握手写成工具已可用 |
+| Hermes | 固定来源与包内Python3.14/uv已隔离安装；Core目录、专用ACP生命周期、原生Session模式与148迁移已接入 | 实际缺会话load返回空对象，Core拒绝确认并隔离重放；补成功Session/真实模型/停止恢复/MCP、原生工程信任与跨Run计量 |
+| OpenClaw | 固定2026.9.8；已在工作区Node24.21隔离安装并取得真实版本输出，Core移植待做；ACP拒绝非空 `mcpServers` | Core管理独立Gateway、配置与认证，兼容原生模型设置及Gateway级MCP；不把思考模式当权限，不把版本输出当执行资格 |
 
 自审后的实施顺序：
 
@@ -34,4 +34,10 @@ Gemini平台资格仍为未验证。Windows本机编译、完整默认499项及�
 
 上游session/new/load成功响应包含models.availableModels/currentModelId和modes.availableModes/currentModeId；plan仅在原生启用时出现。融合源码已沿Core既有ACP模型映射及会话生命周期接入，产品启动使用已验证的两个参数，没有复用Qwen的--mcp-config启动参数；显式模型使用原生session/set_model。初始化中的loadSession/图片音频/MCP是宣告，真实模型、流式、停止、恢复和工具均未通过；Windows Rust编译与迁移回归已通过，跨平台和真实资格待补，移植任务保持实施中。
 
-Hermes固定社区桥接包与官方提交已核对，7个原生协议/会话/模型/权限文件已取得；尚未安装Runtime或接入Core。见[i02-hermes-source-result.json](i02-hermes-source-result.json)。
+Hermes来源审查保留[i02-hermes-source-result.json](i02-hermes-source-result.json)的历史快照。后续已隔离安装、接入Core并取得安全原生协议9项证据：没有创建成功Session、状态库0会话、没有模型请求；不能把它当作真实执行资格。项目Skills信任与会话累计用量归属留在[研发待办](development-todos.json)，仍属一期。
+
+## OpenClaw固定版本的已验证输入
+
+固定2026.9.8对应官方提交`fc23bc864e4553c2d215e479eeec47b67a0bf943`。94个源码文件已按Git blob核对；npm元数据没有gitHead，实际发行包的`dist/build-info.json`完整提交与官方tag一致，包锁integrity与官方npm元数据一致。独立Node24.21.0归档按官方SHA256核验，未修改全局环境。隔离安装禁止生命周期脚本；真实`--version`返回`OpenClaw 2026.9.8 (fc23bc8)`，见[i02-openclaw-source-result.json](i02-openclaw-source-result.json)。
+
+该ACP进程必须先连接Gateway才能处理请求；`session/set_mode`设置思考强度，固定接口没有显式模型设置方法或model配置项。会话级MCP被拒绝，但发行文档提供Gateway的`mcp.servers`配置入口。后续在Core管理的独立Gateway内核实模型目录/冻结、MCP授权、双层Session与生命周期，不接管日常Gateway。当前未启动Gateway、ACP或模型，Core20/完整来源21、四平台未授予资格与324场景待验状态不变；这些兼容研发仍属于一期。

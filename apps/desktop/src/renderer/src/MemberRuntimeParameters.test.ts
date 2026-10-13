@@ -325,6 +325,7 @@ describe('member runtime parameters', () => {
     ['codebuddy-cli', '权限模式', 'bypassPermissions'],
     ['qwen-code', '审批模式', 'yolo'],
     ['gemini-cli', '权限模式', 'yolo'],
+    ['hermes-cli', '权限模式', 'dont_ask'],
     ['trae-cn-cli', '权限模式', 'bypass_permissions'],
     ['kimi-code-cli', '权限模式', 'yolo'],
     ['cline-cli', '执行模式', 'act'],
@@ -582,6 +583,8 @@ function runtimePermissionDefaults(kind: AdapterKind): Record<string, unknown> {
     case 'qwen-code':
     case 'gemini-cli':
       return { approval_mode: 'yolo' }
+    case 'hermes-cli':
+      return { permission_mode: 'dont_ask' }
     case 'trae-cn-cli':
       return { permission_mode: 'bypass_permissions' }
     case 'cursor-agent':

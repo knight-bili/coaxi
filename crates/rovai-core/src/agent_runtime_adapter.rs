@@ -384,6 +384,7 @@ pub enum SkillDeliveryGroupKey {
     Codebuddy,
     Qwen,
     Gemini,
+    Hermes,
     Trae,
     Cursor,
     Kimi,
@@ -395,7 +396,7 @@ pub enum SkillDeliveryGroupKey {
 }
 
 impl SkillDeliveryGroupKey {
-    pub const ALL: [Self; 19] = [
+    pub const ALL: [Self; 20] = [
         Self::Codex,
         Self::Pi,
         Self::Opencode,
@@ -407,6 +408,7 @@ impl SkillDeliveryGroupKey {
         Self::Codebuddy,
         Self::Qwen,
         Self::Gemini,
+        Self::Hermes,
         Self::Trae,
         Self::Cursor,
         Self::Kimi,
@@ -430,6 +432,7 @@ impl SkillDeliveryGroupKey {
             Self::Codebuddy => "codebuddy",
             Self::Qwen => "qwen",
             Self::Gemini => "gemini",
+            Self::Hermes => "hermes",
             Self::Trae => "trae",
             Self::Cursor => "cursor",
             Self::Kimi => "kimi",
@@ -454,6 +457,7 @@ impl SkillDeliveryGroupKey {
             Self::Codebuddy => Path::new(".codebuddy/skills"),
             Self::Qwen => Path::new(".qwen/skills"),
             Self::Gemini => Path::new(".gemini/skills"),
+            Self::Hermes => Path::new(".hermes/skills"),
             Self::Trae => Path::new(".trae/skills"),
             Self::Cursor => Path::new(".cursor/skills"),
             Self::Kimi => Path::new(".kimi-code/skills"),
@@ -482,6 +486,7 @@ impl std::str::FromStr for SkillDeliveryGroupKey {
             "codebuddy" => Ok(Self::Codebuddy),
             "qwen" => Ok(Self::Qwen),
             "gemini" => Ok(Self::Gemini),
+            "hermes" => Ok(Self::Hermes),
             "trae" => Ok(Self::Trae),
             "cursor" => Ok(Self::Cursor),
             "kimi" => Ok(Self::Kimi),
@@ -734,7 +739,7 @@ impl AgentRuntimeAdapterRegistry {
         kind: AdapterKind,
         platform: HostPlatformKey,
     ) -> RuntimePlatformAdmission {
-        if kind == AdapterKind::GeminiCli {
+        if matches!(kind, AdapterKind::GeminiCli | AdapterKind::HermesCli) {
             return RuntimePlatformAdmission::not_qualified(
                 kind,
                 platform,
@@ -942,6 +947,7 @@ impl AgentRuntimeAdapterRegistry {
                 "approval_mode": "yolo",
             }),
             AdapterKind::GeminiCli => json!({"approval_mode": "yolo"}),
+            AdapterKind::HermesCli => json!({"permission_mode": "dont_ask"}),
             AdapterKind::TraeCnCli => json!({
                 "permission_mode": "bypass_permissions",
             }),
@@ -980,6 +986,7 @@ impl AgentRuntimeAdapterRegistry {
             | AdapterKind::CodebuddyCli
             | AdapterKind::QwenCode
             | AdapterKind::GeminiCli
+            | AdapterKind::HermesCli
             | AdapterKind::TraeCnCli
             | AdapterKind::CursorAgent
             | AdapterKind::KimiCodeCli
@@ -1038,6 +1045,10 @@ impl AgentRuntimeAdapterRegistry {
                 [SkillDeliveryGroupKey::Gemini],
                 SkillDiscoveryVerification::DocumentationOnly,
             ),
+            AdapterKind::HermesCli => native_skill_discovery(
+                [SkillDeliveryGroupKey::Hermes],
+                SkillDiscoveryVerification::DocumentationOnly,
+            ),
             AdapterKind::TraeCnCli => native_skill_discovery(
                 [SkillDeliveryGroupKey::Trae],
                 SkillDiscoveryVerification::Verified,
@@ -1070,6 +1081,7 @@ impl AgentRuntimeAdapterRegistry {
             | AdapterKind::CodebuddyCli
             | AdapterKind::QwenCode
             | AdapterKind::GeminiCli
+            | AdapterKind::HermesCli
             | AdapterKind::TraeCnCli
             | AdapterKind::KimiCodeCli
             | AdapterKind::ZcodeApp
@@ -1124,6 +1136,16 @@ impl AgentRuntimeAdapterRegistry {
                     .unwrap_or_default();
                 acp_capability_snapshot(observation, options)
             }
+            AdapterKind::HermesCli => {
+                let options = observation
+                    .session_result
+                    .as_ref()
+                    .filter(|_| observation.probe_status == "ready")
+                    .map(hermes_session_permission_options)
+                    .transpose()?
+                    .unwrap_or_default();
+                acp_capability_snapshot(observation, options)
+            }
             AdapterKind::TraeCnCli => {
                 let permission_options = observation
                     .session_result
@@ -1164,6 +1186,7 @@ impl AgentRuntimeAdapterRegistry {
             AdapterKind::CodebuddyCli => codebuddy_permission_options(),
             AdapterKind::QwenCode => qwen_permission_options(),
             AdapterKind::GeminiCli => gemini_permission_options(),
+            AdapterKind::HermesCli => hermes_permission_options(),
             AdapterKind::AntigravityApp => antigravity_permission_options(),
             AdapterKind::TraeCnCli => trae_static_permission_options(),
             AdapterKind::CursorAgent => cursor_permission_options(),
@@ -2538,7 +2561,9 @@ fn acp_capability_snapshot(
             .as_ref()
             .and_then(|value| value.pointer("/agentCapabilities/sessionCapabilities/resume"))
             .is_some_and(Value::is_object);
-        if supports_resume {
+        // Hermes 0.21.6 silently creates a Session when resume's ID is absent.
+        // Its strict load path preserves Core's existing-binding boundary.
+        if supports_resume && adapter_kind != AdapterKind::HermesCli {
             capabilities.push("session.resume".to_string());
         }
         if adapter_kind != AdapterKind::CursorAgent {
@@ -2556,6 +2581,9 @@ fn acp_capability_snapshot(
                 capabilities.push("mcp.external_projection.unsupported".to_string());
             }
         }
+    }
+    if adapter_kind == AdapterKind::HermesCli {
+        capabilities.retain(|capability| capability != "session.resume");
     }
     capabilities.sort();
     capabilities.dedup();
@@ -3203,6 +3231,60 @@ fn gemini_permission_options() -> Vec<PermissionOptionDescriptor> {
         required: true,
         unsupported_reason: None,
     }]
+}
+
+fn hermes_permission_options() -> Vec<PermissionOptionDescriptor> {
+    vec![PermissionOptionDescriptor {
+        key: "permission_mode".to_string(),
+        label: "mode".to_string(),
+        description: "Hermes native edit approval mode; sensitive requests remain interactive."
+            .to_string(),
+        value_type: "enum".to_string(),
+        choices: ["default", "accept_edits", "dont_ask"]
+            .into_iter()
+            .map(|value| choice(value, value))
+            .collect(),
+        recommended_value: json!("default"),
+        scope: RuntimeOptionScope::Session,
+        risk: "elevated".to_string(),
+        supported: true,
+        required: true,
+        unsupported_reason: None,
+    }]
+}
+
+fn hermes_session_permission_options(session: &Value) -> Result<Vec<PermissionOptionDescriptor>> {
+    let modes = session
+        .pointer("/modes/availableModes")
+        .and_then(Value::as_array)
+        .context("Hermes session did not return native approval modes")?;
+    let mut ids = BTreeSet::new();
+    let mut choices = Vec::new();
+    for mode in modes {
+        let id = mode
+            .get("id")
+            .and_then(Value::as_str)
+            .context("Hermes approval mode has no id")?;
+        anyhow::ensure!(
+            ["default", "accept_edits", "dont_ask"].contains(&id),
+            "Hermes returned an unsupported native approval mode"
+        );
+        anyhow::ensure!(
+            ids.insert(id),
+            "Hermes returned duplicate native approval modes"
+        );
+        choices.push(choice(
+            id,
+            mode.get("name").and_then(Value::as_str).unwrap_or(id),
+        ));
+    }
+    anyhow::ensure!(
+        ids.len() == 3,
+        "Hermes native approval modes are incomplete"
+    );
+    let mut options = hermes_permission_options();
+    options[0].choices = choices;
+    Ok(options)
 }
 
 fn gemini_session_permission_options(session: &Value) -> Result<Vec<PermissionOptionDescriptor>> {
@@ -3871,6 +3953,10 @@ mod tests {
             ),
             (AdapterKind::QwenCode, json!({"approval_mode": "yolo"})),
             (AdapterKind::GeminiCli, json!({"approval_mode": "yolo"})),
+            (
+                AdapterKind::HermesCli,
+                json!({"permission_mode": "dont_ask"}),
+            ),
             (
                 AdapterKind::TraeCnCli,
                 json!({"permission_mode": "bypass_permissions"}),
@@ -4970,29 +5056,29 @@ mod tests {
     }
 
     #[test]
-    fn gemini_catalog_uses_native_modes_without_inventing_plan_or_platform_qualification() {
+    fn native_mode_catalogs_preserve_choices_and_platform_qualification() {
         let registry = AgentRuntimeAdapterRegistry::default();
         let mut session = json!({
             "sessionId":"gemini-test", "models":{"currentModelId":"auto", "availableModels":[{"modelId":"auto", "name":"Auto"}]},
             "modes":{"availableModes":[{"id":"default","name":"Default"},{"id":"auto_edit","name":"Auto Edit"},{"id":"yolo","name":"YOLO"}]}
         });
-        let snapshot = |session: Value| {
+        let snapshot = |kind: AdapterKind, session: Value| {
             registry.acp_capability_snapshot(AcpProbeObservation {
-                adapter_kind: AdapterKind::GeminiCli,
-                reported_version: Some("0.60.0".into()),
+                adapter_kind: kind,
+                reported_version: Some(if kind == AdapterKind::HermesCli {"0.21.6"} else {"0.60.0"}.into()),
                 executable_fingerprint: Some("sha256:fixture".into()),
                 authentication_status: "authenticated".into(),
                 probe_status: "ready".into(),
-                capabilities: vec![],
+                capabilities: vec!["session.resume".into()],
                 initialize_result: Some(
-                    json!({"protocolVersion":1,"agentCapabilities":{"loadSession":true}}),
+                    json!({"protocolVersion":1,"agentCapabilities":{"loadSession":true,"sessionCapabilities":{"resume":{}}}}),
                 ),
                 session_result: Some(session),
                 attempted_at: "2026-10-14T00:00:00Z".into(),
                 last_error: None,
             })
         };
-        let base = snapshot(session.clone()).unwrap();
+        let base = snapshot(AdapterKind::GeminiCli, session.clone()).unwrap();
         assert_eq!(base.models[0].id, "auto");
         assert!(
             !base.permission_options[0]
@@ -5005,7 +5091,9 @@ mod tests {
             .unwrap()
             .push(json!({"id":"plan","name":"Plan"}));
         assert!(
-            snapshot(session.clone()).unwrap().permission_options[0]
+            snapshot(AdapterKind::GeminiCli, session.clone())
+                .unwrap()
+                .permission_options[0]
                 .choices
                 .iter()
                 .any(|choice| choice.value == "plan")
@@ -5016,7 +5104,7 @@ mod tests {
             json!([{"id":"default"},{"id":"unsupported"},{"id":"yolo"}]),
         ] {
             session["modes"]["availableModes"] = bad;
-            assert!(snapshot(session.clone()).is_err());
+            assert!(snapshot(AdapterKind::GeminiCli, session.clone()).is_err());
         }
         for platform in HostPlatformKey::ALL {
             assert_eq!(
@@ -5026,6 +5114,40 @@ mod tests {
                     platform,
                     RuntimePlatformAdmissionReasonCode::QualificationEvidenceMissing
                 )
+            );
+        }
+        let mut hermes = json!({"sessionId":"hermes-test",
+            "models":{"currentModelId":"provider:kept-model","availableModels":[{"modelId":"provider:kept-model","name":"Kept"}]},
+            "modes":{"currentModeId":"default","availableModes":[{"id":"default"},{"id":"accept_edits"},{"id":"dont_ask"}]}});
+        let native = snapshot(AdapterKind::HermesCli, hermes.clone()).unwrap();
+        assert_eq!(native.models[0].id, "provider:kept-model");
+        assert_eq!(
+            native.permission_options[0].scope,
+            RuntimeOptionScope::Session
+        );
+        assert_eq!(
+            native.permission_options[0]
+                .choices
+                .iter()
+                .map(|v| v.value.as_str())
+                .collect::<Vec<_>>(),
+            ["default", "accept_edits", "dont_ask"]
+        );
+        assert!(native.capabilities.contains(&"session.load".to_string()));
+        assert!(!native.capabilities.contains(&"session.resume".to_string()));
+        for bad in [
+            json!([]),
+            json!([{"id":"default"},{"id":"default"},{"id":"dont_ask"}]),
+            json!([{"id":"default"},{"id":"yolo"},{"id":"dont_ask"}]),
+        ] {
+            hermes["modes"]["availableModes"] = bad;
+            assert!(snapshot(AdapterKind::HermesCli, hermes.clone()).is_err());
+        }
+        for platform in HostPlatformKey::ALL {
+            assert!(
+                !registry
+                    .platform_admission(AdapterKind::HermesCli, platform)
+                    .allows_runtime_use()
             );
         }
     }
@@ -5404,6 +5526,11 @@ mod tests {
             (
                 AdapterKind::GeminiCli,
                 &[SkillDeliveryGroupKey::Gemini],
+                SkillDiscoveryVerification::DocumentationOnly,
+            ),
+            (
+                AdapterKind::HermesCli,
+                &[SkillDeliveryGroupKey::Hermes],
                 SkillDiscoveryVerification::DocumentationOnly,
             ),
             (

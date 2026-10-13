@@ -46,8 +46,11 @@ jobs:
           cargo fmt --all --check
           cargo check --workspace --all-targets
       - name: Run default workspace tests
-        run: cargo test --workspace
+        run: cargo test --workspace -- --test-threads=4
       - name: Verify Runtime catalog and atomic migration regressions
         run: |
-          cargo test -p rovai-core --features extended-tests gemini_
-          cargo test -p rovai-core --features extended-tests runtime_catalog_migrations_preserve_rows_and_roll_back_with_their_receipts
+          cargo test -p rovai-core --features extended-tests --lib native_mode_catalogs_preserve_choices_and_platform_qualification
+          cargo test -p rovai-core --features extended-tests --lib db:: -- --test-threads=4
+          cargo test -p rovai-core --features extended-tests --lib acp::route_policy_tests::
+          cargo test -p rovai-core --features extended-tests --lib health::launch_policy_tests::
+          cargo test -p rovai-core --features extended-tests --lib runtime_parsers_emit_sparse_usage_without_antigravity_inference

@@ -37,6 +37,7 @@ export type AdapterKind =
   | 'codebuddy-cli'
   | 'qwen-code'
   | 'gemini-cli'
+  | 'hermes-cli'
   | 'trae-cn-cli'
   | 'cursor-agent'
   | 'kimi-code-cli'

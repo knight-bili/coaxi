@@ -639,3 +639,8 @@ User 于 2026-10-09 确认[完整方案及补充边界 r1](model-context-change-
 Migration197扩展Runtime/Skills闭集并发布schema147，保留旧行与旧来源证据；新平台资格待真实验证。
 当前边界见[Gemini Runtime v1](../../contracts/gemini-runtime-v1.md)，实施状态见
 [融合记录](../../../integration/execution/i02-runtime-port.md)。这一增量不表示一期或Runtime已经验收。
+
+## 融合期 Hermes Runtime 接入（2026-10-14）
+
+在同一Core接入固定官方v0.21.6与社区桥接0.21.6，目录增至20种，Migration198从147升级148；21种来源范围不减。
+原生模式、敏感批准及严格load恢复见[Hermes Runtime v1](../../contracts/hermes-runtime-v1.md)。Windows源码与安全原生协议检查已取得证据，真实模型/工具、原生Skills信任、跨Run计量及平台资格继续验证，阶段仍实施中。

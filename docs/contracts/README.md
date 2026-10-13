@@ -1,7 +1,7 @@
 ---
 document_type: contracts-index
 authority: protocol-contract-routing
-last_updated: 2026-10-13
+last_updated: 2026-10-14
 ---
 
 # 长期接口合同
@@ -12,6 +12,10 @@ User 的主称呼、结构化提及及冻结恢复见 [User Naming v1](user-nami
 
 本目录保存跨版本、字段级且可由测试直接验证的接口合同。[Version Decisions](../decisions/README.md)解释为什么选择某个边界，
 Architecture 解释组件如何组成，Version 概览记录交付范围；它们都不复制本目录的完整 wire shape。
+
+## 融合Runtime
+
+一期新增Runtime合同见[Gemini Runtime v1](gemini-runtime-v1.md)与[Hermes Runtime v1](hermes-runtime-v1.md)；实现和真实资格按融合执行证据核实。
 
 ## 用户主动继续
 

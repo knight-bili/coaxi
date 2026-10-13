@@ -3,7 +3,7 @@
   "purpose": "当前融合工作树接口合同；固定来源与I01旧二进制证据保持原快照",
   "hostWebProtocolVersion": 4,
   "coreDataContractVersion": "v1.72",
-  "coreProjectionSchemaVersion": 147,
+  "coreProjectionSchemaVersion": 148,
   "canonicalWebOperations": [
     "missions.workspace.cleanup",
     "missions.cleanup.list",
@@ -183,16 +183,17 @@
   "integrationBaseCommit": "9d1ad55eeb18c0bc359d6f575afe9a9936055040",
   "runtimeExecution": "not_run",
   "runtimeCatalog": {
-    "adapters": 19,
+    "adapters": 20,
     "added": [
-      "gemini-cli"
+      "gemini-cli",
+      "hermes-cli"
     ],
     "qualification": "source_in_progress_not_runtime_qualified"
   },
   "evolution": {
-    "migration": 197,
-    "sourceProjectionSchemaVersion": 146,
-    "targetProjectionSchemaVersion": 147,
-    "reason": "Gemini Runtime/Skills闭集及旧Core读写保护；不是旧二进制已验证"
+    "migration": 198,
+    "sourceProjectionSchemaVersion": 147,
+    "targetProjectionSchemaVersion": 148,
+    "reason": "Hermes Runtime/Skills闭集扩展；Gemini197历史146->147保持，真实资格单独验证"
   }
 }

@@ -4209,6 +4209,12 @@ impl AcpSessionPermissions {
     fn from_frozen(frozen: &FrozenAgentRuntimeConfig) -> Result<Self> {
         let values = &frozen.permissions.values;
         let mode = match frozen.adapter_kind {
+            AdapterKind::HermesCli => Some(
+                values["permission_mode"]
+                    .as_str()
+                    .filter(|mode| matches!(*mode, "default" | "accept_edits" | "dont_ask"))
+                    .context("Hermes Runtime requires valid permission_mode")?,
+            ),
             AdapterKind::KimiCodeCli => Some(
                 values["permission_mode"]
                     .as_str()
@@ -4289,6 +4295,11 @@ fn select_acp_session_continuation(
     if existing_session_id.is_none() {
         return AcpSessionContinuation::New;
     }
+    if adapter_kind == AdapterKind::HermesCli {
+        // Native resume invents a new Session when its ID is absent.
+        // A changed capability response must still fail through strict load.
+        return AcpSessionContinuation::HistoryRestore;
+    }
     if capabilities.can_resume {
         return AcpSessionContinuation::Resume;
     }
@@ -4307,11 +4318,32 @@ fn history_restore_allowed(adapter_kind: AdapterKind) -> bool {
             | AdapterKind::QoderCli
             | AdapterKind::CodebuddyCli
             | AdapterKind::QwenCode
+            | AdapterKind::GeminiCli
+            | AdapterKind::HermesCli
             | AdapterKind::TraeCnCli
             | AdapterKind::KimiCodeCli
             | AdapterKind::CommandCodeCli
             | AdapterKind::ClineCli
     )
+}
+
+fn validate_acp_restored_session_result(kind: AdapterKind, result: &Value) -> Result<()> {
+    if kind == AdapterKind::HermesCli {
+        // Native load_session returns None for an absent ID; its SDK emits {}.
+        // Missing metadata cannot acknowledge a binding or release replay.
+        anyhow::ensure!(
+            result
+                .get("models")
+                .and_then(Value::as_object)
+                .is_some_and(|models| !models.is_empty())
+                && result
+                    .get("modes")
+                    .and_then(Value::as_object)
+                    .is_some_and(|modes| !modes.is_empty()),
+            "Hermes strict load did not confirm an existing native Session"
+        );
+    }
+    Ok(())
 }
 
 fn validate_new_session_native_rules(
@@ -4629,7 +4661,18 @@ impl AcpRuntime {
                         .rpc_with_timeout(method, params, ACP_HISTORY_RESTORE_TIMEOUT)
                         .await
                     {
-                        Ok(result) => break result,
+                        Ok(result) => {
+                            if let Err(error) = validate_acp_restored_session_result(
+                                self.host.adapter_kind,
+                                &result,
+                            ) {
+                                self.host
+                                    .unbind_session(existing_session_id, &self.owner)
+                                    .await;
+                                return Err(error.context(AcpSessionRestoreError));
+                            }
+                            break result;
+                        }
                         Err(error) => {
                             // -32601 on this exact restore request means the advertised
                             // method is unavailable. Try an advertised, supported load
@@ -4817,7 +4860,10 @@ impl AcpRuntime {
                 // CodeBuddy omits it from set_config_option's built-in choices.
             } else if matches!(
                 self.host.adapter_kind,
-                AdapterKind::KiroCli | AdapterKind::GrokBuild | AdapterKind::GeminiCli
+                AdapterKind::KiroCli
+                    | AdapterKind::GrokBuild
+                    | AdapterKind::GeminiCli
+                    | AdapterKind::HermesCli
             ) {
                 self.set_model(&session_id, model).await?;
             } else {
@@ -4856,7 +4902,7 @@ impl AcpRuntime {
         if model_source == "explicit"
             && matches!(
                 self.host.adapter_kind,
-                AdapterKind::KiroCli | AdapterKind::GrokBuild
+                AdapterKind::KiroCli | AdapterKind::GrokBuild | AdapterKind::HermesCli
             )
             && model_options
                 .as_object()
@@ -4870,7 +4916,7 @@ impl AcpRuntime {
         if model_source == "explicit"
             && !matches!(
                 self.host.adapter_kind,
-                AdapterKind::KiroCli | AdapterKind::GrokBuild
+                AdapterKind::KiroCli | AdapterKind::GrokBuild | AdapterKind::HermesCli
             )
             && let Some(options) = model_options.as_object()
         {
@@ -4894,12 +4940,24 @@ impl AcpRuntime {
             self.set_config_option(&session_id, "mode", effective)
                 .await?;
         }
-        if self.host.adapter_kind == AdapterKind::CommandCodeCli {
-            let mode = self
-                .session_permissions
-                .mode
-                .as_deref()
-                .context("Command Code native mode missing")?;
+        if matches!(
+            self.host.adapter_kind,
+            AdapterKind::CommandCodeCli | AdapterKind::HermesCli
+        ) {
+            let mode = self.session_permissions.mode.as_deref().with_context(|| {
+                format!("{} native mode missing", self.host.adapter_kind.as_str())
+            })?;
+            if self.host.adapter_kind == AdapterKind::HermesCli {
+                let session = self.session_result.read().await;
+                anyhow::ensure!(
+                    session
+                        .as_ref()
+                        .and_then(|session| session.pointer("/modes/availableModes"))
+                        .and_then(Value::as_array)
+                        .is_some_and(|modes| modes.iter().any(|value| value["id"] == mode)),
+                    "Hermes selected native mode is unavailable in the active Session"
+                );
+            }
             self.host
                 .rpc(
                     "session/set_mode",
@@ -4957,10 +5015,13 @@ impl AcpRuntime {
     pub async fn session_capabilities(&self) -> AcpSessionCapabilities {
         let initialize = self.host.initialize_result.read().await;
         AcpSessionCapabilities {
-            can_resume: initialize
-                .as_ref()
-                .and_then(|value| value.pointer("/agentCapabilities/sessionCapabilities/resume"))
-                .is_some_and(Value::is_object),
+            can_resume: self.host.adapter_kind != AdapterKind::HermesCli
+                && initialize
+                    .as_ref()
+                    .and_then(|value| {
+                        value.pointer("/agentCapabilities/sessionCapabilities/resume")
+                    })
+                    .is_some_and(Value::is_object),
             can_load_history: self.host.adapter_kind != AdapterKind::GrokBuild
                 && initialize
                     .as_ref()
@@ -6217,6 +6278,19 @@ fn configure_runtime_command(
         .as_object()
         .context("ACP permission configuration must be an object")?;
     match runtime.adapter_kind {
+        AdapterKind::HermesCli => {
+            anyhow::ensure!(
+                !(permission_semantics == PermissionSemantics::CoreEnforcedV1
+                    && workspace.access == "read_only"),
+                "Hermes has no native read-only mode for a legacy Core-enforced workspace"
+            );
+            health::configure_acp_command(
+                command,
+                runtime.adapter_kind,
+                false,
+                runtime.reported_version.as_deref(),
+            )?;
+        }
         AdapterKind::GeminiCli => {
             let configured = values
                 .get("approval_mode")
@@ -7547,6 +7621,7 @@ pub fn automatically_allows_permission_requests(
         | AdapterKind::AntigravityApp
         | AdapterKind::DeepseekHarness
         | AdapterKind::ZcodeApp
+        | AdapterKind::HermesCli
         | AdapterKind::CommandCodeCli => false,
     }
 }
@@ -8611,6 +8686,15 @@ mod route_policy_tests {
             ),
             (AdapterKind::QwenCode, json!({"approval_mode": "default"})),
             (AdapterKind::GeminiCli, json!({"approval_mode": "default"})),
+            (AdapterKind::HermesCli, json!({"permission_mode":"default"})),
+            (
+                AdapterKind::HermesCli,
+                json!({"permission_mode":"accept_edits"}),
+            ),
+            (
+                AdapterKind::HermesCli,
+                json!({"permission_mode":"dont_ask"}),
+            ),
             (
                 AdapterKind::GeminiCli,
                 json!({"approval_mode": "auto_edit"}),
@@ -8640,6 +8724,153 @@ mod route_policy_tests {
                 adapter_kind.as_str()
             );
         }
+    }
+    #[test]
+    fn continuation_prefers_same_host_then_resume_then_history_restore() {
+        let load_only = AcpSessionCapabilities {
+            can_resume: false,
+            can_load_history: true,
+        };
+        let resume_and_load = AcpSessionCapabilities {
+            can_resume: true,
+            can_load_history: true,
+        };
+
+        assert_eq!(
+            select_acp_session_continuation(
+                AdapterKind::TraeCnCli,
+                true,
+                Some("session-1"),
+                load_only,
+            ),
+            AcpSessionContinuation::ReuseSameHost
+        );
+        assert_eq!(
+            select_acp_session_continuation(
+                AdapterKind::TraeCnCli,
+                false,
+                Some("session-1"),
+                resume_and_load,
+            ),
+            AcpSessionContinuation::Resume
+        );
+        assert_eq!(
+            select_acp_session_continuation(
+                AdapterKind::TraeCnCli,
+                false,
+                Some("session-1"),
+                load_only,
+            ),
+            AcpSessionContinuation::HistoryRestore
+        );
+        assert_eq!(
+            select_acp_session_continuation(
+                AdapterKind::CopilotCli,
+                false,
+                Some("session-1"),
+                load_only,
+            ),
+            AcpSessionContinuation::HistoryRestore
+        );
+        assert_eq!(
+            select_acp_session_continuation(
+                AdapterKind::KimiCodeCli,
+                false,
+                Some("session-1"),
+                resume_and_load,
+            ),
+            AcpSessionContinuation::Resume
+        );
+        assert_eq!(
+            select_acp_session_continuation(
+                AdapterKind::KimiCodeCli,
+                false,
+                Some("session-1"),
+                load_only,
+            ),
+            AcpSessionContinuation::HistoryRestore
+        );
+        assert_eq!(
+            select_acp_session_continuation(
+                AdapterKind::CommandCodeCli,
+                false,
+                Some("session-1"),
+                load_only,
+            ),
+            AcpSessionContinuation::HistoryRestore
+        );
+        assert_eq!(
+            select_acp_session_continuation(
+                AdapterKind::GrokBuild,
+                false,
+                Some("session-1"),
+                load_only,
+            ),
+            AcpSessionContinuation::New
+        );
+        assert_eq!(
+            select_acp_session_continuation(
+                AdapterKind::GrokBuild,
+                false,
+                Some("session-1"),
+                resume_and_load,
+            ),
+            AcpSessionContinuation::Resume
+        );
+        assert_eq!(
+            select_acp_session_continuation(AdapterKind::TraeCnCli, false, None, resume_and_load,),
+            AcpSessionContinuation::New
+        );
+        for kind in [AdapterKind::GeminiCli, AdapterKind::HermesCli] {
+            assert_eq!(
+                select_acp_session_continuation(kind, false, Some("existing"), load_only),
+                AcpSessionContinuation::HistoryRestore
+            );
+            assert_eq!(
+                select_acp_session_continuation(kind, false, None, load_only),
+                AcpSessionContinuation::New
+            );
+            assert_eq!(
+                select_acp_session_continuation(kind, true, Some("existing"), resume_and_load),
+                AcpSessionContinuation::ReuseSameHost
+            );
+        }
+        for capabilities in [
+            resume_and_load,
+            AcpSessionCapabilities {
+                can_resume: true,
+                can_load_history: false,
+            },
+            AcpSessionCapabilities::default(),
+        ] {
+            assert_eq!(
+                select_acp_session_continuation(
+                    AdapterKind::HermesCli,
+                    false,
+                    Some("existing"),
+                    capabilities
+                ),
+                AcpSessionContinuation::HistoryRestore,
+                "Hermes cannot invent a replacement binding through native resume"
+            );
+        }
+        for absent in [
+            Value::Null,
+            json!({}),
+            json!({"models":{}}),
+            json!({"modes":{}}),
+            json!({"models":{},"modes":{}}),
+        ] {
+            assert!(validate_acp_restored_session_result(AdapterKind::HermesCli, &absent).is_err());
+        }
+        assert!(
+            validate_acp_restored_session_result(
+                AdapterKind::HermesCli,
+                &json!({"models":{"currentModelId":"provider:model"},"modes":{"currentModeId":"default"}})
+            )
+            .is_ok()
+        );
+        assert!(validate_acp_restored_session_result(AdapterKind::GeminiCli, &json!({})).is_ok());
     }
 }
 
@@ -13685,104 +13916,6 @@ while IFS= read -r ignored; do :; done
             "ACP request counters restart for each Host"
         );
         assert_eq!(acp_prompt_id("host-a", 1), "acp-prompt-host-a-1");
-    }
-
-    #[test]
-    fn continuation_prefers_same_host_then_resume_then_history_restore() {
-        let load_only = AcpSessionCapabilities {
-            can_resume: false,
-            can_load_history: true,
-        };
-        let resume_and_load = AcpSessionCapabilities {
-            can_resume: true,
-            can_load_history: true,
-        };
-
-        assert_eq!(
-            select_acp_session_continuation(
-                AdapterKind::TraeCnCli,
-                true,
-                Some("session-1"),
-                load_only,
-            ),
-            AcpSessionContinuation::ReuseSameHost
-        );
-        assert_eq!(
-            select_acp_session_continuation(
-                AdapterKind::TraeCnCli,
-                false,
-                Some("session-1"),
-                resume_and_load,
-            ),
-            AcpSessionContinuation::Resume
-        );
-        assert_eq!(
-            select_acp_session_continuation(
-                AdapterKind::TraeCnCli,
-                false,
-                Some("session-1"),
-                load_only,
-            ),
-            AcpSessionContinuation::HistoryRestore
-        );
-        assert_eq!(
-            select_acp_session_continuation(
-                AdapterKind::CopilotCli,
-                false,
-                Some("session-1"),
-                load_only,
-            ),
-            AcpSessionContinuation::HistoryRestore
-        );
-        assert_eq!(
-            select_acp_session_continuation(
-                AdapterKind::KimiCodeCli,
-                false,
-                Some("session-1"),
-                resume_and_load,
-            ),
-            AcpSessionContinuation::Resume
-        );
-        assert_eq!(
-            select_acp_session_continuation(
-                AdapterKind::KimiCodeCli,
-                false,
-                Some("session-1"),
-                load_only,
-            ),
-            AcpSessionContinuation::HistoryRestore
-        );
-        assert_eq!(
-            select_acp_session_continuation(
-                AdapterKind::CommandCodeCli,
-                false,
-                Some("session-1"),
-                load_only,
-            ),
-            AcpSessionContinuation::HistoryRestore
-        );
-        assert_eq!(
-            select_acp_session_continuation(
-                AdapterKind::GrokBuild,
-                false,
-                Some("session-1"),
-                load_only,
-            ),
-            AcpSessionContinuation::New
-        );
-        assert_eq!(
-            select_acp_session_continuation(
-                AdapterKind::GrokBuild,
-                false,
-                Some("session-1"),
-                resume_and_load,
-            ),
-            AcpSessionContinuation::Resume
-        );
-        assert_eq!(
-            select_acp_session_continuation(AdapterKind::TraeCnCli, false, None, resume_and_load,),
-            AcpSessionContinuation::New
-        );
     }
 
     #[test]

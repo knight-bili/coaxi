@@ -32,10 +32,41 @@
     {
       "id": "DEV-CORE-RUNTIME-UNION",
       "task": "I02-T02",
-      "status": "gemini_Windows_Rust_regressions_passed_real_and_cross_platform_pending",
-      "problem": "Gemini Core/schema147与共享客户端已接入，Windows编译/迁移/499默认与32扩展检查通过；Unix原生配置和真实资格待补，Hermes/OpenClaw继续移植",
-      "evidence": "i02-gemini-core-result.json；21来源不删减，未把旧平台资格或bootstrap当真实执行",
+      "status": "Gemini_Hermes_source_implemented_OpenClaw_pending_qualification_not_granted",
+      "problem": "Core20种/schema148，Gemini/Hermes已接入并本机验证；OpenClaw继续移植，全部真实及跨平台资格仍须补齐",
+      "evidence": "i02-hermes-core-result.json；9项native只证明初始化/缺会话拒绝，不证明执行",
       "owner": "研发"
+    },
+    {
+      "id": "DEV-HERMES-PROJECT-SKILLS-TRUST",
+      "task": "I02-T02/I10",
+      "status": "pending_native_trust_integration_and_actual_discovery",
+      "problem": "原生工程Skills需要skills.trusted_project_dirs，不能把目录投影当真实发现；补作用域内信任交互和原生验证",
+      "owner": "研发",
+      "evidence": "固定agent/skill_utils.py与hermes-runtime-v1.md"
+    },
+    {
+      "id": "DEV-HERMES-CROSS-RUN-USAGE",
+      "task": "I02-T02/I08",
+      "status": "pending_native_session_baseline_ownership",
+      "problem": "原生每个Prompt返回session累计；已防止误作增量与按Prompt拆checkpoint，仍需实现/验证跨Run归属基线及恢复，未给历史消耗补零",
+      "owner": "研发",
+      "evidence": "固定agent/turn_finalizer.py及Core累计parser；真实资格未授予"
+    },
+    {
+      "id": "DEV-OPENCLAW-GATEWAY-COMPATIBILITY",
+      "task": "I02-T02/I10",
+      "work": [
+        "Core管理的独立Gateway状态/配置/认证与生命周期；不得接管日常Gateway",
+        "原生模型目录与显式模型冻结的受控Gateway兼容，保留Provider路由",
+        "把思考强度与权限分开；原生批准及Core授权都须保留",
+        "固定发行docs/tools/mcp.md给出Gateway mcp.servers；在隔离配置内验证这条原生路径，冻结Core授权，不向ACP发送非空mcpServers，不削减一期工具范围",
+        "双层Session身份、重放、取消恢复、用量及四平台实际验证"
+      ],
+      "status": "pending_implementation",
+      "owner": "研发",
+      "problem": "固定OpenClaw ACP依赖Gateway、无原生显式模型设置且拒绝Session MCP；须在Core管理边界内实现兼容，不能冒充普通ACP已可用",
+      "evidence": "i02-openclaw-source-result.json"
     }
   ]
 }

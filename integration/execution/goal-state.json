@@ -14,7 +14,7 @@
   "current_branch": "phase/i02-workbench",
   "base_branch": "phase/i01-foundation",
   "current_task": "I02-T02",
-  "current_slice": "Gemini Core本机编译、499默认回归与32扩展检查通过；继续Hermes移植与T01/T03，跨平台和真实资格待补",
+  "current_slice": "Hermes Core/schema148；Windows499默认/48定向、107数据库owner验证（106全量＋1修复复测）及安全原生9项，继续OpenClaw与必需补验",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,9 +33,9 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "Hermes固定源码与桥接来源已核对，沿Core接入；继续T01/T03和OpenClaw",
-    "GitHub恢复后执行Unix原生模型方法owner、Mac/Linux及Desktop ready资格",
-    "补真实模型/停止恢复/MCP与客户资源；沿I03-I12推进"
+    "已锁定OpenClaw2026.9.8/隔离Node24.21及94源文件，继续Core受管理Gateway、模型冻结与Gateway级MCP兼容",
+    "补Hermes原生Skills信任、跨Run用量基线及Core真实Session/工具生命周期",
+    "恢复CI后补Unix/Mac新源码与原生ready；取得开发身份后执行真实模型资格"
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
@@ -48,5 +48,6 @@
   "native_fixture_evidence": "i02-native-fixture-repair-result.json",
   "gemini_native_evidence": "i02-gemini-native-result.json",
   "gemini_core_evidence": "i02-gemini-core-result.json",
-  "hermes_source_evidence": "i02-hermes-source-result.json"
+  "hermes_source_evidence": "i02-hermes-source-result.json",
+  "hermes_core_evidence": "i02-hermes-core-result.json"
 }

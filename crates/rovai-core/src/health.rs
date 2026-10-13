@@ -1571,6 +1571,7 @@ async fn acp_probe_at(
             | AdapterKind::CodebuddyCli
             | AdapterKind::QwenCode
             | AdapterKind::GeminiCli
+            | AdapterKind::HermesCli
             | AdapterKind::TraeCnCli
             | AdapterKind::GrokBuild
             | AdapterKind::DeepseekHarness
@@ -2720,6 +2721,9 @@ pub fn configure_acp_command(
         AdapterKind::GeminiCli => {
             command.args(["--acp", "--skip-trust"]);
         }
+        AdapterKind::HermesCli => {
+            command.arg("acp");
+        }
         AdapterKind::TraeCnCli => {
             command.args(["acp", "serve"]);
         }
@@ -2950,7 +2954,10 @@ fn acp_required_capabilities(kind: AdapterKind) -> Vec<String> {
     capabilities.push(
         if matches!(
             kind,
-            AdapterKind::KiroCli | AdapterKind::GrokBuild | AdapterKind::GeminiCli
+            AdapterKind::KiroCli
+                | AdapterKind::GrokBuild
+                | AdapterKind::GeminiCli
+                | AdapterKind::HermesCli
         ) {
             "session.set_model"
         } else {
@@ -2958,6 +2965,10 @@ fn acp_required_capabilities(kind: AdapterKind) -> Vec<String> {
         }
         .to_string(),
     );
+    if kind == AdapterKind::HermesCli {
+        capabilities.push("session.set_mode".to_string());
+        capabilities.push("session.load".to_string());
+    }
     capabilities
 }
 
@@ -3712,6 +3723,7 @@ pub fn find_adapter(kind: AdapterKind) -> Option<PathBuf> {
             "qwen",
         ),
         AdapterKind::GeminiCli => (&["ROVAI_GEMINI_BIN"][..], "gemini"),
+        AdapterKind::HermesCli => (&["ROVAI_HERMES_BIN"][..], "hermes"),
         AdapterKind::TraeCnCli => (
             &[
                 "ROVAI_TRAE_CN_BIN",
@@ -3850,6 +3862,7 @@ mod launch_policy_tests {
         assert_eq!(arguments(AdapterKind::CodebuddyCli), ["--acp"]);
         assert_eq!(arguments(AdapterKind::QwenCode), ["--acp"]);
         assert_eq!(arguments(AdapterKind::GeminiCli), ["--acp", "--skip-trust"]);
+        assert_eq!(arguments(AdapterKind::HermesCli), ["acp"]);
         assert_eq!(arguments(AdapterKind::TraeCnCli), ["acp", "serve"]);
         assert_eq!(arguments(AdapterKind::CursorAgent), ["acp"]);
         assert_eq!(arguments(AdapterKind::KimiCodeCli), ["acp"]);

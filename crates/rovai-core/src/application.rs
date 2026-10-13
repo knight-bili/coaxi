@@ -2414,6 +2414,7 @@ struct Core {
     codebuddy_cli: AcpCliRuntimeAdapter,
     qwen_code: AcpCliRuntimeAdapter,
     gemini_cli: AcpCliRuntimeAdapter,
+    hermes_cli: AcpCliRuntimeAdapter,
     trae_cn_cli: AcpCliRuntimeAdapter,
     cursor_agent: AcpCliRuntimeAdapter,
     kimi_code_cli: AcpCliRuntimeAdapter,
@@ -2770,6 +2771,7 @@ fn runtime_display_name(kind: AdapterKind) -> &'static str {
         AdapterKind::CodebuddyCli => "CodeBuddy CLI",
         AdapterKind::QwenCode => "Qwen Code",
         AdapterKind::GeminiCli => "Gemini CLI",
+        AdapterKind::HermesCli => "Hermes Agent",
         AdapterKind::TraeCnCli => "TRAE CLI",
         AdapterKind::CursorAgent => "Cursor Agent",
         AdapterKind::KimiCodeCli => "Kimi Code",
@@ -5620,6 +5622,13 @@ impl Core {
             return Some(AgentRunRuntime::Acp(runtime));
         }
         if let Some(runtime) = self
+            .hermes_cli
+            .get_agent_run(agent_run_id, execution_epoch)
+            .await
+        {
+            return Some(AgentRunRuntime::Acp(runtime));
+        }
+        if let Some(runtime) = self
             .trae_cn_cli
             .get_agent_run(agent_run_id, execution_epoch)
             .await
@@ -5782,6 +5791,7 @@ impl Core {
             self.codebuddy_cli.shutdown_all(),
             self.qwen_code.shutdown_all(),
             self.gemini_cli.shutdown_all(),
+            self.hermes_cli.shutdown_all(),
             self.trae_cn_cli.shutdown_all(),
             self.cursor_agent.shutdown_all(),
             self.kimi_code_cli.shutdown_all(),
@@ -5808,6 +5818,7 @@ impl Core {
                 self.codebuddy_cli.shutdown_all(),
                 self.qwen_code.shutdown_all(),
                 self.gemini_cli.shutdown_all(),
+                self.hermes_cli.shutdown_all(),
                 self.trae_cn_cli.shutdown_all(),
                 self.cursor_agent.shutdown_all(),
                 self.kimi_code_cli.shutdown_all(),
@@ -5837,6 +5848,7 @@ impl Core {
             rovai_core::agent_profile::AdapterKind::CodebuddyCli => Some(&self.codebuddy_cli),
             rovai_core::agent_profile::AdapterKind::QwenCode => Some(&self.qwen_code),
             rovai_core::agent_profile::AdapterKind::GeminiCli => Some(&self.gemini_cli),
+            rovai_core::agent_profile::AdapterKind::HermesCli => Some(&self.hermes_cli),
             rovai_core::agent_profile::AdapterKind::TraeCnCli => Some(&self.trae_cn_cli),
             rovai_core::agent_profile::AdapterKind::CursorAgent => Some(&self.cursor_agent),
             rovai_core::agent_profile::AdapterKind::KimiCodeCli => Some(&self.kimi_code_cli),
@@ -11800,6 +11812,7 @@ impl Core {
             | rovai_core::agent_profile::AdapterKind::CodebuddyCli
             | rovai_core::agent_profile::AdapterKind::QwenCode
             | rovai_core::agent_profile::AdapterKind::GeminiCli
+            | rovai_core::agent_profile::AdapterKind::HermesCli
             | rovai_core::agent_profile::AdapterKind::TraeCnCli
             | rovai_core::agent_profile::AdapterKind::CursorAgent
             | rovai_core::agent_profile::AdapterKind::KimiCodeCli
@@ -17876,6 +17889,7 @@ impl Core {
             | rovai_core::agent_profile::AdapterKind::CodebuddyCli
             | rovai_core::agent_profile::AdapterKind::QwenCode
             | rovai_core::agent_profile::AdapterKind::GeminiCli
+            | rovai_core::agent_profile::AdapterKind::HermesCli
             | rovai_core::agent_profile::AdapterKind::TraeCnCli
             | rovai_core::agent_profile::AdapterKind::CursorAgent
             | rovai_core::agent_profile::AdapterKind::KimiCodeCli
@@ -18824,6 +18838,13 @@ async fn run_core(
             AdapterKind::GeminiCli,
             acp_tx.clone(),
             data_dir.join("runtime/gemini"),
+            runtime_fleet.clone(),
+            CompactionDetectorPolicy::Disabled,
+        ),
+        hermes_cli: AcpCliRuntimeAdapter::deferred(
+            AdapterKind::HermesCli,
+            acp_tx.clone(),
+            data_dir.join("runtime/hermes"),
             runtime_fleet.clone(),
             CompactionDetectorPolicy::Disabled,
         ),
@@ -26880,6 +26901,13 @@ mod tests {
                 AdapterKind::GeminiCli,
                 acp_tx.clone(),
                 data_dir.join("runtime/gemini"),
+                runtime_fleet.clone(),
+                CompactionDetectorPolicy::Disabled,
+            )?,
+            hermes_cli: AcpCliRuntimeAdapter::new(
+                AdapterKind::HermesCli,
+                acp_tx.clone(),
+                data_dir.join("runtime/hermes"),
                 runtime_fleet.clone(),
                 CompactionDetectorPolicy::Disabled,
             )?,
