@@ -33,8 +33,8 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "完成I02-T01当前切片界面验收和构建",
-    "继续I02-T01剩余导航、重开恢复和首次使用行为核查",
+    "I02-T01生产BusinessApp与真实隔离Host的工程进入、重开、失效及迟到响应联调",
+    "I02-T01剩余导航与首次使用行为核查",
     "I02-T02成员与Provider",
     "I02-T03 Skills/MCP",
     "按原依赖推进I03至I12"
