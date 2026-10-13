@@ -63,7 +63,7 @@ jobs:
     if: needs.scope.outputs.macos == 'true'
     name: ${{ matrix.app }} macOS ${{ matrix.arch }}
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 90
+    timeout-minutes: ${{ matrix.app == 'codeg' && matrix.arch == 'x64' && 120 || 90 }}
     concurrency:
       group: foundation-macos-${{ github.ref }}-${{ matrix.app }}-${{ matrix.arch }}
       cancel-in-progress: false

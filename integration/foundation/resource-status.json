@@ -3,7 +3,7 @@
   "scope": "resources_not_feature_acceptance",
   "scheduleDates": "v4基准，仅扣周末；资源等待顺延，不是客户承诺提供日期",
   "customerReply": "暂无，暂时搁浅稍后我会提供adb给你",
-  "interpretation": "仅设备实测暂挂，继续软件构建与协议",
+  "interpretation": "客户明确先用GitHub编译/源测试/模拟器，Mac与移动真机运行后置，一期范围保留",
   "resources": [
     {
       "id": "RES-WIN-BUILD",
@@ -16,29 +16,29 @@
     {
       "id": "RES-MAC",
       "resource": "Mac/Xcode26",
-      "status": "unavailable",
-      "owner": "客户提供或另行确认采购",
+      "status": "github_source_builds_passed_intel_ci_timeout_warning_real_device_deferred",
+      "owner": "研发负责GitHub构建；客户后续提供或确认真实Mac验收方式",
       "neededBeforePhase": "I08",
       "baselineDate": "2027-01-15",
-      "action": "Mac桌面和iOS构建另行排到可用环境；没有设备时不签真机通过"
+      "action": "GitHub标准macOS-26/26-intel验证两款源应用arm64/x64；本地Mac和真实设备交互另行验收"
     },
     {
       "id": "RES-IOS",
       "resource": "iPhone/iPad与iOS签名",
-      "status": "device_tests_deferred_by_customer",
-      "owner": "客户",
+      "status": "github_simulator_passed_real_device_deferred",
+      "owner": "研发负责云构建；客户提供真机及发布签名",
       "neededBeforePhase": "I10",
       "baselineDate": "2027-02-19",
-      "action": "后续提供设备；签名账号/费用未确认，模拟器也尚未构建"
+      "action": "Xcode26.6无开发者签名编译与iOS26模拟器启动；真机、发布签名后置，源无测试target不计单测通过"
     },
     {
       "id": "RES-ANDROID",
       "resource": "Android设备/ADB、SDK36、发布签名",
-      "status": "device_tests_deferred_by_customer",
+      "status": "github_build_tests_simulator_passed_real_device_deferred",
       "owner": "客户提供ADB；研发接入与核查SDK",
       "neededBeforePhase": "I10",
       "baselineDate": "2027-02-19",
-      "action": "等待客户指定ADB；不访问旧设备，JDK17已存在但SDK36尚未确认"
+      "action": "GitHub Ubuntu24.04/JDK21/SDK36编译、源单测、lint和API36模拟器；客户指定ADB后补真机"
     },
     {
       "id": "RES-LINUX",
@@ -94,5 +94,7 @@
       "baselineDate": "2027-03-19",
       "action": "在发布前确认分发渠道、证书与费用，当前不采购"
     }
-  ]
+  ],
+  "cloudBuildDecision": "2026-10-13已建立6项跨平台CI；编译/源测试/模拟器与真机验收分开登记，不自动正式签名或发布",
+  "cloudBuildEvidence": "cross-platform-result.json"
 }
