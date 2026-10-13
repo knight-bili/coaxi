@@ -14,7 +14,7 @@ import type { MemberCreationView } from '@contracts'
 import { CopyIcon } from './CopyIcon'
 import { newCommandId } from '../../shared/command-id'
 import { useMobileLayout } from './MobileLayout'
-import { useThreadClient, useEditingRecovery, type ThreadClient } from './camp-client'
+import { useThreadClient, useEditingRecovery, type ThreadClient, type SavedDraftCopy } from './camp-client'
 import { useExecutionDisclosureAnchor } from './useExecutionDisclosureAnchor'
 import { useExecutionMetrics, useExecutionMetricsVisibility } from './useExecutionMetrics'
 import { executionUsageTotal } from './execution-metrics-reader'
@@ -108,6 +108,8 @@ import {
   loadLocalThreadComposerDraft,
   localThreadComposerDraftIsEmpty,
   copyLegacyThreadComposerDraft,
+  parseLocalThreadComposerDraft,
+  THREAD_COMPOSER_STORAGE_PREFIX,
   materializeLocalContinuation,
   nextLocalThreadComposerDraftAfterSend,
   saveLocalThreadComposerDraft,
@@ -1820,6 +1822,20 @@ export function ThreadWorkspace({
     ? loadLocalThreadComposerDraft(snapshot.thread.id) : null,
   [client.editingRecovery, snapshot.thread.id, memberCreation])
   const [legacyDraftRecoveryError, setLegacyDraftRecoveryError] = useState<string | null>(null)
+  const [savedDraftDialogOpen, setSavedDraftDialogOpen] = useState(false)
+  const [draftCopyRevision, setDraftCopyRevision] = useState(0)
+  const savedDraftIdentity = `${THREAD_COMPOSER_STORAGE_PREFIX}${snapshot.thread.id}`
+  const savedDraftCopies = useMemo(() => client.editingRecovery?.draftCopies?.(savedDraftIdentity)
+    .filter(copy => { const draft = parseLocalThreadComposerDraft(copy.value, snapshot.thread.id); return draft && !localThreadComposerDraftIsEmpty(draft) }) ?? [],
+  [client.editingRecovery, savedDraftIdentity, snapshot.thread.id, draftCopyRevision])
+  useEffect(() => {
+    if (!client.editingRecovery?.draftCopies) return
+    const changed = (event: StorageEvent): void => {
+      if (event.storageArea === window.localStorage && event.key?.startsWith('rovai.web.thread-drafts.v1:')) setDraftCopyRevision(value => value + 1)
+    }
+    window.addEventListener('storage', changed)
+    return () => window.removeEventListener('storage', changed)
+  }, [client.editingRecovery])
   const pendingDraftPersistence = useRef<PendingThreadDraftPersistence | null>(null)
   if (!pendingDraftPersistence.current) pendingDraftPersistence.current = new PendingThreadDraftPersistence(client)
   const pendingThreadLeaveRef = useRef(onPendingThreadLeave)
@@ -1908,9 +1924,9 @@ export function ThreadWorkspace({
             saveLocalThreadComposerDraft(draft, composerStorage)
             setComposerPersistenceError(null)
           } catch (error) {
-            setComposerPersistenceError(
-              error instanceof Error ? error : new Error(readErrorMessage(error))
-            )
+            const normalized = error instanceof Error ? error : new Error(readErrorMessage(error))
+            setComposerPersistenceError(normalized)
+            throw normalized
           }
         }
         if (draftCoordinatorChangeRefreshesProjection(kind)) {
@@ -3199,7 +3215,7 @@ export function ThreadWorkspace({
     }
   }
 
-  const recoverLegacyComposerDraft = async (): Promise<void> => {
+  const recoverLegacyComposerDraft = async (copy?: SavedDraftCopy): Promise<void> => {
     if (!composerStorage || composerSubmittingRef.current || routingMutatingRef.current) return
     const threadId = snapshot.thread.id
     const epoch = draftCoordinator.getEpoch()
@@ -3208,7 +3224,8 @@ export function ThreadWorkspace({
       await mutateRoutingDraft(async () => {
         await attachmentPreparationQueue.current
         const current = await draftCoordinator.waitForIdle()
-        const legacy = loadLocalThreadComposerDraft(threadId)
+        const latestCopy = copy ? client.editingRecovery?.draftCopies?.(savedDraftIdentity).find(candidate => candidate.id === copy.id && candidate.value === copy.value) : null
+        const legacy = copy ? parseLocalThreadComposerDraft(latestCopy?.value ?? null, threadId) : loadLocalThreadComposerDraft(threadId)
         if (draftCoordinator.getEpoch() !== epoch || current?.threadId !== threadId || !legacy) {
           throw new Error(uiAttribute('旧草稿暂不可恢复，请重新打开此对话。'))
         }
@@ -3217,6 +3234,7 @@ export function ThreadWorkspace({
         }
         return draftCoordinator.load()
       })
+      setSavedDraftDialogOpen(false)
     } catch (error) {
       if (draftCoordinator.getEpoch() === epoch) setLegacyDraftRecoveryError(readErrorMessage(error))
     }
@@ -3427,6 +3445,7 @@ export function ThreadWorkspace({
     setComposerPersistenceError(null)
     setComposerInviteMessage(null)
     setLegacyDraftRecoveryError(null)
+    setSavedDraftDialogOpen(false)
     setComposerLocalStatus({
       hasContent: false,
       hasExplicitRecipient: false,
@@ -6072,6 +6091,14 @@ export function ThreadWorkspace({
               </span>
             )}
             {legacyDraftRecoveryError && <span className="composer-reply-status" role="alert">{legacyDraftRecoveryError}</span>}
+            {savedDraftCopies.length > 0 && composerDraft && localThreadComposerDraftIsEmpty(composerDraft)
+              && !composerLocalStatus.hasContent && !memberCreation && (
+              <span className="composer-reply-status legacy-draft-recovery saved-draft-recovery" role="status">
+                <UiText zh={"此对话有已保存的未发送草稿。"} />
+                <button type="button" className="quiet-button compact" disabled={composerInteractionDisabled || routingMutating}
+                  onClick={() => { setDraftCopyRevision(value => value + 1); setSavedDraftDialogOpen(true) }}><UiText zh={"选择草稿恢复"} /></button>
+              </span>
+            )}
             {composerInviteMessage && (
               <span className="composer-reply-status composer-invite-error" role="alert">
                 {composerInviteMessage}
@@ -6209,6 +6236,23 @@ export function ThreadWorkspace({
         executionPreviewHost
       )}
       {executionDrawerPortal && createPortal(executionDrawer, executionDrawerPortal)}
+      <Dialog.Root open={savedDraftDialogOpen} onOpenChange={open => { if (!routingMutating) setSavedDraftDialogOpen(open) }}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="dialog-overlay app-dialog-overlay" />
+          <AppDialogContent className="saved-draft-dialog" width="compact">
+            <AppDialogHeader title={uiAttribute('选择要恢复的草稿')} description={uiAttribute('仅复制所选草稿到当前标签，原记录仍保留。旧附件需要重新选择。')} closeDisabled={routingMutating} />
+            <AppDialogBody>
+              {savedDraftCopies.map(copy => <button key={copy.id} type="button" className="quiet-button saved-draft-choice" disabled={routingMutating}
+                onClick={() => void recoverLegacyComposerDraft(copy)}>
+                <time>{new Date(copy.savedAt).toLocaleString(getInterfaceLanguage())}</time>
+                <span>{(() => { const draft = parseLocalThreadComposerDraft(copy.value, snapshot.thread.id); return (draft?.body || draft?.attachments.map(file => file.displayName).join('、') || draft?.quotes[0]?.text || '').slice(0, 160) })()}</span>
+              </button>)}
+              {savedDraftCopies.length === 0 && <p><UiText zh={"没有可恢复的草稿。"} /></p>}
+              {legacyDraftRecoveryError && <p role="alert">{legacyDraftRecoveryError}</p>}
+            </AppDialogBody>
+          </AppDialogContent>
+        </Dialog.Portal>
+      </Dialog.Root>
       <Dialog.Root
         open={withdrawalMessage !== null}
         onOpenChange={(open) => {

@@ -5,7 +5,7 @@
   "status": "passed",
   "scope": "production_web_real_host_navigation_and_recorded_messages_no_runtime",
   "source": {
-    "parentCommit": "08c4220702fde9ebb677be6b5fcd0ea9ab7c5318",
+    "parentCommit": "9047972dac18896c3598abc46ed01a6150a330a0",
     "testedWorkingTreeChanges": [
       {
         "file": "apps/desktop/src/renderer/src/BusinessApp.tsx",
@@ -13,15 +13,27 @@
       },
       {
         "file": "apps/desktop/src/renderer/src/ThreadWorkspace.tsx",
-        "sha256": "99fd56df7d2fa752fbc1a2283f185a6137b17ca6de8c42da898b60133f7354f4"
+        "sha256": "9bab08a39ee4c3979b98694619ecb5d3d025c21f8f6e68b24cddb5a36b68bd7e"
+      },
+      {
+        "file": "apps/desktop/src/renderer/src/camp-client.tsx",
+        "sha256": "bd671efc342f476cf4e6b976061e0dfb88f21fb72067addd353595aa165cf0dc"
       },
       {
         "file": "apps/desktop/src/renderer/src/camp-composer-local-store.ts",
-        "sha256": "648de10fcb699e49995a294788924d8d6ab010d9dc8b34a5445969d51a4d7631"
+        "sha256": "b5a94c8a23342e7de00567b6b295fff6ec6bf7cd713ce5577696d0a8afc03b8a"
       },
       {
         "file": "apps/desktop/src/renderer/src/pending-thread-draft.ts",
         "sha256": "4ab6df9f88d7e3c89d89cac0e432e11a5ad4f8b48303aec91f2424e27078783f"
+      },
+      {
+        "file": "apps/web/src/editing-recovery.ts",
+        "sha256": "42812ad7ba9ab972bdc97d0d42a5d85ada598b69999b45efc4405b29dd0223b0"
+      },
+      {
+        "file": "apps/web/src/camp-adapter.ts",
+        "sha256": "a3c711c50adb13b1005727ec58ff296c2f52c96c98a0cc9c3e3173ed5ecd3c06"
       },
       {
         "file": "scripts/lib/host-web-browser.mjs",
@@ -33,7 +45,7 @@
       },
       {
         "file": "tools/integration/smoke-workbench-live.mjs",
-        "sha256": "fe9ffe30bbc1a43488659606fd05aa550d2903c61fbe5cc2a6bedc2ca2982a8f"
+        "sha256": "e4c9d8211ebc2606e55c5df87f1ffa3420b829f3e0f7b625af1e587730bb1b80"
       }
     ],
     "coreBinary": {
@@ -190,100 +202,100 @@
         "sha256": "24a7719ff1d38588f4889f8d0f6bca90690f58436a048ef8e3c644aabf1aaffd"
       },
       {
-        "file": "assets/index-08J69z7u.js",
-        "sha256": "e31dbe232fe1bd49711e5fa0e3afb29bfedc10e74c4c6e3067a5d8fd7a76c254"
+        "file": "assets/index-3dWRWMyY.css",
+        "sha256": "a6dd53eb132f34d2bb72d5aec104abd64ae8be901448f45512af6122b15d860c"
       },
       {
-        "file": "assets/index-7x65ipM4.js",
-        "sha256": "b4f63f8252c40e0dda102ae104fdc95fadcf42a120d4f189672b4fc9988f28c8"
+        "file": "assets/index-BIhRcvcQ.js",
+        "sha256": "51dc53e0bb8653110cd3a82b9a6a07779cbb74dbca58a1dc7447097c21cb550b"
       },
       {
-        "file": "assets/index-B3vvUv4Z.js",
-        "sha256": "0aa1b82c3003f62b497925520b68c5e6090f62e74f2c34d82c614010eeb0d845"
+        "file": "assets/index-BNtsO8oa.js",
+        "sha256": "c9c8eb8a784e42eecaa30b25be365b43fbf8fd62fc578577d2f82b23d90e0ff5"
       },
       {
-        "file": "assets/index-BUGG0Gw3.js",
-        "sha256": "ec57a1fe259512f5362f45bd40feb7b2275a9805da0026c04937341beed879cc"
+        "file": "assets/index-BOT3dvBK.js",
+        "sha256": "d9ae80a99b9e761065528d43fb47719c8aca54d29f8f49121fa283cff80ebc21"
       },
       {
-        "file": "assets/index-B_sjUskM.js",
-        "sha256": "e8d09448d00571c65c2a36a76e8ac678ea3a39c5771d3ade90a28bc7c4c413ba"
+        "file": "assets/index-BiSE2x_4.js",
+        "sha256": "49f862068a3d6f9832d0407140f6a65614051615c0a43552611d0bdb2913542a"
       },
       {
-        "file": "assets/index-BaQhTv6C.js",
-        "sha256": "bbda7c46804f723f43f448a920b792df01eb70a73f62064b5d74e4f3f4d087b2"
+        "file": "assets/index-Bs1ejPba.js",
+        "sha256": "1b4c5a6caca92e9366ecb5e9ca27a4cfd9a345de1fe7dbc81c37876dc935baf9"
       },
       {
-        "file": "assets/index-Bw_qWTC7.js",
-        "sha256": "8d94a56889a362db5819e7129b601603e94a95a6ed03604113750dd09578834b"
+        "file": "assets/index-CBM2HTt3.js",
+        "sha256": "3b83fea42bb7bf3380bebdba8fa60f6b43ab00e172078180378db775ac013c19"
       },
       {
-        "file": "assets/index-C0KLte2f.js",
-        "sha256": "7ca12facba749f9589cb94c776e6bfd705d9777f90dfb8dd788a064152b8dcac"
+        "file": "assets/index-CR3EeEH5.js",
+        "sha256": "487476fefedf565872efe3144f042c3b0d67039a4a4232067cccbff90f50f516"
       },
       {
-        "file": "assets/index-CD1J9XEZ.js",
-        "sha256": "bd4983760d8686734c57d0bc6da69e995d2807b825184bf49a9056c2d08c1e7c"
+        "file": "assets/index-CacUQejJ.js",
+        "sha256": "cac6b21707a75a855ebcb1f2b81b7f1c90ce3df1a97eef792a66f4d24c110e1c"
       },
       {
-        "file": "assets/index-CFkIbJrx.js",
-        "sha256": "688497534d3609b9025b65846772e3a4f0dd78604f00be9d9ad042d370002229"
+        "file": "assets/index-CeIh1CMW.js",
+        "sha256": "fef462c1c8ea75300e92c81bf489e8b6e9d5762bdf717175ec6734f4b7c30edf"
       },
       {
-        "file": "assets/index-CTgI0yfe.js",
-        "sha256": "26eb41136572ae53fb1456c10ee24a175c1d354fe3730d63c2f843168a1e1550"
+        "file": "assets/index-CffWhqj4.js",
+        "sha256": "9bd2c171dbb9e83199a8b758e7d41855d88d1dfa599be88719ff919fbc67a6aa"
       },
       {
-        "file": "assets/index-CZEnorFv.js",
-        "sha256": "d6dac19b2737c5a5f59570e9e71d83171b7128b1abe217105f0fb97078d893b0"
+        "file": "assets/index-CmLy-NOV.js",
+        "sha256": "a0a4d510a9ad83399b463631d0edeeaf37f3a9af340376003d03f7a47d4cda69"
       },
       {
-        "file": "assets/index-Ca0Jp3m1.js",
-        "sha256": "d670e646ab4195062156878e0a5210f9a7b4493a08fe0d5268334efe029199e2"
+        "file": "assets/index-DApAdm0q.js",
+        "sha256": "c5eeea405015b2f2134c65d005ec0b1230afe886c4f960b46e481d04572ad59b"
       },
       {
-        "file": "assets/index-CqtpE-AN.css",
-        "sha256": "6b7f37e4eca7380a963701e4254b64ddf3682c510b367589b58016ef78b8fd95"
+        "file": "assets/index-DFbSqRxX.js",
+        "sha256": "ded6eff53185828cdbabdc50cbfe9bda50dee15c9c60caef60bc08363dad2aee"
       },
       {
-        "file": "assets/index-CsdFQU_1.js",
-        "sha256": "7305ef7884944503792290f6e9ec268e538694a3def0daa7b93c5842b1f60180"
+        "file": "assets/index-DG27EAiD.js",
+        "sha256": "5450bb53f04d1249302a7465a7594b8471a9b4e33b29f5cb94f075a241d4186c"
       },
       {
-        "file": "assets/index-DPYDd7D3.js",
-        "sha256": "8e4862367cb46c7f305594ace4f5f00fdcdf61dacc309f580520b9cabf632a02"
+        "file": "assets/index-DLHOjUD8.js",
+        "sha256": "5eeb8ccdf9f193bafff4e7422789a154d424903bce8905b845ca3fceb979f656"
       },
       {
-        "file": "assets/index-DrawQNN_.js",
-        "sha256": "c0eaab96c66d5534bcfd53125e0277f0926daad064e711498cc79e9c06855d74"
+        "file": "assets/index-DXJWg8ET.js",
+        "sha256": "7675bc422832d18b596e29f5a133762c85321c75cdfea55c368961ecf2580dfd"
       },
       {
-        "file": "assets/index-LXvN9lsg.js",
-        "sha256": "d80fd2daa5e2ea59cd252b79759d6ebeb597ca8ecc1e043ba8946fd0560062e1"
+        "file": "assets/index-DY1UtRRU.js",
+        "sha256": "91c27857c8cb898bb0c7ca566218b74b26f854220d150b8d1250a92b9bce8731"
       },
       {
-        "file": "assets/index-_5299ymh.js",
-        "sha256": "c917df395cabab6253e584f49f766e1a8409e0b4f402e72b84214a4a6122c474"
+        "file": "assets/index-DmSZoqPv.js",
+        "sha256": "431e378d4d8d916d73607021c4d6eedaccb5fd5259635d7748b06a617925f798"
       },
       {
-        "file": "assets/index-drZA9Uth.js",
-        "sha256": "ccbe7c5db0e53a2e56984befcc93e301feb9189fbd3761f9bfffbcab3c4229fa"
+        "file": "assets/index-DzBISEbE.js",
+        "sha256": "499cdbfbf8f6a0d4d71f07d7cd96c81a879bc95284aabc2355b8b71e733a0846"
       },
       {
-        "file": "assets/index-eBUH_U2C.js",
-        "sha256": "ad4208f23c6a27752cc4cdaa0d04094afb687de4d12e3a98b5ab22cd61b67c56"
+        "file": "assets/index-JELW4VVA.js",
+        "sha256": "62485d4c016403f432a349b991df8f08f5c58817ca5225549fd64f345807ba60"
       },
       {
-        "file": "assets/index-qNUagOs5.js",
-        "sha256": "b65e63549148d76bbf302c34f0bea6bd8b2d7e55dca338619878d44d4cc6f170"
+        "file": "assets/index-M9fhDssV.js",
+        "sha256": "3ecb11702e9cf41cc0768c0b978f7c9279f606dcd8acc3135ef39886e8053c5e"
       },
       {
-        "file": "assets/index-uW1n47q8.js",
-        "sha256": "035b1d38e170951c463cdc56135a1b3c6320c38920b0b45eab4c93c8ce42ff85"
+        "file": "assets/index-eim4FWaa.js",
+        "sha256": "33844e24bbba24f9d46eed788de8f5b5e9bd390afee97110cfe2a08489981fc7"
       },
       {
-        "file": "assets/index-vgVgyRma.js",
-        "sha256": "103441f0eaaa109564547635707d6a8c2b3deab90de58f18619f916fd3dd329c"
+        "file": "assets/index-kiM4XDIc.js",
+        "sha256": "3e647b5a02f503a107195126a8f76a3e722cc02754668a57631a597979277736"
       },
       {
         "file": "assets/javascript-iXu5QeM3.js",
@@ -595,23 +607,35 @@
       "status": "passed"
     },
     {
+      "id": "browser_process_restart_keeps_two_separate_body_snapshots",
+      "status": "passed"
+    },
+    {
+      "id": "explicit_previous_editor_restore_copies_one_snapshot_without_merging",
+      "status": "passed"
+    },
+    {
+      "id": "actual_browser_quota_preserves_input_and_previous_snapshot_then_retries",
+      "status": "passed"
+    },
+    {
       "id": "isolated_database_integrity_and_zero_agent_runs",
       "status": "passed"
     }
   ],
   "screenshot": {
     "file": "I02_工程首页_真实Core验收.png",
-    "sha256": "0ae781784e26b8c389118b24295145a54a59d323747b78d3130fc729b98164bc",
+    "sha256": "011774957efccc05d6986064456838c93c1d4a4dac9afab2b0f52abbc1b07439",
     "review": "已核查重新打开后的稳定页面；当前工程、高亮和工程内对话一致，无其他工程对话"
   },
   "threadScreenshot": {
     "file": "I02_对话消息_真实Core验收.png",
-    "sha256": "b938800ce6abf46097d53a1893c38799bbfc43ae2a48b8b947b621c82d83204a",
+    "sha256": "ac84245f7cd0ca60b5bb80133a4694861019b2726e529a1f8b92c2caf73f7379",
     "review": "八条受控用户消息能在生产Thread读取；截图含等待投递，未启动AI运行"
   },
   "regression": {
-    "files": 5,
-    "passed": 29,
+    "files": 6,
+    "passed": 33,
     "failed": 0
   },
   "typecheck": "passed",
@@ -651,10 +675,11 @@
     "fusionAcceptanceCases": "not_run",
     "desktopProcessRestart": "not_run",
     "hostProcessRestart": "not_run",
-    "draftBrowserProcessRestart": "not_run",
+    "draftBrowserProcessRestart": "passed_normal_exit_explicit_one_copy_restore",
+    "abruptCrash": "not_run",
     "nativeMacFixture": "消息初始化合同已修正，旧SQL/未公开Pending场景尚待改写，完整Mac夹具未运行",
-    "unscopedWebLegacyDraft": "不自动归属，不删除旧记录；需补显式恢复流程",
+    "unscopedWebLegacyDraft": "显式恢复已验证，见i02-legacy-draft-result.json；实际旧附件尚未验证",
     "productStage": "I02-T01仍实施中",
-    "captureFailures": "此前CDP截图超时记录保留在工作日志，本记录只引用完整成功的这一轮"
+    "captureFailures": "此前采集/等待问题保留工作日志，只引用完整成功的一轮"
   }
 }

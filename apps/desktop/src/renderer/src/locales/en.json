@@ -3714,5 +3714,10 @@
   "此浏览器保留了旧版草稿。恢复后原记录仍保留，附件需重新选择。": "This browser has a legacy draft. Recovery keeps the original; select attachments again.",
   "恢复到当前标签": "Restore to this tab",
   "旧草稿暂不可恢复，请重新打开此对话。": "The legacy draft is unavailable. Reopen this conversation.",
-  "当前标签已有内容或旧草稿已变化，未覆盖。": "This tab already has input or the legacy draft changed. Nothing was replaced."
+  "当前标签已有内容或旧草稿已变化，未覆盖。": "This tab already has input or the legacy draft changed. Nothing was replaced.",
+  "此对话有已保存的未发送草稿。": "This conversation has saved unsent drafts.",
+  "选择草稿恢复": "Choose a draft to restore",
+  "选择要恢复的草稿": "Choose the draft to restore",
+  "仅复制所选草稿到当前标签，原记录仍保留。旧附件需要重新选择。": "Copy only the selected draft to this tab. The original is kept. Select attachments again.",
+  "没有可恢复的草稿。": "No saved drafts are available."
 }

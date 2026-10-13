@@ -73,7 +73,7 @@ try {
   await browser.click(`document.querySelector('.legacy-draft-recovery button')`)
   await browser.wait(`${editor}.textContent === 'I02_TAB_A_UNSENT'`)
   assert.equal(await browser.evaluate(`localStorage.getItem(${JSON.stringify(key)})`), original)
-  const scoped = await browser.evaluate(`JSON.parse(sessionStorage.getItem('rovai.web.edits.v1')).entries[${JSON.stringify(key)}]`)
+  const scoped = await browser.evaluate(`Object.keys(localStorage).filter(key=>key.startsWith('rovai.web.thread-drafts.v1:')).map(key=>JSON.parse(localStorage.getItem(key)).entries[${JSON.stringify(key)}]?.value).find(value=>value?.includes('I02_TAB_A_UNSENT'))`)
   assert.equal(JSON.parse(scoped).body, 'I02_TAB_A_UNSENT')
   record('explicit_restore_copies_to_verified_editor_and_preserves_original_bytes')
   await browser.reload()

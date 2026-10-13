@@ -32,7 +32,7 @@
   "electronCodeBuild": "passed",
   "liveCoreNavigation": {
     "status": "passed",
-    "checks": 14,
+    "checks": 17,
     "evidence": "i02-navigation-live-result.json",
     "runtime": "not_started"
   },
@@ -59,8 +59,8 @@
     }
   ],
   "currentRegression": {
-    "files": 5,
-    "passed": 29,
+    "files": 6,
+    "passed": 33,
     "failed": 0
   }
 }

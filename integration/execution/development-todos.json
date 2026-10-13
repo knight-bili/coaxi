@@ -15,11 +15,11 @@
     {
       "id": "DEV-WEB-LEGACY-DRAFT-RECOVERY",
       "task": "I02-T01/I12兼容整改",
-      "status": "explicit_legacy_restore_verified_closed_browser_private_draft_pending",
+      "status": "normal_exit_recovery_verified_attachment_and_crash_pending",
       "file": "apps/desktop/src/renderer/src/camp-composer-local-store.ts",
-      "problem": "旧无身份Web草稿显式恢复已实现并用实际修复前数据验证；新私有草稿的完整浏览器退出/恢复及真实旧附件还需验证",
+      "problem": "旧版显式恢复、正常浏览器退出后公共正文恢复及真实quota已验证；真实旧附件、异常退出与全平台仍需补齐",
       "owner": "研发",
-      "evidence": "i02-legacy-draft-result.json：5项真实Host检查通过；原记录字节不变、现有输入不覆盖、刷新恢复；单测验证旧附件不信原路径和配额失败不改原记录"
+      "evidence": "i02-draft-restart-result.json：完整生产流程17检查，关闭进程后两份各自存在、明确选一份、真实quota保留及重试通过；旧版实际数据5项保持"
     }
   ]
 }

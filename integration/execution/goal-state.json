@@ -14,7 +14,7 @@
   "current_branch": "phase/i02-workbench",
   "base_branch": "phase/i01-foundation",
   "current_task": "I02-T01",
-  "current_slice": "工程导航、Web私有文字及旧草稿显式恢复",
+  "current_slice": "工程导航、Web私有正文快照与选择恢复",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "I02-T01补完整浏览器退出后的私有草稿恢复、重写旧Mac夹具并核查剩余导航差异",
+    "I02-T01重写旧Mac夹具、补附件/异常退出恢复并核查剩余导航差异",
     "I02-T02先盘点独立测试Runtime，再融合成员与Provider",
     "I02-T03 Skills/MCP",
     "按原依赖推进I03至I12"
@@ -43,5 +43,6 @@
   "current_slice_status": "component_and_real_host_navigation_verified_task_in_progress",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-navigation-live-result.json",
-  "legacy_evidence": "i02-legacy-draft-result.json"
+  "legacy_evidence": "i02-legacy-draft-result.json",
+  "draft_restart_evidence": "i02-draft-restart-result.json"
 }

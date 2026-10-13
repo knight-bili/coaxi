@@ -8,7 +8,7 @@ import type {
 } from '@contracts'
 import type { EditingRecovery } from './camp-client'
 
-const STORAGE_PREFIX = 'rovai.camp-composer-draft.v1:'
+export const THREAD_COMPOSER_STORAGE_PREFIX = 'rovai.camp-composer-draft.v1:'
 const MAX_STORED_DRAFT_BYTES = 4 * 1024 * 1024
 const MAX_SEGMENTS = 4_096
 const MAX_ATTACHMENTS = 10
@@ -132,7 +132,7 @@ function isStoredDraft(value: unknown, threadId: string): value is ThreadCompose
 }
 
 function storageKey(threadId: string): string {
-  return `${STORAGE_PREFIX}${threadId}`
+  return `${THREAD_COMPOSER_STORAGE_PREFIX}${threadId}`
 }
 
 function browserStorage(): DraftStorage | null {
@@ -149,7 +149,10 @@ export function loadLocalThreadComposerDraft(
   storage: DraftStorage | null = browserStorage()
 ): ThreadComposerDraftView | null {
   if (!storage) return null
-  const encoded = storage.getItem(storageKey(threadId))
+  return parseLocalThreadComposerDraft(storage.getItem(storageKey(threadId)), threadId)
+}
+
+export function parseLocalThreadComposerDraft(encoded: string | null, threadId: string): ThreadComposerDraftView | null {
   if (!encoded || encoded.length > MAX_STORED_DRAFT_BYTES) return null
   try {
     const parsed: unknown = JSON.parse(encoded)
@@ -188,7 +191,7 @@ export function copyLegacyThreadComposerDraft(
   if (current.threadId !== legacy.threadId || !localThreadComposerDraftIsEmpty(current)
     || !isStoredDraft(legacy, current.threadId) || localThreadComposerDraftIsEmpty(legacy)) return null
   const next: ThreadComposerDraftView = {
-    ...legacy, revision: current.revision + 1,
+    ...legacy, draftId: undefined, revision: current.revision + 1,
     attachments: legacy.attachments.map(({ sourcePath: _sourcePath, ...attachment }) => ({ ...attachment, availability: 'unknown' }))
   }
   saveLocalThreadComposerDraft(next, storage)
