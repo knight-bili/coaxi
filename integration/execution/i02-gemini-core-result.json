@@ -2,20 +2,20 @@
   "schema_version": 1,
   "date": "2026-10-14",
   "task": "I02-T02",
-  "status": "source_implemented_Rust_compile_and_regressions_pending",
+  "status": "compile_failures_repaired_new_native_validation_pending",
   "scope": "Gemini_Core_catalog_ACP_models_permissions_Skills_MCP_mapping_and_schema147",
   "source": [
     {
       "file": "crates/rovai-core/src/agent_profile.rs",
-      "sha256": "5a3f25993a366b941d26a236b15cfa80146957ed3ff80d8cb58ff27f62d4eb4e"
+      "sha256": "93c7fb14fd8d86581b3500fe044d0ec9543323c4f2886e39c3441e48a47afcce"
     },
     {
       "file": "crates/rovai-core/src/agent_runtime_adapter.rs",
-      "sha256": "00e722ad157c6ec6bf2bb917389d7ce2b8367411efba3321b8f927fb73c0a857"
+      "sha256": "424f94426ca9fb8e9d95173665ee3584c7fecbbafcd6ca239e4c4fdcddcfc86d"
     },
     {
       "file": "crates/rovai-core/src/acp.rs",
-      "sha256": "56ab4a5f701e80798fc1a2bc8b91806d621bbe5e2ec46fa4700c529d2888e3f2"
+      "sha256": "4ba97b55be7457f0b69bf89d30c07775e5b87c2311c38445a055748997a4b0c3"
     },
     {
       "file": "crates/rovai-core/src/health.rs",
@@ -27,7 +27,7 @@
     },
     {
       "file": "crates/rovai-core/src/native_skills.rs",
-      "sha256": "f38cce6912a355f65f356dce132617b363dcc2f012ef9a9d545d4dfba926e621"
+      "sha256": "8009bafc3ea0fb50e1512cbc1f6f845aadcbf524d187489847dbc3496c42ba08"
     },
     {
       "file": "crates/rovai-core/src/context.rs",
@@ -56,6 +56,18 @@
     {
       "file": "apps/desktop/src/renderer/src/runtime-products.ts",
       "sha256": "4a046f32601c9db2ffe426ed9727d07e2be9766e811aa613bcab00a1c65f2e5c"
+    },
+    {
+      "file": "crates/rovai-core/src/application.rs",
+      "sha256": "69f41b1fc83ba68c5abc89e66c17d01d3fdaffdf4e39cb55d991fc185bd02462"
+    },
+    {
+      "file": "crates/rovai-core/src/runtime_failure.rs",
+      "sha256": "f452287439306d935ba45608aa722dce3f2ed12841fa2c39cf2d0687bf8c20e0"
+    },
+    {
+      "file": "crates/rovai-core/src/skill.rs",
+      "sha256": "48b66dc8c04174f91676156adbdb38ee32565fd7bd9d843ace84e563e67ea292"
     }
   ],
   "implemented": {
@@ -83,7 +95,8 @@
     "remainingAdapters": [
       "hermes",
       "open_claw"
-    ]
+    ],
+    "lifecycle": "Core专用ACP实例、Runtime检查、精确Run查找/终止和双退出路径均已接入源码"
   },
   "checked": {
     "typecheck": "passed",
@@ -93,7 +106,7 @@
       "failed": 0
     },
     "webExecutionWebDesktopCodeBuild": "passed",
-    "cargoFormat": "passed",
+    "cargoFormat": "passed_after_fix",
     "workflowActionlint": "passed",
     "docsGovernance": "passed",
     "planningAndProtocolConsistency": "passed"
@@ -138,7 +151,7 @@
     "arm64": "cancelled/assertions not_run"
   },
   "limits": {
-    "RustCompile": "pending_CI",
+    "RustCompile": "failed_previous_revision_new_fix_pending",
     "RustTests": "pending_CI",
     "nativeMacReady": "not_passed",
     "actualModel": "not_run",
@@ -148,5 +161,23 @@
     "abruptCrash": "not_run",
     "customerAcceptance": "not_run",
     "full324FusionCases": "not_run"
-  }
+  },
+  "failureHistory": [
+    {
+      "commit": "9c7b8275a212ef7c3d30cf2f8b7282c08e3008b8",
+      "CoreRun": 38459992330,
+      "linuxJob": 115512371151,
+      "macRun": 38459992249,
+      "armJob": 115512371757,
+      "stage": "compile",
+      "errors": 10,
+      "causes": [
+        "BTreeSet未导入",
+        "GEMINI_CLI_HOME根Path到PathBuf未转换",
+        "缺少Core模型检查与ACP实例/查找/关闭/终止分发",
+        "缺少协议、权限和用户错误/Skills标签分支"
+      ],
+      "action": "补齐已发现类型及生产生命周期接入；仍须新编译与迁移执行验证"
+    }
+  ]
 }

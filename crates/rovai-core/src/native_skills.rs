@@ -566,7 +566,7 @@ fn user_roots(
             configured_root("QWEN_CODE_HOME", home.join(".qwen"), configuration).join("skills"),
         ),
         AdapterKind::GeminiCli => {
-            let root = configured_root("GEMINI_CLI_HOME", home.clone(), configuration);
+            let root = configured_root("GEMINI_CLI_HOME", home.to_path_buf(), configuration);
             paths.push(root.join(".gemini/skills"));
             paths.push(root.join(".agents/skills"));
         }

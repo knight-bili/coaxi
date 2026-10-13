@@ -8,6 +8,8 @@ on:
       - '.github/workflows/workbench-native-web.yml'
       - 'scripts/lib/host-web-live.test.mjs'
       - 'scripts/lib/host-web-browser.mjs'
+      - 'crates/**'
+      - 'packages/contracts/**'
 
 permissions:
   contents: read

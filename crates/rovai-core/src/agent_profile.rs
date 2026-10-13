@@ -4186,6 +4186,7 @@ fn provisional_runtime_protocol(adapter_kind: AdapterKind) -> &'static str {
         | AdapterKind::QoderCli
         | AdapterKind::CodebuddyCli
         | AdapterKind::QwenCode
+        | AdapterKind::GeminiCli
         | AdapterKind::TraeCnCli
         | AdapterKind::CursorAgent
         | AdapterKind::KimiCodeCli

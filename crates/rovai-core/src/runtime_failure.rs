@@ -403,6 +403,7 @@ fn runtime_display_name(runtime_kind: AdapterKind) -> &'static str {
         AdapterKind::QoderCli => "Qoder CLI",
         AdapterKind::CodebuddyCli => "CodeBuddy CLI",
         AdapterKind::QwenCode => "Qwen Code",
+        AdapterKind::GeminiCli => "Gemini CLI",
         AdapterKind::TraeCnCli => "TRAE CLI",
         AdapterKind::CursorAgent => "Cursor Agent",
         AdapterKind::KimiCodeCli => "Kimi Code",

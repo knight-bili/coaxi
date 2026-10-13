@@ -7535,7 +7535,7 @@ pub fn automatically_allows_permission_requests(
         AdapterKind::CodebuddyCli | AdapterKind::GrokBuild => {
             permissions["permission_mode"] == "bypassPermissions"
         }
-        AdapterKind::QwenCode => permissions["approval_mode"] == "yolo",
+        AdapterKind::QwenCode | AdapterKind::GeminiCli => permissions["approval_mode"] == "yolo",
         AdapterKind::ClineCli => {
             permissions["mode"] == "act" && permissions["auto_approve"] == "true"
         }
