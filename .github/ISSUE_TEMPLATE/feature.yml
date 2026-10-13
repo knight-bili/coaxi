@@ -1,0 +1,22 @@
+name: 研发任务与客户验收
+description: 记录一期工作包、来源和完成标准
+title: "[一期] "
+body:
+  - type: textarea
+    id: scope
+    attributes:
+      label: 任务与来源
+      description: 填写阶段、工作包、来源能力ID和实际行为
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 自测与客户验收标准
+      description: 填写正常、异常、平台、恢复和证据要求
+    validations:
+      required: true
+  - type: textarea
+    id: blockers
+    attributes:
+      label: 依赖与阻塞

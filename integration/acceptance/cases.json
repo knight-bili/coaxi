@@ -1,0 +1,5510 @@
+[
+  {
+    "id": "C01-N",
+    "feature": "C01",
+    "phase": "I04",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "连接智能体，发送消息，读取结构化输出",
+    "expected": "一次提示对应一个Run，工具与结果归属正确",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C01-F",
+    "feature": "C01",
+    "phase": "I04",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "断开连接后重试同一输入",
+    "expected": "显示连接失败，未接受输入可重试，不创建重复Run",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C01-R",
+    "feature": "C01",
+    "phase": "I04",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位统一ACP智能体相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C01-P",
+    "feature": "C01",
+    "phase": "I04",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查统一ACP智能体及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C02-N",
+    "feature": "C02",
+    "phase": "I02",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "添加Provider并为队员选择模型和模式",
+    "expected": "再次打开配置一致，真实运行使用所选模型",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C02-F",
+    "feature": "C02",
+    "phase": "I02",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "配置错误端点或无效凭据",
+    "expected": "明确认证错误，不泄露密钥",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C02-R",
+    "feature": "C02",
+    "phase": "I02",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位模型与Provider配置相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C02-P",
+    "feature": "C02",
+    "phase": "I02",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查模型与Provider配置及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C03-N",
+    "feature": "C03",
+    "phase": "I04",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "注册自定义ACP入口并执行任务",
+    "expected": "入口可发现，配置传到Adapter，结果进入Thread",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C03-F",
+    "feature": "C03",
+    "phase": "I04",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "入口不存在或握手格式错误",
+    "expected": "拒绝启动并给出可修正的错误",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C03-R",
+    "feature": "C03",
+    "phase": "I04",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位自定义智能体相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C03-P",
+    "feature": "C03",
+    "phase": "I04",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查自定义智能体及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C04-N",
+    "feature": "C04",
+    "phase": "I06",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "选择CLI磁盘历史，预览后导入两次",
+    "expected": "消息与来源对应，重复导入不重复创建记录",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C04-F",
+    "feature": "C04",
+    "phase": "I06",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "提供损坏或版本未知的会话文件",
+    "expected": "隔离坏记录并给原因，原文件不变",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C04-R",
+    "feature": "C04",
+    "phase": "I06",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位原生历史导入相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C04-P",
+    "feature": "C04",
+    "phase": "I06",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查原生历史导入及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C05-N",
+    "feature": "C05",
+    "phase": "I06",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "搜索会话和工程文件，再引用历史消息",
+    "expected": "可定位正确记录，引用保留来源和权限",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C05-F",
+    "feature": "C05",
+    "phase": "I06",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "搜索无结果或引用对象已被删除",
+    "expected": "展示空态或失效引用，不引用另一会话",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C05-R",
+    "feature": "C05",
+    "phase": "I06",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位搜索与旧会话引用相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C05-P",
+    "feature": "C05",
+    "phase": "I06",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查搜索与旧会话引用及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C06-N",
+    "feature": "C06",
+    "phase": "I06",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "从指定消息分叉并在运行中插话",
+    "expected": "分叉来源准确，插话进入支持该能力的执行",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C06-F",
+    "feature": "C06",
+    "phase": "I06",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "Runtime不支持分叉或运行已结束",
+    "expected": "显示能力限制或结束状态，不伪造新历史",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C06-R",
+    "feature": "C06",
+    "phase": "I06",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位会话分叉与插话相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C06-P",
+    "feature": "C06",
+    "phase": "I06",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查会话分叉与插话及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C07-N",
+    "feature": "C07",
+    "phase": "I06",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "创建全局与工程标签，筛选后批量整理",
+    "expected": "范围正确，批量结果和计数一致",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C07-F",
+    "feature": "C07",
+    "phase": "I06",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "并发改同一标签或批量含失效对象",
+    "expected": "版本冲突可见，合法对象不被错误修改",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C07-R",
+    "feature": "C07",
+    "phase": "I06",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位标签与批量会话整理相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C07-P",
+    "feature": "C07",
+    "phase": "I06",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查标签与批量会话整理及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C08-N",
+    "feature": "C08",
+    "phase": "I04",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "队员异步委派子任务并汇总结果",
+    "expected": "交接和返回结果有Task/Thread/Run来源",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C08-F",
+    "feature": "C08",
+    "phase": "I04",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "接收队员不可用或子任务超时",
+    "expected": "责任和阻塞状态可查，父任务不会假完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C08-R",
+    "feature": "C08",
+    "phase": "I04",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位跨智能体异步委派相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C08-P",
+    "feature": "C08",
+    "phase": "I04",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查跨智能体异步委派及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C09-N",
+    "feature": "C09",
+    "phase": "I06",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "保存快捷消息并调用工程命令",
+    "expected": "模板内容及工程目录正确，失败草稿保留",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C09-F",
+    "feature": "C09",
+    "phase": "I06",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "命令不存在或模板参数缺失",
+    "expected": "明确缺项，不在其他工程执行",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C09-R",
+    "feature": "C09",
+    "phase": "I06",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位快捷消息与命令相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C09-P",
+    "feature": "C09",
+    "phase": "I06",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查快捷消息与命令及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C10-N",
+    "feature": "C10",
+    "phase": "I04",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "待办进入运行、待验收、重试、合入及清理",
+    "expected": "状态顺序正确，交付与工程变化可追溯",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C10-F",
+    "feature": "C10",
+    "phase": "I04",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "合入冲突或工作树清理失败",
+    "expected": "保留待处理状态和工程，不丢失交付",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C10-R",
+    "feature": "C10",
+    "phase": "I04",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位待办任务与落地相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C10-P",
+    "feature": "C10",
+    "phase": "I04",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查待办任务与落地及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C11-N",
+    "feature": "C11",
+    "phase": "I04",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "保存Cron，立即运行并查看历史及取消",
+    "expected": "到期执行、历史结果和取消状态一致",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C11-F",
+    "feature": "C11",
+    "phase": "I04",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "前次未结束时再次到期",
+    "expected": "按overlap规则处理，不重复隐式执行",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C11-R",
+    "feature": "C11",
+    "phase": "I04",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位定时自动化相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C11-P",
+    "feature": "C11",
+    "phase": "I04",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查定时自动化及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C12-N",
+    "feature": "C12",
+    "phase": "I03",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "创建、重命名、切换及删除画板",
+    "expected": "布局属于对应画板，重启保持一致",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C12-F",
+    "feature": "C12",
+    "phase": "I03",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "删除当前画板或重复名称冲突",
+    "expected": "选择合理替代视图，不删除其他画板",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C12-R",
+    "feature": "C12",
+    "phase": "I03",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位多画板相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C12-P",
+    "feature": "C12",
+    "phase": "I03",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查多画板及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C13-N",
+    "feature": "C13",
+    "phase": "I03",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "创建八类节点并拖动、缩放、分组和布局",
+    "expected": "节点类型与对象绑定正确，布局可恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C13-F",
+    "feature": "C13",
+    "phase": "I03",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "对象已删除或并发改布局",
+    "expected": "显示失效引用或冲突，不错误绑定其他对象",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C13-R",
+    "feature": "C13",
+    "phase": "I03",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位画布区域与布局相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C13-P",
+    "feature": "C13",
+    "phase": "I03",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查画布区域与布局及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C14-N",
+    "feature": "C14",
+    "phase": "I03",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "打开画布文件卡与终端卡并输入命令",
+    "expected": "文件指向真实路径，PTY输入回显正确",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C14-F",
+    "feature": "C14",
+    "phase": "I03",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "文件删除或PTY进程退出",
+    "expected": "卡片显示明确状态，终端不冒充持久Thread",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C14-R",
+    "feature": "C14",
+    "phase": "I03",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位画布文件与终端相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C14-P",
+    "feature": "C14",
+    "phase": "I03",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查画布文件与终端及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C15-N",
+    "feature": "C15",
+    "phase": "I05",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "展开目录、过滤路径并查找文件",
+    "expected": "树和搜索结果对应实际工程路径",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C15-F",
+    "feature": "C15",
+    "phase": "I05",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "目录无权限、符号链接循环或文件消失",
+    "expected": "报告不可访问项，不无限递归",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C15-R",
+    "feature": "C15",
+    "phase": "I05",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位文件树与工程搜索相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C15-P",
+    "feature": "C15",
+    "phase": "I05",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查文件树与工程搜索及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C16-N",
+    "feature": "C16",
+    "phase": "I05",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "编辑保存文件后处理外部修改冲突",
+    "expected": "正常保存正确，冲突可比较和选择版本",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C16-F",
+    "feature": "C16",
+    "phase": "I05",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "保存前文件被外部程序修改",
+    "expected": "不静默覆盖外部内容，保留编辑草稿",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C16-R",
+    "feature": "C16",
+    "phase": "I05",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位编辑与外部修改冲突相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C16-P",
+    "feature": "C16",
+    "phase": "I05",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查编辑与外部修改冲突及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C17-N",
+    "feature": "C17",
+    "phase": "I05",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "切换文本、Markdown、HTML及图片预览",
+    "expected": "正确格式呈现，标签与文件一致",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C17-F",
+    "feature": "C17",
+    "phase": "I05",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "格式损坏或不支持",
+    "expected": "显示错误和可用回退，不执行未授权脚本",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C17-R",
+    "feature": "C17",
+    "phase": "I05",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位文档与图片预览相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C17-P",
+    "feature": "C17",
+    "phase": "I05",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查文档与图片预览及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C18-N",
+    "feature": "C18",
+    "phase": "I09",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "预览docx/xlsx/pptx并外部修改",
+    "expected": "三种文档刷新到新内容，服务退出被回收",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C18-F",
+    "feature": "C18",
+    "phase": "I09",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "OfficeCLI缺失或watch服务退出",
+    "expected": "提供安装或重启路径，不一直显示旧内容",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C18-R",
+    "feature": "C18",
+    "phase": "I09",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位Office实时预览相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C18-P",
+    "feature": "C18",
+    "phase": "I09",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查Office实时预览及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C19-N",
+    "feature": "C19",
+    "phase": "I05",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "创建PTY、输入、缩放、快照及关闭",
+    "expected": "工作目录和回显正确，关闭无孤儿进程",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C19-F",
+    "feature": "C19",
+    "phase": "I05",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "重复关闭或网络断连",
+    "expected": "生命周期幂等，终端状态和资源一致",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C19-R",
+    "feature": "C19",
+    "phase": "I05",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位内置终端相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C19-P",
+    "feature": "C19",
+    "phase": "I05",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查内置终端及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C20-N",
+    "feature": "C20",
+    "phase": "I05",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "拖动会话和文件标签到分屏并调整布局",
+    "expected": "各标签内容正确，重启恢复约定布局",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C20-F",
+    "feature": "C20",
+    "phase": "I05",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "关闭最后标签或引用文件消失",
+    "expected": "不会展示另一标签内容，失效项有状态",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C20-R",
+    "feature": "C20",
+    "phase": "I05",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位多标签与分屏相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C20-P",
+    "feature": "C20",
+    "phase": "I05",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查多标签与分屏及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C21-N",
+    "feature": "C21",
+    "phase": "I06",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "关联两个目录并设置分组和别名",
+    "expected": "导航映射正确，不复制或移动真实目录",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C21-F",
+    "feature": "C21",
+    "phase": "I06",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "目录移走或重复关联",
+    "expected": "明确失效或去重，不串到另一工程",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C21-R",
+    "feature": "C21",
+    "phase": "I06",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位关联目录与多工程相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C21-P",
+    "feature": "C21",
+    "phase": "I06",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查关联目录与多工程及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C22-N",
+    "feature": "C22",
+    "phase": "I05",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "克隆、初始化、建立分支和Worktree",
+    "expected": "Git实际状态正确，工作树与Mission关联",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C22-F",
+    "feature": "C22",
+    "phase": "I05",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "克隆失败或目标目录已存在",
+    "expected": "保留已有文件，失败路径可清理重试",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C22-R",
+    "feature": "C22",
+    "phase": "I05",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位克隆与分支工作树相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C22-P",
+    "feature": "C22",
+    "phase": "I05",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查克隆与分支工作树及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C23-N",
+    "feature": "C23",
+    "phase": "I05",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "选择文件暂存并提交，保留原有index内容",
+    "expected": "提交范围与预览一致，提交SHA可查",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C23-F",
+    "feature": "C23",
+    "phase": "I05",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "预览后HEAD/index改变",
+    "expected": "拒绝陈旧提交，刷新影响范围",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C23-R",
+    "feature": "C23",
+    "phase": "I05",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位暂存与提交相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C23-P",
+    "feature": "C23",
+    "phase": "I05",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查暂存与提交及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C24-N",
+    "feature": "C24",
+    "phase": "I05",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "查看工作区、分支和历史提交Diff及文件版本",
+    "expected": "基线和内容准确，untracked等变化完整",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C24-F",
+    "feature": "C24",
+    "phase": "I05",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "文件重命名、二进制或基线不存在",
+    "expected": "展示正确类型或具体错误，不伪造空Diff",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C24-R",
+    "feature": "C24",
+    "phase": "I05",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位差异与提交历史相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C24-P",
+    "feature": "C24",
+    "phase": "I05",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查差异与提交历史及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C25-N",
+    "feature": "C25",
+    "phase": "I05",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "创建、查看、apply、pop、drop Stash并重置历史",
+    "expected": "真实Git状态和选择的模式相符",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C25-F",
+    "feature": "C25",
+    "phase": "I05",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "pop冲突或重置前工作区有未保存变化",
+    "expected": "影响可见，冲突保留，可恢复原工程",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C25-R",
+    "feature": "C25",
+    "phase": "I05",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位Stash与历史重置相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C25-P",
+    "feature": "C25",
+    "phase": "I05",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查Stash与历史重置及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C26-N",
+    "feature": "C26",
+    "phase": "I05",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "merge/rebase冲突进入三栏编辑后继续或中止",
+    "expected": "base/ours/theirs正确，保存后Git状态一致",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C26-F",
+    "feature": "C26",
+    "phase": "I05",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "中途失败、再次冲突或退出编辑器",
+    "expected": "保留未解决冲突，继续和中止均可用",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C26-R",
+    "feature": "C26",
+    "phase": "I05",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位合并与三栏冲突编辑相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C26-P",
+    "feature": "C26",
+    "phase": "I05",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查合并与三栏冲突编辑及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C27-N",
+    "feature": "C27",
+    "phase": "I05",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "管理remote并fetch/pull/push到测试远端",
+    "expected": "真实远端与本地引用按操作更新",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C27-F",
+    "feature": "C27",
+    "phase": "I05",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "认证失败、非快进或网络中断",
+    "expected": "具体错误可见，不强制覆盖远端",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C27-R",
+    "feature": "C27",
+    "phase": "I05",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位远程Git操作相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C27-P",
+    "feature": "C27",
+    "phase": "I05",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查远程Git操作及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C28-N",
+    "feature": "C28",
+    "phase": "I07",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "连接四类Forge并读取仓库、议题、评论和PR",
+    "expected": "按源能力展示正确仓库与分页记录",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C28-F",
+    "feature": "C28",
+    "phase": "I07",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "token撤销、限流或仓库不存在",
+    "expected": "明确认证/限流状态，不泄露凭据",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C28-R",
+    "feature": "C28",
+    "phase": "I07",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位Forge仓库面板相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C28-P",
+    "feature": "C28",
+    "phase": "I07",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查Forge仓库面板及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C29-N",
+    "feature": "C29",
+    "phase": "I07",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "从议题创建任务，执行后创建及更新PR",
+    "expected": "来源、任务、分支、PR及验收可互相定位",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C29-F",
+    "feature": "C29",
+    "phase": "I07",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "PR提交成功但客户端响应丢失",
+    "expected": "重查远端并幂等处理，不重复建PR",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C29-R",
+    "feature": "C29",
+    "phase": "I07",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位议题转任务与PR交付相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C29-P",
+    "feature": "C29",
+    "phase": "I07",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查议题转任务与PR交付及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C30-N",
+    "feature": "C30",
+    "phase": "I08",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "共享网页并读取DOM、元素、截图和控制台",
+    "expected": "范围内页面可观察和操作，状态一致",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C30-F",
+    "feature": "C30",
+    "phase": "I08",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "撤销共享、跳转或宿主进程退出",
+    "expected": "旧授权不能继续使用，页面可恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C30-R",
+    "feature": "C30",
+    "phase": "I08",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位内置浏览器与Agent共享相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C30-P",
+    "feature": "C30",
+    "phase": "I08",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查内置浏览器与Agent共享及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C31-N",
+    "feature": "C31",
+    "phase": "I08",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "显式共享原生窗口进行读取、点击和输入",
+    "expected": "只操作授权窗口，审计包含Run和目标",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C31-F",
+    "feature": "C31",
+    "phase": "I08",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "窗口关闭、授权超时或一键撤销",
+    "expected": "立即拒绝旧授权，不改操其他窗口",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C31-R",
+    "feature": "C31",
+    "phase": "I08",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位电脑操作预览相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C31-P",
+    "feature": "C31",
+    "phase": "I08",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查电脑操作预览及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C32-N",
+    "feature": "C32",
+    "phase": "I02",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "安装技能和专家包并分配队员后执行",
+    "expected": "来源和版本可查，队员收到选定技能",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C32-F",
+    "feature": "C32",
+    "phase": "I02",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "来源不可用或升级失败",
+    "expected": "现有技能仍可用，失败可重试或回滚",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C32-R",
+    "feature": "C32",
+    "phase": "I02",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位Skills与专家技能包相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C32-P",
+    "feature": "C32",
+    "phase": "I02",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查Skills与专家技能包及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C33-N",
+    "feature": "C33",
+    "phase": "I02",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "扫描原生MCP，安装服务并按队员配置",
+    "expected": "扫描来源可见，实际工具调用成功",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C33-F",
+    "feature": "C33",
+    "phase": "I02",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "服务启动失败或配置无效",
+    "expected": "给诊断，不静默重写全局配置",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C33-R",
+    "feature": "C33",
+    "phase": "I02",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位MCP扫描与安装相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C33-P",
+    "feature": "C33",
+    "phase": "I02",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查MCP扫描与安装及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C34-N",
+    "feature": "C34",
+    "phase": "I11",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "检查Token、缓存、热力图和费用估算",
+    "expected": "来源与汇总一致，估算区别实际账单",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C34-F",
+    "feature": "C34",
+    "phase": "I11",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "Runtime未提供用量或模型价格缺失",
+    "expected": "显示未知或估算条件，不显示零成本",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C34-R",
+    "feature": "C34",
+    "phase": "I11",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位用量与估算相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C34-P",
+    "feature": "C34",
+    "phase": "I11",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查用量与估算及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C35-N",
+    "feature": "C35",
+    "phase": "I10",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "启用远程连接并部署独立Server/容器",
+    "expected": "认证有效，同一Core事实多端一致",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C35-F",
+    "feature": "C35",
+    "phase": "I10",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "断网、令牌撤销或另一个Host占数据根",
+    "expected": "拒绝失效访问及第二写入者，重连恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C35-R",
+    "feature": "C35",
+    "phase": "I10",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位Server与远程工作区相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C35-P",
+    "feature": "C35",
+    "phase": "I10",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查Server与远程工作区及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C36-N",
+    "feature": "C36",
+    "phase": "I10",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "通过Telegram、飞书和微信发任务及收结果",
+    "expected": "Owner身份正确，消息关联同一Thread",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C36-F",
+    "feature": "C36",
+    "phase": "I10",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "重复Webhook、外部服务断连或未授权身份",
+    "expected": "不重复执行，拒绝未授权来源",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C36-R",
+    "feature": "C36",
+    "phase": "I10",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位聊天渠道相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C36-P",
+    "feature": "C36",
+    "phase": "I10",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查聊天渠道及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C37-N",
+    "feature": "C37",
+    "phase": "I06",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "通过项目启动器生成并预览新工程",
+    "expected": "文件落到选定目录，可进入Git和Mission",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C37-F",
+    "feature": "C37",
+    "phase": "I06",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "生成失败或目录已有用户文件",
+    "expected": "不覆盖已有内容，草稿和错误可继续处理",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C37-R",
+    "feature": "C37",
+    "phase": "I06",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位项目启动器相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C37-P",
+    "feature": "C37",
+    "phase": "I06",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查项目启动器及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C38-N",
+    "feature": "C38",
+    "phase": "I11",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "加密备份，WebDAV同步并独立恢复",
+    "expected": "数据及配置校验一致，恢复前有预检",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C38-F",
+    "feature": "C38",
+    "phase": "I11",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "错密码、坏包、中断或版本冲突",
+    "expected": "拒绝坏包，旧清单和有效数据可恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C38-R",
+    "feature": "C38",
+    "phase": "I11",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位备份与配置同步相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C38-P",
+    "feature": "C38",
+    "phase": "I11",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查备份与配置同步及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C39-N",
+    "feature": "C39",
+    "phase": "I11",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "切换全部主题/语言，修改CSS与快捷键",
+    "expected": "保存后重启一致，快捷键按设置生效",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C39-F",
+    "feature": "C39",
+    "phase": "I11",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "CSS无效、快捷键冲突或缺翻译",
+    "expected": "提示具体错误，关键操作可恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C39-R",
+    "feature": "C39",
+    "phase": "I11",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位主题语言和快捷键相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C39-P",
+    "feature": "C39",
+    "phase": "I11",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查主题语言和快捷键及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C40-N",
+    "feature": "C40",
+    "phase": "I11",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "接收通知、导出诊断并执行测试更新",
+    "expected": "通知定位正确，日志去敏，更新版本可查",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C40-F",
+    "feature": "C40",
+    "phase": "I11",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "更新失败或运行中请求退出",
+    "expected": "遵守有序关闭，恢复旧版本和数据",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C40-R",
+    "feature": "C40",
+    "phase": "I11",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位通知诊断和更新相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C40-P",
+    "feature": "C40",
+    "phase": "I11",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查通知诊断和更新及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C41-N",
+    "feature": "C41",
+    "phase": "I09",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "安装投递科研技能并完成文献/统计任务",
+    "expected": "技能来源和引用可查，产物关联真实Run",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C41-F",
+    "feature": "C41",
+    "phase": "I09",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "依赖缺失或输入数据不合法",
+    "expected": "给可修正错误，不编造研究结果",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C41-R",
+    "feature": "C41",
+    "phase": "I09",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位科研技能相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C41-P",
+    "feature": "C41",
+    "phase": "I09",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查科研技能及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C42-N",
+    "feature": "C42",
+    "phase": "I09",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "渲染结构化卡片并提交交互",
+    "expected": "交互回到原Thread/Run，卡片状态可恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C42-F",
+    "feature": "C42",
+    "phase": "I09",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "卡片格式错误或包含未授权脚本",
+    "expected": "隔离渲染，拒绝危险动作并回退",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C42-R",
+    "feature": "C42",
+    "phase": "I09",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位生成式交互卡片相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C42-P",
+    "feature": "C42",
+    "phase": "I09",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查生成式交互卡片及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C43-N",
+    "feature": "C43",
+    "phase": "I11",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "管理、导入及安装市场宠物并播放动画",
+    "expected": "导入内容校验正确，显示与配置一致",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C43-F",
+    "feature": "C43",
+    "phase": "I11",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "资源损坏或市场不可用",
+    "expected": "失败可见，原宠物和配置仍可恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C43-R",
+    "feature": "C43",
+    "phase": "I11",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位桌面宠物相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C43-P",
+    "feature": "C43",
+    "phase": "I11",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查桌面宠物及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C44-N",
+    "feature": "C44",
+    "phase": "I11",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "打开deep link、恢复对象并外部打开文件",
+    "expected": "定位正确对象，外部动作经过现有授权",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C44-F",
+    "feature": "C44",
+    "phase": "I11",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "协议非法、对象删除或外部程序缺失",
+    "expected": "明确错误，不越权打开其他路径",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C44-R",
+    "feature": "C44",
+    "phase": "I11",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位恢复入口与外部打开相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "C44-P",
+    "feature": "C44",
+    "phase": "I11",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查恢复入口与外部打开及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R01-N",
+    "feature": "R01",
+    "phase": "I02",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "首次启动发现安装并发起真实任务",
+    "expected": "依赖、认证、模型和开始状态一致",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R01-F",
+    "feature": "R01",
+    "phase": "I02",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "未安装或未认证Runtime",
+    "expected": "显示安装/登录路径，不假装任务已运行",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R01-R",
+    "feature": "R01",
+    "phase": "I02",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位首次使用与智能体检查相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R01-P",
+    "feature": "R01",
+    "phase": "I02",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查首次使用与智能体检查及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R02-N",
+    "feature": "R02",
+    "phase": "I02",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "创建队员并修改名字、角色、职责和头像",
+    "expected": "长期身份重启后保留，协作使用正确身份",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R02-F",
+    "feature": "R02",
+    "phase": "I02",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "删除被任务引用的队员",
+    "expected": "引用处理明确，不把任务绑定到其他队员",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R02-R",
+    "feature": "R02",
+    "phase": "I02",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位长期队员身份相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R02-P",
+    "feature": "R02",
+    "phase": "I02",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查长期队员身份及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R03-N",
+    "feature": "R03",
+    "phase": "I02",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "给队员设置模型、参数、权限及环境并运行",
+    "expected": "仅该队员使用所选配置，配置代次正确",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R03-F",
+    "feature": "R03",
+    "phase": "I02",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "运行中修改配置或环境不合法",
+    "expected": "按代次隔离，错误配置不静默生效",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R03-R",
+    "feature": "R03",
+    "phase": "I02",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位队员运行配置与环境相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R03-P",
+    "feature": "R03",
+    "phase": "I02",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查队员运行配置与环境及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R04-N",
+    "feature": "R04",
+    "phase": "I04",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "选择目录中的Runtime和自定义Provider执行",
+    "expected": "能力声明和实际Adapter一致",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R04-F",
+    "feature": "R04",
+    "phase": "I04",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "Provider不可达或Adapter不存在",
+    "expected": "明确错误，不降级到未授权模型",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R04-R",
+    "feature": "R04",
+    "phase": "I04",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位Runtime目录与自定义API相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R04-P",
+    "feature": "R04",
+    "phase": "I04",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查Runtime目录与自定义API及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R05-N",
+    "feature": "R05",
+    "phase": "I04",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "按平台检查Runtime资格后启动",
+    "expected": "仅满足准入条件的平台能执行",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R05-F",
+    "feature": "R05",
+    "phase": "I04",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "启动NotQualified平台Runtime",
+    "expected": "拒绝越级启用，给资格和整改原因",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R05-R",
+    "feature": "R05",
+    "phase": "I04",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位平台资格与权限相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R05-P",
+    "feature": "R05",
+    "phase": "I04",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查平台资格与权限及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R06-N",
+    "feature": "R06",
+    "phase": "I02",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "发现原生技能并加入成员工具箱",
+    "expected": "来源文件只读，成员收到显式选定内容",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R06-F",
+    "feature": "R06",
+    "phase": "I02",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "源文件变化、丢失或不可访问",
+    "expected": "失效状态可见，不改写原生技能",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R06-R",
+    "feature": "R06",
+    "phase": "I02",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位原生Skills与工具箱相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R06-P",
+    "feature": "R06",
+    "phase": "I02",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查原生Skills与工具箱及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R07-N",
+    "feature": "R07",
+    "phase": "I02",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "导入External MCP并分配成员使用",
+    "expected": "配置和工具按Runtime正确投递",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R07-F",
+    "feature": "R07",
+    "phase": "I02",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "服务失效或两成员配置不同",
+    "expected": "分配隔离，诊断不暴露密钥",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R07-R",
+    "feature": "R07",
+    "phase": "I02",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位External MCP相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R07-P",
+    "feature": "R07",
+    "phase": "I02",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查External MCP及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R08-N",
+    "feature": "R08",
+    "phase": "I04",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "创建工程Thread及无工程快速对话并持续发送",
+    "expected": "历史、工程绑定和公共输入来源正确",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R08-F",
+    "feature": "R08",
+    "phase": "I04",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "重复发送同command_id或工程路径失效",
+    "expected": "返回同回执或具体错误，不双发",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R08-R",
+    "feature": "R08",
+    "phase": "I04",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位公共Thread与快速对话相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R08-P",
+    "feature": "R08",
+    "phase": "I04",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查公共Thread与快速对话及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R09-N",
+    "feature": "R09",
+    "phase": "I04",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "切换团队模式、加入退出队员及替换Lead",
+    "expected": "成员关系和责任随版本正确变化",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R09-F",
+    "feature": "R09",
+    "phase": "I04",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "Lead退出或并发改成员关系",
+    "expected": "保持至少一位合法成员，冲突明确",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R09-R",
+    "feature": "R09",
+    "phase": "I04",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位团队模式与动态成员相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R09-P",
+    "feature": "R09",
+    "phase": "I04",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查团队模式与动态成员及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R10-N",
+    "feature": "R10",
+    "phase": "I04",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "公开消息发送给指定队员并交接责任",
+    "expected": "消息、Delivery和Task接收者一致",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R10-F",
+    "feature": "R10",
+    "phase": "I04",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "接收者退出或重复交接命令",
+    "expected": "处理成员代次和幂等，不丢责任",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R10-R",
+    "feature": "R10",
+    "phase": "I04",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位A2A发送与任务交接相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R10-P",
+    "feature": "R10",
+    "phase": "I04",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查A2A发送与任务交接及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R11-N",
+    "feature": "R11",
+    "phase": "I04",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在Thread内单聊、结束并处理待发送输入",
+    "expected": "私有历史隔离，结束和输入队列状态正确",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R11-F",
+    "feature": "R11",
+    "phase": "I04",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "取消单聊或结束前输入尚未接受",
+    "expected": "保留未发送内容，不泄露私有消息",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R11-R",
+    "feature": "R11",
+    "phase": "I04",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位Thread内单聊相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R11-P",
+    "feature": "R11",
+    "phase": "I04",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查Thread内单聊及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R12-N",
+    "feature": "R12",
+    "phase": "I06",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "发送Mention、选文引用及文件图片附件",
+    "expected": "引用对象和附件来源准确，消息可定位",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R12-F",
+    "feature": "R12",
+    "phase": "I06",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "发送失败、附件消失或无访问权",
+    "expected": "保留草稿并给原因，不扩大文件权限",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R12-R",
+    "feature": "R12",
+    "phase": "I06",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位输入草稿引用和附件相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R12-P",
+    "feature": "R12",
+    "phase": "I06",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查输入草稿引用和附件及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R13-N",
+    "feature": "R13",
+    "phase": "I06",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "正文查找、历史分页及消息锚点定位",
+    "expected": "结果在正确Thread，按权限过滤",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R13-F",
+    "feature": "R13",
+    "phase": "I06",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "消息删除或读取历史版本冲突",
+    "expected": "显示失效/冲突，不定位其他对象",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R13-R",
+    "feature": "R13",
+    "phase": "I06",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位历史查找与消息定位相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R13-P",
+    "feature": "R13",
+    "phase": "I06",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查历史查找与消息定位及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R14-N",
+    "feature": "R14",
+    "phase": "I04",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "创建、分派、阻塞、完成、取消及交接Task",
+    "expected": "责任和状态持久，不因视图关闭丢失",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R14-F",
+    "feature": "R14",
+    "phase": "I04",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "重复完成或交接给失效成员",
+    "expected": "回执幂等，非法状态转换拒绝",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R14-R",
+    "feature": "R14",
+    "phase": "I04",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位持久Task责任记录相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R14-P",
+    "feature": "R14",
+    "phase": "I04",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查持久Task责任记录及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R15-N",
+    "feature": "R15",
+    "phase": "I04",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "定义Mission目标、队伍和状态并进入主Thread",
+    "expected": "Mission与主Thread关系稳定，持续任务可查",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R15-F",
+    "feature": "R15",
+    "phase": "I04",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "目标更新与队伍更新并发",
+    "expected": "版本冲突明确，不静默覆盖",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R15-R",
+    "feature": "R15",
+    "phase": "I04",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位Mission使命板相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R15-P",
+    "feature": "R15",
+    "phase": "I04",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查Mission使命板及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R16-N",
+    "feature": "R16",
+    "phase": "I04",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "建立使命工作区并固定基线、清理及重试",
+    "expected": "Worktree、base_sha和资源归属正确",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R16-F",
+    "feature": "R16",
+    "phase": "I04",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "工作区占用、路径缺失或清理失败",
+    "expected": "保留失败事实，重试不丢工程",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R16-R",
+    "feature": "R16",
+    "phase": "I04",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位Mission工程资源相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R16-P",
+    "feature": "R16",
+    "phase": "I04",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查Mission工程资源及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R17-N",
+    "feature": "R17",
+    "phase": "I04",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "查看Mission累计Diff、交付、活动并关联PR",
+    "expected": "四类Git变化完整，交付来源可追溯",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R17-F",
+    "feature": "R17",
+    "phase": "I04",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "基线缺失、PR失效或view版本变化",
+    "expected": "显示具体错误并刷新，不伪造无变化",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R17-R",
+    "feature": "R17",
+    "phase": "I04",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位Mission交付与累计Diff相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R17-P",
+    "feature": "R17",
+    "phase": "I04",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查Mission交付与累计Diff及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R18-N",
+    "feature": "R18",
+    "phase": "I04",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "查看Run工具组、时间线及文件变更证据",
+    "expected": "事件属于对应Run，顺序和证据可复查",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R18-F",
+    "feature": "R18",
+    "phase": "I04",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "事件断流或工具结果不完整",
+    "expected": "标示缺项，重连读取正确快照",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R18-R",
+    "feature": "R18",
+    "phase": "I04",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位执行台和工具过程相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R18-P",
+    "feature": "R18",
+    "phase": "I04",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查执行台和工具过程及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R19-N",
+    "feature": "R19",
+    "phase": "I04",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "回复审批、精确停止、失败续做并恢复",
+    "expected": "审批和取消对应正确Run，续做有来源",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R19-F",
+    "feature": "R19",
+    "phase": "I04",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "重复审批、旧代次取消或外部动作已接受",
+    "expected": "拒绝陈旧控制，不盲重放已接受动作",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R19-R",
+    "feature": "R19",
+    "phase": "I04",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位审批停止与续做相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R19-P",
+    "feature": "R19",
+    "phase": "I04",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查审批停止与续做及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R20-N",
+    "feature": "R20",
+    "phase": "I05",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "读取Run文件变化和图片产物",
+    "expected": "原始变化和图片来源正确，路径受约束",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R20-F",
+    "feature": "R20",
+    "phase": "I05",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "产物被删除或路径越界",
+    "expected": "拒绝越界，失效产物明确提示",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R20-R",
+    "feature": "R20",
+    "phase": "I05",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位运行文件和图片产物相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R20-P",
+    "feature": "R20",
+    "phase": "I05",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查运行文件和图片产物及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R21-N",
+    "feature": "R21",
+    "phase": "I05",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "预览代码、Markdown、图片、HTML并外部刷新",
+    "expected": "标签对应正确文件，刷新保留约定状态",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R21-F",
+    "feature": "R21",
+    "phase": "I05",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "文件损坏或外部修改与编辑冲突",
+    "expected": "不静默覆盖，显示可处理的错误",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R21-R",
+    "feature": "R21",
+    "phase": "I05",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位文件预览多标签相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R21-P",
+    "feature": "R21",
+    "phase": "I05",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查文件预览多标签及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R22-N",
+    "feature": "R22",
+    "phase": "I04",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "读取共同、成员及成员间三类记忆",
+    "expected": "读取范围和可见性按Actor正确过滤",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R22-F",
+    "feature": "R22",
+    "phase": "I04",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "未获授权的成员读取私有记忆",
+    "expected": "拒绝访问且不泄露正文",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R22-R",
+    "feature": "R22",
+    "phase": "I04",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位三类协作记忆相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R22-P",
+    "feature": "R22",
+    "phase": "I04",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查三类协作记忆及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R23-N",
+    "feature": "R23",
+    "phase": "I04",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "修订、审核、停止沿用、遗忘并导出记忆",
+    "expected": "版本和状态真实，遗忘后的投递受控",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R23-F",
+    "feature": "R23",
+    "phase": "I04",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "并发审核或已遗忘记忆仍被引用",
+    "expected": "冲突可见，不继续投递已禁用内容",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R23-R",
+    "feature": "R23",
+    "phase": "I04",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位记忆治理与审核相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R23-P",
+    "feature": "R23",
+    "phase": "I04",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查记忆治理与审核及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R24-N",
+    "feature": "R24",
+    "phase": "I04",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "计划、立即运行、超时、overlap与结果查看",
+    "expected": "执行归统一Core，历史和状态可查",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R24-F",
+    "feature": "R24",
+    "phase": "I04",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "前次运行未结束或重复触发",
+    "expected": "按策略跳过或拒绝，不双Run",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R24-R",
+    "feature": "R24",
+    "phase": "I04",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位定时任务控制面相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R24-P",
+    "feature": "R24",
+    "phase": "I04",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查定时任务控制面及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R25-N",
+    "feature": "R25",
+    "phase": "I11",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "查看来源明确的用量与Coverage",
+    "expected": "采集与估算层分开，来源及缺失可见",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R25-F",
+    "feature": "R25",
+    "phase": "I11",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "Runtime漏报Token或成本",
+    "expected": "显示未知和Coverage，不写零",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R25-R",
+    "feature": "R25",
+    "phase": "I11",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位来源明确的用量监控相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R25-P",
+    "feature": "R25",
+    "phase": "I11",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查来源明确的用量监控及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R26-N",
+    "feature": "R26",
+    "phase": "I11",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "接收未读点、heads-up并定位消息和错误",
+    "expected": "提醒对应正确事实，阅读状态一致",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R26-F",
+    "feature": "R26",
+    "phase": "I11",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "事件重复或目标对象删除",
+    "expected": "提醒去重，失效来源明确",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R26-R",
+    "feature": "R26",
+    "phase": "I11",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位未读与轻量提醒相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R26-P",
+    "feature": "R26",
+    "phase": "I11",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查未读与轻量提醒及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R27-N",
+    "feature": "R27",
+    "phase": "I06",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "工程分组、地图定位及窗口前后历史",
+    "expected": "各入口定位同一Thread和工程",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R27-F",
+    "feature": "R27",
+    "phase": "I06",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "历史对象删除或目录别名改变",
+    "expected": "失效处理明确，不串到新对象",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R27-R",
+    "feature": "R27",
+    "phase": "I06",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位导航和会话地图相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R27-P",
+    "feature": "R27",
+    "phase": "I06",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查导航和会话地图及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R28-N",
+    "feature": "R28",
+    "phase": "I10",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "启用Desktop Web认证并移动浏览器访问",
+    "expected": "响应式可操作，共享同一Core状态",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R28-F",
+    "feature": "R28",
+    "phase": "I10",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "令牌撤销或重连时快照过期",
+    "expected": "拒绝失效令牌，重取合法快照",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R28-R",
+    "feature": "R28",
+    "phase": "I10",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位Desktop Web与移动浏览器相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R28-P",
+    "feature": "R28",
+    "phase": "I10",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查Desktop Web与移动浏览器及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R29-N",
+    "feature": "R29",
+    "phase": "I10",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "独立Host部署静态Web并执行授权操作",
+    "expected": "无需Desktop仍可运行受支持服务",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R29-F",
+    "feature": "R29",
+    "phase": "I10",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "同一数据根已有Host或授权错误",
+    "expected": "拒绝双写及越权，诊断明确",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R29-R",
+    "feature": "R29",
+    "phase": "I10",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位独立Server相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R29-P",
+    "feature": "R29",
+    "phase": "I10",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查独立Server及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R30-N",
+    "feature": "R30",
+    "phase": "I10",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "配置飞书/Lark/钉钉身份并由Owner收发",
+    "expected": "Bot身份、Owner和结果关联正确",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R30-F",
+    "feature": "R30",
+    "phase": "I10",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "未授权用户、重复消息或渠道失效",
+    "expected": "拒绝未授权请求，重复消息不双执行",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R30-R",
+    "feature": "R30",
+    "phase": "I10",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位飞书Lark与钉钉相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R30-P",
+    "feature": "R30",
+    "phase": "I10",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查飞书Lark与钉钉及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R31-N",
+    "feature": "R31",
+    "phase": "I11",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "检查Core、数据根准入并导出启动诊断",
+    "expected": "状态真实，诊断去敏，可提供恢复动作",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R31-F",
+    "feature": "R31",
+    "phase": "I11",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "数据库被占用、损坏或Host不可用",
+    "expected": "降级界面可读，不进入假就绪状态",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R31-R",
+    "feature": "R31",
+    "phase": "I11",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位启动诊断和降级恢复相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R31-P",
+    "feature": "R31",
+    "phase": "I11",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查启动诊断和降级恢复及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R32-N",
+    "feature": "R32",
+    "phase": "I10",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "使用rovai app检查和诊断自动化入口",
+    "expected": "只操作指定开发数据根，返回真实状态",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R32-F",
+    "feature": "R32",
+    "phase": "I10",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "参数不合法或Host未启动",
+    "expected": "返回明确失败，不接入日常用户数据",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R32-R",
+    "feature": "R32",
+    "phase": "I10",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位用户终端自动化相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R32-P",
+    "feature": "R32",
+    "phase": "I10",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查用户终端自动化及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R33-N",
+    "feature": "R33",
+    "phase": "I11",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "切换主题、中英、动态效果和关闭设置",
+    "expected": "设置重启后保留，关闭遵守选择",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R33-F",
+    "feature": "R33",
+    "phase": "I11",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "运行中关闭或配置文件损坏",
+    "expected": "提示正在处理任务或恢复默认配置",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R33-R",
+    "feature": "R33",
+    "phase": "I11",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位主题语言与关闭行为相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R33-P",
+    "feature": "R33",
+    "phase": "I11",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查主题语言与关闭行为及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R34-N",
+    "feature": "R34",
+    "phase": "I11",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "验证warm/cold恢复、代次隔离及退出等待",
+    "expected": "确认事实可恢复，旧进程不会控制新Run",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R34-F",
+    "feature": "R34",
+    "phase": "I11",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "强杀、超时或收到旧代次事件",
+    "expected": "隔离陈旧事件，不重放不确定副作用",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R34-R",
+    "feature": "R34",
+    "phase": "I11",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位执行恢复和有序关闭相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R34-P",
+    "feature": "R34",
+    "phase": "I11",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查执行恢复和有序关闭及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R35-N",
+    "feature": "R35",
+    "phase": "I04",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "重复命令、Actor授权和版本校验",
+    "expected": "同command_id回同回执，写命令版本正确",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R35-F",
+    "feature": "R35",
+    "phase": "I04",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "越权Actor或expected_version陈旧",
+    "expected": "拒绝越权/冲突，不静默写入",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R35-R",
+    "feature": "R35",
+    "phase": "I04",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位命令幂等和授权相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "R35-P",
+    "feature": "R35",
+    "phase": "I04",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查命令幂等和授权及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "M01-N",
+    "feature": "M01",
+    "phase": "I10",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "iPhone/iPad连接Host并查看会话、审批、文件和终端",
+    "expected": "SwiftUI原生页面正确映射融合对象，多端一致",
+    "platforms": [
+      "iOS26 iPhone",
+      "iOS26 iPad",
+      "Desktop Host",
+      "Server Host"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "M01-F",
+    "feature": "M01",
+    "phase": "I10",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "前后台切换、断网或令牌撤销",
+    "expected": "重连恢复合法快照，秘密保留Keychain",
+    "platforms": [
+      "iOS26 iPhone",
+      "iOS26 iPad",
+      "Desktop Host",
+      "Server Host"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "M01-R",
+    "feature": "M01",
+    "phase": "I10",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位iOS 原生客户端相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "iOS26 iPhone",
+      "iOS26 iPad",
+      "Desktop Host",
+      "Server Host"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "M01-P",
+    "feature": "M01",
+    "phase": "I10",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查iOS 原生客户端及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "iOS26 iPhone",
+      "iOS26 iPad",
+      "Desktop Host",
+      "Server Host"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "M02-N",
+    "feature": "M02",
+    "phase": "I10",
+    "kind": "正常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "Android手机/平板操作会话、工程Git和设置",
+    "expected": "Compose原生页面及融合对象正确，多端一致",
+    "platforms": [
+      "Android12+ 手机",
+      "Android12+ 平板",
+      "Desktop Host",
+      "Server Host"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "M02-F",
+    "feature": "M02",
+    "phase": "I10",
+    "kind": "异常流程",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "断网、重复请求或密钥失效",
+    "expected": "恢复连接并去重，秘密由Keystore保护",
+    "platforms": [
+      "Android12+ 手机",
+      "Android12+ 平板",
+      "Desktop Host",
+      "Server Host"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "M02-R",
+    "feature": "M02",
+    "phase": "I10",
+    "kind": "持久化和恢复",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "完成正常流程后重启或重连，再定位Android 原生客户端相关对象、设置或工程",
+    "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+    "platforms": [
+      "Android12+ 手机",
+      "Android12+ 平板",
+      "Desktop Host",
+      "Server Host"
+    ],
+    "status": "not_run",
+    "evidence": null
+  },
+  {
+    "id": "M02-P",
+    "feature": "M02",
+    "phase": "I10",
+    "kind": "平台和权限",
+    "precondition": "隔离数据根、测试工程及必要授权已准备",
+    "steps": "在约定平台检查Android 原生客户端及源支持的远程适用面；撤销Actor或目标授权",
+    "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+    "platforms": [
+      "Android12+ 手机",
+      "Android12+ 平板",
+      "Desktop Host",
+      "Server Host"
+    ],
+    "status": "not_run",
+    "evidence": null
+  }
+]

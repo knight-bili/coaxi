@@ -1,0 +1,767 @@
+[
+  {
+    "id": "I00-T01",
+    "name": "建立主仓和来源基线",
+    "detail": "以 Rovai 历史建立私有融合主仓，Codeg 和移动源码作为固定版本移植来源；保留 MIT、Apache 2.0 许可证和 NOTICE。",
+    "phase": "I00",
+    "feature_ids": [],
+    "acceptance": "主仓、固定 SHA、许可清单和一期完整待办可查；源仓不被改写，仓库中没有凭据。",
+    "status": "awaiting_customer_acceptance"
+  },
+  {
+    "id": "I00-T02",
+    "name": "建立开发和验收规则",
+    "detail": "建立 main、阶段分支、PR 模板、CI、问题单、里程碑和源码覆盖账本；密钥进入本机凭据库或 CI Secrets。",
+    "phase": "I00",
+    "feature_ids": [],
+    "acceptance": "主仓、固定 SHA、许可清单和一期完整待办可查；源仓不被改写，仓库中没有凭据。",
+    "status": "awaiting_customer_acceptance"
+  },
+  {
+    "id": "I00-T03",
+    "name": "展开完整功能清单",
+    "detail": "将 81 个来源功能簇展开为页面、命令、配置、异常和平台用例；记录移植方式和验收凭证，遗漏项补入一期。",
+    "phase": "I00",
+    "feature_ids": [],
+    "acceptance": "主仓、固定 SHA、许可清单和一期完整待办可查；源仓不被改写，仓库中没有凭据。",
+    "status": "awaiting_customer_acceptance"
+  },
+  {
+    "id": "I01-T01",
+    "name": "复现两个应用基线",
+    "detail": "隔离安装依赖和数据目录，运行 Rovai 与 Codeg；记录 Windows 基线，启动 macOS、Linux、Android 和 iOS 构建验证。",
+    "phase": "I01",
+    "feature_ids": [],
+    "acceptance": "基线可启动、协议测试可复跑；各平台缺陷和外部依赖有负责人及修复任务，禁止把基线构建当成融合完成。",
+    "status": "not_started"
+  },
+  {
+    "id": "I01-T02",
+    "name": "确定 Core 和宿主边界",
+    "detail": "保留 Rovai Core 为唯一业务权威；定义 Renderer、Electron、Rust Host、Web Server 和移植服务的调用契约。",
+    "phase": "I01",
+    "feature_ids": [],
+    "acceptance": "基线可启动、协议测试可复跑；各平台缺陷和外部依赖有负责人及修复任务，禁止把基线构建当成融合完成。",
+    "status": "not_started"
+  },
+  {
+    "id": "I01-T03",
+    "name": "建立迁移与协议夹具",
+    "detail": "固化 Core DTO、错误码、事件恢复、版本兼容、旧数据导入和回滚夹具；不创建第二套 Thread 或 Run 数据库。",
+    "phase": "I01",
+    "feature_ids": [],
+    "acceptance": "基线可启动、协议测试可复跑；各平台缺陷和外部依赖有负责人及修复任务，禁止把基线构建当成融合完成。",
+    "status": "not_started"
+  },
+  {
+    "id": "I01-T04",
+    "name": "提前解决资源依赖",
+    "detail": "核实 Mac/Xcode、手机、签名、Runtime 账号、OfficeCLI 和渠道测试凭据；建立缺失资源问题单及最晚到位日期。",
+    "phase": "I01",
+    "feature_ids": [],
+    "acceptance": "基线可启动、协议测试可复跑；各平台缺陷和外部依赖有负责人及修复任务，禁止把基线构建当成融合完成。",
+    "status": "not_started"
+  },
+  {
+    "id": "I02-T01",
+    "name": "统一导航和工程入口",
+    "detail": "融合工程切换、首次使用、队员管理、会话地图、通知入口和工作台布局；目录偏好保持客户端配置。",
+    "phase": "I02",
+    "feature_ids": [
+      "C02",
+      "C32",
+      "C33",
+      "R01",
+      "R02",
+      "R03",
+      "R06",
+      "R07"
+    ],
+    "acceptance": "队员、配置、技能和 MCP 能实际进入一次运行；源配置修改由显式用户动作触发，重新打开应用后配置一致。",
+    "status": "not_started"
+  },
+  {
+    "id": "I02-T02",
+    "name": "统一成员与 Provider",
+    "detail": "保留长期队员身份、职责、模型、环境、权限和各 Runtime 原生配置；显示安装、认证和资格状态。",
+    "phase": "I02",
+    "feature_ids": [
+      "C02",
+      "C32",
+      "C33",
+      "R01",
+      "R02",
+      "R03",
+      "R06",
+      "R07"
+    ],
+    "acceptance": "队员、配置、技能和 MCP 能实际进入一次运行；源配置修改由显式用户动作触发，重新打开应用后配置一致。",
+    "status": "not_started"
+  },
+  {
+    "id": "I02-T03",
+    "name": "融合 Skills 和 MCP",
+    "detail": "兼容 Rovai 原址发现、工具箱与 Codeg 安装、市场和专家包；提供来源、更新、卸载及按成员投递。",
+    "phase": "I02",
+    "feature_ids": [
+      "C02",
+      "C32",
+      "C33",
+      "R01",
+      "R02",
+      "R03",
+      "R06",
+      "R07"
+    ],
+    "acceptance": "队员、配置、技能和 MCP 能实际进入一次运行；源配置修改由显式用户动作触发，重新打开应用后配置一致。",
+    "status": "not_started"
+  },
+  {
+    "id": "I03-T01",
+    "name": "移植全部画布类型",
+    "detail": "移植多画板及 folder、group、agent、conversation、custom、note、file、terminal 八类节点，保留拖动、缩放、分组和布局行为。",
+    "phase": "I03",
+    "feature_ids": [
+      "C12",
+      "C13",
+      "C14"
+    ],
+    "acceptance": "八类节点全部可交互；从画布发起真实任务并回到 Mission、Thread、Diff，重启后布局和绑定不丢失。",
+    "status": "not_started"
+  },
+  {
+    "id": "I03-T02",
+    "name": "绑定统一业务对象",
+    "detail": "为 AI 队员、Mission、Task、Thread 和工程文件提供对象引用及打开、定位、启动入口；同一对象在画布和列表中状态一致。",
+    "phase": "I03",
+    "feature_ids": [
+      "C12",
+      "C13",
+      "C14"
+    ],
+    "acceptance": "八类节点全部可交互；从画布发起真实任务并回到 Mission、Thread、Diff，重启后布局和绑定不丢失。",
+    "status": "not_started"
+  },
+  {
+    "id": "I03-T03",
+    "name": "处理持久化和实时交互",
+    "detail": "布局独立保存，文件指向真实路径，终端绑定临时 PTY；处理删除对象、断连、重启和视图状态恢复。",
+    "phase": "I03",
+    "feature_ids": [
+      "C12",
+      "C13",
+      "C14"
+    ],
+    "acceptance": "八类节点全部可交互；从画布发起真实任务并回到 Mission、Thread、Diff，重启后布局和绑定不丢失。",
+    "status": "not_started"
+  },
+  {
+    "id": "I04-T01",
+    "name": "保留协作全流程",
+    "detail": "保留平级与负责人团队、动态成员、单聊、公开消息、责任 Task、交接、Mission 交付及 Codeg 待办运行和验收体验。",
+    "phase": "I04",
+    "feature_ids": [
+      "C01",
+      "C03",
+      "C08",
+      "C10",
+      "C11",
+      "R04",
+      "R05",
+      "R08",
+      "R09",
+      "R10",
+      "R11",
+      "R14",
+      "R15",
+      "R16",
+      "R17",
+      "R18",
+      "R19",
+      "R22",
+      "R23",
+      "R24",
+      "R35"
+    ],
+    "acceptance": "至少两种可用 Runtime 完成真实协作作为早期检查点；最终所有约定平台可支持的 Runtime 均完成矩阵测试，不以两种通过替代全部准入。",
+    "status": "not_started"
+  },
+  {
+    "id": "I04-T02",
+    "name": "补齐 Runtime 并集",
+    "detail": "保留两源内置 Runtime 并集，补 Gemini、OpenClaw、Hermes 与自定义 ACP；为平台准入、安装、认证、流式输出、工具和能力差异逐项测试。",
+    "phase": "I04",
+    "feature_ids": [
+      "C01",
+      "C03",
+      "C08",
+      "C10",
+      "C11",
+      "R04",
+      "R05",
+      "R08",
+      "R09",
+      "R10",
+      "R11",
+      "R14",
+      "R15",
+      "R16",
+      "R17",
+      "R18",
+      "R19",
+      "R22",
+      "R23",
+      "R24",
+      "R35"
+    ],
+    "acceptance": "至少两种可用 Runtime 完成真实协作作为早期检查点；最终所有约定平台可支持的 Runtime 均完成矩阵测试，不以两种通过替代全部准入。",
+    "status": "not_started"
+  },
+  {
+    "id": "I04-T03",
+    "name": "统一执行和恢复",
+    "detail": "审批、问题回答、计划确认、停止、超时、失败续做、warm/cold 恢复全部归 Core；区分可靠恢复与需要客户重新确认的外部动作。",
+    "phase": "I04",
+    "feature_ids": [
+      "C01",
+      "C03",
+      "C08",
+      "C10",
+      "C11",
+      "R04",
+      "R05",
+      "R08",
+      "R09",
+      "R10",
+      "R11",
+      "R14",
+      "R15",
+      "R16",
+      "R17",
+      "R18",
+      "R19",
+      "R22",
+      "R23",
+      "R24",
+      "R35"
+    ],
+    "acceptance": "至少两种可用 Runtime 完成真实协作作为早期检查点；最终所有约定平台可支持的 Runtime 均完成矩阵测试，不以两种通过替代全部准入。",
+    "status": "not_started"
+  },
+  {
+    "id": "I04-T04",
+    "name": "融合记忆和自动化",
+    "detail": "保留三类记忆的读取、修订、审核、遗忘和导出；融合 Cron、立即运行、历史、overlap、取消和通知。",
+    "phase": "I04",
+    "feature_ids": [
+      "C01",
+      "C03",
+      "C08",
+      "C10",
+      "C11",
+      "R04",
+      "R05",
+      "R08",
+      "R09",
+      "R10",
+      "R11",
+      "R14",
+      "R15",
+      "R16",
+      "R17",
+      "R18",
+      "R19",
+      "R22",
+      "R23",
+      "R24",
+      "R35"
+    ],
+    "acceptance": "至少两种可用 Runtime 完成真实协作作为早期检查点；最终所有约定平台可支持的 Runtime 均完成矩阵测试，不以两种通过替代全部准入。",
+    "status": "not_started"
+  },
+  {
+    "id": "I05-T01",
+    "name": "融合文件与编辑工作区",
+    "detail": "保留文件树、搜索、实际文件操作、编辑保存、外部变更冲突、多标签、分屏、预览和产物定位。",
+    "phase": "I05",
+    "feature_ids": [
+      "C15",
+      "C16",
+      "C17",
+      "C19",
+      "C20",
+      "C22",
+      "C23",
+      "C24",
+      "C25",
+      "C26",
+      "C27",
+      "R20",
+      "R21"
+    ],
+    "acceptance": "在隔离仓库复现提交、Stash、重置、冲突解决和远程交付；危险操作有准确影响预览和原有确认交互，失败后工程可恢复。",
+    "status": "not_started"
+  },
+  {
+    "id": "I05-T02",
+    "name": "融合工程与终端",
+    "detail": "保留克隆、初始化、分支、Worktree、PTY 生命周期、Shell、工作目录和关闭回收；不把 cwd 限定当作操作系统沙箱。",
+    "phase": "I05",
+    "feature_ids": [
+      "C15",
+      "C16",
+      "C17",
+      "C19",
+      "C20",
+      "C22",
+      "C23",
+      "C24",
+      "C25",
+      "C26",
+      "C27",
+      "R20",
+      "R21"
+    ],
+    "acceptance": "在隔离仓库复现提交、Stash、重置、冲突解决和远程交付；危险操作有准确影响预览和原有确认交互，失败后工程可恢复。",
+    "status": "not_started"
+  },
+  {
+    "id": "I05-T03",
+    "name": "融合全部 Git 行为",
+    "detail": "支持暂存、提交、Diff、历史、远程、Stash、任意历史重置、merge/rebase、三栏冲突编辑、继续、中止和工作树清理。",
+    "phase": "I05",
+    "feature_ids": [
+      "C15",
+      "C16",
+      "C17",
+      "C19",
+      "C20",
+      "C22",
+      "C23",
+      "C24",
+      "C25",
+      "C26",
+      "C27",
+      "R20",
+      "R21"
+    ],
+    "acceptance": "在隔离仓库复现提交、Stash、重置、冲突解决和远程交付；危险操作有准确影响预览和原有确认交互，失败后工程可恢复。",
+    "status": "not_started"
+  },
+  {
+    "id": "I05-T04",
+    "name": "落实变化审查",
+    "detail": "Mission 固定 base_sha；累计变化覆盖 committed、staged、unstaged 和 untracked；提交前复核 HEAD 和 index，避免覆盖客户原暂存。",
+    "phase": "I05",
+    "feature_ids": [
+      "C15",
+      "C16",
+      "C17",
+      "C19",
+      "C20",
+      "C22",
+      "C23",
+      "C24",
+      "C25",
+      "C26",
+      "C27",
+      "R20",
+      "R21"
+    ],
+    "acceptance": "在隔离仓库复现提交、Stash、重置、冲突解决和远程交付；危险操作有准确影响预览和原有确认交互，失败后工程可恢复。",
+    "status": "not_started"
+  },
+  {
+    "id": "I06-T01",
+    "name": "移植原生历史导入",
+    "detail": "保留原生磁盘会话解析、预览、选择、去重、来源映射和旧会话引用；原始会话不被重写。",
+    "phase": "I06",
+    "feature_ids": [
+      "C04",
+      "C05",
+      "C06",
+      "C07",
+      "C09",
+      "C21",
+      "C37",
+      "R12",
+      "R13",
+      "R27"
+    ],
+    "acceptance": "真实历史可导入和定位；分叉与插话通过支持该能力的 Runtime 实测；新项目生成后可立即进入 Git 和 Mission。",
+    "status": "not_started"
+  },
+  {
+    "id": "I06-T02",
+    "name": "融合会话整理与执行差异",
+    "detail": "保留全局和工程标签、批量管理、消息定位、分叉、插话、草稿、附件和命令；能力不支持时显示具体原因。",
+    "phase": "I06",
+    "feature_ids": [
+      "C04",
+      "C05",
+      "C06",
+      "C07",
+      "C09",
+      "C21",
+      "C37",
+      "R12",
+      "R13",
+      "R27"
+    ],
+    "acceptance": "真实历史可导入和定位；分叉与插话通过支持该能力的 Runtime 实测；新项目生成后可立即进入 Git 和 Mission。",
+    "status": "not_started"
+  },
+  {
+    "id": "I06-T03",
+    "name": "融合工程组织和项目生成",
+    "detail": "移植关联目录、目录分组、别名、快捷消息及项目启动器的生成、预览、目录落地和继续开发流程。",
+    "phase": "I06",
+    "feature_ids": [
+      "C04",
+      "C05",
+      "C06",
+      "C07",
+      "C09",
+      "C21",
+      "C37",
+      "R12",
+      "R13",
+      "R27"
+    ],
+    "acceptance": "真实历史可导入和定位；分叉与插话通过支持该能力的 Runtime 实测；新项目生成后可立即进入 Git 和 Mission。",
+    "status": "not_started"
+  },
+  {
+    "id": "I07-T01",
+    "name": "融合仓库面板和账号",
+    "detail": "保留 GitHub、GitLab、Gitea、Forgejo 的仓库、议题、PR、评论和认证管理，按源能力建立平台差异矩阵。",
+    "phase": "I07",
+    "feature_ids": [
+      "C28",
+      "C29"
+    ],
+    "acceptance": "各 Forge 在专用测试仓完成其源能力对应的读写用例；议题到任务到 PR 到客户验收全过程可追溯。",
+    "status": "not_started"
+  },
+  {
+    "id": "I07-T02",
+    "name": "融合议题驱动任务",
+    "detail": "议题建立 Mission/Task 并保留来源、分支、Worktree、执行及验收关系；从任务可返回原议题。",
+    "phase": "I07",
+    "feature_ids": [
+      "C28",
+      "C29"
+    ],
+    "acceptance": "各 Forge 在专用测试仓完成其源能力对应的读写用例；议题到任务到 PR 到客户验收全过程可追溯。",
+    "status": "not_started"
+  },
+  {
+    "id": "I07-T03",
+    "name": "实现产品内 PR 写操作",
+    "detail": "移植源应用提供的创建、评论、更新等 PR 写操作，复用 Core 交付事实；处理幂等、权限、网络失败和链接刷新。",
+    "phase": "I07",
+    "feature_ids": [
+      "C28",
+      "C29"
+    ],
+    "acceptance": "各 Forge 在专用测试仓完成其源能力对应的读写用例；议题到任务到 PR 到客户验收全过程可追溯。",
+    "status": "not_started"
+  },
+  {
+    "id": "I08-T01",
+    "name": "适配 Electron 浏览器宿主",
+    "detail": "迁移 Codeg 依赖 Tauri/wry/WebView2 的页面宿主到 Electron；保留页面管理、共享、元素、截图、DOM、控制台和导航。",
+    "phase": "I08",
+    "feature_ids": [
+      "C30",
+      "C31"
+    ],
+    "acceptance": "三桌面平台分别完成网页和原生窗口操作、撤销和故障测试；保留上游 Preview 标识，说明目标应用的限制，不把预览功能伪装成普遍可靠。",
+    "status": "not_started"
+  },
+  {
+    "id": "I08-T02",
+    "name": "移植桌面驱动和 helper",
+    "detail": "复用现有 driver/helper 在 Windows、macOS、Linux 的下载、启动、窗口识别、截图、点击、输入和按键，不从零重写整套驱动。",
+    "phase": "I08",
+    "feature_ids": [
+      "C30",
+      "C31"
+    ],
+    "acceptance": "三桌面平台分别完成网页和原生窗口操作、撤销和故障测试；保留上游 Preview 标识，说明目标应用的限制，不把预览功能伪装成普遍可靠。",
+    "status": "not_started"
+  },
+  {
+    "id": "I08-T03",
+    "name": "保留授权和撤销边界",
+    "detail": "保留仅读、读写、显式本机共享、超时、窗口失效、审计和一键撤销；远程客户端不新增隐式桌面授权。",
+    "phase": "I08",
+    "feature_ids": [
+      "C30",
+      "C31"
+    ],
+    "acceptance": "三桌面平台分别完成网页和原生窗口操作、撤销和故障测试；保留上游 Preview 标识，说明目标应用的限制，不把预览功能伪装成普遍可靠。",
+    "status": "not_started"
+  },
+  {
+    "id": "I08-T04",
+    "name": "完成平台和故障测试",
+    "detail": "测试驱动退出、应用关闭、权限撤销、窗口切换及网络断连；控制能力随授权及时失效。",
+    "phase": "I08",
+    "feature_ids": [
+      "C30",
+      "C31"
+    ],
+    "acceptance": "三桌面平台分别完成网页和原生窗口操作、撤销和故障测试；保留上游 Preview 标识，说明目标应用的限制，不把预览功能伪装成普遍可靠。",
+    "status": "not_started"
+  },
+  {
+    "id": "I09-T01",
+    "name": "融合 Office 实时预览",
+    "detail": "移植 docx/xlsx/pptx 预览和 watch 刷新；管理 OfficeCLI 检测、安装、启动、依赖错误和退出回收。",
+    "phase": "I09",
+    "feature_ids": [
+      "C18",
+      "C41",
+      "C42"
+    ],
+    "acceptance": "三种 Office 格式修改后刷新；科研技能完成代表性真实任务；卡片交互返回同一执行上下文并可恢复。",
+    "status": "not_started"
+  },
+  {
+    "id": "I09-T02",
+    "name": "融合科研和专家工作流",
+    "detail": "保留文献、实验、统计技能的发现、配置、投递、引用和产物；展示来源和所需外部工具。",
+    "phase": "I09",
+    "feature_ids": [
+      "C18",
+      "C41",
+      "C42"
+    ],
+    "acceptance": "三种 Office 格式修改后刷新；科研技能完成代表性真实任务；卡片交互返回同一执行上下文并可恢复。",
+    "status": "not_started"
+  },
+  {
+    "id": "I09-T03",
+    "name": "融合生成式 UI",
+    "detail": "保留 ui-render 技能、结构化卡片、交互回传、渲染隔离和错误回退，统一到 Thread 与 Run 上下文。",
+    "phase": "I09",
+    "feature_ids": [
+      "C18",
+      "C41",
+      "C42"
+    ],
+    "acceptance": "三种 Office 格式修改后刷新；科研技能完成代表性真实任务；卡片交互返回同一执行上下文并可恢复。",
+    "status": "not_started"
+  },
+  {
+    "id": "I10-T01",
+    "name": "补齐 Web 和 Server 操作",
+    "detail": "复用同一 Core，完善认证、操作目录、静态客户端、容器和独立 Server 包；核对桌面与远程的源功能适用范围。",
+    "phase": "I10",
+    "feature_ids": [
+      "C35",
+      "C36",
+      "R28",
+      "R29",
+      "R30",
+      "R32",
+      "M01",
+      "M02"
+    ],
+    "acceptance": "Desktop Web、独立 Server、全部源渠道和 CLI 各完成真实收发；Android 和 iOS 可安装构建及真机主流程通过，不能用响应式 Web 代替原生客户端。",
+    "status": "not_started"
+  },
+  {
+    "id": "I10-T02",
+    "name": "融合全部聊天渠道和 CLI",
+    "detail": "合并 Telegram、微信、飞书、Lark、钉钉与用户 CLI 自动化；抽离 Electron Main 中渠道逻辑以支持约定的 Server 运行方式。",
+    "phase": "I10",
+    "feature_ids": [
+      "C35",
+      "C36",
+      "R28",
+      "R29",
+      "R30",
+      "R32",
+      "M01",
+      "M02"
+    ],
+    "acceptance": "Desktop Web、独立 Server、全部源渠道和 CLI 各完成真实收发；Android 和 iOS 可安装构建及真机主流程通过，不能用响应式 Web 代替原生客户端。",
+    "status": "not_started"
+  },
+  {
+    "id": "I10-T03",
+    "name": "移植 Android 和 iOS 客户端",
+    "detail": "复用 Compose、SwiftUI 源码和原有页面，适配 Host 认证、HTTP、事件流、终端、工程/Git和设置；增加融合对象所必需的队员、Mission、Task、Thread 映射。",
+    "phase": "I10",
+    "feature_ids": [
+      "C35",
+      "C36",
+      "R28",
+      "R29",
+      "R30",
+      "R32",
+      "M01",
+      "M02"
+    ],
+    "acceptance": "Desktop Web、独立 Server、全部源渠道和 CLI 各完成真实收发；Android 和 iOS 可安装构建及真机主流程通过，不能用响应式 Web 代替原生客户端。",
+    "status": "not_started"
+  },
+  {
+    "id": "I10-T04",
+    "name": "验证远程一致性和设备行为",
+    "detail": "覆盖手机和平板、前后台切换、断网重连、令牌撤销、审批恢复和跨客户端一致；桌面 CLI 与文件仍由 Host 运行。",
+    "phase": "I10",
+    "feature_ids": [
+      "C35",
+      "C36",
+      "R28",
+      "R29",
+      "R30",
+      "R32",
+      "M01",
+      "M02"
+    ],
+    "acceptance": "Desktop Web、独立 Server、全部源渠道和 CLI 各完成真实收发；Android 和 iOS 可安装构建及真机主流程通过，不能用响应式 Web 代替原生客户端。",
+    "status": "not_started"
+  },
+  {
+    "id": "I11-T01",
+    "name": "融合加密备份和恢复",
+    "detail": "保留 AES-256-GCM、Argon2id、校验、配置迁移、恢复预检和回滚；使用一致性数据库备份或停机窗口。",
+    "phase": "I11",
+    "feature_ids": [
+      "C34",
+      "C38",
+      "C39",
+      "C40",
+      "C43",
+      "C44",
+      "R25",
+      "R26",
+      "R31",
+      "R33",
+      "R34"
+    ],
+    "acceptance": "备份恢复后关键数据一致；WebDAV 中断不发布损坏清单；主题语言和宠物功能实际可用，升级和回滚演练通过。",
+    "status": "not_started"
+  },
+  {
+    "id": "I11-T02",
+    "name": "融合 WebDAV 同步",
+    "detail": "保留配置、清单、checksum、密钥和提交顺序；处理断网、并发版本、损坏和恢复，迁移后不漏 Core 与画布新增数据。",
+    "phase": "I11",
+    "feature_ids": [
+      "C34",
+      "C38",
+      "C39",
+      "C40",
+      "C43",
+      "C44",
+      "R25",
+      "R26",
+      "R31",
+      "R33",
+      "R34"
+    ],
+    "acceptance": "备份恢复后关键数据一致；WebDAV 中断不发布损坏清单；主题语言和宠物功能实际可用，升级和回滚演练通过。",
+    "status": "not_started"
+  },
+  {
+    "id": "I11-T03",
+    "name": "融合完整个性化能力",
+    "detail": "保留全部源主题、自定义 CSS、语言、快捷键、减少动态效果、宠物管理、导入、市场和动画交互。",
+    "phase": "I11",
+    "feature_ids": [
+      "C34",
+      "C38",
+      "C39",
+      "C40",
+      "C43",
+      "C44",
+      "R25",
+      "R26",
+      "R31",
+      "R33",
+      "R34"
+    ],
+    "acceptance": "备份恢复后关键数据一致；WebDAV 中断不发布损坏清单；主题语言和宠物功能实际可用，升级和回滚演练通过。",
+    "status": "not_started"
+  },
+  {
+    "id": "I11-T04",
+    "name": "融合诊断和升级",
+    "detail": "保留通知、日志、诊断导出、deep link、外部打开及更新流程；提供升级失败和数据迁移失败恢复。",
+    "phase": "I11",
+    "feature_ids": [
+      "C34",
+      "C38",
+      "C39",
+      "C40",
+      "C43",
+      "C44",
+      "R25",
+      "R26",
+      "R31",
+      "R33",
+      "R34"
+    ],
+    "acceptance": "备份恢复后关键数据一致；WebDAV 中断不发布损坏清单；主题语言和宠物功能实际可用，升级和回滚演练通过。",
+    "status": "not_started"
+  },
+  {
+    "id": "I12-T01",
+    "name": "完成可靠性与性能验收",
+    "detail": "执行崩溃、断网、重复命令、并发改写、数据库锁、driver/Office 服务失败和 72 小时运行测试。",
+    "phase": "I12",
+    "feature_ids": [],
+    "acceptance": "所有一期必须用例通过，无阻断使用或造成数据丢失的缺陷；外部资源未到位的项仍为未完成，一期不得直接结项。",
+    "status": "not_started"
+  },
+  {
+    "id": "I12-T02",
+    "name": "验证扩展契约",
+    "detail": "验证 Runtime、Channel、Viewer、Skill 和 Theme 的版本及能力声明；用测试适配器证明扩展不需复制业务数据和执行引擎。",
+    "phase": "I12",
+    "feature_ids": [],
+    "acceptance": "所有一期必须用例通过，无阻断使用或造成数据丢失的缺陷；外部资源未到位的项仍为未完成，一期不得直接结项。",
+    "status": "not_started"
+  },
+  {
+    "id": "I12-T03",
+    "name": "完成全平台全功能回归",
+    "detail": "核销所有来源能力与原子用例；测试安装、升级、迁移、卸载保留数据、签名和恢复，并验证全部高风险整改。",
+    "phase": "I12",
+    "feature_ids": [],
+    "acceptance": "所有一期必须用例通过，无阻断使用或造成数据丢失的缺陷；外部资源未到位的项仍为未完成，一期不得直接结项。",
+    "status": "not_started"
+  },
+  {
+    "id": "I12-T04",
+    "name": "交付发布和客户验收包",
+    "detail": "交付源码、版本包、API 与迁移说明、诊断、测试证据、已知平台限制、用户手册和回滚包；演示贯穿全功能的验收场景。",
+    "phase": "I12",
+    "feature_ids": [],
+    "acceptance": "所有一期必须用例通过，无阻断使用或造成数据丢失的缺陷；外部资源未到位的项仍为未完成，一期不得直接结项。",
+    "status": "not_started"
+  },
+  {
+    "id": "BUF-T01",
+    "name": "处理实际风险",
+    "detail": "为版本差异、宿主迁移、Runtime 准入、渠道联调、移动签名和跨平台缺陷预留；每次使用记录问题、消耗和剩余时间。",
+    "phase": "BUF",
+    "feature_ids": [],
+    "acceptance": "预留不新增范围，也不代替日常测试；超过预留时调整日期并说明证据，完整一期终点不变。",
+    "status": "not_started"
+  },
+  {
+    "id": "BUF-T02",
+    "name": "补测和重新验收",
+    "detail": "修复影响的功能及相邻业务路径重新回归；未消耗的预留可用于提前交付。",
+    "phase": "BUF",
+    "feature_ids": [],
+    "acceptance": "预留不新增范围，也不代替日常测试；超过预留时调整日期并说明证据，完整一期终点不变。",
+    "status": "not_started"
+  }
+]

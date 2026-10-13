@@ -8,11 +8,11 @@ updates:
       day: monday
       time: "09:00"
       timezone: Asia/Shanghai
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 0
     groups:
       github-actions:
         patterns:
           - "*"
     commit-message:
-      prefix: chore
+      prefix: 依赖更新
       include: scope

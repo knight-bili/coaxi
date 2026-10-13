@@ -1,0 +1,388 @@
+{
+  "repository": "knight-bili/codeg-rovai-workbench",
+  "url": "https://github.com/knight-bili/codeg-rovai-workbench",
+  "private": true,
+  "milestones": {
+    "I00": {
+      "number": 1,
+      "title": "[I00] Git 仓库与工程初始化",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/milestone/1",
+      "due_on": "2026-10-15T00:00:00Z"
+    },
+    "I01": {
+      "number": 2,
+      "title": "[I01] 基线构建与融合契约",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/milestone/2",
+      "due_on": "2026-10-27T00:00:00Z"
+    },
+    "I02": {
+      "number": 3,
+      "title": "[I02] 统一工作台 队员与能力配置",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/milestone/3",
+      "due_on": "2026-11-05T00:00:00Z"
+    },
+    "I03": {
+      "number": 4,
+      "title": "[I03] 完整无限画布与对象绑定",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/milestone/4",
+      "due_on": "2026-11-19T00:00:00Z"
+    },
+    "I04": {
+      "number": 5,
+      "title": "[I04] 完整协作执行 Runtime 记忆与自动化",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/milestone/5",
+      "due_on": "2026-12-03T00:00:00Z"
+    },
+    "I05": {
+      "number": 6,
+      "title": "[I05] 文件 编辑 终端与完整 Git 工程工作区",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/milestone/6",
+      "due_on": "2026-12-23T00:00:00Z"
+    },
+    "I06": {
+      "number": 7,
+      "title": "[I06] 原生会话聚合与项目启动器",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/milestone/7",
+      "due_on": "2027-01-04T00:00:00Z"
+    },
+    "I07": {
+      "number": 8,
+      "title": "[I07] 完整 Forge 与议题 PR 工作流",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/milestone/8",
+      "due_on": "2027-01-14T00:00:00Z"
+    },
+    "I08": {
+      "number": 9,
+      "title": "[I08] 完整共享浏览器与电脑操作",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/milestone/9",
+      "due_on": "2027-02-04T00:00:00Z"
+    },
+    "I09": {
+      "number": 10,
+      "title": "[I09] Office 科研技能与生成式交互",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/milestone/10",
+      "due_on": "2027-02-18T00:00:00Z"
+    },
+    "I10": {
+      "number": 11,
+      "title": "[I10] Desktop Web Server 渠道与原生移动端",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/milestone/11",
+      "due_on": "2027-03-18T00:00:00Z"
+    },
+    "I11": {
+      "number": 12,
+      "title": "[I11] 完整备份 WebDAV 主题语言与宠物",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/milestone/12",
+      "due_on": "2027-04-01T00:00:00Z"
+    },
+    "I12": {
+      "number": 13,
+      "title": "[I12] 高可用 扩展性 全量回归与一期最终验收",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/milestone/13",
+      "due_on": "2027-04-22T00:00:00Z"
+    },
+    "BUF": {
+      "number": 14,
+      "title": "[BUF] 整改 兼容 修复与复测预留",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/milestone/14",
+      "due_on": "2027-05-20T00:00:00Z"
+    }
+  },
+  "issues": {
+    "I00-T01": {
+      "number": 1,
+      "title": "[I00-T01] 建立主仓和来源基线",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/1",
+      "state": "open"
+    },
+    "I00-T02": {
+      "number": 2,
+      "title": "[I00-T02] 建立开发和验收规则",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/2",
+      "state": "open"
+    },
+    "I00-T03": {
+      "number": 3,
+      "title": "[I00-T03] 展开完整功能清单",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/3",
+      "state": "open"
+    },
+    "I01-T01": {
+      "number": 4,
+      "title": "[I01-T01] 复现两个应用基线",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/4",
+      "state": "open"
+    },
+    "I01-T02": {
+      "number": 5,
+      "title": "[I01-T02] 确定 Core 和宿主边界",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/5",
+      "state": "open"
+    },
+    "I01-T03": {
+      "number": 6,
+      "title": "[I01-T03] 建立迁移与协议夹具",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/6",
+      "state": "open"
+    },
+    "I01-T04": {
+      "number": 7,
+      "title": "[I01-T04] 提前解决资源依赖",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/7",
+      "state": "open"
+    },
+    "I02-T01": {
+      "number": 8,
+      "title": "[I02-T01] 统一导航和工程入口",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/8",
+      "state": "open"
+    },
+    "I02-T02": {
+      "number": 9,
+      "title": "[I02-T02] 统一成员与 Provider",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/9",
+      "state": "open"
+    },
+    "I02-T03": {
+      "number": 10,
+      "title": "[I02-T03] 融合 Skills 和 MCP",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/10",
+      "state": "open"
+    },
+    "I03-T01": {
+      "number": 11,
+      "title": "[I03-T01] 移植全部画布类型",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/11",
+      "state": "open"
+    },
+    "I03-T02": {
+      "number": 12,
+      "title": "[I03-T02] 绑定统一业务对象",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/12",
+      "state": "open"
+    },
+    "I03-T03": {
+      "number": 13,
+      "title": "[I03-T03] 处理持久化和实时交互",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/13",
+      "state": "open"
+    },
+    "I04-T01": {
+      "number": 14,
+      "title": "[I04-T01] 保留协作全流程",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/14",
+      "state": "open"
+    },
+    "I04-T02": {
+      "number": 15,
+      "title": "[I04-T02] 补齐 Runtime 并集",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/15",
+      "state": "open"
+    },
+    "I04-T03": {
+      "number": 16,
+      "title": "[I04-T03] 统一执行和恢复",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/16",
+      "state": "open"
+    },
+    "I04-T04": {
+      "number": 17,
+      "title": "[I04-T04] 融合记忆和自动化",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/17",
+      "state": "open"
+    },
+    "I05-T01": {
+      "number": 18,
+      "title": "[I05-T01] 融合文件与编辑工作区",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/18",
+      "state": "open"
+    },
+    "I05-T02": {
+      "number": 19,
+      "title": "[I05-T02] 融合工程与终端",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/19",
+      "state": "open"
+    },
+    "I05-T03": {
+      "number": 20,
+      "title": "[I05-T03] 融合全部 Git 行为",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/20",
+      "state": "open"
+    },
+    "I05-T04": {
+      "number": 21,
+      "title": "[I05-T04] 落实变化审查",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/21",
+      "state": "open"
+    },
+    "I06-T01": {
+      "number": 22,
+      "title": "[I06-T01] 移植原生历史导入",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/22",
+      "state": "open"
+    },
+    "I06-T02": {
+      "number": 23,
+      "title": "[I06-T02] 融合会话整理与执行差异",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/23",
+      "state": "open"
+    },
+    "I06-T03": {
+      "number": 24,
+      "title": "[I06-T03] 融合工程组织和项目生成",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/24",
+      "state": "open"
+    },
+    "I07-T01": {
+      "number": 25,
+      "title": "[I07-T01] 融合仓库面板和账号",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/25",
+      "state": "open"
+    },
+    "I07-T02": {
+      "number": 26,
+      "title": "[I07-T02] 融合议题驱动任务",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/26",
+      "state": "open"
+    },
+    "I07-T03": {
+      "number": 27,
+      "title": "[I07-T03] 实现产品内 PR 写操作",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/27",
+      "state": "open"
+    },
+    "I08-T01": {
+      "number": 28,
+      "title": "[I08-T01] 适配 Electron 浏览器宿主",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/28",
+      "state": "open"
+    },
+    "I08-T02": {
+      "number": 29,
+      "title": "[I08-T02] 移植桌面驱动和 helper",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/29",
+      "state": "open"
+    },
+    "I08-T03": {
+      "number": 30,
+      "title": "[I08-T03] 保留授权和撤销边界",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/30",
+      "state": "open"
+    },
+    "I08-T04": {
+      "number": 31,
+      "title": "[I08-T04] 完成平台和故障测试",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/31",
+      "state": "open"
+    },
+    "I09-T01": {
+      "number": 32,
+      "title": "[I09-T01] 融合 Office 实时预览",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/32",
+      "state": "open"
+    },
+    "I09-T02": {
+      "number": 33,
+      "title": "[I09-T02] 融合科研和专家工作流",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/33",
+      "state": "open"
+    },
+    "I09-T03": {
+      "number": 34,
+      "title": "[I09-T03] 融合生成式 UI",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/34",
+      "state": "open"
+    },
+    "I10-T01": {
+      "number": 35,
+      "title": "[I10-T01] 补齐 Web 和 Server 操作",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/35",
+      "state": "open"
+    },
+    "I10-T02": {
+      "number": 36,
+      "title": "[I10-T02] 融合全部聊天渠道和 CLI",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/36",
+      "state": "open"
+    },
+    "I10-T03": {
+      "number": 37,
+      "title": "[I10-T03] 移植 Android 和 iOS 客户端",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/37",
+      "state": "open"
+    },
+    "I10-T04": {
+      "number": 38,
+      "title": "[I10-T04] 验证远程一致性和设备行为",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/38",
+      "state": "open"
+    },
+    "I11-T01": {
+      "number": 39,
+      "title": "[I11-T01] 融合加密备份和恢复",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/39",
+      "state": "open"
+    },
+    "I11-T02": {
+      "number": 40,
+      "title": "[I11-T02] 融合 WebDAV 同步",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/40",
+      "state": "open"
+    },
+    "I11-T03": {
+      "number": 41,
+      "title": "[I11-T03] 融合完整个性化能力",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/41",
+      "state": "open"
+    },
+    "I11-T04": {
+      "number": 42,
+      "title": "[I11-T04] 融合诊断和升级",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/42",
+      "state": "open"
+    },
+    "I12-T01": {
+      "number": 43,
+      "title": "[I12-T01] 完成可靠性与性能验收",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/43",
+      "state": "open"
+    },
+    "I12-T02": {
+      "number": 44,
+      "title": "[I12-T02] 验证扩展契约",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/44",
+      "state": "open"
+    },
+    "I12-T03": {
+      "number": 45,
+      "title": "[I12-T03] 完成全平台全功能回归",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/45",
+      "state": "open"
+    },
+    "I12-T04": {
+      "number": 46,
+      "title": "[I12-T04] 交付发布和客户验收包",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/46",
+      "state": "open"
+    },
+    "BUF-T01": {
+      "number": 47,
+      "title": "[BUF-T01] 处理实际风险",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/47",
+      "state": "open"
+    },
+    "BUF-T02": {
+      "number": 48,
+      "title": "[BUF-T02] 补测和重新验收",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/issues/48",
+      "state": "open"
+    }
+  },
+  "branch_protection": {
+    "enabled": false,
+    "reason": "GitHub API 403 私有仓需要升级账号套餐",
+    "fallback": "私有仓 客户确认后人工合并 禁止自动合并"
+  },
+  "source_history_commits": 2842,
+  "product_tests": "未执行"
+}

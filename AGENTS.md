@@ -33,3 +33,10 @@
 - Do not install or enable Impeccable hooks or plugins without explicit user approval.
 - Incremental work preserves the established Rovai AI visual world. Do not enter a
   replacement-world flow unless the user explicitly requests a redesign.
+
+## Codeg 与 Rovai 融合项目
+
+- 融合范围、阶段及验收先读 [integration/README.md](integration/README.md)，完整一期终点不得缩减。
+- 当前I00仅工程初始化，源产品代码不变；current_version指向源骨架，不表示融合交付状态。
+- 中文回复和中文提交，不加工具署名，main由客户验收控制。
+- CodeGraph仅用已有索引，缺索引使用文件查询；不隐式初始化，源码改动后同步已有索引。

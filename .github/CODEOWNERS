@@ -1,13 +1,15 @@
 # Documentation governance and every future version/topic use the same owner boundary.
-/docs/ @murray17
-/AGENTS.md @murray17
-/CONTRIBUTING.md @murray17
-/SECURITY.md @murray17
-/scripts/check-doc-*.mjs @murray17
-/scripts/generate-doc-adr.mjs @murray17
-/scripts/lib/doc-adr* @murray17
-/package.json @murray17
-/pnpm-lock.yaml @murray17
-/.github/workflows/ @murray17
-/.github/dependabot.yml @murray17
-/.github/CODEOWNERS @murray17
+/docs/ @knight-bili
+/AGENTS.md @knight-bili
+/CONTRIBUTING.md @knight-bili
+/SECURITY.md @knight-bili
+/scripts/check-doc-*.mjs @knight-bili
+/scripts/generate-doc-adr.mjs @knight-bili
+/scripts/lib/doc-adr* @knight-bili
+/package.json @knight-bili
+/pnpm-lock.yaml @knight-bili
+/.github/workflows/ @knight-bili
+/.github/dependabot.yml @knight-bili
+/.github/CODEOWNERS @knight-bili
+
+/integration/ @knight-bili

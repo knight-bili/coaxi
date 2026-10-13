@@ -1,0 +1,2811 @@
+[
+  {
+    "id": "C01",
+    "repo": "codeg",
+    "name": "统一ACP智能体",
+    "detail": "内置与自定义智能体、结构化对话和连接",
+    "path": "src-tauri/src/commands/acp.rs",
+    "line": 10992,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src-tauri/src/commands/acp.rs#L10992",
+    "phase": "I04",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "bd8919ed69496b51a6b4a6dffa32e3e29ba86fb2527755f4cbab3aca47621c00",
+    "primary_work_packages": [
+      "I04-T01",
+      "I04-T02",
+      "I04-T03",
+      "I04-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C01-N",
+      "C01-F",
+      "C01-R",
+      "C01-P"
+    ],
+    "git_blob_sha256": "3d54ec94078eba0385375f0388242709a01e484e01b9f695f790c3604c8a2f87",
+    "normalized_text_sha256": "3d54ec94078eba0385375f0388242709a01e484e01b9f695f790c3604c8a2f87",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C02",
+    "repo": "codeg",
+    "name": "模型与Provider配置",
+    "detail": "模型、模式与各工具原生配置",
+    "path": "src/components/settings/model-provider-settings.tsx",
+    "line": 38,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src/components/settings/model-provider-settings.tsx#L38",
+    "phase": "I02",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "267da1c837152ecb343309f60c39ab7a122dae6aabfa857eddf4246cddef4c4f",
+    "primary_work_packages": [
+      "I02-T01",
+      "I02-T02",
+      "I02-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C02-N",
+      "C02-F",
+      "C02-R",
+      "C02-P"
+    ],
+    "git_blob_sha256": "00586909a3d7faf857378909e9e781634d7fb1cc83bf317b5038b9536e2c544b",
+    "normalized_text_sha256": "00586909a3d7faf857378909e9e781634d7fb1cc83bf317b5038b9536e2c544b",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C03",
+    "repo": "codeg",
+    "name": "自定义智能体",
+    "detail": "自定义ACP入口与安装配置",
+    "path": "src/components/settings/add-custom-agent-dialog.tsx",
+    "line": 76,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src/components/settings/add-custom-agent-dialog.tsx#L76",
+    "phase": "I04",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "9186c1e3a2703cba60d731aa0e5ade52b38ecf0bd55970dc45988b1f44c33258",
+    "primary_work_packages": [
+      "I04-T01",
+      "I04-T02",
+      "I04-T03",
+      "I04-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C03-N",
+      "C03-F",
+      "C03-R",
+      "C03-P"
+    ],
+    "git_blob_sha256": "0e91411394f1b830733ad3a2485978b3c873651bdb16cd466bf7eb6530d356c3",
+    "normalized_text_sha256": "0e91411394f1b830733ad3a2485978b3c873651bdb16cd466bf7eb6530d356c3",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C04",
+    "repo": "codeg",
+    "name": "原生历史导入",
+    "detail": "解析CLI磁盘会话并导入",
+    "path": "src-tauri/src/commands/conversations.rs",
+    "line": 1077,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src-tauri/src/commands/conversations.rs#L1077",
+    "phase": "I06",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "287d412cee30843db1824641eded4da2b2cee2b189d8de8eb9722c09798976d6",
+    "primary_work_packages": [
+      "I06-T01",
+      "I06-T02",
+      "I06-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C04-N",
+      "C04-F",
+      "C04-R",
+      "C04-P"
+    ],
+    "git_blob_sha256": "44e9df51bc0b482036688a669ef302987b106e1608df888bf3797b02bb04a743",
+    "normalized_text_sha256": "44e9df51bc0b482036688a669ef302987b106e1608df888bf3797b02bb04a743",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C05",
+    "repo": "codeg",
+    "name": "搜索与旧会话引用",
+    "detail": "会话和文件查找、引用旧会话",
+    "path": "src/components/conversations/search-command-dialog.tsx",
+    "line": 44,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src/components/conversations/search-command-dialog.tsx#L44",
+    "phase": "I06",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "e0e35236f70850f366716ccfcd543bb72779328d21c9f3dd0c67c89a09c182a0",
+    "primary_work_packages": [
+      "I06-T01",
+      "I06-T02",
+      "I06-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C05-N",
+      "C05-F",
+      "C05-R",
+      "C05-P"
+    ],
+    "git_blob_sha256": "cfdd62aa3c02ba6ceafe4089c10da2104bc7cb5813186fc3399a8b85abfea9b6",
+    "normalized_text_sha256": "cfdd62aa3c02ba6ceafe4089c10da2104bc7cb5813186fc3399a8b85abfea9b6",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C06",
+    "repo": "codeg",
+    "name": "会话分叉与插话",
+    "detail": "按Runtime能力分叉或运行中发送",
+    "path": "src/lib/api.ts",
+    "line": 376,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src/lib/api.ts#L376",
+    "phase": "I06",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "b9bc2845909539756747741bcc23557f93c2c69db44977a8f15118b1d4835647",
+    "primary_work_packages": [
+      "I06-T01",
+      "I06-T02",
+      "I06-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C06-N",
+      "C06-F",
+      "C06-R",
+      "C06-P"
+    ],
+    "git_blob_sha256": "a6581d6d0fbdf4caa877dfee33225a12fcfac26336e12fe20520e05254d77645",
+    "normalized_text_sha256": "a6581d6d0fbdf4caa877dfee33225a12fcfac26336e12fe20520e05254d77645",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C07",
+    "repo": "codeg",
+    "name": "标签与批量会话整理",
+    "detail": "全局和工程标签、筛选与管理",
+    "path": "src-tauri/src/commands/conversation_tags.rs",
+    "line": 71,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src-tauri/src/commands/conversation_tags.rs#L71",
+    "phase": "I06",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "b3c3daedc2891d3af8fe2d9e21ebc18df59de5dd34ff6be99d8469c8b61a422e",
+    "primary_work_packages": [
+      "I06-T01",
+      "I06-T02",
+      "I06-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C07-N",
+      "C07-F",
+      "C07-R",
+      "C07-P"
+    ],
+    "git_blob_sha256": "f3dab92c07b917ab4d29bf590f712d3449f2b1961505f1e13d0915c2a2cb091d",
+    "normalized_text_sha256": "f3dab92c07b917ab4d29bf590f712d3449f2b1961505f1e13d0915c2a2cb091d",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C08",
+    "repo": "codeg",
+    "name": "跨智能体异步委派",
+    "detail": "委派策略、子会话与结果汇集",
+    "path": "src-tauri/src/commands/delegation.rs",
+    "line": 12,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src-tauri/src/commands/delegation.rs#L12",
+    "phase": "I04",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "ff1d3f4cb9201c8fcce7b1414a09fefba6df856503d1c1333bcc8e2f1958397a",
+    "primary_work_packages": [
+      "I04-T01",
+      "I04-T02",
+      "I04-T03",
+      "I04-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C08-N",
+      "C08-F",
+      "C08-R",
+      "C08-P"
+    ],
+    "git_blob_sha256": "00da4b15113e594057337a0a41b452b45b2a90a65baa6c08832b11baef279000",
+    "normalized_text_sha256": "00da4b15113e594057337a0a41b452b45b2a90a65baa6c08832b11baef279000",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C09",
+    "repo": "codeg",
+    "name": "快捷消息与命令",
+    "detail": "消息模板和工程命令入口",
+    "path": "src-tauri/src/commands/quick_messages.rs",
+    "line": 12,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src-tauri/src/commands/quick_messages.rs#L12",
+    "phase": "I06",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "66a9a480e5fe95b2c4ba132f9774b18a8ab25349c1ffbca501359c17bb2b77ae",
+    "primary_work_packages": [
+      "I06-T01",
+      "I06-T02",
+      "I06-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C09-N",
+      "C09-F",
+      "C09-R",
+      "C09-P"
+    ],
+    "git_blob_sha256": "f594d69d119ae6292966258db8a5e22209b4324a1c4a658264963bb70e898ca2",
+    "normalized_text_sha256": "f594d69d119ae6292966258db8a5e22209b4324a1c4a658264963bb70e898ca2",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C10",
+    "repo": "codeg",
+    "name": "待办任务与落地",
+    "detail": "待办、运行、待验收、重试、合入与清理",
+    "path": "src-tauri/src/commands/work_task.rs",
+    "line": 604,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src-tauri/src/commands/work_task.rs#L604",
+    "phase": "I04",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "3b34fa9ad71272071718705fda2743647b150cab8d0cf89d98eca9f576ff9d1e",
+    "primary_work_packages": [
+      "I04-T01",
+      "I04-T02",
+      "I04-T03",
+      "I04-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C10-N",
+      "C10-F",
+      "C10-R",
+      "C10-P"
+    ],
+    "git_blob_sha256": "19e7af45584fdebc0ab310795d95b46c40eab0404646467be5c008e74ba6b5a7",
+    "normalized_text_sha256": "19e7af45584fdebc0ab310795d95b46c40eab0404646467be5c008e74ba6b5a7",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C11",
+    "repo": "codeg",
+    "name": "定时自动化",
+    "detail": "Cron、立即运行、运行历史与取消",
+    "path": "src-tauri/src/commands/automation.rs",
+    "line": 198,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src-tauri/src/commands/automation.rs#L198",
+    "phase": "I04",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "99c416cb2c1c97c7324109743752edba74d45018b6a5f52bc37b9f490233d7e4",
+    "primary_work_packages": [
+      "I04-T01",
+      "I04-T02",
+      "I04-T03",
+      "I04-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C11-N",
+      "C11-F",
+      "C11-R",
+      "C11-P"
+    ],
+    "git_blob_sha256": "ce104bedc235f1afbc7392054d703636e2d1b0d8b6564ee4ed415eb9b873de7d",
+    "normalized_text_sha256": "ce104bedc235f1afbc7392054d703636e2d1b0d8b6564ee4ed415eb9b873de7d",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C12",
+    "repo": "codeg",
+    "name": "多画板",
+    "detail": "创建、命名、切换与删除画板",
+    "path": "src/components/canvas/canvas-board-list.tsx",
+    "line": 77,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src/components/canvas/canvas-board-list.tsx#L77",
+    "phase": "I03",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "aa36e89d029a6b647cf0d0dd61bd38ce667f296e13a6abce65eb5344f5994645",
+    "primary_work_packages": [
+      "I03-T01",
+      "I03-T02",
+      "I03-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C12-N",
+      "C12-F",
+      "C12-R",
+      "C12-P"
+    ],
+    "git_blob_sha256": "b5cec59efe8e5bef85acb570799d110669359a3b0ca141f814a7cfae91fc21a4",
+    "normalized_text_sha256": "b5cec59efe8e5bef85acb570799d110669359a3b0ca141f814a7cfae91fc21a4",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C13",
+    "repo": "codeg",
+    "name": "画布区域与布局",
+    "detail": "文件夹、组、智能体、自定义区域与便签",
+    "path": "src-tauri/src/db/entities/canvas_node.rs",
+    "line": 14,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src-tauri/src/db/entities/canvas_node.rs#L14",
+    "phase": "I03",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "24378e4f86ee6ea6a8b2ea1d4af8c3d83271294301a72382ef7daf51a16480dd",
+    "primary_work_packages": [
+      "I03-T01",
+      "I03-T02",
+      "I03-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C13-N",
+      "C13-F",
+      "C13-R",
+      "C13-P"
+    ],
+    "git_blob_sha256": "ad1c7ed50c9759942f264fe763117f4d5ad2f0729398ac7ab7dce8740e016f01",
+    "normalized_text_sha256": "ad1c7ed50c9759942f264fe763117f4d5ad2f0729398ac7ab7dce8740e016f01",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C14",
+    "repo": "codeg",
+    "name": "画布文件与终端",
+    "detail": "文件卡和终端卡，PTY不作为持久会话",
+    "path": "src-tauri/src/db/entities/canvas_node.rs",
+    "line": 35,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src-tauri/src/db/entities/canvas_node.rs#L35",
+    "phase": "I03",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "24378e4f86ee6ea6a8b2ea1d4af8c3d83271294301a72382ef7daf51a16480dd",
+    "primary_work_packages": [
+      "I03-T01",
+      "I03-T02",
+      "I03-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C14-N",
+      "C14-F",
+      "C14-R",
+      "C14-P"
+    ],
+    "git_blob_sha256": "ad1c7ed50c9759942f264fe763117f4d5ad2f0729398ac7ab7dce8740e016f01",
+    "normalized_text_sha256": "ad1c7ed50c9759942f264fe763117f4d5ad2f0729398ac7ab7dce8740e016f01",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C15",
+    "repo": "codeg",
+    "name": "文件树与工程搜索",
+    "detail": "目录遍历、路径过滤与文件查找",
+    "path": "src-tauri/src/commands/folders.rs",
+    "line": 4688,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src-tauri/src/commands/folders.rs#L4688",
+    "phase": "I05",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "0181e533a78063958f3d167f95eab1413990adfc64ae23f356204a62590c9bc1",
+    "primary_work_packages": [
+      "I05-T01",
+      "I05-T02",
+      "I05-T03",
+      "I05-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C15-N",
+      "C15-F",
+      "C15-R",
+      "C15-P"
+    ],
+    "git_blob_sha256": "cd68dd6747ddf7066efa39e8c70c49e9f3ba514054d1fdb03187764540f36b31",
+    "normalized_text_sha256": "cd68dd6747ddf7066efa39e8c70c49e9f3ba514054d1fdb03187764540f36b31",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C16",
+    "repo": "codeg",
+    "name": "编辑与外部修改冲突",
+    "detail": "真实文件编辑保存、外部冲突处理",
+    "path": "src/components/files/external-conflict-dialog.tsx",
+    "line": 30,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src/components/files/external-conflict-dialog.tsx#L30",
+    "phase": "I05",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "e31a8fcb4aed6fc8dfe39c7fe31b1820c1b756b7f7fef399953c4154a39f46e9",
+    "primary_work_packages": [
+      "I05-T01",
+      "I05-T02",
+      "I05-T03",
+      "I05-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C16-N",
+      "C16-F",
+      "C16-R",
+      "C16-P"
+    ],
+    "git_blob_sha256": "16e8441f46c3f8088361e110fe8edb3f0de503a051718bf264e0d0bb97bbd59d",
+    "normalized_text_sha256": "16e8441f46c3f8088361e110fe8edb3f0de503a051718bf264e0d0bb97bbd59d",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C17",
+    "repo": "codeg",
+    "name": "文档与图片预览",
+    "detail": "文本、Markdown、HTML、图片与预览标签",
+    "path": "src/components/files/file-document-view.tsx",
+    "line": 80,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src/components/files/file-document-view.tsx#L80",
+    "phase": "I05",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "ccde2b014aeb6e42ee7f65cd2be6a18f048fb36b20588cf2be0be6705c728346",
+    "primary_work_packages": [
+      "I05-T01",
+      "I05-T02",
+      "I05-T03",
+      "I05-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C17-N",
+      "C17-F",
+      "C17-R",
+      "C17-P"
+    ],
+    "git_blob_sha256": "43d052d5e86f6b1b6fba6e8bfe26ad5f474e63356c95fe99e747bbd01a31b085",
+    "normalized_text_sha256": "43d052d5e86f6b1b6fba6e8bfe26ad5f474e63356c95fe99e747bbd01a31b085",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C18",
+    "repo": "codeg",
+    "name": "Office实时预览",
+    "detail": "docx/xlsx/pptx，依赖officecli watch服务",
+    "path": "src/components/files/office-preview.tsx",
+    "line": 35,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src/components/files/office-preview.tsx#L35",
+    "phase": "I09",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "d3effd06197f962fb513c57b4fea34b88a5c2fd37d83882d71dced42a91ea3f9",
+    "primary_work_packages": [
+      "I09-T01",
+      "I09-T02",
+      "I09-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C18-N",
+      "C18-F",
+      "C18-R",
+      "C18-P"
+    ],
+    "git_blob_sha256": "34a6b61ff0154ac93a5be14f64b8f9c345b4bf9176d31b94f450b3dcd1398f7a",
+    "normalized_text_sha256": "34a6b61ff0154ac93a5be14f64b8f9c345b4bf9176d31b94f450b3dcd1398f7a",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C19",
+    "repo": "codeg",
+    "name": "内置终端",
+    "detail": "PTY创建、输入、缩放、快照和关闭",
+    "path": "src-tauri/src/commands/terminal.rs",
+    "line": 67,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src-tauri/src/commands/terminal.rs#L67",
+    "phase": "I05",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "768f2b4725215e379cefae6f7c93ed8f30b91fc6b90b7a67e3d3633cf1239b44",
+    "primary_work_packages": [
+      "I05-T01",
+      "I05-T02",
+      "I05-T03",
+      "I05-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C19-N",
+      "C19-F",
+      "C19-R",
+      "C19-P"
+    ],
+    "git_blob_sha256": "22d2cbea4efb85ef9f5f7d65778d4b0cd316a46a8ef787efe5f38c102a566441",
+    "normalized_text_sha256": "22d2cbea4efb85ef9f5f7d65778d4b0cd316a46a8ef787efe5f38c102a566441",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C20",
+    "repo": "codeg",
+    "name": "多标签与分屏",
+    "detail": "会话和文件分组，拖动调整布局",
+    "path": "src/components/conversations/group-split-handle.tsx",
+    "line": 24,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src/components/conversations/group-split-handle.tsx#L24",
+    "phase": "I05",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "3fb3198a23256d643597d6c6cab183c2ff6c2b34e4744cd89caa8021ba4975ba",
+    "primary_work_packages": [
+      "I05-T01",
+      "I05-T02",
+      "I05-T03",
+      "I05-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C20-N",
+      "C20-F",
+      "C20-R",
+      "C20-P"
+    ],
+    "git_blob_sha256": "7ab5b2516b93b6f98974d1ffb22acde3b7bac2736ef4499caab25e4af90b0923",
+    "normalized_text_sha256": "7ab5b2516b93b6f98974d1ffb22acde3b7bac2736ef4499caab25e4af90b0923",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C21",
+    "repo": "codeg",
+    "name": "关联目录与多工程",
+    "detail": "目录分组、别名及关联目录",
+    "path": "src-tauri/src/commands/folder_links.rs",
+    "line": 514,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src-tauri/src/commands/folder_links.rs#L514",
+    "phase": "I06",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "678c449f623ec9206952e4310dcde94247131441037f3b0800360ec96e8a39a3",
+    "primary_work_packages": [
+      "I06-T01",
+      "I06-T02",
+      "I06-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C21-N",
+      "C21-F",
+      "C21-R",
+      "C21-P"
+    ],
+    "git_blob_sha256": "ad588eb18a4c87363e47cddbc7d05aacb4a8625ecc45801f08892bc188358499",
+    "normalized_text_sha256": "ad588eb18a4c87363e47cddbc7d05aacb4a8625ecc45801f08892bc188358499",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C22",
+    "repo": "codeg",
+    "name": "克隆与分支工作树",
+    "detail": "克隆、初始化、分支和Worktree",
+    "path": "src-tauri/src/commands/folders.rs",
+    "line": 2161,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src-tauri/src/commands/folders.rs#L2161",
+    "phase": "I05",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "0181e533a78063958f3d167f95eab1413990adfc64ae23f356204a62590c9bc1",
+    "primary_work_packages": [
+      "I05-T01",
+      "I05-T02",
+      "I05-T03",
+      "I05-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C22-N",
+      "C22-F",
+      "C22-R",
+      "C22-P"
+    ],
+    "git_blob_sha256": "cd68dd6747ddf7066efa39e8c70c49e9f3ba514054d1fdb03187764540f36b31",
+    "normalized_text_sha256": "cd68dd6747ddf7066efa39e8c70c49e9f3ba514054d1fdb03187764540f36b31",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C23",
+    "repo": "codeg",
+    "name": "暂存与提交",
+    "detail": "选中文件、实际暂存区与提交",
+    "path": "src-tauri/src/commands/folders.rs",
+    "line": 2929,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src-tauri/src/commands/folders.rs#L2929",
+    "phase": "I05",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "0181e533a78063958f3d167f95eab1413990adfc64ae23f356204a62590c9bc1",
+    "primary_work_packages": [
+      "I05-T01",
+      "I05-T02",
+      "I05-T03",
+      "I05-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C23-N",
+      "C23-F",
+      "C23-R",
+      "C23-P"
+    ],
+    "git_blob_sha256": "cd68dd6747ddf7066efa39e8c70c49e9f3ba514054d1fdb03187764540f36b31",
+    "normalized_text_sha256": "cd68dd6747ddf7066efa39e8c70c49e9f3ba514054d1fdb03187764540f36b31",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C24",
+    "repo": "codeg",
+    "name": "差异与提交历史",
+    "detail": "工作区、分支、历史提交与文件版本",
+    "path": "src-tauri/src/commands/folders.rs",
+    "line": 2628,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src-tauri/src/commands/folders.rs#L2628",
+    "phase": "I05",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "0181e533a78063958f3d167f95eab1413990adfc64ae23f356204a62590c9bc1",
+    "primary_work_packages": [
+      "I05-T01",
+      "I05-T02",
+      "I05-T03",
+      "I05-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C24-N",
+      "C24-F",
+      "C24-R",
+      "C24-P"
+    ],
+    "git_blob_sha256": "cd68dd6747ddf7066efa39e8c70c49e9f3ba514054d1fdb03187764540f36b31",
+    "normalized_text_sha256": "cd68dd6747ddf7066efa39e8c70c49e9f3ba514054d1fdb03187764540f36b31",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C25",
+    "repo": "codeg",
+    "name": "Stash与历史重置",
+    "detail": "stash/pop/apply/drop和reset",
+    "path": "src-tauri/src/commands/folders.rs",
+    "line": 2303,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src-tauri/src/commands/folders.rs#L2303",
+    "phase": "I05",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "0181e533a78063958f3d167f95eab1413990adfc64ae23f356204a62590c9bc1",
+    "primary_work_packages": [
+      "I05-T01",
+      "I05-T02",
+      "I05-T03",
+      "I05-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C25-N",
+      "C25-F",
+      "C25-R",
+      "C25-P"
+    ],
+    "git_blob_sha256": "cd68dd6747ddf7066efa39e8c70c49e9f3ba514054d1fdb03187764540f36b31",
+    "normalized_text_sha256": "cd68dd6747ddf7066efa39e8c70c49e9f3ba514054d1fdb03187764540f36b31",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C26",
+    "repo": "codeg",
+    "name": "合并与三栏冲突编辑",
+    "detail": "merge/rebase、冲突版本、继续或中止",
+    "path": "src/components/merge/three-pane-merge-editor.tsx",
+    "line": 53,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src/components/merge/three-pane-merge-editor.tsx#L53",
+    "phase": "I05",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "4616ad33ba23de7b14fa04eeb1b4f91113bdef6a47c4e045d66ae7e6cc41c17b",
+    "primary_work_packages": [
+      "I05-T01",
+      "I05-T02",
+      "I05-T03",
+      "I05-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C26-N",
+      "C26-F",
+      "C26-R",
+      "C26-P"
+    ],
+    "git_blob_sha256": "f891b3c28be5b98412ad5fd9477215e8ae32187b245113a1b68c04cfb9ed7a28",
+    "normalized_text_sha256": "f891b3c28be5b98412ad5fd9477215e8ae32187b245113a1b68c04cfb9ed7a28",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C27",
+    "repo": "codeg",
+    "name": "远程Git操作",
+    "detail": "remote管理、fetch/pull/push",
+    "path": "src-tauri/src/commands/folders.rs",
+    "line": 1898,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src-tauri/src/commands/folders.rs#L1898",
+    "phase": "I05",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "0181e533a78063958f3d167f95eab1413990adfc64ae23f356204a62590c9bc1",
+    "primary_work_packages": [
+      "I05-T01",
+      "I05-T02",
+      "I05-T03",
+      "I05-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C27-N",
+      "C27-F",
+      "C27-R",
+      "C27-P"
+    ],
+    "git_blob_sha256": "cd68dd6747ddf7066efa39e8c70c49e9f3ba514054d1fdb03187764540f36b31",
+    "normalized_text_sha256": "cd68dd6747ddf7066efa39e8c70c49e9f3ba514054d1fdb03187764540f36b31",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C28",
+    "repo": "codeg",
+    "name": "Forge仓库面板",
+    "detail": "GitHub/GitLab/Gitea/Forgejo议题、评论和PR",
+    "path": "src-tauri/src/commands/forge.rs",
+    "line": 527,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src-tauri/src/commands/forge.rs#L527",
+    "phase": "I07",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "77b87fd20d45e6b0110f022e617fa81c16403b3fb1e8262a5e50c0452c387def",
+    "primary_work_packages": [
+      "I07-T01",
+      "I07-T02",
+      "I07-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C28-N",
+      "C28-F",
+      "C28-R",
+      "C28-P"
+    ],
+    "git_blob_sha256": "40d015886067b05aa35e90015e0b657fb555ccda5936e501847045a1243dac27",
+    "normalized_text_sha256": "40d015886067b05aa35e90015e0b657fb555ccda5936e501847045a1243dac27",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C29",
+    "repo": "codeg",
+    "name": "议题转任务与PR交付",
+    "detail": "来源映射、仓库工作项驱动任务",
+    "path": "src-tauri/src/commands/forge.rs",
+    "line": 854,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src-tauri/src/commands/forge.rs#L854",
+    "phase": "I07",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "77b87fd20d45e6b0110f022e617fa81c16403b3fb1e8262a5e50c0452c387def",
+    "primary_work_packages": [
+      "I07-T01",
+      "I07-T02",
+      "I07-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C29-N",
+      "C29-F",
+      "C29-R",
+      "C29-P"
+    ],
+    "git_blob_sha256": "40d015886067b05aa35e90015e0b657fb555ccda5936e501847045a1243dac27",
+    "normalized_text_sha256": "40d015886067b05aa35e90015e0b657fb555ccda5936e501847045a1243dac27",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C30",
+    "repo": "codeg",
+    "name": "内置浏览器与Agent共享",
+    "detail": "页面、元素、截图、控制台与共享授权",
+    "path": "src/components/browser/browser-bridge-view.tsx",
+    "line": 59,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src/components/browser/browser-bridge-view.tsx#L59",
+    "phase": "I08",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "5cbacda23b960629d1da779f505686589970de7f58a2bc0d8e954189f8bce12c",
+    "primary_work_packages": [
+      "I08-T01",
+      "I08-T02",
+      "I08-T03",
+      "I08-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C30-N",
+      "C30-F",
+      "C30-R",
+      "C30-P"
+    ],
+    "git_blob_sha256": "74403c30b79247bf253c2f5d069ef763509bed2d932cb8d003704cca319379f9",
+    "normalized_text_sha256": "74403c30b79247bf253c2f5d069ef763509bed2d932cb8d003704cca319379f9",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C31",
+    "repo": "codeg",
+    "name": "电脑操作预览",
+    "detail": "共享窗口与Computer工具授权",
+    "path": "src-tauri/src/commands/computer_tools.rs",
+    "line": 241,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src-tauri/src/commands/computer_tools.rs#L241",
+    "phase": "I08",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "5e000c0d22249c073cf759706ed9556d7d274e52eb003626fdb10dc3a005a40a",
+    "primary_work_packages": [
+      "I08-T01",
+      "I08-T02",
+      "I08-T03",
+      "I08-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C31-N",
+      "C31-F",
+      "C31-R",
+      "C31-P"
+    ],
+    "git_blob_sha256": "98ab597ef56e69588a658918f13c05bc84b5bf23b0c8c5b5f1801d63e2d1f5a8",
+    "normalized_text_sha256": "98ab597ef56e69588a658918f13c05bc84b5bf23b0c8c5b5f1801d63e2d1f5a8",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C32",
+    "repo": "codeg",
+    "name": "Skills与专家技能包",
+    "detail": "按智能体启用、技能包及来源管理",
+    "path": "src/components/settings/skills-settings.tsx",
+    "line": 165,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src/components/settings/skills-settings.tsx#L165",
+    "phase": "I02",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "9a40220832e4aa0ffeec33f6410e5ed7ecaa8ffae5b5317b44def6d6fe8e8059",
+    "primary_work_packages": [
+      "I02-T01",
+      "I02-T02",
+      "I02-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C32-N",
+      "C32-F",
+      "C32-R",
+      "C32-P"
+    ],
+    "git_blob_sha256": "06f9daeaff558381987627e768843313353a4fca57194f4b2bf3e819dc14a5b8",
+    "normalized_text_sha256": "06f9daeaff558381987627e768843313353a4fca57194f4b2bf3e819dc14a5b8",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C33",
+    "repo": "codeg",
+    "name": "MCP扫描与安装",
+    "detail": "服务配置、原生扫描与注册表安装",
+    "path": "src/components/settings/mcp-settings.tsx",
+    "line": 378,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src/components/settings/mcp-settings.tsx#L378",
+    "phase": "I02",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "d713e8c91f9f37e276ca8e26f19571c9b82340a9f6024a71cb0d4da569286542",
+    "primary_work_packages": [
+      "I02-T01",
+      "I02-T02",
+      "I02-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C33-N",
+      "C33-F",
+      "C33-R",
+      "C33-P"
+    ],
+    "git_blob_sha256": "ecc2c88993ab5365ca2e7c1c3cb75d4961bc8728f5796babb5dff57d8b2f980f",
+    "normalized_text_sha256": "ecc2c88993ab5365ca2e7c1c3cb75d4961bc8728f5796babb5dff57d8b2f980f",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C34",
+    "repo": "codeg",
+    "name": "用量与估算",
+    "detail": "Token、缓存、热力图与模型价格估算",
+    "path": "src/components/token-usage/token-usage-page.tsx",
+    "line": 195,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src/components/token-usage/token-usage-page.tsx#L195",
+    "phase": "I11",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "235776e2043951563f08fe405ded5fee6c4397dc1f1ca5f06843f36e02093898",
+    "primary_work_packages": [
+      "I11-T01",
+      "I11-T02",
+      "I11-T03",
+      "I11-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C34-N",
+      "C34-F",
+      "C34-R",
+      "C34-P"
+    ],
+    "git_blob_sha256": "ef637e0af5432284bba6791c6519e23475a993d98b7489bf0a6e13cee4de54f2",
+    "normalized_text_sha256": "ef637e0af5432284bba6791c6519e23475a993d98b7489bf0a6e13cee4de54f2",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C35",
+    "repo": "codeg",
+    "name": "Server与远程工作区",
+    "detail": "Codeg服务器、Docker和远程连接",
+    "path": "src/components/settings/web-service-settings.tsx",
+    "line": 280,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src/components/settings/web-service-settings.tsx#L280",
+    "phase": "I10",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "4f04d3eb33e1c3e48f7b9cab09aeed74d885db643e4548997ff22304de074627",
+    "primary_work_packages": [
+      "I10-T01",
+      "I10-T02",
+      "I10-T03",
+      "I10-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C35-N",
+      "C35-F",
+      "C35-R",
+      "C35-P"
+    ],
+    "git_blob_sha256": "4efb8b61a12212d05e3a5171ac27c88b8315ef5218b6720d09e622fd11b62610",
+    "normalized_text_sha256": "4efb8b61a12212d05e3a5171ac27c88b8315ef5218b6720d09e622fd11b62610",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C36",
+    "repo": "codeg",
+    "name": "聊天渠道",
+    "detail": "Telegram、飞书与微信入口",
+    "path": "src-tauri/src/commands/chat_channel.rs",
+    "line": 14,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src-tauri/src/commands/chat_channel.rs#L14",
+    "phase": "I10",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "a2096358b5794571887ad06d45d9c0d36726d25977c69aa2bb6790dd8e1024ea",
+    "primary_work_packages": [
+      "I10-T01",
+      "I10-T02",
+      "I10-T03",
+      "I10-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C36-N",
+      "C36-F",
+      "C36-R",
+      "C36-P"
+    ],
+    "git_blob_sha256": "c5ac00bb6be73a7d96674d1099d896b760c03ea5560edc93c14d6c7a83ce09f1",
+    "normalized_text_sha256": "c5ac00bb6be73a7d96674d1099d896b760c03ea5560edc93c14d6c7a83ce09f1",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C37",
+    "repo": "codeg",
+    "name": "项目启动器",
+    "detail": "生成新项目并预览",
+    "path": "src/components/project-boot/project-boot-workspace.tsx",
+    "line": 8,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src/components/project-boot/project-boot-workspace.tsx#L8",
+    "phase": "I06",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "87f964c7b7c0c7492dac8cf979c1642a2cb2c5c9e76fc24f814ad6ab50bf51ae",
+    "primary_work_packages": [
+      "I06-T01",
+      "I06-T02",
+      "I06-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C37-N",
+      "C37-F",
+      "C37-R",
+      "C37-P"
+    ],
+    "git_blob_sha256": "0fdb48223931742515f38659e760a71e3401180caff0fcb3d311523688253df5",
+    "normalized_text_sha256": "0fdb48223931742515f38659e760a71e3401180caff0fcb3d311523688253df5",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C38",
+    "repo": "codeg",
+    "name": "备份与配置同步",
+    "detail": "恢复预检、加密、回滚与WebDAV配置同步",
+    "path": "src/components/settings/backup-settings.tsx",
+    "line": 51,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src/components/settings/backup-settings.tsx#L51",
+    "phase": "I11",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "d25be195db78751b76cfb002fd6321325b66cbd2f836cbd0306fe06bd82a21f9",
+    "primary_work_packages": [
+      "I11-T01",
+      "I11-T02",
+      "I11-T03",
+      "I11-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C38-N",
+      "C38-F",
+      "C38-R",
+      "C38-P"
+    ],
+    "git_blob_sha256": "41d9f81ec5aa0a380eaceb183f86049147bf71ccec2e4862de58f5ad2a1c6219",
+    "normalized_text_sha256": "41d9f81ec5aa0a380eaceb183f86049147bf71ccec2e4862de58f5ad2a1c6219",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C39",
+    "repo": "codeg",
+    "name": "主题语言和快捷键",
+    "detail": "Codeg完整主题/CSS与十语言",
+    "path": "src/components/settings/appearance-settings.tsx",
+    "line": 63,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src/components/settings/appearance-settings.tsx#L63",
+    "phase": "I11",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "f47ae3dffb639c589b73388f0e996e825e23aaed54093844edd7ad5f0fc9573d",
+    "primary_work_packages": [
+      "I11-T01",
+      "I11-T02",
+      "I11-T03",
+      "I11-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C39-N",
+      "C39-F",
+      "C39-R",
+      "C39-P"
+    ],
+    "git_blob_sha256": "bdfe1eed6832099c2fe21e8cee0f893e684a14604e4a46d1b627bf26027ff7c3",
+    "normalized_text_sha256": "bdfe1eed6832099c2fe21e8cee0f893e684a14604e4a46d1b627bf26027ff7c3",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C40",
+    "repo": "codeg",
+    "name": "通知诊断和更新",
+    "detail": "系统通知、日志、告警与应用更新",
+    "path": "src/components/layout/status-bar-update.tsx",
+    "line": 115,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src/components/layout/status-bar-update.tsx#L115",
+    "phase": "I11",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "e9de062dbbc55b7e70254f214df0e53f41f07cd8fc401da4a318387ca5f967db",
+    "primary_work_packages": [
+      "I11-T01",
+      "I11-T02",
+      "I11-T03",
+      "I11-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C40-N",
+      "C40-F",
+      "C40-R",
+      "C40-P"
+    ],
+    "git_blob_sha256": "2e8fd78087cfc30492e7d53667502249892d7e921e998e04ae328561981c8448",
+    "normalized_text_sha256": "2e8fd78087cfc30492e7d53667502249892d7e921e998e04ae328561981c8448",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C41",
+    "repo": "codeg",
+    "name": "科研技能",
+    "detail": "文献、实验和统计相关技能投递",
+    "path": "src-tauri/src/commands/science.rs",
+    "line": 369,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src-tauri/src/commands/science.rs#L369",
+    "phase": "I09",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "3005957bf591d4c4508e776ec8eb3b9e7e8c4e34e33d808cb51a91004735cb62",
+    "primary_work_packages": [
+      "I09-T01",
+      "I09-T02",
+      "I09-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C41-N",
+      "C41-F",
+      "C41-R",
+      "C41-P"
+    ],
+    "git_blob_sha256": "1b810c563d87674cc5fa773a28e3fc92755b6428428223d0c3341d2d689b9a85",
+    "normalized_text_sha256": "1b810c563d87674cc5fa773a28e3fc92755b6428428223d0c3341d2d689b9a85",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C42",
+    "repo": "codeg",
+    "name": "生成式交互卡片",
+    "detail": "ui-render技能和结构化卡片呈现",
+    "path": "src/components/settings/generative-ui-settings.tsx",
+    "line": 40,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src/components/settings/generative-ui-settings.tsx#L40",
+    "phase": "I09",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "97636bf893ae2a584c9f9224c04fac9ef1392a3691be0b1daee4c13339e904fe",
+    "primary_work_packages": [
+      "I09-T01",
+      "I09-T02",
+      "I09-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C42-N",
+      "C42-F",
+      "C42-R",
+      "C42-P"
+    ],
+    "git_blob_sha256": "dc9167adc6cabee8fcb99c8f253d9aedd9708327aab2dd2c2be0599026baa523",
+    "normalized_text_sha256": "dc9167adc6cabee8fcb99c8f253d9aedd9708327aab2dd2c2be0599026baa523",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C43",
+    "repo": "codeg",
+    "name": "桌面宠物",
+    "detail": "宠物管理、导入与市场入口",
+    "path": "src/components/settings/pet-manager-section.tsx",
+    "line": 61,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src/components/settings/pet-manager-section.tsx#L61",
+    "phase": "I11",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "6e57de8cd0fb4f482210a5599d49d10e58213a5ce3f76bb41b57a97e84d1298f",
+    "primary_work_packages": [
+      "I11-T01",
+      "I11-T02",
+      "I11-T03",
+      "I11-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C43-N",
+      "C43-F",
+      "C43-R",
+      "C43-P"
+    ],
+    "git_blob_sha256": "3af4c170b422b01faafa896c62ad09a4aa6c0e5c877d4f75a94b138d351b12ea",
+    "normalized_text_sha256": "3af4c170b422b01faafa896c62ad09a4aa6c0e5c877d4f75a94b138d351b12ea",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "C44",
+    "repo": "codeg",
+    "name": "恢复入口与外部打开",
+    "detail": "deep link与外部打开",
+    "path": "src/components/workspace/deep-link-bootstrap.tsx",
+    "line": 20,
+    "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src/components/workspace/deep-link-bootstrap.tsx#L20",
+    "phase": "I11",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "e7012af800d05407edd9d985f318cdeb54a9af7c083fd7b6e4e388c2dc90f324",
+    "primary_work_packages": [
+      "I11-T01",
+      "I11-T02",
+      "I11-T03",
+      "I11-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "C44-N",
+      "C44-F",
+      "C44-R",
+      "C44-P"
+    ],
+    "git_blob_sha256": "da8fbbd4157a9dbfee7d2f00a06675da9b4fe3b79c9bcf457b81a7c359fe84b4",
+    "normalized_text_sha256": "da8fbbd4157a9dbfee7d2f00a06675da9b4fe3b79c9bcf457b81a7c359fe84b4",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R01",
+    "repo": "rovai-ai",
+    "name": "首次使用与智能体检查",
+    "detail": "引导、安装发现、模型选择和真实开始",
+    "path": "apps/desktop/src/renderer/src/OnboardingFlow.tsx",
+    "line": 125,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/apps/desktop/src/renderer/src/OnboardingFlow.tsx#L125",
+    "phase": "I02",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "adb9da03c07e9ac542bbd2c854828715d32e14a8247dd56455e9d3272aaee2d8",
+    "primary_work_packages": [
+      "I02-T01",
+      "I02-T02",
+      "I02-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R01-N",
+      "R01-F",
+      "R01-R",
+      "R01-P"
+    ],
+    "git_blob_sha256": "adb9da03c07e9ac542bbd2c854828715d32e14a8247dd56455e9d3272aaee2d8",
+    "normalized_text_sha256": "adb9da03c07e9ac542bbd2c854828715d32e14a8247dd56455e9d3272aaee2d8",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R02",
+    "repo": "rovai-ai",
+    "name": "长期队员身份",
+    "detail": "名字、角色、职责、准则与头像",
+    "path": "apps/desktop/src/renderer/src/MemberManagement.tsx",
+    "line": 928,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/apps/desktop/src/renderer/src/MemberManagement.tsx#L928",
+    "phase": "I02",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "fe6e17ca2d68db67ec669456ace0ce00b7e3822e5fb48122774f7256c9e23871",
+    "primary_work_packages": [
+      "I02-T01",
+      "I02-T02",
+      "I02-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R02-N",
+      "R02-F",
+      "R02-R",
+      "R02-P"
+    ],
+    "git_blob_sha256": "fe6e17ca2d68db67ec669456ace0ce00b7e3822e5fb48122774f7256c9e23871",
+    "normalized_text_sha256": "fe6e17ca2d68db67ec669456ace0ce00b7e3822e5fb48122774f7256c9e23871",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R03",
+    "repo": "rovai-ai",
+    "name": "队员运行配置与环境",
+    "detail": "按队员保存模型、参数、权限和环境",
+    "path": "apps/desktop/src/renderer/src/MemberEnvironmentEditor.tsx",
+    "line": 13,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/apps/desktop/src/renderer/src/MemberEnvironmentEditor.tsx#L13",
+    "phase": "I02",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "1e44c0bb31bd562dfa1d63fe7837942b8b7fa46c08fcbbf74bd78c90d25f1be3",
+    "primary_work_packages": [
+      "I02-T01",
+      "I02-T02",
+      "I02-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R03-N",
+      "R03-F",
+      "R03-R",
+      "R03-P"
+    ],
+    "git_blob_sha256": "1e44c0bb31bd562dfa1d63fe7837942b8b7fa46c08fcbbf74bd78c90d25f1be3",
+    "normalized_text_sha256": "1e44c0bb31bd562dfa1d63fe7837942b8b7fa46c08fcbbf74bd78c90d25f1be3",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R04",
+    "repo": "rovai-ai",
+    "name": "Runtime目录与自定义API",
+    "detail": "Adapter、模型Provider和能力准入",
+    "path": "crates/rovai-core/src/agent_profile.rs",
+    "line": 37,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/crates/rovai-core/src/agent_profile.rs#L37",
+    "phase": "I04",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "257e0deb64a2d8599a81893bb72cd1a67d63b8af37be29cfbcc24d1f3a2725c9",
+    "primary_work_packages": [
+      "I04-T01",
+      "I04-T02",
+      "I04-T03",
+      "I04-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R04-N",
+      "R04-F",
+      "R04-R",
+      "R04-P"
+    ],
+    "git_blob_sha256": "257e0deb64a2d8599a81893bb72cd1a67d63b8af37be29cfbcc24d1f3a2725c9",
+    "normalized_text_sha256": "257e0deb64a2d8599a81893bb72cd1a67d63b8af37be29cfbcc24d1f3a2725c9",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R05",
+    "repo": "rovai-ai",
+    "name": "平台资格与权限",
+    "detail": "逐Runtime逐平台的资格，禁止越级启用",
+    "path": "crates/rovai-core/src/runtime_platform_admission.rs",
+    "line": 50,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/crates/rovai-core/src/runtime_platform_admission.rs#L50",
+    "phase": "I04",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "59f32e30fd12412881f071f911d139ba548e7fc18ee997924a77e495d7696758",
+    "primary_work_packages": [
+      "I04-T01",
+      "I04-T02",
+      "I04-T03",
+      "I04-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R05-N",
+      "R05-F",
+      "R05-R",
+      "R05-P"
+    ],
+    "git_blob_sha256": "59f32e30fd12412881f071f911d139ba548e7fc18ee997924a77e495d7696758",
+    "normalized_text_sha256": "59f32e30fd12412881f071f911d139ba548e7fc18ee997924a77e495d7696758",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R06",
+    "repo": "rovai-ai",
+    "name": "原生Skills与工具箱",
+    "detail": "原址只读发现，按队员工具箱和显式引用",
+    "path": "apps/desktop/src/renderer/src/RebuiltSkillsSettings.tsx",
+    "line": 18,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/apps/desktop/src/renderer/src/RebuiltSkillsSettings.tsx#L18",
+    "phase": "I02",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "c305d8a21e658860da72217ea297c89213e28303f0ea0620a336b61de5964a9d",
+    "primary_work_packages": [
+      "I02-T01",
+      "I02-T02",
+      "I02-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R06-N",
+      "R06-F",
+      "R06-R",
+      "R06-P"
+    ],
+    "git_blob_sha256": "c305d8a21e658860da72217ea297c89213e28303f0ea0620a336b61de5964a9d",
+    "normalized_text_sha256": "c305d8a21e658860da72217ea297c89213e28303f0ea0620a336b61de5964a9d",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R07",
+    "repo": "rovai-ai",
+    "name": "External MCP",
+    "detail": "导入配置、成员分配和按Runtime投递",
+    "path": "apps/desktop/src/renderer/src/McpSettings.tsx",
+    "line": 32,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/apps/desktop/src/renderer/src/McpSettings.tsx#L32",
+    "phase": "I02",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "eea0a2751d88fec4186e4f5f19e4e29c8cc6f861ca6e2bc5387a0e463e11d996",
+    "primary_work_packages": [
+      "I02-T01",
+      "I02-T02",
+      "I02-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R07-N",
+      "R07-F",
+      "R07-R",
+      "R07-P"
+    ],
+    "git_blob_sha256": "eea0a2751d88fec4186e4f5f19e4e29c8cc6f861ca6e2bc5387a0e463e11d996",
+    "normalized_text_sha256": "eea0a2751d88fec4186e4f5f19e4e29c8cc6f861ca6e2bc5387a0e463e11d996",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R08",
+    "repo": "rovai-ai",
+    "name": "公共Thread与快速对话",
+    "detail": "工程绑定、无工程快速对话和持续消息",
+    "path": "crates/rovai-core/src/collaboration.rs",
+    "line": 56,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/crates/rovai-core/src/collaboration.rs#L56",
+    "phase": "I04",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "3db4059270473baffe0a1001d4c262c60dc7622b17ae9fb07ad3463b25642f48",
+    "primary_work_packages": [
+      "I04-T01",
+      "I04-T02",
+      "I04-T03",
+      "I04-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R08-N",
+      "R08-F",
+      "R08-R",
+      "R08-P"
+    ],
+    "git_blob_sha256": "3db4059270473baffe0a1001d4c262c60dc7622b17ae9fb07ad3463b25642f48",
+    "normalized_text_sha256": "3db4059270473baffe0a1001d4c262c60dc7622b17ae9fb07ad3463b25642f48",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R09",
+    "repo": "rovai-ai",
+    "name": "团队模式与动态成员",
+    "detail": "平级/负责人模式、加入退出和Lead替换",
+    "path": "crates/rovai-core/src/collaboration.rs",
+    "line": 113,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/crates/rovai-core/src/collaboration.rs#L113",
+    "phase": "I04",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "3db4059270473baffe0a1001d4c262c60dc7622b17ae9fb07ad3463b25642f48",
+    "primary_work_packages": [
+      "I04-T01",
+      "I04-T02",
+      "I04-T03",
+      "I04-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R09-N",
+      "R09-F",
+      "R09-R",
+      "R09-P"
+    ],
+    "git_blob_sha256": "3db4059270473baffe0a1001d4c262c60dc7622b17ae9fb07ad3463b25642f48",
+    "normalized_text_sha256": "3db4059270473baffe0a1001d4c262c60dc7622b17ae9fb07ad3463b25642f48",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R10",
+    "repo": "rovai-ai",
+    "name": "A2A发送与任务交接",
+    "detail": "指定接收者、公开消息与Delivery执行",
+    "path": "crates/rovai-core/src/team_tool.rs",
+    "line": 93,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/crates/rovai-core/src/team_tool.rs#L93",
+    "phase": "I04",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "8a765ede6a592179d263117a51aa2d7f1c8e32757bc35620318eac59176f855f",
+    "primary_work_packages": [
+      "I04-T01",
+      "I04-T02",
+      "I04-T03",
+      "I04-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R10-N",
+      "R10-F",
+      "R10-R",
+      "R10-P"
+    ],
+    "git_blob_sha256": "8a765ede6a592179d263117a51aa2d7f1c8e32757bc35620318eac59176f855f",
+    "normalized_text_sha256": "8a765ede6a592179d263117a51aa2d7f1c8e32757bc35620318eac59176f855f",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R11",
+    "repo": "rovai-ai",
+    "name": "Thread内单聊",
+    "detail": "私有讨论、单聊历史、结束和待发送输入",
+    "path": "apps/desktop/src/renderer/src/SingleChatPanel.tsx",
+    "line": 89,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/apps/desktop/src/renderer/src/SingleChatPanel.tsx#L89",
+    "phase": "I04",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "5afa30f21d964fcfabdf97528829beaabf2649f938ae06f3e62fe4c735a01912",
+    "primary_work_packages": [
+      "I04-T01",
+      "I04-T02",
+      "I04-T03",
+      "I04-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R11-N",
+      "R11-F",
+      "R11-R",
+      "R11-P"
+    ],
+    "git_blob_sha256": "5afa30f21d964fcfabdf97528829beaabf2649f938ae06f3e62fe4c735a01912",
+    "normalized_text_sha256": "5afa30f21d964fcfabdf97528829beaabf2649f938ae06f3e62fe4c735a01912",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R12",
+    "repo": "rovai-ai",
+    "name": "输入草稿引用和附件",
+    "detail": "结构化Mention、选文引用、文件图片、失败保留",
+    "path": "apps/desktop/src/renderer/src/StructuredMentionComposer.tsx",
+    "line": 146,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/apps/desktop/src/renderer/src/StructuredMentionComposer.tsx#L146",
+    "phase": "I06",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "5993bdc5bbcd930bdcb08ac2b39f06cde521fab07332ac49e6d6ab1a17f619c8",
+    "primary_work_packages": [
+      "I06-T01",
+      "I06-T02",
+      "I06-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R12-N",
+      "R12-F",
+      "R12-R",
+      "R12-P"
+    ],
+    "git_blob_sha256": "5993bdc5bbcd930bdcb08ac2b39f06cde521fab07332ac49e6d6ab1a17f619c8",
+    "normalized_text_sha256": "5993bdc5bbcd930bdcb08ac2b39f06cde521fab07332ac49e6d6ab1a17f619c8",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R13",
+    "repo": "rovai-ai",
+    "name": "历史查找与消息定位",
+    "detail": "正文查找、历史页、锚点与按权限检索",
+    "path": "crates/rovai-web/src/operations.rs",
+    "line": 242,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/crates/rovai-web/src/operations.rs#L242",
+    "phase": "I06",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "259c1af2bfcf682694d5e6f376426a2e998216830048df52e4abd3996f0a07e6",
+    "primary_work_packages": [
+      "I06-T01",
+      "I06-T02",
+      "I06-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R13-N",
+      "R13-F",
+      "R13-R",
+      "R13-P"
+    ],
+    "git_blob_sha256": "259c1af2bfcf682694d5e6f376426a2e998216830048df52e4abd3996f0a07e6",
+    "normalized_text_sha256": "259c1af2bfcf682694d5e6f376426a2e998216830048df52e4abd3996f0a07e6",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R14",
+    "repo": "rovai-ai",
+    "name": "持久Task责任记录",
+    "detail": "创建、分派、阻塞、完成、取消与交接",
+    "path": "crates/rovai-core/src/collaboration.rs",
+    "line": 462,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/crates/rovai-core/src/collaboration.rs#L462",
+    "phase": "I04",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "3db4059270473baffe0a1001d4c262c60dc7622b17ae9fb07ad3463b25642f48",
+    "primary_work_packages": [
+      "I04-T01",
+      "I04-T02",
+      "I04-T03",
+      "I04-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R14-N",
+      "R14-F",
+      "R14-R",
+      "R14-P"
+    ],
+    "git_blob_sha256": "3db4059270473baffe0a1001d4c262c60dc7622b17ae9fb07ad3463b25642f48",
+    "normalized_text_sha256": "3db4059270473baffe0a1001d4c262c60dc7622b17ae9fb07ad3463b25642f48",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R15",
+    "repo": "rovai-ai",
+    "name": "Mission使命板",
+    "detail": "定义目标、队伍、状态和持续任务入口",
+    "path": "apps/desktop/src/renderer/src/MissionBoard.tsx",
+    "line": 50,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/apps/desktop/src/renderer/src/MissionBoard.tsx#L50",
+    "phase": "I04",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "25c8be2e20effca66abe28df300b3179d35dbf47d32a92fa1569b825b3df3e35",
+    "primary_work_packages": [
+      "I04-T01",
+      "I04-T02",
+      "I04-T03",
+      "I04-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R15-N",
+      "R15-F",
+      "R15-R",
+      "R15-P"
+    ],
+    "git_blob_sha256": "25c8be2e20effca66abe28df300b3179d35dbf47d32a92fa1569b825b3df3e35",
+    "normalized_text_sha256": "25c8be2e20effca66abe28df300b3179d35dbf47d32a92fa1569b825b3df3e35",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R16",
+    "repo": "rovai-ai",
+    "name": "Mission工程资源",
+    "detail": "独立工作区、固定基线、清理失败与重试",
+    "path": "crates/rovai-core/src/mission_workspace.rs",
+    "line": 22,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/crates/rovai-core/src/mission_workspace.rs#L22",
+    "phase": "I04",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "866f498140eba6df093f679e570e4bde86c1a0057f850f7fe5a417018498f599",
+    "primary_work_packages": [
+      "I04-T01",
+      "I04-T02",
+      "I04-T03",
+      "I04-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R16-N",
+      "R16-F",
+      "R16-R",
+      "R16-P"
+    ],
+    "git_blob_sha256": "866f498140eba6df093f679e570e4bde86c1a0057f850f7fe5a417018498f599",
+    "normalized_text_sha256": "866f498140eba6df093f679e570e4bde86c1a0057f850f7fe5a417018498f599",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R17",
+    "repo": "rovai-ai",
+    "name": "Mission交付与累计Diff",
+    "detail": "交付、活动、累计变化与PR关联",
+    "path": "crates/rovai-web/src/operations.rs",
+    "line": 36,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/crates/rovai-web/src/operations.rs#L36",
+    "phase": "I04",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "259c1af2bfcf682694d5e6f376426a2e998216830048df52e4abd3996f0a07e6",
+    "primary_work_packages": [
+      "I04-T01",
+      "I04-T02",
+      "I04-T03",
+      "I04-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R17-N",
+      "R17-F",
+      "R17-R",
+      "R17-P"
+    ],
+    "git_blob_sha256": "259c1af2bfcf682694d5e6f376426a2e998216830048df52e4abd3996f0a07e6",
+    "normalized_text_sha256": "259c1af2bfcf682694d5e6f376426a2e998216830048df52e4abd3996f0a07e6",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R18",
+    "repo": "rovai-ai",
+    "name": "执行台和工具过程",
+    "detail": "Run、工具组、时间线、证据和文件变化",
+    "path": "apps/desktop/src/renderer/src/ExecutionToolGroup.tsx",
+    "line": 44,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/apps/desktop/src/renderer/src/ExecutionToolGroup.tsx#L44",
+    "phase": "I04",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "cf0ac7dd44c96c7d33f272116124e552cf3431ad1714d3f8c99f2291a2e096aa",
+    "primary_work_packages": [
+      "I04-T01",
+      "I04-T02",
+      "I04-T03",
+      "I04-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R18-N",
+      "R18-F",
+      "R18-R",
+      "R18-P"
+    ],
+    "git_blob_sha256": "cf0ac7dd44c96c7d33f272116124e552cf3431ad1714d3f8c99f2291a2e096aa",
+    "normalized_text_sha256": "cf0ac7dd44c96c7d33f272116124e552cf3431ad1714d3f8c99f2291a2e096aa",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R19",
+    "repo": "rovai-ai",
+    "name": "审批停止与续做",
+    "detail": "权限回应、精确取消、失败续做和恢复",
+    "path": "crates/rovai-web/src/operations.rs",
+    "line": 296,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/crates/rovai-web/src/operations.rs#L296",
+    "phase": "I04",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "259c1af2bfcf682694d5e6f376426a2e998216830048df52e4abd3996f0a07e6",
+    "primary_work_packages": [
+      "I04-T01",
+      "I04-T02",
+      "I04-T03",
+      "I04-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R19-N",
+      "R19-F",
+      "R19-R",
+      "R19-P"
+    ],
+    "git_blob_sha256": "259c1af2bfcf682694d5e6f376426a2e998216830048df52e4abd3996f0a07e6",
+    "normalized_text_sha256": "259c1af2bfcf682694d5e6f376426a2e998216830048df52e4abd3996f0a07e6",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R20",
+    "repo": "rovai-ai",
+    "name": "运行文件和图片产物",
+    "detail": "结构化文件变更和图片读取展示",
+    "path": "crates/rovai-core/src/agent_run_file_change.rs",
+    "line": 30,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/crates/rovai-core/src/agent_run_file_change.rs#L30",
+    "phase": "I05",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "bdbd8cbc9e530607f6a7cba0aa8c716ea157814a1a8c136a57255d02322870c9",
+    "primary_work_packages": [
+      "I05-T01",
+      "I05-T02",
+      "I05-T03",
+      "I05-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R20-N",
+      "R20-F",
+      "R20-R",
+      "R20-P"
+    ],
+    "git_blob_sha256": "bdbd8cbc9e530607f6a7cba0aa8c716ea157814a1a8c136a57255d02322870c9",
+    "normalized_text_sha256": "bdbd8cbc9e530607f6a7cba0aa8c716ea157814a1a8c136a57255d02322870c9",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R21",
+    "repo": "rovai-ai",
+    "name": "文件预览多标签",
+    "detail": "代码、文本、Markdown、图片、HTML及外部刷新",
+    "path": "apps/desktop/src/renderer/src/FilePreviewPane.tsx",
+    "line": 303,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/apps/desktop/src/renderer/src/FilePreviewPane.tsx#L303",
+    "phase": "I05",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "150033e4805cb1735d240675e3257939c5a84222f14bdebeaf11455eb0c1d39c",
+    "primary_work_packages": [
+      "I05-T01",
+      "I05-T02",
+      "I05-T03",
+      "I05-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R21-N",
+      "R21-F",
+      "R21-R",
+      "R21-P"
+    ],
+    "git_blob_sha256": "150033e4805cb1735d240675e3257939c5a84222f14bdebeaf11455eb0c1d39c",
+    "normalized_text_sha256": "150033e4805cb1735d240675e3257939c5a84222f14bdebeaf11455eb0c1d39c",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R22",
+    "repo": "rovai-ai",
+    "name": "三类协作记忆",
+    "detail": "共同、队员和队员间记忆，按权限读取",
+    "path": "apps/desktop/src/renderer/src/MemoryLibrary.tsx",
+    "line": 94,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/apps/desktop/src/renderer/src/MemoryLibrary.tsx#L94",
+    "phase": "I04",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "b2901049065e35d9eb514da6d765fa96262b95982b397243be2f94843a975470",
+    "primary_work_packages": [
+      "I04-T01",
+      "I04-T02",
+      "I04-T03",
+      "I04-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R22-N",
+      "R22-F",
+      "R22-R",
+      "R22-P"
+    ],
+    "git_blob_sha256": "b2901049065e35d9eb514da6d765fa96262b95982b397243be2f94843a975470",
+    "normalized_text_sha256": "b2901049065e35d9eb514da6d765fa96262b95982b397243be2f94843a975470",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R23",
+    "repo": "rovai-ai",
+    "name": "记忆治理与审核",
+    "detail": "修订、待审核、停止沿用、遗忘和导出",
+    "path": "crates/rovai-core/src/memory.rs",
+    "line": 953,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/crates/rovai-core/src/memory.rs#L953",
+    "phase": "I04",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "57ed7358abe09045fb97619fd1975d1b9730d09e59deb2fe01c07959cae005dc",
+    "primary_work_packages": [
+      "I04-T01",
+      "I04-T02",
+      "I04-T03",
+      "I04-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R23-N",
+      "R23-F",
+      "R23-R",
+      "R23-P"
+    ],
+    "git_blob_sha256": "57ed7358abe09045fb97619fd1975d1b9730d09e59deb2fe01c07959cae005dc",
+    "normalized_text_sha256": "57ed7358abe09045fb97619fd1975d1b9730d09e59deb2fe01c07959cae005dc",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R24",
+    "repo": "rovai-ai",
+    "name": "定时任务控制面",
+    "detail": "计划、立即运行、overlap跳过、超时与结果",
+    "path": "crates/rovai-core/src/automation.rs",
+    "line": 541,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/crates/rovai-core/src/automation.rs#L541",
+    "phase": "I04",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "cdfbb29ae6b9dcd9791fcd4b74641a2dbe8d3320e0faf8534588036459de4bbc",
+    "primary_work_packages": [
+      "I04-T01",
+      "I04-T02",
+      "I04-T03",
+      "I04-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R24-N",
+      "R24-F",
+      "R24-R",
+      "R24-P"
+    ],
+    "git_blob_sha256": "cdfbb29ae6b9dcd9791fcd4b74641a2dbe8d3320e0faf8534588036459de4bbc",
+    "normalized_text_sha256": "cdfbb29ae6b9dcd9791fcd4b74641a2dbe8d3320e0faf8534588036459de4bbc",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R25",
+    "repo": "rovai-ai",
+    "name": "来源明确的用量监控",
+    "detail": "Token、缓存、成本与Coverage，缺项为未知",
+    "path": "apps/desktop/src/renderer/src/RuntimeMonitoring.tsx",
+    "line": 23,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/apps/desktop/src/renderer/src/RuntimeMonitoring.tsx#L23",
+    "phase": "I11",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "4f869f6a831ca09ac60178965acc31d5ffe0d279138e73e98bade3ec98dd10de",
+    "primary_work_packages": [
+      "I11-T01",
+      "I11-T02",
+      "I11-T03",
+      "I11-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R25-N",
+      "R25-F",
+      "R25-R",
+      "R25-P"
+    ],
+    "git_blob_sha256": "4f869f6a831ca09ac60178965acc31d5ffe0d279138e73e98bade3ec98dd10de",
+    "normalized_text_sha256": "4f869f6a831ca09ac60178965acc31d5ffe0d279138e73e98bade3ec98dd10de",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R26",
+    "repo": "rovai-ai",
+    "name": "未读与轻量提醒",
+    "detail": "来源确认、未读点、heads-up与错误恢复",
+    "path": "apps/desktop/src/renderer/src/NotificationAttentionController.tsx",
+    "line": 68,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/apps/desktop/src/renderer/src/NotificationAttentionController.tsx#L68",
+    "phase": "I11",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "1adae853f61e75e7b9678fafa5317af790fa4f8e7901d98bbea629c971de01f7",
+    "primary_work_packages": [
+      "I11-T01",
+      "I11-T02",
+      "I11-T03",
+      "I11-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R26-N",
+      "R26-F",
+      "R26-R",
+      "R26-P"
+    ],
+    "git_blob_sha256": "1adae853f61e75e7b9678fafa5317af790fa4f8e7901d98bbea629c971de01f7",
+    "normalized_text_sha256": "1adae853f61e75e7b9678fafa5317af790fa4f8e7901d98bbea629c971de01f7",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R27",
+    "repo": "rovai-ai",
+    "name": "导航和会话地图",
+    "detail": "工程分组、会话定位、地图与窗口历史",
+    "path": "apps/desktop/src/renderer/src/ThreadWorldMap.tsx",
+    "line": 169,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/apps/desktop/src/renderer/src/ThreadWorldMap.tsx#L169",
+    "phase": "I06",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "afe6881137ac4ea16dedefa3b5e403235f94154709fa9b0d322cc07afe36ae97",
+    "primary_work_packages": [
+      "I06-T01",
+      "I06-T02",
+      "I06-T03"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R27-N",
+      "R27-F",
+      "R27-R",
+      "R27-P"
+    ],
+    "git_blob_sha256": "afe6881137ac4ea16dedefa3b5e403235f94154709fa9b0d322cc07afe36ae97",
+    "normalized_text_sha256": "afe6881137ac4ea16dedefa3b5e403235f94154709fa9b0d322cc07afe36ae97",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R28",
+    "repo": "rovai-ai",
+    "name": "Desktop Web与移动浏览器",
+    "detail": "受控Web访问、认证与响应式页面",
+    "path": "apps/desktop/src/renderer/src/HostWebSettings.tsx",
+    "line": 12,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/apps/desktop/src/renderer/src/HostWebSettings.tsx#L12",
+    "phase": "I10",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "06e9ccafa762d627193c448ee7c2208469f0962aaf0a30e5915238fe44c5b255",
+    "primary_work_packages": [
+      "I10-T01",
+      "I10-T02",
+      "I10-T03",
+      "I10-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R28-N",
+      "R28-F",
+      "R28-R",
+      "R28-P"
+    ],
+    "git_blob_sha256": "06e9ccafa762d627193c448ee7c2208469f0962aaf0a30e5915238fe44c5b255",
+    "normalized_text_sha256": "06e9ccafa762d627193c448ee7c2208469f0962aaf0a30e5915238fe44c5b255",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R29",
+    "repo": "rovai-ai",
+    "name": "独立Server",
+    "detail": "独立Host实例、授权操作和静态Web客户端",
+    "path": "crates/rovai-web/src/lib.rs",
+    "line": 3,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/crates/rovai-web/src/lib.rs#L3",
+    "phase": "I10",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "ca1fb9717293ccc94ccd5531b5e2db623cb5cbd423b692a8556ed8220447cee2",
+    "primary_work_packages": [
+      "I10-T01",
+      "I10-T02",
+      "I10-T03",
+      "I10-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R29-N",
+      "R29-F",
+      "R29-R",
+      "R29-P"
+    ],
+    "git_blob_sha256": "ca1fb9717293ccc94ccd5531b5e2db623cb5cbd423b692a8556ed8220447cee2",
+    "normalized_text_sha256": "ca1fb9717293ccc94ccd5531b5e2db623cb5cbd423b692a8556ed8220447cee2",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R30",
+    "repo": "rovai-ai",
+    "name": "飞书Lark与钉钉",
+    "detail": "Bot身份、Owner授权、渠道结果与配置",
+    "path": "apps/desktop/src/renderer/src/ChannelSettings.tsx",
+    "line": 73,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/apps/desktop/src/renderer/src/ChannelSettings.tsx#L73",
+    "phase": "I10",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "aaeb73e8164b6f0b0a8495398db03530348b0dc1ad823d100c6580c8ddc3ea5e",
+    "primary_work_packages": [
+      "I10-T01",
+      "I10-T02",
+      "I10-T03",
+      "I10-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R30-N",
+      "R30-F",
+      "R30-R",
+      "R30-P"
+    ],
+    "git_blob_sha256": "aaeb73e8164b6f0b0a8495398db03530348b0dc1ad823d100c6580c8ddc3ea5e",
+    "normalized_text_sha256": "aaeb73e8164b6f0b0a8495398db03530348b0dc1ad823d100c6580c8ddc3ea5e",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R31",
+    "repo": "rovai-ai",
+    "name": "启动诊断和降级恢复",
+    "detail": "Core状态、数据目录准入、错误和诊断导出",
+    "path": "apps/desktop/src/renderer/src/BusinessApp.tsx",
+    "line": 818,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/apps/desktop/src/renderer/src/BusinessApp.tsx#L818",
+    "phase": "I11",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "5154cdfab778248c9ec237c1161074ff979178a12cae9337a8d78d71b4abf3da",
+    "primary_work_packages": [
+      "I11-T01",
+      "I11-T02",
+      "I11-T03",
+      "I11-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R31-N",
+      "R31-F",
+      "R31-R",
+      "R31-P"
+    ],
+    "git_blob_sha256": "5154cdfab778248c9ec237c1161074ff979178a12cae9337a8d78d71b4abf3da",
+    "normalized_text_sha256": "5154cdfab778248c9ec237c1161074ff979178a12cae9337a8d78d71b4abf3da",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R32",
+    "repo": "rovai-ai",
+    "name": "用户终端自动化",
+    "detail": "rovai app检查与本地诊断自动化入口",
+    "path": "apps/desktop/src/main/user-automation.ts",
+    "line": 20,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/apps/desktop/src/main/user-automation.ts#L20",
+    "phase": "I10",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "4f4600eb2fff121647436dbf1a7a763b1475236825ad5a4de42edad0de818825",
+    "primary_work_packages": [
+      "I10-T01",
+      "I10-T02",
+      "I10-T03",
+      "I10-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R32-N",
+      "R32-F",
+      "R32-R",
+      "R32-P"
+    ],
+    "git_blob_sha256": "4f4600eb2fff121647436dbf1a7a763b1475236825ad5a4de42edad0de818825",
+    "normalized_text_sha256": "4f4600eb2fff121647436dbf1a7a763b1475236825ad5a4de42edad0de818825",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R33",
+    "repo": "rovai-ai",
+    "name": "主题语言与关闭行为",
+    "detail": "中英、主题、减少动态效果、关闭设置",
+    "path": "apps/desktop/src/renderer/src/GeneralSettings.tsx",
+    "line": 42,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/apps/desktop/src/renderer/src/GeneralSettings.tsx#L42",
+    "phase": "I11",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "b4fe1b78b78d646c9d46541ce4a758850393524eecb0931a788cfc9081e358c9",
+    "primary_work_packages": [
+      "I11-T01",
+      "I11-T02",
+      "I11-T03",
+      "I11-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R33-N",
+      "R33-F",
+      "R33-R",
+      "R33-P"
+    ],
+    "git_blob_sha256": "b4fe1b78b78d646c9d46541ce4a758850393524eecb0931a788cfc9081e358c9",
+    "normalized_text_sha256": "b4fe1b78b78d646c9d46541ce4a758850393524eecb0931a788cfc9081e358c9",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R34",
+    "repo": "rovai-ai",
+    "name": "执行恢复和有序关闭",
+    "detail": "Warm/cold恢复、代次隔离和退出等待",
+    "path": "crates/rovai-core/src/planned_shutdown.rs",
+    "line": 17,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/crates/rovai-core/src/planned_shutdown.rs#L17",
+    "phase": "I11",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "cb65ad49062feaeeba9faedbcc743da335d218b267cee7032e59aa8fb31e351f",
+    "primary_work_packages": [
+      "I11-T01",
+      "I11-T02",
+      "I11-T03",
+      "I11-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R34-N",
+      "R34-F",
+      "R34-R",
+      "R34-P"
+    ],
+    "git_blob_sha256": "cb65ad49062feaeeba9faedbcc743da335d218b267cee7032e59aa8fb31e351f",
+    "normalized_text_sha256": "cb65ad49062feaeeba9faedbcc743da335d218b267cee7032e59aa8fb31e351f",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "R35",
+    "repo": "rovai-ai",
+    "name": "命令幂等和授权",
+    "detail": "同命令回执、Actor与版本约束",
+    "path": "crates/rovai-core/src/command.rs",
+    "line": 83,
+    "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/crates/rovai-core/src/command.rs#L83",
+    "phase": "I04",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a",
+    "primary_work_packages": [
+      "I04-T01",
+      "I04-T02",
+      "I04-T03",
+      "I04-T04"
+    ],
+    "platform_matrix": [
+      "Windows Desktop",
+      "macOS Desktop",
+      "Linux Desktop",
+      "Web/Server按源适用面验证"
+    ],
+    "acceptance_cases": [
+      "R35-N",
+      "R35-F",
+      "R35-R",
+      "R35-P"
+    ],
+    "git_blob_sha256": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a",
+    "normalized_text_sha256": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "M01",
+    "repo": "codeg-ios",
+    "name": "iOS 原生客户端",
+    "detail": "iPhone/iPad，原生会话、事件流、审批、文件、终端及设置，统一 Host 和融合对象。",
+    "path": "CodegiOS/Networking/CodegClient.swift",
+    "line": 6,
+    "url": "https://github.com/xintaofei/codeg-ios/blob/e2d75f918a64bc8a450216155cbc3ae4a820b0f1/CodegiOS/Networking/CodegClient.swift#L6",
+    "phase": "I10",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "e1b9c3aa3d650823353da08ab245a6e58b010fc7a93007c5c1535918b6071bb3",
+    "primary_work_packages": [
+      "I10-T01",
+      "I10-T02",
+      "I10-T03",
+      "I10-T04"
+    ],
+    "platform_matrix": [
+      "iOS26 iPhone",
+      "iOS26 iPad",
+      "Desktop Host",
+      "Server Host"
+    ],
+    "acceptance_cases": [
+      "M01-N",
+      "M01-F",
+      "M01-R",
+      "M01-P"
+    ],
+    "git_blob_sha256": "c72ad20da04feaf96e12031c60ef3f0320279335071ae04c83fce2c408820c49",
+    "normalized_text_sha256": "c72ad20da04feaf96e12031c60ef3f0320279335071ae04c83fce2c408820c49",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  },
+  {
+    "id": "M02",
+    "repo": "codeg-android",
+    "name": "Android 原生客户端",
+    "detail": "手机/平板，原生会话、工程/Git、设置、事件流及审批，统一 Host 和融合对象。",
+    "path": "app/src/main/java/app/codeg/android/core/network/CodegClient.kt",
+    "line": 155,
+    "url": "https://github.com/xintaofei/codeg-android/blob/33dba91b1522330fe519c27c4833066e35c9495e/app/src/main/java/app/codeg/android/core/network/CodegClient.kt#L155",
+    "phase": "I10",
+    "scope": "一期必须",
+    "implementation_status": "not_started",
+    "acceptance_status": "not_run",
+    "source_sha256": "8ebdbf79d51f8512469c497f64e3c4ed5c0315eddf159847c7eb87caa3981f95",
+    "primary_work_packages": [
+      "I10-T01",
+      "I10-T02",
+      "I10-T03",
+      "I10-T04"
+    ],
+    "platform_matrix": [
+      "Android12+ 手机",
+      "Android12+ 平板",
+      "Desktop Host",
+      "Server Host"
+    ],
+    "acceptance_cases": [
+      "M02-N",
+      "M02-F",
+      "M02-R",
+      "M02-P"
+    ],
+    "git_blob_sha256": "b6f0f288105a61dbf690d88ad03261bf73b0fba90948ad95e2419d57aedfa977",
+    "normalized_text_sha256": "b6f0f288105a61dbf690d88ad03261bf73b0fba90948ad95e2419d57aedfa977",
+    "source_hash_method": "source_sha256为本地只读快照原始字节；git_blob_sha256为固定提交对象；normalized_text_sha256统一CRLF为LF"
+  }
+]
