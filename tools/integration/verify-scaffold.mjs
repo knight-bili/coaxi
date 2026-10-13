@@ -18,8 +18,15 @@ const entries = read('integration/inventory/source-entrypoints.json');
 const ids = new Set(features.map((x) => x.id));
 const caseIds = new Set(cases.map((x) => x.id));
 const phases = new Set(schedule.phases.map((x) => x.id));
+const baselineFeatureIds = [
+  ...Array.from({ length: 44 }, (_, i) => `C${String(i + 1).padStart(2, '0')}`),
+  ...Array.from({ length: 35 }, (_, i) => `R${String(i + 1).padStart(2, '0')}`),
+  'M01', 'M02',
+];
 assert(source.sources.length === 4, '必须锁定四份源码');
+assert(new Set(source.sources.map((x) => x.id)).size === 4 && ['codeg', 'rovai-ai', 'codeg-ios', 'codeg-android'].every((id) => source.sources.some((x) => x.id === id)), '源码来源缺失或重复');
 assert(ids.size === features.length && features.length >= 81, '来源能力缺失或重复');
+assert(baselineFeatureIds.every((id) => ids.has(id)), '固定基线能力被删除或替换');
 assert(caseIds.size === cases.length && cases.length >= 324, '场景缺失或重复');
 assert(new Set(tasks.map((x) => x.id)).size === tasks.length && tasks.length >= 48, '工作包缺失或重复');
 for (const s of source.sources) {
@@ -34,10 +41,12 @@ const base = source.sources.find((x) => x.id === 'rovai-ai').commit;
 git('merge-base', '--is-ancestor', base, 'HEAD');
 for (const f of features) {
   assert(f.scope === '一期必须' && phases.has(f.phase), `来源范围或阶段错误 ${f.id}`);
-  assert(source.sources.some((s) => s.id === f.repo && f.url.includes(s.commit)), `来源链接未固定 ${f.id}`);
+  const owner = source.sources.find((s) => s.id === f.repo);
+  assert(owner && f.url === `${owner.repository}/blob/${owner.commit}/${f.path}#L${f.line}`, `来源链接未固定 ${f.id}`);
   assert(/^[a-f0-9]{64}$/.test(f.source_sha256), `来源hash缺失 ${f.id}`);
   assert(f.primary_work_packages.length > 0 && f.primary_work_packages.every((id) => tasks.some((t) => t.id === id && t.phase === f.phase)), `工作包映射缺失 ${f.id}`);
   assert(f.acceptance_cases.length >= 4 && f.acceptance_cases.every((id) => cases.some((c) => c.id === id && c.feature === f.id && c.phase === f.phase)), `场景映射缺失 ${f.id}`);
+  assert(new Set(f.acceptance_cases).size === f.acceptance_cases.length && ['N', 'F', 'R', 'P'].every((kind) => f.acceptance_cases.includes(`${f.id}-${kind}`)), `基线场景缺失或重复绑定 ${f.id}`);
 }
 for (const c of cases) {
   assert(ids.has(c.feature) && phases.has(c.phase) && c.steps && c.expected && c.platforms.length, `场景不完整 ${c.id}`);
@@ -45,6 +54,7 @@ for (const c of cases) {
   assert(c.status !== 'passed' || c.evidence, `通过用例缺少证据 ${c.id}`);
 }
 assert(runtime.runtimes.length >= 21 && runtime.custom_acp, 'Runtime并集缺失');
+assert(new Set(runtime.runtimes.map((x) => x.id)).size === runtime.runtimes.length, 'Runtime重复');
 assert(entries.count === entries.entries.length && entries.count > 0, '入口库存不完整');
 const weekdayCount = (start, end) => {
   const date = new Date(`${start}T00:00:00Z`), last = new Date(`${end}T00:00:00Z`); let count = 0;
@@ -53,6 +63,8 @@ const weekdayCount = (start, end) => {
   return count;
 };
 for (const p of schedule.phases) assert(weekdayCount(p.start, p.end) === p.days, `阶段日期天数不一致 ${p.id}`);
+assert(phases.size === schedule.phases.length && ['I00', 'I01', 'I02', 'I03', 'I04', 'I05', 'I06', 'I07', 'I08', 'I09', 'I10', 'I11', 'I12', 'BUF'].every((id) => phases.has(id)), '阶段缺失或重复');
+for (let i = 1; i < schedule.phases.length; i++) assert(schedule.phases[i].start > schedule.phases[i - 1].end, `顺序排期重叠 ${schedule.phases[i].id}`);
 assert(schedule.phases.reduce((sum, p) => sum + p.days, 0) === schedule.total_days, '总天数不一致');
 assert(schedule.base_days + schedule.reserve_days === schedule.total_days, '预留天数不一致');
 
