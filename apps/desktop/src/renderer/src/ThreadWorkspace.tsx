@@ -106,6 +106,8 @@ import {
   composerBodyForContent,
   emptyLocalThreadComposerDraft,
   loadLocalThreadComposerDraft,
+  localThreadComposerDraftIsEmpty,
+  copyLegacyThreadComposerDraft,
   materializeLocalContinuation,
   nextLocalThreadComposerDraftAfterSend,
   saveLocalThreadComposerDraft,
@@ -1814,6 +1816,10 @@ export function ThreadWorkspace({
   const memberCreationRef = useRef(memberCreation)
   memberCreationRef.current = memberCreation
   const composerStorage = useMemo(() => threadComposerDraftStorage(client.editingRecovery), [client.editingRecovery])
+  const legacyComposerDraft = useMemo(() => client.editingRecovery && !memberCreation
+    ? loadLocalThreadComposerDraft(snapshot.thread.id) : null,
+  [client.editingRecovery, snapshot.thread.id, memberCreation])
+  const [legacyDraftRecoveryError, setLegacyDraftRecoveryError] = useState<string | null>(null)
   const pendingDraftPersistence = useRef<PendingThreadDraftPersistence | null>(null)
   if (!pendingDraftPersistence.current) pendingDraftPersistence.current = new PendingThreadDraftPersistence(client)
   const pendingThreadLeaveRef = useRef(onPendingThreadLeave)
@@ -3193,6 +3199,29 @@ export function ThreadWorkspace({
     }
   }
 
+  const recoverLegacyComposerDraft = async (): Promise<void> => {
+    if (!composerStorage || composerSubmittingRef.current || routingMutatingRef.current) return
+    const threadId = snapshot.thread.id
+    const epoch = draftCoordinator.getEpoch()
+    setLegacyDraftRecoveryError(null)
+    try {
+      await mutateRoutingDraft(async () => {
+        await attachmentPreparationQueue.current
+        const current = await draftCoordinator.waitForIdle()
+        const legacy = loadLocalThreadComposerDraft(threadId)
+        if (draftCoordinator.getEpoch() !== epoch || current?.threadId !== threadId || !legacy) {
+          throw new Error(uiAttribute('旧草稿暂不可恢复，请重新打开此对话。'))
+        }
+        if (!copyLegacyThreadComposerDraft(current, legacy, composerStorage)) {
+          throw new Error(uiAttribute('当前标签已有内容或旧草稿已变化，未覆盖。'))
+        }
+        return draftCoordinator.load()
+      })
+    } catch (error) {
+      if (draftCoordinator.getEpoch() === epoch) setLegacyDraftRecoveryError(readErrorMessage(error))
+    }
+  }
+
   const focusComposerAtBoundary = (
     _modality: ReplyFocusModality,
     boundary: 'start' | 'end'
@@ -3397,6 +3426,7 @@ export function ThreadWorkspace({
     setDraftLoadState({ state: 'loading' })
     setComposerPersistenceError(null)
     setComposerInviteMessage(null)
+    setLegacyDraftRecoveryError(null)
     setComposerLocalStatus({
       hasContent: false,
       hasExplicitRecipient: false,
@@ -6032,6 +6062,16 @@ export function ThreadWorkspace({
               <span className="composer-reply-status" role="status" aria-live="polite"><UiText zh={"本机草稿保存失败；当前窗口内内容仍保留。"} />{composerPersistenceError.message}
               </span>
             )}
+            {legacyComposerDraft && !localThreadComposerDraftIsEmpty(legacyComposerDraft)
+              && composerDraft && localThreadComposerDraftIsEmpty(composerDraft)
+              && !composerLocalStatus.hasContent && (
+              <span className="composer-reply-status legacy-draft-recovery" role="status">
+                <UiText zh={"此浏览器保留了旧版草稿。恢复后原记录仍保留，附件需重新选择。"} />
+                <button type="button" className="quiet-button compact" disabled={composerInteractionDisabled || routingMutating}
+                  onClick={() => void recoverLegacyComposerDraft()}><UiText zh={"恢复到当前标签"} /></button>
+              </span>
+            )}
+            {legacyDraftRecoveryError && <span className="composer-reply-status" role="alert">{legacyDraftRecoveryError}</span>}
             {composerInviteMessage && (
               <span className="composer-reply-status composer-invite-error" role="alert">
                 {composerInviteMessage}

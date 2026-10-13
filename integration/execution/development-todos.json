@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "policy": "研发可修问题由研发继续处理，不列为客户资源阻塞",
   "items": [
     {
@@ -15,11 +15,11 @@
     {
       "id": "DEV-WEB-LEGACY-DRAFT-RECOVERY",
       "task": "I02-T01/I12兼容整改",
-      "status": "pending",
+      "status": "explicit_legacy_restore_verified_closed_browser_private_draft_pending",
       "file": "apps/desktop/src/renderer/src/camp-composer-local-store.ts",
-      "problem": "旧Web origin共享草稿缺编辑身份，修复隔离后不能自动转给任一标签；旧记录保留，需设计并实现显式恢复，同时补测草稿的完整浏览器退出/恢复",
+      "problem": "旧无身份Web草稿显式恢复已实现并用实际修复前数据验证；新私有草稿的完整浏览器退出/恢复及真实旧附件还需验证",
       "owner": "研发",
-      "evidence": "同一浏览器两标签串读已复现并修复；当前验证同一编辑身份下刷新恢复，未声称完整浏览器重开能恢复旧草稿"
+      "evidence": "i02-legacy-draft-result.json：5项真实Host检查通过；原记录字节不变、现有输入不覆盖、刷新恢复；单测验证旧附件不信原路径和配额失败不改原记录"
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "status": "active",
   "objective": "按v4完整一期计划推进I00至I12及必要整改缓冲，所有工作包自审、自验、自测，交付完整融合MVP",
   "scope": {
@@ -14,7 +14,7 @@
   "current_branch": "phase/i02-workbench",
   "base_branch": "phase/i01-foundation",
   "current_task": "I02-T01",
-  "current_slice": "工程首页入口、受Core核实的路径与页面历史关联",
+  "current_slice": "工程导航、Web私有文字及旧草稿显式恢复",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "I02-T01按当前合同改写原生Web夹具、补显式旧草稿恢复并核查剩余导航差异",
+    "I02-T01补完整浏览器退出后的私有草稿恢复、重写旧Mac夹具并核查剩余导航差异",
     "I02-T02先盘点独立测试Runtime，再融合成员与Provider",
     "I02-T03 Skills/MCP",
     "按原依赖推进I03至I12"
@@ -42,5 +42,6 @@
   "fusion_acceptance": "not_run",
   "current_slice_status": "component_and_real_host_navigation_verified_task_in_progress",
   "evidence": "i02-navigation-result.json",
-  "live_evidence": "i02-navigation-live-result.json"
+  "live_evidence": "i02-navigation-live-result.json",
+  "legacy_evidence": "i02-legacy-draft-result.json"
 }

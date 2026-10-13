@@ -124,8 +124,8 @@ try {
   await browser.wait(home('I02-工程-B'))
   record('production_history_back_forward')
   stage = 'reload'
-  await browser.send('Page.reload')
-  await browser.wait(home('I02-工程-B'))
+  await browser.reload()
+  await browser.wait(`(${home('I02-工程-B')}) && document.querySelector('.web-login-overlay') === null`)
   record('production_reload_restores_project')
   stage = 'late_real_response'
   let held, holdA = true, resolveHeld, resolveACompleted, resolveBCompleted, nextBRequestId
@@ -240,12 +240,12 @@ try {
   await browser.send('Input.insertText', { text: 'I02_TAB_B_UNSENT' })
   await browser.wait(`${editor}.textContent === 'I02_TAB_B_UNSENT'`)
   await browser.wait(`(${storedDraft})?.includes('I02_TAB_B_UNSENT') === true`)
-  await browser.send('Page.reload')
-  await browser.wait(`${editor}?.textContent === 'I02_TAB_B_UNSENT'`)
+  await browser.reload()
+  await browser.wait(`${editor}?.textContent === 'I02_TAB_B_UNSENT' && document.querySelector('.web-login-overlay') === null`)
   browser.usePage()
   assert.equal(await browser.evaluate(`${editor}.textContent`), 'I02_TAB_A_UNSENT')
-  await browser.send('Page.reload')
-  await browser.wait(`${editor}?.textContent === 'I02_TAB_A_UNSENT'`)
+  await browser.reload()
+  await browser.wait(`${editor}?.textContent === 'I02_TAB_A_UNSENT' && document.querySelector('.web-login-overlay') === null`)
   browser.usePage(secondPage)
   assert.equal(await browser.evaluate(`${editor}.textContent`), 'I02_TAB_B_UNSENT')
   record('same_browser_tabs_keep_unsent_text_private_and_restore_after_reload')

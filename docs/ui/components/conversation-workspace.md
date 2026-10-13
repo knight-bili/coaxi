@@ -2,10 +2,18 @@
 document_type: ui-component-contract
 authority: renderer-camp-workspace
 status: accepted
-last_updated: 2026-10-13
+last_updated: 2026-10-14
 ---
 
 # Camp 会话工作区
+
+## 融合期 Web 旧草稿恢复
+
+Web 使用当前已验证编辑身份的草稿存储。旧版本留在浏览器共享存储的同一 Thread 草稿不自动进入新标签；
+当前标签为空时显示中性恢复提示，用户选择“恢复到当前标签”后才复制，原记录保持。
+恢复前先保存/检查当前输入，出现新输入、切换了 Thread 或旧记录不可用时不覆盖。旧附件不沿用原路径，
+显示待重新选择；回复与成员身份仍经过既有恢复校验。存储失败保留原记录和当前输入，错误在 Composer 内显示。
+此入口不适用于 Desktop 的原本机存储，也不导入退役的 Core public Draft/Pending 表。
 
 ## Public Camp v1.60 当前边界
 

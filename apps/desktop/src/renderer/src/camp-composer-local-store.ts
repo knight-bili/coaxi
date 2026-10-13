@@ -180,6 +180,21 @@ export function localThreadComposerDraftIsEmpty(draft: ThreadComposerDraftView):
     && draft.continuationIntent === null
 }
 
+export function copyLegacyThreadComposerDraft(
+  current: ThreadComposerDraftView,
+  legacy: ThreadComposerDraftView,
+  storage: DraftStorage
+): ThreadComposerDraftView | null {
+  if (current.threadId !== legacy.threadId || !localThreadComposerDraftIsEmpty(current)
+    || !isStoredDraft(legacy, current.threadId) || localThreadComposerDraftIsEmpty(legacy)) return null
+  const next: ThreadComposerDraftView = {
+    ...legacy, revision: current.revision + 1,
+    attachments: legacy.attachments.map(({ sourcePath: _sourcePath, ...attachment }) => ({ ...attachment, availability: 'unknown' }))
+  }
+  saveLocalThreadComposerDraft(next, storage)
+  return next
+}
+
 export function saveLocalThreadComposerDraft(
   draft: ThreadComposerDraftView,
   storage: DraftStorage | null = browserStorage()

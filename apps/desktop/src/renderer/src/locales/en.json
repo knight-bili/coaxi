@@ -3710,5 +3710,9 @@
   "已重置{0}的会话。": "{0}’s session was reset.",
   "重置会话": "Reset session",
   "项目目录未保存，请重新添加。": "The project folder was not saved. Please add it again.",
-  "项目目录未保存，现有会话仍可正常使用。": "Project folders were not saved. Existing conversations remain available."
+  "项目目录未保存，现有会话仍可正常使用。": "Project folders were not saved. Existing conversations remain available.",
+  "此浏览器保留了旧版草稿。恢复后原记录仍保留，附件需重新选择。": "This browser has a legacy draft. Recovery keeps the original; select attachments again.",
+  "恢复到当前标签": "Restore to this tab",
+  "旧草稿暂不可恢复，请重新打开此对话。": "The legacy draft is unavailable. Reopen this conversation.",
+  "当前标签已有内容或旧草稿已变化，未覆盖。": "This tab already has input or the legacy draft changed. Nothing was replaced."
 }

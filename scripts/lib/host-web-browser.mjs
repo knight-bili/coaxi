@@ -103,6 +103,24 @@ export async function launchAcceptanceBrowser({ executable, args, env = process.
     return {
       send, evaluate, errors, responses, fileChoosers, close,
       onProtocolEvent(listener) { protocolListeners.add(listener); return () => protocolListeners.delete(listener) },
+      async reload() {
+        const session = activeSession
+        const { frameTree } = await send('Page.getFrameTree')
+        let listener, timer
+        const navigated = new Promise((resolve, reject) => {
+          listener = message => {
+            if ((message.sessionId ?? null) !== session || message.method !== 'Page.frameNavigated') return
+            const frame = message.params.frame
+            if (frame.id === frameTree.frame.id && frame.loaderId !== frameTree.frame.loaderId) resolve()
+          }
+          protocolListeners.add(listener)
+          timer = setTimeout(() => reject(Error('Reload did not commit a new document')), 20_000)
+        })
+        try {
+          await Promise.all([send('Page.reload'), navigated])
+          await this.wait(`document.readyState === 'complete'`)
+        } finally { clearTimeout(timer); protocolListeners.delete(listener) }
+      },
       usePage(sessionId = null) { activeSession = sessionId },
       async newPage(url) {
         const { targetId } = await send('Target.createTarget', { url }, null)
