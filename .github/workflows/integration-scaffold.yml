@@ -1,0 +1,46 @@
+name: Integration scaffold
+
+on:
+  push:
+    branches: ['phase/**']
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: integration-scaffold-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scaffold:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: 24
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
+        with:
+          version: 11.20.0
+          run_install: false
+      - name: Install locked documentation dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Verify integration planning and provenance
+        run: node tools/integration/verify-scaffold.mjs
+      - name: Validate existing documentation governance
+        env:
+          DOCS_BASE_REF: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if [ -z "$DOCS_BASE_REF" ]; then export DOCS_BASE_REF="$GITHUB_SHA"; fi
+          node --test scripts/lib/doc-decisions.test.mjs
+          node scripts/check-doc-version.mjs
+          node scripts/check-doc-decisions.mjs --require-base
+      - name: Check diff whitespace
+        run: git diff --check

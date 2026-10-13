@@ -1,0 +1,504 @@
+{
+  "status": "not_run",
+  "normalization_only": true,
+  "runtimes": [
+    {
+      "id": "antigravity",
+      "sources": [
+        "codeg",
+        "rovai-ai"
+      ],
+      "platforms": {
+        "windows": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "macos": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "linux": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        }
+      }
+    },
+    {
+      "id": "claude_code",
+      "sources": [
+        "codeg",
+        "rovai-ai"
+      ],
+      "platforms": {
+        "windows": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "macos": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "linux": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        }
+      }
+    },
+    {
+      "id": "cline",
+      "sources": [
+        "codeg",
+        "rovai-ai"
+      ],
+      "platforms": {
+        "windows": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "macos": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "linux": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        }
+      }
+    },
+    {
+      "id": "code_buddy",
+      "sources": [
+        "codeg",
+        "rovai-ai"
+      ],
+      "platforms": {
+        "windows": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "macos": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "linux": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        }
+      }
+    },
+    {
+      "id": "codex",
+      "sources": [
+        "codeg",
+        "rovai-ai"
+      ],
+      "platforms": {
+        "windows": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "macos": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "linux": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        }
+      }
+    },
+    {
+      "id": "command_code",
+      "sources": [
+        "rovai-ai"
+      ],
+      "platforms": {
+        "windows": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "macos": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "linux": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        }
+      }
+    },
+    {
+      "id": "copilot",
+      "sources": [
+        "rovai-ai"
+      ],
+      "platforms": {
+        "windows": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "macos": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "linux": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        }
+      }
+    },
+    {
+      "id": "cursor",
+      "sources": [
+        "codeg",
+        "rovai-ai"
+      ],
+      "platforms": {
+        "windows": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "macos": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "linux": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        }
+      }
+    },
+    {
+      "id": "deepseek",
+      "sources": [
+        "codeg",
+        "rovai-ai"
+      ],
+      "platforms": {
+        "windows": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "macos": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "linux": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        }
+      }
+    },
+    {
+      "id": "gemini",
+      "sources": [
+        "codeg"
+      ],
+      "platforms": {
+        "windows": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "macos": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "linux": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        }
+      }
+    },
+    {
+      "id": "grok",
+      "sources": [
+        "codeg",
+        "rovai-ai"
+      ],
+      "platforms": {
+        "windows": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "macos": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "linux": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        }
+      }
+    },
+    {
+      "id": "hermes",
+      "sources": [
+        "codeg"
+      ],
+      "platforms": {
+        "windows": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "macos": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "linux": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        }
+      }
+    },
+    {
+      "id": "kimi_code",
+      "sources": [
+        "codeg",
+        "rovai-ai"
+      ],
+      "platforms": {
+        "windows": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "macos": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "linux": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        }
+      }
+    },
+    {
+      "id": "kiro",
+      "sources": [
+        "rovai-ai"
+      ],
+      "platforms": {
+        "windows": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "macos": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "linux": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        }
+      }
+    },
+    {
+      "id": "open_claw",
+      "sources": [
+        "codeg"
+      ],
+      "platforms": {
+        "windows": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "macos": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "linux": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        }
+      }
+    },
+    {
+      "id": "open_code",
+      "sources": [
+        "codeg",
+        "rovai-ai"
+      ],
+      "platforms": {
+        "windows": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "macos": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "linux": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        }
+      }
+    },
+    {
+      "id": "pi",
+      "sources": [
+        "codeg",
+        "rovai-ai"
+      ],
+      "platforms": {
+        "windows": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "macos": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "linux": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        }
+      }
+    },
+    {
+      "id": "qoder",
+      "sources": [
+        "codeg",
+        "rovai-ai"
+      ],
+      "platforms": {
+        "windows": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "macos": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "linux": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        }
+      }
+    },
+    {
+      "id": "qwen_code",
+      "sources": [
+        "rovai-ai"
+      ],
+      "platforms": {
+        "windows": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "macos": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "linux": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        }
+      }
+    },
+    {
+      "id": "trae_cn",
+      "sources": [
+        "rovai-ai"
+      ],
+      "platforms": {
+        "windows": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "macos": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "linux": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        }
+      }
+    },
+    {
+      "id": "zcode",
+      "sources": [
+        "rovai-ai"
+      ],
+      "platforms": {
+        "windows": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "macos": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        },
+        "linux": {
+          "admission": "to_check",
+          "execution": "not_run",
+          "evidence": null
+        }
+      }
+    }
+  ],
+  "custom_acp": {
+    "status": "to_implement_and_verify"
+  }
+}

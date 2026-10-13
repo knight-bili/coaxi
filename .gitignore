@@ -41,3 +41,13 @@ Desktop.ini
 /.impeccable/
 /.agent/
 /.stitch/
+
+# Fusion local evidence and donor checkouts
+/.codegraph/
+/integration/local/
+/integration/donors/
+/integration/logs/
+*.jks
+*.keystore
+*.p12
+*.mobileprovision

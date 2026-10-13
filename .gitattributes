@@ -8,4 +8,5 @@
 *.png binary
 
 /legal/licenses/** -text -whitespace
+/integration/licenses/** -text -whitespace
 *.crate binary
