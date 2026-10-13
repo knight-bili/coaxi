@@ -33,7 +33,6 @@ jobs:
       CARGO_BUILD_JOBS: 2
       NODE_OPTIONS: --max-old-space-size=3072
       ROVAI_REQUIRE_ELECTRON_INTEGRATION: '1'
-      ROVAI_HOST_WEB_LIVE_OUTPUT: ${{ runner.temp }}/workbench-native-web
       ROVAI_REVIEW_CHROME: /Applications/Google Chrome.app/Contents/MacOS/Google Chrome
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
@@ -49,7 +48,8 @@ jobs:
       - uses: dtolnay/rust-toolchain@4360b52568e2003a75bf9bc1d59f33a8e3fc893c
       - name: Check native browser prerequisite
         run: |
-          mkdir -p "$ROVAI_HOST_WEB_LIVE_OUTPUT"
+          echo "ROVAI_HOST_WEB_LIVE_OUTPUT=$RUNNER_TEMP/workbench-native-web" >> "$GITHUB_ENV"
+          mkdir -p "$RUNNER_TEMP/workbench-native-web"
           test -x "$ROVAI_REVIEW_CHROME"
           "$ROVAI_REVIEW_CHROME" --version
       - name: Install locked dependencies

@@ -18,7 +18,7 @@
     },
     {
       "file": ".github/workflows/workbench-native-web.yml",
-      "sha256": "a2ce6bca247938c019b2b2169fae3ebe94a13f45d8bb21fb23a05c77028367a4"
+      "sha256": "7ee3f1a823ae8932eaa547347a65f65b0dbdac34b5074917867c4f8cf7d99e0a"
     }
   ],
   "changes": [
@@ -34,7 +34,8 @@
     "typecheck": true,
     "webExecutionWebDesktopCodeBuild": true,
     "nativeScriptSyntax": true,
-    "workflowYamlParsing": true
+    "workflowYamlParsing": true,
+    "actionlintWorkflowSemantics": true
   },
   "selfReview": "回执不能仅由寻址成员推导；当前可撤回资格或真实Turn/Run才支撑状态。合法Core API建数据，最后SQL只读核查。没有用旧表注入、假Run或宽松断言使测试通过。",
   "beforeFailures": [
@@ -49,6 +50,13 @@
       "result": "正式发布被快速领取；数据库真实出现1条failed Run，未获得可撤回等待窗口",
       "actualInference": "not_verified",
       "action": "等待状态撤回正向场景保留研发待办，不能记为真实AI通过"
+    },
+    {
+      "id": "workflow_context_invalid",
+      "githubRun": 38446490275,
+      "result": "GitHub未创建作业即失败；actionlint复现job env中runner上下文不可用",
+      "action": "在执行步骤使用RUNNER_TEMP并经GITHUB_ENV传递；修正版actionlint通过",
+      "reference": "https://docs.github.com/en/actions/reference/workflows-and-actions/contexts"
     }
   ],
   "limits": {
