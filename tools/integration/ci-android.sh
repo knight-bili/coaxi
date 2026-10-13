@@ -30,16 +30,34 @@ Path(sys.argv[2]).write_text(json.dumps(counts,indent=2))
 PY
 mark passed
 stage=emulator_launch
+# 已保存APK/测试报告后清理本次构建中间件，给标准runner的模拟器留空间。
+python3 - "$RUNNER_TEMP" "$GRADLE_USER_HOME" "$PWD/app/build" "$PWD/.gradle" <<'PY'
+from pathlib import Path
+import shutil,sys
+temporary=Path(sys.argv[1]).resolve()
+for value in sys.argv[2:]:
+    target=Path(value).resolve()
+    assert target!=temporary and target.is_relative_to(temporary)
+    if target.exists():shutil.rmtree(target)
+PY
 export ANDROID_USER_HOME="$RUNNER_TEMP/foundation-android-config"
 export ANDROID_AVD_HOME="$RUNNER_TEMP/foundation-avds"
 mkdir -p "$ANDROID_USER_HOME" "$ANDROID_AVD_HOME"
 "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'system-images;android-36;google_apis;x86_64' 'emulator' > "$evidence/sdk-install.log" 2>&1
 echo no | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd -n foundation-api36 -p "$ANDROID_AVD_HOME/foundation-api36.avd" -k 'system-images;android-36;google_apis;x86_64' --device pixel_6 > "$evidence/avd.log" 2>&1
+python3 - "$ANDROID_AVD_HOME/foundation-api36.avd/config.ini" <<'PY'
+from pathlib import Path
+import sys
+p=Path(sys.argv[1])
+lines=[line for line in p.read_text().splitlines() if not line.startswith('disk.dataPartition.size=')]
+p.write_text('\n'.join(lines+['disk.dataPartition.size=2048M'])+'\n')
+PY
 "$ANDROID_HOME/emulator/emulator" -list-avds > "$evidence/avd-list.txt"
 grep -Fx foundation-api36 "$evidence/avd-list.txt"
 test -e /dev/kvm
 sudo chmod 666 /dev/kvm
-"$ANDROID_HOME/emulator/emulator" -avd foundation-api36 -port 5554 -no-window -no-audio -no-snapshot -no-boot-anim -gpu swiftshader_indirect > "$evidence/emulator.log" 2>&1 &
+df -h "$RUNNER_TEMP" > "$evidence/space-before-emulator.txt"
+"$ANDROID_HOME/emulator/emulator" -avd foundation-api36 -port 5554 -partition-size 2048 -no-window -no-audio -no-snapshot -no-boot-anim -gpu swiftshader_indirect > "$evidence/emulator.log" 2>&1 &
 emulator_pid=$!
 trap 'kill "$emulator_pid" >/dev/null 2>&1 || true' EXIT
 export ANDROID_SERIAL=emulator-5554
