@@ -100,7 +100,7 @@
   "cloudBuildAccessResolution": {
     "date": "2026-10-14",
     "repositoryVisibility": "public",
-    "standardRunnerProbe": "scaffold_passed_core_running",
+    "standardRunnerProbe": "execution_verified_core_extended_failures_owned_by_development",
     "evidence": "../execution/ci-free-result.json",
     "policy": "../ci-cost-policy.md",
     "accountBudgetModified": false,

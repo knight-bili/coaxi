@@ -2,7 +2,7 @@
   "schema_version": 1,
   "date": "2026-10-14",
   "repository": "knight-bili/codeg-rovai-workbench",
-  "status": "public_standard_runner_verified_scaffold_passed_core_running",
+  "status": "public_standard_runner_verified_core_extended_regressions_failed",
   "customer_authorization": "允许公开：先检查仓库及历史中的敏感内容和许可，再转换公开；发现问题先处理",
   "visibility_before": "PRIVATE",
   "visibility_after": "PUBLIC",
@@ -73,7 +73,7 @@
   },
   "local_audit_directory": "work/ci-free-20261014",
   "implementation": "CI config and current protocol snapshot only; uncommitted Context test expansion is excluded",
-  "checked_at": "2026-10-14T09:51:18.331Z",
+  "checked_at": "2026-10-14T11:55:24.826Z",
   "cloud_validation": {
     "checkedAt": "2026-10-14T09:51:18.331Z",
     "commit": "725512b25f2e1a01adc411817129cb8c2d374a59",
@@ -86,66 +86,23 @@
     "core": {
       "id": 38543710547,
       "url": "https://github.com/knight-bili/codeg-rovai-workbench/actions/runs/38543710547",
-      "status": "in_progress",
-      "conclusion": null,
-      "steps": [
-        {
-          "name": "Set up job",
-          "status": "completed",
-          "conclusion": "success"
-        },
-        {
-          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
-          "status": "completed",
-          "conclusion": "success"
-        },
-        {
-          "name": "Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
-          "status": "completed",
-          "conclusion": "success"
-        },
-        {
-          "name": "Run dtolnay/rust-toolchain@4360b52568e2003a75bf9bc1d59f33a8e3fc893c",
-          "status": "completed",
-          "conclusion": "success"
-        },
-        {
-          "name": "Run Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6",
-          "status": "completed",
-          "conclusion": "success"
-        },
-        {
-          "name": "Check format and all target types",
-          "status": "completed",
-          "conclusion": "success"
-        },
-        {
-          "name": "Run default workspace tests",
-          "status": "completed",
-          "conclusion": "success"
-        },
-        {
-          "name": "Verify Runtime catalog and atomic migration regressions",
-          "status": "in_progress",
-          "conclusion": null
-        },
-        {
-          "name": "Post Run Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6",
-          "status": "pending",
-          "conclusion": null
-        },
-        {
-          "name": "Post Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
-          "status": "pending",
-          "conclusion": null
-        },
-        {
-          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
-          "status": "pending",
-          "conclusion": null
-        }
-      ]
+      "status": "completed",
+      "conclusion": "failure",
+      "formatAndAllTargets": "passed",
+      "defaultWorkspace": "passed",
+      "extendedDatabase": {
+        "passed": 98,
+        "failed": 12,
+        "ignored": 0
+      },
+      "failureLog": "work/ci-free-20261014/core-linux-failed.log",
+      "nextAction": "修复历史夹具和格式识别检查并保留全部用例重跑；不提高支出上限"
     },
-    "followUp": "持续目标接着跟踪此运行；结束后执行work/ci-free-20261014/finalize-cloud-result.mjs，失败先修复，不把在运行写成通过"
+    "followUp": "原运行已终态失败，不再等待或运行只接受成功的finalizer；修复后创建明确平台的新验证运行",
+    "latestScaffold": {
+      "id": 38545531506,
+      "commit": "4aa7e51b6c2f815a88f47348269deef9030fff03",
+      "conclusion": "success"
+    }
   }
 }

@@ -64,8 +64,8 @@
     {
       "id": "INPUT-GITHUB-CI",
       "required_for": "Mac/Linux及GitHub原生验证",
-      "need": "公开前审查及仓库转换已完成，标准runner已运行且计划/治理门禁通过；Linux Core继续由研发跟踪，不需客户提高额度。账号历史账单和硬预算未核实",
-      "status": "resolved_public_runner_started_scaffold_passed",
+      "need": "公开标准运行机已执行且文档门禁通过；Core默认测试通过，数据库扩展12项失败由研发修复，不需客户提高额度。账号历史账单和硬预算仍未核实",
+      "status": "resolved_public_runner_verified_regression_repair_owned_by_development",
       "evidence": {
         "head": "e2963ef0d59989d16d32fffc03d19925dd75de85",
         "run": 38500616853,
@@ -88,7 +88,7 @@
         "publicVerified": true,
         "accountBudgetModified": false,
         "accountBudgetVerified": false,
-        "realCloudProbe": "scaffold_passed_core_running",
+        "realCloudProbe": "runner_executed_scaffold_passed_core_extended_failed",
         "runs": [
           38543657903,
           38543710547

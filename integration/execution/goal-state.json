@@ -14,7 +14,7 @@
   "current_branch": "phase/i02-skill-delivery",
   "base_branch": "phase/i03-canvas",
   "current_task": "I02-T03",
-  "current_slice": "r1技能包实际输入、候选/受控预览、153/203迁移与冻结恢复已接通并通过本地检查；逐SP矩阵及真实Gate继续",
+  "current_slice": "r1本地输入链路及数据库边界的旧公开29/33、执行轮次和旧A2A冻结恢复补测已通过；先修复Linux数据库扩展12项失败，再补进程边界和其余逐SP矩阵",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,9 +33,10 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "补齐r1逐SP跨Run、旧公开29及epoch/冻结Delivery等精确场景的证据矩阵。",
-    "专用测试身份与硬预算到位后执行真实指南读取Gate；不自动付费。",
-    "持续推进I03八类节点、业务绑定、布局和交互PTY，以及I02剩余与I04-I12全部范围。"
+    "修复历史数据库夹具和当前34/29格式识别导致的Linux扩展12项失败，保留全部测试并重跑。",
+    "补Core进程重启/受控Runtime接受边界及SP01-SP11其余精确场景，数据库重开不替代进程恢复。",
+    "专用测试身份与硬预算到位后执行SP12真实指南读取Gate；不自动付费。",
+    "继续I03八类节点、业务绑定、布局和交互PTY，以及I02剩余与I04-I12完整范围。"
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
@@ -55,13 +56,14 @@
   "skill_catalog_evidence": "i02-skill-catalog-result.json",
   "skill_install_evidence": "i02-skill-install-result.json",
   "system_goal_status": "active",
-  "system_goal_verified_at": "2026-10-14T08:52:41.062Z",
+  "system_goal_verified_at": "2026-10-14T11:55:24.829Z",
   "skill_members_evidence": "i02-skill-members-result.json",
   "canvas_boards_evidence": "i03-canvas-boards-result.json",
   "skill_delivery_preparation_evidence": "i02-skill-delivery-preparation-result.json",
   "skill_delivery_context_evidence": "i02-skill-delivery-context-result.json",
   "ci_cost_policy": "integration/ci-cost-policy.md",
   "ci_access_evidence": "ci-free-result.json",
-  "ci_access_status": "public_runner_started_scaffold_passed",
-  "ci_next_action": "跟踪Core run38543710547，结束后归档真实测试结果并处理失败，再继续I02兼容矩阵"
+  "ci_access_status": "public_runner_verified_regression_repair_required",
+  "ci_next_action": "原Core run38543710547已经failure；修复12个数据库扩展失败，按免费标准runner重新验证，不等待旧句柄或误归档成功",
+  "skill_delivery_matrix_evidence": "i02-skill-delivery-matrix-result.json"
 }

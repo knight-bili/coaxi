@@ -1509,6 +1509,11 @@ PR 默认层仍为 `cargo test --workspace`；Renderer 复用 `SingleChatPanel.t
 不能发现索引和消息链接引用不同版本、恢复时重读当前配置等问题；这里复用既有隔离Context fixture，
 不启动模型或外部Runtime，不以测试结果声称模型已读取指南。
 
+同一 owner 补验正式 `mark_for_recovery` / `claim_agent_run` 推进执行轮次后仍复用原 Manifest 和 Blob，
+以及公开29/9/7与33/10/9的历史输入升级、实际序列化和重开恢复。保留的旧公开 A2A 投递使用
+独立历史 CampTurn、已结束的 direct 根任务和对应消息夹具，再走生产 preflight、dispatch、领取及
+物化流程；卸载后逐字比较准备时冻结的输入。不能将现代 batch 任务改成旧任务，也不重启已退役 Gather。
+
 最小命令：`cargo test -p rovai-core --features slow-tests --lib skill_pack_context_freezes`。
 旧公开格式使用升级前schema152 fixture生成真实旧Selection2/输入，再走原升级链；不能删除新格式
 约束或把新Run改成旧身份来消除失败。Renderer扩展既有候选搜索/菜单owner，保留稳定英文发送名、

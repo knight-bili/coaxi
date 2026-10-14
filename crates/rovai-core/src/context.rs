@@ -11588,6 +11588,224 @@ mod slow_tests {
             resolution["entries"][0]["sourceVersion"],
             source.source_version
         );
+        // Restore a retained public A2A delivery. Modern sends use batch lanes;
+        // this exercises the still-supported legacy preflight/materialization
+        // seam rather than claiming a second modern ingress implementation.
+        crate::agent_profile::configure_test_runtime(&fixture.database, &["agent_2"]);
+        fixture
+            .database
+            .connection()
+            .execute(
+                "UPDATE agent_profile SET profile_status=(SELECT profile_status FROM agent_profile WHERE id='agent_1') WHERE id='agent_2'",
+                [],
+            )
+            .unwrap();
+        let mut add = envelope(crate::collaboration::AddThreadMemberCommand {
+            camp_id: fixture.camp_id.clone(),
+            agent_id: "agent_2".into(),
+            expected_membership_generation: 1,
+            capability_overrides: json!({}),
+            source: None,
+        });
+        add.camp_id = Some(fixture.camp_id.clone());
+        let added = CollaborationService::default()
+            .add_camp_member(&mut fixture.database, &add)
+            .unwrap();
+        assert!(
+            matches!(
+                added.result.status,
+                CommandResultStatus::Applied | CommandResultStatus::Accepted
+            ),
+            "{:?}",
+            added.result
+        );
+        let choice = crate::skill_pack_members::list(fixture.database.connection())
+            .unwrap()
+            .remove(0);
+        assert_eq!(
+            set_members(
+                &mut fixture.database,
+                &envelope(SetSkillPackMembersCommand {
+                    skill_id: "brainstorming".into(),
+                    member_ids: vec!["agent_1".into(), "agent_2".into()],
+                    expected_version: choice.version,
+                })
+            )
+            .unwrap()
+            .result
+            .code,
+            "skill_pack.members.updated"
+        );
+        let sent = TeamToolService::default()
+            .send_public_message_attested(
+                &mut fixture.database,
+                &ThreadMessageSendInvocation {
+                    native_binding_id: fixture.native_binding_id.clone(),
+                    binding_credential: fixture.binding_credential.clone(),
+                    runtime_tool_call_id: "pack-frozen-delivery-source".into(),
+                    input: ThreadMessageSendInput {
+                        body: "请按指南准备后续工作".into(),
+                        to: vec![],
+                        public_only: true,
+                        mention_user: false,
+                        task_id: None,
+                        files: vec![],
+                    },
+                    source_files: vec![],
+                },
+                &fixture.run_id,
+                fixture.execution_epoch,
+            )
+            .unwrap();
+        assert_eq!(
+            sent.result.status,
+            CommandResultStatus::Accepted,
+            "{:?}",
+            sent.result
+        );
+        let source_message_id = sent.result.payload["messageId"].as_str().unwrap();
+        let legacy_turn_id = Uuid::new_v4().to_string();
+        let legacy_root_id = Uuid::new_v4().to_string();
+        let message_id = Uuid::new_v4().to_string();
+        let delivery_id = Uuid::new_v4().to_string();
+        let legacy_budget =
+            crate::execution_budget::freeze_camp_turn_execution_budget(None, chrono::Utc::now(), 1)
+                .unwrap();
+        let transaction = fixture.database.connection_mut().transaction().unwrap();
+        let originating_user_message_id: String = transaction.query_row(
+            "SELECT id FROM camp_message WHERE camp_id=?1 AND author_type='user' ORDER BY sequence LIMIT 1",
+            [&fixture.camp_id], |row| row.get(0),
+        ).unwrap();
+        // Seed retained legacy records separately. Never relabel the modern
+        // batch Run or mutate the input already frozen above.
+        transaction.execute(
+            "INSERT INTO camp_turn(id,camp_id,trigger_type,trigger_id,status,created_at,updated_at,
+                execution_budget_schema_version,execution_budget_accepted_at,execution_budget_deadline_at,
+                execution_budget_elapsed_seconds,execution_budget_max_agent_run_responsibilities,
+                execution_budget_max_accepted_a2a,execution_budget_root_agent_run_responsibilities)
+             VALUES(?1,?2,'camp_message',?3,'waiting',?4,?4,?5,?4,?6,?7,?8,?9,1)",
+            params![legacy_turn_id,fixture.camp_id,originating_user_message_id,
+                legacy_budget.accepted_at,legacy_budget.schema_version,legacy_budget.deadline_at,
+                legacy_budget.elapsed_seconds,legacy_budget.max_agent_run_responsibilities,
+                legacy_budget.max_accepted_a2a],
+        ).unwrap();
+        transaction.execute(
+            "INSERT INTO agent_run(id,camp_id,camp_turn_id,conversation_id,
+                initial_camp_context_through_sequence,initial_conversation_context_through_sequence,
+                responsibility_key,start_reason,purpose,completion_role,effective_config_json,
+                workspace_json,status,idempotency_key,runtime_adapter_kind,execution_epoch,
+                trigger_camp_message_id,permission_semantics,created_at,started_at,ended_at,updated_at)
+             SELECT ?1,NULL,?3,conversation_id,initial_camp_context_through_sequence,
+                initial_conversation_context_through_sequence,?1,'initial',purpose,'required',
+                effective_config_json,workspace_json,'succeeded',?1,runtime_adapter_kind,1,
+                ?4,permission_semantics,?5,?5,?5,?5 FROM agent_run WHERE id=?6
+                AND (SELECT camp_id FROM conversation WHERE id=agent_run.conversation_id)=?2",
+            params![legacy_root_id,fixture.camp_id,legacy_turn_id,originating_user_message_id,
+                legacy_budget.accepted_at,fixture.run_id],
+        ).unwrap();
+        transaction.execute(
+            "INSERT INTO camp_message(id,camp_id,sequence,author_type,author_id,source_agent_run_id,
+                body,structured_content_json,content_digest,source_attachments_json,address_mode,
+                addressed_agent_ids_json,camp_turn_id,agent_run_id,created_at,updated_at,
+                effective_recipient_ids_json,recipient_set_digest,recipient_presentation_json,
+                agent_addressing_mode,origin_kind,recall_state)
+             SELECT ?1,camp_id,(SELECT MAX(sequence)+1 FROM camp_message WHERE camp_id=?2),
+                author_type,author_id,?3,body,structured_content_json,content_digest,
+                source_attachments_json,address_mode,addressed_agent_ids_json,?4,?3,?5,?5,
+                effective_recipient_ids_json,recipient_set_digest,recipient_presentation_json,
+                agent_addressing_mode,origin_kind,recall_state FROM camp_message WHERE id=?6",
+            params![message_id,fixture.camp_id,legacy_root_id,legacy_turn_id,
+                legacy_budget.accepted_at,source_message_id],
+        ).unwrap();
+        transaction.execute(
+            "UPDATE camp SET last_message_sequence=(SELECT MAX(sequence) FROM camp_message WHERE camp_id=?1) WHERE id=?1",
+            [&fixture.camp_id],
+        ).unwrap();
+        let membership_version = crate::message_delivery::current_recipient_membership_version(
+            &transaction,
+            &fixture.camp_id,
+            "agent_2",
+        )
+        .unwrap()
+        .unwrap();
+        transaction.execute(
+            "INSERT INTO message_delivery(id,camp_id,camp_turn_id,message_id,recipient_agent_id,
+                source_agent_run_id,edge_kind,target_parent_agent_run_id,a2a_root_agent_run_id,a2a_depth,
+                ancestor_agent_ids_json,recipient_presentation_snapshot_json,frozen_snapshot_json,
+                camp_message_boundary_sequence,queue_sequence,status,dispatch_phase,
+                recipient_membership_version_at_admission,created_at,updated_at,
+                recipient_canonical_position,recipient_digest,message_body_digest)
+             SELECT ?1,?2,run.camp_turn_id,?3,'agent_2',run.id,'forward',run.id,run.id,1,
+                '[\"agent_1\"]','{}','{}',message.sequence,1,'pending','never_attempted',
+                ?6,'2026-10-14','2026-10-14',0,?5,message.content_digest
+             FROM agent_run AS run JOIN camp_message AS message ON message.id=?3
+             WHERE run.id=?4",
+            params![delivery_id,fixture.camp_id,message_id,legacy_root_id,
+                canonical_json_digest(&json!(["agent_2"])).unwrap(),membership_version],
+        ).unwrap();
+        transaction.commit().unwrap();
+        let outcome = crate::message_delivery::dispatch_delivery(
+            &mut fixture.database,
+            &delivery_id,
+            crate::message_delivery::DeliveryDispatchTrigger::Accepted,
+            true,
+        )
+        .unwrap();
+        let crate::message_delivery::DeliveryDispatchOutcome::Materialized {
+            agent_run_id: frozen_run_id,
+        } = outcome
+        else {
+            panic!("retained delivery should materialize: {outcome:?}")
+        };
+        let frozen_value: String = fixture
+            .database
+            .connection()
+            .query_row(
+                "SELECT frozen_snapshot_json FROM message_delivery WHERE id=?1",
+                [&delivery_id],
+                |row| row.get(0),
+            )
+            .unwrap();
+        let frozen_value: Value = serde_json::from_str(&frozen_value).unwrap();
+        let frozen: FrozenDeliveryContext =
+            serde_json::from_value(frozen_value["frozenContext"].clone()).unwrap();
+        assert_eq!(frozen.manifest_selection["contextManifestVersion"], 29);
+        assert!(
+            frozen
+                .rendered_payload
+                .contains(&serde_json::to_string(&source.path).unwrap())
+        );
+        let candidate = ExecutionRuntimeService::default()
+            .load_dispatchable_agent_run(&fixture.database, &frozen_run_id)
+            .unwrap()
+            .unwrap();
+        let mut child_claim = envelope(ClaimAgentRunCommand {
+            agent_run_id: frozen_run_id.clone(),
+            expected_version: candidate.version,
+            lease_owner: "pack-frozen-delivery".into(),
+            lease_seconds: 60,
+            workspace: None,
+            starting_git_observation: None,
+        });
+        child_claim.actor = ActorRef::System {
+            component_id: "agent-run-scheduler".into(),
+        };
+        child_claim.camp_id = Some(fixture.camp_id.clone());
+        let child_claimed = ExecutionRuntimeService::default()
+            .claim_agent_run(&mut fixture.database, &child_claim)
+            .unwrap();
+        assert_eq!(
+            child_claimed.result.status,
+            CommandResultStatus::Accepted,
+            "{:?}",
+            child_claimed.result
+        );
+        let frozen_epoch = child_claimed.result.payload["executionEpoch"]
+            .as_i64()
+            .unwrap();
+        TeamToolService::default()
+            .prepare_binding_credential(&mut fixture.database, &frozen_run_id, frozen_epoch, false)
+            .unwrap();
         let installed = packs.list(fixture.database.connection()).unwrap().remove(0);
         assert_eq!(
             packs
@@ -11620,6 +11838,31 @@ mod slow_tests {
                 .0
                 .is_empty()
         );
+        let ContextMaterialization::Ready(frozen_context) = ContextService
+            .materialize(
+                &mut fixture.database,
+                &store,
+                &MaterializeContextRequest {
+                    agent_run_id: &frozen_run_id,
+                    execution_epoch: frozen_epoch,
+                    charter_delivery_mode: CharterDeliveryMode::NativeAppend,
+                    max_payload_bytes: DEFAULT_MAX_CONTEXT_PAYLOAD_BYTES,
+                },
+            )
+            .unwrap()
+        else {
+            panic!("frozen retained delivery should survive uninstall")
+        };
+        assert_eq!(frozen_context.rendered_payload, frozen.rendered_payload);
+        assert!(
+            frozen_context
+                .rendered_payload
+                .contains(&serde_json::to_string(&source.path).unwrap())
+        );
+        assert_eq!(fixture.database.connection().query_row(
+            "SELECT context_manifest_version,run_facts_schema_version,context_delivery_profile_version
+             FROM context_manifest WHERE agent_run_id=?1",[&frozen_run_id],
+            |row|Ok((row.get::<_,i64>(0)?,row.get::<_,i64>(1)?,row.get::<_,i64>(2)?))).unwrap(),(29,6,7));
         let ContextMaterialization::Ready(replay) = ContextService
             .materialize_with_skill_exposure(&mut fixture.database, &store, &exposure, &request)
             .unwrap()
@@ -11644,61 +11887,211 @@ mod slow_tests {
             restored.rendered_payload_digest,
             first.rendered_payload_digest
         );
-        fixture.cleanup();
-        let mut legacy = fixture_with_legacy_input(true);
-        let legacy_selection: String = legacy
+        // Recovery is a real domain transition. No direct epoch/status rewrite
+        // may make a frozen payload appear eligible for a new execution.
+        let runtime = ExecutionRuntimeService::default();
+        let run_version: i64 = fixture
             .database
             .connection()
             .query_row(
-                "SELECT skill_selection_snapshot_json FROM agent_run WHERE id=?1",
-                [&legacy.run_id],
+                "SELECT version FROM agent_run WHERE id=?1",
+                [&fixture.run_id],
                 |row| row.get(0),
             )
             .unwrap();
+        let mut recovery = envelope(crate::runtime::MarkAgentRunForRecoveryCommand {
+            agent_run_id: fixture.run_id.clone(),
+            expected_version: run_version,
+            execution_epoch: fixture.execution_epoch,
+            reason: "host_lost".into(),
+        });
+        recovery.actor = ActorRef::System {
+            component_id: "runtime-recovery-coordinator".into(),
+        };
+        recovery.camp_id = Some(fixture.camp_id.clone());
         assert_eq!(
-            serde_json::from_str::<Value>(&legacy_selection).unwrap()["schemaVersion"],
-            2
+            runtime
+                .mark_for_recovery(&mut fixture.database, &recovery)
+                .unwrap()
+                .result
+                .status,
+            CommandResultStatus::Accepted
         );
-        crate::db::upgrade_skill_pack_context_fixture(&mut legacy.database);
+        let waiting_version: i64 = fixture
+            .database
+            .connection()
+            .query_row(
+                "SELECT version FROM agent_run WHERE id=?1",
+                [&fixture.run_id],
+                |row| row.get(0),
+            )
+            .unwrap();
+        let mut reclaim = envelope(ClaimAgentRunCommand {
+            agent_run_id: fixture.run_id.clone(),
+            expected_version: waiting_version,
+            lease_owner: "pack-context-recovery".into(),
+            lease_seconds: 60,
+            workspace: None,
+            starting_git_observation: None,
+        });
+        reclaim.actor = recovery.actor.clone();
+        reclaim.camp_id = recovery.camp_id.clone();
+        let claimed = runtime
+            .claim_agent_run(&mut fixture.database, &reclaim)
+            .unwrap();
         assert_eq!(
-            legacy
+            claimed.result.status,
+            CommandResultStatus::Accepted,
+            "{:?}",
+            claimed.result
+        );
+        let next_epoch = claimed.result.payload["executionEpoch"].as_i64().unwrap();
+        assert_eq!(next_epoch, fixture.execution_epoch + 1);
+        let ContextMaterialization::Ready(next) = ContextService
+            .materialize_with_skill_exposure(
+                &mut fixture.database,
+                &store,
+                &exposure,
+                &MaterializeContextRequest {
+                    execution_epoch: next_epoch,
+                    ..request.clone()
+                },
+            )
+            .unwrap()
+        else {
+            panic!("new epoch must keep its original frozen input");
+        };
+        assert_eq!(next.manifest_id, first.manifest_id);
+        assert_eq!(next.rendered_payload, first.rendered_payload);
+        assert_eq!(next.rendered_payload_digest, first.rendered_payload_digest);
+        fixture.cleanup();
+        for (legacy_version, legacy_facts, legacy_profile) in [(29, 7, 9), (33, 9, 10)] {
+            let mut legacy = fixture_with_legacy_input(true);
+            if legacy_version == 29 {
+                // Build a retained historical row before upgrading. Restore the
+                // exact immutable guard inside this synthetic fixture transaction;
+                // production admission and post-migration writes stay unchanged.
+                let tx = legacy.database.connection_mut().transaction().unwrap();
+                let content = vec![
+                    StructuredThreadMessageSegment::CurrentUserMention {
+                        user_id: crate::current_user::CURRENT_USER_ID.into(),
+                    },
+                    StructuredThreadMessageSegment::Text {
+                        text: " 兼容输入".into(),
+                    },
+                ];
+                let digest = canonical_content_digest(&content).unwrap();
+                tx.execute("UPDATE camp_message SET body='@User 兼容输入',structured_content_json=?2,content_digest=?3 WHERE id=(SELECT message_id FROM agent_run_input WHERE agent_run_id=?1 ORDER BY ordinal LIMIT 1)",
+                    params![legacy.run_id,serde_json::to_string(&content).unwrap(),digest]).unwrap();
+                tx.execute(
+                    "UPDATE agent_run_input SET message_content_digest=?2 WHERE agent_run_id=?1",
+                    params![legacy.run_id, digest],
+                )
+                .unwrap();
+                let guard: String = tx.query_row(
+                "SELECT sql FROM sqlite_schema WHERE name='agent_run_input_context_projection_immutable'",
+                [], |row| row.get(0)).unwrap();
+                tx.execute_batch("DROP TRIGGER agent_run_input_context_projection_immutable;")
+                    .unwrap();
+                tx.execute(
+                    "UPDATE agent_run_input SET context_manifest_version=29 WHERE agent_run_id=?1",
+                    [&legacy.run_id],
+                )
+                .unwrap();
+                tx.execute_batch(&guard).unwrap();
+                tx.commit().unwrap();
+            }
+            let legacy_selection: String = legacy
                 .database
                 .connection()
                 .query_row(
                     "SELECT skill_selection_snapshot_json FROM agent_run WHERE id=?1",
                     [&legacy.run_id],
-                    |row| row.get::<_, String>(0)
+                    |row| row.get(0),
                 )
-                .unwrap(),
-            legacy_selection
-        );
-        let ContextMaterialization::Ready(old) = ContextService
-            .materialize(
-                &mut legacy.database,
-                &ManagedBlobStore::new(&legacy.directory),
-                &MaterializeContextRequest {
-                    agent_run_id: &legacy.run_id,
-                    execution_epoch: legacy.execution_epoch,
-                    charter_delivery_mode: CharterDeliveryMode::NativeAppend,
-                    max_payload_bytes: DEFAULT_MAX_CONTEXT_PAYLOAD_BYTES,
-                },
-            )
-            .unwrap()
-        else {
-            panic!("pre-upgrade claimed input should materialize")
-        };
-        assert!(!old.rendered_payload.contains("[ROVAI_SKILL_PACKS]"));
-        let old_version: i64 = legacy
+                .unwrap();
+            assert_eq!(
+                serde_json::from_str::<Value>(&legacy_selection).unwrap()["schemaVersion"],
+                2
+            );
+            crate::db::upgrade_skill_pack_context_fixture(&mut legacy.database);
+            assert_eq!(
+                legacy
+                    .database
+                    .connection()
+                    .query_row(
+                        "SELECT skill_selection_snapshot_json FROM agent_run WHERE id=?1",
+                        [&legacy.run_id],
+                        |row| row.get::<_, String>(0)
+                    )
+                    .unwrap(),
+                legacy_selection
+            );
+            let ContextMaterialization::Ready(old) = ContextService
+                .materialize(
+                    &mut legacy.database,
+                    &ManagedBlobStore::new(&legacy.directory),
+                    &MaterializeContextRequest {
+                        agent_run_id: &legacy.run_id,
+                        execution_epoch: legacy.execution_epoch,
+                        charter_delivery_mode: CharterDeliveryMode::NativeAppend,
+                        max_payload_bytes: DEFAULT_MAX_CONTEXT_PAYLOAD_BYTES,
+                    },
+                )
+                .unwrap()
+            else {
+                panic!("pre-upgrade claimed input should materialize")
+            };
+            assert!(!old.rendered_payload.contains("[ROVAI_SKILL_PACKS]"));
+            let old_version: (i64,i64,i64) = legacy
             .database
             .connection()
             .query_row(
-                "SELECT context_manifest_version FROM context_manifest WHERE agent_run_id=?1",
+                "SELECT context_manifest_version,run_facts_schema_version,context_delivery_profile_version FROM context_manifest WHERE agent_run_id=?1",
                 [&legacy.run_id],
-                |row| row.get(0),
+                |row| Ok((row.get(0)?,row.get(1)?,row.get(2)?)),
             )
             .unwrap();
-        assert_eq!(old_version, 33);
-        legacy.cleanup();
+            assert_eq!(old_version, (legacy_version, legacy_facts, legacy_profile));
+            if legacy_version == 29 {
+                assert!(!old.rendered_payload.contains("[ROVAI_ADDITIONAL_SKILLS]"));
+                let input: Value = serde_json::from_str(
+                    old.rendered_payload
+                        .split_once("[RUN_INPUT]\n")
+                        .unwrap()
+                        .1
+                        .split_once("\n[/RUN_INPUT]")
+                        .unwrap()
+                        .0,
+                )
+                .unwrap();
+                assert!(input["messages"][0].get("mentions").is_none());
+                assert_eq!(input["messages"][0]["mentionsCurrentUser"], true);
+            }
+            let reopened = Database::open(&legacy.directory).unwrap();
+            drop(std::mem::replace(&mut legacy.database, reopened));
+            let ContextMaterialization::Ready(replayed) = ContextService
+                .materialize(
+                    &mut legacy.database,
+                    &ManagedBlobStore::new(&legacy.directory),
+                    &MaterializeContextRequest {
+                        agent_run_id: &legacy.run_id,
+                        execution_epoch: legacy.execution_epoch,
+                        charter_delivery_mode: CharterDeliveryMode::NativeAppend,
+                        max_payload_bytes: DEFAULT_MAX_CONTEXT_PAYLOAD_BYTES,
+                    },
+                )
+                .unwrap()
+            else {
+                panic!("retained legacy serializer bytes must replay")
+            };
+            assert_eq!(replayed.rendered_payload, old.rendered_payload);
+            assert_eq!(
+                replayed.rendered_payload_digest,
+                old.rendered_payload_digest
+            );
+            legacy.cleanup();
+        }
     }
 
     #[test]
