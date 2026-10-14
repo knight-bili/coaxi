@@ -14,7 +14,7 @@
   "current_branch": "phase/i02-skill-delivery",
   "base_branch": "phase/i03-canvas",
   "current_task": "I02-T03",
-  "current_slice": "r1来源与解析准备完成本地自审；生产投递、153/203迁移和最终Blob恢复继续实施",
+  "current_slice": "r1技能包实际输入、候选/受控预览、153/203迁移与冻结恢复已接通并通过本地检查；逐SP矩阵及真实Gate继续",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,13 +33,13 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "按已确认r1接入pack独立来源与成员索引、消息选择、冻结/旧输入恢复及迁移；本地自审自测",
-    "取得专用模型身份/硬预算后补真实Gate；不自动调用付费模型",
-    "继续I03全部节点与业务对象/文件/PTY、I02其他整改及I04-I12完整范围"
+    "补齐r1逐SP跨Run、旧公开29及epoch/冻结Delivery等精确场景的证据矩阵。",
+    "专用测试身份与硬预算到位后执行真实指南读取Gate；不自动付费。",
+    "持续推进I03八类节点、业务绑定、布局和交互PTY，以及I02剩余与I04-I12全部范围。"
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "r1_preparation_local_checks_passed_delivery_in_progress",
+  "current_slice_status": "local_input_chain_verified_additional_matrix_and_real_gate_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -54,9 +54,10 @@
   "openclaw_session_evidence": "i02-openclaw-session-result.json",
   "skill_catalog_evidence": "i02-skill-catalog-result.json",
   "skill_install_evidence": "i02-skill-install-result.json",
-  "system_goal_status": "paused_last_observed_despite_user_continue",
-  "system_goal_verified_at": "2026-10-14T05:33:04.371Z",
+  "system_goal_status": "active",
+  "system_goal_verified_at": "2026-10-14T08:52:41.062Z",
   "skill_members_evidence": "i02-skill-members-result.json",
   "canvas_boards_evidence": "i03-canvas-boards-result.json",
-  "skill_delivery_preparation_evidence": "i02-skill-delivery-preparation-result.json"
+  "skill_delivery_preparation_evidence": "i02-skill-delivery-preparation-result.json",
+  "skill_delivery_context_evidence": "i02-skill-delivery-context-result.json"
 }

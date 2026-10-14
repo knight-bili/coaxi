@@ -19,9 +19,17 @@ last_updated: 2026-10-14
 
 第一批实现内部来源准备与消息来源解析。每位接收队员按其当前选择，从经过所有权、普通文件树、完整性和完整YAML校验的安装包生成独立pack索引；未选择、未安装及被改坏分别记录。索引和局部链接可复用同一份准备事实，更新后使用新版本目录，卸载保留旧文件，重装不恢复成员。
 
-Selection/Resolution v3的内部编码、pack路径拒绝、安装观察版本、遗漏原因与按消息定位的链接解析已编写，旧v1/v2编码保留。生产claim仍写v2，Context仍使用28/33，数据库仍为152/202；新增解析尚未接入实际Run、候选或预览。不能将来源/解析的本地检查当作首次物化、最终Blob恢复、完整12场景或实际模型读取已完成。后续继续一次接通格式、预算、迁移和恢复，再补真实Gate。
+Selection/Resolution v3的内部编码、pack路径拒绝、安装观察版本、遗漏原因与按消息定位的链接解析已编写，旧v1/v2编码保留。该准备批尚未激活生产投递；当时claim v2、Context28/33、数据库152/202，解析未接实际Run、候选或预览。不能将来源/解析的本地检查当作首次物化、最终Blob恢复、完整12场景或实际模型读取已完成。后续继续一次接通格式、预算、迁移和恢复，再补真实Gate。
 
 来源与解析准备已完成本地自审：恢复暂停后重新执行staged要求的完整workspace回归，501通过、0失败、8忽略（7个子进程helper和1个人工Antigravity实际Runtime用例）；扩展技能包owner3项、all-targets编译和通用文档门禁通过。源码摘要绑定到该次验证，客户已确认Word/PDF摘要保持。完整回归中发现并修复Windows更新交接的短暂目录占用；持续占用仍拒绝并保留旧程序和候选。失败与中止记录未删除，不计作通过。详见[准备自审记录](../../../integration/execution/i02-skill-delivery-preparation-result.json)，SP01–SP12仍按分项资格继续，不据此宣称r1或完整MVP完成。
+
+## 本轮本地接通结果（2026-10-14）
+
+新claim已使用Selection3，公开34/Profile10/RunFacts9和非批次29/Profile7/RunFacts6已接入；Schema153/Migration203追加到最新链尾。独立pack候选、受控预览、中文显示/英文发送身份、同源索引和链接、事务重验、最终Blob及Frozen Delivery恢复代码已连接。旧格式与固定Bootstrap/Charter/Binding兼容边界保留。
+
+本地完整workspace501通过、0失败、8忽略；Context/迁移/画板56项、包扩展5项、Renderer/语言16项、真实150→153接口与生产组件19项通过。各套件存在重叠，不合计为独立场景数；真实接口组件夹具的Run/Manifest为0，实际Run输入与Blob由Context owner验证。最终Host摘要、源码摘要和失败记录边界见[本轮自审](../../../integration/execution/i02-skill-delivery-context-result.json)。类型、格式、通用文档门禁已过，三个当前UI截图已检查。
+
+完整SP01–SP12及Runtime/平台资格继续实施；旧公开29、epoch与冻结Delivery等组合仍需逐场景补齐证据，SP12专用模型身份和硬预算未提供，不宣称r1、I02或完整MVP已完成。客户已确认的前后结构和原文未改，Word/PDF摘要保持。
 
 ## 二次确认
 

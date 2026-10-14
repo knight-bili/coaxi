@@ -11,6 +11,8 @@ last_updated: 2026-10-12
 
 ## Rust 测试准入与退役门槛
 
+技能包Context153/203迁移新增扩展owner `db::skill_pack_context::tests::migration_is_atomic_and_preserves_existing_authorities`，拥有三表约束/新默认值/收据的同事务切换、失败时恢复及既有结果和Blob保留。安装/成员owner只加自己的表，不拥有RunInput、Manifest和Run默认值，不能代替这一边界；复用既有私有SQLite模板，不启动模型。最低命令为 `cargo test -p rovai-core --features extended-tests --lib db::skill_pack_context`。实际有内容的旧/新Run恢复与输入预算由Context owner继续验证；结构通过不能替代最终Blob或真实Runtime资格。
+
 Windows更新交接回归复用 `rovai-host::server_updates::install::tests::handoff_requires_settlement_then_runs_the_new_program_with_original_arguments`：本机完整回归与同一二进制的定向执行均曾因进程退出后的短暂目录占用报拒绝访问。目录切换增加有上限的Windows重试后，持续占用及旧目录/候选保留继续由原 `directory_switch_restores_old_program_on_failure_and_retains_it_on_success` 拥有，扩展真实不共享删除的句柄负例；不新增测试或另建进程fixture。最小命令 `cargo test -p rovai-host --lib`。Unix路径仍直接执行一次重命名；不能把本机结果当作Unix更新资格。
 
 技能包模型来源准备复用 `skill_pack_installation::tests::version_publication_preserves_edits_fences_stale_commits_and_replays_across_reopen`，增加独立pack身份、实际路径、安装观察版本及完整YAML description断言。成员来源索引和Selection/Resolution v3解析复用下列成员持久化owner：验证A/B隔离、空索引、完整说明、身份去重及消息位置、伪造路径/名称/版本拒绝、三类遗漏、更新换版本及旧文件保留、重开和重装不恢复选择；不另建SQLite或Runtime fixture。原 `current_input_skill::tests::empty_selection_digest_is_stable` 继续拥有空选择的旧版本规范字节，完整YAML标量仍由原 `managed_skills::tests::frontmatter_preserves_yaml_scalar_value_in_model_index` 拥有。最低命令为 `cargo test -p rovai-core --features extended-tests --lib skill_pack` 和 `cargo test -p rovai-core --lib current_input_skill`。本批生产claim仍为v2、输入仍28/33，尚未验证最终Blob物化/恢复，也不授予实际模型资格。
@@ -1498,6 +1500,19 @@ Rust 复用原 owner 并保持所有仍有效的保护：
 `failed_session_replacement`、`uncertain_input_acknowledgement`、`session_header_scan`、`manual_native_session_restart`。
 PR 默认层仍为 `cargo test --workspace`；Renderer 复用 `SingleChatPanel.test.ts`、`App.test.ts` 与 typecheck。
 不新增真实模型调用、常驻验证进程或永久禁用测试。
+
+## 融合期技能包模型投递测试准入（2026-10-14）
+
+新增慢层 owner `context::slow_tests::skill_pack_context_freezes_versions_and_recovers_original_bytes`，
+拥有 Selection3、公开34/Profile10/RunFacts9、完整包索引与消息局部链接的一致性、最终Blob、
+卸载保留、候选撤下和生产重开后逐字恢复。安装与成员 owner 没有实际Run/ContextManifest，
+不能发现索引和消息链接引用不同版本、恢复时重读当前配置等问题；这里复用既有隔离Context fixture，
+不启动模型或外部Runtime，不以测试结果声称模型已读取指南。
+
+最小命令：`cargo test -p rovai-core --features slow-tests --lib skill_pack_context_freezes`。
+旧公开格式使用升级前schema152 fixture生成真实旧Selection2/输入，再走原升级链；不能删除新格式
+约束或把新Run改成旧身份来消除失败。Renderer扩展既有候选搜索/菜单owner，保留稳定英文发送名、
+中文显示名、来源与相关成员。完整默认层仍执行 `cargo test --workspace`。
 
 ## 融合期 OpenClaw Gateway 测试准入（2026-10-14）
 

@@ -13,11 +13,35 @@ use crate::{
     skill_projection::PreparedSkillExposure,
 };
 
-pub const SKILL_SELECTION_SCHEMA_VERSION: i64 = 2;
-pub const CURRENT_INPUT_SKILL_RESOLUTION_SCHEMA_VERSION: i64 = 2;
-pub const EMPTY_SKILL_SELECTION_JSON: &str = r#"{"entries":[],"schemaVersion":2}"#;
-// The live writer stays at v2 until the context formatter and migration land.
+pub const SKILL_SELECTION_SCHEMA_VERSION: i64 = 3;
+pub const CURRENT_INPUT_SKILL_RESOLUTION_SCHEMA_VERSION: i64 = 3;
+pub const EMPTY_SKILL_SELECTION_JSON: &str = r#"{"entries":[],"schemaVersion":3}"#;
 pub(crate) const PACK_SKILL_SELECTION_SCHEMA_VERSION: i64 = 3;
+
+pub(crate) fn pack_context_enabled(connection: &Connection) -> Result<bool> {
+    let present: bool = connection.query_row(
+        "SELECT EXISTS(SELECT 1 FROM sqlite_schema WHERE type='table' AND name='schema_migration')",
+        [],
+        |row| row.get(0),
+    )?;
+    Ok(present
+        && connection.query_row(
+            "SELECT EXISTS(SELECT 1 FROM schema_migration WHERE version=203)",
+            [],
+            |row| row.get(0),
+        )?)
+}
+
+pub(crate) fn empty_selection(connection: &Connection) -> Result<SkillSelectionSnapshot> {
+    Ok(SkillSelectionSnapshot {
+        schema_version: if pack_context_enabled(connection)? {
+            3
+        } else {
+            2
+        },
+        entries: Vec::new(),
+    })
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -298,10 +322,9 @@ pub(crate) fn projected_skill_links_for_claim(
     execution_root: &Path,
 ) -> Result<Vec<CurrentInputSkillLink>> {
     validate_selection_snapshot(selection)?;
-    anyhow::ensure!(
-        selection.schema_version != 3,
-        "Pack Skill claim projection is not connected"
-    );
+    if selection.schema_version == 3 {
+        anyhow::bail!("Pack Skill claim projection requires receiving-member preparation");
+    }
     if selection.schema_version == 2 {
         return Ok(selection
             .entries
@@ -386,6 +409,9 @@ pub fn freeze_skill_selection_with_messages(
         content.len() == message_indices.len(),
         "Skill selection message positions are incomplete"
     );
+    if pack_context_enabled(transaction)? {
+        return freeze_skill_selection_with_packs(transaction, content, message_indices);
+    }
     let v2_available: bool = transaction.query_row(
         "SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type='table' AND name='native_skill_reference')",
         [], |row| row.get(0)
@@ -932,6 +958,49 @@ fn resolve_v2_source(
         SkillSource::Legacy | SkillSource::Pack => unreachable!(),
     }
     Ok(Ok(path.to_owned()))
+}
+
+/// The delivery preview already froze these facts with its payload. Recovery
+/// validates that frozen selection instead of consulting today's installations.
+pub(crate) fn resolution_from_frozen(
+    value: &Value,
+    selection: &SkillSelectionSnapshot,
+    selection_digest: &str,
+) -> Result<PreparedCurrentInputSkillResolution> {
+    anyhow::ensure!(
+        selection.schema_version == 3,
+        "Frozen pack resolution requires Selection3"
+    );
+    let digest = canonical_json_digest(value)?;
+    let resolution = validate_persisted_resolution(
+        &serde_json::to_string(value)?,
+        &digest,
+        selection,
+        selection_digest,
+        "",
+    )?;
+    let links = resolution
+        .entries
+        .iter()
+        .zip(&selection.entries)
+        .filter(|(entry, _)| entry.outcome == CurrentInputSkillResolutionOutcome::Available)
+        .map(|(entry, selected)| {
+            Ok(CurrentInputSkillLink {
+                name: selected.name_at_send.clone(),
+                path: entry
+                    .source_path
+                    .clone()
+                    .context("Frozen available Skill has no path")?,
+                skill_id: Some(selected.skill_id.clone()),
+                message_index: Some(selected.first_message_index),
+            })
+        })
+        .collect::<Result<Vec<_>>>()?;
+    Ok(PreparedCurrentInputSkillResolution {
+        resolution,
+        digest,
+        links,
+    })
 }
 
 pub fn validate_persisted_resolution(

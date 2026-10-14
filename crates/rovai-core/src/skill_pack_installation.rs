@@ -222,7 +222,58 @@ impl SkillPackStore {
     }
 
     pub fn list(&self, connection: &Connection) -> Result<Vec<SkillPackInstallationView>> {
-        self.views(&snapshot(connection)?)
+        let enabled = crate::current_input_skill::pack_context_enabled(connection)?;
+        let mut views = self.views(&snapshot(connection)?)?;
+        for view in &mut views {
+            view.member_delivery_enabled = enabled;
+        }
+        Ok(views)
+    }
+
+    /// Candidate paths are Core observations for preview only. Message ingress
+    /// accepts identity/name and resolves the receiving member again at prepare.
+    pub fn composer_candidates(
+        &self,
+        connection: &Connection,
+        camp_id: &str,
+    ) -> Result<(Vec<serde_json::Value>, Vec<String>)> {
+        let mut members = std::collections::BTreeMap::<String, Vec<String>>::new();
+        let mut statement = connection.prepare(
+            "SELECT choice.skill_id, choice.agent_id FROM member_skill_pack AS choice
+             JOIN camp_member AS cm ON cm.agent_id=choice.agent_id AND cm.camp_id=?1 AND cm.status='active'
+             JOIN agent_profile AS ap ON ap.id=cm.agent_id AND ap.profile_status<>'removed'
+             JOIN camp ON camp.id=cm.camp_id AND camp.activation_state='active' AND camp.deletion_operation_id IS NULL
+             ORDER BY choice.skill_id, choice.agent_id")?;
+        for row in statement.query_map([camp_id], |row| {
+            Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))
+        })? {
+            let (id, member) = row?;
+            members.entry(id).or_default().push(member);
+        }
+        let catalog = crate::codeg_skill_catalog::list()?;
+        let mut candidates = Vec::new();
+        let mut errors = Vec::new();
+        for (id, member_ids) in members {
+            match self.model_source(connection, &id) {
+                Ok(Some(source)) => {
+                    let display_name = catalog
+                        .entries
+                        .iter()
+                        .find(|entry| entry.id == id)
+                        .map(|entry| &entry.display_name);
+                    let mut candidate = json!({"id":source.id,"name":source.name,
+                        "description":source.desc,"source":"pack","sourceScope":"installed",
+                        "entryPath":source.path,"memberIds":member_ids});
+                    if let Some(display_name) = display_name {
+                        candidate["displayName"] = serde_json::to_value(display_name)?;
+                    }
+                    candidates.push(candidate);
+                }
+                Ok(None) => errors.push(format!("pack:{id}:pack_not_installed")),
+                Err(_) => errors.push(format!("pack:{id}:pack_changed")),
+            }
+        }
+        Ok((candidates, errors))
     }
 
     pub(crate) fn model_source(
@@ -445,7 +496,7 @@ impl SkillPackStore {
             if !prepared.reused {
                 transaction.execute("INSERT INTO skill_pack_installation(skill_id,source_revision,source_digest,active_version,content_digest,status,generation,updated_at) VALUES(?1,?2,?3,?4,?5,?6,?7,?8) ON CONFLICT(skill_id) DO UPDATE SET source_revision=excluded.source_revision,source_digest=excluded.source_digest,active_version=excluded.active_version,content_digest=excluded.content_digest,status=excluded.status,generation=excluded.generation,updated_at=excluded.updated_at",params![row.skill_id,row.source_revision,row.source_digest,row.active_version,row.content_digest,row.status,row.generation,row.updated_at])?;
             }
-            Ok(CommandHandlerResult::applied(if prepared.reused {"skill_pack.already_current"}else{"skill_pack.installed"},json!({"skillId":row.skill_id,"version":row.version()?,"contentPath":content,"previousVersionRetained":previous.as_ref().is_some_and(|old|old.active_version!=row.active_version),"retainedVersion":previous.filter(|old|old.active_version!=row.active_version).map(|old|old.active_version),"memberDeliveryEnabled":false}),None))
+            Ok(CommandHandlerResult::applied(if prepared.reused {"skill_pack.already_current"}else{"skill_pack.installed"},json!({"skillId":row.skill_id,"version":row.version()?,"contentPath":content,"previousVersionRetained":previous.as_ref().is_some_and(|old|old.active_version!=row.active_version),"retainedVersion":previous.filter(|old|old.active_version!=row.active_version).map(|old|old.active_version),"memberDeliveryEnabled":crate::current_input_skill::pack_context_enabled(transaction)?}),None))
         })
     }
 
@@ -462,7 +513,7 @@ impl SkillPackStore {
             let Some(mut row)=current else {return Ok(CommandHandlerResult::rejected("skill_pack.not_installed",json!({})));};
             if row.status!="removed" {crate::skill_pack_members::clear_for_uninstall(transaction,&row.skill_id)?;row.status="removed".into();row.generation+=1;row.updated_at=chrono::Utc::now().to_rfc3339();
                 transaction.execute("UPDATE skill_pack_installation SET status='removed',generation=?2,updated_at=?3 WHERE skill_id=?1",params![row.skill_id,row.generation,row.updated_at])?;}
-            Ok(CommandHandlerResult::applied("skill_pack.uninstalled",json!({"skillId":row.skill_id,"version":row.version()?,"retainedContent":true,"memberDeliveryEnabled":false}),None))
+            Ok(CommandHandlerResult::applied("skill_pack.uninstalled",json!({"skillId":row.skill_id,"version":row.version()?,"retainedContent":true,"memberDeliveryEnabled":crate::current_input_skill::pack_context_enabled(transaction)?}),None))
         })
     }
 

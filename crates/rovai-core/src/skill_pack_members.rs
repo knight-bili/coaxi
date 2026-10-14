@@ -129,7 +129,9 @@ pub fn list(connection: &Connection) -> Result<Vec<SkillPackMembersView>> {
                     &members,
                 )?,
                 member_ids: members,
-                member_delivery_enabled: false,
+                member_delivery_enabled: crate::current_input_skill::pack_context_enabled(
+                    connection,
+                )?,
             })
         })
         .collect()
@@ -164,7 +166,7 @@ pub fn set_members(
             transaction.execute("INSERT INTO member_skill_pack(skill_id,agent_id,updated_at) VALUES(?1,?2,?3)",params![command.skill_id,member_id,now])?;
         }
         let desired=desired.into_iter().collect::<Vec<_>>();
-        Ok(CommandHandlerResult::applied("skill_pack.members.updated",json!({"skillId":command.skill_id,"memberIds":desired,"version":version(source.as_ref().map(|(version,_)|version.as_str()),&desired)?,"memberDeliveryEnabled":false}),None))
+        Ok(CommandHandlerResult::applied("skill_pack.members.updated",json!({"skillId":command.skill_id,"memberIds":desired,"version":version(source.as_ref().map(|(version,_)|version.as_str()),&desired)?,"memberDeliveryEnabled":crate::current_input_skill::pack_context_enabled(transaction)?}),None))
     })
 }
 

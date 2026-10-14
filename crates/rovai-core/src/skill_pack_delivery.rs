@@ -133,4 +133,21 @@ impl PreparedMemberSkillPacks {
             serde_json::to_string(&json!({"skills":skills}))?,
         ))
     }
+
+    pub(crate) fn omissions(&self) -> Vec<String> {
+        self.observations
+            .iter()
+            .filter_map(|(id, entry)| {
+                if !entry.selected {
+                    return None;
+                }
+                let reason = match entry.source.as_ref().err()? {
+                    PackUnavailable::NotSelected => "pack_not_selected",
+                    PackUnavailable::NotInstalled => "pack_not_installed",
+                    PackUnavailable::Changed => "pack_changed",
+                };
+                Some(format!("{id}:{reason}"))
+            })
+            .collect()
+    }
 }

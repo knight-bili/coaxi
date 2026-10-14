@@ -50,8 +50,10 @@ use crate::{
         current_public_camp_batch_context_delivery_profile, unicode_scalar_count,
     },
     current_input_skill::{
-        CurrentInputSkillLink, CurrentInputSkillResolution, SkillSelectionSnapshot,
-        parse_skill_selection_snapshot, resolve_current_input_skills,
+        CurrentInputSkillLink, CurrentInputSkillResolution, PreparedCurrentInputSkillResolution,
+        SkillSelectionSnapshot, empty_selection, parse_skill_selection_snapshot,
+        resolution_from_frozen, resolve_current_input_skills,
+        resolve_current_input_skills_with_packs,
     },
     db::Database,
     managed_attachment::resolve_managed_attachment_path,
@@ -59,6 +61,7 @@ use crate::{
     mcp_projection::{McpExposureSnapshot, PreparedMcpProjection},
     memory::{MemoryScopeKind, MemoryService, RelationshipDirection},
     skill::SkillLibraryService,
+    skill_pack_delivery::PreparedMemberSkillPacks,
     skill_projection::{PreparedSkillExposure, SkillExposureSnapshot},
 };
 
@@ -69,11 +72,11 @@ const DELIVERY_FIRST_PAYLOAD_BOOTSTRAP_RESERVE_BYTES: usize = 32 * 1024;
 fn run_facts_schema_version(manifest_version: i64, invocation_kind: &str) -> i64 {
     if invocation_kind == "batch" {
         match manifest_version {
-            32 | 33 => 9,
+            32 | 33 | 34 => 9,
             31 => 8,
             _ => 7,
         }
-    } else if manifest_version == 28 {
+    } else if matches!(manifest_version, 28 | 29) {
         6
     } else {
         5
@@ -700,12 +703,17 @@ impl ContextService {
             anyhow::bail!("Non-direct AgentRun has a non-empty Skill selection snapshot");
         }
         let adapter_kind = run_snapshot_adapter_kind(&snapshot)?;
-        let current_input_skill_resolution = resolve_current_input_skills(
+        let skill_packs = prepare_run_skill_packs(database.connection(), &snapshot)?;
+        let skill_pack_section = skill_packs
+            .as_ref()
+            .map(|packs| packs.section())
+            .transpose()?;
+        let current_input_skill_resolution = resolve_run_skills(
             database.connection(),
-            &snapshot.skill_selection_snapshot,
-            &snapshot.skill_selection_snapshot_digest,
+            &snapshot,
             prepared_skill_exposure,
             adapter_kind,
+            skill_packs.as_ref(),
         )?;
         let a2a_count = if snapshot.invocation_kind == "batch" {
             0
@@ -778,7 +786,7 @@ impl ContextService {
 
         let workspace_fact =
             prepare_workspace_fact(database, &snapshot, requires_new_native_session, false)?;
-        let additional_skills = (batch_context_manifest_version != Some(29))
+        let mut additional_skills = (batch_context_manifest_version != Some(29))
             .then(|| {
                 prepare_additional_skills(
                     database.connection(),
@@ -790,6 +798,9 @@ impl ContextService {
                 )
             })
             .transpose()?;
+        if let (Some(additional), Some(packs)) = (&mut additional_skills, &skill_packs) {
+            additional.omitted.extend(packs.omissions());
+        }
         let (shared_conversation, payload, runtime_payload) = loop {
             let origin_is_recent = originating_public_user_message
                 .as_ref()
@@ -847,6 +858,7 @@ impl ContextService {
                 additional_skills: additional_skills
                     .as_ref()
                     .map(|skills| skills.section.as_str()),
+                skill_packs: skill_pack_section.as_deref(),
                 a2a_guidance: a2a_guidance.payload_json.as_deref(),
                 single_chat_guidance: (snapshot.invocation_kind == "single_chat")
                     .then_some(SINGLE_CHAT_GUIDANCE.trim()),
@@ -1054,12 +1066,17 @@ impl ContextService {
             .flatten();
         let transaction = database.connection_mut().transaction()?;
         revalidate_snapshot_for_manifest(&transaction, &snapshot, expected_binding_generation)?;
-        let revalidated_skill_resolution = resolve_current_input_skills(
+        let revalidated_packs = prepare_run_skill_packs(&transaction, &snapshot)?;
+        anyhow::ensure!(
+            revalidated_packs == skill_packs,
+            "Skill package configuration or version changed during materialization"
+        );
+        let revalidated_skill_resolution = resolve_run_skills(
             &transaction,
-            &snapshot.skill_selection_snapshot,
-            &snapshot.skill_selection_snapshot_digest,
+            &snapshot,
             prepared_skill_exposure,
             adapter_kind,
+            revalidated_packs.as_ref(),
         )?;
         if revalidated_skill_resolution != current_input_skill_resolution {
             anyhow::bail!("Current Input Skill availability changed during materialization");
@@ -1067,17 +1084,30 @@ impl ContextService {
         let (global_public_message_boundary, history_camps) =
             capture_cross_camp_history_fence(&transaction, &snapshot)?;
         let context_manifest_version =
-            batch_context_manifest_version.unwrap_or(CONTEXT_MANIFEST_VERSION);
+            batch_context_manifest_version.unwrap_or(if skill_packs.is_some() {
+                CONTEXT_MANIFEST_VERSION
+            } else {
+                28
+            });
         let context_formatter_version = batch_context_manifest_version
             .inspect(|&version| {
                 debug_assert!(matches!(
                     version,
-                    29 | 30 | 31 | 32 | PUBLIC_CAMP_BATCH_CONTEXT_FORMATTER_VERSION
+                    29 | 30 | 31 | 32 | 33 | PUBLIC_CAMP_BATCH_CONTEXT_FORMATTER_VERSION
                 ));
             })
-            .unwrap_or(CONTEXT_FORMATTER_VERSION);
+            .unwrap_or(context_manifest_version);
         let run_facts_schema_version =
             run_facts_schema_version(context_manifest_version, &snapshot.invocation_kind);
+        anyhow::ensure!(
+            crate::context_contract::skill_pack_context_format(
+                &snapshot.invocation_kind,
+                context_manifest_version,
+                profile.profile_version,
+                run_facts_schema_version,
+            )? == skill_packs.is_some(),
+            "Context format does not match its selection snapshot"
+        );
         let inserted = transaction.execute(
             r#"
             INSERT OR IGNORE INTO context_manifest(
@@ -1298,6 +1328,24 @@ impl ContextService {
         request: &DeliveryContextPreview<'_>,
     ) -> Result<FrozenDeliveryContext> {
         let snapshot = prospective_delivery_snapshot(transaction, request)?;
+        let skill_packs = prepare_run_skill_packs(transaction, &snapshot)?;
+        let skill_pack_section = skill_packs
+            .as_ref()
+            .map(|packs| packs.section())
+            .transpose()?;
+        let pack_resolution = skill_packs
+            .as_ref()
+            .map(|packs| {
+                resolve_current_input_skills_with_packs(
+                    transaction,
+                    &snapshot.skill_selection_snapshot,
+                    &snapshot.skill_selection_snapshot_digest,
+                    run_snapshot_adapter_kind(&snapshot)?,
+                    &snapshot.agent_id,
+                    packs,
+                )
+            })
+            .transpose()?;
         let max_payload_bytes = request.max_payload_bytes.max(MIN_CONTEXT_PAYLOAD_BYTES);
         let profile = current_context_delivery_profile()?;
         let (mut self_active_tasks, mut self_active_task_omitted_count) =
@@ -1374,7 +1422,13 @@ impl ContextService {
             count_a2a_runs(transaction, &snapshot.camp_turn_id)?,
         )?;
         let rendered_run_facts = render_run_facts(&run_facts)?;
-        let current_input_value = current_input.as_payload(&attachment_paths, &[]);
+        let current_input_value = current_input.as_payload(
+            &attachment_paths,
+            pack_resolution
+                .as_ref()
+                .map(|resolved| resolved.links.as_slice())
+                .unwrap_or(&[]),
+        );
         let a2a_guidance = prepare_a2a_guidance(transaction, &snapshot)?;
 
         // Public Delivery Runs are gated against the full Dynamic Context. A
@@ -1388,7 +1442,7 @@ impl ContextService {
         };
         let workspace_fact =
             prepare_workspace_fact(transaction, &snapshot, requires_new_native_session, true)?;
-        let additional_skills = prepare_additional_skills(
+        let mut additional_skills = prepare_additional_skills(
             transaction,
             std::path::Path::new(
                 transaction
@@ -1399,6 +1453,9 @@ impl ContextService {
             .context("Core data directory is unavailable")?,
             &snapshot,
         )?;
+        if let Some(packs) = &skill_packs {
+            additional_skills.omitted.extend(packs.omissions());
+        }
         let (shared_conversation, payload) = loop {
             let origin_is_recent = originating_public_user_message
                 .as_ref()
@@ -1449,6 +1506,7 @@ impl ContextService {
                 run_facts: &rendered_run_facts,
                 workspace: workspace_fact.section(),
                 additional_skills: Some(&additional_skills.section),
+                skill_packs: skill_pack_section.as_deref(),
                 a2a_guidance: a2a_guidance.payload_json.as_deref(),
                 single_chat_guidance: None,
                 current_input: Some(&current_input_value),
@@ -1589,8 +1647,9 @@ impl ContextService {
 
             "messageProjectionAudience": AGENT_MESSAGE_PROJECTION_AUDIENCE,
 
-            "contextManifestVersion": CONTEXT_MANIFEST_VERSION,
+            "contextManifestVersion": if skill_packs.is_some() { CONTEXT_MANIFEST_VERSION } else { 28 },
             "runFactsSchemaVersion": 6,
+            "currentInputSkillResolution": pack_resolution.as_ref().map(|resolved| &resolved.resolution),
             "workspaceFact": workspace_fact.value,
             "workspaceFactDigest": workspace_fact.digest,
             "workspaceFactIncluded": workspace_fact.included,
@@ -2721,6 +2780,60 @@ struct RunSnapshot {
     skill_selection_snapshot_digest: String,
 }
 
+fn prepare_run_skill_packs(
+    connection: &Connection,
+    snapshot: &RunSnapshot,
+) -> Result<Option<PreparedMemberSkillPacks>> {
+    if snapshot.skill_selection_snapshot.schema_version != 3 {
+        return Ok(None);
+    }
+    let data_dir = std::path::Path::new(
+        connection
+            .path()
+            .context("Core database path is unavailable")?,
+    )
+    .parent()
+    .context("Core data directory is unavailable")?;
+    PreparedMemberSkillPacks::prepare(
+        connection,
+        data_dir,
+        &snapshot.agent_id,
+        snapshot
+            .skill_selection_snapshot
+            .entries
+            .iter()
+            .map(|entry| entry.skill_id.as_str()),
+    )
+    .map(Some)
+}
+
+fn resolve_run_skills(
+    connection: &Connection,
+    snapshot: &RunSnapshot,
+    exposure: &PreparedSkillExposure,
+    adapter: AdapterKind,
+    packs: Option<&PreparedMemberSkillPacks>,
+) -> Result<PreparedCurrentInputSkillResolution> {
+    if let Some(packs) = packs {
+        resolve_current_input_skills_with_packs(
+            connection,
+            &snapshot.skill_selection_snapshot,
+            &snapshot.skill_selection_snapshot_digest,
+            adapter,
+            &snapshot.agent_id,
+            packs,
+        )
+    } else {
+        resolve_current_input_skills(
+            connection,
+            &snapshot.skill_selection_snapshot,
+            &snapshot.skill_selection_snapshot_digest,
+            exposure,
+            adapter,
+        )
+    }
+}
+
 fn prospective_delivery_snapshot(
     transaction: &Transaction<'_>,
     request: &DeliveryContextPreview<'_>,
@@ -2788,8 +2901,8 @@ fn prospective_delivery_snapshot(
         native_charter_digest: conversation.6,
         native_collaboration_state_digest: conversation.7,
         default_lead_agent_id,
-        skill_selection_snapshot: SkillSelectionSnapshot::default(),
-        skill_selection_snapshot_digest: SkillSelectionSnapshot::default().canonical_digest()?,
+        skill_selection_snapshot: empty_selection(transaction)?,
+        skill_selection_snapshot_digest: empty_selection(transaction)?.canonical_digest()?,
     })
 }
 
@@ -4359,7 +4472,7 @@ fn frozen_batch_context_manifest_version(
     anyhow::ensure!(
         matches!(
             version,
-            29 | 30 | 31 | 32 | PUBLIC_CAMP_BATCH_CONTEXT_MANIFEST_VERSION
+            29 | 30 | 31 | 32 | 33 | PUBLIC_CAMP_BATCH_CONTEXT_MANIFEST_VERSION
         ),
         "Batch AgentRun uses an unsupported context version"
     );
@@ -6836,6 +6949,7 @@ struct RenderPayloadInput<'a> {
     run_facts: &'a RenderedRunFacts,
     workspace: Option<&'a Value>,
     additional_skills: Option<&'a str>,
+    skill_packs: Option<&'a str>,
     a2a_guidance: Option<&'a str>,
     single_chat_guidance: Option<&'a str>,
     current_input: Option<&'a Value>,
@@ -6876,6 +6990,10 @@ fn render_payload(input: RenderPayloadInput<'_>) -> Result<String> {
     }
     if let Some(additional_skills) = input.additional_skills {
         output.push_str(additional_skills);
+        output.push_str("\n\n");
+    }
+    if let Some(skill_packs) = input.skill_packs {
+        output.push_str(skill_packs);
         output.push_str("\n\n");
     }
     if let Some(a2a_guidance) = input.a2a_guidance {
@@ -7462,13 +7580,25 @@ fn materialize_frozen_delivery_context(
         anyhow::bail!("Non-direct AgentRun has a non-empty Skill selection snapshot");
     }
     let adapter_kind = run_snapshot_adapter_kind(snapshot)?;
-    let current_input_skill_resolution = resolve_current_input_skills(
-        database.connection(),
-        &snapshot.skill_selection_snapshot,
-        &snapshot.skill_selection_snapshot_digest,
-        prepared_skill_exposure,
-        adapter_kind,
-    )?;
+    let frozen_pack_resolution = snapshot.skill_selection_snapshot.schema_version == 3;
+    let current_input_skill_resolution = if frozen_pack_resolution {
+        resolution_from_frozen(
+            frozen
+                .manifest_selection
+                .get("currentInputSkillResolution")
+                .context("Frozen Delivery Context is missing its Skill resolution")?,
+            &snapshot.skill_selection_snapshot,
+            &snapshot.skill_selection_snapshot_digest,
+        )?
+    } else {
+        resolve_current_input_skills(
+            database.connection(),
+            &snapshot.skill_selection_snapshot,
+            &snapshot.skill_selection_snapshot_digest,
+            prepared_skill_exposure,
+            adapter_kind,
+        )?
+    };
 
     let blob = blob_store.put_bytes(
         database,
@@ -7533,6 +7663,15 @@ fn materialize_frozen_delivery_context(
     let run_facts_schema_version = required("runFactsSchemaVersion")?
         .as_i64()
         .context("Frozen Delivery Context Run Facts schema version is invalid")?;
+    anyhow::ensure!(
+        crate::context_contract::skill_pack_context_format(
+            &snapshot.invocation_kind,
+            context_manifest_version,
+            profile_version,
+            run_facts_schema_version,
+        )? == frozen_pack_resolution,
+        "Frozen Context format does not match its selection snapshot"
+    );
     let mission_details_version = optional_i64("missionDetailsVersion")?;
     if mission_details_version.is_some_and(|version| version < 1) {
         anyhow::bail!("Frozen Delivery Context Mission details version is invalid");
@@ -7561,15 +7700,17 @@ fn materialize_frozen_delivery_context(
     let created_at = chrono::Utc::now().to_rfc3339();
     let transaction = database.connection_mut().transaction()?;
     revalidate_snapshot_for_manifest(&transaction, snapshot, expected_binding_generation)?;
-    let revalidated_skill_resolution = resolve_current_input_skills(
-        &transaction,
-        &snapshot.skill_selection_snapshot,
-        &snapshot.skill_selection_snapshot_digest,
-        prepared_skill_exposure,
-        adapter_kind,
-    )?;
-    if revalidated_skill_resolution != current_input_skill_resolution {
-        anyhow::bail!("Current Input Skill availability changed during materialization");
+    if !frozen_pack_resolution {
+        let revalidated_skill_resolution = resolve_current_input_skills(
+            &transaction,
+            &snapshot.skill_selection_snapshot,
+            &snapshot.skill_selection_snapshot_digest,
+            prepared_skill_exposure,
+            adapter_kind,
+        )?;
+        if revalidated_skill_resolution != current_input_skill_resolution {
+            anyhow::bail!("Current Input Skill availability changed during materialization");
+        }
     }
     let (global_public_message_boundary, history_camps) =
         capture_cross_camp_history_fence(&transaction, snapshot)?;
@@ -8245,8 +8386,9 @@ mod tests {
                     context_manifest_version INTEGER
                 );
                 INSERT INTO agent_run_input VALUES ('historical', 26);
-                INSERT INTO agent_run_input VALUES ('current', 33);
-                INSERT INTO agent_run_input VALUES ('current', 33);
+                INSERT INTO agent_run_input VALUES ('current', 34);
+                INSERT INTO agent_run_input VALUES ('current', 34);
+                INSERT INTO agent_run_input VALUES ('before-packs', 33);
                 INSERT INTO agent_run_input VALUES ('previous', 30);
                 INSERT INTO agent_run_input VALUES ('previous', 30);
                 INSERT INTO agent_run_input VALUES ('legacy', 29);
@@ -8265,6 +8407,10 @@ mod tests {
         assert_eq!(
             frozen_batch_context_manifest_version(&connection, "legacy").unwrap(),
             29
+        );
+        assert_eq!(
+            frozen_batch_context_manifest_version(&connection, "before-packs").unwrap(),
+            33
         );
         assert_eq!(
             frozen_batch_context_manifest_version(&connection, "previous").unwrap(),
@@ -8842,6 +8988,7 @@ mod slow_tests {
             run_facts: &run_facts,
             workspace: None,
             additional_skills: None,
+            skill_packs: None,
             a2a_guidance: None,
             single_chat_guidance: Some(SINGLE_CHAT_GUIDANCE.trim()),
             current_input: Some(&json!({
@@ -9090,7 +9237,14 @@ mod slow_tests {
     }
 
     fn fixture() -> Fixture {
+        fixture_with_legacy_input(false)
+    }
+
+    fn fixture_with_legacy_input(legacy: bool) -> Fixture {
         let (mut database, directory) = crate::test_support::fresh_schema_database();
+        if legacy {
+            crate::db::downgrade_skill_pack_context_fixture(database.connection());
+        }
         let executable = directory.join("codex");
         std::fs::write(&executable, b"context-test-runtime").unwrap();
         let profile_service = AgentProfileService::default();
@@ -10335,7 +10489,11 @@ mod slow_tests {
                 .rendered_payload
                 .contains("managed-v2-context.txt")
         );
-        assert!(materialized.rendered_payload.contains(&projected_path));
+        assert!(
+            materialized
+                .rendered_payload
+                .contains(&serde_json::to_string(&projected_path).unwrap())
+        );
         assert!(
             !materialized
                 .rendered_payload
@@ -10552,7 +10710,7 @@ mod slow_tests {
     // A claimed input without a Manifest must survive an upgrade using its frozen formatter.
     #[test]
     fn claimed_legacy_batch_keeps_its_format_after_mention_upgrade() {
-        let mut fixture = fixture();
+        let mut fixture = fixture_with_legacy_input(true);
         crate::db::downgrade_message_mentions_fixture(&fixture.database);
         crate::db::upgrade_message_mentions_fixture(&mut fixture.database);
         let store = ManagedBlobStore::new(&fixture.directory);
@@ -10802,7 +10960,7 @@ mod slow_tests {
             .unwrap();
         assert_eq!(
             (manifest_version, formatter_version, facts_version),
-            (33, 33, 9)
+            (34, 34, 9)
         );
         assert_eq!(profile_json, None);
         assert_eq!(
@@ -11169,7 +11327,7 @@ mod slow_tests {
                 ],
             )
             .unwrap();
-        let ContextMaterialization::Ready(budget_context) = ContextService
+        let too_small = ContextService
             .materialize(
                 &mut budget_fixture.database,
                 &ManagedBlobStore::new(&budget_fixture.directory),
@@ -11180,11 +11338,53 @@ mod slow_tests {
                     max_payload_bytes: MIN_CONTEXT_PAYLOAD_BYTES,
                 },
             )
+            .unwrap_err();
+        assert!(too_small.is::<ContextPayloadTooLarge>(), "{too_small:#}");
+        assert_eq!(
+            budget_fixture
+                .database
+                .connection()
+                .query_row(
+                    "SELECT COUNT(*) FROM context_manifest WHERE agent_run_id=?1",
+                    [&budget_fixture.run_id],
+                    |row| row.get::<_, i64>(0)
+                )
+                .unwrap(),
+            0
+        );
+        let pack_bytes = PreparedMemberSkillPacks::prepare(
+            budget_fixture.database.connection(),
+            &budget_fixture.directory,
+            "agent_1",
+            std::iter::empty(),
+        )
+        .unwrap()
+        .section()
+        .unwrap()
+        .len()
+            + 2;
+        let complete_budget = MIN_CONTEXT_PAYLOAD_BYTES + pack_bytes;
+        let ContextMaterialization::Ready(budget_context) = ContextService
+            .materialize(
+                &mut budget_fixture.database,
+                &ManagedBlobStore::new(&budget_fixture.directory),
+                &MaterializeContextRequest {
+                    agent_run_id: &budget_fixture.run_id,
+                    execution_epoch: budget_fixture.execution_epoch,
+                    charter_delivery_mode: CharterDeliveryMode::NativeAppend,
+                    max_payload_bytes: complete_budget,
+                },
+            )
             .unwrap()
         else {
             panic!("Task projection should yield rather than fail required Context");
         };
-        assert!(budget_context.rendered_payload.len() <= MIN_CONTEXT_PAYLOAD_BYTES);
+        assert!(budget_context.rendered_payload.len() <= complete_budget);
+        assert!(
+            budget_context
+                .rendered_payload
+                .contains("[ROVAI_SKILL_PACKS]")
+        );
         assert!(
             !budget_context
                 .rendered_payload
@@ -11193,9 +11393,317 @@ mod slow_tests {
         budget_fixture.cleanup();
     }
 
+    // Owns final payload/manifest persistence, not a model or Runtime turn.
+    #[test]
+    fn skill_pack_context_freezes_versions_and_recovers_original_bytes() {
+        use crate::skill_pack_installation::{
+            InstallBeginning, InstallSkillPackCommand, SkillPackStore, UninstallSkillPackCommand,
+        };
+        use crate::skill_pack_members::{SetSkillPackMembersCommand, set_members};
+        fn envelope<T>(payload: T) -> CommandEnvelope<T> {
+            CommandEnvelope {
+                command_id: Uuid::new_v4().to_string(),
+                actor: ActorRef::User {
+                    user_id: "test-user".into(),
+                },
+                camp_id: None,
+                expected_versions: vec![],
+                execution_epoch: None,
+                payload,
+            }
+        }
+        let mut fixture = fixture();
+        let packs = SkillPackStore::new(&fixture.directory).unwrap();
+        let install = envelope(InstallSkillPackCommand {
+            skill_id: "brainstorming".into(),
+            source_revision: crate::codeg_skill_catalog::list().unwrap().commit.into(),
+            expected_version: "absent".into(),
+        });
+        let InstallBeginning::Prepare(plan) = packs
+            .begin_install(&mut fixture.database, &install)
+            .unwrap()
+        else {
+            panic!("first installation should prepare");
+        };
+        let prepared = packs.prepare(plan).unwrap();
+        assert_eq!(
+            packs
+                .commit_install(&mut fixture.database, &install, prepared)
+                .unwrap()
+                .result
+                .code,
+            "skill_pack.installed"
+        );
+        let choice = crate::skill_pack_members::list(fixture.database.connection())
+            .unwrap()
+            .remove(0);
+        assert_eq!(
+            set_members(
+                &mut fixture.database,
+                &envelope(SetSkillPackMembersCommand {
+                    skill_id: "brainstorming".into(),
+                    member_ids: vec!["agent_1".into()],
+                    expected_version: choice.version,
+                })
+            )
+            .unwrap()
+            .result
+            .code,
+            "skill_pack.members.updated"
+        );
+        let (candidates, errors) = packs
+            .composer_candidates(fixture.database.connection(), &fixture.camp_id)
+            .unwrap();
+        assert!(errors.is_empty());
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0]["id"], "pack:brainstorming");
+        assert_eq!(candidates[0]["sourceScope"], "installed");
+        let mut preview: crate::file_preview_authority::ResolveFilePreviewSourceParams =
+            serde_json::from_value(json!({"kind":"skill_reference","threadId":fixture.camp_id,
+                "skillId":"pack:brainstorming","rawReference":"SKILL.md"}))
+            .unwrap();
+        assert!(
+            crate::file_preview_authority::resolve_skill_preview_source(
+                &fixture.database,
+                &fixture.directory,
+                &preview
+            )
+            .unwrap()
+            .is_some()
+        );
+        preview.raw_reference = Some("C:/outside/SKILL.md".into());
+        assert!(
+            crate::file_preview_authority::resolve_skill_preview_source(
+                &fixture.database,
+                &fixture.directory,
+                &preview
+            )
+            .unwrap()
+            .is_none()
+        );
+        preview.raw_reference = Some("SKILL.md".into());
+        let source = packs
+            .model_source(fixture.database.connection(), "brainstorming")
+            .unwrap()
+            .unwrap();
+        // Seed exactly the immutable claim produced by the ingress owner; no
+        // client path or source version is accepted into Selection3.
+        let content = vec![
+            StructuredThreadMessageSegment::SkillMention {
+                skill_id: "pack:brainstorming".into(),
+                name_at_send: "brainstorming".into(),
+            },
+            StructuredThreadMessageSegment::Text {
+                text: " 请规划功能".into(),
+            },
+        ];
+        let tx = fixture.database.connection_mut().transaction().unwrap();
+        let selection = crate::current_input_skill::freeze_skill_selection(
+            &tx,
+            &content,
+            AdapterKind::CodexCli,
+        )
+        .unwrap();
+        assert_eq!(selection.schema_version, 3);
+        assert!(selection.entries[0].source_path.is_none());
+        let (selection_json, selection_digest) = selection.canonical_json_and_digest().unwrap();
+        let content_digest = canonical_content_digest(&content).unwrap();
+        tx.execute("UPDATE camp_message SET body='/brainstorming 请规划功能', structured_content_json=?2, content_digest=?3 WHERE id=(SELECT message_id FROM agent_run_input WHERE agent_run_id=?1 ORDER BY ordinal LIMIT 1)",
+            params![fixture.run_id, serde_json::to_string(&content).unwrap(), content_digest]).unwrap();
+        tx.execute(
+            "UPDATE agent_run_input SET message_content_digest=?2 WHERE agent_run_id=?1",
+            params![fixture.run_id, content_digest],
+        )
+        .unwrap();
+        tx.execute("UPDATE agent_run SET skill_selection_snapshot_json=?2,skill_selection_snapshot_digest=?3 WHERE id=?1",
+            params![fixture.run_id, selection_json, selection_digest]).unwrap();
+        tx.commit().unwrap();
+        let library =
+            SkillLibraryService::new(fixture.directory.join("managed-skill-library")).unwrap();
+        let exposure = ContextService
+            .prepare_skill_exposure(
+                &mut fixture.database,
+                &library,
+                &fixture.run_id,
+                fixture.execution_epoch,
+            )
+            .unwrap();
+        let store = ManagedBlobStore::new(&fixture.directory);
+        let request = MaterializeContextRequest {
+            agent_run_id: &fixture.run_id,
+            execution_epoch: fixture.execution_epoch,
+            charter_delivery_mode: CharterDeliveryMode::NativeAppend,
+            max_payload_bytes: DEFAULT_MAX_CONTEXT_PAYLOAD_BYTES,
+        };
+        let ContextMaterialization::Ready(first) = ContextService
+            .materialize_with_skill_exposure(&mut fixture.database, &store, &exposure, &request)
+            .unwrap()
+        else {
+            panic!("pack input should materialize")
+        };
+        let payload = &first.rendered_payload;
+        assert_eq!(payload.matches("[ROVAI_SKILL_PACKS]").count(), 1);
+        assert!(
+            payload.find("[ROVAI_ADDITIONAL_SKILLS]").unwrap()
+                < payload.find("[ROVAI_SKILL_PACKS]").unwrap()
+        );
+        assert!(
+            payload.find("[ROVAI_SKILL_PACKS]").unwrap() < payload.find("[RUN_INPUT]").unwrap()
+        );
+        let index: Value = serde_json::from_str(
+            payload
+                .split_once("Current for this run; replaces any earlier Rovai Skill Packs.\n")
+                .unwrap()
+                .1
+                .split_once("\n[/ROVAI_SKILL_PACKS]")
+                .unwrap()
+                .0,
+        )
+        .unwrap();
+        assert_eq!(
+            index,
+            json!({"skills":[{"id":source.id,"name":source.name,"desc":source.desc,"path":source.path}]})
+        );
+        let input: Value = serde_json::from_str(
+            payload
+                .split_once("[RUN_INPUT]\n")
+                .unwrap()
+                .1
+                .split_once("\n[/RUN_INPUT]")
+                .unwrap()
+                .0,
+        )
+        .unwrap();
+        assert_eq!(
+            input["messages"][0]["skills"][0],
+            json!({"name":"brainstorming","path":source.path})
+        );
+        let (version, facts, profile, resolution): (i64,i64,i64,String) = fixture.database.connection().query_row(
+            "SELECT context_manifest_version,run_facts_schema_version,context_delivery_profile_version,current_input_skill_resolution_json FROM context_manifest WHERE agent_run_id=?1",
+            [&fixture.run_id], |row| Ok((row.get(0)?,row.get(1)?,row.get(2)?,row.get(3)?))).unwrap();
+        assert_eq!((version, facts, profile), (34, 9, 10));
+        let resolution: Value = serde_json::from_str(&resolution).unwrap();
+        assert_eq!(resolution["schemaVersion"], 3);
+        assert_eq!(
+            resolution["entries"][0]["sourceVersion"],
+            source.source_version
+        );
+        let installed = packs.list(fixture.database.connection()).unwrap().remove(0);
+        assert_eq!(
+            packs
+                .uninstall(
+                    &mut fixture.database,
+                    &envelope(UninstallSkillPackCommand {
+                        skill_id: "brainstorming".into(),
+                        expected_version: installed.version,
+                    })
+                )
+                .unwrap()
+                .result
+                .code,
+            "skill_pack.uninstalled"
+        );
+        assert!(std::path::Path::new(&source.path).is_file());
+        assert!(
+            crate::file_preview_authority::resolve_skill_preview_source(
+                &fixture.database,
+                &fixture.directory,
+                &preview
+            )
+            .unwrap()
+            .is_none()
+        );
+        assert!(
+            packs
+                .composer_candidates(fixture.database.connection(), &fixture.camp_id)
+                .unwrap()
+                .0
+                .is_empty()
+        );
+        let ContextMaterialization::Ready(replay) = ContextService
+            .materialize_with_skill_exposure(&mut fixture.database, &store, &exposure, &request)
+            .unwrap()
+        else {
+            panic!("frozen input should replay")
+        };
+        assert_eq!(replay.rendered_payload, first.rendered_payload);
+        assert_eq!(
+            replay.rendered_payload_digest,
+            first.rendered_payload_digest
+        );
+        let reopened = Database::open(&fixture.directory).unwrap();
+        drop(std::mem::replace(&mut fixture.database, reopened));
+        let ContextMaterialization::Ready(restored) = ContextService
+            .materialize_with_skill_exposure(&mut fixture.database, &store, &exposure, &request)
+            .unwrap()
+        else {
+            panic!("reopened input should replay")
+        };
+        assert_eq!(restored.rendered_payload, first.rendered_payload);
+        assert_eq!(
+            restored.rendered_payload_digest,
+            first.rendered_payload_digest
+        );
+        fixture.cleanup();
+        let mut legacy = fixture_with_legacy_input(true);
+        let legacy_selection: String = legacy
+            .database
+            .connection()
+            .query_row(
+                "SELECT skill_selection_snapshot_json FROM agent_run WHERE id=?1",
+                [&legacy.run_id],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(
+            serde_json::from_str::<Value>(&legacy_selection).unwrap()["schemaVersion"],
+            2
+        );
+        crate::db::upgrade_skill_pack_context_fixture(&mut legacy.database);
+        assert_eq!(
+            legacy
+                .database
+                .connection()
+                .query_row(
+                    "SELECT skill_selection_snapshot_json FROM agent_run WHERE id=?1",
+                    [&legacy.run_id],
+                    |row| row.get::<_, String>(0)
+                )
+                .unwrap(),
+            legacy_selection
+        );
+        let ContextMaterialization::Ready(old) = ContextService
+            .materialize(
+                &mut legacy.database,
+                &ManagedBlobStore::new(&legacy.directory),
+                &MaterializeContextRequest {
+                    agent_run_id: &legacy.run_id,
+                    execution_epoch: legacy.execution_epoch,
+                    charter_delivery_mode: CharterDeliveryMode::NativeAppend,
+                    max_payload_bytes: DEFAULT_MAX_CONTEXT_PAYLOAD_BYTES,
+                },
+            )
+            .unwrap()
+        else {
+            panic!("pre-upgrade claimed input should materialize")
+        };
+        assert!(!old.rendered_payload.contains("[ROVAI_SKILL_PACKS]"));
+        let old_version: i64 = legacy
+            .database
+            .connection()
+            .query_row(
+                "SELECT context_manifest_version FROM context_manifest WHERE agent_run_id=?1",
+                [&legacy.run_id],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(old_version, 33);
+        legacy.cleanup();
+    }
+
     #[test]
     fn context_manifest_freezes_legacy_skill_omission_and_ignores_historical_mcp() {
-        let mut fixture = fixture();
+        let mut fixture = fixture_with_legacy_input(true);
         let library =
             SkillLibraryService::new(fixture.directory.join("managed-skill-library")).unwrap();
         library
@@ -11515,7 +12023,7 @@ mod slow_tests {
 
     #[test]
     fn redelivery_overlay_is_frozen_at_prepare_and_acknowledges_only_its_revision() {
-        let mut fixture = fixture();
+        let mut fixture = fixture_with_legacy_input(true);
         let conversation_id = bind_redelivery_fixture_session(&mut fixture, "redelivery-session");
         insert_redelivery_requirement(&mut fixture, &conversation_id, 1);
         let service = ContextService;
@@ -13185,6 +13693,10 @@ mod slow_tests {
         assert!(!prepared.runtime_payload.contains("[MEMORY_ENTRYPOINT]"));
         assert!(prepared.rendered_payload.contains("只检查当前单聊输入"));
         assert!(prepared.rendered_payload.contains("[SINGLE_CHAT_GUIDANCE]"));
+        assert!(prepared.rendered_payload.contains("[ROVAI_SKILL_PACKS]\nCurrent for this run; replaces any earlier Rovai Skill Packs.\n{\"skills\":[]}\n[/ROVAI_SKILL_PACKS]"));
+        assert_eq!(fixture.database.connection().query_row(
+            "SELECT context_manifest_version,run_facts_schema_version,context_delivery_profile_version FROM context_manifest WHERE agent_run_id=?1",
+            [&run_id], |row| Ok((row.get::<_,i64>(0)?,row.get::<_,i64>(1)?,row.get::<_,i64>(2)?))).unwrap(), (29,6,7));
         let evidence: (String, String) = fixture
             .database
             .connection()
@@ -14433,6 +14945,7 @@ mod slow_tests {
             run_facts: &camp_resources_only,
             workspace: None,
             additional_skills: None,
+            skill_packs: None,
             a2a_guidance: None,
             single_chat_guidance: None,
             current_input: Some(&json!({"source":{"type":"user"},"body":"work"})),

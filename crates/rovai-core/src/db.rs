@@ -20,6 +20,18 @@ mod pending_draft;
 mod run_continuation;
 #[path = "db_simplification.rs"]
 mod simplification;
+#[path = "db_skill_pack_context.rs"]
+mod skill_pack_context;
+
+#[cfg(test)]
+pub(crate) fn downgrade_skill_pack_context_fixture(connection: &Connection) {
+    skill_pack_context::downgrade_for_test(connection);
+}
+
+#[cfg(all(test, feature = "slow-tests"))]
+pub(crate) fn upgrade_skill_pack_context_fixture(database: &mut Database) {
+    skill_pack_context::migrate(database).unwrap();
+}
 #[path = "db_thread_names.rs"]
 mod thread_names;
 #[path = "db_user_anchors.rs"]
@@ -341,8 +353,8 @@ impl MainThreadMigrationSource {
 }
 
 pub(crate) const CURRENT_DATA_CONTRACT_VERSION: &str = "v1.72";
-pub(crate) const CURRENT_PROJECTION_SCHEMA_VERSION: i64 = 152;
-const CURRENT_SCHEMA_MIGRATION_VERSION: i64 = 202;
+pub(crate) const CURRENT_PROJECTION_SCHEMA_VERSION: i64 = 153;
+const CURRENT_SCHEMA_MIGRATION_VERSION: i64 = 203;
 const V147_MIGRATION_SOURCE_DATA_CONTRACT_VERSION: &str = "v1.54";
 const V147_MIGRATION_SOURCE_PROJECTION_SCHEMA_VERSION: i64 = 96;
 const V145_MIGRATION_SOURCE_DATA_CONTRACT_VERSION: &str = "v1.53";
@@ -2946,7 +2958,7 @@ fn connection_has_admissible_data_contract(connection: &Connection) -> rusqlite:
         .and_then(Option::as_ref)
         .is_some_and(|(contract, schema, _)| {
             contract == CURRENT_DATA_CONTRACT_VERSION
-                && matches!(schema, 145 | 146 | 147 | 148 | 149 | 150 | 151 | 152)
+                && matches!(schema, 145 | 146 | 147 | 148 | 149 | 150 | 151 | 152 | 153)
         })
     {
         return Ok(matches!(
@@ -3355,11 +3367,12 @@ pub(crate) fn classify_database_contract(
     if marker.contract_version == CURRENT_DATA_CONTRACT_VERSION
         && matches!(
             marker.projection_schema_version,
-            145 | 146 | 147 | 148 | 149 | 150 | 151 | 152
+            145 | 146 | 147 | 148 | 149 | 150 | 151 | 152 | 153
         )
     {
         let expected_migration = match marker.projection_schema_version {
-            152 => CURRENT_SCHEMA_MIGRATION_VERSION,
+            153 => CURRENT_SCHEMA_MIGRATION_VERSION,
+            152 => 202,
             151 => 201,
             150 => 200,
             149 => 199,
@@ -3393,7 +3406,9 @@ pub(crate) fn classify_database_contract(
             && (marker.projection_schema_version < 151
                 || crate::skill_pack_members::schema_matches(connection)?)
             && (marker.projection_schema_version < 152
-                || crate::canvas_board::schema_matches(connection)?);
+                || crate::canvas_board::schema_matches(connection)?)
+            && (marker.projection_schema_version < 153
+                || skill_pack_context::schema_matches(connection)?);
         return Ok(if !valid {
             DatabaseContractClassification::Unknown(Some(marker))
         } else if marker.projection_schema_version == CURRENT_PROJECTION_SCHEMA_VERSION {
@@ -9088,6 +9103,9 @@ impl Database {
             if !self.schema_migration_applied(202)? {
                 migration_step!("migration_202", self.migrate_canvas_boards());
             }
+            if !self.schema_migration_applied(203)? {
+                migration_step!("migration_203", skill_pack_context::migrate(self));
+            }
             if let Err(error) =
                 crate::notification::maintain_notification_episode_retention(self.connection())
             {
@@ -9913,6 +9931,9 @@ impl Database {
         if !self.schema_migration_applied(202)? {
             migration_step!("migration_202", self.migrate_canvas_boards());
         }
+        if !self.schema_migration_applied(203)? {
+            migration_step!("migration_203", skill_pack_context::migrate(self));
+        }
         if let Err(error) =
             crate::notification::maintain_notification_episode_retention(self.connection())
         {
@@ -10095,7 +10116,7 @@ impl Database {
         anyhow::ensure!(
             matches!(
                 classify_database_contract(&tx)?,
-                DatabaseContractClassification::Current(_)
+                DatabaseContractClassification::Current(ref marker) | DatabaseContractClassification::SupportedMigrationSource(ref marker) if marker.projection_schema_version==152
             ),
             "Canvas board schema admission failed"
         );
@@ -39895,6 +39916,7 @@ mod tests {
         database.migrate_skill_pack_installations().unwrap();
         database.migrate_skill_pack_members().unwrap();
         database.migrate_canvas_boards().unwrap();
+        skill_pack_context::migrate(&mut database).unwrap();
         assert!(connection_has_current_data_contract(database.connection()).unwrap());
         assert!(database.schema_migration_applied(200).unwrap());
         assert!(
