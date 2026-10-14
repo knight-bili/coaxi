@@ -14,7 +14,7 @@
   "current_branch": "phase/i02-skill-delivery",
   "base_branch": "phase/i03-canvas",
   "current_task": "I02-T03",
-  "current_slice": "旧输入恢复补测已同步；数据库历史夹具及当前格式断言已修复，Windows扩展109/0/0和默认workspace501/0/8通过；提交后进行Linux110项及进程边界验收",
+  "current_slice": "数据库夹具修复已同步63fc52b4，Windows109/0/0、workspace501/0/8通过；Linux新run38564836044复验进行中，继续隔离Core进程恢复和其余技能场景",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "同步数据库夹具修复，在公开标准Linux runner复验完整110项数据库扩展，保留原12失败记录。",
+    "跟踪Linux run38564836044的真实终态和110项数据库扩展；不重复dispatch，保留原失败记录。",
     "补Core进程重启/受控Runtime接受边界及SP01-SP11其余精确场景，数据库重开不替代进程恢复。",
     "专用测试身份与硬预算到位后执行SP12真实指南读取Gate；不自动付费。",
     "继续I03八类节点、业务绑定、布局和交互PTY，以及I02剩余与I04-I12完整范围。"
@@ -63,8 +63,8 @@
   "skill_delivery_context_evidence": "i02-skill-delivery-context-result.json",
   "ci_cost_policy": "integration/ci-cost-policy.md",
   "ci_access_evidence": "ci-free-result.json",
-  "ci_access_status": "public_runner_verified_windows_regressions_repaired_linux_pending",
-  "ci_next_action": "原run38543710547保留failure；本地修复和全部109项已通过，提交同步后启动新的Linux运行并记录实际终态",
+  "ci_access_status": "public_runner_verified_local_repair_synced_linux_in_progress",
+  "ci_next_action": "读取run38564836044终态和日志；同步状态后继续SP08等，不将编译或夹具视为真实模型验收",
   "skill_delivery_matrix_evidence": "i02-skill-delivery-matrix-result.json",
   "database_regression_repair_evidence": "i02-db153-regression-repair-result.json"
 }

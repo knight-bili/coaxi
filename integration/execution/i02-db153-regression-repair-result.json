@@ -1,6 +1,6 @@
 {
   "recordedAt": "2026-10-14T12:26:54.175Z",
-  "status": "windows_database_and_staged_workspace_passed_linux_pending",
+  "status": "windows_passed_linux_workflow_in_progress",
   "baseline": "aa5e85bf533512c155d210679c3c18594583dcdc",
   "source": {
     "crates/rovai-core/src/db.rs": {
@@ -58,7 +58,7 @@
       "unixOnly": [
         "db::tests::v107_quarantine_moves_owned_directories_without_following_links"
       ],
-      "linuxStatus": "not_rerun_yet"
+      "linuxStatus": "in_progress"
     },
     "staged": {
       "status": "passed",
@@ -93,6 +93,16 @@
       "scaffold": "passed:81/48/324",
       "foundation": "passed:161operations/10http/6migration-design",
       "logPrefix": "work/i02/db153-"
+    },
+    "cloud": {
+      "checkedAt": "2026-10-14T12:36:51.680Z",
+      "id": 38564836044,
+      "commit": "63fc52b4c13ad12754ba75c2c25cb0c6f0e6697a",
+      "status": "in_progress",
+      "conclusion": null,
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/actions/runs/38564836044",
+      "platform": "linux",
+      "standardPublicRunner": true
     }
   },
   "remaining": [
@@ -103,5 +113,11 @@
     "work/i02/db153-current-schema-before.log",
     "work/i02/db153-fixture-repair-legacy-1.log",
     "work/ci-free-20261014/core-linux-failed.log"
-  ]
+  ],
+  "synchronization": {
+    "commit": "63fc52b4c13ad12754ba75c2c25cb0c6f0e6697a",
+    "pr": 54,
+    "remoteAndFetchVerified": true,
+    "method": "Git push with per-command OpenSSL/HTTP1.1/32MiB buffer; no global configuration changed"
+  }
 }
