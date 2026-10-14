@@ -153,6 +153,7 @@ export function ThreadNavigation({
   onMembers,
   onAutomations = () => undefined,
   onMissions = () => undefined,
+  onCanvas = () => undefined,
   unreadMissionCount = 0,
   onMemory,
   pendingMemoryCount,
@@ -177,7 +178,7 @@ export function ThreadNavigation({
   navigationId?: string
   settingsNavigation?: React.ReactNode
   footer?: React.ReactNode
-  view: 'compose' | 'camp' | 'members' | 'automations' | 'missions' | 'memory' | 'settings'
+  view: 'compose' | 'camp' | 'members' | 'automations' | 'missions' | 'canvas' | 'memory' | 'settings'
   state: 'loading' | 'ready' | 'error'
   disabled?: boolean
   navigation: NavigationSnapshot | null
@@ -202,6 +203,7 @@ export function ThreadNavigation({
   onMembers(): void
   onAutomations?(): void
   onMissions?(): void
+  onCanvas?(): void
   unreadMissionCount?: number
   onMemory(): void
   pendingMemoryCount: number
@@ -444,6 +446,9 @@ export function ThreadNavigation({
                   >
                     <span className="rail-glyph" aria-hidden="true"><MissionIcon /></span><span className="rail-label"><UiText zh={"使命板"} /></span>
                     {unreadMissionCount > 0 && <i className="mission-rail-badge-dot" aria-hidden="true" />}
+                  </button>
+                  <button className={`rail-button ${view === 'canvas' ? 'active' : ''}`} type="button" aria-current={view === 'canvas' ? 'page' : undefined} aria-label={uiAttribute('无限画布')} title={uiAttribute('无限画布')} onClick={onCanvas} disabled={state !== 'ready'}>
+                    <span className="rail-glyph" aria-hidden="true"><NavigationIcon name="blocks" /></span><span className="rail-label"><UiText zh="无限画布" /></span>
                   </button>
                   <button className={`rail-button ${view === 'automations' ? 'active' : ''}`} type="button" aria-current={view === 'automations' ? 'page' : undefined} aria-label={uiAttribute("定时任务")} title={uiAttribute("定时任务")} onClick={onAutomations}>
                     <span className="rail-glyph" aria-hidden="true"><NavigationIcon name="calendar-clock" /></span><span className="rail-label"><UiText zh={"定时任务"} /></span>

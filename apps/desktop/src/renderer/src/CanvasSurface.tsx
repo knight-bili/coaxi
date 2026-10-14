@@ -18,7 +18,7 @@ import { UiText, uiAttribute } from './interface-language'
 import { readErrorMessage } from './error-message'
 import './canvas.css'
 
-export type CanvasLeaveGuard = () => Promise<boolean>
+export interface CanvasLeaveGuard { canLeave(): Promise<boolean>; isBlocked(): boolean }
 export interface CanvasSurfaceProps {
   boardId: string
   scope: CanvasViewScope | null
@@ -147,7 +147,8 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
   useEffect(() => { if (!dragging.current) setNodes(derived) }, [derived])
   useEffect(() => { saveCanvasViewState(storage, props.scope, props.boardId, view) }, [storage, view, props.scope, props.boardId])
   useEffect(() => {
-    props.onLeaveGuardChange?.(async () => !panel.current && !dragging.current && !latestGraph.current.hasUnsettled())
+    const isBlocked = () => panel.current || dragging.current || Boolean(latestGraph.current.hasUnsettled())
+    props.onLeaveGuardChange?.({ isBlocked, canLeave: async () => !isBlocked() })
     return () => props.onLeaveGuardChange?.(null)
   }, [props.onLeaveGuardChange])
 
@@ -200,10 +201,10 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
           ...(row.data.gridColumns ? { gridColumns: columns } : {}), ...(row.data.gridRows ? { gridRows: rows } : {}) } : {}) } }, revision ?? undefined)
     }
   }
-  const deleteSelected = () => {
+  const deleteSelected = (ids = selected) => {
     panel.current = true
-    setDeletion({ ids: [...selected], revision: graph.snapshot!.board!.revision,
-      hasProse: rows.some(row => selected.includes(row.id) && noteHoldsProse(row)) })
+    setDeletion({ ids: [...ids], revision: graph.snapshot!.board!.revision,
+      hasProse: rows.some(row => ids.includes(row.id) && noteHoldsProse(row)) })
   }
   const groupSelected = () => {
     const pins = rows.filter(row => selected.includes(row.id) && row.data.kind === 'conversation' && row.data.conversation)
@@ -226,7 +227,22 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     const others = nodes.filter(item => !ids.has(item.id)).map(item => ({ ...item.position, width: item.width ?? 0, height: item.height ?? 0 }))
     return computeAlignment({ x: left, y: top, width: right - left, height: bottom - top }, others, 8 / flow.getZoom(), BOARD_DOT_GAP)
   }
-  return <section ref={surface} className="canvas-surface" aria-label={uiAttribute('无限画布')}>
+  return <section ref={surface} className="canvas-surface" aria-label={uiAttribute('无限画布')} onKeyDownCapture={event => {
+    const target = event.target
+    if (!(target instanceof HTMLElement) || !target.matches('.react-flow__node, .react-flow__nodesselection-rect') || event.metaKey || event.ctrlKey || event.altKey) return
+    const direction = ({ ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] } as Record<string, number[]>)[event.key]
+    if (!direction && event.key !== 'Delete' && event.key !== 'Backspace') return
+    // ReactFlow's keyboard movement is local only. Route it through the same Core command as pointer gestures.
+    event.preventDefault(); event.stopPropagation()
+    if (blocked || panel.current || dragging.current || latestGraph.current.hasUnsettled()) return
+    const focused = target.dataset.id, ids = focused && !selected.includes(focused) ? [focused] : selected
+    if (!ids.length) return
+    if (focused && !selected.includes(focused)) setSelected([focused])
+    if (!direction) { deleteSelected(ids); return }
+    const distance = event.shiftKey ? 20 : 5
+    const moves = rows.filter(row => ids.includes(row.id)).map(row => ({ nodeId: row.id, x: row.data.x + direction[0] * distance, y: row.data.y + direction[1] * distance }))
+    if (moves.length) mutate({ type: 'move', moves }, graph.snapshot!.board!.revision)
+  }}>
     <div className="canvas-toolbar">
       <button type="button" disabled={blocked} onClick={() => {
         const bounds = flow.getViewport(), element = surface.current?.getBoundingClientRect()
@@ -234,7 +250,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
         panel.current = true; setEditor({ target: { type: 'create', position: point }, revision: graph.snapshot!.board!.revision })
       }}><UiText zh="添加节点" /></button>
       <button type="button" disabled={blocked || !rows.some(row => selected.includes(row.id) && row.data.kind === 'conversation')} onClick={groupSelected}><UiText zh="选中对话分组" /></button>
-      <button type="button" disabled={blocked || !selected.length} onClick={deleteSelected}><UiText zh="删除所选" /></button>
+      <button type="button" disabled={blocked || !selected.length} onClick={() => deleteSelected()}><UiText zh="删除所选" /></button>
       <button type="button" disabled={blocked || !rows.length} onClick={() => {
         const sizes = new Map(nodes.map(node => [node.id, { width: node.width ?? node.data.row.data.width, height: node.height ?? node.data.row.data.height }]))
         const moves = packLayout(rows.map(row => ({ id: row.id, ...row.data })), sizes)
@@ -250,6 +266,10 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     {!graph.loading && graph.snapshot && !graph.snapshot.board && <p className="canvas-notice"><UiText zh="此画板已被删除，请选择其他画板。" /></p>}
     <PresentationContext.Provider value={actions}>
       <ReactFlow<FlowNode> nodes={nodes} nodeTypes={nodeTypes} onNodesChange={changes => setNodes(current => applyNodeChanges(changes, current))}
+        colorMode={props.theme === 'night' ? 'dark' : 'light'} ariaLabelConfig={{ 'controls.zoomIn.ariaLabel': uiAttribute('放大画布'), 'controls.zoomOut.ariaLabel': uiAttribute('缩小画布'), 'controls.fitView.ariaLabel': uiAttribute('查看全部'),
+          'controls.ariaLabel': uiAttribute('画布缩放控件'), 'minimap.ariaLabel': uiAttribute('小地图'),
+          'node.a11yDescription.default': uiAttribute('按回车或空格选择节点，方向键移动，Shift 加速，Delete 删除。'),
+          'node.a11yDescription.keyboardDisabled': uiAttribute('选择节点后可使用工具栏。') }}
         onSelectionChange={({ nodes }) => setSelected(current => {
           const ids = nodes.map(node => node.id); return ids.length === current.length && ids.every((id, i) => id === current[i]) ? current : ids
         })} nodesDraggable={!blocked} elementsSelectable={!blocked} selectionMode={SelectionMode.Partial} selectionOnDrag panOnDrag={[1, 2]} panOnScroll
@@ -290,6 +310,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
       agents={props.agents} groups={props.groups ?? EMPTY_GROUPS}
       references={props.references ?? props.threads.map(thread => ({ reference: { threadId: thread.id, conversationId: null }, label: thread.title }))}
       blocked={graphBlocked} pending={Boolean(graph.pending)} recovery={recovery} onClose={closePanel}
+      commandError={issue}
       onSave={(mutation, revision) => submit(mutation, revision, true)} />}
     {deletion && <Dialog.Root open onOpenChange={open => { if (!open) closePanel() }}><Dialog.Portal>
       <Dialog.Overlay className="dialog-overlay app-dialog-overlay" />

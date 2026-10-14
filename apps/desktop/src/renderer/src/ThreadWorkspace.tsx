@@ -1728,7 +1728,7 @@ export function ThreadWorkspace({
   onNotificationFocusPresented?(requestId: number): void
   onVisibleNotificationSources?(sources: VisibleNotificationSources): void
   onVisibleSingleChatSources?(sources: VisibleNotificationSources): void
-  singleChatTarget?: import("@contracts").NotificationSingleChatSource & { requestId: number } | null
+  singleChatTarget?: import('./SingleChatPanel').SingleChatPanelTarget | null
   runtimeRecovery?: ThreadRuntimeRecovery | null
   firstRunThread?: FirstRunThreadContext | null
   firstRunThreadId?: string | null

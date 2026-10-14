@@ -17,7 +17,7 @@ export interface CanvasReferenceOption { reference: CanvasConversationRef; label
 export interface CanvasFolderGroupOption { id: string; label: string }
 export type CanvasEditTarget = { type: 'create'; position: { x: number; y: number } } | { type: 'update'; row: CanvasNode }
 
-export function CanvasNodeEditor({ target, revision, latestRevision, agents, groups, references, blocked, pending, recovery, onClose, onSave }: {
+export function CanvasNodeEditor({ target, revision, latestRevision, agents, groups, references, blocked, pending, recovery, commandError, onClose, onSave }: {
   target: CanvasEditTarget
   revision: number
   latestRevision: number | null
@@ -27,6 +27,7 @@ export function CanvasNodeEditor({ target, revision, latestRevision, agents, gro
   blocked: boolean
   pending: boolean
   recovery: ReactNode
+  commandError: string | null
   onClose(): void
   onSave(mutation: CanvasNodeMutation, expectedRevision: number): Promise<void>
 }): React.JSX.Element {
@@ -128,7 +129,7 @@ export function CanvasNodeEditor({ target, revision, latestRevision, agents, gro
           {stale && <p className="canvas-notice"><UiText zh="画布已更新，输入仍保留。核对后可按最新画布版本保存。" />
             <button type="button" disabled={locked || blocked} onClick={() => { setCapturedRevision(latestRevision!); setError(null) }}><UiText zh="使用最新画布版本" /></button>
           </p>}
-          {error && <p role="alert">{error}</p>}{recovery}
+          {(commandError || error) && <p role="alert">{commandError || error}</p>}{recovery}
         </AppDialogBody>
         <AppDialogFooter>
           <button className="quiet-button" type="button" disabled={locked} onClick={close}><UiText zh="取消" /></button>

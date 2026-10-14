@@ -1,5 +1,5 @@
 import { expect, it, vi } from 'vitest'
-import { browserCanvasStorage, canvasViewScope, initialCanvasViewState, loadCanvasViewState, parseCanvasViewport, pruneCanvasExpansions, saveCanvasViewState } from './canvas-view-state'
+import { browserCanvasStorage, canvasViewScope, initialCanvasViewState, loadCanvasBoardSelection, loadCanvasViewState, parseCanvasViewport, pruneCanvasExpansions, saveCanvasBoardSelection, saveCanvasViewState } from './canvas-view-state'
 
 function storage() {
   const values = new Map<string, string>()
@@ -10,9 +10,12 @@ it('scopes views to Host/Core/board while sharing the minimap preference only in
   const state = { viewport: { x: -2000000, y: 12, zoom: 2 }, expandedCards: ['card'], expandedRegions: ['region'], minimap: false }
   expect(saveCanvasViewState(local, scope, 'board-a', state)).toBe(true)
   expect(loadCanvasViewState(local, scope, 'board-a')).toEqual(state)
+  saveCanvasBoardSelection(local, scope, 'board-a')
+  expect(loadCanvasBoardSelection(local, scope)).toBe('board-a')
   expect(loadCanvasViewState(local, scope, 'board-b')).toEqual({ ...initialCanvasViewState(), minimap: false })
   for (const other of [{ ...scope, host: 'other/owner' }, { ...scope, core: '/core-b' }]) {
     expect(loadCanvasViewState(local, other, 'board-a')).toEqual(initialCanvasViewState())
+    expect(loadCanvasBoardSelection(local, other)).toBeNull()
   }
   local.values.set('workspace:canvas-viewport', JSON.stringify(state.viewport))
   expect(loadCanvasViewState(local, { host: 'new', core: 'new' }, 'legacy-id')).toEqual(initialCanvasViewState())

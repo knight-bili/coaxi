@@ -4,6 +4,9 @@ import { hasPendingThreadDraftInput } from './pending-thread-draft'
 import { memberCreationHelper, memberCreationInitialDraft, navigationWithMemberCreationDrafts, type MemberCreationDraft } from './member-creation-flow'
 import { navigationThreadReadState } from './navigation-unread'
 import { newCommandId } from '../../shared/command-id'
+import { CanvasWorkspace } from './CanvasWorkspace'
+import type { CanvasLeaveGuard } from './CanvasSurface'
+import type { SingleChatPanelTarget } from './SingleChatPanel'
 import type { BusinessEnvironment } from './business-environment'
 import { AppHeader } from './AppHeader'
 import { MobileLayoutProvider, MobilePageHeader, useMobilePageTransition, useMobileViewport } from './MobileLayout'
@@ -36,6 +39,8 @@ import type {
   ThreadSnapshot,
   CreateThreadRequest,
   CoreEvent,
+  CanvasConversationRef,
+  SingleChatSnapshot,
   DesktopStartupSnapshot,
   EventBatch,
   ExecutionConsolePlacement,
@@ -286,7 +291,7 @@ export function requestAuthoritativeThreadOpenProjection(
 type LoadState = 'loading' | 'ready' | 'error'
 export type StartupStatus = 'loading' | 'waiting' | 'resolved'
 export const SHUTDOWN_FEEDBACK_DELAY_MS = 400
-export type View = 'compose' | 'camp' | 'members' | 'automations' | 'missions' | 'memory' | 'settings'
+export type View = 'compose' | 'camp' | 'members' | 'automations' | 'missions' | 'canvas' | 'memory' | 'settings'
 type ActivateThreadOptions = {
   memberPrepared?: boolean
   reconcileDefaultLead?: boolean
@@ -343,13 +348,21 @@ export async function prepareActiveAutomationForAppQuit(
 }
 
 export type SettingsSection = NavigationSettingsSection
-export type WindowDragStripPage = Extract<View, 'compose' | 'members' | 'automations' | 'missions' | 'memory' | 'settings'>
+export async function runCanvasLeaveTransition(view: View, guard: CanvasLeaveGuard | null, transition: () => void | Promise<void>): Promise<boolean> {
+  if (view === 'canvas' && guard && !await guard.canLeave()) return false
+  await transition(); return true
+}
+export async function prepareActiveCanvasForAppQuit(view: View, guard: CanvasLeaveGuard | null): Promise<void> {
+  if (view === 'canvas' && guard && !await guard.canLeave()) throw new Error(uiAttribute('画布操作或编辑尚未处理完成'))
+}
+export type WindowDragStripPage = Extract<View, 'compose' | 'members' | 'automations' | 'missions' | 'canvas' | 'memory' | 'settings'>
 
 export function windowDragStripPage(view: View): WindowDragStripPage | null {
   return view === 'compose'
     || view === 'members'
     || view === 'automations'
     || view === 'missions'
+    || view === 'canvas'
     || view === 'memory'
     || view === 'settings'
     ? view
@@ -1141,7 +1154,8 @@ export function BusinessApp({
   const campInspectorVisible = activeThreadId !== null && campInspectorThreadId === activeThreadId
   const singleChatVisible = activeThreadId !== null && singleChatThreadId === activeThreadId
   const [notificationFocus, setNotificationFocus] = useState<NotificationFocusTarget | null>(null)
-  const [singleChatNotificationTarget, setSingleChatNotificationTarget] = useState<(NonNullable<NotificationActionView['singleChat']> & { requestId: number }) | null>(null)
+  const [singleChatNotificationTarget, setSingleChatNotificationTarget] = useState<SingleChatPanelTarget | null>(null)
+  const canvasReferenceRequest = useRef(0)
   const [visibleSingleChatSources, setVisibleSingleChatSources] = useState<VisibleNotificationSources | null>(null)
   const [visibleNotificationSources, setVisibleNotificationSources] = useState<VisibleNotificationSources | null>(null)
   const [notificationAnchor, setNotificationAnchor] = useState<{
@@ -1210,6 +1224,7 @@ export function BusinessApp({
     threadId: string; guard: ThreadLeaveGuard; promise: Promise<ThreadLeavePreparation>; users: number; didLeave: boolean
   } | null>(null)
   const automationLeaveGuardRef = useRef<AutomationLeaveGuard | null>(null)
+  const canvasLeaveGuardRef = useRef<CanvasLeaveGuard | null>(null)
   const startupResolvedSessionId = useRef<string | null>(null)
   const pendingRestorableLocation = useRef<RestorableLocation | null>(null)
   const invalidatingNewConversationDefaults = useRef(false)
@@ -1321,6 +1336,7 @@ export function BusinessApp({
   const registerAutomationLeaveGuard = useCallback((guard: AutomationLeaveGuard | null): void => {
     automationLeaveGuardRef.current = guard
   }, [])
+  const registerCanvasLeaveGuard = useCallback((guard: CanvasLeaveGuard | null): void => { canvasLeaveGuardRef.current = guard }, [])
 
   const leaveActiveAutomation = useCallback(async (
     transition: () => void | Promise<void>
@@ -1341,14 +1357,18 @@ export function BusinessApp({
     transition: () => void | Promise<void>
   ): Promise<boolean> => {
     let automationTransitioned = false
-    const campTransitioned = await leaveActiveThread(async () => {
-      automationTransitioned = await leaveActiveAutomation(transition)
+    let campTransitioned = false
+    const canvasTransitioned = await runCanvasLeaveTransition(viewRef.current, canvasLeaveGuardRef.current, async () => {
+      campTransitioned = await leaveActiveThread(async () => {
+        automationTransitioned = await leaveActiveAutomation(transition)
+      })
     })
-    return campTransitioned && automationTransitioned
+    return canvasTransitioned && campTransitioned && automationTransitioned
   }, [leaveActiveAutomation, leaveActiveThread])
 
   const prepareForAppQuit = useCallback(async (): Promise<void> => {
     try {
+      await prepareActiveCanvasForAppQuit(viewRef.current, canvasLeaveGuardRef.current)
       await prepareActiveThreadForAppQuit(
         viewRef.current,
         activeThreadIdRef.current,
@@ -2884,6 +2904,7 @@ export function BusinessApp({
       : nextView === 'memory' ? { kind: 'memory', memoryId: null }
       : nextView === 'automations' ? { kind: 'automations' }
       : nextView === 'missions' ? { kind: 'missions' }
+      : nextView === 'canvas' ? { kind: 'canvas' }
       : nextView === 'camp' && activeThreadId ? { kind: 'camp', threadId: activeThreadId }
       : nextView === 'settings' ? { kind: 'settings', section: settingsSection }
       : { kind: 'quick_chat', projectPath: currentProject.kind === 'directory' ? currentProject.projectPath : null }
@@ -2974,6 +2995,7 @@ export function BusinessApp({
         case 'memory': setMemoryTarget(target); setView('memory'); break
         case 'automations': setView('automations'); break
         case 'missions': setView('missions'); break
+        case 'canvas': setView('canvas'); break
         case 'quick_chat':
           if (target.projectPath !== undefined) chooseCurrentProject(projectWorkspace
             ? { kind: 'directory', projectPath: projectWorkspace.projectPath }
@@ -3096,6 +3118,29 @@ export function BusinessApp({
   const chooseThread = (thread: NavigationThreadTarget): void => {
     void activateThread(thread.id, { reconcileDefaultLead: thread.activationState !== 'pending' })
       .catch((nextError) => notifyError(errorMessage(nextError)))
+  }
+
+  const openCanvasReference = async (reference: CanvasConversationRef): Promise<void> => {
+    const intent = desktopNavigation.beginIntent()
+    try {
+      let target: SingleChatPanelTarget | null = null
+      if (reference.conversationId) {
+        const snapshot = await client.request<SingleChatSnapshot | null>('singleChat.get', { conversationId: reference.conversationId })
+        if (!intent.isCurrent()) return
+        const conversation = snapshot?.conversation
+        if (!conversation || conversation.id !== reference.conversationId || conversation.threadId !== reference.threadId || conversation.status !== 'active') {
+          throw new Error(uiAttribute('这段单聊已结束或不可用。'))
+        }
+        target = { conversationId: conversation.id, agentId: conversation.agentId,
+          agentDisplayName: agents.find(agent => agent.agentId === conversation.agentId)?.displayName ?? uiAttribute('队员'), requestId: ++canvasReferenceRequest.current }
+      }
+      if (!intent.isCurrent()) return
+      const opened = await desktopNavigation.push({ kind: 'camp', threadId: reference.threadId }, { campOptions: { reconcileDefaultLead: false } })
+      if (!opened) return
+      setSingleChatNotificationTarget(target)
+      setSingleChatThreadId(target ? reference.threadId : null)
+      setThreadInspectorThreadId(null)
+    } catch (error) { if (intent.isCurrent()) notifyError(errorMessage(error)) }
   }
 
   const navigateFromNotification = useCallback(async (
@@ -4153,6 +4198,7 @@ export function BusinessApp({
     members: 'members-content',
     automations: 'automation-content',
     missions: 'mission-board-content',
+    canvas: 'canvas-content',
     memory: 'memory-content',
     settings: 'settings-content'
   }
@@ -4303,6 +4349,7 @@ export function BusinessApp({
     onMembers={() => { setMobileConversationDrawerOpen(false); chooseView('members') }}
     onAutomations={() => { setMobileConversationDrawerOpen(false); chooseView('automations') }}
     onMissions={() => { setMobileConversationDrawerOpen(false); chooseView('missions') }}
+    onCanvas={() => { setMobileConversationDrawerOpen(false); chooseView('canvas') }}
     unreadMissionCount={unreadMissionCount(missionList.missions)}
     onMemory={() => { setMobileConversationDrawerOpen(false); chooseView('memory') }}
     pendingMemoryCount={pendingMemoryCount}
@@ -4496,6 +4543,15 @@ export function BusinessApp({
             }}
           />
         )}
+
+        {!startupGateVisible && view === 'canvas' && <>
+          {mobile && <MobilePageHeader title={uiAttribute('无限画布')} onOpenMenu={openMobileMenu} menuOpen={mobileConversationDrawerOpen} triggerRef={mobileConversationListButtonRef} />}
+          <CanvasWorkspace agents={agents} threads={visibleNavigation ? allNavigationThreads(visibleNavigation) : []} theme={appearance.resolvedTheme}
+            onOpenReference={reference => { void openCanvasReference(reference) }}
+            onOpenMember={agentId => { void desktopNavigation.push({ kind: 'members', agentId, tab: 'identity' }) }}
+            onOpenProject={path => { void desktopNavigation.push({ kind: 'quick_chat', projectPath: path }) }}
+            onLeaveGuardChange={registerCanvasLeaveGuard} />
+        </>}
 
         {!startupGateVisible && view === 'automations' && (
           <AutomationWorkspace

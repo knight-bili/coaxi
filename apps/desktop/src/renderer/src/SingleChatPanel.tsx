@@ -634,6 +634,9 @@ type PendingReturnRecovery = {
   commandId: string
 }
 
+/** Canvas navigation selects a conversation; only notification focus may additionally select a Run. */
+export type SingleChatPanelTarget = Pick<NotificationSingleChatSource, 'conversationId' | 'agentId' | 'agentDisplayName'> & { requestId: number }
+
 export function SingleChatPanel({
   threadId,
   members,
@@ -651,7 +654,7 @@ export function SingleChatPanel({
   busy = false,
   onResolveApproval = () => undefined
 }: {
-  target?: (NotificationSingleChatSource & { requestId: number }) | null
+  target?: SingleChatPanelTarget | null
   notificationFocus?: NotificationFocusTarget | null
   onNotificationFocusPresented?(requestId: number): void
   onVisibleNotificationSources?(sources: VisibleNotificationSources): void

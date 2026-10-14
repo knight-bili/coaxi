@@ -68,6 +68,7 @@ import {
   navigationWithoutDeletedThreads,
   optimisticThreadMessage,
   prepareActiveAutomationForAppQuit,
+  prepareActiveCanvasForAppQuit,
   prepareActiveThreadForAppQuit,
   rectanglesIntersect,
   recentThreadSnapshot,
@@ -78,6 +79,7 @@ import {
   requestAuthoritativeThreadOpenProjection,
   runtimeRecoveryFromCommandResult,
   runAutomationLeaveTransition,
+  runCanvasLeaveTransition,
   selectProjectDirectory,
   SettingsView,
   shouldRefreshNavigationForCoreEvent,
@@ -2139,6 +2141,18 @@ describe('task event projections', () => {
     expect(guard).toHaveBeenCalledOnce()
   })
 
+  it('blocks Canvas navigation and App quit while edits or unknown commands still own the page', async () => {
+    const transition = vi.fn(), guard = { isBlocked: () => true, canLeave: vi.fn(async () => false) }
+    expect(await runCanvasLeaveTransition('canvas', guard, transition)).toBe(false)
+    expect(transition).not.toHaveBeenCalled()
+    await expect(prepareActiveCanvasForAppQuit('canvas', guard)).rejects.toThrow('画布操作或编辑尚未处理完成')
+    await prepareActiveCanvasForAppQuit('memory', guard)
+    expect(guard.canLeave).toHaveBeenCalledTimes(2)
+    const events: string[] = []
+    expect(await runCanvasLeaveTransition('canvas', { isBlocked: () => false, canLeave: async () => { events.push('checked'); return true } }, () => { events.push('left') })).toBe(true)
+    expect(events).toEqual(['checked', 'left'])
+  })
+
   it('waits for Automation save before leaving and stays when saving fails', async () => {
     const events: string[] = []
     const saved = await runAutomationLeaveTransition(
@@ -2608,6 +2622,7 @@ describe('task event projections', () => {
     expect(windowDragStripPage('settings')).toBe('settings')
     expect(windowDragStripPage('members')).toBe('members')
     expect(windowDragStripPage('memory')).toBe('memory')
+    expect(windowDragStripPage('canvas')).toBe('canvas')
     expect(windowDragStripPage('camp')).toBeNull()
   })
 
@@ -7890,7 +7905,7 @@ describe('task event projections', () => {
       onOpenRuntimeSettings: () => undefined
     }))
 
-    expect(VISIBLE_PRODUCT_RUNTIMES).toEqual(['claude-code-cli', 'codex-cli', 'copilot-cli', 'opencode-cli', 'kiro-cli', 'qoder-cli', 'codebuddy-cli', 'qwen-code', 'trae-cn-cli', 'kimi-code-cli', 'grok-build', 'deepseek-harness', 'zcode-app', 'antigravity-app', 'pi'])
+    expect(VISIBLE_PRODUCT_RUNTIMES).toEqual(['claude-code-cli', 'codex-cli', 'copilot-cli', 'opencode-cli', 'kiro-cli', 'qoder-cli', 'codebuddy-cli', 'qwen-code', 'gemini-cli', 'hermes-cli', 'openclaw-cli', 'trae-cn-cli', 'kimi-code-cli', 'grok-build', 'deepseek-harness', 'zcode-app', 'antigravity-app', 'pi'])
     expect(markup).toContain('member-runtime-picker')
     expect(markup).toContain('aria-label="智能体类型，暂不配置"')
     expect(markup).toContain('aria-haspopup="menu"')
@@ -8342,6 +8357,9 @@ function runtimeAdmissionRows(
     'qoder-cli',
     'codebuddy-cli',
     'qwen-code',
+    'gemini-cli',
+    'hermes-cli',
+    'openclaw-cli',
     'trae-cn-cli',
     'cursor-agent',
     'kimi-code-cli',
@@ -8352,6 +8370,7 @@ function runtimeAdmissionRows(
     'zcode-app',
     'antigravity-app'
   ]
+  // Synthetic UI branch data, never evidence of actual platform or model qualification.
   return runtimeKinds.map((runtimeKind) => {
     const effectiveStatus = ['cursor-agent', 'cline-cli', 'command-code-cli'].includes(runtimeKind) && status === 'qualified'
         ? 'not_qualified'

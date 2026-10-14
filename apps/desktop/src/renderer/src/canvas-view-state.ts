@@ -33,8 +33,17 @@ export function parseCanvasViewport(value: unknown): CanvasViewport | null {
 }
 const viewKey = (scope: CanvasViewScope, board: string) => `rovai.canvas.view.v1:${JSON.stringify([scope.host, scope.core, board])}`
 const mapKey = (scope: CanvasViewScope) => `rovai.canvas.minimap.v1:${JSON.stringify([scope.host, scope.core])}`
+const boardKey = (scope: CanvasViewScope) => `rovai.canvas.board.v1:${JSON.stringify([scope.host, scope.core])}`
 function read(storage: ViewStorage | undefined, key: string): unknown {
   try { return JSON.parse(storage?.getItem(key) ?? 'null') } catch { return null }
+}
+export function loadCanvasBoardSelection(storage: ViewStorage | undefined, scope: CanvasViewScope | null): string | null {
+  const value = scope ? read(storage, boardKey(scope)) : null
+  return identity(value) ? value : null
+}
+export function saveCanvasBoardSelection(storage: ViewStorage | undefined, scope: CanvasViewScope | null, boardId: string): void {
+  if (!scope || !identity(boardId)) return
+  try { storage?.setItem(boardKey(scope), JSON.stringify(boardId)) } catch { /* Advisory preference only. */ }
 }
 export function loadCanvasViewState(storage: ViewStorage | undefined, scope: CanvasViewScope | null, boardId: string): CanvasViewState {
   if (!scope || !identity(scope.host) || !identity(scope.core) || !identity(boardId)) return initialCanvasViewState()

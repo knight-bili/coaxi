@@ -24,6 +24,8 @@ export type ThreadClient = Pick<RovaiApi,
     }>
   }
   editingRecovery?: EditingRecovery
+  /** Authenticated Host/Owner identity for advisory presentation preferences; never a resource grant. */
+  presentationScope?: string
   /** Explicit resource/platform dependencies of the shared management pages. */
   exportMonitoring: (filter: import('@contracts').MonitoringFilter) => Promise<{ exported: boolean; path?: string }>
   revealMonitoringExport: RovaiApi['revealMonitoringExport'] | null
