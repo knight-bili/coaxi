@@ -59,5 +59,9 @@
   "skill_members_evidence": "i02-skill-members-result.json",
   "canvas_boards_evidence": "i03-canvas-boards-result.json",
   "skill_delivery_preparation_evidence": "i02-skill-delivery-preparation-result.json",
-  "skill_delivery_context_evidence": "i02-skill-delivery-context-result.json"
+  "skill_delivery_context_evidence": "i02-skill-delivery-context-result.json",
+  "ci_cost_policy": "integration/ci-cost-policy.md",
+  "ci_access_evidence": "ci-free-result.json",
+  "ci_access_status": "public_runner_started_scaffold_passed",
+  "ci_next_action": "跟踪Core run38543710547，结束后归档真实测试结果并处理失败，再继续I02兼容矩阵"
 }

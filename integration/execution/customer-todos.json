@@ -64,8 +64,8 @@
     {
       "id": "INPUT-GITHUB-CI",
       "required_for": "Mac/Linux及GitHub原生验证",
-      "need": "已获客户授权并完成公开前审查，仓库现已公开；正在实测标准runner。不要求提高支出上限或绑定付款方式",
-      "status": "resolved_public_repository_cloud_probe_pending",
+      "need": "公开前审查及仓库转换已完成，标准runner已运行且计划/治理门禁通过；Linux Core继续由研发跟踪，不需客户提高额度。账号历史账单和硬预算未核实",
+      "status": "resolved_public_runner_started_scaffold_passed",
       "evidence": {
         "head": "e2963ef0d59989d16d32fffc03d19925dd75de85",
         "run": 38500616853,
@@ -88,7 +88,11 @@
         "publicVerified": true,
         "accountBudgetModified": false,
         "accountBudgetVerified": false,
-        "realCloudProbe": "pending"
+        "realCloudProbe": "scaffold_passed_core_running",
+        "runs": [
+          38543657903,
+          38543710547
+        ]
       }
     },
     {
