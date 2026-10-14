@@ -285,6 +285,8 @@ pub enum Operation {
     SkillPackSetMembers,
     #[serde(rename = "canvas.boards.list")]
     CanvasBoardsList,
+    #[serde(rename = "canvas.references.page")]
+    CanvasReferencesPage,
     #[serde(rename = "canvas.boards.get")]
     CanvasBoardsGet,
     #[serde(rename = "canvas.boards.create")]
@@ -614,6 +616,7 @@ impl Operation {
             Self::SkillPackMembers => "skillPacks.members.list",
             Self::SkillPackSetMembers => "skillPacks.members.set",
             Self::CanvasBoardsList => "canvas.boards.list",
+            Self::CanvasReferencesPage => "canvas.references.page",
             Self::CanvasBoardsGet => "canvas.boards.get",
             Self::CanvasBoardsCreate => "canvas.boards.create",
             Self::CanvasBoardsUpdate => "canvas.boards.update",

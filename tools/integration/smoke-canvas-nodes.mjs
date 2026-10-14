@@ -70,7 +70,8 @@ const withDB = action => {const db = new DatabaseSync(path.join(dataDir, 'rovai.
   try {return action(db);} finally {db.close();}};
 const sourcePaths = ['crates/rovai-core/src/canvas_node.rs', 'crates/rovai-core/src/canvas_board.rs',
   'crates/rovai-core/src/db.rs', 'crates/rovai-core/src/db_skill_pack_context.rs',
-  'crates/rovai-core/src/application.rs', 'crates/rovai-web/src/operations.rs'];
+  'crates/rovai-core/src/application.rs', 'crates/rovai-web/src/operations.rs',
+  'crates/rovai-core/src/read_model.rs', 'crates/rovai-core/src/read_model/canvas_references.rs'];
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 try {
   await start(oldBinary);
@@ -116,6 +117,33 @@ try {
   let graph = await call('canvas.nodes.snapshot', {boardId}); assert.deepEqual(graph.nodes, []);
   assert.deepEqual(graph.board, boardReceipt.payload.board);
   record('153_to154_migration_preserves_real_objects_skill_bytes_and_original_command_results');
+  const directoryThread = await call('threads.create', {commandId: randomUUID(), name: '目录分页的第二个会话', workspace: null,
+    memberAgentIds: [memberId], defaultLeadAgentId: memberId, collaborationMode: 'peer', activationState: 'active'});
+  applied(directoryThread);
+  assert.equal((await raw('canvas.references.page', {}, false)).status, 401);
+  for (const params of [{sql: true}, {afterThreadId: 'not-a-thread'}]) {
+    assert((await (await raw('canvas.references.page', params)).json()).error);
+  }
+  const sequenceBeforeDirectory = (await call('canvas.nodes.snapshot', {boardId})).throughGlobalSequence;
+  const directory = []; let afterThreadId = null, upperThreadId = null;
+  do {
+    const page = await call('canvas.references.page', {afterThreadId, upperThreadId, limit: 1});
+    assert.equal(page.schemaVersion, 1); assert(page.items.length <= 1);
+    if (upperThreadId !== null) assert.equal(page.upperThreadId, upperThreadId);
+    upperThreadId = page.upperThreadId;
+    if (page.nextAfterThreadId !== null) {
+      assert.equal(page.nextAfterThreadId, page.items.at(-1).threadId);
+      assert(afterThreadId === null || page.nextAfterThreadId > afterThreadId);
+    }
+    directory.push(...page.items); afterThreadId = page.nextAfterThreadId;
+  } while (afterThreadId !== null);
+  assert.equal(new Set(directory.map(item => item.threadId)).size, directory.length);
+  assert(directory.some(item => item.threadId === directoryThread.payload.threadId));
+  const directoryItem = directory.find(item => item.threadId === threadId); assert(directoryItem);
+  assert(directoryItem.members.some(item => item.agentId === memberId));
+  assert(directoryItem.privateConversations.some(item => item.conversationId === conversationId && item.agentId === memberId));
+  assert.equal((await call('canvas.nodes.snapshot', {boardId})).throughGlobalSequence, sequenceBeforeDirectory);
+  record('authenticated_keyset_directory_preserves_exact_member_private_identity_and_performs_no_business_writes');
   assert.equal((await raw('canvas.nodes.snapshot', {boardId}, false)).status, 401);
   const malformed = await raw('canvas.nodes.snapshot', {boardId, path: 'C:/fake'}); assert((await malformed.json()).error);
   const other = await command('canvas.boards.create', {name: '另一块画板'}); applied(other);

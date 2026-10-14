@@ -16,6 +16,13 @@ last_updated: 2026-10-12
 
 ## Rust 测试准入与退役门槛
 
+画布目录`read_model::canvas_references`新增最小SQLite owner，拥有跨Thread keyset上界、可信编辑端pending可见性、
+Mission纳入、active成员与私有Conversation归属及只读计数。旧Navigation owner只拥有侧栏摘要/窗口，不能证明这些
+跨表目录关系；新owner只建所读列，不加载完整Database/Runtime。最低命令`cargo test -p rovai-core --lib read_model::canvas_references`，
+本轮按阶段规则尚未编译运行；独立Node SQLite只执行Rust原文SQL，不当作Rust或Host通过。既有application读取队列owner增加新操作断言。
+`canvas-reference-controller.test.ts`拥有多页上界、游标/归属拒绝、读取中失效与dispose，`canvas-reference-model.test.ts`
+拥有同成员Runtime过滤、公开/私有/Mission精确引用和显式目录关系；两者均不启动Core或模型。
+
 画布Renderer读模型由`canvas-graph-controller.test.ts`拥有订阅/读取竞争、Host/画板切换隔离、未知手势原编号与
 版本保留、提交后读取失败、冲突低版本拒绝及回查/显式重试并发；复用既有refresh coordinator，不重测其通用重试矩阵。
 这类异步客户端归属不能由Core数据库owner证明，使用受控Promise与本地fake transport，无Electron/Core/模型。

@@ -12,3 +12,7 @@ Core节点图批使用既有Rust/SQLite/Serde依赖。Renderer已按供体固定
 本次锁文件新增20个包的[版本、完整性与许可摘要](canvas-dependencies/packages.json)和[原文通知](canvas-dependencies/THIRD-PARTY-NOTICES.txt)已保留，
 许可为MIT、ISC与BSD-3-Clause，未运行安装脚本。图形库内部状态仅拥有交互呈现，不拥有Core业务或执行事实；
 PTY后续移植及I12最终发布包仍分别核对，不将本批通知保留当成完整发布资格。
+
+`canvas-reference-model.ts`依据同一固定Codeg提交的`computeRegionMembers`移植筛选、排序和精确引用行为，
+并按Core实际active membership/private Conversation适配；工程父子关系必须明确取得，不用路径前缀推测。
+沿用已保留的Codeg Apache-2.0许可，不增加第三方依赖。

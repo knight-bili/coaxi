@@ -13,17 +13,19 @@ export const canvasKindNames: Record<CanvasNodeKind, string> = {
 export const canvasColors = ['neutral', 'zinc', 'slate', 'stone', 'gray', 'red', 'rose', 'orange', 'green', 'blue', 'yellow', 'violet'] as const
 const colorNames = ['默认', '锌灰', '蓝灰', '石灰', '灰色', '红色', '玫瑰', '橙色', '绿色', '蓝色', '黄色', '紫色']
 export const canvasColorName = (color: string): string => colorNames[canvasColors.indexOf(color as typeof canvasColors[number])] ?? color
-export interface CanvasReferenceOption { reference: CanvasConversationRef; label: string }
-export interface CanvasFolderGroupOption { id: string; label: string }
+export interface CanvasReferenceOption { reference: CanvasConversationRef; label: string; available?: boolean }
+export interface CanvasFolderGroupOption { id: string; label: string; projectPaths?: readonly string[] }
 export type CanvasEditTarget = { type: 'create'; position: { x: number; y: number } } | { type: 'update'; row: CanvasNode }
 
-export function CanvasNodeEditor({ target, revision, latestRevision, agents, groups, references, blocked, pending, recovery, commandError, onClose, onSave }: {
+export function CanvasNodeEditor({ target, revision, latestRevision, agents, groups, references, referencesComplete, onRefreshReferences, blocked, pending, recovery, commandError, onClose, onSave }: {
   target: CanvasEditTarget
   revision: number
   latestRevision: number | null
   agents: AgentProfile[]
   groups: CanvasFolderGroupOption[]
   references: CanvasReferenceOption[]
+  referencesComplete: boolean
+  onRefreshReferences?(): void
   blocked: boolean
   pending: boolean
   recovery: ReactNode
@@ -44,8 +46,11 @@ export function CanvasNodeEditor({ target, revision, latestRevision, agents, gro
   const stale = latestRevision !== null && latestRevision !== capturedRevision
   const locked = pending || submitting
   const choices = agents.filter(agent => !agent.removedAt)
-  const reference = references.find(item => canvasReferenceKey(item.reference) === referenceKey)?.reference
-  const validBinding = Boolean(original) || kind === 'note' || kind === 'custom'
+  const reference = references.find(item => canvasReferenceKey(item.reference) === referenceKey && item.available !== false)?.reference
+  const availableKeys = new Set(references.filter(item => item.available !== false).map(item => canvasReferenceKey(item.reference)))
+  const missingMembers = members.some(key => !availableKeys.has(key))
+  const changedSelection = !original && (kind === 'custom' && missingMembers || kind === 'conversation' && Boolean(referenceKey) && !reference)
+  const validBinding = Boolean(original) || kind === 'note' || kind === 'custom' && !missingMembers
     || (kind === 'folder' || kind === 'file' || kind === 'terminal') && Boolean(path.trim())
     || kind === 'agent' && choices.some(agent => agent.agentId === agentId)
     || kind === 'group' && groups.some(group => group.id === groupId)
@@ -109,7 +114,7 @@ export function CanvasNodeEditor({ target, revision, latestRevision, agents, gro
               <option value="">{uiAttribute(groups.length ? '请选择' : '暂无项目分组')}</option>{groups.map(group => <option key={group.id} value={group.id}>{group.label}</option>)}
             </select></label>}
             {!original && kind === 'conversation' && <label className="field-label"><UiText zh="对话" /><select value={referenceKey} onChange={event => setReferenceKey(event.target.value)}>
-              <option value="">{uiAttribute('请选择')}</option>{references.map(item => <option key={canvasReferenceKey(item.reference)} value={canvasReferenceKey(item.reference)}>{item.label}</option>)}
+              <option value="">{uiAttribute('请选择')}</option>{references.map(item => <option key={canvasReferenceKey(item.reference)} value={canvasReferenceKey(item.reference)} disabled={item.available === false}>{item.label}</option>)}
             </select></label>}
             {!original && kind === 'custom' && <div className="canvas-editor-members" role="group" aria-label={uiAttribute('分组内的对话')}>
               {references.map(item => { const key = canvasReferenceKey(item.reference); return <label key={key}>
@@ -126,6 +131,12 @@ export function CanvasNodeEditor({ target, revision, latestRevision, agents, gro
               <label className="field-label"><UiText zh="固定行数（0 为自动）" /><input type="number" min={0} max={12} step={1} value={rows} onChange={event => setRows(Math.max(0, Math.min(12, Math.round(Number(event.target.value) || 0))))} /></label>
             </div>}
           </fieldset>
+          {changedSelection && <p role="alert"><UiText zh="所选对话已结束或不可用，请重新选择。" />
+            {kind === 'custom' && <button type="button" disabled={locked} onClick={() => setMembers(current => current.filter(key => availableKeys.has(key)))}><UiText zh="移除失效选择" /></button>}
+          </p>}
+          {!original && (kind === 'conversation' || kind === 'custom') && !referencesComplete && <p className="canvas-notice"><UiText zh="对话清单尚未完整载入，当前结果仍在核对。" />
+            {onRefreshReferences && <button type="button" onClick={onRefreshReferences}><UiText zh="重新载入对话" /></button>}
+          </p>}
           {stale && <p className="canvas-notice"><UiText zh="画布已更新，输入仍保留。核对后可按最新画布版本保存。" />
             <button type="button" disabled={locked || blocked} onClick={() => { setCapturedRevision(latestRevision!); setError(null) }}><UiText zh="使用最新画布版本" /></button>
           </p>}

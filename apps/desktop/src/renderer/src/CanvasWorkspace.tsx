@@ -5,10 +5,11 @@ import { CanvasBoardDialog } from './CanvasBoardDialog'
 import { CanvasBoardsController, initialCanvasBoardsState, type CanvasBoardIntent } from './canvas-boards-controller'
 import { browserCanvasStorage, canvasViewScope, loadCanvasBoardSelection, saveCanvasBoardSelection, type CanvasViewScope } from './canvas-view-state'
 import { useThreadClient } from './camp-client'
+import { useCanvasReferences } from './useCanvasReferences'
 import { UiText, uiAttribute } from './interface-language'
 import { readErrorMessage } from './error-message'
 
-export type CanvasWorkspaceProps = Omit<CanvasSurfaceProps, 'boardId' | 'scope'>
+export type CanvasWorkspaceProps = Omit<CanvasSurfaceProps, 'boardId' | 'scope' | 'catalog' | 'onRefreshReferences'>
 const NO_BOARDS: CanvasBoard[] = []
 
 function useCanvasBoards() {
@@ -49,6 +50,7 @@ function CanvasWorkspaceContent({ scope, identityIssue, onLeaveGuardChange, ...p
   scope: CanvasViewScope | null; identityIssue: string | null
 }): React.JSX.Element {
   const { controller, state } = useCanvasBoards(), [storage] = useState(browserCanvasStorage)
+  const catalog = useCanvasReferences()
   const [selectedId, setSelectedId] = useState(() => loadCanvasBoardSelection(storage, scope))
   const [dialog, setDialog] = useState<{ board: CanvasBoard | null; remove: boolean } | null>(null)
   const [issue, setIssue] = useState<string | null>(null), panel = useRef(false), graphGuard = useRef<CanvasLeaveGuard | null>(null)
@@ -120,9 +122,13 @@ function CanvasWorkspaceContent({ scope, identityIssue, onLeaveGuardChange, ...p
     {(issue || Boolean(state.readError)) && <div className="canvas-notice" role="alert">{issue || readErrorMessage(state.readError)}
       <button type="button" onClick={() => { void controller.current?.refresh().catch(() => undefined) }}><UiText zh="重新读取" /></button></div>}
     {!dialog && recovery}
+    {!catalog.complete && <div className="canvas-notice" role={catalog.error ? 'alert' : 'status'}><UiText zh={catalog.error ? '对话清单读取未完成，已保留画布。' : '正在核对完整对话清单…'} />
+      {Boolean(catalog.error) && <button type="button" onClick={() => { void catalog.refresh().catch(() => undefined) }}><UiText zh="重新载入对话" /></button>}
+    </div>}
     {!state.snapshot && state.loading && <p role="status"><UiText zh="正在读取画板…" /></p>}
     {state.snapshot && !boards.length && !state.loading && <div className="canvas-workspace-empty"><h2><UiText zh="还没有画板" /></h2><p><UiText zh="创建一张画板，整理工程、队员、对话和便签。" /></p></div>}
-    {selectedId && <CanvasSurface {...props} boardId={selectedId} scope={scope} onLeaveGuardChange={registerGraphGuard} />}
+    {selectedId && <CanvasSurface {...props} boardId={selectedId} scope={scope} catalog={catalog}
+      onRefreshReferences={() => { void catalog.refresh().catch(() => undefined) }} onLeaveGuardChange={registerGraphGuard} />}
     {dialog && <CanvasBoardDialog board={dialog.board} remove={dialog.remove}
       latest={dialog.board ? boards.find(board => board.id === dialog.board!.id) ?? null : null}
       blocked={state.loading || Boolean(state.readError)} pending={Boolean(state.pending)} recovery={recovery}

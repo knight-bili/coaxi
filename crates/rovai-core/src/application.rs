@@ -866,6 +866,7 @@ fn request_uses_independent_read_queue(method: &str) -> bool {
             | "navigation.camps"
             | "navigation.groupCamps"
             | "navigation.findCamp"
+            | "canvas.references.page"
     )
 }
 
@@ -10059,6 +10060,26 @@ impl Core {
                     false,
                 )?;
                 Ok(serde_json::to_value(selection)?)
+            }
+            "canvas.references.page" => {
+                #[derive(Deserialize)]
+                #[serde(rename_all = "camelCase", deny_unknown_fields)]
+                struct Page {
+                    after_thread_id: Option<ThreadId>,
+                    upper_thread_id: Option<ThreadId>,
+                    limit: Option<usize>,
+                }
+                let page: Page = serde_json::from_value(request.params.clone())?;
+                let mut database = self.database.lock().await;
+                Ok(serde_json::to_value(
+                    ReadModelService.canvas_references_page(
+                        &mut database,
+                        &request.client,
+                        page.after_thread_id.as_ref().map(ThreadId::as_str),
+                        page.upper_thread_id.as_ref().map(ThreadId::as_str),
+                        page.limit.unwrap_or(200),
+                    )?,
+                )?)
             }
             "navigation.snapshot" => {
                 let params: NavigationSnapshotParams =
@@ -30183,6 +30204,9 @@ done
         assert!(request_uses_independent_read_queue("navigation.camps"));
         assert!(request_uses_independent_read_queue("navigation.groupCamps"));
         assert!(request_uses_independent_read_queue("navigation.findCamp"));
+        assert!(request_uses_independent_read_queue(
+            "canvas.references.page"
+        ));
         assert!(!request_uses_independent_read_queue(
             "navigation.campViewed"
         ));

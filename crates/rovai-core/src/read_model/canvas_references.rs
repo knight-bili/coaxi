@@ -1,0 +1,277 @@
+//! Bounded, metadata-only Canvas directory. Never projects transcripts, drafts or model inputs.
+use super::{Database, ReadModelService, current_global_sequence};
+use anyhow::Result;
+use rusqlite::{OptionalExtension, Transaction, params};
+use serde::Serialize;
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CanvasReferenceMember {
+    pub agent_id: String,
+    pub display_name: String,
+    pub runtime_kind: Option<String>,
+}
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CanvasPrivateReference {
+    pub conversation_id: String,
+    pub agent_id: String,
+    pub updated_at: String,
+}
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CanvasThreadReference {
+    pub thread_id: String,
+    pub title: String,
+    pub project_binding_kind: String,
+    pub project_path: String,
+    pub updated_at: String,
+    pub version: i64,
+    pub mission_id: Option<String>,
+    pub members: Vec<CanvasReferenceMember>,
+    pub private_conversations: Vec<CanvasPrivateReference>,
+}
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CanvasReferencePage {
+    pub schema_version: u32,
+    pub through_global_sequence: i64,
+    pub items: Vec<CanvasThreadReference>,
+    pub next_after_thread_id: Option<String>,
+    pub upper_thread_id: Option<String>,
+}
+
+// Same active/own-pending visibility as Navigation, including Mission-backed Threads.
+// Keyset order is immutable identity, not activity: moving a row cannot skip a later page.
+const HIGH_WATER_SQL: &str = r#"
+SELECT camp.id FROM camp WHERE camp.deletion_operation_id IS NULL
+  AND (camp.activation_state = 'active'
+    OR EXISTS(SELECT 1 FROM pending_camp_draft_presence d WHERE d.camp_id = camp.id AND d.client_id = ?1)
+    OR EXISTS(SELECT 1 FROM camp_composer_draft d WHERE d.camp_id = camp.id AND d.client_id = ?1
+              AND (length(trim(d.body)) > 0 OR d.source_attachments_json <> '[]'))
+    OR EXISTS(SELECT 1 FROM prepared_attachment WHERE camp_id = camp.id AND client_id = ?1))
+ORDER BY camp.id DESC LIMIT 1
+"#;
+const PAGE_SQL: &str = r#"
+SELECT camp.id AS thread_id, COALESCE(mission.title, camp.title) AS title, camp.project_binding_kind,
+       camp.project_path, MAX(camp.updated_at, COALESCE(mission.updated_at, camp.updated_at)) AS updated_at,
+       camp.version, mission.id AS mission_id
+FROM camp LEFT JOIN mission ON mission.camp_id = camp.id
+WHERE camp.id > ?2 AND camp.id <= ?4 AND camp.deletion_operation_id IS NULL
+  AND (camp.activation_state = 'active'
+    OR EXISTS(SELECT 1 FROM pending_camp_draft_presence d WHERE d.camp_id = camp.id AND d.client_id = ?1)
+    OR EXISTS(SELECT 1 FROM camp_composer_draft d WHERE d.camp_id = camp.id AND d.client_id = ?1
+              AND (length(trim(d.body)) > 0 OR d.source_attachments_json <> '[]'))
+    OR EXISTS(SELECT 1 FROM prepared_attachment WHERE camp_id = camp.id AND client_id = ?1))
+ORDER BY camp.id LIMIT ?3
+"#;
+const MEMBERS_SQL: &str = r#"
+SELECT member.camp_id, profile.id, profile.display_name, profile.selected_runtime_adapter_kind
+FROM camp_member member JOIN agent_profile profile ON profile.id = member.agent_id
+WHERE member.camp_id IN (SELECT value FROM json_each(?1))
+  AND member.status = 'active' AND profile.profile_status <> 'removed'
+ORDER BY member.camp_id, profile.member_order, profile.id
+"#;
+const PRIVATE_SQL: &str = r#"
+SELECT conversation.camp_id, conversation.id, conversation.agent_id, conversation.updated_at
+FROM conversation
+JOIN camp_member member ON member.camp_id = conversation.camp_id AND member.agent_id = conversation.agent_id
+JOIN agent_profile profile ON profile.id = conversation.agent_id
+WHERE conversation.camp_id IN (SELECT value FROM json_each(?1))
+  AND conversation.kind = 'single_chat' AND conversation.ended_at IS NULL
+  AND member.status = 'active' AND profile.profile_status <> 'removed'
+ORDER BY conversation.camp_id, conversation.updated_at DESC, conversation.id DESC
+"#;
+
+fn read_page(
+    tx: &Transaction<'_>,
+    client_id: &str,
+    after: &str,
+    upper: Option<&str>,
+    limit: usize,
+) -> Result<CanvasReferencePage> {
+    let limit = limit.clamp(1, 200);
+    let upper_thread_id = match upper {
+        Some(value) => Some(value.to_owned()),
+        None => tx
+            .query_row(HIGH_WATER_SQL, [client_id], |row| row.get::<_, String>(0))
+            .optional()?,
+    };
+    let mut items = tx
+        .prepare(PAGE_SQL)?
+        .query_map(
+            params![
+                client_id,
+                after,
+                limit + 1,
+                upper_thread_id.as_deref().unwrap_or("")
+            ],
+            |row| {
+                Ok(CanvasThreadReference {
+                    thread_id: row.get(0)?,
+                    title: row.get(1)?,
+                    project_binding_kind: row.get(2)?,
+                    project_path: row.get(3)?,
+                    updated_at: row.get(4)?,
+                    version: row.get(5)?,
+                    mission_id: row.get(6)?,
+                    members: Vec::new(),
+                    private_conversations: Vec::new(),
+                })
+            },
+        )?
+        .collect::<rusqlite::Result<Vec<_>>>()?;
+    let has_more = items.len() > limit;
+    items.truncate(limit);
+    let positions = items
+        .iter()
+        .enumerate()
+        .map(|(index, item)| (item.thread_id.clone(), index))
+        .collect::<std::collections::BTreeMap<_, _>>();
+    let ids = serde_json::to_string(&positions.keys().collect::<Vec<_>>())?;
+    let members = tx
+        .prepare(MEMBERS_SQL)?
+        .query_map([&ids], |row| {
+            Ok((
+                row.get::<_, String>(0)?,
+                CanvasReferenceMember {
+                    agent_id: row.get(1)?,
+                    display_name: row.get(2)?,
+                    runtime_kind: row.get(3)?,
+                },
+            ))
+        })?
+        .collect::<rusqlite::Result<Vec<_>>>()?;
+    for (id, member) in members {
+        if let Some(index) = positions.get(&id) {
+            items[*index].members.push(member);
+        }
+    }
+    let conversations = tx
+        .prepare(PRIVATE_SQL)?
+        .query_map([&ids], |row| {
+            Ok((
+                row.get::<_, String>(0)?,
+                CanvasPrivateReference {
+                    conversation_id: row.get(1)?,
+                    agent_id: row.get(2)?,
+                    updated_at: row.get(3)?,
+                },
+            ))
+        })?
+        .collect::<rusqlite::Result<Vec<_>>>()?;
+    for (id, conversation) in conversations {
+        if let Some(index) = positions.get(&id) {
+            items[*index].private_conversations.push(conversation);
+        }
+    }
+    let next_after_thread_id = if has_more {
+        items.last().map(|item| item.thread_id.clone())
+    } else {
+        None
+    };
+    Ok(CanvasReferencePage {
+        schema_version: 1,
+        through_global_sequence: current_global_sequence(tx)?,
+        items,
+        next_after_thread_id,
+        upper_thread_id,
+    })
+}
+
+impl ReadModelService {
+    pub fn canvas_references_page(
+        &self,
+        database: &mut Database,
+        client: &crate::draft_client::DraftClient,
+        after: Option<&str>,
+        upper: Option<&str>,
+        limit: usize,
+    ) -> Result<CanvasReferencePage> {
+        let tx = database.connection_mut().transaction()?;
+        let page = read_page(&tx, client.id(), after.unwrap_or(""), upper, limit)?;
+        tx.commit()?;
+        Ok(page)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    // Owns cross-table visibility and keyset joins, using only the columns this read side consumes.
+    // Full Database migration/Host proof remains in the I03 stage verification batch.
+    #[test]
+    fn pages_metadata_with_exact_editor_membership_and_private_identity_without_read_side_writes() {
+        let mut connection = rusqlite::Connection::open_in_memory().unwrap();
+        connection.execute_batch(FIXTURE_SQL).unwrap();
+        let before = connection.total_changes();
+        let tx = connection.transaction().unwrap();
+        let first = read_page(&tx, "desktop", "", None, 2).unwrap();
+        assert_eq!(
+            first
+                .items
+                .iter()
+                .map(|item| item.thread_id.as_str())
+                .collect::<Vec<_>>(),
+            ["a", "b"]
+        );
+        assert_eq!(first.next_after_thread_id.as_deref(), Some("b"));
+        assert_eq!(first.upper_thread_id.as_deref(), Some("own-pending"));
+        assert_eq!(first.items[1].mission_id.as_deref(), Some("mission"));
+        assert_eq!(first.items[1].title, "mission title");
+        assert_eq!(first.items[0].members.len(), 1);
+        assert_eq!(
+            first.items[0].members[0].runtime_kind.as_deref(),
+            Some("codex-cli")
+        );
+        assert_eq!(
+            first.items[0]
+                .private_conversations
+                .iter()
+                .map(|item| item.conversation_id.as_str())
+                .collect::<Vec<_>>(),
+            ["private-a"]
+        );
+        let next = read_page(&tx, "desktop", "b", first.upper_thread_id.as_deref(), 200).unwrap();
+        assert_eq!(
+            next.items
+                .iter()
+                .map(|item| item.thread_id.as_str())
+                .collect::<Vec<_>>(),
+            ["own-pending"]
+        );
+        assert!(next.next_after_thread_id.is_none());
+        assert_eq!(next.through_global_sequence, 9);
+        let other = read_page(&tx, "other", "b", None, 200).unwrap();
+        assert_eq!(
+            other
+                .items
+                .iter()
+                .map(|item| item.thread_id.as_str())
+                .collect::<Vec<_>>(),
+            ["foreign-pending"]
+        );
+        tx.commit().unwrap();
+        assert_eq!(connection.total_changes(), before);
+    }
+    const FIXTURE_SQL: &str = r#"
+CREATE TABLE camp(id TEXT PRIMARY KEY,title TEXT,project_binding_kind TEXT,project_path TEXT,updated_at TEXT,version INTEGER,deletion_operation_id TEXT,activation_state TEXT);
+CREATE TABLE mission(id TEXT,camp_id TEXT,title TEXT,updated_at TEXT);
+CREATE TABLE pending_camp_draft_presence(camp_id TEXT,client_id TEXT);
+CREATE TABLE camp_composer_draft(camp_id TEXT,client_id TEXT,body TEXT,source_attachments_json TEXT);
+CREATE TABLE prepared_attachment(camp_id TEXT,client_id TEXT);
+CREATE TABLE agent_profile(id TEXT,display_name TEXT,selected_runtime_adapter_kind TEXT,profile_status TEXT,member_order INTEGER);
+CREATE TABLE camp_member(camp_id TEXT,agent_id TEXT,status TEXT);
+CREATE TABLE conversation(camp_id TEXT,id TEXT,agent_id TEXT,updated_at TEXT,kind TEXT,ended_at TEXT);
+CREATE TABLE event_sequence(singleton INTEGER PRIMARY KEY,last_sequence INTEGER); INSERT INTO event_sequence VALUES(1,9);
+INSERT INTO camp VALUES('a','public','directory','/project','time',1,NULL,'active'),('b','old title','directory','/project','time',1,NULL,'active'),
+ ('deleted','removed','directory','/project','time',1,'deletion','active'),('foreign-pending','foreign','quick_chat','/quick','time',1,NULL,'pending'),
+ ('own-pending','own','quick_chat','/quick','time',1,NULL,'pending'),('unowned-pending','none','quick_chat','/quick','time',1,NULL,'pending');
+INSERT INTO mission VALUES('mission','b','mission title','time');
+INSERT INTO pending_camp_draft_presence VALUES('own-pending','desktop'),('foreign-pending','other');
+INSERT INTO agent_profile VALUES('agent-a','A','codex-cli','present',1),('agent-b','B','gemini-cli','present',2),('removed','Gone','codex-cli','removed',3);
+INSERT INTO camp_member VALUES('a','agent-a','active'),('a','agent-b','left'),('a','removed','active');
+INSERT INTO conversation VALUES('a','private-a','agent-a','time','single_chat',NULL),('a','ended','agent-a','time','single_chat','ended'),
+ ('a','public-route','agent-a','time','public',NULL),('a','left-member','agent-b','time','single_chat',NULL),('a','removed-profile','removed','time','single_chat',NULL);
+"#;
+}

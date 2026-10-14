@@ -4181,6 +4181,27 @@ export interface CanvasConversationRef {
   conversationId: string | null
 }
 
+export interface CanvasReferenceMember { agentId: string; displayName: string; runtimeKind: AdapterKind | null }
+export interface CanvasPrivateReference { conversationId: string; agentId: string; updatedAt: string }
+export interface CanvasThreadReference {
+  threadId: string
+  title: string
+  projectBindingKind: ProjectBindingKind
+  projectPath: string
+  updatedAt: string
+  version: number
+  missionId: string | null
+  members: CanvasReferenceMember[]
+  privateConversations: CanvasPrivateReference[]
+}
+export interface CanvasReferencePage {
+  schemaVersion: 1
+  throughGlobalSequence: number
+  items: CanvasThreadReference[]
+  nextAfterThreadId: string | null
+  upperThreadId: string | null
+}
+
 export interface CanvasNodeData {
   kind: CanvasNodeKind
   folderPath: string | null
@@ -4354,6 +4375,7 @@ export type CoreMethod =
   | 'canvas.boards.update'
   | 'canvas.boards.delete'
   | 'canvas.nodes.snapshot'
+  | 'canvas.references.page'
   | 'canvas.nodes.apply'
   | 'toolbox.read'
   | 'toolbox.setMembers'

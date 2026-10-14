@@ -16,6 +16,7 @@ not a substitute for interactive nodes, task execution or cross-platform qualifi
 Use Rovai Core's SQLite, typed Domain Command Gateway and authenticated Host transport.
 Board identity and metadata are owned by [Canvas Boards v1](../contracts/canvas-boards-v1.md).
 Node types, graph writes and snapshots are owned by [Canvas Nodes v1](../contracts/canvas-nodes-v1.md).
+The paged metadata directory is owned by [Canvas References v1](../contracts/canvas-references-v1.md).
 Schema152/Migration202 appends one table to schema151 without changing previous model, skill,
 member, Mission or Thread facts. Retain the closed source-contract and existing command-result
 replay; do not copy Codeg's database or SeaORM/Tauri lifecycle into the Core.
@@ -32,6 +33,14 @@ retain that result. Renderer effect instances isolate Host changes and StrictMod
 Controlled client tests cover this cache boundary; mounted UI and actual Core recovery remain separate qualification.
 
 ## Remaining node and interaction work
+
+`canvas.references.page` reads bounded Thread/Mission metadata, actual active members and exact active private
+conversations in one transaction per page. A fixed identity upper bound keeps a scan finite while activity changes;
+the directory controller treats mid-scan invalidation as incomplete and schedules a trailing read. It does not freeze
+one transaction across pages or infer live Runtime qualification. The renderer uses this directory for choices and
+member regions rather than treating sidebar prefixes as complete. Folder/group worktree relations remain explicit
+inputs; absent relations are visibly incomplete, never guessed from path prefixes. Current SQL fixture and controlled
+client results do not qualify the new Rust route or mounted UI before stage verification.
 
 The next I03 slices port board-unit geometry, grid regions, collapse/expand, dragging,
 box selection, alignment, resize, grouping/detach, previews and minimap. Keep the board's own

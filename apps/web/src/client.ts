@@ -151,7 +151,7 @@ export const WEB_OPERATIONS = [
   'toolbox.setMembers',
   'canvas.boards.list', 'canvas.boards.get',
   'canvas.boards.create', 'canvas.boards.update', 'canvas.boards.delete',
-  'canvas.nodes.snapshot', 'canvas.nodes.apply',
+  'canvas.nodes.snapshot', 'canvas.nodes.apply', 'canvas.references.page',
   'nativeSkills.list',
   'nativeSkills.read',
   'skills.candidates',

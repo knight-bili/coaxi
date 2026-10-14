@@ -3,8 +3,10 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { Background, BackgroundVariant, Controls, MiniMap, NodeResizer, ReactFlow, ReactFlowProvider,
   SelectionMode, ViewportPortal, applyNodeChanges, useReactFlow, type Node, type NodeProps } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import type { AgentProfile, CanvasConversationRef, CanvasNode, CanvasNodeMutation, NavigationThreadItem, ResolvedTheme, StoredCommandResult } from '@contracts'
+import type { AgentProfile, CanvasConversationRef, CanvasNode, CanvasNodeMutation, ResolvedTheme, StoredCommandResult } from '@contracts'
 import { useCanvasGraph } from './useCanvasGraph'
+import { initialCanvasReferenceState, type CanvasReferenceState } from './canvas-reference-controller'
+import { canvasReferenceOptions, canvasSavedReference, resolveCanvasRegion, type CanvasFolderResolution } from './canvas-reference-model'
 import { browserCanvasStorage, loadCanvasViewState, saveCanvasViewState, CANVAS_MIN_ZOOM, CANVAS_MAX_ZOOM, type CanvasViewScope } from './canvas-view-state'
 import { basePathName, BOARD_DOT_GAP, CARD_WIDTH, CARD_HEIGHT, REGION_COLLAPSED_HEIGHT,
   REGION_FOOTER_HEIGHT, computeAlignment, computeDropHint, effectiveColumns, isRegionKind, layoutRegionGrid, noteHoldsProse,
@@ -14,7 +16,7 @@ import { CanvasNodeEditor, canvasKindNames, canvasColorName, type CanvasEditTarg
 import { AppDialogBody, AppDialogContent, AppDialogFooter, AppDialogHeader } from './AppDialog'
 import { useThreadClient } from './camp-client'
 import { SafeMarkdown } from './SafeMarkdown'
-import { UiText, uiAttribute } from './interface-language'
+import { UiText, uiAttribute, useInterfaceLanguage } from './interface-language'
 import { readErrorMessage } from './error-message'
 import './canvas.css'
 
@@ -23,9 +25,11 @@ export interface CanvasSurfaceProps {
   boardId: string
   scope: CanvasViewScope | null
   agents: AgentProfile[]
-  threads: NavigationThreadItem[]
   groups?: CanvasFolderGroupOption[]
   references?: CanvasReferenceOption[]
+  catalog?: CanvasReferenceState
+  onRefreshReferences?(): void
+  folderResolutions?: ReadonlyMap<string, CanvasFolderResolution>
   resolvedMembers?: ReadonlyMap<string, { references: CanvasReferenceOption[]; complete: boolean; issue?: string }>
   theme: ResolvedTheme
   onOpenReference(reference: CanvasConversationRef): void
@@ -36,10 +40,12 @@ export interface CanvasSurfaceProps {
 }
 type FlowNode = Node<{ row: CanvasNode }, 'canvas-card'>
 const EMPTY_ROWS: CanvasNode[] = [], EMPTY_GROUPS: CanvasFolderGroupOption[] = []
+const EMPTY_CATALOG = initialCanvasReferenceState()
 type Presentation = CanvasSurfaceProps & {
   blocked: boolean
   expandedRegions: ReadonlySet<string>
   title(reference: CanvasConversationRef): string
+  available(reference: CanvasConversationRef): boolean | undefined
   collapse(row: CanvasNode): void
   expand(row: CanvasNode): void
   detach(row: CanvasNode, reference: CanvasConversationRef): void
@@ -58,7 +64,7 @@ function CanvasCard({ data, selected }: NodeProps<FlowNode>): React.JSX.Element 
     || (d.path || d.folderPath ? basePathName(d.path || d.folderPath!) : uiAttribute(canvasKindNames[d.kind]))
   const columns = effectiveColumns(d, d.width), cap = visibleMemberCap(d, columns)
   const resolution = actions.resolvedMembers?.get(row.id)
-  const references = d.kind === 'custom' ? d.conversations : resolution?.references.map(item => item.reference) ?? []
+  const references = resolution?.references.map(item => item.reference) ?? (d.kind === 'custom' ? d.conversations : [])
   const visible = actions.expandedRegions.has(row.id) ? references : references.slice(0, cap)
   return <article className={`canvas-card canvas-card-${d.kind}${d.collapsed ? ' is-collapsed' : ''}`} data-color={d.color ?? undefined}>
     <NodeResizer isVisible={selected && !actions.blocked && !d.collapsed && d.kind !== 'conversation'}
@@ -75,14 +81,15 @@ function CanvasCard({ data, selected }: NodeProps<FlowNode>): React.JSX.Element 
     </header>
     {!d.collapsed && <div className="canvas-card-body nodrag nowheel">
       {d.kind === 'note' && <SafeMarkdown theme={actions.theme} mode="document">{d.content || ''}</SafeMarkdown>}
-      {d.kind === 'conversation' && d.conversation && <button type="button" onClick={() => actions.onOpenReference(d.conversation!)}><UiText zh="打开对话" /></button>}
+      {d.kind === 'conversation' && d.conversation && <button type="button" disabled={actions.available(d.conversation) === false} onClick={() => actions.onOpenReference(d.conversation!)}><UiText zh="打开对话" /></button>}
+      {d.conversation && actions.available(d.conversation) === false && <p className="canvas-empty-copy"><UiText zh="对话已结束或不可用" /></p>}
       {d.kind === 'folder' && <><code>{d.folderPath}</code>{actions.onOpenProject && <button type="button" onClick={() => actions.onOpenProject?.(d.folderPath!)}><UiText zh="进入工程" /></button>}</>}
       {d.kind === 'agent' && <>{member && !member.removedAt && actions.onOpenMember && <button type="button" onClick={() => actions.onOpenMember?.(member.agentId)}><UiText zh="打开队员" /></button>}
         {d.agentId && (!member || member.removedAt) && <p className="canvas-empty-copy"><UiText zh="队员已移除或不可用" /></p>}</>}
       {region && <>
         <div className="canvas-member-grid" style={{ gridTemplateColumns: `repeat(${columns}, ${CARD_WIDTH}px)` }}>
           {visible.map(reference => <div key={JSON.stringify(reference)} className="canvas-member-card">
-            <button type="button" onClick={() => actions.onOpenReference(reference)}>{resolution?.references.find(item => item.reference.threadId === reference.threadId && item.reference.conversationId === reference.conversationId)?.label ?? actions.title(reference)}</button>
+            <button type="button" disabled={actions.available(reference) === false} onClick={() => actions.onOpenReference(reference)}>{resolution?.references.find(item => item.reference.threadId === reference.threadId && item.reference.conversationId === reference.conversationId)?.label ?? actions.title(reference)}</button>
             <button type="button" disabled={actions.blocked} onClick={() => actions.detach(row, reference)}><UiText zh={d.kind === 'custom' ? '移出分组' : '固定到画布'} /></button>
           </div>)}
         </div>
@@ -109,6 +116,7 @@ export function CanvasSurface(props: CanvasSurfaceProps): React.JSX.Element {
 
 function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
   const graph = useCanvasGraph(props.boardId), flow = useReactFlow<FlowNode>()
+  const language = useInterfaceLanguage(), catalog = props.catalog ?? EMPTY_CATALOG
   const [storage] = useState(browserCanvasStorage)
   const [view, setView] = useState(() => loadCanvasViewState(storage, props.scope, props.boardId))
   const [nodes, setNodes] = useState<FlowNode[]>([]), [selected, setSelected] = useState<string[]>([])
@@ -124,6 +132,10 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
   const graphBlocked = graph.loading || Boolean(graph.readError || graph.pending) || !graph.snapshot?.board
   const blocked = graphBlocked || Boolean(editor || deletion)
   const rows = graph.snapshot?.nodes ?? EMPTY_ROWS
+  const referenceOptions = useMemo(() => props.references ?? canvasReferenceOptions(catalog.items), [props.references, catalog.items, language])
+  const regions = useMemo(() => props.resolvedMembers ?? new Map(rows.filter(row => isRegionKind(row.data.kind)).map(row => [row.id,
+    resolveCanvasRegion(row, catalog, props.groups ?? EMPTY_GROUPS, props.folderResolutions)])),
+  [props.resolvedMembers, rows, catalog.items, catalog.complete, catalog.error, props.groups, props.folderResolutions, language])
   const expanded = useMemo(() => new Set(view.expandedRegions), [view.expandedRegions])
   const derived = useMemo<FlowNode[]>(() => rows.map(row => {
     const d = row.data, region = isRegionKind(d.kind)
@@ -132,7 +144,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     if (region) {
       if (d.collapsed) height = REGION_COLLAPSED_HEIGHT
       else {
-        const memberCount = d.kind === 'custom' ? d.conversations.length : props.resolvedMembers?.get(row.id)?.references.length ?? 0
+        const memberCount = regions.get(row.id)?.references.length ?? (d.kind === 'custom' ? d.conversations.length : 0)
         const columns = effectiveColumns(d, width), cap = visibleMemberCap(d, columns)
         const count = expanded.has(row.id) ? memberCount : Math.min(cap, memberCount)
         height = Math.max(d.gridRows > 0 ? regionHeightForRows(d.gridRows) : height,
@@ -142,7 +154,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     return { id: row.id, type: 'canvas-card', data: { row }, position: { x: d.x, y: d.y },
       width, height, style: { width, height }, selected: selected.includes(row.id), dragHandle: '.canvas-card-handle',
       zIndex: region ? 0 : 1, connectable: false, deletable: false }
-  }), [rows, selected, expanded, props.resolvedMembers])
+  }), [rows, selected, expanded, regions])
   currentDerived.current = derived
   useEffect(() => { if (!dragging.current) setNodes(derived) }, [derived])
   useEffect(() => { saveCanvasViewState(storage, props.scope, props.boardId, view) }, [storage, view, props.scope, props.boardId])
@@ -181,11 +193,11 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     catch (error) { setIssue(readErrorMessage(error)) }
   }
   const title = (reference: CanvasConversationRef) => {
-    const thread = props.threads.find(item => item.id === reference.threadId)
-    return props.references?.find(item => item.reference.threadId === reference.threadId && item.reference.conversationId === reference.conversationId)?.label
-      ?? (reference.conversationId ? uiAttribute('对话内单聊') : thread?.title || uiAttribute('对话'))
+    return referenceOptions.find(item => item.reference.threadId === reference.threadId && item.reference.conversationId === reference.conversationId)?.label
+      ?? canvasSavedReference(reference, catalog).label
   }
-  const actions: Presentation = { ...props, blocked, expandedRegions: expanded, title,
+  const actions: Presentation = { ...props, resolvedMembers: regions, blocked, expandedRegions: expanded, title,
+    available: reference => canvasSavedReference(reference, catalog).available,
     collapse: row => { mutate({ type: 'update', nodeId: row.id, patch: { collapsed: !row.data.collapsed } }) },
     expand: row => setView(current => ({ ...current, expandedRegions: expanded.has(row.id)
       ? current.expandedRegions.filter(id => id !== row.id) : [...current.expandedRegions, row.id] })),
@@ -308,7 +320,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     </PresentationContext.Provider>
     {editor && <CanvasNodeEditor target={editor.target} revision={editor.revision} latestRevision={graph.snapshot?.board?.revision ?? null}
       agents={props.agents} groups={props.groups ?? EMPTY_GROUPS}
-      references={props.references ?? props.threads.map(thread => ({ reference: { threadId: thread.id, conversationId: null }, label: thread.title }))}
+      references={referenceOptions} referencesComplete={catalog.complete} onRefreshReferences={props.onRefreshReferences}
       blocked={graphBlocked} pending={Boolean(graph.pending)} recovery={recovery} onClose={closePanel}
       commandError={issue}
       onSave={(mutation, revision) => submit(mutation, revision, true)} />}

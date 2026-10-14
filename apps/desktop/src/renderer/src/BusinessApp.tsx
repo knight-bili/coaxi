@@ -4546,7 +4546,7 @@ export function BusinessApp({
 
         {!startupGateVisible && view === 'canvas' && <>
           {mobile && <MobilePageHeader title={uiAttribute('无限画布')} onOpenMenu={openMobileMenu} menuOpen={mobileConversationDrawerOpen} triggerRef={mobileConversationListButtonRef} />}
-          <CanvasWorkspace agents={agents} threads={visibleNavigation ? allNavigationThreads(visibleNavigation) : []} theme={appearance.resolvedTheme}
+          <CanvasWorkspace agents={agents} theme={appearance.resolvedTheme}
             onOpenReference={reference => { void openCanvasReference(reference) }}
             onOpenMember={agentId => { void desktopNavigation.push({ kind: 'members', agentId, tab: 'identity' }) }}
             onOpenProject={path => { void desktopNavigation.push({ kind: 'quick_chat', projectPath: path }) }}

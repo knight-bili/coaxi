@@ -140,6 +140,7 @@
     "skillPacks.members.list",
     "skillPacks.members.set",
     "canvas.boards.list",
+    "canvas.references.page",
     "canvas.boards.get",
     "canvas.boards.create",
     "canvas.boards.update",

@@ -31,6 +31,10 @@ use crate::{
 
 mod navigation;
 use navigation::*;
+mod canvas_references;
+pub use canvas_references::{
+    CanvasPrivateReference, CanvasReferenceMember, CanvasReferencePage, CanvasThreadReference,
+};
 mod user_anchors;
 pub use user_anchors::{ThreadUserAnchorIndex, ThreadUserAnchorPreview};
 mod message_model;
