@@ -14,7 +14,7 @@
   "current_branch": "phase/i02-skill-delivery",
   "base_branch": "phase/i03-canvas",
   "current_task": "I02-T03",
-  "current_slice": "数据库夹具修复已同步63fc52b4，Windows109/0/0、workspace501/0/8通过；Linux新run38564836044复验进行中，继续隔离Core进程恢复和其余技能场景",
+  "current_slice": "Linux数据库110/0/0成功；受控真实Core未知输入恢复5项、helper/Composer10项及当前默认workspace501/0/8通过，待提交同步；其余SP恢复分支继续",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,14 +33,14 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "跟踪Linux run38564836044的真实终态和110项数据库扩展；不重复dispatch，保留原失败记录。",
-    "补Core进程重启/受控Runtime接受边界及SP01-SP11其余精确场景，数据库重开不替代进程恢复。",
+    "提交同步已验证的Core未知输入进程恢复和静态成员验收helper修复，更新草稿PR54。",
+    "继续明确确认后的活跃输入恢复、未接收输入的进程恢复/epoch及剩余SP01–SP11；已有未知结果分支不得盲目重发。",
     "专用测试身份与硬预算到位后执行SP12真实指南读取Gate；不自动付费。",
-    "继续I03八类节点、业务绑定、布局和交互PTY，以及I02剩余与I04-I12完整范围。"
+    "继续I03八类节点、业务绑定、布局和交互PTY，以及I02剩余与I04–I12完整范围。"
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "local_input_chain_verified_additional_matrix_and_real_gate_pending",
+  "current_slice_status": "controlled_unknown_outcome_process_recovery_verified_other_sp_and_real_gate_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -63,8 +63,9 @@
   "skill_delivery_context_evidence": "i02-skill-delivery-context-result.json",
   "ci_cost_policy": "integration/ci-cost-policy.md",
   "ci_access_evidence": "ci-free-result.json",
-  "ci_access_status": "public_runner_verified_local_repair_synced_linux_in_progress",
-  "ci_next_action": "读取run38564836044终态和日志；同步状态后继续SP08等，不将编译或夹具视为真实模型验收",
+  "ci_access_status": "public_runner_verified_windows_and_linux_database_regression_passed",
+  "ci_next_action": "run38564836044已success且110项和Unix日志核对；后续按里程碑免费标准runner验证，不重复调度已完成运行",
   "skill_delivery_matrix_evidence": "i02-skill-delivery-matrix-result.json",
-  "database_regression_repair_evidence": "i02-db153-regression-repair-result.json"
+  "database_regression_repair_evidence": "i02-db153-regression-repair-result.json",
+  "skill_process_recovery_evidence": "i02-skill-process-recovery-result.json"
 }

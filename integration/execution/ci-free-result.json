@@ -2,7 +2,7 @@
   "schema_version": 1,
   "date": "2026-10-14",
   "repository": "knight-bili/codeg-rovai-workbench",
-  "status": "public_standard_runner_verified_core_repair_linux_in_progress",
+  "status": "public_standard_runner_verified_core_repair_passed",
   "customer_authorization": "允许公开：先检查仓库及历史中的敏感内容和许可，再转换公开；发现问题先处理",
   "visibility_before": "PRIVATE",
   "visibility_after": "PUBLIC",
@@ -73,7 +73,7 @@
   },
   "local_audit_directory": "work/ci-free-20261014",
   "implementation": "CI config and current protocol snapshot only; uncommitted Context test expansion is excluded",
-  "checked_at": "2026-10-14T12:36:51.680Z",
+  "checked_at": "2026-10-14T13:31:24.441Z",
   "cloud_validation": {
     "checkedAt": "2026-10-14T09:51:18.331Z",
     "commit": "725512b25f2e1a01adc411817129cb8c2d374a59",
@@ -98,21 +98,31 @@
       "failureLog": "work/ci-free-20261014/core-linux-failed.log",
       "nextAction": "修复历史夹具和格式识别检查并保留全部用例重跑；不提高支出上限"
     },
-    "followUp": "原Core失败记录保留；修复提交63fc52b4已同步并启动新run38564836044，待核对新终态与110项数据库测试，不重复运行旧watch",
+    "followUp": "原失败保留；修复提交63fc52b4的新Linux运行成功，110项包含原12失败与Unix专属用例。本次不代表全部Runtime/平台或MVP资格",
     "latestScaffold": {
       "id": 38545531506,
       "commit": "4aa7e51b6c2f815a88f47348269deef9030fff03",
       "conclusion": "success"
     },
     "coreRepair": {
-      "checkedAt": "2026-10-14T12:36:51.680Z",
+      "checkedAt": "2026-10-14T13:31:24.441Z",
       "id": 38564836044,
       "commit": "63fc52b4c13ad12754ba75c2c25cb0c6f0e6697a",
-      "status": "in_progress",
-      "conclusion": null,
+      "status": "completed",
+      "conclusion": "success",
       "url": "https://github.com/knight-bili/codeg-rovai-workbench/actions/runs/38564836044",
+      "standardPublicRunner": true,
       "platform": "linux",
-      "standardPublicRunner": true
+      "database": {
+        "passed": 110,
+        "failed": 0,
+        "ignored": 0
+      },
+      "unixOnlyExecuted": true,
+      "allOriginal12FailuresPassed": true,
+      "formatAndAllTargets": "passed",
+      "defaultWorkspace": "passed",
+      "log": "work/i02/db153-linux-success.log"
     }
   },
   "local_database_repair": {
@@ -128,6 +138,6 @@
       "ignored": 8
     },
     "productionUnchanged": true,
-    "linuxStatus": "pending_new_run"
+    "linuxStatus": "passed:110/0/0 including original12 and Unix-only test"
   }
 }

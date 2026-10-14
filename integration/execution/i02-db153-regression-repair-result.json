@@ -1,6 +1,6 @@
 {
   "recordedAt": "2026-10-14T12:26:54.175Z",
-  "status": "windows_passed_linux_workflow_in_progress",
+  "status": "windows_and_linux_database_regressions_passed",
   "baseline": "aa5e85bf533512c155d210679c3c18594583dcdc",
   "source": {
     "crates/rovai-core/src/db.rs": {
@@ -58,7 +58,7 @@
       "unixOnly": [
         "db::tests::v107_quarantine_moves_owned_directories_without_following_links"
       ],
-      "linuxStatus": "in_progress"
+      "linuxStatus": "passed:110/0/0"
     },
     "staged": {
       "status": "passed",
@@ -95,18 +95,27 @@
       "logPrefix": "work/i02/db153-"
     },
     "cloud": {
-      "checkedAt": "2026-10-14T12:36:51.680Z",
+      "checkedAt": "2026-10-14T13:31:24.441Z",
       "id": 38564836044,
       "commit": "63fc52b4c13ad12754ba75c2c25cb0c6f0e6697a",
-      "status": "in_progress",
-      "conclusion": null,
+      "status": "completed",
+      "conclusion": "success",
       "url": "https://github.com/knight-bili/codeg-rovai-workbench/actions/runs/38564836044",
+      "standardPublicRunner": true,
       "platform": "linux",
-      "standardPublicRunner": true
+      "database": {
+        "passed": 110,
+        "failed": 0,
+        "ignored": 0
+      },
+      "unixOnlyExecuted": true,
+      "allOriginal12FailuresPassed": true,
+      "formatAndAllTargets": "passed",
+      "defaultWorkspace": "passed",
+      "log": "work/i02/db153-linux-success.log"
     }
   },
   "remaining": [
-    "Linux full Core workflow including its Unix-only test",
     "I02 process boundary and remaining SP matrix; real model SP12 with dedicated identity/budget"
   ],
   "failureLogsPreserved": [

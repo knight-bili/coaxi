@@ -1526,6 +1526,29 @@ Schema153 的数据库回归继续复用现有 owner。旧来源夹具必须在�
 断言使用当前约束原因。完整 `db::` 扩展在 Windows 为109项；Linux 多一项现有的 Unix
 目录/符号链接隔离测试，必须在 Linux 实跑，不能以 Windows 数量替代跨平台资格。
 
+## 融合期技能包进程恢复验收（2026-10-14）
+
+`tools/integration/smoke-skill-pack-recovery.mjs` 拥有真实 Host/Core 进程到受控 ACP 的运输与恢复边界，
+不重复 Context owner 的输入矩阵。独立数据根、Skill Library、MCP、Home 和临时目录中使用生产 API
+安装、选择成员和发送任务；受控程序记录实际输入并保持执行。Qwen 的原生接受确认在请求返回时产生，
+本次覆盖已发出、确认未知的分支：卸载包后硬停止 Core，再由真实 Core 重启恢复，检查同一 Manifest、
+Blob 字节与摘要和执行代次；当前恢复合同要求 `failed`、`accepted_input_outcome_unknown`
+与 `delivery_unknown` 保留，不能沿用旧 smoke 的 waiting/recovery_blocked 期望或盲目重发。明确确认后仍在执行的分支待补；
+没有真实模型或指南工具读取，不授予 SP12 或跨平台资格。
+
+最低入口为 `node tools/integration/smoke-skill-pack-recovery.mjs <Host绝对路径> <fixture-launcher绝对路径> <证据根绝对路径>`。
+Host 旁必须有同版 bundled `rovai` CLI；两者先由当前源码构建并复制到隔离产物目录。
+launcher 由 `rustc scripts/fixtures/skill-recovery-runtime-launcher.rs -o <fixture-launcher绝对路径>`
+构建（Windows 需已配置 MSVC/SDK）。它只把原参数交给隔离 Node fixture，Windows 隐藏子进程窗口。
+`streaming-acp-runtime.mjs` 仅在 smoke 设置 `ROVAI_SKILL_RECOVERY_CAPTURE` 时记录/保持输入，
+其他既有流式验收模式保持原行为；不调用供应商 CLI、网络或模型。失败夹具和诊断保留供复核。
+
+最低成本 helper owner 为 `scripts/lib/configure-product-runtime.test.mjs`。修复前，Qwen/Codex 的
+有效静态成员绑定一直返回当前 `installed_unverified`，旧 helper 却反复等待 `ready` 并重写成员。
+表驱动回归要求首次绑定即结束，并保留独立 probe 状态和 needs_attention 的拒绝；配置成功不能
+推导真实执行资格。最小命令 `node --test scripts/lib/configure-product-runtime.test.mjs scripts/lib/create-configured-camp.test.mjs`。
+无新增 Rust 单元测试函数、永久忽略或模型调用；较低层数据库重开无法证明这里的实际进程边界。
+
 ## 融合期 OpenClaw Gateway 测试准入（2026-10-14）
 
 新增最低层纯配置 owner `openclaw_gateway::tests::gateway_configuration_and_acknowledgement_keep_the_owned_scope`，

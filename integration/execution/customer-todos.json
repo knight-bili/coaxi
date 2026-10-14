@@ -64,8 +64,8 @@
     {
       "id": "INPUT-GITHUB-CI",
       "required_for": "Mac/Linux及GitHub原生验证",
-      "need": "公开标准运行机可执行；原12项数据库扩展失败已在Windows完整109项及默认workspace501项中修复验证，Linux110项仍待新运行。无需客户提高额度，账号历史账单和硬预算仍未核实",
-      "status": "resolved_public_runner_verified_linux_repair_verification_owned_by_development",
+      "need": "公开标准运行机已实际完成Linux Core验证，数据库110项（含原12失败和Unix专属）全通过；无需客户提高额度。账号历史账单和硬预算仍未核实",
+      "status": "resolved_public_runner_and_core_linux_verified",
       "evidence": {
         "head": "e2963ef0d59989d16d32fffc03d19925dd75de85",
         "run": 38500616853,
@@ -88,10 +88,11 @@
         "publicVerified": true,
         "accountBudgetModified": false,
         "accountBudgetVerified": false,
-        "realCloudProbe": "runner_executed_scaffold_passed_core_extended_failed",
+        "realCloudProbe": "runner_executed_scaffold_passed_core_repair_all_steps_passed",
         "runs": [
           38543657903,
-          38543710547
+          38543710547,
+          38564836044
         ]
       }
     },
