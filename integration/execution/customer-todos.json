@@ -64,8 +64,8 @@
     {
       "id": "INPUT-GITHUB-CI",
       "required_for": "Mac/Linux及GitHub原生验证",
-      "need": "公开标准运行机已执行且文档门禁通过；Core默认测试通过，数据库扩展12项失败由研发修复，不需客户提高额度。账号历史账单和硬预算仍未核实",
-      "status": "resolved_public_runner_verified_regression_repair_owned_by_development",
+      "need": "公开标准运行机可执行；原12项数据库扩展失败已在Windows完整109项及默认workspace501项中修复验证，Linux110项仍待新运行。无需客户提高额度，账号历史账单和硬预算仍未核实",
+      "status": "resolved_public_runner_verified_linux_repair_verification_owned_by_development",
       "evidence": {
         "head": "e2963ef0d59989d16d32fffc03d19925dd75de85",
         "run": 38500616853,
@@ -73,7 +73,7 @@
         "annotation": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings",
         "steps": 0
       },
-      "software_workaround": "已找到本机E盘现有MSVC，通过VS子进程开发环境进行Windows编译/迁移测试；Mac/Linux仍待补，不自动购买或修改账户额度，不重复调度被拒作业",
+      "software_workaround": "继续本机Windows与公开仓库标准运行机；保留Mac和移动编译入口，不采购、不修改账户额度，不用编译代替真机验收",
       "prior_evidence": [
         {
           "head": "2797a000756d0640a02db0e4e60d10a879f046b6",

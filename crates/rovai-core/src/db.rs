@@ -40585,7 +40585,7 @@ mod tests {
         assert_eq!(historical_delivery(&reopened), delivery_before);
         assert_eq!(historical_bootstrap(&reopened), bootstrap_before);
         assert!(reopened.schema_migration_applied(174).unwrap());
-        assert!(public_history_claim_v174_schema_matches(reopened.connection()).unwrap());
+        assert!(connection_has_current_data_contract(reopened.connection()).unwrap());
         let historical_claim: (Option<i64>, Option<i64>) = reopened
             .connection()
             .query_row(
@@ -40612,11 +40612,7 @@ mod tests {
              VALUES('run-old',1,'unavailable','message-old',2,'old',29)",
             [],
         ).unwrap_err();
-        assert!(
-            old_insert
-                .to_string()
-                .contains("must use ContextManifest v33")
-        );
+        assert!(old_insert.to_string().contains("Context34/Selection3"));
         for (column, invalid) in [
             ("claim_previous_public_boundary_sequence", -1),
             ("claim_has_additional_public_messages", 2),
@@ -40995,7 +40991,8 @@ mod tests {
         let directory =
             std::env::temp_dir().join(format!("rovai-v160-delivery-schema-{}", Uuid::new_v4()));
         let database = crate::test_support::fresh_schema_database_fast_at(&directory);
-        assert!(camp_message_agent_run_v163_schema_matches(database.connection()).unwrap());
+        assert!(connection_has_current_data_contract(database.connection()).unwrap());
+        assert!(skill_pack_context::schema_matches(database.connection()).unwrap());
         let marker = database
             .connection()
             .query_row(
@@ -41432,6 +41429,7 @@ mod tests {
         };
 
         let (mut database, directory) = crate::test_support::seeded_runtime_database_fast();
+        downgrade_skill_pack_context_fixture(database.connection());
         let workspace = directory.join("v162-requeue-workspace");
         std::fs::create_dir_all(&workspace).unwrap();
         let created = CollaborationService::default()
@@ -43498,6 +43496,7 @@ mod tests {
         database.migrate_skill_pack_installations().unwrap();
         database.migrate_skill_pack_members().unwrap();
         database.migrate_canvas_boards().unwrap();
+        skill_pack_context::migrate(&mut database).unwrap();
         assert!(connection_has_current_data_contract(database.connection()).unwrap());
         database.connection().execute_batch("DROP INDEX native_session_bootstrap_binding_idx;
             CREATE UNIQUE INDEX native_session_bootstrap_binding_idx ON native_session_bootstrap_evidence(native_binding_id,native_binding_generation)").unwrap();
@@ -43605,9 +43604,9 @@ mod tests {
                 .unwrap();
             match change {
                 "equivalent_sql" => {
-                    let sql: String = connection.query_row("SELECT sql FROM sqlite_master WHERE name='context_manifest_v33_only_insert'", [], |r| r.get(0)).unwrap();
+                    let sql: String = connection.query_row("SELECT sql FROM sqlite_master WHERE name='context_manifest_v34_only_insert'", [], |r| r.get(0)).unwrap();
                     connection
-                        .execute_batch("DROP TRIGGER context_manifest_v33_only_insert")
+                        .execute_batch("DROP TRIGGER context_manifest_v34_only_insert")
                         .unwrap();
                     connection
                         .execute_batch(&sql.replacen(
@@ -45102,6 +45101,7 @@ mod tests {
         let workspace = directory.join("workspace");
         std::fs::create_dir_all(&workspace).unwrap();
         let mut database = crate::test_support::seeded_runtime_database();
+        downgrade_skill_pack_context_fixture(database.0.connection());
         let collaboration = crate::collaboration::CollaborationService::default();
         let camp = collaboration
             .create_camp(
@@ -45284,7 +45284,7 @@ mod tests {
             )
             .unwrap();
         assert!(manifest_schema.contains(
-            "CHECK(formatter_version IN (20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33))"
+            "CHECK(formatter_version IN (20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34))"
         ));
         let conversation: (Option<String>, Option<String>, i64, i64) = reopened
             .connection()
@@ -45333,6 +45333,7 @@ mod tests {
     #[test]
     fn v98_invalidates_profile_v3_context_and_preserves_public_messages() {
         let (mut database, source_directory) = crate::test_support::seeded_runtime_database();
+        downgrade_skill_pack_context_fixture(database.connection());
         let workspace = source_directory.join("v98-workspace");
         std::fs::create_dir_all(&workspace).unwrap();
         let collaboration = crate::collaboration::CollaborationService::default();
@@ -45618,7 +45619,7 @@ mod tests {
             )
             .unwrap();
         assert!(manifest_schema.contains(
-            "CHECK(formatter_version IN (20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33))"
+            "CHECK(formatter_version IN (20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34))"
         ));
         assert!(
             manifest_schema
@@ -45796,6 +45797,7 @@ mod tests {
         let mut database = crate::test_support::seeded_runtime_database_owned();
         let data_dir = database.directory().to_path_buf();
         let workspace = data_dir.join("migration-100-workspace");
+        downgrade_skill_pack_context_fixture(database.connection());
         fs::create_dir_all(&workspace).unwrap();
         let service = CollaborationService::default();
         let created = service
@@ -50132,6 +50134,7 @@ mod tests {
     #[test]
     fn v111_upgrades_current_main_v110_and_keeps_zero_attempt_cancellation_terminal() {
         let (mut database, directory) = crate::test_support::seeded_runtime_database();
+        downgrade_skill_pack_context_fixture(database.connection());
         let workspace = directory.join("v111-workspace");
         std::fs::create_dir_all(&workspace).unwrap();
         let collaboration = crate::collaboration::CollaborationService::default();
@@ -50694,6 +50697,7 @@ mod tests {
         let mut database = crate::test_support::seeded_runtime_database_owned();
         let data_dir = database.directory().to_path_buf();
         let workspace = data_dir.join("migration-99-workspace");
+        downgrade_skill_pack_context_fixture(database.connection());
         fs::create_dir_all(&workspace).unwrap();
         let created = CollaborationService::default()
             .create_camp(
@@ -56343,9 +56347,9 @@ mod tests {
             connection,
             "trigger",
             &[
-                "context_manifest_v33_only_insert",
+                "context_manifest_v34_only_insert",
                 "context_manifest_version_immutable",
-                "agent_run_input_v33_only_insert",
+                "agent_run_input_v34_only_insert",
                 "agent_run_input_context_projection_immutable",
                 "runtime_input_delivery_attachment_auth_insert",
                 "camp_attachment_view_camp_insert",

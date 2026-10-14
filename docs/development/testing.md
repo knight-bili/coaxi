@@ -1519,6 +1519,13 @@ PR 默认层仍为 `cargo test --workspace`；Renderer 复用 `SingleChatPanel.t
 约束或把新Run改成旧身份来消除失败。Renderer扩展既有候选搜索/菜单owner，保留稳定英文发送名、
 中文显示名、来源与相关成员。完整默认层仍执行 `cargo test --workspace`。
 
+Schema153 的数据库回归继续复用现有 owner。旧来源夹具必须在创建业务任务前退回旧格式，
+保留禁止丢弃 Selection3 行的检查，不能将已生成的新任务改写成旧快照。当前数据库测试检查
+当前准入、v34 插入约束和实际业务列，不要求历史 v163/v174 的 SQL 目录匹配当前新增格式；
+旧来源匹配器和生产准入不放宽。显式重演 bootstrap 升级链时执行到203，拒绝新插入旧输入的
+断言使用当前约束原因。完整 `db::` 扩展在 Windows 为109项；Linux 多一项现有的 Unix
+目录/符号链接隔离测试，必须在 Linux 实跑，不能以 Windows 数量替代跨平台资格。
+
 ## 融合期 OpenClaw Gateway 测试准入（2026-10-14）
 
 新增最低层纯配置 owner `openclaw_gateway::tests::gateway_configuration_and_acknowledgement_keep_the_owned_scope`，
