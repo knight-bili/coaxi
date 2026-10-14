@@ -14,7 +14,7 @@
   "current_branch": "phase/i02-workbench",
   "base_branch": "phase/i01-foundation",
   "current_task": "I02-T03",
-  "current_slice": "固定技能包来源目录及Core/HTTP预览已验，显式安装更新卸载与成员实际投递继续",
+  "current_slice": "Core技能包安装刷新卸载和生产设置页已验，按成员实际投递、自定义与MCP继续",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,14 +33,14 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "实现Core拥有的显式安装/更新/卸载和来源/所有权/改动备份；不恢复旧Revision作为新索引",
+    "实现按成员选择、冻结实际输入与原生发现验证；保留技能包当前状态与版本，不恢复旧Revision索引",
     "接入按成员选择、冻结实际输入和原生发现验证；Office、科研环境及UI渲染能力分别验收",
     "继续MCP扫描/市场/安装与21Runtime授权投递；OpenClaw认证、Hermes信任/计量及T01待办继续研发",
     "独立推进I03至I12，外部账号/设备/签名/付款资源保持客户待办，不削减一期范围"
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "fixed_catalog_and_real_Core_HTTP_preview_verified_install_and_delivery_pending",
+  "current_slice_status": "core_installation_lifecycle_and_production_settings_UI_verified_member_delivery_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -53,5 +53,8 @@
   "hermes_core_evidence": "i02-hermes-core-result.json",
   "openclaw_core_evidence": "i02-openclaw-core-result.json",
   "openclaw_session_evidence": "i02-openclaw-session-result.json",
-  "skill_catalog_evidence": "i02-skill-catalog-result.json"
+  "skill_catalog_evidence": "i02-skill-catalog-result.json",
+  "skill_install_evidence": "i02-skill-install-result.json",
+  "system_goal_status": "active",
+  "system_goal_verified_at": "2026-10-14T04:00:31.738Z"
 }

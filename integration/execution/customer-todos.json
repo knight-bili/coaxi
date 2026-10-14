@@ -9,7 +9,8 @@
       "required_for": "I08及平台最终验收",
       "need": "实际Mac的权限、硬件和安装交互验收方式",
       "status": "deferred",
-      "software_workaround": "GitHub两款双架构源码编译已验证"
+      "software_workaround": "GitHub两款双架构源码编译已验证",
+      "current_fusion_qualification": "not_run_source_baseline_only"
     },
     {
       "id": "INPUT-IOS",
@@ -17,7 +18,8 @@
       "required_for": "I10及原生移动最终验收",
       "need": "iPhone/iPad实际安装、触控、后台和网络验收设备",
       "status": "deferred",
-      "software_workaround": "iPhone模拟器源码构建及启动已验证，iPad和真机未验收"
+      "software_workaround": "iPhone模拟器源码构建及启动已验证，iPad和真机未验收",
+      "current_fusion_qualification": "not_run_source_baseline_only"
     },
     {
       "id": "INPUT-ANDROID",
@@ -25,7 +27,8 @@
       "required_for": "I10及原生移动最终验收",
       "need": "客户指定可使用的ADB连接及实际设备",
       "status": "deferred",
-      "software_workaround": "API36 AOSP模拟器源码构建/176单测/启动已验证，不使用旧ADB设备"
+      "software_workaround": "API36 AOSP模拟器源码构建/176单测/启动已验证，不使用旧ADB设备",
+      "current_fusion_qualification": "not_run_source_baseline_only"
     },
     {
       "id": "INPUT-RUNTIME",
@@ -64,12 +67,21 @@
       "need": "核查GitHub账户付款或Actions支出限制；由客户处理账号与费用决定后补运行",
       "status": "deferred_account_billing",
       "evidence": {
-        "head": "2797a000756d0640a02db0e4e60d10a879f046b6",
-        "run": 38461101658,
-        "checkRun": 115516171718,
-        "annotation": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+        "head": "e2963ef0d59989d16d32fffc03d19925dd75de85",
+        "run": 38500616853,
+        "checkRun": 115646431364,
+        "annotation": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings",
+        "steps": 0
       },
-      "software_workaround": "已找到本机E盘现有MSVC，通过VS子进程开发环境进行Windows编译/迁移测试；Mac/Linux仍待补，不自动购买或修改账户额度，不重复调度被拒作业"
+      "software_workaround": "已找到本机E盘现有MSVC，通过VS子进程开发环境进行Windows编译/迁移测试；Mac/Linux仍待补，不自动购买或修改账户额度，不重复调度被拒作业",
+      "prior_evidence": [
+        {
+          "head": "2797a000756d0640a02db0e4e60d10a879f046b6",
+          "run": 38461101658,
+          "checkRun": 115516171718,
+          "annotation": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+        }
+      ]
     }
   ]
 }

@@ -135,6 +135,69 @@ fn source_url(path: &str) -> String {
     format!("{SOURCE_REPOSITORY}/blob/{SOURCE_COMMIT}/{path}")
 }
 
+pub(crate) struct InstallationFile {
+    pub path: String,
+    pub bytes: &'static [u8],
+    pub executable: bool,
+}
+
+pub(crate) struct InstallationSource {
+    pub revision: &'static str,
+    pub files: Vec<InstallationFile>,
+}
+
+pub(crate) fn installation_source(id: &str) -> Result<InstallationSource> {
+    use sha2::{Digest, Sha256};
+    let entry = catalog()?
+        .entries
+        .iter()
+        .find(|entry| entry.id == id)
+        .context("Skill pack entry is unavailable")?;
+    ensure!(
+        entry.content_source == "embedded",
+        "Skill pack content is not bundled"
+    );
+    let prefix = entry
+        .source_path
+        .strip_prefix("src-tauri/")
+        .and_then(|path| path.strip_suffix("SKILL.md"))
+        .context("Skill pack source is invalid")?;
+    let manifest: serde_json::Value = serde_json::from_str(include_str!(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/resources/codeg-skill-packs/manifest.json"
+    )))?;
+    let mut files = Vec::new();
+    for record in manifest["files"]
+        .as_array()
+        .context("Skill pack manifest is invalid")?
+    {
+        let path = record["path"]
+            .as_str()
+            .context("Skill pack source path is missing")?;
+        if let Some(relative) = path.strip_prefix(prefix) {
+            let bytes = file_bytes(path)?;
+            ensure!(
+                record["sha256"] == format!("{:x}", Sha256::digest(bytes)),
+                "Skill pack source digest changed"
+            );
+            files.push(InstallationFile {
+                path: relative.into(),
+                bytes,
+                executable: record["mode"] == "100755",
+            });
+        }
+    }
+    files.sort_by(|a, b| a.path.cmp(&b.path));
+    ensure!(
+        files.iter().any(|file| file.path == "SKILL.md"),
+        "Skill pack manifest has no guide"
+    );
+    Ok(InstallationSource {
+        revision: SOURCE_COMMIT,
+        files,
+    })
+}
+
 fn metadata_entries(path: &str, key: &str, family: SkillPackFamily) -> Result<Vec<SkillPackEntry>> {
     let source: toml::Value = toml::from_str(std::str::from_utf8(file_bytes(path)?)?)?;
     let entries: Vec<MetadataEntry> = source
@@ -420,10 +483,14 @@ mod tests {
             };
             if entry.family == SkillPackFamily::Office {
                 assert!(read(&request).is_err());
+                assert!(installation_source(&entry.id).is_err());
                 assert!(entry.load_id.is_some());
                 continue;
             }
             let preview = read(&request).unwrap();
+            let source = installation_source(&entry.id).unwrap();
+            assert_eq!(source.revision, SOURCE_COMMIT);
+            assert_eq!(source.files.len(), preview.files.len());
             assert_eq!(preview.status, "text");
             assert!(preview.content.unwrap().starts_with("---"));
             assert!(preview.files.iter().any(|file| file.path == "SKILL.md"));

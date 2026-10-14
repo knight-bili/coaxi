@@ -13,6 +13,8 @@ last_updated: 2026-10-12
 
 融合技能包固定来源由新增纯函数 owner `codeg_skill_catalog::tests::catalog_preserves_pinned_sources_and_bounds_content_reads` 拥有。原先没有固定 Codeg 目录与嵌入资源，原生发现和旧 Revision owner 处理可变路径/数据库，无法验证这一来源的 Git 摘要、9 项 Office 外部依赖和跨包预览边界。该 owner 不建 SQLite、Home 或 Runtime，最低命令为 `cargo test -p rovai-core --lib codeg_skill_catalog::tests::catalog_preserves_pinned_sources_and_bounds_content_reads -- --exact`；Core/HTTP seam 由隔离 smoke 单独验证，不重复纯函数矩阵。
 
+显式安装新增两个扩展 owner：`skill_pack_installation::tests::version_publication_preserves_edits_fences_stale_commits_and_replays_across_reopen` 拥有私有文件树与SQLite指针之间的发布、竞争、收据失败回滚、改动保留和重开；旧Library不参与此状态，不能复用其导入fixture。`db::tests::skill_pack_migration_preserves_receipts_and_rolls_back_its_table` 拥有新的149→150加表及收据事务、旧结果保留和结构拒绝。最低命令先用 `cargo test -p rovai-core --features extended-tests --lib skill_pack -- --list` 确认两项，再去掉 `--list` 执行；预备两次用于证明旧观察版本无法覆盖新提交，不是重复相同happy path。真实HTTP seam使用 `tools/integration/smoke-skill-pack-installation.mjs`，不能替代实际成员/模型投递。
+
 Send 文件输入改动先运行 `cargo test -p rovai-core --bin rovai send_file_`，再运行
 `pnpm test:send-input-file`。后者构建当前 CLI，以隔离临时目录和本地 IPC 夹具验证请求传递、
 业务拒绝不降级、输入失败零 IPC、继承 stdin 不阻塞和 Unix FIFO/设备/权限拒绝；不启动 Core 或模型。

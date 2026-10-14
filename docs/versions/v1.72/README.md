@@ -656,3 +656,5 @@ Migration197扩展Runtime/Skills闭集并发布schema147，保留旧行与旧来
 ## 融合期技能包固定来源目录（2026-10-14）
 
 Core 接入固定 Codeg 的14专家、13科研、1个UI指南及9项Office外部声明，保留五类来源与多语言元数据，通过 `skillPacks.list/read` 提供同一份嵌入目录和内容预览。合同见 [Codeg Skill Packs v1](../../contracts/codeg-skill-packs-v1.md)。不自动安装或改原生配置；OfficeCLI、交互卡片渲染、显式安装更新卸载及成员投递仍属一期实施项，不能以目录移植代替工作包完成。
+
+后续显式安装、刷新修复和卸载进入同一Core，Migration200从149升级150。文件预备在数据库锁外，当前指针、事件与命令结果同事务提交；旧版本、用户改动和历史引用保留。合同见 [Skill Pack Installation v1](../../contracts/skill-pack-installation-v1.md)。安装不会自动启用成员、原生CLI或模型能力，完整一期验收状态不变。

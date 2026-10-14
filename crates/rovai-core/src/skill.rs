@@ -2854,6 +2854,17 @@ fn inspect_candidate_tree(source: &Path, expected_name: &str) -> Result<Candidat
     candidate_snapshot(source, expected_name, collector)
 }
 
+/// The new installed-pack store reuses only the no-follow, bounded tree reader;
+/// it does not use the historical Library tables, revisions or projections.
+pub(crate) fn inspect_installed_pack_tree(source: &Path, expected_name: &str) -> Result<String> {
+    validate_skill_name(expected_name)?;
+    let mut collector = CandidateCollector::default();
+    inspect_candidate_node(source, Path::new(""), 0, &mut collector)?;
+    crate::managed_skills::read_frontmatter(&source.join("SKILL.md"), expected_name)?;
+    collector.records.sort_by(|a, b| a.path.cmp(&b.path));
+    Ok(digest_records(&collector.records))
+}
+
 fn candidate_snapshot(
     content_root: &Path,
     expected_name: &str,

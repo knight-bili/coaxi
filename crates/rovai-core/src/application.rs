@@ -9304,6 +9304,55 @@ impl Core {
                     rovai_core::codeg_skill_catalog::read(&params)?,
                 )?)
             }
+            "skillPacks.installations.list" => {
+                let store =
+                    rovai_core::skill_pack_installation::SkillPackStore::new(&self.data_dir)?;
+                let rows = {
+                    let database = self.database.lock().await;
+                    rovai_core::skill_pack_installation::snapshot(database.connection())?
+                };
+                Ok(serde_json::to_value(
+                    tokio::task::spawn_blocking(move || store.views(&rows)).await??,
+                )?)
+            }
+            "skillPacks.install" => {
+                use rovai_core::skill_pack_installation::{
+                    InstallBeginning, InstallSkillPackCommand, SkillPackStore,
+                };
+                let params: UserCommandParams<InstallSkillPackCommand> =
+                    serde_json::from_value(request.params.clone())?;
+                let envelope = user_command_envelope(params.command_id, params.command);
+                let store = SkillPackStore::new(&self.data_dir)?;
+                let beginning = {
+                    let mut database = self.database.lock().await;
+                    store.begin_install(&mut database, &envelope)?
+                };
+                let execution = match beginning {
+                    InstallBeginning::Complete(execution) => execution,
+                    InstallBeginning::Prepare(plan) => {
+                        let preparing_store = store.clone();
+                        let prepared =
+                            tokio::task::spawn_blocking(move || preparing_store.prepare(plan))
+                                .await??;
+                        let mut database = self.database.lock().await;
+                        store.commit_install(&mut database, &envelope, prepared)?
+                    }
+                };
+                Ok(serde_json::to_value(execution.result)?)
+            }
+            "skillPacks.uninstall" => {
+                let params: UserCommandParams<
+                    rovai_core::skill_pack_installation::UninstallSkillPackCommand,
+                > = serde_json::from_value(request.params.clone())?;
+                let store =
+                    rovai_core::skill_pack_installation::SkillPackStore::new(&self.data_dir)?;
+                let mut database = self.database.lock().await;
+                let execution = store.uninstall(
+                    &mut database,
+                    &user_command_envelope(params.command_id, params.command),
+                )?;
+                Ok(serde_json::to_value(execution.result)?)
+            }
             "toolbox.list" => {
                 let managed =
                     rovai_core::managed_skills::ManagedSkills::for_data_dir(&self.data_dir)?;

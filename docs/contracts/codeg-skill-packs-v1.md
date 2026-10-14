@@ -9,7 +9,7 @@ last_updated: 2026-10-14
 
 # Codeg Skill Packs v1
 
-本合同拥有一期 I02-T03 的固定来源目录与只读预览，不改变 [Skills Rebuild v2](skills-rebuild-v2.md) 的模型投递、原生来源身份和旧 Run 恢复。安装、更新、卸载、按成员投递以及 MCP 市场仍是同一工作包的后续实施项。
+本合同拥有一期 I02-T03 的固定来源目录与只读预览，不改变 [Skills Rebuild v2](skills-rebuild-v2.md) 的模型投递、原生来源身份和旧 Run 恢复。显式安装、刷新与卸载见 [Skill Pack Installation v1](skill-pack-installation-v1.md)；按成员投递以及 MCP 市场仍继续实施。
 
 ## 来源与资格
 

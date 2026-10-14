@@ -119,6 +119,7 @@ pub mod runtime_startup;
 mod runtime_thinking;
 pub mod single_chat;
 pub mod skill;
+pub mod skill_pack_installation;
 pub mod skill_projection;
 pub mod storage_layout;
 pub mod team_tool;

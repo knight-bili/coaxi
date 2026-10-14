@@ -3,7 +3,7 @@
   "purpose": "当前融合工作树接口合同；固定来源与I01旧二进制证据保持原快照",
   "hostWebProtocolVersion": 4,
   "coreDataContractVersion": "v1.72",
-  "coreProjectionSchemaVersion": 149,
+  "coreProjectionSchemaVersion": 150,
   "canonicalWebOperations": [
     "missions.workspace.cleanup",
     "missions.cleanup.list",
@@ -134,6 +134,9 @@
     "toolbox.list",
     "skillPacks.list",
     "skillPacks.read",
+    "skillPacks.installations.list",
+    "skillPacks.install",
+    "skillPacks.uninstall",
     "toolbox.read",
     "toolbox.setMembers",
     "nativeSkills.list",
@@ -194,9 +197,9 @@
     "qualification": "source_in_progress_not_runtime_qualified"
   },
   "evolution": {
-    "migration": 198,
-    "sourceProjectionSchemaVersion": 147,
-    "targetProjectionSchemaVersion": 148,
-    "reason": "Hermes Runtime/Skills闭集扩展；Gemini197历史146->147保持，真实资格单独验证"
+    "migration": 200,
+    "sourceProjectionSchemaVersion": 149,
+    "targetProjectionSchemaVersion": 150,
+    "reason": "Core技能包安装状态与私有版本发布；保留197/198/199来源迁移及21种Runtime目录，实际投递与资格单独验收"
   }
 }

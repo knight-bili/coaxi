@@ -202,6 +202,7 @@ mod tests {
         let directory =
             std::env::temp_dir().join(format!("rovai-simplification-{}", Uuid::new_v4()));
         let mut database = crate::test_support::fresh_schema_database_fast_at(&directory);
+        crate::skill_pack_installation::downgrade_for_test(database.connection());
         let store = crate::managed_blob::ManagedBlobStore::new(&directory);
         let blob = store
             .put_bytes(&mut database, b"frozen input\n", "text/plain", "sensitive")

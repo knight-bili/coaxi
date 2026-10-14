@@ -341,7 +341,7 @@ impl MainThreadMigrationSource {
 }
 
 pub(crate) const CURRENT_DATA_CONTRACT_VERSION: &str = "v1.72";
-pub(crate) const CURRENT_PROJECTION_SCHEMA_VERSION: i64 = 149;
+pub(crate) const CURRENT_PROJECTION_SCHEMA_VERSION: i64 = 150;
 const V147_MIGRATION_SOURCE_DATA_CONTRACT_VERSION: &str = "v1.54";
 const V147_MIGRATION_SOURCE_PROJECTION_SCHEMA_VERSION: i64 = 96;
 const V145_MIGRATION_SOURCE_DATA_CONTRACT_VERSION: &str = "v1.53";
@@ -2945,7 +2945,7 @@ fn connection_has_admissible_data_contract(connection: &Connection) -> rusqlite:
         .and_then(Option::as_ref)
         .is_some_and(|(contract, schema, _)| {
             contract == CURRENT_DATA_CONTRACT_VERSION
-                && matches!(schema, 145 | 146 | 147 | 148 | 149)
+                && matches!(schema, 145 | 146 | 147 | 148 | 149 | 150)
         })
     {
         return Ok(matches!(
@@ -3354,10 +3354,11 @@ pub(crate) fn classify_database_contract(
     if marker.contract_version == CURRENT_DATA_CONTRACT_VERSION
         && matches!(
             marker.projection_schema_version,
-            145 | 146 | 147 | 148 | 149
+            145 | 146 | 147 | 148 | 149 | 150
         )
     {
         let expected_migration = match marker.projection_schema_version {
+            150 => 200,
             149 => 199,
             148 => 198,
             147 => 197,
@@ -3382,8 +3383,10 @@ pub(crate) fn classify_database_contract(
                 || hermes_runtime_schema_matches(connection)?)
             && (marker.projection_schema_version >= 149
                 || added_runtime_schema_matches(connection, "openclaw-cli", "openclaw", false)?)
-            && (marker.projection_schema_version != 149
-                || openclaw_runtime_schema_matches(connection)?);
+            && (marker.projection_schema_version < 149
+                || openclaw_runtime_schema_matches(connection)?)
+            && (marker.projection_schema_version < 150
+                || crate::skill_pack_installation::schema_matches(connection)?);
         return Ok(if !valid {
             DatabaseContractClassification::Unknown(Some(marker))
         } else if marker.projection_schema_version == CURRENT_PROJECTION_SCHEMA_VERSION {
@@ -6619,6 +6622,7 @@ fn run_bootstrap_schema_matches(connection: &Connection) -> rusqlite::Result<boo
 
 #[cfg(test)]
 pub(crate) fn downgrade_run_bootstrap_for_test(connection: &Connection) {
+    crate::skill_pack_installation::downgrade_for_test(connection);
     if !connection
         .query_row(
             "SELECT EXISTS(SELECT 1 FROM schema_migration WHERE version=195)",
@@ -9068,6 +9072,9 @@ impl Database {
             if !self.schema_migration_applied(199)? {
                 migration_step!("migration_199", self.migrate_openclaw_runtime());
             }
+            if !self.schema_migration_applied(200)? {
+                migration_step!("migration_200", self.migrate_skill_pack_installations());
+            }
             if let Err(error) =
                 crate::notification::maintain_notification_episode_retention(self.connection())
             {
@@ -9884,6 +9891,9 @@ impl Database {
         if !self.schema_migration_applied(199)? {
             migration_step!("migration_199", self.migrate_openclaw_runtime());
         }
+        if !self.schema_migration_applied(200)? {
+            migration_step!("migration_200", self.migrate_skill_pack_installations());
+        }
         if let Err(error) =
             crate::notification::maintain_notification_episode_retention(self.connection())
         {
@@ -10003,6 +10013,29 @@ impl Database {
         let foreign_keys = self.connection.execute_batch("PRAGMA foreign_keys=ON;");
         result?;
         foreign_keys?;
+        Ok(())
+    }
+
+    fn migrate_skill_pack_installations(&mut self) -> Result<()> {
+        let transaction = self
+            .connection
+            .transaction_with_behavior(TransactionBehavior::Immediate)?;
+        anyhow::ensure!(
+            matches!(classify_database_contract(&transaction)?,
+            DatabaseContractClassification::SupportedMigrationSource(ref marker)
+                if marker.contract_version=="v1.72" && marker.projection_schema_version==149),
+            "Skill package migration requires v1.72/schema149"
+        );
+        transaction.execute_batch(crate::skill_pack_installation::TABLE_SQL)?;
+        transaction.execute_batch("INSERT INTO schema_migration(version,applied_at) VALUES(200,datetime('now')); UPDATE rovai_data_contract SET projection_schema_version=150,updated_at=datetime('now') WHERE singleton=1;")?;
+        anyhow::ensure!(
+            matches!(
+                classify_database_contract(&transaction)?,
+                DatabaseContractClassification::Current(_)
+            ),
+            "Skill package migration schema admission failed"
+        );
+        transaction.commit()?;
         Ok(())
     }
 
@@ -39753,6 +39786,69 @@ pub(crate) fn downgrade_current_schema_to_v98_source_for_test(connection: &Conne
 mod tests {
     use super::*;
 
+    #[test]
+    fn skill_pack_migration_preserves_receipts_and_rolls_back_its_table() {
+        use crate::command::{ActorRef, CommandEnvelope};
+        use crate::skill_pack_installation::{InstallSkillPackCommand, SkillPackStore};
+        let directory =
+            std::env::temp_dir().join(format!("rovai-skill-pack-migration-{}", Uuid::new_v4()));
+        let mut database = Database::open(&directory).unwrap();
+        let command = CommandEnvelope {
+            command_id: Uuid::new_v4().to_string(),
+            actor: ActorRef::User {
+                user_id: "local_user".into(),
+            },
+            camp_id: None,
+            expected_versions: Vec::new(),
+            execution_epoch: None,
+            payload: InstallSkillPackCommand {
+                skill_id: "brainstorming".into(),
+                source_revision: "stale-source".into(),
+                expected_version: "absent".into(),
+            },
+        };
+        SkillPackStore::new(&directory)
+            .unwrap()
+            .begin_install(&mut database, &command)
+            .unwrap();
+        database.connection().execute_batch("DROP TABLE skill_pack_installation; DELETE FROM schema_migration WHERE version=200; UPDATE rovai_data_contract SET projection_schema_version=149 WHERE singleton=1;").unwrap();
+        assert!(matches!(
+            classify_database_contract(database.connection()).unwrap(),
+            DatabaseContractClassification::SupportedMigrationSource(_)
+        ));
+        database.connection().execute_batch("CREATE TRIGGER reject_package_migration BEFORE INSERT ON schema_migration WHEN NEW.version=200 BEGIN SELECT RAISE(ABORT,'injected receipt failure'); END;").unwrap();
+        assert!(database.migrate_skill_pack_installations().is_err());
+        assert!(!crate::skill_pack_installation::schema_matches(database.connection()).unwrap());
+        assert!(!database.schema_migration_applied(200).unwrap());
+        assert!(
+            matches!(classify_database_contract(database.connection()).unwrap(),DatabaseContractClassification::SupportedMigrationSource(ref marker) if marker.projection_schema_version==149)
+        );
+        database
+            .connection()
+            .execute_batch("DROP TRIGGER reject_package_migration;")
+            .unwrap();
+        database.migrate_skill_pack_installations().unwrap();
+        assert!(connection_has_current_data_contract(database.connection()).unwrap());
+        assert!(database.schema_migration_applied(200).unwrap());
+        assert!(
+            crate::command::DomainCommandGateway
+                .replay_if_recorded(&database, &command)
+                .unwrap()
+                .is_some()
+        );
+        drop(database);
+        let reopened = Database::open(&directory).unwrap();
+        assert!(connection_has_current_data_contract(reopened.connection()).unwrap());
+        reopened
+            .connection()
+            .execute_batch("ALTER TABLE skill_pack_installation ADD COLUMN unexpected TEXT")
+            .unwrap();
+        assert!(matches!(
+            classify_database_contract(reopened.connection()).unwrap(),
+            DatabaseContractClassification::Unknown(_)
+        ));
+    }
+
     // Both exact deployed sources use the same seven-table rebuild boundary.
     #[test]
     fn runtime_catalog_upgrades_preserve_values_and_roll_back_receipts() {
@@ -39786,6 +39882,7 @@ mod tests {
             ),
         ] {
             let (mut database, directory) = crate::test_support::seeded_runtime_database();
+            crate::skill_pack_installation::downgrade_for_test(database.connection());
             database
                 .connection()
                 .execute_batch("PRAGMA foreign_keys=OFF;")
@@ -39903,7 +40000,7 @@ mod tests {
             assert!(reopened.schema_migration_applied(receipt).unwrap());
             assert!(
                 matches!(classify_database_contract(reopened.connection()).unwrap(),
-                DatabaseContractClassification::Current(ref marker) if marker.projection_schema_version==149)
+                DatabaseContractClassification::Current(ref marker) if marker.projection_schema_version==CURRENT_PROJECTION_SCHEMA_VERSION)
             );
             drop(reopened);
             std::fs::remove_dir_all(directory).unwrap();
@@ -43309,6 +43406,7 @@ mod tests {
         database.migrate_gemini_runtime().unwrap();
         database.migrate_hermes_runtime().unwrap();
         database.migrate_openclaw_runtime().unwrap();
+        database.migrate_skill_pack_installations().unwrap();
         assert!(connection_has_current_data_contract(database.connection()).unwrap());
         database.connection().execute_batch("DROP INDEX native_session_bootstrap_binding_idx;
             CREATE UNIQUE INDEX native_session_bootstrap_binding_idx ON native_session_bootstrap_evidence(native_binding_id,native_binding_generation)").unwrap();
@@ -43430,7 +43528,7 @@ mod tests {
                 }
                 "old_receipts" => {
                     connection
-                        .execute("DELETE FROM schema_migration WHERE version<199", [])
+                        .execute("DELETE FROM schema_migration WHERE version<200", [])
                         .unwrap();
                 }
                 "optional_usage" => {
@@ -43447,7 +43545,7 @@ mod tests {
                 }
                 "current_receipt" => {
                     connection
-                        .execute("DELETE FROM schema_migration WHERE version=199", [])
+                        .execute("DELETE FROM schema_migration WHERE version=200", [])
                         .unwrap();
                 }
                 _ => unreachable!(),
@@ -43482,7 +43580,7 @@ mod tests {
         database
             .connection()
             .execute_batch(
-                "DELETE FROM schema_migration WHERE version<199;
+                "DELETE FROM schema_migration WHERE version<200;
              DROP TABLE runtime_usage_run_summary;",
             )
             .unwrap();
