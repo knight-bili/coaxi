@@ -25,6 +25,12 @@ Commit a small invalidation event and the first command result together. Each re
 through-sequence and rows in one transaction. Reconnect, gap and stale responses cause a refetch;
 they do not authorize clients to rebuild a state store from event payloads.
 
+The client graph controller subscribes before its initial read and keeps one Host/board scope.
+Revision/sequence hints reject older reads; conflict and unknown command results do not silently
+rebase a gesture or generate a replacement command ID. Read failures after a committed result
+retain that result. Renderer effect instances isolate Host changes and StrictMode remounts.
+Controlled client tests cover this cache boundary; mounted UI and actual Core recovery remain separate qualification.
+
 ## Remaining node and interaction work
 
 The next I03 slices port board-unit geometry, grid regions, collapse/expand, dragging,

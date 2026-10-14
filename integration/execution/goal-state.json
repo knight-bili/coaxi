@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T03",
-  "current_slice": "八类Core节点图与153→154真实Host升级7组验证完成；I03交互UI、业务定位、文件预览及真实PTY继续，I02剩余SP与真实Gate待补。",
+  "current_slice": "I03 Web操作/回查已编码，浏览器27项及画布controller5项定向测试通过；继续布局与交互UI。新Rust回查编译和真实Host增补按阶段待验。",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "i03_core_graph_locally_verified_stage_batch_coding_continues",
+  "current_slice_status": "i03_canvas_client_sync_coded_targeted_tests_passed_UI_in_progress",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -90,9 +90,14 @@
   "stage_version_plan": "integration/planning/stage-versions.json",
   "objective_revision": "2026-10-14-stage-batch-v2-full-objective",
   "system_goal_text": {
-    "status": "old_host_text_still_present_edit_API_unavailable",
-    "checked_at": "2026-10-14T15:56:27.443Z",
-    "limitation": "当前get_goal已核对仍为旧正文；update_goal只接受状态，create_goal不能替换未完成目标。未伪造完成/暂停来重建目标。",
-    "execution_precedence": "直接客户新指令与本文件最新execution_policy优先；应用旧目标正文不恢复逐切片push/编译/CI等待频率"
+    "status": "new_cadence_confirmed_by_get_goal",
+    "user_edited": true,
+    "checked_at": "2026-10-14T16:01:31.257Z",
+    "confirmed": [
+      "active",
+      "multiple_local_commits_stage_validation_few_pushes",
+      "12_phase_batches",
+      "current_I03"
+    ]
   }
 }

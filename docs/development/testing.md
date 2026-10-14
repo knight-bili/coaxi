@@ -16,6 +16,12 @@ last_updated: 2026-10-12
 
 ## Rust 测试准入与退役门槛
 
+画布Renderer读模型由`canvas-graph-controller.test.ts`拥有订阅/读取竞争、Host/画板切换隔离、未知手势原编号与
+版本保留、提交后读取失败、冲突低版本拒绝及回查/显式重试并发；复用既有refresh coordinator，不重测其通用重试矩阵。
+这类异步客户端归属不能由Core数据库owner证明，使用受控Promise与本地fake transport，无Electron/Core/模型。
+最小命令`pnpm exec vitest run apps/desktop/src/renderer/src/canvas-graph-controller.test.ts`；
+React实际挂载、Desktop/Web业务接线和真实Core回查仍列入I03阶段候选待验。
+
 I03 Web画布操作扩展既有`apps/web/src/client.test.ts`原命令恢复owner：原消息发送与四种画布写入均需重载后只回查、
 未知时拒绝新编号、显式重试保留原参数。新增`camp-adapter.test.ts`适配器seam拥有七种画布入口，
 覆盖此前原始HTTP smoke绕过的浏览器白名单，保留原生专属操作拒绝；不重复Core节点输入矩阵。
