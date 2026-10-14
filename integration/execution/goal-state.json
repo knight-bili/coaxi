@@ -13,8 +13,8 @@
   "authorization": "客户授权完整一期持续开发；2026-10-14更新为多次本地commit、阶段编码/review集齐后冻结候选版本、集中验证和少量push/Actions；main合入及发布仍由客户控制",
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
-  "current_task": "I03-T01/I03-T03",
-  "current_slice": "I03多画板页与生产共享导航/退出保护已编码并本地提交；App183项及其他五模块36项相关检查通过（分两轮，首轮旧夹具5失败保留），定向类型/文案/文档通过。完整业务解析、实际挂载与阶段真实验证继续。",
+  "current_task": "I03-T01/I03-T02/I03-T03",
+  "current_slice": "I03完整分页业务目录、成员/runtime匹配与精确私有Conversation已编码并本地提交；18项定向测试、7项源码SQL见证、定向类型/格式/文案/文档检查通过。新Rust未编译，实际Host/UI及完整分组/worktree关系读取继续待验，阶段候选未冻结。",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "继续I03工程/项目分组/队员区域的完整分页解析、worktree包含和精确私有单聊选择；替换当前导航摘要候选，接Mission/Task/Thread/Diff对象往返。多个小切片本地commit，阶段集齐后冻结候选并集中编译、push及Actions。",
+    "继续I03真实项目分组身份/偏好、Git worktree拓扑读取与folder/group解析；完整分页目录及精确private选择已编码但新Rust/实际Host仍待阶段验证。随后接Mission/Task/Thread/Diff操作往返，多次本地commit，阶段集齐后集中验证/push/Actions。",
     "补齐I03成员拖放、展开对话卡片/既有Composer草稿、Desktop冷启动画布路由、授权文件预览与真实临时PTY生命周期；实际UI/恢复和平台资格仍待阶段验证。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "i03_multi_board_navigation_coded_targeted_checks_passed_not_runtime_qualified",
+  "current_slice_status": "paged_reference_directory_coded_targeted_checks_passed_not_rust_or_host_qualified",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -57,7 +57,7 @@
   "skill_catalog_evidence": "i02-skill-catalog-result.json",
   "skill_install_evidence": "i02-skill-install-result.json",
   "system_goal_status": "active",
-  "system_goal_verified_at": "2026-10-14T15:34:39.662Z",
+  "system_goal_verified_at": "2026-10-14T18:13:09.490Z",
   "skill_members_evidence": "i02-skill-members-result.json",
   "canvas_boards_evidence": "i03-canvas-boards-result.json",
   "skill_delivery_preparation_evidence": "i02-skill-delivery-preparation-result.json",
@@ -92,7 +92,7 @@
   "system_goal_text": {
     "status": "new_cadence_confirmed_by_get_goal",
     "user_edited": true,
-    "checked_at": "2026-10-14T16:01:31.257Z",
+    "checked_at": "2026-10-14T18:13:09.490Z",
     "confirmed": [
       "active",
       "multiple_local_commits_stage_validation_few_pushes",
@@ -101,5 +101,6 @@
     ]
   },
   "canvas_ui_evidence": "i03-canvas-ui-result.json",
-  "canvas_workspace_evidence": "i03-canvas-workspace-result.json"
+  "canvas_workspace_evidence": "i03-canvas-workspace-result.json",
+  "canvas_references_evidence": "i03-canvas-references-result.json"
 }
