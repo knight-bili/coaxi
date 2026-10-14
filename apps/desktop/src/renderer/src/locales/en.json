@@ -3753,5 +3753,12 @@
   "正在卸载…": "Uninstalling…",
   "安装状态已变化，请查看最新状态后重试。": "The installation changed. Review the latest state and retry.",
   "技能包来源已更新，请刷新后重试。": "The pack source changed. Refresh and retry.",
-  "此技能包需要外部内容，暂不能安装。": "This pack needs external content and cannot be installed yet."
+  "此技能包需要外部内容，暂不能安装。": "This pack needs external content and cannot be installed yet.",
+  "队员选择": "Teammate selection",
+  "可保存队员选择；实际投递尚未接入。": "Teammate choices can be saved. Runtime delivery is not connected yet.",
+  "选择会保存，实际投递尚未接入。": "Choices are saved. Runtime delivery is not connected yet.",
+  "配置或安装版本已变化，请按最新状态重试。": "The configuration or installed version changed. Retry using the latest state.",
+  "技能包已卸载，请刷新安装状态。": "The skill pack was uninstalled. Refresh its installation state.",
+  "正在读取队员选择…": "Loading teammate choices…",
+  "选择队员 {0}": "Select teammate {0}"
 }

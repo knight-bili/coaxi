@@ -4868,7 +4868,7 @@ export function SettingsView({
             onPreferencesChange={onGeneralPreferencesChange}
           />
         )}
-        <Activity mode={section === 'skills' ? 'visible' : 'hidden'}><NativeSkillsSettings /></Activity>
+        <Activity mode={section === 'skills' ? 'visible' : 'hidden'}><NativeSkillsSettings agents={agents} /></Activity>
         <Activity mode={section === 'toolbox' ? 'visible' : 'hidden'}><ToolboxSettings agents={agents} /></Activity>
         <Activity mode={section === 'mcp' ? 'visible' : 'hidden'}><McpSettings agents={agents} platform={platform} /></Activity>
         <Activity mode={section === 'runtime' ? 'visible' : 'hidden'}>

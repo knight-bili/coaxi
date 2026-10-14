@@ -3574,6 +3574,20 @@ export interface SkillPackInstallationView {
   memberDeliveryEnabled: false
 }
 
+export interface SkillPackMembersView {
+  skillId: string
+  installed: boolean
+  memberIds: string[]
+  version: string
+  memberDeliveryEnabled: false
+}
+
+export interface SetSkillPackMembersCommand {
+  skillId: string
+  memberIds: string[]
+  expectedVersion: string
+}
+
 export interface ComposerSkillCandidate {
   id: string
   name: string
@@ -4190,6 +4204,8 @@ export type CoreMethod =
   | 'skillPacks.installations.list'
   | 'skillPacks.install'
   | 'skillPacks.uninstall'
+  | 'skillPacks.members.list'
+  | 'skillPacks.members.set'
   | 'toolbox.read'
   | 'toolbox.setMembers'
   | 'nativeSkills.list'

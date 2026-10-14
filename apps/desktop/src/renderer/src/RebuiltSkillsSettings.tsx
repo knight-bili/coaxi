@@ -16,7 +16,7 @@ import { readErrorMessage } from './error-message'
 import './rebuilt-skills-settings.css'
 import { UiText, uiAttribute, useInterfaceLanguage } from './interface-language'
 
-export function NativeSkillsSettings(): React.JSX.Element {
+export function NativeSkillsSettings({ agents = [] }: { agents?: AgentProfile[] } = {}): React.JSX.Element {
   useInterfaceLanguage()
   const id = useId()
   const [source, setSource] = useState<'native' | 'packages'>('native')
@@ -30,7 +30,7 @@ export function NativeSkillsSettings(): React.JSX.Element {
       document.getElementById(`${id}-${next}`)?.focus()
     }}>{(['native', 'packages'] as const).map(key => <button key={key} id={`${id}-${key}`} type="button" role="tab" aria-selected={source === key} aria-controls={`${id}-${key}-panel`} tabIndex={source === key ? 0 : -1} onClick={() => setSource(key)}>{key === 'native' ? uiAttribute('原生 Skills') : uiAttribute('技能包')}</button>)}</div>
     <div id={`${id}-native-panel`} className="skills-source-content" role="tabpanel" aria-labelledby={`${id}-native`} hidden={source !== 'native'}><NativeSkillLibrary /></div>
-    <div id={`${id}-packages-panel`} className="skills-source-content" role="tabpanel" aria-labelledby={`${id}-packages`} hidden={source !== 'packages'}><SkillPackSettings /></div>
+    <div id={`${id}-packages-panel`} className="skills-source-content" role="tabpanel" aria-labelledby={`${id}-packages`} hidden={source !== 'packages'}><SkillPackSettings agents={agents} /></div>
   </div>
 }
 

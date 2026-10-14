@@ -279,6 +279,10 @@ pub enum Operation {
     SkillPackInstall,
     #[serde(rename = "skillPacks.uninstall")]
     SkillPackUninstall,
+    #[serde(rename = "skillPacks.members.list")]
+    SkillPackMembers,
+    #[serde(rename = "skillPacks.members.set")]
+    SkillPackSetMembers,
     #[serde(rename = "toolbox.read")]
     ToolboxRead,
     #[serde(rename = "toolbox.setMembers")]
@@ -593,6 +597,8 @@ impl Operation {
             Self::SkillPackInstallations => "skillPacks.installations.list",
             Self::SkillPackInstall => "skillPacks.install",
             Self::SkillPackUninstall => "skillPacks.uninstall",
+            Self::SkillPackMembers => "skillPacks.members.list",
+            Self::SkillPackSetMembers => "skillPacks.members.set",
             Self::ToolboxRead => "toolbox.read",
             Self::ToolboxSetMembers => "toolbox.setMembers",
             Self::NativeSkillsList => "nativeSkills.list",

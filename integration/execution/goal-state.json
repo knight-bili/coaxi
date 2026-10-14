@@ -14,7 +14,7 @@
   "current_branch": "phase/i02-workbench",
   "base_branch": "phase/i01-foundation",
   "current_task": "I02-T03",
-  "current_slice": "Core技能包安装刷新卸载和生产设置页已验，按成员实际投递、自定义与MCP继续",
+  "current_slice": "Core技能包安装与队员配置已验，模型输入投递r1待确认，继续独立I03研发",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,14 +33,14 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "实现按成员选择、冻结实际输入与原生发现验证；保留技能包当前状态与版本，不恢复旧Revision索引",
-    "接入按成员选择、冻结实际输入和原生发现验证；Office、科研环境及UI渲染能力分别验收",
-    "继续MCP扫描/市场/安装与21Runtime授权投递；OpenClaw认证、Hermes信任/计量及T01待办继续研发",
-    "独立推进I03至I12，外部账号/设备/签名/付款资源保持客户待办，不削减一期范围"
+    "模型投递r1待客户阅读后明确确认；未确认不改模型合同/Schema/实现，继续I03无限画布",
+    "补当前完整工作台与T01恢复/撤回、T02原生认证/实际运行证据；不把组件或协议测试当全功能通过",
+    "自定义创作导入、MCP/市场/OfficeCLI/科研/UI实际执行均保留在一期",
+    "I03至I12按v4推进；账号/付款/设备/签名等待另记，不削减一期终点"
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "core_installation_lifecycle_and_production_settings_UI_verified_member_delivery_pending",
+  "current_slice_status": "member_configuration_verified_model_delivery_pending_r1_confirmation",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -56,5 +56,6 @@
   "skill_catalog_evidence": "i02-skill-catalog-result.json",
   "skill_install_evidence": "i02-skill-install-result.json",
   "system_goal_status": "active",
-  "system_goal_verified_at": "2026-10-14T04:00:31.738Z"
+  "system_goal_verified_at": "2026-10-14T05:33:04.371Z",
+  "skill_members_evidence": "i02-skill-members-result.json"
 }

@@ -37,6 +37,7 @@ pub(crate) const TABLE_SQL: &str = "CREATE TABLE skill_pack_installation (
 
 #[cfg(test)]
 pub(crate) fn downgrade_for_test(connection: &Connection) {
+    crate::skill_pack_members::downgrade_for_test(connection);
     if !connection
         .table_exists(None, "skill_pack_installation")
         .unwrap()
@@ -426,7 +427,7 @@ impl SkillPackStore {
             let actual=version(current.as_ref())?;
             if actual!=envelope.payload.expected_version {return Ok(CommandHandlerResult::rejected("skill_pack.version_conflict",json!({"version":actual})));}
             let Some(mut row)=current else {return Ok(CommandHandlerResult::rejected("skill_pack.not_installed",json!({})));};
-            if row.status!="removed" {row.status="removed".into();row.generation+=1;row.updated_at=chrono::Utc::now().to_rfc3339();
+            if row.status!="removed" {crate::skill_pack_members::clear_for_uninstall(transaction,&row.skill_id)?;row.status="removed".into();row.generation+=1;row.updated_at=chrono::Utc::now().to_rfc3339();
                 transaction.execute("UPDATE skill_pack_installation SET status='removed',generation=?2,updated_at=?3 WHERE skill_id=?1",params![row.skill_id,row.generation,row.updated_at])?;}
             Ok(CommandHandlerResult::applied("skill_pack.uninstalled",json!({"skillId":row.skill_id,"version":row.version()?,"retainedContent":true,"memberDeliveryEnabled":false}),None))
         })
@@ -499,6 +500,15 @@ fn load(connection: &Connection, id: &str) -> Result<Option<Installation>> {
 }
 fn version(row: Option<&Installation>) -> Result<String> {
     row.map_or(Ok("absent".into()), Installation::version)
+}
+
+pub(crate) fn member_configuration_source(
+    connection: &Connection,
+    id: &str,
+) -> Result<Option<(String, bool)>> {
+    load(connection, id)?
+        .map(|row| Ok((row.version()?, row.status == "installed")))
+        .transpose()
 }
 fn is_user<C>(envelope: &CommandEnvelope<C>) -> bool {
     matches!(envelope.actor, ActorRef::User { .. })

@@ -12,7 +12,7 @@ Skills 是模型可按需读取的文件指南，不改变工具、权限、消�
 
 ## 四种来源
 
-融合的固定 Codeg 技能包目录及内容预览由 [Codeg Skill Packs v1](../contracts/codeg-skill-packs-v1.md) 拥有，Core私有安装状态及显式刷新/卸载见 [Skill Pack Installation v1](../contracts/skill-pack-installation-v1.md)。安装预备发生在数据库锁外，完整文件写好后才在命令事务切换指针，旧版本和用户改动保留。目录和安装不授予运行资格，不加入以下模型投递来源；成员选择及真实投递继续实施。
+融合的固定 Codeg 技能包目录及内容预览由 [Codeg Skill Packs v1](../contracts/codeg-skill-packs-v1.md) 拥有，Core私有安装状态及显式刷新/卸载见 [Skill Pack Installation v1](../contracts/skill-pack-installation-v1.md)。安装预备发生在数据库锁外，完整文件写好后才在命令事务切换指针，旧版本和用户改动保留。目录和安装不授予运行资格，不加入以下模型投递来源；成员选择保存见 [Skill Pack Members v1](../contracts/skill-pack-members-v1.md)，真实投递继续实施。
 
 | 来源 | 当前用途 | 权威与生命周期 |
 | --- | --- | --- |

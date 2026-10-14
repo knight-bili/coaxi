@@ -9353,6 +9353,23 @@ impl Core {
                 )?;
                 Ok(serde_json::to_value(execution.result)?)
             }
+            "skillPacks.members.list" => {
+                let database = self.database.lock().await;
+                Ok(serde_json::to_value(rovai_core::skill_pack_members::list(
+                    database.connection(),
+                )?)?)
+            }
+            "skillPacks.members.set" => {
+                let params: UserCommandParams<
+                    rovai_core::skill_pack_members::SetSkillPackMembersCommand,
+                > = serde_json::from_value(request.params.clone())?;
+                let mut database = self.database.lock().await;
+                let execution = rovai_core::skill_pack_members::set_members(
+                    &mut database,
+                    &user_command_envelope(params.command_id, params.command),
+                )?;
+                Ok(serde_json::to_value(execution.result)?)
+            }
             "toolbox.list" => {
                 let managed =
                     rovai_core::managed_skills::ManagedSkills::for_data_dir(&self.data_dir)?;

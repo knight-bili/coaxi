@@ -33,7 +33,7 @@
       "id": "DEV-CORE-RUNTIME-UNION",
       "task": "I02-T02",
       "status": "catalog_21_source_integrated_runtime_parity_and_qualification_pending",
-      "problem": "Core21种/schema150；三种新增来源接入目录与差异控制面，完整实际运行、原生兼容和四平台资格仍须补齐",
+      "problem": "Core21种/schema151；三种新增来源接入目录与差异控制面，完整实际运行、原生兼容和四平台资格仍须补齐",
       "evidence": "i02-openclaw-core-result.json；不以本地元数据或编译替代执行",
       "owner": "研发"
     },
@@ -95,10 +95,10 @@
     {
       "id": "DEV-SKILL-PACK-LIFECYCLE",
       "task": "I02-T03/I08/I12",
-      "status": "core_installation_lifecycle_and_production_settings_UI_verified_member_delivery_pending",
+      "status": "member_configuration_verified_model_delivery_pending_r1_confirmation",
       "owner": "研发",
-      "problem": "固定来源目录、Core显式安装/刷新/卸载、私有不可覆盖版本和生产设置UI已验；按成员投递、自定义/导入、OfficeCLI、科研环境和生成式UI渲染仍须实现与验证；旧版本及未提交目录清理须验证归属和历史引用",
-      "evidence": "i02-skill-install-result.json"
+      "problem": "来源目录、安装/刷新/卸载、生产设置与队员配置保存已验；模型投递r1待确认后实施；自定义/导入、MCP市场、OfficeCLI、科研与UI渲染及历史GC继续研发",
+      "evidence": "i02-skill-members-result.json"
     }
   ]
 }

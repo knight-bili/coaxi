@@ -82,6 +82,21 @@
           "annotation": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
         }
       ]
+    },
+    {
+      "id": "INPUT-SKILL-DELIVERY-R1",
+      "required_for": "I02-T03技能包实际模型输入",
+      "status": "pending_after_complete_proposal_presented",
+      "need": "阅读9页Word/PDF后明确确认按r1实施；确认输入语义及本地实现，专用模型身份/硬额度另补",
+      "proposal": "integration/proposals/skill-pack-model-delivery-r1.md",
+      "revision": 1,
+      "confirmation_status": "pending",
+      "governance": "docs/development/model-context-change-governance.md:49-56",
+      "outputs": [
+        "I02_技能包模型投递变更方案_r1_待确认.docx",
+        "I02_技能包模型投递变更方案_r1_待确认.pdf"
+      ],
+      "software_workaround": "配置保存已完成；不等待该项，继续I03及其他独立研发；禁止自动代确认"
     }
   ]
 }

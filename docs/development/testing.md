@@ -11,6 +11,8 @@ last_updated: 2026-10-12
 
 ## Rust 测试准入与退役门槛
 
+融合技能包成员选择由新增扩展 owner `skill_pack_members::tests::migration_and_member_choices_survive_reopen_and_uninstall_fences_old_replay` 拥有。它覆盖150→151建表/收据原子性、无默认成员、真实成员校验、陈旧观察拒绝、首次结果回放、更新保留选择、卸载事务回滚及重装不恢复选择。旧工具箱只有固定五项且不关联可卸载版本，不能证明新表与安装事务的交互；需要真实SQLite及私有文件fixture。最低命令先 `cargo test -p rovai-core --features extended-tests --lib skill_pack -- --list` 确认新增owner，再执行同一过滤；重复重开与回放用于证明持久化和旧命令不重新赋值。模型输入与成员实际投递由待确认的独立方案拥有，此测试不授予运行资格。
+
 融合技能包固定来源由新增纯函数 owner `codeg_skill_catalog::tests::catalog_preserves_pinned_sources_and_bounds_content_reads` 拥有。原先没有固定 Codeg 目录与嵌入资源，原生发现和旧 Revision owner 处理可变路径/数据库，无法验证这一来源的 Git 摘要、9 项 Office 外部依赖和跨包预览边界。该 owner 不建 SQLite、Home 或 Runtime，最低命令为 `cargo test -p rovai-core --lib codeg_skill_catalog::tests::catalog_preserves_pinned_sources_and_bounds_content_reads -- --exact`；Core/HTTP seam 由隔离 smoke 单独验证，不重复纯函数矩阵。
 
 显式安装新增两个扩展 owner：`skill_pack_installation::tests::version_publication_preserves_edits_fences_stale_commits_and_replays_across_reopen` 拥有私有文件树与SQLite指针之间的发布、竞争、收据失败回滚、改动保留和重开；旧Library不参与此状态，不能复用其导入fixture。`db::tests::skill_pack_migration_preserves_receipts_and_rolls_back_its_table` 拥有新的149→150加表及收据事务、旧结果保留和结构拒绝。最低命令先用 `cargo test -p rovai-core --features extended-tests --lib skill_pack -- --list` 确认两项，再去掉 `--list` 执行；预备两次用于证明旧观察版本无法覆盖新提交，不是重复相同happy path。真实HTTP seam使用 `tools/integration/smoke-skill-pack-installation.mjs`，不能替代实际成员/模型投递。
@@ -1510,6 +1512,8 @@ PR 默认层仍为 `cargo test --workspace`；Renderer 复用 `SingleChatPanel.t
 目录/权限、技能分组、精确恢复、Windows入口拒绝及迁移来源矩阵扩展原owner；保留旧输入和活跃测试。
 Windows入口owner补全本地/全局npm目录、145KiB manifest及额外命令拒绝，数据库owner覆盖146/147/148
 三种精确来源、逐值保留、receipt回滚和149重开，不增加平行数据库fixture。
+
+Windows Server 更新交接继续扩展原 owner `handoff_requires_settlement_then_runs_the_new_program_with_original_arguments`，不新增或跳过测试。重启回执先于子进程退出，Windows 仍可能占用程序目录；测试读取独立 PID 回执，通过仅含 SYNCHRONIZE 权限的进程句柄等待真实退出，再检查目录切换及清理。保留 EOF 拒绝、占用失败回退、最终新程序启动、原参数和数据目录不变的断言；此修复只修改测试，不改变生产更新行为。最小命令：`cargo test -p rovai-host --lib`。
 
 配对Host补验继续扩展同一个外部Runtime owner，不增加Rust测试函数：以真实Native初始化返回的capabilities，
 通过正式Adapter/Fleet/ACP路径建立Session、复用暖Host，再销毁并重建管理器，以同一持久Binding和Session ID
