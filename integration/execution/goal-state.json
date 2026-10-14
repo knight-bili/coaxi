@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "date": "2026-10-14",
+  "date": "2026-10-15",
   "status": "active",
   "objective": "沿既定v4完整一期计划持续推进Codeg × Rovai I00–I12及BUF，以Rovai Core为唯一业务、执行和数据库权威，保留81来源功能簇、48工作包、324验收场景，交付完整、高可用、可扩展的融合MVP，不缩减一期范围。\n\n按“多次本地commit，阶段集中验证，少量push”执行。每个小功能、小缺陷和小调整先完成编码、源码自审及适当的低成本检查，再用中文本地提交；未编译、未运行的检查明确登记为待验，不逐切片默认启动完整编译、全工作区回归、推送或GitHub Actions。\n\n除已完成的I00初始化外，I01–I12正常各安排一次阶段验证批次，共12批。一个阶段计划功能编码和review集齐后，冻结同一提交并定义fusion-iNN-rc.1候选版本，集中执行本阶段相关编译、测试、集成和必要平台验证，再集中推送阶段分支、更新草稿PR并触发相关Actions。同批可包含多个平台任务，不逐功能重复；必需测试不得删除或假通过。\n\nActions提交后登记候选版本、SHA、run ID及状态，继续可独立的编码和review，到阶段检查点或失败通知再核对，不把轮询CI当作默认推进动作。发现缺陷或兼容问题时分别本地提交修复，汇集后递增候选版本，补验失败项及必要依赖，并记录额外批次原因。数据迁移、安全、公共契约或执行恢复问题确实阻断后续编码时，可提前做最小必要局部验证，不顺带启动整套CI。\n\nmain合入、客户最终验收、发布标签和正式发布仍由客户控制。优先公开仓库标准免费runner，不修改付款方式或提高支出上限，不自动采购、不运行付费模型。外部测试身份、硬预算、设备、ADB、签名及渠道资源先登记待办，继续独立工作，最后补齐必需验收；不读取日常凭据、数据或全局MCP，不使用旧ADB。\n\n当前工程work/integration；恢复时先读integration/execution/goal-state.json、integration/ci-cost-policy.md及工作区work/workflow-state.md，以最新执行规则和实际工作区为准。目前继续I03画布交互与统一业务对象定位，并保留I02剩余场景及真实Gate待办。编译、模拟、握手或局部测试不替代真实模型、真机或完整平台资格。每轮汇报真实进度及需要客户处理的事项，然后继续；全部必需实现和验收证据齐备前，目标保持未完成。",
   "scope": {
@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T03",
-  "current_slice": "I03 Web操作/回查已编码，浏览器27项及画布controller5项定向测试通过；继续布局与交互UI。新Rust回查编译和真实Host增补按阶段待验。",
+  "current_slice": "I03八类节点交互/创建编辑模块已编码并本地提交；定向类型、16项测试、文案及依赖通知检查通过。尚未接主导航、多画板页和完整业务解析；React实际挂载、新Rust/真实Host回查仍待阶段验证。",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "按阶段批量验证规则继续I03交互UI、八类节点呈现和统一业务对象定位，多个小切片本地commit；I03编码/review集齐后才冻结fusion-i03-rc.1并集中编译、push及相关Actions。",
+    "按阶段批量规则继续I03 CanvasWorkspace多画板页面及生产导航/退出保护，再接完整业务解析和精确对象定位；多个小切片本地commit，阶段集齐后冻结fusion-i03-rc.1，集中编译、push及相关Actions。",
     "继续I03业务绑定、几何布局/分组与客户端视口，最后接真实临时PTY及关闭/删除生命周期。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "i03_canvas_client_sync_coded_targeted_tests_passed_UI_in_progress",
+  "current_slice_status": "i03_canvas_surface_modules_coded_targeted_checks_passed_not_mounted",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -99,5 +99,6 @@
       "12_phase_batches",
       "current_I03"
     ]
-  }
+  },
+  "canvas_ui_evidence": "i03-canvas-ui-result.json"
 }
