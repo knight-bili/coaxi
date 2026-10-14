@@ -103,17 +103,32 @@ fn native_config_source(launch: &ManagedProcessLaunchSpec) -> Result<(Value, Pat
     Ok((value, state))
 }
 
+fn canonical_agent_id(value: &str) -> Result<String> {
+    let value = value.trim();
+    // Match the native declared-agent grammar, without turning malformed or
+    // path-bearing input into another existing owner through slug fallback.
+    ensure!(
+        !value.is_empty()
+            && value.len() <= 64
+            && value.as_bytes()[0].is_ascii_alphanumeric()
+            && value
+                .bytes()
+                .all(|c| c.is_ascii_alphanumeric() || c == b'-' || c == b'_'),
+        "OpenClaw native agent identity is invalid"
+    );
+    Ok(value.to_ascii_lowercase())
+}
+
 fn assign_session_key(agent_id: &str, binding_id: &str) -> Result<String> {
-    for value in [agent_id, binding_id] {
-        ensure!(
-            !value.is_empty()
-                && value.len() <= 128
-                && value
-                    .bytes()
-                    .all(|c| c.is_ascii_alphanumeric() || c == b'-' || c == b'_'),
-            "OpenClaw managed identity is invalid"
-        );
-    }
+    let agent_id = canonical_agent_id(agent_id)?;
+    ensure!(
+        !binding_id.is_empty()
+            && binding_id.len() <= 128
+            && binding_id
+                .bytes()
+                .all(|c| c.is_ascii_alphanumeric() || c == b'-' || c == b'_'),
+        "OpenClaw managed binding identity is invalid"
+    );
     Ok(format!("agent:{agent_id}:rovai:{binding_id}"))
 }
 
@@ -129,21 +144,83 @@ fn prepare_configuration(
         workspace.is_absolute(),
         "OpenClaw workspace must be absolute"
     );
-    let entries = config.pointer("/agents/entries").and_then(Value::as_object);
-    let agent = if let Some(agent) = selected_agent {
+    let entries = config.pointer("/agents/entries");
+    let list = config.pointer("/agents/list");
+    ensure!(
+        entries.is_none() || list.is_none(),
+        "OpenClaw native agent roster cannot contain both entries and list"
+    );
+    let mut ids = Vec::new();
+    if let Some(entries) = entries {
+        for (id, entry) in entries
+            .as_object()
+            .context("OpenClaw agents.entries must be an object")?
+        {
+            ensure!(
+                entry.is_object(),
+                "OpenClaw native agent entry must be an object"
+            );
+            ids.push(id.as_str());
+        }
+    }
+    if let Some(list) = list {
+        for entry in list
+            .as_array()
+            .context("OpenClaw agents.list must be an array")?
+        {
+            ids.push(
+                entry
+                    .get("id")
+                    .and_then(Value::as_str)
+                    .context("OpenClaw native agent list entry requires an id")?,
+            );
+        }
+    }
+    let mut canonical = std::collections::BTreeSet::new();
+    for id in &ids {
         ensure!(
-            entries.is_none_or(|entries| entries.is_empty() || entries.contains_key(agent)),
+            canonical.insert(canonical_agent_id(id)?),
+            "OpenClaw native agent roster contains duplicate identities"
+        );
+    }
+    let agent = if let Some(agent) = selected_agent {
+        let agent = canonical_agent_id(agent)?;
+        ensure!(
+            ids.is_empty() || canonical.contains(&agent),
             "OpenClaw selected native agent is absent from its configuration"
         );
-        agent.to_owned()
+        agent
     } else {
-        match entries.map(|entries| entries.len()).unwrap_or(0) {
+        match ids.len() {
             0 => "main".to_owned(),
-            1 => entries.unwrap().keys().next().unwrap().to_owned(),
+            1 => canonical_agent_id(ids[0])?,
             _ => bail!("OpenClaw native_agent_id must select one configured native agent"),
         }
     };
     assign_session_key(&agent, "validation")?;
+    // The read compatibility layer accepts list, but the pinned launch schema
+    // accepts only keyed entries. Translate only the managed copy; the source
+    // file, labels and provider/model settings remain owned by the native profile.
+    let mut managed_entries = serde_json::Map::new();
+    if let Some(list) = list {
+        for entry in list.as_array().unwrap() {
+            let mut entry = entry
+                .as_object()
+                .context("OpenClaw native agent list entry must be an object")?
+                .clone();
+            let raw_id = entry
+                .remove("id")
+                .and_then(|value| value.as_str().map(str::to_owned))
+                .context("OpenClaw native agent id missing")?;
+            let id = canonical_agent_id(&raw_id)?;
+            entry.remove("default"); // The legacy flag is not a launch-schema property.
+            managed_entries.insert(id, Value::Object(entry));
+        }
+    } else if let Some(entries) = entries {
+        for (id, entry) in entries.as_object().unwrap() {
+            managed_entries.insert(canonical_agent_id(id)?, entry.clone());
+        }
+    }
     let root = config
         .as_object_mut()
         .context("OpenClaw config must be an object")?;
@@ -173,12 +250,12 @@ fn prepare_configuration(
         .context("OpenClaw agent defaults must be an object")?;
     defaults.insert("workspace".into(), json!(workspace));
     defaults.insert("heartbeat".into(), json!({"every":"0m"}));
-    let entries = agents
-        .entry("entries")
-        .or_insert_with(|| json!({}))
-        .as_object_mut()
-        .context("OpenClaw agent entries must be an object")?;
-    let entry = entries
+    agents.remove("list");
+    agents.insert("entries".into(), Value::Object(managed_entries));
+    let entry = agents
+        .get_mut("entries")
+        .and_then(Value::as_object_mut)
+        .unwrap()
         .entry(agent.clone())
         .or_insert_with(|| json!({}))
         .as_object_mut()
@@ -661,7 +738,7 @@ async fn managed_native_gateway_freezes_routes_and_reaps_its_process_tree() {
     assert_eq!(marker["purpose"], "rovai-openclaw-metadata-only");
     let config = root.join("native.json");
     let workspace = root.join("project");
-    let mut command = Command::new(binary);
+    let mut command = Command::new(&binary);
     command.env_clear().current_dir(&workspace);
     for (key, _) in std::env::vars_os() {
         command.env_remove(key);
@@ -684,6 +761,18 @@ async fn managed_native_gateway_freezes_routes_and_reaps_its_process_tree() {
         .env("OPENCLAW_HOME", &root)
         .env("OPENCLAW_STATE_DIR", root.join("native-state"))
         .env("OPENCLAW_CONFIG_PATH", config);
+    let native_environment = command
+        .as_std()
+        .get_envs()
+        .filter_map(|(key, value)| {
+            value.map(|value| {
+                (
+                    key.to_string_lossy().into_owned(),
+                    value.to_string_lossy().into_owned(),
+                )
+            })
+        })
+        .collect::<BTreeMap<_, _>>();
     let binding = root.join("binding-probe");
     let gateway =
         OpenClawGateway::start(&mut command, &workspace, &binding, None, &BTreeMap::new())
@@ -730,7 +819,213 @@ async fn managed_native_gateway_freezes_routes_and_reaps_its_process_tree() {
             .force_reap_until(tokio::time::Instant::now() + Duration::from_secs(3))
             .await
     );
-    atomic_write_private_json(&root.join("core-probe-result.json"),&json!({"status":"passed","model":"integration-probe/metadata-only-model","source":"local_metadata_fixture","permissionModes":["read-only","guarded"],"nativeSessionKey":gateway.session_key,"processTreeReaped":true,"modelInference":false,"CoreAgentRun":false})).unwrap();
+    // Exercise the actual ACP Host/Fleet seam as well as Gateway control. There
+    // is no Core database, business input, prompt or model request in this owner.
+    use crate::{
+        acp::{AcpCliRuntimeAdapter, AcpSessionRestoreError},
+        agent_profile::{
+            AdapterKind, AdapterPermissionConfig, FrozenAgentRuntimeConfig, ResolvedModelSelection,
+        },
+        builtin_tool_runtime::BuiltinToolProcessConfig,
+        builtin_tool_transport::LocalIpcEndpoint,
+        compaction::CompactionDetectorPolicy,
+        member_environment::LaunchEnvironment,
+        runtime::{AgentRunWorkspace, PermissionSemantics},
+        runtime_fleet::{AgentRuntimeFleetConfig, AgentRuntimeFleetManager},
+    };
+    let digest = crate::command::canonical_json_digest(
+        &json!({"fixture":"metadata-only","kind":"openclaw-cli"}),
+    )
+    .unwrap();
+    let mut frozen = FrozenAgentRuntimeConfig {
+        environment: Some(LaunchEnvironment {
+            values: Some(native_environment),
+            overlay: None,
+        }),
+        custom_api: None,
+        camp_fast: None,
+        adapter_kind: AdapterKind::OpenClawCli,
+        installation_id: "fixture-openclaw".into(),
+        installation_generation: 1,
+        search_environment_generation: 1,
+        executable_path: binary.to_string_lossy().into_owned(),
+        auth_scope: "isolated-fixture".into(),
+        reported_version: Some("2026.9.8".into()),
+        executable_fingerprint: crate::agent_runtime_adapter::executable_fingerprint(&binary)
+            .unwrap(),
+        capabilities: vec!["session.resume".into(), "session.load".into()],
+        protocol_version: "acp-v1".into(),
+        model: ResolvedModelSelection {
+            source: "explicit".into(),
+            model_id: "integration-probe/metadata-only-model".into(),
+            options: json!({}),
+            dsh_source: None,
+        },
+        permissions: AdapterPermissionConfig {
+            adapter_kind: AdapterKind::OpenClawCli,
+            schema_version: 1,
+            values: json!({"permission_mode":"guarded"}),
+        },
+        native_session_compatibility_key: None,
+        binding_compatibility_digest: digest.clone(),
+        host_config_digest: digest.clone(),
+        config_digest: String::new(),
+    };
+    frozen.refresh_config_digest().unwrap();
+    let attachment_root = prepare_private_directory(&root.join("attachments")).unwrap();
+    let ipc = if cfg!(windows) {
+        LocalIpcEndpoint::WindowsNamedPipe {
+            name: format!(
+                r"\\.\pipe\rovai-ai-{}-{}",
+                std::process::id(),
+                uuid::Uuid::new_v4()
+            ),
+        }
+    } else {
+        LocalIpcEndpoint::UnixSocket {
+            path: root.join("fixture.sock").to_string_lossy().into_owned(),
+        }
+    };
+    // This executable is only an inert Builtin context locator, never invoked.
+    let builtin = BuiltinToolProcessConfig::create(
+        &std::env::current_exe().unwrap(),
+        &ipc,
+        &root.join("builtin"),
+    )
+    .unwrap();
+    let fleet_root = root.join("fleet");
+    let workspace =
+        AgentRunWorkspace::runtime_managed_path(workspace.to_string_lossy().into_owned());
+    let acquire = async |adapter: &AcpCliRuntimeAdapter, run: &str, binding: &str| {
+        adapter
+            .ensure_agent_run_runtime(
+                run,
+                1,
+                "fixture-camp",
+                "fixture-agent",
+                binding,
+                &workspace,
+                PermissionSemantics::RuntimeManagedV2,
+                &frozen,
+                &builtin,
+                &BTreeMap::new(),
+                &digest,
+                &attachment_root,
+                &digest,
+            )
+            .await
+            .unwrap()
+    };
+    let (incoming, _receiver) = tokio::sync::mpsc::unbounded_channel();
+    let fleet = Arc::new(AgentRuntimeFleetManager::new(
+        AgentRuntimeFleetConfig::default(),
+    ));
+    let adapter = AcpCliRuntimeAdapter::new(
+        AdapterKind::OpenClawCli,
+        incoming.clone(),
+        fleet_root.clone(),
+        fleet.clone(),
+        CompactionDetectorPolicy::Disabled,
+    )
+    .unwrap();
+    let first = acquire(&adapter, "fixture-run-one", "fixture-binding").await;
+    let caps = first.session_capabilities().await;
+    assert!(caps.can_resume && caps.can_load_history);
+    let first_host = first.host_instance_id().to_owned();
+    let session = first
+        .start_or_resume_session_with_native_rules(
+            None,
+            caps,
+            "explicit",
+            &frozen.model.model_id,
+            &json!({}),
+            &BTreeMap::new(),
+            None,
+        )
+        .await
+        .unwrap();
+    adapter.complete_agent_run("fixture-run-one", 1).await;
+    let warm = acquire(&adapter, "fixture-run-two", "fixture-binding").await;
+    assert_eq!(warm.host_instance_id(), first_host);
+    assert_eq!(
+        warm.start_or_resume_session_with_native_rules(
+            Some(&session),
+            caps,
+            "explicit",
+            &frozen.model.model_id,
+            &json!({}),
+            &BTreeMap::new(),
+            None
+        )
+        .await
+        .unwrap(),
+        session
+    );
+    adapter.complete_agent_run("fixture-run-two", 1).await;
+    adapter.shutdown_all().await;
+    assert!(
+        fleet
+            .shutdown_all_until(tokio::time::Instant::now() + Duration::from_secs(12))
+            .await
+            .all_reaped()
+    );
+    // Recreating both managers exercises a cold Host and its persisted native
+    // binding, rather than relying on the old process's Session cache.
+    let cold_fleet = Arc::new(AgentRuntimeFleetManager::new(
+        AgentRuntimeFleetConfig::default(),
+    ));
+    let cold_adapter = AcpCliRuntimeAdapter::new(
+        AdapterKind::OpenClawCli,
+        incoming,
+        fleet_root,
+        cold_fleet.clone(),
+        CompactionDetectorPolicy::Disabled,
+    )
+    .unwrap();
+    let cold = acquire(&cold_adapter, "fixture-run-three", "fixture-binding").await;
+    assert_ne!(cold.host_instance_id(), first_host);
+    assert_eq!(
+        cold.start_or_resume_session_with_native_rules(
+            Some(&session),
+            caps,
+            "explicit",
+            &frozen.model.model_id,
+            &json!({}),
+            &BTreeMap::new(),
+            None
+        )
+        .await
+        .unwrap(),
+        session
+    );
+    cold_adapter
+        .complete_agent_run("fixture-run-three", 1)
+        .await;
+    let missing = acquire(&cold_adapter, "fixture-run-missing", "missing-binding").await;
+    let rejected = missing
+        .start_or_resume_session_with_native_rules(
+            Some(&session),
+            caps,
+            "explicit",
+            &frozen.model.model_id,
+            &json!({}),
+            &BTreeMap::new(),
+            None,
+        )
+        .await
+        .unwrap_err();
+    assert!(
+        rejected.downcast_ref::<AcpSessionRestoreError>().is_some(),
+        "{rejected:#}"
+    );
+    cold_adapter.shutdown_all().await;
+    assert!(
+        cold_fleet
+            .shutdown_all_until(tokio::time::Instant::now() + Duration::from_secs(15))
+            .await
+            .all_reaped()
+    );
+    atomic_write_private_json(&root.join("core-probe-result.json"),&json!({"status":"passed","model":"integration-probe/metadata-only-model","source":"local_metadata_fixture","permissionModes":["read-only","guarded"],"nativeSessionKey":gateway.session_key,"processTreeReaped":true,"modelInference":false,"CoreAgentRun":false,"AcpHostFleet":{"newSession":true,"warmHostReused":true,"coldHostRecreated":true,"coldSessionIdPreserved":true,"missingBindingRejected":true,"allPairedProcessesReaped":true,"promptSent":false,"builtinCliInvoked":false}})).unwrap();
 }
 
 #[cfg(test)]
@@ -764,6 +1059,10 @@ mod tests {
             assert!(assign_session_key("main", invalid).is_err())
         }
         let key = assign_session_key("native-agent", "binding-1").unwrap();
+        assert_eq!(
+            assign_session_key(" Native-Agent ", "binding-1").unwrap(),
+            key
+        );
         let ack = json!({"ok":true,"key":key,"entry":{"permissionMode":"guarded"},"resolved":{"modelProvider":"provider","model":"model/name"}});
         validate_session_ack(&ack, &key, "guarded", Some("provider/model/name")).unwrap();
         assert!(
@@ -800,5 +1099,27 @@ mod tests {
             prepare_configuration(shared, &native, &workspace, 12345, None, &BTreeMap::new())
                 .is_err()
         );
+        let legacy = json!({"agents":{"list":[{"id":"Native-Agent","default":true,"name":"Kept name","model":{"primary":"provider/kept-model"}}]}});
+        let (legacy, selected) =
+            prepare_configuration(legacy, &native, &workspace, 12345, None, &BTreeMap::new())
+                .unwrap();
+        assert_eq!(selected, "native-agent");
+        assert!(legacy["agents"].get("list").is_none());
+        let projected = &legacy["agents"]["entries"]["native-agent"];
+        assert!(projected.get("id").is_none() && projected.get("default").is_none());
+        assert_eq!(projected["name"], "Kept name");
+        assert_eq!(projected["model"]["primary"], "provider/kept-model");
+        assert_eq!(projected["workspace"], json!(workspace));
+        for bad in [
+            json!({"agents":{"list":[{"name":"no id"}]}}),
+            json!({"agents":{"list":[{"id":"a"},{"id":"A"}]}}),
+            json!({"agents":{"list":[{"id":"a"},{"id":"b"}]}}),
+            json!({"agents":{"list":[],"entries":{}}}),
+        ] {
+            assert!(
+                prepare_configuration(bad, &native, &workspace, 12345, None, &BTreeMap::new())
+                    .is_err()
+            );
+        }
     }
 }

@@ -650,3 +650,5 @@ Migration197扩展Runtime/Skills闭集并发布schema147，保留旧行与旧来
 固定官方2026.9.8在既有Fleet内接入配对Gateway/ACP，目录增至21种，Migration199从148升级149。
 完整Gateway键与ACP SessionId分别绑定，模型和四种权限走官方Gateway控制面；会话MCP字段保持空数组，服务器配置归属私有Gateway。
 合同见[OpenClaw Runtime v1](../../contracts/openclaw-runtime-v1.md)。本地元数据及进程检查不替代真实模型、工具、复杂认证、Bootstrap与平台资格；兼容整改仍属一期。
+
+后续正式Adapter/Fleet/ACP Host的新建、暖复用、冷Host精确恢复及缺失绑定拒绝已通过隔离Native补验；历史`agents.list`只在私有副本转为规范entries，源配置保持原字节。见[会话与原生配置记录](../../../integration/execution/i02-openclaw-session-result.json)，不升级为业务Core进程重启或真实模型资格。

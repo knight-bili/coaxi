@@ -4,6 +4,8 @@
 Windows默认500项、定向51项及成员设置38项通过；数据库107个owner有通过证据（106全量＋1修复定向，未在修夹具后再跑一次全套）。原生OpenClaw协议11项及Core Gateway控制面已验，均没有模型推理。
 完整Runtime原生兼容、真实工具/模型、Bootstrap、停止恢复与四平台资格仍在实施，不代表21种Runtime已验收。证据见[i02-openclaw-core-result.json](i02-openclaw-core-result.json)，前批Gemini/Hermes记录保留；当前合同见[OpenClaw Runtime v1](../../docs/contracts/openclaw-runtime-v1.md)。
 
+后续补验已通过正式Adapter/Fleet/ACP Host的新建、暖进程复用、重建Native进程和管理器后的精确恢复、缺失Binding拒绝与配对进程清理；历史Agent列表只转换私有配置，原文件字节未变。详情见[会话与原生配置记录](i02-openclaw-session-result.json)。没有发送prompt或推理请求，不能当作完整Core进程/业务数据库重启、认证导入、Bootstrap或真实工具通过。
+
 2026-10-14。盘点结果见 [i02-runtime-inventory-result.json](i02-runtime-inventory-result.json)。这是源码差异和研发顺序，不代表 Runtime 已通过准入或执行。
 
 一期保留规划中的21种 Runtime。固定 Rovai 来源的 `AdapterKind::ALL` 声明18种；Codeg另有 Gemini、Hermes、OpenClaw。融合源码目录已加入三种新增类型，差异控制面与原生兼容继续验证。不能删掉来源入口，也不能启动 Codeg 的 Tauri 执行层形成第二个业务权威。移植发生在 Core 的 Runtime 适配、Host 合同和共享成员设置页面内。

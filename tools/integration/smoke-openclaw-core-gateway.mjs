@@ -32,10 +32,11 @@ const server = createServer((request, response) => {
 });
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 await writeFile(path.join(root, 'native.json'), JSON.stringify({
-  agents: { defaults: { workspace: project, heartbeat: { every: '0m' }, model: { primary: 'integration-probe/metadata-only-model' } } },
+  agents: { list: [{ id: 'Native-Fixture', name: 'Preserved native owner' }], defaults: { workspace: project, heartbeat: { every: '0m' }, model: { primary: 'integration-probe/metadata-only-model' } } },
   models: { providers: { 'integration-probe': { baseUrl: `http://127.0.0.1:${server.address().port}/v1`, api: 'openai-completions', apiKey: 'fixture-not-a-real-credential', models: [{ id: 'metadata-only-model', name: 'Metadata only fixture', input: ['text'], reasoning: false, contextWindow: 4096, maxTokens: 128, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 } }] } } },
   plugins: { enabled: false }, tools: { exec: { notifyOnExit: false } },
 }, null, 2));
+const authoredConfiguration = await readFile(path.join(root, 'native.json'));
 const env = { ...process.env,
   ROVAI_OPENCLAW_SMOKE_ROOT: root, ROVAI_OPENCLAW_SMOKE_BIN: values['openclaw-bin'], ROVAI_OPENCLAW_SMOKE_NODE_DIR: values['node-dir'],
 };
@@ -53,8 +54,9 @@ try {
   assert.equal(exit, 0, output.slice(-6500));
   const native = JSON.parse(await readFile(path.join(root, 'core-probe-result.json'), 'utf8'));
   assert.equal(native.status, 'passed');
+  assert.deepEqual(await readFile(path.join(root, 'native.json')), authoredConfiguration);
   assert.equal(requests.filter(request => request.method === 'POST').length, 0);
-  result = { status: 'passed', fixture, isolatedRoot: root, native, requests, realProviderCredentials: false, CoreAgentRun: false, modelInference: false };
+  result = { status: 'passed', fixture, isolatedRoot: root, native, requests, nativeConfigurationUnchanged: true, realProviderCredentials: false, CoreAgentRun: false, modelInference: false };
 } catch (error) {
   process.exitCode = 1;
   result = { status: 'failed', fixture, isolatedRoot: root, error: String(error.stack ?? error), requests, CoreAgentRun: false, modelInference: false };

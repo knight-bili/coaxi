@@ -1506,3 +1506,9 @@ PR 默认层仍为 `cargo test --workspace`；Renderer 复用 `SingleChatPanel.t
 目录/权限、技能分组、精确恢复、Windows入口拒绝及迁移来源矩阵扩展原owner；保留旧输入和活跃测试。
 Windows入口owner补全本地/全局npm目录、145KiB manifest及额外命令拒绝，数据库owner覆盖146/147/148
 三种精确来源、逐值保留、receipt回滚和149重开，不增加平行数据库fixture。
+
+配对Host补验继续扩展同一个外部Runtime owner，不增加Rust测试函数：以真实Native初始化返回的capabilities，
+通过正式Adapter/Fleet/ACP路径建立Session、复用暖Host，再销毁并重建管理器，以同一持久Binding和Session ID
+恢复冷Host；另一个缺失Binding必须拒绝恢复。停止后核对Fleet收敛，不发送prompt、不调用Builtin CLI，
+不能将管理器重建等同完整Core进程/业务数据库重启。配置owner增加历史`agents.list`、规范ID冲突和多Agent
+拒绝，Native fixture采用带大小写的唯一原生Agent，并检查源配置字节未变，复现修复前凭空增加main/双重roster的错误。

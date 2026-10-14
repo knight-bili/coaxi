@@ -71,18 +71,18 @@
     {
       "id": "DEV-OPENCLAW-NATIVE-PROFILE",
       "task": "I02-T02/I12",
-      "status": "pending_implementation_and_validation",
-      "problem": "原生agentDir含可写SQLite，禁止直接挂接；实现隔离身份导入、来源摘要/变更失效、SecretRef/OAuth/$include及多Agent选择，验证不写日常存储",
+      "status": "legacy_roster_fixed_auth_owner_design_active",
+      "problem": "已修复历史list导入与规范Agent身份；认证库/原生owner/OAuth复制约束及SecretRef来源已查明，完整隔离认证导入、多Agent选择、include/环境解析仍须实现；不能把只读调研当导入完成",
       "owner": "研发",
-      "evidence": "i02-openclaw-core-result.json"
+      "evidence": "i02-openclaw-session-result.json"
     },
     {
       "id": "DEV-OPENCLAW-ACP-HOST",
       "task": "I02-T02/I04/I12",
-      "status": "pending_implementation_and_validation",
-      "problem": "把深检接入配对Gateway；验证完整AcpHost暖复用、Core冷重启、未知键拒绝、Bootstrap零重放、模型参数和取消/清理，元数据Gateway Smoke不能替代此项",
+      "status": "native_ACP_Host_Fleet_warm_cold_verified_full_Core_deep_probe_pending",
+      "problem": "正式Adapter/Fleet/ACP路径已验新建/暖复用/冷Host恢复/缺失绑定拒绝及双进程清理；业务数据库/Core进程重启、Bootstrap与活动执行仍未验",
       "owner": "研发",
-      "evidence": "i02-openclaw-core-result.json"
+      "evidence": "i02-openclaw-session-result.json"
     },
     {
       "id": "DEV-OPENCLAW-MCP-SKILLS-USAGE",

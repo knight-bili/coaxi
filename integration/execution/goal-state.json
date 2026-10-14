@@ -14,7 +14,7 @@
   "current_branch": "phase/i02-workbench",
   "base_branch": "phase/i01-foundation",
   "current_task": "I02-T02",
-  "current_slice": "OpenClaw Core/schema149控制面与Windows源码回归；完整Runtime资格及I02-T03继续",
+  "current_slice": "OpenClaw正式ACP Host/Fleet暖复用及冷Host恢复、历史roster兼容已验；认证/完整Core与I02-T03继续",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,14 +33,13 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "继续OpenClaw隔离原生身份导入、配对AcpHost深检/冷恢复，补MCP、Bootstrap与真实工具合同",
-    "I02-T03融合Skills/MCP来源、安装/更新/卸载与专家包；不依赖真实设备的部分继续",
-    "补Hermes原生Skills信任和跨Run计量归属；真实模型凭据列客户资源待办",
-    "GitHub额度恢复后补Mac/Linux与移动编译/原生测试，不重复触发被账单拒绝的作业"
+    "实现隔离原生认证来源/完整配置解析与显式多Agent选择，沿原生owner/继承/刷新锁规则，先用合成SQLite与假认证夹具验证，不读日常凭据",
+    "将现有配对Host证明接入真实深检和Core业务绑定/重启，保留模型、工具和批准的独立证据要求",
+    "推进I02-T03 Skills/MCP来源、安装更新卸载及科研/Office/生成式卡片，继续不依赖客户资源的实现"
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "source_and_native_control_plane_verified_full_parity_pending",
+  "current_slice_status": "native_Core_ACP_Host_Fleet_and_legacy_roster_verified_full_parity_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -51,5 +50,6 @@
   "gemini_core_evidence": "i02-gemini-core-result.json",
   "hermes_source_evidence": "i02-hermes-source-result.json",
   "hermes_core_evidence": "i02-hermes-core-result.json",
-  "openclaw_core_evidence": "i02-openclaw-core-result.json"
+  "openclaw_core_evidence": "i02-openclaw-core-result.json",
+  "openclaw_session_evidence": "i02-openclaw-session-result.json"
 }
