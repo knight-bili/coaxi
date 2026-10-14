@@ -16,6 +16,13 @@ last_updated: 2026-10-12
 
 ## Rust 测试准入与退役门槛
 
+I03 Web画布操作扩展既有`apps/web/src/client.test.ts`原命令恢复owner：原消息发送与四种画布写入均需重载后只回查、
+未知时拒绝新编号、显式重试保留原参数。新增`camp-adapter.test.ts`适配器seam拥有七种画布入口，
+覆盖此前原始HTTP smoke绕过的浏览器白名单，保留原生专属操作拒绝；不重复Core节点输入矩阵。
+既有`smoke-canvas-nodes.mjs`补查实际Core未知/已有/删除后的画布收据且回查不改变序列。
+本地最低命令为`pnpm exec vitest run apps/web/src/client.test.ts apps/web/src/camp-adapter.test.ts`；
+Rust回查分支的编译与真实Host补验登记到I03阶段候选，不以浏览器fixture代替实际Core结果。
+
 技能包Context153/203迁移新增扩展owner `db::skill_pack_context::tests::migration_is_atomic_and_preserves_existing_authorities`，拥有三表约束/新默认值/收据的同事务切换、失败时恢复及既有结果和Blob保留。安装/成员owner只加自己的表，不拥有RunInput、Manifest和Run默认值，不能代替这一边界；复用既有私有SQLite模板，不启动模型。最低命令为 `cargo test -p rovai-core --features extended-tests --lib db::skill_pack_context`。实际有内容的旧/新Run恢复与输入预算由Context owner继续验证；结构通过不能替代最终Blob或真实Runtime资格。
 
 Windows更新交接回归复用 `rovai-host::server_updates::install::tests::handoff_requires_settlement_then_runs_the_new_program_with_original_arguments`：本机完整回归与同一二进制的定向执行均曾因进程退出后的短暂目录占用报拒绝访问。目录切换增加有上限的Windows重试后，持续占用及旧目录/候选保留继续由原 `directory_switch_restores_old_program_on_failure_and_retains_it_on_success` 拥有，扩展真实不共享删除的句柄负例；不新增测试或另建进程fixture。最小命令 `cargo test -p rovai-host --lib`。Unix路径仍直接执行一次重命名；不能把本机结果当作Unix更新资格。

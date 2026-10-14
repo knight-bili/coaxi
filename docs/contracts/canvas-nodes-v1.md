@@ -29,6 +29,9 @@ Snapshot 在同一读事务捕获 Board、节点和序列；不存在或已删�
 所有手势使用当前画板同一个 revision；元数据和节点写入共用该版本，不能分别维护冲突真源。
 冲突返回 `canvas.nodes.conflict` 和当前 revision；缺失画板返回 `canvas.nodes.board_not_found`。
 按 [Domain Command Result v2](domain-command-result-v2.md) 保存首次结果，回放不再修改图或发布失效事件。
+Web共用适配器准入全部画板/节点操作；四种写命令接入既有原命令恢复。
+`commands.reconcile`只读回查原User作用域的首次收据，缺少收据仍是unknown，不能因此自动重发或换命令ID。
+浏览器断线/重载保留既有待核对命令，显式重试使用同一编号和原始参数；读取快照不替代收据确认。
 
 `mutation.type` 为以下闭集，字段均用 camelCase：
 

@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from 'vitest'
-import type { AgentRunExecutionEvidenceView } from '@contracts'
+import type { AgentRunExecutionEvidenceView, CoreMethod } from '@contracts'
 import { ExecutionWindow } from '../../desktop/src/renderer/src/execution-window'
 import { ConsoleClient } from './client'
 import { createThreadAdapter } from './camp-adapter'
@@ -7,6 +7,35 @@ import { createThreadAdapter } from './camp-adapter'
 // Owns the production Web adapter + execution window seam. A Host-only HTTP
 // test bypasses this adapter's allowlist; a populated page hides missing deltas.
 afterEach(() => vi.unstubAllGlobals())
+it('admits the shared canvas operations through the authenticated Web adapter and rejects native-only operations', async () => {
+  const storage = { getItem: () => null, setItem: () => undefined, removeItem: () => undefined }
+  vi.stubGlobal('sessionStorage', storage); vi.stubGlobal('localStorage', storage)
+  vi.stubGlobal('navigator', { platform: 'MacIntel' })
+  vi.stubGlobal('window', { sessionStorage: storage, history: { state: null } })
+  vi.stubGlobal('matchMedia', () => ({ matches: false }))
+  const requests: unknown[] = []
+  const fetcher = vi.fn<typeof fetch>(async (url, options) => {
+    if (String(url).endsWith('/login')) return Response.json({ protocolVersion: 4, token: 'a'.repeat(64), clientId: 'd'.repeat(64), editorProof: 'e'.repeat(64), ownerId: 'local_user' })
+    const request = JSON.parse(String(options?.body)); requests.push(request)
+    expect(new Headers(options?.headers).get('Authorization')).toBe('Bearer ' + 'a'.repeat(64))
+    return Response.json({ result: request })
+  })
+  const transport = new ConsoleClient('http://127.0.0.1:8766', fetcher)
+  await transport.login('b'.repeat(64))
+  const { client } = createThreadAdapter(transport, async () => null).environment
+  const operations = ['canvas.boards.list', 'canvas.boards.get', 'canvas.boards.create',
+    'canvas.boards.update', 'canvas.boards.delete', 'canvas.nodes.snapshot', 'canvas.nodes.apply'] satisfies CoreMethod[]
+  try {
+    for (const operation of operations) {
+      const params = { commandId: operation, command: { boardId: 'board', expectedRevision: 3 } }
+      expect(await client.request(operation, params)).toEqual({ operation, params })
+    }
+    expect(requests).toHaveLength(7)
+    await expect(client.request('preferences.newConversation.initialize')).rejects.toThrow('尚未开放此 Web 操作')
+    expect(requests).toHaveLength(7)
+  } finally { transport.clear() }
+})
+
 it('loads a command after an initially empty Web Run and refreshes its completion', async () => {
   const storage = { getItem: () => null, setItem: () => undefined, removeItem: () => undefined }
   vi.stubGlobal('sessionStorage', storage)

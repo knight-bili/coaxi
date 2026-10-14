@@ -106,6 +106,9 @@ try {
   assert.deepEqual(await call('skillPacks.install', install), installReceipt);
   assert.deepEqual(await call('skillPacks.members.set', choice), choiceReceipt);
   assert.deepEqual(await command('canvas.boards.create', {name: '不能重复创建'}, createBoardId), boardReceipt);
+  const reconciledBoard = await call('commands.reconcile', {operation: 'canvas.boards.create',
+    params: {commandId: createBoardId, command: {name: '回查不得改写'}}});
+  assert.deepEqual(reconciledBoard, {state: 'recorded', result: boardReceipt});
   assert.deepEqual(await readFile(path.join(installation.contentPath, 'SKILL.md')), content);
   assert.equal((await call('skillPacks.installations.list')).find(item => item.skillId === 'brainstorming').version, installation.version);
   assert.deepEqual((await call('skillPacks.members.list')).find(item => item.skillId === 'brainstorming').memberIds, [memberId]);
@@ -142,12 +145,19 @@ try {
   const foreign = await mutate({type: 'create', node: node('note', {content: '其他画板'})}, otherId);
   const foreignId = foreign.payload.nodeIds[0], foreignGraph = await snapshot(otherId);
   const moveId = randomUUID();
+  const moveCommand = {boardId, expectedRevision: graph.board.revision, mutation: {type: 'move', moves: []}};
+  const beforeLookup = await snapshot();
+  assert.deepEqual(await call('commands.reconcile', {operation: 'canvas.nodes.apply',
+    params: {commandId: moveId, command: moveCommand}}), {state: 'unknown'});
+  assert.deepEqual(await snapshot(), beforeLookup);
   const moved = await mutate({type: 'move', moves: [{nodeId: ids.note, x: 99, y: 100},
     {nodeId: foreignId, x: 50, y: 60}, {nodeId: ids.note, x: 2000000, y: -2000000}]}, boardId, moveId);
   graph = await snapshot(); const note = graph.nodes.find(item => item.id === ids.note);
   assert.equal(note.data.x, 1000000); assert.equal(note.data.y, -1000000); assert.equal(note.data.content, '\n中文 **便签**\n');
   assert.deepEqual((await snapshot(otherId)).nodes, foreignGraph.nodes);
   assert.deepEqual(await command('canvas.nodes.apply', {boardId, expectedRevision: -1, mutation: {type: 'delete', nodeIds: [ids.note]}}, moveId), moved);
+  assert.deepEqual(await call('commands.reconcile', {operation: 'canvas.nodes.apply',
+    params: {commandId: moveId, command: moveCommand}}), {state: 'recorded', result: moved});
   const stale = await command('canvas.nodes.apply', {boardId, expectedRevision: graph.board.revision - 1,
     mutation: {type: 'delete', nodeIds: [ids.note]}}); assert.equal(stale.code, 'canvas.nodes.conflict');
   assert.equal((await snapshot()).board.revision, graph.board.revision);
@@ -178,10 +188,14 @@ try {
   graph = await snapshot(); assert.deepEqual(graph.nodes, beforeRestart.nodes); assert.deepEqual(graph.board, beforeRestart.board);
   assert.deepEqual(await command('canvas.nodes.apply', {boardId, expectedRevision: 0, mutation: {type: 'prune'}}, moveId), moved);
   record('real154_Host_restart_preserves_graph_revision_note_bytes_and_historical_result');
-  const deleted = await command('canvas.boards.delete', {boardId, expectedRevision: graph.board.revision}); applied(deleted);
+  const deleteId = randomUUID();
+  const deleteCommand = {boardId, expectedRevision: graph.board.revision};
+  const deleted = await command('canvas.boards.delete', deleteCommand, deleteId); applied(deleted);
   assert.deepEqual((await snapshot()).nodes, []); assert.equal((await snapshot()).board, null);
   assert.deepEqual((await snapshot(otherId)).nodes, foreignGraph.nodes);
   assert.deepEqual(await command('canvas.nodes.apply', {boardId, expectedRevision: 0, mutation: {type: 'prune'}}, moveId), moved);
+  assert.deepEqual(await call('commands.reconcile', {operation: 'canvas.boards.delete',
+    params: {commandId: deleteId, command: deleteCommand}}), {state: 'recorded', result: deleted});
   await close();
   withDB(db => {
     assert.equal(db.prepare('SELECT projection_schema_version AS v FROM rovai_data_contract').get().v, 154);

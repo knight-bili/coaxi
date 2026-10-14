@@ -314,31 +314,38 @@ describe('tab session recovery', () => {
     }
   })
   it('restores unknown command identities and only reconciles on startup; explicit retry reuses exact payload', async () => {
-    const storage = memory()
-    let recorded = false
-    const dispatches: unknown[] = []
-    const fetcher = vi.fn<typeof fetch>().mockImplementation(async (url, options) => {
-      if (!String(url).endsWith('/request')) return Response.json(identity)
-      const request = JSON.parse(String(options?.body))
-      if (request.operation === 'commands.reconcile') return Response.json({ result: recorded ? { state: 'recorded', result: { ok: true } } : { state: 'unknown' } })
-      dispatches.push(request.params)
-      throw new TypeError('response lost')
-    })
-    const first = new ConsoleClient('http://localhost:4317', fetcher, storage)
-    await first.login('d'.repeat(64))
-    const params = { commandId: newCommandId(), threadId: 'original', draftRevision: 7 }
-    void first.request('thread.messages.send', params)
-    await vi.waitFor(() => expect(dispatches).toHaveLength(1))
-    const next = new ConsoleClient('http://localhost:4317', fetcher, storage)
-    await next.restore()
-    expect(next.pendingCommandCount).toBe(1)
-    expect(dispatches).toHaveLength(1)
-    await expect(next.request('thread.messages.send', { ...params, commandId: newCommandId() })).rejects.toThrow('原提交')
-    await next.retryPending()
-    expect(dispatches).toEqual([params, params])
-    recorded = true
-    await vi.waitFor(async () => { await next.reconcilePending(); expect(next.pendingCommandCount).toBe(0) })
-    expect(JSON.parse(storage.getItem('rovai.web.session.v1')!).pending).toEqual([])
+    for (const operation of ['thread.messages.send', 'canvas.boards.create', 'canvas.boards.update', 'canvas.boards.delete', 'canvas.nodes.apply'] as const) {
+      const storage = memory()
+      let recorded = false
+      const dispatches: unknown[] = []
+      const fetcher = vi.fn<typeof fetch>().mockImplementation(async (url, options) => {
+        if (!String(url).endsWith('/request')) return Response.json(identity)
+        const request = JSON.parse(String(options?.body))
+        if (request.operation === 'commands.reconcile') return Response.json({ result: recorded ? { state: 'recorded', result: { ok: true } } : { state: 'unknown' } })
+        dispatches.push(request.params)
+        throw new TypeError('response lost')
+      })
+      const first = new ConsoleClient('http://localhost:4317', fetcher, storage)
+      await first.login('d'.repeat(64))
+      const params = operation === 'thread.messages.send'
+        ? { commandId: newCommandId(), threadId: 'original', draftRevision: 7 }
+        : { commandId: newCommandId(), command: operation === 'canvas.boards.create' ? { name: '原画板' }
+          : operation === 'canvas.nodes.apply' ? { boardId: 'original', expectedRevision: 7, mutation: { type: 'move', moves: [{ nodeId: 'node', x: 12, y: 24 }] } }
+            : { boardId: 'original', expectedRevision: 7 } }
+      void first.request(operation, params).catch(() => undefined)
+      await vi.waitFor(() => expect(dispatches).toHaveLength(1))
+      const next = new ConsoleClient('http://localhost:4317', fetcher, storage)
+      await next.restore()
+      expect(next.pendingCommandCount).toBe(1)
+      expect(dispatches).toHaveLength(1)
+      await expect(next.request(operation, { ...params, commandId: newCommandId() })).rejects.toThrow('原提交')
+      await next.retryPending()
+      expect(dispatches).toEqual([params, params])
+      recorded = true
+      await vi.waitFor(async () => { await next.reconcilePending(); expect(next.pendingCommandCount).toBe(0) })
+      expect(JSON.parse(storage.getItem('rovai.web.session.v1')!).pending).toEqual([])
+      first.clear(); next.clear()
+    }
   })
 })
 

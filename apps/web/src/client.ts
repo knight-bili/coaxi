@@ -149,6 +149,9 @@ export const WEB_OPERATIONS = [
   'toolbox.list',
   'toolbox.read',
   'toolbox.setMembers',
+  'canvas.boards.list', 'canvas.boards.get',
+  'canvas.boards.create', 'canvas.boards.update', 'canvas.boards.delete',
+  'canvas.nodes.snapshot', 'canvas.nodes.apply',
   'nativeSkills.list',
   'nativeSkills.read',
   'skills.candidates',
@@ -191,6 +194,7 @@ export const WEB_OPERATIONS = [
 export type WebOperation = typeof WEB_OPERATIONS[number]
 
 const RECONCILABLE_COMMANDS = new Set<WebOperation>([
+  'canvas.boards.create', 'canvas.boards.update', 'canvas.boards.delete', 'canvas.nodes.apply',
   'threads.rename',
   'threads.delete',
   'threads.retryDeletion',
