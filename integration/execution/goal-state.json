@@ -13,8 +13,8 @@
   "authorization": "客户要求持续自动推进；本项目阶段提交、推送及草稿PR自动执行；main合并与正式发布仍由客户控制",
   "current_branch": "phase/i02-skill-delivery",
   "base_branch": "phase/i03-canvas",
-  "current_task": "I02-T03",
-  "current_slice": "Linux数据库110/0/0成功；受控真实Core未知输入恢复5项、helper/Composer10项及当前默认workspace501/0/8通过，待提交同步；其余SP恢复分支继续",
+  "current_task": "I03-T01",
+  "current_slice": "I02未知输入进程恢复切片已验证并同步679650fa（workspace501/0/8、helper10/0、进程5项）；完整I02未验收。继续I03八类节点Core图模型与持久化，固定源码已核对。",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,14 +33,15 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "提交同步已验证的Core未知输入进程恢复和静态成员验收helper修复，更新草稿PR54。",
-    "继续明确确认后的活跃输入恢复、未接收输入的进程恢复/epoch及剩余SP01–SP11；已有未知结果分支不得盲目重发。",
-    "专用测试身份与硬预算到位后执行SP12真实指南读取Gate；不自动付费。",
-    "继续I03八类节点、业务绑定、布局和交互PTY，以及I02剩余与I04–I12完整范围。"
+    "按锁定Codeg aff1e6c源码实现八类节点的typed contract、Core图持久化、CAS命令及一致快照，再接UI；不能只交付元数据或缩减节点。",
+    "继续I03业务绑定、几何布局/分组与客户端视口，最后接真实临时PTY及关闭/删除生命周期。",
+    "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
+    "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
+    "继续I02剩余、I04–I12与BUF全部既定范围，未补齐必需验收不得标MVP完成。"
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "controlled_unknown_outcome_process_recovery_verified_other_sp_and_real_gate_pending",
+  "current_slice_status": "i03_pinned_node_sources_audited_core_graph_implementation_next",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -67,5 +68,7 @@
   "ci_next_action": "run38564836044已success且110项和Unix日志核对；后续按里程碑免费标准runner验证，不重复调度已完成运行",
   "skill_delivery_matrix_evidence": "i02-skill-delivery-matrix-result.json",
   "database_regression_repair_evidence": "i02-db153-regression-repair-result.json",
-  "skill_process_recovery_evidence": "i02-skill-process-recovery-result.json"
+  "skill_process_recovery_evidence": "i02-skill-process-recovery-result.json",
+  "skill_process_recovery_source_commit": "679650fa65c4e96b32bf75e8e5c95ef0a999a498",
+  "canvas_node_source_audit_evidence": "i03-node-source-audit-result.json"
 }

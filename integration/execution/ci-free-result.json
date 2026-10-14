@@ -100,9 +100,10 @@
     },
     "followUp": "原失败保留；修复提交63fc52b4的新Linux运行成功，110项包含原12失败与Unix专属用例。本次不代表全部Runtime/平台或MVP资格",
     "latestScaffold": {
-      "id": 38545531506,
-      "commit": "4aa7e51b6c2f815a88f47348269deef9030fff03",
-      "conclusion": "success"
+      "id": 38574781228,
+      "commit": "679650fa65c4e96b32bf75e8e5c95ef0a999a498",
+      "conclusion": "success",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/actions/runs/38574781228"
     },
     "coreRepair": {
       "checkedAt": "2026-10-14T13:31:24.441Z",
