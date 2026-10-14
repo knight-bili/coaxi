@@ -221,6 +221,8 @@ function runtimeParametersFor(
       return <div className="runtime-parameter-form">{modelFieldsFor('gemini-cli', props)}<PermissionSelect {...props} fieldKey="approval_mode" label={uiAttribute("权限模式")} /></div>
     case 'hermes-cli':
       return <div className="runtime-parameter-form">{modelFieldsFor('hermes-cli', props)}<PermissionSelect {...props} fieldKey="permission_mode" label={uiAttribute("权限模式")} /></div>
+    case 'openclaw-cli':
+      return <div className="runtime-parameter-form">{modelFieldsFor('openclaw-cli', props)}<PermissionSelect {...props} fieldKey="permission_mode" label={uiAttribute("权限模式")} /></div>
     case 'trae-cn-cli':
       return <TraeRuntimeParameters {...props} />
     case 'cursor-agent':
@@ -429,6 +431,7 @@ function modelFieldsFor(
     case 'kiro-cli':
     case 'gemini-cli':
     case 'hermes-cli':
+    case 'openclaw-cli':
     case 'trae-cn-cli':
     case 'cursor-agent':
     case 'kimi-code-cli':

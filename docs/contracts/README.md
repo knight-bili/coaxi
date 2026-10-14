@@ -15,7 +15,7 @@ Architecture 解释组件如何组成，Version 概览记录交付范围；它�
 
 ## 融合Runtime
 
-一期新增Runtime合同见[Gemini Runtime v1](gemini-runtime-v1.md)与[Hermes Runtime v1](hermes-runtime-v1.md)；实现和真实资格按融合执行证据核实。
+一期新增Runtime合同见[Gemini Runtime v1](gemini-runtime-v1.md)、[Hermes Runtime v1](hermes-runtime-v1.md)与[OpenClaw Runtime v1](openclaw-runtime-v1.md)；实现和真实资格按融合执行证据核实。
 
 ## 用户主动继续
 

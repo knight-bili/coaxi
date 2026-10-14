@@ -1379,6 +1379,7 @@ pub(crate) struct AcpHost {
     client_terminal_bridge: Option<AcpClientTerminalBridge>,
     host_instance_id: String,
     child: Mutex<ManagedProcess>,
+    openclaw_gateway: Option<crate::openclaw_gateway::OpenClawGateway>,
     stdin: Mutex<Box<dyn AsyncWrite + Unpin + Send>>,
     pending: Mutex<HashMap<u64, PendingRpc>>,
     next_id: AtomicU64,
@@ -1624,6 +1625,20 @@ impl AcpHost {
         if let Some(config) = &builtin_tools {
             config.configure_command(&mut command)?;
         }
+        let openclaw_gateway = if frozen_runtime.adapter_kind == AdapterKind::OpenClawCli {
+            Some(
+                crate::openclaw_gateway::OpenClawGateway::start(
+                    &mut command,
+                    cwd,
+                    private_runtime_dir,
+                    None,
+                    external_mcp_servers,
+                )
+                .await?,
+            )
+        } else {
+            None
+        };
         let ephemeral_config = configure_runtime_command(
             &mut command,
             workspace,
@@ -1761,6 +1776,7 @@ impl AcpHost {
             client_terminal_bridge,
             host_instance_id,
             child: Mutex::new(child),
+            openclaw_gateway,
             stdin: Mutex::new(stdin),
             pending: Mutex::new(HashMap::new()),
             next_id: AtomicU64::new(1),
@@ -2300,6 +2316,9 @@ impl AcpHost {
                     return;
                 };
                 if !host.is_alive() {
+                    if host.alive.load(Ordering::Acquire) {
+                        host.handle_exit().await;
+                    }
                     return;
                 }
                 let exited = {
@@ -3498,6 +3517,11 @@ impl AcpHost {
     }
 
     fn redact_text(&self, text: &str) -> String {
+        let owned = self
+            .openclaw_gateway
+            .as_ref()
+            .map(|gateway| gateway.redact_text(text));
+        let text = owned.as_deref().unwrap_or(text);
         self.credential_redactor
             .as_ref()
             .map_or_else(|| text.to_owned(), |redactor| redactor.text(text))
@@ -3521,6 +3545,10 @@ impl AcpHost {
 
     pub(crate) fn is_alive(&self) -> bool {
         self.alive.load(Ordering::Acquire)
+            && self
+                .openclaw_gateway
+                .as_ref()
+                .is_none_or(|gateway| gateway.is_alive())
     }
 
     pub(crate) fn opencode_version_for_program(&self, identity: &str) -> Option<String> {
@@ -3596,7 +3624,13 @@ impl AcpHost {
 
     pub(crate) async fn force_reap_until(&self, deadline: tokio::time::Instant) -> bool {
         self.alive.store(false, Ordering::Release);
-        let (host_reaped, terminals_reaped) = tokio::join!(
+        let (gateway_reaped, host_reaped, terminals_reaped) = tokio::join!(
+            async {
+                match &self.openclaw_gateway {
+                    Some(gateway) => gateway.force_reap_until(deadline).await,
+                    None => true,
+                }
+            },
             async {
                 let Ok(mut child) = tokio::time::timeout_at(deadline, self.child.lock()).await
                 else {
@@ -3630,7 +3664,7 @@ impl AcpHost {
             Ok(child) => self.confirm_native_cleanup(&child, deadline).await,
             Err(_) => false,
         };
-        host_reaped && terminals_reaped && native_groups_reaped
+        gateway_reaped && host_reaped && terminals_reaped && native_groups_reaped
     }
 
     async fn confirm_native_cleanup(
@@ -3744,6 +3778,9 @@ impl AcpHost {
 
     pub(crate) async fn shutdown_and_reap(&self) {
         self.alive.store(false, Ordering::Release);
+        if let Some(gateway) = &self.openclaw_gateway {
+            gateway.shutdown().await;
+        }
         self.release_all_client_terminals().await;
         let mut child = self.child.lock().await;
         let ownership_captured = self.capture_native_descendants(&mut child).is_ok();
@@ -4209,6 +4246,12 @@ impl AcpSessionPermissions {
     fn from_frozen(frozen: &FrozenAgentRuntimeConfig) -> Result<Self> {
         let values = &frozen.permissions.values;
         let mode = match frozen.adapter_kind {
+            AdapterKind::OpenClawCli => Some(
+                values["permission_mode"]
+                    .as_str()
+                    .filter(|mode| crate::openclaw_gateway::PERMISSION_MODES.contains(mode))
+                    .context("OpenClaw requires native Gateway permission_mode")?,
+            ),
             AdapterKind::HermesCli => Some(
                 values["permission_mode"]
                     .as_str()
@@ -4300,6 +4343,13 @@ fn select_acp_session_continuation(
         // A changed capability response must still fail through strict load.
         return AcpSessionContinuation::HistoryRestore;
     }
+    if adapter_kind == AdapterKind::OpenClawCli {
+        return if capabilities.can_resume {
+            AcpSessionContinuation::Resume
+        } else {
+            AcpSessionContinuation::HistoryRestore
+        };
+    }
     if capabilities.can_resume {
         return AcpSessionContinuation::Resume;
     }
@@ -4320,6 +4370,7 @@ fn history_restore_allowed(adapter_kind: AdapterKind) -> bool {
             | AdapterKind::QwenCode
             | AdapterKind::GeminiCli
             | AdapterKind::HermesCli
+            | AdapterKind::OpenClawCli
             | AdapterKind::TraeCnCli
             | AdapterKind::KimiCodeCli
             | AdapterKind::CommandCodeCli
@@ -4423,6 +4474,10 @@ pub(crate) fn build_acp_resume_session_params(
 
 impl AcpRuntime {
     pub(crate) fn redact_output(&self, value: &Value) -> Value {
+        if self.host.openclaw_gateway.is_some() {
+            return serde_json::from_str(&self.host.redact_text(&value.to_string()))
+                .unwrap_or(Value::Null);
+        }
         self.host
             .credential_redactor
             .as_ref()
@@ -4550,6 +4605,14 @@ impl AcpRuntime {
         external_mcp_servers: &BTreeMap<String, McpServerDefinition>,
         new_session_native_rules: Option<&str>,
     ) -> Result<String> {
+        if self.host.adapter_kind == AdapterKind::OpenClawCli {
+            anyhow::ensure!(
+                model_options
+                    .as_object()
+                    .is_some_and(|options| options.is_empty()),
+                "OpenClaw native model options require verified Gateway mapping before use"
+            );
+        }
         let cwd = acp_protocol_path(&self.execution_root);
         let run_tmp = self
             .host
@@ -4569,6 +4632,7 @@ impl AcpRuntime {
                 | AdapterKind::GrokBuild
                 | AdapterKind::ClineCli
                 | AdapterKind::CommandCodeCli
+                | AdapterKind::OpenClawCli
         ) {
             external_mcp_servers
                 .iter()
@@ -4637,7 +4701,7 @@ impl AcpRuntime {
                     "session/load"
                 };
                 let result = loop {
-                    let params = if method == "session/resume" {
+                    let mut params = if method == "session/resume" {
                         build_acp_resume_session_params(
                             self.host.adapter_kind,
                             existing_session_id,
@@ -4656,6 +4720,9 @@ impl AcpRuntime {
                         }
                         params
                     };
+                    if let Some(gateway) = &self.host.openclaw_gateway {
+                        gateway.configure_session_request(&mut params, true);
+                    }
                     match self
                         .host
                         .rpc_with_timeout(method, params, ACP_HISTORY_RESTORE_TIMEOUT)
@@ -4723,13 +4790,16 @@ impl AcpRuntime {
                 (existing_session_id.to_string(), true)
             }
             AcpSessionContinuation::New => {
-                let params = build_acp_new_session_params(
+                let mut params = build_acp_new_session_params(
                     self.host.adapter_kind,
                     &cwd,
                     &mcp_servers,
                     &additional_directories,
                     new_session_native_rules,
                 );
+                if let Some(gateway) = &self.host.openclaw_gateway {
+                    gateway.configure_session_request(&mut params, false);
+                }
                 let result = self.host.rpc("session/new", params).await?;
                 *self.session_result.write().await = Some(result.clone());
                 let session_id = result
@@ -4744,6 +4814,27 @@ impl AcpRuntime {
             && let Some(result) = self.host.session_result(&session_id).await
         {
             *self.session_result.write().await = Some(result);
+        }
+        if let Some(gateway) = &self.host.openclaw_gateway {
+            let configured = self
+                .session_permissions
+                .mode
+                .as_deref()
+                .context("OpenClaw frozen permission mode missing")?;
+            let permission = if self.workspace_access == "read_only" {
+                "read-only"
+            } else {
+                configured
+            };
+            let selected = (model_source != "runtime_default").then_some(model);
+            let models = gateway
+                .configure_session(permission, selected, existing_session_id.is_some())
+                .await?;
+            self.session_result
+                .write()
+                .await
+                .as_mut()
+                .context("OpenClaw native Session result missing")?["models"] = models;
         }
         let session_result = self.session_result.read().await.clone();
         self.host
@@ -4852,7 +4943,9 @@ impl AcpRuntime {
                     model_options,
                 )?;
             }
-            if self.host.adapter_kind == AdapterKind::CodebuddyCli
+            if self.host.adapter_kind == AdapterKind::OpenClawCli {
+                // The owned Gateway already confirmed this exact Provider/model route.
+            } else if self.host.adapter_kind == AdapterKind::CodebuddyCli
                 && model.starts_with("custom-local:")
                 && acp_runtime_model_id_from_session(session_result).as_deref() == Some(model)
             {
@@ -5748,6 +5841,21 @@ impl AcpCliRuntimeAdapter {
         }
         #[cfg(target_os = "macos")]
         ManagedProcess::recover_descendants(&self.private_runtime_dir.join("owned-processes"))?;
+        #[cfg(target_os = "macos")]
+        if kind == AdapterKind::OpenClawCli {
+            let bindings = self.private_runtime_dir.join("bindings");
+            if bindings.exists() {
+                for entry in std::fs::read_dir(bindings)? {
+                    let entry = entry?;
+                    if entry.file_type()?.is_dir() {
+                        ManagedProcess::recover_descendants(&entry.path().join("owned-processes"))?;
+                        ManagedProcess::recover_descendants(
+                            &entry.path().join("gateway-owned-processes"),
+                        )?;
+                    }
+                }
+            }
+        }
         if matches!(
             kind,
             AdapterKind::CopilotCli
@@ -5809,7 +5917,20 @@ impl AcpCliRuntimeAdapter {
         let spawn_builtin_tools = builtin_tools.clone();
         let spawn_external_mcp_servers = external_mcp_servers.clone();
         let spawn_attachment_access_root = attachment_access_root.to_path_buf();
-        let spawn_private_runtime_dir = self.private_runtime_dir.clone();
+        let spawn_private_runtime_dir = if self.kind == AdapterKind::OpenClawCli {
+            anyhow::ensure!(
+                !native_binding_id.is_empty()
+                    && native_binding_id
+                        .bytes()
+                        .all(|c| c.is_ascii_alphanumeric() || c == b'-' || c == b'_'),
+                "OpenClaw binding identity is invalid"
+            );
+            self.private_runtime_dir
+                .join("bindings")
+                .join(native_binding_id)
+        } else {
+            self.private_runtime_dir.clone()
+        };
         let spawn_incoming = self.incoming.clone();
         let spawn_compaction_policy = self.compaction_detector_policy;
         let compatibility = RuntimeCompatibilityKey::member_session(
@@ -5818,7 +5939,10 @@ impl AcpCliRuntimeAdapter {
             Some(native_binding_id),
             runtime_compatibility_digest,
         );
-        if self.kind == AdapterKind::DeepseekHarness {
+        if matches!(
+            self.kind,
+            AdapterKind::DeepseekHarness | AdapterKind::OpenClawCli
+        ) {
             // DSH persists exact Sessions but holds a native lock while the
             // previous Host owns them. Reap obsolete idle Hosts before resume;
             // an active Host retires at its normal Run boundary, and the
@@ -6278,6 +6402,7 @@ fn configure_runtime_command(
         .as_object()
         .context("ACP permission configuration must be an object")?;
     match runtime.adapter_kind {
+        AdapterKind::OpenClawCli => {} // The paired Gateway prepared the exact ACP endpoint.
         AdapterKind::HermesCli => {
             anyhow::ensure!(
                 !(permission_semantics == PermissionSemantics::CoreEnforcedV1
@@ -7622,6 +7747,7 @@ pub fn automatically_allows_permission_requests(
         | AdapterKind::DeepseekHarness
         | AdapterKind::ZcodeApp
         | AdapterKind::HermesCli
+        | AdapterKind::OpenClawCli
         | AdapterKind::CommandCodeCli => false,
     }
 }
@@ -8821,7 +8947,11 @@ mod route_policy_tests {
             select_acp_session_continuation(AdapterKind::TraeCnCli, false, None, resume_and_load,),
             AcpSessionContinuation::New
         );
-        for kind in [AdapterKind::GeminiCli, AdapterKind::HermesCli] {
+        for kind in [
+            AdapterKind::GeminiCli,
+            AdapterKind::HermesCli,
+            AdapterKind::OpenClawCli,
+        ] {
             assert_eq!(
                 select_acp_session_continuation(kind, false, Some("existing"), load_only),
                 AcpSessionContinuation::HistoryRestore
@@ -8871,6 +9001,24 @@ mod route_policy_tests {
             .is_ok()
         );
         assert!(validate_acp_restored_session_result(AdapterKind::GeminiCli, &json!({})).is_ok());
+        assert_eq!(
+            select_acp_session_continuation(
+                AdapterKind::OpenClawCli,
+                false,
+                Some("existing"),
+                AcpSessionCapabilities::default()
+            ),
+            AcpSessionContinuation::HistoryRestore
+        );
+        assert_eq!(
+            select_acp_session_continuation(
+                AdapterKind::OpenClawCli,
+                false,
+                Some("existing"),
+                resume_and_load
+            ),
+            AcpSessionContinuation::Resume
+        );
     }
 }
 

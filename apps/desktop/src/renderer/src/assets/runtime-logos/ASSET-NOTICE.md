@@ -70,3 +70,8 @@ Hermes Agent: `hermes-agent.svg` is copied without changes from
 `integration/licenses/codeg/`). SHA256:
 `f660a2312f42c1d9d21daa5c7dfe1d666901030a42a469edc014678314d0ec8a`.
 The monochrome glyph uses Rovai's existing theme-colored Runtime mask.
+
+OpenClaw: `openclaw.svg` is copied without changes from Codeg commit
+`aff1e6c278453ed8d0b96a5f664edcdca621aa3f`,
+`docs/images/agents/openclaw.svg` (Codeg MIT license retained in
+`integration/licenses/codeg/`). Source Git blob SHA256: `8deb2ad95bb75d9ff2236e166174eae74343d52bef98637211b45e05af57ac2f`.

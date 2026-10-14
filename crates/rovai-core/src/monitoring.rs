@@ -2110,6 +2110,7 @@ fn eligible_mask(runtime: AdapterKind, _runtime_version: Option<&str>) -> i64 {
         AdapterKind::KimiCodeCli => full_tokens & !ELIGIBLE_REASONING_OUTPUT,
         AdapterKind::CursorAgent => 0,
         AdapterKind::GeminiCli => ELIGIBLE_PROMPT_INPUT_TOTAL | ELIGIBLE_OUTPUT,
+        AdapterKind::OpenClawCli => 0,
         AdapterKind::HermesCli => {
             ELIGIBLE_PROMPT_INPUT_TOTAL
                 | ELIGIBLE_OUTPUT

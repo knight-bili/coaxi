@@ -211,6 +211,7 @@ mod tests {
             .execute_batch("PRAGMA foreign_keys=OFF")
             .unwrap();
         let tx = database.connection().unchecked_transaction().unwrap();
+        rewrite_openclaw_runtime_closed_sets(&tx, true).unwrap();
         rewrite_hermes_runtime_closed_sets(&tx, true).unwrap();
         rewrite_gemini_runtime_closed_sets(&tx, true).unwrap();
         tx.execute_batch("ALTER TABLE event_log DROP COLUMN command_client_id;")

@@ -2719,6 +2719,7 @@ fn delivery_group_label(key: SkillDeliveryGroupKey) -> &'static str {
         SkillDeliveryGroupKey::Qwen => "Qwen",
         SkillDeliveryGroupKey::Gemini => "Gemini CLI",
         SkillDeliveryGroupKey::Hermes => "Hermes Agent",
+        SkillDeliveryGroupKey::OpenClaw => "OpenClaw",
         SkillDeliveryGroupKey::Trae => "TRAE",
         SkillDeliveryGroupKey::Cursor => "Cursor",
         SkillDeliveryGroupKey::Kimi => "Kimi Code",

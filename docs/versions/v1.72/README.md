@@ -644,3 +644,9 @@ Migration197扩展Runtime/Skills闭集并发布schema147，保留旧行与旧来
 
 在同一Core接入固定官方v0.21.6与社区桥接0.21.6，目录增至20种，Migration198从147升级148；21种来源范围不减。
 原生模式、敏感批准及严格load恢复见[Hermes Runtime v1](../../contracts/hermes-runtime-v1.md)。Windows源码与安全原生协议检查已取得证据，真实模型/工具、原生Skills信任、跨Run计量及平台资格继续验证，阶段仍实施中。
+
+## 融合期 OpenClaw Runtime 接入（2026-10-14）
+
+固定官方2026.9.8在既有Fleet内接入配对Gateway/ACP，目录增至21种，Migration199从148升级149。
+完整Gateway键与ACP SessionId分别绑定，模型和四种权限走官方Gateway控制面；会话MCP字段保持空数组，服务器配置归属私有Gateway。
+合同见[OpenClaw Runtime v1](../../contracts/openclaw-runtime-v1.md)。本地元数据及进程检查不替代真实模型、工具、复杂认证、Bootstrap与平台资格；兼容整改仍属一期。

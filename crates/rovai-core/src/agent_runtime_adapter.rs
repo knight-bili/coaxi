@@ -385,6 +385,8 @@ pub enum SkillDeliveryGroupKey {
     Qwen,
     Gemini,
     Hermes,
+    #[serde(rename = "openclaw")]
+    OpenClaw,
     Trae,
     Cursor,
     Kimi,
@@ -396,7 +398,7 @@ pub enum SkillDeliveryGroupKey {
 }
 
 impl SkillDeliveryGroupKey {
-    pub const ALL: [Self; 20] = [
+    pub const ALL: [Self; 21] = [
         Self::Codex,
         Self::Pi,
         Self::Opencode,
@@ -409,6 +411,7 @@ impl SkillDeliveryGroupKey {
         Self::Qwen,
         Self::Gemini,
         Self::Hermes,
+        Self::OpenClaw,
         Self::Trae,
         Self::Cursor,
         Self::Kimi,
@@ -433,6 +436,7 @@ impl SkillDeliveryGroupKey {
             Self::Qwen => "qwen",
             Self::Gemini => "gemini",
             Self::Hermes => "hermes",
+            Self::OpenClaw => "openclaw",
             Self::Trae => "trae",
             Self::Cursor => "cursor",
             Self::Kimi => "kimi",
@@ -458,6 +462,7 @@ impl SkillDeliveryGroupKey {
             Self::Qwen => Path::new(".qwen/skills"),
             Self::Gemini => Path::new(".gemini/skills"),
             Self::Hermes => Path::new(".hermes/skills"),
+            Self::OpenClaw => Path::new("skills"),
             Self::Trae => Path::new(".trae/skills"),
             Self::Cursor => Path::new(".cursor/skills"),
             Self::Kimi => Path::new(".kimi-code/skills"),
@@ -487,6 +492,7 @@ impl std::str::FromStr for SkillDeliveryGroupKey {
             "qwen" => Ok(Self::Qwen),
             "gemini" => Ok(Self::Gemini),
             "hermes" => Ok(Self::Hermes),
+            "openclaw" => Ok(Self::OpenClaw),
             "trae" => Ok(Self::Trae),
             "cursor" => Ok(Self::Cursor),
             "kimi" => Ok(Self::Kimi),
@@ -739,7 +745,10 @@ impl AgentRuntimeAdapterRegistry {
         kind: AdapterKind,
         platform: HostPlatformKey,
     ) -> RuntimePlatformAdmission {
-        if matches!(kind, AdapterKind::GeminiCli | AdapterKind::HermesCli) {
+        if matches!(
+            kind,
+            AdapterKind::GeminiCli | AdapterKind::HermesCli | AdapterKind::OpenClawCli
+        ) {
             return RuntimePlatformAdmission::not_qualified(
                 kind,
                 platform,
@@ -948,6 +957,7 @@ impl AgentRuntimeAdapterRegistry {
             }),
             AdapterKind::GeminiCli => json!({"approval_mode": "yolo"}),
             AdapterKind::HermesCli => json!({"permission_mode": "dont_ask"}),
+            AdapterKind::OpenClawCli => json!({"permission_mode":"full"}),
             AdapterKind::TraeCnCli => json!({
                 "permission_mode": "bypass_permissions",
             }),
@@ -987,6 +997,7 @@ impl AgentRuntimeAdapterRegistry {
             | AdapterKind::QwenCode
             | AdapterKind::GeminiCli
             | AdapterKind::HermesCli
+            | AdapterKind::OpenClawCli
             | AdapterKind::TraeCnCli
             | AdapterKind::CursorAgent
             | AdapterKind::KimiCodeCli
@@ -1049,6 +1060,10 @@ impl AgentRuntimeAdapterRegistry {
                 [SkillDeliveryGroupKey::Hermes],
                 SkillDiscoveryVerification::DocumentationOnly,
             ),
+            AdapterKind::OpenClawCli => native_skill_discovery(
+                [SkillDeliveryGroupKey::OpenClaw],
+                SkillDiscoveryVerification::DocumentationOnly,
+            ),
             AdapterKind::TraeCnCli => native_skill_discovery(
                 [SkillDeliveryGroupKey::Trae],
                 SkillDiscoveryVerification::Verified,
@@ -1082,6 +1097,7 @@ impl AgentRuntimeAdapterRegistry {
             | AdapterKind::QwenCode
             | AdapterKind::GeminiCli
             | AdapterKind::HermesCli
+            | AdapterKind::OpenClawCli
             | AdapterKind::TraeCnCli
             | AdapterKind::KimiCodeCli
             | AdapterKind::ZcodeApp
@@ -1146,6 +1162,9 @@ impl AgentRuntimeAdapterRegistry {
                     .unwrap_or_default();
                 acp_capability_snapshot(observation, options)
             }
+            AdapterKind::OpenClawCli => {
+                acp_capability_snapshot(observation, openclaw_permission_options())
+            }
             AdapterKind::TraeCnCli => {
                 let permission_options = observation
                     .session_result
@@ -1187,6 +1206,7 @@ impl AgentRuntimeAdapterRegistry {
             AdapterKind::QwenCode => qwen_permission_options(),
             AdapterKind::GeminiCli => gemini_permission_options(),
             AdapterKind::HermesCli => hermes_permission_options(),
+            AdapterKind::OpenClawCli => openclaw_permission_options(),
             AdapterKind::AntigravityApp => antigravity_permission_options(),
             AdapterKind::TraeCnCli => trae_static_permission_options(),
             AdapterKind::CursorAgent => cursor_permission_options(),
@@ -3253,6 +3273,26 @@ fn hermes_permission_options() -> Vec<PermissionOptionDescriptor> {
     }]
 }
 
+fn openclaw_permission_options() -> Vec<PermissionOptionDescriptor> {
+    vec![PermissionOptionDescriptor {
+        key: "permission_mode".to_string(),
+        label: "mode".to_string(),
+        description: "OpenClaw Gateway permissionMode; ACP modes separately control thought level."
+            .to_string(),
+        value_type: "enum".to_string(),
+        choices: crate::openclaw_gateway::PERMISSION_MODES
+            .into_iter()
+            .map(|value| choice(value, value))
+            .collect(),
+        recommended_value: json!("guarded"),
+        scope: RuntimeOptionScope::Session,
+        risk: "elevated".to_string(),
+        supported: true,
+        required: true,
+        unsupported_reason: None,
+    }]
+}
+
 fn hermes_session_permission_options(session: &Value) -> Result<Vec<PermissionOptionDescriptor>> {
     let modes = session
         .pointer("/modes/availableModes")
@@ -5150,6 +5190,40 @@ mod tests {
                     .allows_runtime_use()
             );
         }
+        let openclaw = snapshot(AdapterKind::OpenClawCli, json!({"sessionId":"openclaw-test",
+            "models":{"currentModelId":"provider/model/name","availableModels":[{"modelId":"provider/model/name","name":"Native"}]},
+            "modes":{"currentModeId":"off","availableModes":[{"id":"off"},{"id":"low"},{"id":"high"}]}})).unwrap();
+        assert_eq!(openclaw.models[0].id, "provider/model/name");
+        let permission = &openclaw.permission_options[0];
+        assert_eq!(permission.key, "permission_mode");
+        assert_eq!(permission.scope, RuntimeOptionScope::Session);
+        assert_eq!(
+            permission
+                .choices
+                .iter()
+                .map(|choice| choice.value.as_str())
+                .collect::<Vec<_>>(),
+            ["read-only", "guarded", "workspace", "full"]
+        );
+        assert_eq!(
+            registry.member_permission_defaults(AdapterKind::OpenClawCli),
+            json!({"permission_mode":"full"})
+        );
+        for platform in HostPlatformKey::ALL {
+            assert!(
+                !registry
+                    .platform_admission(AdapterKind::OpenClawCli, platform)
+                    .allows_runtime_use()
+            );
+        }
+        assert_eq!(
+            serde_json::to_string(&AdapterKind::OpenClawCli).unwrap(),
+            "\"openclaw-cli\""
+        );
+        assert_eq!(
+            serde_json::to_string(&SkillDeliveryGroupKey::OpenClaw).unwrap(),
+            "\"openclaw\""
+        );
     }
 
     #[test]
@@ -5531,6 +5605,11 @@ mod tests {
             (
                 AdapterKind::HermesCli,
                 &[SkillDeliveryGroupKey::Hermes],
+                SkillDiscoveryVerification::DocumentationOnly,
+            ),
+            (
+                AdapterKind::OpenClawCli,
+                &[SkillDeliveryGroupKey::OpenClaw],
                 SkillDiscoveryVerification::DocumentationOnly,
             ),
             (

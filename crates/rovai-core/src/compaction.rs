@@ -137,6 +137,7 @@ pub const fn release_default_policy(adapter_kind: AdapterKind) -> CompactionDete
         | AdapterKind::CursorAgent => CompactionDetectorPolicy::Disabled,
         AdapterKind::GeminiCli => CompactionDetectorPolicy::Disabled,
         AdapterKind::HermesCli => CompactionDetectorPolicy::Disabled,
+        AdapterKind::OpenClawCli => CompactionDetectorPolicy::Disabled,
     }
 }
 
@@ -151,6 +152,7 @@ pub const fn detector_policy_environment_key(adapter_kind: AdapterKind) -> &'sta
         AdapterKind::QwenCode => "ROVAI_INTERNAL_QWEN_COMPACTION_DETECTOR_POLICY",
         AdapterKind::GeminiCli => "ROVAI_INTERNAL_GEMINI_COMPACTION_DETECTOR_POLICY",
         AdapterKind::HermesCli => "ROVAI_INTERNAL_HERMES_COMPACTION_DETECTOR_POLICY",
+        AdapterKind::OpenClawCli => "ROVAI_INTERNAL_OPENCLAW_COMPACTION_DETECTOR_POLICY",
         AdapterKind::KimiCodeCli => "ROVAI_INTERNAL_KIMI_COMPACTION_DETECTOR_POLICY",
         AdapterKind::GrokBuild => "ROVAI_INTERNAL_GROK_COMPACTION_DETECTOR_POLICY",
         AdapterKind::ZcodeApp => "ROVAI_INTERNAL_ZCODE_COMPACTION_DETECTOR_POLICY",
@@ -937,6 +939,7 @@ fn qualified_admission(
         | AdapterKind::CursorAgent => false,
         AdapterKind::GeminiCli => false,
         AdapterKind::HermesCli => false,
+        AdapterKind::OpenClawCli => false,
     }
 }
 

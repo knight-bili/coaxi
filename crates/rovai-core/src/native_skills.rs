@@ -573,6 +573,10 @@ fn user_roots(
         AdapterKind::HermesCli => paths.push(
             configured_root("HERMES_HOME", home.join(".hermes"), configuration).join("skills"),
         ),
+        AdapterKind::OpenClawCli => paths.push(
+            configured_root("OPENCLAW_STATE_DIR", home.join(".openclaw"), configuration)
+                .join("skills"),
+        ),
         AdapterKind::TraeCnCli => paths.extend(
             [
                 ".traecli/skills",
@@ -660,6 +664,7 @@ fn project_roots(adapter: AdapterKind, project: &Path) -> Vec<(&'static str, Pat
         AdapterKind::QwenCode => &[".qwen/skills"],
         AdapterKind::GeminiCli => &[".gemini/skills", ".agents/skills"],
         AdapterKind::HermesCli => &[".hermes/skills", ".agents/skills"],
+        AdapterKind::OpenClawCli => &["skills"],
         AdapterKind::TraeCnCli => &[".traecli/skills", ".trae/skills", ".agents/skills"],
         AdapterKind::CursorAgent => &[
             ".cursor/skills",

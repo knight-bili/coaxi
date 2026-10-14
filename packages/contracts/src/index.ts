@@ -38,6 +38,7 @@ export type AdapterKind =
   | 'qwen-code'
   | 'gemini-cli'
   | 'hermes-cli'
+  | 'openclaw-cli'
   | 'trae-cn-cli'
   | 'cursor-agent'
   | 'kimi-code-cli'

@@ -32,9 +32,9 @@
     {
       "id": "DEV-CORE-RUNTIME-UNION",
       "task": "I02-T02",
-      "status": "Gemini_Hermes_source_implemented_OpenClaw_pending_qualification_not_granted",
-      "problem": "Core20种/schema148，Gemini/Hermes已接入并本机验证；OpenClaw继续移植，全部真实及跨平台资格仍须补齐",
-      "evidence": "i02-hermes-core-result.json；9项native只证明初始化/缺会话拒绝，不证明执行",
+      "status": "catalog_21_source_integrated_runtime_parity_and_qualification_pending",
+      "problem": "Core21种/schema149；三种新增来源接入目录与差异控制面，完整实际运行、原生兼容和四平台资格仍须补齐",
+      "evidence": "i02-openclaw-core-result.json；不以本地元数据或编译替代执行",
       "owner": "研发"
     },
     {
@@ -63,10 +63,34 @@
         "固定发行docs/tools/mcp.md给出Gateway mcp.servers；在隔离配置内验证这条原生路径，冻结Core授权，不向ACP发送非空mcpServers，不削减一期工具范围",
         "双层Session身份、重放、取消恢复、用量及四平台实际验证"
       ],
-      "status": "pending_implementation",
+      "status": "source_and_native_gateway_control_verified_full_parity_pending",
       "owner": "研发",
-      "problem": "固定OpenClaw ACP依赖Gateway、无原生显式模型设置且拒绝Session MCP；须在Core管理边界内实现兼容，不能冒充普通ACP已可用",
-      "evidence": "i02-openclaw-source-result.json"
+      "problem": "配对进程/模型权限/精确键接入并通过原生控制面；完整AcpHost、原生身份导入、Gateway MCP/Bootstrap/工具/Usage及平台资格仍待实施验证",
+      "evidence": "i02-openclaw-core-result.json"
+    },
+    {
+      "id": "DEV-OPENCLAW-NATIVE-PROFILE",
+      "task": "I02-T02/I12",
+      "status": "pending_implementation_and_validation",
+      "problem": "原生agentDir含可写SQLite，禁止直接挂接；实现隔离身份导入、来源摘要/变更失效、SecretRef/OAuth/$include及多Agent选择，验证不写日常存储",
+      "owner": "研发",
+      "evidence": "i02-openclaw-core-result.json"
+    },
+    {
+      "id": "DEV-OPENCLAW-ACP-HOST",
+      "task": "I02-T02/I04/I12",
+      "status": "pending_implementation_and_validation",
+      "problem": "把深检接入配对Gateway；验证完整AcpHost暖复用、Core冷重启、未知键拒绝、Bootstrap零重放、模型参数和取消/清理，元数据Gateway Smoke不能替代此项",
+      "owner": "研发",
+      "evidence": "i02-openclaw-core-result.json"
+    },
+    {
+      "id": "DEV-OPENCLAW-MCP-SKILLS-USAGE",
+      "task": "I02-T03/I08/I12",
+      "status": "pending_implementation_and_validation",
+      "problem": "原生Gateway stdio/HTTP MCP、同名覆盖、真实工具授权/输出、Skills发现/更新和Usage增量归属需实际验证，不补零；仍属一期",
+      "owner": "研发",
+      "evidence": "i02-openclaw-core-result.json"
     }
   ]
 }

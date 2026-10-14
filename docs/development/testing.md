@@ -1486,3 +1486,23 @@ Rust 复用原 owner 并保持所有仍有效的保护：
 `failed_session_replacement`、`uncertain_input_acknowledgement`、`session_header_scan`、`manual_native_session_restart`。
 PR 默认层仍为 `cargo test --workspace`；Renderer 复用 `SingleChatPanel.test.ts`、`App.test.ts` 与 typecheck。
 不新增真实模型调用、常驻验证进程或永久禁用测试。
+
+## 融合期 OpenClaw Gateway 测试准入（2026-10-14）
+
+新增最低层纯配置 owner `openclaw_gateway::tests::gateway_configuration_and_acknowledgement_keep_the_owned_scope`，
+拥有双层原生身份、Gateway权限/模型确认及受管配置的独立安全边界。原共享ACP测试不经过Gateway确认，
+不能发现canonical键指向其他绑定、权限未生效或模型路由被替换；纯JSON即可复现，无需数据库或外部进程。
+最小命令：`cargo test -p rovai-core --lib gateway_configuration_and_acknowledgement_keep_the_owned_scope`。
+
+真实进程 owner `openclaw_gateway::managed_native_gateway_freezes_routes_and_reaps_its_process_tree`位于
+`extended-tests`，带明确外部Runtime隔离前置的ignore，使用手动指定的私有fixture和本地模型元数据。
+它验证实际npm入口、Gateway模型/权限控制和退出收敛，普通函数无法证明Windows shim/Node参数传输、
+原生响应及进程树是否真正退出。修复前真实npm入口误用cmd.exe，JSON参数又被安全检查拒绝；继而发现
+固定发行包145KiB的package manifest超出Codex专用64KiB上限。没有放宽通用批处理argv检查。
+最小命令：准备独立`ROVAI_OPENCLAW_SMOKE_ROOT/BIN/NODE_DIR`后运行
+`cargo test -p rovai-core --features extended-tests --lib openclaw_gateway::managed_native_gateway_freezes_routes_and_reaps_its_process_tree -- --exact --ignored`。
+不读取日常Home、不运行模型，不以该项替代完整AcpHost/Core AgentRun或平台资格。
+
+目录/权限、技能分组、精确恢复、Windows入口拒绝及迁移来源矩阵扩展原owner；保留旧输入和活跃测试。
+Windows入口owner补全本地/全局npm目录、145KiB manifest及额外命令拒绝，数据库owner覆盖146/147/148
+三种精确来源、逐值保留、receipt回滚和149重开，不增加平行数据库fixture。

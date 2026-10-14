@@ -341,7 +341,7 @@ impl MainThreadMigrationSource {
 }
 
 pub(crate) const CURRENT_DATA_CONTRACT_VERSION: &str = "v1.72";
-pub(crate) const CURRENT_PROJECTION_SCHEMA_VERSION: i64 = 148;
+pub(crate) const CURRENT_PROJECTION_SCHEMA_VERSION: i64 = 149;
 const V147_MIGRATION_SOURCE_DATA_CONTRACT_VERSION: &str = "v1.54";
 const V147_MIGRATION_SOURCE_PROJECTION_SCHEMA_VERSION: i64 = 96;
 const V145_MIGRATION_SOURCE_DATA_CONTRACT_VERSION: &str = "v1.53";
@@ -2944,7 +2944,8 @@ fn connection_has_admissible_data_contract(connection: &Connection) -> rusqlite:
         .ok()
         .and_then(Option::as_ref)
         .is_some_and(|(contract, schema, _)| {
-            contract == CURRENT_DATA_CONTRACT_VERSION && matches!(schema, 145 | 146 | 147 | 148)
+            contract == CURRENT_DATA_CONTRACT_VERSION
+                && matches!(schema, 145 | 146 | 147 | 148 | 149)
         })
     {
         return Ok(matches!(
@@ -3351,9 +3352,13 @@ pub(crate) fn classify_database_contract(
     // Current databases do not re-prove every historical migration's SQL text.
     // Older layouts retain their migration-specific source recognition below.
     if marker.contract_version == CURRENT_DATA_CONTRACT_VERSION
-        && matches!(marker.projection_schema_version, 145 | 146 | 147 | 148)
+        && matches!(
+            marker.projection_schema_version,
+            145 | 146 | 147 | 148 | 149
+        )
     {
         let expected_migration = match marker.projection_schema_version {
+            149 => 199,
             148 => 198,
             147 => 197,
             146 => 196,
@@ -3373,8 +3378,12 @@ pub(crate) fn classify_database_contract(
                 || gemini_runtime_schema_matches(connection)?)
             && (marker.projection_schema_version != 147
                 || added_runtime_schema_matches(connection, "hermes-cli", "hermes", false)?)
-            && (marker.projection_schema_version != 148
-                || hermes_runtime_schema_matches(connection)?);
+            && (marker.projection_schema_version < 148
+                || hermes_runtime_schema_matches(connection)?)
+            && (marker.projection_schema_version >= 149
+                || added_runtime_schema_matches(connection, "openclaw-cli", "openclaw", false)?)
+            && (marker.projection_schema_version != 149
+                || openclaw_runtime_schema_matches(connection)?);
         return Ok(if !valid {
             DatabaseContractClassification::Unknown(Some(marker))
         } else if marker.projection_schema_version == CURRENT_PROJECTION_SCHEMA_VERSION {
@@ -4988,6 +4997,10 @@ fn hermes_runtime_schema_matches(connection: &Connection) -> rusqlite::Result<bo
     added_runtime_schema_matches(connection, "hermes-cli", "hermes", true)
 }
 
+fn openclaw_runtime_schema_matches(connection: &Connection) -> rusqlite::Result<bool> {
+    added_runtime_schema_matches(connection, "openclaw-cli", "openclaw", true)
+}
+
 fn added_runtime_schema_matches(
     connection: &Connection,
     runtime_kind: &str,
@@ -5020,6 +5033,10 @@ fn rewrite_gemini_runtime_closed_sets(tx: &Transaction<'_>, reverse: bool) -> Re
 
 fn rewrite_hermes_runtime_closed_sets(tx: &Transaction<'_>, reverse: bool) -> Result<()> {
     rewrite_added_runtime_closed_sets(tx, reverse, "hermes-cli", "hermes")
+}
+
+fn rewrite_openclaw_runtime_closed_sets(tx: &Transaction<'_>, reverse: bool) -> Result<()> {
+    rewrite_added_runtime_closed_sets(tx, reverse, "openclaw-cli", "openclaw")
 }
 
 fn rewrite_added_runtime_closed_sets(
@@ -6617,6 +6634,7 @@ pub(crate) fn downgrade_run_bootstrap_for_test(connection: &Connection) {
         .unwrap();
     let tx = connection.unchecked_transaction().unwrap();
     // Synthetic older sources cannot retain later fusion CHECK catalogs.
+    rewrite_openclaw_runtime_closed_sets(&tx, true).unwrap();
     rewrite_hermes_runtime_closed_sets(&tx, true).unwrap();
     rewrite_gemini_runtime_closed_sets(&tx, true).unwrap();
     let table = "native_session_bootstrap_evidence";
@@ -9047,6 +9065,9 @@ impl Database {
             if !self.schema_migration_applied(198)? {
                 migration_step!("migration_198", self.migrate_hermes_runtime());
             }
+            if !self.schema_migration_applied(199)? {
+                migration_step!("migration_199", self.migrate_openclaw_runtime());
+            }
             if let Err(error) =
                 crate::notification::maintain_notification_episode_retention(self.connection())
             {
@@ -9860,6 +9881,9 @@ impl Database {
         if !self.schema_migration_applied(198)? {
             migration_step!("migration_198", self.migrate_hermes_runtime());
         }
+        if !self.schema_migration_applied(199)? {
+            migration_step!("migration_199", self.migrate_openclaw_runtime());
+        }
         if let Err(error) =
             crate::notification::maintain_notification_episode_retention(self.connection())
         {
@@ -9972,6 +9996,63 @@ impl Database {
                     DatabaseContractClassification::Current(ref marker) | DatabaseContractClassification::SupportedMigrationSource(ref marker) if marker.projection_schema_version == 148
                 ),
                 "Hermes runtime schema admission failed"
+            );
+            tx.commit()?;
+            Ok(())
+        })();
+        let foreign_keys = self.connection.execute_batch("PRAGMA foreign_keys=ON;");
+        result?;
+        foreign_keys?;
+        Ok(())
+    }
+
+    fn migrate_openclaw_runtime(&mut self) -> Result<()> {
+        self.connection.execute_batch("PRAGMA foreign_keys=OFF;")?;
+        let result = (|| -> Result<()> {
+            let tx = self
+                .connection
+                .transaction_with_behavior(TransactionBehavior::Immediate)?;
+            anyhow::ensure!(
+                matches!(classify_database_contract(&tx)?,
+                DatabaseContractClassification::SupportedMigrationSource(ref marker)
+                    if marker.contract_version == "v1.72" && marker.projection_schema_version == 148),
+                "OpenClaw runtime migration requires v1.72/schema 148"
+            );
+            let tables = DSH_RUNTIME_TABLES
+                .iter()
+                .chain(DSH_SKILL_TABLES.iter())
+                .copied()
+                .collect::<Vec<_>>();
+            let counts = tables
+                .iter()
+                .map(|table| {
+                    tx.query_row(&format!("SELECT COUNT(*) FROM \"{table}\""), [], |row| {
+                        row.get::<_, i64>(0)
+                    })
+                })
+                .collect::<rusqlite::Result<Vec<_>>>()?;
+            rewrite_openclaw_runtime_closed_sets(&tx, false)?;
+            anyhow::ensure!(
+                openclaw_runtime_schema_matches(&tx)?,
+                "OpenClaw runtime closed sets are incomplete"
+            );
+            for (table, count) in tables.iter().zip(counts) {
+                anyhow::ensure!(
+                    tx.query_row(&format!("SELECT COUNT(*) FROM \"{table}\""), [], |row| row
+                        .get::<_, i64>(
+                        0
+                    ))? == count,
+                    "OpenClaw runtime migration changed existing {table} rows"
+                );
+            }
+            tx.execute_batch("INSERT INTO schema_migration(version,applied_at) VALUES(199,datetime('now')); UPDATE rovai_data_contract SET projection_schema_version=149,updated_at=datetime('now') WHERE singleton=1;")?;
+            validate_migration_foreign_keys(&tx, &tables)?;
+            anyhow::ensure!(
+                matches!(
+                    classify_database_contract(&tx)?,
+                    DatabaseContractClassification::Current(ref marker) | DatabaseContractClassification::SupportedMigrationSource(ref marker) if marker.projection_schema_version == 149
+                ),
+                "OpenClaw runtime schema admission failed"
             );
             tx.commit()?;
             Ok(())
@@ -39695,6 +39776,14 @@ mod tests {
                 Database::migrate_hermes_runtime as Migrate,
                 hermes_runtime_schema_matches as Matches,
             ),
+            (
+                148,
+                149,
+                199,
+                rewrite_openclaw_runtime_closed_sets as Rewrite,
+                Database::migrate_openclaw_runtime as Migrate,
+                openclaw_runtime_schema_matches as Matches,
+            ),
         ] {
             let (mut database, directory) = crate::test_support::seeded_runtime_database();
             database
@@ -39703,6 +39792,9 @@ mod tests {
                 .unwrap();
             {
                 let tx = database.connection().unchecked_transaction().unwrap();
+                if source_schema < 148 {
+                    rewrite_openclaw_runtime_closed_sets(&tx, true).unwrap();
+                }
                 if source_schema == 146 {
                     rewrite_hermes_runtime_closed_sets(&tx, true).unwrap();
                 }
@@ -39754,20 +39846,20 @@ mod tests {
                 matches!(classify_database_contract(database.connection()).unwrap(),
                 DatabaseContractClassification::SupportedMigrationSource(ref marker) if marker.projection_schema_version==source_schema)
             );
-            if source_schema == 147 {
+            if source_schema >= 147 {
                 database
                     .connection()
                     .execute_batch("PRAGMA foreign_keys=OFF;")
                     .unwrap();
                 {
                     let tx = database.connection().unchecked_transaction().unwrap();
-                    rewrite_hermes_runtime_closed_sets(&tx, false).unwrap();
+                    rewrite(&tx, false).unwrap();
                     assert!(
                         matches!(
                             classify_database_contract(&tx).unwrap(),
                             DatabaseContractClassification::Unknown(_)
                         ),
-                        "a schema147 marker must not admit unreceipted Hermes closed sets"
+                        "an older marker must not admit the next unreceipted Runtime catalog"
                     );
                     tx.rollback().unwrap();
                 }
@@ -39811,7 +39903,7 @@ mod tests {
             assert!(reopened.schema_migration_applied(receipt).unwrap());
             assert!(
                 matches!(classify_database_contract(reopened.connection()).unwrap(),
-                DatabaseContractClassification::Current(ref marker) if marker.projection_schema_version==148)
+                DatabaseContractClassification::Current(ref marker) if marker.projection_schema_version==149)
             );
             drop(reopened);
             std::fs::remove_dir_all(directory).unwrap();
@@ -43216,6 +43308,7 @@ mod tests {
         simplification::migrate(&mut database).unwrap();
         database.migrate_gemini_runtime().unwrap();
         database.migrate_hermes_runtime().unwrap();
+        database.migrate_openclaw_runtime().unwrap();
         assert!(connection_has_current_data_contract(database.connection()).unwrap());
         database.connection().execute_batch("DROP INDEX native_session_bootstrap_binding_idx;
             CREATE UNIQUE INDEX native_session_bootstrap_binding_idx ON native_session_bootstrap_evidence(native_binding_id,native_binding_generation)").unwrap();
@@ -43337,7 +43430,7 @@ mod tests {
                 }
                 "old_receipts" => {
                     connection
-                        .execute("DELETE FROM schema_migration WHERE version<198", [])
+                        .execute("DELETE FROM schema_migration WHERE version<199", [])
                         .unwrap();
                 }
                 "optional_usage" => {
@@ -43354,7 +43447,7 @@ mod tests {
                 }
                 "current_receipt" => {
                     connection
-                        .execute("DELETE FROM schema_migration WHERE version=198", [])
+                        .execute("DELETE FROM schema_migration WHERE version=199", [])
                         .unwrap();
                 }
                 _ => unreachable!(),
@@ -43389,7 +43482,7 @@ mod tests {
         database
             .connection()
             .execute_batch(
-                "DELETE FROM schema_migration WHERE version<198;
+                "DELETE FROM schema_migration WHERE version<199;
              DROP TABLE runtime_usage_run_summary;",
             )
             .unwrap();
@@ -45852,6 +45945,7 @@ mod tests {
                     | SkillDeliveryGroupKey::CommandCode
                     | SkillDeliveryGroupKey::Gemini
                     | SkillDeliveryGroupKey::Hermes
+                    | SkillDeliveryGroupKey::OpenClaw
             )
         }) {
             for (skill_id, revision_id) in [
@@ -46072,6 +46166,7 @@ mod tests {
                     | SkillDeliveryGroupKey::CommandCode
                     | SkillDeliveryGroupKey::Gemini
                     | SkillDeliveryGroupKey::Hermes
+                    | SkillDeliveryGroupKey::OpenClaw
             )
         }) {
             for (skill_id, revision_id) in [
@@ -46257,6 +46352,7 @@ mod tests {
                     | SkillDeliveryGroupKey::CommandCode
                     | SkillDeliveryGroupKey::Gemini
                     | SkillDeliveryGroupKey::Hermes
+                    | SkillDeliveryGroupKey::OpenClaw
             )
         }) {
             for (skill_id, revision_id) in [
@@ -46620,6 +46716,7 @@ mod tests {
                     | SkillDeliveryGroupKey::CommandCode
                     | SkillDeliveryGroupKey::Gemini
                     | SkillDeliveryGroupKey::Hermes
+                    | SkillDeliveryGroupKey::OpenClaw
             )
         }) {
             for (skill_id, revision_id) in [

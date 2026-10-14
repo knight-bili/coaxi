@@ -1572,6 +1572,7 @@ async fn acp_probe_at(
             | AdapterKind::QwenCode
             | AdapterKind::GeminiCli
             | AdapterKind::HermesCli
+            | AdapterKind::OpenClawCli
             | AdapterKind::TraeCnCli
             | AdapterKind::GrokBuild
             | AdapterKind::DeepseekHarness
@@ -2721,7 +2722,7 @@ pub fn configure_acp_command(
         AdapterKind::GeminiCli => {
             command.args(["--acp", "--skip-trust"]);
         }
-        AdapterKind::HermesCli => {
+        AdapterKind::HermesCli | AdapterKind::OpenClawCli => {
             command.arg("acp");
         }
         AdapterKind::TraeCnCli => {
@@ -2968,6 +2969,18 @@ fn acp_required_capabilities(kind: AdapterKind) -> Vec<String> {
     if kind == AdapterKind::HermesCli {
         capabilities.push("session.set_mode".to_string());
         capabilities.push("session.load".to_string());
+    }
+    if kind == AdapterKind::OpenClawCli {
+        capabilities.retain(|capability| capability != "session.set_config_option");
+        capabilities.extend(
+            [
+                "gateway.models.list",
+                "gateway.sessions.patch",
+                "gateway.session_identity.strict",
+            ]
+            .into_iter()
+            .map(str::to_owned),
+        );
     }
     capabilities
 }
@@ -3724,6 +3737,7 @@ pub fn find_adapter(kind: AdapterKind) -> Option<PathBuf> {
         ),
         AdapterKind::GeminiCli => (&["ROVAI_GEMINI_BIN"][..], "gemini"),
         AdapterKind::HermesCli => (&["ROVAI_HERMES_BIN"][..], "hermes"),
+        AdapterKind::OpenClawCli => (&["ROVAI_OPENCLAW_BIN"][..], "openclaw"),
         AdapterKind::TraeCnCli => (
             &[
                 "ROVAI_TRAE_CN_BIN",

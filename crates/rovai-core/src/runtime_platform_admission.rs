@@ -335,7 +335,8 @@ mod tests {
                         | AdapterKind::ClineCli
                         | AdapterKind::CommandCodeCli
                         | AdapterKind::GeminiCli
-                        | AdapterKind::HermesCli => {
+                        | AdapterKind::HermesCli
+                        | AdapterKind::OpenClawCli => {
                             assert_eq!(
                                 admission.status(),
                                 RuntimePlatformAdmissionStatus::NotQualified
@@ -422,6 +423,7 @@ mod tests {
                     | AdapterKind::DeepseekHarness
                     | AdapterKind::GeminiCli
                     | AdapterKind::HermesCli
+                    | AdapterKind::OpenClawCli
             ) {
                 assert!(admission.is_qualified());
                 assert!(admission.allows_runtime_use());
@@ -481,6 +483,7 @@ mod tests {
                 kind,
                 AdapterKind::GeminiCli
                     | AdapterKind::HermesCli
+                    | AdapterKind::OpenClawCli
                     | AdapterKind::CursorAgent
                     | AdapterKind::ClineCli
                     | AdapterKind::CommandCodeCli

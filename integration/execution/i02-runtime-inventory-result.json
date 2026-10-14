@@ -433,11 +433,14 @@
     }
   ],
   "currentFusion": {
-    "sourceDeclaredAdapters": 20,
-    "status": "Windows_source_checked_Gemini_Hermes_real_qualification_pending",
-    "remainingPorts": [
-      "open_claw"
+    "sourceDeclaredAdapters": 21,
+    "status": "catalog_source_integrated_Gemini_Hermes_OpenClaw_full_runtime_parity_pending",
+    "catalogPortsRemaining": [],
+    "parityRemaining": [
+      "gemini_full_qualification",
+      "hermes_native_trust_and_usage",
+      "open_claw_native_profile_MCP_bootstrap_and_lifecycle"
     ],
-    "evidence": "i02-hermes-core-result.json"
+    "evidence": "i02-openclaw-core-result.json"
   }
 }

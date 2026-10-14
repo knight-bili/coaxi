@@ -49,6 +49,7 @@ pub const RUNTIME_ACTIVITY_MAPPINGS: [RuntimeActivityMappingDescriptor; AdapterK
     descriptor(AdapterKind::QwenCode, "acp-v1", "fine_grained", "acp"),
     descriptor(AdapterKind::GeminiCli, "acp-v1", "run_level", "acp"),
     descriptor(AdapterKind::HermesCli, "acp-v1", "run_level", "acp"),
+    descriptor(AdapterKind::OpenClawCli, "acp-v1", "run_level", "acp"),
     descriptor(AdapterKind::TraeCnCli, "acp-v1", "fine_grained", "acp"),
     descriptor(AdapterKind::CursorAgent, "acp-v1", "run_level", "acp"),
     descriptor(AdapterKind::KimiCodeCli, "acp-v1", "run_level", "acp"),

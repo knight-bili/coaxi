@@ -14,7 +14,7 @@
   "current_branch": "phase/i02-workbench",
   "base_branch": "phase/i01-foundation",
   "current_task": "I02-T02",
-  "current_slice": "Hermes Core/schema148；Windows499默认/48定向、107数据库owner验证（106全量＋1修复复测）及安全原生9项，继续OpenClaw与必需补验",
+  "current_slice": "OpenClaw Core/schema149控制面与Windows源码回归；完整Runtime资格及I02-T03继续",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,15 +33,16 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "已锁定OpenClaw2026.9.8/隔离Node24.21及94源文件，继续Core受管理Gateway、模型冻结与Gateway级MCP兼容",
-    "补Hermes原生Skills信任、跨Run用量基线及Core真实Session/工具生命周期",
-    "恢复CI后补Unix/Mac新源码与原生ready；取得开发身份后执行真实模型资格"
+    "继续OpenClaw隔离原生身份导入、配对AcpHost深检/冷恢复，补MCP、Bootstrap与真实工具合同",
+    "I02-T03融合Skills/MCP来源、安装/更新/卸载与专家包；不依赖真实设备的部分继续",
+    "补Hermes原生Skills信任和跨Run计量归属；真实模型凭据列客户资源待办",
+    "GitHub额度恢复后补Mac/Linux与移动编译/原生测试，不重复触发被账单拒绝的作业"
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "component_and_real_host_navigation_verified_task_in_progress",
+  "current_slice_status": "source_and_native_control_plane_verified_full_parity_pending",
   "evidence": "i02-navigation-result.json",
-  "live_evidence": "i02-navigation-live-result.json",
+  "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
   "draft_restart_evidence": "i02-draft-restart-result.json",
   "runtime_inventory_evidence": "i02-runtime-inventory-result.json",
@@ -49,5 +50,6 @@
   "gemini_native_evidence": "i02-gemini-native-result.json",
   "gemini_core_evidence": "i02-gemini-core-result.json",
   "hermes_source_evidence": "i02-hermes-source-result.json",
-  "hermes_core_evidence": "i02-hermes-core-result.json"
+  "hermes_core_evidence": "i02-hermes-core-result.json",
+  "openclaw_core_evidence": "i02-openclaw-core-result.json"
 }
