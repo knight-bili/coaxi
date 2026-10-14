@@ -64,8 +64,8 @@
     {
       "id": "INPUT-GITHUB-CI",
       "required_for": "Mac/Linux及GitHub原生验证",
-      "need": "核查GitHub账户付款或Actions支出限制；由客户处理账号与费用决定后补运行",
-      "status": "deferred_account_billing",
+      "need": "已获客户授权并完成公开前审查，仓库现已公开；正在实测标准runner。不要求提高支出上限或绑定付款方式",
+      "status": "resolved_public_repository_cloud_probe_pending",
       "evidence": {
         "head": "e2963ef0d59989d16d32fffc03d19925dd75de85",
         "run": 38500616853,
@@ -81,7 +81,15 @@
           "checkRun": 115516171718,
           "annotation": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
         }
-      ]
+      ],
+      "resolution": {
+        "policy": "integration/ci-cost-policy.md",
+        "evidence": "integration/execution/ci-free-result.json",
+        "publicVerified": true,
+        "accountBudgetModified": false,
+        "accountBudgetVerified": false,
+        "realCloudProbe": "pending"
+      }
     },
     {
       "id": "INPUT-SKILL-DELIVERY-R1",

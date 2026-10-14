@@ -6,6 +6,7 @@ I00已自审修正并合入，I01基础构建与契约证据保留草稿；I02�
 - [功能账本](planning/features.json)、[研发工作包](planning/work-packages.json)、[验收场景](acceptance/cases.json)。
 - [候选入口库存](inventory/source-entrypoints.json)、[开发规则](development.md)、[I00验收单](acceptance/i00.md)。
 - [资源与风险](resources.md)、[许可证保留](licenses/README.md)。
+- [免费优先 CI 安排](ci-cost-policy.md)：公开前审查、标准运行机、按里程碑启动全平台验证及产物保留边界。
 
 源Rovai当前版本指针只代表源骨架状态，不证明融合完成。根文档和品牌保留，后续设计阶段再处理。
 

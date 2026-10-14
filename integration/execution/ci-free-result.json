@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-14",
+  "repository": "knight-bili/codeg-rovai-workbench",
+  "status": "public_enabled_cloud_probe_pending",
+  "customer_authorization": "允许公开：先检查仓库及历史中的敏感内容和许可，再转换公开；发现问题先处理",
+  "visibility_before": "PRIVATE",
+  "visibility_after": "PUBLIC",
+  "anonymous_read": true,
+  "billing_settings_modified": false,
+  "account_billing_and_hard_budget": "not_verified_no_user_billing_scope",
+  "mvp_scope_reduced": false,
+  "pre_public_audit": {
+    "auditedHead": "a532697656049d91947e46b9cda8d52260384fd2",
+    "tool": "gitleaks 8.30.1 checksum verified",
+    "commits": 1948,
+    "includesAllOriginBranchesTagsAndClosedPr49": true,
+    "findings": 15,
+    "confirmedSecrets": 0,
+    "triage": {
+      "gitOrFileDigests": 7,
+      "syntheticCurlTestTokens": 3,
+      "syntheticFilePreviewToken": 1,
+      "idempotencyCreationKeys": 2,
+      "localStorageKey": 1,
+      "privateKeyDetectorStringConstants": 1
+    },
+    "sensitiveCredentialDatabaseDocumentPaths": 0,
+    "runMetadata": 156,
+    "downloadableLogs": 154,
+    "unavailableLogs": 2,
+    "downloadableLogSecrets": 0,
+    "issuePrReviewTextSecrets": 0,
+    "retainedLicenseHashes": 12
+  },
+  "storage": {
+    "artifactsBefore": 18,
+    "bytesBefore": 849700340,
+    "artifactsBackedUp": 18,
+    "allGithubArchiveDigestsVerified": true,
+    "artifactsAfter": 0,
+    "localBackupDirectory": "work/ci-free-20261014/artifacts",
+    "cacheBytesObserved": 627350595
+  },
+  "workflow_changes": {
+    "heavyChecks": "manual_select_platform_all_at_milestones",
+    "duplicatePushScaffoldRemoved": true,
+    "standardHostedRunnersOnly": true,
+    "foundationPackageUploadDefault": false,
+    "changedArtifactRetentionDays": 1,
+    "allOriginalTestCommandsPreserved": true,
+    "allPlatformOptionsPreserved": true
+  },
+  "validation": {
+    "checkedAt": "2026-10-14T09:28:43.084Z",
+    "workflowsParsed": 10,
+    "existingCommandsPreserved": true,
+    "scenarioCombinations": 10,
+    "retainedLicenseHashes": 12,
+    "rootLicensePreserved": true,
+    "allPlatformMatricesPreserved": true,
+    "actionlint": "1.7.12 passed (shellcheck and pyflakes unavailable)",
+    "documentationUnitTests": {
+      "passed": 10,
+      "failed": 0
+    },
+    "documentationVersion": "passed",
+    "documentationGovernance": "passed",
+    "scaffold": "passed: 81 source clusters / 48 work packages / 324 scenarios",
+    "foundationProtocol": "passed after current snapshot 152 to 153 correction"
+  },
+  "local_audit_directory": "work/ci-free-20261014",
+  "implementation": "CI config and current protocol snapshot only; uncommitted Context test expansion is excluded",
+  "checked_at": "2026-10-14T09:36:52.278Z"
+}
