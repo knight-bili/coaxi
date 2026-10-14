@@ -2,7 +2,7 @@
   "recordedAt": "2026-10-14T15:28:09.473Z",
   "baseline": "2b5f6fcf846238025a549bda4054235da2029645",
   "branch": "phase/i03-canvas-nodes",
-  "status": "Core_node_graph_locally_verified_Linux_and_remaining_I03_pending",
+  "status": "Core_node_graph_locally_verified_Linux_deferred_to_I03_stage_candidate",
   "donor": {
     "commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
     "audit": "i03-node-source-audit-result.json"
@@ -187,7 +187,7 @@
       "log": "work/i03/nodes-db-regression.log"
     },
     "repair": "The cfg(test/slow-tests) admissibility helper omitted schema154; production classification already included it. Existing owner now also rejects missing node columns/index. Both original failed owners rerun after repair.",
-    "windowsFullDBAfterRepair": "not_rerun_as_complete_roster; two_owners_passed; latest_full_roster_queued_for_Linux",
+    "windowsFullDBAfterRepair": "not_rerun_as_complete_roster; two_owners_passed; latest_full_roster_deferred_to_I03_stage_candidate",
     "format": "passed",
     "allTargets": "passed",
     "typecheck": "passed",
@@ -203,7 +203,11 @@
     ],
     "environmentFailure": "A targeted retry linked while the old Windows test exe was running: LNK1104. Retained and fixed by serializing before relink; no tests disabled.",
     "LinuxCurrent": {
-      "status": "pending_push_and_standard_runner_dispatch"
+      "status": "cancelled_not_qualified_deferred_to_I03_stage_candidate",
+      "runId": 38589903091,
+      "sourceCommit": "5a34d69c7e5bf3fd0046e873b0a71b64c7b2b124",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/actions/runs/38589903091",
+      "reason": "客户要求阶段编码集齐再集中验证，已取消本次按小切片启动的Linux完整回归；不重启、不把取消当通过"
     }
   },
   "boundary": {
@@ -222,5 +226,6 @@
     "business_deletion_funnel_and_file_preview_authorization",
     "real_interactive_PTY_ownership_resize_reconnect_and_shutdown",
     "required_platform_and_customer_acceptance"
-  ]
+  ],
+  "sourceCommit": "5a34d69c7e5bf3fd0046e873b0a71b64c7b2b124"
 }

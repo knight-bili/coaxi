@@ -39,4 +39,5 @@
 - 融合范围、阶段及验收先读 [integration/README.md](integration/README.md)，完整一期终点不得缩减。
 - 当前I01状态见 integration/foundation/README.md；current_version仍指向源骨架，不表示融合交付状态。
 - 中文回复和中文提交，不加工具署名，main由客户验收控制。
+- 融合期执行频率以 [阶段批量验证规则](integration/ci-cost-policy.md#阶段版本与验证频率) 为准：小切片先编码、自审和最低成本检查，多次本地提交；阶段编码集齐后冻结候选版本，集中编译/回归、少量推送和 Actions。不要按每个切片自动推送、全量编译或等待 CI。
 - CodeGraph仅用已有索引，缺索引使用文件查询；不隐式初始化，源码改动后同步已有索引。

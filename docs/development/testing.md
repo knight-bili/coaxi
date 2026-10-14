@@ -9,6 +9,11 @@ last_updated: 2026-10-12
 [`package.json#scripts`](../../package.json)是 JavaScript 命令名和组合的真源。Rust 测试
 目标由 Cargo workspace 和测试代码决定。
 
+融合期执行频率按客户2026-10-14确认的[阶段批量验证规则](../../integration/ci-cost-policy.md#阶段版本与验证频率)：
+小切片先编码/review、最低成本检查和本地commit，完整编译、staged全量路由、默认workspace与Actions
+集中到阶段候选；公共契约、安全/迁移或阻断后续开发时允许有原因的最小验证。
+以下owner、命令和测试准入规则继续有效，未执行的检查登记待验，不因减少触发次数而删测试或假报通过。
+
 ## Rust 测试准入与退役门槛
 
 技能包Context153/203迁移新增扩展owner `db::skill_pack_context::tests::migration_is_atomic_and_preserves_existing_authorities`，拥有三表约束/新默认值/收据的同事务切换、失败时恢复及既有结果和Blob保留。安装/成员owner只加自己的表，不拥有RunInput、Manifest和Run默认值，不能代替这一边界；复用既有私有SQLite模板，不启动模型。最低命令为 `cargo test -p rovai-core --features extended-tests --lib db::skill_pack_context`。实际有内容的旧/新Run恢复与输入预算由Context owner继续验证；结构通过不能替代最终Blob或真实Runtime资格。
