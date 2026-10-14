@@ -13,8 +13,8 @@
   "authorization": "客户要求持续自动推进；本项目阶段提交、推送及草稿PR自动执行；main合并与正式发布仍由客户控制",
   "current_branch": "phase/i02-workbench",
   "base_branch": "phase/i01-foundation",
-  "current_task": "I02-T02",
-  "current_slice": "OpenClaw正式ACP Host/Fleet暖复用及冷Host恢复、历史roster兼容已验；认证/完整Core与I02-T03继续",
+  "current_task": "I02-T03",
+  "current_slice": "固定技能包来源目录及Core/HTTP预览已验，显式安装更新卸载与成员实际投递继续",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,13 +33,14 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "实现隔离原生认证来源/完整配置解析与显式多Agent选择，沿原生owner/继承/刷新锁规则，先用合成SQLite与假认证夹具验证，不读日常凭据",
-    "将现有配对Host证明接入真实深检和Core业务绑定/重启，保留模型、工具和批准的独立证据要求",
-    "推进I02-T03 Skills/MCP来源、安装更新卸载及科研/Office/生成式卡片，继续不依赖客户资源的实现"
+    "实现Core拥有的显式安装/更新/卸载和来源/所有权/改动备份；不恢复旧Revision作为新索引",
+    "接入按成员选择、冻结实际输入和原生发现验证；Office、科研环境及UI渲染能力分别验收",
+    "继续MCP扫描/市场/安装与21Runtime授权投递；OpenClaw认证、Hermes信任/计量及T01待办继续研发",
+    "独立推进I03至I12，外部账号/设备/签名/付款资源保持客户待办，不削减一期范围"
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "native_Core_ACP_Host_Fleet_and_legacy_roster_verified_full_parity_pending",
+  "current_slice_status": "fixed_catalog_and_real_Core_HTTP_preview_verified_install_and_delivery_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -51,5 +52,6 @@
   "hermes_source_evidence": "i02-hermes-source-result.json",
   "hermes_core_evidence": "i02-hermes-core-result.json",
   "openclaw_core_evidence": "i02-openclaw-core-result.json",
-  "openclaw_session_evidence": "i02-openclaw-session-result.json"
+  "openclaw_session_evidence": "i02-openclaw-session-result.json",
+  "skill_catalog_evidence": "i02-skill-catalog-result.json"
 }

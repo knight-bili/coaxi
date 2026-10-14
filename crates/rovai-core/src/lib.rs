@@ -44,6 +44,7 @@ pub mod camp_open;
 pub mod canonical_activity;
 pub mod channel;
 pub mod claude_permission;
+pub mod codeg_skill_catalog;
 pub mod collaboration;
 pub mod command;
 pub mod compaction;

@@ -12,6 +12,8 @@ Skills 是模型可按需读取的文件指南，不改变工具、权限、消�
 
 ## 四种来源
 
+融合的固定 Codeg 技能包目录及内容预览由 [Codeg Skill Packs v1](../contracts/codeg-skill-packs-v1.md) 拥有。它登记专家、科研、Office、UI 与自定义来源类型；当前目录不授予安装或运行资格，不加入以下模型投递来源。显式安装、更新卸载与成员投递继续实施。
+
 | 来源 | 当前用途 | 权威与生命周期 |
 | --- | --- | --- |
 | Rovai 平台两项 | 新 Native Session 的固定 `ROVAI_PLATFORM_SKILLS` 索引 | Core 从执行 Host 的受管根读取；`cli-operations`、`memory-stewardship` 固定存在于集合中，缺源或无效 frontmatter 阻止新 Bootstrap 准备。 |

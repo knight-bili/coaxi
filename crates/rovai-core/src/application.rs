@@ -9295,6 +9295,15 @@ impl Core {
                 let database = self.database.lock().await;
                 Ok(serde_json::to_value(self.skill_library.list(&database)?)?)
             }
+            "skillPacks.list" => Ok(serde_json::to_value(
+                rovai_core::codeg_skill_catalog::list()?,
+            )?),
+            "skillPacks.read" => {
+                let params = serde_json::from_value(request.params.clone())?;
+                Ok(serde_json::to_value(
+                    rovai_core::codeg_skill_catalog::read(&params)?,
+                )?)
+            }
             "toolbox.list" => {
                 let managed =
                     rovai_core::managed_skills::ManagedSkills::for_data_dir(&self.data_dir)?;

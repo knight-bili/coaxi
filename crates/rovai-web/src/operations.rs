@@ -269,6 +269,10 @@ pub enum Operation {
     Skill,
     #[serde(rename = "toolbox.list")]
     ToolboxList,
+    #[serde(rename = "skillPacks.list")]
+    SkillPacksList,
+    #[serde(rename = "skillPacks.read")]
+    SkillPacksRead,
     #[serde(rename = "toolbox.read")]
     ToolboxRead,
     #[serde(rename = "toolbox.setMembers")]
@@ -578,6 +582,8 @@ impl Operation {
             Self::Skills => "skills.list",
             Self::Skill => "skills.get",
             Self::ToolboxList => "toolbox.list",
+            Self::SkillPacksList => "skillPacks.list",
+            Self::SkillPacksRead => "skillPacks.read",
             Self::ToolboxRead => "toolbox.read",
             Self::ToolboxSetMembers => "toolbox.setMembers",
             Self::NativeSkillsList => "nativeSkills.list",

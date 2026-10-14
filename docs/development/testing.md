@@ -11,6 +11,8 @@ last_updated: 2026-10-12
 
 ## Rust 测试准入与退役门槛
 
+融合技能包固定来源由新增纯函数 owner `codeg_skill_catalog::tests::catalog_preserves_pinned_sources_and_bounds_content_reads` 拥有。原先没有固定 Codeg 目录与嵌入资源，原生发现和旧 Revision owner 处理可变路径/数据库，无法验证这一来源的 Git 摘要、9 项 Office 外部依赖和跨包预览边界。该 owner 不建 SQLite、Home 或 Runtime，最低命令为 `cargo test -p rovai-core --lib codeg_skill_catalog::tests::catalog_preserves_pinned_sources_and_bounds_content_reads -- --exact`；Core/HTTP seam 由隔离 smoke 单独验证，不重复纯函数矩阵。
+
 Send 文件输入改动先运行 `cargo test -p rovai-core --bin rovai send_file_`，再运行
 `pnpm test:send-input-file`。后者构建当前 CLI，以隔离临时目录和本地 IPC 夹具验证请求传递、
 业务拒绝不降级、输入失败零 IPC、继承 stdin 不阻塞和 Unix FIFO/设备/权限拒绝；不启动 Core 或模型。

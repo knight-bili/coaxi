@@ -11,3 +11,4 @@ I00已自审修正并合入，I01基础构建与契约证据保留草稿；当�
 
 - [I01执行入口](foundation/README.md)。
 - [持续执行状态](execution/goal-state.json)、[需要客户补齐的待办](execution/customer-todos.json)。客户已授权沿I00至I12自动推进，阶段分支持续开发，main仍由客户验收控制。
+- [I02技能包来源与接口证据](execution/i02-skill-catalog-result.json)：固定目录及Core/HTTP预览已验，显式安装、更新卸载、成员投递、Office和生成式界面继续实施；完整一期范围不变。

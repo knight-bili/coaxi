@@ -132,6 +132,8 @@
     "skills.list",
     "skills.get",
     "toolbox.list",
+    "skillPacks.list",
+    "skillPacks.read",
     "toolbox.read",
     "toolbox.setMembers",
     "nativeSkills.list",

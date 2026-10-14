@@ -91,6 +91,14 @@
       "problem": "原生Gateway stdio/HTTP MCP、同名覆盖、真实工具授权/输出、Skills发现/更新和Usage增量归属需实际验证，不补零；仍属一期",
       "owner": "研发",
       "evidence": "i02-openclaw-core-result.json"
+    },
+    {
+      "id": "DEV-SKILL-PACK-LIFECYCLE",
+      "task": "I02-T03/I08/I12",
+      "status": "source_catalog_and_preview_verified_install_delivery_pending",
+      "owner": "研发",
+      "problem": "来源目录和只读预览已接入；显式安装/更新备份/卸载所有权、用户自定义、按成员投递和原生真实运行仍须实现；OfficeCLI和生成式UI渲染不能以有指南代替可用",
+      "evidence": "i02-skill-catalog-result.json"
     }
   ]
 }

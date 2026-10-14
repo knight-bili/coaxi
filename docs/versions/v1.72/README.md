@@ -652,3 +652,7 @@ Migration197扩展Runtime/Skills闭集并发布schema147，保留旧行与旧来
 合同见[OpenClaw Runtime v1](../../contracts/openclaw-runtime-v1.md)。本地元数据及进程检查不替代真实模型、工具、复杂认证、Bootstrap与平台资格；兼容整改仍属一期。
 
 后续正式Adapter/Fleet/ACP Host的新建、暖复用、冷Host精确恢复及缺失绑定拒绝已通过隔离Native补验；历史`agents.list`只在私有副本转为规范entries，源配置保持原字节。见[会话与原生配置记录](../../../integration/execution/i02-openclaw-session-result.json)，不升级为业务Core进程重启或真实模型资格。
+
+## 融合期技能包固定来源目录（2026-10-14）
+
+Core 接入固定 Codeg 的14专家、13科研、1个UI指南及9项Office外部声明，保留五类来源与多语言元数据，通过 `skillPacks.list/read` 提供同一份嵌入目录和内容预览。合同见 [Codeg Skill Packs v1](../../contracts/codeg-skill-packs-v1.md)。不自动安装或改原生配置；OfficeCLI、交互卡片渲染、显式安装更新卸载及成员投递仍属一期实施项，不能以目录移植代替工作包完成。
