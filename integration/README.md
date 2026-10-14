@@ -11,5 +11,5 @@ I00已自审修正并合入，I01基础构建与契约证据保留草稿；I02�
 
 - [I01执行入口](foundation/README.md)。
 - [持续执行状态](execution/goal-state.json)、[需要客户补齐的待办](execution/customer-todos.json)。客户已授权沿I00至I12自动推进，阶段分支持续开发，main仍由客户验收控制。
-- [I02技能包配置证据](execution/i02-skill-members-result.json)：目录、安装/更新卸载与队员配置已验；实际模型投递r1待客户确认，Office及其他一期功能继续实施。
+- [I02技能包配置证据](execution/i02-skill-members-result.json)：目录、安装/更新卸载与队员配置已验；[实际模型投递r1](../docs/versions/v1.72/model-context-change-skill-pack-member-delivery.md)已获客户明确确认，正在实施来源与解析，实际Run投递和真实Gate尚未完成。Office及其他一期功能继续实施。
 - [I03画布架构](../docs/architecture/canvas.md)：多画板Core基础正在实现；八类节点、业务绑定、布局、客户端视口和临时PTY均保留在一期。

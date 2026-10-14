@@ -11,10 +11,10 @@
     "phase_two": "一期完整融合交付后才开始自主新增"
   },
   "authorization": "客户要求持续自动推进；本项目阶段提交、推送及草稿PR自动执行；main合并与正式发布仍由客户控制",
-  "current_branch": "phase/i03-canvas",
-  "base_branch": "phase/i02-workbench",
-  "current_task": "I03-T01/I03-T03",
-  "current_slice": "多画板Core与实际HTTP已验，按客户反馈重写技能投递说明后继续八类节点",
+  "current_branch": "phase/i02-skill-delivery",
+  "base_branch": "phase/i03-canvas",
+  "current_task": "I02-T03",
+  "current_slice": "r1来源与解析准备完成本地自审；生产投递、153/203迁移和最终Blob恢复继续实施",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,14 +33,13 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "完成多画板生命周期/迁移/HTTP真实验证并提交阶段分支和草稿PR",
-    "移植八类节点、几何/分组/布局和画布交互；接现有业务对象及文件/终端权限",
-    "I02模型投递r1等待客户确认，其他Runtime与工作台补验继续；不改变模型来源",
-    "I04至I12及BUF完整推进，所有未补资源保留客户待办"
+    "按已确认r1接入pack独立来源与成员索引、消息选择、冻结/旧输入恢复及迁移；本地自审自测",
+    "取得专用模型身份/硬预算后补真实Gate；不自动调用付费模型",
+    "继续I03全部节点与业务对象/文件/PTY、I02其他整改及I04-I12完整范围"
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "multi_board_Core_lifecycle_and_HTTP_verified_nodes_UI_pending",
+  "current_slice_status": "r1_preparation_local_checks_passed_delivery_in_progress",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -55,8 +54,9 @@
   "openclaw_session_evidence": "i02-openclaw-session-result.json",
   "skill_catalog_evidence": "i02-skill-catalog-result.json",
   "skill_install_evidence": "i02-skill-install-result.json",
-  "system_goal_status": "active",
+  "system_goal_status": "paused_last_observed_despite_user_continue",
   "system_goal_verified_at": "2026-10-14T05:33:04.371Z",
   "skill_members_evidence": "i02-skill-members-result.json",
-  "canvas_boards_evidence": "i03-canvas-boards-result.json"
+  "canvas_boards_evidence": "i03-canvas-boards-result.json",
+  "skill_delivery_preparation_evidence": "i02-skill-delivery-preparation-result.json"
 }

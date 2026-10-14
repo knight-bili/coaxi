@@ -21,7 +21,7 @@ use crate::{
     },
     db::Database,
     platform::private_storage::{create_private_new_file, open_private_read_file},
-    skill::inspect_installed_pack_tree,
+    skill::{inspect_installed_pack_tree, inspect_installed_pack_tree_with_description},
 };
 
 pub(crate) const TABLE_SQL: &str = "CREATE TABLE skill_pack_installation (
@@ -151,6 +151,17 @@ pub struct SkillPackInstallationView {
     pub member_delivery_enabled: bool,
 }
 
+/// Internal source preparation only. The Run/candidate caller must independently
+/// check the receiving member's current choice before exposing this descriptor.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct SkillPackModelSource {
+    pub id: String,
+    pub name: String,
+    pub desc: String,
+    pub path: String,
+    pub source_version: String,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub(crate) struct Installation {
@@ -212,6 +223,28 @@ impl SkillPackStore {
 
     pub fn list(&self, connection: &Connection) -> Result<Vec<SkillPackInstallationView>> {
         self.views(&snapshot(connection)?)
+    }
+
+    pub(crate) fn model_source(
+        &self,
+        connection: &Connection,
+        skill_id: &str,
+    ) -> Result<Option<SkillPackModelSource>> {
+        let Some(row) = load(connection, skill_id)? else {
+            return Ok(None);
+        };
+        if row.status != "installed" {
+            return Ok(None);
+        }
+        let (content, unchanged, description) = self.inspect_details(&row)?;
+        ensure!(unchanged, "Installed Skill pack content changed");
+        Ok(Some(SkillPackModelSource {
+            id: format!("pack:{}", row.skill_id),
+            name: row.skill_id.clone(),
+            desc: description,
+            path: content.join("SKILL.md").to_string_lossy().into_owned(),
+            source_version: row.version()?,
+        }))
     }
 
     pub(crate) fn views(&self, rows: &[Installation]) -> Result<Vec<SkillPackInstallationView>> {
@@ -434,6 +467,11 @@ impl SkillPackStore {
     }
 
     fn inspect(&self, row: &Installation) -> Result<(PathBuf, bool)> {
+        self.inspect_details(row)
+            .map(|(path, unchanged, _)| (path, unchanged))
+    }
+
+    fn inspect_details(&self, row: &Installation) -> Result<(PathBuf, bool, String)> {
         ensure!(
             Uuid::parse_str(&row.active_version)?.to_string() == row.active_version,
             "Invalid owned package version"
@@ -472,8 +510,9 @@ impl SkillPackStore {
                 && owner.content_digest == row.content_digest,
             "Skill package ownership cannot be confirmed"
         );
-        let observed = inspect_installed_pack_tree(&content, &row.skill_id)?;
-        Ok((content, observed == row.content_digest))
+        let (observed, description) =
+            inspect_installed_pack_tree_with_description(&content, &row.skill_id)?;
+        Ok((content, observed == row.content_digest, description))
     }
 }
 
@@ -638,12 +677,37 @@ mod tests {
         let interrupted_path = store.inspect(&interrupted.installation).unwrap().0;
         assert!(interrupted_path.exists());
         assert!(store.list(database.connection()).unwrap().is_empty());
+        assert!(
+            store
+                .model_source(database.connection(), "brainstorming")
+                .unwrap()
+                .is_none()
+        );
         // No commit simulates interruption after staging; retry must not adopt it.
         let committed = apply(&store, &mut database, &first);
         assert_eq!(committed.result.code, "skill_pack.installed");
         let initial = store.list(database.connection()).unwrap().remove(0);
         assert_eq!(initial.availability, "available");
         let initial_path = PathBuf::from(initial.content_path.as_ref().unwrap());
+        let model_source = store
+            .model_source(database.connection(), "brainstorming")
+            .unwrap()
+            .unwrap();
+        assert_eq!(model_source.id, "pack:brainstorming");
+        assert_eq!(model_source.name, "brainstorming");
+        assert_eq!(
+            model_source.desc,
+            crate::managed_skills::read_frontmatter(
+                &initial_path.join("SKILL.md"),
+                "brainstorming"
+            )
+            .unwrap()
+        );
+        assert_eq!(
+            model_source.path,
+            initial_path.join("SKILL.md").to_string_lossy()
+        );
+        assert_eq!(model_source.source_version, initial.version);
         assert_ne!(initial_path, interrupted_path);
         let versions_before = fs::read_dir(store.root.join("versions")).unwrap().count();
         assert!(apply(&store, &mut database, &first).replayed);
@@ -666,6 +730,11 @@ mod tests {
             fs::read_to_string(initial_path.join("SKILL.md")).unwrap()
         );
         fs::write(initial_path.join("SKILL.md"), &user_text).unwrap();
+        assert!(
+            store
+                .model_source(database.connection(), "brainstorming")
+                .is_err()
+        );
         assert_eq!(
             store.list(database.connection()).unwrap()[0].availability,
             "modified"
@@ -771,6 +840,12 @@ mod tests {
         assert!(current_path.exists());
         let removed = store.list(database.connection()).unwrap().remove(0);
         assert_eq!(removed.availability, "removed");
+        assert!(
+            store
+                .model_source(database.connection(), "brainstorming")
+                .unwrap()
+                .is_none()
+        );
         drop(database);
         let mut reopened = Database::open(&directory).unwrap();
         assert_eq!(

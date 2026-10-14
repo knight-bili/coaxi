@@ -11,9 +11,13 @@ last_updated: 2026-10-12
 
 ## Rust 测试准入与退役门槛
 
+Windows更新交接回归复用 `rovai-host::server_updates::install::tests::handoff_requires_settlement_then_runs_the_new_program_with_original_arguments`：本机完整回归与同一二进制的定向执行均曾因进程退出后的短暂目录占用报拒绝访问。目录切换增加有上限的Windows重试后，持续占用及旧目录/候选保留继续由原 `directory_switch_restores_old_program_on_failure_and_retains_it_on_success` 拥有，扩展真实不共享删除的句柄负例；不新增测试或另建进程fixture。最小命令 `cargo test -p rovai-host --lib`。Unix路径仍直接执行一次重命名；不能把本机结果当作Unix更新资格。
+
+技能包模型来源准备复用 `skill_pack_installation::tests::version_publication_preserves_edits_fences_stale_commits_and_replays_across_reopen`，增加独立pack身份、实际路径、安装观察版本及完整YAML description断言。成员来源索引和Selection/Resolution v3解析复用下列成员持久化owner：验证A/B隔离、空索引、完整说明、身份去重及消息位置、伪造路径/名称/版本拒绝、三类遗漏、更新换版本及旧文件保留、重开和重装不恢复选择；不另建SQLite或Runtime fixture。原 `current_input_skill::tests::empty_selection_digest_is_stable` 继续拥有空选择的旧版本规范字节，完整YAML标量仍由原 `managed_skills::tests::frontmatter_preserves_yaml_scalar_value_in_model_index` 拥有。最低命令为 `cargo test -p rovai-core --features extended-tests --lib skill_pack` 和 `cargo test -p rovai-core --lib current_input_skill`。本批生产claim仍为v2、输入仍28/33，尚未验证最终Blob物化/恢复，也不授予实际模型资格。
+
 融合多画板新增扩展 owner `canvas_board::tests::board_migration_and_command_lifecycle_preserve_replay_and_atomic_snapshot`，拥有151→152加表与收据原子性、元数据边界、User作用域、CAS、结果失败回滚、一致读取、重开与删除后历史回放。现有成员/安装owner不拥有画板身份或修订，不能替代；复用已有私有SQLite模板而不另造Runtime。最低命令先 `cargo test -p rovai-core --features extended-tests --lib canvas_board -- --list`，再去掉 `--list` 执行。节点、PTY和真实模型不在此owner的资格范围。
 
-融合技能包成员选择由新增扩展 owner `skill_pack_members::tests::migration_and_member_choices_survive_reopen_and_uninstall_fences_old_replay` 拥有。它覆盖150→151建表/收据原子性、无默认成员、真实成员校验、陈旧观察拒绝、首次结果回放、更新保留选择、卸载事务回滚及重装不恢复选择。旧工具箱只有固定五项且不关联可卸载版本，不能证明新表与安装事务的交互；需要真实SQLite及私有文件fixture。最低命令先 `cargo test -p rovai-core --features extended-tests --lib skill_pack -- --list` 确认新增owner，再执行同一过滤；重复重开与回放用于证明持久化和旧命令不重新赋值。模型输入与成员实际投递由待确认的独立方案拥有，此测试不授予运行资格。
+融合技能包成员选择由新增扩展 owner `skill_pack_members::tests::migration_and_member_choices_survive_reopen_and_uninstall_fences_old_replay` 拥有。它覆盖150→151建表/收据原子性、无默认成员、真实成员校验、陈旧观察拒绝、首次结果回放、更新保留选择、卸载事务回滚及重装不恢复选择。旧工具箱只有固定五项且不关联可卸载版本，不能证明新表与安装事务的交互；需要真实SQLite及私有文件fixture。最低命令先 `cargo test -p rovai-core --features extended-tests --lib skill_pack -- --list` 确认新增owner，再执行同一过滤；重复重开与回放用于证明持久化和旧命令不重新赋值。模型输入与成员实际投递由已获人类确认的独立r1方案拥有，当前仍待实际Run、最终Blob和真实Gate验证，此测试不授予运行资格。
 
 融合技能包固定来源由新增纯函数 owner `codeg_skill_catalog::tests::catalog_preserves_pinned_sources_and_bounds_content_reads` 拥有。原先没有固定 Codeg 目录与嵌入资源，原生发现和旧 Revision owner 处理可变路径/数据库，无法验证这一来源的 Git 摘要、9 项 Office 外部依赖和跨包预览边界。该 owner 不建 SQLite、Home 或 Runtime，最低命令为 `cargo test -p rovai-core --lib codeg_skill_catalog::tests::catalog_preserves_pinned_sources_and_bounds_content_reads -- --exact`；Core/HTTP seam 由隔离 smoke 单独验证，不重复纯函数矩阵。
 
