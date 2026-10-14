@@ -8,4 +8,7 @@ I02-T03补留[Superpowers MIT许可](superpowers/LICENSE)和[固定来源核对]
 
 I03节点图行为依据[固定源码清单](../execution/i03-node-source-audit-result.json)中的Codeg提交移植，
 `crates/rovai-core/src/canvas_node.rs`保留来源及[Codeg Apache-2.0许可](codeg/LICENSE)指引。
-本批使用既有Rust/SQLite/Serde依赖，未引入新的第三方库；Renderer和PTY后续移植另行核对其依赖与通知。
+Core节点图批使用既有Rust/SQLite/Serde依赖。Renderer已按供体固定版本引入`@xyflow/react 12.11.5`；
+本次锁文件新增20个包的[版本、完整性与许可摘要](canvas-dependencies/packages.json)和[原文通知](canvas-dependencies/THIRD-PARTY-NOTICES.txt)已保留，
+许可为MIT、ISC与BSD-3-Clause，未运行安装脚本。图形库内部状态仅拥有交互呈现，不拥有Core业务或执行事实；
+PTY后续移植及I12最终发布包仍分别核对，不将本批通知保留当成完整发布资格。

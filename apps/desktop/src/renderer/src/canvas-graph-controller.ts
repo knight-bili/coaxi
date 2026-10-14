@@ -30,14 +30,15 @@ export function canvasGraphInvalidation(event: CoreEvent, boardId: string): { re
   if (event.method !== 'events.batch') return null
   const batch = params as unknown as Partial<EventBatch>
   if (batch.resetRequired) return { revision: 0, sequence: number(batch.throughGlobalSequence) }
-  let change: { revision: number; sequence: number } | null = null
+  let revision = 0, sequence = 0, changed = false
   for (const item of Array.isArray(batch.events) ? batch.events : []) {
     const payload = record(item.payload)
     if (item.eventType !== 'canvas.board.invalidated' || payload.boardId !== boardId) continue
-    change = { revision: Math.max(change?.revision ?? 0, number(payload.revision)),
-      sequence: Math.max(change?.sequence ?? 0, number(item.globalSequence)) }
+    changed = true
+    revision = Math.max(revision, number(payload.revision))
+    sequence = Math.max(sequence, number(item.globalSequence))
   }
-  return change
+  return changed ? { revision, sequence } : null
 }
 
 /** One instance owns one mounted Host/board scope. It cannot navigate to another board. */
@@ -117,13 +118,13 @@ export class CanvasGraphController {
     if (visible && !this.disposed) void this.refresh().catch(() => undefined)
   }
 
-  apply = (mutation: CanvasNodeMutation): Promise<StoredCommandResult> => {
+  apply = (mutation: CanvasNodeMutation, expectedRevision?: number): Promise<StoredCommandResult> => {
     const { snapshot, loading, readError, pending } = this.state
     if (this.disposed || !this.started || loading || readError || !snapshot?.board || pending) {
       return Promise.reject(new Error(pending ? '原操作仍待核对，请先处理原操作。' : '画布尚未同步，暂时无法修改。'))
     }
     const gesture: PendingGesture = { commandId: newCommandId(),
-      command: { boardId: this.boardId, expectedRevision: snapshot.board.revision, mutation: structuredClone(mutation) }, state: 'sending' }
+      command: { boardId: this.boardId, expectedRevision: expectedRevision ?? snapshot.board.revision, mutation: structuredClone(mutation) }, state: 'sending' }
     return this.send(gesture)
   }
 

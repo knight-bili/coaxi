@@ -62,6 +62,11 @@ describe('Canvas graph ownership and command recovery', () => {
     expect(transport.requests).toHaveLength(count)
     expect(canvasGraphInvalidation({ method: 'events.batch', params: { resetRequired: true, throughGlobalSequence: 30 } }, 'board')).toEqual({ revision: 0, sequence: 30 })
     expect(canvasGraphInvalidation({ method: 'events.batch', params: { events: [{ eventType: 'command.result', payload: {} }] } }, 'board')).toBeNull()
+    expect(canvasGraphInvalidation({ method: 'events.batch', params: { events: [
+      { eventType: 'canvas.board.invalidated', globalSequence: 31, payload: { boardId: 'board', revision: 3 } },
+      { eventType: 'canvas.board.invalidated', globalSequence: 32, payload: { boardId: 'foreign', revision: 90 } },
+      { eventType: 'canvas.board.invalidated', globalSequence: 33, payload: { boardId: 'board', revision: 4 } }
+    ] } }, 'board')).toEqual({ revision: 4, sequence: 33 })
   })
 
   it('disposes the previous Host/board scope before late reads can publish into the new scope', async () => {
@@ -131,6 +136,20 @@ describe('Canvas graph ownership and command recovery', () => {
     expect(current.getSnapshot().snapshot?.board?.revision).toBe(3)
     expect(writes).toBe(2)
     expect(current.getSnapshot().pending).toBeNull()
+  })
+
+  it('uses the version captured when editing or dragging began even if a newer read arrived before submit', async () => {
+    let revision = 1
+    const transport = fixture(async (method, params) => {
+      if (method === 'canvas.nodes.snapshot') return snapshot('board', revision)
+      return result((params as { commandId: string }).commandId, revision, 'rejected')
+    })
+    const current = controller(transport.client); current.start(); await current.refresh()
+    const gestureRevision = current.getSnapshot().snapshot!.board!.revision
+    revision = 4; await current.refresh()
+    expect((await current.apply({ type: 'move', moves: [{ nodeId: 'node', x: 48, y: 72 }] }, gestureRevision)).status).toBe('rejected')
+    expect(transport.requests.filter(item => item.method === 'canvas.nodes.apply')).toHaveLength(1)
+    expect(transport.requests.find(item => item.method === 'canvas.nodes.apply')?.params).toMatchObject({ command: { expectedRevision: 1 } })
   })
 
   it('reconciles unknown receipts without dispatch and leaves an overlapping explicit retry in control', async () => {

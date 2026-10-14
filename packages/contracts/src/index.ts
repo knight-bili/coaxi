@@ -4256,6 +4256,7 @@ export interface ApplyCanvasNodesCommand {
 }
 
 export type CoreMethod =
+  | 'commands.reconcile'
   | 'preferences.newConversation.get'
   | 'preferences.newConversation.setDefaults'
   | 'preferences.newConversation.setOneClick'

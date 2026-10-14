@@ -195,6 +195,7 @@
     "@radix-ui/react-popover": "1.1.23",
     "@radix-ui/react-tabs": "1.1.17",
     "@uiw/react-codemirror": "4.25.11",
+    "@xyflow/react": "12.11.5",
     "acorn": "8.15.0",
     "cron-parser": "5.10.0",
     "dingtalk-stream": "2.1.6-beta.1",

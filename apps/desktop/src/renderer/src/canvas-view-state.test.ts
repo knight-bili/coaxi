@@ -1,5 +1,5 @@
-import { expect, it } from 'vitest'
-import { canvasViewScope, initialCanvasViewState, loadCanvasViewState, parseCanvasViewport, pruneCanvasExpansions, saveCanvasViewState } from './canvas-view-state'
+import { expect, it, vi } from 'vitest'
+import { browserCanvasStorage, canvasViewScope, initialCanvasViewState, loadCanvasViewState, parseCanvasViewport, pruneCanvasExpansions, saveCanvasViewState } from './canvas-view-state'
 
 function storage() {
   const values = new Map<string, string>()
@@ -39,4 +39,8 @@ it('prunes only expansions against a successfully derived graph and tolerates un
   expect(loadCanvasViewState(denied, { host: 'host', core: 'core' }, 'board')).toEqual(initialCanvasViewState())
   expect(saveCanvasViewState(denied, { host: 'host', core: 'core' }, 'board', before)).toBe(false)
   expect(saveCanvasViewState(storage(), null, 'board', before)).toBe(false)
+})
+it('keeps the canvas usable when the origin denies even access to the localStorage property', () => {
+  vi.stubGlobal('window', { get localStorage() { throw new DOMException('denied', 'SecurityError') } })
+  try { expect(browserCanvasStorage()).toBeUndefined() } finally { vi.unstubAllGlobals() }
 })

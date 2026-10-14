@@ -10,6 +10,10 @@ export interface CanvasViewState {
   minimap: boolean
 }
 type ViewStorage = Pick<Storage, 'getItem' | 'setItem'>
+/** Access to the browser storage property itself can fail in a denied/sandboxed origin. */
+export function browserCanvasStorage(): ViewStorage | undefined {
+  try { return typeof window === 'undefined' ? undefined : window.localStorage } catch { return undefined }
+}
 const record = (value: unknown): Record<string, unknown> => value !== null && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {}
 const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
 const identity = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0 && !value.includes('\0')

@@ -1,0 +1,142 @@
+import { useRef, useState, type ReactNode } from 'react'
+import * as Dialog from '@radix-ui/react-dialog'
+import type { AgentProfile, CanvasConversationRef, CanvasNode, CanvasNodeInput, CanvasNodeKind, CanvasNodeMutation } from '@contracts'
+import { AppDialogBody, AppDialogContent, AppDialogFooter, AppDialogHeader } from './AppDialog'
+import { CARD_HEIGHT, CARD_WIDTH, FILE_CARD_HEIGHT, FILE_CARD_WIDTH, TERMINAL_CARD_HEIGHT, TERMINAL_CARD_WIDTH,
+  canvasReferenceKey, isRegionKind, regionHeightForRows, regionWidthForColumns } from './canvas-layout'
+import { UiText, uiAttribute } from './interface-language'
+import { readErrorMessage } from './error-message'
+
+export const canvasKindNames: Record<CanvasNodeKind, string> = {
+  folder: '工程区域', group: '项目分组', agent: '队员区域', conversation: '对话', custom: '自定义分组', note: '便签', file: '文件', terminal: '终端'
+}
+export const canvasColors = ['neutral', 'zinc', 'slate', 'stone', 'gray', 'red', 'rose', 'orange', 'green', 'blue', 'yellow', 'violet'] as const
+const colorNames = ['默认', '锌灰', '蓝灰', '石灰', '灰色', '红色', '玫瑰', '橙色', '绿色', '蓝色', '黄色', '紫色']
+export const canvasColorName = (color: string): string => colorNames[canvasColors.indexOf(color as typeof canvasColors[number])] ?? color
+export interface CanvasReferenceOption { reference: CanvasConversationRef; label: string }
+export interface CanvasFolderGroupOption { id: string; label: string }
+export type CanvasEditTarget = { type: 'create'; position: { x: number; y: number } } | { type: 'update'; row: CanvasNode }
+
+export function CanvasNodeEditor({ target, revision, latestRevision, agents, groups, references, blocked, pending, recovery, onClose, onSave }: {
+  target: CanvasEditTarget
+  revision: number
+  latestRevision: number | null
+  agents: AgentProfile[]
+  groups: CanvasFolderGroupOption[]
+  references: CanvasReferenceOption[]
+  blocked: boolean
+  pending: boolean
+  recovery: ReactNode
+  onClose(): void
+  onSave(mutation: CanvasNodeMutation, expectedRevision: number): Promise<void>
+}): React.JSX.Element {
+  const original = target.type === 'update' ? target.row : null
+  const [kind, setKind] = useState<CanvasNodeKind>(original?.data.kind ?? 'note')
+  const [title, setTitle] = useState(original?.data.title ?? ''), [content, setContent] = useState(original?.data.content ?? '')
+  const [color, setColor] = useState(original?.data.color ?? '')
+  const [path, setPath] = useState(''), [agentId, setAgentId] = useState(''), [groupId, setGroupId] = useState('')
+  const [referenceKey, setReferenceKey] = useState(''), [members, setMembers] = useState<string[]>([])
+  const [columns, setColumns] = useState(original?.data.gridColumns ?? 0), [rows, setRows] = useState(original?.data.gridRows ?? 0)
+  const [capturedRevision, setCapturedRevision] = useState(revision)
+  const [submitting, setSubmitting] = useState(false), [error, setError] = useState<string | null>(null)
+  const saving = useRef(false)
+  const stale = latestRevision !== null && latestRevision !== capturedRevision
+  const locked = pending || submitting
+  const choices = agents.filter(agent => !agent.removedAt)
+  const reference = references.find(item => canvasReferenceKey(item.reference) === referenceKey)?.reference
+  const validBinding = Boolean(original) || kind === 'note' || kind === 'custom'
+    || (kind === 'folder' || kind === 'file' || kind === 'terminal') && Boolean(path.trim())
+    || kind === 'agent' && choices.some(agent => agent.agentId === agentId)
+    || kind === 'group' && groups.some(group => group.id === groupId)
+    || kind === 'conversation' && Boolean(reference)
+  const close = () => { if (!locked) onClose() }
+  const save = async () => {
+    if (saving.current || locked || blocked || !validBinding || stale) return
+    saving.current = true
+    setSubmitting(true); setError(null)
+    try {
+      let mutation: CanvasNodeMutation
+      if (original) {
+        // Bindings are immutable. A note edit never resubmits geometry captured before a remote move.
+        mutation = { type: 'update', nodeId: original.id, patch: { title, color,
+          ...(kind === 'note' ? { content } : {}), ...(isRegionKind(kind) ? { gridColumns: columns, gridRows: rows } : {}) } }
+      } else {
+        const size = kind === 'conversation' ? { width: CARD_WIDTH, height: CARD_HEIGHT }
+          : kind === 'file' ? { width: FILE_CARD_WIDTH, height: FILE_CARD_HEIGHT }
+          : kind === 'terminal' ? { width: TERMINAL_CARD_WIDTH, height: TERMINAL_CARD_HEIGHT }
+          : isRegionKind(kind) ? { width: regionWidthForColumns(columns || 2), height: regionHeightForRows(rows || 1) }
+          : { width: 320, height: 220 }
+        if (target.type !== 'create') throw new Error(uiAttribute('节点编辑状态已改变，请重新打开。'))
+        const node: CanvasNodeInput = { kind, ...target.position, ...size, title, color,
+          ...(isRegionKind(kind) ? { gridColumns: columns, gridRows: rows } : {}) }
+        if (kind === 'note') node.content = content
+        if (kind === 'folder') node.folderPath = path
+        if (kind === 'file' || kind === 'terminal') node.path = path
+        if (kind === 'agent') node.agentId = agentId
+        if (kind === 'group') node.folderGroupId = groupId
+        if (kind === 'conversation') node.conversation = reference!
+        if (kind === 'custom') node.conversations = references.filter(item => members.includes(canvasReferenceKey(item.reference))).map(item => item.reference)
+        mutation = { type: 'create', node }
+      }
+      await onSave(mutation, capturedRevision)
+    } catch (error) { setError(readErrorMessage(error)) } finally { saving.current = false; setSubmitting(false) }
+  }
+  return <Dialog.Root open onOpenChange={open => { if (!open) close() }}><Dialog.Portal>
+    <Dialog.Overlay className="dialog-overlay app-dialog-overlay" />
+    <AppDialogContent className="canvas-node-editor" width="wide" tone="neutral"
+      onEscapeKeyDown={event => { if (locked) event.preventDefault() }} onPointerDownOutside={event => event.preventDefault()}>
+      <AppDialogHeader title={uiAttribute(original ? '编辑画布节点' : '添加到画布')}
+        description={uiAttribute('画布只保存布局和引用；删除节点不会删除工程、对话或文件。')} closeDisabled={locked} />
+      <form className="app-dialog-form" onSubmit={event => { event.preventDefault(); void save() }}>
+        <AppDialogBody>
+          <fieldset disabled={locked} className="canvas-editor-fields">
+            {!original && <label className="field-label"><UiText zh="类型" /><select value={kind} onChange={event => { setKind(event.target.value as CanvasNodeKind); setError(null) }}>
+              {(Object.keys(canvasKindNames) as CanvasNodeKind[]).map(value => <option key={value} value={value}>{uiAttribute(canvasKindNames[value])}</option>)}
+            </select></label>}
+            <label className="field-label"><UiText zh="标题" /><input data-dialog-autofocus value={title} onChange={event => setTitle(event.target.value)} autoComplete="off"
+              onKeyDown={event => { if (event.key === 'Enter' && event.nativeEvent.isComposing) event.preventDefault() }} /></label>
+            <label className="field-label"><UiText zh="标记颜色" /><select value={color} onChange={event => setColor(event.target.value)}>
+              <option value="">{uiAttribute('无')}</option>{canvasColors.map((value, i) => <option key={value} value={value}>{uiAttribute(colorNames[i])}</option>)}
+            </select></label>
+            {!original && (kind === 'folder' || kind === 'file' || kind === 'terminal') && <label className="field-label">
+              <UiText zh={kind === 'file' ? '文件绝对路径' : '工作目录绝对路径'} /><input value={path} onChange={event => setPath(event.target.value)} autoComplete="off" spellCheck={false} />
+            </label>}
+            {!original && kind === 'agent' && <label className="field-label"><UiText zh="队员" /><select value={agentId} onChange={event => setAgentId(event.target.value)}>
+              <option value="">{uiAttribute('请选择')}</option>{choices.map(agent => <option key={agent.agentId} value={agent.agentId}>{agent.displayName}</option>)}
+            </select></label>}
+            {!original && kind === 'group' && <label className="field-label"><UiText zh="项目分组" /><select value={groupId} onChange={event => setGroupId(event.target.value)}>
+              <option value="">{uiAttribute(groups.length ? '请选择' : '暂无项目分组')}</option>{groups.map(group => <option key={group.id} value={group.id}>{group.label}</option>)}
+            </select></label>}
+            {!original && kind === 'conversation' && <label className="field-label"><UiText zh="对话" /><select value={referenceKey} onChange={event => setReferenceKey(event.target.value)}>
+              <option value="">{uiAttribute('请选择')}</option>{references.map(item => <option key={canvasReferenceKey(item.reference)} value={canvasReferenceKey(item.reference)}>{item.label}</option>)}
+            </select></label>}
+            {!original && kind === 'custom' && <div className="canvas-editor-members" role="group" aria-label={uiAttribute('分组内的对话')}>
+              {references.map(item => { const key = canvasReferenceKey(item.reference); return <label key={key}>
+                <input type="checkbox" checked={members.includes(key)} disabled={!members.includes(key) && members.length >= 200}
+                  onChange={event => setMembers(current => event.target.checked ? [...current, key] : current.filter(value => value !== key))} />{item.label}
+              </label> })}
+            </div>}
+            {kind === 'note' && <label className="field-label"><UiText zh="便签内容（支持 Markdown）" />
+              <textarea rows={8} value={content} onChange={event => setContent(event.target.value)} />
+            </label>}
+            {original && <p className="canvas-binding-summary"><UiText zh={canvasKindNames[kind]} /> · {original.data.path || original.data.folderPath || original.data.title || uiAttribute('保留原有绑定')}</p>}
+            {isRegionKind(kind) && <div className="canvas-grid-fields">
+              <label className="field-label"><UiText zh="固定列数（0 为自动）" /><input type="number" min={0} max={12} step={1} value={columns} onChange={event => setColumns(Math.max(0, Math.min(12, Math.round(Number(event.target.value) || 0))))} /></label>
+              <label className="field-label"><UiText zh="固定行数（0 为自动）" /><input type="number" min={0} max={12} step={1} value={rows} onChange={event => setRows(Math.max(0, Math.min(12, Math.round(Number(event.target.value) || 0))))} /></label>
+            </div>}
+          </fieldset>
+          {stale && <p className="canvas-notice"><UiText zh="画布已更新，输入仍保留。核对后可按最新画布版本保存。" />
+            <button type="button" disabled={locked || blocked} onClick={() => { setCapturedRevision(latestRevision!); setError(null) }}><UiText zh="使用最新画布版本" /></button>
+          </p>}
+          {error && <p role="alert">{error}</p>}{recovery}
+        </AppDialogBody>
+        <AppDialogFooter>
+          <button className="quiet-button" type="button" disabled={locked} onClick={close}><UiText zh="取消" /></button>
+          <button className="primary-button conversation-primary-button" type="submit" disabled={blocked || locked || stale || !validBinding}>
+            <UiText zh={locked ? '保存中…' : '保存'} />
+          </button>
+        </AppDialogFooter>
+      </form>
+    </AppDialogContent>
+  </Dialog.Portal></Dialog.Root>
+}

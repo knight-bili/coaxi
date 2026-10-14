@@ -1,0 +1,67 @@
+.canvas-surface {
+  position: relative; display: flex; flex: 1; flex-direction: column; min-width: 0; min-height: 320px;
+  overflow: hidden; background: var(--canvas); color: var(--ink);
+  --xy-background-color: var(--canvas);
+  --xy-background-pattern-dots-color: var(--line-strong);
+  --xy-node-color: var(--ink); --xy-node-background-color: var(--surface);
+  --xy-node-border: 1px solid var(--line-strong); --xy-node-border-radius: 8px;
+  --xy-node-boxshadow-hover: none; --xy-node-boxshadow-selected: none;
+  --xy-controls-button-background-color: var(--surface-raised); --xy-controls-button-background-color-hover: var(--surface-hover);
+  --xy-controls-button-color: var(--ink); --xy-controls-button-color-hover: var(--ink);
+  --xy-controls-button-border-color: var(--line);
+  --xy-minimap-background-color: var(--surface); --xy-minimap-mask-background-color: var(--surface-muted);
+  --xy-minimap-node-background-color: var(--muted); --xy-resize-background-color: var(--ink);
+  --xy-selection-background-color: var(--neutral-selected); --xy-selection-border: 1px dashed var(--ink);
+}
+.canvas-surface > .react-flow { flex: 1; min-height: 0; }
+.canvas-toolbar { display: flex; z-index: 5; flex: 0 0 auto; flex-wrap: wrap; gap: 6px; padding: 8px 12px; border-bottom: 1px solid var(--line); background: var(--surface); }
+.canvas-toolbar button, .canvas-card button, .canvas-notice button {
+  padding: 5px 8px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface-raised);
+  color: var(--ink); font: inherit; cursor: pointer;
+}
+.canvas-surface button:hover:not(:disabled) { background: var(--surface-hover); }
+.canvas-surface button:disabled { opacity: .55; cursor: default; }
+.canvas-toolbar button[aria-pressed="true"] { background: var(--neutral-selected); border-color: var(--line-strong); }
+.canvas-notice { display: flex; z-index: 5; flex: 0 0 auto; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; padding: 8px 12px; background: var(--surface); border-bottom: 1px solid var(--line); line-height: 1.6; }
+.canvas-empty-hint { position: absolute; z-index: 4; top: 100px; left: 24px; right: 24px; margin: 0; color: var(--muted); pointer-events: none; }
+.canvas-empty-copy { margin: 8px 0; color: var(--muted); font-size: 12px; }
+.canvas-card { display: flex; width: 100%; height: 100%; box-sizing: border-box; flex-direction: column; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface); color: var(--ink); }
+.react-flow__node.selected .canvas-card { border-color: var(--ink); }
+.canvas-card-handle { display: flex; align-items: center; gap: 6px; height: 39px; flex: 0 0 39px; padding: 0 10px; border-bottom: 1px solid var(--line); cursor: grab; }
+.canvas-card-handle:active { cursor: grabbing; }
+.canvas-card-handle strong { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 500; }
+.canvas-color-dot { width: 8px; height: 8px; flex: 0 0 8px; border-radius: 50%; background: var(--faint); }
+.canvas-card[data-color="zinc"] .canvas-color-dot { background: color-mix(in srgb, var(--ink) 65%, var(--surface)); }
+.canvas-card[data-color="slate"] .canvas-color-dot { background: var(--brand); }
+.canvas-card[data-color="stone"] .canvas-color-dot { background: var(--attention); }
+.canvas-card[data-color="gray"] .canvas-color-dot { background: var(--muted); }
+.canvas-card[data-color="red"] .canvas-color-dot { background: var(--danger); }
+.canvas-card[data-color="rose"] .canvas-color-dot { background: color-mix(in srgb, var(--danger) 70%, var(--violet)); }
+.canvas-card[data-color="orange"] .canvas-color-dot { background: color-mix(in srgb, var(--danger) 50%, var(--ember)); }
+.canvas-card[data-color="green"] .canvas-color-dot { background: var(--success); }
+.canvas-card[data-color="blue"] .canvas-color-dot { background: var(--info); }
+.canvas-card[data-color="yellow"] .canvas-color-dot { background: var(--ember); }
+.canvas-card[data-color="violet"] .canvas-color-dot { background: var(--violet); }
+.canvas-card-handle button { padding: 2px 5px; font-size: 11px; }
+.canvas-card.is-collapsed .canvas-card-handle { border-bottom: 0; }
+.canvas-card-body { display: flex; flex: 1; min-width: 0; min-height: 0; flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; overflow: auto; font-size: 13px; }
+.canvas-card-body code { max-width: 100%; overflow-wrap: anywhere; white-space: pre-wrap; font-size: 12px; }
+.canvas-card-body .safe-markdown { width: 100%; }
+.canvas-member-grid { display: grid; gap: 12px; }
+.canvas-member-card { display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; box-sizing: border-box; height: 132px; min-width: 0; padding: 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-raised); }
+.canvas-member-card > button:first-child { max-width: 100%; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+.canvas-alignment-guides { position: absolute; top: 0; left: 0; overflow: visible; pointer-events: none; }
+.canvas-alignment-guides line { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 4 4; }
+.canvas-surface .react-flow__controls { box-shadow: none; border: 1px solid var(--line-strong); border-radius: 5px; overflow: hidden; }
+.canvas-surface .react-flow__minimap { border: 1px solid var(--line-strong); border-radius: 5px; }
+.canvas-node-editor { max-height: calc(100dvh - 48px); }
+.canvas-editor-fields { display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.canvas-editor-fields .field-label { display: flex; min-width: 0; flex-direction: column; gap: 5px; }
+.canvas-editor-fields :is(input:not([type="checkbox"]),textarea,select) { width: 100%; min-width: 0; box-sizing: border-box; padding: 8px 10px; }
+.canvas-editor-fields textarea { resize: vertical; min-height: 140px; }
+.canvas-grid-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.canvas-editor-members { display: flex; max-height: 180px; flex-direction: column; gap: 6px; overflow: auto; }
+.canvas-editor-members label { display: flex; gap: 8px; align-items: center; }
+.canvas-binding-summary { margin: 0; color: var(--muted); overflow-wrap: anywhere; }
+@media (max-width: 600px) { .canvas-toolbar { padding: 6px; gap: 4px; } .canvas-grid-fields { grid-template-columns: 1fr; } }
+@media (forced-colors: active) { .canvas-card, .canvas-member-card { border-color: CanvasText; } .react-flow__node.selected .canvas-card { border: 2px solid Highlight; } }

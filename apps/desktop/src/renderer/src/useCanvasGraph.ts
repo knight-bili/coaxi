@@ -30,7 +30,9 @@ export function useCanvasGraph(boardId: string) {
     return controller.current.value
   }, [client, boardId])
   return { ...(owned.client === client && owned.state.boardId === boardId ? owned.state : initialCanvasGraphState(boardId)),
-    apply: useCallback((mutation: CanvasNodeMutation) => active().apply(mutation), [active]),
+    apply: useCallback((mutation: CanvasNodeMutation, expectedRevision?: number) => active().apply(mutation, expectedRevision), [active]),
+    hasUnsettled: useCallback(() => controller.current?.client === client && controller.current.value.boardId === boardId
+      && Boolean(controller.current.value.getSnapshot().pending), [client, boardId]),
     refresh: useCallback(() => active().refresh(), [active]),
     retry: useCallback(() => active().retry(), [active]),
     reconcile: useCallback(() => active().reconcile(), [active]) }
