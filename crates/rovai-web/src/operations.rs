@@ -293,6 +293,10 @@ pub enum Operation {
     CanvasBoardsUpdate,
     #[serde(rename = "canvas.boards.delete")]
     CanvasBoardsDelete,
+    #[serde(rename = "canvas.nodes.snapshot")]
+    CanvasNodesSnapshot,
+    #[serde(rename = "canvas.nodes.apply")]
+    CanvasNodesApply,
     #[serde(rename = "toolbox.read")]
     ToolboxRead,
     #[serde(rename = "toolbox.setMembers")]
@@ -614,6 +618,8 @@ impl Operation {
             Self::CanvasBoardsCreate => "canvas.boards.create",
             Self::CanvasBoardsUpdate => "canvas.boards.update",
             Self::CanvasBoardsDelete => "canvas.boards.delete",
+            Self::CanvasNodesSnapshot => "canvas.nodes.snapshot",
+            Self::CanvasNodesApply => "canvas.nodes.apply",
             Self::ToolboxRead => "toolbox.read",
             Self::ToolboxSetMembers => "toolbox.setMembers",
             Self::NativeSkillsList => "nativeSkills.list",

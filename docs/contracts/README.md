@@ -534,6 +534,7 @@ Architecture 解释组件如何组成，Version 概览记录交付范围；它�
 | [Skill Pack Installation v1（融合）](skill-pack-installation-v1.md) | Core安装状态与私有版本、显式刷新/卸载、改动保留、观察版本和SQLite发布边界；成员投递继续实施 |
 | [Skill Pack Members v1（融合）](skill-pack-members-v1.md) | Core保存队员选择、安装版本观察与卸载原子清空；配置不等于模型投递 |
 | [Canvas Boards v1（融合）](canvas-boards-v1.md) | Core多画板元数据、User命令、修订冲突、首次回放与一致快照；节点和PTY仍待移植 |
+| [Canvas Nodes v1（融合）](canvas-nodes-v1.md) | 八类节点图、原子手势、共享画板CAS、精确会话引用与154/204存储；UI和PTY资格另验 |
 | [Skills Rebuild v1（历史）](skills-rebuild-v1.md) | 受管平台/工具箱、队员配置、原生发现、Selection/Resolution v2、动态索引与旧来源恢复 |
 | [Run Input Skill Links v2（历史）](current-input-skill-links-v2.md) | 旧 Library/Exposure 的 Structured Skill Mention 与 per-message `RUN_INPUT.messages[].skills` |
 | [Current Input Skill Links v1（历史）](current-input-skill-links-v1.md) | Direct Run send-time snapshot 与 optional sibling `CURRENT_INPUT.skills[{name,path}]` |

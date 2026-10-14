@@ -9359,6 +9359,29 @@ impl Core {
                     database.connection(),
                 )?)?)
             }
+            "canvas.nodes.snapshot" => {
+                #[derive(Deserialize)]
+                #[serde(rename_all = "camelCase", deny_unknown_fields)]
+                struct Params {
+                    board_id: String,
+                }
+                let params: Params = serde_json::from_value(request.params.clone())?;
+                let database = self.database.lock().await;
+                Ok(serde_json::to_value(rovai_core::canvas_node::snapshot(
+                    database.connection(),
+                    &params.board_id,
+                )?)?)
+            }
+            "canvas.nodes.apply" => {
+                let params: UserCommandParams<rovai_core::canvas_node::ApplyCanvasNodesCommand> =
+                    serde_json::from_value(request.params.clone())?;
+                let mut database = self.database.lock().await;
+                let execution = rovai_core::canvas_node::apply(
+                    &mut database,
+                    &user_command_envelope(params.command_id, params.command),
+                )?;
+                Ok(serde_json::to_value(execution.result)?)
+            }
             "canvas.boards.get" => {
                 #[derive(Deserialize)]
                 #[serde(rename_all = "camelCase", deny_unknown_fields)]

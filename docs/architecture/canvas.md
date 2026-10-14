@@ -15,6 +15,7 @@ not a substitute for interactive nodes, task execution or cross-platform qualifi
 
 Use Rovai Core's SQLite, typed Domain Command Gateway and authenticated Host transport.
 Board identity and metadata are owned by [Canvas Boards v1](../contracts/canvas-boards-v1.md).
+Node types, graph writes and snapshots are owned by [Canvas Nodes v1](../contracts/canvas-nodes-v1.md).
 Schema152/Migration202 appends one table to schema151 without changing previous model, skill,
 member, Mission or Thread facts. Retain the closed source-contract and existing command-result
 replay; do not copy Codeg's database or SeaORM/Tauri lifecycle into the Core.
@@ -50,9 +51,11 @@ joins need implementation and actual process tests before terminal nodes are qua
 
 ## Current evidence boundary
 
-This slice implements the multi-board Core lifecycle and snapshot only. UI board list/switching,
-all node rendering, graph persistence, business navigation, actual PTY, execution round-trip and
-platform acceptance remain pending. No canvas content is sent to a model by this slice; any
+The multi-board Core lifecycle and schema154/204 eight-kind node command/snapshot boundary
+are implemented. Local isolated Host/HTTP verifies the actual 153 upgrade, graph gestures and restart;
+the [node evidence](../../integration/execution/i03-canvas-nodes-result.json) records checks and remaining work. UI board list/switching,
+all node rendering, business navigation, actual PTY, execution round-trip and
+platform acceptance remain pending. No canvas content is sent to a model by these slices; any
 later model-visible context change must follow the existing revision confirmation governance.
 
 ## Node mapping and retained behavior

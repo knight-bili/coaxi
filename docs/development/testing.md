@@ -1526,6 +1526,28 @@ Schema153 的数据库回归继续复用现有 owner。旧来源夹具必须在�
 断言使用当前约束原因。完整 `db::` 扩展在 Windows 为109项；Linux 多一项现有的 Unix
 目录/符号链接隔离测试，必须在 Linux 实跑，不能以 Windows 数量替代跨平台资格。
 
+## 融合期节点图测试准入（2026-10-14）
+
+最低成本 owner `canvas_node::tests::eight_kinds_preserve_source_geometry_text_and_reference_limits`
+拥有新增八类节点闭集、有限几何、源尺寸/网格夹值、正文与4096标量路径、200精确成员去重和未知字段拒绝；
+不建立数据库或 Runtime。旧 Board owner 仅拥有元数据，无法证明这些节点字段和变换。
+最小命令 `cargo test -p rovai-core --lib canvas_node::tests`。
+
+新增扩展 owner `canvas_node::persistence_tests::migration_and_graph_gestures_preserve_scope_atomicity_replay_and_reopen`
+复用既有私有SQLite模板，拥有153→154加表/索引/回执原子性、精确Thread/Conversation引用、
+共享Board revision、跨画板拒写、批量校验和结果失败回滚、group接纳后再删pin、detach、prune、
+生产重开、删除后的首次结果回放及独立业务数据保留。无旧owner拥有节点图或204事务，较低层纯函数不足以覆盖。
+原Board owner和历史迁移仍保留；旧来源夹具只在节点表为空时回退，禁止丢弃图数据。
+最小命令先 `cargo test -p rovai-core --features extended-tests --lib canvas_node -- --list`，
+再去掉 `--list`；完整数据库扩展和默认workspace仍按实际修改执行。
+既有数据库准入 owner 同时扩展缺失节点必需列/索引的拒绝，保留等价SQL与缺失旧回执的准入；
+不增加平行数据库fixture或删除历史断言。
+真实Host/HTTP owner 为 `tools/integration/smoke-canvas-nodes.mjs`，验证实际153→154升级、
+原Board/Thread/单聊/技能字节与首次结果、八类节点、跨画板批量操作、分组/拆出、真实重启和删除。
+最小命令 `node tools/integration/smoke-canvas-nodes.mjs <旧153Host绝对路径> <当前154Host绝对路径> <证据根绝对路径>`；
+两版Host旁均需同版CLI，使用全新原生私有根及独立Home/Skill Library/MCP，不启动模型或PTY。
+fixture不能替代UI、PTY、模型或全平台资格；免费Linux Core流程增加既有 `canvas_` 模块过滤覆盖。
+
 ## 融合期技能包进程恢复验收（2026-10-14）
 
 `tools/integration/smoke-skill-pack-recovery.mjs` 拥有真实 Host/Core 进程到受控 ACP 的运输与恢复边界，

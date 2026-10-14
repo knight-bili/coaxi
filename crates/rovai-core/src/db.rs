@@ -353,8 +353,8 @@ impl MainThreadMigrationSource {
 }
 
 pub(crate) const CURRENT_DATA_CONTRACT_VERSION: &str = "v1.72";
-pub(crate) const CURRENT_PROJECTION_SCHEMA_VERSION: i64 = 153;
-const CURRENT_SCHEMA_MIGRATION_VERSION: i64 = 203;
+pub(crate) const CURRENT_PROJECTION_SCHEMA_VERSION: i64 = 154;
+const CURRENT_SCHEMA_MIGRATION_VERSION: i64 = 204;
 const V147_MIGRATION_SOURCE_DATA_CONTRACT_VERSION: &str = "v1.54";
 const V147_MIGRATION_SOURCE_PROJECTION_SCHEMA_VERSION: i64 = 96;
 const V145_MIGRATION_SOURCE_DATA_CONTRACT_VERSION: &str = "v1.53";
@@ -2958,7 +2958,10 @@ fn connection_has_admissible_data_contract(connection: &Connection) -> rusqlite:
         .and_then(Option::as_ref)
         .is_some_and(|(contract, schema, _)| {
             contract == CURRENT_DATA_CONTRACT_VERSION
-                && matches!(schema, 145 | 146 | 147 | 148 | 149 | 150 | 151 | 152 | 153)
+                && matches!(
+                    schema,
+                    145 | 146 | 147 | 148 | 149 | 150 | 151 | 152 | 153 | 154
+                )
         })
     {
         return Ok(matches!(
@@ -3367,11 +3370,12 @@ pub(crate) fn classify_database_contract(
     if marker.contract_version == CURRENT_DATA_CONTRACT_VERSION
         && matches!(
             marker.projection_schema_version,
-            145 | 146 | 147 | 148 | 149 | 150 | 151 | 152 | 153
+            145 | 146 | 147 | 148 | 149 | 150 | 151 | 152 | 153 | 154
         )
     {
         let expected_migration = match marker.projection_schema_version {
-            153 => CURRENT_SCHEMA_MIGRATION_VERSION,
+            154 => CURRENT_SCHEMA_MIGRATION_VERSION,
+            153 => 203,
             152 => 202,
             151 => 201,
             150 => 200,
@@ -3408,7 +3412,9 @@ pub(crate) fn classify_database_contract(
             && (marker.projection_schema_version < 152
                 || crate::canvas_board::schema_matches(connection)?)
             && (marker.projection_schema_version < 153
-                || skill_pack_context::schema_matches(connection)?);
+                || skill_pack_context::schema_matches(connection)?)
+            && (marker.projection_schema_version < 154
+                || crate::canvas_node::schema_matches(connection)?);
         return Ok(if !valid {
             DatabaseContractClassification::Unknown(Some(marker))
         } else if marker.projection_schema_version == CURRENT_PROJECTION_SCHEMA_VERSION {
@@ -9106,6 +9112,9 @@ impl Database {
             if !self.schema_migration_applied(203)? {
                 migration_step!("migration_203", skill_pack_context::migrate(self));
             }
+            if !self.schema_migration_applied(204)? {
+                migration_step!("migration_204", self.migrate_canvas_nodes());
+            }
             if let Err(error) =
                 crate::notification::maintain_notification_episode_retention(self.connection())
             {
@@ -9934,6 +9943,9 @@ impl Database {
         if !self.schema_migration_applied(203)? {
             migration_step!("migration_203", skill_pack_context::migrate(self));
         }
+        if !self.schema_migration_applied(204)? {
+            migration_step!("migration_204", self.migrate_canvas_nodes());
+        }
         if let Err(error) =
             crate::notification::maintain_notification_episode_retention(self.connection())
         {
@@ -10098,6 +10110,24 @@ impl Database {
                     if marker.projection_schema_version == 151
             ),
             "Skill package member schema admission failed"
+        );
+        tx.commit()?;
+        Ok(())
+    }
+
+    pub(crate) fn migrate_canvas_nodes(&mut self) -> Result<()> {
+        let tx = self
+            .connection
+            .transaction_with_behavior(TransactionBehavior::Immediate)?;
+        anyhow::ensure!(
+            matches!(classify_database_contract(&tx)?,DatabaseContractClassification::SupportedMigrationSource(ref marker) if marker.projection_schema_version==153),
+            "Canvas nodes require schema153"
+        );
+        tx.execute_batch(crate::canvas_node::TABLE_SQL)?;
+        tx.execute_batch("INSERT INTO schema_migration VALUES(204,datetime('now'));UPDATE rovai_data_contract SET projection_schema_version=154,updated_at=datetime('now') WHERE singleton=1;")?;
+        anyhow::ensure!(
+            matches!(classify_database_contract(&tx)?,DatabaseContractClassification::Current(ref marker) if marker.projection_schema_version==154),
+            "Canvas node schema admission failed"
         );
         tx.commit()?;
         Ok(())
@@ -39917,6 +39947,7 @@ mod tests {
         database.migrate_skill_pack_members().unwrap();
         database.migrate_canvas_boards().unwrap();
         skill_pack_context::migrate(&mut database).unwrap();
+        database.migrate_canvas_nodes().unwrap();
         assert!(connection_has_current_data_contract(database.connection()).unwrap());
         assert!(database.schema_migration_applied(200).unwrap());
         assert!(
@@ -43497,6 +43528,7 @@ mod tests {
         database.migrate_skill_pack_members().unwrap();
         database.migrate_canvas_boards().unwrap();
         skill_pack_context::migrate(&mut database).unwrap();
+        database.migrate_canvas_nodes().unwrap();
         assert!(connection_has_current_data_contract(database.connection()).unwrap());
         database.connection().execute_batch("DROP INDEX native_session_bootstrap_binding_idx;
             CREATE UNIQUE INDEX native_session_bootstrap_binding_idx ON native_session_bootstrap_evidence(native_binding_id,native_binding_generation)").unwrap();
@@ -43597,6 +43629,8 @@ mod tests {
             "old_receipts",
             "optional_usage",
             "required_column",
+            "node_column",
+            "node_index",
             "current_receipt",
         ] {
             connection
@@ -43644,11 +43678,24 @@ mod tests {
                         )
                         .unwrap();
                 }
+                "node_column" => {
+                    connection
+                        .execute_batch("ALTER TABLE canvas_node RENAME COLUMN x TO unavailable_x")
+                        .unwrap();
+                }
+                "node_index" => {
+                    connection
+                        .execute_batch("DROP INDEX canvas_node_board_idx")
+                        .unwrap();
+                }
                 _ => unreachable!(),
             }
             assert_eq!(
                 connection_has_current_data_contract(connection).unwrap(),
-                !matches!(change, "required_column" | "current_receipt"),
+                !matches!(
+                    change,
+                    "required_column" | "node_column" | "node_index" | "current_receipt"
+                ),
                 "{change}"
             );
             connection

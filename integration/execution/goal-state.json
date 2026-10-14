@@ -11,10 +11,10 @@
     "phase_two": "一期完整融合交付后才开始自主新增"
   },
   "authorization": "客户要求持续自动推进；本项目阶段提交、推送及草稿PR自动执行；main合并与正式发布仍由客户控制",
-  "current_branch": "phase/i02-skill-delivery",
-  "base_branch": "phase/i03-canvas",
-  "current_task": "I03-T01",
-  "current_slice": "I02未知输入进程恢复切片已验证并同步679650fa（workspace501/0/8、helper10/0、进程5项）；完整I02未验收。继续I03八类节点Core图模型与持久化，固定源码已核对。",
+  "current_branch": "phase/i03-canvas-nodes",
+  "base_branch": "phase/i02-skill-delivery",
+  "current_task": "I03-T01/I03-T03",
+  "current_slice": "八类Core节点图与153→154真实Host升级7组验证完成；I03交互UI、业务定位、文件预览及真实PTY继续，I02剩余SP与真实Gate待补。",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "按锁定Codeg aff1e6c源码实现八类节点的typed contract、Core图持久化、CAS命令及一致快照，再接UI；不能只交付元数据或缩减节点。",
+    "本切片同步草稿PR并验证Linux最新Core；继续八类画布交互、分组/布局和Core对象打开入口，不能把Core图基础当整个I03完成。",
     "继续I03业务绑定、几何布局/分组与客户端视口，最后接真实临时PTY及关闭/删除生命周期。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "i03_pinned_node_sources_audited_core_graph_implementation_next",
+  "current_slice_status": "i03_core_node_graph_locally_verified_linux_and_UI_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -57,7 +57,7 @@
   "skill_catalog_evidence": "i02-skill-catalog-result.json",
   "skill_install_evidence": "i02-skill-install-result.json",
   "system_goal_status": "active",
-  "system_goal_verified_at": "2026-10-14T11:55:24.829Z",
+  "system_goal_verified_at": "2026-10-14T15:28:09.479Z",
   "skill_members_evidence": "i02-skill-members-result.json",
   "canvas_boards_evidence": "i03-canvas-boards-result.json",
   "skill_delivery_preparation_evidence": "i02-skill-delivery-preparation-result.json",
@@ -65,10 +65,11 @@
   "ci_cost_policy": "integration/ci-cost-policy.md",
   "ci_access_evidence": "ci-free-result.json",
   "ci_access_status": "public_runner_verified_windows_and_linux_database_regression_passed",
-  "ci_next_action": "run38564836044已success且110项和Unix日志核对；后续按里程碑免费标准runner验证，不重复调度已完成运行",
+  "ci_next_action": "推送本切片后运行免费Linux Core完整当前回归；原成功/失败记录保留，不重复调度旧源码。",
   "skill_delivery_matrix_evidence": "i02-skill-delivery-matrix-result.json",
   "database_regression_repair_evidence": "i02-db153-regression-repair-result.json",
   "skill_process_recovery_evidence": "i02-skill-process-recovery-result.json",
   "skill_process_recovery_source_commit": "679650fa65c4e96b32bf75e8e5c95ef0a999a498",
-  "canvas_node_source_audit_evidence": "i03-node-source-audit-result.json"
+  "canvas_node_source_audit_evidence": "i03-node-source-audit-result.json",
+  "canvas_nodes_evidence": "i03-canvas-nodes-result.json"
 }

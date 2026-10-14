@@ -80,9 +80,11 @@ cross-board authority from response arrival order.
 
 Schema152/Migration202 atomically adds `canvas_board`, the receipt and marker to exact schema151.
 It does not modify any existing installation, member choice, Run input or model contract.
-Deletion retains a metadata tombstone to avoid identity reuse; there are no nodes or PTY processes
-in this slice. Node cleanup and actual ephemeral terminal settlement must join the deletion lifecycle
-before those capabilities are introduced; a tombstone alone must never claim terminal settlement.
+Deletion retains a metadata tombstone to avoid identity reuse. [Canvas Nodes v1](canvas-nodes-v1.md)
+extends this lifecycle in schema154: nodes are deleted in the same transaction and graph writes use
+the same board revision. There are no interactive PTY processes in these slices. Actual ephemeral
+terminal settlement must join the deletion lifecycle before that capability is introduced;
+a tombstone alone must never claim terminal settlement.
 
 ## Verification boundary
 

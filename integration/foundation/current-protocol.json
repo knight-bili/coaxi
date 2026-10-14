@@ -3,7 +3,7 @@
   "purpose": "当前融合工作树接口合同；固定来源与I01旧二进制证据保持原快照",
   "hostWebProtocolVersion": 4,
   "coreDataContractVersion": "v1.72",
-  "coreProjectionSchemaVersion": 153,
+  "coreProjectionSchemaVersion": 154,
   "canonicalWebOperations": [
     "missions.workspace.cleanup",
     "missions.cleanup.list",
@@ -144,6 +144,8 @@
     "canvas.boards.create",
     "canvas.boards.update",
     "canvas.boards.delete",
+    "canvas.nodes.snapshot",
+    "canvas.nodes.apply",
     "toolbox.read",
     "toolbox.setMembers",
     "nativeSkills.list",

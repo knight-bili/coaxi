@@ -4174,6 +4174,87 @@ export interface DeleteCanvasBoardCommand {
   expectedRevision: number
 }
 
+export type CanvasNodeKind = 'folder' | 'group' | 'agent' | 'conversation' | 'custom' | 'note' | 'file' | 'terminal'
+
+export interface CanvasConversationRef {
+  threadId: string
+  conversationId: string | null
+}
+
+export interface CanvasNodeData {
+  kind: CanvasNodeKind
+  folderPath: string | null
+  folderGroupId: string | null
+  runtimeKind: string | null
+  agentId: string | null
+  conversation: CanvasConversationRef | null
+  conversations: CanvasConversationRef[]
+  title: string | null
+  content: string | null
+  path: string | null
+  color: string | null
+  collapsed: boolean
+  gridColumns: number
+  gridRows: number
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
+export type CanvasNodeInput = Pick<CanvasNodeData, 'kind' | 'x' | 'y' | 'width' | 'height'>
+  & Partial<Omit<CanvasNodeData, 'kind' | 'x' | 'y' | 'width' | 'height'>>
+
+export interface CanvasNode {
+  id: string
+  boardId: string
+  data: CanvasNodeData
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CanvasGraphSnapshot {
+  board: CanvasBoard | null
+  nodes: CanvasNode[]
+  throughGlobalSequence: number
+}
+
+export interface CanvasNodePatch {
+  title?: string
+  content?: string
+  color?: string
+  collapsed?: boolean
+  gridColumns?: number
+  gridRows?: number
+  x?: number
+  y?: number
+  width?: number
+  height?: number
+  memberAdd?: CanvasConversationRef
+  memberRemove?: CanvasConversationRef
+}
+
+export interface CanvasNodeMove {
+  nodeId: string
+  x: number
+  y: number
+}
+
+export type CanvasNodeMutation =
+  | { type: 'create'; node: CanvasNodeInput }
+  | { type: 'update'; nodeId: string; patch: CanvasNodePatch }
+  | { type: 'move'; moves: CanvasNodeMove[] }
+  | { type: 'group'; targetNodeId: string | null; newRegion: CanvasNodeInput | null; conversations: CanvasConversationRef[]; consumeNodeIds: string[] }
+  | { type: 'detach'; regionId: string; conversation: CanvasConversationRef; x: number; y: number }
+  | { type: 'delete'; nodeIds: string[] }
+  | { type: 'prune' }
+
+export interface ApplyCanvasNodesCommand {
+  boardId: string
+  expectedRevision: number
+  mutation: CanvasNodeMutation
+}
+
 export type CoreMethod =
   | 'preferences.newConversation.get'
   | 'preferences.newConversation.setDefaults'
@@ -4271,6 +4352,8 @@ export type CoreMethod =
   | 'canvas.boards.create'
   | 'canvas.boards.update'
   | 'canvas.boards.delete'
+  | 'canvas.nodes.snapshot'
+  | 'canvas.nodes.apply'
   | 'toolbox.read'
   | 'toolbox.setMembers'
   | 'nativeSkills.list'

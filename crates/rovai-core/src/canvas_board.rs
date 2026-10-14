@@ -122,10 +122,10 @@ fn from_row(row: &Row<'_>) -> rusqlite::Result<CanvasBoard> {
         updated_at: row.get(6)?,
     })
 }
-fn find(connection: &Connection, id: &str) -> Result<Option<CanvasBoard>> {
+pub(crate) fn find(connection: &Connection, id: &str) -> Result<Option<CanvasBoard>> {
     Ok(connection.query_row("SELECT id,name,description,color,revision,created_at,updated_at FROM canvas_board WHERE id=?1 AND deleted_at IS NULL", [id], from_row).optional()?)
 }
-fn sequence(connection: &Connection) -> rusqlite::Result<i64> {
+pub(crate) fn sequence(connection: &Connection) -> rusqlite::Result<i64> {
     connection.query_row(
         "SELECT COALESCE(MAX(global_sequence),0) FROM event_log",
         [],
@@ -153,7 +153,7 @@ pub fn get(connection: &Connection, id: &str) -> Result<CanvasBoardSnapshot> {
     })
 }
 
-fn allowed<C>(envelope: &CommandEnvelope<C>) -> bool {
+pub(crate) fn allowed<C>(envelope: &CommandEnvelope<C>) -> bool {
     matches!(envelope.actor, ActorRef::User { .. })
         && envelope.camp_id.is_none()
         && envelope.execution_epoch.is_none()
@@ -166,7 +166,7 @@ fn text(value: Option<&str>, max: usize) -> std::result::Result<Option<String>, 
     }
     Ok(value.map(str::to_owned))
 }
-fn color(value: Option<&str>) -> std::result::Result<Option<String>, ()> {
+pub(crate) fn color(value: Option<&str>) -> std::result::Result<Option<String>, ()> {
     let value = text(value, 20)?;
     if value.as_ref().is_some_and(|value| {
         ![
@@ -188,7 +188,7 @@ fn entity(id: &str) -> Option<EntityReference> {
         entity_id: id.into(),
     })
 }
-fn invalidated(
+pub(crate) fn invalidated(
     tx: &rusqlite::Transaction<'_>,
     id: &str,
     revision: i64,
@@ -262,6 +262,7 @@ pub fn delete(
             .checked_add(1)
             .ok_or_else(|| anyhow::anyhow!("Canvas board revision overflow"))?;
         let now = chrono::Utc::now().to_rfc3339();
+        tx.execute("DELETE FROM canvas_node WHERE board_id=?1", [&board.id])?;
         tx.execute(
             "UPDATE canvas_board SET revision=?2,updated_at=?3,deleted_at=?3 WHERE id=?1",
             params![board.id, revision, now],
