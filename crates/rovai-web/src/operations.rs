@@ -360,6 +360,8 @@ pub enum Operation {
     MemberClearRuntime,
     #[serde(rename = "workspaces.inspect")]
     WorkspaceInspect,
+    #[serde(rename = "workspaces.worktrees")]
+    WorkspaceWorktrees,
     #[serde(rename = "workspaces.validate")]
     WorkspaceValidate,
     #[serde(rename = "agentRunImages.read")]
@@ -570,6 +572,7 @@ impl Operation {
             Self::MemberRuntime => "members.runtime.set",
             Self::MemberClearRuntime => "members.runtime.clear",
             Self::WorkspaceInspect => "workspaces.inspect",
+            Self::WorkspaceWorktrees => "workspaces.worktrees",
             Self::WorkspaceValidate => "workspaces.validate",
             Self::RunImages => "agentRunImages.read",
             Self::RunFiles => "agentRunFileChanges.get",

@@ -18,6 +18,7 @@ import { useThreadClient } from './camp-client'
 import { SafeMarkdown } from './SafeMarkdown'
 import { UiText, uiAttribute, useInterfaceLanguage } from './interface-language'
 import { readErrorMessage } from './error-message'
+import { useCanvasFolders } from './useCanvasFolders'
 import './canvas.css'
 
 export interface CanvasLeaveGuard { canLeave(): Promise<boolean>; isBlocked(): boolean }
@@ -132,10 +133,14 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
   const graphBlocked = graph.loading || Boolean(graph.readError || graph.pending) || !graph.snapshot?.board
   const blocked = graphBlocked || Boolean(editor || deletion)
   const rows = graph.snapshot?.nodes ?? EMPTY_ROWS
+  const folderPaths = useMemo(() => rows.flatMap(row => row.data.kind === 'folder' && row.data.folderPath ? [row.data.folderPath]
+    : row.data.kind === 'group' ? props.groups?.find(group => group.id === row.data.folderGroupId)?.projectPaths ?? [] : []), [rows, props.groups])
+  const folders = useCanvasFolders(folderPaths)
+  const folderResolutions = props.folderResolutions ?? folders.resolutions
   const referenceOptions = useMemo(() => props.references ?? canvasReferenceOptions(catalog.items), [props.references, catalog.items, language])
   const regions = useMemo(() => props.resolvedMembers ?? new Map(rows.filter(row => isRegionKind(row.data.kind)).map(row => [row.id,
-    resolveCanvasRegion(row, catalog, props.groups ?? EMPTY_GROUPS, props.folderResolutions)])),
-  [props.resolvedMembers, rows, catalog.items, catalog.complete, catalog.error, props.groups, props.folderResolutions, language])
+    resolveCanvasRegion(row, catalog, props.groups ?? EMPTY_GROUPS, folderResolutions)])),
+  [props.resolvedMembers, rows, catalog.items, catalog.complete, catalog.error, props.groups, folderResolutions, language])
   const expanded = useMemo(() => new Set(view.expandedRegions), [view.expandedRegions])
   const derived = useMemo<FlowNode[]>(() => rows.map(row => {
     const d = row.data, region = isRegionKind(d.kind)
@@ -256,6 +261,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     if (moves.length) mutate({ type: 'move', moves }, graph.snapshot!.board!.revision)
   }}>
     <div className="canvas-toolbar">
+      <button type="button" onClick={() => { props.onRefreshReferences?.(); void folders.refresh() }}><UiText zh="刷新关联" /></button>
       <button type="button" disabled={blocked} onClick={() => {
         const bounds = flow.getViewport(), element = surface.current?.getBoundingClientRect()
         const point = element ? flow.screenToFlowPosition({ x: element.left + element.width / 2, y: element.top + element.height / 2 }) : { x: -bounds.x / bounds.zoom, y: -bounds.y / bounds.zoom }
@@ -320,7 +326,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     </PresentationContext.Provider>
     {editor && <CanvasNodeEditor target={editor.target} revision={editor.revision} latestRevision={graph.snapshot?.board?.revision ?? null}
       agents={props.agents} groups={props.groups ?? EMPTY_GROUPS}
-      references={referenceOptions} referencesComplete={catalog.complete} onRefreshReferences={props.onRefreshReferences}
+      references={referenceOptions} referencesComplete={catalog.complete} onRefreshReferences={() => { props.onRefreshReferences?.(); void folders.refresh() }}
       blocked={graphBlocked} pending={Boolean(graph.pending)} recovery={recovery} onClose={closePanel}
       commandError={issue}
       onSave={(mutation, revision) => submit(mutation, revision, true)} />}

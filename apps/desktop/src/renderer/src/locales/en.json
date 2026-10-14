@@ -3874,5 +3874,9 @@
   "配置或安装版本已变化，请按最新状态重试。": "The configuration or installed version changed. Retry using the latest state.",
   "技能包已卸载，请刷新安装状态。": "The skill pack was uninstalled. Refresh its installation state.",
   "正在读取队员选择…": "Loading teammate choices…",
-  "选择队员 {0}": "Select teammate {0}"
+  "选择队员 {0}": "Select teammate {0}",
+  "刷新关联": "Refresh links",
+  "工程工作树关系不一致。": "The project worktree relationships are inconsistent.",
+  "工程关系目录已关闭。": "The project relationship directory is closed.",
+  "工作树关系读取失败，已保留已知对话。": "Could not read worktree relationships. Known conversations are preserved."
 }

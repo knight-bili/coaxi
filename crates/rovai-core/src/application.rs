@@ -867,6 +867,7 @@ fn request_uses_independent_read_queue(method: &str) -> bool {
             | "navigation.groupCamps"
             | "navigation.findCamp"
             | "canvas.references.page"
+            | "workspaces.worktrees"
     )
 }
 
@@ -10050,6 +10051,17 @@ impl Core {
                 )
                 .await?;
                 Ok(serde_json::to_value(inspection)?)
+            }
+            "workspaces.worktrees" => {
+                #[derive(Deserialize)]
+                #[serde(deny_unknown_fields)]
+                struct WorktreesParams {
+                    path: String,
+                }
+                let params: WorktreesParams = serde_json::from_value(request.params.clone())?;
+                Ok(serde_json::to_value(
+                    git::inspect_worktrees(Path::new(&params.path), &self.data_dir).await?,
+                )?)
             }
             "workspaces.validate" => {
                 let params: WorkspaceInspectParams =
@@ -30204,6 +30216,7 @@ done
         assert!(request_uses_independent_read_queue("navigation.camps"));
         assert!(request_uses_independent_read_queue("navigation.groupCamps"));
         assert!(request_uses_independent_read_queue("navigation.findCamp"));
+        assert!(request_uses_independent_read_queue("workspaces.worktrees"));
         assert!(request_uses_independent_read_queue(
             "canvas.references.page"
         ));

@@ -38,8 +38,10 @@ Controlled client tests cover this cache boundary; mounted UI and actual Core re
 conversations in one transaction per page. A fixed identity upper bound keeps a scan finite while activity changes;
 the directory controller treats mid-scan invalidation as incomplete and schedules a trailing read. It does not freeze
 one transaction across pages or infer live Runtime qualification. The renderer uses this directory for choices and
-member regions rather than treating sidebar prefixes as complete. Folder/group worktree relations remain explicit
-inputs; absent relations are visibly incomplete, never guessed from path prefixes. Current SQL fixture and controlled
+member regions rather than treating sidebar prefixes as complete. Folder/group worktree relations come from the
+read-only [Workspace Worktrees v1](../contracts/workspace-worktrees-v1.md) Git topology operation. Main regions absorb
+explicit linked checkouts; a child or project subdirectory stays exact. Missing topology remains visibly incomplete,
+never guessed from path prefixes; real folder-group preferences still need implementation. Current SQL fixture and controlled
 client results do not qualify the new Rust route or mounted UI before stage verification.
 
 The next I03 slices port board-unit geometry, grid regions, collapse/expand, dragging,

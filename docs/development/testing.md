@@ -16,6 +16,12 @@ last_updated: 2026-10-12
 
 ## Rust 测试准入与退役门槛
 
+工作树NUL解析由`git::worktrees::tests::nul_records_preserve_path_characters_and_reject_incomplete_or_ambiguous_topology`
+新增纯函数owner拥有：旧Git文本读取不能处理带换行路径和bare/locked/prunable分帧，亦无等价owner。
+真实主/子worktree、子目录、失效checkout与受保护目录复用`git::tests`现有仓库fixture扩展，不新增进程测试owner。
+最小命令`cargo test -p rovai-core --lib git::`按阶段候选执行；本切片未编译不计通过。Web读队列和浏览器传递
+扩展既有owner，画布前端另有受控并发/迟到/失败测试；纯Git格式见证不替代Rust或真实Host。
+
 画布目录`read_model::canvas_references`新增最小SQLite owner，拥有跨Thread keyset上界、可信编辑端pending可见性、
 Mission纳入、active成员与私有Conversation归属及只读计数。旧Navigation owner只拥有侧栏摘要/窗口，不能证明这些
 跨表目录关系；新owner只建所读列，不加载完整Database/Runtime。最低命令`cargo test -p rovai-core --lib read_model::canvas_references`，

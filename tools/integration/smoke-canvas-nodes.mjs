@@ -71,7 +71,8 @@ const withDB = action => {const db = new DatabaseSync(path.join(dataDir, 'rovai.
 const sourcePaths = ['crates/rovai-core/src/canvas_node.rs', 'crates/rovai-core/src/canvas_board.rs',
   'crates/rovai-core/src/db.rs', 'crates/rovai-core/src/db_skill_pack_context.rs',
   'crates/rovai-core/src/application.rs', 'crates/rovai-web/src/operations.rs',
-  'crates/rovai-core/src/read_model.rs', 'crates/rovai-core/src/read_model/canvas_references.rs'];
+  'crates/rovai-core/src/read_model.rs', 'crates/rovai-core/src/read_model/canvas_references.rs',
+  'crates/rovai-core/src/git.rs', 'crates/rovai-core/src/git/worktrees.rs'];
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 try {
   await start(oldBinary);
@@ -144,6 +145,15 @@ try {
   assert(directoryItem.privateConversations.some(item => item.conversationId === conversationId && item.agentId === memberId));
   assert.equal((await call('canvas.nodes.snapshot', {boardId})).throughGlobalSequence, sequenceBeforeDirectory);
   record('authenticated_keyset_directory_preserves_exact_member_private_identity_and_performs_no_business_writes');
+  assert.equal((await raw('workspaces.worktrees', {path: fixture}, false)).status, 401);
+  for (const params of [{path: fixture, sql: true}, {path: dataDir}, {path: 'relative'}]) {
+    assert((await (await raw('workspaces.worktrees', params)).json()).error);
+  }
+  const plainTopology = await call('workspaces.worktrees', {path: fixture});
+  assert.equal(plainTopology.schemaVersion, 1); assert.equal(plainTopology.requestedPath, fixture);
+  assert.equal(plainTopology.repositoryRoot, null); assert.deepEqual(plainTopology.worktrees, []);
+  assert.equal((await call('canvas.nodes.snapshot', {boardId})).throughGlobalSequence, sequenceBeforeDirectory);
+  record('authenticated_worktree_read_rejects_managed_paths_and_unknown_params_without_business_writes');
   assert.equal((await raw('canvas.nodes.snapshot', {boardId}, false)).status, 401);
   const malformed = await raw('canvas.nodes.snapshot', {boardId, path: 'C:/fake'}); assert((await malformed.json()).error);
   const other = await command('canvas.boards.create', {name: '另一块画板'}); applied(other);

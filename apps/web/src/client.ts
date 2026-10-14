@@ -182,6 +182,7 @@ export const WEB_OPERATIONS = [
   'members.runtime.set',
   'members.runtime.clear',
   'workspaces.inspect',
+  'workspaces.worktrees',
   'workspaces.validate',
   'agentRunImages.read',
   'agentRunFileChanges.get',

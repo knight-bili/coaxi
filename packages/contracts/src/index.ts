@@ -744,6 +744,24 @@ export interface WorkspaceInspection extends WorkspaceSelection {
   gitObservation: GitObservation
 }
 
+export interface WorkspaceWorktree {
+  projectPath: string
+  isMain: boolean
+  bare: boolean
+  locked: boolean
+  prunable: boolean
+  available: boolean
+}
+
+export interface WorkspaceWorktrees {
+  schemaVersion: 1
+  requestedPath: string
+  projectPath: string
+  repositoryRoot: string | null
+  mainWorktreePath: string | null
+  worktrees: WorkspaceWorktree[]
+}
+
 export interface StartPreflightResult {
   admissible: boolean
   checkedAt: string
@@ -4490,6 +4508,7 @@ export type CoreMethod =
   | 'threads.creationPreflight'
   | 'workspaces.validate'
   | 'workspaces.inspect'
+  | 'workspaces.worktrees'
   | 'navigation.snapshot'
   | 'navigation.threads'
   | 'navigation.groupThreads'
