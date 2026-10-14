@@ -39,6 +39,13 @@ zoom independent of the application's text zoom. Persist shared node geometry se
 client-local viewport, selection, expanded cards and unsent conversation drafts. Scope local
 view keys by Core identity and board ID to avoid cross-backend state reuse.
 
+`canvas-layout.ts` adapts the fixed donor's board-unit grids, drop hints, alignment guides and
+shelf packing. Overlap follows actual paint order rather than treating Core UUIDs as numeric source IDs;
+Thread and exact private-conversation references remain distinct. The client view-state module keeps
+viewport/expansion keys under explicit Host/Core/board identity, with a minimap preference shared only
+within that Host/Core. It does not adopt the donor's unscoped numeric-ID keys or persist Runtime sessions.
+Unsent conversation drafting still joins the existing Composer authority in subsequent UI work.
+
 References to AI members, Mission, Task, Thread and project files identify existing Core objects;
 the canvas does not own copied business status or a second execution engine. Resolve visibility
 and actions through the object's existing permissions and current snapshot. Missing or removed
