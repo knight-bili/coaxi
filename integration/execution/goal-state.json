@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "I03真实Git工作树拓扑读取与画布解析已编码并本地提交；11项定向测试和5项隔离Git格式见证通过，定向类型/格式/文案/文档检查通过。新Rust有界进程与真实Host/UI仍待阶段验证，项目分组偏好与后续I03业务继续。",
+  "current_slice": "I03项目分组schema7保存、原文兼容、管理弹窗、侧栏与画布绑定已编码并分三次本地提交；31项相关检查、4项静态导航检查通过，修复后的两个保存模块复验20项通过。共享工作树读取、版本冲突和旧输入保护已编码；实际UI/IPC/Host及新Rust仍待阶段验证，完整I03未完成。",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "继续I03真实项目分组身份/偏好与管理入口，并接Desktop/Web的Host/Owner范围；分页目录和真实Git worktree读取已编码，新Rust/实际Host留待阶段验证。随后Mission/Task/Thread/Diff往返，多次本地commit，阶段集齐后集中验证/push/Actions。",
+    "继续I03项目/分组拖放排序（复用applyProjectLayout与同一revision）、完整worktree树样式、上下文菜单和活动徽章。分组保存/管理/侧栏/画布接线及共享关系读取已编码；实际UI/IPC/Host仍待阶段候选，不逐功能触发Actions。",
     "补齐I03成员拖放、展开对话卡片/既有Composer草稿、Desktop冷启动画布路由、授权文件预览与真实临时PTY生命周期；实际UI/恢复和平台资格仍待阶段验证。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "worktree_topology_and_canvas_resolution_coded_targeted_checks_passed_not_rust_or_host_qualified",
+  "current_slice_status": "project_groups_persistence_management_sidebar_canvas_coded_targeted_checks_passed_runtime_qualification_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -57,7 +57,7 @@
   "skill_catalog_evidence": "i02-skill-catalog-result.json",
   "skill_install_evidence": "i02-skill-install-result.json",
   "system_goal_status": "active",
-  "system_goal_verified_at": "2026-10-14T18:13:09.490Z",
+  "system_goal_verified_at": "2026-10-15T01:42:48.757Z",
   "skill_members_evidence": "i02-skill-members-result.json",
   "canvas_boards_evidence": "i03-canvas-boards-result.json",
   "skill_delivery_preparation_evidence": "i02-skill-delivery-preparation-result.json",
@@ -90,11 +90,12 @@
   "stage_version_plan": "integration/planning/stage-versions.json",
   "objective_revision": "2026-10-14-stage-batch-v2-full-objective",
   "system_goal_text": {
-    "status": "new_cadence_confirmed_by_get_goal",
+    "status": "active_resume_and_stage_policy_confirmed_by_get_goal",
     "user_edited": true,
-    "checked_at": "2026-10-14T18:13:09.490Z",
+    "checked_at": "2026-10-15T01:42:48.757Z",
     "confirmed": [
       "active",
+      "full_objective_preserved",
       "multiple_local_commits_stage_validation_few_pushes",
       "12_phase_batches",
       "current_I03"
@@ -103,5 +104,12 @@
   "canvas_ui_evidence": "i03-canvas-ui-result.json",
   "canvas_workspace_evidence": "i03-canvas-workspace-result.json",
   "canvas_references_evidence": "i03-canvas-references-result.json",
-  "canvas_worktrees_evidence": "i03-canvas-worktrees-result.json"
+  "canvas_worktrees_evidence": "i03-canvas-worktrees-result.json",
+  "resume_confirmation": {
+    "human_request": "恢复吧",
+    "automatic_goal_status": "active_live_verified",
+    "checked_at": "2026-10-15T01:42:48.757Z",
+    "source_progress_continued": true
+  },
+  "project_groups_evidence": "i03-project-groups-result.json"
 }
