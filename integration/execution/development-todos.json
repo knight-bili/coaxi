@@ -116,6 +116,15 @@
       "file": "scripts/fixtures/notification-attention/main.cjs:127",
       "problem": "通知设置taskStatuses:in_progress保存失败后焦点期望控件，实际activeElement无该data属性。当前Controller与2f28cecc旧Controller配同Settings/driver均复现；不跳过测试、不改断言或超时。",
       "evidence": "i03-canvas-notification-result.json"
+    },
+    {
+      "id": "DEV-CANVAS-ATOMIC-LEAVE",
+      "task": "I03/I12",
+      "status": "saved_input_reconstruction_verified_original_editor_atomic_handoff_pending",
+      "owner": "研发",
+      "file": "apps/desktop/src/renderer/src/CanvasWorkspace.tsx:canLeave",
+      "problem": "当前暂时离开会在prepare后卸载卡片，失败时重建已存输入；原编辑器/undo以及后续拒绝/取消的两阶段事务需继续实现，不以saved-input重建冒充完成。",
+      "evidence": "i03-canvas-recovery-result.json"
     }
   ]
 }
