@@ -23,3 +23,5 @@ I00已自审修正并合入，I01基础构建与契约证据保留草稿；I02�
 - [I03完整导航活动统计检查点](execution/i03-navigation-activity-result.json)：Core按普通导航Thread完整聚合、窗口外组定位及工程/分组三态徽章已编码；78项相关检查、6项静态导航与7项SQL原文夹具通过，新Rust/真实Host/挂载UI继续按阶段候选补验，不据此标I03完成。
 
 - [I03区域成员拖放检查点](execution/i03-canvas-member-drag-result.json)：派生成员节点、跨源原子分组、精确引用和旧服务保护已编码；52项相关检查及定向类型/文档/格式通过，新增Rust与真实Host/UI仍待阶段候选，原地展开和Composer继续实施。
+
+- [I03画布原地与侧边会话检查点](execution/i03-canvas-conversation-result.json)：复用既有会话/输入/执行控制，补精确私有绑定和离开保护；40项组件及4项离开退出检查通过，定向类型/文案/文档通过，真实UI/Runtime及多卡、重开恢复、通知继续，不作为I03完成依据。
