@@ -4,7 +4,7 @@ contract: canvas-nodes-v1
 authority: core-canvas-node-graph-and-atomic-gestures
 status: accepted
 version: 1
-last_updated: 2026-10-15
+last_updated: 2026-10-16
 ---
 
 # Canvas Nodes v1
@@ -201,3 +201,35 @@ CAS/跨画板、原子手势与结果回滚、精确引用、重开、删除与�
 上述既有纯输入owner补旧Group序列化不增字段，既有扩展SQLite owner补跨源私有/公开成员原子转移、未选镜像保留、
 无效源回滚、派生绑定不变与原收据回放；没有新增Rust owner，本切片尚未编译/执行。
 真实 Host/HTTP 另证明153升级、封闭入口与实际持久化 seam；这些都不能替代交互画布、真实模型或全平台资格。
+
+
+## 独立业务对象卡片引用（2026-10-16）
+
+既有八种节点保持。conversation 节点可附加闭合、不可变的 `objectReference`，此时是独立业务对象卡片，
+不能只按 Thread 当前关联的 Mission 推断对象。缺少该字段的旧节点序列化仍省略它，保留旧请求及回执指纹。
+
+```ts
+type CanvasObjectReference =
+  | {kind:'mission'; missionId:string}
+  | {kind:'task'; taskId:string}
+  | {kind:'mission_diff'; missionId:string; path?:string|null};
+```
+
+对象卡片必须同时有公开 `conversation:{threadId,conversationId:null}`。创建在原 User/画板版本事务内校验
+该对象实际属于这个 Thread，Thread 未删除；不创建业务对象或触发执行。对象 ID 和绑定不可通过 patch 改写，
+几何/标题等展示仍可调整。引用删除只删除节点元数据，Mission、Task、工作区与用户文件不受影响。
+分组不消费或转换对象卡片；prune 不自动清除它们。原对象缺失时保留引用与布局，读取/定位应显示不可用，不能换成新对象。
+
+`mission_diff` 指原 Mission 的当前累计变更，path 是可选的精确列表文件名，保留空格/Unicode；
+它不授权文件访问、不保存 viewId/PTY/工作区路径或复制固定基线。文件打开仍应先读当前 `missions.changes`，
+按原路径匹配当前列表，再沿原 `missions.fileDiff` 授权与短期视图，不能猜测第一项或采用旧 viewId。
+完整 Git 工程工作区与历史变更能力仍按既定一期后续工作包推进。
+
+Snapshot 增加可选兼容能力 `objectReferenceVersion:1`。旧 Host 未声明时，客户端在派发前拒绝新对象写入，
+不创建一个无法核对的新待处理命令；已有节点和旧操作保持。结果未知时仍冻结原 UUID、对象 ID、path 和起始画板版本，
+显式重试不能跟随 Thread 新绑定重新选择对象。
+
+Schema157/Migration207 仅新增 `canvas_node_object_reference` 及归属/不可变触发器；保留 canvas_node 原表与旧行。
+引用以 node_id 为唯一主键和删除级联外键；业务对象 ID 不设删除级联，以便显示失效引用。迁移只接受准确 schema156，
+表、两触发器、207回执与157 marker 同事务，失败完整回滚；不扫描用户文件，不改既有模型输入或冻结结果。
+当前代码与原文 SQLite 夹具已有分项证据，新增 Rust/实际 Host 尚未编译运行；选择器、独立呈现及精确工作区定位继续实施。

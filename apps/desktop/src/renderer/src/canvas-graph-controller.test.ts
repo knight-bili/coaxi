@@ -35,6 +35,22 @@ const controller = (client: ConstructorParameters<typeof CanvasGraphController>[
 }
 afterEach(() => { controllers.splice(0).forEach(item => item.dispose()); vi.useRealTimers() })
 
+it.each([undefined, 0, 1])('独立对象写入按快照能力声明准入（%s）', async version => {
+  const transport = fixture(async (method, params) => method === 'canvas.nodes.snapshot'
+    ? { ...snapshot(), objectReferenceVersion: version } : result((params as { commandId: string }).commandId))
+  const current = controller(transport.client); current.start(); await current.refresh()
+  const mutation: CanvasNodeMutation = { type: 'create', node: { kind: 'conversation', conversation: { threadId: 'thread', conversationId: null },
+    objectReference: { kind: 'mission', missionId: 'original' }, x: 0, y: 0, width: 224, height: 132 } }
+  if (version === 1) {
+    await current.apply(mutation)
+    expect(transport.requests.filter(item => item.method === 'canvas.nodes.apply')).toHaveLength(1)
+  } else {
+    await expect(current.apply(mutation)).rejects.toThrow('升级服务')
+    expect(transport.requests.filter(item => item.method === 'canvas.nodes.apply')).toEqual([])
+    expect(current.getSnapshot().pending).toBeNull()
+  }
+})
+
 describe('Canvas graph ownership and command recovery', () => {
   it('subscribes before reading, rejects a pre-invalidation snapshot, then converges without replaying events', async () => {
     vi.useFakeTimers()
@@ -86,6 +102,8 @@ describe('Canvas graph ownership and command recovery', () => {
 
   it('keeps the exact unknown gesture across newer reads and only retries its original identity and revision', async () => {
     const cases: CanvasNodeMutation[] = [
+      { type: 'create', node: { kind: 'conversation', conversation: { threadId: 'thread', conversationId: null },
+        objectReference: { kind: 'mission_diff', missionId: 'original-mission', path: ' dir/原文件.rs ' }, x: 0, y: 0, width: 224, height: 132 } },
       { type: 'move', moves: [{ nodeId: 'node', x: 12, y: 24 }] },
       { type: 'group', targetNodeId: 'target', newRegion: null,
         conversations: [{ threadId: 'thread', conversationId: 'private' }], consumeNodeIds: [],
@@ -94,7 +112,7 @@ describe('Canvas graph ownership and command recovery', () => {
     for (const gesture of cases) {
       let revision = 1, writes = 0
       const transport = fixture(async (method, params) => {
-        if (method === 'canvas.nodes.snapshot') return snapshot('board', revision)
+        if (method === 'canvas.nodes.snapshot') return { ...snapshot('board', revision), objectReferenceVersion: 1 }
         if (method === 'canvas.nodes.apply') {
           if (++writes === 1) throw new TypeError('response lost')
           return result((params as { commandId: string }).commandId)
@@ -106,6 +124,7 @@ describe('Canvas graph ownership and command recovery', () => {
       await expect(current.apply(gesture)).rejects.toThrow('response lost')
       if (gesture.type === 'move') gesture.moves[0].x = 900
       if (gesture.type === 'group') { gesture.conversations.length = 0; gesture.sourceMembers![0].conversation.conversationId = 'changed' }
+      if (gesture.type === 'create' && gesture.node.objectReference?.kind === 'mission_diff') gesture.node.objectReference.missionId = 'later-rebound-mission'
       revision = 9; await current.refresh()
       expect(current.getSnapshot().pending?.state).toBe('unknown')
       await expect(current.apply({ type: 'prune' })).rejects.toThrow('原操作')

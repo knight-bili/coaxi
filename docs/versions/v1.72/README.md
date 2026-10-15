@@ -21,7 +21,7 @@ Core 归属 codec、旧 get 省略与显式 null 区分、真实 pin 校验及 S
 Core 材料七动作、精确读取、有界恢复与发送按 scope 消费已接原事务/FIFO，17项定向检查通过，见
 [业务服务证据](../../../integration/execution/i03-private-composer-service-result.json)。get/mutate/recovery 的 Application、
 两端封闭准入、原 UUID 只读核对和客户端能力回显检查已接通，详见[应用入口证据](../../../integration/execution/i03-private-composer-api-result.json)。
-显式 get 才返回 scopeVersion，草稿和编辑会话同归属过滤；默认旧响应保持。Core 编辑租约已按 client+scope 显式接管并轮换 token；完整移回按空/占用目标返回活动/retained 输入，材料与 Pending 取消、回执同事务，见[编辑执行证据](../../../integration/execution/i03-private-pending-edit-result.json)。Renderer 已接新版移回、完整保留输入选择/交换、排队编辑恢复及持久原请求核对，见[输入界面证据](../../../integration/execution/i03-private-input-ui-result.json)。卡片正文/材料隔离和镜像已做模拟 Core 的生产组件挂载；卡片上传、资源授权、默认材料迁入和孤立输入统一界面仍待实现，卡片文件添加与预览暂不启用。最终 Blob/实际 Host/Runtime 和平台仍待验。当前 Web 准入180项，来源161项保持。
+显式 get 才返回 scopeVersion，草稿和编辑会话同归属过滤；默认旧响应保持。Core 编辑租约已按 client+scope 显式接管并轮换 token；完整移回按空/占用目标返回活动/retained 输入，材料与 Pending 取消、回执同事务，见[编辑执行证据](../../../integration/execution/i03-private-pending-edit-result.json)。Renderer 已接新版移回、完整保留输入选择/交换、排队编辑恢复及持久原请求核对，见[输入界面证据](../../../integration/execution/i03-private-input-ui-result.json)。卡片正文/材料隔离和镜像、默认材料迁入及原位置恢复已做模拟 Core 的生产组件挂载；上传准备与精确资源链路已编码，最终卡片文件入口仍待真实 Host 验证后启用。最终 Blob/实际 Host/Runtime 和平台仍待验。当前 Web 准入180项，来源161项保持。
 24项完整验证要求仍待执行，不计入正式324场景通过。
 卡片/工作副本/retained 文件定位已按精确归属接 Core 与 Main 双入口、预览来源和缓存键，
 17项 Core 与65项客户端定向检查通过，见[文件资源证据](../../../integration/execution/i03-private-resource-result.json)。
@@ -768,3 +768,14 @@ Web 按独立可选能力开放，旧 Host 保留原四接口；同卡片旧 Pen
 恢复编辑器的原子离开纳入父页面，未知提交不能通过关闭绕过；没有新的 Core/模型/存储协议。
 实际生产组件模拟 Core 完成9步交互，真实 Host/资源/平台和完整24PC仍待，I03不因本批视为工程完成。
 最新[分项记录](../../../integration/execution/i03-private-recovery-ui-result.json)同时记录低成本检查与真实验证缺项。
+
+
+## 融合期独立业务对象引用存储（2026-10-16）
+
+I03-C02 新增可选显式 Mission/Task/MissionDiff 引用，仍用原八种节点、User 命令与画板版本。
+源码 Schema157/Migration207 仅追加节点引用表及归属/不可变触发器，不复制业务状态或改模型输入；
+旧图与冻结事实保留，源156升级失败完整回滚。旧156明确为206迁移结果，不能误判成最新207。
+Core 对象所属Thread核对、不可变身份、失效保留、分组防误消费和快照能力已编码，
+原文 SQLite 46项见证与4个客户端owner共19项检查通过，定向 types 通过；新增 Rust 未编译执行。
+独立卡片选择/呈现、精确 Mission/Task/Diff 工作区导航和真实Core/Host仍待，C02保持进行中。
+[执行证据](../../../integration/execution/i03-object-reference-storage-result.json)区分源码、原文SQL与真实方法资格。

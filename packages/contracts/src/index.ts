@@ -4362,6 +4362,12 @@ export interface CanvasConversationRef {
   conversationId: string | null
 }
 
+/** 独立对象身份不可变；path只选择当前Mission Diff中的精确文件，不是文件授权。 */
+export type CanvasObjectReference =
+  | { kind: 'mission'; missionId: string }
+  | { kind: 'task'; taskId: string }
+  | { kind: 'mission_diff'; missionId: string; path?: string | null }
+
 export interface CanvasReferenceMember { agentId: string; displayName: string; runtimeKind: AdapterKind | null }
 export interface CanvasPrivateReference { conversationId: string; agentId: string; updatedAt: string }
 export interface CanvasThreadReference {
@@ -4391,6 +4397,7 @@ export interface CanvasNodeData {
   agentId: string | null
   conversation: CanvasConversationRef | null
   conversations: CanvasConversationRef[]
+  objectReference?: CanvasObjectReference
   title: string | null
   content: string | null
   path: string | null
@@ -4416,6 +4423,8 @@ export interface CanvasNode {
 }
 
 export interface CanvasGraphSnapshot {
+  /** Missing on older Hosts; independent object pins require version 1. */
+  objectReferenceVersion?: number
   /** Missing on older Hosts; new sourceMembers writes require version 1. */
   memberTransferVersion?: number
   board: CanvasBoard | null

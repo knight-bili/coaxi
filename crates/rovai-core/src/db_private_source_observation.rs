@@ -78,7 +78,7 @@ pub(super) fn migrate(database: &mut Database) -> Result<()> {
     validate_migration_foreign_keys(&tx, &["single_chat_source_observation"])?;
     anyhow::ensure!(
         matches!(classify_database_contract(&tx)?,
-        DatabaseContractClassification::Current(ref marker) if marker.projection_schema_version==156),
+        DatabaseContractClassification::Current(ref marker) | DatabaseContractClassification::SupportedMigrationSource(ref marker) if marker.projection_schema_version==156),
         "Private source observation admission failed"
     );
     tx.commit()?;
@@ -87,6 +87,7 @@ pub(super) fn migrate(database: &mut Database) -> Result<()> {
 
 #[cfg(test)]
 pub(super) fn downgrade_for_test(connection: &Connection) {
+    super::canvas_objects::downgrade_for_test(connection);
     if !connection
         .table_exists(None, "single_chat_source_observation")
         .unwrap()
@@ -147,6 +148,7 @@ pub(super) fn verify_migration_fixture(database: &mut Database) {
         .execute_batch("DROP TRIGGER reject_source_observation_migration;")
         .unwrap();
     migrate(database).unwrap();
+    super::canvas_objects::migrate(database).unwrap();
     assert!(schema_matches(database.connection()).unwrap());
     let tx = database.connection().unchecked_transaction().unwrap();
     tx.execute_batch("DROP TRIGGER single_chat_source_observation_immutable;

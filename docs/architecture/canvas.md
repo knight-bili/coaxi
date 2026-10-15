@@ -222,3 +222,14 @@ Native新桥的目录请求和共享Native文件恢复界面已接线；Web恢�
 共享控制器只呈现平台原日志/回执，不成为字节或模型材料权威；迟到运输错误不能覆盖已查回结果。
 边界见[共享文件准备与Native恢复](../contracts/single-chat-composer-scope-v1.md#共享文件准备界面与-native-恢复2026-10-16)。
 大材料扫描对事务锁及请求响应的影响须随I03规模检查处理，不能据局部检查宣称高可用完成。
+
+
+## 独立 Mission、Task 与 Diff 身份
+
+I03-C02 在原 conversation 卡片容器上增加显式 `objectReference`，用只含身份/选择提示的独立子表持久化，
+并非另一份 Mission、Task 或 Git 状态。Core 初次写入核对原对象与公开 Thread；对象消失后仍保留卡片，
+后续原对象读取再次核对身份与 Thread，不从 Thread 当前 Mission 重新绑定。
+Mission Diff 只保存 Mission ID 与可选原文件名，基线、实际 Git、临时 viewId 与权限均属于既有 Mission 服务。
+Schema157/Migration207 保留原八类节点表，新增引用表及不可变/归属守卫，与旧节点几何写入共用原命令事务和回执。
+新快照能力控制首次对象写入；旧省略、新字段闭合、原编号未知恢复和失败回滚仍须阶段 Core/Host 实测。
+本切片只完成引用持久化代码与局部证据，独立选择/呈现/工作区定位尚未完成，不能代替 C02 全部交付。

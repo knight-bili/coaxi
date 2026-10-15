@@ -41,8 +41,14 @@
     {
       "id": "I03-C02",
       "name": "独立Mission/Task/Diff持久引用与定位",
-      "status": "incomplete",
-      "done_when": "原对象与引用精确绑定，启动/定位/失效可恢复，包含实际Core集成；既有Thread关联Mission不代替独立pin"
+      "status": "in_progress",
+      "done_when": "原对象与引用精确绑定，启动/定位/失效可恢复，包含实际Core集成；既有Thread关联Mission不代替独立pin",
+      "latest_partial_evidence": "i03-object-reference-storage-result.json",
+      "remaining": [
+        "独立Mission/Task/Diff选择器与卡片呈现",
+        "按原对象ID和Thread核对后接既有工作区与动作，失效不可替换",
+        "源157/207实际Rust/Host升级、事务/回放和真实对象集成随阶段候选验证"
+      ]
     },
     {
       "id": "I03-C03",

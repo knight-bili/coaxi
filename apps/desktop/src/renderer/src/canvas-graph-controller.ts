@@ -123,6 +123,9 @@ export class CanvasGraphController {
     if (this.disposed || !this.started || loading || readError || !snapshot?.board || pending) {
       return Promise.reject(new Error(pending ? '原操作仍待核对，请先处理原操作。' : '画布尚未同步，暂时无法修改。'))
     }
+    if (mutation.type === 'create' && mutation.node.objectReference && snapshot.objectReferenceVersion !== 1) {
+      return Promise.reject(new Error('当前连接暂不支持独立对象卡片，请升级服务后重试。'))
+    }
     const gesture: PendingGesture = { commandId: newCommandId(),
       command: { boardId: this.boardId, expectedRevision: expectedRevision ?? snapshot.board.revision, mutation: structuredClone(mutation) }, state: 'sending' }
     return this.send(gesture)

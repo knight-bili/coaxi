@@ -44,6 +44,7 @@ pub mod camp_open;
 pub mod canonical_activity;
 pub mod canvas_board;
 pub mod canvas_node;
+pub mod canvas_object_reference;
 pub mod channel;
 pub mod claude_permission;
 pub mod codeg_skill_catalog;

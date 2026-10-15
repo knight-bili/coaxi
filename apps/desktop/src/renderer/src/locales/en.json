@@ -4068,5 +4068,6 @@
   "未看到附件和引用；迁入时也会保留原引用记录。": "No attachments or quotes are visible. Original quote records will also be preserved when moving materials.",
   "确认迁入这张卡片": "Confirm moving materials to this card",
   "保留的正文副本（不含附件和引用）": "Retained text copies (without attachments or quotes)",
-  "切换正文副本": "Switch text copy"
+  "切换正文副本": "Switch text copy",
+  "当前连接暂不支持独立对象卡片，请升级服务后重试。": "This connection does not support independent object cards yet. Upgrade the service and try again."
 }

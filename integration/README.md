@@ -66,3 +66,5 @@ I00已自审修正并合入，I01基础构建与契约证据保留草稿；I02�
 - [I03上传准备生命周期与旧租约入口](execution/i03-private-upload-lifecycle-result.json)：原意图重试/明确结束/同卡片旧Pending-token恢复已编码，71项客户端检查、定向类型与2项文案检查通过；新Rust和实际HTTP/Native/挂载待阶段集中验证。用户不承担阶段技术验收。
 
 - [I03默认迁入与原位置恢复界面](execution/i03-private-recovery-ui-result.json)：61项定向检查与类型/文案通过，模拟Core的生产组件完成9步交互，包含孤立原位置编辑与未知提交关闭保护。C01登记阶段工程待验，继续独立Mission/Task/Diff引用；实际Host/资源/24PC尚未通过。
+
+- [I03独立对象引用存储](execution/i03-object-reference-storage-result.json)：源码Schema157/Migration207仅追加引用元数据，原对象归属/身份/失效保留已编码；46项原文SQL与19项客户端检查、types通过，新Rust/实际Host未验。独立卡片选择和工作区定位继续，C02未完成。

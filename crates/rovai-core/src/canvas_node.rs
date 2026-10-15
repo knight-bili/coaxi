@@ -160,6 +160,8 @@ pub struct CanvasNodeData {
     pub conversation: Option<CanvasConversationRef>,
     #[serde(default)]
     pub conversations: Vec<CanvasConversationRef>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub object_reference: Option<crate::canvas_object_reference::CanvasObjectReference>,
     pub title: Option<String>,
     pub content: Option<String>,
     pub path: Option<String>,
@@ -203,6 +205,16 @@ fn valid_reference(reference: &CanvasConversationRef) -> bool {
             .is_none_or(|id| !id.trim().is_empty())
 }
 fn normalize(data: &mut CanvasNodeData) -> std::result::Result<(), &'static str> {
+    if data.object_reference.as_ref().is_some_and(|reference| {
+        !reference.valid()
+            || data.kind != CanvasNodeKind::Conversation
+            || data
+                .conversation
+                .as_ref()
+                .is_none_or(|owner| owner.conversation_id.is_some())
+    }) {
+        return Err("invalid_object_reference");
+    }
     if ![data.x, data.y, data.width, data.height]
         .iter()
         .all(|n| n.is_finite())
@@ -293,6 +305,7 @@ pub struct CanvasGraphSnapshot {
     pub nodes: Vec<CanvasNode>,
     pub through_global_sequence: i64,
     pub member_transfer_version: u32,
+    pub object_reference_version: u32,
 }
 fn from_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<CanvasNode> {
     let decode = |column, error| {
@@ -322,6 +335,7 @@ fn from_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<CanvasNode> {
                 conversation_id,
             }),
             conversations,
+            object_reference: crate::canvas_object_reference::from_row(row, 23)?,
             title: row.get(10)?,
             content: row.get(11)?,
             path: row.get(12)?,
@@ -341,7 +355,9 @@ fn from_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<CanvasNode> {
 fn load(connection: &Connection, board_id: &str) -> Result<Vec<CanvasNode>> {
     Ok(connection
         .prepare(&format!(
-            "SELECT {NODE_COLUMNS} FROM canvas_node WHERE board_id=?1 ORDER BY created_at,id"
+            "SELECT {NODE_COLUMNS},{} FROM canvas_node {} WHERE board_id=?1 ORDER BY created_at,id",
+            crate::canvas_object_reference::COLUMNS,
+            crate::canvas_object_reference::JOIN
         ))?
         .query_map([board_id], from_row)?
         .collect::<rusqlite::Result<Vec<_>>>()?)
@@ -353,7 +369,9 @@ fn load_selected(
 ) -> Result<Vec<CanvasNode>> {
     let ids = ids.into_iter().collect::<BTreeSet<_>>();
     let mut query = connection.prepare(&format!(
-        "SELECT {NODE_COLUMNS} FROM canvas_node WHERE board_id=?1 AND id=?2"
+        "SELECT {NODE_COLUMNS},{} FROM canvas_node {} WHERE board_id=?1 AND id=?2",
+        crate::canvas_object_reference::COLUMNS,
+        crate::canvas_object_reference::JOIN
     ))?;
     let mut nodes = Vec::new();
     for id in ids {
@@ -399,8 +417,10 @@ fn candidates(
         ),
         CanvasNodeMutation::Prune => Ok(connection
             .prepare(&format!(
-                "SELECT {NODE_COLUMNS} FROM canvas_node WHERE board_id=?1
-             AND kind IN ('conversation','custom') ORDER BY created_at,id"
+                "SELECT {NODE_COLUMNS},{} FROM canvas_node {} WHERE board_id=?1
+             AND kind IN ('conversation','custom') AND object_kind IS NULL ORDER BY created_at,id",
+                crate::canvas_object_reference::COLUMNS,
+                crate::canvas_object_reference::JOIN
             ))?
             .query_map([board_id], from_row)?
             .collect::<rusqlite::Result<Vec<_>>>()?),
@@ -422,6 +442,7 @@ pub fn snapshot(connection: &Connection, board_id: &str) -> Result<CanvasGraphSn
         nodes,
         through_global_sequence,
         member_transfer_version: 1,
+        object_reference_version: 1,
     })
 }
 
@@ -525,6 +546,14 @@ fn live_reference(
     }
 }
 fn require_references(connection: &Connection, data: &CanvasNodeData) -> Result<bool> {
+    if let Some(reference) = &data.object_reference {
+        let Some(owner) = &data.conversation else {
+            return Ok(false);
+        };
+        if !reference.live_in_thread(connection, &owner.thread_id)? {
+            return Ok(false);
+        }
+    }
     if let Some(id) = &data.agent_id {
         if !connection.query_row(
             "SELECT EXISTS(SELECT 1 FROM agent_profile WHERE id=?1 AND profile_status='present')",
@@ -560,6 +589,9 @@ fn insert_node(connection: &Connection, node: &CanvasNode) -> Result<()> {
         node.id,node.board_id,d.kind.as_str(),d.folder_path,d.folder_group_id,d.runtime_kind,d.agent_id,
         d.conversation.as_ref().map(|r|r.thread_id.as_str()),d.conversation.as_ref().and_then(|r|r.conversation_id.as_deref()),
         serde_json::to_string(&d.conversations)?,d.title,d.content,d.path,d.color,d.collapsed,d.grid_columns,d.grid_rows,d.x,d.y,d.width,d.height,node.created_at,node.updated_at])?;
+    if let Some(reference) = &d.object_reference {
+        reference.insert(connection, &node.id)?;
+    }
     Ok(())
 }
 fn update_node(connection: &Connection, node: &CanvasNode, old: &CanvasNode) -> Result<()> {
@@ -769,6 +801,12 @@ pub fn apply(
                 consume_node_ids,
                 source_members,
             } => {
+                if nodes
+                    .iter()
+                    .any(|node| node.data.object_reference.is_some())
+                {
+                    return Ok(rejected("object_reference_not_groupable"));
+                }
                 let mut incoming = Vec::new();
                 for reference in conversations {
                     if !live_reference(tx, reference)? {
@@ -894,6 +932,7 @@ pub fn apply(
                     agent_id: None,
                     conversation: Some(conversation.clone()),
                     conversations: vec![],
+                    object_reference: None,
                     title: None,
                     content: None,
                     path: None,
@@ -1011,6 +1050,7 @@ fn fixture_data(kind: CanvasNodeKind) -> CanvasNodeData {
             conversation_id: None,
         }),
         conversations: vec![],
+        object_reference: None,
         title: Some("  节点  ".into()),
         content: (kind == CanvasNodeKind::Note).then(|| "\n中文 **便签**\n".into()),
         path: matches!(kind, CanvasNodeKind::File | CanvasNodeKind::Terminal)
@@ -1110,6 +1150,33 @@ mod tests {
         let legacy = serde_json::json!({"type":"group","targetNodeId":null,"newRegion":null,"conversations":[],"consumeNodeIds":[]});
         let parsed: CanvasNodeMutation = serde_json::from_value(legacy.clone()).unwrap();
         assert_eq!(serde_json::to_value(parsed).unwrap(), legacy);
+        assert!(
+            serde_json::to_value(fixture_data(CanvasNodeKind::Conversation))
+                .unwrap()
+                .get("objectReference")
+                .is_none()
+        );
+        for object in [
+            json!({"kind":"mission","missionId":"mission"}),
+            json!({"kind":"task","taskId":"task"}),
+            json!({"kind":"mission_diff","missionId":"mission","path":" dir/中文.rs "}),
+        ] {
+            let mut data = fixture_data(CanvasNodeKind::Conversation);
+            data.object_reference = Some(serde_json::from_value(object.clone()).unwrap());
+            normalize(&mut data).unwrap();
+            assert_eq!(
+                serde_json::to_value(&data.object_reference).unwrap(),
+                object
+            );
+            data.kind = CanvasNodeKind::Note;
+            assert_eq!(normalize(&mut data), Err("invalid_object_reference"));
+        }
+        assert!(
+            serde_json::from_value::<crate::canvas_object_reference::CanvasObjectReference>(
+                json!({"kind":"mission","missionId":"mission","taskId":"task"})
+            )
+            .is_err()
+        );
     }
 }
 
@@ -1173,6 +1240,220 @@ mod persistence_tests {
             .unwrap()
             .into()
     }
+    fn verify_object_pins(database: &mut Database, other_thread: &str) -> String {
+        use crate::canvas_object_reference::CanvasObjectReference;
+        let workspace = database.directory().join("object-pin-workspace");
+        std::fs::create_dir(&workspace).unwrap();
+        let mission = crate::mission::MissionService::default()
+            .create(
+                database,
+                &envelope(crate::mission::CreateMissionCommand {
+                    title: "画布对象引用".into(),
+                    description: "只验证对象身份，不执行模型".into(),
+                    description_content: None,
+                    project_path: workspace.display().to_string(),
+                    project_binding_kind: crate::collaboration::ProjectBindingKind::Directory,
+                    member_agent_ids: vec!["agent_1".into()],
+                    default_lead_agent_id: "agent_1".into(),
+                    tags: vec![],
+                    source_attachments: vec![],
+                }),
+            )
+            .unwrap()
+            .result;
+        assert_eq!(mission.status, CommandResultStatus::Applied);
+        let mission_id = mission.payload["missionId"].as_str().unwrap().to_owned();
+        let thread_id = mission.payload["threadId"].as_str().unwrap().to_owned();
+        let mut task_command = envelope(crate::collaboration::CreateTaskCommand {
+            camp_id: thread_id.clone(),
+            title: "原任务".into(),
+            description: "任务正文".into(),
+            assignee_agent_id: "agent_1".into(),
+        });
+        task_command.camp_id = Some(thread_id.clone());
+        let task = crate::collaboration::CollaborationService::default()
+            .create_task(database, &task_command)
+            .unwrap()
+            .result;
+        assert_eq!(task.status, CommandResultStatus::Applied, "{task:?}");
+        let task_id = task.payload["taskId"].as_str().unwrap().to_owned();
+        let references = vec![
+            CanvasObjectReference::Mission {
+                mission_id: mission_id.clone(),
+            },
+            CanvasObjectReference::Task {
+                task_id: task_id.clone(),
+            },
+            CanvasObjectReference::MissionDiff {
+                mission_id: mission_id.clone(),
+                path: Some(" dir/中文.rs ".into()),
+            },
+        ];
+        let id = board(database);
+        let mut ids = Vec::new();
+        for reference in &references {
+            let mut data = fixture_data(CanvasNodeKind::Conversation);
+            data.conversation = Some(CanvasConversationRef {
+                thread_id: thread_id.clone(),
+                conversation_id: None,
+            });
+            data.object_reference = Some(reference.clone());
+            let request = command(database, &id, CanvasNodeMutation::Create { node: data });
+            let first = apply(database, &request).unwrap().result;
+            assert_eq!(first.status, CommandResultStatus::Applied);
+            assert_eq!(apply(database, &request).unwrap().result, first);
+            ids.push(first.payload["nodeIds"][0].as_str().unwrap().to_owned());
+        }
+        let stored = snapshot(database.connection(), &id).unwrap();
+        assert_eq!(stored.object_reference_version, 1);
+        for (node_id, reference) in ids.iter().zip(&references) {
+            assert_eq!(
+                stored
+                    .nodes
+                    .iter()
+                    .find(|n| n.id == *node_id)
+                    .unwrap()
+                    .data
+                    .object_reference
+                    .as_ref(),
+                Some(reference)
+            );
+        }
+        assert!(database.connection().execute("UPDATE canvas_node_object_reference SET mission_id=mission_id WHERE node_id=?1",[&ids[0]]).is_err());
+        let mut wrong = stored.nodes[0].data.clone();
+        wrong.conversation.as_mut().unwrap().thread_id = other_thread.into();
+        let request = command(database, &id, CanvasNodeMutation::Create { node: wrong });
+        assert_eq!(
+            apply(database, &request).unwrap().result.code,
+            "canvas.nodes.binding_unavailable"
+        );
+        let request = command(
+            database,
+            &id,
+            CanvasNodeMutation::Group {
+                target_node_id: None,
+                new_region: Some(fixture_data(CanvasNodeKind::Custom)),
+                conversations: vec![CanvasConversationRef {
+                    thread_id: thread_id.clone(),
+                    conversation_id: None,
+                }],
+                consume_node_ids: vec![ids[0].clone()],
+                source_members: vec![],
+            },
+        );
+        assert_eq!(
+            apply(database, &request).unwrap().result.code,
+            "canvas.nodes.object_reference_not_groupable"
+        );
+        let before = serde_json::to_value(snapshot(database.connection(), &id).unwrap()).unwrap();
+        database.connection().execute_batch("CREATE TEMP TRIGGER reject_object_pin_receipt BEFORE INSERT ON event_log WHEN NEW.command_type='canvas.nodes.apply' AND NEW.event_type='command.result' BEGIN SELECT RAISE(ABORT,'object pin rollback fixture');END;").unwrap();
+        let request = command(
+            database,
+            &id,
+            CanvasNodeMutation::Create {
+                node: stored.nodes[0].data.clone(),
+            },
+        );
+        assert!(apply(database, &request).is_err());
+        assert_eq!(
+            before,
+            serde_json::to_value(snapshot(database.connection(), &id).unwrap()).unwrap()
+        );
+        assert_eq!(
+            database
+                .connection()
+                .query_row(
+                    "SELECT COUNT(*) FROM canvas_node_object_reference",
+                    [],
+                    |row| row.get::<_, i64>(0)
+                )
+                .unwrap(),
+            3
+        );
+        database
+            .connection()
+            .execute_batch("DROP TRIGGER reject_object_pin_receipt;")
+            .unwrap();
+        let extra = run(
+            database,
+            &id,
+            CanvasNodeMutation::Create {
+                node: stored.nodes[0].data.clone(),
+            },
+        )
+        .payload["nodeIds"][0]
+            .as_str()
+            .unwrap()
+            .to_owned();
+        run(
+            database,
+            &id,
+            CanvasNodeMutation::Delete {
+                node_ids: vec![extra],
+            },
+        );
+        assert_eq!(
+            database
+                .connection()
+                .query_row(
+                    "SELECT COUNT(*) FROM mission WHERE id=?1",
+                    [&mission_id],
+                    |row| row.get::<_, i64>(0)
+                )
+                .unwrap(),
+            1
+        );
+        assert_eq!(
+            database
+                .connection()
+                .query_row("SELECT COUNT(*) FROM task WHERE id=?1", [&task_id], |row| {
+                    row.get::<_, i64>(0)
+                })
+                .unwrap(),
+            1
+        );
+        database
+            .connection()
+            .execute("DELETE FROM mission WHERE id=?1", [mission_id])
+            .unwrap();
+        database
+            .connection()
+            .execute("DELETE FROM task WHERE id=?1", [task_id])
+            .unwrap();
+        // owned夹具模拟引用的Thread也已不可用，不能清除或替换其原对象身份。
+        database
+            .connection()
+            .execute(
+                "UPDATE canvas_node SET thread_id='missing-object-thread' WHERE id=?1",
+                [&ids[0]],
+            )
+            .unwrap();
+        run(database, &id, CanvasNodeMutation::Prune);
+        assert_eq!(snapshot(database.connection(), &id).unwrap().nodes.len(), 3);
+        run(
+            database,
+            &id,
+            CanvasNodeMutation::Update {
+                node_id: ids[0].clone(),
+                patch: CanvasNodePatch {
+                    title: Some("原对象不可用时仍可整理布局".into()),
+                    ..Default::default()
+                },
+            },
+        );
+        assert_eq!(
+            snapshot(database.connection(), &id)
+                .unwrap()
+                .nodes
+                .iter()
+                .find(|n| n.id == ids[0])
+                .unwrap()
+                .data
+                .object_reference,
+            Some(references[0].clone())
+        );
+        id
+    }
     #[test]
     fn migration_and_graph_gestures_preserve_scope_atomicity_replay_and_reopen() {
         let mut database = crate::test_support::seeded_runtime_database_owned();
@@ -1208,6 +1489,7 @@ mod persistence_tests {
             .execute_batch("DROP TRIGGER reject_node_receipt;")
             .unwrap();
         database.migrate_canvas_nodes().unwrap();
+        crate::db::upgrade_canvas_object_fixture(&mut database);
         assert!(schema_matches(database.connection()).unwrap());
         let workspace = database.directory().join("node-workspace");
         std::fs::create_dir(&workspace).unwrap();
@@ -1261,6 +1543,7 @@ mod persistence_tests {
                 CanvasNodeMutation::Create { node: data },
             );
         }
+        crate::db::verify_canvas_object_fixture(&mut database);
         let initial = snapshot(database.connection(), &id).unwrap();
         assert_eq!(initial.nodes.len(), 8);
         let note = initial
@@ -1708,11 +1991,18 @@ mod persistence_tests {
                 .iter()
                 .any(|n| n.id == restored.id)
         );
+        let object_board = verify_object_pins(&mut database, &thread_id);
+        let object_preserved =
+            serde_json::to_value(snapshot(database.connection(), &object_board).unwrap()).unwrap();
         let preserved =
             serde_json::to_value(snapshot(database.connection(), &id).unwrap()).unwrap();
         let root = database.directory().to_path_buf();
         database.close();
         let mut reopened = Database::open(&root).unwrap();
+        assert_eq!(
+            object_preserved,
+            serde_json::to_value(snapshot(reopened.connection(), &object_board).unwrap()).unwrap()
+        );
         assert_eq!(
             preserved,
             serde_json::to_value(snapshot(reopened.connection(), &id).unwrap()).unwrap()
@@ -1759,6 +2049,22 @@ mod persistence_tests {
                 .connection()
                 .query_row("SELECT COUNT(*) FROM context_manifest", [], |row| row
                     .get::<_, i64>(0))
+                .unwrap(),
+            0
+        );
+        let object_delete = canvas_board::DeleteCanvasBoardCommand {
+            board_id: object_board.clone(),
+            expected_revision: revision(&reopened, &object_board),
+        };
+        canvas_board::delete(&mut reopened, &envelope(object_delete)).unwrap();
+        assert_eq!(
+            reopened
+                .connection()
+                .query_row(
+                    "SELECT COUNT(*) FROM canvas_node_object_reference",
+                    [],
+                    |row| row.get::<_, i64>(0)
+                )
                 .unwrap(),
             0
         );

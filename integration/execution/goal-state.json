@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "默认材料显式迁入及原位置Core/本机正文恢复已编码；61项定向检查/types/文案通过，生产组件模拟Core完成9步并修复继承网格布局。C01进入阶段集中工程验证清单，不作阶段完成；继续C02独立Mission/Task/Diff引用。",
+  "current_slice": "I03-C02独立Mission/Task/MissionDiff引用存储及Core归属/不可变/回放/失效保留代码已编写，源码schema157/M207；46项原文SQL见证、19项客户端和types通过，新Rust未编译，独立选择器/呈现/精确定位继续。C01保留阶段工程待验。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "推进I03-C02独立Mission/Task/Diff持久引用及定位，不等待C01的阶段集中验证。C01保留实际Host/Native/文件入口/原生命周期Rust/完整24PC；缺陷发现后回原组修复，不等客户阶段验收。",
+    "继续I03-C02独立对象选择器、三类卡片和按原ID/Thread精确定位，复用既有Mission/Task/当前Diff服务；对象引用不进普通会话展开/分组。新157/M207及前轮生命周期Rust/真实Host/24PC随阶段候选验证。",
     "继续I03独立持久Mission/Task/Diff对象引用及启动/定位、文件节点授权和真实临时PTY、Desktop冷启动画布；现Thread关联Mission与累计Diff卡片接线已mock前端验证，私有来源完整导航和真实Core/Runtime仍待阶段候选。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "private_recovery_ui_ready_for_stage_verification_next_independent_references",
+  "current_slice_status": "object_reference_storage_coded_renderer_and_actual_core_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -57,7 +57,7 @@
   "skill_catalog_evidence": "i02-skill-catalog-result.json",
   "skill_install_evidence": "i02-skill-install-result.json",
   "system_goal_status": "active",
-  "system_goal_verified_at": "2026-10-15T21:43:17.046905+00:00",
+  "system_goal_verified_at": "2026-10-15T22:17:14.836074+00:00",
   "skill_members_evidence": "i02-skill-members-result.json",
   "canvas_boards_evidence": "i03-canvas-boards-result.json",
   "skill_delivery_preparation_evidence": "i02-skill-delivery-preparation-result.json",
@@ -186,5 +186,6 @@
   "private_web_upload_evidence": "i03-private-web-upload-result.json",
   "private_upload_finality_evidence": "i03-private-upload-finality-result.json",
   "private_upload_lifecycle_evidence": "i03-private-upload-lifecycle-result.json",
-  "private_recovery_ui_evidence": "i03-private-recovery-ui-result.json"
+  "private_recovery_ui_evidence": "i03-private-recovery-ui-result.json",
+  "object_reference_storage_evidence": "i03-object-reference-storage-result.json"
 }
