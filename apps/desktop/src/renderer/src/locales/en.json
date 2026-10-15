@@ -4069,5 +4069,20 @@
   "确认迁入这张卡片": "Confirm moving materials to this card",
   "保留的正文副本（不含附件和引用）": "Retained text copies (without attachments or quotes)",
   "切换正文副本": "Switch text copy",
-  "当前连接暂不支持独立对象卡片，请升级服务后重试。": "This connection does not support independent object cards yet. Upgrade the service and try again."
+  "当前连接暂不支持独立对象卡片，请升级服务后重试。": "This connection does not support independent object cards yet. Upgrade the service and try again.",
+  "原对象已删除或归属已变化，卡片引用仍保留。": "The original item was deleted or moved. The card keeps its original reference.",
+  "任务分页未前进，请重新读取。": "Task pagination did not advance. Reload the list.",
+  "当前变更清单暂不可用，请重新读取。": "The current change list is unavailable. Reload it.",
+  "整个使命的累计变更": "All cumulative changes for this Mission",
+  "所属对话": "Parent conversation",
+  "载入更多任务": "Load more tasks",
+  "只保存原对象的引用；打开卡片不会启动队员。": "Only the original item reference is saved. Opening the card does not start an agent.",
+  "正在读取原对象…": "Loading the original item…",
+  "对象可能已变化，请重新读取后再操作。": "The item may have changed. Reload it before continuing.",
+  "在工作区中操作": "Open in workspace",
+  "原文件已不在当前变更清单中，保留卡片中的原路径。": "The original file is no longer in the current change list. The card keeps its original path.",
+  "读取可固定的变更文件": "Load changed files to pin",
+  "定位文件（可选）": "File to locate (optional)",
+  "读取详情": "Load details",
+  "当前使命尚无可用的 Git 工作区。": "This Mission has no available Git workspace yet."
 }

@@ -23,6 +23,8 @@ import { canvasAbsolutePosition, canvasDropMutation, canvasGroupSelection, canva
 import { CanvasConversationFrame, type CanvasConversationBridge } from './CanvasConversationFrame'
 import { canvasConversationGeometry, canvasConversationMatches, canvasMutationRemovesConversation } from './canvas-conversation'
 import { canvasComposerContext } from './canvas-composer-drafts'
+import { CanvasObjectDialog } from './CanvasObjectDialog'
+import { canvasObjectId, canvasObjectNames, canvasObjectTarget, canvasPlainConversation, type CanvasObjectTarget } from './canvas-object'
 import './canvas.css'
 
 export type { CanvasLeaveGuard } from './canvas-leave'
@@ -41,6 +43,7 @@ export interface CanvasSurfaceProps {
   conversation?: CanvasConversationBridge
   restoreRevision?: number
   onOpenReference(reference: CanvasConversationRef): void
+  onOpenObject?(target: CanvasObjectTarget): void
   onOpenMember?(agentId: string): void
   onOpenProject?(path: string): void
   onOpenFile?(path: string): void
@@ -61,6 +64,7 @@ type Presentation = CanvasSurfaceProps & {
   detach(row: CanvasNode, reference: CanvasConversationRef): void
   openConversation(row: CanvasNode, reference: CanvasConversationRef, member?: boolean): void
   edit(row: CanvasNode): void
+  openObject(row: CanvasNode): void
   beginGesture(owner?: string): number | null
   resize(row: CanvasNode, geometry: { x: number; y: number; width: number; height: number }, revision: number | null): void
 }
@@ -75,7 +79,7 @@ function CanvasCard({ data, selected }: NodeProps<FlowNode>): React.JSX.Element 
   const member = actions.agents.find(item => item.agentId === d.agentId)
   const group = d.kind === 'group' ? actions.groups?.find(item => item.id === d.folderGroupId) : undefined
   const color = d.color ?? group?.color
-  const title = d.title || group?.label || (d.conversation ? actions.title(d.conversation) : member?.displayName)
+  const title = d.title || group?.label || (d.objectReference ? uiAttribute(canvasObjectNames[d.objectReference.kind]) : d.conversation ? actions.title(d.conversation) : member?.displayName)
     || (d.path || d.folderPath ? basePathName(d.path || d.folderPath!) : uiAttribute(canvasKindNames[d.kind]))
   const columns = effectiveColumns(d, d.width), cap = visibleMemberCap(d, columns)
   const resolution = actions.resolvedMembers?.get(row.id)
@@ -88,7 +92,7 @@ function CanvasCard({ data, selected }: NodeProps<FlowNode>): React.JSX.Element 
       <button type="button" disabled={actions.blocked} onClick={() => actions.detach(row, data.member!)}><UiText zh={d.kind === 'custom' ? '移出分组' : '固定到画布'} /></button>
     </div>
   </article>
-  return <article className={`canvas-card canvas-card-${d.kind}${d.collapsed ? ' is-collapsed' : ''}${d.conversation && !selected && actions.selectedReferences.has(canvasReferenceKey(d.conversation)) ? ' is-mirrored' : ''}${actions.dropTargetId === row.id ? ' is-drop-target' : ''}`} data-color={color ?? undefined}>
+  return <article className={`canvas-card canvas-card-${d.kind}${d.collapsed ? ' is-collapsed' : ''}${canvasPlainConversation(row) && !selected && actions.selectedReferences.has(canvasReferenceKey(d.conversation!)) ? ' is-mirrored' : ''}${actions.dropTargetId === row.id ? ' is-drop-target' : ''}`} data-color={color ?? undefined}>
     <NodeResizer isVisible={selected && !actions.blocked && !d.collapsed && (d.kind !== 'conversation' || expandedConversation)}
       minWidth={expandedConversation ? 520 : d.kind === 'file' ? FILE_CARD_MIN_WIDTH : d.kind === 'terminal' ? TERMINAL_CARD_MIN_WIDTH : 48}
       minHeight={expandedConversation ? 560 : d.kind === 'file' ? FILE_CARD_MIN_HEIGHT : d.kind === 'terminal' ? TERMINAL_CARD_MIN_HEIGHT : 48} maxWidth={20000} maxHeight={20000}
@@ -105,8 +109,11 @@ function CanvasCard({ data, selected }: NodeProps<FlowNode>): React.JSX.Element 
     </header>
     {!d.collapsed && <div className="canvas-card-body nodrag nowheel">
       {d.kind === 'note' && <SafeMarkdown theme={actions.theme} mode="document">{d.content || ''}</SafeMarkdown>}
-      {d.kind === 'conversation' && d.conversation && !expandedConversation && <button type="button" disabled={actions.blocked || actions.available(d.conversation) === false} onClick={() => actions.openConversation(row, d.conversation!)}><UiText zh={actions.conversation ? '展开对话' : '打开对话'} /></button>}
-      {d.conversation && actions.available(d.conversation) === false && <p className="canvas-empty-copy"><UiText zh="对话已结束或不可用" /></p>}
+      {d.objectReference && <div className="canvas-object-pin"><code title={canvasObjectId(d.objectReference)}>{canvasObjectId(d.objectReference)}</code>
+        {d.objectReference.kind === 'mission_diff' && d.objectReference.path != null && <code title={d.objectReference.path}>{d.objectReference.path}</code>}
+        <button type="button" disabled={actions.blocked || !canvasObjectTarget(row)} onClick={() => actions.openObject(row)}><UiText zh="读取详情" /></button></div>}
+      {canvasPlainConversation(row) && !expandedConversation && <button type="button" disabled={actions.blocked || actions.available(d.conversation!) === false} onClick={() => actions.openConversation(row, d.conversation!)}><UiText zh={actions.conversation ? '展开对话' : '打开对话'} /></button>}
+      {canvasPlainConversation(row) && actions.available(d.conversation!) === false && <p className="canvas-empty-copy"><UiText zh="对话已结束或不可用" /></p>}
       {region && <>
         <div aria-hidden="true" className="canvas-member-grid-space" style={{ height: Math.max(0, layoutRegionGrid(visible.length, row.data.width, columns).contentHeight - REGION_HEADER_HEIGHT - REGION_PADDING * 2) }} />
         <div className="canvas-region-footer">
@@ -155,6 +162,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
   const [restoreRetry, setRestoreRetry] = useState(0), restored = useRef<string | null>(null)
   const surface = useRef<HTMLElement | null>(null)
   const [editor, setEditor] = useState<{ target: CanvasEditTarget; revision: number } | null>(null)
+  const [objectTarget, setObjectTarget] = useState<CanvasObjectTarget | null>(null)
   const [deletion, setDeletion] = useState<{ ids: string[]; revision: number; hasProse: boolean } | null>(null)
   const [guides, setGuides] = useState<AlignmentGuide[]>([])
   const panel = useRef(false), panelCommand = useRef(false)
@@ -166,7 +174,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
   const latestGraph = useRef(graph)
   latestGraph.current = graph
   const graphBlocked = graph.loading || Boolean(graph.readError || graph.pending) || !graph.snapshot?.board
-  const blocked = graphBlocked || Boolean(editor || deletion || presenting || props.conversation?.opening || props.conversation?.restoring)
+  const blocked = graphBlocked || Boolean(editor || deletion || objectTarget || presenting || props.conversation?.opening || props.conversation?.restoring)
   const rows = graph.snapshot?.nodes ?? EMPTY_ROWS
   useEffect(() => {
     const stamp = JSON.stringify([props.restoreRevision ?? 0, restoreRetry])
@@ -283,6 +291,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
       ?? canvasSavedReference(reference, catalog).label
   }
   const openConversation = async (row: CanvasNode, reference: CanvasConversationRef, member = false) => {
+    if (row.data.objectReference) return
     if (!props.conversation) { props.onOpenReference(reference); return }
     if (blocked || presentingRef.current) return
     if (!props.scope) { setIssue(uiAttribute('展开输入前需要核对服务信息，请重试画板连接。')); return }
@@ -304,7 +313,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
   }
   const actions: Presentation = { ...props, openConversation: (row, reference, member) => { void openConversation(row, reference, member) }, resolvedMembers: regions, blocked, expandedRegions: expanded, title,
     selectedReferences: new Set(nodes.filter(node => selected.includes(node.id)).flatMap(node => node.data.member ? [canvasReferenceKey(node.data.member)]
-      : node.data.row.data.conversation ? [canvasReferenceKey(node.data.row.data.conversation)] : [])),
+      : canvasPlainConversation(node.data.row) ? [canvasReferenceKey(node.data.row.data.conversation!)] : [])),
     dropTargetId: dropHint?.type === 'region' ? dropHint.regionId : dropHint?.type === 'merge' ? dropHint.targetNodeId : null,
     available: reference => canvasSavedReference(reference, catalog).available,
     collapse: row => { mutate({ type: 'update', nodeId: row.id, patch: { collapsed: !row.data.collapsed } }) },
@@ -313,6 +322,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     detach: (row, reference) => { mutate({ type: 'detach', regionId: row.id, conversation: reference,
       x: row.data.x + (flow.getNode(row.id)?.width ?? row.data.width) + 24, y: row.data.y }) },
     edit: row => { panel.current = true; setEditor({ target: { type: 'update', row }, revision: graph.snapshot!.board!.revision }) },
+    openObject: row => { if (!blocked) setObjectTarget(canvasObjectTarget(row)) },
     beginGesture,
     resize: (row, geometry, revision) => {
       if (revision === null || dragOwner.current !== row.id) return
@@ -331,8 +341,8 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
       hasProse: rows.some(row => ids.includes(row.id) && noteHoldsProse(row)) })
   }
   const groupSelected = () => {
-    const items = nodes.filter(node => selected.includes(node.id) && (node.data.member || node.data.row.data.conversation)).map(node => ({
-      conversation: (node.data.member ?? node.data.row.data.conversation)!, ...canvasAbsolutePosition(node, nodes),
+    const items = nodes.filter(node => selected.includes(node.id) && (node.data.member || canvasPlainConversation(node.data.row))).map(node => ({
+      conversation: (node.data.member ?? canvasPlainConversation(node.data.row))!, ...canvasAbsolutePosition(node, nodes),
       ...(node.data.member ? { regionId: node.data.regionId! } : { nodeId: node.id }) }))
     const mutation = canvasGroupSelection(items)
     if (mutation) mutate(mutation)
@@ -353,13 +363,13 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     return computeAlignment({ x: left, y: top, width: right - left, height: bottom - top }, others, 8 / flow.getZoom(), BOARD_DOT_GAP)
   }
   const drop = (moved: FlowNode, position: { x: number; y: number }) => {
-    const reference = moved.data.member ?? moved.data.row.data.conversation
+    const reference = moved.data.member ?? canvasPlainConversation(moved.data.row)
     if (!reference) return null
     const painted = nodes.filter(item => !item.data.member).toSorted((left, right) =>
       (flow.getInternalNode(left.id)?.internals.z ?? left.zIndex ?? 0) - (flow.getInternalNode(right.id)?.internals.z ?? right.zIndex ?? 0))
     const regions = painted.filter(item => isRegionKind(item.data.row.data.kind)).map(item => ({ nodeId: item.id,
       kind: item.data.row.data.kind, ...item.position, width: item.width ?? 0, height: item.height ?? 0 }))
-    const pins = painted.filter(item => item.data.row.data.conversation).map(item => ({ nodeId: item.id,
+    const pins = painted.filter(item => canvasPlainConversation(item.data.row)).map(item => ({ nodeId: item.id,
       conversation: item.data.row.data.conversation!, ...item.position, width: CARD_WIDTH, height: CARD_HEIGHT }))
     const source = moved.data.member ? { kind: 'member' as const, regionId: moved.data.regionId!, conversation: reference }
       : { kind: 'pin' as const, nodeId: moved.id, conversation: reference }
@@ -389,7 +399,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
         const point = element ? flow.screenToFlowPosition({ x: element.left + element.width / 2, y: element.top + element.height / 2 }) : { x: -bounds.x / bounds.zoom, y: -bounds.y / bounds.zoom }
         panel.current = true; setEditor({ target: { type: 'create', position: point }, revision: graph.snapshot!.board!.revision })
       }}><UiText zh="添加节点" /></button>
-      <button type="button" disabled={blocked || !nodes.some(node => selected.includes(node.id) && (node.data.member || node.data.row.data.conversation))} onClick={groupSelected}><UiText zh="选中对话分组" /></button>
+      <button type="button" disabled={blocked || !nodes.some(node => selected.includes(node.id) && (node.data.member || canvasPlainConversation(node.data.row)))} onClick={groupSelected}><UiText zh="选中对话分组" /></button>
       <button type="button" disabled={blocked || !rows.some(row => selected.includes(row.id))} onClick={() => deleteSelected()}><UiText zh="删除所选" /></button>
       <button type="button" disabled={blocked || !rows.length} onClick={() => {
         const sizes = new Map(nodes.map(node => [node.id, { width: node.width ?? node.data.row.data.width, height: node.height ?? node.data.row.data.height }]))
@@ -460,7 +470,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
           const alignment = align(moved, movedNodes)
           const absolute = canvasAbsolutePosition(moved, nodes)
           const position = { x: absolute.x + alignment.dx, y: absolute.y + alignment.dy }
-          const reference = moved.data.member ?? row.data.conversation
+          const reference = moved.data.member ?? canvasPlainConversation(row)
           if (reference && (moved.data.member ? selectedRows.length === 0 : selectedRows.length === 1)) {
             const plan = drop(moved, position)!
             const mutation = canvasDropMutation(plan.source, plan.hint)
@@ -495,10 +505,13 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     </div>
     {editor && <CanvasNodeEditor target={editor.target} revision={editor.revision} latestRevision={graph.snapshot?.board?.revision ?? null}
       agents={props.agents} groups={props.groups ?? EMPTY_GROUPS}
+      objectReferencesSupported={graph.snapshot?.objectReferenceVersion === 1} objectThreads={catalog.items}
       references={referenceOptions} referencesComplete={catalog.complete} onRefreshReferences={() => { props.onRefreshReferences?.(); void folders.refresh() }}
       blocked={graphBlocked} pending={Boolean(graph.pending)} recovery={recovery} onClose={closePanel}
       commandError={issue}
       onSave={async (mutation, revision) => { await submit(mutation, revision, true) }} />}
+    {objectTarget && <CanvasObjectDialog target={objectTarget} onClose={() => setObjectTarget(null)}
+      onOpenWorkspace={props.onOpenObject ? target => { setObjectTarget(null); props.onOpenObject!(target) } : undefined} />}
     {deletion && <Dialog.Root open onOpenChange={open => { if (!open) closePanel() }}><Dialog.Portal>
       <Dialog.Overlay className="dialog-overlay app-dialog-overlay" />
       <AppDialogContent tone="danger" onEscapeKeyDown={event => { if (graph.hasUnsettled()) event.preventDefault() }} onPointerDownOutside={event => event.preventDefault()}>

@@ -1,4 +1,5 @@
 import { CanvasThreadWorkspace } from './CanvasThreadWorkspace'
+import { readCanvasObject, type CanvasObjectTarget } from './canvas-object'
 import { runCanvasLeaveTransition, prepareActiveCanvasForAppQuit, type CanvasLeavePreparation } from './canvas-leave'
 export { runCanvasLeaveTransition, prepareActiveCanvasForAppQuit } from './canvas-leave'
 import { CanvasThreadReader } from './CanvasThreadReader'
@@ -2952,6 +2953,33 @@ function BusinessAppContent({
     } catch (error) { if (intent.isCurrent()) notifyError(errorMessage(error)); return false }
   }
 
+  const openCanvasObject = async (target: CanvasObjectTarget): Promise<void> => {
+    const intent = desktopNavigation.beginIntent()
+    const current = () => intent.isCurrent() && threadClientOwner.current === client
+    try {
+      const value = await readCanvasObject(client, target, current)
+      if (!value || !current()) return
+      if (value.kind === 'mission_diff') return
+      if (value.kind === 'mission') {
+        const projection = await threadProjections.refresh(target.threadId)
+        if (!current()) return
+        if (projection.snapshot.thread.missionId !== value.mission.missionId) throw new Error(uiAttribute('原对象已删除或归属已变化，卡片引用仍保留。'))
+      }
+      const opened = await desktopNavigation.push({ kind: 'camp', threadId: target.threadId }, {
+        campOptions: { reconcileDefaultLead: false, preserveNotificationFocus: true,
+          anchoredTasks: value.kind === 'task' ? [value.task] : [] }
+      })
+      if (!opened || threadClientOwner.current !== client || activeThreadIdRef.current !== target.threadId || viewRef.current !== 'camp') return
+      if (value.kind === 'mission' && campSnapshotRef.current?.thread.missionId !== value.mission.missionId) {
+        throw new Error(uiAttribute('原对象已删除或归属已变化，卡片引用仍保留。'))
+      }
+      setSingleChatNotificationTarget(null); setSingleChatThreadId(null); setThreadInspectorThreadId(null)
+      setMissionPresentation('drawer')
+      setNotificationFocus({ requestId: ++notificationFocusSequence.current, kind: value.kind,
+        subjectId: value.kind === 'task' ? value.task.taskId : value.mission.missionId, threadTurnId: null, active: true })
+    } catch (error) { if (threadClientOwner.current === client) notifyError(errorMessage(error)) }
+  }
+
   const navigateFromNotification = useCallback(async (
     _episode: NotificationEpisodeView,
     action: NotificationActionView
@@ -4054,6 +4082,7 @@ function BusinessAppContent({
             onProjectLayout={saveProjectGroupLayout}
             onRefreshProjectGroups={refreshProjectGroups}
             onOpenReference={reference => { void openCanvasReference(reference) }}
+            onOpenObject={target => { void openCanvasObject(target) }}
             onOpenMember={agentId => { void desktopNavigation.push({ kind: 'members', agentId, tab: 'identity' }) }}
             onOpenProject={path => { void desktopNavigation.push({ kind: 'quick_chat', projectPath: path }) }}
             onLeaveGuardChange={registerCanvasLeaveGuard} />

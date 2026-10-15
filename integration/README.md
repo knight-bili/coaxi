@@ -68,3 +68,5 @@ I00已自审修正并合入，I01基础构建与契约证据保留草稿；I02�
 - [I03默认迁入与原位置恢复界面](execution/i03-private-recovery-ui-result.json)：61项定向检查与类型/文案通过，模拟Core的生产组件完成9步交互，包含孤立原位置编辑与未知提交关闭保护。C01登记阶段工程待验，继续独立Mission/Task/Diff引用；实际Host/资源/24PC尚未通过。
 
 - [I03独立对象引用存储](execution/i03-object-reference-storage-result.json)：源码Schema157/Migration207仅追加引用元数据，原对象归属/身份/失效保留已编码；46项原文SQL与19项客户端检查、types通过，新Rust/实际Host未验。独立卡片选择和工作区定位继续，C02未完成。
+
+- [I03独立对象选择与详情](execution/i03-object-reference-ui-result.json)：Mission/历史Task/Diff原路径选择、按需原对象读取及既有工作区接线已编码；66项定向检查和类型通过，模拟Core界面检查通过。C02代码就绪待阶段工程验证，实际Core/Host/跳转未验；继续C03授权文件节点。

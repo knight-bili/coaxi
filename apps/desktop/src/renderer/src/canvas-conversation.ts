@@ -31,6 +31,7 @@ export function canvasConversationGeometry(node: CanvasRect | null, viewport: { 
 
 export function canvasConversationMatches(node: CanvasNode, target: CanvasConversationTarget): boolean {
   return node.boardId === target.boardId && node.id === target.nodeId && node.data.kind === 'conversation'
+    && !node.data.objectReference
     && Boolean(node.data.conversation && canvasReferenceKey(node.data.conversation) === canvasReferenceKey(target.reference))
 }
 

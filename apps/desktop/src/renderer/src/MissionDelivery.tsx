@@ -14,6 +14,8 @@ import { DialogControlIcon } from './AppDialog'
 import { writeClipboardText } from './clipboard'
 import { displayProjectPath } from '../../shared/project-display-name'
 import { UiText, getInterfaceLanguage, uiAttribute, useUiText } from './interface-language'
+import { canvasDiffFile } from './canvas-object'
+import { retainMissionDiffSession } from './mission-diff-session'
 
 export function MissionActivityDocument({ mission, agents, onSource, onNotify, onWorkspaceCleanupRequested }: {
   mission: MissionRecord; agents: AgentProfile[]; onSource(id: string): void; onNotify(message: string): void; onWorkspaceCleanupRequested(threadId: string): Promise<void>
@@ -398,17 +400,20 @@ function missionReadTime(value: string): string {
   return new Date(value).toLocaleTimeString(getInterfaceLanguage() === 'en' ? 'en-US' : 'zh-CN', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
 }
 
-function MissionChanges({ mission, baseSha }: { mission: MissionRecord; baseSha: string | null }) {
+export function MissionChanges({ mission, baseSha, initiallyExpanded = false, initialPath }: {
+  mission: MissionRecord; baseSha: string | null; initiallyExpanded?: boolean; initialPath?: string | null
+}) {
   const t = useUiText()
   const changesId = useId()
   const client = useThreadClient()
-  const [expanded, setExpanded] = useState(false), [view, setView] = useState<MissionWorkspaceChangesView | null>(null)
+  const [expanded, setExpanded] = useState(initiallyExpanded), [view, setView] = useState<MissionWorkspaceChangesView | null>(null)
   const [error, setError] = useState(''), [loading, setLoading] = useState(false), [attempted, setAttempted] = useState(false)
   const [stale, setStale] = useState(false), [readAt, setReadAt] = useState('')
   const [selected, setSelected] = useState<string | null>(null), [dialogOpen, setDialogOpen] = useState(false)
   const [detailQuery, setDetailQuery] = useState(''), [detailExpanded, setDetailExpanded] = useState<Set<string>>(new Set())
   const [snapshotReady, setSnapshotReady] = useState(false), [snapshotEpoch, setSnapshotEpoch] = useState(0)
   const alive = useRef(true), pending = useRef(false), opened = useRef(false), invalidations = useRef(0)
+  const pathLocated = useRef(false)
   const lastFocus = useRef<HTMLElement | null>(null)
   const diffStore = useRef<MissionDiffStore>({ epoch: 0, cache: new Map(), inFlight: new Map() })
   const files = view?.files ?? null
@@ -431,11 +436,13 @@ function MissionChanges({ mission, baseSha }: { mission: MissionRecord; baseSha:
       setSnapshotReady(Boolean(next.viewId && next.files))
       setReadAt(new Date().toISOString())
       setStale(invalidation !== invalidations.current)
-      setSelected(previous => previous && next.files?.some(file => file.id === previous) ? previous : null)
+      const pinnedFile = canvasDiffFile(next.files, initialPath)
+      setSelected(previous => previous && next.files?.some(file => file.id === previous) ? previous : pinnedFile?.id ?? null)
+      if (pinnedFile && !pathLocated.current) { pathLocated.current = true; setDialogOpen(true) }
     }).catch(failure => {
       if (alive.current) { setError(missionError(failure)); setStale(true) }
     }).finally(() => { pending.current = false; if (alive.current) setLoading(false) })
-  }, [client, mission.missionId])
+  }, [client, mission.missionId, initialPath])
 
   useEffect(() => {
     const terminal = client.onEvent?.(event => {
@@ -450,12 +457,15 @@ function MissionChanges({ mission, baseSha }: { mission: MissionRecord; baseSha:
   }, [client, markStale, mission.threadId])
   useEffect(() => {
     alive.current = true
+    const release = retainMissionDiffSession(client, mission.missionId)
     return () => {
       alive.current = false; opened.current = false
       diffStore.current.epoch += 1; diffStore.current.cache.clear(); diffStore.current.inFlight.clear()
-      void client.request('missions.diffSession.release', { missionId: mission.missionId }).catch(() => undefined)
+      release()
     }
   }, [client, mission.missionId])
+
+  useEffect(() => { if (initiallyExpanded) { opened.current = true; refreshChanges() } }, [initiallyExpanded, refreshChanges])
 
   const requestDiff = useCallback((fileId: string) => {
     if (!view?.viewId) return Promise.reject(new Error('mission.changes_refresh_required'))
@@ -500,6 +510,7 @@ function MissionChanges({ mission, baseSha }: { mission: MissionRecord; baseSha:
       {loading && !view && <p className="mission-section-empty" role="status"><UiText zh={"正在读取工作区…"} /></p>}
       {error && <div className="mission-diff-error" role="alert"><p>{files ? uiAttribute("刷新失败，保留上次结果。") : error}</p><button className="compact-cancel" disabled={loading} onClick={refreshChanges}><UiText zh={"重新读取"} /></button></div>}
       {view?.diffError && <div className="mission-diff-error" role="alert"><p>{missionError(view.diffError)}</p><button className="compact-cancel" disabled={loading} onClick={refreshChanges}><UiText zh={"刷新变更"} /></button></div>}
+      {view && initialPath != null && !canvasDiffFile(files, initialPath) && <p className="canvas-notice" role="status"><UiText zh="原文件已不在当前变更清单中，保留卡片中的原路径。" /><code>{initialPath}</code></p>}
       {files?.length === 0 && <p className="mission-section-empty"><UiText zh={"当前没有文件变更。"} /></p>}
       {!!files?.length && <MissionFileTree files={files} selected={selected} query={detailQuery} expanded={detailExpanded} scope="detail" onQueryChange={setDetailQuery} onExpandedChange={setDetailExpanded} onSelect={openDiff}/>}
     </div>

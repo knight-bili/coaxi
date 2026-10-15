@@ -28,7 +28,7 @@ export class CanvasConversationRecovery {
       try {
         if (raw === null) {
           const legacy = new Set(loadCanvasViewState(this.storage, scope, boardId).expandedCards)
-          contexts = new Set(nodes.filter(node => node.boardId === boardId && node.data.kind === 'conversation' && node.data.conversation && legacy.has(node.id))
+          contexts = new Set(nodes.filter(node => node.boardId === boardId && node.data.kind === 'conversation' && !node.data.objectReference && node.data.conversation && legacy.has(node.id))
             .map(node => canvasComposerContextKey(canvasComposerContext(scope, boardId, node.id, node.data.conversation!))))
         } else {
           const value = JSON.parse(raw)

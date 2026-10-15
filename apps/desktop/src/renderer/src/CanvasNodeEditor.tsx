@@ -1,6 +1,8 @@
 import { useRef, useState, type ReactNode } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
-import type { AgentProfile, CanvasConversationRef, CanvasNode, CanvasNodeInput, CanvasNodeKind, CanvasNodeMutation } from '@contracts'
+import type { AgentProfile, CanvasConversationRef, CanvasNode, CanvasNodeInput, CanvasNodeKind, CanvasNodeMutation, CanvasObjectReference, CanvasThreadReference } from '@contracts'
+import { CanvasObjectPicker } from './CanvasObjectPicker'
+import { canvasObjectNames, type CanvasObjectTarget } from './canvas-object'
 import { AppDialogBody, AppDialogContent, AppDialogFooter, AppDialogHeader } from './AppDialog'
 import { CARD_HEIGHT, CARD_WIDTH, FILE_CARD_HEIGHT, FILE_CARD_WIDTH, TERMINAL_CARD_HEIGHT, TERMINAL_CARD_WIDTH,
   canvasReferenceKey, isRegionKind, regionHeightForRows, regionWidthForColumns } from './canvas-layout'
@@ -17,7 +19,7 @@ export interface CanvasReferenceOption { reference: CanvasConversationRef; label
 export interface CanvasFolderGroupOption { id: string; label: string; color?: string | null; projectPaths?: readonly string[] }
 export type CanvasEditTarget = { type: 'create'; position: { x: number; y: number } } | { type: 'update'; row: CanvasNode }
 
-export function CanvasNodeEditor({ target, revision, latestRevision, agents, groups, references, referencesComplete, onRefreshReferences, blocked, pending, recovery, commandError, onClose, onSave }: {
+export function CanvasNodeEditor({ target, revision, latestRevision, agents, groups, references, referencesComplete, objectReferencesSupported = false, objectThreads = [], onRefreshReferences, blocked, pending, recovery, commandError, onClose, onSave }: {
   target: CanvasEditTarget
   revision: number
   latestRevision: number | null
@@ -25,6 +27,8 @@ export function CanvasNodeEditor({ target, revision, latestRevision, agents, gro
   groups: CanvasFolderGroupOption[]
   references: CanvasReferenceOption[]
   referencesComplete: boolean
+  objectReferencesSupported?: boolean
+  objectThreads?: readonly CanvasThreadReference[]
   onRefreshReferences?(): void
   blocked: boolean
   pending: boolean
@@ -35,6 +39,8 @@ export function CanvasNodeEditor({ target, revision, latestRevision, agents, gro
 }): React.JSX.Element {
   const original = target.type === 'update' ? target.row : null
   const [kind, setKind] = useState<CanvasNodeKind>(original?.data.kind ?? 'note')
+  const [objectKind, setObjectKind] = useState<CanvasObjectReference['kind'] | null>(original?.data.objectReference?.kind ?? null)
+  const [objectTarget, setObjectTarget] = useState<CanvasObjectTarget | null>(null)
   const [title, setTitle] = useState(original?.data.title ?? ''), [content, setContent] = useState(original?.data.content ?? '')
   const [color, setColor] = useState(original?.data.color ?? '')
   const [path, setPath] = useState(''), [agentId, setAgentId] = useState(''), [groupId, setGroupId] = useState('')
@@ -49,12 +55,12 @@ export function CanvasNodeEditor({ target, revision, latestRevision, agents, gro
   const reference = references.find(item => canvasReferenceKey(item.reference) === referenceKey && item.available !== false)?.reference
   const availableKeys = new Set(references.filter(item => item.available !== false).map(item => canvasReferenceKey(item.reference)))
   const missingMembers = members.some(key => !availableKeys.has(key))
-  const changedSelection = !original && (kind === 'custom' && missingMembers || kind === 'conversation' && Boolean(referenceKey) && !reference)
+  const changedSelection = !original && (kind === 'custom' && missingMembers || kind === 'conversation' && !objectKind && Boolean(referenceKey) && !reference)
   const validBinding = Boolean(original) || kind === 'note' || kind === 'custom' && !missingMembers
     || (kind === 'folder' || kind === 'file' || kind === 'terminal') && Boolean(path.trim())
     || kind === 'agent' && choices.some(agent => agent.agentId === agentId)
     || kind === 'group' && groups.some(group => group.id === groupId)
-    || kind === 'conversation' && Boolean(reference)
+    || kind === 'conversation' && (objectKind ? objectReferencesSupported && Boolean(objectTarget) : Boolean(reference))
   const close = () => { if (!locked) onClose() }
   const save = async () => {
     if (saving.current || locked || blocked || !validBinding || stale) return
@@ -80,7 +86,10 @@ export function CanvasNodeEditor({ target, revision, latestRevision, agents, gro
         if (kind === 'file' || kind === 'terminal') node.path = path
         if (kind === 'agent') node.agentId = agentId
         if (kind === 'group') node.folderGroupId = groupId
-        if (kind === 'conversation') node.conversation = reference!
+        if (kind === 'conversation') {
+          node.conversation = objectKind ? { threadId: objectTarget!.threadId, conversationId: null } : reference!
+          if (objectKind) node.objectReference = objectTarget!.object
+        }
         if (kind === 'custom') node.conversations = references.filter(item => members.includes(canvasReferenceKey(item.reference))).map(item => item.reference)
         mutation = { type: 'create', node }
       }
@@ -96,8 +105,13 @@ export function CanvasNodeEditor({ target, revision, latestRevision, agents, gro
       <form className="app-dialog-form" onSubmit={event => { event.preventDefault(); void save() }}>
         <AppDialogBody>
           <fieldset disabled={locked} className="canvas-editor-fields">
-            {!original && <label className="field-label"><UiText zh="类型" /><select value={kind} onChange={event => { setKind(event.target.value as CanvasNodeKind); setError(null) }}>
+            {!original && <label className="field-label"><UiText zh="类型" /><select value={objectKind ?? kind} onChange={event => {
+              const value = event.target.value
+              const nextObject = Object.hasOwn(canvasObjectNames, value) ? value as CanvasObjectReference['kind'] : null
+              setObjectKind(nextObject); setObjectTarget(null); setKind(nextObject ? 'conversation' : value as CanvasNodeKind); setError(null)
+            }}>
               {(Object.keys(canvasKindNames) as CanvasNodeKind[]).map(value => <option key={value} value={value}>{uiAttribute(canvasKindNames[value])}</option>)}
+              {(Object.keys(canvasObjectNames) as CanvasObjectReference['kind'][]).map(value => <option key={value} value={value} disabled={!objectReferencesSupported}>{uiAttribute(canvasObjectNames[value])}</option>)}
             </select></label>}
             <label className="field-label"><UiText zh="标题" /><input data-dialog-autofocus value={title} onChange={event => setTitle(event.target.value)} autoComplete="off"
               onKeyDown={event => { if (event.key === 'Enter' && event.nativeEvent.isComposing) event.preventDefault() }} /></label>
@@ -113,9 +127,10 @@ export function CanvasNodeEditor({ target, revision, latestRevision, agents, gro
             {!original && kind === 'group' && <label className="field-label"><UiText zh="项目分组" /><select value={groupId} onChange={event => setGroupId(event.target.value)}>
               <option value="">{uiAttribute(groups.length ? '请选择' : '暂无项目分组')}</option>{groups.map(group => <option key={group.id} value={group.id}>{group.label}</option>)}
             </select></label>}
-            {!original && kind === 'conversation' && <label className="field-label"><UiText zh="对话" /><select value={referenceKey} onChange={event => setReferenceKey(event.target.value)}>
+            {!original && kind === 'conversation' && !objectKind && <label className="field-label"><UiText zh="对话" /><select value={referenceKey} onChange={event => setReferenceKey(event.target.value)}>
               <option value="">{uiAttribute('请选择')}</option>{references.map(item => <option key={canvasReferenceKey(item.reference)} value={canvasReferenceKey(item.reference)} disabled={item.available === false}>{item.label}</option>)}
             </select></label>}
+            {!original && objectKind && <CanvasObjectPicker key={objectKind} kind={objectKind} threads={objectThreads} complete={referencesComplete} onChange={setObjectTarget} />}
             {!original && kind === 'custom' && <div className="canvas-editor-members" role="group" aria-label={uiAttribute('分组内的对话')}>
               {references.map(item => { const key = canvasReferenceKey(item.reference); return <label key={key}>
                 <input type="checkbox" checked={members.includes(key)} disabled={!members.includes(key) && members.length >= 200}
@@ -125,7 +140,7 @@ export function CanvasNodeEditor({ target, revision, latestRevision, agents, gro
             {kind === 'note' && <label className="field-label"><UiText zh="便签内容（支持 Markdown）" />
               <textarea rows={8} value={content} onChange={event => setContent(event.target.value)} />
             </label>}
-            {original && <p className="canvas-binding-summary"><UiText zh={canvasKindNames[kind]} /> · {original.data.path || original.data.folderPath || original.data.title || uiAttribute('保留原有绑定')}</p>}
+            {original && <p className="canvas-binding-summary"><UiText zh={objectKind ? canvasObjectNames[objectKind] : canvasKindNames[kind]} /> · {original.data.path || original.data.folderPath || original.data.title || uiAttribute('保留原有绑定')}</p>}
             {isRegionKind(kind) && <div className="canvas-grid-fields">
               <label className="field-label"><UiText zh="固定列数（0 为自动）" /><input type="number" min={0} max={12} step={1} value={columns} onChange={event => setColumns(Math.max(0, Math.min(12, Math.round(Number(event.target.value) || 0))))} /></label>
               <label className="field-label"><UiText zh="固定行数（0 为自动）" /><input type="number" min={0} max={12} step={1} value={rows} onChange={event => setRows(Math.max(0, Math.min(12, Math.round(Number(event.target.value) || 0))))} /></label>
@@ -134,7 +149,7 @@ export function CanvasNodeEditor({ target, revision, latestRevision, agents, gro
           {changedSelection && <p role="alert"><UiText zh="所选对话已结束或不可用，请重新选择。" />
             {kind === 'custom' && <button type="button" disabled={locked} onClick={() => setMembers(current => current.filter(key => availableKeys.has(key)))}><UiText zh="移除失效选择" /></button>}
           </p>}
-          {!original && (kind === 'conversation' || kind === 'custom') && !referencesComplete && <p className="canvas-notice"><UiText zh="对话清单尚未完整载入，当前结果仍在核对。" />
+          {!original && (kind === 'conversation' && !objectKind || kind === 'custom') && !referencesComplete && <p className="canvas-notice"><UiText zh="对话清单尚未完整载入，当前结果仍在核对。" />
             {onRefreshReferences && <button type="button" onClick={onRefreshReferences}><UiText zh="重新载入对话" /></button>}
           </p>}
           {stale && <p className="canvas-notice"><UiText zh="画布已更新，输入仍保留。核对后可按最新画布版本保存。" />

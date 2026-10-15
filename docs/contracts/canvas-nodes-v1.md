@@ -232,4 +232,19 @@ Snapshot 增加可选兼容能力 `objectReferenceVersion:1`。旧 Host 未声�
 Schema157/Migration207 仅新增 `canvas_node_object_reference` 及归属/不可变触发器；保留 canvas_node 原表与旧行。
 引用以 node_id 为唯一主键和删除级联外键；业务对象 ID 不设删除级联，以便显示失效引用。迁移只接受准确 schema156，
 表、两触发器、207回执与157 marker 同事务，失败完整回滚；不扫描用户文件，不改既有模型输入或冻结结果。
-当前代码与原文 SQLite 夹具已有分项证据，新增 Rust/实际 Host 尚未编译运行；选择器、独立呈现及精确工作区定位继续实施。
+当前代码与原文 SQLite 夹具已有分项证据，新增 Rust/实际 Host 尚未编译运行，不能据此声称完成工程验证。
+
+客户端选择器提供使命、任务与累计变更三项，只有快照声明 `objectReferenceVersion:1` 才能新建。
+先选原公开 Thread，再以 `missions.get` 核对 Mission，或按50项显式分页选择 Task；历史已结束任务可以继续定位。
+Diff 可显式读取当前变更清单并选择精确路径，只保存 Mission ID 和 path，不把临时文件 ID 或 viewId 写入画布。
+清单刷新后原选择失效时保留原路径并要求重新选择，不能自动换成整个 Mission 或另一文件。
+
+对象卡片显示保存的类型和对象 ID，点击才读取；不为全部卡片预读正文，不渲染私聊输入，不启动 Runtime。
+独立对象不参与普通对话展开、镜像高亮、旧展开状态迁入、成员分组或拖入分组，仍可普通移动、改标题和删除引用。
+详情按保存的对象 ID 和 Thread 复核，失败保留卡片；Mission/Task 的操作入口重新核对后复用既有工作区与定位请求，
+Task 使用精确锚定任务补入原投影，不因任务未在首屏列表而打开另一任务。工作区原有编辑/离开/恢复机制保持。
+
+Diff 详情先核对原 Mission 和 `missions.delivery` 的 Thread、工作区 Mission/Thread，使用原工作区基准及现行可见性条件，
+再复用 `MissionChanges` 读取当前列表，按 path 选择当前文件 ID 与 viewId。原路径不存在时显示提示，不能自动打开第一项。
+相同客户端、相同 Mission 的已挂载 Diff 查看器共享释放计数，最后一个关闭才发 Mission 级释放，防止关闭一个界面使另一个失效。
+Core 的12视图容量及现行过期规则仍生效；选择清单不持久化快照。当前界面模拟检查不能替代真实 Core/Host、工作区跳转和阶段集成。
