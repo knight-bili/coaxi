@@ -1,3 +1,4 @@
+import { singleChatComposerStore } from './single-chat-composer-store'
 import { useThreadClient } from './camp-client'
 import { useMobileLayout } from './MobileLayout'
 import { newCommandId } from '../../shared/command-id'
@@ -15,6 +16,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   type DragEvent as ReactDragEvent,
   type FormEvent
 } from 'react'
@@ -708,26 +710,16 @@ export function SingleChatPanel({
   const [conversations, setConversations] = useState<SingleChatConversationView[]>([])
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(initialAgentId)
   const [snapshot, setSnapshot] = useState<SingleChatSnapshot | null>(null)
-  const recoveryKey = `single-chat:${threadId}`
-  const [bodyDrafts, updateBodyDrafts] = useState<Record<string, string>>(() => {
-    const saved = client.editingRecovery?.get(recoveryKey)
-    return saved && typeof saved === 'object' ? Object.fromEntries(Object.entries(saved).filter(([, value]) => typeof value === 'string')) : {}
-  })
-  const setBodyDrafts: typeof updateBodyDrafts = (next) => updateBodyDrafts(current => {
-    const value = typeof next === 'function' ? next(current) : next
-    client.editingRecovery?.set(recoveryKey, value)
-    return value
-  })
-  useEffect(() => client.onInvalidated?.(() => {
-    const saved = client.editingRecovery?.get(recoveryKey)
-    if (saved && typeof saved === 'object') updateBodyDrafts(Object.fromEntries(Object.entries(saved).filter(([, value]) => typeof value === 'string')))
-  }), [client, recoveryKey])
+  const draftStore = useMemo(() => singleChatComposerStore(client, threadId), [client, threadId])
+  const sharedDraftState = useSyncExternalStore(draftStore.subscribe, draftStore.getSnapshot, draftStore.getSnapshot)
+  const bodyDrafts = sharedDraftState.drafts
+  const setBodyDrafts = (next: (current: Readonly<Record<string, string>>) => Record<string, string>): void => { draftStore.update(next) }
   const [quoteBusy, setQuoteBusy] = useState(false)
   const quoteTailRef = useRef<Promise<void>>(Promise.resolve())
   const quoteOperationCount = useRef(0)
   const [loading, setLoading] = useState(false)
   const loadingRef = useRef(false)
-  const [sending, setSending] = useState(false)
+  const [localSending, setSending] = useState(false)
   const [cancelling, setCancelling] = useState(false)
   const [ending, setEnding] = useState(false)
   const [preparingAttachments, setPreparingAttachments] = useState<PreparingSingleChatAttachment[]>([])
@@ -740,6 +732,7 @@ export function SingleChatPanel({
   const [pendingReturnRecovery, setPendingReturnRecovery] = useState<PendingReturnRecovery | null>(null)
   useLayoutEffect(() => {
     onLeaveGuardChange?.(() => {
+      if (!draftStore.canLeave()) throw new Error(uiAttribute('单聊草稿尚未保存或正在提交，请稍后再离开。'))
       if (returningPendingRef.current) {
         throw new Error(uiAttribute('单聊消息移回结果尚未确认，请先在单聊中重试恢复消息。'))
       }
@@ -756,7 +749,7 @@ export function SingleChatPanel({
       } }
     })
     return () => onLeaveGuardChange?.(null)
-  }, [onLeaveGuardChange])
+  }, [onLeaveGuardChange, draftStore])
   const [error, setError] = useState<string | null>(null)
   const [endDialogOpen, setEndDialogOpen] = useState(false)
   const [endTarget, setEndTarget] = useState<SingleChatEndTarget | null>(null)
@@ -773,18 +766,19 @@ export function SingleChatPanel({
   const currentSnapshot = currentTargetReady ? snapshot : null
   const bodyDraftKey = snapshot?.conversation.agentId === selectedAgentId
     ? `${threadId}:${snapshot.conversation.id}` : `${threadId}:pending:${selectedAgentId ?? ''}`
+  const sending = localSending || sharedDraftState.sendingKeys.includes(bodyDraftKey)
   const draft = bodyDrafts[bodyDraftKey] ?? ''
+  const pendingBodyKey = `${threadId}:pending:${selectedAgentId ?? ''}`
+  const retainedInputKeys = currentSnapshot ? Object.keys(bodyDrafts).filter(key =>
+    (key === pendingBodyKey || key.startsWith(`${bodyDraftKey}:returned:`)) && bodyDrafts[key] && bodyDrafts[key] !== draft) : []
+  const [retainedInputSelection, setRetainedInputSelection] = useState('')
+  const retainedInputKey = retainedInputKeys.includes(retainedInputSelection) ? retainedInputSelection : retainedInputKeys[0]
   const setDraft = (value: string): void => setBodyDrafts((current) => ({ ...current, [bodyDraftKey]: value }))
   useEffect(() => {
     if (!snapshot || snapshot.conversation.agentId !== selectedAgentId) return
     const pendingKey = `${threadId}:pending:${selectedAgentId ?? ''}`
-    setBodyDrafts((current) => {
-      if (!(pendingKey in current)) return current
-      const next = { ...current, [bodyDraftKey]: current[bodyDraftKey] ?? current[pendingKey] }
-      delete next[pendingKey]
-      return next
-    })
-  }, [threadId, selectedAgentId, snapshot?.conversation.id, bodyDraftKey])
+    draftStore.migratePending(pendingKey, bodyDraftKey)
+  }, [threadId, selectedAgentId, snapshot?.conversation.id, bodyDraftKey, draftStore, sharedDraftState.sendingKeys, sharedDraftState.ready])
   const activeRun = currentSnapshot?.agentRuns.find((run) => NON_TERMINAL_RUNS.has(run.status)) ?? null
   const runningCount = conversations.filter((conversation) => (
     conversation.id === currentSnapshot?.conversation.id
@@ -1132,6 +1126,7 @@ export function SingleChatPanel({
   }, [currentSnapshot, notificationFocus, onNotificationFocusPresented, visible])
 
   const performPendingReturn = async (transfer: PendingReturnRecovery): Promise<void> => {
+    if (!draftStore.getSnapshot().ready) throw new Error(uiAttribute('单聊草稿暂时无法读取，请重试。'))
     if (leaveLeaseCountRef.current > 0) throw new Error(uiAttribute('正在离开当前会话，请稍后再编辑待发送消息。'))
     if (returnRequestInFlightRef.current) return
     const { snapshot: current, item, editToken, commandId } = transfer
@@ -1160,7 +1155,7 @@ export function SingleChatPanel({
       const body = resultPayloadString(result, 'body') ?? ''
       const returnedDraft = result.payload.draft as unknown as SingleChatSnapshot['draft']
       const key = `${current.conversation.threadId}:${item.conversationId}`
-      setBodyDrafts((drafts) => ({ ...drafts, [key]: body }))
+      draftStore.restoreReturnedBody(key, body, commandId)
       if (currentConversationIdRef.current === item.conversationId) {
         const latest = snapshotRef.current?.conversation.id === item.conversationId ? snapshotRef.current : current
         acceptMutationSnapshot({ ...latest, draft: returnedDraft,
@@ -1450,7 +1445,8 @@ export function SingleChatPanel({
   const send = async (event: FormEvent): Promise<void> => {
     event.preventDefault()
     if (returningPendingRef.current) return
-    const body = draft.trim()
+    const originalBody = draftStore.getSnapshot().drafts[bodyDraftKey] ?? ''
+    const body = originalBody.trim()
     const agentId = selectedAgentIdRef.current
     if (
       !agentId
@@ -1459,6 +1455,8 @@ export function SingleChatPanel({
       || quoteBusy
       || preparingAttachments.some((item) => !item.error)
     ) return
+    const sendLease = draftStore.tryBeginSend(bodyDraftKey)
+    if (!sendLease) return
     followLatestRef.current = true
     setSending(true)
     setError(null)
@@ -1479,12 +1477,13 @@ export function SingleChatPanel({
         }
       })
       if (result.status === 'rejected') throw new Error(resultMessage(result))
-      setDraft('')
+      sendLease.clearSentBody(originalBody)
       setPreparingAttachments([])
       await refreshCurrent(current.conversation.id)
     } catch (nextError) {
       setError(readErrorMessage(nextError, uiAttribute('消息未发送，请重试。')))
     } finally {
+      sendLease.release()
       setSending(false)
     }
   }
@@ -1714,7 +1713,7 @@ export function SingleChatPanel({
       {currentSnapshot && (
         <SingleChatPendingQueue
           snapshot={currentSnapshot}
-          busyOutside={sending || ending || quoteBusy || returningPending || leaving || preparingAttachments.some((item) => !item.error)}
+          busyOutside={!sharedDraftState.ready || Boolean(sharedDraftState.error) || sending || ending || quoteBusy || returningPending || leaving || preparingAttachments.some((item) => !item.error)}
           onRefresh={async () => {
             await refreshCurrent()
           }}
@@ -1766,7 +1765,7 @@ export function SingleChatPanel({
               ref={composerRef}
               id={`${panelId}-composer`}
               value={draft}
-              disabled={!selectedMember || !currentTargetReady || sending || returningPending || ending}
+              disabled={!sharedDraftState.ready || !selectedMember || !currentTargetReady || sending || returningPending || ending}
               placeholder={selectedMember ? uiAttribute("给 {0} 发消息…", String(selectedMember.displayName)) : uiAttribute("选择一位队员后开始单聊")}
               onChange={(event) => setDraft(event.target.value)}
               onPaste={(event) => {
@@ -1827,11 +1826,22 @@ export function SingleChatPanel({
                     action="send"
                     type="submit"
                     busy={sending || preparingAttachments.some((item) => !item.error)}
-                    disabled={(!draft.trim() && (currentSnapshot?.draft.attachments.length ?? 0) === 0) || !selectedMember || !currentTargetReady || sending || returningPending || ending || quoteBusy || preparingAttachments.some((item) => !item.error)}
+                    disabled={!sharedDraftState.ready || Boolean(sharedDraftState.error) || (!draft.trim() && (currentSnapshot?.draft.attachments.length ?? 0) === 0) || !selectedMember || !currentTargetReady || sending || returningPending || ending || quoteBusy || preparingAttachments.some((item) => !item.error)}
                   />}
             </div>
           </div>
         </div>
+        {retainedInputKey && <div className="single-chat-retained-inputs" role="status">
+          <span><UiText zh="这段单聊还有待恢复输入，均已保留。" /></span>
+          <select aria-label={uiAttribute('选择保留输入')} value={retainedInputKey} disabled={sending} onChange={event => setRetainedInputSelection(event.target.value)}>
+            {retainedInputKeys.map((key, index) => <option key={key} value={key}>{uiAttribute('保留输入 {0}：{1}', index + 1, bodyDrafts[key].slice(0, 36))}</option>)}
+          </select>
+          <button type="button" disabled={sending || Boolean(sharedDraftState.error)} onClick={() => { draftStore.swapBodies(retainedInputKey, bodyDraftKey) }}><UiText zh="切换保留的输入" /></button>
+        </div>}
+        {sharedDraftState.error && <div className="single-chat-error" role="alert">
+          <span><UiText zh={sharedDraftState.ready ? '单聊草稿尚未保存，输入已保留。' : '单聊草稿暂时无法读取，请重试。'} /></span>
+          <button type="button" disabled={sending} onClick={() => { draftStore.retry() }}><UiText zh={sharedDraftState.ready ? '重试保存' : '重新读取'} /></button>
+        </div>}
         {pendingReturnRecovery && <div className="single-chat-error" role="alert">
           <span><UiText zh={"移回结果尚未确认，当前输入已保留。"} /></span>
           <button type="button" onClick={() => {

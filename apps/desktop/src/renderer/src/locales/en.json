@@ -3976,5 +3976,12 @@
   "当前对话输入尚未保存，请处理后重试。": "The current conversation input has not been saved. Resolve it and try again.",
   "对话卡片已保存，请刷新后展开。": "The conversation card was saved. Refresh before expanding it.",
   "原单聊暂不可用，请重新读取，不能新建替代对话。": "The original private conversation is unavailable. Reload it; a replacement conversation cannot be created.",
-  "正在处理画布对话…": "Processing canvas conversation…"
+  "正在处理画布对话…": "Processing canvas conversation…",
+  "单聊草稿尚未保存或正在提交，请稍后再离开。": "The private draft is not saved or is being submitted. Wait before leaving.",
+  "单聊草稿尚未保存，输入已保留。": "The private draft has not been saved. Your input is retained.",
+  "单聊草稿暂时无法读取，请重试。": "The private draft cannot be read right now. Try again.",
+  "切换保留的输入": "Switch retained input",
+  "这段单聊还有待恢复输入，均已保留。": "This private conversation has recoverable inputs. They have all been retained.",
+  "选择保留输入": "Choose retained input",
+  "保留输入 {0}：{1}": "Retained input {0}: {1}"
 }

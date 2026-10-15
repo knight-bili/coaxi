@@ -22,6 +22,9 @@ Canvas `group.sourceMembers`扩展复用`canvas_node::tests::eight_kinds_preserv
 `canvas-conversation.test.ts`拥有公开/私有精确读取、Host/请求归属失效、运输错误、破坏性操作识别及相机几何；
 `thread-commands.test.ts`拥有Core client/Thread固定归属、交错命令、发送快照、原参数字节、缺源/错误Thread拒绝、运输未知不重发及名册CAS字段；
 共享格式/投影提取继续由原`App.test.ts`覆盖，保留原导出。测试仅使用模拟运输，不是实际Host、Runtime或多卡挂载证明。
+`single-chat-composer-store.test.ts`拥有私有正文的client/Thread隔离、镜像整表更新、单次发送互斥、较新输入保留、
+初始读取失败、保存失败/重试、pending key迁移和共享订阅生命周期；原`SingleChatPanel.test.ts`继续拥有私有面板。
+这些纯/静态检查不证明实际多面板、跨客户端接管、Core未知结果、附件/quote revision或进程重启恢复已验。
 `SingleChatPanel.test.ts`既有owner扩绑定私有ID不可替代的准入，`App.test.ts`既有离开/退出owner扩画布挂载Thread。
 这些定向检查不替代真实挂载的草稿、portal、弹层、附件、流式和Runtime验证；后者随阶段候选执行。
 `canvas-member-interaction.test.ts`只拥有客户端落点/原子意图/父坐标，旧graph controller owner扩嵌套来源未知重试；

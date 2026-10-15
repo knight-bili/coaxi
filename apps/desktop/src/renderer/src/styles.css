@@ -1465,6 +1465,11 @@ html[data-rovai-platform="win32"] .bootstrap-shell-brand { padding-left: 20px; }
 .single-chat-error { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-top: 7px; padding: 6px 7px 6px 9px; border-left: 2px solid var(--danger); color: var(--danger); background: var(--danger-soft); font-size: 10.5px; line-height: 1.45; }
 .single-chat-error button { min-width: 32px; min-height: 24px; padding: 0 5px; border: 0; border-radius: 4px; color: var(--danger); background: transparent; cursor: pointer; font-size: 10px; }
 .single-chat-error button:hover { background: color-mix(in srgb, var(--danger) 9%, transparent); }
+.single-chat-retained-inputs { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; margin-top: 7px; padding: 8px; border: 1px solid var(--line); border-radius: 6px; color: var(--muted); background: var(--surface); font-size: 11px; line-height: 1.5; }
+.single-chat-retained-inputs > span { grid-column: 1 / -1; }
+.single-chat-retained-inputs select, .single-chat-retained-inputs button { min-width: 0; max-width: 100%; min-height: 28px; padding: 4px 6px; border: 1px solid var(--line); border-radius: 4px; color: var(--ink); background: var(--surface); font: inherit; }
+.single-chat-retained-inputs button:hover:not(:disabled) { background: var(--surface-hover); }
+.single-chat-retained-inputs button:disabled { opacity: .55; }
 .single-chat-footer { display: flex; min-height: 30px; flex: 0 0 auto; align-items: center; justify-content: space-between; gap: 10px; padding: 4px 12px 4px 16px; border-top: 1px solid var(--line); color: var(--faint); font-size: 10.5px; }
 .single-chat-footer > span:last-child { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
 .single-chat-footer kbd { padding: 1px 5px; border: 1px solid var(--line-strong); border-bottom-width: 2px; border-radius: 4px; background: var(--surface-subtle); font: 500 9px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; }
