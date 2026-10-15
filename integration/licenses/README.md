@@ -19,3 +19,7 @@ PTY后续移植及I12最终发布包仍分别核对，不将本批通知保留�
 
 `navigation-project-groups.ts`按同一固定提交的`folder_group`实体与`folder_group_service`移植非嵌套、唯一归属、
 混合顶层/组内排序和删除组保留工程行为；持久化改用既有导航JSON与版本核对。来源注释及上述Apache-2.0通知保留，无新依赖。
+
+`navigation-project-layout.ts`依据同一固定Codeg提交的`sidebar-conversation-grouping.ts`适配容器移动、拖放目标与布局序列化；
+`ProjectLayoutDialog.tsx`保留固定行投放、工作树跟随主工程的交互语义，并接入Rovai主题、键盘和现有偏好版本冲突保护。
+上述Apache-2.0来源通知保留；本批不增加拖放库或其他第三方依赖。

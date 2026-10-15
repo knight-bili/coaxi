@@ -147,6 +147,7 @@ export function ThreadNavigation({
   pins = [],
   folderGroups = [],
   projectOrder = null,
+  onManageProjectGroups,
   pinnedThreadItems = [],
   threadReadStates = {},
   onSetThreadUnread,
@@ -199,6 +200,7 @@ export function ThreadNavigation({
   pins?: NavigationPin[]
   folderGroups?: NavigationProjectGroup[]
   projectOrder?: string[] | null
+  onManageProjectGroups?(): void
   pinnedThreadItems?: NavigationThreadItem[]
   threadReadStates?: Record<string, NavigationThreadReadState>
   onSetThreadUnread?(thread: NavigationThreadItem, unread: boolean): Promise<void>
@@ -587,7 +589,9 @@ export function ThreadNavigation({
           </section>
         )}
         <section className="navigation-projects" aria-labelledby="projects-heading">
-          <div className="sidebar-group-title navigation-section-title"><span id="projects-heading"><UiText zh={"项目"} /></span><button className="section-create-button" type="button" aria-label={uiAttribute("选择工作目录")} title={uiAttribute("选择工作目录")} onClick={onOpenProject} disabled={state !== 'ready'}>＋</button></div>
+          <div className="sidebar-group-title navigation-section-title navigation-project-section-title"><span id="projects-heading"><UiText zh={"项目"} /></span><div className="navigation-project-actions">
+            {onManageProjectGroups && <button className="section-create-button" type="button" aria-label={uiAttribute('管理项目分组')} title={uiAttribute('管理项目分组')} onClick={onManageProjectGroups} disabled={state !== 'ready'}>⋯</button>}
+            <button className="section-create-button" type="button" aria-label={uiAttribute("选择工作目录")} title={uiAttribute("选择工作目录")} onClick={onOpenProject} disabled={state !== 'ready'}>＋</button></div></div>
           {navigation && navigationProjectSidebarLayout(navigation.projects, resolvedFolderGroups, projectOrder).map(entry => entry.kind === 'project' ? renderProject(entry.project) : (
             <section key={entry.key} className="navigation-folder-group" data-color={entry.group.color ?? undefined}>
               <button type="button" className="navigation-folder-group-toggle" aria-expanded={!collapsedFolderGroups.has(entry.group.id)}

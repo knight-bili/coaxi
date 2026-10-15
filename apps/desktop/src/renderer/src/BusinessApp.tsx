@@ -5,6 +5,7 @@ import { memberCreationHelper, memberCreationInitialDraft, navigationWithMemberC
 import { navigationThreadReadState } from './navigation-unread'
 import { newCommandId } from '../../shared/command-id'
 import { CanvasWorkspace } from './CanvasWorkspace'
+import { ProjectGroupsDialog } from './ProjectGroupsDialog'
 import { CanvasFolderProvider } from './CanvasFolderProvider'
 import type { CanvasLeaveGuard } from './CanvasSurface'
 import type { SingleChatPanelTarget } from './SingleChatPanel'
@@ -61,6 +62,7 @@ import type {
   ThreadViewedAcknowledgement,
   NavigationPin,
   NavigationPreferencesSnapshot,
+  NavigationProjectLayoutMutation,
   NavigationSnapshot,
   ProjectNavigationGroup,
   RestorableLocation,
@@ -1230,6 +1232,12 @@ function BusinessAppContent({
   } | null>(null)
   const automationLeaveGuardRef = useRef<AutomationLeaveGuard | null>(null)
   const canvasLeaveGuardRef = useRef<CanvasLeaveGuard | null>(null)
+  const projectGroupScope = useMemo(() => ({ client, uiPreferences }), [client, uiPreferences])
+  const projectGroupScopeRef = useRef(projectGroupScope)
+  projectGroupScopeRef.current = projectGroupScope
+  const [projectGroupsOwner, setProjectGroupsOwner] = useState<typeof projectGroupScope | null>(null)
+  const projectGroupsOwnerRef = useRef<typeof projectGroupScope | null>(null)
+  useEffect(() => { projectGroupsOwnerRef.current = null; setProjectGroupsOwner(null) }, [projectGroupScope])
   const startupResolvedSessionId = useRef<string | null>(null)
   const pendingRestorableLocation = useRef<RestorableLocation | null>(null)
   const invalidatingNewConversationDefaults = useRef(false)
@@ -1361,6 +1369,7 @@ function BusinessAppContent({
   const leaveActiveSurface = useCallback(async (
     transition: () => void | Promise<void>
   ): Promise<boolean> => {
+    if (projectGroupsOwnerRef.current === projectGroupScope) return false
     let automationTransitioned = false
     let campTransitioned = false
     const canvasTransitioned = await runCanvasLeaveTransition(viewRef.current, canvasLeaveGuardRef.current, async () => {
@@ -1369,10 +1378,11 @@ function BusinessAppContent({
       })
     })
     return canvasTransitioned && campTransitioned && automationTransitioned
-  }, [leaveActiveAutomation, leaveActiveThread])
+  }, [projectGroupScope, leaveActiveAutomation, leaveActiveThread])
 
   const prepareForAppQuit = useCallback(async (): Promise<void> => {
     try {
+      if (projectGroupsOwnerRef.current === projectGroupScope) throw new Error(uiAttribute('请先处理项目分组或排列，再退出应用。'))
       await prepareActiveCanvasForAppQuit(viewRef.current, canvasLeaveGuardRef.current)
       await prepareActiveThreadForAppQuit(
         viewRef.current,
@@ -1387,11 +1397,11 @@ function BusinessAppContent({
       setError(uiAttribute("退出应用前未能完成输入操作：{0}", String(errorMessage(nextError))))
       throw nextError
     }
-  }, [])
+  }, [projectGroupScope])
 
   useEffect(
     () => desktop?.appLifecycle.onPrepareQuit(prepareForAppQuit),
-    [prepareForAppQuit]
+    [desktop, prepareForAppQuit]
   )
 
   const cancelPendingThreadActivation = useCallback((): void => {
@@ -1597,6 +1607,20 @@ function BusinessAppContent({
   }, [acceptThreadReadStates])
 
   useEffect(() => uiPreferences.navigationPreferences.onChanged?.(applyNavigationPreferences), [uiPreferences, applyNavigationPreferences])
+
+  const assertProjectGroupScope = () => {
+    if (projectGroupScopeRef.current !== projectGroupScope) throw new Error(uiAttribute('分组操作未确认，请重新读取后核对。'))
+  }
+  const saveProjectGroupLayout = async (revision: number, mutation: NavigationProjectLayoutMutation) => {
+    assertProjectGroupScope()
+    const next = await uiPreferences.navigationPreferences.applyProjectLayout(revision, mutation)
+    assertProjectGroupScope(); applyNavigationPreferences(next)
+  }
+  const refreshProjectGroups = async () => {
+    assertProjectGroupScope()
+    const next = await uiPreferences.navigationPreferences.get()
+    assertProjectGroupScope(); applyNavigationPreferences(next)
+  }
 
   const registerProject = useCallback(async (projectPath: string, explicit = false): Promise<void> => {
     const current = navigationPreferencesRef.current
@@ -4336,6 +4360,9 @@ function BusinessAppContent({
     navigation={displayNavigation}
     folderGroups={navigationPreferences?.readError ? [] : navigationPreferences?.projectGroups}
     projectOrder={navigationPreferences?.projectOrder}
+    onManageProjectGroups={navigationPreferences ? () => {
+      void leaveActiveSurface(() => { assertProjectGroupScope(); setMobileConversationDrawerOpen(false); projectGroupsOwnerRef.current = projectGroupScope; setProjectGroupsOwner(projectGroupScope) }).catch(error => notifyError(errorMessage(error)))
+    } : undefined}
     groupLimits={navigationGroupLimits}
     onGroupLimitChange={navigationRefreshCoordinator.resizeGroup}
     activeThreadId={activeThreadId}
@@ -4405,6 +4432,9 @@ function BusinessAppContent({
 
   return (
     <MobileLayoutProvider value={mobile}>
+    {projectGroupsOwner === projectGroupScope && navigationPreferences && <ProjectGroupsDialog snapshot={navigationPreferences}
+      onSave={saveProjectGroupLayout} onRefresh={refreshProjectGroups}
+      onClose={() => { if (projectGroupScopeRef.current === projectGroupScope) { projectGroupsOwnerRef.current = null; setProjectGroupsOwner(null) } }} />}
     <FilePreviewProvider api={environment.files} threadId={view === 'camp' ? activeThreadId : null} resolvedTheme={appearance.resolvedTheme}
       missionActivity={activeMission && view === 'camp' ? <MissionActivityDocument mission={activeMission} agents={agents} onSource={missionSource} onNotify={notify} onWorkspaceCleanupRequested={refreshMissionAfterWorkspaceCleanup}/> : null}>
     <MissionInteractionProvider missions={missionList.missions} projects={displayNavigation?.projects ?? []} agents={agents} installations={installations} onChanged={refreshMission} onWorkspaceCleaned={refreshMissionAfterWorkspaceCleanup} onDeleted={onMissionDeleted} onOpen={mission => { void openMission(mission).catch(error => notifyError(missionError(error))) }} onError={notifyError}>
@@ -4555,8 +4585,8 @@ function BusinessAppContent({
           {mobile && <MobilePageHeader title={uiAttribute('无限画布')} onOpenMenu={openMobileMenu} menuOpen={mobileConversationDrawerOpen} triggerRef={mobileConversationListButtonRef} />}
           <CanvasWorkspace agents={agents} theme={appearance.resolvedTheme}
             navigationPreferences={navigationPreferences}
-            onProjectLayout={async (revision, mutation) => applyNavigationPreferences(await uiPreferences.navigationPreferences.applyProjectLayout(revision, mutation))}
-            onRefreshProjectGroups={async () => applyNavigationPreferences(await uiPreferences.navigationPreferences.get())}
+            onProjectLayout={saveProjectGroupLayout}
+            onRefreshProjectGroups={refreshProjectGroups}
             onOpenReference={reference => { void openCanvasReference(reference) }}
             onOpenMember={agentId => { void desktopNavigation.push({ kind: 'members', agentId, tab: 'identity' }) }}
             onOpenProject={path => { void desktopNavigation.push({ kind: 'quick_chat', projectPath: path }) }}

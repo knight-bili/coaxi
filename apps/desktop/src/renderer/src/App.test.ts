@@ -3105,12 +3105,14 @@ describe('task event projections', () => {
           totalCount: 0, recentThreads: [], lastActivityAt: '2026-10-15T00:00:00Z', lastActivityGlobalSequence: 0 })) },
       folderGroups: [{ id, name: '工作分组', color: 'blue', projectPaths: ['/a'] }],
       projectOrder: ['directory:/b', `folder-group:${id}`],
+      onManageProjectGroups() {},
       onNewConversation() {}, onMembers() {}, onMemory() {}, pendingMemoryCount: 0, onSettings() {}, onOpenProject() {},
       onThread() {}, onRemoveProject: async () => undefined, onRename: async () => undefined,
       onDelete: async () => undefined, onError() {}
     }
     const markup = renderToStaticMarkup(createElement(ThreadNavigation, props))
     expect(markup).toContain('class="navigation-folder-group" data-color="blue"')
+    expect(markup).toContain('aria-label="管理项目分组"')
     expect(markup.indexOf('data-group="directory:/b"')).toBeLessThan(markup.indexOf('工作分组'))
     expect(markup.indexOf('工作分组')).toBeLessThan(markup.indexOf('data-group="directory:/a"'))
     expect(markup.indexOf('data-group="directory:/a"')).toBeLessThan(markup.indexOf('data-group="quick-chat"'))

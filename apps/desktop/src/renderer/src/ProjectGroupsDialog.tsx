@@ -7,6 +7,7 @@ import { normalizeProjectDisplayName, projectDisplayNameError } from '../../shar
 import { UiText, uiAttribute } from './interface-language'
 import { useCanvasFolders } from './useCanvasFolders'
 import { projectGroupMembershipIssue } from './project-group-presentation'
+import { ProjectLayoutDialog } from './ProjectLayoutDialog'
 
 export function ProjectGroupsDialog({ snapshot, onSave, onRefresh, onClose }: {
   snapshot: NavigationPreferencesSnapshot
@@ -15,6 +16,7 @@ export function ProjectGroupsDialog({ snapshot, onSave, onRefresh, onClose }: {
   onClose(): void
 }): React.JSX.Element {
   const [editor, setEditor] = useState<{ mode: 'create' | 'update'; group: NavigationProjectGroup; revision: number } | null>(null)
+  const [arranging, setArranging] = useState(false)
   const [removal, setRemoval] = useState<{ group: NavigationProjectGroup; revision: number } | null>(null)
   const [busy, setBusy] = useState(false), [error, setError] = useState<string | null>(null), saving = useRef(false)
   const active = snapshot.registeredProjects.filter(path => !snapshot.removedProjects.some(item => item.targetKey === `directory:${path}`))
@@ -52,6 +54,7 @@ export function ProjectGroupsDialog({ snapshot, onSave, onRefresh, onClose }: {
     if (editor && !blocked && !projectDisplayNameError(editor.group.name)) void apply(editor.revision, { type: editor.mode, group: editor.group })
   }
   const change = (patch: Partial<NavigationProjectGroup>) => { if (editor) setEditor({ ...editor, group: { ...editor.group, ...patch } }) }
+  if (arranging) return <ProjectLayoutDialog snapshot={snapshot} onSave={onSave} onRefresh={onRefresh} onClose={() => setArranging(false)} />
   return <Dialog.Root open onOpenChange={open => { if (!open) close() }}><Dialog.Portal>
     <Dialog.Overlay className="dialog-overlay app-dialog-overlay" />
     <AppDialogContent width="wide" onEscapeKeyDown={event => { if (saving.current) event.preventDefault() }}
@@ -78,6 +81,8 @@ export function ProjectGroupsDialog({ snapshot, onSave, onRefresh, onClose }: {
             <button type="button" disabled={busy} onClick={() => { setEditor(null); setError(null) }}><UiText zh="使用已保存分组" /></button></div>}
           {removal && missing && <button type="button" disabled={busy} onClick={() => { setRemoval(null); setError(null) }}><UiText zh="当前清单已无此分组，返回清单" /></button>}
           {!editor && !removal && <>
+            <button type="button" disabled={blocked || active.some(path => !folders.resolutions.get(path)?.complete)} onClick={() => setArranging(true)}><UiText zh="排列项目与分组" /></button>
+            {active.some(path => !folders.resolutions.get(path)?.complete) && <p role="status"><UiText zh="工程关系尚未核对，排列入口将在核对完成后可用。" /></p>}
             <button type="button" disabled={blocked} onClick={() => edit()}><UiText zh="新建项目分组" /></button>
             {!snapshot.projectGroups.length && <p><UiText zh="还没有项目分组。" /></p>}
             <ul className="project-groups-list">{snapshot.projectGroups.map(group => <li key={group.id}>
