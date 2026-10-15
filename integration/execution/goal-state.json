@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "date": "2026-10-15",
+  "date": "2026-10-16",
   "status": "active",
   "objective": "沿既定v4完整一期计划持续推进Codeg × Rovai I00–I12及BUF，以Rovai Core为唯一业务、执行和数据库权威，保留81来源功能簇、48工作包、324验收场景，交付完整、高可用、可扩展的融合MVP，不缩减一期范围。\n\n按“多次本地commit，阶段集中验证，少量push”执行。每个小功能、小缺陷和小调整先完成编码、源码自审及适当的低成本检查，再用中文本地提交；未编译、未运行的检查明确登记为待验，不逐切片默认启动完整编译、全工作区回归、推送或GitHub Actions。\n\n除已完成的I00初始化外，I01–I12正常各安排一次阶段验证批次，共12批。一个阶段计划功能编码和review集齐后，冻结同一提交并定义fusion-iNN-rc.1候选版本，集中执行本阶段相关编译、测试、集成和必要平台验证，再集中推送阶段分支、更新草稿PR并触发相关Actions。同批可包含多个平台任务，不逐功能重复；必需测试不得删除或假通过。\n\nActions提交后登记候选版本、SHA、run ID及状态，继续可独立的编码和review，到阶段检查点或失败通知再核对，不把轮询CI当作默认推进动作。发现缺陷或兼容问题时分别本地提交修复，汇集后递增候选版本，补验失败项及必要依赖，并记录额外批次原因。数据迁移、安全、公共契约或执行恢复问题确实阻断后续编码时，可提前做最小必要局部验证，不顺带启动整套CI。\n\nmain合入、客户最终验收、发布标签和正式发布仍由客户控制。优先公开仓库标准免费runner，不修改付款方式或提高支出上限，不自动采购、不运行付费模型。外部测试身份、硬预算、设备、ADB、签名及渠道资源先登记待办，继续独立工作，最后补齐必需验收；不读取日常凭据、数据或全局MCP，不使用旧ADB。\n\n当前工程work/integration；恢复时先读integration/execution/goal-state.json、integration/ci-cost-policy.md及工作区work/workflow-state.md，以最新执行规则和实际工作区为准。目前继续I03画布交互与统一业务对象定位，并保留I02剩余场景及真实Gate待办。编译、模拟、握手或局部测试不替代真实模型、真机或完整平台资格。每轮汇报真实进度及需要客户处理的事项，然后继续；全部必需实现和验收证据齐备前，目标保持未完成。",
   "scope": {
@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "I03私聊材料r1的Core单租约scope接管/旧token拒绝与完整移回已实现；17项Core和56项既存/模拟客户端检查通过。Renderer尚缺targetBody/placement/完整保留选择及本机意图，上传准备/授权仍待，不判端到端或产品验收通过。",
+  "current_slice": "I03已接生产私聊完整移回/保留交换、排队编辑、持久原请求与发送恢复；76项定向及模拟Core三位置界面检查通过。卡片上传/源摘要/资源授权、迁入和孤立输入统一界面与真实Host/模型仍待，不判端到端或产品验收通过。",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "优先接Renderer targetBody冻结/placement、完整保留输入选择与本机原UUID意图恢复；现有旧移回按钮缺新版参数会明确拒绝，不能遗忘。继续上传prepare原编号/源摘要和资源授权，再完成卡片材料/显式迁入/orphan UI。Core编辑接管/完整移回与原回执回放已定向验证；实际Host/Native、24PC/324/HTML规模和旧焦点仍待。",
+    "继续scope上传prepare与源摘要/资源授权，再完成默认材料显式迁入和孤立输入恢复；不缩减r1或一期范围 真实HTTP/Native、多窗口/崩溃/规模与完整24PC/324仍待；本机页重载和模拟Core界面不替代正式验收。",
     "继续I03独立持久Mission/Task/Diff对象引用及启动/定位、文件节点授权和真实临时PTY、Desktop冷启动画布；现Thread关联Mission与累计Diff卡片接线已mock前端验证，私有来源完整导航和真实Core/Runtime仍待阶段候选。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "core_scoped_pending_edit_takeover_and_complete_return_locally_verified_Renderer_upload_and_intents_pending",
+  "current_slice_status": "renderer_complete_return_swap_pending_edit_and_original_intent_locally_verified_scoped_upload_orphans_and_real_Host_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -57,7 +57,7 @@
   "skill_catalog_evidence": "i02-skill-catalog-result.json",
   "skill_install_evidence": "i02-skill-install-result.json",
   "system_goal_status": "active",
-  "system_goal_verified_at": "2026-10-15T15:10:36.563261+00:00",
+  "system_goal_verified_at": "2026-10-15T16:39:52.644144+00:00",
   "skill_members_evidence": "i02-skill-members-result.json",
   "canvas_boards_evidence": "i03-canvas-boards-result.json",
   "skill_delivery_preparation_evidence": "i02-skill-delivery-preparation-result.json",
@@ -112,7 +112,7 @@
     "source_progress_continued": true
   },
   "project_groups_evidence": "i03-project-groups-result.json",
-  "checked_at": "2026-10-15T15:10:36.563261+00:00",
+  "checked_at": "2026-10-15T16:39:52.644144+00:00",
   "project_layout_evidence": "i03-project-layout-result.json",
   "project_tree_evidence": "i03-project-tree-result.json",
   "navigation_activity_evidence": "i03-navigation-activity-result.json",
@@ -139,5 +139,6 @@
   "canvas_private_scope_storage_evidence": "i03-private-scope-storage-result.json",
   "canvas_private_composer_service_evidence": "integration/execution/i03-private-composer-service-result.json",
   "canvas_private_composer_api_evidence": "i03-private-composer-api-result.json",
-  "canvas_private_pending_edit_evidence": "i03-private-pending-edit-result.json"
+  "canvas_private_pending_edit_evidence": "i03-private-pending-edit-result.json",
+  "canvas_private_input_ui_evidence": "i03-private-input-ui-result.json"
 }
