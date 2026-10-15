@@ -1,6 +1,6 @@
 import { afterEach, expect, it, vi } from 'vitest'
 import type { CoreMethod, WorkspaceWorktrees } from '@contracts'
-import { CanvasFolderController, canvasFolderResolution } from './canvas-folder-controller'
+import { CanvasFolderController, canvasFolderResolution, createCanvasFolderRequestScope } from './canvas-folder-controller'
 
 const controllers: CanvasFolderController[] = []
 afterEach(() => { controllers.splice(0).forEach(item => item.dispose()); vi.useRealTimers() })
@@ -10,6 +10,24 @@ const topology = (path: string, root: string | null = '/main', main: string | nu
   worktrees: root ? [entry('/main', true), entry('/linked', false), entry('/missing', false, false)] : []
 })
 function deferred<T>() { let resolve!: (value: T) => void; const promise = new Promise<T>(yes => { resolve = yes }); return { promise, resolve } }
+
+it('combines live consumer paths before one bounded reader and stale cleanup cannot release a newer registration', async () => {
+  vi.useFakeTimers()
+  const test = fixture(async path => topology(path, null, null)), scope = createCanvasFolderRequestScope()
+  const a = Symbol('sidebar'), b = Symbol('canvas')
+  const oldRelease = scope.register(a, ['/a', '/b'])
+  scope.bind(test.controller); await vi.advanceTimersByTimeAsync(0)
+  expect(test.calls).toEqual(['/a', '/b'])
+  const releaseB = scope.register(b, ['/b', '/c']); await vi.advanceTimersByTimeAsync(0)
+  expect(test.calls.slice(2)).toEqual(['/a', '/b', '/c'])
+  const releaseA = scope.register(a, ['/d']); await vi.advanceTimersByTimeAsync(0)
+  oldRelease(); expect([...test.controller.getSnapshot().keys()]).toEqual(['/b', '/c', '/d'])
+  releaseB(); await vi.advanceTimersByTimeAsync(0)
+  expect([...test.controller.getSnapshot().keys()]).toEqual(['/d'])
+  scope.unbind(test.controller); const count = test.calls.length
+  releaseA(); scope.register(Symbol('new'), ['/after-unbind']); await vi.advanceTimersByTimeAsync(0)
+  expect(test.calls).toHaveLength(count)
+})
 function fixture(handler: (path: string) => Promise<WorkspaceWorktrees>) {
   const calls: string[] = []
   const controller = new CanvasFolderController({ request: <T,>(method: CoreMethod, params?: unknown): Promise<T> => {
@@ -22,6 +40,7 @@ function fixture(handler: (path: string) => Promise<WorkspaceWorktrees>) {
 it('uses explicit main/linked identity, retains missing checkout history and keeps nested/child/plain directories exact', () => {
   expect(canvasFolderResolution('/main', topology('/main')).paths).toEqual(['/main', '/linked', '/missing'])
   expect(canvasFolderResolution('/linked', topology('/linked', '/linked')).paths).toEqual(['/linked'])
+  expect(canvasFolderResolution('/linked', topology('/linked', '/linked')).parentPath).toBe('/main')
   expect(canvasFolderResolution('/main/sub', topology('/main/sub')).paths).toEqual(['/main/sub'])
   expect(canvasFolderResolution('/plain', topology('/plain', null, null))).toEqual({ paths: ['/plain'], complete: true })
   const alias = { ...topology('/alias'), projectPath: '/main' }

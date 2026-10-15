@@ -61,20 +61,22 @@ function CanvasCard({ data, selected }: NodeProps<FlowNode>): React.JSX.Element 
   const resizeRevision = useRef<number | null>(null)
   const row = data.row, d = row.data, region = isRegionKind(d.kind)
   const member = actions.agents.find(item => item.agentId === d.agentId)
-  const title = d.title || (d.conversation ? actions.title(d.conversation) : member?.displayName)
+  const group = d.kind === 'group' ? actions.groups?.find(item => item.id === d.folderGroupId) : undefined
+  const color = d.color ?? group?.color
+  const title = d.title || group?.label || (d.conversation ? actions.title(d.conversation) : member?.displayName)
     || (d.path || d.folderPath ? basePathName(d.path || d.folderPath!) : uiAttribute(canvasKindNames[d.kind]))
   const columns = effectiveColumns(d, d.width), cap = visibleMemberCap(d, columns)
   const resolution = actions.resolvedMembers?.get(row.id)
   const references = resolution?.references.map(item => item.reference) ?? (d.kind === 'custom' ? d.conversations : [])
   const visible = actions.expandedRegions.has(row.id) ? references : references.slice(0, cap)
-  return <article className={`canvas-card canvas-card-${d.kind}${d.collapsed ? ' is-collapsed' : ''}`} data-color={d.color ?? undefined}>
+  return <article className={`canvas-card canvas-card-${d.kind}${d.collapsed ? ' is-collapsed' : ''}`} data-color={color ?? undefined}>
     <NodeResizer isVisible={selected && !actions.blocked && !d.collapsed && d.kind !== 'conversation'}
       minWidth={d.kind === 'file' ? FILE_CARD_MIN_WIDTH : d.kind === 'terminal' ? TERMINAL_CARD_MIN_WIDTH : 48}
       minHeight={d.kind === 'file' ? FILE_CARD_MIN_HEIGHT : d.kind === 'terminal' ? TERMINAL_CARD_MIN_HEIGHT : 48} maxWidth={20000} maxHeight={20000}
       onResizeStart={() => { resizeRevision.current = actions.beginGesture() }}
       onResizeEnd={(_event, geometry) => { actions.resize(row, geometry, resizeRevision.current); resizeRevision.current = null }} />
     <header className="canvas-card-handle">
-      {d.color && <span className="canvas-color-dot" role="img" aria-label={uiAttribute(canvasColorName(d.color))} />}
+      {color && <span className="canvas-color-dot" role="img" aria-label={uiAttribute(canvasColorName(color))} />}
       <strong title={title}>{title}</strong>
       <button className="nodrag" type="button" disabled={actions.blocked} onClick={() => actions.edit(row)} aria-label={uiAttribute('编辑节点')}><UiText zh="编辑" /></button>
       {region && <button className="nodrag" type="button" disabled={actions.blocked} onClick={() => actions.collapse(row)}

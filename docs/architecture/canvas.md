@@ -41,7 +41,10 @@ one transaction across pages or infer live Runtime qualification. The renderer u
 member regions rather than treating sidebar prefixes as complete. Folder/group worktree relations come from the
 read-only [Workspace Worktrees v1](../contracts/workspace-worktrees-v1.md) Git topology operation. Main regions absorb
 explicit linked checkouts; a child or project subdirectory stays exact. Missing topology remains visibly incomplete,
-never guessed from path prefixes; real folder-group preferences still need implementation. Current SQL fixture and controlled
+never guessed from path prefixes. [Navigation Project Groups v1](../contracts/navigation-project-groups-v1.md) now supplies
+client-local schema7 group identity, membership and color to the sidebar and canvas. One BusinessApp-owned folder provider
+merges sidebar, surface and manager demands behind the same bounded controller; failed reads keep known relations incomplete.
+Management/dragging and real mounted qualification remain separate from these persistence and projection checks. Current SQL fixture and controlled
 client results do not qualify the new Rust route or mounted UI before stage verification.
 
 The next I03 slices port board-unit geometry, grid regions, collapse/expand, dragging,

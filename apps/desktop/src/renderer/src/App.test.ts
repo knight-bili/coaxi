@@ -3096,6 +3096,29 @@ describe('task event projections', () => {
     expect(markup).not.toContain('Horizonward')
   })
 
+  it('keeps presentation folder groups ordered and preserves the existing project rows and pin behavior', () => {
+    const id = '11111111-1111-4111-8111-111111111111'
+    const props: ComponentProps<typeof ThreadNavigation> = {
+      view: 'canvas', state: 'ready', activeThreadId: null,
+      navigation: { schemaVersion: 3, throughGlobalSequence: 0, quickChat: { totalCount: 0, recentThreads: [] },
+        projects: ['/a', '/b'].map(projectPath => ({ projectKey: `directory:${projectPath}`, name: projectPath, projectPath,
+          totalCount: 0, recentThreads: [], lastActivityAt: '2026-10-15T00:00:00Z', lastActivityGlobalSequence: 0 })) },
+      folderGroups: [{ id, name: '工作分组', color: 'blue', projectPaths: ['/a'] }],
+      projectOrder: ['directory:/b', `folder-group:${id}`],
+      onNewConversation() {}, onMembers() {}, onMemory() {}, pendingMemoryCount: 0, onSettings() {}, onOpenProject() {},
+      onThread() {}, onRemoveProject: async () => undefined, onRename: async () => undefined,
+      onDelete: async () => undefined, onError() {}
+    }
+    const markup = renderToStaticMarkup(createElement(ThreadNavigation, props))
+    expect(markup).toContain('class="navigation-folder-group" data-color="blue"')
+    expect(markup.indexOf('data-group="directory:/b"')).toBeLessThan(markup.indexOf('工作分组'))
+    expect(markup.indexOf('工作分组')).toBeLessThan(markup.indexOf('data-group="directory:/a"'))
+    expect(markup.indexOf('data-group="directory:/a"')).toBeLessThan(markup.indexOf('data-group="quick-chat"'))
+    const pinned = renderToStaticMarkup(createElement(ThreadNavigation, { ...props,
+      pins: [{ kind: 'project', targetKey: 'directory:/a', pinnedAt: '2026-10-15T00:00:00Z' }] }))
+    expect(pinned.match(/data-group="directory:\/a"/g)).toHaveLength(1)
+  })
+
   it('renders the current empty workspace without inventing a pinnable Core project', () => {
     const markup = renderToStaticMarkup(createElement(ThreadNavigation, {
       view: 'camp',

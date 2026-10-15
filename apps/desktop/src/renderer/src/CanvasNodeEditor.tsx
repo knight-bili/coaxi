@@ -14,7 +14,7 @@ export const canvasColors = ['neutral', 'zinc', 'slate', 'stone', 'gray', 'red',
 const colorNames = ['默认', '锌灰', '蓝灰', '石灰', '灰色', '红色', '玫瑰', '橙色', '绿色', '蓝色', '黄色', '紫色']
 export const canvasColorName = (color: string): string => colorNames[canvasColors.indexOf(color as typeof canvasColors[number])] ?? color
 export interface CanvasReferenceOption { reference: CanvasConversationRef; label: string; available?: boolean }
-export interface CanvasFolderGroupOption { id: string; label: string; projectPaths?: readonly string[] }
+export interface CanvasFolderGroupOption { id: string; label: string; color?: string | null; projectPaths?: readonly string[] }
 export type CanvasEditTarget = { type: 'create'; position: { x: number; y: number } } | { type: 'update'; row: CanvasNode }
 
 export function CanvasNodeEditor({ target, revision, latestRevision, agents, groups, references, referencesComplete, onRefreshReferences, blocked, pending, recovery, commandError, onClose, onSave }: {

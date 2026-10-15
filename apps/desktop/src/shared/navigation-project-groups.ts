@@ -11,6 +11,18 @@ export const isNavigationProjectGroupKey = (value: unknown): value is string => 
 const object = (value: unknown): value is Record<string, unknown> => value !== null && typeof value === 'object' && !Array.isArray(value)
 const keys = (value: Record<string, unknown>, expected: string[]) => Object.keys(value).length === expected.length && expected.every(key => Object.hasOwn(value, key))
 
+export function navigationProjectSidebarLayout<T extends { projectPath: string; projectKey: string }, G extends NavigationProjectGroup>(projects: readonly T[], groups: readonly G[], order: readonly string[] | null) {
+  const byPath = new Map(projects.map(project => [project.projectPath, project]))
+  const grouped = new Set(groups.flatMap(group => group.projectPaths))
+  const entries: Array<{ kind: 'project'; key: string; project: T } | { kind: 'group'; key: string; group: G; projects: T[] }> = [
+    ...projects.filter(project => !grouped.has(project.projectPath)).map(project => ({ kind: 'project' as const, key: project.projectKey, project })),
+    ...groups.map(group => ({ kind: 'group' as const, key: navigationProjectGroupKey(group.id), group,
+      projects: group.projectPaths.flatMap(path => byPath.has(path) ? [byPath.get(path)!] : []) }))
+  ]
+  const rank = new Map(order?.map((key, index) => [key, index]) ?? [])
+  return entries.toSorted((a, b) => (rank.get(a.key) ?? Number.MAX_SAFE_INTEGER) - (rank.get(b.key) ?? Number.MAX_SAFE_INTEGER))
+}
+
 function parseGroup(value: unknown): NavigationProjectGroup {
   if (!object(value) || !keys(value, ['id', 'name', 'color', 'projectPaths']) || !groupId(value.id)
     || typeof value.name !== 'string' || projectDisplayNameError(value.name)

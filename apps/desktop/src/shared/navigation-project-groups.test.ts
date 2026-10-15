@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 import type { NavigationProjectGroup, NavigationPreferencesSnapshot } from '@contracts'
 import { EMPTY_SNAPSHOT, sanitizeSnapshot, sourceMatchesSupportedSnapshot } from './navigation-preferences-model'
-import { applyNavigationProjectLayout as apply, navigationProjectGroupKey as key } from './navigation-project-groups'
+import { applyNavigationProjectLayout as apply, navigationProjectGroupKey as key, navigationProjectSidebarLayout } from './navigation-project-groups'
 
 const A = '11111111-1111-4111-8111-111111111111', B = '22222222-2222-4222-8222-222222222222'
 const group = (id: string, paths: string[]): NavigationProjectGroup => ({ id, name: id === A ? '工作' : '开源', color: null, projectPaths: paths })
@@ -23,6 +23,10 @@ it('moves a project once, preserves unrelated fields, orders mixed siblings and 
   next = apply(next, 4, { type: 'delete', groupId: B })
   expect(next.projectOrder).toEqual(['directory:/c', key(A), 'directory:/b'])
   expect(next.registeredProjects).toEqual(['/a', '/b', '/c']); expect(next.projectNames).toEqual(source.projectNames)
+  const projects = next.registeredProjects.map(projectPath => ({ projectPath, projectKey: `directory:${projectPath}` }))
+  const rows = navigationProjectSidebarLayout(projects, next.projectGroups, next.projectOrder)
+  expect(rows.map(row => row.key)).toEqual(['directory:/c', key(A), 'directory:/b'])
+  expect(rows[1]).toMatchObject({ kind: 'group', projects: [{ projectPath: '/a' }] })
   expect(source.projectGroups).toEqual([])
 })
 

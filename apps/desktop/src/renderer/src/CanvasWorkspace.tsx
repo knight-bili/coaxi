@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { CanvasBoard, StoredCommandResult } from '@contracts'
+import type { CanvasBoard, StoredCommandResult, NavigationPreferencesSnapshot, NavigationProjectLayoutMutation } from '@contracts'
 import { CanvasSurface, type CanvasLeaveGuard, type CanvasSurfaceProps } from './CanvasSurface'
 import { CanvasBoardDialog } from './CanvasBoardDialog'
 import { CanvasBoardsController, initialCanvasBoardsState, type CanvasBoardIntent } from './canvas-boards-controller'
@@ -8,8 +8,13 @@ import { useThreadClient } from './camp-client'
 import { useCanvasReferences } from './useCanvasReferences'
 import { UiText, uiAttribute } from './interface-language'
 import { readErrorMessage } from './error-message'
+import { ProjectGroupsDialog } from './ProjectGroupsDialog'
 
-export type CanvasWorkspaceProps = Omit<CanvasSurfaceProps, 'boardId' | 'scope' | 'catalog' | 'onRefreshReferences'>
+export type CanvasWorkspaceProps = Omit<CanvasSurfaceProps, 'boardId' | 'scope' | 'catalog' | 'onRefreshReferences' | 'groups'> & {
+  navigationPreferences?: NavigationPreferencesSnapshot | null
+  onProjectLayout?(revision: number, mutation: NavigationProjectLayoutMutation): Promise<void>
+  onRefreshProjectGroups?(): Promise<void>
+}
 const NO_BOARDS: CanvasBoard[] = []
 
 function useCanvasBoards() {
@@ -46,13 +51,14 @@ export function CanvasWorkspace(props: CanvasWorkspaceProps): React.JSX.Element 
   return <CanvasWorkspaceContent key={owner.current.generation} {...props} scope={identity.scope} identityIssue={identity.issue} />
 }
 
-function CanvasWorkspaceContent({ scope, identityIssue, onLeaveGuardChange, ...props }: CanvasWorkspaceProps & {
+function CanvasWorkspaceContent({ scope, identityIssue, onLeaveGuardChange, navigationPreferences, onProjectLayout, onRefreshProjectGroups, ...props }: CanvasWorkspaceProps & {
   scope: CanvasViewScope | null; identityIssue: string | null
 }): React.JSX.Element {
   const { controller, state } = useCanvasBoards(), [storage] = useState(browserCanvasStorage)
   const catalog = useCanvasReferences()
   const [selectedId, setSelectedId] = useState(() => loadCanvasBoardSelection(storage, scope))
   const [dialog, setDialog] = useState<{ board: CanvasBoard | null; remove: boolean } | null>(null)
+  const [groupManager, setGroupManager] = useState(false)
   const [issue, setIssue] = useState<string | null>(null), panel = useRef(false), graphGuard = useRef<CanvasLeaveGuard | null>(null)
   const boards = state.snapshot?.boards ?? NO_BOARDS
   const selected = boards.find(board => board.id === selectedId) ?? null
@@ -106,7 +112,9 @@ function CanvasWorkspaceContent({ scope, identityIssue, onLeaveGuardChange, ...p
     {state.pending.state === 'unknown' && <><button type="button" onClick={() => { void recover(false) }}><UiText zh="核对结果" /></button>
       <button type="button" onClick={() => { void recover(true) }}><UiText zh="重试原操作" /></button></>}
   </div>
-  const blocked = state.loading || Boolean(state.readError || state.pending || dialog)
+  const blocked = state.loading || Boolean(state.readError || state.pending || dialog || groupManager)
+  const groups = navigationPreferences && !navigationPreferences.readError ? navigationPreferences.projectGroups.map(group => ({ id: group.id, label: group.name, color: group.color,
+    projectPaths: group.projectPaths.filter(path => navigationPreferences.registeredProjects.includes(path) && !navigationPreferences.removedProjects.some(item => item.targetKey === `directory:${path}`)) })) : []
   return <section className="canvas-workspace" aria-label={uiAttribute('画板工作区')}>
     <header className="canvas-boards-toolbar">
       <label><span className="sr-only"><UiText zh="当前画板" /></span><select value={selectedId ?? ''} disabled={blocked || !boards.length}
@@ -117,6 +125,7 @@ function CanvasWorkspaceContent({ scope, identityIssue, onLeaveGuardChange, ...p
       <button type="button" disabled={blocked} onClick={() => { void openDialog(null) }}><UiText zh="创建画板" /></button>
       <button type="button" disabled={blocked || !selected} onClick={() => { void openDialog(selected) }}><UiText zh="编辑画板" /></button>
       <button type="button" disabled={blocked || !selected} onClick={() => { void openDialog(selected, true) }}><UiText zh="删除画板" /></button>
+      {navigationPreferences && onProjectLayout && onRefreshProjectGroups && <button type="button" disabled={blocked} onClick={() => { void canLeave().then(allowed => { if (allowed) { panel.current = true; setGroupManager(true) } }) }}><UiText zh="管理项目分组" /></button>}
     </header>
     {identityIssue && <p className="canvas-notice"><UiText zh="视图偏好暂时无法恢复，本次仍可使用画板。" /></p>}
     {(issue || Boolean(state.readError)) && <div className="canvas-notice" role="alert">{issue || readErrorMessage(state.readError)}
@@ -127,12 +136,14 @@ function CanvasWorkspaceContent({ scope, identityIssue, onLeaveGuardChange, ...p
     </div>}
     {!state.snapshot && state.loading && <p role="status"><UiText zh="正在读取画板…" /></p>}
     {state.snapshot && !boards.length && !state.loading && <div className="canvas-workspace-empty"><h2><UiText zh="还没有画板" /></h2><p><UiText zh="创建一张画板，整理工程、队员、对话和便签。" /></p></div>}
-    {selectedId && <CanvasSurface {...props} boardId={selectedId} scope={scope} catalog={catalog}
+    {selectedId && <CanvasSurface {...props} boardId={selectedId} scope={scope} catalog={catalog} groups={groups}
       onRefreshReferences={() => { void catalog.refresh().catch(() => undefined) }} onLeaveGuardChange={registerGraphGuard} />}
     {dialog && <CanvasBoardDialog board={dialog.board} remove={dialog.remove}
       latest={dialog.board ? boards.find(board => board.id === dialog.board!.id) ?? null : null}
       blocked={state.loading || Boolean(state.readError)} pending={Boolean(state.pending)} recovery={recovery}
       commandError={issue}
       onClose={closeDialog} onSave={save} />}
+    {groupManager && navigationPreferences && onProjectLayout && onRefreshProjectGroups && <ProjectGroupsDialog snapshot={navigationPreferences}
+      onSave={onProjectLayout} onRefresh={onRefreshProjectGroups} onClose={() => { panel.current = false; setGroupManager(false) }} />}
   </section>
 }

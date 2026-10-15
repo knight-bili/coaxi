@@ -35,7 +35,7 @@ it('matches the same active teammate for identity and runtime, including only th
 
 it('uses explicit parent/worktree relations for folders and groups and does not mistake missing relations for a complete empty region', () => {
   const state = catalog(thread('root'), thread('child', '/linked'), thread('other', '/elsewhere'))
-  const folders = new Map([['/project', { paths: ['/project', '/linked'], complete: true }], ['/linked', { paths: ['/linked'], complete: true }]])
+  const folders = new Map<string, { paths: string[]; complete: boolean; parentPath?: string }>([['/project', { paths: ['/project', '/linked'], complete: true }], ['/linked', { paths: ['/linked'], complete: true }]])
   const folder = node({ kind: 'folder', folderPath: '/project' })
   expect(new Set(resolveCanvasRegion(folder, state, [], folders).references.map(item => item.reference.threadId))).toEqual(new Set(['root', 'child']))
   expect(new Set(resolveCanvasRegion(node({ kind: 'folder', folderPath: '/linked' }), state, [], folders).references.map(item => item.reference.threadId))).toEqual(new Set(['child']))
@@ -43,6 +43,9 @@ it('uses explicit parent/worktree relations for folders and groups and does not 
   const group = node({ kind: 'group', folderGroupId: 'group' })
   expect(resolveCanvasRegion(group, state, []).complete).toBe(false)
   expect(resolveCanvasRegion(group, state, [{ id: 'group', label: 'group', projectPaths: ['/project', '/linked'] }], folders).references).toHaveLength(6)
+  folders.set('/linked', { paths: ['/linked'], complete: true, parentPath: '/project' })
+  expect(resolveCanvasRegion(group, state, [{ id: 'group', label: 'child-only', projectPaths: ['/linked'] }], folders).references).toEqual([])
+  expect(resolveCanvasRegion(node({ kind: 'folder', folderPath: '/linked' }), state, [], folders).references).toHaveLength(3)
 })
 
 it('retains unavailable curated references without silently deleting them or replacing a private reference with a public Thread', () => {

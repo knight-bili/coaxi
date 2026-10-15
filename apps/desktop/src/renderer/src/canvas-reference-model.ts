@@ -6,7 +6,7 @@ import type { CanvasReferenceState } from './canvas-reference-controller'
 import { canvasReferenceKey } from './canvas-layout'
 import { uiAttribute } from './interface-language'
 
-export interface CanvasFolderResolution { paths: readonly string[]; complete: boolean; issue?: string }
+export interface CanvasFolderResolution { paths: readonly string[]; complete: boolean; parentPath?: string; issue?: string }
 export interface CanvasRegionResolution { references: CanvasReferenceOption[]; complete: boolean; issue?: string }
 const recency = (value: string) => Number.isFinite(Date.parse(value)) ? Date.parse(value) : 0
 function optionsForThread(thread: CanvasThreadReference, memberIds?: ReadonlySet<string>): Array<CanvasReferenceOption & { updatedAt: string }> {
@@ -57,8 +57,9 @@ export function resolveCanvasRegion(node: CanvasNode, catalog: CanvasReferenceSt
     const paths = new Set<string>()
     for (const root of roots) {
       const related = folders?.get(root)
-      for (const path of related?.paths ?? [root]) paths.add(path)
       if (!related?.complete) { complete = false; issue = related?.issue || uiAttribute('工作树关系尚未核对') }
+      if (data.kind === 'group' && related?.parentPath) continue
+      for (const path of related?.paths ?? [root]) paths.add(path)
     }
     for (const thread of catalog.items) if (thread.projectBindingKind === 'directory' && paths.has(thread.projectPath)) selected.push(...optionsForThread(thread))
   }

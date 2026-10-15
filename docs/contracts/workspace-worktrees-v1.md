@@ -46,10 +46,12 @@ Windows失效记录仅转换到持久路径使用的分隔符和verbatim/UNC表�
 绑定 linked worktree 或工程子目录时只显示其精确目录，不吸收兄弟工作树，也不按路径前缀猜测关系。
 缺失工作树的已知路径仍可关联既有Thread历史；访问文件、执行或启动终端时必须另走现有授权和实时校验。
 
-客户端按实际已保存folder/group区域需要的路径去重，每个挂载Host最多4个并发读取；
+同一BusinessApp内，侧栏、画布和分组弹窗通过CanvasFolderProvider合并实际需要的路径，
+共用一个controller与可见性刷新时钟，最多4个并发读取；不因同时显示多个入口重复查询相同工程。
 路径集合切换或Host销毁后不发布旧结果、不再发出旧集合下一项。读取失败保留已知路径，标记未完整。
 页面可见时20秒刷新、回到前台刷新，并提供显式“刷新关联”；不订阅布局事件反复查询Git。
-项目分组的真实身份、偏好保存与管理入口是独立待实施项，不能用这个读取接口代替。
+controller从linked checkout的repositoryRoot/mainWorktreePath派生展示用parentPath，失败刷新保留已知父关系并标记未完整。
+分组身份与管理入口由[Navigation Project Groups v1](navigation-project-groups-v1.md)拥有，不能用这个读取接口代替。
 
 ## 验证所有权
 

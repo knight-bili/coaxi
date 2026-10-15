@@ -26,7 +26,8 @@ export function canvasFolderResolution(path: string, value: WorkspaceWorktrees):
   if (value.projectPath === value.repositoryRoot && value.repositoryRoot === value.mainWorktreePath) {
     for (const entry of value.worktrees) if (!entry.bare) paths.add(entry.projectPath)
   }
-  return { paths: [...paths], complete: true }
+  return { paths: [...paths], complete: true,
+    ...(value.projectPath === value.repositoryRoot && value.mainWorktreePath && value.mainWorktreePath !== value.repositoryRoot ? { parentPath: value.mainWorktreePath } : {}) }
 }
 
 /** One mounted Host, four concurrent reads, coalesced refreshes and no business writes. */
@@ -56,7 +57,7 @@ export class CanvasFolderController {
   refresh = (): Promise<void> => {
     if (this.disposed) return Promise.reject(new Error('工程关系目录已关闭。'))
     ++this.generation
-    this.state = new Map(this.paths.map(path => [path, { paths: this.state.get(path)?.paths ?? [path], complete: false }]))
+    this.state = new Map(this.paths.map(path => [path, { ...this.state.get(path), paths: this.state.get(path)?.paths ?? [path], complete: false }]))
     this.listeners.forEach(listener => listener())
     return this.reads.refresh('explicit')
   }
@@ -71,7 +72,7 @@ export class CanvasFolderController {
           if (!this.disposed && generation === this.generation) this.publish(path, canvasFolderResolution(path, value))
         } catch {
           if (!this.disposed && generation === this.generation) this.publish(path, {
-            paths: this.state.get(path)?.paths ?? [path], complete: false, issue: uiAttribute('工作树关系读取失败，已保留已知对话。')
+            ...this.state.get(path), paths: this.state.get(path)?.paths ?? [path], complete: false, issue: uiAttribute('工作树关系读取失败，已保留已知对话。')
           })
         }
       }
@@ -79,4 +80,20 @@ export class CanvasFolderController {
     await Promise.all(Array.from({ length: Math.min(4, paths.length) }, worker))
   }
   dispose(): void { this.disposed = true; this.reads.dispose(); this.listeners.clear() }
+}
+
+/** One BusinessApp owner combines sidebar, canvas and dialog demands before the bounded reader. */
+export function createCanvasFolderRequestScope() {
+  const requests = new Map<symbol, readonly string[]>()
+  let controller: CanvasFolderController | null = null
+  const sync = () => controller?.setPaths([...requests.values()].flat())
+  return {
+    bind(next: CanvasFolderController) { controller = next; sync() },
+    unbind(current: CanvasFolderController) { if (controller === current) controller = null },
+    register(token: symbol, paths: readonly string[]) {
+      const entry = [...paths]; requests.set(token, entry); sync()
+      return () => { if (requests.get(token) === entry) { requests.delete(token); sync() } }
+    },
+    refresh: () => controller?.refresh() ?? Promise.resolve()
+  }
 }

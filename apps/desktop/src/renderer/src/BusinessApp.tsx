@@ -5,6 +5,7 @@ import { memberCreationHelper, memberCreationInitialDraft, navigationWithMemberC
 import { navigationThreadReadState } from './navigation-unread'
 import { newCommandId } from '../../shared/command-id'
 import { CanvasWorkspace } from './CanvasWorkspace'
+import { CanvasFolderProvider } from './CanvasFolderProvider'
 import type { CanvasLeaveGuard } from './CanvasSurface'
 import type { SingleChatPanelTarget } from './SingleChatPanel'
 import type { BusinessEnvironment } from './business-environment'
@@ -1018,7 +1019,11 @@ export function AppToast({
   )
 }
 
-export function BusinessApp({
+export function BusinessApp(props: React.ComponentProps<typeof BusinessAppContent>): React.JSX.Element {
+  return <CanvasFolderProvider client={props.environment.client}><BusinessAppContent {...props} /></CanvasFolderProvider>
+}
+
+function BusinessAppContent({
   environment,
   sidebarFooter,
   remoteConnection,
@@ -4329,6 +4334,8 @@ export function BusinessApp({
     view={view === 'camp' && missionThread ? 'missions' : view}
     state={startupStatus === 'resolved' ? navigationState : 'loading'}
     navigation={displayNavigation}
+    folderGroups={navigationPreferences?.readError ? [] : navigationPreferences?.projectGroups}
+    projectOrder={navigationPreferences?.projectOrder}
     groupLimits={navigationGroupLimits}
     onGroupLimitChange={navigationRefreshCoordinator.resizeGroup}
     activeThreadId={activeThreadId}
@@ -4547,6 +4554,9 @@ export function BusinessApp({
         {!startupGateVisible && view === 'canvas' && <>
           {mobile && <MobilePageHeader title={uiAttribute('无限画布')} onOpenMenu={openMobileMenu} menuOpen={mobileConversationDrawerOpen} triggerRef={mobileConversationListButtonRef} />}
           <CanvasWorkspace agents={agents} theme={appearance.resolvedTheme}
+            navigationPreferences={navigationPreferences}
+            onProjectLayout={async (revision, mutation) => applyNavigationPreferences(await uiPreferences.navigationPreferences.applyProjectLayout(revision, mutation))}
+            onRefreshProjectGroups={async () => applyNavigationPreferences(await uiPreferences.navigationPreferences.get())}
             onOpenReference={reference => { void openCanvasReference(reference) }}
             onOpenMember={agentId => { void desktopNavigation.push({ kind: 'members', agentId, tab: 'identity' }) }}
             onOpenProject={path => { void desktopNavigation.push({ kind: 'quick_chat', projectPath: path }) }}

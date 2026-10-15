@@ -21,6 +21,7 @@ import type {
   NavigationThreadGroup,
   NavigationSnapshot,
   ProjectNavigationGroup,
+  NavigationProjectGroup,
   SettingsSection
 } from '@contracts'
 import {
@@ -51,6 +52,9 @@ import {
   type NavigationGroupLimits
 } from './navigation-window-reader'
 import { UiText, uiAttribute } from './interface-language'
+import { navigationProjectSidebarLayout } from '../../shared/navigation-project-groups'
+import { useCanvasFolders } from './useCanvasFolders'
+import { resolveSidebarProjectGroups } from './project-group-presentation'
 
 export type NavigationSettingsSection = SettingsSection
 
@@ -141,6 +145,8 @@ export function ThreadNavigation({
   shellOnlyProjectPath = null,
   creatingConversation = false,
   pins = [],
+  folderGroups = [],
+  projectOrder = null,
   pinnedThreadItems = [],
   threadReadStates = {},
   onSetThreadUnread,
@@ -191,6 +197,8 @@ export function ThreadNavigation({
   shellOnlyProjectPath?: string | null
   creatingConversation?: boolean
   pins?: NavigationPin[]
+  folderGroups?: NavigationProjectGroup[]
+  projectOrder?: string[] | null
   pinnedThreadItems?: NavigationThreadItem[]
   threadReadStates?: Record<string, NavigationThreadReadState>
   onSetThreadUnread?(thread: NavigationThreadItem, unread: boolean): Promise<void>
@@ -226,10 +234,15 @@ export function ThreadNavigation({
   onError(error: unknown): void
 }): JSX.Element {
   const client = useThreadClient()
+  const folderPaths = useMemo(() => folderGroups.flatMap(group => group.projectPaths), [folderGroups])
+  const folders = useCanvasFolders(folderPaths)
+  const resolvedFolderGroups = useMemo(() => resolveSidebarProjectGroups(folderGroups, folders.resolutions), [folderGroups, folders.resolutions])
   const mobile = useMobileLayout()
   const collapsed = useNavigationCollapsed()
   const navigationCollapsed = !mobile && collapsed
   const [collapsedProjectGroups, setCollapsedProjectGroups] = useState<Set<string>>(() => new Set())
+  const [collapsedFolderGroups, setCollapsedFolderGroups] = useState<Set<string>>(() => new Set())
+  useEffect(() => setCollapsedFolderGroups(new Set()), [client])
   const [loadingGroups, setLoadingGroups] = useState<Set<string>>(() => new Set())
   const [action, setAction] = useState<NavigationAction>(null)
   const [renameTitle, setRenameTitle] = useState('')
@@ -384,6 +397,52 @@ export function ThreadNavigation({
     }
   }
 
+  const renderProject = (project: ProjectNavigationGroup): JSX.Element | null => {
+    const groupKey = projectKey(project)
+    if (pins.some((pin) => pin.kind === 'project' && pin.targetKey === project.projectKey)) return null
+    const window = groupWindow(groupKey, project)
+    return (
+      <ThreadGroup
+        key={project.projectKey}
+        groupKey={groupKey}
+        pinTargetKey={project.projectKey}
+        label={project.name}
+        totalCount={project.totalCount}
+        threads={window.threads}
+        hasMore={window.hasMore}
+        projectExpanded={!collapsedProjectGroups.has(groupKey)}
+        loadingMore={loadingGroups.has(groupKey)}
+        activeThreadId={activeThreadId}
+        firstRunThreadId={firstRunThreadId}
+        openingThreadId={openingThreadId}
+        currentProject={currentProjectKey === project.projectKey}
+        createDisabled={creatingConversation}
+        pinned={pins.some((pin) => pin.kind === 'project' && pin.targetKey === project.projectKey)}
+        onShowMore={() => void showMore(groupKey)}
+        onCollapseThreads={() => collapseGroupThreads(groupKey)}
+        onToggleExpanded={() => toggleProjectGroup(groupKey)}
+        onSelectProject={() => onSelectProject(project)}
+        onOpenProjectHome={onOpenProjectHome ? () => onOpenProjectHome(project) : undefined}
+        onCreate={() => onCreateInProject(project)}
+        onTogglePin={project.projectPath === shellOnlyProjectPath
+          ? undefined
+          : () => void togglePin('project', project.projectKey)}
+        onRenameProject={onRenameProject ? () => setRenameProject(project) : undefined}
+        onRemoveProject={() => openProjectRemoval(project)}
+        onToggleThreadPin={(thread) => void togglePin('camp', thread.id, thread)}
+        onCopyThreadId={(thread) => void copyThreadId(thread)}
+        threadReadStates={threadReadStates}
+        onSetThreadUnread={onSetThreadUnread ? setThreadUnread : undefined}
+        platform={platform}
+        onRevealProject={onRevealProject ? () => { void onRevealProject(project).catch(onError) } : undefined}
+        onCopyProjectPath={() => void copyProjectPath(project)}
+        onThread={onThread}
+        onAction={openAction}
+      />
+    )
+
+  }
+
   return (
     <>
       <aside id={navigationId} className={`unified-sidebar ${view === 'settings' && !mobile ? 'settings-navigation-mode' : ''}${navigationCollapsed ? ' is-collapsed' : ''}`} inert={disabled || navigationCollapsed} aria-label={view === 'settings' && !mobile ? uiAttribute("设置分类") : uiAttribute("全局导航")}>
@@ -529,50 +588,16 @@ export function ThreadNavigation({
         )}
         <section className="navigation-projects" aria-labelledby="projects-heading">
           <div className="sidebar-group-title navigation-section-title"><span id="projects-heading"><UiText zh={"项目"} /></span><button className="section-create-button" type="button" aria-label={uiAttribute("选择工作目录")} title={uiAttribute("选择工作目录")} onClick={onOpenProject} disabled={state !== 'ready'}>＋</button></div>
-          {navigation?.projects.map((project) => {
-            const groupKey = projectKey(project)
-            if (pins.some((pin) => pin.kind === 'project' && pin.targetKey === project.projectKey)) return null
-            const window = groupWindow(groupKey, project)
-            return (
-              <ThreadGroup
-                key={project.projectKey}
-                groupKey={groupKey}
-                pinTargetKey={project.projectKey}
-                label={project.name}
-                totalCount={project.totalCount}
-                threads={window.threads}
-                hasMore={window.hasMore}
-                projectExpanded={!collapsedProjectGroups.has(groupKey)}
-                loadingMore={loadingGroups.has(groupKey)}
-                activeThreadId={activeThreadId}
-                firstRunThreadId={firstRunThreadId}
-                openingThreadId={openingThreadId}
-                currentProject={currentProjectKey === project.projectKey}
-                createDisabled={creatingConversation}
-                pinned={pins.some((pin) => pin.kind === 'project' && pin.targetKey === project.projectKey)}
-                onShowMore={() => void showMore(groupKey)}
-                onCollapseThreads={() => collapseGroupThreads(groupKey)}
-                onToggleExpanded={() => toggleProjectGroup(groupKey)}
-                onSelectProject={() => onSelectProject(project)}
-                onOpenProjectHome={onOpenProjectHome ? () => onOpenProjectHome(project) : undefined}
-                onCreate={() => onCreateInProject(project)}
-                onTogglePin={project.projectPath === shellOnlyProjectPath
-                  ? undefined
-                  : () => void togglePin('project', project.projectKey)}
-                onRenameProject={onRenameProject ? () => setRenameProject(project) : undefined}
-                onRemoveProject={() => openProjectRemoval(project)}
-                onToggleThreadPin={(thread) => void togglePin('camp', thread.id, thread)}
-                onCopyThreadId={(thread) => void copyThreadId(thread)}
-                threadReadStates={threadReadStates}
-                onSetThreadUnread={onSetThreadUnread ? setThreadUnread : undefined}
-                platform={platform}
-                onRevealProject={onRevealProject ? () => { void onRevealProject(project).catch(onError) } : undefined}
-                onCopyProjectPath={() => void copyProjectPath(project)}
-                onThread={onThread}
-                onAction={openAction}
-              />
-            )
-          })}
+          {navigation && navigationProjectSidebarLayout(navigation.projects, resolvedFolderGroups, projectOrder).map(entry => entry.kind === 'project' ? renderProject(entry.project) : (
+            <section key={entry.key} className="navigation-folder-group" data-color={entry.group.color ?? undefined}>
+              <button type="button" className="navigation-folder-group-toggle" aria-expanded={!collapsedFolderGroups.has(entry.group.id)}
+                onClick={() => setCollapsedFolderGroups(current => toggleNavigationGroup(current, entry.group.id))}>
+                <span aria-hidden="true">{collapsedFolderGroups.has(entry.group.id) ? '▸' : '▾'}</span><span>{entry.group.name}</span>
+                {!entry.group.relationshipsComplete && <small><UiText zh="关系待核对" /></small>}
+              </button>
+              {!collapsedFolderGroups.has(entry.group.id) && <div className="navigation-folder-group-members">{entry.projects.map(renderProject)}</div>}
+            </section>
+          ))}
           {navigation && navigation.projects.length === 0 && <p className="sidebar-empty"><UiText zh={"选择工作目录后，对话会在这里成组显示。"} /></p>}
           {navigation && <ThreadGroup
             groupKey="quick-chat"
