@@ -16,16 +16,23 @@ afterEach(async () => {
 })
 
 describe('navigation preferences', () => {
-  it('upgrades valid schema 4 without a degradation or rewriting the old file', async () => {
+  it('upgrades valid legacy schemas without a degradation or rewriting the old file', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'rovai-navigation-read-'))
     cleanup.push(directory)
     const path = join(directory, 'navigation.json')
-    const original = JSON.stringify({ schemaVersion: 4, pins: [], removedProjects: [], projectOrder: [], projectNames: {} })
-    await writeFile(path, original)
-    const store = await NavigationPreferencesStore.load(path)
-    expect(store.loadDegradation).toBeNull()
-    expect(store.get().threadReadStates).toEqual({})
-    expect(await readFile(path, 'utf8')).toBe(original)
+    for (const source of [
+      { schemaVersion: 4, pins: [], removedProjects: [], projectOrder: [], projectNames: {} },
+      { schemaVersion: 6, pins: [], removedProjects: [], projectOrder: ['directory:/old'], projectNames: { 'directory:/old': '旧工程' },
+        registeredProjects: ['/old'], legacyProjectsSynced: true, threadReadStates: { [CAMP_A]: { manualUnread: true, readThroughGlobalSequence: 12 } } }
+    ]) {
+      const original = JSON.stringify(source)
+      await writeFile(path, original)
+      const store = await NavigationPreferencesStore.load(path)
+      expect(store.loadDegradation).toBeNull()
+      expect(store.get().threadReadStates).toEqual(source.threadReadStates ?? {})
+      expect(store.get()).toMatchObject({ schemaVersion: 7, projectGroups: [], projectGroupsRevision: 0, registeredProjects: source.registeredProjects ?? [] })
+      expect(await readFile(path, 'utf8')).toBe(original)
+    }
   })
 
   it('persists reminders and groups, merges concurrent pin writes and keeps read boundaries monotonic', async () => {
@@ -51,6 +58,11 @@ describe('navigation preferences', () => {
     expect(restarted.get().threadReadStates[CAMP_A]).toEqual({ manualUnread: false, readThroughGlobalSequence: 20 })
     await restarted.setThreadReadState(CAMP_B, null)
     expect(restarted.get().threadReadStates[CAMP_B]).toBeUndefined()
+    await restarted.removeProject('directory:/work/a', [])
+    await restarted.restoreProject('directory:/work/a')
+    expect(restarted.get().projectGroups[0].projectPaths).toEqual(['/work/a'])
+    expect(restarted.get().projectOrder).not.toContain('directory:/work/a')
+    expect(restarted.get().projectGroupsRevision).toBe(1)
   })
 
   it('rejects invalid read state and retains the previous snapshot when saving fails', async () => {

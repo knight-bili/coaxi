@@ -202,7 +202,8 @@ export class NavigationPreferencesStore {
       const next = {
         ...this.#snapshot,
         registeredProjects: [...new Set([...this.#snapshot.registeredProjects, targetKey.slice('directory:'.length)])],
-        projectOrder: [...new Set([...(this.#snapshot.projectOrder ?? []), targetKey])],
+        projectOrder: this.#snapshot.projectGroups.some(group => group.projectPaths.includes(targetKey.slice('directory:'.length)))
+          ? this.#snapshot.projectOrder : [...new Set([...(this.#snapshot.projectOrder ?? []), targetKey])],
         removedProjects: this.#snapshot.removedProjects.filter(
           (project) => project.targetKey !== targetKey
         )

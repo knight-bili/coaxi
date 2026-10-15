@@ -136,7 +136,8 @@ export function browserPreferences(scope: string, transport: ConsoleClient): {
         })),
         restoreProject: key => commitNavigation(current => ({
           registeredProjects: [...new Set([...current.registeredProjects, key.slice('directory:'.length)])],
-          projectOrder: [...new Set([...(current.projectOrder ?? []), key])],
+          projectOrder: current.projectGroups.some(group => group.projectPaths.includes(key.slice('directory:'.length)))
+            ? current.projectOrder : [...new Set([...(current.projectOrder ?? []), key])],
           removedProjects: current.removedProjects.filter(p => p.targetKey !== key)
         }))
       }
