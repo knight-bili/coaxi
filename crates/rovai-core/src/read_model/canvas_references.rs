@@ -103,7 +103,7 @@ fn read_page(
             params![
                 client_id,
                 after,
-                limit + 1,
+                (limit + 1) as i64,
                 upper_thread_id.as_deref().unwrap_or("")
             ],
             |row| {
