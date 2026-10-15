@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "I03项目分组schema7保存、原文兼容、管理弹窗、侧栏与画布绑定已编码并分三次本地提交；31项相关检查、4项静态导航检查通过，修复后的两个保存模块复验20项通过。共享工作树读取、版本冲突和旧输入保护已编码；实际UI/IPC/Host及新Rust仍待阶段验证，完整I03未完成。",
+  "current_slice": "I03项目/分组固定行拖放排列、键盘替代操作和侧栏管理入口已编码；37项相关检查及4项侧栏静态检查通过，定向类型/翻译/文档门禁通过。源码本地提交0efe96e0；实际挂载、跨窗口/Host恢复与完整I03仍待阶段候选。",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "继续I03项目/分组拖放排序（复用applyProjectLayout与同一revision）、完整worktree树样式、上下文菜单和活动徽章。分组保存/管理/侧栏/画布接线及共享关系读取已编码；实际UI/IPC/Host仍待阶段候选，不逐功能触发Actions。",
+    "继续I03完整工作树层级展示、活动徽章和分组上下文操作；项目/分组排列与键盘、侧栏入口已编码，本地37+4项检查通过。实际拖放/跨窗口/Host/退出恢复集中在阶段候选验，不逐功能推送或触发Actions。",
     "补齐I03成员拖放、展开对话卡片/既有Composer草稿、Desktop冷启动画布路由、授权文件预览与真实临时PTY生命周期；实际UI/恢复和平台资格仍待阶段验证。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "project_groups_persistence_management_sidebar_canvas_coded_targeted_checks_passed_runtime_qualification_pending",
+  "current_slice_status": "project_layout_and_sidebar_entry_coded_targeted_checks_passed_mounted_UI_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -111,5 +111,7 @@
     "checked_at": "2026-10-15T01:42:48.757Z",
     "source_progress_continued": true
   },
-  "project_groups_evidence": "i03-project-groups-result.json"
+  "project_groups_evidence": "i03-project-groups-result.json",
+  "checked_at": "2026-10-15T02:10:28.130Z",
+  "project_layout_evidence": "i03-project-layout-result.json"
 }
