@@ -180,6 +180,20 @@ export class PrivateInputController {
     return this.start('mutation', 'singleChat.composerDraft.mutate', snapshot => ({ threadId: this.origin.threadId, conversationId: this.origin.conversationId,
       composerScope: this.origin.scope, expectedDraftRevision: snapshot.draft.revision, action }), action)
   }
+  adoptLegacyMaterials(expectedSourceRevision: number): Promise<void> {
+    if (!this.origin.scope || !Number.isSafeInteger(expectedSourceRevision) || expectedSourceRevision < 0) return Promise.reject(failure('private_input.context_changed'))
+    return this.start('mutation', 'singleChat.composerDraft.mutate', snapshot => ({
+      threadId: this.origin.threadId, conversationId: this.origin.conversationId, composerScope: this.origin.scope,
+      expectedDraftRevision: snapshot.draft.revision,
+      action: { type: 'adopt_legacy_materials', expectedSourceRevision, targetBody: this.bodies.getSnapshot().drafts[bodyKey(this.origin)] ?? '' }
+    }), { type: 'adopt_legacy_materials' })
+  }
+  retainBodyCopy(body: string): void {
+    if (this.state.pending || !this.bodies.canLeave(bodyKey(this.origin))) throw failure('private_input.busy')
+    const key = `${bodyKey(this.origin)}:returned:${newCommandId()}`
+    if (!this.bodies.update(current => ({ ...current, [key]: body }))) throw failure('private_input.body_not_saved')
+    this.rememberBody(key)
+  }
   rememberBody(localKey = bodyKey(this.origin)): void {
     const primary = localKey === bodyKey(this.origin)
     if (primary && this.remembered) return

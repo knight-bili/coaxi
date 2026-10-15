@@ -1819,3 +1819,12 @@ Web/新准备/旧transport等5测试文件61项通过，派发/查回/明确重�
 Main 独立文件夹具扩无原文件的只含意图拒绝、结束前失败/丢回执及成功回放；Browser 扩无原字节/原意图冻结、
 需要重选、明确结束和未知保留；原 renderer controller owner 扩结束先查回/重复点击/未知不移除及旧租约筛选。
 HTTP 原 owner 补认证/跨编辑端/就绪回滚/真实终结/材料与spool不变，脚本只做语法检查，实际运行随阶段候选。
+
+### 默认迁入与原位置恢复 UI（2026-10-16）
+
+沿原 private-input-controller owner 扩迁入的正文锁、源/目标 revision 冻结、默认与卡片正文不移动、正文副本单独保留；
+新增 private-input-recovery-catalog 最低层 owner 负责只读合并、未登记/旧 working 正文、Host/Core 与精确存储围栏、
+不完整分页/失败保留、构造归属冻结和同位置32副本的字典读取上限。既有 SingleChatPanel/store/catalog 文案 owner 共同回归。
+浏览器使用独立端口与独立存储前缀挂载生产组件，Core/资源为模拟：迁入完整保留项、孤立原位置编辑、正文复制不覆盖、
+单次原 scope 提交、未知提交阻止关闭、只读回执结清原挂起调用；没有连接日常数据、真实 Host 或模型。
+本批不增 Rust owner、不重复运行 Cargo/Actions；实际平台/最终文件链路与24PC场景随阶段候选集中执行。

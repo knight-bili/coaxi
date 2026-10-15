@@ -20,7 +20,7 @@
     {
       "id": "I03-C01",
       "name": "完成私聊材料r1剩余链路",
-      "status": "in_progress",
+      "status": "implementation_ready_for_stage_verification",
       "items": [
         "Native/Web上传准备原编号及结果恢复",
         "私有源内容变化检查",
@@ -29,13 +29,13 @@
         "孤立Core/本机正文及冲突统一恢复"
       ],
       "done_when": "本阶段完整使用流程及PC01-PC24适用工程验证有当前源码证据，外部环境缺项明确单列",
-      "latest_partial_evidence": "i03-private-upload-lifecycle-result.json",
+      "latest_partial_evidence": "i03-private-recovery-ui-result.json",
       "remaining_runtime_risks": [
-        "原意图重试与明确结束已编码，新Rust入口及原第三owner断言待阶段编译/运行",
-        "旧Pending/token统一准备入口已编码，实际挂载/Native IPC与HTTP仍待",
-        "默认迁入、孤立输入与正文冲突统一恢复待实现",
-        "大材料、日志枚举与事务锁规模影响待验证",
-        "全工作区格式检查发现未改动源码的既有格式欠账，已登记阶段候选前处理"
+        "新生命周期Rust/Host入口及原第三owner断言随阶段候选编译和真实运行",
+        "实际Host/Native IPC/资源授权验证后启用最终文件入口，UI模拟验证不能替代",
+        "完整PC01-PC24适用工程场景与异常恢复待集中验证；发现代码缺口回到C01修复",
+        "实际大材料/日志枚举/事务锁规模归I03-C05验证；本批32副本只验证字典读取次数",
+        "既有lib.rs/single_chat.rs格式欠账保留阶段候选前处理"
       ]
     },
     {

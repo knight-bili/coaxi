@@ -2,6 +2,7 @@ import { expect, it, vi } from 'vitest'
 import type { RetainedPrivateInput, ScopedSingleChatSnapshot, SingleChatPendingInputView, StoredCommandResult } from '@contracts'
 import { PRIVATE_INPUT_BODY_INDEX, privateInputBodyIndex, PrivateInputController, type PrivateInputOrigin } from './private-input-controller'
 import { SingleChatComposerStore } from './single-chat-composer-store'
+import { canvasComposerContextKey } from './canvas-composer-drafts'
 
 const origin: PrivateInputOrigin = { threadId: 'thread', conversationId: 'private', scope: null, contextKey: 'default' }
 const item = { id: 'pending', revision: 3 } as SingleChatPendingInputView
@@ -52,6 +53,42 @@ function fixture(body = '', values = new Map<string, unknown>()) {
     page: (value: typeof page) => { page = value } }
 }
 const writes = (f: ReturnType<typeof fixture>) => f.request.mock.calls.filter(([method]) => method === 'singleChat.pendingInputs.edit' || method === 'singleChat.composerDraft.mutate' || method === 'singleChat.send')
+
+it('迁入默认材料锁定当前正文和双版本，既有正文与默认正文均不移动', async () => {
+  const f = fixture('默认问题')
+  const scope = { kind: 'canvas' as const, boardId: 'board', nodeId: 'card' }
+  const contextKey = canvasComposerContextKey({ host: 'host', core: 'core', boardId: 'board', nodeId: 'card', threadId: 'thread', conversationId: 'private' })
+  const bodies = new SingleChatComposerStore(f.client, 'thread', contextKey)
+  bodies.update(() => ({ 'thread:private': '卡片当前问题' }))
+  const controller = new PrivateInputController(f.client, { ...origin, scope, contextKey }, bodies)
+  const original = f.request.getMockImplementation()!
+  f.request.mockImplementation(async (method, params) => {
+    const value = await original(method, params)
+    return method === 'singleChat.get' ? { ...value as ScopedSingleChatSnapshot, draft: { ...(value as ScopedSingleChatSnapshot).draft, composerScope: scope, scopeKey: 'canvas:board:card' } } : value
+  })
+  f.delay()
+  const waiting = controller.adoptLegacyMaterials(7)
+  expect(bodies.update(current => ({ ...current, 'thread:private': '镜像迟到覆盖' }))).toBe(false)
+  await vi.waitFor(() => expect(writes(f)).toHaveLength(1))
+  expect(writes(f)[0][1]).toMatchObject({ command: { expectedDraftRevision: 2, composerScope: scope,
+    action: { type: 'adopt_legacy_materials', expectedSourceRevision: 7, targetBody: '卡片当前问题' } } })
+  f.release({ ...result('retained'), payload: { draft: { ...draft(3), composerScope: scope, scopeKey: 'canvas:board:card' } } })
+  await waiting
+  expect(bodies.getSnapshot().drafts['thread:private']).toBe('卡片当前问题')
+  expect(f.bodies.getSnapshot().drafts['thread:private']).toBe('默认问题')
+  expect(bodies.canLeave()).toBe(true)
+})
+
+it('正文恢复只新增明确标注的本机副本，不覆盖当前正文或提交模型材料', async () => {
+  const f = fixture('当前问题')
+  f.controller.retainBodyCopy('旧卡片的未保存正文')
+  expect(f.bodies.getSnapshot().drafts['thread:private']).toBe('当前问题')
+  const copies = Object.entries(f.bodies.getSnapshot().drafts).filter(([key]) => key.startsWith('thread:private:returned:'))
+  expect(copies.map(([, body]) => body)).toEqual(['旧卡片的未保存正文'])
+  expect(Object.values(privateInputBodyIndex(f.client)).map(entry => entry.bodyKey)).toContain(copies[0][0])
+  expect(writes(f)).toHaveLength(0)
+  await expect(f.controller.adoptLegacyMaterials(1)).rejects.toThrow('context_changed')
+})
 
 it.each(['active', 'retained'] as const)('freezes target body and keeps complete %s placement distinct', async placement => {
   const f = fixture(placement === 'active' ? '' : '当前问题')

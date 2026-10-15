@@ -1,6 +1,8 @@
 import { singleChatComposerStore, type SingleChatComposerStore } from './single-chat-composer-store'
 import { privateInputController, type PrivateInputController, type PrivateInputState } from './private-input-controller'
 import { PrivateInputRecoveryPanel, privateInputErrorMessage } from './PrivateInputRecoveryPanel'
+import { PrivateLegacyMaterialsPanel } from './PrivateLegacyMaterialsPanel'
+import { PrivateInputRecoveryBrowser } from './PrivateInputRecoveryBrowser'
 import { PrivateUploadRecoveryPanel, privateUploadErrorMessage } from './PrivateUploadRecoveryPanel'
 import { PrivateUploadHistoryPanel } from './PrivateUploadHistoryPanel'
 import { privateUploadController, type PrivateUploadState } from './private-upload-controller'
@@ -669,6 +671,7 @@ export function SingleChatPanel({
   target,
   boundConversationId,
   composerContext,
+  recoveryBrowser = true,
   notificationFocus,
   onNotificationFocusPresented,
   onVisibleNotificationSources,
@@ -679,6 +682,7 @@ export function SingleChatPanel({
   target?: SingleChatPanelTarget | null
   boundConversationId?: string
   composerContext?: CanvasComposerContext
+  recoveryBrowser?: boolean
   notificationFocus?: NotificationFocusTarget | null
   onNotificationFocusPresented?(requestId: number): void
   onVisibleNotificationSources?(sources: VisibleNotificationSources): void
@@ -748,18 +752,22 @@ export function SingleChatPanel({
   const returningPendingRef = useRef(false)
   const leaveLeaseCountRef = useRef(0)
   const [leaving, setLeaving] = useState(false)
+  const recoveryLeaveGuard = useRef<(() => ThreadLeavePreparation) | null>(null)
+  const bindRecoveryLeaveGuard = useCallback((guard: (() => ThreadLeavePreparation) | null) => { recoveryLeaveGuard.current = guard }, [])
   useLayoutEffect(() => {
     onLeaveGuardChange?.(() => {
       if (!draftStore.canLeave()) throw new Error(uiAttribute('单聊草稿尚未保存或正在提交，请稍后再离开。'))
       if (returningPendingRef.current) {
         throw new Error(uiAttribute('单聊消息移回结果尚未确认，请先在单聊中重试恢复消息。'))
       }
+      const recoveryPreparation = recoveryLeaveGuard.current?.()
       leaveLeaseCountRef.current += 1
       setLeaving(true)
       let completed = false
       return { complete(didLeave) {
         if (completed) return
         completed = true
+        recoveryPreparation?.complete(didLeave)
         if (!didLeave) {
           leaveLeaseCountRef.current -= 1
           setLeaving(leaveLeaseCountRef.current > 0)
@@ -1849,11 +1857,11 @@ export function SingleChatPanel({
           </div>
         </div>
         {retainedInputKey && <div className="single-chat-retained-inputs" role="status">
-          <span><UiText zh="旧版保存的正文副本（不含附件和引用）" /></span>
+          <span><UiText zh="保留的正文副本（不含附件和引用）" /></span>
           <select aria-label={uiAttribute('选择保留输入')} value={retainedInputKey} disabled={sending} onChange={event => setRetainedInputSelection(event.target.value)}>
             {retainedInputKeys.map((key, index) => <option key={key} value={key}>{uiAttribute('保留输入 {0}：{1}', index + 1, bodyDrafts[key].slice(0, 36))}</option>)}
           </select>
-          <button type="button" disabled={sending || inputState.pending || Boolean(sharedDraftState.error)} onClick={() => { draftStore.swapBodies(retainedInputKey, bodyDraftKey) }}><UiText zh="切换旧版正文副本" /></button>
+          <button type="button" disabled={sending || inputState.pending || Boolean(sharedDraftState.error)} onClick={() => { draftStore.swapBodies(retainedInputKey, bodyDraftKey) }}><UiText zh="切换正文副本" /></button>
         </div>}
         {sharedDraftState.error && <div className="single-chat-error" role="alert">
           <span><UiText zh={sharedDraftState.ready ? '单聊草稿尚未保存，输入已保留。' : '单聊草稿暂时无法读取，请重试。'} /></span>
@@ -1861,6 +1869,8 @@ export function SingleChatPanel({
         </div>}
         {input && <PrivateInputRecoveryPanel controller={input} state={inputState}
           busy={localSending || ending || quoteBusy || uploadBusy || preparingAttachments.some(item => !item.error)} onError={setError} />}
+        {input && <PrivateLegacyMaterialsPanel key={input.origin.contextKey} controller={input}
+          busy={busy || leaving || inputState.pending || sending || ending || quoteBusy || uploadBusy} onError={setError} />}
         {uploads?.supported && <PrivateUploadRecoveryPanel controller={uploads} reselect={client.attachments.kind === 'download'} />}
         {uploads?.supported && input && <PrivateUploadHistoryPanel api={client.singleChatAttachments} owner={uploads.owner} enabled={visible}
           activeTargets={[uploads.target, ...(currentSnapshot?.pendingInputs.editSession ? [{ kind: 'single_chat_pending' as const,
@@ -1869,6 +1879,13 @@ export function SingleChatPanel({
           reselect={client.attachments.kind === 'download'} onApplied={() => { void input.refresh().catch(() => undefined) }} />}
         {error && <div className="single-chat-error" role="alert"><span>{error}</span><button type="button" onClick={() => setError(null)}><UiText zh={"关闭"} /></button></div>}
       </form>
+      {input && recoveryBrowser && <PrivateInputRecoveryBrowser controller={input} enabled={visible}
+        busy={busy || leaving || inputState.pending || sending || ending || quoteBusy || uploadBusy}
+        onLeaveGuardChange={bindRecoveryLeaveGuard}
+        renderEditor={(location, close, bindGuard, recoveryLeaving) => <SingleChatPanel key={location.id} threadId={threadId}
+          members={members} boundConversationId={input.origin.conversationId} composerContext={location.context} recoveryBrowser={false}
+          visible={true} onOpen={() => undefined} onClose={close} onLeaveGuardChange={bindGuard} onNotify={onNotify}
+          busy={busy || recoveryLeaving} profileById={profileById} onResolveApproval={onResolveApproval} />} />}
       <footer className="single-chat-footer">
         <span><UiText zh={"单聊正文不会进入公屏"} /></span>
         <span><kbd>Esc</kbd><UiText zh={" 收起"} /></span>
