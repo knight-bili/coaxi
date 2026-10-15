@@ -1,6 +1,7 @@
 import { CanvasThreadWorkspace } from './CanvasThreadWorkspace'
 import { CanvasThreadReader } from './CanvasThreadReader'
 import { useCanvasConversations } from './useCanvasConversations'
+import { CanvasNotificationVisibility } from './canvas-notification-visibility'
 import { ThreadClientProvider } from './camp-client'
 import { shouldRefreshActiveThreadForCoreEvent } from './thread-projection-events'
 export { shouldRefreshActiveThreadForCoreEvent } from './thread-projection-events'
@@ -35,7 +36,7 @@ import { MobileSettingsLayout } from './MobileSettingsLayout'
 export { AppHeader } from './AppHeader'
 import { CurrentUserProfileProvider } from './CurrentUserProfile'
 import { CoreSubsystemNotice } from './CoreSubsystemNotice'
-import { Activity, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Activity, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { THREAD_SNAPSHOT_SCHEMA_VERSION } from '@contracts'
 import type {
@@ -986,6 +987,8 @@ function BusinessAppContent({
   const campOpenFeedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const threadProjections = useMemo(() => new ThreadProjectionStore(client), [client])
   const canvasConversations = useCanvasConversations(client, threadProjections, afterNextPaint)
+  const canvasVisibility = useMemo(() => new CanvasNotificationVisibility(), [client])
+  const canvasNotificationSources = useSyncExternalStore(canvasVisibility.subscribe, canvasVisibility.getSnapshot, canvasVisibility.getSnapshot)
   useEffect(() => () => threadProjections.reset(), [threadProjections])
   useEffect(() => activeThreadId ? threadProjections.retain(activeThreadId) : undefined, [threadProjections, activeThreadId])
   const campSnapshotRef = useRef<ThreadSurfaceSnapshot | null>(null)
@@ -4025,7 +4028,7 @@ function BusinessAppContent({
           <CanvasWorkspace agents={agents} theme={appearance.resolvedTheme}
             conversation={{ instances: canvasConversations.state.instances.map(instance => ({ key: instance.key, target: instance.target,
               busy: canvasConversations.state.busyKeys.includes(instance.key), content: canvasConversations.controller.current && <CanvasThreadWorkspace
-                instance={instance} controller={canvasConversations.controller.current} reads={threadProjections} files={environment.files}
+                instance={instance} controller={canvasConversations.controller.current} reads={threadProjections} files={environment.files} visibility={canvasVisibility}
                 theme={appearance.resolvedTheme} agents={agents} installations={installations} liveRuntimeEvents={liveRuntimeEvents}
                 navigation={navigationRefreshCoordinator} onPendingLeave={settlePendingThreadOnLeave} onForgetMemberCreation={forgetMemberCreationDraft}
                 onConfigureRuntime={configureMemberRuntime} onOpenMotionSettings={() => { void openMotionSettings() }} onNotify={notify} onNotifyError={notifyError} /> })),
@@ -4228,6 +4231,7 @@ function BusinessAppContent({
         onError={notify}
         singleChatSources={singleChatVisible ? visibleSingleChatSources : null}
         visibleSources={visibleNotificationSources}
+        canvasSources={view === 'canvas' && !startupGateVisible && !newConversationOpen && !newMissionOpen && !shuttingDown ? canvasNotificationSources : undefined}
         onHeadsUpVisibleChange={setNotificationHeadsUpVisible}
       />
       {desktop && <AppUpdatePrompt

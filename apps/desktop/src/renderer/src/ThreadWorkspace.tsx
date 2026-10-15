@@ -48,6 +48,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import * as Popover from '@radix-ui/react-popover'
 import { ThreadDetailPopover } from './ThreadDetailPopover'
 import { SingleChatPanel } from './SingleChatPanel'
+import { canvasNotificationNodeVisible, observeCanvasNotificationVisibility } from './canvas-notification-visibility'
 import {
   CompactionEventRow, ExecutionToolGroupStateContext, FileOperationRow, ModifiedFileRow, RuntimeRetryNotice,
   ToolActivityGroup, ToolCallRow, selectCompletePresentableExecutionEvidence, type ToolCallStep
@@ -3945,6 +3946,7 @@ function ThreadWorkspaceContent({
         && conversationView === 'conversation'
         && timeline !== null
         && !timeline.hidden
+        && (!composerContext || canvasNotificationNodeVisible(timeline))
       const messageIds = new Set<string>()
       const campTurnIds = new Set<string>()
       const agentRunIds = new Set<string>()
@@ -3953,6 +3955,7 @@ function ThreadWorkspaceContent({
         const viewport = timeline.getBoundingClientRect()
         for (const node of timeline.querySelectorAll<HTMLElement>('[data-message-id]')) {
           if (!node.getClientRects().length || !rectanglesOverlap(node.getBoundingClientRect(), viewport)) continue
+          if (composerContext && !canvasNotificationNodeVisible(node, timeline)) continue
           const messageId = node.dataset.messageId
           const threadTurnId = node.dataset.threadTurnId
           if (messageId) messageIds.add(messageId)
@@ -3961,7 +3964,7 @@ function ThreadWorkspaceContent({
         const approvalNode = approvalDockRef.current?.querySelector<HTMLElement>(
           '[data-approval-id]'
         ) ?? null
-        if (approvalNode && approvalNode.getClientRects().length > 0 && rectanglesOverlap(approvalNode.getBoundingClientRect(), {
+        if (approvalNode && (!composerContext || canvasNotificationNodeVisible(approvalNode)) && approvalNode.getClientRects().length > 0 && rectanglesOverlap(approvalNode.getBoundingClientRect(), {
           top: 0,
           right: window.innerWidth,
           bottom: window.innerHeight,
@@ -3978,6 +3981,7 @@ function ThreadWorkspaceContent({
           const viewport = node.closest<HTMLElement>('.execution-drawer-body')
           if (!viewport || !node.getClientRects().length || viewport.hidden) continue
           if (!rectanglesOverlap(node.getBoundingClientRect(), viewport.getBoundingClientRect())) continue
+          if (composerContext && !canvasNotificationNodeVisible(node, viewport)) continue
           const agentRunId = node.dataset.agentRunId
           if (agentRunId) agentRunIds.add(agentRunId)
         }
@@ -4002,6 +4006,7 @@ function ThreadWorkspaceContent({
     }
     const timeline = timelineScrollRef.current
     const workspace = workspaceShellRef.current
+    const stopCanvasObservation = composerContext ? observeCanvasNotificationVisibility(workspace, schedule) : () => undefined
     const resizeObserver = new ResizeObserver(schedule)
     const observeExecutionDrawer = (): void => {
       if (!executionDrawerPortal) return
@@ -4036,6 +4041,7 @@ function ThreadWorkspaceContent({
       if (frame !== null) window.cancelAnimationFrame(frame)
       observer.disconnect()
       resizeObserver.disconnect()
+      stopCanvasObservation()
       timeline?.removeEventListener('scroll', schedule)
       workspace?.removeEventListener('scroll', schedule, true)
       executionDrawerPortal?.removeEventListener('scroll', schedule, true)
@@ -4055,6 +4061,7 @@ function ThreadWorkspaceContent({
     inspectorVisible,
     singleChatVisible,
     onVisibleNotificationSources,
+    contextIdentity,
     snapshot.approvals,
     snapshot.thread.id,
     snapshot.messages,

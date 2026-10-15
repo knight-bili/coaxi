@@ -10,12 +10,15 @@ import { effectiveCancellingRunIds, reconcileRunCancellationIds } from './thread
 import type { CanvasConversationInstance, CanvasConversationsController } from './canvas-conversations-controller'
 import type { NavigationWindowReader } from './navigation-window-reader'
 import type { LiveRuntimeEvent } from './ui-model'
+import type { CanvasNotificationVisibility } from './canvas-notification-visibility'
+import type { VisibleNotificationSources } from './ThreadWorkspace'
 import { UiText, uiAttribute } from './interface-language'
 import { errorMessage, type ThreadSurfaceSnapshot } from './thread-workspace-data'
 
 export interface CanvasThreadWorkspaceProps {
   instance: CanvasConversationInstance
   controller: CanvasConversationsController
+  visibility: CanvasNotificationVisibility
   reads: ThreadProjectionStore
   files: FilePreviewApi
   theme: ResolvedTheme
@@ -37,9 +40,17 @@ export function CanvasThreadWorkspace(props: CanvasThreadWorkspaceProps): React.
   </FilePreviewProvider>
 }
 
-function CanvasThreadWorkspaceContent({ instance, controller, reads, agents, installations, liveRuntimeEvents, navigation,
+function CanvasThreadWorkspaceContent({ instance, controller, visibility, reads, agents, installations, liveRuntimeEvents, navigation,
   onPendingLeave, onForgetMemberCreation, onConfigureRuntime, onOpenMotionSettings, onNotify, onNotifyError }: CanvasThreadWorkspaceProps): React.JSX.Element {
   const client = useThreadClient(), threadId = instance.target.reference.threadId
+  const visibilityLease = useRef<ReturnType<CanvasNotificationVisibility['register']> | null>(null)
+  useLayoutEffect(() => {
+    const lease = visibility.register(instance.key, threadId)
+    visibilityLease.current = lease
+    return () => { lease.release(); if (visibilityLease.current === lease) visibilityLease.current = null }
+  }, [visibility, instance.key, threadId])
+  const publicVisible = useCallback((source: VisibleNotificationSources) => visibilityLease.current?.publish('public', source), [])
+  const privateVisible = useCallback((source: VisibleNotificationSources) => visibilityLease.current?.publish('private', source), [])
   const subscribe = useCallback((listener: () => void) => reads.subscribe(threadId, listener), [reads, threadId])
   const getSnapshot = useCallback(() => reads.getSnapshot(threadId), [reads, threadId])
   const projection = useSyncExternalStore(subscribe, getSnapshot, getSnapshot)
@@ -88,6 +99,7 @@ function CanvasThreadWorkspaceContent({ instance, controller, reads, agents, ins
       messageHistory={campSnapshot.openCoverage?.messages} onLoadEarlierMessages={async () => { await reads.loadEarlier(threadId) }}
       busy={Boolean(busy || !projection.snapshot)} optimisticMessages={optimisticThreadMessages.map(entry => entry.message)}
       onSend={actions.sendThreadMessage} onWithdrawMessage={actions.withdrawThreadMessage}
+      onVisibleNotificationSources={publicVisible} onVisibleSingleChatSources={privateVisible}
       onPendingDraftPersisted={() => { void navigation.invalidate({ scope: 'group', threadId }).catch(() => undefined) }}
       onPendingThreadLeave={onPendingLeave} onThreadLeaveGuardChange={bindLeave}
       onChangeLead={actions.changeDefaultLead} onAddMembers={actions.addThreadMembers} onPreviewMemberRemoval={actions.previewThreadMemberRemoval}

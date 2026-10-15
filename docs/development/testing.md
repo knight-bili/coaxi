@@ -21,7 +21,13 @@ I03 多卡输入的最低层 owner 为 `canvas-conversations-controller.test.ts`
 浏览器隔离夹具实际挂载三个生产 Frame/ThreadWorkspace/Composer、模拟 Core/文件与内存编辑恢复，
 检查独立正文、原地/侧边保持编辑器与撤销、局部查找、关闭单卡及重开、精确文件内容、控件唯一性和缩放边界。
 内存夹具的重开不是磁盘/进程重启；它也没有挂载完整 ReactFlow/BusinessApp。真实 Core/文件授权、模型执行、
-可见通知、私有附件/quotes CAS、IME/触控、HTML规模及全平台验证仍保留到相应阶段候选。
+真实可见通知持久确认、私有附件/quotes CAS、IME/触控、HTML规模及全平台验证仍保留到相应阶段候选。
+
+多卡通知继续扩展 `NotificationAttentionController.test.ts` 的来源并集、多 Thread quiet 与冻结请求语义，
+`canvas-notification-visibility.test.ts` 拥有按实例报告/关闭/旧挂载拒绝和窗口交集；不新增 Core 通知测试 owner。
+隔离浏览器挂载生产 Attention Controller 与真实卡片，以模拟 Core 记录实际确认请求：一个 Thread 在途/失败时
+另一个继续、未知重试保持 UUID/字节、关闭一张/全部镜像、画布移出视口、卡片层叠、弹窗遮挡和重新出现。
+夹具调试信息限制高度，避免调试区遮住被测卡片；不由 mock 结果宣称真实通知事务或 Host 接管通过。
 
 ## Rust 测试准入与退役门槛
 

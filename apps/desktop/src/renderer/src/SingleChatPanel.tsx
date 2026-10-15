@@ -9,6 +9,7 @@ import { revealMessageQuote } from './message-quote-reveal'
 import { ReturnToLatest } from './ReturnToLatest'
 import { MessageQuotes, MessageQuoteSelectionToolbar } from './MessageQuotes'
 import type { MessageQuoteAction, MessageQuoteSnapshot } from '@contracts'
+import { canvasNotificationNodeVisible, observeCanvasNotificationVisibility } from './canvas-notification-visibility'
 import {
   useCallback,
   useEffect,
@@ -1075,17 +1076,18 @@ export function SingleChatPanel({
       const viewport = viewportRef.current
       const canObserve = visible && currentSnapshot !== null && viewport !== null
         && document.visibilityState === 'visible' && document.hasFocus()
+        && (!composerContext || canvasNotificationNodeVisible(viewport))
       const campTurnIds = new Set<string>()
       const approvalIds = new Set<string>()
       if (canObserve && viewport) {
         const bounds = viewport.getBoundingClientRect()
         for (const node of viewport.querySelectorAll<HTMLElement>('[data-notification-turn-id]')) {
-          if (node.getClientRects().length && rectanglesOverlap(node.getBoundingClientRect(), bounds)) {
+          if (node.getClientRects().length && (!composerContext || canvasNotificationNodeVisible(node, viewport)) && rectanglesOverlap(node.getBoundingClientRect(), bounds)) {
             campTurnIds.add(node.dataset.notificationTurnId!)
           }
         }
         for (const node of approvalRef.current?.querySelectorAll<HTMLElement>('[data-approval-id]') ?? []) {
-          if (node.getClientRects().length && rectanglesOverlap(node.getBoundingClientRect(), {
+          if (node.getClientRects().length && (!composerContext || canvasNotificationNodeVisible(node)) && rectanglesOverlap(node.getBoundingClientRect(), {
             top: 0, right: window.innerWidth, bottom: window.innerHeight, left: 0
           })) approvalIds.add(node.dataset.approvalId!)
         }
@@ -1103,6 +1105,7 @@ export function SingleChatPanel({
     const schedule = (): void => { if (frame === null) frame = window.requestAnimationFrame(publish) }
     const viewport = viewportRef.current
     const observer = new MutationObserver(schedule)
+    const stopCanvasObservation = composerContext ? observeCanvasNotificationVisibility(panelRef.current, schedule) : () => undefined
     if (panelRef.current) observer.observe(panelRef.current, { subtree: true, childList: true, attributes: true })
     schedule()
     viewport?.addEventListener('scroll', schedule, { passive: true })
@@ -1112,12 +1115,13 @@ export function SingleChatPanel({
     return () => {
       if (frame !== null) window.cancelAnimationFrame(frame)
       observer.disconnect()
+      stopCanvasObservation()
       viewport?.removeEventListener('scroll', schedule)
       window.removeEventListener('resize', schedule)
       window.removeEventListener('focus', schedule)
       document.removeEventListener('visibilitychange', schedule)
     }
-  }, [threadId, currentSnapshot, onVisibleNotificationSources, visible])
+  }, [threadId, currentSnapshot, onVisibleNotificationSources, visible, contextIdentity])
 
   useEffect(() => {
     if (!visible || !notificationFocus?.active || notificationFocus.approvalId

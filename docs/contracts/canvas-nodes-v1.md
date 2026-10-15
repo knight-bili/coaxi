@@ -138,7 +138,9 @@ Board 删除在同一事务删除它的节点并保留 Board tombstone，不恢�
 仅五个空闲缓存受 LRU 预算限制，挂载/订阅及读取中的实例不被该预算驱逐。换 client 新建 store，不跨 Host/Owner 采纳缓存。
 实际多卡入口已按精确卡片上下文挂载，每个 Thread 一个读取订阅 owner，分发既有 Core 事件、Host invalidation 与有界事件轮询。
 每张卡片拥有自己的 leave guard，批量离开先准备全部输入；任一准备失败即解除已准备项并保留全部实例。
-可见通知的并集与确认、完整展开恢复仍需继续实现与实测，不能由读取订阅推导完成。
+可见通知已接实际卡片 public/private 报告的按 Thread 并集、精确确认与独立重试；
+只有窗口与裁剪范围内且未被遮住的来源参与，收起只移除所属实例的报告。
+多卡 quiet 只影响临时浮层，不清未读；完整展开恢复和真实 Core 通知确认仍需继续实施与实测。
 
 固定 Codeg `canvas-conversation-surface.tsx` 的 `draftStorageKey=canvas-draft:<contextKey>` 与 `attachmentTabId=contextKey`
 明确每张卡片的输入独立，不能由同一 Thread 的消息共享推导出所有卡片共享一份草稿。该核查纠正先前检查点中的共享草稿计划，
@@ -174,7 +176,7 @@ Core 事件回读不能覆盖本地未保存正文或正在提交的快照；本
 模拟 Core 的浏览器挂载已检查三张真实 Frame/ThreadWorkspace/Composer 的独立正文、模式切换、撤销、局部查找、
 关闭重开、文件归属及 60%/100% 预览边界；它没有挂载完整 ReactFlow/BusinessApp，也不证明真实文件能力或进程重启。
 私有附件与 quotes 的 Core Draft 仍按 Conversation，需要继续完成卡片间隔离。展开状态跨页面/重启恢复、
-实际可见通知确认、关闭后的孤立输入恢复、复杂导航失败恢复及规模性能仍在 I03 队列，未移出一期。
+真实 Core 的通知确认、关闭后的孤立输入恢复、复杂导航失败恢复及规模性能仍在 I03 队列，未移出一期。
 真实 Core/Runtime 流式、审批、停止、IME/触控、HTML/iframe 资源规模与各平台资格仍待验收。
 
 纯输入 owner 拥有八种类型、几何/网格、路径与成员上限；扩展 SQLite owner 拥有204回执回滚、

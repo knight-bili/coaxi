@@ -133,5 +133,8 @@ object. Contained decks use local coordinates and scoped DOM IDs; focus selects 
 and the file-find surface. Shared Thread preview tabs do not imply shared composer drafts.
 Browser checks mount three production card/editor components with in-memory Core and files;
 they do not mount the full ReactFlow/BusinessApp or establish real Core/model/platform acceptance.
-Notification visibility/ack unions, durable expanded-state restoration, private attachment/quote
-isolation and recovery of closed orphan inputs remain required I03 work.
+Notification visibility/ack unions are now wired through the same Attention Controller, with clipping,
+occlusion checks and independent per-Thread requests. Mock Core browser checks cover offscreen,
+covered and closed cards, source reappearance and a frozen uncertain retry. Real Core notification
+acceptance, durable expanded-state restoration, private attachment/quote isolation and recovery of
+closed orphan inputs remain required I03 work.
