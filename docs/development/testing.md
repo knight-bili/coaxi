@@ -1766,3 +1766,14 @@ Windows Server 更新交接继续扩展原 owner `handoff_requires_settlement_th
 恢复冷Host；另一个缺失Binding必须拒绝恢复。停止后核对Fleet收敛，不发送prompt、不调用Builtin CLI，
 不能将管理器重建等同完整Core进程/业务数据库重启。配置owner增加历史`agents.list`、规范ID冲突和多Agent
 拒绝，Native fixture采用带大小写的唯一原生Agent，并检查源配置字节未变，复现修复前凭空增加main/双重roster的错误。
+
+## 融合期 Native 目录准备与私有暂存预览（2026-10-16）
+
+扩展原 `private-attachment-preparation.test.ts` owner，使用隔离目录与模拟 Core 摘要验证目录类型落盘、重启只查原回执、
+摘要变化不派发及明确重试保留原参数；这里不重新实现 Core 目录摘要算法。
+扩展原 FilePreviewService 私有根 owner，真实本地 HTTP 验证附件槽内 HTML/CSS、跨窗口/卡片拒绝、隐藏路径、
+目录穿越拒绝及授权撤销后的410；Core 只使用模拟授权接口。复用 file-preview-authority、Web client 和摘要 owner，
+5个测试文件共94项通过；Windows 跳过原有冒号文件名用例，未新增跳过。
+最小命令：`pnpm exec vitest run apps/desktop/src/main/private-attachment-preparation.test.ts apps/desktop/src/main/file-preview/file-preview-service.test.ts apps/desktop/src/main/file-preview/file-preview-authority.test.ts apps/web/src/client.test.ts apps/web/src/file-digest.test.ts`。
+Core 原私聊材料 owner 增加 Native 目录观察/绑定、Web 冒用拒绝、错误总量零材料/回执和正确请求恢复断言，
+不新增 Rust 测试函数，按阶段集中规则登记未运行；旧二进制不作为本轮新代码证据。完整 Host/Native IPC、平台和产品验证仍待。

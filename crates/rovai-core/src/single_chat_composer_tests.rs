@@ -1106,6 +1106,7 @@ fn verify_private_upload_bindings() {
         display_name: "upload.txt".into(),
         byte_size: 5,
         sha256: format!("{:x}", Sha256::digest(b"input")),
+        source_kind: crate::local_attachment_source::LocalAttachmentKind::File,
     };
     let mut source =
         observe_source_attachment(&file, &intent.display_name, Some("text/plain")).unwrap();
@@ -1509,6 +1510,56 @@ fn verify_private_source_observations() {
     let first = observe_private_source(&tree).unwrap();
     assert_eq!(first.file_count, 2);
     assert_eq!(first, observe_private_source(&tree).unwrap());
+    let native = crate::web_upload::observe_native(&DraftClient::default(), serde_json::from_value(json!({
+        "commandId":Uuid::new_v4().to_string(),"threadId":f.thread,"expectedRevision":0,
+        "target":{"kind":"single_chat","conversationId":f.conversation,"composerScope":f.scopes[2]},
+        "sourcePath":tree,"displayName":"selected-directory","mediaType":"application/octet-stream"
+    })).unwrap()).unwrap();
+    assert_eq!(native["intent"]["sourceKind"], "directory");
+    assert_eq!(native["intent"]["byteSize"], first.byte_size);
+    assert!(native["source"]["observedByteSize"].is_null());
+    assert!(native["source"]["mediaType"].is_null());
+    let native_intent: crate::web_upload::UploadIntent =
+        serde_json::from_value(native["intent"].clone()).unwrap();
+    let native_source: crate::local_attachment_source::LocalAttachmentSourceRef =
+        serde_json::from_value(native["source"].clone()).unwrap();
+    let web = DraftClient::verified_web(&"9".repeat(64)).unwrap();
+    assert!(crate::web_upload::reconcile(&f.database, &web, native_intent.clone()).is_err());
+    let mut wrong_size = native_intent.clone();
+    wrong_size.byte_size += 1;
+    assert!(
+        crate::web_upload::bind(
+            &mut f.database,
+            &tree,
+            &DraftClient::default(),
+            wrong_size,
+            native_source.clone()
+        )
+        .is_err()
+    );
+    assert!(
+        crate::web_upload::reconcile(&f.database, &DraftClient::default(), native_intent.clone())
+            .unwrap()
+            .is_none()
+    );
+    assert!(
+        read(&f, 2).draft.attachments.is_empty(),
+        "目录观察错误与首次scope登记一起回滚"
+    );
+    crate::web_upload::bind(
+        &mut f.database,
+        &tree,
+        &DraftClient::default(),
+        native_intent.clone(),
+        native_source,
+    )
+    .unwrap();
+    assert_eq!(read(&f, 2).draft.attachments[0].kind, "directory");
+    assert!(
+        crate::web_upload::reconcile(&f.database, &DraftClient::default(), native_intent)
+            .unwrap()
+            .is_some()
+    );
     let source = observe_source_attachment(&tree, "directory-source", None).unwrap();
     let revision = default_revision(&f);
     SingleChatService::default()

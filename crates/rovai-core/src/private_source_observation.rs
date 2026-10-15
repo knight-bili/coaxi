@@ -60,10 +60,13 @@ pub(crate) fn capture_upload(
     conversation: &str,
     source: &LocalAttachmentSourceRef,
     digest: &str,
+    byte_size: u64,
 ) -> Result<()> {
     let observed = observe_private_source(std::path::Path::new(&source.source_path))?;
     ensure!(
-        observed.kind == source.kind && observed.content_digest == digest,
+        observed.kind == source.kind
+            && observed.content_digest == digest
+            && observed.byte_size == byte_size,
         "upload content changed"
     );
     if let Some((path, kind, expected)) = load(tx, conversation, source)? {

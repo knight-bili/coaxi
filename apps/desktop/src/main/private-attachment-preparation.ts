@@ -15,11 +15,11 @@ type Input = { displayName: string; mediaType: string | null } & (
   { sourcePath: string } | { bytes: Uint8Array }
 )
 interface Source {
-  id: string; sourcePath: string; displayName: string; kind: 'file'
-  mediaType: string | null; observedByteSize: number
+  id: string; sourcePath: string; displayName: string; kind: 'file' | 'directory'
+  mediaType: string | null; observedByteSize: number | null
 }
 interface Observation {
-  intent: PrivateAttachmentPreparationRequest & { displayName: string; byteSize: number; sha256: string }
+  intent: PrivateAttachmentPreparationRequest & { displayName: string; byteSize: number; sha256: string; sourceKind?: 'directory' }
   source: Source
 }
 interface Entry extends Observation {
@@ -66,14 +66,18 @@ function observation(value: unknown, request: PrivateAttachmentPreparationReques
   const source = value.source
   if (!isDeepStrictEqual(parsePrivatePreparation({ commandId: intent.commandId, threadId: intent.threadId,
     expectedRevision: intent.expectedRevision, target: intent.target }), request)
-    || !fields(intent, ['commandId', 'threadId', 'expectedRevision', 'target', 'displayName', 'byteSize', 'sha256'])
+    || !fields(intent, ['commandId', 'threadId', 'expectedRevision', 'target', 'displayName', 'byteSize', 'sha256', 'sourceKind'],
+      ['commandId', 'threadId', 'expectedRevision', 'target', 'displayName', 'byteSize', 'sha256'])
     || typeof intent.displayName !== 'string' || !intent.displayName || [...intent.displayName].length > 120
     || !Number.isSafeInteger(intent.byteSize) || Number(intent.byteSize) < 0
     || typeof intent.sha256 !== 'string' || !/^[a-f0-9]{64}$/.test(intent.sha256)
     || !fields(source, ['id', 'sourcePath', 'displayName', 'kind', 'mediaType', 'observedByteSize'])
-    || source.id !== request.commandId || source.kind !== 'file'
+    || source.id !== request.commandId || (source.kind !== 'file' && source.kind !== 'directory')
     || typeof source.sourcePath !== 'string' || !isAbsolute(source.sourcePath)
-    || source.displayName !== intent.displayName || source.observedByteSize !== intent.byteSize
+    || source.displayName !== intent.displayName
+    || (source.kind === 'directory'
+      ? intent.sourceKind !== 'directory' || source.observedByteSize !== null || source.mediaType !== null
+      : intent.sourceKind !== undefined || source.observedByteSize !== intent.byteSize)
     || (source.mediaType !== null && typeof source.mediaType !== 'string')) return fail()
   return value as unknown as Observation
 }
@@ -117,7 +121,7 @@ export class PrivateAttachmentPreparations {
     const request = parsePrivatePreparation(value.request)
     if (request.commandId !== id) return fail()
     const observed = observation(value, request)
-    if (value.original.owned && observed.source.sourcePath !== this.#source(id, value.original.displayName)) return fail()
+    if (value.original.owned && (observed.source.kind !== 'file' || observed.source.sourcePath !== this.#source(id, value.original.displayName))) return fail()
     return { ...value, ...observed, request } as Entry
   }
   async #require(request: PrivateAttachmentPreparationRequest): Promise<Entry> {
@@ -162,6 +166,7 @@ export class PrivateAttachmentPreparations {
         ...request, sourcePath, displayName: input.displayName, mediaType: input.mediaType
       }), request)
       if (observed.source.sourcePath !== sourcePath) return fail()
+      if ('bytes' in input && observed.source.kind !== 'file') return fail()
       const entry: Entry = { version: 1, ...observed, request,
         original: { displayName: input.displayName, mediaType: input.mediaType, owned: 'bytes' in input }, phase: 'prepared' }
       await this.#write(entry)

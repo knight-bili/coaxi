@@ -717,3 +717,11 @@ Migration206/schema156 增加独立私聊源观察表，原输入、SourceRef、
 边界见 [私聊输入 Scope v1](../../contracts/single-chat-composer-scope-v1.md#私聊源观察与接受前检查2026-10-16)。
 因迁移安全，最小 Core lib 检查合并覆盖此前两轮上传接线；实际客户端、Native目录请求、大材料性能和完整平台仍待，
 不能把 Core 局部检查升级为完整 PC01–PC24 或一期交付通过。
+
+## 融合期 Native 目录准备与暂存附件预览（2026-10-16）
+
+Native 原上传请求支持目录类型、树摘要和总字节数，文件请求保持旧 JSON；重启恢复和明确重试保留原意图。
+Core 私有暂存文件复用现有附件授权，未扩大私有根访问权限。
+范围见 [私聊输入 Scope v1](../../contracts/single-chat-composer-scope-v1.md#native-目录准备与暂存附件预览2026-10-16)。
+5个定向测试文件共94项通过，1项既有 Windows 平台跳过；Main/Preload/Web 定向类型检查通过。
+预览使用真实临时文件和本地 HTTP，Core 授权仍为模拟接口；新增 Rust 目录断言、实际 Host/Native IPC 和共享文件界面仍待。

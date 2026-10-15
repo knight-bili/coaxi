@@ -1,14 +1,14 @@
 //! Host temporary-file ingress into the existing source-reference Draft. There
 //! is no new asset lifetime: after binding, Core never deletes the source file.
 use crate::{
-    command::*, db::Database, draft_client::DraftClient,
-    local_attachment_source::LocalAttachmentSourceRef,
+    command::*,
+    db::Database,
+    draft_client::DraftClient,
+    local_attachment_source::{LocalAttachmentKind, LocalAttachmentSourceRef},
 };
-use anyhow::{Context, Result, ensure};
+use anyhow::{Result, ensure};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use sha2::{Digest, Sha256};
-use std::io::Read;
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -45,69 +45,45 @@ pub fn observe_native(
     ensure!(params.expected_revision >= 0, "invalid upload revision");
     let path = std::path::Path::new(&params.source_path);
     ensure!(path.is_absolute(), "upload path must be absolute");
-    let file = crate::local_attachment_snapshot::open_source_without_following(path)?;
-    let metadata = file.metadata()?;
-    ensure!(
-        metadata.is_file(),
-        "private upload directory observation is not available"
-    );
-    let byte_size = metadata.len();
+    let observed = crate::local_attachment_snapshot::observe_private_source(path)?;
     let source = LocalAttachmentSourceRef {
         id: params.command_id.clone(),
         source_path: params.source_path,
         display_name: crate::local_attachment_snapshot::normalize_display_name(
             &params.display_name,
         )?,
-        kind: crate::local_attachment_source::LocalAttachmentKind::File,
-        media_type: params
-            .media_type
-            .as_deref()
-            .map(str::trim)
-            .filter(|value| !value.is_empty())
-            .map(str::to_string),
-        observed_byte_size: Some(byte_size),
+        kind: observed.kind,
+        media_type: if observed.kind == LocalAttachmentKind::File {
+            params
+                .media_type
+                .as_deref()
+                .map(str::trim)
+                .filter(|value| !value.is_empty())
+                .map(str::to_string)
+        } else {
+            None
+        },
+        observed_byte_size: (observed.kind == LocalAttachmentKind::File)
+            .then_some(observed.byte_size),
     };
-    drop(file);
-    let sha256 = observe_file_digest(&source, byte_size)?;
     let intent = UploadIntent {
         target: params.target,
         command_id: params.command_id,
         camp_id: params.camp_id,
         expected_revision: params.expected_revision,
         display_name: source.display_name.clone(),
-        byte_size,
-        sha256,
+        source_kind: observed.kind,
+        byte_size: observed.byte_size,
+        sha256: observed.content_digest,
     };
     Ok(json!({"intent":intent,"source":source}))
 }
 
-fn observe_file_digest(source: &LocalAttachmentSourceRef, expected_size: u64) -> Result<String> {
-    ensure!(
-        source.kind == crate::local_attachment_source::LocalAttachmentKind::File,
-        "upload requires a file"
-    );
-    let file = crate::local_attachment_snapshot::open_source_without_following(
-        std::path::Path::new(&source.source_path),
-    )?;
-    ensure!(file.metadata()?.is_file(), "attachment_kind_changed");
-    let mut reader = file.take(
-        expected_size
-            .checked_add(1)
-            .context("invalid upload size")?,
-    );
-    let mut digest = Sha256::new();
-    let mut count = 0u64;
-    let mut buffer = [0u8; 64 * 1024];
-    loop {
-        let length = reader.read(&mut buffer).context("attachment_unreadable")?;
-        if length == 0 {
-            break;
-        }
-        count += length as u64;
-        digest.update(&buffer[..length]);
-    }
-    ensure!(count == expected_size, "upload content changed");
-    Ok(format!("{:x}", digest.finalize()))
+fn file_source_kind() -> LocalAttachmentKind {
+    LocalAttachmentKind::File
+}
+fn is_file_source_kind(kind: &LocalAttachmentKind) -> bool {
+    *kind == LocalAttachmentKind::File
 }
 
 #[derive(Clone, Deserialize, Serialize)]
@@ -122,6 +98,11 @@ pub struct UploadIntent {
     pub display_name: String,
     pub byte_size: u64,
     pub sha256: String,
+    #[serde(
+        default = "file_source_kind",
+        skip_serializing_if = "is_file_source_kind"
+    )]
+    pub source_kind: LocalAttachmentKind,
 }
 
 #[derive(Clone, Default, Deserialize, Serialize)]
@@ -233,6 +214,11 @@ fn envelope(client: &DraftClient, intent: UploadIntent) -> Result<CommandEnvelop
         !client.is_desktop() || !matches!(intent.target, UploadTarget::Camp),
         "public upload requires a verified Web editor"
     );
+    ensure!(
+        intent.source_kind == LocalAttachmentKind::File
+            || (client.is_desktop() && !matches!(intent.target, UploadTarget::Camp)),
+        "directory upload requires a native private target"
+    );
     crate::camp_id::ThreadId::parse(&intent.camp_id)?;
     uuid::Uuid::parse_str(&intent.command_id)?;
     ensure!(
@@ -276,14 +262,17 @@ pub fn bind(
     );
     ensure!(
         source.display_name == envelope.payload.intent.display_name
-            && source.observed_byte_size == Some(envelope.payload.intent.byte_size),
+            && source.kind == envelope.payload.intent.source_kind
+            && match source.kind {
+                LocalAttachmentKind::File =>
+                    source.observed_byte_size == Some(envelope.payload.intent.byte_size),
+                LocalAttachmentKind::Directory =>
+                    source.observed_byte_size.is_none() && source.media_type.is_none(),
+            },
         "upload observation changed"
     );
     DomainCommandGateway.execute(database, &envelope, |transaction| {
         let intent = &envelope.payload.intent;
-        if !matches!(intent.target, UploadTarget::Camp) {
-            ensure!(observe_file_digest(&source, intent.byte_size)? == intent.sha256, "upload content changed");
-        }
         match &intent.target {
             UploadTarget::Camp => {
                 ensure!(
@@ -306,7 +295,7 @@ pub fn bind(
             UploadTarget::SingleChatPending { conversation_id, pending_input_id, edit_token, composer_scope: None } => crate::single_chat::SingleChatService::for_client(client.clone()).commit_pending_source_attachment_in_transaction(transaction, &intent.camp_id, conversation_id, pending_input_id, intent.expected_revision, edit_token, source.clone())?,
         }
         if let UploadTarget::SingleChat { conversation_id, .. } | UploadTarget::SingleChatPending { conversation_id, .. } = &intent.target {
-            crate::private_source_observation::capture_upload(transaction,conversation_id,&source,&intent.sha256)?;
+            crate::private_source_observation::capture_upload(transaction,conversation_id,&source,&intent.sha256,intent.byte_size)?;
         }
         let payload = if matches!(intent.target, UploadTarget::Camp) {
             json!({"attachmentRefId":intent.command_id, "source":source})

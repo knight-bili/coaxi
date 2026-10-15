@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { mkdtemp, readFile, rm, unlink, writeFile } from 'node:fs/promises'
+import { lstat, mkdir, mkdtemp, readFile, rm, unlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { basename, dirname, join, resolve } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -24,10 +24,21 @@ class Core {
   receipts = new Map<string, StoredCommandResult>()
   mode: 'applied' | 'unknown' | 'lost' | 'hung' = 'applied'
   binds = 0
+  directoryDigest = 'd'.repeat(64)
   async request<T>(method: 'host.upload.observe' | 'host.upload.bind' | 'host.upload.receipt', input: unknown): Promise<T> {
     const params = structuredClone(input) as Record<string, unknown>
     this.calls.push({ method, params })
     if (method === 'host.upload.observe') {
+      if ((await lstat(String(params.sourcePath))).isDirectory()) {
+        // 此 owner 只拥有 Main 的运输/恢复边界；实际目录摘要由 Core owner 验证。
+        return { intent: {
+          commandId: params.commandId, threadId: params.threadId, expectedRevision: params.expectedRevision,
+          target: params.target, displayName: params.displayName, byteSize: 5, sha256: this.directoryDigest, sourceKind: 'directory'
+        }, source: {
+          id: params.commandId, sourcePath: params.sourcePath, displayName: params.displayName,
+          kind: 'directory', mediaType: null, observedByteSize: null
+        } } as T
+      }
       const bytes = await readFile(String(params.sourcePath))
       return { intent: {
         commandId: params.commandId, threadId: params.threadId, expectedRevision: params.expectedRevision,
@@ -189,5 +200,35 @@ describe('Native 私聊上传原请求恢复', () => {
     const before = f.core.calls.length
     await expect(other.reconcile(input)).rejects.toThrow('invalid_recovery')
     expect(f.core.calls).toHaveLength(before)
+  })
+
+  it('目录保留原意图重启恢复，变化时不派发，不能按普通文件丢掉类型', async () => {
+    const f = await fixture()
+    const sourcePath = join(f.root, 'selected-folder')
+    await mkdir(sourcePath)
+    await writeFile(join(sourcePath, 'child.txt'), 'input')
+    const input = request()
+    f.core.mode = 'unknown'
+    expect(await f.service.prepare(input, { ...metadata, displayName: 'selected-folder', sourcePath })).toMatchObject({ state: 'unknown' })
+    const path = join(f.directory, `${input.commandId}.json`)
+    const journal = JSON.parse(await readFile(path, 'utf8'))
+    expect(journal.intent.sourceKind).toBe('directory')
+    expect(journal.source).toMatchObject({ kind: 'directory', observedByteSize: null, mediaType: null })
+    const restored = new PrivateAttachmentPreparations(f.directory, f.core)
+    expect(await restored.reconcile(input)).toMatchObject({ state: 'unknown' })
+    expect(f.core.binds).toBe(1)
+    f.core.directoryDigest = 'e'.repeat(64)
+    await expect(restored.retry(input)).rejects.toThrow('source_changed')
+    expect(f.core.binds).toBe(1)
+    f.core.directoryDigest = journal.intent.sha256
+    f.core.mode = 'applied'
+    expect(await restored.retry(input)).toMatchObject({ state: 'recorded' })
+    expect(f.core.calls.filter(call => call.method === 'host.upload.bind').map(call => call.params)).toEqual([
+      { intent: journal.intent, source: journal.source }, { intent: journal.intent, source: journal.source }
+    ])
+    journal.intent.sourceKind = undefined
+    await writeFile(path, JSON.stringify(journal))
+    await expect(restored.reconcile(input)).rejects.toThrow('invalid_recovery')
+    expect(f.core.binds).toBe(2)
   })
 })
