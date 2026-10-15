@@ -48,3 +48,5 @@ I00已自审修正并合入，I01基础构建与契约证据保留草稿；I02�
 - [I03私聊卡片材料隔离r1](proposals/canvas-private-materials-r1.md)：16页客户确认版已逐页自审且获明确确认，[证据](execution/i03-private-materials-proposal-result.json)绑定批准文件摘要。继续Core归属、完整输入保留和未知结果恢复；24项验证要求仍待执行，不计作功能通过。
 
 - [I03私聊草稿归属基础](execution/i03-private-scope-foundation-result.json)：r1已确认；闭合codec、旧省略/显式null区分与精确活跃私聊pin校验已编写，原文SQL25项见证/格式/文档通过；Rust两owner未编译执行，生产新接口及新存储尚未接通，不计作完整隔离功能通过。
+
+- [I03私聊草稿与保留输入存储](execution/i03-private-scope-storage-result.json)：已确认r1追加Schema155/Migration205，保留旧默认原值，补材料/引用/资源及编辑范围限制、orphan保留和删除清理。22项本地Rust定向及相关回归通过，旧回执/准入负例保留；新卡片材料接口/完整恢复和平台Runtime资格继续，不判I03完成。

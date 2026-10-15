@@ -125,6 +125,15 @@
       "file": "apps/desktop/src/renderer/src/canvas-conversations-controller.ts:prepareLeave",
       "problem": "Renderer两阶段准备/提交/回滚与原DOM/undo已实现并mock浏览器验证，247相关检查通过；Native已经通过预检后的退出失败、真实Core停止/异常进程/Host与并发图资格仍需实测。",
       "evidence": "i03-canvas-atomic-leave-result.json"
+    },
+    {
+      "id": "DEV-CANVAS-PRIVATE-MATERIALS",
+      "task": "I03-T03",
+      "owner": "研发",
+      "status": "r1_confirmed_storage155_and_default_fences_locally_verified_new_apis_pending",
+      "problem": "已确认r1归属编码、Schema155/Migration205、完整保留输入和旧默认范围限制已实现，22项本地定向及相关回归通过；新scope登记/get能力协商/恢复、附件引用CAS/发送、接管/整份移回交换及原UUID未知恢复仍待接通；不得用部分owner冒充完整24PC/324验收。",
+      "confirmation": "i03-private-materials-proposal-result.json",
+      "evidence": "i03-private-scope-storage-result.json"
     }
   ]
 }
