@@ -4807,6 +4807,8 @@ export interface RovaiApi {
     prepareInput?(request: PrivateAttachmentPreparationRequest, file: File): Promise<PrivateAttachmentPreparationResult>
     reconcileInput?(request: PrivateAttachmentPreparationRequest): Promise<PrivateAttachmentPreparationResult>
     retryInput?(request: PrivateAttachmentPreparationRequest, originalFile?: File): Promise<PrivateAttachmentPreparationResult>
+    /** 明确结束尚未绑定的原准备；已提交时只返回首次结果，不删除材料。 */
+    finishInput?(request: PrivateAttachmentPreparationRequest): Promise<PrivateAttachmentPreparationResult>
     pendingPreparations?(owner: PrivateAttachmentPreparationOwner): Promise<Array<{
       request: PrivateAttachmentPreparationRequest; displayName: string; state: 'prepared' | 'unknown' | 'recorded'
     }>>

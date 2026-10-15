@@ -7525,6 +7525,26 @@ impl Core {
                     rovai_core::web_upload::reconcile(&database, &request.client, intent)?;
                 Ok(json!({"receipt":execution.map(|value|value.result)}))
             }
+            "host.upload.retry" => {
+                let intent = serde_json::from_value(request.params.clone())?;
+                let mut database = self.database.lock().await;
+                let execution = rovai_core::web_upload::retry_without_source(
+                    &mut database,
+                    &request.client,
+                    intent,
+                )?;
+                Ok(json!({"receipt":execution.map(|value|value.result)}))
+            }
+            "host.upload.finish" => {
+                let intent = serde_json::from_value(request.params.clone())?;
+                let mut database = self.database.lock().await;
+                let execution = rovai_core::web_upload::finish_preparation(
+                    &mut database,
+                    &request.client,
+                    intent,
+                )?;
+                Ok(json!({"receipt":execution.result}))
+            }
             "host.upload.reconcile" => {
                 let intent: rovai_core::web_upload::UploadIntent =
                     serde_json::from_value(request.params.clone())?;

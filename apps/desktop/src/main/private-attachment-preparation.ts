@@ -10,7 +10,7 @@ import { isAttachmentId } from './attachment-desktop'
 import { parsePrivatePreparation } from '../shared/private-upload-request'
 export { parsePrivatePreparation } from '../shared/private-upload-request'
 
-type HostMethod = 'host.upload.observe' | 'host.upload.bind' | 'host.upload.receipt'
+type HostMethod = 'host.upload.observe' | 'host.upload.bind' | 'host.upload.receipt' | 'host.upload.retry' | 'host.upload.finish'
 interface Core { request<T>(method: HostMethod, params: unknown): Promise<T> }
 type Input = { displayName: string; mediaType: string | null } & (
   { sourcePath: string } | { bytes: Uint8Array }
@@ -174,12 +174,26 @@ export class PrivateAttachmentPreparations {
     const entry = await this.#require(parsePrivatePreparation(value))
     const result = await this.#lookup(entry)
     if (result.state === 'recorded') return result
+    try {
+      const disposition = await this.core.request<{ receipt: unknown }>('host.upload.retry', entry.intent)
+      if (!object(disposition) || !fields(disposition, ['receipt'])) return this.#lookup(entry)
+      if (disposition.receipt != null) return await this.#record(entry, disposition.receipt)
+    } catch { return this.#lookup(entry) }
     const observed = observation(await this.core.request('host.upload.observe', {
       ...entry.request, sourcePath: entry.source.sourcePath,
       displayName: entry.source.displayName, mediaType: entry.source.mediaType
     }), entry.request)
     if (!isDeepStrictEqual(observed, { intent: entry.intent, source: entry.source })) throw new Error('private_upload.source_changed')
     return this.#dispatch(entry)
+  }
+  async finish(value: unknown): Promise<PrivateAttachmentPreparationResult> {
+    const entry = await this.#require(parsePrivatePreparation(value))
+    const known = await this.#lookup(entry)
+    if (known.state === 'recorded') return known
+    try {
+      const result = await this.core.request<{ receipt: unknown }>('host.upload.finish', entry.intent)
+      return await this.#record(entry, result.receipt)
+    } catch { return this.#lookup(entry) }
   }
   async list(value: unknown): Promise<Array<{
     request: PrivateAttachmentPreparationRequest; displayName: string; state: Entry['phase']

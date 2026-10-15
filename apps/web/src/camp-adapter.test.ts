@@ -7,7 +7,7 @@ import { createThreadAdapter } from './camp-adapter'
 // Owns the production Web adapter + execution window seam. A Host-only HTTP
 // test bypasses this adapter's allowlist; a populated page hides missing deltas.
 afterEach(() => vi.unstubAllGlobals())
-it('仅在能力声明后给共享私聊页面提供四个原请求准备接口', async () => {
+it.each([false, true])('恢复与结束准备分别按服务端能力开放（结束能力 %s）', async lifecycle => {
   const values = new Map<string, string>()
   const storage = { getItem: (key: string) => values.get(key) ?? null,
     setItem: (key: string, value: string) => { values.set(key, value) }, removeItem: (key: string) => { values.delete(key) } }
@@ -20,7 +20,7 @@ it('仅在能力声明后给共享私聊页面提供四个原请求准备接口'
     target: { kind: 'single_chat' as const, conversationId } }
   const paths: string[] = []
   const fetcher = vi.fn<typeof fetch>(async (url, options) => {
-    if (String(url).endsWith('/login')) return Response.json({ protocolVersion: 4, token: 'a'.repeat(64), clientId: 'b'.repeat(64), editorProof: 'c'.repeat(64), ownerId: 'owner', privateUploadRecoveryVersion: 1 })
+    if (String(url).endsWith('/login')) return Response.json({ protocolVersion: 4, token: 'a'.repeat(64), clientId: 'b'.repeat(64), editorProof: 'c'.repeat(64), ownerId: 'owner', privateUploadRecoveryVersion: 1, ...(lifecycle ? { privateUploadLifecycleVersion: 1 } : {}) })
     paths.push(new URL(String(url)).pathname)
     if (String(url).endsWith('/uploads')) {
       expect(JSON.parse(String((options!.body as FormData).get('intent')))).toMatchObject(input)
@@ -33,10 +33,12 @@ it('仅在能力声明后给共享私聊页面提供四个原请求准备接口'
   await transport.login('d'.repeat(64))
   const { client } = createThreadAdapter(transport, async () => null).environment
   const api = client.singleChatAttachments
+  expect(typeof api.finishInput).toBe(lifecycle ? 'function' : 'undefined')
   expect(await api.prepareInput!(input, new File(['input'], 'input.txt'))).toMatchObject({ state: 'recorded' })
   expect(await api.pendingPreparations!({ threadId: input.threadId, conversationId, composerScope: null })).toHaveLength(1)
   expect(await api.reconcileInput!(input)).toMatchObject({ state: 'recorded' })
   expect(await api.retryInput!(input)).toMatchObject({ state: 'recorded' })
+  if (lifecycle) expect(await api.finishInput!(input)).toMatchObject({ state: 'recorded' })
   expect(paths).toEqual(['/api/v1/uploads', '/api/v1/uploads/receipt'])
   transport.clear()
 })

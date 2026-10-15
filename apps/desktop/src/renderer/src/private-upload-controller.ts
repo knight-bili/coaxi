@@ -21,6 +21,7 @@ const targetKey = (target: PrivateAttachmentUploadTarget) => JSON.stringify([
   target.kind === 'single_chat_pending' ? target.pendingInputId : null,
   target.kind === 'single_chat_pending' ? target.editToken : null
 ])
+export { targetKey as privateUploadTargetKey }
 const failure = (code: string) => new Error(code)
 
 /** 共享界面仅保留进度；原请求和文件由平台准备日志持有，不创建第二份模型材料。 */
@@ -32,6 +33,7 @@ export class PrivateUploadController {
   private readonly listeners = new Set<() => void>()
   private readonly completed = new Map<string, boolean>()
   private readonly retries = new Map<string, Promise<void>>()
+  private readonly finishing = new Map<string, Promise<void>>()
   private reading: Promise<void> | null = null
 
   constructor(private readonly api: Api, owner: PrivateAttachmentPreparationOwner, target: PrivateAttachmentUploadTarget) {
@@ -43,6 +45,7 @@ export class PrivateUploadController {
   getSnapshot = (): PrivateUploadState => this.state
   subscribe = (listener: () => void): (() => void) => { this.listeners.add(listener); return () => this.listeners.delete(listener) }
   get blocked(): boolean { return !this.state.loaded || this.state.rows.some(row => row.state !== 'rejected') }
+  get canFinish(): boolean { return Boolean(this.api.finishInput) }
   private publish(change: Partial<PrivateUploadState>): void {
     this.state = { ...this.state, ...change }; this.listeners.forEach(listener => listener())
   }
@@ -133,6 +136,20 @@ export class PrivateUploadController {
   dismiss(id: string): void {
     if (this.row(id).state !== 'rejected') throw failure('private_upload.busy')
     this.publish({ rows: this.state.rows.filter(row => row.request.commandId !== id) })
+  }
+  finish(id: string): Promise<void> {
+    const existing = this.finishing.get(id)
+    if (existing) return existing
+    if (!this.api.finishInput) return Promise.reject(failure('private_upload.capability_required'))
+    const operation = (async () => {
+      await this.recover(id)
+      if (this.completed.has(id)) return
+      const request = structuredClone(this.row(id).request)
+      try { this.accept(request, await this.api.finishInput!(request)) }
+      catch (error) { if (!this.completed.has(id)) { this.update(id, { state: 'unknown', error: error as Error }); throw error } }
+    })().finally(() => { this.finishing.delete(id) })
+    this.finishing.set(id, operation)
+    return operation
   }
 }
 

@@ -291,7 +291,7 @@ export class InvalidationDecoder {
   }
 }
 
-type SessionResponse = { protocolVersion?: unknown; token?: unknown; clientId?: unknown; editorProof?: unknown; ownerId?: unknown; channels?: unknown; privateUploadRecoveryVersion?: unknown; expiresAt?: unknown; serverTime?: unknown; renewalWindowSeconds?: unknown }
+type SessionResponse = { protocolVersion?: unknown; token?: unknown; clientId?: unknown; editorProof?: unknown; ownerId?: unknown; channels?: unknown; privateUploadRecoveryVersion?: unknown; privateUploadLifecycleVersion?: unknown; expiresAt?: unknown; serverTime?: unknown; renewalWindowSeconds?: unknown }
 
 export class ConsoleClient {
   readonly origin: string
@@ -315,6 +315,8 @@ export class ConsoleClient {
   #pending = new Map<string, PendingCommand>()
   #pendingUploads = new Map<string, PendingUpload>()
   #privateUploadRecoveryVersion = 0
+  #privateUploadLifecycleVersion = 0
+  get supportsPrivateUploadLifecycle(): boolean { return this.supportsPrivateUploadRecovery && this.#privateUploadLifecycleVersion === 1 }
   get supportsPrivateUploadRecovery(): boolean { return this.authenticated && this.#privateUploadRecoveryVersion === 1 }
   #localUploads = new Map<string, File>()
   #reconciling = false
@@ -487,6 +489,7 @@ export class ConsoleClient {
     this.#ownerId = session.ownerId
     this.#channels = session.channels === 'desktop' ? 'desktop' : 'unsupported'
     this.#privateUploadRecoveryVersion = session.privateUploadRecoveryVersion === 1 ? 1 : 0
+    this.#privateUploadLifecycleVersion = session.privateUploadLifecycleVersion === 1 ? 1 : 0
     this.#token = session.token
     this.#persistTabAuthentication()
     this.#persistRecovery()
@@ -682,7 +685,19 @@ export class ConsoleClient {
           throw error
         }
       },
-      receipt: intent => { guard(); return this.#json('uploads/receipt', { method: 'POST', body: JSON.stringify(intent) }) }
+      receipt: intent => { guard(); return this.#json('uploads/receipt', { method: 'POST', body: JSON.stringify(intent) }) },
+      ...(this.supportsPrivateUploadLifecycle ? {
+        retry: async intent => {
+          guard()
+          if (!this.supportsPrivateUploadLifecycle) throw new Error('private_upload.capability_required')
+          return this.#json<{ state: 'needs_source' } | { state: 'recorded'; receipt: import('@contracts').StoredCommandResult }>('uploads/retry', { method: 'POST', body: JSON.stringify(intent) })
+        },
+        finish: async intent => {
+          guard()
+          if (!this.supportsPrivateUploadLifecycle) throw new Error('private_upload.capability_required')
+          return this.#json<{ state: 'unknown' } | { state: 'recorded'; receipt: import('@contracts').StoredCommandResult }>('uploads/finish', { method: 'POST', body: JSON.stringify(intent) })
+        }
+      } : {})
     })
   }
 
@@ -860,14 +875,14 @@ export class ConsoleClient {
     return this.#json('workspaces', { method: 'POST', body: JSON.stringify({ path, offset }) })
   }
 
-  async #json<T>(path: 'session' | 'session/renew' | 'channels' | 'updates' | 'workspaces' | 'uploads' | 'uploads/reconcile' | 'uploads/receipt' | 'files' | 'avatars', options: RequestInit = {}): Promise<T> {
+  async #json<T>(path: 'session' | 'session/renew' | 'channels' | 'updates' | 'workspaces' | 'uploads' | 'uploads/reconcile' | 'uploads/receipt' | 'uploads/retry' | 'uploads/finish' | 'files' | 'avatars', options: RequestInit = {}): Promise<T> {
     const generation = this.#generation
     const result = await (await this.#authorized(path, options)).json() as T
     if (generation !== this.#generation) throw new DOMException('Connection replaced', 'AbortError')
     return result
   }
 
-  async #authorized(path: 'session' | 'session/renew' | 'channels' | 'updates' | 'workspaces' | 'uploads' | 'uploads/reconcile' | 'uploads/receipt' | 'request' | 'events' | 'logout' | 'files' | 'files/bytes' | 'attachments' | 'avatars', options: RequestInit = {}): Promise<Response> {
+  async #authorized(path: 'session' | 'session/renew' | 'channels' | 'updates' | 'workspaces' | 'uploads' | 'uploads/reconcile' | 'uploads/receipt' | 'uploads/retry' | 'uploads/finish' | 'request' | 'events' | 'logout' | 'files' | 'files/bytes' | 'attachments' | 'avatars', options: RequestInit = {}): Promise<Response> {
     if (!this.#token) throw new SessionRequired()
     const generation = this.#generation
     if (this.#localExpiry !== null && this.#localExpiry - this.#now() <= this.#renewalWindow && !['session', 'session/renew', 'logout'].includes(path)) await this.renewIfNeeded()

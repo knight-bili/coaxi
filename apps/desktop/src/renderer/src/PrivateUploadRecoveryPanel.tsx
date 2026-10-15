@@ -27,12 +27,13 @@ export function PrivateUploadRecoveryPanel({ controller, reselect = false }: { c
     {state.rows.map(row => <div key={row.request.commandId} className="single-chat-scoped-file">
       <span title={row.displayName}>{row.displayName}</span>
       {row.state === 'rejected' ? <>
-        <span role="status"><UiText zh="文件未添加，当前输入已保留。" /></span>
+        <span role="status"><UiText zh={row.error?.message === 'attachment.upload_preparation_ended' ? '已结束文件准备，当前输入已保留。' : '文件未添加，当前输入已保留。'} /></span>
         <button type="button" onClick={() => controller.dismiss(row.request.commandId)}><UiText zh="关闭提示" /></button>
       </> : <>
         <span role="status"><UiText zh={row.state === 'preparing' ? '正在准备文件…' : '正在保留原文件准备请求。'} /></span>
         <button type="button" onClick={() => perform(controller.recover(row.request.commandId))}><UiText zh="核对原上传结果" /></button>
         {row.state !== 'preparing' && <button type="button" onClick={() => perform(controller.retry(row.request.commandId))}><UiText zh="明确重试原文件" /></button>}
+        {controller.canFinish && row.state !== 'preparing' && <button type="button" onClick={() => perform(controller.finish(row.request.commandId))}><UiText zh="结束这次文件准备" /></button>}
         {reselect && row.state !== 'preparing' && <button type="button" onClick={() => {
           selection.current = { controller, id: row.request.commandId }; fileInput.current?.click()
         }}><UiText zh="重选原文件并重试" /></button>}

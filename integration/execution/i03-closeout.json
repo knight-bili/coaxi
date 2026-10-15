@@ -29,12 +29,13 @@
         "孤立Core/本机正文及冲突统一恢复"
       ],
       "done_when": "本阶段完整使用流程及PC01-PC24适用工程验证有当前源码证据，外部环境缺项明确单列",
-      "latest_partial_evidence": "i03-private-upload-finality-result.json",
+      "latest_partial_evidence": "i03-private-upload-lifecycle-result.json",
       "remaining_runtime_risks": [
-        "无原字节且尚无终结回执的明确结束/只含意图重试仍待",
-        "旧租约准备记录与迁入/孤立/冲突统一恢复待实现",
-        "真实Host/NativeIPC/挂载交互及完整平台/模型待验，Core目录与拒绝库级已验",
-        "大材料、日志枚举与事务锁规模影响待验证"
+        "原意图重试与明确结束已编码，新Rust入口及原第三owner断言待阶段编译/运行",
+        "旧Pending/token统一准备入口已编码，实际挂载/Native IPC与HTTP仍待",
+        "默认迁入、孤立输入与正文冲突统一恢复待实现",
+        "大材料、日志枚举与事务锁规模影响待验证",
+        "全工作区格式检查发现未改动源码的既有格式欠账，已登记阶段候选前处理"
       ]
     },
     {

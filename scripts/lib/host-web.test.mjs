@@ -234,7 +234,7 @@ test('Desktop and Web share one Core while listener failure, revocation and stop
     assert.equal('dataDir' in info, false)
     assert.equal(info.name, (await host.request('app.info')).name)
     assert.deepEqual(await call(second, 'navigation.snapshot'), await host.request('navigation.snapshot'))
-    for (const operation of ['preferences.newConversation.initialize', 'host.web.token', 'host.web.rotate', 'host.web.loginTicket', 'core.shutdown', 'host.editor.resolve', 'host.upload.bind', 'host.upload.receipt', 'camp.composerDraft.get', 'camp.composerDraft.save', 'camp.sourceAttachments.addFromPath', 'camp.attachments.desktopOpenTarget', 'filePreview.resolveSource']) {
+    for (const operation of ['preferences.newConversation.initialize', 'host.web.token', 'host.web.rotate', 'host.web.loginTicket', 'core.shutdown', 'host.editor.resolve', 'host.upload.bind', 'host.upload.receipt', 'host.upload.retry', 'host.upload.finish', 'camp.composerDraft.get', 'camp.composerDraft.save', 'camp.sourceAttachments.addFromPath', 'camp.attachments.desktopOpenTarget', 'filePreview.resolveSource']) {
       const response = await authorized(first, 'request', { method: 'POST', body: JSON.stringify({ operation, params: {} }) })
       assert.equal(response.status, 400, operation)
     }
@@ -367,6 +367,26 @@ test('Desktop and Web share one Core while listener failure, revocation and stop
     const originalReceiptResponse = await uploadReceipt(first, privateIntent)
     assert.equal(originalReceiptResponse.status, 200)
     const originalReceipt = await originalReceiptResponse.json()
+    const resolveUpload = (session, action, original) => authorized(session, `uploads/${action}`, { method: 'POST', body: JSON.stringify(original) })
+    const preparationSpools = (await spools()).length
+    for (const action of ['retry', 'finish']) {
+      assert.equal((await request(`uploads/${action}`, { method: 'POST', body: JSON.stringify(privateIntent) })).status, 401)
+      assert.deepEqual(await (await resolveUpload(first, action, privateIntent)).json(), originalReceipt, '已提交材料只返回原首次成功')
+      assert.equal((await resolveUpload(second, action, privateIntent)).status, 503)
+    }
+    const readyPreparation = { ...privateIntent, commandId: crypto.randomUUID(), expectedRevision: privateSnapshot.draft.revision }
+    assert.deepEqual(await (await resolveUpload(first, 'retry', readyPreparation)).json(), { state: 'needs_source' })
+    assert.deepEqual(await (await uploadReceipt(first, readyPreparation)).json(), { state: 'unknown' }, '就绪检查回滚，不落假成功')
+    const endedPreparation = await (await resolveUpload(first, 'finish', readyPreparation)).json()
+    assert.equal(endedPreparation.receipt.status, 'rejected')
+    assert.equal(endedPreparation.receipt.code, 'attachment.upload_preparation_ended')
+    assert.equal(JSON.stringify(endedPreparation).includes('sourcePath'), false)
+    const stalePreparation = { ...privateIntent, commandId: crypto.randomUUID() }
+    const metadataRefusal = await (await resolveUpload(first, 'retry', stalePreparation)).json()
+    assert.equal(metadataRefusal.receipt.status, 'rejected')
+    assert.equal(metadataRefusal.receipt.code, 'single_chat.draft_changed')
+    assert.deepEqual((await call(first, 'singleChat.get', { conversationId })).draft, privateSnapshot.draft)
+    assert.equal((await spools()).length, preparationSpools, '只含原意图的恢复不接收文件或创建spool')
     assert.equal((await request('uploads/receipt', { method: 'POST', body: JSON.stringify(privateIntent) })).status, 401)
     assert.equal(originalReceipt.state, 'recorded')
     assert.equal(originalReceipt.receipt.commandId, privateIntent.commandId)

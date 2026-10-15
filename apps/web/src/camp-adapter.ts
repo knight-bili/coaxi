@@ -62,8 +62,9 @@ export function createThreadAdapter(transport: ConsoleClient, selectWorkspaceDir
         prepareInput: (request, file) => preparations.prepareInput(request, file),
         reconcileInput: request => preparations.reconcileInput(request),
         retryInput: (request, originalFile) => preparations.retryInput(request, originalFile),
+        ...(transport.supportsPrivateUploadLifecycle ? { finishInput: request => preparations.finishInput(request) } : {}),
         pendingPreparations: owner => preparations.pendingPreparations(owner)
-      } satisfies Pick<ThreadClient['singleChatAttachments'], 'prepareInput' | 'reconcileInput' | 'retryInput' | 'pendingPreparations'> : {}),
+      } satisfies Pick<ThreadClient['singleChatAttachments'], 'prepareInput' | 'reconcileInput' | 'retryInput' | 'finishInput' | 'pendingPreparations'> : {}),
       prepare: async (conversationId, revision, file) => {
         const snapshot = await transport.request<SingleChatSnapshot | null>('singleChat.get', { conversationId })
         if (!snapshot) throw new Error('单聊已不在当前会话中。')

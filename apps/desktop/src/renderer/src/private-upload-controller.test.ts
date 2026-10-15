@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 import type { PrivateAttachmentPreparationRequest, PrivateAttachmentPreparationResult, PrivateAttachmentUploadTarget, RovaiApi, StoredCommandResult } from '@contracts'
 import { PrivateUploadController, privateUploadController } from './private-upload-controller'
 import { PrivateUploadRecoveryPanel } from './PrivateUploadRecoveryPanel'
+import { inactiveUploadTargets } from './PrivateUploadHistoryPanel'
 
 const scope = { kind: 'canvas' as const, boardId: 'board', nodeId: 'card' }
 const owner = { threadId: 'thread', conversationId: 'private', composerScope: scope }
@@ -31,6 +32,51 @@ function fixture(records = new Map<string, PrivateAttachmentPreparationRequest>(
 }
 
 describe('私聊文件原请求共享控制器', () => {
+  it('结束准备先查原结果，重复点击合并，只采纳真实终结回执', async () => {
+    const f = fixture()
+    const finish = vi.fn(async (input: PrivateAttachmentPreparationRequest) => {
+      const result = receipt(input, 'rejected')
+      if (result.state === 'recorded') result.receipt.code = 'attachment.upload_preparation_ended'
+      return result
+    })
+    f.api.finishInput = finish
+    await f.controller.load(); await f.controller.prepare(7, file())
+    const original = f.prepare.mock.calls[0][0]
+    const before = f.reconcile.mock.calls.length
+    const first = f.controller.finish(original.commandId), second = f.controller.finish(original.commandId)
+    expect(first).toBe(second)
+    await first
+    expect(f.reconcile.mock.calls.length).toBe(before + 1)
+    expect(finish.mock.calls).toEqual([[original]])
+    expect(f.retry).not.toHaveBeenCalled()
+    expect(f.controller.blocked).toBe(false)
+    expect(renderToStaticMarkup(createElement(PrivateUploadRecoveryPanel, { controller: f.controller }))).toContain('已结束文件准备，当前输入已保留。')
+  })
+  it('没有能力不显示结束入口，失败不能移除未知准备，查到成功不再结束', async () => {
+    const f = fixture()
+    await f.controller.load(); await f.controller.prepare(0, file())
+    const id = f.prepare.mock.calls[0][0].commandId
+    expect(renderToStaticMarkup(createElement(PrivateUploadRecoveryPanel, { controller: f.controller }))).not.toContain('结束这次文件准备')
+    await expect(f.controller.finish(id)).rejects.toThrow('capability_required')
+    const finish = vi.fn(async (): Promise<PrivateAttachmentPreparationResult> => { throw new Error('lost') })
+    f.api.finishInput = finish
+    await expect(f.controller.finish(id)).rejects.toThrow('lost')
+    expect(f.controller.blocked).toBe(true)
+    expect(f.controller.getSnapshot().rows).toHaveLength(1)
+    f.found(); await f.controller.finish(id)
+    expect(finish).toHaveBeenCalledTimes(1)
+    expect(f.controller.getSnapshot()).toMatchObject({ rows: [], applied: 1 })
+  })
+  it('历史列表保留旧租约原位置，排除当前与已完成记录，拒绝另一卡片', () => {
+    const pending: PrivateAttachmentUploadTarget = { ...target, kind: 'single_chat_pending', pendingInputId: 'pending', editToken: 'old' }
+    const original: PrivateAttachmentPreparationRequest = { commandId: 'old', threadId: owner.threadId, expectedRevision: 2, target: pending }
+    const entry = { request: original, displayName: 'input.txt', state: 'unknown' as const }
+    expect(inactiveUploadTargets([entry, entry], owner, [target, { ...pending, editToken: 'new' }])).toEqual([pending])
+    expect(inactiveUploadTargets([entry], owner, [pending])).toEqual([])
+    expect(inactiveUploadTargets([{ ...entry, state: 'recorded' }], owner, [])).toEqual([])
+    expect(() => inactiveUploadTargets([{ ...entry, request: { ...original, threadId: 'foreign' } }], owner, [])).toThrow('context_changed')
+    expect(() => inactiveUploadTargets([entry], { ...owner, composerScope: null }, [])).toThrow('context_changed')
+  })
   it('能力不齐时不开始上传；同平台同位置的镜像共用控制器', async () => {
     const f = fixture()
     const unsupported = new PrivateUploadController({ ...f.api, retryInput: undefined }, owner, target)

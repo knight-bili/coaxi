@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "Core上传写前只读准入将明确版本/租约等拒绝记录为原UUID终结结果，执行错误仍完整回滚；Web拒绝spool清理与旧transport查回已接。最小Core库3owner实际通过(含前轮目录)、61TS/types及Web编译检查通过；真实Host/Native/挂载未跑。无原字节无终结时的结束路径、旧租约/迁入孤立统一恢复、规模及其他I03组继续。",
+  "current_slice": "无原字节的原意图重试、明确结束及同卡片旧Pending/token恢复已编码，71项客户端检查/types/2项文案/文档通过；新Rust与实际HTTP/NativeIPC/挂载留阶段候选，未以旧二进制替代。继续默认迁入与孤立冲突恢复及I03其余组。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "继续无原字节且无终结回执时的明确结束/只含原意图重试，以及旧Pending/lease准备记录统一恢复入口；再迁入/孤立/冲突UI。必须保持原UUID与材料，不以新编号/默认位置覆盖原未知。真实HTTP/Native/挂载/平台/模型和规模、其他I03组及完整24PC/324保留。",
+    "继续默认材料显式迁入、孤立Core/本机正文与冲突统一恢复。原意图重试/明确结束/旧租约入口已编码，真实Core/HTTP/Native/挂载及规模仍随阶段补验；保留原UUID和材料，不新编号覆盖未知。",
     "继续I03独立持久Mission/Task/Diff对象引用及启动/定位、文件节点授权和真实临时PTY、Desktop冷启动画布；现Thread关联Mission与累计Diff卡片接线已mock前端验证，私有来源完整导航和真实Core/Runtime仍待阶段候选。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "Core_business_rejection_verified_missing_bytes_oldlease_recovery_runtime_pending",
+  "current_slice_status": "upload_lifecycle_coded_client_checks_passed_runtime_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -57,7 +57,7 @@
   "skill_catalog_evidence": "i02-skill-catalog-result.json",
   "skill_install_evidence": "i02-skill-install-result.json",
   "system_goal_status": "active",
-  "system_goal_verified_at": "2026-10-15T17:09:03.240342+00:00",
+  "system_goal_verified_at": "2026-10-15T21:11:17.693747+00:00",
   "skill_members_evidence": "i02-skill-members-result.json",
   "canvas_boards_evidence": "i03-canvas-boards-result.json",
   "skill_delivery_preparation_evidence": "i02-skill-delivery-preparation-result.json",
@@ -184,5 +184,6 @@
   "private_native_directory_evidence": "i03-private-native-directory-result.json",
   "private_upload_ui_evidence": "i03-private-upload-ui-result.json",
   "private_web_upload_evidence": "i03-private-web-upload-result.json",
-  "private_upload_finality_evidence": "i03-private-upload-finality-result.json"
+  "private_upload_finality_evidence": "i03-private-upload-finality-result.json",
+  "private_upload_lifecycle_evidence": "i03-private-upload-lifecycle-result.json"
 }

@@ -10,6 +10,8 @@ interface Transport {
   digest(file: File): Promise<string>
   bind(intent: Intent, file: File): Promise<{ rejectedCode?: string }>
   receipt(intent: Intent): Promise<{ state: 'unknown' } | { state: 'recorded'; receipt: StoredCommandResult }>
+  retry?(intent: Intent): Promise<{ state: 'needs_source' } | { state: 'recorded'; receipt: StoredCommandResult }>
+  finish?(intent: Intent): Promise<{ state: 'unknown' } | { state: 'recorded'; receipt: StoredCommandResult }>
 }
 const KEY = 'private-upload-preparations:v1'
 const object = (value: unknown): value is Record<string, unknown> => Boolean(value && typeof value === 'object' && !Array.isArray(value))
@@ -124,6 +126,13 @@ export class BrowserPrivateUploadPreparations {
     const request = parsePrivatePreparation(value), entry = this.require(request)
     const known = await this.lookup(entry)
     if (known.state === 'recorded' || known.state === 'rejected') return known
+    if (this.transport.retry) {
+      try {
+        const disposition = await this.transport.retry(structuredClone(entry.intent))
+        if (disposition.state === 'recorded') return this.record(entry, disposition.receipt)
+        if (disposition.state !== 'needs_source') return this.lookup(entry)
+      } catch { return this.lookup(entry) }
+    }
     const file = originalFile ?? this.files.get(request.commandId)
     if (!file) throw new Error('private_upload.reselect_required')
     if (file.name !== entry.intent.displayName || file.size !== entry.intent.byteSize
@@ -131,6 +140,17 @@ export class BrowserPrivateUploadPreparations {
     this.transport.guard()
     this.rememberFile(request.commandId, file)
     return this.dispatch(entry, file)
+  }
+  async finishInput(value: Request): Promise<Result> {
+    if (!this.transport.finish) throw new Error('private_upload.capability_required')
+    const entry = this.require(parsePrivatePreparation(value))
+    const known = await this.lookup(entry)
+    if (known.state === 'recorded' || known.state === 'rejected') return known
+    try {
+      const result = await this.transport.finish(structuredClone(entry.intent))
+      if (result.state === 'recorded') return this.record(entry, result.receipt)
+    } catch { /* 结束请求可能已提交，原只读查回仍是最终依据。 */ }
+    return this.lookup(entry)
   }
   async pendingPreparations(owner: PrivateAttachmentPreparationOwner): Promise<Array<{ request: Request; displayName: string; state: 'prepared' | 'unknown' | 'recorded' }>> {
     this.transport.guard()

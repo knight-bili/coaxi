@@ -24,8 +24,10 @@ class Core {
   receipts = new Map<string, StoredCommandResult>()
   mode: 'applied' | 'unknown' | 'lost' | 'hung' = 'applied'
   binds = 0
+  retryCode: string | null = null
+  finishFailure: 'before' | 'after' | null = null
   directoryDigest = 'd'.repeat(64)
-  async request<T>(method: 'host.upload.observe' | 'host.upload.bind' | 'host.upload.receipt', input: unknown): Promise<T> {
+  async request<T>(method: 'host.upload.observe' | 'host.upload.bind' | 'host.upload.receipt' | 'host.upload.retry' | 'host.upload.finish', input: unknown): Promise<T> {
     const params = structuredClone(input) as Record<string, unknown>
     this.calls.push({ method, params })
     if (method === 'host.upload.observe') {
@@ -50,6 +52,19 @@ class Core {
       } } as T
     }
     if (method === 'host.upload.receipt') return { receipt: this.receipts.get(String(params.commandId)) ?? null } as T
+    if (method === 'host.upload.retry' || method === 'host.upload.finish') {
+      if (method === 'host.upload.finish' && this.finishFailure === 'before') throw new Error('connection lost')
+      const id = String(params.commandId)
+      let receipt = this.receipts.get(id) ?? null
+      const code = method === 'host.upload.finish' ? 'attachment.upload_preparation_ended' : this.retryCode
+      if (!receipt && code) {
+        receipt = { commandId: id, commandType: 'camp.source_attachment.upload.bind', status: 'rejected', code,
+          payload: {}, resultEntity: null, recordedAt: '2026-10-16T00:00:00Z' }
+        this.receipts.set(id, receipt)
+      }
+      if (method === 'host.upload.finish' && this.finishFailure === 'after') throw new Error('response lost')
+      return { receipt } as T
+    }
     this.binds++
     if (this.mode === 'unknown') throw new Error('连接中断，是否提交未知')
     const intent = params.intent as PrivateAttachmentPreparationRequest
@@ -79,6 +94,44 @@ const owner = (item: PrivateAttachmentPreparationRequest) => ({
 })
 
 describe('Native 私聊上传原请求恢复', () => {
+  it('没有原文件也能查明旧意图拒绝，不再观察或绑定文件', async () => {
+    const f = await fixture(), input = request()
+    f.core.mode = 'unknown'
+    await f.service.prepare(input, { ...metadata, sourcePath: f.sourcePath })
+    await unlink(f.sourcePath)
+    const before = f.core.calls.length
+    f.core.retryCode = 'single_chat.pending_input_edit_fenced'
+    expect(await f.service.retry(input)).toMatchObject({ state: 'recorded', receipt: { status: 'rejected', code: f.core.retryCode } })
+    expect(f.core.calls.slice(before).map(call => call.method)).toEqual(['host.upload.receipt', 'host.upload.retry'])
+    expect(f.core.binds).toBe(1)
+  })
+
+  it('明确结束只有真实首次回执才结清，丢回执可查回且保留源文件', async () => {
+    for (const failure of ['before', 'after'] as const) {
+      const f = await fixture(), input = request()
+      f.core.mode = 'unknown'
+      await f.service.prepare(input, { ...metadata, sourcePath: f.sourcePath })
+      f.core.finishFailure = failure
+      const result = await f.service.finish(input)
+      if (failure === 'before') {
+        expect(result).toMatchObject({ state: 'unknown' })
+        expect(f.core.receipts.size).toBe(0)
+        f.core.finishFailure = null
+      } else expect(result).toMatchObject({ state: 'recorded', receipt: { status: 'rejected', code: 'attachment.upload_preparation_ended' } })
+      expect(await f.service.finish(input)).toMatchObject({ state: 'recorded', receipt: { status: 'rejected' } })
+      expect(await readFile(f.sourcePath, 'utf8')).toBe('input')
+      expect(f.core.binds).toBe(1)
+    }
+  })
+
+  it('结束准备时原提交已完成，只返回首次成功结果', async () => {
+    const f = await fixture(), input = request()
+    const known = await f.service.prepare(input, { ...metadata, sourcePath: f.sourcePath })
+    const before = f.core.calls.length
+    expect(await f.service.finish(input)).toEqual(known)
+    expect(f.core.calls).toHaveLength(before)
+    expect(await readFile(f.sourcePath, 'utf8')).toBe('input')
+  })
   it('在观察前冻结归属，原请求可重启查询且不返回本机文件路径', async () => {
     const f = await fixture()
     const input = request()

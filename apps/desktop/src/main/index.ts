@@ -2210,6 +2210,8 @@ ipcMain.handle('rovai:private-attachment-reconcile', (event, request: unknown) =
   privateUploadService(event).reconcile(request))
 ipcMain.handle('rovai:private-attachment-retry', (event, request: unknown) =>
   privateUploadService(event).retry(request))
+ipcMain.handle('rovai:private-attachment-finish', (event, request: unknown) =>
+  privateUploadService(event).finish(request))
 ipcMain.handle('rovai:private-attachment-list', (event, owner: unknown) =>
   privateUploadService(event).list(owner))
 

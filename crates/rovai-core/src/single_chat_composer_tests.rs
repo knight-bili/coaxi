@@ -1085,6 +1085,20 @@ fn verify_scoped_pending_edits(f: &mut Fixture) {
     );
 }
 
+fn upload_private_state(f: &Fixture) -> Vec<String> {
+    let mut statement = f.database.connection().prepare(
+        "SELECT 'draft:'||json_array(client_id,scope_key,revision,source_attachments_json,quotes_json,quote_trash_json) FROM single_chat_composer_draft WHERE conversation_id=?1
+         UNION ALL SELECT 'working:'||json_array(client_id,scope_key,pending_input_id,edit_token,working_body,working_source_attachments_json,quotes_json,quote_trash_json) FROM single_chat_pending_input_edit_session WHERE conversation_id=?1
+         UNION ALL SELECT 'scope:'||json_array(client_id,scope_key,board_id,node_id) FROM single_chat_composer_scope WHERE conversation_id=?1
+         UNION ALL SELECT 'source:'||json_array(source_ref_id,observation_json) FROM single_chat_source_observation WHERE conversation_id=?1 ORDER BY 1"
+    ).unwrap();
+    statement
+        .query_map([&f.conversation], |row| row.get(0))
+        .unwrap()
+        .collect::<rusqlite::Result<Vec<String>>>()
+        .unwrap()
+}
+
 fn assert_upload_business_rejection(
     f: &mut Fixture,
     client: &DraftClient,
@@ -1092,20 +1106,7 @@ fn assert_upload_business_rejection(
     source: crate::local_attachment_source::LocalAttachmentSourceRef,
     code: &str,
 ) {
-    fn materials(f: &Fixture) -> Vec<String> {
-        let mut statement = f.database.connection().prepare(
-            "SELECT 'draft:'||json_array(client_id,scope_key,revision,source_attachments_json,quotes_json,quote_trash_json) FROM single_chat_composer_draft WHERE conversation_id=?1
-             UNION ALL SELECT 'working:'||json_array(client_id,scope_key,pending_input_id,edit_token,working_body,working_source_attachments_json,quotes_json,quote_trash_json) FROM single_chat_pending_input_edit_session WHERE conversation_id=?1
-             UNION ALL SELECT 'scope:'||json_array(client_id,scope_key,board_id,node_id) FROM single_chat_composer_scope WHERE conversation_id=?1
-             UNION ALL SELECT 'source:'||json_array(source_ref_id,observation_json) FROM single_chat_source_observation WHERE conversation_id=?1 ORDER BY 1"
-        ).unwrap();
-        statement
-            .query_map([&f.conversation], |row| row.get(0))
-            .unwrap()
-            .collect::<rusqlite::Result<Vec<String>>>()
-            .unwrap()
-    }
-    let before = materials(f);
+    let before = upload_private_state(f);
     let path = std::path::PathBuf::from(&source.source_path);
     let first = crate::web_upload::bind(
         &mut f.database,
@@ -1118,7 +1119,7 @@ fn assert_upload_business_rejection(
     assert_eq!(first.result.status, CommandResultStatus::Rejected);
     assert_eq!(first.result.code, code);
     assert_eq!(
-        materials(f),
+        upload_private_state(f),
         before,
         "业务拒绝不能登记scope或改变正文/材料/源观察"
     );
@@ -1136,7 +1137,7 @@ fn assert_upload_business_rejection(
         serde_json::to_value(replay.result).unwrap(),
         serde_json::to_value(first.result).unwrap()
     );
-    assert_eq!(materials(f), before);
+    assert_eq!(upload_private_state(f), before);
 }
 
 fn verify_private_upload_bindings() {
@@ -1269,6 +1270,62 @@ fn verify_private_upload_bindings() {
     );
     let original_intent = intent.clone();
     let original_source = source.clone();
+    // 元数据重试已就绪时必须回滚，不能制造一次成功，也不能提前登记 scope。
+    let mut ready = original_intent.clone();
+    ready.command_id = Uuid::new_v4().to_string();
+    ready.target = UploadTarget::SingleChat {
+        conversation_id: f.conversation.clone(),
+        composer_scope: Some(f.scopes[1].clone()),
+    };
+    let before = upload_private_state(&f);
+    assert!(
+        web_upload::retry_without_source(&mut f.database, &client, ready.clone())
+            .unwrap()
+            .is_none()
+    );
+    assert!(
+        web_upload::reconcile(&f.database, &client, ready.clone())
+            .unwrap()
+            .is_none()
+    );
+    assert_eq!(before, upload_private_state(&f));
+    let ended = web_upload::finish_preparation(&mut f.database, &client, ready.clone()).unwrap();
+    assert_eq!(ended.result.status, CommandResultStatus::Rejected);
+    assert_eq!(ended.result.code, "attachment.upload_preparation_ended");
+    assert_eq!(before, upload_private_state(&f));
+    let mut ended_source = original_source.clone();
+    ended_source.id = ready.command_id.clone();
+    let ended_replay =
+        web_upload::bind(&mut f.database, &file, &client, ready.clone(), ended_source).unwrap();
+    assert!(ended_replay.replayed);
+    assert_eq!(
+        ended_replay.result.code,
+        "attachment.upload_preparation_ended"
+    );
+    assert_eq!(before, upload_private_state(&f));
+    let known =
+        web_upload::finish_preparation(&mut f.database, &client, original_intent.clone()).unwrap();
+    assert!(known.replayed);
+    assert_eq!(
+        serde_json::to_value(&known.result).unwrap(),
+        serde_json::to_value(&first.result).unwrap()
+    );
+    assert_eq!(before, upload_private_state(&f));
+    let mut stale_retry = original_intent.clone();
+    stale_retry.command_id = Uuid::new_v4().to_string();
+    let stale = web_upload::retry_without_source(&mut f.database, &client, stale_retry.clone())
+        .unwrap()
+        .unwrap();
+    assert_eq!(stale.result.status, CommandResultStatus::Rejected);
+    assert_eq!(stale.result.code, "single_chat.draft_changed");
+    assert_eq!(before, upload_private_state(&f));
+    let foreign = DraftClient::verified_web(&"8".repeat(64)).unwrap();
+    assert!(web_upload::finish_preparation(&mut f.database, &foreign, stale_retry).is_err());
+    let mut public = ready;
+    public.command_id = Uuid::new_v4().to_string();
+    public.target = UploadTarget::Camp;
+    assert!(web_upload::retry_without_source(&mut f.database, &client, public.clone()).is_err());
+    assert!(web_upload::finish_preparation(&mut f.database, &client, public).is_err());
     let mut changed_target = intent.clone();
     changed_target.target = UploadTarget::SingleChat {
         conversation_id: f.conversation.clone(),

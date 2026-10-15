@@ -249,6 +249,54 @@ pub fn reconcile(
     DomainCommandGateway.replay_if_recorded(database, &envelope(client, intent)?)
 }
 
+#[derive(Debug)]
+struct UploadSourceRequired;
+impl std::fmt::Display for UploadSourceRequired {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter.write_str("private_upload.source_required")
+    }
+}
+impl std::error::Error for UploadSourceRequired {}
+
+/// 用户明确重试：原结果优先；已知准入拒绝可直接结清，其余情况回滚并要求原源。
+pub fn retry_without_source(
+    database: &mut Database,
+    client: &DraftClient,
+    intent: UploadIntent,
+) -> Result<Option<CommandExecution>> {
+    ensure!(
+        !matches!(&intent.target, UploadTarget::Camp),
+        "private upload target required"
+    );
+    let envelope = envelope(client, intent)?;
+    match DomainCommandGateway.execute(database, &envelope, |transaction| {
+        private_binding_rejection(transaction, client, &envelope.payload.intent)?
+            .ok_or_else(|| UploadSourceRequired.into())
+    }) {
+        Ok(execution) => Ok(Some(execution)),
+        Err(error) if error.is::<UploadSourceRequired>() => Ok(None),
+        Err(error) => Err(error),
+    }
+}
+
+/// 用户明确结束准备：同一首次结果围栏，不修改任何已绑定材料或删除源文件。
+pub fn finish_preparation(
+    database: &mut Database,
+    client: &DraftClient,
+    intent: UploadIntent,
+) -> Result<CommandExecution> {
+    ensure!(
+        !matches!(&intent.target, UploadTarget::Camp),
+        "private upload target required"
+    );
+    DomainCommandGateway.execute(database, &envelope(client, intent)?, |_| {
+        Ok(CommandHandlerResult::rejected(
+            "attachment.upload_preparation_ended",
+            json!({}),
+        ))
+    })
+}
+
 pub fn bind(
     database: &mut Database,
     _data_dir: &std::path::Path,

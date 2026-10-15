@@ -39,3 +39,19 @@ HTTP receipt 只投影 commandId、commandType、status、code、recordedAt、�
 该错误码只来自 Core 原回执，允许旧 transport 结束原 unknown 请求；不能用一次重试的普通错误替代原提交结果。
 `/uploads/receipt` 继续返回 recorded/receipt 安全视图。确认拒绝的未绑定临时文件可删除，未知或已绑定的原文件继续保留。
 私聊拒绝在原事务的只读业务准入产生，数据库/文件/观察执行错误仍按[Domain Command Result](domain-command-result-v1.md#1-命令结果与事务)回滚。
+
+## 私聊文件准备的明确重试与结束（2026-10-16）
+
+登录及恢复身份增加独立可选 `privateUploadLifecycleVersion: 1`，仅在原恢复能力也为1时启用。
+不声明时仍保留原四接口，不显示结束准备入口。
+认证 `POST /api/v1/uploads/retry` 和 `/api/v1/uploads/finish` 均接收完整原 UploadIntent，拒绝 Camp target；
+Host 从可信 Session 构造编辑端身份，通过私有 `host.upload.retry` / `host.upload.finish` 进入原 Core Gateway。
+这两个方法不加入通用 Web RPC 准入，也不接收文件或返回本机路径。
+
+retry 优先返回原首次回执；没有回执时，明确业务失效才记录原 UUID 的真实 rejected，仍就绪则回滚并返回
+`{state:"needs_source"}`，不落回执。客户端随后核对原文件并重传；缺文件则要求重选。
+finish 只由用户明确点击发起，原首次结果优先；未提交时记录 `attachment.upload_preparation_ended` 的真实 rejected。
+已提交结果不变，不删除材料、正文或源文件；后到的原上传只能回放此首次结果。
+两者返回 recorded 时沿用原安全回执投影，存储或运输错误仍返回未知，由客户端只读核对，不能本地伪造完成。
+
+本批已编码并完成客户端定向检查；新 Core 与实际 HTTP 路径留待阶段候选编译及运行验证。

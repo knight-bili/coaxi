@@ -4030,5 +4030,16 @@
   "重新读取保留输入": "Reload retained inputs",
   "编辑排队消息正文": "Edit queued message text",
   "保存排队消息": "Save queued message",
-  "放弃本次编辑": "Discard this edit"
+  "放弃本次编辑": "Discard this edit",
+  "之前的文件准备": "Previous file preparations",
+  "之前编辑的排队消息文件，仍按原来的位置核对。": "Files from earlier queued-message edits are checked against their original location.",
+  "已结束文件准备，当前输入已保留。": "File preparation ended. Your current input is preserved.",
+  "结束这次文件准备": "End this file preparation",
+  "原文件或文件夹已变化，不能作为原请求重试。原输入仍保留。": "The original file or folder changed and cannot be retried as the same request. Your input is preserved.",
+  "原文件字节当前不可用，请重选原文件并核对后重试。": "The original file bytes are unavailable. Select the original file again to verify and retry.",
+  "当前连接尚不支持文件上传恢复，请升级后重试。": "This connection does not support file upload recovery yet. Upgrade and try again.",
+  "文件仍属于原来的输入位置，请回到原位置恢复。": "The file still belongs to its original input location. Return there to recover it.",
+  "文件准备结果尚未确认。请先核对原请求，确认后再继续。": "The file preparation result is not confirmed. Check the original request before continuing.",
+  "文件上传恢复": "File upload recovery",
+  "请先核对原上传结果，其余文件尚未添加。": "Check the original upload result first. The remaining files have not been added."
 }

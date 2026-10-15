@@ -478,6 +478,7 @@ const api: RovaiApi = {
     },
     reconcileInput: request => ipcRenderer.invoke('rovai:private-attachment-reconcile', request),
     retryInput: request => ipcRenderer.invoke('rovai:private-attachment-retry', request),
+    finishInput: request => ipcRenderer.invoke('rovai:private-attachment-finish', request),
     pendingPreparations: owner => ipcRenderer.invoke('rovai:private-attachment-list', owner),
     async prepare(conversationId, expectedDraftRevision, file) {
       const sourcePath = webUtils.getPathForFile(file)

@@ -2,6 +2,7 @@ import { singleChatComposerStore, type SingleChatComposerStore } from './single-
 import { privateInputController, type PrivateInputController, type PrivateInputState } from './private-input-controller'
 import { PrivateInputRecoveryPanel, privateInputErrorMessage } from './PrivateInputRecoveryPanel'
 import { PrivateUploadRecoveryPanel, privateUploadErrorMessage } from './PrivateUploadRecoveryPanel'
+import { PrivateUploadHistoryPanel } from './PrivateUploadHistoryPanel'
 import { privateUploadController, type PrivateUploadState } from './private-upload-controller'
 import { PrivatePendingEditor } from './PrivatePendingEditor'
 import { canvasComposerContextKey, type CanvasComposerContext } from './canvas-composer-drafts'
@@ -1861,6 +1862,11 @@ export function SingleChatPanel({
         {input && <PrivateInputRecoveryPanel controller={input} state={inputState}
           busy={localSending || ending || quoteBusy || uploadBusy || preparingAttachments.some(item => !item.error)} onError={setError} />}
         {uploads?.supported && <PrivateUploadRecoveryPanel controller={uploads} reselect={client.attachments.kind === 'download'} />}
+        {uploads?.supported && input && <PrivateUploadHistoryPanel api={client.singleChatAttachments} owner={uploads.owner} enabled={visible}
+          activeTargets={[uploads.target, ...(currentSnapshot?.pendingInputs.editSession ? [{ kind: 'single_chat_pending' as const,
+            conversationId: input.origin.conversationId, composerScope: input.origin.scope,
+            pendingInputId: currentSnapshot.pendingInputs.editSession.pendingInputId, editToken: currentSnapshot.pendingInputs.editSession.editToken }] : [])]}
+          reselect={client.attachments.kind === 'download'} onApplied={() => { void input.refresh().catch(() => undefined) }} />}
         {error && <div className="single-chat-error" role="alert"><span>{error}</span><button type="button" onClick={() => setError(null)}><UiText zh={"关闭"} /></button></div>}
       </form>
       <footer className="single-chat-footer">

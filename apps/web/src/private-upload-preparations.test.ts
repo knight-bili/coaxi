@@ -7,19 +7,21 @@ const request = (): PrivateAttachmentPreparationRequest => ({ commandId: ids[0],
   target: { kind: 'single_chat', conversationId: ids[1], composerScope: { kind: 'canvas', boardId: ids[2], nodeId: ids[3] } } })
 const owner = () => ({ threadId: request().threadId, conversationId: ids[1], composerScope: request().target.composerScope! })
 const file = (body = 'input', name = 'input.txt') => new File([body], name)
-async function fixture(capability = true) {
+async function fixture(capability = true, lifecycle = false) {
   const values = new Map<string, unknown>()
   let writeFailure = false, recorded = false, malformed = false, rejected = false
   let mode: 'lost' | 'success' | 'reject' | 'hung' = 'lost'
   let finish!: (response: Response) => void
   const posts: Array<{ intent: Record<string, unknown>; text: string }> = []
   const lookups: unknown[] = []
+  const resolutions: Array<{ path: string; intent: unknown }> = []
+  let retryReject = false, finishCode = false, resolutionFailure = false
   const storage = { get: (key: string) => structuredClone(values.get(key) ?? null), set: (key: string, value: unknown) => {
     if (writeFailure) throw new Error('storage denied')
     values.set(key, structuredClone(value))
   } }
   const fetcher = vi.fn<typeof fetch>(async (url, options) => {
-    if (String(url).endsWith('/login')) return Response.json({ protocolVersion: 4, token: 'a'.repeat(64), clientId: 'b'.repeat(64), editorProof: 'c'.repeat(64), ownerId: 'owner', ...(capability ? { privateUploadRecoveryVersion: 1 } : {}) })
+    if (String(url).endsWith('/login')) return Response.json({ protocolVersion: 4, token: 'a'.repeat(64), clientId: 'b'.repeat(64), editorProof: 'c'.repeat(64), ownerId: 'owner', ...(capability ? { privateUploadRecoveryVersion: 1 } : {}), ...(lifecycle ? { privateUploadLifecycleVersion: 1 } : {}) })
     expect(options?.credentials).toBe('omit')
     expect(new Headers(options?.headers).get('Authorization')).toBe(`Bearer ${'a'.repeat(64)}`)
     if (String(url).endsWith('/uploads')) {
@@ -33,10 +35,20 @@ async function fixture(capability = true) {
       recorded = true
       return Response.json({ draft: null })
     }
-    if (String(url).endsWith('/uploads/receipt')) {
-      const intent = JSON.parse(String(options!.body)); lookups.push(intent)
+    if (['/uploads/receipt', '/uploads/retry', '/uploads/finish'].some(path => String(url).endsWith(path))) {
+      const intent = JSON.parse(String(options!.body))
+      const path = String(url).split('/').at(-1)!
+      if (path === 'receipt') lookups.push(intent)
+      else {
+        resolutions.push({ path, intent })
+        if (resolutionFailure) throw new TypeError('connection lost')
+        if (!recorded && (path === 'finish' || retryReject)) {
+          recorded = true; rejected = true; finishCode = path === 'finish'
+        }
+        if (!recorded && path === 'retry') return Response.json({ state: 'needs_source' })
+      }
       return Response.json(recorded ? { state: 'recorded', receipt: {
-        commandId: malformed ? ids[6] : intent.commandId, commandType: 'camp.source_attachment.upload.bind', status: rejected ? 'rejected' : 'applied', code: rejected ? 'single_chat.draft_changed' : 'attachment.upload_bound',
+        commandId: malformed ? ids[6] : intent.commandId, commandType: 'camp.source_attachment.upload.bind', status: rejected ? 'rejected' : 'applied', code: finishCode ? 'attachment.upload_preparation_ended' : rejected ? 'single_chat.draft_changed' : 'attachment.upload_bound',
         payload: rejected ? {} : { attachmentRefId: intent.commandId, revision: 8 }, resultEntity: null, recordedAt: '2026-10-16T00:00:00Z'
       } } : { state: 'unknown' })
     }
@@ -44,13 +56,47 @@ async function fixture(capability = true) {
   })
   const client = new ConsoleClient('http://localhost:4317', fetcher)
   await client.login('d'.repeat(64))
-  return { client, values, storage, posts, lookups, fetcher,
+  return { client, values, storage, posts, lookups, fetcher, resolutions,
+    retryReject: () => { retryReject = true }, resolutionFailure: () => { resolutionFailure = true },
     mode: (value: typeof mode) => { mode = value }, recorded: () => { recorded = true }, malformed: () => { recorded = true; malformed = true },
     rejected: () => { recorded = true; rejected = true },
     writeFailure: () => { writeFailure = true }, finish: () => finish(Response.json({ draft: null })) }
 }
 
 describe('Web 私聊文件原请求与重选', () => {
+  it('新能力先用原意图判断失效，无字节也能取得真实拒绝', async () => {
+    const f = await fixture(true, true), api = f.client.privateUploadPreparations(f.storage)
+    await api.prepareInput(request(), file())
+    f.retryReject()
+    const restored = f.client.privateUploadPreparations(f.storage)
+    expect(await restored.retryInput(request())).toMatchObject({ state: 'recorded', receipt: { status: 'rejected' } })
+    expect(f.resolutions).toEqual([{ path: 'retry', intent: f.posts[0].intent }])
+    expect(f.posts).toHaveLength(1)
+    f.client.clear()
+  })
+  it('原意图仍可提交时只要求重选，明确结束不发送文件或伪造本地完成', async () => {
+    const f = await fixture(true, true), api = f.client.privateUploadPreparations(f.storage)
+    await api.prepareInput(request(), file())
+    const restored = f.client.privateUploadPreparations(f.storage)
+    await expect(restored.retryInput(request())).rejects.toThrow('reselect_required')
+    expect(await restored.finishInput(request())).toMatchObject({ state: 'recorded', receipt: { status: 'rejected', code: 'attachment.upload_preparation_ended' } })
+    expect(f.resolutions.map(item => item.intent)).toEqual([f.posts[0].intent, f.posts[0].intent])
+    expect(await restored.pendingPreparations(owner())).toMatchObject([{ state: 'recorded' }])
+    expect(f.posts).toHaveLength(1)
+    f.client.clear()
+  })
+  it('结束失败仍保留未知记录；已提交材料只回放原成功', async () => {
+    const f = await fixture(true, true), api = f.client.privateUploadPreparations(f.storage)
+    await api.prepareInput(request(), file())
+    f.resolutionFailure()
+    expect(await api.finishInput(request())).toMatchObject({ state: 'unknown' })
+    expect(await api.pendingPreparations(owner())).toHaveLength(1)
+    f.recorded()
+    expect(await api.finishInput(request())).toMatchObject({ state: 'recorded', receipt: { status: 'applied' } })
+    expect(f.resolutions).toHaveLength(1)
+    expect(f.posts).toHaveLength(1)
+    f.client.clear()
+  })
   it('旧 Host 不声明能力时不创建新准备接口', async () => {
     const f = await fixture(false)
     expect(f.client.supportsPrivateUploadRecovery).toBe(false)
