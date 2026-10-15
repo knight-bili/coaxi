@@ -72,3 +72,5 @@ I00已自审修正并合入，I01基础构建与契约证据保留草稿；I02�
 - [I03独立对象选择与详情](execution/i03-object-reference-ui-result.json)：Mission/历史Task/Diff原路径选择、按需原对象读取及既有工作区接线已编码；66项定向检查和类型通过，模拟Core界面检查通过。C02代码就绪待阶段工程验证，实际Core/Host/跳转未验；继续C03授权文件节点。
 
 - [I03文件节点原来源基础](execution/i03-file-binding-result.json)：源码158/208追加原Thread身份与旧节点一次显式绑定；42项原文SQL、76项客户端/原Main检查及类型通过，1项Windows条件跳过。具体预览权限保持，选择/预览UI和生命周期继续，新增Rust/真实Host未运行，C03未完成。
+
+- [I03文件节点选择与固定预览](execution/i03-file-preview-ui-result.json)：来源选择、旧节点绑定、原文件读者、变化/失效与收起/删除/重开已编码；108项定向检查及类型通过，1项原Windows条件跳过。隔离界面包含删除目标缺陷修复复测；C03代码就绪待阶段工程验证，继续C04临时PTY，实际Core/Host/完整App仍待。

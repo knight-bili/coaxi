@@ -1,13 +1,15 @@
 import { uiAttribute } from './interface-language'
 import { memo, createContext, useCallback, useContext, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import type { FilePreviewApi, ResolvedTheme } from '@contracts'
+import type { FilePreviewApi, ResolvedTheme, RestoreFilePreviewRequest } from '@contracts'
 import { desktopFilePreviewApi } from './desktop-file-preview-api'
 import { FilePreviewLayoutProvider, useOptionalFilePreviewLayout } from './FilePreviewLayout'
 import { FileFindProvider } from './FilePreviewFind'
 import { FilePreviewResources, windowFilePreviewResources } from './file-preview-resources'
-import { FilePreviewPaneContent } from './FilePreviewPane'
-import type { FilePreviewContextValue, FilePreviewSession } from './file-preview-controller'
+import { FilePreviewPaneContent, FilePreviewSingleContent } from './FilePreviewPane'
+import type { FilePreviewContextValue, FilePreviewSession, FilePreviewTabModel } from './file-preview-controller'
+import { UiText } from './interface-language'
+import { filePreviewSourceKey } from './file-preview-session'
 export * from './file-preview-controller'
 
 const FilePreviewApiContext = createContext<FilePreviewApi | null>(null)
@@ -157,4 +159,76 @@ export function usePreviewHost(): (element: HTMLDivElement | null) => void {
 }
 export function useExecutionPreviewHost(threadId: string): HTMLDivElement | null {
   return useContext(ExecutionPreviewHostContext).get(threadId) ?? null
+}
+
+/** A fixed file presentation shares the original Thread session and window resource pool. */
+export function PinnedFilePreview({ api, source, resolvedTheme, onNavigate, onWorkspace }: {
+  api: FilePreviewApi; source: RestoreFilePreviewRequest; resolvedTheme: ResolvedTheme
+  onNavigate?: FilePreviewContextValue['open']
+  onWorkspace?(tabId: string): Promise<void>
+}): React.JSX.Element {
+  const resources = useMemo(() => windowFilePreviewResources(api), [api])
+  const owner = useRef({}).current, host = useRef<HTMLDivElement>(null), domScope = `file-card-${useId()}`
+  useSyncExternalStore(resources.subscribe, resources.getSnapshot, resources.getSnapshot)
+  const session = resources.session(source.threadId), state = session.getSnapshot()
+  const [tabId, setTabId] = useState<string | null>(null), [error, setError] = useState<string | null>(null)
+  const [retry, setRetry] = useState(0), [visible, setVisible] = useState(false), [sourceMode, setSourceMode] = useState(false)
+  const [armed, setArmed] = useState(false)
+  const pending = useRef(false)
+  const tab = state.tabs.find(item => item.id === tabId && item.kind === 'file') as FilePreviewTabModel | undefined
+  const focus = () => { resources.focus(source.threadId, owner); if (tabId) resources.touch(session, tabId) }
+  useLayoutEffect(() => {
+    const release = resources.retainOwner()
+    resources.presentFile(owner, source.threadId, null, false)
+    resources.activate(source.threadId, owner)
+    return () => { resources.deactivate(owner); release() }
+  }, [resources, owner, source.threadId])
+  useEffect(() => {
+    if (!host.current) return
+    const observer = new IntersectionObserver(entries => setVisible(entries.some(entry => entry.isIntersecting)))
+    observer.observe(host.current)
+    return () => observer.disconnect()
+  }, [])
+  useLayoutEffect(() => { resources.presentFile(owner, source.threadId, tab?.id ?? null, visible, error ? undefined : filePreviewSourceKey(source)) }, [resources, owner, source, tab?.id, visible, error])
+  useEffect(() => { if (visible) setArmed(true) }, [visible])
+  useEffect(() => {
+    if (!armed) return
+    let current = true
+    pending.current = true; setError(null); setTabId(null)
+    void session.actions.open(source, undefined, undefined, { commitOnSuccess: true, previewOnly: true, revalidateSource: true, background: true }).then(outcome => {
+      if (!current) return
+      if (outcome.kind === 'preview') setTabId(outcome.tabId)
+      else setError(outcome.kind === 'error' ? outcome.error.message : uiAttribute('无法在这里预览这个文件'))
+    }).catch(() => { if (current) setError(uiAttribute('暂时无法读取文件')) })
+      .finally(() => { if (current) pending.current = false })
+    return () => { current = false }
+  }, [session, source, retry, armed])
+  useEffect(() => {
+    if (tabId && !tab && !pending.current) { setTabId(null); setRetry(value => value + 1) }
+  }, [tabId, tab])
+  useEffect(() => { if (visible && tab?.loadState === 'cold') void session.actions.reopen(tab.id, true) }, [visible, tab?.id, tab?.loadState, session])
+  const value: FilePreviewContextValue = { ...sessionValue(session, resolvedTheme), domScope,
+    activeTab: tab ?? null, activeTabId: tab?.id ?? null, tabs: tab ? [tab] : [], paneVisible: true,
+    isCurrentThread: true, isFocusedSurface: resources.isFocused(owner),
+    open: (...args) => onNavigate ? onNavigate(...args) : Promise.resolve({ kind: 'error', error: { code: 'source_not_authorized', message: uiAttribute('当前页面无法打开关联文件。'), retryable: false } }) }
+  const presented = useMemo(() => tab && sourceMode && tab.content?.kind === 'markdown'
+    ? { ...tab, content: { kind: 'code' as const, text: tab.content.text } } : tab, [tab, sourceMode])
+  return <FilePreviewApiContext.Provider value={api}><FilePreviewContext.Provider value={value}>
+    <FileFindProvider activeTabId={tab?.id ?? null} visible={visible && resources.isFocused(owner)}>
+      <div ref={host} className="canvas-file-preview" onPointerDownCapture={focus} onFocusCapture={focus}>
+        <div className="canvas-file-actions">
+          {tab && <button type="button" disabled={tab.isRefreshing} onClick={() => { void session.actions.reload(tab.id) }}><UiText zh="重新读取" /></button>}
+          {tab?.content?.kind === 'markdown' && <button type="button" onClick={() => setSourceMode(value => !value)}><UiText zh={sourceMode ? '显示预览' : '显示源码'} /></button>}
+          {tab?.file?.kind === 'html' && <button type="button" onClick={() => session.actions.toggleHtmlSource(tab.id)}><UiText zh={tab.htmlSourceMode ? '显示预览' : '显示源码'} /></button>}
+          {tab && onWorkspace && <button type="button" onClick={() => { void onWorkspace(tab.id).catch(() => setError(uiAttribute('暂时无法打开原文件工作区。'))) }}><UiText zh="在工作区中操作" /></button>}
+          {tab?.file?.capabilities.includes('download') && <button type="button" onClick={() => { void session.actions.download(tab.id).then(result => { if (!result.ok) setError(result.error.message) }) }}><UiText zh="下载文件" /></button>}
+        </div>
+        {error && <p className="canvas-notice" role="alert">{error}<button type="button" onClick={() => setRetry(value => value + 1)}><UiText zh="重试" /></button>
+          {onNavigate && <button type="button" onClick={() => { void onNavigate(source).then(outcome => { if (outcome.kind === 'error') setError(outcome.error.message) }).catch(() => setError(uiAttribute('暂时无法打开原文件工作区。'))) }}><UiText zh="打开原文件" /></button>}</p>}
+        {!presented && !error && <p role="status"><UiText zh="正在读取原文件…" /></p>}
+        {presented && (resources.canPresentFile(owner, source.threadId, tab?.id) ? <FilePreviewSingleContent tab={presented} />
+          : <p className="canvas-notice" role="status"><UiText zh="页面预览已达窗口上限，请先收起其他页面预览。" /></p>)}
+      </div>
+    </FileFindProvider>
+  </FilePreviewContext.Provider></FilePreviewApiContext.Provider>
 }

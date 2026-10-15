@@ -3,7 +3,9 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { Background, BackgroundVariant, Controls, MiniMap, NodeResizer, ReactFlow, ReactFlowProvider,
   SelectionMode, ViewportPortal, applyNodeChanges, useReactFlow, useViewport, type Node, type NodeProps } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import type { AgentProfile, CanvasConversationRef, CanvasNode, CanvasNodeMutation, ResolvedTheme, StoredCommandResult } from '@contracts'
+import type { AgentProfile, CanvasConversationRef, CanvasNode, CanvasNodeMutation, FilePreviewApi, ResolvedTheme, StoredCommandResult } from '@contracts'
+import { CanvasFilePreview } from './CanvasFilePreview'
+import type { FilePreviewContextValue } from './file-preview-controller'
 import { useCanvasGraph } from './useCanvasGraph'
 import { initialCanvasReferenceState, type CanvasReferenceState } from './canvas-reference-controller'
 import { canvasReferenceOptions, canvasSavedReference, resolveCanvasRegion, type CanvasFolderResolution, type CanvasRegionResolution } from './canvas-reference-model'
@@ -46,7 +48,9 @@ export interface CanvasSurfaceProps {
   onOpenObject?(target: CanvasObjectTarget): void
   onOpenMember?(agentId: string): void
   onOpenProject?(path: string): void
-  onOpenFile?(path: string): void
+  fileApi?: FilePreviewApi
+  onOpenFileSource?(threadId: string, ...args: Parameters<FilePreviewContextValue['open']>): ReturnType<FilePreviewContextValue['open']>
+  onFileWorkspace?(threadId: string, tabId: string): Promise<void>
   onLeaveGuardChange?(guard: CanvasLeaveGuard | null): void
 }
 type FlowNode = Node<{ row: CanvasNode; member?: CanvasConversationRef; regionId?: string }, 'canvas-card'>
@@ -65,6 +69,8 @@ type Presentation = CanvasSurfaceProps & {
   openConversation(row: CanvasNode, reference: CanvasConversationRef, member?: boolean): void
   edit(row: CanvasNode): void
   openObject(row: CanvasNode): void
+  bindFile(row: CanvasNode): void
+  removeFile(row: CanvasNode): void
   beginGesture(owner?: string): number | null
   resize(row: CanvasNode, geometry: { x: number; y: number; width: number; height: number }, revision: number | null): void
 }
@@ -104,8 +110,9 @@ function CanvasCard({ data, selected }: NodeProps<FlowNode>): React.JSX.Element 
       {d.kind === 'folder' && actions.onOpenProject && <button className="nodrag" type="button" title={d.folderPath ?? undefined} onClick={() => actions.onOpenProject?.(d.folderPath!)}><UiText zh="进入工程" /></button>}
       {d.kind === 'agent' && member && !member.removedAt && actions.onOpenMember && <button className="nodrag" type="button" title={d.runtimeKind ?? undefined} onClick={() => actions.onOpenMember?.(member.agentId)}><UiText zh="打开队员" /></button>}
       <button className="nodrag" type="button" disabled={actions.blocked} onClick={() => actions.edit(row)} aria-label={uiAttribute('编辑节点')}><UiText zh="编辑" /></button>
-      {region && <button className="nodrag" type="button" disabled={actions.blocked} onClick={() => actions.collapse(row)}
-        aria-label={uiAttribute(d.collapsed ? '展开区域' : '折叠区域')}>{d.collapsed ? '+' : '−'}</button>}
+      {d.kind === 'file' && <button className="nodrag" type="button" disabled={actions.blocked} onClick={() => actions.removeFile(row)} aria-label={uiAttribute('删除文件节点')}><UiText zh="删除" /></button>}
+      {(region || d.kind === 'file') && <button className="nodrag" type="button" disabled={actions.blocked} onClick={() => actions.collapse(row)}
+        aria-label={uiAttribute(d.kind === 'file' ? d.collapsed ? '展开预览' : '收起预览' : d.collapsed ? '展开区域' : '折叠区域')}>{d.collapsed ? '+' : '−'}</button>}
     </header>
     {!d.collapsed && <div className="canvas-card-body nodrag nowheel">
       {d.kind === 'note' && <SafeMarkdown theme={actions.theme} mode="document">{d.content || ''}</SafeMarkdown>}
@@ -125,8 +132,14 @@ function CanvasCard({ data, selected }: NodeProps<FlowNode>): React.JSX.Element 
         {d.kind === 'agent' && d.agentId && (!member || member.removedAt) && <p className="canvas-empty-copy"><UiText zh="队员已移除或不可用" /></p>}
         </div>
       </>}
-      {(d.kind === 'file' || d.kind === 'terminal') && <code>{d.path}</code>}
-      {d.kind === 'file' && actions.onOpenFile && <button type="button" onClick={() => actions.onOpenFile?.(d.path!)}><UiText zh="打开文件" /></button>}
+      {d.kind === 'terminal' && <code>{d.path}</code>}
+      {d.kind === 'file' && <>
+        <code className="canvas-file-path" title={d.path ?? undefined}>{d.path}</code>
+        {!d.fileReference ? <><p className="canvas-empty-copy"><UiText zh="文件节点尚未绑定原工程会话，请先选择来源。" /></p>
+          <button type="button" disabled={actions.blocked} onClick={() => actions.bindFile(row)}><UiText zh="选择所属对话" /></button></>
+          : actions.fileApi ? <CanvasFilePreview row={row} api={actions.fileApi} theme={actions.theme} onNavigate={actions.onOpenFileSource} onWorkspace={actions.onFileWorkspace} />
+          : <p role="status"><UiText zh="当前连接尚未提供文件预览。" /></p>}
+      </>}
       {d.kind === 'terminal' && <p className="canvas-empty-copy"><UiText zh="终端未连接" /></p>}
     </div>}
   </article>
@@ -211,6 +224,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
           layoutRegionGrid(count, width, columns).contentHeight + REGION_FOOTER_HEIGHT * 2)
       }
     } else if (d.kind === 'conversation') height = inline ? Math.max(560, d.height) : CARD_HEIGHT
+    else if (d.kind === 'file' && d.collapsed) height = REGION_COLLAPSED_HEIGHT
     const root: FlowNode = { id: row.id, type: 'canvas-card', data: { row }, position: { x: d.x, y: d.y },
       width, height, style: { width, height }, selected: selected.includes(row.id), dragHandle: '.canvas-card-handle',
       zIndex: region ? 0 : 1, connectable: false, deletable: false }
@@ -283,7 +297,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     return () => { window.removeEventListener('blur', cancel); window.removeEventListener('keydown', escape) }
   }, [])
   const recover = async (retry: boolean) => {
-    try { const receipt = await (retry ? graph.retry() : graph.reconcile()); if (receipt) settlePanel(receipt) }
+    try { const receipt = await (retry ? graph.retry() : graph.reconcile()); if (receipt) { setIssue(null); settlePanel(receipt) } }
     catch (error) { setIssue(readErrorMessage(error)) }
   }
   const title = (reference: CanvasConversationRef) => {
@@ -323,6 +337,11 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
       x: row.data.x + (flow.getNode(row.id)?.width ?? row.data.width) + 24, y: row.data.y }) },
     edit: row => { panel.current = true; setEditor({ target: { type: 'update', row }, revision: graph.snapshot!.board!.revision }) },
     openObject: row => { if (!blocked) setObjectTarget(canvasObjectTarget(row)) },
+    bindFile: row => {
+      if (graph.snapshot?.fileReferenceVersion !== 1) { setIssue(uiAttribute('当前连接暂不支持文件节点来源绑定，请升级服务后重试。')); return }
+      panel.current = true; setEditor({ target: { type: 'bind_file', row }, revision: graph.snapshot!.board!.revision })
+    },
+    removeFile: row => deleteSelected([row.id]),
     beginGesture,
     resize: (row, geometry, revision) => {
       if (revision === null || dragOwner.current !== row.id) return
@@ -333,7 +352,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
           ...(row.data.gridColumns ? { gridColumns: columns } : {}), ...(row.data.gridRows ? { gridRows: rows } : {}) } : {}) } }, revision ?? undefined)
     }
   }
-  const deleteSelected = (ids = selected) => {
+  const deleteSelected = (ids = flow.getNodes().filter(node => node.selected).map(node => node.id)) => {
     ids = ids.filter(id => rows.some(row => row.id === id))
     if (!ids.length) { setIssue(uiAttribute('区域成员可通过卡片操作移出或固定到画布。')); return }
     panel.current = true
@@ -341,7 +360,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
       hasProse: rows.some(row => ids.includes(row.id) && noteHoldsProse(row)) })
   }
   const groupSelected = () => {
-    const items = nodes.filter(node => selected.includes(node.id) && (node.data.member || canvasPlainConversation(node.data.row))).map(node => ({
+    const items = flow.getNodes().filter(node => node.selected && (node.data.member || canvasPlainConversation(node.data.row))).map(node => ({
       conversation: (node.data.member ?? canvasPlainConversation(node.data.row))!, ...canvasAbsolutePosition(node, nodes),
       ...(node.data.member ? { regionId: node.data.regionId! } : { nodeId: node.id }) }))
     const mutation = canvasGroupSelection(items)
@@ -506,6 +525,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     {editor && <CanvasNodeEditor target={editor.target} revision={editor.revision} latestRevision={graph.snapshot?.board?.revision ?? null}
       agents={props.agents} groups={props.groups ?? EMPTY_GROUPS}
       objectReferencesSupported={graph.snapshot?.objectReferenceVersion === 1} objectThreads={catalog.items}
+      fileReferencesSupported={graph.snapshot?.fileReferenceVersion === 1}
       references={referenceOptions} referencesComplete={catalog.complete} onRefreshReferences={() => { props.onRefreshReferences?.(); void folders.refresh() }}
       blocked={graphBlocked} pending={Boolean(graph.pending)} recovery={recovery} onClose={closePanel}
       commandError={issue}
@@ -517,6 +537,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
       <AppDialogContent tone="danger" onEscapeKeyDown={event => { if (graph.hasUnsettled()) event.preventDefault() }} onPointerDownOutside={event => event.preventDefault()}>
         <AppDialogHeader title={uiAttribute('删除所选节点')} description={uiAttribute('只删除画布节点，保留工程、对话、文件及历史。')} closeDisabled={Boolean(graph.pending)} />
         <AppDialogBody><p>{uiAttribute('将删除 {0} 个节点。', deletion.ids.length)}</p>
+          <ul>{deletion.ids.map(id => { const row = rows.find(row => row.id === id); return <li key={id}>{row?.data.title || row?.data.path || row?.data.folderPath || id}</li> })}</ul>
           {deletion.hasProse && <p><UiText zh="所选便签的文字将一并删除。" /></p>}
           {deletion.revision !== graph.snapshot?.board?.revision && <p><UiText zh="画布已更新，请取消并重新核对所选节点。" /></p>}
           {error && <p role="alert">{error}</p>}{recovery}

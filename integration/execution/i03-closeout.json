@@ -53,14 +53,10 @@
     {
       "id": "I03-C03",
       "name": "文件节点真实权限与预览",
-      "status": "in_progress",
+      "status": "implementation_ready_for_stage_verification",
       "done_when": "路径不能绕过现行文件权限，卡片间身份隔离，关闭/恢复与变化处理有证据",
-      "latest_partial_evidence": "i03-file-binding-result.json",
-      "remaining_implementation_batches": [
-        "来源选择/旧节点显式绑定与原文件预览接线，不自动借用当前会话、不放宽现有具体文件能力",
-        "关闭/删除/重开、内容变化/旧来源失效与多卡身份保持，然后进入C04"
-      ],
-      "remaining_verification": "原2个canvas Rust owner含158/208与实际Host/IPC/完整文件卡片在阶段候选验证；本批原文SQL与Main库测试不代替"
+      "latest_partial_evidence": "i03-file-preview-ui-result.json",
+      "remaining_verification": "原2个canvas Rust owner含158/208、实际Core/Host/Native IPC、真实文件权限/HTML与完整App原工作区导航及冷路由规模随阶段候选验证；模拟界面和原Main库检查不代替。发现代码缺陷回C03修复。"
     },
     {
       "id": "I03-C04",

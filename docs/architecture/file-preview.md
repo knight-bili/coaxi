@@ -2,7 +2,7 @@
 document_type: architecture
 authority: file-preview-components-and-boundaries
 status: accepted
-last_updated: 2026-10-15
+last_updated: 2026-10-16
 ---
 
 # File Preview Architecture
@@ -236,3 +236,13 @@ Markdown 继续使用 `rovai-preview://asset/<tab-token>/<segments>`，在 app.r
 - webContents 销毁/应用退出：幂等释放对应或全部资源。
 
 不支持格式在来源与本地文件校验后直接交给系统默认应用，并在返回前释放一次性解析材料；它不进入上述长期资源图。
+
+## 画布固定文件展示（2026-10-16）
+
+`PinnedFilePreview` 复用原 Thread session、具体文件句柄和窗口资源预算，独立保存展示 tab ID，不切换同 Thread 的活动工作区 tab。
+声明固定展示的 owner 不自动恢复该 session 的其他活动文件；首次可见及冷恢复使用 preview-only 原来源验证，系统打开仅限用户显式操作。
+同一规范文件的后台重复打开在来源重新验证后可复用已打开正文，释放多余新句柄，并按内容版本提示变化；不能拿旧缓存替代失败的来源校验。
+字节、热 Thread、快照与句柄沿原上限，HTML 还按实际展示数计算，同文件镜像也占展示容量。收起/删除撤销该 owner，其他展示保留。
+原工作区交互打开与定位逻辑保持；画布关联链接把完整 request、target 和 presentation 交回原工作区，根文件不会随链接被替换。
+文件 URI 的未转义 `:行号` 在解码前解析，编码的 `%3A` 属于字面文件名；已有 fragment 优先级保持。该解析修复没有增加 wire 字段或文件能力，合同仍为v21。
+实际 Host/Native/HTML/跨平台及完整应用导航随I03阶段候选运行；当前隔离界面不是实际文件服务资格证据。

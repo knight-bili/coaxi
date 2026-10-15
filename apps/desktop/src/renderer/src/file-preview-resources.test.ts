@@ -57,6 +57,73 @@ function active(session: FilePreviewSession): FilePreviewTabModel {
   return session.getSnapshot().tabs.find(tab => tab.id === session.getSnapshot().activeTabId) as FilePreviewTabModel
 }
 
+it('keeps two fixed files in one Thread visible independently and background opens do not replace its active tab', async () => {
+  const { owner, api } = fixture(), first = {}, second = {}
+  owner.presentFile(first, 'a', null, true); owner.activate('a', first)
+  owner.presentFile(second, 'a', null, true); owner.activate('a', second)
+  const session = owner.session('a')
+  const options = { commitOnSuccess: true, previewOnly: true, revalidateSource: true, background: true }
+  const a = await session.actions.open({ kind: 'camp_workspace', threadId: 'a', rawReference: 'one.txt' }, undefined, undefined, options)
+  const b = await session.actions.open({ kind: 'camp_workspace', threadId: 'a', rawReference: 'two.txt' }, undefined, undefined, options)
+  if (a.kind !== 'preview' || b.kind !== 'preview') throw Error('expected fixed previews')
+  expect(a.tabId).not.toBe(b.tabId)
+  expect(session.getSnapshot().activeTabId).toBeNull()
+  owner.presentFile(first, 'a', a.tabId, true); owner.presentFile(second, 'a', b.tabId, true)
+  expect(owner.visible(session, a.tabId)).toBe(true); expect(owner.visible(session, b.tabId)).toBe(true)
+  await owner.sync()
+  expect(vi.mocked(api.updateRetention!).mock.calls.at(-1)![0].handles.filter(handle => handle.visible)).toHaveLength(2)
+  owner.deactivate(first)
+  expect(owner.visible(session, a.tabId)).toBe(false); expect(owner.visible(session, b.tabId)).toBe(true)
+  session.actions.activate(b.tabId)
+  owner.deactivate(second); session.cool()
+  const restores = vi.mocked(api.restore).mock.calls.length
+  owner.presentFile(first, 'a', null, false); owner.activate('a', first)
+  await owner.sync()
+  expect(api.restore).toHaveBeenCalledTimes(restores)
+  await session.actions.reopen(a.tabId, true)
+  expect(api.restore).toHaveBeenCalledTimes(restores + 1)
+  expect(session.getSnapshot().activeTabId).toBe(b.tabId)
+  expect(api.open).not.toHaveBeenCalled()
+})
+
+it('revalidates a cached pin without replacing its body, and a failed source check does not return cached content', async () => {
+  const { owner, api } = fixture(); owner.activate('a')
+  const session = owner.session('a'), request = { kind: 'camp_workspace' as const, threadId: 'a', rawReference: 'one.txt' }
+  const initial = await session.actions.open(request), before = active(session)
+  const restore = vi.mocked(api.restore).getMockImplementation()!
+  vi.mocked(api.restore).mockImplementationOnce(async request => {
+    const result = await restore(request)
+    if (result.ok && result.value.kind === 'file_preview') result.value.file.contentVersion = before.file!.contentVersion
+    return result
+  })
+  const options = { commitOnSuccess: true, previewOnly: true, revalidateSource: true, background: true }
+  expect(await session.actions.open(request, undefined, undefined, options)).toEqual(initial)
+  expect(api.restore).toHaveBeenCalledWith(request)
+  expect(active(session).content).toBe(before.content)
+  expect(active(session).hasExternalUpdate).toBe(false)
+  const reads = vi.mocked(api.readText).mock.calls.length
+  vi.mocked(api.restore).mockResolvedValue({ ok: false, error: { code: 'source_not_authorized', message: 'original Thread unavailable', retryable: false } })
+  expect(await session.actions.open(request, undefined, undefined, options)).toMatchObject({ kind: 'error' })
+  expect(api.readText).toHaveBeenCalledTimes(reads)
+  expect(active(session).content).toBe(before.content)
+})
+
+it('counts separate HTML presentations of a shared file and frees presentation capacity when a card closes', async () => {
+  const { owner } = fixture({ htmlInstances: 1 }), first = {}, mirror = {}
+  owner.presentFile(first, 'a', null, true); owner.activate('a', first)
+  const session = owner.session('a')
+  const result = await session.actions.open({ kind: 'camp_workspace', threadId: 'a', rawReference: 'page.html' }, undefined, undefined,
+    { commitOnSuccess: true, previewOnly: true, background: true })
+  if (result.kind !== 'preview') throw Error('expected HTML')
+  owner.presentFile(first, 'a', result.tabId, true)
+  owner.presentFile(mirror, 'a', null, true); owner.activate('a', mirror)
+  expect(owner.canPresentFile(first)).toBe(true)
+  expect(owner.canPresentFile(mirror, 'a', result.tabId)).toBe(false)
+  owner.presentFile(mirror, 'a', result.tabId, true)
+  owner.deactivate(first)
+  expect(owner.canPresentFile(mirror)).toBe(true)
+})
+
 it('shares one window retention pool while keeping every mounted Thread active and its binding in the union', async () => {
   const f = fixture(), pool = windowFilePreviewResources(f.api), first = {}, second = {}
   resources.push(pool)

@@ -26,6 +26,7 @@ export class FilePreviewResources {
   #syncTail = Promise.resolve()
   currentThreadId: string | null = null
   readonly #activeOwners = new Map<object, string | null>()
+  readonly #fileViews = new Map<object, { threadId: string; tabId: string | null; visible: boolean; sourceKey?: string }>()
   #focusedOwner: object | null = null
   get disposed(): boolean { return this.#disposed }
   isFocused(owner: object): boolean { return this.#focusedOwner === owner }
@@ -80,10 +81,11 @@ export class FilePreviewResources {
     this.prune()
     const binding = this.sync().then(() => this.api.bindThread(threadId))
     session?.setBinding(binding)
-    session?.ensureActive()
+    if (!this.#fileViews.has(owner)) session?.ensureActive()
     this.changed()
   }
   deactivate(owner: object): void {
+    this.#fileViews.delete(owner)
     if (!this.#activeOwners.delete(owner)) return
     if (this.#focusedOwner === owner) { this.#focusedOwner = null; this.currentThreadId = null }
     this.changed()
@@ -97,7 +99,7 @@ export class FilePreviewResources {
     this.currentThreadId = threadId
     const session = threadId ? this.session(threadId) : null
     session?.setBinding(this.sync().then(() => this.api.bindThread(threadId)))
-    session?.ensureActive()
+    if (!this.#fileViews.has(owner)) session?.ensureActive()
   }
 
   touch = (session: FilePreviewSession, tabId?: string): void => {
@@ -123,7 +125,36 @@ export class FilePreviewResources {
 
   visible(session: FilePreviewSession, tabId: string): boolean {
     const state = session.getSnapshot()
-    return this.isCurrent(session.threadId) && state.paneVisible && state.activeTabId === tabId
+    return [...this.#fileViews].some(([owner, view]) => view.threadId === session.threadId && view.visible
+      && (view.tabId === tabId || !view.tabId && state.tabs.some(tab => tab.id === tabId && tab.kind === 'file'
+        && (tab.sourceKey === view.sourceKey || tab.sourceAliases?.includes(view.sourceKey ?? '')))) && this.canPresentFile(owner))
+      || [...this.#activeOwners].some(([owner, threadId]) => threadId === session.threadId && !this.#fileViews.has(owner))
+        && state.paneVisible && state.activeTabId === tabId
+  }
+
+  presentFile(owner: object, threadId: string, tabId: string | null, visible: boolean, sourceKey?: string): void {
+    const previous = this.#fileViews.get(owner)
+    if (previous?.threadId === threadId && previous.tabId === tabId && previous.visible === visible && previous.sourceKey === sourceKey) return
+    this.#fileViews.set(owner, { threadId, tabId, visible, sourceKey }); this.changed()
+  }
+
+  /** Count actual HTML presentations, including mirrors of one shared handle. */
+  canPresentFile(owner: object, threadId = this.#fileViews.get(owner)?.threadId, tabId = this.#fileViews.get(owner)?.tabId): boolean {
+    const ownTab = threadId && this.sessions.get(threadId)?.getSnapshot().tabs.find(tab => tab.id === tabId)
+    if (!ownTab || ownTab.kind !== 'file' || ownTab.content?.kind !== 'html') return true
+    let html = 0
+    for (const [normal, threadId] of this.#activeOwners) {
+      if (!threadId || this.#fileViews.has(normal)) continue
+      const state = this.sessions.get(threadId)?.getSnapshot()
+      if (state?.paneVisible && state.tabs.some(tab => tab.id === state.activeTabId && tab.kind === 'file' && tab.content?.kind === 'html')) html++
+    }
+    for (const [fixed, view] of this.#fileViews) {
+      const tab = this.sessions.get(view.threadId)?.getSnapshot().tabs.find(tab => tab.id === view.tabId)
+      const isHtml = tab?.kind === 'file' && tab.content?.kind === 'html'
+      if (fixed === owner) return html < this.limits.htmlInstances
+      if (isHtml) html++
+    }
+    return true
   }
 
   #entries(): { session: FilePreviewSession; tab: FilePreviewTabModel; visible: boolean; usage: number; recoverable: boolean }[] {
@@ -251,6 +282,7 @@ export class FilePreviewResources {
     for (const session of this.sessions.values()) session.dispose()
     this.sessions.clear()
     this.#activeOwners.clear()
+    this.#fileViews.clear()
     this.#focusedOwner = null
     void this.sync().catch(() => undefined)
   }

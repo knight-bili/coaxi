@@ -162,3 +162,8 @@
 .canvas-object-pin button { justify-self: start; }
 .canvas-object-details > p { white-space: pre-wrap; overflow-wrap: anywhere; }
 .canvas-object-details .canvas-notice code { display: block; white-space: pre-wrap; overflow-wrap: anywhere; }
+.canvas-card-file .canvas-card-body { display: flex; flex-direction: column; overflow: hidden; }
+.canvas-file-path { flex: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.canvas-file-preview { display: flex; flex-direction: column; flex: 1; align-self: stretch; width: 100%; min-height: 0; overflow: hidden; }
+.canvas-file-preview > .file-preview-pane { position: relative; width: 100%; flex: 1; min-height: 0; }
+.canvas-file-actions { display: flex; flex-wrap: wrap; gap: 6px; padding-block: 6px; flex: none; }

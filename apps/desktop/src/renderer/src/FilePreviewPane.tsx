@@ -507,3 +507,10 @@ export function FilePreviewPaneContent({ visible, missionActivity, executionHost
     </section>
   )
 }
+
+/** The pinned card uses the original reader without inheriting another card's active tab. */
+export function FilePreviewSingleContent({ tab }: { tab: FilePreviewTabModel }): React.JSX.Element {
+  return <section className="file-preview-pane" aria-label={uiAttribute('文件预览')}>
+    <div className="file-preview-tab-panel"><ReadingPanel tab={tab}><FileFindScope id={tab.id}><FilePreviewDocument tab={tab} /></FileFindScope></ReadingPanel></div>
+  </section>
+}

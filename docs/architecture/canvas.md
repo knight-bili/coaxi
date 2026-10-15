@@ -1,7 +1,7 @@
 ---
 document_type: architecture
 authority: integration-canvas-boundaries
-last_updated: 2026-10-15
+last_updated: 2026-10-16
 ---
 
 # Codeg canvas integration
@@ -244,4 +244,12 @@ I03-C03 新增独立 `fileReference:{threadId}`：画布保存原公开工程会
 `bind_file` 只为旧文件节点明确追加一次来源，不按当前会话、相同路径或上次焦点推断。来源失效保留，不授予目录权限。
 Schema158/Migration208 仅追加引用子表与来源/不可变守卫，读投影在原23列加4个业务引用列后追加1列，仍以单查询读取。
 创建、旧节点绑定、布局版本、事件和首次结果继续在原Gateway事务中；旧canonical请求新增字段None时省略。
-具体合同见[文件节点来源绑定](../contracts/canvas-nodes-v1.md#文件节点来源绑定2026-10-16)。当前先完成持久身份基础，实际预览接线与生命周期继续。
+具体合同见[文件节点来源绑定](../contracts/canvas-nodes-v1.md#文件节点来源绑定2026-10-16)。
+客户端新建须明确选择原工程 Thread，旧节点通过同一编辑器显式绑定；未知回执保留表单与原选择，核对成功后清除旧运输错误。
+`CanvasFilePreview` 将精确绝对路径编码后交给原 `FilePreviewApi.restore`，不直接读取路径、不借用当前工程，也不自动启动系统应用。
+固定文件展示与原工作区共用窗口 `FilePreviewResources` 和原 Thread session，但保存各卡自己的 tab ID、DOM scope、查找焦点和源码显示状态。
+首次可见才读取；收起/删除撤销展示 owner，不关闭另一处仍使用的共享预览。重新展开再次核对来源，内容变化先保留旧正文并提示，显式刷新才换内容。
+文件中的关联链接沿原句柄打开原 Thread 工作区并传递定位目标；根文件固定不变，迟到导航不能抢走新的页面意图。
+HTML 展示含同句柄镜像计入原窗口上限；后台冷恢复只走预览，不触发系统打开。文件头删除固定本行目标，工具栏删除读取即时选中项，确认框列出路径。
+隔离界面已挂载生产画布与原读者，模拟 Core/文件验证选择、未知恢复、变化、失效、收起/重开和删除；
+当前158/208实际 Rust、Host/Native IPC、真实 HTML、完整应用导航和规模仍须阶段候选验证，代码就绪不等同工程通过。

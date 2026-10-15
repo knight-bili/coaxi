@@ -1,7 +1,7 @@
 ---
 document_type: development-guide
 authority: test-policy-and-command-routing
-last_updated: 2026-10-15
+last_updated: 2026-10-16
 ---
 
 # 测试与 Smoke Test
@@ -1848,3 +1848,11 @@ I03-C03 文件来源绑定继续扩原 canvas_node 纯类型 owner 与 extended 
 原GraphController owner补能力准入和原文件/Thread/node/UUID/版本冻结；原Main access/authority/service owner拥有真实临时文件与symlink边界，
 Windows不能创建的冒号文件名用原平台条件跳过，不能把它计为通过。原文SQL夹具只是SQLite语句证据，
 不证明Rust分类器、Gateway或Host已运行；当前158/208新增Rust随阶段候选列出非零原owner后编译实跑。
+
+I03-C03 文件卡片新增最低层 `canvas-file.test.ts` owner，负责字面路径到既有文件请求的无损编码与拒绝，不复制文件权限实现。
+原 `file-preview-reference.test.ts` 验证编码冒号与行号区分；原窗口资源 owner 扩固定双文件展示、后台打开不改活动tab、
+来源重新核对失败不回显缓存、冷恢复只读预览、固定展示不自动读取邻居文件，以及共享HTML镜像展示上限。
+联合原GraphController、文案与Main access/authority/service共8文件：108通过、1个原Windows冒号文件名条件跳过。
+定向类型检查覆盖生产App/Canvas及新增owner。隔离Vite界面挂载真实ReactFlow、编辑器和文件读者，Core与文件API均模拟；
+17条过程记录包含发现问题、修复复测及夹具操作，不当作17项正式用例通过。早期夹具容器尺寸警告及删除选择缺陷保留记录。
+实际Core/Host/NativeIPC、完整App原工作区导航、真实HTML/权限/规模与正式324场景仍待阶段候选，不新增Rust测试或触发重型构建。

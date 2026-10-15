@@ -17,9 +17,9 @@ const colorNames = ['默认', '锌灰', '蓝灰', '石灰', '灰色', '红色', 
 export const canvasColorName = (color: string): string => colorNames[canvasColors.indexOf(color as typeof canvasColors[number])] ?? color
 export interface CanvasReferenceOption { reference: CanvasConversationRef; label: string; available?: boolean }
 export interface CanvasFolderGroupOption { id: string; label: string; color?: string | null; projectPaths?: readonly string[] }
-export type CanvasEditTarget = { type: 'create'; position: { x: number; y: number } } | { type: 'update'; row: CanvasNode }
+export type CanvasEditTarget = { type: 'create'; position: { x: number; y: number } } | { type: 'update' | 'bind_file'; row: CanvasNode }
 
-export function CanvasNodeEditor({ target, revision, latestRevision, agents, groups, references, referencesComplete, objectReferencesSupported = false, objectThreads = [], onRefreshReferences, blocked, pending, recovery, commandError, onClose, onSave }: {
+export function CanvasNodeEditor({ target, revision, latestRevision, agents, groups, references, referencesComplete, objectReferencesSupported = false, fileReferencesSupported = false, objectThreads = [], onRefreshReferences, blocked, pending, recovery, commandError, onClose, onSave }: {
   target: CanvasEditTarget
   revision: number
   latestRevision: number | null
@@ -28,6 +28,7 @@ export function CanvasNodeEditor({ target, revision, latestRevision, agents, gro
   references: CanvasReferenceOption[]
   referencesComplete: boolean
   objectReferencesSupported?: boolean
+  fileReferencesSupported?: boolean
   objectThreads?: readonly CanvasThreadReference[]
   onRefreshReferences?(): void
   blocked: boolean
@@ -37,10 +38,12 @@ export function CanvasNodeEditor({ target, revision, latestRevision, agents, gro
   onClose(): void
   onSave(mutation: CanvasNodeMutation, expectedRevision: number): Promise<void>
 }): React.JSX.Element {
-  const original = target.type === 'update' ? target.row : null
+  const original = target.type !== 'create' ? target.row : null, bindingOnly = target.type === 'bind_file'
   const [kind, setKind] = useState<CanvasNodeKind>(original?.data.kind ?? 'note')
   const [objectKind, setObjectKind] = useState<CanvasObjectReference['kind'] | null>(original?.data.objectReference?.kind ?? null)
   const [objectTarget, setObjectTarget] = useState<CanvasObjectTarget | null>(null)
+  const [fileThreadId, setFileThreadId] = useState('')
+  const fileThread = objectThreads.find(thread => thread.threadId === fileThreadId && thread.projectBindingKind === 'directory')
   const [title, setTitle] = useState(original?.data.title ?? ''), [content, setContent] = useState(original?.data.content ?? '')
   const [color, setColor] = useState(original?.data.color ?? '')
   const [path, setPath] = useState(''), [agentId, setAgentId] = useState(''), [groupId, setGroupId] = useState('')
@@ -56,8 +59,9 @@ export function CanvasNodeEditor({ target, revision, latestRevision, agents, gro
   const availableKeys = new Set(references.filter(item => item.available !== false).map(item => canvasReferenceKey(item.reference)))
   const missingMembers = members.some(key => !availableKeys.has(key))
   const changedSelection = !original && (kind === 'custom' && missingMembers || kind === 'conversation' && !objectKind && Boolean(referenceKey) && !reference)
-  const validBinding = Boolean(original) || kind === 'note' || kind === 'custom' && !missingMembers
-    || (kind === 'folder' || kind === 'file' || kind === 'terminal') && Boolean(path.trim())
+  const validBinding = bindingOnly ? fileReferencesSupported && Boolean(fileThread) : Boolean(original) || kind === 'note' || kind === 'custom' && !missingMembers
+    || (kind === 'folder' || kind === 'terminal') && Boolean(path.trim())
+    || kind === 'file' && Boolean(path) && fileReferencesSupported && Boolean(fileThread)
     || kind === 'agent' && choices.some(agent => agent.agentId === agentId)
     || kind === 'group' && groups.some(group => group.id === groupId)
     || kind === 'conversation' && (objectKind ? objectReferencesSupported && Boolean(objectTarget) : Boolean(reference))
@@ -68,7 +72,8 @@ export function CanvasNodeEditor({ target, revision, latestRevision, agents, gro
     setSubmitting(true); setError(null)
     try {
       let mutation: CanvasNodeMutation
-      if (original) {
+      if (bindingOnly && original) mutation = { type: 'bind_file', nodeId: original.id, threadId: fileThread!.threadId }
+      else if (original) {
         // Bindings are immutable. A note edit never resubmits geometry captured before a remote move.
         mutation = { type: 'update', nodeId: original.id, patch: { title, color,
           ...(kind === 'note' ? { content } : {}), ...(isRegionKind(kind) ? { gridColumns: columns, gridRows: rows } : {}) } }
@@ -84,6 +89,7 @@ export function CanvasNodeEditor({ target, revision, latestRevision, agents, gro
         if (kind === 'note') node.content = content
         if (kind === 'folder') node.folderPath = path
         if (kind === 'file' || kind === 'terminal') node.path = path
+        if (kind === 'file') node.fileReference = { threadId: fileThread!.threadId }
         if (kind === 'agent') node.agentId = agentId
         if (kind === 'group') node.folderGroupId = groupId
         if (kind === 'conversation') {
@@ -100,17 +106,18 @@ export function CanvasNodeEditor({ target, revision, latestRevision, agents, gro
     <Dialog.Overlay className="dialog-overlay app-dialog-overlay" />
     <AppDialogContent className="canvas-node-editor" width="wide" tone="neutral"
       onEscapeKeyDown={event => { if (locked) event.preventDefault() }} onPointerDownOutside={event => event.preventDefault()}>
-      <AppDialogHeader title={uiAttribute(original ? '编辑画布节点' : '添加到画布')}
+      <AppDialogHeader title={uiAttribute(bindingOnly ? '绑定文件来源' : original ? '编辑画布节点' : '添加到画布')}
         description={uiAttribute('画布只保存布局和引用；删除节点不会删除工程、对话或文件。')} closeDisabled={locked} />
       <form className="app-dialog-form" onSubmit={event => { event.preventDefault(); void save() }}>
         <AppDialogBody>
           <fieldset disabled={locked} className="canvas-editor-fields">
+            {!bindingOnly && <>
             {!original && <label className="field-label"><UiText zh="类型" /><select value={objectKind ?? kind} onChange={event => {
               const value = event.target.value
               const nextObject = Object.hasOwn(canvasObjectNames, value) ? value as CanvasObjectReference['kind'] : null
               setObjectKind(nextObject); setObjectTarget(null); setKind(nextObject ? 'conversation' : value as CanvasNodeKind); setError(null)
             }}>
-              {(Object.keys(canvasKindNames) as CanvasNodeKind[]).map(value => <option key={value} value={value}>{uiAttribute(canvasKindNames[value])}</option>)}
+              {(Object.keys(canvasKindNames) as CanvasNodeKind[]).map(value => <option key={value} value={value} disabled={value === 'file' && !fileReferencesSupported}>{uiAttribute(canvasKindNames[value])}</option>)}
               {(Object.keys(canvasObjectNames) as CanvasObjectReference['kind'][]).map(value => <option key={value} value={value} disabled={!objectReferencesSupported}>{uiAttribute(canvasObjectNames[value])}</option>)}
             </select></label>}
             <label className="field-label"><UiText zh="标题" /><input data-dialog-autofocus value={title} onChange={event => setTitle(event.target.value)} autoComplete="off"
@@ -145,6 +152,15 @@ export function CanvasNodeEditor({ target, revision, latestRevision, agents, gro
               <label className="field-label"><UiText zh="固定列数（0 为自动）" /><input type="number" min={0} max={12} step={1} value={columns} onChange={event => setColumns(Math.max(0, Math.min(12, Math.round(Number(event.target.value) || 0))))} /></label>
               <label className="field-label"><UiText zh="固定行数（0 为自动）" /><input type="number" min={0} max={12} step={1} value={rows} onChange={event => setRows(Math.max(0, Math.min(12, Math.round(Number(event.target.value) || 0))))} /></label>
             </div>}
+            </>}
+            {(bindingOnly || !original && kind === 'file') && <>
+              {bindingOnly && <code className="canvas-binding-summary">{original?.data.path}</code>}
+              <label className="field-label"><UiText zh="所属工程对话" /><select value={fileThreadId} onChange={event => setFileThreadId(event.target.value)}>
+                <option value="">{uiAttribute('请选择')}</option>{objectThreads.filter(thread => thread.projectBindingKind === 'directory').map(thread => <option key={thread.threadId} value={thread.threadId}>{thread.title}</option>)}
+              </select></label>
+              <p className="canvas-empty-copy"><UiText zh="来源绑定后保持不变；实际读取仍由原文件权限检查。" /></p>
+              {!referencesComplete && <p className="canvas-notice"><UiText zh="对话清单尚未完整载入，当前结果仍在核对。" /></p>}
+            </>}
           </fieldset>
           {changedSelection && <p role="alert"><UiText zh="所选对话已结束或不可用，请重新选择。" />
             {kind === 'custom' && <button type="button" disabled={locked} onClick={() => setMembers(current => current.filter(key => availableKeys.has(key)))}><UiText zh="移除失效选择" /></button>}
@@ -160,7 +176,7 @@ export function CanvasNodeEditor({ target, revision, latestRevision, agents, gro
         <AppDialogFooter>
           <button className="quiet-button" type="button" disabled={locked} onClick={close}><UiText zh="取消" /></button>
           <button className="primary-button conversation-primary-button" type="submit" disabled={blocked || locked || stale || !validBinding}>
-            <UiText zh={locked ? '保存中…' : '保存'} />
+            <UiText zh={locked ? '保存中…' : bindingOnly ? '绑定来源' : '保存'} />
           </button>
         </AppDialogFooter>
       </form>

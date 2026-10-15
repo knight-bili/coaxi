@@ -1,5 +1,6 @@
 import { CanvasThreadWorkspace } from './CanvasThreadWorkspace'
 import { readCanvasObject, type CanvasObjectTarget } from './canvas-object'
+import { windowFilePreviewResources } from './file-preview-resources'
 import { runCanvasLeaveTransition, prepareActiveCanvasForAppQuit, type CanvasLeavePreparation } from './canvas-leave'
 export { runCanvasLeaveTransition, prepareActiveCanvasForAppQuit } from './canvas-leave'
 import { CanvasThreadReader } from './CanvasThreadReader'
@@ -4054,7 +4055,24 @@ function BusinessAppContent({
         {!startupGateVisible && view === 'canvas' && <>
           {mobile && <MobilePageHeader title={uiAttribute('无限画布')} onOpenMenu={openMobileMenu} menuOpen={mobileConversationDrawerOpen} triggerRef={mobileConversationListButtonRef} />}
           {[...new Set(canvasConversations.state.instances.map(instance => instance.target.reference.threadId))].map(threadId => <CanvasThreadReader key={threadId} threadId={threadId} reads={threadProjections} />)}
-          <CanvasWorkspace agents={agents} theme={appearance.resolvedTheme}
+          <CanvasWorkspace agents={agents} theme={appearance.resolvedTheme} fileApi={environment.files}
+            onFileWorkspace={async (threadId, tabId) => {
+              if (!await openCanvasReference({ threadId, conversationId: null })) throw new Error(uiAttribute('暂时无法打开原文件工作区。'))
+              const session = windowFilePreviewResources(environment.files).session(threadId)
+              if (!session.getSnapshot().tabs.some(tab => tab.id === tabId)) throw new Error(uiAttribute('原文件预览已关闭，请重新打开。'))
+              session.actions.activate(tabId); session.actions.showPane()
+            }}
+            onOpenFileSource={async (threadId, request, target, presentation, options) => {
+              const intent = desktopNavigation.beginIntent()
+              const resources = windowFilePreviewResources(environment.files), session = resources.session(threadId)
+              const outcome = await session.actions.open(request, target, presentation, { ...options, commitOnSuccess: true })
+              if (!intent.isCurrent() || threadClientOwner.current !== client) return { kind: 'error', error: { code: 'source_not_authorized', message: uiAttribute('原文件打开请求已失效，请重新操作。'), retryable: true } }
+              if (outcome.kind === 'preview') {
+                if (!await openCanvasReference({ threadId, conversationId: null })) return { kind: 'error', error: { code: 'source_not_authorized', message: uiAttribute('暂时无法打开原文件工作区。'), retryable: true } }
+                session.actions.activate(outcome.tabId); session.actions.showPane()
+              }
+              return outcome
+            }}
             conversation={{ instances: canvasConversations.state.instances.map(instance => ({ key: instance.key, target: instance.target,
               busy: canvasConversations.state.busyKeys.includes(instance.key), content: canvasConversations.controller.current && <CanvasThreadWorkspace
                 instance={instance} controller={canvasConversations.controller.current} reads={threadProjections} files={environment.files} visibility={canvasVisibility}
