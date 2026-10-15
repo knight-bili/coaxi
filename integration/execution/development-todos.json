@@ -120,11 +120,11 @@
     {
       "id": "DEV-CANVAS-ATOMIC-LEAVE",
       "task": "I03/I12",
-      "status": "saved_input_reconstruction_verified_original_editor_atomic_handoff_pending",
+      "status": "renderer_original_editor_undo_verified_native_quit_failure_pending",
       "owner": "研发",
-      "file": "apps/desktop/src/renderer/src/CanvasWorkspace.tsx:canLeave",
-      "problem": "当前暂时离开会在prepare后卸载卡片，失败时重建已存输入；原编辑器/undo以及后续拒绝/取消的两阶段事务需继续实现，不以saved-input重建冒充完成。",
-      "evidence": "i03-canvas-recovery-result.json"
+      "file": "apps/desktop/src/renderer/src/canvas-conversations-controller.ts:prepareLeave",
+      "problem": "Renderer两阶段准备/提交/回滚与原DOM/undo已实现并mock浏览器验证，247相关检查通过；Native已经通过预检后的退出失败、真实Core停止/异常进程/Host与并发图资格仍需实测。",
+      "evidence": "i03-canvas-atomic-leave-result.json"
     }
   ]
 }

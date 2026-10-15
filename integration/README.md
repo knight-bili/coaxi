@@ -40,3 +40,5 @@ I00已自审修正并合入，I01基础构建与契约证据保留草稿；I02�
 - [I03多卡通知可见确认检查点](execution/i03-canvas-notification-result.json)：实际卡片来源并集、裁剪/遮挡观察、每Thread确认/独立重试和client围栏已接；245项检查、类型/文案/文档及浏览器9项检查通过。现有隔离Electron通知检查1通过1失败，设置焦点问题在旧Controller对照同样复现并登记研发整改；真实Core通知、公私来源/Host与规模待验。
 
 - [I03展开保存与只读恢复检查点](execution/i03-canvas-recovery-result.json)：精确Host/Owner/Core/Board记录、切页切板保留、显式收起、恢复/停止/重试与saved-input恢复已接；230相关检查及类型/文案/文档通过。真实CanvasWorkspace/Surface/ReactFlow模拟Core完成12步检查，另发现并修复展开白屏；只读运输没有enter/启动Runtime。原编辑器/undo的原子离开、Native完整/异常进程恢复、私有附件隔离及真实平台仍待补齐。
+
+- [I03原编辑器离开事务检查点](execution/i03-canvas-atomic-leave-result.json)：导航失败/拒绝/失效、等待取消与Renderer后续退出检查失败保留同一编辑器和撤销；画板拒绝/未知结果保留实例、核对成功才交接。247相关检查、类型/文案/文档及生产画布mock浏览器验证通过，并修复删除后自动选板循环；Native退出/异常进程/Host与私有附件隔离继续。
