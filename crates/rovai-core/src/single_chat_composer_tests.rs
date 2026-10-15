@@ -816,6 +816,15 @@ fn verify_scoped_pending_edits(f: &mut Fixture) {
         .unwrap()
         .to_owned();
     assert_ne!(alpha_token, beta_token);
+    verify_private_attachment_locator(
+        f,
+        json!({
+            "owner":"single_chat_scoped_pending_edit", "threadId":f.thread,"conversationId":f.conversation,
+            "composerScope":f.scopes[0],"pendingInputId":pending.id,"editToken":alpha_token,
+            "attachmentRefId":pending.attachments[0].id
+        }),
+        &DraftClient::default(),
+    );
     edit.payload.composer_scope = Some(f.scopes[1].clone());
     edit.payload.edit_token = Some(beta_token);
     assert_eq!(
@@ -835,6 +844,30 @@ fn verify_scoped_pending_edits(f: &mut Fixture) {
         .unwrap()
         .to_owned();
     assert_ne!(web_token, alpha_token);
+    verify_private_attachment_locator(
+        f,
+        json!({
+            "owner":"single_chat_scoped_pending_edit", "threadId":f.thread,"conversationId":f.conversation,
+            "composerScope":f.scopes[2],"pendingInputId":pending.id,"editToken":web_token,
+            "attachmentRefId":pending.attachments[0].id
+        }),
+        &DraftClient::verified_web(&"6".repeat(64)).unwrap(),
+    );
+    {
+        use crate::local_attachment_source::{
+            LocalAttachmentOwnerLocator, load_source_attachment_for_client,
+        };
+        let old: LocalAttachmentOwnerLocator=serde_json::from_value(json!({
+            "owner":"single_chat_scoped_pending_edit", "threadId":f.thread,"conversationId":f.conversation,
+            "composerScope":f.scopes[0],"pendingInputId":pending.id,"editToken":alpha_token,
+            "attachmentRefId":pending.attachments[0].id
+        })).unwrap();
+        assert!(
+            load_source_attachment_for_client(&f.database, &old, &DraftClient::default())
+                .unwrap()
+                .is_none()
+        );
+    }
     edit.payload.draft_client = DraftClient::default();
     edit.payload.composer_scope = Some(f.scopes[0].clone());
     edit.payload.edit_token = Some(alpha_token);
@@ -985,6 +1018,15 @@ fn verify_scoped_pending_edits(f: &mut Fixture) {
         .as_str()
         .unwrap()
         .to_owned();
+    verify_private_attachment_locator(
+        f,
+        json!({
+            "owner":"single_chat_retained", "threadId":f.thread,"conversationId":f.conversation,
+            "composerScope":f.scopes[1],"retainedInputId":saved,
+            "attachmentRefId":pending.attachments[0].id
+        }),
+        &DraftClient::default(),
+    );
     let swapped = apply(
         f,
         1,
@@ -1001,6 +1043,35 @@ fn verify_scoped_pending_edits(f: &mut Fixture) {
         pending.attachments[0].id
     );
     assert_eq!(swapped.payload["retainedInput"]["body"], "保留当前正文");
+    let default_retained = Uuid::new_v4().to_string();
+    let sources:String=f.database.connection().query_row("SELECT source_attachments_json FROM single_chat_composer_draft WHERE conversation_id=?1 AND client_id='desktop' AND scope_key=?2",
+        params![f.conversation,f.scopes[1].storage_key().unwrap()],|row|row.get(0)).unwrap();
+    f.database.connection().execute("INSERT INTO single_chat_retained_input(id,conversation_id,client_id,scope_key,body,source_attachments_json,created_at,updated_at) VALUES(?1,?2,'desktop','','默认保留输入',?3,'now','now')",
+        params![default_retained,f.conversation,sources]).unwrap();
+    verify_private_attachment_locator(
+        f,
+        json!({
+            "owner":"single_chat_retained","threadId":f.thread,"conversationId":f.conversation,
+            "composerScope":null,"retainedInputId":default_retained,"attachmentRefId":pending.attachments[0].id
+        }),
+        &DraftClient::default(),
+    );
+    let SingleChatComposerScope::Canvas { board_id, node_id } = &f.scopes[1];
+    f.database
+        .connection()
+        .execute(
+            "DELETE FROM canvas_node WHERE board_id=?1 AND id=?2",
+            params![board_id, node_id],
+        )
+        .unwrap();
+    verify_private_attachment_locator(
+        f,
+        json!({
+            "owner":"single_chat_scoped_composer", "threadId":f.thread,"conversationId":f.conversation,
+            "composerScope":f.scopes[1],"attachmentRefId":pending.attachments[0].id
+        }),
+        &DraftClient::default(),
+    );
     assert!(
         service
             .snapshot(&f.database, &f.conversation)
@@ -1009,6 +1080,81 @@ fn verify_scoped_pending_edits(f: &mut Fixture) {
             .pending_inputs
             .items
             .is_empty()
+    );
+}
+
+fn verify_private_attachment_locator(f: &Fixture, input: serde_json::Value, client: &DraftClient) {
+    use crate::local_attachment_source::{
+        LocalAttachmentOwnerLocator, load_source_attachment_for_client,
+    };
+    let locator: LocalAttachmentOwnerLocator = serde_json::from_value(input.clone()).unwrap();
+    assert_eq!(serde_json::to_value(&locator).unwrap(), input);
+    let legacy = json!({"owner":"single_chat_composer","threadId":f.thread,"conversationId":f.conversation,"attachmentRefId":input["attachmentRefId"]});
+    assert_eq!(
+        serde_json::to_value(
+            serde_json::from_value::<LocalAttachmentOwnerLocator>(legacy.clone()).unwrap()
+        )
+        .unwrap(),
+        legacy
+    );
+    let mut injected = legacy;
+    injected["composerScope"] = input["composerScope"].clone();
+    assert!(serde_json::from_value::<LocalAttachmentOwnerLocator>(injected).is_err());
+    let before = f.database.connection().total_changes();
+    let source = load_source_attachment_for_client(&f.database, &locator, client)
+        .unwrap()
+        .unwrap();
+    assert_eq!(source.id, input["attachmentRefId"].as_str().unwrap());
+    assert!(
+        load_source_attachment_for_client(
+            &f.database,
+            &locator,
+            &DraftClient::verified_web(&"9".repeat(64)).unwrap()
+        )
+        .unwrap()
+        .is_none()
+    );
+    for field in [
+        "threadId",
+        "conversationId",
+        "attachmentRefId",
+        "retainedInputId",
+        "pendingInputId",
+        "editToken",
+    ] {
+        if input.get(field).is_none() {
+            continue;
+        }
+        let mut changed = input.clone();
+        changed[field] = json!(Uuid::new_v4().to_string());
+        let changed: LocalAttachmentOwnerLocator = serde_json::from_value(changed).unwrap();
+        assert!(
+            load_source_attachment_for_client(&f.database, &changed, client)
+                .unwrap()
+                .is_none(),
+            "{field}"
+        );
+    }
+    let mut changed = input.clone();
+    changed["composerScope"] = f
+        .scopes
+        .iter()
+        .map(|scope| serde_json::to_value(scope).unwrap())
+        .find(|scope| scope != &input["composerScope"])
+        .unwrap();
+    let changed: LocalAttachmentOwnerLocator = serde_json::from_value(changed).unwrap();
+    assert!(
+        load_source_attachment_for_client(&f.database, &changed, client)
+            .unwrap()
+            .is_none()
+    );
+    let mut changed = input.clone();
+    changed["clientId"] = json!("desktop");
+    assert!(serde_json::from_value::<LocalAttachmentOwnerLocator>(changed).is_err());
+    assert_eq!(
+        f.database.connection().total_changes(),
+        before,
+        "resource reads must not register or mutate"
     );
 }
 

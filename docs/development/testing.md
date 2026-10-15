@@ -49,6 +49,13 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 
 ## Rust 测试准入与退役门槛
 
+私有附件定位继续扩展既有第三个 `single_chat_composer::tests` owner 的实际 SQLite/源引用夹具，
+覆盖卡片、工作副本、retained/default retained 的正向读取、错 Thread/Conversation/client/scope/ref/Pending/token 拒绝，
+明确接管后旧令牌不可读、pin 删除后孤立输入可读及读取零写入，不新增 Rust owner。
+TypeScript 的闭合输入由原 `file-preview-ipc-input.test.ts` 拥有，来源透传由原 authority owner、
+位置缓存隔离由原 preview-session/AttachmentCard/ImageGallery owner 验证；新增 shared parser/key helper 无额外平行测试框架。
+本地 Core 检查不代表 Host HTTP/Native 或完整文件能力资格；源内容摘要、上传与完整 PC15 继续待验。
+
 私聊材料服务新增三个 `single_chat_composer::tests` 扩展 owner：
 `commands_keep_complete_inputs_separate_preserve_receipts_and_rollback_both_sides` 拥有七动作的跨 scope CAS、整份输入交换/回滚与可信编辑端回执；
 `recovery_pages_are_read_only_context_bound_bounded_and_incomplete_after_changes` 拥有分页只读、上下文/签名、原始摘要贯穿各页与 orphan 保留；

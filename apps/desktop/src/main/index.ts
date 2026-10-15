@@ -23,6 +23,7 @@ import {
   shell
 } from 'electron'
 import { isThreadId } from '@contracts'
+import { parsePrivateAttachmentLocator } from '../shared/private-attachment-locator'
 import type {
   AppearancePreferences,
   AppearanceSnapshot,
@@ -1808,6 +1809,8 @@ function attachmentAvailabilityFromError(error: unknown): LocalAttachmentAvailab
 }
 
 function requireAttachmentOwnerLocator(value: unknown): LocalAttachmentOwnerLocator {
+  const privateLocator = parsePrivateAttachmentLocator(value)
+  if (privateLocator) return privateLocator
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     throw new Error('Attachment Owner 无效。')
   }

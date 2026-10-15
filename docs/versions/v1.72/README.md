@@ -23,6 +23,9 @@ Core 材料七动作、精确读取、有界恢复与发送按 scope 消费已�
 两端封闭准入、原 UUID 只读核对和客户端能力回显检查已接通，详见[应用入口证据](../../../integration/execution/i03-private-composer-api-result.json)。
 显式 get 才返回 scopeVersion，草稿和编辑会话同归属过滤；默认旧响应保持。Core 编辑租约已按 client+scope 显式接管并轮换 token；完整移回按空/占用目标返回活动/retained 输入，材料与 Pending 取消、回执同事务，见[编辑执行证据](../../../integration/execution/i03-private-pending-edit-result.json)。Renderer 已接新版移回、完整保留输入选择/交换、排队编辑恢复及持久原请求核对，见[输入界面证据](../../../integration/execution/i03-private-input-ui-result.json)。卡片正文/材料隔离和镜像已做模拟 Core 的生产组件挂载；卡片上传、资源授权、默认材料迁入和孤立输入统一界面仍待实现，卡片文件添加与预览暂不启用。最终 Blob/实际 Host/Runtime 和平台仍待验。当前 Web 准入180项，来源161项保持。
 24项完整验证要求仍待执行，不计入正式324场景通过。
+卡片/工作副本/retained 文件定位已按精确归属接 Core 与 Main 双入口、预览来源和缓存键，
+17项 Core 与65项客户端定向检查通过，见[文件资源证据](../../../integration/execution/i03-private-resource-result.json)。
+完整文件授权链路、上传源摘要及新文件 UI 仍待，不把本地定位检查计作完整 PC15 通过。
 不授权付费模型、main合入或发布。I03功能集齐后集中编译和平台验证。
 
 ## 技能包实际投递 r1 已获客户确认（2026-10-14）

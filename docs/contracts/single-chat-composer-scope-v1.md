@@ -98,9 +98,27 @@ Renderer 的 SingleChatPanel 已通过 PrivateInputController 提交冻结的 ta
 已存标记的回执不重复恢复旧正文；发送回执只清除仍匹配原发送的正文。Native 默认输入也经现有隔离本机存储落盘。
 只读打开不登记 scope；有意义正文编辑先保存本机正文/索引后登记。未完成分页保留已知输入，只在完整枚举后剔除缺席项。
 
-上传 prepare UUID/源摘要、scope/retained 文件资源授权、默认材料显式迁入和孤立输入统一恢复界面继续实施。
+上传 prepare UUID/源摘要、文件资源完整 Host 链路验收、默认材料显式迁入和孤立输入统一恢复界面继续实施。
 本批卡片文件添加暂禁用、活动卡片附件只显示文件名并可移除，不借旧默认 locator 读取文件；工作副本也不提供未授权预览。
 本机页重载和模拟 Core 挂载不替代实际 HTTP/Native IPC、多窗口恢复、Host 重启、最终 Manifest Blob 或 Runtime/平台验收。
+
+## 私有材料文件定位
+
+新增三个闭合 owner：`single_chat_scoped_composer` 必带卡片描述，
+`single_chat_scoped_pending_edit` 另带原 Pending ID 与 editToken，
+`single_chat_retained` 带 retainedInputId 和可空卡片描述（null 只指默认位置）。
+三者都带 Thread、原 Conversation 和 attachmentRefId；不接受 clientId、scopeKey 或其他自报权限。
+旧默认 owner 的 JSON 不加字段；不能在旧 owner 塞入卡片描述后由 Main 丢弃描述、降级成默认材料。
+
+Core 按可信 client、Conversation、派生 key 和原材料行查找源引用，工作副本另核对 Pending/token；
+retained ID 不能代替上述归属。错绑或材料不存在不回退到旧托管附件查询。读取不登记 scope 或修改数据；
+原 pin 删除后仍按持久原归属读取孤立材料，不将它重绑到其他卡片。文件路径的底层访问策略沿用现行附件合同。
+Main 原生附件与文件预览两入口保留完整描述；预览来源、会话与图片缓存 key 包含卡片、retained ID 或租约，避免同附件号跨位置复用。
+
+本批只完成该定位边界和客户端键值接线，未启用卡片上传/新预览，不以 scopeVersion 1 宣称上传或资源链路已经验收。
+源引用结构、公共/Agent live source 语义、模型输出和旧冻结证据不变；源内容替换检测继续待实现。
+生产 Core 的隔离 SQLite/既有源引用测试与模拟 Main/客户端证据见
+[私有文件资源执行记录](../../integration/execution/i03-private-resource-result.json)，实际 HTTP/Native、最终 Blob 与完整 PC01–PC24 仍待。
 
 本轮因主键及迁移安全影响后续接线，按阶段策略例外做本地定向编译/迁移 owner，完整跨平台、实际 Runtime 与 PC01–PC24 仍待验。
 具体命令、源码和失败记录见[迁移执行证据](../../integration/execution/i03-private-scope-storage-result.json)，不宣称完整功能或整套一期通过。

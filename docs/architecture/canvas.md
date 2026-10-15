@@ -203,3 +203,11 @@ selection, mirrored bodies, other-card isolation, reply loss, reload, same-reque
 takeover are checked there. Actual Host/IPC, multiwindow/crash recovery, scale and final model input
 remain unqualified. Scoped upload/source-digest proof, scoped/retained file authorization, explicit legacy
 material adoption and orphan recovery UI remain required; card files render names only until authorization lands.
+
+Private attachment locators now distinguish scoped composers, scoped pending edits and retained inputs.
+Core resolves the source from its exact Conversation/client/scope row; pending edits also require the current
+Pending ID and lease token. A retained ID grants no independent access. These owners cannot fall back to
+legacy managed-attachment lookup. Persistent scope ownership survives pin deletion for orphan recovery.
+Main's two file entry points preserve the complete descriptor and reject scope data smuggled into an old
+default owner. Renderer and Main file identities include the exact scope/retained/lease before caching.
+Scoped upload, content-change proof and actual Host resource qualification remain pending; file UI stays gated.

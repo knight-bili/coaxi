@@ -1483,6 +1483,9 @@ export type LocalAttachmentAvailability =
 export type LocalAttachmentSourceView = ThreadMessageAttachmentView
 
 export type LocalAttachmentOwnerLocator =
+  | { owner: 'single_chat_scoped_composer'; threadId: string; conversationId: string; composerScope: SingleChatComposerScope; attachmentRefId: string }
+  | { owner: 'single_chat_scoped_pending_edit'; threadId: string; conversationId: string; composerScope: SingleChatComposerScope; pendingInputId: string; editToken: string; attachmentRefId: string }
+  | { owner: 'single_chat_retained'; threadId: string; conversationId: string; composerScope: SingleChatComposerScope | null; retainedInputId: string; attachmentRefId: string }
   | { owner: 'composer'; threadId: string; attachmentRefId: string }
   | { owner: 'pending'; threadId: string; pendingInputId: string; attachmentRefId: string }
   | {
