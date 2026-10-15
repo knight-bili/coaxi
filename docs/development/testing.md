@@ -39,6 +39,12 @@ quota/读取拒绝及旧 scoped ID 经有效图迁移；继续扩展 `canvas-con
 
 ## Rust 测试准入与退役门槛
 
+私聊材料隔离 r1 的新最低层 owner `single_chat_composer_scope::tests::scope_codec_preserves_legacy_omission_and_requires_explicit_closed_identity`
+拥有省略/显式 null 的协商差别、规范闭合标识和额外身份字段拒绝；原 DraftClient 与画布几何 owner 不拥有这项网络编码，不能由完整 Runtime 夹具代替。
+`pin_binding_requires_the_exact_live_private_reference_without_writing` 只建当前查询必要四表，拥有 Board/pin/Thread/Conversation 精确关系及结束/删除/非激活拒绝；
+旧画布引用校验允许公开或历史对象存在，不能证明新草稿首次登记的活跃私聊条件。该 owner 不建立完整 Database、不创建草稿、不启动 Runtime。
+最小命令 `cargo test -p rovai-core --lib single_chat_composer_scope -- --list` 后再执行同过滤；本切片按阶段批量规则只审查/格式检查及执行原文 SQL 见证，Rust 编译和两个 owner 均待 I03 候选，不记为通过。
+
 Canvas `group.sourceMembers`扩展复用`canvas_node::tests::eight_kinds_preserve_source_geometry_text_and_reference_limits`的旧Group序列化断言，
 及`canvas_node::persistence_tests::migration_and_graph_gestures_preserve_scope_atomicity_replay_and_reopen`的跨源转移/私有身份/镜像保留/回放与派生绑定用例；
 不新增Rust owner，阶段命令`cargo test -p rovai-core --lib --features extended-tests canvas_node::`，本切片未编译执行。
