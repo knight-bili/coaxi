@@ -25,7 +25,8 @@ import { canvasConversationGeometry, canvasConversationMatches, canvasMutationRe
 import { canvasComposerContext } from './canvas-composer-drafts'
 import './canvas.css'
 
-export interface CanvasLeaveGuard { canLeave(): Promise<boolean>; isBlocked(): boolean; resume?(): void }
+export type { CanvasLeaveGuard } from './canvas-leave'
+import type { CanvasLeaveGuard } from './canvas-leave'
 export interface CanvasSurfaceProps {
   boardId: string
   scope: CanvasViewScope | null
@@ -169,7 +170,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
   const rows = graph.snapshot?.nodes ?? EMPTY_ROWS
   useEffect(() => {
     const stamp = JSON.stringify([props.restoreRevision ?? 0, restoreRetry])
-    if (restored.current === stamp || !props.scope || graph.loading || graph.readError || graph.pending || !graph.snapshot?.board || !props.conversation) return
+    if (restored.current === stamp || !props.scope || graph.loading || graph.readError || graph.pending || !graph.snapshot?.board || !props.conversation || props.conversation.opening || props.conversation.restoring) return
     restored.current = stamp
     void props.conversation.restore(props.scope, props.boardId, rows).catch(error => setIssue(readErrorMessage(error)))
   }, [props.scope, props.boardId, props.restoreRevision, props.conversation, graph.loading, graph.readError, graph.pending, graph.snapshot, rows, restoreRetry])

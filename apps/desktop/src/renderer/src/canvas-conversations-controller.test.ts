@@ -26,6 +26,118 @@ function fixture(handler: (method: CoreMethod, params?: unknown) => Promise<unkn
 function storage() { const values = new Map<string, string>(); return { values, getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => { values.set(key, value) } } }
 const node = (item: CanvasConversationTarget): CanvasNode => ({ id: item.nodeId, boardId: item.boardId, data: { kind: 'conversation', conversation: item.reference } } as CanvasNode)
 
+it('keeps the exact editors mounted while preparing navigation and unlocks them on rollback', async () => {
+  const f = fixture(), complete = vi.fn()
+  await f.controller.open(target()); const before = f.controller.getSnapshot().instances
+  f.controller.register(before[0].key, async () => ({ complete }))
+  const prepared = await f.controller.prepareLeave()
+  expect(f.controller.getSnapshot().instances).toBe(before)
+  expect(f.controller.getSnapshot()).toMatchObject({ opening: true, leaving: true, busyKeys: [before[0].key] })
+  expect(await f.controller.open(target({ nodeId: 'other' }))).toBe(false)
+  expect(await f.controller.close()).toBe(false)
+  expect(complete).not.toHaveBeenCalled()
+  await prepared.complete(false); await prepared.complete(true)
+  expect(complete).toHaveBeenCalledExactlyOnceWith(false)
+  expect(f.controller.getSnapshot().instances).toBe(before)
+  expect(f.controller.getSnapshot()).toMatchObject({ opening: false, leaving: false, busyKeys: [] })
+})
+
+it('rolls all earlier editors back when a later navigation preparation fails', async () => {
+  const f = fixture(), complete = vi.fn()
+  await f.controller.open(target()); await f.controller.open(target({ nodeId: 'other' }))
+  const before = f.controller.getSnapshot().instances
+  f.controller.register(before[0].key, async () => ({ complete }))
+  f.controller.register(before[1].key, async () => { throw new Error('cannot save editor') })
+  await expect(f.controller.prepareLeave()).rejects.toThrow('cannot save editor')
+  expect(complete).toHaveBeenCalledExactlyOnceWith(false)
+  expect(f.controller.getSnapshot().instances).toBe(before)
+  expect(f.controller.getSnapshot()).toMatchObject({ opening: false, leaving: false })
+})
+
+it('waits for a committed transition checkpoint before removing only its selected editors', async () => {
+  let release!: () => void
+  const waiting = new Promise<void>(resolve => { release = resolve }), complete = vi.fn()
+  const local = storage(), recovery = new CanvasConversationRecovery(local), f = fixture(undefined, () => waiting, recovery)
+  await f.controller.open(target()); await f.controller.open(target({ nodeId: 'other' }))
+  const before = f.controller.getSnapshot().instances, remembered = [...local.values]
+  f.controller.register(before[0].key, async () => ({ complete }))
+  const prepared = await f.controller.prepareLeave([before[0].key]), completing = prepared.complete(true)
+  await Promise.resolve()
+  expect(f.controller.getSnapshot().instances).toBe(before)
+  expect(complete).not.toHaveBeenCalled()
+  release(); await completing
+  expect(f.controller.getSnapshot().instances).toEqual([before[1]])
+  expect(complete).toHaveBeenCalledExactlyOnceWith(true)
+  expect([...local.values]).toEqual(remembered)
+})
+
+it('shares pending navigation preparation without allowing a superseded attempt to unlock a newer attempt', async () => {
+  let release!: () => void
+  const waiting = new Promise<void>(resolve => { release = resolve }), complete = vi.fn(), guard = vi.fn(async () => { await waiting; return { complete } })
+  const f = fixture(); await f.controller.open(target())
+  const before = f.controller.getSnapshot().instances
+  f.controller.register(before[0].key, guard)
+  const first = f.controller.prepareLeave(), second = f.controller.prepareLeave()
+  release(); const [a, b] = await Promise.all([first, second])
+  expect(guard).toHaveBeenCalledOnce()
+  await a.complete(false)
+  expect(complete).not.toHaveBeenCalled()
+  expect(f.controller.getSnapshot().leaving).toBe(true)
+  expect(f.controller.getSnapshot().instances).toBe(before)
+  await b.complete(false)
+  expect(complete).toHaveBeenCalledExactlyOnceWith(false)
+  expect(f.controller.getSnapshot().instances).toBe(before)
+})
+
+it('commits a shared leave only after every attempt releases its input lease', async () => {
+  const f = fixture(), complete = vi.fn(); await f.controller.open(target())
+  f.controller.register(f.controller.getSnapshot().instances[0].key, async () => ({ complete }))
+  const first = await f.controller.prepareLeave(), second = await f.controller.prepareLeave()
+  await first.complete(true)
+  expect(complete).not.toHaveBeenCalled(); expect(f.controller.getSnapshot().instances).toHaveLength(1)
+  await second.complete(false)
+  expect(complete).toHaveBeenCalledExactlyOnceWith(true)
+  expect(f.controller.getSnapshot().instances).toEqual([])
+})
+
+it('rejects a different editor set while an original leave is pending', async () => {
+  const f = fixture(); await f.controller.open(target()); await f.controller.open(target({ nodeId: 'other' }))
+  const prepared = await f.controller.prepareLeave()
+  await expect(f.controller.prepareLeave([f.controller.getSnapshot().instances[0].key])).rejects.toThrow()
+  await prepared.complete(false)
+  expect(f.controller.getSnapshot().instances).toHaveLength(2)
+})
+
+it('preserves original editors and unlocks input when the commit checkpoint fails', async () => {
+  const f = fixture(undefined, async () => { throw new Error('checkpoint failed') }), complete = vi.fn()
+  await f.controller.open(target()); const before = f.controller.getSnapshot().instances
+  f.controller.register(before[0].key, async () => ({ complete }))
+  const prepared = await f.controller.prepareLeave()
+  await expect(prepared.complete(true)).rejects.toThrow('checkpoint failed')
+  expect(complete).toHaveBeenCalledExactlyOnceWith(false)
+  expect(f.controller.getSnapshot().instances).toBe(before)
+  expect(f.controller.getSnapshot().leaving).toBe(false)
+})
+
+it('unlocks a prepared editor once on disposal and rejects a late commit', async () => {
+  const f = fixture(), complete = vi.fn(); await f.controller.open(target())
+  const before = f.controller.getSnapshot().instances
+  f.controller.register(before[0].key, async () => ({ complete }))
+  const prepared = await f.controller.prepareLeave()
+  f.controller.dispose(); await prepared.complete(true)
+  expect(complete).toHaveBeenCalledExactlyOnceWith(false)
+  expect(f.controller.getSnapshot().instances).toBe(before)
+})
+
+it('rolls back a guard that finishes only after its controller was disposed', async () => {
+  let release!: () => void
+  const waiting = new Promise<void>(resolve => { release = resolve }), f = fixture(), complete = vi.fn()
+  await f.controller.open(target()); f.controller.register(f.controller.getSnapshot().instances[0].key, async () => { await waiting; return { complete } })
+  const pending = f.controller.prepareLeave(), rejected = expect(pending).rejects.toThrow()
+  await Promise.resolve(); f.controller.dispose(); release(); await rejected
+  expect(complete).toHaveBeenCalledExactlyOnceWith(false)
+})
+
 it('suspends a board without collapsing saved expansions and restores each Thread with one fresh read', async () => {
   const local = storage(), recovery = new CanvasConversationRecovery(local), first = fixture(undefined, undefined, recovery)
   await first.controller.open(target()); await first.controller.open(target({ nodeId: 'mirror' })); await first.controller.open(target({ nodeId: 'other', threadId: 'other' }))

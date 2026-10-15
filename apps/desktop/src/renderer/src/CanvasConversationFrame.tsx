@@ -3,16 +3,19 @@ import type { CanvasConversationTarget } from './canvas-conversation'
 import type { CanvasNode } from '@contracts'
 import type { CanvasViewScope } from './canvas-view-state'
 import type { ThreadLeavePreparation } from './ThreadWorkspace'
+import type { CanvasLeavePreparation } from './canvas-leave'
 import { UiText, uiAttribute } from './interface-language'
 
 export interface CanvasConversationBridge {
   instances: Array<{ key: string; target: CanvasConversationTarget; content: ReactNode; busy: boolean }>
   opening: boolean
+  leaving?: boolean
   restoring?: { boardId: string; completed: number; total: number } | null
   issue: string | null
   open(target: CanvasConversationTarget): Promise<boolean>
   close(keys?: readonly string[]): Promise<boolean>
   suspend(): Promise<boolean>
+  prepareLeave(keys?: readonly string[]): Promise<CanvasLeavePreparation>
   restore(scope: CanvasViewScope, boardId: string, nodes: readonly CanvasNode[]): Promise<boolean>
   cancelRestore(): void
   prepare(keys: readonly string[]): Promise<ThreadLeavePreparation>

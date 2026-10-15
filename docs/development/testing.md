@@ -1616,6 +1616,12 @@ Schema153 的数据库回归继续复用现有 owner。旧来源夹具必须在�
 
 ## 融合期节点图测试准入（2026-10-14）
 
+画布离开事务扩展既有 `canvas-conversations-controller.test.ts` 与 `App.test.ts`，覆盖原实例保留、失败回滚、
+选择性提交、并发引用计数、迟到/销毁围栏及后续退出检查失败；没有新增 Rust owner。
+浏览器隔离 fixture 挂载生产 CanvasWorkspace/CanvasSurface/ReactFlow/ThreadWorkspace/Composer，
+核对失败导航后同一 DOM 编辑器及真实撤销、等待期间锁定、弹窗取消、切板、画板拒绝/未知回执/核对成功与空列表选择。
+这是模拟 Core 的 Renderer 证据，不能替代完整 BusinessApp、Native 退出/异常恢复或真实 Core/Runtime/platform 验收。
+
 最低成本 owner `canvas_node::tests::eight_kinds_preserve_source_geometry_text_and_reference_limits`
 拥有新增八类节点闭集、有限几何、源尺寸/网格夹值、正文与4096标量路径、200精确成员去重和未知字段拒绝；
 不建立数据库或 Runtime。旧 Board owner 仅拥有元数据，无法证明这些节点字段和变换。

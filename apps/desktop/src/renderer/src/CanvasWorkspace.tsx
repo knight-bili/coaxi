@@ -9,6 +9,7 @@ import { useCanvasReferences } from './useCanvasReferences'
 import { UiText, uiAttribute } from './interface-language'
 import { readErrorMessage } from './error-message'
 import { ProjectGroupsDialog } from './ProjectGroupsDialog'
+import { runCanvasLeaveTransition, type CanvasLeavePreparation } from './canvas-leave'
 
 export type CanvasWorkspaceProps = Omit<CanvasSurfaceProps, 'boardId' | 'scope' | 'catalog' | 'onRefreshReferences' | 'groups'> & {
   navigationPreferences?: NavigationPreferencesSnapshot | null
@@ -74,25 +75,33 @@ function CanvasWorkspaceContent({ scope, identityIssue, onRetryIdentity, onLeave
     try { return await conversationRef.current?.suspend() ?? true }
     catch (error) { setIssue(readErrorMessage(error)); return false }
   }, [isBlocked])
+  const prepareLeave = useCallback(async (): Promise<CanvasLeavePreparation> => {
+    const bridge = conversationRef.current
+    if (panel.current || controller.current?.getSnapshot().pending || bridge?.restoring
+      || bridge?.opening && !bridge.leaving || !bridge?.leaving && graphGuard.current?.isBlocked()) {
+      throw new Error(uiAttribute('请先保存或取消编辑，并核对未完成的画布操作。'))
+    }
+    return bridge?.prepareLeave() ?? { complete: async () => undefined }
+  }, [controller])
+  const transition = useCallback(async (action: () => void | boolean | Promise<void | boolean>, leaves = true): Promise<boolean> => {
+    try { return await runCanvasLeaveTransition('canvas', { canLeave, isBlocked, prepareLeave }, action, () => leaves) }
+    catch (error) { setIssue(readErrorMessage(error)); return false }
+  }, [canLeave, isBlocked, prepareLeave])
   useEffect(() => {
-    const guard = { canLeave, isBlocked, resume: () => setRestoreRevision(value => value + 1) }
+    const guard = { canLeave, isBlocked, prepareLeave, resume: () => setRestoreRevision(value => value + 1) }
     onLeaveGuardChange?.(guard)
     const beforeUnload = (event: BeforeUnloadEvent) => { if (guard.isBlocked()) { event.preventDefault(); event.returnValue = '' } }
     window.addEventListener('beforeunload', beforeUnload)
     return () => { onLeaveGuardChange?.(null); window.removeEventListener('beforeunload', beforeUnload) }
-  }, [canLeave, isBlocked, onLeaveGuardChange])
+  }, [canLeave, isBlocked, prepareLeave, onLeaveGuardChange])
   useEffect(() => {
-    if (state.loading || !state.snapshot || selected || isBlocked() || props.conversation?.instances.some(item => item.target.boardId === selectedId)) return
-    let cancelled = false
-    void canLeave().then(allowed => {
-      if (allowed && !cancelled) setSelectedId(current => current === selectedId ? boards[0]?.id ?? null : current)
-    })
-    return () => { cancelled = true }
-  }, [state.loading, state.snapshot, selected, selectedId, boards, isBlocked, canLeave, props.conversation?.instances])
+    if (state.loading || !state.snapshot || selected || isBlocked() || props.conversation?.instances.length) return
+    // No editor is leaving here. Starting a leave transaction would invalidate this effect itself.
+    setSelectedId(current => current === selectedId ? boards[0]?.id ?? null : current)
+  }, [state.loading, state.snapshot, selected, selectedId, boards, isBlocked, props.conversation?.instances])
   useEffect(() => { if (selected) saveCanvasBoardSelection(storage, scope, selected.id) }, [selected, storage, scope])
   const openDialog = async (board: CanvasBoard | null, remove = false) => {
-    if (!await canLeave()) return
-    setIssue(null); panel.current = true; setDialog({ board: board ? structuredClone(board) : null, remove })
+    await transition(() => { setIssue(null); panel.current = true; setDialog({ board: board ? structuredClone(board) : null, remove }) }, false)
   }
   const closeDialog = () => { if (!controller.current?.getSnapshot().pending) { panel.current = false; setDialog(null); setRestoreRevision(value => value + 1) } }
   const acceptReceipt = (result: StoredCommandResult) => {
@@ -107,38 +116,53 @@ function CanvasWorkspaceContent({ scope, identityIssue, onRetryIdentity, onLeave
   }
   const save = async (intent: CanvasBoardIntent) => {
     if (!controller.current) throw new Error(uiAttribute('画板页面尚未准备好。'))
-    try { acceptReceipt(await controller.current.apply(intent)) }
-    catch (error) { setIssue(readErrorMessage(error)); throw error }
+    let prepared: CanvasLeavePreparation | undefined
+    try {
+      prepared = await prepareBoardChange(intent)
+      acceptReceipt(await controller.current.apply(intent))
+      await prepared?.complete(true)
+    } catch (error) { await prepared?.complete(false).catch(() => undefined); setIssue(readErrorMessage(error)); throw error }
+  }
+  const prepareBoardChange = (intent: CanvasBoardIntent) => {
+    const bridge = conversationRef.current
+    if (!bridge || intent.operation === 'canvas.boards.update') return undefined
+    return bridge.prepareLeave(intent.operation === 'canvas.boards.delete'
+      ? bridge.instances.filter(item => item.target.boardId === intent.command.boardId).map(item => item.key) : undefined)
   }
   const recover = async (retry: boolean) => {
+    let prepared: CanvasLeavePreparation | undefined
     try {
       const current = controller.current
       if (!current) return
+      const pending = current.getSnapshot().pending
+      if (!pending) return
+      prepared = await prepareBoardChange(pending)
       const receipt = await (retry ? current.retry() : current.reconcile())
       if (receipt) acceptReceipt(receipt)
-    } catch (error) { setIssue(readErrorMessage(error)) }
+      await prepared?.complete(Boolean(receipt))
+    } catch (error) { await prepared?.complete(false).catch(() => undefined); setIssue(readErrorMessage(error)) }
   }
   const recovery = state.pending && <div className="canvas-notice" role="status"><UiText zh={state.pending.state === 'unknown' ? '原画板操作结果待核对。' : '正在保存画板…'} />
     {state.pending.state === 'unknown' && <><button type="button" onClick={() => { void recover(false) }}><UiText zh="核对结果" /></button>
       <button type="button" onClick={() => { void recover(true) }}><UiText zh="重试原操作" /></button></>}
   </div>
-  const blocked = state.loading || Boolean(state.readError || state.pending || dialog || groupManager)
+  const blocked = state.loading || Boolean(state.readError || state.pending || dialog || groupManager || props.conversation?.opening || props.conversation?.restoring)
   const groups = useMemo(() => navigationPreferences && !navigationPreferences.readError ? navigationPreferences.projectGroups.map(group => ({ id: group.id, label: group.name, color: group.color,
     projectPaths: group.projectPaths.filter(path => navigationPreferences.registeredProjects.includes(path) && !navigationPreferences.removedProjects.some(item => item.targetKey === `directory:${path}`)) })) : [], [navigationPreferences])
   return <section className="canvas-workspace" aria-label={uiAttribute('画板工作区')}>
     <header className="canvas-boards-toolbar">
       <label><span className="sr-only"><UiText zh="当前画板" /></span><select value={selectedId ?? ''} disabled={blocked || !boards.length}
-        onChange={event => { const id = event.target.value; void canLeave().then(allowed => { if (allowed) { setSelectedId(id); setIssue(null) } }) }}>
+        onChange={event => { const id = event.target.value; void transition(() => { setSelectedId(id); setIssue(null) }, id !== selectedId) }}>
         {!selected && <option value={selectedId ?? ''}>{uiAttribute('请选择画板')}</option>}
         {boards.map(board => <option key={board.id} value={board.id}>{board.name || uiAttribute('未命名画板')}</option>)}
       </select></label>
       <button type="button" disabled={blocked} onClick={() => { void openDialog(null) }}><UiText zh="创建画板" /></button>
       <button type="button" disabled={blocked || !selected} onClick={() => { void openDialog(selected) }}><UiText zh="编辑画板" /></button>
       <button type="button" disabled={blocked || !selected} onClick={() => { void openDialog(selected, true) }}><UiText zh="删除画板" /></button>
-      {navigationPreferences && onProjectLayout && onRefreshProjectGroups && <button type="button" disabled={blocked} onClick={() => { void canLeave().then(allowed => { if (allowed) { panel.current = true; setGroupManager(true) } }) }}><UiText zh="管理项目分组" /></button>}
+      {navigationPreferences && onProjectLayout && onRefreshProjectGroups && <button type="button" disabled={blocked} onClick={() => { void transition(() => { panel.current = true; setGroupManager(true) }, false) }}><UiText zh="管理项目分组" /></button>}
     </header>
     {identityIssue && <div className="canvas-notice" role="alert"><UiText zh="服务信息未核对，暂时不能展开对话输入。" /> {identityIssue}
-      <button type="button" disabled={blocked} onClick={() => { void canLeave().then(allowed => { if (allowed) onRetryIdentity() }) }}><UiText zh="重新核对服务" /></button></div>}
+      <button type="button" disabled={blocked} onClick={() => { void transition(onRetryIdentity) }}><UiText zh="重新核对服务" /></button></div>}
     {(issue || Boolean(state.readError)) && <div className="canvas-notice" role="alert">{issue || readErrorMessage(state.readError)}
       <button type="button" onClick={() => { void controller.current?.refresh().catch(() => undefined) }}><UiText zh="重新读取" /></button></div>}
     {!dialog && recovery}

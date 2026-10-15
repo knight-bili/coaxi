@@ -2175,6 +2175,42 @@ describe('task event projections', () => {
     expect(resume).toHaveBeenCalledTimes(2)
   })
 
+  it('prepares Canvas input before navigation and commits only after the actual destination is observed', async () => {
+    const events: string[] = [], complete = vi.fn(async (left: boolean) => { events.push(`complete:${left}`) })
+    const guard = { isBlocked: () => false, canLeave: vi.fn(), prepareLeave: async () => { events.push('prepare'); return { complete } } }
+    expect(await runCanvasLeaveTransition('canvas', guard, () => { events.push('navigate') }, async () => { events.push('destination'); return true })).toBe(true)
+    expect(events).toEqual(['prepare', 'navigate', 'destination', 'complete:true'])
+    expect(guard.canLeave).not.toHaveBeenCalled()
+  })
+
+  it('rolls Canvas input back on navigation failure, refusal or a superseded no-op', async () => {
+    const complete = vi.fn(async (_left: boolean) => undefined), resume = vi.fn()
+    const guard = { isBlocked: () => false, canLeave: vi.fn(), prepareLeave: async () => ({ complete }), resume }
+    const failure = new Error('navigation failed')
+    await expect(runCanvasLeaveTransition('canvas', guard, async () => { throw failure })).rejects.toBe(failure)
+    expect(await runCanvasLeaveTransition('canvas', guard, () => false)).toBe(false)
+    expect(await runCanvasLeaveTransition('canvas', guard, () => undefined, () => false)).toBe(true)
+    expect(complete.mock.calls).toEqual([[false], [false], [false]])
+    expect(resume).not.toHaveBeenCalled()
+  })
+
+  it('does not navigate if Canvas input preparation rejects', async () => {
+    const transition = vi.fn(), failure = new Error('save failed')
+    await expect(runCanvasLeaveTransition('canvas', { isBlocked: () => false, canLeave: vi.fn(), prepareLeave: async () => { throw failure } }, transition)).rejects.toBe(failure)
+    expect(transition).not.toHaveBeenCalled()
+  })
+
+  it('keeps the Canvas quit preparation reversible until all other quit guards succeed', async () => {
+    const complete = vi.fn(async (_left: boolean) => undefined), prepared = { complete }, prepareLeave = vi.fn(async () => prepared)
+    const guard = { isBlocked: () => false, canLeave: vi.fn(), prepareLeave }
+    const result = await prepareActiveCanvasForAppQuit('canvas', guard)
+    expect(result).toBe(prepared); expect(complete).not.toHaveBeenCalled()
+    await result?.complete(false)
+    expect(complete).toHaveBeenCalledExactlyOnceWith(false)
+    expect(await prepareActiveCanvasForAppQuit('memory', guard)).toBeNull()
+    expect(prepareLeave).toHaveBeenCalledOnce()
+  })
+
   it('waits for Automation save before leaving and stays when saving fails', async () => {
     const events: string[] = []
     const saved = await runAutomationLeaveTransition(

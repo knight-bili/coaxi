@@ -146,10 +146,15 @@ Drawer placement remains session-only and reconstruction uses inline cards. Corr
 and unmatched references are retained; quota failures retain in-memory intent and expose retry.
 The restore batch reports progress and can stop without accepting its late reads.
 
-CanvasSurface waits for a valid graph before one restore pass per mount/retry. Workspace dialog
-return and failed navigation request another pass; saved input is recovered through the existing
-per-card composer store. A fully atomic leave that preserves the same editor and undo history on
-navigation failure still needs implementation. Node geometry depends on stable context/mode keys,
+CanvasSurface waits for a valid graph and a completed leave transaction before one restore pass
+per mount/retry. Navigation prepares input while keeping the original instances mounted and locked;
+only the observed committed destination releases them. Failure, refusal and superseded no-ops
+unlock the same editors and preserve undo history. Concurrent navigation attempts share preparation
+and release it only after all attempts settle. Metadata dialogs keep their editors; create/delete
+commands release affected instances only after an applied receipt, including reconciliation of an
+unknown result. An empty selection chooses the next board directly without starting an editor leave.
+Renderer quit preparation rolls back if another renderer guard fails; failures after successful native
+quit preflight, real Core shutdown and platform qualification remain pending. Node geometry depends on stable context/mode keys,
 not changing content elements or visibility reports; project group projections are memoized to avoid
 the ReactFlow update loop found by the real mounted canvas fixture.
 The fixture mounts CanvasWorkspace/CanvasSurface/ReactFlow/editors with mock Core, observes actual

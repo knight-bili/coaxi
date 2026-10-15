@@ -8,14 +8,19 @@ import type { CanvasViewScope } from './canvas-view-state'
 import type { ThreadProjectionStore } from './thread-projection-store'
 import { readErrorMessage } from './error-message'
 import { uiAttribute } from './interface-language'
+import type { CanvasLeavePreparation } from './canvas-leave'
 
 export interface CanvasConversationInstance {
   key: string
   target: CanvasConversationTarget
   conversation: SingleChatSnapshot['conversation'] | null
 }
-export interface CanvasConversationsState { instances: CanvasConversationInstance[]; busyKeys: readonly string[]; opening: boolean; issue: string | null; restoring: { boardId: string; completed: number; total: number } | null }
-export const initialCanvasConversations = (): CanvasConversationsState => ({ instances: [], busyKeys: [], opening: false, issue: null, restoring: null })
+export interface CanvasConversationsState { instances: CanvasConversationInstance[]; busyKeys: readonly string[]; opening: boolean; leaving: boolean; issue: string | null; restoring: { boardId: string; completed: number; total: number } | null }
+export const initialCanvasConversations = (): CanvasConversationsState => ({ instances: [], busyKeys: [], opening: false, leaving: false, issue: null, restoring: null })
+interface CanvasLeaveEntry {
+  generation: number; keys: string[]; preparations: ThreadLeavePreparation[]
+  prepared: Promise<void>; users: number; didLeave: boolean; cancelled: boolean; completing: Promise<void> | null
+}
 
 /** Presentation instances only. Core owns conversations/execution; each real card retains its input context. */
 export class CanvasConversationsController {
@@ -24,6 +29,7 @@ export class CanvasConversationsController {
   private readonly guards = new Map<string, ThreadLeaveGuard>()
   private disposed = false
   private generation = 0
+  private leave: CanvasLeaveEntry | null = null
   constructor(private readonly client: Pick<ThreadClient, 'request' | 'presentationScope'>, private readonly reads: Pick<ThreadProjectionStore, 'open'> & Partial<Pick<ThreadProjectionStore, 'refresh'>>, private readonly afterCommit: () => Promise<void>, private readonly recovery?: CanvasConversationRecovery) {}
   getSnapshot = (): CanvasConversationsState => this.state
   subscribe = (listener: () => void): (() => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener) } }
@@ -117,6 +123,65 @@ export class CanvasConversationsController {
       this.publish({ opening: false, busyKeys: [] })
     } }
   }
+  async prepareLeave(keys: readonly string[] = this.state.instances.map(item => item.key)): Promise<CanvasLeavePreparation> {
+    const selected = this.state.instances.filter(item => keys.includes(item.key)), selectedKeys = selected.map(item => item.key).sort()
+    let entry = this.leave
+    if (entry) {
+      if (entry.cancelled || entry.completing || JSON.stringify(entry.keys) !== JSON.stringify(selectedKeys)) throw new Error(uiAttribute('当前对话输入尚未保存，请处理后重试。'))
+    } else {
+      if (this.disposed || this.state.opening || this.state.restoring) throw new Error(uiAttribute('当前对话输入尚未保存，请处理后重试。'))
+      const created: CanvasLeaveEntry = { generation: this.generation, keys: selectedKeys, preparations: [], prepared: Promise.resolve(), users: 0, didLeave: false, cancelled: false, completing: null }
+      this.leave = created; entry = created
+      this.publish({ opening: true, leaving: true, busyKeys: selectedKeys, issue: null })
+      created.prepared = Promise.resolve().then(async () => {
+        try {
+          if (created.cancelled || this.disposed || created.generation !== this.generation) throw new Error(uiAttribute('会话读取已失效，请重新打开。'))
+          for (const instance of selected) {
+            const guard = this.guards.get(instance.key)
+            if (guard) created.preparations.push(await guard())
+            if (created.cancelled || this.disposed || created.generation !== this.generation) throw new Error(uiAttribute('会话读取已失效，请重新打开。'))
+          }
+        } catch (error) {
+          created.cancelled = true; this.finishPreparations(created, false)
+          if (this.leave === created) { this.leave = null; this.publish({ opening: false, leaving: false, busyKeys: [], issue: readErrorMessage(error) }) }
+          throw error
+        }
+      })
+    }
+    const owned = entry
+    owned.users += 1
+    try {
+      await owned.prepared
+      if (owned.cancelled || this.disposed || owned.generation !== this.generation) throw new Error(uiAttribute('会话读取已失效，请重新打开。'))
+    } catch (error) { owned.users -= 1; throw error }
+    let released = false
+    return { complete: (didLeave: boolean) => {
+      if (released) return owned.completing ?? Promise.resolve()
+      released = true; owned.didLeave ||= didLeave; owned.users -= 1
+      if (owned.users > 0) return Promise.resolve()
+      owned.completing = Promise.resolve().then(async () => {
+        try {
+          if (!owned.cancelled && !this.disposed && owned.generation === this.generation && owned.didLeave) {
+            await this.afterCommit()
+            const current = !owned.cancelled && !this.disposed && owned.generation === this.generation
+            if (current) this.publish({ instances: this.state.instances.filter(item => !owned.keys.includes(item.key)) })
+            this.finishPreparations(owned, current)
+            if (current) for (const key of owned.keys) this.guards.delete(key)
+          } else this.finishPreparations(owned, false)
+        } catch (error) {
+          this.finishPreparations(owned, false)
+          if (this.leave === owned) this.publish({ issue: readErrorMessage(error) })
+          throw error
+        } finally {
+          if (this.leave === owned) { this.leave = null; this.publish({ opening: false, leaving: false, busyKeys: [] }) }
+        }
+      })
+      return owned.completing
+    } }
+  }
+  private finishPreparations(entry: CanvasLeaveEntry, didLeave: boolean): void {
+    for (const preparation of entry.preparations.splice(0)) preparation.complete(didLeave)
+  }
   async restore(scope: CanvasViewScope, boardId: string, nodes: readonly CanvasNode[]): Promise<boolean> {
     if (!this.recovery || this.disposed || this.state.opening || this.state.restoring) return false
     const generation = this.generation, current = () => !this.disposed && generation === this.generation
@@ -146,5 +211,9 @@ export class CanvasConversationsController {
     this.generation += 1
     this.publish({ restoring: null, opening: false, busyKeys: [], issue: uiAttribute('已停止恢复，未展开的记录仍保留。') })
   }
-  dispose(): void { this.generation += 1; this.disposed = true; this.listeners.clear(); this.guards.clear() }
+  dispose(): void {
+    this.generation += 1; this.disposed = true
+    if (this.leave) { this.leave.cancelled = true; this.finishPreparations(this.leave, false); this.leave = null }
+    this.listeners.clear(); this.guards.clear()
+  }
 }

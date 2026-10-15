@@ -1,4 +1,6 @@
 import { CanvasThreadWorkspace } from './CanvasThreadWorkspace'
+import { runCanvasLeaveTransition, prepareActiveCanvasForAppQuit, type CanvasLeavePreparation } from './canvas-leave'
+export { runCanvasLeaveTransition, prepareActiveCanvasForAppQuit } from './canvas-leave'
 import { CanvasThreadReader } from './CanvasThreadReader'
 import { useCanvasConversations } from './useCanvasConversations'
 import { CanvasNotificationVisibility } from './canvas-notification-visibility'
@@ -322,17 +324,6 @@ export async function prepareActiveAutomationForAppQuit(
 }
 
 export type SettingsSection = NavigationSettingsSection
-export async function runCanvasLeaveTransition(view: View, guard: CanvasLeaveGuard | null, transition: () => void | boolean | Promise<void | boolean>): Promise<boolean> {
-  if (view === 'canvas' && guard && !await guard.canLeave()) return false
-  try {
-    if (await transition() === false) { if (view === 'canvas') guard?.resume?.(); return false }
-    return true
-  }
-  catch (error) { if (view === 'canvas') guard?.resume?.(); throw error }
-}
-export async function prepareActiveCanvasForAppQuit(view: View, guard: CanvasLeaveGuard | null): Promise<void> {
-  if (view === 'canvas' && guard && !await guard.canLeave()) throw new Error(uiAttribute('画布操作或编辑尚未处理完成'))
-}
 export type WindowDragStripPage = Extract<View, 'compose' | 'members' | 'automations' | 'missions' | 'canvas' | 'memory' | 'settings'>
 
 export function windowDragStripPage(view: View): WindowDragStripPage | null {
@@ -1177,15 +1168,16 @@ function BusinessAppContent({
         automationTransitioned = await leaveActiveAutomation(transition)
       })
       return campTransitioned && automationTransitioned
-    })
+    }, async () => { await afterNextPaint(); return viewRef.current !== 'canvas' })
     return canvasTransitioned && campTransitioned && automationTransitioned
   }, [projectGroupScope, leaveActiveAutomation, leaveActiveThread])
 
   const prepareForAppQuit = useCallback(async (): Promise<void> => {
+    let canvasPrepared: CanvasLeavePreparation | null = null
     try {
       if (worktreeOpenRequest.current) throw new Error(uiAttribute('请等待工作树打开完成，再退出应用。'))
       if (projectGroupsOwnerRef.current === projectGroupScope) throw new Error(uiAttribute('请先处理项目分组或排列，再退出应用。'))
-      await prepareActiveCanvasForAppQuit(viewRef.current, canvasLeaveGuardRef.current)
+      canvasPrepared = await prepareActiveCanvasForAppQuit(viewRef.current, canvasLeaveGuardRef.current)
       await prepareActiveThreadForAppQuit(
         viewRef.current,
         activeThreadIdRef.current,
@@ -1195,8 +1187,10 @@ function BusinessAppContent({
         viewRef.current,
         automationLeaveGuardRef.current
       )
+      await canvasPrepared?.complete(true)
     } catch (nextError) {
-      if (viewRef.current === 'canvas') canvasLeaveGuardRef.current?.resume?.()
+      if (canvasPrepared) await canvasPrepared.complete(false).catch(() => undefined)
+      else if (viewRef.current === 'canvas') canvasLeaveGuardRef.current?.resume?.()
       setError(uiAttribute("退出应用前未能完成输入操作：{0}", String(errorMessage(nextError))))
       throw nextError
     }
@@ -4038,10 +4032,14 @@ function BusinessAppContent({
                 theme={appearance.resolvedTheme} agents={agents} installations={installations} liveRuntimeEvents={liveRuntimeEvents}
                 navigation={navigationRefreshCoordinator} onPendingLeave={settlePendingThreadOnLeave} onForgetMemberCreation={forgetMemberCreationDraft}
                 onConfigureRuntime={configureMemberRuntime} onOpenMotionSettings={() => { void openMotionSettings() }} onNotify={notify} onNotifyError={notifyError} /> })),
-              opening: canvasConversations.state.opening, restoring: canvasConversations.state.restoring, issue: canvasConversations.state.issue,
+              opening: canvasConversations.state.opening, leaving: canvasConversations.state.leaving, restoring: canvasConversations.state.restoring, issue: canvasConversations.state.issue,
               open: target => canvasConversations.controller.current?.open(target) ?? Promise.resolve(false),
               close: keys => canvasConversations.controller.current?.close(keys) ?? Promise.resolve(true),
               suspend: () => canvasConversations.controller.current?.close(undefined, false) ?? Promise.resolve(true),
+              prepareLeave: keys => {
+                if (!canvasConversations.controller.current) return Promise.reject(new Error(uiAttribute('画板页面尚未准备好。')))
+                return canvasConversations.controller.current.prepareLeave(keys)
+              },
               restore: (scope, boardId, nodes) => canvasConversations.controller.current?.restore(scope, boardId, nodes) ?? Promise.resolve(false),
               cancelRestore: () => canvasConversations.controller.current?.cancelRestore(),
               prepare: async keys => {
