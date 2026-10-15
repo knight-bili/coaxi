@@ -1,4 +1,6 @@
 import { RemoteConnectionStatus } from './RemoteConnectionStatus'
+import { CanvasFolderContext } from './CanvasFolderProvider'
+import { canvasFolderResolution } from './canvas-folder-controller'
 import { VISIBLE_PRODUCT_RUNTIMES } from './runtime-products'
 import { DEFAULT_APPEARANCE } from '../../shared/appearance'
 import { DEFAULT_GENERAL_PREFERENCES } from '../../shared/general-preferences-model'
@@ -3113,12 +3115,45 @@ describe('task event projections', () => {
     const markup = renderToStaticMarkup(createElement(ThreadNavigation, props))
     expect(markup).toContain('class="navigation-folder-group" data-color="blue"')
     expect(markup).toContain('aria-label="管理项目分组"')
+    expect(markup).toContain(`data-sidebar-menu-target="folder-group:${id}"`)
     expect(markup.indexOf('data-group="directory:/b"')).toBeLessThan(markup.indexOf('工作分组'))
     expect(markup.indexOf('工作分组')).toBeLessThan(markup.indexOf('data-group="directory:/a"'))
     expect(markup.indexOf('data-group="directory:/a"')).toBeLessThan(markup.indexOf('data-group="quick-chat"'))
     const pinned = renderToStaticMarkup(createElement(ThreadNavigation, { ...props,
       pins: [{ kind: 'project', targetKey: 'directory:/a', pinnedAt: '2026-10-15T00:00:00Z' }] }))
     expect(pinned.match(/data-group="directory:\/a"/g)).toHaveLength(1)
+  })
+
+  it('renders real worktree hierarchy once across pinned parents and children without turning missing checkouts into openable projects', () => {
+    const entry = (projectPath: string, isMain: boolean, available = true) => ({ projectPath, isMain, available, bare: false, locked: false, prunable: !available, branch: isMain ? 'main' : 'feature/test', detached: false })
+    const topology = { schemaVersion: 1 as const, requestedPath: '/main', projectPath: '/main', repositoryRoot: '/main', mainWorktreePath: '/main',
+      worktrees: [entry('/main', true), { ...entry('/linked', false), locked: true }, entry('/missing', false, false), { ...entry('/bare', false), bare: true }] }
+    const resolutions = new Map([
+      ['/main', canvasFolderResolution('/main', topology)],
+      ['/linked', canvasFolderResolution('/linked', { ...topology, requestedPath: '/linked', projectPath: '/linked', repositoryRoot: '/linked' })]
+    ])
+    const props: ComponentProps<typeof ThreadNavigation> = {
+      view: 'canvas', state: 'ready', activeThreadId: null,
+      navigation: { schemaVersion: 3, throughGlobalSequence: 0, quickChat: { totalCount: 0, recentThreads: [] },
+        projects: ['/main', '/linked', '/main-sibling'].map(projectPath => ({ projectKey: `directory:${projectPath}`, name: projectPath, projectPath,
+          totalCount: 0, recentThreads: [], lastActivityAt: '2026-10-15T00:00:00Z', lastActivityGlobalSequence: 0 })) },
+      onNewConversation() {}, onMembers() {}, onMemory() {}, pendingMemoryCount: 0, onSettings() {}, onOpenProject() {}, onOpenWorktree() {},
+      onThread() {}, onRemoveProject: async () => undefined, onRename: async () => undefined, onDelete: async () => undefined, onError() {}
+    }
+    const render = (pin?: string) => renderToStaticMarkup(createElement(CanvasFolderContext.Provider, {
+      value: { resolutions, register: () => () => undefined, refresh: async () => undefined }
+    }, createElement(ThreadNavigation, { ...props, pins: pin ? [{ kind: 'project', targetKey: `directory:${pin}`, pinnedAt: '2026-10-15T00:00:00Z' }] : [] })))
+    for (const pin of [undefined, '/main', '/linked']) {
+      const markup = render(pin)
+      expect(markup.match(/data-group="directory:\/main"/g)).toHaveLength(1)
+      expect(markup.match(/data-group="directory:\/linked"/g)).toHaveLength(1)
+      expect(markup).toContain('data-worktree-path="/missing"')
+      expect(markup).toMatch(/data-worktree-path="\/missing"[\s\S]*?<button[^>]*disabled=""/)
+      expect(markup).not.toContain('data-worktree-path="/bare"')
+      expect(markup).toContain('feature/test'); expect(markup).toContain('已锁定')
+      expect(markup).toContain('data-group="directory:/main-sibling"')
+      expect(markup).toContain('navigation-worktrees')
+    }
   })
 
   it('renders the current empty workspace without inventing a pinnable Core project', () => {

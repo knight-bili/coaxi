@@ -42,7 +42,13 @@ it('uses explicit main/linked identity, retains missing checkout history and kee
   expect(canvasFolderResolution('/linked', topology('/linked', '/linked')).paths).toEqual(['/linked'])
   expect(canvasFolderResolution('/linked', topology('/linked', '/linked')).parentPath).toBe('/main')
   expect(canvasFolderResolution('/main/sub', topology('/main/sub')).paths).toEqual(['/main/sub'])
-  expect(canvasFolderResolution('/plain', topology('/plain', null, null))).toEqual({ paths: ['/plain'], complete: true })
+  expect(canvasFolderResolution('/plain', topology('/plain', null, null))).toEqual({ paths: ['/plain'], complete: true,
+    projectPath: '/plain', repositoryRoot: null, mainWorktreePath: null, worktrees: [] })
+  const withBranch = topology('/main'); withBranch.worktrees[1] = { ...withBranch.worktrees[1], branch: 'feature/测试', detached: false }
+  const projected = canvasFolderResolution('/main', withBranch)
+  expect(projected.worktrees?.[1].branch).toBe('feature/测试')
+  withBranch.worktrees[1].branch = 'later'
+  expect(projected.worktrees?.[1].branch).toBe('feature/测试')
   const alias = { ...topology('/alias'), projectPath: '/main' }
   expect(canvasFolderResolution('/alias', alias).paths).toEqual(['/alias', '/main', '/linked', '/missing'])
   const bare = topology('/linked', '/linked', null); bare.worktrees[0].bare = true; bare.worktrees[0].available = false
@@ -53,7 +59,10 @@ it('uses explicit main/linked identity, retains missing checkout history and kee
     { ...topology('/main'), repositoryRoot: '/other' },
     { ...topology('/main'), mainWorktreePath: '/linked' },
     { ...topology('/plain', null, null), worktrees: [entry('/main', true)] },
-    { ...topology('/main'), worktrees: [entry('/main', true), entry('/main', false)] }
+    { ...topology('/main'), worktrees: [entry('/main', true), entry('/main', false)] },
+    { ...topology('/main'), worktrees: [{ ...entry('/main', true), branch: '' }] },
+    { ...topology('/main'), worktrees: [{ ...entry('/main', true), branch: 'main', detached: true }] },
+    { ...topology('/main'), worktrees: [{ ...entry('/main', true), detached: 'false' }] } as unknown as WorkspaceWorktrees
   ]) expect(() => canvasFolderResolution('/main', invalid)).toThrow()
 })
 

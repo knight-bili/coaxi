@@ -751,6 +751,9 @@ export interface WorkspaceWorktree {
   locked: boolean
   prunable: boolean
   available: boolean
+  /** Older Hosts may omit branch metadata. Missing is unknown, never inferred from directory names. */
+  branch?: string | null
+  detached?: boolean
 }
 
 export interface WorkspaceWorktrees {

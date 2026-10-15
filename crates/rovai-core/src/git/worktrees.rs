@@ -14,6 +14,8 @@ pub struct WorkspaceWorktree {
     pub locked: bool,
     pub prunable: bool,
     pub available: bool,
+    pub branch: Option<String>,
+    pub detached: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -184,6 +186,8 @@ fn parse_worktrees(bytes: &[u8]) -> Result<Vec<WorkspaceWorktree>> {
             locked: false,
             prunable: false,
             available: false,
+            branch: None,
+            detached: false,
         };
         for field in fields {
             let label = field.split_once(' ').map_or(field, |(label, _)| label);
@@ -191,8 +195,26 @@ fn parse_worktrees(bytes: &[u8]) -> Result<Vec<WorkspaceWorktree>> {
                 "bare" => entry.bare = true,
                 "locked" => entry.locked = true,
                 "prunable" => entry.prunable = true,
+                "branch" => {
+                    ensure!(
+                        entry.branch.is_none() && !entry.detached,
+                        "Git worktree has ambiguous branch metadata"
+                    );
+                    let branch = field
+                        .strip_prefix("branch refs/heads/")
+                        .filter(|branch| !branch.is_empty())
+                        .context("Git worktree branch is invalid")?;
+                    entry.branch = Some(branch.to_string());
+                }
+                "detached" => {
+                    ensure!(
+                        field == "detached" && entry.branch.is_none() && !entry.detached,
+                        "Git worktree has ambiguous branch metadata"
+                    );
+                    entry.detached = true;
+                }
                 "worktree" => anyhow::bail!("Git worktree record separator is missing"),
-                _ => {} // HEAD/branch/detached and future attributes do not affect folder identity.
+                _ => {} // HEAD and future attributes do not affect folder identity.
             }
         }
         entries.push(entry);
@@ -219,6 +241,28 @@ mod tests {
         assert!(entries[0].is_main && entries[0].bare);
         assert_eq!(entries[1].project_path, child.to_str().unwrap());
         assert!(!entries[1].is_main && entries[1].locked && entries[1].prunable);
+        assert!(entries[1].detached && entries[1].branch.is_none());
+        let branch = format!(
+            "worktree {}\0HEAD 123\0branch refs/heads/feature/测试\0\0",
+            base.display()
+        );
+        assert_eq!(
+            parse_worktrees(branch.as_bytes()).unwrap()[0]
+                .branch
+                .as_deref(),
+            Some("feature/测试")
+        );
+        for fields in [
+            "branch refs/heads/\0",
+            "branch refs/heads/a\0detached\0",
+            "detached\0branch refs/heads/a\0",
+            "branch refs/heads/a\0branch refs/heads/b\0",
+        ] {
+            assert!(
+                parse_worktrees(format!("worktree {}\0{fields}\0", base.display()).as_bytes())
+                    .is_err()
+            );
+        }
         for invalid in [
             String::new(),
             format!("worktree {}\0", base.display()),

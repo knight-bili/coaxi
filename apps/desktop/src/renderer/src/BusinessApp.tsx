@@ -5,7 +5,7 @@ import { memberCreationHelper, memberCreationInitialDraft, navigationWithMemberC
 import { navigationThreadReadState } from './navigation-unread'
 import { newCommandId } from '../../shared/command-id'
 import { CanvasWorkspace } from './CanvasWorkspace'
-import { ProjectGroupsDialog } from './ProjectGroupsDialog'
+import { ProjectGroupsDialog, type ProjectGroupInitialAction } from './ProjectGroupsDialog'
 import { CanvasFolderProvider } from './CanvasFolderProvider'
 import type { CanvasLeaveGuard } from './CanvasSurface'
 import type { SingleChatPanelTarget } from './SingleChatPanel'
@@ -1237,7 +1237,10 @@ function BusinessAppContent({
   projectGroupScopeRef.current = projectGroupScope
   const [projectGroupsOwner, setProjectGroupsOwner] = useState<typeof projectGroupScope | null>(null)
   const projectGroupsOwnerRef = useRef<typeof projectGroupScope | null>(null)
-  useEffect(() => { projectGroupsOwnerRef.current = null; setProjectGroupsOwner(null) }, [projectGroupScope])
+  const [projectGroupInitialAction, setProjectGroupInitialAction] = useState<ProjectGroupInitialAction | null>(null)
+  const [openingWorktreePath, setOpeningWorktreePath] = useState<string | null>(null)
+  const worktreeOpenRequest = useRef<object | null>(null)
+  useEffect(() => { projectGroupsOwnerRef.current = null; setProjectGroupsOwner(null); setProjectGroupInitialAction(null); worktreeOpenRequest.current = null; setOpeningWorktreePath(null) }, [projectGroupScope])
   const startupResolvedSessionId = useRef<string | null>(null)
   const pendingRestorableLocation = useRef<RestorableLocation | null>(null)
   const invalidatingNewConversationDefaults = useRef(false)
@@ -1367,8 +1370,9 @@ function BusinessAppContent({
   }, [])
 
   const leaveActiveSurface = useCallback(async (
-    transition: () => void | Promise<void>
+    transition: () => void | Promise<void>, worktreeOperation?: object
   ): Promise<boolean> => {
+    if (worktreeOpenRequest.current && worktreeOpenRequest.current !== worktreeOperation) return false
     if (projectGroupsOwnerRef.current === projectGroupScope) return false
     let automationTransitioned = false
     let campTransitioned = false
@@ -1382,6 +1386,7 @@ function BusinessAppContent({
 
   const prepareForAppQuit = useCallback(async (): Promise<void> => {
     try {
+      if (worktreeOpenRequest.current) throw new Error(uiAttribute('请等待工作树打开完成，再退出应用。'))
       if (projectGroupsOwnerRef.current === projectGroupScope) throw new Error(uiAttribute('请先处理项目分组或排列，再退出应用。'))
       await prepareActiveCanvasForAppQuit(viewRef.current, canvasLeaveGuardRef.current)
       await prepareActiveThreadForAppQuit(
@@ -2921,6 +2926,26 @@ function BusinessAppContent({
     return membersViewRef.current?.requestTransition(action) ?? Promise.resolve(false)
   }, [])
 
+  const openWorktree = (path: string): void => {
+    if (worktreeOpenRequest.current) return
+    const operation = {}; worktreeOpenRequest.current = operation; setOpeningWorktreePath(path)
+    void requestMemberTransition(() => leaveActiveSurface(async () => {
+      assertProjectGroupScope()
+      const workspace = await client.request<WorkspaceInspection>('workspaces.inspect', { path })
+      assertProjectGroupScope()
+      const key = projectTargetKey(workspace.projectPath)
+      const saved = navigationPreferencesRef.current?.removedProjects.some(item => item.targetKey === key)
+        ? await uiPreferences.navigationPreferences.restoreProject(key)
+        : await uiPreferences.navigationPreferences.registerProjects([workspace.projectPath])
+      assertProjectGroupScope(); applyNavigationPreferences(saved)
+      chooseCurrentProject({ kind: 'directory', projectPath: workspace.projectPath }, workspace)
+    }, operation).then(() => undefined)).catch(error => {
+      if (projectGroupScopeRef.current === projectGroupScope) notifyError(errorMessage(error))
+    }).finally(() => {
+      if (worktreeOpenRequest.current === operation) { worktreeOpenRequest.current = null; setOpeningWorktreePath(null) }
+    })
+  }
+
   const chooseView = (nextView: View): void => {
     if (nextView === viewRef.current) {
       const current = desktopNavigation.getSnapshot()
@@ -4352,6 +4377,7 @@ function BusinessAppContent({
   }
 
   const renderNavigation = (drawer = false): React.JSX.Element => <ThreadNavigation
+    disabled={openingWorktreePath !== null}
     navigationId={drawer ? 'mobile-conversation-navigation' : 'global-navigation'}
     platform={client.platform}
     footer={sidebarFooter}
@@ -4360,8 +4386,15 @@ function BusinessAppContent({
     navigation={displayNavigation}
     folderGroups={navigationPreferences?.readError ? [] : navigationPreferences?.projectGroups}
     projectOrder={navigationPreferences?.projectOrder}
-    onManageProjectGroups={navigationPreferences ? () => {
-      void leaveActiveSurface(() => { assertProjectGroupScope(); setMobileConversationDrawerOpen(false); projectGroupsOwnerRef.current = projectGroupScope; setProjectGroupsOwner(projectGroupScope) }).catch(error => notifyError(errorMessage(error)))
+    onOpenWorktree={openWorktree} openingWorktreePath={openingWorktreePath}
+    onManageProjectGroups={navigationPreferences ? (groupId, action) => {
+      void leaveActiveSurface(() => {
+        assertProjectGroupScope()
+        const group = navigationPreferences.projectGroups.find(group => group.id === groupId)
+        if (groupId && !group) throw new Error(uiAttribute('原分组已移除，不能用旧输入重新创建。'))
+        setProjectGroupInitialAction(group && action ? { kind: action, group: structuredClone(group), revision: navigationPreferences.projectGroupsRevision } : null)
+        setMobileConversationDrawerOpen(false); projectGroupsOwnerRef.current = projectGroupScope; setProjectGroupsOwner(projectGroupScope)
+      }).catch(error => notifyError(errorMessage(error)))
     } : undefined}
     groupLimits={navigationGroupLimits}
     onGroupLimitChange={navigationRefreshCoordinator.resizeGroup}
@@ -4433,6 +4466,7 @@ function BusinessAppContent({
   return (
     <MobileLayoutProvider value={mobile}>
     {projectGroupsOwner === projectGroupScope && navigationPreferences && <ProjectGroupsDialog snapshot={navigationPreferences}
+      initialAction={projectGroupInitialAction}
       onSave={saveProjectGroupLayout} onRefresh={refreshProjectGroups}
       onClose={() => { if (projectGroupScopeRef.current === projectGroupScope) { projectGroupsOwnerRef.current = null; setProjectGroupsOwner(null) } }} />}
     <FilePreviewProvider api={environment.files} threadId={view === 'camp' ? activeThreadId : null} resolvedTheme={appearance.resolvedTheme}

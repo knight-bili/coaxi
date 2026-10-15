@@ -19,6 +19,9 @@ last_updated: 2026-10-12
 工作树NUL解析由`git::worktrees::tests::nul_records_preserve_path_characters_and_reject_incomplete_or_ambiguous_topology`
 新增纯函数owner拥有：旧Git文本读取不能处理带换行路径和bare/locked/prunable分帧，亦无等价owner。
 真实主/子worktree、子目录、失效checkout与受保护目录复用`git::tests`现有仓库fixture扩展，不新增进程测试owner。
+同一NUL owner扩展Unicode分支、游离HEAD、重复/冲突分支拒绝断言，不新增Rust测试；本次仍只格式检查，实际执行沿阶段候选。
+`navigation-project-tree.test.ts`拥有精确关系、未登记/缺失子项、无主工程独立入口、失败缓存和矛盾/循环不隐藏工程；
+既有App导航静态owner补置顶主/子工程去重与分组菜单，不能替代实际鼠标/触控、显式打开与跨Host/退出验收。
 最小命令`cargo test -p rovai-core --lib git::`按阶段候选执行；本切片未编译不计通过。Web读队列和浏览器传递
 扩展既有owner，画布前端另有受控并发/迟到/失败测试；纯Git格式见证不替代Rust或真实Host。
 

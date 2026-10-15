@@ -82,6 +82,18 @@
 .navigation-folder-group-toggle { display: flex; align-items: center; gap: 6px; width: 100%; min-width: 0; padding: 6px 8px; border: 0; background: transparent; color: var(--group-accent, var(--muted)); font: inherit; text-align: left; cursor: pointer; }
 .navigation-folder-group-toggle > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .navigation-folder-group-members { margin-left: 10px; padding-left: 5px; border-left: 1px solid var(--line); }
+.navigation-folder-group-heading { display: flex; align-items: center; position: relative; }
+.navigation-folder-group-heading > .navigation-folder-group-toggle { flex: 1; width: auto; }
+.navigation-folder-group-heading .group-menu-trigger { position: static; flex-shrink: 0; }
+.navigation-folder-group-heading:hover .group-menu-trigger, .navigation-folder-group-heading:focus-within .group-menu-trigger { opacity: 1; pointer-events: auto; }
+@media (hover: none) { .navigation-folder-group-heading .group-menu-trigger { opacity: 1; pointer-events: auto; } }
+.navigation-worktrees { margin-left: 10px; padding-left: 5px; border-left: 1px solid var(--line); }
+.navigation-worktree-label { display: flex; min-width: 0; max-width: 45%; gap: 4px; color: var(--muted); font-size: 11px; overflow: hidden; }
+.project-select-row:has(.navigation-worktree-label) > .truncate { flex: 1; }
+.navigation-worktree-label > span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.navigation-unregistered-worktree { display: grid; gap: 2px; padding: 5px 8px; }
+.navigation-unregistered-worktree > button { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: left; }
+.navigation-unregistered-worktree > small { color: var(--muted); font-size: 11px; }
 .navigation-folder-group[data-color="zinc"] { --group-accent: var(--ink); }
 .navigation-folder-group[data-color="slate"] { --group-accent: var(--brand); }
 .navigation-folder-group[data-color="stone"] { --group-accent: var(--attention); }

@@ -24,7 +24,10 @@ last_updated: 2026-10-15
 - requestedPath 保留请求路径，projectPath 是核实后的 canonical 目录。
 - repositoryRoot 为当前 checkout 根目录，普通目录为 null；工程内子目录与根目录保持不同身份。
 - mainWorktreePath 为主工作树路径；普通目录和 bare 主仓库为 null。
-- worktrees 每项为 `{projectPath,isMain,bare,locked,prunable,available}`。
+- worktrees 每项为 `{projectPath,isMain,bare,locked,prunable,available,branch,detached}`。
+  branch为`branch refs/heads/`后的真实Git分支名或null，detached只来自独立`detached`字段，不从目录名推测。
+  重复branch、branch与detached并存或空分支拒绝，未知未来属性仍沿原边界忽略。旧Host可能不返回这两个新增展示字段，
+  客户端将其视为未知而非猜测分支；schema1、身份与权限含义不变，不新增Git命令或访问范围。
   主记录保持第一项，bare 主记录仍保留 isMain=true，但不能作为工程工作区。
 
 Git 复用现有可执行文件解析、进程环境和Core托管有界命令执行器，10秒单命令deadline、2秒清理窗口；
@@ -51,6 +54,14 @@ Windows失效记录仅转换到持久路径使用的分隔符和verbatim/UNC表�
 路径集合切换或Host销毁后不发布旧结果、不再发出旧集合下一项。读取失败保留已知路径，标记未完整。
 页面可见时20秒刷新、回到前台刷新，并提供显式“刷新关联”；不订阅布局事件反复查询Git。
 controller从linked checkout的repositoryRoot/mainWorktreePath派生展示用parentPath，失败刷新保留已知父关系并标记未完整。
+同一缓存保存原始只读工作树元数据的副本，侧栏/画布/管理弹窗仍共用有界读取。主工程仅按精确Git关系容纳工作树，
+普通子目录与同名前缀不成为父工程；主工程未登记时，已登记linked checkout仍可作为独立入口，不吸收兄弟工作树。
+关系冲突、循环或旧缓存缺少必要元数据时不得隐藏已登记工程；保留入口并显示待核对，不能任意选择一个父工程。
+
+侧栏在主工程展开内容中显示已登记子工作树的原会话、菜单和分页，置顶主工程携带未置顶子项，置顶子项不重复显示。
+未登记的非bare工作树仅显示元数据和显式打开入口；缺失/待清理或关系未完整时禁开，锁定状态只作为事实展示。
+打开先走当前Core `workspaces.inspect`校验实际目录，再沿原导航偏好登记/恢复与选择，不在读取时自动登记、授权或执行。
+同一时刻仅一个打开操作，保护页面离开/退出；Host/Owner切换拒绝旧结果回填。实际Desktop/Web操作仍待阶段集中验收。
 分组身份与管理入口由[Navigation Project Groups v1](navigation-project-groups-v1.md)拥有，不能用这个读取接口代替。
 
 ## 验证所有权

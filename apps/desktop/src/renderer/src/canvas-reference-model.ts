@@ -1,12 +1,16 @@
 // Codeg aff1e6c278453ed8d0b96a5f664edcdca621aa3f region membership, adapted to Core Thread/private identities.
 // Apache-2.0: integration/licenses/codeg/LICENSE. Business relationships remain Core-owned.
-import type { CanvasConversationRef, CanvasNode, CanvasThreadReference } from '@contracts'
+import type { CanvasConversationRef, CanvasNode, CanvasThreadReference, WorkspaceWorktree } from '@contracts'
 import type { CanvasFolderGroupOption, CanvasReferenceOption } from './CanvasNodeEditor'
 import type { CanvasReferenceState } from './canvas-reference-controller'
 import { canvasReferenceKey } from './canvas-layout'
 import { uiAttribute } from './interface-language'
 
-export interface CanvasFolderResolution { paths: readonly string[]; complete: boolean; parentPath?: string; issue?: string }
+export interface CanvasFolderResolution {
+  paths: readonly string[]; complete: boolean; parentPath?: string; issue?: string
+  projectPath?: string; repositoryRoot?: string | null; mainWorktreePath?: string | null
+  worktrees?: readonly WorkspaceWorktree[]
+}
 export interface CanvasRegionResolution { references: CanvasReferenceOption[]; complete: boolean; issue?: string }
 const recency = (value: string) => Number.isFinite(Date.parse(value)) ? Date.parse(value) : 0
 function optionsForThread(thread: CanvasThreadReference, memberIds?: ReadonlySet<string>): Array<CanvasReferenceOption & { updatedAt: string }> {

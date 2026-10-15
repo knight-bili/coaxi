@@ -23,3 +23,7 @@ PTY后续移植及I12最终发布包仍分别核对，不将本批通知保留�
 `navigation-project-layout.ts`依据同一固定Codeg提交的`sidebar-conversation-grouping.ts`适配容器移动、拖放目标与布局序列化；
 `ProjectLayoutDialog.tsx`保留固定行投放、工作树跟随主工程的交互语义，并接入Rovai主题、键盘和现有偏好版本冲突保护。
 上述Apache-2.0来源通知保留；本批不增加拖放库或其他第三方依赖。
+
+`navigation-project-tree.ts`及侧栏树形/分组菜单按同一固定Codeg的`sidebar-conversation-list.tsx`、
+`sidebar-folder-group-header.tsx`适配主工程/工作树、置顶去重和统一菜单语义；保留上述Apache-2.0许可。
+真实关系及分支来自Rovai只读Git API，不移植供体数据库；本批无新增第三方依赖。

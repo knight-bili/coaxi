@@ -9,15 +9,20 @@ import { useCanvasFolders } from './useCanvasFolders'
 import { projectGroupMembershipIssue } from './project-group-presentation'
 import { ProjectLayoutDialog } from './ProjectLayoutDialog'
 
-export function ProjectGroupsDialog({ snapshot, onSave, onRefresh, onClose }: {
+export type ProjectGroupInitialAction = { kind: 'edit' | 'delete'; group: NavigationProjectGroup; revision: number }
+
+export function ProjectGroupsDialog({ snapshot, onSave, onRefresh, onClose, initialAction }: {
   snapshot: NavigationPreferencesSnapshot
   onSave(revision: number, mutation: NavigationProjectLayoutMutation): Promise<void>
   onRefresh(): Promise<void>
   onClose(): void
+  initialAction?: ProjectGroupInitialAction | null
 }): React.JSX.Element {
-  const [editor, setEditor] = useState<{ mode: 'create' | 'update'; group: NavigationProjectGroup; revision: number } | null>(null)
+  const [editor, setEditor] = useState<{ mode: 'create' | 'update'; group: NavigationProjectGroup; revision: number } | null>(() => initialAction?.kind === 'edit'
+    ? { mode: 'update', group: structuredClone(initialAction.group), revision: initialAction.revision } : null)
   const [arranging, setArranging] = useState(false)
-  const [removal, setRemoval] = useState<{ group: NavigationProjectGroup; revision: number } | null>(null)
+  const [removal, setRemoval] = useState<{ group: NavigationProjectGroup; revision: number } | null>(() => initialAction?.kind === 'delete'
+    ? { group: structuredClone(initialAction.group), revision: initialAction.revision } : null)
   const [busy, setBusy] = useState(false), [error, setError] = useState<string | null>(null), saving = useRef(false)
   const active = snapshot.registeredProjects.filter(path => !snapshot.removedProjects.some(item => item.targetKey === `directory:${path}`))
   const folders = useCanvasFolders(active)

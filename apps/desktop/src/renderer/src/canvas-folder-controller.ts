@@ -14,7 +14,10 @@ export function canvasFolderResolution(path: string, value: WorkspaceWorktrees):
   for (const [index, entry] of value.worktrees.entries()) {
     if (typeof entry.projectPath !== 'string' || !entry.projectPath || seen.has(entry.projectPath)
       || typeof entry.available !== 'boolean' || typeof entry.bare !== 'boolean' || typeof entry.locked !== 'boolean'
-      || typeof entry.prunable !== 'boolean' || entry.isMain !== (index === 0)) throw new Error('工程工作树关系不一致。')
+      || typeof entry.prunable !== 'boolean' || entry.isMain !== (index === 0)
+      || entry.branch !== undefined && entry.branch !== null && (typeof entry.branch !== 'string' || !entry.branch.length)
+      || entry.detached !== undefined && typeof entry.detached !== 'boolean'
+      || entry.detached && entry.branch != null) throw new Error('工程工作树关系不一致。')
     seen.add(entry.projectPath)
   }
   if (value.repositoryRoot === null) {
@@ -26,7 +29,8 @@ export function canvasFolderResolution(path: string, value: WorkspaceWorktrees):
   if (value.projectPath === value.repositoryRoot && value.repositoryRoot === value.mainWorktreePath) {
     for (const entry of value.worktrees) if (!entry.bare) paths.add(entry.projectPath)
   }
-  return { paths: [...paths], complete: true,
+  return { paths: [...paths], complete: true, projectPath: value.projectPath, repositoryRoot: value.repositoryRoot,
+    mainWorktreePath: value.mainWorktreePath, worktrees: value.worktrees.map(entry => ({ ...entry })),
     ...(value.projectPath === value.repositoryRoot && value.mainWorktreePath && value.mainWorktreePath !== value.repositoryRoot ? { parentPath: value.mainWorktreePath } : {}) }
 }
 
