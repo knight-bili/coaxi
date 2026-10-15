@@ -16,3 +16,6 @@ PTY后续移植及I12最终发布包仍分别核对，不将本批通知保留�
 `canvas-reference-model.ts`依据同一固定Codeg提交的`computeRegionMembers`移植筛选、排序和精确引用行为，
 并按Core实际active membership/private Conversation适配；工程父子关系必须明确取得，不用路径前缀推测。
 沿用已保留的Codeg Apache-2.0许可，不增加第三方依赖。
+
+`navigation-project-groups.ts`按同一固定提交的`folder_group`实体与`folder_group_service`移植非嵌套、唯一归属、
+混合顶层/组内排序和删除组保留工程行为；持久化改用既有导航JSON与版本核对。来源注释及上述Apache-2.0通知保留，无新依赖。

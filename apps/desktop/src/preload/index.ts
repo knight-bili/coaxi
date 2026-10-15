@@ -345,6 +345,9 @@ const api: RovaiApi = {
     }
   },
   navigationPreferences: {
+    applyProjectLayout(expectedRevision, mutation) {
+      return ipcRenderer.invoke('rovai:navigation-preferences-apply-project-layout', expectedRevision, mutation)
+    },
     registerProjects(paths, completeLegacy = false) {
       return ipcRenderer.invoke('rovai:navigation-preferences-register-projects', paths, completeLegacy)
     },

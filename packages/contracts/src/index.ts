@@ -3460,8 +3460,24 @@ export interface NavigationThreadReadState {
   readThroughGlobalSequence: number
 }
 
+export const NAVIGATION_PROJECT_GROUP_COLORS = ['neutral', 'zinc', 'slate', 'stone', 'gray', 'red', 'rose', 'orange', 'green', 'blue', 'yellow', 'violet'] as const
+export type NavigationProjectGroupColor = typeof NAVIGATION_PROJECT_GROUP_COLORS[number]
+export interface NavigationProjectGroup {
+  id: string
+  name: string
+  color: NavigationProjectGroupColor | null
+  projectPaths: string[]
+}
+export type NavigationProjectLayoutEntry = { kind: 'group'; groupId: string }
+  | { kind: 'project'; projectPath: string; groupId: string | null }
+export type NavigationProjectLayoutMutation = { type: 'create' | 'update'; group: NavigationProjectGroup }
+  | { type: 'delete'; groupId: string }
+  | { type: 'layout'; entries: NavigationProjectLayoutEntry[] }
+
 export interface NavigationPreferencesSnapshot {
-  schemaVersion: 6
+  schemaVersion: 7
+  projectGroups: NavigationProjectGroup[]
+  projectGroupsRevision: number
   registeredProjects: string[]
   legacyProjectsSynced: boolean
   /** Read degradation only; never persisted. */
@@ -3474,6 +3490,7 @@ export interface NavigationPreferencesSnapshot {
 }
 
 export interface NavigationPreferencesApi {
+  applyProjectLayout(expectedRevision: number, mutation: NavigationProjectLayoutMutation): Promise<NavigationPreferencesSnapshot>
   registerProjects(projectPaths: string[], completeLegacy?: boolean): Promise<NavigationPreferencesSnapshot>
   get(): Promise<NavigationPreferencesSnapshot>
   setThreadReadState(threadId: string, state: NavigationThreadReadState | null): Promise<NavigationPreferencesSnapshot>

@@ -1652,6 +1652,10 @@ ipcMain.handle('rovai:navigation-preferences-get', () =>
   projectAccessTransactions.run(() => requireNavigationPreferences().reload())
 )
 
+ipcMain.handle('rovai:navigation-preferences-apply-project-layout', (_event, expectedRevision: number, mutation: unknown) =>
+  projectAccessTransactions.run(() => requireNavigationPreferences().applyProjectLayout(expectedRevision, mutation).then(publishNavigationPreferences))
+)
+
 ipcMain.handle('rovai:navigation-preferences-replace-pins', (_event, pins: NavigationPin[]) =>
   projectAccessTransactions.run(() => requireNavigationPreferences().replacePins(pins).then(publishNavigationPreferences))
 )

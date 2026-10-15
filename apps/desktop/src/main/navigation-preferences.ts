@@ -10,6 +10,7 @@ import type {
 } from '@contracts'
 import { writePrivateJson } from './general-preferences'
 import { normalizeProjectDisplayName, projectDisplayNameError } from '../shared/project-display-name'
+import { applyNavigationProjectLayout } from '../shared/navigation-project-groups'
 
 export async function readNavigationPreferences(
   filePath: string
@@ -110,6 +111,13 @@ export class NavigationPreferencesStore {
         pins
       })
       await this.#commit(next)
+      return this.get()
+    })
+  }
+
+  applyProjectLayout(expectedRevision: number, mutation: unknown): Promise<NavigationPreferencesSnapshot> {
+    return this.#enqueue(async () => {
+      await this.#commit(applyNavigationProjectLayout(this.#snapshot, expectedRevision, mutation))
       return this.get()
     })
   }
