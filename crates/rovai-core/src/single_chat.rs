@@ -837,8 +837,16 @@ impl SingleChatService {
                 [&target.conversation_id],
             )?;
             transaction.execute(
+                "DELETE FROM single_chat_retained_input WHERE conversation_id = ?1",
+                [&target.conversation_id],
+            )?;
+            transaction.execute(
                 "DELETE FROM single_chat_pending_input_edit_session
                  WHERE conversation_id = ?1",
+                [&target.conversation_id],
+            )?;
+            transaction.execute(
+                "DELETE FROM single_chat_composer_scope WHERE conversation_id = ?1",
                 [&target.conversation_id],
             )?;
             transaction.execute(
@@ -1054,7 +1062,7 @@ impl SingleChatService {
                  FROM single_chat_pending_input_edit_session
                  WHERE conversation_id = ?1 AND pending_input_id = ?2
                    AND edit_token = ?3 AND base_pending_revision = ?4
-                   AND recovery_required = 0 AND client_id = ?5",
+                   AND recovery_required = 0 AND client_id = ?5 AND scope_key = ''",
                 params![
                     conversation_id,
                     pending_input_id,
@@ -1075,7 +1083,7 @@ impl SingleChatService {
         transaction.execute(
             "UPDATE single_chat_pending_input_edit_session
              SET working_source_attachments_json = ?4
-             WHERE conversation_id = ?1 AND pending_input_id = ?2 AND edit_token = ?3",
+             WHERE conversation_id = ?1 AND pending_input_id = ?2 AND edit_token = ?3 AND scope_key = ''",
             params![
                 conversation_id,
                 pending_input_id,
@@ -1150,6 +1158,7 @@ impl SingleChatService {
                     && session.base_pending_revision == revision
                     && Some(session.edit_token.as_str()) == command.edit_token.as_deref()
                     && session.client_id == client.id()
+                    && session.scope_key.is_empty()
             });
 
             match &command.action {
@@ -1165,7 +1174,7 @@ impl SingleChatService {
                         &parse_source_attachments(&source_attachments_json)?, client)?;
                     copy_quotes(transaction, QuoteStorage::PrivatePending, &command.pending_input_id,
                         QuoteStorage::ClientPrivateDraft(client), &command.conversation_id)?;
-                    transaction.execute("UPDATE single_chat_composer_draft SET quote_trash_json = '[]' WHERE conversation_id = ?1 AND client_id = ?2", params![command.conversation_id, client.id()])?;
+                    transaction.execute("UPDATE single_chat_composer_draft SET quote_trash_json = '[]' WHERE conversation_id = ?1 AND client_id = ?2 AND scope_key = ''", params![command.conversation_id, client.id()])?;
                     transaction.execute(
                         "UPDATE single_chat_pending_input SET state = 'cancelled', revision = revision + 1, updated_at = ?2 WHERE id = ?1",
                         params![command.pending_input_id, chrono::Utc::now().to_rfc3339()],
@@ -1178,7 +1187,7 @@ impl SingleChatService {
                                 revision: draft_revision + 1,
                                 attachments: source_attachment_views(&source_attachments_json)?,
                                 quotes: load_quotes(transaction, QuoteStorage::ClientPrivateDraft(client), &command.conversation_id)?,
-                                updated_at: Some(transaction.query_row("SELECT updated_at FROM single_chat_composer_draft WHERE conversation_id = ?1 AND client_id = ?2",
+                                updated_at: Some(transaction.query_row("SELECT updated_at FROM single_chat_composer_draft WHERE conversation_id = ?1 AND client_id = ?2 AND scope_key = ''",
                                     params![command.conversation_id, client.id()], |row| row.get::<_, String>(0))?),
                             }}), None));
                 }
@@ -1775,7 +1784,7 @@ fn load_single_chat_draft_refs(
     let stored = connection
         .query_row(
             "SELECT revision, source_attachments_json
-             FROM single_chat_composer_draft WHERE conversation_id = ?1 AND client_id = ?2",
+             FROM single_chat_composer_draft WHERE conversation_id = ?1 AND client_id = ?2 AND scope_key = ''",
             params![conversation_id, client.id()],
             |row| Ok((row.get::<_, i64>(0)?, row.get::<_, String>(1)?)),
         )
@@ -1795,7 +1804,7 @@ fn load_single_chat_draft(
         .connection()
         .query_row(
             "SELECT revision, source_attachments_json, updated_at
-             FROM single_chat_composer_draft WHERE conversation_id = ?1 AND client_id = ?2",
+             FROM single_chat_composer_draft WHERE conversation_id = ?1 AND client_id = ?2 AND scope_key = ''",
             params![conversation_id, client.id()],
             |row| {
                 Ok((
@@ -1839,7 +1848,7 @@ fn store_single_chat_draft_refs(
         let updated = transaction.execute(
             "UPDATE single_chat_composer_draft
              SET source_attachments_json = ?2, revision = 1, updated_at = ?3
-             WHERE conversation_id = ?1 AND revision = 0 AND client_id = ?4",
+             WHERE conversation_id = ?1 AND revision = 0 AND client_id = ?4 AND scope_key = ''",
             params![conversation_id, serialized, now, client.id()],
         )?;
         if updated == 0 {
@@ -1855,7 +1864,7 @@ fn store_single_chat_draft_refs(
     let updated = transaction.execute(
         "UPDATE single_chat_composer_draft
          SET source_attachments_json = ?3, revision = revision + 1, updated_at = ?4
-         WHERE conversation_id = ?1 AND revision = ?2 AND client_id = ?5",
+         WHERE conversation_id = ?1 AND revision = ?2 AND client_id = ?5 AND scope_key = ''",
         params![
             conversation_id,
             expected_revision,
@@ -1917,6 +1926,7 @@ fn load_pending_input(
 #[derive(Debug)]
 struct StoredSingleChatPendingEditSession {
     client_id: String,
+    scope_key: String,
     pending_input_id: String,
     edit_token: String,
     base_pending_revision: i64,
@@ -1931,13 +1941,14 @@ fn load_pending_edit_session(
     Ok(connection
         .query_row(
             "SELECT pending_input_id, edit_token, base_pending_revision,
-                    recovery_required, working_source_attachments_json, client_id
+                    recovery_required, working_source_attachments_json, client_id, scope_key
              FROM single_chat_pending_input_edit_session
              WHERE conversation_id = ?1",
             [conversation_id],
             |row| {
                 Ok(StoredSingleChatPendingEditSession {
                     client_id: row.get(5)?,
+                    scope_key: row.get(6)?,
                     pending_input_id: row.get(0)?,
                     edit_token: row.get(1)?,
                     base_pending_revision: row.get(2)?,
@@ -1959,7 +1970,7 @@ fn store_pending_edit_refs(
     let updated = transaction.execute(
         "UPDATE single_chat_pending_input_edit_session
          SET working_source_attachments_json = ?4
-         WHERE conversation_id = ?1 AND pending_input_id = ?2 AND edit_token = ?3",
+         WHERE conversation_id = ?1 AND pending_input_id = ?2 AND edit_token = ?3 AND scope_key = ''",
         params![
             conversation_id,
             pending_input_id,
@@ -2106,7 +2117,7 @@ fn read_single_chat_pending_inputs(
                    recovery_required, working_body,
                    working_source_attachments_json
             FROM single_chat_pending_input_edit_session
-            WHERE conversation_id = ?1 AND client_id = ?2
+            WHERE conversation_id = ?1 AND client_id = ?2 AND scope_key = ''
             "#,
             params![conversation_id, client.id()],
             |row| {
@@ -2168,7 +2179,7 @@ fn consume_single_chat_draft(
         let updated = transaction.execute(
             "UPDATE single_chat_composer_draft
              SET source_attachments_json = '[]', quotes_json='[]', quote_trash_json='[]', revision = 1, updated_at = ?2
-             WHERE conversation_id = ?1 AND revision = 0 AND client_id = ?3",
+             WHERE conversation_id = ?1 AND revision = 0 AND client_id = ?3 AND scope_key = ''",
             params![conversation_id, now, client.id()],
         )?;
         if updated == 0 {
@@ -2184,7 +2195,7 @@ fn consume_single_chat_draft(
     let updated = transaction.execute(
         "UPDATE single_chat_composer_draft
          SET source_attachments_json = '[]', quotes_json='[]', quote_trash_json='[]', revision = revision + 1, updated_at = ?3
-         WHERE conversation_id = ?1 AND revision = ?2 AND client_id = ?4",
+         WHERE conversation_id = ?1 AND revision = ?2 AND client_id = ?4 AND scope_key = ''",
         params![conversation_id, expected_revision, now, client.id()],
     )?;
     anyhow::ensure!(updated == 1, "single_chat.draft_changed");

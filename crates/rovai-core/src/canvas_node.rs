@@ -983,6 +983,7 @@ pub fn apply(
 
 #[cfg(test)]
 pub(crate) fn downgrade_for_test(connection: &Connection) {
+    crate::db::downgrade_private_composer_scope_fixture(connection);
     if !connection.table_exists(None, "canvas_node").unwrap() {
         return;
     }

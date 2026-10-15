@@ -171,10 +171,15 @@ pub enum QuoteStorage<'a> {
 impl QuoteStorage<'_> {
     fn client_filter(self) -> String {
         match self {
-            Self::CampDraft | Self::PrivateDraft => " AND client_id = 'desktop'".to_owned(),
-            Self::ClientCampDraft(client) | Self::ClientPrivateDraft(client) => {
+            Self::CampDraft => " AND client_id = 'desktop'".to_owned(),
+            Self::PrivateDraft => " AND client_id = 'desktop' AND scope_key = ''".to_owned(),
+            Self::ClientCampDraft(client) => {
                 format!(" AND client_id = '{}'", client.sql_key())
             }
+            Self::ClientPrivateDraft(client) => {
+                format!(" AND client_id = '{}' AND scope_key = ''", client.sql_key())
+            }
+            Self::PrivateEdit => " AND scope_key = ''".to_owned(),
             _ => String::new(),
         }
     }

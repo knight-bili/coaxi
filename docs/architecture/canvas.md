@@ -69,8 +69,8 @@ operation may change layout without changing or deleting the referenced business
 
 客户已确认[私聊材料隔离 r1](../versions/v1.72/model-context-change-canvas-private-materials.md)。
 [Scope 合同](../contracts/single-chat-composer-scope-v1.md)区分可信编辑端身份和卡片材料归属，
-保留默认草稿、单一 FIFO、旧命令摘要与已冻结输入。当前仅 scope codec/真实 pin 只读校验基础已编写，
-新存储、附件/引用/发送、完整移回与恢复尚待接通；不能据此宣称卡片材料已隔离或暴露 scopeVersion 能力。
+保留默认草稿、单一 FIFO、旧命令摘要与已冻结输入。Scope codec、真实 pin 校验和 Schema155/Migration205 存储已实现，
+默认 SQL/quote/资源读取限定空 scope；新卡片材料接口、发送、完整移回与恢复尚待接通，不能据此暴露 scopeVersion 能力或宣称完整隔离功能完成。
 
 会话读取由 client 所有的 `ThreadProjectionStore` 按 Thread 隔离，现有页面的只读打开、刷新、缓存和历史分页已接入。
 同 Thread 的同时打开合并运输；刷新发生在读取过程中时追加一次最新读取，不把较早的在途请求当刷新完成。

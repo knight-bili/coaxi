@@ -43,7 +43,14 @@ quota/读取拒绝及旧 scoped ID 经有效图迁移；继续扩展 `canvas-con
 拥有省略/显式 null 的协商差别、规范闭合标识和额外身份字段拒绝；原 DraftClient 与画布几何 owner 不拥有这项网络编码，不能由完整 Runtime 夹具代替。
 `pin_binding_requires_the_exact_live_private_reference_without_writing` 只建当前查询必要四表，拥有 Board/pin/Thread/Conversation 精确关系及结束/删除/非激活拒绝；
 旧画布引用校验允许公开或历史对象存在，不能证明新草稿首次登记的活跃私聊条件。该 owner 不建立完整 Database、不创建草稿、不启动 Runtime。
-最小命令 `cargo test -p rovai-core --lib single_chat_composer_scope -- --list` 后再执行同过滤；本切片按阶段批量规则只审查/格式检查及执行原文 SQL 见证，Rust 编译和两个 owner 均待 I03 候选，不记为通过。
+最小命令 `cargo test -p rovai-core --lib single_chat_composer_scope -- --list` 后再执行同过滤。首批只有原文 SQL 见证；
+本轮新增 Schema155/Migration205 后，归属编码、pin 校验与下述迁移 owner 已纳入本地定向编译/执行。
+
+`db::private_composer_scope::tests::migration_preserves_default_materials_fences_scopes_and_rolls_back_receipts` 新增一个扩展 owner，
+拥有三维草稿主键、私有注册/完整保留项/编辑 scope 的原子切换、旧默认 JSON 原值与回执回放、缺结构拒绝、默认资源隔离、orphan 保留及删除清理。
+既有纯 codec/几何、旧两维编辑端迁移 owner 均不拥有这些跨表约束，故使用既有隔离私有 SQLite 模板、真实源文件与真实 Core 默认入口；
+不另建 Runtime 夹具、不调用模型。最小命令 `cargo test -p rovai-core --lib --features extended-tests composer_scope -- --list` 后去掉 `--list` 执行。
+因主键/回滚安全阻断后续材料接线，本轮按阶段规则例外执行这个本地最小检查及受影响旧 owner；全仓/跨平台与完整 PC01–PC24 仍留 I03 候选。
 
 Canvas `group.sourceMembers`扩展复用`canvas_node::tests::eight_kinds_preserve_source_geometry_text_and_reference_limits`的旧Group序列化断言，
 及`canvas_node::persistence_tests::migration_and_graph_gestures_preserve_scope_atomicity_replay_and_reopen`的跨源转移/私有身份/镜像保留/回放与派生绑定用例；

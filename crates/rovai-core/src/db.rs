@@ -16,12 +16,19 @@ mod mission_details;
 pub(crate) mod notification_model;
 #[path = "db_pending_draft.rs"]
 mod pending_draft;
+#[path = "db_private_composer_scope.rs"]
+mod private_composer_scope;
 #[path = "db_run_continuation.rs"]
 mod run_continuation;
 #[path = "db_simplification.rs"]
 mod simplification;
 #[path = "db_skill_pack_context.rs"]
 mod skill_pack_context;
+
+#[cfg(test)]
+pub(crate) fn downgrade_private_composer_scope_fixture(connection: &Connection) {
+    private_composer_scope::downgrade_for_test(connection);
+}
 
 #[cfg(test)]
 pub(crate) fn downgrade_skill_pack_context_fixture(connection: &Connection) {
@@ -353,8 +360,8 @@ impl MainThreadMigrationSource {
 }
 
 pub(crate) const CURRENT_DATA_CONTRACT_VERSION: &str = "v1.72";
-pub(crate) const CURRENT_PROJECTION_SCHEMA_VERSION: i64 = 154;
-const CURRENT_SCHEMA_MIGRATION_VERSION: i64 = 204;
+pub(crate) const CURRENT_PROJECTION_SCHEMA_VERSION: i64 = 155;
+const CURRENT_SCHEMA_MIGRATION_VERSION: i64 = 205;
 const V147_MIGRATION_SOURCE_DATA_CONTRACT_VERSION: &str = "v1.54";
 const V147_MIGRATION_SOURCE_PROJECTION_SCHEMA_VERSION: i64 = 96;
 const V145_MIGRATION_SOURCE_DATA_CONTRACT_VERSION: &str = "v1.53";
@@ -2960,7 +2967,7 @@ fn connection_has_admissible_data_contract(connection: &Connection) -> rusqlite:
             contract == CURRENT_DATA_CONTRACT_VERSION
                 && matches!(
                     schema,
-                    145 | 146 | 147 | 148 | 149 | 150 | 151 | 152 | 153 | 154
+                    145 | 146 | 147 | 148 | 149 | 150 | 151 | 152 | 153 | 154 | 155
                 )
         })
     {
@@ -3370,11 +3377,12 @@ pub(crate) fn classify_database_contract(
     if marker.contract_version == CURRENT_DATA_CONTRACT_VERSION
         && matches!(
             marker.projection_schema_version,
-            145 | 146 | 147 | 148 | 149 | 150 | 151 | 152 | 153 | 154
+            145 | 146 | 147 | 148 | 149 | 150 | 151 | 152 | 153 | 154 | 155
         )
     {
         let expected_migration = match marker.projection_schema_version {
-            154 => CURRENT_SCHEMA_MIGRATION_VERSION,
+            155 => CURRENT_SCHEMA_MIGRATION_VERSION,
+            154 => 204,
             153 => 203,
             152 => 202,
             151 => 201,
@@ -3414,7 +3422,11 @@ pub(crate) fn classify_database_contract(
             && (marker.projection_schema_version < 153
                 || skill_pack_context::schema_matches(connection)?)
             && (marker.projection_schema_version < 154
-                || crate::canvas_node::schema_matches(connection)?);
+                || crate::canvas_node::schema_matches(connection)?)
+            && (marker.projection_schema_version < 155
+                || private_composer_scope::schema_matches(connection)?)
+            && (marker.projection_schema_version != 154
+                || private_composer_scope::source_schema_matches(connection)?);
         return Ok(if !valid {
             DatabaseContractClassification::Unknown(Some(marker))
         } else if marker.projection_schema_version == CURRENT_PROJECTION_SCHEMA_VERSION {
@@ -9115,6 +9127,9 @@ impl Database {
             if !self.schema_migration_applied(204)? {
                 migration_step!("migration_204", self.migrate_canvas_nodes());
             }
+            if !self.schema_migration_applied(205)? {
+                migration_step!("migration_205", private_composer_scope::migrate(self));
+            }
             if let Err(error) =
                 crate::notification::maintain_notification_episode_retention(self.connection())
             {
@@ -9946,6 +9961,9 @@ impl Database {
         if !self.schema_migration_applied(204)? {
             migration_step!("migration_204", self.migrate_canvas_nodes());
         }
+        if !self.schema_migration_applied(205)? {
+            migration_step!("migration_205", private_composer_scope::migrate(self));
+        }
         if let Err(error) =
             crate::notification::maintain_notification_episode_retention(self.connection())
         {
@@ -10126,7 +10144,7 @@ impl Database {
         tx.execute_batch(crate::canvas_node::TABLE_SQL)?;
         tx.execute_batch("INSERT INTO schema_migration VALUES(204,datetime('now'));UPDATE rovai_data_contract SET projection_schema_version=154,updated_at=datetime('now') WHERE singleton=1;")?;
         anyhow::ensure!(
-            matches!(classify_database_contract(&tx)?,DatabaseContractClassification::Current(ref marker) if marker.projection_schema_version==154),
+            matches!(classify_database_contract(&tx)?,DatabaseContractClassification::Current(ref marker) | DatabaseContractClassification::SupportedMigrationSource(ref marker) if marker.projection_schema_version==154),
             "Canvas node schema admission failed"
         );
         tx.commit()?;
@@ -39948,6 +39966,7 @@ mod tests {
         database.migrate_canvas_boards().unwrap();
         skill_pack_context::migrate(&mut database).unwrap();
         database.migrate_canvas_nodes().unwrap();
+        private_composer_scope::migrate(&mut database).unwrap();
         assert!(connection_has_current_data_contract(database.connection()).unwrap());
         assert!(database.schema_migration_applied(200).unwrap());
         assert!(
@@ -43529,6 +43548,7 @@ mod tests {
         database.migrate_canvas_boards().unwrap();
         skill_pack_context::migrate(&mut database).unwrap();
         database.migrate_canvas_nodes().unwrap();
+        private_composer_scope::migrate(&mut database).unwrap();
         assert!(connection_has_current_data_contract(database.connection()).unwrap());
         database.connection().execute_batch("DROP INDEX native_session_bootstrap_binding_idx;
             CREATE UNIQUE INDEX native_session_bootstrap_binding_idx ON native_session_bootstrap_evidence(native_binding_id,native_binding_generation)").unwrap();

@@ -579,6 +579,7 @@ pub fn load_source_attachment_for_client(
                 WHERE conversation.camp_id = ?1
                   AND conversation.id = ?2
                   AND conversation.kind = 'single_chat' AND draft.client_id = ?3
+                  AND draft.scope_key = ''
                 "#,
                 params![camp_id, conversation_id, client.id()],
                 |row| row.get::<_, String>(0),
@@ -623,6 +624,7 @@ pub fn load_source_attachment_for_client(
                   AND edit.conversation_id = conversation.id
                   AND edit.pending_input_id = ?3
                   AND edit.edit_token = ?4 AND edit.client_id = ?5
+                  AND edit.scope_key = ''
                 "#,
                 params![camp_id, conversation_id, pending_input_id, edit_token, client.id()],
                 |row| row.get::<_, String>(0),

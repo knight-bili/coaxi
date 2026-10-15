@@ -25,9 +25,9 @@ last_updated: 2026-10-15
 
 ## 实施状态
 
-第一批已编写 Core scope 归属 codec、get 省略/显式 null 的能力协商编码，以及精确活跃私聊 pin 的只读校验，见[scope合同](../../contracts/single-chat-composer-scope-v1.md)。当前未接生产 get/send/上传/quote，未分配新 scope 或迁移数据库；旧调用继续原路径。
+Core scope 归属 codec、get 省略/显式 null 的能力协商编码与精确活跃私聊 pin 的只读校验已实现，见[scope合同](../../contracts/single-chat-composer-scope-v1.md)。Schema155/Migration205 已追加：旧草稿原值进入空 scope，新增注册、完整保留输入与排队编辑归属，默认 SQL/quote/资源路径明确围栏。当前新 scope 的生产 get/send/上传/quote/登记尚未接通；旧调用继续默认路径。
 
-Rust 原文 SQL 在最小四表 SQLite 夹具中执行25项读取见证，覆盖精确绑定、镜像/错板/错聊/错 Thread、公开 pin、私聊结束、Thread 非激活/删除、Board/节点删除和零写入；它不是 Rust 编译或完整 Core 接口证明。两个新增 Rust 最低层 owner 已编写，编译及执行随 I03 候选，不记作通过。接下来原子迁移默认草稿和新存储，再接附件、引用、发送、排队编辑及恢复。
+第一批原文 SQL 的25项读取见证保持原边界。本轮因主键及迁移回滚是后续材料接线的前提，按阶段策略例外做一次本地定向 Rust 编译与 owner，覆盖旧值保留、事务失败回滚、默认读取不漏出其他 scope、pin 删除后保留、重开与 Conversation 删除清理，并补旧回执及准入结构负例。相关旧私聊、引用、资源、目录与升级 owner 也做定向回归；实际结论及初次环境/编译失败见[执行证据](../../../integration/execution/i03-private-scope-storage-result.json)。未运行全仓回归、GitHub Actions、实际模型或真机验证。
 
 以下24项是拟实施的完整验证要求，均未执行；不替代正式324场景或实际 Runtime/真机资格。低成本检查按切片运行，编译及完整集成随 I03 候选集中执行。
 
