@@ -2,14 +2,21 @@
 document_type: integration-proposal
 change_id: canvas-private-materials
 revision: 1
-confirmed_revision: null
-confirmation_status: pending
-confirmed_by: null
-confirmed_at: null
+confirmed_revision: 1
+confirmation_status: confirmed
+confirmed_by: User
+confirmed_at: 2026-10-15T11:58:42Z
 implementation_status: not_started
 implementation_baseline: e671ed204aacb8f56c4470a1c8f6e98bd325ba25
-authority: proposal-only
+authority: confirmed-integration-proposal
 ---
+
+## 人工确认记录
+
+客户阅读16页客户确认版 r1 后直接回复：“确认，按私聊材料隔离 r1 实施”。确认记录于 2026-10-15T11:58:42Z（回复后首次读取时钟）。
+
+以下正文保留批准时提案快照，“待确认”“当前尚未改动”均描述提案时状态；实现进展以正式说明和执行证据为准。确认仅覆盖本 r1，不包含付费模型、main 合入或发布。
+
 
 # 私聊材料怎么分开用
 Codeg 与 Rovai 一期融合  客户确认版 r1  待确认

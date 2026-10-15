@@ -120,6 +120,26 @@
         "I02_技能包怎么用_客户确认版_r1.pdf"
       ],
       "formal_statement": "docs/versions/v1.72/model-context-change-skill-pack-member-delivery.md"
+    },
+    {
+      "id": "INPUT-PRIVATE-MATERIALS-R1",
+      "required_for": "I03私聊材料卡片隔离模型输入选择",
+      "status": "confirmed",
+      "need": "已阅读16页客户确认版r1并明确确认，继续实施，无需再次确认",
+      "proposal": "integration/proposals/canvas-private-materials-r1.md",
+      "formal_statement": "docs/versions/v1.72/model-context-change-canvas-private-materials.md",
+      "revision": 1,
+      "confirmed_revision": 1,
+      "confirmation_status": "confirmed",
+      "confirmed_by": "User",
+      "confirmed_at": "2026-10-15T11:58:42Z",
+      "human_reply": "确认，按私聊材料隔离 r1 实施",
+      "governance": "docs/development/model-context-change-governance.md:49-56",
+      "outputs": [
+        "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I03_私聊材料隔离_r1\\final\\I03_私聊材料怎么分开用_客户确认版_r1.docx",
+        "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I03_私聊材料隔离_r1\\final\\I03_私聊材料怎么分开用_客户确认版_r1.pdf"
+      ],
+      "software_workaround": "r1已确认，按阶段批量验证规则继续本地实现；真实模型身份/预算与设备仍另补，不自动付费"
     }
   ]
 }
