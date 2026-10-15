@@ -1,10 +1,15 @@
 // Interaction adapted from Codeg aff1e6c278453ed8d0b96a5f664edcdca621aa3f
 // canvas-conversation-surface.tsx / canvas-conversation-drawer.tsx (Apache-2.0).
 // Conversation, draft and Runtime authority remain in Rovai's existing workspace.
-import type { CanvasConversationRef, CanvasNode, CanvasNodeMutation, SingleChatSnapshot, ThreadSnapshot } from '@contracts'
+import type { CanvasConversationRef, CanvasNode, CanvasNodeMutation, MissionRecord, SingleChatSnapshot, ThreadSnapshot } from '@contracts'
 import { canvasReferenceKey, DETAIL_CARD_HEIGHT, DETAIL_CARD_WIDTH, type CanvasRect, type CanvasSize } from './canvas-layout'
 import { uiAttribute } from './interface-language'
 import type { CanvasComposerContext } from './canvas-composer-drafts'
+
+/** Both current projections must identify the same Mission; a cached title or Thread alone is insufficient. */
+export function canvasMissionForThread(snapshot: ThreadSnapshot | null, mission: MissionRecord | null | undefined): MissionRecord | null {
+  return snapshot && mission && snapshot.thread.id === mission.threadId && snapshot.thread.missionId === mission.missionId ? mission : null
+}
 
 export interface CanvasConversationTarget {
   boardId: string

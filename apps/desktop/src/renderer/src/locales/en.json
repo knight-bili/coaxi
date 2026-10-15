@@ -4002,5 +4002,8 @@
   "已停止恢复，未展开的记录仍保留。": "Restoration stopped. The remaining expansion records are retained.",
   "正在恢复已展开的卡片：{0}/{1}": "Restoring expanded cards: {0}/{1}",
   "停止恢复": "Stop restoring",
-  "重试恢复展开": "Retry expanded cards"
+  "重试恢复展开": "Retry expanded cards",
+  "查看交付与累计变更": "View deliveries and cumulative changes",
+  "使命已删除或暂时不可用，请重新读取列表。": "The mission was deleted or is temporarily unavailable. Reload the list.",
+  "请打开完整工作区查看公开消息来源。": "Open the full workspace to view the public source message."
 }

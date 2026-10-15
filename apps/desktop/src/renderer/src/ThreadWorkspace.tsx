@@ -3600,7 +3600,7 @@ function ThreadWorkspaceContent({
       }
       if (notificationFocus.kind === 'task' || notificationFocus.kind === 'mission') {
         const id = notificationFocus.subjectId
-        const target = id ? document.querySelector<HTMLElement>(notificationFocus.kind === 'task'
+        const target = id ? workspaceShellRef.current?.querySelector<HTMLElement>(notificationFocus.kind === 'task'
           ? `.task-detail[data-task-id="${CSS.escape(id)}"]`
           : `.mission-intro[data-mission-id="${CSS.escape(id)}"]`) : null
         if (target && target.getClientRects().length > 0) presentTarget(target)

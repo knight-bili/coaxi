@@ -2928,13 +2928,13 @@ function BusinessAppContent({
       .catch((nextError) => notifyError(errorMessage(nextError)))
   }
 
-  const openCanvasReference = async (reference: CanvasConversationRef): Promise<void> => {
+  const openCanvasReference = async (reference: CanvasConversationRef): Promise<boolean> => {
     const intent = desktopNavigation.beginIntent()
     try {
       let target: SingleChatPanelTarget | null = null
       if (reference.conversationId) {
         const snapshot = await client.request<SingleChatSnapshot | null>('singleChat.get', { conversationId: reference.conversationId })
-        if (!intent.isCurrent()) return
+        if (!intent.isCurrent()) return false
         const conversation = snapshot?.conversation
         if (!conversation || conversation.id !== reference.conversationId || conversation.threadId !== reference.threadId || conversation.status !== 'active') {
           throw new Error(uiAttribute('这段单聊已结束或不可用。'))
@@ -2942,13 +2942,14 @@ function BusinessAppContent({
         target = { conversationId: conversation.id, agentId: conversation.agentId,
           agentDisplayName: agents.find(agent => agent.agentId === conversation.agentId)?.displayName ?? uiAttribute('队员'), requestId: ++canvasReferenceRequest.current }
       }
-      if (!intent.isCurrent()) return
+      if (!intent.isCurrent()) return false
       const opened = await desktopNavigation.push({ kind: 'camp', threadId: reference.threadId }, { campOptions: { reconcileDefaultLead: false } })
-      if (!opened) return
+      if (!opened) return false
       setSingleChatNotificationTarget(target)
       setSingleChatThreadId(target ? reference.threadId : null)
       setThreadInspectorThreadId(null)
-    } catch (error) { if (intent.isCurrent()) notifyError(errorMessage(error)) }
+      return true
+    } catch (error) { if (intent.isCurrent()) notifyError(errorMessage(error)); return false }
   }
 
   const navigateFromNotification = useCallback(async (
@@ -4029,6 +4030,9 @@ function BusinessAppContent({
             conversation={{ instances: canvasConversations.state.instances.map(instance => ({ key: instance.key, target: instance.target,
               busy: canvasConversations.state.busyKeys.includes(instance.key), content: canvasConversations.controller.current && <CanvasThreadWorkspace
                 instance={instance} controller={canvasConversations.controller.current} reads={threadProjections} files={environment.files} visibility={canvasVisibility}
+                mission={missionList.missions.find(mission => mission.threadId === instance.target.reference.threadId) ?? null}
+                projects={displayNavigation?.projects ?? []} onMissionWorkspaceChanged={refreshMissionAfterWorkspaceCleanup}
+                onOpenPublicSource={async (threadId, messageId) => { if (await openCanvasReference({ threadId, conversationId: null })) missionSource(messageId) }}
                 theme={appearance.resolvedTheme} agents={agents} installations={installations} liveRuntimeEvents={liveRuntimeEvents}
                 navigation={navigationRefreshCoordinator} onPendingLeave={settlePendingThreadOnLeave} onForgetMemberCreation={forgetMemberCreationDraft}
                 onConfigureRuntime={configureMemberRuntime} onOpenMotionSettings={() => { void openMotionSettings() }} onNotify={notify} onNotifyError={notifyError} /> })),

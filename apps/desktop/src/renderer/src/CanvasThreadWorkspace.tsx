@@ -1,8 +1,11 @@
 import { useCallback, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
-import type { AgentProfile, AdapterInstallation, FilePreviewApi, ResolvedTheme, ThreadComposerDraftView } from '@contracts'
+import type { AgentProfile, AdapterInstallation, FilePreviewApi, MissionRecord, ProjectNavigationGroup, ResolvedTheme, ThreadComposerDraftView } from '@contracts'
 import { useThreadClient } from './camp-client'
-import { ThreadWorkspace, type ThreadInspectorTab, type ThreadRuntimeRecovery } from './ThreadWorkspace'
-import { FilePreviewProvider } from './FilePreviewContext'
+import { ThreadWorkspace, type NotificationFocusTarget, type ThreadInspectorTab, type ThreadRuntimeRecovery } from './ThreadWorkspace'
+import { FilePreviewProvider, useFilePreview } from './FilePreviewContext'
+import { MissionIntro } from './MissionBoard'
+import { MissionActivityDocument } from './MissionDelivery'
+import { canvasMissionForThread } from './canvas-conversation'
 import { ThreadProjectionStore, ThreadProjectionSupersededError } from './thread-projection-store'
 import { threadCommands } from './thread-commands'
 import { threadWorkspaceActions, type ThreadOptimisticEntry, type ThreadActionToast } from './thread-workspace-actions'
@@ -32,17 +35,42 @@ export interface CanvasThreadWorkspaceProps {
   onOpenMotionSettings(): void
   onNotify(message: string): void
   onNotifyError(message: string): void
+  onOpenPublicSource?(threadId: string, messageId: string): Promise<void>
+  mission?: MissionRecord | null
+  projects?: ProjectNavigationGroup[]
+  onMissionWorkspaceChanged?(threadId: string): Promise<void>
 }
 
 export function CanvasThreadWorkspace(props: CanvasThreadWorkspaceProps): React.JSX.Element {
-  return <FilePreviewProvider api={props.files} threadId={props.instance.target.reference.threadId} resolvedTheme={props.theme} contained>
-    <CanvasThreadWorkspaceContent {...props} />
+  const [focus, setFocus] = useState<NotificationFocusTarget | null>(null), sequence = useRef(0)
+  return <FilePreviewProvider api={props.files} threadId={props.instance.target.reference.threadId} resolvedTheme={props.theme} contained
+    missionActivity={<CanvasMissionActivity {...props} onSource={messageId => {
+      if (props.instance.conversation) {
+        if (props.onOpenPublicSource) void props.onOpenPublicSource(props.instance.target.reference.threadId, messageId).catch(error => props.onNotifyError(errorMessage(error)))
+        else props.onNotifyError(uiAttribute('请打开完整工作区查看公开消息来源。'))
+      } else setFocus({ requestId: ++sequence.current, kind: 'camp_message', messageId, threadTurnId: null, active: true })
+    }} />}>
+    <CanvasThreadWorkspaceContent {...props} focus={focus} onFocusPresented={requestId => setFocus(current => current?.requestId === requestId ? null : current)} />
   </FilePreviewProvider>
 }
 
+function CanvasMissionActivity({ mission, instance, reads, agents, onNotify, onMissionWorkspaceChanged, onSource }: CanvasThreadWorkspaceProps & { onSource(messageId: string): void }): React.JSX.Element {
+  const threadId = instance.target.reference.threadId
+  const subscribe = useCallback((listener: () => void) => reads.subscribe(threadId, listener), [reads, threadId])
+  const getSnapshot = useCallback(() => reads.getSnapshot(threadId), [reads, threadId])
+  const projection = useSyncExternalStore(subscribe, getSnapshot, getSnapshot)
+  const current = canvasMissionForThread(projection.snapshot, mission)
+  if (!current) return <p role="status"><UiText zh="使命已删除或暂时不可用，请重新读取列表。" /></p>
+  return <MissionActivityDocument mission={current} agents={agents} onSource={onSource} onNotify={onNotify}
+    onWorkspaceCleanupRequested={async id => { await onMissionWorkspaceChanged?.(id); await reads.refresh(id) }} />
+}
+
 function CanvasThreadWorkspaceContent({ instance, controller, visibility, reads, agents, installations, liveRuntimeEvents, navigation,
-  onPendingLeave, onForgetMemberCreation, onConfigureRuntime, onOpenMotionSettings, onNotify, onNotifyError }: CanvasThreadWorkspaceProps): React.JSX.Element {
+  onPendingLeave, onForgetMemberCreation, onConfigureRuntime, onOpenMotionSettings, onNotify, onNotifyError, mission, projects = [], focus, onFocusPresented }: CanvasThreadWorkspaceProps & {
+    focus: NotificationFocusTarget | null; onFocusPresented(requestId: number): void
+  }): React.JSX.Element {
   const client = useThreadClient(), threadId = instance.target.reference.threadId
+  const preview = useFilePreview()
   const visibilityLease = useRef<ReturnType<CanvasNotificationVisibility['register']> | null>(null)
   useLayoutEffect(() => {
     const lease = visibility.register(instance.key, threadId)
@@ -57,6 +85,7 @@ function CanvasThreadWorkspaceContent({ instance, controller, visibility, reads,
   const lastSnapshot = useRef<ThreadSurfaceSnapshot | null>(null)
   if (projection.snapshot) lastSnapshot.current = projection.snapshot
   const campSnapshot = projection.snapshot ?? lastSnapshot.current
+  const currentMission = canvasMissionForThread(projection.snapshot, mission)
   const campSnapshotRef = useRef(campSnapshot); campSnapshotRef.current = campSnapshot
   const activeThreadId = threadId, activeThreadIdRef = useRef<string | null>(threadId)
   const activeThreadCommands = useMemo(() => threadCommands(client, threadId), [client, threadId])
@@ -95,6 +124,9 @@ function CanvasThreadWorkspaceContent({ instance, controller, visibility, reads,
   return <>
     {issue && <div className="canvas-notice" role="alert">{issue}<button type="button" disabled={projection.loading} onClick={() => { setError(null); void reads.refresh(threadId).catch(error => setError(errorMessage(error))) }}><UiText zh="重新读取" /></button></div>}
     <ThreadWorkspace snapshot={campSnapshot} composerContext={instance.target.draftContext} projectName={null} previewTabsInPane
+      missionBoard={!instance.conversation && currentMission ? <><MissionIntro mission={currentMission} projects={projects} />
+        <button type="button" className="mission-activity-entry" onClick={() => preview.openMissionActivity(currentMission.missionId)}><UiText zh="查看交付与累计变更" /></button></> : null}
+      notificationFocus={focus} onNotificationFocusPresented={onFocusPresented}
       agents={agents} installations={installations} liveRuntimeEvents={liveRuntimeEvents} openCoverage={campSnapshot.openCoverage}
       messageHistory={campSnapshot.openCoverage?.messages} onLoadEarlierMessages={async () => { await reads.loadEarlier(threadId) }}
       busy={Boolean(busy || !projection.snapshot)} optimisticMessages={optimisticThreadMessages.map(entry => entry.message)}

@@ -160,3 +160,16 @@ the ReactFlow update loop found by the real mounted canvas fixture.
 The fixture mounts CanvasWorkspace/CanvasSurface/ReactFlow/editors with mock Core, observes actual
 page reload/localStorage recovery and confirms readonly calls. Native process/crash/Host recovery,
 concurrent graph changes, private attachments and scale/platform qualification remain pending.
+
+Mission-backed public cards now reuse MissionIntro and the existing window Mission action owner.
+The current Thread projection and Mission list record must agree on both IDs before exposing the
+Mission entry. Delivery/activity and cumulative Diff use the existing MissionActivityDocument and
+Core missions.delivery/changes/fileDiff paths inside each card's contained preview. Missing or
+rebound Missions show unavailable content in retained activity tabs, never a substituted Mission.
+Activity source links focus the original card's public message; Task/Mission focus lookup is scoped
+to its workspace shell. A private card sends public-source navigation through the existing guarded
+full public workspace and focuses only after successful navigation; that private route still needs
+full integration qualification. Diff disclosure/tree/modal IDs are per instance, and the viewport portal sits
+above selected graph nodes so selection cannot intercept real conversation controls.
+These are current Thread-to-Mission links; durable independent Mission/Task/Diff pins, file-node
+authorization joins and actual Core/Runtime/end-to-end qualification remain required I03 work.

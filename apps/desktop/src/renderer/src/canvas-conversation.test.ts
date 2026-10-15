@@ -1,12 +1,22 @@
 import { expect, it, vi } from 'vitest'
-import type { CanvasNode, SingleChatSnapshot, ThreadSnapshot } from '@contracts'
-import { canvasConversationGeometry, canvasConversationMatches, canvasMutationRemovesConversation, readCanvasConversation, type CanvasConversationTarget } from './canvas-conversation'
+import type { CanvasNode, MissionRecord, SingleChatSnapshot, ThreadSnapshot } from '@contracts'
+import { canvasConversationGeometry, canvasConversationMatches, canvasMissionForThread, canvasMutationRemovesConversation, readCanvasConversation, type CanvasConversationTarget } from './canvas-conversation'
 
 const reference = { threadId: 'thread', conversationId: 'private-a' }
 const target: CanvasConversationTarget = { boardId: 'board', nodeId: 'pin', reference, presentation: 'inline' }
 const thread = { thread: { id: 'thread' }, marker: 'authoritative' } as unknown as ThreadSnapshot & { marker: string }
 const privateSnapshot = { conversation: { id: 'private-a', threadId: 'thread', agentId: 'agent', status: 'active' } } as SingleChatSnapshot
 const node = { boardId: 'board', id: 'pin', data: { kind: 'conversation', conversation: reference } } as CanvasNode
+
+it('exposes Mission actions only when both current projections agree on exact Thread and Mission identities', () => {
+  const snapshot = { ...thread, thread: { ...thread.thread, missionId: 'mission-a' } }, mission = { missionId: 'mission-a', threadId: 'thread' } as MissionRecord
+  expect(canvasMissionForThread(snapshot, mission)).toBe(mission)
+  expect(canvasMissionForThread(snapshot, null)).toBeNull()
+  expect(canvasMissionForThread(null, mission)).toBeNull()
+  expect(canvasMissionForThread(thread, mission)).toBeNull()
+  expect(canvasMissionForThread(snapshot, { ...mission, threadId: 'other' })).toBeNull()
+  expect(canvasMissionForThread(snapshot, { ...mission, missionId: 'mission-b' })).toBeNull()
+})
 
 it('reads public references without private RPC and returns the original authoritative projection', async () => {
   const readPrivate = vi.fn(), readThread = vi.fn(async () => thread)
