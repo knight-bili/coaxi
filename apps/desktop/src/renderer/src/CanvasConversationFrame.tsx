@@ -1,14 +1,20 @@
 import type { ReactNode } from 'react'
 import type { CanvasConversationTarget } from './canvas-conversation'
+import type { CanvasNode } from '@contracts'
+import type { CanvasViewScope } from './canvas-view-state'
 import type { ThreadLeavePreparation } from './ThreadWorkspace'
 import { UiText, uiAttribute } from './interface-language'
 
 export interface CanvasConversationBridge {
   instances: Array<{ key: string; target: CanvasConversationTarget; content: ReactNode; busy: boolean }>
   opening: boolean
+  restoring?: { boardId: string; completed: number; total: number } | null
   issue: string | null
   open(target: CanvasConversationTarget): Promise<boolean>
   close(keys?: readonly string[]): Promise<boolean>
+  suspend(): Promise<boolean>
+  restore(scope: CanvasViewScope, boardId: string, nodes: readonly CanvasNode[]): Promise<boolean>
+  cancelRestore(): void
   prepare(keys: readonly string[]): Promise<ThreadLeavePreparation>
 }
 
@@ -25,11 +31,11 @@ export function CanvasConversationFrame({ bridge, instance, title, orphaned = fa
     onPointerDown={event => event.stopPropagation()}>
     <header className="canvas-conversation-heading">
       <strong title={title}>{title}</strong>
-      {!orphaned && <button type="button" disabled={bridge.opening} onClick={() => { void bridge.open({ ...target, presentation: target.presentation === 'inline' ? 'drawer' : 'inline' }) }}>
+      {!orphaned && <button type="button" disabled={bridge.opening || Boolean(bridge.restoring)} onClick={() => { void bridge.open({ ...target, presentation: target.presentation === 'inline' ? 'drawer' : 'inline' }) }}>
         <UiText zh={target.presentation === 'inline' ? '移至侧边' : '放回画布'} />
       </button>}
-      <button type="button" disabled={bridge.opening} onClick={onOpenWorkspace}><UiText zh="打开完整工作区" /></button>
-      <button type="button" disabled={bridge.opening} onClick={() => { void bridge.close([key]) }}><UiText zh="收起对话" /></button>
+      <button type="button" disabled={bridge.opening || Boolean(bridge.restoring)} onClick={onOpenWorkspace}><UiText zh="打开完整工作区" /></button>
+      <button type="button" disabled={bridge.opening || Boolean(bridge.restoring)} onClick={() => { void bridge.close([key]) }}><UiText zh="收起对话" /></button>
     </header>
     {orphaned && <p className="canvas-notice" role="status"><UiText zh="原画布卡片已变更，当前对话保留在侧边，请先保存或收起。" /></p>}
     <div className="canvas-conversation-content" inert={busy} aria-busy={busy}>{instance.content}</div>

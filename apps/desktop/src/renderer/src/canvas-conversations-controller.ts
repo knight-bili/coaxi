@@ -1,8 +1,10 @@
-import type { SingleChatSnapshot } from '@contracts'
+import type { CanvasNode, SingleChatSnapshot } from '@contracts'
 import type { ThreadClient } from './camp-client'
 import type { ThreadLeaveGuard, ThreadLeavePreparation } from './ThreadWorkspace'
 import { canvasComposerContextKey } from './canvas-composer-drafts'
-import { readCanvasConversation, type CanvasConversationTarget } from './canvas-conversation'
+import { canvasConversationMatches, readCanvasConversation, type CanvasConversationTarget } from './canvas-conversation'
+import type { CanvasConversationRecovery } from './canvas-conversation-recovery'
+import type { CanvasViewScope } from './canvas-view-state'
 import type { ThreadProjectionStore } from './thread-projection-store'
 import { readErrorMessage } from './error-message'
 import { uiAttribute } from './interface-language'
@@ -12,8 +14,8 @@ export interface CanvasConversationInstance {
   target: CanvasConversationTarget
   conversation: SingleChatSnapshot['conversation'] | null
 }
-export interface CanvasConversationsState { instances: CanvasConversationInstance[]; busyKeys: readonly string[]; opening: boolean; issue: string | null }
-export const initialCanvasConversations = (): CanvasConversationsState => ({ instances: [], busyKeys: [], opening: false, issue: null })
+export interface CanvasConversationsState { instances: CanvasConversationInstance[]; busyKeys: readonly string[]; opening: boolean; issue: string | null; restoring: { boardId: string; completed: number; total: number } | null }
+export const initialCanvasConversations = (): CanvasConversationsState => ({ instances: [], busyKeys: [], opening: false, issue: null, restoring: null })
 
 /** Presentation instances only. Core owns conversations/execution; each real card retains its input context. */
 export class CanvasConversationsController {
@@ -22,7 +24,7 @@ export class CanvasConversationsController {
   private readonly guards = new Map<string, ThreadLeaveGuard>()
   private disposed = false
   private generation = 0
-  constructor(private readonly client: Pick<ThreadClient, 'request' | 'presentationScope'>, private readonly reads: Pick<ThreadProjectionStore, 'open'>, private readonly afterCommit: () => Promise<void>) {}
+  constructor(private readonly client: Pick<ThreadClient, 'request' | 'presentationScope'>, private readonly reads: Pick<ThreadProjectionStore, 'open'> & Partial<Pick<ThreadProjectionStore, 'refresh'>>, private readonly afterCommit: () => Promise<void>, private readonly recovery?: CanvasConversationRecovery) {}
   getSnapshot = (): CanvasConversationsState => this.state
   subscribe = (listener: () => void): (() => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener) } }
   private publish(change: Partial<CanvasConversationsState>): void {
@@ -31,8 +33,12 @@ export class CanvasConversationsController {
     for (const listener of this.listeners) listener()
   }
   register(key: string, guard: ThreadLeaveGuard | null): void { if (guard) this.guards.set(key, guard); else this.guards.delete(key) }
-  async open(input: CanvasConversationTarget): Promise<boolean> {
-    if (this.disposed || this.state.opening) return false
+  open(input: CanvasConversationTarget): Promise<boolean> { return this.openTarget(input) }
+  private remember(target: CanvasConversationTarget, expanded: boolean): void {
+    try { this.recovery?.remember(target, expanded) } catch (error) { this.publish({ issue: readErrorMessage(error) }) }
+  }
+  private async openTarget(input: CanvasConversationTarget, restoring = false, fresh = false): Promise<boolean> {
+    if (this.disposed || this.state.opening || this.state.restoring && !restoring) return false
     const target = structuredClone(input), context = target.draftContext
     if (!context || context.host !== this.client.presentationScope || context.boardId !== target.boardId || context.nodeId !== target.nodeId
       || context.threadId !== target.reference.threadId || context.conversationId !== (target.reference.conversationId ?? null)) {
@@ -43,6 +49,7 @@ export class CanvasConversationsController {
       const others = this.state.instances.filter(item => item.key !== key).map(item => target.presentation === 'drawer' && item.target.presentation === 'drawer'
         ? { ...item, target: { ...item.target, presentation: 'inline' as const } } : item)
       this.publish({ instances: [...others, { ...existing, target }], issue: null })
+      if (!restoring) this.remember(target, true)
       return true
     }
     const generation = this.generation
@@ -54,15 +61,16 @@ export class CanvasConversationsController {
       if (info.dataDir !== context.core) throw new Error(uiAttribute('画布输入的所属信息不完整，请重新读取画板。'))
       const loaded = await readCanvasConversation(target.reference,
         conversationId => this.client.request<SingleChatSnapshot | null>('singleChat.get', { conversationId }),
-        async threadId => (await this.reads.open(threadId)).snapshot, current)
+        async threadId => (await (fresh && this.reads.refresh ? this.reads.refresh(threadId) : this.reads.open(threadId))).snapshot, current)
       if (!loaded || !current()) return false
       this.publish({ instances: [...this.state.instances, { key, target, conversation: loaded.conversation }] })
+      if (!restoring) this.remember(target, true)
       return true
     } catch (error) { if (current()) this.publish({ issue: readErrorMessage(error) }); return false }
     finally { if (current()) this.publish({ opening: false }) }
   }
-  async close(keys: readonly string[] = this.state.instances.map(item => item.key)): Promise<boolean> {
-    if (this.disposed || this.state.opening) return false
+  async close(keys: readonly string[] = this.state.instances.map(item => item.key), rememberClosed = true): Promise<boolean> {
+    if (this.disposed || this.state.opening || this.state.restoring) return false
     const selected = this.state.instances.filter(item => keys.includes(item.key))
     if (!selected.length) return true
     const generation = this.generation, preparations: ThreadLeavePreparation[] = []
@@ -78,6 +86,7 @@ export class CanvasConversationsController {
       await this.afterCommit()
       for (const preparation of preparations) preparation.complete(true)
       for (const key of closed) this.guards.delete(key)
+      if (rememberClosed) for (const item of selected) this.remember(item.target, false)
       return true
     } catch (error) {
       for (const preparation of preparations) preparation.complete(false)
@@ -85,7 +94,7 @@ export class CanvasConversationsController {
     } finally { this.publish({ opening: false, busyKeys: [] }) }
   }
   async prepare(keys: readonly string[]): Promise<ThreadLeavePreparation> {
-    if (this.disposed || this.state.opening) throw new Error(uiAttribute('当前对话输入尚未保存，请处理后重试。'))
+    if (this.disposed || this.state.opening || this.state.restoring) throw new Error(uiAttribute('当前对话输入尚未保存，请处理后重试。'))
     const selected = this.state.instances.filter(item => keys.includes(item.key)), preparations: ThreadLeavePreparation[] = []
     const generation = this.generation
     this.publish({ opening: true, busyKeys: selected.map(item => item.key), issue: null })
@@ -107,6 +116,35 @@ export class CanvasConversationsController {
       for (const item of preparations) item.complete(false)
       this.publish({ opening: false, busyKeys: [] })
     } }
+  }
+  async restore(scope: CanvasViewScope, boardId: string, nodes: readonly CanvasNode[]): Promise<boolean> {
+    if (!this.recovery || this.disposed || this.state.opening || this.state.restoring) return false
+    const generation = this.generation, current = () => !this.disposed && generation === this.generation
+    if (scope.host !== this.client.presentationScope) return false
+    const issues: string[] = [], freshThreads = new Set<string>()
+    try {
+      const targets = this.recovery.load(scope, boardId, nodes)
+      this.publish({ restoring: { boardId, completed: 0, total: targets.length }, issue: null })
+      let completed = 0
+      for (const target of targets) {
+        if (!current()) return false
+        if (!nodes.some(node => canvasConversationMatches(node, target))) issues.push(uiAttribute('部分展开卡片已变更，原引用记录仍保留。'))
+        else if (this.state.instances.some(item => item.key === canvasComposerContextKey(target.draftContext!))) freshThreads.add(target.reference.threadId)
+        else if (await this.openTarget(target, true, !freshThreads.has(target.reference.threadId))) freshThreads.add(target.reference.threadId)
+        else if (current()) issues.push(this.state.issue ?? uiAttribute('部分对话未能恢复，原展开记录仍保留。'))
+        if (!current()) return false
+        this.publish({ restoring: { boardId, completed: ++completed, total: targets.length } })
+      }
+      this.recovery.flush(scope, boardId)
+      if (current()) this.publish({ issue: [...new Set(issues)].join(' ') || null })
+      return issues.length === 0
+    } catch (error) { if (current()) this.publish({ issue: readErrorMessage(error) }); return false }
+    finally { if (current()) this.publish({ restoring: null }) }
+  }
+  cancelRestore(): void {
+    if (!this.state.restoring) return
+    this.generation += 1
+    this.publish({ restoring: null, opening: false, busyKeys: [], issue: uiAttribute('已停止恢复，未展开的记录仍保留。') })
   }
   dispose(): void { this.generation += 1; this.disposed = true; this.listeners.clear(); this.guards.clear() }
 }

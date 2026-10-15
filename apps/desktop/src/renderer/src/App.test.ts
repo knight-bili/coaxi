@@ -2164,6 +2164,17 @@ describe('task event projections', () => {
     expect(events).toEqual(['checked', 'left'])
   })
 
+  it('resumes remembered Canvas expansions when later navigation rejects or refuses the transition', async () => {
+    const resume = vi.fn(), guard = { isBlocked: () => false, canLeave: async () => true, resume }
+    const failure = new Error('navigation failed')
+    await expect(runCanvasLeaveTransition('canvas', guard, async () => { throw failure })).rejects.toBe(failure)
+    expect(resume).toHaveBeenCalledTimes(1)
+    expect(await runCanvasLeaveTransition('canvas', guard, async () => false)).toBe(false)
+    expect(resume).toHaveBeenCalledTimes(2)
+    await expect(runCanvasLeaveTransition('memory', guard, async () => { throw failure })).rejects.toBe(failure)
+    expect(resume).toHaveBeenCalledTimes(2)
+  })
+
   it('waits for Automation save before leaving and stays when saving fails', async () => {
     const events: string[] = []
     const saved = await runAutomationLeaveTransition(

@@ -1,9 +1,10 @@
 import { expect, it, vi } from 'vitest'
-import type { CoreMethod } from '@contracts'
+import type { CanvasNode, CoreMethod } from '@contracts'
 import { CanvasConversationsController } from './canvas-conversations-controller'
 import { canvasComposerContextKey, type CanvasComposerContext } from './canvas-composer-drafts'
 import type { CanvasConversationTarget } from './canvas-conversation'
 import type { ThreadSurfaceSnapshot } from './thread-workspace-data'
+import { CanvasConversationRecovery } from './canvas-conversation-recovery'
 
 const context: CanvasComposerContext = { host: 'host', core: '/core', boardId: 'board', nodeId: 'first', threadId: 'thread', conversationId: null }
 const target = (changes: Partial<CanvasComposerContext> = {}): CanvasConversationTarget => {
@@ -11,15 +12,73 @@ const target = (changes: Partial<CanvasComposerContext> = {}): CanvasConversatio
   return { boardId: draftContext.boardId, nodeId: draftContext.nodeId, draftContext,
     reference: { threadId: draftContext.threadId, conversationId: draftContext.conversationId }, presentation: 'inline' }
 }
-function fixture(handler: (method: CoreMethod, params?: unknown) => Promise<unknown> = async method => method === 'app.info' ? { dataDir: '/core' } : null, afterCommit: () => Promise<void> = async () => undefined) {
+function fixture(handler: (method: CoreMethod, params?: unknown) => Promise<unknown> = async method => method === 'app.info' ? { dataDir: '/core' } : null, afterCommit: () => Promise<void> = async () => undefined, recovery?: CanvasConversationRecovery) {
   const requests: Array<{ method: CoreMethod; params: unknown }> = []
   const client = { presentationScope: context.host, request<T>(method: CoreMethod, params?: unknown): Promise<T> {
     requests.push({ method, params }); return handler(method, params) as Promise<T>
   } }
   const reads = { open: vi.fn(async (threadId: string) => ({ snapshot: { thread: { id: threadId }, throughGlobalSequence: 1 } as ThreadSurfaceSnapshot,
     traceId: 'trace', startedAt: 0, receivedAt: 1 })) }
-  return { requests, reads, controller: new CanvasConversationsController(client, reads, afterCommit) }
+  const ownedReads = { ...reads, refresh: vi.fn(async (threadId: string) => reads.open(threadId)) }
+  return { requests, reads: ownedReads, controller: new CanvasConversationsController(client, ownedReads, afterCommit, recovery) }
 }
+
+function storage() { const values = new Map<string, string>(); return { values, getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => { values.set(key, value) } } }
+const node = (item: CanvasConversationTarget): CanvasNode => ({ id: item.nodeId, boardId: item.boardId, data: { kind: 'conversation', conversation: item.reference } } as CanvasNode)
+
+it('suspends a board without collapsing saved expansions and restores each Thread with one fresh read', async () => {
+  const local = storage(), recovery = new CanvasConversationRecovery(local), first = fixture(undefined, undefined, recovery)
+  await first.controller.open(target()); await first.controller.open(target({ nodeId: 'mirror' })); await first.controller.open(target({ nodeId: 'other', threadId: 'other' }))
+  await first.controller.open({ ...target(), presentation: 'drawer' })
+  expect(await first.controller.close(undefined, false)).toBe(true)
+  const restored = fixture(undefined, undefined, new CanvasConversationRecovery(local)), targets = [target(), target({ nodeId: 'mirror' }), target({ nodeId: 'other', threadId: 'other' })]
+  expect(await restored.controller.restore(context, 'board', targets.map(node))).toBe(true)
+  expect(restored.controller.getSnapshot().instances).toHaveLength(3)
+  expect(restored.controller.getSnapshot().instances.every(item => item.target.presentation === 'inline')).toBe(true)
+  expect(restored.reads.refresh.mock.calls.map(call => call[0]).sort()).toEqual(['other', 'thread'])
+  expect(restored.requests.every(request => request.method === 'app.info')).toBe(true)
+  expect(await restored.controller.close([restored.controller.getSnapshot().instances[0].key])).toBe(true)
+  expect(new CanvasConversationRecovery(local).load(context, 'board')).toHaveLength(2)
+})
+it('retains a rebound or missing context without reading its replacement Thread', async () => {
+  const local = storage(), recovery = new CanvasConversationRecovery(local)
+  recovery.remember(target(), true); recovery.remember(target({ nodeId: 'missing' }), true)
+  const f = fixture(undefined, undefined, recovery)
+  expect(await f.controller.restore(context, 'board', [node(target({ threadId: 'replacement' }))])).toBe(false)
+  expect(f.reads.open).not.toHaveBeenCalled(); expect(f.reads.refresh).not.toHaveBeenCalled()
+  expect(new CanvasConversationRecovery(local).load(context, 'board')).toHaveLength(2)
+  expect(f.controller.getSnapshot().issue).toContain('原引用记录仍保留')
+})
+it('keeps ended private references and failed reads for explicit retry without creating successors', async () => {
+  const local = storage(), recovery = new CanvasConversationRecovery(local), privateTarget = target({ conversationId: 'private' })
+  recovery.remember(privateTarget, true); recovery.remember(target({ nodeId: 'public' }), true)
+  const f = fixture(async method => method === 'app.info' ? { dataDir: '/core' } : { conversation: { id: 'private', threadId: 'thread', status: 'ended' } }, undefined, recovery)
+  expect(await f.controller.restore(context, 'board', [node(privateTarget), node(target({ nodeId: 'public' }))])).toBe(false)
+  expect(f.controller.getSnapshot().instances.map(item => item.target.nodeId)).toEqual(['public'])
+  expect(new CanvasConversationRecovery(local).load(context, 'board')).toHaveLength(2)
+  expect(f.requests.every(request => ['app.info', 'singleChat.get'].includes(request.method))).toBe(true)
+})
+it('cancels restoration and rejects its late results while a new manual opening may proceed', async () => {
+  const local = storage(), recovery = new CanvasConversationRecovery(local)
+  recovery.remember(target(), true)
+  let release!: (value: unknown) => void
+  const waiting = new Promise(resolve => { release = resolve })
+  const f = fixture(async () => waiting, undefined, recovery)
+  const restoring = f.controller.restore(context, 'board', [node(target())])
+  await vi.waitFor(() => expect(f.controller.getSnapshot().restoring?.total).toBe(1))
+  expect(await f.controller.close()).toBe(false)
+  f.controller.cancelRestore(); release({ dataDir: '/core' })
+  expect(await restoring).toBe(false); expect(f.controller.getSnapshot().instances).toEqual([])
+  expect(f.controller.getSnapshot()).toMatchObject({ opening: false, restoring: null })
+  expect(await f.controller.open(target({ nodeId: 'manual' }))).toBe(true)
+})
+it('does not overwrite the remembered layout when input preparation rejects a suspend', async () => {
+  const local = storage(), recovery = new CanvasConversationRecovery(local), f = fixture(undefined, undefined, recovery)
+  await f.controller.open(target()); const before = [...local.values]
+  f.controller.register(f.controller.getSnapshot().instances[0].key, async () => { throw new Error('input save failed') })
+  expect(await f.controller.close(undefined, false)).toBe(false)
+  expect(f.controller.getSnapshot().instances).toHaveLength(1); expect([...local.values]).toEqual(before)
+})
 
 it('opens multiple real card contexts, including mirrors, without replacing their instances or entering a Thread', async () => {
   const f = fixture()

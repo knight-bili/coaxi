@@ -136,5 +136,22 @@ they do not mount the full ReactFlow/BusinessApp or establish real Core/model/pl
 Notification visibility/ack unions are now wired through the same Attention Controller, with clipping,
 occlusion checks and independent per-Thread requests. Mock Core browser checks cover offscreen,
 covered and closed cards, source reappearance and a frozen uncertain retry. Real Core notification
-acceptance, durable expanded-state restoration, private attachment/quote isolation and recovery of
-closed orphan inputs remain required I03 work.
+acceptance, private attachment/quote isolation and recovery of closed orphan inputs remain required I03 work.
+
+Expanded card contexts now persist in Host/Owner + Core + Board scoped local presentation records.
+Only exact validated live graph references restore. Restoring reads existing Threads (fresh per Thread),
+checks the original private Conversation and never enters a Thread or restores execution liveness.
+Transient leave/suspend retains expansion intent; explicit collapse removes only that context.
+Drawer placement remains session-only and reconstruction uses inline cards. Corrupt/future records
+and unmatched references are retained; quota failures retain in-memory intent and expose retry.
+The restore batch reports progress and can stop without accepting its late reads.
+
+CanvasSurface waits for a valid graph before one restore pass per mount/retry. Workspace dialog
+return and failed navigation request another pass; saved input is recovered through the existing
+per-card composer store. A fully atomic leave that preserves the same editor and undo history on
+navigation failure still needs implementation. Node geometry depends on stable context/mode keys,
+not changing content elements or visibility reports; project group projections are memoized to avoid
+the ReactFlow update loop found by the real mounted canvas fixture.
+The fixture mounts CanvasWorkspace/CanvasSurface/ReactFlow/editors with mock Core, observes actual
+page reload/localStorage recovery and confirms readonly calls. Native process/crash/Host recovery,
+concurrent graph changes, private attachments and scale/platform qualification remain pending.

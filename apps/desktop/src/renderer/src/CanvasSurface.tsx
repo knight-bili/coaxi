@@ -25,7 +25,7 @@ import { canvasConversationGeometry, canvasConversationMatches, canvasMutationRe
 import { canvasComposerContext } from './canvas-composer-drafts'
 import './canvas.css'
 
-export interface CanvasLeaveGuard { canLeave(): Promise<boolean>; isBlocked(): boolean }
+export interface CanvasLeaveGuard { canLeave(): Promise<boolean>; isBlocked(): boolean; resume?(): void }
 export interface CanvasSurfaceProps {
   boardId: string
   scope: CanvasViewScope | null
@@ -38,6 +38,7 @@ export interface CanvasSurfaceProps {
   resolvedMembers?: ReadonlyMap<string, { references: CanvasReferenceOption[]; complete: boolean; issue?: string }>
   theme: ResolvedTheme
   conversation?: CanvasConversationBridge
+  restoreRevision?: number
   onOpenReference(reference: CanvasConversationRef): void
   onOpenMember?(agentId: string): void
   onOpenProject?(path: string): void
@@ -150,6 +151,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
   const [view, setView] = useState(() => loadCanvasViewState(storage, props.scope, props.boardId))
   const [nodes, setNodes] = useState<FlowNode[]>([]), [selected, setSelected] = useState<string[]>([])
   const [issue, setIssue] = useState<string | null>(null)
+  const [restoreRetry, setRestoreRetry] = useState(0), restored = useRef<string | null>(null)
   const surface = useRef<HTMLElement | null>(null)
   const [editor, setEditor] = useState<{ target: CanvasEditTarget; revision: number } | null>(null)
   const [deletion, setDeletion] = useState<{ ids: string[]; revision: number; hasProse: boolean } | null>(null)
@@ -163,8 +165,14 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
   const latestGraph = useRef(graph)
   latestGraph.current = graph
   const graphBlocked = graph.loading || Boolean(graph.readError || graph.pending) || !graph.snapshot?.board
-  const blocked = graphBlocked || Boolean(editor || deletion || presenting || props.conversation?.opening)
+  const blocked = graphBlocked || Boolean(editor || deletion || presenting || props.conversation?.opening || props.conversation?.restoring)
   const rows = graph.snapshot?.nodes ?? EMPTY_ROWS
+  useEffect(() => {
+    const stamp = JSON.stringify([props.restoreRevision ?? 0, restoreRetry])
+    if (restored.current === stamp || !props.scope || graph.loading || graph.readError || graph.pending || !graph.snapshot?.board || !props.conversation) return
+    restored.current = stamp
+    void props.conversation.restore(props.scope, props.boardId, rows).catch(error => setIssue(readErrorMessage(error)))
+  }, [props.scope, props.boardId, props.restoreRevision, props.conversation, graph.loading, graph.readError, graph.pending, graph.snapshot, rows, restoreRetry])
   const folderPaths = useMemo(() => rows.flatMap(row => row.data.kind === 'folder' && row.data.folderPath ? [row.data.folderPath]
     : row.data.kind === 'group' ? props.groups?.find(group => group.id === row.data.folderGroupId)?.projectPaths ?? [] : []), [rows, props.groups])
   const folders = useCanvasFolders(folderPaths)
@@ -176,6 +184,8 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
   const regions = useMemo(() => frozenMembers ? new Map([...liveRegions, ...frozenMembers]) : liveRegions, [liveRegions, frozenMembers])
   const expanded = useMemo(() => new Set(view.expandedRegions), [view.expandedRegions])
   const conversationInstances = props.conversation?.instances ?? EMPTY_CONVERSATIONS
+  // Content elements/visibility reports change without changing any node geometry.
+  const conversationLayoutKey = JSON.stringify(conversationInstances.map(item => [item.key, item.target.presentation]))
   const orphanedConversations = conversationInstances.filter(item => item.target.boardId === props.boardId && !rows.some(row => canvasConversationMatches(row, item.target)))
   const derived = useMemo<FlowNode[]>(() => rows.flatMap(row => {
     const d = row.data, region = isRegionKind(d.kind)
@@ -206,12 +216,12 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
         ariaLabel: uiAttribute('区域对话：{0}。可拖动，或按 Tab 使用卡片操作。', regions.get(row.id)?.references[index]?.label ?? uiAttribute('对话')),
         dragHandle: '.canvas-card-handle', connectable: false, deletable: false, zIndex: 2 }
     })]
-  }), [rows, selected, expanded, regions, conversationInstances])
+  }), [rows, selected, expanded, regions, conversationLayoutKey])
   currentDerived.current = derived
   useEffect(() => { if (!dragging.current) setNodes(derived) }, [derived])
   useEffect(() => { saveCanvasViewState(storage, props.scope, props.boardId, view) }, [storage, view, props.scope, props.boardId])
   useEffect(() => {
-    const isBlocked = () => panel.current || dragging.current || presentingRef.current || Boolean(bridgeRef.current?.opening || latestGraph.current.hasUnsettled())
+    const isBlocked = () => panel.current || dragging.current || presentingRef.current || Boolean(bridgeRef.current?.opening || bridgeRef.current?.restoring || latestGraph.current.hasUnsettled())
     props.onLeaveGuardChange?.({ isBlocked, canLeave: async () => !isBlocked() })
     return () => props.onLeaveGuardChange?.(null)
   }, [props.onLeaveGuardChange])
@@ -388,9 +398,14 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
       <button type="button" onClick={() => { void flow.fitView({ padding: 0.15 }) }}><UiText zh="查看全部" /></button>
       <button type="button" aria-pressed={view.minimap} onClick={() => setView(current => ({ ...current, minimap: !current.minimap }))}><UiText zh="小地图" /></button>
     </div>
-    {error && <div className="canvas-notice" role="alert">{error}<button type="button" onClick={() => { void graph.refresh().catch(() => undefined) }}><UiText zh="重新读取" /></button></div>}
+    {error && <div className="canvas-notice" role="alert">{error}<button type="button" onClick={() => { void graph.refresh().catch(() => undefined) }}><UiText zh="重新读取" /></button>
+      {props.conversation?.issue && !props.conversation.restoring && <button type="button" disabled={blocked || !props.scope}
+        onClick={() => { setIssue(null); setRestoreRetry(value => value + 1) }}><UiText zh="重试恢复展开" /></button>}
+    </div>}
     {!editor && !deletion && recovery}
     {(presenting || props.conversation?.opening) && <p className="canvas-notice" role="status"><UiText zh="正在处理画布对话…" /></p>}
+    {props.conversation?.restoring && <p className="canvas-notice" role="status">{uiAttribute('正在恢复已展开的卡片：{0}/{1}', props.conversation.restoring.completed, props.conversation.restoring.total)}
+      <button type="button" onClick={() => props.conversation?.cancelRestore()}><UiText zh="停止恢复" /></button></p>}
     {orphanedConversations.length > 1 && <div className="canvas-notice" role="status"><UiText zh="这些卡片已变更，输入仍保留。选择需要查看的对话。" />
       {orphanedConversations.map(item => <button type="button" key={item.key} disabled={props.conversation?.opening}
         onClick={() => { void props.conversation?.open({ ...item.target, presentation: 'drawer' }) }}>{title(item.target.reference)}</button>)}

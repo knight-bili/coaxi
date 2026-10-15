@@ -175,7 +175,16 @@ Core 事件回读不能覆盖本地未保存正文或正在提交的快照；本
 窗口共用一份文件保留资源并集和原预算；卡片预览坐标、DOM 标识和查找焦点隔离，原系统动作等待所属绑定。
 模拟 Core 的浏览器挂载已检查三张真实 Frame/ThreadWorkspace/Composer 的独立正文、模式切换、撤销、局部查找、
 关闭重开、文件归属及 60%/100% 预览边界；它没有挂载完整 ReactFlow/BusinessApp，也不证明真实文件能力或进程重启。
-私有附件与 quotes 的 Core Draft 仍按 Conversation，需要继续完成卡片间隔离。展开状态跨页面/重启恢复、
+展开记录按 Host/Owner、Core dataDir、Board 保存精确规范上下文；只含卡片引用，不存正文、私有证明、会话令牌或 Runtime 连接。
+恢复等待完整且有效的画板图，先匹配原节点及精确公开/私有引用，再核对 Core 与读取原会话；每 Thread 首次恢复刷新，镜像共享该读取 owner。
+跨画板、跨 Owner/Core、旧服务加载占位及错误图不触发恢复。旧的本项目 scoped expandedCards 仅通过当前有效图迁为精确上下文，
+原 Codeg 未分后端的 localStorage key 不自动迁入。失配/不可用引用、破损/未来记录均保留，禁止换成新的私有 Conversation。
+切页/切画板暂时关闭只卸载实例，显式收起才删除对应展开记录；drawer 位置只属于当前会话，重建按原地卡片恢复，
+不恢复 ACP/Runtime 连接或发送消息。恢复有完成数量、停止与显式重试，迟到结果受代次限制；本机 quota 失败保留当前内存意图和输入。
+导航失败、编辑画板或项目分组对话框返回后可重新读取展开记录与已存输入；原编辑器/撤销栈的完整事务交接仍待补齐。
+真实 CanvasWorkspace/CanvasSurface/ReactFlow/编辑器已在模拟 Core 下验证切板、离开返回、页面刷新、显式收起/重开及独立草稿恢复。
+这不是完整 BusinessApp、Native 进程重启、异常退出或真实 Host 接管资格。
+私有附件与 quotes 的 Core Draft 仍按 Conversation，需要继续完成卡片间隔离。完整进程/异常退出恢复、
 真实 Core 的通知确认、关闭后的孤立输入恢复、复杂导航失败恢复及规模性能仍在 I03 队列，未移出一期。
 真实 Core/Runtime 流式、审批、停止、IME/触控、HTML/iframe 资源规模与各平台资格仍待验收。
 

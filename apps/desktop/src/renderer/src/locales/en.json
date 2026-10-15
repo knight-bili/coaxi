@@ -3994,5 +3994,13 @@
   "重新核对服务": "Verify service again",
   "会话读取已失效，请重新打开。": "The conversation read is no longer current. Open the conversation again.",
   "画布恢复只能读取已有会话。": "Canvas restoration can only read existing conversations.",
-  "这些卡片已变更，输入仍保留。选择需要查看的对话。": "These cards have changed. Your input is retained. Choose a conversation to view."
+  "这些卡片已变更，输入仍保留。选择需要查看的对话。": "These cards have changed. Your input is retained. Choose a conversation to view.",
+  "画布展开记录无法读取，原记录已保留。": "The canvas expansion record cannot be read. The original record is retained.",
+  "展开状态未能保存，本次输入仍保留，请恢复本机存储后重试。": "The expanded state could not be saved. Your input is retained. Restore local storage and retry.",
+  "部分展开卡片已变更，原引用记录仍保留。": "Some expanded cards have changed. Their original references are retained.",
+  "部分对话未能恢复，原展开记录仍保留。": "Some conversations could not be restored. Their expansion records are retained.",
+  "已停止恢复，未展开的记录仍保留。": "Restoration stopped. The remaining expansion records are retained.",
+  "正在恢复已展开的卡片：{0}/{1}": "Restoring expanded cards: {0}/{1}",
+  "停止恢复": "Stop restoring",
+  "重试恢复展开": "Retry expanded cards"
 }

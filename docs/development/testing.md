@@ -29,6 +29,14 @@ I03 多卡输入的最低层 owner 为 `canvas-conversations-controller.test.ts`
 另一个继续、未知重试保持 UUID/字节、关闭一张/全部镜像、画布移出视口、卡片层叠、弹窗遮挡和重新出现。
 夹具调试信息限制高度，避免调试区遮住被测卡片；不由 mock 结果宣称真实通知事务或 Host 接管通过。
 
+展开恢复的最低层 `canvas-conversation-recovery.test.ts` 拥有精确 scoped 记录、显式收起、版本拒绝/保留、
+quota/读取拒绝及旧 scoped ID 经有效图迁移；继续扩展 `canvas-conversations-controller.test.ts`，覆盖 suspend 不删意图、
+恢复时每 Thread 首次刷新、失配引用/结束私聊不替代、取消后的迟到结果、输入保存失败不离开。
+`App.test.ts` 扩展失败/拒绝导航的恢复通知。浏览器夹具挂载生产 CanvasWorkspace、CanvasSurface、ReactFlow 和编辑器，
+检查独立双草稿、切板、切页、页面刷新、收起保持关闭、重开及 drawer 不持久，并审阅实际只读运输记录。
+该挂载发现并修复节点几何随内容/空分组数组反复更新的 ReactFlow 白屏；原纯/静态测试不覆盖此问题。
+页面 reload/localStorage 不等于完整 Native 进程重启；原编辑器 undo 保留、异常退出、私有附件/quotes CAS 与平台规模继续待验。
+
 ## Rust 测试准入与退役门槛
 
 Canvas `group.sourceMembers`扩展复用`canvas_node::tests::eight_kinds_preserve_source_geometry_text_and_reference_limits`的旧Group序列化断言，

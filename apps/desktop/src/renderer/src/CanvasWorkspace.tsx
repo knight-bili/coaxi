@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CanvasBoard, StoredCommandResult, NavigationPreferencesSnapshot, NavigationProjectLayoutMutation } from '@contracts'
 import { CanvasSurface, type CanvasLeaveGuard, type CanvasSurfaceProps } from './CanvasSurface'
 import { CanvasBoardDialog } from './CanvasBoardDialog'
@@ -60,6 +60,7 @@ function CanvasWorkspaceContent({ scope, identityIssue, onRetryIdentity, onLeave
   const { controller, state } = useCanvasBoards(), [storage] = useState(browserCanvasStorage)
   const catalog = useCanvasReferences()
   const [selectedId, setSelectedId] = useState(() => loadCanvasBoardSelection(storage, scope))
+  const [restoreRevision, setRestoreRevision] = useState(0)
   const [dialog, setDialog] = useState<{ board: CanvasBoard | null; remove: boolean } | null>(null)
   const [groupManager, setGroupManager] = useState(false)
   const [issue, setIssue] = useState<string | null>(null), panel = useRef(false), graphGuard = useRef<CanvasLeaveGuard | null>(null)
@@ -67,14 +68,14 @@ function CanvasWorkspaceContent({ scope, identityIssue, onRetryIdentity, onLeave
   const boards = state.snapshot?.boards ?? NO_BOARDS
   const selected = boards.find(board => board.id === selectedId) ?? null
   const registerGraphGuard = useCallback((guard: CanvasLeaveGuard | null) => { graphGuard.current = guard }, [])
-  const isBlocked = useCallback(() => panel.current || Boolean(conversationRef.current?.opening || controller.current?.getSnapshot().pending || graphGuard.current?.isBlocked()), [controller])
+  const isBlocked = useCallback(() => panel.current || Boolean(conversationRef.current?.opening || conversationRef.current?.restoring || controller.current?.getSnapshot().pending || graphGuard.current?.isBlocked()), [controller])
   const canLeave = useCallback(async () => {
     if (isBlocked()) { setIssue(uiAttribute('请先保存或取消编辑，并核对未完成的画布操作。')); return false }
-    try { return await conversationRef.current?.close() ?? true }
+    try { return await conversationRef.current?.suspend() ?? true }
     catch (error) { setIssue(readErrorMessage(error)); return false }
   }, [isBlocked])
   useEffect(() => {
-    const guard = { canLeave, isBlocked }
+    const guard = { canLeave, isBlocked, resume: () => setRestoreRevision(value => value + 1) }
     onLeaveGuardChange?.(guard)
     const beforeUnload = (event: BeforeUnloadEvent) => { if (guard.isBlocked()) { event.preventDefault(); event.returnValue = '' } }
     window.addEventListener('beforeunload', beforeUnload)
@@ -93,7 +94,7 @@ function CanvasWorkspaceContent({ scope, identityIssue, onRetryIdentity, onLeave
     if (!await canLeave()) return
     setIssue(null); panel.current = true; setDialog({ board: board ? structuredClone(board) : null, remove })
   }
-  const closeDialog = () => { if (!controller.current?.getSnapshot().pending) { panel.current = false; setDialog(null) } }
+  const closeDialog = () => { if (!controller.current?.getSnapshot().pending) { panel.current = false; setDialog(null); setRestoreRevision(value => value + 1) } }
   const acceptReceipt = (result: StoredCommandResult) => {
     if (result.status === 'rejected') {
       const message = result.code === 'canvas.board.conflict' ? uiAttribute('画板已有新修改，此次操作未保存。请重新核对。') : uiAttribute('画板操作未完成，请核对输入后重试。')
@@ -102,7 +103,7 @@ function CanvasWorkspaceContent({ scope, identityIssue, onRetryIdentity, onLeave
     const board = result.payload.board as Partial<CanvasBoard> | undefined
     if (result.commandType === 'canvas.boards.create' && typeof board?.id === 'string') setSelectedId(board.id)
     if (result.commandType === 'canvas.boards.delete' && result.payload.boardId === selectedId) setSelectedId(null)
-    panel.current = false; setDialog(null); setIssue(null)
+    panel.current = false; setDialog(null); setIssue(null); setRestoreRevision(value => value + 1)
   }
   const save = async (intent: CanvasBoardIntent) => {
     if (!controller.current) throw new Error(uiAttribute('画板页面尚未准备好。'))
@@ -122,8 +123,8 @@ function CanvasWorkspaceContent({ scope, identityIssue, onRetryIdentity, onLeave
       <button type="button" onClick={() => { void recover(true) }}><UiText zh="重试原操作" /></button></>}
   </div>
   const blocked = state.loading || Boolean(state.readError || state.pending || dialog || groupManager)
-  const groups = navigationPreferences && !navigationPreferences.readError ? navigationPreferences.projectGroups.map(group => ({ id: group.id, label: group.name, color: group.color,
-    projectPaths: group.projectPaths.filter(path => navigationPreferences.registeredProjects.includes(path) && !navigationPreferences.removedProjects.some(item => item.targetKey === `directory:${path}`)) })) : []
+  const groups = useMemo(() => navigationPreferences && !navigationPreferences.readError ? navigationPreferences.projectGroups.map(group => ({ id: group.id, label: group.name, color: group.color,
+    projectPaths: group.projectPaths.filter(path => navigationPreferences.registeredProjects.includes(path) && !navigationPreferences.removedProjects.some(item => item.targetKey === `directory:${path}`)) })) : [], [navigationPreferences])
   return <section className="canvas-workspace" aria-label={uiAttribute('画板工作区')}>
     <header className="canvas-boards-toolbar">
       <label><span className="sr-only"><UiText zh="当前画板" /></span><select value={selectedId ?? ''} disabled={blocked || !boards.length}
@@ -146,7 +147,7 @@ function CanvasWorkspaceContent({ scope, identityIssue, onRetryIdentity, onLeave
     </div>}
     {!state.snapshot && state.loading && <p role="status"><UiText zh="正在读取画板…" /></p>}
     {state.snapshot && !boards.length && !state.loading && <div className="canvas-workspace-empty"><h2><UiText zh="还没有画板" /></h2><p><UiText zh="创建一张画板，整理工程、队员、对话和便签。" /></p></div>}
-    {selectedId && <CanvasSurface {...props} boardId={selectedId} scope={scope} catalog={catalog} groups={groups}
+    {selectedId && <CanvasSurface {...props} boardId={selectedId} scope={scope} catalog={catalog} groups={groups} restoreRevision={restoreRevision}
       onRefreshReferences={() => { void catalog.refresh().catch(() => undefined) }} onLeaveGuardChange={registerGraphGuard} />}
     {dialog && <CanvasBoardDialog board={dialog.board} remove={dialog.remove}
       latest={dialog.board ? boards.find(board => board.id === dialog.board!.id) ?? null : null}
@@ -154,6 +155,6 @@ function CanvasWorkspaceContent({ scope, identityIssue, onRetryIdentity, onLeave
       commandError={issue}
       onClose={closeDialog} onSave={save} />}
     {groupManager && navigationPreferences && onProjectLayout && onRefreshProjectGroups && <ProjectGroupsDialog snapshot={navigationPreferences}
-      onSave={onProjectLayout} onRefresh={onRefreshProjectGroups} onClose={() => { panel.current = false; setGroupManager(false) }} />}
+      onSave={onProjectLayout} onRefresh={onRefreshProjectGroups} onClose={() => { panel.current = false; setGroupManager(false); setRestoreRevision(value => value + 1) }} />}
   </section>
 }
