@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "私聊材料隔离r1完成16页自审且获客户明确确认，开始Core归属/默认兼容/迁移，再逐步接附件引用发送恢复；不重复确认、不缩一期。",
+  "current_slice": "已确认私聊材料隔离r1：Core scope闭合编码、Legacy/显式null及精确pin只读基础已编写，本地原文SQL25项见证通过；生产接口/存储与Rust资格尚未接通或执行。",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "按已确认私聊材料隔离r1实施Core scope/认证/迁移，再接材料CAS、FIFO发送、编辑租约、整份保留/交换及原UUID未知恢复；24项PC均待执行。Native恢复/Host/并发图/HTML规模/旧焦点问题继续。",
+    "原子迁移复合主键、scope注册与完整保留输入存储，默认路径全部加scope围栏；随后按已确认r1接完整材料、队列和恢复，PC01-PC24保持待验；Native恢复/Host/HTML规模/旧焦点继续。",
     "继续I03独立持久Mission/Task/Diff对象引用及启动/定位、文件节点授权和真实临时PTY、Desktop冷启动画布；现Thread关联Mission与累计Diff卡片接线已mock前端验证，私有来源完整导航和真实Core/Runtime仍待阶段候选。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "private_materials_r1_human_confirmed_implementation_starting",
+  "current_slice_status": "private_composer_scope_codec_and_exact_pin_foundation_written_production_wiring_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -112,7 +112,7 @@
     "source_progress_continued": true
   },
   "project_groups_evidence": "i03-project-groups-result.json",
-  "checked_at": "2026-10-15T12:00:20.468496+00:00",
+  "checked_at": "2026-10-15T12:12:23.053433+00:00",
   "project_layout_evidence": "i03-project-layout-result.json",
   "project_tree_evidence": "i03-project-tree-result.json",
   "navigation_activity_evidence": "i03-navigation-activity-result.json",
@@ -134,5 +134,6 @@
   "canvas_recovery_evidence": "i03-canvas-recovery-result.json",
   "canvas_atomic_leave_evidence": "i03-canvas-atomic-leave-result.json",
   "canvas_mission_evidence": "i03-canvas-mission-result.json",
-  "canvas_private_materials_proposal_evidence": "i03-private-materials-proposal-result.json"
+  "canvas_private_materials_proposal_evidence": "i03-private-materials-proposal-result.json",
+  "canvas_private_scope_foundation_evidence": "i03-private-scope-foundation-result.json"
 }

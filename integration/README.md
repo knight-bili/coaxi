@@ -46,3 +46,5 @@ I00已自审修正并合入，I01基础构建与契约证据保留草稿；I02�
 - [I03卡片使命交付与累计Diff检查点](execution/i03-canvas-mission-result.json)：复用原Mission说明/启动/交付/活动/累计Diff，核对Thread/Mission标识、来源回原卡片及镜像控件隔离；修复选中节点遮挡真实会话控件。228相关检查与类型/文案/文档、mock前端交互通过；独立持久对象引用、完整私有导航和真实使命运行/平台验收继续。
 
 - [I03私聊卡片材料隔离r1](proposals/canvas-private-materials-r1.md)：16页客户确认版已逐页自审且获明确确认，[证据](execution/i03-private-materials-proposal-result.json)绑定批准文件摘要。继续Core归属、完整输入保留和未知结果恢复；24项验证要求仍待执行，不计作功能通过。
+
+- [I03私聊草稿归属基础](execution/i03-private-scope-foundation-result.json)：r1已确认；闭合codec、旧省略/显式null区分与精确活跃私聊pin校验已编写，原文SQL25项见证/格式/文档通过；Rust两owner未编译执行，生产新接口及新存储尚未接通，不计作完整隔离功能通过。
