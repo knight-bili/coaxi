@@ -25,3 +25,5 @@ I00已自审修正并合入，I01基础构建与契约证据保留草稿；I02�
 - [I03区域成员拖放检查点](execution/i03-canvas-member-drag-result.json)：派生成员节点、跨源原子分组、精确引用和旧服务保护已编码；52项相关检查及定向类型/文档/格式通过，新增Rust与真实Host/UI仍待阶段候选，原地展开和Composer继续实施。
 
 - [I03画布原地与侧边会话检查点](execution/i03-canvas-conversation-result.json)：复用既有会话/输入/执行控制，补精确私有绑定和离开保护；40项组件及4项离开退出检查通过，定向类型/文案/文档通过，真实UI/Runtime及多卡、重开恢复、通知继续，不作为I03完成依据。
+
+- [I03会话读写归属检查点](execution/i03-thread-scope-result.json)：既有页面改用固定Core client/Thread的共享读写层；13声明保持原文、10旧导出兼容，216项定向检查与类型/文案/文档通过。多卡实例、共享草稿和展开恢复仍继续，实际UI/Runtime待阶段候选。

@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "I03画布原地展开/侧边会话、共享ThreadWorkspace与精确私有绑定已编码；40项组件检查+4项离开退出检查、定向类型/文案/文档通过。源码b07fb4a0，真实UI/Runtime及多卡/重开恢复/通知继续。",
+  "current_slice": "I03会话共享读写层已接入既有页面，按Core client/Thread固定绑定8项操作及只读open，审批迟到围栏已补；13声明原文不变/10旧导出保留，216定向检查及类型/文案/文档通过。源码53aecaf3；多卡实例/共享草稿/重开恢复与实际UI仍继续。",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "继续I03多卡片同时展开、按精确Thread/Conversation隔离和共享输入owner、展开状态重开恢复与真实可见通知确认；原地/侧边单一宿主已编码，本批40+4定向检查通过，实际UI/附件/流式/问题权限/审批/停止仍待阶段候选，不据此标I03完成。",
+    "接每Thread读取/刷新与每精确引用呈现实例，公共ThreadWorkspace及私有SingleChatPanel共享现成Core transport；公开/私有同Thread不能多挂公开草稿owner。 保留同引用镜像多处展开，需共享草稿及发送锁，不能静默缩成只读镜像或唯一卡片；固定供体源码继续核查其draft绑定。 稳定portal子树、多实例leave准备、Host/Core/board展开恢复、只读请求并发及可见通知继续；随后Mission/Task/Thread/Diff、授权文件、真实PTY及Desktop冷路由。",
     "继续I03 Mission/Task/Thread/Diff精确定位、授权文件预览、真实临时PTY生命周期和Desktop冷启动画布路由；阶段候选集中完整编译/集成/平台验证。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "inline_drawer_shared_workspace_and_bound_private_reference_coded_targeted_checks_passed_mounted_UI_Runtime_pending",
+  "current_slice_status": "shared_Thread_data_and_bound_Core_commands_used_by_existing_workspace_216_checks_passed_multi_instance_UI_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -57,7 +57,7 @@
   "skill_catalog_evidence": "i02-skill-catalog-result.json",
   "skill_install_evidence": "i02-skill-install-result.json",
   "system_goal_status": "active",
-  "system_goal_verified_at": "2026-10-15T05:10:22.809Z",
+  "system_goal_verified_at": "2026-10-15T05:30:15.935Z",
   "skill_members_evidence": "i02-skill-members-result.json",
   "canvas_boards_evidence": "i03-canvas-boards-result.json",
   "skill_delivery_preparation_evidence": "i02-skill-delivery-preparation-result.json",
@@ -112,10 +112,11 @@
     "source_progress_continued": true
   },
   "project_groups_evidence": "i03-project-groups-result.json",
-  "checked_at": "2026-10-15T05:10:22.809Z",
+  "checked_at": "2026-10-15T05:30:15.935Z",
   "project_layout_evidence": "i03-project-layout-result.json",
   "project_tree_evidence": "i03-project-tree-result.json",
   "navigation_activity_evidence": "i03-navigation-activity-result.json",
   "canvas_member_drag_evidence": "i03-canvas-member-drag-result.json",
-  "canvas_conversation_evidence": "i03-canvas-conversation-result.json"
+  "canvas_conversation_evidence": "i03-canvas-conversation-result.json",
+  "thread_scope_evidence": "i03-thread-scope-result.json"
 }
