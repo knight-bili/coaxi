@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "I03私有共享正文/发送互斥、失败保存和保留输入恢复已接既有面板；11个新纯用例及原owner共41项通过，定向类型/文案/文档与原RPC表达式核对通过。源码4c35cf3c；公开草稿镜像、多卡实际挂载及重开恢复仍继续。",
+  "current_slice": "I03按固定Codeg源码改正草稿共享假设：已接每卡独立公开/私有正文、Pending并集与Web公开归档/精确副本；源码2774006a，251相关检查及定向类型/文案/文档通过。多卡实际挂载和私有附件/quotes隔离仍继续。",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "继续公开Thread草稿的共享coordinator/工作中正文及发送互斥，镜像均完整可编辑；需保留Lexical焦点/IME/撤销，不能退成只读镜像或唯一卡。 接每Thread读取/刷新及精确引用多呈现实例、全部leave准备、各Thread文件预览、稳定portal、Host/Core/board展开恢复与可见通知。",
+    "继续接同Thread只读读取/刷新owner与精确引用多卡呈现，每卡独立输入、自己的FilePreviewProvider和稳定portal；保留全部leave准备/回滚、Host/Core/board展开恢复及可见通知，恢复不得enter或启动Runtime。 补私有附件/quotes的卡片隔离及原Core Draft CAS/未知结果，核对卡片删除/换绑后孤立输入恢复、跨编辑端接管与规模/配额；不能把当前独立正文当完整附件隔离或多卡完成。",
     "继续I03 Mission/Task/Thread/Diff精确定位、授权文件预览、真实临时PTY生命周期和Desktop冷启动画布路由；阶段候选集中完整编译/集成/平台验证。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "shared_private_body_store_send_exclusion_retained_input_recovery_used_by_existing_panel_41_checks_passed_multi_UI_pending",
+  "current_slice_status": "independent_canvas_card_drafts_pending_union_and_web_archive_wired_251_checks_passed_actual_multi_UI_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -57,7 +57,7 @@
   "skill_catalog_evidence": "i02-skill-catalog-result.json",
   "skill_install_evidence": "i02-skill-install-result.json",
   "system_goal_status": "active",
-  "system_goal_verified_at": "2026-10-15T06:00:41.356Z",
+  "system_goal_verified_at": "2026-10-15T06:49:16.957Z",
   "skill_members_evidence": "i02-skill-members-result.json",
   "canvas_boards_evidence": "i03-canvas-boards-result.json",
   "skill_delivery_preparation_evidence": "i02-skill-delivery-preparation-result.json",
@@ -112,12 +112,20 @@
     "source_progress_continued": true
   },
   "project_groups_evidence": "i03-project-groups-result.json",
-  "checked_at": "2026-10-15T06:00:41.356Z",
+  "checked_at": "2026-10-15T06:49:16.957Z",
   "project_layout_evidence": "i03-project-layout-result.json",
   "project_tree_evidence": "i03-project-tree-result.json",
   "navigation_activity_evidence": "i03-navigation-activity-result.json",
   "canvas_member_drag_evidence": "i03-canvas-member-drag-result.json",
   "canvas_conversation_evidence": "i03-canvas-conversation-result.json",
   "thread_scope_evidence": "i03-thread-scope-result.json",
-  "single_chat_shared_evidence": "i03-single-chat-shared-result.json"
+  "single_chat_shared_evidence": "i03-single-chat-shared-result.json",
+  "canvas_composer_context_evidence": "i03-canvas-composer-context-result.json",
+  "canvas_draft_plan_correction": {
+    "source": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+    "file": "src/components/canvas/canvas-conversation-surface.tsx",
+    "draft_line": 786,
+    "policy": "per_card_context_independent_input_same_card_presentation_reuses_editor",
+    "evidence": "i03-canvas-composer-context-result.json"
+  }
 }
