@@ -909,6 +909,7 @@ export interface SendSingleChatMessageCommand {
   conversationId: string
   body: string
   draftRevision: number
+  composerScope?: SingleChatComposerScope | null
 }
 
 export interface EndSingleChatCommand {
@@ -975,6 +976,86 @@ export interface SingleChatComposerDraftView {
   revision: number
   attachments: LocalAttachmentSourceView[]
   updatedAt: string | null
+}
+
+export interface SingleChatComposerScope {
+  kind: 'canvas'
+  boardId: string
+  nodeId: string
+}
+
+export interface ScopedSingleChatComposerDraftView extends SingleChatComposerDraftView {
+  scopeVersion: 1
+  scopeKey: string
+  composerScope: SingleChatComposerScope | null
+}
+
+export interface ScopedSingleChatSnapshot extends SingleChatSnapshot {
+  draft: ScopedSingleChatComposerDraftView
+  pendingInputs: SingleChatPendingInputsView & { editingElsewhere: boolean }
+}
+
+export type PrivateComposerAction =
+  | { type: 'register_scope' }
+  | { type: 'remove_attachment'; attachmentRefId: string }
+  | { type: 'reorder_attachments'; attachmentRefIds: string[] }
+  | { type: 'quote'; action: MessageQuoteAction }
+  | { type: 'swap_retained'; retainedInputId: string; expectedRetainedRevision: number; currentBody: string }
+  | { type: 'discard_retained'; retainedInputId: string; expectedRetainedRevision: number }
+  | { type: 'adopt_legacy_materials'; expectedSourceRevision: number; targetBody: string }
+
+export interface MutatePrivateComposerCommand {
+  threadId: string
+  conversationId: string
+  composerScope?: SingleChatComposerScope | null
+  expectedDraftRevision: number
+  action: PrivateComposerAction
+}
+
+export interface PrivateComposerScopeEntry {
+  scopeKey: string
+  composerScope: SingleChatComposerScope | null
+  orphaned: boolean
+  draftRevision: number
+  attachmentCount: number
+  quoteCount: number
+  retainedInputCount: number
+  updatedAt: string | null
+}
+
+export interface RetainedPrivateInput {
+  id: string
+  conversationId: string
+  scopeKey: string
+  revision: number
+  body: string
+  attachments: LocalAttachmentSourceView[]
+  quotes: MessageQuoteSnapshot[]
+  updatedAt: string
+}
+
+export interface PrivateComposerMutationPayload {
+  draft: ScopedSingleChatComposerDraftView
+  body?: string
+  retainedInput?: RetainedPrivateInput
+}
+
+export type PrivateComposerRecoveryItem =
+  | { kind: 'scope'; scope: PrivateComposerScopeEntry }
+  | { kind: 'retained'; input: RetainedPrivateInput }
+
+export interface PrivateComposerRecoveryResult {
+  items: PrivateComposerRecoveryItem[]
+  nextCursor: string | null
+  complete: boolean
+  throughGlobalSequence: number
+}
+
+export interface PrivateComposerRecoveryParams {
+  threadId: string
+  conversationId: string
+  cursor?: string | null
+  limit?: number
 }
 
 export interface SingleChatPendingInputView {
@@ -4567,6 +4648,8 @@ export type CoreMethod =
   | 'singleChat.end'
   | 'singleChat.sourceAttachments.addFromPath'
   | 'singleChat.composerDraft.removeAttachment'
+  | 'singleChat.composerDraft.mutate'
+  | 'singleChat.composerDraft.recovery'
   | 'singleChat.pendingInputs.addSourceAttachmentFromPath'
   | 'singleChat.pendingInputs.edit'
   | 'agentRuns.cancel'

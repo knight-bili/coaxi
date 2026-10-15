@@ -71,8 +71,9 @@ operation may change layout without changing or deleting the referenced business
 [Scope 合同](../contracts/single-chat-composer-scope-v1.md)区分可信编辑端身份和卡片材料归属，
 保留默认草稿、单一 FIFO、旧命令摘要与已冻结输入。Scope codec、真实 pin 校验和 Schema155/Migration205 存储已实现，
 默认 SQL/quote/资源读取限定空 scope。Core 已实现材料七动作、精确读取、有界恢复及按 scope 消费后进入原单一 FIFO；
-完整保留项与回执同事务，引用复用原捕获和模型投影。新 get/mutate/recovery 的 Application/Host/客户端仍待接线，
-上传准备、编辑接管/完整移回及本机意图恢复继续，不能据此暴露 scopeVersion 能力或宣称完整隔离功能完成。
+完整保留项与回执同事务，引用复用原捕获和模型投影。get/mutate/recovery 已接同一 Application、两端准入与共享客户端能力核对，
+显式请求才回显 scopeVersion；快照草稿和编辑会话按同一归属过滤，原回执只读恢复不派发命令。
+上传准备、编辑接管/完整移回及本机意图恢复继续；UI 尚未启用，真实 Host/Runtime 与完整隔离功能仍待验。
 
 会话读取由 client 所有的 `ThreadProjectionStore` 按 Thread 隔离，现有页面的只读打开、刷新、缓存和历史分页已接入。
 同 Thread 的同时打开合并运输；刷新发生在读取过程中时追加一次最新读取，不把较早的在途请求当刷新完成。

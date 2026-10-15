@@ -105,6 +105,10 @@ pub enum Operation {
     SingleChatPendingEdit,
     #[serde(rename = "singleChat.composerDraft.removeAttachment")]
     SingleChatRemoveAttachment,
+    #[serde(rename = "singleChat.composerDraft.mutate")]
+    SingleChatComposerMutate,
+    #[serde(rename = "singleChat.composerDraft.recovery")]
+    SingleChatComposerRecovery,
 
     #[serde(rename = "skills.content.read")]
     SkillContent,
@@ -533,6 +537,8 @@ impl Operation {
             Self::SingleChatEnd => "singleChat.end",
             Self::SingleChatPendingEdit => "singleChat.pendingInputs.edit",
             Self::SingleChatRemoveAttachment => "singleChat.composerDraft.removeAttachment",
+            Self::SingleChatComposerMutate => "singleChat.composerDraft.mutate",
+            Self::SingleChatComposerRecovery => "singleChat.composerDraft.recovery",
 
             Self::MemoryCreate => "memory.create",
             Self::MemoryRevise => "memory.revise",
@@ -757,6 +763,14 @@ mod tests {
             .expect("User message withdrawal should be admitted by the Web Host");
         assert_eq!(withdraw.method(), "camp.messages.withdraw");
         for (public, internal) in [
+            (
+                "singleChat.composerDraft.mutate",
+                "singleChat.composerDraft.mutate",
+            ),
+            (
+                "singleChat.composerDraft.recovery",
+                "singleChat.composerDraft.recovery",
+            ),
             ("thread.messages.anchors", "camp.messages.anchors"),
             (
                 "thread.messages.anchorPreview",

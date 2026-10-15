@@ -4,6 +4,7 @@ use rusqlite::OptionalExtension;
 mod config;
 mod conversation_preferences;
 mod mission;
+pub(crate) mod private_composer;
 mod transport;
 mod web_commands;
 pub use config::{CoreConfig, RemovedSkillProjectRoots};
@@ -1337,12 +1338,6 @@ struct ThreadCreationMember {
 struct ThreadIdParams {
     #[serde(rename = "threadId", alias = "campId")]
     camp_id: ThreadId,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
-struct SingleChatSnapshotParams {
-    conversation_id: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -10367,14 +10362,26 @@ impl Core {
                         .list_active(&database, params.camp_id.as_str())?,
                 )?)
             }
-            "singleChat.get" => {
-                let params: SingleChatSnapshotParams =
-                    serde_json::from_value(request.params.clone())?;
-                let database = self.database.lock().await;
-                Ok(serde_json::to_value(
-                    SingleChatService::for_client(request.client.clone())
-                        .snapshot(&database, &params.conversation_id)?,
-                )?)
+            "singleChat.get"
+            | "singleChat.composerDraft.mutate"
+            | "singleChat.composerDraft.recovery" => {
+                let reply = {
+                    let mut database = self.database.lock().await;
+                    private_composer::handle(
+                        &mut database,
+                        &request.client,
+                        &request.method,
+                        request.params.clone(),
+                    )?
+                };
+                if let Some((thread_id, conversation_id)) = reply.changed {
+                    emit(
+                        &self.output,
+                        "single_chat.changed",
+                        json!({"threadId":thread_id,"conversationId":conversation_id}),
+                    );
+                }
+                Ok(reply.result)
             }
             "singleChat.sourceAttachments.addFromPath" => {
                 let params: AddSingleChatSourceAttachmentFromPathParams =

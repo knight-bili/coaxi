@@ -49,6 +49,9 @@ pub(super) fn reconcile(
         }};
     }
     match query.operation.as_str() {
+        "singleChat.composerDraft.mutate" => {
+            private_composer::reconcile(database, client, query.params)
+        }
         "canvas.boards.create" => user!(rovai_core::canvas_board::CreateCanvasBoardCommand),
         "canvas.boards.update" => user!(rovai_core::canvas_board::UpdateCanvasBoardCommand),
         "canvas.boards.delete" => user!(rovai_core::canvas_board::DeleteCanvasBoardCommand),

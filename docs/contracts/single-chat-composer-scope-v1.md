@@ -64,12 +64,24 @@ Core recovery 仅列出当前可信编辑端在指定 Thread/Conversation 的 sc
 翻页期间状态变化时 complete 为 false；缺页、未完整或游标失效不能解释成删除。进程重启会使进程期签名游标失效，
 客户端重新只读枚举，原输入不受影响。游标不替代 Host 认证；孤立输入仍按原归属保留，不自动绑定或发送。
 
-新 get 能力协商、mutate/recovery 的 Application/Host/RPC 与客户端尚未接线，生产 get 不广告 scopeVersion，
-现有准入操作数仍178。上传 prepare UUID/源摘要、编辑租约接管/完整移回及本机意图恢复继续实施；
-不能因 Core 服务存在而启用前端能力，不能宣称最终 Manifest Blob、实际 Runtime 或完整隔离已经验收。
+Application 已接 `singleChat.get`、`singleChat.composerDraft.mutate` 和 `.recovery` 的同一封闭入口；
+可信 Request 注入 DraftClient，网络或 Renderer 不能自报编辑端。Web 枚举、Desktop Main 与 TS 准入同步增加两项，
+current 操作数180，历史来源161保持。新增材料命令也进入原只读 `commands.reconcile`：原 UUID/完整请求核对原回执，
+结果未知时不派发；执行与回查复用同一闭合解析器。重放不再发布变更提示，首次提示只含 Thread/Conversation 标识。
+
+get 省略 composerScope 保留旧四字段 draft 和原 pendingInputs 响应；显式 null 或完整描述才返回 scopeVersion 1、
+scopeKey 与完整描述回显，并在 pendingInputs 增加 editingElsewhere 布尔值。draft 和编辑会话都按同一可信 client/scope 读取，
+其他位置不返回 editToken、未保存正文或 working quotes。公开历史/原私聊 FIFO 仍由原 snapshot 拥有。
+共享只读客户端核对 Thread、Conversation、完整描述、key 和版本；缺失/错误能力回显明确失败，不登记、不发送、不自动降级。
+
+上传 prepare UUID/源摘要、编辑租约接管/完整移回及本机意图恢复继续实施；现有排队编辑拒绝未支持的 scope 参数，
+不能据 scopeVersion 推定这些未完成链路可用。卡片 UI 尚未启用新材料操作；最终 Manifest Blob、实际 Runtime 和完整隔离仍待验收。
 
 本轮因主键及迁移安全影响后续接线，按阶段策略例外做本地定向编译/迁移 owner，完整跨平台、实际 Runtime 与 PC01–PC24 仍待验。
 具体命令、源码和失败记录见[迁移执行证据](../../integration/execution/i03-private-scope-storage-result.json)，不宣称完整功能或整套一期通过。
 
 材料服务与按 scope 发送的17项本地定向检查、自审修正和未验边界见
 [业务服务执行证据](../../integration/execution/i03-private-composer-service-result.json)。完整 PC01–PC24 仍待全链路验证。
+
+Application/可信编辑端接线、默认形状/编辑令牌隔离、回执只读核对及客户端能力检查见
+[应用入口执行证据](../../integration/execution/i03-private-composer-api-result.json)。实际 Host HTTP/Native IPC 与完整平台随阶段候选验证。

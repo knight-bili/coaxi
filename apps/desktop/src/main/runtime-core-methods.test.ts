@@ -33,12 +33,13 @@ describe('Runtime Renderer Core method allowlist', () => {
     )
   })
 
-  it('allows the Single Chat pending-input mutation implemented by Core', () => {
+  it('allows the Single Chat pending-input and scoped-material operations implemented by Core', () => {
     const allowlistStart = mainSource.indexOf('const allowedMethods = new Set<CoreMethod>([')
     const allowlistEnd = mainSource.indexOf('\n])', allowlistStart)
     expect(allowlistStart).toBeGreaterThan(-1)
     expect(allowlistEnd).toBeGreaterThan(allowlistStart)
-    expect(mainSource.slice(allowlistStart, allowlistEnd))
-      .toContain("'singleChat.pendingInputs.edit'")
+    for (const method of ['singleChat.pendingInputs.edit', 'singleChat.composerDraft.mutate', 'singleChat.composerDraft.recovery']) {
+      expect(mainSource.slice(allowlistStart, allowlistEnd)).toContain(`'${method}'`)
+    }
   })
 })

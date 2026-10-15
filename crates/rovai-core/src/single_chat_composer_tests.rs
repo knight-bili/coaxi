@@ -739,6 +739,7 @@ fn send_consumes_only_the_registered_scope_and_keeps_one_private_fifo_and_legacy
         1,
         "scope cards do not create parallel execution lanes"
     );
+    verify_application_routes(&mut f, &snapshot.pending_inputs.items[0]);
     assert_eq!(
         serde_json::to_value(&quote.model_projection())
             .unwrap()
@@ -747,4 +748,206 @@ fn send_consumes_only_the_registered_scope_and_keeps_one_private_fifo_and_legacy
             .len(),
         3
     );
+}
+
+fn verify_application_routes(
+    f: &mut Fixture,
+    pending: &crate::single_chat::SingleChatPendingInputView,
+) {
+    use crate::application::private_composer::{handle, reconcile};
+    use crate::single_chat::{EditSingleChatPendingInputCommand, SingleChatPendingInputEditAction};
+    let client = DraftClient::default();
+    SingleChatService::default()
+        .edit_pending_input(
+            &mut f.database,
+            &envelope(
+                Some(&f.thread),
+                EditSingleChatPendingInputCommand {
+                    draft_client: client.clone(),
+                    camp_id: f.thread.clone(),
+                    conversation_id: f.conversation.clone(),
+                    pending_input_id: pending.id.clone(),
+                    expected_revision: pending.revision,
+                    edit_token: None,
+                    action: SingleChatPendingInputEditAction::Begin,
+                },
+            ),
+        )
+        .unwrap();
+    f.database.connection().execute("UPDATE single_chat_pending_input_edit_session SET working_body='默认位置未保存正文' WHERE conversation_id=?1", [&f.conversation]).unwrap();
+    let legacy = handle(
+        &mut f.database,
+        &client,
+        "singleChat.get",
+        json!({"conversationId":f.conversation}),
+    )
+    .unwrap();
+    assert_eq!(legacy.result["draft"].as_object().unwrap().len(), 4);
+    assert!(
+        legacy.result["pendingInputs"]
+            .get("editingElsewhere")
+            .is_none()
+    );
+    let token = legacy.result["pendingInputs"]["editSession"]["editToken"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+    let default_view = handle(
+        &mut f.database,
+        &client,
+        "singleChat.get",
+        json!({"conversationId":f.conversation,"composerScope":null}),
+    )
+    .unwrap();
+    assert_eq!(default_view.result["draft"]["scopeVersion"], 1);
+    assert_eq!(default_view.result["draft"]["scopeKey"], "");
+    assert_eq!(
+        default_view.result["pendingInputs"]["editingElsewhere"],
+        false
+    );
+    let alpha = handle(
+        &mut f.database,
+        &client,
+        "singleChat.get",
+        json!({"conversationId":f.conversation,"composerScope":f.scopes[0]}),
+    )
+    .unwrap();
+    assert!(alpha.result["pendingInputs"]["editSession"].is_null());
+    assert_eq!(alpha.result["pendingInputs"]["editingElsewhere"], true);
+    assert!(
+        !serde_json::to_string(&alpha.result)
+            .unwrap()
+            .contains(&token)
+    );
+    assert!(
+        !serde_json::to_string(&alpha.result)
+            .unwrap()
+            .contains("默认位置未保存正文")
+    );
+    assert!(
+        alpha.result["draft"]["attachments"]
+            .as_array()
+            .unwrap()
+            .is_empty()
+    );
+    let beta_key = PrivateComposerKey::for_scope(Some(&f.scopes[1])).unwrap();
+    f.database.connection().execute("UPDATE single_chat_pending_input_edit_session SET scope_key=?2 WHERE conversation_id=?1", params![f.conversation,beta_key.sql_key()]).unwrap();
+    let default_hidden = handle(
+        &mut f.database,
+        &client,
+        "singleChat.get",
+        json!({"conversationId":f.conversation}),
+    )
+    .unwrap();
+    assert!(default_hidden.result["pendingInputs"]["editSession"].is_null());
+    let beta = handle(
+        &mut f.database,
+        &client,
+        "singleChat.get",
+        json!({"conversationId":f.conversation,"composerScope":f.scopes[1]}),
+    )
+    .unwrap();
+    assert_eq!(
+        beta.result["pendingInputs"]["editSession"]["editToken"],
+        token
+    );
+    assert_eq!(
+        beta.result["pendingInputs"]["editSession"]["workingQuotes"][0]["quoteId"],
+        pending.quotes[0].quote_id
+    );
+    assert_eq!(beta.result["pendingInputs"]["editingElsewhere"], false);
+    let web = DraftClient::verified_web(&"6".repeat(64)).unwrap();
+    let mutation = json!({"commandId":Uuid::new_v4().to_string(),"command":{
+        "threadId":f.thread,"conversationId":f.conversation,"composerScope":f.scopes[2],
+        "expectedDraftRevision":0,"action":{"type":"register_scope"}}});
+    assert_eq!(
+        reconcile(&f.database, &web, mutation.clone()).unwrap()["state"],
+        "unknown"
+    );
+    let first = handle(
+        &mut f.database,
+        &web,
+        "singleChat.composerDraft.mutate",
+        mutation.clone(),
+    )
+    .unwrap();
+    assert_eq!(first.result["status"], "applied");
+    assert_eq!(
+        first.changed,
+        Some((f.thread.clone(), f.conversation.clone()))
+    );
+    let before: i64 = f
+        .database
+        .connection()
+        .query_row("SELECT COUNT(*) FROM event_log", [], |row| row.get(0))
+        .unwrap();
+    let stored = reconcile(&f.database, &web, mutation.clone()).unwrap();
+    assert_eq!(stored["state"], "recorded");
+    assert_eq!(stored["result"], first.result);
+    let again = handle(
+        &mut f.database,
+        &web,
+        "singleChat.composerDraft.mutate",
+        mutation.clone(),
+    )
+    .unwrap();
+    assert_eq!(again.result, first.result);
+    assert!(again.changed.is_none());
+    assert!(reconcile(&f.database, &client, mutation.clone()).is_err());
+    let after: i64 = f
+        .database
+        .connection()
+        .query_row("SELECT COUNT(*) FROM event_log", [], |row| row.get(0))
+        .unwrap();
+    assert_eq!(before, after);
+    let recovery = handle(
+        &mut f.database,
+        &web,
+        "singleChat.composerDraft.recovery",
+        json!({"threadId":f.thread,"conversationId":f.conversation}),
+    )
+    .unwrap();
+    assert_eq!(recovery.result["items"].as_array().unwrap().len(), 1);
+    assert_eq!(
+        recovery.result["items"][0]["scope"]["composerScope"],
+        serde_json::to_value(&f.scopes[2]).unwrap()
+    );
+    let mut spoof = mutation.clone();
+    spoof["command"]["draftClient"] = json!({"clientId":"desktop"});
+    assert!(
+        handle(
+            &mut f.database,
+            &web,
+            "singleChat.composerDraft.mutate",
+            spoof.clone()
+        )
+        .is_err()
+    );
+    assert!(reconcile(&f.database, &web, spoof).is_err());
+    assert!(
+        handle(
+            &mut f.database,
+            &web,
+            "singleChat.get",
+            json!({"conversationId":f.conversation,"scopeKey":beta_key.sql_key()})
+        )
+        .is_err()
+    );
+    assert!(
+        handle(
+            &mut f.database,
+            &web,
+            "singleChat.composerDraft.recovery",
+            json!({"threadId":f.thread,"conversationId":f.conversation,"clientId":"desktop"})
+        )
+        .is_err()
+    );
+    let missing = handle(
+        &mut f.database,
+        &web,
+        "singleChat.get",
+        json!({"conversationId":"missing","composerScope":null}),
+    )
+    .unwrap();
+    assert!(missing.result.is_null());
 }

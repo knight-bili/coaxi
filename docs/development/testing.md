@@ -49,6 +49,15 @@ quota/读取拒绝及旧 scoped ID 经有效图迁移；继续扩展 `canvas-con
 原 Context 慢测 `single_chat_contract_bytes_and_dynamic_section_order_are_exact` 在本次 extended 配置下没有入册，
 登记为未执行并留待阶段候选的 slow-tests，不将零测试视作通过。完整 PC01–PC24、实际 Host/模型和平台仍待验。
 
+上述原发送 owner 继续扩展同一 fixture，调用生产 Application 私聊材料 handler 与 reconcile，
+拥有旧省略/显式 null 的响应差别、默认与卡片/其他编辑端的 editToken/working 正文/quotes 隔离、可信身份注入、
+未知回执只读及首次结果重放/不重复提示；不新增 Rust owner，不用 SQLite/模拟运输推断实际 HTTP/Native IPC 通过。
+Web 原 `public_projection_excludes_mcp_credentials_and_desktop_mutation_actions` 增加两项操作编码/方法映射，随 I03 候选执行；
+本批只编译/执行受影响 Core lib owner。共享 `private-composer-scope.test.ts` 拥有旧 Core、错绑回显及调用后变更描述的拒绝；
+Web 原 client owner 表驱动复用发送/材料交换的丢回执重登检查，Main 原准入 owner 扩两项方法；低成本命令为
+`pnpm exec vitest run apps/desktop/src/shared/private-composer-scope.test.ts apps/web/src/client.test.ts apps/desktop/src/main/runtime-core-methods.test.ts`。
+这批客户端检查使用模拟 Fetch/请求，不是实际 Host 或 UI 资格。
+
 私聊材料隔离 r1 的新最低层 owner `single_chat_composer_scope::tests::scope_codec_preserves_legacy_omission_and_requires_explicit_closed_identity`
 拥有省略/显式 null 的协商差别、规范闭合标识和额外身份字段拒绝；原 DraftClient 与画布几何 owner 不拥有这项网络编码，不能由完整 Runtime 夹具代替。
 `pin_binding_requires_the_exact_live_private_reference_without_writing` 只建当前查询必要四表，拥有 Board/pin/Thread/Conversation 精确关系及结束/删除/非激活拒绝；

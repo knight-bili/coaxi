@@ -54,6 +54,8 @@ export const WEB_OPERATIONS = [
   'singleChat.end',
   'singleChat.pendingInputs.edit',
   'singleChat.composerDraft.removeAttachment',
+  'singleChat.composerDraft.mutate',
+  'singleChat.composerDraft.recovery',
   'skills.content.read',
   'skills.import.inspect',
   'skills.import.github.inspect',
@@ -210,6 +212,7 @@ const RECONCILABLE_COMMANDS = new Set<WebOperation>([
   'skills.reconcile',
 
   'singleChat.open', 'singleChat.send', 'singleChat.end', 'singleChat.pendingInputs.edit',
+  'singleChat.composerDraft.mutate',
   'skills.import.commit',
   'skills.setEnabled',
   'skills.setGroupAssignments',

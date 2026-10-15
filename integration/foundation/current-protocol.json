@@ -52,6 +52,8 @@
     "singleChat.end",
     "singleChat.pendingInputs.edit",
     "singleChat.composerDraft.removeAttachment",
+    "singleChat.composerDraft.mutate",
+    "singleChat.composerDraft.recovery",
     "skills.content.read",
     "skills.import.inspect",
     "skills.import.github.inspect",

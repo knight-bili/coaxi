@@ -125,24 +125,28 @@ describe('console transport', () => {
     expect(scoped.takeChanges()).toEqual([])
   })
 
-  it('retains an unknown command across reauthentication and only looks up its original receipt', async () => {
+  it.each(['thread.messages.send', 'singleChat.composerDraft.mutate'] as const)('retains unknown %s across reauthentication and only looks up its original receipt', async operation => {
     let recorded = false
-    const params = { commandId: newCommandId(), threadId: 'test', draftRevision: 4, execution: null }
+    const params = operation === 'thread.messages.send'
+      ? { commandId: newCommandId(), threadId: 'test', draftRevision: 4, execution: null }
+      : { commandId: newCommandId(), command: { threadId: 'test', conversationId: 'private', composerScope: { kind: 'canvas', boardId: 'board', nodeId: 'node' }, expectedDraftRevision: 4, action: { type: 'swap_retained', retainedInputId: 'saved', expectedRetainedRevision: 1, currentBody: '保留完整输入' } } }
+    const original = structuredClone(params)
     const result = { commandResult: { status: 'applied', payload: { threadMessageId: 'once' } } }
     const fetcher = vi.fn<typeof fetch>().mockImplementation(async (url, options) => {
       if (String(url).endsWith('/login')) return Response.json({ protocolVersion: 4, token: 'a'.repeat(64), clientId: 'd'.repeat(64), editorProof: 'e'.repeat(64), ownerId: 'local_user' })
       const body = JSON.parse(String(options?.body))
-      if (body.operation === 'thread.messages.send') throw new TypeError('connection lost after admission')
-      expect(body).toEqual({ operation: 'commands.reconcile', params: { operation: 'thread.messages.send', params } })
+      if (body.operation === operation) throw new TypeError('connection lost after admission')
+      expect(body).toEqual({ operation: 'commands.reconcile', params: { operation, params: original } })
       return Response.json({ result: recorded ? { state: 'recorded', result } : { state: 'unknown' } })
     })
     const client = new ConsoleClient('http://127.0.0.1:4317', fetcher)
     await client.login('b'.repeat(64))
     let settled = false
-    const pending = client.request('thread.messages.send', params).then(value => { settled = true; return value })
+    const pending = client.request(operation, params).then(value => { settled = true; return value })
     await vi.waitFor(() => expect(fetcher.mock.calls.length).toBeGreaterThanOrEqual(3))
     expect(settled).toBe(false)
     expect(client.pendingCommandCount).toBe(1)
+    Reflect.set(params, 'laterCallerValue', '不可污染原请求')
     const scope = client.editingScope
     client.clear()
     recorded = true
@@ -151,7 +155,7 @@ describe('console transport', () => {
     await expect(pending).resolves.toEqual(result)
     expect(client.editingScope).toBe(scope)
     expect(client.pendingCommandCount).toBe(0)
-    expect(fetcher.mock.calls.filter(([, init]) => init?.body && JSON.parse(String(init.body)).operation === 'thread.messages.send')).toHaveLength(1)
+    expect(fetcher.mock.calls.filter(([, init]) => init?.body && JSON.parse(String(init.body)).operation === operation)).toHaveLength(1)
   })
 
   it('resumes an unknown source binding without uploading another file', async () => {

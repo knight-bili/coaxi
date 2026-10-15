@@ -1582,6 +1582,15 @@ impl SingleChatService {
         database: &Database,
         conversation_id: &str,
     ) -> Result<Option<SingleChatSnapshot>> {
+        self.snapshot_for_key(database, conversation_id, &PrivateComposerKey::default())
+    }
+
+    pub(crate) fn snapshot_for_key(
+        &self,
+        database: &Database,
+        conversation_id: &str,
+        key: &PrivateComposerKey,
+    ) -> Result<Option<SingleChatSnapshot>> {
         let conversation = database
             .connection()
             .query_row(
@@ -1660,9 +1669,20 @@ impl SingleChatService {
                 )
                 .collect::<Result<Vec<_>>>()?
         };
-        let draft = load_single_chat_draft(database, conversation_id, &self.client)?;
+        let draft = if key.sql_key().is_empty() {
+            load_single_chat_draft(database, conversation_id, &self.client)?
+        } else {
+            crate::single_chat_composer::DraftMaterials::load(
+                database.connection(),
+                conversation_id,
+                &self.client,
+                key,
+            )?
+            .view(key, None)?
+            .draft
+        };
         let pending_inputs =
-            read_single_chat_pending_inputs(database, conversation_id, &self.client)?;
+            read_single_chat_pending_inputs(database, conversation_id, &self.client, key)?;
         let agent_runs = {
             let mut statement = database.connection().prepare(
                 r#"
@@ -2091,6 +2111,7 @@ fn read_single_chat_pending_inputs(
     database: &Database,
     conversation_id: &str,
     client: &DraftClient,
+    key: &PrivateComposerKey,
 ) -> Result<SingleChatPendingInputsView> {
     let mut statement = database.connection().prepare(
         r#"
@@ -2146,11 +2167,11 @@ fn read_single_chat_pending_inputs(
             r#"
             SELECT pending_input_id, edit_token, base_pending_revision,
                    recovery_required, working_body,
-                   working_source_attachments_json
+                   working_source_attachments_json, quotes_json
             FROM single_chat_pending_input_edit_session
-            WHERE conversation_id = ?1 AND client_id = ?2 AND scope_key = ''
+            WHERE conversation_id = ?1 AND client_id = ?2 AND scope_key = ?3
             "#,
-            params![conversation_id, client.id()],
+            params![conversation_id, client.id(), key.sql_key()],
             |row| {
                 Ok((
                     row.get::<_, String>(0)?,
@@ -2159,6 +2180,7 @@ fn read_single_chat_pending_inputs(
                     row.get::<_, bool>(3)?,
                     row.get::<_, String>(4)?,
                     row.get::<_, String>(5)?,
+                    row.get::<_, String>(6)?,
                 ))
             },
         )
@@ -2171,14 +2193,11 @@ fn read_single_chat_pending_inputs(
                 recovery_required,
                 working_body,
                 working_source_attachments_json,
+                working_quotes_json,
             )| {
                 Ok::<SingleChatPendingInputEditSessionView, anyhow::Error>(
                     SingleChatPendingInputEditSessionView {
-                        working_quotes: load_quotes(
-                            database.connection(),
-                            QuoteStorage::PrivateEdit,
-                            conversation_id,
-                        )?,
+                        working_quotes: crate::message_quote::parse_quotes(&working_quotes_json)?,
                         pending_input_id,
                         edit_token,
                         base_pending_revision,

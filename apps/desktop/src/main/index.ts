@@ -311,6 +311,8 @@ const allowedMethods = new Set<CoreMethod>([
   'singleChat.send',
   'singleChat.end',
   'singleChat.pendingInputs.edit',
+  'singleChat.composerDraft.mutate',
+  'singleChat.composerDraft.recovery',
   'agentRuns.cancel',
   'agentRuns.continue',
   'threads.snapshot',

@@ -252,7 +252,7 @@ impl DraftMaterials {
             || !self.quotes()?.is_empty()
             || !serde_json::from_str::<Vec<serde_json::Value>>(&self.trash_json)?.is_empty())
     }
-    fn view(
+    pub(crate) fn view(
         &self,
         key: &PrivateComposerKey,
         scope: Option<&SingleChatComposerScope>,

@@ -19,8 +19,10 @@ last_updated: 2026-10-13
 Core 归属 codec、旧 get 省略与显式 null 区分、真实 pin 校验及 Schema155/Migration205 私有存储已实现，
 默认材料路径限定空 scope；[本地迁移证据](../../../integration/execution/i03-private-scope-storage-result.json)保留定向 Rust/旧路径回归及失败边界。
 Core 材料七动作、精确读取、有界恢复与发送按 scope 消费已接原事务/FIFO，17项定向检查通过，见
-[业务服务证据](../../../integration/execution/i03-private-composer-service-result.json)。新 get/mutate/recovery 的运输与客户端、
-上传准备、编辑接管/完整移回及本机意图恢复尚未接通；最终 Blob/实际 Runtime 待验，不向客户端广告 scopeVersion。
+[业务服务证据](../../../integration/execution/i03-private-composer-service-result.json)。get/mutate/recovery 的 Application、
+两端封闭准入、原 UUID 只读核对和客户端能力回显检查已接通，详见[应用入口证据](../../../integration/execution/i03-private-composer-api-result.json)。
+显式 get 才返回 scopeVersion，草稿和编辑会话同归属过滤；默认旧响应保持。上传准备、编辑接管/完整移回及本机意图恢复尚未接通，
+UI 未启用；最终 Blob/实际 Host/Runtime 和平台仍待验。当前 Web 准入180项，来源161项保持。
 24项完整验证要求仍待执行，不计入正式324场景通过。
 不授权付费模型、main合入或发布。I03功能集齐后集中编译和平台验证。
 
