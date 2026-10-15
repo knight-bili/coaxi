@@ -39,6 +39,16 @@ quota/读取拒绝及旧 scoped ID 经有效图迁移；继续扩展 `canvas-con
 
 ## Rust 测试准入与退役门槛
 
+私聊材料服务新增三个 `single_chat_composer::tests` 扩展 owner：
+`commands_keep_complete_inputs_separate_preserve_receipts_and_rollback_both_sides` 拥有七动作的跨 scope CAS、整份输入交换/回滚与可信编辑端回执；
+`recovery_pages_are_read_only_context_bound_bounded_and_incomplete_after_changes` 拥有分页只读、上下文/签名、原始摘要贯穿各页与 orphan 保留；
+`send_consumes_only_the_registered_scope_and_keeps_one_private_fifo_and_legacy_shape` 拥有精确消费、默认 JSON 和同 Conversation FIFO。
+原 codec/pin/迁移 owner 不拥有材料事务与业务消费，旧 single_chat owner 只拥有默认路径；因此复用隔离 SQLite/既有真实源文件夹具，
+不另造 Runtime 或格式 golden。先 `cargo test -p rovai-core --lib --features extended-tests single_chat_composer::tests -- --list`，再同过滤执行，
+另运行既有 single_chat、message_quote 及 scope codec/pin owner。17项通过仅证明本地 Core 边界；
+原 Context 慢测 `single_chat_contract_bytes_and_dynamic_section_order_are_exact` 在本次 extended 配置下没有入册，
+登记为未执行并留待阶段候选的 slow-tests，不将零测试视作通过。完整 PC01–PC24、实际 Host/模型和平台仍待验。
+
 私聊材料隔离 r1 的新最低层 owner `single_chat_composer_scope::tests::scope_codec_preserves_legacy_omission_and_requires_explicit_closed_identity`
 拥有省略/显式 null 的协商差别、规范闭合标识和额外身份字段拒绝；原 DraftClient 与画布几何 owner 不拥有这项网络编码，不能由完整 Runtime 夹具代替。
 `pin_binding_requires_the_exact_live_private_reference_without_writing` 只建当前查询必要四表，拥有 Board/pin/Thread/Conversation 精确关系及结束/删除/非激活拒绝；

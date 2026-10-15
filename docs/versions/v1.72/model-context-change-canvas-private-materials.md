@@ -25,11 +25,16 @@ last_updated: 2026-10-15
 
 ## 实施状态
 
-Core scope 归属 codec、get 省略/显式 null 的能力协商编码与精确活跃私聊 pin 的只读校验已实现，见[scope合同](../../contracts/single-chat-composer-scope-v1.md)。Schema155/Migration205 已追加：旧草稿原值进入空 scope，新增注册、完整保留输入与排队编辑归属，默认 SQL/quote/资源路径明确围栏。当前新 scope 的生产 get/send/上传/quote/登记尚未接通；旧调用继续默认路径。
+Core scope 归属 codec、get 省略/显式 null 的能力协商编码与精确活跃私聊 pin 的只读校验已实现，见[scope合同](../../contracts/single-chat-composer-scope-v1.md)。Schema155/Migration205 已追加：旧草稿原值进入空 scope，新增注册、完整保留输入与排队编辑归属，默认 SQL/quote/资源路径明确围栏。Core 材料七动作、精确读取、有界恢复及按 scope 发送消费已实现；新 get/mutate/recovery 运输与客户端尚未接通，未广告 scopeVersion。旧调用继续默认路径，上传准备、编辑接管/完整移回及本机意图恢复继续。
 
 第一批原文 SQL 的25项读取见证保持原边界。本轮因主键及迁移回滚是后续材料接线的前提，按阶段策略例外做一次本地定向 Rust 编译与 owner，覆盖旧值保留、事务失败回滚、默认读取不漏出其他 scope、pin 删除后保留、重开与 Conversation 删除清理，并补旧回执及准入结构负例。相关旧私聊、引用、资源、目录与升级 owner 也做定向回归；实际结论及初次环境/编译失败见[执行证据](../../../integration/execution/i03-private-scope-storage-result.json)。未运行全仓回归、GitHub Actions、实际模型或真机验证。
 
-以下24项是拟实施的完整验证要求，均未执行；不替代正式324场景或实际 Runtime/真机资格。低成本检查按切片运行，编译及完整集成随 I03 候选集中执行。
+材料服务本批因跨 scope 隐私、完整交换回滚与公共命令兼容是运输接线的前提，执行限定 Core lib extended 编译及17项定向检查。
+已验证选定材料进入原 Core 消息/FIFO 记录、默认旧 JSON 省略、引用拒绝的持久结果、整份交换回滚及只读分页；
+测试未启动真实模型，也未验证最终 Manifest Blob 和实际 Runtime。格式器/预算/版本未变，批准文件与后文原提案快照不改。
+证据和初次编译失败见[业务服务执行记录](../../../integration/execution/i03-private-composer-service-result.json)。
+
+以下24项完整场景仍未执行完毕；本地分项检查不替代正式324场景或实际 Runtime/真机资格。低成本检查按切片运行，编译及完整集成随 I03 候选集中执行。
 
 ## 明确不变
 

@@ -49,9 +49,27 @@ scope 注册必须对应真实活跃 pin；其 Conversation、client、key 和�
 旧默认编辑 token、working body 或材料。Scope 全部迁移完成并经必需结构/索引/归属约束准入后才可启动业务工作区。
 失败回滚同一原库事务，不替换原库、不初始化空库。旧 marker 与已加入新布局的混合来源在迁移入口拒绝。
 
-Core 类型、编码、只读 pin 校验与新存储已实现；新 scope 的生产 get/send/上传/quote/登记操作尚未接通，
-默认 get 响应、现有操作数和实际模型输入保持。scopeVersion 不能因类型或表存在而被前端当作可用。
-后续按批准 r1 接材料 CAS、编辑租约、完整移回/交换及原 UUID 恢复。
+Core 类型、编码、只读 pin 校验、新存储和材料业务服务已实现。新服务提供精确归属读取及七个闭合动作：登记、
+移除/排序附件、引用操作、交换/丢弃保留输入、显式迁入旧默认材料。Host 注入可信编辑端；读取不分配 scope。
+写操作先核对当前材料 revision，保留输入另核对自己的 revision。交换同时搬动正文、附件、引用及撤销材料，
+任一写入或回执失败回滚双方；原 UUID 回放首次结果。旧材料只移动材料，目标已有正文或材料时另建完整保留项。
+明确拒绝也保存结果；普通变更事件只含 Conversation 标识，完整私有结果仍由原命令回执的编辑端边界保护。
+
+现有 Core 发送命令识别可选 composerScope；省略时沿默认路径及原规范序列化。卡片必须先登记，发送才按相同
+Conversation/client/scope 读取、验证和消费材料。所有 scope 仍进入原 Conversation 单一 FIFO，不增加执行队列。
+引用仍复用原捕获和模型投影；只引用而无问题正文的卡片发送明确拒绝并保留输入。
+
+Core recovery 仅列出当前可信编辑端在指定 Thread/Conversation 的 scope 元数据和完整保留项，每页默认50、最大100。
+签名游标绑定上下文、原始状态摘要和遍历位置；所有元数据参与一致性判断，只有本页保留项加载正文及材料。
+翻页期间状态变化时 complete 为 false；缺页、未完整或游标失效不能解释成删除。进程重启会使进程期签名游标失效，
+客户端重新只读枚举，原输入不受影响。游标不替代 Host 认证；孤立输入仍按原归属保留，不自动绑定或发送。
+
+新 get 能力协商、mutate/recovery 的 Application/Host/RPC 与客户端尚未接线，生产 get 不广告 scopeVersion，
+现有准入操作数仍178。上传 prepare UUID/源摘要、编辑租约接管/完整移回及本机意图恢复继续实施；
+不能因 Core 服务存在而启用前端能力，不能宣称最终 Manifest Blob、实际 Runtime 或完整隔离已经验收。
 
 本轮因主键及迁移安全影响后续接线，按阶段策略例外做本地定向编译/迁移 owner，完整跨平台、实际 Runtime 与 PC01–PC24 仍待验。
 具体命令、源码和失败记录见[迁移执行证据](../../integration/execution/i03-private-scope-storage-result.json)，不宣称完整功能或整套一期通过。
+
+材料服务与按 scope 发送的17项本地定向检查、自审修正和未验边界见
+[业务服务执行证据](../../integration/execution/i03-private-composer-service-result.json)。完整 PC01–PC24 仍待全链路验证。

@@ -120,6 +120,7 @@ pub mod runtime_search_operation;
 pub mod runtime_startup;
 mod runtime_thinking;
 pub mod single_chat;
+pub mod single_chat_composer;
 pub mod single_chat_composer_scope;
 pub mod skill;
 pub(crate) mod skill_pack_delivery;

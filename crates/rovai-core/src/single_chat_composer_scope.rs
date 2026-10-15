@@ -61,6 +61,23 @@ impl SingleChatComposerScope {
     }
 }
 
+/// 由描述派生的闭合 Core key；不是网络参数或权限凭据。
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct PrivateComposerKey(String);
+
+impl PrivateComposerKey {
+    pub fn for_scope(scope: Option<&SingleChatComposerScope>) -> Result<Self> {
+        scope.map_or_else(
+            || Ok(Self::default()),
+            |scope| scope.storage_key().map(Self),
+        )
+    }
+
+    pub(crate) fn sql_key(&self) -> &str {
+        &self.0
+    }
+}
+
 const CURRENT_PIN_SQL: &str = "SELECT EXISTS(
     SELECT 1 FROM canvas_node AS node
     JOIN canvas_board AS board ON board.id=node.board_id

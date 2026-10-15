@@ -17,8 +17,11 @@ last_updated: 2026-10-13
 [独立模型输入变更说明](model-context-change-canvas-private-materials.md)保存原文、具体 revision、批准文件摘要及完整前后对照。
 本次在模型接受输入前按卡片选择完整材料；现有已发布消息投影、格式版本、预算与冻结证据保持。
 Core 归属 codec、旧 get 省略与显式 null 区分、真实 pin 校验及 Schema155/Migration205 私有存储已实现，
-默认材料路径限定空 scope；新 scope 的生产材料接口尚未接通。[本地迁移证据](../../../integration/execution/i03-private-scope-storage-result.json)保留定向 Rust/旧路径回归及失败边界。
-继续附件、引用、发送、编辑和恢复；24项完整验证要求尚未执行，不计入正式324场景通过。
+默认材料路径限定空 scope；[本地迁移证据](../../../integration/execution/i03-private-scope-storage-result.json)保留定向 Rust/旧路径回归及失败边界。
+Core 材料七动作、精确读取、有界恢复与发送按 scope 消费已接原事务/FIFO，17项定向检查通过，见
+[业务服务证据](../../../integration/execution/i03-private-composer-service-result.json)。新 get/mutate/recovery 的运输与客户端、
+上传准备、编辑接管/完整移回及本机意图恢复尚未接通；最终 Blob/实际 Runtime 待验，不向客户端广告 scopeVersion。
+24项完整验证要求仍待执行，不计入正式324场景通过。
 不授权付费模型、main合入或发布。I03功能集齐后集中编译和平台验证。
 
 ## 技能包实际投递 r1 已获客户确认（2026-10-14）

@@ -2,6 +2,7 @@ use crate::draft_client::DraftClient;
 use crate::message_quote::{
     MessageQuoteSnapshot, QuoteStorage, copy_quotes, load_quotes, store_quotes,
 };
+use crate::single_chat_composer_scope::{PrivateComposerKey, SingleChatComposerScope};
 use std::collections::{BTreeSet, HashMap, HashSet};
 
 use anyhow::{Context, Result};
@@ -81,6 +82,8 @@ pub struct SendSingleChatMessageCommand {
     pub conversation_id: String,
     pub body: String,
     pub draft_revision: i64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub composer_scope: Option<SingleChatComposerScope>,
 }
 
 impl sealed::Sealed for SendSingleChatMessageCommand {}
@@ -624,8 +627,33 @@ impl SingleChatService {
                     "Single Chat target is not an active Thread member",
                 ));
             }
-            let (draft_revision, source_attachments) =
-                load_single_chat_draft_refs(transaction, &target.conversation_id, client)?;
+            let Some((key, registered)) = crate::single_chat_composer::resolve_scope(
+                transaction,
+                &target.camp_id,
+                &target.conversation_id,
+                client,
+                envelope.payload.composer_scope.as_ref(),
+            )?
+            else {
+                return Ok(rejected(
+                    "single_chat.scope_unavailable",
+                    "The private input scope is unavailable",
+                ));
+            };
+            if !registered {
+                return Ok(rejected(
+                    "single_chat.scope_unregistered",
+                    "Register this private input before sending",
+                ));
+            }
+            let materials = crate::single_chat_composer::DraftMaterials::load(
+                transaction,
+                &target.conversation_id,
+                client,
+                &key,
+            )?;
+            let draft_revision = materials.revision;
+            let source_attachments = materials.sources()?;
             if draft_revision != envelope.payload.draft_revision {
                 return Ok(CommandHandlerResult::rejected(
                     "single_chat.draft_changed",
@@ -633,11 +661,13 @@ impl SingleChatService {
                 ));
             }
             let body = envelope.payload.body.trim();
-            let quotes = load_quotes(
-                transaction,
-                QuoteStorage::ClientPrivateDraft(client),
-                &target.conversation_id,
-            )?;
+            let quotes = materials.quotes()?;
+            if envelope.payload.composer_scope.is_some() && !quotes.is_empty() && body.is_empty() {
+                return Ok(rejected(
+                    "quote.question_required",
+                    "A question body is required with quotes",
+                ));
+            }
             anyhow::ensure!(
                 quotes.is_empty() || !body.is_empty(),
                 "quote.question_required"
@@ -680,6 +710,7 @@ impl SingleChatService {
                     &target.conversation_id,
                     draft_revision,
                     client,
+                    &key,
                 )?;
                 append_domain_event(
                     transaction,
@@ -732,7 +763,7 @@ impl SingleChatService {
                 &quotes,
                 &runtime,
                 &envelope.command_id,
-                Some((draft_revision, client)),
+                Some((draft_revision, client, &key)),
                 &envelope.actor,
             )?;
             Ok(CommandHandlerResult::accepted(
@@ -1762,7 +1793,7 @@ struct EndTarget {
     ended_at: Option<String>,
 }
 
-fn source_attachment_views(value: &str) -> Result<Vec<LocalAttachmentSourceView>> {
+pub(crate) fn source_attachment_views(value: &str) -> Result<Vec<LocalAttachmentSourceView>> {
     Ok(parse_source_attachments(value)?
         .iter()
         .map(|source_ref| source_ref.view(LocalAttachmentAvailability::Unknown))
@@ -2173,21 +2204,22 @@ fn consume_single_chat_draft(
     conversation_id: &str,
     expected_revision: i64,
     client: &DraftClient,
+    key: &PrivateComposerKey,
 ) -> Result<()> {
     let now = chrono::Utc::now().to_rfc3339();
     if expected_revision == 0 {
         let updated = transaction.execute(
             "UPDATE single_chat_composer_draft
              SET source_attachments_json = '[]', quotes_json='[]', quote_trash_json='[]', revision = 1, updated_at = ?2
-             WHERE conversation_id = ?1 AND revision = 0 AND client_id = ?3 AND scope_key = ''",
-            params![conversation_id, now, client.id()],
+             WHERE conversation_id = ?1 AND revision = 0 AND client_id = ?3 AND scope_key = ?4",
+            params![conversation_id, now, client.id(), key.sql_key()],
         )?;
         if updated == 0 {
             transaction.execute(
                 "INSERT INTO single_chat_composer_draft(
-                    conversation_id, revision, source_attachments_json, updated_at, client_id
-                 ) VALUES (?1, 1, '[]', ?2, ?3)",
-                params![conversation_id, now, client.id()],
+                    conversation_id, revision, source_attachments_json, updated_at, client_id, scope_key
+                 ) VALUES (?1, 1, '[]', ?2, ?3, ?4)",
+                params![conversation_id, now, client.id(), key.sql_key()],
             )?;
         }
         return Ok(());
@@ -2195,8 +2227,8 @@ fn consume_single_chat_draft(
     let updated = transaction.execute(
         "UPDATE single_chat_composer_draft
          SET source_attachments_json = '[]', quotes_json='[]', quote_trash_json='[]', revision = revision + 1, updated_at = ?3
-         WHERE conversation_id = ?1 AND revision = ?2 AND client_id = ?4 AND scope_key = ''",
-        params![conversation_id, expected_revision, now, client.id()],
+         WHERE conversation_id = ?1 AND revision = ?2 AND client_id = ?4 AND scope_key = ?5",
+        params![conversation_id, expected_revision, now, client.id(), key.sql_key()],
     )?;
     anyhow::ensure!(updated == 1, "single_chat.draft_changed");
     Ok(())
@@ -2285,7 +2317,7 @@ fn admit_single_chat_message(
     quotes: &[MessageQuoteSnapshot],
     runtime: &crate::agent_profile::FrozenAgentRuntimeConfig,
     command_id: &str,
-    draft_revision: Option<(i64, &DraftClient)>,
+    draft_revision: Option<(i64, &DraftClient, &PrivateComposerKey)>,
     actor: &ActorRef,
 ) -> Result<AdmittedSingleChatMessage> {
     anyhow::ensure!(
@@ -2300,8 +2332,14 @@ fn admit_single_chat_message(
     let agent_run_id = Uuid::new_v4().to_string();
     let source_attachments_json = serialize_source_attachments(source_attachments)?;
 
-    if let Some((draft_revision, client)) = draft_revision {
-        consume_single_chat_draft(transaction, &target.conversation_id, draft_revision, client)?;
+    if let Some((draft_revision, client, key)) = draft_revision {
+        consume_single_chat_draft(
+            transaction,
+            &target.conversation_id,
+            draft_revision,
+            client,
+            key,
+        )?;
     }
     let updated = transaction.execute(
         r#"
@@ -2848,6 +2886,7 @@ mod tests {
                     command_id,
                     Some(camp_id),
                     SendSingleChatMessageCommand {
+                        composer_scope: None,
                         draft_client: Default::default(),
                         camp_id: camp_id.to_string(),
                         conversation_id: conversation_id.to_string(),
@@ -3708,6 +3747,7 @@ mod tests {
                     "single-chat-send-attachment",
                     Some(&camp_id),
                     SendSingleChatMessageCommand {
+                        composer_scope: None,
                         draft_client: Default::default(),
                         camp_id: camp_id.clone(),
                         conversation_id: conversation_id.clone(),
@@ -3823,6 +3863,7 @@ mod tests {
             "web-private-send",
             Some(&camp_id),
             SendSingleChatMessageCommand {
+                composer_scope: None,
                 draft_client: client_a.clone(),
                 camp_id: camp_id.clone(),
                 conversation_id: conversation_id.clone(),
@@ -4201,6 +4242,7 @@ mod tests {
                     "single-chat-send-pending-attachment",
                     Some(&camp_id),
                     SendSingleChatMessageCommand {
+                        composer_scope: None,
                         draft_client: Default::default(),
                         camp_id: camp_id.clone(),
                         conversation_id: conversation_id.clone(),
@@ -4401,6 +4443,7 @@ mod tests {
                     "single-chat-send-repair-head",
                     Some(&camp_id),
                     SendSingleChatMessageCommand {
+                        composer_scope: None,
                         draft_client: Default::default(),
                         camp_id: camp_id.clone(),
                         conversation_id: conversation_id.clone(),
@@ -4421,6 +4464,7 @@ mod tests {
                     "single-chat-send-repair-later",
                     Some(&camp_id),
                     SendSingleChatMessageCommand {
+                        composer_scope: None,
                         draft_client: Default::default(),
                         camp_id: camp_id.clone(),
                         conversation_id: conversation_id.clone(),
