@@ -27,3 +27,5 @@ I00已自审修正并合入，I01基础构建与契约证据保留草稿；I02�
 - [I03画布原地与侧边会话检查点](execution/i03-canvas-conversation-result.json)：复用既有会话/输入/执行控制，补精确私有绑定和离开保护；40项组件及4项离开退出检查通过，定向类型/文案/文档通过，真实UI/Runtime及多卡、重开恢复、通知继续，不作为I03完成依据。
 
 - [I03会话读写归属检查点](execution/i03-thread-scope-result.json)：既有页面改用固定Core client/Thread的共享读写层；13声明保持原文、10旧导出兼容，216项定向检查与类型/文案/文档通过。多卡实例、共享草稿和展开恢复仍继续，实际UI/Runtime待阶段候选。
+
+- [I03私有共享草稿检查点](execution/i03-single-chat-shared-result.json)：既有面板接共享正文、发送互斥、保存失败恢复与保留输入切换，原send和pending edit请求表达式保持；41项相关检查及类型/文案/文档通过。公开草稿镜像和多卡挂载仍继续，真实UI/Runtime未验。
