@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "I03-C02独立Mission/Task/Diff选择器、按需详情、原对象校验与既有工作区定位接线完成；66项局部检查、定向类型通过，模拟界面检查覆盖历史任务/失效/原路径/旧服务。C01/C02代码就绪待阶段工程验证，新Rust/真实Core/Host/工作区跳转未验；下一项C03授权文件节点。",
+  "current_slice": "I03-C03文件节点原工程Thread来源与旧节点显式一次绑定已编码，源码158/208；42项原文SQL、76项客户端/既有Main检查通过，1项Windows条件跳过，定向类型通过。文件选择/预览UI及真实Core/Host仍待，不标C03完成。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,15 +33,15 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "继续I03-C03授权文件节点与预览真实路径，随后C04隔离PTY；C01/C02真实Core/Host/资源与原工作区跳转、冷路由/规模及完整PC场景在C05/C06阶段集中验证，缺陷回所属组修复。",
-    "I03-C05多卡/冷启动/兼容与规模代码集齐后，C06冻结fusion-i03-rc.1，集中编译当前157/207和此前生命周期增量、原扩展owner/HTTP/实际Desktop场景，不运行旧归档binary冒充当前源码。",
+    "继续I03-C03文件节点来源选择、旧节点明确绑定和原FilePreviewApi预览，禁止自动借用当前Thread；补关闭/删除/恢复及变化提示后转C04隔离PTY。C01/C02真实集成仍随C05/C06验证。",
+    "I03-C05冷路由/多卡/规模代码集齐后，C06冻结fusion-i03-rc.1，集中编译当前158/208及此前生命周期增量，原扩展owner/HTTP/实际Desktop统一验证；不把旧二进制当当前源码证据。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
     "继续I02剩余、I04–I12与BUF全部既定范围，未补齐必需验收不得标MVP完成。"
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "object_reference_ui_ready_for_stage_verification",
+  "current_slice_status": "file_source_binding_coded_preview_ui_and_actual_core_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -188,5 +188,6 @@
   "private_upload_lifecycle_evidence": "i03-private-upload-lifecycle-result.json",
   "private_recovery_ui_evidence": "i03-private-recovery-ui-result.json",
   "object_reference_storage_evidence": "i03-object-reference-storage-result.json",
-  "object_reference_ui_evidence": "i03-object-reference-ui-result.json"
+  "object_reference_ui_evidence": "i03-object-reference-ui-result.json",
+  "file_binding_evidence": "i03-file-binding-result.json"
 }

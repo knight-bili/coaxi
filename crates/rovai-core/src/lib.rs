@@ -43,6 +43,7 @@ pub mod camp_message_send_teaching;
 pub mod camp_open;
 pub mod canonical_activity;
 pub mod canvas_board;
+pub mod canvas_file_reference;
 pub mod canvas_node;
 pub mod canvas_object_reference;
 pub mod channel;

@@ -248,3 +248,24 @@ Diff 详情先核对原 Mission 和 `missions.delivery` 的 Thread、工作区 M
 再复用 `MissionChanges` 读取当前列表，按 path 选择当前文件 ID 与 viewId。原路径不存在时显示提示，不能自动打开第一项。
 相同客户端、相同 Mission 的已挂载 Diff 查看器共享释放计数，最后一个关闭才发 Mission 级释放，防止关闭一个界面使另一个失效。
 Core 的12视图容量及现行过期规则仍生效；选择清单不持久化快照。当前界面模拟检查不能替代真实 Core/Host、工作区跳转和阶段集成。
+
+## 文件节点来源绑定（2026-10-16）
+
+文件节点的 `path` 本身不授予读取能力。新增可选 `fileReference:{threadId}` 保存原公开工程会话身份，
+不保存 Root Grant、文件句柄、reopen token 或文件内容；不存在该字段的旧请求继续省略它，保留原回执指纹。
+新绑定只用于 `file`，创建时须匹配未删除、active、directory 的原 Thread，具体路径和权限仍由现行
+[文件预览架构](../architecture/file-preview.md)与 File Preview v21 负责。
+
+旧文件节点不会自动借用当前会话。显式 `bind_file:{nodeId,threadId}` 在原画板 CAS/Gateway 事务内追加一次来源，
+不能改绑或清空；原 UUID 重放沿首次持久结果。仅来源相同的新请求可得到未改变结果，跨画板或失效来源拒绝。
+创建或绑定都不 stat 文件、不创建文件能力，不启动执行；之后实际打开必须重新经过原文件预览来源/真实身份校验。
+原 Thread 失效后保留文件路径和来源，仍可移动、改标题和删除引用，不能默选其他 Thread。
+
+Snapshot 声明可选 `fileReferenceVersion:1`。旧服务没有声明时，客户端在分配待处理命令前拒绝带来源的新建与显式绑定。
+未知恢复冻结原 UUID、画板版本、nodeId、threadId 和原路径，不跟随当前页面或目录重新选择。
+新绑定文件保存精确原路径，不修剪尾部空格去打开另一个 Unix 文件；未绑定旧请求的规范化保持。
+
+Schema158/Migration208 只增加 `canvas_node_file_reference` 与来源/不可变触发器，不重建节点主表、不回写旧路径或
+157/207 的 Mission/Task/Diff 引用。node_id 外键仅级联引用元数据，Thread 采用保留失效身份的软引用。
+准确157来源、DDL、208回执和158 marker 同事务；失败完整回滚，目标准入比较三项自身DDL。
+当前完成来源基础代码与分项检查；文件选择/预览界面、实际Core/Host与关闭恢复仍在I03-C03，不能据此宣称本组完成。

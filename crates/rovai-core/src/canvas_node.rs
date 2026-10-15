@@ -162,6 +162,8 @@ pub struct CanvasNodeData {
     pub conversations: Vec<CanvasConversationRef>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub object_reference: Option<crate::canvas_object_reference::CanvasObjectReference>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub file_reference: Option<crate::canvas_file_reference::CanvasFileReference>,
     pub title: Option<String>,
     pub content: Option<String>,
     pub path: Option<String>,
@@ -205,6 +207,13 @@ fn valid_reference(reference: &CanvasConversationRef) -> bool {
             .is_none_or(|id| !id.trim().is_empty())
 }
 fn normalize(data: &mut CanvasNodeData) -> std::result::Result<(), &'static str> {
+    if data
+        .file_reference
+        .as_ref()
+        .is_some_and(|reference| !reference.valid() || data.kind != CanvasNodeKind::File)
+    {
+        return Err("invalid_file_reference");
+    }
     if data.object_reference.as_ref().is_some_and(|reference| {
         !reference.valid()
             || data.kind != CanvasNodeKind::Conversation
@@ -231,9 +240,12 @@ fn normalize(data: &mut CanvasNodeData) -> std::result::Result<(), &'static str>
         &mut data.folder_group_id,
         &mut data.runtime_kind,
         &mut data.agent_id,
-        &mut data.path,
     ] {
         optional_text(value);
+    }
+    // A new bound file keeps its exact path; trimming could select a different Unix file.
+    if data.file_reference.is_none() {
+        optional_text(&mut data.path);
     }
     data.color = canvas_board::color(data.color.as_deref()).map_err(|_| "invalid_color")?;
     if data.content.as_ref().is_some_and(String::is_empty) {
@@ -306,6 +318,7 @@ pub struct CanvasGraphSnapshot {
     pub through_global_sequence: i64,
     pub member_transfer_version: u32,
     pub object_reference_version: u32,
+    pub file_reference_version: u32,
 }
 fn from_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<CanvasNode> {
     let decode = |column, error| {
@@ -336,6 +349,9 @@ fn from_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<CanvasNode> {
             }),
             conversations,
             object_reference: crate::canvas_object_reference::from_row(row, 23)?,
+            file_reference: row
+                .get::<_, Option<String>>(27)?
+                .map(|thread_id| crate::canvas_file_reference::CanvasFileReference { thread_id }),
             title: row.get(10)?,
             content: row.get(11)?,
             path: row.get(12)?,
@@ -355,9 +371,11 @@ fn from_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<CanvasNode> {
 fn load(connection: &Connection, board_id: &str) -> Result<Vec<CanvasNode>> {
     Ok(connection
         .prepare(&format!(
-            "SELECT {NODE_COLUMNS},{} FROM canvas_node {} WHERE board_id=?1 ORDER BY created_at,id",
+            "SELECT {NODE_COLUMNS},{},{} FROM canvas_node {} {} WHERE board_id=?1 ORDER BY created_at,id",
             crate::canvas_object_reference::COLUMNS,
-            crate::canvas_object_reference::JOIN
+            crate::canvas_file_reference::COLUMNS,
+            crate::canvas_object_reference::JOIN,
+            crate::canvas_file_reference::JOIN
         ))?
         .query_map([board_id], from_row)?
         .collect::<rusqlite::Result<Vec<_>>>()?)
@@ -369,9 +387,11 @@ fn load_selected(
 ) -> Result<Vec<CanvasNode>> {
     let ids = ids.into_iter().collect::<BTreeSet<_>>();
     let mut query = connection.prepare(&format!(
-        "SELECT {NODE_COLUMNS},{} FROM canvas_node {} WHERE board_id=?1 AND id=?2",
+        "SELECT {NODE_COLUMNS},{},{} FROM canvas_node {} {} WHERE board_id=?1 AND id=?2",
         crate::canvas_object_reference::COLUMNS,
-        crate::canvas_object_reference::JOIN
+        crate::canvas_file_reference::COLUMNS,
+        crate::canvas_object_reference::JOIN,
+        crate::canvas_file_reference::JOIN
     ))?;
     let mut nodes = Vec::new();
     for id in ids {
@@ -392,7 +412,8 @@ fn candidates(
 ) -> Result<Vec<CanvasNode>> {
     match mutation {
         CanvasNodeMutation::Create { .. } | CanvasNodeMutation::Move { .. } => Ok(vec![]),
-        CanvasNodeMutation::Update { node_id, .. } => {
+        CanvasNodeMutation::Update { node_id, .. }
+        | CanvasNodeMutation::BindFile { node_id, .. } => {
             load_selected(connection, board_id, [node_id.clone()])
         }
         CanvasNodeMutation::Detach { region_id, .. } => {
@@ -417,10 +438,12 @@ fn candidates(
         ),
         CanvasNodeMutation::Prune => Ok(connection
             .prepare(&format!(
-                "SELECT {NODE_COLUMNS},{} FROM canvas_node {} WHERE board_id=?1
+                "SELECT {NODE_COLUMNS},{},{} FROM canvas_node {} {} WHERE board_id=?1
              AND kind IN ('conversation','custom') AND object_kind IS NULL ORDER BY created_at,id",
                 crate::canvas_object_reference::COLUMNS,
-                crate::canvas_object_reference::JOIN
+                crate::canvas_file_reference::COLUMNS,
+                crate::canvas_object_reference::JOIN,
+                crate::canvas_file_reference::JOIN
             ))?
             .query_map([board_id], from_row)?
             .collect::<rusqlite::Result<Vec<_>>>()?),
@@ -443,6 +466,7 @@ pub fn snapshot(connection: &Connection, board_id: &str) -> Result<CanvasGraphSn
         through_global_sequence,
         member_transfer_version: 1,
         object_reference_version: 1,
+        file_reference_version: 1,
     })
 }
 
@@ -489,6 +513,10 @@ pub enum CanvasNodeMutation {
     Update {
         node_id: String,
         patch: CanvasNodePatch,
+    },
+    BindFile {
+        node_id: String,
+        thread_id: String,
     },
     Move {
         moves: Vec<CanvasNodeMove>,
@@ -546,6 +574,11 @@ fn live_reference(
     }
 }
 fn require_references(connection: &Connection, data: &CanvasNodeData) -> Result<bool> {
+    if let Some(reference) = &data.file_reference {
+        if !reference.live(connection)? {
+            return Ok(false);
+        }
+    }
     if let Some(reference) = &data.object_reference {
         let Some(owner) = &data.conversation else {
             return Ok(false);
@@ -592,6 +625,9 @@ fn insert_node(connection: &Connection, node: &CanvasNode) -> Result<()> {
     if let Some(reference) = &d.object_reference {
         reference.insert(connection, &node.id)?;
     }
+    if let Some(reference) = &d.file_reference {
+        reference.insert(connection, &node.id)?;
+    }
     Ok(())
 }
 fn update_node(connection: &Connection, node: &CanvasNode, old: &CanvasNode) -> Result<()> {
@@ -625,6 +661,16 @@ fn update_node(connection: &Connection, node: &CanvasNode, old: &CanvasNode) -> 
     }
     sql.push_str(" WHERE id=?1 AND board_id=?2");
     connection.execute(&sql, rusqlite::params_from_iter(values))?;
+    if d.file_reference != old.data.file_reference {
+        anyhow::ensure!(
+            old.data.file_reference.is_none(),
+            "Canvas file reference is immutable"
+        );
+        d.file_reference
+            .as_ref()
+            .context("Canvas file reference cannot be cleared")?
+            .insert(connection, &node.id)?;
+    }
     Ok(())
 }
 fn finish(
@@ -735,6 +781,29 @@ pub fn apply(
                     return Ok(rejected("binding_unavailable"));
                 }
                 nodes.push(node(&board.id, data, &now));
+            }
+            CanvasNodeMutation::BindFile { node_id, thread_id } => {
+                let Some(target) = nodes.iter_mut().find(|n| n.id == *node_id) else {
+                    return Ok(rejected("not_found"));
+                };
+                let reference = crate::canvas_file_reference::CanvasFileReference {
+                    thread_id: thread_id.clone(),
+                };
+                if target.data.kind != CanvasNodeKind::File || !reference.valid() {
+                    return Ok(rejected("invalid_file_reference"));
+                }
+                if target
+                    .data
+                    .file_reference
+                    .as_ref()
+                    .is_some_and(|current| current != &reference)
+                {
+                    return Ok(rejected("file_binding_immutable"));
+                }
+                if !reference.live(tx)? {
+                    return Ok(rejected("binding_unavailable"));
+                }
+                target.data.file_reference = Some(reference);
             }
             CanvasNodeMutation::Update { node_id, patch } => {
                 let Some(target) = nodes.iter_mut().find(|n| n.id == *node_id) else {
@@ -933,6 +1002,7 @@ pub fn apply(
                     conversation: Some(conversation.clone()),
                     conversations: vec![],
                     object_reference: None,
+                    file_reference: None,
                     title: None,
                     content: None,
                     path: None,
@@ -1051,6 +1121,7 @@ fn fixture_data(kind: CanvasNodeKind) -> CanvasNodeData {
         }),
         conversations: vec![],
         object_reference: None,
+        file_reference: None,
         title: Some("  节点  ".into()),
         content: (kind == CanvasNodeKind::Note).then(|| "\n中文 **便签**\n".into()),
         path: matches!(kind, CanvasNodeKind::File | CanvasNodeKind::Terminal)
@@ -1174,6 +1245,36 @@ mod tests {
         assert!(
             serde_json::from_value::<crate::canvas_object_reference::CanvasObjectReference>(
                 json!({"kind":"mission","missionId":"mission","taskId":"task"})
+            )
+            .is_err()
+        );
+        let mut bound_file = fixture_data(CanvasNodeKind::File);
+        bound_file.path = Some("/workspace/原文件.txt ".into());
+        bound_file.file_reference = Some(crate::canvas_file_reference::CanvasFileReference {
+            thread_id: "original-thread".into(),
+        });
+        normalize(&mut bound_file).unwrap();
+        assert_eq!(bound_file.path.as_deref(), Some("/workspace/原文件.txt "));
+        bound_file.kind = CanvasNodeKind::Terminal;
+        assert_eq!(normalize(&mut bound_file), Err("invalid_file_reference"));
+        assert!(
+            !serde_json::to_value(fixture_data(CanvasNodeKind::File))
+                .unwrap()
+                .as_object()
+                .unwrap()
+                .contains_key("fileReference")
+        );
+        for bad in ["", " thread", "thread ", "thread\0", &"x".repeat(129)] {
+            assert!(
+                !crate::canvas_file_reference::CanvasFileReference {
+                    thread_id: bad.into()
+                }
+                .valid()
+            );
+        }
+        assert!(
+            serde_json::from_value::<crate::canvas_file_reference::CanvasFileReference>(
+                json!({"threadId":"thread","rootGrantId":"injected"})
             )
             .is_err()
         );
@@ -1452,6 +1553,143 @@ mod persistence_tests {
                 .object_reference,
             Some(references[0].clone())
         );
+        id
+    }
+    fn verify_file_pins(database: &mut Database, thread_id: &str) -> String {
+        use crate::canvas_file_reference::CanvasFileReference;
+        let id = board(database);
+        let reference = CanvasFileReference {
+            thread_id: thread_id.into(),
+        };
+        let mut data = fixture_data(CanvasNodeKind::File);
+        data.path = Some(
+            database
+                .directory()
+                .join("missing #文档.txt ")
+                .display()
+                .to_string(),
+        );
+        data.file_reference = Some(reference.clone());
+        let request = command(
+            database,
+            &id,
+            CanvasNodeMutation::Create { node: data.clone() },
+        );
+        let first = apply(database, &request).unwrap().result;
+        assert_eq!(first.status, CommandResultStatus::Applied);
+        assert_eq!(apply(database, &request).unwrap().result, first);
+        let node_id = first.payload["nodeIds"][0].as_str().unwrap().to_owned();
+        let stored = snapshot(database.connection(), &id).unwrap();
+        assert_eq!(stored.file_reference_version, 1);
+        assert_eq!(stored.nodes[0].data, data);
+        assert!(database.connection().execute("UPDATE canvas_node_file_reference SET file_thread_id=file_thread_id WHERE node_id=?1", [&node_id]).is_err());
+        let mut missing = data.clone();
+        missing.file_reference.as_mut().unwrap().thread_id = "missing-thread".into();
+        let invalid = command(database, &id, CanvasNodeMutation::Create { node: missing });
+        assert_eq!(
+            apply(database, &invalid).unwrap().result.code,
+            "canvas.nodes.binding_unavailable"
+        );
+        let legacy = run(
+            database,
+            &id,
+            CanvasNodeMutation::Create {
+                node: fixture_data(CanvasNodeKind::File),
+            },
+        )
+        .payload["nodeIds"][0]
+            .as_str()
+            .unwrap()
+            .to_owned();
+        let bind = command(
+            database,
+            &id,
+            CanvasNodeMutation::BindFile {
+                node_id: legacy.clone(),
+                thread_id: thread_id.into(),
+            },
+        );
+        let bound = apply(database, &bind).unwrap().result;
+        assert_eq!(bound.status, CommandResultStatus::Applied);
+        assert_eq!(apply(database, &bind).unwrap().result, bound);
+        let wrong = command(
+            database,
+            &id,
+            CanvasNodeMutation::BindFile {
+                node_id: legacy.clone(),
+                thread_id: "replacement".into(),
+            },
+        );
+        assert_eq!(
+            apply(database, &wrong).unwrap().result.code,
+            "canvas.nodes.file_binding_immutable"
+        );
+        let other_board = board(database);
+        let cross = command(
+            database,
+            &other_board,
+            CanvasNodeMutation::BindFile {
+                node_id: legacy,
+                thread_id: thread_id.into(),
+            },
+        );
+        assert_eq!(
+            apply(database, &cross).unwrap().result.code,
+            "canvas.nodes.not_found"
+        );
+        let before = serde_json::to_value(snapshot(database.connection(), &id).unwrap()).unwrap();
+        database.connection().execute_batch("CREATE TEMP TRIGGER reject_canvas_file_receipt BEFORE INSERT ON event_log WHEN NEW.command_type='canvas.nodes.apply' AND NEW.event_type='command.result' BEGIN SELECT RAISE(ABORT,'file reference rollback fixture');END;").unwrap();
+        let failed = command(database, &id, CanvasNodeMutation::Create { node: data });
+        assert!(apply(database, &failed).is_err());
+        assert_eq!(
+            serde_json::to_value(snapshot(database.connection(), &id).unwrap()).unwrap(),
+            before
+        );
+        assert!(!database.connection().query_row("SELECT EXISTS(SELECT 1 FROM event_log WHERE command_id=?1 AND event_type='command.result')", [&failed.command_id], |row| row.get::<_,bool>(0)).unwrap());
+        database
+            .connection()
+            .execute_batch("DROP TRIGGER reject_canvas_file_receipt;")
+            .unwrap();
+        // Missing original Thread is a retained soft reference, not a new implicit binding.
+        database
+            .connection()
+            .execute(
+                "UPDATE camp SET activation_state='pending' WHERE id=?1",
+                [thread_id],
+            )
+            .unwrap();
+        run(database, &id, CanvasNodeMutation::Prune);
+        run(
+            database,
+            &id,
+            CanvasNodeMutation::Update {
+                node_id: node_id.clone(),
+                patch: CanvasNodePatch {
+                    title: Some("保留原引用".into()),
+                    ..Default::default()
+                },
+            },
+        );
+        assert_eq!(
+            snapshot(database.connection(), &id)
+                .unwrap()
+                .nodes
+                .iter()
+                .find(|node| node.id == node_id)
+                .unwrap()
+                .data
+                .file_reference
+                .as_ref(),
+            Some(&reference)
+        );
+        assert_eq!(apply(database, &request).unwrap().result, first);
+        database
+            .connection()
+            .execute(
+                "UPDATE camp SET activation_state='active' WHERE id=?1",
+                [thread_id],
+            )
+            .unwrap();
         id
     }
     #[test]
@@ -1992,6 +2230,9 @@ mod persistence_tests {
                 .any(|n| n.id == restored.id)
         );
         let object_board = verify_object_pins(&mut database, &thread_id);
+        let file_board = verify_file_pins(&mut database, &thread_id);
+        let file_preserved =
+            serde_json::to_value(snapshot(database.connection(), &file_board).unwrap()).unwrap();
         let object_preserved =
             serde_json::to_value(snapshot(database.connection(), &object_board).unwrap()).unwrap();
         let preserved =
@@ -1999,6 +2240,10 @@ mod persistence_tests {
         let root = database.directory().to_path_buf();
         database.close();
         let mut reopened = Database::open(&root).unwrap();
+        assert_eq!(
+            file_preserved,
+            serde_json::to_value(snapshot(reopened.connection(), &file_board).unwrap()).unwrap()
+        );
         assert_eq!(
             object_preserved,
             serde_json::to_value(snapshot(reopened.connection(), &object_board).unwrap()).unwrap()
@@ -2056,6 +2301,22 @@ mod persistence_tests {
             board_id: object_board.clone(),
             expected_revision: revision(&reopened, &object_board),
         };
+        let file_delete = canvas_board::DeleteCanvasBoardCommand {
+            board_id: file_board.clone(),
+            expected_revision: revision(&reopened, &file_board),
+        };
+        canvas_board::delete(&mut reopened, &envelope(file_delete)).unwrap();
+        assert_eq!(
+            reopened
+                .connection()
+                .query_row(
+                    "SELECT COUNT(*) FROM canvas_node_file_reference",
+                    [],
+                    |row| row.get::<_, i64>(0)
+                )
+                .unwrap(),
+            0
+        );
         canvas_board::delete(&mut reopened, &envelope(object_delete)).unwrap();
         assert_eq!(
             reopened

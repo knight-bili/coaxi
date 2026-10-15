@@ -1,5 +1,7 @@
 #[path = "db_attachment_paths.rs"]
 mod attachment_paths;
+#[path = "db_canvas_files.rs"]
+mod canvas_files;
 #[path = "db_canvas_objects.rs"]
 mod canvas_objects;
 #[path = "db_member_creation.rs"]
@@ -40,10 +42,14 @@ pub(crate) fn upgrade_canvas_object_fixture(database: &mut Database) {
     if !database.schema_migration_applied(207).unwrap() {
         canvas_objects::migrate(database).unwrap();
     }
+    if !database.schema_migration_applied(208).unwrap() {
+        canvas_files::migrate(database).unwrap();
+    }
 }
 #[cfg(test)]
 pub(crate) fn verify_canvas_object_fixture(database: &mut Database) {
     canvas_objects::verify_fixture(database);
+    canvas_files::verify_fixture(database);
 }
 
 #[cfg(test)]
@@ -381,8 +387,8 @@ impl MainThreadMigrationSource {
 }
 
 pub(crate) const CURRENT_DATA_CONTRACT_VERSION: &str = "v1.72";
-pub(crate) const CURRENT_PROJECTION_SCHEMA_VERSION: i64 = 157;
-const CURRENT_SCHEMA_MIGRATION_VERSION: i64 = 207;
+pub(crate) const CURRENT_PROJECTION_SCHEMA_VERSION: i64 = 158;
+const CURRENT_SCHEMA_MIGRATION_VERSION: i64 = 208;
 const V147_MIGRATION_SOURCE_DATA_CONTRACT_VERSION: &str = "v1.54";
 const V147_MIGRATION_SOURCE_PROJECTION_SCHEMA_VERSION: i64 = 96;
 const V145_MIGRATION_SOURCE_DATA_CONTRACT_VERSION: &str = "v1.53";
@@ -3398,11 +3404,12 @@ pub(crate) fn classify_database_contract(
     if marker.contract_version == CURRENT_DATA_CONTRACT_VERSION
         && matches!(
             marker.projection_schema_version,
-            145 | 146 | 147 | 148 | 149 | 150 | 151 | 152 | 153 | 154 | 155 | 156 | 157
+            145 | 146 | 147 | 148 | 149 | 150 | 151 | 152 | 153 | 154 | 155 | 156 | 157 | 158
         )
     {
         let expected_migration = match marker.projection_schema_version {
-            157 => CURRENT_SCHEMA_MIGRATION_VERSION,
+            158 => CURRENT_SCHEMA_MIGRATION_VERSION,
+            157 => 207,
             156 => 206,
             155 => 205,
             154 => 204,
@@ -3450,6 +3457,10 @@ pub(crate) fn classify_database_contract(
                 || private_composer_scope::schema_matches(connection)?)
             && (marker.projection_schema_version < 156
                 || private_source_observation::schema_matches(connection)?)
+            && (marker.projection_schema_version < 158
+                || canvas_files::schema_matches(connection)?)
+            && (marker.projection_schema_version != 157
+                || canvas_files::source_schema_matches(connection)?)
             && (marker.projection_schema_version < 157
                 || canvas_objects::schema_matches(connection)?)
             && (marker.projection_schema_version != 156
@@ -9167,6 +9178,9 @@ impl Database {
             if !self.schema_migration_applied(207)? {
                 migration_step!("migration_207", canvas_objects::migrate(self));
             }
+            if !self.schema_migration_applied(208)? {
+                migration_step!("migration_208", canvas_files::migrate(self));
+            }
             if let Err(error) =
                 crate::notification::maintain_notification_episode_retention(self.connection())
             {
@@ -10006,6 +10020,9 @@ impl Database {
         }
         if !self.schema_migration_applied(207)? {
             migration_step!("migration_207", canvas_objects::migrate(self));
+        }
+        if !self.schema_migration_applied(208)? {
+            migration_step!("migration_208", canvas_files::migrate(self));
         }
         if let Err(error) =
             crate::notification::maintain_notification_episode_retention(self.connection())
@@ -40012,6 +40029,7 @@ mod tests {
         private_composer_scope::migrate(&mut database).unwrap();
         private_source_observation::migrate(&mut database).unwrap();
         canvas_objects::migrate(&mut database).unwrap();
+        canvas_files::migrate(&mut database).unwrap();
         assert!(connection_has_current_data_contract(database.connection()).unwrap());
         assert!(database.schema_migration_applied(200).unwrap());
         assert!(
@@ -43596,6 +43614,7 @@ mod tests {
         private_composer_scope::migrate(&mut database).unwrap();
         private_source_observation::migrate(&mut database).unwrap();
         canvas_objects::migrate(&mut database).unwrap();
+        canvas_files::migrate(&mut database).unwrap();
         assert!(connection_has_current_data_contract(database.connection()).unwrap());
         database.connection().execute_batch("DROP INDEX native_session_bootstrap_binding_idx;
             CREATE UNIQUE INDEX native_session_bootstrap_binding_idx ON native_session_bootstrap_evidence(native_binding_id,native_binding_generation)").unwrap();

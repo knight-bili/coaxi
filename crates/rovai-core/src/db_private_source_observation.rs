@@ -149,6 +149,7 @@ pub(super) fn verify_migration_fixture(database: &mut Database) {
         .unwrap();
     migrate(database).unwrap();
     super::canvas_objects::migrate(database).unwrap();
+    super::canvas_files::migrate(database).unwrap();
     assert!(schema_matches(database.connection()).unwrap());
     let tx = database.connection().unchecked_transaction().unwrap();
     tx.execute_batch("DROP TRIGGER single_chat_source_observation_immutable;

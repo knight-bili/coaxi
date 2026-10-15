@@ -57,6 +57,7 @@ pub(super) fn migrate(database: &mut Database) -> Result<()> {
 }
 #[cfg(test)]
 pub(super) fn downgrade_for_test(connection: &Connection) {
+    super::canvas_files::downgrade_for_test(connection);
     if !connection
         .table_exists(None, "canvas_node_object_reference")
         .unwrap()
@@ -124,6 +125,7 @@ pub(super) fn verify_fixture(database: &mut Database) {
         .execute_batch("DROP TRIGGER reject_canvas_object_migration;")
         .unwrap();
     migrate(database).unwrap();
+    super::canvas_files::migrate(database).unwrap();
     assert!(connection_has_current_data_contract(database.connection()).unwrap());
     assert_eq!(rows(database.connection()), before);
     let tx = database.connection().unchecked_transaction().unwrap();

@@ -1840,3 +1840,11 @@ HTTP 原 owner 补认证/跨编辑端/就绪回滚/真实终结/材料与spool�
 原 GraphController owner 扩能力缺失拒绝和独立Diff原UUID/对象/path冻结重试；当前类型检查与低成本客户端检查独立记录。
 实际 SQLite 夹具从当前 Rust 字符串提取表/触发器/Join/列及来源判定 SQL，覆盖回滚/失效保留/权限/重开/删除；
 它不调用 Rust migration/classifier/Gateway，不能写成这些方法已通过。真实Host owner、独立卡片UI与既有工作区导航待接线和阶段验证。
+
+I03-C03 文件来源绑定继续扩原 canvas_node 纯类型 owner 与 extended migration/graph owner，不新增 Rust 测试函数。
+类型断言覆盖旧None省略、来源闭合、错误kind/空白/长度和精确原路径；原持久owner覆盖208迁移回滚/假触发器，
+带来源创建、显式旧节点绑定/重放、不能改绑/跨板、回执故障全回滚、来源失效保留与重开/删除级联。
+旧205–207夹具链先安全移除空208再逐步回退，恢复到208后继续；有真实引用时禁止降级夹具丢弃数据。
+原GraphController owner补能力准入和原文件/Thread/node/UUID/版本冻结；原Main access/authority/service owner拥有真实临时文件与symlink边界，
+Windows不能创建的冒号文件名用原平台条件跳过，不能把它计为通过。原文SQL夹具只是SQLite语句证据，
+不证明Rust分类器、Gateway或Host已运行；当前158/208新增Rust随阶段候选列出非零原owner后编译实跑。
