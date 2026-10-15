@@ -16,7 +16,7 @@ export function CanvasConversationFrame({ bridge, instance, title, orphaned = fa
   bridge: CanvasConversationBridge; instance: CanvasConversationBridge['instances'][number]; title: string; orphaned?: boolean; onOpenWorkspace(): void
 }): React.JSX.Element {
   const { target, key, busy } = instance
-  return <section className="canvas-conversation-frame nodrag nowheel nopan" aria-label={uiAttribute('画布对话：{0}', title)}
+  return <section className="canvas-conversation-frame nodrag nowheel nopan" data-canvas-conversation-key={key} aria-label={uiAttribute('画布对话：{0}', title)}
     onKeyDown={event => {
       if (event.key === 'Escape' && !event.defaultPrevented) { event.preventDefault(); void bridge.close([key]) }
       // Preserve document-level conversation shortcuts, while isolating canvas movement/deletion.

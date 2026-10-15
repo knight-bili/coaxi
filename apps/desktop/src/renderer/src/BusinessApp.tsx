@@ -4232,6 +4232,7 @@ function BusinessAppContent({
         singleChatSources={singleChatVisible ? visibleSingleChatSources : null}
         visibleSources={visibleNotificationSources}
         canvasSources={view === 'canvas' && !startupGateVisible && !newConversationOpen && !newMissionOpen && !shuttingDown ? canvasNotificationSources : undefined}
+        readCanvasSources={view === 'canvas' && !startupGateVisible && !newConversationOpen && !newMissionOpen && !shuttingDown ? canvasVisibility.readVisibleSources : undefined}
         onHeadsUpVisibleChange={setNotificationHeadsUpVisible}
       />
       {desktop && <AppUpdatePrompt

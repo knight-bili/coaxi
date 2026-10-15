@@ -1,9 +1,21 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { CanvasNotificationVisibility, intersectNotificationRects } from './canvas-notification-visibility'
 const source = (threadId: string, messageId: string, conversationId: string | null = null) => ({ threadId, conversationId,
   surfaceVisible: true, snapshotSequence: 10, messageIds: [messageId], campTurnIds: [], agentRunIds: [], approvalIds: [] })
+afterEach(() => vi.unstubAllGlobals())
 
 describe('canvas visibility reports', () => {
+  it('rechecks window attention and rejects reports whose real frame is gone before dispatch', () => {
+    const store = new CanvasNotificationVisibility()
+    store.register('first', 'a').publish('public', source('a', 'message'))
+    vi.stubGlobal('document', { visibilityState: 'hidden', hasFocus: () => true })
+    expect(store.readVisibleSources()).toEqual([])
+    vi.stubGlobal('document', { visibilityState: 'visible', hasFocus: () => false })
+    expect(store.readVisibleSources()).toEqual([])
+    vi.stubGlobal('document', { visibilityState: 'visible', hasFocus: () => true, querySelectorAll: () => [] })
+    expect(store.readVisibleSources()).toEqual([])
+    expect(store.getSnapshot()[0].messageIds).toEqual(['message'])
+  })
   it('retains both mirrors and private reports while closing only their own lease', () => {
     const store = new CanvasNotificationVisibility(), first = store.register('first', 'a'), mirror = store.register('mirror', 'a'), other = store.register('other', 'b')
     first.publish('public', source('a', 'first')); mirror.publish('public', source('a', 'mirror')); other.publish('private', source('b', 'private', 'conversation-b'))

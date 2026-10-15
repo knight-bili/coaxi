@@ -7,6 +7,21 @@ export class CanvasNotificationVisibility {
   private snapshot: readonly VisibleNotificationSources[] = []
   subscribe = (listener: () => void): (() => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener) } }
   getSnapshot = (): readonly VisibleNotificationSources[] => this.snapshot
+  readVisibleSources = (): readonly VisibleNotificationSources[] => {
+    if (document.visibilityState !== 'visible' || !document.hasFocus()) return []
+    return [...this.owners].flatMap(([key, owner]) => {
+      const frame = [...document.querySelectorAll<HTMLElement>('.canvas-conversation-frame')].find(node => node.dataset.canvasConversationKey === key)
+      if (!frame) return []
+      const visibleIds = (attribute: string): Set<string> => new Set([...frame.querySelectorAll<HTMLElement>(`[${attribute}]`)]
+        .filter(node => canvasNotificationNodeVisible(node)).map(node => node.getAttribute(attribute)!))
+      const messages = visibleIds('data-message-id'), turns = new Set([...visibleIds('data-thread-turn-id'), ...visibleIds('data-notification-turn-id')])
+      const runs = visibleIds('data-agent-run-id'), approvals = visibleIds('data-approval-id')
+      return [...owner.sources.values()].filter(source => source.surfaceVisible === true).map(source => ({ ...source,
+        surfaceVisible: canvasNotificationNodeVisible(frame), messageIds: source.messageIds.filter(id => messages.has(id)),
+        campTurnIds: source.campTurnIds.filter(id => turns.has(id)), agentRunIds: source.agentRunIds.filter(id => runs.has(id)),
+        approvalIds: source.approvalIds.filter(id => approvals.has(id)) }))
+    })
+  }
   private changed(): void {
     const next = [...this.owners.values()].flatMap(owner => [...owner.sources.values()])
     if (JSON.stringify(next) === JSON.stringify(this.snapshot)) return

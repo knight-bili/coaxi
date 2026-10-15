@@ -58,6 +58,7 @@ interface NotificationAttentionControllerProps {
   visibleSources: VisibleNotificationSources | null
   singleChatSources?: VisibleNotificationSources | null
   canvasSources?: readonly VisibleNotificationSources[]
+  readCanvasSources?(): readonly VisibleNotificationSources[]
   onHeadsUpVisibleChange?(visible: boolean): void
 }
 
@@ -342,13 +343,15 @@ function NotificationAttentionControllerContent({
   visibleSources: publicSources,
   singleChatSources = null,
   canvasSources = NO_CANVAS_SOURCES,
+  readCanvasSources,
   onHeadsUpVisibleChange
 }: NotificationAttentionControllerProps): React.JSX.Element {
   const client = useThreadClient()
-  const readingSources = useMemo(() => [...(activeThreadVisible
+  const mainReadingSources = useMemo(() => activeThreadVisible
     ? [publicSources, singleChatSources].filter((source): source is VisibleNotificationSources => (
       source !== null && source.threadId === activeThreadId && source.surfaceVisible !== false
-    )) : []), ...canvasSources.filter(source => source.surfaceVisible !== false)], [activeThreadVisible, activeThreadId, publicSources, singleChatSources, canvasSources])
+    )) : [], [activeThreadVisible, activeThreadId, publicSources, singleChatSources])
+  const readingSources = useMemo(() => [...mainReadingSources, ...canvasSources.filter(source => source.surfaceVisible !== false)], [mainReadingSources, canvasSources])
   const visibleSourceGroups = useMemo(() => groupVisibleNotificationSources(readingSources), [readingSources])
   const quietThreadIds = useMemo(() => [...new Set([...(activeThreadVisible && activeThreadId ? [activeThreadId] : []),
     ...canvasSources.filter(source => source.surfaceVisible === true).map(source => source.threadId)])], [activeThreadVisible, activeThreadId, canvasSources])
@@ -638,7 +641,8 @@ function NotificationAttentionControllerContent({
       || navigationActive
       || !windowAttentive
     ) return undefined
-    for (const visibleSources of visibleSourceGroups) {
+    const currentGroups = readCanvasSources ? groupVisibleNotificationSources([...mainReadingSources, ...readCanvasSources()]) : visibleSourceGroups
+    for (const visibleSources of currentGroups) {
       const sourceCount = visibleSources.messageIds.length
         + visibleSources.campTurnIds.length
         + visibleSources.agentRunIds.length
@@ -689,6 +693,8 @@ function NotificationAttentionControllerContent({
     readUnreadStatus,
     visibleAcknowledgementRetry,
     visibleSourceGroups,
+    mainReadingSources,
+    readCanvasSources,
     windowAttentive
   ])
 
