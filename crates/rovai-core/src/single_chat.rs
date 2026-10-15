@@ -1,7 +1,5 @@
 use crate::draft_client::DraftClient;
-use crate::message_quote::{
-    MessageQuoteSnapshot, QuoteStorage, copy_quotes, load_quotes, store_quotes,
-};
+use crate::message_quote::{MessageQuoteSnapshot, QuoteStorage, load_quotes, store_quotes};
 use crate::single_chat_composer_scope::{PrivateComposerKey, SingleChatComposerScope};
 use std::collections::{BTreeSet, HashMap, HashSet};
 
@@ -258,6 +256,8 @@ pub struct EditSingleChatPendingInputCommand {
     pub pending_input_id: String,
     pub expected_revision: i64,
     pub edit_token: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub composer_scope: Option<SingleChatComposerScope>,
     pub action: SingleChatPendingInputEditAction,
 }
 
@@ -267,6 +267,12 @@ pub enum SingleChatPendingInputEditAction {
     ReturnToComposer {
         #[serde(rename = "expectedDraftRevision")]
         expected_draft_revision: i64,
+        #[serde(
+            default,
+            rename = "targetBody",
+            skip_serializing_if = "Option::is_none"
+        )]
+        target_body: Option<String>,
     },
     Begin,
     Takeover,
@@ -1153,9 +1159,15 @@ impl SingleChatService {
                     "Single Chat command is outside the Thread",
                 ));
             }
+            if !crate::single_chat_composer::owner_exists(transaction, &command.camp_id, &command.conversation_id, true)? {
+                return Ok(rejected("single_chat.not_active", "The private conversation is unavailable"));
+            }
+            let Some((key, registered)) = crate::single_chat_composer::resolve_scope(
+                transaction, &command.camp_id, &command.conversation_id, client, command.composer_scope.as_ref(),
+            )? else { return Ok(rejected("single_chat.scope_unavailable", "The private input scope is unavailable")); };
             let current = transaction
                 .query_row(
-                    "SELECT revision, state, body, source_attachments_json
+                    "SELECT revision, state, body, source_attachments_json, quotes_json
                      FROM single_chat_pending_input
                      WHERE conversation_id = ?1 AND id = ?2",
                     params![command.conversation_id, command.pending_input_id],
@@ -1165,11 +1177,12 @@ impl SingleChatService {
                             row.get::<_, String>(1)?,
                             row.get::<_, String>(2)?,
                             row.get::<_, String>(3)?,
+                            row.get::<_, String>(4)?,
                         ))
                     },
                 )
                 .optional()?;
-            let Some((revision, state, body, source_attachments_json)) = current else {
+            let Some((revision, state, body, source_attachments_json, quotes_json)) = current else {
                 return Ok(rejected(
                     "single_chat.pending_input_not_found",
                     "Pending input no longer exists",
@@ -1189,38 +1202,22 @@ impl SingleChatService {
                     && session.base_pending_revision == revision
                     && Some(session.edit_token.as_str()) == command.edit_token.as_deref()
                     && session.client_id == client.id()
-                    && session.scope_key.is_empty()
+                    && session.scope_key == key.sql_key()
             });
 
             match &command.action {
-                SingleChatPendingInputEditAction::ReturnToComposer { expected_draft_revision } => {
-                    if session.as_ref().is_some_and(|session| session.pending_input_id == command.pending_input_id) && !owns_session {
-                        return Ok(rejected("single_chat.pending_input_edit_fenced", "The pending input edit session changed"));
+                SingleChatPendingInputEditAction::ReturnToComposer { .. } => {
+                    if session.as_ref().is_some_and(|session| session.pending_input_id == command.pending_input_id) {
+                        return Ok(rejected("single_chat.pending_input_edit_open", "Save or cancel this edit before returning the pending input"));
                     }
-                    let (draft_revision, _) = load_single_chat_draft_refs(transaction, &command.conversation_id, client)?;
-                    if draft_revision != *expected_draft_revision {
-                        return Ok(rejected("single_chat.draft_changed", "The Composer Draft changed; reload it first"));
+                    let result = crate::single_chat_composer::return_pending_input(transaction, command, &key, registered,
+                        &body, &source_attachments_json, &quotes_json)?;
+                    if result.status != crate::command::CommandResultStatus::Rejected {
+                        append_domain_event(transaction, "single_chat.pending_input_updated", Some(&target.camp_id),
+                            Some(("single_chat_pending_input", &command.pending_input_id)), &envelope.actor, None,
+                            &json!({"conversationId":command.conversation_id}))?;
                     }
-                    store_single_chat_draft_refs(transaction, &command.conversation_id, draft_revision,
-                        &parse_source_attachments(&source_attachments_json)?, client)?;
-                    copy_quotes(transaction, QuoteStorage::PrivatePending, &command.pending_input_id,
-                        QuoteStorage::ClientPrivateDraft(client), &command.conversation_id)?;
-                    transaction.execute("UPDATE single_chat_composer_draft SET quote_trash_json = '[]' WHERE conversation_id = ?1 AND client_id = ?2 AND scope_key = ''", params![command.conversation_id, client.id()])?;
-                    transaction.execute(
-                        "UPDATE single_chat_pending_input SET state = 'cancelled', revision = revision + 1, updated_at = ?2 WHERE id = ?1",
-                        params![command.pending_input_id, chrono::Utc::now().to_rfc3339()],
-                    )?;
-                    transaction.execute("DELETE FROM single_chat_pending_input_edit_session WHERE conversation_id = ?1 AND pending_input_id = ?2",
-                        params![command.conversation_id, command.pending_input_id])?;
-                    return Ok(CommandHandlerResult::applied("single_chat.pending_input_returned_to_composer",
-                        json!({"pendingInputId": command.pending_input_id, "body": body,
-                            "draft": SingleChatComposerDraftView {
-                                revision: draft_revision + 1,
-                                attachments: source_attachment_views(&source_attachments_json)?,
-                                quotes: load_quotes(transaction, QuoteStorage::ClientPrivateDraft(client), &command.conversation_id)?,
-                                updated_at: Some(transaction.query_row("SELECT updated_at FROM single_chat_composer_draft WHERE conversation_id = ?1 AND client_id = ?2 AND scope_key = ''",
-                                    params![command.conversation_id, client.id()], |row| row.get::<_, String>(0))?),
-                            }}), None));
+                    return Ok(result);
                 }
                 SingleChatPendingInputEditAction::Begin
                 | SingleChatPendingInputEditAction::Takeover => {
@@ -1233,21 +1230,22 @@ impl SingleChatService {
                         ));
                     }
                     if matches!(command.action, SingleChatPendingInputEditAction::Takeover)
-                        && !owns_session
+                        && !session.as_ref().is_some_and(|session| session.pending_input_id == command.pending_input_id && session.base_pending_revision == revision)
                     {
                         return Ok(rejected(
                             "single_chat.pending_input_edit_fenced",
                             "The pending input edit session changed",
                         ));
                     }
+                    crate::single_chat_composer::register(transaction, &command.conversation_id, client, command.composer_scope.as_ref(), &key, registered)?;
                     let edit_token = Uuid::new_v4().to_string();
                     transaction.execute(
                         r#"
                         INSERT INTO single_chat_pending_input_edit_session(
                             conversation_id, pending_input_id, edit_token,
                             base_pending_revision, recovery_required, working_body,
-                            working_source_attachments_json, client_id
-                        ) VALUES (?1, ?2, ?3, ?4, 0, ?5, ?6, ?7)
+                            working_source_attachments_json, client_id, scope_key, quotes_json, quote_trash_json
+                        ) VALUES (?1, ?2, ?3, ?4, 0, ?5, ?6, ?7, ?8, ?9, '[]')
                         ON CONFLICT(conversation_id) DO UPDATE SET
                             pending_input_id = excluded.pending_input_id,
                             edit_token = excluded.edit_token,
@@ -1256,7 +1254,10 @@ impl SingleChatService {
                             working_body = excluded.working_body,
                             working_source_attachments_json =
                                 excluded.working_source_attachments_json,
-                            client_id = excluded.client_id
+                            client_id = excluded.client_id,
+                            scope_key = excluded.scope_key,
+                            quotes_json = excluded.quotes_json,
+                            quote_trash_json = '[]'
                         "#,
                         params![
                             command.conversation_id,
@@ -1265,11 +1266,9 @@ impl SingleChatService {
                             revision,
                             body,
                             source_attachments_json,
-                            client.id(),
+                            client.id(), key.sql_key(), quotes_json,
                         ],
                     )?;
-                    copy_quotes(transaction, QuoteStorage::PrivatePending, &command.pending_input_id, QuoteStorage::PrivateEdit, &command.conversation_id)?;
-                    transaction.execute("UPDATE single_chat_pending_input_edit_session SET quote_trash_json='[]' WHERE conversation_id=?1", [&command.conversation_id])?;
                     return Ok(CommandHandlerResult::applied(
                         "single_chat.pending_input_edit_started",
                         json!({ "editToken": edit_token }),
@@ -1296,7 +1295,7 @@ impl SingleChatService {
                         .working_source_attachments_json
                         .clone();
                     let refs = parse_source_attachments(&working_json)?;
-                    let working_quotes = load_quotes(transaction, QuoteStorage::PrivateEdit, &command.conversation_id)?;
+                    let working_quotes = crate::message_quote::parse_quotes(&session.as_ref().expect("owned pending edit session").working_quotes_json)?;
                     anyhow::ensure!(working_quotes.is_empty() || !body.trim().is_empty(), "quote.question_required");
                     if body.trim().is_empty() && refs.is_empty() {
                         return Ok(rejected(
@@ -1324,8 +1323,22 @@ impl SingleChatService {
                     if !owns_session || session.as_ref().is_some_and(|session| session.recovery_required) {
                         return Ok(rejected("single_chat.pending_input_edit_fenced", "Reopen the pending input before editing quotes"));
                     }
-                    crate::message_quote::mutate_quotes(transaction, QuoteStorage::PrivateEdit, &command.conversation_id,
-                        &command.camp_id, Some(&command.conversation_id), action)?;
+                    let owned = session.as_ref().expect("owned pending edit session");
+                    let (quotes, trash) = match crate::message_quote::prepare_quote_mutation(transaction, &command.camp_id, Some(&command.conversation_id),
+                        crate::message_quote::parse_quotes(&owned.working_quotes_json)?, &owned.quote_trash_json, action) {
+                        Ok(value) => value,
+                        Err(error) => {
+                            let reason = error.to_string();
+                            if reason.starts_with("quote.") && reason.len() <= 80 && reason.bytes().all(|b| b.is_ascii_lowercase() || b == b'_' || b == b'.') {
+                                return Ok(CommandHandlerResult::rejected(reason, json!({})));
+                            }
+                            return Err(error);
+                        }
+                    };
+                    let changed = transaction.execute("UPDATE single_chat_pending_input_edit_session SET quotes_json=?5,quote_trash_json=?6
+                        WHERE conversation_id=?1 AND pending_input_id=?2 AND edit_token=?3 AND client_id=?4 AND scope_key=?7",
+                        params![command.conversation_id,command.pending_input_id,command.edit_token,client.id(),serde_json::to_string(&quotes)?,trash,key.sql_key()])?;
+                    anyhow::ensure!(changed == 1, "single_chat.pending_input_edit_fenced");
                     return Ok(CommandHandlerResult::applied("single_chat.pending_input_quotes_updated", json!({"pendingInputId":command.pending_input_id}), None));
                 }
                 SingleChatPendingInputEditAction::RemoveAttachment { attachment_ref_id } => {
@@ -1354,6 +1367,7 @@ impl SingleChatService {
                         &command.pending_input_id,
                         command.edit_token.as_deref().unwrap_or_default(),
                         &refs,
+                        &key,
                     )?;
                     return Ok(CommandHandlerResult::applied(
                         "single_chat.pending_input_attachment_removed",
@@ -1400,6 +1414,7 @@ impl SingleChatService {
                         &command.pending_input_id,
                         command.edit_token.as_deref().unwrap_or_default(),
                         &reordered,
+                        &key,
                     )?;
                     return Ok(CommandHandlerResult::applied(
                         "single_chat.pending_input_attachments_reordered",
@@ -1983,6 +1998,8 @@ struct StoredSingleChatPendingEditSession {
     base_pending_revision: i64,
     recovery_required: bool,
     working_source_attachments_json: String,
+    working_quotes_json: String,
+    quote_trash_json: String,
 }
 
 fn load_pending_edit_session(
@@ -1992,7 +2009,7 @@ fn load_pending_edit_session(
     Ok(connection
         .query_row(
             "SELECT pending_input_id, edit_token, base_pending_revision,
-                    recovery_required, working_source_attachments_json, client_id, scope_key
+                    recovery_required, working_source_attachments_json, client_id, scope_key, quotes_json, quote_trash_json
              FROM single_chat_pending_input_edit_session
              WHERE conversation_id = ?1",
             [conversation_id],
@@ -2005,6 +2022,8 @@ fn load_pending_edit_session(
                     base_pending_revision: row.get(2)?,
                     recovery_required: row.get(3)?,
                     working_source_attachments_json: row.get(4)?,
+                    working_quotes_json: row.get(7)?,
+                    quote_trash_json: row.get(8)?,
                 })
             },
         )
@@ -2017,16 +2036,18 @@ fn store_pending_edit_refs(
     pending_input_id: &str,
     edit_token: &str,
     refs: &[LocalAttachmentSourceRef],
+    key: &PrivateComposerKey,
 ) -> Result<()> {
     let updated = transaction.execute(
         "UPDATE single_chat_pending_input_edit_session
          SET working_source_attachments_json = ?4
-         WHERE conversation_id = ?1 AND pending_input_id = ?2 AND edit_token = ?3 AND scope_key = ''",
+         WHERE conversation_id = ?1 AND pending_input_id = ?2 AND edit_token = ?3 AND scope_key = ?5",
         params![
             conversation_id,
             pending_input_id,
             edit_token,
             serialize_source_attachments(refs)?,
+            key.sql_key(),
         ],
     )?;
     anyhow::ensure!(updated == 1, "single_chat.pending_input_edit_fenced");
@@ -3055,6 +3076,7 @@ mod tests {
                     "single-chat-begin-pending-before-end",
                     Some(&camp_id),
                     EditSingleChatPendingInputCommand {
+                        composer_scope: None,
                         draft_client: Default::default(),
                         camp_id: camp_id.clone(),
                         conversation_id: conversation_id.clone(),
@@ -3925,6 +3947,7 @@ mod tests {
             "web-private-edit",
             Some(&camp_id),
             EditSingleChatPendingInputCommand {
+                composer_scope: None,
                 draft_client: client_a.clone(),
                 camp_id: camp_id.clone(),
                 conversation_id: conversation_id.clone(),
@@ -3974,9 +3997,34 @@ mod tests {
                 .code,
             "single_chat.pending_input_edit_fenced"
         );
+        edit.command_id = "web-private-return-with-open-edit".into();
+        edit.payload.draft_client = client_a.clone();
+        edit.payload.action = SingleChatPendingInputEditAction::ReturnToComposer {
+            target_body: Some(String::new()),
+            expected_draft_revision: snapshot_a.draft.revision,
+        };
+        assert_eq!(
+            browser_a
+                .edit_pending_input(&mut database, &edit)
+                .unwrap()
+                .result
+                .code,
+            "single_chat.pending_input_edit_open"
+        );
+        edit.command_id = "web-private-cancel-before-return".into();
+        edit.payload.action = SingleChatPendingInputEditAction::Cancel;
+        assert_ne!(
+            browser_a
+                .edit_pending_input(&mut database, &edit)
+                .unwrap()
+                .result
+                .status,
+            CommandResultStatus::Rejected
+        );
         edit.command_id = "web-private-return".into();
         edit.payload.draft_client = client_a;
         edit.payload.action = SingleChatPendingInputEditAction::ReturnToComposer {
+            target_body: Some(String::new()),
             expected_draft_revision: snapshot_a.draft.revision,
         };
         assert_eq!(
@@ -4062,6 +4110,7 @@ mod tests {
             "return-stale-draft",
             Some(&camp_id),
             EditSingleChatPendingInputCommand {
+                composer_scope: None,
                 draft_client: Default::default(),
                 camp_id: camp_id.clone(),
                 conversation_id: conversation_id.clone(),
@@ -4069,6 +4118,7 @@ mod tests {
                 expected_revision: item.revision,
                 edit_token: None,
                 action: SingleChatPendingInputEditAction::ReturnToComposer {
+                    target_body: Some(String::new()),
                     expected_draft_revision: snapshot.draft.revision - 1,
                 },
             },
@@ -4093,6 +4143,7 @@ mod tests {
         );
         command.command_id = "return-success".into();
         command.payload.action = SingleChatPendingInputEditAction::ReturnToComposer {
+            target_body: Some(String::new()),
             expected_draft_revision: snapshot.draft.revision,
         };
         let returned = service.edit_pending_input(&mut database, &command).unwrap();
@@ -4170,6 +4221,7 @@ mod tests {
         command.payload.pending_input_id = next.id.clone();
         command.payload.expected_revision = next.revision;
         command.payload.action = SingleChatPendingInputEditAction::ReturnToComposer {
+            target_body: Some(String::new()),
             expected_draft_revision: after_send.draft.revision,
         };
         assert_eq!(
@@ -4566,6 +4618,7 @@ mod tests {
                     "single-chat-begin-repair",
                     Some(&camp_id),
                     EditSingleChatPendingInputCommand {
+                        composer_scope: None,
                         draft_client: Default::default(),
                         camp_id: camp_id.clone(),
                         conversation_id: conversation_id.clone(),
@@ -4588,6 +4641,7 @@ mod tests {
                     "single-chat-remove-repair-attachment",
                     Some(&camp_id),
                     EditSingleChatPendingInputCommand {
+                        composer_scope: None,
                         draft_client: Default::default(),
                         camp_id: camp_id.clone(),
                         conversation_id: conversation_id.clone(),
@@ -4608,6 +4662,7 @@ mod tests {
                     "single-chat-save-repair",
                     Some(&camp_id),
                     EditSingleChatPendingInputCommand {
+                        composer_scope: None,
                         draft_client: Default::default(),
                         camp_id: camp_id.clone(),
                         conversation_id: conversation_id.clone(),

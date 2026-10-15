@@ -74,8 +74,20 @@ scopeKey 与完整描述回显，并在 pendingInputs 增加 editingElsewhere �
 其他位置不返回 editToken、未保存正文或 working quotes。公开历史/原私聊 FIFO 仍由原 snapshot 拥有。
 共享只读客户端核对 Thread、Conversation、完整描述、key 和版本；缺失/错误能力回显明确失败，不登记、不发送、不自动降级。
 
-上传 prepare UUID/源摘要、编辑租约接管/完整移回及本机意图恢复继续实施；现有排队编辑拒绝未支持的 scope 参数，
-不能据 scopeVersion 推定这些未完成链路可用。卡片 UI 尚未启用新材料操作；最终 Manifest Blob、实际 Runtime 和完整隔离仍待验收。
+排队编辑已识别可选 composerScope，默认 None 序列化省略，旧规范请求形状保持。单 Conversation 租约继续唯一，
+ownership 按可信 client 加 scope；Begin 不能覆盖已有租约，显式 Takeover 可接管相同排队项/版本，
+从已保存 Pending 重开并旋转 token，原位置迟到的保存、附件和引用操作均拒绝。工作副本 quote/trash 和附件写入按同一归属保护；
+即使已有 scope，也拒绝正在删除或非活跃 Thread 的新编辑。
+
+return_to_composer 必须携带冻结的 targetBody 并核对目标材料 revision；缺字段的新请求持久拒绝 capability_required，
+已存旧 UUID 仍沿原 Gateway 回执规则回放。排队项有未完成编辑时须先保存或取消，不用 working 副本覆盖持久版本。
+空目标把正文、附件和引用作为一份活动输入返回；目标正文或材料/撤销材料非空时，创建完整 retained 输入并返回 placement=retained，
+当前 draft/revision 保持。两条路径与原 Pending 取消、事件和回执同事务，失败全回滚；不创建新 FIFO。
+成功 payload 保留 pendingInputId/body/draft，增加 active/retained placement，retained 时带完整 retainedInput；外部变更提示只含 Thread/Conversation。
+
+上传 prepare UUID/源摘要、资源授权、Renderer 新移回参数/完整保留选择、本机意图恢复继续实施。
+现有 SingleChatPanel 尚未接 targetBody 与 placement，按钮新请求会明确拒绝；这是本阶段尚未接通的客户端项，不能宣称 UI 可用。
+卡片 UI 尚未启用新材料操作；最终 Manifest Blob、实际 Runtime 和完整隔离仍待验收。
 
 本轮因主键及迁移安全影响后续接线，按阶段策略例外做本地定向编译/迁移 owner，完整跨平台、实际 Runtime 与 PC01–PC24 仍待验。
 具体命令、源码和失败记录见[迁移执行证据](../../integration/execution/i03-private-scope-storage-result.json)，不宣称完整功能或整套一期通过。
@@ -85,3 +97,6 @@ scopeKey 与完整描述回显，并在 pendingInputs 增加 editingElsewhere �
 
 Application/可信编辑端接线、默认形状/编辑令牌隔离、回执只读核对及客户端能力检查见
 [应用入口执行证据](../../integration/execution/i03-private-composer-api-result.json)。实际 Host HTTP/Native IPC 与完整平台随阶段候选验证。
+
+排队租约/完整移回、尾部回执失败回滚、原请求回放和旧默认形状的本地证据见
+[排队编辑执行记录](../../integration/execution/i03-private-pending-edit-result.json)。本地分项不替代完整 PC01–PC24 或实际客户端验收。

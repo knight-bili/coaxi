@@ -58,6 +58,13 @@ Web 原 client owner 表驱动复用发送/材料交换的丢回执重登检查�
 `pnpm exec vitest run apps/desktop/src/shared/private-composer-scope.test.ts apps/web/src/client.test.ts apps/desktop/src/main/runtime-core-methods.test.ts`。
 这批客户端检查使用模拟 Fetch/请求，不是实际 Host 或 UI 资格。
 
+同一原发送 owner 继续复用已有私聊/Pending fixture 验证编辑租约的 client+scope 归属、显式跨位置接管/旧 token 拒绝、
+working quote/remove/restore 与附件排序、保存后移回完整 retained、缺 targetBody/错误材料 revision 的拒绝、
+回执尾注入失败时 Pending 状态与双方材料回滚及原 UUID 重放。旧 Web 编辑端 owner 增加先保存/取消的 r1 前置，
+保留原返回附件隔离、FIFO 和旧断言，不新增或停用 Rust owner；原默认 JSON 不出现 composerScope/targetBody 的兼容编码同场验证。
+最小 Core 命令仍为上述 extended service owner 与 single_chat/message_quote/scope 有关 owner；
+现有 SingleChatPanel/正文 store 测试只证明既存消费者和存储边界，未执行新版移回按钮或完整材料选择 UI。
+
 私聊材料隔离 r1 的新最低层 owner `single_chat_composer_scope::tests::scope_codec_preserves_legacy_omission_and_requires_explicit_closed_identity`
 拥有省略/显式 null 的协商差别、规范闭合标识和额外身份字段拒绝；原 DraftClient 与画布几何 owner 不拥有这项网络编码，不能由完整 Runtime 夹具代替。
 `pin_binding_requires_the_exact_live_private_reference_without_writing` 只建当前查询必要四表，拥有 Board/pin/Thread/Conversation 精确关系及结束/删除/非激活拒绝；

@@ -1087,7 +1087,7 @@ export interface SingleChatPendingInputsView {
 }
 
 export type SingleChatPendingInputEditAction =
-  | { type: 'return_to_composer'; expectedDraftRevision: number }
+  | { type: 'return_to_composer'; expectedDraftRevision: number; targetBody: string }
   | { type: 'quote'; action: MessageQuoteAction }
   | { type: 'begin' | 'takeover' | 'cancel' | 'delete' }
   | { type: 'save'; body: string }
@@ -1100,8 +1100,18 @@ export interface EditSingleChatPendingInputCommand {
   pendingInputId: string
   expectedRevision: number
   editToken: string | null
+  composerScope?: SingleChatComposerScope | null
   action: SingleChatPendingInputEditAction
 }
+
+export type SingleChatPendingReturnPayload = {
+  pendingInputId: string
+  body: string
+  draft: ScopedSingleChatComposerDraftView
+} & (
+  | { placement: 'active'; retainedInput?: never }
+  | { placement: 'retained'; retainedInput: RetainedPrivateInput }
+)
 
 export type NavigationThreadMarker = 'loading' | 'unread_completed' | 'none'
 

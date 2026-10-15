@@ -10445,7 +10445,6 @@ impl Core {
                         json!({
                             "threadId": camp_id,
                             "conversationId": conversation_id,
-                            "result": execution.result,
                         }),
                     );
                 }

@@ -740,6 +740,7 @@ fn send_consumes_only_the_registered_scope_and_keeps_one_private_fifo_and_legacy
         "scope cards do not create parallel execution lanes"
     );
     verify_application_routes(&mut f, &snapshot.pending_inputs.items[0]);
+    verify_scoped_pending_edits(&mut f);
     assert_eq!(
         serde_json::to_value(&quote.model_projection())
             .unwrap()
@@ -747,6 +748,267 @@ fn send_consumes_only_the_registered_scope_and_keeps_one_private_fifo_and_legacy
             .unwrap()
             .len(),
         3
+    );
+}
+
+fn verify_scoped_pending_edits(f: &mut Fixture) {
+    use crate::single_chat::{
+        EditSingleChatPendingInputCommand, SingleChatPendingInputEditAction as Action,
+    };
+    let service = SingleChatService::default();
+    let pending = service
+        .snapshot(&f.database, &f.conversation)
+        .unwrap()
+        .unwrap()
+        .pending_inputs
+        .items[0]
+        .clone();
+    let beta_key = PrivateComposerKey::for_scope(Some(&f.scopes[1])).unwrap();
+    let beta_token = service
+        .snapshot_for_key(&f.database, &f.conversation, &beta_key)
+        .unwrap()
+        .unwrap()
+        .pending_inputs
+        .edit_session
+        .unwrap()
+        .edit_token;
+    let mut edit = envelope(
+        Some(&f.thread),
+        EditSingleChatPendingInputCommand {
+            draft_client: DraftClient::default(),
+            composer_scope: Some(f.scopes[0].clone()),
+            camp_id: f.thread.clone(),
+            conversation_id: f.conversation.clone(),
+            pending_input_id: pending.id.clone(),
+            expected_revision: pending.revision,
+            edit_token: None,
+            action: Action::Begin,
+        },
+    );
+    let mut legacy = edit.payload.clone();
+    legacy.composer_scope = None;
+    legacy.action = Action::ReturnToComposer {
+        expected_draft_revision: 7,
+        target_body: None,
+    };
+    assert_eq!(
+        serde_json::to_value(legacy).unwrap(),
+        json!({
+            "threadId":f.thread,"conversationId":f.conversation,"pendingInputId":pending.id,
+            "expectedRevision":pending.revision,"editToken":null,
+            "action":{"type":"return_to_composer","expectedDraftRevision":7}
+        })
+    );
+    macro_rules! apply_edit {
+        ($action:expr) => {{
+            edit.command_id = Uuid::new_v4().to_string();
+            edit.payload.action = $action;
+            service.edit_pending_input(&mut f.database, &edit).unwrap()
+        }};
+    }
+    assert_eq!(
+        apply_edit!(Action::Begin).result.code,
+        "single_chat.pending_input_edit_open"
+    );
+    let alpha = apply_edit!(Action::Takeover);
+    let alpha_token = alpha.result.payload["editToken"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+    assert_ne!(alpha_token, beta_token);
+    edit.payload.composer_scope = Some(f.scopes[1].clone());
+    edit.payload.edit_token = Some(beta_token);
+    assert_eq!(
+        apply_edit!(Action::Save {
+            body: "迟到旧位置".into()
+        })
+        .result
+        .code,
+        "single_chat.pending_input_edit_fenced"
+    );
+    edit.payload.draft_client = DraftClient::verified_web(&"6".repeat(64)).unwrap();
+    edit.payload.composer_scope = Some(f.scopes[2].clone());
+    edit.payload.edit_token = None;
+    let web_takeover = apply_edit!(Action::Takeover);
+    let web_token = web_takeover.result.payload["editToken"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+    assert_ne!(web_token, alpha_token);
+    edit.payload.draft_client = DraftClient::default();
+    edit.payload.composer_scope = Some(f.scopes[0].clone());
+    edit.payload.edit_token = Some(alpha_token);
+    assert_eq!(
+        apply_edit!(Action::Save {
+            body: "迟到另一编辑端".into()
+        })
+        .result
+        .code,
+        "single_chat.pending_input_edit_fenced"
+    );
+    edit.payload.draft_client = DraftClient::verified_web(&"6".repeat(64)).unwrap();
+    edit.payload.composer_scope = Some(f.scopes[2].clone());
+    edit.payload.edit_token = Some(web_token);
+    assert_eq!(
+        apply_edit!(Action::ReturnToComposer {
+            expected_draft_revision: 0,
+            target_body: Some(String::new())
+        })
+        .result
+        .code,
+        "single_chat.pending_input_edit_open"
+    );
+    assert_ne!(
+        apply_edit!(Action::ReorderAttachments {
+            attachment_ref_ids: pending.attachments.iter().map(|r| r.id.clone()).collect()
+        })
+        .result
+        .status,
+        CommandResultStatus::Rejected
+    );
+    assert_eq!(
+        apply_edit!(Action::RemoveAttachment {
+            attachment_ref_id: "other-scope-reference".into()
+        })
+        .result
+        .code,
+        "attachment_not_found"
+    );
+    let quote = pending.quotes[0].quote_id.clone();
+    assert_ne!(
+        apply_edit!(Action::Quote {
+            action: QuoteAction::Remove {
+                quote_id: quote.clone()
+            }
+        })
+        .result
+        .status,
+        CommandResultStatus::Rejected
+    );
+    assert_ne!(
+        apply_edit!(Action::Quote {
+            action: QuoteAction::Restore {
+                quote_id: quote.clone()
+            }
+        })
+        .result
+        .status,
+        CommandResultStatus::Rejected
+    );
+    assert_ne!(
+        apply_edit!(Action::Save {
+            body: "已保存的排队问题".into()
+        })
+        .result
+        .status,
+        CommandResultStatus::Rejected
+    );
+    edit.payload.expected_revision += 1;
+    edit.payload.draft_client = DraftClient::default();
+    edit.payload.composer_scope = Some(f.scopes[1].clone());
+    edit.payload.edit_token = None;
+    let revision = read(f, 1).draft.revision;
+    assert_eq!(
+        apply_edit!(Action::ReturnToComposer {
+            expected_draft_revision: revision,
+            target_body: None
+        })
+        .result
+        .code,
+        "single_chat.capability_required"
+    );
+    assert_eq!(
+        apply_edit!(Action::ReturnToComposer {
+            expected_draft_revision: revision + 1,
+            target_body: Some("保留当前正文".into())
+        })
+        .result
+        .code,
+        "single_chat.draft_changed"
+    );
+    edit.command_id = Uuid::new_v4().to_string();
+    edit.payload.action = Action::ReturnToComposer {
+        expected_draft_revision: revision,
+        target_body: Some("保留当前正文".into()),
+    };
+    let retained_before: i64 = f
+        .database
+        .connection()
+        .query_row("SELECT COUNT(*) FROM single_chat_retained_input", [], |r| {
+            r.get(0)
+        })
+        .unwrap();
+    f.database.connection().execute_batch("CREATE TEMP TRIGGER reject_pending_return_receipt BEFORE INSERT ON event_log WHEN NEW.command_type='single_chat.pending_input.edit' AND NEW.event_type='command.result' BEGIN SELECT RAISE(ABORT,'return receipt rollback fixture'); END;").unwrap();
+    assert!(service.edit_pending_input(&mut f.database, &edit).is_err());
+    let state: String = f
+        .database
+        .connection()
+        .query_row(
+            "SELECT state FROM single_chat_pending_input WHERE id=?1",
+            [&pending.id],
+            |r| r.get(0),
+        )
+        .unwrap();
+    let retained_after: i64 = f
+        .database
+        .connection()
+        .query_row("SELECT COUNT(*) FROM single_chat_retained_input", [], |r| {
+            r.get(0)
+        })
+        .unwrap();
+    assert_eq!(state, "queued");
+    assert_eq!(retained_before, retained_after);
+    assert_eq!(read(f, 1).draft.revision, revision);
+    f.database
+        .connection()
+        .execute_batch("DROP TRIGGER reject_pending_return_receipt")
+        .unwrap();
+    let returned = service.edit_pending_input(&mut f.database, &edit).unwrap();
+    assert_eq!(returned.result.payload["placement"], "retained");
+    assert_eq!(returned.result.payload["body"], "已保存的排队问题");
+    assert_eq!(
+        returned.result.payload["retainedInput"]["quotes"][0]["quoteId"],
+        quote
+    );
+    assert_eq!(
+        returned.result.payload["retainedInput"]["attachments"][0]["id"],
+        pending.attachments[0].id
+    );
+    assert_eq!(read(f, 1).draft.revision, revision);
+    let replay = service.edit_pending_input(&mut f.database, &edit).unwrap();
+    assert!(replay.replayed);
+    assert_eq!(
+        serde_json::to_value(replay.result).unwrap(),
+        serde_json::to_value(&returned.result).unwrap()
+    );
+    let saved = returned.result.payload["retainedInput"]["id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+    let swapped = apply(
+        f,
+        1,
+        revision,
+        PrivateComposerAction::SwapRetained {
+            retained_input_id: saved,
+            expected_retained_revision: 1,
+            current_body: "保留当前正文".into(),
+        },
+    );
+    assert_eq!(swapped.payload["body"], "已保存的排队问题");
+    assert_eq!(
+        swapped.payload["draft"]["attachments"][0]["id"],
+        pending.attachments[0].id
+    );
+    assert_eq!(swapped.payload["retainedInput"]["body"], "保留当前正文");
+    assert!(
+        service
+            .snapshot(&f.database, &f.conversation)
+            .unwrap()
+            .unwrap()
+            .pending_inputs
+            .items
+            .is_empty()
     );
 }
 
@@ -763,6 +1025,7 @@ fn verify_application_routes(
             &envelope(
                 Some(&f.thread),
                 EditSingleChatPendingInputCommand {
+                    composer_scope: None,
                     draft_client: client.clone(),
                     camp_id: f.thread.clone(),
                     conversation_id: f.conversation.clone(),

@@ -335,7 +335,7 @@ pub(crate) fn resolve_scope(
     }
 }
 
-fn register(
+pub(crate) fn register(
     tx: &Transaction<'_>,
     conversation: &str,
     client: &DraftClient,
@@ -367,6 +367,91 @@ pub fn read_draft(
     let view = DraftMaterials::load(&tx, conversation, client, &key)?.view(&key, scope)?;
     tx.commit()?;
     Ok(view)
+}
+
+/// 调用方已在同一写事务核对排队项版本、归属和无未完成编辑。
+pub(crate) fn return_pending_input(
+    tx: &Transaction<'_>,
+    command: &crate::single_chat::EditSingleChatPendingInputCommand,
+    key: &PrivateComposerKey,
+    registered: bool,
+    body: &str,
+    source_json: &str,
+    quotes_json: &str,
+) -> Result<CommandHandlerResult> {
+    let crate::single_chat::SingleChatPendingInputEditAction::ReturnToComposer {
+        expected_draft_revision,
+        target_body,
+    } = &command.action
+    else {
+        anyhow::bail!("single_chat.invalid_return_action");
+    };
+    let Some(target_body) = target_body else {
+        return Ok(CommandHandlerResult::rejected(
+            "single_chat.capability_required",
+            json!({}),
+        ));
+    };
+    let client = &command.draft_client;
+    let current = DraftMaterials::load(tx, &command.conversation_id, client, key)?;
+    if current.revision != *expected_draft_revision {
+        return Ok(CommandHandlerResult::rejected(
+            "single_chat.draft_changed",
+            json!({"currentRevision":current.revision}),
+        ));
+    }
+    let occupied = !target_body.trim().is_empty() || current.has_materials()?;
+    register(
+        tx,
+        &command.conversation_id,
+        client,
+        command.composer_scope.as_ref(),
+        key,
+        registered,
+    )?;
+    let mut retained_id = None;
+    if occupied {
+        let id = Uuid::new_v4().to_string();
+        tx.execute("INSERT INTO single_chat_retained_input(id,conversation_id,client_id,scope_key,body,source_attachments_json,quotes_json,quote_trash_json,source_pending_id,created_at,updated_at)
+            VALUES(?1,?2,?3,?4,?5,?6,?7,'[]',?8,?9,?9)",
+            params![id,command.conversation_id,client.id(),key.sql_key(),body,source_json,quotes_json,command.pending_input_id,chrono::Utc::now().to_rfc3339()])?;
+        retained_id = Some(id);
+    } else {
+        DraftMaterials {
+            source_json: source_json.into(),
+            quotes_json: quotes_json.into(),
+            trash_json: "[]".into(),
+            ..current
+        }
+        .store(tx, &command.conversation_id, client, key)?;
+    }
+    let changed = tx.execute(
+        "UPDATE single_chat_pending_input SET state='cancelled',revision=revision+1,updated_at=?4
+        WHERE conversation_id=?1 AND id=?2 AND revision=?3 AND state IN ('queued','needs_repair')",
+        params![
+            command.conversation_id,
+            command.pending_input_id,
+            command.expected_revision,
+            chrono::Utc::now().to_rfc3339()
+        ],
+    )?;
+    ensure!(changed == 1, "single_chat.pending_input_changed");
+    let draft = DraftMaterials::load(tx, &command.conversation_id, client, key)?
+        .view(key, command.composer_scope.as_ref())?;
+    let mut payload = json!({"pendingInputId":command.pending_input_id,"body":body,"draft":draft,
+        "placement":if occupied {"retained"} else {"active"}});
+    if let Some(id) = retained_id {
+        payload["retainedInput"] = serde_json::to_value(
+            load_retained(tx, &command.conversation_id, client, key.sql_key(), &id)?
+                .context("single_chat.retained_not_found")?
+                .view(&command.conversation_id, key.sql_key())?,
+        )?;
+    }
+    Ok(CommandHandlerResult::applied(
+        "single_chat.pending_input_returned_to_composer",
+        payload,
+        None,
+    ))
 }
 
 #[derive(Debug, Clone)]
