@@ -17,3 +17,5 @@ I00已自审修正并合入，I01基础构建与契约证据保留草稿；I02�
 - [I02恢复兼容矩阵增补](execution/i02-skill-delivery-matrix-result.json)：数据库边界的执行轮次、旧公开29/33与旧A2A冻结输入补测已通过；[数据库修复](execution/i02-db153-regression-repair-result.json)的 Windows109项与Linux110项全部通过，原失败保留。[进程恢复](execution/i02-skill-process-recovery-result.json)已验真实Core重启保留冻结输入并终结未知结果、禁止重发；明确确认分支、其余逐SP与真实模型Gate继续补齐。
 
 - [I03项目分组排列检查点](execution/i03-project-layout-result.json)：侧栏/画布统一入口、组与工程混合拖放、键盘排列及冲突/未知结果保护已编码；37项相关检查与4项静态导航检查通过，实际交互和当前Host资格仍待阶段候选。
+
+- [I03工作树层级与分组菜单检查点](execution/i03-project-tree-result.json)：真实Git父子/分支展示、置顶去重、显式打开登记和统一分组菜单已编码；42项相关测试与5项静态导航检查通过，新Rust及实际Host/UI仍待阶段候选，活动统计继续实施。
