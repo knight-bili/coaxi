@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "stage": "I03",
+  "status": "in_progress",
+  "engineering_owner": "Codex",
+  "customer_stage_gate": false,
+  "basis": [
+    "integration/planning/work-packages.json#I03",
+    "integration/planning/schedule.json#I03",
+    "integration/proposals/canvas-private-materials-r1.md"
+  ],
+  "scope_rule": "固定列出本阶段既定必需工作，不把I04-I12全部能力提前堆入I03；新发现缺陷按影响归属登记，不遗漏必需项",
+  "implemented_evidence": [
+    "i03-private-input-ui-result.json",
+    "i03-private-resource-result.json",
+    "i03-canvas-mission-result.json",
+    "i03-canvas-recovery-result.json"
+  ],
+  "remaining": [
+    {
+      "id": "I03-C01",
+      "name": "完成私聊材料r1剩余链路",
+      "status": "in_progress",
+      "items": [
+        "Native/Web上传准备原编号及结果恢复",
+        "私有源内容变化检查",
+        "文件真实Host链路后启用卡片/working/retained文件UI",
+        "默认材料显式迁入",
+        "孤立Core/本机正文及冲突统一恢复"
+      ],
+      "done_when": "本阶段完整使用流程及PC01-PC24适用工程验证有当前源码证据，外部环境缺项明确单列"
+    },
+    {
+      "id": "I03-C02",
+      "name": "独立Mission/Task/Diff持久引用与定位",
+      "status": "incomplete",
+      "done_when": "原对象与引用精确绑定，启动/定位/失效可恢复，包含实际Core集成；既有Thread关联Mission不代替独立pin"
+    },
+    {
+      "id": "I03-C03",
+      "name": "文件节点真实权限与预览",
+      "status": "incomplete",
+      "done_when": "路径不能绕过现行文件权限，卡片间身份隔离，关闭/恢复与变化处理有证据"
+    },
+    {
+      "id": "I03-C04",
+      "name": "临时终端节点生命周期",
+      "status": "incomplete",
+      "done_when": "真实临时PTY启动、输出、resize、关闭、删除及重连符合现行合同；不把I05完整Git工程工作区提前并入"
+    },
+    {
+      "id": "I03-C05",
+      "name": "冷启动与多卡交互兼容",
+      "status": "partially_verified",
+      "done_when": "真实Desktop冷路由、旧焦点/编辑器保持、恢复与本阶段规模检查完成；平台资源缺项单列"
+    },
+    {
+      "id": "I03-C06",
+      "name": "阶段候选集中工程验证",
+      "status": "not_started",
+      "done_when": "功能集齐冻结fusion-i03-rc.1，相关编译/集成/回归/平台检查由Codex执行，记录缺陷和必要复验，不等待客户阶段验收"
+    }
+  ],
+  "state_rule": "代码完成、工程验证通过、待环境验证分别记录；无代码缺口且工程验证满足时由Codex收口；缺环境继续独立后续工作，最终MVP不豁免",
+  "customer_action_required_now": false,
+  "progress_audit": {
+    "first_board_evidence_at": "2026-10-14T06:11:31.818Z",
+    "checked_at": "2026-10-15T17:14:31.400839+00:00",
+    "original_I03_engineering_days": 10,
+    "note": "从首批证据到本次核对的自然时间不是连续研发工时；原排期状态未同步和客户验收口径混用已纠正",
+    "elapsed_minutes_since_first_evidence": 2102
+  }
+}

@@ -60,3 +60,5 @@ I00已自审修正并合入，I01基础构建与契约证据保留草稿；I02�
 - [I03私聊完整输入界面与原请求恢复](execution/i03-private-input-ui-result.json)：生产面板已接完整移回、整份保留交换、排队保存/放弃/接管和本机原请求恢复。76项定向检查及模拟Core三位置挂载通过，包括原连接永久等待后查回结果解除按钮等待；卡片上传/资源授权、迁入/孤立恢复与真实Host/平台/模型仍待，完整24PC/324未验。
 
 - [I03私有文件资源定位](execution/i03-private-resource-result.json)：卡片、排队工作副本与retained按可信编辑端/原对话/位置/材料定位，旧默认JSON保持；Main双入口与缓存保留位置，接管后旧token拒绝、孤立输入保留可读。17项Core、65项客户端及定向types/文档通过；上传/源摘要、实际Host文件链路与新预览UI、完整PC15/324仍待。
+
+2026-10-16分工澄清：[目标描述](execution/goal-description.txt)与[阶段验证规则](ci-cost-policy.md#工程验证与最终用户验收)规定I00–I12由Codex研发和工程验证，客户只审方案/协助环境，I12工程完成后才进行真实软件使用验收；[I03固定收口清单](execution/i03-closeout.json)不设客户阶段门槛。

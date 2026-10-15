@@ -18,7 +18,9 @@
       "frozen_commit": null,
       "validation_batch": null,
       "validation_runs": [],
-      "customer_acceptance": "pending"
+      "engineering_validation": "pending_evidence_for_frozen_candidate",
+      "engineering_owner": "Codex",
+      "customer_stage_gate": false
     },
     {
       "stage_id": "I02",
@@ -28,7 +30,9 @@
       "frozen_commit": null,
       "validation_batch": null,
       "validation_runs": [],
-      "customer_acceptance": "pending"
+      "engineering_validation": "pending_evidence_for_frozen_candidate",
+      "engineering_owner": "Codex",
+      "customer_stage_gate": false
     },
     {
       "stage_id": "I03",
@@ -38,7 +42,9 @@
       "frozen_commit": null,
       "validation_batch": null,
       "validation_runs": [],
-      "customer_acceptance": "pending"
+      "engineering_validation": "pending_evidence_for_frozen_candidate",
+      "engineering_owner": "Codex",
+      "customer_stage_gate": false
     },
     {
       "stage_id": "I04",
@@ -48,7 +54,9 @@
       "frozen_commit": null,
       "validation_batch": null,
       "validation_runs": [],
-      "customer_acceptance": "pending"
+      "engineering_validation": "pending_evidence_for_frozen_candidate",
+      "engineering_owner": "Codex",
+      "customer_stage_gate": false
     },
     {
       "stage_id": "I05",
@@ -58,7 +66,9 @@
       "frozen_commit": null,
       "validation_batch": null,
       "validation_runs": [],
-      "customer_acceptance": "pending"
+      "engineering_validation": "pending_evidence_for_frozen_candidate",
+      "engineering_owner": "Codex",
+      "customer_stage_gate": false
     },
     {
       "stage_id": "I06",
@@ -68,7 +78,9 @@
       "frozen_commit": null,
       "validation_batch": null,
       "validation_runs": [],
-      "customer_acceptance": "pending"
+      "engineering_validation": "pending_evidence_for_frozen_candidate",
+      "engineering_owner": "Codex",
+      "customer_stage_gate": false
     },
     {
       "stage_id": "I07",
@@ -78,7 +90,9 @@
       "frozen_commit": null,
       "validation_batch": null,
       "validation_runs": [],
-      "customer_acceptance": "pending"
+      "engineering_validation": "pending_evidence_for_frozen_candidate",
+      "engineering_owner": "Codex",
+      "customer_stage_gate": false
     },
     {
       "stage_id": "I08",
@@ -88,7 +102,9 @@
       "frozen_commit": null,
       "validation_batch": null,
       "validation_runs": [],
-      "customer_acceptance": "pending"
+      "engineering_validation": "pending_evidence_for_frozen_candidate",
+      "engineering_owner": "Codex",
+      "customer_stage_gate": false
     },
     {
       "stage_id": "I09",
@@ -98,7 +114,9 @@
       "frozen_commit": null,
       "validation_batch": null,
       "validation_runs": [],
-      "customer_acceptance": "pending"
+      "engineering_validation": "pending_evidence_for_frozen_candidate",
+      "engineering_owner": "Codex",
+      "customer_stage_gate": false
     },
     {
       "stage_id": "I10",
@@ -108,7 +126,9 @@
       "frozen_commit": null,
       "validation_batch": null,
       "validation_runs": [],
-      "customer_acceptance": "pending"
+      "engineering_validation": "pending_evidence_for_frozen_candidate",
+      "engineering_owner": "Codex",
+      "customer_stage_gate": false
     },
     {
       "stage_id": "I11",
@@ -118,17 +138,51 @@
       "frozen_commit": null,
       "validation_batch": null,
       "validation_runs": [],
-      "customer_acceptance": "pending"
+      "engineering_validation": "pending_evidence_for_frozen_candidate",
+      "engineering_owner": "Codex",
+      "customer_stage_gate": false
     },
     {
       "stage_id": "I12",
-      "name": "高可用 扩展性 全量回归与一期最终验收",
+      "name": "高可用 扩展性 全量工程验证与交付准备",
       "candidate_version": "fusion-i12-rc.1",
       "status": "planned_not_frozen",
       "frozen_commit": null,
       "validation_batch": null,
       "validation_runs": [],
-      "customer_acceptance": "pending"
+      "engineering_validation": "pending_evidence_for_frozen_candidate",
+      "engineering_owner": "Codex",
+      "customer_stage_gate": false
     }
-  ]
+  ],
+  "acceptance_definition": {
+    "revision": "2026-10-16-engineering-vs-user-acceptance",
+    "authority": "用户明确：I12之前只审核方案和提供无法自行解决的环境帮助；验收是I12之后真实使用软件",
+    "engineering_owner": "Codex",
+    "engineering_stages": "I00-I12及BUF",
+    "customer_before_I12": [
+      "必要方案审核",
+      "确实无法自行解决的环境/身份/预算/设备协助"
+    ],
+    "customer_phase_acceptance_required": false,
+    "customer_PR_or_test_report_review_required": false,
+    "formal_324_executor": "Codex",
+    "customer_acceptance": "after_I12_engineering_completion_real_user_software_use",
+    "customer_acceptance_is_not": [
+      "逐阶段技术验收",
+      "逐条执行324技术场景",
+      "PR审查",
+      "审阅测试或数据库报告"
+    ],
+    "environment_deferral": "未验证项明确保留，继续独立研发，不假通过；最终MVP仍必须补齐",
+    "main_and_release": "保留最终授权，阶段分支持续推进，不增加阶段客户验收等待",
+    "effective_immediately": true,
+    "wait_for_app_goal_text_update": false
+  },
+  "customer_final_acceptance": {
+    "after": "I12_engineering_complete",
+    "kind": "real_user_software_trial",
+    "status": "not_due",
+    "owner": "User"
+  }
 }

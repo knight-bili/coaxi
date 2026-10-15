@@ -65,3 +65,10 @@
 官方依据（核实于 2026-10-14）：[Actions 计费与免费范围](https://docs.github.com/en/billing/concepts/product-billing/github-actions)、
 [标准 runner](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)、
 [公开仓库的影响](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/managing-repository-settings/setting-repository-visibility)。
+
+## 工程验证与最终用户验收
+
+2026-10-16用户明确：I12工程完成前，只审核方案并协助无法自行解决的环境条件。阶段实现、代码审查、测试、构建、PR管理及工程收口均由Codex负责，不能设“等待客户阶段验收”门槛。
+“客户验收”只指I12必需工程完成后，用户取得可运行完整软件并按真实用户方式使用反馈；用户不负责逐条执行324技术场景、审PR或技术报告。
+阶段状态使用开发中、代码完成、工程验证中/通过、待环境验证。缺资源明确单列，继续独立工作；最终完整MVP不能豁免必需实现或验证。main最终合入/正式发布仍保留授权，阶段分支研发不等待该最终事件。
+当前[I03有限收口清单](execution/i03-closeout.json)和[完整目标描述](execution/goal-description.txt)落实此规则；不得通过搬走必需功能或把后期全部验证堆到I03来改变终点。

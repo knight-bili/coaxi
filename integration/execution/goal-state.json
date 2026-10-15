@@ -2,7 +2,7 @@
   "schema_version": 1,
   "date": "2026-10-16",
   "status": "active",
-  "objective": "沿既定v4完整一期计划持续推进Codeg × Rovai I00–I12及BUF，以Rovai Core为唯一业务、执行和数据库权威，保留81来源功能簇、48工作包、324验收场景，交付完整、高可用、可扩展的融合MVP，不缩减一期范围。\n\n按“多次本地commit，阶段集中验证，少量push”执行。每个小功能、小缺陷和小调整先完成编码、源码自审及适当的低成本检查，再用中文本地提交；未编译、未运行的检查明确登记为待验，不逐切片默认启动完整编译、全工作区回归、推送或GitHub Actions。\n\n除已完成的I00初始化外，I01–I12正常各安排一次阶段验证批次，共12批。一个阶段计划功能编码和review集齐后，冻结同一提交并定义fusion-iNN-rc.1候选版本，集中执行本阶段相关编译、测试、集成和必要平台验证，再集中推送阶段分支、更新草稿PR并触发相关Actions。同批可包含多个平台任务，不逐功能重复；必需测试不得删除或假通过。\n\nActions提交后登记候选版本、SHA、run ID及状态，继续可独立的编码和review，到阶段检查点或失败通知再核对，不把轮询CI当作默认推进动作。发现缺陷或兼容问题时分别本地提交修复，汇集后递增候选版本，补验失败项及必要依赖，并记录额外批次原因。数据迁移、安全、公共契约或执行恢复问题确实阻断后续编码时，可提前做最小必要局部验证，不顺带启动整套CI。\n\nmain合入、客户最终验收、发布标签和正式发布仍由客户控制。优先公开仓库标准免费runner，不修改付款方式或提高支出上限，不自动采购、不运行付费模型。外部测试身份、硬预算、设备、ADB、签名及渠道资源先登记待办，继续独立工作，最后补齐必需验收；不读取日常凭据、数据或全局MCP，不使用旧ADB。\n\n当前工程work/integration；恢复时先读integration/execution/goal-state.json、integration/ci-cost-policy.md及工作区work/workflow-state.md，以最新执行规则和实际工作区为准。目前继续I03画布交互与统一业务对象定位，并保留I02剩余场景及真实Gate待办。编译、模拟、握手或局部测试不替代真实模型、真机或完整平台资格。每轮汇报真实进度及需要客户处理的事项，然后继续；全部必需实现和验收证据齐备前，目标保持未完成。",
+  "objective": "持续推进 Codeg × Rovai 完整一期融合项目 I00–I12 及 BUF。以 Rovai Core 为唯一业务、执行和数据库权威，保留既定 v4 的81个来源功能簇、48个工作包和324个验证场景，交付完整、高可用、可扩展的融合 MVP；整改、兼容、迁移和缺陷修复都纳入研发。一期范围不缩减，第二阶段才规划自主新增能力。\n\n【分工与验收】Codex 负责设计细化、架构、编码、自审、代码审查、测试、构建、集成、GitHub 仓库与 PR 管理、阶段收口和修复。I12 完成前，用户只审核方案，以及提供 Codex 确实无法自行解决的环境、身份、预算、设备等外部条件，不承担技术测试、PR 审查、测试报告审核或逐阶段软件验收。已确认方案直接实施，普通实现选择和修复自行处理；需要改变产品方向、用户行为或模型输入等已定方案时，先提供易读的完整方案审核。\n\n“客户验收”只指 I12 必需研发和工程验证完成后，用户取得可运行的完整软件，以真实用户身份使用并反馈是否满足需求。324个技术场景由 Codex 执行、记录证据并修复问题，不要求用户逐条跑测试，也不把代码、报告或 PR 代替软件交付。用户使用反馈引出的缺陷仍由 Codex 修复和回归。\n\nI00–I12 内部统一称“研发实现”和“工程验证”，由 Codex 自行负责。准确区分“开发中、代码完成、工程验证中、工程验证通过、待环境验证”；不再将“等待客户验收”列为阶段收口条件或推进障碍。缺外部条件时保留未验证项，继续独立工作；最终 MVP 必须补齐所有必需实现和验证，不能通过改名、跳过或延期宣称完成。\n\n【阶段推进】保持既定阶段范围与依赖，每阶段维护有限剩余清单、完成条件、验证方式、预计剩余工作和下一动作。不要把后续阶段的全部能力或最终产品验证无区别地压入当前阶段，也不得为进入下一阶段遗漏必需功能；新发现的缺陷按所属阶段和实际影响处理。当前继续 I03 的已确认私聊材料 r1 剩余上传、源内容变化检查、真实文件链路、迁入与孤立恢复，以及既定 Mission/Task/Diff 引用、文件节点、临时终端、冷启动和阶段集成；保留 I02 剩余项。等待阶段结果或外部条件时推进可独立的后续工作。\n\n【提交与验证频率】多次本地 commit、阶段集中验证、少量 push。每个小功能、缺陷或调整先编码、自审并完成适当低成本检查，再中文本地提交；未编译、未运行项登记待验，不逐切片默认全量编译、全工作区回归、推送或触发 Actions。复用绑定准确源码的既有证据，避免重复检查和长篇重复报告。\n\n除已完成 I00 外，I01–I12 正常各一次阶段验证批次，共12批。本阶段代码和审查集齐后，冻结提交并定义 fusion-iNN-rc.1，集中执行相关构建、测试、集成和必要平台验证，再集中推送阶段分支、更新 PR、触发相关 Actions；一批可含多个平台任务。失败或兼容修复汇集后递增候选，补验失败项及必要依赖并记录额外批次原因，不删除或假通过必需测试。Actions 登记版本、SHA、run ID 和状态后继续独立开发，到检查点或失败通知再查。数据迁移、安全、公共契约或执行恢复确实阻断后续开发时，才提前做最小必要局部验证并说明原因。\n\n【资源和授权】优先公开仓库标准免费 runner；不改付款方式或提高支出上限，不自动采购或运行付费模型，不读日常凭据、数据或全局 MCP，不使用旧 ADB。专用测试身份、硬预算、设备、签名和渠道资源确需协助时提出具体事项，同时继续独立工作。main 最终合入、正式发布及费用保留用户授权；研发通过阶段分支和 PR 持续推进，不要求用户逐阶段验收。\n\n【交付和汇报】I12 工程完成后提供可运行软件、必要使用说明、完整范围对照、工程验证结果和真实遗留问题，再交用户使用验收。每轮只报新增完成、实际验证、具体未完项、下一动作和确需用户协助事项；阶段反复停留或超出预计时，说明根因、剩余工作和整改，不用局部测试数量代替阶段进度。用户询问进度时立即先答再继续，不等待用户修改目标正文才执行新规则。\n\n工程为 work/integration。恢复时读 integration/execution/goal-state.json、integration/ci-cost-policy.md、integration/execution/i03-closeout.json 和 work/workflow-state.md，以最新用户指示和实际工作区为准。编译、模拟、握手和局部测试不代替真实模型、实际平台或完整产品资格；全部必需研发、工程验证及最终用户验收完成前，持续目标保持未完成。",
   "scope": {
     "source_feature_clusters": 81,
     "work_packages": 48,
@@ -10,14 +10,14 @@
     "authority": "rovai-core",
     "phase_two": "一期完整融合交付后才开始自主新增"
   },
-  "authorization": "客户授权完整一期持续开发；2026-10-14更新为多次本地commit、阶段编码/review集齐后冻结候选版本、集中验证和少量push/Actions；main合入及发布仍由客户控制",
+  "authorization": "客户授权完整一期持续开发；2026-10-14更新为多次本地commit、阶段编码/review集齐后冻结候选版本、集中验证和少量push/Actions；main合入及发布仍由客户控制；2026-10-16用户明确研发阶段由Codex自行工程验证，I12后才由用户使用软件验收",
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
   "current_slice": "I03私有文件定位已接Core精确归属与Main双入口/缓存，17项Core和65项客户端定向及类型/文档检查通过。上传原UUID/源摘要、实际Host文件链路与UI、迁入和孤立恢复继续待；不判完整PC15或产品验收通过。",
   "stages": {
-    "I00": "accepted",
-    "I01": "source_evidence_ready_pending_customer_acceptance",
+    "I00": "engineering_complete",
+    "I01": "engineering_evidence_ready_environment_validation_deferred",
     "I02": "in_progress",
     "I03": "in_progress",
     "I04": "not_started",
@@ -39,7 +39,7 @@
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
     "继续I02剩余、I04–I12与BUF全部既定范围，未补齐必需验收不得标MVP完成。"
   ],
-  "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
+  "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
   "current_slice_status": "private_resource_locator_Core_client_scope_joins_and_Main_cache_boundaries_locally_verified_upload_digest_and_Host_pending",
   "evidence": "i02-navigation-result.json",
@@ -85,20 +85,24 @@
     "CI_waiting": "记录run/SHA后继续独立编码/review，到检查点或失败通知再查，不轮询占满工作",
     "failures": "汇集修复后递增rc候选，复验失败项及必要依赖；必需检查不能删除或假通过",
     "normal_phase_batches": 12,
-    "automatic_release_or_main_merge": false
+    "automatic_release_or_main_merge": false,
+    "acceptance_definition": "2026-10-16-engineering-vs-user-acceptance",
+    "customer_phase_acceptance_required": false,
+    "stage_closeout": "Codex按阶段必需实现/工程验证清单自行收口；环境缺项单列并继续独立工作；最终全部补齐"
   },
   "stage_version_plan": "integration/planning/stage-versions.json",
-  "objective_revision": "2026-10-14-stage-batch-v2-full-objective",
+  "objective_revision": "2026-10-16-acceptance-v3-full-objective",
   "system_goal_text": {
-    "status": "active_resume_and_stage_policy_confirmed_by_get_goal",
+    "status": "active_acceptance_v3_confirmed_by_get_goal",
     "user_edited": true,
-    "checked_at": "2026-10-15T01:42:48.757Z",
+    "checked_at": "2026-10-15T17:19:27.002434+00:00",
     "confirmed": [
       "active",
       "full_objective_preserved",
-      "multiple_local_commits_stage_validation_few_pushes",
       "12_phase_batches",
-      "current_I03"
+      "agent_engineering_validation",
+      "customer_software_use_after_I12",
+      "no_customer_stage_gate"
     ]
   },
   "canvas_ui_evidence": "i03-canvas-ui-result.json",
@@ -112,7 +116,7 @@
     "source_progress_continued": true
   },
   "project_groups_evidence": "i03-project-groups-result.json",
-  "checked_at": "2026-10-15T17:09:03.240342+00:00",
+  "checked_at": "2026-10-15T17:14:31.400839+00:00",
   "project_layout_evidence": "i03-project-layout-result.json",
   "project_tree_evidence": "i03-project-tree-result.json",
   "navigation_activity_evidence": "i03-navigation-activity-result.json",
@@ -141,5 +145,37 @@
   "canvas_private_composer_api_evidence": "i03-private-composer-api-result.json",
   "canvas_private_pending_edit_evidence": "i03-private-pending-edit-result.json",
   "canvas_private_input_ui_evidence": "i03-private-input-ui-result.json",
-  "canvas_private_resource_evidence": "i03-private-resource-result.json"
+  "canvas_private_resource_evidence": "i03-private-resource-result.json",
+  "acceptance_definition": {
+    "revision": "2026-10-16-engineering-vs-user-acceptance",
+    "authority": "用户明确：I12之前只审核方案和提供无法自行解决的环境帮助；验收是I12之后真实使用软件",
+    "engineering_owner": "Codex",
+    "engineering_stages": "I00-I12及BUF",
+    "customer_before_I12": [
+      "必要方案审核",
+      "确实无法自行解决的环境/身份/预算/设备协助"
+    ],
+    "customer_phase_acceptance_required": false,
+    "customer_PR_or_test_report_review_required": false,
+    "formal_324_executor": "Codex",
+    "customer_acceptance": "after_I12_engineering_completion_real_user_software_use",
+    "customer_acceptance_is_not": [
+      "逐阶段技术验收",
+      "逐条执行324技术场景",
+      "PR审查",
+      "审阅测试或数据库报告"
+    ],
+    "environment_deferral": "未验证项明确保留，继续独立研发，不假通过；最终MVP仍必须补齐",
+    "main_and_release": "保留最终授权，阶段分支持续推进，不增加阶段客户验收等待",
+    "effective_immediately": true,
+    "wait_for_app_goal_text_update": false
+  },
+  "goal_description_sync": {
+    "app_goal_update_owner": "User",
+    "app_goal_text_update": "user_updated_live_verified",
+    "execution_uses_latest_human_rule_now": true,
+    "wait_required": false,
+    "checked_at": "2026-10-15T17:19:27.002434+00:00"
+  },
+  "i03_closeout": "i03-closeout.json"
 }
