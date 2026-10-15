@@ -1,6 +1,8 @@
 import { singleChatComposerStore, type SingleChatComposerStore } from './single-chat-composer-store'
 import { privateInputController, type PrivateInputController, type PrivateInputState } from './private-input-controller'
 import { PrivateInputRecoveryPanel, privateInputErrorMessage } from './PrivateInputRecoveryPanel'
+import { PrivateUploadRecoveryPanel, privateUploadErrorMessage } from './PrivateUploadRecoveryPanel'
+import { privateUploadController, type PrivateUploadState } from './private-upload-controller'
 import { PrivatePendingEditor } from './PrivatePendingEditor'
 import { canvasComposerContextKey, type CanvasComposerContext } from './canvas-composer-drafts'
 import { useThreadClient } from './camp-client'
@@ -563,8 +565,17 @@ function SingleChatPendingQueue({ snapshot, input, bodies, busyOutside, onRefres
   const busyRef = useRef(false)
   const queue = snapshot.pendingInputs
   const session = queue.editSession
+  const client = useThreadClient()
+  const pendingUploads = useMemo(() => input && session ? privateUploadController(client.singleChatAttachments,
+    { threadId: input.origin.threadId, conversationId: input.origin.conversationId, composerScope: input.origin.scope },
+    { kind: 'single_chat_pending', conversationId: input.origin.conversationId, pendingInputId: session.pendingInputId,
+      editToken: session.editToken, ...(input.origin.scope ? { composerScope: input.origin.scope } : {}) }) : null,
+    [client, input, session?.pendingInputId, session?.editToken])
+  const pendingUploadState = useSyncExternalStore(pendingUploads?.subscribe ?? noPrivateInputSubscription,
+    pendingUploads?.getSnapshot ?? emptyPrivateUpload, pendingUploads?.getSnapshot ?? emptyPrivateUpload)
+  const blockedOutside = busyOutside || Boolean(pendingUploads?.supported && (!pendingUploadState.loaded || pendingUploadState.rows.some(row => row.state !== 'rejected')))
   const perform = async (item: SingleChatPendingInputView, remove: boolean): Promise<void> => {
-    if (busyRef.current || busyOutside || !input) return
+    if (busyRef.current || blockedOutside || !input) return
     busyRef.current = true
     setBusy(true)
     try {
@@ -597,16 +608,16 @@ function SingleChatPendingQueue({ snapshot, input, bodies, busyOutside, onRefres
                 {session?.pendingInputId === item.id && <small><UiText zh="请先保存或放弃本次编辑" /></small>}
               </div>
               <span className="pending-input-actions">
-                <button className="pending-input-edit" type="button" disabled={busy || busyOutside || !input || session?.pendingInputId === item.id} onClick={() => { void perform(item, false) }} aria-label={uiAttribute("编辑待发送消息")} title={uiAttribute("移回输入框编辑（保留当前输入）")}>
+                <button className="pending-input-edit" type="button" disabled={busy || blockedOutside || !input || session?.pendingInputId === item.id} onClick={() => { void perform(item, false) }} aria-label={uiAttribute("编辑待发送消息")} title={uiAttribute("移回输入框编辑（保留当前输入）")}>
                   <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3.2 11.9.7-3.2 6.8-6.8a1.25 1.25 0 0 1 1.8 0l1.6 1.6a1.25 1.25 0 0 1 0 1.8L6.3 12l-3.1.7Z" /><path d="m9.8 2.8 3.4 3.4" /></svg>
                 </button>
-                <button className="pending-input-delete" type="button" disabled={busy || busyOutside || !input} onClick={() => { void perform(item, true) }} aria-label={uiAttribute("删除待发送消息")}>
+                <button className="pending-input-delete" type="button" disabled={busy || blockedOutside || !input} onClick={() => { void perform(item, true) }} aria-label={uiAttribute("删除待发送消息")}>
                   <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4.5 4.5 7 7m0-7-7 7" /></svg>
                 </button>
               </span>
               {session?.pendingInputId === item.id && input && <PrivatePendingEditor item={item} session={session}
-                controller={input} bodies={bodies} busy={busy || busyOutside} onError={onNotify} />}
-              {'editingElsewhere' in queue && queue.editingElsewhere === true && input && <button type="button" disabled={busy || busyOutside}
+                controller={input} bodies={bodies} busy={busy || blockedOutside} onError={onNotify} />}
+              {'editingElsewhere' in queue && queue.editingElsewhere === true && input && <button type="button" disabled={busy || blockedOutside}
                 onClick={() => { void input.edit(item, { type: 'takeover' }, null).catch(error => onNotify(privateInputErrorMessage(error))) }}><UiText zh="从已保存版本接管" /></button>}
               {repairMessage && <p className="pending-input-error">{repairMessage}</p>}
               {item.attachments.length > 0 && (
@@ -639,6 +650,8 @@ function SingleChatPendingQueue({ snapshot, input, bodies, busyOutside, onRefres
 const EMPTY_PRIVATE_INPUT: PrivateInputState = { snapshot: null, retained: [], nextCursor: null, complete: true, pending: false, unknown: false, error: null }
 const noPrivateInputSubscription = (): (() => void) => () => undefined
 const emptyPrivateInput = (): PrivateInputState => EMPTY_PRIVATE_INPUT
+const EMPTY_PRIVATE_UPLOAD: PrivateUploadState = { rows: [], loaded: false, error: null, applied: 0 }
+const emptyPrivateUpload = (): PrivateUploadState => EMPTY_PRIVATE_UPLOAD
 
 /** Canvas navigation selects a conversation; only notification focus may additionally select a Run. */
 export type SingleChatPanelTarget = Pick<NotificationSingleChatSource, 'conversationId' | 'agentId' | 'agentDisplayName'> & { requestId: number }
@@ -779,6 +792,12 @@ export function SingleChatPanel({
   const input = useMemo(() => currentSnapshot ? getInputController(currentSnapshot.conversation.id) : null,
     [getInputController, currentSnapshot?.conversation.id])
   const inputState = useSyncExternalStore(input?.subscribe ?? noPrivateInputSubscription, input?.getSnapshot ?? emptyPrivateInput, input?.getSnapshot ?? emptyPrivateInput)
+  const uploads = useMemo(() => input ? privateUploadController(client.singleChatAttachments,
+    { threadId, conversationId: input.origin.conversationId, composerScope: input.origin.scope },
+    { kind: 'single_chat', conversationId: input.origin.conversationId, ...(input.origin.scope ? { composerScope: input.origin.scope } : {}) }) : null,
+    [client, input, threadId])
+  const uploadState = useSyncExternalStore(uploads?.subscribe ?? noPrivateInputSubscription, uploads?.getSnapshot ?? emptyPrivateUpload, uploads?.getSnapshot ?? emptyPrivateUpload)
+  const uploadBusy = Boolean(uploads?.supported && (!uploadState.loaded || uploadState.rows.some(row => row.state !== 'rejected')))
   const returningPending = sharedDraftState.mutatingKeys.includes(bodyDraftKey)
   returningPendingRef.current = returningPending
   const pendingBodyKey = `${threadId}:pending:${selectedAgentId ?? ''}`
@@ -952,6 +971,12 @@ export function SingleChatPanel({
     })().catch(error => { if (active) setError(privateInputErrorMessage(error)) })
     return () => { active = false }
   }, [input, visible])
+  useEffect(() => {
+    if (visible && uploads?.supported) void uploads.load().catch(() => undefined)
+  }, [uploads, visible])
+  useEffect(() => {
+    if (input && uploadState.applied) void input.refresh().catch(error => setError(privateInputErrorMessage(error)))
+  }, [input, uploadState.applied])
   useEffect(() => {
     if (!input || !inputState.snapshot || input.origin.contextKey !== (contextIdentityRef.current ?? 'default')) return
     acceptSnapshot(input.origin.conversationId, inputState.snapshot)
@@ -1174,7 +1199,7 @@ export function SingleChatPanel({
   const returnPendingInputToComposer = async (item: SingleChatPendingInputView, editToken: string | null): Promise<void> => {
     const current = snapshotRef.current
     if (!current || current.conversation.id !== item.conversationId || sending || ending || quoteOperationCount.current > 0
-      || preparingAttachments.some(entry => !entry.error) || leaveLeaseCountRef.current > 0) throw new Error(uiAttribute('输入框正在处理变更，请稍后再试。'))
+      || (uploads?.supported && uploads.blocked) || preparingAttachments.some(entry => !entry.error) || leaveLeaseCountRef.current > 0) throw new Error(uiAttribute('输入框正在处理变更，请稍后再试。'))
     await getInputController(item.conversationId).returnPending(item, editToken)
     await refreshCurrent(item.conversationId)
     window.requestAnimationFrame(() => composerRef.current?.focus())
@@ -1260,8 +1285,8 @@ export function SingleChatPanel({
   }
 
   const prepareFiles = async (files: File[]): Promise<void> => {
-    if (composerContext) { setError(uiAttribute('这张卡片的文件准备尚未接通，当前输入已保留。')); return }
-    if (returningPendingRef.current || inputState.pending) return
+    if (composerContext && !uploads?.supported) { setError(privateUploadErrorMessage(new Error('private_upload.capability_required'))); return }
+    if (returningPendingRef.current || inputState.pending || (uploads?.supported && uploads.blocked)) return
     const agentId = selectedAgentIdRef.current
     if (
       !agentId
@@ -1269,6 +1294,21 @@ export function SingleChatPanel({
       || ending
       || files.length === 0
     ) return
+    if (uploads?.supported && input) {
+      setError(null)
+      try {
+        for (const [index, file] of files.entries()) {
+          const original = await input.ensureRegistered()
+          if (!original) throw new Error('private_upload.context_changed')
+          if (!await uploads.prepare(original.draft.revision, file)) {
+            if (index + 1 < files.length) setError(uiAttribute('请先核对原上传结果，其余文件尚未添加。'))
+            return
+          }
+          await input.refresh()
+        }
+      } catch (error) { setError(privateUploadErrorMessage(error)) }
+      return
+    }
     const pending = files.map((file) => ({ id: newCommandId(), name: file.name, error: null }))
     setPreparingAttachments((current) => [...current, ...pending])
     setError(null)
@@ -1324,7 +1364,7 @@ export function SingleChatPanel({
     }, 1_200)
   }
 
-  const attachmentDropBlocked = !currentTargetReady || ending || sending || quoteBusy
+  const attachmentDropBlocked = !currentTargetReady || ending || sending || quoteBusy || inputState.pending || uploadBusy || (Boolean(composerContext) && !uploads?.supported)
     || returningPending || preparingAttachments.some((item) => !item.error)
 
   const enterAttachmentDropSurface = (event: ReactDragEvent<HTMLElement>): void => {
@@ -1399,7 +1439,7 @@ export function SingleChatPanel({
   }, [])
 
   const removeDraftAttachment = async (attachmentId: string): Promise<void> => {
-    if (returningPendingRef.current) return
+    if (returningPendingRef.current || (uploads?.supported && uploads.blocked)) return
     const current = snapshotRef.current
     if (
       !current
@@ -1417,6 +1457,7 @@ export function SingleChatPanel({
 
   const mutateDraftQuote = (action: MessageQuoteAction): Promise<void> => {
     if (returningPendingRef.current) return Promise.reject(new Error(uiAttribute('消息正在移回输入框，请稍后再试。')))
+    if (uploads?.supported && uploads.blocked) return Promise.reject(new Error(privateUploadErrorMessage(new Error('private_upload.busy'))))
     const owner = snapshotRef.current?.conversation.id
     const ownerContext = contextIdentity
     if (!owner) return Promise.reject(new Error('quote.owner_unavailable'))
@@ -1437,7 +1478,7 @@ export function SingleChatPanel({
     const agentId = selectedAgentIdRef.current
     const originalBody = draftStore.getSnapshot().drafts[bodyDraftKey] ?? ''
     if (!agentId || !singleChatConversationReady(snapshotRef.current, agentId, loadingRef.current, boundConversationId)
-      || sending || returningPending || ending || quoteBusy || inputState.pending || preparingAttachments.some(item => !item.error)) return
+      || sending || returningPending || ending || quoteBusy || inputState.pending || (uploads?.supported && uploads.blocked) || preparingAttachments.some(item => !item.error)) return
     setSending(true); setError(null); followLatestRef.current = true
     try {
       let current = snapshotRef.current?.conversation.agentId === agentId ? snapshotRef.current : await openConversation(agentId)
@@ -1683,7 +1724,7 @@ export function SingleChatPanel({
         <SingleChatPendingQueue
           snapshot={currentSnapshot}
           input={input} bodies={draftStore}
-          busyOutside={!sharedDraftState.ready || Boolean(sharedDraftState.error) || sending || ending || quoteBusy || inputState.pending || returningPending || leaving || preparingAttachments.some((item) => !item.error)}
+          busyOutside={!sharedDraftState.ready || Boolean(sharedDraftState.error) || sending || ending || quoteBusy || inputState.pending || uploadBusy || returningPending || leaving || preparingAttachments.some((item) => !item.error)}
           onRefresh={async () => {
             await refreshCurrent()
           }}
@@ -1704,7 +1745,7 @@ export function SingleChatPanel({
                 {currentSnapshot?.draft.attachments.map((attachment) => composerContext ? (
                   <div className="single-chat-scoped-file" key={attachment.id}>
                     <span>{attachment.displayName}</span>
-                    <button type="button" disabled={inputState.pending || sending || quoteBusy} onClick={() => void removeDraftAttachment(attachment.id)}><UiText zh="移除附件" /></button>
+                    <button type="button" disabled={inputState.pending || uploadBusy || sending || quoteBusy} onClick={() => void removeDraftAttachment(attachment.id)}><UiText zh="移除附件" /></button>
                   </div>
                 ) : (
                   <AttachmentCard
@@ -1734,7 +1775,7 @@ export function SingleChatPanel({
             )}
             <MessageQuotes key={currentSnapshot?.conversation.id ?? 'empty'} quotes={currentSnapshot?.draft.quotes ?? []}
               onEmptyFocus={() => composerRef.current?.focus()}
-              disabled={sending || inputState.pending || returningPending || quoteBusy} onReveal={revealPrivateQuote} onMutate={mutateDraftQuote} />
+              disabled={sending || inputState.pending || uploadBusy || returningPending || quoteBusy} onReveal={revealPrivateQuote} onMutate={mutateDraftQuote} />
             <label className="sr-only" htmlFor={`${panelId}-composer`}><UiText zh={"发送单聊消息"} /></label>
             <textarea
               ref={composerRef}
@@ -1780,7 +1821,7 @@ export function SingleChatPanel({
                 type="button"
                 aria-label={uiAttribute("添加文件")}
                 title={uiAttribute("添加文件")}
-                disabled={Boolean(composerContext) || inputState.pending || !selectedMember || !currentTargetReady || sending || returningPending || ending || quoteBusy || preparingAttachments.some((item) => !item.error)}
+                disabled={(Boolean(composerContext) && (!uploads?.supported || !inputState.snapshot)) || uploadBusy || inputState.pending || !selectedMember || !currentTargetReady || sending || returningPending || ending || quoteBusy || preparingAttachments.some((item) => !item.error)}
                 onClick={() => fileInputRef.current?.click()}
               >
                 <svg aria-hidden="true" viewBox="0 0 18 18"><path d="m6.2 9.8 4.65-4.65a2.5 2.5 0 0 1 3.54 3.54l-6.1 6.1a4 4 0 0 1-5.66-5.66l6.1-6.1" /></svg>
@@ -1801,7 +1842,7 @@ export function SingleChatPanel({
                     action="send"
                     type="submit"
                     busy={sending || preparingAttachments.some((item) => !item.error)}
-                    disabled={!sharedDraftState.ready || Boolean(sharedDraftState.error) || inputState.pending || (Boolean(composerContext) && !inputState.snapshot) || (!draft.trim() && (currentSnapshot?.draft.attachments.length ?? 0) === 0) || !selectedMember || !currentTargetReady || sending || returningPending || ending || quoteBusy || preparingAttachments.some((item) => !item.error)}
+                    disabled={!sharedDraftState.ready || Boolean(sharedDraftState.error) || inputState.pending || uploadBusy || (Boolean(composerContext) && !inputState.snapshot) || (!draft.trim() && (currentSnapshot?.draft.attachments.length ?? 0) === 0) || !selectedMember || !currentTargetReady || sending || returningPending || ending || quoteBusy || preparingAttachments.some((item) => !item.error)}
                   />}
             </div>
           </div>
@@ -1818,7 +1859,8 @@ export function SingleChatPanel({
           <button type="button" disabled={sending} onClick={() => { draftStore.retry() }}><UiText zh={sharedDraftState.ready ? '重试保存' : '重新读取'} /></button>
         </div>}
         {input && <PrivateInputRecoveryPanel controller={input} state={inputState}
-          busy={localSending || ending || quoteBusy || preparingAttachments.some(item => !item.error)} onError={setError} />}
+          busy={localSending || ending || quoteBusy || uploadBusy || preparingAttachments.some(item => !item.error)} onError={setError} />}
+        {uploads?.supported && <PrivateUploadRecoveryPanel controller={uploads} />}
         {error && <div className="single-chat-error" role="alert"><span>{error}</span><button type="button" onClick={() => setError(null)}><UiText zh={"关闭"} /></button></div>}
       </form>
       <footer className="single-chat-footer">

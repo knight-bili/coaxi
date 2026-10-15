@@ -92,10 +92,11 @@ describe('Native 私聊上传原请求恢复', () => {
     expect(JSON.stringify(entries)).not.toContain(f.sourcePath)
     expect(await f.service.list(owner(input))).toEqual([])
     const before = f.core.binds
+    const callsBefore = f.core.calls.length
     await unlink(f.sourcePath)
     expect(await f.service.reconcile(frozen)).toMatchObject({ state: 'recorded' })
     expect(f.core.binds).toBe(before)
-    expect(f.core.calls.at(-1)?.method).toBe('host.upload.receipt')
+    expect(f.core.calls).toHaveLength(callsBefore)
   })
 
   it('未知结果保留原字节文件，重启和重复准备不自动派发，重试拒绝内容变化', async () => {
@@ -188,7 +189,7 @@ describe('Native 私聊上传原请求恢复', () => {
     const journal = JSON.parse(await readFile(path, 'utf8'))
     await unlink(path)
     const restored = new PrivateAttachmentPreparations(f.directory, f.core)
-    await expect(restored.prepare(input, { ...metadata, bytes: new TextEncoder().encode('other') })).rejects.toThrow()
+    expect(await restored.prepare(input, { ...metadata, bytes: new TextEncoder().encode('other') })).toEqual({ state: 'not_prepared', commandId: input.commandId })
     expect(await readFile(journal.source.sourcePath, 'utf8')).toBe('input')
     expect(f.core.binds).toBe(1)
     expect(await restored.prepare(input, { ...metadata, bytes })).toMatchObject({ state: 'unknown' })
@@ -200,6 +201,33 @@ describe('Native 私聊上传原请求恢复', () => {
     const before = f.core.calls.length
     await expect(other.reconcile(input)).rejects.toThrow('invalid_recovery')
     expect(f.core.calls).toHaveLength(before)
+  })
+
+  it('已落盘的原回执离线仍可恢复，损坏回执不能冒充完成', async () => {
+    const f = await fixture(), input = request()
+    const recorded = await f.service.prepare(input, { ...metadata, bytes: new TextEncoder().encode('input') })
+    expect(recorded.state).toBe('recorded')
+    f.core.receipts.clear()
+    const before = f.core.calls.length
+    const restored = new PrivateAttachmentPreparations(f.directory, f.core)
+    expect(await restored.reconcile(input)).toEqual(recorded)
+    expect(f.core.calls).toHaveLength(before)
+    const path = join(f.directory, `${input.commandId}.json`)
+    const journal = JSON.parse(await readFile(path, 'utf8'))
+    journal.receipt.commandId = '00000000-0000-4000-8000-000000000099'
+    await writeFile(path, JSON.stringify(journal))
+    await expect(restored.reconcile(input)).rejects.toThrow('invalid_recovery')
+  })
+
+  it('观察失败确认未派发，修好原路径后可显式重新准备', async () => {
+    const f = await fixture()
+    const input = request(), sourcePath = join(f.root, 'not-created.txt')
+    expect(await f.service.prepare(input, { ...metadata, sourcePath })).toEqual({ state: 'not_prepared', commandId: input.commandId })
+    expect(f.core.binds).toBe(0)
+    await expect(readFile(join(f.directory, `${input.commandId}.json`))).rejects.toMatchObject({ code: 'ENOENT' })
+    await writeFile(sourcePath, 'input')
+    expect(await f.service.prepare(input, { ...metadata, sourcePath })).toMatchObject({ state: 'recorded' })
+    expect(f.core.binds).toBe(1)
   })
 
   it('目录保留原意图重启恢复，变化时不派发，不能按普通文件丢掉类型', async () => {

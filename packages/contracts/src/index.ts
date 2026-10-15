@@ -998,6 +998,10 @@ export interface PrivateAttachmentPreparationRequest {
 }
 
 export type PrivateAttachmentPreparationResult = {
+  /** 平台已确认本次未派发绑定；不能用于运输结果未知。 */
+  state: 'not_prepared'
+  commandId: string
+} | {
   state: 'prepared' | 'unknown'
   commandId: string
 } | {

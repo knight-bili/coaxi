@@ -1777,3 +1777,13 @@ Windows Server 更新交接继续扩展原 owner `handoff_requires_settlement_th
 最小命令：`pnpm exec vitest run apps/desktop/src/main/private-attachment-preparation.test.ts apps/desktop/src/main/file-preview/file-preview-service.test.ts apps/desktop/src/main/file-preview/file-preview-authority.test.ts apps/web/src/client.test.ts apps/web/src/file-digest.test.ts`。
 Core 原私聊材料 owner 增加 Native 目录观察/绑定、Web 冒用拒绝、错误总量零材料/回执和正确请求恢复断言，
 不新增 Rust 测试函数，按阶段集中规则登记未运行；旧二进制不作为本轮新代码证据。完整 Host/Native IPC、平台和产品验证仍待。
+
+## 融合期共享文件准备控制器与 Native UI（2026-10-16）
+
+新增 Renderer 最低层 `private-upload-controller.test.ts`，拥有平台能力、同位置镜像、冻结归属、未知请求禁止替换、
+重建只读查回、明确原编号重试、挂起请求独立查回、迟到错误/未知不降级、错编号/跨卡片拒绝和编辑租约隔离。
+该 owner 使用模拟平台 API，不重复实现 Core 摘要或 Native 落盘；恢复提示只做静态组件呈现检查。
+扩展原 Main 准备 owner 验证观察失败零 bind、不同字节残留不覆盖、已落盘回执离线回放与损坏回执拒绝。
+新的 not_prepared 状态只说明本次未派发，原绑定结果未知不得使用；既有准备残留测试保留原字节和 bind 次数断言。
+最小命令：`pnpm exec vitest run apps/desktop/src/renderer/src/private-upload-controller.test.ts apps/desktop/src/renderer/src/SingleChatPanel.test.ts apps/desktop/src/renderer/src/private-input-controller.test.ts apps/desktop/src/main/private-attachment-preparation.test.ts`。
+实际挂载交互、Native IPC/Host、Web重选与旧租约记录恢复继续随阶段候选验证，不新增或忽略 Rust 测试。

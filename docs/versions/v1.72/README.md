@@ -725,3 +725,10 @@ Core 私有暂存文件复用现有附件授权，未扩大私有根访问权限
 范围见 [私聊输入 Scope v1](../../contracts/single-chat-composer-scope-v1.md#native-目录准备与暂存附件预览2026-10-16)。
 5个定向测试文件共94项通过，1项既有 Windows 平台跳过；Main/Preload/Web 定向类型检查通过。
 预览使用真实临时文件和本地 HTTP，Core 授权仍为模拟接口；新增 Rust 目录断言、实际 Host/Native IPC 和共享文件界面仍待。
+
+## 融合期共享文件准备与 Native 恢复界面（2026-10-16）
+
+新增按原位置复用的共享文件控制器与恢复面板，接入 Native 卡片和排队工作副本；未知请求只核对，明确重试复用原编号。
+准备前明确失败与运输未知分开，已落盘回执支持离线查回且拒绝损坏记录，迟到结果不降级已完成状态。
+范围见[共享文件准备与Native恢复](../../contracts/single-chat-composer-scope-v1.md#共享文件准备界面与-native-恢复2026-10-16)。
+本批只做定向 Renderer/Main 检查和类型检查；Web 适配、原文件重选、旧租约/孤立恢复与实际 Host/Native 运行仍待，完整一期未完成。

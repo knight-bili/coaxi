@@ -33,6 +33,13 @@ const object = (value: unknown): value is Record<string, unknown> => Boolean(val
 const fields = (value: Record<string, unknown>, allowed: string[], required = allowed) =>
   Object.keys(value).every(key => allowed.includes(key)) && required.every(key => Object.hasOwn(value, key))
 const fail = (): never => { throw new Error('private_upload.invalid_recovery') }
+function recordedReceipt(entry: Pick<Entry, 'request'>, value: unknown): StoredCommandResult {
+  if (!object(value) || value.commandId !== entry.request.commandId || value.commandType !== 'camp.source_attachment.upload.bind'
+    || !['applied', 'accepted', 'rejected'].includes(String(value.status)) || !object(value.payload)
+    || typeof value.code !== 'string' || typeof value.recordedAt !== 'string'
+    || (value.status !== 'rejected' && value.payload.attachmentRefId !== entry.request.commandId)) return fail()
+  return value as unknown as StoredCommandResult
+}
 
 export function parsePrivatePreparation(value: unknown): PrivateAttachmentPreparationRequest {
   if (!object(value) || !fields(value, ['commandId', 'threadId', 'expectedRevision', 'target'])
@@ -122,7 +129,10 @@ export class PrivateAttachmentPreparations {
     if (request.commandId !== id) return fail()
     const observed = observation(value, request)
     if (value.original.owned && (observed.source.kind !== 'file' || observed.source.sourcePath !== this.#source(id, value.original.displayName))) return fail()
-    return { ...value, ...observed, request } as Entry
+    const entry = { ...value, ...observed, request } as Entry
+    if (entry.phase === 'recorded') entry.receipt = recordedReceipt(entry, value.receipt)
+    else if (value.receipt !== undefined) return fail()
+    return entry
   }
   async #require(request: PrivateAttachmentPreparationRequest): Promise<Entry> {
     const entry = await this.#read(request.commandId)
@@ -147,31 +157,37 @@ export class PrivateAttachmentPreparations {
             : existing.intent.sha256 !== createHash('sha256').update(input.bytes).digest('hex'))) return fail()
         return { entry: existing, created: false }
       }
-      let sourcePath: string
-      if ('sourcePath' in input) sourcePath = input.sourcePath
-      else {
-        sourcePath = this.#source(request.commandId, input.displayName)
-        await mkdir(join(this.#root, 'sources', request.commandId), { recursive: true, mode: 0o700 })
-        // 写入及落盘完成后才观察；从未发给 Core 的同编号残留也不能静默覆盖。
-        try {
-          const file = await open(sourcePath, 'wx', 0o600)
-          try { await file.writeFile(input.bytes); await file.sync() } finally { await file.close() }
-        } catch (error) {
-          // 崩溃可能留下已完整落盘但尚未登记的同编号文件；只复用逐字相同的原输入。
-          if (!object(error) || error.code !== 'EEXIST'
-            || !isDeepStrictEqual(new Uint8Array(await readFile(sourcePath)), input.bytes)) throw error
+      try {
+        let sourcePath: string
+        if ('sourcePath' in input) sourcePath = input.sourcePath
+        else {
+          sourcePath = this.#source(request.commandId, input.displayName)
+          await mkdir(join(this.#root, 'sources', request.commandId), { recursive: true, mode: 0o700 })
+          // 写入及落盘完成后才观察；从未发给 Core 的同编号残留也不能静默覆盖。
+          try {
+            const file = await open(sourcePath, 'wx', 0o600)
+            try { await file.writeFile(input.bytes); await file.sync() } finally { await file.close() }
+          } catch (error) {
+            // 崩溃可能留下已完整落盘但尚未登记的同编号文件；只复用逐字相同的原输入。
+            if (!object(error) || error.code !== 'EEXIST'
+              || !isDeepStrictEqual(new Uint8Array(await readFile(sourcePath)), input.bytes)) throw error
+          }
         }
+        const observed = observation(await this.core.request('host.upload.observe', {
+          ...request, sourcePath, displayName: input.displayName, mediaType: input.mediaType
+        }), request)
+        if (observed.source.sourcePath !== sourcePath) return fail()
+        if ('bytes' in input && observed.source.kind !== 'file') return fail()
+        const entry: Entry = { version: 1, ...observed, request,
+          original: { displayName: input.displayName, mediaType: input.mediaType, owned: 'bytes' in input }, phase: 'prepared' }
+        await this.#write(entry)
+        return { entry, created: true }
+      } catch {
+        // 此锁内已确认没有旧日志，且尚未调用 bind；只读 observe 的失败不会产生业务结果。
+        return null
       }
-      const observed = observation(await this.core.request('host.upload.observe', {
-        ...request, sourcePath, displayName: input.displayName, mediaType: input.mediaType
-      }), request)
-      if (observed.source.sourcePath !== sourcePath) return fail()
-      if ('bytes' in input && observed.source.kind !== 'file') return fail()
-      const entry: Entry = { version: 1, ...observed, request,
-        original: { displayName: input.displayName, mediaType: input.mediaType, owned: 'bytes' in input }, phase: 'prepared' }
-      await this.#write(entry)
-      return { entry, created: true }
     })
+    if (!prepared) return { state: 'not_prepared', commandId: request.commandId }
     // 已存在的请求只核对，不把重复 prepare 调用解释为重试。
     return prepared.created ? this.#dispatch(prepared.entry) : this.#lookup(prepared.entry)
   }
@@ -216,11 +232,7 @@ export class PrivateAttachmentPreparations {
     return results
   }
   async #record(entry: Entry, value: unknown): Promise<PrivateAttachmentPreparationResult> {
-    if (!object(value) || value.commandId !== entry.request.commandId || value.commandType !== 'camp.source_attachment.upload.bind'
-      || !['applied', 'accepted', 'rejected'].includes(String(value.status)) || !object(value.payload)
-      || typeof value.code !== 'string' || typeof value.recordedAt !== 'string'
-      || (value.status !== 'rejected' && value.payload.attachmentRefId !== entry.request.commandId)) return fail()
-    const receipt = value as unknown as StoredCommandResult
+    const receipt = recordedReceipt(entry, value)
     await this.#locked(entry.request.commandId, async () => {
       const current = await this.#require(entry.request)
       if (current.receipt && !isDeepStrictEqual(current.receipt, receipt)) return fail()
@@ -232,6 +244,7 @@ export class PrivateAttachmentPreparations {
     return result
   }
   async #lookup(entry: Entry): Promise<PrivateAttachmentPreparationResult> {
+    if (entry.phase === 'recorded' && entry.receipt) return { state: 'recorded', commandId: entry.request.commandId, receipt: entry.receipt }
     try {
       const result = await this.core.request<{ receipt: unknown }>('host.upload.receipt', entry.intent)
       if (result.receipt != null) return await this.#record(entry, result.receipt)

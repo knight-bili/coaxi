@@ -29,11 +29,11 @@
         "孤立Core/本机正文及冲突统一恢复"
       ],
       "done_when": "本阶段完整使用流程及PC01-PC24适用工程验证有当前源码证据，外部环境缺项明确单列",
-      "latest_partial_evidence": "i03-private-native-directory-result.json",
+      "latest_partial_evidence": "i03-private-upload-ui-result.json",
       "remaining_runtime_risks": [
-        "目录Core增量随阶段候选编译，真实Host/Native资源链路仍待",
-        "共享上传/重选/恢复界面与迁入/孤立/冲突未完成",
-        "大材料扫描在事务内的延迟影响待规模验证"
+        "Web新恢复接口/原文件重选及旧租约/迁入/孤立/冲突统一恢复待实现",
+        "实际Host/NativeIPC/挂载交互与目录Core增量随阶段候选验证",
+        "大材料、日志枚举与事务锁规模影响待验证"
       ]
     },
     {
