@@ -16,6 +16,12 @@ last_updated: 2026-10-12
 
 ## Rust 测试准入与退役门槛
 
+`read_model::navigation::tests::activity_counts_complete_visible_threads_once_and_resolves_external_window_owners`新增一个最小SQLite owner，
+拥有新完整活动聚合的Run去重、camp_turn fallback、归属优先、编辑端隔离、Mission/删除与物理缺失定位；
+旧Navigation owner仅证明窗口、历史隔离和读量，不能覆盖该聚合语义。新owner不加载完整Database/Runtime；
+阶段命令`cargo test -p rovai-core --lib --features extended-tests read_model::navigation`，本切片未编译运行。
+前端控制器另测200批量、迟到/失败、Host dispose、隐藏积压与水位，App既有静态owner补徽章三态；Node原文SQL见证及这些局部检查不替代实际Host/UI。
+
 工作树NUL解析由`git::worktrees::tests::nul_records_preserve_path_characters_and_reject_incomplete_or_ambiguous_topology`
 新增纯函数owner拥有：旧Git文本读取不能处理带换行路径和bare/locked/prunable分帧，亦无等价owner。
 真实主/子worktree、子目录、失效checkout与受保护目录复用`git::tests`现有仓库fixture扩展，不新增进程测试owner。

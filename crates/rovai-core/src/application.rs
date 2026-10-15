@@ -863,6 +863,7 @@ fn request_uses_independent_read_queue(method: &str) -> bool {
         "camps.open"
             | "camps.enter"
             | "navigation.snapshot"
+            | "navigation.activity"
             | "navigation.camps"
             | "navigation.groupCamps"
             | "navigation.findCamp"
@@ -1693,6 +1694,13 @@ struct NavigationSnapshotParams {
     #[serde(default)]
     group_limits: BTreeMap<String, usize>,
     group_keys: Option<Vec<String>>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct NavigationActivityParams {
+    group_keys: Vec<String>,
+    thread_ids: Option<Vec<String>>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -10102,6 +10110,19 @@ impl Core {
                         &mut database,
                         &params.group_limits,
                         params.group_keys.as_deref(),
+                        &request.client,
+                    )?,
+                )?)
+            }
+            "navigation.activity" => {
+                let params: NavigationActivityParams =
+                    serde_json::from_value(request.params.clone())?;
+                let mut database = self.database.lock().await;
+                Ok(serde_json::to_value(
+                    ReadModelService.navigation_activity(
+                        &mut database,
+                        &params.group_keys,
+                        params.thread_ids.as_deref(),
                         &request.client,
                     )?,
                 )?)
@@ -30213,6 +30234,7 @@ done
         assert!(request_uses_independent_read_queue("camps.enter"));
         assert!(request_uses_independent_read_queue("camps.open"));
         assert!(request_uses_independent_read_queue("navigation.snapshot"));
+        assert!(request_uses_independent_read_queue("navigation.activity"));
         assert!(request_uses_independent_read_queue("navigation.camps"));
         assert!(request_uses_independent_read_queue("navigation.groupCamps"));
         assert!(request_uses_independent_read_queue("navigation.findCamp"));

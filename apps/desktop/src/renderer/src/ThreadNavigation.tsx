@@ -57,6 +57,9 @@ import { navigationProjectSidebarLayout } from '../../shared/navigation-project-
 import { useCanvasFolders } from './useCanvasFolders'
 import { resolveSidebarProjectGroups } from './project-group-presentation'
 import { navigationProjectTrees } from './navigation-project-tree'
+import { useNavigationActivity } from './useNavigationActivity'
+import { navigationActivityForGroups } from './navigation-activity-controller'
+import { NavigationActivityBadge } from './NavigationActivityBadge'
 
 export type NavigationSettingsSection = SettingsSection
 
@@ -249,6 +252,10 @@ export function ThreadNavigation({
   const mobile = useMobileLayout()
   const collapsed = useNavigationCollapsed()
   const navigationCollapsed = !mobile && collapsed
+  const activity = useNavigationActivity(client, navigation ? ['quick-chat', ...navigation.projects.map(project => project.projectKey)] : [],
+    state === 'ready' && !disabled && !navigationCollapsed && (view !== 'settings' || mobile))
+  const projectActivityKeys = (project: ProjectNavigationGroup) => [project.projectKey,
+    ...(projectTrees.find(tree => tree.project.projectKey === project.projectKey)?.children.flatMap(child => child.project ? [child.project.projectKey] : []) ?? [])]
   const [collapsedProjectGroups, setCollapsedProjectGroups] = useState<Set<string>>(() => new Set())
   const [collapsedFolderGroups, setCollapsedFolderGroups] = useState<Set<string>>(() => new Set())
   useEffect(() => setCollapsedFolderGroups(new Set()), [client])
@@ -427,6 +434,7 @@ export function ThreadNavigation({
         currentProject={currentProjectKey === project.projectKey}
         createDisabled={creatingConversation || options.worktree?.available === false || Boolean(options.worktree?.prunable)}
         worktree={options.worktree} parentProjectPath={options.parentPath} relationComplete={options.complete} worktreeChildren={options.children}
+        activity={navigationActivityForGroups(activity, projectActivityKeys(project), options.complete !== false)}
         pinned={pins.some((pin) => pin.kind === 'project' && pin.targetKey === project.projectKey)}
         onShowMore={() => void showMore(groupKey)}
         onCollapseThreads={() => collapseGroupThreads(groupKey)}
@@ -582,6 +590,7 @@ export function ThreadNavigation({
           {navigation && navigationProjectSidebarLayout(projectTrees.map(tree => tree.project), resolvedFolderGroups, projectOrder).map(entry => entry.kind === 'project' ? renderProjectTree(entry.project) : (
             <section key={entry.key} className="navigation-folder-group" data-color={entry.group.color ?? undefined}>
               <ProjectFolderGroupHeader group={entry.group} expanded={!collapsedFolderGroups.has(entry.group.id)} complete={entry.group.relationshipsComplete && entry.projects.every(project => projectTrees.find(tree => tree.project === project)?.complete)}
+                activity={navigationActivityForGroups(activity, entry.projects.flatMap(projectActivityKeys), entry.group.relationshipsComplete && entry.projects.every(project => projectTrees.find(tree => tree.project === project)?.complete))}
                 onToggle={() => setCollapsedFolderGroups(current => toggleNavigationGroup(current, entry.group.id))} onManage={onManageProjectGroups} />
               {!collapsedFolderGroups.has(entry.group.id) && <div className="navigation-folder-group-members">{entry.projects.map(project => renderProjectTree(project))}</div>}
             </section>
@@ -590,6 +599,7 @@ export function ThreadNavigation({
           {navigation && <ThreadGroup
             groupKey="quick-chat"
             label={uiAttribute("快速对话")}
+            activity={navigationActivityForGroups(activity, ['quick-chat'])}
             totalCount={quickChatTotalCount}
             threads={quickChatWindow.threads}
             hasMore={quickChatWindow.hasMore}
@@ -949,9 +959,10 @@ function CommandPalette({
   )
 }
 
-function ProjectFolderGroupHeader({ group, expanded, complete, onToggle, onManage }: {
+function ProjectFolderGroupHeader({ group, expanded, complete, onToggle, onManage, activity }: {
   group: NavigationProjectGroup; expanded: boolean; complete: boolean; onToggle(): void
   onManage?(groupId?: string, action?: 'edit' | 'delete'): void
+  activity: { count: number | null; complete: boolean }
 }): JSX.Element {
   const mobile = useMobileLayout(), menu = useNavigationPressMenu(Boolean(onManage))
   const items: SidebarActionMenuItem[] = onManage ? [
@@ -961,6 +972,7 @@ function ProjectFolderGroupHeader({ group, expanded, complete, onToggle, onManag
   return <div className="navigation-folder-group-heading" onContextMenu={event => { if (!event.defaultPrevented) menu.rowProps.onContextMenu?.(event) }}>
     <button {...menu.rowProps} type="button" className="navigation-folder-group-toggle" aria-expanded={expanded} onClick={onToggle}>
       <span aria-hidden="true">{expanded ? '▾' : '▸'}</span><span>{group.name}</span>{!complete && <small><UiText zh="关系待核对" /></small>}
+      <NavigationActivityBadge {...activity} />
     </button>
     {onManage && <SidebarActionMenu target={`folder-group:${group.id}`} label={uiAttribute('管理分组“{0}”', group.name)} triggerClassName="group-menu-trigger"
       items={items} pressMenu={menu} mobile={mobile} />}
@@ -985,6 +997,7 @@ function ThreadGroup({
   parentProjectPath,
   relationComplete,
   worktreeChildren,
+  activity,
   pinned = false,
   onShowMore,
   onCollapseThreads,
@@ -1022,6 +1035,7 @@ function ThreadGroup({
   parentProjectPath?: string
   relationComplete?: boolean
   worktreeChildren?: React.ReactNode
+  activity?: { count: number | null; complete: boolean }
   pinned?: boolean
   onShowMore(): void
   onCollapseThreads(): void
@@ -1102,6 +1116,7 @@ function ThreadGroup({
             </g>
           </svg>
           <span className="truncate">{label}</span>
+          {activity && <NavigationActivityBadge {...activity} />}
           {(worktree || parentProjectPath) && <small className="navigation-worktree-label" title={parentProjectPath ? uiAttribute('主工程：{0}', parentProjectPath) : undefined}>
             {(parentProjectPath || worktree?.isMain === false) && <UiText zh="工作树" />}
             {worktree?.branch && <span>{worktree.branch}</span>}{worktree?.detached && <UiText zh="游离 HEAD" />}

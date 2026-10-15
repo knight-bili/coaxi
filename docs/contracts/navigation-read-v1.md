@@ -22,6 +22,8 @@ external_principal 消息推进。查看、重命名、队员消息和 Run 终�
 `groupKeys` 为 `quick-chat` 或 `directory:<projectPath>`。`groupLimits` 为完整前缀大小，默认/最少 5；
 未知 key 不创建组。分组响应在同一个事务里获得总数与排序后的前 N 条，不能用部分本地数据推导补位或名次。
 完整快照只跨组读取目录/计数元数据，各组详细行按索引限定窗口；正常路径不访问 event_log。
+完整活动徽章另用[Navigation Activity v1](navigation-activity-v1.md)只读元数据，不能把本接口的前缀loading数当成全组数量；
+原`navigation.threads`/分组窗口的读取范围和返回内容保持，不因统计需求附带其他Thread详情。
 置顶 Camp 用已知 ID 批量读取，不遍历其他组寻找；完整恢复同时按 ID 核对窗口外的置顶项，普通切换不带起其他置顶项读取。
 
 NavigationCampItem 延续 schema 3 字段，并提供 `lastSeenGlobalSequence`（读取旧 fixture 时可缺省为 0）。

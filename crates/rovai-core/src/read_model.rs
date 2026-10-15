@@ -145,6 +145,21 @@ pub struct NavigationSnapshot {
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
+pub struct NavigationGroupActivity {
+    pub group_key: String,
+    pub active_thread_count: usize,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct NavigationActivitySnapshot {
+    pub schema_version: u32,
+    pub through_global_sequence: i64,
+    pub groups: Vec<NavigationGroupActivity>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct NavigationThreadPage {
     pub schema_version: i64,
     pub through_global_sequence: i64,
@@ -1112,6 +1127,23 @@ impl ReadModelService {
             next_offset,
             camps,
         })
+    }
+
+    pub fn navigation_activity(
+        &self,
+        database: &mut Database,
+        keys: &[String],
+        thread_ids: Option<&[String]>,
+        client: &crate::draft_client::DraftClient,
+    ) -> Result<NavigationActivitySnapshot> {
+        let tx = database.connection_mut().transaction()?;
+        let result = NavigationActivitySnapshot {
+            schema_version: 1,
+            through_global_sequence: current_global_sequence(&tx)?,
+            groups: navigation::load_navigation_activity(&tx, client, keys, thread_ids)?,
+        };
+        tx.commit()?;
+        Ok(result)
     }
 
     pub fn navigation_camps(

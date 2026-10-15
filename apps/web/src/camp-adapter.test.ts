@@ -24,17 +24,18 @@ it('admits the shared canvas operations through the authenticated Web adapter an
   await transport.login('b'.repeat(64))
   const { client } = createThreadAdapter(transport, async () => null).environment
   const operations = ['canvas.boards.list', 'canvas.boards.get', 'canvas.boards.create',
-    'canvas.boards.update', 'canvas.boards.delete', 'canvas.nodes.snapshot', 'canvas.nodes.apply', 'canvas.references.page', 'workspaces.worktrees'] satisfies CoreMethod[]
+    'canvas.boards.update', 'canvas.boards.delete', 'canvas.nodes.snapshot', 'canvas.nodes.apply', 'canvas.references.page', 'workspaces.worktrees', 'navigation.activity'] satisfies CoreMethod[]
   try {
     for (const operation of operations) {
-      const params = operation === 'canvas.references.page' ? { afterThreadId: null, upperThreadId: null, limit: 200 }
+      const params = operation === 'navigation.activity' ? { groupKeys: ['directory:/project'], threadIds: ['external-window-thread'] }
+        : operation === 'canvas.references.page' ? { afterThreadId: null, upperThreadId: null, limit: 200 }
         : operation === 'workspaces.worktrees' ? { path: '/project' }
         : { commandId: operation, command: { boardId: 'board', expectedRevision: 3 } }
       expect(await client.request(operation, params)).toEqual({ operation, params })
     }
-    expect(requests).toHaveLength(9)
+    expect(requests).toHaveLength(operations.length)
     await expect(client.request('preferences.newConversation.initialize')).rejects.toThrow('尚未开放此 Web 操作')
-    expect(requests).toHaveLength(9)
+    expect(requests).toHaveLength(operations.length)
   } finally { transport.clear() }
 })
 

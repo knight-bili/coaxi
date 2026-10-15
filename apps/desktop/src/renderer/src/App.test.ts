@@ -1,6 +1,7 @@
 import { RemoteConnectionStatus } from './RemoteConnectionStatus'
 import { CanvasFolderContext } from './CanvasFolderProvider'
 import { canvasFolderResolution } from './canvas-folder-controller'
+import { NavigationActivityBadge } from './NavigationActivityBadge'
 import { VISIBLE_PRODUCT_RUNTIMES } from './runtime-products'
 import { DEFAULT_APPEARANCE } from '../../shared/appearance'
 import { DEFAULT_GENERAL_PREFERENCES } from '../../shared/general-preferences-model'
@@ -3154,6 +3155,16 @@ describe('task event projections', () => {
       expect(markup).toContain('data-group="directory:/main-sibling"')
       expect(markup).toContain('navigation-worktrees')
     }
+  })
+
+  it('renders complete, unknown and stale activity totals without relabeling unknown as zero', () => {
+    expect(renderToStaticMarkup(createElement(NavigationActivityBadge, { count: 0, complete: true }))).toBe('')
+    const complete = renderToStaticMarkup(createElement(NavigationActivityBadge, { count: 16, complete: true }))
+    expect(complete).toContain('16 个对话正在处理'); expect(complete).toContain('>16</span>')
+    const stale = renderToStaticMarkup(createElement(NavigationActivityBadge, { count: 2, complete: false }))
+    expect(stale).toContain('~2'); expect(stale).toContain('上次统计 2 个对话正在处理，等待更新')
+    const unknown = renderToStaticMarkup(createElement(NavigationActivityBadge, { count: null, complete: false }))
+    expect(unknown).toContain('活动统计尚未核对'); expect(unknown).toContain('>…</span>'); expect(unknown).not.toContain('>0</span>')
   })
 
   it('renders the current empty workspace without inventing a pinnable Core project', () => {

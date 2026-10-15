@@ -26,6 +26,7 @@ Architecture 解释组件如何组成，Version 概览记录交付范围；它�
 ## Navigation
 
 - [Navigation Read v1（当前）](navigation-read-v1.md)：单会话、单分组、完整摘要快照，观察水位内已读确认与局部失效。
+- [Navigation Activity v1（当前）](navigation-activity-v1.md)：完整普通导航Thread活动统计、窗口外归属定位与未知值；不以窗口loading数代替整组数量。
 
 ## Mission
 

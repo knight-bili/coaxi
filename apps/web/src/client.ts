@@ -118,6 +118,7 @@ export const WEB_OPERATIONS = [
   'automations.run',
   'app.info',
   'navigation.snapshot',
+  'navigation.activity',
   'navigation.threads',
   'navigation.groupThreads',
   'navigation.campViewed',

@@ -3957,5 +3957,8 @@
   " · 正在运行": " · Running",
   "打开并登记工作树“{0}”": "Open and register worktree “{0}”",
   "工作树关系待核对，暂不能打开": "Worktree relationships are unverified. Opening is unavailable.",
-  "工作树当前无法打开": "The worktree cannot be opened right now."
+  "工作树当前无法打开": "The worktree cannot be opened right now.",
+  "{0} 个对话正在处理": "{0} conversations in progress",
+  "活动统计尚未核对": "Activity counts are unverified",
+  "上次统计 {0} 个对话正在处理，等待更新": "Last count: {0} conversations in progress. Waiting for an update."
 }

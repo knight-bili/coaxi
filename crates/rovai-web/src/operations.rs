@@ -225,6 +225,8 @@ pub enum Operation {
     Member,
     #[serde(rename = "navigation.snapshot")]
     Navigation,
+    #[serde(rename = "navigation.activity")]
+    NavigationActivity,
     #[serde(rename = "navigation.threads", alias = "navigation.camps")]
     NavigationCamps,
     #[serde(rename = "navigation.groupThreads", alias = "navigation.groupCamps")]
@@ -589,6 +591,7 @@ impl Operation {
             Self::Members => "members.list",
             Self::Member => "members.get",
             Self::Navigation => "navigation.snapshot",
+            Self::NavigationActivity => "navigation.activity",
             Self::NavigationCamps => "navigation.camps",
             Self::GroupCamps => "navigation.groupCamps",
             Self::CampExists => "camps.exists",

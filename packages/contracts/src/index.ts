@@ -1077,6 +1077,12 @@ export interface NavigationSnapshot {
   projects: ProjectNavigationGroup[]
 }
 
+export interface NavigationActivitySnapshot {
+  schemaVersion: 1
+  throughGlobalSequence: number
+  groups: Array<{ groupKey: string; activeThreadCount: number }>
+}
+
 export interface NavigationThreadPage {
   schemaVersion: 3
   throughGlobalSequence: number
@@ -4530,6 +4536,7 @@ export type CoreMethod =
   | 'workspaces.inspect'
   | 'workspaces.worktrees'
   | 'navigation.snapshot'
+  | 'navigation.activity'
   | 'navigation.threads'
   | 'navigation.groupThreads'
   | 'navigation.findThread'

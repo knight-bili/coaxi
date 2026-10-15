@@ -110,6 +110,7 @@
     "members.list",
     "members.get",
     "navigation.snapshot",
+    "navigation.activity",
     "navigation.threads",
     "navigation.groupThreads",
     "threads.exists",

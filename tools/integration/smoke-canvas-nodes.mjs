@@ -71,7 +71,7 @@ const withDB = action => {const db = new DatabaseSync(path.join(dataDir, 'rovai.
 const sourcePaths = ['crates/rovai-core/src/canvas_node.rs', 'crates/rovai-core/src/canvas_board.rs',
   'crates/rovai-core/src/db.rs', 'crates/rovai-core/src/db_skill_pack_context.rs',
   'crates/rovai-core/src/application.rs', 'crates/rovai-web/src/operations.rs',
-  'crates/rovai-core/src/read_model.rs', 'crates/rovai-core/src/read_model/canvas_references.rs',
+  'crates/rovai-core/src/read_model.rs', 'crates/rovai-core/src/read_model/canvas_references.rs', 'crates/rovai-core/src/read_model/navigation.rs',
   'crates/rovai-core/src/git.rs', 'crates/rovai-core/src/git/worktrees.rs'];
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 try {
@@ -154,6 +154,17 @@ try {
   assert.equal(plainTopology.repositoryRoot, null); assert.deepEqual(plainTopology.worktrees, []);
   assert.equal((await call('canvas.nodes.snapshot', {boardId})).throughGlobalSequence, sequenceBeforeDirectory);
   record('authenticated_worktree_read_rejects_managed_paths_and_unknown_params_without_business_writes');
+  assert.equal((await raw('navigation.activity', {groupKeys: ['quick-chat']}, false)).status, 401);
+  for (const params of [{groupKeys: []}, {groupKeys: ['foreign']}, {groupKeys: ['quick-chat'], sql: true}, {groupKeys: ['quick-chat'], threadIds: []}]) {
+    assert((await (await raw('navigation.activity', params)).json()).error);
+  }
+  const activity = await call('navigation.activity', {groupKeys: ['quick-chat', `directory:${fixture}`]});
+  assert.equal(activity.schemaVersion, 1); assert.equal(activity.groups.length, 2);
+  assert(activity.groups.every(group => group.activeThreadCount === 0));
+  const unchangedActivity = await call('navigation.activity', {groupKeys: ['quick-chat', `directory:${fixture}`], threadIds: ['physically-absent-thread']});
+  assert.deepEqual(unchangedActivity.groups, activity.groups);
+  assert.equal((await call('canvas.nodes.snapshot', {boardId})).throughGlobalSequence, sequenceBeforeDirectory);
+  record('authenticated_navigation_activity_is_bounded_complete_metadata_and_missing_thread_reconciliation_without_business_writes');
   assert.equal((await raw('canvas.nodes.snapshot', {boardId}, false)).status, 401);
   const malformed = await raw('canvas.nodes.snapshot', {boardId, path: 'C:/fake'}); assert((await malformed.json()).error);
   const other = await command('canvas.boards.create', {name: '另一块画板'}); applied(other);
