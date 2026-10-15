@@ -998,6 +998,11 @@ export interface PrivateAttachmentPreparationRequest {
 }
 
 export type PrivateAttachmentPreparationResult = {
+  /** 首次派发已明确未绑定；已有未知请求不能用单次重试拒绝覆盖。 */
+  state: 'rejected'
+  commandId: string
+  code: string
+} | {
   /** 平台已确认本次未派发绑定；不能用于运输结果未知。 */
   state: 'not_prepared'
   commandId: string
@@ -4801,7 +4806,7 @@ export interface RovaiApi {
   singleChatAttachments: {
     prepareInput?(request: PrivateAttachmentPreparationRequest, file: File): Promise<PrivateAttachmentPreparationResult>
     reconcileInput?(request: PrivateAttachmentPreparationRequest): Promise<PrivateAttachmentPreparationResult>
-    retryInput?(request: PrivateAttachmentPreparationRequest): Promise<PrivateAttachmentPreparationResult>
+    retryInput?(request: PrivateAttachmentPreparationRequest, originalFile?: File): Promise<PrivateAttachmentPreparationResult>
     pendingPreparations?(owner: PrivateAttachmentPreparationOwner): Promise<Array<{
       request: PrivateAttachmentPreparationRequest; displayName: string; state: 'prepared' | 'unknown' | 'recorded'
     }>>

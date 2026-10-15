@@ -265,6 +265,41 @@ pub async fn reconcile(
     }
 }
 
+/// 只返回原请求的安全结果字段，不查询当前草稿或泄漏旧公开上传的 sourcePath。
+pub async fn receipt(
+    State(state): State<WebState>,
+    Extension(session): Extension<Arc<Session>>,
+    Json(intent): Json<UploadIntent>,
+) -> Response {
+    if matches!(&intent.target, rovai_core::web_upload::UploadTarget::Camp) {
+        return error(StatusCode::BAD_REQUEST, "invalid_upload");
+    }
+    let client = DraftClient::verified_web(&session.client_id).expect("Host editor identity");
+    match state
+        .core
+        .request_for_editor("host.upload.receipt", json!(intent), client)
+        .await
+    {
+        Ok(reply) if reply.error.is_none() => {
+            let value = reply.result.unwrap_or_default()["receipt"].take();
+            if value.is_null() {
+                Json(json!({"state":"unknown"})).into_response()
+            } else {
+                let payload = if value["status"] == "rejected" {
+                    json!({})
+                } else {
+                    json!({"attachmentRefId":value["payload"]["attachmentRefId"],"revision":value["payload"]["revision"]})
+                };
+                Json(json!({"state":"recorded","receipt":{
+                    "commandId":value["commandId"],"commandType":value["commandType"],"status":value["status"],
+                    "code":value["code"],"payload":payload,"resultEntity":null,"recordedAt":value["recordedAt"]
+                }})).into_response()
+            }
+        }
+        _ => error(StatusCode::SERVICE_UNAVAILABLE, "upload_binding_unknown"),
+    }
+}
+
 fn project_upload(intent: &UploadIntent, value: serde_json::Value) -> serde_json::Value {
     use rovai_core::web_upload::UploadTarget;
     let operation = match intent.target {

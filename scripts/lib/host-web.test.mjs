@@ -234,7 +234,7 @@ test('Desktop and Web share one Core while listener failure, revocation and stop
     assert.equal('dataDir' in info, false)
     assert.equal(info.name, (await host.request('app.info')).name)
     assert.deepEqual(await call(second, 'navigation.snapshot'), await host.request('navigation.snapshot'))
-    for (const operation of ['preferences.newConversation.initialize', 'host.web.token', 'host.web.rotate', 'host.web.loginTicket', 'core.shutdown', 'host.editor.resolve', 'host.upload.bind', 'camp.composerDraft.get', 'camp.composerDraft.save', 'camp.sourceAttachments.addFromPath', 'camp.attachments.desktopOpenTarget', 'filePreview.resolveSource']) {
+    for (const operation of ['preferences.newConversation.initialize', 'host.web.token', 'host.web.rotate', 'host.web.loginTicket', 'core.shutdown', 'host.editor.resolve', 'host.upload.bind', 'host.upload.receipt', 'camp.composerDraft.get', 'camp.composerDraft.save', 'camp.sourceAttachments.addFromPath', 'camp.attachments.desktopOpenTarget', 'filePreview.resolveSource']) {
       const response = await authorized(first, 'request', { method: 'POST', body: JSON.stringify({ operation, params: {} }) })
       assert.equal(response.status, 400, operation)
     }
@@ -363,6 +363,20 @@ test('Desktop and Web share one Core while listener failure, revocation and stop
     const privateResponse = await sendPrivateUpload()
     assert.equal(privateResponse.status, 200, await privateResponse.clone().text())
     const privateSnapshot = (await privateResponse.json()).draft
+    const uploadReceipt = (session, original) => authorized(session, 'uploads/receipt', { method: 'POST', body: JSON.stringify(original) })
+    const originalReceiptResponse = await uploadReceipt(first, privateIntent)
+    assert.equal(originalReceiptResponse.status, 200)
+    const originalReceipt = await originalReceiptResponse.json()
+    assert.equal((await request('uploads/receipt', { method: 'POST', body: JSON.stringify(privateIntent) })).status, 401)
+    assert.equal(originalReceipt.state, 'recorded')
+    assert.equal(originalReceipt.receipt.commandId, privateIntent.commandId)
+    assert.equal(JSON.stringify(originalReceipt).includes('sourcePath'), false)
+    const foreignReceipt = await uploadReceipt(second, privateIntent)
+    assert.equal(foreignReceipt.status, 503)
+    assert.equal(JSON.stringify(await foreignReceipt.json()).includes('receipt'), false)
+    const projectedReplay = await uploadReceipt(first, { ...intent, target: privateIntent.target })
+    assert.equal(projectedReplay.status, 200)
+    assert.equal(JSON.stringify(await projectedReplay.json()).includes(bound.sourcePath), false)
     assert.equal(privateSnapshot.draft.attachments[0].id, privateIntent.commandId)
     assert.equal((await call(second, 'singleChat.get', { conversationId })).draft.attachments.length, 0)
     assert.equal((await host.request('singleChat.get', { conversationId })).draft.attachments.length, 0)
@@ -373,6 +387,7 @@ test('Desktop and Web share one Core while listener failure, revocation and stop
     assert.equal((await call(first, 'singleChat.get', { conversationId })).draft.attachments.length, 1)
     const privateRemove = await call(first, 'singleChat.composerDraft.removeAttachment', { conversationId, expectedDraftRevision: privateSnapshot.draft.revision, attachmentRefId: privateIntent.commandId })
     assert.equal(privateRemove.draft.attachments.length, 0)
+    assert.deepEqual(await (await uploadReceipt(first, privateIntent)).json(), originalReceipt, '原材料移除不影响原回执查回')
     assert.equal((await call(second, 'singleChat.get', { conversationId })).draft.revision, 0)
     const sentParams = { commandId: crypto.randomUUID(), threadId,
       content: { version: 2, segments: [{ kind: 'text', text: 'Published from Web' }] },
@@ -410,7 +425,10 @@ test('Desktop and Web share one Core while listener failure, revocation and stop
     const replayed = await postPending(first)
     assert.equal(replayed.status, 200)
     assert.equal((await replayed.json()).draft.pendingInputs.editSession.workingAttachments.length, 1, 'replaying an unknown upload outcome must not duplicate the attachment')
+    const pendingReceipt = await (await uploadReceipt(first, pendingIntent)).json()
+    assert.equal(pendingReceipt.state, 'recorded')
     await call(first, operation, { commandId: crypto.randomUUID(), command: { ...command, editToken: edit.editToken, action: { type: 'cancel' } } })
+    assert.deepEqual(await (await uploadReceipt(first, pendingIntent)).json(), pendingReceipt, '编辑租约取消后仍按原请求读取回执')
     const html = await fetch(origin, { redirect: 'error' })
     assert.equal(html.status, 200)
     assert.match(html.headers.get('content-security-policy'), /frame-ancestors 'none'/)

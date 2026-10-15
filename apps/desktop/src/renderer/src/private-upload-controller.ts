@@ -57,10 +57,10 @@ export class PrivateUploadController {
   private accept(request: PrivateAttachmentPreparationRequest, result: PrivateAttachmentPreparationResult): void {
     if (this.completed.has(request.commandId)) return
     if (result.commandId !== request.commandId) throw failure('private_upload.invalid_recovery')
-    if (result.state === 'not_prepared') {
+    if (result.state === 'not_prepared' || result.state === 'rejected') {
       this.completed.set(request.commandId, false)
       this.publish({ rows: this.state.rows.map(row => row.request.commandId === request.commandId
-        ? { ...row, state: 'rejected', error: failure('private_upload.not_prepared') } : row) })
+        ? { ...row, state: 'rejected', error: failure(result.state === 'rejected' ? result.code : 'private_upload.not_prepared') } : row) })
       return
     }
     if (result.state === 'prepared' || result.state === 'unknown') { this.update(request.commandId, { state: result.state, error: null }); return }
@@ -117,14 +117,14 @@ export class PrivateUploadController {
     try { this.accept(request, await this.api.reconcileInput!(request)) }
     catch (error) { if (!this.completed.has(id)) { this.update(id, { state: 'unknown', error: error as Error }); throw error } }
   }
-  retry(id: string): Promise<void> {
+  retry(id: string, originalFile?: File): Promise<void> {
     const existing = this.retries.get(id)
     if (existing) return existing
     const operation = (async () => {
       await this.recover(id)
       if (this.completed.has(id)) return
       const request = structuredClone(this.row(id).request)
-      try { this.accept(request, await this.api.retryInput!(request)) }
+      try { this.accept(request, await this.api.retryInput!(request, originalFile)) }
       catch (error) { if (!this.completed.has(id)) { this.update(id, { state: 'unknown', error: error as Error }); throw error } }
     })().finally(() => { this.retries.delete(id) })
     this.retries.set(id, operation)

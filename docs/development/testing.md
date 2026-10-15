@@ -1787,3 +1787,14 @@ Core 原私聊材料 owner 增加 Native 目录观察/绑定、Web 冒用拒绝�
 新的 not_prepared 状态只说明本次未派发，原绑定结果未知不得使用；既有准备残留测试保留原字节和 bind 次数断言。
 最小命令：`pnpm exec vitest run apps/desktop/src/renderer/src/private-upload-controller.test.ts apps/desktop/src/renderer/src/SingleChatPanel.test.ts apps/desktop/src/renderer/src/private-input-controller.test.ts apps/desktop/src/main/private-attachment-preparation.test.ts`。
 实际挂载交互、Native IPC/Host、Web重选与旧租约记录恢复继续随阶段候选验证，不新增或忽略 Rust 测试。
+
+## 融合期 Web 原上传请求与重选（2026-10-16）
+
+新增最低层 Browser 准备 owner `apps/web/src/private-upload-preparations.test.ts`，经实际 ConsoleClient/文件摘要与模拟 fetch，
+验证元数据先落盘、冻结归属、刷新只读、重选名称/大小/摘要、同编号重试、挂起查回、首次拒绝与旧未知区别、错回执、
+存储失败零上传、位置/编辑租约隔离及有界文件缓存。扩展原 Web adapter owner，只有明确能力时提供四个新接口；
+扩展原共享控制器 owner 验证重选 File 保留原目标。Native 原准备 owner 验证共享解析提取后行为未变。
+5测试文件57项通过，定向类型检查通过，不累计中间复跑数量。
+最小命令：`pnpm exec vitest run apps/web/src/private-upload-preparations.test.ts apps/web/src/client.test.ts apps/web/src/camp-adapter.test.ts apps/desktop/src/renderer/src/private-upload-controller.test.ts apps/desktop/src/main/private-attachment-preparation.test.ts`。
+原 `scripts/lib/host-web.test.mjs` 实际进程 owner 增加无认证/错编辑端、RPC拒绝、路径投影、材料移除和编辑租约取消后原回执查询；
+当前仅语法检查，未启动旧Host或把旧二进制当新入口证据。Rust入口编译与该真实HTTP owner随阶段候选执行，不新增Rust测试函数。

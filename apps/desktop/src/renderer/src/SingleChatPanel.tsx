@@ -1860,7 +1860,7 @@ export function SingleChatPanel({
         </div>}
         {input && <PrivateInputRecoveryPanel controller={input} state={inputState}
           busy={localSending || ending || quoteBusy || uploadBusy || preparingAttachments.some(item => !item.error)} onError={setError} />}
-        {uploads?.supported && <PrivateUploadRecoveryPanel controller={uploads} />}
+        {uploads?.supported && <PrivateUploadRecoveryPanel controller={uploads} reselect={client.attachments.kind === 'download'} />}
         {error && <div className="single-chat-error" role="alert"><span>{error}</span><button type="button" onClick={() => setError(null)}><UiText zh={"关闭"} /></button></div>}
       </form>
       <footer className="single-chat-footer">

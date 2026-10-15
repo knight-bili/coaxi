@@ -3,6 +3,8 @@ import { browserEditingRecovery } from './editing-recovery'
 import { RECOVERY_KEY, type RecoveryStorage } from './tab-recovery'
 import { fileDigest } from './file-digest'
 import { newCommandId } from '../../desktop/src/shared/command-id'
+import { BrowserPrivateUploadPreparations } from './private-upload-preparations'
+import type { EditingRecovery } from '../../desktop/src/renderer/src/camp-client'
 import type { ThreadReadInvalidation, ChannelKind, ChannelSettingsSnapshot, FilePreviewBinaryContent, FilePreviewOperationResult, LocalAttachmentSourceView } from '@contracts'
 
 const HOST_WEB_PROTOCOL_VERSION = 4
@@ -289,7 +291,7 @@ export class InvalidationDecoder {
   }
 }
 
-type SessionResponse = { protocolVersion?: unknown; token?: unknown; clientId?: unknown; editorProof?: unknown; ownerId?: unknown; channels?: unknown; expiresAt?: unknown; serverTime?: unknown; renewalWindowSeconds?: unknown }
+type SessionResponse = { protocolVersion?: unknown; token?: unknown; clientId?: unknown; editorProof?: unknown; ownerId?: unknown; channels?: unknown; privateUploadRecoveryVersion?: unknown; expiresAt?: unknown; serverTime?: unknown; renewalWindowSeconds?: unknown }
 
 export class ConsoleClient {
   readonly origin: string
@@ -312,6 +314,8 @@ export class ConsoleClient {
 
   #pending = new Map<string, PendingCommand>()
   #pendingUploads = new Map<string, PendingUpload>()
+  #privateUploadRecoveryVersion = 0
+  get supportsPrivateUploadRecovery(): boolean { return this.authenticated && this.#privateUploadRecoveryVersion === 1 }
   #localUploads = new Map<string, File>()
   #reconciling = false
   #restored = false
@@ -482,6 +486,7 @@ export class ConsoleClient {
     this.#editor = { clientId: session.clientId, proof: session.editorProof }
     this.#ownerId = session.ownerId
     this.#channels = session.channels === 'desktop' ? 'desktop' : 'unsupported'
+    this.#privateUploadRecoveryVersion = session.privateUploadRecoveryVersion === 1 ? 1 : 0
     this.#token = session.token
     this.#persistTabAuthentication()
     this.#persistRecovery()
@@ -652,6 +657,35 @@ export class ConsoleClient {
     return this.uploadTo<LocalAttachmentSourceView>(threadId, expectedRevision, file)
   }
 
+  privateUploadPreparations(storage: EditingRecovery): BrowserPrivateUploadPreparations {
+    const scope = this.editingScope
+    const guard = (): void => {
+      if (!this.supportsPrivateUploadRecovery || scope !== this.editingScope) throw new Error('private_upload.context_changed')
+    }
+    guard()
+    return new BrowserPrivateUploadPreparations(storage, {
+      guard,
+      digest: async file => {
+        guard()
+        const generation = this.#generation
+        const digest = await fileDigest(file, this.#lifetime.signal)
+        guard()
+        if (generation !== this.#generation) throw new DOMException('Connection replaced', 'AbortError')
+        return digest
+      },
+      bind: async (intent, file) => {
+        guard()
+        const data = new FormData(); data.append('intent', JSON.stringify(intent)); data.append('file', file)
+        try { await this.#json('uploads', { method: 'POST', body: data }); return {} }
+        catch (error) {
+          if (error instanceof HttpRequestError && ['draft_changed', 'invalid_upload', 'upload_too_large', 'upload_changed_or_session_expired', 'upload_capacity'].includes(error.code)) return { rejectedCode: error.code }
+          throw error
+        }
+      },
+      receipt: intent => { guard(); return this.#json('uploads/receipt', { method: 'POST', body: JSON.stringify(intent) }) }
+    })
+  }
+
   async uploadTo<T>(threadId: string, expectedRevision: number, file: File, target?:
     | { kind: 'single_chat'; conversationId: string; composerScope?: import('@contracts').SingleChatComposerScope | null }
     | { kind: 'single_chat_pending'; conversationId: string; pendingInputId: string; editToken: string; composerScope?: import('@contracts').SingleChatComposerScope | null }
@@ -817,14 +851,14 @@ export class ConsoleClient {
     return this.#json('workspaces', { method: 'POST', body: JSON.stringify({ path, offset }) })
   }
 
-  async #json<T>(path: 'session' | 'session/renew' | 'channels' | 'updates' | 'workspaces' | 'uploads' | 'uploads/reconcile' | 'files' | 'avatars', options: RequestInit = {}): Promise<T> {
+  async #json<T>(path: 'session' | 'session/renew' | 'channels' | 'updates' | 'workspaces' | 'uploads' | 'uploads/reconcile' | 'uploads/receipt' | 'files' | 'avatars', options: RequestInit = {}): Promise<T> {
     const generation = this.#generation
     const result = await (await this.#authorized(path, options)).json() as T
     if (generation !== this.#generation) throw new DOMException('Connection replaced', 'AbortError')
     return result
   }
 
-  async #authorized(path: 'session' | 'session/renew' | 'channels' | 'updates' | 'request' | 'events' | 'logout' | 'workspaces' | 'uploads' | 'uploads/reconcile' | 'files' | 'files/bytes' | 'attachments' | 'avatars', options: RequestInit = {}): Promise<Response> {
+  async #authorized(path: 'session' | 'session/renew' | 'channels' | 'updates' | 'workspaces' | 'uploads' | 'uploads/reconcile' | 'uploads/receipt' | 'request' | 'events' | 'logout' | 'files' | 'files/bytes' | 'attachments' | 'avatars', options: RequestInit = {}): Promise<Response> {
     if (!this.#token) throw new SessionRequired()
     const generation = this.#generation
     if (this.#localExpiry !== null && this.#localExpiry - this.#now() <= this.#renewalWindow && !['session', 'session/renew', 'logout'].includes(path)) await this.renewIfNeeded()

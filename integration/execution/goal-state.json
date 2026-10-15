@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "共享文件准备/恢复控制器与Native卡片、排队工作副本入口已接线；原编号恢复、迟到结果保护、准备未派发状态和离线原回执校验完成，51项定向检查与最终types通过。Web新适配/原文件重选、旧租约和迁入孤立统一恢复、真实Host/IPC、规模及I03其余组继续；目录Rust增量仍待阶段编译。",
+  "current_slice": "Web四个原请求接口、能力声明、元数据落盘/有界File缓存和重选已接共享界面；独立认证回执仅安全字段，不依赖当前草稿/租约。57项TS与types/格式通过，Core/Web Rust与真实Host未运行。旧未知上传遇CAS/失效租约的Core终结、旧租约/迁入孤立UI、规模和I03其余组继续。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "补Web同一原请求prepare/reconcile/retry/list接口、可靠原回执与刷新后原文件重选；随后旧Pending租约准备记录与迁入/孤立/冲突统一恢复。实际Host/Native/挂载交互和目录Rust增量随阶段候选；规模、完整24PC/324保留。",
+    "优先补已派发旧未知上传遇CAS/失效租约时的Core终结结果，沿原UUID收口，不换新编号掩盖原未知；再旧Pending租约准备记录与迁入/孤立/冲突统一恢复。新Core/Web/目录增量编译、真实HTTP/Native/挂载交互随阶段候选；规模与完整24PC/324保留。",
     "继续I03独立持久Mission/Task/Diff对象引用及启动/定位、文件节点授权和真实临时PTY、Desktop冷启动画布；现Thread关联Mission与累计Diff卡片接线已mock前端验证，私有来源完整导航和真实Core/Runtime仍待阶段候选。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "Native_shared_upload_UI_wired_Web_reselection_actual_runtime_pending",
+  "current_slice_status": "Web_original_upload_reselection_wired_Core_finality_oldlease_runtime_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -116,7 +116,7 @@
     "source_progress_continued": true
   },
   "project_groups_evidence": "i03-project-groups-result.json",
-  "checked_at": "2026-10-15T19:36:19.767541+00:00",
+  "checked_at": "2026-10-15T20:02:50.384562+00:00",
   "project_layout_evidence": "i03-project-layout-result.json",
   "project_tree_evidence": "i03-project-tree-result.json",
   "navigation_activity_evidence": "i03-navigation-activity-result.json",
@@ -182,5 +182,6 @@
   "canvas_private_native_upload_evidence": "i03-private-native-upload-result.json",
   "canvas_private_source_observation_evidence": "i03-private-source-observation-result.json",
   "private_native_directory_evidence": "i03-private-native-directory-result.json",
-  "private_upload_ui_evidence": "i03-private-upload-ui-result.json"
+  "private_upload_ui_evidence": "i03-private-upload-ui-result.json",
+  "private_web_upload_evidence": "i03-private-web-upload-result.json"
 }

@@ -222,6 +222,7 @@ fn routes(state: WebState) -> Router {
             post(uploads::upload).layer(DefaultBodyLimit::max(uploads::MAX_BYTES + 16384)),
         )
         .route("/uploads/reconcile", post(uploads::reconcile))
+        .route("/uploads/receipt", post(uploads::receipt))
         .route(
             "/avatars",
             post(avatars::avatar).layer(DefaultBodyLimit::max(24 * 1024 * 1024)),
@@ -424,7 +425,7 @@ async fn finish_login(
     match result {
         Ok((token, session)) => {
             let mut response = state.sessions.timing(&session);
-            response.as_object_mut().expect("session timing").extend(json!({"protocolVersion":HOST_WEB_PROTOCOL_VERSION,"token":token,"clientId":session.client_id,"editorProof":identity["proof"],"ownerId":identity["ownerId"],"epoch":state.epoch,"channels":if state.channels.is_some() { "desktop" } else { "unsupported" }}).as_object().expect("session response").clone());
+            response.as_object_mut().expect("session timing").extend(json!({"protocolVersion":HOST_WEB_PROTOCOL_VERSION,"token":token,"clientId":session.client_id,"editorProof":identity["proof"],"ownerId":identity["ownerId"],"epoch":state.epoch,"privateUploadRecoveryVersion":1,"channels":if state.channels.is_some() { "desktop" } else { "unsupported" }}).as_object().expect("session response").clone());
             Json(response).into_response()
         }
         Err(failure) if ticket => ticket_failure(failure),
@@ -513,6 +514,7 @@ async fn resume_session(
         .expect("Core identity object")
         .remove("proof");
     identity["protocolVersion"] = json!(HOST_WEB_PROTOCOL_VERSION);
+    identity["privateUploadRecoveryVersion"] = json!(1);
     identity["channels"] = json!(if state.channels.is_some() {
         "desktop"
     } else {

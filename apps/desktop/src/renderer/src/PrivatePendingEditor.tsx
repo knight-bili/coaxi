@@ -54,7 +54,7 @@ export function PrivatePendingEditor({ item, session, controller, bodies, busy, 
         void uploads.prepare(item.revision, file).catch(error => onError(privateUploadErrorMessage(error)))
       }} />
       <button type="button" disabled={busy || uploadBusy || session.recoveryRequired} onClick={() => fileInput.current?.click()}><UiText zh="为排队消息添加文件" /></button>
-      <PrivateUploadRecoveryPanel controller={uploads} />
+      <PrivateUploadRecoveryPanel controller={uploads} reselect={client.attachments.kind === 'download'} />
     </>}
     <div className="pending-input-actions">
       {session.recoveryRequired

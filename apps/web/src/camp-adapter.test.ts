@@ -7,6 +7,40 @@ import { createThreadAdapter } from './camp-adapter'
 // Owns the production Web adapter + execution window seam. A Host-only HTTP
 // test bypasses this adapter's allowlist; a populated page hides missing deltas.
 afterEach(() => vi.unstubAllGlobals())
+it('仅在能力声明后给共享私聊页面提供四个原请求准备接口', async () => {
+  const values = new Map<string, string>()
+  const storage = { getItem: (key: string) => values.get(key) ?? null,
+    setItem: (key: string, value: string) => { values.set(key, value) }, removeItem: (key: string) => { values.delete(key) } }
+  vi.stubGlobal('sessionStorage', storage); vi.stubGlobal('localStorage', storage)
+  vi.stubGlobal('navigator', { platform: 'Win32' })
+  vi.stubGlobal('window', { sessionStorage: storage, history: { state: null } })
+  vi.stubGlobal('matchMedia', () => ({ matches: false }))
+  const id = '00000000-0000-4000-8000-000000000001', conversationId = '00000000-0000-4000-8000-000000000002'
+  const input = { commandId: id, threadId: 'rvcamp_0000000000e008000000000001', expectedRevision: 0,
+    target: { kind: 'single_chat' as const, conversationId } }
+  const paths: string[] = []
+  const fetcher = vi.fn<typeof fetch>(async (url, options) => {
+    if (String(url).endsWith('/login')) return Response.json({ protocolVersion: 4, token: 'a'.repeat(64), clientId: 'b'.repeat(64), editorProof: 'c'.repeat(64), ownerId: 'owner', privateUploadRecoveryVersion: 1 })
+    paths.push(new URL(String(url)).pathname)
+    if (String(url).endsWith('/uploads')) {
+      expect(JSON.parse(String((options!.body as FormData).get('intent')))).toMatchObject(input)
+      return Response.json({ draft: null })
+    }
+    return Response.json({ state: 'recorded', receipt: { commandId: id, commandType: 'camp.source_attachment.upload.bind', status: 'applied', code: 'attachment.upload_bound',
+      payload: { attachmentRefId: id }, resultEntity: null, recordedAt: '2026-10-16T00:00:00Z' } })
+  })
+  const transport = new ConsoleClient('http://localhost:4317', fetcher)
+  await transport.login('d'.repeat(64))
+  const { client } = createThreadAdapter(transport, async () => null).environment
+  const api = client.singleChatAttachments
+  expect(await api.prepareInput!(input, new File(['input'], 'input.txt'))).toMatchObject({ state: 'recorded' })
+  expect(await api.pendingPreparations!({ threadId: input.threadId, conversationId, composerScope: null })).toHaveLength(1)
+  expect(await api.reconcileInput!(input)).toMatchObject({ state: 'recorded' })
+  expect(await api.retryInput!(input)).toMatchObject({ state: 'recorded' })
+  expect(paths).toEqual(['/api/v1/uploads', '/api/v1/uploads/receipt'])
+  transport.clear()
+})
+
 it('admits the shared canvas operations through the authenticated Web adapter and rejects native-only operations', async () => {
   const storage = { getItem: () => null, setItem: () => undefined, removeItem: () => undefined }
   vi.stubGlobal('sessionStorage', storage); vi.stubGlobal('localStorage', storage)
@@ -23,6 +57,7 @@ it('admits the shared canvas operations through the authenticated Web adapter an
   const transport = new ConsoleClient('http://127.0.0.1:8766', fetcher)
   await transport.login('b'.repeat(64))
   const { client } = createThreadAdapter(transport, async () => null).environment
+  expect(client.singleChatAttachments.prepareInput).toBeUndefined()
   const operations = ['canvas.boards.list', 'canvas.boards.get', 'canvas.boards.create',
     'canvas.boards.update', 'canvas.boards.delete', 'canvas.nodes.snapshot', 'canvas.nodes.apply', 'canvas.references.page', 'workspaces.worktrees', 'navigation.activity'] satisfies CoreMethod[]
   try {

@@ -7493,12 +7493,10 @@ impl Core {
                     rovai_core::draft_client::resolve_editor(&database, resume)?,
                 )?)
             }
-            "host.upload.observe" => {
-                rovai_core::web_upload::observe_native(
-                    &request.client,
-                    serde_json::from_value(request.params.clone())?,
-                )
-            }
+            "host.upload.observe" => rovai_core::web_upload::observe_native(
+                &request.client,
+                serde_json::from_value(request.params.clone())?,
+            ),
             "host.upload.bind" => {
                 #[derive(Deserialize)]
                 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -7520,13 +7518,11 @@ impl Core {
                 )
             }
             "host.upload.receipt" => {
-                anyhow::ensure!(
-                    request.client.is_desktop(),
-                    "native receipt requires the desktop editor"
-                );
+                // Host 构造可信编辑端；只读原回执不依赖当前草稿或编辑租约。
                 let intent = serde_json::from_value(request.params.clone())?;
                 let database = self.database.lock().await;
-                let execution = rovai_core::web_upload::reconcile(&database, &request.client, intent)?;
+                let execution =
+                    rovai_core::web_upload::reconcile(&database, &request.client, intent)?;
                 Ok(json!({"receipt":execution.map(|value|value.result)}))
             }
             "host.upload.reconcile" => {
