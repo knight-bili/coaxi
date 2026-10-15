@@ -4,12 +4,14 @@
 import type { CanvasConversationRef, CanvasNode, CanvasNodeMutation, SingleChatSnapshot, ThreadSnapshot } from '@contracts'
 import { canvasReferenceKey, DETAIL_CARD_HEIGHT, DETAIL_CARD_WIDTH, type CanvasRect, type CanvasSize } from './canvas-layout'
 import { uiAttribute } from './interface-language'
+import type { CanvasComposerContext } from './canvas-composer-drafts'
 
 export interface CanvasConversationTarget {
   boardId: string
   nodeId: string
   reference: CanvasConversationRef
   presentation: 'inline' | 'drawer'
+  draftContext?: CanvasComposerContext
 }
 
 // All modes share one portal child. Moving or changing modes must not unmount the Composer.

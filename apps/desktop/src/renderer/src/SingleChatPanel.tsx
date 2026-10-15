@@ -1,4 +1,5 @@
 import { singleChatComposerStore } from './single-chat-composer-store'
+import { canvasComposerContextKey, type CanvasComposerContext } from './canvas-composer-drafts'
 import { useThreadClient } from './camp-client'
 import { useMobileLayout } from './MobileLayout'
 import { newCommandId } from '../../shared/command-id'
@@ -652,6 +653,7 @@ export function SingleChatPanel({
   onNotify = () => undefined,
   target,
   boundConversationId,
+  composerContext,
   notificationFocus,
   onNotificationFocusPresented,
   onVisibleNotificationSources,
@@ -661,6 +663,7 @@ export function SingleChatPanel({
 }: {
   target?: SingleChatPanelTarget | null
   boundConversationId?: string
+  composerContext?: CanvasComposerContext
   notificationFocus?: NotificationFocusTarget | null
   onNotificationFocusPresented?(requestId: number): void
   onVisibleNotificationSources?(sources: VisibleNotificationSources): void
@@ -710,7 +713,8 @@ export function SingleChatPanel({
   const [conversations, setConversations] = useState<SingleChatConversationView[]>([])
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(initialAgentId)
   const [snapshot, setSnapshot] = useState<SingleChatSnapshot | null>(null)
-  const draftStore = useMemo(() => singleChatComposerStore(client, threadId), [client, threadId])
+  const contextIdentity = composerContext ? canvasComposerContextKey(composerContext) : null
+  const draftStore = useMemo(() => singleChatComposerStore(client, threadId, composerContext), [client, threadId, contextIdentity])
   const sharedDraftState = useSyncExternalStore(draftStore.subscribe, draftStore.getSnapshot, draftStore.getSnapshot)
   const bodyDrafts = sharedDraftState.drafts
   const setBodyDrafts = (next: (current: Readonly<Record<string, string>>) => Record<string, string>): void => { draftStore.update(next) }

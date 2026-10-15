@@ -24,6 +24,13 @@ Canvas `group.sourceMembers`扩展复用`canvas_node::tests::eight_kinds_preserv
 共享格式/投影提取继续由原`App.test.ts`覆盖，保留原导出。测试仅使用模拟运输，不是实际Host、Runtime或多卡挂载证明。
 `single-chat-composer-store.test.ts`拥有私有正文的client/Thread隔离、镜像整表更新、单次发送互斥、较新输入保留、
 初始读取失败、保存失败/重试、pending key迁移和共享订阅生命周期；原`SingleChatPanel.test.ts`继续拥有私有面板。
+`canvas-composer-drafts.test.ts`拥有每卡规范归属、主会话隔离、既有格式往返、索引/内容单值写入、单卡删除、
+破损/未知版本及非字符串拒绝覆盖、写失败保留、闭合卡片输入恢复、服务身份失败重试和精确副本提取。
+原`pending-thread-draft.test.ts`扩多卡presence并集/串行收据、空主会话保留闭合卡片、失败写提示、卸载后挂载保护及已接受激活迟到错误。
+原`single-chat-composer-store.test.ts`扩同卡复用、不同卡/Host/Core/私有引用隔离、Native存储拒绝与失败重试；
+这些假存储/模拟运输检查不证明真实进程重启或附件/引用隔离。最小命令为 `pnpm exec vitest run apps/desktop/src/renderer/src/canvas-composer-drafts.test.ts apps/desktop/src/renderer/src/pending-thread-draft.test.ts apps/desktop/src/renderer/src/single-chat-composer-store.test.ts`。
+`apps/web/src/editing-recovery.test.ts`既有owner扩画布公开bundle的旧标签页迁入、同编辑端归档重建、精确副本与其他Owner隔离，
+并验证私聊/证明不归档、quota失败及未知版本拒绝覆盖；命令 `pnpm exec vitest run apps/web/src/editing-recovery.test.ts`。
 这些纯/静态检查不证明实际多面板、跨客户端接管、Core未知结果、附件/quote revision或进程重启恢复已验。
 `SingleChatPanel.test.ts`既有owner扩绑定私有ID不可替代的准入，`App.test.ts`既有离开/退出owner扩画布挂载Thread。
 这些定向检查不替代真实挂载的草稿、portal、弹层、附件、流式和Runtime验证；后者随阶段候选执行。

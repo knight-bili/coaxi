@@ -40,19 +40,22 @@ export function CanvasWorkspace(props: CanvasWorkspaceProps): React.JSX.Element 
   const client = useThreadClient(), owner = useRef({ client, generation: 0 })
   if (owner.current.client !== client) owner.current = { client, generation: owner.current.generation + 1 }
   const [identity, setIdentity] = useState<{ client: typeof client; scope: CanvasViewScope | null; issue: string | null } | null>(null)
+  const [identityAttempt, setIdentityAttempt] = useState(0)
   useEffect(() => {
     let disposed = false
     void client.request<{ dataDir: string }>('app.info').then(info => {
-      if (!disposed) setIdentity({ client, scope: canvasViewScope(client.presentationScope, info.dataDir), issue: null })
+      const scope = canvasViewScope(client.presentationScope, info.dataDir)
+      if (!disposed) setIdentity({ client, scope, issue: scope ? null : uiAttribute('画布输入的所属信息不完整，请重新读取画板。') })
     }, error => { if (!disposed) setIdentity({ client, scope: null, issue: readErrorMessage(error) }) })
     return () => { disposed = true }
-  }, [client])
+  }, [client, identityAttempt])
   if (identity?.client !== client) return <section className="canvas-workspace"><p role="status"><UiText zh="正在读取画板…" /></p></section>
-  return <CanvasWorkspaceContent key={owner.current.generation} {...props} scope={identity.scope} identityIssue={identity.issue} />
+  return <CanvasWorkspaceContent key={owner.current.generation} {...props} scope={identity.scope} identityIssue={identity.issue}
+    onRetryIdentity={() => { setIdentity(null); setIdentityAttempt(current => current + 1) }} />
 }
 
-function CanvasWorkspaceContent({ scope, identityIssue, onLeaveGuardChange, navigationPreferences, onProjectLayout, onRefreshProjectGroups, ...props }: CanvasWorkspaceProps & {
-  scope: CanvasViewScope | null; identityIssue: string | null
+function CanvasWorkspaceContent({ scope, identityIssue, onRetryIdentity, onLeaveGuardChange, navigationPreferences, onProjectLayout, onRefreshProjectGroups, ...props }: CanvasWorkspaceProps & {
+  scope: CanvasViewScope | null; identityIssue: string | null; onRetryIdentity(): void
 }): React.JSX.Element {
   const { controller, state } = useCanvasBoards(), [storage] = useState(browserCanvasStorage)
   const catalog = useCanvasReferences()
@@ -133,7 +136,8 @@ function CanvasWorkspaceContent({ scope, identityIssue, onLeaveGuardChange, navi
       <button type="button" disabled={blocked || !selected} onClick={() => { void openDialog(selected, true) }}><UiText zh="删除画板" /></button>
       {navigationPreferences && onProjectLayout && onRefreshProjectGroups && <button type="button" disabled={blocked} onClick={() => { void canLeave().then(allowed => { if (allowed) { panel.current = true; setGroupManager(true) } }) }}><UiText zh="管理项目分组" /></button>}
     </header>
-    {identityIssue && <p className="canvas-notice"><UiText zh="视图偏好暂时无法恢复，本次仍可使用画板。" /></p>}
+    {identityIssue && <div className="canvas-notice" role="alert"><UiText zh="服务信息未核对，暂时不能展开对话输入。" /> {identityIssue}
+      <button type="button" disabled={blocked} onClick={() => { void canLeave().then(allowed => { if (allowed) onRetryIdentity() }) }}><UiText zh="重新核对服务" /></button></div>}
     {(issue || Boolean(state.readError)) && <div className="canvas-notice" role="alert">{issue || readErrorMessage(state.readError)}
       <button type="button" onClick={() => { void controller.current?.refresh().catch(() => undefined) }}><UiText zh="重新读取" /></button></div>}
     {!dialog && recovery}

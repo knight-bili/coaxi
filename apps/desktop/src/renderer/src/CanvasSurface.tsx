@@ -22,6 +22,7 @@ import { useCanvasFolders } from './useCanvasFolders'
 import { canvasAbsolutePosition, canvasDropMutation, canvasGroupSelection, canvasMemberMutationSupported } from './canvas-member-interaction'
 import { CanvasConversationFrame, type CanvasConversationBridge } from './CanvasConversationFrame'
 import { canvasConversationGeometry, canvasConversationMatches, canvasMutationRemovesConversation } from './canvas-conversation'
+import { canvasComposerContext } from './canvas-composer-drafts'
 import './canvas.css'
 
 export interface CanvasLeaveGuard { canLeave(): Promise<boolean>; isBlocked(): boolean }
@@ -269,6 +270,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
   const openConversation = async (row: CanvasNode, reference: CanvasConversationRef, member = false) => {
     if (!props.conversation) { props.onOpenReference(reference); return }
     if (blocked || presentingRef.current) return
+    if (!props.scope) { setIssue(uiAttribute('展开输入前需要核对服务信息，请重试画板连接。')); return }
     presentingRef.current = true; setPresenting(true)
     try {
       let nodeId = row.id
@@ -280,7 +282,8 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
         if (typeof created !== 'string') throw new Error(uiAttribute('对话卡片已保存，请刷新后展开。'))
         nodeId = created
       }
-      await props.conversation.open({ boardId: props.boardId, nodeId, reference, presentation: 'inline' })
+      await props.conversation.open({ boardId: props.boardId, nodeId, reference, presentation: 'inline',
+        draftContext: canvasComposerContext(props.scope, props.boardId, nodeId, reference) })
     } catch (error) { setIssue(readErrorMessage(error)) }
     finally { presentingRef.current = false; setPresenting(false) }
   }

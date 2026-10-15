@@ -1,4 +1,5 @@
 import type { ThreadClient } from './camp-client'
+import { canvasComposerContextKey, localComposerBaseStorage, type CanvasComposerContext } from './canvas-composer-drafts'
 
 type Owner = Pick<ThreadClient, 'editingRecovery' | 'onInvalidated'>
 export interface SingleChatComposerState {
@@ -17,8 +18,8 @@ const same = (left: Readonly<Record<string, string>>, right: Readonly<Record<str
   Object.keys(left).length === Object.keys(right).length && Object.keys(left).every(key => left[key] === right[key])
 const errorValue = (value: unknown) => value instanceof Error ? value : new Error(String(value))
 
-/** One existing client-local recovery dictionary per client/Thread, shared by its mounted mirrors.
- * Body storage keeps the existing single-chat:<Thread> key and string-map shape. No Core draft or model format is added. */
+/** One client-local dictionary per client/Thread/composer context; different canvas cards keep independent input.
+ * The default context retains single-chat:<Thread>; scoped keys retain the same string-map shape. No Core/model format is added. */
 export class SingleChatComposerStore {
   private state: SingleChatComposerState = { drafts: Object.freeze({}), ready: false, error: null, sendingKeys: [] }
   private readonly listeners = new Set<() => void>()
@@ -26,8 +27,8 @@ export class SingleChatComposerStore {
   private unsubscribe: (() => void) | undefined
   private readonly key: string
 
-  constructor(private readonly owner: Owner, threadId: string) {
-    this.key = `single-chat:${threadId}`
+  constructor(private readonly owner: Owner, threadId: string, contextIdentity?: string) {
+    this.key = contextIdentity ? `single-chat:${threadId}:${contextIdentity}` : `single-chat:${threadId}`
     this.load()
   }
   getSnapshot = (): SingleChatComposerState => this.state
@@ -123,10 +124,29 @@ export class SingleChatComposerStore {
   }
 }
 const owners = new WeakMap<object, Map<string, SingleChatComposerStore>>()
-export function singleChatComposerStore(owner: Owner, threadId: string): SingleChatComposerStore {
+export function singleChatComposerStore(owner: Owner, threadId: string, context?: CanvasComposerContext): SingleChatComposerStore {
+  if (context && context.threadId !== threadId) throw new Error('Canvas draft belongs to another Thread.')
+  const contextIdentity = context ? canvasComposerContextKey(context) : undefined
+  const identity = contextIdentity ? JSON.stringify([threadId, contextIdentity]) : threadId
   let threads = owners.get(owner)
   if (!threads) { threads = new Map(); owners.set(owner, threads) }
-  let store = threads.get(threadId)
-  if (!store) { store = new SingleChatComposerStore(owner, threadId); threads.set(threadId, store) }
+  let store = threads.get(identity)
+  if (!store) {
+    // Native canvas bodies use the same local storage bridge as public drafts, under a separate scoped key.
+    const scopedOwner = context && !owner.editingRecovery ? { onInvalidated: owner.onInvalidated, editingRecovery: {
+      get(key: string): unknown {
+        const storage = localComposerBaseStorage(owner)
+        if (!storage) throw new Error('Canvas draft storage is unavailable.')
+        const value = storage.getItem(key)
+        return value === null ? undefined : JSON.parse(value)
+      },
+      set(key: string, value: unknown): void {
+        const storage = localComposerBaseStorage(owner)
+        if (!storage) throw new Error('Canvas draft storage is unavailable.')
+        storage.setItem(key, JSON.stringify(value))
+      }
+    } } : owner
+    store = new SingleChatComposerStore(scopedOwner, threadId, contextIdentity); threads.set(identity, store)
+  }
   return store
 }

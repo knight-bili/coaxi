@@ -1,5 +1,6 @@
 import { expect, it, vi } from 'vitest'
 import { SingleChatComposerStore, singleChatComposerStore } from './single-chat-composer-store'
+import type { CanvasComposerContext } from './canvas-composer-drafts'
 
 function fixture(initial: unknown = {}) {
   let saved = initial, failRead = false, failWrite = false
@@ -14,6 +15,59 @@ function fixture(initial: unknown = {}) {
     failRead: (value: boolean) => { failRead = value }, failWrite: (value: boolean) => { failWrite = value },
     invalidate: () => { for (const callback of invalidations) callback() } }
 }
+
+const canvasContext: CanvasComposerContext = { host: 'host', core: '/test/core', boardId: 'board', nodeId: 'card', threadId: 'thread', conversationId: 'private' }
+it('keeps independent canvas card bodies and the legacy main dictionary in distinct persisted records', () => {
+  const values = new Map<string, unknown>()
+  const editingRecovery = { get: (key: string) => values.get(key), set: (key: string, value: unknown) => { values.set(key, structuredClone(value)) } }
+  const owner = { editingRecovery }, a = singleChatComposerStore(owner, 'thread', canvasContext)
+  const b = singleChatComposerStore(owner, 'thread', { ...canvasContext, nodeId: 'other' }), main = singleChatComposerStore(owner, 'thread')
+  expect(singleChatComposerStore(owner, 'thread', { ...canvasContext })).toBe(a)
+  a.update(() => ({ 'thread:private': 'first' }))
+  b.update(() => ({ 'thread:private': 'second' }))
+  main.update(() => ({ 'thread:private': 'main' }))
+  expect(values.size).toBe(3)
+  expect(values.get('single-chat:thread')).toEqual({ 'thread:private': 'main' })
+  expect(singleChatComposerStore({ editingRecovery }, 'thread', canvasContext).getSnapshot().drafts).toEqual({ 'thread:private': 'first' })
+  for (const change of [{ host: 'different' }, { core: 'different' }, { boardId: 'different' }, { conversationId: 'different' }]) {
+    expect(singleChatComposerStore(owner, 'thread', { ...canvasContext, ...change }).getSnapshot().drafts).toEqual({})
+  }
+  expect(() => singleChatComposerStore(owner, 'other', canvasContext)).toThrow('another Thread')
+})
+
+it('persists scoped Native canvas bodies through the local storage bridge and reconstructs only that context', () => {
+  const values = new Map<string, string>()
+  vi.stubGlobal('window', { localStorage: { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => { values.set(key, value) } } })
+  try {
+    const owner = Object.defineProperty({}, 'unrelatedDesktopBridge', { enumerable: true, get() { throw new Error('unrelated bridge must stay lazy') } })
+    const store = singleChatComposerStore(owner, 'thread', canvasContext)
+    expect(store.update(() => ({ body: 'retained' }))).toBe(true)
+    expect(singleChatComposerStore({}, 'thread', canvasContext).getSnapshot().drafts).toEqual({ body: 'retained' })
+    expect(singleChatComposerStore({}, 'thread', { ...canvasContext, nodeId: 'other' }).getSnapshot().drafts).toEqual({})
+    expect(values.has('single-chat:thread')).toBe(false)
+  } finally { vi.unstubAllGlobals() }
+})
+
+it('blocks scoped input when Native storage is unavailable and retains newest text when a later write fails', () => {
+  vi.stubGlobal('window', {})
+  try {
+    const unavailable = singleChatComposerStore({}, 'thread', canvasContext)
+    expect(unavailable.getSnapshot().ready).toBe(false)
+    expect(unavailable.canLeave()).toBe(false)
+    expect(unavailable.tryBeginSend('body')).toBeNull()
+    let saved: string | null = null, fail = false
+    vi.stubGlobal('window', { localStorage: { getItem: () => saved, setItem: (_key: string, value: string) => { if (fail) throw new Error('quota'); saved = value } } })
+    expect(unavailable.retry()).toBe(true)
+    unavailable.update(() => ({ body: 'saved' }))
+    fail = true
+    expect(unavailable.update(() => ({ body: 'newest' }))).toBe(false)
+    expect(unavailable.getSnapshot().drafts.body).toBe('newest')
+    expect(unavailable.canLeave()).toBe(false)
+    fail = false
+    expect(unavailable.retry()).toBe(true)
+    expect(JSON.parse(saved!)).toEqual({ body: 'newest' })
+  } finally { vi.unstubAllGlobals() }
+})
 
 it('shares one store for a client/Thread and keeps different clients or Threads isolated', () => {
   const a = fixture(), b = fixture()

@@ -3983,5 +3983,12 @@
   "切换保留的输入": "Switch retained input",
   "这段单聊还有待恢复输入，均已保留。": "This private conversation has recoverable inputs. They have all been retained.",
   "选择保留输入": "Choose retained input",
-  "保留输入 {0}：{1}": "Retained input {0}: {1}"
+  "保留输入 {0}：{1}": "Retained input {0}: {1}",
+  "画布输入的所属信息不完整，请重新读取画板。": "Canvas input ownership is incomplete. Reload the board.",
+  "本机输入存储暂不可用，请恢复后重试。": "Local input storage is unavailable. Restore it and try again.",
+  "画布输入记录无法读取，请先恢复后再离开会话。": "Canvas input records cannot be read. Restore them before leaving the conversation.",
+  "画布输入与当前会话不一致。": "Canvas input does not belong to the current conversation.",
+  "展开输入前需要核对服务信息，请重试画板连接。": "Verify the service before expanding input. Retry the board connection.",
+  "服务信息未核对，暂时不能展开对话输入。": "The service has not been verified. Conversation input cannot be expanded yet.",
+  "重新核对服务": "Verify service again"
 }

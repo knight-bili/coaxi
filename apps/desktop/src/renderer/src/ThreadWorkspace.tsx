@@ -1,10 +1,11 @@
+import { canvasComposerContextKey, canvasComposerDraftStorage, canvasComposerDraftCopies, type CanvasComposerContext } from './canvas-composer-drafts'
 import { groupExecutionEventsByRunId } from './execution-events'
 export { groupExecutionEventsByRunId } from './execution-events'
 import { MemberSessionReset } from './MemberSessionReset'
 import { ContinueAgentRunButton } from './ContinueAgentRunButton'
 import { ConversationRunPresence } from './ConversationRunPresence'
 import { conversationRunPresenceTimeline } from './conversation-run-presence'
-import { PendingThreadDraftPersistence } from './pending-thread-draft'
+import { PendingThreadDraftPersistence, retainPendingThreadDraftSurface } from './pending-thread-draft'
 import { MessageModelSummary, ModelSummaryText, ProfileModelFields } from './ThreadModelInformation'
 import { memberRuntimeConfigurationPresentation, modelSummary, runtimeAdapterLabel } from './runtime-model-presentation'
 export { memberRuntimeConfigurationPresentation, type MemberRuntimeConfigurationPresentation } from './runtime-model-presentation'
@@ -1613,8 +1614,17 @@ function RevealNotificationConversation({ active, onHidePreview }: { active: boo
   return null
 }
 
-export function ThreadWorkspace({
+export function ThreadWorkspace(props: Parameters<typeof ThreadWorkspaceContent>[0]): JSX.Element {
+  const client = useThreadClient(), owner = useRef({ client, generation: 0 })
+  if (props.composerContext && props.composerContext.threadId !== props.snapshot.thread.id) throw new Error('Canvas draft belongs to another Thread.')
+  if (owner.current.client !== client) owner.current = { client, generation: owner.current.generation + 1 }
+  const key = JSON.stringify([owner.current.generation, props.snapshot.thread.id, props.composerContext ? canvasComposerContextKey(props.composerContext) : null])
+  return <ThreadWorkspaceContent key={key} {...props} />
+}
+
+function ThreadWorkspaceContent({
   snapshot,
+  composerContext,
   userAnchorNavigation,
   missionBoard = null,
   previewTabsInPane = false,
@@ -1677,6 +1687,7 @@ export function ThreadWorkspace({
   onNotifyError
 }: {
   snapshot: ThreadSnapshot
+  composerContext?: CanvasComposerContext
   userAnchorNavigation?: ThreadUserAnchorNavigation
   missionBoard?: React.ReactNode
   previewTabsInPane?: boolean
@@ -1741,6 +1752,7 @@ export function ThreadWorkspace({
   onNotifyError?(message: string): void
 }): JSX.Element {
   const client = useThreadClient()
+  useLayoutEffect(() => retainPendingThreadDraftSurface(client, snapshot.thread.id), [client, snapshot.thread.id])
   const interfaceLanguage = useInterfaceLanguage()
   const { profile: currentUserProfile } = useCurrentUserProfile()
   const currentUserName = currentUserDisplayName(currentUserProfile)
@@ -1819,17 +1831,19 @@ export function ThreadWorkspace({
   const activationStateRef = useRef(snapshot.thread.activationState)
   const memberCreationRef = useRef(memberCreation)
   memberCreationRef.current = memberCreation
-  const composerStorage = useMemo(() => threadComposerDraftStorage(client.editingRecovery), [client.editingRecovery])
-  const legacyComposerDraft = useMemo(() => client.editingRecovery && !memberCreation
+  const contextIdentity = composerContext ? canvasComposerContextKey(composerContext) : null
+  const composerStorage = useMemo(() => composerContext ? canvasComposerDraftStorage(client, composerContext) : threadComposerDraftStorage(client.editingRecovery), [client, contextIdentity])
+  const legacyComposerDraft = useMemo(() => !composerContext && client.editingRecovery && !memberCreation
     ? loadLocalThreadComposerDraft(snapshot.thread.id) : null,
-  [client.editingRecovery, snapshot.thread.id, memberCreation])
+  [client.editingRecovery, snapshot.thread.id, memberCreation, contextIdentity])
   const [legacyDraftRecoveryError, setLegacyDraftRecoveryError] = useState<string | null>(null)
   const [savedDraftDialogOpen, setSavedDraftDialogOpen] = useState(false)
   const [draftCopyRevision, setDraftCopyRevision] = useState(0)
   const savedDraftIdentity = `${THREAD_COMPOSER_STORAGE_PREFIX}${snapshot.thread.id}`
-  const savedDraftCopies = useMemo(() => client.editingRecovery?.draftCopies?.(savedDraftIdentity)
-    .filter(copy => { const draft = parseLocalThreadComposerDraft(copy.value, snapshot.thread.id); return draft && !localThreadComposerDraftIsEmpty(draft) }) ?? [],
-  [client.editingRecovery, savedDraftIdentity, snapshot.thread.id, draftCopyRevision])
+  const readSavedDraftCopies = () => composerContext ? canvasComposerDraftCopies(client, composerContext) : client.editingRecovery?.draftCopies?.(savedDraftIdentity) ?? []
+  const savedDraftCopies = useMemo(() => readSavedDraftCopies()
+    .filter(copy => { const draft = parseLocalThreadComposerDraft(copy.value, snapshot.thread.id); return draft && !localThreadComposerDraftIsEmpty(draft) }),
+  [client.editingRecovery, savedDraftIdentity, snapshot.thread.id, draftCopyRevision, contextIdentity])
   useEffect(() => {
     if (!client.editingRecovery?.draftCopies) return
     const changed = (event: StorageEvent): void => {
@@ -1839,7 +1853,7 @@ export function ThreadWorkspace({
     return () => window.removeEventListener('storage', changed)
   }, [client.editingRecovery])
   const pendingDraftPersistence = useRef<PendingThreadDraftPersistence | null>(null)
-  if (!pendingDraftPersistence.current) pendingDraftPersistence.current = new PendingThreadDraftPersistence(client)
+  if (!pendingDraftPersistence.current) pendingDraftPersistence.current = new PendingThreadDraftPersistence(client, composerContext ? draft => saveLocalThreadComposerDraft(draft, composerStorage) : undefined, composerContext)
   const pendingThreadLeaveRef = useRef(onPendingThreadLeave)
   const pendingDraftChangeRef = useRef(onPendingDraftChange)
   pendingDraftChangeRef.current = onPendingDraftChange
@@ -1852,7 +1866,7 @@ export function ThreadWorkspace({
   if (!draftCoordinatorRef.current) {
     draftCoordinatorRef.current = new DraftMutationCoordinator({
       load: async (threadId) => {
-        const initial = initialComposerDraftRef.current?.threadId === threadId
+        const initial = !composerContext && initialComposerDraftRef.current?.threadId === threadId
           ? initialComposerDraftRef.current
           : null
         let draft = (activationStateRef.current === 'active' || !memberCreationRef.current
@@ -3218,6 +3232,7 @@ export function ThreadWorkspace({
   }
 
   const recoverLegacyComposerDraft = async (copy?: SavedDraftCopy): Promise<void> => {
+    if (composerContext && !copy) return
     if (!composerStorage || composerSubmittingRef.current || routingMutatingRef.current) return
     const threadId = snapshot.thread.id
     const epoch = draftCoordinator.getEpoch()
@@ -3226,7 +3241,7 @@ export function ThreadWorkspace({
       await mutateRoutingDraft(async () => {
         await attachmentPreparationQueue.current
         const current = await draftCoordinator.waitForIdle()
-        const latestCopy = copy ? client.editingRecovery?.draftCopies?.(savedDraftIdentity).find(candidate => candidate.id === copy.id && candidate.value === copy.value) : null
+        const latestCopy = copy ? readSavedDraftCopies().find(candidate => candidate.id === copy.id && candidate.value === copy.value) : null
         const legacy = copy ? parseLocalThreadComposerDraft(latestCopy?.value ?? null, threadId) : loadLocalThreadComposerDraft(threadId)
         if (draftCoordinator.getEpoch() !== epoch || current?.threadId !== threadId || !legacy) {
           throw new Error(uiAttribute('旧草稿暂不可恢复，请重新打开此对话。'))
@@ -4805,6 +4820,7 @@ export function ThreadWorkspace({
     onLeaveGuardChange={bindSingleChatLeaveGuard}
     target={singleChatTarget}
     boundConversationId={singleChatBoundConversationId}
+    composerContext={composerContext}
     notificationFocus={notificationFocus?.kind === 'single_chat' ? notificationFocus : null}
     onNotificationFocusPresented={onNotificationFocusPresented}
     onVisibleNotificationSources={onVisibleSingleChatSources}
@@ -6035,7 +6051,7 @@ export function ThreadWorkspace({
             <StructuredMentionComposer
               ref={composerHandleRef}
               id="camp-message"
-              draftIdentity={`${snapshot.thread.id}:composer`}
+              draftIdentity={contextIdentity ? `${snapshot.thread.id}:composer:${contextIdentity}` : `${snapshot.thread.id}:composer`}
               document={composerDraft?.threadId === snapshot.thread.id
                 ? composerDraft.content
                 : emptyComposerDocument()}

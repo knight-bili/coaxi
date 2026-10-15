@@ -10,7 +10,8 @@ export {
 } from './thread-workspace-data'
 import { EMPTY_SNAPSHOT, isProjectPath } from '../../shared/navigation-preferences-model'
 import { useThreadUserAnchorCache } from './useThreadUserAnchors'
-import { hasPendingThreadDraftInput } from './pending-thread-draft'
+import { hasAnyPendingThreadDraftInput, hasPendingThreadDraftInput, hasPendingThreadDraftSurfaces } from './pending-thread-draft'
+import { canvasComposerContextKey } from './canvas-composer-drafts'
 import { memberCreationHelper, memberCreationInitialDraft, navigationWithMemberCreationDrafts, type MemberCreationDraft } from './member-creation-flow'
 import { navigationThreadReadState } from './navigation-unread'
 import { newCommandId } from '../../shared/command-id'
@@ -1294,6 +1295,7 @@ function BusinessAppContent({
       await afterNextPaint()
       preparation.didLeave ||= !activeThreadSurfaceNeedsLeaveGuard(viewRef.current, activeThreadIdRef.current, canvasConversationRef.current?.reference.threadId)
         || activeThreadIdRef.current !== leavingThreadId || (viewRef.current === 'canvas') !== Boolean(leavingCanvas)
+        || (leavingCanvas?.draftContext && canvasComposerContextKey(leavingCanvas.draftContext)) !== (canvasConversationRef.current?.draftContext && canvasComposerContextKey(canvasConversationRef.current.draftContext))
     } catch (nextError) {
       setError(uiAttribute("离开当前会话前未能完成输入操作：{0}", String(errorMessage(nextError))))
       return false
@@ -3909,7 +3911,7 @@ function BusinessAppContent({
   }
 
   const settlePendingThreadOnLeave = async (draft: ThreadComposerDraftView): Promise<void> => {
-    if (hasPendingThreadDraftInput(draft)) {
+    if (hasPendingThreadDraftInput(draft) || hasPendingThreadDraftSurfaces(client, draft.threadId) || await hasAnyPendingThreadDraftInput(client, draft.threadId)) {
       await navigationRefreshCoordinator.invalidate({ scope: 'group', threadId: draft.threadId })
       return
     }
@@ -4446,6 +4448,7 @@ function BusinessAppContent({
   const activeThreadWorkspace = !startupGateVisible && generalPreferences && activeThreadId
     && visibleThreadSnapshot?.thread.id === activeThreadId ? (<ThreadWorkspace
             key={activeThreadId}
+            composerContext={canvasConversationVisible ? canvasConversation?.draftContext : undefined}
             missionBoard={activeMission ? <MissionIntro mission={activeMission} projects={displayNavigation?.projects ?? []}/> : null}
             previewTabsInPane={false}
             suppressExecutionAutoOpen={missionDrawerSuppressesExecutionAutoOpen(
@@ -4454,8 +4457,8 @@ function BusinessAppContent({
             )}
             snapshot={visibleThreadSnapshot}
             userAnchorNavigation={userAnchorNavigationFor(activeThreadId)}
-            memberCreation={memberCreationDrafts.has(activeThreadId)}
-            initialComposerDraft={memberCreationDrafts.get(activeThreadId)?.draft ?? campSnapshotState.initialComposerDraft}
+            memberCreation={!canvasConversationVisible && memberCreationDrafts.has(activeThreadId)}
+            initialComposerDraft={canvasConversationVisible ? null : memberCreationDrafts.get(activeThreadId)?.draft ?? campSnapshotState.initialComposerDraft}
             onPendingDraftChange={updateMemberCreationDraft}
             onInitialComposerDraftConsumed={consumeInitialComposerDraft}
             openCoverage={campSnapshot?.thread.id === activeThreadId

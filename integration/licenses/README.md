@@ -39,3 +39,8 @@ PTY后续移植及I12最终发布包仍分别核对，不将本批通知保留�
 画布会话呈现参考同一固定Codeg `canvas-conversation-surface.tsx`与`canvas-conversation-drawer.tsx`的原地交互，
 在`canvas-conversation.ts`保留来源注释；实际会话、输入、流式、审批和停止复用Rovai既有组件及Core，不复制供体ACP执行层。
 保留上述Apache-2.0许可，无新增第三方依赖。
+
+`canvas-composer-drafts.ts`依据同一固定Codeg `canvas-conversation-surface.tsx`的
+`draftStorageKey=canvas-draft:<contextKey>`、`attachmentTabId=contextKey`保留每卡独立输入；
+按Rovai Host/Owner、Core、画板、真实pin与精确引用适配本机存储，不移植供体执行或数据库。
+源码保留上述Apache-2.0来源通知，无新增第三方依赖。
