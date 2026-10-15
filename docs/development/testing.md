@@ -19,6 +19,9 @@ last_updated: 2026-10-12
 Canvas `group.sourceMembers`扩展复用`canvas_node::tests::eight_kinds_preserve_source_geometry_text_and_reference_limits`的旧Group序列化断言，
 及`canvas_node::persistence_tests::migration_and_graph_gestures_preserve_scope_atomicity_replay_and_reopen`的跨源转移/私有身份/镜像保留/回放与派生绑定用例；
 不新增Rust owner，阶段命令`cargo test -p rovai-core --lib --features extended-tests canvas_node::`，本切片未编译执行。
+`canvas-conversation.test.ts`拥有公开/私有精确读取、Host/请求归属失效、运输错误、破坏性操作识别及相机几何；
+`SingleChatPanel.test.ts`既有owner扩绑定私有ID不可替代的准入，`App.test.ts`既有离开/退出owner扩画布挂载Thread。
+这些定向检查不替代真实挂载的草稿、portal、弹层、附件、流式和Runtime验证；后者随阶段候选执行。
 `canvas-member-interaction.test.ts`只拥有客户端落点/原子意图/父坐标，旧graph controller owner扩嵌套来源未知重试；
 真实成员节点挂载、触控、取消/多选/高密度网格与Host升级仍列阶段集中验证。
 

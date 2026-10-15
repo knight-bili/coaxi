@@ -280,6 +280,10 @@ describe('Single Chat presentation', () => {
     expect(singleChatConversationReady(firstSnapshot, 'agent-1', false)).toBe(true)
     expect(singleChatConversationReady(firstSnapshot, 'agent-2', false)).toBe(false)
     expect(singleChatConversationReady(firstSnapshot, 'agent-1', true)).toBe(false)
+    expect(singleChatConversationReady(null, 'agent-1', false, firstSnapshot.conversation.id)).toBe(false)
+    expect(singleChatConversationReady(firstSnapshot, 'agent-1', false, firstSnapshot.conversation.id)).toBe(true)
+    expect(singleChatConversationReady(firstSnapshot, 'agent-1', false, 'other-private')).toBe(false)
+    expect(singleChatConversationReady({ ...firstSnapshot, conversation: { ...firstSnapshot.conversation, status: 'ended' } }, 'agent-1', false, firstSnapshot.conversation.id)).toBe(false)
 
     const chooseTargetStart = source.indexOf('const chooseTarget = async')
     const chooseTargetEnd = source.indexOf('\n  const prepareFiles =', chooseTargetStart)

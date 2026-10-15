@@ -60,13 +60,15 @@ function CanvasWorkspaceContent({ scope, identityIssue, onLeaveGuardChange, navi
   const [dialog, setDialog] = useState<{ board: CanvasBoard | null; remove: boolean } | null>(null)
   const [groupManager, setGroupManager] = useState(false)
   const [issue, setIssue] = useState<string | null>(null), panel = useRef(false), graphGuard = useRef<CanvasLeaveGuard | null>(null)
+  const conversationRef = useRef(props.conversation); conversationRef.current = props.conversation
   const boards = state.snapshot?.boards ?? NO_BOARDS
   const selected = boards.find(board => board.id === selectedId) ?? null
   const registerGraphGuard = useCallback((guard: CanvasLeaveGuard | null) => { graphGuard.current = guard }, [])
-  const isBlocked = useCallback(() => panel.current || Boolean(controller.current?.getSnapshot().pending || graphGuard.current?.isBlocked()), [controller])
+  const isBlocked = useCallback(() => panel.current || Boolean(conversationRef.current?.opening || controller.current?.getSnapshot().pending || graphGuard.current?.isBlocked()), [controller])
   const canLeave = useCallback(async () => {
     if (isBlocked()) { setIssue(uiAttribute('请先保存或取消编辑，并核对未完成的画布操作。')); return false }
-    return true
+    try { return await conversationRef.current?.close() ?? true }
+    catch (error) { setIssue(readErrorMessage(error)); return false }
   }, [isBlocked])
   useEffect(() => {
     const guard = { canLeave, isBlocked }
@@ -76,9 +78,13 @@ function CanvasWorkspaceContent({ scope, identityIssue, onLeaveGuardChange, navi
     return () => { onLeaveGuardChange?.(null); window.removeEventListener('beforeunload', beforeUnload) }
   }, [canLeave, isBlocked, onLeaveGuardChange])
   useEffect(() => {
-    if (state.loading || !state.snapshot || selected || isBlocked()) return
-    setSelectedId(boards[0]?.id ?? null)
-  }, [state.loading, state.snapshot, selected, boards, isBlocked])
+    if (state.loading || !state.snapshot || selected || isBlocked() || props.conversation?.target?.boardId === selectedId) return
+    let cancelled = false
+    void canLeave().then(allowed => {
+      if (allowed && !cancelled) setSelectedId(current => current === selectedId ? boards[0]?.id ?? null : current)
+    })
+    return () => { cancelled = true }
+  }, [state.loading, state.snapshot, selected, selectedId, boards, isBlocked, canLeave, props.conversation?.target])
   useEffect(() => { if (selected) saveCanvasBoardSelection(storage, scope, selected.id) }, [selected, storage, scope])
   const openDialog = async (board: CanvasBoard | null, remove = false) => {
     if (!await canLeave()) return

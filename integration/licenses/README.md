@@ -35,3 +35,7 @@ PTY后续移植及I12最终发布包仍分别核对，不将本批通知保留�
 `canvas-member-interaction.ts`与派生成员节点按同一固定Codeg `canvas-view.tsx`的applyDrop/selection、
 `conversation-card-node.tsx`的卡片和镜像语义接入现有ReactFlow；Core以可选sourceMembers接原子移动，不移植供体数据库。
 来源注释和Apache-2.0许可保留，本批不增加第三方依赖。
+
+画布会话呈现参考同一固定Codeg `canvas-conversation-surface.tsx`与`canvas-conversation-drawer.tsx`的原地交互，
+在`canvas-conversation.ts`保留来源注释；实际会话、输入、流式、审批和停止复用Rovai既有组件及Core，不复制供体ACP执行层。
+保留上述Apache-2.0许可，无新增第三方依赖。

@@ -3964,5 +3964,17 @@
   "区域成员可通过卡片操作移出或固定到画布。": "Use the card actions to remove a region member or pin it to the canvas.",
   "所选对话或成员引用超过200个，请减少选择。": "More than 200 conversations or member references are selected. Reduce the selection.",
   "区域对话：{0}。可拖动，或按 Tab 使用卡片操作。": "Region conversation: {0}. Drag it, or press Tab to use the card actions.",
-  "当前 Core 不支持原子成员转移，请升级服务后重试。": "This Core does not support atomic member transfers. Upgrade the server and try again."
+  "当前 Core 不支持原子成员转移，请升级服务后重试。": "This Core does not support atomic member transfers. Upgrade the server and try again.",
+  "展开对话": "Expand conversation",
+  "画布对话：{0}": "Canvas conversation: {0}",
+  "移至侧边": "Move to side",
+  "放回画布": "Return to canvas",
+  "收起对话": "Collapse conversation",
+  "打开完整工作区": "Open full workspace",
+  "原画布卡片已变更，当前对话保留在侧边，请先保存或收起。": "The original canvas card changed. The conversation is kept at the side. Save or collapse it first.",
+  "对话读取结果与所选引用不一致。": "The loaded conversation does not match the selected reference.",
+  "当前对话输入尚未保存，请处理后重试。": "The current conversation input has not been saved. Resolve it and try again.",
+  "对话卡片已保存，请刷新后展开。": "The conversation card was saved. Refresh before expanding it.",
+  "原单聊暂不可用，请重新读取，不能新建替代对话。": "The original private conversation is unavailable. Reload it; a replacement conversation cannot be created.",
+  "正在处理画布对话…": "Processing canvas conversation…"
 }

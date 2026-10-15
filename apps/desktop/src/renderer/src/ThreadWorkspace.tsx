@@ -1666,6 +1666,7 @@ export function ThreadWorkspace({
   onVisibleNotificationSources,
   onVisibleSingleChatSources,
   singleChatTarget,
+  singleChatBoundConversationId,
   runtimeRecovery = null,
   firstRunThread = null,
   firstRunThreadId = null,
@@ -1729,6 +1730,7 @@ export function ThreadWorkspace({
   onVisibleNotificationSources?(sources: VisibleNotificationSources): void
   onVisibleSingleChatSources?(sources: VisibleNotificationSources): void
   singleChatTarget?: import('./SingleChatPanel').SingleChatPanelTarget | null
+  singleChatBoundConversationId?: string
   runtimeRecovery?: ThreadRuntimeRecovery | null
   firstRunThread?: FirstRunThreadContext | null
   firstRunThreadId?: string | null
@@ -4799,6 +4801,35 @@ export function ThreadWorkspace({
   const rightExecutionVisible = executionPlacement === 'right'
     && Boolean(filePreview?.paneVisible && filePreview.activeTab?.kind === 'execution')
 
+  const singleChatPanel = <SingleChatPanel
+    onLeaveGuardChange={bindSingleChatLeaveGuard}
+    target={singleChatTarget}
+    boundConversationId={singleChatBoundConversationId}
+    notificationFocus={notificationFocus?.kind === 'single_chat' ? notificationFocus : null}
+    onNotificationFocusPresented={onNotificationFocusPresented}
+    onVisibleNotificationSources={onVisibleSingleChatSources}
+    profileById={profileById}
+    busy={busy}
+    onResolveApproval={onResolveApproval}
+    threadId={snapshot.thread.id}
+    members={snapshot.members}
+    entryHost={detailEntryHost}
+    visible={singleChatVisible}
+    onOpen={onOpenSingleChat}
+    onClose={singleChatBoundConversationId ? onCloseSingleChat : mobile ? closeMobileSecondaryPanel : onCloseSingleChat}
+    onNotify={onNotify}
+  />
+  // A pinned private reference owns only its exact transcript; the public Composer is not mounted underneath.
+  if (singleChatBoundConversationId) return <section ref={workspaceShellRef} className="workspace-shell camp-workspace">
+    <FilePreviewWorkspace>
+      <section className="canvas-bound-single-chat">{singleChatPanel}</section>
+      {filePreview && <>
+        <FilePreviewResizeHandle onClose={filePreview.hidePane} />
+        <FilePreviewPane tabsInPane={previewTabsInPane} />
+      </>}
+    </FilePreviewWorkspace>
+  </section>
+
   return (
     <section ref={workspaceShellRef} className="workspace-shell camp-workspace" data-mobile-panel={mobile && inspectorVisible ? inspectorSurfaceTab : undefined} data-mobile-execution-maximized={mobile && mobileExecutionMaximized || undefined} aria-label={uiAttribute("会话：{0}", String(formatThreadTitle(snapshot.thread, firstRunThreadId)))}>
       <FilePreviewWorkspace
@@ -5697,23 +5728,7 @@ export function ThreadWorkspace({
             </section>
             </ThreadDetailPopover>}
             {snapshot.thread.activationState === 'active' && (
-              <SingleChatPanel
-                onLeaveGuardChange={bindSingleChatLeaveGuard}
-                target={singleChatTarget}
-                notificationFocus={notificationFocus?.kind === 'single_chat' ? notificationFocus : null}
-                onNotificationFocusPresented={onNotificationFocusPresented}
-                onVisibleNotificationSources={onVisibleSingleChatSources}
-                profileById={profileById}
-                busy={busy}
-                onResolveApproval={onResolveApproval}
-                threadId={snapshot.thread.id}
-                members={snapshot.members}
-                entryHost={detailEntryHost}
-                visible={singleChatVisible}
-                onOpen={onOpenSingleChat}
-                onClose={mobile ? closeMobileSecondaryPanel : onCloseSingleChat}
-                onNotify={onNotify}
-              />
+              singleChatPanel
             )}
           </div>
           {executionPlacement === 'bottom' && (

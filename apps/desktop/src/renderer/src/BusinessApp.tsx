@@ -8,6 +8,7 @@ import { CanvasWorkspace } from './CanvasWorkspace'
 import { ProjectGroupsDialog, type ProjectGroupInitialAction } from './ProjectGroupsDialog'
 import { CanvasFolderProvider } from './CanvasFolderProvider'
 import type { CanvasLeaveGuard } from './CanvasSurface'
+import { readCanvasConversation, type CanvasConversationTarget } from './canvas-conversation'
 import type { SingleChatPanelTarget } from './SingleChatPanel'
 import type { BusinessEnvironment } from './business-environment'
 import { AppHeader } from './AppHeader'
@@ -309,18 +310,20 @@ type ActivateThreadOptions = {
 
 export function activeThreadSurfaceNeedsLeaveGuard(
   view: View,
-  activeThreadId: string | null
+  activeThreadId: string | null,
+  canvasThreadId: string | null = null
 ): activeThreadId is string {
-  return view === 'camp' && activeThreadId !== null
+  return activeThreadId !== null && (view === 'camp' || (view === 'canvas' && canvasThreadId === activeThreadId))
 }
 
 export async function prepareActiveThreadForAppQuit(
   view: View,
   activeThreadId: string | null,
-  registration: { threadId: string; guard: ThreadLeaveGuard } | null
+  registration: { threadId: string; guard: ThreadLeaveGuard } | null,
+  canvasThreadId: string | null = null
 ): Promise<void> {
   if (
-    view !== 'camp'
+    !activeThreadSurfaceNeedsLeaveGuard(view, activeThreadId, canvasThreadId)
     || !activeThreadId
     || registration?.threadId !== activeThreadId
   ) {
@@ -1163,6 +1166,15 @@ function BusinessAppContent({
   const [notificationFocus, setNotificationFocus] = useState<NotificationFocusTarget | null>(null)
   const [singleChatNotificationTarget, setSingleChatNotificationTarget] = useState<SingleChatPanelTarget | null>(null)
   const canvasReferenceRequest = useRef(0)
+  const [canvasConversation, setCanvasConversation] = useState<CanvasConversationTarget | null>(null)
+  const [canvasConversationClient, setCanvasConversationClient] = useState<typeof client | null>(null)
+  const canvasConversationRef = useRef(canvasConversation)
+  canvasConversationRef.current = canvasConversationClient === client ? canvasConversation : null
+  const canvasConversationOwner = useRef(client)
+  canvasConversationOwner.current = client
+  const canvasConversationToken = useRef(0), canvasConversationOpening = useRef(false)
+  const [canvasConversationBusy, setCanvasConversationBusy] = useState(false)
+  const canvasConversationVisible = view === 'canvas' && canvasConversationClient === client && canvasConversation?.reference.threadId === activeThreadId
   const [visibleSingleChatSources, setVisibleSingleChatSources] = useState<VisibleNotificationSources | null>(null)
   const [visibleNotificationSources, setVisibleNotificationSources] = useState<VisibleNotificationSources | null>(null)
   const [notificationAnchor, setNotificationAnchor] = useState<{
@@ -1315,8 +1327,9 @@ function BusinessAppContent({
   ): Promise<boolean> => {
     const leavingThreadId = activeThreadIdRef.current
     const registration = campLeaveGuardRef.current
+    const leavingCanvas = canvasConversationRef.current
     if (
-      !activeThreadSurfaceNeedsLeaveGuard(viewRef.current, leavingThreadId)
+      !activeThreadSurfaceNeedsLeaveGuard(viewRef.current, leavingThreadId, leavingCanvas?.reference.threadId)
       || registration?.threadId !== leavingThreadId
     ) {
       await transition()
@@ -1335,7 +1348,8 @@ function BusinessAppContent({
       prepared = await preparation.promise
       await transition()
       await afterNextPaint()
-      preparation.didLeave ||= viewRef.current !== 'camp' || activeThreadIdRef.current !== leavingThreadId
+      preparation.didLeave ||= !activeThreadSurfaceNeedsLeaveGuard(viewRef.current, activeThreadIdRef.current, canvasConversationRef.current?.reference.threadId)
+        || activeThreadIdRef.current !== leavingThreadId || (viewRef.current === 'canvas') !== Boolean(leavingCanvas)
     } catch (nextError) {
       setError(uiAttribute("离开当前会话前未能完成输入操作：{0}", String(errorMessage(nextError))))
       return false
@@ -1392,7 +1406,8 @@ function BusinessAppContent({
       await prepareActiveThreadForAppQuit(
         viewRef.current,
         activeThreadIdRef.current,
-        campLeaveGuardRef.current
+        campLeaveGuardRef.current,
+        canvasConversationRef.current?.reference.threadId
       )
       await prepareActiveAutomationForAppQuit(
         viewRef.current,
@@ -1480,9 +1495,23 @@ function BusinessAppContent({
   }, [agents, selectedMemberId, view, memberTab, desktopNavigation, displayedEntry, memberRosterEntryReady])
 
   useEffect(() => {
-    setThreadInspectorThreadId((current) => view === 'camp' && current === activeThreadId ? current : null)
-    setSingleChatThreadId((current) => view === 'camp' && current === activeThreadId ? current : null)
-  }, [activeThreadId, view])
+    setThreadInspectorThreadId((current) => (view === 'camp' || canvasConversationVisible) && current === activeThreadId ? current : null)
+    setSingleChatThreadId((current) => (view === 'camp' || canvasConversationVisible) && current === activeThreadId ? current : null)
+  }, [activeThreadId, view, canvasConversationVisible])
+
+  useEffect(() => {
+    canvasConversationToken.current += 1
+    canvasConversationRef.current = null
+    setCanvasConversation(null)
+    setCanvasConversationClient(null)
+  }, [client])
+  useEffect(() => {
+    if (view !== 'canvas') {
+      canvasConversationToken.current += 1
+      canvasConversationRef.current = null
+      setCanvasConversation(null)
+    }
+  }, [view])
 
   const memberRosterReader = useMemo(() => createMemberRosterReader(
     () => client.request<AgentProfile[]>('members.list'),
@@ -2592,7 +2621,7 @@ function BusinessAppContent({
       if (event.method === 'preferences.new_conversation_changed') {
         void uiPreferences.generalPreferences.get().then(setGeneralPreferences).catch((e) => setError(errorMessage(e)))
       }
-      if (event.method === 'members.invalidated' && (viewRef.current === 'members' || viewRef.current === 'camp')) {
+      if (event.method === 'members.invalidated' && (viewRef.current === 'members' || viewRef.current === 'camp' || (viewRef.current === 'canvas' && canvasConversationRef.current))) {
         void loadAgents().catch((nextError) => setError(errorMessage(nextError)))
       }
       if (event.method === 'agent_run.terminal') liveEvents.flush()
@@ -3172,6 +3201,61 @@ function BusinessAppContent({
   const chooseThread = (thread: NavigationThreadTarget): void => {
     void activateThread(thread.id, { reconcileDefaultLead: thread.activationState !== 'pending' })
       .catch((nextError) => notifyError(errorMessage(nextError)))
+  }
+
+  const closeCanvasConversation = async (): Promise<boolean> => {
+    if (canvasConversationOpening.current) return false
+    if (!canvasConversationRef.current) return true
+    canvasConversationOpening.current = true; setCanvasConversationBusy(true)
+    try {
+      return await leaveActiveThread(() => {
+        canvasConversationToken.current += 1
+        canvasConversationRef.current = null
+        setCanvasConversation(null)
+        setSingleChatThreadId(null)
+        setThreadInspectorThreadId(null)
+      })
+    } finally {
+      canvasConversationOpening.current = false; setCanvasConversationBusy(false)
+    }
+  }
+
+  const presentCanvasConversation = async (input: CanvasConversationTarget): Promise<boolean> => {
+    if (canvasConversationOpening.current || viewRef.current !== 'canvas') return false
+    const target = structuredClone(input), requestOwner = client
+    const token = ++canvasConversationToken.current
+    const isCurrent = () => canvasConversationToken.current === token && canvasConversationOwner.current === requestOwner && viewRef.current === 'canvas'
+    canvasConversationOpening.current = true; setCanvasConversationBusy(true)
+    cancelPendingThreadActivation()
+    let committed = false
+    try {
+      const prepared = await leaveActiveThread(async () => {
+        const loaded = await readCanvasConversation(target.reference,
+          conversationId => client.request<SingleChatSnapshot | null>('singleChat.get', { conversationId }),
+          async threadId => (await requestThreadProjection(threadId, 'open')).snapshot, isCurrent)
+        if (!loaded || !isCurrent()) return
+        const { snapshot, conversation } = loaded
+        campEventSequenceMarker.current = snapshot.throughGlobalSequence
+        setActiveThreadId(target.reference.threadId)
+        setThreadSnapshot(snapshot)
+        setNotificationFocus(null); setNotificationAnchor(null)
+        setThreadInspectorThreadId(null)
+        setSingleChatNotificationTarget(conversation ? { conversationId: conversation.id, agentId: conversation.agentId,
+          agentDisplayName: agents.find(agent => agent.agentId === conversation.agentId)?.displayName ?? uiAttribute('队员'),
+          requestId: ++canvasReferenceRequest.current } : null)
+        setSingleChatThreadId(conversation ? target.reference.threadId : null)
+        canvasConversationRef.current = target; setCanvasConversation(target); setCanvasConversationClient(client)
+        committed = true
+      })
+      // Reconcile the read/subscription handoff through the same existing bounded refresh owner.
+      if (prepared && committed && isCurrent()) void refreshActiveThreadSnapshot(target.reference.threadId).catch(error => { if (isCurrent()) notifyError(errorMessage(error)) })
+      return prepared && committed
+    } catch (error) {
+      if (isCurrent()) notifyError(errorMessage(error))
+      return false
+    } finally {
+      canvasConversationOpening.current = false; setCanvasConversationBusy(false)
+    }
   }
 
   const openCanvasReference = async (reference: CanvasConversationRef): Promise<void> => {
@@ -4463,13 +4547,88 @@ function BusinessAppContent({
     onError={(nextError) => setError(errorMessage(nextError))}
   />
 
+  const activeThreadWorkspace = !startupGateVisible && generalPreferences && activeThreadId
+    && visibleThreadSnapshot?.thread.id === activeThreadId ? (<ThreadWorkspace
+            key={activeThreadId}
+            missionBoard={activeMission ? <MissionIntro mission={activeMission} projects={displayNavigation?.projects ?? []}/> : null}
+            previewTabsInPane={false}
+            suppressExecutionAutoOpen={missionDrawerSuppressesExecutionAutoOpen(
+              missionDrawer,
+              generalPreferences.executionConsolePlacement
+            )}
+            snapshot={visibleThreadSnapshot}
+            userAnchorNavigation={userAnchorNavigationFor(activeThreadId)}
+            memberCreation={memberCreationDrafts.has(activeThreadId)}
+            initialComposerDraft={memberCreationDrafts.get(activeThreadId)?.draft ?? campSnapshotState.initialComposerDraft}
+            onPendingDraftChange={updateMemberCreationDraft}
+            onInitialComposerDraftConsumed={consumeInitialComposerDraft}
+            openCoverage={campSnapshot?.thread.id === activeThreadId
+              ? campSnapshot.openCoverage ?? null
+              : null}
+            messageHistory={campSnapshot?.thread.id === activeThreadId
+              ? campSnapshot.openCoverage?.messages ?? null
+              : null}
+            onLoadEarlierMessages={loadEarlierThreadMessages}
+            optimisticMessages={activeOptimisticMessages}
+            projectName={activeThreadProject?.name ?? null}
+            agents={agents}
+            installations={installations}
+            liveRuntimeEvents={liveRuntimeEvents}
+            busy={busy === 'camp-message' || busy === 'change-default-lead' || busy === 'camp-membership' || busy?.startsWith('action-approval-') === true}
+            onSend={sendThreadMessage}
+            onWithdrawMessage={withdrawThreadMessage}
+            onPendingDraftPersisted={refreshPendingThreadNavigation}
+            onPendingThreadLeave={settlePendingThreadOnLeave}
+            onThreadLeaveGuardChange={registerThreadLeaveGuard}
+            onChangeLead={changeDefaultLead}
+            onAddMembers={addThreadMembers}
+            onPreviewMemberRemoval={previewThreadMemberRemoval}
+            onRemoveMember={removeThreadMember}
+            onTasksChanged={() => refreshActiveThreadSnapshot(activeThreadId)}
+            onResolveApproval={(approval, decision) => {
+              void resolveActionApproval(approval, decision)
+            }}
+            cancellingTurnIds={activeCancellingTurnIds}
+            cancellingRunIds={activeCancellingRunIds}
+            confirmingRunIds={activeConfirmingRunIds}
+            onCancelAgentRun={cancelAgentRun}
+            stopping={activeThreadStopping}
+            executionPlacement={mobile || canvasConversationVisible ? 'inspector' : generalPreferences.executionConsolePlacement}
+            onExecutionPlacementChange={changeExecutionConsolePlacement}
+            worldMapEnabled={!mobile && !canvasConversationVisible && generalPreferences.worldMapEnabled}
+            workspaceEntrySnapshotReady={!campSnapshotState.entryPreview}
+            inspectorVisible={visibleThreadSnapshot.thread.activationState === 'active' && campInspectorVisible}
+            inspectorTab={campInspectorTab}
+            detailEntryHost={campDetailEntryHost}
+            singleChatVisible={visibleThreadSnapshot.thread.activationState === 'active' && singleChatVisible}
+            onOpenSingleChat={openSingleChat}
+            onCloseSingleChat={() => { if (canvasConversationVisible && canvasConversation?.reference.conversationId) { void closeCanvasConversation() } else setSingleChatThreadId(null) }}
+            onCloseInspector={() => setThreadInspectorThreadId(null)}
+            onInspectorTabChange={setThreadInspectorTab}
+            onOpenInspector={openThreadInspector}
+            notificationFocus={notificationFocus}
+            onNotificationFocusPresented={completeNotificationNavigation}
+            singleChatTarget={singleChatNotificationTarget}
+            singleChatBoundConversationId={canvasConversationVisible ? canvasConversation?.reference.conversationId ?? undefined : undefined}
+            onVisibleSingleChatSources={setVisibleSingleChatSources}
+            onVisibleNotificationSources={setVisibleNotificationSources}
+            runtimeRecovery={runtimeRecovery?.threadId === activeThreadId ? runtimeRecovery : null}
+            firstRunThread={firstRunThread}
+            firstRunThreadId={firstRunThreadId}
+            onConfigureRuntime={configureMemberRuntime}
+            onOpenMotionSettings={() => { void openMotionSettings() }}
+            onDismissRuntimeRecovery={() => setRuntimeRecovery(null)}
+            onNotify={notify}
+            onNotifyError={notifyError}
+          />) : null
+
   return (
     <MobileLayoutProvider value={mobile}>
     {projectGroupsOwner === projectGroupScope && navigationPreferences && <ProjectGroupsDialog snapshot={navigationPreferences}
       initialAction={projectGroupInitialAction}
       onSave={saveProjectGroupLayout} onRefresh={refreshProjectGroups}
       onClose={() => { if (projectGroupScopeRef.current === projectGroupScope) { projectGroupsOwnerRef.current = null; setProjectGroupsOwner(null) } }} />}
-    <FilePreviewProvider api={environment.files} threadId={view === 'camp' ? activeThreadId : null} resolvedTheme={appearance.resolvedTheme}
+    <FilePreviewProvider api={environment.files} threadId={view === 'camp' || canvasConversationVisible ? activeThreadId : null} resolvedTheme={appearance.resolvedTheme}
       missionActivity={activeMission && view === 'camp' ? <MissionActivityDocument mission={activeMission} agents={agents} onSource={missionSource} onNotify={notify} onWorkspaceCleanupRequested={refreshMissionAfterWorkspaceCleanup}/> : null}>
     <MissionInteractionProvider missions={missionList.missions} projects={displayNavigation?.projects ?? []} agents={agents} installations={installations} onChanged={refreshMission} onWorkspaceCleaned={refreshMissionAfterWorkspaceCleanup} onDeleted={onMissionDeleted} onOpen={mission => { void openMission(mission).catch(error => notifyError(missionError(error))) }} onError={notifyError}>
     <NavigationShell platform={client.platform} settings={view === 'settings'} navigation={desktopNavigation} nativeWindowControls={desktop?.windowControls} browser={!desktop} disabled={startupStatus !== 'resolved' || shuttingDown} className={view === 'camp' && !missionDrawer ? 'app-shell-camp' : ''} data-mobile-view={mobile ? view : undefined} data-mobile-settings-list={mobile && view === 'settings' && mobileSettingsList || undefined}>
@@ -4515,7 +4674,7 @@ function BusinessAppContent({
         {!startupGateVisible && <MissionBoard missions={missionList.missions} projects={displayNavigation?.projects ?? []} loading={missionList.loading} error={missionList.error}
           hidden={view !== 'missions' && !missionDrawer} selectedId={missionDrawer ? activeMission?.missionId : undefined} onRefresh={missionList.refresh}
           onOpenMenu={openMobileMenu} menuOpen={mobileConversationDrawerOpen} menuTriggerRef={mobileConversationListButtonRef}
-          onNew={() => { setNewMissionOpen(true) }} onOpen={mission => { void openMission(mission).catch(error => notifyError(missionError(error))) }}/>} 
+          onNew={() => { setNewMissionOpen(true) }} onOpen={mission => { void openMission(mission).catch(error => notifyError(missionError(error))) }}/>}
         {!startupGateVisible && view === 'camp' && missionThread && !activeMission && <section className="mission-section-empty" role={missionList.error ? 'alert' : 'status'}><p>{missionList.error || (missionList.loading ? uiAttribute("正在读取使命…") : uiAttribute("此使命当前不可用。"))}</p>{!missionList.loading && <button className="quiet-button" onClick={() => void missionList.refresh()}><UiText zh={"重试"} /></button>}<button className="quiet-button" onClick={returnToMissions}><UiText zh={"返回使命板"} /></button></section>}
         {!startupGateVisible && generalPreferences && view === 'camp' && (!missionThread || activeMission) && activeThreadId && visibleThreadSnapshot?.thread.id === activeThreadId && (
           <MissionSurface key={activeThreadId} enabled={!!activeMission} full={!missionDrawer} onExpand={() => setMissionPresentation('full')} onClose={returnToMissions}>
@@ -4524,78 +4683,7 @@ function BusinessAppContent({
             executionTakesPreviewPriority={generalPreferences.executionConsolePlacement === 'right'
               && visibleThreadSnapshot.agentRuns.some((run) => run.status === 'running')}
             onClose={returnToMissions} onFocusApprovals={focusThreadApprovals} detailEntryHostRef={setThreadDetailEntryHost}/>}
-          <ThreadWorkspace
-            key={activeThreadId}
-            missionBoard={activeMission ? <MissionIntro mission={activeMission} projects={displayNavigation?.projects ?? []}/> : null}
-            previewTabsInPane={false}
-            suppressExecutionAutoOpen={missionDrawerSuppressesExecutionAutoOpen(
-              missionDrawer,
-              generalPreferences.executionConsolePlacement
-            )}
-            snapshot={visibleThreadSnapshot}
-            userAnchorNavigation={userAnchorNavigationFor(activeThreadId)}
-            memberCreation={memberCreationDrafts.has(activeThreadId)}
-            initialComposerDraft={memberCreationDrafts.get(activeThreadId)?.draft ?? campSnapshotState.initialComposerDraft}
-            onPendingDraftChange={updateMemberCreationDraft}
-            onInitialComposerDraftConsumed={consumeInitialComposerDraft}
-            openCoverage={campSnapshot?.thread.id === activeThreadId
-              ? campSnapshot.openCoverage ?? null
-              : null}
-            messageHistory={campSnapshot?.thread.id === activeThreadId
-              ? campSnapshot.openCoverage?.messages ?? null
-              : null}
-            onLoadEarlierMessages={loadEarlierThreadMessages}
-            optimisticMessages={activeOptimisticMessages}
-            projectName={activeThreadProject?.name ?? null}
-            agents={agents}
-            installations={installations}
-            liveRuntimeEvents={liveRuntimeEvents}
-            busy={busy === 'camp-message' || busy === 'change-default-lead' || busy === 'camp-membership' || busy?.startsWith('action-approval-') === true}
-            onSend={sendThreadMessage}
-            onWithdrawMessage={withdrawThreadMessage}
-            onPendingDraftPersisted={refreshPendingThreadNavigation}
-            onPendingThreadLeave={settlePendingThreadOnLeave}
-            onThreadLeaveGuardChange={registerThreadLeaveGuard}
-            onChangeLead={changeDefaultLead}
-            onAddMembers={addThreadMembers}
-            onPreviewMemberRemoval={previewThreadMemberRemoval}
-            onRemoveMember={removeThreadMember}
-            onTasksChanged={() => refreshActiveThreadSnapshot(activeThreadId)}
-            onResolveApproval={(approval, decision) => {
-              void resolveActionApproval(approval, decision)
-            }}
-            cancellingTurnIds={activeCancellingTurnIds}
-            cancellingRunIds={activeCancellingRunIds}
-            confirmingRunIds={activeConfirmingRunIds}
-            onCancelAgentRun={cancelAgentRun}
-            stopping={activeThreadStopping}
-            executionPlacement={mobile ? 'inspector' : generalPreferences.executionConsolePlacement}
-            onExecutionPlacementChange={changeExecutionConsolePlacement}
-            worldMapEnabled={!mobile && generalPreferences.worldMapEnabled}
-            workspaceEntrySnapshotReady={!campSnapshotState.entryPreview}
-            inspectorVisible={visibleThreadSnapshot.thread.activationState === 'active' && campInspectorVisible}
-            inspectorTab={campInspectorTab}
-            detailEntryHost={campDetailEntryHost}
-            singleChatVisible={visibleThreadSnapshot.thread.activationState === 'active' && singleChatVisible}
-            onOpenSingleChat={openSingleChat}
-            onCloseSingleChat={() => setSingleChatThreadId(null)}
-            onCloseInspector={() => setThreadInspectorThreadId(null)}
-            onInspectorTabChange={setThreadInspectorTab}
-            onOpenInspector={openThreadInspector}
-            notificationFocus={notificationFocus}
-            onNotificationFocusPresented={completeNotificationNavigation}
-            singleChatTarget={singleChatNotificationTarget}
-            onVisibleSingleChatSources={setVisibleSingleChatSources}
-            onVisibleNotificationSources={setVisibleNotificationSources}
-            runtimeRecovery={runtimeRecovery?.threadId === activeThreadId ? runtimeRecovery : null}
-            firstRunThread={firstRunThread}
-            firstRunThreadId={firstRunThreadId}
-            onConfigureRuntime={configureMemberRuntime}
-            onOpenMotionSettings={() => { void openMotionSettings() }}
-            onDismissRuntimeRecovery={() => setRuntimeRecovery(null)}
-            onNotify={notify}
-            onNotifyError={notifyError}
-          />
+          {activeThreadWorkspace}
           </MissionSurface>
         )}
 
@@ -4618,6 +4706,8 @@ function BusinessAppContent({
         {!startupGateVisible && view === 'canvas' && <>
           {mobile && <MobilePageHeader title={uiAttribute('无限画布')} onOpenMenu={openMobileMenu} menuOpen={mobileConversationDrawerOpen} triggerRef={mobileConversationListButtonRef} />}
           <CanvasWorkspace agents={agents} theme={appearance.resolvedTheme}
+            conversation={{ target: canvasConversationClient === client ? canvasConversation : null, content: canvasConversationVisible ? activeThreadWorkspace : null, opening: canvasConversationBusy,
+              open: presentCanvasConversation, close: closeCanvasConversation }}
             navigationPreferences={navigationPreferences}
             onProjectLayout={saveProjectGroupLayout}
             onRefreshProjectGroups={refreshProjectGroups}
@@ -4814,7 +4904,7 @@ function BusinessAppContent({
       />
       {desktop && <AppUpdatePrompt
         snapshot={appUpdates.snapshot}
-        campComposerVisible={view === 'camp'}
+        campComposerVisible={view === 'camp' || canvasConversationVisible}
         blocked={notificationHeadsUpVisible
           || newConversationOpen
           || shuttingDown

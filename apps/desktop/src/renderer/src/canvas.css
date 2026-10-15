@@ -20,7 +20,18 @@
   --xy-minimap-node-background-color: var(--muted); --xy-resize-background-color: var(--ink);
   --xy-selection-background-color: var(--neutral-selected); --xy-selection-border: 1px dashed var(--ink);
 }
-.canvas-surface > .react-flow { flex: 1; min-height: 0; }
+.canvas-flow-stage { position: relative; display: flex; flex: 1; min-height: 0; overflow: hidden; }
+.canvas-flow-stage > .react-flow { flex: 1; min-height: 0; }
+.canvas-conversation-overlay { position: absolute; z-index: 1000; pointer-events: auto; transform-origin: top left; }
+.canvas-conversation-frame { display: flex; width: 100%; height: 100%; min-width: 0; min-height: 0; flex-direction: column; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--conversation-surface); }
+.canvas-conversation-heading { display: flex; flex: 0 0 auto; align-items: center; gap: 8px; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+.canvas-conversation-heading strong { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 500; }
+.canvas-conversation-heading button { flex-shrink: 0; padding: 4px 8px; border: 1px solid var(--line); border-radius: 5px; color: var(--ink); background: var(--surface); font: inherit; }
+.canvas-conversation-content { position: relative; display: flex; flex: 1; min-width: 0; min-height: 0; overflow: hidden; }
+.canvas-conversation-content > .workspace-shell { flex: 1; min-width: 0; }
+.canvas-bound-single-chat { position: relative; flex: 1; grid-column: 1; grid-row: 1 / -1; min-width: 0; min-height: 0; height: 100%; }
+.canvas-bound-single-chat > .single-chat-popover { inset: 0; width: 100%; height: 100%; border: 0; border-radius: 0; box-shadow: none; }
+.canvas-bound-single-chat > .camp-detail-entry-fallback { display: none; }
 .canvas-toolbar { display: flex; z-index: 5; flex: 0 0 auto; flex-wrap: wrap; gap: 6px; padding: 8px 12px; border-bottom: 1px solid var(--line); background: var(--surface); }
 .canvas-toolbar button, .canvas-card button, .canvas-notice button {
   padding: 5px 8px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface-raised);

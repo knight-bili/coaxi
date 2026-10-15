@@ -97,10 +97,12 @@ export function singleChatTargetRequestIsCurrent(
 export function singleChatConversationReady(
   snapshot: SingleChatSnapshot | null,
   selectedAgentId: string | null,
-  loading: boolean
+  loading: boolean,
+  boundConversationId?: string
 ): boolean {
   return Boolean(
     !loading
+    && (!boundConversationId || (snapshot?.conversation.id === boundConversationId && snapshot.conversation.status === 'active'))
     && selectedAgentId
     && (!snapshot || snapshot.conversation.agentId === selectedAgentId)
   )
@@ -647,6 +649,7 @@ export function SingleChatPanel({
   onLeaveGuardChange,
   onNotify = () => undefined,
   target,
+  boundConversationId,
   notificationFocus,
   onNotificationFocusPresented,
   onVisibleNotificationSources,
@@ -655,6 +658,7 @@ export function SingleChatPanel({
   onResolveApproval = () => undefined
 }: {
   target?: SingleChatPanelTarget | null
+  boundConversationId?: string
   notificationFocus?: NotificationFocusTarget | null
   onNotificationFocusPresented?(requestId: number): void
   onVisibleNotificationSources?(sources: VisibleNotificationSources): void
@@ -765,7 +769,7 @@ export function SingleChatPanel({
   const activeMembersRef = useRef(activeMembers)
   const memberByIdRef = useRef(memberById)
   const selectedMember = selectedAgentId ? memberById.get(selectedAgentId) ?? null : null
-  const currentTargetReady = singleChatConversationReady(snapshot, selectedAgentId, loading)
+  const currentTargetReady = singleChatConversationReady(snapshot, selectedAgentId, loading, boundConversationId)
   const currentSnapshot = currentTargetReady ? snapshot : null
   const bodyDraftKey = snapshot?.conversation.agentId === selectedAgentId
     ? `${threadId}:${snapshot.conversation.id}` : `${threadId}:pending:${selectedAgentId ?? ''}`
@@ -1198,6 +1202,7 @@ export function SingleChatPanel({
       sequence: targetRequestSequenceRef.current
     }
   ): Promise<SingleChatSnapshot | null> => {
+    if (boundConversationId) throw new Error(uiAttribute('原单聊暂不可用，请重新读取，不能新建替代对话。'))
     const result = await client.request<StoredCommandResult>('singleChat.open', {
       commandId: newCommandId(),
       command: { threadId, agentId }
@@ -1229,7 +1234,7 @@ export function SingleChatPanel({
   }
 
   const chooseTarget = async (agentId: string): Promise<void> => {
-    if (returningPendingRef.current) return
+    if (boundConversationId || returningPendingRef.current) return
     const targetRequest: SingleChatTargetRequest = {
       agentId,
       sequence: ++targetRequestSequenceRef.current
@@ -1269,7 +1274,7 @@ export function SingleChatPanel({
     const agentId = selectedAgentIdRef.current
     if (
       !agentId
-      || !singleChatConversationReady(snapshotRef.current, agentId, loadingRef.current)
+      || !singleChatConversationReady(snapshotRef.current, agentId, loadingRef.current, boundConversationId)
       || ending
       || files.length === 0
     ) return
@@ -1407,7 +1412,7 @@ export function SingleChatPanel({
     const current = snapshotRef.current
     if (
       !current
-      || !singleChatConversationReady(current, selectedAgentIdRef.current, loadingRef.current)
+      || !singleChatConversationReady(current, selectedAgentIdRef.current, loadingRef.current, boundConversationId)
       || ending
     ) return
     setError(null)
@@ -1449,7 +1454,7 @@ export function SingleChatPanel({
     const agentId = selectedAgentIdRef.current
     if (
       !agentId
-      || !singleChatConversationReady(snapshotRef.current, agentId, loadingRef.current)
+      || !singleChatConversationReady(snapshotRef.current, agentId, loadingRef.current, boundConversationId)
       || sending
       || quoteBusy
       || preparingAttachments.some((item) => !item.error)
@@ -1490,7 +1495,7 @@ export function SingleChatPanel({
     if (
       !run
       || !current
-      || !singleChatConversationReady(current, selectedAgentIdRef.current, loadingRef.current)
+      || !singleChatConversationReady(current, selectedAgentIdRef.current, loadingRef.current, boundConversationId)
       || current.conversation.activeAgentRunId !== run.id
       || cancelling
     ) return
@@ -1556,7 +1561,7 @@ export function SingleChatPanel({
     const agentId = selectedAgentIdRef.current
     if (
       !current
-      || !singleChatConversationReady(current, agentId, loadingRef.current)
+      || !singleChatConversationReady(current, agentId, loadingRef.current, boundConversationId)
       || current.conversation.id !== currentConversationIdRef.current
     ) return
     const target = singleChatEndTargetFromSnapshot(
@@ -1632,7 +1637,7 @@ export function SingleChatPanel({
       <div className="single-chat-target-bar">
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
-            <button className={`single-chat-target-trigger${selectedMember ? '' : ' no-target'}`} type="button" disabled={activeMembers.length === 0 || ending || returningPending || sending || quoteBusy || preparingAttachments.some((item) => !item.error)}>
+            <button className={`single-chat-target-trigger${selectedMember ? '' : ' no-target'}`} type="button" disabled={Boolean(boundConversationId) || activeMembers.length === 0 || ending || returningPending || sending || quoteBusy || preparingAttachments.some((item) => !item.error)}>
               {selectedMember && <MemberAvatar agentId={selectedMember.agentId} avatarRef={selectedMember.avatarRef} displayName={selectedMember.displayName} size="mention" decorative />}
               <span className="single-chat-target-copy">
                 <strong>{selectedMember?.displayName ?? uiAttribute("选择单聊对象")}</strong>

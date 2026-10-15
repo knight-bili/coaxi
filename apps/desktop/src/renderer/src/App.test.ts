@@ -2112,6 +2112,9 @@ describe('task event projections', () => {
     expect(activeThreadSurfaceNeedsLeaveGuard('compose', 'camp-a')).toBe(false)
     expect(activeThreadSurfaceNeedsLeaveGuard('members', 'camp-a')).toBe(false)
     expect(activeThreadSurfaceNeedsLeaveGuard('camp', null)).toBe(false)
+    expect(activeThreadSurfaceNeedsLeaveGuard('canvas', 'camp-a', 'camp-a')).toBe(true)
+    expect(activeThreadSurfaceNeedsLeaveGuard('canvas', 'camp-a', 'camp-b')).toBe(false)
+    expect(activeThreadSurfaceNeedsLeaveGuard('canvas', 'camp-a')).toBe(false)
   })
 
   it('prepares only the matching mounted Thread before App quit', async () => {
@@ -2129,6 +2132,11 @@ describe('task event projections', () => {
     await prepareActiveThreadForAppQuit('camp', 'camp-b', registration)
     await prepareActiveThreadForAppQuit('camp', null, registration)
     expect(guard).toHaveBeenCalledOnce()
+    await prepareActiveThreadForAppQuit('canvas', 'camp-a', registration, 'camp-b')
+    expect(guard).toHaveBeenCalledOnce()
+    await prepareActiveThreadForAppQuit('canvas', 'camp-a', registration, 'camp-a')
+    expect(guard).toHaveBeenCalledTimes(2)
+    expect(complete).toHaveBeenCalledTimes(2)
   })
 
   it('propagates App quit Draft preparation failures without completing a leave', async () => {
