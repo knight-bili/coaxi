@@ -130,10 +130,10 @@
       "id": "DEV-CANVAS-PRIVATE-MATERIALS",
       "task": "I03-T03",
       "owner": "研发",
-      "status": "r1_application_routes_and_capability_verified_upload_edit_UI_pending",
-      "problem": "I03私聊材料r1已接get/mutate/recovery统一应用入口、两端准入、可信编辑端和原UUID只读核对；17项Core与29项模拟客户端检查通过。卡片UI、上传准备、编辑接管/完整移回和本机意图仍待，不判实际Host/模型或完整功能通过。",
+      "status": "r1_core_pending_edit_verified_Renderer_return_upload_and_intents_pending",
+      "problem": "I03私聊材料r1的Core单租约scope接管/旧token拒绝与完整移回已实现；17项Core和56项既存/模拟客户端检查通过。Renderer尚缺targetBody/placement/完整保留选择及本机意图，上传准备/授权仍待，不判端到端或产品验收通过。",
       "confirmation": "i03-private-materials-proposal-result.json",
-      "evidence": "i03-private-composer-api-result.json"
+      "evidence": "i03-private-pending-edit-result.json"
     }
   ]
 }

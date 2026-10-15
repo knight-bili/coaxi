@@ -54,3 +54,5 @@ I00已自审修正并合入，I01基础构建与契约证据保留草稿；I02�
 - [I03私聊材料业务服务与按卡片发送](execution/i03-private-composer-service-result.json)：已确认r1的Core七动作、精确读取、分页恢复及按scope消费接原FIFO，17项本地定向检查通过；整份交换/回执回滚和100001字正文保留已验证。运输/客户端、上传准备、编辑接管/完整移回及最终Blob/真实Runtime继续，不计完整24PC或324产品场景通过。
 
 - [I03私聊材料应用入口与客户端能力核对](execution/i03-private-composer-api-result.json)：统一get/mutate/recovery、可信编辑端注入和原UUID只读回查已接两端准入；快照隔离其他位置的令牌和未保存材料。17项Core、29项模拟客户端及定向类型/文档通过；current准入180，历史161保持。UI未启用，上传/编辑/本机意图及实际Host/Native/模型继续待验。
+
+- [I03私聊排队接管与完整移回](execution/i03-private-pending-edit-result.json)：Core 单租约按 client/scope 接管并拒绝旧令牌；空目标迁入、占用目标完整 retained，与 Pending 取消和回执同事务。17项Core及56项既存/模拟客户端检查通过。Renderer 仍缺 targetBody/placement 和完整保留选择，当前按钮流程尚未完成，优先接线；上传/授权/本机意图和正式24PC/324继续。
