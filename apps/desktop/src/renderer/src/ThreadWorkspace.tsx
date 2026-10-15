@@ -1832,6 +1832,7 @@ function ThreadWorkspaceContent({
   const memberCreationRef = useRef(memberCreation)
   memberCreationRef.current = memberCreation
   const contextIdentity = composerContext ? canvasComposerContextKey(composerContext) : null
+  const composerDomId = useId()
   const composerStorage = useMemo(() => composerContext ? canvasComposerDraftStorage(client, composerContext) : threadComposerDraftStorage(client.editingRecovery), [client, contextIdentity])
   const legacyComposerDraft = useMemo(() => !composerContext && client.editingRecovery && !memberCreation
     ? loadLocalThreadComposerDraft(snapshot.thread.id) : null,
@@ -3161,6 +3162,7 @@ function ThreadWorkspaceContent({
   useEffect(() => {
     const handleFindShortcut = (event: globalThis.KeyboardEvent): void => {
       if (event.defaultPrevented || event.isComposing || isFileFindTarget(event.target)) return
+      if (composerContext && !workspaceShellRef.current?.contains(document.activeElement)) return
       if (
         event.altKey
         || (!event.metaKey && !event.ctrlKey)
@@ -3171,7 +3173,7 @@ function ThreadWorkspaceContent({
     }
     window.addEventListener('keydown', handleFindShortcut)
     return () => window.removeEventListener('keydown', handleFindShortcut)
-  }, [openConversationFind])
+  }, [openConversationFind, contextIdentity])
 
   useLayoutEffect(() => {
     const timeline = timelineScrollRef.current
@@ -6050,7 +6052,7 @@ function ThreadWorkspaceContent({
               onMutate={async (action) => { await mutateRoutingDraft(() => draftCoordinator.mutateQuote(action)) }} />
             <StructuredMentionComposer
               ref={composerHandleRef}
-              id="camp-message"
+              id={composerContext ? `camp-message-${composerDomId}` : 'camp-message'}
               draftIdentity={contextIdentity ? `${snapshot.thread.id}:composer:${contextIdentity}` : `${snapshot.thread.id}:composer`}
               document={composerDraft?.threadId === snapshot.thread.id
                 ? composerDraft.content

@@ -1051,13 +1051,14 @@ export function SingleChatPanel({
     if (!visible) return
     const dismissOnEscape = (event: KeyboardEvent): void => {
       if (event.key !== 'Escape' || event.defaultPrevented) return
+      if (composerContext && !panelRef.current?.contains(document.activeElement)) return
       if (document.querySelector('.app-dialog, [role="menu"][data-state="open"]')) return
       event.preventDefault()
       onClose()
     }
     document.addEventListener('keydown', dismissOnEscape)
     return () => document.removeEventListener('keydown', dismissOnEscape)
-  }, [onClose, visible])
+  }, [onClose, visible, contextIdentity])
 
   useEffect(() => {
     if (!visible) return

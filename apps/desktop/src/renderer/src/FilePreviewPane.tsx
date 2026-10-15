@@ -1,5 +1,5 @@
 import { usePreviewHost } from './FilePreviewContext'
-import { FilePreviewTabs } from './FilePreviewTabs'
+import { FilePreviewTabs, tabDomId, panelDomId } from './FilePreviewTabs'
 import { useOptionalFilePreviewLayout } from './FilePreviewLayout'
 import { useCallback, useEffect, useLayoutEffect, useId, useMemo, useRef, useState } from 'react'
 import { MarkdownFilePreview } from './MarkdownFilePreview'
@@ -481,10 +481,10 @@ export function FilePreviewPaneContent({ visible, missionActivity, executionHost
   executionHostRef?(element: HTMLDivElement | null): void
 }): React.JSX.Element {
   const language = useInterfaceLanguage()
-  const { tabs, activeTabId, paneVisible } = useFilePreview()
+  const { tabs, activeTabId, paneVisible, domScope } = useFilePreview()
   const tabLabels = useMemo(() => previewTabLabels(tabs, language), [tabs, language])
   return (
-    <section id={visible ? "file-preview-pane" : undefined} className="file-preview-pane" hidden={!paneVisible} aria-label={uiAttribute("文件预览")}>
+    <section id={visible ? `file-preview-pane${domScope ? `-${domScope}` : ''}` : undefined} className="file-preview-pane" hidden={!paneVisible} aria-label={uiAttribute("文件预览")}>
       {tabs.length === 0 && <div className="file-preview-empty">
         <FilePreviewTabIcon kind="text" />
         <h2><UiText zh={"选择一个文件预览"} /></h2>
@@ -492,13 +492,13 @@ export function FilePreviewPaneContent({ visible, missionActivity, executionHost
       </div>}
       {tabs.map((tab) => <section
         key={tab.id}
-        id={`file-preview-panel-${tab.id}`}
+        id={panelDomId(tab.id, domScope)}
         className="file-preview-tab-panel"
         hidden={!visible || tab.id !== activeTabId}
         role="tabpanel"
         tabIndex={0}
         aria-label={tabLabels.get(tab.id) ?? previewTabLabel(tab, language)}
-        aria-labelledby={`file-preview-tab-${tab.id}`}
+        aria-labelledby={tabDomId(tab.id, domScope)}
       >
         {tab.kind === 'execution'
           ? <div ref={executionHostRef} className="execution-preview-host" />

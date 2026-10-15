@@ -25,6 +25,10 @@ export class FilePreviewResources {
   #htmlReservations = 0
   #syncTail = Promise.resolve()
   currentThreadId: string | null = null
+  readonly #activeOwners = new Map<object, string | null>()
+  #focusedOwner: object | null = null
+  get disposed(): boolean { return this.#disposed }
+  isFocused(owner: object): boolean { return this.#focusedOwner === owner }
 
   constructor(readonly api: FilePreviewApi, readonly limits: Readonly<Record<keyof typeof filePreviewRetentionLimits, number>> = filePreviewRetentionLimits) {
     this.#empty = createFilePreviewSession(api, '', this)
@@ -52,7 +56,7 @@ export class FilePreviewResources {
 
   subscribe = (listener: () => void): (() => void) => { this.#listeners.add(listener); return () => this.#listeners.delete(listener) }
   getSnapshot = (): number => this.#revision
-  isCurrent = (threadId: string): boolean => this.currentThreadId === threadId
+  isCurrent = (threadId: string): boolean => [...this.#activeOwners.values()].includes(threadId)
 
   session(threadId: string): FilePreviewSession {
     if (!threadId) return this.#empty
@@ -64,9 +68,11 @@ export class FilePreviewResources {
     return session
   }
 
-  activate(threadId: string | null): void {
+  activate(threadId: string | null, owner: object = this): void {
     this.#connect()
-    if (this.currentThreadId === threadId) return
+    if (this.#activeOwners.has(owner) && this.#activeOwners.get(owner) === threadId) return
+    this.#activeOwners.set(owner, threadId)
+    this.#focusedOwner = owner
     this.currentThreadId = threadId
     const session = threadId ? this.session(threadId) : null
     if (session?.getSnapshot().tabs.length) this.touch(session, session.getSnapshot().activeTabId ?? undefined)
@@ -76,6 +82,22 @@ export class FilePreviewResources {
     session?.setBinding(binding)
     session?.ensureActive()
     this.changed()
+  }
+  deactivate(owner: object): void {
+    if (!this.#activeOwners.delete(owner)) return
+    if (this.#focusedOwner === owner) { this.#focusedOwner = null; this.currentThreadId = null }
+    this.changed()
+  }
+  focus(threadId: string | null, owner: object): void {
+    if (!this.#activeOwners.has(owner) || this.#activeOwners.get(owner) !== threadId) { this.activate(threadId, owner); return }
+    const changedOwner = this.#focusedOwner !== owner
+    this.#focusedOwner = owner
+    if (changedOwner) this.changed()
+    if (this.currentThreadId === threadId) return
+    this.currentThreadId = threadId
+    const session = threadId ? this.session(threadId) : null
+    session?.setBinding(this.sync().then(() => this.api.bindThread(threadId)))
+    session?.ensureActive()
   }
 
   touch = (session: FilePreviewSession, tabId?: string): void => {
@@ -228,6 +250,15 @@ export class FilePreviewResources {
     for (const off of this.#unsubscribe) off()
     for (const session of this.sessions.values()) session.dispose()
     this.sessions.clear()
+    this.#activeOwners.clear()
+    this.#focusedOwner = null
     void this.sync().catch(() => undefined)
   }
+}
+
+const windowResources = new WeakMap<FilePreviewApi, FilePreviewResources>()
+export function windowFilePreviewResources(api: FilePreviewApi): FilePreviewResources {
+  let resources = windowResources.get(api)
+  if (!resources || resources.disposed) { resources = new FilePreviewResources(api); windowResources.set(api, resources) }
+  return resources
 }

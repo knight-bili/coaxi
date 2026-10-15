@@ -2,10 +2,17 @@
 document_type: architecture
 authority: file-preview-components-and-boundaries
 status: accepted
-last_updated: 2026-09-22
+last_updated: 2026-10-15
 ---
 
 # File Preview Architecture
+
+融合画布的多个 Provider 使用同一个 `FilePreviewApi` 对象对应的窗口资源池，向 Main 提交所有挂载 Thread 的保留并集，
+继续使用原窗口预算与既有权限方法。每个 Thread 只有一个资源会话；同 Thread 镜像共享预览标签与阅读状态，
+其输入框草稿仍属于各自卡片。最后一个窗口呈现 owner 退出才释放资源；焦点 owner 退出后下次聚焦重新绑定。
+卡片内保留 deck 使用容器本地坐标和独立 DOM scope，查找及打开反馈仅处理当前焦点表面；系统打开/定位/复制等待绑定完成。
+这些变化只涉及 Renderer 生命周期和展示，不扩大 Main/Core 文件授权或增加 API 字段。
+模拟文件与真实组件已验证基础文本、多卡归属及缩放边界；真实 Main 能力、HTML/iframe 多镜像预算和规模资格仍需阶段验证。
 
 ## 组件与权威
 

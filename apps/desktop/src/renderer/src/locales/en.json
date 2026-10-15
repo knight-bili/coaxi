@@ -19,6 +19,7 @@
   "按回车或空格选择节点，方向键移动，Shift 加速，Delete 删除。": "Press Enter or Space to select a node, arrow keys to move, Shift to move faster, and Delete to remove it.",
   "选择节点后可使用工具栏。": "Select a node to use the toolbar.",
   "正在读取画板…": "Loading boards…",
+  "正在读取对话…": "Reading conversation…",
   "请先保存或取消编辑，并核对未完成的画布操作。": "Save or cancel your edits and resolve unfinished canvas operations first.",
   "画板已有新修改，此次操作未保存。请重新核对。": "The board has changed. This operation was not saved. Review it again.",
   "画板操作未完成，请核对输入后重试。": "The board operation did not complete. Review your input before retrying.",
@@ -3991,5 +3992,7 @@
   "展开输入前需要核对服务信息，请重试画板连接。": "Verify the service before expanding input. Retry the board connection.",
   "服务信息未核对，暂时不能展开对话输入。": "The service has not been verified. Conversation input cannot be expanded yet.",
   "重新核对服务": "Verify service again",
-  "会话读取已失效，请重新打开。": "The conversation read is no longer current. Open the conversation again."
+  "会话读取已失效，请重新打开。": "The conversation read is no longer current. Open the conversation again.",
+  "画布恢复只能读取已有会话。": "Canvas restoration can only read existing conversations.",
+  "这些卡片已变更，输入仍保留。选择需要查看的对话。": "These cards have changed. Your input is retained. Choose a conversation to view."
 }

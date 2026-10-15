@@ -81,13 +81,13 @@ function CanvasWorkspaceContent({ scope, identityIssue, onRetryIdentity, onLeave
     return () => { onLeaveGuardChange?.(null); window.removeEventListener('beforeunload', beforeUnload) }
   }, [canLeave, isBlocked, onLeaveGuardChange])
   useEffect(() => {
-    if (state.loading || !state.snapshot || selected || isBlocked() || props.conversation?.target?.boardId === selectedId) return
+    if (state.loading || !state.snapshot || selected || isBlocked() || props.conversation?.instances.some(item => item.target.boardId === selectedId)) return
     let cancelled = false
     void canLeave().then(allowed => {
       if (allowed && !cancelled) setSelectedId(current => current === selectedId ? boards[0]?.id ?? null : current)
     })
     return () => { cancelled = true }
-  }, [state.loading, state.snapshot, selected, selectedId, boards, isBlocked, canLeave, props.conversation?.target])
+  }, [state.loading, state.snapshot, selected, selectedId, boards, isBlocked, canLeave, props.conversation?.instances])
   useEffect(() => { if (selected) saveCanvasBoardSelection(storage, scope, selected.id) }, [selected, storage, scope])
   const openDialog = async (board: CanvasBoard | null, remove = false) => {
     if (!await canLeave()) return

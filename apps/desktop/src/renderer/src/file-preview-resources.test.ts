@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { FilePreviewApi, ResolvedFilePreview, OpenFilePreviewRequest, FilePreviewTextContent } from '@contracts'
-import { FilePreviewResources } from './file-preview-resources'
+import { FilePreviewResources, windowFilePreviewResources } from './file-preview-resources'
 import { filePreviewSessionStore } from './file-preview-session'
 import { filePreviewRetentionLimits } from '../../file-preview-retention'
 import type { FilePreviewSession, FilePreviewTabModel } from './file-preview-controller'
@@ -56,6 +56,54 @@ function fixture(limits: Partial<Record<keyof typeof filePreviewRetentionLimits,
 function active(session: FilePreviewSession): FilePreviewTabModel {
   return session.getSnapshot().tabs.find(tab => tab.id === session.getSnapshot().activeTabId) as FilePreviewTabModel
 }
+
+it('shares one window retention pool while keeping every mounted Thread active and its binding in the union', async () => {
+  const f = fixture(), pool = windowFilePreviewResources(f.api), first = {}, second = {}
+  resources.push(pool)
+  expect(windowFilePreviewResources(f.api)).toBe(pool)
+  const releaseFirst = pool.retainOwner(), releaseSecond = pool.retainOwner()
+  pool.activate('a', first); pool.activate('b', second)
+  await pool.sync()
+  expect(pool.isCurrent('a')).toBe(true); expect(pool.isCurrent('b')).toBe(true)
+  const state = vi.mocked(f.api.updateRetention!).mock.calls.at(-1)![0]
+  expect(state.sessions.map(item => item.threadId).sort()).toEqual(['a', 'b'])
+  expect(pool.session('a')).not.toBe(pool.session('b'))
+  expect(pool.session('a')).toBe(windowFilePreviewResources(f.api).session('a'))
+  const mirror = {}
+  pool.activate('a', mirror)
+  expect(pool.isFocused(mirror)).toBe(true)
+  expect(pool.isFocused(second)).toBe(false)
+  pool.deactivate(mirror)
+  expect(pool.isCurrent('a')).toBe(true)
+  expect(pool.isFocused(mirror)).toBe(false)
+  pool.focus('b', second)
+  expect(pool.isFocused(second)).toBe(true)
+  pool.deactivate(first); releaseFirst(); await Promise.resolve()
+  expect(pool.disposed).toBe(false); expect(pool.isCurrent('b')).toBe(true)
+  pool.deactivate(second); releaseSecond()
+  await vi.waitFor(() => expect(pool.disposed).toBe(true))
+  expect(windowFilePreviewResources(f.api)).not.toBe(pool)
+})
+
+it('waits for the focused card binding before a native action while retaining the other card resources', async () => {
+  const f = fixture(), pool = windowFilePreviewResources(f.api), first = {}, second = {}
+  resources.push(pool)
+  pool.activate('a', first)
+  const a = pool.session('a')
+  await a.actions.open({ kind: 'camp_workspace', threadId: 'a', rawReference: 'file.txt' })
+  pool.activate('b', second); await pool.sync(); await Promise.resolve()
+  let release!: () => void
+  const binding = new Promise<void>(resolve => { release = resolve })
+  vi.mocked(f.api.bindThread).mockImplementation(async id => { if (id === 'a') await binding })
+  f.api.copyPath = vi.fn(async () => ({ ok: true as const, value: { copied: true as const } }))
+  pool.focus('a', first)
+  const action = a.actions.copyPath(active(a).id)
+  await Promise.resolve()
+  expect(f.api.copyPath).not.toHaveBeenCalled()
+  release(); expect(await action).toEqual({ ok: true, value: { copied: true } })
+  expect(f.api.copyPath).toHaveBeenCalledExactlyOnceWith({ handleId: active(a).file!.handleId, format: 'absolute' })
+  expect(pool.isCurrent('a')).toBe(true); expect(pool.isCurrent('b')).toBe(true)
+})
 async function open(owner: FilePreviewResources, threadId: string, name = 'file.txt') {
   owner.activate(threadId)
   const session = owner.session(threadId)

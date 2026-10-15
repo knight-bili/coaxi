@@ -1,11 +1,11 @@
 import { uiAttribute } from './interface-language'
-import { memo, createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react'
+import { memo, createContext, useCallback, useContext, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import type { FilePreviewApi, ResolvedTheme } from '@contracts'
 import { desktopFilePreviewApi } from './desktop-file-preview-api'
 import { FilePreviewLayoutProvider, useOptionalFilePreviewLayout } from './FilePreviewLayout'
 import { FileFindProvider } from './FilePreviewFind'
-import { FilePreviewResources } from './file-preview-resources'
+import { FilePreviewResources, windowFilePreviewResources } from './file-preview-resources'
 import { FilePreviewPaneContent } from './FilePreviewPane'
 import type { FilePreviewContextValue, FilePreviewSession } from './file-preview-controller'
 export * from './file-preview-controller'
@@ -21,12 +21,13 @@ function sessionValue(session: FilePreviewSession, resolvedTheme: ResolvedTheme)
 }
 
 const RetainedPane = memo(FilePreviewPaneContent)
-function RetainedPreview({ session, resolvedTheme, current, bounds, resizing, missionActivity, registerExecutionHost }: {
+function RetainedPreview({ session, resolvedTheme, current, bounds, resizing, missionActivity, registerExecutionHost, domScope, isFocusedSurface }: {
   session: FilePreviewSession; resolvedTheme: ResolvedTheme; current: boolean; bounds: CSSProperties | null; resizing: boolean; missionActivity?: ReactNode
   registerExecutionHost(threadId: string, element: HTMLDivElement | null): void
+  domScope?: string; isFocusedSurface: boolean
 }): React.JSX.Element {
   const state = session.getSnapshot()
-  const value = useMemo(() => ({ ...sessionValue(session, resolvedTheme), isCurrentThread: current }), [session, state, resolvedTheme, current])
+  const value = useMemo(() => ({ ...sessionValue(session, resolvedTheme), isCurrentThread: current, domScope, isFocusedSurface }), [session, state, resolvedTheme, current, domScope, isFocusedSurface])
   const visible = current && value.paneVisible && !!bounds
   const executionHostRef = useCallback(
     (element: HTMLDivElement | null) => registerExecutionHost(session.threadId, element),
@@ -44,9 +45,11 @@ function RetainedPreview({ session, resolvedTheme, current, bounds, resizing, mi
   </FilePreviewContext.Provider>
 }
 
-function PreviewDeck({ resources, anchor, resolvedTheme, missionActivity, registerExecutionHost }: {
+function PreviewDeck({ resources, anchor, resolvedTheme, missionActivity, registerExecutionHost, contained, host, threadId, domScope, isFocusedSurface }: {
   resources: FilePreviewResources; anchor: HTMLDivElement | null; resolvedTheme: ResolvedTheme; missionActivity?: ReactNode
   registerExecutionHost(threadId: string, element: HTMLDivElement | null): void
+  contained?: boolean; host: HTMLElement; threadId: string | null
+  domScope?: string; isFocusedSurface: boolean
 }): React.JSX.Element {
   const layout = useOptionalFilePreviewLayout()
   const [bounds, setBounds] = useState<CSSProperties | null>(null)
@@ -55,8 +58,11 @@ function PreviewDeck({ resources, anchor, resolvedTheme, missionActivity, regist
     const measure = (): void => {
       const bounds = anchor.getBoundingClientRect()
       if (!bounds.width || !bounds.height || !anchor.clientWidth) return
-      const scale = bounds.width / anchor.clientWidth
-      const rect = { left: bounds.left / scale, top: bounds.top / scale, width: bounds.width / scale, height: bounds.height / scale }
+      const hostBounds = host.getBoundingClientRect()
+      const scale = contained ? hostBounds.width / host.clientWidth : bounds.width / anchor.clientWidth
+      if (!Number.isFinite(scale) || scale <= 0) return
+      const rect = { left: (bounds.left - (contained ? hostBounds.left : 0)) / scale,
+        top: (bounds.top - (contained ? hostBounds.top : 0)) / scale, width: bounds.width / scale, height: bounds.height / scale }
       setBounds(previous => previous?.left === rect.left && previous.top === rect.top
         && previous.width === rect.width && previous.height === rect.height ? previous
         : { left: rect.left, top: rect.top, width: rect.width, height: rect.height })
@@ -64,38 +70,42 @@ function PreviewDeck({ resources, anchor, resolvedTheme, missionActivity, regist
     measure()
     const observer = new ResizeObserver(measure)
     observer.observe(anchor)
+    if (contained) observer.observe(host)
     window.addEventListener('resize', measure)
     window.addEventListener('scroll', measure, true)
     return () => { observer.disconnect(); window.removeEventListener('resize', measure); window.removeEventListener('scroll', measure, true) }
-  }, [anchor, layout?.width, layout?.availableWidth, layout?.compact])
+  }, [anchor, layout?.width, layout?.availableWidth, layout?.compact, contained, host])
   // The split context updates before a ResizeObserver delivery on a window resize.
   const width = layout?.workspace ? (layout.compact ? layout.availableWidth : Math.round(layout.width)) : undefined
   const positioned = bounds && {
-    ...bounds, width: width ?? bounds.width,
+    ...bounds, ...(contained ? { position: 'absolute' as const } : {}), width: width ?? bounds.width,
     left: typeof bounds.left === 'number' && typeof bounds.width === 'number' && width !== undefined
       ? bounds.left + bounds.width - width : bounds.left
   }
-  return <>{[...resources.sessions.values()].map(session => <RetainedPreview key={session.id} session={session}
-    resolvedTheme={resolvedTheme} current={resources.isCurrent(session.threadId)} bounds={positioned} resizing={!!layout?.resizing}
-    missionActivity={resources.isCurrent(session.threadId) ? missionActivity : null}
-    registerExecutionHost={registerExecutionHost} />)}</>
+  return <>{[...resources.sessions.values()].filter(session => !contained || session.threadId === threadId).map(session => <RetainedPreview key={session.id} session={session}
+    resolvedTheme={resolvedTheme} current={session.threadId === threadId} bounds={positioned} resizing={!!layout?.resizing}
+    missionActivity={session.threadId === threadId ? missionActivity : null}
+    registerExecutionHost={registerExecutionHost} domScope={domScope} isFocusedSurface={isFocusedSurface && session.threadId === threadId} />)}</>
 
 }
 
-export function FilePreviewProvider({ threadId, resolvedTheme, api: providedApi, children, missionActivity }: {
-  threadId: string | null; resolvedTheme: ResolvedTheme; api?: FilePreviewApi; children: ReactNode; missionActivity?: ReactNode
+export function FilePreviewProvider({ threadId, resolvedTheme, api: providedApi, children, missionActivity, contained = false }: {
+  threadId: string | null; resolvedTheme: ResolvedTheme; api?: FilePreviewApi; children: ReactNode; missionActivity?: ReactNode; contained?: boolean
 }): React.JSX.Element {
   const api = providedApi ?? (typeof window === 'undefined' || window.rovai ? desktopFilePreviewApi : null)
   if (!api) throw new Error(uiAttribute('共享文件页面缺少显式资源适配。'))
-  const resources = useMemo(() => new FilePreviewResources(api), [api])
+  const resources = useMemo(() => windowFilePreviewResources(api), [api])
+  const owner = useRef({}).current
+  const surfaceId = useId(), domScope = contained ? `canvas-${surfaceId}` : undefined
+  const isFocusedSurface = resources.isFocused(owner)
   useSyncExternalStore(resources.subscribe, resources.getSnapshot, resources.getSnapshot)
   const [anchor, setAnchor] = useState<HTMLDivElement | null>(null)
   const [deckHost, setDeckHost] = useState<HTMLElement>(document.body)
   const [executionHosts, setExecutionHosts] = useState<ReadonlyMap<string, HTMLDivElement>>(new Map())
   const registerAnchor = useCallback((element: HTMLDivElement | null): void => {
     setAnchor(element)
-    if (element) setDeckHost(element.closest<HTMLElement>('.app-shell') ?? document.body)
-  }, [])
+    if (element) setDeckHost(element.closest<HTMLElement>(contained ? '.file-preview-contained' : '.app-shell') ?? document.body)
+  }, [contained])
   const registerExecutionHost = useCallback((targetThreadId: string, element: HTMLDivElement | null): void => {
     setExecutionHosts((current) => {
       if (current.get(targetThreadId) === element || (!element && !current.has(targetThreadId))) return current
@@ -107,21 +117,22 @@ export function FilePreviewProvider({ threadId, resolvedTheme, api: providedApi,
   }, [])
   const session = resources.session(threadId ?? '')
   const state = session.getSnapshot()
-  const value = useMemo(() => sessionValue(session, resolvedTheme), [session, state, resolvedTheme])
-  useLayoutEffect(() => { resources.activate(threadId) }, [resources, threadId])
+  const value = useMemo(() => ({ ...sessionValue(session, resolvedTheme), domScope, isFocusedSurface }), [session, state, resolvedTheme, domScope, isFocusedSurface])
+  useLayoutEffect(() => { resources.activate(threadId, owner); return () => resources.deactivate(owner) }, [resources, threadId, owner])
   useEffect(() => {
     const release = resources.retainOwner()
     const dispose = (): void => resources.dispose()
     window.addEventListener('beforeunload', dispose)
     return () => { window.removeEventListener('beforeunload', dispose); release() }
   }, [resources])
+  const deck = createPortal(<PreviewDeck resources={resources} anchor={anchor} resolvedTheme={resolvedTheme} missionActivity={missionActivity}
+    registerExecutionHost={registerExecutionHost} contained={contained} host={deckHost} threadId={threadId} domScope={domScope} isFocusedSurface={isFocusedSurface} />, deckHost)
   return <FilePreviewApiContext.Provider value={api}><FilePreviewContext.Provider value={value}>
     <FilePreviewLayoutProvider threadId={threadId} visible={!!threadId && value.paneVisible} activityMode={value.activeTab?.kind === 'mission_activity'}>
-      <FileFindProvider activeTabId={value.activeTabId} visible={!!threadId && value.paneVisible}>
+      <FileFindProvider activeTabId={value.activeTabId} visible={!!threadId && value.paneVisible && isFocusedSurface}>
         <ExecutionPreviewHostContext.Provider value={executionHosts}>
-          <PreviewHostContext.Provider value={registerAnchor}>{children}</PreviewHostContext.Provider>
-          {createPortal(<PreviewDeck resources={resources} anchor={anchor} resolvedTheme={resolvedTheme} missionActivity={missionActivity}
-            registerExecutionHost={registerExecutionHost} />, deckHost)}
+          <PreviewHostContext.Provider value={registerAnchor}>{contained ? <div className="file-preview-contained"
+            onPointerDownCapture={() => resources.focus(threadId, owner)} onFocusCapture={() => resources.focus(threadId, owner)}>{children}{deck}</div> : <>{children}{deck}</>}</PreviewHostContext.Provider>
         </ExecutionPreviewHostContext.Provider>
       </FileFindProvider>
     </FilePreviewLayoutProvider>

@@ -1,8 +1,16 @@
+import { CanvasThreadWorkspace } from './CanvasThreadWorkspace'
+import { CanvasThreadReader } from './CanvasThreadReader'
+import { useCanvasConversations } from './useCanvasConversations'
+import { ThreadClientProvider } from './camp-client'
+import { shouldRefreshActiveThreadForCoreEvent } from './thread-projection-events'
+export { shouldRefreshActiveThreadForCoreEvent } from './thread-projection-events'
+import { threadWorkspaceActions } from './thread-workspace-actions'
+import { reconcileCancellingTurnIds, effectiveCancellingTurnIds, reconcileRunCancellationIds, effectiveCancellingRunIds } from './thread-run-cancellation'
+export { cancellableTurnIds, reconcileCancellingTurnIds, effectiveCancellingTurnIds, reconcileRunCancellationIds, effectiveCancellingRunIds, applyCancellationResult } from './thread-run-cancellation'
 import { ThreadProjectionStore, ThreadProjectionSupersededError } from './thread-projection-store'
 import { threadCommands } from './thread-commands'
 import {
-  optimisticThreadMessage, commandFailureMessage, membershipConflictCode,
-  runtimeRecoveryFromCommandResult, asRecord, stringField, stringArrayField, errorMessage, type ThreadSurfaceSnapshot
+  commandFailureMessage, asRecord, stringField, errorMessage, type ThreadSurfaceSnapshot
 } from './thread-workspace-data'
 export {
   requestAuthoritativeThreadOpenProjection, campOpenProjectionAsSnapshot, optimisticThreadMessage,
@@ -12,7 +20,6 @@ export {
 import { EMPTY_SNAPSHOT, isProjectPath } from '../../shared/navigation-preferences-model'
 import { useThreadUserAnchorCache } from './useThreadUserAnchors'
 import { hasAnyPendingThreadDraftInput, hasPendingThreadDraftInput, hasPendingThreadDraftSurfaces } from './pending-thread-draft'
-import { canvasComposerContextKey } from './canvas-composer-drafts'
 import { memberCreationHelper, memberCreationInitialDraft, navigationWithMemberCreationDrafts, type MemberCreationDraft } from './member-creation-flow'
 import { navigationThreadReadState } from './navigation-unread'
 import { newCommandId } from '../../shared/command-id'
@@ -20,7 +27,6 @@ import { CanvasWorkspace } from './CanvasWorkspace'
 import { ProjectGroupsDialog, type ProjectGroupInitialAction } from './ProjectGroupsDialog'
 import { CanvasFolderProvider } from './CanvasFolderProvider'
 import type { CanvasLeaveGuard } from './CanvasSurface'
-import { readCanvasConversation, type CanvasConversationTarget } from './canvas-conversation'
 import type { SingleChatPanelTarget } from './SingleChatPanel'
 import type { BusinessEnvironment } from './business-environment'
 import { AppHeader } from './AppHeader'
@@ -37,7 +43,6 @@ import type {
   AdapterKind,
   AgentProfile,
   AgentRunView,
-  ActionApprovalView,
   AppUpdatePrompt as AppUpdatePromptValue,
   AppearancePreferences,
   AppearanceSnapshot,
@@ -47,7 +52,6 @@ import type {
   ThreadDeletionIssue,
   ThreadMessageAroundSnapshot,
   ThreadMessageView,
-  ThreadMemberRemovalPreview,
   ThreadOpenProjection,
   ThreadSnapshot,
   CreateThreadRequest,
@@ -94,12 +98,8 @@ import type { MemberWorkspaceTab } from './MemberSidebar'
 import {
   ThreadWorkspace,
   QuickChatWorkspace,
-  composerHasSendablePayload,
-  type ThreadMessageSendReceipt,
   type ThreadLeaveGuard,
   type ThreadLeavePreparation,
-  type ThreadMemberAddOutcome,
-  type ThreadMemberRemoveOutcome,
   type ThreadInspectorTab,
   type ThreadRuntimeRecovery,
   type NotificationFocusTarget,
@@ -190,24 +190,6 @@ import { appendLiveRuntimeEventBatch, createLiveRuntimeEventBuffer } from './liv
 
 export { allNavigationThreads }
 
-const ACTIVE_CAMP_INVALIDATION_EVENTS = new Set([
-  'thread.messages.changed',
-  'thread.memberCreated',
-  'thread.member.fast.updated',
-  'camp.member_added',
-  'camp.member_removed',
-  'camp.membership_reconciliation_started',
-  'camp.membership_reconciliation_completed',
-  'camp.default_lead_reconciled',
-  'agent_run.cancelled',
-  'agent_run.continuation_requested',
-  'agent_run.recovery_blocker_resolved',
-  'agent_run.runtime_model_observed',
-  'agent_run.terminal',
-  'agent_run.images.updated',
-  'agent_run.file_changes_completed'
-])
-
 export const NAVIGATION_REFRESH_POLL_MS = 20_000
 
 export function shouldRefreshNavigationForCoreEvent(
@@ -215,21 +197,6 @@ export function shouldRefreshNavigationForCoreEvent(
   shuttingDown = false
 ): boolean {
   return !shuttingDown && event.method === 'navigation.invalidated'
-}
-
-export function shouldRefreshActiveThreadForCoreEvent(
-  event: CoreEvent,
-  activeThreadId: string | null,
-  shuttingDown = false
-): boolean {
-  if (shuttingDown || !activeThreadId || !ACTIVE_CAMP_INVALIDATION_EVENTS.has(event.method)) {
-    return false
-  }
-  const eventThreadId = stringField(asRecord(event.params), 'threadId')
-  if (event.method === 'agent_run.runtime_model_observed') {
-    return eventThreadId === activeThreadId
-  }
-  return !eventThreadId || eventThreadId === activeThreadId
 }
 
 export interface ActiveThreadRefreshCoordinator {
@@ -458,17 +425,6 @@ export function campActivationPreview<T extends ThreadSnapshot>(
   }
   return cachedSnapshot?.thread.id === targetThreadId ? cachedSnapshot : null
 }
-
-
-const CANCELLABLE_TURN_STATUSES = new Set<ThreadSnapshot['turns'][number]['status']>([
-  'running',
-  'waiting'
-])
-const CANCELLABLE_RUN_STATUSES = new Set<ThreadSnapshot['agentRuns'][number]['status']>([
-  'queued',
-  'running',
-  'waiting'
-])
 export function campActivationStateForCreation(
   source: 'one_click' | 'dialog'
 ): ThreadActivationState {
@@ -486,128 +442,6 @@ export async function selectProjectDirectory(
   await restoreProject(workspace.projectPath)
   selectProject({ kind: 'directory', projectPath: workspace.projectPath }, workspace)
   return 'selected'
-}
-
-export function cancellableTurnIds(snapshot: {
-  turns: Pick<ThreadSnapshot['turns'][number], 'id' | 'status'>[]
-  agentRuns: Pick<ThreadSnapshot['agentRuns'][number], 'threadTurnId' | 'status'>[]
-}, scope: 'current_execution' | 'camp_cleanup' = 'current_execution'): string[] {
-  if (scope === 'camp_cleanup') {
-    return snapshot.turns
-      .filter((turn) => CANCELLABLE_TURN_STATUSES.has(turn.status))
-      .map((turn) => turn.id)
-  }
-  const executingTurnIds = new Set(snapshot.agentRuns
-    .filter((run) => CANCELLABLE_RUN_STATUSES.has(run.status))
-    .map((run) => run.threadTurnId))
-  return snapshot.turns
-    .filter((turn) =>
-      CANCELLABLE_TURN_STATUSES.has(turn.status) && executingTurnIds.has(turn.id))
-    .map((turn) => turn.id)
-}
-
-export function reconcileCancellingTurnIds(
-  current: ReadonlySet<string>,
-  snapshot: Pick<ThreadSnapshot, 'turns'>
-): Set<string> {
-  const terminalTurnIds = new Set(snapshot.turns
-    .filter((turn) => !CANCELLABLE_TURN_STATUSES.has(turn.status))
-    .map((turn) => turn.id))
-  if (![...current].some((turnId) => terminalTurnIds.has(turnId))) {
-    return current instanceof Set ? current : new Set(current)
-  }
-  return new Set([...current].filter((turnId) => !terminalTurnIds.has(turnId)))
-}
-
-export function effectiveCancellingTurnIds(
-  local: ReadonlySet<string>,
-  snapshot: Pick<ThreadSnapshot, 'turns'>
-): Set<string> {
-  const activeIds = new Set(snapshot.turns
-    .filter((item) => CANCELLABLE_TURN_STATUSES.has(item.status))
-    .map((item) => item.id))
-  return new Set([...local].filter((id) => activeIds.has(id)))
-}
-
-export function reconcileRunCancellationIds(
-  current: ReadonlySet<string>,
-  snapshot: {
-    agentRuns: Pick<AgentRunView, 'id' | 'status' | 'cancelRequestedAt'>[]
-  }
-): Set<string> {
-  const runById = new Map(snapshot.agentRuns.map((run) => [run.id, run]))
-  const next = new Set([...current].filter((runId) => {
-    const run = runById.get(runId)
-    return Boolean(
-      run
-      && CANCELLABLE_RUN_STATUSES.has(run.status)
-      && run.cancelRequestedAt === null
-    )
-  }))
-  if (next.size === current.size && [...next].every((runId) => current.has(runId))) {
-    return current instanceof Set ? current : next
-  }
-  return next
-}
-
-export function effectiveCancellingRunIds(
-  local: ReadonlySet<string>,
-  snapshot: { agentRuns: Pick<AgentRunView, 'id' | 'status' | 'cancelRequestedAt'>[] }
-): Set<string> {
-  const activeIds = new Set(snapshot.agentRuns
-    .filter((item) => CANCELLABLE_RUN_STATUSES.has(item.status))
-    .map((item) => item.id))
-  return new Set([...local].filter((id) => activeIds.has(id)))
-}
-
-// Apply only terminal facts returned by Core, then refresh the complete projection.
-// Cleanup ACK is deliberately absent from this presentation boundary.
-export function applyCancellationResult(
-  snapshot: ThreadSnapshot,
-  result: StoredCommandResult
-): ThreadSnapshot {
-  if (result.status !== 'applied') return snapshot
-  const payload = result.payload
-  const runs = new Map<string, {
-    status: AgentRunView['status']
-    unknown: boolean
-    cancelledByRequest: boolean
-  }>()
-  const addRun = (id: unknown, status: unknown, code: unknown): void => {
-    if (typeof id === 'string' && (status === 'failed' || status === 'cancelled' || status === 'succeeded')) {
-      runs.set(id, {
-        status,
-        unknown: code === 'agent_run.accepted_input_outcome_unknown',
-        cancelledByRequest: status === 'cancelled' && code === 'agent_run.cancelled'
-      })
-    }
-  }
-  addRun(payload.agentRunId, payload.status, result.code)
-  if (Array.isArray(payload.runs)) {
-    for (const item of payload.runs) {
-      if (item && typeof item === 'object' && 'agentRunId' in item && 'terminalStatus' in item) {
-        addRun(item.agentRunId, item.terminalStatus, 'terminalCode' in item ? item.terminalCode : null)
-      }
-    }
-  }
-  const turnStatus = payload.threadTurnStatus
-  return {
-    ...snapshot,
-    agentRuns: snapshot.agentRuns.map((run) => {
-      const settled = runs.get(run.id)
-      return settled ? {
-        ...run,
-        status: settled.status,
-        waitReason: null,
-        hasUnsettledExternalEffects: settled.cancelledByRequest
-          ? false
-          : run.hasUnsettledExternalEffects || settled.unknown
-      } : run
-    }),
-    turns: snapshot.turns.map((turn) => turn.id === payload.threadTurnId
-      && (turnStatus === 'completed' || turnStatus === 'failed' || turnStatus === 'cancelled')
-      ? { ...turn, status: turnStatus } : turn)
-  }
 }
 
 export function shouldLoadRuntimeHealth(
@@ -969,7 +803,7 @@ export function AppToast({
 }
 
 export function BusinessApp(props: React.ComponentProps<typeof BusinessAppContent>): React.JSX.Element {
-  return <CanvasFolderProvider client={props.environment.client}><BusinessAppContent {...props} /></CanvasFolderProvider>
+  return <ThreadClientProvider client={props.environment.client}><CanvasFolderProvider client={props.environment.client}><BusinessAppContent {...props} /></CanvasFolderProvider></ThreadClientProvider>
 }
 
 function BusinessAppContent({
@@ -1111,15 +945,8 @@ function BusinessAppContent({
   const [notificationFocus, setNotificationFocus] = useState<NotificationFocusTarget | null>(null)
   const [singleChatNotificationTarget, setSingleChatNotificationTarget] = useState<SingleChatPanelTarget | null>(null)
   const canvasReferenceRequest = useRef(0)
-  const [canvasConversation, setCanvasConversation] = useState<CanvasConversationTarget | null>(null)
-  const [canvasConversationClient, setCanvasConversationClient] = useState<typeof client | null>(null)
-  const canvasConversationRef = useRef(canvasConversation)
-  canvasConversationRef.current = canvasConversationClient === client ? canvasConversation : null
   const threadClientOwner = useRef(client)
   threadClientOwner.current = client
-  const canvasConversationToken = useRef(0), canvasConversationOpening = useRef(false)
-  const [canvasConversationBusy, setCanvasConversationBusy] = useState(false)
-  const canvasConversationVisible = view === 'canvas' && canvasConversationClient === client && canvasConversation?.reference.threadId === activeThreadId
   const [visibleSingleChatSources, setVisibleSingleChatSources] = useState<VisibleNotificationSources | null>(null)
   const [visibleNotificationSources, setVisibleNotificationSources] = useState<VisibleNotificationSources | null>(null)
   const [notificationAnchor, setNotificationAnchor] = useState<{
@@ -1158,6 +985,7 @@ function BusinessAppContent({
   const campSelectionGeneration = useRef(0)
   const campOpenFeedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const threadProjections = useMemo(() => new ThreadProjectionStore(client), [client])
+  const canvasConversations = useCanvasConversations(client, threadProjections, afterNextPaint)
   useEffect(() => () => threadProjections.reset(), [threadProjections])
   useEffect(() => activeThreadId ? threadProjections.retain(activeThreadId) : undefined, [threadProjections, activeThreadId])
   const campSnapshotRef = useRef<ThreadSurfaceSnapshot | null>(null)
@@ -1275,9 +1103,8 @@ function BusinessAppContent({
   ): Promise<boolean> => {
     const leavingThreadId = activeThreadIdRef.current
     const registration = campLeaveGuardRef.current
-    const leavingCanvas = canvasConversationRef.current
     if (
-      !activeThreadSurfaceNeedsLeaveGuard(viewRef.current, leavingThreadId, leavingCanvas?.reference.threadId)
+      !activeThreadSurfaceNeedsLeaveGuard(viewRef.current, leavingThreadId)
       || registration?.threadId !== leavingThreadId
     ) {
       await transition()
@@ -1296,9 +1123,8 @@ function BusinessAppContent({
       prepared = await preparation.promise
       await transition()
       await afterNextPaint()
-      preparation.didLeave ||= !activeThreadSurfaceNeedsLeaveGuard(viewRef.current, activeThreadIdRef.current, canvasConversationRef.current?.reference.threadId)
-        || activeThreadIdRef.current !== leavingThreadId || (viewRef.current === 'canvas') !== Boolean(leavingCanvas)
-        || (leavingCanvas?.draftContext && canvasComposerContextKey(leavingCanvas.draftContext)) !== (canvasConversationRef.current?.draftContext && canvasComposerContextKey(canvasConversationRef.current.draftContext))
+      preparation.didLeave ||= !activeThreadSurfaceNeedsLeaveGuard(viewRef.current, activeThreadIdRef.current)
+        || activeThreadIdRef.current !== leavingThreadId
     } catch (nextError) {
       setError(uiAttribute("离开当前会话前未能完成输入操作：{0}", String(errorMessage(nextError))))
       return false
@@ -1355,8 +1181,7 @@ function BusinessAppContent({
       await prepareActiveThreadForAppQuit(
         viewRef.current,
         activeThreadIdRef.current,
-        campLeaveGuardRef.current,
-        canvasConversationRef.current?.reference.threadId
+        campLeaveGuardRef.current
       )
       await prepareActiveAutomationForAppQuit(
         viewRef.current,
@@ -1446,23 +1271,9 @@ function BusinessAppContent({
   }, [agents, selectedMemberId, view, memberTab, desktopNavigation, displayedEntry, memberRosterEntryReady])
 
   useEffect(() => {
-    setThreadInspectorThreadId((current) => (view === 'camp' || canvasConversationVisible) && current === activeThreadId ? current : null)
-    setSingleChatThreadId((current) => (view === 'camp' || canvasConversationVisible) && current === activeThreadId ? current : null)
-  }, [activeThreadId, view, canvasConversationVisible])
-
-  useEffect(() => {
-    canvasConversationToken.current += 1
-    canvasConversationRef.current = null
-    setCanvasConversation(null)
-    setCanvasConversationClient(null)
-  }, [client])
-  useEffect(() => {
-    if (view !== 'canvas') {
-      canvasConversationToken.current += 1
-      canvasConversationRef.current = null
-      setCanvasConversation(null)
-    }
-  }, [view])
+    setThreadInspectorThreadId((current) => view === 'camp' && current === activeThreadId ? current : null)
+    setSingleChatThreadId((current) => view === 'camp' && current === activeThreadId ? current : null)
+  }, [activeThreadId, view])
 
   const memberRosterReader = useMemo(() => createMemberRosterReader(
     () => client.request<AgentProfile[]>('members.list'),
@@ -2530,7 +2341,7 @@ function BusinessAppContent({
       if (event.method === 'preferences.new_conversation_changed') {
         void uiPreferences.generalPreferences.get().then(setGeneralPreferences).catch((e) => setError(errorMessage(e)))
       }
-      if (event.method === 'members.invalidated' && (viewRef.current === 'members' || viewRef.current === 'camp' || (viewRef.current === 'canvas' && canvasConversationRef.current))) {
+      if (event.method === 'members.invalidated' && (viewRef.current === 'members' || viewRef.current === 'camp' || viewRef.current === 'canvas')) {
         void loadAgents().catch((nextError) => setError(errorMessage(nextError)))
       }
       if (event.method === 'agent_run.terminal') liveEvents.flush()
@@ -2597,7 +2408,7 @@ function BusinessAppContent({
           groupKeys: Array.isArray(params.groupKeys) ? params.groupKeys.filter((key): key is string => typeof key === 'string') : undefined
         }).catch(() => undefined)
       }
-      const threadId = activeThreadIdRef.current
+      const threadId = viewRef.current === 'canvas' ? null : activeThreadIdRef.current
       const refresh = threadId && deletingThreadIdsRef.current.has(threadId)
         ? null
         : refreshActiveThreadForCoreEvent(
@@ -2696,7 +2507,7 @@ function BusinessAppContent({
   useEffect(() => {
     let cancelled = false
     let timer: ReturnType<typeof setTimeout> | null = null
-    if (client.onInvalidated || !activeThreadId || campSnapshot?.thread.id !== activeThreadId) return undefined
+    if (view === 'canvas' || client.onInvalidated || !activeThreadId || campSnapshot?.thread.id !== activeThreadId) return undefined
     const threadId = activeThreadId
 
     const refreshSnapshot = async (): Promise<void> => {
@@ -2762,7 +2573,7 @@ function BusinessAppContent({
       cancelled = true
       if (timer) clearTimeout(timer)
     }
-  }, [activeThreadId, campSnapshot?.thread.id, requestThreadProjection, threadProjections, setThreadSnapshot])
+  }, [activeThreadId, campSnapshot?.thread.id, requestThreadProjection, threadProjections, setThreadSnapshot, view])
 
   useEffect(() => client.onInvalidated?.(() => {
     campViewedAcknowledgements.current.clear()
@@ -2771,7 +2582,7 @@ function BusinessAppContent({
     void loadNavigation('invalidation').catch(() => undefined)
     void loadThreadDeletionIssues().catch(() => undefined)
     const threadId = activeThreadIdRef.current
-    if (threadId && !deletingThreadIdsRef.current.has(threadId)) {
+    if (viewRef.current !== 'canvas' && threadId && !deletingThreadIdsRef.current.has(threadId)) {
       void activeThreadRefreshCoordinator.refresh(threadId).catch((e) => setError(errorMessage(e)))
     }
     void loadAgents().catch(() => undefined)
@@ -3112,61 +2923,6 @@ function BusinessAppContent({
   const chooseThread = (thread: NavigationThreadTarget): void => {
     void activateThread(thread.id, { reconcileDefaultLead: thread.activationState !== 'pending' })
       .catch((nextError) => notifyError(errorMessage(nextError)))
-  }
-
-  const closeCanvasConversation = async (): Promise<boolean> => {
-    if (canvasConversationOpening.current) return false
-    if (!canvasConversationRef.current) return true
-    canvasConversationOpening.current = true; setCanvasConversationBusy(true)
-    try {
-      return await leaveActiveThread(() => {
-        canvasConversationToken.current += 1
-        canvasConversationRef.current = null
-        setCanvasConversation(null)
-        setSingleChatThreadId(null)
-        setThreadInspectorThreadId(null)
-      })
-    } finally {
-      canvasConversationOpening.current = false; setCanvasConversationBusy(false)
-    }
-  }
-
-  const presentCanvasConversation = async (input: CanvasConversationTarget): Promise<boolean> => {
-    if (canvasConversationOpening.current || viewRef.current !== 'canvas') return false
-    const target = structuredClone(input), requestOwner = client
-    const token = ++canvasConversationToken.current
-    const isCurrent = () => canvasConversationToken.current === token && threadClientOwner.current === requestOwner && viewRef.current === 'canvas'
-    canvasConversationOpening.current = true; setCanvasConversationBusy(true)
-    cancelPendingThreadActivation()
-    let committed = false
-    try {
-      const prepared = await leaveActiveThread(async () => {
-        const loaded = await readCanvasConversation(target.reference,
-          conversationId => client.request<SingleChatSnapshot | null>('singleChat.get', { conversationId }),
-          async threadId => (await requestThreadProjection(threadId, 'open')).snapshot, isCurrent)
-        if (!loaded || !isCurrent()) return
-        const { snapshot, conversation } = loaded
-        campEventSequenceMarker.current = snapshot.throughGlobalSequence
-        setActiveThreadId(target.reference.threadId)
-        setThreadSnapshot(snapshot)
-        setNotificationFocus(null); setNotificationAnchor(null)
-        setThreadInspectorThreadId(null)
-        setSingleChatNotificationTarget(conversation ? { conversationId: conversation.id, agentId: conversation.agentId,
-          agentDisplayName: agents.find(agent => agent.agentId === conversation.agentId)?.displayName ?? uiAttribute('队员'),
-          requestId: ++canvasReferenceRequest.current } : null)
-        setSingleChatThreadId(conversation ? target.reference.threadId : null)
-        canvasConversationRef.current = target; setCanvasConversation(target); setCanvasConversationClient(client)
-        committed = true
-      })
-      // Reconcile the read/subscription handoff through the same existing bounded refresh owner.
-      if (prepared && committed && isCurrent()) void refreshActiveThreadSnapshot(target.reference.threadId).catch(error => { if (isCurrent()) notifyError(errorMessage(error)) })
-      return prepared && committed
-    } catch (error) {
-      if (isCurrent()) notifyError(errorMessage(error))
-      return false
-    } finally {
-      canvasConversationOpening.current = false; setCanvasConversationBusy(false)
-    }
   }
 
   const openCanvasReference = async (reference: CanvasConversationRef): Promise<void> => {
@@ -3549,203 +3305,6 @@ function BusinessAppContent({
     await deleteThreadWithoutAutomationLeaveGuard(thread)
   }
 
-  const cancelAgentRun = async (run: AgentRunView): Promise<void> => {
-    const threadId = activeThreadCommands?.threadId
-    if (!threadId || campSnapshotRef.current?.thread.id !== threadId) return
-    setError(null)
-    setConfirmingRunIds((current) => {
-      const next = new Set(current)
-      next.delete(run.id)
-      return next
-    })
-    setCancellingRunIds((current) => new Set(current).add(run.id))
-
-    let result: StoredCommandResult
-    try {
-      result = await activeThreadCommands!.cancel(newCommandId(), run)
-    } catch {
-      setCancellingRunIds((current) => {
-        const next = new Set(current)
-        next.delete(run.id)
-        return next
-      })
-      setConfirmingRunIds((current) => new Set(current).add(run.id))
-      try {
-        const { snapshot } = await requestThreadProjection(threadId, 'open')
-        if (activeThreadIdRef.current === threadId) {
-          campEventSequenceMarker.current = Math.max(
-            campEventSequenceMarker.current,
-            snapshot.throughGlobalSequence
-          )
-          setThreadSnapshot(snapshot)
-        }
-        setConfirmingRunIds((current) => reconcileRunCancellationIds(current, snapshot))
-      } catch {
-        // Keep the uncertainty projection until a later authoritative Thread refresh converges it.
-      }
-      return
-    }
-
-    if (result.status === 'rejected') {
-      setCancellingRunIds((current) => {
-        const next = new Set(current)
-        next.delete(run.id)
-        return next
-      })
-      setConfirmingRunIds((current) => {
-        const next = new Set(current)
-        next.delete(run.id)
-        return next
-      })
-      try {
-        await refreshActiveThreadSnapshot(threadId)
-      } catch {
-        // The deterministic command result remains authoritative even if this refresh fails.
-      }
-      setError(commandFailureMessage(result))
-      return
-    }
-
-    if (campSnapshotRef.current?.thread.id === threadId) {
-      setThreadSnapshot(applyCancellationResult(campSnapshotRef.current, result))
-    }
-    setCancellingRunIds((current) => new Set([...current].filter((id) => id !== run.id)))
-    setConfirmingRunIds((current) => new Set([...current].filter((id) => id !== run.id)))
-    try {
-      await refreshActiveThreadSnapshot(threadId)
-    } catch {
-      // Core's terminal response already clears stopping; the next poll fills in the rest.
-    }
-  }
-
-  const changeDefaultLead = async (agentId: string): Promise<void> => {
-    if (!activeThreadId || campSnapshot?.thread.id !== activeThreadId) return
-    setBusy('change-default-lead')
-    setError(null)
-    try {
-      const result = await activeThreadCommands!.changeLead(newCommandId(), agentId, campSnapshot.thread.version)
-      if (result.status === 'rejected') throw new Error(commandFailureMessage(result))
-      await Promise.all([
-        refreshActiveThreadSnapshot(activeThreadId),
-        navigationRefreshCoordinator.refreshThreads([activeThreadId], 'explicit')
-      ])
-    } catch (nextError) {
-      setError(errorMessage(nextError))
-      throw nextError
-    } finally {
-      setBusy(null)
-    }
-  }
-
-  const addThreadMembers = async (agentIds: string[]): Promise<ThreadMemberAddOutcome> => {
-    const threadId = activeThreadCommands?.threadId
-    const currentSnapshot = campSnapshotRef.current
-    if (!threadId || currentSnapshot?.thread.id !== threadId) {
-      throw new Error(uiAttribute('当前会话尚未准备好。'))
-    }
-    setBusy('camp-membership')
-    setError(null)
-    const outcome: ThreadMemberAddOutcome = {
-      addedAgentIds: [],
-      unchangedAgentIds: [],
-      failures: []
-    }
-    let membershipGeneration = currentSnapshot.thread.membershipGeneration
-    try {
-      for (let index = 0; index < agentIds.length; index += 1) {
-        const agentId = agentIds[index]
-        try {
-          const result = await activeThreadCommands!.addMember(newCommandId(), agentId, membershipGeneration)
-          if (result.status === 'rejected') {
-            const message = commandFailureMessage(result)
-            outcome.failures.push({ agentId, message })
-            if (membershipConflictCode(result.code)) {
-              for (const remainingAgentId of agentIds.slice(index + 1)) {
-                outcome.failures.push({
-                  agentId: remainingAgentId,
-                  message:uiAttribute("名册已发生变化，请在刷新后重试。")
-                })
-              }
-              break
-            }
-            continue
-          }
-          const payload = asRecord(result.payload)
-          if (typeof payload.membershipGeneration === 'number') {
-            membershipGeneration = payload.membershipGeneration
-          }
-          if (payload.changed === false) outcome.unchangedAgentIds.push(agentId)
-          else outcome.addedAgentIds.push(agentId)
-        } catch (error) {
-          outcome.failures.push({ agentId, message: errorMessage(error) })
-        }
-      }
-      try {
-        await Promise.all([
-          refreshActiveThreadSnapshot(threadId),
-          navigationRefreshCoordinator.refreshThreads([threadId], 'explicit')
-        ])
-      } catch {
-        // The per-command outcomes are authoritative; normal event refresh will converge the surface.
-      }
-      return outcome
-    } finally {
-      setBusy(null)
-    }
-  }
-
-  const previewThreadMemberRemoval = async (agentId: string): Promise<ThreadMemberRemovalPreview> => {
-    const threadId = activeThreadCommands?.threadId
-    if (!threadId || campSnapshotRef.current?.thread.id !== threadId) {
-      throw new Error(uiAttribute('当前会话尚未准备好。'))
-    }
-    const preview = await activeThreadCommands!.removalPreview(agentId)
-    if (!preview) throw new Error(uiAttribute('这位队员已不在当前会话中。'))
-    return preview
-  }
-
-  const removeThreadMember = async (
-    preview: ThreadMemberRemovalPreview
-  ): Promise<ThreadMemberRemoveOutcome> => {
-    const threadId = activeThreadCommands?.threadId
-    if (!threadId || preview.threadId !== threadId || campSnapshotRef.current?.thread.id !== threadId) {
-      return { status: 'conflict', message:uiAttribute("当前会话已发生变化，请重新读取影响。") }
-    }
-    setBusy('camp-membership')
-    setError(null)
-    try {
-      const result = await activeThreadCommands!.removeMember(newCommandId(), preview)
-      if (result.status === 'rejected') {
-        try {
-          await refreshActiveThreadSnapshot(threadId)
-        } catch {
-          // Keep the deterministic command result when the follow-up projection is unavailable.
-        }
-        return {
-          status: membershipConflictCode(result.code) ? 'conflict' : 'failed',
-          message: commandFailureMessage(result)
-        }
-      }
-      try {
-        await Promise.all([
-          refreshActiveThreadSnapshot(threadId),
-          navigationRefreshCoordinator.refreshThreads([threadId], 'explicit')
-        ])
-      } catch {
-        // The accepted cutover is authoritative; reconciliation events will refresh the surface.
-      }
-      const reconciliationStatus = stringField(asRecord(result.payload), 'reconciliationStatus')
-      return {
-        status: 'removed',
-        reconciliationStatus: reconciliationStatus === 'reconciling' ? 'reconciling' : 'settled'
-      }
-    } catch (error) {
-      return { status: 'failed', message: errorMessage(error) }
-    } finally {
-      setBusy(null)
-    }
-  }
-
   async function createThread(
     draft: Omit<CreateThreadRequest, 'commandId'>,
     enableOneClick = false,
@@ -3896,112 +3455,7 @@ function BusinessAppContent({
     await navigationRefreshCoordinator.invalidate({ scope: 'group', threadId: draft.threadId })
   }
 
-  const sendThreadMessage = async (
-    draft: ThreadComposerDraftView
-  ): Promise<ThreadMessageSendReceipt | void> => {
-    const hasReadyAttachment = draft.attachments.length > 0
-    const hasSendablePayload = composerHasSendablePayload(draft.body, hasReadyAttachment)
-    const threadId = activeThreadCommands?.threadId
-    if (!threadId || draft.threadId !== threadId || !hasSendablePayload || draft.revision < 1) return
-    const commandId = newCommandId()
-    const selectionGeneration = campSelectionGeneration.current
-    const optimisticMessage = optimisticThreadMessage(
-      campSnapshotRef.current?.thread.id === threadId ? campSnapshotRef.current : null,
-      commandId,
-      draft
-    )
-    // Core decides direct publication versus private queue admission. Never expose
-    // a pending input as an optimistic public ThreadMessage before that decision.
-    setBusy('camp-message')
-    setError(null)
-    setToast((current) => current?.persistent ? current : null)
-    setRuntimeRecovery((current) => current?.threadId === threadId ? null : current)
-    let rejectedForRuntime = false
-    try {
-      const result = await activeThreadCommands!.send(commandId, draft)
-      if (!result.commandResult) {
-        throw new Error(uiAttribute('消息提交结果暂时不可用，请稍后重试。'))
-      }
-      if (result.commandResult.status === 'rejected') {
-        const recovery = runtimeRecoveryFromCommandResult(threadId, result.commandResult)
-        if (recovery) {
-          rejectedForRuntime = true
-          setRuntimeRecovery(recovery)
-        }
-        throw new Error(commandFailureMessage(result.commandResult))
-      }
-      forgetMemberCreationDraft(threadId)
-      const threadMessageId = stringField(result.commandResult.payload, 'threadMessageId')
-      const deliveryIds = stringArrayField(result.commandResult.payload, 'deliveryIds')
-      const agentRunIds = stringArrayField(result.commandResult.payload, 'agentRunIds')
-      const sequence = typeof result.commandResult.payload.sequence === 'number'
-        ? result.commandResult.payload.sequence
-        : optimisticMessage.sequence
-      if (threadMessageId) {
-        setOptimisticThreadMessages((current) => [...current, {
-          threadId, commandId,
-          message: { ...optimisticMessage, id: threadMessageId, sequence, threadTurnId: null }
-        }])
-        void refreshActiveThreadSnapshot(threadId)
-          .then(async () => {
-            if (selectionGeneration !== campSelectionGeneration.current) return
-            setOptimisticThreadMessages((current) =>
-              current.filter((entry) => entry.commandId !== commandId)
-            )
-            if (selectionGeneration === campSelectionGeneration.current) await navigationRefreshCoordinator.invalidate({ scope: 'group', threadId })
-          })
-          .catch((nextError) => setError(errorMessage(nextError)))
-      }
-      return {
-        ...(threadMessageId ? { threadMessageId } : {}),
-        ...(threadMessageId && typeof result.commandResult.payload.sequence === 'number'
-          ? { publishedMessageSequence: sequence } : {}),
-        deliveryIds,
-        agentRunIds,
-        addressedAgentIds: optimisticMessage.addressedAgentIds
-      }
-    } catch (nextError) {
-      setOptimisticThreadMessages((current) =>
-        current.filter((entry) => entry.commandId !== commandId)
-      )
-      if (!rejectedForRuntime) notify(errorMessage(nextError))
-      throw nextError
-    } finally {
-      setBusy(null)
-    }
-  }
-
-  const withdrawThreadMessage = async (message: ThreadMessageView): Promise<void> => {
-    const threadId = activeThreadCommands?.threadId
-    if (!threadId || message.id.startsWith('optimistic:') || !message.canWithdraw) return
-    const result = await activeThreadCommands!.withdraw(newCommandId(), message)
-    if (result.status === 'rejected') throw new Error(commandFailureMessage(result))
-    setOptimisticThreadMessages((current) => current.filter((entry) => entry.message.id !== message.id))
-    await refreshActiveThreadSnapshot(threadId)
-  }
-
-  const resolveActionApproval = async (
-    approval: ActionApprovalView,
-    optionId: string
-  ): Promise<void> => {
-    const threadId = activeThreadCommands?.threadId, generation = campSelectionGeneration.current, requestOwner = client
-    if (!threadId || campSnapshotRef.current?.thread.id !== threadId) return
-    setBusy(`action-approval-${approval.id}`)
-    setError(null)
-    try {
-      const result = await activeThreadCommands!.resolveApproval(newCommandId(), approval, optionId)
-      if (result.status === 'rejected') throw new Error(commandFailureMessage(result))
-      const { snapshot } = await requestThreadProjection(threadId, 'open')
-      if (requestOwner !== threadClientOwner.current || generation !== campSelectionGeneration.current || activeThreadIdRef.current !== threadId
-        || snapshot.throughGlobalSequence < campEventSequenceMarker.current) return
-      campEventSequenceMarker.current = snapshot.throughGlobalSequence
-      setThreadSnapshot(snapshot)
-    } catch (nextError) {
-      if (requestOwner === threadClientOwner.current && generation === campSelectionGeneration.current && activeThreadIdRef.current === threadId) setError(errorMessage(nextError))
-    } finally {
-      setBusy(current => current === `action-approval-${approval.id}` ? null : current)
-    }
-  }
+  const { cancelAgentRun, changeDefaultLead, addThreadMembers, previewThreadMemberRemoval, removeThreadMember, sendThreadMessage, withdrawThreadMessage, resolveActionApproval } = threadWorkspaceActions({ client, activeThreadId, activeThreadCommands, campSnapshot, campSnapshotRef, activeThreadIdRef, campSelectionGeneration, threadClientOwner, campEventSequenceMarker, setThreadSnapshot, setBusy, setError, setToast, setRuntimeRecovery, setOptimisticThreadMessages, setCancellingRunIds, setConfirmingRunIds, refreshActiveThreadSnapshot, requestThreadProjection, navigationRefreshCoordinator, forgetMemberCreationDraft, notify })
 
   const changeAppearancePreferences = async (preferences: AppearancePreferences): Promise<AppearanceSnapshot> => {
     const snapshot = await uiPreferences.appearance.updatePreferences(preferences)
@@ -4413,7 +3867,6 @@ function BusinessAppContent({
   const activeThreadWorkspace = !startupGateVisible && generalPreferences && activeThreadId
     && visibleThreadSnapshot?.thread.id === activeThreadId ? (<ThreadWorkspace
             key={activeThreadId}
-            composerContext={canvasConversationVisible ? canvasConversation?.draftContext : undefined}
             missionBoard={activeMission ? <MissionIntro mission={activeMission} projects={displayNavigation?.projects ?? []}/> : null}
             previewTabsInPane={false}
             suppressExecutionAutoOpen={missionDrawerSuppressesExecutionAutoOpen(
@@ -4422,8 +3875,8 @@ function BusinessAppContent({
             )}
             snapshot={visibleThreadSnapshot}
             userAnchorNavigation={userAnchorNavigationFor(activeThreadId)}
-            memberCreation={!canvasConversationVisible && memberCreationDrafts.has(activeThreadId)}
-            initialComposerDraft={canvasConversationVisible ? null : memberCreationDrafts.get(activeThreadId)?.draft ?? campSnapshotState.initialComposerDraft}
+            memberCreation={memberCreationDrafts.has(activeThreadId)}
+            initialComposerDraft={memberCreationDrafts.get(activeThreadId)?.draft ?? campSnapshotState.initialComposerDraft}
             onPendingDraftChange={updateMemberCreationDraft}
             onInitialComposerDraftConsumed={consumeInitialComposerDraft}
             openCoverage={campSnapshot?.thread.id === activeThreadId
@@ -4457,23 +3910,22 @@ function BusinessAppContent({
             confirmingRunIds={activeConfirmingRunIds}
             onCancelAgentRun={cancelAgentRun}
             stopping={activeThreadStopping}
-            executionPlacement={mobile || canvasConversationVisible ? 'inspector' : generalPreferences.executionConsolePlacement}
+            executionPlacement={mobile ? 'inspector' : generalPreferences.executionConsolePlacement}
             onExecutionPlacementChange={changeExecutionConsolePlacement}
-            worldMapEnabled={!mobile && !canvasConversationVisible && generalPreferences.worldMapEnabled}
+            worldMapEnabled={!mobile && generalPreferences.worldMapEnabled}
             workspaceEntrySnapshotReady={!campSnapshotState.entryPreview}
             inspectorVisible={visibleThreadSnapshot.thread.activationState === 'active' && campInspectorVisible}
             inspectorTab={campInspectorTab}
             detailEntryHost={campDetailEntryHost}
             singleChatVisible={visibleThreadSnapshot.thread.activationState === 'active' && singleChatVisible}
             onOpenSingleChat={openSingleChat}
-            onCloseSingleChat={() => { if (canvasConversationVisible && canvasConversation?.reference.conversationId) { void closeCanvasConversation() } else setSingleChatThreadId(null) }}
+            onCloseSingleChat={() => setSingleChatThreadId(null)}
             onCloseInspector={() => setThreadInspectorThreadId(null)}
             onInspectorTabChange={setThreadInspectorTab}
             onOpenInspector={openThreadInspector}
             notificationFocus={notificationFocus}
             onNotificationFocusPresented={completeNotificationNavigation}
             singleChatTarget={singleChatNotificationTarget}
-            singleChatBoundConversationId={canvasConversationVisible ? canvasConversation?.reference.conversationId ?? undefined : undefined}
             onVisibleSingleChatSources={setVisibleSingleChatSources}
             onVisibleNotificationSources={setVisibleNotificationSources}
             runtimeRecovery={runtimeRecovery?.threadId === activeThreadId ? runtimeRecovery : null}
@@ -4492,7 +3944,7 @@ function BusinessAppContent({
       initialAction={projectGroupInitialAction}
       onSave={saveProjectGroupLayout} onRefresh={refreshProjectGroups}
       onClose={() => { if (projectGroupScopeRef.current === projectGroupScope) { projectGroupsOwnerRef.current = null; setProjectGroupsOwner(null) } }} />}
-    <FilePreviewProvider api={environment.files} threadId={view === 'camp' || canvasConversationVisible ? activeThreadId : null} resolvedTheme={appearance.resolvedTheme}
+    <FilePreviewProvider api={environment.files} threadId={view === 'camp' ? activeThreadId : null} resolvedTheme={appearance.resolvedTheme}
       missionActivity={activeMission && view === 'camp' ? <MissionActivityDocument mission={activeMission} agents={agents} onSource={missionSource} onNotify={notify} onWorkspaceCleanupRequested={refreshMissionAfterWorkspaceCleanup}/> : null}>
     <MissionInteractionProvider missions={missionList.missions} projects={displayNavigation?.projects ?? []} agents={agents} installations={installations} onChanged={refreshMission} onWorkspaceCleaned={refreshMissionAfterWorkspaceCleanup} onDeleted={onMissionDeleted} onOpen={mission => { void openMission(mission).catch(error => notifyError(missionError(error))) }} onError={notifyError}>
     <NavigationShell platform={client.platform} settings={view === 'settings'} navigation={desktopNavigation} nativeWindowControls={desktop?.windowControls} browser={!desktop} disabled={startupStatus !== 'resolved' || shuttingDown} className={view === 'camp' && !missionDrawer ? 'app-shell-camp' : ''} data-mobile-view={mobile ? view : undefined} data-mobile-settings-list={mobile && view === 'settings' && mobileSettingsList || undefined}>
@@ -4569,9 +4021,21 @@ function BusinessAppContent({
 
         {!startupGateVisible && view === 'canvas' && <>
           {mobile && <MobilePageHeader title={uiAttribute('无限画布')} onOpenMenu={openMobileMenu} menuOpen={mobileConversationDrawerOpen} triggerRef={mobileConversationListButtonRef} />}
+          {[...new Set(canvasConversations.state.instances.map(instance => instance.target.reference.threadId))].map(threadId => <CanvasThreadReader key={threadId} threadId={threadId} reads={threadProjections} />)}
           <CanvasWorkspace agents={agents} theme={appearance.resolvedTheme}
-            conversation={{ target: canvasConversationClient === client ? canvasConversation : null, content: canvasConversationVisible ? activeThreadWorkspace : null, opening: canvasConversationBusy,
-              open: presentCanvasConversation, close: closeCanvasConversation }}
+            conversation={{ instances: canvasConversations.state.instances.map(instance => ({ key: instance.key, target: instance.target,
+              busy: canvasConversations.state.busyKeys.includes(instance.key), content: canvasConversations.controller.current && <CanvasThreadWorkspace
+                instance={instance} controller={canvasConversations.controller.current} reads={threadProjections} files={environment.files}
+                theme={appearance.resolvedTheme} agents={agents} installations={installations} liveRuntimeEvents={liveRuntimeEvents}
+                navigation={navigationRefreshCoordinator} onPendingLeave={settlePendingThreadOnLeave} onForgetMemberCreation={forgetMemberCreationDraft}
+                onConfigureRuntime={configureMemberRuntime} onOpenMotionSettings={() => { void openMotionSettings() }} onNotify={notify} onNotifyError={notifyError} /> })),
+              opening: canvasConversations.state.opening, issue: canvasConversations.state.issue,
+              open: target => canvasConversations.controller.current?.open(target) ?? Promise.resolve(false),
+              close: keys => canvasConversations.controller.current?.close(keys) ?? Promise.resolve(true),
+              prepare: async keys => {
+                if (!canvasConversations.controller.current) throw new Error(uiAttribute('画板页面尚未准备好。'))
+                return canvasConversations.controller.current.prepare(keys)
+              } }}
             navigationPreferences={navigationPreferences}
             onProjectLayout={saveProjectGroupLayout}
             onRefreshProjectGroups={refreshProjectGroups}
@@ -4768,7 +4232,7 @@ function BusinessAppContent({
       />
       {desktop && <AppUpdatePrompt
         snapshot={appUpdates.snapshot}
-        campComposerVisible={view === 'camp' || canvasConversationVisible}
+        campComposerVisible={view === 'camp' || view === 'canvas' && canvasConversations.state.instances.length > 0}
         blocked={notificationHeadsUpVisible
           || newConversationOpen
           || shuttingDown

@@ -62,12 +62,13 @@ type Presentation = CanvasSurfaceProps & {
   beginGesture(owner?: string): number | null
   resize(row: CanvasNode, geometry: { x: number; y: number; width: number; height: number }, revision: number | null): void
 }
+const EMPTY_CONVERSATIONS: CanvasConversationBridge['instances'] = []
 const PresentationContext = createContext<Presentation | null>(null)
 
 function CanvasCard({ data, selected }: NodeProps<FlowNode>): React.JSX.Element {
   const actions = useContext(PresentationContext)!
   const resizeRevision = useRef<number | null>(null)
-  const expandedConversation = Boolean(actions.conversation?.target?.presentation === 'inline' && canvasConversationMatches(data.row, actions.conversation.target))
+  const expandedConversation = Boolean(actions.conversation?.instances.some(item => item.target.presentation === 'inline' && canvasConversationMatches(data.row, item.target)))
   const row = data.row, d = row.data, region = isRegionKind(d.kind)
   const member = actions.agents.find(item => item.agentId === d.agentId)
   const group = d.kind === 'group' ? actions.groups?.find(item => item.id === d.folderGroupId) : undefined
@@ -174,11 +175,11 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
   [props.resolvedMembers, rows, catalog.items, catalog.complete, catalog.error, props.groups, folderResolutions, language])
   const regions = useMemo(() => frozenMembers ? new Map([...liveRegions, ...frozenMembers]) : liveRegions, [liveRegions, frozenMembers])
   const expanded = useMemo(() => new Set(view.expandedRegions), [view.expandedRegions])
-  const activeConversation = props.conversation?.target
-  const activeConversationRow = activeConversation?.boardId === props.boardId ? rows.find(row => canvasConversationMatches(row, activeConversation)) : undefined
+  const conversationInstances = props.conversation?.instances ?? EMPTY_CONVERSATIONS
+  const orphanedConversations = conversationInstances.filter(item => item.target.boardId === props.boardId && !rows.some(row => canvasConversationMatches(row, item.target)))
   const derived = useMemo<FlowNode[]>(() => rows.flatMap(row => {
     const d = row.data, region = isRegionKind(d.kind)
-    const inline = activeConversation?.presentation === 'inline' && canvasConversationMatches(row, activeConversation)
+    const inline = conversationInstances.some(item => item.target.presentation === 'inline' && canvasConversationMatches(row, item.target))
     const width = inline ? Math.max(520, d.width) : region && d.gridColumns > 0 ? regionWidthForColumns(d.gridColumns) : d.kind === 'conversation' ? CARD_WIDTH : d.width
     let height = d.height
     if (region) {
@@ -205,7 +206,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
         ariaLabel: uiAttribute('区域对话：{0}。可拖动，或按 Tab 使用卡片操作。', regions.get(row.id)?.references[index]?.label ?? uiAttribute('对话')),
         dragHandle: '.canvas-card-handle', connectable: false, deletable: false, zIndex: 2 }
     })]
-  }), [rows, selected, expanded, regions, activeConversation])
+  }), [rows, selected, expanded, regions, conversationInstances])
   currentDerived.current = derived
   useEffect(() => { if (!dragging.current) setNodes(derived) }, [derived])
   useEffect(() => { saveCanvasViewState(storage, props.scope, props.boardId, view) }, [storage, view, props.scope, props.boardId])
@@ -232,10 +233,13 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     try {
       if (!canvasMemberMutationSupported(mutation, graph.snapshot?.memberTransferVersion)) throw new Error(uiAttribute('当前 Core 不支持原子成员转移，请升级服务后重试。'))
       const bridge = bridgeRef.current
-      if (bridge?.target && canvasMutationRemovesConversation(mutation, bridge.target) && !await bridge.close()) throw new Error(uiAttribute('当前对话输入尚未保存，请处理后重试。'))
-      const receipt = await graph.apply(mutation, revision)
-      settlePanel(receipt)
-      return receipt
+      const affected = bridge?.instances.filter(item => item.target.boardId === props.boardId && canvasMutationRemovesConversation(mutation, item.target)).map(item => item.key) ?? []
+      const prepared = affected.length ? await bridge!.prepare(affected) : null
+      try {
+        const receipt = await graph.apply(mutation, revision)
+        settlePanel(receipt)
+        return receipt
+      } finally { prepared?.complete(false) }
     } catch (error) {
       if (!graph.hasUnsettled()) panelCommand.current = false
       setIssue(readErrorMessage(error)); throw error
@@ -323,12 +327,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     if (mutation) mutate(mutation)
     else if (items.length) setIssue(uiAttribute('所选对话或成员引用超过200个，请减少选择。'))
   }
-  const error = issue || (graph.readError ? readErrorMessage(graph.readError) : null)
-  const conversationFlowNode = activeConversationRow ? nodes.find(node => node.id === activeConversationRow.id) : null
-  const conversationGeometry = canvasConversationGeometry(activeConversationRow && activeConversation?.presentation === 'inline' ? {
-    x: conversationFlowNode?.position.x ?? activeConversationRow.data.x, y: conversationFlowNode?.position.y ?? activeConversationRow.data.y,
-    width: conversationFlowNode?.width ?? activeConversationRow.data.width, height: conversationFlowNode?.height ?? activeConversationRow.data.height
-  } : null, viewport, stageSize)
+  const error = issue || props.conversation?.issue || (graph.readError ? readErrorMessage(graph.readError) : null)
   const recovery = graph.pending && <div className="canvas-notice" role="status"><UiText zh={graph.pending.state === 'unknown' ? '原操作结果待核对，请先核对或重试原操作。' : '正在保存画布…'} />
     {graph.pending.state === 'unknown' && <><button type="button" onClick={() => { void recover(false) }}><UiText zh="核对结果" /></button>
       <button type="button" onClick={() => { void recover(true) }}><UiText zh="重试原操作" /></button></>}
@@ -392,6 +391,10 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     {error && <div className="canvas-notice" role="alert">{error}<button type="button" onClick={() => { void graph.refresh().catch(() => undefined) }}><UiText zh="重新读取" /></button></div>}
     {!editor && !deletion && recovery}
     {(presenting || props.conversation?.opening) && <p className="canvas-notice" role="status"><UiText zh="正在处理画布对话…" /></p>}
+    {orphanedConversations.length > 1 && <div className="canvas-notice" role="status"><UiText zh="这些卡片已变更，输入仍保留。选择需要查看的对话。" />
+      {orphanedConversations.map(item => <button type="button" key={item.key} disabled={props.conversation?.opening}
+        onClick={() => { void props.conversation?.open({ ...item.target, presentation: 'drawer' }) }}>{title(item.target.reference)}</button>)}
+    </div>}
     {graph.loading && !graph.snapshot && <p className="canvas-notice" role="status"><UiText zh="正在读取画布…" /></p>}
     {!graph.loading && graph.snapshot?.board && !rows.length && <p className="canvas-empty-hint"><UiText zh="从添加节点开始，也可以把对话整理到同一片画布。" /></p>}
     {!graph.loading && graph.snapshot && !graph.snapshot.board && <p className="canvas-notice"><UiText zh="此画板已被删除，请选择其他画板。" /></p>}
@@ -458,11 +461,18 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
           {guides.map((guide, i) => <line key={i} x1={guide.axis === 'x' ? guide.at : guide.from} x2={guide.axis === 'x' ? guide.at : guide.to}
             y1={guide.axis === 'y' ? guide.at : guide.from} y2={guide.axis === 'y' ? guide.at : guide.to} vectorEffect="non-scaling-stroke" />)}
         </svg>
-          {props.conversation?.target?.boardId === props.boardId && <div className="canvas-conversation-overlay"
-            style={conversationGeometry}>
-            <CanvasConversationFrame bridge={props.conversation} title={title(props.conversation.target.reference)} orphaned={!activeConversationRow}
-              onOpenWorkspace={() => props.onOpenReference(props.conversation!.target!.reference)} />
-          </div>}
+          {conversationInstances.filter(instance => instance.target.boardId === props.boardId).map((instance, index) => {
+            const row = rows.find(row => canvasConversationMatches(row, instance.target))
+            const flowNode = row && nodes.find(node => node.id === row.id)
+            const geometry = canvasConversationGeometry(row && instance.target.presentation === 'inline' ? {
+              x: flowNode?.position.x ?? row.data.x, y: flowNode?.position.y ?? row.data.y,
+              width: flowNode?.width ?? row.data.width, height: flowNode?.height ?? row.data.height
+            } : null, viewport, stageSize)
+            return <div key={instance.key} className="canvas-conversation-overlay" style={{ ...geometry, zIndex: 10 + index }}>
+              <CanvasConversationFrame bridge={props.conversation!} instance={instance} title={title(instance.target.reference)} orphaned={!row}
+                onOpenWorkspace={() => props.onOpenReference(instance.target.reference)} />
+            </div>
+          })}
         </ViewportPortal>
       </ReactFlow>
     </PresentationContext.Provider>

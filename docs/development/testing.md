@@ -1,7 +1,7 @@
 ---
 document_type: development-guide
 authority: test-policy-and-command-routing
-last_updated: 2026-10-12
+last_updated: 2026-10-15
 ---
 
 # 测试与 Smoke Test
@@ -13,6 +13,15 @@ last_updated: 2026-10-12
 小切片先编码/review、最低成本检查和本地commit，完整编译、staged全量路由、默认workspace与Actions
 集中到阶段候选；公共契约、安全/迁移或阻断后续开发时允许有原因的最小验证。
 以下owner、命令和测试准入规则继续有效，未执行的检查登记待验，不因减少触发次数而删测试或假报通过。
+
+I03 多卡输入的最低层 owner 为 `canvas-conversations-controller.test.ts`（精确上下文、全部准备回滚、模式切换与孤立输入保留）
+和 `thread-workspace-actions.test.ts`（不同 Thread 命令归属、冻结发送及拒绝/未知不清输入）。
+窗口预览生命周期继续扩展 `file-preview-resources.test.ts`，DOM scope 继续扩展 `FilePreviewTabs.test.ts`；
+原 `App.test.ts`、Thread 命令/读取/会话 owner 一并作相关回归，不新增平行执行或文件能力测试。
+浏览器隔离夹具实际挂载三个生产 Frame/ThreadWorkspace/Composer、模拟 Core/文件与内存编辑恢复，
+检查独立正文、原地/侧边保持编辑器与撤销、局部查找、关闭单卡及重开、精确文件内容、控件唯一性和缩放边界。
+内存夹具的重开不是磁盘/进程重启；它也没有挂载完整 ReactFlow/BusinessApp。真实 Core/文件授权、模型执行、
+可见通知、私有附件/quotes CAS、IME/触控、HTML规模及全平台验证仍保留到相应阶段候选。
 
 ## Rust 测试准入与退役门槛
 

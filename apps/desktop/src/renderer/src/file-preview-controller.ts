@@ -82,6 +82,8 @@ export interface FilePreviewOpenOptions {
 
 export interface FilePreviewContextValue {
   isCurrentThread?: boolean
+  domScope?: string
+  isFocusedSurface?: boolean
   tabs: PreviewTabModel[]
   activeTab: PreviewTabModel | null
   activeTabId: string | null
@@ -1008,6 +1010,7 @@ export function createFilePreviewSession(api: FilePreviewApi, threadId: string, 
     return result.ok && result.value.kind === 'file_preview' ? result.value.file : null
   }
   const withActionFile = async <T>(tabId: string, action: (file: ResolvedFilePreview) => Promise<FilePreviewOperationResult<T>>): Promise<FilePreviewOperationResult<T>> => {
+    await bindingPromiseRef.current
     const tab = tabsRef.current.find(entry => entry.id === tabId)
     if (tab?.kind !== 'file') return { ok: false, error: unavailableSourceError() }
     const file = tab.file ?? await restoreHandle(tab)
