@@ -22,6 +22,10 @@ Canvas `group.sourceMembers`扩展复用`canvas_node::tests::eight_kinds_preserv
 `canvas-conversation.test.ts`拥有公开/私有精确读取、Host/请求归属失效、运输错误、破坏性操作识别及相机几何；
 `thread-commands.test.ts`拥有Core client/Thread固定归属、交错命令、发送快照、原参数字节、缺源/错误Thread拒绝、运输未知不重发及名册CAS字段；
 共享格式/投影提取继续由原`App.test.ts`覆盖，保留原导出。测试仅使用模拟运输，不是实际Host、Runtime或多卡挂载证明。
+`thread-projection-store.test.ts`拥有每 client/Thread 的只读打开合并、刷新期间补读、失败保留/显式重试、
+schema/精确Thread/水位拒绝、历史请求与覆盖、过期分页丢弃、忘记/重启代次、挂载租约/订阅和五个空闲缓存预算。
+既有 `App.test.ts` 继续拥有页面投影/刷新/导航纯及静态行为；最小命令 `pnpm exec vitest run apps/desktop/src/renderer/src/thread-projection-store.test.ts apps/desktop/src/renderer/src/App.test.ts`。
+这些 mock 检查不证明实际Core重启、同时挂载多卡、可见通知、附件/流式或文件预览资格；完整接线仍须阶段验证。
 `single-chat-composer-store.test.ts`拥有私有正文的client/Thread隔离、镜像整表更新、单次发送互斥、较新输入保留、
 初始读取失败、保存失败/重试、pending key迁移和共享订阅生命周期；原`SingleChatPanel.test.ts`继续拥有私有面板。
 `canvas-composer-drafts.test.ts`拥有每卡规范归属、主会话隔离、既有格式往返、索引/内容单值写入、单卡删除、

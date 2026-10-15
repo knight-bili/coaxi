@@ -1,6 +1,7 @@
+import { ThreadProjectionStore, ThreadProjectionSupersededError } from './thread-projection-store'
 import { threadCommands } from './thread-commands'
 import {
-  campOpenProjectionAsSnapshot, optimisticThreadMessage, commandFailureMessage, membershipConflictCode,
+  optimisticThreadMessage, commandFailureMessage, membershipConflictCode,
   runtimeRecoveryFromCommandResult, asRecord, stringField, stringArrayField, errorMessage, type ThreadSurfaceSnapshot
 } from './thread-workspace-data'
 export {
@@ -44,7 +45,6 @@ import type {
   ThreadCreationPreflight,
   ThreadComposerDraftView,
   ThreadDeletionIssue,
-  ThreadMessagePage,
   ThreadMessageAroundSnapshot,
   ThreadMessageView,
   ThreadMemberRemovalPreview,
@@ -1157,7 +1157,9 @@ function BusinessAppContent({
   const campEventSequenceMarker = useRef(0)
   const campSelectionGeneration = useRef(0)
   const campOpenFeedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const campSnapshotCache = useRef(new Map<string, ThreadSurfaceSnapshot>())
+  const threadProjections = useMemo(() => new ThreadProjectionStore(client), [client])
+  useEffect(() => () => threadProjections.reset(), [threadProjections])
+  useEffect(() => activeThreadId ? threadProjections.retain(activeThreadId) : undefined, [threadProjections, activeThreadId])
   const campSnapshotRef = useRef<ThreadSurfaceSnapshot | null>(null)
   const campSnapshotEntryPreviewRef = useRef(false)
   const activeThreadIdRef = useRef<string | null>(null)
@@ -1217,11 +1219,12 @@ function BusinessAppContent({
     entryPreview = false,
     initialComposerDraft: ThreadComposerDraftView | null = null
   ): void => {
+    if (threadClientOwner.current !== client) return
+    if (snapshot && !entryPreview) snapshot = threadProjections.remember(snapshot)
     campSnapshotRef.current = snapshot
     campSnapshotEntryPreviewRef.current = entryPreview
-    if (snapshot) rememberThreadSnapshot(campSnapshotCache.current, snapshot)
     setThreadSnapshotState({ snapshot, entryPreview, initialComposerDraft })
-  }, [])
+  }, [client, threadProjections])
 
   const consumeInitialComposerDraft = useCallback((draft: ThreadComposerDraftView): void => {
     setThreadSnapshotState((current) => current.initialComposerDraft === draft
@@ -1384,18 +1387,20 @@ function BusinessAppContent({
     startedAt: number
     receivedAt: number
   }> => {
+    if (threadClientOwner.current !== client) throw new ThreadProjectionSupersededError()
+    if (mode === 'open') return threadProjections.open(threadId)
     const traceId = newCommandId()
     const startedAt = performance.now()
-    const method = mode === 'enter' ? 'threads.enter' : 'threads.open'
+    const method = 'threads.enter'
+    const epoch = threadProjections.epoch
     console.info(`[camp-open] trace=${traceId} stage=renderer_request method=${method}`)
-    const projection = mode === 'enter'
-      ? await client.request<ThreadOpenProjection>('threads.enter', {
-          traceId,
-          commandId: newCommandId(),
-          command: { threadId }
-        })
-      : await threadCommands(client, threadId).open(traceId)
-    if (projection.schemaVersion !== 8) throw new Error(uiAttribute('会话打开数据版本不兼容。'))
+    const projection = await client.request<ThreadOpenProjection>('threads.enter', {
+      traceId,
+      commandId: newCommandId(),
+      command: { threadId }
+    })
+    if (threadClientOwner.current !== client || epoch !== threadProjections.epoch || deletingThreadIdsRef.current.has(threadId)) throw new ThreadProjectionSupersededError()
+    const snapshot = threadProjections.accept(threadId, projection)
     const receivedAt = performance.now()
     console.info(
       `[camp-open] trace=${traceId} stage=renderer_received method=${method} `
@@ -1405,12 +1410,12 @@ function BusinessAppContent({
       + `evidence=${projection.executionEvidence.length}`
     )
     return {
-      snapshot: campOpenProjectionAsSnapshot(projection, campSnapshotRef.current),
+      snapshot,
       traceId,
       startedAt,
       receivedAt
     }
-  }, [client])
+  }, [client, threadProjections])
 
   useEffect(() => () => {
     notificationPresentationRef.current?.cancel()
@@ -1845,9 +1850,10 @@ function BusinessAppContent({
     transaction?: NavigationTransaction
   ): Promise<boolean> => {
     if (selectionGeneration !== campSelectionGeneration.current || (transaction && !transaction.isCurrent())) return false
+    const requestOwner = client
     const cachedSnapshot = activeThreadIdRef.current === threadId
       ? null
-      : recentThreadSnapshot(campSnapshotCache.current, threadId)
+      : threadProjections.peek(threadId)
     const previewSnapshot = campActivationPreview(
       campSnapshotRef.current,
       activeThreadIdRef.current,
@@ -1900,7 +1906,7 @@ function BusinessAppContent({
         threadId,
         options.reconcileDefaultLead === false ? 'open' : 'enter'
       )
-      if (selectionGeneration !== campSelectionGeneration.current || (transaction && !transaction.isCurrent())) {
+      if (requestOwner !== threadClientOwner.current || selectionGeneration !== campSelectionGeneration.current || (transaction && !transaction.isCurrent())) {
         return false
       }
       clearThreadOpenFeedback()
@@ -1927,6 +1933,7 @@ function BusinessAppContent({
       })
       return true
     } catch (nextError) {
+      if (requestOwner !== threadClientOwner.current || nextError instanceof ThreadProjectionSupersededError) return false
       if (selectionGeneration !== campSelectionGeneration.current) return false
       clearThreadOpenFeedback()
       if (transaction && !transaction.isCurrent()) return false
@@ -1942,7 +1949,7 @@ function BusinessAppContent({
       }
       return false
     }
-  }, [clearThreadOpenFeedback, navigationRefreshCoordinator, requestThreadProjection, setThreadSnapshot, userAnchorNavigationFor])
+  }, [client, threadProjections, clearThreadOpenFeedback, navigationRefreshCoordinator, requestThreadProjection, setThreadSnapshot, userAnchorNavigationFor])
 
   const activateThread = useCallback(async (
     threadId: string,
@@ -1980,17 +1987,18 @@ function BusinessAppContent({
   }), [activateThread])
 
   const refreshActiveThreadSnapshotOnce = useCallback(async (threadId: string): Promise<void> => {
-    const { snapshot } = await requestThreadProjection(threadId, 'open')
-    if (activeThreadIdRef.current !== threadId) return
-    if (snapshot.throughGlobalSequence < campEventSequenceMarker.current) return
-    campEventSequenceMarker.current = snapshot.throughGlobalSequence
-    setThreadSnapshot(snapshot)
-    setConfirmingRunIds(new Set())
-  }, [requestThreadProjection, setThreadSnapshot])
+    try {
+      const { snapshot } = await threadProjections.refresh(threadId)
+      if (threadClientOwner.current !== client || activeThreadIdRef.current !== threadId) return
+      if (snapshot.throughGlobalSequence < campEventSequenceMarker.current) return
+      campEventSequenceMarker.current = snapshot.throughGlobalSequence
+      setThreadSnapshot(snapshot)
+      setConfirmingRunIds(new Set())
+    } catch (error) { if (threadClientOwner.current === client && !(error instanceof ThreadProjectionSupersededError)) throw error }
+  }, [client, threadProjections, setThreadSnapshot])
 
-  const activeThreadRefreshCoordinator = useMemo(
-    () => createActiveThreadRefreshCoordinator(refreshActiveThreadSnapshotOnce),
-    [refreshActiveThreadSnapshotOnce]
+  const activeThreadRefreshCoordinator = useMemo<ActiveThreadRefreshCoordinator>(
+    () => ({ refresh: refreshActiveThreadSnapshotOnce }), [refreshActiveThreadSnapshotOnce]
   )
 
   const refreshActiveThreadSnapshot = useCallback(
@@ -1999,61 +2007,16 @@ function BusinessAppContent({
   )
 
   const loadEarlierThreadMessages = useCallback(async (): Promise<void> => {
-    const requestedSnapshot = campSnapshotRef.current
-    const coverage = requestedSnapshot?.openCoverage?.messages
-    const beforeSequence = coverage?.oldestLoadedSequence ?? null
-    if (!requestedSnapshot || !coverage?.hasEarlier || beforeSequence === null) return
-    const threadId = requestedSnapshot.thread.id
-    const selectionGeneration = campSelectionGeneration.current
-    const page = await client.request<ThreadMessagePage>('thread.messages.page', {
-      threadId,
-      beforeSequence,
-      throughGlobalSequence: requestedSnapshot.throughGlobalSequence,
-      limit: 50
-    })
-    if (
-      page.schemaVersion !== 1
-      || page.threadId !== threadId
-      || page.throughGlobalSequence !== requestedSnapshot.throughGlobalSequence
-      || page.requestedBeforeSequence !== beforeSequence
-      || page.hasMore !== (page.nextBeforeSequence !== null)
-      || page.messages.some((message) => message.sequence >= beforeSequence)
-    ) {
-      throw new Error(uiAttribute('较早消息数据不兼容，请重新打开会话。'))
-    }
-    if (selectionGeneration !== campSelectionGeneration.current) return
-    const current = campSnapshotRef.current
-    if (!current || current.thread.id !== threadId) return
-    const messagesById = new Map(current.messages.map((message) => [message.id, message]))
-    for (const message of page.messages) messagesById.set(message.id, message)
-    const messages = [...messagesById.values()].sort((left, right) =>
-      left.sequence - right.sequence || left.id.localeCompare(right.id)
-    )
-    const loadedCount = messages.length
-    const totalCount = page.hasMore
-      ? Math.max(current.openCoverage?.messages.totalCount ?? 0, loadedCount + 1)
-      : loadedCount
-    const omittedCount = Math.max(0, totalCount - loadedCount)
-    setThreadSnapshot({
-      ...current,
-      messages,
-      openCoverage: current.openCoverage
-        ? {
-            ...current.openCoverage,
-            messages: {
-              ...current.openCoverage.messages,
-              loadedCount,
-              totalCount,
-              omittedCount,
-              complete: !page.hasMore,
-              hasEarlier: page.hasMore,
-              oldestLoadedSequence: messages[0]?.sequence ?? null,
-              newestLoadedSequence: messages.at(-1)?.sequence ?? null
-            }
-          }
-        : undefined
-    })
-  }, [setThreadSnapshot])
+    const threadId = campSnapshotRef.current?.thread.id
+    if (!threadId) return
+    const generation = campSelectionGeneration.current
+    let snapshot: ThreadSurfaceSnapshot | null
+    try { snapshot = await threadProjections.loadEarlier(threadId) }
+    catch (error) { if (error instanceof ThreadProjectionSupersededError) return; throw error }
+    if (!snapshot || client !== threadClientOwner.current || generation !== campSelectionGeneration.current
+      || activeThreadIdRef.current !== threadId) return
+    setThreadSnapshot(snapshot)
+  }, [client, threadProjections, setThreadSnapshot])
 
   const refreshVisibleNotificationThread = useCallback(async (
     _episode: NotificationEpisodeView,
@@ -2583,6 +2546,7 @@ function BusinessAppContent({
           setState('error')
           setError(stringField(params, 'message') ?? uiAttribute('后台服务已停止。'))
         } else if (runtimeStatus === 'starting' || runtimeStatus === 'restarting') {
+          threadProjections.reset()
           campViewedAcknowledgements.current.clear()
           setOpenedNavigationRow(null)
           setState('loading')
@@ -2651,6 +2615,7 @@ function BusinessAppContent({
     return () => { unsubscribe?.(); liveEvents.dispose() }
   }, [
     activeThreadRefreshCoordinator,
+    threadProjections,
     loadHealth,
     loadInstallations,
     loadAgents,
@@ -2735,7 +2700,7 @@ function BusinessAppContent({
     const threadId = activeThreadId
 
     const refreshSnapshot = async (): Promise<void> => {
-      const { snapshot } = await requestThreadProjection(threadId, 'open')
+      const { snapshot } = await threadProjections.refresh(threadId)
       if (cancelled) return
       if (snapshot.throughGlobalSequence < campEventSequenceMarker.current) return
       campEventSequenceMarker.current = snapshot.throughGlobalSequence
@@ -2786,7 +2751,7 @@ function BusinessAppContent({
           campEventSequenceMarker.current = batch.nextGlobalSequence
         }
       } catch (nextError) {
-        if (!cancelled) setError(errorMessage(nextError))
+        if (!cancelled && !(nextError instanceof ThreadProjectionSupersededError)) setError(errorMessage(nextError))
       } finally {
         if (!cancelled) timer = setTimeout(() => void poll(), 1_400)
       }
@@ -2797,7 +2762,7 @@ function BusinessAppContent({
       cancelled = true
       if (timer) clearTimeout(timer)
     }
-  }, [activeThreadId, campSnapshot?.thread.id, requestThreadProjection, setThreadSnapshot])
+  }, [activeThreadId, campSnapshot?.thread.id, requestThreadProjection, threadProjections, setThreadSnapshot])
 
   useEffect(() => client.onInvalidated?.(() => {
     campViewedAcknowledgements.current.clear()
@@ -3318,7 +3283,7 @@ function BusinessAppContent({
           }
           const availableSnapshot = campSnapshotRef.current?.thread.id === action.threadId
             ? campSnapshotRef.current
-            : campSnapshotCache.current.get(action.threadId) ?? null
+            : threadProjections.peek(action.threadId)
           const run = await resolveNotificationAgentRun(client, action.threadId, action.agentRunId, availableSnapshot)
           if (!run) {
             result = {
@@ -3901,7 +3866,7 @@ function BusinessAppContent({
     const discardComposerAttachments = client.composerAttachments.discard?.(threadId)
     if (discardComposerAttachments) void discardComposerAttachments.catch(() => undefined)
     forgetFilePreviewSession(threadId, activeThreadIdRef.current === threadId)
-    campSnapshotCache.current.delete(threadId)
+    threadProjections.forget(threadId)
     forgetRemovedThreadSurface(threadId)
   }
 
@@ -3924,7 +3889,7 @@ function BusinessAppContent({
     }
     if (result.status !== 'rejected') {
       clearLocalThreadComposerDraft(draft.threadId, threadComposerDraftStorage(client.editingRecovery))
-      campSnapshotCache.current.delete(draft.threadId)
+      threadProjections.forget(draft.threadId)
       forgetMemberCreationDraft(draft.threadId)
     }
     if (result.status !== 'rejected') forgetRemovedThreadSurface(draft.threadId)

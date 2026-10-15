@@ -130,6 +130,14 @@ Board 删除在同一事务删除它的节点并保留 Board tombstone，不恢�
 发送格式和投影转换从既有页面提取、函数体保持不变；原导出保留兼容，发送参数在运输前复制，编辑器后续修改不改变已提交内容。
 命令工厂不产生重试/回执权威或替代生命周期；Core 仍核对授权、CAS、输入准入和持久结果，呈现 owner 负责拒绝迟到结果。
 
+现有只读入口、刷新和分页已接同一 client 所有的 `ThreadProjectionStore`；每 Thread 独立水位、历史、错误和在途队列。
+同 Thread 的普通打开复用在途读取；刷新信号使该读取结束后补读，多个信号合并，只有新信号才补读，运输失败不自动无限重试。
+显式 enter 的投影可交回该 owner，但 owner 本身只调用 `threads.open`、`thread.messages.page`，不 enter、建会话、启动 Runtime 或确认通知。
+有效历史沿用原排序/coverage 合并；分页的请求水位被新投影越过时不采纳，旧 schema/Thread/游标或更晚序号仍拒绝。
+服务重启推进本机读取代次、清快照并保留已挂载租约与订阅；删除精确资源使原在途结果失效。
+仅五个空闲缓存受 LRU 预算限制，挂载/订阅及读取中的实例不被该预算驱逐。换 client 新建 store，不跨 Host/Owner 采纳缓存。
+本接线尚未将事件、可见通知、文件预览或全部 leave guard 分发给同时挂载的多张卡片，这些仍属于 I03 的完整目标。
+
 固定 Codeg `canvas-conversation-surface.tsx` 的 `draftStorageKey=canvas-draft:<contextKey>` 与 `attachmentTabId=contextKey`
 明确每张卡片的输入独立，不能由同一 Thread 的消息共享推导出所有卡片共享一份草稿。该核查纠正先前检查点中的共享草稿计划，
 不缩减多卡完整编辑能力。卡片上下文使用 Host/Owner、Core dataDir、Board、真实 pin ID、Thread 和精确私有 Conversation 的规范元组；

@@ -1,7 +1,7 @@
 ---
 document_type: architecture
 authority: integration-canvas-boundaries
-last_updated: 2026-10-14
+last_updated: 2026-10-15
 ---
 
 # Codeg canvas integration
@@ -58,13 +58,22 @@ shelf packing. Overlap follows actual paint order rather than treating Core UUID
 Thread and exact private-conversation references remain distinct. The client view-state module keeps
 viewport/expansion keys under explicit Host/Core/board identity, with a minimap preference shared only
 within that Host/Core. It does not adopt the donor's unscoped numeric-ID keys or persist Runtime sessions.
-Unsent conversation drafting still joins the existing Composer authority in subsequent UI work.
+Unsent input now uses the existing Composer with independent Host/Core/board/pin/reference draft contexts;
+the same card's inline/drawer presentations reuse its editor. Different cards do not merge unsent input.
 
 References to AI members, Mission, Task, Thread and project files identify existing Core objects;
 the canvas does not own copied business status or a second execution engine. Resolve visibility
 and actions through the object's existing permissions and current snapshot. Missing or removed
 objects must be visibly unavailable; never recreate one because its card survived. A board/node
 operation may change layout without changing or deleting the referenced business object.
+
+会话读取由 client 所有的 `ThreadProjectionStore` 按 Thread 隔离，现有页面的只读打开、刷新、缓存和历史分页已接入。
+同 Thread 的同时打开合并运输；刷新发生在读取过程中时追加一次最新读取，不把较早的在途请求当刷新完成。
+各 Thread 水位与历史窗口独立，未知/失败保留最后有效快照；分页被新水位越过后丢弃，防止旧内容覆盖已更新读取。
+五个空闲快照沿用原缓存预算，已挂载/订阅或正在读取的 Thread 不受该空闲上限限制。
+显式 `threads.enter` 继续由原导航入口发出，只把其有效结果交回同一读取 owner；画布恢复没有 enter、Runtime 启动或通知确认副作用。
+服务重启清快照、推进代次并保留挂载/订阅关系；旧 client、删除资源和旧代次结果不能覆盖新读取。
+实际多卡 UI、全部卡片事件分发、各 Thread 文件预览与离开保护聚合仍需接线及阶段资格验证，不能以当前单聚焦入口代替。
 
 File nodes use the existing file-preview handle/root grant and actual path validation. A stored
 path is not file authorization. Terminal nodes keep launch intent and geometry, never a durable

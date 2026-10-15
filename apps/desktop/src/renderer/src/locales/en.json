@@ -3990,5 +3990,6 @@
   "画布输入与当前会话不一致。": "Canvas input does not belong to the current conversation.",
   "展开输入前需要核对服务信息，请重试画板连接。": "Verify the service before expanding input. Retry the board connection.",
   "服务信息未核对，暂时不能展开对话输入。": "The service has not been verified. Conversation input cannot be expanded yet.",
-  "重新核对服务": "Verify service again"
+  "重新核对服务": "Verify service again",
+  "会话读取已失效，请重新打开。": "The conversation read is no longer current. Open the conversation again."
 }
