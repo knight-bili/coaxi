@@ -305,6 +305,9 @@ pub fn bind(
             }
             UploadTarget::SingleChatPending { conversation_id, pending_input_id, edit_token, composer_scope: None } => crate::single_chat::SingleChatService::for_client(client.clone()).commit_pending_source_attachment_in_transaction(transaction, &intent.camp_id, conversation_id, pending_input_id, intent.expected_revision, edit_token, source.clone())?,
         }
+        if let UploadTarget::SingleChat { conversation_id, .. } | UploadTarget::SingleChatPending { conversation_id, .. } = &intent.target {
+            crate::private_source_observation::capture_upload(transaction,conversation_id,&source,&intent.sha256)?;
+        }
         let payload = if matches!(intent.target, UploadTarget::Camp) {
             json!({"attachmentRefId":intent.command_id, "source":source})
         } else {

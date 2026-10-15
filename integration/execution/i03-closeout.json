@@ -29,7 +29,12 @@
         "孤立Core/本机正文及冲突统一恢复"
       ],
       "done_when": "本阶段完整使用流程及PC01-PC24适用工程验证有当前源码证据，外部环境缺项明确单列",
-      "latest_partial_evidence": "i03-private-native-upload-result.json"
+      "latest_partial_evidence": "i03-private-source-observation-result.json",
+      "remaining_runtime_risks": [
+        "Native目录请求和共享界面未接",
+        "实际资源/预览未验",
+        "大材料扫描与事务锁影响待规模整改"
+      ]
     },
     {
       "id": "I03-C02",

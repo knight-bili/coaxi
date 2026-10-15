@@ -742,6 +742,7 @@ fn send_consumes_only_the_registered_scope_and_keeps_one_private_fifo_and_legacy
     verify_application_routes(&mut f, &snapshot.pending_inputs.items[0]);
     verify_scoped_pending_edits(&mut f);
     verify_private_upload_bindings();
+    verify_private_source_observations();
     assert_eq!(
         serde_json::to_value(&quote.model_projection())
             .unwrap()
@@ -1218,7 +1219,28 @@ fn verify_private_upload_bindings() {
         conversation_id: f.conversation.clone(),
         composer_scope: Some(f.scopes[1].clone()),
     };
-    assert!(web_upload::reconcile(&f.database, &client, changed_target).is_err());
+    // 继承 Gateway 的同编号首次结果规则；改载荷不把附件重新绑定到另一位置。
+    let original_replay = web_upload::reconcile(&f.database, &client, changed_target)
+        .unwrap()
+        .unwrap();
+    assert!(original_replay.replayed);
+    assert_eq!(
+        serde_json::to_value(&original_replay.result).unwrap(),
+        serde_json::to_value(&first.result).unwrap()
+    );
+    assert!(
+        read_draft(
+            &f.database,
+            &client,
+            &f.thread,
+            &f.conversation,
+            Some(&f.scopes[1])
+        )
+        .unwrap()
+        .draft
+        .attachments
+        .is_empty()
+    );
     assert!(
         web_upload::reconcile(
             &f.database,
@@ -1419,6 +1441,181 @@ fn verify_private_upload_bindings() {
             .query_row("SELECT COUNT(*) FROM event_log", [], |row| row
                 .get::<_, i64>(0))
             .unwrap()
+    );
+}
+
+fn verify_private_source_observations() {
+    use crate::local_attachment_snapshot::observe_private_source;
+    use crate::private_source_observation::changed_source;
+    let mut f = fixture();
+    add_default_source(&mut f, "observed.txt");
+    let path = f.database.directory().join("observed.txt");
+    let original = observe_private_source(&path).unwrap();
+    assert_eq!(original, observe_private_source(&path).unwrap());
+    apply(
+        &mut f,
+        0,
+        0,
+        PrivateComposerAction::AdoptLegacyMaterials {
+            expected_source_revision: 1,
+            target_body: "".into(),
+        },
+    );
+    let send = envelope(
+        Some(&f.thread),
+        SendSingleChatMessageCommand {
+            draft_client: Default::default(),
+            composer_scope: Some(f.scopes[0].clone()),
+            camp_id: f.thread.clone(),
+            conversation_id: f.conversation.clone(),
+            body: "核对这份文件".into(),
+            draft_revision: 1,
+        },
+    );
+    std::fs::write(&path, vec![b'x'; "observed.txt".len()]).unwrap();
+    let rejected = SingleChatService::default()
+        .send(&mut f.database, &send)
+        .unwrap();
+    assert_eq!(
+        rejected.result.code,
+        "single_chat.attachment_source_changed"
+    );
+    assert_eq!(rejected.result.status, CommandResultStatus::Rejected);
+    assert_eq!(read(&f, 0).draft.revision, 1);
+    assert_eq!(read(&f, 0).draft.attachments.len(), 1);
+    let snapshot = SingleChatService::default()
+        .snapshot(&f.database, &f.conversation)
+        .unwrap()
+        .unwrap();
+    assert!(snapshot.agent_runs.is_empty());
+    assert!(snapshot.pending_inputs.items.is_empty());
+    std::fs::write(&path, b"observed.txt").unwrap();
+    let replay = SingleChatService::default()
+        .send(&mut f.database, &send)
+        .unwrap();
+    assert!(replay.replayed);
+    assert_eq!(replay.result.code, rejected.result.code);
+    let saved = f.database.directory().join("observed-original.txt");
+    std::fs::rename(&path, &saved).unwrap();
+    std::fs::write(&path, b"observed.txt").unwrap();
+    let replacement = observe_private_source(&path).unwrap();
+    assert_eq!(replacement.content_digest, original.content_digest);
+    assert_ne!(replacement.identity_digest, original.identity_digest);
+
+    let tree = f.database.directory().join("directory-source");
+    std::fs::create_dir_all(tree.join("empty")).unwrap();
+    std::fs::write(tree.join("b.txt"), b"bravo").unwrap();
+    std::fs::write(tree.join("a.txt"), b"alpha").unwrap();
+    let first = observe_private_source(&tree).unwrap();
+    assert_eq!(first.file_count, 2);
+    assert_eq!(first, observe_private_source(&tree).unwrap());
+    let source = observe_source_attachment(&tree, "directory-source", None).unwrap();
+    let revision = default_revision(&f);
+    SingleChatService::default()
+        .add_source_attachment(&mut f.database, &f.conversation, revision, source.clone())
+        .unwrap();
+    let check = |f: &Fixture| {
+        changed_source(
+            f.database.connection(),
+            &f.conversation,
+            std::slice::from_ref(&source),
+            true,
+        )
+        .unwrap()
+    };
+    assert!(check(&f).is_none());
+    apply(&mut f, 1, 0, PrivateComposerAction::RegisterScope);
+    let service = SingleChatService::default();
+    let start = envelope(
+        Some(&f.thread),
+        SendSingleChatMessageCommand {
+            draft_client: Default::default(),
+            composer_scope: Some(f.scopes[1].clone()),
+            camp_id: f.thread.clone(),
+            conversation_id: f.conversation.clone(),
+            body: "先执行的问题".into(),
+            draft_revision: 0,
+        },
+    );
+    assert_eq!(
+        service.send(&mut f.database, &start).unwrap().result.status,
+        CommandResultStatus::Accepted
+    );
+    let queued = envelope(
+        Some(&f.thread),
+        SendSingleChatMessageCommand {
+            draft_client: Default::default(),
+            composer_scope: None,
+            camp_id: f.thread.clone(),
+            conversation_id: f.conversation.clone(),
+            body: "目录材料的问题".into(),
+            draft_revision: default_revision(&f),
+        },
+    );
+    assert_eq!(
+        service.send(&mut f.database, &queued).unwrap().result.code,
+        "single_chat.pending_input_queued"
+    );
+    std::fs::write(tree.join("a.txt"), b"other").unwrap();
+    assert_eq!(check(&f), Some(source.id.clone()));
+    f.database
+        .connection()
+        .execute(
+            "UPDATE agent_run SET status='succeeded',ended_at=updated_at WHERE conversation_id=?1",
+            [&f.conversation],
+        )
+        .unwrap();
+    let mut ready = crate::single_chat::ready_pending_inputs(&f.database).unwrap();
+    assert_eq!(ready.len(), 1);
+    let publication = envelope(Some(&f.thread), ready.remove(0));
+    let blocked = service
+        .publish_pending_input(&mut f.database, &publication)
+        .unwrap();
+    assert_eq!(blocked.result.status, CommandResultStatus::Rejected);
+    assert_eq!(blocked.result.code, "single_chat.attachment_source_changed");
+    let retained = service
+        .snapshot(&f.database, &f.conversation)
+        .unwrap()
+        .unwrap();
+    assert_eq!(retained.pending_inputs.items[0].state, "needs_repair");
+    assert_eq!(
+        retained.pending_inputs.items[0].attachments[0].id,
+        source.id
+    );
+    assert_eq!(retained.agent_runs.len(), 1, "目录变化不能启动第二个Run");
+    assert!(
+        crate::single_chat::ready_pending_inputs(&f.database)
+            .unwrap()
+            .is_empty(),
+        "源失效队首进入待修复，不能形成自动重试循环"
+    );
+    // 旧对象保留在树外，验证不同现存对象的身份，不依赖时间精度或删除后的编号复用。
+    std::fs::rename(tree.join("a.txt"), f.database.directory().join("old-a.txt")).unwrap();
+    std::fs::write(tree.join("a.txt"), b"alpha").unwrap();
+    let next = observe_private_source(&tree).unwrap();
+    assert_ne!(
+        first.content_digest, next.content_digest,
+        "恢复相同字节不重置已改变的目录成员身份"
+    );
+    std::fs::rename(tree.join("empty"), tree.join("renamed-empty")).unwrap();
+    assert_ne!(
+        next.content_digest,
+        observe_private_source(&tree).unwrap().content_digest
+    );
+    assert!(f.database.connection().execute("UPDATE single_chat_source_observation SET source_path='forged' WHERE conversation_id=?1",[&f.conversation]).is_err());
+    let source_id = read(&f, 0).draft.attachments[0].id.clone();
+    f.database.connection().execute("DELETE FROM single_chat_source_observation WHERE conversation_id=?1 AND source_ref_id=?2",params![f.conversation,source_id]).unwrap();
+    let raw:String=f.database.connection().query_row("SELECT source_attachments_json FROM single_chat_composer_draft WHERE conversation_id=?1 AND client_id='desktop' AND scope_key=?2",params![f.conversation,f.scopes[0].storage_key().unwrap()],|row|row.get(0)).unwrap();
+    let refs = parse_source_attachments(&raw).unwrap();
+    assert!(
+        changed_source(f.database.connection(), &f.conversation, &refs, false)
+            .unwrap()
+            .is_none(),
+        "历史默认输入缺失旧摘要保持原兼容语义"
+    );
+    assert_eq!(
+        changed_source(f.database.connection(), &f.conversation, &refs, true).unwrap(),
+        Some(source_id)
     );
 }
 

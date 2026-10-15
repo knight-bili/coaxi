@@ -207,7 +207,7 @@ pub(super) fn migrate(database: &mut Database) -> Result<()> {
     )?;
     anyhow::ensure!(
         matches!(classify_database_contract(&tx)?,
-        DatabaseContractClassification::Current(ref marker) if marker.projection_schema_version==155),
+        DatabaseContractClassification::Current(ref marker) | DatabaseContractClassification::SupportedMigrationSource(ref marker) if marker.projection_schema_version==155),
         "Private composer scope schema admission failed"
     );
     tx.commit()?;
@@ -216,6 +216,7 @@ pub(super) fn migrate(database: &mut Database) -> Result<()> {
 
 #[cfg(test)]
 pub(super) fn downgrade_for_test(connection: &Connection) {
+    super::private_source_observation::downgrade_for_test(connection);
     if !connection
         .table_exists(None, "single_chat_composer_scope")
         .unwrap()
@@ -389,6 +390,8 @@ mod tests {
             .execute_batch("DROP TRIGGER reject_private_scope_receipt")
             .unwrap();
         migrate(&mut database).unwrap();
+        super::super::private_source_observation::migrate(&mut database).unwrap();
+        super::super::private_source_observation::verify_migration_fixture(&mut database);
         assert!(connection_has_current_data_contract(database.connection()).unwrap());
         assert_eq!(legacy_rows(database.connection()), before);
         let event_count: i64 = database

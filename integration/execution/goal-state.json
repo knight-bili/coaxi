@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "Native原上传请求持久记录、只读回执核对、原请求显式重试与卡片位置枚举已接Main/Preload；6项Native隔离文件/模拟Core和27项Web/摘要、定向types通过。Core新增观察/回执及附加前摘要检查待阶段编译，目录/发送前变化、实际文件授权和共享上传UI继续；I03未收口。",
+  "current_slice": "Core私聊文件/目录源观察、schema156/Migration206与发送/排队接受前检查已实现，源变化保留输入并将队首标为待修复防自动循环。13项当前Core库检查及文档/基础门禁通过；新Native桥目录请求、实际资源授权/预览、共享上传恢复UI、大材料性能及其他I03组继续，完整PC15/324未判通过。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "Native_upload_bridge_locally_verified_Core_directory_pre_send_proof_resource_UI_pending",
+  "current_slice_status": "Core_source_observation_verified_Native_directory_resource_UI_scale_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -116,7 +116,7 @@
     "source_progress_continued": true
   },
   "project_groups_evidence": "i03-project-groups-result.json",
-  "checked_at": "2026-10-15T17:59:58.645147+00:00",
+  "checked_at": "2026-10-15T18:49:29.300463+00:00",
   "project_layout_evidence": "i03-project-layout-result.json",
   "project_tree_evidence": "i03-project-tree-result.json",
   "navigation_activity_evidence": "i03-navigation-activity-result.json",
@@ -179,5 +179,6 @@
   },
   "i03_closeout": "i03-closeout.json",
   "canvas_private_upload_evidence": "i03-private-upload-result.json",
-  "canvas_private_native_upload_evidence": "i03-private-native-upload-result.json"
+  "canvas_private_native_upload_evidence": "i03-private-native-upload-result.json",
+  "canvas_private_source_observation_evidence": "i03-private-source-observation-result.json"
 }

@@ -400,6 +400,16 @@ pub(crate) fn return_pending_input(
             json!({"currentRevision":current.revision}),
         ));
     }
+    if let Some(id) = crate::private_source_observation::capture_sources(
+        tx,
+        &command.conversation_id,
+        &parse_source_attachments(source_json)?,
+    )? {
+        return Ok(CommandHandlerResult::rejected(
+            "single_chat.attachment_source_changed",
+            json!({"attachmentRefId":id,"message":"附件源文件已变化，请先编辑排队消息。"}),
+        ));
+    }
     let occupied = !target_body.trim().is_empty() || current.has_materials()?;
     register(
         tx,
@@ -654,6 +664,9 @@ pub fn mutate(
                 let source=DraftMaterials::load(tx,&command.conversation_id,client,&PrivateComposerKey::default())?;
                 if source.revision!=*expected_source_revision {return Ok(CommandHandlerResult::rejected("single_chat.draft_changed",json!({"currentRevision":source.revision})));}
                 if !source.has_materials()? {return Ok(CommandHandlerResult::rejected("single_chat.no_legacy_materials",json!({})));}
+                if let Some(id)=crate::private_source_observation::capture_sources(tx,&command.conversation_id,&source.sources()?)? {
+                    return Ok(CommandHandlerResult::rejected("single_chat.attachment_source_changed",json!({"attachmentRefId":id,"message":"旧材料源文件已变化或不可读，请重新选择。"})));
+                }
                 register(tx,&command.conversation_id,client,command.composer_scope.as_ref(),&key,registered)?;
                 scope_registered=true;
                 if !target_body.trim().is_empty() || current.has_materials()? {

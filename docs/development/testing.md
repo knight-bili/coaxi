@@ -66,6 +66,12 @@ Native 异常后保留源文件目前只有源码审查和类型证据，实际 
 Core 替身只拥有观察/回执运输 seam，不证明实际 Core 或 Native IPC；原第三个 Core owner 扩展 Native 观察/准入、公开目标拒绝、
 同长度内容变化时零附加/无回执及原结果回放，不新增 Rust owner。6项 Main 加既有27项 Web/摘要检查通过，定向 types 含 Main/Preload。
 Core、实际 IPC 和文件 UI 统一留待阶段集中验证；附加前检查不代替发送前源观察或完整 PC15。
+
+后续 Migration206/source observation 因迁移安全阻断材料接线，按阶段规则例外合并一次最小 Core lib 检查，
+同时覆盖此前累计未编译的 Web/Native 上传代码。原205迁移 owner 扩206数据保留、回执失败回滚和伪造同名触发器拒绝；
+原第三个材料 owner 扩同长度变更阻断发送、同 UUID 拒绝结果回放、不同现存文件身份、目录内容/空目录名变化、
+观察不可改写、历史缺摘要兼容及目录排队失效进入 needs_repair。旧对象保留后才构造替换对象，不依赖删除后的编号复用或时间精度。
+不新增 Rust owner。相关默认单聊 owner 作回归，实际平台和完整 PC15 仍需阶段集成证据。
 本地 Core 检查不代表 Host HTTP/Native 或完整文件能力资格；源内容摘要、上传与完整 PC15 继续待验。
 
 私聊材料服务新增三个 `single_chat_composer::tests` 扩展 owner：

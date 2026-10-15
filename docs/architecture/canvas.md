@@ -211,3 +211,11 @@ legacy managed-attachment lookup. Persistent scope ownership survives pin deleti
 Main's two file entry points preserve the complete descriptor and reject scope data smuggled into an old
 default owner. Renderer and Main file identities include the exact scope/retained/lease before caching.
 Scoped upload, content-change proof and actual Host resource qualification remain pending; file UI stays gated.
+
+## 私聊源观察（2026-10-16）
+
+Migration206/schema156 按 Conversation/source ref 独立保存内容及对象身份观察，不把摘要加入 SourceRef 或模型输入。
+选择材料和显式迁入时记录，发送/排队准入前重检；变化阻断并保留整份输入，队首失效记为 needs_repair。
+目录的安全递归观察复用既有句柄和层级/条目边界，公共/Agent live source 及旧冻结 Run 不改。
+实现边界见 [私聊输入合同](../contracts/single-chat-composer-scope-v1.md#私聊源观察与接受前检查2026-10-16)。
+Native新桥的目录请求、实际资源预览和恢复界面仍待；大材料扫描对事务锁及请求响应的影响须随I03规模检查处理，不能据局部检查宣称高可用完成。

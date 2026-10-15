@@ -693,6 +693,10 @@ impl SingleChatService {
                     json!({ "message": error.to_string() }),
                 ));
             }
+            if let Some(id)=crate::private_source_observation::changed_source(transaction,&target.conversation_id,&source_attachments,envelope.payload.composer_scope.is_some())? {
+                return Ok(CommandHandlerResult::rejected("single_chat.attachment_source_changed",
+                    json!({"attachmentRefId":id,"message":"私聊附件源文件已变化，请重新选择文件后发送。"})));
+            }
 
             if single_chat_has_active_run(transaction, &target.conversation_id)?
                 || single_chat_has_pending_queue(transaction, &target.conversation_id)?
@@ -990,6 +994,7 @@ impl SingleChatService {
             refs.len() < MAX_PREPARED_ATTACHMENTS,
             "attachment_count_exceeded"
         );
+        anyhow::ensure!(crate::private_source_observation::capture_sources(transaction,conversation_id,std::slice::from_ref(&source_ref))?.is_none(),"single_chat.attachment_source_changed");
         refs.push(source_ref);
         store_single_chat_draft_refs(
             transaction,
@@ -1116,6 +1121,7 @@ impl SingleChatService {
             refs.len() < MAX_PREPARED_ATTACHMENTS,
             "attachment_count_exceeded"
         );
+        anyhow::ensure!(crate::private_source_observation::capture_sources(transaction,conversation_id,std::slice::from_ref(&source_ref))?.is_none(),"single_chat.attachment_source_changed");
         refs.push(source_ref);
         transaction.execute(
             "UPDATE single_chat_pending_input_edit_session
@@ -1302,6 +1308,10 @@ impl SingleChatService {
                             "single_chat.empty_message",
                             "Pending input must contain text or an attachment",
                         ));
+                    }
+                    if let Some(id)=crate::private_source_observation::capture_sources(transaction,&command.conversation_id,&refs)? {
+                        return Ok(CommandHandlerResult::rejected("single_chat.attachment_source_changed",
+                            json!({"attachmentRefId":id,"message":"附件源文件已变化，请移除后重新选择。"})));
                     }
                     transaction.execute(
                         "UPDATE single_chat_pending_input
@@ -1534,6 +1544,11 @@ impl SingleChatService {
                 ));
             }
             validate_source_attachments(&pending.source_attachments).map_err(anyhow::Error::new)?;
+            if let Some(id)=crate::private_source_observation::changed_source(transaction,&command.conversation_id,&pending.source_attachments,false)? {
+                record_pending_publish_failure_on(transaction,command,"single_chat.attachment_source_changed")?;
+                return Ok(CommandHandlerResult::rejected("single_chat.attachment_source_changed",
+                    json!({"attachmentRefId":id,"message":"排队消息的附件源文件已变化，请编辑并重新选择文件。"})));
+            }
             let runtime =
                 resolve_frozen_runtime(transaction, &target.conversation_id, &target.agent_id)?
                     .map_err(|blocker| {
@@ -2113,7 +2128,11 @@ pub fn record_pending_publish_failure(
     command: &PublishSingleChatPendingInput,
     code: &str,
 ) -> Result<()> {
-    database.connection().execute(
+    record_pending_publish_failure_on(database.connection(),command,code)
+}
+
+fn record_pending_publish_failure_on(connection:&rusqlite::Connection, command:&PublishSingleChatPendingInput, code:&str) -> Result<()> {
+    connection.execute(
         "UPDATE single_chat_pending_input
          SET state = 'needs_repair', last_attempt_error_code = ?4, updated_at = ?5
          WHERE conversation_id = ?1 AND id = ?2 AND revision = ?3 AND state = 'queued'",

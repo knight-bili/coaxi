@@ -18,6 +18,8 @@ pub(crate) mod notification_model;
 mod pending_draft;
 #[path = "db_private_composer_scope.rs"]
 mod private_composer_scope;
+#[path = "db_private_source_observation.rs"]
+mod private_source_observation;
 #[path = "db_run_continuation.rs"]
 mod run_continuation;
 #[path = "db_simplification.rs"]
@@ -360,8 +362,8 @@ impl MainThreadMigrationSource {
 }
 
 pub(crate) const CURRENT_DATA_CONTRACT_VERSION: &str = "v1.72";
-pub(crate) const CURRENT_PROJECTION_SCHEMA_VERSION: i64 = 155;
-const CURRENT_SCHEMA_MIGRATION_VERSION: i64 = 205;
+pub(crate) const CURRENT_PROJECTION_SCHEMA_VERSION: i64 = 156;
+const CURRENT_SCHEMA_MIGRATION_VERSION: i64 = 206;
 const V147_MIGRATION_SOURCE_DATA_CONTRACT_VERSION: &str = "v1.54";
 const V147_MIGRATION_SOURCE_PROJECTION_SCHEMA_VERSION: i64 = 96;
 const V145_MIGRATION_SOURCE_DATA_CONTRACT_VERSION: &str = "v1.53";
@@ -3377,11 +3379,12 @@ pub(crate) fn classify_database_contract(
     if marker.contract_version == CURRENT_DATA_CONTRACT_VERSION
         && matches!(
             marker.projection_schema_version,
-            145 | 146 | 147 | 148 | 149 | 150 | 151 | 152 | 153 | 154 | 155
+            145 | 146 | 147 | 148 | 149 | 150 | 151 | 152 | 153 | 154 | 155 | 156
         )
     {
         let expected_migration = match marker.projection_schema_version {
-            155 => CURRENT_SCHEMA_MIGRATION_VERSION,
+            156 => CURRENT_SCHEMA_MIGRATION_VERSION,
+            155 => 205,
             154 => 204,
             153 => 203,
             152 => 202,
@@ -3425,6 +3428,10 @@ pub(crate) fn classify_database_contract(
                 || crate::canvas_node::schema_matches(connection)?)
             && (marker.projection_schema_version < 155
                 || private_composer_scope::schema_matches(connection)?)
+            && (marker.projection_schema_version < 156
+                || private_source_observation::schema_matches(connection)?)
+            && (marker.projection_schema_version != 155
+                || private_source_observation::source_schema_matches(connection)?)
             && (marker.projection_schema_version != 154
                 || private_composer_scope::source_schema_matches(connection)?);
         return Ok(if !valid {
@@ -9130,6 +9137,9 @@ impl Database {
             if !self.schema_migration_applied(205)? {
                 migration_step!("migration_205", private_composer_scope::migrate(self));
             }
+            if !self.schema_migration_applied(206)? {
+                migration_step!("migration_206", private_source_observation::migrate(self));
+            }
             if let Err(error) =
                 crate::notification::maintain_notification_episode_retention(self.connection())
             {
@@ -9963,6 +9973,9 @@ impl Database {
         }
         if !self.schema_migration_applied(205)? {
             migration_step!("migration_205", private_composer_scope::migrate(self));
+        }
+        if !self.schema_migration_applied(206)? {
+            migration_step!("migration_206", private_source_observation::migrate(self));
         }
         if let Err(error) =
             crate::notification::maintain_notification_episode_retention(self.connection())
@@ -39967,6 +39980,7 @@ mod tests {
         skill_pack_context::migrate(&mut database).unwrap();
         database.migrate_canvas_nodes().unwrap();
         private_composer_scope::migrate(&mut database).unwrap();
+        private_source_observation::migrate(&mut database).unwrap();
         assert!(connection_has_current_data_contract(database.connection()).unwrap());
         assert!(database.schema_migration_applied(200).unwrap());
         assert!(
@@ -43549,6 +43563,7 @@ mod tests {
         skill_pack_context::migrate(&mut database).unwrap();
         database.migrate_canvas_nodes().unwrap();
         private_composer_scope::migrate(&mut database).unwrap();
+        private_source_observation::migrate(&mut database).unwrap();
         assert!(connection_has_current_data_contract(database.connection()).unwrap());
         database.connection().execute_batch("DROP INDEX native_session_bootstrap_binding_idx;
             CREATE UNIQUE INDEX native_session_bootstrap_binding_idx ON native_session_bootstrap_evidence(native_binding_id,native_binding_generation)").unwrap();
