@@ -29,11 +29,11 @@
         "孤立Core/本机正文及冲突统一恢复"
       ],
       "done_when": "本阶段完整使用流程及PC01-PC24适用工程验证有当前源码证据，外部环境缺项明确单列",
-      "latest_partial_evidence": "i03-private-web-upload-result.json",
+      "latest_partial_evidence": "i03-private-upload-finality-result.json",
       "remaining_runtime_risks": [
-        "旧未知上传在Core handler因CAS/租约失败而不存终结回执时仍需补原UUID收口",
+        "无原字节且尚无终结回执的明确结束/只含意图重试仍待",
         "旧租约准备记录与迁入/孤立/冲突统一恢复待实现",
-        "Core/Web/目录Rust及真实Host/Native/挂载交互随阶段候选验证",
+        "真实Host/NativeIPC/挂载交互及完整平台/模型待验，Core目录与拒绝库级已验",
         "大材料、日志枚举与事务锁规模影响待验证"
       ]
     },

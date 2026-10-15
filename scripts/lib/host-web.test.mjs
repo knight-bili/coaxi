@@ -388,6 +388,19 @@ test('Desktop and Web share one Core while listener failure, revocation and stop
     const privateRemove = await call(first, 'singleChat.composerDraft.removeAttachment', { conversationId, expectedDraftRevision: privateSnapshot.draft.revision, attachmentRefId: privateIntent.commandId })
     assert.equal(privateRemove.draft.attachments.length, 0)
     assert.deepEqual(await (await uploadReceipt(first, privateIntent)).json(), originalReceipt, '原材料移除不影响原回执查回')
+    const refusedIntent = { ...privateIntent, commandId: crypto.randomUUID() }
+    const refusedSpools = (await spools()).length
+    const refusedBody = () => { const body = new FormData(); body.append('intent', JSON.stringify(refusedIntent)); body.append('file', new Blob([input]), 'refused.txt'); return body }
+    const refused = await postUpload(refusedBody())
+    assert.equal(refused.status, 409)
+    assert.equal((await refused.json()).error.code, 'upload_rejected')
+    const refusal = await (await uploadReceipt(first, refusedIntent)).json()
+    assert.equal(refusal.receipt.status, 'rejected')
+    assert.equal(refusal.receipt.code, 'single_chat.draft_changed')
+    assert.equal((await postUpload(refusedBody())).status, 409)
+    assert.equal((await authorized(first, 'uploads/reconcile', { method: 'POST', body: JSON.stringify(refusedIntent) })).status, 409)
+    assert.equal((await spools()).length, refusedSpools, '明确拒绝/回放的未绑定spool全部清理')
+    assert.deepEqual((await call(first, 'singleChat.get', { conversationId })).draft, privateRemove.draft)
     assert.equal((await call(second, 'singleChat.get', { conversationId })).draft.revision, 0)
     const sentParams = { commandId: crypto.randomUUID(), threadId,
       content: { version: 2, segments: [{ kind: 'text', text: 'Published from Web' }] },
@@ -429,6 +442,14 @@ test('Desktop and Web share one Core while listener failure, revocation and stop
     assert.equal(pendingReceipt.state, 'recorded')
     await call(first, operation, { commandId: crypto.randomUUID(), command: { ...command, editToken: edit.editToken, action: { type: 'cancel' } } })
     assert.deepEqual(await (await uploadReceipt(first, pendingIntent)).json(), pendingReceipt, '编辑租约取消后仍按原请求读取回执')
+    const fencedIntent = { ...pendingIntent, commandId: crypto.randomUUID() }
+    const fencedBody = new FormData(); fencedBody.append('intent', JSON.stringify(fencedIntent)); fencedBody.append('file', new Blob([input]), 'fenced.txt')
+    const fencedSpools = (await spools()).length
+    assert.equal((await postUpload(fencedBody)).status, 409)
+    const fencedReceipt = await (await uploadReceipt(first, fencedIntent)).json()
+    assert.equal(fencedReceipt.receipt.status, 'rejected')
+    assert.equal(fencedReceipt.receipt.code, 'single_chat.pending_input_edit_fenced')
+    assert.equal((await spools()).length, fencedSpools)
     const html = await fetch(origin, { redirect: 'error' })
     assert.equal(html.status, 200)
     assert.match(html.headers.get('content-security-policy'), /frame-ancestors 'none'/)

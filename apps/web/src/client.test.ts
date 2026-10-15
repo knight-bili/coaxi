@@ -246,6 +246,38 @@ describe('console transport', () => {
     }
   })
 
+  it.each(['dispatch', 'reconcile', 'retry'] as const)('settles canonical upload rejection from %s while keeping the original identity', async stage => {
+    let known = stage === 'dispatch', posts = 0
+    const intents: unknown[] = []
+    const fetcher = vi.fn<typeof fetch>(async (url, options) => {
+      if (String(url).endsWith('/login')) return Response.json({ protocolVersion: 4, token: 'a'.repeat(64), clientId: 'd'.repeat(64), editorProof: 'e'.repeat(64), ownerId: 'local_user' })
+      if (String(url).endsWith('/uploads')) {
+        posts++; intents.push(JSON.parse(String((options?.body as FormData).get('intent'))))
+        if (known) return Response.json({ error: { code: 'upload_rejected' } }, { status: 409 })
+        throw new TypeError('response lost')
+      }
+      return known && stage === 'reconcile'
+        ? Response.json({ error: { code: 'upload_rejected' } }, { status: 409 })
+        : Response.json({ state: 'unknown' })
+    })
+    const client = new ConsoleClient('http://localhost:4317', fetcher)
+    await client.login('b'.repeat(64))
+    const waiting = client.uploadFile('original-thread', 7, new File(['input'], 'input.txt'))
+    const settled = expect(waiting).rejects.toThrow('upload_rejected')
+    await vi.waitFor(() => expect(posts).toBe(1))
+    if (stage !== 'dispatch') {
+      expect(client.pendingCommandCount).toBe(1)
+      known = true
+      if (stage === 'reconcile') await client.reconcilePending()
+      else await client.retryPending()
+    }
+    await settled
+    expect(client.pendingCommandCount).toBe(0)
+    expect(posts).toBe(stage === 'retry' ? 2 : 1)
+    expect(intents.every(intent => JSON.stringify(intent) === JSON.stringify(intents[0]))).toBe(true)
+    client.clear()
+  })
+
   it('settles a recorded quote rejection after a lost reply without dispatching it twice', async () => {
     let recorded = false
     let sends = 0

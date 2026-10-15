@@ -1798,3 +1798,15 @@ Core 原私聊材料 owner 增加 Native 目录观察/绑定、Web 冒用拒绝�
 最小命令：`pnpm exec vitest run apps/web/src/private-upload-preparations.test.ts apps/web/src/client.test.ts apps/web/src/camp-adapter.test.ts apps/desktop/src/renderer/src/private-upload-controller.test.ts apps/desktop/src/main/private-attachment-preparation.test.ts`。
 原 `scripts/lib/host-web.test.mjs` 实际进程 owner 增加无认证/错编辑端、RPC拒绝、路径投影、材料移除和编辑租约取消后原回执查询；
 当前仅语法检查，未启动旧Host或把旧二进制当新入口证据。Rust入口编译与该真实HTTP owner随阶段候选执行，不新增Rust测试函数。
+
+## 融合期上传业务拒绝持久化（2026-10-16）
+
+扩展原第三个 private-composer owner，复用同一隔离数据库/文件；不新增Rust测试函数或平行数据库owner。
+比较所有编辑端的草稿、工作正文/材料/引用、scope和源观察，证明明确拒绝只增加回执，原编号回放逐值相同。
+覆盖卡片/Native默认/Web默认版本、不可用scope、跨scope租约及接管后的旧令牌；原文件/目录观察失败仍是错误且不存回执。
+临时回执触发器同时阻断已写材料的成功路径和业务拒绝路径，证明存储失败不伪装拒绝，并回滚scope/观察/材料。
+最小命令 `cargo test -p rovai-core --lib --features extended-tests single_chat_composer::tests -- --test-threads=1` 实跑3项通过；
+首跑新增夹具误用了Rust字段名working_quotes_json作为表列，已按真实quotes_json/quote_trash_json修正并完整复验，失败日志保留。
+Web/新准备/旧transport等5测试文件61项通过，派发/查回/明确重试均识别真正Core拒绝；定向types和 `cargo check -p rovai-web` 通过。
+最小Core批次因原持久结果边界阻断后续恢复接线而提前执行，合并验证此前未编译目录和上传入口，不跑全仓/Actions。
+实际 `host-web.test.mjs` 增加拒绝回执、旧reconcile、重复拒绝spool和失效租约清理断言；当前只做语法检查，实际Host与平台仍待。

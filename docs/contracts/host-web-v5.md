@@ -34,3 +34,8 @@ HTTP receipt 只投影 commandId、commandType、status、code、recordedAt、�
 名称、大小和 SHA-256 全部一致才可用原 UUID/target/revision 重试。恢复/重复 prepare 只查询，不发送新文件。
 首次明确 HTTP 拒绝可记为本次 rejected，不伪装成 Core recorded；已有未知请求的重试拒绝仍保留未知，等待原回执。
 准确的输入位置和界面边界见[私聊输入合同](single-chat-composer-scope-v1.md#web-原请求准备与原文件重选2026-10-16)。
+
+已提交上传拒绝通过 `/uploads` 与旧 `/uploads/reconcile` 返回 `409/upload_rejected`，区别于普通 `draft_changed` 或运输未知。
+该错误码只来自 Core 原回执，允许旧 transport 结束原 unknown 请求；不能用一次重试的普通错误替代原提交结果。
+`/uploads/receipt` 继续返回 recorded/receipt 安全视图。确认拒绝的未绑定临时文件可删除，未知或已绑定的原文件继续保留。
+私聊拒绝在原事务的只读业务准入产生，数据库/文件/观察执行错误仍按[Domain Command Result](domain-command-result-v1.md#1-命令结果与事务)回滚。

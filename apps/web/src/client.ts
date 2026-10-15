@@ -740,6 +740,10 @@ export class ConsoleClient {
         if (this.#pendingUploads.get(commandId) !== entry) return
         this.#pendingUploads.delete(commandId); this.#notifyPending(); entry.resolve(result.draft)
       }).catch(error => {
+        if (error instanceof HttpRequestError && error.code === 'upload_rejected') {
+          if (this.#pendingUploads.get(commandId) === entry) { this.#pendingUploads.delete(commandId); this.#notifyPending(); entry.reject(error) }
+          return
+        }
         if (preserveUnknown) { void this.reconcilePending(); return }
         if (error instanceof SessionRequired || (error instanceof HttpRequestError && ['draft_changed', 'invalid_upload', 'upload_too_large', 'upload_changed_or_session_expired', 'upload_conflict', 'upload_capacity'].includes(error.code))) {
           if (this.#pendingUploads.get(commandId) === entry) { this.#pendingUploads.delete(commandId); this.#notifyPending(); entry.reject(error) }
@@ -814,7 +818,12 @@ export class ConsoleClient {
           if (result.draft && this.#pendingUploads.get(id) === entry) {
             this.#pendingUploads.delete(id); this.#notifyPending(); entry.resolve(result.draft)
           }
-        } catch { /* No deletion or redispatch while binding remains unknown. */ }
+        } catch (error) {
+          if (error instanceof HttpRequestError && error.code === 'upload_rejected' && this.#pendingUploads.get(id) === entry) {
+            this.#pendingUploads.delete(id); this.#notifyPending(); entry.reject(error)
+          }
+          // 只有明确 Core 拒绝才能结清；运输失败仍不删除或重传。
+        }
       }
     } finally { this.#reconciling = false }
   }

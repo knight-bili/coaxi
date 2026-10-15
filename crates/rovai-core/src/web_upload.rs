@@ -7,6 +7,7 @@ use crate::{
     local_attachment_source::{LocalAttachmentKind, LocalAttachmentSourceRef},
 };
 use anyhow::{Result, ensure};
+use rusqlite::OptionalExtension;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
@@ -273,6 +274,9 @@ pub fn bind(
     );
     DomainCommandGateway.execute(database, &envelope, |transaction| {
         let intent = &envelope.payload.intent;
+        if let Some(rejected) = private_binding_rejection(transaction, client, intent)? {
+            return Ok(rejected);
+        }
         match &intent.target {
             UploadTarget::Camp => {
                 ensure!(
@@ -304,4 +308,80 @@ pub fn bind(
         };
         Ok(CommandHandlerResult::applied("attachment.upload_bound", payload, None))
     })
+}
+
+/// 只读业务准入，必须在同一 Gateway 写事务内、任何材料/观察写入之前执行。
+/// 存储损坏、文件读取及真正的 Handler 错误继续上抛并回滚，不能冒充业务拒绝。
+fn private_binding_rejection(
+    transaction: &rusqlite::Transaction<'_>,
+    client: &DraftClient,
+    intent: &UploadIntent,
+) -> Result<Option<CommandHandlerResult>> {
+    let (conversation, scope, pending) = match &intent.target {
+        UploadTarget::Camp => return Ok(None),
+        UploadTarget::SingleChat {
+            conversation_id,
+            composer_scope,
+        } => (conversation_id, composer_scope.as_ref(), None),
+        UploadTarget::SingleChatPending {
+            conversation_id,
+            composer_scope,
+            pending_input_id,
+            edit_token,
+        } => (
+            conversation_id,
+            composer_scope.as_ref(),
+            Some((pending_input_id, edit_token)),
+        ),
+    };
+    let rejected = |code| Some(CommandHandlerResult::rejected(code, json!({})));
+    if !crate::single_chat_composer::owner_exists(transaction, &intent.camp_id, conversation, true)?
+    {
+        return Ok(rejected("single_chat.not_active"));
+    }
+    let Some((key, _)) = crate::single_chat_composer::resolve_scope(
+        transaction,
+        &intent.camp_id,
+        conversation,
+        client,
+        scope,
+    )?
+    else {
+        return Ok(rejected("single_chat.scope_unavailable"));
+    };
+    let refs = if let Some((pending_id, token)) = pending {
+        let working: Option<String> = transaction.query_row(
+            "SELECT e.working_source_attachments_json FROM single_chat_pending_input_edit_session e
+             JOIN single_chat_pending_input p ON p.conversation_id=e.conversation_id AND p.id=e.pending_input_id
+             WHERE e.conversation_id=?1 AND e.client_id=?2 AND e.scope_key=?3 AND e.pending_input_id=?4
+               AND e.edit_token=?5 AND e.base_pending_revision=?6 AND e.recovery_required=0
+               AND p.revision=?6 AND p.state IN ('queued','needs_repair')",
+            rusqlite::params![conversation,client.id(),key.sql_key(),pending_id,token,intent.expected_revision], |row| row.get(0),
+        ).optional()?;
+        let Some(working) = working else {
+            return Ok(rejected("single_chat.pending_input_edit_fenced"));
+        };
+        crate::local_attachment_source::parse_source_attachments(&working)?
+    } else {
+        let draft = crate::single_chat_composer::DraftMaterials::load(
+            transaction,
+            conversation,
+            client,
+            &key,
+        )?;
+        if draft.revision != intent.expected_revision {
+            return Ok(Some(CommandHandlerResult::rejected(
+                "single_chat.draft_changed",
+                json!({"currentRevision":draft.revision}),
+            )));
+        }
+        draft.sources()?
+    };
+    if refs.len() >= crate::camp_attachment::MAX_PREPARED_ATTACHMENTS {
+        return Ok(rejected("attachment_count_exceeded"));
+    }
+    if refs.iter().any(|source| source.id == intent.command_id) {
+        return Ok(rejected("attachment_reference_conflict"));
+    }
+    Ok(None)
 }

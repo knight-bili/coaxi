@@ -9,7 +9,7 @@ const owner = () => ({ threadId: request().threadId, conversationId: ids[1], com
 const file = (body = 'input', name = 'input.txt') => new File([body], name)
 async function fixture(capability = true) {
   const values = new Map<string, unknown>()
-  let writeFailure = false, recorded = false, malformed = false
+  let writeFailure = false, recorded = false, malformed = false, rejected = false
   let mode: 'lost' | 'success' | 'reject' | 'hung' = 'lost'
   let finish!: (response: Response) => void
   const posts: Array<{ intent: Record<string, unknown>; text: string }> = []
@@ -36,8 +36,8 @@ async function fixture(capability = true) {
     if (String(url).endsWith('/uploads/receipt')) {
       const intent = JSON.parse(String(options!.body)); lookups.push(intent)
       return Response.json(recorded ? { state: 'recorded', receipt: {
-        commandId: malformed ? ids[6] : intent.commandId, commandType: 'camp.source_attachment.upload.bind', status: 'applied', code: 'attachment.upload_bound',
-        payload: { attachmentRefId: intent.commandId, revision: 8 }, resultEntity: null, recordedAt: '2026-10-16T00:00:00Z'
+        commandId: malformed ? ids[6] : intent.commandId, commandType: 'camp.source_attachment.upload.bind', status: rejected ? 'rejected' : 'applied', code: rejected ? 'single_chat.draft_changed' : 'attachment.upload_bound',
+        payload: rejected ? {} : { attachmentRefId: intent.commandId, revision: 8 }, resultEntity: null, recordedAt: '2026-10-16T00:00:00Z'
       } } : { state: 'unknown' })
     }
     throw new Error(`unexpected ${url}`)
@@ -46,6 +46,7 @@ async function fixture(capability = true) {
   await client.login('d'.repeat(64))
   return { client, values, storage, posts, lookups, fetcher,
     mode: (value: typeof mode) => { mode = value }, recorded: () => { recorded = true }, malformed: () => { recorded = true; malformed = true },
+    rejected: () => { recorded = true; rejected = true },
     writeFailure: () => { writeFailure = true }, finish: () => finish(Response.json({ draft: null })) }
 }
 
@@ -122,6 +123,17 @@ describe('Web 私聊文件原请求与重选', () => {
     expect(await api.retryInput(request(), file())).toMatchObject({ state: 'unknown' })
     expect((await api.pendingPreparations(owner()))[0].state).toBe('unknown')
     expect(f.posts).toHaveLength(2)
+    f.client.clear()
+  })
+  it('原未知请求查到真实 Core 拒绝后结清，不要求原字节或再次上传', async () => {
+    const f = await fixture(), api = f.client.privateUploadPreparations(f.storage)
+    await api.prepareInput(request(), file())
+    f.rejected()
+    const restored = f.client.privateUploadPreparations(f.storage)
+    const known = await restored.retryInput(request())
+    expect(known).toMatchObject({ state: 'recorded', commandId: request().commandId, receipt: { status: 'rejected', code: 'single_chat.draft_changed' } })
+    expect(f.posts).toHaveLength(1)
+    expect(await restored.reconcileInput(request())).toEqual(known)
     f.client.clear()
   })
   it('错编号回执不采纳，损坏元数据/原请求改位置不派发', async () => {

@@ -1085,6 +1085,60 @@ fn verify_scoped_pending_edits(f: &mut Fixture) {
     );
 }
 
+fn assert_upload_business_rejection(
+    f: &mut Fixture,
+    client: &DraftClient,
+    intent: crate::web_upload::UploadIntent,
+    source: crate::local_attachment_source::LocalAttachmentSourceRef,
+    code: &str,
+) {
+    fn materials(f: &Fixture) -> Vec<String> {
+        let mut statement = f.database.connection().prepare(
+            "SELECT 'draft:'||json_array(client_id,scope_key,revision,source_attachments_json,quotes_json,quote_trash_json) FROM single_chat_composer_draft WHERE conversation_id=?1
+             UNION ALL SELECT 'working:'||json_array(client_id,scope_key,pending_input_id,edit_token,working_body,working_source_attachments_json,quotes_json,quote_trash_json) FROM single_chat_pending_input_edit_session WHERE conversation_id=?1
+             UNION ALL SELECT 'scope:'||json_array(client_id,scope_key,board_id,node_id) FROM single_chat_composer_scope WHERE conversation_id=?1
+             UNION ALL SELECT 'source:'||json_array(source_ref_id,observation_json) FROM single_chat_source_observation WHERE conversation_id=?1 ORDER BY 1"
+        ).unwrap();
+        statement
+            .query_map([&f.conversation], |row| row.get(0))
+            .unwrap()
+            .collect::<rusqlite::Result<Vec<String>>>()
+            .unwrap()
+    }
+    let before = materials(f);
+    let path = std::path::PathBuf::from(&source.source_path);
+    let first = crate::web_upload::bind(
+        &mut f.database,
+        &path,
+        client,
+        intent.clone(),
+        source.clone(),
+    )
+    .unwrap();
+    assert_eq!(first.result.status, CommandResultStatus::Rejected);
+    assert_eq!(first.result.code, code);
+    assert_eq!(
+        materials(f),
+        before,
+        "业务拒绝不能登记scope或改变正文/材料/源观察"
+    );
+    let recorded = crate::web_upload::reconcile(&f.database, client, intent.clone())
+        .unwrap()
+        .unwrap();
+    assert!(recorded.replayed);
+    assert_eq!(
+        serde_json::to_value(&recorded.result).unwrap(),
+        serde_json::to_value(&first.result).unwrap()
+    );
+    let replay = crate::web_upload::bind(&mut f.database, &path, client, intent, source).unwrap();
+    assert!(replay.replayed);
+    assert_eq!(
+        serde_json::to_value(replay.result).unwrap(),
+        serde_json::to_value(first.result).unwrap()
+    );
+    assert_eq!(materials(f), before);
+}
+
 fn verify_private_upload_bindings() {
     use crate::single_chat::{EditSingleChatPendingInputCommand, SingleChatPendingInputEditAction};
     use crate::web_upload::{self, UploadIntent, UploadTarget};
@@ -1265,15 +1319,12 @@ fn verify_private_upload_bindings() {
     };
     let mut rejected_source = source.clone();
     rejected_source.id = rejected_scope.command_id.clone();
-    assert!(
-        web_upload::bind(
-            &mut f.database,
-            &file,
-            &client,
-            rejected_scope,
-            rejected_source
-        )
-        .is_err()
+    assert_upload_business_rejection(
+        &mut f,
+        &client,
+        rejected_scope,
+        rejected_source,
+        "single_chat.draft_changed",
     );
     let failed_scope_count: i64 = f.database.connection().query_row(
         "SELECT COUNT(*) FROM single_chat_composer_scope WHERE conversation_id=?1 AND client_id=?2 AND scope_key=?3",
@@ -1282,20 +1333,45 @@ fn verify_private_upload_bindings() {
     assert_eq!(failed_scope_count, 0, "失败上传不留下首次位置登记");
     intent.command_id = Uuid::new_v4().to_string();
     source.id = intent.command_id.clone();
-    assert!(
-        web_upload::bind(
-            &mut f.database,
-            &file,
-            &client,
-            intent.clone(),
-            source.clone()
-        )
-        .is_err()
+    assert_upload_business_rejection(
+        &mut f,
+        &client,
+        intent.clone(),
+        source.clone(),
+        "single_chat.draft_changed",
     );
-    assert!(
-        web_upload::reconcile(&f.database, &client, intent.clone())
-            .unwrap()
-            .is_none()
+
+    for default_client in [DraftClient::default(), client.clone()] {
+        let mut stale = original_intent.clone();
+        stale.command_id = Uuid::new_v4().to_string();
+        stale.target = UploadTarget::SingleChat {
+            conversation_id: f.conversation.clone(),
+            composer_scope: None,
+        };
+        stale.expected_revision = if default_client.is_desktop() { 0 } else { 1 };
+        let mut unbound = original_source.clone();
+        unbound.id = stale.command_id.clone();
+        assert_upload_business_rejection(
+            &mut f,
+            &default_client,
+            stale,
+            unbound,
+            "single_chat.draft_changed",
+        );
+    }
+    let mut unavailable = original_intent.clone();
+    unavailable.command_id = Uuid::new_v4().to_string();
+    unavailable.target = UploadTarget::SingleChat { conversation_id: f.conversation.clone(), composer_scope: Some(serde_json::from_value(json!({
+        "kind":"canvas","boardId":Uuid::new_v4().to_string(),"nodeId":Uuid::new_v4().to_string()
+    })).unwrap()) };
+    let mut unbound = original_source.clone();
+    unbound.id = unavailable.command_id.clone();
+    assert_upload_business_rejection(
+        &mut f,
+        &client,
+        unavailable,
+        unbound,
+        "single_chat.scope_unavailable",
     );
 
     let mut send = envelope(
@@ -1380,15 +1456,12 @@ fn verify_private_upload_bindings() {
     }
     intent.command_id = Uuid::new_v4().to_string();
     source.id = intent.command_id.clone();
-    assert!(
-        web_upload::bind(
-            &mut f.database,
-            &file,
-            &client,
-            intent.clone(),
-            source.clone()
-        )
-        .is_err()
+    assert_upload_business_rejection(
+        &mut f,
+        &client,
+        intent.clone(),
+        source.clone(),
+        "single_chat.pending_input_edit_fenced",
     );
     edit.command_id = Uuid::new_v4().to_string();
     edit.payload.action = SingleChatPendingInputEditAction::Takeover;
@@ -1404,11 +1477,91 @@ fn verify_private_upload_bindings() {
     intent = pending_original;
     intent.command_id = Uuid::new_v4().to_string();
     source.id = intent.command_id.clone();
-    assert!(web_upload::bind(&mut f.database, &file, &client, intent.clone(), source).is_err());
+    assert_upload_business_rejection(
+        &mut f,
+        &client,
+        intent,
+        source,
+        "single_chat.pending_input_edit_fenced",
+    );
+
+    // 回执存储失败仍是错误：就绪路径已写入的scope/材料/源观察全部回滚。
+    f.database.connection().execute_batch("CREATE TEMP TRIGGER reject_upload_receipt BEFORE INSERT ON event_log WHEN NEW.command_type='camp.source_attachment.upload.bind' AND NEW.event_type='command.result' BEGIN SELECT RAISE(ABORT,'upload receipt rollback fixture'); END;").unwrap();
+    let mut fault = original_intent.clone();
+    fault.command_id = Uuid::new_v4().to_string();
+    fault.target = UploadTarget::SingleChat {
+        conversation_id: f.conversation.clone(),
+        composer_scope: Some(f.scopes[2].clone()),
+    };
+    let mut fault_source = original_source.clone();
+    fault_source.id = fault.command_id.clone();
     assert!(
-        web_upload::reconcile(&f.database, &client, intent)
+        web_upload::bind(
+            &mut f.database,
+            &file,
+            &client,
+            fault.clone(),
+            fault_source.clone()
+        )
+        .is_err()
+    );
+    assert!(
+        web_upload::reconcile(&f.database, &client, fault.clone())
             .unwrap()
             .is_none()
+    );
+    assert!(
+        read_draft(
+            &f.database,
+            &client,
+            &f.thread,
+            &f.conversation,
+            Some(&f.scopes[2])
+        )
+        .unwrap()
+        .draft
+        .attachments
+        .is_empty()
+    );
+    let observations:i64=f.database.connection().query_row("SELECT COUNT(*) FROM single_chat_source_observation WHERE conversation_id=?1 AND source_ref_id=?2",params![f.conversation,fault.command_id],|row|row.get(0)).unwrap();
+    assert_eq!(observations, 0);
+    let mut refused_fault = fault.clone();
+    refused_fault.command_id = Uuid::new_v4().to_string();
+    refused_fault.expected_revision = 1;
+    let mut refused_source = fault_source.clone();
+    refused_source.id = refused_fault.command_id.clone();
+    assert!(
+        web_upload::bind(
+            &mut f.database,
+            &file,
+            &client,
+            refused_fault.clone(),
+            refused_source.clone()
+        )
+        .is_err()
+    );
+    assert!(
+        web_upload::reconcile(&f.database, &client, refused_fault.clone())
+            .unwrap()
+            .is_none()
+    );
+    f.database
+        .connection()
+        .execute_batch("DROP TRIGGER reject_upload_receipt")
+        .unwrap();
+    assert_upload_business_rejection(
+        &mut f,
+        &client,
+        refused_fault,
+        refused_source,
+        "single_chat.draft_changed",
+    );
+    assert_eq!(
+        web_upload::bind(&mut f.database, &file, &client, fault, fault_source)
+            .unwrap()
+            .result
+            .status,
+        CommandResultStatus::Applied
     );
 
     let count: i64 = f

@@ -126,7 +126,7 @@ pub async fn upload(
     // A replay discards its unbound spool through the guard; it never rebinds it.
     if let Ok(reply) = state
         .core
-        .request_for_editor("host.upload.reconcile", json!(intent), client.clone())
+        .request_for_editor("host.upload.receipt", json!(intent), client.clone())
         .await
     {
         if reply.error.is_some() {
@@ -137,6 +137,13 @@ pub async fn upload(
             .as_ref()
             .is_some_and(|result| !result["receipt"].is_null())
         {
+            if reply
+                .result
+                .as_ref()
+                .is_some_and(|result| result["receipt"]["status"] == "rejected")
+            {
+                return error(StatusCode::CONFLICT, "upload_rejected");
+            }
             return upload_draft(&state, &intent, &client).await;
         }
     } else {
@@ -174,6 +181,10 @@ pub async fn upload(
             match reply {
                 Ok(reply) if reply.error.is_none() => {
                     let result = reply.result.context("upload binding result missing")?;
+                    if result["receipt"]["status"] == "rejected" {
+                        temporary.retain = false;
+                        return Ok(error(StatusCode::CONFLICT, "upload_rejected"));
+                    }
                     // A replay belongs to its original file, so this duplicate
                     // never became a source and can be cleaned.
                     if result["replayed"] == true {
@@ -189,7 +200,7 @@ pub async fn upload(
                     // receipt before deciding whether the file is still unbound.
                     if let Ok(receipt) = state
                         .core
-                        .request_for_editor("host.upload.reconcile", json!(intent), client.clone())
+                        .request_for_editor("host.upload.receipt", json!(intent), client.clone())
                         .await
                     {
                         if receipt.error.is_none()
@@ -202,6 +213,14 @@ pub async fn upload(
                             return Ok(error(StatusCode::CONFLICT, "draft_changed"));
                         }
                         if receipt.error.is_none() {
+                            if receipt
+                                .result
+                                .as_ref()
+                                .is_some_and(|value| value["receipt"]["status"] == "rejected")
+                            {
+                                temporary.retain = false;
+                                return Ok(error(StatusCode::CONFLICT, "upload_rejected"));
+                            }
                             return Ok(upload_draft(&state, &intent, &client).await);
                         }
                     }
@@ -247,7 +266,7 @@ pub async fn reconcile(
     let client = DraftClient::verified_web(&session.client_id).expect("Host editor identity");
     match state
         .core
-        .request_for_editor("host.upload.reconcile", json!(intent), client.clone())
+        .request_for_editor("host.upload.receipt", json!(intent), client.clone())
         .await
     {
         Ok(reply) if reply.error.is_none() => {
@@ -256,6 +275,13 @@ pub async fn reconcile(
                 .as_ref()
                 .is_some_and(|value| !value["receipt"].is_null())
             {
+                if reply
+                    .result
+                    .as_ref()
+                    .is_some_and(|value| value["receipt"]["status"] == "rejected")
+                {
+                    return error(StatusCode::CONFLICT, "upload_rejected");
+                }
                 upload_draft(&state, &intent, &client).await
             } else {
                 Json(json!({"state":"unknown"})).into_response()
