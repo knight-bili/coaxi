@@ -183,3 +183,23 @@ full integration qualification. Diff disclosure/tree/modal IDs are per instance,
 above selected graph nodes so selection cannot intercept real conversation controls.
 These are current Thread-to-Mission links; durable independent Mission/Task/Diff pins, file-node
 authorization joins and actual Core/Runtime/end-to-end qualification remain required I03 work.
+
+
+## Private input handoff in the Renderer
+
+SingleChatPanel binds PrivateInputController to the admitted client, Thread, original Conversation and
+exact canvas context. Reads validate scope metadata without registering. Meaningful local edits and
+explicit commands persist the body-location index before registration or dispatch. The Core remains
+the authority for revisions, retained materials, one FIFO and the edit lease; no parallel execution queue exists.
+
+Full returns and swaps lock the same context's body store while preserving other contexts. A durable
+intent freezes the original UUID and complete parameters, then records the outcome before atomically
+applying body/receipt markers. Reload performs receipt lookup; only an explicit unknown retry resends.
+Late unapplied bodies cannot be paired with newer Core materials. Accepted sends only clear their matching
+original body. Native default bodies use the same admitted local recovery storage as canvas bodies.
+
+The mounted three-panel fixture uses a simulated Core and isolated browser storage. Complete retained
+selection, mirrored bodies, other-card isolation, reply loss, reload, same-request retry, save/cancel and
+takeover are checked there. Actual Host/IPC, multiwindow/crash recovery, scale and final model input
+remain unqualified. Scoped upload/source-digest proof, scoped/retained file authorization, explicit legacy
+material adoption and orphan recovery UI remain required; card files render names only until authorization lands.

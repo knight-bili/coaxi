@@ -36,6 +36,7 @@ export function createThreadAdapter(transport: ConsoleClient, selectWorkspaceDir
     platform: browserPlatform(),
     missionAttachments: null,
     editingRecovery: browserEditingRecovery(transport.editingScope, sessionStorage, { ownerScope: transport.presentationScope, storage: localStorage }),
+    retryPendingCommand: (method, params) => transport.retryPendingCommand(method, params),
     exportDiagnostics: async () => downloadJson(await transport.request('diagnostics.export'), 'rovai-diagnostics.json'),
     exportMonitoring: async filter => downloadJson({ exportedAt: new Date().toISOString(), ...await transport.request<object>('monitoring.snapshot', filter) }, 'rovai-runtime-monitoring.json'),
     revealMonitoringExport: null,

@@ -45,6 +45,9 @@ it('persists scoped Native canvas bodies through the local storage bridge and re
     expect(singleChatComposerStore({}, 'thread', canvasContext).getSnapshot().drafts).toEqual({ body: 'retained' })
     expect(singleChatComposerStore({}, 'thread', { ...canvasContext, nodeId: 'other' }).getSnapshot().drafts).toEqual({})
     expect(values.has('single-chat:thread')).toBe(false)
+    const main = singleChatComposerStore({}, 'thread')
+    expect(main.update(() => ({ body: 'native main' }))).toBe(true)
+    expect(singleChatComposerStore({}, 'thread').getSnapshot().drafts).toEqual({ body: 'native main' })
   } finally { vi.unstubAllGlobals() }
 })
 

@@ -1,4 +1,4 @@
-import type { ThreadClient } from './camp-client'
+import type { EditingRecovery, ThreadClient } from './camp-client'
 import { canvasComposerContextKey, localComposerBaseStorage, type CanvasComposerContext } from './canvas-composer-drafts'
 
 type Owner = Pick<ThreadClient, 'editingRecovery' | 'onInvalidated'>
@@ -7,9 +7,15 @@ export interface SingleChatComposerState {
   readonly ready: boolean
   readonly error: Error | null
   readonly sendingKeys: readonly string[]
+  readonly mutatingKeys: readonly string[]
 }
 export interface SingleChatSendLease {
   clearSentBody(originalBody: string): boolean
+  applyReceipt(commandId: string, originalBody: string): boolean
+  release(): void
+}
+export interface SingleChatMutationLease {
+  applyReceipt(commandId: string, originalBody: string, body?: string): boolean
   release(): void
 }
 const dictionary = (value: unknown): Record<string, string> => value && typeof value === 'object'
@@ -21,9 +27,10 @@ const errorValue = (value: unknown) => value instanceof Error ? value : new Erro
 /** One client-local dictionary per client/Thread/composer context; different canvas cards keep independent input.
  * The default context retains single-chat:<Thread>; scoped keys retain the same string-map shape. No Core/model format is added. */
 export class SingleChatComposerStore {
-  private state: SingleChatComposerState = { drafts: Object.freeze({}), ready: false, error: null, sendingKeys: [] }
+  private state: SingleChatComposerState = { drafts: Object.freeze({}), ready: false, error: null, sendingKeys: [], mutatingKeys: [] }
   private readonly listeners = new Set<() => void>()
   private readonly sends = new Map<string, object>()
+  private readonly mutations = new Map<string, object>()
   private unsubscribe: (() => void) | undefined
   private readonly key: string
 
@@ -32,6 +39,7 @@ export class SingleChatComposerStore {
     this.load()
   }
   getSnapshot = (): SingleChatComposerState => this.state
+  get storageIdentity(): string { return this.key }
   subscribe = (listener: () => void): (() => void) => {
     this.listeners.add(listener)
     if (this.listeners.size === 1) {
@@ -46,12 +54,13 @@ export class SingleChatComposerStore {
   update(next: (current: Readonly<Record<string, string>>) => Record<string, string>): boolean {
     if (!this.state.ready) return false
     const drafts = next(this.state.drafts)
+    if ([...this.mutations.keys()].some(key => (drafts[key] ?? '') !== (this.state.drafts[key] ?? ''))) return false
     if (same(drafts, this.state.drafts)) return !this.state.error
     return this.persist(drafts)
   }
   retry(): boolean { return this.state.ready ? this.persist(this.state.drafts) : this.load() }
   canLeave(key?: string): boolean {
-    return this.state.ready && !this.state.error && (key ? !this.sends.has(key) : this.sends.size === 0)
+    return this.state.ready && !this.state.error && (key ? !this.sends.has(key) && !this.mutations.has(key) : this.sends.size === 0 && this.mutations.size === 0)
   }
   migratePending(from: string, to: string): boolean {
     if (this.sends.has(from) || this.sends.has(to)) return false
@@ -78,10 +87,16 @@ export class SingleChatComposerStore {
     })
   }
   tryBeginSend(key: string): SingleChatSendLease | null {
-    if (!this.state.ready || this.state.error || this.sends.has(key)) return null
+    if (!this.canLeave(key)) return null
     const token = {}
     this.sends.set(key, token); this.publish({ sendingKeys: [...this.sends.keys()] })
     return {
+      applyReceipt: (commandId, originalBody) => {
+        if (this.sends.get(key) !== token || this.state.error) return false
+        const marker = `${key}:sent:${commandId}`
+        if (Object.hasOwn(this.state.drafts, marker)) return true
+        return this.persist({ ...this.state.drafts, ...((this.state.drafts[key] ?? '') === originalBody ? { [key]: '' } : {}), [marker]: '' })
+      },
       clearSentBody: originalBody => {
         if (this.sends.get(key) !== token || (this.state.drafts[key] ?? '') !== originalBody) return false
         return this.update(current => ({ ...current, [key]: '' }))
@@ -92,9 +107,27 @@ export class SingleChatComposerStore {
       }
     }
   }
+  tryBeginMutation(key: string): SingleChatMutationLease | null {
+    if (!this.canLeave(key)) return null
+    const token = {}
+    this.mutations.set(key, token); this.publish({ mutatingKeys: [...this.mutations.keys()] })
+    return {
+      applyReceipt: (commandId, originalBody, body) => {
+        if (this.mutations.get(key) !== token || this.state.error) return false
+        const marker = `${key}:returned:${commandId}`
+        if (Object.hasOwn(this.state.drafts, marker)) return true
+        if (body !== undefined && (this.state.drafts[key] ?? '') !== originalBody) return false
+        return this.persist({ ...this.state.drafts, ...(body === undefined ? {} : { [key]: body }), [marker]: '' })
+      },
+      release: () => {
+        if (this.mutations.get(key) !== token) return
+        this.mutations.delete(key); this.publish({ mutatingKeys: [...this.mutations.keys()] })
+      }
+    }
+  }
   reconcile(): boolean {
     // An unrelated Core invalidation must not discard an unsaved body or revive a sending snapshot.
-    if (!this.state.ready || this.state.error || this.sends.size || !this.owner.editingRecovery) return false
+    if (!this.state.ready || this.state.error || this.sends.size || this.mutations.size || !this.owner.editingRecovery) return false
     try {
       const saved = this.owner.editingRecovery.get(this.key)
       if (!saved || typeof saved !== 'object') return false
@@ -124,6 +157,22 @@ export class SingleChatComposerStore {
   }
 }
 const owners = new WeakMap<object, Map<string, SingleChatComposerStore>>()
+export function singleChatRecoveryStorage(owner: Owner): EditingRecovery {
+  if (owner.editingRecovery) return owner.editingRecovery
+  return {
+    get(key) {
+      const storage = localComposerBaseStorage(owner)
+      if (!storage) throw new Error('Private input storage is unavailable.')
+      const value = storage.getItem(key)
+      return value === null ? undefined : JSON.parse(value)
+    },
+    set(key, value) {
+      const storage = localComposerBaseStorage(owner)
+      if (!storage) throw new Error('Private input storage is unavailable.')
+      storage.setItem(key, JSON.stringify(value))
+    }
+  }
+}
 export function singleChatComposerStore(owner: Owner, threadId: string, context?: CanvasComposerContext): SingleChatComposerStore {
   if (context && context.threadId !== threadId) throw new Error('Canvas draft belongs to another Thread.')
   const contextIdentity = context ? canvasComposerContextKey(context) : undefined
@@ -132,20 +181,7 @@ export function singleChatComposerStore(owner: Owner, threadId: string, context?
   if (!threads) { threads = new Map(); owners.set(owner, threads) }
   let store = threads.get(identity)
   if (!store) {
-    // Native canvas bodies use the same local storage bridge as public drafts, under a separate scoped key.
-    const scopedOwner = context && !owner.editingRecovery ? { onInvalidated: owner.onInvalidated, editingRecovery: {
-      get(key: string): unknown {
-        const storage = localComposerBaseStorage(owner)
-        if (!storage) throw new Error('Canvas draft storage is unavailable.')
-        const value = storage.getItem(key)
-        return value === null ? undefined : JSON.parse(value)
-      },
-      set(key: string, value: unknown): void {
-        const storage = localComposerBaseStorage(owner)
-        if (!storage) throw new Error('Canvas draft storage is unavailable.')
-        storage.setItem(key, JSON.stringify(value))
-      }
-    } } : owner
+    const scopedOwner = { onInvalidated: owner.onInvalidated, editingRecovery: singleChatRecoveryStorage(owner) }
     store = new SingleChatComposerStore(scopedOwner, threadId, contextIdentity); threads.set(identity, store)
   }
   return store

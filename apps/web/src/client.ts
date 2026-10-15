@@ -246,6 +246,14 @@ const RECONCILABLE_COMMANDS = new Set<WebOperation>([
   'messageQuotes.mutateDraft'
 ])
 
+function commandGroup(operation: WebOperation, params: unknown): string {
+  if (operation !== 'singleChat.composerDraft.mutate' && operation !== 'singleChat.pendingInputs.edit' && operation !== 'singleChat.send') return operation
+  const command = params && typeof params === 'object' && 'command' in params ? params.command : null
+  if (!command || typeof command !== 'object') return operation
+  const input = command as { threadId?: string; campId?: string; conversationId?: string; composerScope?: unknown }
+  return JSON.stringify([operation, input.threadId ?? input.campId, input.conversationId, input.composerScope ?? null])
+}
+
 export type ConnectionState = 'connecting' | 'live' | 'offline' | 'expired'
 type PendingCommand = { operation: WebOperation; params: unknown; resolve(value: unknown): void; reject(error: unknown): void }
 type PendingUpload = { intent: unknown; data: FormData | null; resolve(draft: unknown): void; reject(error: unknown): void }
@@ -568,10 +576,25 @@ export class ConsoleClient {
   }
 
   async request<T>(operation: WebOperation, params: unknown = {}): Promise<T> {
+    if (operation === 'commands.reconcile') {
+      const query = structuredClone(params) as { operation?: WebOperation; params?: { commandId?: string } }
+      const receipt = await this.#rpc<CommandReceipt>(operation, query)
+      const id = query.params?.commandId
+      const entry = id ? this.#pending.get(id) : undefined
+      if (receipt.state === 'recorded' && id && entry && entry.operation === query.operation && JSON.stringify(entry.params) === JSON.stringify(query.params)) {
+        this.#pending.delete(id)
+        try { this.#notifyPending() } finally {
+          if (receipt.error) entry.reject(new CoreRequestError(receipt.error.code, receipt.error.message))
+          else entry.resolve(receipt.result)
+        }
+      }
+      return receipt as T
+    }
     const commandId = params && typeof params === 'object' && 'commandId' in params ? params.commandId : undefined
     if (!RECONCILABLE_COMMANDS.has(operation) || typeof commandId !== 'string') return this.#rpc<T>(operation, params)
     if (!this.authenticated) throw new SessionRequired()
-    if ([...this.#pending.values()].some(entry => entry.operation === operation)) throw new Error('同类操作的原提交仍待核对，请先核对原提交结果。')
+    const group = commandGroup(operation, params)
+    if ([...this.#pending.values()].some(entry => commandGroup(entry.operation, entry.params) === group)) throw new Error('同类操作的原提交仍待核对，请先核对原提交结果。')
     if (this.#pending.has(commandId)) throw new Error('原命令仍在核对中，请等待其结果。')
     // Keep the original request and promise alive through connection/session
     // loss. Shared production handlers retain their submitting state; no new ID
@@ -582,6 +605,14 @@ export class ConsoleClient {
       this.#notifyPending()
       void this.#dispatchCommand(commandId, entry)
     })
+  }
+
+  async retryPendingCommand(operation: 'singleChat.composerDraft.mutate' | 'singleChat.pendingInputs.edit' | 'singleChat.send', params: unknown): Promise<void> {
+    const id = params && typeof params === 'object' && 'commandId' in params ? params.commandId : undefined
+    const entry = typeof id === 'string' ? this.#pending.get(id) : undefined
+    if (!entry) { await this.request(operation, structuredClone(params)); return }
+    if (entry.operation !== operation || JSON.stringify(entry.params) !== JSON.stringify(params)) throw new Error('原命令参数不一致。')
+    await this.#dispatchCommand(id as string, entry, true)
   }
 
   async #dispatchCommand(commandId: string, entry: PendingCommand, preserveUnknown = false): Promise<void> {

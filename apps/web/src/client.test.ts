@@ -158,6 +158,55 @@ describe('console transport', () => {
     expect(fetcher.mock.calls.filter(([, init]) => init?.body && JSON.parse(String(init.body)).operation === operation)).toHaveLength(1)
   })
 
+  it('keeps an unknown private card independent and settles the original promise through an explicit receipt read', async () => {
+    let recorded = false
+    const params = (nodeId: string) => ({ commandId: newCommandId(), command: { threadId: 'thread', conversationId: 'private', composerScope: { kind: 'canvas', boardId: 'board', nodeId }, expectedDraftRevision: 0, action: { type: 'register_scope' } } })
+    const first = params('A'), second = params('B')
+    const result = { status: 'applied', code: 'single_chat.composer_draft_updated', payload: {} }
+    const fetcher = vi.fn<typeof fetch>().mockImplementation(async (url, options) => {
+      if (String(url).endsWith('/login')) return Response.json({ protocolVersion: 4, token: 'a'.repeat(64), clientId: 'd'.repeat(64), editorProof: 'e'.repeat(64), ownerId: 'local_user' })
+      const body = JSON.parse(String(options?.body))
+      if (body.operation === 'commands.reconcile') return Response.json({ result: recorded ? { state: 'recorded', result } : { state: 'unknown' } })
+      if (body.params.commandId === first.commandId) throw new TypeError('A reply lost')
+      expect(body.params).toEqual(second)
+      return Response.json({ result })
+    })
+    const client = new ConsoleClient('http://localhost:4317', fetcher)
+    await client.login('b'.repeat(64))
+    const pending = client.request('singleChat.composerDraft.mutate', first)
+    await vi.waitFor(() => expect(fetcher.mock.calls.some(([, init]) => JSON.parse(String(init?.body)).operation === 'commands.reconcile')).toBe(true))
+    await expect(client.request('singleChat.composerDraft.mutate', { ...first, commandId: newCommandId() })).rejects.toThrow('同类操作')
+    await expect(client.request('singleChat.composerDraft.mutate', second)).resolves.toEqual(result)
+    recorded = true
+    await client.request('commands.reconcile', { operation: 'singleChat.composerDraft.mutate', params: first })
+    await expect(pending).resolves.toEqual(result)
+    expect(client.pendingCommandCount).toBe(0)
+    expect(fetcher.mock.calls.filter(([, init]) => { const body = JSON.parse(String(init?.body)); return body.operation === 'singleChat.composerDraft.mutate' && body.params.commandId === first.commandId })).toHaveLength(1)
+  })
+
+  it('retries only the exact original private request and resolves its retained transport promise', async () => {
+    let permit = false
+    const params = { commandId: newCommandId(), command: { threadId: 'thread', conversationId: 'private', action: { type: 'return_to_composer', targetBody: '完整当前正文', expectedDraftRevision: 1 } } }
+    const result = { status: 'applied', payload: { placement: 'retained' } }
+    const fetcher = vi.fn<typeof fetch>().mockImplementation(async (url, options) => {
+      if (String(url).endsWith('/login')) return Response.json({ protocolVersion: 4, token: 'a'.repeat(64), clientId: 'd'.repeat(64), editorProof: 'e'.repeat(64), ownerId: 'local_user' })
+      const body = JSON.parse(String(options?.body))
+      if (body.operation === 'commands.reconcile') return Response.json({ result: { state: 'unknown' } })
+      expect(body.params).toEqual(params)
+      if (!permit) throw new TypeError('lost')
+      return Response.json({ result })
+    })
+    const client = new ConsoleClient('http://localhost:4317', fetcher)
+    await client.login('b'.repeat(64))
+    const pending = client.request('singleChat.pendingInputs.edit', params)
+    await vi.waitFor(() => expect(client.pendingCommandCount).toBe(1))
+    await expect(client.retryPendingCommand('singleChat.pendingInputs.edit', { ...params, command: { ...params.command, action: { ...params.command.action, targetBody: '变更正文' } } })).rejects.toThrow('参数不一致')
+    permit = true
+    await client.retryPendingCommand('singleChat.pendingInputs.edit', params)
+    await expect(pending).resolves.toEqual(result)
+    expect(client.pendingCommandCount).toBe(0)
+  })
+
   it('resumes an unknown source binding without uploading another file', async () => {
     let bound = false
     let intent: unknown

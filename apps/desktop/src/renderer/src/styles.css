@@ -1470,6 +1470,21 @@ html[data-rovai-platform="win32"] .bootstrap-shell-brand { padding-left: 20px; }
 .single-chat-retained-inputs select, .single-chat-retained-inputs button { min-width: 0; max-width: 100%; min-height: 28px; padding: 4px 6px; border: 1px solid var(--line); border-radius: 4px; color: var(--ink); background: var(--surface); font: inherit; }
 .single-chat-retained-inputs button:hover:not(:disabled) { background: var(--surface-hover); }
 .single-chat-retained-inputs button:disabled { opacity: .55; }
+.single-chat-retained-inputs[aria-label] { grid-template-columns: minmax(0, 1fr); max-height: min(240px, 32vh); overflow: auto; }
+.single-chat-retained-inputs[aria-label] > div { min-width: 0; }
+.single-chat-retained-inputs label { display: block; margin-bottom: 4px; }
+.single-chat-retained-inputs select { width: 100%; margin-bottom: 5px; }
+.single-chat-retained-inputs details { margin-top: 6px; }
+.single-chat-retained-inputs pre, .single-chat-retained-inputs blockquote { margin: 6px 0; white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; }
+.single-chat-retained-inputs .single-chat-error { flex-wrap: wrap; }
+.single-chat-pending-editor { grid-column: 1 / -1; min-width: 0; width: 100%; }
+.single-chat-pending-editor label { display: grid; gap: 4px; color: var(--muted); }
+.single-chat-pending-editor textarea { box-sizing: border-box; width: 100%; min-height: 70px; max-height: 180px; resize: vertical; padding: 7px; border: 1px solid var(--line); border-radius: 4px; color: var(--ink); background: var(--surface); font: inherit; }
+.single-chat-pending-editor button, .single-chat-scoped-file button { padding: 4px 6px; border: 1px solid var(--line); border-radius: 4px; color: var(--ink); background: var(--surface); font: inherit; }
+.single-chat-pending-editor .pending-input-actions { margin-top: 6px; flex-wrap: wrap; }
+.single-chat-pending-editor blockquote { white-space: pre-wrap; overflow-wrap: anywhere; }
+.single-chat-scoped-file { display: flex; min-width: 0; align-items: center; gap: 6px; padding: 5px; border: 1px solid var(--line); border-radius: 4px; color: var(--muted); }
+.single-chat-scoped-file span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .single-chat-footer { display: flex; min-height: 30px; flex: 0 0 auto; align-items: center; justify-content: space-between; gap: 10px; padding: 4px 12px 4px 16px; border-top: 1px solid var(--line); color: var(--faint); font-size: 10.5px; }
 .single-chat-footer > span:last-child { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
 .single-chat-footer kbd { padding: 1px 5px; border: 1px solid var(--line-strong); border-bottom-width: 2px; border-radius: 4px; background: var(--surface-subtle); font: 500 9px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; }

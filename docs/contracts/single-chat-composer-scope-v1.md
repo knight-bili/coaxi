@@ -4,7 +4,7 @@ contract: single-chat-composer-scope-v1
 authority: private-composer-scope-and-material-selection
 status: accepted
 version: 1
-last_updated: 2026-10-15
+last_updated: 2026-10-16
 ---
 
 # Single Chat Composer Scope v1
@@ -85,9 +85,22 @@ return_to_composer 必须携带冻结的 targetBody 并核对目标材料 revisi
 当前 draft/revision 保持。两条路径与原 Pending 取消、事件和回执同事务，失败全回滚；不创建新 FIFO。
 成功 payload 保留 pendingInputId/body/draft，增加 active/retained placement，retained 时带完整 retainedInput；外部变更提示只含 Thread/Conversation。
 
-上传 prepare UUID/源摘要、资源授权、Renderer 新移回参数/完整保留选择、本机意图恢复继续实施。
-现有 SingleChatPanel 尚未接 targetBody 与 placement，按钮新请求会明确拒绝；这是本阶段尚未接通的客户端项，不能宣称 UI 可用。
-卡片 UI 尚未启用新材料操作；最终 Manifest Blob、实际 Runtime 和完整隔离仍待验收。
+Renderer 的 SingleChatPanel 已通过 PrivateInputController 提交冻结的 targetBody、材料 revision 与原 UUID，
+区分 active/retained，按精确位置列出完整保留输入并整份交换；旧版正文副本明确标注不含附件和引用。
+卡片 scoped get 核对回显，quote/remove/send 使用同一 scope；能力不匹配时只展示历史，不以默认材料替代卡片写入。
+排队工作副本可保存、放弃或从已保存版本明确接管；不把别位置的令牌或工作正文展示给当前卡片。
+
+本机正文仍用 string-map，增加版本化原请求记录、正文位置索引和空回执标记。写操作先登记正文位置，
+再落盘原 UUID/全参数后发出；本机记录失败不提交。移回/交换锁定同位置镜像，其他位置继续编辑。
+收到结果先保存回执，再保存正文和标记，最后清原意图；重载只读核对原请求，不自动重发。
+结果为 unknown 才提供明确重试，继续原编号/全参数。迟到的移回结果若材料已更新且正文尚未应用，保持待恢复并拒绝拼接新材料；
+原连接始终不返回时，只读查询取得的已存结果同样结清原界面等待；不以连接仍未返回为由重发或继续锁住已完成操作。
+已存标记的回执不重复恢复旧正文；发送回执只清除仍匹配原发送的正文。Native 默认输入也经现有隔离本机存储落盘。
+只读打开不登记 scope；有意义正文编辑先保存本机正文/索引后登记。未完成分页保留已知输入，只在完整枚举后剔除缺席项。
+
+上传 prepare UUID/源摘要、scope/retained 文件资源授权、默认材料显式迁入和孤立输入统一恢复界面继续实施。
+本批卡片文件添加暂禁用、活动卡片附件只显示文件名并可移除，不借旧默认 locator 读取文件；工作副本也不提供未授权预览。
+本机页重载和模拟 Core 挂载不替代实际 HTTP/Native IPC、多窗口恢复、Host 重启、最终 Manifest Blob 或 Runtime/平台验收。
 
 本轮因主键及迁移安全影响后续接线，按阶段策略例外做本地定向编译/迁移 owner，完整跨平台、实际 Runtime 与 PC01–PC24 仍待验。
 具体命令、源码和失败记录见[迁移执行证据](../../integration/execution/i03-private-scope-storage-result.json)，不宣称完整功能或整套一期通过。
@@ -100,3 +113,6 @@ Application/可信编辑端接线、默认形状/编辑令牌隔离、回执只�
 
 排队租约/完整移回、尾部回执失败回滚、原请求回放和旧默认形状的本地证据见
 [排队编辑执行记录](../../integration/execution/i03-private-pending-edit-result.json)。本地分项不替代完整 PC01–PC24 或实际客户端验收。
+
+Renderer、原请求恢复和隔离浏览器挂载的分项证据见
+[输入界面执行记录](../../integration/execution/i03-private-input-ui-result.json)；完整 PC01–PC24 仍未执行完毕。

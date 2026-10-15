@@ -37,6 +37,16 @@ quota/读取拒绝及旧 scoped ID 经有效图迁移；继续扩展 `canvas-con
 该挂载发现并修复节点几何随内容/空分组数组反复更新的 ReactFlow 白屏；原纯/静态测试不覆盖此问题。
 页面 reload/localStorage 不等于完整 Native 进程重启；原编辑器 undo 保留、异常退出、私有附件/quotes CAS 与平台规模继续待验。
 
+私聊输入交接新增最低层 TypeScript owner `private-input-controller.test.ts`，负责原请求持久化、
+active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确同编号重试、正文标记幂等、晚回执材料变化拒绝、
+损坏版本保留和本机正文位置索引。移回和发送均覆盖原连接永久等待、只读查询已有结果后结清原调用，不依赖 Web 运输代为完成 Promise。
+既有 `single-chat-composer-store.test.ts` 继续负责 string-map/Native 存储，
+`client.test.ts` 负责 Web 请求分组和原在途 Promise 与手工核对收敛，`SingleChatPanel.test.ts` 保留展示/轮询契约。
+独立控制器不触发 Runtime，原静态展示和运输 owner 不拥有上述交接状态，故新增 owner 有明确职责。
+生产 SingleChatPanel/恢复区/排队编辑的三位置浏览器夹具仅使用模拟 Core 和隔离本机前缀，检查完整材料切换、
+同位置镜像、不同位置隔离、页面 reload 只读恢复、同编号明确重试及保存/放弃/接管。
+该夹具不证明实际 Host/Native、多窗口、源文件摘要/授权、最终模型 Blob 或完整 PC01–PC24；正式324场景保持未验。
+
 ## Rust 测试准入与退役门槛
 
 私聊材料服务新增三个 `single_chat_composer::tests` 扩展 owner：
