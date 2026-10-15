@@ -42,3 +42,5 @@ I00已自审修正并合入，I01基础构建与契约证据保留草稿；I02�
 - [I03展开保存与只读恢复检查点](execution/i03-canvas-recovery-result.json)：精确Host/Owner/Core/Board记录、切页切板保留、显式收起、恢复/停止/重试与saved-input恢复已接；230相关检查及类型/文案/文档通过。真实CanvasWorkspace/Surface/ReactFlow模拟Core完成12步检查，另发现并修复展开白屏；只读运输没有enter/启动Runtime。原编辑器/undo的原子离开、Native完整/异常进程恢复、私有附件隔离及真实平台仍待补齐。
 
 - [I03原编辑器离开事务检查点](execution/i03-canvas-atomic-leave-result.json)：导航失败/拒绝/失效、等待取消与Renderer后续退出检查失败保留同一编辑器和撤销；画板拒绝/未知结果保留实例、核对成功才交接。247相关检查、类型/文案/文档及生产画布mock浏览器验证通过，并修复删除后自动选板循环；Native退出/异常进程/Host与私有附件隔离继续。
+
+- [I03卡片使命交付与累计Diff检查点](execution/i03-canvas-mission-result.json)：复用原Mission说明/启动/交付/活动/累计Diff，核对Thread/Mission标识、来源回原卡片及镜像控件隔离；修复选中节点遮挡真实会话控件。228相关检查与类型/文案/文档、mock前端交互通过；独立持久对象引用、完整私有导航和真实使命运行/平台验收继续。
