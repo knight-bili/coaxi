@@ -130,10 +130,10 @@
       "id": "DEV-CANVAS-PRIVATE-MATERIALS",
       "task": "I03-T03",
       "owner": "研发",
-      "status": "r1_confirmed_storage155_and_default_fences_locally_verified_new_apis_pending",
-      "problem": "已确认r1归属编码、Schema155/Migration205、完整保留输入和旧默认范围限制已实现，22项本地定向及相关回归通过；新scope登记/get能力协商/恢复、附件引用CAS/发送、接管/整份移回交换及原UUID未知恢复仍待接通；不得用部分owner冒充完整24PC/324验收。",
+      "status": "r1_confirmed_core_service_scoped_send_verified_transports_and_clients_pending",
+      "problem": "I03私聊材料隔离r1的Core七动作、精确读取、有界恢复及按scope发送消费已实现，17项本地定向检查通过。运输与客户端/上传/编辑接管和完整移回仍待接通，不作全链路或模型资格。完整24PC/324、最终Blob与实际Runtime仍待验；缺资源最后补验，不缩一期范围。",
       "confirmation": "i03-private-materials-proposal-result.json",
-      "evidence": "i03-private-scope-storage-result.json"
+      "evidence": "i03-private-composer-service-result.json"
     }
   ]
 }
