@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "I03私聊材料隔离r1的Core七动作、精确读取、有界恢复及按scope发送消费已实现，17项本地定向检查通过。运输与客户端/上传/编辑接管和完整移回仍待接通，不作全链路或模型资格。",
+  "current_slice": "I03私聊材料r1已接get/mutate/recovery统一应用入口、两端准入、可信编辑端和原UUID只读核对；17项Core与29项模拟客户端检查通过。卡片UI、上传准备、编辑接管/完整移回和本机意图仍待，不判实际Host/模型或完整功能通过。",
   "stages": {
     "I00": "accepted",
     "I01": "source_evidence_ready_pending_customer_acceptance",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "按已确认r1接Application/get省略与显式null能力回显、mutate/recovery的可信运输与客户端，再接上传prepare原UUID/源摘要、编辑接管/完整移回和本机未知意图恢复。Core七动作/分页/所选材料发送及原FIFO已本地17项验证；完整24PC/324仍待验，Host/Native/HTML规模/旧焦点继续。",
+    "按已确认r1继续上传prepare原UUID/源摘要和资源授权；单Conversation编辑接管/完整移回；本机正文索引/未知意图和Renderer卡片材料UI。get/mutate/recovery应用入口和两端准入已接，scope快照与原UUID只读核对本地验证；实际Host/Native、完整24PC/324、HTML规模及旧焦点仍待。",
     "继续I03独立持久Mission/Task/Diff对象引用及启动/定位、文件节点授权和真实临时PTY、Desktop冷启动画布；现Thread关联Mission与累计Diff卡片接线已mock前端验证，私有来源完整导航和真实Core/Runtime仍待阶段候选。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "必需实现和验证全部完成后交客户验收；待办未补齐或场景未验收不标记目标完成",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "core_private_material_service_and_scoped_send_locally_verified_transport_and_clients_pending",
+  "current_slice_status": "private_composer_application_routes_and_client_capability_checks_locally_verified_upload_edit_and_UI_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -57,7 +57,7 @@
   "skill_catalog_evidence": "i02-skill-catalog-result.json",
   "skill_install_evidence": "i02-skill-install-result.json",
   "system_goal_status": "active",
-  "system_goal_verified_at": "2026-10-15T14:10:21.283726+00:00",
+  "system_goal_verified_at": "2026-10-15T14:35:30.343011+00:00",
   "skill_members_evidence": "i02-skill-members-result.json",
   "canvas_boards_evidence": "i03-canvas-boards-result.json",
   "skill_delivery_preparation_evidence": "i02-skill-delivery-preparation-result.json",
@@ -112,7 +112,7 @@
     "source_progress_continued": true
   },
   "project_groups_evidence": "i03-project-groups-result.json",
-  "checked_at": "2026-10-15T14:10:21.283726+00:00",
+  "checked_at": "2026-10-15T14:35:30.343011+00:00",
   "project_layout_evidence": "i03-project-layout-result.json",
   "project_tree_evidence": "i03-project-tree-result.json",
   "navigation_activity_evidence": "i03-navigation-activity-result.json",
@@ -137,5 +137,6 @@
   "canvas_private_materials_proposal_evidence": "i03-private-materials-proposal-result.json",
   "canvas_private_scope_foundation_evidence": "i03-private-scope-foundation-result.json",
   "canvas_private_scope_storage_evidence": "i03-private-scope-storage-result.json",
-  "canvas_private_composer_service_evidence": "integration/execution/i03-private-composer-service-result.json"
+  "canvas_private_composer_service_evidence": "integration/execution/i03-private-composer-service-result.json",
+  "canvas_private_composer_api_evidence": "i03-private-composer-api-result.json"
 }
