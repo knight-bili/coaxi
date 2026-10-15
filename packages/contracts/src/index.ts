@@ -978,6 +978,40 @@ export interface SingleChatComposerDraftView {
   updatedAt: string | null
 }
 
+export type PrivateAttachmentUploadTarget = {
+  kind: 'single_chat'
+  conversationId: string
+  composerScope?: SingleChatComposerScope | null
+} | {
+  kind: 'single_chat_pending'
+  conversationId: string
+  composerScope?: SingleChatComposerScope | null
+  pendingInputId: string
+  editToken: string
+}
+
+export interface PrivateAttachmentPreparationRequest {
+  commandId: string
+  threadId: string
+  expectedRevision: number
+  target: PrivateAttachmentUploadTarget
+}
+
+export type PrivateAttachmentPreparationResult = {
+  state: 'prepared' | 'unknown'
+  commandId: string
+} | {
+  state: 'recorded'
+  commandId: string
+  receipt: StoredCommandResult
+}
+
+export interface PrivateAttachmentPreparationOwner {
+  threadId: string
+  conversationId: string
+  composerScope: SingleChatComposerScope | null
+}
+
 export interface SingleChatComposerScope {
   kind: 'canvas'
   boardId: string
@@ -4761,6 +4795,12 @@ export interface RovaiApi {
   }
   missionAttachments: MissionAttachmentsApi
   singleChatAttachments: {
+    prepareInput?(request: PrivateAttachmentPreparationRequest, file: File): Promise<PrivateAttachmentPreparationResult>
+    reconcileInput?(request: PrivateAttachmentPreparationRequest): Promise<PrivateAttachmentPreparationResult>
+    retryInput?(request: PrivateAttachmentPreparationRequest): Promise<PrivateAttachmentPreparationResult>
+    pendingPreparations?(owner: PrivateAttachmentPreparationOwner): Promise<Array<{
+      request: PrivateAttachmentPreparationRequest; displayName: string; state: 'prepared' | 'unknown' | 'recorded'
+    }>>
     prepare(
       conversationId: string,
       expectedDraftRevision: number,

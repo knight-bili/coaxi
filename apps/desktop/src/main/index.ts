@@ -24,6 +24,7 @@ import {
 } from 'electron'
 import { isThreadId } from '@contracts'
 import { parsePrivateAttachmentLocator } from '../shared/private-attachment-locator'
+import { PrivateAttachmentPreparations } from './private-attachment-preparation'
 import type {
   AppearancePreferences,
   AppearanceSnapshot,
@@ -539,6 +540,9 @@ executionView.onChanged((snapshot) => {
 })
 const localComposerAttachments = new LocalComposerAttachmentRegistry(
   join(app.getPath('userData'), 'local-composer-attachments-v1.json')
+)
+const privateAttachmentPreparations = coreDataPath === null ? null : new PrivateAttachmentPreparations(
+  join(coreDataPath, 'private-attachment-preparations-v1'), core
 )
 const filePreview = new FilePreviewService(
   new CoreFilePreviewSourceAuthority(core, async (locator) =>
@@ -2193,6 +2197,21 @@ ipcMain.handle(
     return localComposerAttachments.location(locator)
   }
 )
+
+function privateUploadService(event: Electron.IpcMainInvokeEvent): PrivateAttachmentPreparations {
+  if (!privateAttachmentPreparations || event.sender !== mainWindow?.webContents) {
+    throw new Error('私聊上传工作区不可用。')
+  }
+  return privateAttachmentPreparations
+}
+ipcMain.handle('rovai:private-attachment-prepare', (event, request: unknown, input: unknown) =>
+  privateUploadService(event).prepare(request, input))
+ipcMain.handle('rovai:private-attachment-reconcile', (event, request: unknown) =>
+  privateUploadService(event).reconcile(request))
+ipcMain.handle('rovai:private-attachment-retry', (event, request: unknown) =>
+  privateUploadService(event).retry(request))
+ipcMain.handle('rovai:private-attachment-list', (event, owner: unknown) =>
+  privateUploadService(event).list(owner))
 
 ipcMain.handle(
   'rovai:single-chat-attachment-prepare-path',

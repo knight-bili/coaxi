@@ -60,6 +60,12 @@ Web 按卡片上传继续扩展上述第三个 Core owner 的独立临时 SQLite
 阶段候选显式使用 extended-tests 并确认非零清单后运行。Web 原 `client.test.ts` 上传恢复 owner 改为公开/卡片/工作副本三类表驱动，
 验证摘要期间的目标冻结及丢回执只核对原请求；与原 `file-digest.test.ts` 共27项通过。定向 types 包含 Main。
 Native 异常后保留源文件目前只有源码审查和类型证据，实际 IPC 故障注入、原编号恢复和清理资格仍待完成。
+
+后续新增 `private-attachment-preparation.test.ts` 最低层 Main owner：独立临时目录验证版本化日志落盘、准确位置枚举、
+已准备/未知状态重启只读、相同原字节残留复用、同长度变化拒绝、另一 Core 目录拒绝采纳，以及查询回执独立结清永久等待的原调用。
+Core 替身只拥有观察/回执运输 seam，不证明实际 Core 或 Native IPC；原第三个 Core owner 扩展 Native 观察/准入、公开目标拒绝、
+同长度内容变化时零附加/无回执及原结果回放，不新增 Rust owner。6项 Main 加既有27项 Web/摘要检查通过，定向 types 含 Main/Preload。
+Core、实际 IPC 和文件 UI 统一留待阶段集中验证；附加前检查不代替发送前源观察或完整 PC15。
 本地 Core 检查不代表 Host HTTP/Native 或完整文件能力资格；源内容摘要、上传与完整 PC15 继续待验。
 
 私聊材料服务新增三个 `single_chat_composer::tests` 扩展 owner：

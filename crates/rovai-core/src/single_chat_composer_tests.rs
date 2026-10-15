@@ -1109,6 +1109,55 @@ fn verify_private_upload_bindings() {
     let mut source =
         observe_source_attachment(&file, &intent.display_name, Some("text/plain")).unwrap();
     source.id = intent.command_id.clone();
+    let native_params = json!({
+        "commandId":Uuid::new_v4().to_string(),"threadId":f.thread,"expectedRevision":0,
+        "target":{"kind":"single_chat","conversationId":f.conversation},
+        "sourcePath":file,"displayName":"upload.txt","mediaType":"text/plain"
+    });
+    assert!(
+        web_upload::observe_native(
+            &client,
+            serde_json::from_value(native_params.clone()).unwrap()
+        )
+        .is_err()
+    );
+    let native = web_upload::observe_native(
+        &DraftClient::default(),
+        serde_json::from_value(native_params).unwrap(),
+    )
+    .unwrap();
+    let native_intent: UploadIntent = serde_json::from_value(native["intent"].clone()).unwrap();
+    let native_source = serde_json::from_value(native["source"].clone()).unwrap();
+    assert_eq!(native_intent.sha256, intent.sha256);
+    web_upload::bind(
+        &mut f.database,
+        &file,
+        &DraftClient::default(),
+        native_intent.clone(),
+        native_source,
+    )
+    .unwrap();
+    let mut public_native = native_intent;
+    public_native.target = UploadTarget::Camp;
+    public_native.command_id = Uuid::new_v4().to_string();
+    assert!(web_upload::reconcile(&f.database, &DraftClient::default(), public_native).is_err());
+    std::fs::write(&file, b"other").unwrap();
+    assert!(
+        web_upload::bind(
+            &mut f.database,
+            &file,
+            &client,
+            intent.clone(),
+            source.clone()
+        )
+        .is_err()
+    );
+    assert!(
+        web_upload::reconcile(&f.database, &client, intent.clone())
+            .unwrap()
+            .is_none()
+    );
+    std::fs::write(&file, b"input").unwrap();
     assert!(
         web_upload::reconcile(&f.database, &client, intent.clone())
             .unwrap()

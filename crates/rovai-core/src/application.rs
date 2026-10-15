@@ -7493,6 +7493,12 @@ impl Core {
                     rovai_core::draft_client::resolve_editor(&database, resume)?,
                 )?)
             }
+            "host.upload.observe" => {
+                rovai_core::web_upload::observe_native(
+                    &request.client,
+                    serde_json::from_value(request.params.clone())?,
+                )
+            }
             "host.upload.bind" => {
                 #[derive(Deserialize)]
                 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -7512,6 +7518,16 @@ impl Core {
                 Ok(
                     json!({"receipt":execution.result, "replayed":execution.replayed, "draft":rovai_core::web_upload::snapshot(&database, &self.data_dir, &request.client, &params.intent)?}),
                 )
+            }
+            "host.upload.receipt" => {
+                anyhow::ensure!(
+                    request.client.is_desktop(),
+                    "native receipt requires the desktop editor"
+                );
+                let intent = serde_json::from_value(request.params.clone())?;
+                let database = self.database.lock().await;
+                let execution = rovai_core::web_upload::reconcile(&database, &request.client, intent)?;
+                Ok(json!({"receipt":execution.map(|value|value.result)}))
             }
             "host.upload.reconcile" => {
                 let intent: rovai_core::web_upload::UploadIntent =

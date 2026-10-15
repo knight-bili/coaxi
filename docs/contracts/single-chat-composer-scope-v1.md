@@ -146,3 +146,25 @@ Web 上传的既有 `single_chat` / `single_chat_pending` target 增加可选 co
 Native 旧字节入口不再因 Core 异常删除可能已经绑定的源文件；明确失败后的回收、Native 上传原编号持久化及
 私有源内容变化校验继续实施。卡片文件添加入口保持禁用。此批只完成部分接线，Core 新断言留待阶段候选编译执行；
 27项 Web 客户端/摘要检查及定向类型通过不代表实际 Host HTTP、Native IPC 或完整 PC01–PC24 通过。
+
+## Native 原上传请求恢复（2026-10-16）
+
+新增可选 Native `prepareInput/reconcileInput/retryInput/pendingPreparations` 桥。请求固定原 commandId、Thread、
+Conversation、scope、revision 和可选 Pending/编辑令牌；闭合解析拒绝自报 client、未知字段及非规范标识。
+Main 在当前 Core 数据目录保存版本化请求记录；本机路径和原文件信息只留在 Main，不返回 Renderer。
+字节来源先写入并落盘，再保存准备记录；完整同编号残留仅在与显式重选的原字节逐字一致时复用，不覆盖不同内容。
+记录为 prepared、unknown 或 recorded，读恢复/重复 prepare 只查询原结果，显式 retry 才派发原请求。
+
+Host 私有 `host.upload.observe` 只允许 Desktop 私聊目标，观察文件和摘要，不创建业务对象或 scope；
+`host.upload.receipt` 独立只读原回执，不依赖当前草稿快照或源文件仍存在。公开上传仍不接受 Desktop 身份。
+所有私聊上传在原 Gateway Handler 内复核实际字节摘要，已存 UUID 回放先命中原结果，不重新读取源文件。
+读取使用现有不跟随末端符号链接、非阻塞的文件打开边界，类型变化拒绝。原 SourceRef 形状、模型投影和冻结输入保持。
+
+Main 查询到 Core 原回执后持久记录，并可独立结清原连接仍在等待的调用；查询未知、连接失败或请求冲突时保留输入和文件。
+明确重试再次观察原路径并核对原摘要、名称和类型，同长度内容变化也拒绝，不改请求编号或改绑位置。
+准备记录按准确位置列出，不把其他卡片的 Pending 令牌交给当前卡片。旧 Native 默认入口仍兼容，新增桥尚未接入文件界面。
+
+本批 Native 桥暂只观察普通文件，目录的内容观察仍在一期清单内。明确失败后的安全回收、已附加后至发送前的源变化检查、
+Core 数据目录内字节暂存的实际资源授权/预览、原字节重选界面以及迁入/孤立恢复继续实施；不能据上传附加前摘要校验判 PC15 通过。
+新增 Main 最低层 owner 以真实隔离文件系统和模拟 Core 运输验证持久化、恢复、内容变化和迟到回执；
+Core 新代码及原第三个扩展 owner 留待阶段候选编译运行。卡片文件添加仍禁用，实际 Native IPC/Host/多窗口验证未完成。

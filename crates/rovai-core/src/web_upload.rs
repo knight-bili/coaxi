@@ -4,9 +4,111 @@ use crate::{
     command::*, db::Database, draft_client::DraftClient,
     local_attachment_source::LocalAttachmentSourceRef,
 };
-use anyhow::{Result, ensure};
+use anyhow::{Context, Result, ensure};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use sha2::{Digest, Sha256};
+use std::io::Read;
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct NativeUploadPreparation {
+    pub command_id: String,
+    #[serde(rename = "threadId")]
+    pub camp_id: String,
+    pub expected_revision: i64,
+    pub target: UploadTarget,
+    pub source_path: String,
+    pub display_name: String,
+    pub media_type: Option<String>,
+}
+
+// Host 私有入口只观察本机文件，不写草稿、不登记 scope、不执行上传。
+pub fn observe_native(
+    client: &DraftClient,
+    params: NativeUploadPreparation,
+) -> Result<serde_json::Value> {
+    ensure!(
+        client.is_desktop(),
+        "native upload requires the desktop editor"
+    );
+    ensure!(
+        !matches!(params.target, UploadTarget::Camp),
+        "native upload requires a private target"
+    );
+    crate::camp_id::ThreadId::parse(&params.camp_id)?;
+    let id = uuid::Uuid::parse_str(&params.command_id)?;
+    ensure!(
+        id.hyphenated().to_string() == params.command_id,
+        "invalid upload identity"
+    );
+    ensure!(params.expected_revision >= 0, "invalid upload revision");
+    let path = std::path::Path::new(&params.source_path);
+    ensure!(path.is_absolute(), "upload path must be absolute");
+    let file = crate::local_attachment_snapshot::open_source_without_following(path)?;
+    let metadata = file.metadata()?;
+    ensure!(
+        metadata.is_file(),
+        "private upload directory observation is not available"
+    );
+    let byte_size = metadata.len();
+    let source = LocalAttachmentSourceRef {
+        id: params.command_id.clone(),
+        source_path: params.source_path,
+        display_name: crate::local_attachment_snapshot::normalize_display_name(
+            &params.display_name,
+        )?,
+        kind: crate::local_attachment_source::LocalAttachmentKind::File,
+        media_type: params
+            .media_type
+            .as_deref()
+            .map(str::trim)
+            .filter(|value| !value.is_empty())
+            .map(str::to_string),
+        observed_byte_size: Some(byte_size),
+    };
+    drop(file);
+    let sha256 = observe_file_digest(&source, byte_size)?;
+    let intent = UploadIntent {
+        target: params.target,
+        command_id: params.command_id,
+        camp_id: params.camp_id,
+        expected_revision: params.expected_revision,
+        display_name: source.display_name.clone(),
+        byte_size,
+        sha256,
+    };
+    Ok(json!({"intent":intent,"source":source}))
+}
+
+fn observe_file_digest(source: &LocalAttachmentSourceRef, expected_size: u64) -> Result<String> {
+    ensure!(
+        source.kind == crate::local_attachment_source::LocalAttachmentKind::File,
+        "upload requires a file"
+    );
+    let file = crate::local_attachment_snapshot::open_source_without_following(
+        std::path::Path::new(&source.source_path),
+    )?;
+    ensure!(file.metadata()?.is_file(), "attachment_kind_changed");
+    let mut reader = file.take(
+        expected_size
+            .checked_add(1)
+            .context("invalid upload size")?,
+    );
+    let mut digest = Sha256::new();
+    let mut count = 0u64;
+    let mut buffer = [0u8; 64 * 1024];
+    loop {
+        let length = reader.read(&mut buffer).context("attachment_unreadable")?;
+        if length == 0 {
+            break;
+        }
+        count += length as u64;
+        digest.update(&buffer[..length]);
+    }
+    ensure!(count == expected_size, "upload content changed");
+    Ok(format!("{:x}", digest.finalize()))
+}
 
 #[derive(Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -128,8 +230,8 @@ impl DomainCommand for BindUpload {
 
 fn envelope(client: &DraftClient, intent: UploadIntent) -> Result<CommandEnvelope<BindUpload>> {
     ensure!(
-        !client.is_desktop(),
-        "upload requires a verified Web editor"
+        !client.is_desktop() || !matches!(intent.target, UploadTarget::Camp),
+        "public upload requires a verified Web editor"
     );
     crate::camp_id::ThreadId::parse(&intent.camp_id)?;
     uuid::Uuid::parse_str(&intent.command_id)?;
@@ -179,6 +281,9 @@ pub fn bind(
     );
     DomainCommandGateway.execute(database, &envelope, |transaction| {
         let intent = &envelope.payload.intent;
+        if !matches!(intent.target, UploadTarget::Camp) {
+            ensure!(observe_file_digest(&source, intent.byte_size)? == intent.sha256, "upload content changed");
+        }
         match &intent.target {
             UploadTarget::Camp => {
                 ensure!(

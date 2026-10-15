@@ -467,6 +467,18 @@ const api: RovaiApi = {
     }
   },
   singleChatAttachments: {
+    async prepareInput(request, file) {
+      const frozen = structuredClone(request)
+      const sourcePath = webUtils.getPathForFile(file)
+      const metadata = { displayName: file.name, mediaType: file.type || null }
+      if (sourcePath) return ipcRenderer.invoke('rovai:private-attachment-prepare', frozen, { ...metadata, sourcePath })
+      if (file.size > 25 * 1024 * 1024) throw new Error('附件超过 25 MiB。')
+      const bytes = new Uint8Array(await file.arrayBuffer())
+      return ipcRenderer.invoke('rovai:private-attachment-prepare', frozen, { ...metadata, bytes })
+    },
+    reconcileInput: request => ipcRenderer.invoke('rovai:private-attachment-reconcile', request),
+    retryInput: request => ipcRenderer.invoke('rovai:private-attachment-retry', request),
+    pendingPreparations: owner => ipcRenderer.invoke('rovai:private-attachment-list', owner),
     async prepare(conversationId, expectedDraftRevision, file) {
       const sourcePath = webUtils.getPathForFile(file)
       if (sourcePath) {
