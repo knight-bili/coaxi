@@ -492,6 +492,92 @@ impl StoredRetained {
     }
 }
 
+// 只由可信 Host 上传入口调用，来源文件及内容已由 Host 接收并校验。
+pub(crate) fn bind_uploaded_source(
+    tx: &Transaction<'_>,
+    client: &DraftClient,
+    intent: &crate::web_upload::UploadIntent,
+    source: LocalAttachmentSourceRef,
+) -> Result<()> {
+    let (conversation, scope, pending) = match &intent.target {
+        crate::web_upload::UploadTarget::SingleChat {
+            conversation_id,
+            composer_scope: Some(scope),
+        } => (conversation_id, scope, None),
+        crate::web_upload::UploadTarget::SingleChatPending {
+            conversation_id,
+            pending_input_id,
+            edit_token,
+            composer_scope: Some(scope),
+        } => (conversation_id, scope, Some((pending_input_id, edit_token))),
+        _ => anyhow::bail!("single_chat.scope_required"),
+    };
+    ensure!(
+        owner_exists(tx, &intent.camp_id, conversation, true)?,
+        "single_chat.not_active"
+    );
+    let (key, registered) = resolve_scope(tx, &intent.camp_id, conversation, client, Some(scope))?
+        .context("single_chat.scope_unavailable")?;
+    crate::local_attachment_source::validate_source_attachment(&source)
+        .map_err(anyhow::Error::new)?;
+    if let Some((pending_id, token)) = pending {
+        let working: Option<String> = tx.query_row(
+            "SELECT e.working_source_attachments_json FROM single_chat_pending_input_edit_session e
+             JOIN single_chat_pending_input p ON p.conversation_id=e.conversation_id AND p.id=e.pending_input_id
+             WHERE e.conversation_id=?1 AND e.client_id=?2 AND e.scope_key=?3 AND e.pending_input_id=?4
+               AND e.edit_token=?5 AND e.base_pending_revision=?6 AND e.recovery_required=0
+               AND p.revision=?6 AND p.state IN ('queued','needs_repair')",
+            params![conversation,client.id(),key.sql_key(),pending_id,token,intent.expected_revision], |row| row.get(0),
+        ).optional()?;
+        let mut refs =
+            parse_source_attachments(&working.context("single_chat.pending_input_edit_fenced")?)?;
+        ensure!(
+            refs.len() < crate::camp_attachment::MAX_PREPARED_ATTACHMENTS,
+            "attachment_count_exceeded"
+        );
+        ensure!(
+            !refs.iter().any(|item| item.id == source.id),
+            "attachment_reference_conflict"
+        );
+        refs.push(source);
+        let changed = tx.execute(
+            "UPDATE single_chat_pending_input_edit_session SET working_source_attachments_json=?7
+             WHERE conversation_id=?1 AND client_id=?2 AND scope_key=?3 AND pending_input_id=?4
+               AND edit_token=?5 AND base_pending_revision=?6 AND recovery_required=0",
+            params![
+                conversation,
+                client.id(),
+                key.sql_key(),
+                pending_id,
+                token,
+                intent.expected_revision,
+                serialize_source_attachments(&refs)?
+            ],
+        )?;
+        ensure!(changed == 1, "single_chat.pending_input_edit_fenced");
+    } else {
+        let mut draft = DraftMaterials::load(tx, conversation, client, &key)?;
+        ensure!(
+            draft.revision == intent.expected_revision,
+            "single_chat.draft_changed"
+        );
+        let mut refs = draft.sources()?;
+        ensure!(
+            refs.len() < crate::camp_attachment::MAX_PREPARED_ATTACHMENTS,
+            "attachment_count_exceeded"
+        );
+        ensure!(
+            !refs.iter().any(|item| item.id == source.id),
+            "attachment_reference_conflict"
+        );
+        refs.push(source);
+        draft.source_json = serialize_source_attachments(&refs)?;
+        register(tx, conversation, client, Some(scope), &key, registered)?;
+        draft.store(tx, conversation, client, &key)?;
+    }
+    Ok(())
+}
+
 pub fn mutate(
     database: &mut Database,
     envelope: &CommandEnvelope<MutatePrivateComposerCommand>,

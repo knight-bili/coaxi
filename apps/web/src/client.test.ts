@@ -208,29 +208,42 @@ describe('console transport', () => {
   })
 
   it('resumes an unknown source binding without uploading another file', async () => {
-    let bound = false
-    let intent: unknown
-    const draft = { threadId: 'test', draftId: 'test/editor', revision: 2, attachments: [{ id: 'bound' }] }
-    const fetcher = vi.fn<typeof fetch>().mockImplementation(async (url, options) => {
-      if (String(url).endsWith('/login')) return Response.json({ protocolVersion: 4, token: 'a'.repeat(64), clientId: 'd'.repeat(64), editorProof: 'e'.repeat(64), ownerId: 'local_user' })
-      if (String(url).endsWith('/uploads')) {
-        intent = JSON.parse(String((options?.body as FormData).get('intent')))
-        expect(intent).toMatchObject({ threadId: 'test', expectedRevision: 1, displayName: 'input.txt', byteSize: 5 })
-        throw new TypeError('response lost after binding')
-      }
-      expect(String(url)).toMatch(/\/uploads\/reconcile$/)
-      expect(JSON.parse(String(options?.body))).toEqual(intent)
-      return Response.json(bound ? { draft } : { state: 'unknown' })
-    })
-    const client = new ConsoleClient('http://127.0.0.1:4317', fetcher)
-    await client.login('b'.repeat(64))
-    const pending = client.uploadFile('test', 1, new File(['input'], 'input.txt'))
-    await vi.waitFor(() => expect(fetcher.mock.calls.some(([url]) => String(url).endsWith('/uploads/reconcile'))).toBe(true))
-    client.clear(); bound = true
-    await client.login('b'.repeat(64))
-    await client.reconcilePending()
-    await expect(pending).resolves.toEqual(draft)
-    expect(fetcher.mock.calls.filter(([url]) => String(url).endsWith('/uploads'))).toHaveLength(1)
+    const targets: Parameters<ConsoleClient['uploadTo']>[3][] = [
+      undefined,
+      { kind: 'single_chat', conversationId: 'private', composerScope: { kind: 'canvas', boardId: 'board', nodeId: 'original-card' } },
+      { kind: 'single_chat_pending', conversationId: 'private', pendingInputId: 'pending', editToken: 'lease', composerScope: { kind: 'canvas', boardId: 'board', nodeId: 'original-card' } }
+    ]
+    for (const target of targets) {
+      const frozenTarget = structuredClone(target)
+      let bound = false
+      let intent: unknown
+      const draft = { threadId: 'test', draftId: 'test/editor', revision: 2, attachments: [{ id: 'bound' }] }
+      const fetcher = vi.fn<typeof fetch>().mockImplementation(async (url, options) => {
+        if (String(url).endsWith('/login')) return Response.json({ protocolVersion: 4, token: 'a'.repeat(64), clientId: 'd'.repeat(64), editorProof: 'e'.repeat(64), ownerId: 'local_user' })
+        if (String(url).endsWith('/uploads')) {
+          intent = JSON.parse(String((options?.body as FormData).get('intent')))
+          expect(intent).toMatchObject({ threadId: 'test', expectedRevision: 1, displayName: 'input.txt', byteSize: 5 })
+          if (frozenTarget) expect(intent).toMatchObject({ target: frozenTarget })
+          else expect(intent).not.toHaveProperty('target')
+          throw new TypeError('response lost after binding')
+        }
+        expect(String(url)).toMatch(/\/uploads\/reconcile$/)
+        expect(JSON.parse(String(options?.body))).toEqual(intent)
+        return Response.json(bound ? { draft } : { state: 'unknown' })
+      })
+      const client = new ConsoleClient('http://127.0.0.1:4317', fetcher)
+      await client.login('b'.repeat(64))
+      const pending = target
+        ? client.uploadTo('test', 1, new File(['input'], 'input.txt'), target)
+        : client.uploadFile('test', 1, new File(['input'], 'input.txt'))
+      if (target?.composerScope) target.composerScope.nodeId = 'later-card'
+      await vi.waitFor(() => expect(fetcher.mock.calls.some(([url]) => String(url).endsWith('/uploads/reconcile'))).toBe(true))
+      client.clear(); bound = true
+      await client.login('b'.repeat(64))
+      await client.reconcilePending()
+      await expect(pending).resolves.toEqual(draft)
+      expect(fetcher.mock.calls.filter(([url]) => String(url).endsWith('/uploads'))).toHaveLength(1)
+    }
   })
 
   it('settles a recorded quote rejection after a lost reply without dispatching it twice', async () => {

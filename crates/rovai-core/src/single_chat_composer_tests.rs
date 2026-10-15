@@ -741,6 +741,7 @@ fn send_consumes_only_the_registered_scope_and_keeps_one_private_fifo_and_legacy
     );
     verify_application_routes(&mut f, &snapshot.pending_inputs.items[0]);
     verify_scoped_pending_edits(&mut f);
+    verify_private_upload_bindings();
     assert_eq!(
         serde_json::to_value(&quote.model_projection())
             .unwrap()
@@ -1080,6 +1081,295 @@ fn verify_scoped_pending_edits(f: &mut Fixture) {
             .pending_inputs
             .items
             .is_empty()
+    );
+}
+
+fn verify_private_upload_bindings() {
+    use crate::single_chat::{EditSingleChatPendingInputCommand, SingleChatPendingInputEditAction};
+    use crate::web_upload::{self, UploadIntent, UploadTarget};
+    use sha2::{Digest, Sha256};
+
+    let mut f = fixture();
+    let client = DraftClient::verified_web(&"7".repeat(64)).unwrap();
+    let service = SingleChatService::for_client(client.clone());
+    let file = f.database.directory().join("upload.txt");
+    std::fs::write(&file, b"input").unwrap();
+    let mut intent = UploadIntent {
+        target: UploadTarget::SingleChat {
+            conversation_id: f.conversation.clone(),
+            composer_scope: Some(f.scopes[0].clone()),
+        },
+        command_id: Uuid::new_v4().to_string(),
+        camp_id: f.thread.clone(),
+        expected_revision: 0,
+        display_name: "upload.txt".into(),
+        byte_size: 5,
+        sha256: format!("{:x}", Sha256::digest(b"input")),
+    };
+    let mut source =
+        observe_source_attachment(&file, &intent.display_name, Some("text/plain")).unwrap();
+    source.id = intent.command_id.clone();
+    assert!(
+        web_upload::reconcile(&f.database, &client, intent.clone())
+            .unwrap()
+            .is_none()
+    );
+    let first = web_upload::bind(
+        &mut f.database,
+        &file,
+        &client,
+        intent.clone(),
+        source.clone(),
+    )
+    .unwrap();
+    assert_eq!(first.result.status, CommandResultStatus::Applied);
+    assert!(
+        web_upload::bind(
+            &mut f.database,
+            &file,
+            &DraftClient::default(),
+            intent.clone(),
+            source.clone()
+        )
+        .is_err()
+    );
+    let snapshot = web_upload::snapshot(&f.database, &file, &client, &intent).unwrap();
+    assert_eq!(snapshot["draft"]["scopeVersion"], 1);
+    assert_eq!(
+        snapshot["draft"]["composerScope"],
+        serde_json::to_value(&f.scopes[0]).unwrap()
+    );
+    assert_eq!(snapshot["draft"]["attachments"][0]["id"], intent.command_id);
+    assert!(
+        service
+            .snapshot(&f.database, &f.conversation)
+            .unwrap()
+            .unwrap()
+            .draft
+            .attachments
+            .is_empty()
+    );
+    assert!(
+        read_draft(
+            &f.database,
+            &client,
+            &f.thread,
+            &f.conversation,
+            Some(&f.scopes[1])
+        )
+        .unwrap()
+        .draft
+        .attachments
+        .is_empty()
+    );
+    let original_intent = intent.clone();
+    let original_source = source.clone();
+    let mut changed_target = intent.clone();
+    changed_target.target = UploadTarget::SingleChat {
+        conversation_id: f.conversation.clone(),
+        composer_scope: Some(f.scopes[1].clone()),
+    };
+    assert!(web_upload::reconcile(&f.database, &client, changed_target).is_err());
+    assert!(
+        web_upload::reconcile(
+            &f.database,
+            &DraftClient::verified_web(&"8".repeat(64)).unwrap(),
+            intent.clone()
+        )
+        .is_err()
+    );
+    let mut legacy = serde_json::to_value(&intent).unwrap();
+    legacy["target"] = json!({"kind":"single_chat","conversationId":f.conversation});
+    let parsed: UploadIntent = serde_json::from_value(legacy.clone()).unwrap();
+    assert_eq!(serde_json::to_value(parsed).unwrap(), legacy);
+    legacy["target"]["scopeKey"] = json!("canvas:untrusted");
+    assert!(serde_json::from_value::<UploadIntent>(legacy).is_err());
+    let mut rejected_scope = original_intent.clone();
+    rejected_scope.command_id = Uuid::new_v4().to_string();
+    rejected_scope.expected_revision = 1;
+    rejected_scope.target = UploadTarget::SingleChat {
+        conversation_id: f.conversation.clone(),
+        composer_scope: Some(f.scopes[1].clone()),
+    };
+    let mut rejected_source = source.clone();
+    rejected_source.id = rejected_scope.command_id.clone();
+    assert!(
+        web_upload::bind(
+            &mut f.database,
+            &file,
+            &client,
+            rejected_scope,
+            rejected_source
+        )
+        .is_err()
+    );
+    let failed_scope_count: i64 = f.database.connection().query_row(
+        "SELECT COUNT(*) FROM single_chat_composer_scope WHERE conversation_id=?1 AND client_id=?2 AND scope_key=?3",
+        params![f.conversation,client.id(),f.scopes[1].storage_key().unwrap()], |row| row.get(0),
+    ).unwrap();
+    assert_eq!(failed_scope_count, 0, "失败上传不留下首次位置登记");
+    intent.command_id = Uuid::new_v4().to_string();
+    source.id = intent.command_id.clone();
+    assert!(
+        web_upload::bind(
+            &mut f.database,
+            &file,
+            &client,
+            intent.clone(),
+            source.clone()
+        )
+        .is_err()
+    );
+    assert!(
+        web_upload::reconcile(&f.database, &client, intent.clone())
+            .unwrap()
+            .is_none()
+    );
+
+    let mut send = envelope(
+        Some(&f.thread),
+        SendSingleChatMessageCommand {
+            draft_client: client.clone(),
+            composer_scope: Some(f.scopes[0].clone()),
+            camp_id: f.thread.clone(),
+            conversation_id: f.conversation.clone(),
+            body: "第一个问题".into(),
+            draft_revision: 1,
+        },
+    );
+    assert_eq!(
+        service.send(&mut f.database, &send).unwrap().result.status,
+        CommandResultStatus::Accepted
+    );
+    send.command_id = Uuid::new_v4().to_string();
+    send.payload.body = "排队的问题".into();
+    send.payload.draft_revision = 2;
+    let queued = service.send(&mut f.database, &send).unwrap();
+    assert_eq!(queued.result.code, "single_chat.pending_input_queued");
+    let pending = service
+        .snapshot(&f.database, &f.conversation)
+        .unwrap()
+        .unwrap()
+        .pending_inputs
+        .items[0]
+        .clone();
+    let mut edit = envelope(
+        Some(&f.thread),
+        EditSingleChatPendingInputCommand {
+            draft_client: client.clone(),
+            composer_scope: Some(f.scopes[0].clone()),
+            camp_id: f.thread.clone(),
+            conversation_id: f.conversation.clone(),
+            pending_input_id: pending.id.clone(),
+            expected_revision: pending.revision,
+            edit_token: None,
+            action: SingleChatPendingInputEditAction::Begin,
+        },
+    );
+    let opened = service.edit_pending_input(&mut f.database, &edit).unwrap();
+    let token = opened.result.payload["editToken"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+    intent.command_id = Uuid::new_v4().to_string();
+    intent.expected_revision = pending.revision;
+    intent.target = UploadTarget::SingleChatPending {
+        conversation_id: f.conversation.clone(),
+        pending_input_id: pending.id.clone(),
+        edit_token: token,
+        composer_scope: Some(f.scopes[0].clone()),
+    };
+    source.id = intent.command_id.clone();
+    web_upload::bind(
+        &mut f.database,
+        &file,
+        &client,
+        intent.clone(),
+        source.clone(),
+    )
+    .unwrap();
+    let snapshot = web_upload::snapshot(&f.database, &file, &client, &intent).unwrap();
+    assert_eq!(
+        snapshot["pendingInputs"]["editSession"]["workingAttachments"][0]["id"],
+        intent.command_id
+    );
+    assert!(
+        service
+            .snapshot(&f.database, &f.conversation)
+            .unwrap()
+            .unwrap()
+            .pending_inputs
+            .edit_session
+            .is_none()
+    );
+    let pending_original = intent.clone();
+    if let UploadTarget::SingleChatPending { composer_scope, .. } = &mut intent.target {
+        *composer_scope = Some(f.scopes[1].clone());
+    }
+    intent.command_id = Uuid::new_v4().to_string();
+    source.id = intent.command_id.clone();
+    assert!(
+        web_upload::bind(
+            &mut f.database,
+            &file,
+            &client,
+            intent.clone(),
+            source.clone()
+        )
+        .is_err()
+    );
+    edit.command_id = Uuid::new_v4().to_string();
+    edit.payload.action = SingleChatPendingInputEditAction::Takeover;
+    edit.payload.composer_scope = Some(f.scopes[1].clone());
+    assert_eq!(
+        service
+            .edit_pending_input(&mut f.database, &edit)
+            .unwrap()
+            .result
+            .code,
+        "single_chat.pending_input_edit_started"
+    );
+    intent = pending_original;
+    intent.command_id = Uuid::new_v4().to_string();
+    source.id = intent.command_id.clone();
+    assert!(web_upload::bind(&mut f.database, &file, &client, intent.clone(), source).is_err());
+    assert!(
+        web_upload::reconcile(&f.database, &client, intent)
+            .unwrap()
+            .is_none()
+    );
+
+    let count: i64 = f
+        .database
+        .connection()
+        .query_row("SELECT COUNT(*) FROM event_log", [], |row| row.get(0))
+        .unwrap();
+    std::fs::remove_file(&file).unwrap();
+    let replay = web_upload::bind(
+        &mut f.database,
+        &file,
+        &client,
+        original_intent.clone(),
+        original_source,
+    )
+    .unwrap();
+    assert!(replay.replayed, "已存结果回放不重新读取已变化的源文件");
+    assert_eq!(
+        serde_json::to_value(replay.result).unwrap(),
+        serde_json::to_value(first.result).unwrap()
+    );
+    assert!(
+        web_upload::reconcile(&f.database, &client, original_intent)
+            .unwrap()
+            .is_some()
+    );
+    assert_eq!(
+        count,
+        f.database
+            .connection()
+            .query_row("SELECT COUNT(*) FROM event_log", [], |row| row
+                .get::<_, i64>(0))
+            .unwrap()
     );
 }
 

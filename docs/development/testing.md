@@ -54,6 +54,12 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 明确接管后旧令牌不可读、pin 删除后孤立输入可读及读取零写入，不新增 Rust owner。
 TypeScript 的闭合输入由原 `file-preview-ipc-input.test.ts` 拥有，来源透传由原 authority owner、
 位置缓存隔离由原 preview-session/AttachmentCard/ImageGallery owner 验证；新增 shared parser/key helper 无额外平行测试框架。
+
+Web 按卡片上传继续扩展上述第三个 Core owner 的独立临时 SQLite/文件夹具，覆盖可信编辑端、位置与租约绑定、
+原 UUID 回放、失败无登记以及旧 target 编码；不新增 Rust 测试 owner。按阶段批量策略，本批 Core 新断言尚未编译执行，
+阶段候选显式使用 extended-tests 并确认非零清单后运行。Web 原 `client.test.ts` 上传恢复 owner 改为公开/卡片/工作副本三类表驱动，
+验证摘要期间的目标冻结及丢回执只核对原请求；与原 `file-digest.test.ts` 共27项通过。定向 types 包含 Main。
+Native 异常后保留源文件目前只有源码审查和类型证据，实际 IPC 故障注入、原编号恢复和清理资格仍待完成。
 本地 Core 检查不代表 Host HTTP/Native 或完整文件能力资格；源内容摘要、上传与完整 PC15 继续待验。
 
 私聊材料服务新增三个 `single_chat_composer::tests` 扩展 owner：

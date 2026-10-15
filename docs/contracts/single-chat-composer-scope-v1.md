@@ -134,3 +134,15 @@ Application/可信编辑端接线、默认形状/编辑令牌隔离、回执只�
 
 Renderer、原请求恢复和隔离浏览器挂载的分项证据见
 [输入界面执行记录](../../integration/execution/i03-private-input-ui-result.json)；完整 PC01–PC24 仍未执行完毕。
+
+## 上传位置接线与待验边界（2026-10-16）
+
+Web 上传的既有 `single_chat` / `single_chat_pending` target 增加可选 composerScope，默认空值序列化省略，
+旧规范请求和原 UUID 回放不变。新卡片上传在原 Gateway 事务内核对 Thread、Conversation、可信 client 和 scope；
+活动输入按 draft revision 附加，排队工作副本还核对原 Pending 版本、编辑令牌和租约位置。失败不留下首次登记。
+上传及原结果查询的快照精确返回原卡片，不返回其他位置的工作正文或令牌。Web 在摘要计算前冻结 target，
+身份变化则拒绝派发，不把后续切卡改动带入在途上传。
+
+Native 旧字节入口不再因 Core 异常删除可能已经绑定的源文件；明确失败后的回收、Native 上传原编号持久化及
+私有源内容变化校验继续实施。卡片文件添加入口保持禁用。此批只完成部分接线，Core 新断言留待阶段候选编译执行；
+27项 Web 客户端/摘要检查及定向类型通过不代表实际 Host HTTP、Native IPC 或完整 PC01–PC24 通过。

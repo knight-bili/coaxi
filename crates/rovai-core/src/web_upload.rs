@@ -30,6 +30,12 @@ pub enum UploadTarget {
     SingleChat {
         #[serde(rename = "conversationId")]
         conversation_id: String,
+        #[serde(
+            rename = "composerScope",
+            default,
+            skip_serializing_if = "Option::is_none"
+        )]
+        composer_scope: Option<crate::single_chat_composer_scope::SingleChatComposerScope>,
     },
     SingleChatPending {
         #[serde(rename = "conversationId")]
@@ -38,6 +44,12 @@ pub enum UploadTarget {
         pending_input_id: String,
         #[serde(rename = "editToken")]
         edit_token: String,
+        #[serde(
+            rename = "composerScope",
+            default,
+            skip_serializing_if = "Option::is_none"
+        )]
+        composer_scope: Option<crate::single_chat_composer_scope::SingleChatComposerScope>,
     },
 }
 impl UploadTarget {
@@ -58,12 +70,38 @@ pub fn snapshot(
                 .ok_or_else(|| anyhow::anyhow!("upload receipt is missing"))?;
             Ok(recorded.result.payload["source"].clone())
         }
-        UploadTarget::SingleChat { conversation_id }
+        UploadTarget::SingleChat {
+            conversation_id,
+            composer_scope,
+        }
         | UploadTarget::SingleChatPending {
-            conversation_id, ..
+            conversation_id,
+            composer_scope,
+            ..
         } => {
-            let snapshot = crate::single_chat::SingleChatService::for_client(client.clone())
-                .snapshot(database, conversation_id)?;
+            let service = crate::single_chat::SingleChatService::for_client(client.clone());
+            if let Some(scope) = composer_scope {
+                let draft = crate::single_chat_composer::read_draft(
+                    database,
+                    client,
+                    &intent.camp_id,
+                    conversation_id,
+                    Some(scope),
+                )?;
+                let key =
+                    crate::single_chat_composer_scope::PrivateComposerKey::for_scope(Some(scope))?;
+                let snapshot = service.snapshot_for_key(database, conversation_id, &key)?;
+                let mut value = serde_json::to_value(snapshot)?;
+                ensure!(!value.is_null(), "single_chat.not_found");
+                value["draft"] = serde_json::to_value(draft)?;
+                let editing_elsewhere: bool = database.connection().query_row(
+                    "SELECT EXISTS(SELECT 1 FROM single_chat_pending_input_edit_session WHERE conversation_id=?1 AND (client_id<>?2 OR scope_key<>?3))",
+                    rusqlite::params![conversation_id, client.id(), key.sql_key()], |row| row.get(0),
+                )?;
+                value["pendingInputs"]["editingElsewhere"] = json!(editing_elsewhere);
+                return Ok(value);
+            }
+            let snapshot = service.snapshot(database, conversation_id)?;
             ensure!(
                 snapshot
                     .as_ref()
@@ -152,11 +190,15 @@ pub fn bind(
                     "camp.not_found"
                 );
             }
-            UploadTarget::SingleChat { conversation_id } => {
+            UploadTarget::SingleChat { composer_scope: Some(_), .. }
+            | UploadTarget::SingleChatPending { composer_scope: Some(_), .. } => {
+                crate::single_chat_composer::bind_uploaded_source(transaction, client, intent, source.clone())?;
+            }
+            UploadTarget::SingleChat { conversation_id, composer_scope: None } => {
                 ensure!(transaction.query_row("SELECT EXISTS(SELECT 1 FROM conversation WHERE id=?1 AND camp_id=?2 AND kind='single_chat' AND ended_at IS NULL)", rusqlite::params![conversation_id,intent.camp_id], |r| r.get::<_, bool>(0))?, "single_chat.camp_mismatch");
                 crate::single_chat::SingleChatService::for_client(client.clone()).commit_source_attachment_in_transaction(transaction, conversation_id, intent.expected_revision, source.clone())?;
             }
-            UploadTarget::SingleChatPending { conversation_id, pending_input_id, edit_token } => crate::single_chat::SingleChatService::for_client(client.clone()).commit_pending_source_attachment_in_transaction(transaction, &intent.camp_id, conversation_id, pending_input_id, intent.expected_revision, edit_token, source.clone())?,
+            UploadTarget::SingleChatPending { conversation_id, pending_input_id, edit_token, composer_scope: None } => crate::single_chat::SingleChatService::for_client(client.clone()).commit_pending_source_attachment_in_transaction(transaction, &intent.camp_id, conversation_id, pending_input_id, intent.expected_revision, edit_token, source.clone())?,
         }
         let payload = if matches!(intent.target, UploadTarget::Camp) {
             json!({"attachmentRefId":intent.command_id, "source":source})

@@ -2234,24 +2234,19 @@ ipcMain.handle(
       throw new Error('Core is not available for attachment references')
     }
     const temporaryPath = temporarySourceAttachmentPath(resolvedDisplayName)
-    let referenced = false
-    try {
-      await writeFile(temporaryPath, input, { flag: 'wx', mode: 0o600 })
-      const snapshot = await core.request(
-        'singleChat.sourceAttachments.addFromPath' as CoreMethod,
-        {
-          conversationId: resolvedConversationId,
-          expectedDraftRevision: resolvedRevision,
-          sourcePath: temporaryPath,
-          displayName: resolvedDisplayName,
-          mediaType: typeof mediaType === 'string' && mediaType.trim() ? mediaType : null
-        }
-      )
-      referenced = true
-      return snapshot
-    } finally {
-      if (!referenced) await unlink(temporaryPath).catch(() => undefined)
-    }
+    // 请求已交给 Core 后，异常可能只是回执丢失。保留源文件，避免删除已提交的附件。
+    // 原请求持久化与明确拒绝后的安全回收由后续上传恢复链路统一处理。
+    await writeFile(temporaryPath, input, { flag: 'wx', mode: 0o600 })
+    return core.request(
+      'singleChat.sourceAttachments.addFromPath' as CoreMethod,
+      {
+        conversationId: resolvedConversationId,
+        expectedDraftRevision: resolvedRevision,
+        sourcePath: temporaryPath,
+        displayName: resolvedDisplayName,
+        mediaType: typeof mediaType === 'string' && mediaType.trim() ? mediaType : null
+      }
+    )
   }
 )
 
@@ -2292,23 +2287,18 @@ ipcMain.handle(
       throw new Error('Core is not available for attachment references')
     }
     const temporaryPath = temporarySourceAttachmentPath(resolvedDisplayName)
-    let referenced = false
-    try {
-      await writeFile(temporaryPath, input, { flag: 'wx', mode: 0o600 })
-      const snapshot = await core.request(
-        'singleChat.pendingInputs.addSourceAttachmentFromPath' as CoreMethod,
-        {
-          ...resolvedOwner,
-          sourcePath: temporaryPath,
-          displayName: resolvedDisplayName,
-          mediaType: typeof mediaType === 'string' && mediaType.trim() ? mediaType : null
-        }
-      )
-      referenced = true
-      return snapshot
-    } finally {
-      if (!referenced) await unlink(temporaryPath).catch(() => undefined)
-    }
+    // 请求已交给 Core 后，异常可能只是回执丢失。保留源文件，避免删除已提交的附件。
+    // 原请求持久化与明确拒绝后的安全回收由后续上传恢复链路统一处理。
+    await writeFile(temporaryPath, input, { flag: 'wx', mode: 0o600 })
+    return core.request(
+      'singleChat.pendingInputs.addSourceAttachmentFromPath' as CoreMethod,
+      {
+        ...resolvedOwner,
+        sourcePath: temporaryPath,
+        displayName: resolvedDisplayName,
+        mediaType: typeof mediaType === 'string' && mediaType.trim() ? mediaType : null
+      }
+    )
   }
 )
 

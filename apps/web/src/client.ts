@@ -653,15 +653,20 @@ export class ConsoleClient {
   }
 
   async uploadTo<T>(threadId: string, expectedRevision: number, file: File, target?:
-    | { kind: 'single_chat'; conversationId: string }
-    | { kind: 'single_chat_pending'; conversationId: string; pendingInputId: string; editToken: string }
+    | { kind: 'single_chat'; conversationId: string; composerScope?: import('@contracts').SingleChatComposerScope | null }
+    | { kind: 'single_chat_pending'; conversationId: string; pendingInputId: string; editToken: string; composerScope?: import('@contracts').SingleChatComposerScope | null }
   ): Promise<T> {
     if (!this.authenticated) throw new SessionRequired()
     if (file.size > 20 * 1024 * 1024) throw new Error('单个上传文件不能超过 20 MB。')
     const scope = this.editingScope
+    const generation = this.#generation
+    const frozenTarget = target ? structuredClone(target) : undefined
     const digest = await fileDigest(file, this.#lifetime.signal)
+    if (scope !== this.editingScope || generation !== this.#generation || !this.authenticated) {
+      throw new DOMException('Connection replaced', 'AbortError')
+    }
     const commandId = newCommandId()
-    const intent = { commandId, threadId, expectedRevision, ...(target ? { target } : {}), displayName: file.name, byteSize: file.size,
+    const intent = { commandId, threadId, expectedRevision, ...(frozenTarget ? { target: frozenTarget } : {}), displayName: file.name, byteSize: file.size,
       sha256: digest }
     const data = new FormData(); data.append('intent', JSON.stringify(intent)); data.append('file', file)
     return new Promise((resolve, reject) => {
