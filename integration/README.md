@@ -58,3 +58,5 @@ I00已自审修正并合入，I01基础构建与契约证据保留草稿；I02�
 - [I03私聊排队接管与完整移回](execution/i03-private-pending-edit-result.json)：Core 单租约按 client/scope 接管并拒绝旧令牌；空目标迁入、占用目标完整 retained，与 Pending 取消和回执同事务。17项Core及56项既存/模拟客户端检查通过。该检查点之后继续 Renderer 接线；最新进展见下一条，上传/授权和正式24PC/324继续。
 
 - [I03私聊完整输入界面与原请求恢复](execution/i03-private-input-ui-result.json)：生产面板已接完整移回、整份保留交换、排队保存/放弃/接管和本机原请求恢复。76项定向检查及模拟Core三位置挂载通过，包括原连接永久等待后查回结果解除按钮等待；卡片上传/资源授权、迁入/孤立恢复与真实Host/平台/模型仍待，完整24PC/324未验。
+
+- [I03私有文件资源定位](execution/i03-private-resource-result.json)：卡片、排队工作副本与retained按可信编辑端/原对话/位置/材料定位，旧默认JSON保持；Main双入口与缓存保留位置，接管后旧token拒绝、孤立输入保留可读。17项Core、65项客户端及定向types/文档通过；上传/源摘要、实际Host文件链路与新预览UI、完整PC15/324仍待。
