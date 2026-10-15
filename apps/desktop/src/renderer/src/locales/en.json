@@ -3960,5 +3960,9 @@
   "工作树当前无法打开": "The worktree cannot be opened right now.",
   "{0} 个对话正在处理": "{0} conversations in progress",
   "活动统计尚未核对": "Activity counts are unverified",
-  "上次统计 {0} 个对话正在处理，等待更新": "Last count: {0} conversations in progress. Waiting for an update."
+  "上次统计 {0} 个对话正在处理，等待更新": "Last count: {0} conversations in progress. Waiting for an update.",
+  "区域成员可通过卡片操作移出或固定到画布。": "Use the card actions to remove a region member or pin it to the canvas.",
+  "所选对话或成员引用超过200个，请减少选择。": "More than 200 conversations or member references are selected. Reduce the selection.",
+  "区域对话：{0}。可拖动，或按 Tab 使用卡片操作。": "Region conversation: {0}. Drag it, or press Tab to use the card actions.",
+  "当前 Core 不支持原子成员转移，请升级服务后重试。": "This Core does not support atomic member transfers. Upgrade the server and try again."
 }

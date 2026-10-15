@@ -30,7 +30,8 @@ export function sameCanvasReference(a: CanvasConversationRef, b: CanvasConversat
 }
 /** Derived member IDs never become persisted node IDs. JSON tuples avoid UUID/separator collisions. */
 export function canvasMemberKey(regionId: string, reference: CanvasConversationRef): string {
-  return `member:${JSON.stringify([regionId, reference.threadId, reference.conversationId ?? null])}`
+  const tuple = JSON.stringify([regionId, reference.threadId, reference.conversationId ?? null])
+  return `member:${encodeURIComponent(tuple).replace(/[!'()*]/g, character => `%${character.charCodeAt(0).toString(16)}`)}`
 }
 export function regionWidthForColumns(columns: number): number {
   const n = Math.max(1, Math.round(columns))

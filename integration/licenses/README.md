@@ -31,3 +31,7 @@ PTY后续移植及I12最终发布包仍分别核对，不将本批通知保留�
 侧栏活动徽章保留固定Codeg `sidebar-folder-group-header.tsx`与`sidebar-conversation-list.tsx`的整组活动语义，
 按Rovai Thread/Run和导航可见性重写为`navigation.activity`只读统计；不复制供体会话数据库或用窗口内行数代替完整值。
 上述Apache-2.0通知保留，本批没有新增依赖。
+
+`canvas-member-interaction.ts`与派生成员节点按同一固定Codeg `canvas-view.tsx`的applyDrop/selection、
+`conversation-card-node.tsx`的卡片和镜像语义接入现有ReactFlow；Core以可选sourceMembers接原子移动，不移植供体数据库。
+来源注释和Apache-2.0许可保留，本批不增加第三方依赖。

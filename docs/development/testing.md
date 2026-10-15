@@ -16,6 +16,12 @@ last_updated: 2026-10-12
 
 ## Rust 测试准入与退役门槛
 
+Canvas `group.sourceMembers`扩展复用`canvas_node::tests::eight_kinds_preserve_source_geometry_text_and_reference_limits`的旧Group序列化断言，
+及`canvas_node::persistence_tests::migration_and_graph_gestures_preserve_scope_atomicity_replay_and_reopen`的跨源转移/私有身份/镜像保留/回放与派生绑定用例；
+不新增Rust owner，阶段命令`cargo test -p rovai-core --lib --features extended-tests canvas_node::`，本切片未编译执行。
+`canvas-member-interaction.test.ts`只拥有客户端落点/原子意图/父坐标，旧graph controller owner扩嵌套来源未知重试；
+真实成员节点挂载、触控、取消/多选/高密度网格与Host升级仍列阶段集中验证。
+
 `read_model::navigation::tests::activity_counts_complete_visible_threads_once_and_resolves_external_window_owners`新增一个最小SQLite owner，
 拥有新完整活动聚合的Run去重、camp_turn fallback、归属优先、编辑端隔离、Mission/删除与物理缺失定位；
 旧Navigation owner仅证明窗口、历史隔离和读量，不能覆盖该聚合语义。新owner不加载完整Database/Runtime；

@@ -292,6 +292,7 @@ pub struct CanvasGraphSnapshot {
     pub board: Option<canvas_board::CanvasBoard>,
     pub nodes: Vec<CanvasNode>,
     pub through_global_sequence: i64,
+    pub member_transfer_version: u32,
 }
 fn from_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<CanvasNode> {
     let decode = |column, error| {
@@ -385,6 +386,7 @@ fn candidates(
         CanvasNodeMutation::Group {
             target_node_id,
             consume_node_ids,
+            source_members,
             ..
         } => load_selected(
             connection,
@@ -392,6 +394,7 @@ fn candidates(
             target_node_id
                 .iter()
                 .cloned()
+                .chain(source_members.iter().map(|member| member.region_id.clone()))
                 .chain(consume_node_ids.iter().cloned()),
         ),
         CanvasNodeMutation::Prune => Ok(connection
@@ -418,6 +421,7 @@ pub fn snapshot(connection: &Connection, board_id: &str) -> Result<CanvasGraphSn
         board,
         nodes,
         through_global_sequence,
+        member_transfer_version: 1,
     })
 }
 
@@ -444,6 +448,12 @@ pub struct CanvasNodeMove {
     pub x: f64,
     pub y: f64,
 }
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct CanvasSourceMember {
+    pub region_id: String,
+    pub conversation: CanvasConversationRef,
+}
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(
     tag = "type",
@@ -467,6 +477,8 @@ pub enum CanvasNodeMutation {
         new_region: Option<CanvasNodeData>,
         conversations: Vec<CanvasConversationRef>,
         consume_node_ids: Vec<String>,
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        source_members: Vec<CanvasSourceMember>,
     },
     Detach {
         region_id: String,
@@ -755,6 +767,7 @@ pub fn apply(
                 new_region,
                 conversations,
                 consume_node_ids,
+                source_members,
             } => {
                 let mut incoming = Vec::new();
                 for reference in conversations {
@@ -763,6 +776,27 @@ pub fn apply(
                     }
                     if !incoming.contains(reference) {
                         incoming.push(reference.clone());
+                    }
+                }
+                if source_members.len() > 200 {
+                    return Ok(rejected("too_many_members"));
+                }
+                let mut unique_sources = Vec::new();
+                for member in source_members {
+                    if unique_sources.contains(member) || !incoming.contains(&member.conversation) {
+                        return Ok(rejected("invalid_source_member"));
+                    }
+                    unique_sources.push(member.clone());
+                    let Some(source) = nodes.iter().find(|node| node.id == member.region_id) else {
+                        return Ok(rejected("not_found"));
+                    };
+                    if !source.data.kind.is_region() {
+                        return Ok(rejected("invalid_region"));
+                    }
+                    if source.data.kind == CanvasNodeKind::Custom
+                        && !source.data.conversations.contains(&member.conversation)
+                    {
+                        return Ok(rejected("member_not_found"));
                     }
                 }
                 let target_id = match (target_node_id, new_region) {
@@ -791,15 +825,30 @@ pub fn apply(
                 if target.data.kind != CanvasNodeKind::Custom {
                     return Ok(rejected("invalid_region"));
                 }
-                for reference in incoming {
-                    if !target.data.conversations.contains(&reference) {
-                        target.data.conversations.push(reference);
+                for reference in &incoming {
+                    if !target.data.conversations.contains(reference) {
+                        target.data.conversations.push(reference.clone());
                     }
                 }
                 if let Err(code) = normalize(&mut target.data) {
                     return Ok(rejected(code));
                 }
                 let adopted = target.data.conversations.clone();
+                for member in source_members {
+                    if member.region_id == target_id {
+                        continue;
+                    }
+                    let source = nodes
+                        .iter_mut()
+                        .find(|node| node.id == member.region_id)
+                        .expect("validated source region");
+                    if source.data.kind == CanvasNodeKind::Custom {
+                        source
+                            .data
+                            .conversations
+                            .retain(|reference| reference != &member.conversation);
+                    }
+                }
                 for candidate in nodes.iter().filter(|n| {
                     consume_node_ids.contains(&n.id) && n.data.kind == CanvasNodeKind::Conversation
                 }) {
@@ -1057,6 +1106,9 @@ mod tests {
         let mut malformed = fixture_data(CanvasNodeKind::File);
         malformed.content = Some("invisible".into());
         assert_eq!(normalize(&mut malformed), Err("invalid_content"));
+        let legacy = serde_json::json!({"type":"group","targetNodeId":null,"newRegion":null,"conversations":[],"consumeNodeIds":[]});
+        let parsed: CanvasNodeMutation = serde_json::from_value(legacy.clone()).unwrap();
+        assert_eq!(serde_json::to_value(parsed).unwrap(), legacy);
     }
 }
 
@@ -1416,6 +1468,7 @@ mod persistence_tests {
                 new_region: None,
                 conversations: vec![reference.clone()],
                 consume_node_ids: vec![second_pin.clone()],
+                source_members: vec![],
             },
         );
         assert_eq!(
@@ -1435,6 +1488,7 @@ mod persistence_tests {
                     note.id.clone(),
                     foreign_node.clone(),
                 ],
+                source_members: vec![],
             },
         );
         assert_eq!(
@@ -1452,6 +1506,160 @@ mod persistence_tests {
                 .data
                 .conversations,
             [reference.clone(), distinct.clone()]
+        );
+        let mut mirror_data = fixture_data(CanvasNodeKind::Custom);
+        mirror_data.conversations = vec![reference.clone(), distinct.clone()];
+        let mirror = run(
+            &mut database,
+            &id,
+            CanvasNodeMutation::Create { node: mirror_data },
+        )
+        .payload["nodeIds"][0]
+            .as_str()
+            .unwrap()
+            .to_owned();
+        let mut target_data = fixture_data(CanvasNodeKind::Custom);
+        target_data.conversations.clear();
+        let target = run(
+            &mut database,
+            &id,
+            CanvasNodeMutation::Create { node: target_data },
+        )
+        .payload["nodeIds"][0]
+            .as_str()
+            .unwrap()
+            .to_owned();
+        let invalid_source = command(
+            &database,
+            &id,
+            CanvasNodeMutation::Group {
+                target_node_id: Some(target.clone()),
+                new_region: None,
+                conversations: vec![reference.clone()],
+                consume_node_ids: vec![],
+                source_members: vec![CanvasSourceMember {
+                    region_id: region.id.clone(),
+                    conversation: distinct.clone(),
+                }],
+            },
+        );
+        let before_invalid = revision(&database, &id);
+        assert_eq!(
+            apply(&mut database, &invalid_source).unwrap().result.code,
+            "canvas.nodes.invalid_source_member"
+        );
+        assert_eq!(revision(&database, &id), before_invalid);
+        let transfer = command(
+            &database,
+            &id,
+            CanvasNodeMutation::Group {
+                target_node_id: Some(target.clone()),
+                new_region: None,
+                conversations: vec![reference.clone(), distinct.clone()],
+                consume_node_ids: vec![],
+                source_members: vec![
+                    CanvasSourceMember {
+                        region_id: region.id.clone(),
+                        conversation: reference.clone(),
+                    },
+                    CanvasSourceMember {
+                        region_id: mirror.clone(),
+                        conversation: distinct.clone(),
+                    },
+                ],
+            },
+        );
+        let transferred = apply(&mut database, &transfer).unwrap();
+        assert_eq!(transferred.result.status, CommandResultStatus::Applied);
+        let after_transfer = revision(&database, &id);
+        assert_eq!(
+            apply(&mut database, &transfer).unwrap().result,
+            transferred.result
+        );
+        assert_eq!(revision(&database, &id), after_transfer);
+        let current = snapshot(database.connection(), &id).unwrap();
+        assert_eq!(
+            current
+                .nodes
+                .iter()
+                .find(|node| node.id == region.id)
+                .unwrap()
+                .data
+                .conversations,
+            [distinct.clone()]
+        );
+        assert_eq!(
+            current
+                .nodes
+                .iter()
+                .find(|node| node.id == mirror)
+                .unwrap()
+                .data
+                .conversations,
+            [reference.clone()]
+        );
+        assert_eq!(
+            current
+                .nodes
+                .iter()
+                .find(|node| node.id == target)
+                .unwrap()
+                .data
+                .conversations,
+            [reference.clone(), distinct.clone()]
+        );
+        let folder = current
+            .nodes
+            .iter()
+            .find(|node| node.data.kind == CanvasNodeKind::Folder)
+            .unwrap();
+        let folder_id = folder.id.clone();
+        let folder_data = folder.data.clone();
+        run(
+            &mut database,
+            &id,
+            CanvasNodeMutation::Group {
+                target_node_id: Some(target.clone()),
+                new_region: None,
+                conversations: vec![reference.clone()],
+                consume_node_ids: vec![],
+                source_members: vec![CanvasSourceMember {
+                    region_id: folder_id.clone(),
+                    conversation: reference.clone(),
+                }],
+            },
+        );
+        assert_eq!(
+            serde_json::to_value(
+                snapshot(database.connection(), &id)
+                    .unwrap()
+                    .nodes
+                    .iter()
+                    .find(|node| node.id == folder_id)
+                    .unwrap()
+                    .data
+                    .clone()
+            )
+            .unwrap(),
+            serde_json::to_value(folder_data).unwrap()
+        );
+        run(
+            &mut database,
+            &id,
+            CanvasNodeMutation::Group {
+                target_node_id: Some(region.id.clone()),
+                new_region: None,
+                conversations: vec![reference.clone()],
+                consume_node_ids: vec![],
+                source_members: vec![],
+            },
+        );
+        run(
+            &mut database,
+            &id,
+            CanvasNodeMutation::Delete {
+                node_ids: vec![mirror, target],
+            },
         );
         run(
             &mut database,

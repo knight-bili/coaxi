@@ -191,6 +191,7 @@ try {
   assert.deepEqual(graph.nodes.find(item => item.id === ids.custom).data.conversations, [ref, exact]);
   assert.equal(graph.nodes.find(item => item.id === ids.note).data.content, '\n中文 **便签**\n');
   record('authenticated_HTTP_creates_all_eight_kinds_with_distinct_thread_and_private_conversation_refs');
+  assert.equal(graph.memberTransferVersion, 1);
   const foreign = await mutate({type: 'create', node: node('note', {content: '其他画板'})}, otherId);
   const foreignId = foreign.payload.nodeIds[0], foreignGraph = await snapshot(otherId);
   const moveId = randomUUID();
@@ -218,6 +219,19 @@ try {
   await mutate({type: 'group', targetNodeId: ids.custom, newRegion: null, conversations: [ref], consumeNodeIds: [ids.conversation, ids.note, foreignId]});
   graph = await snapshot(); assert(!graph.nodes.some(item => item.id === ids.conversation));
   assert(graph.nodes.some(item => item.id === ids.note)); assert.deepEqual((await snapshot(otherId)).nodes, foreignGraph.nodes);
+  const targetGroup = (await mutate({type: 'create', node: node('custom', {conversations: []})})).payload.nodeIds[0];
+  graph = await snapshot();
+  const transferId = randomUUID(), transferRequest = {boardId, expectedRevision: graph.board.revision, mutation: {type: 'group', targetNodeId: targetGroup,
+    newRegion: null, conversations: [exact], consumeNodeIds: [], sourceMembers: [{regionId: ids.custom, conversation: exact}]}};
+  const transferred = await command('canvas.nodes.apply', transferRequest, transferId); applied(transferred);
+  graph = await snapshot(); const afterTransfer = graph.board.revision;
+  assert.deepEqual(graph.nodes.find(item => item.id === ids.custom).data.conversations, [ref]);
+  assert.deepEqual(graph.nodes.find(item => item.id === targetGroup).data.conversations, [exact]);
+  assert.deepEqual(await command('canvas.nodes.apply', transferRequest, transferId), transferred);
+  assert.equal((await snapshot()).board.revision, afterTransfer);
+  await mutate({type: 'group', targetNodeId: ids.custom, newRegion: null, conversations: [exact], consumeNodeIds: [], sourceMembers: [{regionId: targetGroup, conversation: exact}]});
+  await mutate({type: 'delete', nodeIds: [targetGroup]});
+  record('atomic_member_transfer_preserves_private_identity_source_membership_and_first_receipt_replay');
   const detached = await mutate({type: 'detach', regionId: ids.custom, conversation: exact, x: 12, y: 18});
   graph = await snapshot(); const pin = graph.nodes.find(item => item.id === detached.payload.nodeIds.find(id => id !== ids.custom));
   assert.deepEqual(pin.data.conversation, exact); assert.equal(pin.data.width, 224); assert.equal(pin.data.height, 132);

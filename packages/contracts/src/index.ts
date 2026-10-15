@@ -4279,6 +4279,8 @@ export interface CanvasNode {
 }
 
 export interface CanvasGraphSnapshot {
+  /** Missing on older Hosts; new sourceMembers writes require version 1. */
+  memberTransferVersion?: number
   board: CanvasBoard | null
   nodes: CanvasNode[]
   throughGlobalSequence: number
@@ -4309,7 +4311,7 @@ export type CanvasNodeMutation =
   | { type: 'create'; node: CanvasNodeInput }
   | { type: 'update'; nodeId: string; patch: CanvasNodePatch }
   | { type: 'move'; moves: CanvasNodeMove[] }
-  | { type: 'group'; targetNodeId: string | null; newRegion: CanvasNodeInput | null; conversations: CanvasConversationRef[]; consumeNodeIds: string[] }
+  | { type: 'group'; targetNodeId: string | null; newRegion: CanvasNodeInput | null; conversations: CanvasConversationRef[]; consumeNodeIds: string[]; sourceMembers?: Array<{ regionId: string; conversation: CanvasConversationRef }> }
   | { type: 'detach'; regionId: string; conversation: CanvasConversationRef; x: number; y: number }
   | { type: 'delete'; nodeIds: string[] }
   | { type: 'prune' }

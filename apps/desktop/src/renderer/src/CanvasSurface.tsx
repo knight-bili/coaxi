@@ -6,11 +6,11 @@ import '@xyflow/react/dist/style.css'
 import type { AgentProfile, CanvasConversationRef, CanvasNode, CanvasNodeMutation, ResolvedTheme, StoredCommandResult } from '@contracts'
 import { useCanvasGraph } from './useCanvasGraph'
 import { initialCanvasReferenceState, type CanvasReferenceState } from './canvas-reference-controller'
-import { canvasReferenceOptions, canvasSavedReference, resolveCanvasRegion, type CanvasFolderResolution } from './canvas-reference-model'
+import { canvasReferenceOptions, canvasSavedReference, resolveCanvasRegion, type CanvasFolderResolution, type CanvasRegionResolution } from './canvas-reference-model'
 import { browserCanvasStorage, loadCanvasViewState, saveCanvasViewState, CANVAS_MIN_ZOOM, CANVAS_MAX_ZOOM, type CanvasViewScope } from './canvas-view-state'
 import { basePathName, BOARD_DOT_GAP, CARD_WIDTH, CARD_HEIGHT, REGION_COLLAPSED_HEIGHT,
-  REGION_FOOTER_HEIGHT, computeAlignment, computeDropHint, effectiveColumns, isRegionKind, layoutRegionGrid, noteHoldsProse,
-  packLayout, regionHeightForRows, regionWidthForColumns, visibleMemberCap, columnsForRegionWidth, rowsForRegionHeight,
+  REGION_FOOTER_HEIGHT, REGION_HEADER_HEIGHT, REGION_PADDING, computeAlignment, computeDropHint, effectiveColumns, isRegionKind, layoutRegionGrid, noteHoldsProse,
+  packLayout, regionHeightForRows, regionWidthForColumns, visibleMemberCap, columnsForRegionWidth, rowsForRegionHeight, canvasMemberKey, canvasReferenceKey, type CanvasDropHint,
   FILE_CARD_MIN_WIDTH, FILE_CARD_MIN_HEIGHT, TERMINAL_CARD_MIN_WIDTH, TERMINAL_CARD_MIN_HEIGHT, type AlignmentGuide } from './canvas-layout'
 import { CanvasNodeEditor, canvasKindNames, canvasColorName, type CanvasEditTarget, type CanvasFolderGroupOption, type CanvasReferenceOption } from './CanvasNodeEditor'
 import { AppDialogBody, AppDialogContent, AppDialogFooter, AppDialogHeader } from './AppDialog'
@@ -19,6 +19,7 @@ import { SafeMarkdown } from './SafeMarkdown'
 import { UiText, uiAttribute, useInterfaceLanguage } from './interface-language'
 import { readErrorMessage } from './error-message'
 import { useCanvasFolders } from './useCanvasFolders'
+import { canvasAbsolutePosition, canvasDropMutation, canvasGroupSelection, canvasMemberMutationSupported } from './canvas-member-interaction'
 import './canvas.css'
 
 export interface CanvasLeaveGuard { canLeave(): Promise<boolean>; isBlocked(): boolean }
@@ -39,11 +40,13 @@ export interface CanvasSurfaceProps {
   onOpenFile?(path: string): void
   onLeaveGuardChange?(guard: CanvasLeaveGuard | null): void
 }
-type FlowNode = Node<{ row: CanvasNode }, 'canvas-card'>
+type FlowNode = Node<{ row: CanvasNode; member?: CanvasConversationRef; regionId?: string }, 'canvas-card'>
 const EMPTY_ROWS: CanvasNode[] = [], EMPTY_GROUPS: CanvasFolderGroupOption[] = []
 const EMPTY_CATALOG = initialCanvasReferenceState()
 type Presentation = CanvasSurfaceProps & {
   blocked: boolean
+  selectedReferences: ReadonlySet<string>
+  dropTargetId: string | null
   expandedRegions: ReadonlySet<string>
   title(reference: CanvasConversationRef): string
   available(reference: CanvasConversationRef): boolean | undefined
@@ -51,7 +54,7 @@ type Presentation = CanvasSurfaceProps & {
   expand(row: CanvasNode): void
   detach(row: CanvasNode, reference: CanvasConversationRef): void
   edit(row: CanvasNode): void
-  beginGesture(): number | null
+  beginGesture(owner?: string): number | null
   resize(row: CanvasNode, geometry: { x: number; y: number; width: number; height: number }, revision: number | null): void
 }
 const PresentationContext = createContext<Presentation | null>(null)
@@ -69,15 +72,24 @@ function CanvasCard({ data, selected }: NodeProps<FlowNode>): React.JSX.Element 
   const resolution = actions.resolvedMembers?.get(row.id)
   const references = resolution?.references.map(item => item.reference) ?? (d.kind === 'custom' ? d.conversations : [])
   const visible = actions.expandedRegions.has(row.id) ? references : references.slice(0, cap)
-  return <article className={`canvas-card canvas-card-${d.kind}${d.collapsed ? ' is-collapsed' : ''}`} data-color={color ?? undefined}>
+  if (data.member) return <article className={`canvas-member-card${selected ? ' is-selected' : actions.selectedReferences.has(canvasReferenceKey(data.member)) ? ' is-mirrored' : ''}`}>
+    <header className="canvas-card-handle"><strong title={actions.title(data.member)}>{actions.title(data.member)}</strong></header>
+    <div className="canvas-member-actions nodrag nowheel">
+      <button type="button" disabled={actions.blocked || actions.available(data.member) === false} onClick={() => actions.onOpenReference(data.member!)}><UiText zh="打开对话" /></button>
+      <button type="button" disabled={actions.blocked} onClick={() => actions.detach(row, data.member!)}><UiText zh={d.kind === 'custom' ? '移出分组' : '固定到画布'} /></button>
+    </div>
+  </article>
+  return <article className={`canvas-card canvas-card-${d.kind}${d.collapsed ? ' is-collapsed' : ''}${d.conversation && !selected && actions.selectedReferences.has(canvasReferenceKey(d.conversation)) ? ' is-mirrored' : ''}${actions.dropTargetId === row.id ? ' is-drop-target' : ''}`} data-color={color ?? undefined}>
     <NodeResizer isVisible={selected && !actions.blocked && !d.collapsed && d.kind !== 'conversation'}
       minWidth={d.kind === 'file' ? FILE_CARD_MIN_WIDTH : d.kind === 'terminal' ? TERMINAL_CARD_MIN_WIDTH : 48}
       minHeight={d.kind === 'file' ? FILE_CARD_MIN_HEIGHT : d.kind === 'terminal' ? TERMINAL_CARD_MIN_HEIGHT : 48} maxWidth={20000} maxHeight={20000}
-      onResizeStart={() => { resizeRevision.current = actions.beginGesture() }}
+      onResizeStart={() => { resizeRevision.current = actions.beginGesture(row.id) }}
       onResizeEnd={(_event, geometry) => { actions.resize(row, geometry, resizeRevision.current); resizeRevision.current = null }} />
     <header className="canvas-card-handle">
       {color && <span className="canvas-color-dot" role="img" aria-label={uiAttribute(canvasColorName(color))} />}
       <strong title={title}>{title}</strong>
+      {d.kind === 'folder' && actions.onOpenProject && <button className="nodrag" type="button" title={d.folderPath ?? undefined} onClick={() => actions.onOpenProject?.(d.folderPath!)}><UiText zh="进入工程" /></button>}
+      {d.kind === 'agent' && member && !member.removedAt && actions.onOpenMember && <button className="nodrag" type="button" title={d.runtimeKind ?? undefined} onClick={() => actions.onOpenMember?.(member.agentId)}><UiText zh="打开队员" /></button>}
       <button className="nodrag" type="button" disabled={actions.blocked} onClick={() => actions.edit(row)} aria-label={uiAttribute('编辑节点')}><UiText zh="编辑" /></button>
       {region && <button className="nodrag" type="button" disabled={actions.blocked} onClick={() => actions.collapse(row)}
         aria-label={uiAttribute(d.collapsed ? '展开区域' : '折叠区域')}>{d.collapsed ? '+' : '−'}</button>}
@@ -86,21 +98,16 @@ function CanvasCard({ data, selected }: NodeProps<FlowNode>): React.JSX.Element 
       {d.kind === 'note' && <SafeMarkdown theme={actions.theme} mode="document">{d.content || ''}</SafeMarkdown>}
       {d.kind === 'conversation' && d.conversation && <button type="button" disabled={actions.available(d.conversation) === false} onClick={() => actions.onOpenReference(d.conversation!)}><UiText zh="打开对话" /></button>}
       {d.conversation && actions.available(d.conversation) === false && <p className="canvas-empty-copy"><UiText zh="对话已结束或不可用" /></p>}
-      {d.kind === 'folder' && <><code>{d.folderPath}</code>{actions.onOpenProject && <button type="button" onClick={() => actions.onOpenProject?.(d.folderPath!)}><UiText zh="进入工程" /></button>}</>}
-      {d.kind === 'agent' && <>{member && !member.removedAt && actions.onOpenMember && <button type="button" onClick={() => actions.onOpenMember?.(member.agentId)}><UiText zh="打开队员" /></button>}
-        {d.agentId && (!member || member.removedAt) && <p className="canvas-empty-copy"><UiText zh="队员已移除或不可用" /></p>}</>}
       {region && <>
-        <div className="canvas-member-grid" style={{ gridTemplateColumns: `repeat(${columns}, ${CARD_WIDTH}px)` }}>
-          {visible.map(reference => <div key={JSON.stringify(reference)} className="canvas-member-card">
-            <button type="button" disabled={actions.available(reference) === false} onClick={() => actions.onOpenReference(reference)}>{resolution?.references.find(item => item.reference.threadId === reference.threadId && item.reference.conversationId === reference.conversationId)?.label ?? actions.title(reference)}</button>
-            <button type="button" disabled={actions.blocked} onClick={() => actions.detach(row, reference)}><UiText zh={d.kind === 'custom' ? '移出分组' : '固定到画布'} /></button>
-          </div>)}
-        </div>
+        <div aria-hidden="true" className="canvas-member-grid-space" style={{ height: Math.max(0, layoutRegionGrid(visible.length, row.data.width, columns).contentHeight - REGION_HEADER_HEIGHT - REGION_PADDING * 2) }} />
+        <div className="canvas-region-footer">
         {references.length > cap && <button type="button" onClick={() => actions.expand(row)}>
           {actions.expandedRegions.has(row.id) ? uiAttribute('收起成员') : uiAttribute('显示全部 {0} 个成员', references.length)}
         </button>}
         {d.kind !== 'custom' && !resolution && <p className="canvas-empty-copy"><UiText zh="关联对话尚未载入" /></p>}
         {resolution && !resolution.complete && <p className="canvas-empty-copy">{resolution.issue || uiAttribute('部分关联对话尚未载入')}</p>}
+        {d.kind === 'agent' && d.agentId && (!member || member.removedAt) && <p className="canvas-empty-copy"><UiText zh="队员已移除或不可用" /></p>}
+        </div>
       </>}
       {(d.kind === 'file' || d.kind === 'terminal') && <code>{d.path}</code>}
       {d.kind === 'file' && actions.onOpenFile && <button type="button" onClick={() => actions.onOpenFile?.(d.path!)}><UiText zh="打开文件" /></button>}
@@ -130,6 +137,10 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
   const [guides, setGuides] = useState<AlignmentGuide[]>([])
   const panel = useRef(false), panelCommand = useRef(false)
   const dragRevision = useRef<number | null>(null), dragging = useRef(false), currentDerived = useRef<FlowNode[]>([])
+  const gestureGeneration = useRef(0)
+  const dragOwner = useRef<string | null>(null)
+  const [frozenMembers, setFrozenMembers] = useState<ReadonlyMap<string, CanvasRegionResolution> | null>(null)
+  const [dropHint, setDropHint] = useState<CanvasDropHint | null>(null)
   const latestGraph = useRef(graph)
   latestGraph.current = graph
   const graphBlocked = graph.loading || Boolean(graph.readError || graph.pending) || !graph.snapshot?.board
@@ -140,11 +151,12 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
   const folders = useCanvasFolders(folderPaths)
   const folderResolutions = props.folderResolutions ?? folders.resolutions
   const referenceOptions = useMemo(() => props.references ?? canvasReferenceOptions(catalog.items), [props.references, catalog.items, language])
-  const regions = useMemo(() => props.resolvedMembers ?? new Map(rows.filter(row => isRegionKind(row.data.kind)).map(row => [row.id,
+  const liveRegions = useMemo(() => props.resolvedMembers ?? new Map(rows.filter(row => isRegionKind(row.data.kind)).map(row => [row.id,
     resolveCanvasRegion(row, catalog, props.groups ?? EMPTY_GROUPS, folderResolutions)])),
   [props.resolvedMembers, rows, catalog.items, catalog.complete, catalog.error, props.groups, folderResolutions, language])
+  const regions = useMemo(() => frozenMembers ? new Map([...liveRegions, ...frozenMembers]) : liveRegions, [liveRegions, frozenMembers])
   const expanded = useMemo(() => new Set(view.expandedRegions), [view.expandedRegions])
-  const derived = useMemo<FlowNode[]>(() => rows.map(row => {
+  const derived = useMemo<FlowNode[]>(() => rows.flatMap(row => {
     const d = row.data, region = isRegionKind(d.kind)
     const width = region && d.gridColumns > 0 ? regionWidthForColumns(d.gridColumns) : d.kind === 'conversation' ? CARD_WIDTH : d.width
     let height = d.height
@@ -155,12 +167,23 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
         const columns = effectiveColumns(d, width), cap = visibleMemberCap(d, columns)
         const count = expanded.has(row.id) ? memberCount : Math.min(cap, memberCount)
         height = Math.max(d.gridRows > 0 ? regionHeightForRows(d.gridRows) : height,
-          layoutRegionGrid(count, width, columns).contentHeight + (memberCount > cap ? REGION_FOOTER_HEIGHT : 0))
+          layoutRegionGrid(count, width, columns).contentHeight + REGION_FOOTER_HEIGHT * 2)
       }
     } else if (d.kind === 'conversation') height = CARD_HEIGHT
-    return { id: row.id, type: 'canvas-card', data: { row }, position: { x: d.x, y: d.y },
+    const root: FlowNode = { id: row.id, type: 'canvas-card', data: { row }, position: { x: d.x, y: d.y },
       width, height, style: { width, height }, selected: selected.includes(row.id), dragHandle: '.canvas-card-handle',
       zIndex: region ? 0 : 1, connectable: false, deletable: false }
+    if (!region || d.collapsed) return [root]
+    const allMembers = regions.get(row.id)?.references.map(item => item.reference) ?? d.conversations
+    const members = expanded.has(row.id) ? allMembers : allMembers.slice(0, visibleMemberCap(d, effectiveColumns(d, width)))
+    const grid = layoutRegionGrid(members.length, width, effectiveColumns(d, width))
+    return [root, ...members.map((member, index): FlowNode => {
+      const id = canvasMemberKey(row.id, member)
+      return { id, type: 'canvas-card', parentId: row.id, data: { row, member, regionId: row.id }, position: grid.positions[index],
+        width: CARD_WIDTH, height: CARD_HEIGHT, style: { width: CARD_WIDTH, height: CARD_HEIGHT }, selected: selected.includes(id),
+        ariaLabel: uiAttribute('区域对话：{0}。可拖动，或按 Tab 使用卡片操作。', regions.get(row.id)?.references[index]?.label ?? uiAttribute('对话')),
+        dragHandle: '.canvas-card-handle', connectable: false, deletable: false, zIndex: 2 }
+    })]
   }), [rows, selected, expanded, regions])
   currentDerived.current = derived
   useEffect(() => { if (!dragging.current) setNodes(derived) }, [derived])
@@ -173,28 +196,45 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
 
   const settlePanel = (receipt: StoredCommandResult) => {
     if (receipt.status === 'rejected') {
-      const message = receipt.code === 'canvas.nodes.conflict' ? uiAttribute('画布已有新修改，此次操作未保存。请核对最新布局后重试。') : uiAttribute('此次画布操作未完成，请核对输入后重试。')
+      const message = receipt.code === 'canvas.nodes.conflict' ? uiAttribute('画布已有新修改，此次操作未保存。请核对最新布局后重试。')
+        : receipt.code === 'canvas.nodes.too_many_members' ? uiAttribute('所选对话或成员引用超过200个，请减少选择。')
+          : uiAttribute('此次画布操作未完成，请核对输入后重试。')
       setIssue(message); panelCommand.current = false
       throw new Error(message)
     }
     if (panelCommand.current) { panelCommand.current = false; panel.current = false; setEditor(null); setDeletion(null) }
   }
   const submit = async (mutation: CanvasNodeMutation, revision?: number, fromPanel = false) => {
+    const gesture = gestureGeneration.current
     setIssue(null)
     panelCommand.current = fromPanel
     try {
+      if (!canvasMemberMutationSupported(mutation, graph.snapshot?.memberTransferVersion)) throw new Error(uiAttribute('当前 Core 不支持原子成员转移，请升级服务后重试。'))
       const receipt = await graph.apply(mutation, revision)
       settlePanel(receipt)
     } catch (error) {
       if (!graph.hasUnsettled()) panelCommand.current = false
       setIssue(readErrorMessage(error)); throw error
     } finally {
-      dragging.current = false; setGuides([]); setNodes(currentDerived.current)
+      if (gesture === gestureGeneration.current) { dragOwner.current = null; dragging.current = false; setFrozenMembers(null); setDropHint(null); setGuides([]); setNodes(currentDerived.current) }
     }
   }
   const mutate = (mutation: CanvasNodeMutation, revision?: number) => { void submit(mutation, revision).catch(() => undefined) }
   const closePanel = () => { if (!graph.hasUnsettled()) { panel.current = false; setEditor(null); setDeletion(null) } }
-  const beginGesture = () => { dragging.current = true; return graph.snapshot?.board?.revision ?? null }
+  const beginGesture = (owner?: string) => {
+    if (dragging.current || panel.current || latestGraph.current.loading || latestGraph.current.readError || latestGraph.current.hasUnsettled() || !latestGraph.current.snapshot?.board) return null
+    gestureGeneration.current += 1; dragOwner.current = owner ?? null; dragging.current = true; return graph.snapshot?.board?.revision ?? null
+  }
+  const cancelGesture = () => {
+    gestureGeneration.current += 1; dragRevision.current = null; dragOwner.current = null; dragging.current = false
+    setFrozenMembers(null); setDropHint(null); setGuides([]); setNodes(currentDerived.current)
+  }
+  useEffect(() => {
+    const cancel = () => { if (dragging.current && !latestGraph.current.hasUnsettled()) cancelGesture() }
+    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') cancel() }
+    window.addEventListener('blur', cancel); window.addEventListener('keydown', escape)
+    return () => { window.removeEventListener('blur', cancel); window.removeEventListener('keydown', escape) }
+  }, [])
   const recover = async (retry: boolean) => {
     try { const receipt = await (retry ? graph.retry() : graph.reconcile()); if (receipt) settlePanel(receipt) }
     catch (error) { setIssue(readErrorMessage(error)) }
@@ -204,6 +244,9 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
       ?? canvasSavedReference(reference, catalog).label
   }
   const actions: Presentation = { ...props, resolvedMembers: regions, blocked, expandedRegions: expanded, title,
+    selectedReferences: new Set(nodes.filter(node => selected.includes(node.id)).flatMap(node => node.data.member ? [canvasReferenceKey(node.data.member)]
+      : node.data.row.data.conversation ? [canvasReferenceKey(node.data.row.data.conversation)] : [])),
+    dropTargetId: dropHint?.type === 'region' ? dropHint.regionId : dropHint?.type === 'merge' ? dropHint.targetNodeId : null,
     available: reference => canvasSavedReference(reference, catalog).available,
     collapse: row => { mutate({ type: 'update', nodeId: row.id, patch: { collapsed: !row.data.collapsed } }) },
     expand: row => setView(current => ({ ...current, expandedRegions: expanded.has(row.id)
@@ -213,6 +256,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     edit: row => { panel.current = true; setEditor({ target: { type: 'update', row }, revision: graph.snapshot!.board!.revision }) },
     beginGesture,
     resize: (row, geometry, revision) => {
+      if (revision === null || dragOwner.current !== row.id) return
       const region = isRegionKind(row.data.kind)
       const columns = Math.min(12, columnsForRegionWidth(geometry.width)), rows = Math.min(12, rowsForRegionHeight(geometry.height))
       mutate({ type: 'update', nodeId: row.id, patch: { ...geometry,
@@ -221,17 +265,19 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     }
   }
   const deleteSelected = (ids = selected) => {
+    ids = ids.filter(id => rows.some(row => row.id === id))
+    if (!ids.length) { setIssue(uiAttribute('区域成员可通过卡片操作移出或固定到画布。')); return }
     panel.current = true
     setDeletion({ ids: [...ids], revision: graph.snapshot!.board!.revision,
       hasProse: rows.some(row => ids.includes(row.id) && noteHoldsProse(row)) })
   }
   const groupSelected = () => {
-    const pins = rows.filter(row => selected.includes(row.id) && row.data.kind === 'conversation' && row.data.conversation)
-    if (!pins.length) return
-    const anchor = pins[0].data
-    mutate({ type: 'group', targetNodeId: null, newRegion: { kind: 'custom', x: anchor.x - 12, y: anchor.y - 52,
-      width: regionWidthForColumns(2), height: regionHeightForRows(1) },
-    conversations: pins.map(row => row.data.conversation!), consumeNodeIds: pins.map(row => row.id) })
+    const items = nodes.filter(node => selected.includes(node.id) && (node.data.member || node.data.row.data.conversation)).map(node => ({
+      conversation: (node.data.member ?? node.data.row.data.conversation)!, ...canvasAbsolutePosition(node, nodes),
+      ...(node.data.member ? { regionId: node.data.regionId! } : { nodeId: node.id }) }))
+    const mutation = canvasGroupSelection(items)
+    if (mutation) mutate(mutation)
+    else if (items.length) setIssue(uiAttribute('所选对话或成员引用超过200个，请减少选择。'))
   }
   const error = issue || (graph.readError ? readErrorMessage(graph.readError) : null)
   const recovery = graph.pending && <div className="canvas-notice" role="status"><UiText zh={graph.pending.state === 'unknown' ? '原操作结果待核对，请先核对或重试原操作。' : '正在保存画布…'} />
@@ -239,12 +285,26 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
       <button type="button" onClick={() => { void recover(true) }}><UiText zh="重试原操作" /></button></>}
   </div>
   const align = (moved: FlowNode, movedNodes: FlowNode[]) => {
-    const moving = movedNodes.length ? movedNodes : [moved], ids = new Set(moving.map(item => item.id))
+    if (moved.data.member) return { dx: 0, dy: 0, guides: [] }
+    const moving = (movedNodes.length ? movedNodes : [moved]).filter(item => !item.data.member), ids = new Set(moving.map(item => item.id))
     const left = Math.min(...moving.map(item => item.position.x)), top = Math.min(...moving.map(item => item.position.y))
     const right = Math.max(...moving.map(item => item.position.x + (item.width ?? item.data.row.data.width)))
     const bottom = Math.max(...moving.map(item => item.position.y + (item.height ?? item.data.row.data.height)))
-    const others = nodes.filter(item => !ids.has(item.id)).map(item => ({ ...item.position, width: item.width ?? 0, height: item.height ?? 0 }))
+    const others = nodes.filter(item => !item.data.member && !ids.has(item.id)).map(item => ({ ...item.position, width: item.width ?? 0, height: item.height ?? 0 }))
     return computeAlignment({ x: left, y: top, width: right - left, height: bottom - top }, others, 8 / flow.getZoom(), BOARD_DOT_GAP)
+  }
+  const drop = (moved: FlowNode, position: { x: number; y: number }) => {
+    const reference = moved.data.member ?? moved.data.row.data.conversation
+    if (!reference) return null
+    const painted = nodes.filter(item => !item.data.member).toSorted((left, right) =>
+      (flow.getInternalNode(left.id)?.internals.z ?? left.zIndex ?? 0) - (flow.getInternalNode(right.id)?.internals.z ?? right.zIndex ?? 0))
+    const regions = painted.filter(item => isRegionKind(item.data.row.data.kind)).map(item => ({ nodeId: item.id,
+      kind: item.data.row.data.kind, ...item.position, width: item.width ?? 0, height: item.height ?? 0 }))
+    const pins = painted.filter(item => item.data.row.data.conversation).map(item => ({ nodeId: item.id,
+      conversation: item.data.row.data.conversation!, ...item.position, width: CARD_WIDTH, height: CARD_HEIGHT }))
+    const source = moved.data.member ? { kind: 'member' as const, regionId: moved.data.regionId!, conversation: reference }
+      : { kind: 'pin' as const, nodeId: moved.id, conversation: reference }
+    return { source, hint: computeDropHint(source, position, regions, pins) }
   }
   return <section ref={surface} className="canvas-surface" aria-label={uiAttribute('无限画布')} onKeyDownCapture={event => {
     const target = event.target
@@ -258,6 +318,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     if (!ids.length) return
     if (focused && !selected.includes(focused)) setSelected([focused])
     if (!direction) { deleteSelected(ids); return }
+    if (!rows.some(row => ids.includes(row.id))) { setIssue(uiAttribute('区域成员可通过卡片操作移出或固定到画布。')); return }
     const distance = event.shiftKey ? 20 : 5
     const moves = rows.filter(row => ids.includes(row.id)).map(row => ({ nodeId: row.id, x: row.data.x + direction[0] * distance, y: row.data.y + direction[1] * distance }))
     if (moves.length) mutate({ type: 'move', moves }, graph.snapshot!.board!.revision)
@@ -269,8 +330,8 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
         const point = element ? flow.screenToFlowPosition({ x: element.left + element.width / 2, y: element.top + element.height / 2 }) : { x: -bounds.x / bounds.zoom, y: -bounds.y / bounds.zoom }
         panel.current = true; setEditor({ target: { type: 'create', position: point }, revision: graph.snapshot!.board!.revision })
       }}><UiText zh="添加节点" /></button>
-      <button type="button" disabled={blocked || !rows.some(row => selected.includes(row.id) && row.data.kind === 'conversation')} onClick={groupSelected}><UiText zh="选中对话分组" /></button>
-      <button type="button" disabled={blocked || !selected.length} onClick={() => deleteSelected()}><UiText zh="删除所选" /></button>
+      <button type="button" disabled={blocked || !nodes.some(node => selected.includes(node.id) && (node.data.member || node.data.row.data.conversation))} onClick={groupSelected}><UiText zh="选中对话分组" /></button>
+      <button type="button" disabled={blocked || !rows.some(row => selected.includes(row.id))} onClick={() => deleteSelected()}><UiText zh="删除所选" /></button>
       <button type="button" disabled={blocked || !rows.length} onClick={() => {
         const sizes = new Map(nodes.map(node => [node.id, { width: node.width ?? node.data.row.data.width, height: node.height ?? node.data.row.data.height }]))
         const moves = packLayout(rows.map(row => ({ id: row.id, ...row.data })), sizes)
@@ -296,24 +357,46 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
         nodesConnectable={false} deleteKeyCode={null} minZoom={CANVAS_MIN_ZOOM} maxZoom={CANVAS_MAX_ZOOM}
         defaultViewport={view.viewport ?? { x: 0, y: 0, zoom: 1 }}
         onMoveEnd={(_event, viewport) => setView(current => ({ ...current, viewport }))}
-        onNodeDragStart={() => { dragRevision.current = beginGesture() }}
-        onNodeDrag={(_event, moved, movedNodes) => setGuides(align(moved, movedNodes).guides)}
+        onNodeDragStart={(_event, moved) => {
+          const revision = beginGesture(moved.id)
+          if (revision === null) return
+          dragRevision.current = revision
+          if (moved.data.member && moved.data.regionId) {
+            const resolution = regions.get(moved.data.regionId)
+            if (resolution) setFrozenMembers(new Map([[moved.data.regionId, resolution]]))
+          }
+        }}
+        onNodeDrag={(_event, moved, movedNodes) => {
+          if (dragOwner.current !== moved.id) return
+          const alignment = align(moved, movedNodes); setGuides(alignment.guides)
+          const position = canvasAbsolutePosition(moved, nodes)
+          setDropHint(drop(moved, { x: position.x + alignment.dx, y: position.y + alignment.dy })?.hint ?? null)
+        }}
+        onSelectionDragStart={() => { const revision = beginGesture('@selection'); if (revision !== null) dragRevision.current = revision }}
+        onSelectionDragStop={(_event, selection) => {
+          if (dragOwner.current !== '@selection') return
+          const revision = dragRevision.current; dragRevision.current = null
+          const real = selection.filter(node => !node.data.member)
+          if (revision === null || !real.length) { cancelGesture(); return }
+          const alignment = align(real[0], real)
+          mutate({ type: 'move', moves: real.map(node => ({ nodeId: node.id, x: node.position.x + alignment.dx, y: node.position.y + alignment.dy })) }, revision)
+        }}
         onNodeDragStop={(_event, moved, movedNodes) => {
-          const revision = dragRevision.current ?? undefined
+          if (dragOwner.current !== moved.id) return
+          const revision = dragRevision.current
           dragRevision.current = null
-          const row = moved.data.row, selectedRows = movedNodes.length ? movedNodes : [moved]
+          if (revision === null) { cancelGesture(); return }
+          const row = moved.data.row, selectedRows = (movedNodes.length ? movedNodes : [moved]).filter(node => !node.data.member)
           const alignment = align(moved, movedNodes)
-          const position = { x: moved.position.x + alignment.dx, y: moved.position.y + alignment.dy }
-          if (row.data.conversation && selectedRows.length === 1) {
-            const regions = nodes.filter(item => isRegionKind(item.data.row.data.kind)).map(item => ({ nodeId: item.id,
-              kind: item.data.row.data.kind, ...item.position, width: item.width ?? 0, height: item.height ?? 0 }))
-            const pins = nodes.filter(item => item.data.row.data.conversation).map(item => ({ nodeId: item.id,
-              conversation: item.data.row.data.conversation!, ...item.position, width: CARD_WIDTH, height: CARD_HEIGHT }))
-            const hint = computeDropHint({ kind: 'pin', nodeId: row.id, conversation: row.data.conversation }, position, regions, pins)
-            if (hint.type === 'region') { mutate({ type: 'group', targetNodeId: hint.regionId, newRegion: null,
-              conversations: [row.data.conversation], consumeNodeIds: [row.id] }, revision); return }
-            if (hint.type === 'merge') { mutate({ type: 'group', targetNodeId: null, newRegion: { kind: 'custom', ...hint.rect },
-              conversations: [hint.targetConversation, row.data.conversation], consumeNodeIds: [hint.targetNodeId, row.id] }, revision); return }
+          const absolute = canvasAbsolutePosition(moved, nodes)
+          const position = { x: absolute.x + alignment.dx, y: absolute.y + alignment.dy }
+          const reference = moved.data.member ?? row.data.conversation
+          if (reference && (moved.data.member ? selectedRows.length === 0 : selectedRows.length === 1)) {
+            const plan = drop(moved, position)!
+            const mutation = canvasDropMutation(plan.source, plan.hint)
+            if (mutation) mutate(mutation, revision)
+            else cancelGesture()
+            return
           }
           mutate({ type: 'move', moves: selectedRows.map(node => ({ nodeId: node.id, x: node.position.x + alignment.dx, y: node.position.y + alignment.dy })) }, revision)
         }}>

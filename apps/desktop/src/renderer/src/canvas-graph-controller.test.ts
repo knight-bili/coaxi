@@ -85,28 +85,37 @@ describe('Canvas graph ownership and command recovery', () => {
   })
 
   it('keeps the exact unknown gesture across newer reads and only retries its original identity and revision', async () => {
-    let revision = 1, writes = 0
-    const transport = fixture(async (method, params) => {
-      if (method === 'canvas.nodes.snapshot') return snapshot('board', revision)
-      if (method === 'canvas.nodes.apply') {
-        if (++writes === 1) throw new TypeError('response lost')
-        return result((params as { commandId: string }).commandId)
-      }
-      throw Error(method)
-    })
-    const current = controller(transport.client); current.start(); await current.refresh()
-    const gesture: CanvasNodeMutation = { type: 'move', moves: [{ nodeId: 'node', x: 12, y: 24 }] }
-    await expect(current.apply(gesture)).rejects.toThrow('response lost')
-    gesture.moves[0].x = 900
-    revision = 9; await current.refresh()
-    expect(current.getSnapshot().pending?.state).toBe('unknown')
-    await expect(current.apply({ type: 'prune' })).rejects.toThrow('原操作')
-    const receipt = await current.retry()
-    const sent = transport.requests.filter(item => item.method === 'canvas.nodes.apply')
-    expect(sent).toHaveLength(2); expect(sent[1]).toEqual(sent[0])
-    expect(sent[1].params).toMatchObject({ command: { expectedRevision: 1, mutation: { moves: [{ x: 12 }] } } })
-    expect(current.getSnapshot().lastResult).toBe(receipt)
-    expect(current.getSnapshot().pending).toBeNull()
+    const cases: CanvasNodeMutation[] = [
+      { type: 'move', moves: [{ nodeId: 'node', x: 12, y: 24 }] },
+      { type: 'group', targetNodeId: 'target', newRegion: null,
+        conversations: [{ threadId: 'thread', conversationId: 'private' }], consumeNodeIds: [],
+        sourceMembers: [{ regionId: 'source', conversation: { threadId: 'thread', conversationId: 'private' } }] }
+    ]
+    for (const gesture of cases) {
+      let revision = 1, writes = 0
+      const transport = fixture(async (method, params) => {
+        if (method === 'canvas.nodes.snapshot') return snapshot('board', revision)
+        if (method === 'canvas.nodes.apply') {
+          if (++writes === 1) throw new TypeError('response lost')
+          return result((params as { commandId: string }).commandId)
+        }
+        throw Error(method)
+      })
+      const current = controller(transport.client); current.start(); await current.refresh()
+      const original = structuredClone(gesture)
+      await expect(current.apply(gesture)).rejects.toThrow('response lost')
+      if (gesture.type === 'move') gesture.moves[0].x = 900
+      if (gesture.type === 'group') { gesture.conversations.length = 0; gesture.sourceMembers![0].conversation.conversationId = 'changed' }
+      revision = 9; await current.refresh()
+      expect(current.getSnapshot().pending?.state).toBe('unknown')
+      await expect(current.apply({ type: 'prune' })).rejects.toThrow('原操作')
+      const receipt = await current.retry()
+      const sent = transport.requests.filter(item => item.method === 'canvas.nodes.apply')
+      expect(sent).toHaveLength(2); expect(sent[1]).toEqual(sent[0])
+      expect(sent[1].params).toMatchObject({ command: { expectedRevision: 1, mutation: original } })
+      expect(current.getSnapshot().lastResult).toBe(receipt)
+      expect(current.getSnapshot().pending).toBeNull()
+    }
   })
 
   it('retains a successful result when the following read fails and does not silently rebase a conflict', async () => {

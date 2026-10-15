@@ -4,7 +4,7 @@ contract: canvas-nodes-v1
 authority: core-canvas-node-graph-and-atomic-gestures
 status: accepted
 version: 1
-last_updated: 2026-10-14
+last_updated: 2026-10-15
 ---
 
 # Canvas Nodes v1
@@ -40,7 +40,7 @@ Web共用适配器准入全部画板/节点操作；四种写命令接入既有�
 | create | node | 创建一个新节点，ID 由 Core 分配 |
 | update | nodeId, patch | 更新展示、几何或 custom 成员；kind、画板和绑定身份不变 |
 | move | moves:[{nodeId,x,y}] | 整批移动；不操作其他画板或已删除 ID |
-| group | targetNodeId / newRegion 二选一，conversations，consumeNodeIds | 合并到 custom 区域并同时移除已被接纳的会话 pin；其他种类不被吸收删除 |
+| group | targetNodeId / newRegion 二选一，conversations，consumeNodeIds，可选sourceMembers | 合并到 custom 区域，原子移除明确选中的custom源成员及已被接纳的会话pin；其他种类不被吸收删除 |
 | detach | regionId, conversation, x, y | custom 中移除该精确成员并生成 pin；其他 region 保持其动态绑定 |
 | delete | nodeIds | 仅删除本画板节点，不删除引用的业务对象或用户文件 |
 | prune | 无 | 清除本画板失效会话 pin、custom 中的失效引用 |
@@ -73,6 +73,25 @@ Note 以外不接受正文，file/terminal 以外不接受 path。其他不相�
 标题和颜色修剪，空标题清除；正文不修剪。颜色沿用 Board 的固定主题词汇。
 尺寸夹在 48..20000，坐标夹在 -1000000..1000000，非有限值拒绝。
 region 的网格轴夹在 0..12，0 为自动，非 region 轴为0；detach pin 为源尺寸224×132。
+
+## 区域成员手势
+
+`group.sourceMembers`为最多200个唯一`{regionId,conversation:{threadId,conversationId}}`，均须属于本次incoming引用。
+源必须是同画板真实region；custom源必须仍包含该精确成员。全部校验成功后，同一原子命令完成目标接纳、
+移除明确选中的custom源成员及消费独立pin。未选择的镜像实例保留；folder/group/agent源只复制引用，不改变动态绑定或业务归属。
+目标与源相同的已存在实例保留；单卡落回原区域由客户端作为无变化处理。公开与私有Conversation始终是不同引用。
+源区域也进入原有命令前内容指纹范围。默认空sourceMembers在序列化时省略，旧Group请求及收据指纹保持，
+不以新增可选字段改变旧未知操作的回查/原编号重试。此扩展不新增数据库字段、操作名或模型输入。
+新快照返回`memberTransferVersion:1`；旧Host省略该字段时，Renderer不发送包含sourceMembers的新写入，
+先提示升级服务，避免旧服务拒绝字段后留下无法结算的新手势。原detach、pin移动/分组及其他旧操作仍按原合同使用。
+
+Renderer采用真实画布库派生成员节点，ID仅用于展示选择，不写成Core节点或业务ID。坐标由真实父区域与固定网格计算，
+区域移动/折叠、显示全部、选中镜像、落点提示与已展开区域保持一致；拖动时冻结源成员名单，释放时使用起始画板版本。
+成员拖到空白调用detach，拖到custom或独立pin调用单次group；投放到folder/agent区域只形成独立pin，不给Thread改工程/队员。
+选中的跨区域成员与独立pin可以一次分组，只消费pin与明确选中custom成员。多选位置移动只持久化独立节点/区域，派生网格位置不写回。
+删除、方向键布局、打包与对齐过滤派生ID；键盘用户可通过卡片按钮移出或固定，再沿独立节点布局。
+失焦/Esc只取消未发送手势，待核对命令继续走原回执；手势归属与代次保护避免旧结束回调清掉新操作。
+实际鼠标/触控/键盘、镜像/重排、断连恢复、Rust与Host新增路径仍按I03阶段候选验，不用派生模型测试替代。
 路径限制4096个Unicode标量，拒绝NUL/相对路径；保留其他主机的绝对路径作为不可用引用，不能因此获得本机访问权。
 文件和目录暂时不存在时，节点身份与几何仍保留。已有业务对象后来消失时允许显示不可用；新会话引用不接受不存在的对象。
 
@@ -95,4 +114,6 @@ Board 删除在同一事务删除它的节点并保留 Board tombstone，不恢�
 
 纯输入 owner 拥有八种类型、几何/网格、路径与成员上限；扩展 SQLite owner 拥有204回执回滚、
 CAS/跨画板、原子手势与结果回滚、精确引用、重开、删除与旧结果回放。
+上述既有纯输入owner补旧Group序列化不增字段，既有扩展SQLite owner补跨源私有/公开成员原子转移、未选镜像保留、
+无效源回滚、派生绑定不变与原收据回放；没有新增Rust owner，本切片尚未编译/执行。
 真实 Host/HTTP 另证明153升级、封闭入口与实际持久化 seam；这些都不能替代交互画布、真实模型或全平台资格。
