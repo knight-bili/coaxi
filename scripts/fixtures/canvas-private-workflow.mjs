@@ -78,7 +78,7 @@ export async function beginHeldPrivateRun(rpc, context, capture) {
 }
 
 export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait, openCanvasBoard, config, report, record, seam }) {
-  assert.ok(['private-roundtrip', 'private-queue', 'private-rebind', 'private-late-upload'].includes(config.mode))
+  assert.ok(['private-roundtrip', 'private-queue', 'private-rebind', 'private-late-upload', 'private-send'].includes(config.mode))
   assert.ok(seam, 'private Native modes require an observed production IPC transport')
   window.unmaximize(); window.setContentSize(1680, 1000); window.webContents.setZoomFactor(1)
   const context = await preparePrivateWorkflow({ rpc, config, record })
@@ -149,6 +149,60 @@ export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait
     await wait(`!${frame(2)}`)
     await open(0); await open(1)
     await evaluate(`(()=>{document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]').click();return true})()`)
+    if (config.mode === 'private-send') {
+      const aFile = 'R02 仅甲卡发送.txt', bFile = 'R02 乙卡仍保留.txt', defaultFile = 'R02 默认输入保留.txt'
+      await addMaterial(scopes[0], aFile, '甲材料对应的问题')
+      await addMaterial(scopes[1], bFile, '乙材料对应的问题')
+      await addMaterial(null, defaultFile, 'R01 可引用原文')
+      const firstBody = `R02 甲卡实际发送 ${randomUUID()}`, otherBody = `R02 乙卡未发送 ${randomUUID()}`
+      await typeBody(0, firstBody); await typeBody(1, otherBody)
+      const beta = (await get(scopes[1])).draft, ordinary = (await get(null)).draft
+      const send = index => `${frame(index)}.querySelector('.single-chat-composer button[type="submit"]')`
+      await clickNative(send(0))
+      const first = await waitPrivateSnapshot(rpc, conversationId, value => value.messages.some(message => message.authorType === 'user' && message.body === firstBody)
+        && value.agentRuns.length === context.primeRunIds.length + 1 && value.agentRuns.every(terminal))
+      assert.ok(first.agentRuns.every(run => run.status === 'succeeded'), JSON.stringify(first.agentRuns))
+      await wait(`${input(0)}.value===''`)
+      assert.deepEqual((await get(scopes[0])).draft.attachments, []); assert.deepEqual((await get(scopes[0])).draft.quotes, [])
+      assert.deepEqual((await get(scopes[1])).draft, beta); assert.deepEqual((await get(null)).draft, ordinary)
+      assert.equal(await evaluate(`${input(1)}.value`), otherBody)
+      assert.equal(first.messages.filter(message => message.authorType === 'user' && message.body === firstBody).length, 1)
+      record('actual_native_send_consumes_only_selected_card_body_file_and_quote_while_other_card_and_default_materials_stay_exact')
+      const capturedInputs = async () => (await readFile(config.runtime_capture, 'utf8')).trim().split('\n').map(line => JSON.parse(line)).flatMap(entry => {
+        const prompt = (entry.params?.prompt ?? []).filter(part => part.type === 'text').map(part => part.text).join('\n')
+        const match = /\[CURRENT_INPUT\]\s*([\s\S]*?)\s*\[\/CURRENT_INPUT\]/.exec(prompt)
+        return match ? [{ requestId: entry.requestId, input: JSON.parse(match[1]) }] : []
+      })
+      const selected = (await capturedInputs()).filter(entry => JSON.stringify(entry.input).includes(firstBody))
+      assert.equal(selected.length, 1)
+      await writeFile(join(config.evidence, 'selected-runtime-current-input.json'), JSON.stringify(selected[0], null, 2) + '\n', { flag: 'wx' })
+      assert.equal(selected[0].input.message, firstBody)
+      assert.equal(selected[0].input.attachments.length, 1)
+      assert.equal(await readFile(selected[0].input.attachments[0], 'utf8'), aFile)
+      assert.deepEqual(selected[0].input.quotes.map(quote => quote.text), ['甲材料对应的问题'])
+      record('actual_owned_acp_receives_selected_card_materials_in_current_input_without_other_card_or_default_files')
+      const onlyFile = 'R02 仅附件发送.txt', empty = await get(scopes[0])
+      const prepared = await evaluate(`window.rovai.singleChatAttachments.prepareInput(${JSON.stringify({commandId:randomUUID(),threadId,expectedRevision:empty.draft.revision,target:{kind:'single_chat',conversationId,composerScope:scopes[0]}})},new File(['R02 attachment only'],${JSON.stringify(onlyFile)},{type:'text/plain'}))`)
+      assert.equal(prepared.state, 'recorded'); assert.equal(prepared.receipt.status, 'applied')
+      await wait(`${input(0)}.value===''`); await clickNative(send(0))
+      const final = await waitPrivateSnapshot(rpc, conversationId, value => value.agentRuns.length === first.agentRuns.length + 1 && value.agentRuns.every(terminal))
+      assert.ok(final.agentRuns.every(run => run.status === 'succeeded'), JSON.stringify(final.agentRuns))
+      assert.deepEqual((await get(scopes[0])).draft.attachments, []); assert.deepEqual((await get(scopes[0])).draft.quotes, [])
+      assert.deepEqual((await get(scopes[1])).draft, beta); assert.deepEqual((await get(null)).draft, ordinary)
+      assert.equal(await evaluate(`${input(1)}.value`), otherBody)
+      const onlyInputs = (await capturedInputs()).filter(entry => Array.isArray(entry.input.attachments) && entry.input.attachments.length === 1
+        && !JSON.stringify(entry.input).includes(firstBody))
+      assert.equal(onlyInputs.length, 1)
+      assert.equal(onlyInputs[0].input.message, '')
+      assert.equal(await readFile(onlyInputs[0].input.attachments[0], 'utf8'), 'R02 attachment only')
+      assert.deepEqual(onlyInputs[0].input.quotes ?? [], [])
+      await writeFile(join(config.evidence, 'attachment-only-runtime-current-input.json'), JSON.stringify(onlyInputs[0], null, 2) + '\n', { flag: 'wx' })
+      report.private_send = { selectedBody: firstBody, otherBody, selectedFile: aFile, otherFile: bFile, defaultFile, attachmentOnly: onlyFile,
+        beforeOtherDraft: beta, beforeDefaultDraft: ordinary, runIds: final.agentRuns.map(run => run.id), qualification: 'actual native send and fixed local ACP transport; no external model inference; PC02 default body and PC14 final Blob still separate' }
+      record('actual_attachment_only_native_send_succeeds_with_its_selected_file_without_consuming_other_inputs')
+      await writeFile(join(config.evidence, '01-private-send-retains-other-card.png'), (await window.webContents.capturePage()).toPNG())
+      return
+    }
     if (config.mode === 'private-roundtrip') {
       await addMaterial(scopes[0], 'R01 甲卡材料.txt', '甲材料对应的问题')
       const baseline = '甲卡保持的未发送正文\n撤销与重做探针', text = `${baseline}Z`
