@@ -18,6 +18,7 @@ export async function qualifyCrossCoreUpload({ binary, uiDirectory, chrome, outp
   for (const key of ['SystemRoot','WINDIR','COMSPEC','PATHEXT']) if (process.env[key]) env[key] = process.env[key]
   Object.assign(env, { PATH: join(process.env.SystemRoot, 'System32'), HOME: home, USERPROFILE: home,
     APPDATA: join(home, 'AppData/Roaming'), LOCALAPPDATA: join(home, 'AppData/Local'), TEMP: fixture, TMP: fixture })
+  await Promise.all([mkdir(env.APPDATA, { recursive: true }), mkdir(env.LOCALAPPDATA, { recursive: true })])
   const report = { status: 'running', channel: 'automatic_acceptance', fixture, profile, hosts: [], checks: [],
     external_model_calls: 0, started_at: new Date().toISOString() }
   console.log(JSON.stringify({ channel: report.channel, fixture, profile, model: false }))
