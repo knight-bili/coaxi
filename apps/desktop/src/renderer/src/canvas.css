@@ -179,7 +179,7 @@
 .canvas-object-details .canvas-notice code { display: block; white-space: pre-wrap; overflow-wrap: anywhere; }
 .canvas-card-file .canvas-card-body { display: flex; flex-direction: column; align-items: stretch; gap: 0; padding: 0; overflow: hidden; }
 .canvas-card-file .canvas-card-handle { gap: 4px; }
-.canvas-card-file .canvas-card-handle > .resource-reference-icon { flex: none; width: 16px; height: 16px; color: var(--muted); }
+.canvas-card-file .canvas-card-handle > .resource-reference-icon { flex: none; align-self: center; width: 16px; height: 16px; color: var(--muted); transform: none; }
 .canvas-card-file .canvas-card-handle button { flex: none; min-height: 28px; padding: 3px 6px; border-color: transparent; background: transparent; color: var(--muted); }
 .canvas-card-file .canvas-card-handle button:hover:not(:disabled), .canvas-card-file .canvas-card-handle button[aria-pressed="true"] { color: var(--ink); background: var(--neutral-selected); }
 .canvas-card-file .canvas-card-body > :is(p, button) { margin: 12px; }
