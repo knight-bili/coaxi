@@ -5,6 +5,7 @@ import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { setTimeout as pause } from 'node:timers/promises'
 import { stripVTControlCharacters } from 'node:util'
+import { execFileSync } from 'node:child_process'
 
 const config=JSON.parse(await readFile(process.env.ROVAI_C06_NATIVE_CONFIG,'utf8'))
 const report={source_commit:config.source_commit,scope:'production Main/preload/Core; direct Electron native input events',checks:[],status:'running',started_at:new Date().toISOString()}
@@ -106,6 +107,18 @@ async function qualify(window){
    report.status='passed'
    return
   }
+  if(config.mode==='ready-diff'){
+   report.scope='production Main/preload/Core and real Git worktree/Diff with owned controlled ACP protocol; no external model or database seeding'
+   await qualifyReadyDiff(window,{evaluate,wait,rpc})
+   report.status='passed'
+   return
+  }
+  if(config.mode==='public-cold'){
+   report.scope='fresh production App/Core process; persisted public pin drafts and 64 summary nodes; explicit board/card reopening; no model'
+   await qualifyPublicCold(window,{evaluate,wait,rpc})
+   report.status='passed'
+   return
+  }
   const boards=await rpc('canvas.boards.list'),board=boards.boards.find(board=>board.name==='C06 真实桌面画布')
   assert.ok(board)
   const graph=await rpc('canvas.nodes.snapshot',{boardId:board.id}),terminal=graph.nodes.find(node=>node.data.kind==='terminal')
@@ -155,6 +168,7 @@ async function qualify(window){
  }catch(error){report.status='failed';report.error=String(error.stack??error);report.runtime_errors=await evaluate('window.nativeRuntimeErrors').catch(()=>null);report.native_keys=await evaluate('window.nativeKeys').catch(()=>null);report.dom=await evaluate('document.body.innerText.slice(-2500)').catch(()=>null);if((report.screenshots?.length??0)<3){const path=join(config.evidence,'failure.png');await writeFile(path,(await window.webContents.capturePage()).toPNG()).then(()=>{(report.screenshots??=[]).push(path)}).catch(()=>{})}}
  finally{
   if(report.status==='failed')await evaluate(`(()=>{document.querySelector('.canvas-board-dialog .app-dialog-close:not(:disabled)')?.click();return true})()`).catch(()=>{})
+  if(report.status==='failed'&&config.mode==='ready-diff')await evaluate(`(()=>{document.querySelector('.mission-diff-dialog button[aria-label="关闭累计文件变更"]')?.click();document.querySelector('.canvas-object-dialog .app-dialog-close')?.click();return true})()`).catch(()=>{})
   if(report.status==='failed'&&report.crash_context?.nodeIds?.[2]){
    const noteId=report.crash_context.nodeIds[2]
    report.fixture_note_cleanup=await evaluate(`(()=>{const button=document.querySelector('[data-id="${noteId}"] .canvas-note-status button:not(:disabled)');if(!button)return 'no_visible_fixture_note';button.click();return 'requested_own_note_save'})()`).catch(()=> 'renderer_unavailable')
@@ -1037,5 +1051,104 @@ async function qualifyPublicMulti(window,{evaluate,wait,rpc}){
  assert.deepEqual(final.nodes.map(node=>node.id).sort(),summaryIds.slice().sort())
  record('native_wheel_pans_actual_64_card_viewport_without_mutating_or_losing_persisted_nodes')
  await writeFile(join(config.evidence,'02-real-64-summary-cards.png'),(await window.webContents.capturePage()).toPNG())
+}
+async function qualifyReadyDiff(window,{evaluate,wait,rpc}){
+ window.unmaximize();window.setContentSize(1680,1000);window.webContents.setZoomFactor(1)
+ const project=config.ready_diff_repository,relativePath='src/精确 #变更.txt',otherPath='src/另一处变更.txt',newPath='src/未跟踪.txt'
+ const baseline='原内容甲\n保留行\n',updated='新内容乙\n保留行\n'
+ const git=(cwd,...args)=>execFileSync(config.git_executable,['-C',cwd,...args],{encoding:'utf8',windowsHide:true}).trim()
+ await mkdir(project);await mkdir(join(project,'src'))
+ await writeFile(join(project,relativePath),baseline);await writeFile(join(project,otherPath),'另一文件原文\n')
+ git(project,'init','-b','main');git(project,'config','user.name','工程测试');git(project,'config','user.email','fixture@example.invalid');git(project,'config','core.autocrlf','false')
+ git(project,'add','.');git(project,'commit','-m','保存差异跳转测试的初始文件')
+ const base=git(project,'rev-parse','HEAD')
+ const member=await rpc('members.create',{commandId:randomUUID(),command:{displayName:'C02 本地协议工作区队员',teamRole:'隔离工程测试',professionalResponsibilities:'本地协议响应，不连接外部模型。',personalityTraits:['严谨'],workingPrinciples:'固定协议夹具',growthTopic:''}})
+ assert.equal(member.status,'applied',JSON.stringify(member));const agentId=member.resultEntity.entityId
+ const {configureProductRuntime}=await import(config.runtime_configure_module)
+ report.controlled_runtime=await configureProductRuntime(rpc,'qwen-code',[agentId])
+ record('owned_controlled_acp_passes_original_product_runtime_gate_without_external_model')
+ const created=await rpc('missions.create',{commandId:randomUUID(),command:{title:'C02 可用Git的精确Diff定位',description:'验证真实Core工作区准备与精确文件差异定位。',projectBindingKind:'directory',projectPath:project,memberAgentIds:[agentId],defaultLeadAgentId:agentId,tags:[]}})
+ assert.equal(created.status,'applied',JSON.stringify(created));const {missionId,threadId}=created.payload
+ report.ready_diff_context={missionId,threadId,agentId,project,relativePath,otherPath,newPath,base}
+ const started=await rpc('missions.start',{commandId:randomUUID(),command:{missionId}})
+ assert.equal(started.status,'accepted',JSON.stringify(started))
+ await wait(`window.rovai.request('missions.delivery',{missionId:${JSON.stringify(missionId)}}).then(value=>value.git&&value.workspace?.state==='ready')`,60_000)
+ const delivery=await rpc('missions.delivery',{missionId}),workspace=delivery.workspace
+ assert.equal(workspace.missionId,missionId);assert.equal(workspace.threadId,threadId);assert.equal(workspace.baseSha,base)
+ assert.equal(git(workspace.worktreePath,'rev-parse','HEAD'),base);assert.notEqual(workspace.worktreePath,project)
+ report.ready_diff_context.workspace=workspace
+ await wait(`window.rovai.request('threads.open',{threadId:${JSON.stringify(threadId)},traceId:${JSON.stringify(randomUUID())}}).then(value=>value.agentRuns.length>0&&value.agentRuns.every(run=>['succeeded','failed','cancelled'].includes(run.status)))`,60_000)
+ report.controlled_run=await rpc('threads.open',{threadId,traceId:randomUUID()})
+ assert.ok(report.controlled_run.agentRuns.every(run=>run.status==='succeeded'),JSON.stringify(report.controlled_run.agentRuns))
+ record('real_core_prepares_managed_git_worktree_at_recorded_base_and_settles_controlled_protocol_run')
+ const beforeIndex=git(workspace.worktreePath,'ls-files','--stage','-z')
+ await writeFile(join(config.evidence,'git-fixture-before.json'),JSON.stringify({workspace,files:{[relativePath]:await readFile(join(workspace.workingDirectory,relativePath),'utf8'),[otherPath]:await readFile(join(workspace.workingDirectory,otherPath),'utf8')},index:beforeIndex},null,2)+'\n',{flag:'wx'})
+ await writeFile(join(workspace.workingDirectory,relativePath),updated);await writeFile(join(workspace.workingDirectory,otherPath),'另一文件已修改\n');await writeFile(join(workspace.workingDirectory,newPath),'新建未跟踪文件\n')
+ const changes=await rpc('missions.changes',{missionId});assert.equal(changes.diffError,null);assert.ok(changes.viewId)
+ assert.deepEqual(changes.files.map(file=>file.path).sort(),[relativePath,otherPath,newPath].sort())
+ const target=changes.files.find(file=>file.path===relativePath),diff=await rpc('missions.fileDiff',{missionId,viewId:changes.viewId,fileId:target.id})
+ assert.equal(diff.file.path,relativePath);assert.ok(diff.patch.includes('-原内容甲')&&diff.patch.includes('+新内容乙'))
+ assert.equal(git(workspace.worktreePath,'ls-files','--stage','-z'),beforeIndex);assert.equal(git(project,'status','--porcelain'),'')
+ report.real_changes=changes;report.real_diff=diff
+ record('actual_core_git_diff_includes_exact_unicode_path_and_untracked_file_without_writing_real_index_or_source_checkout')
+ const board=await rpc('canvas.boards.create',{commandId:randomUUID(),command:{name:'C02 可用工作区Diff卡'}})
+ assert.equal(board.status,'applied',JSON.stringify(board));const boardId=board.payload.board.id
+ const graph=await rpc('canvas.nodes.snapshot',{boardId}),pin=await rpc('canvas.nodes.apply',{commandId:randomUUID(),command:{boardId,expectedRevision:graph.board.revision,mutation:{type:'create',node:{kind:'conversation',conversation:{threadId,conversationId:null},objectReference:{kind:'mission_diff',missionId,path:relativePath},title:'精确文件变更',x:0,y:0,width:360,height:240}}}})
+ assert.equal(pin.status,'applied',JSON.stringify(pin));const nodeId=pin.payload.nodeIds[0]
+ Object.assign(report.ready_diff_context,{boardId,nodeId})
+ const inspect=async()=>{
+  await openCanvasBoard(evaluate,wait,boardId)
+  await wait(`Boolean([...document.querySelector('[data-id="${nodeId}"]').querySelectorAll('button')].find(button=>button.textContent==='读取详情'&&!button.disabled))`)
+  await evaluate(`(()=>{[...document.querySelector('[data-id="${nodeId}"]').querySelectorAll('button')].find(button=>button.textContent==='读取详情').click();return true})()`)
+  await wait(`document.querySelector('.canvas-object-details')?.dataset.missionId===${JSON.stringify(missionId)}`)
+ }
+ const close=async()=>{
+  await evaluate(`(()=>{document.querySelector('.mission-diff-dialog button[aria-label="关闭累计文件变更"]')?.click();return true})()`)
+  await wait(`!document.querySelector('.mission-diff-dialog')`)
+  await evaluate(`(()=>{[...document.querySelector('.canvas-object-dialog').querySelectorAll('button')].find(button=>button.textContent==='关闭').click();return true})()`)
+  await wait(`!document.querySelector('.canvas-object-dialog')`)
+ }
+ await inspect()
+ await wait(`document.querySelector('.mission-diff-reading .diff-title-wrap strong')?.textContent===${JSON.stringify(relativePath)}&&document.querySelector('.mission-diff-code')?.textContent.includes('新内容乙')&&document.querySelector('.mission-diff-code')?.textContent.includes('原内容甲')`)
+ assert.ok(await evaluate(`Boolean(document.querySelector('.mission-diff-dialog [data-file-id="${target.id}"][aria-selected="true"]'))`))
+ record('actual_canvas_diff_pin_opens_original_mission_diff_view_and_exact_unicode_file_with_visible_before_after_lines')
+ await writeFile(join(config.evidence,'01-ready-git-exact-diff.png'),(await window.webContents.capturePage()).toPNG())
+ await close()
+ await writeFile(join(config.evidence,'git-fixture-before-restore.json'),JSON.stringify({path:join(workspace.workingDirectory,relativePath),content:await readFile(join(workspace.workingDirectory,relativePath),'utf8')},null,2)+'\n',{flag:'wx'})
+ await writeFile(join(workspace.workingDirectory,relativePath),baseline)
+ await inspect()
+ await wait(`document.querySelectorAll('.canvas-object-dialog .changes-tree-row.is-file').length===2`)
+ assert.equal(await evaluate(`document.querySelector('.mission-diff-reading')!==null`),false)
+ assert.equal(await evaluate(`document.querySelectorAll('.canvas-object-dialog [data-file-id][aria-selected="true"]').length`),0)
+ record('formerly_changed_pinned_path_becoming_clean_keeps_original_pin_and_does_not_substitute_another_changed_file')
+ await writeFile(join(config.evidence,'02-no-fallback-after-target-clean.png'),(await window.webContents.capturePage()).toPNG())
+ await close()
+ assert.equal(git(workspace.worktreePath,'ls-files','--stage','-z'),beforeIndex)
+ const final=await rpc('canvas.nodes.snapshot',{boardId});assert.equal(final.nodes.find(node=>node.id===nodeId).data.objectReference.path,relativePath)
+ report.final_changes=await rpc('missions.changes',{missionId});assert.equal(report.final_changes.files.length,2)
+ report.external_model_calls=0
+}
+async function qualifyPublicCold(window,{evaluate,wait,rpc}){
+ window.unmaximize();window.setContentSize(1680,1000);window.webContents.setZoomFactor(1)
+ const previous=JSON.parse(await readFile(config.public_previous_result,'utf8'));assert.equal(previous.status,'passed');assert.equal(previous.source_commit,config.source_commit)
+ const summary=previous.summary_context,context=previous.public_context
+ report.cold_context={...context,main_pid:process.pid,renderer_pid:window.webContents.getOSProcessId(),recovery:'fresh App; explicit board and card reopening, not automatic expanded-pin restoration'}
+ await openCanvasBoard(evaluate,wait,summary.boardId)
+ await wait(`document.querySelectorAll('.react-flow__node').length===64`)
+ const graph=await rpc('canvas.nodes.snapshot',{boardId:summary.boardId});assert.deepEqual(graph.nodes.map(node=>node.id).sort(),summary.nodeIds.slice().sort())
+ record('fresh_app_restores_64_exact_persisted_summary_nodes_without_recreating_references')
+ await openCanvasBoard(evaluate,wait,context.boardId)
+ const inputs=context.nodeIds.map(id=>`document.querySelector('.canvas-conversation-frame[data-canvas-conversation-key*="${id}"]')?.querySelector('.structured-mention-editor[contenteditable="true"]')`)
+ for(const [index,id] of context.nodeIds.entries()){
+  await wait(`Boolean(document.querySelector('[data-id="${id}"] button[aria-label="展开对话"]:not(:disabled)'))`)
+  await evaluate(`(()=>{document.querySelector('[data-id="${id}"] button[aria-label="展开对话"]').click();return true})()`)
+  await wait(`${inputs[index]}?.textContent===${JSON.stringify(context.texts[index])}`)
+ }
+ assert.ok(await evaluate(`new Set([${inputs.join(',')}]).size===3`))
+ record('fresh_app_explicitly_reopened_public_pins_restore_three_distinct_bodies_including_previous_native_focus_input')
+ for(const threadId of new Set(context.threads)){const projection=await rpc('threads.open',{threadId,traceId:randomUUID()});assert.deepEqual(projection.messages,[]);assert.deepEqual(projection.agentRuns,[])}
+ record('public_cold_reopening_keeps_original_two_threads_without_sending_messages_or_starting_model_runs')
+ await evaluate(`(()=>{document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]').click();return true})()`);await pause(350)
+ await writeFile(join(config.evidence,'01-cold-public-pin-drafts.png'),(await window.webContents.capturePage()).toPNG())
 }
 await import(config.production_main)
