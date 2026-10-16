@@ -137,10 +137,15 @@ export async function qualifyCanvasObjectCold(window,{evaluate,wait,rpc,openCanv
   for(const key of ['readerA','readerB']){
     await click(`document.querySelector('[data-id="${nodes[key]}"] button[aria-label="展开对话"]')`)
     await wait(`Boolean(${frame(key)}?.querySelector('.mission-activity-entry'))`)
+    await click(`document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]')`)
     if(!await evaluate(`Boolean(${frame(key)}.querySelector('.mission-changes-disclosure')?.checkVisibility())`)){
-      if(!await evaluate(`${frame(key)}.querySelector('.mission-activity-entry').checkVisibility()`))await click(`${frame(key)}.querySelector('.file-preview-return')`)
+      if(!await evaluate(`${frame(key)}.querySelector('.mission-activity-entry').checkVisibility()`)){
+        await click(`${frame(key)}.querySelector('.file-preview-return')`)
+        await click(`document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]')`)
+      }
       await click(`${frame(key)}.querySelector('.mission-activity-entry')`)
     }
+    await click(`document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]')`)
     await click(`${frame(key)}.querySelector('.mission-changes-disclosure')`)
     await wait(`Boolean(${frame(key)}.querySelector('.mission-changes-read-state'))`)
     readerViews.push(viewRows().at(-1).result.value)
