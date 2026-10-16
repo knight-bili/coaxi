@@ -83,7 +83,8 @@ export async function qualifyCanvasFileResources(window,{evaluate,wait,rpc,openC
     const foreign=await fp('restore',{kind:'camp_workspace',threadId:projects[0].threadId,rawReference:pathToFileURL(projects[1].path).href})
     assert.equal(foreign.ok,true,JSON.stringify(foreign));assert.equal(foreign.value.file.pathPresentation,'external')
     assert.notEqual(foreign.value.file.previewKey,files[1].previewKey)
-    const missing=await fp('restore',{kind:'camp_workspace',threadId:'r06-missing-'+randomUUID(),rawReference:pathToFileURL(projects[0].path).href})
+    const missingThread=['0','1','2'].map(last=>projects[0].threadId.slice(0,-1)+last).find(id=>projects.every(project=>project.threadId!==id))
+    const missing=await fp('restore',{kind:'camp_workspace',threadId:missingThread,rawReference:pathToFileURL(projects[0].path).href})
     assert.equal(missing.ok,false,JSON.stringify(missing));report.missing_thread_denial=missing.error
     report.explicit_external_reference={pathPresentation:foreign.value.file.pathPresentation,previewKeyIsThreadScoped:true,rule:'docs/ui/components/file-preview.md:46; existing explicit absolute file preview remains allowed'}
     for(const file of projects)assert.ok(await evaluate(`${card(file.nodeId)}.textContent.includes(${JSON.stringify(file.body.trim())})`))
