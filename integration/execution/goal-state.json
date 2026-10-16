@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "rc14复用，无新编译：三个公开卡/两个Thread真实输入隔离、原生焦点、同DOM布局往返、读者按Thread共享/完整焦点可见监听释放、收起重开、无消息/Run和64持久摘要卡/原生滚轮平移等8场景通过；当前候选52不同Native场景。r1-r4夹具错误有源码定因，均正常退出且保留证据。I03剩余仍按原有限清单继续。",
+  "current_slice": "rc14复用无新编译：本地固定ACP脚本通过原准入，真实Core创建Mission Git worktree并完成受控协议Run；中文精确Diff/未跟踪/真实索引SHA与mtime保持、目标变干净不替代共5场景通过。公开三卡/双Thread正文及64摘要新App显式重开恢复3场景通过，当前60不同Native场景。不是模型推理资格，无push/Actions/外部模型；继续原有限剩余。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "继续C05/C02既定剩余：先补ready Git Diff与公开卡新进程恢复，随后五空闲投影/文件及终端窗口资源预算、整App/Core硬中断与未知请求、大材料IO及完整PC。已过的公开三卡双Thread焦点/监听释放、64摘要卡视口、私聊/便笺暖冷和renderer故障不循环重跑。原13px便笺、主题/八类状态及ResizeObserver等产品整改攒齐再冻结新候选，不逐切片编译/push/Actions。",
+    "先审计C05五空闲投影、各Thread真实文件预览、HTML/终端窗口预算的已有Core/Host证据，充分项直接复用，只补真实缺口；继续整App/Core硬中断/未知在途请求、大材料IO及PC。ready Git Diff、公开新进程与已过多卡/renderer不重复验证。原13px便笺、Diff失效态搜索框边框、主题/八类与ResizeObserver产品整改攒齐再冻结候选，不逐切片重编/push/Actions；外部缺项单列并继续I04等可独立编码。",
     "阶段剩余清单固定按I03-C06继续工程验证；暂缺环境只单列待办，继续可独立的I02余项和I04-I12/BUF，不把后续功能提前塞入I03。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "public_multi_native_focus_reader_release_and_64_summary_viewport_verified_remaining_stage_pending",
+  "current_slice_status": "real_core_git_exact_diff_and_fresh_public_pin_recovery_verified_remaining_stage_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -57,7 +57,7 @@
   "skill_catalog_evidence": "i02-skill-catalog-result.json",
   "skill_install_evidence": "i02-skill-install-result.json",
   "system_goal_status": "active",
-  "system_goal_verified_at": "2026-10-16T11:30:11.922Z",
+  "system_goal_verified_at": "2026-10-16T11:54:50.025Z",
   "skill_members_evidence": "i02-skill-members-result.json",
   "canvas_boards_evidence": "i03-canvas-boards-result.json",
   "skill_delivery_preparation_evidence": "i02-skill-delivery-preparation-result.json",
@@ -213,5 +213,6 @@
   "canvas_source_card_group_verification": "i03-c06-source-card-group-verification.json",
   "canvas_notes_mirrors_native_evidence": "i03-c05-notes-mirrors-native-verification.json",
   "canvas_renderer_crash_native_evidence": "i03-c05-renderer-crash-native-verification.json",
-  "canvas_public_multi_native_evidence": "i03-c05-public-multi-native-verification.json"
+  "canvas_public_multi_native_evidence": "i03-c05-public-multi-native-verification.json",
+  "canvas_ready_diff_public_cold_native_evidence": "i03-c02-ready-diff-public-cold-native-verification.json"
 }

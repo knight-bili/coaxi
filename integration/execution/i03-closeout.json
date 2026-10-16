@@ -50,12 +50,14 @@
       "name": "独立Mission/Task/Diff持久引用与定位",
       "status": "implementation_ready_for_stage_verification",
       "done_when": "原对象与引用精确绑定，启动/定位/失效可恢复，包含实际Core集成；既有Thread关联Mission不代替独立pin",
-      "latest_partial_evidence": "i03-object-reference-ui-result.json",
+      "latest_partial_evidence": "i03-c02-ready-diff-public-cold-native-verification.json",
       "remaining": [
         "当前158/208及既有157/207链实际Rust/Host升级、事务/回放与真实对象绑定随候选运行",
         "实际App原Mission/历史Task工作区与焦点、失效/冷路由/多卡交互资格",
-        "真实Git当前基准、视图更新/容量/过期与多查看器释放回归；模拟组件不能代替"
-      ]
+        "当前基准/中文路径/未跟踪/变干净无替代及实际索引物理不改写已有真实Core/Git/Native证据；其他视图更新/容量/过期与多查看器释放仍需审计既有证据并补缺口，不把受控协议Run写成真实模型"
+      ],
+      "ready_git_native_evidence": "i03-c02-ready-diff-public-cold-native-verification.json",
+      "verified_ready_git": "真实Core创建固定基准Mission worktree，实际三文件变更及中文精确Diff；真实索引SHA/mtime与条目均保持；原画布pin打开原MissionDiff并显示正确增删行，文件变干净后明确提示而无替代"
     },
     {
       "id": "I03-C03",
@@ -79,7 +81,7 @@
       "name": "冷启动与多卡交互兼容",
       "status": "implementation_ready_for_stage_verification",
       "done_when": "真实Desktop冷路由、旧焦点/编辑器保持、恢复与本阶段规模检查完成；平台资源缺项单列",
-      "latest_partial_evidence": "i03-c05-public-multi-native-verification.json",
+      "latest_partial_evidence": "i03-c02-ready-diff-public-cold-native-verification.json",
       "checked_subtasks": [
         {
           "id": "C05-cold",
@@ -104,13 +106,14 @@
       ],
       "remaining_implementation_batches": [],
       "remaining_verification": [
-        "公开三卡双Thread的暖态输入/焦点/监听释放和同私聊暖冷/renderer故障已有证据；公开卡新App冷恢复、整App/Core硬中断及未知请求、ready Git Diff继续补齐",
+        "公开/私聊多卡暖冷、原生焦点/监听释放、renderer故障、本机便笺恢复和ready Git Diff已有证据；整App/Core硬中断及未知在途请求继续补齐，未授予真实模型或自动展开恢复资格",
         "64摘要卡实际渲染/滚轮平移已通过；超过五Thread的空闲缓存预算、各Thread真实文件预览、HTML/终端窗口上限及其他资源释放仍需各自证据",
         "真实Core大材料/目录/日志下的交互响应、事务锁和超时/取消；随C06当前源验证",
         "软键盘/IME与原生平台运行资格按可用环境记录，缺真机不假通过"
       ],
-      "partial_runtime_evidence": "同私聊双pin暖态编辑器/滚动/正文及材料scope隔离、新App进程冷恢复；便笺拖动/行内保存/冲突/离开保护及renderer硬中断后独立本机副本恢复；公开三卡双Thread独立输入/原生焦点/同DOM布局/收起重开、一Thread一个读者和全部窗口监听释放；另一板64摘要卡实际渲染与可信滚轮平移。未覆盖整App/Core硬中断、未知在途请求、公开卡新进程、五空闲快照预算、各Thread真实文件预览、HTML/终端窗口上限、大材料IO和IME。",
-      "public_multi_native_evidence": "i03-c05-public-multi-native-verification.json"
+      "partial_runtime_evidence": "同私聊双pin暖态编辑器/滚动/正文及材料scope隔离、新App进程冷恢复；便笺拖动/行内保存/冲突/离开保护及renderer硬中断后独立本机副本恢复；公开三卡双Thread独立输入/原生焦点/同DOM布局/收起重开、一Thread一个读者和全部窗口监听释放；另一板64摘要卡实际渲染与可信滚轮平移。未覆盖整App/Core硬中断、未知在途请求、五空闲快照预算、各Thread真实文件预览、HTML/终端窗口上限、大材料IO和IME。；本轮公开三卡正文与64节点的新App显式重开恢复通过，受控协议准备的可用Git精确Diff及失效不替代通过。",
+      "public_multi_native_evidence": "i03-c05-public-multi-native-verification.json",
+      "public_cold_native_evidence": "i03-c02-ready-diff-public-cold-native-verification.json"
     },
     {
       "id": "I03-C06",
@@ -145,14 +148,15 @@
         "rc14 Desktop/Web0且未重编原生；终端5/私聊5/文件9/对象8共27不同Native通过，所有run均受控退出",
         "rc14追加便笺6、同私聊双卡6、新App冷恢复3通过（无发送断言重复一次），当前候选41个不同Native断言；生产源码未变化，未重编",
         "rc14复用无新构建：renderer两次实际crashed及进程PID更替，双私聊最后字符/独立正文、未失焦便笺副本与Core原文分开、原引用/无模型3场景通过；当前44个不同Native场景，r3受控退出。r1/r2旧失败不计重复通过，r2无受控退出回执。",
-        "rc14复用：公开三卡/双Thread实际独立草稿、原生焦点、同DOM布局、ThreadReader数0/1/1/2/2/1/0/0与全监听签名回到baseline、收起重开及无发送；64真实摘要卡/原生滚轮平移等8场景通过，当前52不同Native场景。成功及旧失败均受控completed，无deadline/forcedSignal。"
+        "rc14复用：公开三卡/双Thread实际独立草稿、原生焦点、同DOM布局、ThreadReader数0/1/1/2/2/1/0/0与全监听签名回到baseline、收起重开及无发送；64真实摘要卡/原生滚轮平移等8场景通过，当前52不同Native场景。成功及旧失败均受控completed，无deadline/forcedSignal。",
+        "rc14复用：真实Core+本地ACP协议创建Mission Git worktree，中文精确Diff/索引字节mtime/目标干净无替代5不同场景；新App公开三卡正文/64节点显式恢复3项。当前60不同Native场景，全部本批run正常受控退出，无deadline/forcedSignal、无真实模型或新构建。"
       ],
       "open_findings": [
         "同一HTML卡片及保留工作区两个合法入口交换重叠，单布尔位导致合法跳转403；已改逐入口计数并在异步来源复核前认领，原授权和额外请求拒绝均保留，待新Desktop真实复验"
       ],
       "remaining_checks": [
         "私聊材料完整真实流程/PC01-PC24与文件卡片实际挂载/HTML，不用直接文件API和局部Core测试替代",
-        "Mission/Task/文件基本定位、公开双Thread多卡暖态焦点/监听释放、同私聊暖冷/renderer故障已验证；ready Git Diff、公开卡新进程恢复、整App/Core硬中断与未知命令等未验证部分继续补齐",
+        "Mission/Task/文件定位、ready Git精确Diff、公开双Thread暖冷及焦点监听、同私聊暖冷/renderer故障已有证据；整App/Core硬中断与未知命令、其他Git视图过期/容量及资源预算缺口继续补齐",
         "真实多卡/资源释放/规模、大材料交互响应与其他适用迁移、冻结输入、平台和正式场景证据；环境缺项单列，继续独立后续阶段"
       ],
       "resolved_findings": [
@@ -166,12 +170,12 @@
         "rc12原生鼠标触发React#185：两条selection写回交替；改由onNodesChange同批维护选中状态，原失败鼠标用例通过",
         "便笺r4实测100%/DOM矩阵scale1，鼠标可信；XYDrag在首越阈值处捕获起点且8px边缘吸附导致最终80/48。r7按两段动作及既有对齐属性通过六项，未改产品代码"
       ],
-      "latest_native_evidence": "i03-c05-public-multi-native-verification.json",
+      "latest_native_evidence": "i03-c02-ready-diff-public-cold-native-verification.json",
       "ui_remaining": [
         "rc14空私聊viewport extraY0与紧凑旧材料入口已实际通过；两种主题/其他高度与有消息状态仍按完整UI清单继续",
         "缩放/尺寸切换有ResizeObserver延迟通知，继续定位；功能断言通过不授予零控制台问题资格",
         "Codeg列表真实缩略预览/节点数、日主题与完整八类创建/错误状态仍未取得全部资格",
-        "当前Codeg分型卡片、私聊贴合、终端窄宽控制、便笺拖动/行内编辑/冲突及renderer恢复已有rc14对应证据；完整日夜主题/八类创建与错误态、悬停键盘及摘要/区域视觉仍需核对。便笺SafeMarkdown document实际15px覆盖原13px，随下一组修复并集中验证。"
+        "当前Codeg分型卡片、私聊贴合、终端窄宽控制、便笺拖动/行内编辑/冲突及renderer恢复已有rc14对应证据；完整日夜主题/八类创建与错误态、悬停键盘及摘要/区域视觉仍需核对。便笺SafeMarkdown document实际15px覆盖原13px，随下一组修复并集中验证。 可用Diff已实际查看；失效路径态搜索框双层边框不贴合，随下一组按原组件修正。"
       ],
       "latest_card_style_evidence": "i03-c06-card-source-style-result.json",
       "latest_note_terminal_evidence": "i03-c06-note-terminal-interaction-result.json",
@@ -179,7 +183,8 @@
       "latest_source_card_group_verification": "i03-c06-source-card-group-verification.json",
       "latest_notes_mirrors_evidence": "i03-c05-notes-mirrors-native-verification.json",
       "latest_renderer_crash_evidence": "i03-c05-renderer-crash-native-verification.json",
-      "latest_public_multi_evidence": "i03-c05-public-multi-native-verification.json"
+      "latest_public_multi_evidence": "i03-c05-public-multi-native-verification.json",
+      "latest_ready_diff_public_cold_evidence": "i03-c02-ready-diff-public-cold-native-verification.json"
     }
   ],
   "state_rule": "代码完成、工程验证通过、待环境验证分别记录；无代码缺口且工程验证满足时由Codex收口；缺环境继续独立后续工作，最终MVP不豁免",

@@ -138,3 +138,15 @@ r1漏只读traceId、r2把每卡发布监听也当成读者、r3忽略原350ms�
 final result: blocked
 
 仅完整视觉/阶段验证未完成；目标active，本轮不需要客户介入。
+
+## 真实可用Git精确Diff与公开卡新进程恢复
+
+复用rc14/c4463813及2158df02原生。固定ACP协议脚本经原Runtime准入和调度，真实Core创建Mission worktree，无数据库种植或外部模型。ready-diff-r4五项通过：固定基准、三文件真实Git变化、中文#路径精确进入原Diff并显示甲删除/乙新增；索引物理SHA/纳秒mtime与条目均不变，源checkout干净；目标恢复原文后明确显示原路径不在清单中，无默认选中其他文件。r3同五项保留但索引证明较窄，r4不是重复累计。
+
+public-cold-r1三项通过，新App显式打开原64节点和三张公开pin，恢复包含原生焦点追加文字的三份独立正文，原Thread无消息/AgentRun。r1/r2失败分别是夹具null准入及重试显示名冲突，均受控退出；全部本批run无deadline/强杀。已查看r4精确Diff、r3无替代和公开冷恢复截图。
+
+失效态搜索框双层边框不贴合需随下一批按原样式纠正；便笺字号/完整主题八类与ResizeObserver原问题继续保留。本批通过的是真实Core/Git/界面和受控协议，不是模型推理、自主工具或自动展开恢复。报告integration/execution/i03-c02-ready-diff-public-cold-native-verification.json。
+
+final result: blocked
+
+完整视觉/阶段工程验证未完，目标active，本轮无需客户介入。
