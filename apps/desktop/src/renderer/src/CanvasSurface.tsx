@@ -1,10 +1,12 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { Background, BackgroundVariant, Controls, MiniMap, NodeResizer, ReactFlow, ReactFlowProvider,
   SelectionMode, ViewportPortal, applyNodeChanges, useReactFlow, useViewport, type Node, type NodeProps } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import type { AgentProfile, CanvasConversationRef, CanvasNode, CanvasNodeMutation, FilePreviewApi, ResolvedTheme, StoredCommandResult } from '@contracts'
 import { CanvasFilePreview } from './CanvasFilePreview'
+import { ResourceReferenceIcon } from './FilePreviewTabIcon'
 import { CanvasTerminal } from './CanvasTerminal'
 import type { FilePreviewContextValue } from './file-preview-controller'
 import { useCanvasGraph } from './useCanvasGraph'
@@ -82,6 +84,7 @@ const PresentationContext = createContext<Presentation | null>(null)
 function CanvasCard({ data, selected }: NodeProps<FlowNode>): React.JSX.Element {
   const actions = useContext(PresentationContext)!
   const resizeRevision = useRef<number | null>(null)
+  const [fileActionsHost, setFileActionsHost] = useState<HTMLSpanElement | null>(null)
   const expandedConversation = Boolean(actions.conversation?.instances.some(item => item.target.presentation === 'inline' && canvasConversationMatches(data.row, item.target)))
   const row = data.row, d = row.data, region = isRegionKind(d.kind)
   const member = actions.agents.find(item => item.agentId === d.agentId)
@@ -108,11 +111,19 @@ function CanvasCard({ data, selected }: NodeProps<FlowNode>): React.JSX.Element 
       onResizeEnd={(_event, geometry) => { actions.resize(row, geometry, resizeRevision.current); resizeRevision.current = null }} />
     <header className="canvas-card-handle">
       {color && <span className="canvas-color-dot" role="img" aria-label={uiAttribute(canvasColorName(color))} />}
-      <strong title={title}>{title}</strong>
+      {d.kind === 'file' && <ResourceReferenceIcon kind="file" className="resource-reference-icon" />}
+      <strong title={d.kind === 'file' && d.path ? `${title}\n${d.path}` : title}>{title}</strong>
+      {d.kind === 'file' && <span ref={setFileActionsHost} className="canvas-file-actions nodrag nowheel" />}
       {d.kind === 'folder' && actions.onOpenProject && <button className="nodrag" type="button" title={d.folderPath ?? undefined} onClick={() => actions.onOpenProject?.(d.folderPath!)}><UiText zh="进入工程" /></button>}
       {d.kind === 'agent' && member && !member.removedAt && actions.onOpenMember && <button className="nodrag" type="button" title={d.runtimeKind ?? undefined} onClick={() => actions.onOpenMember?.(member.agentId)}><UiText zh="打开队员" /></button>}
-      <button className="nodrag" type="button" disabled={actions.blocked} onClick={() => actions.edit(row)} aria-label={uiAttribute('编辑节点')}><UiText zh="编辑" /></button>
-      {(d.kind === 'file' || d.kind === 'terminal') && <button className="nodrag" type="button" disabled={actions.blocked} onClick={() => actions.removeNode(row)} aria-label={uiAttribute(d.kind === 'file' ? '删除文件节点' : '删除终端节点')}><UiText zh="删除" /></button>}
+      {d.kind === 'file' ? <DropdownMenu.Root>
+        <DropdownMenu.Trigger asChild><button className="nodrag" type="button" disabled={actions.blocked} aria-label={uiAttribute('文件节点操作')}><UiText zh="更多" /></button></DropdownMenu.Trigger>
+        <DropdownMenu.Portal><DropdownMenu.Content className="canvas-card-menu" align="end" sideOffset={4} collisionPadding={12} loop onCloseAutoFocus={event => event.preventDefault()}>
+          <DropdownMenu.Item className="canvas-card-menu-item" disabled={actions.blocked} onSelect={() => actions.edit(row)}><UiText zh="编辑节点" /></DropdownMenu.Item>
+          <DropdownMenu.Item className="canvas-card-menu-item is-danger" disabled={actions.blocked} onSelect={() => actions.removeNode(row)}><UiText zh="移除文件节点" /></DropdownMenu.Item>
+        </DropdownMenu.Content></DropdownMenu.Portal>
+      </DropdownMenu.Root> : <button className="nodrag" type="button" disabled={actions.blocked} onClick={() => actions.edit(row)} aria-label={uiAttribute('编辑节点')}><UiText zh="编辑" /></button>}
+      {d.kind === 'terminal' && <button className="nodrag" type="button" disabled={actions.blocked} onClick={() => actions.removeNode(row)} aria-label={uiAttribute('删除终端节点')}><UiText zh="删除" /></button>}
       {(region || d.kind === 'file' || d.kind === 'terminal') && <button className="nodrag" type="button" disabled={actions.blocked} onClick={() => actions.collapse(row)}
         aria-label={uiAttribute(d.kind === 'file' ? d.collapsed ? '展开预览' : '收起预览' : d.kind === 'terminal' ? d.collapsed ? '展开终端' : '收起终端' : d.collapsed ? '展开区域' : '折叠区域')}>{d.collapsed ? '+' : '−'}</button>}
     </header>
@@ -137,10 +148,9 @@ function CanvasCard({ data, selected }: NodeProps<FlowNode>): React.JSX.Element 
       {d.kind === 'terminal' && (actions.scope ? <CanvasTerminal row={row} scope={JSON.stringify([actions.scope.host, actions.scope.core])} terminalVersion={actions.terminalVersion} disabled={actions.blocked} />
         : <p className="canvas-empty-copy"><UiText zh="画布输入的所属信息不完整，请重新读取画板。" /></p>)}
       {d.kind === 'file' && <>
-        <code className="canvas-file-path" title={d.path ?? undefined}>{d.path}</code>
         {!d.fileReference ? <><p className="canvas-empty-copy"><UiText zh="文件节点尚未绑定原工程会话，请先选择来源。" /></p>
           <button type="button" disabled={actions.blocked} onClick={() => actions.bindFile(row)}><UiText zh="选择所属对话" /></button></>
-          : actions.fileApi ? <CanvasFilePreview row={row} api={actions.fileApi} theme={actions.theme} onNavigate={actions.onOpenFileSource} onWorkspace={actions.onFileWorkspace} />
+          : actions.fileApi ? <CanvasFilePreview row={row} api={actions.fileApi} theme={actions.theme} actionsHost={fileActionsHost} onNavigate={actions.onOpenFileSource} onWorkspace={actions.onFileWorkspace} />
           : <p role="status"><UiText zh="当前连接尚未提供文件预览。" /></p>}
       </>}
     </div>}

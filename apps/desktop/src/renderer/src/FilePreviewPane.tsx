@@ -340,13 +340,13 @@ function Viewer({ tab }: { tab: FilePreviewTabModel }): React.JSX.Element {
   return <SourceViewer tab={tab} />
 }
 
-function FilePreviewDocument({ tab }: { tab: FilePreviewTabModel }): React.JSX.Element {
+function FilePreviewDocument({ tab, hidePath = false }: { tab: FilePreviewTabModel; hidePath?: boolean }): React.JSX.Element {
   const { reload, retry, changePage, revealInFolder, displayed } = useFilePreview()
   const [pathActionError, setPathActionError] = useState<string | null>(null)
   useEffect(() => setPathActionError(null), [tab.file?.handleId, tab.id])
   useEffect(() => { if (tab.file && tab.content && tab.content.kind !== 'html') displayed(tab.id, tab.file.handleId) }, [tab.file?.handleId, tab.content, tab.id, displayed])
   const page = tab.content?.kind === 'page' ? tab.content.page : null
-  const showPath = tab.loadState === 'ready' && previewPathIsVisible(tab.presentation)
+  const showPath = !hidePath && tab.loadState === 'ready' && previewPathIsVisible(tab.presentation)
   const showUpdate = tab.loadState === 'ready' && Boolean(tab.file)
     && (tab.hasExternalUpdate || tab.isRefreshing)
   const updateAction = showUpdate ? (
@@ -511,6 +511,6 @@ export function FilePreviewPaneContent({ visible, missionActivity, executionHost
 /** The pinned card uses the original reader without inheriting another card's active tab. */
 export function FilePreviewSingleContent({ tab }: { tab: FilePreviewTabModel }): React.JSX.Element {
   return <section className="file-preview-pane" aria-label={uiAttribute('文件预览')}>
-    <div className="file-preview-tab-panel"><ReadingPanel tab={tab}><FileFindScope id={tab.id}><FilePreviewDocument tab={tab} /></FileFindScope></ReadingPanel></div>
+    <div className="file-preview-tab-panel"><ReadingPanel tab={tab}><FileFindScope id={tab.id}><FilePreviewDocument tab={tab} hidePath /></FileFindScope></ReadingPanel></div>
   </section>
 }

@@ -55,8 +55,8 @@
       "name": "文件节点真实权限与预览",
       "status": "implementation_ready_for_stage_verification",
       "done_when": "路径不能绕过现行文件权限，卡片间身份隔离，关闭/恢复与变化处理有证据",
-      "latest_partial_evidence": "i03-c06-html-entry-repair-result.json",
-      "remaining_verification": "原canvas Rust已通过；真实生产Main/preload/Core/NTFS文件API7业务断言通过，含Unicode/#、代次/伪造grant/独立handle和释放。实际文件卡片、HTML、导航与完整App冷路由/规模仍待；原文件API允许显式外部具体文件，不得擅自改成项目根白名单。"
+      "latest_partial_evidence": "i03-c06-card-refinement-result.json",
+      "remaining_verification": "真实文件API与rc.6六项卡片/作者HTML交互检查通过；新增状态断言在旧桌面复现加载中/等待连接，rc.7须验证通信修复与单标题界面、原有源码切换/重读隔离/移除不删除原文件。导航、冷路由、规模及平台资格仍单列。"
     },
     {
       "id": "I03-C04",

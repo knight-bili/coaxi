@@ -162,8 +162,9 @@ export function useExecutionPreviewHost(threadId: string): HTMLDivElement | null
 }
 
 /** A fixed file presentation shares the original Thread session and window resource pool. */
-export function PinnedFilePreview({ api, source, resolvedTheme, onNavigate, onWorkspace }: {
+export function PinnedFilePreview({ api, source, resolvedTheme, actionsHost, onNavigate, onWorkspace }: {
   api: FilePreviewApi; source: RestoreFilePreviewRequest; resolvedTheme: ResolvedTheme
+  actionsHost: HTMLElement | null
   onNavigate?: FilePreviewContextValue['open']
   onWorkspace?(tabId: string): Promise<void>
 }): React.JSX.Element {
@@ -216,13 +217,13 @@ export function PinnedFilePreview({ api, source, resolvedTheme, onNavigate, onWo
   return <FilePreviewApiContext.Provider value={api}><FilePreviewContext.Provider value={value}>
     <FileFindProvider activeTabId={tab?.id ?? null} visible={visible && resources.isFocused(owner)}>
       <div ref={host} className="canvas-file-preview" onPointerDownCapture={focus} onFocusCapture={focus}>
-        <div className="canvas-file-actions">
-          {tab && <button type="button" disabled={tab.isRefreshing} onClick={() => { void session.actions.reload(tab.id) }}><UiText zh="重新读取" /></button>}
-          {tab?.content?.kind === 'markdown' && <button type="button" onClick={() => setSourceMode(value => !value)}><UiText zh={sourceMode ? '显示预览' : '显示源码'} /></button>}
-          {tab?.file?.kind === 'html' && <button type="button" onClick={() => session.actions.toggleHtmlSource(tab.id)}><UiText zh={tab.htmlSourceMode ? '显示预览' : '显示源码'} /></button>}
-          {tab && onWorkspace && <button type="button" onClick={() => { void onWorkspace(tab.id).catch(() => setError(uiAttribute('暂时无法打开原文件工作区。'))) }}><UiText zh="在工作区中操作" /></button>}
-          {tab?.file?.capabilities.includes('download') && <button type="button" onClick={() => { void session.actions.download(tab.id).then(result => { if (!result.ok) setError(result.error.message) }) }}><UiText zh="下载文件" /></button>}
-        </div>
+        {actionsHost && createPortal(<>
+          {tab && <button type="button" title={uiAttribute('重新读取')} aria-label={uiAttribute('重新读取')} disabled={tab.isRefreshing} onClick={() => { void session.actions.reload(tab.id) }}><UiText zh="重读" /></button>}
+          {tab?.content?.kind === 'markdown' && <button type="button" aria-label={uiAttribute(sourceMode ? '显示预览' : '显示源码')} aria-pressed={sourceMode} onClick={() => setSourceMode(value => !value)}><UiText zh={sourceMode ? '预览' : '源码'} /></button>}
+          {tab?.file?.kind === 'html' && <button type="button" aria-label={uiAttribute(tab.htmlSourceMode ? '显示预览' : '显示源码')} aria-pressed={Boolean(tab.htmlSourceMode)} onClick={() => session.actions.toggleHtmlSource(tab.id)}><UiText zh={tab.htmlSourceMode ? '预览' : '源码'} /></button>}
+          {tab && onWorkspace && <button type="button" title={uiAttribute('在工作区中操作')} aria-label={uiAttribute('在工作区中操作')} onClick={() => { void onWorkspace(tab.id).catch(() => setError(uiAttribute('暂时无法打开原文件工作区。'))) }}><UiText zh="工作区" /></button>}
+          {tab?.file?.capabilities.includes('download') && <button type="button" aria-label={uiAttribute('下载文件')} onClick={() => { void session.actions.download(tab.id).then(result => { if (!result.ok) setError(result.error.message) }) }}><UiText zh="下载" /></button>}
+        </>, actionsHost)}
         {error && <p className="canvas-notice" role="alert">{error}<button type="button" onClick={() => setRetry(value => value + 1)}><UiText zh="重试" /></button>
           {onNavigate && <button type="button" onClick={() => { void onNavigate(source).then(outcome => { if (outcome.kind === 'error') setError(outcome.error.message) }).catch(() => setError(uiAttribute('暂时无法打开原文件工作区。'))) }}><UiText zh="打开原文件" /></button>}</p>}
         {!presented && !error && <p role="status"><UiText zh="正在读取原文件…" /></p>}

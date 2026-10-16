@@ -177,8 +177,17 @@
 .canvas-object-pin button { justify-self: start; }
 .canvas-object-details > p { white-space: pre-wrap; overflow-wrap: anywhere; }
 .canvas-object-details .canvas-notice code { display: block; white-space: pre-wrap; overflow-wrap: anywhere; }
-.canvas-card-file .canvas-card-body { display: flex; flex-direction: column; overflow: hidden; }
-.canvas-file-path { flex: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.canvas-card-file .canvas-card-body { display: flex; flex-direction: column; align-items: stretch; gap: 0; padding: 0; overflow: hidden; }
+.canvas-card-file .canvas-card-handle { gap: 4px; }
+.canvas-card-file .canvas-card-handle > .resource-reference-icon { flex: none; width: 16px; height: 16px; color: var(--muted); }
+.canvas-card-file .canvas-card-handle button { flex: none; min-height: 28px; padding: 3px 6px; border-color: transparent; background: transparent; color: var(--muted); }
+.canvas-card-file .canvas-card-handle button:hover:not(:disabled), .canvas-card-file .canvas-card-handle button[aria-pressed="true"] { color: var(--ink); background: var(--neutral-selected); }
+.canvas-card-file .canvas-card-body > :is(p, button) { margin: 12px; }
+.canvas-card-menu { z-index: 2100; min-width: 140px; padding: 5px; border: 1px solid var(--line-strong); border-radius: 8px; color: var(--ink); background: var(--surface-raised); box-shadow: var(--shadow-float); font-size: 13px; }
+.canvas-card-menu-item { padding: 7px 9px; border-radius: 4px; cursor: pointer; }
+.canvas-card-menu-item[data-highlighted] { background: var(--surface-hover); outline: none; }
+.canvas-card-menu-item[data-disabled] { opacity: .55; cursor: default; }
+.canvas-card-menu-item.is-danger { color: var(--danger); }
 .canvas-file-preview { display: flex; flex-direction: column; flex: 1; align-self: stretch; width: 100%; min-height: 0; overflow: hidden; }
 .canvas-file-preview > .file-preview-pane { position: relative; width: 100%; flex: 1; min-height: 0; }
-.canvas-file-actions { display: flex; flex-wrap: wrap; gap: 6px; padding-block: 6px; flex: none; }
+.canvas-file-actions { display: inline-flex; align-items: center; gap: 2px; flex: none; }

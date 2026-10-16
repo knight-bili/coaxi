@@ -37,10 +37,10 @@
     {
       "stage_id": "I03",
       "name": "完整无限画布与对象绑定",
-      "candidate_version": "fusion-i03-rc.6",
-      "status": "repair_candidate_pending_freeze",
+      "candidate_version": "fusion-i03-rc.7",
+      "status": "repair_ready_for_freeze",
       "frozen_commit": null,
-      "validation_batch": "I03-repair-05",
+      "validation_batch": "I03-repair-06",
       "validation_runs": [
         {
           "kind": "local_windows_cargo_build",
@@ -165,9 +165,16 @@
           "candidate_version": "fusion-i03-rc.5",
           "frozen_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3",
           "state": "native_keyboard_and_file_api_passed_html_concurrent_entry_finding"
+        },
+        {
+          "candidate_version": "fusion-i03-rc.6",
+          "frozen_commit": "b087607ead00efc874ef3253fd6c199fe7cb371f",
+          "full_types": "passed",
+          "desktop_build": "passed",
+          "native_file_cards": "6_checks_passed_then_new_host_state_assertion_failed"
         }
       ],
-      "repair_reason": "HTML shared site loses overlapping admitted iframe entry navigations; Desktop Main bundle rebuild required, no Rust/Core/Web source change",
+      "repair_reason": "客户指出卡片重复路径/标题与按钮堆积；真实桌面新增断言复现HTML加载状态等待，修复路由回调身份变化拆除通信订阅。共享Renderer须重建Desktop/Web，Core不变。",
       "windows_build": "passed",
       "related_rust_unique_owners": 26,
       "related_rust": "passed",

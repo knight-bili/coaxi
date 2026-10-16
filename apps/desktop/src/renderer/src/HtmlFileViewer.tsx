@@ -42,8 +42,8 @@ function HtmlPageViewer({ tab, pathControl, updateAction, candidate }: {
   const [diagnostics, setDiagnostics] = useState<HtmlPreviewDiagnostic[]>([])
   const [notice, setNotice] = useState<string | null>(null)
   const fragment = tab.reading ? undefined : tab.file?.target?.htmlFragment
-  const current = useRef({ file: tab.file, fragment, reading: tab.reading, candidate })
-  current.current = { file: tab.file, fragment, reading: tab.reading, candidate }
+  const current = useRef({ file: tab.file, fragment, reading: tab.reading, candidate, open })
+  current.current = { file: tab.file, fragment, reading: tab.reading, candidate, open }
   const retry = (): void => { void reload(tab.id) }
 
   useEffect(() => {
@@ -82,14 +82,14 @@ function HtmlPageViewer({ tab, pathControl, updateAction, candidate }: {
         state.serverDiagnostics(message.documentId, message.state, message.reason)
       } else if (message.type === 'fragment-result' && typeof message.found === 'boolean') setNotice(message.found ? null : uiAttribute('未找到指定的页内位置。'))
       else if (message.type === 'link' && typeof message.href === 'string' && message.href.startsWith('file:') && message.href.length <= 4096 && current.current.file) {
-        void open({ kind: 'child_of_handle', parentHandleId: current.current.file.handleId, rawReference: message.href, allowSystemOpen: true })
+        void current.current.open({ kind: 'child_of_handle', parentHandleId: current.current.file.handleId, rawReference: message.href, allowSystemOpen: true })
           .then(outcome => setNotice(outcome.kind === 'error' ? outcome.error.message : null))
       }
     })
     let detach: (() => void) | undefined
     try { detach = channel.attach(window) } catch (error) { state.failed(error instanceof Error ? error.message : uiAttribute('无法建立预览。')) }
     return () => { unsubscribe(); detach?.(); state.close(); load.current = null }
-  }, [channel, preview, open])
+  }, [channel, preview])
 
   useEffect(() => {
     if (!tab.file) return
