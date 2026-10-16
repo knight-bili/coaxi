@@ -37,10 +37,10 @@
     {
       "stage_id": "I03",
       "name": "完整无限画布与对象绑定",
-      "candidate_version": "fusion-i03-rc.22",
+      "candidate_version": "fusion-i03-rc.23",
       "status": "frozen_with_partial_engineering_evidence",
-      "frozen_commit": "1e840216a1af1f93da1371db545579889e42d4da",
-      "validation_batch": "I03-cumulative-HTML-and-summary-model-repair",
+      "frozen_commit": "30d1e0e0453a814f20fe4ec141453cd92b147cbf",
+      "validation_batch": "I03-R08-private-notification-and-R09-original-ui-consolidated-repair",
       "validation_runs": [
         {
           "kind": "local_windows_cargo_build",
@@ -850,30 +850,36 @@
       "related_rust": "two_original_owners_compiled_and_executed_rc22_historical_owners_retained_separately",
       "actual_host_pty": "passed",
       "native_app_scale_platform": "full_flows_scale_and_platform_pending",
-      "native_desktop": "R01_to_R07_local_boundaries_verified_R08_to_R10_open",
+      "native_desktop": "R01_to_R08_local_boundaries_verified_R09_R10_open",
       "full_types": "passed_current_tree",
-      "desktop_build": "passed_rc21_reused_verified_inputs",
-      "web_build": "passed_rc21_reused_verified_inputs",
-      "next_renderer_batch": "R09既定源码检查与必要修复累计后冻结下一候选；本次私聊通知修复必须编入并补Native场景，不复用rc22旧Renderer冒充修复验证。Core未变按精确编译输入决定复用。",
+      "desktop_build": "passed_rc23",
+      "web_build": "passed_rc23",
+      "next_renderer_batch": "当前rc23累计候选已构建并核定通知修复；继续复用做R09真实UI，只有实际新增缺陷才增加必要修复候选。",
       "rust_evidence_scope": "本候选新增运行两个既有owner，不将历史owner数量机械相加为当前结果。",
       "candidate_history": [
         {
           "candidate_version": "fusion-i03-rc.19",
           "frozen_commit": "8bc026f9c0f116e85a92949c06716fb761e1cd96",
           "status": "historical_candidate_preserved_with_r04_red_and_core_evidence"
+        },
+        {
+          "candidate_version": "fusion-i03-rc.22",
+          "frozen_commit": "1e840216a1af1f93da1371db545579889e42d4da",
+          "status": "historical_candidate_preserved_with_r06_r07_and_r08_red"
         }
       ],
-      "repair_candidates": 21,
+      "repair_candidates": 22,
       "pending_renderer_repair": {
         "commit": "809a3d0bc42b8607f2337ad45f7fa4265b0541e4",
         "evidence": "i03-r08-notification-progress.json",
-        "status": "source_repaired_48_tests_types_passed_native_pending",
+        "status": "native_verified_rc23",
         "previous_completed_repair": {
           "commit": "afee4415",
           "evidence": "i03-r06-file-html-progress.json",
           "status": "native_verified_rc22",
           "verification": "i03-r06-file-html-verification.json"
-        }
+        },
+        "verification": "i03-r08-complete-local-verification.json"
       },
       "pending_native_terminal_verification": [],
       "pending_summary_projection_verification": [
@@ -883,15 +889,16 @@
         "已收集ResizeObserver只读调用栈、目标及错误；继续定位和影响评估，不能以通过的功能测试宣告告警无影响"
       ],
       "artifact_sources": {
-        "desktop": "a2bd333284649abc1352e70e5078780adaaaca6f",
-        "web": "a2bd333284649abc1352e70e5078780adaaaca6f",
+        "desktop": "30d1e0e0453a814f20fe4ec141453cd92b147cbf",
+        "web": "30d1e0e0453a814f20fe4ec141453cd92b147cbf",
         "core": "1e840216a1af1f93da1371db545579889e42d4da",
-        "evidence": "i03-r09-model-build-verification.json"
+        "evidence": "i03-r08-complete-local-verification.json"
       },
       "native_terminal_verification": {
         "status": "engineering_verified_within_declared_local_scope",
         "evidence": "i03-r07-native-input-verification.json"
-      }
+      },
+      "r08_complete_local_verification": "i03-r08-complete-local-verification.json"
     },
     {
       "stage_id": "I04",

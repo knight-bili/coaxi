@@ -14,10 +14,10 @@
   },
   "counts": {
     "settled_obligations": 17,
-    "open_work_groups": 3,
+    "open_work_groups": 2,
     "private_cases_verified": 24,
     "private_cases_open": 0,
-    "verified_work_groups": 7
+    "verified_work_groups": 8
   },
   "count_boundary": "不同层级不相加；17条为限定范围旧待办，固定10组按状态计算剩余；私聊按原24场景逐项核定，不计算完成百分比",
   "settled_obligations": [
@@ -339,13 +339,13 @@
     {
       "id": "I03-R08",
       "name": "实际规模、源IO与通知可见性",
-      "status": "open",
+      "status": "engineering_verified",
       "private_cases": [],
       "original_groups": [
         "I03-C05"
       ],
       "done_when": "大材料/目录/日志下响应、事务锁、取消/超时及worker名额正确；可见/被遮挡卡片的真实Core通知确认及清理正确。",
-      "next_action": "先完成R09既定源码检查并累计必要修复；集中构建新候选后补私聊/监听及公屏回归，同时继续实际文件IO取消/超时。大正文和原Core材料IO不重复。",
+      "next_action": "本机工程边界完成；继续R09八类原版UI/动态摘要/尺寸告警，再R10正式场景与开发预览。原平台待办仍保留。",
       "owner": "Codex",
       "external_condition": "none_confirmed_blocking_current_independent_work",
       "native_private_storage_followup": "同步私聊落盘在大正文/真实输入压力下的响应归既有R08源IO与规模验证，不用小输入恢复测试代替性能资格。",
@@ -373,10 +373,7 @@
         "source_bytes_preserved": true,
         "messages_and_model_runs_created": 0
       },
-      "remaining_runtime_boundaries": [
-        "集中候选构建后执行私聊通知四种实际可见性场景、全部卡片关闭后的Observer/listener释放，并保留公屏回归；本轮只有公屏四项实测通过，私聊为源码修复/48项测试/类型检查通过",
-        "实际文件IO取消或超时期间worker名额生命周期；已有受控阻塞Core owner不代替整App真实文件IO"
-      ],
+      "remaining_runtime_boundaries": [],
       "verified_native_large_input": {
         "body_bytes": 1048707,
         "keys": 16,
@@ -393,7 +390,32 @@
         "source": "809a3d0bc42b8607f2337ad45f7fa4265b0541e4",
         "tests": 48,
         "types_exit": 0,
-        "native_verified": false
+        "native_verified": true,
+        "status": "native_verified_rc23",
+        "verification": "i03-r08-complete-local-verification.json"
+      },
+      "latest_verification": "i03-r08-complete-local-verification.json",
+      "verified_private_notification_scenarios": 4,
+      "verified_actual_file_io": {
+        "worker_limit": 4,
+        "os_file_breaks": 4,
+        "independent_database_commit_ms": 4.368800000000192,
+        "client_wait_abort": {
+          "name": "AbortError",
+          "message": "Owned client stopped waiting"
+        },
+        "client_wait_deadline": {
+          "name": "TimeoutError",
+          "message": "Owned client wait deadline"
+        },
+        "source_bytes_preserved": true,
+        "all_helpers_exit_0": true,
+        "host_exit": {
+          "code": 0,
+          "signal": null
+        },
+        "messages_created": 0,
+        "agent_runs_created": 0
       }
     },
     {
@@ -651,6 +673,6 @@
     "真实移动平台按I10推进；终端平台专属保护按相应平台阶段补齐，不能被Windows结果代替"
   ],
   "change_control": "剩余编号固定；发现缺陷归入已有组并说明影响。新增必需范围须有来源和编号变更记录；不能为减少数量合并隐藏未完成条件。",
-  "latest_verification": "i03-r07-native-input-verification.json",
-  "latest_partial_verification": "i03-r08-notification-progress.json"
+  "latest_verification": "i03-r08-complete-local-verification.json",
+  "latest_partial_verification": "i03-r08-complete-local-verification.json"
 }
