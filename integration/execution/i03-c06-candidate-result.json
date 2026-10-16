@@ -3,9 +3,9 @@
   "stage": "I03",
   "closeout_group": "I03-C06",
   "status": "in_progress",
-  "recorded_at": "2026-10-16T05:00:56.230348+00:00",
+  "recorded_at": "2026-10-16T05:07:05.142834+00:00",
   "source_binding": {
-    "base_commit": "b43416d3b2d161868cb0aa4204a4fc92de550942",
+    "base_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3",
     "kind": "exact_worktree_sha256_before_commit",
     "files": {
       "crates/rovai-core/src/application.rs": "6dd5d2070103fe562c52bf91d997ec5bf40cd67d9cc77833e350c1936de76110",
@@ -13,9 +13,9 @@
       "crates/rovai-core/src/canvas_terminal/helper.rs": "53ea8b282231798d1c4303e9fcddd7a4c38f62f51ee0c0876907c816d55ac4e6",
       "crates/rovai-core/src/canvas_terminal/manager.rs": "706df64aa5c67216209266abed21d441a69eab6500b3252ee490295d4a091caf",
       "crates/rovai-core/src/canvas_terminal/manager/tests.rs": "b80c8bc020d6a892ce0408ef58a1d013ae00fe2db426f787b2e343983fb31fbe",
-      "integration/execution/goal-state.json": "59189c6adcfb90a1558e15c84693fe955cbdf2499b6ba664346caebd8b5dc303",
-      "integration/execution/i03-closeout.json": "ce9b1084928a508a6bff8b86daba150d7a42f9f052d94a3e7b6f0ffee7fb1a30",
-      "integration/planning/stage-versions.json": "314086cc3ab5bb384b148d0905a85d0bbccd5231f0f3bb0c698bb6911b2035eb"
+      "integration/execution/goal-state.json": "2a47e8d5b90550e8660a75f57cb5c7b8d8fc6ac306451d08e43b23a76a6861c6",
+      "integration/execution/i03-closeout.json": "361af62ea5fd0021f1e8d1526217eebba278874bc4bf765ba08fec91ddc88a83",
+      "integration/planning/stage-versions.json": "3690593adc199d4e723154991b6ecb3c2a04d79aa6a3eaa279aaafa6560b4f6e"
     }
   },
   "artifact_binding": {
@@ -100,7 +100,39 @@
     "work/i03/run-c06-host-lifecycle-rc4.ps1": "ebd22c7b4a56dd3ed025d2d9e9f44a6a007925f349db9c4b7a1ce06b48985aab",
     "work/i03/run-c06-rust-owner-list-rc4.ps1": "0def91d12e434d46394b54895d4dd0f11be16713adadb01a27cb88ccde50784a",
     "work/i03/run-c06-selected-rust-rc4.ps1": "00e33ed03d5974bca53759e888cb30cf87899859ec46c989162c95449d524e2b",
-    "work/i03/record-c06-rc4-fixes.py": "d89c250821c1078d3280150874fc9a05ae3d74389dde868c37745e81f147fb9b"
+    "work/i03/record-c06-rc4-fixes.py": "d89c250821c1078d3280150874fc9a05ae3d74389dde868c37745e81f147fb9b",
+    "work/i03/c06/fusion-i03-rc.5/format-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "work/i03/c06/fusion-i03-rc.5/freeze.json": "a4061ec5c8f83d1e328c53a712f8860a444271c589fca8a45ee6af711deaf0d7",
+    "work/i03/c06/fusion-i03-rc.5/host-lifecycle-process.json": "35eb6b52a37ee2802279c1910a0c2525a4dc9ff1c9c942a2796c834b25a89455",
+    "work/i03/c06/fusion-i03-rc.5/host-lifecycle-result.json": "7e7d2001e087c0a0389e9230abf5d26deb07651dd44aa4a9ae5a996a1d9e60cb",
+    "work/i03/c06/fusion-i03-rc.5/host-lifecycle-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "work/i03/c06/fusion-i03-rc.5/host-lifecycle.log": "d13842d18eedd34f6b43d17095ff6ef47246c98458d37f418bb84feef8ff252d",
+    "work/i03/c06/fusion-i03-rc.5/rust-owner-01.log": "20e234e0019a0d83eff07f13f171ce1a994a8d45dabdb80fb409775803994f12",
+    "work/i03/c06/fusion-i03-rc.5/rust-owner-02.log": "ca305dc1bf921ebd55006c4f451e651eaba90ab01f782a81b22ae41521db4417",
+    "work/i03/c06/fusion-i03-rc.5/rust-owner-03.log": "b439712dfa400ddfdafdf0d7bb473fa35e6ca3c80bbd89b8673e23a97115fee5",
+    "work/i03/c06/fusion-i03-rc.5/rust-owner-04.log": "42c3c95753ddf00f444b9d398a7325b2041f705cf4063d1b6cee2ff64dde86c8",
+    "work/i03/c06/fusion-i03-rc.5/rust-owner-05.log": "acaf167b54b8fd5efadcdcb9686e30f44358a2a42a3a77655e3a3c8897b9304b",
+    "work/i03/c06/fusion-i03-rc.5/rust-owner-06.log": "c3e25ad7f51c74ccdde2d7d0059ef8aaed76b700fdb6de422e86fe019958d59a",
+    "work/i03/c06/fusion-i03-rc.5/rust-owner-07.log": "5f6c110fed6e57d6a59093818c8c6332f4077fa849ebbbb70a189a8fca950cae",
+    "work/i03/c06/fusion-i03-rc.5/rust-owner-list-result.json": "b16afa443a916fb69987775c94c5cd23319b14db2ec063eadec80654135d438b",
+    "work/i03/c06/fusion-i03-rc.5/rust-owner-list-start.json": "f4208212916aba8bcab85d0e1f960b6da1104a2ca661cec5717ccd17fd19788d",
+    "work/i03/c06/fusion-i03-rc.5/rust-owner-list.log": "779208b20f6475d29c02a2cd576ebea782d21170786a10f32787039d898999d2",
+    "work/i03/c06/fusion-i03-rc.5/rust-test-binary.json": "82353f1b0e0fedc1d803c3a07502230bc2bfa3c9c7ebe19a3555ca17d04f1791",
+    "work/i03/c06/fusion-i03-rc.5/selected-owners.json": "30da76996e217acdaea1be7e66ef988df278b314db799c48dfc91b6e4a81bb88",
+    "work/i03/c06/fusion-i03-rc.5/selected-rust-results.json": "bf32d59bdc3a3e815ceee344069fd8efec68d94e46f343990a3ed9bd7787ffdf",
+    "work/i03/c06/fusion-i03-rc.5/selected-rust-summary.json": "7d741dba29143914fd150499bfb7dd0ec04625eb2c83f7c955c64ef0523c831a",
+    "work/i03/c06/fusion-i03-rc.5/unique-related-rust-verification.json": "0b81487cc5f66dc2dc4ca2582b8ebf46714c04e71948037c366b715f23ee94ce",
+    "work/i03/c06/fusion-i03-rc.5/verified-owner-list.json": "0aa281293fc3476354a37f46c32b4e8e5968e7a56c1fcd129874d79b05097a8c",
+    "work/i03/c06/fusion-i03-rc.5/windows-binaries.json": "ea107c774441e48f71494a0f60a0affbedb66cd7355cbfcdf0b8957472924997",
+    "work/i03/c06/fusion-i03-rc.5/windows-build-result.json": "5a212d24daa0f16be55adb87f74e11bbaba9366acd589c6036b315dd45f22d4b",
+    "work/i03/c06/fusion-i03-rc.5/windows-build-start.json": "fb145c94c93cbba811630b304ac4a24a8ed15a7a4121cfca2824ccd244c21e14",
+    "work/i03/c06/fusion-i03-rc.5/windows-build.log": "1b7e6ffb3923f91dc0cd8a6a19f9dd61626fc9624f6ddd51261d73ce10538db9",
+    "work/i03/freeze-i03-rc5.py": "c91565cb5cbb904d3788b7f82ca4a9a6d708277a1d032ed8b5814b230f0be0d5",
+    "work/i03/run-c06-native-rc5.ps1": "033da68d3fa1fe44ca499507091ebbfc71ac5016026a2c80adbea2a502e7a975",
+    "work/i03/run-c06-rust-owner-list-rc5.ps1": "676e59b87c6364deb4551294cde160d1a19da3a8ea20c4ced33c7cc1f3330495",
+    "work/i03/run-c06-host-lifecycle-rc5.ps1": "00b4b5d911e22e756b76f2cb3cfb53291d489d6ad3cf512aa7eff83366599fe7",
+    "work/i03/run-c06-selected-rust-rc5.ps1": "0c967f0d2061e4ef5cd9a4ebcb21d6834771f9898b575a5361b4c60e50b7f3fe",
+    "work/i03/record-c06-rc5-result.py": "4e3f3f01710f24f4e10bfbab7bcf103d9fc3228fec5c708c73e40fb26d8e5f4f"
   },
   "frozen_authority_files": {
     "crates/rovai-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
@@ -214,38 +246,59 @@
       },
       "actual_host_passed": true,
       "desktop_build_passed": true
+    },
+    {
+      "version": "fusion-i03-rc.5",
+      "source_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3",
+      "status": "partial_engineering_verified",
+      "related_rust": {
+        "failed": 0,
+        "started_at": "2026-10-16T05:06:19.6224620Z",
+        "source_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3",
+        "completed": 7,
+        "selected": 7,
+        "passed": 7,
+        "test_binary_sha256": "53a1727b1701906dd130b5e2d14b23b05713bb4155cb8cf80a771b1404791a3b",
+        "finished_at": "2026-10-16T05:06:40.7314235Z"
+      },
+      "actual_host_passed": true,
+      "remaining": [
+        "其他阶段相关Rust/Host projection和适用升级/迁移与冻结输入回归；未列为通过的保持待验",
+        "真实Native IPC/桌面App、文件资源授权与HTML预览、冷路由、多卡和大材料交互响应",
+        "阶段适用平台资格与PC01-PC24/正式场景证据；缺环境可独立推进后续阶段，最终MVP必需项不豁免"
+      ]
     }
   ],
   "windows_binaries": [
     {
       "name": "rovai-core.exe",
       "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\target\\debug\\rovai-core.exe",
-      "length": 79836672,
-      "last_write_utc": "2026-10-16T04:37:18.6708264Z",
-      "sha256": "24dd1600ffbde38e493d403a7437621f0ddb1df2019e9a8e76f956d091e089a9",
-      "source_commit": "18984d69134a7314939ca13b0e114bbd2ceece6d"
+      "length": 79862272,
+      "last_write_utc": "2026-10-16T05:03:14.7500155Z",
+      "sha256": "2345fdd7ad001ce45420e2285acdfe371bf2b809cadba3b7d24cd93d6fb6d0ac",
+      "source_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3"
     },
     {
       "name": "rovai-host.exe",
       "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\target\\debug\\rovai-host.exe",
-      "length": 85925376,
-      "last_write_utc": "2026-10-16T04:37:21.4283502Z",
-      "sha256": "3019fcdee249aa8be9dd025a1bca75685b3ad4e372c56770ed5cfbca09f79109",
-      "source_commit": "18984d69134a7314939ca13b0e114bbd2ceece6d"
+      "length": 85946880,
+      "last_write_utc": "2026-10-16T05:03:17.8049047Z",
+      "sha256": "f54e9bba856e8310fe0088baeba6590b23994d6f6a39851738d043fba208e37d",
+      "source_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3"
     },
     {
       "name": "rovai.exe",
       "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\target\\debug\\rovai.exe",
-      "length": 6582272,
-      "last_write_utc": "2026-10-16T04:37:21.6476745Z",
-      "sha256": "bdbeb9e42434cbbb49e6c10971128261b90b128d06eb8b9a111d4b26e73c7b69",
-      "source_commit": "18984d69134a7314939ca13b0e114bbd2ceece6d"
+      "length": 6582784,
+      "last_write_utc": "2026-10-16T05:03:18.5375722Z",
+      "sha256": "d6f5bb6e8847b8bf4490b295ddafe0a45a5ae794a7d1ea57209a47c099231327",
+      "source_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3"
     }
   ],
   "implemented_repair": [
-    "原Core队列测试使用普通mkdir不满足Windows私有DACL，改现有prepare_private_directory",
-    "文件pin持久化测试错误期待未经归一化的几何/标题，改明确规范预期且精确路径保留",
-    "Serde内部tag单位变体漏拒额外字段，Ready/Stop改空struct保持原JSON，保留原坏帧断言并扩同owner检查Stop；需新二进制/真实PTY复验"
+    "Windows私有目录夹具按原规则创建并通过",
+    "文件pin规范几何/标题/颜色预期及精确路径通过",
+    "Ready/Stop空struct闭合额外字段且原JSON不变；所有坏帧/拆包/超量断言和真实生命周期通过"
   ],
   "reuse_boundary": "Production application prefix unchanged; preserve actual rc.3 binary source commit and hashes, rc.2 TS/Web and unaffected3 material owners",
   "web_asset_inventory": {
@@ -277,7 +330,7 @@
     "real_user_data_or_credentials": false,
     "customer_action_required_now": false
   },
-  "next": "冻结rc.5：真实重新构建受辅助协议修复影响的Core/Host/CLI；编译受影响测试版本并先list后运行原3失败及终端5owner；复跑真实Host完整PTY生命周期。复用未变TS/Web/Desktop、材料3及其余已通过Rust owner。",
+  "next": "I03-C06继续实际Native IPC与桌面App、文件授权/预览、冷路由/多卡/大材料规模、适用迁移/平台及PC01-PC24/正式场景证据；当前26相关Rust、3材料、Windows真实Host/PTY、types/Web/Desktop已有通过结果，按改动范围复用。发现代码缺口回所属C01-C05，不等用户阶段技术验收。",
   "format_gate": {
     "before_exit": 1,
     "after_exit": 0,
@@ -307,14 +360,12 @@
     "remaining_lifecycle": "node/board deletion, natural exit, stop/restart, planned exit and hard crash not reached"
   },
   "rust_related_verification": {
-    "selected": 26,
-    "completed": 26,
-    "passed": 23,
-    "source_commit": "b43416d3b2d161868cb0aa4204a4fc92de550942",
-    "started_at": "2026-10-16T04:56:49.6192596Z",
-    "finished_at": "2026-10-16T04:58:27.2305593Z",
-    "failed": 3,
-    "test_binary_sha256": "7c9c971b905f76853807f06f11e6393817b750f5d95f7c01f98c11d42d6776d4"
+    "unique_owners": 26,
+    "passed": 26,
+    "failed": 0,
+    "current_rc5": 7,
+    "unaffected_rc4_reuse": 19,
+    "private_materials_additional_unchanged": 3
   },
   "desktop_build": {
     "source_commit": "b43416d3b2d161868cb0aa4204a4fc92de550942",
@@ -322,8 +373,8 @@
     "inventory": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.4\\desktop-output-inventory.json"
   },
   "host_lifecycle": {
-    "source_commit": "b43416d3b2d161868cb0aa4204a4fc92de550942",
-    "binary_source_commit": "18984d69134a7314939ca13b0e114bbd2ceece6d",
+    "source_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3",
+    "binary_source_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3",
     "exit_code": 0,
     "passed": 1,
     "agent_model": false,

@@ -38,8 +38,8 @@
       "stage_id": "I03",
       "name": "完整无限画布与对象绑定",
       "candidate_version": "fusion-i03-rc.5",
-      "status": "repair_candidate_pending_freeze",
-      "frozen_commit": null,
+      "status": "candidate_partial_engineering_verified",
+      "frozen_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3",
       "validation_batch": "I03-repair-04",
       "validation_runs": [
         {
@@ -86,6 +86,26 @@
           "kind": "host-lifecycle",
           "source_commit": "18984d69134a7314939ca13b0e114bbd2ceece6d",
           "exit_code": 1
+        },
+        {
+          "kind": "windows-build",
+          "source_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3",
+          "exit_code": 0
+        },
+        {
+          "kind": "rust-owner-list",
+          "source_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3",
+          "exit_code": 0
+        },
+        {
+          "kind": "selected-rust-7",
+          "source_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3",
+          "exit_code": 0
+        },
+        {
+          "kind": "actual-host-pty",
+          "source_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3",
+          "exit_code": 0
         }
       ],
       "engineering_validation": "in_progress",
@@ -127,7 +147,12 @@
           }
         }
       ],
-      "repair_reason": "Fix three actual candidate findings together: Windows private test directory, normalized File expectations, closed helper Ready/Stop shapes"
+      "repair_reason": "Fix three actual candidate findings together: Windows private test directory, normalized File expectations, closed helper Ready/Stop shapes",
+      "windows_build": "passed",
+      "related_rust_unique_owners": 26,
+      "related_rust": "passed",
+      "actual_host_pty": "passed",
+      "native_app_scale_platform": "pending"
     },
     {
       "stage_id": "I04",

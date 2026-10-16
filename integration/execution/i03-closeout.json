@@ -34,8 +34,7 @@
         "新生命周期Rust/Host入口及原第三owner断言随阶段候选编译和真实运行",
         "实际Host/Native IPC/资源授权验证后启用最终文件入口，UI模拟验证不能替代",
         "完整PC01-PC24适用工程场景与异常恢复待集中验证；发现代码缺口回到C01修复",
-        "实际大材料/日志枚举/事务锁规模归I03-C05验证；本批32副本只验证字典读取次数",
-        "既有lib.rs/single_chat.rs格式欠账保留阶段候选前处理"
+        "实际大材料/日志枚举/事务锁规模归I03-C05验证；本批32副本只验证字典读取次数"
       ]
     },
     {
@@ -65,7 +64,7 @@
       "done_when": "真实临时PTY启动、输出、resize、关闭、删除及重连符合现行合同；不把I05完整Git工程工作区提前并入",
       "latest_partial_evidence": "i03-terminal-process-owner-result.json",
       "remaining_implementation_batches": [],
-      "remaining_verification": "原Host生命周期owner已接真实PTY/HTTP/管道、原启动与输入回执、resize/洪流、node/board删除、自然退出、停止/新代次、计划退出及硬重启后树清空；当前只检查源码/脚本与独立worker。真实Core/helper/Host编译及运行、Linux保护线程、macOS账本恢复、Windows Job/ConPTY、Native IPC/实际UI和平台资格须C06执行；发现缺口回C04修复。"
+      "remaining_verification": "Windows真实Host/HTTP/管道/PTY完整生命周期与终端5原owner已通过；Native IPC/实际App操作、Linux保护线程和macOS账本恢复及各平台资格仍待，不能用Windows结果代替。"
     },
     {
       "id": "I03-C05",
@@ -118,18 +117,21 @@
         "extended+slow测试版本编译0，3材料owner非零入册并3项通过",
         "rc.4真实隔离Host/HTTP/PTY完整生命周期1owner通过：启动/输入/resize/洪流/卡片与板删除/自然退出/停止重开/计划退出/硬重启回收；无关control存活",
         "Desktop main/preload/renderer生产构建0，精确文件SHA记录；不是Native UI或打包运行",
-        "extended+slow当前1248测试非零入册；定向26项23通过3失败，完整上下文冻结字节慢测通过"
+        "extended+slow当前1248测试非零入册；定向26项23通过3失败，完整上下文冻结字节慢测通过",
+        "rc.5修复后当前SHA三原生程序新构建0，完整Host/HTTP/PTY1owner再验证0",
+        "7项必要Rust复验全部通过；替换旧失败及4个重复终端结果后26个不同相关owner通过（19未变复用+7当前），不累计运行次数",
+        "Core受控观察IO在途时真实互动响应、满额拒绝、取消后名额保持/实际完成释放均通过；不是所有大文件或慢盘性能资格"
       ],
-      "open_findings": [
-        "原Core队列测试使用普通mkdir不满足Windows私有DACL，改现有prepare_private_directory",
-        "文件pin持久化测试错误期待未经归一化的几何/标题，改明确规范预期且精确路径保留",
-        "Serde内部tag单位变体漏拒额外字段，Ready/Stop改空struct保持原JSON，保留原坏帧断言并扩同owner检查Stop；需新二进制/真实PTY复验"
-      ],
+      "open_findings": [],
       "remaining_checks": [
-        "正确features下相关Rust owner先list非零再运行",
-        "全量types及Web/Desktop生产构建",
-        "实际Core/Host/HTTP/PTY/Native/App、冷路由、多卡与大材料响应",
-        "阶段适用平台/迁移/冻结输入回归与正式场景证据"
+        "其他阶段相关Rust/Host projection和适用升级/迁移与冻结输入回归；未列为通过的保持待验",
+        "真实Native IPC/桌面App、文件资源授权与HTML预览、冷路由、多卡和大材料交互响应",
+        "阶段适用平台资格与PC01-PC24/正式场景证据；缺环境可独立推进后续阶段，最终MVP必需项不豁免"
+      ],
+      "resolved_findings": [
+        "Windows私有目录夹具按原规则创建并通过",
+        "文件pin规范几何/标题/颜色预期及精确路径通过",
+        "Ready/Stop空struct闭合额外字段且原JSON不变；所有坏帧/拆包/超量断言和真实生命周期通过"
       ]
     }
   ],
