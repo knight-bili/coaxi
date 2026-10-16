@@ -27,22 +27,32 @@ export function CanvasConversationFrame({ bridge, instance, title, orphaned = fa
   bridge: CanvasConversationBridge; instance: CanvasConversationBridge['instances'][number]; title: string; orphaned?: boolean; onOpenWorkspace(): void
 }): React.JSX.Element {
   const { target, key, busy } = instance
-  return <section className="canvas-conversation-frame nodrag nowheel nopan" data-canvas-conversation-key={key} aria-label={uiAttribute('画布对话：{0}', title)}
+  const inline = target.presentation === 'inline' && !orphaned
+  return <section className={`canvas-conversation-frame nodrag nowheel nopan${inline ? ' is-inline' : ''}`} data-canvas-conversation-key={key} aria-label={uiAttribute('画布对话：{0}', title)}
     onKeyDown={event => {
       if (event.key === 'Escape' && !event.defaultPrevented) { event.preventDefault(); void bridge.close([key]) }
       // Preserve document-level conversation shortcuts, while isolating canvas movement/deletion.
       if (['Escape', 'Delete', 'Backspace', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) event.stopPropagation()
     }} onWheel={event => event.stopPropagation()}
     onPointerDown={event => event.stopPropagation()}>
-    <header className="canvas-conversation-heading">
+    {!inline && <header className="canvas-conversation-heading">
       <MessageSquare size={16} aria-hidden="true" />
       <strong title={title}>{title}</strong>
-      {!orphaned && <CanvasIconButton disabled={bridge.opening || Boolean(bridge.restoring)} onClick={() => { void bridge.open({ ...target, presentation: target.presentation === 'inline' ? 'drawer' : 'inline' }) }}
-        label={uiAttribute(target.presentation === 'inline' ? '移至侧边' : '放回画布')}>{target.presentation === 'inline' ? <PanelRight size={15} /> : <PanelsTopLeft size={15} />}</CanvasIconButton>}
-      <CanvasIconButton disabled={bridge.opening || Boolean(bridge.restoring)} onClick={onOpenWorkspace} label={uiAttribute('打开完整工作区')}><ExternalLink size={15} /></CanvasIconButton>
-      <CanvasIconButton disabled={bridge.opening || Boolean(bridge.restoring)} onClick={() => { void bridge.close([key]) }} label={uiAttribute('收起对话')}><X size={16} /></CanvasIconButton>
-    </header>
+      <CanvasConversationActions bridge={bridge} instance={instance} orphaned={orphaned} onOpenWorkspace={onOpenWorkspace} />
+    </header>}
     {orphaned && <p className="canvas-notice" role="status"><UiText zh="原画布卡片已变更，当前对话保留在侧边，请先保存或收起。" /></p>}
     <div className="canvas-conversation-content" inert={busy} aria-busy={busy}>{instance.content}</div>
   </section>
+}
+
+export function CanvasConversationActions({ bridge, instance, orphaned = false, onOpenWorkspace }: {
+  bridge: CanvasConversationBridge; instance: CanvasConversationBridge['instances'][number]; orphaned?: boolean; onOpenWorkspace(): void
+}): React.JSX.Element {
+  const { target, key } = instance, disabled = bridge.opening || Boolean(bridge.restoring)
+  return <>
+    {!orphaned && <CanvasIconButton className="nodrag" disabled={disabled} onClick={() => { void bridge.open({ ...target, presentation: target.presentation === 'inline' ? 'drawer' : 'inline' }) }}
+      label={uiAttribute(target.presentation === 'inline' ? '移至侧边' : '放回画布')}>{target.presentation === 'inline' ? <PanelRight size={15} /> : <PanelsTopLeft size={15} />}</CanvasIconButton>}
+    <CanvasIconButton className="nodrag" disabled={disabled} onClick={onOpenWorkspace} label={uiAttribute('打开完整工作区')}><ExternalLink size={15} /></CanvasIconButton>
+    <CanvasIconButton className="nodrag" disabled={disabled} onClick={() => { void bridge.close([key]) }} label={uiAttribute('收起对话')}><X size={16} /></CanvasIconButton>
+  </>
 }

@@ -27,7 +27,7 @@ import { UiText, uiAttribute, useInterfaceLanguage } from './interface-language'
 import { readErrorMessage } from './error-message'
 import { useCanvasFolders } from './useCanvasFolders'
 import { canvasAbsolutePosition, canvasDropMutation, canvasGroupSelection, canvasMemberMutationSupported } from './canvas-member-interaction'
-import { CanvasConversationFrame, type CanvasConversationBridge } from './CanvasConversationFrame'
+import { CanvasConversationActions, CanvasConversationFrame, type CanvasConversationBridge } from './CanvasConversationFrame'
 import { canvasConversationGeometry, canvasConversationMatches, canvasMutationRemovesConversation } from './canvas-conversation'
 import { canvasComposerContext } from './canvas-composer-drafts'
 import { CanvasObjectDialog } from './CanvasObjectDialog'
@@ -87,7 +87,8 @@ function CanvasCard({ data, selected }: NodeProps<FlowNode>): React.JSX.Element 
   const actions = useContext(PresentationContext)!
   const resizeRevision = useRef<number | null>(null)
   const [fileActionsHost, setFileActionsHost] = useState<HTMLSpanElement | null>(null)
-  const expandedConversation = Boolean(actions.conversation?.instances.some(item => item.target.presentation === 'inline' && canvasConversationMatches(data.row, item.target)))
+  const inlineConversation = actions.conversation?.instances.find(item => item.target.presentation === 'inline' && canvasConversationMatches(data.row, item.target))
+  const expandedConversation = Boolean(inlineConversation)
   const row = data.row, d = row.data, region = isRegionKind(d.kind)
   const member = actions.agents.find(item => item.agentId === d.agentId)
   const group = d.kind === 'group' ? actions.groups?.find(item => item.id === d.folderGroupId) : undefined
@@ -115,6 +116,8 @@ function CanvasCard({ data, selected }: NodeProps<FlowNode>): React.JSX.Element 
       {color && <span className="canvas-color-dot" role="img" aria-label={uiAttribute(canvasColorName(color))} />}
       {d.kind === 'file' && <ResourceReferenceIcon kind="file" className="resource-reference-icon" />}
       <strong title={d.kind === 'file' && d.path ? `${title}\n${d.path}` : title}>{title}</strong>
+      {inlineConversation && actions.conversation && <CanvasConversationActions bridge={actions.conversation} instance={inlineConversation}
+        onOpenWorkspace={() => actions.onOpenReference(inlineConversation.target.reference)} />}
       {d.kind === 'file' && <span ref={setFileActionsHost} className="canvas-file-actions nodrag nowheel" />}
       {d.kind === 'folder' && actions.onOpenProject && <CanvasIconButton className="nodrag" label={uiAttribute('进入工程')} onClick={() => actions.onOpenProject?.(d.folderPath!)}><ExternalLink size={15} /></CanvasIconButton>}
       {d.kind === 'agent' && member && !member.removedAt && actions.onOpenMember && <CanvasIconButton className="nodrag" label={uiAttribute('打开队员')} onClick={() => actions.onOpenMember?.(member.agentId)}><ExternalLink size={15} /></CanvasIconButton>}

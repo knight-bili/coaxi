@@ -4847,7 +4847,7 @@ function ThreadWorkspaceContent({
   // A pinned private reference owns only its exact transcript; the public Composer is not mounted underneath.
   if (singleChatBoundConversationId) return <section ref={workspaceShellRef} className="workspace-shell camp-workspace">
     <FilePreviewWorkspace>
-      <section className="canvas-bound-single-chat">{singleChatPanel}</section>
+      <section className="timeline-pane canvas-bound-single-chat">{singleChatPanel}</section>
       {filePreview && <>
         <FilePreviewResizeHandle onClose={filePreview.hidePane} />
         <FilePreviewPane tabsInPane={previewTabsInPane} />

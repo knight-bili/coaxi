@@ -98,6 +98,11 @@ function CanvasThreadWorkspaceContent({ instance, controller, visibility, reads,
   const [confirmingRunIds, setConfirmingRunIds] = useState<Set<string>>(() => new Set())
   const [singleChatVisible, setSingleChatVisible] = useState(false)
   const [inspectorVisible, setInspectorVisible] = useState(false), [inspectorTab, setInspectorTab] = useState<ThreadInspectorTab>('tasks')
+  const privateId = instance.conversation?.id, privateAgentId = instance.conversation?.agentId
+  const privateAgentName = agents.find(item => item.agentId === privateAgentId)?.displayName ?? uiAttribute('队员')
+  const singleChatTarget = useMemo(() => privateId && privateAgentId
+    ? { conversationId: privateId, agentId: privateAgentId, agentDisplayName: privateAgentName, requestId: 1 } : null,
+  [privateId, privateAgentId, privateAgentName])
   useLayoutEffect(() => {
     const release = reads.retain(threadId)
     activeThreadIdRef.current = threadId
@@ -144,8 +149,7 @@ function CanvasThreadWorkspaceContent({ instance, controller, visibility, reads,
       onCloseInspector={() => setInspectorVisible(false)} onInspectorTabChange={setInspectorTab}
       singleChatVisible={Boolean(instance.conversation || singleChatVisible)}
       singleChatBoundConversationId={instance.conversation?.id}
-      singleChatTarget={instance.conversation ? { conversationId: instance.conversation.id, agentId: instance.conversation.agentId,
-        agentDisplayName: agents.find(item => item.agentId === instance.conversation?.agentId)?.displayName ?? uiAttribute('队员'), requestId: 1 } : null}
+      singleChatTarget={singleChatTarget}
       onOpenSingleChat={() => { setSingleChatVisible(true); setInspectorVisible(false) }}
       onCloseSingleChat={() => { if (instance.conversation) { void controller.close([instance.key]) } else setSingleChatVisible(false) }}
       runtimeRecovery={runtimeRecovery} onDismissRuntimeRecovery={() => setRuntimeRecovery(null)}
