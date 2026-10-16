@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "R08实际目录/大文件、四worker容量、原回执重放及PTY日志负载六项通过；Native响应/通知和R06/R07仍待集中候选，继续R09。",
+  "current_slice": "R08实际Core负载六项通过；R09摘要模型配置/分支/隔离活动及缺失附件指引已编码，33项局部检查通过，新增Core/HTML修复均待累计候选。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "完成R09原版信息/错误态实现核查后累计冻结下一候选；集中补R06 HTML三次启动、R07 Native输入/剪贴板及R08大正文/通知/取消边界，再R10正式收口。",
+    "完成R09剩余八类原UI/模型观测适用性及真实运行owner；累计冻结新Core和Desktop/Web候选，集中补R06三次HTML启动、R07 Native输入/剪贴板、R08大正文/通知/取消，再R10正式场景收口。",
     "阶段剩余清单固定为i03-closeout-ledger.json的I03-R01–R10，原C01–C06均有映射；暂缺环境只单列待办，继续可独立的I02余项和I04-I12/BUF，不把后续功能提前塞入I03。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "r08_core_load_verified_native_pending_r09_next",
+  "current_slice_status": "r09_summary_source_complete_remaining_ui_candidate_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -233,5 +233,6 @@
   "latest_r05_object_cold_verification": "i03-r05-object-cold-diff-verification.json",
   "latest_r06_partial_verification": "i03-r06-file-html-progress.json",
   "latest_r07_core_capacity_verification": "i03-r07-core-terminal-capacity-verification.json",
-  "latest_r08_source_load_verification": "i03-r08-source-load-verification.json"
+  "latest_r08_source_load_verification": "i03-r08-source-load-verification.json",
+  "latest_r09_summary_implementation": "i03-r09-summary-implementation.json"
 }

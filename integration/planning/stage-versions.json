@@ -639,6 +639,12 @@
           "core_source": "e0c4fad7e7c7f20d4c7b5f83418d8237c4ff6195",
           "status": "core_source_io_and_terminal_load_verified_native_pending",
           "evidence": "i03-r08-source-load-verification.json"
+        },
+        {
+          "kind": "r09-summary-source-types-sql",
+          "source": "5e21f0f24c94e6a953199048d2541e8f96f8c2cf",
+          "status": "source_implemented_candidate_pending",
+          "evidence": "i03-r09-summary-implementation.json"
         }
       ],
       "engineering_validation": "in_progress",
@@ -821,6 +827,12 @@
       "pending_native_terminal_verification": [
         "Native real Windows IME composition and clipboard/paste behavior",
         "current final candidate terminal collapse/reopen and connection UI regression; old related Native evidence remains applicable only within its source scope"
+      ],
+      "pending_summary_projection_verification": [
+        "新增Core活动只读投影与原Rust owner尚未编译/运行；真实Host多Thread/公开与私聊交错状态仍待候选",
+        "模型配置与原生会话实际观测的展示适用性继续核对，不把配置冒充观测",
+        "八类创建/编辑/排列/折叠/错误态、画板CRUD、菜单键/旧Host提示的完整当前候选运行",
+        "日夜主题、小窗口/缩放/末项可达和四行长标题的实际同场景对照；尺寸告警须定位并登记影响"
       ]
     },
     {
