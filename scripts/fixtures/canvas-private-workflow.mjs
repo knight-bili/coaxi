@@ -194,7 +194,7 @@ export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait
       await clickNative(`${frame(0)}.querySelector('.single-chat-composer .message-quotes-trigger')`)
       await clickNative(`document.querySelector('.message-quotes-popover button.message-quote-remove')`)
       await waitMain(() => seam.snapshot().faults.some(fault => fault.kind === 'concurrent_material_change'))
-      await wait(`document.body.innerText.includes('输入材料刚刚发生变化')`)
+      await wait(`${frame(0)}.innerText.includes('草稿已更新，请重试；已有问题和引用已保留。')`)
       const cas = seam.since(conflictMark).find(entry => entry.action === 'quote')
       assert.equal(cas.status, 'rejected'); assert.equal(cas.code, 'single_chat.draft_changed')
       assert.equal(await evaluate(`${input(0)}.value`), text)
