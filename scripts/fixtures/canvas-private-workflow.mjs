@@ -241,30 +241,38 @@ export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait
       assert.notEqual(nextId, conversationId, 'the replacement target must be a distinct private conversation')
       ownedConversations.set(nextId, nextThreadId)
       const graph = await rpc('canvas.nodes.snapshot', { boardId })
-      const rebound = await rpc('canvas.nodes.apply', { commandId: randomUUID(), command: { boardId,
-        expectedRevision: graph.board.revision, mutation: { type: 'update', nodeId: scopes[0].nodeId,
-          patch: { conversation: { threadId: nextThreadId, conversationId: nextId } } } } })
-      assert.equal(rebound.status, 'applied', JSON.stringify(rebound))
+      const removed = await rpc('canvas.nodes.apply', { commandId: randomUUID(), command: { boardId,
+        expectedRevision: graph.board.revision, mutation: { type: 'delete', nodeIds: [scopes[0].nodeId] } } })
+      assert.equal(removed.status, 'applied', JSON.stringify(removed))
+      const afterRemoval = await rpc('canvas.nodes.snapshot', { boardId })
+      const replacement = await rpc('canvas.nodes.apply', { commandId: randomUUID(), command: { boardId,
+        expectedRevision: afterRemoval.board.revision, mutation: { type: 'create', node: { kind: 'conversation',
+          title: 'R01 新目标独立卡片', conversation: { threadId: nextThreadId, conversationId: nextId },
+          x: 0, y: 0, width: 520, height: 650 } } } })
+      assert.equal(replacement.status, 'applied', JSON.stringify(replacement))
+      const replacementScope = { kind: 'canvas', boardId, nodeId: replacement.payload.nodeIds[0] }
+      const replacementFrame = `document.querySelector('.canvas-conversation-frame[data-canvas-conversation-key*="${replacementScope.nodeId}"]')`
+      const replacementInput = `${replacementFrame}?.querySelector('.single-chat-composer textarea')`
       // The old result arrives after its authoritative target ended and the pin
-      // changed. Existing navigation guards may retain the old editor until it
+      // was removed. Existing navigation guards may retain the old editor until it
       // settles; the new input must still begin empty when explicitly reopened.
       if (gate) { gate.release(); await pause(400) }
       await openCanvasBoard(evaluate, wait, boardId)
       if (await evaluate(`Boolean(${frame(0)})`)) {
-        await evaluate(`(()=>{document.querySelector('[data-id="${scopes[0].nodeId}"] button[aria-label="收起对话"]')?.click();return true})()`)
+        await evaluate(`(()=>{${frame(0)}.querySelector('button[aria-label="收起对话"]')?.click();return true})()`)
         await wait(`!${frame(0)}`)
       }
-      await open(0)
-      await wait(`${input(0)}.value===''`)
-      const replacement = () => rpc('singleChat.get', { conversationId: nextId, composerScope: scopes[0] })
-      const clean = await replacement()
+      await clickNative(`document.querySelector('[data-id="${replacementScope.nodeId}"] button[aria-label="展开对话"]')`)
+      await wait(`${replacementInput}?.value===''`)
+      const getReplacement = () => rpc('singleChat.get', { conversationId: nextId, composerScope: replacementScope })
+      const clean = await getReplacement()
       assert.deepEqual(clean.draft.attachments, []); assert.deepEqual(clean.draft.quotes, [])
       assert.deepEqual(clean.messages, []); assert.deepEqual(clean.agentRuns, [])
       if (gate) {
-        assert.equal(await evaluate(`${input(0)}.value`), '')
-        assert.deepEqual((await replacement()).draft, clean.draft)
-        assert.ok(!(await evaluate(`${frame(0)}.innerText`)).includes('迟到上传原文件.txt'))
-        record('late_real_upload_reply_after_ending_old_conversation_cannot_pollute_rebound_private_composer')
+        assert.equal(await evaluate(`${replacementInput}.value`), '')
+        assert.deepEqual((await getReplacement()).draft, clean.draft)
+        assert.ok(!(await evaluate(`${replacementFrame}.innerText`)).includes('迟到上传原文件.txt'))
+        record('late_real_upload_reply_after_ending_old_conversation_cannot_pollute_replacement_private_composer')
         await writeFile(join(config.evidence, '01-late-upload-does-not-cross-context.png'), (await window.webContents.capturePage()).toPNG())
         return
       }
@@ -287,8 +295,8 @@ export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait
       assert.ok(await evaluate(`Boolean(document.querySelector('.private-input-recovery-editor .attachment-open[aria-label="打开文件预览 R01 原归属材料.txt"]'))`))
       assert.ok(!seam.since(restoreMark).some(entry => ['singleChat.open', 'singleChat.send'].includes(entry.method)))
       assert.deepEqual(materials((await get(scopes[0])).draft), materials(original.draft))
-      assert.deepEqual((await replacement()).draft, clean.draft)
-      record('rebound_node_restores_original_body_and_materials_in_original_private_recovery_editor_without_forwarding_to_new_target')
+      assert.deepEqual((await getReplacement()).draft, clean.draft)
+      record('removed_node_restores_original_body_and_materials_in_original_private_recovery_editor_without_forwarding_to_new_target')
       await writeFile(join(config.evidence, '01-original-input-after-node-rebind.png'), (await window.webContents.capturePage()).toPNG())
       return
     }
