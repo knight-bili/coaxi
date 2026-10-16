@@ -55,6 +55,8 @@ Mission、Task、Diff、文件工作区仍进入原对象。此前真实 C02 检
 
 ## 本批完成标准
 
+2026-10-17：节点编辑色板复用 Codeg `src/components/canvas/canvas-swatches.tsx:92–115` 的十二色、六列、24px 命中区和再次选择清空行为，与已移植的画板色板共用样式。原生选择框改为原版色点，仍保留字段禁用、可访问名称和选中状态；未改 Core 命令。实际日夜、键盘、清空及小窗口观察归下一集中候选，不以源码检查代替。
+
 列表右键菜单沿用 Codeg `canvas-board-list.tsx:393–408` 的打开/编辑/删除；定位与 Escape 回焦复用 Rovai
 `ImageContextMenu.tsx:36–50` 的视口锚点。右键、菜单键/Shift+F10 与省略号入口共用原处理函数，未增加执行通道。
 删除提示对照 Codeg `canvas-board-dialogs.tsx:235–258`，显示同画板/版本的节点数和终端卡数，明确只关闭仍在运行的终端；

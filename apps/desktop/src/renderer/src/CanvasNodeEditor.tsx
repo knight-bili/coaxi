@@ -122,9 +122,14 @@ export function CanvasNodeEditor({ target, revision, latestRevision, agents, gro
             </select></label>}
             <label className="field-label"><UiText zh="标题" /><input data-dialog-autofocus value={title} onChange={event => setTitle(event.target.value)} autoComplete="off"
               onKeyDown={event => { if (event.key === 'Enter' && event.nativeEvent.isComposing) event.preventDefault() }} /></label>
-            <label className="field-label"><UiText zh="标记颜色" /><select value={color} onChange={event => setColor(event.target.value)}>
-              <option value="">{uiAttribute('无')}</option>{canvasColors.map((value, i) => <option key={value} value={value}>{uiAttribute(colorNames[i])}</option>)}
-            </select></label>
+            <div className="field-label"><span id="canvas-node-color-label"><UiText zh="标记颜色" /></span>
+              {/* 沿用Codeg canvas-swatches.tsx的十二色色板与再次选色清空；许可证见integration/licenses/codeg/LICENSE。 */}
+              <div className="canvas-color-palette" role="group" aria-labelledby="canvas-node-color-label">
+                {canvasColors.map(value => <button key={value} type="button" data-color={value} className="canvas-color-choice"
+                  aria-label={uiAttribute(canvasColorName(value))} title={uiAttribute(canvasColorName(value))} aria-pressed={color === value}
+                  onClick={() => setColor(color === value ? '' : value)}><span className="canvas-color-dot" /></button>)}
+              </div>
+            </div>
             {!original && (kind === 'folder' || kind === 'file' || kind === 'terminal') && <label className="field-label">
               <UiText zh={kind === 'file' ? '文件绝对路径' : '工作目录绝对路径'} /><input value={path} onChange={event => setPath(event.target.value)} autoComplete="off" spellCheck={false} />
             </label>}

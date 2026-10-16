@@ -194,3 +194,9 @@ final result: blocked
 final result: blocked
 
 完整阶段视觉/工程验证未完，持续目标active；无需客户做技术验收。
+
+## R09 节点色板源码复用（2026-10-17）
+
+节点编辑采用固定 Codeg canvas-swatches.tsx 原十二色色板，与画板编辑共用现有样式。30项相关测试通过；类型检查退出0。尚未取得本次修改的真实App截图，日夜/键盘/取消颜色和小窗口保留集中候选运行；原尺寸告警未过滤、未认定无影响。
+
+final result: blocked

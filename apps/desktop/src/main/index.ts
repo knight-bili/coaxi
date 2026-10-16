@@ -434,6 +434,7 @@ if (windowsBootstrap?.kind === 'blocked') {
 }
 let appUpdates: AppUpdatesService | null = null
 let mainWindow: BrowserWindow | null = null
+const closedFilePreviewSenders = new WeakSet<Electron.WebContents>()
 let appearanceStore: AppearancePreferencesStore | null = null
 let appearanceFilePath = ''
 let lastDiagnosticsExportPath: string | null = null
@@ -841,7 +842,8 @@ function createWindow(): void {
       zoomFactor: pageZoomFactor(appearanceSnapshot().zoomPercentage)
     }
   })
-  const webContentsId = window.webContents.id
+  const webContents = window.webContents
+  const webContentsId = webContents.id
   installFilePreviewProtocol(window)
   if (process.platform === 'win32') window.setMenuBarVisibility(false)
   mainWindow = window
@@ -930,6 +932,7 @@ function createWindow(): void {
     }
   })
   window.on('closed', () => {
+    closedFilePreviewSenders.add(webContents)
     if (pageZoomFeedbackTimer !== null) clearTimeout(pageZoomFeedbackTimer)
     pageZoomFeedbackTimer = null
     desktopSessions.delete(webContentsId)
@@ -1294,8 +1297,11 @@ ipcMain.handle('rovai:supervisor-retry', () => {
   return core.retryFullCore()
 })
 
-ipcMain.handle('rovai:file-preview-retention', (event, value: unknown) =>
-  filePreview.updateRetention(requireFilePreviewSender(event), parseRetentionState(value)))
+ipcMain.handle('rovai:file-preview-retention', (event, value: unknown) => {
+  // 已关闭主窗口的资源由releaseWindow回收，丢弃它迟到的保留状态，避免重建已释放会话。
+  if (closedFilePreviewSenders.has(event.sender)) return
+  return filePreview.updateRetention(requireFilePreviewSender(event), parseRetentionState(value))
+})
 
 ipcMain.handle('rovai:file-preview-bind-camp', (event, value: unknown) =>
   filePreview.bindThread(requireFilePreviewSender(event), parseFilePreviewThread(value)))

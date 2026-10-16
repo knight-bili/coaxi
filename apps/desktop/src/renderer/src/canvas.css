@@ -328,7 +328,7 @@ html[data-rovai-platform="darwin"] .navigation-collapsed .canvas-boards-toolbar 
 :root .dialog-content.app-dialog.canvas-board-dialog .app-dialog-body .field-label input { border-radius: 999px; }
 :root .dialog-content.app-dialog.canvas-board-dialog .app-dialog-body .field-label textarea { min-height: 64px; border-radius: 14px; resize: vertical; }
 :root .dialog-content.app-dialog.canvas-board-dialog :is(input, textarea)::placeholder { color: var(--muted); }
-:root .dialog-content.app-dialog.canvas-board-dialog .canvas-color-palette { display: grid; grid-template-columns: repeat(6, 24px); gap: 4px; width: max-content; padding: 4px 0; }
+:root .dialog-content.app-dialog:is(.canvas-board-dialog, .canvas-node-editor) .canvas-color-palette { display: grid; grid-template-columns: repeat(6, 24px); gap: 4px; width: max-content; padding: 4px 0; }
 .canvas-color-choice { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; padding: 0; border: 0; border-radius: 6px; background: transparent; cursor: pointer; }
 .canvas-color-choice:hover:not(:disabled) { background: var(--surface-hover); }
 .canvas-color-choice .canvas-color-dot { width: 12px; height: 12px; flex-basis: 12px; border: 1px solid var(--line); }
