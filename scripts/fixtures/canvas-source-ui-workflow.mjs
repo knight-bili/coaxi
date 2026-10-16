@@ -35,6 +35,7 @@ export async function qualifyCanvasSourceUi(window,{evaluate,wait,rpc,openCanvas
  const mission=await rpc('missions.create',{commandId:randomUUID(),command:{title:'R09 原工程会话',description:'仅原卡片UI验证，不启动执行。',projectBindingKind:'directory',projectPath:config.workspace,memberAgentIds:[agentId],defaultLeadAgentId:agentId,tags:[]}});assert.equal(mission.status,'applied');const threadId=mission.payload.threadId
  const sourceFile=join(config.workspace,'R09 真实文件.txt'),sourceText='R09 原文件预览\n中文与 emoji 🙂，保留原始字节。\n';await writeFile(sourceFile,sourceText,{flag:'wx'})
  report.ui_context={agentId,threadId,missionId:mission.payload.missionId,sourceFile,sourceSha256:createHash('sha256').update(sourceText).digest('hex')}
+ try{report.workspace_topology=await rpc('workspaces.worktrees',{path:config.workspace})}catch(error){report.workspace_topology_failure=error.stack??String(error)}
  await click('document.querySelector(\'button[aria-label="无限画布"]\')');await wait('Boolean(document.querySelector(".canvas-breadcrumb-root:not(:disabled)"))')
  await click('document.querySelector(".canvas-breadcrumb-root")');await wait('Boolean(document.querySelector(".canvas-boards-home .canvas-primary-button:not(:disabled)"))')
  await click('document.querySelector(".canvas-boards-home .canvas-primary-button")');await wait('Boolean(document.querySelector(".canvas-board-dialog input[data-dialog-autofocus]"))')
@@ -79,7 +80,7 @@ export async function qualifyCanvasSourceUi(window,{evaluate,wait,rpc,openCanvas
   let current=await graph();assert.equal(current.nodes.length,1);const node=current.nodes[0],nodeId=node.id;assert.equal(node.data.kind,kind);assert.equal(node.data.color,'blue')
   const selector=`.react-flow__node[data-id="${nodeId}"]`,card=`document.querySelector('${selector}')`
   await wait(`Boolean(${card})`);await click('document.querySelector(\'.canvas-dock-panel button[aria-label="查看全部"]\')');await pause(450)
-  if(kind==='note'){await click(card);await click('document.querySelector(\'.canvas-dock-panel button[aria-label="编辑节点"]\')')}
+  if(kind==='note'){await click(`${card}.querySelector('.canvas-note-title')`);await wait(`${card}.classList.contains('selected')`);await click('document.querySelector(\'.canvas-dock-panel button[aria-label="编辑节点"]\')')}
   else if(kind==='file'){await click(`${card}.querySelector('button[aria-label="文件节点操作"]')`);await click(menu('编辑节点'))}
   else await click(`${card}.querySelector('button[aria-label="编辑节点"]')`)
   await wait('Boolean(document.querySelector(".canvas-node-editor"))');await text(field('标题'),'R09 '+label+' 已编辑')
@@ -97,6 +98,7 @@ export async function qualifyCanvasSourceUi(window,{evaluate,wait,rpc,openCanvas
    record('actual_'+kind+'_collapse_and_reopen_keep_original_node_and_source')
   }
   await click('document.querySelector(\'.canvas-dock-panel button[aria-label="自动排列"]\')');await pause(180);await click('document.querySelector(\'.canvas-dock-panel button[aria-label="查看全部"]\')');await pause(450)
+  await click('document.querySelector(\'.canvas-zoom-pill button[aria-label="恢复到 100%"]\')');await wait('document.querySelector(".canvas-zoom-readout").textContent==="100%"');await pause(180)
   if(kind==='file')await wait(`${card}.textContent.includes('R09 原文件预览')`)
   const bounds=await evaluate(`(()=>{const n=${card},m=document.querySelector('.content.canvas-content'),w=document.querySelector('.canvas-workspace'),r=n.getBoundingClientRect();return{card:r.toJSON(),viewport:{width:innerWidth,height:innerHeight,dpr:devicePixelRatio},outerExtraX:m.scrollWidth-m.clientWidth,outerExtraY:m.scrollHeight-m.clientHeight,workspace:w.getBoundingClientRect().toJSON(),zoom:document.querySelector('.canvas-zoom-percentage')?.textContent??document.querySelector('.canvas-zoom-pill')?.textContent}})()`)
   assert.ok(bounds.outerExtraX<=1&&bounds.outerExtraY<=1);report.ui_cards.push({kind,nodeId,createRevision:node.updatedAt,editedRevision:current.board.revision,collapseApplicable:!['note','conversation'].includes(kind),bounds})
