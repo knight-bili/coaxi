@@ -108,8 +108,8 @@ Board 删除在同一事务删除它的节点并保留 Board tombstone，不恢�
 本切片没有交互 PTY，不能据此声称已结算终端；引入真实终端前必须接入所属进程的关闭/删除生命周期。
 后续 `canvas_terminal` 移植基础使用原 board/node 查活跃终端来源，原请求/进程代次只存Core内存，不写画布表。
 拟接启动/读取/写入/resize/停止的闭合请求不接受cwd、shell、Owner或RootGrant注入，原代次和原输入编号不能由重连替换。
-父端registry、CLI helper、受管进程与删除/退出已有源码接线，没有新增公开方法或终端能力声明；
-Native/Web、读者和真实最低层进程owner继续属于C04必需实现。完整Core/Host与真实PTY尚未编译或运行，不据纯状态检查宣称终端交付。
+父端registry、CLI helper、受管进程与删除/退出已有源码接线；后续公开方法/终端能力、Native/Web与读者合同见本文件末节。
+真实最低层进程检查已接入原Host生命周期owner。完整Core/Host与真实PTY尚未编译或运行，不据纯状态检查宣称终端交付。
 内部启动类型增加必需coreGeneration，必须来自本次Core；输入增加必需expectedInputSequence，以原代次/序号/inputId/摘要核对，
 待定、未知及过期回执均不能换新编号重新写入。会话ID不进入数据库，完整内部状态与限额见[终端架构](../architecture/canvas.md#临时终端移植基础2026-10-16)。
 跨画板业务删除 funnel 的自动清理、导航组实时解析、Mission/Task 入口、Renderer 布局和客户端视口继续属于 I03 后续工作，
@@ -320,3 +320,7 @@ written清除原运输错误并开放后续；unknown/未入队不能用新编�
 客户端缓存最多64个窗口控制器，只安全淘汰无展示/未决/在途者；身份不能跨ThreadClient或Core目录scope复用。
 读者按同一代次逐块写Uint8Array并等待绘制确认；缺口重置并提示，Core/代次改变清空旧显示及无障碍live region。
 浏览器模拟覆盖这些交互，实际PTY、Native/Web平台资格和真实进程回收仍须阶段候选执行。
+
+Linux专用helper在Core父pidfd失活时回收其收养的自有后代；父进程身份来自Core冻结环境，客户端不能提交或更改。
+启动许可与回收互斥，清空还需内核确认无剩余子进程。Windows原Job、macOS原身份账本及Core统一清理完成条件继续适用。
+真实退出/强退/重启和无关进程保护由原Host生命周期测试拥有，源码就绪不代表实际平台已通过。

@@ -1897,3 +1897,13 @@ Core application仅做Rust语法解析，新模块与改动进程模块做格式
 生产CanvasSurface/CanvasTerminal/xterm挂在隔离Vite页，Core/PTY模拟；浏览器见证记录操作和发现/复验，不能把记录条数当正式通过数。
 旧错误残留、最小尺寸换行、fit内外padding及无障碍旧代次文本问题已修正；真实Shell/进程树、Native IPC/Host、剪贴板平台权限、
 软键盘visualViewport、多窗口与规模仍由相应阶段/平台owner实际验证，不用该夹具替代。
+
+终端真实进程场景复用`host-web.test.mjs`首个Desktop/Web共用Core生命周期owner与原数据目录，不新增整库fixture或Rust测试owner。
+辅助`canvas-terminal-process.mjs`使用绝对Node解释器运行真实PTY，隔离环境，不继承账户令牌或全局MCP；无模型请求。
+新增断言覆盖并发原启动去重、真实TTY/中文cwd、相同输入只写一次、陈旧序号/跨节点/参数注入拒绝、未认证HTTP拒绝、
+实际111×33缩放、256KiB输出洪流与128KiB/块数/单块上限、原始UTF8/控制字节、互动队列响应、node/board删除，
+自然退出码7与脱离父进程后代回收、显式stop/新代次及旧代次拒绝、计划退出、Core强退/重开不自动启动。
+回收同时核对实际Shell、helper、detached child退出与独立控制进程存活；macOS先核实私有账本实际捕获，随后重开Core恢复。
+Linux专用helper保护线程的父pidfd、启动/清空互斥和subreaper行为由这条实际Host链路验证，不用纯形状测试替代。
+阶段候选构建当前Core/Host及Web后，执行`node --test --test-name-pattern="Desktop and Web share one Core" scripts/lib/host-web.test.mjs`；
+随后原Host完整相关套件仍须回归。当前只完成这些场景的源码和脚本/独立worker检查，真实Core/helper/PTY场景未运行。

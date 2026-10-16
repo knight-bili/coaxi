@@ -4,7 +4,11 @@
 use std::{
     io::{BufRead, BufReader, Read, Write},
     path::PathBuf,
-    sync::{Arc, Mutex, mpsc},
+    sync::{
+        Arc, Mutex,
+        atomic::{AtomicBool, Ordering},
+        mpsc,
+    },
     time::Duration,
 };
 
@@ -103,6 +107,36 @@ impl Drop for OwnedChild {
 /// 父进程先冻结受管启动规格，再写入首个 Launch 帧。
 /// 三个二进制的专用早期入口调用它；普通Core/Host启动不会进入此分支。
 pub(crate) fn run() -> Result<()> {
+    #[cfg(target_os = "linux")]
+    let resources = crate::managed_process::HelperDescendantGuard::new(
+        std::env::var("ROVAI_CANVAS_CORE_PARENT_PID")?.parse()?,
+    )?;
+    #[cfg(target_os = "linux")]
+    let interrupted = resources.interruption();
+    #[cfg(not(target_os = "linux"))]
+    let interrupted = Arc::new(AtomicBool::new(false));
+    let result = run_session(interrupted, |slave, command| {
+        #[cfg(target_os = "linux")]
+        let _permit = resources.launch_permit()?;
+        let child = OwnedChild(slave.spawn_command(command)?);
+        #[cfg(target_os = "linux")]
+        resources.protect_direct_child(
+            child
+                .0
+                .process_id()
+                .context("canvas_terminal.child_identity_missing")?,
+        );
+        Ok(child)
+    });
+    #[cfg(target_os = "linux")]
+    resources.finish()?;
+    result
+}
+
+fn run_session(
+    interrupted: Arc<AtomicBool>,
+    spawn_child: impl FnOnce(&dyn portable_pty::SlavePty, CommandBuilder) -> Result<OwnedChild>,
+) -> Result<()> {
     let mut input = BufReader::new(std::io::stdin());
     let launch: HelperLaunch = read_frame(&mut input)?.context("canvas_terminal.launch_missing")?;
     let size = Size::new(launch.cols, launch.rows).map_err(anyhow::Error::msg)?;
@@ -136,7 +170,7 @@ pub(crate) fn run() -> Result<()> {
         command.env("PYTHONUTF8", "1");
         command.env("PYTHONIOENCODING", "utf-8");
     }
-    let mut child = OwnedChild(pair.slave.spawn_command(command)?);
+    let mut child = spawn_child(pair.slave.as_ref(), command)?;
     drop(pair.slave);
     let mut writer = pair.master.take_writer()?;
     let mut reader = pair.master.try_clone_reader()?;
@@ -184,7 +218,10 @@ pub(crate) fn run() -> Result<()> {
                             break;
                         }
                     }
-                    Ok(None) => break,
+                    Ok(None) => {
+                        interrupted.store(true, Ordering::Release);
+                        break;
+                    }
                     Err(error) => {
                         let _ = input_tx.send(Err(error));
                         break;

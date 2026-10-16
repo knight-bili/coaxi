@@ -604,6 +604,11 @@ pub(crate) fn launch_spec(
         .arg(HELPER_FLAG)
         .current_dir(&launch.cwd)
         .env("PATH", environment.path_value());
+    #[cfg(target_os = "linux")]
+    command.env(
+        "ROVAI_CANVAS_CORE_PARENT_PID",
+        std::process::id().to_string(),
+    );
     ManagedProcessLaunchSpec::capture(
         &command,
         ManagedProcessPurpose::RuntimeHost,

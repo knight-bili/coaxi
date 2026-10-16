@@ -10,6 +10,7 @@ import test from 'node:test'
 import { DatabaseSync } from 'node:sqlite'
 import { setTimeout as pause } from 'node:timers/promises'
 import { coreDataDirectoryArguments, removeEphemeralRuntimeCampFilesRoot } from './runtime-camp-files-root.mjs'
+import { canvasTerminalProcessFixture } from './canvas-terminal-process.mjs'
 
 const repository = resolve(import.meta.dirname, '../..')
 const binary = process.env.ROVAI_HOST_BIN ?? join(repository, 'target/debug', process.platform === 'win32' ? 'rovai-host.exe' : 'rovai-host')
@@ -17,7 +18,7 @@ const uiDirectory = process.env.ROVAI_WEB_UI ?? join(repository, 'out/web')
 
 // Owns the real Desktop pipe + HTTP + unique Core lifetime seam. It uses only
 // isolated directories and public record mutations, never a model or daily data.
-test('Desktop and Web share one Core while listener failure, revocation and stop stay local', { timeout: 90_000 }, async () => {
+test('Desktop and Web share one Core while listener failure, revocation and stop stay local', { timeout: 180_000 }, async () => {
   const fixture = await realpath(await mkdtemp(join(tmpdir(), 'rovai-host-web-')))
   const builtUiDirectory = uiDirectory
   const ownedUiDirectory = join(fixture, 'web-ui')
@@ -32,10 +33,11 @@ test('Desktop and Web share one Core while listener failure, revocation and stop
   console.log(JSON.stringify({ channel: 'automatic_acceptance', dataDir, skillLibraryRoot: join(dataDir, 'skills'), mcpConfigPath: join(dataDir, 'mcp.json'), runtime: false }))
   const uploadScratch = join(fixture, 'uploads')
   await mkdir(uploadScratch)
+  const terminalProcesses = await canvasTerminalProcessFixture(fixture, uploadScratch, dataDir)
   const host = launchHost(binary, [
     ...coreDataDirectoryArguments(dataDir),
     '--skill-library-root', join(dataDir, 'skills'), '--mcp-config-path', join(dataDir, 'mcp.json')
-  ], { cwd: repository, env: { ...process.env, TMPDIR: uploadScratch, TMP: uploadScratch, TEMP: uploadScratch } })
+  ], { cwd: repository, env: terminalProcesses.environment, windowsHide: true })
   const controllers = []
   try {
     await within(host.ready)
@@ -690,16 +692,20 @@ test('Desktop and Web share one Core while listener failure, revocation and stop
     const beforeExitReply = await fetch(`${restarted.origin}/api/v1/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ protocolVersion: 4, administratorToken: restarted.administratorToken }) })
     assert.equal(beforeExitReply.status, 200, 'the retained credential permits a fresh login')
     const beforeExit = await beforeExitReply.json()
+    await terminalProcesses.exercise(host, restarted.origin, beforeExit)
     const reply = await host.request('core.shutdown', { protocolVersion: 3, deadlineMs: 10_000 })
     assert.equal(reply.controlledShutdownCyclePersisted, true)
+    assert.equal(reply.deadlineExpired, false)
     assert.equal((await within(host.closed)).code, 0)
+    await terminalProcesses.assertPlannedReaped()
     await assert.rejects(fetch(restarted.origin, { signal: AbortSignal.timeout(2000) }))
     assert.equal(host.unmatchedResponses.length, 0, 'Web correlation responses must never leak into Desktop stdout')
     assert.ok(!host.stderr().includes(administrator), 'management credentials must not enter logs')
     assert.ok(!host.stderr().includes(first.token), 'session credentials must not enter logs')
-    const reopened = launch([...coreDataDirectoryArguments(dataDir), '--skill-library-root', join(dataDir, 'skills'), '--mcp-config-path', join(dataDir, 'mcp.json')])
+    const reopened = launch([...coreDataDirectoryArguments(dataDir), '--skill-library-root', join(dataDir, 'skills'), '--mcp-config-path', join(dataDir, 'mcp.json')], terminalProcesses.environment)
     try {
       await within(reopened.ready)
+      await terminalProcesses.assertRestarted(reopened)
       const reopenedWeb = await reopened.request('host.web.start', { listen: '127.0.0.1:0', uiDirectory: ownedUiDirectory })
       assert.equal(reopenedWeb.administratorToken, restarted.administratorToken)
       const recoveredSession = await fetch(`${reopenedWeb.origin}/api/v1/session`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${beforeExit.token}` }, body: JSON.stringify({ editor: { clientId: beforeExit.clientId, proof: beforeExit.editorProof } }) })
@@ -713,10 +719,14 @@ test('Desktop and Web share one Core while listener failure, revocation and stop
       const path = join(dataDir, 'new-conversation-preferences.json')
       await writeFile(path, '{broken')
       await assert.rejects(reopened.request(defaultsMethod + 'get'), 'corrupt preferences cannot masquerade as an empty team')
+      await terminalProcesses.armCrash(reopened)
+      assert.equal(reopened.child.kill('SIGKILL'), true)
+      await within(reopened.closed)
     } finally { await reopened.close() }
-    const disabled = launch([...coreDataDirectoryArguments(dataDir), '--skill-library-root', join(dataDir, 'skills'), '--mcp-config-path', join(dataDir, 'mcp.json')])
+    const disabled = launch([...coreDataDirectoryArguments(dataDir), '--skill-library-root', join(dataDir, 'skills'), '--mcp-config-path', join(dataDir, 'mcp.json')], terminalProcesses.environment)
     try {
       await within(disabled.ready)
+      await terminalProcesses.assertRestarted(disabled)
       // Explicit stop also revokes persisted Sessions before the first listener
       // start in a reopened Desktop Host, where credentials are still lazy.
       await disabled.request('host.web.stop')
@@ -726,7 +736,8 @@ test('Desktop and Web share one Core while listener failure, revocation and stop
     } finally { await disabled.close() }
   } finally {
     controllers.forEach((controller) => controller.abort())
-    await host.close()
+    await host.close({ timeoutMs: 15_000 })
+    await terminalProcesses.cleanup()
     await removeEphemeralRuntimeCampFilesRoot(dataDir, { temporaryDirectory: fixture })
     await rm(fixture, { recursive: true, force: true })
   }
@@ -850,4 +861,4 @@ test('Host clock consumes scheduled occurrences with Web stopped and in standalo
   }
 })
 
-function launch(args) { return launchHost(binary, args, { cwd: repository }) }
+function launch(args, env) { return launchHost(binary, args, { cwd: repository, ...(env ? { env } : {}), windowsHide: true }) }

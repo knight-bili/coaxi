@@ -270,8 +270,8 @@ ManagedProcess启动，复用Windows原Job归属和Unix既有身份回收；遵�
 父端未读时输出管道反压，输入队列最多8帧，单次输入16KiB；EOF、root退出和输出排空分别观察，不把它们冒充整树回收。
 
 Core父端registry、三个二进制的早期helper入口、原ManagedProcess父端、节点/画板删除与计划退出已编码。
-公共方法/能力、Native/Web准入、终端读者与卡片已接线；实际最低层进程owner尚待补齐，尚未编译完整Core或启动实际PTY。
-纯状态源单独编译通过不代表辅助进程或完整Core编译通过；完整PTY/Host/平台必须在阶段候选实际验证，C04保持开发中。
+公共方法/能力、Native/Web准入、终端读者与卡片已接线；实际最低层进程检查已接入原Host生命周期owner，尚未编译完整Core或启动实际PTY。
+纯状态源单独编译通过不代表辅助进程或完整Core编译通过；C04代码集齐后转C05/C06，完整PTY/Host/平台资格由阶段候选实际验证。
 
 启动绑定原Core generation和原请求，旧Core的未结请求不能在重启后重开Shell。一个节点同代次只接受原参数，
 新启动必须匹配已退出的原代次；活动和回收中进程合计最多16个。最近64个已退出会话保留正文，其他会话只保留
@@ -330,4 +330,18 @@ xterm6.0.0、fit0.11.0及web-links0.12.0沿固定供体版本接入，无新增�
 
 低层定向测试及生产画布/xterm的浏览器夹具已检查未知恢复、双卡、换页、停止/新代次、缩放、日夜主题与删除目标。
 夹具Core/PTY为模拟，不证明实际Host、Native IPC、Shell、进程树或平台通过；证据见
-`integration/execution/i03-terminal-ui-result.json`。实际进程owner及集中工程验证仍是C04/C06必需项。
+`integration/execution/i03-terminal-ui-result.json`。实际进程owner源码见下节，集中工程验证仍是C06必需项。
+
+## 终端进程退出保护与实际测试（2026-10-16）
+
+Linux专用PTY helper通过Core冻结环境取得父进程身份，并用pidfd核对实际父子关系及存活；该字段不进入公开RPC。
+仅helper设置child subreaper，普通Core/Runtime的收养行为保持既有规则。保护线程观察Core父pidfd和本helper退出意图，
+平时不扫描`/proc`；父进程硬退出或本次会话收尾时，捕获helper自有后代，用pidfd终止，收养并回收已退出孤儿。
+启动锁与保护线程共用，防止清空后又产生新Shell；portable-pty直接child由原owner等待，保留实际退出码。
+除已捕获进程均退出外，还需内核`waitid(WNOWAIT)`确认没有子进程，才算helper清理完成；扫描失败不伪报清空。
+这不改变Core的原ManagedProcess关闭、实际树为空与会话`cleanupComplete`条件；Windows沿原Job，macOS沿原持久身份账本恢复。
+
+`scripts/lib/canvas-terminal-process.mjs`扩展原`host-web.test.mjs`的唯一Core生命周期夹具，使用隔离HOME/PATH、
+绝对Node交互解释器和真实PTY；同一Host管道与已认证HTTP交替调用。子进程使用带随机nonce的本机证明服务，
+清理请求须匹配本夹具身份；另起独立控制进程，所有终端回收后均要求其仍活跃。macOS在硬退出前核实后代身份已实际落盘，
+不靠固定睡眠推定已捕获。测试脚本源码与独立worker冒烟不能证明这些真实Core/PTY场景已通过，结果随C06候选记录。

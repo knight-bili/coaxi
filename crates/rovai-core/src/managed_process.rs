@@ -30,6 +30,9 @@ mod windows;
 #[path = "managed_process/linux.rs"]
 mod process_tree;
 
+#[cfg(target_os = "linux")]
+pub(crate) use process_tree::HelperDescendantGuard;
+
 #[cfg(target_os = "macos")]
 #[path = "managed_process/macos.rs"]
 mod process_tree;
