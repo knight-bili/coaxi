@@ -310,9 +310,21 @@
         "I03-C05"
       ],
       "done_when": "真实Core16/17容量及释放重开、连接恢复、适用中文IME/剪贴板行为受控；窗口64控制器与真实PTY数量分开。",
-      "next_action": "沿既有Host/PTY生命周期owner补真实容量；保留现有二进制和隔离启动约束。",
+      "next_action": "Core/Host实际容量与重连已核定；Native输入法/剪贴板及当前候选界面复验随集中候选补齐，先推进R08独立规模/通知工作。",
       "owner": "Codex",
-      "external_condition": "none_confirmed_blocking_current_independent_work"
+      "external_condition": "none_confirmed_blocking_current_independent_work",
+      "latest_partial_verification": "i03-r07-core-terminal-capacity-verification.json",
+      "verified_core_boundaries": [
+        "16 actual owned helper processes and 16 unique Node interactive TTY shells at the original directory",
+        "17th start rejected without extra helper/session; released slot admits another target; replayed old start never relaunches",
+        "real loopback Host listener stop, revoked old session, fresh Owner login and HTTP reconnect retain original Core, generation, process, cursor and exact input receipt; replay causes one side effect",
+        "actual UTF8 stdin split inside a Chinese character preserves original Chinese and emoji file bytes; explicit restart gives new generation and rejects late old input",
+        "planned shutdown reaps 16 terminal trees and leaves unrelated control process alive; fresh Core preserves canvas nodes without reopening shells or replaying old-Core launch"
+      ],
+      "remaining_native_boundaries": [
+        "Native real Windows IME composition and clipboard/paste behavior",
+        "current final candidate terminal collapse/reopen and connection UI regression; old related Native evidence remains applicable only within its source scope"
+      ]
     },
     {
       "id": "I03-R08",
@@ -564,5 +576,5 @@
     "真实移动平台按I10推进；终端平台专属保护按相应平台阶段补齐，不能被Windows结果代替"
   ],
   "change_control": "剩余编号固定；发现缺陷归入已有组并说明影响。新增必需范围须有来源和编号变更记录；不能为减少数量合并隐藏未完成条件。",
-  "latest_verification": "i03-r06-file-html-progress.json"
+  "latest_verification": "i03-r07-core-terminal-capacity-verification.json"
 }

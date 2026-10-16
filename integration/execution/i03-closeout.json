@@ -99,7 +99,7 @@
       "name": "临时终端节点生命周期",
       "status": "implementation_ready_for_stage_verification",
       "done_when": "真实临时PTY启动、输出、resize、关闭、删除及重连符合现行合同；不把I05完整Git工程工作区提前并入",
-      "latest_partial_evidence": "i03-terminal-process-owner-result.json",
+      "latest_partial_evidence": "i03-r07-core-terminal-capacity-verification.json",
       "remaining_implementation_batches": [],
       "remaining_verification": "已有实际生命周期和rc15终端相关回归已结算；R07只补16/17真实PTY容量、重连与适用Windows输入/剪贴板。其他平台资格在正式平台矩阵保留，不能由Windows结果替代。"
     },
@@ -245,6 +245,6 @@
     "private_cases_open": 0,
     "verified_work_groups": 5
   },
-  "latest_group_verification": "i03-r06-file-html-progress.json",
+  "latest_group_verification": "i03-r07-core-terminal-capacity-verification.json",
   "latest_preparation": "i03-r01-private-workflow-preparation.json"
 }

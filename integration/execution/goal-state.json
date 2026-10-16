@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "R06真实App发现隐藏HTML副本使实际文档8超4；修复代码/52项检查与类型已过，集中候选运行待补；继续R07独立终端验证。",
+  "current_slice": "R07实际Core/Host容量、释放重开、HTTP重连/原回执及16树回收八项通过；Native输入法/剪贴板与R06修复仍待集中候选；先推进R08。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "R07 actual PTY capacity and reconnect on unchanged Core; accumulate R06 repair with remaining code for the next candidate; execute all R06 phases before closure",
+    "推进R08规模/源IO/通知和R09原版UI；下一集中候选补齐R06全部启动/HTML回归与R07 Native输入/剪贴板/界面复验，相关未变Core结果不重复运行。",
     "阶段剩余清单固定为i03-closeout-ledger.json的I03-R01–R10，原C01–C06均有映射；暂缺环境只单列待办，继续可独立的I02余项和I04-I12/BUF，不把后续功能提前塞入I03。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "r06_repair_coded_native_pending_r07_independent_next",
+  "current_slice_status": "r07_core_capacity_verified_native_pending_r08_next",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -231,5 +231,6 @@
   "latest_r02_complete_boundaries_verification": "i03-r02-complete-send-boundaries-verification.json",
   "latest_r04_process_interruption_verification": "i03-r04-process-interruption-verification.json",
   "latest_r05_object_cold_verification": "i03-r05-object-cold-diff-verification.json",
-  "latest_r06_partial_verification": "i03-r06-file-html-progress.json"
+  "latest_r06_partial_verification": "i03-r06-file-html-progress.json",
+  "latest_r07_core_capacity_verification": "i03-r07-core-terminal-capacity-verification.json"
 }
