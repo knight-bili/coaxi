@@ -119,12 +119,14 @@
       "id": "PC10",
       "scenario": "上传中切 Core 或结束单聊",
       "expected": "迟到结果不污染新上下文",
-      "status": "partial_real_native_verified",
+      "status": "engineering_verified",
       "verified": [
-        "实际文件输入input/change均可信，真实Main/Core完成上传后延迟回复；结束旧私聊、删除旧卡并打开新目标，迟到回复未污染新正文/附件/引用/消息/Run"
+        "实际文件输入input/change均可信，真实Main/Core完成上传后延迟回复；结束旧私聊、删除旧卡并打开新目标，迟到回复未污染新正文/附件/引用/消息/Run",
+        "真实Web文件上传在Core A提交后暂停HTTP回复，同页切到独立Core B并输入；原执行环境和暂停请求确已失效，B正文/附件/引用/消息/Run保持，A材料不转移。两个Host正常退出。"
       ],
-      "remaining": "实际切换到不同Core连接下的迟到上传仍待核验；结束原单聊分支不能替代它",
-      "evidence": "i03-r01-native-complete-input-verification.json#pc10_partial"
+      "remaining": null,
+      "evidence": "i03-r01-cross-core-upload-verification.json#qualification",
+      "verification_layer": "rc18实际Native结束旧单聊的迟到回复；rc19实际双Core浏览器导航和旧页面失效隔离；无外部模型"
     },
     {
       "id": "PC11",
@@ -280,6 +282,6 @@
     }
   ],
   "settlement": "i03-closeout-settlement.json",
-  "latest_verification": "i03-r01-native-complete-input-verification.json",
+  "latest_verification": "i03-r01-cross-core-upload-verification.json",
   "latest_preparation": "i03-r01-private-workflow-preparation.json"
 }
