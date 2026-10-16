@@ -104,7 +104,10 @@ async function qualify(window){
   record('native_terminal_stop_completes_process_cleanup')
   report.status='passed'
  }catch(error){report.status='failed';report.error=String(error.stack??error);report.native_keys=await evaluate('window.nativeKeys').catch(()=>null);report.dom=await evaluate('document.body.innerText.slice(-2500)').catch(()=>null);if((report.screenshots?.length??0)<3){const path=join(config.evidence,'failure.png');await writeFile(path,(await window.webContents.capturePage()).toPNG()).then(()=>{(report.screenshots??=[]).push(path)}).catch(()=>{})}}
- finally{report.finished_at=new Date().toISOString();await writeFile(join(config.evidence,'result.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({status:report.status,evidence:config.evidence}));process.exitCode=report.status==='passed'?0:1;app.quit()}
+ finally{
+  if(report.status==='failed')await evaluate(`(()=>{document.querySelector('.canvas-board-dialog .app-dialog-close:not(:disabled)')?.click();return true})()`).catch(()=>{})
+  report.finished_at=new Date().toISOString();await writeFile(join(config.evidence,'result.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({status:report.status,evidence:config.evidence}));process.exitCode=report.status==='passed'?0:1;app.quit()
+ }
 }
 async function qualifyCanvasVisual(window,{evaluate,wait,rpc}){
  window.unmaximize();window.setContentSize(1440,920)
@@ -138,6 +141,7 @@ async function qualifyCanvasVisual(window,{evaluate,wait,rpc}){
  await evaluate(`new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))`)
  await evaluate(`(()=>{document.querySelector('.canvas-boards-home .canvas-primary-button').click();return true})()`)
  await wait(`Boolean(document.querySelector('.canvas-board-dialog input[data-dialog-autofocus]'))`)
+ await evaluate(`Promise.all(document.querySelector('.canvas-board-dialog').getAnimations({subtree:true}).map(animation=>animation.finished.catch(()=>undefined)))`)
  assert.equal(await evaluate(`document.querySelectorAll('.canvas-board-dialog .canvas-color-choice').length`),12)
  report.dialog_style=await evaluate(`(()=>{const panel=document.querySelector('.canvas-board-dialog'),input=panel.querySelector('input'),style=getComputedStyle(panel);return {width:panel.getBoundingClientRect().width,padding:style.paddingTop,radius:style.borderRadius,inputRadius:getComputedStyle(input).borderRadius}})()`)
  assert.equal(report.dialog_style.width,448);assert.equal(report.dialog_style.padding,'24px');assert.equal(report.dialog_style.radius,'28px');assert.equal(report.dialog_style.inputRadius,'999px')
