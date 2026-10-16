@@ -37,10 +37,10 @@
     {
       "stage_id": "I03",
       "name": "完整无限画布与对象绑定",
-      "candidate_version": "fusion-i03-rc.5",
-      "status": "candidate_partial_engineering_verified",
-      "frozen_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3",
-      "validation_batch": "I03-repair-04",
+      "candidate_version": "fusion-i03-rc.6",
+      "status": "repair_candidate_pending_freeze",
+      "frozen_commit": null,
+      "validation_batch": "I03-repair-05",
       "validation_runs": [
         {
           "kind": "local_windows_cargo_build",
@@ -160,9 +160,14 @@
             "passed": 23,
             "failed": 3
           }
+        },
+        {
+          "candidate_version": "fusion-i03-rc.5",
+          "frozen_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3",
+          "state": "native_keyboard_and_file_api_passed_html_concurrent_entry_finding"
         }
       ],
-      "repair_reason": "Fix three actual candidate findings together: Windows private test directory, normalized File expectations, closed helper Ready/Stop shapes",
+      "repair_reason": "HTML shared site loses overlapping admitted iframe entry navigations; Desktop Main bundle rebuild required, no Rust/Core/Web source change",
       "windows_build": "passed",
       "related_rust_unique_owners": 26,
       "related_rust": "passed",

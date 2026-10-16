@@ -34,7 +34,8 @@
         "新生命周期Rust/Host入口及原第三owner断言随阶段候选编译和真实运行",
         "实际Host/Native IPC/资源授权验证后启用最终文件入口，UI模拟验证不能替代",
         "完整PC01-PC24适用工程场景与异常恢复待集中验证；发现代码缺口回到C01修复",
-        "实际大材料/日志枚举/事务锁规模归I03-C05验证；本批32副本只验证字典读取次数"
+        "实际大材料/日志枚举/事务锁规模归I03-C05验证；本批32副本只验证字典读取次数",
+        "复用隔离App重启时2个测试Thread的Published Attachment View出现路径缺失完整性事件；文件卡片文本读取不受影响，私聊材料资格前须核对该恢复链，不把此日志当通过"
       ]
     },
     {
@@ -54,7 +55,7 @@
       "name": "文件节点真实权限与预览",
       "status": "implementation_ready_for_stage_verification",
       "done_when": "路径不能绕过现行文件权限，卡片间身份隔离，关闭/恢复与变化处理有证据",
-      "latest_partial_evidence": "i03-file-preview-ui-result.json",
+      "latest_partial_evidence": "i03-c06-html-entry-repair-result.json",
       "remaining_verification": "原canvas Rust已通过；真实生产Main/preload/Core/NTFS文件API7业务断言通过，含Unicode/#、代次/伪造grant/独立handle和释放。实际文件卡片、HTML、导航与完整App冷路由/规模仍待；原文件API允许显式外部具体文件，不得擅自改成项目根白名单。"
     },
     {
@@ -123,9 +124,12 @@
         "Core受控观察IO在途时真实互动响应、满额拒绝、取消后名额保持/实际完成释放均通过；不是所有大文件或慢盘性能资格",
         "实际Windows隔离Desktop Main/preload/Core握手；生产画布三卡/选择恢复；原生可信键盘输入2+3，真实PTY计算5且xterm读者可见绘制、停止回收、App计划退出均通过",
         "生产Desktop文件API经实际Core/NTFS：7业务断言+1准备步骤通过，保留原显式外部具体文件策略；无模型或模拟Core",
-        "原rovai-web公开操作投影1owner先非零list再实际运行通过"
+        "原rovai-web公开操作投影1owner先非零list再实际运行通过",
+        "真实文本文件卡片可见；HTML HTTP入口缺陷原owner修复前1fail，修复后原站点/文件服务/资源池3owner文件91pass1原平台skip"
       ],
-      "open_findings": [],
+      "open_findings": [
+        "同一HTML卡片及保留工作区两个合法入口交换重叠，单布尔位导致合法跳转403；已改逐入口计数并在异步来源复核前认领，原授权和额外请求拒绝均保留，待新Desktop真实复验"
+      ],
       "remaining_checks": [
         "私聊材料完整真实流程/PC01-PC24与文件卡片实际挂载/HTML，不用直接文件API和局部Core测试替代",
         "Mission/Task/Diff/文件真实原工作区路由、焦点/编辑器/崩溃/冷恢复及同Thread多卡镜像",
