@@ -1098,7 +1098,7 @@ async function qualifyReadyDiff(window,{evaluate,wait,rpc}){
  Object.assign(report.ready_diff_context,{boardId,nodeId})
  const inspect=async()=>{
   await openCanvasBoard(evaluate,wait,boardId)
-  await wait(`Boolean([...document.querySelector('[data-id="${nodeId}"]').querySelectorAll('button')].find(button=>button.textContent==='读取详情'&&!button.disabled))`)
+  await wait(`(()=>{const row=document.querySelector('[data-id="${nodeId}"]');return Boolean(row&&[...row.querySelectorAll('button')].find(button=>button.textContent==='读取详情'&&!button.disabled))})()`)
   await evaluate(`(()=>{[...document.querySelector('[data-id="${nodeId}"]').querySelectorAll('button')].find(button=>button.textContent==='读取详情').click();return true})()`)
   await wait(`document.querySelector('.canvas-object-details')?.dataset.missionId===${JSON.stringify(missionId)}`)
  }
