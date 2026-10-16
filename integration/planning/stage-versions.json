@@ -106,6 +106,21 @@
           "kind": "actual-host-pty",
           "source_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3",
           "exit_code": 0
+        },
+        {
+          "kind": "web-public-projection-1",
+          "source_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3",
+          "exit_code": 0
+        },
+        {
+          "kind": "native-desktop-keyboard-visible-4",
+          "source_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3",
+          "exit_code": 0
+        },
+        {
+          "kind": "native-file-api-7-plus-fixture",
+          "source_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3",
+          "exit_code": 0
         }
       ],
       "engineering_validation": "in_progress",
@@ -152,7 +167,8 @@
       "related_rust_unique_owners": 26,
       "related_rust": "passed",
       "actual_host_pty": "passed",
-      "native_app_scale_platform": "pending"
+      "native_app_scale_platform": "full_flows_scale_and_platform_pending",
+      "native_desktop": "partial_actual_keyboard_output_stop_and_file_api_passed"
     },
     {
       "stage_id": "I04",

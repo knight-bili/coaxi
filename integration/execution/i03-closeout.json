@@ -55,7 +55,7 @@
       "status": "implementation_ready_for_stage_verification",
       "done_when": "路径不能绕过现行文件权限，卡片间身份隔离，关闭/恢复与变化处理有证据",
       "latest_partial_evidence": "i03-file-preview-ui-result.json",
-      "remaining_verification": "原2个canvas Rust owner含158/208、实际Core/Host/Native IPC、真实文件权限/HTML与完整App原工作区导航及冷路由规模随阶段候选验证；模拟界面和原Main库检查不代替。发现代码缺陷回C03修复。"
+      "remaining_verification": "原canvas Rust已通过；真实生产Main/preload/Core/NTFS文件API7业务断言通过，含Unicode/#、代次/伪造grant/独立handle和释放。实际文件卡片、HTML、导航与完整App冷路由/规模仍待；原文件API允许显式外部具体文件，不得擅自改成项目根白名单。"
     },
     {
       "id": "I03-C04",
@@ -64,7 +64,7 @@
       "done_when": "真实临时PTY启动、输出、resize、关闭、删除及重连符合现行合同；不把I05完整Git工程工作区提前并入",
       "latest_partial_evidence": "i03-terminal-process-owner-result.json",
       "remaining_implementation_batches": [],
-      "remaining_verification": "Windows真实Host/HTTP/管道/PTY完整生命周期与终端5原owner已通过；Native IPC/实际App操作、Linux保护线程和macOS账本恢复及各平台资格仍待，不能用Windows结果代替。"
+      "remaining_verification": "Windows Host/HTTP/管道/PTY完整生命周期、终端5Rust owner及真实Desktop原生键盘/可见结果/停止回收均通过；其他真实多卡重连、窗口/平台与IME/剪贴板、Linux保护线程、macOS账本恢复仍需各自资格，不能由当前单卡和Windows结果替代。"
     },
     {
       "id": "I03-C05",
@@ -75,7 +75,7 @@
       "checked_subtasks": [
         {
           "id": "C05-cold",
-          "status": "source_reviewed_related_local_checks_passed_actual_app_pending",
+          "status": "partial_real_desktop_three_cards_board_selection_and_no_auto_terminal_verified",
           "scope": "Host/Core/board展示恢复、真实pin隔离、只读Thread恢复和原工作区导航"
         },
         {
@@ -120,19 +120,23 @@
         "extended+slow当前1248测试非零入册；定向26项23通过3失败，完整上下文冻结字节慢测通过",
         "rc.5修复后当前SHA三原生程序新构建0，完整Host/HTTP/PTY1owner再验证0",
         "7项必要Rust复验全部通过；替换旧失败及4个重复终端结果后26个不同相关owner通过（19未变复用+7当前），不累计运行次数",
-        "Core受控观察IO在途时真实互动响应、满额拒绝、取消后名额保持/实际完成释放均通过；不是所有大文件或慢盘性能资格"
+        "Core受控观察IO在途时真实互动响应、满额拒绝、取消后名额保持/实际完成释放均通过；不是所有大文件或慢盘性能资格",
+        "实际Windows隔离Desktop Main/preload/Core握手；生产画布三卡/选择恢复；原生可信键盘输入2+3，真实PTY计算5且xterm读者可见绘制、停止回收、App计划退出均通过",
+        "生产Desktop文件API经实际Core/NTFS：7业务断言+1准备步骤通过，保留原显式外部具体文件策略；无模型或模拟Core",
+        "原rovai-web公开操作投影1owner先非零list再实际运行通过"
       ],
       "open_findings": [],
       "remaining_checks": [
-        "其他阶段相关Rust/Host projection和适用升级/迁移与冻结输入回归；未列为通过的保持待验",
-        "真实Native IPC/桌面App、文件资源授权与HTML预览、冷路由、多卡和大材料交互响应",
-        "阶段适用平台资格与PC01-PC24/正式场景证据；缺环境可独立推进后续阶段，最终MVP必需项不豁免"
+        "私聊材料完整真实流程/PC01-PC24与文件卡片实际挂载/HTML，不用直接文件API和局部Core测试替代",
+        "Mission/Task/Diff/文件真实原工作区路由、焦点/编辑器/崩溃/冷恢复及同Thread多卡镜像",
+        "真实多卡/资源释放/规模、大材料交互响应与其他适用迁移、冻结输入、平台和正式场景证据；环境缺项单列，继续独立后续阶段"
       ],
       "resolved_findings": [
         "Windows私有目录夹具按原规则创建并通过",
         "文件pin规范几何/标题/颜色预期及精确路径通过",
         "Ready/Stop空struct闭合额外字段且原JSON不变；所有坏帧/拆包/超量断言和真实生命周期通过"
-      ]
+      ],
+      "latest_native_evidence": "i03-c06-native-result.json"
     }
   ],
   "state_rule": "代码完成、工程验证通过、待环境验证分别记录；无代码缺口且工程验证满足时由Codex收口；缺环境继续独立后续工作，最终MVP不豁免",

@@ -1917,4 +1917,21 @@ Core application仅做Rust语法解析，新模块与改动进程模块做格式
 回收同时核对实际Shell、helper、detached child退出与独立控制进程存活；macOS先核实私有账本实际捕获，随后重开Core恢复。
 Linux专用helper保护线程的父pidfd、启动/清空互斥和subreaper行为由这条实际Host链路验证，不用纯形状测试替代。
 阶段候选构建当前Core/Host及Web后，执行`node --test --test-name-pattern="Desktop and Web share one Core" scripts/lib/host-web.test.mjs`；
-随后原Host完整相关套件仍须回归。当前只完成这些场景的源码和脚本/独立worker检查，真实Core/helper/PTY场景未运行。
+随后原Host完整相关套件仍须回归。I03-C06 当前 Windows 候选已实际通过上述 Host/Core/helper/PTY 生命周期；
+Linux、macOS 和其他未记录的场景仍须各自验证，不能由 Windows 结果替代。
+
+`scripts/fixtures/canvas-native-input.mjs` 拥有生产 Desktop Main/preload、真实 Core 和实际 PTY 之间的原生键盘边界。
+普通控制器 mock 和 Host 管道测试不经过 Chromium 输入及 xterm 绘制，不能代替这个 owner。
+它在父执行者已经装配并隔离的候选 App 中包装原 Main，依次核对画板/节点恢复、可用按钮、原生可信键盘事件、
+Core 实际计算、终端读者可见绘制和停止后的进程回收；不模拟请求、不运行模型，也不新增 Rust owner。
+配置由 `ROVAI_C06_NATIVE_CONFIG` 指向的本次私有 JSON 提供 `source_commit`、`evidence` 和 `production_main`；
+父执行者必须先按本地隔离合同明确 App、显式 data root、Skill Library、MCP 和独立环境目录。
+父执行者必须读取 `result.json.status`，并核对组件源码和产物，不能仅以 Electron 退出码判定通过。
+Windows 当前候选已通过这四项检查，并保存实际显示 `2+3` 与 `5` 的截图；导航和按钮使用生产 DOM handler，
+键盘使用 Electron `sendInputEvent`，不据此宣称 OS 鼠标、剪贴板、IME、触控或多窗口均已通过。
+
+同候选的实际 Desktop 文件检查经过生产 preload/Main/FilePreviewService/Core 与 NTFS，覆盖中文及 `#` 文件名、
+旧代次拒绝、伪造目录 grant 拒绝、两个 Thread 的独立文件 handle、单 handle 释放和会话清理。
+既有显式具体文件访问策略保持：文件位于项目外不自动构成拒绝条件；具体文件访问不产生目录 grant。
+这部分不代替文件卡片完整交互、HTML 页面、私聊附件授权或完整冷路由/多卡规模资格。
+本批实际结果和源码/产物绑定见 `integration/execution/i03-c06-native-result.json`。

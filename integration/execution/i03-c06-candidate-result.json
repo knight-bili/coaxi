@@ -3,19 +3,33 @@
   "stage": "I03",
   "closeout_group": "I03-C06",
   "status": "in_progress",
-  "recorded_at": "2026-10-16T05:07:05.142834+00:00",
+  "recorded_at": "2026-10-16T05:44:54.409845+00:00",
   "source_binding": {
-    "base_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3",
+    "base_commit": "db1e335598fbaf807b6bb00013a524b24db70013",
     "kind": "exact_worktree_sha256_before_commit",
     "files": {
-      "crates/rovai-core/src/application.rs": "6dd5d2070103fe562c52bf91d997ec5bf40cd67d9cc77833e350c1936de76110",
+      "apps/desktop/src/main/core-client.ts": "242efdea1ff985e0e366fbd05c73f5c7c2d8c39f239e715a79d753075a26a41c",
+      "apps/desktop/src/renderer/src/canvas-terminal-reader.ts": "78101fc2e4618ae71ee8b1d9b83d7d9fec01f1ac83c052e757c60e277eecc64e",
+      "apps/desktop/src/renderer/src/canvas-file.ts": "d66dfa3d201c45bd46c0530217f85bc8b2a349f1e99fd82e1381429b57dd17a1",
+      "docs/development/testing.md": "08178948a27505949336fc8978de3dfc20f0fdab4d979f6e4d91f631e8561acd",
+      "apps/desktop/src/main/file-preview/file-preview-authority.ts": "18f533d393fd5f89be73b5644e68785c5aeacf5ef057f2c5b5038b2114a632c8",
+      "apps/desktop/src/renderer/src/CanvasTerminal.tsx": "5b9415e1531478efdff5acb368a38ba838c12991bae0bafd754c6b7b72c3df92",
+      "apps/desktop/src/preload/index.ts": "6e967337ab894d853dab1bcd459af6106f749de76fdc93e6b414de85b34ab1c8",
       "crates/rovai-core/src/canvas_node.rs": "e18a62ced0d45ef17acd437991654d60054ecc3f36176ce7c816c2ba14f25498",
-      "crates/rovai-core/src/canvas_terminal/helper.rs": "53ea8b282231798d1c4303e9fcddd7a4c38f62f51ee0c0876907c816d55ac4e6",
+      "integration/planning/stage-versions.json": "8174569f07323b80c29a0f76917b67356e1210b9ab73780e3ccba644c0c5238c",
+      "apps/desktop/src/main/file-preview/file-preview-access.ts": "855527a6e86c487cf356a401b02d3bace30e33922fddbf5ec3567b9168888873",
+      "integration/execution/goal-state.json": "8e874efa0ab45b058e08f9dd590b64b9fa4231705b8b11e3a8dbfc59578ff668",
+      "crates/rovai-core/src/application.rs": "6dd5d2070103fe562c52bf91d997ec5bf40cd67d9cc77833e350c1936de76110",
       "crates/rovai-core/src/canvas_terminal/manager.rs": "706df64aa5c67216209266abed21d441a69eab6500b3252ee490295d4a091caf",
+      "crates/rovai-core/src/canvas_terminal/helper.rs": "53ea8b282231798d1c4303e9fcddd7a4c38f62f51ee0c0876907c816d55ac4e6",
+      "apps/desktop/src/file-preview-reference.ts": "7463017c138c751fafa837337b3144e226af062f5080beb01657913479362a3f",
+      "integration/execution/i03-closeout.json": "0d74526489f467682e3b2096be0fcb795f52a82f6ad060b6da444446df20cd9f",
       "crates/rovai-core/src/canvas_terminal/manager/tests.rs": "b80c8bc020d6a892ce0408ef58a1d013ae00fe2db426f787b2e343983fb31fbe",
-      "integration/execution/goal-state.json": "2a47e8d5b90550e8660a75f57cb5c7b8d8fc6ac306451d08e43b23a76a6861c6",
-      "integration/execution/i03-closeout.json": "361af62ea5fd0021f1e8d1526217eebba278874bc4bf765ba08fec91ddc88a83",
-      "integration/planning/stage-versions.json": "3690593adc199d4e723154991b6ecb3c2a04d79aa6a3eaa279aaafa6560b4f6e"
+      "integration/execution/i03-c06-native-result.json": "1445815ffed792ef9e73a98b22ea06e2558427e7d762edbcc4f348ade63eb04c",
+      "apps/desktop/src/main/index.ts": "6e225d0010a7d820209a969207e0dffb46b1d7c974a86279ecac8a5f39f66a5a",
+      "apps/desktop/src/renderer/src/canvas-terminal-controller.ts": "ccd7319816088174101decd55deff9a01d5a8d4a73eecfadd01822641dedc2da",
+      "scripts/fixtures/canvas-native-input.mjs": "b774e339f5011d2806da5a246bb4bb09b0c9b34a609e286c196b7a816184a6cd",
+      "apps/desktop/src/main/file-preview/file-preview-service.ts": "fbebcfd10fd9a7c46156915b6712764a27892ab97db902c2a173f6b66d28580a"
     }
   },
   "artifact_binding": {
@@ -330,7 +344,7 @@
     "real_user_data_or_credentials": false,
     "customer_action_required_now": false
   },
-  "next": "I03-C06继续实际Native IPC与桌面App、文件授权/预览、冷路由/多卡/大材料规模、适用迁移/平台及PC01-PC24/正式场景证据；当前26相关Rust、3材料、Windows真实Host/PTY、types/Web/Desktop已有通过结果，按改动范围复用。发现代码缺口回所属C01-C05，不等用户阶段技术验收。",
+  "next": "I03-C06继续文件卡片实际挂载/HTML、私聊附件/上传真实授权及完整PC01-PC24适用流程；独立Mission/Task/Diff/文件实际工作区路由与焦点/冷恢复；多卡/大材料响应和适用平台。Windows原生键盘/终端可见输出/文件API及Web投影已有证据，复用未变结果，不能把三卡或直接API检查当完整UI/规模通过。",
   "format_gate": {
     "before_exit": 1,
     "after_exit": 0,
@@ -380,5 +394,6 @@
     "agent_model": false,
     "actual_windows_pty": true,
     "full_native_ui": false
-  }
+  },
+  "native_engineering_evidence": "i03-c06-native-result.json"
 }
