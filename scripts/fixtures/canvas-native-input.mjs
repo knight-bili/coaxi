@@ -24,6 +24,12 @@ app.on('browser-window-created',(_event,window)=>{
  window.webContents.once('did-finish-load',()=>{void qualify(window)})
 })
 async function qualify(window){
+ report.renderer_errors=[]
+ window.webContents.on('console-message',(details,...legacy)=>{
+  const level=details.level??legacy[0],message=details.message??legacy[1]
+  if((level==='error'||typeof level==='number'&&level>=2)&&typeof message==='string')report.renderer_errors.push(message.slice(0,2000))
+  if(report.renderer_errors.length>8)report.renderer_errors.shift()
+ })
  const evaluate=async expression=>{
   const result=await window.webContents.executeJavaScript(`(async()=>{try{return {ok:true,value:await (${expression})}}catch(error){return {ok:false,error:String(error.stack??error)}}})()`,true)
   if(!result.ok)throw Error(result.error)
@@ -548,10 +554,10 @@ async function qualifyPrivateUi(window,{evaluate,wait,rpc}){
   window.webContents.sendInputEvent({type:'mouseUp',button:'left',clickCount:1,...point})
  }
  await clickNative(`document.querySelector('[data-id="${scopes[1].nodeId}"] .canvas-card-handle button[aria-label="移至侧边"]')`)
- await wait(`Boolean(${frame}.querySelector('.canvas-conversation-heading button[aria-label="放回画布"]'))`)
+ await wait(`Boolean(${frame}?.querySelector('.canvas-conversation-heading button[aria-label="放回画布"]'))`)
  assert.ok(await evaluate(`${frame}.querySelector('textarea')===window.nativePrivateComposer`))
  await clickNative(`${frame}.querySelector('.canvas-conversation-heading button[aria-label="放回画布"]')`)
- await wait(`${frame}.classList.contains('is-inline')&&!${frame}.querySelector('.canvas-conversation-heading')`)
+ await wait(`Boolean(${frame}?.classList.contains('is-inline'))&&!${frame}?.querySelector('.canvas-conversation-heading')`)
  assert.ok(await evaluate(`${frame}.querySelector('textarea')===window.nativePrivateComposer`))
  record('real_mouse_moves_private_card_between_inline_and_drawer_without_remounting_composer')
  const after=await rpc('singleChat.get',{conversationId,composerScope:scopes[1]})
