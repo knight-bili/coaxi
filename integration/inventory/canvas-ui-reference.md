@@ -49,7 +49,7 @@ Mission、Task、Diff、文件工作区仍进入原对象。此前真实 C02 检
 
 原Codeg摘要的元信息按 `conversation-card-node.tsx:114–200` 与 `conversation-status-dot.tsx` 继续适配。R09新增代码从实际 active 成员和原 AgentProfile 读取明确选择的模型，标注“配置”以区别原生会话的实际观测；私聊只读精确队员，不把 Default Lead 配置套给所有卡片。默认模型没有实际ID时保持空，不生成推测名。分支来自原 `workspaces.worktrees` 的精确 checkout，复用四并发目录读取；旧字段、失败、缺失、游离HEAD不猜分支。新增Core只读活动投影区分公开Run与精确私聊Run，沿现有目录失效合并刷新；旧Host缺字段保持未知，目录未完整不显示活动点。沿用14px元信息行、6px状态点、四行标题和左右紧凑页脚；运行颜色沿Rovai `conversation-run-presence.css:16` 的 `--info`，尊重减少动画偏好。
 
-这些新增实现尚未集中编译/Native验证；实际模型观测的展示适用性、八类完整状态和视觉对照仍由 [I03-R09](../execution/i03-closeout-remaining.md) 跟踪。原 `child_count` 对应Codeg原生父子Conversation，来源功能簇C08“跨智能体异步委派”按既定I04实施；当前独立私聊不是其子会话，不能用 privateConversations.length 填徽章。I04必须完成真实委派身份/数量接线与画布回归，完整一期范围保留；不能把当前缺少子会话来源写成已移植。摘要操作继续保留紧凑图标；实际布局、四行长标题、悬停/键盘、色板、选中/镜像/拖入、不同缩放与日/夜主题须在下一批真实运行中核对，源码和局部测试不覆盖视觉结论。
+随后已补最近运行模型的源码：复用Rovai `read_model/message_model.rs` 的原投影，直接来自精确公开/私聊Run的冻结选择或默认模型实际观测，优先于当前配置，分别标注“最近”和“配置”；最新默认Run缺观测不回退更早模型。模型与分支沿原Codeg使用等宽元信息。源码、原文SQL和局部检查已有结果，新增Core与实际UI尚未集中编译/运行；八类完整状态和视觉对照仍由 [I03-R09](../execution/i03-closeout-remaining.md) 跟踪。原 `child_count` 对应Codeg原生父子Conversation，来源功能簇C08“跨智能体异步委派”按既定I04实施；当前独立私聊不是其子会话，不能用 privateConversations.length 填徽章。I04必须完成真实委派身份/数量接线与画布回归，完整一期范围保留；不能把当前缺少子会话来源写成已移植。摘要操作继续保留紧凑图标；实际布局、四行长标题、悬停/键盘、色板、选中/镜像/拖入、不同缩放与日/夜主题须在下一批真实运行中核对，源码和局部测试不覆盖视觉结论。
 
 当前真实证据沿 `integration/execution/i03-c06-source-card-group-verification.json`、`i03-c05-notes-mirrors-native-verification.json`、`i03-c05-renderer-crash-native-verification.json` 分别记录，不用旧截图覆盖后续源码。renderer故障只验证显式重载后选择画布的恢复，不等于整个App/Core硬中断、自动恢复入口或在途未知请求已通过。
 

@@ -13,6 +13,14 @@ export const initialCanvasReferenceState = (): CanvasReferenceState => ({ items:
 type Client = Pick<ThreadClient, 'request' | 'onEvent' | 'onInvalidated'>
 const record = (value: unknown): Record<string, unknown> => value !== null && typeof value === 'object' ? value as Record<string, unknown> : {}
 const counter = (value: unknown) => typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 ? value : 0
+const validRunModel = (value: unknown): boolean => {
+  if (value === null || value === undefined) return true
+  const model = record(value)
+  return typeof model.runId === 'string' && Boolean(model.runId.trim())
+    && typeof model.adapterKind === 'string' && Boolean(model.adapterKind.trim())
+    && (model.modelId === null || typeof model.modelId === 'string' && Boolean(model.modelId.trim()))
+    && (model.reasoningEffort === null || typeof model.reasoningEffort === 'string')
+}
 export function canvasReferencesInvalidation(event: CoreEvent): number | null {
   if (['navigation.invalidated', 'members.invalidated', 'missions.invalidated', 'single_chat.changed'].includes(event.method)) return 0
   if (event.method !== 'events.batch') return null
@@ -90,9 +98,11 @@ export class CanvasReferenceController {
             || typeof item.title !== 'string' || typeof item.projectPath !== 'string'
             || !Array.isArray(item.members) || !Array.isArray(item.privateConversations)) throw new Error('对话目录分页未前进或归属不一致。')
           const members = new Set(item.members.map(member => member.agentId))
+          if (item.members.some(member => !validRunModel(member.lastRunModel))) throw new Error('会话模型来源无效。')
           if (item.publicActiveRunCount !== undefined && (!Number.isSafeInteger(item.publicActiveRunCount) || item.publicActiveRunCount < 0)) throw new Error('会话运行数量无效。')
           if (item.privateConversations.some(conversation => !conversation.conversationId || !members.has(conversation.agentId)
-            || conversation.hasActiveRun !== undefined && typeof conversation.hasActiveRun !== 'boolean')) throw new Error('单聊与队员归属不一致。')
+            || conversation.hasActiveRun !== undefined && typeof conversation.hasActiveRun !== 'boolean'
+            || !validRunModel(conversation.lastRunModel))) throw new Error('单聊与队员归属不一致。')
           previous = item.threadId
         }
         if (page.nextAfterThreadId !== null && (!page.items.length || page.nextAfterThreadId !== previous || page.nextAfterThreadId === after)) {

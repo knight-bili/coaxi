@@ -22,14 +22,22 @@ User 通过 Native Core 或已认证 Host 使用 `canvas.references.page`，参�
 响应为 `{schemaVersion:1, throughGlobalSequence, items, nextAfterThreadId, upperThreadId}`。
 每个 item 包含 `threadId,title,projectBindingKind,projectPath,updatedAt,version,missionId`，以及：
 
-- `members:[{agentId,displayName,runtimeKind}]`，只含实际 active membership 和未移除队员。
-- `privateConversations:[{conversationId,agentId,updatedAt,hasActiveRun?}]`，只含这些队员实际存在且未结束的 single_chat。
+- `members:[{agentId,displayName,runtimeKind,lastRunModel?}]`，只含实际 active membership 和未移除队员。
+- `privateConversations:[{conversationId,agentId,updatedAt,hasActiveRun?,lastRunModel?}]`，只含这些队员实际存在且未结束的 single_chat。
 - `publicActiveRunCount?`，本 Thread 的公开非终态 Run 数量，不含任何 single_chat Run。
 
 两项活动字段为兼容性可选字段：当前 Core 总是返回，旧 Host 省略时客户端保留未知，不能填零或显示空闲。
 非终态沿原 Navigation/Single Chat 定义为 queued、running、waiting；私聊按同一 camp_id、精确 conversation_id
 及 single_chat invocation 核对。公开数量以 Run 的直接 camp_id 为先，只有缺失时才沿原 task 归属兼容；
 历史任务不能覆盖直接归属。计数不表示 Runtime 已开始推理、模型可用或任务一定成功。
+
+`lastRunModel` 为兼容性可选字段，当前Core没有可解析的运行记录时返回null，旧Host可省略。
+非空时只含 `{runId,adapterKind,modelId,reasoningEffort}`，复用原消息模型投影：明确选择取该Run冻结的modelId，
+runtime_default只取该Run实际记录的runtime_observed_model_id，缺少观测时modelId=null；不从当前队员配置倒推历史。
+公开成员只取同Thread、同队员的公开Run，私聊只取该Conversation的single_chat Run；两者独立按created_at/id取最新。
+最新Run无可用模型时不回退到更早的模型。直接camp_id优先，缺失时沿原camp_turn归属兼容；错Thread、已结束私聊和已离队/移除成员排除。
+查询先按既有Thread/turn索引限定本页，再选择最新记录，不查询消息正文、文件、原生Session或权限/凭据JSON，不触发Runtime。
+客户端在摘要上区分“最近”与当前“配置”；旧字段或默认模型未观测时不编造名称，也不将公开模型套到私聊。
 
 `runtimeKind` 是该队员当前配置的产品类型，不代表平台已验收、模型可用或历史 Run 使用的产品。
 title 对使命 Thread 使用现行使命标题，missionId 保持实际业务身份；不在普通侧栏创建使命镜像。
@@ -41,7 +49,7 @@ title 对使命 Thread 使用现行使命标题，missionId 保持实际业务�
 `id > afterThreadId AND id <= upperThreadId` 按身份升序推进；末页 nextAfterThreadId=null。
 活动时间变化不改变分页身份位置，上界之后创建的新对象留待下一轮读取。上界只是读范围，不是访问授权。
 
-每页的 Thread、成员、私有单聊、活动计数和 throughGlobalSequence 来自同一个只读事务。
+每页的 Thread、成员、私有单聊、活动计数、最近运行模型和 throughGlobalSequence 来自同一个只读事务。
 整轮不冻结跨页事务：业务仍可变化，客户端遇到相关失效时必须补读；不能把分页上界称为全目录业务快照。
 请求沿已有有界独立读取队列运行，SQLite仍使用同一个数据库锁。读取不创建会话、Run、Manifest、草稿或通知。
 

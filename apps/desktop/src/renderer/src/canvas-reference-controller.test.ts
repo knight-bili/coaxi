@@ -46,7 +46,9 @@ it('rejects looping pages, changed bounds and mismatched private owners without 
     () => page(['b'], null, 'c'),
     () => ({ ...page(['b'], null, 'b'), items: [{ ...row('b'), privateConversations: [{ conversationId: 'private', agentId: 'foreign', updatedAt: 'time' }] }] }),
     () => ({ ...page(['b'], null, 'b'), items: [{ ...row('b'), publicActiveRunCount: -1 }] }),
-    () => ({ ...page(['b'], null, 'b'), items: [{ ...row('b'), publicActiveRunCount: Number.NaN }] })
+    () => ({ ...page(['b'], null, 'b'), items: [{ ...row('b'), publicActiveRunCount: Number.NaN }] }),
+    () => ({ ...page(['b'], null, 'b'), items: [{ ...row('b'), members: [{ agentId: 'a', displayName: 'A', runtimeKind: null, lastRunModel: { runId: '', adapterKind: 'codex-cli', modelId: 'model', reasoningEffort: null } }] }] }),
+    () => ({ ...page(['b'], null, 'b'), items: [{ ...row('b'), members: [{ agentId: 'a', displayName: 'A', runtimeKind: null }], privateConversations: [{ conversationId: 'private', agentId: 'a', updatedAt: 'time', lastRunModel: { runId: 'run', adapterKind: 'codex-cli', modelId: '' , reasoningEffort: null } }] }] })
   ]) {
     const transport = fixture(async params => params.afterThreadId === null ? page(['a'], 'a', 'b') : invalid())
     transport.controller.start(); await vi.advanceTimersByTimeAsync(0)

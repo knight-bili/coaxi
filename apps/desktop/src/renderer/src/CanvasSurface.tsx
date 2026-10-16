@@ -100,7 +100,7 @@ function CanvasConversationSummary({ actions, row, reference, selected, derived,
       {privateChat ? <LockKeyhole size={14} aria-hidden="true" /> : <MessageSquare size={14} aria-hidden="true" />}
       {actions.catalog?.complete && metadata.active !== undefined && <span className="canvas-summary-status" data-active={metadata.active}
         role="img" aria-label={uiAttribute(metadata.active ? '有进行中的任务' : '当前没有进行中的任务')} title={uiAttribute(metadata.active ? '有进行中的任务' : '当前没有进行中的任务')} />}
-      <span className="canvas-summary-kind" title={metadata.modelTitle ?? kind} aria-label={metadata.modelTitle ? `${kind} · ${metadata.modelTitle}` : kind}>{metadata.model ?? kind}</span>
+      <span className={`canvas-summary-kind${metadata.model ? ' canvas-summary-model' : ''}`} title={metadata.modelTitle ?? kind} aria-label={metadata.modelTitle ? `${kind} · ${metadata.modelTitle}` : kind}>{metadata.model ?? kind}</span>
       <div className="canvas-summary-actions nodrag nowheel">
         <CanvasIconButton disabled={actions.blocked || unavailable} label={openLabel} onClick={() => actions.openConversation(row, reference, derived)}><Maximize2 size={14} /></CanvasIconButton>
         {derived ? <CanvasIconButton disabled={actions.blocked} label={uiAttribute(row.data.kind === 'custom' ? '移出分组' : '固定到画布')} onClick={() => actions.detach(row, reference)}><Pin size={14} /></CanvasIconButton>
@@ -111,7 +111,7 @@ function CanvasConversationSummary({ actions, row, reference, selected, derived,
     <div className="canvas-summary-footer">
       {unavailable ? <span><UiText zh="对话已结束或不可用" /></span> : <>
         {metadata.project ? <span title={metadata.project}><Folder size={10} aria-hidden="true" /><span>{basePathName(metadata.project)}</span></span> : <span><UiText zh={privateChat ? '独立私聊材料' : '共享会话'} /></span>}
-        {metadata.branch && <span title={uiAttribute('Git 分支：{0}', metadata.branch)}><GitBranch size={10} aria-hidden="true" /><span dir="ltr">{metadata.branch}</span></span>}
+        {metadata.branch && <span className="canvas-summary-branch" title={uiAttribute('Git 分支：{0}', metadata.branch)}><GitBranch size={10} aria-hidden="true" /><span dir="ltr">{metadata.branch}</span></span>}
       </>}
     </div>
   </article>

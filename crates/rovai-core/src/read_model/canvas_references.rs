@@ -6,10 +6,19 @@ use serde::Serialize;
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
+pub struct CanvasRunModel {
+    pub run_id: String,
+    #[serde(flatten)]
+    pub model: super::message_model::ThreadMessageRuntimeModelView,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct CanvasReferenceMember {
     pub agent_id: String,
     pub display_name: String,
     pub runtime_kind: Option<String>,
+    pub last_run_model: Option<CanvasRunModel>,
 }
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -18,6 +27,7 @@ pub struct CanvasPrivateReference {
     pub agent_id: String,
     pub updated_at: String,
     pub has_active_run: bool,
+    pub last_run_model: Option<CanvasRunModel>,
 }
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -94,6 +104,35 @@ WHERE COALESCE(run.camp_id, task.camp_id) IN (SELECT value FROM json_each(?1))
   AND run.invocation_kind <> 'single_chat' AND run.status IN ('queued', 'running', 'waiting')
 GROUP BY COALESCE(run.camp_id, task.camp_id)
 "#;
+// Scope by indexed Thread/turn ownership before ranking; never load transcripts or permission JSON.
+const RUN_MODELS_SQL: &str = r#"
+WITH owned AS (
+  SELECT run.camp_id AS thread_id, run.id, run.conversation_id, run.invocation_kind, run.created_at,
+         run.runtime_adapter_kind, run.runtime_model_selection_json, run.runtime_observed_model_id
+  FROM agent_run run WHERE run.camp_id IN (SELECT value FROM json_each(?1))
+  UNION ALL
+  SELECT turn.camp_id, run.id, run.conversation_id, run.invocation_kind, run.created_at,
+         run.runtime_adapter_kind, run.runtime_model_selection_json, run.runtime_observed_model_id
+  FROM camp_turn turn JOIN agent_run run ON run.camp_turn_id = turn.id AND run.camp_id IS NULL
+  WHERE turn.camp_id IN (SELECT value FROM json_each(?1))
+), ranked AS (
+  SELECT owned.*, conversation.agent_id, conversation.kind,
+         ROW_NUMBER() OVER (
+           PARTITION BY owned.thread_id, conversation.agent_id,
+                        CASE WHEN conversation.kind = 'single_chat' THEN conversation.id ELSE '' END
+           ORDER BY owned.created_at DESC, owned.id DESC) AS ordinal
+  FROM owned JOIN conversation ON conversation.id = owned.conversation_id AND conversation.camp_id = owned.thread_id
+  JOIN camp_member member ON member.camp_id = owned.thread_id AND member.agent_id = conversation.agent_id
+  JOIN agent_profile profile ON profile.id = conversation.agent_id
+  WHERE member.status = 'active' AND profile.profile_status <> 'removed'
+    AND ((conversation.kind = 'single_chat' AND conversation.ended_at IS NULL AND owned.invocation_kind = 'single_chat')
+      OR (conversation.kind <> 'single_chat' AND owned.invocation_kind <> 'single_chat'))
+)
+SELECT thread_id, conversation_id, agent_id, kind, id,
+       runtime_adapter_kind, runtime_model_selection_json, runtime_observed_model_id
+FROM ranked WHERE ordinal = 1
+ORDER BY thread_id, conversation_id
+"#;
 
 fn read_page(
     tx: &Transaction<'_>,
@@ -151,6 +190,7 @@ fn read_page(
                     agent_id: row.get(1)?,
                     display_name: row.get(2)?,
                     runtime_kind: row.get(3)?,
+                    last_run_model: None,
                 },
             ))
         })?
@@ -170,6 +210,7 @@ fn read_page(
                     agent_id: row.get(2)?,
                     updated_at: row.get(3)?,
                     has_active_run: row.get(4)?,
+                    last_run_model: None,
                 },
             ))
         })?
@@ -188,6 +229,47 @@ fn read_page(
     for (id, count) in active {
         if let Some(index) = positions.get(&id) {
             items[*index].public_active_run_count = count;
+        }
+    }
+    let models = tx
+        .prepare(RUN_MODELS_SQL)?
+        .query_map([&ids], |row| {
+            Ok((
+                row.get::<_, String>(0)?,
+                row.get::<_, String>(1)?,
+                row.get::<_, String>(2)?,
+                row.get::<_, String>(3)?,
+                row.get::<_, String>(4)?,
+                row.get::<_, Option<String>>(5)?,
+                row.get::<_, Option<String>>(6)?,
+                row.get::<_, Option<String>>(7)?,
+            ))
+        })?
+        .collect::<rusqlite::Result<Vec<_>>>()?;
+    for (thread, conversation, agent, kind, run_id, adapter, selection, observed) in models {
+        let Some(model) =
+            super::message_model::project_model(adapter.as_deref(), selection.as_deref(), observed)
+        else {
+            continue;
+        };
+        let Some(index) = positions.get(&thread) else {
+            continue;
+        };
+        let value = Some(CanvasRunModel { run_id, model });
+        if kind == "single_chat" {
+            if let Some(target) = items[*index]
+                .private_conversations
+                .iter_mut()
+                .find(|item| item.conversation_id == conversation && item.agent_id == agent)
+            {
+                target.last_run_model = value;
+            }
+        } else if let Some(target) = items[*index]
+            .members
+            .iter_mut()
+            .find(|item| item.agent_id == agent)
+        {
+            target.last_run_model = value;
         }
     }
     let next_after_thread_id = if has_more {
@@ -249,6 +331,33 @@ mod tests {
         assert_eq!(first.items[1].public_active_run_count, 2);
         assert!(first.items[0].private_conversations[0].has_active_run);
         assert!(!first.items[1].private_conversations[0].has_active_run);
+        let public = first.items[0].members[0].last_run_model.as_ref().unwrap();
+        assert_eq!(public.run_id, "model-public-new");
+        assert_eq!(public.model.model_id.as_deref(), Some("public-observed"));
+        let private = first.items[0].private_conversations[0]
+            .last_run_model
+            .as_ref()
+            .unwrap();
+        assert_eq!(private.run_id, "model-private");
+        assert_eq!(private.model.model_id.as_deref(), Some("private-frozen"));
+        let legacy = first.items[1].members[0].last_run_model.as_ref().unwrap();
+        assert_eq!(legacy.run_id, "model-legacy");
+        assert_eq!(legacy.model.adapter_kind, "gemini-cli");
+        assert_eq!(legacy.model.model_id.as_deref(), Some("legacy-observed"));
+        assert!(
+            first.items[1].private_conversations[0]
+                .last_run_model
+                .as_ref()
+                .unwrap()
+                .model
+                .model_id
+                .is_none()
+        );
+        assert!(
+            !serde_json::to_string(&first)
+                .unwrap()
+                .contains("NEVER-PROJECT")
+        );
         assert_eq!(
             first.items[0].members[0].runtime_kind.as_deref(),
             Some("codex-cli")
@@ -311,5 +420,24 @@ INSERT INTO agent_run VALUES('public-queued','a',NULL,NULL,'camp_request','queue
  ('completed','a',NULL,NULL,'camp_request','succeeded'),('private','a',NULL,'private-a','single_chat','running'),
  ('private-foreign','b',NULL,'private-a','single_chat','running'),('legacy-run',NULL,'legacy-task',NULL,'task','running'),
  ('direct-owner','b','wrong-task',NULL,'task','queued'),('private-wrong-camp','a',NULL,'private-b','single_chat','waiting');
+ALTER TABLE agent_run ADD COLUMN camp_turn_id TEXT;
+ALTER TABLE agent_run ADD COLUMN created_at TEXT;
+ALTER TABLE agent_run ADD COLUMN runtime_adapter_kind TEXT;
+ALTER TABLE agent_run ADD COLUMN runtime_model_selection_json TEXT;
+ALTER TABLE agent_run ADD COLUMN runtime_observed_model_id TEXT;
+CREATE TABLE camp_turn(id TEXT PRIMARY KEY,camp_id TEXT);
+INSERT INTO camp_turn VALUES('legacy-turn','b');
+INSERT INTO conversation VALUES('a','public-a','agent-a','time','public',NULL),('b','public-b','agent-a','time','public',NULL),
+ ('a','public-left','agent-b','time','public',NULL);
+INSERT INTO agent_run(id,camp_id,conversation_id,invocation_kind,status,camp_turn_id,created_at,runtime_adapter_kind,runtime_model_selection_json,runtime_observed_model_id) VALUES
+ ('model-public-old','a','public-a','camp_request','succeeded',NULL,'2026-10-15','codex-cli','{"source":"explicit","modelId":"old-public"}',NULL),
+ ('model-public-new','a','public-a','camp_request','succeeded',NULL,'2026-10-16','codex-cli','{"source":"runtime_default","modelId":"not-an-observation"}','public-observed'),
+ ('model-private','a','private-a','single_chat','succeeded',NULL,'2026-10-16','codex-cli','{"source":"explicit","modelId":"private-frozen","options":{"api_key":"NEVER-PROJECT"}}','ignore-explicit-observation'),
+ ('model-legacy',NULL,'public-b','camp_request','succeeded','legacy-turn','2026-10-16','gemini-cli','{"source":"runtime_default"}','legacy-observed'),
+ ('model-private-b-old','b','private-b','single_chat','succeeded',NULL,'2026-10-15','codex-cli','{"source":"explicit","modelId":"old-private"}',NULL),
+ ('model-private-b-unknown','b','private-b','single_chat','succeeded',NULL,'2026-10-16','codex-cli','{"source":"runtime_default"}',NULL),
+ ('model-wrong-thread','b','public-a','camp_request','succeeded',NULL,'2026-10-17','codex-cli','{"source":"explicit","modelId":"wrong-thread"}',NULL),
+ ('model-left','a','public-left','camp_request','succeeded',NULL,'2026-10-17','gemini-cli','{"source":"explicit","modelId":"left-member"}',NULL),
+ ('model-ended','a','ended','single_chat','succeeded',NULL,'2026-10-17','codex-cli','{"source":"explicit","modelId":"ended-private"}',NULL);
 "#;
 }

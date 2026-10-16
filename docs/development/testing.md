@@ -221,6 +221,10 @@ owner，覆盖公开非终态计数、私聊精确归属、终态排除与历史
 本批只执行原文SQL见证，Rust编译/执行及真实Host活动刷新留待累计候选。上述TypeScript两个owner扩展模型配置归属、
 精确工作树分支/缺字段未知、公开与私聊状态隔离及agent_run失效；原 `SingleChatPanel.test.ts` 扩展缺失附件错误指引。
 原静态面板owner显式注入内存编辑恢复，避免在无window环境中触发Native存储getter；不将该替身算作Native保存资格。
+同一画布目录Rust owner继续扩展最近运行模型的公开/私聊隔离、已结束/离队/错Thread排除、旧camp_turn归属、
+最新默认模型缺观测不回退旧值和零写入；模型解析直接复用 `message_model::project_model`，不新建解析器或测试owner。
+原 `message_model` owner拥有冻结选择/默认观测和展示选项白名单；两owner随累计候选编译执行。
+原TypeScript模型/目录owner覆盖历史优先于当前配置、精确私聊和缺字段/非法模型记录拒绝，不授予真实Core/UI资格。
 
 画布Renderer读模型由`canvas-graph-controller.test.ts`拥有订阅/读取竞争、Host/画板切换隔离、未知手势原编号与
 版本保留、提交后读取失败、冲突低版本拒绝及回查/显式重试并发；复用既有refresh coordinator，不重测其通用重试矩阵。

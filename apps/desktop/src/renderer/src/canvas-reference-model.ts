@@ -26,7 +26,7 @@ export function canvasSummaryProjectPaths(nodes: readonly CanvasNode[], threads:
   return [...new Set(threads.filter(thread => ids.has(thread.threadId) && thread.projectBindingKind === 'directory').map(thread => thread.projectPath))]
 }
 
-/** Configured model is labelled as configuration, never as an observed native session model. */
+/** Historical Run model uses the existing Core projection; current configuration is explicitly distinguished. */
 export function canvasSummaryMetadata(reference: CanvasConversationRef, threads: readonly CanvasThreadReference[],
   agents: readonly Pick<AgentProfile, 'agentId' | 'displayName' | 'runtimeConfiguration' | 'presence' | 'removedAt'>[],
   folders?: ReadonlyMap<string, CanvasFolderResolution>): { model: string | null; modelTitle: string | null; project: string | null; branch: string | null; active: boolean | undefined } {
@@ -34,12 +34,17 @@ export function canvasSummaryMetadata(reference: CanvasConversationRef, threads:
   const conversation = reference.conversationId ? thread?.privateConversations.find(item => item.conversationId === reference.conversationId) : null
   const members = thread?.members.filter(member => !reference.conversationId || conversation?.agentId === member.agentId) ?? []
   const configured = members.flatMap(member => {
+    const historical = reference.conversationId ? conversation?.lastRunModel : member.lastRunModel
+    if (historical?.modelId) return [{ name: member.displayName, model: historical.modelId, historical: true }]
     const profile = agents.find(item => item.agentId === member.agentId && item.presence !== 'removed' && item.removedAt === null)
     const config = profile?.runtimeConfiguration
     return config?.adapterKind === member.runtimeKind && config.model.mode === 'explicit' && config.model.modelId
-      ? [{ name: member.displayName, model: config.model.modelId }] : []
+      ? [{ name: member.displayName, model: config.model.modelId, historical: false }] : []
   })
-  const models = [...new Set(configured.map(item => item.model))]
+  const models = [true, false].flatMap(historical => {
+    const names = [...new Set(configured.filter(item => item.historical === historical).map(item => item.model))]
+    return names.length ? [uiAttribute(historical ? '最近：{0}' : '配置：{0}', names.join(' · '))] : []
+  })
   const project = thread?.projectBindingKind === 'directory' ? thread.projectPath : null
   let branch: string | null = null
   if (project && folders) {
@@ -55,8 +60,8 @@ export function canvasSummaryMetadata(reference: CanvasConversationRef, threads:
   }
   const active = reference.conversationId ? conversation?.hasActiveRun
     : thread?.publicActiveRunCount === undefined ? undefined : thread.publicActiveRunCount > 0
-  return { active, model: models.length ? uiAttribute('配置：{0}', models.join(' · ')) : null,
-    modelTitle: configured.length ? uiAttribute('模型配置：{0}', configured.map(item => `${item.name}: ${item.model}`).join('；')) : null, project, branch }
+  return { active, model: models.length ? models.join(' · ') : null,
+    modelTitle: configured.length ? configured.map(item => uiAttribute(item.historical ? '最近运行模型：{0}' : '模型配置：{0}', `${item.name}: ${item.model}`)).join('；') : null, project, branch }
 }
 
 const recency = (value: string) => Number.isFinite(Date.parse(value)) ? Date.parse(value) : 0

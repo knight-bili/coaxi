@@ -4391,8 +4391,9 @@ export type CanvasObjectReference =
 /** 仅绑定文件节点原公开工程会话；具体文件能力仍由原预览系统签发。 */
 export interface CanvasFileReference { threadId: string }
 
-export interface CanvasReferenceMember { agentId: string; displayName: string; runtimeKind: AdapterKind | null }
-export interface CanvasPrivateReference { conversationId: string; agentId: string; updatedAt: string; hasActiveRun?: boolean }
+export interface CanvasRunModel extends ThreadMessageRuntimeModelView { runId: string }
+export interface CanvasReferenceMember { agentId: string; displayName: string; runtimeKind: AdapterKind | null; lastRunModel?: CanvasRunModel | null }
+export interface CanvasPrivateReference { conversationId: string; agentId: string; updatedAt: string; hasActiveRun?: boolean; lastRunModel?: CanvasRunModel | null }
 export interface CanvasThreadReference {
   threadId: string
   title: string

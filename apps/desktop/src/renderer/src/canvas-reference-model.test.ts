@@ -83,6 +83,20 @@ it('keeps public and exact private activity separate and leaves old Host activit
   expect(canvasSummaryMetadata({ ...reference, conversationId: 'ended' }, [current], []).active).toBeUndefined()
 })
 
+it('uses the exact last Run model before current configuration and never substitutes public or another private history', () => {
+  const original = thread('one'), lastRunModel = { runId: 'public-run', adapterKind: 'codex-cli', modelId: 'public-observed', reasoningEffort: null }
+  const current = { ...original, members: original.members.map(member => member.agentId === 'a' ? { ...member, lastRunModel } : member),
+    privateConversations: original.privateConversations.map(item => item.agentId === 'a' ? { ...item, lastRunModel: { ...lastRunModel, runId: 'private-run', modelId: 'private-frozen' } } : item) }
+  const profiles = [summaryProfile('a', 'changed-current-config', 'codex-cli'), summaryProfile('b', 'model-b', 'gemini-cli')]
+  const reference = { threadId: 'one', conversationId: null }
+  expect(canvasSummaryMetadata(reference, [current], profiles)).toMatchObject({ model: '最近：public-observed · 配置：model-b', modelTitle: '最近运行模型：A: public-observed；模型配置：B: model-b' })
+  expect(canvasSummaryMetadata({ ...reference, conversationId: 'one-private-a' }, [current], profiles).model).toBe('最近：private-frozen')
+  expect(canvasSummaryMetadata({ ...reference, conversationId: 'one-private-b' }, [current], profiles).model).toBe('配置：model-b')
+  const unknown = { ...current, privateConversations: current.privateConversations.map(item => ({ ...item, lastRunModel: { ...lastRunModel, modelId: null } })) }
+  expect(canvasSummaryMetadata({ ...reference, conversationId: 'one-private-a' }, [unknown], [{ ...profiles[0], runtimeConfiguration: null }]).model).toBeNull()
+  expect(canvasSummaryMetadata({ ...reference, conversationId: 'missing' }, [current], profiles).model).toBeNull()
+})
+
 it('reads branch only from the exact verified checkout including aliases and hides it after failed refresh, detached HEAD or missing old Host metadata', () => {
   const threads = [thread('one', '/alias')], reference = { threadId: 'one', conversationId: null }
   const relation: CanvasFolderResolution = { paths: ['/alias', '/checkout'], complete: true, projectPath: '/checkout', worktrees: [{ projectPath: '/checkout', isMain: false, bare: false, locked: false, prunable: false, available: true, branch: '功能/中文', detached: false }] }
