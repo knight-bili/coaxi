@@ -145,6 +145,24 @@ afterEach(() => {
 })
 
 describe('Single Chat presentation', () => {
+  it('exposes the exact private Run on readable terminal summaries and final replies without a legacy turn ID', () => {
+    for (const status of ['succeeded', 'failed'] as const) {
+      const currentRun = run({ status, threadTurnId: undefined })
+      const markup = renderToStaticMarkup(createElement(SingleChatRunHistory, {
+        threadId: 'camp-1', conversationId: 'conversation-1', run: currentRun, evidence: [],
+        finalMessage: status === 'succeeded' ? {
+          id: 'message-2', sequence: 2, authorType: 'agent', authorId: member.agentId,
+          body: '已展示的私聊回复', quotes: [], attachments: [], agentRunId: currentRun.id,
+          createdAt: '2026-09-03T11:00:00.000Z'
+        } : null,
+        now: '2026-09-03T11:00:00.000Z'
+      }))
+      expect(markup).toContain('class="single-chat-run-summary" data-agent-run-id="run-1"')
+      expect(markup).not.toContain('data-notification-turn-id=')
+      if (status === 'succeeded') expect(markup).toContain('class="single-chat-final" data-agent-run-id="run-1"')
+    }
+  })
+
   it('uses the confirmed Chinese terminal summaries', () => {
     expect(formatSingleChatDuration(
       '2026-09-03T10:00:00.000Z',

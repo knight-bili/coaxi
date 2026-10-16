@@ -70,7 +70,10 @@ export async function qualifyCanvasNotifications(window,{evaluate,wait,rpc,openC
  const fit=async()=>{await click(`document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]')`);await pause(450)}
  const open=async context=>{if(!await evaluate(`Boolean(${frame(context)})`))await click(button(context,'展开对话'));await wait(`Boolean(${frame(context)}?.querySelector('${context.kind==='private'?'.single-chat-composer textarea':'.structured-mention-editor'}'))`)}
  const close=async context=>{await click(button(context,'收起对话'));await wait(`!${frame(context)}`)}
- const move=async(context,x)=>{const graph=await rpc('canvas.nodes.snapshot',{boardId});const changed=await rpc('canvas.nodes.apply',{commandId:randomUUID(),command:{boardId,expectedRevision:graph.board.revision,mutation:{type:'update',nodeId:context.nodeId,patch:{x}}}});assert.equal(changed.status,'applied');await pause(300)}
+ const move=async(context,x)=>{
+  const graph=await rpc('canvas.nodes.snapshot',{boardId}),changed=await rpc('canvas.nodes.apply',{commandId:randomUUID(),command:{boardId,expectedRevision:graph.board.revision,mutation:{type:'update',nodeId:context.nodeId,patch:{x}}}});assert.equal(changed.status,'applied')
+  await wait(`(()=>{const node=document.querySelector('.react-flow__node[data-id="${context.nodeId}"]');return node&&Math.abs(new DOMMatrix(getComputedStyle(node).transform).m41-${x})<1})()`)
+ }
  const inbox=()=>rpc('notifications.inbox',{filter:'all',limit:100})
  const snapshot=context=>context.kind==='private'?rpc('singleChat.get',{conversationId:context.conversationId}):rpc('threads.open',{threadId:context.threadId,traceId:randomUUID()})
  const send=async(context,label)=>{

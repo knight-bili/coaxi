@@ -439,7 +439,7 @@ export function SingleChatRunHistory({
           onToggle={(event) => { if (terminal) setOpen(event.currentTarget.open) }}
         >
           <summary hidden={!terminal}>
-            <span className="single-chat-run-summary" data-notification-turn-id={terminal ? run.threadTurnId : undefined}>{terminal && executionRunSummary(run, now)}</span>
+            <span className="single-chat-run-summary" data-agent-run-id={terminal ? run.id : undefined} data-notification-turn-id={terminal ? run.threadTurnId : undefined}>{terminal && executionRunSummary(run, now)}</span>
             <span className="single-chat-disclosure" aria-hidden="true"><ChevronGlyph /></span>
           </summary>
           <div className="single-chat-execution-content process-content">
@@ -459,7 +459,7 @@ export function SingleChatRunHistory({
         </details>
         {finalMessage && <>
           <hr className="single-chat-final-rule" />
-          <div className="single-chat-final" data-single-chat-message-id={finalMessage.id} data-message-quote-body={finalMessage.id} data-quote-owner={`single_chat:${conversationId}`} data-notification-turn-id={run.threadTurnId}><SafeMarkdown>{finalMessage.body}</SafeMarkdown></div>
+          <div className="single-chat-final" data-agent-run-id={run.id} data-single-chat-message-id={finalMessage.id} data-message-quote-body={finalMessage.id} data-quote-owner={`single_chat:${conversationId}`} data-notification-turn-id={run.threadTurnId}><SafeMarkdown>{finalMessage.body}</SafeMarkdown></div>
         </>}
       </div>
     </section>
@@ -1149,12 +1149,14 @@ export function SingleChatPanel({
         && document.visibilityState === 'visible' && document.hasFocus()
         && (!composerContext || canvasNotificationNodeVisible(viewport))
       const campTurnIds = new Set<string>()
+      const agentRunIds = new Set<string>()
       const approvalIds = new Set<string>()
       if (canObserve && viewport) {
         const bounds = viewport.getBoundingClientRect()
-        for (const node of viewport.querySelectorAll<HTMLElement>('[data-notification-turn-id]')) {
+        for (const node of viewport.querySelectorAll<HTMLElement>('[data-notification-turn-id], [data-agent-run-id]')) {
           if (node.getClientRects().length && (!composerContext || canvasNotificationNodeVisible(node, viewport)) && rectanglesOverlap(node.getBoundingClientRect(), bounds)) {
-            campTurnIds.add(node.dataset.notificationTurnId!)
+            if (node.dataset.notificationTurnId) campTurnIds.add(node.dataset.notificationTurnId)
+            if (node.dataset.agentRunId) agentRunIds.add(node.dataset.agentRunId)
           }
         }
         for (const node of approvalRef.current?.querySelectorAll<HTMLElement>('[data-approval-id]') ?? []) {
@@ -1166,7 +1168,7 @@ export function SingleChatPanel({
       const sources: VisibleNotificationSources = { threadId,
         conversationId: currentSnapshot?.conversation.id ?? null, surfaceVisible: canObserve,
         snapshotSequence: 0, messageIds: [], campTurnIds: [...campTurnIds].sort(),
-        agentRunIds: [], approvalIds: [...approvalIds].sort() }
+        agentRunIds: [...agentRunIds].sort(), approvalIds: [...approvalIds].sort() }
       const signature = JSON.stringify(sources)
       if (signature !== lastVisibleSources.current) {
         lastVisibleSources.current = signature

@@ -66,6 +66,23 @@ function frameFixture(key: string, top = 0) {
 }
 const visibleStyle = () => ({ visibility: 'visible', opacity: '1', overflowX: 'visible', overflowY: 'visible' })
 
+it('keeps a private Run exact and excludes covered or unmounted reply sources', () => {
+  const row = frameFixture('run-1'), store = new CanvasNotificationVisibility()
+  row.frame.querySelectorAll = ((selector: string) => selector === '[data-agent-run-id]' ? [row.message] : []) as unknown as typeof row.frame.querySelectorAll
+  const owner = store.register('run-1', 'thread-1')
+  owner.publish('private', { ...source('thread-1', '', 'private-1'), messageIds: [], agentRunIds: ['run-1', 'unmounted-run'] })
+  let covered = false
+  vi.stubGlobal('getComputedStyle', visibleStyle)
+  vi.stubGlobal('window', { innerWidth: 600, innerHeight: 800 })
+  vi.stubGlobal('document', { visibilityState: 'visible', hasFocus: () => true, querySelectorAll: () => [row.frame],
+    elementFromPoint: () => covered ? {} : row.message })
+  expect(store.readVisibleSources()[0]).toMatchObject({ conversationId: 'private-1', agentRunIds: ['run-1'] })
+  covered = true
+  expect(store.readVisibleSources()[0]).toMatchObject({ surfaceVisible: false, agentRunIds: [] })
+  owner.release()
+  expect(store.readVisibleSources()).toEqual([])
+})
+
 it('excludes keyboard-covered messages and clips zoomed/panned CSS coordinates to the visual viewport', () => {
   const { message, bounds } = frameFixture('message', 500)
   const hit = vi.fn(() => message)
