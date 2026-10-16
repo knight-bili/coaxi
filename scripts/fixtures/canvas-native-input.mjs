@@ -234,6 +234,8 @@ async function qualifyBoardList(window,{evaluate,wait,rpc}){
  assert.ok(text.includes('将删除 3 个节点。')&&text.includes('其中有 1 张终端卡；删除时会关闭仍在运行的终端。'))
  assert.equal(await evaluate(`document.querySelector('.canvas-board-dialog button[type="submit"]').disabled`),false)
  record('delete_confirmation_uses_the_exact_board_revision_node_count_and_terminal_card_warning')
+ await evaluate(`Promise.all(document.querySelector('.canvas-board-dialog').getAnimations({subtree:true}).map(animation=>animation.finished.catch(()=>undefined)))`)
+ await evaluate(`new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))`)
  await writeFile(join(config.evidence,'01-original-board-delete-warning.png'),(await window.webContents.capturePage()).toPNG())
  await evaluate(`(()=>{[...document.querySelectorAll('.canvas-board-dialog button')].find(item=>item.textContent==='取消').click();return true})()`)
  await wait(`!document.querySelector('.canvas-board-dialog')`)
@@ -248,6 +250,9 @@ async function qualifyBoardList(window,{evaluate,wait,rpc}){
  await wait(`!document.querySelector('.canvas-board-dialog')`)
  record('separate_overflow_menu_keeps_edit_action_without_nested_buttons_or_a_write')
  assert.equal(await evaluate(`document.querySelectorAll('.canvas-board-item button button').length`),0)
+ report.board_card_geometry=await evaluate(`(()=>{const card=document.querySelector('${tile}').closest('.canvas-board-item');const box=e=>{const r=e.getBoundingClientRect(),s=getComputedStyle(e);return {class:e.className,width:r.width,height:r.height,minHeight:s.minHeight,flex:s.flex,aspectRatio:s.aspectRatio,gridAutoRows:s.gridAutoRows}};return {grid:box(card.parentElement),card:box(card),preview:box(card.querySelector('.canvas-board-preview')),svg:box(card.querySelector('.canvas-board-preview > svg')),copy:box(card.querySelector('.canvas-board-copy')),children:[...card.querySelector('.canvas-board-copy').children].map(box)}})()`)
+ report.board_list_copy_bounds=await evaluate(`(()=>{return [...document.querySelectorAll('.canvas-board-item')].map(card=>{const copy=card.querySelector('.canvas-board-copy'),s=getComputedStyle(copy),children=[...copy.children],p=copy.querySelector('p');return {boardId:card.querySelector('.canvas-board-tile').dataset.boardId,copy:copy.getBoundingClientRect().height,intrinsic:children.reduce((sum,child)=>sum+child.getBoundingClientRect().height,0)+parseFloat(s.paddingTop)+parseFloat(s.paddingBottom)+parseFloat(s.gap)*(children.length-1),descriptionLength:p?.textContent.length??0,descriptionHeight:p?.getBoundingClientRect().height??0,lineClamp:p?getComputedStyle(p).webkitLineClamp:null}})})()`)
+ await evaluate(`new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))`)
  await writeFile(join(config.evidence,'02-real-board-list.png'),(await window.webContents.capturePage()).toPNG())
 }
 

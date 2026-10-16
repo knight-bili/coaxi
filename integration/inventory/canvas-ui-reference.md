@@ -56,7 +56,13 @@ Mission、Task、Diff、文件工作区仍进入原对象。此前真实 C02 检
 列表右键菜单沿用 Codeg `canvas-board-list.tsx:393–408` 的打开/编辑/删除；定位与 Escape 回焦复用 Rovai
 `ImageContextMenu.tsx:36–50` 的视口锚点。右键、菜单键/Shift+F10 与省略号入口共用原处理函数，未增加执行通道。
 删除提示对照 Codeg `canvas-board-dialogs.tsx:235–258`，显示同画板/版本的节点数和终端卡数，明确只关闭仍在运行的终端；
-统计缺失或失配不显示伪造零值，原冻结版本、冲突阻断和忙碌保护继续保留。真实 Native `board-list` 场景已准备，尚未运行。
+统计缺失或失配不显示伪造零值，原冻结版本、冲突阻断和忙碌保护继续保留。rc15 已实际通过真实 Core 数量/轮廓、原生右键/Shift+F10、Escape 回焦、同版本删除提示及取消、独立省略号编辑，共7个场景；菜单键与旧服务提示保留后续检查，不用已过场景替代。
+
+列表对照 `canvas-board-list.tsx:336–357` 与 `canvas-board-preview.tsx:108–139`，文字采用自然流紧凑排布。
+纵向轮廓的 SVG 固有高度不能决定卡片行高：当前轮廓绝对贴合既有16:10框，空画板图标仍在框内居中，
+网格保持原等高行、描述最多两行和可到达末尾的单一列表滚动。rc15截图发现此问题，后续当前CSS已在日夜实际组件复现/修复验证，
+完整App集成待下一累计候选。精确证据分别见 `integration/execution/i03-c06-rc15-list-native-verification.json` 与
+`integration/execution/i03-c06-board-compact-renderer-verification.json`，不将旧候选结果归给后改CSS。
 
 1. 先完成组件与调用链核对、界面代码、自审、类型及相关低成本检查。
 2. 与已完成的私聊附件 UI 和 Mission 输出修复一起冻结候选，集中编译并运行已有真实 Native 检查，不为每个按钮分别构建或触发 Actions。

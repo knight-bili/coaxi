@@ -41,13 +41,13 @@
 .canvas-board-item > .canvas-board-tile { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; padding: 0; border: 0; border-radius: 12px; background: transparent; }
 .canvas-board-item > .canvas-board-tile:focus-visible, .canvas-board-create:focus-visible { outline: 2px solid var(--muted); outline-offset: -2px; }
 .canvas-board-preview { position: relative; display: flex; flex: 0 0 auto; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 10; border-bottom: 1px solid var(--line); color: var(--muted); background: radial-gradient(circle, color-mix(in srgb, var(--muted) 22%, transparent) 1px, transparent 1.2px) 0 0 / 14px 14px, var(--canvas); pointer-events: none; }
-.canvas-board-preview > svg { width: 100%; height: 100%; }
+.canvas-board-preview > svg:not(.lucide) { position: absolute; inset: 0; width: 100%; height: 100%; }
 .canvas-board-preview > svg.lucide { width: 28px; height: 28px; opacity: .3; }
 .canvas-board-color { position: absolute; inset: 0 0 auto; height: 4px; pointer-events: none; }
-.canvas-board-copy { position: relative; display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 4px; padding: 10px 12px; pointer-events: none; }
+.canvas-board-copy { position: relative; display: flex; min-width: 0; flex-direction: column; gap: 4px; padding: 10px 12px; pointer-events: none; }
 .canvas-board-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 500; }
 .canvas-board-copy p { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin: 0; color: var(--muted); font-size: 12px; white-space: pre-line; overflow-wrap: anywhere; }
-.canvas-board-meta { margin-top: auto; overflow: hidden; color: var(--muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.canvas-board-meta { overflow: hidden; color: var(--muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
 .canvas-board-total { margin-left: 8px; color: var(--muted); font-size: 12px; font-weight: 400; }
 .canvas-board-item .canvas-board-menu-trigger { position: absolute; z-index: 1; top: 8px; right: 8px; width: 28px; height: 28px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); opacity: 0; }
 .canvas-board-item:hover .canvas-board-menu-trigger, .canvas-board-item:focus-within .canvas-board-menu-trigger, .canvas-board-menu-trigger[data-state="open"] { opacity: 1; }

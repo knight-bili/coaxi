@@ -238,4 +238,4 @@ window.addEventListener('unhandledrejection',e=>(window as any).missionQA.errors
 if(query.has('canvasResize'))instrumentCanvasResize()
 createRoot(document.getElementById('root')!).render(<ThreadClientProvider client={client as any}><CurrentUserProfileContext.Provider value={{profile:{displayName:'维护者',avatarDataUrl:null},update:async()=>{}} as any}>{query.has('canvasDiff')
  ? <CanvasObjectDialog target={{threadId:items[0].threadId,object:{kind:'mission_diff',missionId:items[0].missionId,path:'missing-original-file.txt'}}} onClose={()=>{}}/>
- : query.has('canvasResize') ? <CanvasSourceFixture client={client as any} theme={theme}/> : <BusinessApp environment={environment}/>}</CurrentUserProfileContext.Provider></ThreadClientProvider>)
+ : query.has('canvasResize')||query.has('canvasBoards') ? <CanvasSourceFixture client={client as any} theme={theme} list={query.has('canvasBoards')}/> : <BusinessApp environment={environment}/>}</CurrentUserProfileContext.Provider></ThreadClientProvider>)

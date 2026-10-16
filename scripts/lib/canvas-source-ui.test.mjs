@@ -19,13 +19,15 @@ test('Canvas source cards and embedded Mission search retain their own sizing an
  const entry=join(fixture,'canvas-source.cjs')
  await cp(join(source,'canvas-source.cjs'),entry,{errorOnExist:true,force:false})
  const manifest=[]
- for(const path of ['apps/desktop/src/renderer/src/styles.css','apps/desktop/src/renderer/src/canvas.css','apps/desktop/src/renderer/src/CanvasSurface.tsx','apps/desktop/src/renderer/src/CanvasNote.tsx','apps/desktop/src/renderer/src/CanvasObjectDialog.tsx','apps/desktop/src/renderer/src/MissionDelivery.tsx','scripts/fixtures/mission-board/renderer.tsx','scripts/fixtures/mission-board/canvas-source.tsx','scripts/fixtures/mission-board/canvas-source.cjs','scripts/lib/canvas-source-ui.test.mjs']){
+ for(const path of ['apps/desktop/src/renderer/src/styles.css','apps/desktop/src/renderer/src/canvas.css','apps/desktop/src/renderer/src/CanvasSurface.tsx','apps/desktop/src/renderer/src/CanvasNote.tsx','apps/desktop/src/renderer/src/CanvasObjectDialog.tsx','apps/desktop/src/renderer/src/MissionDelivery.tsx','apps/desktop/src/renderer/src/CanvasWorkspace.tsx','apps/desktop/src/renderer/src/CanvasBoardPreview.tsx','apps/desktop/src/renderer/src/canvas-boards-controller.ts','scripts/fixtures/mission-board/renderer.tsx','scripts/fixtures/mission-board/canvas-source.tsx','scripts/fixtures/mission-board/canvas-source.cjs','scripts/lib/canvas-source-ui.test.mjs']){
   const bytes=await readFile(join(root,path));manifest.push({path,sha256:createHash('sha256').update(bytes).digest('hex')})
  }
  await writeFile(join(fixture,'source-files.json'),JSON.stringify(manifest,null,2)+'\n')
  await build({configFile:false,root:source,base:'./',logLevel:'error',plugins:[react()],resolve:{alias:{'@contracts':join(root,'packages/contracts/src/index.ts')}},build:{outDir:join(fixture,'renderer'),minify:false}})
  const results=[]
- for(const theme of ['day','night'])for(const mode of ['diff','resize']){
+ const modes=(process.env.ROVAI_CANVAS_SOURCE_MODES??'diff,resize,boards').split(',')
+ assert(modes.length&&modes.every(mode=>['diff','resize','boards'].includes(mode)))
+ for(const theme of ['day','night'])for(const mode of modes){
   const userData=join(fixture,`${mode}-${theme}`),env={}
   for(const key of ['SystemRoot','WINDIR','COMSPEC','PATHEXT','PATH'])if(process.env[key])env[key]=process.env[key]
   Object.assign(env,{HOME:join(fixture,'home'),USERPROFILE:join(fixture,'home'),ELECTRON_DISABLE_SECURITY_WARNINGS:'true'})

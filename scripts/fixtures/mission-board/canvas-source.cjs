@@ -12,7 +12,7 @@ app.whenReady().then(async()=>{
  const wait=async expression=>{for(let i=0;i<160;i++){if(await read(expression))return;await pause(50)}throw Error('Timed out: '+expression)}
  const report={mode,theme,scope:'production Renderer with closed memory projections; no Core, Git, PTY or model',checks:[],status:'running'}
  try{
-  await window.loadFile(renderer,{query:{[mode==='diff'?'canvasDiff':'canvasResize']:'1',theme}})
+  await window.loadFile(renderer,{query:{[{diff:'canvasDiff',resize:'canvasResize',boards:'canvasBoards'}[mode]]:'1',theme}})
   if(mode==='diff'){
    await wait(`Boolean(document.querySelector('.canvas-object-dialog .changes-tree-search input'))`)
    await pause(300)
@@ -30,6 +30,27 @@ app.whenReady().then(async()=>{
    report.control=await read(`(()=>{const input=document.createElement('input');document.querySelector('.canvas-object-dialog').append(input);const style=getComputedStyle(input);const result={border:style.borderTopWidth,minHeight:style.minHeight};input.remove();return result})()`)
    assert(Number.parseFloat(report.control.border)>0);assert.equal(report.control.minHeight,'40px')
    report.checks.push('ordinary_dialog_fields_keep_their_existing_border_and_height')
+  }else if(mode==='boards'){
+   await wait(`Boolean(document.querySelector('.canvas-board-title:not(:disabled)'))`)
+   await read(`document.querySelector('.canvas-breadcrumb-root').click()`)
+   await wait(`document.querySelectorAll('.canvas-board-item').length===10`)
+   report.layouts=[]
+   for(const [width,height] of [[1040,700],[1440,920]]){
+    window.setContentSize(width,height);await wait(`window.innerWidth===${width}&&window.innerHeight===${height}`)
+    await read(`new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))`)
+    const layout=await read(`(()=>{const cards=[...document.querySelectorAll('.canvas-board-item')];const list=document.querySelector('.canvas-board-scroll');return {width:innerWidth,height:innerHeight,outerExtra:document.documentElement.scrollHeight-innerHeight,horizontalExtra:list.scrollWidth-list.clientWidth,cards:cards.map(card=>{const preview=card.querySelector('.canvas-board-preview'),copy=card.querySelector('.canvas-board-copy'),style=getComputedStyle(copy),children=[...copy.children];return {height:card.getBoundingClientRect().height,previewHeight:preview.getBoundingClientRect().height,copyHeight:copy.getBoundingClientRect().height,intrinsicCopy:children.reduce((sum,child)=>sum+child.getBoundingClientRect().height,0)+parseFloat(style.paddingTop)+parseFloat(style.paddingBottom)+parseFloat(style.gap)*(children.length-1)}})}})()`)
+    report.layouts.push(layout)
+    const copyHeight=Math.max(...layout.cards.map(card=>card.intrinsicCopy))
+    assert(layout.cards.every(card=>card.height<=card.previewHeight+copyHeight+3),'Cards must fit their preview and compact copy without blank filler')
+    assert(Math.max(...layout.cards.map(card=>card.height))-Math.min(...layout.cards.map(card=>card.height))<1,'All original grid rows keep equal card heights')
+    assert(layout.outerExtra<=1&&layout.horizontalExtra<=1,'Only the board list may scroll vertically')
+   }
+   report.checks.push('original_board_cards_fit_their_content_and_keep_equal_rows_at_two_window_sizes')
+   report.lastTile=await read(`(()=>{const list=document.querySelector('.canvas-board-scroll'),last=document.querySelector('.canvas-board-create');list.scrollTop=list.scrollHeight;return {scrollTop:list.scrollTop,visible:last.getBoundingClientRect().bottom<=list.getBoundingClientRect().bottom+1}})()`)
+   assert(report.lastTile.scrollTop>0&&report.lastTile.visible)
+   report.checks.push('one_scroll_owner_keeps_the_last_create_tile_reachable')
+   await read(`document.querySelector('.canvas-board-scroll').scrollTop=0`)
+   report.runtimeErrors=await read(`window.missionQA.errors`);assert.deepEqual(report.runtimeErrors,[])
   }else{
    await wait(`document.querySelectorAll('.canvas-conversation-summary').length===64`)
    for(const [width,height] of [[1000,700],[1440,920],[820,620],[1280,800]]){
