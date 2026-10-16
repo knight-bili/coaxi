@@ -30543,7 +30543,7 @@ done
         let data_dir = root.join("data");
         let workspace_dir = root.join("workspace");
         fs::create_dir_all(&workspace_dir).unwrap();
-        fs::create_dir_all(&data_dir).unwrap();
+        rovai_core::platform::prepare_private_directory(&data_dir).unwrap();
         let runtime_camp_files_root =
             rovai_core::storage_layout::server_runtime_root(&data_dir).unwrap();
         let (camp_ids, repair_camp_id) = {

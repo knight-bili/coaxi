@@ -44,13 +44,13 @@ pub(crate) enum HelperInput {
         cols: u16,
         rows: u16,
     },
-    Stop,
+    Stop {},
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 pub(crate) enum HelperOutput {
-    Ready,
+    Ready {},
     Output {
         #[serde(rename = "bytesBase64")]
         bytes_base64: String,
@@ -175,7 +175,7 @@ fn run_session(
     let mut writer = pair.master.take_writer()?;
     let mut reader = pair.master.try_clone_reader()?;
     let output = Arc::new(Mutex::new(std::io::stdout()));
-    emit(&output, HelperOutput::Ready)?;
+    emit(&output, HelperOutput::Ready {})?;
 
     let (drained_tx, drained_rx) = mpsc::sync_channel(1);
     let reader_output = output.clone();
@@ -283,7 +283,7 @@ fn run_session(
                 })?;
                 emit(&output, HelperOutput::Resized { cols, rows })?;
             }
-            HelperInput::Stop => {
+            HelperInput::Stop {} => {
                 // Parent 的 ManagedProcess 仍须完成整个树的回收，root wait 不替代它。
                 child.0.kill()?;
             }

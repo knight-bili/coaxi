@@ -1590,7 +1590,18 @@ mod persistence_tests {
         let node_id = first.payload["nodeIds"][0].as_str().unwrap().to_owned();
         let stored = snapshot(database.connection(), &id).unwrap();
         assert_eq!(stored.file_reference_version, 1);
-        assert_eq!(stored.nodes[0].data, data);
+        let expected = CanvasNodeData {
+            title: Some("节点".into()),
+            color: Some("blue".into()),
+            grid_columns: 0,
+            grid_rows: 0,
+            x: 1_000_000.0,
+            y: -1_000_000.0,
+            width: 48.0,
+            height: 20_000.0,
+            ..data.clone()
+        };
+        assert_eq!(stored.nodes[0].data, expected);
         assert!(database.connection().execute("UPDATE canvas_node_file_reference SET file_thread_id=file_thread_id WHERE node_id=?1", [&node_id]).is_err());
         let mut missing = data.clone();
         missing.file_reference.as_mut().unwrap().thread_id = "missing-thread".into();

@@ -115,10 +115,15 @@
         "rc.2 Web生产构建exit0及全部asset-cache内容SHA核验",
         "全仓cargo fmt --all -- --check exit0；9文件规范化前后formatter canonical输出一致，4冻结权威未改",
         "rc.3当前SHA Windows Core/Host/CLI构建0",
-        "extended+slow测试版本编译0，3材料owner非零入册并3项通过"
+        "extended+slow测试版本编译0，3材料owner非零入册并3项通过",
+        "rc.4真实隔离Host/HTTP/PTY完整生命周期1owner通过：启动/输入/resize/洪流/卡片与板删除/自然退出/停止重开/计划退出/硬重启回收；无关control存活",
+        "Desktop main/preload/renderer生产构建0，精确文件SHA记录；不是Native UI或打包运行",
+        "extended+slow当前1248测试非零入册；定向26项23通过3失败，完整上下文冻结字节慢测通过"
       ],
       "open_findings": [
-        "实际Host测试被新增错误探针monitoring.summary中断；已改现有app.info，保持5s响应/全部生命周期断言，待rc.4复验"
+        "原Core队列测试使用普通mkdir不满足Windows私有DACL，改现有prepare_private_directory",
+        "文件pin持久化测试错误期待未经归一化的几何/标题，改明确规范预期且精确路径保留",
+        "Serde内部tag单位变体漏拒额外字段，Ready/Stop改空struct保持原JSON，保留原坏帧断言并扩同owner检查Stop；需新二进制/真实PTY复验"
       ],
       "remaining_checks": [
         "正确features下相关Rust owner先list非零再运行",

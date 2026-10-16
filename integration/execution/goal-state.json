@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "I03-C06 rc.3新Core/Host/CLI构建通过、extended+slow测试版本编译/3材料owner入册并全部通过。真实Host已跑至实际PTY输入/缩放/洪流，但新增健康探针误用不存在monitoring.summary而失败；两测试调用已改app.info，待rc.4复验Host和相关队列/画布/终端owner。",
+  "current_slice": "I03-C06 Windows真实Host/HTTP/PTY完整生命周期和Desktop生产构建已通过。相关26 Rust owner中23通过3失败，已集中修正私有目录测试夹具、文件节点归一化预期、辅助协议空变体漏拒额外字段；冻结rc.5后新生产/测试构建并做必要复验。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "冻结rc.4，复用生产源码未变的rc.3新二进制和已通过材料3owner、rc.2 types/Web。仅测试探针改为既有app.info，重新编译受影响测试版本，先list再运行队列/画布/终端/单聊/上下文相关owner，同时重跑实际Host/PTY完整生命周期；不添加不存在的产品接口或删除存活检查。",
+    "冻结rc.5：真实重新构建受辅助协议修复影响的Core/Host/CLI；编译受影响测试版本并先list后运行原3失败及终端5owner；复跑真实Host完整PTY生命周期。复用未变TS/Web/Desktop、材料3及其余已通过Rust owner。",
     "I03-C05冷路由/多卡/规模代码集齐后，C06冻结fusion-i03-rc.1，集中编译当前158/208及此前生命周期增量，原扩展owner/HTTP/实际Desktop统一验证；不把旧二进制当当前源码证据。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "c06_materials_passed_actual_pty_probe_repair_pending",
+  "current_slice_status": "c06_runtime_and_desktop_passed_three_findings_fixed_pending_revalidation",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",

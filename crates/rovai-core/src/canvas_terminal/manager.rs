@@ -818,7 +818,7 @@ async fn run_entry(
                     let Some(frame) = frame else { anyhow::bail!("canvas_terminal.helper_closed"); };
                     let Some(frame) = frame? else { break; };
                     match frame {
-                        HelperOutput::Ready => { ensure!(!ready, "canvas_terminal.duplicate_ready"); entry.data()?.session.commit_spawn().map_err(anyhow::Error::msg)?; ready = true; permit.take(); },
+                        HelperOutput::Ready {} => { ensure!(!ready, "canvas_terminal.duplicate_ready"); entry.data()?.session.commit_spawn().map_err(anyhow::Error::msg)?; ready = true; permit.take(); },
                         HelperOutput::Output { bytes_base64 } => { let bytes = STANDARD.decode(bytes_base64)?; ensure!(bytes.len() <= READ_CHUNK_LIMIT, "canvas_terminal.invalid_output_chunk"); entry.data()?.session.append(&bytes).map_err(anyhow::Error::msg)?; },
                         HelperOutput::Written { input_id } => {
                             ensure!(matches!(&pending, Some(Pending::Write(id)) if *id==input_id), "canvas_terminal.input_ack_mismatch");

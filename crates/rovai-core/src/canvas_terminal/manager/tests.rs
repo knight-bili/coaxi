@@ -120,7 +120,7 @@ async fn helper_frames_preserve_split_packets_and_refuse_partial_oversize_or_ope
     let mut read = BufReader::new(read);
     assert!(matches!(
         read_frame(&mut read).await.unwrap(),
-        Some(HelperOutput::Ready)
+        Some(HelperOutput::Ready {})
     ));
     writer.await.unwrap();
     assert!(read_frame(&mut read).await.unwrap().is_none());
@@ -132,4 +132,17 @@ async fn helper_frames_preserve_split_packets_and_refuse_partial_oversize_or_ope
         let mut read = BufReader::new(bytes.as_slice());
         assert!(read_frame(&mut read).await.is_err());
     }
+    assert_eq!(
+        serde_json::to_value(HelperOutput::Ready {}).unwrap(),
+        serde_json::json!({ "kind": "ready" })
+    );
+    assert_eq!(
+        serde_json::to_value(HelperInput::Stop {}).unwrap(),
+        serde_json::json!({ "op": "stop" })
+    );
+    assert!(matches!(
+        serde_json::from_str::<HelperInput>(r#"{"op":"stop"}"#).unwrap(),
+        HelperInput::Stop {}
+    ));
+    assert!(serde_json::from_str::<HelperInput>(r#"{"op":"stop","injected":true}"#).is_err());
 }
