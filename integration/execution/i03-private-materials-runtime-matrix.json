@@ -172,25 +172,34 @@
       "id": "PC17",
       "scenario": "另一卡查看编辑并明确接管",
       "expected": "不继承 token；接管后旧写拒绝",
-      "status": "engineering_verification_pending",
-      "verified": [],
-      "remaining": "不继承 token；接管后旧写拒绝"
+      "status": "partial_real_core_verified",
+      "verified": [
+        "真实Host/Core由原发送产生队列；另一scope看不到编辑token，明确接管获得新token，旧token保存被拒绝，无Pending/Run数据库种入"
+      ],
+      "remaining": "另一卡页面接管、显示和实际编辑保存已准备，尚未运行",
+      "partial_evidence": "i03-r01-private-workflow-preparation.json"
     },
     {
       "id": "PC18",
       "scenario": "排队消息移回空卡",
       "expected": "正文、附件、quotes 同份返回",
-      "status": "engineering_verification_pending",
-      "verified": [],
-      "remaining": "正文、附件、quotes 同份返回"
+      "status": "partial_real_core_verified",
+      "verified": [
+        "真实Core把原队列正文/quote移回空位置，原FIFO未向固定ACP派发排队输入；附件与页面完整资格继续"
+      ],
+      "remaining": "含附件的完整输入及实际页面移回已准备，尚未运行",
+      "partial_evidence": "i03-r01-private-workflow-preparation.json"
     },
     {
       "id": "PC19",
       "scenario": "移回非空目标",
       "expected": "两份完整输入，无覆盖或混装",
-      "status": "engineering_verification_pending",
-      "verified": [],
-      "remaining": "两份完整输入，无覆盖或混装"
+      "status": "partial_real_core_verified",
+      "verified": [
+        "真实Core非空目标保持原draft/quote，另建含原队列正文/quote的retained，未派发原排队输入"
+      ],
+      "remaining": "含附件及本机正文的实际页面保留、交换已准备，尚未运行",
+      "partial_evidence": "i03-r01-private-workflow-preparation.json"
     },
     {
       "id": "PC20",
@@ -244,5 +253,6 @@
     }
   ],
   "settlement": "i03-closeout-settlement.json",
-  "latest_verification": "i03-r03-host-private-verification.json"
+  "latest_verification": "i03-r03-host-private-verification.json",
+  "latest_preparation": "i03-r01-private-workflow-preparation.json"
 }

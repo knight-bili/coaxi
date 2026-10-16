@@ -218,5 +218,6 @@
     "private_cases_open": 18,
     "verified_work_groups": 1
   },
-  "latest_group_verification": "i03-r03-host-private-verification.json"
+  "latest_group_verification": "i03-r03-host-private-verification.json",
+  "latest_preparation": "i03-r01-private-workflow-preparation.json"
 }

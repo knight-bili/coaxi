@@ -59,6 +59,21 @@ async function qualify(window){
   }
   window.show();window.focus();window.webContents.focus()
   await wait(`window.rovai&&document.querySelector('button[aria-label="无限画布"]')?.disabled===false`,60_000)
+  if(['private-roundtrip','private-queue'].includes(config.mode)){
+   assert.ok(config.private_workflow_module,'新私聊场景必须由候选驱动绑定独立模块及固定本地协议程序')
+   const moduleUrl=new URL(config.private_workflow_module);assert.equal(moduleUrl.protocol,'file:')
+   assert.equal(createHash('sha256').update(await readFile(moduleUrl)).digest('hex'),config.private_workflow_sha256)
+   for(const [key,specification] of [['ROVAI_QWEN_BIN',config.controlled_launcher],['ROVAI_ACCEPTANCE_SCRIPT',config.controlled_script]]){
+    assert.ok(specification?.path&&specification.sha256);assert.equal(process.env[key],specification.path)
+    assert.equal(createHash('sha256').update(await readFile(specification.path)).digest('hex'),specification.sha256)
+   }
+   assert.equal(process.env.ROVAI_SKILL_RECOVERY_CAPTURE,config.runtime_capture)
+   const {qualifyCanvasPrivateWorkflow}=await import(config.private_workflow_module)
+   report.scope='production Main/preload/Core with owned controlled ACP; actual private editor and complete queue input transitions; no external model'
+   await qualifyCanvasPrivateWorkflow(window,{evaluate,wait,rpc,openCanvasBoard,config,report,record})
+   report.status='passed'
+   return
+  }
   if(config.mode==='materials'){
    report.scope='production Main/preload/Core; private composer scopes and Native byte preparation; no model'
    await qualifyMaterials({evaluate,rpc})

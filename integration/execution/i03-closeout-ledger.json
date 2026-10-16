@@ -19,7 +19,7 @@
     "private_cases_open": 18,
     "verified_work_groups": 1
   },
-  "count_boundary": "不同层级不相加；17项为限定范围旧待办结算，10组含21个私聊子场景及其他必需工作，不是完成百分比",
+  "count_boundary": "不同层级不相加；17条为限定范围旧待办，固定10组按状态计算剩余；私聊按原24场景逐项核定，不计算完成百分比",
   "settled_obligations": [
     {
       "id": "S01",
@@ -161,9 +161,17 @@
         "I03-C01"
       ],
       "done_when": "引用/revision/撤销在模式往返保持；空scope只读无登记；冲突保留本机输入；上传迟到不串入；租约接管、完整移回/交换及节点换绑恢复有实际界面证据。",
-      "next_action": "沿既有Native owner补同次往返观测和有效pending token/retained输入场景；先准备代码与相关低成本检查。",
+      "next_action": "补PC09/PC10/PC20/PC23故障和换绑页面场景，累计候选运行全部已准备Native模式；本机工程完成条件不变。",
       "owner": "Codex",
-      "external_condition": "none_confirmed_blocking_current_independent_work"
+      "external_condition": "none_confirmed_blocking_current_independent_work",
+      "latest_preparation": "i03-r01-private-workflow-preparation.json",
+      "prepared_native_cases": [
+        "PC03",
+        "PC08",
+        "PC17",
+        "PC18",
+        "PC19"
+      ]
     },
     {
       "id": "I03-R02",

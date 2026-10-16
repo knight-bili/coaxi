@@ -21,6 +21,14 @@ I03 编辑端归属扩展现有 `host-web.test.mjs`，定向运行 `node --test 
 本机未发送正文与保存位置另由现有 `editing-recovery.test.ts` 检查，不把纯存储测试当作实际页面/编辑器切换；
 旧能力缺失拒绝仍由 `private-composer-scope.test.ts` 拥有，数据库迁移失败回滚继续复用既有 Rust migration owner。
 
+I03 R01 的真实页面场景继续使用原 `canvas-native-input.mjs`，新增 `private-roundtrip` / `private-queue` 两个模式，
+共享 `canvas-private-workflow.mjs` 的真实业务命令夹具。原地/侧边往返同时观察正文、附件、引用顺序、revision、
+同一个编辑器及既有撤销/重做；排队场景观察完整移回、保留输入交换、另一卡明确接管和旧令牌拒绝。
+夹具通过已准入的固定本地 ACP 生成私聊历史、暂停中的实际 Run 和原 FIFO 排队项，不直接写历史/Pending/Run 表。
+候选驱动须绑定独立模块、固定启动器与协议脚本的摘要，保持隔离环境并保留每次结果；不修改旧冻结驱动或放宽源码检查。
+Core 夹具前置验证与真正 Native UI 分别记资格；只有前置通过不能关闭 PC03/08/17/18/19 或整个 R01。
+其他并发拒绝、迟到上传、丢回执和换绑恢复继续由 R01 原清单约束，不被两个模式省略。
+
 I03 多卡输入的最低层 owner 为 `canvas-conversations-controller.test.ts`（精确上下文、全部准备回滚、模式切换与孤立输入保留）
 和 `thread-workspace-actions.test.ts`（不同 Thread 命令归属、冻结发送及拒绝/未知不清输入）。
 窗口预览生命周期继续扩展 `file-preview-resources.test.ts`，DOM scope 继续扩展 `FilePreviewTabs.test.ts`；
