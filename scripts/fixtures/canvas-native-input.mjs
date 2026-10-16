@@ -13,7 +13,7 @@ await mkdir(config.evidence,{recursive:false})
 let started=false
 const privateModes=['private-roundtrip','private-queue','private-rebind','private-late-upload','private-send','private-send-boundaries','private-core-interruption','private-app-interruption']
 let privateWorkflow,privateIpc
-let objectWorkflow, fileWorkflow
+let objectWorkflow, fileWorkflow, terminalWorkflow
 const record=(name,details={})=>{report.checks.push({name,passed:true,...details});console.log(JSON.stringify({check:name,passed:true}))}
 async function openCanvasBoard(evaluate,wait,boardId){
  await evaluate(`(()=>{document.querySelector('button[aria-label="无限画布"]').click();return true})()`)
@@ -170,8 +170,7 @@ async function qualify(window){
   }
   if(config.mode==='terminal-input'){
    report.scope='production Main/preload/Core; physical Windows IME, actual clipboard and terminal remount; no model'
-   const workflow=await import(config.terminal_input_module)
-   await workflow.qualifyCanvasTerminalInput(window,{evaluate,wait,rpc,openCanvasBoard,config,report,record})
+   await terminalWorkflow.qualifyCanvasTerminalInput(window,{evaluate,wait,rpc,openCanvasBoard,config,report,record,seam:privateIpc})
    report.status='passed';return
   }
   const boards=await rpc('canvas.boards.list'),board=boards.boards.find(board=>board.name==='C06 真实桌面画布')
@@ -1273,6 +1272,12 @@ async function qualifyPublicCold(window,{evaluate,wait,rpc}){
  record('public_cold_reopening_keeps_original_two_threads_without_sending_messages_or_starting_model_runs')
  await evaluate(`(()=>{document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]').click();return true})()`);await pause(350)
  await writeFile(join(config.evidence,'01-cold-public-pin-drafts.png'),(await window.webContents.capturePage()).toPNG())
+}
+if(config.mode==='terminal-input'){
+ assert.equal(createHash('sha256').update(await readFile(new URL(config.terminal_input_module))).digest('hex'),config.terminal_input_sha256)
+ assert.equal(createHash('sha256').update(await readFile(config.windows_input_script)).digest('hex'),config.windows_input_sha256)
+ terminalWorkflow=await import(config.terminal_input_module)
+ privateIpc=terminalWorkflow.installTerminalInputIpc(ipcMain)
 }
 if(config.mode==='file-resources'){
  for(const key of ['file_workflow','file_ipc'])assert.equal(createHash('sha256').update(await readFile(new URL(config[key+'_module']))).digest('hex'),config[key+'_sha256'])

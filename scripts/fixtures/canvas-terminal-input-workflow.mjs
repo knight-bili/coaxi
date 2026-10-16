@@ -7,7 +7,24 @@ import { join } from 'node:path'
 import { randomUUID, createHash } from 'node:crypto'
 import { setTimeout as pause } from 'node:timers/promises'
 
-export async function qualifyCanvasTerminalInput(window,{evaluate,wait,rpc,openCanvasBoard,config,report,record}) {
+export function installTerminalInputIpc(ipcMain) {
+ const register=ipcMain.handle,requests=[],faults=[];let target=null,registered=false
+ ipcMain.handle=function(channel,handler){
+  if(channel!=='rovai:request')return register.call(this,channel,handler)
+  registered=true
+  return register.call(this,channel,async(event,method,params)=>{
+   requests.push({method,target:params?.target??null})
+   if(target&&method==='canvas.terminals.snapshot'&&params?.target?.boardId===target.boardId&&params.target.nodeId===target.nodeId){
+    faults.push({kind:'controlled_terminal_read_transport_failure',target:{...target}})
+    return {kind:'failure',failure:{kind:'infrastructure_failure',code:'fixture_terminal_connection_unavailable',message:'受控测试：终端连接暂不可用。',retryable:true,generation:0,details:{}}}
+   }
+   return handler(event,method,params)
+  })
+ }
+ return {finishRegistration(){ipcMain.handle=register;assert.ok(registered)},armReadFailure(value){assert.equal(target,null);target={...value}},releaseAll(){target=null},snapshot:()=>({requests,faults})}
+}
+
+export async function qualifyCanvasTerminalInput(window,{evaluate,wait,rpc,openCanvasBoard,config,report,record,seam}) {
  const invoke=promisify(execFile),failures=[]
  const hwnd=window.getNativeWindowHandle().readBigUInt64LE().toString()
  const physical=async action=>{
@@ -23,7 +40,7 @@ export async function qualifyCanvasTerminalInput(window,{evaluate,wait,rpc,openC
  const node=(await rpc('canvas.nodes.snapshot',{boardId})).nodes[0],target={boardId,nodeId:node.id},card=`.react-flow__node[data-id="${node.id}"]`
  report.terminal_input_context={boardId,target,mainPid:process.pid,workspace:config.workspace}
  const button=label=>`${card} button[aria-label="${label}"]`
- const click=async selector=>evaluate(`(()=>{const b=document.querySelector(${JSON.stringify(selector)});if(!b||b.disabled)throw Error('Required enabled control missing');b.click();return true})()`)
+ const click=async selector=>{await wait(`Boolean(document.querySelector(${JSON.stringify(selector)})&&!document.querySelector(${JSON.stringify(selector)}).disabled)`);return evaluate(`(()=>{document.querySelector(${JSON.stringify(selector)}).click();return true})()`)}
  const focus=async()=>{window.focus();window.webContents.focus();await evaluate(`(()=>{document.querySelector('${card} .xterm-helper-textarea').focus();return true})()`)}
  const enter=async()=>{await focus();await physical('enter')}
  const typeText=async text=>{for(const keyCode of text){window.webContents.sendInputEvent({type:'keyDown',keyCode});window.webContents.sendInputEvent({type:'char',keyCode});window.webContents.sendInputEvent({type:'keyUp',keyCode})}await pause(400)}
@@ -31,6 +48,17 @@ export async function qualifyCanvasTerminalInput(window,{evaluate,wait,rpc,openC
  const output=async()=>stripVTControlCharacters(Buffer.concat((await snapshot()).chunks.map(x=>Buffer.from(x.bytesBase64,'base64'))).toString('utf8'))
  const waitOutput=async text=>{for(let i=0;i<80;i++){if((await output()).split(/\r?\n/).some(line=>line.trim()===text))return;await pause(100)}throw Error('Actual PTY output missing: '+text)}
  let restoreClipboard,restoreImeMode=false
+ const formats=clipboard.availableFormats(),supported=new Set(['text/plain','text/html','text/rtf','image/png'])
+ const clipboardAvailable=formats.every(x=>supported.has(x))
+ if(clipboardAvailable){
+  const original={},originalBytes={}
+  if(formats.includes('text/plain'))original.text=clipboard.readText()
+  if(formats.includes('text/html'))original.html=clipboard.readHTML()
+  if(formats.includes('text/rtf'))original.rtf=clipboard.readRTF()
+  if(formats.includes('image/png'))original.image=clipboard.readImage()
+  for(const format of formats)originalBytes[format]=clipboard.readBuffer(format)
+  restoreClipboard=()=>{clipboard.clear();if(formats.length)clipboard.write(original);assert.deepEqual(clipboard.availableFormats().sort(),[...formats].sort(),'Clipboard formats must be restored');for(const format of formats)assert.ok(clipboard.readBuffer(format).equals(originalBytes[format]),'Clipboard payload must be restored')}
+ }
  try {
   await openCanvasBoard(evaluate,wait,boardId)
   await wait(`Boolean(document.querySelector('${button('启动终端')}')&&!document.querySelector('${button('启动终端')}').disabled)`)
@@ -41,10 +69,11 @@ export async function qualifyCanvasTerminalInput(window,{evaluate,wait,rpc,openC
   const initial=await snapshot();assert.equal(initial.phase,'running');report.generation=initial.generation
   record('fresh_isolated_native_terminal_starts_real_pty_and_uses_original_generation')
   try {
+   assert.ok(clipboardAvailable,'IME command preparation needs a safely restorable clipboard')
    const imePath=join(config.workspace,'ime-result.txt'),prefix=`require('node:fs').writeFileSync(${JSON.stringify(imePath)},"`
    let composing=false
    for(let attempt=0;attempt<2;attempt++){
-    await focus();const beforePrefix=await snapshot();await typeText(prefix);await pause(600)
+    await focus();const beforePrefix=await snapshot();clipboard.writeText(prefix);await click(button('粘贴'));await pause(600)
     assert.ok((await snapshot()).inputSequence>beforePrefix.inputSequence,'Command prefix must reach the real PTY before IME qualification')
     await evaluate('(()=>{window.r07InputEvents=[];return true})()')
     const before=await snapshot();await physical('compose')
@@ -64,22 +93,14 @@ export async function qualifyCanvasTerminalInput(window,{evaluate,wait,rpc,openC
    assert.equal(report.ime_events.filter(e=>e.type==='compositionend'&&e.data==='你好').length,1)
    assert.ok(report.ime_events.some(e=>e.type==='input'&&e.trusted&&e.data==='你好'))
    assert.equal(report.synthetic_composition_ends.length,0,'Test or application JavaScript must not synthesize composition completion')
-   await typeText('");console.log("R07_IME_DONE")');await enter();await waitOutput('R07_IME_DONE')
+   clipboard.writeText('");console.log("R07_IME_DONE")');await click(button('粘贴'));await pause(400);await enter();await waitOutput('R07_IME_DONE')
    const bytes=await readFile(imePath);assert.deepEqual(bytes,Buffer.from('你好'))
    report.ime_file={path:imePath,sha256:createHash('sha256').update(bytes).digest('hex'),bytes:bytes.length}
    record('actual_windows_pinyin_composition_sends_no_uncommitted_bytes_and_commits_exact_chinese_once')
   } catch(error) { failures.push(String(error.stack??error));report.ime_failure=failures.at(-1);await focus();await physical('cancel').catch(()=>{});await physical('clear').catch(()=>{}) }
 
-  const formats=clipboard.availableFormats(),supported=new Set(['text/plain','text/html','text/rtf','image/png'])
-  if(formats.some(x=>!supported.has(x))){report.clipboard_deferred={formats,reason:'Existing format cannot be losslessly restored; no clipboard mutation performed'};failures.push('Clipboard qualification deferred: existing unsupported format')}
+  if(!clipboardAvailable){report.clipboard_deferred={formats,reason:'Existing format cannot be losslessly restored; no clipboard mutation performed'};failures.push('Clipboard qualification deferred: existing unsupported format')}
   else {
-   const original={},originalBytes={}
-   if(formats.includes('text/plain'))original.text=clipboard.readText()
-   if(formats.includes('text/html'))original.html=clipboard.readHTML()
-   if(formats.includes('text/rtf'))original.rtf=clipboard.readRTF()
-   if(formats.includes('image/png'))original.image=clipboard.readImage()
-   for(const format of formats)originalBytes[format]=clipboard.readBuffer(format)
-   restoreClipboard=()=>{clipboard.clear();if(formats.length)clipboard.write(original);const restored=clipboard.availableFormats();assert.deepEqual(restored.sort(),[...formats].sort(),'Clipboard formats must be restored');for(const format of formats)assert.ok(clipboard.readBuffer(format).equals(originalBytes[format]),'Clipboard payload must be restored')}
    const pastePath=join(config.workspace,'剪贴板-实际提交.txt'),value='中文剪贴板😀',command=`require('node:fs').writeFileSync(${JSON.stringify(pastePath)},${JSON.stringify(value)});console.log("R07_PASTE_DONE")`
    clipboard.writeText(command);await click(button('粘贴'));await pause(400);await enter();await waitOutput('R07_PASTE_DONE')
    assert.deepEqual(await readFile(pastePath),Buffer.from(value))
@@ -99,10 +120,18 @@ export async function qualifyCanvasTerminalInput(window,{evaluate,wait,rpc,openC
   await click(button('展开终端'));await wait(`Boolean(document.querySelector('${card} .xterm-helper-textarea'))`)
   await click(button('重新读取'));await pause(700)
   const reopened=await snapshot();assert.equal(reopened.generation,before.generation);assert.equal(reopened.inputSequence,before.inputSequence)
+  seam.armReadFailure(target);await click(button('重新读取'))
+  await wait(`document.querySelector('${card} [role="alert"]')?.textContent.includes('受控测试：终端连接暂不可用。')&&document.querySelector('${button('粘贴')}').disabled`)
+  seam.releaseAll()
+  assert.equal((await snapshot()).inputSequence,before.inputSequence)
+  await click(button('重新读取'));await wait(`!document.querySelector('${card} [role="alert"]')&&!document.querySelector('${button('粘贴')}').disabled`)
+  const recovered=await snapshot();assert.equal(recovered.generation,before.generation);assert.equal(recovered.inputSequence,before.inputSequence)
+  record('controlled_native_read_transport_error_disables_input_then_explicit_refresh_recovers_same_shell_without_replay')
   await focus();await typeText('2+3');await enter();await wait(`Array.from(document.querySelectorAll('${card} .xterm-rows > div')).some(row=>row.textContent?.trim()==='5')`)
   record('collapse_reopen_and_explicit_refresh_keep_original_shell_and_do_not_replay_old_input')
   const shot=join(config.evidence,'01-windows-terminal-input.png');await writeFile(shot,(await window.webContents.capturePage()).toPNG());report.screenshots=[shot]
  } finally {
+  seam.releaseAll()
   if(restoreClipboard){try{restoreClipboard();report.clipboard_original_restored=true}catch(error){failures.push(String(error.stack??error));report.clipboard_restore_failed=true}}
   if(restoreImeMode){try{await focus();await physical('toggle-ime');report.ime_mode_restored=true}catch(error){failures.push(String(error.stack??error));report.ime_mode_restore_failed=true}}
   const value=await snapshot()
