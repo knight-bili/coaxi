@@ -47,7 +47,7 @@ async function qualify(window){
  const wait=async(expression,timeout=20_000)=>{const until=Date.now()+timeout;while(Date.now()<until){if(await evaluate(expression))return;await pause(100)}throw Error('Native condition timed out: '+expression)}
  const rpc=(method,params={})=>evaluate(`window.rovai.request(${JSON.stringify(method)},${JSON.stringify(params)})`)
  try{
-  if(privateModes.includes(config.mode)||config.mode==='object-cold'||config.mode==='file-resources'){
+  if(privateModes.includes(config.mode)||config.mode==='object-cold'||config.mode==='file-resources'||config.mode==='terminal-input'){
    await wait(`window.rovai?.onboarding&&window.rovai.onboarding.get().then(value=>value.status!=='uninitialized')`,60_000)
    const initial=await evaluate('window.rovai.onboarding.get()')
    if(initial.status!=='completed'){
@@ -167,6 +167,12 @@ async function qualify(window){
    await qualifyPublicCold(window,{evaluate,wait,rpc})
    report.status='passed'
    return
+  }
+  if(config.mode==='terminal-input'){
+   report.scope='production Main/preload/Core; physical Windows IME, actual clipboard and terminal remount; no model'
+   const workflow=await import(config.terminal_input_module)
+   await workflow.qualifyCanvasTerminalInput(window,{evaluate,wait,rpc,openCanvasBoard,config,report,record})
+   report.status='passed';return
   }
   const boards=await rpc('canvas.boards.list'),board=boards.boards.find(board=>board.name==='C06 真实桌面画布')
   assert.ok(board)
