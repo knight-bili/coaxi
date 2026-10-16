@@ -116,10 +116,18 @@ export async function qualifyCanvasFileResources(window,{evaluate,wait,rpc,openC
     await remove(html[0].nodeId)
     await click(`[...${card(html[4].nodeId)}.querySelectorAll('[role="alert"] button')].find(node=>node.textContent==='重试')`)
     await inspectHtml(html[4].nodeId,html[4].identity)
-    await wait(`window.rovai.filePreview.readText({handleId:${JSON.stringify(html[0].handle.handleId)},expectedGeneration:${JSON.stringify(html[0].handle.contentGeneration)}}).then(value=>value.ok===false)`)
+    const releaseDeadline=Date.now()+20000
+    while(Date.now()<releaseDeadline&&!rows().some(row=>row.channel==='rovai:file-preview-release-html-site'&&row.args[0]?.previewId===html[0].site.previewId&&row.result?.released===true))await pause(50)
+    assert.ok(rows().some(row=>row.channel==='rovai:file-preview-release-html-site'&&row.args[0]?.previewId===html[0].site.previewId&&row.result?.released===true),'original HTML site was not released')
+    assert.ok(!window.webContents.mainFrame.framesInSubtree.some(frame=>frame.frameTreeNodeId===documents[0].frameId),'removed author document is still alive')
+    const retained=rows().filter(row=>row.channel==='rovai:file-preview-retention').at(-1)?.args[0]
+    assert.ok(retained&&retained.handles.length<=64)
+    const cached=retained.handles.find(row=>row.handleId===html[0].handle.handleId)
+    if(cached)assert.equal(cached.visible,false)
+    report.html_release={originalSiteReleased:true,originalDocumentRemoved:true,cachedSourceHandleRetained:Boolean(cached),retainedHandleCount:retained.handles.length,qualification:'File Preview v13/v14 retain bounded source/read snapshots separately from the four live HTML documents and sites'}
     for(const doc of documents.slice(1))assert.ok(window.webContents.mainFrame.framesInSubtree.some(frame=>frame.frameTreeNodeId===doc.frameId))
     assert.equal(sha(await readFile(html[0].path)),sha(Buffer.from(html[0].body)))
-    record('removing_one_html_pin_then_retrying_the_fifth_reclaims_its_original_handle_and_preserves_other_documents_and_source')
+    record('removing_one_html_pin_releases_its_document_and_site_then_retry_admits_the_fifth_and_preserves_other_documents_and_source')
     await capture('02-window-html-budget')
     const mirrors=await rpc('canvas.boards.create',{commandId:randomUUID(),command:{name:'R06 同源HTML呈现预算'}})
     assert.equal(mirrors.status,'applied');context.mirrorBoardId=mirrors.payload.board.id;context.mirrorIds=[]
