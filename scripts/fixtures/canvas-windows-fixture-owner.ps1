@@ -6,7 +6,10 @@ if ($item.Name -notmatch '^rc22-native-notifications-r[1-9][0-9]*$' -or $item.Pa
 $core=(Resolve-Path -LiteralPath (Join-Path $target 'Core')).Path
 $user=[Security.Principal.WindowsIdentity]::GetCurrent().User
 $admin=New-Object Security.Principal.SecurityIdentifier('S-1-5-32-544')
-$candidates=@(Get-ChildItem -LiteralPath $core -Force -Recurse)
+$candidates=@(foreach ($name in @('skills','runtime-private','quick-chat')) {
+ $path=Join-Path $core $name
+ if (Test-Path -LiteralPath $path) { Get-Item -LiteralPath $path -Force; Get-ChildItem -LiteralPath $path -Force -Recurse }
+})
 if ($candidates | Where-Object { ($_.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 -or -not $_.FullName.StartsWith($core+'\',[StringComparison]::OrdinalIgnoreCase) }) { throw 'Fixture traversal encountered an unowned or reparse path' }
 $before=@($candidates | ForEach-Object {
  $acl=Get-Acl -LiteralPath $_.FullName
