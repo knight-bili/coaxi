@@ -150,12 +150,17 @@ export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait
     await evaluate(`(()=>{document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]').click();return true})()`)
     if (config.mode === 'private-roundtrip') {
       await addMaterial(scopes[0], 'R01 甲卡材料.txt', '甲材料对应的问题')
-      const text = '甲卡保持的未发送正文\n撤销与重做探针'
-      await typeBody(0, text)
+      const baseline = '甲卡保持的未发送正文\n撤销与重做探针', text = `${baseline}Z`
+      await typeBody(0, baseline)
       await typeBody(1, '乙卡另一份未发送正文')
+      window.focus(); window.webContents.focus()
+      await evaluate(`(()=>{const input=${input(0)};input.focus();input.setSelectionRange(input.value.length,input.value.length);window.r01UndoEvents=[];document.addEventListener('input',event=>window.r01UndoEvents.push({type:event.inputType,trusted:event.isTrusted,value:event.target.value}),true);return true})()`)
+      for(const type of ['keyDown','char','keyUp'])window.webContents.sendInputEvent({type,keyCode:'Z'})
+      await wait(`${input(0)}.value===${JSON.stringify(text)}`)
       await wait(`${frame(0)}.querySelector('.single-chat-composer .message-quotes-trigger')?.textContent.includes('1')`)
       const before = await get(scopes[0]), beta = await get(scopes[1])
       await evaluate(`(()=>{window.r01Editor=${input(0)};${input(0)}.focus();return true})()`)
+      assert.ok(await evaluate(`document.activeElement===${input(0)}`))
       window.webContents.undo()
       await wait(`${input(0)}.value!==${JSON.stringify(text)}`)
       const undoValue = await evaluate(`${input(0)}.value`)
