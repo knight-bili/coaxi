@@ -61,6 +61,18 @@ within that Host/Core. It does not adopt the donor's unscoped numeric-ID keys or
 Unsent input now uses the existing Composer with independent Host/Core/board/pin/reference draft contexts;
 the same card's inline/drawer presentations reuse its editor. Different cards do not merge unsent input.
 
+Notes retain Codeg's whole-paper drag and double-click inline editing, while idle Markdown uses
+the existing safe renderer. Blur or Escape submits only the content patch at the board revision
+captured when editing began. A rejected or uncertain write keeps the text; an uncertain command
+uses the existing graph reconciliation instead of minting another command. Revision changes
+require explicit review and a new save against the current snapshot. There is no silent rebase.
+Unsent note copies use a separate `rovai.canvas.note-draft.v1` local-storage key scoped by
+Host, Core, board and node, containing only text, baseline and captured revision. They never
+enter advisory view-state records or model input. Input handlers save the last text synchronously;
+normal navigation/quit guards block while a note remains dirty. Forced unmount leaves the local
+copy for explicit recovery on the same surviving note; it does not dispatch against a disposed
+Core owner or recreate a deleted node. Confirmed saves clear only that note's local copy.
+
 References to AI members, Mission, Task, Thread and project files identify existing Core objects;
 the canvas does not own copied business status or a second execution engine. Resolve visibility
 and actions through the object's existing permissions and current snapshot. Missing or removed

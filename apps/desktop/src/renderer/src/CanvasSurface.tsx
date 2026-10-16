@@ -5,11 +5,12 @@ import { Background, BackgroundVariant, Panel, NodeResizer, ReactFlow, ReactFlow
   SelectionMode, ViewportPortal, applyNodeChanges, useReactFlow, useViewport, type Node, type NodeProps } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import type { AgentProfile, CanvasConversationRef, CanvasNode, CanvasNodeKind, CanvasNodeMutation, FilePreviewApi, ResolvedTheme, StoredCommandResult } from '@contracts'
-import { ExternalLink, Expand, FileDiff, Flag, Folder, Folders, Group, LayoutGrid, ListTodo, LockKeyhole, Map as MapIcon, Maximize2, MessageSquare, Minus, MoreHorizontal, Pencil, Pin, Plus, RefreshCw, SquareTerminal, StickyNote, Trash2, Users } from 'lucide-react'
+import { ExternalLink, Expand, FileDiff, Flag, Folder, Folders, Group, LayoutGrid, ListTodo, LockKeyhole, Map as MapIcon, Maximize2, MessageSquare, Minus, MoreHorizontal, Pencil, Pin, Plus, RefreshCw, SquareTerminal, Trash2, Users } from 'lucide-react'
 import { CanvasIconButton, CanvasViewportPanel } from './CanvasDock'
 import { CanvasFilePreview } from './CanvasFilePreview'
 import { ResourceReferenceIcon } from './FilePreviewTabIcon'
 import { CanvasTerminal } from './CanvasTerminal'
+import { CanvasNote } from './CanvasNote'
 import type { FilePreviewContextValue } from './file-preview-controller'
 import { useCanvasGraph } from './useCanvasGraph'
 import { initialCanvasReferenceState, type CanvasReferenceState } from './canvas-reference-controller'
@@ -22,7 +23,6 @@ import { basePathName, BOARD_DOT_GAP, CARD_WIDTH, CARD_HEIGHT, REGION_COLLAPSED_
 import { CanvasNodeEditor, canvasKindNames, canvasColorName, type CanvasEditTarget, type CanvasFolderGroupOption, type CanvasReferenceOption } from './CanvasNodeEditor'
 import { AppDialogBody, AppDialogContent, AppDialogFooter, AppDialogHeader } from './AppDialog'
 import { useThreadClient } from './camp-client'
-import { SafeMarkdown } from './SafeMarkdown'
 import { UiText, uiAttribute, useInterfaceLanguage } from './interface-language'
 import { readErrorMessage } from './error-message'
 import { useCanvasFolders } from './useCanvasFolders'
@@ -64,6 +64,9 @@ const EMPTY_CATALOG = initialCanvasReferenceState()
 type Presentation = CanvasSurfaceProps & {
   terminalVersion?: number
   blocked: boolean
+  noteRevision: number
+  noteDirty(nodeId: string, dirty: boolean): void
+  saveNote(row: CanvasNode, text: string, revision: number): Promise<void>
   selectedReferences: ReadonlySet<string>
   dropTargetId: string | null
   expandedRegions: ReadonlySet<string>
@@ -127,20 +130,23 @@ function CanvasCard({ data, selected }: NodeProps<FlowNode>): React.JSX.Element 
   const visible = actions.expandedRegions.has(row.id) ? references : references.slice(0, cap)
   if (data.member) return <CanvasConversationSummary actions={actions} row={row} reference={data.member} selected={selected} derived title={actions.title(data.member)} color={color} />
   if (canvasPlainConversation(row) && !expandedConversation) return <CanvasConversationSummary actions={actions} row={row} reference={d.conversation!} selected={selected} title={title} color={color} />
+  const resizer = <NodeResizer isVisible={selected && !actions.blocked && !d.collapsed && (d.kind !== 'conversation' || expandedConversation)}
+    minWidth={expandedConversation ? 520 : d.kind === 'file' ? FILE_CARD_MIN_WIDTH : d.kind === 'terminal' ? TERMINAL_CARD_MIN_WIDTH : d.kind === 'note' ? 140 : region ? 260 : 48}
+    minHeight={expandedConversation ? 560 : d.kind === 'file' ? FILE_CARD_MIN_HEIGHT : d.kind === 'terminal' ? TERMINAL_CARD_MIN_HEIGHT : d.kind === 'note' ? 96 : region ? 160 : 48} maxWidth={20000} maxHeight={20000}
+    onResizeStart={() => { resizeRevision.current = actions.beginGesture(row.id) }}
+    onResizeEnd={(_event, geometry) => { actions.resize(row, geometry, resizeRevision.current); resizeRevision.current = null }} />
+  if (d.kind === 'note') return <CanvasNote row={row} revision={actions.noteRevision} scope={actions.scope} theme={actions.theme} blocked={actions.blocked}
+    onDirtyChange={dirty => actions.noteDirty(row.id, dirty)} onSave={(text, revision) => actions.saveNote(row, text, revision)}>{resizer}</CanvasNote>
   const HeaderIcon = d.objectReference ? d.objectReference.kind === 'task' ? ListTodo : d.objectReference.kind === 'mission' ? Flag : FileDiff
     : d.kind === 'folder' ? Folder : d.kind === 'group' ? Folders : d.kind === 'agent' ? Users : d.kind === 'custom' ? Group
-      : d.kind === 'note' ? StickyNote : d.kind === 'terminal' ? SquareTerminal : d.kind === 'conversation' ? MessageSquare : null
+      : d.kind === 'terminal' ? SquareTerminal : d.kind === 'conversation' ? MessageSquare : null
   return <article className={`canvas-card canvas-card-${d.kind}${region ? ' canvas-region' : ''}${region && resolution && !resolution.complete ? ' is-unresolved' : ''}${d.collapsed ? ' is-collapsed' : ''}${canvasPlainConversation(row) && !selected && actions.selectedReferences.has(canvasReferenceKey(d.conversation!)) ? ' is-mirrored' : ''}${actions.dropTargetId === row.id ? ' is-drop-target' : ''}`} data-color={color ?? undefined}>
-    <NodeResizer isVisible={selected && !actions.blocked && !d.collapsed && (d.kind !== 'conversation' || expandedConversation)}
-      minWidth={expandedConversation ? 520 : d.kind === 'file' ? FILE_CARD_MIN_WIDTH : d.kind === 'terminal' ? TERMINAL_CARD_MIN_WIDTH : d.kind === 'note' ? 140 : region ? 260 : 48}
-      minHeight={expandedConversation ? 560 : d.kind === 'file' ? FILE_CARD_MIN_HEIGHT : d.kind === 'terminal' ? TERMINAL_CARD_MIN_HEIGHT : d.kind === 'note' ? 96 : region ? 160 : 48} maxWidth={20000} maxHeight={20000}
-      onResizeStart={() => { resizeRevision.current = actions.beginGesture(row.id) }}
-      onResizeEnd={(_event, geometry) => { actions.resize(row, geometry, resizeRevision.current); resizeRevision.current = null }} />
+    {resizer}
     <header className="canvas-card-handle">
       {color && <span className="canvas-color-dot" role="img" aria-label={uiAttribute(canvasColorName(color))} />}
       {d.kind === 'file' && <ResourceReferenceIcon kind="file" className="resource-reference-icon" />}
       {HeaderIcon && <HeaderIcon className="canvas-card-kind-icon" size={14} aria-hidden="true" />}
-      <strong title={d.kind === 'file' && d.path ? `${title}\n${d.path}` : title}>{title}</strong>
+      <strong title={(d.kind === 'file' || d.kind === 'terminal') && d.path ? `${title}\n${d.path}` : title}>{title}</strong>
       {region && <span className="canvas-region-count" title={uiAttribute(resolution?.complete ? '{0} 个关联对话' : '已载入 {0} 个关联对话', references.length)}>{references.length}</span>}
       {inlineConversation && actions.conversation && <CanvasConversationActions bridge={actions.conversation} instance={inlineConversation}
         onOpenWorkspace={() => actions.onOpenReference(inlineConversation.target.reference)} />}
@@ -159,7 +165,6 @@ function CanvasCard({ data, selected }: NodeProps<FlowNode>): React.JSX.Element 
         label={uiAttribute(d.kind === 'file' ? d.collapsed ? '展开预览' : '收起预览' : d.kind === 'terminal' ? d.collapsed ? '展开终端' : '收起终端' : d.collapsed ? '展开区域' : '折叠区域')}>{d.collapsed ? <Plus size={15} /> : <Minus size={15} />}</CanvasIconButton>}
     </header>
     {!d.collapsed && <div className="canvas-card-body nodrag nowheel">
-      {d.kind === 'note' && <SafeMarkdown theme={actions.theme} mode="document">{d.content || ''}</SafeMarkdown>}
       {d.objectReference && <div className="canvas-object-pin"><code title={canvasObjectId(d.objectReference)}>{canvasObjectId(d.objectReference)}</code>
         {d.objectReference.kind === 'mission_diff' && d.objectReference.path != null && <code title={d.objectReference.path}>{d.objectReference.path}</code>}
         <button type="button" disabled={actions.blocked || !canvasObjectTarget(row)} onClick={() => actions.openObject(row)}><UiText zh="读取详情" /></button></div>}
@@ -222,6 +227,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
   const [deletion, setDeletion] = useState<{ ids: string[]; revision: number; hasProse: boolean; hasTerminal: boolean } | null>(null)
   const [guides, setGuides] = useState<AlignmentGuide[]>([])
   const panel = useRef(false), panelCommand = useRef(false)
+  const dirtyNotes = useRef(new Set<string>())
   const dragRevision = useRef<number | null>(null), dragging = useRef(false), currentDerived = useRef<FlowNode[]>([])
   const gestureGeneration = useRef(0)
   const dragOwner = useRef<string | null>(null)
@@ -288,7 +294,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
   useEffect(() => { if (!dragging.current) setNodes(derived) }, [derived])
   useEffect(() => { saveCanvasViewState(storage, props.scope, props.boardId, view) }, [storage, view, props.scope, props.boardId])
   useEffect(() => {
-    const isBlocked = () => panel.current || dragging.current || presentingRef.current || Boolean(bridgeRef.current?.opening || bridgeRef.current?.restoring || latestGraph.current.hasUnsettled())
+    const isBlocked = () => dirtyNotes.current.size > 0 || panel.current || dragging.current || presentingRef.current || Boolean(bridgeRef.current?.opening || bridgeRef.current?.restoring || latestGraph.current.hasUnsettled())
     props.onLeaveGuardChange?.({ isBlocked, canLeave: async () => !isBlocked() })
     return () => props.onLeaveGuardChange?.(null)
   }, [props.onLeaveGuardChange])
@@ -370,6 +376,9 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     finally { presentingRef.current = false; setPresenting(false) }
   }
   const actions: Presentation = { ...props, terminalVersion: graph.snapshot?.terminalVersion, openConversation: (row, reference, member) => { void openConversation(row, reference, member) }, resolvedMembers: regions, blocked, expandedRegions: expanded, title,
+    noteRevision: graph.snapshot?.board?.revision ?? 0,
+    noteDirty: (nodeId, dirty) => { if (dirty) dirtyNotes.current.add(nodeId); else dirtyNotes.current.delete(nodeId) },
+    saveNote: async (row, content, revision) => { await submit({ type: 'update', nodeId: row.id, patch: { content } }, revision) },
     selectedReferences: new Set(nodes.filter(node => selected.includes(node.id)).flatMap(node => node.data.member ? [canvasReferenceKey(node.data.member)]
       : canvasPlainConversation(node.data.row) ? [canvasReferenceKey(node.data.row.data.conversation!)] : [])),
     dropTargetId: dropHint?.type === 'region' ? dropHint.regionId : dropHint?.type === 'merge' ? dropHint.targetNodeId : null,
@@ -379,7 +388,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
       ? current.expandedRegions.filter(id => id !== row.id) : [...current.expandedRegions, row.id] })),
     detach: (row, reference) => { mutate({ type: 'detach', regionId: row.id, conversation: reference,
       x: row.data.x + (flow.getNode(row.id)?.width ?? row.data.width) + 24, y: row.data.y }) },
-    edit: row => { panel.current = true; setEditor({ target: { type: 'update', row }, revision: graph.snapshot!.board!.revision }) },
+    edit: row => { if (dirtyNotes.current.size) { setIssue(uiAttribute('请先保存便笺草稿，再编辑节点。')); return } panel.current = true; setEditor({ target: { type: 'update', row }, revision: graph.snapshot!.board!.revision }) },
     openObject: row => { if (!blocked) setObjectTarget(canvasObjectTarget(row)) },
     bindFile: row => {
       if (graph.snapshot?.fileReferenceVersion !== 1) { setIssue(uiAttribute('当前连接暂不支持文件节点来源绑定，请升级服务后重试。')); return }
@@ -397,6 +406,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     }
   }
   const deleteSelected = (ids = flow.getNodes().filter(node => node.selected).map(node => node.id)) => {
+    if (dirtyNotes.current.size) { setIssue(uiAttribute('请先保存便笺草稿，再删除节点。')); return }
     ids = ids.filter(id => rows.some(row => row.id === id))
     if (!ids.length) { setIssue(uiAttribute('区域成员可通过卡片操作移出或固定到画布。')); return }
     panel.current = true
@@ -472,6 +482,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
       </DropdownMenu.Content></DropdownMenu.Portal>
     </DropdownMenu.Root>
     {selected.length > 0 && <><span className="canvas-dock-divider" aria-hidden="true" />
+      {selected.length === 1 && rows.find(row => row.id === selected[0])?.data.kind === 'note' && <CanvasIconButton label={uiAttribute('编辑节点')} disabled={blocked} onClick={() => actions.edit(rows.find(row => row.id === selected[0])!)}><Pencil size={17} /></CanvasIconButton>}
       <CanvasIconButton label={uiAttribute('选中对话分组')} disabled={blocked || !nodes.some(node => selected.includes(node.id) && (node.data.member || canvasPlainConversation(node.data.row)))} onClick={groupSelected}><Group size={17} /></CanvasIconButton>
       <CanvasIconButton label={uiAttribute('删除所选')} disabled={blocked || !rows.some(row => selected.includes(row.id))} onClick={() => deleteSelected()}><Trash2 size={17} /></CanvasIconButton></>}
   </div>

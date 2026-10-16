@@ -85,9 +85,9 @@ async function qualify(window){
   await evaluate(`(()=>{document.querySelector('button[aria-label="无限画布"]').click();return true})()`)
   await wait(`document.querySelectorAll('.react-flow__node').length===3`)
   record('production_canvas_route_and_persisted_nodes',{board_id:board.id})
-  await wait(`(()=>{const button=[...document.querySelectorAll('.canvas-terminal button')].find(button=>button.textContent.trim()==='启动终端');return button&&!button.disabled})()`,15_000)
-  await evaluate(`(()=>{[...document.querySelectorAll('.canvas-terminal button')].find(button=>button.textContent.trim()==='启动终端').click();return true})()`)
-  await wait(`(()=>{const button=[...document.querySelectorAll('.canvas-terminal button')].find(button=>button.textContent.trim()==='粘贴');return button&&!button.disabled})()`,30_000)
+  await wait(`(()=>{const button=[...document.querySelectorAll('.canvas-terminal button')].find(button=>(button.getAttribute('aria-label')||button.textContent.trim())==='启动终端');return button&&!button.disabled})()`,15_000)
+  await evaluate(`(()=>{[...document.querySelectorAll('.canvas-terminal button')].find(button=>(button.getAttribute('aria-label')||button.textContent.trim())==='启动终端').click();return true})()`)
+  await wait(`(()=>{const button=[...document.querySelectorAll('.canvas-terminal button')].find(button=>(button.getAttribute('aria-label')||button.textContent.trim())==='粘贴');return button&&!button.disabled})()`,30_000)
   window.show();window.focus();window.webContents.focus()
   await evaluate(`(()=>{window.nativeKeys=[];for(const type of ['keydown','keypress','input'])document.addEventListener(type,event=>{if(event.target?.classList?.contains('xterm-helper-textarea'))window.nativeKeys.push({type,key:event.key,trusted:event.isTrusted})},true);document.querySelector('.canvas-terminal .xterm-helper-textarea').focus();return true})()`)
   const before=await rpc('canvas.terminals.snapshot',{target})
@@ -110,7 +110,7 @@ async function qualify(window){
   await wait(`Boolean(document.querySelector('.canvas-terminal .xterm-screen')?.textContent.includes('2+3'))&&[...document.querySelectorAll('.canvas-terminal .xterm-rows > div')].some(row=>row.textContent?.trim()==='5')`,8_000)
   record('real_pty_result_is_painted_in_production_terminal_reader')
   const shot=join(config.evidence,'native-output.png');await writeFile(shot,(await window.webContents.capturePage()).toPNG());report.screenshot=shot
-  await evaluate(`(()=>{[...document.querySelectorAll('.canvas-terminal button')].find(button=>button.textContent.trim()==='停止终端').click();return true})()`)
+  await evaluate(`(()=>{[...document.querySelectorAll('.canvas-terminal button')].find(button=>(button.getAttribute('aria-label')||button.textContent.trim())==='停止终端').click();return true})()`)
   await wait(`window.rovai.request('canvas.terminals.snapshot',{target:${JSON.stringify(target)}}).then(value=>value.cleanupComplete===true)`)
   record('native_terminal_stop_completes_process_cleanup')
   report.status='passed'

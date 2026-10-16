@@ -1,5 +1,7 @@
 // Behavior ported from Codeg aff1e6c terminal-node/terminal-view; Apache-2.0 notice: integration/licenses/codeg/LICENSE.
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
+import { ClipboardPaste, Copy, Keyboard, Play, RefreshCw, RotateCcw, Square } from 'lucide-react'
+import { CanvasIconButton } from './CanvasDock'
 import type { Terminal, ITheme } from '@xterm/xterm'
 import '@xterm/xterm/css/xterm.css'
 import type { CanvasNode } from '@contracts'
@@ -134,15 +136,14 @@ export function CanvasTerminal({ row, scope, terminalVersion, disabled = false }
   const size = () => ({ cols: terminal.current?.cols ?? 80, rows: terminal.current?.rows ?? 24 })
   return <section className="canvas-terminal nodrag nowheel nopan" aria-label={uiAttribute('画布终端')} onKeyDown={event => event.stopPropagation()} onPointerDown={event => event.stopPropagation()}>
     <div className="canvas-terminal-toolbar">
-      <span role="status">{current ? uiAttribute(phases[current.phase]) : uiAttribute(owned.error ? '终端不可用' : '正在读取终端…')}</span>
-      <button type="button" disabled={busy || !canStart || !visible || !foreground} onClick={() => { setUiError(null); void controller?.start(size()) }}><UiText zh={current?.exists ? '重新启动' : '启动终端'} /></button>
-      <button type="button" disabled={busy || !canStop} onClick={() => void controller?.stop()}><UiText zh="停止终端" /></button>
-      <button type="button" disabled={busy || state?.reading} onClick={refresh}><UiText zh="重新读取" /></button>
-      <button type="button" disabled={!controller} onClick={() => setShowKeys(value => !value)} aria-expanded={showKeys}><UiText zh="快捷键" /></button>
-      <button type="button" disabled={!terminal.current} onClick={() => { if (terminal.current?.hasSelection()) void copyTerminalSelection(terminal.current).then(ok => { if (!ok) setUiError(uiAttribute('复制失败，请使用系统复制快捷键。')) }) }}><UiText zh="复制选区" /></button>
-      <button type="button" disabled={busy || !controller?.inputReady()} onClick={() => { void navigator.clipboard.readText().then(value => terminal.current?.paste(value)).catch(() => setUiError(uiAttribute('无法读取剪贴板，请使用系统粘贴快捷键。'))) }}><UiText zh="粘贴" /></button>
+      <span role="status" title={row.data.path ?? undefined}>{current ? uiAttribute(phases[current.phase]) : uiAttribute(owned.error ? '终端不可用' : '正在读取终端…')}</span>
+      <CanvasIconButton label={uiAttribute(current?.exists ? '重新启动' : '启动终端')} disabled={busy || !canStart || !visible || !foreground} onClick={() => { setUiError(null); void controller?.start(size()) }}>{current?.exists ? <RotateCcw size={14} /> : <Play size={14} />}</CanvasIconButton>
+      <CanvasIconButton label={uiAttribute('停止终端')} disabled={busy || !canStop} onClick={() => void controller?.stop()}><Square size={14} /></CanvasIconButton>
+      <CanvasIconButton label={uiAttribute('重新读取')} disabled={busy || state?.reading} onClick={refresh}><RefreshCw size={14} /></CanvasIconButton>
+      <CanvasIconButton label={uiAttribute('快捷键')} disabled={!controller} onClick={() => setShowKeys(value => !value)} aria-expanded={showKeys}><Keyboard size={14} /></CanvasIconButton>
+      <CanvasIconButton label={uiAttribute('复制选区')} disabled={!terminal.current} onClick={() => { if (terminal.current?.hasSelection()) void copyTerminalSelection(terminal.current).then(ok => { if (!ok) setUiError(uiAttribute('复制失败，请使用系统复制快捷键。')) }) }}><Copy size={14} /></CanvasIconButton>
+      <CanvasIconButton label={uiAttribute('粘贴')} disabled={busy || !controller?.inputReady()} onClick={() => { void navigator.clipboard.readText().then(value => terminal.current?.paste(value)).catch(() => setUiError(uiAttribute('无法读取剪贴板，请使用系统粘贴快捷键。'))) }}><ClipboardPaste size={14} /></CanvasIconButton>
     </div>
-    <code className="canvas-terminal-path" title={row.data.path ?? undefined}>{row.data.path}</code>
     {(owned.error || uiError || state?.readError || state?.actionError) && <p className="canvas-terminal-issue" role="alert">{owned.error || uiError || state?.readError || state?.actionError}</p>}
     {state?.startUnknown && <p className="canvas-terminal-issue"><UiText zh="启动结果尚未查明，不会另开会话。" /> <button type="button" disabled={busy || !!state.readError} onClick={() => void controller?.retryStart()}><UiText zh="重试原启动" /></button></p>}
     {state && ['unknown', 'not_written', 'expired'].includes(state.inputStatus) && <p className="canvas-terminal-issue"><UiText zh="上次输入尚未确认完整写入，后续未发送输入已丢弃；不会自动重发。" />

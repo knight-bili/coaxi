@@ -76,3 +76,11 @@ final result: blocked
 final result: blocked
 
 仅代表整套视觉核对未完；持续目标active，不需要客户阶段技术验收。
+
+## 便笺原交互与终端控制栏
+
+按原NoteNode恢复整纸拖动、双击/键盘行内编辑和失焦/Escape保存；保留安全Markdown，将标题/颜色编辑保留在选中工具条。Core仍按捕获版本只写content；冲突保留本机原文和草稿，明确核对后再保存。草稿单独按Host/Core/板/便笺隔离，不写入视口偏好或模型输入。终端六操作改为24px图标，原处理函数及输入异常恢复保留，路径沿原版在标题悬停展示。
+
+全量types0、草稿与graph两文件24项通过、文档测试10项/门禁0；实际鼠标/输入法/保存失败/离开/冷恢复和终端运行尚未验证。原rc13截图不授予本代码资格，待集中候选执行。记录见integration/execution/i03-c06-note-terminal-interaction-result.json。
+
+final result: blocked
