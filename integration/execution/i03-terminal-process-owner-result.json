@@ -3,7 +3,7 @@
   "stage": "I03",
   "closeout_group": "I03-C04",
   "status": "implementation_ready_for_stage_verification",
-  "recorded_at": "2026-10-16T03:09:31.482298+00:00",
+  "recorded_at": "2026-10-16T03:12:40.187378+00:00",
   "source_binding": {
     "base_commit": "b22b772dc85b377c0f04e40c3baf3cb11f42145a",
     "kind": "exact_worktree_sha256_before_commit",
@@ -12,19 +12,19 @@
       "crates/rovai-core/src/managed_process/linux.rs": "f1d9683ac428c78d2309b3004e1640918168aacb79f81906a6190c16b51495b5",
       "crates/rovai-core/src/canvas_terminal/helper.rs": "5bcbd7c3a00380fe27e95d4033b3c5525f7f1d3c2e7cd177d02d8fa02cf9db1e",
       "crates/rovai-core/src/canvas_terminal/manager.rs": "707cdf6fd1026c92864a1c67ab54e97293d9ee13c79fe2a3518a47782d5cc78d",
-      "scripts/lib/canvas-terminal-process.mjs": "66990f5d8d96eff59f657c3e59b21223aea0c7cecc4f95f6e9cfb21872d77100",
+      "scripts/lib/canvas-terminal-process.mjs": "0af72a5391051edf236ccba01ef2a191162416e4576a29637d68e713efc2056e",
       "scripts/lib/host-web.test.mjs": "75806a2061625c7658c4e808ea960bc4d500a74a293f6f519935a8732c2d2ecc",
       "scripts/lib/host-test-client.mjs": "89e0071deced57443ff12eccf3d8d3a48e920a3421b0eaba20077078eeb758d0",
       "docs/architecture/canvas.md": "daf0f4d65b96e6b20b96a42c3598bfb5d7a4c8cd267cd29449993d7e986cb10e",
       "docs/contracts/canvas-nodes-v1.md": "9c2c9f4e3064cdb62097e4a15ad2e039a868eb17365c2d8201ff23d19311175b",
       "docs/development/testing.md": "6c1cb4621b7f33f3af0c57ae7f09525435ba1dabed76857ec62d6cc1890759eb",
-      "integration/execution/goal-state.json": "0e2d6526107172e05762f8926b1882b6a6d6af16ba16a1dcb6a1537b98e73fe9",
+      "integration/execution/goal-state.json": "e3bc20e6f3987e2e0c3882906783ab4a321d92e83e489eacc804b9b17bf6c8fb",
       "integration/execution/goal-description.txt": "c6e1837d3a36d7796516a2ee8d6abf49b2495c80e95c901c120fe38be8368ddc",
       "integration/execution/i03-closeout.json": "ab815ef448ecf8e20f2ee4556eaf7f5108b2bb0d1a38b9f0edcd03f5cb409d93"
     }
   },
   "artifact_binding": {
-    "work/i03/record-terminal-process.py": "3974bb225ee76bf0a4aef6d33a9a42a4fa0848cb3117828b4cfce5dfd47f6bd4",
+    "work/i03/record-terminal-process.py": "d53a6e84d698215575b814c583a9915c04f035b4c443c4750895714bc11e24b3",
     "work/i03/verify-terminal-process-fixture.mjs": "f8687d2d2782f6bfb64fdfec541e4fa941239f2984960e03a5972cf96768862c",
     "work/i03/terminal-process-fixture-final.log": "974a10614281d480c20e067f1cf08345d6aa2a4ab301b17760b4d2e1de8e9750",
     "work/i03/terminal-process-rustfmt-final.log": "26b546188f87d60300830ab8ca930249353cf99bf8511e516735e3630283b595",
@@ -99,7 +99,8 @@
     "Kernel no-child check closes reparenting snapshot race; portable-pty owns direct-child wait result",
     "Generated flood statement uses escaped newline rather than an invalid single-quoted newline",
     "Generated PTY JS parsed before delivery; macOS actual ledger precondition replaces fixed delay",
-    "Owned stop requires nonce header and nonce path to avoid generic port-reuse stop authority"
+    "Owned stop requires nonce header and nonce path to avoid generic port-reuse stop authority",
+    "ConPTY may normalize application ANSI sequences; compare actual retained same-sequence HTTP/pipe bytes and runtime visible UTF8 instead"
   ],
   "candidate_command": "node --test --test-name-pattern=\"Desktop and Web share one Core\" scripts/lib/host-web.test.mjs",
   "source_protocol": {
