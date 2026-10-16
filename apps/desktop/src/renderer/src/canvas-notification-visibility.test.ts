@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { CanvasNotificationVisibility, intersectNotificationRects } from './canvas-notification-visibility'
+import { CanvasNotificationVisibility, canvasNotificationNodeVisible, intersectNotificationRects, observeCanvasNotificationVisibility } from './canvas-notification-visibility'
 const source = (threadId: string, messageId: string, conversationId: string | null = null) => ({ threadId, conversationId,
   surfaceVisible: true, snapshotSequence: 10, messageIds: [messageId], campTurnIds: [], agentRunIds: [], approvalIds: [] })
 afterEach(() => vi.unstubAllGlobals())
@@ -52,4 +52,70 @@ it('clips transformed cards and nested scroll bounds to the window, excluding ze
   expect(intersectNotificationRects([window, {left: 90, top: 50, right: 200, bottom: 200}])).toEqual({left:90,top:50,right:100,bottom:100})
   expect(intersectNotificationRects([window, {left: 100, top: 0, right: 200, bottom: 100}])).toBeNull()
   expect(intersectNotificationRects([window, {left: 10, top: 10, right: 90, bottom: 90}, {left: 20, top: 20, right: 30, bottom: 30}])).toEqual({left:20,top:20,right:30,bottom:30})
+})
+
+function frameFixture(key: string, top = 0) {
+  const bounds = { left: 0, right: 300, top, bottom: top + 20 }
+  const frame = { dataset: { canvasConversationKey: key }, parentElement: null, hidden: false, inert: false,
+    getBoundingClientRect: () => bounds, getClientRects: () => [bounds], closest: () => frame,
+    contains: (hit: unknown) => hit === frame || hit === message,
+    querySelectorAll: (selector: string) => selector === '[data-message-id]' ? [message] : [] }
+  const message = { parentElement: frame, getBoundingClientRect: () => bounds, getClientRects: () => [bounds],
+    closest: () => frame, contains: (hit: unknown) => hit === message, getAttribute: () => key }
+  return { frame: frame as unknown as HTMLElement, message: message as unknown as HTMLElement, bounds }
+}
+const visibleStyle = () => ({ visibility: 'visible', opacity: '1', overflowX: 'visible', overflowY: 'visible' })
+
+it('excludes keyboard-covered messages and clips zoomed/panned CSS coordinates to the visual viewport', () => {
+  const { message, bounds } = frameFixture('message', 500)
+  const hit = vi.fn(() => message)
+  vi.stubGlobal('getComputedStyle', visibleStyle)
+  vi.stubGlobal('document', { elementFromPoint: hit })
+  const viewport = { offsetLeft: 80, offsetTop: 100, width: 200, height: 300, scale: 2 }
+  vi.stubGlobal('window', { innerWidth: 600, innerHeight: 800, visualViewport: viewport })
+  expect(canvasNotificationNodeVisible(message)).toBe(false)
+  expect(hit).not.toHaveBeenCalled()
+  bounds.top = 350; bounds.bottom = 450
+  expect(canvasNotificationNodeVisible(message)).toBe(true)
+  for (const [x, y] of hit.mock.calls as unknown as Array<[number, number]>) {
+    expect(x).toBeGreaterThanOrEqual(80); expect(x).toBeLessThan(280)
+    expect(y).toBeGreaterThanOrEqual(350); expect(y).toBeLessThan(400)
+  }
+  bounds.top = 400; bounds.bottom = 500
+  expect(canvasNotificationNodeVisible(message)).toBe(false)
+  vi.stubGlobal('window', { innerWidth: 600, innerHeight: 800 })
+  expect(canvasNotificationNodeVisible(message)).toBe(true)
+})
+
+it('rechecks visual viewport and window changes, then releases exact observer/listener ownership', () => {
+  const visualViewport = new EventTarget(), window = Object.assign(new EventTarget(), { visualViewport })
+  const mutationDisconnect = vi.fn(), resizeDisconnect = vi.fn(), schedule = vi.fn()
+  vi.stubGlobal('window', window); vi.stubGlobal('document', { body: {} })
+  vi.stubGlobal('MutationObserver', class { observe() {} disconnect = mutationDisconnect })
+  vi.stubGlobal('ResizeObserver', class { observe() {} disconnect = resizeDisconnect })
+  const release = observeCanvasNotificationVisibility(frameFixture('a').frame, schedule)
+  for (const target of [window, visualViewport]) for (const event of ['resize', 'scroll']) target.dispatchEvent(new Event(event))
+  window.dispatchEvent(new Event('blur'))
+  expect(schedule).toHaveBeenCalledTimes(5)
+  release()
+  expect(mutationDisconnect).toHaveBeenCalledOnce(); expect(resizeDisconnect).toHaveBeenCalledOnce()
+  for (const target of [window, visualViewport]) for (const event of ['resize', 'scroll']) target.dispatchEvent(new Event(event))
+  window.dispatchEvent(new Event('blur'))
+  expect(schedule).toHaveBeenCalledTimes(5)
+})
+
+it('indexes mounted frames once for a multi-card dispatch and never acknowledges covered rows', () => {
+  const rows = Array.from({ length: 64 }, (_, index) => frameFixture('card-' + index, index * 20))
+  const query = vi.fn(() => rows.map(row => row.frame)), store = new CanvasNotificationVisibility()
+  for (const row of rows) store.register(row.frame.dataset.canvasConversationKey!, 'thread').publish('public', source('thread', row.message.getAttribute('data-message-id')!))
+  vi.stubGlobal('getComputedStyle', visibleStyle)
+  vi.stubGlobal('window', { innerWidth: 600, innerHeight: 2000, visualViewport: { offsetLeft: 0, offsetTop: 0, width: 600, height: 640 } })
+  vi.stubGlobal('document', { visibilityState: 'visible', hasFocus: () => true, querySelectorAll: query,
+    elementFromPoint: (_x: number, y: number) => rows.find(row => y >= row.bounds.top && y < row.bounds.bottom)?.message ?? null })
+  const reports = store.readVisibleSources()
+  expect(query).toHaveBeenCalledOnce()
+  expect(reports).toHaveLength(64)
+  expect(reports.filter(row => row.surfaceVisible).flatMap(row => row.messageIds)).toEqual(rows.slice(0, 32).map(row => row.frame.dataset.canvasConversationKey))
+  expect(reports.slice(32).every(row => !row.surfaceVisible && !row.messageIds.length)).toBe(true)
+  expect(store.getSnapshot().every(row => row.surfaceVisible && row.messageIds.length === 1)).toBe(true)
 })

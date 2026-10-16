@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "I03-C04真实进程检查已复用原Host生命周期owner接齐，Linux专用helper父pidfd/subreaper和启动/清空互斥已编码。脚本语法、隔离worker冒烟与4个Rust模块格式检查通过；实际Core/helper/PTY场景随C06候选运行，现转I03-C05冷启动/多卡/规模。",
+  "current_slice": "I03-C05已修复软键盘/缩放可见区域的通知误确认，并将多卡派发的全页卡片扫描降为一次；相关4个TS owner32项和定向types通过。冷恢复/导航/窗口资源源码已核查，剩余私聊源内容观察仍在数据库事务内扫描的性能风险须处理，之后进入C06候选。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "推进I03-C05冷路由/多卡/规模：核对窗口资源、隐藏/恢复及原工作区精确定位，补当前阶段代码缺口；C01-C04代码已集齐待C06工程验证，失败回所属组修复。",
+    "完成I03-C05最后一组代码：将私聊源内容观察与数据库事务/交互队列隔离，保留r1的原来源/内容/身份/缺失观察/旧UUID回放和完整输入拒绝规则；扩原owner，不借减小材料范围或只查mtime跳过内容校验。之后冻结C06候选集中构建与真实链路验证。",
     "I03-C05冷路由/多卡/规模代码集齐后，C06冻结fusion-i03-rc.1，集中编译当前158/208及此前生命周期增量，原扩展owner/HTTP/实际Desktop统一验证；不把旧二进制当当前源码证据。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "terminal_process_owner_coded_stage_execution_pending_next_c05",
+  "current_slice_status": "c05_visibility_fixed_source_observation_scheduling_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -195,5 +195,6 @@
   "terminal_parent_evidence": "i03-terminal-parent-result.json",
   "terminal_api_evidence": "i03-terminal-api-result.json",
   "terminal_ui_evidence": "i03-terminal-ui-result.json",
-  "terminal_process_owner_evidence": "i03-terminal-process-owner-result.json"
+  "terminal_process_owner_evidence": "i03-terminal-process-owner-result.json",
+  "canvas_c05_visibility_evidence": "i03-c05-visibility-result.json"
 }

@@ -25,6 +25,8 @@ I03 多卡输入的最低层 owner 为 `canvas-conversations-controller.test.ts`
 
 多卡通知继续扩展 `NotificationAttentionController.test.ts` 的来源并集、多 Thread quiet 与冻结请求语义，
 `canvas-notification-visibility.test.ts` 拥有按实例报告/关闭/旧挂载拒绝和窗口交集；不新增 Core 通知测试 owner。
+该owner同时覆盖软键盘/缩放视口的CSS坐标裁剪、视口及窗口事件的重算/卸载、64卡片只枚举一次且被遮挡消息不确认。
+修复前新增3项均复现失败，修复后与原视图/恢复/终端控制器相关4个owner共32项通过；只证明局部逻辑，不替代真实App规模或移动真机。
 隔离浏览器挂载生产 Attention Controller 与真实卡片，以模拟 Core 记录实际确认请求：一个 Thread 在途/失败时
 另一个继续、未知重试保持 UUID/字节、关闭一张/全部镜像、画布移出视口、卡片层叠、弹窗遮挡和重新出现。
 夹具调试信息限制高度，避免调试区遮住被测卡片；不由 mock 结果宣称真实通知事务或 Host 接管通过。

@@ -70,8 +70,40 @@
     {
       "id": "I03-C05",
       "name": "冷启动与多卡交互兼容",
-      "status": "partially_verified",
-      "done_when": "真实Desktop冷路由、旧焦点/编辑器保持、恢复与本阶段规模检查完成；平台资源缺项单列"
+      "status": "in_progress",
+      "done_when": "真实Desktop冷路由、旧焦点/编辑器保持、恢复与本阶段规模检查完成；平台资源缺项单列",
+      "latest_partial_evidence": "i03-c05-visibility-result.json",
+      "checked_subtasks": [
+        {
+          "id": "C05-cold",
+          "status": "source_reviewed_related_local_checks_passed_actual_app_pending",
+          "scope": "Host/Core/board展示恢复、真实pin隔离、只读Thread恢复和原工作区导航"
+        },
+        {
+          "id": "C05-window",
+          "status": "source_reviewed_runtime_scale_pending",
+          "scope": "每Thread一个读者、5空闲投影、64窗口终端controller和原文件资源预算"
+        },
+        {
+          "id": "C05-visibility",
+          "status": "implemented_local_logic_verified",
+          "scope": "视觉视口、原监听释放、64卡片单次枚举与遮挡消息排除"
+        },
+        {
+          "id": "C05-material-scan",
+          "status": "required_fix_identified",
+          "scope": "源内容观察在原数据库事务内读文件/枚举目录，慢盘或大目录可能拖住其他操作"
+        }
+      ],
+      "remaining_implementation_batches": [
+        "私聊源内容观察的锁外调度与事务内身份/CAS复核；沿原测试owner追加对应覆盖，保持r1输入语义"
+      ],
+      "remaining_verification": [
+        "真实Desktop冷路由、快速切换/旧焦点、崩溃恢复及精确Mission/Task/Diff/文件定位",
+        "真实多卡/同Thread镜像的滚动、资源释放、HTML及终端窗口上限；局部64卡片夹具不是实际页面帧率",
+        "真实Core大材料/目录/日志下的交互响应、事务锁和超时/取消；随C06当前源验证",
+        "软键盘/IME与原生平台运行资格按可用环境记录，缺真机不假通过"
+      ]
     },
     {
       "id": "I03-C06",

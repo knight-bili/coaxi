@@ -148,6 +148,11 @@ occlusion checks and independent per-Thread requests. Mock Core browser checks c
 covered and closed cards, source reappearance and a frozen uncertain retry. Real Core notification
 acceptance, private attachment/quote isolation and recovery of closed orphan inputs remain required I03 work.
 
+通知派发前只建立一次当前卡片DOM索引，保留原同key首个挂载匹配规则，避免每个owner重新扫描整页。
+真实可见范围同时裁剪布局窗口和`visualViewport`的CSS坐标区域，覆盖软键盘遮挡、滚动偏移与缩放；
+视口resize/scroll、窗口resize/scroll/blur均重新计算，卸载撤销原观察和监听。被遮挡消息不进入本次可见来源，
+原报告和Core已读事实不改写。64卡片局部夹具验证单次DOM枚举与32可见/32遮挡分离，不代表真实页面帧率或移动真机通过。
+
 Expanded card contexts now persist in Host/Owner + Core + Board scoped local presentation records.
 Only exact validated live graph references restore. Restoring reads existing Threads (fresh per Thread),
 checks the original private Conversation and never enters a Thread or restores execution liveness.

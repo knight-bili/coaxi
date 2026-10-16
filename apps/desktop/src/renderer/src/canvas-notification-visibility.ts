@@ -8,9 +8,14 @@ export class CanvasNotificationVisibility {
   subscribe = (listener: () => void): (() => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener) } }
   getSnapshot = (): readonly VisibleNotificationSources[] => this.snapshot
   readVisibleSources = (): readonly VisibleNotificationSources[] => {
-    if (document.visibilityState !== 'visible' || !document.hasFocus()) return []
+    if (!this.owners.size || document.visibilityState !== 'visible' || !document.hasFocus()) return []
+    const frames = new Map<string, HTMLElement>()
+    for (const node of document.querySelectorAll<HTMLElement>('.canvas-conversation-frame')) {
+      const key = node.dataset.canvasConversationKey
+      if (key && !frames.has(key)) frames.set(key, node)
+    }
     return [...this.owners].flatMap(([key, owner]) => {
-      const frame = [...document.querySelectorAll<HTMLElement>('.canvas-conversation-frame')].find(node => node.dataset.canvasConversationKey === key)
+      const frame = frames.get(key)
       if (!frame) return []
       const visibleIds = (attribute: string): Set<string> => new Set([...frame.querySelectorAll<HTMLElement>(`[${attribute}]`)]
         .filter(node => canvasNotificationNodeVisible(node)).map(node => node.getAttribute(attribute)!))
@@ -52,6 +57,8 @@ export function intersectNotificationRects(rects: readonly Rect[]): Rect | null 
 export function canvasNotificationNodeVisible(node: HTMLElement, viewport?: HTMLElement): boolean {
   if (!node.closest('.canvas-conversation-frame') || !node.getClientRects().length) return false
   const rects: Rect[] = [node.getBoundingClientRect(), { top: 0, left: 0, right: window.innerWidth, bottom: window.innerHeight }]
+  const visual = window.visualViewport
+  if (visual) rects.push({ left: visual.offsetLeft, top: visual.offsetTop, right: visual.offsetLeft + visual.width, bottom: visual.offsetTop + visual.height })
   if (viewport) rects.push(viewport.getBoundingClientRect())
   for (let parent: HTMLElement | null = node; parent; parent = parent.parentElement) {
     const style = getComputedStyle(parent)
@@ -79,5 +86,12 @@ export function observeCanvasNotificationVisibility(node: HTMLElement | null, sc
   for (let parent: HTMLElement | null = node; parent; parent = parent.parentElement) resize.observe(parent)
   window.addEventListener('scroll', schedule, { capture: true, passive: true })
   window.addEventListener('blur', schedule)
-  return () => { mutation.disconnect(); resize.disconnect(); window.removeEventListener('scroll', schedule, true); window.removeEventListener('blur', schedule) }
+  window.addEventListener('resize', schedule)
+  const visual = window.visualViewport
+  visual?.addEventListener('resize', schedule)
+  visual?.addEventListener('scroll', schedule)
+  return () => {
+    mutation.disconnect(); resize.disconnect(); window.removeEventListener('scroll', schedule, { capture: true }); window.removeEventListener('blur', schedule)
+    window.removeEventListener('resize', schedule); visual?.removeEventListener('resize', schedule); visual?.removeEventListener('scroll', schedule)
+  }
 }
