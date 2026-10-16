@@ -1889,3 +1889,11 @@ Core application仅做Rust语法解析，新模块与改动进程模块做格式
 以及此前漏列的原待创建会话存在状态通知，
 原ConsoleClient恢复owner扩展丢输入回执后重新登录、零持久pending/零原输入重发，使用模拟fetch。
 原Core队列owner、原canvas快照owner及原Web投影owner只追加对应断言，不增加整库fixture；这些Rust断言随候选编译运行。
+
+终端UI新增最低层`canvas-terminal-controller.test.ts`，覆盖实际客户端控制器/字节读者/窗口缓存/键编码：
+一份在途与有界输入顺序、未知启动原请求、回执丢失只读、代次替换的迟到写、释放绘制等待、重挂与淘汰、
+已回收会话解除旧输入围栏、尺寸合并及先读后重试。旧API形状owner没有队列和绘制生命周期，不能代替此边界；
+不创建平行Core/数据库或模型fixture，不新增Rust owner。本批4个相关TS owner24项通过，不累计中途重复运行。
+生产CanvasSurface/CanvasTerminal/xterm挂在隔离Vite页，Core/PTY模拟；浏览器见证记录操作和发现/复验，不能把记录条数当正式通过数。
+旧错误残留、最小尺寸换行、fit内外padding及无障碍旧代次文本问题已修正；真实Shell/进程树、Native IPC/Host、剪贴板平台权限、
+软键盘visualViewport、多窗口与规模仍由相应阶段/平台owner实际验证，不用该夹具替代。

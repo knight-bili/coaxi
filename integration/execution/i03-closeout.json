@@ -63,11 +63,11 @@
       "name": "临时终端节点生命周期",
       "status": "in_progress",
       "done_when": "真实临时PTY启动、输出、resize、关闭、删除及重连符合现行合同；不把I05完整Git工程工作区提前并入",
-      "latest_partial_evidence": "i03-terminal-api-result.json",
+      "latest_partial_evidence": "i03-terminal-ui-result.json",
       "remaining_implementation_batches": [
-        "原终端读者与卡片/会话控制器、原代次及输入回执重连和实际最低层进程owner；接齐后转C05/C06"
+        "实际最低层进程owner（复用原Host生命周期fixture）与必要修复；接齐后转C05/C06"
       ],
-      "remaining_verification": "终端API/Native/Web源码与模拟客户端48项通过；Rust队列/快照/投影新增断言未编译执行。manager/helper/完整Core、真实PTY/树回收/输入洪流/删除/退出/硬重启/UNC、实际Native IPC/Host HTTP与UI/平台随候选验证。"
+      "remaining_verification": "生产卡片/xterm及控制器24项定向测试、类型和浏览器模拟已验；浏览器记录含发现/复验，不当正式通过数。真实Core/helper/Host、Native IPC、PTY/进程树、删除/退出/硬重启、剪贴板平台权限、软键盘、多窗口/规模及平台资格随候选执行；未新增或执行Rust进程owner。"
     },
     {
       "id": "I03-C05",

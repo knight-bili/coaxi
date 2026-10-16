@@ -311,3 +311,12 @@ chunks,inputSequence,inputs,issue,cleanupComplete`。不存在时phase为missing
 chunks每块`{seq,bytesBase64}`，每块最多8192字节，总128KiB及2048块，整块淘汰；缺段由gap明确标出，不能假装连续。
 inputs最多64条`{sequence,inputId,status}`，正文淘汰后可为空但原截止序号仍保留。跨块字节交由终端读者连续解码。
 Host和客户端投影排除内部进程身份、环境与输入摘要。完整Core/Host/Native IPC、实际PTY和最终界面行为随阶段候选验证。
+
+终端卡片首次可见只读，显式启动/重试原启动；重进页面不自动执行Shell。收起、切页、隐藏和视口外释放读者与未发送输入，
+保留Core进程及窗口内未决请求身份；不把原始输入写进localStorage、sessionStorage、草稿或通用命令恢复。
+输入单份在途，未发队列64KiB，单份16KiB；队列超限整次拒绝本次输入。失去回执后丢弃后续未发字节，按原ID读取，
+written清除原运输错误并开放后续；unknown/未入队不能用新编号补发原字节。确认继续仅在Core截止序号已围住原输入时开放。
+停止未回收时禁止重新启动；旧会话已实际回收后，其未知输入不能阻止用户显式新开代次，迟到旧输入仍被Core代次挡住。
+客户端缓存最多64个窗口控制器，只安全淘汰无展示/未决/在途者；身份不能跨ThreadClient或Core目录scope复用。
+读者按同一代次逐块写Uint8Array并等待绘制确认；缺口重置并提示，Core/代次改变清空旧显示及无障碍live region。
+浏览器模拟覆盖这些交互，实际PTY、Native/Web平台资格和真实进程回收仍须阶段候选执行。
