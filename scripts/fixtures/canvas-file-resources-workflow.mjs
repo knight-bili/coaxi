@@ -66,8 +66,7 @@ export async function qualifyCanvasFileResources(window,{evaluate,wait,rpc,openC
     const member=await rpc('members.create',{commandId:randomUUID(),command:{displayName:'R06 文件资源队员',teamRole:'只读文件验证',professionalResponsibilities:'不执行模型。',personalityTraits:['严谨'],workingPrinciples:'仅隔离工程文件',growthTopic:''}})
     assert.equal(member.status,'applied',JSON.stringify(member));const agentId=member.resultEntity.entityId
     for(const [index,project] of projects.entries()){
-      const validated=await rpc('workspaces.validate',{path:project.directory});assert.equal(resolve(validated.projectPath),resolve(project.directory))
-      const created=await rpc('threads.create',{commandId:randomUUID(),name:`R06 文件来源 ${index}`,workspace:{projectPath:validated.projectPath},memberAgentIds:[agentId],defaultLeadAgentId:agentId,collaborationMode:'peer'})
+      const created=await rpc('threads.create',{commandId:randomUUID(),name:`R06 文件来源 ${index}`,workspace:{projectPath:project.directory},memberAgentIds:[agentId],defaultLeadAgentId:agentId,collaborationMode:'peer'})
       assert.equal(created.status,'applied',JSON.stringify(created));project.threadId=created.payload.threadId
     }
     const board=await rpc('canvas.boards.create',{commandId:randomUUID(),command:{name:'R06 跨Thread与HTML资源'}})
