@@ -802,6 +802,19 @@ async function qualifyMirrors(window,{evaluate,wait,rpc}){
 }
 async function qualifyRendererCrash(window,{evaluate,wait,rpc}){
  window.unmaximize();window.setContentSize(1680,1000);window.webContents.setZoomFactor(1)
+ if(config.preflight_note_recovery_result){
+  const previous=JSON.parse(await readFile(config.preflight_note_recovery_result,'utf8'))
+  assert.equal(previous.status,'failed')
+  const {boardId,nodeIds,note_text:noteText}=previous.crash_context
+  await openCanvasBoard(evaluate,wait,boardId)
+  const note=`document.querySelector('[data-id="${nodeIds[2]}"] .canvas-note-paper')`
+  await wait(`${note}?.querySelector('.canvas-note-prose')?.textContent.includes(${JSON.stringify(noteText)})&&Boolean(${note}?.querySelector('.canvas-note-status button:not(:disabled)'))`)
+  await evaluate(`(()=>{${note}.querySelector('.canvas-note-status button').click();return true})()`)
+  await wait(`!${note}.querySelector('.canvas-note-status')`)
+  const saved=(await rpc('canvas.nodes.snapshot',{boardId})).nodes.find(node=>node.id===nodeIds[2])
+  assert.equal(saved.data.content,noteText)
+  report.fixture_preflight={source_result:config.preflight_note_recovery_result,boardId,noteId:nodeIds[2],own_recovered_note_saved:true}
+ }
  const prior=JSON.parse(await readFile(config.previous_result,'utf8'))
  assert.equal(prior.status,'passed')
  const {thread_id:threadId,conversation_id:conversationId}=prior.private_context
