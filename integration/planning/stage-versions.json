@@ -37,10 +37,10 @@
     {
       "stage_id": "I03",
       "name": "完整无限画布与对象绑定",
-      "candidate_version": "fusion-i03-rc.20",
+      "candidate_version": "fusion-i03-rc.22",
       "status": "frozen_with_partial_engineering_evidence",
-      "frozen_commit": "4585a9289f028b55a7b5449b3585fc144c7f372b",
-      "validation_batch": "I03-whole-App-private-input-durability-repair",
+      "frozen_commit": "1e840216a1af1f93da1371db545579889e42d4da",
+      "validation_batch": "I03-cumulative-HTML-and-summary-model-repair",
       "validation_runs": [
         {
           "kind": "local_windows_cargo_build",
@@ -645,6 +645,18 @@
           "source": "5e21f0f24c94e6a953199048d2541e8f96f8c2cf",
           "status": "source_implemented_candidate_pending",
           "evidence": "i03-r09-summary-implementation.json"
+        },
+        {
+          "kind": "r06-file-html-three-processes-and-interactive-regression",
+          "source": "1e840216a1af1f93da1371db545579889e42d4da",
+          "status": "engineering_verified_within_declared_local_scope",
+          "evidence": "i03-r06-file-html-verification.json"
+        },
+        {
+          "kind": "r09-last-model-source-owners-build",
+          "source": "1e840216a1af1f93da1371db545579889e42d4da",
+          "status": "source_and_build_verified_native_ui_remaining",
+          "evidence": "i03-r09-model-build-verification.json"
         }
       ],
       "engineering_validation": "in_progress",
@@ -797,20 +809,35 @@
           "candidate_version": "fusion-i03-rc.18",
           "frozen_commit": "4fb189c5eb0d52f8b890bd369f6cd289ffc74923",
           "status": "historical_candidate_evidence_preserved_not_requalified_by_this_update"
+        },
+        {
+          "candidate_version": "fusion-i03-rc.19",
+          "frozen_commit": "8bc026f9c0f116e85a92949c06716fb761e1cd96",
+          "status": "historical_candidate_preserved"
+        },
+        {
+          "candidate_version": "fusion-i03-rc.20",
+          "frozen_commit": "4585a9289f028b55a7b5449b3585fc144c7f372b",
+          "status": "historical_candidate_r01_to_r05_verified"
+        },
+        {
+          "candidate_version": "fusion-i03-rc.21",
+          "frozen_commit": "a2bd333284649abc1352e70e5078780adaaaca6f",
+          "status": "desktop_web_passed_rust_compile_failed"
         }
       ],
-      "repair_reason": "实际整App硬退出丢失Chromium未落盘的正文及原请求，修复Desktop Main同步可靠存储；不改变Core回执、材料、冻结输入和模型格式。桌面/Web集中构建，Core按源码与SHA复用，无Actions。",
-      "windows_build": "desktop_rc20_core_e0c4fad7_reused",
+      "repair_reason": "累计HTML实际文档预算及R09摘要/模型投影；rc21真实Rust FromSql编译错误后以两行i64修复递增rc22，Frontend按相同源码/SHA复用，Core新编。",
+      "windows_build": "passed_new_core22_frontend21_identical_inputs",
       "related_rust_unique_owners": 26,
-      "related_rust": "historical_results_retained_current_core_reused_e0c4fad7_no_rerun",
+      "related_rust": "two_original_owners_compiled_and_executed_rc22_historical_owners_retained_separately",
       "actual_host_pty": "passed",
       "native_app_scale_platform": "full_flows_scale_and_platform_pending",
-      "native_desktop": "R01_to_R05_local_boundaries_verified_R06_to_R10_open",
+      "native_desktop": "R01_to_R06_local_boundaries_verified_R07_to_R10_open",
       "full_types": "passed_current_tree",
-      "desktop_build": "passed_rc20",
-      "web_build": "passed_rc20",
-      "next_renderer_batch": "Accumulate remaining code, freeze a new candidate, run complete R06 prepare/resume/missing plus affected HTML regressions; current working Renderer no longer matches rc20.",
-      "rust_evidence_scope": "原历史owner及rc15编译/执行保留；本轮Core未改未重编，不把历史Rust数量写成rc19新增通过。",
+      "desktop_build": "passed_rc21_reused_verified_inputs",
+      "web_build": "passed_rc21_reused_verified_inputs",
+      "next_renderer_batch": "复用rc22当前产物完成R07–R10适用验证；真实缺陷修复后仅补必要构建/回归。",
+      "rust_evidence_scope": "本候选新增运行两个既有owner，不将历史owner数量机械相加为当前结果。",
       "candidate_history": [
         {
           "candidate_version": "fusion-i03-rc.19",
@@ -818,22 +845,29 @@
           "status": "historical_candidate_preserved_with_r04_red_and_core_evidence"
         }
       ],
-      "repair_candidates": 19,
+      "repair_candidates": 21,
       "pending_renderer_repair": {
         "commit": "afee4415",
         "evidence": "i03-r06-file-html-progress.json",
-        "status": "coded_not_built_or_native_verified"
+        "status": "native_verified_rc22",
+        "verification": "i03-r06-file-html-verification.json"
       },
       "pending_native_terminal_verification": [
         "Native real Windows IME composition and clipboard/paste behavior",
         "current final candidate terminal collapse/reopen and connection UI regression; old related Native evidence remains applicable only within its source scope"
       ],
       "pending_summary_projection_verification": [
-        "新增Core活动只读投影与原Rust owner尚未编译/运行；真实Host多Thread/公开与私聊交错状态仍待候选",
-        "模型配置与原生会话实际观测的展示适用性继续核对，不把配置冒充观测",
+        "真实Host多Thread/公开和精确私聊交错活动、模型最近运行/配置差异的界面验证",
         "八类创建/编辑/排列/折叠/错误态、画板CRUD、菜单键/旧Host提示的完整当前候选运行",
-        "日夜主题、小窗口/缩放/末项可达和四行长标题的实际同场景对照；尺寸告警须定位并登记影响"
-      ]
+        "日夜主题、小窗口/缩放/末项可达和四行长标题的实际同场景对照",
+        "已收集ResizeObserver只读调用栈、目标及错误；继续定位和影响评估，不能以通过的功能测试宣告告警无影响"
+      ],
+      "artifact_sources": {
+        "desktop": "a2bd333284649abc1352e70e5078780adaaaca6f",
+        "web": "a2bd333284649abc1352e70e5078780adaaaca6f",
+        "core": "1e840216a1af1f93da1371db545579889e42d4da",
+        "evidence": "i03-r09-model-build-verification.json"
+      }
     },
     {
       "stage_id": "I04",
