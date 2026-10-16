@@ -791,7 +791,7 @@
       "full_types": "passed_current_tree",
       "desktop_build": "passed_rc20",
       "web_build": "passed_rc20",
-      "next_renderer_batch": "推进R06跨Thread文件、HTML窗口预算/关闭释放和冷恢复，再R07–R10；已过且相关源码未变的R01–R05不重复验证。",
+      "next_renderer_batch": "Accumulate remaining code, freeze a new candidate, run complete R06 prepare/resume/missing plus affected HTML regressions; current working Renderer no longer matches rc20.",
       "rust_evidence_scope": "原历史owner及rc15编译/执行保留；本轮Core未改未重编，不把历史Rust数量写成rc19新增通过。",
       "candidate_history": [
         {
@@ -800,7 +800,12 @@
           "status": "historical_candidate_preserved_with_r04_red_and_core_evidence"
         }
       ],
-      "repair_candidates": 19
+      "repair_candidates": 19,
+      "pending_renderer_repair": {
+        "commit": "afee4415",
+        "evidence": "i03-r06-file-html-progress.json",
+        "status": "coded_not_built_or_native_verified"
+      }
     },
     {
       "stage_id": "I04",

@@ -286,9 +286,19 @@
         "I03-C05"
       ],
       "done_when": "不同Thread的实际文件预览不串源，HTML窗口上限/关闭释放、冷恢复和文件失效状态有独立证据。",
-      "next_action": "保留原权限/CSP/已过9项；补实际多Thread及窗口预算边界。",
+      "next_action": "R07 actual PTY capacity and reconnect on unchanged Core; accumulate R06 repair with remaining code for the next candidate; execute all R06 phases before closure",
       "owner": "Codex",
-      "external_condition": "none_confirmed_blocking_current_independent_work"
+      "external_condition": "none_confirmed_blocking_current_independent_work",
+      "latest_partial_verification": "i03-r06-file-html-progress.json",
+      "production_repair_pending": {
+        "commit": "afee4415",
+        "reason": "four HTML resources create eight actual documents via hidden deck duplication",
+        "required": [
+          "actual document count <=4",
+          "same-source mirrors and close/retry",
+          "cold recovery and missing-file retry"
+        ]
+      }
     },
     {
       "id": "I03-R07",
@@ -554,5 +564,5 @@
     "真实移动平台按I10推进；终端平台专属保护按相应平台阶段补齐，不能被Windows结果代替"
   ],
   "change_control": "剩余编号固定；发现缺陷归入已有组并说明影响。新增必需范围须有来源和编号变更记录；不能为减少数量合并隐藏未完成条件。",
-  "latest_verification": "i03-r05-object-cold-diff-verification.json"
+  "latest_verification": "i03-r06-file-html-progress.json"
 }

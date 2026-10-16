@@ -91,7 +91,7 @@
       "name": "文件节点真实权限与预览",
       "status": "implementation_ready_for_stage_verification",
       "done_when": "路径不能绕过现行文件权限，卡片间身份隔离，关闭/恢复与变化处理有证据",
-      "latest_partial_evidence": "i03-c06-card-refinement-verification.json",
+      "latest_partial_evidence": "i03-r06-file-html-progress.json",
       "remaining_verification": "真实文件API及rc.8九项卡片/HTML/原生菜单检查通过，完整路径悬停、无重复标题、源码切换和跨卡重读后文档loaded/channel connected、移除节点保留原文件均有证据。原工作区文件导航、完整冷恢复、真实多卡资源/平台资格仍按C02/C05/C06单列，C03整体不提前判通过。"
     },
     {
@@ -245,6 +245,6 @@
     "private_cases_open": 0,
     "verified_work_groups": 5
   },
-  "latest_group_verification": "i03-r05-object-cold-diff-verification.json",
+  "latest_group_verification": "i03-r06-file-html-progress.json",
   "latest_preparation": "i03-r01-private-workflow-preparation.json"
 }
