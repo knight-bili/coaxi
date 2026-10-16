@@ -14,10 +14,10 @@
   },
   "counts": {
     "settled_obligations": 17,
-    "open_work_groups": 4,
+    "open_work_groups": 3,
     "private_cases_verified": 24,
     "private_cases_open": 0,
-    "verified_work_groups": 6
+    "verified_work_groups": 7
   },
   "count_boundary": "不同层级不相加；17条为限定范围旧待办，固定10组按状态计算剩余；私聊按原24场景逐项核定，不计算完成百分比",
   "settled_obligations": [
@@ -306,14 +306,14 @@
     {
       "id": "I03-R07",
       "name": "真实PTY容量、重连和Windows输入边界",
-      "status": "open",
+      "status": "engineering_verified",
       "private_cases": [],
       "original_groups": [
         "I03-C04",
         "I03-C05"
       ],
       "done_when": "真实Core16/17容量及释放重开、连接恢复、适用中文IME/剪贴板行为受控；窗口64控制器与真实PTY数量分开。",
-      "next_action": "Core/Host实际容量与重连已核定；Native输入法/剪贴板及当前候选界面复验随集中候选补齐，先推进R08独立规模/通知工作。",
+      "next_action": "本组Windows本机边界完成；继续R08大正文/真实通知/取消与超时，原跨平台和最终候选仍归R10。",
       "owner": "Codex",
       "external_condition": "none_confirmed_blocking_current_independent_work",
       "latest_partial_verification": "i03-r07-core-terminal-capacity-verification.json",
@@ -324,9 +324,16 @@
         "actual UTF8 stdin split inside a Chinese character preserves original Chinese and emoji file bytes; explicit restart gives new generation and rejects late old input",
         "planned shutdown reaps 16 terminal trees and leaves unrelated control process alive; fresh Core preserves canvas nodes without reopening shells or replaying old-Core launch"
       ],
-      "remaining_native_boundaries": [
-        "Native real Windows IME composition and clipboard/paste behavior",
-        "current final candidate terminal collapse/reopen and connection UI regression; old related Native evidence remains applicable only within its source scope"
+      "remaining_native_boundaries": [],
+      "latest_verification": "i03-r07-native-input-verification.json",
+      "verified_native_boundaries": [
+        "fresh_isolated_native_terminal_starts_real_pty_and_uses_original_generation",
+        "actual_windows_pinyin_composition_sends_no_uncommitted_bytes_and_commits_exact_chinese_once",
+        "actual_clipboard_button_pastes_exact_chinese_and_emoji_into_real_pty",
+        "native_terminal_selection_and_windows_copy_shortcut_write_exact_system_clipboard",
+        "controlled_native_read_transport_error_disables_input_then_explicit_refresh_recovers_same_shell_without_replay",
+        "collapse_reopen_and_explicit_refresh_keep_original_shell_and_do_not_replay_old_input",
+        "native_input_test_stops_and_reaps_its_owned_terminal"
       ]
     },
     {
@@ -627,5 +634,5 @@
     "真实移动平台按I10推进；终端平台专属保护按相应平台阶段补齐，不能被Windows结果代替"
   ],
   "change_control": "剩余编号固定；发现缺陷归入已有组并说明影响。新增必需范围须有来源和编号变更记录；不能为减少数量合并隐藏未完成条件。",
-  "latest_verification": "i03-r06-file-html-verification.json"
+  "latest_verification": "i03-r07-native-input-verification.json"
 }

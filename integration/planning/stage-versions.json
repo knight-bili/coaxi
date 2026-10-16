@@ -657,6 +657,12 @@
           "source": "1e840216a1af1f93da1371db545579889e42d4da",
           "status": "source_and_build_verified_native_ui_remaining",
           "evidence": "i03-r09-model-build-verification.json"
+        },
+        {
+          "kind": "r07-windows-physical-ime-clipboard-remount-and-read-error-ui",
+          "source": "0cd981afcfe8b1dc856f0f2e032b7a5fba3c6970",
+          "status": "engineering_verified_within_declared_local_scope",
+          "evidence": "i03-r07-native-input-verification.json"
         }
       ],
       "engineering_validation": "in_progress",
@@ -832,7 +838,7 @@
       "related_rust": "two_original_owners_compiled_and_executed_rc22_historical_owners_retained_separately",
       "actual_host_pty": "passed",
       "native_app_scale_platform": "full_flows_scale_and_platform_pending",
-      "native_desktop": "R01_to_R06_local_boundaries_verified_R07_to_R10_open",
+      "native_desktop": "R01_to_R07_local_boundaries_verified_R08_to_R10_open",
       "full_types": "passed_current_tree",
       "desktop_build": "passed_rc21_reused_verified_inputs",
       "web_build": "passed_rc21_reused_verified_inputs",
@@ -852,10 +858,7 @@
         "status": "native_verified_rc22",
         "verification": "i03-r06-file-html-verification.json"
       },
-      "pending_native_terminal_verification": [
-        "Native real Windows IME composition and clipboard/paste behavior",
-        "current final candidate terminal collapse/reopen and connection UI regression; old related Native evidence remains applicable only within its source scope"
-      ],
+      "pending_native_terminal_verification": [],
       "pending_summary_projection_verification": [
         "真实Host多Thread/公开和精确私聊交错活动、模型最近运行/配置差异的界面验证",
         "八类创建/编辑/排列/折叠/错误态、画板CRUD、菜单键/旧Host提示的完整当前候选运行",
@@ -867,6 +870,10 @@
         "web": "a2bd333284649abc1352e70e5078780adaaaca6f",
         "core": "1e840216a1af1f93da1371db545579889e42d4da",
         "evidence": "i03-r09-model-build-verification.json"
+      },
+      "native_terminal_verification": {
+        "status": "engineering_verified_within_declared_local_scope",
+        "evidence": "i03-r07-native-input-verification.json"
       }
     },
     {

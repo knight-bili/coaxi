@@ -97,11 +97,11 @@
     {
       "id": "I03-C04",
       "name": "临时终端节点生命周期",
-      "status": "implementation_ready_for_stage_verification",
+      "status": "engineering_verified_within_declared_local_scope",
       "done_when": "真实临时PTY启动、输出、resize、关闭、删除及重连符合现行合同；不把I05完整Git工程工作区提前并入",
-      "latest_partial_evidence": "i03-r07-core-terminal-capacity-verification.json",
+      "latest_partial_evidence": "i03-r07-native-input-verification.json",
       "remaining_implementation_batches": [],
-      "remaining_verification": "已有实际生命周期和rc15终端相关回归已结算；R07只补16/17真实PTY容量、重连与适用Windows输入/剪贴板。其他平台资格在正式平台矩阵保留，不能由Windows结果替代。"
+      "remaining_verification": "原Core/Host16/17容量和真实重连，加rc22 Windows实际IME/剪贴板、折叠重开、受控Native读取故障恢复和回收均核定；跨平台及正式场景继续R10。"
     },
     {
       "id": "I03-C05",
@@ -240,11 +240,11 @@
   "latest_settlement": "i03-closeout-settlement.json",
   "remaining_queue_counts": {
     "settled_obligations": 17,
-    "open_work_groups": 4,
+    "open_work_groups": 3,
     "private_cases_verified": 24,
     "private_cases_open": 0,
-    "verified_work_groups": 6
+    "verified_work_groups": 7
   },
-  "latest_group_verification": "i03-r06-file-html-verification.json",
+  "latest_group_verification": "i03-r07-native-input-verification.json",
   "latest_preparation": "i03-r01-private-workflow-preparation.json"
 }
