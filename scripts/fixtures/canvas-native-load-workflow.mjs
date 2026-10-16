@@ -91,7 +91,7 @@ export async function qualifyCanvasNativeLoad(window,{evaluate,wait,rpc,openCanv
    const initial=await readInput(0);assert.equal(initial.sha256,hash(large));assert.ok(initial.bytes>1024*1024)
    const sent=[],transaction={};let independent
    for(let n=0;n<keys.length;n++){
-    if(n===4){transaction.started=Date.now();independent=rpc('canvas.boards.create',{commandId:randomUUID(),command:{name:'R08 输入期间独立事务'}}).then(value=>{assert.equal(value.status,'applied');transaction.completed=Date.now();transaction.durationMs=transaction.completed-transaction.started;transaction.keysDispatched=sent.length})}
+    if(n===4){transaction.started=Date.now();independent=rpc('canvas.boards.create',{commandId:randomUUID(),command:{name:'R08 输入期间独立事务'}}).then(value=>{assert.equal(value.status,'applied');transaction.coreRecordedAt=Date.parse(value.recordedAt);assert.ok(Number.isFinite(transaction.coreRecordedAt));transaction.completed=Date.now();transaction.durationMs=transaction.completed-transaction.started;transaction.keysDispatched=sent.length})}
     sent.push(Date.now());const keyCode=keys[n]
     window.webContents.sendInputEvent({type:'keyDown',keyCode});window.webContents.sendInputEvent({type:'char',keyCode});window.webContents.sendInputEvent({type:'keyUp',keyCode});await pause(35)
    }
@@ -100,10 +100,11 @@ export async function qualifyCanvasNativeLoad(window,{evaluate,wait,rpc,openCanv
    const typed=observed.inputs.filter(row=>row.length>large.length)
    assert.equal(typed.length,keys.length);assert.ok(typed.every(row=>row.trusted))
    const latencies=typed.map((row,n)=>row.at-sent[n]);assert.ok(latencies.every(x=>x>=0))
-   report.native_load_metrics={bodyBytes:Buffer.byteLength(expected),bodyCharacters:expected.length,keys:keys.length,keyLatencyMs:stats(latencies),rendererFrameGapMs:stats(observed.frames),mainTimerGapMs:stats(mainGaps),independentTransaction:transaction,qualification:'本机约1MiB正文、16键及同场景数据；工程检查预算按键p95<250ms、主线程/帧间隔max<1000ms，不外推全部设备或正式性能SLA。'}
+   report.native_load_metrics={bodyBytes:Buffer.byteLength(expected),bodyCharacters:expected.length,keys:keys.length,inputEvents:typed,sentAt:sent,keyLatencyMs:stats(latencies),rendererFrameGapMs:stats(observed.frames),mainTimerGapMs:stats(mainGaps),independentTransaction:transaction,qualification:'本机约1MiB正文、16键及同场景数据；工程检查预算按键p95<250ms、主线程/帧间隔max<1000ms，不外推全部设备或正式性能SLA。'}
    assert.ok(report.native_load_metrics.keyLatencyMs.p95<250,'Observed input latency exceeded the local engineering budget')
    assert.ok(report.native_load_metrics.mainTimerGapMs.max<1000&&report.native_load_metrics.rendererFrameGapMs.max<1000,'Owned application stalled over one second')
-   assert.ok(transaction.keysDispatched<keys.length,'Independent Core command must complete while input is ongoing')
+   // 测试脚本发完输入不代表Renderer处理完输入；以真实Core回执与可信DOM事件核对交错。
+   assert.ok(transaction.coreRecordedAt>=typed[0].at&&transaction.coreRecordedAt<typed.at(-1).at,'Independent Core commit must occur during actual input handling')
    assert.equal((await readInput(0)).sha256,hash(expected));assert.equal((await readInput(1)).sha256,hash(other))
    record('actual_mebibyte_private_input_keeps_all_sixteen_trusted_keys_and_other_card_while_independent_core_transaction_completes')
    report.persisted_bodies=[await savedBody(expected),await savedBody(other)]
