@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { app } from 'electron'
 import { mkdir,readFile,writeFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { basename,join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { setTimeout as pause } from 'node:timers/promises'
 import { stripVTControlCharacters } from 'node:util'
@@ -1062,7 +1062,7 @@ async function qualifyReadyDiff(window,{evaluate,wait,rpc}){
  git(project,'init','-b','main');git(project,'config','user.name','工程测试');git(project,'config','user.email','fixture@example.invalid');git(project,'config','core.autocrlf','false')
  git(project,'add','.');git(project,'commit','-m','保存差异跳转测试的初始文件')
  const base=git(project,'rev-parse','HEAD')
- const member=await rpc('members.create',{commandId:randomUUID(),command:{displayName:'C02 本地协议工作区队员',teamRole:'隔离工程测试',professionalResponsibilities:'本地协议响应，不连接外部模型。',personalityTraits:['严谨'],workingPrinciples:'固定协议夹具',growthTopic:''}})
+ const member=await rpc('members.create',{commandId:randomUUID(),command:{displayName:'C02 本地协议工作区队员 '+basename(project),teamRole:'隔离工程测试',professionalResponsibilities:'本地协议响应，不连接外部模型。',personalityTraits:['严谨'],workingPrinciples:'固定协议夹具',growthTopic:''}})
  assert.equal(member.status,'applied',JSON.stringify(member));const agentId=member.resultEntity.entityId
  const {configureProductRuntime}=await import(config.runtime_configure_module)
  report.controlled_runtime=await configureProductRuntime(rpc,'qwen-code',[agentId])
