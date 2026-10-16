@@ -209,14 +209,21 @@ it('changes presentation of the same context without reading again, re-keying in
   const first = f.controller.getSnapshot().instances[0], guard = vi.fn()
   f.controller.register(first.key, guard)
   expect(await f.controller.open({ ...first.target, presentation: 'drawer' })).toBe(true)
-  const changed = f.controller.getSnapshot().instances.at(-1)!
+  const changed = f.controller.getSnapshot().instances.find(item => item.key === first.key)!
   expect(changed.key).toBe(first.key)
   expect(changed.target.draftContext).toEqual(first.target.draftContext)
+  expect(f.controller.getSnapshot().instances.map(item => item.target.nodeId)).toEqual(['first', 'second'])
   expect(f.controller.getSnapshot().instances).toHaveLength(2)
   expect(f.reads.open).toHaveBeenCalledTimes(2)
   expect(guard).not.toHaveBeenCalled()
   await f.controller.open({ ...target({ nodeId: 'second' }), presentation: 'drawer' })
   expect(f.controller.getSnapshot().instances.filter(item => item.target.presentation === 'drawer')).toHaveLength(1)
+  expect(f.controller.getSnapshot().instances.map(item => item.target.nodeId)).toEqual(['first', 'second'])
+  expect(f.controller.getSnapshot().instances[0].target.presentation).toBe('inline')
+  expect(f.controller.getSnapshot().instances[1].target.presentation).toBe('drawer')
+  await f.controller.open({ ...first.target, presentation: 'inline' })
+  expect(f.controller.getSnapshot().instances.map(item => item.target.nodeId)).toEqual(['first', 'second'])
+  expect(f.requests.map(item => item.method)).toEqual(['app.info', 'app.info'])
 })
 
 it('rejects missing, substituted or foreign Host/Core input ownership before loading a Thread', async () => {

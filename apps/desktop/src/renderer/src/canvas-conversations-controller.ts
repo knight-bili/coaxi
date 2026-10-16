@@ -52,9 +52,11 @@ export class CanvasConversationsController {
     }
     const key = canvasComposerContextKey(context), existing = this.state.instances.find(item => item.key === key)
     if (existing) {
-      const others = this.state.instances.filter(item => item.key !== key).map(item => target.presentation === 'drawer' && item.target.presentation === 'drawer'
-        ? { ...item, target: { ...item.target, presentation: 'inline' as const } } : item)
-      this.publish({ instances: [...others, { ...existing, target }], issue: null })
+      // Reordering keyed editors still detaches their DOM and loses native undo history.
+      const instances = this.state.instances.map(item => item.key === key ? { ...item, target }
+        : target.presentation === 'drawer' && item.target.presentation === 'drawer'
+          ? { ...item, target: { ...item.target, presentation: 'inline' as const } } : item)
+      this.publish({ instances, issue: null })
       if (!restoring) this.remember(target, true)
       return true
     }
