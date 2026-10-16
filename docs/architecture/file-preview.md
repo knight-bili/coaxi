@@ -152,6 +152,9 @@ Renderer 的 `file-preview-session.ts` 保存最多 24 个 Camp 的轻量快照�
 切 Camp 只切显示。热命中直接复用标签内容、Blob URL 和 iframe，不重读、不重验、不重新准备站点；冷恢复仅加载
 当前需要显示的标签。原请求继续归原 Camp/session/tab/generation，关闭、淘汰、代次替代才拒绝并释放迟到资源。
 HTML 保留页面和站点，隐藏时退出交互与焦点范围，接受有限实例继续执行作者脚本，不增加冻结或监控系统。
+实际 HTML 文档名额由同一个窗口资源 owner 管理，完整文件区与固定卡片共同计数；从未显示的隐藏文件区不创建作者 iframe 副本。
+已有可见读者优先，名额不足时先回收不可见文档，不能替换仍在使用的页面；有余量的隐藏文档继续保留。
+四个实际文档都可见时，新 HTML 加载或刷新候选必须失败并保留旧预览；关闭释放后可重试，不以共享文件句柄数量代替实际文档数量。
 
 Main 将 `{campId, previewSessionId, bindingGeneration}` 与当前导航分开。来源读取检查存活 session；系统打开、
 目录选择等原生效果仍检查发起时导航。session 结束释放自己的 handle、Grant、challenge、token 与 watcher。

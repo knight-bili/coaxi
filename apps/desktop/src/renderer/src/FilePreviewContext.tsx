@@ -14,6 +14,9 @@ export * from './file-preview-controller'
 
 const FilePreviewApiContext = createContext<FilePreviewApi | null>(null)
 const FilePreviewContext = createContext<FilePreviewContextValue | null>(null)
+const HtmlPresentationContext = createContext<FilePreviewResources | null>(null)
+const noSubscription = (): (() => void) => () => undefined
+const emptyRevision = (): number => 0
 const PreviewHostContext = createContext<((element: HTMLDivElement | null) => void) | null>(null)
 const ExecutionPreviewHostContext = createContext<ReadonlyMap<string, HTMLDivElement>>(new Map())
 
@@ -129,7 +132,7 @@ export function FilePreviewProvider({ threadId, resolvedTheme, api: providedApi,
   }, [resources])
   const deck = createPortal(<PreviewDeck resources={resources} anchor={anchor} resolvedTheme={resolvedTheme} missionActivity={missionActivity}
     registerExecutionHost={registerExecutionHost} contained={contained} host={deckHost} threadId={threadId} domScope={domScope} isFocusedSurface={isFocusedSurface} />, deckHost)
-  return <FilePreviewApiContext.Provider value={api}><FilePreviewContext.Provider value={value}>
+  return <HtmlPresentationContext.Provider value={resources}><FilePreviewApiContext.Provider value={api}><FilePreviewContext.Provider value={value}>
     <FilePreviewLayoutProvider threadId={threadId} visible={!!threadId && value.paneVisible} activityMode={value.activeTab?.kind === 'mission_activity'}>
       <FileFindProvider activeTabId={value.activeTabId} visible={!!threadId && value.paneVisible && isFocusedSurface}>
         <ExecutionPreviewHostContext.Provider value={executionHosts}>
@@ -138,7 +141,23 @@ export function FilePreviewProvider({ threadId, resolvedTheme, api: providedApi,
         </ExecutionPreviewHostContext.Provider>
       </FileFindProvider>
     </FilePreviewLayoutProvider>
-  </FilePreviewContext.Provider></FilePreviewApiContext.Provider>
+  </FilePreviewContext.Provider></FilePreviewApiContext.Provider></HtmlPresentationContext.Provider>
+}
+
+/** A hidden deck must not create a second author document for a pinned file. */
+export function useHtmlPreviewPresentation(host: { current: HTMLElement | null }): { presented: boolean; limited: boolean } {
+  const resources = useContext(HtmlPresentationContext), owner = useRef({}).current
+  useSyncExternalStore(resources?.subscribe ?? noSubscription, resources?.getSnapshot ?? emptyRevision, emptyRevision)
+  useLayoutEffect(() => {
+    if (!resources || !host.current) return
+    const release = resources.retainHtmlPresentation(owner)
+    const target = host.current.closest('.file-preview-html-version')?.parentElement ?? host.current
+    const observer = new IntersectionObserver(entries => resources.presentHtml(owner,
+      entries.some(entry => entry.isIntersecting) && target.getClientRects().length > 0 && getComputedStyle(target).visibility !== 'hidden'))
+    observer.observe(target)
+    return () => { observer.disconnect(); release() }
+  }, [resources, owner, host])
+  return { presented: !resources || resources.canPresentHtml(owner), limited: resources?.htmlPresentationLimited(owner) ?? false }
 }
 
 export function useFilePreview(): FilePreviewContextValue {
@@ -214,7 +233,7 @@ export function PinnedFilePreview({ api, source, resolvedTheme, actionsHost, onN
     open: (...args) => onNavigate ? onNavigate(...args) : Promise.resolve({ kind: 'error', error: { code: 'source_not_authorized', message: uiAttribute('当前页面无法打开关联文件。'), retryable: false } }) }
   const presented = useMemo(() => tab && sourceMode && tab.content?.kind === 'markdown'
     ? { ...tab, content: { kind: 'code' as const, text: tab.content.text } } : tab, [tab, sourceMode])
-  return <FilePreviewApiContext.Provider value={api}><FilePreviewContext.Provider value={value}>
+  return <HtmlPresentationContext.Provider value={resources}><FilePreviewApiContext.Provider value={api}><FilePreviewContext.Provider value={value}>
     <FileFindProvider activeTabId={tab?.id ?? null} visible={visible && resources.isFocused(owner)}>
       <div ref={host} className="canvas-file-preview" onPointerDownCapture={focus} onFocusCapture={focus}>
         {actionsHost && createPortal(<>
@@ -231,5 +250,5 @@ export function PinnedFilePreview({ api, source, resolvedTheme, actionsHost, onN
           : <p className="canvas-notice" role="status"><UiText zh="页面预览已达窗口上限，请先收起其他页面预览。" /></p>)}
       </div>
     </FileFindProvider>
-  </FilePreviewContext.Provider></FilePreviewApiContext.Provider>
+  </FilePreviewContext.Provider></FilePreviewApiContext.Provider></HtmlPresentationContext.Provider>
 }

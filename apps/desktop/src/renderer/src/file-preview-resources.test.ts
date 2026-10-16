@@ -57,6 +57,40 @@ function active(session: FilePreviewSession): FilePreviewTabModel {
   return session.getSnapshot().tabs.find(tab => tab.id === session.getSnapshot().activeTabId) as FilePreviewTabModel
 }
 
+it('bounds actual HTML documents across hidden decks and visible mirrors without evicting current readers', () => {
+  const { owner } = fixture(), surfaces = Array.from({ length: 9 }, () => ({}))
+  const release = surfaces.map(surface => owner.retainHtmlPresentation(surface))
+  expect(surfaces.filter(surface => owner.canPresentHtml(surface))).toHaveLength(0)
+  expect(surfaces.some(surface => owner.htmlPresentationLimited(surface))).toBe(false)
+  for (const surface of surfaces.slice(4)) owner.presentHtml(surface, true)
+  expect(surfaces.slice(4).map(surface => owner.canPresentHtml(surface))).toEqual([true, true, true, true, false])
+  expect(owner.htmlPresentationLimited(surfaces[8])).toBe(true)
+  owner.presentHtml(surfaces[4], false)
+  expect(owner.canPresentHtml(surfaces[4])).toBe(false)
+  expect(owner.canPresentHtml(surfaces[8])).toBe(true)
+  owner.presentHtml(surfaces[4], true)
+  expect(owner.canPresentHtml(surfaces[4])).toBe(false)
+  expect(surfaces.filter(surface => owner.canPresentHtml(surface))).toHaveLength(4)
+  release[5](); release[5]()
+  expect(owner.canPresentHtml(surfaces[4])).toBe(true)
+  expect(surfaces.filter(surface => owner.canPresentHtml(surface))).toHaveLength(4)
+  owner.presentHtml(surfaces[4], false)
+  expect(owner.canPresentHtml(surfaces[4])).toBe(true)
+  owner.dispose()
+  expect(surfaces.filter(surface => owner.canPresentHtml(surface))).toHaveLength(0)
+})
+
+it('refuses a new HTML refresh while four actual mirrored documents remain visible and admits it after release', async () => {
+  const { owner } = fixture(), surfaces = Array.from({ length: 4 }, () => ({}))
+  const release = surfaces.map(surface => owner.retainHtmlPresentation(surface))
+  for (const surface of surfaces) owner.presentHtml(surface, true)
+  expect(await owner.reserveHtml(owner.session('a'), 'candidate')).toBeNull()
+  release[0]()
+  const reservation = await owner.reserveHtml(owner.session('a'), 'candidate')
+  expect(reservation).toBeTypeOf('function')
+  reservation?.()
+})
+
 it('keeps two fixed files in one Thread visible independently and background opens do not replace its active tab', async () => {
   const { owner, api } = fixture(), first = {}, second = {}
   owner.presentFile(first, 'a', null, true); owner.activate('a', first)

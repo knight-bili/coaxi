@@ -27,6 +27,7 @@ export class FilePreviewResources {
   currentThreadId: string | null = null
   readonly #activeOwners = new Map<object, string | null>()
   readonly #fileViews = new Map<object, { threadId: string; tabId: string | null; visible: boolean; sourceKey?: string }>()
+  readonly #htmlPresentations = new Map<object, { visible: boolean; admitted: boolean; usage: number }>()
   #focusedOwner: object | null = null
   get disposed(): boolean { return this.#disposed }
   isFocused(owner: object): boolean { return this.#focusedOwner === owner }
@@ -136,6 +137,39 @@ export class FilePreviewResources {
     const previous = this.#fileViews.get(owner)
     if (previous?.threadId === threadId && previous.tabId === tabId && previous.visible === visible && previous.sourceKey === sourceKey) return
     this.#fileViews.set(owner, { threadId, tabId, visible, sourceKey }); this.changed()
+  }
+
+  retainHtmlPresentation(owner: object): () => void {
+    this.#htmlPresentations.set(owner, { visible: false, admitted: false, usage: 0 })
+    let released = false
+    return () => {
+      if (released) return
+      released = true
+      if (this.#htmlPresentations.delete(owner)) { this.#admitHtmlPresentations(); this.changed() }
+    }
+  }
+
+  presentHtml(owner: object, visible: boolean): void {
+    const view = this.#htmlPresentations.get(owner)
+    if (!view || view.visible === visible) return
+    view.visible = visible
+    if (visible) view.usage = ++this.#sequence
+    this.#admitHtmlPresentations()
+    this.changed()
+  }
+
+  canPresentHtml(owner: object): boolean { return this.#htmlPresentations.get(owner)?.admitted ?? false }
+  htmlPresentationLimited(owner: object): boolean {
+    const view = this.#htmlPresentations.get(owner)
+    return Boolean(view?.visible && !view.admitted)
+  }
+
+  #admitHtmlPresentations(): void {
+    const views = [...this.#htmlPresentations.values()]
+    const priority = (view: typeof views[number]): number => view.visible ? view.admitted ? 0 : 1 : 2
+    const admitted = new Set(views.filter(view => view.visible || view.admitted).sort((a, b) => priority(a) - priority(b)
+      || (a.visible ? a.usage - b.usage : b.usage - a.usage)).slice(0, this.limits.htmlInstances))
+    for (const view of views) view.admitted = admitted.has(view)
   }
 
   /** Count actual HTML presentations, including mirrors of one shared handle. */
@@ -252,6 +286,7 @@ export class FilePreviewResources {
   }
 
   reserveHtml = async (session: FilePreviewSession, tabId: string): Promise<(() => void) | null> => {
+    if (this.#htmlReservations + [...this.#htmlPresentations.values()].filter(view => view.visible && view.admitted).length >= this.limits.htmlInstances) return null
     const entries = this.#entries()
     let count = this.#htmlReservations + [...this.sessions.values()].reduce((n, session) => n + [...session.retired.values()].filter(value => value.content?.kind === 'html').length, 0) + entries.reduce((n, { tab }) => n + Number(tab.content?.kind === 'html') + Number(tab.candidate?.loaded.content.kind === 'html'), 0)
     for (const entry of entries.sort((a, b) => a.usage - b.usage)) {
@@ -283,6 +318,7 @@ export class FilePreviewResources {
     this.sessions.clear()
     this.#activeOwners.clear()
     this.#fileViews.clear()
+    this.#htmlPresentations.clear()
     this.#focusedOwner = null
     void this.sync().catch(() => undefined)
   }

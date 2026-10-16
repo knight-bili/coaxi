@@ -1,7 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react'
 import { HtmlPreviewHostChannel } from '../../../../../packages/html-preview/src/host-channel'
 import { htmlPreviewDiagnosticKey, parseHtmlPreviewDiagnostic, validPreviewOrigin, type HtmlPreviewDiagnostic } from '../../../../../packages/html-preview/src/protocol'
-import { useFilePreview, type FilePreviewTabModel } from './FilePreviewContext'
+import { useFilePreview, useHtmlPreviewPresentation, type FilePreviewTabModel } from './FilePreviewContext'
 import { HtmlPreviewSource } from './HtmlPreviewSource'
 import { useHtmlFileFind } from './file-find-html'
 import { HtmlPreviewLoadState, type HtmlPreviewLoadSnapshot } from './file-preview-html-load'
@@ -30,7 +30,9 @@ function HtmlPageViewer({ tab, pathControl, updateAction, candidate }: {
   const content = tab.content?.kind === 'html' ? tab.content : null
   const preview = content?.preview
   const iframeRef = useRef<HTMLIFrameElement>(null)
-  const channel = useMemo(() => preview ? new HtmlPreviewHostChannel(preview, () => iframeRef.current?.contentWindow ?? null) : null, [preview])
+  const hostRef = useRef<HTMLDivElement>(null)
+  const { presented, limited } = useHtmlPreviewPresentation(hostRef)
+  const channel = useMemo(() => preview && presented ? new HtmlPreviewHostChannel(preview, () => iframeRef.current?.contentWindow ?? null) : null, [preview, presented])
   const sourceMode = !candidate && Boolean(tab.htmlSourceMode)
   const [detailsOpen, setDetailsOpen] = useState(false)
   const detailsId = useId()
@@ -92,12 +94,12 @@ function HtmlPageViewer({ tab, pathControl, updateAction, candidate }: {
   }, [channel, preview])
 
   useEffect(() => {
-    if (!tab.file) return
+    if (!tab.file || !presented) return
     if (!candidate) { displayed(tab.id, tab.file.handleId); return }
     if (documentState === 'loaded' && channelState === 'connected') completeHtmlRefresh(tab.id, tab.file.handleId)
     else if (['failed', 'unresponsive', 'unconfirmed'].includes(documentState) || channelState === 'unavailable')
       completeHtmlRefresh(tab.id, tab.file.handleId, failure ?? uiAttribute('无法确认新页面已加载，旧预览已保留。'))
-  }, [candidate, tab.id, tab.file?.handleId, documentState, channelState, failure, completeHtmlRefresh, displayed])
+  }, [candidate, tab.id, tab.file?.handleId, documentState, channelState, failure, completeHtmlRefresh, displayed, presented])
 
   useEffect(() => { if (fragment) channel?.send('fragment', { fragment }) }, [channel, fragment])
   const safe = Boolean(preview && validPreviewOrigin(preview, window.location.origin))
@@ -122,7 +124,7 @@ function HtmlPageViewer({ tab, pathControl, updateAction, candidate }: {
     {summary ||uiAttribute("诊断详情")}
     <svg className="file-preview-html-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d={expanded ? 'm4 10 4-4 4 4' : 'm4 6 4 4 4-4'} /></svg>
   </button> : summary && <span className="file-preview-html-feedback">{summary}</span>
-  return <div className="file-preview-html-stage" data-document-state={documentState} data-script-state={scriptFailed ? 'error' : 'no-error-observed'} data-resource-state={resourceFailed ? 'partial-failure' : 'no-error-observed'} data-channel-state={channelState} data-server-diagnostics-state={loadState.serverDiagnostics}>
+  return <div ref={hostRef} className="file-preview-html-stage" data-document-state={documentState} data-script-state={scriptFailed ? 'error' : 'no-error-observed'} data-resource-state={resourceFailed ? 'partial-failure' : 'no-error-observed'} data-channel-state={channelState} data-server-diagnostics-state={loadState.serverDiagnostics}>
     <span className="sr-only" role="status">{summary}</span>
     {(pathControl || feedback || updateAction) && <div className={pathControl ? 'file-preview-path-row' : 'file-preview-html-feedback-row'}>
       {pathControl}
@@ -147,10 +149,11 @@ function HtmlPageViewer({ tab, pathControl, updateAction, candidate }: {
     {notice && <p className="file-preview-html-notice" role="status">{notice}</p>}
     <div className="file-preview-content">
       {sourceMode && <HtmlPreviewSource key={preview.generation} file={tab.file} theme={resolvedTheme} tab={tab} />}
-      {safe && <iframe hidden={sourceMode} ref={iframeRef} className="file-preview-html" title={uiAttribute("{0} HTML 预览", String(tab.presentation.fileName))}
+      {safe && presented && <iframe hidden={sourceMode} ref={iframeRef} className="file-preview-html" title={uiAttribute("{0} HTML 预览", String(tab.presentation.fileName))}
         src={preview.entryUrl} sandbox={preview.sandboxedDocument === undefined ? 'allow-scripts allow-same-origin' : 'allow-scripts allow-same-origin allow-forms allow-popups allow-modals'} referrerPolicy="no-referrer"
         onLoad={() => { load.current?.frameLoaded(); channel?.connect() }}
         onError={() => load.current?.failed(uiAttribute('无法加载预览页面。'))} />}
+      {limited && !sourceMode && <p role="status"><UiText zh="页面预览已达窗口上限，请先收起其他页面预览。" /></p>}
       {!sourceMode && documentFailed && <div className="file-preview-error file-preview-html-failure" role="alert">
         <strong><UiText zh={"无法加载 HTML 预览"} /></strong><p>{failure ?? uiAttribute("预览站点未与主应用隔离。")}</p><button type="button" onClick={retry} disabled={tab.isRefreshing}>{tab.isRefreshing ? uiAttribute("重试中…") : uiAttribute("重试")}</button>
       </div>}

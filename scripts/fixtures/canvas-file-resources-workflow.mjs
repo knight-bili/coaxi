@@ -33,19 +33,24 @@ export async function qualifyCanvasFileResources(window,{evaluate,wait,rpc,openC
     await wait(`${card(id)}?.querySelector('.file-preview-html-stage')?.dataset.documentState==='loaded'&&${card(id)}.querySelector('.file-preview-html-stage').dataset.channelState==='connected'`,30000)
     const src=await evaluate(`${card(id)}.querySelector('iframe.file-preview-html').src`),origin=new URL(src).origin
     let found
+    const probe=randomUUID(),bounded=promise=>Promise.race([promise,pause(1000).then(()=>null)])
     const deadline=Date.now()+15000
     while(Date.now()<deadline&&!found){
-      for(const frame of window.webContents.mainFrame.framesInSubtree){
+      const candidates=window.webContents.mainFrame.framesInSubtree.filter(frame=>{try{return new URL(frame.url).origin===origin}catch{return false}})
+      for(const frame of candidates)await bounded(frame.executeJavaScript(`(()=>{if(window.__r06ProbeHandler)removeEventListener('message',window.__r06ProbeHandler);window.__r06ProbeHandler=event=>{if(event.source===parent&&event.data?.r06FrameProbe===${JSON.stringify(probe)})window.__r06FrameProbe=${JSON.stringify(probe)}};addEventListener('message',window.__r06ProbeHandler);return true})()`).catch(()=>null))
+      await evaluate(`(()=>{${card(id)}.querySelector('iframe.file-preview-html').contentWindow.postMessage({r06FrameProbe:${JSON.stringify(probe)}},${JSON.stringify(origin)});return true})()`)
+      await pause(50)
+      for(const frame of candidates){
         try{
-          if(new URL(frame.url).origin!==origin)continue
-          const doc=await frame.executeJavaScript(`({identity:document.querySelector('#identity')?.textContent,bridge:typeof window.rovai,node:typeof window.require,csp:document.querySelector('meta[http-equiv="Content-Security-Policy"]')?.content})`)
-          if(doc.identity!==identity)continue
+          const doc=await bounded(frame.executeJavaScript(`({matched:window.__r06FrameProbe===${JSON.stringify(probe)},identity:document.querySelector('#identity')?.textContent,bridge:typeof window.rovai,node:typeof window.require,csp:document.querySelector('meta[http-equiv="Content-Security-Policy"]')?.content})`))
+          if(!doc?.matched||doc.identity!==identity)continue
           assert.equal(doc.bridge,'undefined');assert.equal(doc.node,'undefined');assert.equal(doc.csp,config.file_author_csp)
           found={origin,frameId:frame.frameTreeNodeId,...doc};break
         }catch(error){if(error.code==='ERR_ASSERTION')throw error}
       }
       if(!found)await pause(100)
     }
+    for(const frame of window.webContents.mainFrame.framesInSubtree.filter(frame=>{try{return new URL(frame.url).origin===origin}catch{return false}}))await bounded(frame.executeJavaScript(`(()=>{removeEventListener('message',window.__r06ProbeHandler);delete window.__r06ProbeHandler;delete window.__r06FrameProbe;return true})()`).catch(()=>null))
     assert.ok(found,'actual author document not found: '+identity);return found
   }
   let context
