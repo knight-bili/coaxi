@@ -67,7 +67,7 @@ export async function qualifyCanvasNotifications(window,{evaluate,wait,rpc,openC
  const snapshot=context=>context.kind==='private'?rpc('singleChat.get',{conversationId:context.conversationId}):rpc('threads.open',{threadId:context.threadId,traceId:randomUUID()})
  const send=async(context,label)=>{
   const before=await snapshot(context),body=`R08 ${context.kind} ${label} ${randomUUID()}`
-  const sent=context.kind==='private'?await rpc('singleChat.send',{commandId:randomUUID(),command:{threadId:context.threadId,conversationId:context.conversationId,body,draftRevision:before.draft.revision}}):await rpc('camp.messages.send',{commandId:randomUUID(),threadId:context.threadId,content:{version:2,segments:[{kind:'text',text:body}]},sourceAttachments:[],quotes:[],replyToThreadMessageId:null})
+  const sent=context.kind==='private'?await rpc('singleChat.send',{commandId:randomUUID(),command:{threadId:context.threadId,conversationId:context.conversationId,body,draftRevision:before.draft.revision}}):await rpc('thread.messages.send',{commandId:randomUUID(),threadId:context.threadId,content:{version:2,segments:[{kind:'text',text:body}]},sourceAttachments:[],quotes:[],replyToThreadMessageId:null})
   assert.equal((sent.commandResult??sent).status,'accepted',JSON.stringify(sent))
   const after=await until(async()=>{const view=await snapshot(context),runs=view.agentRuns.filter(run=>!before.agentRuns.some(old=>old.id===run.id));return runs.length&&runs.every(run=>['succeeded','failed','cancelled'].includes(run.status))?{view,runs}:false})
   assert.equal(after.runs.length,1);assert.equal(after.runs[0].status,'succeeded',JSON.stringify(after.runs))
