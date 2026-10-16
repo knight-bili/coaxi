@@ -115,6 +115,7 @@ export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait
   }
   const clickNative = async expression => {
     await wait(`Boolean((${expression})&&!(${expression}).disabled&&(${expression}).checkVisibility())`)
+    await evaluate(`(()=>{(${expression}).scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'});return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))})()`)
     const point = await evaluate(`(()=>{const element=${expression},r=element.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,hit=document.elementFromPoint(x,y);if(!hit||!(hit===element||element.contains(hit)))throw Error('真实输入目标被遮挡');return {x:Math.round(x),y:Math.round(y)}})()`)
     for (const type of ['mouseMove', 'mouseDown', 'mouseUp']) window.webContents.sendInputEvent({ type, ...point,
       ...(type === 'mouseMove' ? {} : { button: 'left', clickCount: 1 }) })
