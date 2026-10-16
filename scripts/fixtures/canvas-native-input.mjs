@@ -1026,13 +1026,16 @@ async function qualifyPublicMulti(window,{evaluate,wait,rpc}){
  report.summary_frame_intervals=await evaluate(`new Promise(resolve=>{const intervals=[];let last=performance.now();const next=now=>{intervals.push(now-last);last=now;if(intervals.length===60)resolve(intervals);else requestAnimationFrame(next)};requestAnimationFrame(next)})`)
  const intervals=[...report.summary_frame_intervals].sort((a,b)=>a-b)
  report.summary_frame_metrics={sample_frames:intervals.length,median_ms:intervals[Math.floor(intervals.length/2)],p95_ms:intervals[Math.ceil(intervals.length*.95)-1],max_ms:intervals.at(-1),qualification:'真实64摘要卡静态帧间隔采样，不是64个展开工作区、终端窗口上限或全交互帧率资格'}
- const zoomBefore=await evaluate(`document.querySelector('.canvas-zoom-readout').textContent`)
- const center=await evaluate(`(()=>{const rect=document.querySelector('.canvas-flow-stage').getBoundingClientRect();return {x:Math.round(rect.left+rect.width/2),y:Math.round(rect.top+rect.height/2)}})()`)
- window.webContents.sendInputEvent({type:'mouseWheel',...center,deltaY:100,deltaX:0,canScroll:true})
- await wait(`document.querySelector('.canvas-zoom-readout').textContent!==${JSON.stringify(zoomBefore)}`)
+ report.summary_viewport_before=await evaluate(`(()=>{window.summaryWheel=[];window.addEventListener('wheel',event=>window.summaryWheel.push({trusted:event.isTrusted,deltaX:event.deltaX,deltaY:event.deltaY}),true);return {transform:document.querySelector('.react-flow__viewport').style.transform,zoom:document.querySelector('.canvas-zoom-readout').textContent}})()`)
+ const point=await evaluate(`(()=>{const rect=document.querySelector('.canvas-flow-stage').getBoundingClientRect();return {x:Math.round(rect.left+12),y:Math.round(rect.top+12)}})()`)
+ window.webContents.sendInputEvent({type:'mouseWheel',...point,deltaY:100,deltaX:0,canScroll:true})
+ // Both original Codeg and this surface use panOnScroll: a plain wheel pans, it does not change the zoom percentage.
+ await wait(`document.querySelector('.react-flow__viewport').style.transform!==${JSON.stringify(report.summary_viewport_before.transform)}`)
+ report.summary_viewport_after=await evaluate(`({transform:document.querySelector('.react-flow__viewport').style.transform,zoom:document.querySelector('.canvas-zoom-readout').textContent,wheel:window.summaryWheel})`)
+ assert.equal(report.summary_viewport_after.zoom,report.summary_viewport_before.zoom);assert.ok(report.summary_viewport_after.wheel.some(event=>event.trusted))
  const final=await rpc('canvas.nodes.snapshot',{boardId:summaryBoardId})
  assert.deepEqual(final.nodes.map(node=>node.id).sort(),summaryIds.slice().sort())
- record('native_wheel_changes_actual_64_card_viewport_without_mutating_or_losing_persisted_nodes')
+ record('native_wheel_pans_actual_64_card_viewport_without_mutating_or_losing_persisted_nodes')
  await writeFile(join(config.evidence,'02-real-64-summary-cards.png'),(await window.webContents.capturePage()).toPNG())
 }
 await import(config.production_main)
