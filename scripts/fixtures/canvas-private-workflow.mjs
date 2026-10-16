@@ -165,6 +165,9 @@ export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait
       await wait(`${input(0)}.value!==${JSON.stringify(text)}`)
       const undoValue = await evaluate(`${input(0)}.value`)
       window.webContents.redo(); await wait(`${input(0)}.value===${JSON.stringify(text)}`)
+      report.roundtrip_baseline = { text, undoValue, passed: true }
+      record('native_private_editor_undo_redo_baseline_before_presentation_change')
+      await evaluate(`(()=>{window.r01EditorMoves=[];const overlay=window.r01Editor.closest('.canvas-conversation-overlay');window.r01EditorObserver=new MutationObserver(records=>{for(const change of records)for(const node of change.removedNodes)if(node===overlay||node.contains?.(window.r01Editor))window.r01EditorMoves.push({removedEditorAncestor:true,parent:change.target.className})});window.r01EditorObserver.observe(overlay.parentNode,{childList:true,subtree:true});return true})()`)
       await clickNative(`document.querySelector('[data-id="${scopes[0].nodeId}"] .canvas-card-handle button[aria-label="移至侧边"]')`)
       await wait(`Boolean(${frame(0)}?.querySelector('button[aria-label="放回画布"]'))`)
       assert.ok(await evaluate(`${input(0)}===window.r01Editor`))
@@ -376,6 +379,11 @@ export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait
     record('actual_other_card_takeover_uses_saved_working_input_and_new_token_then_rejects_old_writer_and_saves_its_own_edit')
     await writeFile(join(config.evidence, '02-private-pending-takeover.png'), (await window.webContents.capturePage()).toPNG())
   } finally {
+    if (config.mode === 'private-roundtrip') {
+      try {
+        report.undo_diagnostics = await evaluate(`(()=>{window.r01EditorObserver?.disconnect();return {events:window.r01UndoEvents??[],moves:window.r01EditorMoves??[],editorConnected:window.r01Editor?.isConnected??false,editorFocused:document.activeElement===window.r01Editor,body:window.r01Editor?.value??null}})()`)
+      } catch (error) { report.undo_diagnostics = { error: String(error) } }
+    }
     seam.releaseAll()
     for (const [id, ownerThreadId] of ownedConversations) {
       const value = await rpc('singleChat.get', { conversationId: id })
