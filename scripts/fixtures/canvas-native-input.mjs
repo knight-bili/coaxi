@@ -602,16 +602,20 @@ async function qualifyNotes(window,{evaluate,wait,rpc}){
  report.notes={board_id:boardId,node_ids:ids}
  await openCanvasBoard(evaluate,wait,boardId)
  await wait(`document.querySelectorAll('.canvas-note-paper').length===2`)
+ const waitForViewport=async()=>{
+  let lastTransform=null,stableFrames=0
+  for(let attempt=0;attempt<20&&stableFrames<3;attempt++){
+   const transform=await evaluate(`document.querySelector('.react-flow__viewport').style.transform`)
+   stableFrames=transform===lastTransform?stableFrames+1:0;lastTransform=transform;await pause(80)
+  }
+  assert.ok(stableFrames>=3,'画布视口仍在动画中，不能开始拖动')
+ }
  await evaluate(`(()=>{document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]').click();return true})()`)
+ await waitForViewport()
  await evaluate(`(()=>{document.querySelector('button[aria-label="恢复到 100%"]').click();return true})()`)
  await wait(`document.querySelector('.canvas-zoom-readout').textContent==='100%'`)
+ await waitForViewport()
  await wait(`Boolean(document.querySelector('.canvas-dock-panel button[aria-label="自动排列"]:not(:disabled)'))`)
- let lastTransform=null,stableFrames=0
- for(let attempt=0;attempt<20&&stableFrames<3;attempt++){
-  const transform=await evaluate(`document.querySelector('.react-flow__viewport').style.transform`)
-  stableFrames=transform===lastTransform?stableFrames+1:0;lastTransform=transform;await pause(80)
- }
- assert.ok(stableFrames>=3,'画布视口仍在动画中，不能开始拖动')
  const card=`document.querySelector('[data-id="${ids[0]}"] .canvas-note-paper')`
  const point=async expression=>{
   await wait(`Boolean(${expression})`)
