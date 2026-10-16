@@ -92,3 +92,15 @@ final result: blocked
 已有Native owner新增notes六项真实操作检查，以及最小260px终端六按钮可达和空私聊viewport真实无溢出检查；源码入口已经准备，不能记为通过。该组代码已齐，下一步冻结单候选集中构建/运行，复用既有原生程序，不继续堆新的界面范围。记录见integration/execution/i03-c06-private-empty-fit-result.json。
 
 final result: blocked
+
+## rc14 本组真实运行结果
+
+生产c4463813、Desktop/Web各一次构建0，复用2158df02原生。串行终端5、私聊5、文件9、原对象8，共27不同Native断言通过；全部成功及三次失败run均受控退出、无deadline或强杀。已查看终端最小宽与私聊返回截图：六操作可见，真实输入2+3得到5并停止回收；私聊空状态显示完整、viewport extraY0，原附件/同textarea模式切换保留。
+
+便笺r1/r2/r3均在首拖动断言未过。r3真实Core位置从0/0变48/24，而owner预期72/48；不能继续说拖动完全无效，也不能把它算通过。下一步采集浏览器实际缩放、DOM/RF矩阵及window捕获mousemove，区分坐标输入/对齐和产品问题。后续行内编辑/冲突/导航验证未执行。原有ResizeObserver及作者CSP诊断限制保留。
+
+证据见integration/execution/i03-c06-source-card-group-verification.json。
+
+final result: blocked
+
+仅整套画布工程视觉仍有待补项；目标active，本轮无需客户介入。
