@@ -11,7 +11,7 @@ const config=JSON.parse(await readFile(process.env.ROVAI_C06_NATIVE_CONFIG,'utf8
 const report={source_commit:config.source_commit,scope:'production Main/preload/Core; direct Electron native input events',checks:[],status:'running',started_at:new Date().toISOString()}
 await mkdir(config.evidence,{recursive:false})
 let started=false
-const privateModes=['private-roundtrip','private-queue','private-rebind','private-late-upload','private-send']
+const privateModes=['private-roundtrip','private-queue','private-rebind','private-late-upload','private-send','private-send-boundaries']
 let privateWorkflow,privateIpc
 const record=(name,details={})=>{report.checks.push({name,passed:true,...details});console.log(JSON.stringify({check:name,passed:true}))}
 async function openCanvasBoard(evaluate,wait,boardId){

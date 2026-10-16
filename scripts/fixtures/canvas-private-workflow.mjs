@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { randomUUID } from 'node:crypto'
+import { createHash, randomUUID } from 'node:crypto'
 import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { setTimeout as pause } from 'node:timers/promises'
@@ -78,7 +78,7 @@ export async function beginHeldPrivateRun(rpc, context, capture) {
 }
 
 export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait, openCanvasBoard, config, report, record, seam }) {
-  assert.ok(['private-roundtrip', 'private-queue', 'private-rebind', 'private-late-upload', 'private-send'].includes(config.mode))
+  assert.ok(['private-roundtrip', 'private-queue', 'private-rebind', 'private-late-upload', 'private-send', 'private-send-boundaries'].includes(config.mode))
   assert.ok(seam, 'private Native modes require an observed production IPC transport')
   window.unmaximize(); window.setContentSize(1680, 1000); window.webContents.setZoomFactor(1)
   const context = await preparePrivateWorkflow({ rpc, config, record })
@@ -149,6 +149,14 @@ export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait
     await wait(`!${frame(2)}`)
     await open(0); await open(1)
     await evaluate(`(()=>{document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]').click();return true})()`)
+    if (config.mode === 'private-send-boundaries') {
+      assert.equal(createHash('sha256').update(await readFile(new URL(config.private_send_boundary_module))).digest('hex'), config.private_send_boundary_sha256)
+      const { qualifyPrivateSendBoundaries } = await import(config.private_send_boundary_module)
+      await qualifyPrivateSendBoundaries(window, { config, context, report, record, evaluate, wait, rpc, seam,
+        openCanvasBoard, open, get, mutate, addMaterial, clickNative, typeBody, frame, input, ownedConversations, waitMain,
+        waitPrivateSnapshot, beginHeldPrivateRun, terminal })
+      return
+    }
     if (config.mode === 'private-send') {
       const aFile = 'R02 仅甲卡发送.txt', bFile = 'R02 乙卡仍保留.txt', defaultFile = 'R02 默认输入保留.txt'
       await addMaterial(scopes[0], aFile, '甲材料对应的问题')
