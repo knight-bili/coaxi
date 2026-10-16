@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { ChevronDown, ChevronRight, Map as MapIcon, Pencil, Plus, Trash2 } from 'lucide-react'
-import type { CanvasBoard, StoredCommandResult, NavigationPreferencesSnapshot, NavigationProjectLayoutMutation } from '@contracts'
+import { ChevronDown, ChevronRight, Map as MapIcon, MoreHorizontal, Pencil, Plus, SquareArrowOutUpRight, Trash2 } from 'lucide-react'
+import type { CanvasBoard, CanvasBoardSummary, StoredCommandResult, NavigationPreferencesSnapshot, NavigationProjectLayoutMutation } from '@contracts'
 import { CanvasSurface, type CanvasLeaveGuard, type CanvasSurfaceProps } from './CanvasSurface'
 import { CanvasBoardDialog } from './CanvasBoardDialog'
+import { CanvasBoardPreview, canvasPreviewTint } from './CanvasBoardPreview'
 import { CanvasBoardsController, initialCanvasBoardsState, type CanvasBoardIntent } from './canvas-boards-controller'
 import { browserCanvasStorage, canvasViewScope, loadCanvasBoardSelection, saveCanvasBoardSelection, type CanvasViewScope } from './canvas-view-state'
 import { useThreadClient } from './camp-client'
 import { useCanvasReferences } from './useCanvasReferences'
-import { UiText, uiAttribute } from './interface-language'
+import { UiText, uiAttribute, useInterfaceLanguage } from './interface-language'
 import { readErrorMessage } from './error-message'
 import { ProjectGroupsDialog } from './ProjectGroupsDialog'
 import { runCanvasLeaveTransition, type CanvasLeavePreparation } from './canvas-leave'
@@ -19,6 +20,38 @@ export type CanvasWorkspaceProps = Omit<CanvasSurfaceProps, 'boardId' | 'scope' 
   onRefreshProjectGroups?(): Promise<void>
 }
 const NO_BOARDS: CanvasBoard[] = []
+
+// Codeg canvas-board-list.tsx BoardCard: silhouette, compact copy, count, edit time and a separate menu.
+function BoardCard({ board, summary, name, now, blocked, onOpen, onEdit, onDelete }: {
+  board: CanvasBoard; summary?: CanvasBoardSummary; name: string; now: number; blocked: boolean
+  onOpen(): void; onEdit(): void; onDelete(): void
+}) {
+  const language = useInterfaceLanguage(), tint = canvasPreviewTint(board.color), at = Date.parse(board.updatedAt)
+  let edited: string | null = null
+  if (now && Number.isFinite(at)) {
+    const seconds = Math.floor(Math.max(0, now - at) / 1000)
+    const [unit, divisor] = seconds >= 86400 ? ['day', 86400] as const : seconds >= 3600 ? ['hour', 3600] as const
+      : seconds >= 60 ? ['minute', 60] as const : ['second', 1] as const
+    edited = new Intl.RelativeTimeFormat(language === 'en' ? 'en' : 'zh-CN', { numeric: 'auto' }).format(-Math.floor(seconds / divisor), unit)
+  }
+  return <article className="canvas-board-item" title={Number.isFinite(at) ? new Date(at).toLocaleString(language === 'en' ? 'en-US' : 'zh-CN') : undefined}>
+    <button className="canvas-board-tile" data-board-id={board.id} type="button" disabled={blocked} aria-label={name} onClick={onOpen} />
+    <CanvasBoardPreview rects={summary?.preview ?? []} />
+    {tint && <span className="canvas-board-color" style={{ background: tint }} aria-hidden="true" />}
+    <div className="canvas-board-copy"><strong>{name}</strong>{board.description && <p>{board.description}</p>}
+      <span className="canvas-board-meta">{summary ? uiAttribute('{0} 个节点', summary.nodeCount) : uiAttribute('统计暂不可用')}
+        {edited && <> · <time dateTime={board.updatedAt}>{edited}</time></>}</span></div>
+    <DropdownMenu.Root><DropdownMenu.Trigger asChild><button type="button" className="canvas-icon-button canvas-board-menu-trigger" disabled={blocked}
+      aria-label={uiAttribute('画板操作：{0}', name)} title={uiAttribute('画板操作')}><MoreHorizontal size={16} /></button></DropdownMenu.Trigger>
+      <DropdownMenu.Portal><DropdownMenu.Content className="canvas-card-menu" align="end" sideOffset={4} collisionPadding={12} loop>
+        <DropdownMenu.Item className="canvas-card-menu-item" disabled={blocked} onSelect={onOpen}><SquareArrowOutUpRight size={15} /><UiText zh="打开画板" /></DropdownMenu.Item>
+        <DropdownMenu.Item className="canvas-card-menu-item" disabled={blocked} onSelect={onEdit}><Pencil size={15} /><UiText zh="编辑画板" /></DropdownMenu.Item>
+        <DropdownMenu.Separator className="canvas-menu-separator" />
+        <DropdownMenu.Item className="canvas-card-menu-item is-danger" disabled={blocked} onSelect={onDelete}><Trash2 size={15} /><UiText zh="删除画板" /></DropdownMenu.Item>
+      </DropdownMenu.Content></DropdownMenu.Portal>
+    </DropdownMenu.Root>
+  </article>
+}
 
 function useCanvasBoards() {
   const client = useThreadClient(), controller = useRef<CanvasBoardsController | null>(null)
@@ -70,6 +103,13 @@ function CanvasWorkspaceContent({ scope, identityIssue, onRetryIdentity, onLeave
   const [issue, setIssue] = useState<string | null>(null), panel = useRef(false), graphGuard = useRef<CanvasLeaveGuard | null>(null)
   const conversationRef = useRef(props.conversation); conversationRef.current = props.conversation
   const boards = state.snapshot?.boards ?? NO_BOARDS
+  const summaries = useMemo(() => new Map(state.snapshot?.summaries?.map(summary => [summary.boardId, summary])), [state.snapshot])
+  const [now, setNow] = useState(0), listVisible = !boards.length || showBoards
+  useEffect(() => {
+    if (!listVisible) return
+    const tick = () => setNow(Date.now()); tick()
+    const clock = setInterval(tick, 30_000); return () => clearInterval(clock)
+  }, [listVisible])
   const selected = boards.find(board => board.id === selectedId) ?? null
   const registerGraphGuard = useCallback((guard: CanvasLeaveGuard | null) => { graphGuard.current = guard }, [])
   const isBlocked = useCallback(() => panel.current || Boolean(conversationRef.current?.opening || conversationRef.current?.restoring || controller.current?.getSnapshot().pending || graphGuard.current?.isBlocked()), [controller])
@@ -183,16 +223,16 @@ function CanvasWorkspaceContent({ scope, identityIssue, onRetryIdentity, onLeave
     </div>}
     {!state.snapshot && state.loading && <p role="status"><UiText zh="正在读取画板…" /></p>}
     {state.snapshot && (!boards.length || showBoards) && !state.loading && <div className="canvas-boards-home">
-      <div className="canvas-home-heading"><div><h2><UiText zh="画布" /></h2><p><UiText zh="每个画布都是一块独立的无限画板，可以摆放区域、会话卡片、便签、文件和终端。" /></p></div>
+      <div className="canvas-home-heading"><div><h2><UiText zh="画布" />{Boolean(boards.length) && <span className="canvas-board-total">{boards.length}</span>}</h2><p><UiText zh="每个画布都是一块独立的无限画板，可以摆放区域、会话卡片、便签、文件和终端。" /></p></div>
         {Boolean(boards.length) && <div className="canvas-home-actions"><input type="search" value={query} onChange={event => setQuery(event.target.value)} aria-label={uiAttribute('搜索画板')} placeholder={uiAttribute('搜索画板')} />
           <button className="canvas-primary-button" type="button" disabled={blocked} onClick={() => { void openDialog(null) }}><Plus size={16} /><UiText zh="新建画布" /></button></div>}</div>
       {!boards.length ? <div className="canvas-workspace-empty"><MapIcon size={40} strokeWidth={1.5} aria-hidden="true" /><h3><UiText zh="还没有画布" /></h3>
         <p><UiText zh="新建一个画布，用空间方式梳理工作。每个画布都有自己的区域、卡片和便签。" /></p>
         <button className="canvas-primary-button" type="button" disabled={blocked} onClick={() => { void openDialog(null) }}><Plus size={16} /><UiText zh="新建画布" /></button></div>
-        : <div className="canvas-board-grid">{visibleBoards.map(board => <button key={board.id} type="button" className="canvas-board-tile" data-board-id={board.id} disabled={blocked} onClick={() => selectBoard(board.id)}>
-          <MapIcon size={28} strokeWidth={1.5} aria-hidden="true" /><strong>{boardName(board)}</strong><p>{board.description}</p></button>)}
+        : <div className="canvas-board-scroll"><div className="canvas-board-grid">{visibleBoards.map(board => <BoardCard key={board.id} board={board} summary={summaries.get(board.id)} name={boardName(board)} now={now} blocked={blocked}
+          onOpen={() => selectBoard(board.id)} onEdit={() => { void openDialog(board) }} onDelete={() => { void openDialog(board, true) }} />)}
           {!query.trim() && <button type="button" className="canvas-board-tile canvas-board-create" disabled={blocked} onClick={() => { void openDialog(null) }}><Plus size={24} /><UiText zh="新建画布" /></button>}
-          {query.trim() && !visibleBoards.length && <p className="canvas-empty-copy"><UiText zh="没有匹配的画板" /></p>}</div>}
+          {query.trim() && !visibleBoards.length && <p className="canvas-empty-copy"><UiText zh="没有匹配的画板" /></p>}</div></div>}
     </div>}
     {selectedId && !showBoards && <CanvasSurface {...props} boardId={selectedId} scope={scope} catalog={catalog} groups={groups} restoreRevision={restoreRevision}
       onRefreshReferences={() => { void catalog.refresh().catch(() => undefined) }} onLeaveGuardChange={registerGraphGuard} />}

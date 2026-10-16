@@ -214,7 +214,7 @@ async function qualifyCanvasVisual(window,{evaluate,wait,rpc}){
  record('real_canvas_home_keeps_existing_boards_and_opens_creation',{boards:before.boards.length})
  window.setContentSize(1040,700)
  await evaluate(`new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))`)
- report.small_window=await evaluate(`(()=>{const main=document.querySelector('.content.canvas-content'),grid=document.querySelector('.canvas-board-grid'),last=grid.lastElementChild;grid.scrollTop=grid.scrollHeight;return {viewport:{width:innerWidth,height:innerHeight},outerExtraX:main.scrollWidth-main.clientWidth,outerExtraY:main.scrollHeight-main.clientHeight,listExtraY:grid.scrollHeight-grid.clientHeight,listScrollTop:grid.scrollTop,lastVisible:last.getBoundingClientRect().bottom<=grid.getBoundingClientRect().bottom+1}})()`)
+ report.small_window=await evaluate(`(()=>{const main=document.querySelector('.content.canvas-content'),grid=document.querySelector('.canvas-board-grid'),list=document.querySelector('.canvas-board-scroll')??grid,last=grid.lastElementChild;list.scrollTop=list.scrollHeight;return {viewport:{width:innerWidth,height:innerHeight},scrollOwner:list.className,outerExtraX:main.scrollWidth-main.clientWidth,outerExtraY:main.scrollHeight-main.clientHeight,listExtraY:list.scrollHeight-list.clientHeight,listScrollTop:list.scrollTop,lastVisible:last.getBoundingClientRect().bottom<=list.getBoundingClientRect().bottom+1}})()`)
  assert.ok(report.small_window.outerExtraX<=1&&report.small_window.outerExtraY<=1)
  assert.ok(report.small_window.listExtraY>0&&report.small_window.listScrollTop>0&&report.small_window.lastVisible)
  record('small_window_keeps_one_real_scroll_owner_and_last_board_reachable',report.small_window)

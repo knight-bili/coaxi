@@ -17,7 +17,7 @@
 | 原 Codeg 文件或组件 | 原设计承担的职责 | 融合实现 |
 |---|---|---|
 | `canvas-page.tsx` 的 `CanvasPageTitle` / `BoardTitleMenu` | 细标题栏、画板标题菜单、返回列表 | `CanvasWorkspace.tsx` 的面包屑、画板菜单与画布列表；沿用原有离开事务，切换前保留输入保护 |
-| `canvas-board-list.tsx` 的 `CanvasBoardList` | 空列表居中引导、画布选择与搜索 | `CanvasWorkspace.tsx` 的空状态、搜索和真实画板卡片；当前 Core 列表不提供节点缩略图与计数，不能绘制假内容冒充 |
+| `canvas-board-list.tsx` 的 `CanvasBoardList` / `BoardCard`、`canvas-board-preview.tsx` | 空列表引导、画布选择/搜索、真实轮廓/数量、编辑时间及独立菜单 | `CanvasWorkspace.tsx`、`CanvasBoardPreview.tsx` 已接同事务 Core `summaries`，保留最大200轮廓但节点计数完整；旧服务缺字段明确不可用。16:10预览、12px卡片、紧凑文案、独立打开/编辑/删除菜单，列表单独承担必要滚动。当前源码/局部逻辑检查不代证Rust编译、真实Core与日夜列表视觉 |
 | `canvas-board-dialogs.tsx` / `canvas-swatches.tsx` | 单标题创建表单、名称/描述/颜色、再次选色清空 | `CanvasBoardDialog.tsx`，继续使用 Core 并发版本、未知结果回查与忙碌锁；保留所有十二种合法颜色及无色值 |
 | `canvas-dock.tsx` 的 `CanvasDock` | 底部悬浮图标操作，选择后出现相应动作 | `CanvasSurface.tsx`，添加入口接原有八类节点；排列、分组、删除、刷新均保留原处理函数和确认保护 |
 | `canvas-dock.tsx` 的 `CanvasViewportPanel` | 右下角小地图与水平缩放胶囊，实时比例、100%恢复、尺寸同步 | `CanvasDock.tsx`，复用原有按 Host/Core 隔离的视口和地图偏好；缩放不启动任何模型 |

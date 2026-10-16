@@ -51,6 +51,13 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 
 ## Rust 测试准入与退役门槛
 
+画板列表缩略图/数量扩展既有 `canvas_board::tests::board_migration_and_command_lifecycle_preserve_replay_and_atomic_snapshot`
+owner：复用其 SQLite 与重开过程，覆盖 schema152 无节点时省略统计、当前空板真实零值、201节点保留完整计数但只投影200轮廓、
+大轮廓优先、跨板隔离、终端卡数量、删除板排除、投影不包含正文/路径及读取零写入。不新增 Rust owner 或整库夹具。
+最低命令 `cargo test -p rovai-core --features extended-tests --lib canvas_board::tests::board_migration_and_command_lifecycle_preserve_replay_and_atomic_snapshot`，
+按阶段候选集中编译执行；未执行前只能标源码已补。客户端归属/缺项兼容扩既有 `canvas-boards-controller.test.ts`；
+新 `CanvasBoardPreview.test.ts` 只拥有原SVG视框计算与预设颜色，不平行重测Core数据库。实际日夜列表、菜单/键盘、必要滚动与真实Core接口仍需候选资格。
+
 私有附件定位继续扩展既有第三个 `single_chat_composer::tests` owner 的实际 SQLite/源引用夹具，
 覆盖卡片、工作副本、retained/default retained 的正向读取、错 Thread/Conversation/client/scope/ref/Pending/token 拒绝，
 明确接管后旧令牌不可读、pin 删除后孤立输入可读及读取零写入，不新增 Rust owner。

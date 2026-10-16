@@ -37,6 +37,20 @@ export class CanvasBoardsController {
       try {
         const snapshot = await client.request<CanvasBoardsSnapshot>('canvas.boards.list', {})
         if (this.disposed) return
+        if (snapshot.summaries !== undefined) {
+          const boards = new Map(snapshot.boards.map(board => [board.id, board.revision]))
+          const seen = new Set<string>()
+          if (snapshot.summaries.length !== boards.size || snapshot.summaries.some(summary => {
+            const duplicate = seen.has(summary.boardId); seen.add(summary.boardId)
+            return duplicate || boards.get(summary.boardId) !== summary.revision
+              || !Number.isSafeInteger(summary.nodeCount) || summary.nodeCount < 0
+              || !Number.isSafeInteger(summary.terminalCount) || summary.terminalCount < 0 || summary.terminalCount > summary.nodeCount
+              || !Array.isArray(summary.preview) || summary.preview.length !== Math.min(summary.nodeCount, 200)
+              || summary.preview.some(rect => ![rect.x, rect.y, rect.width, rect.height].every(Number.isFinite)
+                || Math.abs(rect.x) > 1_000_000 || Math.abs(rect.y) > 1_000_000 || rect.width < 48 || rect.width > 20_000 || rect.height < 48 || rect.height > 20_000
+                || !['folder', 'group', 'agent', 'conversation', 'custom', 'note', 'file', 'terminal'].includes(rect.kind))
+          })) throw new Error('画板统计与列表不一致，请重新读取。')
+        }
         if (snapshot.throughGlobalSequence < this.minimumSequence
           || snapshot.boards.some(board => board.revision < (this.revisions.get(board.id) ?? 0))) {
           throw new Error('画板列表正在同步最新修改，请稍后重试。')

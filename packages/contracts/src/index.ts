@@ -4331,7 +4331,27 @@ export interface CanvasBoard {
 
 export interface CanvasBoardsSnapshot {
   boards: CanvasBoard[]
+  /** Missing on metadata-only Hosts. Same transaction/revisions as boards; never a zero-count fallback. */
+  summaries?: CanvasBoardSummary[]
   throughGlobalSequence: number
+}
+
+export interface CanvasBoardSummary {
+  boardId: string
+  revision: number
+  nodeCount: number
+  terminalCount: number
+  /** At most 200 persisted footprints, largest area first. No text, paths or conversation identities. */
+  preview: CanvasBoardPreviewRect[]
+}
+
+export interface CanvasBoardPreviewRect {
+  kind: CanvasNodeKind
+  x: number
+  y: number
+  width: number
+  height: number
+  color: string | null
 }
 
 export interface CanvasBoardSnapshot {

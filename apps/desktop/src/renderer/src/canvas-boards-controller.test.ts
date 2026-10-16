@@ -20,6 +20,26 @@ function fixture(handler: (method: CoreMethod, params: unknown) => Promise<unkno
   controllers.push(controller)
   return { controller, requests, events }
 }
+
+it('keeps summaries in the authoritative board read and rejects mixed revisions or partial geometry without replacing the last snapshot', async () => {
+  const rect = { kind: 'note' as const, x: -120, y: 80, width: 320, height: 260, color: 'orange' }
+  let next: CanvasBoardsSnapshot = { ...snapshot(), summaries: [{ boardId: 'board', revision: 1, nodeCount: 1, terminalCount: 0, preview: [rect] }] }
+  const transport = fixture(async () => structuredClone(next)), current = transport.controller
+  current.start(); await current.refresh()
+  const accepted = current.getSnapshot().snapshot!
+  expect(accepted.summaries?.[0].preview).toEqual([rect])
+  for (const change of [{ revision: 0 }, { boardId: 'other' }, { nodeCount: -1 }, { terminalCount: 2 }, { preview: [] },
+    { preview: [{ ...rect, width: Infinity }] }]) {
+    next = { ...snapshot(), summaries: [{ ...accepted.summaries![0], ...change }] }
+    await expect(current.refresh()).rejects.toThrow('统计与列表不一致')
+    expect(current.getSnapshot().snapshot).toBe(accepted)
+  }
+  next = { ...snapshot(2, 20), summaries: [{ boardId: 'board', revision: 2, nodeCount: 201, terminalCount: 1, preview: Array.from({ length: 200 }, () => rect) }] }
+  await current.refresh(); expect(current.getSnapshot().snapshot?.summaries?.[0].nodeCount).toBe(201)
+  next = snapshot(3, 30); await current.refresh()
+  expect(current.getSnapshot().snapshot?.summaries).toBeUndefined()
+  expect(transport.requests.every(item => item.method === 'canvas.boards.list')).toBe(true)
+})
 function receipt(id: string, operation: string, payload: StoredCommandResult['payload'] = {}): StoredCommandResult {
   return { commandId: id, commandType: operation, status: 'applied', code: 'canvas.board.created', payload, resultEntity: null, recordedAt: 'time' }
 }

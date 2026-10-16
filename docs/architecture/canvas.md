@@ -16,6 +16,10 @@ not a substitute for interactive nodes, task execution or cross-platform qualifi
 Use Rovai Core's SQLite, typed Domain Command Gateway and authenticated Host transport.
 Board identity and metadata are owned by [Canvas Boards v1](../contracts/canvas-boards-v1.md).
 Node types, graph writes and snapshots are owned by [Canvas Nodes v1](../contracts/canvas-nodes-v1.md).
+The board list also reads the optional bounded silhouette/count projection from Canvas Boards v1,
+in the same Core transaction as board metadata and the sequence. It never opens a Thread, reads
+file/note contents or starts a terminal to generate a thumbnail; older Hosts expose unavailable
+statistics explicitly. The Renderer adapts Codeg's original footprint SVG and board-card structure.
 The paged metadata directory is owned by [Canvas References v1](../contracts/canvas-references-v1.md).
 Schema152/Migration202 appends one table to schema151 without changing previous model, skill,
 member, Mission or Thread facts. Retain the closed source-contract and existing command-result
