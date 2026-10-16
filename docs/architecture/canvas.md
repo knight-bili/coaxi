@@ -57,6 +57,12 @@ zoom independent of the application's text zoom. Persist shared node geometry se
 client-local viewport, selection, expanded cards and unsent conversation drafts. Scope local
 view keys by Core identity and board ID to avoid cross-backend state reuse.
 
+Native uses the live `app.info.dataDir` as an identity hint. Web deliberately redacts that server
+path and uses a live authenticated, Core-issued editor identity scoped by origin and owner instead;
+it remains stable when that editor resumes and distinct across independently verified editors/Cores.
+Neither identity grants file access. Canvas opening, composer lookup and private-input recovery
+use the same resolver; stale authentication replies and missing identity never fall back to Host-only keys.
+
 `canvas-layout.ts` adapts the fixed donor's board-unit grids, drop hints, alignment guides and
 shelf packing. Overlap follows actual paint order rather than treating Core UUIDs as numeric source IDs;
 Thread and exact private-conversation references remain distinct. The client view-state module keeps

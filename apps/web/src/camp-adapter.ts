@@ -35,6 +35,7 @@ export function createThreadAdapter(transport: ConsoleClient, selectWorkspaceDir
   }
   const client: ThreadClient = {
     presentationScope: transport.presentationScope,
+    canvasCoreIdentity: () => transport.canvasCoreIdentity(),
     platform: browserPlatform(),
     missionAttachments: null,
     editingRecovery,

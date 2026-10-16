@@ -4,7 +4,7 @@ import type { ThreadLeaveGuard, ThreadLeavePreparation } from './ThreadWorkspace
 import { canvasComposerContextKey } from './canvas-composer-drafts'
 import { canvasConversationMatches, readCanvasConversation, type CanvasConversationTarget } from './canvas-conversation'
 import type { CanvasConversationRecovery } from './canvas-conversation-recovery'
-import type { CanvasViewScope } from './canvas-view-state'
+import { readCanvasViewScope, type CanvasViewScope } from './canvas-view-state'
 import type { ThreadProjectionStore } from './thread-projection-store'
 import { readErrorMessage } from './error-message'
 import { uiAttribute } from './interface-language'
@@ -30,7 +30,7 @@ export class CanvasConversationsController {
   private disposed = false
   private generation = 0
   private leave: CanvasLeaveEntry | null = null
-  constructor(private readonly client: Pick<ThreadClient, 'request' | 'presentationScope'>, private readonly reads: Pick<ThreadProjectionStore, 'open'> & Partial<Pick<ThreadProjectionStore, 'refresh'>>, private readonly afterCommit: () => Promise<void>, private readonly recovery?: CanvasConversationRecovery) {}
+  constructor(private readonly client: Pick<ThreadClient, 'request' | 'presentationScope' | 'canvasCoreIdentity'>, private readonly reads: Pick<ThreadProjectionStore, 'open'> & Partial<Pick<ThreadProjectionStore, 'refresh'>>, private readonly afterCommit: () => Promise<void>, private readonly recovery?: CanvasConversationRecovery) {}
   getSnapshot = (): CanvasConversationsState => this.state
   subscribe = (listener: () => void): (() => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener) } }
   private publish(change: Partial<CanvasConversationsState>): void {
@@ -64,9 +64,9 @@ export class CanvasConversationsController {
     const current = () => !this.disposed && generation === this.generation
     this.publish({ opening: true, issue: null })
     try {
-      const info = await this.client.request<{ dataDir: string }>('app.info')
+      const scope = await readCanvasViewScope(this.client)
       if (!current()) return false
-      if (info.dataDir !== context.core) throw new Error(uiAttribute('画布输入的所属信息不完整，请重新读取画板。'))
+      if (scope?.core !== context.core || scope.host !== context.host) throw new Error(uiAttribute('画布输入的所属信息不完整，请重新读取画板。'))
       const loaded = await readCanvasConversation(target.reference,
         conversationId => this.client.request<SingleChatSnapshot | null>('singleChat.get', { conversationId }),
         async threadId => (await (fresh && this.reads.refresh ? this.reads.refresh(threadId) : this.reads.open(threadId))).snapshot, current)

@@ -1,5 +1,6 @@
 // Codeg canvas-view-storage behavior adapted to explicit Host/Core/board identity.
 // Fixed donor aff1e6c278453ed8d0b96a5f664edcdca621aa3f; Apache-2.0: integration/licenses/codeg/LICENSE.
+import type { ThreadClient } from './camp-client'
 export const CANVAS_MIN_ZOOM = 0.1, CANVAS_MAX_ZOOM = 2
 export interface CanvasViewport { x: number; y: number; zoom: number }
 export interface CanvasViewScope { host: string; core: string }
@@ -19,9 +20,14 @@ const finite = (value: unknown): value is number => typeof value === 'number' &&
 const identity = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0 && !value.includes('\0')
 const ids = (value: unknown): string[] => Array.isArray(value) ? [...new Set(value.filter(identity))] : []
 
-/** app.info's dataDir is an identity hint, never a file/root access grant. */
-export function canvasViewScope(presentationScope: string | undefined, coreDataDir: unknown): CanvasViewScope | null {
-  return identity(presentationScope) && identity(coreDataDir) ? { host: presentationScope, core: coreDataDir } : null
+/** The opaque identity (Native dataDir or verified Web editor) never grants file/root access. */
+export function canvasViewScope(presentationScope: string | undefined, coreIdentity: unknown): CanvasViewScope | null {
+  return identity(presentationScope) && identity(coreIdentity) ? { host: presentationScope, core: coreIdentity } : null
+}
+export async function readCanvasViewScope(client: Pick<ThreadClient, 'request' | 'presentationScope' | 'canvasCoreIdentity'>): Promise<CanvasViewScope | null> {
+  const host = client.presentationScope
+  const core = client.canvasCoreIdentity ? await client.canvasCoreIdentity() : (await client.request<{ dataDir?: string }>('app.info')).dataDir
+  return host === client.presentationScope ? canvasViewScope(host, core) : null
 }
 export function initialCanvasViewState(): CanvasViewState {
   return { viewport: null, expandedCards: [], expandedRegions: [], minimap: true }

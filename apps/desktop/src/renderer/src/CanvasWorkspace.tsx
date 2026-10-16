@@ -7,7 +7,7 @@ import { CanvasSurface, type CanvasLeaveGuard, type CanvasSurfaceProps } from '.
 import { CanvasBoardDialog } from './CanvasBoardDialog'
 import { CanvasBoardPreview, canvasPreviewTint } from './CanvasBoardPreview'
 import { CanvasBoardsController, initialCanvasBoardsState, type CanvasBoardIntent } from './canvas-boards-controller'
-import { browserCanvasStorage, canvasViewScope, loadCanvasBoardSelection, saveCanvasBoardSelection, type CanvasViewScope } from './canvas-view-state'
+import { browserCanvasStorage, readCanvasViewScope, loadCanvasBoardSelection, saveCanvasBoardSelection, type CanvasViewScope } from './canvas-view-state'
 import { useThreadClient } from './camp-client'
 import { useCanvasReferences } from './useCanvasReferences'
 import { UiText, uiAttribute, useInterfaceLanguage } from './interface-language'
@@ -98,8 +98,7 @@ export function CanvasWorkspace(props: CanvasWorkspaceProps): React.JSX.Element 
   const [identityAttempt, setIdentityAttempt] = useState(0)
   useEffect(() => {
     let disposed = false
-    void client.request<{ dataDir: string }>('app.info').then(info => {
-      const scope = canvasViewScope(client.presentationScope, info.dataDir)
+    void readCanvasViewScope(client).then(scope => {
       if (!disposed) setIdentity({ client, scope, issue: scope ? null : uiAttribute('画布输入的所属信息不完整，请重新读取画板。') })
     }, error => { if (!disposed) setIdentity({ client, scope: null, issue: readErrorMessage(error) }) })
     return () => { disposed = true }

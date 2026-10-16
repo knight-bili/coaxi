@@ -343,6 +343,14 @@ export class ConsoleClient {
   get presentationScope(): string | null {
     return this.#ownerId ? `${this.origin}/${this.#ownerId}` : null
   }
+  /** Core-verified editor identity; never a server path, credential or resource grant. */
+  async canvasCoreIdentity(): Promise<string> {
+    const scope = this.editingScope, generation = this.#generation
+    if (!scope || !this.authenticated) throw new SessionRequired()
+    await this.request('app.info')
+    if (!this.authenticated || scope !== this.editingScope || generation !== this.#generation) throw new DOMException('Connection replaced', 'AbortError')
+    return `web:${scope}`
+  }
   get authenticated(): boolean { return this.#token !== null }
   onAuthenticationChanged(listener: () => void): () => void {
     this.#authListeners.add(listener)

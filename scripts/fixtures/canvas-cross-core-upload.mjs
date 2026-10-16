@@ -105,8 +105,10 @@ export async function qualifyCrossCoreUpload({ binary, uiDirectory, chrome, outp
       await browser.click('document.querySelector(".web-login button[type=submit]")')
       await browser.wait('!document.querySelector(".web-login-overlay")&&Boolean(document.querySelector("button[aria-label=无限画布]"))', 30_000)
       await browser.click('document.querySelector("button[aria-label=无限画布]")')
-      await browser.wait(`Boolean(document.querySelector('.canvas-board-tile[data-board-id="${host.boardId}"]:not(:disabled)'))`, 30_000)
-      await browser.click(`document.querySelector('.canvas-board-tile[data-board-id="${host.boardId}"]')`)
+      await browser.wait(`Boolean(document.querySelector('.canvas-board-title[data-board-id="${host.boardId}"]'))||Boolean(document.querySelector('.canvas-board-tile[data-board-id="${host.boardId}"]:not(:disabled)'))`, 30_000)
+      if (!await browser.evaluate(`Boolean(document.querySelector('.canvas-board-title[data-board-id="${host.boardId}"]'))`)) {
+        await browser.click(`document.querySelector('.canvas-board-tile[data-board-id="${host.boardId}"]')`)
+      }
       await browser.wait(`Boolean(document.querySelector('[data-id="${host.scope.nodeId}"] button[aria-label="展开对话"]:not(:disabled)'))`)
       await browser.click(`document.querySelector('[data-id="${host.scope.nodeId}"] button[aria-label="展开对话"]')`)
       await browser.wait('Boolean(document.querySelector(".single-chat-composer textarea:not(:disabled)"))')

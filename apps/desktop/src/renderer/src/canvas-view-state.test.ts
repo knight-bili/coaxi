@@ -1,10 +1,27 @@
 import { expect, it, vi } from 'vitest'
-import { browserCanvasStorage, canvasViewScope, initialCanvasViewState, loadCanvasBoardSelection, loadCanvasViewState, parseCanvasViewport, pruneCanvasExpansions, saveCanvasBoardSelection, saveCanvasViewState } from './canvas-view-state'
+import { browserCanvasStorage, canvasViewScope, readCanvasViewScope, initialCanvasViewState, loadCanvasBoardSelection, loadCanvasViewState, parseCanvasViewport, pruneCanvasExpansions, saveCanvasBoardSelection, saveCanvasViewState } from './canvas-view-state'
+import type { ThreadClient } from './camp-client'
 
 function storage() {
   const values = new Map<string, string>()
   return { values, getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => { values.set(key, value) } }
 }
+it('requires a Native Core identity and never adopts a generic Host-only scope', async () => {
+  const client = { presentationScope: 'native/owner', request: vi.fn().mockResolvedValue({ dataDir: '/native-core' }) } as Pick<ThreadClient, 'request' | 'presentationScope'>
+  expect(await readCanvasViewScope(client)).toEqual({ host: 'native/owner', core: '/native-core' })
+  client.request = vi.fn().mockResolvedValue({ name: 'Rovai' })
+  expect(await readCanvasViewScope(client)).toBeNull()
+})
+it('rejects a changed Host during a live Web identity read and does not fall back after an identity failure', async () => {
+  let finish: ((value: string) => void) | undefined
+  const client = { presentationScope: 'A/owner', request: vi.fn(), canvasCoreIdentity: () => new Promise<string>(resolve => { finish = resolve }) } as Pick<ThreadClient, 'request' | 'presentationScope' | 'canvasCoreIdentity'>
+  const pending = readCanvasViewScope(client)
+  client.presentationScope = 'B/owner'; finish!('web:editor-A')
+  expect(await pending).toBeNull()
+  client.canvasCoreIdentity = async () => { throw new Error('connection replaced') }
+  await expect(readCanvasViewScope(client)).rejects.toThrow('connection replaced')
+  expect(client.request).not.toHaveBeenCalled()
+})
 it('scopes views to Host/Core/board while sharing the minimap preference only inside that Host/Core', () => {
   const local = storage(), scope = { host: 'server/owner', core: '/core-a' }
   const state = { viewport: { x: -2000000, y: 12, zoom: 2 }, expandedCards: ['card'], expandedRegions: ['region'], minimap: false }

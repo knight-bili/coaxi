@@ -2,11 +2,11 @@
 // per card in canvas-conversation-surface.tsx (Apache-2.0, integration/licenses/codeg/LICENSE).
 import type { CanvasConversationRef, ThreadComposerDraftView } from '@contracts'
 import type { SavedDraftCopy, ThreadClient } from './camp-client'
-import type { CanvasViewScope } from './canvas-view-state'
+import { readCanvasViewScope, type CanvasViewScope } from './canvas-view-state'
 import { parseLocalThreadComposerDraft, THREAD_COMPOSER_STORAGE_PREFIX, threadComposerDraftStorage } from './camp-composer-local-store'
 import { uiAttribute } from './interface-language'
 
-type Client = Pick<ThreadClient, 'request' | 'editingRecovery' | 'presentationScope'>
+type Client = Pick<ThreadClient, 'request' | 'editingRecovery' | 'presentationScope' | 'canvasCoreIdentity'>
 type DraftStorage = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>
 export interface CanvasComposerContext extends CanvasViewScope {
   boardId: string
@@ -101,9 +101,9 @@ const coreScopes = new WeakMap<object, Promise<CanvasViewScope>>()
 async function currentScope(client: Client): Promise<CanvasViewScope> {
   let pending = coreScopes.get(client)
   if (!pending) {
-    pending = client.request<{ dataDir: string }>('app.info').then(info => {
-      if (!valid(client.presentationScope) || !valid(info.dataDir)) throw new Error(uiAttribute('画布输入的所属信息不完整，请重新读取画板。'))
-      return { host: client.presentationScope, core: info.dataDir }
+    pending = readCanvasViewScope(client).then(scope => {
+      if (!scope) throw new Error(uiAttribute('画布输入的所属信息不完整，请重新读取画板。'))
+      return scope
     }).catch(error => { coreScopes.delete(client); throw error })
     coreScopes.set(client, pending)
   }

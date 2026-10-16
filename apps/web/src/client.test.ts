@@ -6,6 +6,44 @@ import { newCommandId } from '../../desktop/src/shared/command-id'
 // cannot detect a client adding cookies, following a redirect, or accepting a
 // late response from a replaced session.
 describe('console transport', () => {
+  it('scopes Web canvas state to a verified editor without exposing server directories or credentials', async () => {
+    const origin = 'http://127.0.0.1:4317'
+    const connect = async (clientId: string) => {
+      const fetcher = vi.fn<typeof fetch>(async url => String(url).endsWith('/login')
+        ? Response.json({ protocolVersion: 4, token: 'a'.repeat(64), clientId, editorProof: 'e'.repeat(64), ownerId: 'local_user' })
+        : Response.json({ result: { name: 'Rovai', version: 'test' } }))
+      const client = new ConsoleClient(origin, fetcher)
+      await client.login('c'.repeat(64))
+      return { client, fetcher }
+    }
+    const first = await connect('b'.repeat(64)), second = await connect('d'.repeat(64))
+    const scope = await first.client.canvasCoreIdentity()
+    expect(scope).toBe(`web:${first.client.editingScope}`)
+    expect(scope).not.toContain('a'.repeat(64)); expect(scope).not.toContain('e'.repeat(64))
+    await first.client.login('c'.repeat(64))
+    expect(await first.client.canvasCoreIdentity()).toBe(scope)
+    expect(await second.client.canvasCoreIdentity()).not.toBe(scope)
+    const request = first.fetcher.mock.calls.find(([url]) => String(url).endsWith('/request'))
+    expect(JSON.parse(String(request?.[1]?.body)).operation).toBe('app.info')
+    first.client.clear(); second.client.clear()
+    await expect(first.client.canvasCoreIdentity()).rejects.toBeInstanceOf(SessionRequired)
+  })
+
+  it('rejects a late canvas identity read after the same editor reauthenticates', async () => {
+    let finish: ((value: Response) => void) | undefined
+    const fetcher = vi.fn<typeof fetch>(async url => String(url).endsWith('/login')
+      ? Response.json({ protocolVersion: 4, token: 'a'.repeat(64), clientId: 'b'.repeat(64), editorProof: 'c'.repeat(64), ownerId: 'local_user' })
+      : new Promise(resolve => { finish = resolve }))
+    const client = new ConsoleClient('http://127.0.0.1:4317', fetcher)
+    await client.login('d'.repeat(64))
+    const old = client.canvasCoreIdentity()
+    await vi.waitFor(() => expect(finish).toBeTypeOf('function'))
+    await client.login('d'.repeat(64))
+    finish!(Response.json({ result: { name: 'Rovai' } }))
+    await expect(old).rejects.toMatchObject({ name: 'AbortError' })
+    client.clear()
+  })
+
   it('uses Host channel capabilities and fences a channel reply across reauthentication', async () => {
     let pending: ((value: Response) => void) | undefined
     const fetcher = vi.fn<typeof fetch>().mockImplementation(async url => {

@@ -2,7 +2,7 @@ import { useCallback, useLayoutEffect, useRef, useState, useSyncExternalStore, t
 import * as Dialog from '@radix-ui/react-dialog'
 import { AppDialogBody, AppDialogContent, AppDialogHeader } from './AppDialog'
 import { useThreadClient } from './camp-client'
-import { canvasViewScope } from './canvas-view-state'
+import { readCanvasViewScope } from './canvas-view-state'
 import type { PrivateInputController } from './private-input-controller'
 import { PrivateInputRecoveryCatalog, type PrivateRecoveryLocation } from './private-input-recovery-catalog'
 import { privateInputErrorMessage } from './PrivateInputRecoveryPanel'
@@ -77,9 +77,8 @@ export function PrivateInputRecoveryBrowser({ controller, busy, enabled, onLeave
   const launch = async (): Promise<void> => {
     setReadingOwner(controller); setError(null)
     try {
-      const info = await client.request<{ dataDir: string }>('app.info')
+      const view = await readCanvasViewScope(client)
       if (!isCurrent()) return
-      const view = canvasViewScope(client.presentationScope, info.dataDir)
       if (!view) throw new Error('private_input.context_changed')
       const catalog = new PrivateInputRecoveryCatalog(client, controller.origin, view)
       setSelection(null); setSession({ client, controller, catalog }); setOpen(true)
