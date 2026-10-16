@@ -8887,10 +8887,11 @@ html[lang="en"] .runtime-parameter-picker-menu:has(.permission-menu-guidance) { 
 :is(.app-dialog,.compact-dialog,.memory-review-drawer) :is(.danger-button,.compact-danger):hover:not(:disabled) { color:var(--danger); background:color-mix(in srgb,var(--danger) 10%,var(--danger-soft)); border-color:color-mix(in srgb,var(--danger) 22%,transparent); }
 :is(.app-dialog,.compact-dialog,.memory-review-drawer) :is(.danger-button,.compact-danger):active:not(:disabled) { background:color-mix(in srgb,var(--danger) 16%,var(--danger-soft)); }
 :root .app-dialog :is(.field-label,.task-field > span,.mcp-json-editor > span,.mcp-import-options label > span,.channel-dialog-fact > span,.channel-approver-select > span) { color:var(--dialog-field-label); font-weight:400; font-size:12.5px; }
-:root .app-dialog :is(input:not([type=checkbox]):not([type=radio]):not([type=range]),textarea,select) { color:var(--ink); font-weight:400; font-size:13px; line-height:1.5; border:1px solid var(--dialog-field-line); border-radius:7px; background:var(--input); box-shadow:none; }
-:root .app-dialog :is(input:not([type=checkbox]):not([type=radio]):not([type=range]),select) { min-height:40px; }
-:root .app-dialog :is(input,textarea,select):hover:not(:disabled) { border-color:var(--dialog-field-line-hover); }
-:root .app-dialog :is(input,textarea,select)[aria-invalid=true] { border-color:var(--danger); }
+/* Mission's composite search owns its border and height, including inside object dialogs. */
+:root .app-dialog :is(input:not([type=checkbox]):not([type=radio]):not([type=range]),textarea,select):not(:where(.changes-tree-search > input)) { color:var(--ink); font-weight:400; font-size:13px; line-height:1.5; border:1px solid var(--dialog-field-line); border-radius:7px; background:var(--input); box-shadow:none; }
+:root .app-dialog :is(input:not([type=checkbox]):not([type=radio]):not([type=range]),select):not(:where(.changes-tree-search > input)) { min-height:40px; }
+:root .app-dialog :is(input,textarea,select):not(:where(.changes-tree-search > input)):hover:not(:disabled) { border-color:var(--dialog-field-line-hover); }
+:root .app-dialog :is(input,textarea,select):not(:where(.changes-tree-search > input))[aria-invalid=true] { border-color:var(--danger); }
 .app-dialog-fact-grid { display:grid; gap:8px; margin:0; }
 .app-dialog-fact-grid > div { min-width:0; display:flex; align-items:baseline; justify-content:space-between; gap:20px; }
 .app-dialog-fact-grid dt { color:var(--dialog-field-label); font-size:12.5px; }

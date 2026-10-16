@@ -45,6 +45,18 @@ async function qualify(window){
  const rpc=(method,params={})=>evaluate(`window.rovai.request(${JSON.stringify(method)},${JSON.stringify(params)})`)
  try{
   await evaluate(`(()=>{window.nativeRuntimeErrors=[];window.addEventListener('error',event=>window.nativeRuntimeErrors.push({message:event.message,stack:String(event.error?.stack??'')}));return true})()`)
+  if(config.capture_resize_observers){
+   report.resize_observer_scope='opt-in callback observations; no suppression or rescheduling; performance timing is diagnostic only'
+   await evaluate(`(()=>{
+    const Native=window.ResizeObserver,trace=[],errors=[];window.nativeResizeObservations={trace,errors};
+    window.ResizeObserver=class extends Native{constructor(callback){const origin=new Error().stack;super((entries,observer)=>{
+     trace.push({at:performance.now(),origin,total:entries.length,entries:entries.slice(0,8).map(entry=>({id:entry.target.getAttribute('data-id'),target:String(entry.target.className),width:entry.contentRect.width,height:entry.contentRect.height}))});
+     if(trace.length>32)trace.shift();callback.call(observer,entries,observer);
+    })}};
+    window.addEventListener('error',event=>{if(event.message.includes('ResizeObserver')){errors.push({message:event.message,trace:trace.slice(-6)});if(errors.length>6)errors.shift()}});
+    return true;
+   })()`)
+  }
   window.show();window.focus();window.webContents.focus()
   await wait(`window.rovai&&document.querySelector('button[aria-label="无限画布"]')?.disabled===false`,60_000)
   if(config.mode==='materials'){
@@ -167,6 +179,7 @@ async function qualify(window){
   report.status='passed'
  }catch(error){report.status='failed';report.error=String(error.stack??error);report.runtime_errors=await evaluate('window.nativeRuntimeErrors').catch(()=>null);report.native_keys=await evaluate('window.nativeKeys').catch(()=>null);report.dom=await evaluate('document.body.innerText.slice(-2500)').catch(()=>null);if((report.screenshots?.length??0)<3){const path=join(config.evidence,'failure.png');await writeFile(path,(await window.webContents.capturePage()).toPNG()).then(()=>{(report.screenshots??=[]).push(path)}).catch(()=>{})}}
  finally{
+  if(config.capture_resize_observers)report.resize_observations=await evaluate('window.nativeResizeObservations').catch(()=>null)
   if(report.status==='failed')await evaluate(`(()=>{document.querySelector('.canvas-board-dialog .app-dialog-close:not(:disabled)')?.click();return true})()`).catch(()=>{})
   if(report.status==='failed'&&config.mode==='ready-diff')await evaluate(`(()=>{document.querySelector('.mission-diff-dialog button[aria-label="关闭累计文件变更"]')?.click();document.querySelector('.canvas-object-dialog .app-dialog-close')?.click();return true})()`).catch(()=>{})
   if(report.status==='failed'&&report.crash_context?.nodeIds?.[2]){
