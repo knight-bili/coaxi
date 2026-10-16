@@ -485,14 +485,21 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
       <h3><UiText zh="画布还是空的" /></h3><p><UiText zh="用空间方式梳理工作区：区域对应工程和队员，卡片对应会话，便签记录其它。" /></p>
       <button type="button" className="canvas-primary-button" disabled={blocked} onClick={() => addNode()}><Plus size={16} /><UiText zh="添加节点" /></button></div>}
     <PresentationContext.Provider value={actions}>
-      <ReactFlow<FlowNode> nodes={nodes} nodeTypes={nodeTypes} onNodesChange={changes => setNodes(current => applyNodeChanges(changes, current))}
+      <ReactFlow<FlowNode> nodes={nodes} nodeTypes={nodeTypes} onNodesChange={changes => {
+        setNodes(current => applyNodeChanges(changes, current))
+        const selections = changes.filter(change => change.type === 'select')
+        // Consume selection in the same batch as the controlled nodes, rather than echoing stale store snapshots.
+        if (selections.length) setSelected(current => {
+          const next = new Set(current)
+          for (const change of selections) { if (change.selected) next.add(change.id); else next.delete(change.id) }
+          return next.size === current.length && current.every(id => next.has(id)) ? current : [...next]
+        })
+      }}
         colorMode={props.theme === 'night' ? 'dark' : 'light'} ariaLabelConfig={{ 'controls.zoomIn.ariaLabel': uiAttribute('放大画布'), 'controls.zoomOut.ariaLabel': uiAttribute('缩小画布'), 'controls.fitView.ariaLabel': uiAttribute('查看全部'),
           'controls.ariaLabel': uiAttribute('画布缩放控件'), 'minimap.ariaLabel': uiAttribute('小地图'),
           'node.a11yDescription.default': uiAttribute('按回车或空格选择节点，方向键移动，Shift 加速，Delete 删除。'),
           'node.a11yDescription.keyboardDisabled': uiAttribute('选择节点后可使用工具栏。') }}
-        onSelectionChange={({ nodes }) => setSelected(current => {
-          const ids = nodes.map(node => node.id); return ids.length === current.length && ids.every((id, i) => id === current[i]) ? current : ids
-        })} nodesDraggable={!blocked} elementsSelectable={!blocked} selectionMode={SelectionMode.Partial} selectionOnDrag panOnDrag={[1, 2]} panOnScroll
+        nodesDraggable={!blocked} elementsSelectable={!blocked} selectionMode={SelectionMode.Partial} selectionOnDrag panOnDrag={[1, 2]} panOnScroll
         nodesConnectable={false} elevateNodesOnSelect={false} deleteKeyCode={null} minZoom={CANVAS_MIN_ZOOM} maxZoom={CANVAS_MAX_ZOOM}
         defaultViewport={view.viewport ?? { x: 0, y: 0, zoom: 1 }}
         onMoveEnd={(_event, viewport) => setView(current => ({ ...current, viewport }))}

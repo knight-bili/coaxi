@@ -38,6 +38,7 @@ async function qualify(window){
  const wait=async(expression,timeout=20_000)=>{const until=Date.now()+timeout;while(Date.now()<until){if(await evaluate(expression))return;await pause(100)}throw Error('Native condition timed out: '+expression)}
  const rpc=(method,params={})=>evaluate(`window.rovai.request(${JSON.stringify(method)},${JSON.stringify(params)})`)
  try{
+  await evaluate(`(()=>{window.nativeRuntimeErrors=[];window.addEventListener('error',event=>window.nativeRuntimeErrors.push({message:event.message,stack:String(event.error?.stack??'')}));return true})()`)
   window.show();window.focus();window.webContents.focus()
   await wait(`window.rovai&&document.querySelector('button[aria-label="无限画布"]')?.disabled===false`,60_000)
   if(config.mode==='materials'){
@@ -113,7 +114,7 @@ async function qualify(window){
   await wait(`window.rovai.request('canvas.terminals.snapshot',{target:${JSON.stringify(target)}}).then(value=>value.cleanupComplete===true)`)
   record('native_terminal_stop_completes_process_cleanup')
   report.status='passed'
- }catch(error){report.status='failed';report.error=String(error.stack??error);report.native_keys=await evaluate('window.nativeKeys').catch(()=>null);report.dom=await evaluate('document.body.innerText.slice(-2500)').catch(()=>null);if((report.screenshots?.length??0)<3){const path=join(config.evidence,'failure.png');await writeFile(path,(await window.webContents.capturePage()).toPNG()).then(()=>{(report.screenshots??=[]).push(path)}).catch(()=>{})}}
+ }catch(error){report.status='failed';report.error=String(error.stack??error);report.runtime_errors=await evaluate('window.nativeRuntimeErrors').catch(()=>null);report.native_keys=await evaluate('window.nativeKeys').catch(()=>null);report.dom=await evaluate('document.body.innerText.slice(-2500)').catch(()=>null);if((report.screenshots?.length??0)<3){const path=join(config.evidence,'failure.png');await writeFile(path,(await window.webContents.capturePage()).toPNG()).then(()=>{(report.screenshots??=[]).push(path)}).catch(()=>{})}}
  finally{
   if(report.status==='failed')await evaluate(`(()=>{document.querySelector('.canvas-board-dialog .app-dialog-close:not(:disabled)')?.click();return true})()`).catch(()=>{})
   report.finished_at=new Date().toISOString();await writeFile(join(config.evidence,'result.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({status:report.status,evidence:config.evidence}));process.exitCode=report.status==='passed'?0:1;app.quit()
