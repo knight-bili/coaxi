@@ -83,6 +83,12 @@ async function qualify(window){
    report.status='passed'
    return
   }
+  if(config.mode==='mirrors'||config.mode==='mirrors-reopen'){
+   report.scope='production Main/preload/Core; same private conversation on two exact canvas pins, independent drafts and stable editors; no model'
+   await qualifyMirrors(window,{evaluate,wait,rpc})
+   report.status='passed'
+   return
+  }
   const boards=await rpc('canvas.boards.list'),board=boards.boards.find(board=>board.name==='C06 真实桌面画布')
   assert.ok(board)
   const graph=await rpc('canvas.nodes.snapshot',{boardId:board.id}),terminal=graph.nodes.find(node=>node.data.kind==='terminal')
@@ -694,5 +700,88 @@ async function qualifyNotes(window,{evaluate,wait,rpc}){
  assert.ok(!(await evaluate(`Object.values(localStorage).map(value=>{try{return JSON.parse(value)}catch{return null}}).filter(Boolean)`)).some(value=>value.text===local&&value.baseline===remote))
  record('explicit_review_saves_local_note_and_clears_only_its_draft_preserving_other_note')
  await writeFile(join(config.evidence,'01-note-paper-after-conflict.png'),(await window.webContents.capturePage()).toPNG())
+}
+async function qualifyMirrors(window,{evaluate,wait,rpc}){
+ window.unmaximize();window.setContentSize(1680,1000);window.webContents.setZoomFactor(1)
+ let context
+ if(config.mode==='mirrors-reopen'){
+  const previous=JSON.parse(await readFile(config.mirror_previous_result,'utf8'))
+  assert.equal(previous.status,'passed');context=previous.mirror_context
+ }else{
+  const prior=JSON.parse(await readFile(config.previous_result,'utf8'))
+  assert.equal(prior.status,'passed')
+  const {thread_id:threadId,conversation_id:conversationId}=prior.private_context
+  const created=await rpc('canvas.boards.create',{commandId:randomUUID(),command:{name:'C05 同会话双卡'}})
+  assert.equal(created.status,'applied',JSON.stringify(created))
+  const boardId=created.payload.board.id,nodeIds=[]
+  for(const index of [0,1]){
+   const graph=await rpc('canvas.nodes.snapshot',{boardId})
+   const result=await rpc('canvas.nodes.apply',{commandId:randomUUID(),command:{boardId,expectedRevision:graph.board.revision,mutation:{type:'create',node:{kind:'conversation',conversation:{threadId,conversationId},title:index?'乙卡同一私聊':'甲卡同一私聊',x:index*560,y:0,width:520,height:600}}}})
+   assert.equal(result.status,'applied',JSON.stringify(result));nodeIds.push(result.payload.nodeIds[0])
+  }
+  context={boardId,threadId,conversationId,nodeIds,texts:['甲卡独立未发送输入',Array.from({length:40},(_,i)=>`乙卡独立长输入第${i+1}行`).join('\n')]}
+ }
+ report.mirror_context=context
+ const {boardId,conversationId,nodeIds,texts}=context
+ const frames=nodeIds.map(id=>`document.querySelector('.canvas-conversation-frame[data-canvas-conversation-key*="${id}"]')`)
+ const inputs=frames.map(frame=>`${frame}?.querySelector('.single-chat-composer textarea')`)
+ const open=async index=>{
+  if(await evaluate(`Boolean(${inputs[index]})`))return
+  await wait(`Boolean(document.querySelector('[data-id="${nodeIds[index]}"] button[aria-label="展开对话"]:not(:disabled)'))`)
+  await evaluate(`(()=>{document.querySelector('[data-id="${nodeIds[index]}"] button[aria-label="展开对话"]').click();return true})()`)
+  await wait(`Boolean(${inputs[index]}&&!${inputs[index]}.disabled)`)
+ }
+ await openCanvasBoard(evaluate,wait,boardId)
+ if(config.mode==='mirrors-reopen'){
+  await wait(`Boolean(${inputs[0]}&&${inputs[1]}&&${inputs[0]}.value===${JSON.stringify(texts[0])}&&${inputs[1]}.value===${JSON.stringify(texts[1])})`,30_000)
+  record('cold_native_route_restores_both_exact_private_pins_and_independent_draft_bodies')
+  const restored=await rpc('canvas.nodes.snapshot',{boardId})
+  for(const id of nodeIds){const row=restored.nodes.find(node=>node.id===id);assert.equal(row.data.conversation.conversationId,conversationId)}
+  record('cold_mirror_recovery_keeps_original_private_identity_instead_of_creating_replacements')
+ }else{
+  await open(0)
+  await evaluate(`(()=>{window.mirrorOriginalEditor=${inputs[0]};return true})()`)
+  await open(1)
+  assert.ok(await evaluate(`${inputs[0]}===window.mirrorOriginalEditor&&${inputs[0]}!==${inputs[1]}`))
+  await evaluate(`(()=>{window.mirrorEditors=[${inputs[0]},${inputs[1]}];return true})()`)
+  record('opening_same_private_conversation_twice_preserves_first_editor_and_mounts_a_distinct_second_editor')
+  for(const index of [0,1]){
+   await wait(`Boolean(${inputs[index]}&&!${inputs[index]}.disabled)`)
+   await evaluate(`(()=>{const input=${inputs[index]};input.focus();input.select();window.mirrorTrustedInputs=[];input.addEventListener('input',event=>window.mirrorTrustedInputs.push(event.isTrusted));return true})()`)
+   await window.webContents.insertText(texts[index])
+   await wait(`${inputs[index]}.value===${JSON.stringify(texts[index])}`)
+   assert.ok((await evaluate('window.mirrorTrustedInputs')).some(Boolean))
+  }
+  for(const index of [0,1])assert.equal(await evaluate(`${inputs[index]}.value`),texts[index])
+  record('trusted_input_in_each_same_thread_private_pin_remains_in_its_own_composer')
+  const snapshots=[]
+  for(const nodeId of nodeIds)snapshots.push(await rpc('singleChat.get',{conversationId,composerScope:{kind:'canvas',boardId,nodeId}}))
+  assert.ok(snapshots[0].draft.scopeKey&&snapshots[1].draft.scopeKey&&snapshots[0].draft.scopeKey!==snapshots[1].draft.scopeKey)
+  report.mirror_scope_keys=snapshots.map(snapshot=>snapshot.draft.scopeKey)
+  record('actual_core_keeps_distinct_canvas_material_scopes_for_same_private_conversation')
+  const scroll=await evaluate(`(()=>{const input=${inputs[1]};input.scrollTop=input.scrollHeight;return {top:input.scrollTop,extra:input.scrollHeight-input.clientHeight}})()`)
+  assert.ok(scroll.extra>0&&scroll.top>0,JSON.stringify(scroll))
+  await evaluate(`(()=>{document.querySelector('[data-id="${nodeIds[0]}"] button[aria-label="移至侧边"]').click();return true})()`)
+  await wait(`Boolean(${frames[0]}?.querySelector('button[aria-label="放回画布"]:not(:disabled)'))`)
+  assert.ok(await evaluate(`${inputs[0]}===window.mirrorEditors[0]&&${inputs[1]}===window.mirrorEditors[1]`))
+  assert.ok(Math.abs(await evaluate(`${inputs[1]}.scrollTop`)-scroll.top)<=1)
+  await evaluate(`(()=>{${frames[0]}.querySelector('button[aria-label="放回画布"]').click();return true})()`)
+  await wait(`Boolean(${frames[0]}?.classList.contains('is-inline'))`)
+  assert.ok(await evaluate(`${inputs[0]}===window.mirrorEditors[0]&&${inputs[1]}===window.mirrorEditors[1]`))
+  record('moving_one_private_mirror_keeps_both_editor_instances_and_other_composer_scroll_position')
+  await evaluate(`(()=>{document.querySelector('[data-id="${nodeIds[0]}"] button[aria-label="收起对话"]').click();return true})()`)
+  await wait(`!${frames[0]}`)
+  assert.ok(await evaluate(`${inputs[1]}===window.mirrorEditors[1]&&${inputs[1]}.value===${JSON.stringify(texts[1])}`))
+  await open(0)
+  await wait(`${inputs[0]}.value===${JSON.stringify(texts[0])}`)
+  assert.ok(await evaluate(`${inputs[0]}!==window.mirrorEditors[0]&&${inputs[1]}===window.mirrorEditors[1]`))
+  record('closing_and_reopening_one_private_pin_recovers_its_draft_without_replacing_the_other_editor')
+ }
+ const after=await rpc('singleChat.get',{conversationId})
+ assert.deepEqual(after.messages,[]);assert.deepEqual(after.agentRuns,[])
+ record('mirror_edit_and_recovery_does_not_send_messages_or_start_agent_runs')
+ await evaluate(`(()=>{document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]').click();return true})()`)
+ await pause(350)
+ await writeFile(join(config.evidence,'01-same-private-conversation-two-cards.png'),(await window.webContents.capturePage()).toPNG())
 }
 await import(config.production_main)
