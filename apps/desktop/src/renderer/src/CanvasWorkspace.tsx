@@ -98,10 +98,10 @@ function CanvasWorkspaceContent({ scope, identityIssue, onRetryIdentity, onLeave
     return () => { onLeaveGuardChange?.(null); window.removeEventListener('beforeunload', beforeUnload) }
   }, [canLeave, isBlocked, prepareLeave, onLeaveGuardChange])
   useEffect(() => {
-    if (state.loading || !state.snapshot || selected || isBlocked() || props.conversation?.instances.length) return
+    if (state.loading || state.readError || !state.snapshot || selected || isBlocked() || props.conversation?.instances.length) return
     // No editor is leaving here. Starting a leave transaction would invalidate this effect itself.
     setSelectedId(current => current === selectedId ? boards[0]?.id ?? null : current)
-  }, [state.loading, state.snapshot, selected, selectedId, boards, isBlocked, props.conversation?.instances])
+  }, [state.loading, state.readError, state.snapshot, selected, selectedId, boards, isBlocked, props.conversation?.instances])
   useEffect(() => { if (selected) saveCanvasBoardSelection(storage, scope, selected.id) }, [selected, storage, scope])
   const openDialog = async (board: CanvasBoard | null, remove = false) => {
     await transition(() => { setIssue(null); panel.current = true; setDialog({ board: board ? structuredClone(board) : null, remove }) }, false)
@@ -113,8 +113,8 @@ function CanvasWorkspaceContent({ scope, identityIssue, onRetryIdentity, onLeave
       setIssue(message); throw new Error(message)
     }
     const board = result.payload.board as Partial<CanvasBoard> | undefined
-    if (result.commandType === 'canvas.boards.create' && typeof board?.id === 'string') { setSelectedId(board.id); setShowBoards(false) }
-    if (result.commandType === 'canvas.boards.delete' && result.payload.boardId === selectedId) setSelectedId(null)
+    if (result.commandType === 'canvas.board.create' && typeof board?.id === 'string') { setSelectedId(board.id); setShowBoards(false) }
+    if (result.commandType === 'canvas.board.delete' && result.payload.boardId === selectedId) setSelectedId(null)
     panel.current = false; setDialog(null); setIssue(null); setRestoreRevision(value => value + 1)
   }
   const save = async (intent: CanvasBoardIntent) => {
@@ -153,14 +153,14 @@ function CanvasWorkspaceContent({ scope, identityIssue, onRetryIdentity, onLeave
   const groups = useMemo(() => navigationPreferences && !navigationPreferences.readError ? navigationPreferences.projectGroups.map(group => ({ id: group.id, label: group.name, color: group.color,
     projectPaths: group.projectPaths.filter(path => navigationPreferences.registeredProjects.includes(path) && !navigationPreferences.removedProjects.some(item => item.targetKey === `directory:${path}`)) })) : [], [navigationPreferences])
   const selectBoard = (id: string) => { void transition(() => { setSelectedId(id); setShowBoards(false); setIssue(null) }, id !== selectedId || showBoards) }
-  const boardName = (board: CanvasBoard) => board.name || uiAttribute('未命名画板')
+  const boardName = (board: CanvasBoard) => board.name || uiAttribute('未命名画布')
   const visibleBoards = boards.filter(board => `${boardName(board)}\n${board.description ?? ''}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()))
   // Codeg canvas-page / canvas-board-list, adapted to the existing Core controller and leave transaction.
   return <section className="canvas-workspace" aria-label={uiAttribute('画板工作区')}>
     <header className="canvas-boards-toolbar">
       <button className="canvas-breadcrumb-root" type="button" disabled={blocked} onClick={() => { void transition(() => setShowBoards(true)) }}><MapIcon size={16} /><UiText zh="无限画布" /></button>
       {selected && !showBoards && <><ChevronRight className="canvas-breadcrumb-separator" size={14} aria-hidden="true" /><DropdownMenu.Root>
-        <DropdownMenu.Trigger asChild><button className="canvas-board-title" type="button" disabled={blocked} aria-label={uiAttribute('画板操作')}>
+        <DropdownMenu.Trigger asChild><button className="canvas-board-title" type="button" data-board-id={selected.id} disabled={blocked} aria-label={uiAttribute('画板操作')}>
           <span>{boardName(selected)}</span><ChevronDown size={14} aria-hidden="true" /></button></DropdownMenu.Trigger>
         <DropdownMenu.Portal><DropdownMenu.Content className="canvas-card-menu" align="start" sideOffset={4} collisionPadding={12} loop onCloseAutoFocus={event => event.preventDefault()}>
           <DropdownMenu.Item className="canvas-card-menu-item" disabled={blocked} onSelect={() => { void openDialog(selected) }}><Pencil size={15} /><UiText zh="编辑画板" /></DropdownMenu.Item>

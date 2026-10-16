@@ -35,6 +35,13 @@ spacing:
 
 ## Overview
 
+The customer's explicit fusion requirement (2026-10-16) applies to every page and
+complex dialog: use the corresponding Codeg/Rovai source UI as the baseline,
+reuse its components and interactions, and avoid an invented replacement design.
+Further improvements require a concrete reason and rendered comparisons that
+demonstrate no regression in visual quality, complete functionality or usability.
+Follow [`integration/ui-source-policy.md`](integration/ui-source-policy.md).
+
 **Creative North Star: “Porcelain Day / Steel Night.”**
 
 Rovai AI is a dense but calm desktop workspace: porcelain and graphite surfaces provide quiet

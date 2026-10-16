@@ -39,8 +39,8 @@ export function CanvasBoardDialog({ board, remove, latest, blocked, pending, rec
         closeDisabled={locked} />
       <form className="app-dialog-form" onSubmit={event => { event.preventDefault(); void save() }}>
         <AppDialogBody>
-          {remove ? <p>{board?.name || uiAttribute('未命名画板')}</p> : <fieldset disabled={locked} className="canvas-editor-fields">
-            <label className="field-label"><UiText zh="名称" /><input data-dialog-autofocus placeholder={uiAttribute('未命名画板')} value={name} onChange={event => setName(event.target.value)}
+          {remove ? <p>{board?.name || uiAttribute('未命名画布')}</p> : <fieldset disabled={locked} className="canvas-editor-fields">
+            <label className="field-label"><UiText zh="名称" /><input data-dialog-autofocus placeholder={uiAttribute('未命名画布')} value={name} onChange={event => setName(event.target.value)}
               onKeyDown={event => { if (event.key === 'Enter' && event.nativeEvent.isComposing) event.preventDefault() }} /></label>
             <label className="field-label"><UiText zh="描述" /><textarea placeholder={uiAttribute('这个画布用来做什么？（可选）')} value={description} rows={3} onChange={event => setDescription(event.target.value)} /></label>
             <div className="field-label"><span id="canvas-board-color-label"><UiText zh="颜色" /></span>

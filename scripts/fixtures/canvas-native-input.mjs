@@ -108,6 +108,7 @@ async function qualify(window){
 }
 async function qualifyCanvasVisual(window,{evaluate,wait,rpc}){
  window.unmaximize();window.setContentSize(1440,920)
+ window.webContents.setZoomFactor(1)
  await evaluate(`(()=>{document.querySelector('button[aria-label="无限画布"]').click();return true})()`)
  await wait(`Boolean(document.querySelector('.canvas-breadcrumb-root:not(:disabled)'))`)
  await evaluate(`(()=>{document.querySelector('.canvas-breadcrumb-root').click();return true})()`)
@@ -122,11 +123,24 @@ async function qualifyCanvasVisual(window,{evaluate,wait,rpc}){
  }
  const before=await rpc('canvas.boards.list'),beforeIds=new Set(before.boards.map(board=>board.id))
  report.home_state=before.boards.length?'existing_boards':'no_boards'
+ report.container_fit=await evaluate(`(()=>{const main=document.querySelector('.content.canvas-content'),work=document.querySelector('.canvas-workspace'),style=getComputedStyle(main),a=main.getBoundingClientRect(),b=work.getBoundingClientRect();return {padding:[style.paddingTop,style.paddingRight,style.paddingBottom,style.paddingLeft],extraScrollX:main.scrollWidth-main.clientWidth,extraScrollY:main.scrollHeight-main.clientHeight,widthGap:Math.abs(a.width-b.width),heightGap:Math.abs(a.height-b.height)}})()`)
+ assert.deepEqual(report.container_fit.padding,['0px','0px','0px','0px'])
+ assert.ok(report.container_fit.extraScrollX<=1&&report.container_fit.extraScrollY<=1&&report.container_fit.widthGap<=1&&report.container_fit.heightGap<=1)
  await capture('00-board-home')
  record('real_canvas_home_keeps_existing_boards_and_opens_creation',{boards:before.boards.length})
+ window.setContentSize(1040,700)
+ await evaluate(`new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))`)
+ report.small_window=await evaluate(`(()=>{const main=document.querySelector('.content.canvas-content'),grid=document.querySelector('.canvas-board-grid'),last=grid.lastElementChild;grid.scrollTop=grid.scrollHeight;return {viewport:{width:innerWidth,height:innerHeight},outerExtraX:main.scrollWidth-main.clientWidth,outerExtraY:main.scrollHeight-main.clientHeight,listExtraY:grid.scrollHeight-grid.clientHeight,listScrollTop:grid.scrollTop,lastVisible:last.getBoundingClientRect().bottom<=grid.getBoundingClientRect().bottom+1}})()`)
+ assert.ok(report.small_window.outerExtraX<=1&&report.small_window.outerExtraY<=1)
+ assert.ok(report.small_window.listExtraY>0&&report.small_window.listScrollTop>0&&report.small_window.lastVisible)
+ record('small_window_keeps_one_real_scroll_owner_and_last_board_reachable',report.small_window)
+ window.setContentSize(1440,920)
+ await evaluate(`new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))`)
  await evaluate(`(()=>{document.querySelector('.canvas-boards-home .canvas-primary-button').click();return true})()`)
  await wait(`Boolean(document.querySelector('.canvas-board-dialog input[data-dialog-autofocus]'))`)
  assert.equal(await evaluate(`document.querySelectorAll('.canvas-board-dialog .canvas-color-choice').length`),12)
+ report.dialog_style=await evaluate(`(()=>{const panel=document.querySelector('.canvas-board-dialog'),input=panel.querySelector('input'),style=getComputedStyle(panel);return {width:panel.getBoundingClientRect().width,padding:style.paddingTop,radius:style.borderRadius,inputRadius:getComputedStyle(input).borderRadius}})()`)
+ assert.equal(report.dialog_style.width,448);assert.equal(report.dialog_style.padding,'24px');assert.equal(report.dialog_style.radius,'28px');assert.equal(report.dialog_style.inputRadius,'999px')
  await capture('01-board-dialog')
  await evaluate(`(()=>{document.querySelector('.canvas-board-dialog .canvas-color-choice[data-color="blue"]').click();return true})()`)
  await wait(`document.querySelector('.canvas-board-dialog .canvas-color-choice[data-color="blue"]').getAttribute('aria-pressed')==='true'`)
@@ -139,6 +153,7 @@ async function qualifyCanvasVisual(window,{evaluate,wait,rpc}){
  await wait(`!document.querySelector('.canvas-board-dialog')&&document.querySelector('.canvas-empty-hint h3')?.textContent==='画布还是空的'`)
  const after=await rpc('canvas.boards.list'),created=after.boards.filter(board=>!beforeIds.has(board.id))
  assert.equal(created.length,1);assert.equal(created[0].name,'test');assert.ok(!created[0].color)
+ await wait(`document.querySelector('.canvas-board-title')?.dataset.boardId===${JSON.stringify(created[0].id)}`)
  const graph=await rpc('canvas.nodes.snapshot',{boardId:created[0].id});assert.equal(graph.nodes.length,0)
  report.visual_board_id=created[0].id
  await capture('02-empty-board')

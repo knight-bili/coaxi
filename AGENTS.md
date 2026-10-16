@@ -18,6 +18,8 @@
 
 ## Frontend design
 
+- 一期全部页面与复杂弹窗必须遵循客户明确指定的 [原应用源码 UI 规则](integration/ui-source-policy.md)：参考固定 Codeg/Rovai 原组件与交互，优先复用，禁止无依据原创发挥；允许有具体依据的优化，但不得降低视觉、功能和使用体验。每页要有真实运行的同场景对照；代码检查不替代视觉检查，不新增客户逐页技术验收门槛。
+
 - For any UI/UX or renderer-facing change, read [`DESIGN.md`](DESIGN.md) and
   [`docs/ui/README.md`](docs/ui/README.md) first.
 - Read `PRODUCT.md`, when it exists, only when the task depends on users, product purpose,
