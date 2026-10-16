@@ -617,8 +617,13 @@ async function qualifyNotes(window,{evaluate,wait,rpc}){
   if(double){mouse('mouseDown',position,2);mouse('mouseUp',position,2)}
  }
  const start=await point(`${card}.querySelector('.canvas-note-prose')`)
+ await evaluate(`(()=>{window.noteDragEvents=[];for(const name of ['mousedown','mousemove','mouseup'])document.addEventListener(name,event=>window.noteDragEvents.push({type:event.type,buttons:event.buttons,trusted:event.isTrusted,x:event.clientX,y:event.clientY}),true);return true})()`)
  mouse('mouseMove',start);mouse('mouseDown',start)
- mouse('mouseMove',{x:start.x+72,y:start.y+48});await pause(80);mouse('mouseUp',{x:start.x+72,y:start.y+48})
+ await pause(50)
+ window.webContents.sendInputEvent({type:'mouseMove',x:start.x+72,y:start.y+48,modifiers:['leftButtonDown']});await pause(80);mouse('mouseUp',{x:start.x+72,y:start.y+48})
+ await pause(200)
+ report.note_drag_events=await evaluate('window.noteDragEvents')
+ report.note_graph_after_drag=await rpc('canvas.nodes.snapshot',{boardId})
  await wait(`window.rovai.request('canvas.nodes.snapshot',{boardId:${JSON.stringify(boardId)}}).then(graph=>graph.nodes.find(node=>node.id===${JSON.stringify(ids[0])})?.data.x===72)`)
  const moved=(await rpc('canvas.nodes.snapshot',{boardId})).nodes.find(node=>node.id===ids[0])
  assert.equal(moved.data.y,48);record('whole_note_body_native_drag_updates_exact_core_geometry')
