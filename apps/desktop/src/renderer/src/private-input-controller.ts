@@ -8,7 +8,7 @@ import { newCommandId } from '../../shared/command-id'
 import type { EditingRecovery, ThreadClient } from './camp-client'
 import { singleChatRecoveryStorage, type SingleChatComposerStore, type SingleChatMutationLease, type SingleChatSendLease } from './single-chat-composer-store'
 
-type Client = Pick<ThreadClient, 'request' | 'editingRecovery' | 'onInvalidated'> & {
+type Client = Pick<ThreadClient, 'request' | 'editingRecovery' | 'privateInputRecovery' | 'onInvalidated'> & {
   retryPendingCommand?: (method: 'singleChat.composerDraft.mutate' | 'singleChat.pendingInputs.edit' | 'singleChat.send', params: unknown) => Promise<void>
 }
 export interface PrivateInputOrigin {
@@ -46,7 +46,7 @@ const locksBody = (kind: Kind, action?: unknown) => kind === 'return' || kind ==
 export const PRIVATE_INPUT_BODY_INDEX = 'single-chat-input-body-index:v1'
 export interface PrivateInputBodyEntry { origin: PrivateInputOrigin; bodyStorageKey: string; bodyKey: string }
 
-export function privateInputBodyIndex(client: Pick<ThreadClient, 'editingRecovery'>): Readonly<Record<string, PrivateInputBodyEntry>> {
+export function privateInputBodyIndex(client: Pick<ThreadClient, 'editingRecovery' | 'privateInputRecovery'>): Readonly<Record<string, PrivateInputBodyEntry>> {
   const value = singleChatRecoveryStorage(client).get(PRIVATE_INPUT_BODY_INDEX)
   if (value == null) return {}
   if (!object(value) || value.version !== 1 || !object(value.entries)

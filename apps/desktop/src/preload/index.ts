@@ -62,6 +62,17 @@ async function invokeHostWeb<T>(operation: string, input?: unknown): Promise<T> 
 }
 
 const api: RovaiApi = {
+  privateInputRecovery: {
+    get(identity) {
+      const reply = ipcRenderer.sendSync('rovai:private-input-recovery', 'get', identity)
+      if (!reply?.ok) throw new Error(reply?.error ?? '私聊输入无法读取。')
+      return reply.value
+    },
+    set(identity, value) {
+      const reply = ipcRenderer.sendSync('rovai:private-input-recovery', 'set', identity, value)
+      if (!reply?.ok) throw new Error(reply?.error ?? '私聊输入未可靠保存。')
+    }
+  },
   windowClose: createWindowCloseApi(ipcRenderer, process.platform),
   hostWeb: {
     loginTicket: () => invokeHostWeb('loginTicket'),

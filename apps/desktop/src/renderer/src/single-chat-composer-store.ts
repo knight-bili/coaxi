@@ -1,7 +1,7 @@
 import type { EditingRecovery, ThreadClient } from './camp-client'
 import { canvasComposerContextKey, localComposerBaseStorage, type CanvasComposerContext } from './canvas-composer-drafts'
 
-type Owner = Pick<ThreadClient, 'editingRecovery' | 'onInvalidated'>
+type Owner = Pick<ThreadClient, 'editingRecovery' | 'privateInputRecovery' | 'onInvalidated'>
 export interface SingleChatComposerState {
   readonly drafts: Readonly<Record<string, string>>
   readonly ready: boolean
@@ -159,6 +159,19 @@ export class SingleChatComposerStore {
 const owners = new WeakMap<object, Map<string, SingleChatComposerStore>>()
 export function singleChatRecoveryStorage(owner: Owner): EditingRecovery {
   if (owner.editingRecovery) return owner.editingRecovery
+  const native = owner.privateInputRecovery
+  if (native) return {
+    get(key) {
+      const saved = native.get(key)
+      if (saved.found) return saved.value
+      const legacy = localComposerBaseStorage(owner)?.getItem(key)
+      if (legacy == null) return undefined
+      const value: unknown = JSON.parse(legacy)
+      native.set(key, value)
+      return value
+    },
+    set: (key, value) => native.set(key, value)
+  }
   return {
     get(key) {
       const storage = localComposerBaseStorage(owner)

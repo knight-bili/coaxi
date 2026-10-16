@@ -1,5 +1,5 @@
 import { expect, it, vi } from 'vitest'
-import { SingleChatComposerStore, singleChatComposerStore } from './single-chat-composer-store'
+import { SingleChatComposerStore, singleChatComposerStore, singleChatRecoveryStorage } from './single-chat-composer-store'
 import type { CanvasComposerContext } from './canvas-composer-drafts'
 
 function fixture(initial: unknown = {}) {
@@ -17,6 +17,37 @@ function fixture(initial: unknown = {}) {
 }
 
 const canvasContext: CanvasComposerContext = { host: 'host', core: '/test/core', boardId: 'board', nodeId: 'card', threadId: 'thread', conversationId: 'private' }
+it('uses durable Native private recovery without changing the browser recovery adapter', () => {
+  const values = new Map<string, unknown>(), native = { get: vi.fn((key: string) => values.has(key) ? { found: true as const, value: values.get(key) } : {found:false as const}),
+    set: vi.fn((key: string, value: unknown) => { values.set(key, structuredClone(value)) }) }
+  const owner = { privateInputRecovery: native }, body = singleChatComposerStore(owner, 'native', {...canvasContext, threadId:'native'})
+  expect(body.update(() => ({ 'native:private': '末字' }))).toBe(true)
+  expect(singleChatComposerStore({ privateInputRecovery:native }, 'native', {...canvasContext, threadId:'native'}).getSnapshot().drafts).toEqual({'native:private':'末字'})
+  native.set.mockImplementationOnce(() => { throw new Error('disk full') })
+  expect(body.update(() => ({ 'native:private':'保留未保存输入' }))).toBe(false)
+  expect(body.getSnapshot().drafts['native:private']).toBe('保留未保存输入')
+  expect(body.tryBeginSend('native:private')).toBe(null)
+  const browser = fixture(), storage = singleChatRecoveryStorage({...owner, editingRecovery:browser.owner.editingRecovery})
+  storage.set('single-chat:web', {})
+  expect(browser.set).toHaveBeenCalledOnce()
+})
+it('migrates legacy private input once and never revives it after a durable clear or read error', () => {
+  const key = 'single-chat:legacy', legacy = { getItem:vi.fn(() => '{"private":"旧正文"}') }
+  let saved: {found:false} | {found:true;value:unknown} = {found:false}
+  const native = { get:vi.fn(() => saved), set:vi.fn((_key:string, value:unknown) => { saved = {found:true,value} }) }
+  vi.stubGlobal('window', {localStorage:legacy})
+  try {
+    const storage = singleChatRecoveryStorage({privateInputRecovery:native})
+    expect(storage.get(key)).toEqual({private:'旧正文'})
+    expect(native.set).toHaveBeenCalledWith(key, {private:'旧正文'})
+    storage.set(key, null)
+    expect(storage.get(key)).toBe(null)
+    expect(legacy.getItem).toHaveBeenCalledOnce()
+    native.get.mockImplementationOnce(() => { throw new Error('damaged disk record') })
+    expect(() => storage.get(key)).toThrow('damaged disk record')
+    expect(legacy.getItem).toHaveBeenCalledOnce()
+  } finally { vi.unstubAllGlobals() }
+})
 it('keeps independent canvas card bodies and the legacy main dictionary in distinct persisted records', () => {
   const values = new Map<string, unknown>()
   const editingRecovery = { get: (key: string) => values.get(key), set: (key: string, value: unknown) => { values.set(key, structuredClone(value)) } }

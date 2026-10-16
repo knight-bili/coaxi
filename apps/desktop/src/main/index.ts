@@ -25,6 +25,7 @@ import {
 import { isThreadId } from '@contracts'
 import { parsePrivateAttachmentLocator } from '../shared/private-attachment-locator'
 import { PrivateAttachmentPreparations } from './private-attachment-preparation'
+import { NativePrivateInputRecovery } from './private-input-recovery'
 import type {
   AppearancePreferences,
   AppearanceSnapshot,
@@ -562,6 +563,16 @@ executionView.onChanged((snapshot) => {
 const localComposerAttachments = new LocalComposerAttachmentRegistry(
   join(app.getPath('userData'), 'local-composer-attachments-v1.json')
 )
+const privateInputRecovery = coreDataPath === null ? null : new NativePrivateInputRecovery(
+  join(app.getPath('userData'), 'private-input-recovery-v1')
+)
+ipcMain.on('rovai:private-input-recovery', (event, action: unknown, identity: unknown, value: unknown) => {
+  try {
+    if (!privateInputRecovery || event.sender !== mainWindow?.webContents || event.senderFrame !== event.sender.mainFrame
+      || typeof identity !== 'string' || (action !== 'get' && action !== 'set')) throw new Error('Private editor unavailable')
+    event.returnValue = {ok:true, value:action === 'get' ? privateInputRecovery.get(identity) : privateInputRecovery.set(identity, value)}
+  } catch { event.returnValue = {ok:false, error:'私聊输入未可靠保存或无法读取，请保留原文后重试。'} }
+})
 const privateAttachmentPreparations = coreDataPath === null ? null : new PrivateAttachmentPreparations(
   join(coreDataPath, 'private-attachment-preparations-v1'), core
 )

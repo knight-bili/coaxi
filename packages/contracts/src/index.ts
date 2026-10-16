@@ -4857,6 +4857,11 @@ export interface HostWebApi {
 }
 
 export interface RovaiApi {
+  /** Desktop-local private editor durability; never a Core receipt or Web resource grant. */
+  privateInputRecovery?: {
+    get(identity: string): {found:false} | {found:true; value:unknown}
+    set(identity: string, value: unknown): void
+  }
   /** Local Desktop owner only; absent on the public Web capability. */
   hostWeb?: HostWebApi
   request<T>(method: CoreMethod, params?: unknown): Promise<T>

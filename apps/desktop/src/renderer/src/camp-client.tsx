@@ -24,6 +24,7 @@ export type ThreadClient = Pick<RovaiApi,
     }>
   }
   editingRecovery?: EditingRecovery
+  privateInputRecovery?: RovaiApi['privateInputRecovery']
   retryPendingCommand?: (method: 'singleChat.composerDraft.mutate' | 'singleChat.pendingInputs.edit' | 'singleChat.send', params: unknown) => Promise<void>
   /** Authenticated Host/Owner identity for advisory presentation preferences; never a resource grant. */
   presentationScope?: string

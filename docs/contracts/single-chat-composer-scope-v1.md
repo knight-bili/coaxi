@@ -147,6 +147,19 @@ Native 旧字节入口不再因 Core 异常删除可能已经绑定的源文件�
 私有源内容变化校验继续实施。卡片文件添加入口保持禁用。此批只完成部分接线，Core 新断言留待阶段候选编译执行；
 27项 Web 客户端/摘要检查及定向类型通过不代表实际 Host HTTP、Native IPC 或完整 PC01–PC24 通过。
 
+## Native 私聊正文与在途命令的整进程恢复（2026-10-17）
+
+Native 的私聊本机正文、恢复索引与原命令使用 Desktop Main 私有文件存储；同步保存完成后才允许发送继续。
+每份原归属记录独立命名，使用临时文件、内容 flush 与原子替换，写入失败保留当前正文并阻止发送；
+损坏记录不能解释为空记录。该存储只拥有客户端编辑状态，不拥有 Core 回执、材料权威或模型输入。
+旧 localStorage 记录在首次读取时迁入；已迁入的明确清除记录不再恢复旧副本。Web 仍使用原编辑端存储。
+桥接只允许主业务窗口的主 frame、闭合私聊 key 和受限大小，不提供文件路径操作。
+
+原请求恢复继续只读查询相同 UUID 与完整参数，不自动重发。Single Chat 沿当前 v8 继承的重启约定
+取消未完成旧回复并保留 Conversation；公共会话的 accepted-input failure 状态不用于替换该私聊语义。
+标准 ACP 的确定接受在其 prompt terminal 核定；已派发而未收到确定接受的输入仍为结果未知，不能称为 not_accepted。
+本批单测与实际整 App/Core 资格分别记录，实际中断测试通过前不据本节宣告 PC21/PC22 完成。
+
 ## Native 原上传请求恢复（2026-10-16）
 
 新增可选 Native `prepareInput/reconcileInput/retryInput/pendingPreparations` 桥。请求固定原 commandId、Thread、
