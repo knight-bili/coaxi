@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "rc14本组Desktop/Web通过并复用原生；终端5、私聊5、文件9、原对象8，共27项不同Native断言通过，均受控退出。便笺r1/r2/r3在首拖动断言未过；r3实际Core48/24而预期72/48，坐标/缩放/阈值尚未定位，后续编辑/冲突/离开检查仍待。I03保持进行中。",
+  "current_slice": "rc14便笺六项真实检查通过，拖动差异定因为测试激活阈值与原边缘吸附预期；同一私聊双卡六项及独立App冷恢复三项通过（其中无发送断言重复），当前候选41个不同Native断言。未重编/未push/Actions，继续C05硬崩溃/多Thread/焦点/规模、PC及ready Git Diff等必需剩余。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "先复用rc14诊断便笺拖动：同时记录WebContents实际zoom、DPR/innerWidth、DOM/ReactFlow矩阵及window捕获mousemove真实坐标、对齐后的Core位置，区分输入坐标和产品问题；不盲目改断言或重编。确认根因再沿原owner补六项及冷恢复/输入法；已过27项只按受影响范围复验。继续原C05/PC/ready Git Diff及既定后续阶段，不新增客户技术验收。",
+    "复用rc14继续原C05：先完成硬崩溃/未知请求恢复与同Thread/多Thread资源释放、原生焦点及实际规模检查；已验证便笺拖动/行内保存/冲突和同私聊双卡暖冷恢复不再反复重跑。补ready Git Diff及既定PC，IME/适用平台外部条件按真实可用性处理。源码改动才收下一批候选，不逐切片push/Actions。",
     "阶段剩余清单固定按I03-C06继续工程验证；暂缺环境只单列待办，继续可独立的I02余项和I04-I12/BUF，不把后续功能提前塞入I03。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "card_group_native_partial_pass_note_coordinates_unresolved",
+  "current_slice_status": "notes_drag_and_same_private_mirror_warm_cold_native_verified_remaining_c05_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -210,5 +210,6 @@
   "canvas_card_source_style_evidence": "i03-c06-card-source-style-result.json",
   "canvas_note_terminal_interaction_evidence": "i03-c06-note-terminal-interaction-result.json",
   "canvas_private_empty_fit_evidence": "i03-c06-private-empty-fit-result.json",
-  "canvas_source_card_group_verification": "i03-c06-source-card-group-verification.json"
+  "canvas_source_card_group_verification": "i03-c06-source-card-group-verification.json",
+  "canvas_notes_mirrors_native_evidence": "i03-c05-notes-mirrors-native-verification.json"
 }

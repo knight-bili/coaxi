@@ -104,3 +104,15 @@ final result: blocked
 final result: blocked
 
 仅整套画布工程视觉仍有待补项；目标active，本轮无需客户介入。
+
+## 便笺定因与同私聊双卡真实检查
+
+复用rc14生产c4463813，未增加构建。r4实测缩放/矩阵1、可信鼠标坐标正常；按XYDrag的激活起点和原computeAlignment边缘吸附，最终应80/48。r7沿原产品行为通过便笺六项，保留r1-r6旧失败；没有关闭吸附或修改拖动代码。
+
+实际双私聊卡片六项和新App进程冷路由三项通过：同一conversation在两个node的正文/材料scope分开；第二张打开、模式往返与单卡收起重开保留另一textarea；暖态输入框滚动保持；冷态恢复精确两个pin及两份正文，无消息和AgentRun。三次成功均受控退出，三个截图已实际查看。本次不同断言新增14，连同上批当前候选共41；重复无发送断言只计一次。
+
+便笺截图保留普通导航被阻止时的通知，核对后已保存；该画面不当作无错误全视觉资格。IME、硬崩溃、公开/多Thread、真实规模/资源释放、ready Git Diff及完整主题/字号仍待。证据见integration/execution/i03-c05-notes-mirrors-native-verification.json。
+
+final result: blocked
+
+仅完整画布视觉/阶段验证未完；目标active，无本轮客户事项。
