@@ -5,7 +5,7 @@ import { Background, BackgroundVariant, Panel, NodeResizer, ReactFlow, ReactFlow
   SelectionMode, ViewportPortal, applyNodeChanges, useReactFlow, useViewport, type Node, type NodeProps } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import type { AgentProfile, CanvasConversationRef, CanvasNode, CanvasNodeKind, CanvasNodeMutation, FilePreviewApi, ResolvedTheme, StoredCommandResult } from '@contracts'
-import { ExternalLink, Expand, FileDiff, Flag, Folder, Folders, Group, LayoutGrid, ListTodo, LockKeyhole, Map as MapIcon, Maximize2, MessageSquare, Minus, MoreHorizontal, Pencil, Pin, Plus, RefreshCw, SquareTerminal, Trash2, Users } from 'lucide-react'
+import { ExternalLink, Expand, FileDiff, Flag, Folder, Folders, GitBranch, Group, LayoutGrid, ListTodo, LockKeyhole, Map as MapIcon, Maximize2, MessageSquare, Minus, MoreHorizontal, Pencil, Pin, Plus, RefreshCw, SquareTerminal, Trash2, Users } from 'lucide-react'
 import { CanvasIconButton, CanvasViewportPanel } from './CanvasDock'
 import { CanvasFilePreview } from './CanvasFilePreview'
 import { ResourceReferenceIcon } from './FilePreviewTabIcon'
@@ -14,7 +14,7 @@ import { CanvasNote } from './CanvasNote'
 import type { FilePreviewContextValue } from './file-preview-controller'
 import { useCanvasGraph } from './useCanvasGraph'
 import { initialCanvasReferenceState, type CanvasReferenceState } from './canvas-reference-controller'
-import { canvasReferenceOptions, canvasSavedReference, resolveCanvasRegion, type CanvasFolderResolution, type CanvasRegionResolution } from './canvas-reference-model'
+import { canvasReferenceOptions, canvasSavedReference, canvasSummaryMetadata, canvasSummaryProjectPaths, resolveCanvasRegion, type CanvasFolderResolution, type CanvasRegionResolution } from './canvas-reference-model'
 import { browserCanvasStorage, loadCanvasViewState, saveCanvasViewState, CANVAS_MIN_ZOOM, CANVAS_MAX_ZOOM, type CanvasViewScope } from './canvas-view-state'
 import { basePathName, BOARD_DOT_GAP, CARD_WIDTH, CARD_HEIGHT, REGION_COLLAPSED_HEIGHT,
   REGION_FOOTER_HEIGHT, REGION_HEADER_HEIGHT, REGION_PADDING, computeAlignment, computeDropHint, effectiveColumns, isRegionKind, layoutRegionGrid, noteHoldsProse,
@@ -90,15 +90,17 @@ const PresentationContext = createContext<Presentation | null>(null)
 function CanvasConversationSummary({ actions, row, reference, selected, derived, title, color }: {
   actions: Presentation; row: CanvasNode; reference: CanvasConversationRef; selected?: boolean; derived?: boolean; title: string; color?: string | null
 }): React.JSX.Element {
-  const thread = actions.catalog?.items.find(item => item.threadId === reference.threadId)
   const privateChat = Boolean(reference.conversationId)
   const unavailable = actions.available(reference) === false
-  const project = thread?.projectBindingKind === 'directory' ? thread.projectPath : null
+  const metadata = canvasSummaryMetadata(reference, actions.catalog?.items ?? [], actions.agents, actions.folderResolutions)
+  const kind = uiAttribute(privateChat ? '私有对话' : '公开对话')
   const openLabel = uiAttribute(actions.conversation ? '展开对话' : '打开对话')
   return <article className={`${derived ? 'canvas-member-card' : 'canvas-card canvas-card-conversation'} canvas-conversation-summary canvas-card-handle${selected ? ' is-selected' : actions.selectedReferences.has(canvasReferenceKey(reference)) ? ' is-mirrored' : ''}`} data-color={color ?? undefined}>
     <div className="canvas-summary-meta">
       {privateChat ? <LockKeyhole size={14} aria-hidden="true" /> : <MessageSquare size={14} aria-hidden="true" />}
-      <span className="canvas-summary-kind"><UiText zh={privateChat ? '私有对话' : '公开对话'} /></span>
+      {actions.catalog?.complete && metadata.active !== undefined && <span className="canvas-summary-status" data-active={metadata.active}
+        role="img" aria-label={uiAttribute(metadata.active ? '有进行中的任务' : '当前没有进行中的任务')} title={uiAttribute(metadata.active ? '有进行中的任务' : '当前没有进行中的任务')} />}
+      <span className="canvas-summary-kind" title={metadata.modelTitle ?? kind} aria-label={metadata.modelTitle ? `${kind} · ${metadata.modelTitle}` : kind}>{metadata.model ?? kind}</span>
       <div className="canvas-summary-actions nodrag nowheel">
         <CanvasIconButton disabled={actions.blocked || unavailable} label={openLabel} onClick={() => actions.openConversation(row, reference, derived)}><Maximize2 size={14} /></CanvasIconButton>
         {derived ? <CanvasIconButton disabled={actions.blocked} label={uiAttribute(row.data.kind === 'custom' ? '移出分组' : '固定到画布')} onClick={() => actions.detach(row, reference)}><Pin size={14} /></CanvasIconButton>
@@ -107,7 +109,10 @@ function CanvasConversationSummary({ actions, row, reference, selected, derived,
     </div>
     <p className="canvas-summary-title" title={title}>{title}</p>
     <div className="canvas-summary-footer">
-      {unavailable ? <span><UiText zh="对话已结束或不可用" /></span> : project ? <span title={project}><Folder size={10} aria-hidden="true" /><span>{basePathName(project)}</span></span> : <span><UiText zh={privateChat ? '独立私聊材料' : '共享会话'} /></span>}
+      {unavailable ? <span><UiText zh="对话已结束或不可用" /></span> : <>
+        {metadata.project ? <span title={metadata.project}><Folder size={10} aria-hidden="true" /><span>{basePathName(metadata.project)}</span></span> : <span><UiText zh={privateChat ? '独立私聊材料' : '共享会话'} /></span>}
+        {metadata.branch && <span title={uiAttribute('Git 分支：{0}', metadata.branch)}><GitBranch size={10} aria-hidden="true" /><span dir="ltr">{metadata.branch}</span></span>}
+      </>}
     </div>
   </article>
 }
@@ -244,8 +249,8 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     restored.current = stamp
     void props.conversation.restore(props.scope, props.boardId, rows).catch(error => setIssue(readErrorMessage(error)))
   }, [props.scope, props.boardId, props.restoreRevision, props.conversation, graph.loading, graph.readError, graph.pending, graph.snapshot, rows, restoreRetry])
-  const folderPaths = useMemo(() => rows.flatMap(row => row.data.kind === 'folder' && row.data.folderPath ? [row.data.folderPath]
-    : row.data.kind === 'group' ? props.groups?.find(group => group.id === row.data.folderGroupId)?.projectPaths ?? [] : []), [rows, props.groups])
+  const folderPaths = useMemo(() => [...canvasSummaryProjectPaths(rows, catalog.items), ...rows.flatMap(row => row.data.kind === 'folder' && row.data.folderPath ? [row.data.folderPath]
+    : row.data.kind === 'group' ? props.groups?.find(group => group.id === row.data.folderGroupId)?.projectPaths ?? [] : [])], [rows, props.groups, catalog.items])
   const folders = useCanvasFolders(folderPaths)
   const folderResolutions = props.folderResolutions ?? folders.resolutions
   const referenceOptions = useMemo(() => props.references ?? canvasReferenceOptions(catalog.items), [props.references, catalog.items, language])
@@ -375,7 +380,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     } catch (error) { setIssue(readErrorMessage(error)) }
     finally { presentingRef.current = false; setPresenting(false) }
   }
-  const actions: Presentation = { ...props, terminalVersion: graph.snapshot?.terminalVersion, openConversation: (row, reference, member) => { void openConversation(row, reference, member) }, resolvedMembers: regions, blocked, expandedRegions: expanded, title,
+  const actions: Presentation = { ...props, folderResolutions, terminalVersion: graph.snapshot?.terminalVersion, openConversation: (row, reference, member) => { void openConversation(row, reference, member) }, resolvedMembers: regions, blocked, expandedRegions: expanded, title,
     noteRevision: graph.snapshot?.board?.revision ?? 0,
     noteDirty: (nodeId, dirty) => { if (dirty) dirtyNotes.current.add(nodeId); else dirtyNotes.current.delete(nodeId) },
     saveNote: async (row, content, revision) => { await submit({ type: 'update', nodeId: row.id, patch: { content } }, revision) },

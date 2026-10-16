@@ -1,6 +1,6 @@
 // Codeg aff1e6c278453ed8d0b96a5f664edcdca621aa3f region membership, adapted to Core Thread/private identities.
 // Apache-2.0: integration/licenses/codeg/LICENSE. Business relationships remain Core-owned.
-import type { CanvasConversationRef, CanvasNode, CanvasThreadReference, WorkspaceWorktree } from '@contracts'
+import type { AgentProfile, CanvasConversationRef, CanvasNode, CanvasThreadReference, WorkspaceWorktree } from '@contracts'
 import type { CanvasFolderGroupOption, CanvasReferenceOption } from './CanvasNodeEditor'
 import type { CanvasReferenceState } from './canvas-reference-controller'
 import { canvasReferenceKey } from './canvas-layout'
@@ -12,6 +12,53 @@ export interface CanvasFolderResolution {
   worktrees?: readonly WorkspaceWorktree[]
 }
 export interface CanvasRegionResolution { references: CanvasReferenceOption[]; complete: boolean; issue?: string }
+
+/** Only ask the existing bounded folder reader for projects represented by these summary cards. */
+export function canvasSummaryProjectPaths(nodes: readonly CanvasNode[], threads: readonly CanvasThreadReference[]): string[] {
+  const ids = new Set<string>()
+  for (const { data } of nodes) {
+    if (data.kind === 'conversation' && data.conversation && !data.objectReference) ids.add(data.conversation.threadId)
+    if (data.kind === 'custom') data.conversations.forEach(reference => ids.add(reference.threadId))
+    if (data.kind === 'agent') for (const thread of threads) {
+      if (thread.members.some(member => (!data.agentId || member.agentId === data.agentId) && (!data.runtimeKind || member.runtimeKind === data.runtimeKind))) ids.add(thread.threadId)
+    }
+  }
+  return [...new Set(threads.filter(thread => ids.has(thread.threadId) && thread.projectBindingKind === 'directory').map(thread => thread.projectPath))]
+}
+
+/** Configured model is labelled as configuration, never as an observed native session model. */
+export function canvasSummaryMetadata(reference: CanvasConversationRef, threads: readonly CanvasThreadReference[],
+  agents: readonly Pick<AgentProfile, 'agentId' | 'displayName' | 'runtimeConfiguration' | 'presence' | 'removedAt'>[],
+  folders?: ReadonlyMap<string, CanvasFolderResolution>): { model: string | null; modelTitle: string | null; project: string | null; branch: string | null; active: boolean | undefined } {
+  const thread = threads.find(item => item.threadId === reference.threadId)
+  const conversation = reference.conversationId ? thread?.privateConversations.find(item => item.conversationId === reference.conversationId) : null
+  const members = thread?.members.filter(member => !reference.conversationId || conversation?.agentId === member.agentId) ?? []
+  const configured = members.flatMap(member => {
+    const profile = agents.find(item => item.agentId === member.agentId && item.presence !== 'removed' && item.removedAt === null)
+    const config = profile?.runtimeConfiguration
+    return config?.adapterKind === member.runtimeKind && config.model.mode === 'explicit' && config.model.modelId
+      ? [{ name: member.displayName, model: config.model.modelId }] : []
+  })
+  const models = [...new Set(configured.map(item => item.model))]
+  const project = thread?.projectBindingKind === 'directory' ? thread.projectPath : null
+  let branch: string | null = null
+  if (project && folders) {
+    const exact = folders.get(project)
+    // A failed exact refresh must not be masked by a different cached region.
+    const candidates = exact ? [exact] : [...folders.values()].filter(value => value.worktrees?.some(item => item.projectPath === project))
+    const branches = candidates.flatMap(value => {
+      if (!value.complete) return []
+      const checkout = value.worktrees?.find(item => item.projectPath === (value === exact ? value.projectPath : project))
+      return checkout?.available && !checkout.bare && !checkout.prunable && !checkout.detached && checkout.branch ? [checkout.branch] : []
+    })
+    if (branches.length && new Set(branches).size === 1) branch = branches[0]
+  }
+  const active = reference.conversationId ? conversation?.hasActiveRun
+    : thread?.publicActiveRunCount === undefined ? undefined : thread.publicActiveRunCount > 0
+  return { active, model: models.length ? uiAttribute('配置：{0}', models.join(' · ')) : null,
+    modelTitle: configured.length ? uiAttribute('模型配置：{0}', configured.map(item => `${item.name}: ${item.model}`).join('；')) : null, project, branch }
+}
+
 const recency = (value: string) => Number.isFinite(Date.parse(value)) ? Date.parse(value) : 0
 function optionsForThread(thread: CanvasThreadReference, memberIds?: ReadonlySet<string>): Array<CanvasReferenceOption & { updatedAt: string }> {
   const title = thread.missionId ? uiAttribute('使命：{0}', thread.title) : thread.title

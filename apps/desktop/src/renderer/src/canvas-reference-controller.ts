@@ -20,7 +20,7 @@ export function canvasReferencesInvalidation(event: CoreEvent): number | null {
   if (batch.resetRequired) return counter(batch.throughGlobalSequence)
   let sequence: number | null = null
   for (const item of Array.isArray(batch.events) ? batch.events : []) {
-    if (/^(camp[._]|camp_member[._]|agent_profile[._]|conversation[._]|single_chat[._]|mission[._])/.test(item.eventType)) {
+    if (/^(camp[._]|camp_member[._]|agent_profile[._]|agent_run[._]|conversation[._]|single_chat[._]|mission[._])/.test(item.eventType)) {
       sequence = Math.max(sequence ?? 0, counter(item.globalSequence))
     }
   }
@@ -90,7 +90,9 @@ export class CanvasReferenceController {
             || typeof item.title !== 'string' || typeof item.projectPath !== 'string'
             || !Array.isArray(item.members) || !Array.isArray(item.privateConversations)) throw new Error('对话目录分页未前进或归属不一致。')
           const members = new Set(item.members.map(member => member.agentId))
-          if (item.privateConversations.some(conversation => !conversation.conversationId || !members.has(conversation.agentId))) throw new Error('单聊与队员归属不一致。')
+          if (item.publicActiveRunCount !== undefined && (!Number.isSafeInteger(item.publicActiveRunCount) || item.publicActiveRunCount < 0)) throw new Error('会话运行数量无效。')
+          if (item.privateConversations.some(conversation => !conversation.conversationId || !members.has(conversation.agentId)
+            || conversation.hasActiveRun !== undefined && typeof conversation.hasActiveRun !== 'boolean')) throw new Error('单聊与队员归属不一致。')
           previous = item.threadId
         }
         if (page.nextAfterThreadId !== null && (!page.items.length || page.nextAfterThreadId !== previous || page.nextAfterThreadId === after)) {

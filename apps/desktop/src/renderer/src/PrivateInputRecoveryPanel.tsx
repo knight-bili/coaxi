@@ -2,9 +2,11 @@ import { useId, useState } from 'react'
 import type { PrivateInputController, PrivateInputState } from './private-input-controller'
 import { UiText, uiAttribute } from './interface-language'
 import { AttachmentCard } from './AttachmentCard'
+import { readErrorMessage } from './error-message'
 
 export function privateInputErrorMessage(error: unknown): string {
-  const code = error instanceof Error ? error.message : ''
+  const code = readErrorMessage(error, '')
+  if (code === 'attachment_missing' || code === 'single_chat.attachment_missing') return uiAttribute('附件文件已被移动或删除，请重新选择文件；当前输入已保留。')
   if (code === 'single_chat.draft_changed' || code === 'single_chat.retained_changed') return uiAttribute('输入材料刚刚发生变化，请重新读取后再试。')
   if (code === 'single_chat.pending_input_changed') return uiAttribute('这条排队消息刚刚发生变化，请重试。')
   if (code === 'single_chat.no_legacy_materials') return uiAttribute('默认输入中没有可迁入的材料，原输入已保留。')

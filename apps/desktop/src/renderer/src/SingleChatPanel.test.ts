@@ -2,6 +2,9 @@ import { readFileSync } from 'node:fs'
 // Keep JSX explicit so this suite remains within the repository's discovered `.test.ts` pattern.
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
+import { privateInputErrorMessage } from './PrivateInputRecoveryPanel'
+import { ThreadClientProvider } from './camp-client'
+import { desktopThreadClient } from './desktop-camp-client'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type {
   AgentRunExecutionEvidenceView,
@@ -27,6 +30,14 @@ import {
 } from './SingleChatPanel'
 
 const source = readFileSync(new URL('./SingleChatPanel.tsx', import.meta.url), 'utf8')
+
+it('gives missing-file recovery guidance for native and bridge errors without interpreting unknown failures as missing files', () => {
+  const message = '附件文件已被移动或删除，请重新选择文件；当前输入已保留。'
+  expect(privateInputErrorMessage(new Error('attachment_missing'))).toBe(message)
+  expect(privateInputErrorMessage({ message: 'single_chat.attachment_missing' })).toBe(message)
+  expect(privateInputErrorMessage({ message: 'single_chat.attachment_source_changed' })).toContain('原材料文件已变化或不可读')
+  expect(privateInputErrorMessage({ message: 'unrelated_transport_failure' })).not.toBe(message)
+})
 
 function run(overrides: Partial<SingleChatRunView> = {}): SingleChatRunView {
   return {
@@ -225,13 +236,16 @@ describe('Single Chat presentation', () => {
   })
 
   it('puts avatars in the selector trigger while keeping the transcript avatar-free', () => {
-    const markup = renderToStaticMarkup(createElement(SingleChatPanel, {
+    const client = Object.create(desktopThreadClient) as typeof desktopThreadClient
+    client.editingRecovery = { get: () => undefined, set: () => undefined }
+    const panel = createElement(SingleChatPanel, {
       threadId: 'rvcamp_01m1jkkpkzfvgraw1p4r9zfb7v',
       members: [member],
       visible: true,
       onOpen: () => undefined,
       onClose: () => undefined
-    }))
+    })
+    const markup = renderToStaticMarkup(createElement(ThreadClientProvider, { client, children: panel }))
     expect(markup).toContain('single-chat-target-trigger')
     expect(markup).toContain('member-avatar')
     expect(source).not.toMatch(/single-chat-(?:user-message|agent-response)[\s\S]{0,180}<MemberAvatar/)

@@ -17,6 +17,7 @@ pub struct CanvasPrivateReference {
     pub conversation_id: String,
     pub agent_id: String,
     pub updated_at: String,
+    pub has_active_run: bool,
 }
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -30,6 +31,7 @@ pub struct CanvasThreadReference {
     pub mission_id: Option<String>,
     pub members: Vec<CanvasReferenceMember>,
     pub private_conversations: Vec<CanvasPrivateReference>,
+    pub public_active_run_count: u64,
 }
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -73,7 +75,10 @@ WHERE member.camp_id IN (SELECT value FROM json_each(?1))
 ORDER BY member.camp_id, profile.member_order, profile.id
 "#;
 const PRIVATE_SQL: &str = r#"
-SELECT conversation.camp_id, conversation.id, conversation.agent_id, conversation.updated_at
+SELECT conversation.camp_id, conversation.id, conversation.agent_id, conversation.updated_at,
+       EXISTS(SELECT 1 FROM agent_run run WHERE run.conversation_id = conversation.id
+              AND run.camp_id = conversation.camp_id AND run.invocation_kind = 'single_chat'
+              AND run.status IN ('queued', 'running', 'waiting'))
 FROM conversation
 JOIN camp_member member ON member.camp_id = conversation.camp_id AND member.agent_id = conversation.agent_id
 JOIN agent_profile profile ON profile.id = conversation.agent_id
@@ -81,6 +86,13 @@ WHERE conversation.camp_id IN (SELECT value FROM json_each(?1))
   AND conversation.kind = 'single_chat' AND conversation.ended_at IS NULL
   AND member.status = 'active' AND profile.profile_status <> 'removed'
 ORDER BY conversation.camp_id, conversation.updated_at DESC, conversation.id DESC
+"#;
+const ACTIVE_PUBLIC_SQL: &str = r#"
+SELECT COALESCE(run.camp_id, task.camp_id), COUNT(*)
+FROM agent_run run LEFT JOIN task ON task.id = run.task_id
+WHERE COALESCE(run.camp_id, task.camp_id) IN (SELECT value FROM json_each(?1))
+  AND run.invocation_kind <> 'single_chat' AND run.status IN ('queued', 'running', 'waiting')
+GROUP BY COALESCE(run.camp_id, task.camp_id)
 "#;
 
 fn read_page(
@@ -117,6 +129,7 @@ fn read_page(
                     mission_id: row.get(6)?,
                     members: Vec::new(),
                     private_conversations: Vec::new(),
+                    public_active_run_count: 0,
                 })
             },
         )?
@@ -156,6 +169,7 @@ fn read_page(
                     conversation_id: row.get(1)?,
                     agent_id: row.get(2)?,
                     updated_at: row.get(3)?,
+                    has_active_run: row.get(4)?,
                 },
             ))
         })?
@@ -163,6 +177,17 @@ fn read_page(
     for (id, conversation) in conversations {
         if let Some(index) = positions.get(&id) {
             items[*index].private_conversations.push(conversation);
+        }
+    }
+    let active = tx
+        .prepare(ACTIVE_PUBLIC_SQL)?
+        .query_map([&ids], |row| {
+            Ok((row.get::<_, String>(0)?, row.get::<_, u64>(1)?))
+        })?
+        .collect::<rusqlite::Result<Vec<_>>>()?;
+    for (id, count) in active {
+        if let Some(index) = positions.get(&id) {
+            items[*index].public_active_run_count = count;
         }
     }
     let next_after_thread_id = if has_more {
@@ -220,6 +245,10 @@ mod tests {
         assert_eq!(first.items[1].mission_id.as_deref(), Some("mission"));
         assert_eq!(first.items[1].title, "mission title");
         assert_eq!(first.items[0].members.len(), 1);
+        assert_eq!(first.items[0].public_active_run_count, 2);
+        assert_eq!(first.items[1].public_active_run_count, 2);
+        assert!(first.items[0].private_conversations[0].has_active_run);
+        assert!(!first.items[1].private_conversations[0].has_active_run);
         assert_eq!(
             first.items[0].members[0].runtime_kind.as_deref(),
             Some("codex-cli")
@@ -263,6 +292,8 @@ CREATE TABLE prepared_attachment(camp_id TEXT,client_id TEXT);
 CREATE TABLE agent_profile(id TEXT,display_name TEXT,selected_runtime_adapter_kind TEXT,profile_status TEXT,member_order INTEGER);
 CREATE TABLE camp_member(camp_id TEXT,agent_id TEXT,status TEXT);
 CREATE TABLE conversation(camp_id TEXT,id TEXT,agent_id TEXT,updated_at TEXT,kind TEXT,ended_at TEXT);
+CREATE TABLE task(id TEXT PRIMARY KEY,camp_id TEXT);
+CREATE TABLE agent_run(id TEXT PRIMARY KEY,camp_id TEXT,task_id TEXT,conversation_id TEXT,invocation_kind TEXT,status TEXT);
 CREATE TABLE event_sequence(singleton INTEGER PRIMARY KEY,last_sequence INTEGER); INSERT INTO event_sequence VALUES(1,9);
 INSERT INTO camp VALUES('a','public','directory','/project','time',1,NULL,'active'),('b','old title','directory','/project','time',1,NULL,'active'),
  ('deleted','removed','directory','/project','time',1,'deletion','active'),('foreign-pending','foreign','quick_chat','/quick','time',1,NULL,'pending'),
@@ -271,7 +302,14 @@ INSERT INTO mission VALUES('mission','b','mission title','time');
 INSERT INTO pending_camp_draft_presence VALUES('own-pending','desktop'),('foreign-pending','other');
 INSERT INTO agent_profile VALUES('agent-a','A','codex-cli','present',1),('agent-b','B','gemini-cli','present',2),('removed','Gone','codex-cli','removed',3);
 INSERT INTO camp_member VALUES('a','agent-a','active'),('a','agent-b','left'),('a','removed','active');
+INSERT INTO camp_member VALUES('b','agent-a','active');
 INSERT INTO conversation VALUES('a','private-a','agent-a','time','single_chat',NULL),('a','ended','agent-a','time','single_chat','ended'),
  ('a','public-route','agent-a','time','public',NULL),('a','left-member','agent-b','time','single_chat',NULL),('a','removed-profile','removed','time','single_chat',NULL);
+INSERT INTO conversation VALUES('b','private-b','agent-a','time','single_chat',NULL);
+INSERT INTO task VALUES('legacy-task','b'),('wrong-task','a');
+INSERT INTO agent_run VALUES('public-queued','a',NULL,NULL,'camp_request','queued'),('public-waiting','a',NULL,NULL,'camp_request','waiting'),
+ ('completed','a',NULL,NULL,'camp_request','succeeded'),('private','a',NULL,'private-a','single_chat','running'),
+ ('private-foreign','b',NULL,'private-a','single_chat','running'),('legacy-run',NULL,'legacy-task',NULL,'task','running'),
+ ('direct-owner','b','wrong-task',NULL,'task','queued'),('private-wrong-camp','a',NULL,'private-b','single_chat','waiting');
 "#;
 }

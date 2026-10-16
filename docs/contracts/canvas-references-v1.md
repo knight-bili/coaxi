@@ -4,7 +4,7 @@ contract: canvas-references-v1
 authority: core-canvas-business-reference-directory
 status: accepted
 version: 1
-last_updated: 2026-10-15
+last_updated: 2026-10-17
 ---
 
 # Canvas References v1
@@ -23,7 +23,13 @@ User 通过 Native Core 或已认证 Host 使用 `canvas.references.page`，参�
 每个 item 包含 `threadId,title,projectBindingKind,projectPath,updatedAt,version,missionId`，以及：
 
 - `members:[{agentId,displayName,runtimeKind}]`，只含实际 active membership 和未移除队员。
-- `privateConversations:[{conversationId,agentId,updatedAt}]`，只含这些队员实际存在且未结束的 single_chat。
+- `privateConversations:[{conversationId,agentId,updatedAt,hasActiveRun?}]`，只含这些队员实际存在且未结束的 single_chat。
+- `publicActiveRunCount?`，本 Thread 的公开非终态 Run 数量，不含任何 single_chat Run。
+
+两项活动字段为兼容性可选字段：当前 Core 总是返回，旧 Host 省略时客户端保留未知，不能填零或显示空闲。
+非终态沿原 Navigation/Single Chat 定义为 queued、running、waiting；私聊按同一 camp_id、精确 conversation_id
+及 single_chat invocation 核对。公开数量以 Run 的直接 camp_id 为先，只有缺失时才沿原 task 归属兼容；
+历史任务不能覆盖直接归属。计数不表示 Runtime 已开始推理、模型可用或任务一定成功。
 
 `runtimeKind` 是该队员当前配置的产品类型，不代表平台已验收、模型可用或历史 Run 使用的产品。
 title 对使命 Thread 使用现行使命标题，missionId 保持实际业务身份；不在普通侧栏创建使命镜像。
@@ -35,7 +41,7 @@ title 对使命 Thread 使用现行使命标题，missionId 保持实际业务�
 `id > afterThreadId AND id <= upperThreadId` 按身份升序推进；末页 nextAfterThreadId=null。
 活动时间变化不改变分页身份位置，上界之后创建的新对象留待下一轮读取。上界只是读范围，不是访问授权。
 
-每页的 Thread、成员、私有单聊和 throughGlobalSequence 来自同一个只读事务。
+每页的 Thread、成员、私有单聊、活动计数和 throughGlobalSequence 来自同一个只读事务。
 整轮不冻结跨页事务：业务仍可变化，客户端遇到相关失效时必须补读；不能把分页上界称为全目录业务快照。
 请求沿已有有界独立读取队列运行，SQLite仍使用同一个数据库锁。读取不创建会话、Run、Manifest、草稿或通知。
 
@@ -44,7 +50,8 @@ title 对使命 Thread 使用现行使命标题，missionId 保持实际业务�
 客户端先订阅再读，固定同一 Host/editor；逐页校验schema、上界、序号、身份递增和私有单聊成员归属。
 拒绝循环游标、重复身份、跨上界与迟到旧主机结果。完整读取后才能把缺失引用标为不可用；
 读取失败或读取中失效保留已知结果并标记未完整，trailing读取收敛，不应用事件 payload 作为目录状态。
-普通画布布局事件不触发目录全量刷新。
+普通画布布局事件不触发目录全量刷新。agent_run 业务事件与其他相关失效进入同一个合并刷新器；
+不按每张摘要卡创建 Thread 读取或轮询。目录尚未完整时不显示活动状态点，避免把旧结果显示为当前状态。
 
 队员区域按实际 active membership 过滤，不能只按 Default Lead；agentId和runtimeKind同时指定时必须
 匹配同一位成员。私有单聊还须匹配该成员，不能因共用threadId而混入其他队员单聊。
@@ -59,11 +66,12 @@ custom 展示保留精确公开/私有引用并按实际活动时间排序；缺
 ## 验证边界
 
 `read_model::canvas_references`的最小SQLite owner拥有pending编辑端、删除fence、Mission纳入、
-active成员与精确私有身份、keyset分页及只读行为；不启动完整Database或Runtime。
+active成员与精确私有身份、公开/私聊活动隔离及旧 task fallback、keyset分页及只读行为；不启动完整Database或Runtime。
 最低命令为`cargo test -p rovai-core --lib read_model::canvas_references`，按阶段批量规则留待I03候选编译。
 `application`既有读取队列owner扩展准入断言，不新增重复队列fixture。
 
 TypeScript controller owner拥有完整多页、错误分页/归属、相关失效后的补读和旧Host销毁；
 model owner拥有成员交叉过滤、精确引用、目录关系与失效成员保留。
+R09扩展原同一Rust owner，没有新增测试。新增活动投影仍待集中候选编译及真实Host/UI核定。
 本地额外用Node内存SQLite执行当前Rust原文SQL，只证明这些SQL与最小夹具的行为，不能替代Rust类型检查、
 真实Core/Host、实际UI或模型与平台资格。上述实际验证继续留在阶段候选。

@@ -216,6 +216,12 @@ Mission纳入、active成员与私有Conversation归属及只读计数。旧Navi
 `canvas-reference-controller.test.ts`拥有多页上界、游标/归属拒绝、读取中失效与dispose，`canvas-reference-model.test.ts`
 拥有同成员Runtime过滤、公开/私有/Mission精确引用和显式目录关系；两者均不启动Core或模型。
 
+R09继续扩展原 `read_model::canvas_references::tests::pages_metadata_with_exact_editor_membership_and_private_identity_without_read_side_writes`
+owner，覆盖公开非终态计数、私聊精确归属、终态排除与历史task fallback，不新增Rust owner或完整数据库fixture。
+本批只执行原文SQL见证，Rust编译/执行及真实Host活动刷新留待累计候选。上述TypeScript两个owner扩展模型配置归属、
+精确工作树分支/缺字段未知、公开与私聊状态隔离及agent_run失效；原 `SingleChatPanel.test.ts` 扩展缺失附件错误指引。
+原静态面板owner显式注入内存编辑恢复，避免在无window环境中触发Native存储getter；不将该替身算作Native保存资格。
+
 画布Renderer读模型由`canvas-graph-controller.test.ts`拥有订阅/读取竞争、Host/画板切换隔离、未知手势原编号与
 版本保留、提交后读取失败、冲突低版本拒绝及回查/显式重试并发；复用既有refresh coordinator，不重测其通用重试矩阵。
 这类异步客户端归属不能由Core数据库owner证明，使用受控Promise与本地fake transport，无Electron/Core/模型。

@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
-import type { CanvasNode, CanvasNodeData, CanvasThreadReference } from '@contracts'
+import type { AdapterKind, AgentProfile, CanvasNode, CanvasNodeData, CanvasThreadReference } from '@contracts'
 import type { CanvasReferenceState } from './canvas-reference-controller'
-import { canvasReferenceOptions, canvasSavedReference, resolveCanvasRegion } from './canvas-reference-model'
+import { canvasReferenceOptions, canvasSavedReference, canvasSummaryMetadata, canvasSummaryProjectPaths, resolveCanvasRegion, type CanvasFolderResolution } from './canvas-reference-model'
 
 const thread = (threadId: string, projectPath = '/project'): CanvasThreadReference => ({ threadId, projectPath, projectBindingKind: 'directory',
   title: threadId, updatedAt: '2026-10-15T00:00:00Z', version: 1, missionId: null,
@@ -55,4 +55,50 @@ it('retains unavailable curated references without silently deleting them or rep
   const resolved = resolveCanvasRegion(region, state, [])
   expect(resolved.references.map(item => item.reference)).toEqual([selected[1], selected[0], selected[2]])
   expect(resolved.references[2].available).toBe(false); expect(region).toEqual(before)
+})
+
+const summaryProfile = (agentId: string, modelId: string, adapterKind: AdapterKind): Pick<AgentProfile, 'agentId' | 'displayName' | 'runtimeConfiguration' | 'presence' | 'removedAt'> => ({
+  agentId, displayName: agentId, presence: 'present', removedAt: null,
+  runtimeConfiguration: { adapterKind, model: { mode: 'explicit', modelId, options: {} }, permissions: { adapterKind, schemaVersion: 1, values: {} } }
+})
+
+it('shows only the exact private teammate configuration and never invents an observed model for defaults, removed or mismatched runtimes', () => {
+  const threads = [thread('one')], a = summaryProfile('a', 'model-a', 'codex-cli'), b = summaryProfile('b', 'model-b', 'gemini-cli')
+  const privateRef = { threadId: 'one', conversationId: 'one-private-b' }
+  expect(canvasSummaryMetadata(privateRef, threads, [a, b])).toMatchObject({ model: '配置：model-b', modelTitle: '模型配置：B: model-b' })
+  expect(canvasSummaryMetadata({ threadId: 'one', conversationId: null }, threads, [a, b]).model).toBe('配置：model-a · model-b')
+  expect(canvasSummaryMetadata({ threadId: 'one', conversationId: 'ended' }, threads, [a, b]).model).toBeNull()
+  expect(canvasSummaryMetadata(privateRef, threads, [a, { ...b, presence: 'removed' }]).model).toBeNull()
+  expect(canvasSummaryMetadata(privateRef, threads, [a, summaryProfile('b', 'wrong', 'codex-cli')]).model).toBeNull()
+  expect(canvasSummaryMetadata(privateRef, threads, [a, { ...b, runtimeConfiguration: { ...b.runtimeConfiguration!, model: { mode: 'runtime_default' } } }]).model).toBeNull()
+})
+
+it('keeps public and exact private activity separate and leaves old Host activity unknown', () => {
+  const reference = { threadId: 'one', conversationId: null }, original = thread('one')
+  expect(canvasSummaryMetadata(reference, [original], []).active).toBeUndefined()
+  const current = { ...original, publicActiveRunCount: 3, privateConversations: original.privateConversations.map((item, n) => ({ ...item, hasActiveRun: n === 0 })) }
+  expect(canvasSummaryMetadata(reference, [current], []).active).toBe(true)
+  expect(canvasSummaryMetadata({ ...reference, conversationId: 'one-private-b' }, [current], []).active).toBe(false)
+  expect(canvasSummaryMetadata({ ...reference, conversationId: 'one-private-a' }, [{ ...current, publicActiveRunCount: 0 }], []).active).toBe(true)
+  expect(canvasSummaryMetadata({ ...reference, conversationId: 'ended' }, [current], []).active).toBeUndefined()
+})
+
+it('reads branch only from the exact verified checkout including aliases and hides it after failed refresh, detached HEAD or missing old Host metadata', () => {
+  const threads = [thread('one', '/alias')], reference = { threadId: 'one', conversationId: null }
+  const relation: CanvasFolderResolution = { paths: ['/alias', '/checkout'], complete: true, projectPath: '/checkout', worktrees: [{ projectPath: '/checkout', isMain: false, bare: false, locked: false, prunable: false, available: true, branch: '功能/中文', detached: false }] }
+  const metadata = (value: CanvasFolderResolution) => canvasSummaryMetadata(reference, threads, [], new Map([['/alias', value]]))
+  expect(metadata(relation)).toMatchObject({ project: '/alias', branch: '功能/中文' })
+  expect(metadata({ ...relation, complete: false }).branch).toBeNull()
+  for (const patch of [{ detached: true, branch: null }, { branch: undefined }, { available: false }, { prunable: true }, { projectPath: '/other' }]) {
+    expect(metadata({ ...relation, worktrees: [{ ...relation.worktrees![0], ...patch }] }).branch).toBeNull()
+  }
+  expect(canvasSummaryMetadata(reference, [{ ...threads[0], projectBindingKind: 'quick_chat' }], [], new Map([['/alias', relation]]))).toMatchObject({ project: null, branch: null })
+})
+
+it('adds summary project reads only for represented references and matching agent/runtime memberships, without treating object pins or quick chats as checkouts', () => {
+  const threads = [thread('one'), thread('two', '/other'), { ...thread('quick', '/quick'), projectBindingKind: 'quick_chat' as const }]
+  expect(canvasSummaryProjectPaths([node({ kind: 'conversation', conversation: { threadId: 'one', conversationId: null } }), node({ kind: 'custom', conversations: [{ threadId: 'quick', conversationId: null }] })], threads)).toEqual(['/project'])
+  expect(canvasSummaryProjectPaths([node({ kind: 'conversation', conversation: { threadId: 'one', conversationId: null }, objectReference: { kind: 'mission', missionId: 'mission' } })], threads)).toEqual([])
+  expect(canvasSummaryProjectPaths([node({ kind: 'agent', agentId: 'a', runtimeKind: 'gemini-cli' })], threads)).toEqual([])
+  expect(canvasSummaryProjectPaths([node({ kind: 'agent', agentId: 'a', runtimeKind: 'codex-cli' })], threads)).toEqual(['/project', '/other'])
 })

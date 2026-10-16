@@ -4392,7 +4392,7 @@ export type CanvasObjectReference =
 export interface CanvasFileReference { threadId: string }
 
 export interface CanvasReferenceMember { agentId: string; displayName: string; runtimeKind: AdapterKind | null }
-export interface CanvasPrivateReference { conversationId: string; agentId: string; updatedAt: string }
+export interface CanvasPrivateReference { conversationId: string; agentId: string; updatedAt: string; hasActiveRun?: boolean }
 export interface CanvasThreadReference {
   threadId: string
   title: string
@@ -4403,6 +4403,8 @@ export interface CanvasThreadReference {
   missionId: string | null
   members: CanvasReferenceMember[]
   privateConversations: CanvasPrivateReference[]
+  /** Omitted by older Hosts. Counts only public nonterminal Runs, never a private card's activity. */
+  publicActiveRunCount?: number
 }
 export interface CanvasReferencePage {
   schemaVersion: 1

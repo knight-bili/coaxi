@@ -30,6 +30,7 @@ it('reads every page under one upper bound and ignores graph-only events without
   expect(transport.controller.getSnapshot()).toMatchObject({ complete: true, loading: false, pagesRead: 2 })
   expect(transport.controller.getSnapshot().items.map(item => item.threadId)).toEqual(['a', 'b'])
   expect(canvasReferencesInvalidation({ method: 'events.batch', params: { events: [{ eventType: 'canvas.node.moved', globalSequence: 20 }] } })).toBeNull()
+  expect(canvasReferencesInvalidation({ method: 'events.batch', params: { events: [{ eventType: 'agent_run.status_changed', globalSequence: 20 }] } })).toBe(20)
   transport.emit({ method: 'canvas.board.invalidated', params: { boardId: 'unrelated' } })
   await vi.advanceTimersByTimeAsync(200); expect(transport.calls).toHaveLength(2)
   transport.emit({ method: 'single_chat.changed', params: {} })
@@ -43,7 +44,9 @@ it('rejects looping pages, changed bounds and mismatched private owners without 
   for (const invalid of [
     () => page(['a'], 'a', 'b'),
     () => page(['b'], null, 'c'),
-    () => ({ ...page(['b'], null, 'b'), items: [{ ...row('b'), privateConversations: [{ conversationId: 'private', agentId: 'foreign', updatedAt: 'time' }] }] })
+    () => ({ ...page(['b'], null, 'b'), items: [{ ...row('b'), privateConversations: [{ conversationId: 'private', agentId: 'foreign', updatedAt: 'time' }] }] }),
+    () => ({ ...page(['b'], null, 'b'), items: [{ ...row('b'), publicActiveRunCount: -1 }] }),
+    () => ({ ...page(['b'], null, 'b'), items: [{ ...row('b'), publicActiveRunCount: Number.NaN }] })
   ]) {
     const transport = fixture(async params => params.afterThreadId === null ? page(['a'], 'a', 'b') : invalid())
     transport.controller.start(); await vi.advanceTimersByTimeAsync(0)
