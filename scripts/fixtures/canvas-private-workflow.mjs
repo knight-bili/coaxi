@@ -77,12 +77,18 @@ export async function beginHeldPrivateRun(rpc, context, capture) {
   return held.agentRuns.find(run => run.id === held.conversation.activeAgentRunId)?.id
 }
 
-export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait, openCanvasBoard, config, report, record }) {
-  assert.ok(['private-roundtrip', 'private-queue'].includes(config.mode))
+export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait, openCanvasBoard, config, report, record, seam }) {
+  assert.ok(['private-roundtrip', 'private-queue', 'private-rebind', 'private-late-upload'].includes(config.mode))
+  assert.ok(seam, 'private Native modes require an observed production IPC transport')
   window.unmaximize(); window.setContentSize(1680, 1000); window.webContents.setZoomFactor(1)
   const context = await preparePrivateWorkflow({ rpc, config, record })
   report.private_workflow_context = context
   const { threadId, conversationId, boardId, scopes, quoteMessage } = context
+  const ownedConversations = new Map([[conversationId, threadId]])
+  const waitMain = async predicate => {
+    const deadline = Date.now() + 20_000
+    while (!predicate()) { assert.ok(Date.now() < deadline, 'Main fault observation timed out'); await pause(50) }
+  }
   const frame = index => `document.querySelector('.canvas-conversation-frame[data-canvas-conversation-key*="${scopes[index].nodeId}"]')`
   const input = index => `${frame(index)}?.querySelector('.single-chat-composer textarea')`
   const get = scope => rpc('singleChat.get', { conversationId, composerScope: scope })
@@ -128,12 +134,16 @@ export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait
   }
   try {
     await openCanvasBoard(evaluate, wait, boardId)
+    const readingMark = seam.mark()
     await open(2)
     const recovery = await rpc('singleChat.composerDraft.recovery', { threadId, conversationId })
     assert.ok(!recovery.items.some(item => item.kind === 'scope' && item.scope.composerScope?.nodeId === scopes[2].nodeId))
     assert.equal((await get(scopes[2])).draft.revision, 0)
     assert.equal((await get(null)).agentRuns.length, context.primeRunIds.length)
-    record('actual_opening_of_empty_private_pin_reads_history_without_registering_scope_or_starting_a_run')
+    const readingCalls = seam.since(readingMark).filter(entry => entry.threadId === threadId)
+    assert.ok(!readingCalls.some(entry => ['threads.enter', 'camps.enter', 'singleChat.open', 'singleChat.send'].includes(entry.method)))
+    report.readonly_calls = readingCalls
+    record('actual_empty_pin_open_reads_history_without_scope_registration_enter_or_execution')
     await evaluate(`(()=>{document.querySelector('[data-id="${scopes[2].nodeId}"] button[aria-label="收起对话"]').click();return true})()`)
     await wait(`!${frame(2)}`)
     await open(0); await open(1)
@@ -169,6 +179,107 @@ export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait
         attachments: names(before.draft), undoValue, restoredBody: text }
       record('same_native_inline_drawer_roundtrip_preserves_body_attachments_quote_order_revision_editor_and_preexisting_undo_redo')
       await writeFile(join(config.evidence, '01-private-full-input-roundtrip.png'), (await window.webContents.capturePage()).toPNG())
+      const conflictMark = seam.mark()
+      seam.armConflict({ conversationId, scope: scopes[0], attachmentRefId: before.draft.attachments[0].id })
+      await clickNative(`${frame(0)}.querySelector('.single-chat-composer .message-quotes-trigger')`)
+      await clickNative(`document.querySelector('.message-quotes-popover button.message-quote-remove')`)
+      await waitMain(() => seam.snapshot().faults.some(fault => fault.kind === 'concurrent_material_change'))
+      await wait(`document.body.innerText.includes('输入材料刚刚发生变化')`)
+      const cas = seam.since(conflictMark).find(entry => entry.action === 'quote')
+      assert.equal(cas.status, 'rejected'); assert.equal(cas.code, 'single_chat.draft_changed')
+      assert.equal(await evaluate(`${input(0)}.value`), text)
+      const afterConflict = await get(scopes[0])
+      assert.deepEqual(afterConflict.draft.quotes, before.draft.quotes)
+      assert.deepEqual(afterConflict.draft.attachments, [])
+      assert.deepEqual((await get(scopes[1])).draft, beta.draft)
+      record('real_concurrent_cas_rejection_keeps_visible_local_body_and_does_not_apply_the_stale_quote_removal')
+      await writeFile(join(config.evidence, '02-private-cas-preserves-input.png'), (await window.webContents.capturePage()).toPNG())
+      return
+    }
+    if (config.mode === 'private-rebind' || config.mode === 'private-late-upload') {
+      const originalBody = '原卡片尚未发送、不能转给新私聊的正文'
+      await addMaterial(scopes[0], 'R01 原归属材料.txt', '甲材料对应的问题')
+      await typeBody(0, originalBody)
+      const original = await get(scopes[0])
+      let gate
+      if (config.mode === 'private-late-upload') {
+        gate = seam.holdUpload({ conversationId, scope: scopes[0] })
+        const path = join(config.evidence, '迟到上传原文件.txt')
+        await writeFile(path, '只属于原私聊的迟到上传材料', { flag: 'wx' })
+        const debug = window.webContents.debugger
+        debug.attach('1.3')
+        try {
+          const { root } = await debug.sendCommand('DOM.getDocument', { depth: 0 })
+          const selector = `.canvas-conversation-frame[data-canvas-conversation-key*="${scopes[0].nodeId}"] .single-chat-composer input.composer-file-input`
+          const { nodeId } = await debug.sendCommand('DOM.querySelector', { nodeId: root.nodeId, selector })
+          assert.ok(nodeId)
+          await debug.sendCommand('DOM.setFileInputFiles', { nodeId, files: [path] })
+        } finally { debug.detach() }
+        await waitMain(() => Boolean(gate.observed))
+        assert.equal(gate.observed.state, 'recorded')
+        assert.ok(names((await get(scopes[0])).draft).includes('迟到上传原文件.txt'))
+        const ended = await rpc('singleChat.end', { commandId: randomUUID(), command: { threadId, conversationId } })
+        assert.equal(ended.status, 'applied')
+      }
+      const nextThread = await rpc('camps.create', { commandId: randomUUID(), name: 'R01 换绑后的目标', workspace: null,
+        memberAgentIds: [context.agentId], defaultLeadAgentId: context.agentId, collaborationMode: 'peer' })
+      assert.equal(nextThread.status, 'applied')
+      const nextThreadId = nextThread.payload.threadId
+      const nextOpen = await rpc('singleChat.open', { commandId: randomUUID(), command: { threadId: nextThreadId, agentId: context.agentId } })
+      assert.equal(nextOpen.status, 'applied')
+      const nextId = nextOpen.payload.conversationId
+      assert.notEqual(nextId, conversationId, 'the replacement target must be a distinct private conversation')
+      ownedConversations.set(nextId, nextThreadId)
+      const graph = await rpc('canvas.nodes.snapshot', { boardId })
+      const rebound = await rpc('canvas.nodes.apply', { commandId: randomUUID(), command: { boardId,
+        expectedRevision: graph.board.revision, mutation: { type: 'update', nodeId: scopes[0].nodeId,
+          patch: { conversation: { threadId: nextThreadId, conversationId: nextId } } } } })
+      assert.equal(rebound.status, 'applied', JSON.stringify(rebound))
+      // The old result arrives after its authoritative target ended and the pin
+      // changed. Existing navigation guards may retain the old editor until it
+      // settles; the new input must still begin empty when explicitly reopened.
+      if (gate) { gate.release(); await pause(400) }
+      await openCanvasBoard(evaluate, wait, boardId)
+      if (await evaluate(`Boolean(${frame(0)})`)) {
+        await evaluate(`(()=>{document.querySelector('[data-id="${scopes[0].nodeId}"] button[aria-label="收起对话"]')?.click();return true})()`)
+        await wait(`!${frame(0)}`)
+      }
+      await open(0)
+      await wait(`${input(0)}.value===''`)
+      const replacement = () => rpc('singleChat.get', { conversationId: nextId, composerScope: scopes[0] })
+      const clean = await replacement()
+      assert.deepEqual(clean.draft.attachments, []); assert.deepEqual(clean.draft.quotes, [])
+      assert.deepEqual(clean.messages, []); assert.deepEqual(clean.agentRuns, [])
+      if (gate) {
+        assert.equal(await evaluate(`${input(0)}.value`), '')
+        assert.deepEqual((await replacement()).draft, clean.draft)
+        assert.ok(!(await evaluate(`${frame(0)}.innerText`)).includes('迟到上传原文件.txt'))
+        record('late_real_upload_reply_after_ending_old_conversation_cannot_pollute_rebound_private_composer')
+        await writeFile(join(config.evidence, '01-late-upload-does-not-cross-context.png'), (await window.webContents.capturePage()).toPNG())
+        return
+      }
+      const recovered = await rpc('singleChat.composerDraft.recovery', { threadId, conversationId })
+      assert.ok(recovered.items.some(item => item.kind === 'scope' && item.scope.composerScope?.nodeId === scopes[0].nodeId && item.scope.orphaned))
+      const orphanDraft = (await get(scopes[0])).draft
+      assert.equal(orphanDraft.revision, original.draft.revision)
+      assert.equal(orphanDraft.scopeKey, original.draft.scopeKey)
+      assert.deepEqual(materials(orphanDraft), materials(original.draft))
+      await clickNative(`document.querySelector('[data-id="${scopes[1].nodeId}"] button[aria-label="打开完整工作区"]')`)
+      await wait(`!document.querySelector('.canvas-workspace')`)
+      const trigger = `[...document.querySelectorAll('.single-chat-recovery-trigger')].find(button=>button.checkVisibility()&&!button.disabled)`
+      await clickNative(trigger)
+      await wait(`Boolean([...document.querySelectorAll('.private-input-recovery-location')].find(row=>row.textContent.includes(${JSON.stringify(originalBody)})))`)
+      const location = `[...document.querySelectorAll('.private-input-recovery-location')].find(row=>row.textContent.includes(${JSON.stringify(originalBody)}))`
+      const restoreMark = seam.mark()
+      await clickNative(`[...(${location}).querySelectorAll('button')].find(button=>button.textContent==='在原位置继续编辑')`)
+      const restoredInput = `document.querySelector('.private-input-recovery-editor .single-chat-composer textarea')`
+      await wait(`${restoredInput}?.value===${JSON.stringify(originalBody)}`)
+      assert.ok(await evaluate(`Boolean(document.querySelector('.private-input-recovery-editor .attachment-open[aria-label="打开文件预览 R01 原归属材料.txt"]'))`))
+      assert.ok(!seam.since(restoreMark).some(entry => ['singleChat.open', 'singleChat.send'].includes(entry.method)))
+      assert.deepEqual(materials((await get(scopes[0])).draft), materials(original.draft))
+      assert.deepEqual((await replacement()).draft, clean.draft)
+      record('rebound_node_restores_original_body_and_materials_in_original_private_recovery_editor_without_forwarding_to_new_target')
+      await writeFile(join(config.evidence, '01-original-input-after-node-rebind.png'), (await window.webContents.capturePage()).toPNG())
       return
     }
     const activeRunId = await beginHeldPrivateRun(rpc, context, config.runtime_capture)
@@ -199,14 +310,34 @@ export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait
     assert.ok(saved); assert.deepEqual(materials(saved), materials(queue[1]))
     record('return_to_occupied_card_keeps_existing_complete_input_and_retains_the_other_without_mixing')
     const swap = `[...${frame(0)}.querySelectorAll('.single-chat-retained-inputs button')].find(button=>button.textContent==='切换完整输入')`
+    const swapMark = seam.mark()
+    seam.loseNextSwap({ conversationId, scope: scopes[0] })
+    await clickNative(swap)
+    const retryButton = `[...${frame(0)}.querySelectorAll('.single-chat-retained-inputs button')].find(button=>button.textContent==='明确重试原请求')`
+    await wait(`Boolean(${retryButton})`)
+    const committed = await get(scopes[0]), committedRecovery = await rpc('singleChat.composerDraft.recovery', { threadId, conversationId })
+    await clickNative(retryButton)
+    await wait(`${input(0)}.value===${JSON.stringify(queue[1].body)}`)
+    const attempts = seam.since(swapMark).filter(entry => entry.action === 'swap_retained')
+    assert.equal(attempts.length, 2); assert.equal(attempts[0].commandId, attempts[1].commandId)
+    assert.deepEqual((await get(scopes[0])).draft, committed.draft)
+    assert.deepEqual((await rpc('singleChat.composerDraft.recovery', { threadId, conversationId })).items, committedRecovery.items)
+    record('lost_committed_swap_reply_explicit_retry_reuses_same_uuid_without_swapping_twice')
+    seam.loseNextSwap({ conversationId, scope: scopes[0] })
     await clickNative(swap); await wait(`${input(0)}.value===${JSON.stringify(queue[1].body)}`)
-    assert.deepEqual(materials((await get(scopes[0])).draft), materials(queue[1]))
+    await wait(`Boolean(${retryButton})`)
+    const committedBack = await get(scopes[0]), backMark = seam.mark()
+    await clickNative(`[...${frame(0)}.querySelectorAll('.single-chat-retained-inputs button')].find(button=>button.textContent==='恢复原请求')`)
+    await wait(`${input(0)}.value===${JSON.stringify(queue[0].body)}`)
+    assert.ok(!seam.since(backMark).some(entry => entry.action === 'swap_retained'))
+    assert.deepEqual((await get(scopes[0])).draft, committedBack.draft)
+    assert.deepEqual(materials(committedBack.draft), materials(queue[0]))
     const back = await rpc('singleChat.composerDraft.recovery', { threadId, conversationId })
-    assert.ok(back.items.some(item => item.kind === 'retained' && item.input.body === queue[0].body
-      && JSON.stringify(materials(item.input)) === JSON.stringify(materials(queue[0]))))
+    assert.ok(back.items.some(item => item.kind === 'retained' && item.input.body === queue[1].body
+      && JSON.stringify(materials(item.input)) === JSON.stringify(materials(queue[1]))))
     assert.equal((await get(scopes[0])).conversation.activeAgentRunId, activeRunId)
     assert.equal(await evaluate(`${input(1)}.value`), '')
-    record('actual_full_input_switch_moves_body_and_materials_together_preserving_other_card_and_active_run')
+    record('read_only_reconciliation_recovers_reverse_swap_once_preserving_both_complete_inputs_other_card_and_active_run')
     report.queue_inputs = queue
     await writeFile(join(config.evidence, '01-private-pending-complete-inputs.png'), (await window.webContents.capturePage()).toPNG())
     const leaseBody = '第三份排队消息：用于明确接管', ready = await addMaterial(scopes[1], 'R01 租约材料.txt', '甲材料对应的问题')
@@ -240,9 +371,15 @@ export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait
     record('actual_other_card_takeover_uses_saved_working_input_and_new_token_then_rejects_old_writer_and_saves_its_own_edit')
     await writeFile(join(config.evidence, '02-private-pending-takeover.png'), (await window.webContents.capturePage()).toPNG())
   } finally {
-    const ended = await rpc('singleChat.end', { commandId: randomUUID(), command: { threadId, conversationId } })
-    assert.equal(ended.status, 'applied', JSON.stringify(ended))
-    await waitPrivateSnapshot(rpc, conversationId, value => value.agentRuns.every(terminal))
+    seam.releaseAll()
+    for (const [id, ownerThreadId] of ownedConversations) {
+      const value = await rpc('singleChat.get', { conversationId: id })
+      if (value.conversation.status === 'active') {
+        const ended = await rpc('singleChat.end', { commandId: randomUUID(), command: { threadId: ownerThreadId, conversationId: id } })
+        assert.equal(ended.status, 'applied', JSON.stringify(ended))
+      }
+      await waitPrivateSnapshot(rpc, id, value => value.agentRuns.every(terminal))
+    }
     record('owned_private_workflow_ends_its_conversation_and_settles_only_its_controlled_run')
   }
 }

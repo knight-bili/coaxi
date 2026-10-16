@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { app } from 'electron'
+import { app,ipcMain } from 'electron'
 import { mkdir,readFile,writeFile,stat } from 'node:fs/promises'
 import { basename,join,resolve } from 'node:path'
 import { randomUUID,createHash } from 'node:crypto'
@@ -11,6 +11,8 @@ const config=JSON.parse(await readFile(process.env.ROVAI_C06_NATIVE_CONFIG,'utf8
 const report={source_commit:config.source_commit,scope:'production Main/preload/Core; direct Electron native input events',checks:[],status:'running',started_at:new Date().toISOString()}
 await mkdir(config.evidence,{recursive:false})
 let started=false
+const privateModes=['private-roundtrip','private-queue','private-rebind','private-late-upload']
+let privateWorkflow,privateIpc
 const record=(name,details={})=>{report.checks.push({name,passed:true,...details});console.log(JSON.stringify({check:name,passed:true}))}
 async function openCanvasBoard(evaluate,wait,boardId){
  await evaluate(`(()=>{document.querySelector('button[aria-label="无限画布"]').click();return true})()`)
@@ -59,18 +61,10 @@ async function qualify(window){
   }
   window.show();window.focus();window.webContents.focus()
   await wait(`window.rovai&&document.querySelector('button[aria-label="无限画布"]')?.disabled===false`,60_000)
-  if(['private-roundtrip','private-queue'].includes(config.mode)){
-   assert.ok(config.private_workflow_module,'新私聊场景必须由候选驱动绑定独立模块及固定本地协议程序')
-   const moduleUrl=new URL(config.private_workflow_module);assert.equal(moduleUrl.protocol,'file:')
-   assert.equal(createHash('sha256').update(await readFile(moduleUrl)).digest('hex'),config.private_workflow_sha256)
-   for(const [key,specification] of [['ROVAI_QWEN_BIN',config.controlled_launcher],['ROVAI_ACCEPTANCE_SCRIPT',config.controlled_script]]){
-    assert.ok(specification?.path&&specification.sha256);assert.equal(process.env[key],specification.path)
-    assert.equal(createHash('sha256').update(await readFile(specification.path)).digest('hex'),specification.sha256)
-   }
-   assert.equal(process.env.ROVAI_SKILL_RECOVERY_CAPTURE,config.runtime_capture)
-   const {qualifyCanvasPrivateWorkflow}=await import(config.private_workflow_module)
+  if(privateModes.includes(config.mode)){
+   const {qualifyCanvasPrivateWorkflow}=privateWorkflow
    report.scope='production Main/preload/Core with owned controlled ACP; actual private editor and complete queue input transitions; no external model'
-   await qualifyCanvasPrivateWorkflow(window,{evaluate,wait,rpc,openCanvasBoard,config,report,record})
+   await qualifyCanvasPrivateWorkflow(window,{evaluate,wait,rpc,openCanvasBoard,config,report,record,seam:privateIpc})
    report.status='passed'
    return
   }
@@ -200,6 +194,7 @@ async function qualify(window){
   report.status='passed'
  }catch(error){report.status='failed';report.error=String(error.stack??error);report.runtime_errors=await evaluate('window.nativeRuntimeErrors').catch(()=>null);report.native_keys=await evaluate('window.nativeKeys').catch(()=>null);report.dom=await evaluate('document.body.innerText.slice(-2500)').catch(()=>null);if((report.screenshots?.length??0)<3){const path=join(config.evidence,'failure.png');await writeFile(path,(await window.webContents.capturePage()).toPNG()).then(()=>{(report.screenshots??=[]).push(path)}).catch(()=>{})}}
  finally{
+  if(privateIpc){privateIpc.releaseAll();report.private_ipc=privateIpc.snapshot()}
   if(config.capture_resize_observers)report.resize_observations=await evaluate('window.nativeResizeObservations').catch(()=>null)
   if(report.status==='failed')await evaluate(`(()=>{document.querySelector('.canvas-board-dialog .app-dialog-close:not(:disabled)')?.click();return true})()`).catch(()=>{})
   if(report.status==='failed'&&config.mode==='ready-diff')await evaluate(`(()=>{document.querySelector('.mission-diff-dialog button[aria-label="关闭累计文件变更"]')?.click();document.querySelector('.canvas-object-dialog .app-dialog-close')?.click();return true})()`).catch(()=>{})
@@ -1251,4 +1246,19 @@ async function qualifyPublicCold(window,{evaluate,wait,rpc}){
  await evaluate(`(()=>{document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]').click();return true})()`);await pause(350)
  await writeFile(join(config.evidence,'01-cold-public-pin-drafts.png'),(await window.webContents.capturePage()).toPNG())
 }
+if(privateModes.includes(config.mode)){
+ for(const [url,hash] of [[config.private_workflow_module,config.private_workflow_sha256],[config.private_ipc_module,config.private_ipc_sha256]]){
+  const file=new URL(url);assert.equal(file.protocol,'file:')
+  assert.equal(createHash('sha256').update(await readFile(file)).digest('hex'),hash)
+ }
+ for(const [key,specification] of [['ROVAI_QWEN_BIN',config.controlled_launcher],['ROVAI_ACCEPTANCE_SCRIPT',config.controlled_script]]){
+  assert.ok(specification?.path&&specification.sha256);assert.equal(process.env[key],specification.path)
+  assert.equal(createHash('sha256').update(await readFile(specification.path)).digest('hex'),specification.sha256)
+ }
+ assert.equal(process.env.ROVAI_SKILL_RECOVERY_CAPTURE,config.runtime_capture)
+ privateWorkflow=await import(config.private_workflow_module)
+ const {installCanvasPrivateIpc}=await import(config.private_ipc_module)
+ privateIpc=installCanvasPrivateIpc(ipcMain)
+}
 await import(config.production_main)
+privateIpc?.finishRegistration()

@@ -29,6 +29,12 @@ I03 R01 的真实页面场景继续使用原 `canvas-native-input.mjs`，新增 
 Core 夹具前置验证与真正 Native UI 分别记资格；只有前置通过不能关闭 PC03/08/17/18/19 或整个 R01。
 其他并发拒绝、迟到上传、丢回执和换绑恢复继续由 R01 原清单约束，不被两个模式省略。
 
+上述模式增加 `canvas-private-ipc.mjs` 的测试期 Main IPC 观察：只记录方法/归属/原请求编号；
+精确输入上的一次并发材料修改仍调用原生产 handler，交换丢回执只发生在 Core 已完成之后。
+`private-rebind` 与 `private-late-upload` 分别检查原输入恢复和结束旧私聊后的迟到回执；后者不代替另一个 Core 的实际切换资格。
+`canvas-private-ipc.test.mjs` 仅拥有故障触发、原 handler 继续执行、其他归属不受影响和延迟释放的逻辑，不能据此标 Native UI 通过。
+本轮累计异常场景与待集成CSS使用同一修复候选做本地页面验证，复用源码未变的现有Core；不触发额外平台Actions或全Rust编译。
+
 I03 多卡输入的最低层 owner 为 `canvas-conversations-controller.test.ts`（精确上下文、全部准备回滚、模式切换与孤立输入保留）
 和 `thread-workspace-actions.test.ts`（不同 Thread 命令归属、冻结发送及拒绝/未知不清输入）。
 窗口预览生命周期继续扩展 `file-preview-resources.test.ts`，DOM scope 继续扩展 `FilePreviewTabs.test.ts`；
