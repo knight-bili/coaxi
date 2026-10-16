@@ -1856,3 +1856,18 @@ I03-C03 文件卡片新增最低层 `canvas-file.test.ts` owner，负责字面�
 定向类型检查覆盖生产App/Canvas及新增owner。隔离Vite界面挂载真实ReactFlow、编辑器和文件读者，Core与文件API均模拟；
 17条过程记录包含发现问题、修复复测及夹具操作，不当作17项正式用例通过。早期夹具容器尺寸警告及删除选择缺陷保留记录。
 实际Core/Host/NativeIPC、完整App原工作区导航、真实HTML/权限/规模与正式324场景仍待阶段候选，不新增Rust测试或触发重型构建。
+
+### I03临时终端最低层准入（2026-10-16）
+
+新增 `canvas_terminal::state::tests` 两个纯状态 owner，拥有关闭先到/启动迟到、代次围栏和退出结果保留，
+以及原始字节跨块、游标重叠、字节/块数上限与淘汰缺口。旧canvas几何owner和AgentRun terminal结算没有交互PTY状态，不能覆盖这些失败输入。
+新增 `canvas_terminal::tests::terminal_requests_are_closed_and_keep_original_generation_and_bytes` 拥有新请求闭合、
+禁止cwd/shell/Owner等注入、规范UUID、代次/游标、尺寸和输入字节上限；它不建完整Database或启动进程。
+完整Cargo最低命令为 `cargo test -p rovai-core --lib canvas_terminal:: -- --list` 后同过滤运行，随阶段候选执行；本批该codec owner尚未编译运行。
+
+为确定下一步PTY移植所依赖的执行恢复状态，本批例外直接以rustc编译无外部依赖的生产 `canvas_terminal/state.rs` 并先列出2个非零owner后执行，
+2项通过。这仅证明该纯状态源，不代表新helper、来源目录校验或完整Core编译通过。初次默认环境缺link.exe、继而缺SDK库；
+复用已验证本机MSVC和工作区SDK链接后通过，失败日志保留，不安装或修改系统环境。
+来源谓词另外提取Rust原文SQL，在最小两表SQLite执行11项原画板/错画板/错kind/删除/参数注入与零写入见证；
+不能把该SQL见证写成Rust的真实目录canonicalize、可信Owner或Host授权通过。
+辅助进程原生启动/进程树/真实字节和终端UI的最低层进程owner在父端接线后补齐，当前未开放产品入口。

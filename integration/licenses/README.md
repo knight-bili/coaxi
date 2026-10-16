@@ -44,3 +44,8 @@ PTY后续移植及I12最终发布包仍分别核对，不将本批通知保留�
 `draftStorageKey=canvas-draft:<contextKey>`、`attachmentTabId=contextKey`保留每卡独立输入；
 按Rovai Host/Owner、Core、画板、真实pin与精确引用适配本机存储，不移植供体执行或数据库。
 源码保留上述Apache-2.0来源通知，无新增第三方依赖。
+
+画布临时终端的 `canvas_terminal/state.rs` 与 `helper.rs` 根据固定Codeg提交的 `terminal/manager.rs`、
+`terminal/types.rs` 适配代次、整块回放和PTY生命周期，保留上述Apache-2.0来源通知。
+新增Rust直接依赖锁定为供体使用的portable-pty0.8.1，crate校验值与[原MIT许可证](portable-pty/LICENSE.md)见
+[来源记录](portable-pty/source.json)。该次锁定新增21包，既有278包版本和校验保持；完整传递依赖通知仍纳入I12发布资格，当前不宣称全部通知已完成。

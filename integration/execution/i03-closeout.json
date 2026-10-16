@@ -61,8 +61,14 @@
     {
       "id": "I03-C04",
       "name": "临时终端节点生命周期",
-      "status": "incomplete",
-      "done_when": "真实临时PTY启动、输出、resize、关闭、删除及重连符合现行合同；不把I05完整Git工程工作区提前并入"
+      "status": "in_progress",
+      "done_when": "真实临时PTY启动、输出、resize、关闭、删除及重连符合现行合同；不把I05完整Git工程工作区提前并入",
+      "latest_partial_evidence": "i03-terminal-foundation-result.json",
+      "remaining_implementation_batches": [
+        "父端registry、原ManagedProcess/可信启动、CLI helper入口、删除与计划退出；真实进程owner",
+        "Native/Web API、能力准入、终端卡片与重连/原代次输入恢复，之后C05/C06统一实际资格"
+      ],
+      "remaining_verification": "helper/完整Core含新codec owner尚未编译；实际PTY/树回收/Native/Web/UI/跨平台随阶段候选集中验证。纯状态2项和SQL11项不替代。"
     },
     {
       "id": "I03-C05",

@@ -106,6 +106,10 @@ Schema154/Migration204 从准确 schema153 原子增加 `canvas_node`、画板�
 
 Board 删除在同一事务删除它的节点并保留 Board tombstone，不恢复旧 ID。
 本切片没有交互 PTY，不能据此声称已结算终端；引入真实终端前必须接入所属进程的关闭/删除生命周期。
+后续 `canvas_terminal` 移植基础使用原 board/node 查活跃终端来源，原请求/进程代次只存Core内存，不写画布表。
+拟接启动/读取/写入/resize/停止的闭合请求不接受cwd、shell、Owner或RootGrant注入，原代次和原输入编号不能由重连替换。
+当前只存在内部类型、原始字节回放状态和未接入口的PTY辅助进程源码，没有新增公开方法或终端能力声明；
+真实父端启动、进程树回收、删除/退出与Native/Web/读者仍属C04必需实现，不据纯状态检查宣称终端交付。
 跨画板业务删除 funnel 的自动清理、导航组实时解析、Mission/Task 入口、Renderer 布局和客户端视口继续属于 I03 后续工作，
 本合同的 prune 不替代这些生命周期接线，也不缩减[完整一期计划](../../integration/planning/plan-v4.md)。
 画布正文不会自动进入模型输入；以后若改变该边界，继续遵循既有模型输入变更治理。
