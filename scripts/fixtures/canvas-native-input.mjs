@@ -46,6 +46,18 @@ async function qualify(window){
  const wait=async(expression,timeout=20_000)=>{const until=Date.now()+timeout;while(Date.now()<until){if(await evaluate(expression))return;await pause(100)}throw Error('Native condition timed out: '+expression)}
  const rpc=(method,params={})=>evaluate(`window.rovai.request(${JSON.stringify(method)},${JSON.stringify(params)})`)
  try{
+  if(privateModes.includes(config.mode)){
+   await wait(`window.rovai?.onboarding&&window.rovai.onboarding.get().then(value=>value.status!=='uninitialized')`,60_000)
+   const initial=await evaluate('window.rovai.onboarding.get()')
+   if(initial.status!=='completed'){
+    if(initial.step==='welcome')await evaluate('window.rovai.onboarding.completeWelcome()')
+    if(['welcome','member'].includes(initial.step))await evaluate('window.rovai.onboarding.completeMemberSelection()')
+    const deferred=await evaluate('window.rovai.onboarding.deferRuntimeSetup()')
+    assert.equal(deferred.status,'completed');assert.equal(deferred.origin,'runtime_deferred')
+    report.onboarding_preparation={before:initial.status,after:deferred.status,origin:deferred.origin,qualification:'fixture setup only; not first-use flow qualification'}
+    const loaded=new Promise(resolve=>window.webContents.once('did-finish-load',resolve));window.webContents.reload();await loaded
+   }
+  }
   await evaluate(`(()=>{window.nativeRuntimeErrors=[];window.addEventListener('error',event=>window.nativeRuntimeErrors.push({message:event.message,stack:String(event.error?.stack??'')}));return true})()`)
   if(config.capture_resize_observers){
    report.resize_observer_scope='opt-in callback observations; no suppression or rescheduling; performance timing is diagnostic only'
