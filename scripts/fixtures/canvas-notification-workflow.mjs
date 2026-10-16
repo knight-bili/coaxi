@@ -67,24 +67,25 @@ export async function qualifyCanvasNotifications(window,{evaluate,wait,rpc,openC
  const snapshot=context=>context.kind==='private'?rpc('singleChat.get',{conversationId:context.conversationId}):rpc('threads.open',{threadId:context.threadId,traceId:randomUUID()})
  const send=async(context,label)=>{
   const before=await snapshot(context),body=`R08 ${context.kind} ${label} ${randomUUID()}`
-  const sent=context.kind==='private'?await rpc('singleChat.send',{commandId:randomUUID(),command:{threadId:context.threadId,conversationId:context.conversationId,body,draftRevision:before.draft.revision}}):await rpc('thread.messages.send',{commandId:randomUUID(),threadId:context.threadId,content:{version:2,segments:[{kind:'text',text:body}]},sourceAttachments:[],quotes:[],replyToThreadMessageId:null})
+  const sent=context.kind==='private'?await rpc('singleChat.send',{commandId:randomUUID(),command:{threadId:context.threadId,conversationId:context.conversationId,body,draftRevision:before.draft.revision}}):await rpc('thread.messages.send',{commandId:randomUUID(),threadId:context.threadId,content:{version:2,segments:[{kind:'text',text:body}]},sourceAttachments:[],quotes:[],replyToThreadMessageId:null,execution:{taskId:null,purpose:'R08 本机通知可见性验证',completionRole:'required'}})
   assert.equal((sent.commandResult??sent).status,'accepted',JSON.stringify(sent))
   const after=await until(async()=>{const view=await snapshot(context),runs=view.agentRuns.filter(run=>!before.agentRuns.some(old=>old.id===run.id));return runs.length&&runs.every(run=>['succeeded','failed','cancelled'].includes(run.status))?{view,runs}:false})
   assert.equal(after.runs.length,1);assert.equal(after.runs[0].status,'succeeded',JSON.stringify(after.runs))
   const runId=after.runs[0].id
-  const episode=await until(async()=>{const state=await inbox();return state.items.find(item=>item.agentRunId===runId||item.primaryAction.agentRunId===runId||item.primaryAction.singleChat?.agentRunId===runId)})
-  return {runId,episodeId:episode.id,body}
+  const turnId=after.runs[0].threadTurnId
+  const episode=await until(async()=>{const state=await inbox();return state.items.find(item=>item.thread.id===context.threadId&&(item.agentRunId===runId||item.primaryAction.agentRunId===runId||item.primaryAction.singleChat?.agentRunId===runId||turnId&&item.threadTurnId===turnId))})
+  return {runId,threadTurnId:episode.threadTurnId,episodeId:episode.id,body}
  }
- const acknowledged=runId=>seam.snapshot().calls.filter(call=>call.method==='notifications.acknowledgeVisibleSources'&&call.params?.command?.visibleAgentRunIds?.includes(runId))
+ const acknowledged=target=>seam.snapshot().calls.filter(call=>call.method==='notifications.acknowledgeVisibleSources'&&(call.params?.command?.visibleAgentRunIds?.includes(target.runId)||target.threadTurnId&&call.params?.command?.visibleThreadTurnIds?.includes(target.threadTurnId)))
  const stateFor=async target=>(await inbox()).items.find(item=>item.id===target.episodeId)
  const assertUnread=async(context,target,label)=>{
   const observations=[]
-  for(const delay of [0,300,700,1000]){await pause(delay);const state=await stateFor(target);assert.ok(state?.unread,`${context.kind} ${label} notification was acknowledged without visible source`);assert.equal(acknowledged(target.runId).length,0);observations.push({at:Date.now(),unread:state.unread,changeSequence:state.changeSequence})}
+  for(const delay of [0,300,700,1000]){await pause(delay);const state=await stateFor(target);assert.ok(state?.unread,`${context.kind} ${label} notification was acknowledged without visible source`);assert.equal(acknowledged(target).length,0);observations.push({at:Date.now(),unread:state.unread,changeSequence:state.changeSequence})}
   return observations
  }
  const assertRead=async(context,target)=>{
   await wait(`Boolean(${frame(context)}?.querySelector('[data-agent-run-id="${target.runId}"]'))`)
-  await until(async()=>{const state=await stateFor(target);return state&&!state.unread&&acknowledged(target.runId).some(call=>call.result?.value?.status==='applied')})
+  await until(async()=>{const state=await stateFor(target);return state&&!state.unread&&acknowledged(target).some(call=>call.result?.value?.status==='applied')})
  }
  const screenshot=async name=>{const path=join(config.evidence,name);await writeFile(path,(await window.webContents.capturePage()).toPNG());(report.screenshots??=[]).push(path)}
  await openCanvasBoard(evaluate,wait,boardId)
