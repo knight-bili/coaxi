@@ -79,7 +79,7 @@
       "name": "冷启动与多卡交互兼容",
       "status": "implementation_ready_for_stage_verification",
       "done_when": "真实Desktop冷路由、旧焦点/编辑器保持、恢复与本阶段规模检查完成；平台资源缺项单列",
-      "latest_partial_evidence": "i03-c05-renderer-crash-native-verification.json",
+      "latest_partial_evidence": "i03-c05-public-multi-native-verification.json",
       "checked_subtasks": [
         {
           "id": "C05-cold",
@@ -88,7 +88,7 @@
         },
         {
           "id": "C05-window",
-          "status": "source_reviewed_runtime_scale_pending",
+          "status": "partial_public_readers_release_and_64_summaries_native_verified_other_budgets_pending",
           "scope": "每Thread一个读者、5空闲投影、64窗口终端controller和原文件资源预算"
         },
         {
@@ -104,12 +104,13 @@
       ],
       "remaining_implementation_batches": [],
       "remaining_verification": [
-        "同私聊双卡暖冷/编辑器与renderer硬中断后正文/便笺本机副本已通过；继续公开/多Thread、原生焦点、整App/Core硬中断和未知请求、ready Git Diff；原Task/Mission/文件精确定位复用已过证据",
-        "真实多卡/同Thread镜像的滚动、资源释放、HTML及终端窗口上限；局部64卡片夹具不是实际页面帧率",
+        "公开三卡双Thread的暖态输入/焦点/监听释放和同私聊暖冷/renderer故障已有证据；公开卡新App冷恢复、整App/Core硬中断及未知请求、ready Git Diff继续补齐",
+        "64摘要卡实际渲染/滚轮平移已通过；超过五Thread的空闲缓存预算、各Thread真实文件预览、HTML/终端窗口上限及其他资源释放仍需各自证据",
         "真实Core大材料/目录/日志下的交互响应、事务锁和超时/取消；随C06当前源验证",
         "软键盘/IME与原生平台运行资格按可用环境记录，缺真机不假通过"
       ],
-      "partial_runtime_evidence": "同私聊双pin：第二卡打开不换第一编辑器，各自可信输入/材料scope独立，模式往返保留两个textarea及另一输入的滚动，收起重开单卡保留两份正文，新App进程冷路由恢复精确双pin和正文；尚未覆盖整App/Core硬中断、未知请求、多Thread/公开卡、全规模及IME；本轮真实renderer两次crashed后显式重载及选择画布，双pin正文最后字及note独立本机副本恢复，Core原便笺未覆盖；不覆盖整App/Core硬杀及未知请求"
+      "partial_runtime_evidence": "同私聊双pin暖态编辑器/滚动/正文及材料scope隔离、新App进程冷恢复；便笺拖动/行内保存/冲突/离开保护及renderer硬中断后独立本机副本恢复；公开三卡双Thread独立输入/原生焦点/同DOM布局/收起重开、一Thread一个读者和全部窗口监听释放；另一板64摘要卡实际渲染与可信滚轮平移。未覆盖整App/Core硬中断、未知在途请求、公开卡新进程、五空闲快照预算、各Thread真实文件预览、HTML/终端窗口上限、大材料IO和IME。",
+      "public_multi_native_evidence": "i03-c05-public-multi-native-verification.json"
     },
     {
       "id": "I03-C06",
@@ -143,14 +144,15 @@
         "rc13必要回归25个不同Native断言通过，成功运行均受控退出；两个调度冲突run剔除并加入独占保护",
         "rc14 Desktop/Web0且未重编原生；终端5/私聊5/文件9/对象8共27不同Native通过，所有run均受控退出",
         "rc14追加便笺6、同私聊双卡6、新App冷恢复3通过（无发送断言重复一次），当前候选41个不同Native断言；生产源码未变化，未重编",
-        "rc14复用无新构建：renderer两次实际crashed及进程PID更替，双私聊最后字符/独立正文、未失焦便笺副本与Core原文分开、原引用/无模型3场景通过；当前44个不同Native场景，r3受控退出。r1/r2旧失败不计重复通过，r2无受控退出回执。"
+        "rc14复用无新构建：renderer两次实际crashed及进程PID更替，双私聊最后字符/独立正文、未失焦便笺副本与Core原文分开、原引用/无模型3场景通过；当前44个不同Native场景，r3受控退出。r1/r2旧失败不计重复通过，r2无受控退出回执。",
+        "rc14复用：公开三卡/双Thread实际独立草稿、原生焦点、同DOM布局、ThreadReader数0/1/1/2/2/1/0/0与全监听签名回到baseline、收起重开及无发送；64真实摘要卡/原生滚轮平移等8场景通过，当前52不同Native场景。成功及旧失败均受控completed，无deadline/forcedSignal。"
       ],
       "open_findings": [
         "同一HTML卡片及保留工作区两个合法入口交换重叠，单布尔位导致合法跳转403；已改逐入口计数并在异步来源复核前认领，原授权和额外请求拒绝均保留，待新Desktop真实复验"
       ],
       "remaining_checks": [
         "私聊材料完整真实流程/PC01-PC24与文件卡片实际挂载/HTML，不用直接文件API和局部Core测试替代",
-        "Mission/Task/文件基本定位、同私聊双卡暖冷/原生模式切换及renderer硬中断恢复已有证据；ready Git Diff、公开/多Thread/原生焦点、整App/Core硬中断与未知命令恢复仍需补齐",
+        "Mission/Task/文件基本定位、公开双Thread多卡暖态焦点/监听释放、同私聊暖冷/renderer故障已验证；ready Git Diff、公开卡新进程恢复、整App/Core硬中断与未知命令等未验证部分继续补齐",
         "真实多卡/资源释放/规模、大材料交互响应与其他适用迁移、冻结输入、平台和正式场景证据；环境缺项单列，继续独立后续阶段"
       ],
       "resolved_findings": [
@@ -164,7 +166,7 @@
         "rc12原生鼠标触发React#185：两条selection写回交替；改由onNodesChange同批维护选中状态，原失败鼠标用例通过",
         "便笺r4实测100%/DOM矩阵scale1，鼠标可信；XYDrag在首越阈值处捕获起点且8px边缘吸附导致最终80/48。r7按两段动作及既有对齐属性通过六项，未改产品代码"
       ],
-      "latest_native_evidence": "i03-c05-renderer-crash-native-verification.json",
+      "latest_native_evidence": "i03-c05-public-multi-native-verification.json",
       "ui_remaining": [
         "rc14空私聊viewport extraY0与紧凑旧材料入口已实际通过；两种主题/其他高度与有消息状态仍按完整UI清单继续",
         "缩放/尺寸切换有ResizeObserver延迟通知，继续定位；功能断言通过不授予零控制台问题资格",
@@ -176,7 +178,8 @@
       "latest_empty_private_fit_evidence": "i03-c06-private-empty-fit-result.json",
       "latest_source_card_group_verification": "i03-c06-source-card-group-verification.json",
       "latest_notes_mirrors_evidence": "i03-c05-notes-mirrors-native-verification.json",
-      "latest_renderer_crash_evidence": "i03-c05-renderer-crash-native-verification.json"
+      "latest_renderer_crash_evidence": "i03-c05-renderer-crash-native-verification.json",
+      "latest_public_multi_evidence": "i03-c05-public-multi-native-verification.json"
     }
   ],
   "state_rule": "代码完成、工程验证通过、待环境验证分别记录；无代码缺口且工程验证满足时由Codex收口；缺环境继续独立后续工作，最终MVP不豁免",

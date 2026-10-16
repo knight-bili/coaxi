@@ -128,3 +128,13 @@ r1错误要求固定启动快照的reload直接进画布；r2的helper又返回�
 final result: blocked
 
 完整视觉/阶段检查仍未完；持续目标active，无本轮客户事项。
+
+## 公开多卡、焦点与64摘要卡真实检查
+
+复用rc14/c4463813，无新编译。public-multi-r5八场景通过：两Thread三张公开卡独立输入和实际保存记录，原生鼠标焦点/可信输入在另一卡布局往返时保持同DOM；一Thread一个读者，0/1/1/2/2/1/0/0序列、全部关闭后的focus/visibility完整监听签名回到baseline。公开卡收起重开保持原正文，无消息或AgentRun。另板64个持久摘要节点实际渲染，可信滚轮按原panOnScroll平移，比例63%不变、节点全集保持。两张2520×1500截图已查看。60静态rAF样本不代表全交互性能或64展开工作区资格。
+
+r1漏只读traceId、r2把每卡发布监听也当成读者、r3忽略原350ms防抖、r4把滚轮平移当缩放均为夹具预期错误；定因后修owner，未改产品或放宽保护。r1-r5全部正常受控退出，旧失败保留。仍有ResizeObserver通知、便笺document字号、完整主题/八类状态及真实列表投影待处理。证据integration/execution/i03-c05-public-multi-native-verification.json。
+
+final result: blocked
+
+仅完整视觉/阶段验证未完成；目标active，本轮不需要客户介入。
