@@ -42,7 +42,7 @@ function installObserverAudit() {
 export async function qualifyCanvasNotifications(window,{evaluate,wait,rpc,openCanvasBoard,config,report,record,seam}) {
  assert.equal(createHash('sha256').update(await readFile(new URL(config.runtime_configure_module))).digest('hex'),config.runtime_configure_sha256)
  const mcp=await rpc('mcp.config.get')
- assert.equal(mcp.exists,true);assert.deepEqual(mcp.servers,[]);assert.equal(mcp.permissionIssue,false);assert.equal(mcp.fileIssue,null)
+ assert.equal(mcp.exists,true);assert.deepEqual(mcp.servers,[]);assert.equal(mcp.permissionIssue,false);assert.ok(mcp.fileIssue==null)
  assert.equal(mcp.path.replaceAll('\\','/').toLowerCase(),config.mcp_config_path.replaceAll('\\','/').toLowerCase())
  report.fixture_mcp_native_initialization={path:mcp.path,servers:0,permissionIssue:mcp.permissionIssue,sha256:createHash('sha256').update(await readFile(config.mcp_config_path)).digest('hex')}
  const {configureProductRuntime}=await import(config.runtime_configure_module)
