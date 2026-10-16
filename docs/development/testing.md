@@ -35,6 +35,12 @@ Core 夹具前置验证与真正 Native UI 分别记资格；只有前置通过�
 精确输入上的一次并发材料修改仍调用原生产 handler，交换丢回执只发生在 Core 已完成之后。
 `private-rebind` 与 `private-late-upload` 分别检查原输入恢复和结束旧私聊后的迟到回执；后者不代替另一个 Core 的实际切换资格。
 `canvas-private-ipc.test.mjs` 仅拥有故障触发、原 handler 继续执行、其他归属不受影响和延迟释放的逻辑，不能据此标 Native UI 通过。
+
+PC10 的不同 Core 分支扩展现有 `host-web-live.test.mjs`，定向 owner 为 `actual browser Core switch`。
+共享 `canvas-cross-core-upload.mjs` 启动两套独立私有目录的真实Host/Core，使用现有Web产物和隔离Chrome标签页；
+文件经实际页面上传，确认原Core已绑定后仅在浏览器运输层暂停回复，再在同一标签页导航至另一Core。
+检查新Core正文/附件/引用/消息/Run不被旧结果改写、旧Core仍保留原材料；旧文档取消与实际延迟释放分别记录。
+该owner当前限定Windows，必须显式指定已核定的Host、Web、Chrome与唯一输出路径；不配置Runtime、不调用模型、不复用日常浏览器数据。
 本轮累计异常场景与待集成CSS使用同一修复候选做本地页面验证，复用源码未变的现有Core；不触发额外平台Actions或全Rust编译。
 
 I03 多卡输入的最低层 owner 为 `canvas-conversations-controller.test.ts`（精确上下文、全部准备回滚、模式切换与孤立输入保留）
