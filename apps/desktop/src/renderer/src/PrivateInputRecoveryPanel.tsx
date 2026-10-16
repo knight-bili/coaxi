@@ -1,6 +1,7 @@
 import { useId, useState } from 'react'
 import type { PrivateInputController, PrivateInputState } from './private-input-controller'
 import { UiText, uiAttribute } from './interface-language'
+import { AttachmentCard } from './AttachmentCard'
 
 export function privateInputErrorMessage(error: unknown): string {
   const code = error instanceof Error ? error.message : ''
@@ -43,7 +44,11 @@ export function PrivateInputRecoveryPanel({ controller, state, busy, onError }: 
       <details>
         <summary><UiText zh="查看保留的正文、附件和引用" /></summary>
         <pre className="single-chat-pending-copy">{selected.body}</pre>
-        {selected.attachments.length > 0 && <ul>{selected.attachments.map(attachment => <li key={attachment.id}>{attachment.displayName}</li>)}</ul>}
+        {selected.attachments.length > 0 && <div className="single-chat-pending-attachments">{selected.attachments.map(attachment => <AttachmentCard
+          key={attachment.id} attachment={attachment} presentation="user-timeline" disabled={busy || state.pending}
+          locator={{ owner: 'single_chat_retained', threadId: controller.origin.threadId,
+            conversationId: controller.origin.conversationId, composerScope: controller.origin.scope,
+            retainedInputId: selected.id, attachmentRefId: attachment.id }} onNotify={onError} />)}</div>}
         {selected.quotes.map(quote => <blockquote key={quote.quoteId}>{quote.text}</blockquote>)}
       </details>
     </div>}

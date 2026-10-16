@@ -136,6 +136,18 @@
           "kind": "native-file-cards-html-ui-9",
           "source_commit": "72048c73f9736a85ee1550cdc12dd1e3b45b6c79",
           "exit_code": 0
+        },
+        {
+          "kind": "native-private-materials-8",
+          "source_commit": "72048c73f9736a85ee1550cdc12dd1e3b45b6c79",
+          "core_source": "391e21fe62ade0ed5eade33c7b8335df84c9cca3",
+          "exit_code": 0
+        },
+        {
+          "kind": "native-private-materials-cold-file-reader-5",
+          "source_commit": "72048c73f9736a85ee1550cdc12dd1e3b45b6c79",
+          "core_source": "391e21fe62ade0ed5eade33c7b8335df84c9cca3",
+          "exit_code": 0
         }
       ],
       "engineering_validation": "in_progress",
@@ -206,7 +218,8 @@
       "native_desktop": "file_cards_html_channel_menu_9_passed_other_full_flows_pending",
       "full_types": "passed_reused_unchanged_typescript",
       "desktop_build": "passed",
-      "web_build": "passed"
+      "web_build": "passed",
+      "next_renderer_batch": "已实现三位置附件UI；与后续I03整改集齐后验证，当前rc.8构建不包含新UI。"
     },
     {
       "stage_id": "I04",

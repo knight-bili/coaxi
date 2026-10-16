@@ -1751,21 +1751,23 @@ export function SingleChatPanel({
           <div className="composer-input">
             {((currentSnapshot?.draft.attachments.length ?? 0) > 0 || preparingAttachments.length > 0) && (
               <SingleChatAttachmentStrip>
-                {currentSnapshot?.draft.attachments.map((attachment) => composerContext ? (
-                  <div className="single-chat-scoped-file" key={attachment.id}>
-                    <span>{attachment.displayName}</span>
-                    <button type="button" disabled={inputState.pending || uploadBusy || sending || quoteBusy} onClick={() => void removeDraftAttachment(attachment.id)}><UiText zh="移除附件" /></button>
-                  </div>
-                ) : (
+                {currentSnapshot?.draft.attachments.map((attachment) => (
                   <AttachmentCard
                     attachment={attachment}
-                    locator={{
+                    locator={input?.origin.scope ? {
+                      owner: 'single_chat_scoped_composer',
+                      threadId: input.origin.threadId,
+                      conversationId: input.origin.conversationId,
+                      composerScope: input.origin.scope,
+                      attachmentRefId: attachment.id
+                    } : {
                       owner: 'single_chat_composer',
                       threadId,
                       conversationId: currentSnapshot.conversation.id,
                       attachmentRefId: attachment.id
                     }}
                     onNotify={onNotify}
+                    disabled={Boolean(composerContext) && (inputState.pending || uploadBusy || sending || quoteBusy)}
                     presentation="composer"
                     key={attachment.id}
                     onRemove={() => void removeDraftAttachment(attachment.id)}

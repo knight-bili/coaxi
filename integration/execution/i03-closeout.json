@@ -29,14 +29,21 @@
         "孤立Core/本机正文及冲突统一恢复"
       ],
       "done_when": "本阶段完整使用流程及PC01-PC24适用工程验证有当前源码证据，外部环境缺项明确单列",
-      "latest_partial_evidence": "i03-private-recovery-ui-result.json",
+      "latest_partial_evidence": "i03-c06-private-materials-native-result.json",
       "remaining_runtime_risks": [
         "新生命周期Rust/Host入口及原第三owner断言随阶段候选编译和真实运行",
         "实际Host/Native IPC/资源授权验证后启用最终文件入口，UI模拟验证不能替代",
         "完整PC01-PC24适用工程场景与异常恢复待集中验证；发现代码缺口回到C01修复",
-        "实际大材料/日志枚举/事务锁规模归I03-C05验证；本批32副本只验证字典读取次数",
-        "复用隔离App重启时2个测试Thread的Published Attachment View出现路径缺失完整性事件；文件卡片文本读取不受影响，私聊材料资格前须核对该恢复链，不把此日志当通过"
-      ]
+        "实际大材料/日志枚举/事务锁规模归I03-C05验证；本批32副本只验证字典读取次数"
+      ],
+      "runtime_matrix": "i03-private-materials-runtime-matrix.json",
+      "verified_native_subflows": [
+        "真实Native字节准备/原回执核对，两卡和默认附件分开",
+        "伪造pin/跨卡移除拒绝、并发CAS、默认材料显式迁入与保留交换原UUID回放",
+        "删除pin后的原归属恢复与冷启动保持；原读者精确读取卡片和retained附件、跨卡拒绝"
+      ],
+      "file_ui_status": "卡片/working/retained现已接原AttachmentCard，types/56项检查通过；新Renderer实际界面及有效pending token文件资格仍待集中验证",
+      "resolved_fixture_incident": "旧两测试Thread空附件视图目录缺失后已有Core重建恢复，当前ready/error为空且目录存在，后续启动无同事件；初始消失原因和非空旧附件恢复未由本次证明。"
     },
     {
       "id": "I03-C02",

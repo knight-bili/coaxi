@@ -1,0 +1,217 @@
+{
+  "schema_version": 1,
+  "stage": "I03-C01",
+  "basis": "integration/proposals/canvas-private-materials-r1.md",
+  "engineering_owner": "Codex",
+  "customer_stage_gate": false,
+  "cases": [
+    {
+      "id": "PC01",
+      "scenario": "同一私聊双卡分别放附件和引用",
+      "expected": "甲发送只消费甲，乙完整保留",
+      "status": "partial_real_native_verified",
+      "verified": [
+        "实际双卡附件隔离及错误跨卡移除通过"
+      ],
+      "remaining": "双卡引用与实际发送消费仍需验证"
+    },
+    {
+      "id": "PC02",
+      "scenario": "默认输入和画布同时准备材料",
+      "expected": "两处互不串入或清空",
+      "status": "partial_real_native_verified",
+      "verified": [
+        "实际默认草稿与两张卡片附件互不串入，显式迁入后默认材料清空"
+      ],
+      "remaining": "本机正文并行与最终发送仍需验证"
+    },
+    {
+      "id": "PC03",
+      "scenario": "同卡原地与侧边切换",
+      "expected": "同正文、材料、revision 与编辑器",
+      "status": "engineering_verification_pending",
+      "verified": [],
+      "remaining": "同正文、材料、revision 与编辑器"
+    },
+    {
+      "id": "PC04",
+      "scenario": "另一 Conversation 复用相同节点文本",
+      "expected": "不采纳原私聊 scope",
+      "status": "engineering_verification_pending",
+      "verified": [],
+      "remaining": "不采纳原私聊 scope"
+    },
+    {
+      "id": "PC05",
+      "scenario": "另一个已验证编辑端访问同 Conversation",
+      "expected": "不看到对方草稿与保留项",
+      "status": "engineering_verification_pending",
+      "verified": [],
+      "remaining": "不看到对方草稿与保留项"
+    },
+    {
+      "id": "PC06",
+      "scenario": "网络伪造 draftClient 和恢复证明",
+      "expected": "Host 拒绝，无授权提升",
+      "status": "engineering_verification_pending",
+      "verified": [],
+      "remaining": "Host 拒绝，无授权提升"
+    },
+    {
+      "id": "PC07",
+      "scenario": "伪造 Board pin 或错误私有引用",
+      "expected": "首次写入拒绝并回滚",
+      "status": "partial_real_native_verified",
+      "verified": [
+        "伪造节点登记实际拒绝，SQL只读复核无scope行"
+      ],
+      "remaining": "错误私有引用等剩余负例仍需验证"
+    },
+    {
+      "id": "PC08",
+      "scenario": "只读恢复空 scope",
+      "expected": "不建表行、不 enter、不执行",
+      "status": "partial_real_native_verified",
+      "verified": [
+        "空scope只读读取后恢复列表和SQL均无登记；冷读未新增消息/Run"
+      ],
+      "remaining": "完整页面进入/编辑器行为仍需验证"
+    },
+    {
+      "id": "PC09",
+      "scenario": "同 scope 两次并发 CAS",
+      "expected": "仅一笔生效，另一保留输入",
+      "status": "partial_real_native_verified",
+      "verified": [
+        "真实同revision并发材料修改恰好一笔生效、另一拒绝，另一卡不变"
+      ],
+      "remaining": "界面保留被拒绝的本机输入仍需验证"
+    },
+    {
+      "id": "PC10",
+      "scenario": "上传中切 Core 或结束单聊",
+      "expected": "迟到结果不污染新上下文",
+      "status": "engineering_verification_pending",
+      "verified": [],
+      "remaining": "迟到结果不污染新上下文"
+    },
+    {
+      "id": "PC11",
+      "scenario": "移除别 scope 附件或越权 quote",
+      "expected": "拒绝，不借用或删除别卡材料",
+      "status": "partial_real_native_verified",
+      "verified": [
+        "跨卡移除附件拒绝且两份草稿逐字段保持；原文件读者跨卡读取拒绝"
+      ],
+      "remaining": "quote越权与排队工作副本完整资格仍需验证"
+    },
+    {
+      "id": "PC12",
+      "scenario": "仅附件发送",
+      "expected": "维持原合法行为，使用所选附件",
+      "status": "engineering_verification_pending",
+      "verified": [],
+      "remaining": "维持原合法行为，使用所选附件"
+    },
+    {
+      "id": "PC13",
+      "scenario": "只有 quote 没有问题正文",
+      "expected": "保留原 question_required 约束",
+      "status": "engineering_verification_pending",
+      "verified": [],
+      "remaining": "保留原 question_required 约束"
+    },
+    {
+      "id": "PC14",
+      "scenario": "单卡发送并检查最终输入",
+      "expected": "路径、quote 顺序及原 section 正确；无卡片字段",
+      "status": "final_runtime_input_evidence_pending",
+      "verified": [],
+      "remaining": "须补最终Blob与实际Runtime独立证据；本轮不使用模型身份或预算，不能用当前Core材料检查代替"
+    },
+    {
+      "id": "PC15",
+      "scenario": "发送前源文件变化或失效",
+      "expected": "明确失败并保留输入，不替换同名源",
+      "status": "engineering_verification_pending",
+      "verified": [],
+      "remaining": "明确失败并保留输入，不替换同名源"
+    },
+    {
+      "id": "PC16",
+      "scenario": "双卡同 Conversation 连续发送",
+      "expected": "原 FIFO 顺序，无额外执行队列",
+      "status": "engineering_verification_pending",
+      "verified": [],
+      "remaining": "原 FIFO 顺序，无额外执行队列"
+    },
+    {
+      "id": "PC17",
+      "scenario": "另一卡查看编辑并明确接管",
+      "expected": "不继承 token；接管后旧写拒绝",
+      "status": "engineering_verification_pending",
+      "verified": [],
+      "remaining": "不继承 token；接管后旧写拒绝"
+    },
+    {
+      "id": "PC18",
+      "scenario": "排队消息移回空卡",
+      "expected": "正文、附件、quotes 同份返回",
+      "status": "engineering_verification_pending",
+      "verified": [],
+      "remaining": "正文、附件、quotes 同份返回"
+    },
+    {
+      "id": "PC19",
+      "scenario": "移回非空目标",
+      "expected": "两份完整输入，无覆盖或混装",
+      "status": "engineering_verification_pending",
+      "verified": [],
+      "remaining": "两份完整输入，无覆盖或混装"
+    },
+    {
+      "id": "PC20",
+      "scenario": "交换保留输入时丢失回执并重试",
+      "expected": "原 UUID 只交换一次，双方均可恢复",
+      "status": "partial_real_native_verified",
+      "verified": [
+        "真实保留输入交换原UUID回放结果相同；冷启动后双方正文/附件和原准备回执保持"
+      ],
+      "remaining": "明确回执丢失后的界面核对路径仍需验证"
+    },
+    {
+      "id": "PC21",
+      "scenario": "发送已接受但响应丢失并重启",
+      "expected": "核对原结果，不换 UUID 重发",
+      "status": "engineering_verification_pending",
+      "verified": [],
+      "remaining": "核对原结果，不换 UUID 重发"
+    },
+    {
+      "id": "PC22",
+      "scenario": "Core 在输入接受前后分别退出",
+      "expected": "旧冻结 Manifest Blob 与接受边界保持",
+      "status": "final_runtime_input_evidence_pending",
+      "verified": [],
+      "remaining": "须补最终Blob与实际Runtime独立证据；本轮不使用模型身份或预算，不能用当前Core材料检查代替"
+    },
+    {
+      "id": "PC23",
+      "scenario": "删除节点或换绑后恢复",
+      "expected": "保留原归属，不自动转发新单聊",
+      "status": "partial_real_native_verified",
+      "verified": [
+        "删除pin后原归属标为孤立、材料保持，冷启动可按原owner读取正文和源文件"
+      ],
+      "remaining": "换绑及恢复编辑器的完整交互仍需验证"
+    },
+    {
+      "id": "PC24",
+      "scenario": "升级旧数据与旧客户端及注入迁移失败",
+      "expected": "默认行、旧回执不变；失败全回滚；新功能不降级绕过",
+      "status": "engineering_verification_pending",
+      "verified": [],
+      "remaining": "默认行、旧回执不变；失败全回滚；新功能不降级绕过"
+    }
+  ]
+}

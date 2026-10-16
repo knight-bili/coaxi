@@ -22,6 +22,18 @@ async function qualify(window){
  try{
   window.show();window.focus();window.webContents.focus()
   await wait(`window.rovai&&document.querySelector('button[aria-label="无限画布"]')?.disabled===false`,60_000)
+  if(config.mode==='materials'){
+   report.scope='production Main/preload/Core; private composer scopes and Native byte preparation; no model'
+   await qualifyMaterials({evaluate,rpc})
+   report.status='passed'
+   return
+  }
+  if(config.mode==='materials-reopen'){
+   report.scope='production Main/preload/Core; cold private material recovery and authorized file reads; no model'
+   await qualifyMaterialReopen({evaluate,rpc})
+   report.status='passed'
+   return
+  }
   if(config.mode==='files'){
    report.scope='production Main/preload/Core; real file cards and author HTML lifecycle'
    await qualifyFiles(window,{evaluate,wait,rpc})
@@ -180,5 +192,138 @@ async function qualifyFiles(window,{evaluate,wait,rpc}){
  assert.equal(await readFile(config.text_file,'utf8'),original)
  assert.ok(!(await rpc('canvas.nodes.snapshot',{boardId})).nodes.some(node=>node.id===nodeIds[0]))
  record('core_node_deletion_removes_only_pin_and_preserves_file_and_other_html_view')
+}
+async function qualifyMaterials({evaluate,rpc}){
+ const threadId=config.thread_id
+ const opened=await rpc('singleChat.open',{commandId:randomUUID(),command:{threadId,agentId:config.agent_id}})
+ assert.equal(opened.status,'applied',JSON.stringify(opened))
+ const conversationId=opened.payload.conversationId
+ assert.equal(typeof conversationId,'string')
+ const board=await rpc('canvas.boards.create',{commandId:randomUUID(),command:{name:'C06 私聊材料隔离'}})
+ assert.equal(board.status,'applied',JSON.stringify(board))
+ const boardId=board.payload.board.id,scopes=[]
+ for(let index=0;index<3;index++){
+  const graph=await rpc('canvas.nodes.snapshot',{boardId})
+  const created=await rpc('canvas.nodes.apply',{commandId:randomUUID(),command:{boardId,expectedRevision:graph.board.revision,mutation:{type:'create',node:{kind:'conversation',conversation:{threadId,conversationId},x:index*400,y:0,width:360,height:300}}}})
+  assert.equal(created.status,'applied',JSON.stringify(created))
+  scopes.push({kind:'canvas',boardId,nodeId:created.payload.nodeIds[0]})
+ }
+ report.private_context={thread_id:threadId,conversation_id:conversationId,board_id:boardId,scopes}
+ const get=scope=>rpc('singleChat.get',{conversationId,composerScope:scope})
+ const mutation=(scope,revision,action,commandId=randomUUID())=>({commandId,command:{threadId,conversationId,composerScope:scope,expectedDraftRevision:revision,action}})
+ const mutate=async(scope,revision,action)=>rpc('singleChat.composerDraft.mutate',mutation(scope,revision,action))
+ const names=draft=>draft.attachments.map(item=>item.displayName)
+ const reject=async(method,params)=>{
+  let response
+  try{response=await rpc(method,params)}catch(error){return {rejected:true,error:String(error).slice(0,800)}}
+  assert.equal(response.status,'rejected',JSON.stringify(response))
+  return {rejected:true,result:response}
+ }
+ assert.equal((await get(scopes[2])).draft.revision,0)
+ const readonly=await rpc('singleChat.composerDraft.recovery',{threadId,conversationId})
+ assert.ok(!readonly.items.some(item=>item.kind==='scope'&&item.scope.composerScope?.nodeId===scopes[2].nodeId))
+ record('readonly_empty_scope_does_not_register_a_recovery_scope')
+ for(const scope of scopes.slice(0,2))assert.equal((await mutate(scope,0,{type:'register_scope'})).status,'applied')
+ const bogus={kind:'canvas',boardId,nodeId:randomUUID()}
+ report.invalid_scope=bogus
+ report.invalid_scope_rejection=await reject('singleChat.composerDraft.mutate',mutation(bogus,0,{type:'register_scope'}))
+ record('forged_node_scope_cannot_register_private_materials')
+ const prepare=async(scope,name,text)=>{
+  const current=await get(scope),request={commandId:randomUUID(),threadId,expectedRevision:current.draft.revision,target:{kind:'single_chat',conversationId,composerScope:scope}}
+  const prepared=await evaluate(`window.rovai.singleChatAttachments.prepareInput(${JSON.stringify(request)},new File([${JSON.stringify(text)}],${JSON.stringify(name)},{type:'text/plain'}))`)
+  assert.equal(prepared.state,'recorded',JSON.stringify(prepared));assert.equal(prepared.receipt.status,'applied',JSON.stringify(prepared))
+  const reconciled=await evaluate(`window.rovai.singleChatAttachments.reconcileInput(${JSON.stringify(request)})`)
+  assert.deepEqual(reconciled,prepared)
+  report.preparations??=[];report.preparations.push({request,result:prepared})
+  return get(scope)
+ }
+ let alpha=await prepare(scopes[0],'甲材料一 #中文.txt','甲卡第一份专用材料')
+ alpha=await prepare(scopes[0],'甲材料二.txt','甲卡第二份专用材料')
+ const beta=await prepare(scopes[1],'乙材料.txt','乙卡专用材料')
+ assert.deepEqual(names(alpha.draft),['甲材料一 #中文.txt','甲材料二.txt'])
+ assert.deepEqual(names(beta.draft),['乙材料.txt'])
+ assert.deepEqual(names((await get(null)).draft),[])
+ record('native_byte_uploads_and_receipt_lookup_keep_two_cards_and_default_draft_isolated')
+ report.cross_scope_remove=await reject('singleChat.composerDraft.mutate',mutation(scopes[0],alpha.draft.revision,{type:'remove_attachment',attachmentRefId:beta.draft.attachments[0].id}))
+ assert.deepEqual((await get(scopes[0])).draft,alpha.draft)
+ assert.deepEqual((await get(scopes[1])).draft,beta.draft)
+ record('cross_scope_remove_is_rejected_without_mutating_either_draft')
+ const ids=alpha.draft.attachments.map(item=>item.id)
+ const concurrent=await Promise.all([rpc('singleChat.composerDraft.mutate',mutation(scopes[0],alpha.draft.revision,{type:'reorder_attachments',attachmentRefIds:[...ids].reverse()})),rpc('singleChat.composerDraft.mutate',mutation(scopes[0],alpha.draft.revision,{type:'reorder_attachments',attachmentRefIds:ids}))])
+ assert.equal(concurrent.filter(x=>x.status==='applied').length,1)
+ assert.equal(concurrent.filter(x=>x.status==='rejected').length,1)
+ assert.deepEqual((await get(scopes[1])).draft,beta.draft)
+ record('concurrent_same_revision_mutations_apply_once_and_leave_other_card_unchanged')
+ const legacy=await prepare(null,'原工作区材料.txt','原默认位置待迁入材料')
+ alpha=await get(scopes[0])
+ const adopted=await mutate(scopes[0],alpha.draft.revision,{type:'adopt_legacy_materials',expectedSourceRevision:legacy.draft.revision,targetBody:'甲卡原有问题正文'})
+ assert.equal(adopted.status,'applied',JSON.stringify(adopted))
+ assert.deepEqual(names((await get(scopes[0])).draft),names(alpha.draft))
+ assert.deepEqual(names((await get(null)).draft),[])
+ const recovery=await rpc('singleChat.composerDraft.recovery',{threadId,conversationId})
+ const targetScopeKey=(await get(scopes[0])).draft.scopeKey
+ const retained=recovery.items.find(item=>item.kind==='retained'&&item.input.scopeKey===targetScopeKey)
+ assert.ok(retained,JSON.stringify(recovery))
+ assert.deepEqual(names(retained.input),['原工作区材料.txt'])
+ record('legacy_materials_move_to_a_complete_retained_input_when_target_is_occupied')
+ alpha=await get(scopes[0])
+ const swap=mutation(scopes[0],alpha.draft.revision,{type:'swap_retained',retainedInputId:retained.input.id,expectedRetainedRevision:retained.input.revision,currentBody:'甲卡原有问题正文'})
+ const first=await rpc('singleChat.composerDraft.mutate',swap)
+ assert.equal(first.status,'applied',JSON.stringify(first))
+ const replay=await rpc('singleChat.composerDraft.mutate',swap)
+ assert.deepEqual(replay,first)
+ assert.deepEqual(names((await get(scopes[0])).draft),['原工作区材料.txt'])
+ assert.deepEqual((await get(scopes[1])).draft,beta.draft)
+ record('retained_swap_replay_preserves_original_receipt_and_other_card_materials')
+ const graph=await rpc('canvas.nodes.snapshot',{boardId})
+ const removed=await rpc('canvas.nodes.apply',{commandId:randomUUID(),command:{boardId,expectedRevision:graph.board.revision,mutation:{type:'delete',nodeIds:[scopes[0].nodeId]}}})
+ assert.equal(removed.status,'applied',JSON.stringify(removed))
+ const orphan=await rpc('singleChat.composerDraft.recovery',{threadId,conversationId})
+ assert.ok(orphan.items.some(item=>item.kind==='scope'&&item.scope.composerScope?.nodeId===scopes[0].nodeId&&item.scope.orphaned))
+ assert.deepEqual(names((await get(scopes[0])).draft),['原工作区材料.txt'])
+ report.final_recovery=orphan
+ record('deleted_pin_keeps_private_materials_recoverable_under_original_conversation')
+}
+async function qualifyMaterialReopen({evaluate,rpc}){
+ const previous=JSON.parse(await readFile(config.previous_result,'utf8'))
+ assert.equal(previous.status,'passed')
+ const {thread_id:threadId,conversation_id:conversationId,scopes}=previous.private_context
+ const recovery=await rpc('singleChat.composerDraft.recovery',{threadId,conversationId})
+ assert.deepEqual(recovery.items,previous.final_recovery.items)
+ record('cold_reopen_preserves_complete_private_material_and_orphan_recovery_entries')
+ const alpha=await rpc('singleChat.get',{conversationId,composerScope:scopes[0]})
+ const beta=await rpc('singleChat.get',{conversationId,composerScope:scopes[1]})
+ assert.deepEqual(alpha.draft.attachments.map(x=>x.displayName),['原工作区材料.txt'])
+ assert.deepEqual(beta.draft.attachments.map(x=>x.displayName),['乙材料.txt'])
+ assert.deepEqual(alpha.agentRuns,[]);assert.deepEqual(alpha.messages,[])
+ for(const prepared of previous.preparations){
+  const receipt=await evaluate(`window.rovai.singleChatAttachments.reconcileInput(${JSON.stringify(prepared.request)})`)
+  assert.deepEqual(receipt,prepared.result)
+ }
+ record('native_preparation_receipts_survive_process_restart_without_rebinding_or_execution')
+ await evaluate(`window.rovai.filePreview.bindThread(${JSON.stringify(threadId)})`)
+ const preview=async(locator,expected)=>{
+  const opened=await evaluate(`window.rovai.filePreview.restore(${JSON.stringify({kind:'attachment',threadId,locator})})`)
+  assert.equal(opened.ok,true,JSON.stringify(opened));assert.equal(opened.value.kind,'file_preview')
+  const file=opened.value.file
+  const read=await evaluate(`window.rovai.filePreview.readText(${JSON.stringify({handleId:file.handleId,expectedGeneration:file.contentGeneration})})`)
+  assert.equal(read.ok,true,JSON.stringify(read));assert.equal(read.value.text,expected)
+  await evaluate(`window.rovai.filePreview.release(${JSON.stringify({handleId:file.handleId})})`)
+  return {kind:file.kind,fileName:file.fileName}
+ }
+ report.orphan_file=await preview({owner:'single_chat_scoped_composer',threadId,conversationId,composerScope:scopes[0],attachmentRefId:alpha.draft.attachments[0].id},'原默认位置待迁入材料')
+ report.beta_file=await preview({owner:'single_chat_scoped_composer',threadId,conversationId,composerScope:scopes[1],attachmentRefId:beta.draft.attachments[0].id},'乙卡专用材料')
+ record('production_file_reader_resolves_exact_card_owner_after_cold_reopen')
+ const retained=recovery.items.find(x=>x.kind==='retained'&&x.input.scopeKey===alpha.draft.scopeKey)
+ assert.ok(retained);assert.equal(retained.input.body,'甲卡原有问题正文')
+ const expected={'甲材料一 #中文.txt':'甲卡第一份专用材料','甲材料二.txt':'甲卡第二份专用材料'}
+ for(const attachment of retained.input.attachments)await preview({owner:'single_chat_retained',threadId,conversationId,composerScope:scopes[0],retainedInputId:retained.input.id,attachmentRefId:attachment.id},expected[attachment.displayName])
+ assert.equal(retained.input.attachments.length,2)
+ record('retained_input_keeps_original_body_and_each_authorized_attachment_content')
+ const crossed=await evaluate(`window.rovai.filePreview.restore(${JSON.stringify({kind:'attachment',threadId,locator:{owner:'single_chat_scoped_composer',threadId,conversationId,composerScope:scopes[0],attachmentRefId:beta.draft.attachments[0].id}})})`)
+ assert.equal(crossed.ok,false,JSON.stringify(crossed));report.crossed_file=crossed
+ record('production_file_reader_rejects_attachment_from_a_different_card')
+ assert.deepEqual((await rpc('singleChat.composerDraft.recovery',{threadId,conversationId})).items,recovery.items)
+ report.private_context=previous.private_context
 }
 await import(config.production_main)

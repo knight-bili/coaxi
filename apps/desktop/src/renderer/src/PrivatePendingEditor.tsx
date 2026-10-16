@@ -7,6 +7,7 @@ import { PrivateUploadRecoveryPanel, privateUploadErrorMessage } from './Private
 import { privateUploadController } from './private-upload-controller'
 import { useThreadClient } from './camp-client'
 import { UiText, uiAttribute } from './interface-language'
+import { AttachmentCard } from './AttachmentCard'
 
 export function PrivatePendingEditor({ item, session, controller, bodies, busy, onError }: {
   item: SingleChatPendingInputView
@@ -41,10 +42,14 @@ export function PrivatePendingEditor({ item, session, controller, bodies, busy, 
           try { controller.rememberBody(key) } catch (error) { onError(privateInputErrorMessage(error)) }
         }} />
     </label>
-    {session.workingAttachments.length > 0 && <ul>{session.workingAttachments.map(attachment => <li key={attachment.id}>
-      {attachment.displayName}
-      <button type="button" disabled={busy || uploadBusy || session.recoveryRequired} onClick={() => perform(controller.edit(item, { type: 'remove_attachment', attachmentRefId: attachment.id }, session.editToken))}><UiText zh="移除附件" /></button>
-    </li>)}</ul>}
+    {session.workingAttachments.length > 0 && <div className="single-chat-pending-attachments">{session.workingAttachments.map(attachment => <AttachmentCard
+      key={attachment.id} attachment={attachment} disabled={busy || uploadBusy || session.recoveryRequired}
+      locator={controller.origin.scope ? { owner: 'single_chat_scoped_pending_edit', threadId: controller.origin.threadId,
+        conversationId: controller.origin.conversationId, composerScope: controller.origin.scope,
+        pendingInputId: item.id, editToken: session.editToken, attachmentRefId: attachment.id }
+        : { owner: 'single_chat_pending_edit', threadId: controller.origin.threadId, conversationId: controller.origin.conversationId,
+          pendingInputId: item.id, editToken: session.editToken, attachmentRefId: attachment.id }}
+      onNotify={onError} onRemove={() => perform(controller.edit(item, { type: 'remove_attachment', attachmentRefId: attachment.id }, session.editToken))} />)}</div>}
     {session.workingQuotes.map(quote => <blockquote key={quote.quoteId}>{quote.text}</blockquote>)}
     {uploads.supported && <>
       <input ref={fileInput} className="composer-file-input" type="file" tabIndex={-1} onChange={event => {
