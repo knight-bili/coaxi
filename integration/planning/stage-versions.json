@@ -37,14 +37,34 @@
     {
       "stage_id": "I03",
       "name": "完整无限画布与对象绑定",
-      "candidate_version": "fusion-i03-rc.1",
-      "status": "planned_not_frozen",
+      "candidate_version": "fusion-i03-rc.2",
+      "status": "repair_candidate_pending_freeze",
       "frozen_commit": null,
-      "validation_batch": null,
-      "validation_runs": [],
-      "engineering_validation": "pending_evidence_for_frozen_candidate",
+      "validation_batch": "I03-normal-01",
+      "validation_runs": [
+        {
+          "kind": "local_windows_cargo_build",
+          "source_commit": "f2630de05ed69cef3d49db1dcf0e5f141299b047",
+          "exit_code": 0
+        },
+        {
+          "kind": "local_full_types",
+          "source_commit": "f2630de05ed69cef3d49db1dcf0e5f141299b047",
+          "exit_code": 2
+        }
+      ],
+      "engineering_validation": "in_progress",
       "engineering_owner": "Codex",
-      "customer_stage_gate": false
+      "customer_stage_gate": false,
+      "previous_candidates": [
+        {
+          "candidate_version": "fusion-i03-rc.1",
+          "frozen_commit": "f2630de05ed69cef3d49db1dcf0e5f141299b047",
+          "windows_production_build": "passed",
+          "full_types": "failed",
+          "repair_reason": "Main Native upload retry/finish type declaration omission"
+        }
+      ]
     },
     {
       "stage_id": "I04",

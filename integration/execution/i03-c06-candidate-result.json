@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "stage": "I03",
+  "closeout_group": "I03-C06",
+  "status": "in_progress",
+  "recorded_at": "2026-10-16T04:14:06.607604+00:00",
+  "source_binding": {
+    "base_commit": "f2630de05ed69cef3d49db1dcf0e5f141299b047",
+    "kind": "exact_worktree_sha256_before_commit",
+    "files": {
+      "apps/desktop/src/main/core-client.ts": "242efdea1ff985e0e366fbd05c73f5c7c2d8c39f239e715a79d753075a26a41c",
+      "integration/execution/goal-state.json": "149934bf26a04ea7e42adb4fd4ea80fc600cf65f2d83a4cf68b4afc010ae462e",
+      "integration/execution/i03-closeout.json": "ec2eae11bacfd82ea244eaa7e9fccee0398e0d195171e83122c38883b344a9f3",
+      "integration/planning/stage-versions.json": "82c6e59dd55b45eb0f6e5e8daaa3fa21a058759d59e7f4b6460150872d4d9d3c"
+    }
+  },
+  "artifact_binding": {
+    "work/i03/c06/fusion-i03-rc.1/freeze.json": "575cd2f409b21bfdbed51c01d2b8713180646a3b0751853878d5c61b92228431",
+    "work/i03/c06/fusion-i03-rc.1/windows-build-start.json": "e6d453535eda5a2016c0bd073d800d16f87898dec17a6776febf962d18920d4b",
+    "work/i03/c06/fusion-i03-rc.1/windows-build-result.json": "65d9adc0c81ebd747126eddd339e579a7ec5c6a1e61c0a6b95b6d78d2cbb0380",
+    "work/i03/c06/fusion-i03-rc.1/windows-build.log": "f99baa58f0f449086dec2d3a93bdd3d66f400ceec24a432f144213e74e4a0642",
+    "work/i03/c06/fusion-i03-rc.1/windows-binaries.json": "a15019d59c6b3f20f6350606156d320ddf9a2cd43a846ec07a3d7b1ee0e52c36",
+    "work/i03/c06/fusion-i03-rc.1/windows-build-offline.log": "05ef457d0df0de7f01872f3a7cd0a4bbe8d41ab83091b5f36cb847c49e2c526a",
+    "work/i03/c06/fusion-i03-rc.1/windows-build-offline-result.json": "d3a2842874dd14c976a84ac26d360a25fccfa3a1e2c57759bed7c80e7392bb87",
+    "work/i03/c06/fusion-i03-rc.1/types-result.json": "f7fcf3e387cf5b1810af0ed049ab325cd773a9bb8de284bef370ace9044e862a",
+    "work/i03/c06/fusion-i03-rc.1/types.log": "ec319bb5daa0410cb1075e2367690b9648a6af8be0a0028274ae2a4f543370f4",
+    "work/i03/c06/fusion-i03-rc.1/tool-sessions.json": "aabc1e93a11cfe982b7fb3a636a124a998faf3b4537d04dac3afa7cfe769ede2",
+    "work/i03/record-c06-type-repair.py": "63dd49469751fb639829e27cb641f806a8007636412694fad1837013c784f3af"
+  },
+  "frozen_authority_files": {
+    "crates/rovai-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
+    "crates/rovai-core/src/context.rs": "329144f38675ebedeaf5652858d457d42369455eb26c6159af61d19c02218784",
+    "crates/rovai-core/src/message_quote.rs": "efb6e962946b85c089483bb1120fe92f32458bb3b3b5e5eb668e26f8aa96481e",
+    "crates/rovai-core/src/command.rs": "22258f81dc5b76040cd0fdba20074321b5be7104e648a8278412c0736ef0d85a"
+  },
+  "candidates": [
+    {
+      "version": "fusion-i03-rc.1",
+      "source_commit": "f2630de05ed69cef3d49db1dcf0e5f141299b047",
+      "status": "failed_full_types",
+      "windows_build": {
+        "source_commit": "f2630de05ed69cef3d49db1dcf0e5f141299b047",
+        "candidate": "fusion-i03-rc.1",
+        "started_at": "2026-10-16T04:05:56.4204015Z",
+        "finished_at": "2026-10-16T04:08:12.0440560Z",
+        "command": "cargo build --locked --package rovai-core --package rovai-host",
+        "exit_code": 0,
+        "status": "passed"
+      },
+      "types": {
+        "source_commit": "f2630de05ed69cef3d49db1dcf0e5f141299b047",
+        "started_at": "2026-10-16T04:05:56.0980802Z",
+        "finished_at": "2026-10-16T04:06:22.0532906Z",
+        "command": "pnpm exec tsc --noEmit",
+        "exit_code": 2,
+        "status": "failed"
+      }
+    }
+  ],
+  "implemented_repair": "Only Main HostWebMethod union adds existing Core host.upload.retry/finish; no runtime body or renderer authority change",
+  "reuse_boundary": "No changes to crates/Cargo/skills/resources since passing rc.1 build; preserve actual binary source commit and revalidate differences/hashes for next candidate",
+  "windows_binaries": [
+    {
+      "name": "rovai-core.exe",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\target\\debug\\rovai-core.exe",
+      "length": 79836672,
+      "last_write_utc": "2026-10-16T04:08:11.8541802Z",
+      "sha256": "a2d48b9f2906002c27f37e1ad702860b9ecf7874af40b117f091a71c6912d994",
+      "source_commit": "f2630de05ed69cef3d49db1dcf0e5f141299b047"
+    },
+    {
+      "name": "rovai-host.exe",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\target\\debug\\rovai-host.exe",
+      "length": 85925376,
+      "last_write_utc": "2026-10-16T04:08:10.7353382Z",
+      "sha256": "bba8c729af58c250b2412683845f2e83d3a155432ce5418aaef50bf67afd2f98",
+      "source_commit": "f2630de05ed69cef3d49db1dcf0e5f141299b047"
+    },
+    {
+      "name": "rovai.exe",
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\target\\debug\\rovai.exe",
+      "length": 6582272,
+      "last_write_utc": "2026-10-16T04:08:09.7039758Z",
+      "sha256": "e57d2ada60af54875998e9d2194e7ec53f039105b29d38f7985eff5bbf0496d0",
+      "source_commit": "f2630de05ed69cef3d49db1dcf0e5f141299b047"
+    }
+  ],
+  "dependency_attempt": "offline cache miss for locked bitflags1.3.2, terminal101; normal locked public dependency fetch then build terminal0; no source failure inferred from cache miss",
+  "not_run": [
+    "rc.2 full types and Web build",
+    "Rust cfg(test)/extended/slow owner compilation or execution",
+    "actual Host/HTTP/Core/PTy/native/App/platform scenarios",
+    "full PC01-PC24/324"
+  ],
+  "normal_phase_batches": 1,
+  "repair_candidates": 1,
+  "guardrails": {
+    "push": false,
+    "actions": false,
+    "paid_models": false,
+    "real_user_data_or_credentials": false,
+    "customer_action_required_now": false
+  },
+  "next": "冻结fusion-i03-rc.2；仅补Main HostWebMethod的retry/finish类型声明，Rust/技能/资源源码保持，复用rc.1真实Windows构建并核其源码差异与3二进制SHA。先全量types/Web构建及Rust owner正确features下list非零，再运行实际Host/PTY/Native/App和平台。"
+}

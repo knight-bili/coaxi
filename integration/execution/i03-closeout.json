@@ -106,8 +106,21 @@
     {
       "id": "I03-C06",
       "name": "阶段候选集中工程验证",
-      "status": "not_started",
-      "done_when": "功能集齐冻结fusion-i03-rc.1，相关编译/集成/回归/平台检查由Codex执行，记录缺陷和必要复验，不等待客户阶段验收"
+      "status": "in_progress",
+      "done_when": "功能集齐冻结fusion-i03-rc.1，相关编译/集成/回归/平台检查由Codex执行，记录缺陷和必要复验，不等待客户阶段验收",
+      "latest_partial_evidence": "i03-c06-candidate-result.json",
+      "completed_checks": [
+        "rc.1源码冻结f2630de0、当前Windows Core/Host/CLI生产构建exit0和3新二进制SHA"
+      ],
+      "open_findings": [
+        "rc.1全量tsc exit2：Main HostWebMethod遗漏已实现retry/finish；已改声明，待rc.2全量复验"
+      ],
+      "remaining_checks": [
+        "正确features下相关Rust owner先list非零再运行",
+        "全量types及Web/Desktop生产构建",
+        "实际Core/Host/HTTP/PTY/Native/App、冷路由、多卡与大材料响应",
+        "阶段适用平台/迁移/冻结输入回归与正式场景证据"
+      ]
     }
   ],
   "state_rule": "代码完成、工程验证通过、待环境验证分别记录；无代码缺口且工程验证满足时由Codex收口；缺环境继续独立后续工作，最终MVP不豁免",
