@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { app } from 'electron'
+import { app, clipboard } from 'electron'
 import { randomUUID, createHash } from 'node:crypto'
 import { readFile, writeFile, readdir } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -52,8 +52,20 @@ export async function qualifyCanvasNativeLoad(window,{evaluate,wait,rpc,openCanv
  const readInput=async n=>evaluate(`(async()=>{const text=${input(n)}.value,bytes=new TextEncoder().encode(text),digest=await crypto.subtle.digest('SHA-256',bytes);return {sha256:[...new Uint8Array(digest)].map(b=>b.toString(16).padStart(2,'0')).join(''),characters:text.length,bytes:bytes.length,tail:text.slice(-40)}})()`)
  const seed=async(n,text)=>{
   await evaluate(`(()=>{const input=${input(n)};input.focus();input.select();window.r08SeedEvents=[];input.addEventListener('input',event=>window.r08SeedEvents.push(event.isTrusted),{once:true});return true})()`)
-  await window.webContents.insertText(text)
-  await wait(`${input(n)}.value.length===${text.length}`)
+  if(Buffer.byteLength(text)>1024*1024){
+   const formats=clipboard.availableFormats(),supported=new Set(['text/plain','text/html','text/rtf','image/png']),saved={},buffers={}
+   assert.ok(formats.every(format=>supported.has(format)),'Existing clipboard format cannot be restored safely; no mutation performed')
+   if(formats.includes('text/plain'))saved.text=clipboard.readText()
+   if(formats.includes('text/html'))saved.html=clipboard.readHTML()
+   if(formats.includes('text/rtf'))saved.rtf=clipboard.readRTF()
+   if(formats.includes('image/png'))saved.image=clipboard.readImage()
+   for(const format of formats)buffers[format]=clipboard.readBuffer(format)
+   const restore=()=>{clipboard.clear();if(formats.length)clipboard.write(saved);assert.deepEqual(clipboard.availableFormats().sort(),[...formats].sort());for(const format of formats)assert.ok(clipboard.readBuffer(format).equals(buffers[format]),'Original clipboard bytes must be restored');report.original_clipboard_restored=true}
+   // 大文本使用用户实际粘贴入口；bulk insertText走不同的IME插入路径。超出15秒即终止本测试Renderer，先阻止迟到粘贴再恢复系统状态。
+   const guard=setTimeout(()=>{report.paste_guard_triggered=true;window.webContents.forcefullyCrashRenderer();restore()},15_000)
+   try{clipboard.writeText(text);window.webContents.paste();await wait(`${input(n)}.value.length===${text.length}`)}
+   finally{clearTimeout(guard);restore()}
+  }else{await window.webContents.insertText(text);await wait(`${input(n)}.value.length===${text.length}`)}
   assert.ok((await evaluate('window.r08SeedEvents')).includes(true))
  }
  const savedBody=async expected=>{
