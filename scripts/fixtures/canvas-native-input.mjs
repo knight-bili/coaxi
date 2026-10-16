@@ -634,15 +634,17 @@ async function qualifyNotes(window,{evaluate,wait,rpc}){
  await pause(50)
  // XYDrag.startDrag captures the pointer after its activation threshold, not on mouseDown.
  const activated={x:start.x+8,y:start.y+8},ended={x:activated.x+72,y:activated.y+48}
- report.note_drag_path={pressed:start,activated,ended,expected_delta:{x:72,y:48}}
+ const expectedGeometry={x:400-320,y:48}
+ report.note_drag_path={pressed:start,activated,ended,drag_delta:{x:72,y:48},expected_final_position:expectedGeometry,alignment:'right edge snaps to the neighbouring note at x=400 within the existing 8px tolerance'}
  window.webContents.sendInputEvent({type:'mouseMove',...activated,modifiers:['leftButtonDown']});await pause(80)
  window.webContents.sendInputEvent({type:'mouseMove',...ended,modifiers:['leftButtonDown']});await pause(80);mouse('mouseUp',ended)
  await pause(200)
  report.note_drag_events=await evaluate('window.noteDragEvents')
  report.note_graph_after_drag=await rpc('canvas.nodes.snapshot',{boardId})
- await wait(`window.rovai.request('canvas.nodes.snapshot',{boardId:${JSON.stringify(boardId)}}).then(graph=>graph.nodes.find(node=>node.id===${JSON.stringify(ids[0])})?.data.x===72)`)
+ await wait(`window.rovai.request('canvas.nodes.snapshot',{boardId:${JSON.stringify(boardId)}}).then(graph=>graph.nodes.find(node=>node.id===${JSON.stringify(ids[0])})?.data.x===${expectedGeometry.x})`)
  const moved=(await rpc('canvas.nodes.snapshot',{boardId})).nodes.find(node=>node.id===ids[0])
- assert.equal(moved.data.y,48);record('whole_note_body_native_drag_updates_exact_core_geometry')
+ assert.equal(moved.data.x+moved.data.width,400);assert.equal(moved.data.y,expectedGeometry.y)
+ record('whole_note_body_native_drag_updates_exact_core_geometry_and_retains_edge_alignment')
  const type=async(text,keyboard=false)=>{
   await wait(`Boolean(document.querySelector('.canvas-dock-panel button[aria-label="自动排列"]:not(:disabled)'))`)
   if(keyboard){
