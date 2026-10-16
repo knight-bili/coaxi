@@ -160,3 +160,15 @@ CSS解析和差异空白检查通过，没有新增构建、Native运行、推�
 final result: blocked
 
 完整视觉/阶段工程验证未完，持续目标active，无新增客户确认事项。
+
+## 原搜索框兼容与卡片Renderer检查
+
+原Mission搜索在画布对象弹窗内被通用表单边框/40px最小高度覆盖，已仅为该复合搜索排除通用表单规则，保留原29px容器与12px文字。修复前真实输入高39.680px/容器28.768px，修复后27.445px/28.768px、内部边框0、普通字段仍有边框与40px高度。最终日夜两主题四次Renderer运行通过，源码及独立测试入口已绑定；实际查看最终夜主题Diff和日主题64摘要截图。
+
+上轮便笺13px、正文选择/标题禁选获当前CSS局部运行证据。纯画布窗口/缩放未复现ResizeObserver；完整App已有提示仍待下一候选多会话抓取，已加显式可选回调观察，不过滤错误。此次内存投影无Core/Git/PTY/模型，不追加rc14真实Native场景；下排占位卡不代表完整八类资格。标准typecheck及新增TSX通过；整个原Mission演示夹具不属于默认严格typecheck范围，其旧缺项记录在报告中，未改无关代码。
+
+报告integration/execution/i03-c06-source-search-layout-verification.json。未完整构建、push或Actions；C06完整主题/八类/真实列表投影及既有C05有限剩余继续，持续目标active，无需客户介入。
+
+final result: blocked
+
+完整阶段工程验证未完，局部Renderer检查已过。

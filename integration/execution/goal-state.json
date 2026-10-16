@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "按客户卡片源码要求补正Codeg正文选择/光标、标题拖动及便笺13px密度；CSS解析与差异检查通过，待集中候选运行。原rc14的60个Native场景仍有效但不覆盖新CSS；不逐切片全构建或触发Actions。",
+  "current_slice": "原组件CSS兼容：修复画布对象弹窗搜索双边框/40px撑出；日夜四次最终Renderer运行及标准类型检查通过。便笺13px/正文选择获当前CSS的局部运行证据。纯画布64摘要未复现ResizeObserver，完整App仍待来源抓取，Native诊断开关已备。无完整构建/push/Actions。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "先审计C05五空闲投影、各Thread真实文件预览、HTML/终端窗口预算的已有Core/Host证据，充分项直接复用，只补真实缺口；继续整App/Core硬中断/未知在途请求、大材料IO及PC。ready Git Diff、公开新进程与已过多卡/renderer不重复验证。已编码待视觉的13px便笺/正文选择、待修Diff失效态搜索框边框、主题/八类与ResizeObserver产品整改攒齐再冻结候选，不逐切片重编/push/Actions；外部缺项单列并继续I04等可独立编码。",
+    "按原C06补真实画板缩略预览/数量及完整八类状态；本批便笺和Diff搜索CSS已通过针对性Renderer检查，下一冻结候选抓多会话ResizeObserver来源并做必要集成。不得重复跑已过的60个rc14场景；C05资源/未知请求/IO/PC余项按证据复用后补缺。缺外部条件继续独立I04等编码，不逐切片全构建/push/Actions。",
     "阶段剩余清单固定按I03-C06继续工程验证；暂缺环境只单列待办，继续可独立的I02余项和I04-I12/BUF，不把后续功能提前塞入I03。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "source_card_css_followup_implemented_pending_batched_visual_verification",
+  "current_slice_status": "source_search_css_and_card_renderer_checks_passed_full_app_and_stage_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -215,5 +215,6 @@
   "canvas_renderer_crash_native_evidence": "i03-c05-renderer-crash-native-verification.json",
   "canvas_public_multi_native_evidence": "i03-c05-public-multi-native-verification.json",
   "canvas_ready_diff_public_cold_native_evidence": "i03-c02-ready-diff-public-cold-native-verification.json",
-  "canvas_card_source_followup": "i03-c06-card-source-followup.json"
+  "canvas_card_source_followup": "i03-c06-card-source-followup.json",
+  "canvas_source_search_layout_evidence": "i03-c06-source-search-layout-verification.json"
 }
