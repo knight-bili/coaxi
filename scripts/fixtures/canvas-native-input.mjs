@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict'
 import { app } from 'electron'
-import { mkdir,readFile,writeFile } from 'node:fs/promises'
-import { basename,join } from 'node:path'
-import { randomUUID } from 'node:crypto'
+import { mkdir,readFile,writeFile,stat } from 'node:fs/promises'
+import { basename,join,resolve } from 'node:path'
+import { randomUUID,createHash } from 'node:crypto'
 import { setTimeout as pause } from 'node:timers/promises'
 import { stripVTControlCharacters } from 'node:util'
 import { execFileSync } from 'node:child_process'
@@ -1082,13 +1082,16 @@ async function qualifyReadyDiff(window,{evaluate,wait,rpc}){
  assert.ok(report.controlled_run.agentRuns.every(run=>run.status==='succeeded'),JSON.stringify(report.controlled_run.agentRuns))
  record('real_core_prepares_managed_git_worktree_at_recorded_base_and_settles_controlled_protocol_run')
  const beforeIndex=git(workspace.worktreePath,'ls-files','--stage','-z')
- await writeFile(join(config.evidence,'git-fixture-before.json'),JSON.stringify({workspace,files:{[relativePath]:await readFile(join(workspace.workingDirectory,relativePath),'utf8'),[otherPath]:await readFile(join(workspace.workingDirectory,otherPath),'utf8')},index:beforeIndex},null,2)+'\n',{flag:'wx'})
+ const indexPath=resolve(workspace.worktreePath,git(workspace.worktreePath,'rev-parse','--git-path','index'))
+ const readIndex=async()=>({path:indexPath,sha256:createHash('sha256').update(await readFile(indexPath)).digest('hex'),mtime_ns:String((await stat(indexPath,{bigint:true})).mtimeNs)})
+ const beforeIndexFile=await readIndex()
+ await writeFile(join(config.evidence,'git-fixture-before.json'),JSON.stringify({workspace,files:{[relativePath]:await readFile(join(workspace.workingDirectory,relativePath),'utf8'),[otherPath]:await readFile(join(workspace.workingDirectory,otherPath),'utf8')},index:beforeIndex,index_file:beforeIndexFile},null,2)+'\n',{flag:'wx'})
  await writeFile(join(workspace.workingDirectory,relativePath),updated);await writeFile(join(workspace.workingDirectory,otherPath),'另一文件已修改\n');await writeFile(join(workspace.workingDirectory,newPath),'新建未跟踪文件\n')
  const changes=await rpc('missions.changes',{missionId});assert.equal(changes.diffError,null);assert.ok(changes.viewId)
  assert.deepEqual(changes.files.map(file=>file.path).sort(),[relativePath,otherPath,newPath].sort())
  const target=changes.files.find(file=>file.path===relativePath),diff=await rpc('missions.fileDiff',{missionId,viewId:changes.viewId,fileId:target.id})
  assert.equal(diff.file.path,relativePath);assert.ok(diff.patch.includes('-原内容甲')&&diff.patch.includes('+新内容乙'))
- assert.equal(git(workspace.worktreePath,'ls-files','--stage','-z'),beforeIndex);assert.equal(git(project,'status','--porcelain'),'')
+ assert.equal(git(workspace.worktreePath,'ls-files','--stage','-z'),beforeIndex);assert.deepEqual(await readIndex(),beforeIndexFile);assert.equal(git(project,'status','--porcelain'),'')
  report.real_changes=changes;report.real_diff=diff
  record('actual_core_git_diff_includes_exact_unicode_path_and_untracked_file_without_writing_real_index_or_source_checkout')
  const board=await rpc('canvas.boards.create',{commandId:randomUUID(),command:{name:'C02 可用工作区Diff卡'}})
@@ -1124,6 +1127,9 @@ async function qualifyReadyDiff(window,{evaluate,wait,rpc}){
  await writeFile(join(config.evidence,'02-no-fallback-after-target-clean.png'),(await window.webContents.capturePage()).toPNG())
  await close()
  assert.equal(git(workspace.worktreePath,'ls-files','--stage','-z'),beforeIndex)
+ const afterIndexFile=await readIndex();assert.deepEqual(afterIndexFile,beforeIndexFile)
+ report.index_file_before=beforeIndexFile;report.index_file_after=afterIndexFile
+ await writeFile(join(config.evidence,'git-index-after.json'),JSON.stringify(afterIndexFile,null,2)+'\n',{flag:'wx'})
  const final=await rpc('canvas.nodes.snapshot',{boardId});assert.equal(final.nodes.find(node=>node.id===nodeId).data.objectReference.path,relativePath)
  report.final_changes=await rpc('missions.changes',{missionId});assert.equal(report.final_changes.files.length,2)
  report.external_model_calls=0
