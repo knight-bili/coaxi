@@ -633,6 +633,12 @@
           "core_source": "e0c4fad7e7c7f20d4c7b5f83418d8237c4ff6195",
           "status": "core_host_boundaries_verified_native_input_pending",
           "evidence": "i03-r07-core-terminal-capacity-verification.json"
+        },
+        {
+          "kind": "r08-actual-core-source-io-and-pty-log-load",
+          "core_source": "e0c4fad7e7c7f20d4c7b5f83418d8237c4ff6195",
+          "status": "core_source_io_and_terminal_load_verified_native_pending",
+          "evidence": "i03-r08-source-load-verification.json"
         }
       ],
       "engineering_validation": "in_progress",
