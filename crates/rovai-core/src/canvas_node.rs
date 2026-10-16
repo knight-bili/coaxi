@@ -1343,7 +1343,10 @@ mod persistence_tests {
             .unwrap()
             .into()
     }
-    fn verify_object_pins(database: &mut crate::test_support::OwnedTestDatabase, other_thread: &str) -> String {
+    fn verify_object_pins(
+        database: &mut crate::test_support::OwnedTestDatabase,
+        other_thread: &str,
+    ) -> String {
         use crate::canvas_object_reference::CanvasObjectReference;
         let workspace = database.directory().join("object-pin-workspace");
         std::fs::create_dir(&workspace).unwrap();
@@ -1558,7 +1561,10 @@ mod persistence_tests {
         );
         id
     }
-    fn verify_file_pins(database: &mut crate::test_support::OwnedTestDatabase, thread_id: &str) -> String {
+    fn verify_file_pins(
+        database: &mut crate::test_support::OwnedTestDatabase,
+        thread_id: &str,
+    ) -> String {
         use crate::canvas_file_reference::CanvasFileReference;
         let id = board(database);
         let reference = CanvasFileReference {

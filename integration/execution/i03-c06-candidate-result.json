@@ -3,15 +3,23 @@
   "stage": "I03",
   "closeout_group": "I03-C06",
   "status": "in_progress",
-  "recorded_at": "2026-10-16T04:25:55.357033+00:00",
+  "recorded_at": "2026-10-16T04:31:41.238024+00:00",
   "source_binding": {
-    "base_commit": "9a2eaef5d8000371c69ca30283ab6daa539802a8",
+    "base_commit": "f78492b995c2295127e48b5dea37850a5b82b764",
     "kind": "exact_worktree_sha256_before_commit",
     "files": {
-      "crates/rovai-core/src/canvas_node.rs": "aa08bde66ca88e5616d5396af95c1311b0ac160fa408ae45925eb193ea5285d6",
-      "integration/execution/goal-state.json": "a3d5ba08c7119a8a8538010ed14da940eff68f3185254c32a92b470ef7c917e5",
-      "integration/execution/i03-closeout.json": "46abadb960b0e9838889cb2c225c6b367039f84bbc0a0b397b76453e944f5990",
-      "integration/planning/stage-versions.json": "bb113022d3b29cde0e4b46acbef9c8c229e51e3e9538d840989658fc56636d3b"
+      "crates/rovai-core/src/application.rs": "34655f87f71e4e62808226dad7167c2726177bb4798d5912cc0407bda88a7546",
+      "crates/rovai-core/src/application/private_composer.rs": "e5ad05571e64d81d137ecff7f4e249dab702fcaf364b23f933630ef8fdb51123",
+      "crates/rovai-core/src/canvas_node.rs": "ad459aa5b51e005010dc94384a60cfe7832af5bbb727ee2d68aa3314c757fdce",
+      "crates/rovai-core/src/lib.rs": "5a3ca8e4bad4319799ae1af4d9ae3a2e2b358dd5733fd01beab513247337e516",
+      "crates/rovai-core/src/private_source_observation.rs": "2650717fc2b2535a44a256b63eaac41112f8b1873d7d42a5e35084ebd3ac9ac8",
+      "crates/rovai-core/src/single_chat.rs": "288e6688548f1c65ed5133d46bccdb9386545307fdd46e64ea9e02ec0ac96392",
+      "crates/rovai-core/src/single_chat_composer.rs": "ff754e70aec31bd970751664dff2d9331e1fa3cf19c434172dcc6c71e8dba88d",
+      "crates/rovai-core/src/single_chat_composer_tests.rs": "270bee4fb999acb369c7bc1dd0da585e75469e5b46eb22b7646c1bb25e2be5b5",
+      "crates/rovai-core/src/web_upload.rs": "e017d477f5d728fc97b527eaa2574550818eb3ce04ebafd1e977d7d7d1250185",
+      "integration/execution/goal-state.json": "03707105f4410caad473860f561eb02a99e6b4c21aec03e770b5d503b76dd2cc",
+      "integration/execution/i03-closeout.json": "88f5f3658f46ccfa53df8e696036efef815d6288dcea69c2eb8a88b42f617816",
+      "integration/planning/stage-versions.json": "b189c3cce38ead47f4016e551743671847312725c5b8474923a59b824453b5f6"
     }
   },
   "artifact_binding": {
@@ -23,7 +31,14 @@
     "work/i03/c06/fusion-i03-rc.2/rust-owner-list-result.json": "bf13d48dc31a68c0675862fe4958af7faf62f5302191d8497cf40865654f8c82",
     "work/i03/c06/fusion-i03-rc.2/rust-owner-list.log": "8ca9a60217936694de39298478d4119c0c0435e3c8a2ffb108416ec6b3ee39b0",
     "work/i03/c06/fusion-i03-rc.2/web-ui/asset-cache.json": "8d56a5815d03334687fcb0e2db33d5f2db0b8dacf0647e74ffd97baba849e162",
-    "work/i03/record-c06-fixture-repair.py": "d0b08b72cfacd9b0000221192d0c6ce8f8485654c3861036e805555a76841d9b"
+    "work/i03/record-c06-fixture-repair.py": "d0b08b72cfacd9b0000221192d0c6ce8f8485654c3861036e805555a76841d9b",
+    "work/i03/c06/format-before-rc3.log": "0a7e67826df68619822788094a47ac6a1d15319da9b22f0a6686cdbc2c21560e",
+    "work/i03/c06/format-plan.json": "f07c90f7585e64ffa0d65621a26f899553980c8bfc2b015ed21e9a64ac4293d5",
+    "work/i03/c06/format-proof.json": "bf17f1fde593ec5d060dc215821256bfec4eba4f868e0321e01102abb6f5cbd9",
+    "work/i03/c06/format-apply.log": "0ffba0856bf561da59a6d5d903749b1f138470aa7b84f459f5f4e3d68e554e0d",
+    "work/i03/c06/format-after-rc3.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "work/i03/format-c06-rust.py": "dfbee46ed0e5da0b6c9f7107c99ac6bad256e843b1b8af69f45e9f0e8a475ce1",
+    "work/i03/record-c06-format.py": "76e17c6babcf59b4372dede578303d6785df3cbc83e13ecee37b3c32016fc94e"
   },
   "frozen_authority_files": {
     "crates/rovai-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
@@ -109,7 +124,7 @@
     }
   ],
   "implemented_repair": "Two existing cfg(test) helpers now accept OwnedTestDatabase, which owns directory(); no production prefix, test owner or assertion change",
-  "reuse_boundary": "Only cfg(test) helper signatures and execution metadata changed since rc.2; production Rust and all TS/Web inputs unchanged",
+  "reuse_boundary": "TS/Web source unchanged since passing rc.2; Rust source text changed by required formatting, so rc.3 requires a new native build before actual Host tests",
   "web_asset_inventory": {
     "source_commit": "9a2eaef5d8000371c69ca30283ab6daa539802a8",
     "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.2\\web-ui",
@@ -137,5 +152,13 @@
     "real_user_data_or_credentials": false,
     "customer_action_required_now": false
   },
-  "next": "冻结fusion-i03-rc.3，补验原画布测试夹具类型。两处改动均在cfg(test)内；复用已通过且源码未变的Windows生产构建、全量types和Web产物。先extended+slow下列非零owner再运行；并使用新Host/专用Node24.21及rc.2 Web进行实际隔离Host/PTY生命周期检查。"
+  "next": "冻结fusion-i03-rc.3（含测试夹具及必要格式修复），重新构建本候选Core/Host/CLI并编译extended+slow测试owner清单，复用未变TS/Web已通过结果。先确认3材料owner非零，再执行原材料/画布/终端/队列及实际隔离Host/PTY/Native/App/平台检查。",
+  "format_gate": {
+    "before_exit": 1,
+    "after_exit": 0,
+    "files": 9,
+    "canonical_before_after_equal": true,
+    "frozen_authority_unchanged": true,
+    "session_id": 75064
+  }
 }

@@ -112,10 +112,12 @@
       "completed_checks": [
         "rc.1源码冻结f2630de0、当前Windows Core/Host/CLI生产构建exit0和3新二进制SHA",
         "rc.2全量types exit0",
-        "rc.2 Web生产构建exit0及全部asset-cache内容SHA核验"
+        "rc.2 Web生产构建exit0及全部asset-cache内容SHA核验",
+        "全仓cargo fmt --all -- --check exit0；9文件规范化前后formatter canonical输出一致，4冻结权威未改"
       ],
       "open_findings": [
-        "测试版本编译101：canvas_node两处辅助夹具需要OwnedTestDatabase.directory；已修参数类型，待rc.3重新编译/列册/执行"
+        "测试版本编译101：canvas_node两处辅助夹具需要OwnedTestDatabase.directory；已修参数类型，待rc.3重新编译/列册/执行",
+        "必要格式整改已完成；因原生源码文本改变，rc.3重新构建原生程序后才运行真实Host，不用旧exe冒充"
       ],
       "remaining_checks": [
         "正确features下相关Rust owner先list非零再运行",

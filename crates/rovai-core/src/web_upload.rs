@@ -210,7 +210,10 @@ impl DomainCommand for BindUpload {
     }
 }
 
-pub(crate) fn envelope(client: &DraftClient, intent: UploadIntent) -> Result<CommandEnvelope<BindUpload>> {
+pub(crate) fn envelope(
+    client: &DraftClient,
+    intent: UploadIntent,
+) -> Result<CommandEnvelope<BindUpload>> {
     ensure!(
         !client.is_desktop() || !matches!(intent.target, UploadTarget::Camp),
         "public upload requires a verified Web editor"
@@ -306,7 +309,9 @@ pub fn bind(
 ) -> Result<CommandExecution> {
     let envelope = envelope(client, intent.clone())?;
     validate_bind_source(&intent, &source)?;
-    if let Some(execution) = DomainCommandGateway.replay_if_recorded(database, &envelope)? { return Ok(execution); }
+    if let Some(execution) = DomainCommandGateway.replay_if_recorded(database, &envelope)? {
+        return Ok(execution);
+    }
     let sources = binding_source_inputs(database, client, &intent, &source)?;
     let prepared = crate::private_source_observation::PreparedSources::capture(sources)?;
     bind_with_prepared(database, _data_dir, client, intent, source, &prepared)
@@ -318,19 +323,29 @@ pub(crate) fn binding_source_inputs(
     intent: &UploadIntent,
     source: &LocalAttachmentSourceRef,
 ) -> Result<Vec<LocalAttachmentSourceRef>> {
-    if matches!(intent.target, UploadTarget::Camp) || private_binding_rejection(database.connection(), client, intent)?.is_some() {
+    if matches!(intent.target, UploadTarget::Camp)
+        || private_binding_rejection(database.connection(), client, intent)?.is_some()
+    {
         return Ok(vec![]);
     }
     Ok(vec![source.clone()])
 }
 
-pub(crate) fn validate_bind_source(intent: &UploadIntent, source: &LocalAttachmentSourceRef) -> Result<()> {
+pub(crate) fn validate_bind_source(
+    intent: &UploadIntent,
+    source: &LocalAttachmentSourceRef,
+) -> Result<()> {
     ensure!(source.id == intent.command_id, "upload reference changed");
-    ensure!(source.display_name == intent.display_name && source.kind == intent.source_kind
-        && match source.kind {
-            LocalAttachmentKind::File => source.observed_byte_size == Some(intent.byte_size),
-            LocalAttachmentKind::Directory => source.observed_byte_size.is_none() && source.media_type.is_none(),
-        }, "upload observation changed");
+    ensure!(
+        source.display_name == intent.display_name
+            && source.kind == intent.source_kind
+            && match source.kind {
+                LocalAttachmentKind::File => source.observed_byte_size == Some(intent.byte_size),
+                LocalAttachmentKind::Directory =>
+                    source.observed_byte_size.is_none() && source.media_type.is_none(),
+            },
+        "upload observation changed"
+    );
     Ok(())
 }
 

@@ -87,7 +87,8 @@
           "rust_test_compilation": "failed",
           "repair_reason": "Two cfg(test) canvas helpers used Database instead of OwnedTestDatabase"
         }
-      ]
+      ],
+      "repair_reason": "两处cfg(test)夹具归属类型及CI实际要求的9文件Rust格式整改；不变更业务输入/输出"
     },
     {
       "stage_id": "I04",

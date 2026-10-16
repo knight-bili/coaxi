@@ -22,24 +22,34 @@ impl std::error::Error for PreparationChanged {}
 
 impl PreparedSources {
     pub(crate) fn capture(sources: Vec<LocalAttachmentSourceRef>) -> Result<Self> {
-        let inputs = sources.iter().map(serde_json::to_string).collect::<std::result::Result<Vec<_>, _>>()?;
+        let inputs = sources
+            .iter()
+            .map(serde_json::to_string)
+            .collect::<std::result::Result<Vec<_>, _>>()?;
         let mut values = BTreeMap::new();
         for source in sources {
             let key = serde_json::to_string(&source)?;
             values.entry(key).or_insert_with(|| {
-                observe_private_source(std::path::Path::new(&source.source_path)).map_err(|error| format!("{error:#}"))
+                observe_private_source(std::path::Path::new(&source.source_path))
+                    .map_err(|error| format!("{error:#}"))
             });
         }
         Ok(Self { inputs, values })
     }
 
     fn require_inputs(&self, sources: &[LocalAttachmentSourceRef]) -> Result<()> {
-        let inputs = sources.iter().map(serde_json::to_string).collect::<std::result::Result<Vec<_>, _>>()?;
+        let inputs = sources
+            .iter()
+            .map(serde_json::to_string)
+            .collect::<std::result::Result<Vec<_>, _>>()?;
         ensure!(inputs == self.inputs, PreparationChanged);
         Ok(())
     }
 
-    fn read(&self, source: &LocalAttachmentSourceRef) -> Result<std::result::Result<PrivateSourceObservation, String>> {
+    fn read(
+        &self,
+        source: &LocalAttachmentSourceRef,
+    ) -> Result<std::result::Result<PrivateSourceObservation, String>> {
         self.values
             .get(&serde_json::to_string(source)?)
             .cloned()
@@ -53,11 +63,14 @@ pub(crate) fn changed_source_inputs(
     conversation: &str,
     sources: Vec<LocalAttachmentSourceRef>,
 ) -> Result<Vec<LocalAttachmentSourceRef>> {
-    sources.into_iter().filter_map(|source| match load(connection, conversation, &source) {
-        Ok(Some(_)) => Some(Ok(source)),
-        Ok(None) => None,
-        Err(error) => Some(Err(error)),
-    }).collect()
+    sources
+        .into_iter()
+        .filter_map(|source| match load(connection, conversation, &source) {
+            Ok(Some(_)) => Some(Ok(source)),
+            Ok(None) => None,
+            Err(error) => Some(Err(error)),
+        })
+        .collect()
 }
 
 fn load(
@@ -151,7 +164,11 @@ pub(crate) fn changed_source(
     require_observation: bool,
     prepared: &PreparedSources,
 ) -> Result<Option<String>> {
-    prepared.require_inputs(&changed_source_inputs(connection, conversation, sources.to_vec())?)?;
+    prepared.require_inputs(&changed_source_inputs(
+        connection,
+        conversation,
+        sources.to_vec(),
+    )?)?;
     for source in sources {
         let Some((path, kind, expected)) = load(connection, conversation, source)? else {
             if require_observation {

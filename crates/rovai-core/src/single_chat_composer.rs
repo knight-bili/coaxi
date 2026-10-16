@@ -594,20 +594,61 @@ pub fn mutate(
     database: &mut Database,
     envelope: &CommandEnvelope<MutatePrivateComposerCommand>,
 ) -> Result<CommandExecution> {
-    if let Some(execution) = DomainCommandGateway.replay_if_recorded(database, envelope)? { return Ok(execution); }
-    let prepared = crate::private_source_observation::PreparedSources::capture(mutation_source_inputs(database, envelope)?)?;
+    if let Some(execution) = DomainCommandGateway.replay_if_recorded(database, envelope)? {
+        return Ok(execution);
+    }
+    let prepared = crate::private_source_observation::PreparedSources::capture(
+        mutation_source_inputs(database, envelope)?,
+    )?;
     mutate_with_prepared_sources(database, envelope, &prepared)
 }
 
-pub(crate) fn mutation_source_inputs(database: &Database, envelope: &CommandEnvelope<MutatePrivateComposerCommand>) -> Result<Vec<LocalAttachmentSourceRef>> {
+pub(crate) fn mutation_source_inputs(
+    database: &Database,
+    envelope: &CommandEnvelope<MutatePrivateComposerCommand>,
+) -> Result<Vec<LocalAttachmentSourceRef>> {
     let command = &envelope.payload;
-    let PrivateComposerAction::AdoptLegacyMaterials { expected_source_revision, .. } = &command.action else { return Ok(vec![]); };
+    let PrivateComposerAction::AdoptLegacyMaterials {
+        expected_source_revision,
+        ..
+    } = &command.action
+    else {
+        return Ok(vec![]);
+    };
     let connection = database.connection();
-    if !matches!(envelope.actor, ActorRef::User { .. }) || !owner_exists(connection, &command.camp_id, &command.conversation_id, true)? { return Ok(vec![]); }
-    let Some((key, _)) = resolve_scope(connection, &command.camp_id, &command.conversation_id, &command.draft_client, command.composer_scope.as_ref())? else { return Ok(vec![]); };
-    let current = DraftMaterials::load(connection, &command.conversation_id, &command.draft_client, &key)?;
-    let legacy = DraftMaterials::load(connection, &command.conversation_id, &command.draft_client, &PrivateComposerKey::default())?;
-    if current.revision != command.expected_draft_revision || legacy.revision != *expected_source_revision || key.sql_key().is_empty() { return Ok(vec![]); }
+    if !matches!(envelope.actor, ActorRef::User { .. })
+        || !owner_exists(connection, &command.camp_id, &command.conversation_id, true)?
+    {
+        return Ok(vec![]);
+    }
+    let Some((key, _)) = resolve_scope(
+        connection,
+        &command.camp_id,
+        &command.conversation_id,
+        &command.draft_client,
+        command.composer_scope.as_ref(),
+    )?
+    else {
+        return Ok(vec![]);
+    };
+    let current = DraftMaterials::load(
+        connection,
+        &command.conversation_id,
+        &command.draft_client,
+        &key,
+    )?;
+    let legacy = DraftMaterials::load(
+        connection,
+        &command.conversation_id,
+        &command.draft_client,
+        &PrivateComposerKey::default(),
+    )?;
+    if current.revision != command.expected_draft_revision
+        || legacy.revision != *expected_source_revision
+        || key.sql_key().is_empty()
+    {
+        return Ok(vec![]);
+    }
     legacy.sources()
 }
 

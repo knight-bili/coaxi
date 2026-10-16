@@ -333,53 +333,171 @@ impl SingleChatService {
         }
     }
 
-    pub(crate) fn with_prepared_sources(mut self, prepared: std::sync::Arc<crate::private_source_observation::PreparedSources>) -> Self {
+    pub(crate) fn with_prepared_sources(
+        mut self,
+        prepared: std::sync::Arc<crate::private_source_observation::PreparedSources>,
+    ) -> Self {
         self.prepared_sources = Some(prepared);
         self
     }
 
-    fn prepare_sources(&self, sources: impl FnOnce() -> Result<Vec<LocalAttachmentSourceRef>>) -> Result<std::sync::Arc<crate::private_source_observation::PreparedSources>> {
-        if let Some(prepared) = &self.prepared_sources { return Ok(prepared.clone()); }
-        Ok(std::sync::Arc::new(crate::private_source_observation::PreparedSources::capture(sources()?)?))
+    fn prepare_sources(
+        &self,
+        sources: impl FnOnce() -> Result<Vec<LocalAttachmentSourceRef>>,
+    ) -> Result<std::sync::Arc<crate::private_source_observation::PreparedSources>> {
+        if let Some(prepared) = &self.prepared_sources {
+            return Ok(prepared.clone());
+        }
+        Ok(std::sync::Arc::new(
+            crate::private_source_observation::PreparedSources::capture(sources()?)?,
+        ))
     }
 
-    pub(crate) fn send_source_inputs(database: &Database, envelope: &CommandEnvelope<SendSingleChatMessageCommand>) -> Result<Vec<LocalAttachmentSourceRef>> {
+    pub(crate) fn send_source_inputs(
+        database: &Database,
+        envelope: &CommandEnvelope<SendSingleChatMessageCommand>,
+    ) -> Result<Vec<LocalAttachmentSourceRef>> {
         let command = &envelope.payload;
         let connection = database.connection();
-        if !matches!(envelope.actor, ActorRef::User { .. }) { return Ok(vec![]); }
-        let Some(target) = load_active_target(connection, &command.conversation_id)? else { return Ok(vec![]); };
-        if target.camp_id != command.camp_id || envelope.camp_id.as_deref() != Some(&command.camp_id) || !active_member(connection, &target.camp_id, &target.agent_id)? { return Ok(vec![]); }
-        let Some((key, true)) = crate::single_chat_composer::resolve_scope(connection, &command.camp_id, &command.conversation_id, &command.draft_client, command.composer_scope.as_ref())? else { return Ok(vec![]); };
-        let materials = crate::single_chat_composer::DraftMaterials::load(connection, &command.conversation_id, &command.draft_client, &key)?;
-        if materials.revision != command.draft_revision || command.draft_revision < 0 || command.body.chars().count() > 100_000 { return Ok(vec![]); }
+        if !matches!(envelope.actor, ActorRef::User { .. }) {
+            return Ok(vec![]);
+        }
+        let Some(target) = load_active_target(connection, &command.conversation_id)? else {
+            return Ok(vec![]);
+        };
+        if target.camp_id != command.camp_id
+            || envelope.camp_id.as_deref() != Some(&command.camp_id)
+            || !active_member(connection, &target.camp_id, &target.agent_id)?
+        {
+            return Ok(vec![]);
+        }
+        let Some((key, true)) = crate::single_chat_composer::resolve_scope(
+            connection,
+            &command.camp_id,
+            &command.conversation_id,
+            &command.draft_client,
+            command.composer_scope.as_ref(),
+        )?
+        else {
+            return Ok(vec![]);
+        };
+        let materials = crate::single_chat_composer::DraftMaterials::load(
+            connection,
+            &command.conversation_id,
+            &command.draft_client,
+            &key,
+        )?;
+        if materials.revision != command.draft_revision
+            || command.draft_revision < 0
+            || command.body.chars().count() > 100_000
+        {
+            return Ok(vec![]);
+        }
         let sources = materials.sources()?;
-        if sources.len() > MAX_PREPARED_ATTACHMENTS { return Ok(vec![]); }
-        crate::private_source_observation::changed_source_inputs(connection, &command.conversation_id, sources)
+        if sources.len() > MAX_PREPARED_ATTACHMENTS {
+            return Ok(vec![]);
+        }
+        crate::private_source_observation::changed_source_inputs(
+            connection,
+            &command.conversation_id,
+            sources,
+        )
     }
 
-    pub(crate) fn edit_source_inputs(database: &Database, envelope: &CommandEnvelope<EditSingleChatPendingInputCommand>) -> Result<Vec<LocalAttachmentSourceRef>> {
+    pub(crate) fn edit_source_inputs(
+        database: &Database,
+        envelope: &CommandEnvelope<EditSingleChatPendingInputCommand>,
+    ) -> Result<Vec<LocalAttachmentSourceRef>> {
         let command = &envelope.payload;
-        if !matches!(command.action, SingleChatPendingInputEditAction::Save { .. } | SingleChatPendingInputEditAction::ReturnToComposer { .. }) || !matches!(envelope.actor, ActorRef::User { .. }) { return Ok(vec![]); }
+        if !matches!(
+            command.action,
+            SingleChatPendingInputEditAction::Save { .. }
+                | SingleChatPendingInputEditAction::ReturnToComposer { .. }
+        ) || !matches!(envelope.actor, ActorRef::User { .. })
+        {
+            return Ok(vec![]);
+        }
         let connection = database.connection();
-        if !crate::single_chat_composer::owner_exists(connection, &command.camp_id, &command.conversation_id, true)? { return Ok(vec![]); }
-        let Some((key, _)) = crate::single_chat_composer::resolve_scope(connection, &command.camp_id, &command.conversation_id, &command.draft_client, command.composer_scope.as_ref())? else { return Ok(vec![]); };
-        let Some(pending) = load_pending_input(connection, &command.conversation_id, &command.pending_input_id)? else { return Ok(vec![]); };
-        if pending.revision != command.expected_revision || !matches!(pending.state.as_str(), "queued" | "needs_repair") { return Ok(vec![]); }
+        if !crate::single_chat_composer::owner_exists(
+            connection,
+            &command.camp_id,
+            &command.conversation_id,
+            true,
+        )? {
+            return Ok(vec![]);
+        }
+        let Some((key, _)) = crate::single_chat_composer::resolve_scope(
+            connection,
+            &command.camp_id,
+            &command.conversation_id,
+            &command.draft_client,
+            command.composer_scope.as_ref(),
+        )?
+        else {
+            return Ok(vec![]);
+        };
+        let Some(pending) = load_pending_input(
+            connection,
+            &command.conversation_id,
+            &command.pending_input_id,
+        )?
+        else {
+            return Ok(vec![]);
+        };
+        if pending.revision != command.expected_revision
+            || !matches!(pending.state.as_str(), "queued" | "needs_repair")
+        {
+            return Ok(vec![]);
+        }
         let session = load_pending_edit_session(connection, &command.conversation_id)?;
-        if matches!(command.action, SingleChatPendingInputEditAction::ReturnToComposer { .. }) {
-            if session.as_ref().is_some_and(|session| session.pending_input_id == command.pending_input_id) { return Ok(vec![]); }
+        if matches!(
+            command.action,
+            SingleChatPendingInputEditAction::ReturnToComposer { .. }
+        ) {
+            if session
+                .as_ref()
+                .is_some_and(|session| session.pending_input_id == command.pending_input_id)
+            {
+                return Ok(vec![]);
+            }
             return Ok(pending.source_attachments);
         }
-        let Some(session) = session else { return Ok(vec![]); };
-        if session.client_id != command.draft_client.id() || session.scope_key != key.sql_key() || session.pending_input_id != command.pending_input_id || session.base_pending_revision != command.expected_revision || session.recovery_required || command.edit_token.as_deref() != Some(session.edit_token.as_str()) { return Ok(vec![]); }
+        let Some(session) = session else {
+            return Ok(vec![]);
+        };
+        if session.client_id != command.draft_client.id()
+            || session.scope_key != key.sql_key()
+            || session.pending_input_id != command.pending_input_id
+            || session.base_pending_revision != command.expected_revision
+            || session.recovery_required
+            || command.edit_token.as_deref() != Some(session.edit_token.as_str())
+        {
+            return Ok(vec![]);
+        }
         parse_source_attachments(&session.working_source_attachments_json)
     }
 
-    pub(crate) fn publish_source_inputs(database: &Database, envelope: &CommandEnvelope<PublishSingleChatPendingInput>) -> Result<Vec<LocalAttachmentSourceRef>> {
+    pub(crate) fn publish_source_inputs(
+        database: &Database,
+        envelope: &CommandEnvelope<PublishSingleChatPendingInput>,
+    ) -> Result<Vec<LocalAttachmentSourceRef>> {
         let command = &envelope.payload;
-        let Some(pending) = load_pending_input(database.connection(), &command.conversation_id, &command.pending_input_id)? else { return Ok(vec![]); };
-        if pending.revision != command.expected_revision || pending.state != "queued" { return Ok(vec![]); }
-        crate::private_source_observation::changed_source_inputs(database.connection(), &command.conversation_id, pending.source_attachments)
+        let Some(pending) = load_pending_input(
+            database.connection(),
+            &command.conversation_id,
+            &command.pending_input_id,
+        )?
+        else {
+            return Ok(vec![]);
+        };
+        if pending.revision != command.expected_revision || pending.state != "queued" {
+            return Ok(vec![]);
+        }
+        crate::private_source_observation::changed_source_inputs(
+            database.connection(),
+            &command.conversation_id,
+            pending.source_attachments,
+        )
     }
 
     pub fn history_input_schema() -> Value {
@@ -654,7 +772,9 @@ impl SingleChatService {
         if envelope.payload.draft_revision < 0 {
             anyhow::bail!("Single Chat Draft revision is invalid");
         }
-        if let Some(execution) = self.gateway.replay_if_recorded(database, envelope)? { return Ok(execution); }
+        if let Some(execution) = self.gateway.replay_if_recorded(database, envelope)? {
+            return Ok(execution);
+        }
         let prepared = self.prepare_sources(|| Self::send_source_inputs(database, envelope))?;
         let client = &envelope.payload.draft_client;
         self.gateway.execute(database, envelope, |transaction| {
@@ -1049,7 +1169,16 @@ impl SingleChatService {
             refs.len() < MAX_PREPARED_ATTACHMENTS,
             "attachment_count_exceeded"
         );
-        anyhow::ensure!(crate::private_source_observation::capture_sources(transaction,conversation_id,std::slice::from_ref(&source_ref), prepared)?.is_none(),"single_chat.attachment_source_changed");
+        anyhow::ensure!(
+            crate::private_source_observation::capture_sources(
+                transaction,
+                conversation_id,
+                std::slice::from_ref(&source_ref),
+                prepared
+            )?
+            .is_none(),
+            "single_chat.attachment_source_changed"
+        );
         refs.push(source_ref);
         store_single_chat_draft_refs(
             transaction,
@@ -1179,7 +1308,16 @@ impl SingleChatService {
             refs.len() < MAX_PREPARED_ATTACHMENTS,
             "attachment_count_exceeded"
         );
-        anyhow::ensure!(crate::private_source_observation::capture_sources(transaction,conversation_id,std::slice::from_ref(&source_ref), prepared)?.is_none(),"single_chat.attachment_source_changed");
+        anyhow::ensure!(
+            crate::private_source_observation::capture_sources(
+                transaction,
+                conversation_id,
+                std::slice::from_ref(&source_ref),
+                prepared
+            )?
+            .is_none(),
+            "single_chat.attachment_source_changed"
+        );
         refs.push(source_ref);
         transaction.execute(
             "UPDATE single_chat_pending_input_edit_session
@@ -1200,7 +1338,9 @@ impl SingleChatService {
         database: &mut Database,
         envelope: &CommandEnvelope<EditSingleChatPendingInputCommand>,
     ) -> Result<CommandExecution> {
-        if let Some(execution) = self.gateway.replay_if_recorded(database, envelope)? { return Ok(execution); }
+        if let Some(execution) = self.gateway.replay_if_recorded(database, envelope)? {
+            return Ok(execution);
+        }
         let prepared = self.prepare_sources(|| Self::edit_source_inputs(database, envelope))?;
         let client = &envelope.payload.draft_client;
         self.gateway.execute(database, envelope, |transaction| {
@@ -1550,7 +1690,9 @@ impl SingleChatService {
         database: &mut Database,
         envelope: &CommandEnvelope<PublishSingleChatPendingInput>,
     ) -> Result<CommandExecution> {
-        if let Some(execution) = self.gateway.replay_if_recorded(database, envelope)? { return Ok(execution); }
+        if let Some(execution) = self.gateway.replay_if_recorded(database, envelope)? {
+            return Ok(execution);
+        }
         let prepared = self.prepare_sources(|| Self::publish_source_inputs(database, envelope))?;
         self.gateway.execute(database, envelope, |transaction| {
             let ActorRef::User { user_id } = &envelope.actor else {
@@ -2190,10 +2332,14 @@ pub fn record_pending_publish_failure(
     command: &PublishSingleChatPendingInput,
     code: &str,
 ) -> Result<()> {
-    record_pending_publish_failure_on(database.connection(),command,code)
+    record_pending_publish_failure_on(database.connection(), command, code)
 }
 
-fn record_pending_publish_failure_on(connection:&rusqlite::Connection, command:&PublishSingleChatPendingInput, code:&str) -> Result<()> {
+fn record_pending_publish_failure_on(
+    connection: &rusqlite::Connection,
+    command: &PublishSingleChatPendingInput,
+    code: &str,
+) -> Result<()> {
     connection.execute(
         "UPDATE single_chat_pending_input
          SET state = 'needs_repair', last_attempt_error_code = ?4, updated_at = ?5
@@ -2706,7 +2852,11 @@ fn load_end_target(
         .optional()?)
 }
 
-fn active_member(transaction: &rusqlite::Connection, camp_id: &str, agent_id: &str) -> Result<bool> {
+fn active_member(
+    transaction: &rusqlite::Connection,
+    camp_id: &str,
+    agent_id: &str,
+) -> Result<bool> {
     Ok(transaction.query_row(
         r#"
         SELECT EXISTS(
