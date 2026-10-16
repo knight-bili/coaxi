@@ -90,3 +90,6 @@ I03本机研发队列关闭时应交付可运行开发预览、原T01–T03与C0
 
 
 2026-10-17 R08进展：rc22真实系统粘贴1,048,707字节、16个可信键盘输入、原同步持久文件与新App/Core精确恢复通过。粘贴497ms、按键P95 131.5ms、帧最大374.9ms、Main定时最大76.7ms；原Main在输入期间5ms收到Core applied答复。原编译Core集成owner实际1 passed，证明受控阻塞期间独立请求及abort等待者的名额持有；尚不等于真实文件IO取消/超时。保留前次失败及R09告警记录。证据见[i03-r08-native-large-input-verification.json](i03-r08-native-large-input-verification.json)。R08仍open，固定剩余R08–R10三组；下一项为真实通知可见/遮挡/离视口/关闭与监听释放，随后实际文件IO取消/超时。范围81/48/324、私聊24、正式12及平台边界均保持，不重复已核定大正文、不新增客户技术验收。
+
+
+2026-10-17 通知进展：原rc22公屏通知可见/真实弹窗遮挡/离视口/关闭重开四项通过，Core只读事实确认4个原Run已确认；私聊真实回复暴露缺少Run编号的缺陷。源码已修复，48项测试和类型检查通过，尚未编译成新候选，不宣称私聊Native通过。证据见[i03-r08-notification-progress.json](i03-r08-notification-progress.json)。与R09必要修改累计后集中构建，再补私聊四场景、全部监听释放及公屏回归；实际文件IO取消/超时仍待。R08仍open，剩余R08–R10三组；无新范围/客户技术验收门槛。先前Windows owner错误已定位为测试驱动手写MCP文件问题，当前改用原mcp.config.get初始化，不登记为已确认产品Runtime-private缺陷。

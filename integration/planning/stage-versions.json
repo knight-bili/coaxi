@@ -669,6 +669,12 @@
           "source": "f2327d3c1ead2fa7591e7e4d7558380e50d1e82c",
           "status": "partial_engineering_verification",
           "evidence": "i03-r08-native-large-input-verification.json"
+        },
+        {
+          "kind": "r08-real-public-notification-4-and-private-source-repair",
+          "source": "809a3d0bc42b8607f2337ad45f7fa4265b0541e4",
+          "status": "partial_engineering_verification_with_source_repair_pending_candidate",
+          "evidence": "i03-r08-notification-progress.json"
         }
       ],
       "engineering_validation": "in_progress",
@@ -848,7 +854,7 @@
       "full_types": "passed_current_tree",
       "desktop_build": "passed_rc21_reused_verified_inputs",
       "web_build": "passed_rc21_reused_verified_inputs",
-      "next_renderer_batch": "复用rc22当前产物完成R07–R10适用验证；真实缺陷修复后仅补必要构建/回归。",
+      "next_renderer_batch": "R09既定源码检查与必要修复累计后冻结下一候选；本次私聊通知修复必须编入并补Native场景，不复用rc22旧Renderer冒充修复验证。Core未变按精确编译输入决定复用。",
       "rust_evidence_scope": "本候选新增运行两个既有owner，不将历史owner数量机械相加为当前结果。",
       "candidate_history": [
         {
@@ -859,10 +865,15 @@
       ],
       "repair_candidates": 21,
       "pending_renderer_repair": {
-        "commit": "afee4415",
-        "evidence": "i03-r06-file-html-progress.json",
-        "status": "native_verified_rc22",
-        "verification": "i03-r06-file-html-verification.json"
+        "commit": "809a3d0bc42b8607f2337ad45f7fa4265b0541e4",
+        "evidence": "i03-r08-notification-progress.json",
+        "status": "source_repaired_48_tests_types_passed_native_pending",
+        "previous_completed_repair": {
+          "commit": "afee4415",
+          "evidence": "i03-r06-file-html-progress.json",
+          "status": "native_verified_rc22",
+          "verification": "i03-r06-file-html-verification.json"
+        }
       },
       "pending_native_terminal_verification": [],
       "pending_summary_projection_verification": [

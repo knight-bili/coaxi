@@ -345,11 +345,11 @@
         "I03-C05"
       ],
       "done_when": "大材料/目录/日志下响应、事务锁、取消/超时及worker名额正确；可见/被遮挡卡片的真实Core通知确认及清理正确。",
-      "next_action": "继续真实Core通知的可见/遮挡/离视口/关闭与监听释放，随后实际文件IO取消/超时；大正文已核定不重复。",
+      "next_action": "先完成R09既定源码检查并累计必要修复；集中构建新候选后补私聊/监听及公屏回归，同时继续实际文件IO取消/超时。大正文和原Core材料IO不重复。",
       "owner": "Codex",
       "external_condition": "none_confirmed_blocking_current_independent_work",
       "native_private_storage_followup": "同步私聊落盘在大正文/真实输入压力下的响应归既有R08源IO与规模验证，不用小输入恢复测试代替性能资格。",
-      "latest_partial_verification": "i03-r08-native-large-input-verification.json",
+      "latest_partial_verification": "i03-r08-notification-progress.json",
       "verified_core_boundaries": {
         "directory_files": 1500,
         "large_file_bytes": 20971520,
@@ -374,8 +374,8 @@
         "messages_and_model_runs_created": 0
       },
       "remaining_runtime_boundaries": [
-        "可见、遮挡、移出视口和关闭卡片的真实Core通知确认及监听释放",
-        "实际文件IO取消或超时期间worker名额生命周期；本轮受控阻塞Core集成测试只证明取消等待者不提前释放名额"
+        "集中候选构建后执行私聊通知四种实际可见性场景、全部卡片关闭后的Observer/listener释放，并保留公屏回归；本轮只有公屏四项实测通过，私聊为源码修复/48项测试/类型检查通过",
+        "实际文件IO取消或超时期间worker名额生命周期；已有受控阻塞Core owner不代替整App真实文件IO"
       ],
       "verified_native_large_input": {
         "body_bytes": 1048707,
@@ -386,6 +386,14 @@
         "main_max_ms": 76.67199999999866,
         "independent_core_response_ms": 5,
         "fresh_app_core_exact_restore": true
+      },
+      "latest_native_large_input_verification": "i03-r08-native-large-input-verification.json",
+      "verified_public_notification_scenarios": 4,
+      "pending_private_notification_repair": {
+        "source": "809a3d0bc42b8607f2337ad45f7fa4265b0541e4",
+        "tests": 48,
+        "types_exit": 0,
+        "native_verified": false
       }
     },
     {
@@ -644,5 +652,5 @@
   ],
   "change_control": "剩余编号固定；发现缺陷归入已有组并说明影响。新增必需范围须有来源和编号变更记录；不能为减少数量合并隐藏未完成条件。",
   "latest_verification": "i03-r07-native-input-verification.json",
-  "latest_partial_verification": "i03-r08-native-large-input-verification.json"
+  "latest_partial_verification": "i03-r08-notification-progress.json"
 }
