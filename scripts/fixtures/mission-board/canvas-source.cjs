@@ -62,6 +62,7 @@ app.whenReady().then(async()=>{
    report.resize=await read(`window.canvasResize`)
    report.runtimeErrors=await read(`window.missionQA.errors`)
    assert.deepEqual(report.runtimeErrors.filter(error=>!error.includes('ResizeObserver')),[],'Unexpected Renderer errors are not a passing layout result')
+   assert.deepEqual(report.resize.errors,[],'Loading and viewport transitions must not leave ResizeObserver notifications undelivered')
    report.geometry=await read(`(()=>{const style=selector=>{const e=document.querySelector(selector),s=getComputedStyle(e);return {fontSize:s.fontSize,lineHeight:s.lineHeight,cursor:s.cursor,userSelect:s.userSelect}};return {note:style('.canvas-note-prose > .safe-markdown'),body:style('.canvas-card-file .canvas-card-body'),header:style('.canvas-card-file .canvas-card-handle'),count:document.querySelectorAll('.canvas-conversation-summary').length,zoom:document.querySelector('.canvas-zoom-readout').textContent}})()`)
    assert.equal(report.geometry.note.fontSize,'13px');assert.equal(report.geometry.body.userSelect,'text');assert.equal(report.geometry.header.userSelect,'none')
    assert.equal(report.geometry.count,64)

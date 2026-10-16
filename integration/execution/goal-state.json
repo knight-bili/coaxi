@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "rc15集中构建/Rust既有owner通过，真实列表7项及公开多卡8项/终端5项相关回归通过。截图发现纵向SVG撑高卡片，当前CSS已修并通过日夜实际组件检查；完整App尺寸监听仍有警告，未宣告阶段完成。",
+  "current_slice": "按I03收口排期预览先结算C01–C06有限剩余；延迟加载的日夜Renderer诊断已结束且未复现完整App告警，问题仍开放。剩余本机工程规划5个工作日，另留2日修复缓冲；外部未验不算通过。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "先复用既有资源预算证据并补原C05缺口；尺寸监听诊断及纵向列表CSS待下一累计候选必要集成，不逐小修重编。完整主题/八类、未知请求/IO/PC保留，缺外部条件继续独立I04。",
+    "先执行i03-closeout-plan-r1.md第1批：逐项结算旧证据并冻结有限剩余编号，复用有效结果；尺寸告警有界诊断后继续私聊完整流程、异常恢复和资源/规模，不让单项猜测无限阻塞。目标日期10月23，风险缓冲10月27，属于排期估计。",
     "阶段剩余清单固定按I03-C06继续工程验证；暂缺环境只单列待办，继续可独立的I02余项和I04-I12/BUF，不把后续功能提前塞入I03。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -219,5 +219,7 @@
   "canvas_source_search_layout_evidence": "i03-c06-source-search-layout-verification.json",
   "canvas_board_preview_projection": "i03-c06-board-preview-projection-result.json",
   "canvas_rc15_list_native_evidence": "i03-c06-rc15-list-native-verification.json",
-  "canvas_board_compact_renderer_evidence": "i03-c06-board-compact-renderer-verification.json"
+  "canvas_board_compact_renderer_evidence": "i03-c06-board-compact-renderer-verification.json",
+  "i03_closeout_plan_preview": "i03-closeout-plan-r1.md",
+  "canvas_loading_transition_observation": "i03-c06-loading-transition-observation.json"
 }

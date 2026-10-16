@@ -37,7 +37,10 @@ export function CanvasSourceFixture({client,theme,list=false}:{client:ThreadClie
   if(method==='app.info')return {dataDir:'source-fixture-only'}
   if(method==='canvas.references.page')return {schemaVersion:1,throughGlobalSequence:1,items:[],upperThreadId:null,nextAfterThreadId:null}
   if(method==='canvas.boards.list')return {throughGlobalSequence:1,boards,summaries:boards.map((board,i)=>({boardId:board.id,revision:1,nodeCount:1,terminalCount:0,preview:[{kind:'note',x:0,y:0,width:320,height:i===0?2400:260,color:'orange'}]}))}
-  if(method==='canvas.nodes.snapshot')return list?{board:boards.find(board=>board.id===params?.boardId),throughGlobalSequence:1,nodes:[]}:graph
+  if(method==='canvas.nodes.snapshot'){
+   if(!list)await new Promise(resolve=>setTimeout(resolve,120))
+   return list?{board:boards.find(board=>board.id===params?.boardId),throughGlobalSequence:1,nodes:[]}:graph
+  }
   throw new Error(`Unexpected source fixture request: ${method}`)
  }} as ThreadClient
  return <div className="canvas-workspace" style={{height:'100vh'}}><ThreadClientProvider client={sourceClient}><CanvasFolderProvider client={sourceClient}>
