@@ -26,6 +26,7 @@ export async function qualifyCanvasTerminalInput(window,{evaluate,wait,rpc,openC
  const click=async selector=>evaluate(`(()=>{const b=document.querySelector(${JSON.stringify(selector)});if(!b||b.disabled)throw Error('Required enabled control missing');b.click();return true})()`)
  const focus=async()=>{window.focus();window.webContents.focus();await evaluate(`(()=>{document.querySelector('${card} .xterm-helper-textarea').focus();return true})()`)}
  const enter=async()=>{await focus();await physical('enter')}
+ const typeText=async text=>{for(const keyCode of text)window.webContents.sendInputEvent({type:'char',keyCode});await pause(400)}
  const snapshot=()=>rpc('canvas.terminals.snapshot',{target,afterSeq:0})
  const output=async()=>stripVTControlCharacters(Buffer.concat((await snapshot()).chunks.map(x=>Buffer.from(x.bytesBase64,'base64'))).toString('utf8'))
  const waitOutput=async text=>{for(let i=0;i<80;i++){if((await output()).split(/\r?\n/).some(line=>line.trim()===text))return;await pause(100)}throw Error('Actual PTY output missing: '+text)}
@@ -36,14 +37,15 @@ export async function qualifyCanvasTerminalInput(window,{evaluate,wait,rpc,openC
   await click(button('启动终端'))
   await wait(`Boolean(document.querySelector('${card} .xterm-helper-textarea')&&!document.querySelector('${button('粘贴')}').disabled)`,30_000)
   await focus()
-  await evaluate(`(()=>{window.r07InputEvents=[];for(const name of ['compositionstart','compositionupdate','compositionend','beforeinput','input'])document.addEventListener(name,event=>{if(event.target?.classList?.contains('xterm-helper-textarea'))window.r07InputEvents.push({type:event.type,data:event.data??null,isComposing:event.isComposing??null,trusted:event.isTrusted})},true);return true})()`)
+  await evaluate(`(()=>{window.r07InputEvents=[];window.r07SyntheticEnds=[];const original=EventTarget.prototype.dispatchEvent;EventTarget.prototype.dispatchEvent=function(event){if(event.type==='compositionend'&&this.classList?.contains('xterm-helper-textarea'))window.r07SyntheticEnds.push({data:event.data,stack:new Error().stack});return original.call(this,event)};for(const name of ['compositionstart','compositionupdate','compositionend','beforeinput','input'])document.addEventListener(name,event=>{if(event.target?.classList?.contains('xterm-helper-textarea'))window.r07InputEvents.push({type:event.type,data:event.data??null,isComposing:event.isComposing??null,trusted:event.isTrusted})},true);return true})()`)
   const initial=await snapshot();assert.equal(initial.phase,'running');report.generation=initial.generation
   record('fresh_isolated_native_terminal_starts_real_pty_and_uses_original_generation')
   try {
    const imePath=join(config.workspace,'IME-实际提交.txt'),prefix=`require('node:fs').writeFileSync(${JSON.stringify(imePath)},"`
    let composing=false
    for(let attempt=0;attempt<2;attempt++){
-    await focus();await window.webContents.insertText(prefix);await pause(600)
+    await focus();const beforePrefix=await snapshot();await typeText(prefix);await pause(600)
+    assert.ok((await snapshot()).inputSequence>beforePrefix.inputSequence,'Command prefix must reach the real PTY before IME qualification')
     await evaluate('(()=>{window.r07InputEvents=[];return true})()')
     const before=await snapshot();await physical('compose')
     const events=await evaluate('window.r07InputEvents'),after=await snapshot()
@@ -56,8 +58,9 @@ export async function qualifyCanvasTerminalInput(window,{evaluate,wait,rpc,openC
    assert.ok(composing,'Physical Pinyin did not produce trusted Windows composition events')
    await physical('commit');await pause(250)
    report.ime_events=await evaluate('window.r07InputEvents')
+   report.synthetic_composition_ends=await evaluate('window.r07SyntheticEnds')
    assert.ok(report.ime_events.some(e=>e.type==='compositionend'&&e.trusted&&e.data==='你好'),'The physical IME must commit the expected Chinese text')
-   await window.webContents.insertText('");console.log("R07_IME_DONE")');await enter();await waitOutput('R07_IME_DONE')
+   await typeText('");console.log("R07_IME_DONE")');await enter();await waitOutput('R07_IME_DONE')
    const bytes=await readFile(imePath);assert.deepEqual(bytes,Buffer.from('你好'))
    report.ime_file={path:imePath,sha256:createHash('sha256').update(bytes).digest('hex'),bytes:bytes.length}
    record('actual_windows_pinyin_composition_sends_no_uncommitted_bytes_and_commits_exact_chinese_once')
@@ -78,7 +81,7 @@ export async function qualifyCanvasTerminalInput(window,{evaluate,wait,rpc,openC
    assert.deepEqual(await readFile(pastePath),Buffer.from(value))
    record('actual_clipboard_button_pastes_exact_chinese_and_emoji_into_real_pty')
    const marker='R07_COPY_原生中文',copyCommand=`console.log(${JSON.stringify(marker)})`
-   await focus();await window.webContents.insertText(copyCommand);await enter()
+   await focus();await typeText(copyCommand);await enter()
    await wait(`Array.from(document.querySelectorAll('${card} .xterm-rows > div')).some(row=>row.textContent?.trim()===${JSON.stringify(marker)})`)
    const rect=await evaluate(`(()=>{const row=[...document.querySelectorAll('${card} .xterm-rows > div')].find(row=>row.textContent?.trim()===${JSON.stringify(marker)}),r=row.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height}})()`)
    const y=Math.round(rect.y+rect.height/2),left=Math.round(rect.x+1),right=Math.round(rect.x+rect.width-1)
@@ -92,7 +95,7 @@ export async function qualifyCanvasTerminalInput(window,{evaluate,wait,rpc,openC
   await click(button('展开终端'));await wait(`Boolean(document.querySelector('${card} .xterm-helper-textarea'))`)
   await click(button('重新读取'));await pause(700)
   const reopened=await snapshot();assert.equal(reopened.generation,before.generation);assert.equal(reopened.inputSequence,before.inputSequence)
-  await focus();await window.webContents.insertText('2+3');await enter();await wait(`Array.from(document.querySelectorAll('${card} .xterm-rows > div')).some(row=>row.textContent?.trim()==='5')`)
+  await focus();await typeText('2+3');await enter();await wait(`Array.from(document.querySelectorAll('${card} .xterm-rows > div')).some(row=>row.textContent?.trim()==='5')`)
   record('collapse_reopen_and_explicit_refresh_keep_original_shell_and_do_not_replay_old_input')
   const shot=join(config.evidence,'01-windows-terminal-input.png');await writeFile(shot,(await window.webContents.capturePage()).toPNG());report.screenshots=[shot]
  } finally {
