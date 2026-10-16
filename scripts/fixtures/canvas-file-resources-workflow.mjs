@@ -114,7 +114,7 @@ export async function qualifyCanvasFileResources(window,{evaluate,wait,rpc,openC
       await wait(`!${card(id)}`);await fit()
     }
     await remove(html[0].nodeId)
-    await click(`${card(html[4].nodeId)}.querySelector('.canvas-file-actions button[aria-label="重新读取"]')`)
+    await click(`[...${card(html[4].nodeId)}.querySelectorAll('[role="alert"] button')].find(node=>node.textContent==='重试')`)
     await inspectHtml(html[4].nodeId,html[4].identity)
     await wait(`window.rovai.filePreview.readText({handleId:${JSON.stringify(html[0].handle.handleId)},expectedGeneration:${JSON.stringify(html[0].handle.contentGeneration)}}).then(value=>value.ok===false)`)
     for(const doc of documents.slice(1))assert.ok(window.webContents.mainFrame.framesInSubtree.some(frame=>frame.frameTreeNodeId===doc.frameId))
