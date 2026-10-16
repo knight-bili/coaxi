@@ -36,6 +36,8 @@
   "打开画板": "Open board",
   "{0} 个节点": "{0} nodes",
   "统计暂不可用": "Statistics unavailable",
+  "其中有 {0} 张终端卡；删除时会关闭仍在运行的终端。": "This includes {0} terminal cards; deleting the board will stop any terminals that are still running.",
+  "终端数量暂不可用；删除时仍会关闭该画板中运行的终端。": "The terminal count is unavailable; deleting the board will still stop its running terminals.",
   "画布操作": "Canvas actions",
   "编辑画板": "Edit board",
   "删除画板": "Delete board",

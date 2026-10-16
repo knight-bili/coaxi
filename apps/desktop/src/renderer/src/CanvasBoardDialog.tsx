@@ -1,14 +1,15 @@
 import { useRef, useState, type ReactNode } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
-import type { CanvasBoard } from '@contracts'
+import type { CanvasBoard, CanvasBoardSummary } from '@contracts'
 import type { CanvasBoardIntent } from './canvas-boards-controller'
 import { AppDialogBody, AppDialogContent, AppDialogFooter, AppDialogHeader } from './AppDialog'
 import { canvasColors, canvasColorName } from './CanvasNodeEditor'
 import { UiText, uiAttribute } from './interface-language'
 import { readErrorMessage } from './error-message'
 
-export function CanvasBoardDialog({ board, remove, latest, blocked, pending, recovery, commandError, onClose, onSave }: {
+export function CanvasBoardDialog({ board, remove, latest, summary, blocked, pending, recovery, commandError, onClose, onSave }: {
   board: CanvasBoard | null; remove: boolean; latest: CanvasBoard | null
+  summary?: CanvasBoardSummary
   blocked: boolean; pending: boolean; recovery: ReactNode
   commandError: string | null
   onClose(): void; onSave(intent: CanvasBoardIntent): Promise<void>
@@ -17,6 +18,7 @@ export function CanvasBoardDialog({ board, remove, latest, blocked, pending, rec
   const [color, setColor] = useState(board?.color ?? ''), [revision, setRevision] = useState(board?.revision ?? null)
   const [busy, setBusy] = useState(false), [error, setError] = useState<string | null>(null), saving = useRef(false)
   const locked = busy || pending, stale = Boolean(board && latest?.revision !== revision)
+  const counts = summary && summary.boardId === board?.id && summary.revision === revision && !stale ? summary : null
   const invalid = Array.from(name.trim()).length > 200 || Array.from(description.trim()).length > 2000
   const save = async () => {
     if (locked || saving.current || blocked || stale || invalid) return
@@ -39,7 +41,11 @@ export function CanvasBoardDialog({ board, remove, latest, blocked, pending, rec
         closeDisabled={locked} />
       <form className="app-dialog-form" onSubmit={event => { event.preventDefault(); void save() }}>
         <AppDialogBody>
-          {remove ? <p>{board?.name || uiAttribute('未命名画布')}</p> : <fieldset disabled={locked} className="canvas-editor-fields">
+          {remove ? <><p>{board?.name || uiAttribute('未命名画布')}</p>
+            {counts ? <>{counts.nodeCount > 0 && <p>{uiAttribute('将删除 {0} 个节点。', counts.nodeCount)}</p>}
+              {counts.terminalCount > 0 && <p>{uiAttribute('其中有 {0} 张终端卡；删除时会关闭仍在运行的终端。', counts.terminalCount)}</p>}</>
+              : <p role="status"><UiText zh="终端数量暂不可用；删除时仍会关闭该画板中运行的终端。" /></p>}
+          </> : <fieldset disabled={locked} className="canvas-editor-fields">
             <label className="field-label"><UiText zh="名称" /><input data-dialog-autofocus placeholder={uiAttribute('未命名画布')} value={name} onChange={event => setName(event.target.value)}
               onKeyDown={event => { if (event.key === 'Enter' && event.nativeEvent.isComposing) event.preventDefault() }} /></label>
             <label className="field-label"><UiText zh="描述" /><textarea placeholder={uiAttribute('这个画布用来做什么？（可选）')} value={description} rows={3} onChange={event => setDescription(event.target.value)} /></label>

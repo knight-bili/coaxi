@@ -89,6 +89,12 @@ async function qualify(window){
    report.status='passed'
    return
   }
+  if(config.mode==='board-list'){
+   report.scope='production Main/preload/Core; actual board summaries, original list menus, delete warning and cancel; no terminal start or model'
+   await qualifyBoardList(window,{evaluate,wait,rpc})
+   report.status='passed'
+   return
+  }
   if(config.mode==='files'){
    report.scope='production Main/preload/Core; real file cards and author HTML lifecycle'
    await qualifyFiles(window,{evaluate,wait,rpc})
@@ -190,6 +196,59 @@ async function qualify(window){
   report.finished_at=new Date().toISOString();await writeFile(join(config.evidence,'result.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({status:report.status,evidence:config.evidence}));process.exitCode=report.status==='passed'?0:1;app.quit()
  }
 }
+async function qualifyBoardList(window,{evaluate,wait,rpc}){
+ window.unmaximize();window.setContentSize(1440,920);window.webContents.setZoomFactor(1)
+ const created=await rpc('canvas.boards.create',{commandId:randomUUID(),command:{name:`C06 原列表菜单 ${config.evidence.split(/[\\/]/).at(-1)}`,description:'同事务轮廓和真实节点数量',color:'blue'}})
+ assert.equal(created.status,'applied',JSON.stringify(created));const boardId=created.payload.board.id
+ const seed=[{kind:'note',content:'列表轮廓不应读取这段正文',x:-100,y:0,width:320,height:260,color:'orange'},
+  {kind:'note',content:'第二张纸',x:260,y:60,width:320,height:260},
+  {kind:'terminal',path:config.workspace,x:620,y:0,width:480,height:300}]
+ for(const node of seed){const graph=await rpc('canvas.nodes.snapshot',{boardId});const result=await rpc('canvas.nodes.apply',{commandId:randomUUID(),command:{boardId,expectedRevision:graph.board.revision,mutation:{type:'create',node}}});assert.equal(result.status,'applied',JSON.stringify(result))}
+ const graph=await rpc('canvas.nodes.snapshot',{boardId}),terminal=graph.nodes.find(node=>node.data.kind==='terminal')
+ report.board_list_context={boardId,nodeIds:graph.nodes.map(node=>node.id),terminalId:terminal.id,revision:graph.board.revision}
+ const list=await rpc('canvas.boards.list'),summary=list.summaries.find(item=>item.boardId===boardId)
+ assert.equal(summary.revision,graph.board.revision);assert.equal(summary.nodeCount,3);assert.equal(summary.terminalCount,1);assert.equal(summary.preview.length,3)
+ assert.equal(summary.preview[0].kind,'terminal');assert.ok(!JSON.stringify(summary).includes(seed[0].content))
+ const again=await rpc('canvas.boards.list');assert.equal(again.throughGlobalSequence,list.throughGlobalSequence)
+ record('real_core_list_returns_exact_same_revision_counts_and_geometry_without_advancing_event_sequence')
+ await openCanvasBoard(evaluate,wait,boardId)
+ await evaluate(`(()=>{document.querySelector('.canvas-breadcrumb-root').click();return true})()`)
+ const tile=`.canvas-board-tile[data-board-id="${boardId}"]`
+ await wait(`Boolean(document.querySelector('${tile}'))`)
+ await wait(`document.querySelector('${tile}').closest('.canvas-board-item').querySelectorAll('.canvas-board-preview rect').length===3`)
+ assert.ok((await evaluate(`document.querySelector('${tile}').closest('.canvas-board-item').querySelector('.canvas-board-meta').textContent`)).includes('3 个节点'))
+ record('actual_board_card_draws_three_authoritative_footprints_and_exact_node_count')
+ const click=async(selector,button='left')=>{const point=await evaluate(`(()=>{const rect=document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect();return {x:Math.round(rect.left+rect.width/2),y:Math.round(rect.top+rect.height/2)}})()`);window.webContents.sendInputEvent({type:'mouseMove',...point});window.webContents.sendInputEvent({type:'mouseDown',...point,button,clickCount:1});window.webContents.sendInputEvent({type:'mouseUp',...point,button,clickCount:1})}
+ const key=async(keyCode,modifiers=[])=>{window.webContents.sendInputEvent({type:'keyDown',keyCode,modifiers});window.webContents.sendInputEvent({type:'keyUp',keyCode,modifiers})}
+ await click(tile,'right');await wait(`Boolean(document.querySelector('.canvas-board-context-menu'))`)
+ assert.deepEqual(await evaluate(`[...document.querySelectorAll('.canvas-board-context-menu [role="menuitem"]')].map(item=>item.textContent.trim())`),['打开画板','编辑画板','删除画板'])
+ await key('Escape');await wait(`!document.querySelector('.canvas-board-context-menu')&&document.activeElement===document.querySelector('${tile}')`)
+ record('trusted_right_click_opens_original_actions_and_escape_restores_the_exact_board_button')
+ await key('F10',['shift']);await wait(`Boolean(document.querySelector('.canvas-board-context-menu'))`)
+ record('trusted_shift_f10_opens_the_same_board_context_actions')
+ await click('.canvas-board-context-menu [role="menuitem"]:last-child')
+ await wait(`Boolean(document.querySelector('.canvas-board-dialog'))`)
+ const text=await evaluate(`document.querySelector('.canvas-board-dialog').innerText`)
+ assert.ok(text.includes('将删除 3 个节点。')&&text.includes('其中有 1 张终端卡；删除时会关闭仍在运行的终端。'))
+ assert.equal(await evaluate(`document.querySelector('.canvas-board-dialog button[type="submit"]').disabled`),false)
+ record('delete_confirmation_uses_the_exact_board_revision_node_count_and_terminal_card_warning')
+ await writeFile(join(config.evidence,'01-original-board-delete-warning.png'),(await window.webContents.capturePage()).toPNG())
+ await evaluate(`(()=>{[...document.querySelectorAll('.canvas-board-dialog button')].find(item=>item.textContent==='取消').click();return true})()`)
+ await wait(`!document.querySelector('.canvas-board-dialog')`)
+ const unchanged=await rpc('canvas.nodes.snapshot',{boardId});assert.equal(unchanged.board.revision,graph.board.revision);assert.equal(unchanged.nodes.length,3)
+ assert.equal((await rpc('canvas.terminals.snapshot',{target:{boardId,nodeId:terminal.id},generation:null,afterSeq:0})).exists,false)
+ record('menu_and_cancel_preserve_all_nodes_and_never_start_a_terminal')
+ await click(`${tile} ~ .canvas-board-menu-trigger`)
+ await wait(`Boolean(document.querySelector('.canvas-card-menu [role="menuitem"]'))`)
+ await evaluate(`(()=>{[...document.querySelectorAll('.canvas-card-menu [role="menuitem"]')].find(item=>item.textContent==='编辑画板').click();return true})()`)
+ await wait(`document.querySelector('.canvas-board-dialog input')?.value===${JSON.stringify(created.payload.board.name)}`)
+ await evaluate(`(()=>{[...document.querySelectorAll('.canvas-board-dialog button')].find(item=>item.textContent==='取消').click();return true})()`)
+ await wait(`!document.querySelector('.canvas-board-dialog')`)
+ record('separate_overflow_menu_keeps_edit_action_without_nested_buttons_or_a_write')
+ assert.equal(await evaluate(`document.querySelectorAll('.canvas-board-item button button').length`),0)
+ await writeFile(join(config.evidence,'02-real-board-list.png'),(await window.webContents.capturePage()).toPNG())
+}
+
 async function qualifyCanvasVisual(window,{evaluate,wait,rpc}){
  window.unmaximize();window.setContentSize(1440,920)
  window.webContents.setZoomFactor(1)

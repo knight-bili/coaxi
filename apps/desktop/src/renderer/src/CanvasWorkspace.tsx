@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { ChevronDown, ChevronRight, Map as MapIcon, MoreHorizontal, Pencil, Plus, SquareArrowOutUpRight, Trash2 } from 'lucide-react'
 import type { CanvasBoard, CanvasBoardSummary, StoredCommandResult, NavigationPreferencesSnapshot, NavigationProjectLayoutMutation } from '@contracts'
@@ -27,6 +28,16 @@ function BoardCard({ board, summary, name, now, blocked, onOpen, onEdit, onDelet
   onOpen(): void; onEdit(): void; onDelete(): void
 }) {
   const language = useInterfaceLanguage(), tint = canvasPreviewTint(board.color), at = Date.parse(board.updatedAt)
+  const [menu, setMenu] = useState<'dropdown' | { x: number; y: number } | null>(null)
+  const openButton = useRef<HTMLButtonElement | null>(null), returnFocus = useRef(false)
+  const context = menu && typeof menu === 'object' ? menu : null
+  const openContext = (x: number, y: number) => { if (!blocked) { returnFocus.current = false; setMenu({ x, y }) } }
+  const items = <>
+    <DropdownMenu.Item className="canvas-card-menu-item" disabled={blocked} onSelect={onOpen}><SquareArrowOutUpRight size={15} /><UiText zh="打开画板" /></DropdownMenu.Item>
+    <DropdownMenu.Item className="canvas-card-menu-item" disabled={blocked} onSelect={onEdit}><Pencil size={15} /><UiText zh="编辑画板" /></DropdownMenu.Item>
+    <DropdownMenu.Separator className="canvas-menu-separator" />
+    <DropdownMenu.Item className="canvas-card-menu-item is-danger" disabled={blocked} onSelect={onDelete}><Trash2 size={15} /><UiText zh="删除画板" /></DropdownMenu.Item>
+  </>
   let edited: string | null = null
   if (now && Number.isFinite(at)) {
     const seconds = Math.floor(Math.max(0, now - at) / 1000)
@@ -34,20 +45,28 @@ function BoardCard({ board, summary, name, now, blocked, onOpen, onEdit, onDelet
       : seconds >= 60 ? ['minute', 60] as const : ['second', 1] as const
     edited = new Intl.RelativeTimeFormat(language === 'en' ? 'en' : 'zh-CN', { numeric: 'auto' }).format(-Math.floor(seconds / divisor), unit)
   }
-  return <article className="canvas-board-item" title={Number.isFinite(at) ? new Date(at).toLocaleString(language === 'en' ? 'en-US' : 'zh-CN') : undefined}>
-    <button className="canvas-board-tile" data-board-id={board.id} type="button" disabled={blocked} aria-label={name} onClick={onOpen} />
+  return <article className="canvas-board-item" title={Number.isFinite(at) ? new Date(at).toLocaleString(language === 'en' ? 'en-US' : 'zh-CN') : undefined}
+    onContextMenu={event => { if ((event.target as HTMLElement).closest('[role="menu"]')) return; event.preventDefault(); openContext(event.clientX, event.clientY) }}>
+    <button ref={openButton} className="canvas-board-tile" data-board-id={board.id} type="button" disabled={blocked} aria-label={name} onClick={onOpen}
+      onKeyDown={event => { if (event.key === 'ContextMenu' || event.key === 'F10' && event.shiftKey) { event.preventDefault(); event.stopPropagation(); const bounds = event.currentTarget.getBoundingClientRect(); openContext(bounds.left, bounds.bottom) } }} />
     <CanvasBoardPreview rects={summary?.preview ?? []} />
     {tint && <span className="canvas-board-color" style={{ background: tint }} aria-hidden="true" />}
     <div className="canvas-board-copy"><strong>{name}</strong>{board.description && <p>{board.description}</p>}
       <span className="canvas-board-meta">{summary ? uiAttribute('{0} 个节点', summary.nodeCount) : uiAttribute('统计暂不可用')}
         {edited && <> · <time dateTime={board.updatedAt}>{edited}</time></>}</span></div>
-    <DropdownMenu.Root><DropdownMenu.Trigger asChild><button type="button" className="canvas-icon-button canvas-board-menu-trigger" disabled={blocked}
+    <DropdownMenu.Root open={menu === 'dropdown'} onOpenChange={open => setMenu(current => open ? 'dropdown' : current === 'dropdown' ? null : current)}><DropdownMenu.Trigger asChild><button type="button" className="canvas-icon-button canvas-board-menu-trigger" disabled={blocked}
       aria-label={uiAttribute('画板操作：{0}', name)} title={uiAttribute('画板操作')}><MoreHorizontal size={16} /></button></DropdownMenu.Trigger>
       <DropdownMenu.Portal><DropdownMenu.Content className="canvas-card-menu" align="end" sideOffset={4} collisionPadding={12} loop>
-        <DropdownMenu.Item className="canvas-card-menu-item" disabled={blocked} onSelect={onOpen}><SquareArrowOutUpRight size={15} /><UiText zh="打开画板" /></DropdownMenu.Item>
-        <DropdownMenu.Item className="canvas-card-menu-item" disabled={blocked} onSelect={onEdit}><Pencil size={15} /><UiText zh="编辑画板" /></DropdownMenu.Item>
-        <DropdownMenu.Separator className="canvas-menu-separator" />
-        <DropdownMenu.Item className="canvas-card-menu-item is-danger" disabled={blocked} onSelect={onDelete}><Trash2 size={15} /><UiText zh="删除画板" /></DropdownMenu.Item>
+        {items}
+      </DropdownMenu.Content></DropdownMenu.Portal>
+    </DropdownMenu.Root>
+    {/* Reuse Rovai ImageContextMenu's viewport anchor and Escape focus return. */}
+    <DropdownMenu.Root open={Boolean(context)} onOpenChange={open => { if (!open) setMenu(current => typeof current === 'object' ? null : current) }}>
+      {context && createPortal(<DropdownMenu.Trigger asChild><span className="attachment-context-anchor" style={{ left: context.x, top: context.y }} /></DropdownMenu.Trigger>, document.body)}
+      <DropdownMenu.Portal><DropdownMenu.Content className="canvas-card-menu canvas-board-context-menu" aria-label={uiAttribute('画板操作：{0}', name)}
+        align="start" side="right" sideOffset={4} collisionPadding={12} loop onKeyDown={event => event.stopPropagation()}
+        onEscapeKeyDown={() => { returnFocus.current = true }} onCloseAutoFocus={event => { event.preventDefault(); if (returnFocus.current) openButton.current?.focus({ preventScroll: true }); returnFocus.current = false }}>
+        {items}
       </DropdownMenu.Content></DropdownMenu.Portal>
     </DropdownMenu.Root>
   </article>
@@ -237,6 +256,7 @@ function CanvasWorkspaceContent({ scope, identityIssue, onRetryIdentity, onLeave
     {selectedId && !showBoards && <CanvasSurface {...props} boardId={selectedId} scope={scope} catalog={catalog} groups={groups} restoreRevision={restoreRevision}
       onRefreshReferences={() => { void catalog.refresh().catch(() => undefined) }} onLeaveGuardChange={registerGraphGuard} />}
     {dialog && <CanvasBoardDialog board={dialog.board} remove={dialog.remove}
+      summary={dialog.board ? summaries.get(dialog.board.id) : undefined}
       latest={dialog.board ? boards.find(board => board.id === dialog.board!.id) ?? null : null}
       blocked={state.loading || Boolean(state.readError)} pending={Boolean(state.pending)} recovery={recovery}
       commandError={issue}

@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "原Codeg列表补真实轮廓/数量源码：Core同事务summaries、完整计数及最大200轮廓，客户端一致性检查、SVG卡片/时间/独立菜单已接线；8项TS及类型/5项实际SQLite查询边界/文档检查通过。Rust owner已补未编译，列表真实画面与Core接口待集中候选。无新增构建/Native/push/Actions。",
+  "current_slice": "原列表右键/Shift+F10/菜单键及Escape回焦、同版本删除节点/终端卡数量提示已接线；复用两源原组件和现有操作保护。Native board-list真实场景已准备，接下来将累计CSS与Core summaries一起冻结下一候选集中验证。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "先补原版列表右键菜单与删除前终端数量提示，再按已累积的CSS/真实列表投影集中冻结下一候选：新Core及扩展owner、Desktop/Web与必要Native列表/多会话ResizeObserver来源。60个已过rc14场景按源码影响复用，不全量重复。C05资源/未知请求/IO/PC余项复用后补缺；缺外部条件继续独立I04等编码，不逐切片全构建/push/Actions。",
+    "集中冻结本组累计CSS、Core真实统计/轮廓、原列表菜单与删除提示；新Core扩展owner/二进制、Desktop/Web一次构建，串行Native board-list与必要多会话RO来源观察。60旧rc14场景按源码影响复用。C05其他有限余项和I04保留，缺环境继续独立工作，不逐切片push/Actions。",
     "阶段剩余清单固定按I03-C06继续工程验证；暂缺环境只单列待办，继续可独立的I02余项和I04-I12/BUF，不把后续功能提前塞入I03。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "board_summary_projection_implemented_local_checks_passed_core_and_ui_runtime_pending",
+  "current_slice_status": "original_board_context_and_delete_warning_coded_preparing_batched_candidate",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
