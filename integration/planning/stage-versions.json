@@ -37,10 +37,10 @@
     {
       "stage_id": "I03",
       "name": "完整无限画布与对象绑定",
-      "candidate_version": "fusion-i03-rc.8",
+      "candidate_version": "fusion-i03-rc.18",
       "status": "frozen_with_partial_engineering_evidence",
-      "frozen_commit": "72048c73f9736a85ee1550cdc12dd1e3b45b6c79",
-      "validation_batch": "I03-repair-07",
+      "frozen_commit": "4fb189c5eb0d52f8b890bd369f6cd289ffc74923",
+      "validation_batch": "I03-desktop-command-reconciliation-admission-repair",
       "validation_runs": [
         {
           "kind": "local_windows_cargo_build",
@@ -148,6 +148,138 @@
           "source_commit": "72048c73f9736a85ee1550cdc12dd1e3b45b6c79",
           "core_source": "391e21fe62ade0ed5eade33c7b8335df84c9cca3",
           "exit_code": 0
+        },
+        {
+          "kind": "native-private-roundtrip-r5",
+          "candidate_version": "fusion-i03-rc.16",
+          "source_commit": "c82cf7f735d87caa0d5f12f39dc04bbbd1309c30",
+          "status": "failed",
+          "driver_exit": {
+            "code": 0,
+            "signal": null,
+            "deadline_terminated": false,
+            "at": "2026-10-16T15:57:51.114Z"
+          }
+        },
+        {
+          "kind": "native-private-roundtrip-r1",
+          "candidate_version": "fusion-i03-rc.17",
+          "source_commit": "286312f4d47b2282494a21fa1b28dcc573132e88",
+          "status": "failed",
+          "driver_exit": {
+            "code": 0,
+            "signal": null,
+            "deadline_terminated": false,
+            "at": "2026-10-16T16:01:31.652Z"
+          }
+        },
+        {
+          "kind": "native-private-roundtrip-r2",
+          "candidate_version": "fusion-i03-rc.17",
+          "source_commit": "286312f4d47b2282494a21fa1b28dcc573132e88",
+          "status": "passed",
+          "driver_exit": {
+            "code": 0,
+            "signal": null,
+            "deadline_terminated": false,
+            "at": "2026-10-16T16:02:57.847Z"
+          }
+        },
+        {
+          "kind": "native-private-queue-r1",
+          "candidate_version": "fusion-i03-rc.17",
+          "source_commit": "286312f4d47b2282494a21fa1b28dcc573132e88",
+          "status": "failed",
+          "driver_exit": {
+            "code": null,
+            "signal": "SIGKILL",
+            "deadline_terminated": true,
+            "at": "2026-10-16T16:08:05.689Z"
+          }
+        },
+        {
+          "kind": "native-private-queue-r2",
+          "candidate_version": "fusion-i03-rc.17",
+          "source_commit": "286312f4d47b2282494a21fa1b28dcc573132e88",
+          "status": "failed",
+          "driver_exit": {
+            "code": null,
+            "signal": "SIGKILL",
+            "deadline_terminated": true,
+            "at": "2026-10-16T16:12:42.433Z"
+          }
+        },
+        {
+          "kind": "native-private-rebind-r1",
+          "candidate_version": "fusion-i03-rc.17",
+          "source_commit": "286312f4d47b2282494a21fa1b28dcc573132e88",
+          "status": "failed",
+          "driver_exit": {
+            "code": 0,
+            "signal": null,
+            "deadline_terminated": false,
+            "at": "2026-10-16T16:14:51.015Z"
+          }
+        },
+        {
+          "kind": "native-private-late-upload-r1",
+          "candidate_version": "fusion-i03-rc.17",
+          "source_commit": "286312f4d47b2282494a21fa1b28dcc573132e88",
+          "status": "failed",
+          "driver_exit": {
+            "code": 0,
+            "signal": null,
+            "deadline_terminated": false,
+            "at": "2026-10-16T16:16:12.392Z"
+          }
+        },
+        {
+          "kind": "native-private-queue-r1",
+          "candidate_version": "fusion-i03-rc.18",
+          "source_commit": "4fb189c5eb0d52f8b890bd369f6cd289ffc74923",
+          "status": "failed",
+          "driver_exit": {
+            "code": 0,
+            "signal": null,
+            "deadline_terminated": false,
+            "at": "2026-10-16T16:20:18.004Z"
+          }
+        },
+        {
+          "kind": "native-private-queue-r2",
+          "candidate_version": "fusion-i03-rc.18",
+          "source_commit": "4fb189c5eb0d52f8b890bd369f6cd289ffc74923",
+          "status": "passed",
+          "driver_exit": {
+            "code": 0,
+            "signal": null,
+            "deadline_terminated": false,
+            "at": "2026-10-16T16:22:13.873Z"
+          }
+        },
+        {
+          "kind": "native-private-rebind-r1",
+          "candidate_version": "fusion-i03-rc.18",
+          "source_commit": "4fb189c5eb0d52f8b890bd369f6cd289ffc74923",
+          "status": "passed",
+          "driver_exit": {
+            "code": 0,
+            "signal": null,
+            "deadline_terminated": false,
+            "at": "2026-10-16T16:23:49.304Z"
+          }
+        },
+        {
+          "kind": "native-private-late-upload-r1",
+          "candidate_version": "fusion-i03-rc.18",
+          "source_commit": "4fb189c5eb0d52f8b890bd369f6cd289ffc74923",
+          "status": "passed",
+          "driver_exit": {
+            "code": 0,
+            "signal": null,
+            "deadline_terminated": false,
+            "at": "2026-10-16T16:24:47.777Z"
+          }
         }
       ],
       "engineering_validation": "in_progress",
@@ -207,19 +339,108 @@
           "web_build": "passed",
           "native_file_cards": "9_passed",
           "visual_review": "icon_baseline_alignment_repaired_in_rc8"
+        },
+        {
+          "candidate_version": "fusion-i03-rc.8",
+          "frozen_commit": "72048c73f9736a85ee1550cdc12dd1e3b45b6c79",
+          "status": "frozen_with_partial_engineering_evidence",
+          "desktop_build": "passed",
+          "web_build": "passed"
+        },
+        {
+          "candidate_version": "fusion-i03-rc.9",
+          "frozen_commit": "2158df02e793fc2eb3a01297b4921de214cdbe61",
+          "status": "historical_candidate_evidence_preserved_not_requalified_by_this_update",
+          "freeze": {
+            "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.9\\freeze.json",
+            "sha256": "05258848329b72f2733343e133fb3d1d232ca7103ae922e52a286fa711208fe5"
+          }
+        },
+        {
+          "candidate_version": "fusion-i03-rc.10",
+          "frozen_commit": "7eef4c6ca082f28f7a39ce78b1fcf9dd68cbe9c6",
+          "status": "historical_candidate_evidence_preserved_not_requalified_by_this_update",
+          "freeze": {
+            "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.10\\freeze.json",
+            "sha256": "f08fa6df6008b04580006632e66dc51796a8a56dcf41d7e6179af532631ce49d"
+          }
+        },
+        {
+          "candidate_version": "fusion-i03-rc.11",
+          "frozen_commit": "3c54d5d58350fa8b2fe1a638b403dd5cdc22288f",
+          "status": "historical_candidate_evidence_preserved_not_requalified_by_this_update",
+          "freeze": {
+            "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.11\\freeze.json",
+            "sha256": "9f8475c78c9ae96da0e1cfda0dc03c018345c979c1429a3d65c1949abc4ac6c5"
+          }
+        },
+        {
+          "candidate_version": "fusion-i03-rc.12",
+          "frozen_commit": "cebe5a698ab9476ce3c631bf4960a2cadde6ffa3",
+          "status": "historical_candidate_evidence_preserved_not_requalified_by_this_update",
+          "freeze": {
+            "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.12\\freeze.json",
+            "sha256": "34771f68af41505fc2a3c1e046ee34345e8d9619e1a0c362e112f71c7717091c"
+          }
+        },
+        {
+          "candidate_version": "fusion-i03-rc.13",
+          "frozen_commit": "caa03f67d9cf11f3ec8c608ab8f5b5c3b530c549",
+          "status": "historical_candidate_evidence_preserved_not_requalified_by_this_update",
+          "freeze": {
+            "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.13\\freeze.json",
+            "sha256": "18fe8f28f0190b2ee0384ce6978b111a886cffcdd2bfbc1f91e267cce5f687f0"
+          }
+        },
+        {
+          "candidate_version": "fusion-i03-rc.14",
+          "frozen_commit": "c44638135b8e06d34456bdc50657707404a6045c",
+          "status": "historical_candidate_evidence_preserved_not_requalified_by_this_update",
+          "freeze": {
+            "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.14\\freeze.json",
+            "sha256": "b969e5a47a959932718c1c716770d43cb789385897263e01b07e8110e89b5c77"
+          }
+        },
+        {
+          "candidate_version": "fusion-i03-rc.15",
+          "frozen_commit": "e0c4fad7e7c7f20d4c7b5f83418d8237c4ff6195",
+          "status": "historical_candidate_evidence_preserved_not_requalified_by_this_update",
+          "freeze": {
+            "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.15\\freeze.json",
+            "sha256": "ed6d832e4e94a702bd23ee4195f3383e5bed097875e9b3d48e2bf348f4e66e68"
+          }
+        },
+        {
+          "candidate_version": "fusion-i03-rc.16",
+          "frozen_commit": "c82cf7f735d87caa0d5f12f39dc04bbbd1309c30",
+          "status": "historical_candidate_evidence_preserved_not_requalified_by_this_update",
+          "freeze": {
+            "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.16\\freeze.json",
+            "sha256": "de64ef25f57c3748673a8b5bdc9a47c7cbeb7d02071850dc9740aed917fb6459"
+          }
+        },
+        {
+          "candidate_version": "fusion-i03-rc.17",
+          "frozen_commit": "286312f4d47b2282494a21fa1b28dcc573132e88",
+          "status": "historical_candidate_evidence_preserved_not_requalified_by_this_update",
+          "freeze": {
+            "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.17\\freeze.json",
+            "sha256": "c48cdb90ce9a1b0f3390c2037b3ee1f267dd75c2eeca41c1997451692cdb4e47"
+          }
         }
       ],
-      "repair_reason": "Visual review of rc.7 found inherited baseline alignment on file-card icon; use header center and assert actual geometry",
-      "windows_build": "passed",
+      "repair_reason": "rc17真实排队恢复请求被桌面Main白名单拒绝；只补已实现的commands.reconcile准入。仅桌面重建，Web/Renderer与Core源码不变，按SHA复用，不触发Actions",
+      "windows_build": "desktop_rc18_core_e0c4fad7_reused",
       "related_rust_unique_owners": 26,
-      "related_rust": "passed",
+      "related_rust": "historical_results_retained_current_core_reused_e0c4fad7_no_rerun",
       "actual_host_pty": "passed",
       "native_app_scale_platform": "full_flows_scale_and_platform_pending",
-      "native_desktop": "file_cards_html_channel_menu_9_passed_other_full_flows_pending",
-      "full_types": "passed_reused_unchanged_typescript",
-      "desktop_build": "passed",
-      "web_build": "passed",
-      "next_renderer_batch": "已实现三位置附件UI；与后续I03整改集齐后验证，当前rc.8构建不包含新UI。"
+      "native_desktop": "roundtrip_and_cas_rc17_queue_and_deleted_pin_recovery_and_late_upload_rc18_verified_remaining_groups_open",
+      "full_types": "passed_current_tree",
+      "desktop_build": "passed_rc18",
+      "web_build": "reused_rc17_unchanged_sources_assets_verified",
+      "next_renderer_batch": "补PC10真实不同Core连接切换；R01其余8项本机边界已核定，继续R02最终输入/发送和R04进程异常，不重复已过且相关源码未变的模式。",
+      "rust_evidence_scope": "原历史owner及rc15编译/执行记录保留；本轮未执行Rust测试或重新编译，不把历史数量写成rc18新增通过。"
     },
     {
       "stage_id": "I04",

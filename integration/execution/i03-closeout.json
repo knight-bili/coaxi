@@ -21,7 +21,7 @@
     {
       "id": "I03-C01",
       "name": "完成私聊材料r1剩余链路",
-      "status": "implementation_ready_for_stage_verification",
+      "status": "engineering_verification_in_progress",
       "items": [
         "Native/Web上传准备原编号及结果恢复",
         "私有源内容变化检查",
@@ -30,9 +30,9 @@
         "孤立Core/本机正文及冲突统一恢复"
       ],
       "done_when": "本阶段完整使用流程及PC01-PC24适用工程验证有当前源码证据，外部环境缺项明确单列",
-      "latest_partial_evidence": "i03-c06-private-materials-native-result.json",
+      "latest_partial_evidence": "i03-r01-native-complete-input-verification.json",
       "remaining_runtime_risks": [
-        "PC04/05/06/07/13/24工程边界已核定，18个其余私聊场景按R01/R02/R04补缺；实际页面、最终Runtime和进程中断未被Host API证据替代。",
+        "私聊14项本机边界已核定，剩余PC01/02/10/11/12/14/15/16/21/22；实际不同Core切换、最终Runtime输入、发送消费和进程中断不能由当前四类Native模式替代。",
         "实际Host/Native IPC/资源授权验证后启用最终文件入口，UI模拟验证不能替代",
         "完整PC01-PC24适用工程场景与异常恢复待集中验证；发现代码缺口回到C01修复",
         "实际大材料/日志枚举/事务锁规模归I03-C05验证；本批32副本只验证字典读取次数"
@@ -41,9 +41,10 @@
       "verified_native_subflows": [
         "真实Native字节准备/原回执核对，两卡和默认附件分开",
         "伪造pin/跨卡移除拒绝、并发CAS、默认材料显式迁入与保留交换原UUID回放",
-        "删除pin后的原归属恢复与冷启动保持；原读者精确读取卡片和retained附件、跨卡拒绝"
+        "删除pin后的原归属恢复与冷启动保持；原读者精确读取卡片和retained附件、跨卡拒绝",
+        "rc17/18四类实际页面模式：稳定DOM顺序及撤销/引用/revision往返、完整移回/保留/交换、同UUID重试和只读核对、接管保存、删除后原位置恢复及结束原单聊后的迟到上传。"
       ],
-      "file_ui_status": "实际卡片附件入口与精确预览已通过；有效pending token/retained完整界面、引用和最后输入交接按R01/R02继续，不重复已过附件打开",
+      "file_ui_status": "实际Native完整排队输入、租约接管、保留交换、原位置恢复已核定；不同Core切换、源内容变化、最终发送与实际进程中断继续R01/R02/R04。",
       "resolved_fixture_incident": "旧两测试Thread空附件视图目录缺失后已有Core重建恢复，当前ready/error为空且目录存在，后续启动无同事件；初始消失原因和非空旧附件恢复未由本次证明。"
     },
     {
@@ -214,10 +215,10 @@
   "remaining_queue_counts": {
     "settled_obligations": 17,
     "open_work_groups": 9,
-    "private_cases_verified": 6,
-    "private_cases_open": 18,
+    "private_cases_verified": 14,
+    "private_cases_open": 10,
     "verified_work_groups": 1
   },
-  "latest_group_verification": "i03-r03-host-private-verification.json",
+  "latest_group_verification": "i03-r01-native-complete-input-verification.json",
   "latest_preparation": "i03-r01-private-workflow-preparation.json"
 }

@@ -15,8 +15,8 @@
   "counts": {
     "settled_obligations": 17,
     "open_work_groups": 9,
-    "private_cases_verified": 6,
-    "private_cases_open": 18,
+    "private_cases_verified": 14,
+    "private_cases_open": 10,
     "verified_work_groups": 1
   },
   "count_boundary": "不同层级不相加；17条为限定范围旧待办，固定10组按状态计算剩余；私聊按原24场景逐项核定，不计算完成百分比",
@@ -161,7 +161,7 @@
         "I03-C01"
       ],
       "done_when": "引用/revision/撤销在模式往返保持；空scope只读无登记；冲突保留本机输入；上传迟到不串入；租约接管、完整移回/交换及节点换绑恢复有实际界面证据。",
-      "next_action": "补PC09/PC10/PC20/PC23故障和换绑页面场景，累计候选运行全部已准备Native模式；本机工程完成条件不变。",
+      "next_action": "补PC10真实不同Core连接切换；R01其余8项本机边界已核定，继续R02最终输入/发送和R04进程异常，不重复已过且相关源码未变的模式。",
       "owner": "Codex",
       "external_condition": "none_confirmed_blocking_current_independent_work",
       "latest_preparation": "i03-r01-private-workflow-preparation.json",
@@ -171,7 +171,21 @@
         "PC17",
         "PC18",
         "PC19"
-      ]
+      ],
+      "verified_private_cases": [
+        "PC03",
+        "PC08",
+        "PC09",
+        "PC17",
+        "PC18",
+        "PC19",
+        "PC20",
+        "PC23"
+      ],
+      "remaining_private_cases": [
+        "PC10"
+      ],
+      "latest_verification": "i03-r01-native-complete-input-verification.json"
     },
     {
       "id": "I03-R02",
@@ -517,5 +531,5 @@
     "真实移动平台按I10推进；终端平台专属保护按相应平台阶段补齐，不能被Windows结果代替"
   ],
   "change_control": "剩余编号固定；发现缺陷归入已有组并说明影响。新增必需范围须有来源和编号变更记录；不能为减少数量合并隐藏未完成条件。",
-  "latest_verification": "i03-r03-host-private-verification.json"
+  "latest_verification": "i03-r01-native-complete-input-verification.json"
 }
