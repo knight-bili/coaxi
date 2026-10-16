@@ -150,3 +150,13 @@ public-cold-r1三项通过，新App显式打开原64节点和三张公开pin，�
 final result: blocked
 
 完整视觉/阶段工程验证未完，目标active，本轮无需客户介入。
+
+## 卡片源码对照补正（待集中运行）
+
+再次对照固定 Codeg `nodes/card-frame.tsx:13–18,64,98–110` 与 `nodes/note-node.tsx:139–146`。现有摘要、实时会话、文件、终端、区域和便笺继续沿用既有原组件映射，不新增另一套卡片设计。本次只补正文普通光标/文字选择、标题拖动时禁选及便笺 Markdown 局部13px/1.625；普通文件文档仍保留原阅读样式。
+
+CSS解析和差异空白检查通过，没有新增构建、Native运行、推送或Actions。报告 `integration/execution/i03-c06-card-source-followup.json` 绑定本次CSS；rc14已有60个Native场景不覆盖新CSS。下一冻结候选再检查日夜主题、八类、长标题、小窗口、正文选择和必要滚动；不把代码对齐当作视觉通过。原Diff搜索框与ResizeObserver问题仍保留。
+
+final result: blocked
+
+完整视觉/阶段工程验证未完，持续目标active，无新增客户确认事项。

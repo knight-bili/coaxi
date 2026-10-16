@@ -175,7 +175,7 @@
         "rc14空私聊viewport extraY0与紧凑旧材料入口已实际通过；两种主题/其他高度与有消息状态仍按完整UI清单继续",
         "缩放/尺寸切换有ResizeObserver延迟通知，继续定位；功能断言通过不授予零控制台问题资格",
         "Codeg列表真实缩略预览/节点数、日主题与完整八类创建/错误状态仍未取得全部资格",
-        "当前Codeg分型卡片、私聊贴合、终端窄宽控制、便笺拖动/行内编辑/冲突及renderer恢复已有rc14对应证据；完整日夜主题/八类创建与错误态、悬停键盘及摘要/区域视觉仍需核对。便笺SafeMarkdown document实际15px覆盖原13px，随下一组修复并集中验证。 可用Diff已实际查看；失效路径态搜索框双层边框不贴合，随下一组按原组件修正。"
+        "当前Codeg分型卡片、私聊贴合、终端窄宽控制、便笺拖动/行内编辑/冲突及renderer恢复已有rc14对应证据；完整日夜主题/八类创建与错误态、悬停键盘及摘要/区域视觉仍需核对。便笺SafeMarkdown document覆盖已局部修正为13px/1.625，卡片正文选择/光标及标题禁选同时补正；CSS解析通过，待下一冻结候选集中运行，rc14不代证新CSS。 可用Diff已实际查看；失效路径态搜索框双层边框不贴合，随下一组按原组件修正。"
       ],
       "latest_card_style_evidence": "i03-c06-card-source-style-result.json",
       "latest_note_terminal_evidence": "i03-c06-note-terminal-interaction-result.json",
@@ -184,7 +184,8 @@
       "latest_notes_mirrors_evidence": "i03-c05-notes-mirrors-native-verification.json",
       "latest_renderer_crash_evidence": "i03-c05-renderer-crash-native-verification.json",
       "latest_public_multi_evidence": "i03-c05-public-multi-native-verification.json",
-      "latest_ready_diff_public_cold_evidence": "i03-c02-ready-diff-public-cold-native-verification.json"
+      "latest_ready_diff_public_cold_evidence": "i03-c02-ready-diff-public-cold-native-verification.json",
+      "latest_source_card_followup": "i03-c06-card-source-followup.json"
     }
   ],
   "state_rule": "代码完成、工程验证通过、待环境验证分别记录；无代码缺口且工程验证满足时由Codex收口；缺环境继续独立后续工作，最终MVP不豁免",

@@ -64,7 +64,7 @@
 .canvas-conversation-heading { display: flex; flex: 0 0 36px; align-items: center; gap: 6px; padding: 0 10px; border-bottom: 1px solid var(--line); }
 .canvas-conversation-heading > svg { flex-shrink: 0; color: var(--muted); }
 .canvas-conversation-heading strong { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 600; }
-.canvas-conversation-content { position: relative; display: flex; flex: 1; min-width: 0; min-height: 0; overflow: hidden; }
+.canvas-conversation-content { position: relative; display: flex; flex: 1; min-width: 0; min-height: 0; overflow: hidden; cursor: auto; user-select: text; }
 .canvas-conversation-content > .workspace-shell { flex: 1; min-width: 0; }
 .canvas-bound-single-chat { position: relative; flex: 1; grid-column: 1; grid-row: 1 / -1; min-width: 0; min-height: 0; height: 100%; }
 .canvas-bound-single-chat > .single-chat-popover { inset: 0; width: 100%; height: 100%; border: 0; border-radius: 0; box-shadow: none; }
@@ -107,7 +107,7 @@
 .canvas-empty-copy { margin: 8px 0; color: var(--muted); font-size: 12px; }
 .canvas-card { display: flex; width: 100%; height: 100%; box-sizing: border-box; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(color-mix(in srgb, var(--canvas-node-tint, transparent) 8%, transparent), color-mix(in srgb, var(--canvas-node-tint, transparent) 8%, transparent)), var(--surface); color: var(--ink); transition: border-color .15s, box-shadow .15s; }
 .react-flow__node.selected .canvas-card { border-color: var(--ink); box-shadow: 0 0 0 2px color-mix(in srgb, var(--ink) 25%, transparent); }
-.canvas-card-handle { display: flex; align-items: center; gap: 6px; height: 36px; flex: 0 0 36px; padding: 0 10px; border-bottom: 1px solid var(--line); cursor: grab; }
+.canvas-card-handle { display: flex; align-items: center; gap: 6px; height: 36px; flex: 0 0 36px; padding: 0 10px; border-bottom: 1px solid var(--line); cursor: grab; user-select: none; }
 .canvas-card-handle:active { cursor: grabbing; }
 .canvas-card-handle strong { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 600; }
 .canvas-card-kind-icon { flex-shrink: 0; color: var(--muted); }
@@ -138,7 +138,7 @@
 [data-color="violet"] > .canvas-color-dot, .canvas-card[data-color="violet"] .canvas-color-dot { background: var(--canvas-color-violet); }
 .canvas-card-handle button { padding: 2px 5px; font-size: 11px; }
 .canvas-card.is-collapsed .canvas-card-handle { border-bottom: 0; }
-.canvas-card-body { display: flex; flex: 1; min-width: 0; min-height: 0; flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; overflow: auto; font-size: 13px; }
+.canvas-card-body { display: flex; flex: 1; min-width: 0; min-height: 0; flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; overflow: auto; font-size: 13px; cursor: auto; user-select: text; }
 .canvas-card-body code { max-width: 100%; overflow-wrap: anywhere; white-space: pre-wrap; font-size: 12px; }
 .canvas-card-body .safe-markdown { width: 100%; }
 .canvas-card-terminal .canvas-card-body { align-items: stretch; padding: 0; overflow: hidden; }
@@ -189,6 +189,7 @@
 .canvas-note-paper.canvas-card-handle { position: relative; align-items: stretch; gap: 0; height: 100%; flex: none; padding: 0; user-select: none; }
 .canvas-note-paper > .canvas-note-title { flex: 0 0 auto; margin: 12px 12px 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 500; }
 .canvas-note-prose { flex: 1; min-width: 0; min-height: 0; overflow: hidden; padding: 12px; font-size: 13px; }
+.canvas-note-prose > .safe-markdown.is-document { font-size: 13px; line-height: 1.625; }
 .canvas-note-placeholder { margin: 0; color: var(--muted); }
 .canvas-note-editor { box-sizing: border-box; flex: 1; width: 100%; min-width: 0; min-height: 0; padding: 12px; resize: none; border: 0; border-radius: 12px; outline: none; background: transparent; color: var(--ink); font: inherit; font-size: 13px; line-height: 1.625; user-select: text; }
 .canvas-note-status { flex: 0 1 auto; max-height: 50%; overflow: auto; padding: 8px 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; user-select: text; }
