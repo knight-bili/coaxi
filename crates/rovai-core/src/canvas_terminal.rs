@@ -1,6 +1,6 @@
 //! 画布临时终端的 Core 来源校验与闭合请求。进程身份不写入画布数据库。
 //! Codeg 行为来源固定 aff1e6c，许可证见 integration/licenses/codeg/LICENSE。
-//! 父端与关闭流程已接线；公共方法、Host 与界面准入仍待后续批次。
+//! 父端、关闭流程及公共方法已接线；界面与真实平台验证仍待后续批次。
 pub(crate) mod helper;
 pub(crate) mod manager;
 pub(crate) mod state;

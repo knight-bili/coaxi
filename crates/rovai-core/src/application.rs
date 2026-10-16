@@ -844,6 +844,10 @@ fn request_runs_outside_main_queue(method: &str) -> bool {
             | "agentRunExecution.changes"
             | "missions.changes"
             | "missions.fileDiff"
+            | "canvas.terminals.start"
+            | "canvas.terminals.write"
+            | "canvas.terminals.resize"
+            | "canvas.terminals.stop"
             | "agentRuns.cancel"
             | "agentRuns.continue"
             | "singleChat.sourceAttachments.addFromPath"
@@ -870,6 +874,7 @@ fn request_uses_independent_read_queue(method: &str) -> bool {
             | "navigation.groupCamps"
             | "navigation.findCamp"
             | "canvas.references.page"
+            | "canvas.terminals.snapshot"
             | "workspaces.worktrees"
     )
 }
@@ -9391,6 +9396,26 @@ impl Core {
                     &user_command_envelope(params.command_id, params.command),
                 )?;
                 Ok(serde_json::to_value(execution.result)?)
+            }
+            "canvas.terminals.start" => {
+                self.start_canvas_terminal(serde_json::from_value(request.params.clone())?)
+                    .await
+            }
+            "canvas.terminals.snapshot" => {
+                self.read_canvas_terminal(serde_json::from_value(request.params.clone())?)
+                    .await
+            }
+            "canvas.terminals.write" => {
+                self.write_canvas_terminal(serde_json::from_value(request.params.clone())?)
+                    .await
+            }
+            "canvas.terminals.resize" => {
+                self.resize_canvas_terminal(serde_json::from_value(request.params.clone())?)
+                    .await
+            }
+            "canvas.terminals.stop" => {
+                self.stop_canvas_terminal(serde_json::from_value(request.params.clone())?)
+                    .await
             }
             "canvas.boards.list" => {
                 let database = self.database.lock().await;
@@ -30333,6 +30358,18 @@ done
         assert!(request_uses_independent_read_queue(
             "canvas.references.page"
         ));
+        assert!(request_uses_independent_read_queue(
+            "canvas.terminals.snapshot"
+        ));
+        for method in [
+            "canvas.terminals.start",
+            "canvas.terminals.write",
+            "canvas.terminals.resize",
+            "canvas.terminals.stop",
+        ] {
+            assert!(request_runs_outside_main_queue(method));
+            assert!(!request_uses_independent_read_queue(method));
+        }
         assert!(!request_uses_independent_read_queue(
             "navigation.campViewed"
         ));

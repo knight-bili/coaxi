@@ -4431,6 +4431,8 @@ export interface CanvasGraphSnapshot {
   objectReferenceVersion?: number
   /** Bound file creation and explicit legacy binding require version 1. */
   fileReferenceVersion?: number
+  /** Missing on older Hosts; all ephemeral terminal operations require version 1. */
+  terminalVersion?: number
   /** Missing on older Hosts; new sourceMembers writes require version 1. */
   memberTransferVersion?: number
   board: CanvasBoard | null
@@ -4473,6 +4475,49 @@ export interface ApplyCanvasNodesCommand {
   boardId: string
   expectedRevision: number
   mutation: CanvasNodeMutation
+}
+
+export interface CanvasTerminalTarget { boardId: string; nodeId: string }
+export interface CanvasTerminalSize { cols: number; rows: number }
+export interface CanvasTerminalStart extends CanvasTerminalSize {
+  target: CanvasTerminalTarget
+  coreGeneration: string
+  requestId: string
+  expectedGeneration: string | null
+}
+export interface CanvasTerminalRead { target: CanvasTerminalTarget; generation?: string | null; afterSeq?: number }
+export interface CanvasTerminalWrite {
+  target: CanvasTerminalTarget
+  generation: string
+  inputId: string
+  expectedInputSequence: number
+  bytesBase64: string
+}
+export interface CanvasTerminalResize extends CanvasTerminalSize { target: CanvasTerminalTarget; generation: string }
+export interface CanvasTerminalStop { target: CanvasTerminalTarget; generation: string }
+export interface CanvasTerminalInputReceipt {
+  sequence: number
+  inputId: string
+  status: 'queued' | 'pending' | 'written' | 'unknown' | 'not_written'
+}
+export interface CanvasTerminalSnapshot {
+  coreGeneration: string
+  target: CanvasTerminalTarget
+  exists: boolean
+  generation: string | null
+  launchRequestId: string | null
+  phase: 'missing' | 'starting' | 'running' | 'stopping' | 'exited' | 'failed'
+  cols: number | null
+  rows: number | null
+  exitCode: number | null
+  throughSeq: number
+  firstAvailableSeq: number
+  gap: boolean
+  chunks: Array<{ seq: number; bytesBase64: string }>
+  inputSequence: number
+  inputs: CanvasTerminalInputReceipt[]
+  issue: string | null
+  cleanupComplete: boolean
 }
 
 export type CoreMethod =
@@ -4576,6 +4621,11 @@ export type CoreMethod =
   | 'canvas.nodes.snapshot'
   | 'canvas.references.page'
   | 'canvas.nodes.apply'
+  | 'canvas.terminals.start'
+  | 'canvas.terminals.snapshot'
+  | 'canvas.terminals.write'
+  | 'canvas.terminals.resize'
+  | 'canvas.terminals.stop'
   | 'toolbox.read'
   | 'toolbox.setMembers'
   | 'nativeSkills.list'

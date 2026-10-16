@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { ConsoleClient, InvalidationDecoder, SessionRequired } from './client'
+import { ConsoleClient, InvalidationDecoder, SessionRequired, WEB_OPERATIONS } from './client'
 import { newCommandId } from '../../desktop/src/shared/command-id'
 
 // Owns browser credential routing and connection generations. Host HTTP tests
@@ -345,6 +345,33 @@ describe('tab session recovery', () => {
     return { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => { values.set(key, value) }, removeItem: (key: string) => { values.delete(key) } }
   }
   const identity = { protocolVersion: 4, token: 'a'.repeat(64), clientId: 'b'.repeat(64), editorProof: 'c'.repeat(64), ownerId: 'local_user', channels: 'desktop' }
+  it('admits terminal transport without persisting input or replaying a lost write after reauthentication', async () => {
+    const storage = memory(), operations: string[] = []
+    const params = { target: { boardId: 'board', nodeId: 'A' }, generation: newCommandId(), inputId: newCommandId(), expectedInputSequence: 0, bytesBase64: 'dGVybWluYWwtaW5wdXQ=', commandId: newCommandId() }
+    const fetcher = vi.fn<typeof fetch>().mockImplementation(async (url, init) => {
+      if (String(url).endsWith('/login')) return Response.json(identity)
+      const body = JSON.parse(String(init?.body))
+      operations.push(body.operation)
+      if (body.operation === 'canvas.terminals.write') throw new TypeError('terminal reply lost')
+      return Response.json({ result: {} })
+    })
+    const client = new ConsoleClient('http://localhost:4317', fetcher, storage)
+    await client.login('d'.repeat(64))
+    for (const operation of ['canvas.terminals.start', 'canvas.terminals.snapshot', 'canvas.terminals.write', 'canvas.terminals.resize', 'canvas.terminals.stop'] as const) {
+      expect(WEB_OPERATIONS).toContain(operation)
+      if (operation === 'canvas.terminals.write') await expect(client.request(operation, params)).rejects.toThrow('terminal reply lost')
+      else await client.request(operation, { target: params.target })
+    }
+    expect(client.pendingCommandCount).toBe(0)
+    expect(JSON.parse(storage.getItem('rovai.web.session.v1')!).pending).toEqual([])
+    expect(storage.getItem('rovai.web.session.v1')).not.toContain(params.bytesBase64)
+    expect(storage.getItem('rovai.web.edits.v1')).toBeNull()
+    client.clear(); await client.login('d'.repeat(64))
+    await client.reconcilePending(); await client.retryPending()
+    expect(operations).toEqual(['canvas.terminals.start', 'canvas.terminals.snapshot', 'canvas.terminals.write', 'canvas.terminals.resize', 'canvas.terminals.stop'])
+    expect(client.pendingCommandCount).toBe(0)
+    client.clear()
+  })
   it('exchanges a scan ticket only in POST and retains this tab editor but never a copied editor', async () => {
     const storage = memory()
     const fetcher = vi.fn<typeof fetch>().mockImplementation(async () => Response.json(identity))

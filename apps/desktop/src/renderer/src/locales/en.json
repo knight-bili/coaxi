@@ -4106,5 +4106,8 @@
   "页面预览已达窗口上限，请先收起其他页面预览。": "This window has reached its page preview limit. Collapse another page preview first.",
   "正在读取原文件…": "Loading the original file…",
   "打开原文件": "Open original file",
-  "删除文件节点": "Delete file card"
+  "删除文件节点": "Delete file card",
+  "终端请求格式不正确。": "The terminal request is invalid.",
+  "终端返回的信息与原节点不一致，请重新读取。": "The terminal reply does not match the original card. Read it again.",
+  "当前连接暂不支持画布终端，请升级服务后重试。": "This connection does not support canvas terminals. Upgrade the service and try again."
 }

@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "I03-C04父端会话registry、原输入顺序/回执、受管helper/CLI、删除与计划退出已编码。纯状态源2项复验、模块格式与Core语法解析通过；manager/helper/完整Core未编译，真实进程owner、Native/Web/API与终端UI继续，不标C04完成。",
+  "current_slice": "I03-C04终端5个公共方法、terminalVersion1、共享类型、Native/Web准入与固定节点字节客户端已编码；补齐此前Main漏列的15个画布/技能包方法和Web漏列的7个技能包及1个原草稿状态通知。5个TS owner共48项通过，定向类型检查通过；Rust仅格式/语法检查，终端UI/控制器与真实进程owner继续，未完成C04。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "继续I03-C04公开RPC与Core能力、TS类型及Native/Web准入/客户端，再移植终端读者/卡片/原代次重连和实际最低层进程owner；父端代码已接Core但完整编译/进程/删除/退出尚待阶段候选。",
+    "继续I03-C04原终端读者/卡片与会话控制器：显式启动、连续原字节、resize/stop、原请求与代次重连/输入回执查询、收起/删除/重开；补实际最低层进程owner。API与客户端已编码，实际Core/Host/Native/PTY随阶段候选运行。",
     "I03-C05冷路由/多卡/规模代码集齐后，C06冻结fusion-i03-rc.1，集中编译当前158/208及此前生命周期增量，原扩展owner/HTTP/实际Desktop统一验证；不把旧二进制当当前源码证据。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "parent_lifecycle_coded_rpc_ui_and_actual_process_pending",
+  "current_slice_status": "terminal_api_client_coded_ui_and_actual_process_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -192,5 +192,6 @@
   "file_binding_evidence": "i03-file-binding-result.json",
   "file_preview_ui_evidence": "i03-file-preview-ui-result.json",
   "terminal_foundation_evidence": "i03-terminal-foundation-result.json",
-  "terminal_parent_evidence": "i03-terminal-parent-result.json"
+  "terminal_parent_evidence": "i03-terminal-parent-result.json",
+  "terminal_api_evidence": "i03-terminal-api-result.json"
 }

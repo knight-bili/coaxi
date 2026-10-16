@@ -319,6 +319,7 @@ pub struct CanvasGraphSnapshot {
     pub member_transfer_version: u32,
     pub object_reference_version: u32,
     pub file_reference_version: u32,
+    pub terminal_version: u32,
 }
 fn from_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<CanvasNode> {
     let decode = |column, error| {
@@ -467,6 +468,7 @@ pub fn snapshot(connection: &Connection, board_id: &str) -> Result<CanvasGraphSn
         member_transfer_version: 1,
         object_reference_version: 1,
         file_reference_version: 1,
+        terminal_version: 1,
     })
 }
 
@@ -1407,6 +1409,7 @@ mod persistence_tests {
         }
         let stored = snapshot(database.connection(), &id).unwrap();
         assert_eq!(stored.object_reference_version, 1);
+        assert_eq!(stored.terminal_version, 1);
         for (node_id, reference) in ids.iter().zip(&references) {
             assert_eq!(
                 stored

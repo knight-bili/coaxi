@@ -1881,3 +1881,11 @@ I03-C03 文件卡片新增最低层 `canvas-file.test.ts` owner，负责字面�
 原state回放owner补正文淘汰仍保留through/gap，新的独立源编译本批仍2项通过，不累计前轮次数。
 Core application仅做Rust语法解析，新模块与改动进程模块做格式检查；不把这些写成Core/Host类型或执行通过。
 后续必须补真实Core/Host终端进程owner，覆盖启动/原回执、输入、resize、日志洪流、删除、Core重启和计划退出，实际操作按阶段集中规则执行。
+
+终端接口批次新增`canvas-terminal-client.test.ts`为最低层客户端owner：固定节点/代次、启动Core身份、原输入字节冻结、
+未知运输只返回一次、原回执序号、原始块/淘汰游标以及公开字段投影。原画布命令owner只拥有持久Gateway手势，
+不能代替临时PTY字节与回执；该owner只模拟request，不启动Core、Host、Shell或模型。
+原Main准入owner扩展技能包/画布/终端的显式准入，原Web adapter owner沿真实适配器检查终端5方法及技能包7方法，
+以及此前漏列的原待创建会话存在状态通知，
+原ConsoleClient恢复owner扩展丢输入回执后重新登录、零持久pending/零原输入重发，使用模拟fetch。
+原Core队列owner、原canvas快照owner及原Web投影owner只追加对应断言，不增加整库fixture；这些Rust断言随候选编译运行。

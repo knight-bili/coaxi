@@ -1,4 +1,4 @@
-//! 终端操作在原 Core Owner 入口内调用；公开方法/Host准入随下一批接线。
+//! 终端公开操作在原 Core Owner 入口内调用，与画布生命周期及计划退出准入共用围栏。
 use super::*;
 use crate::canvas_terminal::{
     ReadTerminal, ResizeTerminal, StartTerminal, StopTerminal, WriteTerminal,

@@ -270,7 +270,7 @@ ManagedProcess启动，复用Windows原Job归属和Unix既有身份回收；遵�
 父端未读时输出管道反压，输入队列最多8帧，单次输入16KiB；EOF、root退出和输出排空分别观察，不把它们冒充整树回收。
 
 Core父端registry、三个二进制的早期helper入口、原ManagedProcess父端、节点/画板删除与计划退出已编码。
-公共方法/能力、Native/Web准入、终端读者与实际最低层进程owner尚未接齐；尚未编译完整Core或启动实际PTY。
+公共方法/能力及Native/Web准入已接线；终端读者与实际最低层进程owner尚未接齐，尚未编译完整Core或启动实际PTY。
 纯状态源单独编译通过不代表辅助进程或完整Core编译通过；完整PTY/Host/平台必须在阶段候选实际验证，C04保持开发中。
 
 启动绑定原Core generation和原请求，旧Core的未结请求不能在重启后重开Shell。一个节点同代次只接受原参数，
@@ -288,3 +288,20 @@ Shell优先SHELL，再用平台默认；裸命令经原RuntimeSearchEnvironment�
 节点删除只在原命令事务后核对真实删除事实，CAS拒绝不杀仍存活节点；回收异常不推翻已经持久的画布命令回执。
 计划退出立即停止新终端启动，终端回收结果计入原退出报告deadlineExpired；它不改变AgentRun的终态fence前提。
 Linux重复强停继续通知已捕获的后代；原进程owner补恢复标记回归。真实Linux/macOS硬退出、网络目录、ConPTY/Job和跨平台仍待验证，不能据源码宣称高可用已完成。
+
+## 终端公共接口与客户端（2026-10-16）
+
+画布快照声明可选`terminalVersion:1`，缺少或未知版本时客户端在运输前拒绝终端操作。Core暴露5个
+`canvas.terminals.*`方法，Native沿原IPC准入、Web沿原已认证Host逐项开放，均复用原Core身份与会话权威。
+启动/输入/缩放/停止离开主请求队列，快照走独立读取队列；后台方法仍在各自生命周期入口核对来源。
+既有Main准入漏列的7个技能包与8个画布方法，以及Web共享客户端漏列的7个技能包方法本批同步补齐，避免拦截已经实现的业务入口。
+逐项对照还补齐Web原待创建会话的`threads.pendingDraft.setPresence`，恢复原草稿存在状态通知；不改变草稿内容或命令恢复行为。
+
+共享`CanvasTerminalClient`固定构造时的board/node，逐项组装闭合请求，冻结原字节与请求字段，核对响应目标、
+Core/启动身份、会话代次、连续游标、有界原始块和输入回执。不承担进程管理或UI轮询；不自动重试，不保存命令字节。
+Web终端操作明确不进入`RECONCILABLE_COMMANDS`或持久恢复队列；丢回执后由后续终端控制器读取原会话/输入回执，
+不能借通用恢复再次投递stdin。停止响应仅表示已请求，实际回收必须看快照`cleanupComplete`。
+Host投影与Native客户端都按公开字段组装返回值，排除未来新增的内部进程/摘要字段；输出仍为base64原始字节。
+
+当前协议清单追加5个动作至185项，并修正清单中过时的schema156为既有158/208；Host协议4和固定来源161项快照不改。
+合同见[临时终端接口](../contracts/canvas-nodes-v1.md#临时终端公共接口2026-10-16)。客户端与模拟运输检查不代表实际Core/Host/IPC或PTY通过。

@@ -61,12 +61,19 @@ it('admits the shared canvas operations through the authenticated Web adapter an
   const { client } = createThreadAdapter(transport, async () => null).environment
   expect(client.singleChatAttachments.prepareInput).toBeUndefined()
   const operations = ['canvas.boards.list', 'canvas.boards.get', 'canvas.boards.create',
-    'canvas.boards.update', 'canvas.boards.delete', 'canvas.nodes.snapshot', 'canvas.nodes.apply', 'canvas.references.page', 'workspaces.worktrees', 'navigation.activity'] satisfies CoreMethod[]
+    'canvas.boards.update', 'canvas.boards.delete', 'canvas.nodes.snapshot', 'canvas.nodes.apply', 'canvas.references.page',
+    'canvas.terminals.start', 'canvas.terminals.snapshot', 'canvas.terminals.write', 'canvas.terminals.resize', 'canvas.terminals.stop',
+    'skillPacks.list', 'skillPacks.read', 'skillPacks.installations.list', 'skillPacks.install', 'skillPacks.uninstall', 'skillPacks.members.list', 'skillPacks.members.set',
+    'threads.pendingDraft.setPresence',
+    'workspaces.worktrees', 'navigation.activity'] satisfies CoreMethod[]
   try {
     for (const operation of operations) {
       const params = operation === 'navigation.activity' ? { groupKeys: ['directory:/project'], threadIds: ['external-window-thread'] }
         : operation === 'canvas.references.page' ? { afterThreadId: null, upperThreadId: null, limit: 200 }
         : operation === 'workspaces.worktrees' ? { path: '/project' }
+        : operation.startsWith('canvas.terminals.') ? { target: { boardId: 'board', nodeId: 'terminal' }, generation: 'original' }
+        : operation.startsWith('skillPacks.') ? { skillId: 'example', commandId: 'original', command: { skillId: 'example', expectedVersion: 'absent' } }
+        : operation === 'threads.pendingDraft.setPresence' ? { threadId: 'pending', present: true }
         : { commandId: operation, command: { boardId: 'board', expectedRevision: 3 } }
       expect(await client.request(operation, params)).toEqual({ operation, params })
     }

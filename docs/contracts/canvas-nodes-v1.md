@@ -281,3 +281,33 @@ Windows盘符/UNC只规范分隔符，UNC的实际支持继续受各平台原文
 重新展开必须重新核对原来源，失败不直接回显缓存正文；已经打开的旧快照沿原文件合同保留。变化提示不静默替换旧内容。
 本组代码已接线，分项与隔离界面证据见 `integration/execution/i03-file-preview-ui-result.json`；
 真实158/208 Core/Host、Native IPC、完整应用跳转与多卡规模仍随阶段候选工程验证，不能据模拟证据宣称本组工程完成。
+
+## 临时终端公共接口（2026-10-16）
+
+`CanvasGraphSnapshot.terminalVersion`可选，只有数值1允许使用。临时终端不新增DB迁移、不创建AgentRun或模型输入，
+现行schema158/208保持。Native与Web共用下表的方法和驼峰字段，Web继续使用Host协议4及原Owner登录。
+`target`固定为`{boardId,nodeId}`，必须指向存活画板上的terminal节点；请求不接收目录、Shell、用户身份或进程参数。
+
+| 方法 | 除target以外的请求字段 | 返回 |
+| --- | --- | --- |
+| `canvas.terminals.start` | `coreGeneration,requestId,expectedGeneration,cols,rows` | 原会话快照 |
+| `canvas.terminals.snapshot` | `generation?:string|null,afterSeq?:number` | 有界原字节快照与输入回执 |
+| `canvas.terminals.write` | `generation,inputId,expectedInputSequence,bytesBase64` | `sequence,inputId,status` |
+| `canvas.terminals.resize` | `generation,cols,rows` | `{resized:true}`仅在原PTY确认后 |
+| `canvas.terminals.stop` | `generation` | `{stopping:true}`表示停止已请求 |
+
+身份使用规范小写UUID。初次读取可不带generation且afterSeq必须0，以取得当前Core/会话身份；增量读取必须固定原generation。
+启动固定原Core代次和requestId，只有同一请求得到原会话；重启已结束会话需显式新requestId及原expectedGeneration。
+客户端不因运输超时自动重新启动。Core重启后旧终端不恢复执行，读取原节点再由用户显式启动新会话。
+
+尺寸为1至1000的整数。单次输入1至16384原字节，使用规范标准base64。输入序号CAS与inputId共同定位原回执，
+状态为queued/pending/written/unknown/not_written；written仅表示原输入写入PTY，不表示命令执行成功。
+unknown不能自动重发，过期回执不能用原序号再次写入。终端控制器只按原代次/编号读取核对，不使用通用commands.reconcile。
+输入字节不进入Web持久恢复、本地草稿或业务命令存储。
+
+快照包含`coreGeneration,target,exists,generation,launchRequestId,phase,cols,rows,exitCode,throughSeq,firstAvailableSeq,gap,
+chunks,inputSequence,inputs,issue,cleanupComplete`。不存在时phase为missing，身份/尺寸/exitCode为空、序号0、firstAvailableSeq1。
+存在时phase为starting/running/stopping/exited/failed；停止请求或根进程退出都不能代替cleanupComplete。
+chunks每块`{seq,bytesBase64}`，每块最多8192字节，总128KiB及2048块，整块淘汰；缺段由gap明确标出，不能假装连续。
+inputs最多64条`{sequence,inputId,status}`，正文淘汰后可为空但原截止序号仍保留。跨块字节交由终端读者连续解码。
+Host和客户端投影排除内部进程身份、环境与输入摘要。完整Core/Host/Native IPC、实际PTY和最终界面行为随阶段候选验证。
