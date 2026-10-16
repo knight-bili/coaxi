@@ -14,6 +14,13 @@ last_updated: 2026-10-16
 集中到阶段候选；公共契约、安全/迁移或阻断后续开发时允许有原因的最小验证。
 以下owner、命令和测试准入规则继续有效，未执行的检查登记待验，不因减少触发次数而删测试或假报通过。
 
+I03 编辑端归属扩展现有 `host-web.test.mjs`，定向运行 `node --test --test-name-pattern="^Host private composer" scripts/lib/host-web.test.mjs`。
+该 owner 使用真实隔离 Host/Core、两个实际登录端及同一画布 pin，检查材料与完整保留正文隔离、跨端回执/retained ID、
+身份与恢复证明伪造、游标篡改、原身份重登及默认响应兼容；不种入 Pending/Run、不发送消息、不启动模型或 Renderer。
+可通过 `ROVAI_HOST_BIN`、`ROVAI_WEB_UI` 指定已构建候选；`ROVAI_KEEP_HOST_PRIVATE_SCOPE_FIXTURE=1` 保留合成 fixture 的结果供证据核对。
+本机未发送正文与保存位置另由现有 `editing-recovery.test.ts` 检查，不把纯存储测试当作实际页面/编辑器切换；
+旧能力缺失拒绝仍由 `private-composer-scope.test.ts` 拥有，数据库迁移失败回滚继续复用既有 Rust migration owner。
+
 I03 多卡输入的最低层 owner 为 `canvas-conversations-controller.test.ts`（精确上下文、全部准备回滚、模式切换与孤立输入保留）
 和 `thread-workspace-actions.test.ts`（不同 Thread 命令归属、冻结发送及拒绝/未知不清输入）。
 窗口预览生命周期继续扩展 `file-preview-resources.test.ts`，DOM scope 继续扩展 `FilePreviewTabs.test.ts`；

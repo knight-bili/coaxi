@@ -51,21 +51,27 @@
       "id": "PC05",
       "scenario": "另一个已验证编辑端访问同 Conversation",
       "expected": "不看到对方草稿与保留项",
-      "status": "partial_core_boundary_verified",
+      "status": "engineering_verified",
       "verified": [
-        "Core既有owner实测另一个已验证DraftClient读取空附件/空恢复列表，旧回执不能跨编辑端回放，当前相关模块字节相同"
+        "真实Host两个独立登录身份访问同Conversation同pin，只读到各自材料与完整保留正文；跨端retained ID、回执拒绝，Desktop默认身份也读不到Web材料",
+        "原生产本机正文存储接Web编辑端隔离层，单测验证同pin正文/保留副本/位置索引分离、各自重载和复制标签页换身份后不采纳原私聊"
       ],
-      "remaining": "补Host及真实两个已验证编辑端的正文/草稿/保留项隔离，不能由内部DraftClient构造替代认证链路"
+      "remaining": null,
+      "verification_layer": "Windows真实Host/Core HTTP和客户端存储逻辑；不宣称浏览器页面、编辑器undo或多窗口UI已运行",
+      "evidence": "i03-r03-host-private-verification.json#qualification"
     },
     {
       "id": "PC06",
       "scenario": "网络伪造 draftClient 和恢复证明",
       "expected": "Host 拒绝，无授权提升",
-      "status": "partial_core_codec_verified",
+      "status": "engineering_verified",
       "verified": [
-        "Core命令反序列化拒绝外部draftClient字段；篡改或跨编辑端恢复cursor拒绝，当前相关模块字节相同"
+        "真实HTTP的Session/Proof身份错配、无Bearer恢复、伪造draftClient字段和顶层身份拒绝，前后材料不变",
+        "真实Host分页恢复游标跨编辑端和篡改拒绝，原编辑端合法游标仍可读取"
       ],
-      "remaining": "补实际网络Host伪造draftClient/恢复证明请求及权限不提升；Core解码测试不替代Host验证"
+      "remaining": null,
+      "verification_layer": "Windows真实Host/Core网络准入；不是仅Core反序列化或模拟HTTP",
+      "evidence": "i03-r03-host-private-verification.json#qualification"
     },
     {
       "id": "PC07",
@@ -226,10 +232,17 @@
       "id": "PC24",
       "scenario": "升级旧数据与旧客户端及注入迁移失败",
       "expected": "默认行、旧回执不变；失败全回滚；新功能不降级绕过",
-      "status": "engineering_verification_pending",
-      "verified": [],
-      "remaining": "默认行、旧回执不变；失败全回滚；新功能不降级绕过"
+      "status": "engineering_verified",
+      "verified": [
+        "真实Host原身份重登保留完整输入，旧默认get形状不增加scope字段，旧命令回执保持，错误revision不改原草稿",
+        "复用rc4实际迁移owner：注入Migration205回执失败保持旧schema/材料，成功升级逐值保留默认行、编辑会话和原回执；当前迁移及相关DB/私聊依赖源码不变",
+        "共享客户端能力owner实际执行，旧Core/错误版本/错卡/错私聊拒绝且无写入或自动降级"
+      ],
+      "remaining": null,
+      "verification_layer": "真实Host兼容、已运行同源Core迁移回滚、当前客户端能力逻辑；不宣称所有历史安装包或平台运行通过",
+      "evidence": "i03-r03-host-private-verification.json#qualification"
     }
   ],
-  "settlement": "i03-closeout-settlement.json"
+  "settlement": "i03-closeout-settlement.json",
+  "latest_verification": "i03-r03-host-private-verification.json"
 }

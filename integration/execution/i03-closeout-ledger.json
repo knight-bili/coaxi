@@ -14,9 +14,10 @@
   },
   "counts": {
     "settled_obligations": 17,
-    "open_work_groups": 10,
-    "private_cases_verified": 3,
-    "private_cases_open": 21
+    "open_work_groups": 9,
+    "private_cases_verified": 6,
+    "private_cases_open": 18,
+    "verified_work_groups": 1
   },
   "count_boundary": "不同层级不相加；17项为限定范围旧待办结算，10组含21个私聊子场景及其他必需工作，不是完成百分比",
   "settled_obligations": [
@@ -188,7 +189,7 @@
     {
       "id": "I03-R03",
       "name": "真实编辑端身份与兼容",
-      "status": "open",
+      "status": "engineering_verified",
       "private_cases": [
         "PC05",
         "PC06",
@@ -198,9 +199,11 @@
         "I03-C01"
       ],
       "done_when": "真实Host拒绝伪造身份/恢复证明；两个已验证编辑端互相隔离；默认材料/旧回执/失败回滚及旧能力缺失不绕过。",
-      "next_action": "先查既有Host安全测试owner；用当前已构建Core/Host补必要API边界，不为此重编完整App。",
+      "next_action": "本组工程边界已核定；同次页面往返、引用/revision/undo继续I03-R01，最终平台和候选归R10。",
       "owner": "Codex",
-      "external_condition": "none_confirmed_blocking_current_independent_work"
+      "external_condition": "none_confirmed_blocking_current_independent_work",
+      "verification": "i03-r03-host-private-verification.json",
+      "verification_boundary": "真实Windows Host/Core API；本机正文/旧能力为客户端逻辑，迁移复用同源实际owner；完整UI与平台不在本组资格内"
     },
     {
       "id": "I03-R04",
@@ -352,7 +355,6 @@
       "status": "engineering_verification_in_progress",
       "evidence_scope": "Core actor/归属负例有逻辑证据；Host撤销及多平台未完整",
       "remaining_work": [
-        "I03-R03",
         "I03-R10"
       ],
       "platform_state": {
@@ -360,7 +362,11 @@
         "macOS Desktop": "not_verified_for_current_fusion",
         "Linux Desktop": "not_verified_for_current_fusion",
         "Web/Server按源适用面验证": "not_verified_for_current_fusion"
-      }
+      },
+      "verified_work_groups": [
+        "I03-R03"
+      ],
+      "api_verification": "i03-r03-host-private-verification.json"
     },
     {
       "id": "C13-N",
@@ -416,7 +422,6 @@
       "status": "engineering_verification_in_progress",
       "evidence_scope": "Core绑定和实际文件越权拒绝已有证据；Host与平台未完整",
       "remaining_work": [
-        "I03-R03",
         "I03-R10"
       ],
       "platform_state": {
@@ -424,7 +429,11 @@
         "macOS Desktop": "not_verified_for_current_fusion",
         "Linux Desktop": "not_verified_for_current_fusion",
         "Web/Server按源适用面验证": "not_verified_for_current_fusion"
-      }
+      },
+      "verified_work_groups": [
+        "I03-R03"
+      ],
+      "api_verification": "i03-r03-host-private-verification.json"
     },
     {
       "id": "C14-N",
@@ -478,7 +487,6 @@
       "status": "engineering_verification_in_progress",
       "evidence_scope": "实际跨卡文件拒绝/CSP隔离有证据；撤销和平台仍补",
       "remaining_work": [
-        "I03-R03",
         "I03-R06",
         "I03-R07",
         "I03-R10"
@@ -488,7 +496,11 @@
         "macOS Desktop": "not_verified_for_current_fusion",
         "Linux Desktop": "not_verified_for_current_fusion",
         "Web/Server按源适用面验证": "not_verified_for_current_fusion"
-      }
+      },
+      "verified_work_groups": [
+        "I03-R03"
+      ],
+      "api_verification": "i03-r03-host-private-verification.json"
     }
   ],
   "known_environment_deferrals": [
@@ -496,5 +508,6 @@
     "PC14/PC22最终输入/Runtime独立证据继续；专用外部模型身份或额度如确需则列资源，不自动付费",
     "真实移动平台按I10推进；终端平台专属保护按相应平台阶段补齐，不能被Windows结果代替"
   ],
-  "change_control": "剩余编号固定；发现缺陷归入已有组并说明影响。新增必需范围须有来源和编号变更记录；不能为减少数量合并隐藏未完成条件。"
+  "change_control": "剩余编号固定；发现缺陷归入已有组并说明影响。新增必需范围须有来源和编号变更记录；不能为减少数量合并隐藏未完成条件。",
+  "latest_verification": "i03-r03-host-private-verification.json"
 }

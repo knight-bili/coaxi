@@ -14,7 +14,8 @@
     "i03-private-input-ui-result.json",
     "i03-private-resource-result.json",
     "i03-canvas-mission-result.json",
-    "i03-canvas-recovery-result.json"
+    "i03-canvas-recovery-result.json",
+    "i03-r03-host-private-verification.json"
   ],
   "remaining": [
     {
@@ -31,7 +32,7 @@
       "done_when": "本阶段完整使用流程及PC01-PC24适用工程验证有当前源码证据，外部环境缺项明确单列",
       "latest_partial_evidence": "i03-c06-private-materials-native-result.json",
       "remaining_runtime_risks": [
-        "原3个材料Rust owner已实际通过；PC04/07/13对应Core边界已结算，21个其余子场景按R01–R04精确补缺",
+        "PC04/05/06/07/13/24工程边界已核定，18个其余私聊场景按R01/R02/R04补缺；实际页面、最终Runtime和进程中断未被Host API证据替代。",
         "实际Host/Native IPC/资源授权验证后启用最终文件入口，UI模拟验证不能替代",
         "完整PC01-PC24适用工程场景与异常恢复待集中验证；发现代码缺口回到C01修复",
         "实际大材料/日志枚举/事务锁规模归I03-C05验证；本批32副本只验证字典读取次数"
@@ -212,8 +213,10 @@
   "latest_settlement": "i03-closeout-settlement.json",
   "remaining_queue_counts": {
     "settled_obligations": 17,
-    "open_work_groups": 10,
-    "private_cases_verified": 3,
-    "private_cases_open": 21
-  }
+    "open_work_groups": 9,
+    "private_cases_verified": 6,
+    "private_cases_open": 18,
+    "verified_work_groups": 1
+  },
+  "latest_group_verification": "i03-r03-host-private-verification.json"
 }

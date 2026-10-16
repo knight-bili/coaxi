@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { browserEditingRecovery } from './editing-recovery'
 import { emptyLocalThreadComposerDraft, saveLocalThreadComposerDraft, threadComposerDraftStorage, loadLocalThreadComposerDraft } from '../../desktop/src/renderer/src/camp-composer-local-store'
 import { canvasComposerDraftStorage, canvasComposerDraftCopies, CANVAS_COMPOSER_STORAGE_PREFIX, type CanvasComposerContext } from '../../desktop/src/renderer/src/canvas-composer-drafts'
+import { singleChatComposerStore } from '../../desktop/src/renderer/src/single-chat-composer-store'
 
 class Store {
   values = new Map<string, string>()
@@ -15,6 +16,25 @@ const identity = 'rovai.camp-composer-draft.v1:thread'
 const draft = (body: string) => ({ ...emptyLocalThreadComposerDraft('thread'), body, content: { version: 2 as const, segments: [{ kind: 'text' as const, text: body }] } })
 
 describe('Web body snapshots', () => {
+  it('keeps same-pin private bodies and saved input positions local to each verified editor', () => {
+    const archive = new Store(), tabA = new Store(), tabB = new Store()
+    const context: CanvasComposerContext = { host: 'host/owner', core: '/core', boardId: 'board', nodeId: 'same-pin', threadId: 'thread', conversationId: 'private' }
+    const owner = (editor: string, tab: Store) => ({ editingRecovery: browserEditingRecovery(`host/owner/${editor}`, tab, { ownerScope: 'host/owner', storage: archive }) })
+    const a = owner('a', tabA), b = owner('b', tabB)
+    const first = singleChatComposerStore(a, 'thread', context), second = singleChatComposerStore(b, 'thread', context)
+    expect(first.update(() => ({ private: '甲未发送正文', 'private:returned:request-a': '甲保留副本' }))).toBe(true)
+    a.editingRecovery.set('single-chat-input-body-index:v1', { version: 1, entries: { own: { bodyKey: 'private' } } })
+    expect(second.getSnapshot().drafts).toEqual({})
+    expect(b.editingRecovery.get('single-chat-input-body-index:v1')).toBeNull()
+    expect(second.update(() => ({ private: '乙未发送正文' }))).toBe(true)
+    expect(first.getSnapshot().drafts.private).toBe('甲未发送正文')
+    expect(singleChatComposerStore(owner('a', tabA), 'thread', context).getSnapshot().drafts).toEqual(first.getSnapshot().drafts)
+    expect(singleChatComposerStore(owner('b', tabB), 'thread', context).getSnapshot().drafts).toEqual({ private: '乙未发送正文' })
+    const copiedTab = new Store(); copiedTab.values = new Map(tabA.values)
+    expect(singleChatComposerStore(owner('new-editor', copiedTab), 'thread', context).getSnapshot().drafts).toEqual({})
+    expect(archive.length).toBe(0)
+  })
+
   it('archives per-card public snapshots after tab loss, offers exact-context copies, and excludes private edits and proofs', () => {
     const archive = new Store(), tab = new Store(), scope = 'host/owner/editor'
     const context: CanvasComposerContext = { host: 'host/owner', core: '/core', boardId: 'board', nodeId: 'first', threadId: 'thread', conversationId: null }
