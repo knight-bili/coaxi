@@ -37,10 +37,10 @@
     {
       "stage_id": "I03",
       "name": "完整无限画布与对象绑定",
-      "candidate_version": "fusion-i03-rc.7",
-      "status": "repair_ready_for_freeze",
-      "frozen_commit": null,
-      "validation_batch": "I03-repair-06",
+      "candidate_version": "fusion-i03-rc.8",
+      "status": "frozen_with_partial_engineering_evidence",
+      "frozen_commit": "72048c73f9736a85ee1550cdc12dd1e3b45b6c79",
+      "validation_batch": "I03-repair-07",
       "validation_runs": [
         {
           "kind": "local_windows_cargo_build",
@@ -121,6 +121,21 @@
           "kind": "native-file-api-7-plus-fixture",
           "source_commit": "391e21fe62ade0ed5eade33c7b8335df84c9cca3",
           "exit_code": 0
+        },
+        {
+          "kind": "desktop-build",
+          "source_commit": "72048c73f9736a85ee1550cdc12dd1e3b45b6c79",
+          "exit_code": 0
+        },
+        {
+          "kind": "web-build",
+          "source_commit": "72048c73f9736a85ee1550cdc12dd1e3b45b6c79",
+          "exit_code": 0
+        },
+        {
+          "kind": "native-file-cards-html-ui-9",
+          "source_commit": "72048c73f9736a85ee1550cdc12dd1e3b45b6c79",
+          "exit_code": 0
         }
       ],
       "engineering_validation": "in_progress",
@@ -172,15 +187,26 @@
           "full_types": "passed",
           "desktop_build": "passed",
           "native_file_cards": "6_checks_passed_then_new_host_state_assertion_failed"
+        },
+        {
+          "candidate_version": "fusion-i03-rc.7",
+          "frozen_commit": "7376576084f699b8223b6b0ec17a1a151f5d21b4",
+          "desktop_build": "passed",
+          "web_build": "passed",
+          "native_file_cards": "9_passed",
+          "visual_review": "icon_baseline_alignment_repaired_in_rc8"
         }
       ],
-      "repair_reason": "客户指出卡片重复路径/标题与按钮堆积；真实桌面新增断言复现HTML加载状态等待，修复路由回调身份变化拆除通信订阅。共享Renderer须重建Desktop/Web，Core不变。",
+      "repair_reason": "Visual review of rc.7 found inherited baseline alignment on file-card icon; use header center and assert actual geometry",
       "windows_build": "passed",
       "related_rust_unique_owners": 26,
       "related_rust": "passed",
       "actual_host_pty": "passed",
       "native_app_scale_platform": "full_flows_scale_and_platform_pending",
-      "native_desktop": "partial_actual_keyboard_output_stop_and_file_api_passed"
+      "native_desktop": "file_cards_html_channel_menu_9_passed_other_full_flows_pending",
+      "full_types": "passed_reused_unchanged_typescript",
+      "desktop_build": "passed",
+      "web_build": "passed"
     },
     {
       "stage_id": "I04",

@@ -55,8 +55,8 @@
       "name": "文件节点真实权限与预览",
       "status": "implementation_ready_for_stage_verification",
       "done_when": "路径不能绕过现行文件权限，卡片间身份隔离，关闭/恢复与变化处理有证据",
-      "latest_partial_evidence": "i03-c06-card-refinement-result.json",
-      "remaining_verification": "真实文件API与rc.6六项卡片/作者HTML交互检查通过；新增状态断言在旧桌面复现加载中/等待连接，rc.7须验证通信修复与单标题界面、原有源码切换/重读隔离/移除不删除原文件。导航、冷路由、规模及平台资格仍单列。"
+      "latest_partial_evidence": "i03-c06-card-refinement-verification.json",
+      "remaining_verification": "真实文件API及rc.8九项卡片/HTML/原生菜单检查通过，完整路径悬停、无重复标题、源码切换和跨卡重读后文档loaded/channel connected、移除节点保留原文件均有证据。原工作区文件导航、完整冷恢复、真实多卡资源/平台资格仍按C02/C05/C06单列，C03整体不提前判通过。"
     },
     {
       "id": "I03-C04",
@@ -125,7 +125,10 @@
         "实际Windows隔离Desktop Main/preload/Core握手；生产画布三卡/选择恢复；原生可信键盘输入2+3，真实PTY计算5且xterm读者可见绘制、停止回收、App计划退出均通过",
         "生产Desktop文件API经实际Core/NTFS：7业务断言+1准备步骤通过，保留原显式外部具体文件策略；无模型或模拟Core",
         "原rovai-web公开操作投影1owner先非零list再实际运行通过",
-        "真实文本文件卡片可见；HTML HTTP入口缺陷原owner修复前1fail，修复后原站点/文件服务/资源池3owner文件91pass1原平台skip"
+        "真实文本文件卡片可见；HTML HTTP入口缺陷原owner修复前1fail，修复后原站点/文件服务/资源池3owner文件91pass1原平台skip",
+        "rc.7共享Renderer全量types exit0、4文件46项相关检查通过；rc.8仅CSS/既存Native owner改变，复用未变TypeScript检查",
+        "rc.8 Desktop/Web构建exit0，149个Desktop文件及141个Web缓存条目逐SHA匹配，真实App副本一致",
+        "rc.8真实Windows Desktop同owner九项通过：HTML已加载且通信连接、单标题/悬停路径/图标居中、源码切换和跨卡重读保持文档、原生键盘菜单及原确认窗移除节点而原文件保留；受控退出completed无deadline/强杀"
       ],
       "open_findings": [
         "同一HTML卡片及保留工作区两个合法入口交换重叠，单布尔位导致合法跳转403；已改逐入口计数并在异步来源复核前认领，原授权和额外请求拒绝均保留，待新Desktop真实复验"
@@ -140,7 +143,11 @@
         "文件pin规范几何/标题/颜色预期及精确路径通过",
         "Ready/Stop空struct闭合额外字段且原JSON不变；所有坏帧/拆包/超量断言和真实生命周期通过"
       ],
-      "latest_native_evidence": "i03-c06-native-result.json"
+      "latest_native_evidence": "i03-c06-native-result.json",
+      "ui_remaining": [
+        "画布顶部两排工具条仍拥挤，需要在现有视觉规范内整理并验证；本轮只完成文件卡片整改",
+        "双主题/窄窗口及完整画布使用路径仍需对应实际验证，当前截图不能代替"
+      ]
     }
   ],
   "state_rule": "代码完成、工程验证通过、待环境验证分别记录；无代码缺口且工程验证满足时由Codex收口；缺环境继续独立后续工作，最终MVP不豁免",

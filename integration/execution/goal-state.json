@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "I03-C06：文件卡片改为单层标题、悬停完整路径和标题栏操作；HTML通信不因路由回调重绘而重置。旧桌面已复现状态等待，类型和46项相关检查通过，rc.7真实桌面与网页构建/运行待验。",
+  "current_slice": "I03-C06：文件卡片单层标题与HTML通信修复已通过真实Desktop九项检查、类型/46项相关检查和Desktop/Web构建；继续C01材料完整流程、C02定位及C05冷路由/规模，画布顶层工具条仍需整理。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "冻结rc.7，复用未改Core/Host/CLI；共享Renderer变动集中构建Desktop和Web，运行同一真实文件卡片owner新增加载状态与单标题断言；随后继续C01材料完整流程、C02定位及C05冷路由/规模。",
+    "继续C01真实Host/Native私聊材料完整流程：先核Published Attachment View路径完整性事件，再完成PC01-PC24适用链路；C02对象定位/C05冷路由与规模并行按有限清单推进，不重跑未变的卡片和构建。",
     "阶段剩余清单固定按I03-C06继续工程验证；暂缺环境只单列待办，继续可独立的I02余项和I04-I12/BUF，不把后续功能提前塞入I03。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "c06_card_refinement_and_html_channel_ready_for_candidate",
+  "current_slice_status": "c06_file_cards_and_html_state_verified_other_finite_items_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -200,5 +200,6 @@
   "canvas_c05_source_preparation_evidence": "i03-c05-source-preparation-result.json",
   "candidate_validation_evidence": "i03-c06-candidate-result.json",
   "native_engineering_evidence": "i03-c06-native-result.json",
-  "card_refinement_evidence": "i03-c06-card-refinement-result.json"
+  "card_refinement_evidence": "i03-c06-card-refinement-result.json",
+  "card_refinement_verification_evidence": "i03-c06-card-refinement-verification.json"
 }
