@@ -41,8 +41,15 @@ test('controlled ACP resumes the requested session and holds only the current in
     assert.ok(!messages.some(message => message.id === 4))
     send(null, 'session/cancel', { sessionId: 'fixture-stream-from-a-prior-process' })
     assert.equal((await wait(message => message.id === 4)).result.stopReason, 'cancelled')
+    const silentStart = messages.length
+    send(5, 'session/prompt', { sessionId: 'fixture-stream-from-a-prior-process', prompt: [{ type: 'text', text: '[CURRENT_INPUT]\n{"message":"ROVAI_SKILL_RECOVERY_SILENT_HELD_INPUT current"}\n[/CURRENT_INPUT]' }] })
+    send(6, 'fixture/check')
+    await wait(message => message.id === 6)
+    assert.ok(!messages.slice(silentStart).some(message => message.id === 5 || message.method === 'session/update'))
+    send(null, 'session/cancel', { sessionId: 'fixture-stream-from-a-prior-process' })
+    assert.equal((await wait(message => message.id === 5)).result.stopReason, 'cancelled')
     const captured = (await readFile(capture, 'utf8')).trim().split('\n').map(JSON.parse)
-    assert.deepEqual(captured.map(entry => entry.requestId), [3, 4])
+    assert.deepEqual(captured.map(entry => entry.requestId), [3, 4, 5])
     assert.ok(messages.filter(message => message.method === 'session/update').every(message => message.params.sessionId === 'fixture-stream-from-a-prior-process'))
   } finally { child.stdin.end(); assert.deepEqual(await closed, [0, null]) }
 })

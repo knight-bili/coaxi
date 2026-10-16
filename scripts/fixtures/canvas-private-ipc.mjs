@@ -12,7 +12,7 @@ const matches = (command, owner) => {
 // validation and Core work. Faults apply once to an explicitly armed input.
 export function installCanvasPrivateIpc(ipcMain) {
   const register = ipcMain.handle, wrapped = new Set(), requests = [], faults = [], gates = []
-  let conflict = null, lostSwap = null, upload = null
+  let conflict = null, lostSwap = null, upload = null, send = null
   ipcMain.handle = function (channel, handler) {
     if (!['rovai:request', 'rovai:private-attachment-prepare'].includes(channel)) return register.call(this, channel, handler)
     wrapped.add(channel)
@@ -21,6 +21,7 @@ export function installCanvasPrivateIpc(ipcMain) {
       const params = channel === 'rovai:request' ? args[1] : args[0]
       const command = params?.command
       const entry = { method, commandId: params?.commandId ?? null,
+        lookupCommandId: method === 'commands.reconcile' ? params?.params?.commandId ?? null : null,
         threadId: command?.threadId ?? params?.threadId ?? params?.campId ?? null,
         conversationId: command?.conversationId ?? params?.conversationId ?? params?.target?.conversationId ?? null,
         action: command?.action?.type ?? null }
@@ -48,9 +49,16 @@ export function installCanvasPrivateIpc(ipcMain) {
         && matches({ conversationId: params?.target?.conversationId, composerScope: params?.target?.composerScope }, upload)
       const gate = hold ? upload : null
       if (hold) upload = null
+      const sendGate = send && method === 'singleChat.send' && matches(command, send) ? send : null
+      if (sendGate) send = null
       const result = await handler(event, ...args)
       entry.status = channel === 'rovai:request' ? result.value?.status ?? result.kind : result.state
       entry.code = channel === 'rovai:request' ? result.value?.code ?? result.failure?.code ?? null : result.receipt?.code ?? null
+      if (sendGate) {
+        sendGate.observed = { params: structuredClone(params), result: structuredClone(result) }
+        faults.push({ kind: 'held_send_reply', commandId: params.commandId })
+        await sendGate.promise
+      }
       if (drop) {
         assert.equal(result.kind, 'value'); assert.equal(result.value.status, 'applied')
         faults.push({ kind: 'lost_committed_swap_reply', commandId: params.commandId })
@@ -79,6 +87,13 @@ export function installCanvasPrivateIpc(ipcMain) {
       const gate = { ...structuredClone(owner), observed: null, promise: new Promise(resolve => { release = resolve }),
         release() { release() } }
       gates.push(gate); upload = gate
+      return gate
+    },
+    holdSend(owner) {
+      assert.equal(send, null)
+      let release
+      const gate = { ...structuredClone(owner), observed: null, promise: new Promise(resolve => { release = resolve }), release() { release() } }
+      gates.push(gate); send = gate
       return gate
     },
     releaseAll() { for (const gate of gates) gate.release() },

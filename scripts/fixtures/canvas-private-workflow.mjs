@@ -78,10 +78,15 @@ export async function beginHeldPrivateRun(rpc, context, capture) {
 }
 
 export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait, openCanvasBoard, config, report, record, seam }) {
-  assert.ok(['private-roundtrip', 'private-queue', 'private-rebind', 'private-late-upload', 'private-send', 'private-send-boundaries'].includes(config.mode))
+  assert.ok(['private-roundtrip', 'private-queue', 'private-rebind', 'private-late-upload', 'private-send', 'private-send-boundaries', 'private-core-interruption', 'private-app-interruption'].includes(config.mode))
   assert.ok(seam, 'private Native modes require an observed production IPC transport')
   window.unmaximize(); window.setContentSize(1680, 1000); window.webContents.setZoomFactor(1)
-  const context = await preparePrivateWorkflow({ rpc, config, record })
+  let context
+  if (config.private_app_phase === 'resume') {
+    const checkpoint = await readFile(config.private_app_checkpoint)
+    assert.equal(createHash('sha256').update(checkpoint).digest('hex'), config.private_app_checkpoint_sha256)
+    context = JSON.parse(checkpoint).context
+  } else context = await preparePrivateWorkflow({ rpc, config, record })
   report.private_workflow_context = context
   const { threadId, conversationId, boardId, scopes, quoteMessage } = context
   const ownedConversations = new Map([[conversationId, threadId]])
@@ -127,14 +132,23 @@ export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait
     await wait(`${selector}.value===${JSON.stringify(text)}`)
     assert.ok((await evaluate('window.r01TrustedInputs')).includes(true))
   }
-  const open = async index => {
+  const open = async (index, allowPending = false) => {
     const button = `document.querySelector('[data-id="${scopes[index].nodeId}"] button[aria-label="展开对话"]')`
     await wait(`Boolean(${button}&&!${button}.disabled)`)
     await evaluate(`(()=>{${button}.click();return true})()`)
-    await wait(`Boolean(${input(index)}&&!${input(index)}.disabled)`)
+    await wait(`Boolean(${input(index)}${allowPending ? '' : `&&!${input(index)}.disabled`})`)
   }
   try {
     await openCanvasBoard(evaluate, wait, boardId)
+    if (config.private_app_phase === 'resume') {
+      await open(0, true); await open(1)
+      await evaluate(`(()=>{document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]').click();return true})()`)
+      assert.equal(createHash('sha256').update(await readFile(new URL(config.private_core_interruption_module))).digest('hex'), config.private_core_interruption_sha256)
+      const { qualifyPrivateCoreInterruption } = await import(config.private_core_interruption_module)
+      await qualifyPrivateCoreInterruption(window, { config, context, report, record, evaluate, wait, rpc, seam,
+        openCanvasBoard, open, get, addMaterial, clickNative, typeBody, frame, input, waitMain, waitPrivateSnapshot })
+      return
+    }
     const readingMark = seam.mark()
     await open(2)
     const recovery = await rpc('singleChat.composerDraft.recovery', { threadId, conversationId })
@@ -149,6 +163,13 @@ export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait
     await wait(`!${frame(2)}`)
     await open(0); await open(1)
     await evaluate(`(()=>{document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]').click();return true})()`)
+    if (config.mode === 'private-core-interruption' || config.mode === 'private-app-interruption') {
+      assert.equal(createHash('sha256').update(await readFile(new URL(config.private_core_interruption_module))).digest('hex'), config.private_core_interruption_sha256)
+      const { qualifyPrivateCoreInterruption } = await import(config.private_core_interruption_module)
+      await qualifyPrivateCoreInterruption(window, { config, context, report, record, evaluate, wait, rpc, seam,
+        openCanvasBoard, open, get, addMaterial, clickNative, typeBody, frame, input, waitMain, waitPrivateSnapshot })
+      return
+    }
     if (config.mode === 'private-send-boundaries') {
       assert.equal(createHash('sha256').update(await readFile(new URL(config.private_send_boundary_module))).digest('hex'), config.private_send_boundary_sha256)
       const { qualifyPrivateSendBoundaries } = await import(config.private_send_boundary_module)
@@ -459,6 +480,11 @@ export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait
     assert.deepEqual(materials(savedPending), materials(leaseItem))
     record('actual_other_card_takeover_uses_saved_working_input_and_new_token_then_rejects_old_writer_and_saves_its_own_edit')
     await writeFile(join(config.evidence, '02-private-pending-takeover.png'), (await window.webContents.capturePage()).toPNG())
+  } catch (error) {
+    report.private_workflow_failure = String(error?.stack ?? error)
+    console.error(report.private_workflow_failure)
+    await writeFile(join(config.evidence, 'private-workflow-failure.json'), JSON.stringify({error: report.private_workflow_failure}, null, 2)+'\n', {flag:'wx'})
+    throw error
   } finally {
     if (config.mode === 'private-late-upload') {
       report.upload_input_events = await evaluate('window.r01UploadInputEvents??[]').catch(error => ({ error: String(error) }))

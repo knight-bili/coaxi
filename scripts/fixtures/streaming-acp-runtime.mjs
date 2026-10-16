@@ -54,9 +54,11 @@ for await (const line of createInterface({ input: process.stdin })) {
       // item, never the preceding Bootstrap handshake.
       const rendered = (message.params.prompt ?? []).filter(part => part.type === 'text').map(part => part.text).join('\n')
       const current = /\[CURRENT_INPUT\]\s*([\s\S]*?)\s*\[\/CURRENT_INPUT\]/.exec(rendered)
-      if (JSON.stringify(current ? JSON.parse(current[1]) : message.params).includes('ROVAI_SKILL_RECOVERY_HELD_INPUT')) {
+      const input = JSON.stringify(current ? JSON.parse(current[1]) : message.params)
+      const silent = input.includes('ROVAI_SKILL_RECOVERY_SILENT_HELD_INPUT')
+      if (silent || input.includes('ROVAI_SKILL_RECOVERY_HELD_INPUT')) {
         heldPromptId = message.id
-        update({ sessionUpdate: 'agent_message_chunk', content: {
+        if (!silent) update({ sessionUpdate: 'agent_message_chunk', content: {
           type: 'text', text: 'Controlled input received; waiting for recovery injection.'
         } })
         continue

@@ -57,3 +57,16 @@ test('private IPC seam injects a material race before the original call and rele
   gate.release(); assert.equal((await pending).state, 'recorded')
   assert.equal(resolved, true)
 })
+
+test('private IPC send gate observes the original result before holding only its matching reply', async () => {
+  const f = fixture(), gate = f.seam.holdSend(owner)
+  const foreign = mutation('foreign-send'); foreign.command.composerScope = { ...owner.scope, nodeId: 'other' }
+  assert.equal((await f.invoke('rovai:request', 'singleChat.send', foreign)).kind, 'value')
+  let resolved = false
+  const params = mutation('own-send'), pending = f.invoke('rovai:request', 'singleChat.send', params).then(value => { resolved = true; return value })
+  await Promise.resolve(); await Promise.resolve()
+  assert.deepEqual(gate.observed.params, params); assert.equal(gate.observed.result.value.status, 'applied'); assert.equal(resolved, false)
+  await f.invoke('rovai:request', 'commands.reconcile', { operation: 'singleChat.send', params })
+  assert.equal(f.seam.since(0).at(-1).lookupCommandId, 'own-send')
+  f.seam.releaseAll(); assert.equal((await pending).kind, 'value'); assert.equal(f.calls.length, 3)
+})
