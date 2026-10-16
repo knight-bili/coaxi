@@ -17,13 +17,13 @@ async function openCanvasBoard(evaluate,wait,boardId){
  await wait(`Boolean(document.querySelector('.canvas-breadcrumb-root:not(:disabled)'))`)
  await wait(`Boolean(document.querySelector('.canvas-board-title')||document.querySelector('.canvas-boards-home'))`)
  if(await evaluate(`Boolean(document.querySelector('.canvas-board-title[data-board-id="${boardId}"]'))`)){
-  await wait(`Boolean(document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]'))`)
+  await wait(`Boolean(document.querySelector('.canvas-board-title[data-board-id="${boardId}"]:not(:disabled)')&&document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]'))`)
   return
  }
  await evaluate(`(()=>{document.querySelector('.canvas-breadcrumb-root').click();return true})()`)
  await wait(`Boolean(document.querySelector('.canvas-board-tile[data-board-id="${boardId}"]:not(:disabled)'))`,40_000)
  await evaluate(`(()=>{document.querySelector('.canvas-board-tile[data-board-id="${boardId}"]').click();return true})()`)
- await wait(`Boolean(document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]'))`)
+ await wait(`Boolean(document.querySelector('.canvas-board-title[data-board-id="${boardId}"]:not(:disabled)')&&document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]'))`)
 }
 app.on('browser-window-created',(_event,window)=>{
  if(started)return;started=true
@@ -212,6 +212,8 @@ async function qualifyBoardList(window,{evaluate,wait,rpc}){
  const again=await rpc('canvas.boards.list');assert.equal(again.throughGlobalSequence,list.throughGlobalSequence)
  record('real_core_list_returns_exact_same_revision_counts_and_geometry_without_advancing_event_sequence')
  await openCanvasBoard(evaluate,wait,boardId)
+ await wait(`(()=>{const ids=${JSON.stringify(graph.nodes.map(node=>node.id))};return ids.every(id=>document.querySelector('.react-flow__node[data-id="'+id+'"]'))&&!document.querySelector('.canvas-breadcrumb-root').disabled})()`)
+ report.list_navigation=await evaluate(`({title:document.querySelector('.canvas-board-title')?.dataset.boardId,rootDisabled:document.querySelector('.canvas-breadcrumb-root')?.disabled,nodes:[...document.querySelectorAll('.react-flow__node')].map(node=>node.dataset.id)})`)
  await evaluate(`(()=>{document.querySelector('.canvas-breadcrumb-root').click();return true})()`)
  const tile=`.canvas-board-tile[data-board-id="${boardId}"]`
  await wait(`Boolean(document.querySelector('${tile}'))`)
