@@ -15,8 +15,8 @@
   "counts": {
     "settled_obligations": 17,
     "open_work_groups": 8,
-    "private_cases_verified": 15,
-    "private_cases_open": 9,
+    "private_cases_verified": 17,
+    "private_cases_open": 7,
     "verified_work_groups": 2
   },
   "count_boundary": "不同层级不相加；17条为限定范围旧待办，固定10组按状态计算剩余；私聊按原24场景逐项核定，不计算完成百分比",
@@ -203,9 +203,21 @@
         "I03-C01"
       ],
       "done_when": "双卡/默认位置的正文、附件和引用按所选scope消费；原FIFO、普通单聊与源变化保护保持；最终Blob与实际Runtime交接独立核验，不以材料API或模型清单替代。",
-      "next_action": "复用已验证附件和Core事务，补双卡引用/消费及最终输入捕获；外部模型身份若确需再明确列资源，不用日常凭据。",
+      "next_action": "继续默认正文并行、越权quote/working副本、最终Blob/多引用顺序、源变化及双卡原FIFO；已有发送隔离和仅附件发送复用。",
       "owner": "Codex",
-      "external_condition": "none_confirmed_blocking_current_independent_work"
+      "external_condition": "none_confirmed_blocking_current_independent_work",
+      "verified_private_cases": [
+        "PC01",
+        "PC12"
+      ],
+      "remaining_private_cases": [
+        "PC02",
+        "PC11",
+        "PC14",
+        "PC15",
+        "PC16"
+      ],
+      "latest_verification": "i03-r02-native-send-verification.json"
     },
     {
       "id": "I03-R03",
@@ -530,5 +542,5 @@
     "真实移动平台按I10推进；终端平台专属保护按相应平台阶段补齐，不能被Windows结果代替"
   ],
   "change_control": "剩余编号固定；发现缺陷归入已有组并说明影响。新增必需范围须有来源和编号变更记录；不能为减少数量合并隐藏未完成条件。",
-  "latest_verification": "i03-r01-cross-core-upload-verification.json"
+  "latest_verification": "i03-r02-native-send-verification.json"
 }

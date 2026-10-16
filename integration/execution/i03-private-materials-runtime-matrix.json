@@ -9,11 +9,14 @@
       "id": "PC01",
       "scenario": "同一私聊双卡分别放附件和引用",
       "expected": "甲发送只消费甲，乙完整保留",
-      "status": "partial_real_native_verified",
+      "status": "engineering_verified",
       "verified": [
-        "实际双卡附件隔离及错误跨卡移除通过"
+        "实际双卡附件隔离及错误跨卡移除通过",
+        "真实输入/提交并经Core和固定ACP完成；仅消费所选卡正文、文件和引用，另一卡正文/材料及默认材料逐值保持。"
       ],
-      "remaining": "双卡引用与实际发送消费仍需验证"
+      "remaining": null,
+      "evidence": "i03-r02-native-send-verification.json#qualification",
+      "verification_layer": "当前编译Desktop真实发送、真实Core消费及固定本机ACP接收；无外部模型推理"
     },
     {
       "id": "PC02",
@@ -21,9 +24,11 @@
       "expected": "两处互不串入或清空",
       "status": "partial_real_native_verified",
       "verified": [
-        "实际默认草稿与两张卡片附件互不串入，显式迁入后默认材料清空"
+        "实际默认草稿与两张卡片附件互不串入，显式迁入后默认材料清空",
+        "当前实际卡片发送及仅附件发送后，默认附件/引用草稿逐值保持；乙卡本机正文保持。"
       ],
-      "remaining": "本机正文并行与最终发送仍需验证"
+      "remaining": "默认位置与卡片的本机正文实际并行使用仍需验证；不以默认材料保留代替正文验证。",
+      "evidence": "i03-r02-native-send-verification.json#qualification"
     },
     {
       "id": "PC03",
@@ -142,9 +147,13 @@
       "id": "PC12",
       "scenario": "仅附件发送",
       "expected": "维持原合法行为，使用所选附件",
-      "status": "engineering_verification_pending",
-      "verified": [],
-      "remaining": "维持原合法行为，使用所选附件"
+      "status": "engineering_verified",
+      "verified": [
+        "真实空正文仅附件发送成功；实际Runtime收到唯一所选源路径，读取字节匹配，其他输入保持。"
+      ],
+      "remaining": null,
+      "evidence": "i03-r02-native-send-verification.json#qualification",
+      "verification_layer": "当前编译Desktop真实发送、真实Core消费及固定本机ACP接收；无外部模型推理"
     },
     {
       "id": "PC13",
@@ -162,9 +171,12 @@
       "id": "PC14",
       "scenario": "单卡发送并检查最终输入",
       "expected": "路径、quote 顺序及原 section 正确；无卡片字段",
-      "status": "final_runtime_input_evidence_pending",
-      "verified": [],
-      "remaining": "须补最终Blob与实际Runtime独立证据；本轮不使用模型身份或预算，不能用当前Core材料检查代替"
+      "status": "partial_runtime_transport_verified",
+      "verified": [
+        "实际Core向固定本机ACP交接所选源路径和引用；读取实际路径字节匹配，其他卡和默认材料未混入CURRENT_INPUT。"
+      ],
+      "remaining": "最终持久Blob与Runtime独立对照、多引用顺序、原section及无卡片字段仍需核定；固定协议不外推外部模型推理。",
+      "evidence": "i03-r02-native-send-verification.json#qualification"
     },
     {
       "id": "PC15",
@@ -282,6 +294,6 @@
     }
   ],
   "settlement": "i03-closeout-settlement.json",
-  "latest_verification": "i03-r01-cross-core-upload-verification.json",
+  "latest_verification": "i03-r02-native-send-verification.json",
   "latest_preparation": "i03-r01-private-workflow-preparation.json"
 }
