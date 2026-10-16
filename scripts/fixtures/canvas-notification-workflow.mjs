@@ -89,7 +89,10 @@ export async function qualifyCanvasNotifications(window,{evaluate,wait,rpc,openC
  }
  const assertRead=async(context,target)=>{
   // 原Attention合同要求公屏完成通知的具体Run实际可见；仅看到公开消息不等于看过执行。
-  if(context.kind==='public'&&!await evaluate(`Boolean(${frame(context)}?.querySelector('[data-agent-run-id="${target.runId}"]'))`))await click(`Array.from(${frame(context)}.querySelectorAll('button')).find(node=>node.textContent?.trim().startsWith('执行'))`)
+  if(context.kind==='public'&&!await evaluate(`Boolean(${frame(context)}?.querySelector('.execution-drawer'))`)){
+   if(!await evaluate(`Boolean(${frame(context)}?.querySelector('.run-pulse-chip[data-agent-id="${agentId}"]'))`))await click(`Array.from(${frame(context)}.querySelectorAll('button')).find(node=>node.textContent?.trim().startsWith('执行'))`)
+   await click(`${frame(context)}.querySelector('.run-pulse-chip[data-agent-id="${agentId}"]')`)
+  }
   await wait(`Boolean(${frame(context)}?.querySelector('[data-agent-run-id="${target.runId}"]'))`)
   await until(async()=>{const state=await stateFor(target);return state&&!state.unread&&acknowledged(target).some(call=>call.result?.value?.status==='applied')})
  }
