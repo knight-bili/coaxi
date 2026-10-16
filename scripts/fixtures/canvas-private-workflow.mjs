@@ -28,7 +28,7 @@ export async function preparePrivateWorkflow({ rpc, config, record }) {
   const agentId = member.resultEntity.entityId
   const { configureProductRuntime } = await import(config.runtime_configure_module)
   await configureProductRuntime(rpc, 'qwen-code', [agentId])
-  const created = await rpc('camps.create', { commandId: randomUUID(), name: 'R01 私聊完整输入', workspace: null,
+  const created = await rpc('threads.create', { commandId: randomUUID(), name: 'R01 私聊完整输入', workspace: null,
     memberAgentIds: [agentId], defaultLeadAgentId: agentId, collaborationMode: 'peer' })
   assert.equal(created.status, 'applied')
   const threadId = created.payload.threadId
@@ -221,7 +221,7 @@ export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait
         const ended = await rpc('singleChat.end', { commandId: randomUUID(), command: { threadId, conversationId } })
         assert.equal(ended.status, 'applied')
       }
-      const nextThread = await rpc('camps.create', { commandId: randomUUID(), name: 'R01 换绑后的目标', workspace: null,
+      const nextThread = await rpc('threads.create', { commandId: randomUUID(), name: 'R01 换绑后的目标', workspace: null,
         memberAgentIds: [context.agentId], defaultLeadAgentId: context.agentId, collaborationMode: 'peer' })
       assert.equal(nextThread.status, 'applied')
       const nextThreadId = nextThread.payload.threadId
