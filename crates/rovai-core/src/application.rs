@@ -30635,7 +30635,7 @@ done
         assert!(busy.is::<private_sources::ObservationBusy>());
         let healthy = tokio::time::timeout(
             Duration::from_secs(5),
-            service.request("monitoring.summary", json!({})),
+            service.request("app.info", json!({})),
         )
         .await
         .unwrap()

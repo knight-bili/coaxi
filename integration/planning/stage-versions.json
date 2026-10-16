@@ -37,10 +37,10 @@
     {
       "stage_id": "I03",
       "name": "完整无限画布与对象绑定",
-      "candidate_version": "fusion-i03-rc.3",
+      "candidate_version": "fusion-i03-rc.4",
       "status": "repair_candidate_pending_freeze",
       "frozen_commit": null,
-      "validation_batch": "I03-repair-02",
+      "validation_batch": "I03-repair-03",
       "validation_runs": [
         {
           "kind": "local_windows_cargo_build",
@@ -66,6 +66,26 @@
           "kind": "local_rust_test_owner_list_compile",
           "source_commit": "9a2eaef5d8000371c69ca30283ab6daa539802a8",
           "exit_code": 101
+        },
+        {
+          "kind": "windows-build",
+          "source_commit": "18984d69134a7314939ca13b0e114bbd2ceece6d",
+          "exit_code": 0
+        },
+        {
+          "kind": "rust-owner-list",
+          "source_commit": "18984d69134a7314939ca13b0e114bbd2ceece6d",
+          "exit_code": 0
+        },
+        {
+          "kind": "private-material-tests",
+          "source_commit": "18984d69134a7314939ca13b0e114bbd2ceece6d",
+          "exit_code": 0
+        },
+        {
+          "kind": "host-lifecycle",
+          "source_commit": "18984d69134a7314939ca13b0e114bbd2ceece6d",
+          "exit_code": 1
         }
       ],
       "engineering_validation": "in_progress",
@@ -86,9 +106,17 @@
           "web_build": "passed",
           "rust_test_compilation": "failed",
           "repair_reason": "Two cfg(test) canvas helpers used Database instead of OwnedTestDatabase"
+        },
+        {
+          "candidate_version": "fusion-i03-rc.3",
+          "frozen_commit": "18984d69134a7314939ca13b0e114bbd2ceece6d",
+          "windows_build": "passed",
+          "rust_test_compilation": "passed",
+          "private_material_owners": "3_passed",
+          "actual_host_lifecycle": "failed_bad_test_probe"
         }
       ],
-      "repair_reason": "两处cfg(test)夹具归属类型及CI实际要求的9文件Rust格式整改；不变更业务输入/输出"
+      "repair_reason": "New test liveness probe used unsupported monitoring.summary; use existing app.info in two tests"
     },
     {
       "stage_id": "I04",

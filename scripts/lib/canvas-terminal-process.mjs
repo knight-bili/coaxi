@@ -171,7 +171,7 @@ const [path,nonce]=process.argv.slice(2); const server=http.createServer((reques
       for (const chunk of sharedChunks) assert.equal(chunk.bytesBase64, httpChunks.get(chunk.seq), 'same-sequence UTF8/control bytes must match across transports')
       assert.ok(flood.bytes.length <= 128 * 1024); assert.ok(flood.state.chunks.length <= 2048); assert.equal(flood.state.gap, true)
       assert.ok(flood.state.chunks.every(chunk => Buffer.from(chunk.bytesBase64, 'base64').length <= 8192))
-      const healthAt = Date.now(); await native('monitoring.summary'); assert.ok(Date.now() - healthAt < 5000, 'output must not monopolize the interactive queue')
+      const healthAt = Date.now(); await native('app.info'); assert.ok(Date.now() - healthAt < 5000, 'output must not monopolize the interactive queue')
       const graph = await native('canvas.nodes.snapshot', { boardId: first.target.boardId })
       assert.equal((await native('canvas.nodes.apply', { commandId: randomUUID(), command: { boardId: first.target.boardId, expectedRevision: graph.board.revision, mutation: { type: 'delete', nodeIds: [first.target.nodeId] } } })).status, 'applied')
       await assertReaped(first)

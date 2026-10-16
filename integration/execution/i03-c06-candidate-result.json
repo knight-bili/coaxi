@@ -3,23 +3,16 @@
   "stage": "I03",
   "closeout_group": "I03-C06",
   "status": "in_progress",
-  "recorded_at": "2026-10-16T04:31:41.238024+00:00",
+  "recorded_at": "2026-10-16T04:52:41.449464+00:00",
   "source_binding": {
-    "base_commit": "f78492b995c2295127e48b5dea37850a5b82b764",
+    "base_commit": "18984d69134a7314939ca13b0e114bbd2ceece6d",
     "kind": "exact_worktree_sha256_before_commit",
     "files": {
-      "crates/rovai-core/src/application.rs": "34655f87f71e4e62808226dad7167c2726177bb4798d5912cc0407bda88a7546",
-      "crates/rovai-core/src/application/private_composer.rs": "e5ad05571e64d81d137ecff7f4e249dab702fcaf364b23f933630ef8fdb51123",
-      "crates/rovai-core/src/canvas_node.rs": "ad459aa5b51e005010dc94384a60cfe7832af5bbb727ee2d68aa3314c757fdce",
-      "crates/rovai-core/src/lib.rs": "5a3ca8e4bad4319799ae1af4d9ae3a2e2b358dd5733fd01beab513247337e516",
-      "crates/rovai-core/src/private_source_observation.rs": "2650717fc2b2535a44a256b63eaac41112f8b1873d7d42a5e35084ebd3ac9ac8",
-      "crates/rovai-core/src/single_chat.rs": "288e6688548f1c65ed5133d46bccdb9386545307fdd46e64ea9e02ec0ac96392",
-      "crates/rovai-core/src/single_chat_composer.rs": "ff754e70aec31bd970751664dff2d9331e1fa3cf19c434172dcc6c71e8dba88d",
-      "crates/rovai-core/src/single_chat_composer_tests.rs": "270bee4fb999acb369c7bc1dd0da585e75469e5b46eb22b7646c1bb25e2be5b5",
-      "crates/rovai-core/src/web_upload.rs": "e017d477f5d728fc97b527eaa2574550818eb3ce04ebafd1e977d7d7d1250185",
-      "integration/execution/goal-state.json": "03707105f4410caad473860f561eb02a99e6b4c21aec03e770b5d503b76dd2cc",
-      "integration/execution/i03-closeout.json": "88f5f3658f46ccfa53df8e696036efef815d6288dcea69c2eb8a88b42f617816",
-      "integration/planning/stage-versions.json": "b189c3cce38ead47f4016e551743671847312725c5b8474923a59b824453b5f6"
+      "crates/rovai-core/src/application.rs": "07260920478b689d596c144eb291146953f266f75ea6f0d060bdce91cdcf57a7",
+      "scripts/lib/canvas-terminal-process.mjs": "8b0dd13a9e7e508c8d8486c1f6f1d6fefa062c1eaae8eef3221bfd6bb3e4b5fd",
+      "integration/execution/goal-state.json": "ac0ff227594abafc401745451681930ee7eac9bc7a9d2ba52ccf9eaebcf43b89",
+      "integration/execution/i03-closeout.json": "5aef77e2b0f711053e77fcd8139e473994eb444948da8899ebd21bfd57457604",
+      "integration/planning/stage-versions.json": "e0d0623f450e91451213cd094e9a1420030f2cdb8b6550dafa3cc04ac08344f8"
     }
   },
   "artifact_binding": {
@@ -38,7 +31,25 @@
     "work/i03/c06/format-apply.log": "0ffba0856bf561da59a6d5d903749b1f138470aa7b84f459f5f4e3d68e554e0d",
     "work/i03/c06/format-after-rc3.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "work/i03/format-c06-rust.py": "dfbee46ed0e5da0b6c9f7107c99ac6bad256e843b1b8af69f45e9f0e8a475ce1",
-    "work/i03/record-c06-format.py": "76e17c6babcf59b4372dede578303d6785df3cbc83e13ecee37b3c32016fc94e"
+    "work/i03/record-c06-format.py": "76e17c6babcf59b4372dede578303d6785df3cbc83e13ecee37b3c32016fc94e",
+    "work/i03/c06/fusion-i03-rc.3/freeze.json": "2278fe255f44945123223437f0c96b1dd851a060f5d05febef8d55e23250c91b",
+    "work/i03/c06/fusion-i03-rc.3/host-lifecycle-process.json": "57b2478d00c452b21caf6f4f39fe31e2ca59d14939acbe7d2fddd7730a99c3a5",
+    "work/i03/c06/fusion-i03-rc.3/host-lifecycle-result.json": "6692ed7a10a70a33d4aeb11a3ec1e87a15c79f322bf19d787f9e0f2d9fdac9fc",
+    "work/i03/c06/fusion-i03-rc.3/host-lifecycle-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "work/i03/c06/fusion-i03-rc.3/host-lifecycle.log": "72942afedc8f944074210cc15fd97f3e1efb4c76030aba464964e7168a5deaac",
+    "work/i03/c06/fusion-i03-rc.3/private-material-tests-result.json": "0e6178d69b95554cc99b9d09c9797c38c0016349e4abd330ef12782bae352e38",
+    "work/i03/c06/fusion-i03-rc.3/private-material-tests-start.json": "2507d45eef2e5326c169c59b1e360303176fcc8fe4b06396970cf65e188dd5e3",
+    "work/i03/c06/fusion-i03-rc.3/private-material-tests.log": "11ffb3215467215efced7cd86668d4e5602e6a75a8e5830730ff50dc6659bc2f",
+    "work/i03/c06/fusion-i03-rc.3/rust-owner-list-result.json": "6867a9544d5cec762e9f9c3a21d99b3cad0d93d9fccd85a8c288151e92b96204",
+    "work/i03/c06/fusion-i03-rc.3/rust-owner-list-start.json": "ac13504083bceafbdfd4090b192ee25a6916b9142d9f6120dbb2bd60cef95888",
+    "work/i03/c06/fusion-i03-rc.3/rust-owner-list.log": "cf862ca5c391f5642aa259e3133da2f7d06b22b0a5c26fd9791193208f9bd685",
+    "work/i03/c06/fusion-i03-rc.3/verified-owner-list.json": "2904e351461113210219bbd0e3edb313af00872ca6a849f448b7fcea08298aeb",
+    "work/i03/c06/fusion-i03-rc.3/windows-binaries.json": "0ecc6806cba03694543a62eace401d77636f6046e15a70a4d24ecc631467168b",
+    "work/i03/c06/fusion-i03-rc.3/windows-build-result.json": "ee59aacf229206f5c05c111c04229458b52def5c8d3f6ae464d2b13f2b412fe8",
+    "work/i03/c06/fusion-i03-rc.3/windows-build-start.json": "15e4164cf5966f16a9bf52a22777c7948570717848a51bd446d2964f6368b0c0",
+    "work/i03/c06/fusion-i03-rc.3/windows-build.log": "28fa9b29540c577dccd04d3ea759b0d550b677ad894c59c5a8917b985cc4b505",
+    "work/i03/run-c06-host-lifecycle.ps1": "f75fae0d0aac796cb6437a8a5d759648a7a4ed3558e05fe7753589e4f5e75626",
+    "work/i03/record-c06-probe-repair.py": "fcf68316531fdf2b5a6d1b144990e382ff62c0d476438da60b4c7c70414beb6b"
   },
   "frozen_authority_files": {
     "crates/rovai-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
@@ -95,6 +106,46 @@
         "command": "cargo test --locked --offline -p rovai-core --lib --features extended-tests,slow-tests single_chat_composer::tests -- --list",
         "exit_code": 101
       }
+    },
+    {
+      "version": "fusion-i03-rc.3",
+      "source_commit": "18984d69134a7314939ca13b0e114bbd2ceece6d",
+      "status": "failed_test_probe",
+      "checks": {
+        "windows-build": {
+          "source_commit": "18984d69134a7314939ca13b0e114bbd2ceece6d",
+          "started_at": "2026-10-16T04:36:12.6124793Z",
+          "finished_at": "2026-10-16T04:37:21.8522192Z",
+          "command": "cargo build --locked --offline --package rovai-core --package rovai-host",
+          "exit_code": 0
+        },
+        "rust-owner-list": {
+          "source_commit": "18984d69134a7314939ca13b0e114bbd2ceece6d",
+          "started_at": "2026-10-16T04:37:22.0917993Z",
+          "finished_at": "2026-10-16T04:40:13.5451941Z",
+          "command": "cargo test --locked --offline -p rovai-core --lib --features extended-tests,slow-tests single_chat_composer::tests -- --list",
+          "exit_code": 0
+        },
+        "private-material-tests": {
+          "source_commit": "18984d69134a7314939ca13b0e114bbd2ceece6d",
+          "started_at": "2026-10-16T04:40:13.6002203Z",
+          "finished_at": "2026-10-16T04:40:24.2709091Z",
+          "command": "cargo test --locked --offline -p rovai-core --lib --features extended-tests,slow-tests single_chat_composer::tests -- --test-threads=1",
+          "exit_code": 0
+        },
+        "host-lifecycle": {
+          "source_commit": "18984d69134a7314939ca13b0e114bbd2ceece6d",
+          "started_at": "2026-10-16T04:41:53.5623240Z",
+          "finished_at": "2026-10-16T04:42:10.3142129Z",
+          "exit_code": 1,
+          "timed_out": false,
+          "harness_root": "C:\\Users\\JiaLe\\AppData\\Local\\Temp\\rovai-host-harness-9fa50169a60144ffabf3180a2e1b160d",
+          "node": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\tools\\node-v24.21.0\\node-v24.21.0-win-x64\\node.exe",
+          "host_binary": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\target\\debug\\rovai-host.exe",
+          "web": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.2\\web-ui",
+          "scope": "actual isolated Host/HTTP/Core/PTY lifecycle, no agent model"
+        }
+      }
     }
   ],
   "windows_binaries": [
@@ -102,29 +153,29 @@
       "name": "rovai-core.exe",
       "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\target\\debug\\rovai-core.exe",
       "length": 79836672,
-      "last_write_utc": "2026-10-16T04:08:11.8541802Z",
-      "sha256": "a2d48b9f2906002c27f37e1ad702860b9ecf7874af40b117f091a71c6912d994",
-      "source_commit": "f2630de05ed69cef3d49db1dcf0e5f141299b047"
+      "last_write_utc": "2026-10-16T04:37:18.6708264Z",
+      "sha256": "24dd1600ffbde38e493d403a7437621f0ddb1df2019e9a8e76f956d091e089a9",
+      "source_commit": "18984d69134a7314939ca13b0e114bbd2ceece6d"
     },
     {
       "name": "rovai-host.exe",
       "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\target\\debug\\rovai-host.exe",
       "length": 85925376,
-      "last_write_utc": "2026-10-16T04:08:10.7353382Z",
-      "sha256": "bba8c729af58c250b2412683845f2e83d3a155432ce5418aaef50bf67afd2f98",
-      "source_commit": "f2630de05ed69cef3d49db1dcf0e5f141299b047"
+      "last_write_utc": "2026-10-16T04:37:21.4283502Z",
+      "sha256": "3019fcdee249aa8be9dd025a1bca75685b3ad4e372c56770ed5cfbca09f79109",
+      "source_commit": "18984d69134a7314939ca13b0e114bbd2ceece6d"
     },
     {
       "name": "rovai.exe",
       "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\target\\debug\\rovai.exe",
       "length": 6582272,
-      "last_write_utc": "2026-10-16T04:08:09.7039758Z",
-      "sha256": "e57d2ada60af54875998e9d2194e7ec53f039105b29d38f7985eff5bbf0496d0",
-      "source_commit": "f2630de05ed69cef3d49db1dcf0e5f141299b047"
+      "last_write_utc": "2026-10-16T04:37:21.6476745Z",
+      "sha256": "bdbeb9e42434cbbb49e6c10971128261b90b128d06eb8b9a111d4b26e73c7b69",
+      "source_commit": "18984d69134a7314939ca13b0e114bbd2ceece6d"
     }
   ],
-  "implemented_repair": "Two existing cfg(test) helpers now accept OwnedTestDatabase, which owns directory(); no production prefix, test owner or assertion change",
-  "reuse_boundary": "TS/Web source unchanged since passing rc.2; Rust source text changed by required formatting, so rc.3 requires a new native build before actual Host tests",
+  "implemented_repair": "Only cfg(test) and actual process fixture probe names change to existing app.info; keep timeout and all lifecycle checks",
+  "reuse_boundary": "Production application prefix unchanged; preserve actual rc.3 binary source commit and hashes, rc.2 TS/Web and unaffected3 material owners",
   "web_asset_inventory": {
     "source_commit": "9a2eaef5d8000371c69ca30283ab6daa539802a8",
     "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.2\\web-ui",
@@ -138,12 +189,13 @@
     "full PC01-PC24/324"
   ],
   "normal_phase_batches": 1,
-  "repair_candidates": 2,
-  "candidate_execution_batches": 3,
+  "repair_candidates": 3,
+  "candidate_execution_batches": 4,
   "validation_batch_mapping": {
     "fusion-i03-rc.1": "I03-normal-01",
     "fusion-i03-rc.2": "I03-repair-01",
-    "fusion-i03-rc.3": "I03-repair-02"
+    "fusion-i03-rc.3": "I03-repair-02",
+    "fusion-i03-rc.4": "I03-repair-03"
   },
   "guardrails": {
     "push": false,
@@ -152,7 +204,7 @@
     "real_user_data_or_credentials": false,
     "customer_action_required_now": false
   },
-  "next": "冻结fusion-i03-rc.3（含测试夹具及必要格式修复），重新构建本候选Core/Host/CLI并编译extended+slow测试owner清单，复用未变TS/Web已通过结果。先确认3材料owner非零，再执行原材料/画布/终端/队列及实际隔离Host/PTY/Native/App/平台检查。",
+  "next": "冻结rc.4，复用生产源码未变的rc.3新二进制和已通过材料3owner、rc.2 types/Web。仅测试探针改为既有app.info，重新编译受影响测试版本，先list再运行队列/画布/终端/单聊/上下文相关owner，同时重跑实际Host/PTY完整生命周期；不添加不存在的产品接口或删除存活检查。",
   "format_gate": {
     "before_exit": 1,
     "after_exit": 0,
@@ -160,5 +212,25 @@
     "canonical_before_after_equal": true,
     "frozen_authority_unchanged": true,
     "session_id": 75064
+  },
+  "private_material_verification": {
+    "source_commit": "18984d69134a7314939ca13b0e114bbd2ceece6d",
+    "features": "extended-tests,slow-tests",
+    "nonzero_owner_list": [
+      "single_chat_composer::tests::commands_keep_complete_inputs_separate_preserve_receipts_and_rollback_both_sides",
+      "single_chat_composer::tests::recovery_pages_are_read_only_context_bound_bounded_and_incomplete_after_changes",
+      "single_chat_composer::tests::send_consumes_only_the_registered_scope_and_keeps_one_private_fifo_and_legacy_shape"
+    ],
+    "passed": 3,
+    "failed": 0,
+    "exit_code": 0
+  },
+  "host_partial": {
+    "source_commit": "18984d69134a7314939ca13b0e114bbd2ceece6d",
+    "exit_code": 1,
+    "full_case_passed": false,
+    "agent_model": false,
+    "scope": "real Host/HTTP/PTY; reached flood/resize/input assertions before unsupported liveness call",
+    "remaining_lifecycle": "node/board deletion, natural exit, stop/restart, planned exit and hard crash not reached"
   }
 }
