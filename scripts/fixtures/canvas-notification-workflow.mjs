@@ -88,6 +88,8 @@ export async function qualifyCanvasNotifications(window,{evaluate,wait,rpc,openC
   return observations
  }
  const assertRead=async(context,target)=>{
+  // 原Attention合同要求公屏完成通知的具体Run实际可见；仅看到公开消息不等于看过执行。
+  if(context.kind==='public'&&!await evaluate(`Boolean(${frame(context)}?.querySelector('[data-agent-run-id="${target.runId}"]'))`))await click(`Array.from(${frame(context)}.querySelectorAll('button')).find(node=>node.textContent?.trim().startsWith('执行'))`)
   await wait(`Boolean(${frame(context)}?.querySelector('[data-agent-run-id="${target.runId}"]'))`)
   await until(async()=>{const state=await stateFor(target);return state&&!state.unread&&acknowledged(target).some(call=>call.result?.value?.status==='applied')})
  }
@@ -122,10 +124,10 @@ export async function qualifyCanvasNotifications(window,{evaluate,wait,rpc,openC
   report.observers_closed=await evaluate('window.r08NotificationAudit.snapshot()')
   record('all_canvas_notification_mutation_resize_observers_and_window_visual_viewport_listeners_release_after_close')
   const captured=(await readFile(config.runtime_capture,'utf8')).trim().split('\n').map(line=>JSON.parse(line)).map(entry=>{
-   const text=(entry.params?.prompt??[]).filter(part=>part.type==='text').map(part=>part.text).join('\n'),current=/\[CURRENT_INPUT\]\s*([\s\S]*?)\s*\[\/CURRENT_INPUT\]/.exec(text)
-   return current?JSON.parse(current[1]):null
+   const text=(entry.params?.prompt??[]).filter(part=>part.type==='text').map(part=>part.text).join('\n'),current=/\[(CURRENT_INPUT|RUN_INPUT)\]\s*([\s\S]*?)\s*\[\/\1\]/.exec(text)
+   return current?JSON.parse(current[2]):null
   }).filter(Boolean)
-  for(const scenario of report.notification_scenarios)assert.equal(captured.filter(input=>input.message===scenario.body).length,1)
+  for(const scenario of report.notification_scenarios)assert.equal(captured.filter(input=>JSON.stringify(input).includes(scenario.body)).length,1)
   record('all_eight_reply_inputs_reach_owned_fixed_local_acp_exactly_once_without_external_model_or_database_seeding')
  }finally{report.observers_final=await evaluate('window.r08NotificationAudit.snapshot()').catch(()=>null);await evaluate('(()=>{window.r08NotificationAudit.restore();return true})()').catch(()=>{})}
 }
