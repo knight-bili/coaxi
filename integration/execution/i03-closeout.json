@@ -135,14 +135,17 @@
         "真实文本文件卡片可见；HTML HTTP入口缺陷原owner修复前1fail，修复后原站点/文件服务/资源池3owner文件91pass1原平台skip",
         "rc.7共享Renderer全量types exit0、4文件46项相关检查通过；rc.8仅CSS/既存Native owner改变，复用未变TypeScript检查",
         "rc.8 Desktop/Web构建exit0，149个Desktop文件及141个Web缓存条目逐SHA匹配，真实App副本一致",
-        "rc.8真实Windows Desktop同owner九项通过：HTML已加载且通信连接、单标题/悬停路径/图标居中、源码切换和跨卡重读保持文档、原生键盘菜单及原确认窗移除节点而原文件保留；受控退出completed无deadline/强杀"
+        "rc.8真实Windows Desktop同owner九项通过：HTML已加载且通信连接、单标题/悬停路径/图标居中、源码切换和跨卡重读保持文档、原生键盘菜单及原确认窗移除节点而原文件保留；受控退出completed无deadline/强杀",
+        "rc9 Core/Host/CLI与Desktop/Web构建0；rc10只构建Frontend两入口0，复用已核验2158df02原生程序",
+        "rc10真实Windows生产App：容器/创建4、文件HTML9、对象定位8、私聊附件2通过；四次成功run均受控退出，未用付费模型"
       ],
       "open_findings": [
-        "同一HTML卡片及保留工作区两个合法入口交换重叠，单布尔位导致合法跳转403；已改逐入口计数并在异步来源复核前认领，原授权和额外请求拒绝均保留，待新Desktop真实复验"
+        "同一HTML卡片及保留工作区两个合法入口交换重叠，单布尔位导致合法跳转403；已改逐入口计数并在异步来源复核前认领，原授权和额外请求拒绝均保留，待新Desktop真实复验",
+        "私聊真实截图仍存在重复标题，附件预览可见稳定状态需要另行核对；不能以两项DOM/读取断言授予完整UI资格"
       ],
       "remaining_checks": [
         "私聊材料完整真实流程/PC01-PC24与文件卡片实际挂载/HTML，不用直接文件API和局部Core测试替代",
-        "Mission/Task/Diff/文件真实原工作区路由、焦点/编辑器/崩溃/冷恢复及同Thread多卡镜像",
+        "Mission/Task/文件基本原工作区定位已通过；准备好Git工作区的Diff、焦点/编辑器/崩溃/冷恢复及同Thread多卡仍需补证",
         "真实多卡/资源释放/规模、大材料交互响应与其他适用迁移、冻结输入、平台和正式场景证据；环境缺项单列，继续独立后续阶段"
       ],
       "resolved_findings": [
@@ -150,10 +153,12 @@
         "文件pin规范几何/标题/颜色预期及精确路径通过",
         "Ready/Stop空struct闭合额外字段且原JSON不变；所有坏帧/拆包/超量断言和真实生命周期通过"
       ],
-      "latest_native_evidence": "i03-c06-native-result.json",
+      "latest_native_evidence": "i03-c06-source-ui-verification.json",
       "ui_remaining": [
-        "画布顶部两排工具条仍拥挤，需要在现有视觉规范内整理并验证；本轮只完成文件卡片整改",
-        "双主题/窄窗口及完整画布使用路径仍需对应实际验证，当前截图不能代替"
+        "私聊卡片重复标题与内容容器贴合需继续整改",
+        "附件预览截图仍停留单聊加载状态，当前DOM及授权读取通过不等同完整视觉资格",
+        "Codeg列表真实预览/节点数量尚未接入，禁止假缩略图",
+        "双主题、完整八类创建路径、键盘/错误状态、冷恢复及规模仍按I03有限清单补证"
       ]
     }
   ],

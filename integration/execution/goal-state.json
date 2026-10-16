@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "推进C02真实Mission/Task/Diff与文件工作区定位、C05冷恢复和画布顶层工具条；本轮新附件UI与后续整改集齐后统一候选验证，不为这三个入口立即重编/推送。PC01-PC24按矩阵逐项补证，实际Runtime输入证据等待专用身份和预算。",
+    "容器贴合与创建跳转已取得rc10真实资格，文件/对象/私聊附件必要回归通过。继续私聊卡片重复标题、预览稳定可见证据，以及C05冷恢复/同Thread多卡；先编码与自审，小切片不默认重编/push/Actions。PC01-PC24按矩阵补证，真实Runtime输入仍待专用身份与预算。",
     "阶段剩余清单固定按I03-C06继续工程验证；暂缺环境只单列待办，继续可独立的I02余项和I04-I12/BUF，不把后续功能提前塞入I03。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -203,5 +203,7 @@
   "card_refinement_evidence": "i03-c06-card-refinement-result.json",
   "card_refinement_verification_evidence": "i03-c06-card-refinement-verification.json",
   "private_materials_native_evidence": "i03-c06-private-materials-native-result.json",
-  "private_materials_runtime_matrix": "i03-private-materials-runtime-matrix.json"
+  "private_materials_runtime_matrix": "i03-private-materials-runtime-matrix.json",
+  "canvas_source_ui_evidence": "i03-c06-source-ui-verification.json",
+  "canvas_source_ui_policy": "integration/ui-source-policy.md"
 }
