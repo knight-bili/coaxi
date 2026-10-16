@@ -41,7 +41,7 @@ pub struct CanvasThreadReference {
     pub mission_id: Option<String>,
     pub members: Vec<CanvasReferenceMember>,
     pub private_conversations: Vec<CanvasPrivateReference>,
-    pub public_active_run_count: u64,
+    pub public_active_run_count: i64,
 }
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -223,7 +223,7 @@ fn read_page(
     let active = tx
         .prepare(ACTIVE_PUBLIC_SQL)?
         .query_map([&ids], |row| {
-            Ok((row.get::<_, String>(0)?, row.get::<_, u64>(1)?))
+            Ok((row.get::<_, String>(0)?, row.get::<_, i64>(1)?))
         })?
         .collect::<rusqlite::Result<Vec<_>>>()?;
     for (id, count) in active {
