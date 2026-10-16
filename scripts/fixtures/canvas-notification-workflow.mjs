@@ -13,7 +13,7 @@ export function installNotificationIpc(ipcMain) {
   try{const result=await handler(event,method,params);entry.returnedAt=Date.now();entry.result=result;return result}
   catch(error){entry.error=String(error);throw error}
  }:handler)
- return {finishRegistration(){ipcMain.handle=original},snapshot(){return {calls}},restore(){ipcMain.handle=original}}
+ return {finishRegistration(){ipcMain.handle=original},releaseAll(){ipcMain.handle=original},snapshot(){return {calls}}}
 }
 
 // 观察原生Observer/事件订阅的实际注册和释放，不改变回调、调度或命中结果。
