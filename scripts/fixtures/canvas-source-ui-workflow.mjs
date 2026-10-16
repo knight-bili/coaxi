@@ -14,6 +14,8 @@ export async function qualifyCanvasSourceUi(window,{evaluate,wait,rpc,openCanvas
  await checkpoint()
  const click=async expression=>{
   await wait(`Boolean((${expression})&&!(${expression}).disabled&&(${expression}).checkVisibility())`)
+  await evaluate(`(()=>{(${expression}).scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'});return true})()`)
+  await wait(`(()=>{const node=(${expression});if(!node||node.disabled)return false;const r=node.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return Boolean(hit&&node.contains(hit))})()`)
   const point=await evaluate(`(()=>{const node=(${expression});node.scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'});const r=node.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,hit=document.elementFromPoint(x,y);if(!hit||!node.contains(hit))throw Error('Original UI control is occluded: '+node.outerHTML.slice(0,150));return{x:Math.round(x),y:Math.round(y)}})()`)
   for(const type of ['mouseMove','mouseDown','mouseUp'])window.webContents.sendInputEvent({type,...point,...(type==='mouseMove'?{}:{button:'left',clickCount:1})})
  }
@@ -45,6 +47,7 @@ export async function qualifyCanvasSourceUi(window,{evaluate,wait,rpc,openCanvas
  const prefs=await evaluate('window.rovai.navigationPreferences.get()'),group=prefs.projectGroups.find(group=>group.name==='R09 原项目分组');assert.ok(group);report.ui_context.groupId=group.id
  record('original_board_creation_and_project_group_management_persist_real_board_and_device_group_without_model')
  for(const [kind,label] of Object.entries(kinds)){
+  report.ui_step=kind+':create';await checkpoint()
   const base=await graph();assert.equal(base.nodes.length,0)
   await click('document.querySelector(\'.canvas-dock-panel button[aria-label="添加节点"]\')');await click(menu(label));await wait('Boolean(document.querySelector(".canvas-node-editor"))')
   await wait(`document.querySelector('.canvas-node-editor select').value===${JSON.stringify(kind)}`)
