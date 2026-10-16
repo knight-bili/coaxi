@@ -54,6 +54,12 @@ async function qualify(window){
    report.status='passed'
    return
   }
+  if(config.mode==='visual'){
+   report.scope='production Main/preload/Core; Codeg canvas creation and rendered visual states; no model'
+   await qualifyCanvasVisual(window,{evaluate,wait,rpc})
+   report.status='passed'
+   return
+  }
   if(config.mode==='files'){
    report.scope='production Main/preload/Core; real file cards and author HTML lifecycle'
    await qualifyFiles(window,{evaluate,wait,rpc})
@@ -97,8 +103,46 @@ async function qualify(window){
   await wait(`window.rovai.request('canvas.terminals.snapshot',{target:${JSON.stringify(target)}}).then(value=>value.cleanupComplete===true)`)
   record('native_terminal_stop_completes_process_cleanup')
   report.status='passed'
- }catch(error){report.status='failed';report.error=String(error.stack??error);report.native_keys=await evaluate('window.nativeKeys').catch(()=>null);report.dom=await evaluate('document.body.innerText.slice(-2500)').catch(()=>null);if(config.mode==='files'&&(report.screenshots?.length??0)<3){const path=join(config.evidence,'failure.png');await writeFile(path,(await window.webContents.capturePage()).toPNG()).then(()=>{(report.screenshots??=[]).push(path)}).catch(()=>{})}}
+ }catch(error){report.status='failed';report.error=String(error.stack??error);report.native_keys=await evaluate('window.nativeKeys').catch(()=>null);report.dom=await evaluate('document.body.innerText.slice(-2500)').catch(()=>null);if((report.screenshots?.length??0)<3){const path=join(config.evidence,'failure.png');await writeFile(path,(await window.webContents.capturePage()).toPNG()).then(()=>{(report.screenshots??=[]).push(path)}).catch(()=>{})}}
  finally{report.finished_at=new Date().toISOString();await writeFile(join(config.evidence,'result.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({status:report.status,evidence:config.evidence}));process.exitCode=report.status==='passed'?0:1;app.quit()}
+}
+async function qualifyCanvasVisual(window,{evaluate,wait,rpc}){
+ window.unmaximize();window.setContentSize(1440,920)
+ await evaluate(`(()=>{document.querySelector('button[aria-label="无限画布"]').click();return true})()`)
+ await wait(`Boolean(document.querySelector('.canvas-breadcrumb-root:not(:disabled)'))`)
+ await evaluate(`(()=>{document.querySelector('.canvas-breadcrumb-root').click();return true})()`)
+ await wait(`Boolean(document.querySelector('.canvas-boards-home .canvas-primary-button:not(:disabled)'))`)
+ report.visual_states=[]
+ const capture=async name=>{
+  await evaluate(`new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))`)
+  await pause(150)
+  const metrics=await evaluate(`(()=>{const box=selector=>document.querySelector(selector)?.getBoundingClientRect().toJSON();return {viewport:{width:innerWidth,height:innerHeight,dpr:devicePixelRatio},font:{family:getComputedStyle(document.body).fontFamily,rootSize:getComputedStyle(document.documentElement).fontSize},theme:document.documentElement.dataset.theme,workspace:box('.canvas-workspace'),dialog:box('.canvas-board-dialog'),canvas:box('.canvas-flow-stage'),dock:box('.canvas-toolbar'),zoom:box('.canvas-zoom-pill')}})()`)
+  const path=join(config.evidence,name+'.png');await writeFile(path,(await window.webContents.capturePage()).toPNG())
+  ;(report.screenshots??=[]).push(path);report.visual_states.push({state:name,path,metrics})
+ }
+ const before=await rpc('canvas.boards.list'),beforeIds=new Set(before.boards.map(board=>board.id))
+ report.home_state=before.boards.length?'existing_boards':'no_boards'
+ await capture('00-board-home')
+ record('real_canvas_home_keeps_existing_boards_and_opens_creation',{boards:before.boards.length})
+ await evaluate(`(()=>{document.querySelector('.canvas-boards-home .canvas-primary-button').click();return true})()`)
+ await wait(`Boolean(document.querySelector('.canvas-board-dialog input[data-dialog-autofocus]'))`)
+ assert.equal(await evaluate(`document.querySelectorAll('.canvas-board-dialog .canvas-color-choice').length`),12)
+ await capture('01-board-dialog')
+ await evaluate(`(()=>{document.querySelector('.canvas-board-dialog .canvas-color-choice[data-color="blue"]').click();return true})()`)
+ await wait(`document.querySelector('.canvas-board-dialog .canvas-color-choice[data-color="blue"]').getAttribute('aria-pressed')==='true'`)
+ await evaluate(`(()=>{document.querySelector('.canvas-board-dialog .canvas-color-choice[data-color="blue"]').click();document.querySelector('.canvas-board-dialog input[data-dialog-autofocus]').focus();return true})()`)
+ await wait(`document.querySelector('.canvas-board-dialog .canvas-color-choice[data-color="blue"]').getAttribute('aria-pressed')==='false'`)
+ await window.webContents.insertText('test')
+ await wait(`document.querySelector('.canvas-board-dialog input[data-dialog-autofocus]').value==='test'`)
+ record('real_creation_form_has_twelve_swatches_and_repicking_clears_color')
+ await evaluate(`(()=>{document.querySelector('.canvas-board-dialog button[type="submit"]').click();return true})()`)
+ await wait(`!document.querySelector('.canvas-board-dialog')&&document.querySelector('.canvas-empty-hint h3')?.textContent==='画布还是空的'`)
+ const after=await rpc('canvas.boards.list'),created=after.boards.filter(board=>!beforeIds.has(board.id))
+ assert.equal(created.length,1);assert.equal(created[0].name,'test');assert.ok(!created[0].color)
+ const graph=await rpc('canvas.nodes.snapshot',{boardId:created[0].id});assert.equal(graph.nodes.length,0)
+ report.visual_board_id=created[0].id
+ await capture('02-empty-board')
+ record('real_creation_persists_one_empty_board_and_displays_codeg_canvas_chrome',{board_id:created[0].id})
 }
 async function qualifyFiles(window,{evaluate,wait,rpc}){
  const requests=new Set(),network=[]
