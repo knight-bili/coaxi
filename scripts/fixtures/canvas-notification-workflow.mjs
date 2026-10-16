@@ -3,7 +3,6 @@ import { randomUUID, createHash } from 'node:crypto'
 import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { setTimeout as pause } from 'node:timers/promises'
-import { execFileSync } from 'node:child_process'
 
 // 只旁路记录原Main请求与真实Core回执；不替换通知事实、可见性或确认结果。
 export function installNotificationIpc(ipcMain) {
@@ -42,6 +41,10 @@ function installObserverAudit() {
 
 export async function qualifyCanvasNotifications(window,{evaluate,wait,rpc,openCanvasBoard,config,report,record,seam}) {
  assert.equal(createHash('sha256').update(await readFile(new URL(config.runtime_configure_module))).digest('hex'),config.runtime_configure_sha256)
+ const mcp=await rpc('mcp.config.get')
+ assert.equal(mcp.exists,true);assert.deepEqual(mcp.servers,[]);assert.equal(mcp.permissionIssue,false);assert.equal(mcp.fileIssue,null)
+ assert.equal(mcp.path.replaceAll('\\','/').toLowerCase(),config.mcp_config_path.replaceAll('\\','/').toLowerCase())
+ report.fixture_mcp_native_initialization={path:mcp.path,servers:0,permissionIssue:mcp.permissionIssue,sha256:createHash('sha256').update(await readFile(config.mcp_config_path)).digest('hex')}
  const {configureProductRuntime}=await import(config.runtime_configure_module)
  const member=await rpc('members.create',{commandId:randomUUID(),command:{displayName:'R08 本机通知队员',teamRole:'通知工程验证',professionalResponsibilities:'仅本机固定ACP协议',personalityTraits:['严谨'],workingPrinciples:'不连接外部服务',growthTopic:''}})
  assert.equal(member.status,'applied');const agentId=member.resultEntity.entityId
@@ -56,9 +59,6 @@ export async function qualifyCanvasNotifications(window,{evaluate,wait,rpc,openC
   contexts.push({kind,threadId,conversationId,nodeId:pin.payload.nodeIds[0],x:index*580})
  }
  report.notification_context={boardId,agentId,contexts};report.notification_scenarios=[]
- assert.equal(createHash('sha256').update(await readFile(config.fixture_owner_script)).digest('hex'),config.fixture_owner_sha256)
- report.fixture_owner_preparation=join(config.evidence,'fixture-owner-preparation.json')
- execFileSync(join(process.env.SystemRoot,'System32/WindowsPowerShell/v1.0/powershell.exe'),['-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',config.fixture_owner_script,'-Root',config.data_root,'-Report',report.fixture_owner_preparation],{windowsHide:true,timeout:30_000})
  const until=async predicate=>{const end=Date.now()+30_000;while(Date.now()<end){const result=await predicate();if(result)return result;await pause(100)}throw Error('Actual notification state did not reach the expected condition')}
  const frame=context=>`document.querySelector('.canvas-conversation-frame[data-canvas-conversation-key*="${context.nodeId}"]')`
  const button=(context,label)=>`document.querySelector('[data-id="${context.nodeId}"] button[aria-label="${label}"]')`
