@@ -966,7 +966,10 @@ async function qualifyPublicMulti(window,{evaluate,wait,rpc}){
    await window.webContents.insertText(texts[index])
    await wait(`${inputs[index]}.textContent===${JSON.stringify(texts[index])}`)
   }
-  report.public_drafts=await evaluate(`Object.entries(localStorage).filter(([key])=>key.startsWith('rovai.canvas-composer-drafts.v1:')).flatMap(([key,value])=>Object.entries(JSON.parse(value).drafts).map(([context,body])=>({key,context:JSON.parse(context.slice(7)),draft:JSON.parse(body)}))).filter(item=>item.context[2]===${JSON.stringify(boardId)})`)
+  const readDrafts=`Object.entries(localStorage).filter(([key])=>key.startsWith('rovai.canvas-composer-drafts.v1:')).flatMap(([key,value])=>Object.entries(JSON.parse(value).drafts).map(([context,body])=>({key,context:JSON.parse(context.slice(7)),draft:JSON.parse(body)}))).filter(item=>item.context[2]===${JSON.stringify(boardId)})`
+  // The original public Lexical composer saves through its debounce owner; DOM text is not a persistence receipt.
+  await wait(`(()=>{const drafts=${readDrafts};return ${JSON.stringify(nodeIds)}.every((id,index)=>drafts.some(item=>item.context[3]===id&&item.draft.body===${JSON.stringify(texts)}[index]))})()`)
+  report.public_drafts=await evaluate(readDrafts)
   assert.equal(report.public_drafts.length,3)
   for(const index of [0,1,2]){const draft=report.public_drafts.find(item=>item.context[3]===nodeIds[index]);assert.equal(draft.context[4],threads[index]);assert.equal(draft.context[5],null);assert.equal(draft.draft.body,texts[index])}
   record('trusted_public_input_uses_three_independent_pin_drafts_across_two_real_threads')
