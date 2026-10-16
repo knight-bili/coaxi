@@ -628,8 +628,11 @@ async function qualifyNotes(window,{evaluate,wait,rpc}){
  await evaluate(`(()=>{window.noteDragEvents=[];for(const name of ['mousedown','mousemove','mouseup'])window.addEventListener(name,event=>window.noteDragEvents.push({type:event.type,buttons:event.buttons,trusted:event.isTrusted,x:event.clientX,y:event.clientY,screenX:event.screenX,screenY:event.screenY,transform:document.querySelector('.react-flow__viewport').style.transform}),true);return true})()`)
  mouse('mouseMove',start);mouse('mouseDown',start)
  await pause(50)
- window.webContents.sendInputEvent({type:'mouseMove',x:start.x+8,y:start.y+8,modifiers:['leftButtonDown']});await pause(80)
- window.webContents.sendInputEvent({type:'mouseMove',x:start.x+72,y:start.y+48,modifiers:['leftButtonDown']});await pause(80);mouse('mouseUp',{x:start.x+72,y:start.y+48})
+ // XYDrag.startDrag captures the pointer after its activation threshold, not on mouseDown.
+ const activated={x:start.x+8,y:start.y+8},ended={x:activated.x+72,y:activated.y+48}
+ report.note_drag_path={pressed:start,activated,ended,expected_delta:{x:72,y:48}}
+ window.webContents.sendInputEvent({type:'mouseMove',...activated,modifiers:['leftButtonDown']});await pause(80)
+ window.webContents.sendInputEvent({type:'mouseMove',...ended,modifiers:['leftButtonDown']});await pause(80);mouse('mouseUp',ended)
  await pause(200)
  report.note_drag_events=await evaluate('window.noteDragEvents')
  report.note_graph_after_drag=await rpc('canvas.nodes.snapshot',{boardId})
