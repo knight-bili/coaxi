@@ -26,7 +26,7 @@ export async function qualifyCanvasTerminalInput(window,{evaluate,wait,rpc,openC
  const click=async selector=>evaluate(`(()=>{const b=document.querySelector(${JSON.stringify(selector)});if(!b||b.disabled)throw Error('Required enabled control missing');b.click();return true})()`)
  const focus=async()=>{window.focus();window.webContents.focus();await evaluate(`(()=>{document.querySelector('${card} .xterm-helper-textarea').focus();return true})()`)}
  const enter=async()=>{await focus();await physical('enter')}
- const typeText=async text=>{for(const keyCode of text)window.webContents.sendInputEvent({type:'char',keyCode});await pause(400)}
+ const typeText=async text=>{for(const keyCode of text){window.webContents.sendInputEvent({type:'keyDown',keyCode});window.webContents.sendInputEvent({type:'char',keyCode});window.webContents.sendInputEvent({type:'keyUp',keyCode})}await pause(400)}
  const snapshot=()=>rpc('canvas.terminals.snapshot',{target,afterSeq:0})
  const output=async()=>stripVTControlCharacters(Buffer.concat((await snapshot()).chunks.map(x=>Buffer.from(x.bytesBase64,'base64'))).toString('utf8'))
  const waitOutput=async text=>{for(let i=0;i<80;i++){if((await output()).split(/\r?\n/).some(line=>line.trim()===text))return;await pause(100)}throw Error('Actual PTY output missing: '+text)}
@@ -41,7 +41,7 @@ export async function qualifyCanvasTerminalInput(window,{evaluate,wait,rpc,openC
   const initial=await snapshot();assert.equal(initial.phase,'running');report.generation=initial.generation
   record('fresh_isolated_native_terminal_starts_real_pty_and_uses_original_generation')
   try {
-   const imePath=join(config.workspace,'IME-实际提交.txt'),prefix=`require('node:fs').writeFileSync(${JSON.stringify(imePath)},"`
+   const imePath=join(config.workspace,'ime-result.txt'),prefix=`require('node:fs').writeFileSync(${JSON.stringify(imePath)},"`
    let composing=false
    for(let attempt=0;attempt<2;attempt++){
     await focus();const beforePrefix=await snapshot();await typeText(prefix);await pause(600)
@@ -59,7 +59,11 @@ export async function qualifyCanvasTerminalInput(window,{evaluate,wait,rpc,openC
    await physical('commit');await pause(250)
    report.ime_events=await evaluate('window.r07InputEvents')
    report.synthetic_composition_ends=await evaluate('window.r07SyntheticEnds')
-   assert.ok(report.ime_events.some(e=>e.type==='compositionend'&&e.trusted&&e.data==='你好'),'The physical IME must commit the expected Chinese text')
+   // Chromium150的compositionend经DispatchScopedEvent队列派发，不设置trusted；开始/更新/输入仍须真实可信。
+   // https://github.com/chromium/chromium/blob/150.0.7871.114/third_party/blink/renderer/core/editing/ime/input_method_controller.cc#L396
+   assert.equal(report.ime_events.filter(e=>e.type==='compositionend'&&e.data==='你好').length,1)
+   assert.ok(report.ime_events.some(e=>e.type==='input'&&e.trusted&&e.data==='你好'))
+   assert.equal(report.synthetic_composition_ends.length,0,'Test or application JavaScript must not synthesize composition completion')
    await typeText('");console.log("R07_IME_DONE")');await enter();await waitOutput('R07_IME_DONE')
    const bytes=await readFile(imePath);assert.deepEqual(bytes,Buffer.from('你好'))
    report.ime_file={path:imePath,sha256:createHash('sha256').update(bytes).digest('hex'),bytes:bytes.length}
@@ -81,7 +85,7 @@ export async function qualifyCanvasTerminalInput(window,{evaluate,wait,rpc,openC
    assert.deepEqual(await readFile(pastePath),Buffer.from(value))
    record('actual_clipboard_button_pastes_exact_chinese_and_emoji_into_real_pty')
    const marker='R07_COPY_原生中文',copyCommand=`console.log(${JSON.stringify(marker)})`
-   await focus();await typeText(copyCommand);await enter()
+   clipboard.writeText(copyCommand);await click(button('粘贴'));await pause(400);await enter()
    await wait(`Array.from(document.querySelectorAll('${card} .xterm-rows > div')).some(row=>row.textContent?.trim()===${JSON.stringify(marker)})`)
    const rect=await evaluate(`(()=>{const row=[...document.querySelectorAll('${card} .xterm-rows > div')].find(row=>row.textContent?.trim()===${JSON.stringify(marker)}),r=row.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height}})()`)
    const y=Math.round(rect.y+rect.height/2),left=Math.round(rect.x+1),right=Math.round(rect.x+rect.width-1)
