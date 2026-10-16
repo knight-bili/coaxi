@@ -182,3 +182,15 @@ final result: blocked
 final result: blocked
 
 完整工程验证未完，目标active，无新增客户事项。
+
+## rc15实际列表与纵向缩略图整改
+
+冻结e0c4fad7集中构建新Core/Host/CLI和Desktop/Web均通过；Rust既有画板owner扩展1项通过，1247项过滤，不代表全库。真实列表7项以及公开多卡/64摘要8项、终端5项相关回归通过。列表r1是导航夹具提前返回，修正精确目标就绪等待后通过；旧失败和每次快照保留。删除弹窗r2截图落在动画中，r3/r4等动画及两帧后捕获，已实际查看r3稳定弹窗。公开两Thread/三卡、64摘要及终端截图也已查看。
+
+列表截图仍有大空白：真实文字固有高度最多77.333px，容器167.698px。用实际组件加入纵向轮廓后复现：1040窗口整卡736.667px，普通卡文字区534.917px；当前CSS仅将SVG绝对贴合16:10预览，并恢复原Codeg文字自然排布，整卡295.083px、文字区93.333/77.333px。日夜两视口等高/贴合、单列表滚动和末尾新建可达通过；没有全局隐藏滚动。实际查看最终夜主题截图。修复只获闭合投影Renderer证据，未重编完整App，rc15不能覆盖后改CSS。
+
+完整App仍有ResizeObserver尺寸监听警告，来源观察保持原回调调度，未过滤，不宣告零错误。报告integration/execution/i03-c06-rc15-list-native-verification.json与i03-c06-board-compact-renderer-verification.json。
+
+final result: blocked
+
+完整阶段视觉/工程验证未完，持续目标active；无需客户做技术验收。

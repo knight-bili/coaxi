@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "原列表右键/Shift+F10/菜单键及Escape回焦、同版本删除节点/终端卡数量提示已接线；复用两源原组件和现有操作保护。Native board-list真实场景已准备，接下来将累计CSS与Core summaries一起冻结下一候选集中验证。",
+  "current_slice": "rc15集中构建/Rust既有owner通过，真实列表7项及公开多卡8项/终端5项相关回归通过。截图发现纵向SVG撑高卡片，当前CSS已修并通过日夜实际组件检查；完整App尺寸监听仍有警告，未宣告阶段完成。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "集中冻结本组累计CSS、Core真实统计/轮廓、原列表菜单与删除提示；新Core扩展owner/二进制、Desktop/Web一次构建，串行Native board-list与必要多会话RO来源观察。60旧rc14场景按源码影响复用。C05其他有限余项和I04保留，缺环境继续独立工作，不逐切片push/Actions。",
+    "先复用既有资源预算证据并补原C05缺口；尺寸监听诊断及纵向列表CSS待下一累计候选必要集成，不逐小修重编。完整主题/八类、未知请求/IO/PC保留，缺外部条件继续独立I04。",
     "阶段剩余清单固定按I03-C06继续工程验证；暂缺环境只单列待办，继续可独立的I02余项和I04-I12/BUF，不把后续功能提前塞入I03。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -217,5 +217,7 @@
   "canvas_ready_diff_public_cold_native_evidence": "i03-c02-ready-diff-public-cold-native-verification.json",
   "canvas_card_source_followup": "i03-c06-card-source-followup.json",
   "canvas_source_search_layout_evidence": "i03-c06-source-search-layout-verification.json",
-  "canvas_board_preview_projection": "i03-c06-board-preview-projection-result.json"
+  "canvas_board_preview_projection": "i03-c06-board-preview-projection-result.json",
+  "canvas_rc15_list_native_evidence": "i03-c06-rc15-list-native-verification.json",
+  "canvas_board_compact_renderer_evidence": "i03-c06-board-compact-renderer-verification.json"
 }
