@@ -65,3 +65,6 @@ R08实际Core负载见[材料与日志验证](i03-r08-source-load-verification.j
 R09新增[最近模型投影与实际构建](i03-r09-model-build-verification.json)：复用原Run投影，区分最近实际模型与当前配置，公开及精确私聊历史隔离；默认模型没有观测时保持未知。34项相关TS、全类型、2个原Rust owner实际执行和Core/Host/CLI、Desktop/Web构建通过。rc21出现真实SQLite计数编译错误，仅改i64后以rc22重建Core；Frontend相同输入和文件SHA复用。八类完整界面、交错活动/模型展示、日夜/小窗口与告警影响仍待，R09保持开放。C08真实父子会话/异步委派沿I04保留并须回接画布，不用私聊数量替代。旧[摘要源码记录](i03-r09-summary-implementation.json)是历史证据，其待构建状态已由新报告补齐。
 
 下一动作：复用rc22完成R08大正文/真实通知/取消、R09动态摘要和八类原版UI及尺寸告警影响，随后R10正式场景和开发预览交接。当前不重复构建、不push、不触发Actions；发现实际缺陷才增加必要修复候选。排期及日期仍是工作量估计，任务提前完成即接下一项，见[收口预览](i03-closeout-plan-r1.md)。
+
+
+2026-10-17 R08进展：rc22真实系统粘贴1,048,707字节、16个可信键盘输入、原同步持久文件与新App/Core精确恢复通过。粘贴497ms、按键P95 131.5ms、帧最大374.9ms、Main定时最大76.7ms；原Main在输入期间5ms收到Core applied答复。原编译Core集成owner实际1 passed，证明受控阻塞期间独立请求及abort等待者的名额持有；尚不等于真实文件IO取消/超时。保留前次失败及R09告警记录。证据见[i03-r08-native-large-input-verification.json](i03-r08-native-large-input-verification.json)。R08仍open，固定剩余R08–R10三组；下一项为真实通知可见/遮挡/离视口/关闭与监听释放，随后实际文件IO取消/超时。范围81/48/324、私聊24、正式12及平台边界均保持，不重复已核定大正文、不新增客户技术验收。

@@ -345,11 +345,11 @@
         "I03-C05"
       ],
       "done_when": "大材料/目录/日志下响应、事务锁、取消/超时及worker名额正确；可见/被遮挡卡片的真实Core通知确认及清理正确。",
-      "next_action": "真实材料IO/日志六项已核定；Native大正文输入、真实通知和取消/超时随集中候选补齐，先核对R09原版信息与错误态。",
+      "next_action": "继续真实Core通知的可见/遮挡/离视口/关闭与监听释放，随后实际文件IO取消/超时；大正文已核定不重复。",
       "owner": "Codex",
       "external_condition": "none_confirmed_blocking_current_independent_work",
       "native_private_storage_followup": "同步私聊落盘在大正文/真实输入压力下的响应归既有R08源IO与规模验证，不用小输入恢复测试代替性能资格。",
-      "latest_partial_verification": "i03-r08-source-load-verification.json",
+      "latest_partial_verification": "i03-r08-native-large-input-verification.json",
       "verified_core_boundaries": {
         "directory_files": 1500,
         "large_file_bytes": 20971520,
@@ -374,10 +374,19 @@
         "messages_and_model_runs_created": 0
       },
       "remaining_runtime_boundaries": [
-        "Native大正文可靠保存期间的实际键盘输入和界面响应",
         "可见、遮挡、移出视口和关闭卡片的真实Core通知确认及监听释放",
-        "worker取消/超时期间名额不提前释放的适用运行边界；已有静态/单元资格不扩大为整App实测"
-      ]
+        "实际文件IO取消或超时期间worker名额生命周期；本轮受控阻塞Core集成测试只证明取消等待者不提前释放名额"
+      ],
+      "verified_native_large_input": {
+        "body_bytes": 1048707,
+        "keys": 16,
+        "real_paste_ms": 497.295900000001,
+        "key_p95_ms": 131.5,
+        "frame_max_ms": 374.9000000000001,
+        "main_max_ms": 76.67199999999866,
+        "independent_core_response_ms": 5,
+        "fresh_app_core_exact_restore": true
+      }
     },
     {
       "id": "I03-R09",
@@ -634,5 +643,6 @@
     "真实移动平台按I10推进；终端平台专属保护按相应平台阶段补齐，不能被Windows结果代替"
   ],
   "change_control": "剩余编号固定；发现缺陷归入已有组并说明影响。新增必需范围须有来源和编号变更记录；不能为减少数量合并隐藏未完成条件。",
-  "latest_verification": "i03-r07-native-input-verification.json"
+  "latest_verification": "i03-r07-native-input-verification.json",
+  "latest_partial_verification": "i03-r08-native-large-input-verification.json"
 }

@@ -663,6 +663,12 @@
           "source": "0cd981afcfe8b1dc856f0f2e032b7a5fba3c6970",
           "status": "engineering_verified_within_declared_local_scope",
           "evidence": "i03-r07-native-input-verification.json"
+        },
+        {
+          "kind": "r08-native-mebibyte-private-input-cold-restore-and-existing-core-worker-owner",
+          "source": "f2327d3c1ead2fa7591e7e4d7558380e50d1e82c",
+          "status": "partial_engineering_verification",
+          "evidence": "i03-r08-native-large-input-verification.json"
         }
       ],
       "engineering_validation": "in_progress",
