@@ -172,3 +172,13 @@ final result: blocked
 final result: blocked
 
 完整阶段工程验证未完，局部Renderer检查已过。
+
+## 原画板列表轮廓与数量（源码接线，待候选运行）
+
+固定Codeg原BoardCard/CanvasBoardPreview采用16:10轮廓、12px卡片、紧凑文案/节点数量/编辑时间及独立菜单。已改为Core同事务summaries真实投影；保留完整计数，SQL仅返回最大200几何轮廓，不读取正文/路径/会话身份，不启动任何卡片。旧服务缺字段明确统计不可用，错配响应保留最后有效列表。单独列表容器承担溢出滚动，网格按内容等高排布，避免fr行在空余窗口里被拉长。
+
+2个TS owner共8项、标准types、源SQL在内存SQLite的5项边界、文档检查通过；新Rust断言只扩原owner，尚未编译执行。未构建App、未新增Native；没有当前列表截图，不宣告视觉通过。原右键菜单和删除前终端数量提示仍待补；真实Core/Host、日夜/小窗口最后卡片可达性及完整八类按候选检查。报告integration/execution/i03-c06-board-preview-projection-result.json。
+
+final result: blocked
+
+完整工程验证未完，目标active，无新增客户事项。
