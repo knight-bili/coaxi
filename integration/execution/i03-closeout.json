@@ -76,12 +76,12 @@
     {
       "id": "I03-C02",
       "name": "独立Mission/Task/Diff持久引用与定位",
-      "status": "implementation_ready_for_stage_verification",
+      "status": "engineering_verified_within_declared_local_scope",
       "done_when": "原对象与引用精确绑定，启动/定位/失效可恢复，包含实际Core集成；既有Thread关联Mission不代替独立pin",
-      "latest_partial_evidence": "i03-c02-ready-diff-public-cold-native-verification.json",
+      "latest_partial_evidence": "i03-r05-object-cold-diff-verification.json",
       "remaining": [
-        "原Mission/历史Task/具体文件工作区8场景及ready Git精确路径已结算；新进程对象冷路由、Diff过期/容量/多查看器释放按R05补齐。",
-        "原Rust事务/迁移owner已有实际执行，最终当前候选必要集成归R10；不再保留笼统“尚未编译/定位”待办。"
+        "原对象路由与真实精确Git证据保留；rc20新进程对象恢复、Diff刷新/过期/容量/多查看器释放已核定。",
+        "最终当前候选与原正式场景继续R10；其他平台资格不由Windows结果替代。"
       ],
       "ready_git_native_evidence": "i03-c02-ready-diff-public-cold-native-verification.json",
       "verified_ready_git": "真实Core创建固定基准Mission worktree，实际三文件变更及中文精确Diff；真实索引SHA/mtime与条目均保持；原画布pin打开原MissionDiff并显示正确增删行，文件变干净后明确提示而无替代"
@@ -240,11 +240,11 @@
   "latest_settlement": "i03-closeout-settlement.json",
   "remaining_queue_counts": {
     "settled_obligations": 17,
-    "open_work_groups": 6,
+    "open_work_groups": 5,
     "private_cases_verified": 24,
     "private_cases_open": 0,
-    "verified_work_groups": 4
+    "verified_work_groups": 5
   },
-  "latest_group_verification": "i03-r04-process-interruption-verification.json",
+  "latest_group_verification": "i03-r05-object-cold-diff-verification.json",
   "latest_preparation": "i03-r01-private-workflow-preparation.json"
 }

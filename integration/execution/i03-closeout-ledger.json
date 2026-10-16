@@ -14,10 +14,10 @@
   },
   "counts": {
     "settled_obligations": 17,
-    "open_work_groups": 6,
+    "open_work_groups": 5,
     "private_cases_verified": 24,
     "private_cases_open": 0,
-    "verified_work_groups": 4
+    "verified_work_groups": 5
   },
   "count_boundary": "不同层级不相加；17条为限定范围旧待办，固定10组按状态计算剩余；私聊按原24场景逐项核定，不计算完成百分比",
   "settled_obligations": [
@@ -265,15 +265,16 @@
     {
       "id": "I03-R05",
       "name": "业务对象冷路由、Diff更新/容量与释放",
-      "status": "open",
+      "status": "engineering_verified",
       "private_cases": [],
       "original_groups": [
         "I03-C02"
       ],
       "done_when": "Mission/Task/具体文件在新进程仍回原工作区；过期/容量/视图更新和多查看器释放有证据。",
-      "next_action": "复用已过精确Git和8项原对象路由，只补新进程、视图状态和资源缺口。",
+      "next_action": "本组本机工程边界完成；进入R06跨Thread文件、HTML上限/释放与冷恢复。",
       "owner": "Codex",
-      "external_condition": "none_confirmed_blocking_current_independent_work"
+      "external_condition": "none_confirmed_blocking_current_independent_work",
+      "latest_verification": "i03-r05-object-cold-diff-verification.json"
     },
     {
       "id": "I03-R06",
@@ -553,5 +554,5 @@
     "真实移动平台按I10推进；终端平台专属保护按相应平台阶段补齐，不能被Windows结果代替"
   ],
   "change_control": "剩余编号固定；发现缺陷归入已有组并说明影响。新增必需范围须有来源和编号变更记录；不能为减少数量合并隐藏未完成条件。",
-  "latest_verification": "i03-r04-process-interruption-verification.json"
+  "latest_verification": "i03-r05-object-cold-diff-verification.json"
 }
