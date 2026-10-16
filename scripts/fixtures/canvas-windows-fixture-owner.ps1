@@ -6,6 +6,15 @@ if ($item.Name -notmatch '^rc22-native-notifications-r[1-9][0-9]*$' -or $item.Pa
 $core=(Resolve-Path -LiteralPath (Join-Path $target 'Core')).Path
 $user=[Security.Principal.WindowsIdentity]::GetCurrent().User
 $admin=New-Object Security.Principal.SecurityIdentifier('S-1-5-32-544')
+Add-Type -TypeDefinition @'
+using System; using System.Runtime.InteropServices;
+public static class CanvasFixtureOwner {
+ [DllImport("advapi32.dll",CharSet=CharSet.Unicode)]
+ public static extern uint SetNamedSecurityInfo(string name,int type,uint information,byte[] owner,IntPtr group,IntPtr dacl,IntPtr sacl);
+}
+'@
+$sidBytes=New-Object byte[] $user.BinaryLength
+$user.GetBinaryForm($sidBytes,0)
 $candidates=@(foreach ($name in @('skills','runtime-private','quick-chat')) {
  $path=Join-Path $core $name
  if (Test-Path -LiteralPath $path) { Get-Item -LiteralPath $path -Force; Get-ChildItem -LiteralPath $path -Force -Recurse }
@@ -24,7 +33,8 @@ foreach ($entry in $before) {
  $acl=Get-Acl -LiteralPath $entry.path
  if ($acl.Sddl -ne $entry.sddl) { throw 'Fixture permissions changed after snapshot' }
  $originalAccess=$acl.GetSecurityDescriptorSddlForm([Security.AccessControl.AccessControlSections]::Access)
- $acl.SetOwner($user);Set-Acl -LiteralPath $entry.path -AclObject $acl
+ $errorCode=[CanvasFixtureOwner]::SetNamedSecurityInfo($entry.path,1,1,$sidBytes,[IntPtr]::Zero,[IntPtr]::Zero,[IntPtr]::Zero)
+ if ($errorCode -ne 0) { throw ('Native owner-only preparation failed: '+$errorCode) }
  $after=Get-Acl -LiteralPath $entry.path
  if ($after.GetOwner([Security.Principal.SecurityIdentifier]).Value -ne $user.Value) { throw 'Fixture owner preparation did not apply' }
  if ($after.GetSecurityDescriptorSddlForm([Security.AccessControl.AccessControlSections]::Access) -ne $originalAccess) { throw 'Fixture DACL changed during owner preparation' }
