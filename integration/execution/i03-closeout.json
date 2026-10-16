@@ -30,9 +30,9 @@
         "孤立Core/本机正文及冲突统一恢复"
       ],
       "done_when": "本阶段完整使用流程及PC01-PC24适用工程验证有当前源码证据，外部环境缺项明确单列",
-      "latest_partial_evidence": "i03-r02-native-send-verification.json",
+      "latest_partial_evidence": "i03-r02-complete-send-boundaries-verification.json",
       "remaining_runtime_risks": [
-        "私聊17项本机边界已核定，剩余PC02/11/14/15/16/21/22；默认正文并行、越权工作副本、最终Blob/引用顺序、源变化、FIFO及整进程中断继续R02/R04。",
+        "私聊22项当前本机边界已核定，仅PC21/22整App/Core进程中断、接受前/后及未知在途请求继续R04；其他平台与外部推理不由固定ACP结果替代。",
         "实际Host/Native IPC/资源授权验证后启用最终文件入口，UI模拟验证不能替代",
         "完整PC01-PC24适用工程场景与异常恢复待集中验证；发现代码缺口回到C01修复",
         "实际大材料/日志枚举/事务锁规模归I03-C05验证；本批32副本只验证字典读取次数"
@@ -44,9 +44,10 @@
         "删除pin后的原归属恢复与冷启动保持；原读者精确读取卡片和retained附件、跨卡拒绝",
         "rc17/18四类实际页面模式：稳定DOM顺序及撤销/引用/revision往返、完整移回/保留/交换、同UUID重试和只读核对、接管保存、删除后原位置恢复及结束原单聊后的迟到上传。",
         "rc19真实双Core Web切换的上传隔离及当前Desktop往返/撤销/CAS回归通过，R01全部九项本机边界核定。",
-        "rc19真实发送只消费本卡且另一卡正文/附件/引用和默认材料完整保持；真实仅附件发送及实际ACP源路径/内容核验通过。"
+        "rc19真实发送只消费本卡且另一卡正文/附件/引用和默认材料完整保持；真实仅附件发送及实际ACP源路径/内容核验通过。",
+        "rc19五项完整发送边界通过：默认正文双向独立、越权quote/working拒绝、最终持久Blob与实际ACP原文一致、源变化/缺失/同名替换拒绝、原FIFO恢复与顺序。"
       ],
-      "file_ui_status": "R01实际完整输入恢复及跨Core上传隔离已核定；源变化、最终发送与实际进程中断继续R02/R04。",
+      "file_ui_status": "R01/R02实际输入恢复、发送、源变化及最终输入已核定；整App/Core中断继续R04，完整文件资源与原版UI仍在其既定工作组。",
       "resolved_fixture_incident": "旧两测试Thread空附件视图目录缺失后已有Core重建恢复，当前ready/error为空且目录存在，后续启动无同事件；初始消失原因和非空旧附件恢复未由本次证明。"
     },
     {
@@ -216,11 +217,11 @@
   "latest_settlement": "i03-closeout-settlement.json",
   "remaining_queue_counts": {
     "settled_obligations": 17,
-    "open_work_groups": 8,
-    "private_cases_verified": 17,
-    "private_cases_open": 7,
-    "verified_work_groups": 2
+    "open_work_groups": 7,
+    "private_cases_verified": 22,
+    "private_cases_open": 2,
+    "verified_work_groups": 3
   },
-  "latest_group_verification": "i03-r02-native-send-verification.json",
+  "latest_group_verification": "i03-r02-complete-send-boundaries-verification.json",
   "latest_preparation": "i03-r01-private-workflow-preparation.json"
 }

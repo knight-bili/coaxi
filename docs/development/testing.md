@@ -1,7 +1,7 @@
 ---
 document_type: development-guide
 authority: test-policy-and-command-routing
-last_updated: 2026-10-16
+last_updated: 2026-10-17
 ---
 
 # 测试与 Smoke Test
@@ -42,6 +42,15 @@ PC10 的不同 Core 分支扩展现有 `host-web-live.test.mjs`，定向 owner �
 检查新Core正文/附件/引用/消息/Run不被旧结果改写、旧Core仍保留原材料；旧文档取消与实际延迟释放分别记录。
 该owner当前限定Windows，必须显式指定已核定的Host、Web、Chrome与唯一输出路径；不配置Runtime、不调用模型、不复用日常浏览器数据。
 本轮累计异常场景与待集成CSS使用同一修复候选做本地页面验证，复用源码未变的现有Core；不触发额外平台Actions或全Rust编译。
+
+I03 R02 继续使用同一 Native owner 的 `private-send` 与 `private-send-boundaries` 模式，后者将
+`canvas-private-send-boundaries.mjs` 单独复制并绑定摘要。实际默认正文/画布往返、两处发送、跨卡quote/working拒绝、
+原FIFO及源变化均经过生产UI/IPC/Core；最终Managed Blob用只读SQLite连接读取并核对摘要、原section、
+两个引用顺序和实际固定ACP收到的完整原文，不以Core草稿或最终材料API替代Runtime交接。
+测试源文件修改前保留字节及归属快照，解析绝对路径且仅操作本次隔离Core中的合成文件；业务数据库不种入行。
+固定ACP的会话恢复与暂停准入由 `node --test scripts/lib/streaming-acp-runtime.test.mjs` 拥有：
+必须恢复请求的准确Session ID，旧历史中的暂停标记不能阻塞后继CURRENT_INPUT。
+固定协议资格不代表外部模型推理；整App/Core中断、其他平台和完整UI仍分别核验，不由这些模式提前通过。
 
 I03 多卡输入的最低层 owner 为 `canvas-conversations-controller.test.ts`（精确上下文、全部准备回滚、模式切换与孤立输入保留）
 和 `thread-workspace-actions.test.ts`（不同 Thread 命令归属、冻结发送及拒绝/未知不清输入）。

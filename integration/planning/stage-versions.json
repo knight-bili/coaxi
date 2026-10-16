@@ -312,6 +312,58 @@
             "deadline_terminated": false,
             "at": "2026-10-16T17:21:50.128Z"
           }
+        },
+        {
+          "kind": "native-private-send-boundaries-r1",
+          "candidate_version": "fusion-i03-rc.19",
+          "source_commit": "8bc026f9c0f116e85a92949c06716fb761e1cd96",
+          "status": "failed",
+          "driver_exit": {
+            "code": 0,
+            "signal": null,
+            "deadline_terminated": false,
+            "at": "2026-10-16T17:38:13.938Z"
+          },
+          "evidence": "i03-r02-complete-send-boundaries-verification.json"
+        },
+        {
+          "kind": "native-private-send-boundaries-r2",
+          "candidate_version": "fusion-i03-rc.19",
+          "source_commit": "8bc026f9c0f116e85a92949c06716fb761e1cd96",
+          "status": "failed",
+          "driver_exit": {
+            "code": 0,
+            "signal": null,
+            "deadline_terminated": false,
+            "at": "2026-10-16T17:41:03.203Z"
+          },
+          "evidence": "i03-r02-complete-send-boundaries-verification.json"
+        },
+        {
+          "kind": "native-private-send-boundaries-r3",
+          "candidate_version": "fusion-i03-rc.19",
+          "source_commit": "8bc026f9c0f116e85a92949c06716fb761e1cd96",
+          "status": "failed",
+          "driver_exit": {
+            "code": 0,
+            "signal": null,
+            "deadline_terminated": false,
+            "at": "2026-10-16T17:42:26.558Z"
+          },
+          "evidence": "i03-r02-complete-send-boundaries-verification.json"
+        },
+        {
+          "kind": "native-private-send-boundaries-r4",
+          "candidate_version": "fusion-i03-rc.19",
+          "source_commit": "8bc026f9c0f116e85a92949c06716fb761e1cd96",
+          "status": "passed",
+          "driver_exit": {
+            "code": 0,
+            "signal": null,
+            "deadline_terminated": false,
+            "at": "2026-10-16T17:44:19.130Z"
+          },
+          "evidence": "i03-r02-complete-send-boundaries-verification.json"
         }
       ],
       "engineering_validation": "in_progress",
@@ -472,11 +524,11 @@
       "related_rust": "historical_results_retained_current_core_reused_e0c4fad7_no_rerun",
       "actual_host_pty": "passed",
       "native_app_scale_platform": "full_flows_scale_and_platform_pending",
-      "native_desktop": "rc19_roundtrip_undo_CAS_verified_R01_closed_other_groups_open",
+      "native_desktop": "R01_R02_local_native_verified_R03_host_verified_remaining_R04_to_R10_open",
       "full_types": "passed_current_tree",
       "desktop_build": "passed_rc19",
       "web_build": "passed_rc19",
-      "next_renderer_batch": "继续R02的PC02/11/14/15/16及R04的PC21/22；R01完成，发送隔离和仅附件发送复用，不新增构建。",
+      "next_renderer_batch": "推进R04的PC21/22实际App/Core中断与原UUID/冻结输入恢复；R01/R02/R03已完成，不重复已过且源码未变的模式，之后R05–R10。",
       "rust_evidence_scope": "原历史owner及rc15编译/执行保留；本轮Core未改未重编，不把历史Rust数量写成rc19新增通过。"
     },
     {
