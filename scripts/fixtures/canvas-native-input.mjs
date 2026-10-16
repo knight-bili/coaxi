@@ -36,7 +36,7 @@ async function qualify(window){
   if(report.renderer_errors.length>8)report.renderer_errors.shift()
  })
  const evaluate=async expression=>{
-  const result=await window.webContents.executeJavaScript(`(async()=>{try{return {ok:true,value:await (${expression})}}catch(error){return {ok:false,error:String(error.stack??error)}}})()`,true)
+  const result=await window.webContents.executeJavaScript(`(async()=>{try{return {ok:true,value:await (${expression})}}catch(error){return {ok:false,error:String(error?.stack??error?.message??JSON.stringify(error))}}})()`,true)
   if(!result.ok)throw Error(result.error)
   return result.value
  }
@@ -915,7 +915,7 @@ async function qualifyPublicMulti(window,{evaluate,wait,rpc}){
  const authority=JSON.parse(await readFile(config.public_threads_evidence,'utf8'))
  const threadIds=authority.rows.map(row=>row.camp_id)
  assert.equal(threadIds.length,2);assert.equal(threadIds[0],config.thread_id);assert.notEqual(threadIds[0],threadIds[1])
- const before=await Promise.all(threadIds.map(threadId=>rpc('threads.open',{threadId})))
+ const before=await Promise.all(threadIds.map(threadId=>rpc('threads.open',{threadId,traceId:randomUUID()})))
  const original=before.map(value=>({messages:value.messages,agentRuns:value.agentRuns}))
  const created=await rpc('canvas.boards.create',{commandId:randomUUID(),command:{name:'C05 公开双Thread与镜像卡'}})
  assert.equal(created.status,'applied',JSON.stringify(created))
@@ -997,7 +997,7 @@ async function qualifyPublicMulti(window,{evaluate,wait,rpc}){
   for(const index of [0,1,2])await close(index)
   await count('all_reopened_cards_closed',0)
  }finally{window.webContents.debugger.detach()}
- const after=await Promise.all(threadIds.map(threadId=>rpc('threads.open',{threadId})))
+ const after=await Promise.all(threadIds.map(threadId=>rpc('threads.open',{threadId,traceId:randomUUID()})))
  for(const [index,snapshot] of after.entries()){assert.deepEqual(snapshot.messages,original[index].messages);assert.deepEqual(snapshot.agentRuns,original[index].agentRuns)}
  record('public_multi_card_input_and_navigation_do_not_publish_messages_or_start_agent_runs')
  const summary=await rpc('canvas.boards.create',{commandId:randomUUID(),command:{name:'C05 真实64摘要卡'}})
