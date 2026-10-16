@@ -835,7 +835,7 @@ async function qualifyRendererCrash(window,{evaluate,wait,rpc}){
   window.webContents.forcefullyCrashRenderer()
   const details=await gone.finally(()=>clearTimeout(timer))
   assert.ok(['killed','crashed'].includes(details.reason),JSON.stringify(details))
-  report.crashes??=[];report.crashes.push({kind,before_renderer_pid:before,main_pid:mainPid,details,recovery_action:'explicit_webContents_reload'})
+  report.crashes??=[];report.crashes.push({kind,before_renderer_pid:before,main_pid:mainPid,details,recovery_action:'explicit_webContents_reload_then_open_exact_board'})
   await writeFile(join(config.evidence,'crash-events.json'),JSON.stringify(report.crashes,null,2)+'\n')
   await new Promise((resolve,reject)=>{
    const loaded=()=>{clearTimeout(timer);resolve()}
@@ -846,11 +846,14 @@ async function qualifyRendererCrash(window,{evaluate,wait,rpc}){
   const after=window.webContents.getOSProcessId()
   assert.ok(before>0&&after>0&&before!==after);assert.equal(process.pid,mainPid)
   report.crashes.at(-1).after_renderer_pid=after
+  report.crashes.at(-1).landing_on_canvas=await evaluate(`Boolean(document.querySelector('.canvas-workspace'))`)
+  // Main retains its original startup snapshot after a renderer reload; select the exact persisted board as on cold recovery.
+  await openCanvasBoard(evaluate,wait,boardId)
   await wait(`Boolean(${inputs[0]}&&${inputs[1]}&&${inputs[0]}.value===${JSON.stringify(texts[0]+last)}&&${inputs[1]}.value===${JSON.stringify(texts[1])})`,30_000)
  }
  await evaluate(`(()=>{const input=${inputs[0]};input.focus();input.setSelectionRange(input.value.length,input.value.length);return true})()`)
  await crashAndReload('last_private_character',()=>window.webContents.insertText(last))
- record('forced_renderer_termination_after_last_private_character_restores_both_exact_pins_and_distinct_bodies')
+ record('reopening_exact_board_after_forced_renderer_termination_recovers_last_private_character_and_both_distinct_bodies')
  const note=`document.querySelector('[data-id="${nodeIds[2]}"] .canvas-note-paper')`,noteText='尚未失焦保存的便笺，最后字符：乙'
  await evaluate(`(()=>{${note}.focus();return true})()`)
  window.webContents.sendInputEvent({type:'keyDown',keyCode:'F2'});window.webContents.sendInputEvent({type:'keyUp',keyCode:'F2'})
