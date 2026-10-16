@@ -14,6 +14,11 @@ const record=(name,details={})=>{report.checks.push({name,passed:true,...details
 async function openCanvasBoard(evaluate,wait,boardId){
  await evaluate(`(()=>{document.querySelector('button[aria-label="无限画布"]').click();return true})()`)
  await wait(`Boolean(document.querySelector('.canvas-breadcrumb-root:not(:disabled)'))`)
+ await wait(`Boolean(document.querySelector('.canvas-board-title')||document.querySelector('.canvas-boards-home'))`)
+ if(await evaluate(`Boolean(document.querySelector('.canvas-board-title[data-board-id="${boardId}"]'))`)){
+  await wait(`Boolean(document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]'))`)
+  return
+ }
  await evaluate(`(()=>{document.querySelector('.canvas-breadcrumb-root').click();return true})()`)
  await wait(`Boolean(document.querySelector('.canvas-board-tile[data-board-id="${boardId}"]:not(:disabled)'))`,40_000)
  await evaluate(`(()=>{document.querySelector('.canvas-board-tile[data-board-id="${boardId}"]').click();return true})()`)
@@ -144,6 +149,11 @@ async function qualify(window){
  }catch(error){report.status='failed';report.error=String(error.stack??error);report.runtime_errors=await evaluate('window.nativeRuntimeErrors').catch(()=>null);report.native_keys=await evaluate('window.nativeKeys').catch(()=>null);report.dom=await evaluate('document.body.innerText.slice(-2500)').catch(()=>null);if((report.screenshots?.length??0)<3){const path=join(config.evidence,'failure.png');await writeFile(path,(await window.webContents.capturePage()).toPNG()).then(()=>{(report.screenshots??=[]).push(path)}).catch(()=>{})}}
  finally{
   if(report.status==='failed')await evaluate(`(()=>{document.querySelector('.canvas-board-dialog .app-dialog-close:not(:disabled)')?.click();return true})()`).catch(()=>{})
+  if(report.status==='failed'&&report.crash_context?.nodeIds?.[2]){
+   const noteId=report.crash_context.nodeIds[2]
+   report.fixture_note_cleanup=await evaluate(`(()=>{const button=document.querySelector('[data-id="${noteId}"] .canvas-note-status button:not(:disabled)');if(!button)return 'no_visible_fixture_note';button.click();return 'requested_own_note_save'})()`).catch(()=> 'renderer_unavailable')
+   if(report.fixture_note_cleanup==='requested_own_note_save')await wait(`!document.querySelector('[data-id="${noteId}"] .canvas-note-status')`).catch(()=>{})
+  }
   report.finished_at=new Date().toISOString();await writeFile(join(config.evidence,'result.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({status:report.status,evidence:config.evidence}));process.exitCode=report.status==='passed'?0:1;app.quit()
  }
 }
