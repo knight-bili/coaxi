@@ -7,7 +7,16 @@ import { setTimeout as pause } from 'node:timers/promises'
 
 // 只计时原生产处理器，不代替存储、不改变同步IPC或回执。
 export function installNativeLoadIpc(ipcMain) {
- const on=ipcMain.on,operations=[];let registered=false
+ const on=ipcMain.on,handle=ipcMain.handle,operations=[],domainOperations=[];let registered=false,requestRegistered=false
+ ipcMain.handle=function(channel,handler){
+  if(channel!=='rovai:request')return handle.call(this,channel,handler)
+  requestRegistered=true
+  return handle.call(this,channel,async(event,method,params)=>{
+   if(method!=='canvas.boards.create')return handler(event,method,params)
+   const entry={commandId:params?.commandId,enteredAt:Date.now()};domainOperations.push(entry)
+   const result=await handler(event,method,params);entry.coreReplyAt=Date.now();entry.status=result.value?.status??null;return result
+  })
+ }
  ipcMain.on=function(channel,handler){
   if(channel!=='rovai:private-input-recovery')return on.call(this,channel,handler)
   registered=true
@@ -17,7 +26,7 @@ export function installNativeLoadIpc(ipcMain) {
    return result
   })
  }
- return {finishRegistration(){ipcMain.on=on;assert.ok(registered)},releaseAll(){},snapshot:()=>({operations})}
+ return {finishRegistration(){ipcMain.on=on;ipcMain.handle=handle;assert.ok(registered&&requestRegistered)},releaseAll(){},snapshot:()=>({operations,domainOperations})}
 }
 const hash=value=>createHash('sha256').update(value).digest('hex')
 const stats=values=>{const s=[...values].sort((a,b)=>a-b);return {samples:s.length,p50:s[Math.max(0,Math.ceil(s.length*.5)-1)]??0,p95:s[Math.max(0,Math.ceil(s.length*.95)-1)]??0,max:s.at(-1)??0}}
@@ -99,6 +108,7 @@ export async function qualifyCanvasNativeLoad(window,{evaluate,wait,rpc,openCanv
    await wait(`Boolean(window.r08Independent?.completed||window.r08Independent?.error)`);await wait(`${input(0)}.value.endsWith(${JSON.stringify(keys)})`)
    await evaluate('(()=>{window.r08Measure=false;return true})()');const observed=await evaluate('({frames:window.r08Frames,inputs:window.r08Inputs,transaction:window.r08Independent})'),transaction=observed.transaction
    assert.equal(transaction.status,'applied');assert.ok(Number.isFinite(transaction.coreRecordedAt))
+   const domain=seam.snapshot().domainOperations.find(row=>row.commandId===transaction.commandId);assert.equal(domain.status,'applied');transaction.mainCoreReplyAt=domain.coreReplyAt;transaction.mainCoreDurationMs=domain.coreReplyAt-domain.enteredAt
    const typed=observed.inputs.filter(row=>row.length>large.length)
    assert.equal(typed.length,keys.length);assert.ok(typed.every(row=>row.trusted))
    const latencies=typed.map((row,n)=>row.at-sent[n]);assert.ok(latencies.every(x=>x>=0))
@@ -106,7 +116,7 @@ export async function qualifyCanvasNativeLoad(window,{evaluate,wait,rpc,openCanv
    assert.ok(report.native_load_metrics.keyLatencyMs.p95<250,'Observed input latency exceeded the local engineering budget')
    assert.ok(report.native_load_metrics.mainTimerGapMs.max<1000&&report.native_load_metrics.rendererFrameGapMs.max<1000,'Owned application stalled over one second')
    // 测试脚本发完输入不代表Renderer处理完输入；以真实Core回执与可信DOM事件核对交错。
-   assert.ok(transaction.coreRecordedAt>=typed[0].at&&transaction.coreRecordedAt<typed.at(-1).at,'Independent Core commit must occur during actual input handling')
+   assert.ok(transaction.mainCoreReplyAt>=typed[0].at&&transaction.mainCoreReplyAt<typed.at(-1).at,'Original Main handler must receive the applied Core response during actual input handling')
    assert.equal((await readInput(0)).sha256,hash(expected));assert.equal((await readInput(1)).sha256,hash(other))
    record('actual_mebibyte_private_input_keeps_all_sixteen_trusted_keys_and_other_card_while_independent_core_transaction_completes')
    report.persisted_bodies=[await savedBody(expected),await savedBody(other)]
