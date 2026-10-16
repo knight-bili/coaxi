@@ -13,7 +13,7 @@ await mkdir(config.evidence,{recursive:false})
 let started=false
 const privateModes=['private-roundtrip','private-queue','private-rebind','private-late-upload','private-send','private-send-boundaries','private-core-interruption','private-app-interruption']
 let privateWorkflow,privateIpc
-let objectWorkflow, fileWorkflow, terminalWorkflow
+let objectWorkflow, fileWorkflow, terminalWorkflow, nativeLoadWorkflow
 const record=(name,details={})=>{report.checks.push({name,passed:true,...details});console.log(JSON.stringify({check:name,passed:true}))}
 async function openCanvasBoard(evaluate,wait,boardId){
  await evaluate(`(()=>{document.querySelector('button[aria-label="无限画布"]').click();return true})()`)
@@ -47,7 +47,7 @@ async function qualify(window){
  const wait=async(expression,timeout=20_000)=>{const until=Date.now()+timeout;while(Date.now()<until){if(await evaluate(expression))return;await pause(100)}throw Error('Native condition timed out: '+expression)}
  const rpc=(method,params={})=>evaluate(`window.rovai.request(${JSON.stringify(method)},${JSON.stringify(params)})`)
  try{
-  if(privateModes.includes(config.mode)||config.mode==='object-cold'||config.mode==='file-resources'||config.mode==='terminal-input'){
+  if(privateModes.includes(config.mode)||config.mode==='object-cold'||config.mode==='file-resources'||config.mode==='terminal-input'||config.mode==='native-load'){
    await wait(`window.rovai?.onboarding&&window.rovai.onboarding.get().then(value=>value.status!=='uninitialized')`,60_000)
    const initial=await evaluate('window.rovai.onboarding.get()')
    if(initial.status!=='completed'){
@@ -167,6 +167,11 @@ async function qualify(window){
    await qualifyPublicCold(window,{evaluate,wait,rpc})
    report.status='passed'
    return
+  }
+  if(config.mode==='native-load'){
+   report.scope='production Main/preload/Core; real large private editor input, synchronous durable save and actual frame/event-loop measurements; no model'
+   await nativeLoadWorkflow.qualifyCanvasNativeLoad(window,{evaluate,wait,rpc,openCanvasBoard,config,report,record,seam:privateIpc})
+   report.status='passed';return
   }
   if(config.mode==='terminal-input'){
    report.scope='production Main/preload/Core; physical Windows IME, actual clipboard and terminal remount; no model'
@@ -1272,6 +1277,11 @@ async function qualifyPublicCold(window,{evaluate,wait,rpc}){
  record('public_cold_reopening_keeps_original_two_threads_without_sending_messages_or_starting_model_runs')
  await evaluate(`(()=>{document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]').click();return true})()`);await pause(350)
  await writeFile(join(config.evidence,'01-cold-public-pin-drafts.png'),(await window.webContents.capturePage()).toPNG())
+}
+if(config.mode==='native-load'){
+ assert.equal(createHash('sha256').update(await readFile(new URL(config.native_load_module))).digest('hex'),config.native_load_sha256)
+ nativeLoadWorkflow=await import(config.native_load_module)
+ privateIpc=nativeLoadWorkflow.installNativeLoadIpc(ipcMain)
 }
 if(config.mode==='terminal-input'){
  assert.equal(createHash('sha256').update(await readFile(new URL(config.terminal_input_module))).digest('hex'),config.terminal_input_sha256)
