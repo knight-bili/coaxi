@@ -86,17 +86,17 @@ export async function qualifyCanvasNativeLoad(window,{evaluate,wait,rpc,openCanv
   await seed(1,other)
   const mainGaps=[];let previous=performance.now();const heartbeat=setInterval(()=>{const now=performance.now();mainGaps.push(now-previous);previous=now},20)
   try {
-   await evaluate(`(()=>{window.r08Frames=[];window.r08Inputs=[];window.r08LastFrame=performance.now();window.r08Measure=true;const tick=now=>{if(!window.r08Measure)return;window.r08Frames.push(now-window.r08LastFrame);window.r08LastFrame=now;requestAnimationFrame(tick)};requestAnimationFrame(tick);document.addEventListener('input',event=>{if(event.target===${input(0)})window.r08Inputs.push({at:performance.timeOrigin+performance.now(),trusted:event.isTrusted,length:event.target.value.length})});return true})()`)
+   await evaluate(`(()=>{window.r08Frames=[];window.r08Inputs=[];window.r08Independent=null;window.r08LastFrame=performance.now();window.r08Measure=true;const tick=now=>{if(!window.r08Measure)return;window.r08Frames.push(now-window.r08LastFrame);window.r08LastFrame=now;requestAnimationFrame(tick)};requestAnimationFrame(tick);document.addEventListener('input',event=>{if(event.target!==${input(0)})return;window.r08Inputs.push({at:performance.timeOrigin+performance.now(),trusted:event.isTrusted,length:event.target.value.length});if(event.target.value.length>${large.length}&&window.r08Inputs.filter(row=>row.length>${large.length}).length===4&&!window.r08Independent){const commandId=crypto.randomUUID(),transaction=window.r08Independent={started:Date.now(),commandId};void window.rovai.request('canvas.boards.create',{commandId,command:{name:'R08 输入期间独立事务'}}).then(value=>{transaction.status=value.status;transaction.coreRecordedAt=Date.parse(value.recordedAt);transaction.completed=Date.now();transaction.durationMs=transaction.completed-transaction.started}).catch(error=>{transaction.error=String(error)})}});return true})()`)
    const start=performance.now();await seed(0,large);report.large_seed_ms=performance.now()-start
    const initial=await readInput(0);assert.equal(initial.sha256,hash(large));assert.ok(initial.bytes>1024*1024)
-   const sent=[],transaction={};let independent
+   const sent=[]
    for(let n=0;n<keys.length;n++){
-    if(n===4){transaction.started=Date.now();independent=rpc('canvas.boards.create',{commandId:randomUUID(),command:{name:'R08 输入期间独立事务'}}).then(value=>{assert.equal(value.status,'applied');transaction.coreRecordedAt=Date.parse(value.recordedAt);assert.ok(Number.isFinite(transaction.coreRecordedAt));transaction.completed=Date.now();transaction.durationMs=transaction.completed-transaction.started;transaction.keysDispatched=sent.length})}
     sent.push(Date.now());const keyCode=keys[n]
     window.webContents.sendInputEvent({type:'keyDown',keyCode});window.webContents.sendInputEvent({type:'char',keyCode});window.webContents.sendInputEvent({type:'keyUp',keyCode});await pause(35)
    }
-   await independent;await wait(`${input(0)}.value.endsWith(${JSON.stringify(keys)})`)
-   await evaluate('(()=>{window.r08Measure=false;return true})()');const observed=await evaluate('({frames:window.r08Frames,inputs:window.r08Inputs})')
+   await wait(`Boolean(window.r08Independent?.completed||window.r08Independent?.error)`);await wait(`${input(0)}.value.endsWith(${JSON.stringify(keys)})`)
+   await evaluate('(()=>{window.r08Measure=false;return true})()');const observed=await evaluate('({frames:window.r08Frames,inputs:window.r08Inputs,transaction:window.r08Independent})'),transaction=observed.transaction
+   assert.equal(transaction.status,'applied');assert.ok(Number.isFinite(transaction.coreRecordedAt))
    const typed=observed.inputs.filter(row=>row.length>large.length)
    assert.equal(typed.length,keys.length);assert.ok(typed.every(row=>row.trusted))
    const latencies=typed.map((row,n)=>row.at-sent[n]);assert.ok(latencies.every(x=>x>=0))
