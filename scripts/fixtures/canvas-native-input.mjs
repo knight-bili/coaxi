@@ -233,11 +233,15 @@ async function qualify(window){
   const restored=await rpc('canvas.nodes.apply',{commandId:randomUUID(),command:{boardId:board.id,expectedRevision:finalGraph.board.revision,mutation:{type:'update',nodeId:terminal.id,patch:{width:terminal.data.width}}}})
   assert.equal(restored.status,'applied',JSON.stringify(restored))
   report.status='passed'
- }catch(error){report.status='failed';report.error=String(error.stack??error);report.runtime_errors=await evaluate('window.nativeRuntimeErrors').catch(()=>null);report.native_keys=await evaluate('window.nativeKeys').catch(()=>null);report.dom=await evaluate('document.body.innerText.slice(-2500)').catch(()=>null);if((report.screenshots?.length??0)<3){const path=join(config.evidence,'failure.png');await writeFile(path,(await window.webContents.capturePage()).toPNG()).then(()=>{(report.screenshots??=[]).push(path)}).catch(()=>{})}}
+ }catch(error){report.status='failed';report.error=String(error.stack??error);report.runtime_errors=await evaluate('window.nativeRuntimeErrors').catch(()=>null);report.native_keys=await evaluate('window.nativeKeys').catch(()=>null);report.dom=await evaluate('document.body.innerText.slice(-2500)').catch(()=>null);if(config.mode==='source-ui'||(report.screenshots?.length??0)<3){const path=join(config.evidence,'failure.png');await writeFile(path,(await window.webContents.capturePage()).toPNG()).then(()=>{(report.screenshots??=[]).push(path)}).catch(()=>{})}}
  finally{
   if(privateIpc){privateIpc.releaseAll();report.private_ipc=privateIpc.snapshot()}
   if(config.capture_resize_observers)report.resize_observations=await evaluate('window.nativeResizeObservations').catch(()=>null)
   if(report.status==='failed')await evaluate(`(()=>{document.querySelector('.canvas-board-dialog .app-dialog-close:not(:disabled)')?.click();return true})()`).catch(()=>{})
+  if(report.status==='failed'&&config.mode==='source-ui'){
+   report.fixture_editor_cleanup=await evaluate(`(()=>{const dialog=document.querySelector('.canvas-node-editor'),button=dialog?.querySelector('.app-dialog-footer .quiet-button:not(:disabled)');if(!dialog)return 'no_fixture_editor';if(!button)return 'fixture_editor_locked';button.click();return 'original_fixture_editor_cancel_requested'})()`).catch(()=> 'renderer_unavailable')
+   if(report.fixture_editor_cleanup==='original_fixture_editor_cancel_requested')await wait('!document.querySelector(".canvas-node-editor")').catch(()=>{})
+  }
   if(report.status==='failed'&&config.mode==='ready-diff')await evaluate(`(()=>{document.querySelector('.mission-diff-dialog button[aria-label="关闭累计文件变更"]')?.click();document.querySelector('.canvas-object-dialog .app-dialog-close')?.click();return true})()`).catch(()=>{})
   if(report.status==='failed'&&report.crash_context?.nodeIds?.[2]){
    const noteId=report.crash_context.nodeIds[2]

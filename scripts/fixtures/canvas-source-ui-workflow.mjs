@@ -31,7 +31,14 @@ export async function qualifyCanvasSourceUi(window,{evaluate,wait,rpc,openCanvas
  }
  const settled=async()=>{await evaluate('Promise.all(document.getAnimations().filter(animation=>Number.isFinite(animation.effect?.getComputedTiming().iterations)).map(animation=>animation.finished.catch(()=>undefined)))');await evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))')}
  const screenshot=async(id,path)=>{await settled();await writeFile(path,(await window.webContents.capturePage()).toPNG());(report.screenshots??=[]).push(path);const item=report.ui_artifacts.find(item=>item.id===id);if(item)item.status='captured';await checkpoint()}
- const member=await rpc('members.create',{commandId:randomUUID(),command:{displayName:'R09 原版卡片队员',teamRole:'本机界面检查',professionalResponsibilities:'不发送消息、不调用模型。',personalityTraits:['严谨'],workingPrinciples:'保留原组件和真实身份',growthTopic:''}});assert.equal(member.status,'applied');const agentId=member.resultEntity.entityId
+ if(config.ui_phase==='layout'){
+  assert.equal(createHash('sha256').update(await readFile(new URL(config.board_ui_module))).digest('hex'),config.board_ui_sha256)
+  report.ui_artifacts=['board-list-day','board-list-night','board-delete'].map(id=>({id,path:join(config.evidence,id+'.png'),status:'pending'}))
+  const {qualifyCanvasBoardUi}=await import(config.board_ui_module)
+  return qualifyCanvasBoardUi(window,{evaluate,wait,rpc,config,report,record,click,key,text,button,menu,screenshot})
+ }
+ const profiles=await rpc('members.list'),member=profiles.find(item=>!item.removedAt);assert.ok(member);const agentId=member.agentId
+ report.member_fixture='original Core bootstrap member already present in the actual interface; member creation refresh belongs to its own workflow'
  const mission=await rpc('missions.create',{commandId:randomUUID(),command:{title:'R09 原工程会话',description:'仅原卡片UI验证，不启动执行。',projectBindingKind:'directory',projectPath:config.workspace,memberAgentIds:[agentId],defaultLeadAgentId:agentId,tags:[]}});assert.equal(mission.status,'applied');const threadId=mission.payload.threadId
  const sourceFile=join(config.workspace,'R09 真实文件.txt'),sourceText='R09 原文件预览\n中文与 emoji 🙂，保留原始字节。\n';await writeFile(sourceFile,sourceText,{flag:'wx'})
  report.ui_context={agentId,threadId,missionId:mission.payload.missionId,sourceFile,sourceSha256:createHash('sha256').update(sourceText).digest('hex')}
