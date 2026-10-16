@@ -79,11 +79,11 @@
       "name": "冷启动与多卡交互兼容",
       "status": "implementation_ready_for_stage_verification",
       "done_when": "真实Desktop冷路由、旧焦点/编辑器保持、恢复与本阶段规模检查完成；平台资源缺项单列",
-      "latest_partial_evidence": "i03-c05-notes-mirrors-native-verification.json",
+      "latest_partial_evidence": "i03-c05-renderer-crash-native-verification.json",
       "checked_subtasks": [
         {
           "id": "C05-cold",
-          "status": "partial_same_private_mirrors_warm_and_cold_native_verified",
+          "status": "partial_warm_cold_and_renderer_crash_private_note_recovery_native_verified",
           "scope": "Host/Core/board展示恢复、真实pin隔离、只读Thread恢复和原工作区导航"
         },
         {
@@ -104,12 +104,12 @@
       ],
       "remaining_implementation_batches": [],
       "remaining_verification": [
-        "同私聊双卡的暖路由/编辑器/正文冷恢复已通过；继续多Thread/公开卡、原生焦点、硬崩溃和ready Git Diff，原Task/Mission/文件精确定位复用已过证据",
+        "同私聊双卡暖冷/编辑器与renderer硬中断后正文/便笺本机副本已通过；继续公开/多Thread、原生焦点、整App/Core硬中断和未知请求、ready Git Diff；原Task/Mission/文件精确定位复用已过证据",
         "真实多卡/同Thread镜像的滚动、资源释放、HTML及终端窗口上限；局部64卡片夹具不是实际页面帧率",
         "真实Core大材料/目录/日志下的交互响应、事务锁和超时/取消；随C06当前源验证",
         "软键盘/IME与原生平台运行资格按可用环境记录，缺真机不假通过"
       ],
-      "partial_runtime_evidence": "同私聊双pin：第二卡打开不换第一编辑器，各自可信输入/材料scope独立，模式往返保留两个textarea及另一输入的滚动，收起重开单卡保留两份正文，新App进程冷路由恢复精确双pin和正文；未覆盖硬崩溃、多Thread/公开卡、全规模及IME"
+      "partial_runtime_evidence": "同私聊双pin：第二卡打开不换第一编辑器，各自可信输入/材料scope独立，模式往返保留两个textarea及另一输入的滚动，收起重开单卡保留两份正文，新App进程冷路由恢复精确双pin和正文；尚未覆盖整App/Core硬中断、未知请求、多Thread/公开卡、全规模及IME；本轮真实renderer两次crashed后显式重载及选择画布，双pin正文最后字及note独立本机副本恢复，Core原便笺未覆盖；不覆盖整App/Core硬杀及未知请求"
     },
     {
       "id": "I03-C06",
@@ -142,14 +142,15 @@
         "rc13单标题/可见预览/真实鼠标模式往返及空白页原回归通过；同textarea与草稿保留，两个独立App冷启动通过",
         "rc13必要回归25个不同Native断言通过，成功运行均受控退出；两个调度冲突run剔除并加入独占保护",
         "rc14 Desktop/Web0且未重编原生；终端5/私聊5/文件9/对象8共27不同Native通过，所有run均受控退出",
-        "rc14追加便笺6、同私聊双卡6、新App冷恢复3通过（无发送断言重复一次），当前候选41个不同Native断言；生产源码未变化，未重编"
+        "rc14追加便笺6、同私聊双卡6、新App冷恢复3通过（无发送断言重复一次），当前候选41个不同Native断言；生产源码未变化，未重编",
+        "rc14复用无新构建：renderer两次实际crashed及进程PID更替，双私聊最后字符/独立正文、未失焦便笺副本与Core原文分开、原引用/无模型3场景通过；当前44个不同Native场景，r3受控退出。r1/r2旧失败不计重复通过，r2无受控退出回执。"
       ],
       "open_findings": [
         "同一HTML卡片及保留工作区两个合法入口交换重叠，单布尔位导致合法跳转403；已改逐入口计数并在异步来源复核前认领，原授权和额外请求拒绝均保留，待新Desktop真实复验"
       ],
       "remaining_checks": [
         "私聊材料完整真实流程/PC01-PC24与文件卡片实际挂载/HTML，不用直接文件API和局部Core测试替代",
-        "Mission/Task/文件基本原工作区定位已通过；准备好Git工作区的Diff、焦点/编辑器/崩溃/冷恢复及同Thread多卡仍需补证",
+        "Mission/Task/文件基本定位、同私聊双卡暖冷/原生模式切换及renderer硬中断恢复已有证据；ready Git Diff、公开/多Thread/原生焦点、整App/Core硬中断与未知命令恢复仍需补齐",
         "真实多卡/资源释放/规模、大材料交互响应与其他适用迁移、冻结输入、平台和正式场景证据；环境缺项单列，继续独立后续阶段"
       ],
       "resolved_findings": [
@@ -163,27 +164,26 @@
         "rc12原生鼠标触发React#185：两条selection写回交替；改由onNodesChange同批维护选中状态，原失败鼠标用例通过",
         "便笺r4实测100%/DOM矩阵scale1，鼠标可信；XYDrag在首越阈值处捕获起点且8px边缘吸附导致最终80/48。r7按两段动作及既有对齐属性通过六项，未改产品代码"
       ],
-      "latest_native_evidence": "i03-c06-private-workspace-verification.json",
+      "latest_native_evidence": "i03-c05-renderer-crash-native-verification.json",
       "ui_remaining": [
         "rc14空私聊viewport extraY0与紧凑旧材料入口已实际通过；两种主题/其他高度与有消息状态仍按完整UI清单继续",
         "缩放/尺寸切换有ResizeObserver延迟通知，继续定位；功能断言通过不授予零控制台问题资格",
         "Codeg列表真实缩略预览/节点数、日主题与完整八类创建/错误状态仍未取得全部资格",
-        "按Codeg各类卡片源码的摘要/区域/便笺第一批样式已编码且types0，真实运行与原便笺交互、终端控制栏等剩余须在下一批完成；不得复用rc13旧截图授予新代码视觉资格",
-        "便笺整纸拖动/行内编辑/CAS/本机副本及终端24px图标已编码并完成低成本检查，真实输入/冲突/冷恢复/最小宽度待集中Native；无新客户门槛",
-        "便笺原拖动/行内保存/冲突/普通离开6项已在rc14 r7通过；冷崩溃副本恢复与IME、完整字号/主题仍待后续"
+        "当前Codeg分型卡片、私聊贴合、终端窄宽控制、便笺拖动/行内编辑/冲突及renderer恢复已有rc14对应证据；完整日夜主题/八类创建与错误态、悬停键盘及摘要/区域视觉仍需核对。便笺SafeMarkdown document实际15px覆盖原13px，随下一组修复并集中验证。"
       ],
       "latest_card_style_evidence": "i03-c06-card-source-style-result.json",
       "latest_note_terminal_evidence": "i03-c06-note-terminal-interaction-result.json",
       "latest_empty_private_fit_evidence": "i03-c06-private-empty-fit-result.json",
       "latest_source_card_group_verification": "i03-c06-source-card-group-verification.json",
-      "latest_notes_mirrors_evidence": "i03-c05-notes-mirrors-native-verification.json"
+      "latest_notes_mirrors_evidence": "i03-c05-notes-mirrors-native-verification.json",
+      "latest_renderer_crash_evidence": "i03-c05-renderer-crash-native-verification.json"
     }
   ],
   "state_rule": "代码完成、工程验证通过、待环境验证分别记录；无代码缺口且工程验证满足时由Codex收口；缺环境继续独立后续工作，最终MVP不豁免",
   "customer_action_required_now": false,
   "progress_audit": {
     "first_board_evidence_at": "2026-10-14T06:11:31.818Z",
-    "checked_at": "2026-10-15T17:14:31.400839+00:00",
+    "checked_at": "2026-10-16T01:14:31.400839+08:00",
     "original_I03_engineering_days": 10,
     "note": "从首批证据到本次核对的自然时间不是连续研发工时；原排期状态未同步和客户验收口径混用已纠正",
     "elapsed_minutes_since_first_evidence": 2102

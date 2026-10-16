@@ -116,3 +116,15 @@ final result: blocked
 final result: blocked
 
 仅完整画布视觉/阶段验证未完；目标active，无本轮客户事项。
+
+## 卡片输入在界面进程硬中断后恢复
+
+复用rc14的c4463813，无新编译。Native renderer-crash-r3实际两次render-process-gone=crashed/exitCode2，进程326000→317920→328112，Main保持277224。显式reload及选择画布后，精确原板的两张私聊卡恢复不同正文及最后甲；便笺未经失焦保存的最后乙作为本机副本可见，Core原文仍保留。三场景通过，明确保存自有便笺后受控退出，无deadline/forcedSignal。已实际查看2520×1500截图。
+
+r1错误要求固定启动快照的reload直接进画布；r2的helper又返回列表，触发已恢复便笺的正常离开保护，未取得正常退出回执。旧失败与截图保留；r3修helper并在重试前通过原UI核对保存自有草稿，未改产品行为。
+
+截图仍发现便笺document字号15px覆盖原Codeg 13px；完整主题/八类状态及ResizeObserver通知继续记录。本次不授予自动恢复入口、整App/Core硬杀、未知请求或IME资格。证据integration/execution/i03-c05-renderer-crash-native-verification.json。
+
+final result: blocked
+
+完整视觉/阶段检查仍未完；持续目标active，无本轮客户事项。
