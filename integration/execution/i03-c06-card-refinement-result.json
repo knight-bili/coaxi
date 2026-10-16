@@ -11,7 +11,7 @@
       "apps/desktop/src/renderer/src/FilePreviewPane.tsx": "a0c85443725374ab31414b9fd48701ee5c0cc4f35f3dff1bff6c965f83a1731e",
       "apps/desktop/src/renderer/src/HtmlFileViewer.tsx": "6f72da9db9b9baa9fb4955f2b0d92e68c96bff7a4e71b0d83b5fb13c1bff8a74",
       "apps/desktop/src/renderer/src/canvas.css": "8b6c4586fb5ec859922ab517fbdd81a01d8f65a11747074e134aab8d6f553d67",
-      "scripts/fixtures/canvas-native-input.mjs": "3ce4ab8991bfc6dc90622d1797242d4a5006e24edf51552a7b8cd51f25ca0431",
+      "scripts/fixtures/canvas-native-input.mjs": "5eb84b3fb912058e47e8eea181e35b75e15c57a07785ffb7d5f31f0d27191d50",
       "integration/execution/goal-state.json": "fb68276515ccf0fdafdfd16e737826ebbd617e78337984ee77416b5f7a3b9b70",
       "integration/execution/i03-closeout.json": "bea99e41f753e5bedbdbeed137d8378372027cfd88c082948b8751357bac90f2",
       "integration/planning/stage-versions.json": "48472459b27a70aa790a4166c70612d9df978271a2dcff8bd021749d0823b50f"
