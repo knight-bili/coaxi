@@ -24,7 +24,11 @@ app.on('browser-window-created',(_event,window)=>{
  window.webContents.once('did-finish-load',()=>{void qualify(window)})
 })
 async function qualify(window){
- const evaluate=expression=>window.webContents.executeJavaScript(expression,true)
+ const evaluate=async expression=>{
+  const result=await window.webContents.executeJavaScript(`(async()=>{try{return {ok:true,value:await (${expression})}}catch(error){return {ok:false,error:String(error.stack??error)}}})()`,true)
+  if(!result.ok)throw Error(result.error)
+  return result.value
+ }
  const wait=async(expression,timeout=20_000)=>{const until=Date.now()+timeout;while(Date.now()<until){if(await evaluate(expression))return;await pause(100)}throw Error('Native condition timed out: '+expression)}
  const rpc=(method,params={})=>evaluate(`window.rovai.request(${JSON.stringify(method)},${JSON.stringify(params)})`)
  try{
@@ -516,8 +520,9 @@ async function qualifyPrivateUi(window,{evaluate,wait,rpc}){
  await openCanvasBoard(evaluate,wait,boardId)
  await wait(`Boolean(document.querySelector('[data-id="${scopes[1].nodeId}"]'))`)
  await evaluate(`(()=>{document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]').click();return true})()`)
- await evaluate(`(()=>{[...document.querySelector('[data-id="${scopes[1].nodeId}"]').querySelectorAll('button')].find(button=>button.textContent==='展开对话').click();return true})()`)
- const frame=`document.querySelector('.canvas-conversation-frame')`
+ const frame=`document.querySelector('.canvas-conversation-frame[data-canvas-conversation-key*="${scopes[1].nodeId}"]')`
+ await wait(`Boolean(${frame})||[...document.querySelector('[data-id="${scopes[1].nodeId}"]').querySelectorAll('button')].some(button=>button.textContent==='展开对话'&&!button.disabled)`)
+ report.private_opening=await evaluate(`(()=>{if(${frame})return 'restored_exact_node';[...document.querySelector('[data-id="${scopes[1].nodeId}"]').querySelectorAll('button')].find(button=>button.textContent==='展开对话'&&!button.disabled).click();return 'clicked_exact_node'})()`)
  await wait(`Boolean(${frame}?.querySelector('.single-chat-composer-box .attachment-open[aria-label="打开文件预览 乙材料.txt"]'))`,25_000)
  assert.ok(!(await evaluate(`${frame}.querySelector('.single-chat-composer-box').textContent`)).includes('甲材料'))
  record('actual_scoped_composer_renders_only_its_own_attachment_card')
