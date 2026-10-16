@@ -27,7 +27,7 @@ export async function qualifyCanvasFileResources(window,{evaluate,wait,rpc,openC
   }
   const capture=async name=>{const path=join(config.evidence,name+'.png');await writeFile(path,(await window.webContents.capturePage()).toPNG());(report.screenshots??=[]).push(path)}
   const rows=()=>seam.since(0)
-  const openedFile=path=>rows().filter(row=>row.result?.ok&&row.result.value?.kind==='file_preview'&&resolve(row.result.value.file.absolutePath??'').toLowerCase()===resolve(path).toLowerCase()).at(-1)?.result.value.file
+  const openedFile=path=>rows().filter(row=>row.result?.ok&&row.result.value?.kind==='file_preview'&&row.args[0]?.rawReference===pathToFileURL(path).href).at(-1)?.result.value.file
   const siteFor=file=>rows().filter(row=>row.channel==='rovai:file-preview-prepare-html-site'&&row.args[0]?.handleId===file.handleId&&row.result?.ok).at(-1)?.result.value
   const inspectHtml=async(id,identity)=>{
     await wait(`${card(id)}?.querySelector('.file-preview-html-stage')?.dataset.documentState==='loaded'&&${card(id)}.querySelector('.file-preview-html-stage').dataset.channelState==='connected'`,30000)
