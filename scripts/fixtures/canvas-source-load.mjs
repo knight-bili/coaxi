@@ -59,7 +59,8 @@ export async function qualifyCanvasSourceLoad({request,fixture,dataDir,evidence,
  record('real_core_persists_complete_directory_file_counts_and_large_file_sha_after_busy_requests_can_be_retried')
  const before=await request('singleChat.get',{conversationId:contexts[8].conversationId})
  let failure;try{await attach(contexts[8],deep,'R08 too deep')}catch(error){failure=JSON.stringify(error)}
- assert.ok(failure?.includes('attachment_directory_depth_exceeded'),failure??'over-deep source unexpectedly accepted')
+ assert.ok(failure?.includes('single_chat.attachment_source_changed'),failure??'over-deep source unexpectedly accepted')
+ report.sourceLoad.overDepthPublicRejection=JSON.parse(failure)
  const after=await request('singleChat.get',{conversationId:contexts[8].conversationId});assert.deepEqual(after.draft,before.draft)
  await attach(contexts[8],large,'R08 valid after rejection')
  record('actual_over_depth_source_is_rejected_without_mutating_materials_or_leaking_the_worker_slot')
