@@ -37,10 +37,10 @@
     {
       "stage_id": "I03",
       "name": "完整无限画布与对象绑定",
-      "candidate_version": "fusion-i03-rc.2",
+      "candidate_version": "fusion-i03-rc.3",
       "status": "repair_candidate_pending_freeze",
       "frozen_commit": null,
-      "validation_batch": "I03-normal-01",
+      "validation_batch": "I03-repair-02",
       "validation_runs": [
         {
           "kind": "local_windows_cargo_build",
@@ -51,6 +51,21 @@
           "kind": "local_full_types",
           "source_commit": "f2630de05ed69cef3d49db1dcf0e5f141299b047",
           "exit_code": 2
+        },
+        {
+          "kind": "local_full_types",
+          "source_commit": "9a2eaef5d8000371c69ca30283ab6daa539802a8",
+          "exit_code": 0
+        },
+        {
+          "kind": "local_web_build",
+          "source_commit": "9a2eaef5d8000371c69ca30283ab6daa539802a8",
+          "exit_code": 0
+        },
+        {
+          "kind": "local_rust_test_owner_list_compile",
+          "source_commit": "9a2eaef5d8000371c69ca30283ab6daa539802a8",
+          "exit_code": 101
         }
       ],
       "engineering_validation": "in_progress",
@@ -63,6 +78,14 @@
           "windows_production_build": "passed",
           "full_types": "failed",
           "repair_reason": "Main Native upload retry/finish type declaration omission"
+        },
+        {
+          "candidate_version": "fusion-i03-rc.2",
+          "frozen_commit": "9a2eaef5d8000371c69ca30283ab6daa539802a8",
+          "full_types": "passed",
+          "web_build": "passed",
+          "rust_test_compilation": "failed",
+          "repair_reason": "Two cfg(test) canvas helpers used Database instead of OwnedTestDatabase"
         }
       ]
     },

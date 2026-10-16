@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "I03-C06已冻结rc.1并完成当前源Windows Core/Host/CLI构建，3个新二进制已绑定SHA；全量类型检查发现Main缺少两项已实现Native上传方法类型。已补retry/finish，待冻结rc.2复验types并继续Web/真实Host/PTY/Rust owner与平台检查。",
+  "current_slice": "I03-C06：Windows Core/Host/CLI生产构建通过；rc.2全量types与Web生产构建通过。extended+slow测试版本编译发现canvas_node原两辅助夹具用错Database类型，已改OwnedTestDatabase；待rc.3重列非零owner并运行真实材料/画布/终端/Host等检查。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "冻结fusion-i03-rc.2；仅补Main HostWebMethod的retry/finish类型声明，Rust/技能/资源源码保持，复用rc.1真实Windows构建并核其源码差异与3二进制SHA。先全量types/Web构建及Rust owner正确features下list非零，再运行实际Host/PTY/Native/App和平台。",
+    "冻结fusion-i03-rc.3，补验原画布测试夹具类型。两处改动均在cfg(test)内；复用已通过且源码未变的Windows生产构建、全量types和Web产物。先extended+slow下列非零owner再运行；并使用新Host/专用Node24.21及rc.2 Web进行实际隔离Host/PTY生命周期检查。",
     "I03-C05冷路由/多卡/规模代码集齐后，C06冻结fusion-i03-rc.1，集中编译当前158/208及此前生命周期增量，原扩展owner/HTTP/实际Desktop统一验证；不把旧二进制当当前源码证据。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "c06_windows_built_main_type_repair_candidate_pending",
+  "current_slice_status": "c06_production_types_web_passed_test_fixture_repair_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",

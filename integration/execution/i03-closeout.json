@@ -110,10 +110,12 @@
       "done_when": "功能集齐冻结fusion-i03-rc.1，相关编译/集成/回归/平台检查由Codex执行，记录缺陷和必要复验，不等待客户阶段验收",
       "latest_partial_evidence": "i03-c06-candidate-result.json",
       "completed_checks": [
-        "rc.1源码冻结f2630de0、当前Windows Core/Host/CLI生产构建exit0和3新二进制SHA"
+        "rc.1源码冻结f2630de0、当前Windows Core/Host/CLI生产构建exit0和3新二进制SHA",
+        "rc.2全量types exit0",
+        "rc.2 Web生产构建exit0及全部asset-cache内容SHA核验"
       ],
       "open_findings": [
-        "rc.1全量tsc exit2：Main HostWebMethod遗漏已实现retry/finish；已改声明，待rc.2全量复验"
+        "测试版本编译101：canvas_node两处辅助夹具需要OwnedTestDatabase.directory；已修参数类型，待rc.3重新编译/列册/执行"
       ],
       "remaining_checks": [
         "正确features下相关Rust owner先list非零再运行",

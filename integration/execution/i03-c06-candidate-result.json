@@ -3,29 +3,27 @@
   "stage": "I03",
   "closeout_group": "I03-C06",
   "status": "in_progress",
-  "recorded_at": "2026-10-16T04:14:06.607604+00:00",
+  "recorded_at": "2026-10-16T04:25:55.357033+00:00",
   "source_binding": {
-    "base_commit": "f2630de05ed69cef3d49db1dcf0e5f141299b047",
+    "base_commit": "9a2eaef5d8000371c69ca30283ab6daa539802a8",
     "kind": "exact_worktree_sha256_before_commit",
     "files": {
-      "apps/desktop/src/main/core-client.ts": "242efdea1ff985e0e366fbd05c73f5c7c2d8c39f239e715a79d753075a26a41c",
-      "integration/execution/goal-state.json": "149934bf26a04ea7e42adb4fd4ea80fc600cf65f2d83a4cf68b4afc010ae462e",
-      "integration/execution/i03-closeout.json": "ec2eae11bacfd82ea244eaa7e9fccee0398e0d195171e83122c38883b344a9f3",
-      "integration/planning/stage-versions.json": "82c6e59dd55b45eb0f6e5e8daaa3fa21a058759d59e7f4b6460150872d4d9d3c"
+      "crates/rovai-core/src/canvas_node.rs": "aa08bde66ca88e5616d5396af95c1311b0ac160fa408ae45925eb193ea5285d6",
+      "integration/execution/goal-state.json": "a3d5ba08c7119a8a8538010ed14da940eff68f3185254c32a92b470ef7c917e5",
+      "integration/execution/i03-closeout.json": "46abadb960b0e9838889cb2c225c6b367039f84bbc0a0b397b76453e944f5990",
+      "integration/planning/stage-versions.json": "bb113022d3b29cde0e4b46acbef9c8c229e51e3e9538d840989658fc56636d3b"
     }
   },
   "artifact_binding": {
-    "work/i03/c06/fusion-i03-rc.1/freeze.json": "575cd2f409b21bfdbed51c01d2b8713180646a3b0751853878d5c61b92228431",
-    "work/i03/c06/fusion-i03-rc.1/windows-build-start.json": "e6d453535eda5a2016c0bd073d800d16f87898dec17a6776febf962d18920d4b",
-    "work/i03/c06/fusion-i03-rc.1/windows-build-result.json": "65d9adc0c81ebd747126eddd339e579a7ec5c6a1e61c0a6b95b6d78d2cbb0380",
-    "work/i03/c06/fusion-i03-rc.1/windows-build.log": "f99baa58f0f449086dec2d3a93bdd3d66f400ceec24a432f144213e74e4a0642",
-    "work/i03/c06/fusion-i03-rc.1/windows-binaries.json": "a15019d59c6b3f20f6350606156d320ddf9a2cd43a846ec07a3d7b1ee0e52c36",
-    "work/i03/c06/fusion-i03-rc.1/windows-build-offline.log": "05ef457d0df0de7f01872f3a7cd0a4bbe8d41ab83091b5f36cb847c49e2c526a",
-    "work/i03/c06/fusion-i03-rc.1/windows-build-offline-result.json": "d3a2842874dd14c976a84ac26d360a25fccfa3a1e2c57759bed7c80e7392bb87",
-    "work/i03/c06/fusion-i03-rc.1/types-result.json": "f7fcf3e387cf5b1810af0ed049ab325cd773a9bb8de284bef370ace9044e862a",
-    "work/i03/c06/fusion-i03-rc.1/types.log": "ec319bb5daa0410cb1075e2367690b9648a6af8be0a0028274ae2a4f543370f4",
-    "work/i03/c06/fusion-i03-rc.1/tool-sessions.json": "aabc1e93a11cfe982b7fb3a636a124a998faf3b4537d04dac3afa7cfe769ede2",
-    "work/i03/record-c06-type-repair.py": "63dd49469751fb639829e27cb641f806a8007636412694fad1837013c784f3af"
+    "work/i03/c06/fusion-i03-rc.2/freeze.json": "c29e5a8b106a11652959dd373ad49e1af2a3846520cd486e56a88801b464eee2",
+    "work/i03/c06/fusion-i03-rc.2/types-result.json": "c1e77e868a7ab0dfb0e84d176ae4fdc6eb0903482a9ac3b591420bed2e2f93e2",
+    "work/i03/c06/fusion-i03-rc.2/types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "work/i03/c06/fusion-i03-rc.2/web-build-result.json": "ec28e67799ab3f49819fe989aee0d02cd65b529fecdc5a1f2eaba014acf25a0f",
+    "work/i03/c06/fusion-i03-rc.2/web-build.log": "69e431097e018ef3df5a5c58f50b8419229c287a325815c5c0a500d9bcffc58e",
+    "work/i03/c06/fusion-i03-rc.2/rust-owner-list-result.json": "bf13d48dc31a68c0675862fe4958af7faf62f5302191d8497cf40865654f8c82",
+    "work/i03/c06/fusion-i03-rc.2/rust-owner-list.log": "8ca9a60217936694de39298478d4119c0c0435e3c8a2ffb108416ec6b3ee39b0",
+    "work/i03/c06/fusion-i03-rc.2/web-ui/asset-cache.json": "8d56a5815d03334687fcb0e2db33d5f2db0b8dacf0647e74ffd97baba849e162",
+    "work/i03/record-c06-fixture-repair.py": "d0b08b72cfacd9b0000221192d0c6ce8f8485654c3861036e805555a76841d9b"
   },
   "frozen_authority_files": {
     "crates/rovai-core/src/local_attachment_source.rs": "8830581e72fc103b2f359be17a0072c5ee0cedc6eb5fe58b179ae3d255dbc1ca",
@@ -55,10 +53,35 @@
         "exit_code": 2,
         "status": "failed"
       }
+    },
+    {
+      "version": "fusion-i03-rc.2",
+      "source_commit": "9a2eaef5d8000371c69ca30283ab6daa539802a8",
+      "status": "failed_rust_test_compilation",
+      "types": {
+        "source_commit": "9a2eaef5d8000371c69ca30283ab6daa539802a8",
+        "started_at": "2026-10-16T04:18:02.4965528Z",
+        "finished_at": "2026-10-16T04:18:25.4882673Z",
+        "exit_code": 0,
+        "command": "pnpm exec tsc --noEmit"
+      },
+      "web": {
+        "source_commit": "9a2eaef5d8000371c69ca30283ab6daa539802a8",
+        "started_at": "2026-10-16T04:18:25.5099909Z",
+        "finished_at": "2026-10-16T04:18:36.3430189Z",
+        "exit_code": 0,
+        "output": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.2\\web-ui",
+        "command": "pnpm run build:web --outDir <candidate>/web-ui"
+      },
+      "rust_test_owner_list": {
+        "source_commit": "9a2eaef5d8000371c69ca30283ab6daa539802a8",
+        "started_at": "2026-10-16T04:18:02.5120970Z",
+        "finished_at": "2026-10-16T04:19:26.2978353Z",
+        "command": "cargo test --locked --offline -p rovai-core --lib --features extended-tests,slow-tests single_chat_composer::tests -- --list",
+        "exit_code": 101
+      }
     }
   ],
-  "implemented_repair": "Only Main HostWebMethod union adds existing Core host.upload.retry/finish; no runtime body or renderer authority change",
-  "reuse_boundary": "No changes to crates/Cargo/skills/resources since passing rc.1 build; preserve actual binary source commit and revalidate differences/hashes for next candidate",
   "windows_binaries": [
     {
       "name": "rovai-core.exe",
@@ -85,15 +108,28 @@
       "source_commit": "f2630de05ed69cef3d49db1dcf0e5f141299b047"
     }
   ],
-  "dependency_attempt": "offline cache miss for locked bitflags1.3.2, terminal101; normal locked public dependency fetch then build terminal0; no source failure inferred from cache miss",
+  "implemented_repair": "Two existing cfg(test) helpers now accept OwnedTestDatabase, which owns directory(); no production prefix, test owner or assertion change",
+  "reuse_boundary": "Only cfg(test) helper signatures and execution metadata changed since rc.2; production Rust and all TS/Web inputs unchanged",
+  "web_asset_inventory": {
+    "source_commit": "9a2eaef5d8000371c69ca30283ab6daa539802a8",
+    "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i03\\c06\\fusion-i03-rc.2\\web-ui",
+    "files": 141,
+    "all_sha256_verified": true,
+    "manifest_sha256": "8d56a5815d03334687fcb0e2db33d5f2db0b8dacf0647e74ffd97baba849e162"
+  },
   "not_run": [
-    "rc.2 full types and Web build",
-    "Rust cfg(test)/extended/slow owner compilation or execution",
-    "actual Host/HTTP/Core/PTy/native/App/platform scenarios",
+    "rc.3 Rust test compilation/list and selected owner execution",
+    "actual Host/PTY/native/App/platform runtime scenarios",
     "full PC01-PC24/324"
   ],
   "normal_phase_batches": 1,
-  "repair_candidates": 1,
+  "repair_candidates": 2,
+  "candidate_execution_batches": 3,
+  "validation_batch_mapping": {
+    "fusion-i03-rc.1": "I03-normal-01",
+    "fusion-i03-rc.2": "I03-repair-01",
+    "fusion-i03-rc.3": "I03-repair-02"
+  },
   "guardrails": {
     "push": false,
     "actions": false,
@@ -101,5 +137,5 @@
     "real_user_data_or_credentials": false,
     "customer_action_required_now": false
   },
-  "next": "冻结fusion-i03-rc.2；仅补Main HostWebMethod的retry/finish类型声明，Rust/技能/资源源码保持，复用rc.1真实Windows构建并核其源码差异与3二进制SHA。先全量types/Web构建及Rust owner正确features下list非零，再运行实际Host/PTY/Native/App和平台。"
+  "next": "冻结fusion-i03-rc.3，补验原画布测试夹具类型。两处改动均在cfg(test)内；复用已通过且源码未变的Windows生产构建、全量types和Web产物。先extended+slow下列非零owner再运行；并使用新Host/专用Node24.21及rc.2 Web进行实际隔离Host/PTY生命周期检查。"
 }
