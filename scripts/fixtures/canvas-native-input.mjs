@@ -89,6 +89,12 @@ async function qualify(window){
    report.status='passed'
    return
   }
+  if(config.mode==='renderer-crash'){
+   report.scope='production Main/preload/Core; forced isolated renderer termination followed by explicit reload; no App/Core crash or model'
+   await qualifyRendererCrash(window,{evaluate,wait,rpc})
+   report.status='passed'
+   return
+  }
   const boards=await rpc('canvas.boards.list'),board=boards.boards.find(board=>board.name==='C06 真实桌面画布')
   assert.ok(board)
   const graph=await rpc('canvas.nodes.snapshot',{boardId:board.id}),terminal=graph.nodes.find(node=>node.data.kind==='terminal')
@@ -783,5 +789,93 @@ async function qualifyMirrors(window,{evaluate,wait,rpc}){
  await evaluate(`(()=>{document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]').click();return true})()`)
  await pause(350)
  await writeFile(join(config.evidence,'01-same-private-conversation-two-cards.png'),(await window.webContents.capturePage()).toPNG())
+}
+async function qualifyRendererCrash(window,{evaluate,wait,rpc}){
+ window.unmaximize();window.setContentSize(1680,1000);window.webContents.setZoomFactor(1)
+ const prior=JSON.parse(await readFile(config.previous_result,'utf8'))
+ assert.equal(prior.status,'passed')
+ const {thread_id:threadId,conversation_id:conversationId}=prior.private_context
+ const created=await rpc('canvas.boards.create',{commandId:randomUUID(),command:{name:'C05 渲染进程硬中断恢复'}})
+ assert.equal(created.status,'applied',JSON.stringify(created))
+ const boardId=created.payload.board.id,nodeIds=[],baseline='硬中断前已保存的便笺原文'
+ for(const index of [0,1,2]){
+  const graph=await rpc('canvas.nodes.snapshot',{boardId})
+  const node=index===2?{kind:'note',content:baseline,title:'硬中断便笺',x:0,y:640,width:520,height:220}
+   :{kind:'conversation',conversation:{threadId,conversationId},title:index?'乙卡恢复对照':'甲卡硬中断输入',x:index*560,y:0,width:520,height:600}
+  const result=await rpc('canvas.nodes.apply',{commandId:randomUUID(),command:{boardId,expectedRevision:graph.board.revision,mutation:{type:'create',node}}})
+  assert.equal(result.status,'applied',JSON.stringify(result));nodeIds.push(result.payload.nodeIds[0])
+ }
+ const frames=nodeIds.slice(0,2).map(id=>`document.querySelector('.canvas-conversation-frame[data-canvas-conversation-key*="${id}"]')`)
+ const inputs=frames.map(frame=>`${frame}?.querySelector('.single-chat-composer textarea')`)
+ const texts=['甲卡未发送，硬中断前最后一个字：','乙卡独立输入保持不变'],last='甲'
+ report.crash_context={boardId,threadId,conversationId,nodeIds,texts:[texts[0]+last,texts[1]],baseline}
+ const open=async()=>{
+  await openCanvasBoard(evaluate,wait,boardId)
+  for(const index of [0,1]){
+   await wait(`Boolean(document.querySelector('[data-id="${nodeIds[index]}"] button[aria-label="展开对话"]:not(:disabled)'))`)
+   await evaluate(`(()=>{document.querySelector('[data-id="${nodeIds[index]}"] button[aria-label="展开对话"]').click();return true})()`)
+   await wait(`Boolean(${inputs[index]}&&!${inputs[index]}.disabled)`)
+  }
+ }
+ await open()
+ for(const index of [0,1]){
+  await evaluate(`(()=>{${inputs[index]}.focus();${inputs[index]}.select();return true})()`)
+  await window.webContents.insertText(texts[index])
+  await wait(`${inputs[index]}.value===${JSON.stringify(texts[index])}`)
+ }
+ const crashAndReload=async(kind,insertFinal)=>{
+  const before=window.webContents.getOSProcessId(),mainPid=process.pid
+  let timer
+  const gone=new Promise((resolve,reject)=>{
+   timer=setTimeout(()=>reject(Error('Owned renderer did not emit render-process-gone')),15_000)
+   window.webContents.once('render-process-gone',(_event,details)=>resolve(details))
+  })
+  // Do not blur, navigate, read storage, or wait between the last trusted input and fault injection.
+  await insertFinal()
+  window.webContents.forcefullyCrashRenderer()
+  const details=await gone.finally(()=>clearTimeout(timer))
+  assert.ok(['killed','crashed'].includes(details.reason),JSON.stringify(details))
+  report.crashes??=[];report.crashes.push({kind,before_renderer_pid:before,main_pid:mainPid,details,recovery_action:'explicit_webContents_reload'})
+  await writeFile(join(config.evidence,'crash-events.json'),JSON.stringify(report.crashes,null,2)+'\n')
+  await new Promise((resolve,reject)=>{
+   const loaded=()=>{clearTimeout(timer);resolve()}
+   timer=setTimeout(()=>{window.webContents.removeListener('did-finish-load',loaded);reject(Error('Owned renderer reload timed out'))},60_000)
+   window.webContents.once('did-finish-load',loaded);window.webContents.reload()
+  })
+  await wait(`window.rovai&&document.querySelector('button[aria-label="无限画布"]')?.disabled===false`,60_000)
+  const after=window.webContents.getOSProcessId()
+  assert.ok(before>0&&after>0&&before!==after);assert.equal(process.pid,mainPid)
+  report.crashes.at(-1).after_renderer_pid=after
+  await wait(`Boolean(${inputs[0]}&&${inputs[1]}&&${inputs[0]}.value===${JSON.stringify(texts[0]+last)}&&${inputs[1]}.value===${JSON.stringify(texts[1])})`,30_000)
+ }
+ await evaluate(`(()=>{const input=${inputs[0]};input.focus();input.setSelectionRange(input.value.length,input.value.length);return true})()`)
+ await crashAndReload('last_private_character',()=>window.webContents.insertText(last))
+ record('forced_renderer_termination_after_last_private_character_restores_both_exact_pins_and_distinct_bodies')
+ const note=`document.querySelector('[data-id="${nodeIds[2]}"] .canvas-note-paper')`,noteText='尚未失焦保存的便笺，最后字符：乙'
+ await evaluate(`(()=>{${note}.focus();return true})()`)
+ window.webContents.sendInputEvent({type:'keyDown',keyCode:'F2'});window.webContents.sendInputEvent({type:'keyUp',keyCode:'F2'})
+ await wait(`Boolean(${note}.querySelector('textarea'))`)
+ await evaluate(`(()=>{${note}.querySelector('textarea').focus();${note}.querySelector('textarea').select();return true})()`)
+ report.crash_context.note_text=noteText
+ await crashAndReload('unblurred_note_draft',()=>window.webContents.insertText(noteText))
+ await wait(`${note}?.querySelector('.canvas-note-prose')?.textContent.includes(${JSON.stringify(noteText)})&&Boolean(${note}?.querySelector('.canvas-note-status button'))`)
+ const after=(await rpc('canvas.nodes.snapshot',{boardId})).nodes.find(node=>node.id===nodeIds[2])
+ assert.equal(after.data.content,baseline)
+ report.recovered_note=await evaluate(`Object.entries(localStorage).filter(([key])=>key.startsWith('rovai.canvas.note-draft.v1:')&&key.includes(${JSON.stringify(nodeIds[2])})).map(([key,value])=>({key,value:JSON.parse(value)}))`)
+ assert.equal(report.recovered_note.length,1);assert.equal(report.recovered_note[0].value.text,noteText);assert.equal(report.recovered_note[0].value.baseline,baseline)
+ record('unblurred_note_survives_forced_renderer_termination_as_a_visible_scoped_draft_without_overwriting_saved_text')
+ for(const id of nodeIds.slice(0,2)){
+  const graph=await rpc('canvas.nodes.snapshot',{boardId})
+  assert.deepEqual(graph.nodes.find(node=>node.id===id).data.conversation,{threadId,conversationId})
+ }
+ const privateAfter=await rpc('singleChat.get',{conversationId})
+ assert.deepEqual(privateAfter.messages,[]);assert.deepEqual(privateAfter.agentRuns,[])
+ record('two_real_renderer_faults_keep_original_private_identity_and_do_not_send_or_start_model_runs')
+ await evaluate(`(()=>{document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]').click();return true})()`)
+ await pause(350)
+ await writeFile(join(config.evidence,'01-recovered-private-cards-and-note.png'),(await window.webContents.capturePage()).toPNG())
+ // Resolve this fixture's own dirty note through the existing UI so normal controlled shutdown can finish.
+ await evaluate(`(()=>{${note}.querySelector('.canvas-note-status button').click();return true})()`)
+ await wait(`!${note}.querySelector('.canvas-note-status')&&window.rovai.request('canvas.nodes.snapshot',{boardId:${JSON.stringify(boardId)}}).then(graph=>graph.nodes.find(node=>node.id===${JSON.stringify(nodeIds[2])})?.data.content===${JSON.stringify(noteText)})`)
 }
 await import(config.production_main)
