@@ -35,7 +35,15 @@ export function installCanvasPrivateIpc(ipcMain) {
       }
       const drop = lostSwap && method === 'singleChat.composerDraft.mutate' && matches(command, lostSwap)
         && command.action?.type === 'swap_retained'
+      const loss = drop ? lostSwap : null
       if (drop) lostSwap = null
+      const lostReply = { kind: 'failure', failure: { kind: 'infrastructure_failure', code: 'fixture_reply_lost',
+        message: '受控测试：运输回执丢失，须核对原请求。', retryable: true, generation: 0, details: {} } }
+      if (loss?.beforeAccept) {
+        entry.status = 'interrupted_before_dispatch'
+        faults.push({ kind: 'swap_not_dispatched', commandId: params.commandId })
+        return lostReply
+      }
       const hold = upload && channel === 'rovai:private-attachment-prepare'
         && matches({ conversationId: params?.target?.conversationId, composerScope: params?.target?.composerScope }, upload)
       const gate = hold ? upload : null
@@ -46,8 +54,7 @@ export function installCanvasPrivateIpc(ipcMain) {
       if (drop) {
         assert.equal(result.kind, 'value'); assert.equal(result.value.status, 'applied')
         faults.push({ kind: 'lost_committed_swap_reply', commandId: params.commandId })
-        return { kind: 'failure', failure: { kind: 'infrastructure_failure', code: 'fixture_reply_lost',
-          message: '受控测试：Core已完成，运输回执丢失。', retryable: true, generation: 0, details: {} } }
+        return lostReply
       }
       if (gate) {
         gate.observed = { commandId: params.commandId, state: result.state, target: structuredClone(params.target) }

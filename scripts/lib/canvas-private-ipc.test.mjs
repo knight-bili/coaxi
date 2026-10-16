@@ -31,6 +31,13 @@ test('private IPC seam observes unrelated requests and loses only one already-co
   assert.equal(f.calls.length, 2, 'the dropped response follows actual handler completion')
   assert.equal((await f.invoke('rovai:request', 'singleChat.composerDraft.mutate', mutation('own'))).kind, 'value')
   assert.deepEqual(f.seam.snapshot().faults, [{ kind: 'lost_committed_swap_reply', commandId: 'own' }])
+  f.seam.loseNextSwap({ ...owner, beforeAccept: true })
+  const before = f.calls.length
+  assert.equal((await f.invoke('rovai:request', 'singleChat.composerDraft.mutate', mutation('unaccepted'))).kind, 'failure')
+  assert.equal(f.calls.length, before, 'the interrupted request must not reach Core before acceptance')
+  assert.equal((await f.invoke('rovai:request', 'singleChat.composerDraft.mutate', mutation('unaccepted'))).kind, 'value')
+  assert.equal(f.calls.length, before + 1)
+  assert.deepEqual(f.seam.snapshot().faults.at(-1), { kind: 'swap_not_dispatched', commandId: 'unaccepted' })
 })
 
 test('private IPC seam injects a material race before the original call and releases only the held upload result', async () => {

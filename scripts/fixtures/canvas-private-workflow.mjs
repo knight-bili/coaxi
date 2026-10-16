@@ -321,23 +321,29 @@ export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait
     record('return_to_occupied_card_keeps_existing_complete_input_and_retains_the_other_without_mixing')
     const swap = `[...${frame(0)}.querySelectorAll('.single-chat-retained-inputs button')].find(button=>button.textContent==='切换完整输入')`
     const swapMark = seam.mark()
-    seam.loseNextSwap({ conversationId, scope: scopes[0] })
+    seam.loseNextSwap({ conversationId, scope: scopes[0], beforeAccept: true })
     await clickNative(swap)
+    const recoverButton = `[...${frame(0)}.querySelectorAll('.single-chat-retained-inputs button')].find(button=>button.textContent==='恢复原请求')`
     const retryButton = `[...${frame(0)}.querySelectorAll('.single-chat-retained-inputs button')].find(button=>button.textContent==='明确重试原请求')`
+    await wait(`Boolean(${recoverButton})`)
+    assert.deepEqual((await get(scopes[0])).draft, original)
+    await clickNative(recoverButton)
     await wait(`Boolean(${retryButton})`)
-    const committed = await get(scopes[0]), committedRecovery = await rpc('singleChat.composerDraft.recovery', { threadId, conversationId })
     await clickNative(retryButton)
     await wait(`${input(0)}.value===${JSON.stringify(queue[1].body)}`)
     const attempts = seam.since(swapMark).filter(entry => entry.action === 'swap_retained')
     assert.equal(attempts.length, 2); assert.equal(attempts[0].commandId, attempts[1].commandId)
-    assert.deepEqual((await get(scopes[0])).draft, committed.draft)
-    assert.deepEqual((await rpc('singleChat.composerDraft.recovery', { threadId, conversationId })).items, committedRecovery.items)
-    record('lost_committed_swap_reply_explicit_retry_reuses_same_uuid_without_swapping_twice')
+    const committed = await get(scopes[0])
+    assert.deepEqual(materials(committed.draft), materials(queue[1]))
+    const committedRecovery = await rpc('singleChat.composerDraft.recovery', { threadId, conversationId })
+    assert.ok(committedRecovery.items.some(item => item.kind === 'retained' && item.input.body === queue[0].body
+      && JSON.stringify(materials(item.input)) === JSON.stringify(materials(queue[0]))))
+    record('interrupted_before_acceptance_swap_is_unknown_then_explicit_retry_reuses_original_uuid_and_swaps_once')
     seam.loseNextSwap({ conversationId, scope: scopes[0] })
     await clickNative(swap); await wait(`${input(0)}.value===${JSON.stringify(queue[1].body)}`)
-    await wait(`Boolean(${retryButton})`)
+    await wait(`Boolean(${recoverButton})`)
     const committedBack = await get(scopes[0]), backMark = seam.mark()
-    await clickNative(`[...${frame(0)}.querySelectorAll('.single-chat-retained-inputs button')].find(button=>button.textContent==='恢复原请求')`)
+    await clickNative(recoverButton)
     await wait(`${input(0)}.value===${JSON.stringify(queue[0].body)}`)
     assert.ok(!seam.since(backMark).some(entry => entry.action === 'swap_retained'))
     assert.deepEqual((await get(scopes[0])).draft, committedBack.draft)
@@ -381,6 +387,22 @@ export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait
     record('actual_other_card_takeover_uses_saved_working_input_and_new_token_then_rejects_old_writer_and_saves_its_own_edit')
     await writeFile(join(config.evidence, '02-private-pending-takeover.png'), (await window.webContents.capturePage()).toPNG())
   } finally {
+    if (config.mode === 'private-queue') {
+      report.fixture_request_cleanup = []
+      for (const index of [0, 1]) {
+        try {
+          const recover = `[...(${frame(index)}?.querySelectorAll('.single-chat-retained-inputs button')??[])].find(button=>button.textContent==='恢复原请求')`
+          if (await evaluate(`Boolean(${recover})`)) {
+            await evaluate(`(()=>{${recover}.click();return true})()`)
+            await wait(`!(${recover})||Boolean([...${frame(index)}.querySelectorAll('.single-chat-retained-inputs button')].find(button=>button.textContent==='明确重试原请求'))`, 4_000)
+            const retry = `[...${frame(index)}.querySelectorAll('.single-chat-retained-inputs button')].find(button=>button.textContent==='明确重试原请求')`
+            if (await evaluate(`Boolean(${retry})`)) await evaluate(`(()=>{${retry}.click();return true})()`)
+            await wait(`!(${recover})`, 4_000)
+            report.fixture_request_cleanup.push({ index, settled: true })
+          }
+        } catch (error) { report.fixture_request_cleanup.push({ index, error: String(error) }) }
+      }
+    }
     if (config.mode === 'private-roundtrip') {
       try {
         report.undo_diagnostics = await evaluate(`(()=>{window.r01EditorObserver?.disconnect();return {events:window.r01UndoEvents??[],moves:window.r01EditorMoves??[],editorConnected:window.r01Editor?.isConnected??false,editorFocused:document.activeElement===window.r01Editor,body:window.r01Editor?.value??null}})()`)
