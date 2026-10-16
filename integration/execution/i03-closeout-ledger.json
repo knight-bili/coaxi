@@ -14,10 +14,10 @@
   },
   "counts": {
     "settled_obligations": 17,
-    "open_work_groups": 7,
-    "private_cases_verified": 22,
-    "private_cases_open": 2,
-    "verified_work_groups": 3
+    "open_work_groups": 6,
+    "private_cases_verified": 24,
+    "private_cases_open": 0,
+    "verified_work_groups": 4
   },
   "count_boundary": "不同层级不相加；17条为限定范围旧待办，固定10组按状态计算剩余；私聊按原24场景逐项核定，不计算完成百分比",
   "settled_obligations": [
@@ -184,7 +184,8 @@
         "PC23"
       ],
       "remaining_private_cases": [],
-      "latest_verification": "i03-r01-cross-core-upload-verification.json"
+      "latest_verification": "i03-r01-cross-core-upload-verification.json",
+      "current_candidate_regression": "i03-r04-process-interruption-verification.json#regressions"
     },
     {
       "id": "I03-R02",
@@ -216,7 +217,8 @@
         "PC16"
       ],
       "remaining_private_cases": [],
-      "latest_verification": "i03-r02-complete-send-boundaries-verification.json"
+      "latest_verification": "i03-r02-complete-send-boundaries-verification.json",
+      "current_candidate_regression": "i03-r04-process-interruption-verification.json#regressions"
     },
     {
       "id": "I03-R03",
@@ -240,7 +242,7 @@
     {
       "id": "I03-R04",
       "name": "整个App/Core中断与未知在途请求",
-      "status": "open",
+      "status": "engineering_verified",
       "private_cases": [
         "PC21",
         "PC22"
@@ -250,9 +252,15 @@
         "I03-C05"
       ],
       "done_when": "覆盖实际App/Core进程退出、接受前/后和丢回执；按原UUID核对，不重复发送，不重选冻结材料；本机输入能恢复。",
-      "next_action": "复用renderer恢复记录但保留独立进程边界；准备可控接受前/后中断，不以整App正常退出替代。",
+      "next_action": "本组当前本机工程边界完成；进入R05对象冷路由与Diff视图/资源。",
       "owner": "Codex",
-      "external_condition": "none_confirmed_blocking_current_independent_work"
+      "external_condition": "none_confirmed_blocking_current_independent_work",
+      "verified_private_cases": [
+        "PC21",
+        "PC22"
+      ],
+      "remaining_private_cases": [],
+      "latest_verification": "i03-r04-process-interruption-verification.json"
     },
     {
       "id": "I03-R05",
@@ -306,7 +314,8 @@
       "done_when": "大材料/目录/日志下响应、事务锁、取消/超时及worker名额正确；可见/被遮挡卡片的真实Core通知确认及清理正确。",
       "next_action": "复用5空闲投影/64控制器及已有Core限量worker逻辑证据，补真实负载和通知交互，不重跑静态预算单测。",
       "owner": "Codex",
-      "external_condition": "none_confirmed_blocking_current_independent_work"
+      "external_condition": "none_confirmed_blocking_current_independent_work",
+      "native_private_storage_followup": "同步私聊落盘在大正文/真实输入压力下的响应归既有R08源IO与规模验证，不用小输入恢复测试代替性能资格。"
     },
     {
       "id": "I03-R09",
@@ -540,9 +549,9 @@
   ],
   "known_environment_deferrals": [
     "Mac/Linux桌面及Web/Server未具备当前融合运行证据的适用项，不用原仓构建代替；分别记录到正式场景平台矩阵",
-    "PC14当前Windows固定ACP最终持久输入/真实交接已核定；PC22实际整进程中断下输入恢复仍开放。外部模型推理和其他平台不由本机协议资格替代；确需身份/额度时另列资源，不自动付费。",
+    "私聊24项当前Windows/Core本机边界已核定；标准ACP/整进程恢复不外推外部模型推理、其他平台或I02真正冻结后尚未投递窗口。其余环境和身份义务仍在原平台/阶段矩阵，不自动付费。",
     "真实移动平台按I10推进；终端平台专属保护按相应平台阶段补齐，不能被Windows结果代替"
   ],
   "change_control": "剩余编号固定；发现缺陷归入已有组并说明影响。新增必需范围须有来源和编号变更记录；不能为减少数量合并隐藏未完成条件。",
-  "latest_verification": "i03-r02-complete-send-boundaries-verification.json"
+  "latest_verification": "i03-r04-process-interruption-verification.json"
 }

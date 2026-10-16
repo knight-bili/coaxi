@@ -268,17 +268,25 @@
       "id": "PC21",
       "scenario": "发送已接受但响应丢失并重启",
       "expected": "核对原结果，不换 UUID 重发",
-      "status": "engineering_verification_pending",
-      "verified": [],
-      "remaining": "核对原结果，不换 UUID 重发"
+      "status": "engineering_verified",
+      "verified": [
+        "当前rc20真实Windows整App强制退出，旧Core确认退出后以同根新App恢复；另一卡正文末字/附件/引用完整，原发送UUID被实际commands.reconcile核对，零singleChat.send重派发、零额外Runtime输入，不人工flush或正常退出准备。"
+      ],
+      "remaining": null,
+      "evidence": "i03-r04-process-interruption-verification.json#qualification",
+      "verification_layer": "Windows实际Desktop/Core、固定本机ACP和只读持久输入；不宣称外部推理、其他平台、断电恢复或完整I03通过。其他平台/外部推理及I02真正冻结后未投递窗口仍保留原所属队列。"
     },
     {
       "id": "PC22",
       "scenario": "Core 在输入接受前后分别退出",
       "expected": "旧冻结 Manifest Blob 与接受边界保持",
-      "status": "final_runtime_input_evidence_pending",
-      "verified": [],
-      "remaining": "须补最终Blob与实际Runtime独立证据；本轮不使用模型身份或预算，不能用当前Core材料检查代替"
+      "status": "engineering_verified",
+      "verified": [
+        "当前rc20实际杀死Core，生产Supervisor以新PID重建；已派发未确认与标准ACP terminal确定接受两个窗口，冻结Blob/摘要/Manifest/epoch与原UUID保持，另一卡完整输入不变，无材料重选或重复发送。已派发未知不称为not_accepted；不外推其他协议运行中显式确认。"
+      ],
+      "remaining": null,
+      "evidence": "i03-r04-process-interruption-verification.json#qualification",
+      "verification_layer": "Windows实际Desktop/Core、固定本机ACP和只读持久输入；不宣称外部推理、其他平台、断电恢复或完整I03通过。其他平台/外部推理及I02真正冻结后未投递窗口仍保留原所属队列。"
     },
     {
       "id": "PC23",
@@ -309,6 +317,6 @@
     }
   ],
   "settlement": "i03-closeout-settlement.json",
-  "latest_verification": "i03-r02-complete-send-boundaries-verification.json",
+  "latest_verification": "i03-r04-process-interruption-verification.json",
   "latest_preparation": "i03-r01-private-workflow-preparation.json"
 }

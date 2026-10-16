@@ -21,7 +21,7 @@
     {
       "id": "I03-C01",
       "name": "完成私聊材料r1剩余链路",
-      "status": "engineering_verification_in_progress",
+      "status": "engineering_verified_within_declared_local_scope",
       "items": [
         "Native/Web上传准备原编号及结果恢复",
         "私有源内容变化检查",
@@ -30,11 +30,11 @@
         "孤立Core/本机正文及冲突统一恢复"
       ],
       "done_when": "本阶段完整使用流程及PC01-PC24适用工程验证有当前源码证据，外部环境缺项明确单列",
-      "latest_partial_evidence": "i03-r02-complete-send-boundaries-verification.json",
+      "latest_partial_evidence": "i03-r04-process-interruption-verification.json",
       "remaining_runtime_risks": [
-        "私聊22项当前本机边界已核定，仅PC21/22整App/Core进程中断、接受前/后及未知在途请求继续R04；其他平台与外部推理不由固定ACP结果替代。",
-        "实际Host/Native IPC/资源授权验证后启用最终文件入口，UI模拟验证不能替代",
-        "完整PC01-PC24适用工程场景与异常恢复待集中验证；发现代码缺口回到C01修复",
+        "私聊24项当前本机工程边界已核定，其他平台与外部推理不由本机固定ACP结果替代。",
+        "Host/Native接线与输入材料授权已有证据；跨Thread/HTML及原版错误态继续既定R06/R09。",
+        "原12正式I03场景与最终当前候选集成仍由R10逐项执行，不据24私聊子场景直接宣布I03通过。",
         "实际大材料/日志枚举/事务锁规模归I03-C05验证；本批32副本只验证字典读取次数"
       ],
       "runtime_matrix": "i03-private-materials-runtime-matrix.json",
@@ -45,10 +45,33 @@
         "rc17/18四类实际页面模式：稳定DOM顺序及撤销/引用/revision往返、完整移回/保留/交换、同UUID重试和只读核对、接管保存、删除后原位置恢复及结束原单聊后的迟到上传。",
         "rc19真实双Core Web切换的上传隔离及当前Desktop往返/撤销/CAS回归通过，R01全部九项本机边界核定。",
         "rc19真实发送只消费本卡且另一卡正文/附件/引用和默认材料完整保持；真实仅附件发送及实际ACP源路径/内容核验通过。",
-        "rc19五项完整发送边界通过：默认正文双向独立、越权quote/working拒绝、最终持久Blob与实际ACP原文一致、源变化/缺失/同名替换拒绝、原FIFO恢复与顺序。"
+        "rc19五项完整发送边界通过：默认正文双向独立、越权quote/working拒绝、最终持久Blob与实际ACP原文一致、源变化/缺失/同名替换拒绝、原FIFO恢复与顺序。",
+        "rc20实际整个App和Core中断恢复通过，修复Native正文/原请求未可靠落盘；原UUID只读核对、冻结输入一致、另一卡完整输入与零重发，往返/撤销/CAS及完整发送边界回归通过。"
       ],
-      "file_ui_status": "R01/R02实际输入恢复、发送、源变化及最终输入已核定；整App/Core中断继续R04，完整文件资源与原版UI仍在其既定工作组。",
-      "resolved_fixture_incident": "旧两测试Thread空附件视图目录缺失后已有Core重建恢复，当前ready/error为空且目录存在，后续启动无同事件；初始消失原因和非空旧附件恢复未由本次证明。"
+      "file_ui_status": "R01–R04私聊24项当前本机功能/恢复边界已核定；跨Thread/HTML、规模和八类原版UI继续R06/R08/R09，最终正式场景仍归R10。",
+      "resolved_fixture_incident": "旧两测试Thread空附件视图目录缺失后已有Core重建恢复，当前ready/error为空且目录存在，后续启动无同事件；初始消失原因和非空旧附件恢复未由本次证明。",
+      "startup_view_observation": [
+        {
+          "mode": "private-core-interruption",
+          "empty_public_view_state": [
+            [
+              "ready",
+              2
+            ]
+          ],
+          "qualification": "startup missing empty view logged then rebuilt; no nonempty attachment recovery claim"
+        },
+        {
+          "mode": "private-app-interruption",
+          "empty_public_view_state": [
+            [
+              "ready",
+              2
+            ]
+          ],
+          "qualification": "startup missing empty view logged then rebuilt; no nonempty attachment recovery claim"
+        }
+      ]
     },
     {
       "id": "I03-C02",
@@ -217,11 +240,11 @@
   "latest_settlement": "i03-closeout-settlement.json",
   "remaining_queue_counts": {
     "settled_obligations": 17,
-    "open_work_groups": 7,
-    "private_cases_verified": 22,
-    "private_cases_open": 2,
-    "verified_work_groups": 3
+    "open_work_groups": 6,
+    "private_cases_verified": 24,
+    "private_cases_open": 0,
+    "verified_work_groups": 4
   },
-  "latest_group_verification": "i03-r02-complete-send-boundaries-verification.json",
+  "latest_group_verification": "i03-r04-process-interruption-verification.json",
   "latest_preparation": "i03-r01-private-workflow-preparation.json"
 }
