@@ -296,7 +296,15 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     })]
   }), [rows, selected, expanded, regions, conversationLayoutKey])
   currentDerived.current = derived
-  useEffect(() => { if (!dragging.current) setNodes(derived) }, [derived])
+  useEffect(() => {
+    if (!dragging.current) setNodes(derived)
+    // Core删除或移出成员后，旧选中ID不应继续占用工具条的单选状态。
+    const ids = new Set(derived.map(node => node.id))
+    setSelected(current => {
+      const next = current.filter(id => ids.has(id))
+      return next.length === current.length ? current : next
+    })
+  }, [derived])
   useEffect(() => { saveCanvasViewState(storage, props.scope, props.boardId, view) }, [storage, view, props.scope, props.boardId])
   useEffect(() => {
     const isBlocked = () => dirtyNotes.current.size > 0 || panel.current || dragging.current || presentingRef.current || Boolean(bridgeRef.current?.opening || bridgeRef.current?.restoring || latestGraph.current.hasUnsettled())

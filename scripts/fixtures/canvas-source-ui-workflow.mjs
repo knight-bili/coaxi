@@ -36,6 +36,10 @@ export async function qualifyCanvasSourceUi(window,{evaluate,wait,rpc,openCanvas
  const sourceFile=join(config.workspace,'R09 真实文件.txt'),sourceText='R09 原文件预览\n中文与 emoji 🙂，保留原始字节。\n';await writeFile(sourceFile,sourceText,{flag:'wx'})
  report.ui_context={agentId,threadId,missionId:mission.payload.missionId,sourceFile,sourceSha256:createHash('sha256').update(sourceText).digest('hex')}
  try{report.workspace_topology=await rpc('workspaces.worktrees',{path:config.workspace})}catch(error){report.workspace_topology_failure=error.stack??String(error)}
+ assert.equal(report.workspace_topology?.schemaVersion,1,report.workspace_topology_failure)
+ assert.equal(report.workspace_topology.requestedPath,config.workspace)
+ assert.equal(report.workspace_topology.repositoryRoot,null)
+ record('native_main_admits_original_read_only_worktree_topology_for_a_plain_directory')
  await click('document.querySelector(\'button[aria-label="无限画布"]\')');await wait('Boolean(document.querySelector(".canvas-breadcrumb-root:not(:disabled)"))')
  await click('document.querySelector(".canvas-breadcrumb-root")');await wait('Boolean(document.querySelector(".canvas-boards-home .canvas-primary-button:not(:disabled)"))')
  await click('document.querySelector(".canvas-boards-home .canvas-primary-button")');await wait('Boolean(document.querySelector(".canvas-board-dialog input[data-dialog-autofocus]"))')

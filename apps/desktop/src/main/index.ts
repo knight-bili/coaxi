@@ -292,6 +292,7 @@ const allowedMethods = new Set<CoreMethod>([
   'app.info',
   'threads.creationPreflight',
   'workspaces.inspect',
+  'workspaces.worktrees',
   'navigation.snapshot',
   'navigation.threads',
   'navigation.groupThreads',
