@@ -624,7 +624,8 @@ async function qualifyNotes(window,{evaluate,wait,rpc}){
   if(double){mouse('mouseDown',position,2);mouse('mouseUp',position,2)}
  }
  const start=await point(`${card}.querySelector('.canvas-note-prose')`)
- await evaluate(`(()=>{window.noteDragEvents=[];for(const name of ['mousedown','mousemove','mouseup'])document.addEventListener(name,event=>window.noteDragEvents.push({type:event.type,buttons:event.buttons,trusted:event.isTrusted,x:event.clientX,y:event.clientY}),true);return true})()`)
+ report.note_before_drag={zoomFactor:window.webContents.getZoomFactor(),start,layout:await evaluate(`(()=>{const note=${card},viewport=document.querySelector('.react-flow__viewport');return {window:{width:innerWidth,height:innerHeight,dpr:devicePixelRatio},node:note.getBoundingClientRect().toJSON(),offset:{width:note.offsetWidth,height:note.offsetHeight},viewportTransform:viewport.style.transform,computedTransform:getComputedStyle(viewport).transform,bodyZoom:getComputedStyle(document.body).zoom,rootZoom:getComputedStyle(document.documentElement).zoom,readout:document.querySelector('.canvas-zoom-readout').textContent}})()`)}
+ await evaluate(`(()=>{window.noteDragEvents=[];for(const name of ['mousedown','mousemove','mouseup'])window.addEventListener(name,event=>window.noteDragEvents.push({type:event.type,buttons:event.buttons,trusted:event.isTrusted,x:event.clientX,y:event.clientY,screenX:event.screenX,screenY:event.screenY,transform:document.querySelector('.react-flow__viewport').style.transform}),true);return true})()`)
  mouse('mouseMove',start);mouse('mouseDown',start)
  await pause(50)
  window.webContents.sendInputEvent({type:'mouseMove',x:start.x+8,y:start.y+8,modifiers:['leftButtonDown']});await pause(80)
