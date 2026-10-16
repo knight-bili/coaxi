@@ -81,9 +81,13 @@ export async function qualifyCanvasFileResources(window,{evaluate,wait,rpc,openC
     for(const file of projects)await wait(`${card(file.nodeId)}?.textContent.includes(${JSON.stringify(file.body.trim())})`,30000)
     const files=projects.map(file=>openedFile(file.path));assert.ok(files.every(Boolean));assert.notEqual(files[0].handleId,files[1].handleId);assert.notEqual(files[0].previewKey,files[1].previewKey)
     const foreign=await fp('restore',{kind:'camp_workspace',threadId:projects[0].threadId,rawReference:pathToFileURL(projects[1].path).href})
-    assert.equal(foreign.ok,false,JSON.stringify(foreign));report.cross_thread_denial=foreign.error
+    assert.equal(foreign.ok,true,JSON.stringify(foreign));assert.equal(foreign.value.file.pathPresentation,'external')
+    assert.notEqual(foreign.value.file.previewKey,files[1].previewKey)
+    const missing=await fp('restore',{kind:'camp_workspace',threadId:'r06-missing-'+randomUUID(),rawReference:pathToFileURL(projects[0].path).href})
+    assert.equal(missing.ok,false,JSON.stringify(missing));report.missing_thread_denial=missing.error
+    report.explicit_external_reference={pathPresentation:foreign.value.file.pathPresentation,previewKeyIsThreadScoped:true,rule:'docs/ui/components/file-preview.md:46; existing explicit absolute file preview remains allowed'}
     for(const file of projects)assert.ok(await evaluate(`${card(file.nodeId)}.textContent.includes(${JSON.stringify(file.body.trim())})`))
-    record('actual_two_thread_same_filename_previews_keep_distinct_handles_contents_and_reject_foreign_workspace_source')
+    record('actual_two_thread_same_filename_previews_keep_distinct_contents_and_keys_preserve_explicit_external_paths_and_reject_missing_thread')
     await capture('01-cross-thread-sources')
     const documents=[]
     for(let n=0;n<4;n++){
