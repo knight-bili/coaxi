@@ -1871,3 +1871,13 @@ I03-C03 文件卡片新增最低层 `canvas-file.test.ts` owner，负责字面�
 来源谓词另外提取Rust原文SQL，在最小两表SQLite执行11项原画板/错画板/错kind/删除/参数注入与零写入见证；
 不能把该SQL见证写成Rust的真实目录canonicalize、可信Owner或Host授权通过。
 辅助进程原生启动/进程树/真实字节和终端UI的最低层进程owner在父端接线后补齐，当前未开放产品入口。
+
+父端批次新增 `canvas_terminal::manager::tests` 两个最低层owner：输入原序号/UUID/摘要冲突、pending阻断、
+64条真实缓存边界后只拒绝旧输入、停止与实际回收区分；以及真实内存管道中的分片帧、EOF半帧、超长与开放JSON拒绝。
+旧state owner只拥有进程状态与字节游标，旧codec只拥有形状，不能证明上述实际入队/不重投与异步帧边界；
+新owner不启动完整Database、Core、Shell或模型。目前两项新增manager owner及更新codec尚未执行，随阶段候选列出非零清单再运行。
+原 `managed_process::tests::cancellation_reaps_captured_detached_children_after_parent_exit` 注入Linux根停止已记录但后代仍活跃状态，
+扩展实际自有子树与无关控制进程夹具；不新增全进程owner，此Linux/macOS检查本批未编译运行。
+原state回放owner补正文淘汰仍保留through/gap，新的独立源编译本批仍2项通过，不累计前轮次数。
+Core application仅做Rust语法解析，新模块与改动进程模块做格式检查；不把这些写成Core/Host类型或执行通过。
+后续必须补真实Core/Host终端进程owner，覆盖启动/原回执、输入、resize、日志洪流、删除、Core重启和计划退出，实际操作按阶段集中规则执行。

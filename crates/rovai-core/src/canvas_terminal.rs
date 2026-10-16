@@ -1,8 +1,10 @@
 //! 画布临时终端的 Core 来源校验与闭合请求。进程身份不写入画布数据库。
 //! Codeg 行为来源固定 aff1e6c，许可证见 integration/licenses/codeg/LICENSE。
-//! 当前尚未接公共方法；OS 适配器、Host 和关闭流程接齐后才开放能力。
+//! 父端与关闭流程已接线；公共方法、Host 与界面准入仍待后续批次。
 pub(crate) mod helper;
+pub(crate) mod manager;
 pub(crate) mod state;
+pub use manager::run_helper_if_requested;
 
 use std::path::PathBuf;
 
@@ -42,6 +44,13 @@ pub struct TerminalTarget {
 }
 
 impl TerminalTarget {
+    pub(crate) fn live(&self, connection: &Connection) -> Result<bool> {
+        self.validate()?;
+        Ok(connection
+            .query_row(SOURCE_SQL, params![self.node_id, self.board_id], |_| Ok(()))
+            .optional()?
+            .is_some())
+    }
     pub fn validate(&self) -> Result<()> {
         for id in [&self.board_id, &self.node_id] {
             ensure!(
@@ -54,7 +63,7 @@ impl TerminalTarget {
 
     /// 必须由可信 Owner 入口在画布生命周期锁内调用；请求体不接受 cwd 或 shell。
     /// 目录是启动位置，不是 OS 沙箱，也不由文件预览 RootGrant 授权执行。
-    pub(crate) fn directory(&self, connection: &Connection) -> Result<PathBuf> {
+    pub(crate) fn directory_path(&self, connection: &Connection) -> Result<PathBuf> {
         self.validate()?;
         let path: Option<String> = connection
             .query_row(SOURCE_SQL, params![self.node_id, self.board_id], |row| {
@@ -66,18 +75,15 @@ impl TerminalTarget {
             path.is_absolute() && !path.as_os_str().is_empty(),
             "canvas_terminal.invalid_directory"
         );
-        let canonical = path
-            .canonicalize()
-            .context("canvas_terminal.directory_unavailable")?;
-        ensure!(canonical.is_dir(), "canvas_terminal.not_directory");
-        Ok(canonical)
+        Ok(path)
     }
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct StartTerminal {
     pub target: TerminalTarget,
+    pub core_generation: String,
     pub request_id: String,
     pub expected_generation: Option<String>,
     pub cols: u16,
@@ -87,6 +93,10 @@ pub struct StartTerminal {
 impl StartTerminal {
     pub(crate) fn validate(&self) -> Result<state::Size> {
         self.target.validate()?;
+        ensure!(
+            valid_uuid(&self.core_generation),
+            "canvas_terminal.invalid_core_generation"
+        );
         ensure!(
             valid_uuid(&self.request_id),
             "canvas_terminal.invalid_request_id"
@@ -128,6 +138,7 @@ pub struct WriteTerminal {
     pub target: TerminalTarget,
     pub generation: String,
     pub input_id: String,
+    pub expected_input_sequence: u64,
     pub bytes_base64: String,
 }
 
@@ -189,7 +200,7 @@ mod tests {
     fn terminal_requests_are_closed_and_keep_original_generation_and_bytes() {
         let generation = "b7a24047-8f99-4ad7-8d7f-b34ca2a0359d";
         let target = json!({"boardId":"board", "nodeId":"node"});
-        let start = json!({"target":target, "requestId":generation, "cols":80, "rows":24});
+        let start = json!({"target":target, "coreGeneration":generation, "requestId":generation, "cols":80, "rows":24});
         let request: StartTerminal = serde_json::from_value(start.clone()).unwrap();
         assert!(request.validate().is_ok());
         for extra in [
@@ -223,7 +234,7 @@ mod tests {
                 .unwrap();
         read.validate().unwrap();
         let raw = vec![0, 0xff, 0xe4, 0xbd, 0xa0, 0x1b];
-        let write: WriteTerminal = serde_json::from_value(json!({"target":target,"generation":generation,"inputId":generation,"bytesBase64":STANDARD.encode(&raw)})).unwrap();
+        let write: WriteTerminal = serde_json::from_value(json!({"target":target,"generation":generation,"inputId":generation,"expectedInputSequence":0,"bytesBase64":STANDARD.encode(&raw)})).unwrap();
         assert_eq!(write.decode().unwrap(), raw);
         for bytes in [vec![], vec![0; INPUT_LIMIT + 1]] {
             assert!(decode_input(&STANDARD.encode(bytes)).is_err());

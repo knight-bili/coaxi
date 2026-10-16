@@ -101,7 +101,7 @@ impl Drop for OwnedChild {
 }
 
 /// 父进程先冻结受管启动规格，再写入首个 Launch 帧。
-/// 此函数尚未接命令行入口，不能从已发布产品触发。
+/// 三个二进制的专用早期入口调用它；普通Core/Host启动不会进入此分支。
 pub(crate) fn run() -> Result<()> {
     let mut input = BufReader::new(std::io::stdin());
     let launch: HelperLaunch = read_frame(&mut input)?.context("canvas_terminal.launch_missing")?;
@@ -130,6 +130,12 @@ pub(crate) fn run() -> Result<()> {
     command.args(&launch.args);
     command.cwd(&launch.cwd);
     command.env("TERM", "xterm-256color");
+    command.env("COLORTERM", "truecolor");
+    #[cfg(windows)]
+    {
+        command.env("PYTHONUTF8", "1");
+        command.env("PYTHONIOENCODING", "utf-8");
+    }
     let mut child = OwnedChild(pair.slave.spawn_command(command)?);
     drop(pair.slave);
     let mut writer = pair.master.take_writer()?;

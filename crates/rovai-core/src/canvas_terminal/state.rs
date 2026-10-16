@@ -213,6 +213,11 @@ impl Session {
         self.require_generation(generation)?;
         self.output.replay(after_seq)
     }
+
+    pub fn discard_output(&mut self) {
+        self.output.chunks = VecDeque::new();
+        self.output.bytes = 0;
+    }
 }
 
 #[cfg(test)]
@@ -311,6 +316,11 @@ mod tests {
         assert!(!session.replay("generation", 7).unwrap().gap);
         assert!(session.replay("generation", 24).is_err());
         assert!(session.replay("generation", 23).unwrap().chunks.is_empty());
+        session.discard_output();
+        let cold = session.replay("generation", 0).unwrap();
+        assert_eq!(cold.through_seq, 23);
+        assert_eq!(cold.first_available_seq, 24);
+        assert!(cold.gap && cold.chunks.is_empty());
         let mut tiny = Session::new("tiny".into(), "tiny".into(), Size::new(80, 24).unwrap());
         tiny.commit_spawn().unwrap();
         for _ in 0..OUTPUT_CHUNKS_LIMIT * 2 {

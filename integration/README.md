@@ -76,3 +76,5 @@ I00已自审修正并合入，I01基础构建与契约证据保留草稿；I02�
 - [I03文件节点选择与固定预览](execution/i03-file-preview-ui-result.json)：来源选择、旧节点绑定、原文件读者、变化/失效与收起/删除/重开已编码；108项定向检查及类型通过，1项原Windows条件跳过。隔离界面包含删除目标缺陷修复复测；C03代码就绪待阶段工程验证，继续C04临时PTY，实际Core/Host/完整App仍待。
 
 - [I03临时终端移植基础](execution/i03-terminal-foundation-result.json)：闭合请求、原节点来源查询、进程代次和有界原始字节回放、PTY辅助进程源码已加入。纯状态源单独编译执行2项通过，11项原文SQL只读见证通过；helper/完整Core尚未编译，父端受管进程、API/Native/Web/UI和关闭接线继续，C04开发中。
+
+- [I03终端父端与关闭接线](execution/i03-terminal-parent-result.json)：Core会话registry、受管helper、原输入顺序/回执、删除和计划退出已编码；状态源2项复验通过，Core语法与模块格式通过。新增manager/codec、实际PTY/进程树尚未运行，Native/Web/API与终端读者继续，C04开发中，用户无需阶段技术验收。

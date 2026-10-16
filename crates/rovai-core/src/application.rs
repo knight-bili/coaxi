@@ -1,6 +1,7 @@
 mod execution_drivers;
 use execution_drivers::*;
 use rusqlite::OptionalExtension;
+mod canvas_terminal;
 mod config;
 mod conversation_preferences;
 mod mission;
@@ -2365,6 +2366,7 @@ struct ClaudeInputAcceptanceTarget<'a> {
 }
 
 struct Core {
+    canvas_terminals: Arc<crate::canvas_terminal::manager::Manager>,
     execution_wake: crate::execution_wake::ExecutionWake,
     non_batch_retry_at: Mutex<Option<tokio::time::Instant>>,
     database: Arc<Mutex<Database>>,
@@ -9412,11 +9414,32 @@ impl Core {
             "canvas.nodes.apply" => {
                 let params: UserCommandParams<rovai_core::canvas_node::ApplyCanvasNodesCommand> =
                     serde_json::from_value(request.params.clone())?;
+                let _terminal_lifecycle = self.canvas_terminals.lifecycle.lock().await;
+                let terminal_board_id = params.command.board_id.clone();
+                let deleted_nodes = match &params.command.mutation {
+                    crate::canvas_node::CanvasNodeMutation::Delete { node_ids } => node_ids.clone(),
+                    _ => Vec::new(),
+                };
                 let mut database = self.database.lock().await;
                 let execution = rovai_core::canvas_node::apply(
                     &mut database,
                     &user_command_envelope(params.command_id, params.command),
                 )?;
+                let cleanup = (|| -> Result<()> {
+                    for node_id in deleted_nodes {
+                        let target = crate::canvas_terminal::TerminalTarget {
+                            board_id: terminal_board_id.clone(), node_id,
+                        };
+                        if !target.live(database.connection())? {
+                            self.canvas_terminals.forget(&target)?;
+                        }
+                    }
+                    Ok(())
+                })();
+                if let Err(error) = cleanup {
+                    self.canvas_terminals.begin_shutdown();
+                    eprintln!("canvas terminal cleanup admission failed after node receipt: {error:#}");
+                }
                 Ok(serde_json::to_value(execution.result)?)
             }
             "canvas.boards.get" => {
@@ -9455,11 +9478,25 @@ impl Core {
             "canvas.boards.delete" => {
                 let params: UserCommandParams<rovai_core::canvas_board::DeleteCanvasBoardCommand> =
                     serde_json::from_value(request.params.clone())?;
+                let _terminal_lifecycle = self.canvas_terminals.lifecycle.lock().await;
+                let terminal_board_id = params.command.board_id.clone();
                 let mut database = self.database.lock().await;
                 let execution = rovai_core::canvas_board::delete(
                     &mut database,
                     &user_command_envelope(params.command_id, params.command),
                 )?;
+                let cleanup = (|| -> Result<()> {
+                    if crate::canvas_board::get(database.connection(), &terminal_board_id)?.board.is_none() {
+                        for target in self.canvas_terminals.targets(&terminal_board_id)? {
+                            self.canvas_terminals.forget(&target)?;
+                        }
+                    }
+                    Ok(())
+                })();
+                if let Err(error) = cleanup {
+                    self.canvas_terminals.begin_shutdown();
+                    eprintln!("canvas terminal cleanup admission failed after board receipt: {error:#}");
+                }
                 Ok(serde_json::to_value(execution.result)?)
             }
             "skillPacks.members.list" => {
@@ -18985,7 +19022,11 @@ async fn run_core(
         builtin_tool_leases.clone(),
     )?);
     let planned_shutdown = PlannedShutdownCoordinator::new(uuid::Uuid::new_v4().to_string());
+    let canvas_terminals = crate::canvas_terminal::manager::Manager::new(
+        data_dir.clone(), planned_shutdown.generation().to_owned(),
+    )?;
     let core = Arc::new(Core {
+        canvas_terminals,
         execution_wake: database.execution_wake.clone(),
         delivery_batch_scheduler_notify: database.execution_wake.delivery.clone(),
         agent_run_cancellation_notify: database.execution_wake.cancellation.clone(),
@@ -19475,6 +19516,7 @@ async fn run_core(
         // This store is the launch-admission linearization point. Worker stop
         // signals follow it, so no new recovery or scheduler launch can enter.
         core.planned_shutdown.close_launch_admission();
+        core.canvas_terminals.begin_shutdown();
         let _ = network_recovery_shutdown_tx.send(());
         let _ = scheduler_shutdown_tx.send(());
         let _ = execution_shutdown_tx.send(true);
@@ -19840,7 +19882,9 @@ async fn run_core(
             .await;
         }
 
+        let canvas_terminals_quiesced = core.canvas_terminals.shutdown_until(output_deadline).await;
         deadline_expired |= tokio::time::Instant::now() >= deadline
+            || !canvas_terminals_quiesced
             || !launch_quiesced
             || !terminal_drained
             || !routes_drained
@@ -19898,6 +19942,11 @@ async fn run_core(
             output_handle.abort();
         }
     } else {
+        core.planned_shutdown.close_launch_admission();
+        let terminal_deadline = tokio::time::Instant::now() + Duration::from_secs(5);
+        if !core.canvas_terminals.shutdown_until(terminal_deadline).await {
+            eprintln!("canvas terminal cleanup did not finish before Core exit");
+        }
         background_requests.abort_all();
         while background_requests.join_next().await.is_some() {}
         runtime_discovery_handle.abort();
@@ -27065,7 +27114,11 @@ mod tests {
             builtin_tool_leases.clone(),
         )?);
 
+        let planned_shutdown = PlannedShutdownCoordinator::new(uuid::Uuid::new_v4().to_string());
         Ok(Core {
+            canvas_terminals: crate::canvas_terminal::manager::Manager::new(
+                data_dir.clone(), planned_shutdown.generation().to_owned(),
+            )?,
             execution_wake: database.execution_wake.clone(),
             delivery_batch_scheduler_notify: database.execution_wake.delivery.clone(),
             agent_run_cancellation_notify: database.execution_wake.cancellation.clone(),
@@ -27259,7 +27312,7 @@ mod tests {
             )?,
             claude_code_cli: ClaudeCodeCliRuntimeAdapter::new(&data_dir)?,
             antigravity_app: AntigravityAppRuntimeAdapter::new(&data_dir)?,
-            planned_shutdown: PlannedShutdownCoordinator::new(uuid::Uuid::new_v4().to_string()),
+            planned_shutdown,
             agent_run_tasks: Mutex::new(tokio::task::JoinSet::new()),
             attachment_views,
             attachment_view_gates: Mutex::new(HashMap::new()),
