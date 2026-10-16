@@ -605,6 +605,13 @@ async function qualifyNotes(window,{evaluate,wait,rpc}){
  await evaluate(`(()=>{document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]').click();return true})()`)
  await evaluate(`(()=>{document.querySelector('button[aria-label="恢复到 100%"]').click();return true})()`)
  await wait(`document.querySelector('.canvas-zoom-readout').textContent==='100%'`)
+ await wait(`Boolean(document.querySelector('.canvas-dock-panel button[aria-label="自动排列"]:not(:disabled)'))`)
+ let lastTransform=null,stableFrames=0
+ for(let attempt=0;attempt<20&&stableFrames<3;attempt++){
+  const transform=await evaluate(`document.querySelector('.react-flow__viewport').style.transform`)
+  stableFrames=transform===lastTransform?stableFrames+1:0;lastTransform=transform;await pause(80)
+ }
+ assert.ok(stableFrames>=3,'画布视口仍在动画中，不能开始拖动')
  const card=`document.querySelector('[data-id="${ids[0]}"] .canvas-note-paper')`
  const point=async expression=>{
   await wait(`Boolean(${expression})`)
@@ -620,6 +627,7 @@ async function qualifyNotes(window,{evaluate,wait,rpc}){
  await evaluate(`(()=>{window.noteDragEvents=[];for(const name of ['mousedown','mousemove','mouseup'])document.addEventListener(name,event=>window.noteDragEvents.push({type:event.type,buttons:event.buttons,trusted:event.isTrusted,x:event.clientX,y:event.clientY}),true);return true})()`)
  mouse('mouseMove',start);mouse('mouseDown',start)
  await pause(50)
+ window.webContents.sendInputEvent({type:'mouseMove',x:start.x+8,y:start.y+8,modifiers:['leftButtonDown']});await pause(80)
  window.webContents.sendInputEvent({type:'mouseMove',x:start.x+72,y:start.y+48,modifiers:['leftButtonDown']});await pause(80);mouse('mouseUp',{x:start.x+72,y:start.y+48})
  await pause(200)
  report.note_drag_events=await evaluate('window.noteDragEvents')
