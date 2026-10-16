@@ -1,10 +1,12 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { Background, BackgroundVariant, Controls, MiniMap, NodeResizer, ReactFlow, ReactFlowProvider,
+import { Background, BackgroundVariant, Panel, NodeResizer, ReactFlow, ReactFlowProvider,
   SelectionMode, ViewportPortal, applyNodeChanges, useReactFlow, useViewport, type Node, type NodeProps } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import type { AgentProfile, CanvasConversationRef, CanvasNode, CanvasNodeMutation, FilePreviewApi, ResolvedTheme, StoredCommandResult } from '@contracts'
+import type { AgentProfile, CanvasConversationRef, CanvasNode, CanvasNodeKind, CanvasNodeMutation, FilePreviewApi, ResolvedTheme, StoredCommandResult } from '@contracts'
+import { ExternalLink, Expand, Group, LayoutGrid, Map as MapIcon, Minus, MoreHorizontal, Pencil, Plus, RefreshCw, Trash2 } from 'lucide-react'
+import { CanvasIconButton, CanvasViewportPanel } from './CanvasDock'
 import { CanvasFilePreview } from './CanvasFilePreview'
 import { ResourceReferenceIcon } from './FilePreviewTabIcon'
 import { CanvasTerminal } from './CanvasTerminal'
@@ -114,18 +116,18 @@ function CanvasCard({ data, selected }: NodeProps<FlowNode>): React.JSX.Element 
       {d.kind === 'file' && <ResourceReferenceIcon kind="file" className="resource-reference-icon" />}
       <strong title={d.kind === 'file' && d.path ? `${title}\n${d.path}` : title}>{title}</strong>
       {d.kind === 'file' && <span ref={setFileActionsHost} className="canvas-file-actions nodrag nowheel" />}
-      {d.kind === 'folder' && actions.onOpenProject && <button className="nodrag" type="button" title={d.folderPath ?? undefined} onClick={() => actions.onOpenProject?.(d.folderPath!)}><UiText zh="进入工程" /></button>}
-      {d.kind === 'agent' && member && !member.removedAt && actions.onOpenMember && <button className="nodrag" type="button" title={d.runtimeKind ?? undefined} onClick={() => actions.onOpenMember?.(member.agentId)}><UiText zh="打开队员" /></button>}
+      {d.kind === 'folder' && actions.onOpenProject && <CanvasIconButton className="nodrag" label={uiAttribute('进入工程')} onClick={() => actions.onOpenProject?.(d.folderPath!)}><ExternalLink size={15} /></CanvasIconButton>}
+      {d.kind === 'agent' && member && !member.removedAt && actions.onOpenMember && <CanvasIconButton className="nodrag" label={uiAttribute('打开队员')} onClick={() => actions.onOpenMember?.(member.agentId)}><ExternalLink size={15} /></CanvasIconButton>}
       {d.kind === 'file' ? <DropdownMenu.Root>
-        <DropdownMenu.Trigger asChild><button className="nodrag" type="button" disabled={actions.blocked} aria-label={uiAttribute('文件节点操作')}><UiText zh="更多" /></button></DropdownMenu.Trigger>
+        <DropdownMenu.Trigger asChild><button className="canvas-icon-button nodrag" type="button" disabled={actions.blocked} aria-label={uiAttribute('文件节点操作')} title={uiAttribute('文件节点操作')}><MoreHorizontal size={16} /></button></DropdownMenu.Trigger>
         <DropdownMenu.Portal><DropdownMenu.Content className="canvas-card-menu" align="end" sideOffset={4} collisionPadding={12} loop onCloseAutoFocus={event => event.preventDefault()}>
           <DropdownMenu.Item className="canvas-card-menu-item" disabled={actions.blocked} onSelect={() => actions.edit(row)}><UiText zh="编辑节点" /></DropdownMenu.Item>
           <DropdownMenu.Item className="canvas-card-menu-item is-danger" disabled={actions.blocked} onSelect={() => actions.removeNode(row)}><UiText zh="移除文件节点" /></DropdownMenu.Item>
         </DropdownMenu.Content></DropdownMenu.Portal>
-      </DropdownMenu.Root> : <button className="nodrag" type="button" disabled={actions.blocked} onClick={() => actions.edit(row)} aria-label={uiAttribute('编辑节点')}><UiText zh="编辑" /></button>}
-      {d.kind === 'terminal' && <button className="nodrag" type="button" disabled={actions.blocked} onClick={() => actions.removeNode(row)} aria-label={uiAttribute('删除终端节点')}><UiText zh="删除" /></button>}
-      {(region || d.kind === 'file' || d.kind === 'terminal') && <button className="nodrag" type="button" disabled={actions.blocked} onClick={() => actions.collapse(row)}
-        aria-label={uiAttribute(d.kind === 'file' ? d.collapsed ? '展开预览' : '收起预览' : d.kind === 'terminal' ? d.collapsed ? '展开终端' : '收起终端' : d.collapsed ? '展开区域' : '折叠区域')}>{d.collapsed ? '+' : '−'}</button>}
+      </DropdownMenu.Root> : <CanvasIconButton className="nodrag" disabled={actions.blocked} onClick={() => actions.edit(row)} label={uiAttribute('编辑节点')}><Pencil size={15} /></CanvasIconButton>}
+      {d.kind === 'terminal' && <CanvasIconButton className="nodrag" disabled={actions.blocked} onClick={() => actions.removeNode(row)} label={uiAttribute('删除终端节点')}><Trash2 size={15} /></CanvasIconButton>}
+      {(region || d.kind === 'file' || d.kind === 'terminal') && <CanvasIconButton className="nodrag" disabled={actions.blocked} onClick={() => actions.collapse(row)}
+        label={uiAttribute(d.kind === 'file' ? d.collapsed ? '展开预览' : '收起预览' : d.kind === 'terminal' ? d.collapsed ? '展开终端' : '收起终端' : d.collapsed ? '展开区域' : '折叠区域')}>{d.collapsed ? <Plus size={15} /> : <Minus size={15} />}</CanvasIconButton>}
     </header>
     {!d.collapsed && <div className="canvas-card-body nodrag nowheel">
       {d.kind === 'note' && <SafeMarkdown theme={actions.theme} mode="document">{d.content || ''}</SafeMarkdown>}
@@ -406,6 +408,43 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
       : { kind: 'pin' as const, nodeId: moved.id, conversation: reference }
     return { source, hint: computeDropHint(source, position, regions, pins) }
   }
+  const addNode = (kind?: CanvasNodeKind) => {
+      if (blocked) return
+      const bounds = flow.getViewport(), element = surface.current?.getBoundingClientRect()
+      const point = element ? flow.screenToFlowPosition({ x: element.left + element.width / 2, y: element.top + element.height / 2 }) : { x: -bounds.x / bounds.zoom, y: -bounds.y / bounds.zoom }
+      panel.current = true; setEditor({ target: { type: 'create', position: point, kind }, revision: graph.snapshot!.board!.revision })
+  }
+  const arrange = () => {
+    const sizes = new Map(nodes.map(node => [node.id, { width: node.width ?? node.data.row.data.width, height: node.height ?? node.data.row.data.height }]))
+    const moves = packLayout(rows.map(row => ({ id: row.id, ...row.data })), sizes)
+    if (moves.length) mutate({ type: 'move', moves })
+  }
+  // Codeg's board actions stay in a bottom-centred dock; viewport controls own their corner.
+  const toolbar = <div className="canvas-toolbar" role="toolbar" aria-label={uiAttribute('画布工具')}>
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger asChild><button type="button" className="canvas-icon-button" disabled={blocked} aria-label={uiAttribute('添加节点')} title={uiAttribute('添加节点')}><Plus size={18} /></button></DropdownMenu.Trigger>
+      <DropdownMenu.Portal><DropdownMenu.Content className="canvas-card-menu" side="top" align="start" sideOffset={10} collisionPadding={12} loop onCloseAutoFocus={event => event.preventDefault()}>
+        {(Object.keys(canvasKindNames) as CanvasNodeKind[]).map(kind => <DropdownMenu.Item key={kind} className="canvas-card-menu-item" disabled={blocked} onSelect={() => addNode(kind)}>{uiAttribute(canvasKindNames[kind])}</DropdownMenu.Item>)}
+      </DropdownMenu.Content></DropdownMenu.Portal>
+    </DropdownMenu.Root>
+    <CanvasIconButton label={uiAttribute('查看全部')} onClick={() => { void flow.fitView({ padding: 0.15 }) }}><Expand size={17} /></CanvasIconButton>
+    <CanvasIconButton label={uiAttribute('自动排列')} disabled={blocked || !rows.length} onClick={arrange}><LayoutGrid size={17} /></CanvasIconButton>
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger asChild><button className="canvas-icon-button" type="button" aria-label={uiAttribute('画布操作')} title={uiAttribute('画布操作')}><MoreHorizontal size={18} /></button></DropdownMenu.Trigger>
+      <DropdownMenu.Portal><DropdownMenu.Content className="canvas-card-menu" side="top" align="end" sideOffset={10} collisionPadding={12} loop onCloseAutoFocus={event => event.preventDefault()}>
+        <DropdownMenu.Item className="canvas-card-menu-item" onSelect={() => { props.onRefreshReferences?.(); void folders.refresh() }}><RefreshCw size={15} /><UiText zh="刷新关联" /></DropdownMenu.Item>
+        <DropdownMenu.Item className="canvas-card-menu-item" disabled={blocked || !nodes.some(node => selected.includes(node.id) && (node.data.member || canvasPlainConversation(node.data.row)))} onSelect={groupSelected}><UiText zh="选中对话分组" /></DropdownMenu.Item>
+        <DropdownMenu.Item className="canvas-card-menu-item is-danger" disabled={blocked || !rows.some(row => selected.includes(row.id))} onSelect={() => deleteSelected()}><UiText zh="删除所选" /></DropdownMenu.Item>
+        <DropdownMenu.Item className="canvas-card-menu-item" disabled={blocked || !rows.length} onSelect={arrange}><UiText zh="自动排列" /></DropdownMenu.Item>
+        <DropdownMenu.CheckboxItem className="canvas-card-menu-item" checked={view.minimap} onCheckedChange={checked => setView(current => ({ ...current, minimap: checked === true }))}>
+          <DropdownMenu.ItemIndicator><MapIcon size={15} /></DropdownMenu.ItemIndicator><UiText zh="小地图" />
+        </DropdownMenu.CheckboxItem>
+      </DropdownMenu.Content></DropdownMenu.Portal>
+    </DropdownMenu.Root>
+    {selected.length > 0 && <><span className="canvas-dock-divider" aria-hidden="true" />
+      <CanvasIconButton label={uiAttribute('选中对话分组')} disabled={blocked || !nodes.some(node => selected.includes(node.id) && (node.data.member || canvasPlainConversation(node.data.row)))} onClick={groupSelected}><Group size={17} /></CanvasIconButton>
+      <CanvasIconButton label={uiAttribute('删除所选')} disabled={blocked || !rows.some(row => selected.includes(row.id))} onClick={() => deleteSelected()}><Trash2 size={17} /></CanvasIconButton></>}
+  </div>
   return <section ref={surface} className="canvas-surface" aria-label={uiAttribute('无限画布')} onKeyDownCapture={event => {
     const target = event.target
     if (!(target instanceof HTMLElement) || !target.matches('.react-flow__node, .react-flow__nodesselection-rect') || event.metaKey || event.ctrlKey || event.altKey) return
@@ -423,23 +462,6 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     const moves = rows.filter(row => ids.includes(row.id)).map(row => ({ nodeId: row.id, x: row.data.x + direction[0] * distance, y: row.data.y + direction[1] * distance }))
     if (moves.length) mutate({ type: 'move', moves }, graph.snapshot!.board!.revision)
   }}>
-    <div className="canvas-toolbar">
-      <button type="button" onClick={() => { props.onRefreshReferences?.(); void folders.refresh() }}><UiText zh="刷新关联" /></button>
-      <button type="button" disabled={blocked} onClick={() => {
-        const bounds = flow.getViewport(), element = surface.current?.getBoundingClientRect()
-        const point = element ? flow.screenToFlowPosition({ x: element.left + element.width / 2, y: element.top + element.height / 2 }) : { x: -bounds.x / bounds.zoom, y: -bounds.y / bounds.zoom }
-        panel.current = true; setEditor({ target: { type: 'create', position: point }, revision: graph.snapshot!.board!.revision })
-      }}><UiText zh="添加节点" /></button>
-      <button type="button" disabled={blocked || !nodes.some(node => selected.includes(node.id) && (node.data.member || canvasPlainConversation(node.data.row)))} onClick={groupSelected}><UiText zh="选中对话分组" /></button>
-      <button type="button" disabled={blocked || !rows.some(row => selected.includes(row.id))} onClick={() => deleteSelected()}><UiText zh="删除所选" /></button>
-      <button type="button" disabled={blocked || !rows.length} onClick={() => {
-        const sizes = new Map(nodes.map(node => [node.id, { width: node.width ?? node.data.row.data.width, height: node.height ?? node.data.row.data.height }]))
-        const moves = packLayout(rows.map(row => ({ id: row.id, ...row.data })), sizes)
-        if (moves.length) mutate({ type: 'move', moves })
-      }}><UiText zh="自动排列" /></button>
-      <button type="button" onClick={() => { void flow.fitView({ padding: 0.15 }) }}><UiText zh="查看全部" /></button>
-      <button type="button" aria-pressed={view.minimap} onClick={() => setView(current => ({ ...current, minimap: !current.minimap }))}><UiText zh="小地图" /></button>
-    </div>
     {error && <div className="canvas-notice" role="alert">{error}<button type="button" onClick={() => { void graph.refresh().catch(() => undefined) }}><UiText zh="重新读取" /></button>
       {props.conversation?.issue && !props.conversation.restoring && <button type="button" disabled={blocked || !props.scope}
         onClick={() => { setIssue(null); setRestoreRetry(value => value + 1) }}><UiText zh="重试恢复展开" /></button>}
@@ -453,9 +475,11 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
         onClick={() => { void props.conversation?.open({ ...item.target, presentation: 'drawer' }) }}>{title(item.target.reference)}</button>)}
     </div>}
     {graph.loading && !graph.snapshot && <p className="canvas-notice" role="status"><UiText zh="正在读取画布…" /></p>}
-    {!graph.loading && graph.snapshot?.board && !rows.length && <p className="canvas-empty-hint"><UiText zh="从添加节点开始，也可以把对话整理到同一片画布。" /></p>}
     {!graph.loading && graph.snapshot && !graph.snapshot.board && <p className="canvas-notice"><UiText zh="此画板已被删除，请选择其他画板。" /></p>}
     <div className="canvas-flow-stage" ref={stage}>
+    {!graph.loading && graph.snapshot?.board && !rows.length && <div className="canvas-empty-hint"><MapIcon size={40} strokeWidth={1.5} aria-hidden="true" />
+      <h3><UiText zh="画布还是空的" /></h3><p><UiText zh="用空间方式梳理工作区：区域对应工程和队员，卡片对应会话，便签记录其它。" /></p>
+      <button type="button" className="canvas-primary-button" disabled={blocked} onClick={() => addNode()}><Plus size={16} /><UiText zh="添加节点" /></button></div>}
     <PresentationContext.Provider value={actions}>
       <ReactFlow<FlowNode> nodes={nodes} nodeTypes={nodeTypes} onNodesChange={changes => setNodes(current => applyNodeChanges(changes, current))}
         colorMode={props.theme === 'night' ? 'dark' : 'light'} ariaLabelConfig={{ 'controls.zoomIn.ariaLabel': uiAttribute('放大画布'), 'controls.zoomOut.ariaLabel': uiAttribute('缩小画布'), 'controls.fitView.ariaLabel': uiAttribute('查看全部'),
@@ -512,8 +536,8 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
           mutate({ type: 'move', moves: selectedRows.map(node => ({ nodeId: node.id, x: node.position.x + alignment.dx, y: node.position.y + alignment.dy })) }, revision)
         }}>
         <Background variant={BackgroundVariant.Dots} gap={BOARD_DOT_GAP} size={1} />
-        <Controls showInteractive={false} />
-        {view.minimap && <MiniMap pannable zoomable />}
+        <Panel position="bottom-center" className="canvas-dock-panel">{toolbar}</Panel>
+        <CanvasViewportPanel minimap={view.minimap} onMinimapChange={minimap => setView(current => ({ ...current, minimap }))} />
         <ViewportPortal><svg className="canvas-alignment-guides" width={1} height={1} aria-hidden="true">
           {guides.map((guide, i) => <line key={i} x1={guide.axis === 'x' ? guide.at : guide.from} x2={guide.axis === 'x' ? guide.at : guide.to}
             y1={guide.axis === 'y' ? guide.at : guide.from} y2={guide.axis === 'y' ? guide.at : guide.to} vectorEffect="non-scaling-stroke" />)}

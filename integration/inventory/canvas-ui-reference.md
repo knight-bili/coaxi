@@ -1,0 +1,42 @@
+# 画布界面的源码参考与移植边界
+
+客户于 2026-10-16 提供五张真实 Codeg 截图，并明确要求持续参考两份应用的本地源码与 CodeGraph。此次纠正此前仅整理文字按钮的实现方式，按照原组件的布局和交互组织画布。此调整属于 I03 已有画布能力的界面整改，不新增阶段、不减少完整一期范围。
+
+## 固定参考版本
+
+| 源码 | 本地位置（相对融合仓库） | 固定提交 | 使用方式 |
+|---|---|---|---|
+| Codeg | `../source-reference/codeg` | `aff1e6c278453ed8d0b96a5f664edcdca621aa3f` | 独立 detached 工作树，源码参考，Apache-2.0 |
+| Rovai AI | `../source-reference/rovai-ai` | `cc465dda562536b94f23787759e3206324baa29e` | 独立 detached 工作树，源码参考，MIT |
+| 融合工程 | 当前仓库 | 以当前任务分支为准 | 实际开发与测试 |
+
+三处均已按客户本次直接授权建立 CodeGraph 索引，并通过实际组件查询验证。没有修改源仓库较新的 HEAD，没有更改 `sources.lock.json`，也没有更改全局 MCP 配置。索引只存本地，不提交数据库。后续一批源码修改结束后同步融合索引；参考源只有在明确升级锁定版本时才更换。
+
+## 原组件到融合组件
+
+| 原 Codeg 文件或组件 | 原设计承担的职责 | 融合实现 |
+|---|---|---|
+| `canvas-page.tsx` 的 `CanvasPageTitle` / `BoardTitleMenu` | 细标题栏、画板标题菜单、返回列表 | `CanvasWorkspace.tsx` 的面包屑、画板菜单与画布列表；沿用原有离开事务，切换前保留输入保护 |
+| `canvas-board-list.tsx` 的 `CanvasBoardList` | 空列表居中引导、画布选择与搜索 | `CanvasWorkspace.tsx` 的空状态、搜索和真实画板卡片；当前 Core 列表不提供节点缩略图与计数，不能绘制假内容冒充 |
+| `canvas-board-dialogs.tsx` / `canvas-swatches.tsx` | 单标题创建表单、名称/描述/颜色、再次选色清空 | `CanvasBoardDialog.tsx`，继续使用 Core 并发版本、未知结果回查与忙碌锁；保留所有十二种合法颜色及无色值 |
+| `canvas-dock.tsx` 的 `CanvasDock` | 底部悬浮图标操作，选择后出现相应动作 | `CanvasSurface.tsx`，添加入口接原有八类节点；排列、分组、删除、刷新均保留原处理函数和确认保护 |
+| `canvas-dock.tsx` 的 `CanvasViewportPanel` | 右下角小地图与水平缩放胶囊，实时比例、100%恢复、尺寸同步 | `CanvasDock.tsx`，复用原有按 Host/Core 隔离的视口和地图偏好；缩放不启动任何模型 |
+| `nodes/card-frame.tsx` | 16px 卡片圆角、36px 单标题栏、紧凑图标操作 | `canvas.css`、`CanvasSurface.tsx`、`CanvasConversationFrame.tsx`；保留实时文件、终端和对话组件 |
+| `theme-presets.ts` 的 `THEME_COLOR_PREVIEW` | 稳定身份色，与成功/错误等状态色分开 | `packages/ui/src/theme.css` 中画布专用色板，十二个颜色值按原源码保留 |
+| 原应用使用的 `lucide-react` | 工具与窗口操作图标 | 同版本 `0.564.0`，精确锁定依赖并保留许可证；没有顺带升级其他依赖 |
+
+以上 Codeg 文件均位于固定参考源码的 `src/components/canvas/` 下，色板位于 `src/lib/theme-presets.ts`。相关 Apache-2.0 许可证已保留在 `integration/licenses/codeg/`。
+
+## Rovai 继续承担的真实业务
+
+Rovai 原 `ThreadWorkspace`、`SingleChatPanel`、`FilePreviewProvider` 的职责仍在原组件中。画布里的队员来自真实队员列表，不伪造 Codeg 的品牌代理列表；公开/私有输入、每卡材料隔离、恢复副本、文件权限、停止和排队等能力继续经过原业务链路。Core 仍是唯一数据和执行权威，不能接入供体自己的 Tauri 数据库或 ACP 连接管理来形成第二套执行系统。
+
+Mission、Task、Diff、文件工作区仍进入原对象。此前真实 C02 检查发现的 `missions.delivery` 输出字段修复属于独立兼容缺陷，不通过放宽客户端归属校验来掩盖。
+
+## 本批完成标准
+
+1. 先完成组件与调用链核对、界面代码、自审、类型及相关低成本检查。
+2. 与已完成的私聊附件 UI 和 Mission 输出修复一起冻结候选，集中编译并运行已有真实 Native 检查，不为每个按钮分别构建或触发 Actions。
+3. 使用真实应用截图，按同一画布场景核对主页、创建弹窗、空画布、会话与文件卡片；记录参考图尺寸、实际视口和缩放，不能把不同 DPI 的截图直接当作差异。
+4. 实际验证八类创建入口、菜单键盘操作、排列/分组/删除、小地图与缩放、原工作区跳转及每卡附件预览。此前已通过的结果不自动覆盖新界面。
+5. 类型检查和源码移植均不等于视觉验证通过。未取得新的运行截图前，本批界面保持工程验证待补，不交给客户做阶段技术测试。

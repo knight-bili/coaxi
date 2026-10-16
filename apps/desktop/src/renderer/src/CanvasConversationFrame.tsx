@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react'
+import { ExternalLink, MessageSquare, PanelRight, PanelsTopLeft, X } from 'lucide-react'
+import { CanvasIconButton } from './CanvasDock'
 import type { CanvasConversationTarget } from './canvas-conversation'
 import type { CanvasNode } from '@contracts'
 import type { CanvasViewScope } from './canvas-view-state'
@@ -33,12 +35,12 @@ export function CanvasConversationFrame({ bridge, instance, title, orphaned = fa
     }} onWheel={event => event.stopPropagation()}
     onPointerDown={event => event.stopPropagation()}>
     <header className="canvas-conversation-heading">
+      <MessageSquare size={16} aria-hidden="true" />
       <strong title={title}>{title}</strong>
-      {!orphaned && <button type="button" disabled={bridge.opening || Boolean(bridge.restoring)} onClick={() => { void bridge.open({ ...target, presentation: target.presentation === 'inline' ? 'drawer' : 'inline' }) }}>
-        <UiText zh={target.presentation === 'inline' ? '移至侧边' : '放回画布'} />
-      </button>}
-      <button type="button" disabled={bridge.opening || Boolean(bridge.restoring)} onClick={onOpenWorkspace}><UiText zh="打开完整工作区" /></button>
-      <button type="button" disabled={bridge.opening || Boolean(bridge.restoring)} onClick={() => { void bridge.close([key]) }}><UiText zh="收起对话" /></button>
+      {!orphaned && <CanvasIconButton disabled={bridge.opening || Boolean(bridge.restoring)} onClick={() => { void bridge.open({ ...target, presentation: target.presentation === 'inline' ? 'drawer' : 'inline' }) }}
+        label={uiAttribute(target.presentation === 'inline' ? '移至侧边' : '放回画布')}>{target.presentation === 'inline' ? <PanelRight size={15} /> : <PanelsTopLeft size={15} />}</CanvasIconButton>}
+      <CanvasIconButton disabled={bridge.opening || Boolean(bridge.restoring)} onClick={onOpenWorkspace} label={uiAttribute('打开完整工作区')}><ExternalLink size={15} /></CanvasIconButton>
+      <CanvasIconButton disabled={bridge.opening || Boolean(bridge.restoring)} onClick={() => { void bridge.close([key]) }} label={uiAttribute('收起对话')}><X size={16} /></CanvasIconButton>
     </header>
     {orphaned && <p className="canvas-notice" role="status"><UiText zh="原画布卡片已变更，当前对话保留在侧边，请先保存或收起。" /></p>}
     <div className="canvas-conversation-content" inert={busy} aria-busy={busy}>{instance.content}</div>

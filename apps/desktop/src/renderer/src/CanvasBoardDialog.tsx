@@ -31,20 +31,24 @@ export function CanvasBoardDialog({ board, remove, latest, blocked, pending, rec
   const close = () => { if (!saving.current && !pending) onClose() }
   return <Dialog.Root open onOpenChange={open => { if (!open) close() }}><Dialog.Portal>
     <Dialog.Overlay className="dialog-overlay app-dialog-overlay" />
-    <AppDialogContent tone={remove ? 'danger' : 'neutral'} onPointerDownOutside={event => event.preventDefault()}
+    <AppDialogContent className="canvas-board-dialog" tone={remove ? 'danger' : 'neutral'} onPointerDownOutside={event => event.preventDefault()}
       onEscapeKeyDown={event => { if (locked) event.preventDefault() }}>
-      <AppDialogHeader title={uiAttribute(remove ? '删除画板' : board ? '编辑画板' : '创建画板')}
+      <AppDialogHeader title={uiAttribute(remove ? '删除画板' : board ? '编辑画板' : '新建画布')}
         description={uiAttribute(remove ? '删除画板及其中全部节点和便签正文，保留工程、对话、文件与历史。' : '名称可以留空，布局和节点内容会保存到当前工作区。')}
+        hideDescription={!remove}
         closeDisabled={locked} />
       <form className="app-dialog-form" onSubmit={event => { event.preventDefault(); void save() }}>
         <AppDialogBody>
           {remove ? <p>{board?.name || uiAttribute('未命名画板')}</p> : <fieldset disabled={locked} className="canvas-editor-fields">
-            <label className="field-label"><UiText zh="画板名称" /><input data-dialog-autofocus value={name} onChange={event => setName(event.target.value)}
+            <label className="field-label"><UiText zh="名称" /><input data-dialog-autofocus placeholder={uiAttribute('未命名画板')} value={name} onChange={event => setName(event.target.value)}
               onKeyDown={event => { if (event.key === 'Enter' && event.nativeEvent.isComposing) event.preventDefault() }} /></label>
-            <label className="field-label"><UiText zh="说明" /><textarea value={description} rows={3} onChange={event => setDescription(event.target.value)} /></label>
-            <label className="field-label"><UiText zh="标记颜色" /><select value={color} onChange={event => setColor(event.target.value)}>
-              <option value="">{uiAttribute('无')}</option>{canvasColors.map(value => <option key={value} value={value}>{uiAttribute(canvasColorName(value))}</option>)}
-            </select></label>
+            <label className="field-label"><UiText zh="描述" /><textarea placeholder={uiAttribute('这个画布用来做什么？（可选）')} value={description} rows={3} onChange={event => setDescription(event.target.value)} /></label>
+            <div className="field-label"><span id="canvas-board-color-label"><UiText zh="颜色" /></span>
+              <div className="canvas-color-palette" role="group" aria-labelledby="canvas-board-color-label">
+                {canvasColors.map(value => <button key={value} type="button" data-color={value} className="canvas-color-choice" aria-label={uiAttribute(canvasColorName(value))}
+                  title={uiAttribute(canvasColorName(value))} aria-pressed={color === value} onClick={() => setColor(color === value ? '' : value)}><span className="canvas-color-dot" /></button>)}
+              </div>
+            </div>
           </fieldset>}
           {invalid && <p role="alert"><UiText zh="名称最多 200 个字符，说明最多 2000 个字符。" /></p>}
           {board && !latest && <p role="alert"><UiText zh="画板已删除或暂时不可用，请重新读取列表。" /></p>}
@@ -55,7 +59,7 @@ export function CanvasBoardDialog({ board, remove, latest, blocked, pending, rec
         </AppDialogBody>
         <AppDialogFooter><button type="button" className="quiet-button" disabled={locked} onClick={close}><UiText zh="取消" /></button>
           <button className={remove ? 'danger-button' : 'primary-button conversation-primary-button'} type="submit" disabled={blocked || locked || stale || invalid}>
-            <UiText zh={locked ? '保存中…' : remove ? '删除画板' : board ? '保存' : '创建画板'} />
+            <UiText zh={locked ? '保存中…' : remove ? '删除画板' : board ? '保存' : '创建'} />
           </button>
         </AppDialogFooter>
       </form>

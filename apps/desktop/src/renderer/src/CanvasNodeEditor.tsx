@@ -17,7 +17,7 @@ const colorNames = ['默认', '锌灰', '蓝灰', '石灰', '灰色', '红色', 
 export const canvasColorName = (color: string): string => colorNames[canvasColors.indexOf(color as typeof canvasColors[number])] ?? color
 export interface CanvasReferenceOption { reference: CanvasConversationRef; label: string; available?: boolean }
 export interface CanvasFolderGroupOption { id: string; label: string; color?: string | null; projectPaths?: readonly string[] }
-export type CanvasEditTarget = { type: 'create'; position: { x: number; y: number } } | { type: 'update' | 'bind_file'; row: CanvasNode }
+export type CanvasEditTarget = { type: 'create'; position: { x: number; y: number }; kind?: CanvasNodeKind } | { type: 'update' | 'bind_file'; row: CanvasNode }
 
 export function CanvasNodeEditor({ target, revision, latestRevision, agents, groups, references, referencesComplete, objectReferencesSupported = false, fileReferencesSupported = false, objectThreads = [], onRefreshReferences, blocked, pending, recovery, commandError, onClose, onSave }: {
   target: CanvasEditTarget
@@ -39,7 +39,7 @@ export function CanvasNodeEditor({ target, revision, latestRevision, agents, gro
   onSave(mutation: CanvasNodeMutation, expectedRevision: number): Promise<void>
 }): React.JSX.Element {
   const original = target.type !== 'create' ? target.row : null, bindingOnly = target.type === 'bind_file'
-  const [kind, setKind] = useState<CanvasNodeKind>(original?.data.kind ?? 'note')
+  const [kind, setKind] = useState<CanvasNodeKind>(original?.data.kind ?? (target.type === 'create' ? target.kind : undefined) ?? 'note')
   const [objectKind, setObjectKind] = useState<CanvasObjectReference['kind'] | null>(original?.data.objectReference?.kind ?? null)
   const [objectTarget, setObjectTarget] = useState<CanvasObjectTarget | null>(null)
   const [fileThreadId, setFileThreadId] = useState('')

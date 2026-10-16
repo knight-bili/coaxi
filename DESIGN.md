@@ -137,6 +137,13 @@ and ambient shadows.
 
 ## Shapes
 
+The integrated canvas follows the customer's explicit Codeg reference (2026-10-16):
+16px document cards, a 36px card title row, pill-shaped floating tools and a 28px
+board dialog. Its neutral Day/Night palette is scoped through the `--canvas-board-*`
+tokens in `packages/ui/src/theme.css`; this does not replace the App shell's visual
+system. Source mappings and verification boundaries live in
+[`integration/inventory/canvas-ui-reference.md`](integration/inventory/canvas-ui-reference.md).
+
 Controls use compact 5–8px radii, work surfaces typically use 9–11px and dialogs use 12–13px.
 Pills are reserved for terse status, filters and identity metadata; they do not wrap paragraphs.
 Circular shapes are reserved for portraits, small status dots and bounded icon controls.

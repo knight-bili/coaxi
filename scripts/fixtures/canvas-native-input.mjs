@@ -11,6 +11,14 @@ const report={source_commit:config.source_commit,scope:'production Main/preload/
 await mkdir(config.evidence,{recursive:false})
 let started=false
 const record=(name,details={})=>{report.checks.push({name,passed:true,...details});console.log(JSON.stringify({check:name,passed:true}))}
+async function openCanvasBoard(evaluate,wait,boardId){
+ await evaluate(`(()=>{document.querySelector('button[aria-label="无限画布"]').click();return true})()`)
+ await wait(`Boolean(document.querySelector('.canvas-breadcrumb-root:not(:disabled)'))`)
+ await evaluate(`(()=>{document.querySelector('.canvas-breadcrumb-root').click();return true})()`)
+ await wait(`Boolean(document.querySelector('.canvas-board-tile[data-board-id="${boardId}"]:not(:disabled)'))`,40_000)
+ await evaluate(`(()=>{document.querySelector('.canvas-board-tile[data-board-id="${boardId}"]').click();return true})()`)
+ await wait(`Boolean(document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]'))`)
+}
 app.on('browser-window-created',(_event,window)=>{
  if(started)return;started=true
  window.webContents.once('did-finish-load',()=>{void qualify(window)})
@@ -31,6 +39,18 @@ async function qualify(window){
   if(config.mode==='materials-reopen'){
    report.scope='production Main/preload/Core; cold private material recovery and authorized file reads; no model'
    await qualifyMaterialReopen({evaluate,rpc})
+   report.status='passed'
+   return
+  }
+  if(config.mode==='objects'){
+   report.scope='production Main/preload/Core; exact Mission/Task/Diff/file workspace navigation; no model'
+   await qualifyObjects(window,{evaluate,wait,rpc})
+   report.status='passed'
+   return
+  }
+  if(config.mode==='private-ui'){
+   report.scope='production Main/preload/Core; actual scoped attachment card opens exact source in canvas; no model'
+   await qualifyPrivateUi(window,{evaluate,wait,rpc})
    report.status='passed'
    return
   }
@@ -104,11 +124,9 @@ async function qualifyFiles(window,{evaluate,wait,rpc}){
   assert.equal(applied.status,'applied',JSON.stringify(applied));nodeIds.push(applied.payload.nodeIds[0])
  }
  report.board_id=boardId;report.node_ids=nodeIds
- await evaluate(`(()=>{document.querySelector('button[aria-label="无限画布"]').click();return true})()`)
- await wait(`Boolean(document.querySelector('.canvas-boards-toolbar select option[value="${boardId}"]'))`)
- await evaluate(`(()=>{const select=document.querySelector('.canvas-boards-toolbar select');select.value=${JSON.stringify(boardId)};select.dispatchEvent(new Event('change',{bubbles:true}));return true})()`)
+ await openCanvasBoard(evaluate,wait,boardId)
  await wait(`document.querySelectorAll('.react-flow__node').length===2`)
- await evaluate(`(()=>{[...document.querySelectorAll('.canvas-surface button')].find(button=>button.textContent.trim()==='查看全部').click();return true})()`)
+ await evaluate(`(()=>{document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]').click();return true})()`)
  const textCard=`document.querySelector('[data-id="${nodeIds[0]}"] .canvas-card')`
  const htmlCard=`document.querySelector('[data-id="${nodeIds[1]}"] .canvas-card')`
  await wait(`${textCard}?.textContent.includes('C06 真实文件权限')`,25_000)
@@ -325,5 +343,130 @@ async function qualifyMaterialReopen({evaluate,rpc}){
  record('production_file_reader_rejects_attachment_from_a_different_card')
  assert.deepEqual((await rpc('singleChat.composerDraft.recovery',{threadId,conversationId})).items,recovery.items)
  report.private_context=previous.private_context
+}
+async function qualifyObjects(window,{evaluate,wait,rpc}){
+ const mission=await rpc('missions.create',{commandId:randomUUID(),command:{title:'C06 原使命定位',description:'只保存使命，不启动模型。',projectBindingKind:'directory',projectPath:config.workspace,memberAgentIds:[config.agent_id],defaultLeadAgentId:config.agent_id,tags:[]}})
+ assert.equal(mission.status,'applied',JSON.stringify(mission))
+ const {missionId,threadId}=mission.payload
+ assert.ok(missionId&&threadId,JSON.stringify(mission))
+ const task=await rpc('tasks.create',{commandId:randomUUID(),threadId,title:'C06 原历史任务定位',description:'通过原对象卡片恢复这条已取消任务。',assigneeAgentId:config.agent_id})
+ assert.equal(task.status,'applied',JSON.stringify(task))
+ const taskId=task.payload.taskId
+ assert.ok(taskId,JSON.stringify(task))
+ const ended=await rpc('tasks.update',{commandId:randomUUID(),threadId,taskId,status:'cancelled',cancelReason:'本地历史任务定位检查'})
+ assert.equal(ended.status,'applied',JSON.stringify(ended))
+ const created=await rpc('canvas.boards.create',{commandId:randomUUID(),command:{name:'C06 原对象与工作区'}})
+ assert.equal(created.status,'applied',JSON.stringify(created))
+ const boardId=created.payload.board.id,nodes={}
+ let toolbarChecked=false
+ for(const [index,[kind,objectReference]] of [['mission',{kind:'mission',missionId}],['task',{kind:'task',taskId}],['mission_diff',{kind:'mission_diff',missionId,path:'不存在的精确路径.txt'}]].entries()){
+  const graph=await rpc('canvas.nodes.snapshot',{boardId})
+  const applied=await rpc('canvas.nodes.apply',{commandId:randomUUID(),command:{boardId,expectedRevision:graph.board.revision,mutation:{type:'create',node:{kind:'conversation',conversation:{threadId,conversationId:null},objectReference,x:index*380,y:0,width:360,height:240}}}})
+  assert.equal(applied.status,'applied',JSON.stringify(applied));nodes[kind]=applied.payload.nodeIds[0]
+ }
+ const graph=await rpc('canvas.nodes.snapshot',{boardId})
+ const file=await rpc('canvas.nodes.apply',{commandId:randomUUID(),command:{boardId,expectedRevision:graph.board.revision,mutation:{type:'create',node:{kind:'file',path:config.text_file,fileReference:{threadId:config.thread_id},x:0,y:300,width:520,height:400}}}})
+ assert.equal(file.status,'applied',JSON.stringify(file));nodes.file=file.payload.nodeIds[0]
+ report.objects={board_id:boardId,mission_id:missionId,thread_id:threadId,task_id:taskId,nodes}
+ const board=async()=>{
+  await openCanvasBoard(evaluate,wait,boardId)
+  await wait(`document.querySelectorAll('.react-flow__node').length===4`)
+  await evaluate(`(()=>{document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]').click();return true})()`)
+  if(config.expect_toolbar&&!toolbarChecked){
+   report.toolbar_layout=await evaluate(`(()=>{const host=document.querySelector('.canvas-boards-toolbar'),toolbar=document.querySelector('.canvas-toolbar'),stage=document.querySelector('.canvas-flow-stage'),pill=document.querySelector('.canvas-zoom-pill'),map=document.querySelector('.canvas-minimap');return {headerHeight:host.getBoundingClientRect().height,dockBottom:stage.getBoundingClientRect().bottom-toolbar.getBoundingClientRect().bottom,dockOutsideHeader:!host.contains(toolbar),mapWidth:map?.getBoundingClientRect().width,pillWidth:pill.getBoundingClientRect().width}})()`)
+   assert.ok(report.toolbar_layout.headerHeight<=44&&report.toolbar_layout.dockOutsideHeader&&report.toolbar_layout.dockBottom>=8&&report.toolbar_layout.dockBottom<=24)
+   assert.ok(Math.abs(report.toolbar_layout.mapWidth-report.toolbar_layout.pillWidth)<2)
+   const menu=async label=>{
+    await evaluate(`(()=>{document.querySelector('button[aria-label="${label}"]').focus();return true})()`)
+    window.webContents.sendInputEvent({type:'keyDown',keyCode:'Down'});window.webContents.sendInputEvent({type:'keyUp',keyCode:'Down'})
+    await wait(`Boolean(document.querySelector('.canvas-card-menu [role="menuitem"]'))`)
+   }
+   await menu('画板操作')
+   report.board_menu=await evaluate(`[...document.querySelectorAll('.canvas-card-menu [role="menuitem"]')].map(item=>item.textContent)`)
+   assert.ok(report.board_menu.includes('编辑画板')&&report.board_menu.includes('删除画板'))
+   window.webContents.sendInputEvent({type:'keyDown',keyCode:'Escape'});window.webContents.sendInputEvent({type:'keyUp',keyCode:'Escape'})
+   await wait(`!document.querySelector('.canvas-card-menu')`)
+   await menu('画布操作')
+   report.canvas_menu=await evaluate(`[...document.querySelectorAll('.canvas-card-menu [role="menuitem"]')].map(item=>item.textContent)`)
+   for(const label of ['刷新关联','选中对话分组','删除所选','自动排列'])assert.ok(report.canvas_menu.includes(label))
+   const visible=await evaluate(`Boolean(document.querySelector('.react-flow__minimap'))`)
+   await evaluate(`(()=>{document.querySelector('.canvas-card-menu [role="menuitemcheckbox"]').click();return true})()`)
+   await wait(`Boolean(document.querySelector('.react-flow__minimap'))===${!visible}`)
+   await menu('画布操作')
+   await evaluate(`(()=>{document.querySelector('.canvas-card-menu [role="menuitemcheckbox"]').click();return true})()`)
+   await wait(`Boolean(document.querySelector('.react-flow__minimap'))===${visible}`)
+   await evaluate(`(()=>{document.querySelector('button[aria-label="恢复到 100%"]').click();return true})()`)
+   await wait(`document.querySelector('.canvas-zoom-readout')?.textContent==='100%'`)
+   await evaluate(`(()=>{document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]').click();return true})()`)
+   toolbarChecked=true;record('codeg_canvas_dock_viewport_keyboard_menus_and_minimap_toggle')
+   await writeFile(join(config.evidence,'00-codeg-canvas-dock.png'),(await window.webContents.capturePage()).toPNG())
+  }
+ }
+ const inspect=async kind=>{
+  await board()
+  await evaluate(`(()=>{[...document.querySelector('[data-id="${nodes[kind]}"]').querySelectorAll('button')].find(button=>button.textContent==='读取详情').click();return true})()`)
+  await wait(`Boolean(document.querySelector('.canvas-object-dialog .canvas-object-details'))`)
+ }
+ const workspace=async()=>{
+  await evaluate(`(()=>{[...document.querySelector('.canvas-object-dialog').querySelectorAll('button')].find(button=>button.textContent==='在工作区中操作').click();return true})()`)
+  await wait(`!document.querySelector('.canvas-workspace')`)
+ }
+ await inspect('task')
+ assert.equal(await evaluate(`document.querySelector('.canvas-object-details').dataset.taskId`),taskId)
+ assert.ok(await evaluate(`document.querySelector('.canvas-object-details').textContent.includes('已取消')`))
+ record('actual_canvas_task_pin_reads_exact_cancelled_task')
+ await workspace()
+ await wait(`(()=>{const task=document.querySelector('.task-detail[data-task-id="${taskId}"]');return task&&task.getBoundingClientRect().height>0})()`)
+ record('actual_history_task_pin_opens_original_workspace_and_exact_task_detail')
+ await inspect('mission')
+ assert.equal(await evaluate(`document.querySelector('.canvas-object-details').dataset.missionId`),missionId)
+ record('actual_mission_pin_reads_original_mission_id')
+ await workspace()
+ await wait(`(()=>{const mission=document.querySelector('.mission-intro[data-mission-id="${missionId}"]');return mission&&mission.getBoundingClientRect().height>0})()`)
+ record('actual_mission_pin_opens_original_mission_workspace')
+ report.delivery=await rpc('missions.delivery',{missionId})
+ assert.equal(report.delivery.threadId,threadId,JSON.stringify(report.delivery))
+ assert.equal(Object.hasOwn(report.delivery,'campId'),false)
+ record('mission_delivery_uses_canonical_thread_identity')
+ await inspect('mission_diff')
+ assert.equal(await evaluate(`document.querySelector('.canvas-object-details').dataset.missionId`),missionId)
+ await wait(`document.querySelector('.canvas-object-details').textContent.includes('当前使命尚无可用的 Git 工作区。')`)
+ record('diff_pin_without_prepared_workspace_reports_unavailability_without_substituting_a_file')
+ await evaluate(`(()=>{[...document.querySelector('.canvas-object-dialog').querySelectorAll('button')].find(button=>button.textContent==='关闭').click();return true})()`)
+ await wait(`!document.querySelector('.canvas-object-dialog')`)
+ const fileCard=`document.querySelector('[data-id="${nodes.file}"]')`
+ await wait(`Boolean(${fileCard}?.querySelector('.canvas-file-actions button[aria-label="在工作区中操作"]'))`,25_000)
+ await evaluate(`(()=>{${fileCard}.querySelector('.canvas-file-actions button[aria-label="在工作区中操作"]').click();return true})()`)
+ await wait(`!document.querySelector('.canvas-workspace')&&Boolean(document.querySelector('.camp-workspace[aria-label]'))`)
+ assert.ok(await evaluate(`document.querySelector('.camp-workspace[aria-label]').getAttribute('aria-label').includes('文件工程A')`))
+ await wait(`Boolean([...document.querySelectorAll('.file-preview-path-row')].find(row=>row.getBoundingClientRect().height>0&&row.textContent.includes('说明 #中文.txt')))`)
+ record('actual_file_pin_opens_its_original_thread_and_exact_file_tab')
+ assert.equal((await rpc('tasks.get',{threadId,taskId})).status,'cancelled')
+ assert.equal((await rpc('missions.get',{missionId})).missionId,missionId)
+ report.no_model=true
+ await writeFile(join(config.evidence,'01-original-file-workspace.png'),(await window.webContents.capturePage()).toPNG())
+}
+async function qualifyPrivateUi(window,{evaluate,wait,rpc}){
+ const prior=JSON.parse(await readFile(config.previous_result,'utf8'))
+ assert.equal(prior.status,'passed')
+ const {board_id:boardId,conversation_id:conversationId,scopes}=prior.private_context
+ await openCanvasBoard(evaluate,wait,boardId)
+ await wait(`Boolean(document.querySelector('[data-id="${scopes[1].nodeId}"]'))`)
+ await evaluate(`(()=>{document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]').click();return true})()`)
+ await evaluate(`(()=>{[...document.querySelector('[data-id="${scopes[1].nodeId}"]').querySelectorAll('button')].find(button=>button.textContent==='展开对话').click();return true})()`)
+ const frame=`document.querySelector('.canvas-conversation-frame')`
+ await wait(`Boolean(${frame}?.querySelector('.single-chat-composer-box .attachment-open[aria-label="打开文件预览 乙材料.txt"]'))`,25_000)
+ assert.ok(!(await evaluate(`${frame}.querySelector('.single-chat-composer-box').textContent`)).includes('甲材料'))
+ record('actual_scoped_composer_renders_only_its_own_attachment_card')
+ await wait(`${frame}.querySelector('.single-chat-composer-box .attachment-open[aria-label="打开文件预览 乙材料.txt"]').disabled===false`)
+ await evaluate(`(()=>{${frame}.querySelector('.single-chat-composer-box .attachment-open[aria-label="打开文件预览 乙材料.txt"]').click();return true})()`)
+ await wait(`Boolean([...document.querySelectorAll('.file-preview-content')].find(element=>element.getBoundingClientRect().height>0&&element.textContent.includes('乙卡专用材料')))`,20_000)
+ const after=await rpc('singleChat.get',{conversationId,composerScope:scopes[1]})
+ assert.deepEqual(after.agentRuns,[]);assert.deepEqual(after.messages,[])
+ assert.deepEqual(after.draft.attachments.map(x=>x.displayName),['乙材料.txt'])
+ record('actual_scoped_attachment_button_opens_authorized_file_without_sending_or_consuming_input')
+ await pause(100)
+ await writeFile(join(config.evidence,'01-private-attachment-preview.png'),(await window.webContents.capturePage()).toPNG())
+ report.private_context=prior.private_context
 }
 await import(config.production_main)
