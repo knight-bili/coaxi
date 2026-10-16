@@ -45,8 +45,10 @@ export async function qualifyCanvasNativeLoad(window,{evaluate,wait,rpc,openCanv
  const frame=n=>`document.querySelector('.canvas-conversation-frame[data-canvas-conversation-key*="${context.scopes[n].nodeId}"]')`
  const input=n=>`${frame(n)}?.querySelector('.single-chat-composer textarea')`
  const open=async n=>{
-  const button=`document.querySelector('[data-id="${context.scopes[n].nodeId}"] button[aria-label="展开对话"]')`
-  await wait(`Boolean(${button}&&!${button}.disabled)`);await evaluate(`(()=>{${button}.click();return true})()`)
+  if(!await evaluate(`Boolean(${input(n)})`)){
+   const button=`document.querySelector('[data-id="${context.scopes[n].nodeId}"] button[aria-label="展开对话"]')`
+   await wait(`Boolean(${button}&&!${button}.disabled)`);await evaluate(`(()=>{${button}.click();return true})()`)
+  }
   await wait(`Boolean(${input(n)}&&!${input(n)}.disabled&&!${input(n)}.readOnly)`)
  }
  const readInput=async n=>evaluate(`(async()=>{const text=${input(n)}.value,bytes=new TextEncoder().encode(text),digest=await crypto.subtle.digest('SHA-256',bytes);return {sha256:[...new Uint8Array(digest)].map(b=>b.toString(16).padStart(2,'0')).join(''),characters:text.length,bytes:bytes.length,tail:text.slice(-40)}})()`)
