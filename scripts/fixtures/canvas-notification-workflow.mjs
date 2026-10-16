@@ -3,6 +3,7 @@ import { randomUUID, createHash } from 'node:crypto'
 import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { setTimeout as pause } from 'node:timers/promises'
+import { execFileSync } from 'node:child_process'
 
 // 只旁路记录原Main请求与真实Core回执；不替换通知事实、可见性或确认结果。
 export function installNotificationIpc(ipcMain) {
@@ -55,6 +56,9 @@ export async function qualifyCanvasNotifications(window,{evaluate,wait,rpc,openC
   contexts.push({kind,threadId,conversationId,nodeId:pin.payload.nodeIds[0],x:index*580})
  }
  report.notification_context={boardId,agentId,contexts};report.notification_scenarios=[]
+ assert.equal(createHash('sha256').update(await readFile(config.fixture_owner_script)).digest('hex'),config.fixture_owner_sha256)
+ report.fixture_owner_preparation=join(config.evidence,'fixture-owner-preparation.json')
+ execFileSync(join(process.env.SystemRoot,'System32/WindowsPowerShell/v1.0/powershell.exe'),['-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',config.fixture_owner_script,'-Root',config.data_root,'-Report',report.fixture_owner_preparation],{windowsHide:true,timeout:30_000})
  const until=async predicate=>{const end=Date.now()+30_000;while(Date.now()<end){const result=await predicate();if(result)return result;await pause(100)}throw Error('Actual notification state did not reach the expected condition')}
  const frame=context=>`document.querySelector('.canvas-conversation-frame[data-canvas-conversation-key*="${context.nodeId}"]')`
  const button=(context,label)=>`document.querySelector('[data-id="${context.nodeId}"] button[aria-label="${label}"]')`
