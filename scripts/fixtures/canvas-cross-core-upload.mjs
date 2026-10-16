@@ -71,14 +71,20 @@ export async function qualifyCrossCoreUpload({ binary, uiDirectory, chrome, outp
       '--remote-debugging-port=0', `--user-data-dir=${profile}`, 'about:blank'] })
     let resolvePaused
     const paused = new Promise(resolve => { resolvePaused = resolve })
-    const networkEvents = [], dialogEvents = []
+    const networkEvents = [], dialogEvents = [], contexts = new Map()
+    report.network_events = networkEvents; report.dialog_events = dialogEvents
     stopEvents = browser.onProtocolEvent(message => {
+      if (message.method === 'Runtime.executionContextCreated') contexts.set(message.params.context.id, message.params.context)
+      if (message.method === 'Runtime.executionContextDestroyed') contexts.delete(message.params.executionContextId)
+      if (message.method === 'Runtime.executionContextsCleared') contexts.clear()
       if (message.method === 'Fetch.requestPaused' && message.params.request.url === `${first.origin}/api/v1/uploads`) {
         assert.equal(pausedUpload, undefined)
         pausedUpload = message.params; resolvePaused()
       }
       if (message.method === 'Network.loadingFailed' && message.params.requestId === pausedUpload?.networkId)
         networkEvents.push({ method: message.method, cancelled: message.params.canceled, errorText: message.params.errorText })
+      if (message.method === 'Network.loadingFinished' && message.params.requestId === pausedUpload?.networkId)
+        networkEvents.push({ method: message.method })
       if (message.method === 'Page.javascriptDialogOpening') {
         dialogEvents.push({ type: message.params.type })
         void browser.send('Page.handleJavaScriptDialog', { accept: true }).catch(error => { dialogEvents.push({ failure: String(error) }) })
@@ -116,6 +122,8 @@ export async function qualifyCrossCoreUpload({ binary, uiDirectory, chrome, outp
       assert.ok(host.token)
     }
     await open(first)
+    const oldContext = [...contexts.values()].find(context => context.origin === first.origin && context.auxData?.isDefault)
+    assert.ok(oldContext, 'observe the actual old page default execution context before navigation')
     const frame = host => `.canvas-conversation-frame[data-canvas-conversation-key*="${host.scope.nodeId}"]`
     const input = host => `document.querySelector('${frame(host)} .single-chat-composer textarea')`
     const firstBody = '旧Core保留的未发送正文', nextBody = '新Core自己的未发送正文', fileName = 'PC10 仅属于原Core.txt'
@@ -139,10 +147,22 @@ export async function qualifyCrossCoreUpload({ binary, uiDirectory, chrome, outp
     const clean = await get(second)
     assert.deepEqual(clean.draft.attachments, []); assert.deepEqual(clean.draft.quotes, [])
     assert.deepEqual(clean.messages, []); assert.deepEqual(clean.agentRuns, [])
+    let destroyedContext
+    try { await browser.send('Runtime.evaluate', { expression: 'location.origin', contextId: oldContext.id, returnByValue: true }) }
+    catch (error) {
+      assert.equal(error.code, -32000)
+      assert.match(error.message, /Cannot find context with specified id/)
+      destroyedContext = { id: oldContext.id, code: error.code, message: error.message }
+    }
+    assert.ok(destroyedContext, 'the new Core must own a new page, with the old execution context actually gone')
+    report.destroyed_old_context = destroyedContext
     let release
     try { await browser.send('Fetch.continueResponse', { requestId: pausedUpload.requestId }); release = 'continued_after_new_core_opened' }
     catch (error) {
-      assert.ok(networkEvents.some(event => event.cancelled === true), 'Only a confirmed old-document cancellation explains a missing paused request')
+      report.release_error = { code: error.code, message: error.message }
+      assert.equal(error.code, -32602)
+      assert.equal(error.message, 'Invalid InterceptionId.')
+      assert.ok(destroyedContext, 'accept an invalid interception only after proving the original page context was destroyed')
       release = { cancelled_with_old_document: true, protocolCode: error.code, message: error.message }
     }
     await browser.send('Fetch.disable'); await pause(400)
