@@ -13,6 +13,7 @@ await mkdir(config.evidence,{recursive:false})
 let started=false
 const privateModes=['private-roundtrip','private-queue','private-rebind','private-late-upload','private-send','private-send-boundaries','private-core-interruption','private-app-interruption']
 let privateWorkflow,privateIpc
+let objectWorkflow
 const record=(name,details={})=>{report.checks.push({name,passed:true,...details});console.log(JSON.stringify({check:name,passed:true}))}
 async function openCanvasBoard(evaluate,wait,boardId){
  await evaluate(`(()=>{document.querySelector('button[aria-label="无限画布"]').click();return true})()`)
@@ -46,7 +47,7 @@ async function qualify(window){
  const wait=async(expression,timeout=20_000)=>{const until=Date.now()+timeout;while(Date.now()<until){if(await evaluate(expression))return;await pause(100)}throw Error('Native condition timed out: '+expression)}
  const rpc=(method,params={})=>evaluate(`window.rovai.request(${JSON.stringify(method)},${JSON.stringify(params)})`)
  try{
-  if(privateModes.includes(config.mode)){
+  if(privateModes.includes(config.mode)||config.mode==='object-cold'){
    await wait(`window.rovai?.onboarding&&window.rovai.onboarding.get().then(value=>value.status!=='uninitialized')`,60_000)
    const initial=await evaluate('window.rovai.onboarding.get()')
    if(initial.status!=='completed'){
@@ -73,6 +74,11 @@ async function qualify(window){
   }
   window.show();window.focus();window.webContents.focus()
   await wait(`window.rovai&&document.querySelector('button[aria-label="无限画布"]')?.disabled===false`,60_000)
+  if(config.mode==='object-cold'){
+   if(config.object_phase==='prepare')await qualifyReadyDiff(window,{evaluate,wait,rpc})
+   await objectWorkflow.qualifyCanvasObjectCold(window,{evaluate,wait,rpc,openCanvasBoard,config,report,record,seam:privateIpc})
+   report.status='passed';return
+  }
   if(privateModes.includes(config.mode)){
    const {qualifyCanvasPrivateWorkflow}=privateWorkflow
    report.scope='production Main/preload/Core with owned controlled ACP; actual private editor and complete queue input transitions; no external model'
@@ -1257,6 +1263,15 @@ async function qualifyPublicCold(window,{evaluate,wait,rpc}){
  record('public_cold_reopening_keeps_original_two_threads_without_sending_messages_or_starting_model_runs')
  await evaluate(`(()=>{document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]').click();return true})()`);await pause(350)
  await writeFile(join(config.evidence,'01-cold-public-pin-drafts.png'),(await window.webContents.capturePage()).toPNG())
+}
+if(config.mode==='object-cold'){
+ for(const key of ['object_workflow','object_ipc'])assert.equal(createHash('sha256').update(await readFile(new URL(config[key+'_module']))).digest('hex'),config[key+'_sha256'])
+ for(const [key,specification] of [['ROVAI_QWEN_BIN',config.controlled_launcher],['ROVAI_ACCEPTANCE_SCRIPT',config.controlled_script]]){
+  assert.equal(process.env[key],specification.path);assert.equal(createHash('sha256').update(await readFile(specification.path)).digest('hex'),specification.sha256)
+ }
+ assert.equal(process.env.ROVAI_SKILL_RECOVERY_CAPTURE,config.runtime_capture)
+ objectWorkflow=await import(config.object_workflow_module)
+ privateIpc=(await import(config.object_ipc_module)).installCanvasMissionIpc(ipcMain)
 }
 if(privateModes.includes(config.mode)){
  for(const [url,hash] of [[config.private_workflow_module,config.private_workflow_sha256],[config.private_ipc_module,config.private_ipc_sha256]]){
