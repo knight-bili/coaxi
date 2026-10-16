@@ -5,7 +5,7 @@ import { Background, BackgroundVariant, Panel, NodeResizer, ReactFlow, ReactFlow
   SelectionMode, ViewportPortal, applyNodeChanges, useReactFlow, useViewport, type Node, type NodeProps } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import type { AgentProfile, CanvasConversationRef, CanvasNode, CanvasNodeKind, CanvasNodeMutation, FilePreviewApi, ResolvedTheme, StoredCommandResult } from '@contracts'
-import { ExternalLink, Expand, Group, LayoutGrid, Map as MapIcon, Minus, MoreHorizontal, Pencil, Plus, RefreshCw, Trash2 } from 'lucide-react'
+import { ExternalLink, Expand, FileDiff, Flag, Folder, Folders, Group, LayoutGrid, ListTodo, LockKeyhole, Map as MapIcon, Maximize2, MessageSquare, Minus, MoreHorizontal, Pencil, Pin, Plus, RefreshCw, SquareTerminal, StickyNote, Trash2, Users } from 'lucide-react'
 import { CanvasIconButton, CanvasViewportPanel } from './CanvasDock'
 import { CanvasFilePreview } from './CanvasFilePreview'
 import { ResourceReferenceIcon } from './FilePreviewTabIcon'
@@ -83,6 +83,32 @@ type Presentation = CanvasSurfaceProps & {
 const EMPTY_CONVERSATIONS: CanvasConversationBridge['instances'] = []
 const PresentationContext = createContext<Presentation | null>(null)
 
+// Codeg conversation-card-node: 224×132 summary, four-line title and compact metadata.
+function CanvasConversationSummary({ actions, row, reference, selected, derived, title, color }: {
+  actions: Presentation; row: CanvasNode; reference: CanvasConversationRef; selected?: boolean; derived?: boolean; title: string; color?: string | null
+}): React.JSX.Element {
+  const thread = actions.catalog?.items.find(item => item.threadId === reference.threadId)
+  const privateChat = Boolean(reference.conversationId)
+  const unavailable = actions.available(reference) === false
+  const project = thread?.projectBindingKind === 'directory' ? thread.projectPath : null
+  const openLabel = uiAttribute(actions.conversation ? '展开对话' : '打开对话')
+  return <article className={`${derived ? 'canvas-member-card' : 'canvas-card canvas-card-conversation'} canvas-conversation-summary canvas-card-handle${selected ? ' is-selected' : actions.selectedReferences.has(canvasReferenceKey(reference)) ? ' is-mirrored' : ''}`} data-color={color ?? undefined}>
+    <div className="canvas-summary-meta">
+      {privateChat ? <LockKeyhole size={14} aria-hidden="true" /> : <MessageSquare size={14} aria-hidden="true" />}
+      <span className="canvas-summary-kind"><UiText zh={privateChat ? '私有对话' : '公开对话'} /></span>
+      <div className="canvas-summary-actions nodrag nowheel">
+        <CanvasIconButton disabled={actions.blocked || unavailable} label={openLabel} onClick={() => actions.openConversation(row, reference, derived)}><Maximize2 size={14} /></CanvasIconButton>
+        {derived ? <CanvasIconButton disabled={actions.blocked} label={uiAttribute(row.data.kind === 'custom' ? '移出分组' : '固定到画布')} onClick={() => actions.detach(row, reference)}><Pin size={14} /></CanvasIconButton>
+          : <CanvasIconButton disabled={actions.blocked} label={uiAttribute('编辑节点')} onClick={() => actions.edit(row)}><Pencil size={14} /></CanvasIconButton>}
+      </div>
+    </div>
+    <p className="canvas-summary-title" title={title}>{title}</p>
+    <div className="canvas-summary-footer">
+      {unavailable ? <span><UiText zh="对话已结束或不可用" /></span> : project ? <span title={project}><Folder size={10} aria-hidden="true" /><span>{basePathName(project)}</span></span> : <span><UiText zh={privateChat ? '独立私聊材料' : '共享会话'} /></span>}
+    </div>
+  </article>
+}
+
 function CanvasCard({ data, selected }: NodeProps<FlowNode>): React.JSX.Element {
   const actions = useContext(PresentationContext)!
   const resizeRevision = useRef<number | null>(null)
@@ -99,23 +125,23 @@ function CanvasCard({ data, selected }: NodeProps<FlowNode>): React.JSX.Element 
   const resolution = actions.resolvedMembers?.get(row.id)
   const references = resolution?.references.map(item => item.reference) ?? (d.kind === 'custom' ? d.conversations : [])
   const visible = actions.expandedRegions.has(row.id) ? references : references.slice(0, cap)
-  if (data.member) return <article className={`canvas-member-card${selected ? ' is-selected' : actions.selectedReferences.has(canvasReferenceKey(data.member)) ? ' is-mirrored' : ''}`}>
-    <header className="canvas-card-handle"><strong title={actions.title(data.member)}>{actions.title(data.member)}</strong></header>
-    <div className="canvas-member-actions nodrag nowheel">
-      <button type="button" disabled={actions.blocked || actions.available(data.member) === false} onClick={() => actions.openConversation(row, data.member!, true)}><UiText zh={actions.conversation ? '展开对话' : '打开对话'} /></button>
-      <button type="button" disabled={actions.blocked} onClick={() => actions.detach(row, data.member!)}><UiText zh={d.kind === 'custom' ? '移出分组' : '固定到画布'} /></button>
-    </div>
-  </article>
-  return <article className={`canvas-card canvas-card-${d.kind}${d.collapsed ? ' is-collapsed' : ''}${canvasPlainConversation(row) && !selected && actions.selectedReferences.has(canvasReferenceKey(d.conversation!)) ? ' is-mirrored' : ''}${actions.dropTargetId === row.id ? ' is-drop-target' : ''}`} data-color={color ?? undefined}>
+  if (data.member) return <CanvasConversationSummary actions={actions} row={row} reference={data.member} selected={selected} derived title={actions.title(data.member)} color={color} />
+  if (canvasPlainConversation(row) && !expandedConversation) return <CanvasConversationSummary actions={actions} row={row} reference={d.conversation!} selected={selected} title={title} color={color} />
+  const HeaderIcon = d.objectReference ? d.objectReference.kind === 'task' ? ListTodo : d.objectReference.kind === 'mission' ? Flag : FileDiff
+    : d.kind === 'folder' ? Folder : d.kind === 'group' ? Folders : d.kind === 'agent' ? Users : d.kind === 'custom' ? Group
+      : d.kind === 'note' ? StickyNote : d.kind === 'terminal' ? SquareTerminal : d.kind === 'conversation' ? MessageSquare : null
+  return <article className={`canvas-card canvas-card-${d.kind}${region ? ' canvas-region' : ''}${region && resolution && !resolution.complete ? ' is-unresolved' : ''}${d.collapsed ? ' is-collapsed' : ''}${canvasPlainConversation(row) && !selected && actions.selectedReferences.has(canvasReferenceKey(d.conversation!)) ? ' is-mirrored' : ''}${actions.dropTargetId === row.id ? ' is-drop-target' : ''}`} data-color={color ?? undefined}>
     <NodeResizer isVisible={selected && !actions.blocked && !d.collapsed && (d.kind !== 'conversation' || expandedConversation)}
-      minWidth={expandedConversation ? 520 : d.kind === 'file' ? FILE_CARD_MIN_WIDTH : d.kind === 'terminal' ? TERMINAL_CARD_MIN_WIDTH : 48}
-      minHeight={expandedConversation ? 560 : d.kind === 'file' ? FILE_CARD_MIN_HEIGHT : d.kind === 'terminal' ? TERMINAL_CARD_MIN_HEIGHT : 48} maxWidth={20000} maxHeight={20000}
+      minWidth={expandedConversation ? 520 : d.kind === 'file' ? FILE_CARD_MIN_WIDTH : d.kind === 'terminal' ? TERMINAL_CARD_MIN_WIDTH : d.kind === 'note' ? 140 : region ? 260 : 48}
+      minHeight={expandedConversation ? 560 : d.kind === 'file' ? FILE_CARD_MIN_HEIGHT : d.kind === 'terminal' ? TERMINAL_CARD_MIN_HEIGHT : d.kind === 'note' ? 96 : region ? 160 : 48} maxWidth={20000} maxHeight={20000}
       onResizeStart={() => { resizeRevision.current = actions.beginGesture(row.id) }}
       onResizeEnd={(_event, geometry) => { actions.resize(row, geometry, resizeRevision.current); resizeRevision.current = null }} />
     <header className="canvas-card-handle">
       {color && <span className="canvas-color-dot" role="img" aria-label={uiAttribute(canvasColorName(color))} />}
       {d.kind === 'file' && <ResourceReferenceIcon kind="file" className="resource-reference-icon" />}
+      {HeaderIcon && <HeaderIcon className="canvas-card-kind-icon" size={14} aria-hidden="true" />}
       <strong title={d.kind === 'file' && d.path ? `${title}\n${d.path}` : title}>{title}</strong>
+      {region && <span className="canvas-region-count" title={uiAttribute(resolution?.complete ? '{0} 个关联对话' : '已载入 {0} 个关联对话', references.length)}>{references.length}</span>}
       {inlineConversation && actions.conversation && <CanvasConversationActions bridge={actions.conversation} instance={inlineConversation}
         onOpenWorkspace={() => actions.onOpenReference(inlineConversation.target.reference)} />}
       {d.kind === 'file' && <span ref={setFileActionsHost} className="canvas-file-actions nodrag nowheel" />}
@@ -137,9 +163,9 @@ function CanvasCard({ data, selected }: NodeProps<FlowNode>): React.JSX.Element 
       {d.objectReference && <div className="canvas-object-pin"><code title={canvasObjectId(d.objectReference)}>{canvasObjectId(d.objectReference)}</code>
         {d.objectReference.kind === 'mission_diff' && d.objectReference.path != null && <code title={d.objectReference.path}>{d.objectReference.path}</code>}
         <button type="button" disabled={actions.blocked || !canvasObjectTarget(row)} onClick={() => actions.openObject(row)}><UiText zh="读取详情" /></button></div>}
-      {canvasPlainConversation(row) && !expandedConversation && <button type="button" disabled={actions.blocked || actions.available(d.conversation!) === false} onClick={() => actions.openConversation(row, d.conversation!)}><UiText zh={actions.conversation ? '展开对话' : '打开对话'} /></button>}
       {canvasPlainConversation(row) && actions.available(d.conversation!) === false && <p className="canvas-empty-copy"><UiText zh="对话已结束或不可用" /></p>}
       {region && <>
+        {resolution?.complete && references.length === 0 && <p className="canvas-region-empty canvas-empty-copy"><UiText zh={d.kind === 'custom' ? '拖入对话卡片进行分组' : '还没有关联对话'} /></p>}
         <div aria-hidden="true" className="canvas-member-grid-space" style={{ height: Math.max(0, layoutRegionGrid(visible.length, row.data.width, columns).contentHeight - REGION_HEADER_HEIGHT - REGION_PADDING * 2) }} />
         <div className="canvas-region-footer">
         {references.length > cap && <button type="button" onClick={() => actions.expand(row)}>

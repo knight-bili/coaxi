@@ -528,8 +528,8 @@ async function qualifyPrivateUi(window,{evaluate,wait,rpc}){
  await wait(`Boolean(document.querySelector('[data-id="${scopes[1].nodeId}"]'))`)
  await evaluate(`(()=>{document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]').click();return true})()`)
  const frame=`document.querySelector('.canvas-conversation-frame[data-canvas-conversation-key*="${scopes[1].nodeId}"]')`
- await wait(`Boolean(${frame})||[...document.querySelector('[data-id="${scopes[1].nodeId}"]').querySelectorAll('button')].some(button=>button.textContent==='展开对话'&&!button.disabled)`)
- report.private_opening=await evaluate(`(()=>{if(${frame})return 'restored_exact_node';[...document.querySelector('[data-id="${scopes[1].nodeId}"]').querySelectorAll('button')].find(button=>button.textContent==='展开对话'&&!button.disabled).click();return 'clicked_exact_node'})()`)
+ await wait(`Boolean(${frame})||[...document.querySelector('[data-id="${scopes[1].nodeId}"]').querySelectorAll('button')].some(button=>(button.getAttribute('aria-label')||button.textContent)==='展开对话'&&!button.disabled)`)
+ report.private_opening=await evaluate(`(()=>{if(${frame})return 'restored_exact_node';[...document.querySelector('[data-id="${scopes[1].nodeId}"]').querySelectorAll('button')].find(button=>(button.getAttribute('aria-label')||button.textContent)==='展开对话'&&!button.disabled).click();return 'clicked_exact_node'})()`)
  await wait(`Boolean(${frame}?.querySelector('.single-chat-composer-box .attachment-open[aria-label="打开文件预览 乙材料.txt"]'))`,25_000)
  assert.ok(!(await evaluate(`${frame}.querySelector('.single-chat-composer-box').textContent`)).includes('甲材料'))
  record('actual_scoped_composer_renders_only_its_own_attachment_card')
