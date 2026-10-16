@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "I03-C06：各类卡片样式后继续完成便笺整纸拖动/行内编辑/CAS与本机副本，以及终端紧凑原操作；types0、2文件24项与文档门禁通过，真实UI/交互待集中批次。继续空私聊尺寸和C05既定有限验证。",
+  "current_slice": "I03-C06：原卡片分型、便笺原交互/草稿保护、终端紧凑操作、空私聊高度与恢复入口本组编码已齐；types0、两文件24项及文档10项/门禁通过。Native notes/最小终端/空私聊入口已补，尚未执行；下一步冻结单候选集中运行，不扩大本批范围。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "卡片按固定Codeg源码分型整改，第一批代码和types0已完成；先补便笺原交互、终端控制栏和空私聊恢复入口，再集中运行长标题/色板/主题/键盘/缩放。继续C05同Thread多卡/焦点/崩溃/规模与PC矩阵；不逐切片全量编译、push或Actions。",
+    "冻结新候选，将c5998894卡片样式、a4e7a0de便笺/终端交互和空私聊贴合一起集中验证；只构建Desktop/Web并复用已核验2158df02原生程序。串行执行notes、终端、private-ui及必要文件/对象回归，按原失败owner修复；driver须保留独占锁、原生环境隔离和每次唯一rN。通过后继续C05及I03有限剩余，期间不逐切片push/Actions。",
     "阶段剩余清单固定按I03-C06继续工程验证；暂缺环境只单列待办，继续可独立的I02余项和I04-I12/BUF，不把后续功能提前塞入I03。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "note_terminal_source_interactions_implemented_pending_batch",
+  "current_slice_status": "card_group_ready_for_batched_native_verification",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -208,5 +208,6 @@
   "canvas_source_ui_policy": "integration/ui-source-policy.md",
   "canvas_private_workspace_evidence": "i03-c06-private-workspace-verification.json",
   "canvas_card_source_style_evidence": "i03-c06-card-source-style-result.json",
-  "canvas_note_terminal_interaction_evidence": "i03-c06-note-terminal-interaction-result.json"
+  "canvas_note_terminal_interaction_evidence": "i03-c06-note-terminal-interaction-result.json",
+  "canvas_private_empty_fit_evidence": "i03-c06-private-empty-fit-result.json"
 }

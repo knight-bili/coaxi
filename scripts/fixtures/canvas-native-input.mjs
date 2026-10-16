@@ -77,14 +77,26 @@ async function qualify(window){
    report.status='passed'
    return
   }
+  if(config.mode==='notes'){
+   report.scope='production Main/preload/Core; real paper drag, inline note edit, revision conflict and leave guard; no model'
+   await qualifyNotes(window,{evaluate,wait,rpc})
+   report.status='passed'
+   return
+  }
   const boards=await rpc('canvas.boards.list'),board=boards.boards.find(board=>board.name==='C06 真实桌面画布')
   assert.ok(board)
   const graph=await rpc('canvas.nodes.snapshot',{boardId:board.id}),terminal=graph.nodes.find(node=>node.data.kind==='terminal')
   assert.ok(terminal)
   const target={boardId:board.id,nodeId:terminal.id}
-  await evaluate(`(()=>{document.querySelector('button[aria-label="无限画布"]').click();return true})()`)
+  await openCanvasBoard(evaluate,wait,board.id)
   await wait(`document.querySelectorAll('.react-flow__node').length===3`)
   record('production_canvas_route_and_persisted_nodes',{board_id:board.id})
+  const resized=await rpc('canvas.nodes.apply',{commandId:randomUUID(),command:{boardId:board.id,expectedRevision:graph.board.revision,mutation:{type:'update',nodeId:terminal.id,patch:{width:260}}}})
+  assert.equal(resized.status,'applied',JSON.stringify(resized))
+  await wait(`(()=>{const toolbar=document.querySelector('.canvas-terminal-toolbar');return toolbar&&Math.abs(toolbar.offsetWidth-258)<=2&&toolbar.querySelectorAll('button').length===6})()`)
+  report.terminal_toolbar=await evaluate(`(()=>{const toolbar=document.querySelector('.canvas-terminal-toolbar'),rect=toolbar.getBoundingClientRect();return {width:toolbar.offsetWidth,extraX:toolbar.scrollWidth-toolbar.clientWidth,buttons:[...toolbar.querySelectorAll('button')].map(button=>({name:button.getAttribute('aria-label'),visible:button.getBoundingClientRect().left>=rect.left&&button.getBoundingClientRect().right<=rect.right}))}})()`)
+  assert.ok(report.terminal_toolbar.extraX<=1&&report.terminal_toolbar.buttons.every(button=>button.visible))
+  record('minimum_width_terminal_preserves_six_visible_named_controls_without_outer_scroll')
   await wait(`(()=>{const button=[...document.querySelectorAll('.canvas-terminal button')].find(button=>(button.getAttribute('aria-label')||button.textContent.trim())==='启动终端');return button&&!button.disabled})()`,15_000)
   await evaluate(`(()=>{[...document.querySelectorAll('.canvas-terminal button')].find(button=>(button.getAttribute('aria-label')||button.textContent.trim())==='启动终端').click();return true})()`)
   await wait(`(()=>{const button=[...document.querySelectorAll('.canvas-terminal button')].find(button=>(button.getAttribute('aria-label')||button.textContent.trim())==='粘贴');return button&&!button.disabled})()`,30_000)
@@ -113,6 +125,9 @@ async function qualify(window){
   await evaluate(`(()=>{[...document.querySelectorAll('.canvas-terminal button')].find(button=>(button.getAttribute('aria-label')||button.textContent.trim())==='停止终端').click();return true})()`)
   await wait(`window.rovai.request('canvas.terminals.snapshot',{target:${JSON.stringify(target)}}).then(value=>value.cleanupComplete===true)`)
   record('native_terminal_stop_completes_process_cleanup')
+  const finalGraph=await rpc('canvas.nodes.snapshot',{boardId:board.id})
+  const restored=await rpc('canvas.nodes.apply',{commandId:randomUUID(),command:{boardId:board.id,expectedRevision:finalGraph.board.revision,mutation:{type:'update',nodeId:terminal.id,patch:{width:terminal.data.width}}}})
+  assert.equal(restored.status,'applied',JSON.stringify(restored))
   report.status='passed'
  }catch(error){report.status='failed';report.error=String(error.stack??error);report.runtime_errors=await evaluate('window.nativeRuntimeErrors').catch(()=>null);report.native_keys=await evaluate('window.nativeKeys').catch(()=>null);report.dom=await evaluate('document.body.innerText.slice(-2500)').catch(()=>null);if((report.screenshots?.length??0)<3){const path=join(config.evidence,'failure.png');await writeFile(path,(await window.webContents.capturePage()).toPNG()).then(()=>{(report.screenshots??=[]).push(path)}).catch(()=>{})}}
  finally{
@@ -565,8 +580,96 @@ async function qualifyPrivateUi(window,{evaluate,wait,rpc}){
  assert.deepEqual(after.agentRuns,[]);assert.deepEqual(after.messages,[])
  assert.deepEqual(after.draft.attachments.map(x=>x.displayName),['乙材料.txt'])
  record('actual_scoped_attachment_button_opens_authorized_file_without_sending_or_consuming_input')
+  await wait(`(()=>{const viewport=${frame}?.querySelector('.single-chat-viewport');return viewport&&viewport.checkVisibility()&&viewport.clientHeight>0&&viewport.scrollHeight-viewport.clientHeight<=1})()`)
+  report.private_empty_layout=await evaluate(`(()=>{const root=${frame},viewport=root.querySelector('.single-chat-viewport'),empty=root.querySelector('.single-chat-empty'),legacy=root.querySelector('.private-legacy-materials');return {extraY:viewport.scrollHeight-viewport.clientHeight,emptyMinHeight:getComputedStyle(empty).minHeight,legacyExpanded:legacy?.dataset.expanded,legacyHeight:legacy?.getBoundingClientRect().height}})()`)
+  assert.equal(report.private_empty_layout.emptyMinHeight,'0px')
+  assert.equal(report.private_empty_layout.legacyExpanded,'false')
+  record('empty_private_reading_area_fits_card_and_keeps_compact_recovery_entries')
  await pause(100)
  await writeFile(join(config.evidence,'02-private-conversation-returned.png'),(await window.webContents.capturePage()).toPNG())
  report.private_context=prior.private_context
+}
+async function qualifyNotes(window,{evaluate,wait,rpc}){
+ window.unmaximize();window.setContentSize(1440,920);window.webContents.setZoomFactor(1)
+ const created=await rpc('canvas.boards.create',{commandId:randomUUID(),command:{name:'C06 原版便笺交互'}})
+ assert.equal(created.status,'applied',JSON.stringify(created))
+ const boardId=created.payload.board.id,ids=[]
+ for(const index of [0,1]){
+  const graph=await rpc('canvas.nodes.snapshot',{boardId})
+  const result=await rpc('canvas.nodes.apply',{commandId:randomUUID(),command:{boardId,expectedRevision:graph.board.revision,mutation:{type:'create',node:{kind:'note',title:index?'另一张便笺':'原版便笺',content:index?'乙卡独立原文':'甲卡原文',color:index?'blue':'yellow',x:index*400,y:0,width:320,height:260}}}})
+  assert.equal(result.status,'applied',JSON.stringify(result));ids.push(result.payload.nodeIds[0])
+ }
+ report.notes={board_id:boardId,node_ids:ids}
+ await openCanvasBoard(evaluate,wait,boardId)
+ await wait(`document.querySelectorAll('.canvas-note-paper').length===2`)
+ await evaluate(`(()=>{document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]').click();return true})()`)
+ await evaluate(`(()=>{document.querySelector('button[aria-label="恢复到 100%"]').click();return true})()`)
+ await wait(`document.querySelector('.canvas-zoom-readout').textContent==='100%'`)
+ const card=`document.querySelector('[data-id="${ids[0]}"] .canvas-note-paper')`
+ const point=async expression=>{
+  await wait(`Boolean(${expression})`)
+  await evaluate(`(()=>{(${expression}).scrollIntoView({block:'nearest',inline:'nearest'});return true})()`)
+  return evaluate(`(()=>{const target=${expression},rect=target.getBoundingClientRect(),x=Math.round(rect.x+rect.width/2),y=Math.round(rect.y+rect.height/2),hit=document.elementFromPoint(x,y);if(!hit||!(target===hit||target.contains(hit)))throw Error('便笺目标被遮挡');return {x,y}})()`)
+ }
+ const mouse=(type,position,clickCount=1)=>window.webContents.sendInputEvent({type,button:'left',clickCount,...position})
+ const click=async(expression,double=false)=>{
+  const position=await point(expression);mouse('mouseMove',position);mouse('mouseDown',position);mouse('mouseUp',position)
+  if(double){mouse('mouseDown',position,2);mouse('mouseUp',position,2)}
+ }
+ const start=await point(`${card}.querySelector('.canvas-note-prose')`)
+ mouse('mouseMove',start);mouse('mouseDown',start)
+ mouse('mouseMove',{x:start.x+72,y:start.y+48});await pause(80);mouse('mouseUp',{x:start.x+72,y:start.y+48})
+ await wait(`window.rovai.request('canvas.nodes.snapshot',{boardId:${JSON.stringify(boardId)}}).then(graph=>graph.nodes.find(node=>node.id===${JSON.stringify(ids[0])})?.data.x===72)`)
+ const moved=(await rpc('canvas.nodes.snapshot',{boardId})).nodes.find(node=>node.id===ids[0])
+ assert.equal(moved.data.y,48);record('whole_note_body_native_drag_updates_exact_core_geometry')
+ const type=async(text,keyboard=false)=>{
+  await wait(`Boolean(document.querySelector('.canvas-dock-panel button[aria-label="自动排列"]:not(:disabled)'))`)
+  if(keyboard){
+   await evaluate(`(()=>{${card}.focus();return true})()`)
+   window.webContents.sendInputEvent({type:'keyDown',keyCode:'F2'});window.webContents.sendInputEvent({type:'keyUp',keyCode:'F2'})
+  }else await click(`${card}.querySelector('.canvas-note-prose')`,true)
+  await wait(`Boolean(${card}.querySelector('textarea'))`)
+  await evaluate(`(()=>{const input=${card}.querySelector('textarea');input.focus();input.select();window.noteInputEvents=[];input.addEventListener('input',event=>window.noteInputEvents.push({trusted:event.isTrusted}));return true})()`)
+  await window.webContents.insertText(text)
+  await wait(`${card}.querySelector('textarea').value===${JSON.stringify(text)}`)
+  assert.ok((await evaluate('window.noteInputEvents')).some(event=>event.trusted))
+ }
+ let saved='真实行内输入\n最后字符乙'
+ await type(saved)
+ await click(`document.querySelector('button[aria-label="恢复到 100%"]')`)
+ await wait(`window.rovai.request('canvas.nodes.snapshot',{boardId:${JSON.stringify(boardId)}}).then(graph=>graph.nodes.find(node=>node.id===${JSON.stringify(ids[0])})?.data.content===${JSON.stringify(saved)})`)
+ const after=(await rpc('canvas.nodes.snapshot',{boardId})).nodes.find(node=>node.id===ids[0])
+ assert.equal(after.data.x,moved.data.x);assert.equal(after.data.y,moved.data.y)
+ record('native_double_click_and_trusted_last_character_blur_save_only_note_content')
+ saved='键盘进入后按Escape保存的便笺丙'
+ await type(saved,true)
+ window.webContents.sendInputEvent({type:'keyDown',keyCode:'Escape'});window.webContents.sendInputEvent({type:'keyUp',keyCode:'Escape'})
+ await wait(`!${card}.querySelector('textarea')&&window.rovai.request('canvas.nodes.snapshot',{boardId:${JSON.stringify(boardId)}}).then(graph=>graph.nodes.find(node=>node.id===${JSON.stringify(ids[0])})?.data.content===${JSON.stringify(saved)})`)
+ record('native_f2_edit_and_escape_save_preserve_original_note_exit_semantics')
+ const local='本机冲突草稿乙',remote='远端已经保存的原文甲'
+ await type(local)
+ const current=await rpc('canvas.nodes.snapshot',{boardId})
+ const other=await rpc('canvas.nodes.apply',{commandId:randomUUID(),command:{boardId,expectedRevision:current.board.revision,mutation:{type:'update',nodeId:ids[0],patch:{content:remote}}}})
+ assert.equal(other.status,'applied',JSON.stringify(other))
+ await wait(`${card}.querySelector('.canvas-note-status details')?.textContent.includes(${JSON.stringify(remote)})`)
+ await click(`document.querySelector('button[aria-label="恢复到 100%"]')`)
+ const conflict=(await rpc('canvas.nodes.snapshot',{boardId})).nodes.find(node=>node.id===ids[0])
+ assert.equal(conflict.data.content,remote)
+ report.note_drafts=await evaluate(`Object.entries(localStorage).filter(([key])=>key.startsWith('rovai.canvas.note-draft.v1:')).map(([key,value])=>({key,value:JSON.parse(value)}))`)
+ assert.ok(report.note_drafts.some(item=>item.value.text===local&&item.value.baseline===saved))
+ record('remote_note_revision_keeps_saved_text_and_local_draft_without_silent_overwrite')
+ await click(`document.querySelector('button[aria-label="队员"]')`)
+ assert.ok(await evaluate(`Boolean(document.querySelector('.canvas-workspace')&&${card})`))
+ record('dirty_note_prevents_ordinary_navigation_until_explicit_resolution')
+ await click(`${card}.querySelector('.canvas-note-status summary')`)
+ assert.ok(await evaluate(`${card}.querySelector('.canvas-note-status details').open`))
+ await click(`${card}.querySelector('.canvas-note-status button')`)
+ await wait(`window.rovai.request('canvas.nodes.snapshot',{boardId:${JSON.stringify(boardId)}}).then(graph=>graph.nodes.find(node=>node.id===${JSON.stringify(ids[0])})?.data.content===${JSON.stringify(local)})`)
+ await wait(`!${card}.querySelector('.canvas-note-status')`)
+ const final=await rpc('canvas.nodes.snapshot',{boardId})
+ assert.equal(final.nodes.find(node=>node.id===ids[1]).data.content,'乙卡独立原文')
+ assert.ok(!(await evaluate(`Object.values(localStorage).map(value=>{try{return JSON.parse(value)}catch{return null}}).filter(Boolean)`)).some(value=>value.text===local&&value.baseline===remote))
+ record('explicit_review_saves_local_note_and_clears_only_its_draft_preserving_other_note')
+ await writeFile(join(config.evidence,'01-note-paper-after-conflict.png'),(await window.webContents.capturePage()).toPNG())
 }
 await import(config.production_main)

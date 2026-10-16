@@ -29,7 +29,7 @@ export function PrivateLegacyMaterialsPanel({ controller, busy, onError }: {
     try { await controller.adoptLegacyMaterials(source.draft.revision); if (current()) setPreview(null) }
     catch (error) { if (current()) onError(privateInputErrorMessage(error)) }
   }
-  return <section className="single-chat-retained-inputs" aria-label={uiAttribute('迁入默认输入的材料')}>
+  return <section className="single-chat-retained-inputs private-legacy-materials" data-expanded={Boolean(source)} aria-label={uiAttribute('迁入默认输入的材料')}>
     <button type="button" disabled={busy || reading} onClick={() => { void inspect() }}><UiText zh="查看默认输入的旧材料" /></button>
     {source && <>
       <p><UiText zh="只迁入附件和引用，默认输入的正文保留。当前卡片已有内容时，材料另存为一份完整输入。" /></p>

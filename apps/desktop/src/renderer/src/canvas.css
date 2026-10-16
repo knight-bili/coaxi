@@ -75,6 +75,11 @@
 .canvas-bound-single-chat .single-chat-target-trigger:disabled { opacity: 1; }
 .canvas-bound-single-chat .single-chat-target-copy strong { font-size: 13px; font-weight: 500; }
 .canvas-bound-single-chat .single-chat-target-copy small, .canvas-bound-single-chat .single-chat-private-label { font-size: 10.5px; }
+.canvas-bound-single-chat .single-chat-transcript { gap: 16px; padding: 16px 12px; }
+.canvas-bound-single-chat .single-chat-empty { flex: 1; min-height: 0; padding: 16px 12px; }
+.canvas-bound-single-chat .private-legacy-materials[data-expanded="false"] { display: block; max-height: none; margin-top: 4px; padding: 0; overflow: visible; border: 0; background: transparent; }
+.canvas-bound-single-chat .private-legacy-materials[data-expanded="false"] > button { width: auto; padding: 4px 0; border-color: transparent; background: transparent; }
+.canvas-bound-single-chat .single-chat-recovery-trigger { align-self: flex-start; width: auto; max-width: calc(100% - 24px); margin: 4px 12px; border-color: transparent; background: transparent; }
 .canvas-conversation-frame .composer { padding: 10px 12px 12px; border-top: 0; background: transparent; }
 .canvas-conversation-frame .composer-box { border: 1px solid var(--line); border-radius: 16px; background: var(--canvas); }
 .canvas-conversation-frame .single-chat-composer textarea { min-height: 68px; }

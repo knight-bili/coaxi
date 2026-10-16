@@ -84,3 +84,11 @@ final result: blocked
 全量types0、草稿与graph两文件24项通过、文档测试10项/门禁0；实际鼠标/输入法/保存失败/离开/冷恢复和终端运行尚未验证。原rc13截图不授予本代码资格，待集中候选执行。记录见integration/execution/i03-c06-note-terminal-interaction-result.json。
 
 final result: blocked
+
+## 空私聊高度与本组集中验证入口
+
+已实际查看rc13返回私聊截图，结合原Rovai CSS定位到空状态300px min-height及闲置默认材料外框占位。仅画布绑定私聊改为自适应空状态，并减轻未展开材料入口；实际正文/展开材料仍保留原滚动和完整操作。本次types0与语法/差异检查通过，尚未运行新Renderer。
+
+已有Native owner新增notes六项真实操作检查，以及最小260px终端六按钮可达和空私聊viewport真实无溢出检查；源码入口已经准备，不能记为通过。该组代码已齐，下一步冻结单候选集中构建/运行，复用既有原生程序，不继续堆新的界面范围。记录见integration/execution/i03-c06-private-empty-fit-result.json。
+
+final result: blocked
