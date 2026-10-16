@@ -228,7 +228,8 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
   const orphanedConversations = conversationInstances.filter(item => item.target.boardId === props.boardId && !rows.some(row => canvasConversationMatches(row, item.target)))
   const derived = useMemo<FlowNode[]>(() => rows.flatMap(row => {
     const d = row.data, region = isRegionKind(d.kind)
-    const inline = conversationInstances.some(item => item.target.presentation === 'inline' && canvasConversationMatches(row, item.target))
+    const inlineIndex = conversationInstances.findIndex(item => item.target.presentation === 'inline' && canvasConversationMatches(row, item.target))
+    const inline = inlineIndex >= 0
     const width = inline ? Math.max(520, d.width) : region && d.gridColumns > 0 ? regionWidthForColumns(d.gridColumns) : d.kind === 'conversation' ? CARD_WIDTH : d.width
     let height = d.height
     if (region) {
@@ -244,7 +245,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
     else if ((d.kind === 'file' || d.kind === 'terminal') && d.collapsed) height = REGION_COLLAPSED_HEIGHT
     const root: FlowNode = { id: row.id, type: 'canvas-card', data: { row }, position: { x: d.x, y: d.y },
       width, height, style: { width, height }, selected: selected.includes(row.id), dragHandle: '.canvas-card-handle',
-      zIndex: region ? 0 : 1, connectable: false, deletable: false }
+      zIndex: (selected.includes(row.id) ? 1000 : 0) + (inline ? 10 + inlineIndex : region ? 0 : 1), connectable: false, deletable: false }
     if (!region || d.collapsed) return [root]
     const allMembers = regions.get(row.id)?.references.map(item => item.reference) ?? d.conversations
     const members = expanded.has(row.id) ? allMembers : allMembers.slice(0, visibleMemberCap(d, effectiveColumns(d, width)))
@@ -492,7 +493,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
         onSelectionChange={({ nodes }) => setSelected(current => {
           const ids = nodes.map(node => node.id); return ids.length === current.length && ids.every((id, i) => id === current[i]) ? current : ids
         })} nodesDraggable={!blocked} elementsSelectable={!blocked} selectionMode={SelectionMode.Partial} selectionOnDrag panOnDrag={[1, 2]} panOnScroll
-        nodesConnectable={false} deleteKeyCode={null} minZoom={CANVAS_MIN_ZOOM} maxZoom={CANVAS_MAX_ZOOM}
+        nodesConnectable={false} elevateNodesOnSelect={false} deleteKeyCode={null} minZoom={CANVAS_MIN_ZOOM} maxZoom={CANVAS_MAX_ZOOM}
         defaultViewport={view.viewport ?? { x: 0, y: 0, zoom: 1 }}
         onMoveEnd={(_event, viewport) => setView(current => ({ ...current, viewport }))}
         onNodeDragStart={(_event, moved) => {
@@ -552,7 +553,8 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
               x: flowNode?.position.x ?? row.data.x, y: flowNode?.position.y ?? row.data.y,
               width: flowNode?.width ?? row.data.width, height: flowNode?.height ?? row.data.height
             } : null, viewport, stageSize)
-            return <div key={instance.key} className="canvas-conversation-overlay" style={{ ...geometry, zIndex: 10 + index }}>
+            return <div key={instance.key} className="canvas-conversation-overlay" style={{ ...geometry,
+              zIndex: row && instance.target.presentation === 'inline' ? flowNode?.zIndex ?? 10 + index : 2010 + index }}>
               <CanvasConversationFrame bridge={props.conversation!} instance={instance} title={title(instance.target.reference)} orphaned={!row}
                 onOpenWorkspace={() => props.onOpenReference(instance.target.reference)} />
             </div>
