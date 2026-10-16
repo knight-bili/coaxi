@@ -1657,7 +1657,7 @@ fn verify_private_upload_bindings() {
 
 fn verify_private_source_observations() {
     use crate::local_attachment_snapshot::observe_private_source;
-    use crate::private_source_observation::changed_source;
+    use crate::private_source_observation::{changed_source, PreparedSources, PreparationChanged};
     let mut f = fixture();
     add_default_source(&mut f, "observed.txt");
     let path = f.database.directory().join("observed.txt");
@@ -1683,6 +1683,30 @@ fn verify_private_source_observations() {
             draft_revision: 1,
         },
     );
+    let inputs = SingleChatService::send_source_inputs(&f.database, &send).unwrap();
+    assert_eq!(inputs.len(), 1);
+    let unprepared = SingleChatService::default()
+        .with_prepared_sources(std::sync::Arc::new(PreparedSources::default()))
+        .send(&mut f.database, &send).unwrap_err();
+    assert!(unprepared.is::<PreparationChanged>());
+    assert!(DomainCommandGateway.replay_if_recorded(&f.database, &send).unwrap().is_none());
+    assert_eq!(read(&f, 0).draft.revision, 1);
+    let prepared = PreparedSources::capture(inputs.clone()).unwrap();
+    let mut foreign = inputs[0].clone();
+    foreign.source_path.push_str("-another-source");
+    {
+        let tx = f.database.connection().unchecked_transaction().unwrap();
+        let mismatch = crate::private_source_observation::capture_sources(&tx, &f.conversation, &[foreign], &prepared).unwrap_err();
+        assert!(mismatch.is::<PreparationChanged>(), "same ref ID cannot borrow another path's observation");
+    }
+    let mut mirror = inputs[0].clone();
+    mirror.id = Uuid::new_v4().to_string();
+    let ordered = PreparedSources::capture(vec![inputs[0].clone(), mirror.clone()]).unwrap();
+    {
+        let tx = f.database.connection().unchecked_transaction().unwrap();
+        let reordered = crate::private_source_observation::capture_sources(&tx, &f.conversation, &[mirror, inputs[0].clone()], &ordered).unwrap_err();
+        assert!(reordered.is::<PreparationChanged>(), "working materials changed during preparation must be re-read as one ordered input");
+    }
     std::fs::write(&path, vec![b'x'; "observed.txt".len()]).unwrap();
     let rejected = SingleChatService::default()
         .send(&mut f.database, &send)
@@ -1702,6 +1726,7 @@ fn verify_private_source_observations() {
     assert!(snapshot.pending_inputs.items.is_empty());
     std::fs::write(&path, b"observed.txt").unwrap();
     let replay = SingleChatService::default()
+        .with_prepared_sources(std::sync::Arc::new(PreparedSources::default()))
         .send(&mut f.database, &send)
         .unwrap();
     assert!(replay.replayed);
@@ -1781,6 +1806,7 @@ fn verify_private_source_observations() {
             &f.conversation,
             std::slice::from_ref(&source),
             true,
+            &PreparedSources::capture(vec![source.clone()]).unwrap(),
         )
         .unwrap()
     };
@@ -1868,14 +1894,17 @@ fn verify_private_source_observations() {
     f.database.connection().execute("DELETE FROM single_chat_source_observation WHERE conversation_id=?1 AND source_ref_id=?2",params![f.conversation,source_id]).unwrap();
     let raw:String=f.database.connection().query_row("SELECT source_attachments_json FROM single_chat_composer_draft WHERE conversation_id=?1 AND client_id='desktop' AND scope_key=?2",params![f.conversation,f.scopes[0].storage_key().unwrap()],|row|row.get(0)).unwrap();
     let refs = parse_source_attachments(&raw).unwrap();
+    let legacy_inputs = crate::private_source_observation::changed_source_inputs(f.database.connection(), &f.conversation, refs.clone()).unwrap();
+    assert!(legacy_inputs.iter().all(|source| source.id != source_id), "legacy missing observations must not add content scans");
+    let legacy_prepared = PreparedSources::capture(legacy_inputs).unwrap();
     assert!(
-        changed_source(f.database.connection(), &f.conversation, &refs, false)
+        changed_source(f.database.connection(), &f.conversation, &refs, false, &legacy_prepared)
             .unwrap()
             .is_none(),
         "历史默认输入缺失旧摘要保持原兼容语义"
     );
     assert_eq!(
-        changed_source(f.database.connection(), &f.conversation, &refs, true).unwrap(),
+        changed_source(f.database.connection(), &f.conversation, &refs, true, &legacy_prepared).unwrap(),
         Some(source_id)
     );
 }

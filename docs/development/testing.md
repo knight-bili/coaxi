@@ -86,6 +86,15 @@ Core、实际 IPC 和文件 UI 统一留待阶段集中验证；附加前检查�
 原 Context 慢测 `single_chat_contract_bytes_and_dynamic_section_order_are_exact` 在本次 extended 配置下没有入册，
 登记为未执行并留待阶段候选的 slow-tests，不将零测试视作通过。完整 PC01–PC24、实际 Host/模型和平台仍待验。
 
+C05源观察调度继续扩原第三个材料owner，验证缺准备时无回执/不消费输入、同ID异路径及材料顺序变化拒绝、
+原UUID无需准备直接回放、旧缺观察不增加内容扫描。原Application队列分类owner扩3入口准入，原
+`independent_reads_do_not_inherit_an_unrelated_non_database_wait`复用真实Core夹具检查受控IO任务在途时互动请求可完成、
+容量满时拒绝以及取消等待后实际IO仍持名额；不新增Rust owner或整库fixture。
+本批Rust只做语法检查，新worker模块格式检查；上述真实Core/SQLite断言未编译或运行。
+候选先列出非零owner再执行：`cargo test -p rovai-core --lib --features extended-tests single_chat_composer::tests -- --list`，
+以及同配置的`application::tests::independent_reads_do_not_inherit_an_unrelated_non_database_wait`与
+`application::tests::runtime_probes_do_not_occupy_the_interactive_request_queue`；随后执行同过滤并回归既有single_chat。
+
 上述原发送 owner 继续扩展同一 fixture，调用生产 Application 私聊材料 handler 与 reconcile，
 拥有旧省略/显式 null 的响应差别、默认与卡片/其他编辑端的 editToken/working 正文/quotes 隔离、可信身份注入、
 未知回执只读及首次结果重放/不重复提示；不新增 Rust owner，不用 SQLite/模拟运输推断实际 HTTP/Native IPC 通过。

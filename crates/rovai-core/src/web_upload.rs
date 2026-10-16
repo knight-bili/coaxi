@@ -210,7 +210,7 @@ impl DomainCommand for BindUpload {
     }
 }
 
-fn envelope(client: &DraftClient, intent: UploadIntent) -> Result<CommandEnvelope<BindUpload>> {
+pub(crate) fn envelope(client: &DraftClient, intent: UploadIntent) -> Result<CommandEnvelope<BindUpload>> {
     ensure!(
         !client.is_desktop() || !matches!(intent.target, UploadTarget::Camp),
         "public upload requires a verified Web editor"
@@ -304,22 +304,46 @@ pub fn bind(
     intent: UploadIntent,
     source: LocalAttachmentSourceRef,
 ) -> Result<CommandExecution> {
+    let envelope = envelope(client, intent.clone())?;
+    validate_bind_source(&intent, &source)?;
+    if let Some(execution) = DomainCommandGateway.replay_if_recorded(database, &envelope)? { return Ok(execution); }
+    let sources = binding_source_inputs(database, client, &intent, &source)?;
+    let prepared = crate::private_source_observation::PreparedSources::capture(sources)?;
+    bind_with_prepared(database, _data_dir, client, intent, source, &prepared)
+}
+
+pub(crate) fn binding_source_inputs(
+    database: &Database,
+    client: &DraftClient,
+    intent: &UploadIntent,
+    source: &LocalAttachmentSourceRef,
+) -> Result<Vec<LocalAttachmentSourceRef>> {
+    if matches!(intent.target, UploadTarget::Camp) || private_binding_rejection(database.connection(), client, intent)?.is_some() {
+        return Ok(vec![]);
+    }
+    Ok(vec![source.clone()])
+}
+
+pub(crate) fn validate_bind_source(intent: &UploadIntent, source: &LocalAttachmentSourceRef) -> Result<()> {
+    ensure!(source.id == intent.command_id, "upload reference changed");
+    ensure!(source.display_name == intent.display_name && source.kind == intent.source_kind
+        && match source.kind {
+            LocalAttachmentKind::File => source.observed_byte_size == Some(intent.byte_size),
+            LocalAttachmentKind::Directory => source.observed_byte_size.is_none() && source.media_type.is_none(),
+        }, "upload observation changed");
+    Ok(())
+}
+
+pub(crate) fn bind_with_prepared(
+    database: &mut Database,
+    _data_dir: &std::path::Path,
+    client: &DraftClient,
+    intent: UploadIntent,
+    source: LocalAttachmentSourceRef,
+    prepared: &crate::private_source_observation::PreparedSources,
+) -> Result<CommandExecution> {
     let envelope = envelope(client, intent)?;
-    ensure!(
-        source.id == envelope.payload.intent.command_id,
-        "upload reference changed"
-    );
-    ensure!(
-        source.display_name == envelope.payload.intent.display_name
-            && source.kind == envelope.payload.intent.source_kind
-            && match source.kind {
-                LocalAttachmentKind::File =>
-                    source.observed_byte_size == Some(envelope.payload.intent.byte_size),
-                LocalAttachmentKind::Directory =>
-                    source.observed_byte_size.is_none() && source.media_type.is_none(),
-            },
-        "upload observation changed"
-    );
+    validate_bind_source(&envelope.payload.intent, &source)?;
     DomainCommandGateway.execute(database, &envelope, |transaction| {
         let intent = &envelope.payload.intent;
         if let Some(rejected) = private_binding_rejection(transaction, client, intent)? {
@@ -342,12 +366,12 @@ pub fn bind(
             }
             UploadTarget::SingleChat { conversation_id, composer_scope: None } => {
                 ensure!(transaction.query_row("SELECT EXISTS(SELECT 1 FROM conversation WHERE id=?1 AND camp_id=?2 AND kind='single_chat' AND ended_at IS NULL)", rusqlite::params![conversation_id,intent.camp_id], |r| r.get::<_, bool>(0))?, "single_chat.camp_mismatch");
-                crate::single_chat::SingleChatService::for_client(client.clone()).commit_source_attachment_in_transaction(transaction, conversation_id, intent.expected_revision, source.clone())?;
+                crate::single_chat::SingleChatService::for_client(client.clone()).commit_source_attachment_in_transaction(transaction, conversation_id, intent.expected_revision, source.clone(), prepared)?;
             }
-            UploadTarget::SingleChatPending { conversation_id, pending_input_id, edit_token, composer_scope: None } => crate::single_chat::SingleChatService::for_client(client.clone()).commit_pending_source_attachment_in_transaction(transaction, &intent.camp_id, conversation_id, pending_input_id, intent.expected_revision, edit_token, source.clone())?,
+            UploadTarget::SingleChatPending { conversation_id, pending_input_id, edit_token, composer_scope: None } => crate::single_chat::SingleChatService::for_client(client.clone()).commit_pending_source_attachment_in_transaction(transaction, &intent.camp_id, conversation_id, pending_input_id, intent.expected_revision, edit_token, source.clone(), prepared)?,
         }
         if let UploadTarget::SingleChat { conversation_id, .. } | UploadTarget::SingleChatPending { conversation_id, .. } = &intent.target {
-            crate::private_source_observation::capture_upload(transaction,conversation_id,&source,&intent.sha256,intent.byte_size)?;
+            crate::private_source_observation::capture_upload(transaction,conversation_id,&source,&intent.sha256,intent.byte_size, prepared)?;
         }
         let payload = if matches!(intent.target, UploadTarget::Camp) {
             json!({"attachmentRefId":intent.command_id, "source":source})
@@ -358,10 +382,10 @@ pub fn bind(
     })
 }
 
-/// 只读业务准入，必须在同一 Gateway 写事务内、任何材料/观察写入之前执行。
+/// 计划阶段可只读预检；最终必须在同一Gateway事务内、材料/观察写入前重新核实。
 /// 存储损坏、文件读取及真正的 Handler 错误继续上抛并回滚，不能冒充业务拒绝。
 fn private_binding_rejection(
-    transaction: &rusqlite::Transaction<'_>,
+    transaction: &rusqlite::Connection,
     client: &DraftClient,
     intent: &UploadIntent,
 ) -> Result<Option<CommandHandlerResult>> {

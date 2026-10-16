@@ -136,3 +136,18 @@ pub(crate) fn handle(
     };
     Ok(Reply { result, changed })
 }
+
+pub(super) async fn handle_mutation(
+    database: &Mutex<Database>,
+    capacity: &Arc<Semaphore>,
+    client: &crate::draft_client::DraftClient,
+    params: Value,
+) -> Result<Reply> {
+    let envelope = mutation_envelope(client, params)?;
+    let execution = super::private_sources::command(database, capacity, &envelope,
+        |database| single_chat_composer::mutation_source_inputs(database, &envelope),
+        |database, prepared| single_chat_composer::mutate_with_prepared_sources(database, &envelope, &prepared)).await?;
+    let changed = (!execution.replayed && execution.result.status != CommandResultStatus::Rejected)
+        .then(|| (envelope.payload.camp_id.clone(), envelope.payload.conversation_id.clone()));
+    Ok(Reply { result: serde_json::to_value(execution.result)?, changed })
+}

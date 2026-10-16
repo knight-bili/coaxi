@@ -6,6 +6,7 @@ mod config;
 mod conversation_preferences;
 mod mission;
 pub(crate) mod private_composer;
+mod private_sources;
 mod transport;
 mod web_commands;
 pub use config::{CoreConfig, RemovedSkillProjectRoots};
@@ -851,6 +852,9 @@ fn request_runs_outside_main_queue(method: &str) -> bool {
             | "agentRuns.cancel"
             | "agentRuns.continue"
             | "singleChat.sourceAttachments.addFromPath"
+            | "singleChat.composerDraft.mutate"
+            | "host.upload.observe"
+            | "host.upload.bind"
             | "singleChat.composerDraft.removeAttachment"
             | "singleChat.pendingInputs.addSourceAttachmentFromPath"
             | "singleChat.pendingInputs.edit"
@@ -1829,24 +1833,27 @@ struct AddSingleChatPendingSourceAttachmentFromPathParams {
 
 async fn add_single_chat_source_attachment_from_path(
     database: &Mutex<Database>,
+    capacity: &Arc<Semaphore>,
     output: &mpsc::UnboundedSender<String>,
     params: AddSingleChatSourceAttachmentFromPathParams,
 ) -> Result<Value> {
     let source_path = params.source_path.clone();
     let display_name = params.display_name.clone();
     let media_type = params.media_type.clone();
-    let source_ref = tokio::task::spawn_blocking(move || {
-        observe_source_attachment(
+    let (source_ref, prepared) = private_sources::worker(capacity, move || {
+        let source = observe_source_attachment(
             Path::new(&source_path),
             &display_name,
             media_type.as_deref(),
-        )
+        )?;
+        let prepared = Arc::new(crate::private_source_observation::PreparedSources::capture(vec![source.clone()])?);
+        Ok((source, prepared))
     })
     .await
-    .context("Single Chat Source Attachment observation task failed")??;
+    .context("Single Chat Source Attachment observation task failed")?;
     let snapshot = {
         let mut database = database.lock().await;
-        SingleChatService::default().add_source_attachment(
+        SingleChatService::default().with_prepared_sources(prepared).add_source_attachment(
             &mut database,
             &params.conversation_id,
             params.expected_draft_revision,
@@ -1866,24 +1873,27 @@ async fn add_single_chat_source_attachment_from_path(
 
 async fn add_single_chat_pending_source_attachment_from_path(
     database: &Mutex<Database>,
+    capacity: &Arc<Semaphore>,
     output: &mpsc::UnboundedSender<String>,
     params: AddSingleChatPendingSourceAttachmentFromPathParams,
 ) -> Result<Value> {
     let source_path = params.source_path.clone();
     let display_name = params.display_name.clone();
     let media_type = params.media_type.clone();
-    let source_ref = tokio::task::spawn_blocking(move || {
-        observe_source_attachment(
+    let (source_ref, prepared) = private_sources::worker(capacity, move || {
+        let source = observe_source_attachment(
             Path::new(&source_path),
             &display_name,
             media_type.as_deref(),
-        )
+        )?;
+        let prepared = Arc::new(crate::private_source_observation::PreparedSources::capture(vec![source.clone()])?);
+        Ok((source, prepared))
     })
     .await
-    .context("Single Chat pending Source Attachment observation task failed")??;
+    .context("Single Chat pending Source Attachment observation task failed")?;
     let snapshot = {
         let mut database = database.lock().await;
-        SingleChatService::default().add_pending_source_attachment(
+        SingleChatService::default().with_prepared_sources(prepared).add_pending_source_attachment(
             &mut database,
             params.camp_id.as_str(),
             &params.conversation_id,
@@ -2392,6 +2402,7 @@ struct Core {
     camp_deletion_gate: Mutex<()>,
     camp_deletion_notify: Notify,
     mission_git_read_capacity: Semaphore,
+    private_source_read_capacity: Arc<Semaphore>,
     mission_diff_snapshots: Mutex<crate::mission_workspace::MissionDiffSnapshotCache>,
     #[cfg(test)]
     runtime_search_capture: Option<runtime_check_environment::TestSearchCapture>,
@@ -7500,10 +7511,11 @@ impl Core {
                     rovai_core::draft_client::resolve_editor(&database, resume)?,
                 )?)
             }
-            "host.upload.observe" => rovai_core::web_upload::observe_native(
-                &request.client,
-                serde_json::from_value(request.params.clone())?,
-            ),
+            "host.upload.observe" => {
+                let client = request.client.clone();
+                let params = serde_json::from_value(request.params.clone())?;
+                private_sources::worker(&self.private_source_read_capacity, move || rovai_core::web_upload::observe_native(&client, params)).await
+            }
             "host.upload.bind" => {
                 #[derive(Deserialize)]
                 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -7512,14 +7524,12 @@ impl Core {
                     source: rovai_core::local_attachment_source::LocalAttachmentSourceRef,
                 }
                 let params: Bind = serde_json::from_value(request.params.clone())?;
-                let mut database = self.database.lock().await;
-                let execution = rovai_core::web_upload::bind(
-                    &mut database,
-                    &self.data_dir,
-                    &request.client,
-                    params.intent.clone(),
-                    params.source,
-                )?;
+                let envelope = rovai_core::web_upload::envelope(&request.client, params.intent.clone())?;
+                rovai_core::web_upload::validate_bind_source(&params.intent, &params.source)?;
+                let execution = private_sources::command(&self.database, &self.private_source_read_capacity, &envelope,
+                    |database| rovai_core::web_upload::binding_source_inputs(database, &request.client, &params.intent, &params.source),
+                    |database, prepared| rovai_core::web_upload::bind_with_prepared(database, &self.data_dir, &request.client, params.intent.clone(), params.source.clone(), &prepared)).await?;
+                let database = self.database.lock().await;
                 Ok(
                     json!({"receipt":execution.result, "replayed":execution.replayed, "draft":rovai_core::web_upload::snapshot(&database, &self.data_dir, &request.client, &params.intent)?}),
                 )
@@ -10456,9 +10466,14 @@ impl Core {
                         .list_active(&database, params.camp_id.as_str())?,
                 )?)
             }
-            "singleChat.get"
-            | "singleChat.composerDraft.mutate"
-            | "singleChat.composerDraft.recovery" => {
+            "singleChat.composerDraft.mutate" => {
+                let reply = private_composer::handle_mutation(&self.database, &self.private_source_read_capacity, &request.client, request.params.clone()).await?;
+                if let Some((thread_id, conversation_id)) = reply.changed {
+                    emit(&self.output, "single_chat.changed", json!({"threadId":thread_id,"conversationId":conversation_id}));
+                }
+                Ok(reply.result)
+            }
+            "singleChat.get" | "singleChat.composerDraft.recovery" => {
                 let reply = {
                     let mut database = self.database.lock().await;
                     private_composer::handle(
@@ -10480,7 +10495,7 @@ impl Core {
             "singleChat.sourceAttachments.addFromPath" => {
                 let params: AddSingleChatSourceAttachmentFromPathParams =
                     serde_json::from_value(request.params.clone())?;
-                add_single_chat_source_attachment_from_path(&self.database, &self.output, params)
+                add_single_chat_source_attachment_from_path(&self.database, &self.private_source_read_capacity, &self.output, params)
                     .await
             }
             "singleChat.composerDraft.removeAttachment" => {
@@ -10510,6 +10525,7 @@ impl Core {
                     serde_json::from_value(request.params.clone())?;
                 add_single_chat_pending_source_attachment_from_path(
                     &self.database,
+                    &self.private_source_read_capacity,
                     &self.output,
                     params,
                 )
@@ -10521,17 +10537,10 @@ impl Core {
                 params.command.draft_client = request.client.clone();
                 let camp_id = params.command.camp_id.clone();
                 let conversation_id = params.command.conversation_id.clone();
-                let mut database = self.database.lock().await;
-                let execution = SingleChatService::for_client(request.client.clone())
-                    .edit_pending_input(
-                        &mut database,
-                        &user_camp_command_envelope(
-                            params.command_id,
-                            camp_id.clone(),
-                            params.command,
-                        ),
-                    )?;
-                drop(database);
+                let envelope = user_camp_command_envelope(params.command_id, camp_id.clone(), params.command);
+                let execution = private_sources::command(&self.database, &self.private_source_read_capacity, &envelope,
+                    |database| SingleChatService::edit_source_inputs(database, &envelope),
+                    |database, prepared| SingleChatService::for_client(request.client.clone()).with_prepared_sources(prepared).edit_pending_input(database, &envelope)).await?;
                 if execution.result.status != CommandResultStatus::Rejected && !execution.replayed {
                     emit(
                         &self.output,
@@ -10570,13 +10579,11 @@ impl Core {
                     serde_json::from_value(request.params.clone())?;
                 params.command.draft_client = request.client.clone();
                 let camp_id = params.command.camp_id.clone();
-                let mut database = self.database.lock().await;
-                let execution = SingleChatService::for_client(request.client.clone()).send(
-                    &mut database,
-                    &user_camp_command_envelope(params.command_id, camp_id.clone(), params.command),
-                )?;
+                let envelope = user_camp_command_envelope(params.command_id, camp_id.clone(), params.command);
+                let execution = private_sources::command(&self.database, &self.private_source_read_capacity, &envelope,
+                    |database| SingleChatService::send_source_inputs(database, &envelope),
+                    |database, prepared| SingleChatService::for_client(request.client.clone()).with_prepared_sources(prepared).send(database, &envelope)).await?;
                 let changed = execution.result.status != CommandResultStatus::Rejected;
-                drop(database);
                 if changed {
                     emit(
                         &self.output,
@@ -19074,6 +19081,7 @@ async fn run_core(
         camp_deletion_gate: Mutex::new(()),
         camp_deletion_notify: Notify::new(),
         mission_git_read_capacity: Semaphore::new(MISSION_GIT_READ_CONCURRENCY_LIMIT),
+        private_source_read_capacity: Arc::new(Semaphore::new(private_sources::CONCURRENCY_LIMIT)),
         mission_diff_snapshots: Mutex::new(
             crate::mission_workspace::MissionDiffSnapshotCache::default(),
         ),
@@ -25184,10 +25192,9 @@ async fn dispatch_pending_single_chat_inputs(core: &Core) -> Result<()> {
             execution_epoch: None,
             payload: command.clone(),
         };
-        let result = {
-            let mut database = core.database.lock().await;
-            SingleChatService::default().publish_pending_input(&mut database, &envelope)
-        };
+        let result = private_sources::command(&core.database, &core.private_source_read_capacity, &envelope,
+            |database| SingleChatService::publish_source_inputs(database, &envelope),
+            |database, prepared| SingleChatService::default().with_prepared_sources(prepared).publish_pending_input(database, &envelope)).await;
         match result {
             Ok(execution) if execution.result.status != CommandResultStatus::Rejected => emit(
                 &core.output,
@@ -25208,6 +25215,10 @@ async fn dispatch_pending_single_chat_inputs(core: &Core) -> Result<()> {
                 }),
             ),
             Err(error) => {
+                if error.is::<private_sources::ObservationBusy>() || error.is::<crate::private_source_observation::PreparationChanged>() {
+                    // 尚未准入/提交；稍后按当前队首重新准备，不把容量或并发材料变化记成损坏。
+                    continue;
+                }
                 let code = error
                     .downcast_ref::<LocalAttachmentFailure>()
                     .map(|failure| failure.code().as_str())
@@ -27166,6 +27177,7 @@ mod tests {
             camp_deletion_gate: Mutex::new(()),
             camp_deletion_notify: Notify::new(),
             mission_git_read_capacity: Semaphore::new(MISSION_GIT_READ_CONCURRENCY_LIMIT),
+            private_source_read_capacity: Arc::new(Semaphore::new(private_sources::CONCURRENCY_LIMIT)),
             mission_diff_snapshots: Mutex::new(
                 crate::mission_workspace::MissionDiffSnapshotCache::default(),
             ),
@@ -30366,6 +30378,9 @@ done
             "canvas.terminals.write",
             "canvas.terminals.resize",
             "canvas.terminals.stop",
+            "singleChat.composerDraft.mutate",
+            "host.upload.observe",
+            "host.upload.bind",
         ] {
             assert!(request_runs_outside_main_queue(method));
             assert!(!request_uses_independent_read_queue(method));
@@ -30499,6 +30514,31 @@ done
             .await
             .expect("isolated Core should become ready")
             .unwrap();
+
+        // 原真实Core夹具同时拥有源观察worker的容量、取消和互动队列响应，不另起整库。
+        let source_capacity = Arc::new(Semaphore::new(1));
+        let worker_capacity = source_capacity.clone();
+        let (entered_tx, entered_rx) = tokio::sync::oneshot::channel();
+        let (release_tx, release_rx) = std::sync::mpsc::channel();
+        let observing = tokio::spawn(async move {
+            private_sources::worker(&worker_capacity, move || {
+                let _ = entered_tx.send(());
+                release_rx.recv_timeout(Duration::from_secs(30)).context("source test observation was not released")?;
+                Ok(())
+            }).await
+        });
+        tokio::time::timeout(Duration::from_secs(5), entered_rx).await.unwrap().unwrap();
+        let busy = private_sources::worker(&source_capacity, || Ok(())).await.unwrap_err();
+        assert!(busy.is::<private_sources::ObservationBusy>());
+        let healthy = tokio::time::timeout(Duration::from_secs(5), service.request("monitoring.summary", json!({}))).await.unwrap().unwrap();
+        assert!(healthy.error.is_none(), "source observation must leave the actual Core interaction responsive");
+        observing.abort();
+        assert!(observing.await.unwrap_err().is_cancelled());
+        assert_eq!(source_capacity.available_permits(), 0, "cancelled waiter must not release an active IO slot");
+        release_tx.send(()).unwrap();
+        tokio::time::timeout(Duration::from_secs(5), async {
+            while source_capacity.available_permits() == 0 { tokio::time::sleep(Duration::from_millis(1)).await; }
+        }).await.unwrap();
 
         let blocked_service = service.clone();
         let blocked_request = tokio::spawn(async move {

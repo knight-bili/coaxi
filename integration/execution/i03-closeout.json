@@ -70,9 +70,9 @@
     {
       "id": "I03-C05",
       "name": "冷启动与多卡交互兼容",
-      "status": "in_progress",
+      "status": "implementation_ready_for_stage_verification",
       "done_when": "真实Desktop冷路由、旧焦点/编辑器保持、恢复与本阶段规模检查完成；平台资源缺项单列",
-      "latest_partial_evidence": "i03-c05-visibility-result.json",
+      "latest_partial_evidence": "i03-c05-source-preparation-result.json",
       "checked_subtasks": [
         {
           "id": "C05-cold",
@@ -91,13 +91,11 @@
         },
         {
           "id": "C05-material-scan",
-          "status": "required_fix_identified",
-          "scope": "源内容观察在原数据库事务内读文件/枚举目录，慢盘或大目录可能拖住其他操作"
+          "status": "implemented_runtime_verification_pending",
+          "scope": "完整内容hash/递归目录观察移到Core数据库锁外限量worker；原事务对有序材料/身份/CAS及回放作最终核对，真实响应/退出/负载待C06"
         }
       ],
-      "remaining_implementation_batches": [
-        "私聊源内容观察的锁外调度与事务内身份/CAS复核；沿原测试owner追加对应覆盖，保持r1输入语义"
-      ],
+      "remaining_implementation_batches": [],
       "remaining_verification": [
         "真实Desktop冷路由、快速切换/旧焦点、崩溃恢复及精确Mission/Task/Diff/文件定位",
         "真实多卡/同Thread镜像的滚动、资源释放、HTML及终端窗口上限；局部64卡片夹具不是实际页面帧率",

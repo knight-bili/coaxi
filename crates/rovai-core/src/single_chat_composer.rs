@@ -378,6 +378,7 @@ pub(crate) fn return_pending_input(
     body: &str,
     source_json: &str,
     quotes_json: &str,
+    prepared: &crate::private_source_observation::PreparedSources,
 ) -> Result<CommandHandlerResult> {
     let crate::single_chat::SingleChatPendingInputEditAction::ReturnToComposer {
         expected_draft_revision,
@@ -404,6 +405,7 @@ pub(crate) fn return_pending_input(
         tx,
         &command.conversation_id,
         &parse_source_attachments(source_json)?,
+        prepared,
     )? {
         return Ok(CommandHandlerResult::rejected(
             "single_chat.attachment_source_changed",
@@ -592,6 +594,28 @@ pub fn mutate(
     database: &mut Database,
     envelope: &CommandEnvelope<MutatePrivateComposerCommand>,
 ) -> Result<CommandExecution> {
+    if let Some(execution) = DomainCommandGateway.replay_if_recorded(database, envelope)? { return Ok(execution); }
+    let prepared = crate::private_source_observation::PreparedSources::capture(mutation_source_inputs(database, envelope)?)?;
+    mutate_with_prepared_sources(database, envelope, &prepared)
+}
+
+pub(crate) fn mutation_source_inputs(database: &Database, envelope: &CommandEnvelope<MutatePrivateComposerCommand>) -> Result<Vec<LocalAttachmentSourceRef>> {
+    let command = &envelope.payload;
+    let PrivateComposerAction::AdoptLegacyMaterials { expected_source_revision, .. } = &command.action else { return Ok(vec![]); };
+    let connection = database.connection();
+    if !matches!(envelope.actor, ActorRef::User { .. }) || !owner_exists(connection, &command.camp_id, &command.conversation_id, true)? { return Ok(vec![]); }
+    let Some((key, _)) = resolve_scope(connection, &command.camp_id, &command.conversation_id, &command.draft_client, command.composer_scope.as_ref())? else { return Ok(vec![]); };
+    let current = DraftMaterials::load(connection, &command.conversation_id, &command.draft_client, &key)?;
+    let legacy = DraftMaterials::load(connection, &command.conversation_id, &command.draft_client, &PrivateComposerKey::default())?;
+    if current.revision != command.expected_draft_revision || legacy.revision != *expected_source_revision || key.sql_key().is_empty() { return Ok(vec![]); }
+    legacy.sources()
+}
+
+pub(crate) fn mutate_with_prepared_sources(
+    database: &mut Database,
+    envelope: &CommandEnvelope<MutatePrivateComposerCommand>,
+    prepared: &crate::private_source_observation::PreparedSources,
+) -> Result<CommandExecution> {
     DomainCommandGateway.execute(database,envelope,|tx| {
         let command=&envelope.payload;
         let client=&command.draft_client;
@@ -664,7 +688,7 @@ pub fn mutate(
                 let source=DraftMaterials::load(tx,&command.conversation_id,client,&PrivateComposerKey::default())?;
                 if source.revision!=*expected_source_revision {return Ok(CommandHandlerResult::rejected("single_chat.draft_changed",json!({"currentRevision":source.revision})));}
                 if !source.has_materials()? {return Ok(CommandHandlerResult::rejected("single_chat.no_legacy_materials",json!({})));}
-                if let Some(id)=crate::private_source_observation::capture_sources(tx,&command.conversation_id,&source.sources()?)? {
+                if let Some(id)=crate::private_source_observation::capture_sources(tx,&command.conversation_id,&source.sources()?, prepared)? {
                     return Ok(CommandHandlerResult::rejected("single_chat.attachment_source_changed",json!({"attachmentRefId":id,"message":"旧材料源文件已变化或不可读，请重新选择。"})));
                 }
                 register(tx,&command.conversation_id,client,command.composer_scope.as_ref(),&key,registered)?;
