@@ -29,43 +29,56 @@
       "id": "PC03",
       "scenario": "同卡原地与侧边切换",
       "expected": "同正文、材料、revision 与编辑器",
-      "status": "engineering_verification_pending",
-      "verified": [],
-      "remaining": "同正文、材料、revision 与编辑器"
+      "status": "partial_real_native_verified",
+      "verified": [
+        "rc14真实鼠标原地/侧边往返保留同textarea；同私聊双卡往返保留双方编辑器与另一输入滚动，已有精确附件预览和原材料不消费证据"
+      ],
+      "remaining": "同次往返补引用、draft revision和撤销栈观测；现有DOM身份检查不替代这些断言"
     },
     {
       "id": "PC04",
       "scenario": "另一 Conversation 复用相同节点文本",
       "expected": "不采纳原私聊 scope",
-      "status": "engineering_verification_pending",
-      "verified": [],
-      "remaining": "不采纳原私聊 scope"
+      "status": "engineering_verified",
+      "verified": [
+        "single_chat_composer_scope.rs:206–298，错误Thread/Conversation及失效节点返回false且数据库零写入；旧测试日志已核，当前模块字节一致"
+      ],
+      "remaining": null,
+      "verification_layer": "Core真实SQLite绑定边界；不声称其他编辑端、Host认证或完整UI通过",
+      "evidence": "i03-closeout-settlement.json#core_case_reuse"
     },
     {
       "id": "PC05",
       "scenario": "另一个已验证编辑端访问同 Conversation",
       "expected": "不看到对方草稿与保留项",
-      "status": "engineering_verification_pending",
-      "verified": [],
-      "remaining": "不看到对方草稿与保留项"
+      "status": "partial_core_boundary_verified",
+      "verified": [
+        "Core既有owner实测另一个已验证DraftClient读取空附件/空恢复列表，旧回执不能跨编辑端回放，当前相关模块字节相同"
+      ],
+      "remaining": "补Host及真实两个已验证编辑端的正文/草稿/保留项隔离，不能由内部DraftClient构造替代认证链路"
     },
     {
       "id": "PC06",
       "scenario": "网络伪造 draftClient 和恢复证明",
       "expected": "Host 拒绝，无授权提升",
-      "status": "engineering_verification_pending",
-      "verified": [],
-      "remaining": "Host 拒绝，无授权提升"
+      "status": "partial_core_codec_verified",
+      "verified": [
+        "Core命令反序列化拒绝外部draftClient字段；篡改或跨编辑端恢复cursor拒绝，当前相关模块字节相同"
+      ],
+      "remaining": "补实际网络Host伪造draftClient/恢复证明请求及权限不提升；Core解码测试不替代Host验证"
     },
     {
       "id": "PC07",
       "scenario": "伪造 Board pin 或错误私有引用",
       "expected": "首次写入拒绝并回滚",
-      "status": "partial_real_native_verified",
+      "status": "engineering_verified",
       "verified": [
-        "伪造节点登记实际拒绝，SQL只读复核无scope行"
+        "伪造节点登记实际拒绝，SQL只读复核无scope行",
+        "实际Native伪造节点首次登记拒绝且无scope行；Core同源绑定负例及首次跨卡引用失败回滚断言通过"
       ],
-      "remaining": "错误私有引用等剩余负例仍需验证"
+      "remaining": null,
+      "verification_layer": "Core绑定/事务边界与实际Native伪造pin；不覆盖其余24场景",
+      "evidence": "i03-closeout-settlement.json#core_case_reuse"
     },
     {
       "id": "PC08",
@@ -117,9 +130,13 @@
       "id": "PC13",
       "scenario": "只有 quote 没有问题正文",
       "expected": "保留原 question_required 约束",
-      "status": "engineering_verification_pending",
-      "verified": [],
-      "remaining": "保留原 question_required 约束"
+      "status": "engineering_verified",
+      "verified": [
+        "single_chat_composer_tests.rs:692–708，实际Service拒绝quote.question_required且原revision不变；同源既有owner已运行通过"
+      ],
+      "remaining": null,
+      "verification_layer": "Core真实SQLite发送准入；未运行模型，最终Runtime输入仍归PC14/PC22",
+      "evidence": "i03-closeout-settlement.json#core_case_reuse"
     },
     {
       "id": "PC14",
@@ -213,5 +230,6 @@
       "verified": [],
       "remaining": "默认行、旧回执不变；失败全回滚；新功能不降级绕过"
     }
-  ]
+  ],
+  "settlement": "i03-closeout-settlement.json"
 }

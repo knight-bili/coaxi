@@ -12,6 +12,7 @@ I00已自审修正并合入，I01基础构建与契约证据保留草稿；I02�
 
 - [I01执行入口](foundation/README.md)。
 - [持续执行状态](execution/goal-state.json)、[需要客户补齐的待办](execution/customer-todos.json)。客户已授权沿I00至I12自动推进，阶段分支持续开发，main仍由客户验收控制。
+- [I03收口排期](execution/i03-closeout-plan-r1.md)、[有限剩余清单](execution/i03-closeout-remaining.md)：由Codex完成研发与工程验证，明确每组完成条件，客户软件使用验收仍在I12之后。
 - [I02技能包配置证据](execution/i02-skill-members-result.json)：目录、安装/更新卸载与队员配置已验；[实际模型投递r1](../docs/versions/v1.72/model-context-change-skill-pack-member-delivery.md)已获客户明确确认，[本地实际输入及恢复](execution/i02-skill-delivery-context-result.json)已接通并验证，逐SP矩阵和真实Gate仍继续。Office及其他一期功能继续实施。
 - [I03画布架构](../docs/architecture/canvas.md)：多画板Core元数据及八类节点图已实现；[固定版本节点源码清单](execution/i03-node-source-audit-result.json)与[节点持久化/真实升级验证](execution/i03-canvas-nodes-result.json)可查。交互UI、实时业务绑定、布局、客户端视口和真实临时PTY继续实施，均保留在一期，不能把Core基础当整个I03完成。
 - [I02恢复兼容矩阵增补](execution/i02-skill-delivery-matrix-result.json)：数据库边界的执行轮次、旧公开29/33与旧A2A冻结输入补测已通过；[数据库修复](execution/i02-db153-regression-repair-result.json)的 Windows109项与Linux110项全部通过，原失败保留。[进程恢复](execution/i02-skill-process-recovery-result.json)已验真实Core重启保留冻结输入并终结未知结果、禁止重发；明确确认分支、其余逐SP与真实模型Gate继续补齐。

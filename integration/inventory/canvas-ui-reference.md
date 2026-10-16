@@ -47,7 +47,7 @@ Mission、Task、Diff、文件工作区仍进入原对象。此前真实 C02 检
 | 便笺 | `nodes/note-node.tsx:30–155` | 12px纸张边框、13px正文、8%淡底，最小140×96；整纸拖动、双击及键盘行内编辑，失焦/Escape保存。可选标题和安全Markdown保留，标题/颜色编辑移至选中工具条。Core冲突保留原文与独立本机副本；rc14真实拖动/编辑/冲突/离开保护及renderer硬中断后副本恢复已通过。SafeMarkdown文档15px覆盖已用便笺局部13px/1.625规则修正，未改普通文档，待下一冻结候选实际核对；物理IME与完整主题视觉仍待 |
 | Mission、Task、累计Diff对象 | Codeg `nodes/card-frame.tsx`；Rovai `MissionBoard.tsx`、`MissionControls.tsx` | 外框只沿用Codeg框架，使命/任务/变更图标区分原对象；真实详情和状态继续来自Rovai原组件，不能将对象伪装成普通对话摘要或生成假进度 |
 
-原Codeg摘要中的模型名、分支、子会话数和运行脉冲当前没有同等的Core画布投影，本批不填入推测值或假状态。其功能对照与所需真实投影保留在剩余清单中。摘要中的操作保留为紧凑图标，是为保留当前融合操作的直接入口；实际布局、四行长标题、悬停/键盘、色板、选中/镜像/拖入、不同缩放与日/夜主题须在下一批真实运行中核对。本批代码和类型检查不覆盖运行视觉结论。
+原Codeg摘要中的模型名、分支、子会话数和运行脉冲当前没有同等的Core画布投影，本批不填入推测值或假状态。其功能对照与所需真实投影明确归入 [I03-R09](../execution/i03-closeout-remaining.md) 实施核查；逐项读取真实Core事实或给出有源码依据的适用性结论，不得将缺少的信息当作已完成的样式检查。摘要中的操作保留为紧凑图标，是为保留当前融合操作的直接入口；实际布局、四行长标题、悬停/键盘、色板、选中/镜像/拖入、不同缩放与日/夜主题须在下一批真实运行中核对。本批代码和类型检查不覆盖运行视觉结论。
 
 当前真实证据沿 `integration/execution/i03-c06-source-card-group-verification.json`、`i03-c05-notes-mirrors-native-verification.json`、`i03-c05-renderer-crash-native-verification.json` 分别记录，不用旧截图覆盖后续源码。renderer故障只验证显式重载后选择画布的恢复，不等于整个App/Core硬中断、自动恢复入口或在途未知请求已通过。
 

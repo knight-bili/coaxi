@@ -1,0 +1,500 @@
+{
+  "schema_version": 1,
+  "stage": "I03",
+  "frozen_at": "2026-10-16T14:24:10.917969+00:00",
+  "audit_base": "04fc69bd",
+  "owner": "Codex",
+  "customer_stage_gate": false,
+  "scope": {
+    "source_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i03_formal_cases": 12,
+    "private_material_cases": 24
+  },
+  "counts": {
+    "settled_obligations": 17,
+    "open_work_groups": 10,
+    "private_cases_verified": 3,
+    "private_cases_open": 21
+  },
+  "count_boundary": "不同层级不相加；17项为限定范围旧待办结算，10组含21个私聊子场景及其他必需工作，不是完成百分比",
+  "settled_obligations": [
+    {
+      "id": "S01",
+      "obligation": "便笺真实拖动、行内保存、冲突及离开保护",
+      "evidence": "i03-c05-notes-mirrors-native-verification.json",
+      "qualification_boundary": "六项rc14真实场景；当前新CSS最终集成另归R10",
+      "status": "settled_within_declared_scope"
+    },
+    {
+      "id": "S02",
+      "obligation": "同私聊双卡独立正文/编辑器、暖态及新App恢复",
+      "evidence": "i03-c05-notes-mirrors-native-verification.json",
+      "qualification_boundary": "不等于整App/Core硬中断或最终发送",
+      "status": "settled_within_declared_scope"
+    },
+    {
+      "id": "S03",
+      "obligation": "renderer两次硬中断保留私聊末字和便笺副本",
+      "evidence": "i03-c05-renderer-crash-native-verification.json",
+      "qualification_boundary": "只关闭renderer层旧待办；App/Core仍在R04",
+      "status": "settled_within_declared_scope"
+    },
+    {
+      "id": "S04",
+      "obligation": "公开双Thread三卡焦点、读者与监听释放",
+      "evidence": "i03-c05-public-multi-native-verification.json",
+      "qualification_boundary": "rc15相关回归通过；其他资源预算另列",
+      "status": "settled_within_declared_scope"
+    },
+    {
+      "id": "S05",
+      "obligation": "64摘要实际渲染和可信滚轮平移",
+      "evidence": "i03-c05-public-multi-native-verification.json",
+      "qualification_boundary": "不外推所有操作帧率、64实时输入或64PTY",
+      "status": "settled_within_declared_scope"
+    },
+    {
+      "id": "S06",
+      "obligation": "Mission/历史Task/具体文件进入原工作区",
+      "evidence": "i03-c06-source-card-group-verification.json",
+      "qualification_boundary": "真实对象8场景；新进程对象路由和过期容量仍在R05",
+      "status": "settled_within_declared_scope"
+    },
+    {
+      "id": "S07",
+      "obligation": "真实Git中文精确Diff、索引物理不变及变干净不替代",
+      "evidence": "i03-c02-ready-diff-public-cold-native-verification.json",
+      "qualification_boundary": "真实Core+固定本地ACP协议；无外部模型推理",
+      "status": "settled_within_declared_scope"
+    },
+    {
+      "id": "S08",
+      "obligation": "真实文本/HTML、作者交互、CSP、源码往返及跨卡重读",
+      "evidence": "i03-c06-source-card-group-verification.json",
+      "qualification_boundary": "真实文件9场景；跨Thread/HTML上限和冷恢复在R06",
+      "status": "settled_within_declared_scope"
+    },
+    {
+      "id": "S09",
+      "obligation": "临时PTY既有生命周期和真实键盘输入/绘制/停止",
+      "evidence": "i03-c06-rc15-list-native-verification.json",
+      "qualification_boundary": "rc15相关终端5场景；16/17真实上限、重连和IME在R07",
+      "status": "settled_within_declared_scope"
+    },
+    {
+      "id": "S10",
+      "obligation": "真实列表轮廓/节点数、右键/Shift+F10/回焦和删除提示",
+      "evidence": "i03-c06-rc15-list-native-verification.json",
+      "qualification_boundary": "7场景；后改纵向SVG样式须R10集成，菜单键和旧Host提示在R09",
+      "status": "settled_within_declared_scope"
+    },
+    {
+      "id": "S11",
+      "obligation": "原三个私聊材料Rust测试owner已编译并执行",
+      "evidence": "i03-c06-candidate-result.json",
+      "qualification_boundary": "只结算旧“尚未编译”记录，不宣告24场景全过",
+      "status": "settled_within_declared_scope"
+    },
+    {
+      "id": "S12",
+      "obligation": "五个空闲Thread快照的逻辑预算",
+      "evidence": "i03-thread-projection-result.json",
+      "qualification_boundary": "原源码/测试与日志匹配；挂载、监听、在途不淘汰，不是窗口实测性能",
+      "status": "settled_within_declared_scope"
+    },
+    {
+      "id": "S13",
+      "obligation": "64个窗口终端控制器的逻辑预算",
+      "evidence": "i03-terminal-ui-result.json",
+      "qualification_boundary": "原源码/测试与日志匹配；不可淘汰条目锁住第65个，释放后可替换，不是64真实PTY",
+      "status": "settled_within_declared_scope"
+    },
+    {
+      "id": "S14",
+      "obligation": "原HTML合法双入口403修复的真实界面复验",
+      "evidence": "i03-c06-card-refinement-verification.json",
+      "qualification_boundary": "原9场景及后续rc14文件回归；不扩大为全部浏览器/HTML预算通过",
+      "status": "settled_within_declared_scope"
+    },
+    {
+      "id": "S15",
+      "obligation": "PC04错误会话绑定边界",
+      "evidence": "i03-closeout-settlement.json",
+      "qualification_boundary": "Core真实SQLite绑定边界；不声称其他编辑端、Host认证或完整UI通过",
+      "status": "settled_within_declared_scope"
+    },
+    {
+      "id": "S16",
+      "obligation": "PC07伪造pin及登记回滚边界",
+      "evidence": "i03-closeout-settlement.json",
+      "qualification_boundary": "Core绑定/事务边界与实际Native伪造pin；不覆盖其余24场景",
+      "status": "settled_within_declared_scope"
+    },
+    {
+      "id": "S17",
+      "obligation": "PC13引用无正文准入边界",
+      "evidence": "i03-closeout-settlement.json",
+      "qualification_boundary": "Core真实SQLite发送准入；未运行模型，最终Runtime输入仍归PC14/PC22",
+      "status": "settled_within_declared_scope"
+    }
+  ],
+  "remaining_work": [
+    {
+      "id": "I03-R01",
+      "name": "私聊实际页面与完整输入恢复",
+      "status": "open",
+      "private_cases": [
+        "PC03",
+        "PC08",
+        "PC09",
+        "PC10",
+        "PC17",
+        "PC18",
+        "PC19",
+        "PC20",
+        "PC23"
+      ],
+      "original_groups": [
+        "I03-C01"
+      ],
+      "done_when": "引用/revision/撤销在模式往返保持；空scope只读无登记；冲突保留本机输入；上传迟到不串入；租约接管、完整移回/交换及节点换绑恢复有实际界面证据。",
+      "next_action": "沿既有Native owner补同次往返观测和有效pending token/retained输入场景；先准备代码与相关低成本检查。",
+      "owner": "Codex",
+      "external_condition": "none_confirmed_blocking_current_independent_work"
+    },
+    {
+      "id": "I03-R02",
+      "name": "发送消费、源变化和最终输入交接",
+      "status": "open",
+      "private_cases": [
+        "PC01",
+        "PC02",
+        "PC11",
+        "PC12",
+        "PC14",
+        "PC15",
+        "PC16"
+      ],
+      "original_groups": [
+        "I03-C01"
+      ],
+      "done_when": "双卡/默认位置的正文、附件和引用按所选scope消费；原FIFO、普通单聊与源变化保护保持；最终Blob与实际Runtime交接独立核验，不以材料API或模型清单替代。",
+      "next_action": "复用已验证附件和Core事务，补双卡引用/消费及最终输入捕获；外部模型身份若确需再明确列资源，不用日常凭据。",
+      "owner": "Codex",
+      "external_condition": "none_confirmed_blocking_current_independent_work"
+    },
+    {
+      "id": "I03-R03",
+      "name": "真实编辑端身份与兼容",
+      "status": "open",
+      "private_cases": [
+        "PC05",
+        "PC06",
+        "PC24"
+      ],
+      "original_groups": [
+        "I03-C01"
+      ],
+      "done_when": "真实Host拒绝伪造身份/恢复证明；两个已验证编辑端互相隔离；默认材料/旧回执/失败回滚及旧能力缺失不绕过。",
+      "next_action": "先查既有Host安全测试owner；用当前已构建Core/Host补必要API边界，不为此重编完整App。",
+      "owner": "Codex",
+      "external_condition": "none_confirmed_blocking_current_independent_work"
+    },
+    {
+      "id": "I03-R04",
+      "name": "整个App/Core中断与未知在途请求",
+      "status": "open",
+      "private_cases": [
+        "PC21",
+        "PC22"
+      ],
+      "original_groups": [
+        "I03-C01",
+        "I03-C05"
+      ],
+      "done_when": "覆盖实际App/Core进程退出、接受前/后和丢回执；按原UUID核对，不重复发送，不重选冻结材料；本机输入能恢复。",
+      "next_action": "复用renderer恢复记录但保留独立进程边界；准备可控接受前/后中断，不以整App正常退出替代。",
+      "owner": "Codex",
+      "external_condition": "none_confirmed_blocking_current_independent_work"
+    },
+    {
+      "id": "I03-R05",
+      "name": "业务对象冷路由、Diff更新/容量与释放",
+      "status": "open",
+      "private_cases": [],
+      "original_groups": [
+        "I03-C02"
+      ],
+      "done_when": "Mission/Task/具体文件在新进程仍回原工作区；过期/容量/视图更新和多查看器释放有证据。",
+      "next_action": "复用已过精确Git和8项原对象路由，只补新进程、视图状态和资源缺口。",
+      "owner": "Codex",
+      "external_condition": "none_confirmed_blocking_current_independent_work"
+    },
+    {
+      "id": "I03-R06",
+      "name": "跨Thread文件、HTML上限与冷恢复",
+      "status": "open",
+      "private_cases": [],
+      "original_groups": [
+        "I03-C03",
+        "I03-C05"
+      ],
+      "done_when": "不同Thread的实际文件预览不串源，HTML窗口上限/关闭释放、冷恢复和文件失效状态有独立证据。",
+      "next_action": "保留原权限/CSP/已过9项；补实际多Thread及窗口预算边界。",
+      "owner": "Codex",
+      "external_condition": "none_confirmed_blocking_current_independent_work"
+    },
+    {
+      "id": "I03-R07",
+      "name": "真实PTY容量、重连和Windows输入边界",
+      "status": "open",
+      "private_cases": [],
+      "original_groups": [
+        "I03-C04",
+        "I03-C05"
+      ],
+      "done_when": "真实Core16/17容量及释放重开、连接恢复、适用中文IME/剪贴板行为受控；窗口64控制器与真实PTY数量分开。",
+      "next_action": "沿既有Host/PTY生命周期owner补真实容量；保留现有二进制和隔离启动约束。",
+      "owner": "Codex",
+      "external_condition": "none_confirmed_blocking_current_independent_work"
+    },
+    {
+      "id": "I03-R08",
+      "name": "实际规模、源IO与通知可见性",
+      "status": "open",
+      "private_cases": [],
+      "original_groups": [
+        "I03-C05"
+      ],
+      "done_when": "大材料/目录/日志下响应、事务锁、取消/超时及worker名额正确；可见/被遮挡卡片的真实Core通知确认及清理正确。",
+      "next_action": "复用5空闲投影/64控制器及已有Core限量worker逻辑证据，补真实负载和通知交互，不重跑静态预算单测。",
+      "owner": "Codex",
+      "external_condition": "none_confirmed_blocking_current_independent_work"
+    },
+    {
+      "id": "I03-R09",
+      "name": "八类原版UI与缺少的真实摘要信息",
+      "status": "open",
+      "private_cases": [],
+      "original_groups": [
+        "I03-C06"
+      ],
+      "done_when": "八类创建/编辑/排列/折叠/错误态、画板CRUD、原菜单键/旧Host提示、日夜小窗口和末项可达通过；源码参考中已登记的模型/分支/子会话/运行状态有真实Core投影或逐项有依据的适用性结论；尺寸告警形成定位及影响记录。",
+      "next_action": "核对原组件已登记缺口；补真实投影和必要样式，禁止填假状态。尺寸诊断按计划限时后转其他必需项。",
+      "owner": "Codex",
+      "external_condition": "none_confirmed_blocking_current_independent_work"
+    },
+    {
+      "id": "I03-R10",
+      "name": "最终候选、正式场景与开发预览交接",
+      "status": "open",
+      "private_cases": [],
+      "original_groups": [
+        "I03-C06"
+      ],
+      "done_when": "累计代码和自审集齐后冻结，当前Windows/Web适用面集中构建/运行；12个正式场景按平台登记；可运行开发预览及说明齐备。",
+      "next_action": "等待R01–R09到达可验证状态再一次集中候选，失败只补受影响项；Mac/Linux/Web未验不算通过，环境缺项保持待环境验证并继续独立I04。",
+      "owner": "Codex",
+      "external_condition": "none_confirmed_blocking_current_independent_work"
+    }
+  ],
+  "formal_cases": [
+    {
+      "id": "C12-N",
+      "status": "engineering_verification_in_progress",
+      "evidence_scope": "Core CRUD/回放与实际创建/切板/原菜单已有证据",
+      "remaining_work": [
+        "I03-R09",
+        "I03-R10"
+      ],
+      "platform_state": {
+        "Windows Desktop": "partial_verified",
+        "macOS Desktop": "not_verified_for_current_fusion",
+        "Linux Desktop": "not_verified_for_current_fusion",
+        "Web/Server按源适用面验证": "not_verified_for_current_fusion"
+      }
+    },
+    {
+      "id": "C12-F",
+      "status": "engineering_verification_in_progress",
+      "evidence_scope": "Core并发版本拒绝/原子性已验证；实际删除当前板的替代视图仍补",
+      "remaining_work": [
+        "I03-R09",
+        "I03-R10"
+      ],
+      "platform_state": {
+        "Windows Desktop": "partial_verified",
+        "macOS Desktop": "not_verified_for_current_fusion",
+        "Linux Desktop": "not_verified_for_current_fusion",
+        "Web/Server按源适用面验证": "not_verified_for_current_fusion"
+      }
+    },
+    {
+      "id": "C12-R",
+      "status": "engineering_verification_in_progress",
+      "evidence_scope": "公开/私聊板新App显式重开已有证据；完整多板与中断仍补",
+      "remaining_work": [
+        "I03-R04",
+        "I03-R09",
+        "I03-R10"
+      ],
+      "platform_state": {
+        "Windows Desktop": "partial_verified",
+        "macOS Desktop": "not_verified_for_current_fusion",
+        "Linux Desktop": "not_verified_for_current_fusion",
+        "Web/Server按源适用面验证": "not_verified_for_current_fusion"
+      }
+    },
+    {
+      "id": "C12-P",
+      "status": "engineering_verification_in_progress",
+      "evidence_scope": "Core actor/归属负例有逻辑证据；Host撤销及多平台未完整",
+      "remaining_work": [
+        "I03-R03",
+        "I03-R10"
+      ],
+      "platform_state": {
+        "Windows Desktop": "partial_verified",
+        "macOS Desktop": "not_verified_for_current_fusion",
+        "Linux Desktop": "not_verified_for_current_fusion",
+        "Web/Server按源适用面验证": "not_verified_for_current_fusion"
+      }
+    },
+    {
+      "id": "C13-N",
+      "status": "engineering_verification_in_progress",
+      "evidence_scope": "便笺/会话/文件/终端真实交互已有证据；完整八类仍补",
+      "remaining_work": [
+        "I03-R01",
+        "I03-R09",
+        "I03-R10"
+      ],
+      "platform_state": {
+        "Windows Desktop": "partial_verified",
+        "macOS Desktop": "not_verified_for_current_fusion",
+        "Linux Desktop": "not_verified_for_current_fusion",
+        "Web/Server按源适用面验证": "not_verified_for_current_fusion"
+      }
+    },
+    {
+      "id": "C13-F",
+      "status": "engineering_verification_in_progress",
+      "evidence_scope": "便笺冲突、伪造引用和Diff失效不替代已有证据；完整失效状态仍补",
+      "remaining_work": [
+        "I03-R01",
+        "I03-R05",
+        "I03-R09",
+        "I03-R10"
+      ],
+      "platform_state": {
+        "Windows Desktop": "partial_verified",
+        "macOS Desktop": "not_verified_for_current_fusion",
+        "Linux Desktop": "not_verified_for_current_fusion",
+        "Web/Server按源适用面验证": "not_verified_for_current_fusion"
+      }
+    },
+    {
+      "id": "C13-R",
+      "status": "engineering_verification_in_progress",
+      "evidence_scope": "renderer/公开私聊板恢复已有证据；整App/Core和全部类型仍补",
+      "remaining_work": [
+        "I03-R04",
+        "I03-R09",
+        "I03-R10"
+      ],
+      "platform_state": {
+        "Windows Desktop": "partial_verified",
+        "macOS Desktop": "not_verified_for_current_fusion",
+        "Linux Desktop": "not_verified_for_current_fusion",
+        "Web/Server按源适用面验证": "not_verified_for_current_fusion"
+      }
+    },
+    {
+      "id": "C13-P",
+      "status": "engineering_verification_in_progress",
+      "evidence_scope": "Core绑定和实际文件越权拒绝已有证据；Host与平台未完整",
+      "remaining_work": [
+        "I03-R03",
+        "I03-R10"
+      ],
+      "platform_state": {
+        "Windows Desktop": "partial_verified",
+        "macOS Desktop": "not_verified_for_current_fusion",
+        "Linux Desktop": "not_verified_for_current_fusion",
+        "Web/Server按源适用面验证": "not_verified_for_current_fusion"
+      }
+    },
+    {
+      "id": "C14-N",
+      "status": "engineering_verification_in_progress",
+      "evidence_scope": "Windows真实文件路径与PTY键盘/绘制已有证据；其余平台未验",
+      "remaining_work": [
+        "I03-R10"
+      ],
+      "platform_state": {
+        "Windows Desktop": "partial_verified",
+        "macOS Desktop": "not_verified_for_current_fusion",
+        "Linux Desktop": "not_verified_for_current_fusion",
+        "Web/Server按源适用面验证": "not_verified_for_current_fusion"
+      }
+    },
+    {
+      "id": "C14-F",
+      "status": "engineering_verification_in_progress",
+      "evidence_scope": "真实Host进程退出/停止与文件pin删除不删原文件已有证据；原文件被删的UI仍补",
+      "remaining_work": [
+        "I03-R06",
+        "I03-R07",
+        "I03-R10"
+      ],
+      "platform_state": {
+        "Windows Desktop": "partial_verified",
+        "macOS Desktop": "not_verified_for_current_fusion",
+        "Linux Desktop": "not_verified_for_current_fusion",
+        "Web/Server按源适用面验证": "not_verified_for_current_fusion"
+      }
+    },
+    {
+      "id": "C14-R",
+      "status": "engineering_verification_in_progress",
+      "evidence_scope": "实际Host终端生命周期及附件新App恢复有证据；完整冷恢复/重连仍补",
+      "remaining_work": [
+        "I03-R04",
+        "I03-R06",
+        "I03-R07",
+        "I03-R10"
+      ],
+      "platform_state": {
+        "Windows Desktop": "partial_verified",
+        "macOS Desktop": "not_verified_for_current_fusion",
+        "Linux Desktop": "not_verified_for_current_fusion",
+        "Web/Server按源适用面验证": "not_verified_for_current_fusion"
+      }
+    },
+    {
+      "id": "C14-P",
+      "status": "engineering_verification_in_progress",
+      "evidence_scope": "实际跨卡文件拒绝/CSP隔离有证据；撤销和平台仍补",
+      "remaining_work": [
+        "I03-R03",
+        "I03-R06",
+        "I03-R07",
+        "I03-R10"
+      ],
+      "platform_state": {
+        "Windows Desktop": "partial_verified",
+        "macOS Desktop": "not_verified_for_current_fusion",
+        "Linux Desktop": "not_verified_for_current_fusion",
+        "Web/Server按源适用面验证": "not_verified_for_current_fusion"
+      }
+    }
+  ],
+  "known_environment_deferrals": [
+    "Mac/Linux桌面及Web/Server未具备当前融合运行证据的适用项，不用原仓构建代替；分别记录到正式场景平台矩阵",
+    "PC14/PC22最终输入/Runtime独立证据继续；专用外部模型身份或额度如确需则列资源，不自动付费",
+    "真实移动平台按I10推进；终端平台专属保护按相应平台阶段补齐，不能被Windows结果代替"
+  ],
+  "change_control": "剩余编号固定；发现缺陷归入已有组并说明影响。新增必需范围须有来源和编号变更记录；不能为减少数量合并隐藏未完成条件。"
+}
