@@ -79,7 +79,7 @@
       "name": "冷启动与多卡交互兼容",
       "status": "implementation_ready_for_stage_verification",
       "done_when": "真实Desktop冷路由、旧焦点/编辑器保持、恢复与本阶段规模检查完成；平台资源缺项单列",
-      "latest_partial_evidence": "i03-c05-source-preparation-result.json",
+      "latest_partial_evidence": "i03-c06-private-workspace-verification.json",
       "checked_subtasks": [
         {
           "id": "C05-cold",
@@ -108,7 +108,8 @@
         "真实多卡/同Thread镜像的滚动、资源释放、HTML及终端窗口上限；局部64卡片夹具不是实际页面帧率",
         "真实Core大材料/目录/日志下的交互响应、事务锁和超时/取消；随C06当前源验证",
         "软键盘/IME与原生平台运行资格按可用环境记录，缺真机不假通过"
-      ]
+      ],
+      "partial_runtime_evidence": "单卡冷启动精确恢复和行内/侧边原生鼠标往返保留编辑器已通过，不覆盖同Thread多卡/崩溃/规模"
     },
     {
       "id": "I03-C06",
@@ -137,11 +138,12 @@
         "rc.8 Desktop/Web构建exit0，149个Desktop文件及141个Web缓存条目逐SHA匹配，真实App副本一致",
         "rc.8真实Windows Desktop同owner九项通过：HTML已加载且通信连接、单标题/悬停路径/图标居中、源码切换和跨卡重读保持文档、原生键盘菜单及原确认窗移除节点而原文件保留；受控退出completed无deadline/强杀",
         "rc9 Core/Host/CLI与Desktop/Web构建0；rc10只构建Frontend两入口0，复用已核验2158df02原生程序",
-        "rc10真实Windows生产App：容器/创建4、文件HTML9、对象定位8、私聊附件2通过；四次成功run均受控退出，未用付费模型"
+        "rc10真实Windows生产App：容器/创建4、文件HTML9、对象定位8、私聊附件2通过；四次成功run均受控退出，未用付费模型",
+        "rc13单标题/可见预览/真实鼠标模式往返及空白页原回归通过；同textarea与草稿保留，两个独立App冷启动通过",
+        "rc13必要回归25个不同Native断言通过，成功运行均受控退出；两个调度冲突run剔除并加入独占保护"
       ],
       "open_findings": [
-        "同一HTML卡片及保留工作区两个合法入口交换重叠，单布尔位导致合法跳转403；已改逐入口计数并在异步来源复核前认领，原授权和额外请求拒绝均保留，待新Desktop真实复验",
-        "私聊真实截图仍存在重复标题，附件预览可见稳定状态需要另行核对；不能以两项DOM/读取断言授予完整UI资格"
+        "同一HTML卡片及保留工作区两个合法入口交换重叠，单布尔位导致合法跳转403；已改逐入口计数并在异步来源复核前认领，原授权和额外请求拒绝均保留，待新Desktop真实复验"
       ],
       "remaining_checks": [
         "私聊材料完整真实流程/PC01-PC24与文件卡片实际挂载/HTML，不用直接文件API和局部Core测试替代",
@@ -151,14 +153,18 @@
       "resolved_findings": [
         "Windows私有目录夹具按原规则创建并通过",
         "文件pin规范几何/标题/颜色预期及精确路径通过",
-        "Ready/Stop空struct闭合额外字段且原JSON不变；所有坏帧/拆包/超量断言和真实生命周期通过"
+        "Ready/Stop空struct闭合额外字段且原JSON不变；所有坏帧/拆包/超量断言和真实生命周期通过",
+        "行内私聊复用原节点36px拖动标题栏，侧边保留独立标题，避免叠两层标题；操作仍完整",
+        "目标对象按会话和队员身份稳定，避免本地渲染触发反复打开单聊",
+        "绑定私聊复用原timeline-pane紧凑文件替换，正文可见且鼠标命中，不只DOM存在",
+        "节点标题和正文采用统一层级，相邻折叠卡片不再盖住当前操作；选中抬高仍保留",
+        "rc12原生鼠标触发React#185：两条selection写回交替；改由onNodesChange同批维护选中状态，原失败鼠标用例通过"
       ],
-      "latest_native_evidence": "i03-c06-source-ui-verification.json",
+      "latest_native_evidence": "i03-c06-private-workspace-verification.json",
       "ui_remaining": [
-        "私聊卡片重复标题与内容容器贴合需继续整改",
-        "附件预览截图仍停留单聊加载状态，当前DOM及授权读取通过不等同完整视觉资格",
-        "Codeg列表真实预览/节点数量尚未接入，禁止假缩略图",
-        "双主题、完整八类创建路径、键盘/错误状态、冷恢复及规模仍按I03有限清单补证"
+        "空私聊在恢复材料入口占位较多时仍有局部滚动；应按原内容布局继续核对空状态和恢复入口高度",
+        "缩放/尺寸切换有ResizeObserver延迟通知，继续定位；功能断言通过不授予零控制台问题资格",
+        "Codeg列表真实缩略预览/节点数、日主题与完整八类创建/错误状态仍未取得全部资格"
       ]
     }
   ],
