@@ -213,6 +213,8 @@ export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait
       const original = await get(scopes[0])
       let gate
       if (config.mode === 'private-late-upload') {
+        await wait(`Boolean(${frame(0)}?.querySelector('button[aria-label="添加文件"]')&&!${frame(0)}.querySelector('button[aria-label="添加文件"]').disabled)`)
+        await evaluate(`(()=>{window.r01UploadInputEvents=[];const input=${frame(0)}.querySelector('input.composer-file-input');for(const type of ['input','change'])input.addEventListener(type,event=>window.r01UploadInputEvents.push({type,trusted:event.isTrusted,count:event.target.files?.length??0}),{capture:true});return true})()`)
         gate = seam.holdUpload({ conversationId, scope: scopes[0] })
         const path = join(config.evidence, '迟到上传原文件.txt')
         await writeFile(path, '只属于原私聊的迟到上传材料', { flag: 'wx' })
@@ -259,7 +261,7 @@ export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait
       if (gate) { gate.release(); await pause(400) }
       await openCanvasBoard(evaluate, wait, boardId)
       if (await evaluate(`Boolean(${frame(0)})`)) {
-        await evaluate(`(()=>{${frame(0)}.querySelector('button[aria-label="收起对话"]')?.click();return true})()`)
+        await clickNative(`${frame(0)}.querySelector('.canvas-conversation-heading button[aria-label="收起对话"]')`)
         await wait(`!${frame(0)}`)
       }
       await clickNative(`document.querySelector('[data-id="${replacementScope.nodeId}"] button[aria-label="展开对话"]')`)
@@ -395,6 +397,9 @@ export async function qualifyCanvasPrivateWorkflow(window, { rpc, evaluate, wait
     record('actual_other_card_takeover_uses_saved_working_input_and_new_token_then_rejects_old_writer_and_saves_its_own_edit')
     await writeFile(join(config.evidence, '02-private-pending-takeover.png'), (await window.webContents.capturePage()).toPNG())
   } finally {
+    if (config.mode === 'private-late-upload') {
+      report.upload_input_events = await evaluate('window.r01UploadInputEvents??[]').catch(error => ({ error: String(error) }))
+    }
     if (config.mode === 'private-queue') {
       report.fixture_request_cleanup = []
       for (const index of [0, 1]) {

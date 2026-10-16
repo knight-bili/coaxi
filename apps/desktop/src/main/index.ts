@@ -191,6 +191,7 @@ const mainStartupStartedAt = performance.now()
 console.info('[startup] stage=main_module_loaded elapsed_ms=0.0')
 
 const allowedMethods = new Set<CoreMethod>([
+  'commands.reconcile',
   'health.check',
   'diagnostics.check',
   'monitoring.snapshot',
