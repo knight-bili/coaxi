@@ -941,11 +941,17 @@ async function qualifyPublicMulti(window,{evaluate,wait,rpc}){
    await window.webContents.debugger.sendCommand('Runtime.releaseObjectGroup',{objectGroup:'native-public-listeners'})
    return snapshot
   }
+  const isReader=listener=>/document\.visibilityState\s*!==\s*["']hidden["'][\s\S]*\brefresh\(\)\.catch/.test(listener.handler??'')
+  report.reader_owner_match='CanvasThreadReader.tsx:34 foreground: hidden check then refresh().catch; other per-card visibility/focus hooks remain in full snapshots'
   const baseline=await listeners();report.reader_listeners=[{step:'empty_board',snapshot:baseline}]
+  for(const type of ['focus','visibilitychange'])assert.equal(baseline[type].filter(isReader).length,0)
   const count=async(step,extra)=>{
    await pause(120)
    const current=await listeners();report.reader_listeners.push({step,snapshot:current})
-   for(const type of ['focus','visibilitychange'])assert.equal(current[type].length-baseline[type].length,extra,JSON.stringify({step,type,baseline:baseline[type],current:current[type]}))
+   for(const type of ['focus','visibilitychange']){
+    assert.equal(current[type].filter(isReader).length,extra,JSON.stringify({step,type,current:current[type]}))
+    if(extra===0)assert.deepEqual(current[type].map(item=>item.signature).sort(),baseline[type].map(item=>item.signature).sort(),JSON.stringify({step,type,current:current[type]}))
+   }
   }
   const open=async index=>{
    await wait(`Boolean(document.querySelector('[data-id="${nodeIds[index]}"] button[aria-label="展开对话"]:not(:disabled)'))`)
