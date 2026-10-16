@@ -62,7 +62,11 @@ export async function qualifyCanvasNotifications(window,{evaluate,wait,rpc,openC
  const until=async predicate=>{const end=Date.now()+30_000;while(Date.now()<end){const result=await predicate();if(result)return result;await pause(100)}throw Error('Actual notification state did not reach the expected condition')}
  const frame=context=>`document.querySelector('.canvas-conversation-frame[data-canvas-conversation-key*="${context.nodeId}"]')`
  const button=(context,label)=>`document.querySelector('[data-id="${context.nodeId}"] button[aria-label="${label}"]')`
- const click=async expression=>{await wait(`Boolean((${expression})&&!(${expression}).disabled)`);await evaluate(`(()=>{(${expression}).click();return true})()`)}
+ const click=async expression=>{
+  await wait(`Boolean((${expression})&&!(${expression}).disabled&&(${expression}).checkVisibility())`)
+  const point=await evaluate(`(()=>{const node=(${expression});node.scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'});const r=node.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,hit=document.elementFromPoint(x,y);if(!hit||!node.contains(hit))throw Error('Actual menu/control is occluded');return {x:Math.round(x),y:Math.round(y)}})()`)
+  for(const type of ['mouseMove','mouseDown','mouseUp'])window.webContents.sendInputEvent({type,...point,...(type==='mouseMove'?{}:{button:'left',clickCount:1})})
+ }
  const fit=async()=>{await click(`document.querySelector('.canvas-dock-panel button[aria-label="查看全部"]')`);await pause(450)}
  const open=async context=>{if(!await evaluate(`Boolean(${frame(context)})`))await click(button(context,'展开对话'));await wait(`Boolean(${frame(context)}?.querySelector('${context.kind==='private'?'.single-chat-composer textarea':'.structured-mention-editor'}'))`)}
  const close=async context=>{await click(button(context,'收起对话'));await wait(`!${frame(context)}`)}
