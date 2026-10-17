@@ -109,13 +109,14 @@ export async function qualifyCanvasSourceUi(window, { evaluate, wait, rpc, openC
     record('original_four_line_long_title_and_metadata_keep_local_canvas_layout_across_day_night_small_window_and_original_83_120_zoom_steps')
     window.setContentSize(1440, 920); await click('.canvas-dock-panel button[aria-label="查看全部"]'); await pause(450)
     await click(`${node(contexts[0])} button[aria-label="展开对话"]`)
-    await wait(`Boolean(document.querySelector('${node(contexts[0])} .structured-mention-editor'))`)
+    const frame = `.canvas-conversation-frame[data-canvas-conversation-key*="${contexts[0].nodeId}"]`
+    await wait(`Boolean(document.querySelector('${frame} .structured-mention-editor'))`)
     await click('.canvas-dock-panel button[aria-label="查看全部"]'); await pause(450)
-    const frames = await evaluate(`new Promise(resolve=>{const rows=[];let previous=performance.now();function frame(now){const stage=document.querySelector('.canvas-flow-stage').getBoundingClientRect(),editor=document.querySelector('${node(contexts[0])} .structured-mention-editor'),r=editor.getBoundingClientRect(),hit=document.elementFromPoint(r.x+Math.min(12,r.width/2),r.y+Math.min(12,r.height/2));rows.push({gap:now-previous,stage:[stage.width,stage.height],editor:[r.x,r.y,r.width,r.height],hit:Boolean(hit&&editor.contains(hit))});previous=now;if(rows.length<12)requestAnimationFrame(frame);else resolve(rows)}requestAnimationFrame(frame)})`)
+    const frames = await evaluate(`new Promise(resolve=>{const rows=[];let previous=performance.now();function frame(now){const stage=document.querySelector('.canvas-flow-stage').getBoundingClientRect(),editor=document.querySelector('${frame} .structured-mention-editor'),r=editor.getBoundingClientRect(),hit=document.elementFromPoint(r.x+Math.min(12,r.width/2),r.y+Math.min(12,r.height/2));rows.push({gap:now-previous,stage:[stage.width,stage.height],editor:[r.x,r.y,r.width,r.height],hit:Boolean(hit&&editor.contains(hit))});previous=now;if(rows.length<12)requestAnimationFrame(frame);else resolve(rows)}requestAnimationFrame(frame)})`)
     report.summary.frameObservations = frames; await checkpoint(); assert.ok(frames.every(f => f.hit && f.editor[2] > 0 && f.editor[3] > 0))
     assert.deepEqual(frames.at(-1).stage, frames.at(-2).stage)
-    await click(`${node(contexts[0])} .structured-mention-editor`); const body = 'R09 尺寸观察后的真实输入🙂'; await window.webContents.insertText(body)
-    await wait(`document.querySelector('${node(contexts[0])} .structured-mention-editor').textContent===${JSON.stringify(body)}`)
+    await click(`${frame} .structured-mention-editor`); const body = 'R09 尺寸观察后的真实输入🙂'; await window.webContents.insertText(body)
+    await wait(`document.querySelector('${frame} .structured-mention-editor').textContent===${JSON.stringify(body)}`)
     report.summary.inputAfterFrames = body; record('actual_post_expansion_frames_keep_visible_editor_hit_and_stable_stage_then_trusted_input_reaches_original_composer')
   } finally {
     for (const c of contexts) for (const run of activeRuns(await view(c))) {
