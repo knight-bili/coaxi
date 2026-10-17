@@ -86,8 +86,9 @@ ORDER BY member.camp_id, profile.member_order, profile.id
 "#;
 const PRIVATE_SQL: &str = r#"
 SELECT conversation.camp_id, conversation.id, conversation.agent_id, conversation.updated_at,
-       EXISTS(SELECT 1 FROM agent_run run WHERE run.conversation_id = conversation.id
-              AND run.camp_id = conversation.camp_id AND run.invocation_kind = 'single_chat'
+       EXISTS(SELECT 1 FROM agent_run run LEFT JOIN camp_turn turn ON turn.id = run.camp_turn_id
+              WHERE run.conversation_id = conversation.id
+              AND COALESCE(run.camp_id, turn.camp_id) = conversation.camp_id AND run.invocation_kind = 'single_chat'
               AND run.status IN ('queued', 'running', 'waiting'))
 FROM conversation
 JOIN camp_member member ON member.camp_id = conversation.camp_id AND member.agent_id = conversation.agent_id
@@ -417,7 +418,7 @@ INSERT INTO conversation VALUES('a','private-a','agent-a','time','single_chat',N
 INSERT INTO conversation VALUES('b','private-b','agent-a','time','single_chat',NULL);
 INSERT INTO task VALUES('legacy-task','b'),('wrong-task','a');
 INSERT INTO agent_run VALUES('public-queued','a',NULL,NULL,'camp_request','queued'),('public-waiting','a',NULL,NULL,'camp_request','waiting'),
- ('completed','a',NULL,NULL,'camp_request','succeeded'),('private','a',NULL,'private-a','single_chat','running'),
+ ('completed','a',NULL,NULL,'camp_request','succeeded'),('private',NULL,NULL,'private-a','single_chat','running'),
  ('private-foreign','b',NULL,'private-a','single_chat','running'),('legacy-run',NULL,'legacy-task',NULL,'task','running'),
  ('direct-owner','b','wrong-task',NULL,'task','queued'),('private-wrong-camp','a',NULL,'private-b','single_chat','waiting');
 ALTER TABLE agent_run ADD COLUMN camp_turn_id TEXT;
@@ -426,13 +427,16 @@ ALTER TABLE agent_run ADD COLUMN runtime_adapter_kind TEXT;
 ALTER TABLE agent_run ADD COLUMN runtime_model_selection_json TEXT;
 ALTER TABLE agent_run ADD COLUMN runtime_observed_model_id TEXT;
 CREATE TABLE camp_turn(id TEXT PRIMARY KEY,camp_id TEXT);
-INSERT INTO camp_turn VALUES('legacy-turn','b');
+INSERT INTO camp_turn VALUES('legacy-turn','b'),('private-turn','a');
+UPDATE agent_run SET camp_turn_id='private-turn' WHERE id='private';
+INSERT INTO agent_run(id,camp_id,conversation_id,invocation_kind,status,camp_turn_id)
+ VALUES('private-wrong-turn',NULL,'private-b','single_chat','waiting','private-turn');
 INSERT INTO conversation VALUES('a','public-a','agent-a','time','public',NULL),('b','public-b','agent-a','time','public',NULL),
  ('a','public-left','agent-b','time','public',NULL);
 INSERT INTO agent_run(id,camp_id,conversation_id,invocation_kind,status,camp_turn_id,created_at,runtime_adapter_kind,runtime_model_selection_json,runtime_observed_model_id) VALUES
  ('model-public-old','a','public-a','camp_request','succeeded',NULL,'2026-10-15','codex-cli','{"source":"explicit","modelId":"old-public"}',NULL),
  ('model-public-new','a','public-a','camp_request','succeeded',NULL,'2026-10-16','codex-cli','{"source":"runtime_default","modelId":"not-an-observation"}','public-observed'),
- ('model-private','a','private-a','single_chat','succeeded',NULL,'2026-10-16','codex-cli','{"source":"explicit","modelId":"private-frozen","options":{"api_key":"NEVER-PROJECT"}}','ignore-explicit-observation'),
+ ('model-private',NULL,'private-a','single_chat','succeeded','private-turn','2026-10-16','codex-cli','{"source":"explicit","modelId":"private-frozen","options":{"api_key":"NEVER-PROJECT"}}','ignore-explicit-observation'),
  ('model-legacy',NULL,'public-b','camp_request','succeeded','legacy-turn','2026-10-16','gemini-cli','{"source":"runtime_default"}','legacy-observed'),
  ('model-private-b-old','b','private-b','single_chat','succeeded',NULL,'2026-10-15','codex-cli','{"source":"explicit","modelId":"old-private"}',NULL),
  ('model-private-b-unknown','b','private-b','single_chat','succeeded',NULL,'2026-10-16','codex-cli','{"source":"runtime_default"}',NULL),

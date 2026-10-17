@@ -427,7 +427,7 @@
         "I03-C06"
       ],
       "done_when": "八类创建/编辑/排列/折叠/错误态、画板CRUD、原菜单键/旧Host提示、日夜小窗口和末项可达通过；源码参考中已登记的模型/分支/子会话/运行状态有真实Core投影或逐项有依据的适用性结论；尺寸告警形成定位及影响记录。",
-      "next_action": "复用rc24补真实交错活动/最近模型/分支、旧Host、剩余主题/缩放/长标题与尺寸告警影响；既过八类CRUD/画板/菜单键不重跑，随后R10。",
+      "next_action": "只构建Core25，复用24相同前端；重跑完整摘要交错与视觉观察。",
       "owner": "Codex",
       "external_condition": "none_confirmed_blocking_current_independent_work",
       "known_ui_followups": [
@@ -453,7 +453,18 @@
         "work": "Codeg真实父子会话/异步委派完成后补child_count画布投影和回归，不能拿私聊数量替代；功能仍在完整一期"
       },
       "verified_native_card_checks": 25,
-      "verified_native_board_checks": 6
+      "verified_native_board_checks": 6,
+      "pending_core_repair": {
+        "status": "source_verified_native_rebuild_required",
+        "source_file": "crates/rovai-core/src/read_model/canvas_references.rs",
+        "source_sha256": "d78cee9719072b8cc00158f0f0bf142c6b58d5566ecea2c20280a496675064cf",
+        "defect": "真实single_chat运行通过camp_turn归属原Thread，直接camp_id为null；PRIVATE_SQL漏计活动，RUN_MODELS原有轮次关联正确。",
+        "repair": "活动投影沿原camp_turn核对归属，保留直接Thread归属优先及跨Thread拒绝；不改模型输入、数据库或API。",
+        "red": "r09-nullable-private-red.log",
+        "green": "r09-nullable-private-green.log",
+        "native_red": "fusion-i03-rc.24/native-source-ui-r7-prepare/result.json",
+        "next": "只构建Core25，复用24相同前端；重跑完整摘要交错与视觉观察。"
+      }
     },
     {
       "id": "I03-R10",

@@ -924,7 +924,18 @@
         "evidence": "i03-r07-native-input-verification.json"
       },
       "r08_complete_local_verification": "i03-r08-complete-local-verification.json",
-      "r09_source_ui_progress": "i03-r09-source-ui-progress.json"
+      "r09_source_ui_progress": "i03-r09-source-ui-progress.json",
+      "pending_core_repair": {
+        "status": "source_verified_native_rebuild_required",
+        "source_file": "crates/rovai-core/src/read_model/canvas_references.rs",
+        "source_sha256": "d78cee9719072b8cc00158f0f0bf142c6b58d5566ecea2c20280a496675064cf",
+        "defect": "真实single_chat运行通过camp_turn归属原Thread，直接camp_id为null；PRIVATE_SQL漏计活动，RUN_MODELS原有轮次关联正确。",
+        "repair": "活动投影沿原camp_turn核对归属，保留直接Thread归属优先及跨Thread拒绝；不改模型输入、数据库或API。",
+        "red": "r09-nullable-private-red.log",
+        "green": "r09-nullable-private-green.log",
+        "native_red": "fusion-i03-rc.24/native-source-ui-r7-prepare/result.json",
+        "next": "只构建Core25，复用24相同前端；重跑完整摘要交错与视觉观察。"
+      }
     },
     {
       "stage_id": "I04",
