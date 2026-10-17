@@ -18,6 +18,7 @@ last_updated: 2026-10-18
 当前重启接受输入分项：原启动恢复改用已有 Runtime 失败结算事务，按父先子后取消受控树，接管分支及其后续 User 输入保留。
 未知输入仍等待原请求核对并拒绝领取，已正确等待时重复恢复零写；接受凭据、原任务 Blob、冻结配置及绑定保持，清理确认仍由 Adapter 独立负责。
 7个原Rust owner及10项文档测试定向通过；Session/ACK/FakeHost明确为夹具，不新增owner或正式场景通过，不作为完整Host/Runtime验证或I04完成声明。
+源码 `7c13ccb10` 的[重启结算分项证据](../../../integration/execution/i04-delegation-restart-result.json)固定10个源码Git blob、48份日志及6份批准工件核定，保留测试准备错误和重复写缺陷的失败记录。
 
 ## 分项记录
 
