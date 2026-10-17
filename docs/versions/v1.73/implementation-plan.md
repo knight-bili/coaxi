@@ -40,5 +40,6 @@ User resume已编码Core/两端运输/原请求恢复：独立User授权支持�
 完整delta只读结构分类已编码：settings、全部新增对象、五扩展旧表和十个改动旧guard共用安装转换；旧159来源拒绝部分目标和被删改的旧约束。沿原身份迁移owner补来源/目标篡改、无害格式与额外列兼容、晚期故障回滚验证。接下来补policy3与新Run冻结资格、显式旧v1.72来源和两条升级链，再登记160/210；本项不提前改变现行159/209。
 候选delta及额外冲突约束的[结构分项证据](../../../integration/execution/i04-delegation-schema-result.json)记录定向原Rust owner、文档门禁、源码与日志核定；没有新增owner、启动登记或阶段完成声明。
 私聊policy3的工具/历史/终态版本与冻结角色检查已接线，普通默认policy2不变；生产准入改为精确v1.73/160和210。原私聊策略owner扩同库新Run创建/只读历史/最终私有回复及角色拒绝，原冻结资格owner补旧/未来合同拒绝；完整启动登记与旧Selection1/2冻结输入/排队兼容仍按下一批合齐，不能据此称160/210已开通。
+源码 `596aa7818` 的[私聊权限分项证据](../../../integration/execution/i04-delegation-policy3-result.json)：5项原Rust owner和10项文档测试通过，8个源码文件/31份日志及6份批准工件核定；完整迁移及I04其余工作继续。
 
 依赖与客户事项以[执行计划](../../../integration/execution/i04-execution-plan.md)和[客户待办](../../../integration/execution/customer-todos.json)为准。
