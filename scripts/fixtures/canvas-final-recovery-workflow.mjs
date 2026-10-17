@@ -56,7 +56,8 @@ export async function qualifyCanvasSourceUi(window,{evaluate,wait,rpc,openCanvas
   await click('document.querySelector(\'.canvas-dock-panel button[aria-label="查看全部"]\')');await pause(500)
   await click(`document.querySelector('.react-flow__node[data-id="${node('terminal').id}"] button[aria-label="启动终端"]')`)
   const running=await until(async()=>{const s=await terminal();return s.phase==='running'?s:false});context.terminalBefore=running
-  const marker='R10_COLD_'+randomUUID().replaceAll('-',''),bytes=Buffer.from('echo '+marker+'\r','utf8')
+  const marker='R10_COLD_'+randomUUID().replaceAll('-',''),bytes=Buffer.from(`console.log(${JSON.stringify(marker)})\r`,'utf8')
+  report.terminal_program={shell:process.env.SHELL,language:'Node.js REPL from the explicit isolated test SHELL; real OS PTY, no runtime model'}
   await rpc('canvas.terminals.write',{target:running.target,generation:running.generation,inputId:randomUUID(),expectedInputSequence:running.inputSequence,bytesBase64:bytes.toString('base64')})
   const output=await until(async()=>{const s=await terminal(),text=stripVTControlCharacters(Buffer.concat(s.chunks.map(c=>Buffer.from(c.bytesBase64,'base64'))).toString('utf8'));return text.split(/\r?\n/).some(line=>line.trim()===marker)?s:false})
   assert.equal(output.generation,running.generation);await rpc('canvas.terminals.stop',{target:running.target,generation:running.generation});await until(async()=>{const s=await terminal();return s.cleanupComplete?s:false})
