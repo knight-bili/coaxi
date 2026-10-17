@@ -23,11 +23,19 @@ export async function qualifyCanvasBoardUi(window,{evaluate,wait,rpc,config,repo
    const list='document.querySelector(".canvas-board-scroll")'
    const p=await evaluate(`(()=>{const r=${list}.getBoundingClientRect();return{x:Math.round(r.x+r.width/2),y:Math.round(r.y+r.height/2)}})()`)
    await evaluate('(()=>{window.r09Wheel=[];document.querySelector(".canvas-board-scroll").addEventListener("wheel",event=>window.r09Wheel.push({trusted:event.isTrusted,dy:event.deltaY}),{passive:true});return true})()')
-   window.webContents.sendInputEvent({type:'mouseMove',...p});window.webContents.sendInputEvent({type:'mouseWheel',...p,deltaX:0,deltaY:-6000,canScroll:true});await pause(250)
-   if(await evaluate(`${list}.scrollTop===0`)){window.webContents.sendInputEvent({type:'mouseWheel',...p,deltaX:0,deltaY:6000,canScroll:true});await pause(250)}
+   let direction=-1;const wheelSteps=[]
+   for(let step=0;step<16;step++){
+    const before=await evaluate(`${list}.scrollTop`)
+    window.webContents.sendInputEvent({type:'mouseMove',...p});window.webContents.sendInputEvent({type:'mouseWheel',...p,modifiers:[],deltaX:0,deltaY:direction*1200,canScroll:true});await pause(120)
+    const after=await evaluate(`${list}.scrollTop`);wheelSteps.push({before,after,direction})
+    if(step===0&&after===before)direction=1
+    if(await evaluate(`${list}.scrollTop+${list}.clientHeight>=${list}.scrollHeight-1`))break
+   }
+   report.board_ui.wheelSteps??=[];report.board_ui.wheelSteps.push({theme,steps:wheelSteps})
    const metrics=await evaluate(`(()=>{const main=document.querySelector('.content.canvas-content'),work=document.querySelector('.canvas-workspace'),list=${list},last=list.querySelector('.canvas-board-create'),r=list.getBoundingClientRect(),b=last.getBoundingClientRect();return{theme:document.documentElement.dataset.theme,viewport:{width:innerWidth,height:innerHeight,dpr:devicePixelRatio},padding:[getComputedStyle(main).paddingTop,getComputedStyle(main).paddingRight,getComputedStyle(main).paddingBottom,getComputedStyle(main).paddingLeft],outerExtraX:main.scrollWidth-main.clientWidth,outerExtraY:main.scrollHeight-main.clientHeight,widthGap:Math.abs(main.getBoundingClientRect().width-work.getBoundingClientRect().width),heightGap:Math.abs(main.getBoundingClientRect().height-work.getBoundingClientRect().height),listExtraY:list.scrollHeight-list.clientHeight,scrollTop:list.scrollTop,lastVisible:b.top>=r.top-1&&b.bottom<=r.bottom+1,wheel:window.r09Wheel,cards:Array.from(document.querySelectorAll('.canvas-board-item')).map(card=>({height:card.getBoundingClientRect().height,copy:card.querySelector('.canvas-board-copy').getBoundingClientRect().height,preview:card.querySelector('.canvas-board-preview').getBoundingClientRect().height}))}})()`)
-   assert.deepEqual(metrics.padding,['0px','0px','0px','0px']);assert.ok(metrics.outerExtraX<=1&&metrics.outerExtraY<=1&&metrics.widthGap<=1&&metrics.heightGap<=1);assert.ok(metrics.listExtraY>0&&metrics.scrollTop>0&&metrics.lastVisible);assert.ok(metrics.wheel.some(event=>event.trusted));assert.ok(Math.max(...metrics.cards.map(c=>c.height))-Math.min(...metrics.cards.map(c=>c.height))<=1)
-   report.board_ui.layouts.push(metrics);await screenshot('board-list-'+theme,join(config.evidence,'board-list-'+theme+'.png'));record('actual_'+theme+'_small_window_keeps_compact_equal_cards_single_scroll_and_trusted_wheel_reaches_last_create_button');await checkpoint()
+   report.board_ui.layouts.push(metrics);await checkpoint()
+   assert.deepEqual(metrics.padding,['0px','0px','0px','0px']);assert.ok(metrics.outerExtraX<=1&&metrics.outerExtraY<=1&&metrics.widthGap<=1&&metrics.heightGap<=1);assert.ok(metrics.listExtraY>0&&metrics.scrollTop>0&&metrics.lastVisible,JSON.stringify(metrics));assert.ok(metrics.wheel.some(event=>event.trusted));assert.ok(Math.max(...metrics.cards.map(c=>c.height))-Math.min(...metrics.cards.map(c=>c.height))<=1)
+   await screenshot('board-list-'+theme,join(config.evidence,'board-list-'+theme+'.png'));record('actual_'+theme+'_small_window_keeps_compact_equal_cards_single_scroll_and_trusted_wheel_reaches_last_create_button');await checkpoint()
   }
   window.setContentSize(1440,920);await pause(180)
   const tile=`document.querySelector('.canvas-board-tile[data-board-id="${targetId}"]')`
