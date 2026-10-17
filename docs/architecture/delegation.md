@@ -10,6 +10,7 @@ Core 是委派业务与执行权威。DelegationId 关联真实发起成员、�
 User 查询依据 Host 身份及确切持久 Thread/child 关系，父 Run 终态不撤销用户查看历史的能力；模型侧仍每次核对原活跃运行与接管水位。
 两类读取复用原固定结果与有界分页，但签名游标隔离受众。全局设置走原User命令/CAS/同事务事件回执，不改变旧冻结输入；具体入口见当前合同。
 User恢复以原UUID和持久父Conversation归属授权，允许父Run已经终态，复用同一原任务/Session/清理与writer检查和attempt工厂。候选SQL只凭对应新Run/attempt的同事务User恢复事件准入该分支；模型的活跃父身份门禁保持。因果依据仍来自上一attempt，不伪造模型执行或另一套broker。
+私聊新角色使用policy3，普通私聊默认保持policy2。工具、历史和终态写回共享版本/冻结角色校验，不能只把数值3加入白名单；实际六操作仍走委派原鉴权。生产准入精确匹配v1.73/160和210，不按未来schema范围猜测能力。旧Run不补角色，完整启动升级及旧冻结输入兼容仍须另行验证。
 现有 Scheduler/Fleet、Runtime Adapter、输入接收、清理和命令回执承担执行；不能另运行具有业务权威的 Codeg broker。原生提供方的子代理通过只读证据/引用投影，缺可靠来源时显示未知，不伪造 Core 子 Run。
 
 当前[输入、设置和持久身份原语](../contracts/delegation-v1.md)已编码，候选身份 DDL 在隔离 Core 夹具验证；启动迁移尚未登记。下一步按[实施计划](../versions/v1.73/implementation-plan.md)合齐格式/冻结资格/严格迁移与执行全链路；既有 Host 或 Runtime 尚不会因为这些模块而获得新能力。

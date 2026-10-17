@@ -33,6 +33,7 @@ use crate::{
 
 pub const SINGLE_CHAT_OPERATION_POLICY: &str = "single_chat_v1";
 pub const SINGLE_CHAT_OPERATION_POLICY_VERSION: i64 = 2;
+pub(crate) const SINGLE_CHAT_DELEGATION_POLICY_VERSION: i64 = 3;
 pub const SINGLE_CHAT_RESPONSE_DELIVERY: &str = "conversation_message";
 pub const SINGLE_CHAT_HISTORY_TOOL_NAME: &str = "single_chat.history";
 
@@ -2838,7 +2839,7 @@ fn admit_single_chat_message(
     let operation_policy_version = if child {
         1
     } else if crate::delegation_policy::FrozenPolicy::from_config(&effective_config)?.is_some() {
-        3
+        SINGLE_CHAT_DELEGATION_POLICY_VERSION
     } else {
         SINGLE_CHAT_OPERATION_POLICY_VERSION
     };
@@ -3231,8 +3232,13 @@ pub fn authorize_builtin_operation(
         }
         return Ok(None);
     };
+    let config: String = database.connection().query_row(
+        "SELECT effective_config_json FROM agent_run WHERE id=?1 AND execution_epoch=?2",
+        params![agent_run_id, execution_epoch],
+        |row| row.get(0),
+    )?;
     if response_delivery != SINGLE_CHAT_RESPONSE_DELIVERY
-        || !single_chat_operation_policy_is_supported(&operation_policy, policy_version)
+        || !frozen_single_chat_policy_is_supported(&operation_policy, policy_version, &config)?
     {
         anyhow::bail!("Single Chat AgentRun has an invalid frozen operation policy");
     }
@@ -3282,11 +3288,12 @@ fn load_single_chat_history_target(
     agent_run_id: &str,
     execution_epoch: i64,
 ) -> Result<Option<(String, i64)>> {
-    Ok(database
+    let target: Option<(String, i64, String, i64, String)> = database
         .connection()
         .query_row(
             r#"
-            SELECT conversation.id, current_input.sequence
+            SELECT conversation.id, current_input.sequence, agent_run.operation_policy,
+                   agent_run.operation_policy_version, agent_run.effective_config_json
             FROM agent_run
             JOIN camp_turn ON camp_turn.id = agent_run.camp_turn_id
             JOIN conversation
@@ -3301,7 +3308,7 @@ fn load_single_chat_history_target(
               AND agent_run.invocation_kind = 'single_chat'
               AND agent_run.response_delivery = 'conversation_message'
               AND agent_run.operation_policy = 'single_chat_v1'
-              AND agent_run.operation_policy_version IN (1, 2)
+              AND agent_run.operation_policy_version IN (1, 2, 3)
               AND agent_run.status = 'running'
               AND agent_run.cancel_requested_at IS NULL
               AND camp_turn.kind = 'single_chat'
@@ -3313,21 +3320,57 @@ fn load_single_chat_history_target(
               AND current_input.sequence = agent_run.initial_conversation_context_through_sequence
             "#,
             params![agent_run_id, execution_epoch],
-            |row| Ok((row.get(0)?, row.get(1)?)),
+            |row| {
+                Ok((
+                    row.get(0)?,
+                    row.get(1)?,
+                    row.get(2)?,
+                    row.get(3)?,
+                    row.get(4)?,
+                ))
+            },
         )
-        .optional()?)
+        .optional()?;
+    match target {
+        Some((id, sequence, policy, version, config))
+            if frozen_single_chat_policy_is_supported(&policy, version, &config)? =>
+        {
+            Ok(Some((id, sequence)))
+        }
+        _ => Ok(None),
+    }
 }
 
 pub fn single_chat_operation_policy_is_supported(policy: &str, version: i64) -> bool {
     policy == SINGLE_CHAT_OPERATION_POLICY
-        && matches!(version, 1..=SINGLE_CHAT_OPERATION_POLICY_VERSION)
+        && matches!(version, 1..=SINGLE_CHAT_DELEGATION_POLICY_VERSION)
+}
+
+pub(crate) fn frozen_single_chat_policy_is_supported(
+    policy: &str,
+    version: i64,
+    config: &str,
+) -> Result<bool> {
+    if !single_chat_operation_policy_is_supported(policy, version) {
+        return Ok(false);
+    }
+    let frozen =
+        crate::delegation_policy::FrozenPolicy::from_config(&serde_json::from_str(config)?)?;
+    Ok(if version == SINGLE_CHAT_DELEGATION_POLICY_VERSION {
+        frozen.is_some_and(|policy| policy.role == crate::delegation_policy::Role::PrivateParent)
+    } else {
+        frozen.is_none()
+    })
 }
 
 fn single_chat_operation_is_allowed(policy_version: i64, operation: &str) -> bool {
-    matches!(
-        operation,
-        "thread.search" | "thread.read" | SINGLE_CHAT_HISTORY_TOOL_NAME
-    ) || (policy_version >= 2 && matches!(operation, "mission.list" | "mission.get"))
+    matches!(policy_version, 1..=SINGLE_CHAT_DELEGATION_POLICY_VERSION)
+        && (matches!(
+            operation,
+            "thread.search" | "thread.read" | SINGLE_CHAT_HISTORY_TOOL_NAME
+        ) || (policy_version >= 2 && matches!(operation, "mission.list" | "mission.get"))
+            || (policy_version == SINGLE_CHAT_DELEGATION_POLICY_VERSION
+                && crate::delegation_contract::canonical_operation(operation).is_some()))
 }
 
 #[cfg(test)]
@@ -3343,6 +3386,7 @@ mod tests {
         runtime::{ExecutionRuntimeService, SucceedAgentRunCommand},
         skill_projection::{SkillExposureEntry, SkillExposureSnapshot},
     };
+    include!("single_chat_policy3_tests.rs");
 
     fn user_envelope<P>(command_id: &str, camp_id: Option<&str>, payload: P) -> CommandEnvelope<P> {
         CommandEnvelope {
@@ -4151,6 +4195,7 @@ mod tests {
 
     #[test]
     fn built_in_policy_is_a_closed_allowlist_and_restart_cancels_only_the_reply() {
+        assert_frozen_policy_versions();
         assert!(!single_chat_operation_is_allowed(1, "mission.list"));
         assert!(!single_chat_operation_is_allowed(1, "mission.get"));
         assert!(single_chat_operation_is_allowed(2, "mission.list"));
@@ -4263,6 +4308,7 @@ mod tests {
             "single-chat-send-after-restart",
         );
         assert_eq!(next.result.status, CommandResultStatus::Accepted);
+        assert_delegation_policy3(&mut database, &service, &camp_id, &run_id);
     }
 
     #[test]

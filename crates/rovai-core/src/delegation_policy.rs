@@ -110,7 +110,7 @@ pub(crate) fn freeze_for_conversation(
     connection: &Connection,
     conversation_id: &str,
 ) -> Result<Option<FrozenPolicy>> {
-    let ready:bool=connection.query_row("SELECT EXISTS(SELECT 1 FROM rovai_data_contract WHERE singleton=1 AND projection_schema_version>=160) AND EXISTS(SELECT 1 FROM schema_migration WHERE version=210)",[],|r|r.get(0))?;
+    let ready:bool=connection.query_row("SELECT EXISTS(SELECT 1 FROM rovai_data_contract WHERE singleton=1 AND contract_version='v1.73' AND projection_schema_version=160) AND EXISTS(SELECT 1 FROM schema_migration WHERE version=210)",[],|r|r.get(0))?;
     if !ready {
         return Ok(None);
     }
@@ -249,7 +249,7 @@ mod tests {
         );
         // Minimal SQL owner for the feature gate, not a Core migration/authentication fixture.
         let connection = Connection::open_in_memory().unwrap();
-        connection.execute_batch("CREATE TABLE rovai_data_contract(singleton INTEGER,projection_schema_version INTEGER); INSERT INTO rovai_data_contract VALUES(1,159); CREATE TABLE schema_migration(version INTEGER); CREATE TABLE conversation(id TEXT,kind TEXT,ended_at TEXT); INSERT INTO conversation VALUES('parent','camp_member',NULL),('private','single_chat',NULL),('child','delegation_child',NULL); CREATE TABLE delegation(parent_conversation_id TEXT);").unwrap();
+        connection.execute_batch("CREATE TABLE rovai_data_contract(singleton INTEGER,contract_version TEXT,projection_schema_version INTEGER); INSERT INTO rovai_data_contract VALUES(1,'v1.72',159); CREATE TABLE schema_migration(version INTEGER); CREATE TABLE conversation(id TEXT,kind TEXT,ended_at TEXT); INSERT INTO conversation VALUES('parent','camp_member',NULL),('private','single_chat',NULL),('child','delegation_child',NULL); CREATE TABLE delegation(parent_conversation_id TEXT);").unwrap();
         connection
             .execute_batch(crate::delegation_settings::SCHEMA)
             .unwrap();
@@ -273,6 +273,18 @@ mod tests {
         connection
             .execute("INSERT INTO schema_migration VALUES(210)", [])
             .unwrap();
+        assert_eq!(
+            freeze_for_conversation(&connection, "parent").unwrap(),
+            None
+        );
+        for (contract, schema) in [("v1.74", 160), ("v1.73", 161), ("v1.73", 159)] {
+            connection.execute("UPDATE rovai_data_contract SET contract_version=?1,projection_schema_version=?2",params![contract,schema]).unwrap();
+            assert_eq!(
+                freeze_for_conversation(&connection, "parent").unwrap(),
+                None
+            );
+        }
+        connection.execute("UPDATE rovai_data_contract SET contract_version='v1.73',projection_schema_version=160",[]).unwrap();
         let frozen = freeze_for_conversation(&connection, "parent")
             .unwrap()
             .unwrap();

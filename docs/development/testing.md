@@ -89,6 +89,12 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 
 ## Rust 测试准入与退役门槛
 
+I04 私聊policy3扩展原 `single_chat::tests::built_in_policy_is_a_closed_allowlist_and_restart_cancels_only_the_reply`，
+helper为 `single_chat_policy3_tests.rs`，复用同一Core数据库，不新增owner。
+验证新Run真实配置冻结、旧Run不补权、闭合操作/别名、历史零写入、版本不可变和非法角色的工具/历史/终态拒绝，以及正常私有回复不写公屏。
+运行状态及未来准入标记是明确夹具，不代表完整启动升级、原生输入ACK或真实Runtime。
+原资格owner补精确旧/未来合同门禁；原私聊最终回复、历史分页和Context owner作相关回归。
+
 I04 完整迁移delta的结构验证扩展原
 `delegation::tests::identity_graph_preserves_core_rows_and_fences_scope_replay_depth_and_takeover`，
 helper为 `db_delegation_shape_tests.rs`，复用同一真实Core数据库，不新增owner或整库。

@@ -5310,6 +5310,7 @@ struct TerminalTarget {
     response_delivery: String,
     operation_policy: String,
     operation_policy_version: i64,
+    effective_config: String,
     destination_conversation_id: Option<String>,
     anchor_message_id: Option<String>,
     now: String,
@@ -5403,7 +5404,7 @@ fn persist_private_conversation_success(
         WHERE id = ?1 AND status = 'running'
           AND version = ?4 AND execution_epoch = ?5
           AND response_delivery = 'conversation_message'
-          AND ((invocation_kind='single_chat' AND operation_policy='single_chat_v1' AND operation_policy_version IN (1,2))
+          AND ((invocation_kind='single_chat' AND operation_policy='single_chat_v1' AND operation_policy_version IN (1,2,3))
             OR (invocation_kind IN ('delegation','delegation_user') AND operation_policy='delegation_child_v1' AND operation_policy_version=1))
           AND destination_conversation_id = ?8
         "#,
@@ -5730,7 +5731,7 @@ fn load_terminal_target(
                    agent_run.invocation_kind, agent_run.response_delivery,
                    agent_run.operation_policy, agent_run.operation_policy_version,
                    agent_run.destination_conversation_id,
-                   agent_run.anchor_message_id
+                   agent_run.anchor_message_id, agent_run.effective_config_json
             FROM agent_run
             LEFT JOIN camp_turn ON camp_turn.id = agent_run.camp_turn_id
             JOIN camp ON camp.id = COALESCE(agent_run.camp_id, camp_turn.camp_id)
@@ -5763,6 +5764,7 @@ fn load_terminal_target(
                     operation_policy_version: row.get(19)?,
                     destination_conversation_id: row.get(20)?,
                     anchor_message_id: row.get(21)?,
+                    effective_config: row.get(22)?,
                     now: chrono::Utc::now().to_rfc3339(),
                 })
             },
@@ -5812,10 +5814,11 @@ fn validate_terminal_target(
         && (target.conversation_kind != "single_chat"
             || target.conversation_ended_at.is_some()
             || target.response_delivery != crate::single_chat::SINGLE_CHAT_RESPONSE_DELIVERY
-            || !crate::single_chat::single_chat_operation_policy_is_supported(
+            || !crate::single_chat::frozen_single_chat_policy_is_supported(
                 &target.operation_policy,
                 target.operation_policy_version,
-            )
+                &target.effective_config,
+            )?
             || target.destination_conversation_id.as_deref()
                 != Some(target.conversation_id.as_str()))
     {

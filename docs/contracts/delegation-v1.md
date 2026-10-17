@@ -29,6 +29,14 @@ User/model游标有独立受众，不能交叉使用。纯查询不写数据库�
 当前真实159库未安装委派表时查询返回 `delegation.unavailable`，设置写入保存明确拒绝，不做部分DDL安装或假写160/210标记。
 这些是已接线的后端入口；原页面、完整迁移与真实Host/Runtime验证仍按实施队列推进，不能算整项交付。
 
+### 私聊权限版本
+
+普通私聊默认仍使用既有policy2。只有新Run冻结了合法private_parent资格，才使用policy3；旧Run的版本、配置与输入不因当前开关改变。policy3保留原只读Thread/私聊历史及Mission操作，并增加批准的六个delegation操作和四个兼容别名；实际委派仍须经过原Binding、父Run、范围、冻结开关和当前开关检查。
+
+工具入口、私聊历史与私聊终态写回共同核对版本和冻结角色：1/2不能携带新角色，3必须是private_parent，未知版本/非法角色拒绝。原输出路由不可变约束继续禁止直接改写权限版本；历史读取仍按本Conversation和原输入序号限定，最终回复只写回该私聊。
+
+新角色的生产准入精确要求v1.73/Schema160及210回执，并以Core完整启动合同准入为前提；旧合同或未来未支持版本不能仅靠schema>=160开通。本批组件夹具中的手动准入标记不构成真实启动迁移验证。
+
 ### User 恢复原任务
 
 `delegations.resume` 接 `{commandId,command:{delegationId,expectedAttemptNo,reason?}}`；reason沿批准的非空UTF-8、最多2KiB规则，不接受task、目录、Runtime或伪造父身份。
