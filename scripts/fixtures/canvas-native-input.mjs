@@ -76,6 +76,9 @@ async function qualify(window){
   await wait(`window.rovai&&document.querySelector('button[aria-label="无限画布"]')?.disabled===false`,60_000)
   if(config.mode==='source-ui'){
    await sourceUiWorkflow.qualifyCanvasSourceUi(window,{evaluate,wait,rpc,openCanvasBoard,config,report,record})
+   report.runtime_errors=await evaluate('window.nativeRuntimeErrors')
+   report.unexpected_runtime_errors=report.runtime_errors.filter(error=>!error.message.includes('ResizeObserver loop'))
+   assert.deepEqual(report.unexpected_runtime_errors,[])
    report.status='passed';return
   }
   if(config.mode==='object-cold'){
