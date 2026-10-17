@@ -1,5 +1,7 @@
 import { RemoteConnectionStatus } from './RemoteConnectionStatus'
 import { CanvasFolderContext } from './CanvasFolderProvider'
+import { ThreadClientProvider } from './camp-client'
+import { desktopThreadClient } from './desktop-camp-client'
 import { canvasFolderResolution } from './canvas-folder-controller'
 import { NavigationActivityBadge } from './NavigationActivityBadge'
 import { VISIBLE_PRODUCT_RUNTIMES } from './runtime-products'
@@ -102,7 +104,7 @@ import {
   type NavigationSettingsSection
 } from './ThreadNavigation'
 import {
-  ThreadWorkspace,
+  ThreadWorkspace as ProductionThreadWorkspace,
   QuickChatWorkspace,
   RunExecutionDisclosure,
   TaskPanel,
@@ -206,6 +208,13 @@ import {
   selectCompleteExecutionEvidence,
   type LiveRuntimeEvent
 } from './ui-model'
+
+// Static markup has no Electron window; inject editing storage at the real client seam.
+function ThreadWorkspace(props: ComponentProps<typeof ProductionThreadWorkspace>) {
+  const client = Object.create(desktopThreadClient) as typeof desktopThreadClient
+  client.editingRecovery = { get: () => undefined, set: () => undefined }
+  return createElement(ThreadClientProvider, { client, children: createElement(ProductionThreadWorkspace, props) })
+}
 
 // Exercise the same controlled disclosure state used to preserve open groups across paging.
 function renderExpandedExecution(props: ComponentProps<typeof RunExecutionDisclosure>): string {

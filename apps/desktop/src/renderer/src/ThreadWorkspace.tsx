@@ -2659,8 +2659,8 @@ function ThreadWorkspaceContent({
     [executionEventsByRunId, snapshot.agentRuns, openCoverage]
   )
   const worldMapProjection = useMemo(
-    () => projectThreadWorldMap(snapshot.members, snapshot.agentRuns, executionProgressByRunId),
-    [executionProgressByRunId, snapshot.agentRuns, snapshot.members]
+    () => projectThreadWorldMap(snapshot.members, snapshot.agentRuns, executionProgressByRunId, snapshot.messages),
+    [executionProgressByRunId, snapshot.agentRuns, snapshot.members, snapshot.messages]
   )
   const truncatedEvidenceByRunId = useMemo(() => {
     const grouped = new Map<string, AgentRunExecutionEvidenceView[]>()

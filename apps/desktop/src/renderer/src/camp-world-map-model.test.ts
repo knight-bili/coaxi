@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { AgentRunView, ThreadMemberView, GeneralPreferencesApi } from '@contracts'
+import type { AgentRunView, ThreadMemberView, ThreadMessageView, GeneralPreferencesApi } from '@contracts'
 import type { LiveExecutionProgress } from './ui-model'
 import { changeInterfaceLanguage } from './interface-language'
 import { DEFAULT_GENERAL_PREFERENCES } from '../../shared/general-preferences-model'
@@ -79,6 +79,11 @@ function run(
     updatedAt: '2026-08-13T12:00:02.000Z',
     ...overrides
   }
+}
+
+type HandoffMessage = Pick<ThreadMessageView, 'id' | 'authorType' | 'authorId' | 'sourceAgentRunId' | 'addressedAgentIds' | 'withdrawn'>
+function handoffMessage(id: string, source: AgentRunView, recipient: string, overrides: Partial<HandoffMessage> = {}): HandoffMessage {
+  return { id, authorType: 'agent', authorId: source.agentId, sourceAgentRunId: source.id, addressedAgentIds: [recipient], withdrawn: false, ...overrides }
 }
 
 describe('Thread world map model', () => {
@@ -232,5 +237,49 @@ describe('Thread world map model', () => {
       targetRunId: 'run_target'
     }])
     expect(waiting.rendezvous).toEqual([])
+  })
+
+  it('projects a current batch handoff from its exact public input message instead of legacy parent fields', () => {
+    const source = run('source', 'alice', 'running', { invocationKind: 'batch' })
+    const target = run('target', 'kyoko', 'running', { invocationKind: 'batch', inputMessageIds: ['accepted'], createdAt: '2026-08-13T12:00:03.000Z' })
+    const messages = [handoffMessage('accepted', source, target.agentId)]
+    const projection = projectThreadWorldMap([member('alice', 1), member('kyoko', 2)], [source, target], new Map(), messages)
+    expect(projection.rendezvous).toEqual([{ key: 'source:target', sourceAgentId: 'alice', targetAgentId: 'kyoko', sourceRunId: source.id, targetRunId: target.id }])
+    expect(projectThreadWorldMap([member('alice', 1), member('kyoko', 2)], [source, { ...target, inputMessageIds: ['unloaded'] }], new Map(), messages).rendezvous).toEqual([])
+  })
+
+  it('selects one recent eligible handoff from a multi-input batch without inventing a single parent or mutating input order', () => {
+    const alice = run('alice-run', 'alice', 'running', { invocationKind: 'batch' }), bob = run('bob-run', 'bob', 'running', { invocationKind: 'batch' })
+    const target = run('target', 'kyoko', 'running', { invocationKind: 'batch', inputMessageIds: ['alice-input', 'bob-input', 'bob-input'], createdAt: '2026-08-13T12:00:03.000Z' })
+    const messages = [handoffMessage('alice-input', alice, target.agentId), handoffMessage('bob-input', bob, target.agentId)]
+    const before = structuredClone([alice, bob, target, messages])
+    const result = projectThreadWorldMap([member('alice', 1), member('bob', 2), member('kyoko', 3)], [alice, bob, target], new Map(), messages)
+    expect(result.rendezvous).toEqual([{ key: 'bob-run:target', sourceAgentId: 'bob', targetAgentId: 'kyoko', sourceRunId: bob.id, targetRunId: target.id }])
+    expect([alice, bob, target, messages]).toEqual(before)
+  })
+
+  it('refuses mismatched, withdrawn, user-authored and unaddressed batch input as a handoff source', () => {
+    const source = run('source', 'alice', 'running'), target = run('target', 'kyoko', 'running', { invocationKind: 'batch', inputMessageIds: ['accepted'] })
+    const valid = handoffMessage('accepted', source, target.agentId)
+    for (const patch of [{ id: 'other' }, { authorType: 'user' as const }, { authorType: 'system' as const }, { authorId: 'bob' }, { sourceAgentRunId: null }, { sourceAgentRunId: 'missing-run' }, { withdrawn: true }, { addressedAgentIds: [] }, { addressedAgentIds: ['bob'] }]) {
+      expect(projectThreadWorldMap([member('alice', 1), member('kyoko', 2)], [source, target], new Map(), [{ ...valid, ...patch }]).rendezvous, JSON.stringify(patch)).toEqual([])
+    }
+  })
+
+  it('does not revive stale, private, stopped or recovery-blocked runs to visualize a current handoff', () => {
+    const source = run('source', 'alice', 'running'), target = run('target', 'kyoko', 'running', { invocationKind: 'batch', inputMessageIds: ['accepted'] })
+    const messages = [handoffMessage('accepted', source, target.agentId)], members = [member('alice', 1), member('kyoko', 2)]
+    for (const patch of [{ status: 'succeeded' as const }, { status: 'waiting' as const }, { waitReason: 'recovery_blocked' as const }, { invocationKind: 'single_chat' as const }]) {
+      expect(projectThreadWorldMap(members, [{ ...source, ...patch }, target], new Map(), messages).rendezvous).toEqual([])
+    }
+    expect(projectThreadWorldMap(members, [source, target, { ...source, id: 'new-source', createdAt: '2026-08-13T12:00:03.000Z' }], new Map(), messages).rendezvous).toEqual([])
+    expect(projectThreadWorldMap(members, [source, { ...target, status: 'waiting' }], new Map(), messages).rendezvous).toEqual([])
+    expect(projectThreadWorldMap([member('alice', 1, { membershipStatus: 'left' }), member('kyoko', 2)], [source, target], new Map(), messages).rendezvous).toEqual([])
+  })
+
+  it('does not use legacy parent hints for batch runs with missing accepted message metadata', () => {
+    const source = run('source', 'alice', 'running'), target = run('target', 'kyoko', 'running', { invocationKind: 'batch', a2aParentAgentRunId: source.id, anchorMessageId: 'accepted' })
+    const messages = [handoffMessage('accepted', source, target.agentId)]
+    expect(projectThreadWorldMap([member('alice', 1), member('kyoko', 2)], [source, target], new Map(), messages).rendezvous).toEqual([])
   })
 })

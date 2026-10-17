@@ -1,4 +1,4 @@
-import type { AgentRunView, ThreadMemberView } from '@contracts'
+import type { AgentRunView, ThreadMemberView, ThreadMessageView } from '@contracts'
 import { uiAttribute } from './interface-language'
 import { localizedExecutionStepTitle } from './execution-step-language'
 import type { ExecutionProgressItem, LiveExecutionProgress } from './ui-model'
@@ -432,7 +432,8 @@ function mapSpeechForRun(
 export function projectThreadWorldMap(
   members: readonly ThreadMemberView[],
   runs: readonly AgentRunView[],
-  progressByRunId: ReadonlyMap<string, LiveExecutionProgress>
+  progressByRunId: ReadonlyMap<string, LiveExecutionProgress>,
+  messages: readonly Pick<ThreadMessageView, 'id' | 'authorType' | 'authorId' | 'sourceAgentRunId' | 'addressedAgentIds' | 'withdrawn'>[] = []
 ): ThreadWorldMapProjection {
   const visibleMembers = members
     .filter((member) => member.membershipStatus === 'active' && member.profilePresence === 'present')
@@ -466,24 +467,32 @@ export function projectThreadWorldMap(
   })
 
   const reservedAgents = new Set<string>()
+  const runsById = new Map(runs.map(run => [run.id, run]))
+  const messagesById = new Map(messages.map(message => [message.id, message]))
   const rendezvous = [...runs]
-    .filter((run) => run.invocationKind === 'a2a' && run.status === 'running')
+    .filter((run) => (run.invocationKind === 'a2a' || run.invocationKind === 'batch') && run.status === 'running')
     .sort(newestFirst)
     .flatMap((targetRun): ThreadWorldMapRendezvous[] => {
-      const sourceRun = targetRun.a2aParentAgentRunId
-        ? runs.find((candidate) => candidate.id === targetRun.a2aParentAgentRunId) ?? null
-        : null
-      if (
-        !sourceRun
-        || sourceRun.agentId === targetRun.agentId
-        || sourceRun.status !== 'running'
-        || sourceRun.waitReason === 'recovery_blocked'
-        || targetRun.waitReason === 'recovery_blocked'
-        || activeRunByAgentId.get(sourceRun.agentId)?.id !== sourceRun.id
+      if (targetRun.waitReason === 'recovery_blocked'
         || activeRunByAgentId.get(targetRun.agentId)?.id !== targetRun.id
-        || reservedAgents.has(sourceRun.agentId)
-        || reservedAgents.has(targetRun.agentId)
-      ) return []
+        || reservedAgents.has(targetRun.agentId)) return []
+      // Current batches can consume several independent messages; this is one
+      // visual encounter, never a persisted parent, routing rule or success fact.
+      const sourceIds = targetRun.invocationKind === 'batch'
+        ? [...(targetRun.inputMessageIds ?? [])].reverse().flatMap(id => {
+          const message = messagesById.get(id)
+          const source = message?.sourceAgentRunId ? runsById.get(message.sourceAgentRunId) : null
+          return message?.authorType === 'agent' && !message.withdrawn
+            && message.addressedAgentIds.includes(targetRun.agentId)
+            && source?.agentId === message.authorId ? [source.id] : []
+        })
+        : targetRun.a2aParentAgentRunId ? [targetRun.a2aParentAgentRunId] : []
+      const sourceRun = sourceIds.map(id => runsById.get(id)).find(source => source
+        && source.agentId !== targetRun.agentId && source.invocationKind !== 'single_chat'
+        && source.status === 'running' && source.waitReason !== 'recovery_blocked'
+        && activeRunByAgentId.get(source.agentId)?.id === source.id
+        && !reservedAgents.has(source.agentId))
+      if (!sourceRun) return []
       reservedAgents.add(sourceRun.agentId)
       reservedAgents.add(targetRun.agentId)
       return [{
