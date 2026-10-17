@@ -13,7 +13,7 @@ use crate::{
     db::Database,
     delegation::FrozenRequest,
     delegation_admission::{ParentStartAdmission, WorkspaceObservation, authenticate_operation},
-    delegation_contract::{CancelParams, StartParams},
+    delegation_contract::{CancelParams, ResumeParams, StartParams},
     delegation_factory::ChildRunPlan,
     team_tool::{AuthenticatedTeamToolRun, BuiltinToolBindingCredential},
 };
@@ -50,6 +50,14 @@ struct Cancel(Payload);
 impl sealed::Sealed for Cancel {}
 impl DomainCommand for Cancel {
     const TYPE: &'static str = "delegation.cancel";
+    const EXACT_REPLAY: bool = true;
+}
+#[derive(Serialize)]
+#[serde(transparent)]
+struct Resume(Payload);
+impl sealed::Sealed for Resume {}
+impl DomainCommand for Resume {
+    const TYPE: &'static str = "delegation.resume";
     const EXACT_REPLAY: bool = true;
 }
 
@@ -116,6 +124,30 @@ pub(crate) fn replay_start(
     invocation: &Invocation<'_, StartParams>,
 ) -> Result<Option<CommandExecution>> {
     DomainCommandGateway.replay_if_recorded(db, &envelope(db.connection(), invocation, Start)?)
+}
+
+pub(crate) fn replay_resume(
+    db: &Database,
+    invocation: &Invocation<'_, ResumeParams>,
+) -> Result<Option<CommandExecution>> {
+    DomainCommandGateway.replay_if_recorded(db, &envelope(db.connection(), invocation, Resume)?)
+}
+pub(crate) fn resume(
+    db: &mut Database,
+    invocation: &Invocation<'_, ResumeParams>,
+    prepared: &crate::delegation_resume::PreparedResume,
+    directory: &crate::delegation_resume::DirectoryObservation,
+) -> Result<CommandExecution> {
+    let command = envelope(db.connection(), invocation, Resume)?;
+    DomainCommandGateway.execute(db, &command, |tx| {
+        prepared.commit(
+            tx,
+            invocation,
+            directory,
+            &command.actor,
+            &chrono::Utc::now().to_rfc3339(),
+        )
+    })
 }
 
 pub(crate) struct PreparedStart<'a> {

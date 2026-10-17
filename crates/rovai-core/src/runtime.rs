@@ -733,6 +733,30 @@ fn validate_frozen_runtime_columns(
     Ok(())
 }
 
+pub(crate) fn validate_saved_frozen_runtime(
+    connection: &Connection,
+    run: &str,
+    runtime: &FrozenAgentRuntimeConfig,
+) -> Result<()> {
+    connection.query_row(
+        "SELECT runtime_adapter_kind,runtime_installation_id,runtime_installation_generation,
+          runtime_search_environment_generation,runtime_executable_path,runtime_auth_scope,
+          runtime_reported_version,runtime_executable_fingerprint,runtime_capabilities_json,
+          runtime_model_selection_json,runtime_permission_config_json,runtime_binding_compatibility_digest,
+          runtime_host_config_digest,runtime_protocol_version,runtime_native_session_compatibility_key
+         FROM agent_run WHERE id=?1", [run], |r| Ok(validate_frozen_runtime_columns(
+            runtime, r.get::<_,Option<String>>(0)?.as_deref(), r.get::<_,Option<String>>(1)?.as_deref(),
+            r.get(2)?, r.get(3)?, r.get::<_,Option<String>>(4)?.as_deref(),
+            r.get::<_,Option<String>>(5)?.as_deref(), r.get::<_,Option<String>>(6)?.as_deref(),
+            r.get::<_,Option<String>>(7)?.as_deref(), r.get::<_,Option<String>>(8)?.as_deref(),
+            r.get::<_,Option<String>>(9)?.as_deref(), r.get::<_,Option<String>>(10)?.as_deref(),
+            r.get::<_,Option<String>>(11)?.as_deref(), r.get::<_,Option<String>>(12)?.as_deref(),
+            r.get::<_,Option<String>>(13)?.as_deref(), r.get::<_,Option<String>>(14)?.as_deref(),
+        )),
+    )??;
+    Ok(())
+}
+
 pub(crate) fn runtime_cleanup_blocked_since_connection(
     connection: &Connection,
     conversation_id: &str,
@@ -1030,7 +1054,7 @@ impl ExecutionRuntimeService {
     ) -> Result<NativeSessionResumeDisposition> {
         // Run/epoch, input-delivery and native writer-lock fences remain the
         // execution authority. Historical configuration attempts are audit only.
-        let _ = database;
+        crate::delegation_resume::require_execution(database.connection(), execution)?;
         Ok(execution.native_session_resume_disposition())
     }
 
@@ -3318,6 +3342,15 @@ impl ExecutionRuntimeService {
                     .context("Native Binding generation overflow")?
                     .max(1)
             };
+            if let Err(error) = crate::delegation_resume::require_binding(
+                transaction, &envelope.payload.agent_run_id, &envelope.payload.native_session_id,
+                &binding_id, binding_generation,
+            ) {
+                if error.chain().any(|cause| cause.is::<rusqlite::Error>()) {
+                    return Err(error);
+                }
+                return Ok(rejected("delegation.session_changed", "Delegation continuation must retain its original Native Session and Binding"));
+            }
             if !binding_reused {
                 let updated = if binding_prepared {
                     // The Team Tool credential and Binding identity were
@@ -4035,6 +4068,19 @@ impl ExecutionRuntimeService {
                     }
                     _ => envelope.payload.effective_runtime.clone(),
                 };
+            if let Err(error) = crate::delegation_resume::require_rebound_runtime(
+                transaction,
+                &target.agent_run_id,
+                &rebound_runtime,
+            ) {
+                if error.chain().any(|cause| cause.is::<rusqlite::Error>()) {
+                    return Err(error);
+                }
+                return Ok(rejected(
+                    "delegation.session_incompatible",
+                    "Delegation continuation requires its original Native Session compatibility",
+                ));
+            }
             replace_effective_runtime(&mut effective_config, &rebound_runtime)?;
             let effective_config_json = serde_json::to_string(&effective_config)?;
             let runtime = &rebound_runtime;
@@ -7245,7 +7291,7 @@ fn append_domain_event(
     Ok(())
 }
 
-fn runtime_logical_identity_matches(
+pub(crate) fn runtime_logical_identity_matches(
     frozen: &FrozenAgentRuntimeConfig,
     effective: &FrozenAgentRuntimeConfig,
 ) -> bool {

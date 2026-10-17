@@ -848,6 +848,14 @@ impl TeamToolService {
             && current_generation >= 1
             && current_kind.is_none_or(|kind| Some(kind.as_str()) == adapter_kind.as_deref());
         let binding_replaced = force_new_binding || !compatible_binding;
+        if crate::delegation_resume::validate_session(&transaction, agent_run_id)?.is_some()
+            && binding_replaced
+        {
+            return Err(invocation_error(
+                "delegation.session_changed",
+                "Delegation continuation cannot replace its original Native Binding",
+            ));
+        }
         let binding_id = if binding_replaced {
             Uuid::new_v4().to_string()
         } else {

@@ -184,11 +184,15 @@ pub struct CancelParams {
     pub task_id: NonEmpty,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ResumeParams {
     pub task_id: NonEmpty,
-    #[serde(default, deserialize_with = "present")]
+    #[serde(
+        default,
+        deserialize_with = "present",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub reason: Option<InterruptionReason>,
 }
 

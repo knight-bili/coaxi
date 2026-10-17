@@ -103,6 +103,14 @@ pub(crate) fn install_identity_schema(tx: &Transaction<'_>) -> Result<()> {
     )?;
     tx.execute_batch("DROP TRIGGER context_manifest_quote_profile_insert;")?;
     tx.execute_batch(&profile_guard)?;
+    let attachment_guard: String = tx.query_row(
+        "SELECT sql FROM sqlite_schema WHERE type='trigger' AND name='runtime_input_delivery_attachment_auth_insert'",
+        [], |r| r.get(0),
+    )?;
+    let attachment_guard =
+        replace_once(attachment_guard, "31, 32, 33, 34)", "31, 32, 33, 34, 35)")?;
+    tx.execute_batch("DROP TRIGGER runtime_input_delivery_attachment_auth_insert;")?;
+    tx.execute_batch(&attachment_guard)?;
     tx.execute_batch("DROP TRIGGER agent_run_input_v34_only_insert;
         CREATE TRIGGER agent_run_input_v34_only_insert BEFORE INSERT ON agent_run_input
         WHEN NOT EXISTS(SELECT 1 FROM agent_run r WHERE r.id=NEW.agent_run_id AND r.invocation_kind='batch'

@@ -2084,3 +2084,14 @@ I04 模型 start/cancel 与持久回执继续扩同一 Context owner、同一候
 I04 模型 status/read/history 继续扩同一 Context owner 和候选库，不新增 owner/数据库。共用精确已结算 final 的 Run/路由/作者/终止原因检查；原消息没有数值版本列，结果游标以持久消息内容摘要固定读取版本。HMAC 游标按原单聊恢复的进程期密钥方式签发，绑定父/自身范围、任务、结果及位置；每页重新鉴权，进程重启后旧游标失效可从无游标读取重新开始。核对长中文按64KiB拼回全文、1字节不足容纳下一字符时明确报错、改签名/错类型/错任务/错范围/变化结果拒绝、未知和祖先最小输出、历史逆序选页后按时间正序返回。Core 的 system/delegation-parent 输入只在原 attempt 的触发消息匹配时投影 delegation_parent，原生系统日志与非 final 输出不纳入；真实 User 消息的 agent_run_id 是处理关联，不能按空值误排除。实际 User 接管及两轮发送/领取/终结核对父接管上界、自身 CURRENT_INPUT 排他上界、原结果继续固定、附件仅id/name/kind/size_bytes而无路径。故意变更隔离结果前保存原正文并恢复，证明旧游标不拼接两个版本。
 
 状态使用独立 Notify 广播，不消费原调度器单消费者通知；每轮先注册再读一致快照，等待前释放 DB 锁。复用同一候选库和等待函数、用 Mutex 借用原 Database 及暂停的 Tokio 时钟，核对快照之后首 await 之前提交终态不丢唤醒、两个等待者都被原取消命令唤醒、原权限阻塞返回且同游标只在超时再返回（不轮询）、0无限等待、正数90000被真实逻辑限制为60000、断线信号不写库/不停止任务、实际父取消唤醒并撤销读取资格。游标按顺序保留重复任务，观察标记纳入当前attempt及阻塞kind/request_id，标题变化不当新请求。原idle/通知注册、授权回执、Gateway、身份、旧私聊history和取消owner回归。生产 status Mutex 包装目前尚无外层调用；测试不是实际网络断线/原生进程、resume新attempt、问题/计划投影或完整正式场景资格。六操作运输、真实Session续做、完整210与原UI仍需接续。
+
+I04 原任务续做继续扩同一 Context owner，helper 为 `context/delegation_resume_tests.rs`，不新增 Rust owner或数据库。
+使用实际模型命令内核、生产工厂、领取、绑定、ContextManifest、输入准备/接受与取消，核对原任务及会话身份不变、
+新 attempt/Run、固定继续提示与 interruptionContext、旧已接受输入不重发、原 UUID 精确回放、改原因冲突、
+回执写入故障整图回滚、规划后版本变化拒绝、全局关闭拒绝新工作但保留旧回执及跨 attempt 状态观察。
+格式35的输入投递沿原 attachment-auth guard 增加版本分支；空请求摘要及残缺材料凭证仍须被原触发器拒绝。
+普通 Runtime 恢复、绑定更换、历史尝试、单聊、成员绑定、版本漂移与 Gateway 原 owner 作相关回归。
+Native Session ID、原生输入回执和清理完成信号由明确夹具提供；真实 Core 存储与命令调用不等于原生进程恢复。
+Registry 启动前配置不提供原生会话凭据，续做保留原冻结执行依据并由原启动核验处理兼容变动；
+原 Session 的可空 compatibility key 保持原值，实际原生加载必须成功，续做禁止冷启动回退或改 Session/Binding。
+完整 Host/Fleet/writer、User resume、六操作运输、启动迁移160/210及正式场景继续归阶段候选，不能由此测试代替。

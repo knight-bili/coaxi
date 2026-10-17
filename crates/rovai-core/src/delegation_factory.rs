@@ -142,8 +142,6 @@ pub(crate) fn create_child(
     // Resolve afresh through the actual Registry. A previously child-tagged parent
     // binding, Session, evidence, lease or recovery state never enters this Run.
     let runtime = plan.policy.freeze_resolved_runtime(&base)?;
-    let now = chrono::DateTime::parse_from_rfc3339(at)?.with_timezone(&chrono::Utc);
-    let budget = crate::execution_budget::freeze_camp_turn_execution_budget(None, now, 1)?;
     tx.execute("INSERT INTO conversation(id,camp_id,agent_id,kind,created_at,updated_at,last_message_sequence)
         VALUES(?1,?2,?3,'delegation_child',?4,?4,1)",params![identity.child_conversation_id,identity.camp_id,identity.owner_agent_id,at])?;
     let mut config = crate::collaboration::build_effective_config(
@@ -158,11 +156,38 @@ pub(crate) fn create_child(
         .remove("configDigest");
     config["delegationPolicy"] = serde_json::to_value(plan.policy)?;
     config["configDigest"] = json!(canonical_json_digest(&config)?);
+    append_attempt(
+        tx,
+        identity,
+        plan.task,
+        &config,
+        &runtime,
+        plan.workspace,
+        1,
+        1,
+        at,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn append_attempt(
+    tx: &Transaction<'_>,
+    identity: &Identity,
+    message_body: &str,
+    config: &serde_json::Value,
+    runtime: &crate::agent_profile::FrozenAgentRuntimeConfig,
+    workspace: &AgentRunWorkspace,
+    sequence: i64,
+    attempt: i64,
+    at: &str,
+) -> Result<String> {
+    let now = chrono::DateTime::parse_from_rfc3339(at)?.with_timezone(&chrono::Utc);
+    let budget = crate::execution_budget::freeze_camp_turn_execution_budget(None, now, 1)?;
     let message = Uuid::new_v4().to_string();
     let turn = Uuid::new_v4().to_string();
     let run = Uuid::new_v4().to_string();
     tx.execute("INSERT INTO conversation_message(id,conversation_id,sequence,author_type,author_id,body,created_at)
-        VALUES(?1,?2,1,'system','delegation-parent',?3,?4)",params![message,identity.child_conversation_id,plan.task,at])?;
+        VALUES(?1,?2,?5,'system','delegation-parent',?3,?4)",params![message,identity.child_conversation_id,message_body,at,sequence])?;
     tx.execute("INSERT INTO camp_turn(id,camp_id,trigger_type,trigger_id,status,kind,created_at,updated_at,
         execution_budget_schema_version,execution_budget_accepted_at,execution_budget_deadline_at,
         execution_budget_elapsed_seconds,execution_budget_max_agent_run_responsibilities,
@@ -182,14 +207,15 @@ pub(crate) fn create_child(
         runtime_protocol_version,runtime_installation_generation,runtime_search_environment_generation,
         runtime_native_session_compatibility_key,invocation_kind,response_delivery,operation_policy,
         operation_policy_version,destination_conversation_id,status,idempotency_key,version,created_at,updated_at)
-        VALUES(?1,?2,?3,?4,?5,0,1,?6,0,'initial','Execute the complete delegated task','required',
+        VALUES(?1,?2,?3,?4,?5,0,?24,?6,0,?25,?26,'required',
         ?7,?8,'runtime_managed_v2',?9,?10,?11,?12,?13,?14,?13,?14,?15,?16,?17,?18,?19,?20,?21,?22,?23,
         'delegation','conversation_message','delegation_child_v1',1,?3,'queued',?6,1,?5,?5)",
-        params![run,turn,identity.child_conversation_id,message,at,format!("delegation/{}/initial",identity.id),
-            serde_json::to_string(&config)?,serde_json::to_string(plan.workspace)?,runtime.adapter_kind.as_str(),
+        params![run,turn,identity.child_conversation_id,message,at,if attempt==1 {format!("delegation/{}/initial",identity.id)} else {format!("delegation/{}/resume/{attempt}",identity.id)},
+            serde_json::to_string(config)?,serde_json::to_string(workspace)?,runtime.adapter_kind.as_str(),
             runtime.installation_id,runtime.executable_path,runtime.auth_scope,runtime.reported_version,
             runtime.executable_fingerprint,serde_json::to_string(&runtime.capabilities)?,serde_json::to_string(&runtime.model)?,
             serde_json::to_string(&runtime.permissions)?,runtime.binding_compatibility_digest,runtime.host_config_digest,
-            runtime.protocol_version,runtime.installation_generation,runtime.search_environment_generation,runtime.native_session_compatibility_key])?;
+            runtime.protocol_version,runtime.installation_generation,runtime.search_environment_generation,runtime.native_session_compatibility_key,
+            sequence,if attempt==1 {"initial"} else {"retry"},if attempt==1 {"Execute the complete delegated task"} else {"Continue the original delegated task"}])?;
     Ok(run)
 }

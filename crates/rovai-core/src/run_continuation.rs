@@ -126,6 +126,9 @@ pub(crate) fn can_replace_session_before_dispatch(
     run_id: &str,
     execution_epoch: i64,
 ) -> Result<bool> {
+    if crate::delegation_resume::expected(connection, run_id)?.is_some() {
+        return Ok(false);
+    }
     Ok(connection.query_row(
         "SELECT EXISTS(SELECT 1 FROM agent_run AS run
          WHERE run.id=?1 AND run.execution_epoch=?2 AND run.status IN ('running','waiting')
