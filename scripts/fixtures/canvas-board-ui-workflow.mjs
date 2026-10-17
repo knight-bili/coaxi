@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
-import {randomUUID} from 'node:crypto'
-import {writeFile} from 'node:fs/promises'
+import {randomUUID,createHash} from 'node:crypto'
+import {writeFile,readFile} from 'node:fs/promises'
+import {execFileSync} from 'node:child_process'
 import {join} from 'node:path'
 import {setTimeout as pause} from 'node:timers/promises'
 
@@ -41,7 +42,9 @@ export async function qualifyCanvasBoardUi(window,{evaluate,wait,rpc,config,repo
   const tile=`document.querySelector('.canvas-board-tile[data-board-id="${targetId}"]')`
   await click(tile);await wait(`document.querySelector('.canvas-board-title')?.dataset.boardId===${JSON.stringify(targetId)}`);await click('document.querySelector(".canvas-breadcrumb-root")');await wait(`Boolean(${tile})`)
   await evaluate(`(()=>{${tile}.scrollIntoView({block:'center'});${tile}.focus();window.r09MenuKeys=[];${tile}.addEventListener('keydown',event=>window.r09MenuKeys.push({key:event.key,code:event.code,trusted:event.isTrusted}));return true})()`)
-  await key('ContextMenu');await wait('Boolean(document.querySelector(".canvas-board-context-menu"))');report.board_ui.menuKeys=await evaluate('window.r09MenuKeys');assert.ok(report.board_ui.menuKeys.some(event=>event.key==='ContextMenu'&&event.trusted))
+  assert.equal(createHash('sha256').update(await readFile(config.windows_menu_script)).digest('hex'),config.windows_menu_sha256)
+  report.board_ui.menuInput=JSON.parse(execFileSync(join(process.env.SystemRoot,'System32/WindowsPowerShell/v1.0/powershell.exe'),['-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',config.windows_menu_script,'-OwnedPid',String(process.pid),'-Hwnd',window.getNativeWindowHandle().readBigUInt64LE().toString(),'-DataRoot',config.data_root],{encoding:'utf8',windowsHide:true}))
+  await pause(100);report.board_ui.menuKeys=await evaluate('window.r09MenuKeys');await checkpoint();await wait('Boolean(document.querySelector(".canvas-board-context-menu"))');assert.ok(report.board_ui.menuKeys.some(event=>event.key==='ContextMenu'&&event.trusted))
   assert.deepEqual(await evaluate('Array.from(document.querySelectorAll(".canvas-board-context-menu [role=menuitem]")).map(node=>node.textContent.trim())'),['打开画板','编辑画板','删除画板'])
   await key('Escape');await wait(`!document.querySelector('.canvas-board-context-menu')&&document.activeElement===${tile}`);record('actual_windows_menu_key_opens_original_board_actions_and_escape_restores_exact_focus')
   await click(tile);await wait(`document.querySelector('.canvas-board-title')?.dataset.boardId===${JSON.stringify(targetId)}`)
