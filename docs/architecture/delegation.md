@@ -1,12 +1,14 @@
 ---
 document_type: architecture
 authority: core-delegation-ownership
-last_updated: 2026-10-17
+last_updated: 2026-10-18
 ---
 
 # 独立帮手
 
 Core 是委派业务与执行权威。DelegationId 关联真实发起成员、父/根 Conversation、原 Run/epoch/Binding/tool-call 和独立 child Conversation；恢复增加 attempt，不替换逻辑编号。它不是 Task、Mission、正式成员或提供方原生子代理。
+User 查询依据 Host 身份及确切持久 Thread/child 关系，父 Run 终态不撤销用户查看历史的能力；模型侧仍每次核对原活跃运行与接管水位。
+两类读取复用原固定结果与有界分页，但签名游标隔离受众。全局设置走原User命令/CAS/同事务事件回执，不改变旧冻结输入；具体入口见当前合同。
 现有 Scheduler/Fleet、Runtime Adapter、输入接收、清理和命令回执承担执行；不能另运行具有业务权威的 Codeg broker。原生提供方的子代理通过只读证据/引用投影，缺可靠来源时显示未知，不伪造 Core 子 Run。
 
 当前[输入、设置和持久身份原语](../contracts/delegation-v1.md)已编码，候选身份 DDL 在隔离 Core 夹具验证；启动迁移尚未登记。下一步按[实施计划](../versions/v1.73/implementation-plan.md)合齐格式/冻结资格/严格迁移与执行全链路；既有 Host 或 Runtime 尚不会因为这些模块而获得新能力。

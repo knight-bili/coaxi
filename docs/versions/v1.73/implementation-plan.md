@@ -33,6 +33,8 @@ Builtin39/36项、六命令/四原别名、封闭输出/安全错误/证据投�
 原回执早返回不记第二笔，每次实际执行尝试独立，避免同号新查询/提交前失败重试污染旧观察。
 关联使用原读模型的精确操作/输出摘要载体判定，provider事件夹具与真实Core调用分开标明。
 开始记录失败不派任务；结束记录故障保住原提交和回执，started行供后续Host重启核对，不宣称自动补齐。
-下一项继续 User 查询、设置和父 Run 已终态时的 User resume；真实 Host/Runtime、恢复协调和原 UI 资格仍按完整清单推进。
+User list/get/history/read、设置读取/全局CAS保存已接Core与Native/Web方法及原UUID恢复；原分页算法复用，User/model游标隔离，User可读接管后历史而父模型水位不变，原attempt结果不被后续User回复替换。
+父Run结束仍可读；设置事件仅版本，旧Run配置不重写；旧159库明确不可用，不装候选表。问题/计划等其他阻塞摘要仍待。
+下一项继续父 Run 已终态时的 User resume；真实 Host/Runtime、恢复协调和原 UI 资格仍按完整清单推进。
 
 依赖与客户事项以[执行计划](../../../integration/execution/i04-execution-plan.md)和[客户待办](../../../integration/execution/customer-todos.json)为准。

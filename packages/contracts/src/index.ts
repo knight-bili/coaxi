@@ -1167,6 +1167,64 @@ export interface SendDelegationMessageCommand {
 }
 export interface TakeoverDelegationCommand { delegationId: string; expectedControlVersion: number }
 export interface CancelDelegationCommand { delegationId: string; attemptNo: number }
+export type DelegationRuntimeTarget =
+  | 'antigravity' | 'claude_code' | 'cline' | 'code_buddy' | 'codex' | 'command_code'
+  | 'copilot' | 'cursor' | 'deepseek' | 'gemini' | 'grok' | 'hermes' | 'kimi_code'
+  | 'kiro' | 'open_claw' | 'open_code' | 'pi' | 'qoder' | 'qwen_code' | 'trae_cn' | 'zcode'
+  | `custom:${string}`
+export interface DelegationRuntimeDefaults { mode_id?: string | null; config_values?: Record<string, string> }
+export interface DelegationSettings {
+  version: number
+  enabled: boolean
+  depthLimit: number
+  perRuntimeDefaults: Partial<Record<DelegationRuntimeTarget, DelegationRuntimeDefaults>>
+  completedCacheMaxMb: number
+}
+export interface UpdateDelegationSettingsCommand {
+  expectedVersion: number
+  patch: Partial<Omit<DelegationSettings, 'version'>>
+}
+export interface DelegationListParams { parentConversationId: string; cursor?: string; limit?: number }
+export interface DelegationGetParams { delegationId: string }
+export interface DelegationReadParams { task_id: string; cursor?: string; limit_bytes?: number }
+export interface DelegationHistoryParams { task_id: string; before_cursor?: string; limit?: number }
+export interface DelegationDetail {
+  delegationId: string
+  threadId: string
+  ownerAgentId: string
+  rootConversationId: string
+  parentConversationId: string
+  parentDelegationId: string | null
+  conversationId: string
+  depth: number
+  currentAttemptNo: number
+  controlVersion: number
+  takenOver: boolean
+  agentRunId: string
+  executionEpoch: number
+  status: string
+  agentType: DelegationRuntimeTarget
+  createdAt: string
+  startedAt: string | null
+  endedAt: string | null
+  cleanupPending: boolean
+  blockedOn?: { kind: 'permission'; request_id: string; title: string }
+}
+export interface DelegationListPage { parentConversationId: string; items: DelegationDetail[]; nextCursor?: string }
+export interface DelegationReadPage {
+  task_id: string
+  result_ref: { conversation_id: string; message_id: string }
+  text: string
+  next_cursor?: string
+}
+export interface DelegationHistoryPage {
+  task_id: string
+  conversation_id: string
+  messages: { id: string; sequence: number; author_type: 'user' | 'delegation_parent' | 'assistant'; body: string; created_at: string;
+    attachments?: { id: string; name: string; kind: 'file' | 'directory'; size_bytes?: number }[] }[]
+  next_cursor?: string
+}
+export interface UnknownDelegation { task_id: string; status: 'unknown' }
 
 export type SingleChatPendingReturnPayload = {
   pendingInputId: string
@@ -4822,6 +4880,12 @@ export type CoreMethod =
   | 'singleChat.sourceAttachments.addFromPath'
   | 'singleChat.composerDraft.removeAttachment'
   | 'singleChat.composerDraft.mutate'
+  | 'delegations.list'
+  | 'delegations.get'
+  | 'delegations.history'
+  | 'delegations.read'
+  | 'delegations.settings.get'
+  | 'delegations.settings.update'
   | 'delegations.composer.get'
   | 'delegations.message.send'
   | 'delegations.takeover'

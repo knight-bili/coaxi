@@ -1,5 +1,5 @@
 //! User-only settings storage primitive. The command gateway owns authorization, receipt and event.
-//! Not exposed to Host or installed on a live database until the complete delegation migration lands.
+//! Host methods refuse an old database; live installation awaits the complete delegation migration.
 use crate::delegation_contract::{RuntimeTarget, present};
 use anyhow::{Context, Result};
 use rusqlite::{Connection, Transaction, params};
@@ -27,24 +27,116 @@ pub struct DelegationSettings {
     pub completed_cache_max_mb: i64,
 }
 
-#[derive(Debug, Default, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct SettingsPatch {
-    #[serde(default, deserialize_with = "present")]
+    #[serde(
+        default,
+        deserialize_with = "present",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub enabled: Option<bool>,
-    #[serde(default, deserialize_with = "present")]
+    #[serde(
+        default,
+        deserialize_with = "present",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub depth_limit: Option<u8>,
-    #[serde(default, deserialize_with = "present")]
+    #[serde(
+        default,
+        deserialize_with = "present",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub per_runtime_defaults: Option<BTreeMap<RuntimeTarget, RuntimeDefaults>>,
-    #[serde(default, deserialize_with = "present")]
+    #[serde(
+        default,
+        deserialize_with = "present",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub completed_cache_max_mb: Option<i64>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct UpdateSettingsParams {
     pub expected_version: i64,
     pub patch: SettingsPatch,
+}
+
+impl crate::command::sealed::Sealed for UpdateSettingsParams {}
+impl crate::command::DomainCommand for UpdateSettingsParams {
+    const TYPE: &'static str = "delegations.settings.update";
+    const EXACT_REPLAY: bool = true;
+}
+
+pub(crate) fn installed(connection: &Connection) -> Result<bool> {
+    Ok(connection.query_row(
+        "SELECT EXISTS(SELECT 1 FROM sqlite_schema WHERE type='table' AND name='delegation_settings')",
+        [], |row| row.get(0),
+    )?)
+}
+
+pub(crate) fn read_user(
+    db: &crate::db::Database,
+    actor: &crate::command::ActorRef,
+) -> Result<DelegationSettings> {
+    anyhow::ensure!(
+        matches!(actor, crate::command::ActorRef::User { .. }),
+        "delegation.user_required"
+    );
+    anyhow::ensure!(installed(db.connection())?, "delegation.unavailable");
+    read(db.connection())
+}
+
+pub(crate) fn update_user(
+    db: &mut crate::db::Database,
+    envelope: &crate::command::CommandEnvelope<UpdateSettingsParams>,
+) -> Result<crate::command::CommandExecution> {
+    use crate::command::{ActorRef, CommandHandlerResult, DomainCommandGateway};
+    DomainCommandGateway.execute(db, envelope, |tx| {
+        let reject = |code| Ok(CommandHandlerResult::rejected(code, serde_json::json!({})));
+        if !matches!(envelope.actor, ActorRef::User { .. }) {
+            return reject("delegation.user_required");
+        }
+        if envelope.camp_id.is_some() {
+            return reject("delegation.settings_scope_mismatch");
+        }
+        if !installed(tx)? {
+            return reject("delegation.unavailable");
+        }
+        let current = read(tx)?;
+        if current.version != envelope.payload.expected_version {
+            return reject("delegation.settings_changed");
+        }
+        let patch = &envelope.payload.patch;
+        if current.version == i64::MAX
+            || patch.depth_limit.is_some_and(|v| !(1..=8).contains(&v))
+            || patch.completed_cache_max_mb.is_some_and(|v| v < 0)
+            || patch.per_runtime_defaults.as_ref().is_some_and(|defaults| {
+                defaults
+                    .values()
+                    .any(|preset| preset.config_values.keys().any(String::is_empty))
+            })
+        {
+            return reject("delegation.settings_invalid");
+        }
+        // Storage faults propagate and roll back; they are not durable business refusals.
+        let next = update(tx, &envelope.payload)?;
+        crate::collaboration::append_domain_event(
+            tx,
+            "delegation.settings_changed",
+            None,
+            Some(("delegation_settings", "1")),
+            &envelope.actor,
+            None,
+            &serde_json::json!({"version": next.version}),
+        )?;
+        Ok(CommandHandlerResult::applied(
+            "delegation.settings_updated",
+            serde_json::to_value(next)?,
+            None,
+        ))
+    })
 }
 
 pub fn read(connection: &Connection) -> Result<DelegationSettings> {

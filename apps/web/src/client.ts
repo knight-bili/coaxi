@@ -57,6 +57,12 @@ export const WEB_OPERATIONS = [
   'singleChat.pendingInputs.edit',
   'singleChat.composerDraft.removeAttachment',
   'singleChat.composerDraft.mutate',
+  'delegations.list',
+  'delegations.get',
+  'delegations.history',
+  'delegations.read',
+  'delegations.settings.get',
+  'delegations.settings.update',
   'delegations.composer.get',
   'delegations.message.send',
   'delegations.takeover',
@@ -229,6 +235,7 @@ const RECONCILABLE_COMMANDS = new Set<WebOperation>([
   'singleChat.open', 'singleChat.send', 'singleChat.end', 'singleChat.pendingInputs.edit',
   'singleChat.composerDraft.mutate',
   'delegations.composer.mutate',
+  'delegations.settings.update',
   'delegations.message.send', 'delegations.pendingInputs.edit',
   'delegations.takeover', 'delegations.cancel', 'delegations.conversation.end',
   'skills.import.commit',
@@ -643,7 +650,7 @@ export class ConsoleClient {
     })
   }
 
-  async retryPendingCommand(operation: 'singleChat.composerDraft.mutate' | 'delegations.composer.mutate' | 'delegations.message.send' | 'delegations.pendingInputs.edit' | 'delegations.takeover' | 'delegations.cancel' | 'delegations.conversation.end' | 'singleChat.pendingInputs.edit' | 'singleChat.send', params: unknown): Promise<void> {
+  async retryPendingCommand(operation: 'delegations.settings.update' | 'singleChat.composerDraft.mutate' | 'delegations.composer.mutate' | 'delegations.message.send' | 'delegations.pendingInputs.edit' | 'delegations.takeover' | 'delegations.cancel' | 'delegations.conversation.end' | 'singleChat.pendingInputs.edit' | 'singleChat.send', params: unknown): Promise<void> {
     const id = params && typeof params === 'object' && 'commandId' in params ? params.commandId : undefined
     const entry = typeof id === 'string' ? this.#pending.get(id) : undefined
     if (!entry) { await this.request(operation, structuredClone(params)); return }

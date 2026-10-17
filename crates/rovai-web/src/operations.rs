@@ -109,6 +109,18 @@ pub enum Operation {
     SingleChatComposerMutate,
     #[serde(rename = "singleChat.composerDraft.recovery")]
     SingleChatComposerRecovery,
+    #[serde(rename = "delegations.list")]
+    DelegationList,
+    #[serde(rename = "delegations.get")]
+    DelegationGet,
+    #[serde(rename = "delegations.history")]
+    DelegationHistory,
+    #[serde(rename = "delegations.read")]
+    DelegationRead,
+    #[serde(rename = "delegations.settings.get")]
+    DelegationSettingsGet,
+    #[serde(rename = "delegations.settings.update")]
+    DelegationSettingsUpdate,
     #[serde(rename = "delegations.composer.get")]
     DelegationComposerGet,
     #[serde(rename = "delegations.message.send")]
@@ -575,6 +587,12 @@ impl Operation {
             Self::SingleChatRemoveAttachment => "singleChat.composerDraft.removeAttachment",
             Self::SingleChatComposerMutate => "singleChat.composerDraft.mutate",
             Self::SingleChatComposerRecovery => "singleChat.composerDraft.recovery",
+            Self::DelegationList => "delegations.list",
+            Self::DelegationGet => "delegations.get",
+            Self::DelegationHistory => "delegations.history",
+            Self::DelegationRead => "delegations.read",
+            Self::DelegationSettingsGet => "delegations.settings.get",
+            Self::DelegationSettingsUpdate => "delegations.settings.update",
             Self::DelegationComposerGet => "delegations.composer.get",
             Self::DelegationMessageSend => "delegations.message.send",
             Self::DelegationTakeover => "delegations.takeover",
@@ -854,6 +872,12 @@ mod tests {
             .expect("User message withdrawal should be admitted by the Web Host");
         assert_eq!(withdraw.method(), "camp.messages.withdraw");
         for (public, internal) in [
+            ("delegations.list", "delegations.list"),
+            ("delegations.get", "delegations.get"),
+            ("delegations.history", "delegations.history"),
+            ("delegations.read", "delegations.read"),
+            ("delegations.settings.get", "delegations.settings.get"),
+            ("delegations.settings.update", "delegations.settings.update"),
             ("delegations.composer.get", "delegations.composer.get"),
             ("delegations.message.send", "delegations.message.send"),
             ("delegations.takeover", "delegations.takeover"),

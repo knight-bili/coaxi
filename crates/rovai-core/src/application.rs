@@ -7,6 +7,7 @@ mod conversation_preferences;
 pub(crate) mod delegation_composer;
 pub(crate) mod delegation_control;
 pub(crate) mod delegation_input;
+pub(crate) mod delegation_queries;
 mod mission;
 pub(crate) mod private_composer;
 mod private_sources;
@@ -866,6 +867,7 @@ fn request_runs_outside_main_queue(method: &str) -> bool {
             | "delegations.message.send"
             | "delegations.takeover"
             | "delegations.cancel"
+            | "delegations.settings.update"
             | "delegations.conversation.end"
             | "delegations.pendingInputs.edit"
             | "delegations.composer.mutate"
@@ -10583,6 +10585,28 @@ impl Core {
                     SingleChatService::for_client(request.client.clone())
                         .list_active(&database, params.camp_id.as_str())?,
                 )?)
+            }
+            "delegations.list"
+            | "delegations.get"
+            | "delegations.history"
+            | "delegations.read"
+            | "delegations.settings.get" => {
+                let db = self.database.lock().await;
+                delegation_queries::read(&db, &request.method, request.params.clone())
+            }
+            "delegations.settings.update" => {
+                let mut db = self.database.lock().await;
+                let execution =
+                    delegation_queries::update_settings(&mut db, request.params.clone())?;
+                drop(db);
+                if !execution.replayed && execution.result.code == "delegation.settings_updated" {
+                    emit(
+                        &self.output,
+                        "delegation.settings_changed",
+                        json!({"version":execution.result.payload["version"]}),
+                    );
+                }
+                Ok(serde_json::to_value(execution.result)?)
             }
             "delegations.takeover" | "delegations.cancel" | "delegations.conversation.end" => {
                 let mut db = self.database.lock().await;

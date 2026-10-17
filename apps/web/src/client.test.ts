@@ -228,9 +228,9 @@ describe('console transport', () => {
     expect(fetcher.mock.calls.filter(([, init]) => { const body = JSON.parse(String(init?.body)); return body.operation === operation && body.params.commandId === first.commandId })).toHaveLength(1)
   })
 
-  it.each(['singleChat.pendingInputs.edit', 'delegations.pendingInputs.edit', 'delegations.conversation.end'] as const)('retries only the exact original private request and resolves its retained transport promise: %s', async operation => {
+  it.each(['singleChat.pendingInputs.edit', 'delegations.pendingInputs.edit', 'delegations.conversation.end', 'delegations.settings.update'] as const)('retries only the exact original private request and resolves its retained transport promise: %s', async operation => {
     let permit = false
-    const params = operation === 'delegations.conversation.end' ? { commandId: newCommandId(), command: { conversationId: 'private' } } : { commandId: newCommandId(), command: { ...(operation === 'singleChat.pendingInputs.edit' ? { threadId: 'thread' } : {}), conversationId: 'private', pendingInputId: 'pending', expectedRevision: 1, editToken: 'lease', action: { type: 'return_to_composer', targetBody: '完整当前正文', expectedDraftRevision: 1 } } }
+    const params = operation === 'delegations.settings.update' ? { commandId: newCommandId(), command: { expectedVersion: 7, patch: { enabled: true } } } : operation === 'delegations.conversation.end' ? { commandId: newCommandId(), command: { conversationId: 'private' } } : { commandId: newCommandId(), command: { ...(operation === 'singleChat.pendingInputs.edit' ? { threadId: 'thread' } : {}), conversationId: 'private', pendingInputId: 'pending', expectedRevision: 1, editToken: 'lease', action: { type: 'return_to_composer', targetBody: '完整当前正文', expectedDraftRevision: 1 } } }
     const result = { status: 'applied', payload: { placement: 'retained' } }
     const fetcher = vi.fn<typeof fetch>().mockImplementation(async (url, options) => {
       if (String(url).endsWith('/login')) return Response.json({ protocolVersion: 4, token: 'a'.repeat(64), clientId: 'd'.repeat(64), editorProof: 'e'.repeat(64), ownerId: 'local_user' })
@@ -244,7 +244,7 @@ describe('console transport', () => {
     await client.login('b'.repeat(64))
     const pending = client.request(operation, params)
     await vi.waitFor(() => expect(client.pendingCommandCount).toBe(1))
-    const changed = operation === 'delegations.conversation.end' ? { ...params, command: { conversationId: 'another-child' } } : { ...params, command: { ...params.command, action: { type: 'return_to_composer', targetBody: '变更正文', expectedDraftRevision: 1 } } }
+    const changed = operation === 'delegations.settings.update' ? { ...params, command: { expectedVersion: 7, patch: { enabled: false } } } : operation === 'delegations.conversation.end' ? { ...params, command: { conversationId: 'another-child' } } : { ...params, command: { ...params.command, action: { type: 'return_to_composer', targetBody: '变更正文', expectedDraftRevision: 1 } } }
     await expect(client.retryPendingCommand(operation, changed)).rejects.toThrow('参数不一致')
     permit = true
     await client.retryPendingCommand(operation, params)

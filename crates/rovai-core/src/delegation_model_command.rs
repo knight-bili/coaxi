@@ -420,6 +420,21 @@ pub(crate) fn fixed_final(
     .transpose()
 }
 
+pub(crate) fn blocked_summary(
+    connection: &rusqlite::Connection,
+    run: &str,
+    epoch: i64,
+) -> Result<Option<Value>> {
+    let permission:Option<String>=connection.query_row(
+        "SELECT p.id FROM approval p JOIN action_execution x ON x.id=p.action_id
+         WHERE x.agent_run_id=?1 AND x.source_agent_run_execution_epoch=?2 AND x.status='prepared' AND x.action_kind='runtime_permission_grant'
+           AND p.status='pending' AND p.requested_for_user_id=?3 ORDER BY p.requested_at,p.id LIMIT 1",
+        params![run,epoch,crate::current_user::CURRENT_USER_ID],|r|r.get(0)).optional()?;
+    Ok(permission.map(
+        |permission| json!({"kind":"permission","request_id":permission,"title":"需要用户授权"}),
+    ))
+}
+
 /// Only the current attempt's persisted final is a result. Never use the latest
 /// message in the child, which may belong to a later User after takeover.
 pub(crate) fn task_report(connection: &Connection, id: &str, parent: &str) -> Result<Value> {
@@ -460,15 +475,9 @@ pub(crate) fn task_report(connection: &Connection, id: &str, parent: &str) -> Re
             if status == "queued" {
                 report["message"] = json!("等待资源");
             }
-            let permission:Option<String>=connection.query_row(
-                "SELECT p.id FROM approval p JOIN action_execution x ON x.id=p.action_id
-                 WHERE x.agent_run_id=?1 AND x.source_agent_run_execution_epoch=?2 AND x.status='prepared' AND x.action_kind='runtime_permission_grant'
-                   AND p.status='pending' AND p.requested_for_user_id=?3 ORDER BY p.requested_at,p.id LIMIT 1",
-                params![run,epoch,crate::current_user::CURRENT_USER_ID],|r|r.get(0)).optional()?;
-            if let Some(permission) = permission {
+            if let Some(blocked) = blocked_summary(connection, &run, epoch)? {
                 report["message"] = json!("等待用户授权");
-                report["blocked_on"] =
-                    json!({"kind":"permission","request_id":permission,"title":"需要用户授权"});
+                report["blocked_on"] = blocked;
             }
         }
         "cancelled" => {

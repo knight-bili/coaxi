@@ -223,6 +223,7 @@ fn assert_child_native_projections(fixture: &Fixture, run: &str, epoch: i64) -> 
 }
 
 fn assert_delegation_materialization(fixture: &mut Fixture, legacy_private_run: &str) {
+    assert_user_delegation_old_database(fixture);
     let old_manifest: String = fixture
         .database
         .connection()

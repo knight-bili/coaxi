@@ -421,6 +421,7 @@ fn assert_delegation_model_commands(
         .unwrap();
     assert_eq!(final_body, full_output);
     assert_delegation_model_queries(f, binding, source, request, plan, &id, &run, &full_output);
+    assert_user_delegation_queries(f, binding, source, &id, &full_output);
     assert_delegation_resume(f, binding, source, request, plan, &id, &receipt_proof);
     assert_production_start(f, binding, source);
     assert_delegation_dispatch(f, binding, source, &id);
@@ -798,4 +799,6 @@ fn assert_delegation_model_commands(
     assert_eq!(factory_counts(f), before);
     assert_eq!(f.database.connection().total_changes(), changes);
     lease_runtime.block_on(lease_registry.unregister(lease_config.process_id()));
+    assert_user_queries_after_parent_stop(f, &id, &source.agent_run_id);
+    assert_user_delegation_settings(f);
 }

@@ -4,10 +4,30 @@ contract: delegation-v1
 authority: core-delegation-identity-settings-and-wire
 status: accepted
 version: 1
-last_updated: 2026-10-17
+last_updated: 2026-10-18
 ---
 
 # Delegation v1
+
+### User 查询与设置运输
+
+`delegations.list` 接 `{parentConversationId,cursor?,limit?}`，默认20、最大100，按确切父 Conversation 和 Thread 读取；按创建时间及稳定ID倒序分页。
+签名游标固定父 Conversation、Thread、User、首尾位置，不允许跨父、跨身份、改签名或与其他分页交换。
+`delegations.get` 接 `{delegationId}`，返回稳定归属、当前 attempt/Run/epoch、控制版本、原始 Run 状态、接管与清理状态、当前可核定的阻塞摘要。
+列表和详情不夹带任务正文、结果全文、原生凭据、Runtime配置或原目录。当前阻塞摘要接原权限请求；问题与计划等其他阻塞类型仍须补齐。
+
+`delegations.history` 和 `delegations.read` 使用批准的模型分页输入 shape，由 Host 的真实 User 身份和持久 child/Thread 关系授权，不能使用模型活跃父 Run 的鉴权替代。
+历史只含已发布 User 正文、委派输入、原 Runtime 固定最终回复及安全附件引用，不含草稿、路径、思考片段或传输密钥。
+User 能查看接管后的完整会话；父模型原接管水位和 child 自身 CURRENT_INPUT 排除边界不变。
+复用原固定结果与UTF-8有界分页算法；User `read` 始终锚定原 attempt 结果，不因接管后有新的 User Run 就把新回复冒充旧任务结果。
+User/model游标有独立受众，不能交叉使用。纯查询不写数据库；父执行结束、全局开关关闭或成员历史保留不阻止 User 读取，删除中的 Thread 拒绝。
+
+`delegations.settings.get` 严格接 `{}`。`delegations.settings.update` 接 `{commandId,command:{expectedVersion,patch}}`；业务 patch 只含批准的四字段，外层显式null/未知字段拒绝，嵌套 Runtime preset 保留原 `mode_id` 空值兼容。
+使用原全局 User Command Gateway、CAS、同一事务的设置事件与首次回执；只更新出现字段，设置切换不重写任何已冻结 Run。
+`commands.reconcile` 对此命令只核对原编号与完整原参数，不派发保存；同号改参数冲突，旧回执零写入，事件或回执存储故障整笔回滚。
+公开 `delegation.settings_changed` 仅有版本，不广播设置值。Native/Main和Web只放行已接线方法；Web丢回复后保留未知请求，明确重试须原UUID及参数。
+当前真实159库未安装委派表时查询返回 `delegation.unavailable`，设置写入保存明确拒绝，不做部分DDL安装或假写160/210标记。
+这些是已接线的后端入口；User resume、原页面、完整迁移与真实Host/Runtime验证仍按实施队列推进，不能算整项交付。
 
 完整批准边界见[独立变更说明](../versions/v1.73/model-context-change-native-delegation.md)。本合同区分基础实现和待接线能力，不能据此判断一期或 I04 已完成。
 

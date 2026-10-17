@@ -1,4 +1,4 @@
-//! Read-only model views. A signed cursor fixes position/content, never authority.
+//! Read-only model and User views. A signed cursor fixes position/content, never authority.
 use std::sync::{Arc, OnceLock};
 
 use crate::{
@@ -13,6 +13,9 @@ use base64::{Engine, engine::general_purpose::URL_SAFE_NO_PAD};
 use rusqlite::{Connection, OptionalExtension, params};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
+
+#[path = "delegation_user_query.rs"]
+pub(crate) mod user;
 
 static CURSOR_KEY: OnceLock<[u8; 32]> = OnceLock::new();
 fn key() -> Result<ring::hmac::Key> {
@@ -34,6 +37,11 @@ struct ScopeKey {
     task: String,
     child: String,
     own: bool,
+    #[serde(default, skip_serializing_if = "is_model")]
+    user: bool,
+}
+fn is_model(user: &bool) -> bool {
+    !user
 }
 #[derive(Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
@@ -51,6 +59,14 @@ enum Cursor {
         scope: ScopeKey,
         through: i64,
         before: i64,
+    },
+    UserList {
+        v: u8,
+        reader: String,
+        parent: String,
+        camp: String,
+        upper: (String, String),
+        before: (String, String),
     },
     Status {
         v: u8,
@@ -107,6 +123,7 @@ fn scope(
                     task: task.into(),
                     child,
                     own: true,
+                    user: false,
                 },
                 through,
             }));
@@ -124,6 +141,7 @@ fn scope(
             task: task.into(),
             child,
             own: false,
+            user: false,
         },
         through,
     }))
@@ -142,8 +160,14 @@ pub(crate) fn read(db: &Database, invocation: &Invocation<'_, ReadParams>) -> Re
     let Some(scope) = scope(&tx, &admission, invocation.source, task)? else {
         return Ok(json!({"task_id":task,"status":"unknown"}));
     };
-    let cursor = invocation
-        .input
+    let page = read_scoped(&tx, invocation.input, scope)?;
+    tx.commit()?;
+    Ok(page)
+}
+
+fn read_scoped(tx: &Connection, input: &ReadParams, scope: ReadScope) -> Result<Value> {
+    let task = input.task_id.as_str();
+    let cursor = input
         .cursor
         .as_ref()
         .map(|c| decode(c.as_str(), 4096))
@@ -177,7 +201,7 @@ pub(crate) fn read(db: &Database, invocation: &Invocation<'_, ReadParams>) -> Re
         ensure!(tx.query_row("SELECT EXISTS(SELECT 1 FROM delegation_attempt WHERE delegation_id=?1 AND agent_run_id=?2)",params![task,run],|r|r.get::<_,bool>(0))?,"delegation.cursor_invalid");
     }
     let result =
-        crate::delegation_model_command::fixed_final(&tx, &run, &scope.key.child, scope.through)?
+        crate::delegation_model_command::fixed_final(tx, &run, &scope.key.child, scope.through)?
             .context("delegation.result_unavailable")?;
     ensure!(
         message.as_ref().is_none_or(|id| id == &result.message)
@@ -188,10 +212,7 @@ pub(crate) fn read(db: &Database, invocation: &Invocation<'_, ReadParams>) -> Re
         offset <= result.body.len() && result.body.is_char_boundary(offset),
         "delegation.cursor_invalid"
     );
-    let mut end = result
-        .body
-        .len()
-        .min(offset + invocation.input.page_bytes() as usize);
+    let mut end = result.body.len().min(offset + input.page_bytes() as usize);
     while !result.body.is_char_boundary(end) {
         end -= 1;
     }
@@ -210,7 +231,6 @@ pub(crate) fn read(db: &Database, invocation: &Invocation<'_, ReadParams>) -> Re
             offset: end
         })?);
     }
-    tx.commit()?;
     Ok(page)
 }
 
@@ -227,7 +247,14 @@ pub(crate) fn history(db: &Database, invocation: &Invocation<'_, HistoryParams>)
     let Some(scope) = scope(&tx, &admission, invocation.source, task)? else {
         return Ok(json!({"task_id":task,"status":"unknown"}));
     };
-    let (through, before) = if let Some(cursor) = invocation.input.before_cursor.as_ref() {
+    let page = history_scoped(&tx, invocation.input, scope)?;
+    tx.commit()?;
+    Ok(page)
+}
+
+fn history_scoped(tx: &Connection, input: &HistoryParams, scope: ReadScope) -> Result<Value> {
+    let task = input.task_id.as_str();
+    let (through, before) = if let Some(cursor) = input.before_cursor.as_ref() {
         let Cursor::History {
             v: 1,
             scope: previous,
@@ -258,10 +285,10 @@ pub(crate) fn history(db: &Database, invocation: &Invocation<'_, HistoryParams>)
                   AND (m.agent_run_id IS NULL OR m.agent_run_id=input.id)
                   AND input.invocation_kind='delegation' AND input.operation_policy='delegation_child_v1' AND input.operation_policy_version=1))
             OR EXISTS(SELECT 1 FROM agent_run r WHERE {FIXED_FINAL}))
-        ORDER BY m.sequence DESC,m.id DESC LIMIT ?4"))?.query_map(params![scope.key.child,through,before,i64::from(invocation.input.page_size())+1,task],|r|
+        ORDER BY m.sequence DESC,m.id DESC LIMIT ?4"))?.query_map(params![scope.key.child,through,before,i64::from(input.page_size())+1,task],|r|
             Ok((r.get::<_,String>(0)?,r.get::<_,i64>(1)?,r.get::<_,String>(2)?,r.get::<_,String>(3)?,r.get::<_,String>(4)?,r.get::<_,String>(5)?)))?.collect::<rusqlite::Result<Vec<_>>>()?;
-    let has_more = rows.len() > invocation.input.page_size() as usize;
-    rows.truncate(invocation.input.page_size() as usize);
+    let has_more = rows.len() > input.page_size() as usize;
+    rows.truncate(input.page_size() as usize);
     rows.reverse();
     let next = has_more.then(|| rows.first().map(|r| r.1)).flatten();
     let messages=rows.into_iter().map(|(id,sequence,author,body,created,attachments)|->Result<Value> {
@@ -284,7 +311,6 @@ pub(crate) fn history(db: &Database, invocation: &Invocation<'_, HistoryParams>)
             before
         })?);
     }
-    tx.commit()?;
     Ok(page)
 }
 
