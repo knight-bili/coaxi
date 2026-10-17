@@ -309,8 +309,14 @@ test('actual Desktop and browser share Camp geometry while three drafts and reau
     await writeFile(join(output, 'desktop-web-live.json'), JSON.stringify({ ...evidence, coreAliveAfterWebStop: true }, null, 2))
     console.log(JSON.stringify({ ...evidence, coreAliveAfterWebStop: true }))
   } catch (error) {
+    for (const [surface, browser] of [['desktop', desktop], ['web', web]]) {
+      if (!browser) continue
+      // Failure can occur on connection settings/login. Hide fixture credentials
+      // before saving evidence to a public Actions artifact; skip if hiding fails.
+      await browser.evaluate(`document.querySelectorAll('#remote-token,#administrator-token').forEach(element=>{element.style.visibility='hidden'})`)
+        .then(() => browser.capture(join(output, `${surface}-failure.png`))).catch(() => undefined)
+    }
     if (desktop) {
-      await desktop.capture(join(output, 'desktop-failure.png')).catch(() => undefined)
       const navigation = await desktop.evaluate(`window.rovai.navigationPreferences.get().then(s=>({schemaVersion:s.schemaVersion,legacyProjectsSynced:s.legacyProjectsSynced,registeredProjectCount:s.registeredProjects.length,readError:Boolean(s.readError)}))`).catch(() => null)
       await writeFile(join(output, 'desktop-failure-state.json'), JSON.stringify({ stage, navigation }, null, 2))
     }
@@ -320,7 +326,6 @@ test('actual Desktop and browser share Camp geometry while three drafts and reau
       await desktop.capture(join(output, 'desktop-startup-failure.png')).catch(() => undefined)
       console.log(JSON.stringify({ stage, startup }))
     }
-    if (web) await web.capture(join(output, 'web-failure.png')).catch(() => undefined)
     throw new Error(`Live acceptance at ${stage}: ${error.message}`, { cause: error })
   } finally {
     if (second) await second.close(); if (web) await web.close(); if (desktop) await desktop.close()
