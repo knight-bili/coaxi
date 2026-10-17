@@ -24,7 +24,17 @@ working_dir 须为 Host 绝对路径；语法通过不是目录授权。reason �
 User API 更新输入为 {expectedVersion,patch}，patch 仅 enabled/depthLimit/perRuntimeDefaults/completedCacheMaxMb。缺字段保持原值，显式 null/未知字段拒绝。深度/缓存非法时零写入。每次成功更新精确比较版本并递增；开关请求只携带 enabled，不覆盖其他配置。
 更新原语接受调用者事务；随后回执/事件失败应回滚同一事务。读取只读，不懒建表、不重设配置。SCHEMA 只在隔离 SQLite 存储夹具执行；启动迁移、Command Gateway User-only 鉴权、幂等回执/事件及 Host 两端入口仍待集齐，不允许生产路径自行执行建表字符串。
 
-## 持久委派与执行待接入
+## 持久身份与接管存储
 
-后续必须按批准 r1 引入 delegation/attempt/control、真实父链、child Conversation、task 空值与专用 policy/格式闭集、输入接收和清理围栏、原 Session 恢复及用户接管。Run 仍是执行终态权威；设置或参数通过不得直接启动进程。未启用/无历史关系的旧模型输入不改，关闭后仍可读取/取消历史任务。
-目标数据合同 v1.73、Schema160/Migration210 尚未应用；当前数据合同和已有输入仍原样保留。
+Core `delegation.rs` 已实现身份登记与精确父查询原语，`delegation_schema.sql` 定义 delegation/attempt/control。原请求由绑定 ID/generation、父 Run/epoch/tool-call 固定；同身份同 task 字节、目标和原始 working_dir 回放原身份，不调用创建回调，也不重新冻结变化后的配置。换参数拒绝。新登记才核对当前启用状态、成员/父会话/执行/绑定、从持久父链派生的 root/parent/depth；深度同时受1..8和当前设置限制。
+子 Conversation、消息、私有 Turn 和 queued Run 由 Core 调用者在同一事务创建；身份/initial attempt/control 一起提交。原始任务继续由 managed_blob 外键持有，初始消息正文 SHA 必须与该 Blob 一致，失败由调用者回滚同一事务。查询只接受当前可信父 Conversation 的直接委派，错父返回缺失；这里没有开放网络读取 API。
+
+候选身份 DDL 只扩展精确 child kind、delegation/delegation_user invocation 和 delegation_child_v1 policy。子执行不能退回公屏成员 policy，task_id 必须为空，输出必须送回同一个 child，Turn/触发消息/成员/Thread 同属；每个 child 仅一个 queued/running/waiting Run。原公屏/活跃私聊索引不扩进 child，父与子不能复用绑定或同安装的原生 Session。新身份、attempt、Conversation/Run/Turn 归属不可改绑，不增加 AgentProfile。
+
+control 原语按精确版本记录接管，要求旧 Run 已经终态，冻结该事务的消息序号；后续用户消息不能抬高旧父的可见边界。同原命令可回放，其他旧版本拒绝，已接管的控制事实不可改回。该原语不执行递归取消、进程清理、用户命令鉴权、权限校验或后续新输入准入；这些仍须由完整 Core 服务在同一命令链中实现，不能仅记录 control 就宣布接管完成。
+
+`db_delegation::install_identity_schema` 是待合并迁移的一部分，只在隔离 Core 夹具执行。新对象检查核对完整 DDL，不以同名触发器存在代替约束；该检查尚不等于完整数据合同分类器。现有表重建复用通用 helper；中途失败回滚与已有行保留已分项验证。设置、旧表扩展和格式版本还要统一完整准入。
+
+## 完整执行待接入
+
+目标 v1.73/Schema160/Migration210 尚未登记启动链。必须集齐格式35、父冻结工具资格、子 Bootstrap、数据合同分类/旧来源升级，然后接 User/模型/CLI、回执事件、调度与输入接收、取消清理、原 Session 恢复、接管发送与原界面。Run 仍是唯一执行终态权威；这些存储原语不构成完整身份认证或 Runtime 准入，不得据此启动真实进程。当前运行数据和旧模型输入保持，正式场景不据分项测试记为完成。

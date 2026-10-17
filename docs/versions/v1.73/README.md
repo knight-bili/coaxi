@@ -19,6 +19,7 @@ last_updated: 2026-10-17
 
 Core 新增六操作的严格输入类型及 User-only 设置存储原语，默认关闭、深度 1..8、缓存 512 MiB/0 不限、精确版本更新。
 设置 SQL 目前只在隔离存储夹具中安装，尚未登记到启动迁移，也没有 Host/CLI/Renderer 入口。
+持久委派/attempt/control、派生父链、原请求回放、任务正文核对、私有 Run 路由与接管序号原语已实现，候选身份 DDL 已在实际 Core 创建的隔离数据库分项验证；仍未登记启动迁移，不能当完整执行或接管功能交付。
 当前运行数据仍是 v1.72/Schema159/Migration209；目标 v1.73/Schema160/Migration210 将在完整关系、kind、Run policy 和格式约束集齐后原子接入。
 文档 current 表示本轮研发目标，不表示数据合同已经升级。旧 Run、回执、Bootstrap 和模型输入字节没有因这批基础类型改变。
 子 Run 调度、完整工具输出、接收/取消/恢复/接管、材料、原 UI 和阶段验证均未完成；不得把这些基础类型称为功能交付。
@@ -40,5 +41,6 @@ Core 新增六操作的严格输入类型及 User-only 设置存储原语，默�
 ## 验证与收口
 
 检查执行结果在[本轮执行记录](../../../integration/execution/i04-delegation-foundation-result.json)逐项记录。
+后续身份约束、候选 DDL 和接管存储分项见[关系执行记录](../../../integration/execution/i04-delegation-identity-result.json)。
 本批存储夹具不代表完整 Core 启动迁移或命令回执集成。D01–D32、真实 Gate 与 I04 原 84 正式场景仍按实际运行逐项取证。
 专用身份/硬预算、平台条件留册；不新增客户阶段验收，I12 后才交用户使用软件。

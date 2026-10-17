@@ -62,3 +62,8 @@ Grok两个确切扩展方法的spawned/finished现可经活动Prompt的原Sessio
 六操作闭集输入、可选 null 拒绝、21+custom 目标语法、完整 task、UTF-8 reason 与等待/分页边界已编码。
 User-only 设置的默认值、局部 patch、CAS、事务原语与 SQLite 闭集已编码。设置 SQL 仅在隔离夹具安装，尚无生产迁移、User Command、Host/CLI/Renderer或真实 Runtime；实际分项验证见本批记录，不能当D01-D32或84场景通过。
 文档研发目标切换v1.73，运行数据仍v1.72/159/209；下一步集齐 delegation/attempt/control、child kind/Run policy/格式闭集，再原子登记160/210，不能部分升级。
+
+## 已确认 r1 的持久关系分项
+
+delegation/attempt/control、从实际父Run及绑定派生的归属/父链、原请求回放不再创建、任务Blob与初始消息字节核对、私有child/Turn/Run路由及接管序号存储已编码。候选身份DDL在真实Core创建的隔离数据库通过单个extended owner，覆盖中途失败回滚、11表旧行保留、错归属/旧身份、八层/第九层拒绝、不可改绑与原始SQLite重开。原公开会话按需创建，数量与成员数不同；测试按原数量验证，不改原版行为。
+见[关系分项记录](i04-delegation-identity-result.json)。这不是完整启动迁移、身份认证、取消/恢复/接管或Runtime功能通过；原Run终态的接管检查由夹具SQL设置，进程清理与后续输入准入仍需Core执行链。当前数据仍159/209，格式35/Bootstrap/冻结角色/完整分类和升级链集齐后才登记160/210。User/模型/CLI/事件、两类原查看器、原生读取和后台观察及T02/T03/T04均继续保留。

@@ -6,6 +6,8 @@ mod automation_run_control;
 mod canvas_files;
 #[path = "db_canvas_objects.rs"]
 mod canvas_objects;
+#[path = "db_delegation.rs"]
+pub(crate) mod delegation;
 #[path = "db_member_creation.rs"]
 mod member_creation;
 #[path = "db_member_environment.rs"]

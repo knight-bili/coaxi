@@ -14,7 +14,7 @@
   "current_branch": "phase/i04-collaboration-runtime",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I04-T01",
-  "current_slice": "I04 独立帮手 r1 已确认；六操作严格输入与设置存储基础已编码并通过两个最低层 owner。继续持久父子关系、完整迁移和执行接线；原生查看器保留。",
+  "current_slice": "I04 已确认r1的持久关系、父链、原请求回放、私有运行约束及接管序号存储已编码，单个真实Core数据库owner通过；继续合齐完整160/210格式与准入，尚未开放执行/API。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,14 +33,14 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "I04-T01：按已确认 r1 实现持久委派身份、设置、Core 生命周期及版本迁移；不重复索要确认",
+    "I04-T01：身份存储/候选DDL分项已验证；下一步合齐格式35/父冻结工具资格/子Bootstrap、完整数据分类与旧源升级，一次登记Schema160/Migration210；不再重复批准",
     "I04-T01：六个模型操作、CLI/原别名、冻结输入及接收/恢复围栏",
     "I04-T01：按 Codeg 原版委派和原生子代理查看器接入两端 UI，保留 User-only 原生读取与后台观察队列",
     "I04-T02/T03/T04：Runtime 并集、恢复、记忆及自动化；阶段候选集中验证，缺外部条件留待办"
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "input_and_settings_primitives_locally_verified_complete_core_integration_pending",
+  "current_slice_status": "identity_graph_and_candidate_ddl_locally_verified_full_contract_migration_and_runtime_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -251,5 +251,6 @@
   "i04_native_subagent_protocol_evidence": "i04-native-subagent-protocol-result.json",
   "delegation_r1_confirmation": "i04-delegation-r1-confirmation.json",
   "i04_delegation_foundation_evidence": "i04-delegation-foundation-result.json",
-  "i04_delegation_foundation_source_commit": "e0b2f60905e232b9615de83ba9905d613d00deba"
+  "i04_delegation_foundation_source_commit": "e0b2f60905e232b9615de83ba9905d613d00deba",
+  "i04_delegation_identity_evidence": "i04-delegation-identity-result.json"
 }
