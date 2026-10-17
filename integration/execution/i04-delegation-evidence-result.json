@@ -1,0 +1,450 @@
+{
+  "schema_version": 1,
+  "stage": "I04",
+  "task": "I04-T01",
+  "checked_at": "2026-10-17T18:45:35.345307+00:00",
+  "status": "original_execution_lifecycle_and_carrier_association_connected_and_fault_checked_full_host_reconciliation_pending",
+  "source_commit": "c99d2014c64d2e1528d2a5f48279876a2b7d27b5",
+  "implementation_baseline": "9cbf8ab84b13553bdbb5f87739cb40162d855f3d",
+  "confirmation_record": "i04-delegation-r1-confirmation.json",
+  "implemented": [
+    "Shared six-operation executor now records start and finish through original ExecutionEvidenceService and canonical single-row lifecycle. No new task/evidence database or broker state machine",
+    "Exact persistent mutation receipts still return before observation preparation, including retired proof recovery. Invalid input, invalid/retired authority and old no-role159 calls remain zero-write",
+    "Every actual invocation attempt has a Core-generated observation key bound to Run/epoch/Binding generation/original tool call. Query snapshots and pre-commit-failure retries keep independent input/result pairs; Gateway remains the sole mutation identity/replay authority",
+    "A concurrent in-flight receipt replay finishes its own already-created observation with the actual replay flag and original command receipt id. A later known receipt recovery creates no new observation",
+    "Original CLI and evidence use one closed envelope builder. Internal Outcome stores original Gateway command id for receipt linkage, never a made-up query receipt; Agent-facing output shape is unchanged",
+    "Core-only coreRequestId preserves a valid UUID in original runtime.action normalization for correlation, including started-only rows. Runtime declarations and invalid values are ignored. This field is never an authorization or replay index",
+    "Original normalization keeps one bounded output and Agent output digest, without a duplicate body under coreEnvelope/operationProjection. Starting metadata stores hashes/counts, no source credential, task copy or directory",
+    "Observation preparation is outside DB/gate. Exact lease and original reader-role admission precede durable start. Work cannot run if that start cannot be recorded; existing no-role source159 does not touch new tables",
+    "All filesystem/status work still releases DB/gate. The original narrow terminal-evidence path settles the held observation after source stop/lease retirement without obtaining new business authority",
+    "Completion evidence failure logs only a fixed safe diagnostic and retains the durable started identity; it cannot replace committed task/result/receipt. Full Host restart repair of retained starts remains pending"
+  ],
+  "checks": {
+    "core_owner": {
+      "log": "delegation-evidence-core-03.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0
+    },
+    "regressions": [
+      {
+        "owner": "execution_evidence::tests::",
+        "listed": 17,
+        "passed": 17,
+        "failed": 0,
+        "ignored": 0,
+        "exit_code": 0,
+        "log": "delegation-evidence-regression-lifecycle.log"
+      },
+      {
+        "owner": "builtin_tool_cli_output::tests::",
+        "listed": 8,
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0,
+        "exit_code": 0,
+        "log": "delegation-evidence-regression-outputs.log"
+      },
+      {
+        "owner": "builtin_tool_evidence_projection::tests::",
+        "listed": 14,
+        "passed": 14,
+        "failed": 0,
+        "ignored": 0,
+        "exit_code": 0,
+        "log": "delegation-evidence-regression-projection.log"
+      },
+      {
+        "owner": "builtin_tool_runtime::tests::",
+        "listed": 2,
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "exit_code": 0,
+        "log": "delegation-evidence-regression-leases.log"
+      },
+      {
+        "owner": "read_model::slow_tests::execution_evidence_is_counted_in_snapshot_and_paged_by_agent_run",
+        "listed": 1,
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "exit_code": 0,
+        "log": "delegation-evidence-regression-read-model.log"
+      },
+      {
+        "owner": "canonical_activity::tests::",
+        "listed": 13,
+        "passed": 13,
+        "failed": 0,
+        "ignored": 0,
+        "exit_code": 0,
+        "log": "delegation-evidence-regression-canonical.log"
+      }
+    ],
+    "rust_passed": 56,
+    "docs_tests_passed": 10,
+    "new_rust_test_owners": 0,
+    "new_full_database_owners": 0,
+    "full_1253_suite_run": false,
+    "lib_test_warnings": 7,
+    "new_formal_cases_passed": 0
+  },
+  "tested": [
+    "One original Context Database owner runs real Core start/cancel/resume/query/lease/Blob/Manifest/input receipt paths. It now reads actual lifecycle rows through original read_full_payload and canonical execution window",
+    "Fresh start creates one revision2 completed lifecycle row, original Gateway command receipt exists, private task text is absent from start evidence, and known exact start recovery has zero total_changes",
+    "Explicit provider Shell start/end observations surround an actual delegation.status call; original canonical reader annotates the CLI carrier as delegation.status using exact operation/timing/Agent output digest",
+    "Same query UUID before/after actual cancel returns running then canceled and stores distinct observations preserving both outputs/digests; no stale cache or terminal conflict merge",
+    "Inserted start-evidence storage fault stops before delegation graph/Run/message creation and returns safe internal error without private SQL fixture text",
+    "Injected command.result storage fault rolls back the complete child graph. The same UUID/input succeeds after removing the fault, keeping failed and completed invocation observations distinct with no terminalConflict",
+    "Injected lifecycle completion-update fault leaves started evidence but returns the committed task. Original exact request recovery remains zero-write and does not fabricate a repaired completion",
+    "An independent active source child is canceled by the real parent model cancel command while its status wait is pending; old observation receives failed/run_not_bound terminal evidence, and the fenced source cannot dispatch new work",
+    "Original old159/no-role/invalid-input/retired-query/receipt replay checks remain strict zero-write. Valid query/wait side effects are limited to observation rows, proven by business graph, Run status/epoch/cancel markers and message count snapshots",
+    "All17 original lifecycle owners,8 closed-output,14 evidence-projection,2 lease,1 original large paged execution read and13 canonical-activity owners pass; no full suite or new full-DB fixture"
+  ],
+  "failures_and_repairs": [
+    "compile01 passed. Core01 expected a duplicate coreEnvelope.result body; the original store intentionally keeps one bounded output. Fixed tests to verify original envelope metadata/output digest, without weakening or duplicating production storage",
+    "Self-review replaced shared logical observation keys with distinct accepted invocation attempts. Otherwise a pre-commit error or same-UUID fresh query could contaminate a later result. Persistent Gateway replay still returns before any observation",
+    "Added trusted valid coreRequestId correlation because started-only records have no terminal envelope. Provider Shell fixture uses original runtime.action input shape instead of a dropped command field",
+    "Core02 exposed a fault injector that used an incorrect internal phase label, so it had not fired. Changed fixture to abort the actual evidence INSERT/UPDATE directly; production admission/storage rules were unchanged",
+    "Final compile04/Core03 and all55 related regressions pass. Deliberate completion-deferred diagnostic in Core03 is the injected end-storage fault, not an unexplained production failure",
+    "Earlier patch-context mismatches made no source changes; final diffs/source blobs are verified. All failed compiler/test logs are retained; no external model/runtime retry"
+  ],
+  "runtime_data_contract": {
+    "version": "v1.72",
+    "schema": 159,
+    "migration": 209
+  },
+  "target_data_contract": {
+    "version": "v1.73",
+    "schema": 160,
+    "migration": 210,
+    "status": "not_registered"
+  },
+  "source_transport": {
+    "builtin_contract": 39,
+    "cli": 39,
+    "capability": "builtin_cli.transport.v39",
+    "operations": 36,
+    "ipc": 3,
+    "envelope": 2,
+    "agent_output": 10,
+    "web_methods": 195,
+    "daily_gui_or_release_updated": false
+  },
+  "pending_migration_modified_legacy_guards": [
+    "context_manifest_v34_only_insert",
+    "context_manifest_quote_profile_insert",
+    "agent_run_input_v34_only_insert",
+    "single_chat_composer_draft_scope_insert",
+    "single_chat_retained_input_insert_guard",
+    "single_chat_source_observation_owner",
+    "conversation_message_single_chat_attachment_insert_guard",
+    "conversation_message_single_chat_attachment_update_guard",
+    "single_chat_pending_input_scope_insert",
+    "runtime_input_delivery_attachment_auth_insert"
+  ],
+  "qualification_limits": [
+    "Real Database/files/Core lifecycle/canonical window/pipe adapter paths are exercised. Provider Shell/Session/ACK/cleanup observations are explicit fixtures; no actual provider process/model/MCP/whole Host/GUI was launched",
+    "Retained started rows after completion faults/crash require full existing Host startup reconciliation work. This batch preserves identity/result and proves safe behavior, not automatic cross-process repair",
+    "Canonical carrier annotation passes with provider observation fixtures, not every real Runtime/CLI platform. Original two subagent viewers and actual UI comparison remain pending",
+    "Current source remains Builtin39/36 operations, IPC3/Envelope2/Output10/Web195 and actual startup159/209. Schema160/Migration210 and10 modified legacy guards are still unregistered/unqualified",
+    "No new formal D01-D32/84 I04 case or complete stage is claimed from component counts. No whole1253/default suite, App build, push/Actions/main/release"
+  ],
+  "remaining": [
+    "User list/get/read/history/settings.get/update and User resume after parent Run terminal, plus complete owner/context constraints",
+    "Complete retained-activity/startup reconciliation and real Host/Fleet/Session/input-unknown/writers/causal cancel/cleanup/resume/takeover/restart",
+    "Question/plan backend/projection; generic ACP and actual21+custom defaults/aliases/default-model options/DSH/native compatibility",
+    "Full Schema160/Migration210 atomic source qualification,10 legacy guards, old frozen/queued inputs, rollback/foreign_keys/receipt/marker",
+    "Original Codeg/Rovai settings/cards/grouping/two viewers, positive skills/materials/Canvas/adopt, actual GUI/runtime/platform checks, I04-T02/T03/T04 and I05-I12/BUF"
+  ],
+  "scope": {
+    "source_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_packages": 4,
+    "i04_clusters": 21,
+    "i04_formal_cases": 84,
+    "customer_software_acceptance": "after_I12"
+  },
+  "resource_use": {
+    "project_model_calls": 0,
+    "project_model_cost": 0,
+    "remote_push": false,
+    "actions_triggered": false,
+    "main_merged": false,
+    "released": false
+  },
+  "approved_files": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1",
+      "unchanged": true
+    }
+  ],
+  "source_files": [
+    {
+      "path": "crates/rovai-core/src/context.rs",
+      "bytes": 675990,
+      "git_blob_sha256": "1f5504da74c1f15a8fca905eeed3b89f21cafbac7697ce72baf96c1a725a0838"
+    },
+    {
+      "path": "crates/rovai-core/src/context/delegation_dispatch_tests.rs",
+      "bytes": 14892,
+      "git_blob_sha256": "c7a9de1c0a2166bb5b4b553c0ab019d3bb649b5b0f024ad11beafbee2679fb4c"
+    },
+    {
+      "path": "crates/rovai-core/src/context/delegation_evidence_tests.rs",
+      "bytes": 15183,
+      "git_blob_sha256": "71b15716501bf8546376fd3c53eff82fe2bd24230395ada7a69f3f7175158f64"
+    },
+    {
+      "path": "crates/rovai-core/src/context/delegation_model_command_tests.rs",
+      "bytes": 26436,
+      "git_blob_sha256": "18782e5177dff1a20ef0a0135379c59561a01dc390fd24b3a12028ae21c1da3e"
+    },
+    {
+      "path": "crates/rovai-core/src/context/delegation_transport_tests.rs",
+      "bytes": 11569,
+      "git_blob_sha256": "38feadfd823f71d2655bcdbdca85226e6b0ca4d8d1285a83ae49269e951925a3"
+    },
+    {
+      "path": "crates/rovai-core/src/delegation_dispatch.rs",
+      "bytes": 24472,
+      "git_blob_sha256": "fe15bdda1c4851414477053b353a1dd6b619a32e7b3f8e7876e8636abcaa7e9a"
+    },
+    {
+      "path": "crates/rovai-core/src/delegation_dispatch/evidence.rs",
+      "bytes": 4467,
+      "git_blob_sha256": "e5192ea33f4cf3d565a81c9f4a9b3da74a3dcaa8079390da02835301dcef4a71"
+    },
+    {
+      "path": "crates/rovai-core/src/execution_evidence.rs",
+      "bytes": 245240,
+      "git_blob_sha256": "55698c1bab9d97b862ac33c4ee2c0fe58dbb3d3d55c8131913164c97e803db7e"
+    },
+    {
+      "path": "docs/contracts/builtin-tool-transport-v39.md",
+      "bytes": 5499,
+      "git_blob_sha256": "9b3d9642bce85ee3b235eb7c1d1ec74c4c218b5b14a3ca16a7e185f846f22ea3"
+    },
+    {
+      "path": "docs/development/testing.md",
+      "bytes": 230789,
+      "git_blob_sha256": "e6f41833af412f78ed9c5e2fbdf35389b76f4530fd579933e74a8537ff080ff3"
+    },
+    {
+      "path": "docs/versions/v1.73/implementation-plan.md",
+      "bytes": 4371,
+      "git_blob_sha256": "59a4b1dea7ac0c3b1c40f24a01cfba266bba93013c894fbf0306fab50722bd2d"
+    }
+  ],
+  "log_files": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-codegraph-sync-01.log",
+      "bytes": 262,
+      "sha256": "726dcd8b55a074c79d2fdfe4b9bb321a2bc113b76d29fa795166b6083d932b16"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-codegraph-sync-02.log",
+      "bytes": 251,
+      "sha256": "a2fb1ba510a62c673b8008cc957f648de0bff7f8b24c16e622650a0f9ce8a353"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-codegraph-sync-final.log",
+      "bytes": 249,
+      "sha256": "8229be8471e251b8e6fca63fb9ec95180a306907ae3be32748ea9b4b493b438a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-compile-01.log",
+      "bytes": 2225,
+      "sha256": "a24454031154a893cad8cb9ea16e6d2dfe036a53df5981fc0b5531368cfc05b8"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-compile-02.log",
+      "bytes": 2225,
+      "sha256": "e3a430fac42a780edb7074d6fa2192d3df82cbc1a1287984e795c4caf2454829"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-compile-03.log",
+      "bytes": 2225,
+      "sha256": "a65cfa1a3132547f4192eda82f7a2b502e7de1cd12fb5fb31e480f861fac4586"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-compile-04.log",
+      "bytes": 2225,
+      "sha256": "69e9bda31d438160b7c7c2c558c2195708c3fbc30fec2cca5a9820256abc3c08"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-core-01-list.log",
+      "bytes": 125,
+      "sha256": "8d7c39b86e00e4e7eee958d5210fe31c3224cf0ebf2bba69b1e95c305acee56d"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-core-01.log",
+      "bytes": 924,
+      "sha256": "3dc4af37b00d50943dd4d4cff191dcdb63ab05fe548a258acf470b1bcfe010ba"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-core-02.log",
+      "bytes": 679,
+      "sha256": "4be7f1f7e65e29b73deacc95276d9979b6303ea205bd2dafad317287f02bfad6"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-core-03.log",
+      "bytes": 292,
+      "sha256": "1d2605da37fd75518f343baf2720def767da41d0b0384d5f00c062432c9ba0e8"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-diff.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-doc-governance.log",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-doc-tests.log",
+      "bytes": 920,
+      "sha256": "21cb10755848ac995999e620a87522c1b7544c0211f142dd72e7df770bedf88b"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-doc-version.log",
+      "bytes": 79,
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-include-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-owner-list.log",
+      "bytes": 1805,
+      "sha256": "bf3178ad5d75f7c767d9ef1070b69c8b9b7fd71dac08a709ce9997abeb180c00"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-protocol.log",
+      "bytes": 182,
+      "sha256": "044569df112d191be31ea876439bd2bd3294beb8d9fa469452c1bcc1ea893695"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-read-model-list.log",
+      "bytes": 2653,
+      "sha256": "70fa0821bc4372e82dbd0f9bc6aa63cb3561b66d3ab9bcbe91eec61b99d65c95"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-regression-canonical-list.log",
+      "bytes": 1245,
+      "sha256": "ec7604797442532b779fe710aefdff468a22c321f8bd5ed85c77db565aa37031"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-regression-canonical.log",
+      "bytes": 1417,
+      "sha256": "48a5d93ac4c5d3d1e9719decb325e742a713210ae4b72cdfa768d3a5b4bbd43e"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-regression-leases-list.log",
+      "bytes": 197,
+      "sha256": "bcbaf746a42387466716d6f1769b520e77f727e16b4820a3b9f5b2d03bb6a443"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-regression-leases.log",
+      "bytes": 302,
+      "sha256": "917f9fa0a0a6d520f9e73647be9ff7f6a76a1b40c0c0ae64548746253051ba16"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-regression-lifecycle-list.log",
+      "bytes": 1786,
+      "sha256": "8b5b9d6c4b5c7abb518efbe315547318bca2de8a771664fbc7e3f1c24430bb04"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-regression-lifecycle.log",
+      "bytes": 1982,
+      "sha256": "492e380ff032710c863e77941ded568ce3daf2c9ff6bda6dba709a07a88e0880"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-regression-outputs-list.log",
+      "bytes": 766,
+      "sha256": "c33652a4ee0e53e3463cde7fb84a7caf1759ab4eae99a51993a647a967eedfad"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-regression-outputs.log",
+      "bytes": 907,
+      "sha256": "48f25dad6b545c8cfaeb017e77ba87442b0ba2f2a91a1982c9cd6cbeaa635b92"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-regression-projection-list.log",
+      "bytes": 1588,
+      "sha256": "8a0de00ad58008c87fc1addfb20893b994e019ab95040af79f53dc53ad179d73"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-regression-projection.log",
+      "bytes": 1766,
+      "sha256": "2123555d3d13f5c0906db7484fa64e0371afc7e2bc494ba5b3ecbc7e5b8916fe"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-regression-read-model-list.log",
+      "bytes": 117,
+      "sha256": "2a1e783cd272cb537d58f56d44c52307b7012142d012830dc1b5cac55b3a577b"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-regression-read-model.log",
+      "bytes": 346,
+      "sha256": "95540487bf87e6b9be617e81796f8261f1008d0518748e7a2acab7f0fd2a9b08"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-regression-results.json",
+      "bytes": 1342,
+      "sha256": "1beadaa08f75017ae29ba18d2616413eb58db6c49e43510f127b47b7fb2f1d15"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-scaffold.log",
+      "bytes": 222,
+      "sha256": "01288a06b7440b08c394c6da77c7750da896b58e4bc599c2e110eb1820be4b08"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-evidence-source-commit.log",
+      "bytes": 338,
+      "sha256": "dfe5c987bba0868d6a922103db637a3268bdcbed6c044e243017eb48a089956e"
+    }
+  ]
+}
