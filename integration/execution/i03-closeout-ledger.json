@@ -14,10 +14,10 @@
   },
   "counts": {
     "settled_obligations": 17,
-    "open_work_groups": 2,
+    "open_work_groups": 1,
     "private_cases_verified": 24,
     "private_cases_open": 0,
-    "verified_work_groups": 8
+    "verified_work_groups": 9
   },
   "count_boundary": "不同层级不相加；17条为限定范围旧待办，固定10组按状态计算剩余；私聊按原24场景逐项核定，不计算完成百分比",
   "settled_obligations": [
@@ -421,13 +421,13 @@
     {
       "id": "I03-R09",
       "name": "八类原版UI与缺少的真实摘要信息",
-      "status": "open",
+      "status": "engineering_verified",
       "private_cases": [],
       "original_groups": [
         "I03-C06"
       ],
       "done_when": "八类创建/编辑/排列/折叠/错误态、画板CRUD、原菜单键/旧Host提示、日夜小窗口和末项可达通过；源码参考中已登记的模型/分支/子会话/运行状态有真实Core投影或逐项有依据的适用性结论；尺寸告警形成定位及影响记录。",
-      "next_action": "只构建Core25，复用24相同前端；重跑完整摘要交错与视觉观察。",
+      "next_action": "本机工程边界完成；转R10正式12场景/平台矩阵和可运行开发预览。尺寸诊断按原计划保留跟进，不转客户技术验收。",
       "owner": "Codex",
       "external_condition": "none_confirmed_blocking_current_independent_work",
       "known_ui_followups": [
@@ -441,12 +441,7 @@
         "Core只读公开活动计数和精确私聊活动，原同一目录事务与失效合并，不增加逐卡轮询",
         "Native桥接错误对象保留具体附件缺失/源变化指引；输入和恢复语义不变"
       ],
-      "pending_candidate_verification": [
-        "真实Core多Thread公开/精确私聊交错活动、最近实际运行模型与当前配置差异、真实分支摘要；不调用付费模型。",
-        "原八类在日间/小窗口/缩放和四行长标题的剩余同场景对照；已过夜间100%与画板列表日夜小窗口不重复。",
-        "旧Host能力缺失的原界面指引；错误态逐项按现有能力保留，不能绕过准入。",
-        "卡片运行的6条ResizeObserver告警继续定位和实际帧/输入/命中影响记录；列表整批无告警不覆盖卡片。"
-      ],
+      "pending_candidate_verification": [],
       "source_dependency": {
         "source_feature": "C08",
         "planned_stage": "I04",
@@ -455,7 +450,7 @@
       "verified_native_card_checks": 25,
       "verified_native_board_checks": 6,
       "pending_core_repair": {
-        "status": "source_verified_native_rebuild_required",
+        "status": "native_verified_rc25",
         "source_file": "crates/rovai-core/src/read_model/canvas_references.rs",
         "source_sha256": "d78cee9719072b8cc00158f0f0bf142c6b58d5566ecea2c20280a496675064cf",
         "defect": "真实single_chat运行通过camp_turn归属原Thread，直接camp_id为null；PRIVATE_SQL漏计活动，RUN_MODELS原有轮次关联正确。",
@@ -463,8 +458,14 @@
         "red": "r09-nullable-private-red.log",
         "green": "r09-nullable-private-green.log",
         "native_red": "fusion-i03-rc.24/native-source-ui-r7-prepare/result.json",
-        "next": "只构建Core25，复用24相同前端；重跑完整摘要交错与视觉观察。"
-      }
+        "next": "只构建Core25，复用24相同前端；重跑完整摘要交错与视觉观察。",
+        "verification": "i03-r09-complete-local-verification.json"
+      },
+      "latest_verification": "i03-r09-complete-local-verification.json",
+      "remaining_runtime_boundaries": [],
+      "known_diagnostics": [
+        "i03-ui-diagnostic-followups.json"
+      ]
     },
     {
       "id": "I03-R10",
@@ -475,7 +476,7 @@
         "I03-C06"
       ],
       "done_when": "累计代码和自审集齐后冻结，当前Windows/Web适用面集中构建/运行；12个正式场景按平台登记；可运行开发预览及说明齐备。",
-      "next_action": "等待R01–R09到达可验证状态再一次集中候选，失败只补受影响项；Mac/Linux/Web未验不算通过，环境缺项保持待环境验证并继续独立I04。",
+      "next_action": "核对C12/C13/C14各N/F/R/P共12正式场景，按Windows/Web当前适用面和其他平台分别登记；原已核定输入未变的证据精确复用。准备隔离可运行开发预览和说明，登记未验证环境后继续I04，不转客户做阶段技术验收。",
       "owner": "Codex",
       "external_condition": "none_confirmed_blocking_current_independent_work"
     }
@@ -686,6 +687,6 @@
     "真实移动平台按I10推进；终端平台专属保护按相应平台阶段补齐，不能被Windows结果代替"
   ],
   "change_control": "剩余编号固定；发现缺陷归入已有组并说明影响。新增必需范围须有来源和编号变更记录；不能为减少数量合并隐藏未完成条件。",
-  "latest_verification": "i03-r08-complete-local-verification.json",
-  "latest_partial_verification": "i03-r09-source-ui-progress.json"
+  "latest_verification": "i03-r09-complete-local-verification.json",
+  "latest_partial_verification": "i03-r09-complete-local-verification.json"
 }

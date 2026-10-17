@@ -240,12 +240,12 @@
   "latest_settlement": "i03-closeout-settlement.json",
   "remaining_queue_counts": {
     "settled_obligations": 17,
-    "open_work_groups": 2,
+    "open_work_groups": 1,
     "private_cases_verified": 24,
     "private_cases_open": 0,
-    "verified_work_groups": 8
+    "verified_work_groups": 9
   },
-  "latest_group_verification": "i03-r08-complete-local-verification.json",
+  "latest_group_verification": "i03-r09-complete-local-verification.json",
   "latest_preparation": "i03-r01-private-workflow-preparation.json",
-  "latest_partial_verification": "i03-r09-source-ui-progress.json"
+  "latest_partial_verification": "i03-r09-complete-local-verification.json"
 }

@@ -37,10 +37,10 @@
     {
       "stage_id": "I03",
       "name": "完整无限画布与对象绑定",
-      "candidate_version": "fusion-i03-rc.24",
+      "candidate_version": "fusion-i03-rc.25",
       "status": "frozen_with_partial_engineering_evidence",
-      "frozen_commit": "94dc225f0be8889808f76ec46ae6ec1c16f3947a",
-      "validation_batch": "I03-R09-actual-native-findings-consolidated-repair",
+      "frozen_commit": "af544d3e0765b735c8e1e3eb74f0af71f1de0a01",
+      "validation_batch": "I03-R09-nullable-private-activity-repair",
       "validation_runs": [
         {
           "kind": "local_windows_cargo_build",
@@ -695,6 +695,21 @@
           "kind": "native-board-ui-windows-menu-6",
           "source_commit": "94dc225f0be8889808f76ec46ae6ec1c16f3947a",
           "exit_code": 0
+        },
+        {
+          "kind": "windows-core-host-cli-build",
+          "source_commit": "af544d3e0765b735c8e1e3eb74f0af71f1de0a01",
+          "exit_code": 0
+        },
+        {
+          "kind": "native-interleaved-summary-frame-input-5",
+          "source_commit": "af544d3e0765b735c8e1e3eb74f0af71f1de0a01",
+          "exit_code": 0
+        },
+        {
+          "kind": "native-old-contract-eight-card-theme-fit-5",
+          "source_commit": "af544d3e0765b735c8e1e3eb74f0af71f1de0a01",
+          "exit_code": 0
         }
       ],
       "engineering_validation": "in_progress",
@@ -864,17 +879,17 @@
           "status": "desktop_web_passed_rust_compile_failed"
         }
       ],
-      "repair_reason": "rc23真实界面复现Main拒绝已有workspaces.worktrees和连续删除遗留选中ID造成便签编辑入口缺失；累计两处修复后集中构建Desktop/Web，Core输入未改按SHA复用。",
-      "windows_build": "passed_new_core22_frontend21_identical_inputs",
+      "repair_reason": "真实Native交错执行复现私聊活动漏计；仅Core查询修复并编译，前端输入与24相同按SHA复用。",
+      "windows_build": "passed_new_core25_frontend24_identical_inputs",
       "related_rust_unique_owners": 26,
       "related_rust": "two_original_owners_compiled_and_executed_rc22_historical_owners_retained_separately",
       "actual_host_pty": "passed",
       "native_app_scale_platform": "full_flows_scale_and_platform_pending",
-      "native_desktop": "R01_to_R08_local_boundaries_verified_R09_card_board_partial_R10_open",
+      "native_desktop": "R01_to_R09_local_boundaries_verified_R10_open",
       "full_types": "passed_current_tree",
-      "desktop_build": "passed_rc24",
-      "web_build": "passed_rc24",
-      "next_renderer_batch": "复用rc24补真实交错活动/最近模型/分支、旧Host、剩余主题/缩放/长标题与尺寸告警影响；既过八类CRUD/画板/菜单键不重跑，随后R10。",
+      "desktop_build": "reused_passed_rc24_identical_inputs",
+      "web_build": "reused_passed_rc24_identical_inputs",
+      "next_renderer_batch": "R09本机边界已核定；R10集中核对正式场景和开发预览，前端未变不重编。",
       "rust_evidence_scope": "本候选新增运行两个既有owner，不将历史owner数量机械相加为当前结果。",
       "candidate_history": [
         {
@@ -891,9 +906,14 @@
           "candidate_version": "fusion-i03-rc.23",
           "frozen_commit": "30d1e0e0453a814f20fe4ec141453cd92b147cbf",
           "status": "historical_candidate_preserved_with_r08_complete_and_r09_red"
+        },
+        {
+          "candidate_version": "fusion-i03-rc.24",
+          "frozen_commit": "94dc225f0be8889808f76ec46ae6ec1c16f3947a",
+          "status": "historical_frontend_preserved_and_reused_with_native_card_board_qualification"
         }
       ],
-      "repair_candidates": 23,
+      "repair_candidates": 24,
       "pending_renderer_repair": {
         "commit": "809a3d0bc42b8607f2337ad45f7fa4265b0541e4",
         "evidence": "i03-r08-notification-progress.json",
@@ -907,17 +927,12 @@
         "verification": "i03-r08-complete-local-verification.json"
       },
       "pending_native_terminal_verification": [],
-      "pending_summary_projection_verification": [
-        "真实Core多Thread公开/精确私聊交错活动、最近实际运行模型与当前配置差异、真实分支摘要；不调用付费模型。",
-        "原八类在日间/小窗口/缩放和四行长标题的剩余同场景对照；已过夜间100%与画板列表日夜小窗口不重复。",
-        "旧Host能力缺失的原界面指引；错误态逐项按现有能力保留，不能绕过准入。",
-        "卡片运行的6条ResizeObserver告警继续定位和实际帧/输入/命中影响记录；列表整批无告警不覆盖卡片。"
-      ],
+      "pending_summary_projection_verification": [],
       "artifact_sources": {
+        "core": "af544d3e0765b735c8e1e3eb74f0af71f1de0a01",
         "desktop": "94dc225f0be8889808f76ec46ae6ec1c16f3947a",
         "web": "94dc225f0be8889808f76ec46ae6ec1c16f3947a",
-        "core": "1e840216a1af1f93da1371db545579889e42d4da",
-        "evidence": "i03-r09-source-ui-progress.json"
+        "evidence": "i03-r09-complete-local-verification.json"
       },
       "native_terminal_verification": {
         "status": "engineering_verified_within_declared_local_scope",
@@ -926,7 +941,7 @@
       "r08_complete_local_verification": "i03-r08-complete-local-verification.json",
       "r09_source_ui_progress": "i03-r09-source-ui-progress.json",
       "pending_core_repair": {
-        "status": "source_verified_native_rebuild_required",
+        "status": "native_verified_rc25",
         "source_file": "crates/rovai-core/src/read_model/canvas_references.rs",
         "source_sha256": "d78cee9719072b8cc00158f0f0bf142c6b58d5566ecea2c20280a496675064cf",
         "defect": "真实single_chat运行通过camp_turn归属原Thread，直接camp_id为null；PRIVATE_SQL漏计活动，RUN_MODELS原有轮次关联正确。",
@@ -934,8 +949,10 @@
         "red": "r09-nullable-private-red.log",
         "green": "r09-nullable-private-green.log",
         "native_red": "fusion-i03-rc.24/native-source-ui-r7-prepare/result.json",
-        "next": "只构建Core25，复用24相同前端；重跑完整摘要交错与视觉观察。"
-      }
+        "next": "只构建Core25，复用24相同前端；重跑完整摘要交错与视觉观察。",
+        "verification": "i03-r09-complete-local-verification.json"
+      },
+      "r09_complete_local_verification": "i03-r09-complete-local-verification.json"
     },
     {
       "stage_id": "I04",
