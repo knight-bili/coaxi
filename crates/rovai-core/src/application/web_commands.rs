@@ -49,6 +49,9 @@ pub(super) fn reconcile(
         }};
     }
     match query.operation.as_str() {
+        "delegations.composer.mutate" => {
+            delegation_composer::reconcile(database, client, query.params)
+        }
         "singleChat.composerDraft.mutate" => {
             private_composer::reconcile(database, client, query.params)
         }

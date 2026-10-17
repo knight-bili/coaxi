@@ -146,6 +146,45 @@ pub(crate) fn child_identity(
     connection.query_row("SELECT d.id,d.requested_runtime FROM delegation d JOIN conversation c ON c.id=d.child_conversation_id JOIN camp_member m ON m.camp_id=c.camp_id AND m.agent_id=c.agent_id JOIN agent_profile a ON a.id=c.agent_id WHERE c.id=?1 AND c.kind='delegation_child' AND c.camp_id=?2 AND c.agent_id=?3 AND d.camp_id=c.camp_id AND d.owner_agent_id=c.agent_id AND m.status='active' AND a.profile_status<>'removed'",params![conversation_id,camp_id,owner],|r|Ok((r.get(0)?,r.get(1)?))).optional()?.context("Missing owned delegation child identity")
 }
 
+pub(crate) fn child_display_name(
+    connection: &Connection,
+    camp: &str,
+    conversation: &str,
+    owner: &str,
+) -> Result<String> {
+    let (id, target, config): (String, String, String) = connection
+        .query_row(
+            "SELECT d.id,d.requested_runtime,r.effective_config_json
+         FROM delegation d JOIN conversation c ON c.id=d.child_conversation_id
+         JOIN delegation_attempt a ON a.delegation_id=d.id AND a.attempt_no=1
+         JOIN agent_run r ON r.id=a.agent_run_id
+         WHERE c.id=?1 AND c.camp_id=?2 AND c.agent_id=?3 AND c.kind='delegation_child'
+           AND d.camp_id=c.camp_id AND d.owner_agent_id=c.agent_id AND r.conversation_id=c.id",
+            params![conversation, camp, owner],
+            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)),
+        )
+        .optional()?
+        .context("Missing owned child quote author")?;
+    let config: Value = serde_json::from_str(&config)?;
+    let policy =
+        FrozenPolicy::from_config(&config)?.context("Missing child quote author policy")?;
+    anyhow::ensure!(
+        policy.role == Role::Child,
+        "Invalid child quote author policy"
+    );
+    let runtime: FrozenAgentRuntimeConfig = serde_json::from_value(config["runtime"].clone())?;
+    let label = if target.starts_with("custom:") {
+        format!("Custom ACP {}", target.trim_start_matches("custom:"))
+    } else {
+        runtime.adapter_kind.display_name().to_string()
+    };
+    Ok(format!(
+        "{} {}",
+        label,
+        id.chars().take(8).collect::<String>()
+    ))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

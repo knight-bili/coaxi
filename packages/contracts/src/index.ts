@@ -1573,7 +1573,7 @@ export type LocalAttachmentOwnerLocator =
 export interface MessageQuoteSnapshot {
   version: 1
   quoteId: string
-  source: { scope: 'camp' | 'single_chat'; campId: string; conversationId?: string; messageId: string }
+  source: { scope: 'camp' | 'single_chat' | 'delegation_child'; campId: string; conversationId?: string; messageId: string }
   authorAtCapture: { type: 'user'; displayName: string } | { type: 'agent'; agentId: string; displayName: string }
   text: string
   format: 'plain_text'
@@ -4796,6 +4796,9 @@ export type CoreMethod =
   | 'singleChat.sourceAttachments.addFromPath'
   | 'singleChat.composerDraft.removeAttachment'
   | 'singleChat.composerDraft.mutate'
+  | 'delegations.composer.get'
+  | 'delegations.composer.mutate'
+  | 'delegations.composer.recovery'
   | 'singleChat.composerDraft.recovery'
   | 'singleChat.pendingInputs.addSourceAttachmentFromPath'
   | 'singleChat.pendingInputs.edit'

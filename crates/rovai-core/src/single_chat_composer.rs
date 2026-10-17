@@ -131,6 +131,68 @@ impl DomainCommand for MutatePrivateComposerCommand {
     }
 }
 
+// Selected by a sealed Core command type, never by a request's conversation kind.
+#[derive(Clone, Copy)]
+pub(crate) enum ComposerOwner {
+    SingleChat,
+    DelegationChild,
+}
+
+impl ComposerOwner {
+    fn exists(
+        self,
+        connection: &Connection,
+        thread: &str,
+        conversation: &str,
+        active: bool,
+    ) -> Result<bool> {
+        match self {
+            Self::SingleChat => owner_exists(connection, thread, conversation, active),
+            Self::DelegationChild => crate::delegation_user::material_owner_exists(
+                connection,
+                thread,
+                conversation,
+                active,
+            ),
+        }
+    }
+    fn event(self) -> &'static str {
+        match self {
+            Self::SingleChat => "single_chat.composer_draft_changed",
+            Self::DelegationChild => "delegation.composer_draft_changed",
+        }
+    }
+    fn updated(self) -> &'static str {
+        match self {
+            Self::SingleChat => "single_chat.composer_draft_updated",
+            Self::DelegationChild => "delegation.composer_draft_updated",
+        }
+    }
+    fn unavailable(self) -> &'static str {
+        match self {
+            Self::SingleChat => "single_chat.not_active",
+            Self::DelegationChild => "delegation.not_user_controlled",
+        }
+    }
+    fn not_found(self) -> &'static str {
+        match self {
+            Self::SingleChat => "single_chat.not_found",
+            Self::DelegationChild => "delegation.not_user_controlled",
+        }
+    }
+}
+
+pub(crate) trait PrivateComposerCommand: DomainCommand {
+    const OWNER: ComposerOwner;
+    fn materials(&self) -> &MutatePrivateComposerCommand;
+}
+impl PrivateComposerCommand for MutatePrivateComposerCommand {
+    const OWNER: ComposerOwner = ComposerOwner::SingleChat;
+    fn materials(&self) -> &MutatePrivateComposerCommand {
+        self
+    }
+}
+
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ScopedPrivateDraftView {
@@ -357,10 +419,28 @@ pub fn read_draft(
     conversation: &str,
     scope: Option<&SingleChatComposerScope>,
 ) -> Result<ScopedPrivateDraftView> {
+    read_owned_draft(
+        database,
+        client,
+        thread,
+        conversation,
+        scope,
+        ComposerOwner::SingleChat,
+    )
+}
+
+pub(crate) fn read_owned_draft(
+    database: &Database,
+    client: &DraftClient,
+    thread: &str,
+    conversation: &str,
+    scope: Option<&SingleChatComposerScope>,
+    owner: ComposerOwner,
+) -> Result<ScopedPrivateDraftView> {
     let tx = database.connection().unchecked_transaction()?;
     ensure!(
-        owner_exists(&tx, thread, conversation, false)?,
-        "single_chat.not_found"
+        owner.exists(&tx, thread, conversation, false)?,
+        owner.not_found()
     );
     let (key, _) = resolve_scope(&tx, thread, conversation, client, scope)?
         .context("single_chat.scope_unavailable")?;
@@ -594,6 +674,13 @@ pub fn mutate(
     database: &mut Database,
     envelope: &CommandEnvelope<MutatePrivateComposerCommand>,
 ) -> Result<CommandExecution> {
+    mutate_owned(database, envelope)
+}
+
+pub(crate) fn mutate_owned<C: PrivateComposerCommand>(
+    database: &mut Database,
+    envelope: &CommandEnvelope<C>,
+) -> Result<CommandExecution> {
     if let Some(execution) = DomainCommandGateway.replay_if_recorded(database, envelope)? {
         return Ok(execution);
     }
@@ -603,11 +690,11 @@ pub fn mutate(
     mutate_with_prepared_sources(database, envelope, &prepared)
 }
 
-pub(crate) fn mutation_source_inputs(
+pub(crate) fn mutation_source_inputs<C: PrivateComposerCommand>(
     database: &Database,
-    envelope: &CommandEnvelope<MutatePrivateComposerCommand>,
+    envelope: &CommandEnvelope<C>,
 ) -> Result<Vec<LocalAttachmentSourceRef>> {
-    let command = &envelope.payload;
+    let command = envelope.payload.materials();
     let PrivateComposerAction::AdoptLegacyMaterials {
         expected_source_revision,
         ..
@@ -617,7 +704,8 @@ pub(crate) fn mutation_source_inputs(
     };
     let connection = database.connection();
     if !matches!(envelope.actor, ActorRef::User { .. })
-        || !owner_exists(connection, &command.camp_id, &command.conversation_id, true)?
+        || envelope.camp_id.as_deref() != Some(command.camp_id.as_str())
+        || !C::OWNER.exists(connection, &command.camp_id, &command.conversation_id, true)?
     {
         return Ok(vec![]);
     }
@@ -652,17 +740,17 @@ pub(crate) fn mutation_source_inputs(
     legacy.sources()
 }
 
-pub(crate) fn mutate_with_prepared_sources(
+pub(crate) fn mutate_with_prepared_sources<C: PrivateComposerCommand>(
     database: &mut Database,
-    envelope: &CommandEnvelope<MutatePrivateComposerCommand>,
+    envelope: &CommandEnvelope<C>,
     prepared: &crate::private_source_observation::PreparedSources,
 ) -> Result<CommandExecution> {
     DomainCommandGateway.execute(database,envelope,|tx| {
-        let command=&envelope.payload;
+        let command=envelope.payload.materials();
         let client=&command.draft_client;
         if !matches!(envelope.actor,ActorRef::User {..}) || envelope.camp_id.as_deref()!=Some(&command.camp_id)
-            || !owner_exists(tx,&command.camp_id,&command.conversation_id,true)? {
-            return Ok(CommandHandlerResult::rejected("single_chat.not_active",json!({})));
+            || !C::OWNER.exists(tx,&command.camp_id,&command.conversation_id,true)? {
+            return Ok(CommandHandlerResult::rejected(C::OWNER.unavailable(),json!({})));
         }
         let Some((key,registered))=resolve_scope(tx,&command.camp_id,&command.conversation_id,client,command.composer_scope.as_ref())? else {
             return Ok(CommandHandlerResult::rejected("single_chat.scope_unavailable",json!({})));
@@ -750,8 +838,8 @@ pub(crate) fn mutate_with_prepared_sources(
         let mut payload=json!({"draft":draft});
         if let Some(body)=body {payload["body"]=json!(body);}
         if let Some(id)=retained {payload["retainedInput"]=serde_json::to_value(load_retained(tx,&command.conversation_id,client,key.sql_key(),&id)?.context("single_chat.retained_not_found")?.view(&command.conversation_id,key.sql_key())?)?;}
-        append_domain_event(tx,"single_chat.composer_draft_changed",Some(&command.camp_id),Some(("conversation",&command.conversation_id)),&envelope.actor,None,&json!({"conversationId":command.conversation_id}))?;
-        Ok(CommandHandlerResult::applied("single_chat.composer_draft_updated",payload,Some(EntityReference {entity_type:"conversation".into(),entity_id:command.conversation_id.clone()})))
+        append_domain_event(tx,C::OWNER.event(),Some(&command.camp_id),Some(("conversation",&command.conversation_id)),&envelope.actor,None,&json!({"conversationId":command.conversation_id}))?;
+        Ok(CommandHandlerResult::applied(C::OWNER.updated(),payload,Some(EntityReference {entity_type:"conversation".into(),entity_id:command.conversation_id.clone()})))
     })
 }
 
@@ -787,6 +875,15 @@ pub fn recovery(
     client: &DraftClient,
     input: &PrivateRecoveryParams,
 ) -> Result<PrivateRecoveryResult> {
+    recover_owned(database, client, input, ComposerOwner::SingleChat)
+}
+
+pub(crate) fn recover_owned(
+    database: &Database,
+    client: &DraftClient,
+    input: &PrivateRecoveryParams,
+    owner: ComposerOwner,
+) -> Result<PrivateRecoveryResult> {
     let cursor = if let Some(value) = &input.cursor {
         let cursor = decode_cursor(value)?;
         ensure!(
@@ -806,8 +903,8 @@ pub fn recovery(
     };
     let tx = database.connection().unchecked_transaction()?;
     ensure!(
-        owner_exists(&tx, &input.camp_id, &input.conversation_id, false)?,
-        "single_chat.not_found"
+        owner.exists(&tx, &input.camp_id, &input.conversation_id, false)?,
+        owner.not_found()
     );
     let through_global_sequence = tx.query_row(
         "SELECT COALESCE(MAX(global_sequence),0) FROM event_log",

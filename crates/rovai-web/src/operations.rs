@@ -109,6 +109,12 @@ pub enum Operation {
     SingleChatComposerMutate,
     #[serde(rename = "singleChat.composerDraft.recovery")]
     SingleChatComposerRecovery,
+    #[serde(rename = "delegations.composer.get")]
+    DelegationComposerGet,
+    #[serde(rename = "delegations.composer.mutate")]
+    DelegationComposerMutate,
+    #[serde(rename = "delegations.composer.recovery")]
+    DelegationComposerRecovery,
 
     #[serde(rename = "skills.content.read")]
     SkillContent,
@@ -557,6 +563,9 @@ impl Operation {
             Self::SingleChatRemoveAttachment => "singleChat.composerDraft.removeAttachment",
             Self::SingleChatComposerMutate => "singleChat.composerDraft.mutate",
             Self::SingleChatComposerRecovery => "singleChat.composerDraft.recovery",
+            Self::DelegationComposerGet => "delegations.composer.get",
+            Self::DelegationComposerMutate => "delegations.composer.mutate",
+            Self::DelegationComposerRecovery => "delegations.composer.recovery",
 
             Self::MemoryCreate => "memory.create",
             Self::MemoryRevise => "memory.revise",
@@ -827,6 +836,12 @@ mod tests {
             .expect("User message withdrawal should be admitted by the Web Host");
         assert_eq!(withdraw.method(), "camp.messages.withdraw");
         for (public, internal) in [
+            ("delegations.composer.get", "delegations.composer.get"),
+            ("delegations.composer.mutate", "delegations.composer.mutate"),
+            (
+                "delegations.composer.recovery",
+                "delegations.composer.recovery",
+            ),
             (
                 "singleChat.composerDraft.mutate",
                 "singleChat.composerDraft.mutate",

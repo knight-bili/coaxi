@@ -38,7 +38,8 @@ describe('Runtime Renderer Core method allowlist', () => {
     const allowlistEnd = mainSource.indexOf('\n])', allowlistStart)
     expect(allowlistStart).toBeGreaterThan(-1)
     expect(allowlistEnd).toBeGreaterThan(allowlistStart)
-    for (const method of ['singleChat.pendingInputs.edit', 'singleChat.composerDraft.mutate', 'singleChat.composerDraft.recovery']) {
+    for (const method of ['singleChat.pendingInputs.edit', 'singleChat.composerDraft.mutate', 'singleChat.composerDraft.recovery',
+      'delegations.composer.get', 'delegations.composer.mutate', 'delegations.composer.recovery']) {
       expect(mainSource.slice(allowlistStart, allowlistEnd)).toContain(`'${method}'`)
     }
   })

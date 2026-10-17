@@ -66,6 +66,7 @@ pub mod delegation;
 pub mod delegation_contract;
 pub mod delegation_policy;
 pub mod delegation_settings;
+pub mod delegation_user;
 pub mod delivery_queue;
 pub mod diagnostics;
 pub mod dsh;

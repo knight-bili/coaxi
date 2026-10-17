@@ -196,9 +196,9 @@ describe('console transport', () => {
     expect(fetcher.mock.calls.filter(([, init]) => init?.body && JSON.parse(String(init.body)).operation === operation)).toHaveLength(1)
   })
 
-  it('keeps an unknown private card independent and settles the original promise through an explicit receipt read', async () => {
+  it.each(['singleChat.composerDraft.mutate', 'delegations.composer.mutate'] as const)('keeps an unknown private card independent and settles the original promise through an explicit receipt read: %s', async operation => {
     let recorded = false
-    const params = (nodeId: string) => ({ commandId: newCommandId(), command: { threadId: 'thread', conversationId: 'private', composerScope: { kind: 'canvas', boardId: 'board', nodeId }, expectedDraftRevision: 0, action: { type: 'register_scope' } } })
+    const params = (nodeId: string) => ({ commandId: newCommandId(), command: { threadId: 'thread', conversationId: operation === 'delegations.composer.mutate' ? `child-${nodeId}` : 'private', ...(operation === 'singleChat.composerDraft.mutate' ? { composerScope: { kind: 'canvas', boardId: 'board', nodeId } } : {}), expectedDraftRevision: 0, action: { type: 'register_scope' } } })
     const first = params('A'), second = params('B')
     const result = { status: 'applied', code: 'single_chat.composer_draft_updated', payload: {} }
     const fetcher = vi.fn<typeof fetch>().mockImplementation(async (url, options) => {
@@ -211,15 +211,15 @@ describe('console transport', () => {
     })
     const client = new ConsoleClient('http://localhost:4317', fetcher)
     await client.login('b'.repeat(64))
-    const pending = client.request('singleChat.composerDraft.mutate', first)
+    const pending = client.request(operation, first)
     await vi.waitFor(() => expect(fetcher.mock.calls.some(([, init]) => JSON.parse(String(init?.body)).operation === 'commands.reconcile')).toBe(true))
-    await expect(client.request('singleChat.composerDraft.mutate', { ...first, commandId: newCommandId() })).rejects.toThrow('同类操作')
-    await expect(client.request('singleChat.composerDraft.mutate', second)).resolves.toEqual(result)
+    await expect(client.request(operation, { ...first, commandId: newCommandId() })).rejects.toThrow('同类操作')
+    await expect(client.request(operation, second)).resolves.toEqual(result)
     recorded = true
-    await client.request('commands.reconcile', { operation: 'singleChat.composerDraft.mutate', params: first })
+    await client.request('commands.reconcile', { operation, params: first })
     await expect(pending).resolves.toEqual(result)
     expect(client.pendingCommandCount).toBe(0)
-    expect(fetcher.mock.calls.filter(([, init]) => { const body = JSON.parse(String(init?.body)); return body.operation === 'singleChat.composerDraft.mutate' && body.params.commandId === first.commandId })).toHaveLength(1)
+    expect(fetcher.mock.calls.filter(([, init]) => { const body = JSON.parse(String(init?.body)); return body.operation === operation && body.params.commandId === first.commandId })).toHaveLength(1)
   })
 
   it('retries only the exact original private request and resolves its retained transport promise', async () => {

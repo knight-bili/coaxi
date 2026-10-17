@@ -4,6 +4,7 @@ use rusqlite::OptionalExtension;
 mod canvas_terminal;
 mod config;
 mod conversation_preferences;
+pub(crate) mod delegation_composer;
 mod mission;
 pub(crate) mod private_composer;
 mod private_sources;
@@ -10540,6 +10541,32 @@ impl Core {
                     SingleChatService::for_client(request.client.clone())
                         .list_active(&database, params.camp_id.as_str())?,
                 )?)
+            }
+            "delegations.composer.mutate" => {
+                let reply = delegation_composer::handle_mutation(
+                    &self.database,
+                    &self.private_source_read_capacity,
+                    &request.client,
+                    request.params.clone(),
+                )
+                .await?;
+                if let Some((thread_id, conversation_id)) = reply.changed {
+                    emit(
+                        &self.output,
+                        "delegation.changed",
+                        json!({"threadId":thread_id,"conversationId":conversation_id}),
+                    );
+                }
+                Ok(reply.result)
+            }
+            "delegations.composer.get" | "delegations.composer.recovery" => {
+                let database = self.database.lock().await;
+                delegation_composer::handle(
+                    &database,
+                    &request.client,
+                    &request.method,
+                    request.params.clone(),
+                )
             }
             "singleChat.composerDraft.mutate" => {
                 let reply = private_composer::handle_mutation(

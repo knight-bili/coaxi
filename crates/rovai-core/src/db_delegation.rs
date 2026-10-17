@@ -113,6 +113,32 @@ pub(crate) fn install_identity_schema(tx: &Transaction<'_>) -> Result<()> {
         BEGIN SELECT RAISE(ABORT,'New public RunInput must match its frozen role and pack selection'); END;")?;
     tx.execute_batch(crate::delegation_settings::SCHEMA)?;
     tx.execute_batch(IDENTITY_SQL)?;
+    for (name, old, new) in [
+        (
+            "single_chat_composer_draft_scope_insert",
+            "conversation.kind = 'single_chat'",
+            "(conversation.kind = 'single_chat' OR (conversation.kind='delegation_child' AND EXISTS(SELECT 1 FROM delegation d JOIN delegation_control control ON control.delegation_id=d.id WHERE d.child_conversation_id=conversation.id AND control.takeover_at IS NOT NULL AND control.takeover_message_sequence IS NOT NULL)))",
+        ),
+        (
+            "single_chat_retained_input_insert_guard",
+            "kind='single_chat'",
+            "(kind='single_chat' OR (kind='delegation_child' AND EXISTS(SELECT 1 FROM delegation d JOIN delegation_control control ON control.delegation_id=d.id WHERE d.child_conversation_id=conversation.id AND control.takeover_at IS NOT NULL AND control.takeover_message_sequence IS NOT NULL)))",
+        ),
+        (
+            "single_chat_source_observation_owner",
+            "kind='single_chat'",
+            "(kind='single_chat' OR (kind='delegation_child' AND EXISTS(SELECT 1 FROM delegation d JOIN delegation_control control ON control.delegation_id=d.id WHERE d.child_conversation_id=conversation.id AND control.takeover_at IS NOT NULL AND control.takeover_message_sequence IS NOT NULL)))",
+        ),
+    ] {
+        let original: String = tx.query_row(
+            "SELECT sql FROM sqlite_schema WHERE type='trigger' AND name=?1",
+            [name],
+            |r| r.get(0),
+        )?;
+        let extended = replace_once(original, old, new)?;
+        tx.execute_batch(&format!("DROP TRIGGER {name};"))?;
+        tx.execute_batch(&extended)?;
+    }
     anyhow::ensure!(
         identity_schema_matches(tx)?,
         "Delegation identity schema admission failed"

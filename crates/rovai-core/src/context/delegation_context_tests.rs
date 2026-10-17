@@ -395,6 +395,7 @@ fn assert_delegation_materialization(fixture: &mut Fixture, legacy_private_run: 
     );
     child.takeover_sequence = Some(3);
     assert!(delegation_context::current_input(&fixture.database, &snapshot, &child).is_err());
+    assert_child_user_materials(fixture, &id, &run, legacy_private_run);
 
     fixture
         .database

@@ -100,6 +100,15 @@ MCP 校验实际成员、执行轮次、冻结目标 Runtime/版本和工作目�
 这些 SQL/投影夹具不证明已认证接管、用户草稿发送、真实 Runtime 启动或完整 D01–D32；
 用户材料 API、源观察、完整取消/恢复和阶段集成仍须另外完成。
 
+同一 owner 继续验证独立 child 草稿的 User 权限、原私聊接口拒绝 child、接管前拒绝、
+错 Thread/Conversation/CAS 拒绝、引用添加/移除/恢复、真实子 Runtime 显示名、
+原 UUID 回放/回执只读恢复和读取零写入。接管与终态通过明确 SQL 夹具准备，
+不构成真实取消、清理或接管生命周期证据。沿原 source observation 服务验证 child 接管前
+插入失败、接管后保留原来源观察；不新增 Rust owner。
+`rovai-web` 原 `public_projection_excludes_mcp_credentials_and_desktop_mutation_actions`
+owner 增补三个闭合 User composer 操作；Web client 原请求恢复及 Native 方法名单沿原 owner 回归。
+上传/附件绑定、七类动作的完整 child 场景、实际发送、Host/IPC 和 UI 仍归后续工程验证。
+
 I04 原生子代理引用扩展既有 `execution_evidence::tests::provider_packets_are_reduced_to_public_evidence_fields`
 owner，覆盖冻结 Codex adapter、明确协作事件、父会话一致性、编号类型/去重/上限、未知状态及不复制子报告/任务/路径。
 复用 `evidence_is_durable_blob_backed_agent_inaccessible_and_cancel_fenced` 的真实 SQLite/Context 夹具，

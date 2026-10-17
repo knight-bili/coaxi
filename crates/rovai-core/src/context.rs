@@ -6449,6 +6449,14 @@ fn load_current_input<R: ContextReadConnection>(
         for quote in &input.quotes {
             anyhow::ensure!(
                 quote.source.camp_id == snapshot.camp_id
+                    && quote.source.scope
+                        == if child.is_some() {
+                            "delegation_child"
+                        } else if snapshot.invocation_kind == "single_chat" {
+                            "single_chat"
+                        } else {
+                            "camp"
+                        }
                     && if snapshot.invocation_kind == "single_chat" || child.is_some() {
                         quote.source.conversation_id.as_deref()
                             == Some(snapshot.conversation_id.as_str())
@@ -9022,6 +9030,7 @@ mod tests {
 mod slow_tests {
     use super::*;
     include!("context/delegation_context_tests.rs");
+    include!("context/delegation_material_tests.rs");
     use crate::{
         agent_profile::{
             AdapterCapabilitySnapshot, AdapterKind, AdapterPermissionConfig, AgentProfileService,

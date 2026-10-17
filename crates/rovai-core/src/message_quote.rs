@@ -142,7 +142,7 @@ pub fn parse_quotes(value: &str) -> Result<Vec<MessageQuoteSnapshot>> {
                     quote.source.scope.as_str(),
                     quote.source.conversation_id.as_ref()
                 ),
-                ("camp", None) | ("single_chat", Some(_))
+                ("camp", None) | ("single_chat" | "delegation_child", Some(_))
             ),
             "quote.invalid_source"
         );
@@ -422,19 +422,21 @@ pub fn capture_quote(
         selection.text.chars().count() <= MAX_QUOTE_SCALARS,
         "quote.limit_exceeded"
     );
-    let (author_type, author_id, body, revision): (String, String, String, Value) = if let Some(
-        conversation_id,
-    ) =
-        conversation_id
-    {
+    let (author_type, author_id, body, revision, private_kind): (
+        String,
+        String,
+        String,
+        Value,
+        Option<String>,
+    ) = if let Some(conversation_id) = conversation_id {
         let row = transaction.query_row(
-            "SELECT m.author_type, m.author_id, m.body, m.created_at FROM conversation_message m
+            "SELECT m.author_type, m.author_id, m.body, m.created_at, c.kind FROM conversation_message m
              JOIN conversation c ON c.id=m.conversation_id
-             WHERE m.id=?1 AND m.conversation_id=?2 AND c.camp_id=?3 AND c.kind='single_chat' AND c.ended_at IS NULL",
+             WHERE m.id=?1 AND m.conversation_id=?2 AND c.camp_id=?3 AND c.kind IN ('single_chat','delegation_child') AND c.ended_at IS NULL",
             params![selection.message_id, conversation_id, camp_id],
-            |row| Ok((row.get::<_,String>(0)?, row.get::<_,String>(1)?, row.get::<_,String>(2)?, row.get::<_,String>(3)?))
+            |row| Ok((row.get::<_,String>(0)?, row.get::<_,String>(1)?, row.get::<_,String>(2)?, row.get::<_,String>(3)?, row.get::<_,String>(4)?))
         ).optional()?.context("quote.source_unavailable")?;
-        (row.0, row.1, row.2, json!(row.3))
+        (row.0, row.1, row.2, json!(row.3), Some(row.4))
     } else {
         let row = transaction
             .query_row(
@@ -459,6 +461,7 @@ pub fn capture_quote(
             row.1,
             body,
             json!({"version":row.3,"content":content}),
+            None,
         )
     };
     ensure!(body == selection.body_at_selection, "quote.source_changed");
@@ -467,11 +470,20 @@ pub fn capture_quote(
             display_name: "用户".into(),
         },
         "agent" => MessageQuoteAuthor::Agent {
-            display_name: transaction.query_row(
-                "SELECT display_name FROM agent_profile WHERE id=?1",
-                [&author_id],
-                |row| row.get(0),
-            )?,
+            display_name: if private_kind.as_deref() == Some("delegation_child") {
+                crate::delegation_policy::child_display_name(
+                    transaction,
+                    camp_id,
+                    conversation_id.context("quote.invalid_source")?,
+                    &author_id,
+                )?
+            } else {
+                transaction.query_row(
+                    "SELECT display_name FROM agent_profile WHERE id=?1",
+                    [&author_id],
+                    |row| row.get(0),
+                )?
+            },
             agent_id: author_id,
         },
         _ => anyhow::bail!("quote.source_not_supported"),
@@ -520,12 +532,7 @@ pub fn capture_quote(
         "quote.projection_mismatch"
     );
     let source = MessageQuoteSource {
-        scope: if conversation_id.is_some() {
-            "single_chat"
-        } else {
-            "camp"
-        }
-        .into(),
+        scope: private_kind.as_deref().unwrap_or("camp").into(),
         camp_id: camp_id.into(),
         conversation_id: conversation_id.map(str::to_owned),
         message_id: selection.message_id.clone(),
@@ -834,6 +841,23 @@ pub(crate) fn prepare_quote_mutation(
         "quote.limit_exceeded"
     );
     parse_quotes(&serde_json::to_string(&quotes)?)?;
+    let expected_scope = if let Some(conversation) = conversation_id {
+        transaction.query_row("SELECT kind FROM conversation WHERE id=?1 AND camp_id=?2 AND kind IN ('single_chat','delegation_child')",
+            params![conversation,camp_id], |r|r.get::<_,String>(0)).optional()?.context("quote.owner_mismatch")?
+    } else {
+        "camp".to_string()
+    };
+    for quote in quotes
+        .iter()
+        .chain(trash.iter().map(|removed| &removed.quote))
+    {
+        ensure!(
+            quote.source.scope == expected_scope
+                && quote.source.camp_id == camp_id
+                && quote.source.conversation_id.as_deref() == conversation_id,
+            "quote.owner_mismatch"
+        );
+    }
     Ok((quotes, serde_json::to_string(&trash)?))
 }
 

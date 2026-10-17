@@ -57,6 +57,9 @@ export const WEB_OPERATIONS = [
   'singleChat.pendingInputs.edit',
   'singleChat.composerDraft.removeAttachment',
   'singleChat.composerDraft.mutate',
+  'delegations.composer.get',
+  'delegations.composer.mutate',
+  'delegations.composer.recovery',
   'singleChat.composerDraft.recovery',
   'skills.content.read',
   'skills.import.inspect',
@@ -219,6 +222,7 @@ const RECONCILABLE_COMMANDS = new Set<WebOperation>([
 
   'singleChat.open', 'singleChat.send', 'singleChat.end', 'singleChat.pendingInputs.edit',
   'singleChat.composerDraft.mutate',
+  'delegations.composer.mutate',
   'skills.import.commit',
   'skills.setEnabled',
   'skills.setGroupAssignments',
@@ -254,7 +258,7 @@ const RECONCILABLE_COMMANDS = new Set<WebOperation>([
 ])
 
 function commandGroup(operation: WebOperation, params: unknown): string {
-  if (operation !== 'singleChat.composerDraft.mutate' && operation !== 'singleChat.pendingInputs.edit' && operation !== 'singleChat.send') return operation
+  if (operation !== 'singleChat.composerDraft.mutate' && operation !== 'delegations.composer.mutate' && operation !== 'singleChat.pendingInputs.edit' && operation !== 'singleChat.send') return operation
   const command = params && typeof params === 'object' && 'command' in params ? params.command : null
   if (!command || typeof command !== 'object') return operation
   const input = command as { threadId?: string; campId?: string; conversationId?: string; composerScope?: unknown }
@@ -628,7 +632,7 @@ export class ConsoleClient {
     })
   }
 
-  async retryPendingCommand(operation: 'singleChat.composerDraft.mutate' | 'singleChat.pendingInputs.edit' | 'singleChat.send', params: unknown): Promise<void> {
+  async retryPendingCommand(operation: 'singleChat.composerDraft.mutate' | 'delegations.composer.mutate' | 'singleChat.pendingInputs.edit' | 'singleChat.send', params: unknown): Promise<void> {
     const id = params && typeof params === 'object' && 'commandId' in params ? params.commandId : undefined
     const entry = typeof id === 'string' ? this.#pending.get(id) : undefined
     if (!entry) { await this.request(operation, structuredClone(params)); return }
