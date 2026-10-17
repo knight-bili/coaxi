@@ -48,4 +48,10 @@ User resume已编码Core/两端运输/原请求恢复：独立User授权支持�
 
 当前完整迁移源码 `49e084b38` 的[启动升级分项证据](../../../integration/execution/i04-delegation-startup-result.json)：登记Core v1.73/160/210，两条初始化链、旧159与旧140同文件迁移、结构/回执/标记故障回滚、旧选择1/排队选择2保持及历史回执清理后的技能包能力。13项原Rust owner与10项文档测试通过，19个源码文件/53份日志及6份批准工件核定；不新增owner、不作为完整Host/Runtime或阶段完成证据。
 
+授权票据和中断恢复的[分项证据](../../../integration/execution/i04-delegation-authority-result.json)对应源码 `5491b025d`：
+真实159票据升级、210回执失败整步回滚、重新准入/原库重开，以及210前/提交后和六个原历史分支的测试子进程中断恢复通过。
+共7个原Rust owner取得定向成功结果；原批4通过/1失败如实保留，失败的进程owner修复后单独复验通过，不重跑全部历史来源。
+两个测试准备修正限于私有临时目录/文件创建及无额外定义时恢复原SQL排版；生产安全规则和原库事务迁移架构不变。
+没有新建普通升级快照/切换流程，没有完整Host/Fleet/App或模型运行；真实执行、重启未结活动、cleanup、原UI及其他I04工作继续。
+
 依赖与客户事项以[执行计划](../../../integration/execution/i04-execution-plan.md)和[客户待办](../../../integration/execution/customer-todos.json)为准。
