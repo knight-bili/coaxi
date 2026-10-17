@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "stage": "I03",
+  "checked_at": "2026-10-17T02:54:37.773588+00:00",
+  "batch": "I03-stage-platform-batch-20261017",
+  "original_dispatch": "i03-stage-platform-batch.json",
+  "previous_snapshot": {
+    "path": "integration/integration/execution/i03-stage-platform-result.json",
+    "sha256": "35de5eac8c53d88feb908852126f6d8a2827edd24082d44a53f23e6f5c5b0f24"
+  },
+  "source_commit": "a672ad1bf1cfff78d68b4eecf6436af3e5032a29",
+  "linux": {
+    "run_id": 38991417893,
+    "url": "https://github.com/knight-bili/codeg-rovai-workbench/actions/runs/38991417893",
+    "status": "completed",
+    "conclusion": "failure",
+    "default_workspace_tests": "passed",
+    "extended_database_tests": {
+      "passed": 109,
+      "failed": 2
+    },
+    "failed_tests": [
+      "db::tests::database_contract_preflight_admits_current_and_rejects_future_store",
+      "db::tests::legacy_feishu_migration_marker_collision_reconciles_without_quarantine"
+    ],
+    "cause": "slow/test admission helper routed only current-contract schema145..155 to production classifier; schema156..158 fell through historical validation ending at migration196",
+    "local_fix_commit": "d4b50885d16dccc6b285ea214f006edf15c288e4",
+    "fix": "current-contract schemas >=145 delegate to the existing production classifier; future schemas, missing current receipts and forged constraints remain rejected",
+    "local_windows_regression": {
+      "passed": 2,
+      "failed": 0
+    },
+    "remote_rerun": "not_run_accumulate_for_stage_repair_batch",
+    "evidence": [
+      {
+        "path": "i04/i03-linux-checkpoint5.json",
+        "sha256": "6a7d141dbefeda130fc24c843af5f9cf1d8320cf1d6a59c936b3bc9c3ea4c2d7"
+      },
+      {
+        "path": "i04/i03-linux-batch1-failed.log",
+        "sha256": "c8d249b423f65f784d5568915ae174b52014b1d0cd084f0b259f6f10d30a9b73"
+      },
+      {
+        "path": "i04/i03-linux-preflight-local-before.log",
+        "sha256": "8ae9e085ad90f050027e733cc41cb09c5def9a8c7d15a0528e8d3076d85ba6a6"
+      },
+      {
+        "path": "i04/i03-linux-preflight-local-fixed.log",
+        "sha256": "914d61a4ff3b0a1a51bef8f83ff36ab1925300a993ff7137696599ce0241a648"
+      },
+      {
+        "path": "i04/i03-linux-legacy-marker-local-fixed.log",
+        "sha256": "80bd6e87435e75b7b404c95f2a7783abb5d87b20a54e76e221f0880552807b33"
+      }
+    ]
+  },
+  "macos": {
+    "run_id": 38991420493,
+    "status": "completed",
+    "conclusion": "failure",
+    "architectures": [
+      "arm64",
+      "x64"
+    ],
+    "core_desktop_web_compilation": "passed_both_architectures",
+    "native_and_web_live": "failed_at_fixture_seeded_project_sidebar_visibility_before_real_shared_editor_checks",
+    "failure": "fixture creates a directory-bound Camp through Core after initial legacy import, but never registers the directory with Desktop Main navigation preferences; the saved directory projection correctly omits it",
+    "source_proof": [
+      "scripts/lib/host-web-live.test.mjs:58 before repair",
+      "apps/desktop/src/renderer/src/new-conversation-preferences.ts:255",
+      "apps/desktop/src/renderer/src/BusinessApp.tsx:1426",
+      "apps/desktop/src/preload/index.ts:362"
+    ],
+    "local_fix_commit": "c86110fece68ee6b9bac5b408644017d2b981c26",
+    "fix": "register the seeded project through original Main API and assert saved membership; retain actual click/reauth/editor assertions; capture general Desktop failure state and screenshots in artifacts",
+    "local_checks": {
+      "navigation_related_tests": 29,
+      "node_syntax": "passed",
+      "diff_check": "passed",
+      "codegraph_sync": "passed"
+    },
+    "fixed_macos_rerun": "not_run_accumulate_for_next_stage_repair_batch",
+    "qualification": "compile success only; do not mark real Mac editor checks or all I03 platform cases passed",
+    "failure_evidence_privacy_commit": "a5fb8e13f01e0db454caa4dbeeb188e98d891725",
+    "failure_evidence_privacy": "hide temporary remote/login credential inputs before exporting a failure screenshot; skip screenshot when hiding fails",
+    "repaired_source_files": [
+      {
+        "path": "integration/scripts/lib/host-web-live.test.mjs",
+        "sha256": "20eae741b13ff676a445982be77a29c01903707ed01e91a72dc7f845cf1925ad"
+      },
+      {
+        "path": "integration/.github/workflows/workbench-native-web.yml",
+        "sha256": "ff7b6cffcc84e710051978edc01175684b5d4fc0c1f894fb63c1fa7b06ae8677"
+      }
+    ]
+  },
+  "new_runs_or_reruns": 0,
+  "qualification": "Linux and Mac failures remain remote pending after local fixes; preserve I03 R01-R10 local closeout and original stage dispatch/results.",
+  "next": "汇集修复后进行必要的阶段修复批次，不逐小功能触发 Actions；继续 I04。"
+}

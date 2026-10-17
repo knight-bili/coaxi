@@ -1,0 +1,329 @@
+{
+  "schema_version": 1,
+  "stage": "I04",
+  "task": "I04-T04",
+  "checked_at": "2026-10-17T02:54:37.773588+00:00",
+  "status": "single_occurrence_stop_locally_verified_full_package_pending",
+  "implementation_commit": "d4b50885d16dccc6b285ea214f006edf15c288e4",
+  "problem": "原 Codeg 能停止历史中的单次定时运行；融合后的 Rovai 原历史页只有打开会话入口。",
+  "change": "复用原历史行及 Codeg 紧凑停止入口，经 Desktop/Web User 命令交给 Core 精确停止原 occurrence；保留历史、原回执及后继清理门禁。",
+  "authority": "rovai-core",
+  "command": {
+    "method": "automations.cancelRun",
+    "domain_command": "automation.run.cancel",
+    "actor": "User only",
+    "identity": "original commandId + automationId + runId; unknown receipts reconcile the original request"
+  },
+  "schema": {
+    "from": 158,
+    "to": 159,
+    "migration": 209,
+    "data_contract": "v1.72",
+    "change": "closed automation_run.reason adds user_requested_automation_stop; preserve actual rows, receipts, indexes, triggers and foreign keys"
+  },
+  "verified_boundaries": [
+    "reject non-User actors and mismatched definition/occurrence",
+    "stop the exact waiting Delivery or claimed Run, retain legacy Turn association",
+    "replay the original UUID and preserve completed results against late stop",
+    "an old stop does not target a later run and does not pause the definition",
+    "migration rollback preserves actual rows and receipts; forged reason constraints are rejected",
+    "stop bypasses the long main queue; existing cancellation and scheduler notifications are retained",
+    "stop retry uses identical commandId and payload; history and original conversation remain accessible"
+  ],
+  "checks": {
+    "core_automation_existing_tests": {
+      "passed": 9,
+      "failed": 0,
+      "new_test_owners": 0
+    },
+    "canvas_migration_existing_test": {
+      "passed": 1,
+      "failed": 0
+    },
+    "linux_failure_tests_reproduced_and_repaired_on_windows": {
+      "passed": 2,
+      "failed": 0,
+      "remote_rerun": "not_run"
+    },
+    "related_typescript_tests": {
+      "passed": 43,
+      "files": 3
+    },
+    "typescript_no_emit": "passed",
+    "rust_format": "passed",
+    "core_host_web_typecheck": "passed_not_full_binary_build",
+    "actual_chrome_production_renderer_memory_rpc": {
+      "passed": 6,
+      "failed": 0
+    },
+    "fixed_rovai_editor_same_scene_baseline": {
+      "passed": 2,
+      "failed": 0
+    },
+    "visual_review": "day/night before comparison plus stopped state inspected; layout retained",
+    "documentation_version_and_decisions": "passed",
+    "scope_and_foundation": "passed",
+    "codegraph_sync": "passed"
+  },
+  "ui_source": {
+    "rovai_commit": "cc465dda562536b94f23787759e3206324baa29e",
+    "codeg_commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+    "rovai_editor_before_change_normalized_sha256": "01147c00c60e2bfc37e0814792225233e0a7f9dce5e977b59ae64456214139d1",
+    "source_files": [
+      {
+        "path": "source-reference/rovai-ai/apps/desktop/src/renderer/src/AutomationEditor.tsx",
+        "sha256": "01147c00c60e2bfc37e0814792225233e0a7f9dce5e977b59ae64456214139d1"
+      },
+      {
+        "path": "source-reference/codeg/src/components/automations/automations-page.tsx",
+        "sha256": "5606be928bd2813c420993323210bea460481f4af753929e525be333846d7b17"
+      },
+      {
+        "path": "source-reference/codeg/src-tauri/src/commands/automation.rs",
+        "sha256": "99c416cb2c1c97c7324109743752edba74d45018b6a5f52bc37b9f490233d7e4"
+      }
+    ],
+    "comparison": "same full production AutomationWorkspace; baseline substitutes only the fixed donor AutomationEditor, which matches the prior production editor after newline normalization",
+    "screenshots": [
+      {
+        "path": "i04/automation-stop-ui-r1/source/day-before.png",
+        "sha256": "6e2d747d366b6e924d66537a7dc7339539eb3c146ba0520f209701c91df81ebd"
+      },
+      {
+        "path": "i04/automation-stop-ui-r1/source/night-before.png",
+        "sha256": "b881eadd671017e57121c5293c4f8c2963b1e3f98b15f4b1feea49c980e008f9"
+      },
+      {
+        "path": "i04/automation-stop-ui-r1/current/day-before.png",
+        "sha256": "f98226598ed9187622d4933fb1e78cc476f8701abac913db3d3b81b126319f8d"
+      },
+      {
+        "path": "i04/automation-stop-ui-r1/current/night-before.png",
+        "sha256": "0526e6a83535d3050ffebbf5ea7e8443a0825055f8974ec7f7d016154afa2bb8"
+      },
+      {
+        "path": "i04/automation-stop-ui-r1/current/night-stopped.png",
+        "sha256": "96975f371d52978269dce88c153ff159f1057f2fb7495296a13c07114da24d3e"
+      }
+    ]
+  },
+  "initial_failures_resolved": [
+    "ordinary shell lacked cl.exe; used existing local MSVC/SDK wrapper without installation",
+    "red Core test exposed closed SQL reason CHECK; added migration 209 rather than mislabeling user stop",
+    "first browser fixture server watched a running Cargo exe and exited on EBUSY; test server now ignores generated target/local paths",
+    "current foundation snapshot was still schema 158; updated current snapshot only, fixed donor evidence unchanged"
+  ],
+  "not_proven": [
+    "real Host round trip and physical Runtime termination/cleanup for this new command",
+    "new production Desktop package, platform matrix or customer-use acceptance",
+    "full I04-T04 memory/automation package or all 84 I04 formal scenarios"
+  ],
+  "scope": {
+    "source_feature_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_formal_cases": 84,
+    "new_formal_cases_passed": 0
+  },
+  "model_input_change": false,
+  "new_model_tools": false,
+  "external_models_used": false,
+  "new_push": false,
+  "new_actions": false,
+  "preview": "frozen I03 rc25 remains unchanged; new feature is not staged into that preview",
+  "source_files": [
+    {
+      "path": "integration/apps/desktop/src/main/index.ts",
+      "sha256": "ec6681ec4776d87c9c20ff882d64cd2cf96810c4c2fca0167acdd9b8927fcb82"
+    },
+    {
+      "path": "integration/apps/desktop/src/renderer/src/AutomationEditor.tsx",
+      "sha256": "ebe618cae82843f06fb1b7fd1bf51f0959665aca8b2facba04a9c7d728f11f9c"
+    },
+    {
+      "path": "integration/apps/desktop/src/renderer/src/automation-workspace-model.ts",
+      "sha256": "c57e0fc047baf81d41e0feaecbe280c51f00832ffab3b4e52e72365c115eff20"
+    },
+    {
+      "path": "integration/apps/desktop/src/renderer/src/locales/en.json",
+      "sha256": "98e79ef71ead0a1a4e8c8ff6981fe81ee91122d210cd18633e2a1dcecd8ba0f7"
+    },
+    {
+      "path": "integration/apps/desktop/src/renderer/src/styles.css",
+      "sha256": "2f40920850db9a05d7c8fa61fe11beb4b850a624cc0c77f691d1bca249a929b9"
+    },
+    {
+      "path": "integration/apps/web/src/client.test.ts",
+      "sha256": "1535cad31ead4d128a80a63149523ff9463f53e36e09726808db7010b2c2e0be"
+    },
+    {
+      "path": "integration/apps/web/src/client.ts",
+      "sha256": "cc004fb44f00896fd33cd70783eb8ee401a61385240e19325d8e299f959f7501"
+    },
+    {
+      "path": "integration/crates/rovai-core/src/application.rs",
+      "sha256": "ab2bdb4ae9e0701a2c1d48b556ef29a4d510d50143c3e405ee77f9968692ab42"
+    },
+    {
+      "path": "integration/crates/rovai-core/src/application/web_commands.rs",
+      "sha256": "4d5cbc8348415a8a40d147026769bd8a573dd1adf151982bb8e2757b9653b76f"
+    },
+    {
+      "path": "integration/crates/rovai-core/src/automation.rs",
+      "sha256": "c6cae65a4cebbc377483c3bade534276535e04278f370e68bae090bb8819a32d"
+    },
+    {
+      "path": "integration/crates/rovai-core/src/db.rs",
+      "sha256": "4fae23fd11b6a3ad8babfcf3f974d0575cc431ee9ced177649423313733e8a23"
+    },
+    {
+      "path": "integration/crates/rovai-core/src/db_automation_run_control.rs",
+      "sha256": "d67f5dabbd2fc5bf3e96803e3c615bf79866f9778b40dee29b9afff822dcdf35"
+    },
+    {
+      "path": "integration/crates/rovai-core/src/db_canvas_files.rs",
+      "sha256": "87c738988a38599735f5b91c25b6fe8073f8a336e627745861fa2fd034d8474c"
+    },
+    {
+      "path": "integration/crates/rovai-core/src/db_canvas_objects.rs",
+      "sha256": "152b732db9c378a4976b9b27bd32ee556b79510f2b6e753c93eb9f9ad032db15"
+    },
+    {
+      "path": "integration/crates/rovai-core/src/runtime.rs",
+      "sha256": "078ab6cf70bd3720050d66f38b9690bac5ea621123a48376ed0db3358a2164a9"
+    },
+    {
+      "path": "integration/crates/rovai-web/src/operations.rs",
+      "sha256": "49f676d00e7bfa815280a81f66b31f07ab3cff71a5e463e67d5094322865c519"
+    },
+    {
+      "path": "integration/docs/contracts/README.md",
+      "sha256": "19d4a44d2592ab02506a74d2ea384eee5d918a3bda74394edf8bee5e4b203033"
+    },
+    {
+      "path": "integration/docs/contracts/automation-run-control-v1.md",
+      "sha256": "f850a95bfa998f521f668ff432b2614783c68efba25d16468bdd6a2282f61117"
+    },
+    {
+      "path": "integration/docs/development/testing.md",
+      "sha256": "8c056d3e3c629fc444d8914b2d9898d4943a9753c889648a69eb8a758d73b749"
+    },
+    {
+      "path": "integration/docs/ui/components/automation-workspace.md",
+      "sha256": "27e0a21d4addfd3a5b882944944e90a01ade933c3ba7ab510b9d64af6a79507f"
+    },
+    {
+      "path": "integration/docs/versions/v1.72/README.md",
+      "sha256": "20ef0d2e9f3285b8f4a8a93458039e708ff1a0feab2b39e0a2b19d99f87e1ee9"
+    },
+    {
+      "path": "integration/integration/foundation/current-protocol.json",
+      "sha256": "778cf225bbb955346d7a7e9b024216627992be6a136159ff5dcc405d0ea39f7c"
+    },
+    {
+      "path": "integration/integration/planning/feature-ledger.csv",
+      "sha256": "5832b49e86978871654a982967125cb9f5270de346f5be01361e75f1d72f05a6"
+    },
+    {
+      "path": "integration/integration/planning/features.json",
+      "sha256": "473007afbfcac2228959853f04ea2cb1478da5a0cd29dcb6f295c98f9487cd52"
+    },
+    {
+      "path": "integration/integration/planning/work-packages.json",
+      "sha256": "a93e8234180479a2125cb97a75e653d9f6949480f9b4f138b86419decba29cb1"
+    },
+    {
+      "path": "integration/packages/contracts/src/index.ts",
+      "sha256": "cbfedd00d8b78b465fd016f935ea0def6f1109de718611ea5b07c80b0c4abd84"
+    },
+    {
+      "path": "integration/scripts/fixtures/automation-workspace/renderer.tsx",
+      "sha256": "e9e235038a889dcf0f6994614c641682a23ab4dafdb0bd402b30d6c13c4745d2"
+    }
+  ],
+  "logs": [
+    {
+      "path": "i04/automation-stop-core-owner-msvc.log",
+      "sha256": "197d0c74dd72a4ed826414b8559cf41c02026cfea196239572080500d492cf80"
+    },
+    {
+      "path": "i04/automation-stop-core-owner-migration.log",
+      "sha256": "29cf45232a113164b5e4fc556ade2762aecf586f72199f31102fff748b2d0a78"
+    },
+    {
+      "path": "i04/automation-stop-core-related-current.log",
+      "sha256": "574ce7284e3654783e2dbdd5c2be31fd28fbd36f198583aa94392e8edbc38834"
+    },
+    {
+      "path": "i04/automation-stop-canvas-migration-related.log",
+      "sha256": "ef5cb03369a70fbf4210f2035e5d9cee08b1876c4c35196b70cd5976c1a903d9"
+    },
+    {
+      "path": "i04/automation-stop-core-host-check-final.log",
+      "sha256": "058072adfdfd2783bfa0546c0672c61b35f3dd57c8ae6a2c68cd95187803a0b4"
+    },
+    {
+      "path": "i04/automation-stop-client-tests.log",
+      "sha256": "0a5f01d60388bd44095c72a81a9237dd769f5866004739e0ebeaea886efa2b89"
+    },
+    {
+      "path": "i04/automation-stop-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "i04/automation-stop-format-final.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "i04/automation-stop-doc-version.log",
+      "sha256": "01dbc9daf44dff0600954e17b82ec917ad4998a3eb5eefa32505c4ca15a8552d"
+    },
+    {
+      "path": "i04/automation-stop-doc-decisions.log",
+      "sha256": "d58168f462b9dd5bd281a72af820169f9a7e92d02aa34b1c51c5aef9e29aa77e"
+    },
+    {
+      "path": "i04/automation-stop-scaffold.log",
+      "sha256": "f083e90a92f682cff36635984ede5675823be6579af10f30ac56cd717e724241"
+    },
+    {
+      "path": "i04/automation-stop-foundation-fixed.log",
+      "sha256": "044569df112d191be31ea876439bd2bd3294beb8d9fa469452c1bcc1ea893695"
+    },
+    {
+      "path": "i04/automation-stop-final-sync.log",
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "i04/automation-stop-current-ui-r2.log",
+      "sha256": "3fcad7a4c1dbe84af4cffd5c8eacce6f3dddfaaf194d8899735bb3b0f8cff11d"
+    },
+    {
+      "path": "i04/automation-stop-source-ui-r2.log",
+      "sha256": "b67b4be9890d92186fe44ad39cdc5db33e996e832119d9a8e0e9f45a33335ab4"
+    },
+    {
+      "path": "i04/i03-linux-preflight-local-before.log",
+      "sha256": "8ae9e085ad90f050027e733cc41cb09c5def9a8c7d15a0528e8d3076d85ba6a6"
+    },
+    {
+      "path": "i04/i03-linux-preflight-local-fixed.log",
+      "sha256": "914d61a4ff3b0a1a51bef8f83ff36ab1925300a993ff7137696599ce0241a648"
+    },
+    {
+      "path": "i04/i03-linux-legacy-marker-local-fixed.log",
+      "sha256": "80bd6e87435e75b7b404c95f2a7783abb5d87b20a54e76e221f0880552807b33"
+    }
+  ],
+  "renderer_results": [
+    {
+      "path": "i04/automation-stop-ui-r1/source/result.json",
+      "sha256": "022f179bca1db4e3c3e03f69dd1fe3ccb4a5350a48a32a916e9ffacc0b002b9f"
+    },
+    {
+      "path": "i04/automation-stop-ui-r1/current/result.json",
+      "sha256": "ab03ad88a948939cbbf57cbea0a4649e2bfacb9751e49618b5b3c8dffc39c926"
+    }
+  ],
+  "next": "继续 I04-T01 原生子会话 Core 关系/API/恢复具体设计；保留 T04 真实执行清理和阶段集中验证。"
+}
