@@ -3402,7 +3402,12 @@ mod tests {
     }
 
     fn fixture() -> (crate::test_support::OwnedTestDatabase, String) {
-        let mut database = crate::test_support::seeded_runtime_database_owned();
+        fixture_on_database(crate::test_support::seeded_runtime_database_owned())
+    }
+
+    fn fixture_on_database(
+        mut database: crate::test_support::OwnedTestDatabase,
+    ) -> (crate::test_support::OwnedTestDatabase, String) {
         let workspace = database.directory().join("workspace");
         std::fs::create_dir_all(&workspace).unwrap();
         let created = CollaborationService::default()
@@ -4200,7 +4205,8 @@ mod tests {
         assert!(!single_chat_operation_is_allowed(1, "mission.get"));
         assert!(single_chat_operation_is_allowed(2, "mission.list"));
         assert!(single_chat_operation_is_allowed(2, "mission.get"));
-        let (mut database, camp_id) = fixture();
+        let (mut database, camp_id) =
+            fixture_on_database(crate::test_support::seeded_runtime_database_v172_owned());
         let service = SingleChatService::default();
         let (conversation_id, _) =
             open(&service, &mut database, &camp_id, "single-chat-open-policy");

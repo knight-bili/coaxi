@@ -155,6 +155,11 @@ thread_local! {
     static STOP_BEFORE_PUBLIC_CONTEXT_MIGRATION_FOR_TEST: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
 }
 
+#[cfg(test)]
+thread_local! {
+    static STOP_BEFORE_DELEGATION_MIGRATION_FOR_TEST: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
 fn expand_closed_set(
     transaction: &Transaction<'_>,
     table: &str,
@@ -397,9 +402,10 @@ impl MainThreadMigrationSource {
     }
 }
 
-pub(crate) const CURRENT_DATA_CONTRACT_VERSION: &str = "v1.72";
-pub(crate) const CURRENT_PROJECTION_SCHEMA_VERSION: i64 = 159;
-const CURRENT_SCHEMA_MIGRATION_VERSION: i64 = 209;
+const V172_DATA_CONTRACT_VERSION: &str = "v1.72";
+pub(crate) const CURRENT_DATA_CONTRACT_VERSION: &str = "v1.73";
+pub(crate) const CURRENT_PROJECTION_SCHEMA_VERSION: i64 = 160;
+const CURRENT_SCHEMA_MIGRATION_VERSION: i64 = 210;
 const V147_MIGRATION_SOURCE_DATA_CONTRACT_VERSION: &str = "v1.54";
 const V147_MIGRATION_SOURCE_PROJECTION_SCHEMA_VERSION: i64 = 96;
 const V145_MIGRATION_SOURCE_DATA_CONTRACT_VERSION: &str = "v1.53";
@@ -894,7 +900,7 @@ impl CurrentMigrationState {
         if self.v196 {
             let mut previous = *self;
             previous.v196 = false;
-            return contract == CURRENT_DATA_CONTRACT_VERSION
+            return contract == V172_DATA_CONTRACT_VERSION
                 && schema == 146
                 && self.v195
                 && previous.admits("v1.72", 145, classifier);
@@ -902,7 +908,7 @@ impl CurrentMigrationState {
         if self.v195 {
             let mut previous = *self;
             previous.v195 = false;
-            return contract == CURRENT_DATA_CONTRACT_VERSION
+            return contract == V172_DATA_CONTRACT_VERSION
                 && schema == 145
                 && self.v194
                 && previous.admits("v1.72", 144, classifier);
@@ -910,7 +916,7 @@ impl CurrentMigrationState {
         if self.v194 {
             let mut previous = *self;
             previous.v194 = false;
-            return contract == CURRENT_DATA_CONTRACT_VERSION
+            return contract == V172_DATA_CONTRACT_VERSION
                 && schema == 144
                 && self.v193
                 && previous.admits("v1.72", 143, classifier);
@@ -918,7 +924,7 @@ impl CurrentMigrationState {
         if self.v193 {
             let mut previous = *self;
             previous.v193 = false;
-            return contract == CURRENT_DATA_CONTRACT_VERSION
+            return contract == V172_DATA_CONTRACT_VERSION
                 && schema == 143
                 && self.v192
                 && previous.admits("v1.72", 142, classifier);
@@ -926,7 +932,7 @@ impl CurrentMigrationState {
         if self.v192 {
             let mut previous = *self;
             previous.v192 = false;
-            return contract == CURRENT_DATA_CONTRACT_VERSION
+            return contract == V172_DATA_CONTRACT_VERSION
                 && schema == 142
                 && self.v191
                 && previous.admits("v1.72", 141, classifier);
@@ -934,7 +940,7 @@ impl CurrentMigrationState {
         if self.v191 {
             let mut previous = *self;
             previous.v191 = false;
-            return contract == CURRENT_DATA_CONTRACT_VERSION
+            return contract == V172_DATA_CONTRACT_VERSION
                 && schema == 141
                 && self.v190
                 && previous.admits("v1.72", 140, classifier);
@@ -942,7 +948,7 @@ impl CurrentMigrationState {
         if self.v190 {
             let mut previous = *self;
             previous.v190 = false;
-            return contract == CURRENT_DATA_CONTRACT_VERSION
+            return contract == V172_DATA_CONTRACT_VERSION
                 && schema == 140
                 && self.v189
                 && previous.admits("v1.72", 139, classifier);
@@ -950,7 +956,7 @@ impl CurrentMigrationState {
         if self.v189 {
             let mut previous = *self;
             previous.v189 = false;
-            return contract == CURRENT_DATA_CONTRACT_VERSION
+            return contract == V172_DATA_CONTRACT_VERSION
                 && schema == 139
                 && self.v188
                 && previous.admits("v1.72", 138, classifier);
@@ -966,7 +972,7 @@ impl CurrentMigrationState {
         if self.v187 {
             let mut previous = *self;
             previous.v187 = false;
-            return contract == CURRENT_DATA_CONTRACT_VERSION
+            return contract == V172_DATA_CONTRACT_VERSION
                 && schema == 137
                 && self.v186
                 && previous.admits("v1.72", 136, classifier);
@@ -1030,7 +1036,7 @@ impl CurrentMigrationState {
         if self.v179 {
             let mut previous = *self;
             previous.v179 = false;
-            return contract == CURRENT_DATA_CONTRACT_VERSION
+            return contract == V172_DATA_CONTRACT_VERSION
                 && schema == 129
                 && self.v178
                 && previous.admits("v1.72", 128, classifier);
@@ -1038,7 +1044,7 @@ impl CurrentMigrationState {
         if self.v178 {
             let mut previous = *self;
             previous.v178 = false;
-            return contract == CURRENT_DATA_CONTRACT_VERSION
+            return contract == V172_DATA_CONTRACT_VERSION
                 && schema == 128
                 && self.v177
                 && previous.admits("v1.72", 127, classifier);
@@ -1046,7 +1052,7 @@ impl CurrentMigrationState {
         if self.v177 {
             let mut previous = *self;
             previous.v177 = false;
-            return contract == CURRENT_DATA_CONTRACT_VERSION
+            return contract == V172_DATA_CONTRACT_VERSION
                 && schema == 127
                 && self.v176
                 && previous.admits("v1.72", 126, classifier);
@@ -3005,7 +3011,8 @@ fn connection_has_admissible_data_contract(connection: &Connection) -> rusqlite:
             // This legacy test/slow-check helper must use the production
             // classifier for later fusion schemas too. The classifier, not a
             // second list here, rejects future markers and missing current facts.
-            contract == CURRENT_DATA_CONTRACT_VERSION && *schema >= 145
+            (contract == CURRENT_DATA_CONTRACT_VERSION || contract == V172_DATA_CONTRACT_VERSION)
+                && *schema >= 145
         })
     {
         return Ok(matches!(
@@ -3411,39 +3418,70 @@ pub(crate) fn classify_database_contract(
     };
     // Current databases do not re-prove every historical migration's SQL text.
     // Older layouts retain their migration-specific source recognition below.
-    if marker.contract_version == CURRENT_DATA_CONTRACT_VERSION
-        && matches!(
-            marker.projection_schema_version,
-            145 | 146 | 147 | 148 | 149 | 150 | 151 | 152 | 153 | 154 | 155 | 156 | 157 | 158 | 159
-        )
+    if connection.query_row(
+        "SELECT EXISTS(SELECT 1 FROM schema_migration WHERE version>?1)",
+        [CURRENT_SCHEMA_MIGRATION_VERSION],
+        |row| row.get::<_, bool>(0),
+    )? {
+        return Ok(DatabaseContractClassification::Unknown(Some(marker)));
+    }
+    let delegation_current = marker.contract_version == CURRENT_DATA_CONTRACT_VERSION
+        && marker.projection_schema_version == CURRENT_PROJECTION_SCHEMA_VERSION;
+    if delegation_current
+        || (marker.contract_version == V172_DATA_CONTRACT_VERSION
+            && matches!(
+                marker.projection_schema_version,
+                145 | 146
+                    | 147
+                    | 148
+                    | 149
+                    | 150
+                    | 151
+                    | 152
+                    | 153
+                    | 154
+                    | 155
+                    | 156
+                    | 157
+                    | 158
+                    | 159
+            ))
     {
-        let expected_migration = match marker.projection_schema_version {
-            159 => CURRENT_SCHEMA_MIGRATION_VERSION,
-            158 => 208,
-            157 => 207,
-            156 => 206,
-            155 => 205,
-            154 => 204,
-            153 => 203,
-            152 => 202,
-            151 => 201,
-            150 => 200,
-            149 => 199,
-            148 => 198,
-            147 => 197,
-            146 => 196,
-            _ => 195,
+        let expected_migration = if delegation_current {
+            CURRENT_SCHEMA_MIGRATION_VERSION
+        } else {
+            match marker.projection_schema_version {
+                159 => 209,
+                158 => 208,
+                157 => 207,
+                156 => 206,
+                155 => 205,
+                154 => 204,
+                153 => 203,
+                152 => 202,
+                151 => 201,
+                150 => 200,
+                149 => 199,
+                148 => 198,
+                147 => 197,
+                146 => 196,
+                _ => 195,
+            }
         };
         let completed: bool = connection.query_row(
-            "SELECT EXISTS(SELECT 1 FROM schema_migration WHERE version=?1)",
+            "SELECT EXISTS(SELECT 1 FROM schema_migration WHERE version=?1) AND NOT EXISTS(SELECT 1 FROM schema_migration WHERE version>?1)",
             [expected_migration],
             |row| row.get(0),
         )?;
         let valid = completed
             && marker.classifier_version == V147_CLASSIFIER_VERSION
-            && delegation::source_objects_absent(connection)?
-            && (marker.projection_schema_version != 159
-                || delegation::source_matches_for_classifier(connection)?)
+            && if delegation_current {
+                delegation::matches_for_classifier(connection)?
+            } else {
+                delegation::source_objects_absent(connection)?
+                    && (marker.projection_schema_version != 159
+                        || delegation::source_matches_for_classifier(connection)?)
+            }
             && simplification::current_structure_matches(connection)?
             && (marker.projection_schema_version < 146
                 || simplification::schema_matches(connection)?)
@@ -3464,13 +3502,21 @@ pub(crate) fn classify_database_contract(
             && (marker.projection_schema_version < 152
                 || crate::canvas_board::schema_matches(connection)?)
             && (marker.projection_schema_version < 153
-                || skill_pack_context::schema_matches(connection)?)
+                || if delegation_current {
+                    skill_pack_context::schema_matches_with_delegation(connection)?
+                } else {
+                    skill_pack_context::schema_matches(connection)?
+                })
             && (marker.projection_schema_version < 154
                 || crate::canvas_node::schema_matches(connection)?)
             && (marker.projection_schema_version < 155
                 || private_composer_scope::schema_matches(connection)?)
             && (marker.projection_schema_version < 156
-                || private_source_observation::schema_matches(connection)?)
+                || if delegation_current {
+                    private_source_observation::schema_matches_with_delegation(connection)?
+                } else {
+                    private_source_observation::schema_matches(connection)?
+                })
             && (marker.projection_schema_version < 158
                 || canvas_files::schema_matches(connection)?)
             && (marker.projection_schema_version < 159
@@ -3489,7 +3535,7 @@ pub(crate) fn classify_database_contract(
                 || private_composer_scope::source_schema_matches(connection)?);
         return Ok(if !valid {
             DatabaseContractClassification::Unknown(Some(marker))
-        } else if marker.projection_schema_version == CURRENT_PROJECTION_SCHEMA_VERSION {
+        } else if delegation_current {
             DatabaseContractClassification::Current(marker)
         } else {
             DatabaseContractClassification::SupportedMigrationSource(marker)
@@ -9202,6 +9248,13 @@ impl Database {
             if !self.schema_migration_applied(209)? {
                 migration_step!("migration_209", automation_run_control::migrate(self));
             }
+            #[cfg(test)]
+            if STOP_BEFORE_DELEGATION_MIGRATION_FOR_TEST.with(|flag| flag.get()) {
+                return Ok(());
+            }
+            if !self.schema_migration_applied(210)? {
+                migration_step!("migration_210", delegation::migrate(self));
+            }
             if let Err(error) =
                 crate::notification::maintain_notification_episode_retention(self.connection())
             {
@@ -10047,6 +10100,13 @@ impl Database {
         }
         if !self.schema_migration_applied(209)? {
             migration_step!("migration_209", automation_run_control::migrate(self));
+        }
+        #[cfg(test)]
+        if STOP_BEFORE_DELEGATION_MIGRATION_FOR_TEST.with(|flag| flag.get()) {
+            return Ok(());
+        }
+        if !self.schema_migration_applied(210)? {
+            migration_step!("migration_210", delegation::migrate(self));
         }
         if let Err(error) =
             crate::notification::maintain_notification_episode_retention(self.connection())
@@ -35506,6 +35566,17 @@ fn downgrade_current_schema_to_v151_source_for_test(connection: &Connection) {
     }
 }
 
+// Real historical startup chain, stopped before 210 for migration-source tests.
+#[cfg(test)]
+pub(crate) fn open_v172_source_for_test(directory: &Path) -> Result<Database> {
+    STOP_BEFORE_DELEGATION_MIGRATION_FOR_TEST.with(|flag| {
+        let previous = flag.replace(true);
+        let result = Database::open(directory);
+        flag.set(previous);
+        result
+    })
+}
+
 #[cfg(all(test, feature = "extended-tests"))]
 pub(crate) fn open_v170_source_for_test(directory: &Path) -> Result<Database> {
     STOP_BEFORE_TASK_VERSIONLESS_MIGRATION_FOR_TEST.with(|flag| {
@@ -43725,7 +43796,9 @@ mod tests {
         assert_eq!(state, migration_state_through(196));
         assert_eq!(schema, CURRENT_PROJECTION_SCHEMA_VERSION);
         // The historical receipt walker stops at 196; current admission owns later catalogs.
-        assert!(state.admits(&contract, 146, &classifier));
+        assert_eq!(contract, CURRENT_DATA_CONTRACT_VERSION);
+        assert!(state.admits(V172_DATA_CONTRACT_VERSION, 146, &classifier));
+        assert!(!state.admits(&contract, 146, &classifier));
         assert!(has_admissible_data_contract(
             &directory.join("rovai.sqlite")
         ));
@@ -43767,6 +43840,7 @@ mod tests {
                             [CURRENT_SCHEMA_MIGRATION_VERSION],
                         )
                         .unwrap();
+                    assert!(crate::current_input_skill::pack_context_enabled(connection).unwrap());
                 }
                 "optional_usage" => {
                     connection

@@ -172,7 +172,7 @@ pub(crate) fn child_with_task(
 
 #[test]
 fn identity_graph_preserves_core_rows_and_fences_scope_replay_depth_and_takeover() {
-    let mut database = crate::test_support::seeded_runtime_database_owned();
+    let mut database = crate::test_support::seeded_runtime_database_v172_owned();
     let directory = database.directory().to_path_buf();
     let workspace = directory.join("workspace");
     std::fs::create_dir_all(&workspace).unwrap();
@@ -324,10 +324,14 @@ fn identity_graph_preserves_core_rows_and_fences_scope_replay_depth_and_takeover
     connection
         .execute_batch("DROP TABLE delegation_control;")
         .unwrap();
-    let tx = connection.unchecked_transaction().unwrap();
-    crate::db::delegation::install_identity_schema(&tx).unwrap();
-    tx.commit().unwrap();
     connection.execute_batch("PRAGMA foreign_keys=ON;").unwrap();
+    // Reopen this same populated159 file through the actual old-database
+    // startup chain. This is another handle, not another Core fixture.
+    let upgraded = crate::db::Database::open(&directory).unwrap();
+    assert!(
+        matches!(crate::db::classify_database_contract(upgraded.connection()).unwrap(),crate::db::DatabaseContractClassification::Current(ref marker) if marker.contract_version=="v1.73" && marker.projection_schema_version==160)
+    );
+    drop(upgraded);
     assert!(crate::db::delegation::identity_schema_matches(connection).unwrap());
     crate::db::delegation::checks::target(connection);
     let tx = connection.unchecked_transaction().unwrap();

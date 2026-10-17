@@ -24,12 +24,21 @@ pub(crate) fn pack_context_enabled(connection: &Connection) -> Result<bool> {
         [],
         |row| row.get(0),
     )?;
-    Ok(present
+    if present
         && connection.query_row(
             "SELECT EXISTS(SELECT 1 FROM schema_migration WHERE version=203)",
             [],
             |row| row.get(0),
-        )?)
+        )?
+    {
+        return Ok(true);
+    }
+    // A completely admitted successor contract may retain only its current
+    // receipt. Do not disable packs or create legacy input in that database.
+    Ok(present
+        && matches!(crate::db::classify_database_contract(connection)?,
+        crate::db::DatabaseContractClassification::Current(ref marker)
+            if marker.contract_version=="v1.73" && marker.projection_schema_version==160))
 }
 
 pub(crate) fn empty_selection(connection: &Connection) -> Result<SkillSelectionSnapshot> {

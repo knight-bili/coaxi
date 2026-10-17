@@ -31,6 +31,12 @@ pub(super) fn source_schema_matches(connection: &Connection) -> rusqlite::Result
         AND NOT EXISTS(SELECT 1 FROM schema_migration WHERE version=206)", [], |row|row.get(0))
 }
 pub(super) fn schema_matches(connection: &Connection) -> rusqlite::Result<bool> {
+    schema_matches_impl(connection, false)
+}
+pub(super) fn schema_matches_with_delegation(connection: &Connection) -> rusqlite::Result<bool> {
+    schema_matches_impl(connection, true)
+}
+fn schema_matches_impl(connection: &Connection, delegation: bool) -> rusqlite::Result<bool> {
     for (name, expected) in [
         ("single_chat_source_observation", TABLE_SQL),
         ("single_chat_source_observation_owner", OWNER_GUARD_SQL),
@@ -39,6 +45,12 @@ pub(super) fn schema_matches(connection: &Connection) -> rusqlite::Result<bool> 
             IMMUTABLE_GUARD_SQL,
         ),
     ] {
+        if delegation && name == "single_chat_source_observation_owner" {
+            if !super::delegation::modified_guard_matches(connection, name)? {
+                return Ok(false);
+            }
+            continue;
+        }
         let actual: Option<String> = connection
             .query_row(
                 "SELECT sql FROM sqlite_schema WHERE name=?1",

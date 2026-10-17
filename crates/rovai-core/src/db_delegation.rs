@@ -1,4 +1,4 @@
-//! Complete delegation schema delta and source checks for pending160/210. No startup registration.
+//! Complete delegation migration and exact source/target schema admission.
 use super::*;
 
 const IDENTITY_SQL: &str = include_str!("delegation_schema.sql");
@@ -7,8 +7,15 @@ const IDENTITY_SQL: &str = include_str!("delegation_schema.sql");
 #[cfg(all(test, feature = "extended-tests"))]
 #[path = "db_delegation_shape_tests.rs"]
 pub(crate) mod checks;
+#[cfg(test)]
+#[path = "db_delegation_fixture.rs"]
+mod fixture;
 #[path = "db_delegation_shape.rs"]
 mod shape;
+#[cfg(test)]
+pub(crate) fn downgrade_for_test(connection: &Connection) {
+    fixture::downgrade(connection).expect("legacy fixture must retain exact schema159 source");
+}
 const MODIFIED_GUARDS: &[&str] = &[
     "context_manifest_v34_only_insert",
     "context_manifest_quote_profile_insert",
@@ -87,6 +94,65 @@ pub(crate) fn source_schema_matches(connection: &Connection) -> Result<bool> {
 pub(crate) fn source_matches_for_classifier(connection: &Connection) -> rusqlite::Result<bool> {
     source_schema_matches(connection)
         .map_err(|error| rusqlite::Error::ToSqlConversionFailure(error.into()))
+}
+
+pub(super) fn matches_for_classifier(connection: &Connection) -> rusqlite::Result<bool> {
+    schema_matches(connection)
+        .map_err(|error| rusqlite::Error::ToSqlConversionFailure(error.into()))
+}
+
+pub(super) fn modified_guard_matches(
+    connection: &Connection,
+    name: &str,
+) -> rusqlite::Result<bool> {
+    let expected = shape::target_guard(name)
+        .map_err(|error| rusqlite::Error::ToSqlConversionFailure(error.into()))?;
+    let actual: Option<String> = connection
+        .query_row(
+            "SELECT sql FROM sqlite_schema WHERE type='trigger' AND name=?1",
+            [name],
+            |row| row.get(0),
+        )
+        .optional()?;
+    Ok(actual.is_some_and(|actual| shape::equivalent(&actual, &expected)))
+}
+
+pub(super) fn migrate(database: &mut Database) -> Result<()> {
+    migrate_connection(database.connection())
+}
+
+pub(crate) fn migrate_connection(connection: &Connection) -> Result<()> {
+    anyhow::ensure!(
+        connection.is_autocommit(),
+        "Delegation migration requires an idle connection"
+    );
+    if matches!(classify_database_contract(connection)?, DatabaseContractClassification::Current(ref marker)
+        if marker.contract_version==CURRENT_DATA_CONTRACT_VERSION && marker.projection_schema_version==160)
+    {
+        return Ok(());
+    }
+    connection.execute_batch("PRAGMA foreign_keys=OFF;")?;
+    let result = (|| -> Result<()> {
+        let tx = Transaction::new_unchecked(connection, TransactionBehavior::Immediate)?;
+        install_identity_schema(&tx)?;
+        tx.execute(
+            "INSERT INTO schema_migration VALUES(210,datetime('now'))",
+            [],
+        )?;
+        let updated=tx.execute("UPDATE rovai_data_contract SET contract_version=?1,projection_schema_version=160,updated_at=datetime('now') WHERE singleton=1 AND contract_version='v1.72' AND projection_schema_version=159",[CURRENT_DATA_CONTRACT_VERSION])?;
+        anyhow::ensure!(updated == 1, "Delegation migration source marker changed");
+        anyhow::ensure!(
+            matches!(classify_database_contract(&tx)?,DatabaseContractClassification::Current(ref marker)
+            if marker.contract_version==CURRENT_DATA_CONTRACT_VERSION && marker.projection_schema_version==160),
+            "Delegation migration target admission failed"
+        );
+        tx.commit()?;
+        Ok(())
+    })();
+    let restore = connection
+        .execute_batch("PRAGMA foreign_keys=ON;")
+        .map_err(anyhow::Error::from);
+    result.and(restore)
 }
 
 pub(crate) fn source_objects_absent(connection: &Connection) -> rusqlite::Result<bool> {

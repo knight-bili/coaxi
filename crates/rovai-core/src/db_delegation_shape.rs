@@ -170,6 +170,111 @@ pub(super) fn target_guard(name: &str) -> Result<String> {
             .context("Missing compiled source guard")?,
     )
 }
+
+#[cfg(test)]
+pub(super) fn source_guard(name: &str) -> Result<String> {
+    source()?
+        .guards
+        .remove(name)
+        .context("Missing compiled source guard")
+}
+
+// Only historical test fixtures go backwards. Preserve all actual columns and
+// unrelated constraints; reverse the same changed definitions used forwards.
+#[cfg(test)]
+pub(super) fn legacy_table(name: &str, actual: &str) -> Result<String> {
+    fn groups(sql: &str) -> Result<(usize, usize, Vec<String>)> {
+        let ts = spans(sql).context("Invalid fixture schema")?;
+        let first = ts
+            .iter()
+            .position(|t| t.0 == "(")
+            .context("Missing table body")?;
+        let mut depth = 0;
+        let mut start = first + 1;
+        let mut out = Vec::new();
+        for i in start..ts.len() {
+            match ts[i].0.as_str() {
+                "(" => depth += 1,
+                ")" if depth > 0 => depth -= 1,
+                "," if depth == 0 => {
+                    out.push(sql[ts[start].1..ts[i - 1].2].to_string());
+                    start = i + 1;
+                }
+                ")" => {
+                    if start < i {
+                        out.push(sql[ts[start].1..ts[i - 1].2].to_string());
+                    }
+                    return Ok((ts[first].2, ts[i].1, out));
+                }
+                _ => {}
+            }
+        }
+        anyhow::bail!("Unclosed fixture table body")
+    }
+    fn column(sql: &str) -> Option<String> {
+        let ts = tokens(sql)?;
+        let name = ts.first()?.strip_prefix("w:")?;
+        (!matches!(
+            name,
+            "check" | "constraint" | "foreign" | "primary" | "unique"
+        ))
+        .then(|| name.to_string())
+    }
+    let old = source()?
+        .tables
+        .remove(name)
+        .context("Unknown fixture table")?;
+    let new = extend_table(name, old.clone())?;
+    let (_, _, old_groups) = groups(&old)?;
+    let (_, _, new_groups) = groups(&new)?;
+    let old_columns = old_groups
+        .iter()
+        .filter_map(|g| column(g).map(|name| (name, g)))
+        .collect::<BTreeMap<_, _>>();
+    let changed = changed_columns(&old, &new).context("Invalid fixture column delta")?;
+    let old_constraints = old_groups
+        .iter()
+        .filter(|g| column(g).is_none())
+        .map(|g| (tokens(g).unwrap(), g))
+        .collect::<BTreeMap<_, _>>();
+    let new_constraints = new_groups
+        .iter()
+        .filter(|g| column(g).is_none())
+        .map(|g| tokens(g).unwrap())
+        .collect::<BTreeSet<_>>();
+    let (begin, end, actual_groups) = groups(actual)?;
+    let mut restored = Vec::new();
+    for group in actual_groups {
+        if let Some(name) = column(&group) {
+            if changed.contains(&name) {
+                restored.push(
+                    (*old_columns
+                        .get(&name)
+                        .context("Missing original fixture column")?)
+                    .clone(),
+                );
+                continue;
+            }
+        } else {
+            let key = tokens(&group).context("Invalid fixture constraint")?;
+            if new_constraints.contains(&key) && !old_constraints.contains_key(&key) {
+                continue;
+            }
+        }
+        restored.push(group);
+    }
+    for (key, group) in old_constraints {
+        if !new_constraints.contains(&key) {
+            restored.push(group.clone());
+        }
+    }
+    Ok(format!(
+        "{}\n{}\n{}",
+        &actual[..begin],
+        restored.join(",\n"),
+        &actual[end..]
+    ))
+}
 pub(super) fn equivalent(left: &str, right: &str) -> bool {
     tokens(left).zip(tokens(right)).is_some_and(|(l, r)| l == r)
 }

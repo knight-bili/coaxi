@@ -89,6 +89,12 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 
 ## Rust 测试准入与退役门槛
 
+I04 完整210启动迁移沿原身份owner验证同一填充159文件经真实旧库启动升级、全结构/标记/回执故障回滚、FK恢复和零写重复调用；原私聊最终回复owner覆盖新库默认启动，原preflight/分类器升级owner验证当前与旧/未来来源。
+原更早夹具沿已有209降级链先恢复159，只在无新委派记录/冻结角色时工作，复用同一delta并保留旧行/无关扩展列；不提供产品降级入口，不新建重型owner。
+原 `context::slow_tests::claimed_legacy_batch_keeps_its_format_after_mention_upgrade` 扩同一数据库的历史选择1和排队选择2，helper为 `context/delegation_legacy_upgrade_tests.rs`。
+选择1是显式合法历史数据夹具，旧源码路径先实际装配32；同一旧139文件经生产启动到160后开启新设置，验证原正文/摘要与选择/配置不变，以及原queued选择2真实Core领取后仍装配32。
+Native执行与ACK仍为原夹具边界，数据升级通过不代替真实Host/Runtime或完整正式场景；不增加Rust owner或在该owner另建Core全库。
+
 I04 私聊policy3扩展原 `single_chat::tests::built_in_policy_is_a_closed_allowlist_and_restart_cancels_only_the_reply`，
 helper为 `single_chat_policy3_tests.rs`，复用同一Core数据库，不新增owner。
 验证新Run真实配置冻结、旧Run不补权、闭合操作/别名、历史零写入、版本不可变和非法角色的工具/历史/终态拒绝，以及正常私有回复不写公屏。

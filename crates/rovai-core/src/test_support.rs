@@ -231,6 +231,20 @@ pub(crate) fn seeded_runtime_database_owned() -> OwnedTestDatabase {
     )
 }
 
+pub(crate) fn seeded_runtime_database_v172_owned() -> OwnedTestDatabase {
+    let directory = unique_directory("seeded-v172");
+    let database = crate::db::open_v172_source_for_test(&directory).unwrap();
+    configure_test_runtime(&database, &["agent_1", "agent_2", "agent_3"]);
+    OwnedTestDatabase::new(database, directory)
+}
+
+#[cfg(feature = "slow-tests")]
+pub(crate) fn fresh_v172_database() -> (Database, PathBuf) {
+    let directory = unique_directory("fresh-v172");
+    let database = crate::db::open_v172_source_for_test(&directory).unwrap();
+    (database, directory)
+}
+
 #[cfg(feature = "extended-tests")]
 pub(crate) fn seeded_runtime_database_v170_owned() -> OwnedTestDatabase {
     let directory = unique_directory("seeded-v170");

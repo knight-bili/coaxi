@@ -19,14 +19,23 @@ fn schema(connection: &Connection, kind: &str, name: &str) -> Result<String> {
 }
 
 pub(super) fn schema_matches(connection: &Connection) -> rusqlite::Result<bool> {
+    schema_matches_impl(connection, false)
+}
+pub(super) fn schema_matches_with_delegation(connection: &Connection) -> rusqlite::Result<bool> {
+    if !super::delegation::modified_guard_matches(connection, "agent_run_input_v34_only_insert")? {
+        return Ok(false);
+    }
+    schema_matches_impl(connection, true)
+}
+fn schema_matches_impl(connection: &Connection, delegation: bool) -> rusqlite::Result<bool> {
     connection.query_row("SELECT
-        EXISTS(SELECT 1 FROM sqlite_schema WHERE name='agent_run_input_v34_only_insert' AND instr(sql,'NEW.context_manifest_version IS NOT 34')>0)
+        EXISTS(SELECT 1 FROM sqlite_schema WHERE name='agent_run_input_v34_only_insert' AND (?1 OR instr(sql,'NEW.context_manifest_version IS NOT 34')>0))
         AND EXISTS(SELECT 1 FROM sqlite_schema WHERE name='context_manifest_v34_only_insert' AND instr(sql,'NEW.run_facts_schema_version = 6')>0 AND instr(sql,'NEW.context_manifest_version = 34')>0)
         AND EXISTS(SELECT 1 FROM sqlite_schema WHERE name='context_manifest_quote_profile_insert' AND instr(sql,'NEW.context_manifest_version = 29 AND NEW.context_delivery_profile_version = 7')>0)
         AND EXISTS(SELECT 1 FROM sqlite_schema WHERE type='table' AND name='context_manifest' AND instr(sql,'context_manifest_version = 34 AND formatter_version = 34 AND run_facts_schema_version = 9')>0 AND instr(sql,'context_manifest_version = 29 AND formatter_version = 29 AND run_facts_schema_version = 6')>0)
         AND EXISTS(SELECT 1 FROM pragma_table_info('agent_run') WHERE name='skill_selection_snapshot_json' AND json_extract(trim(dflt_value,char(39)),'$.schemaVersion')=3)
         AND NOT EXISTS(SELECT 1 FROM sqlite_schema WHERE name='agent_run_input_v33_only_insert')",
-        [], |row| row.get(0))
+        [delegation], |row| row.get(0))
 }
 
 // Stream the touched rows, including NULL and raw text/blob bytes. Legacy proof

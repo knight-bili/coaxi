@@ -194,6 +194,41 @@ pub(crate) fn source(connection: &Connection) {
     tx.rollback().unwrap();
     assert_eq!(inventory(connection), before);
     connection.execute_batch("PRAGMA foreign_keys=ON;").unwrap();
+    for fault in [
+        "CREATE TEMP TRIGGER fail_delegation_receipt BEFORE INSERT ON schema_migration WHEN NEW.version=210 BEGIN SELECT RAISE(ABORT,'fixture receipt fault'); END;",
+        "CREATE TEMP TRIGGER fail_delegation_receipt BEFORE UPDATE ON rovai_data_contract WHEN NEW.projection_schema_version=160 BEGIN SELECT RAISE(ABORT,'fixture marker fault'); END;",
+        "CREATE TEMP TRIGGER fail_delegation_receipt AFTER INSERT ON schema_migration WHEN NEW.version=210 BEGIN UPDATE rovai_data_contract SET classifier_version='fixture-invalid'; END;",
+    ] {
+        connection.execute_batch(fault).unwrap();
+        assert!(migrate_connection(connection).is_err());
+        connection
+            .execute_batch("DROP TRIGGER temp.fail_delegation_receipt;")
+            .unwrap();
+        assert!(
+            connection
+                .query_row("PRAGMA foreign_keys", [], |r| r.get::<_, bool>(0))
+                .unwrap()
+        );
+        assert_eq!(
+            inventory(connection),
+            before,
+            "full migration failure rolls back schema"
+        );
+        assert!(source_schema_matches(connection).unwrap());
+        assert!(
+            matches!(classify_database_contract(connection).unwrap(),DatabaseContractClassification::SupportedMigrationSource(ref marker) if marker.contract_version=="v1.72" && marker.projection_schema_version==159)
+        );
+        assert_eq!(
+            connection
+                .query_row(
+                    "SELECT count(*) FROM schema_migration WHERE version=210",
+                    [],
+                    |r| r.get::<_, i64>(0)
+                )
+                .unwrap(),
+            0
+        );
+    }
 }
 
 pub(crate) fn target(connection: &Connection) {
@@ -201,8 +236,28 @@ pub(crate) fn target(connection: &Connection) {
     let writes = connection.total_changes();
     assert!(schema_matches(connection).unwrap());
     assert!(!source_schema_matches(connection).unwrap());
-    unknown(connection); // No premature current160/210 registration.
+    assert!(
+        matches!(classify_database_contract(connection).unwrap(),DatabaseContractClassification::Current(ref marker) if marker.contract_version=="v1.73" && marker.projection_schema_version==160)
+    );
     assert_eq!(connection.total_changes(), writes);
+    migrate_connection(connection).unwrap();
+    assert_eq!(
+        connection.total_changes(),
+        writes,
+        "already complete migration is zero-write"
+    );
+    for tamper in [
+        "DELETE FROM schema_migration WHERE version=210;",
+        "INSERT INTO schema_migration VALUES(211,datetime('now'));",
+        "UPDATE rovai_data_contract SET contract_version='v1.74';",
+        "UPDATE rovai_data_contract SET projection_schema_version=161;",
+        "UPDATE rovai_data_contract SET contract_version='v1.72',projection_schema_version=159;",
+    ] {
+        let tx = connection.unchecked_transaction().unwrap();
+        tx.execute_batch(tamper).unwrap();
+        unknown(&tx);
+        tx.rollback().unwrap();
+    }
     for name in MODIFIED_GUARDS {
         let tx = connection.unchecked_transaction().unwrap();
         fake_guard(&tx, name);
@@ -211,6 +266,7 @@ pub(crate) fn target(connection: &Connection) {
             "owned objects alone miss {name}"
         );
         assert!(!schema_matches(&tx).unwrap(), "target forged {name}");
+        unknown(&tx);
         tx.rollback().unwrap();
     }
     connection

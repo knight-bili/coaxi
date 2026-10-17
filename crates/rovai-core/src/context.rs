@@ -9030,6 +9030,7 @@ mod tests {
 mod slow_tests {
     use super::*;
     include!("context/delegation_context_tests.rs");
+    include!("context/delegation_legacy_upgrade_tests.rs");
     include!("context/delegation_material_tests.rs");
     include!("context/delegation_upload_tests.rs");
     include!("context/delegation_send_tests.rs");
@@ -9586,7 +9587,13 @@ mod slow_tests {
     }
 
     fn fixture_with_legacy_input(legacy: bool) -> Fixture {
-        let (mut database, directory) = crate::test_support::fresh_schema_database();
+        fixture_on_database(crate::test_support::fresh_schema_database(), legacy)
+    }
+
+    fn fixture_on_database(
+        (mut database, directory): (Database, std::path::PathBuf),
+        legacy: bool,
+    ) -> Fixture {
         if legacy {
             crate::db::downgrade_skill_pack_context_fixture(database.connection());
         }
@@ -11056,6 +11063,7 @@ mod slow_tests {
     #[test]
     fn claimed_legacy_batch_keeps_its_format_after_mention_upgrade() {
         let mut fixture = fixture_with_legacy_input(true);
+        let queued = queued_legacy_batch(&mut fixture);
         crate::db::downgrade_message_mentions_fixture(&fixture.database);
         crate::db::upgrade_message_mentions_fixture(&mut fixture.database);
         let store = ManagedBlobStore::new(&fixture.directory);
@@ -11111,6 +11119,14 @@ mod slow_tests {
         assert_eq!(
             replay.rendered_payload_digest,
             first.rendered_payload_digest
+        );
+        let legacy_mode = request.charter_delivery_mode;
+        assert_legacy_delegation_upgrade(
+            &mut fixture,
+            &queued,
+            &first.rendered_payload,
+            &first.rendered_payload_digest,
+            legacy_mode,
         );
         fixture.cleanup();
     }
@@ -14324,7 +14340,7 @@ mod slow_tests {
 
     #[test]
     fn single_chat_materializes_conversation_input_with_a_memory_free_bootstrap() {
-        let mut fixture = fixture();
+        let mut fixture = fixture_on_database(crate::test_support::fresh_v172_database(), false);
         let single_chat = SingleChatService::default();
         let opened = single_chat
             .open(

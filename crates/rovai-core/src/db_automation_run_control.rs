@@ -62,7 +62,7 @@ pub(super) fn migrate(database: &mut Database) -> Result<()> {
             ],
         )?;
         anyhow::ensure!(
-            matches!(classify_database_contract(&tx)?, DatabaseContractClassification::Current(ref marker) if marker.projection_schema_version==159),
+            matches!(classify_database_contract(&tx)?, DatabaseContractClassification::Current(ref marker) | DatabaseContractClassification::SupportedMigrationSource(ref marker) if marker.contract_version=="v1.72" && marker.projection_schema_version==159),
             "Automation run control admission failed"
         );
         tx.commit()?;
@@ -97,6 +97,7 @@ fn rewrite_reason(tx: &Transaction<'_>, downgrade: bool) -> Result<()> {
 
 #[cfg(test)]
 pub(super) fn downgrade_for_test(connection: &Connection) {
+    super::delegation::downgrade_for_test(connection);
     if !connection.table_exists(None, "schema_migration").unwrap()
         || !connection
             .query_row(
