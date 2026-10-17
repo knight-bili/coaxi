@@ -1,0 +1,439 @@
+{
+  "schema_version": 1,
+  "stage": "I04",
+  "task": "I04-T01",
+  "checked_at": "2026-10-17T12:39:19.831058+00:00",
+  "status": "attested_parent_and_within_parent_workspace_admission_components_verified_external_permissions_and_defaults_pending",
+  "source_commit": "1548d06706a8ce3934def2d08631cf7cf4ae8c41",
+  "implementation_baseline": "79588f1d2333851dae7a927dd3e06113dfc9a7fa",
+  "confirmation_record": "i04-delegation-r1-confirmation.json",
+  "runtime_data_contract": {
+    "version": "v1.72",
+    "schema": 159,
+    "migration": 209
+  },
+  "target_data_contract": {
+    "version": "v1.73",
+    "schema": 160,
+    "migration": 210,
+    "status": "not_registered"
+  },
+  "pending_migration_modified_legacy_guards": [
+    "context_manifest_v34_only_insert",
+    "context_manifest_quote_profile_insert",
+    "agent_run_input_v34_only_insert",
+    "single_chat_composer_draft_scope_insert",
+    "single_chat_retained_input_insert_guard",
+    "single_chat_source_observation_owner",
+    "conversation_message_single_chat_attachment_insert_guard",
+    "conversation_message_single_chat_attachment_update_guard",
+    "single_chat_pending_input_scope_insert"
+  ],
+  "implemented": [
+    "Opaque new-work parent admission reuses real attested Team Tool credential authentication and derives Run/epoch/Thread/member/Conversation from persisted records, never model business arguments",
+    "Parent binding generation/compatibility, active Thread/present member, config digest, Conversation/invocation/role and child current-attempt versus taken-over User control must match; frozen and current enablement/depth both constrain new work",
+    "An ephemeral nonserializable parent proof binds the original tool call, config, frozen actual workspace, narrowed child policy and current runtime defaults; revalidation catches intervening authority/settings changes",
+    "Filesystem observation is separate from database validation, uses the actual frozen Run root and canonical existing directory, preserves access/isolation and never converts an outside-root observation into an authorized workspace",
+    "Within-parent registration reauthenticates in its transaction and checks original directory request, observation owner, exact workspace and child policy before calling the production initial factory",
+    "Original child preparing/claim now verifies the complete stored delegation workspace and private route; ordinary public/SingleChat Camp/Mission matching is unchanged. No schema, method, model text or UI changes"
+  ],
+  "checks": {
+    "main_owner": {
+      "log": "delegation-admission-owner-04.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 1251
+    },
+    "regressions": [
+      {
+        "name": "identity",
+        "filter": "delegation::tests::identity_graph_preserves_core_rows_and_fences_scope_replay_depth_and_takeover",
+        "listed": 1,
+        "exit_code": 0,
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "name": "frozen-role",
+        "filter": "delegation_policy::tests::frozen_capability_cannot_be_granted_by_later_settings_or_private_shape",
+        "listed": 1,
+        "exit_code": 0,
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "name": "lease",
+        "filter": "builtin_tool_runtime::tests::lease_rotates_fences_and_replays_exact_request",
+        "listed": 1,
+        "exit_code": 0,
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "name": "member-binding",
+        "filter": "team_tool::tests::slow_tests::every_agent_business_tool_binding_is_fenced_after_leave_and_readd",
+        "listed": 1,
+        "exit_code": 0,
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "name": "mission-worktree",
+        "filter": "delivery_queue::tests::mission_batch_claim_uses_ready_worktree_and_defers_unprepared_workspace",
+        "listed": 1,
+        "exit_code": 0,
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "name": "legacy-private",
+        "filter": "single_chat::tests::",
+        "listed": 9,
+        "exit_code": 0,
+        "passed": 9,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "name": "cancel-run",
+        "filter": "runtime::tests::user_agent_run_cancellation_is_run_local_and_stably_idempotent",
+        "listed": 1,
+        "exit_code": 0,
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "rust_total_passed": 16,
+    "docs_tests_passed": 10,
+    "full_rust_suite_run": false,
+    "ts_js_rerun": false,
+    "ts_js_reason": "No TypeScript/JavaScript/API shape changed; current195 protocol and previous transport remain unchanged",
+    "version_governance_scaffold_protocol_fmt_diff_existing_codegraph_sync": "passed",
+    "current_protocol_methods": 195,
+    "locked_source_operations_reported_by_checker": 161,
+    "new_formal_cases_fully_passed": 0
+  },
+  "verified_behaviors": [
+    "Actual production factory/claim/Binding prepares a child with an actual Chinese-named execution directory distinct from the Camp root. Core attested credentials yield a parent proof and default observation returns that exact run directory with read_only access",
+    "Forged credential, generation, epoch and owner reject; valid old SingleChat binding without a frozen delegation policy cannot acquire new work after the global switch is enabled",
+    "Temporary switch/depth/default-mode/presence/membership-version changes invalidate the prior proof; rollback restores the exact same valid parent without mutating model input or granting privileges",
+    "Nested directory is observed within scope; parent traversal, similar path prefix and a real Windows Junction resolve outside scope and require a separate User permission fact. Missing directory and ordinary file reject",
+    "The Junction is created by a hidden local fixture-only PowerShell process using ordinary Windows paths, verified against its real canonical target, then removed without removing the target; original attachment symlink protection remains unchanged",
+    "Different original tool-call observations, mismatched directory request, widened write access and external directory plans all reject with no child rows; actual within-parent registration persists the exact observed workspace at depth2",
+    "The actual registered nested child enters original Core workspace preparation and claim successfully. Candidate execution workspace equals its persisted scope, rather than the current Camp root",
+    "Actual User takeover fences the old parent proof; a genuinely admitted/claimed later User Run gets its own proof with its own execution directory, and explicit Core stop fences that proof",
+    "Original identity, frozen policy, runtime lease crypto/replay, member leave/readd binding, ready Mission worktree claim, nine SingleChat owners and Run-local cancellation regressions pass"
+  ],
+  "corrected_failures": [
+    "owner01 exposed a real production claim gap: child directories were still forced to the Camp project path. A child-specific exact persisted workspace/route check now runs before preparing/claim while old public/private/Mission checks remain unchanged",
+    "owner02 reached the filesystem case but the Windows PowerShell fixture created an invalid Junction target from an extended path. Only fixture utility arguments now use ordinary Windows paths; Core canonicalization is unchanged",
+    "owner03 completed the new behavior but fixture cleanup correctly rejected its leftover Junction. The fixture now removes only its own link immediately after the assertion and verifies the target still exists; no safety guard was loosened",
+    "Final compile04/owner04 and the seven regression groups correspond to the committed source; prior failing logs remain preserved"
+  ],
+  "limitations": [
+    "This component assumes the outer transport supplied its trusted active Run attestation after lease authentication; this owner uses real Core Binding credentials but does not execute a complete Host/IPC/native model request. The existing lease unit owner is separate regression evidence",
+    "Outside directories are only marked as requiring User permission, never authorized here. Persistent approval creation/decision/denial/stop/restart consumption and existing-grant lookup still must be integrated",
+    "User per-runtime defaults affect proof consistency but their mode/config application before first task input remains pending. This is not completed default selection or native-mode behavior",
+    "Workspace observation and preparing/claim evidence here are Core metadata plus real local filesystem operations; actual Runtime read-only enforcement, Host preparation races, process/Fleet/writer/input acceptance and original Session recovery remain pending",
+    "Original recorded-result recovery must precede new-work admission in the full command layer, including disabled settings or a later terminal parent; this component is not that complete model six-operation/CLI/reconcile implementation",
+    "Candidate parent/installation setup still contains explicit future-role and synthetic executable fixtures. No real agent or model is launched; the only new utility process creates a temporary local Junction",
+    "Full generic ACP registration/adapter, all21 positive runtime qualifications, complete160/210, full Context/Canvas/adopt, original viewer/settings UI and other I04 work packages remain mandatory",
+    "Final Core compiler retains six existing test-helper warnings; no full app/Web build, paid model, external agent/MCP/Host/GUI, push/Actions, main merge or release. No formal D01-D32 or84 case completion is claimed"
+  ],
+  "next_actions": [
+    "Persistent workspace approval and exact permission consumption",
+    "User default runtime mode/config application plus complete trusted model command layer",
+    "Generic ACP, real lifecycle, full210, original UI and remaining I04 work packages"
+  ],
+  "external_actions": {
+    "push": false,
+    "actions": false,
+    "main_merge": false,
+    "release": false,
+    "real_model_budget": 0
+  },
+  "approved_artifacts": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1",
+      "unchanged": true
+    }
+  ],
+  "source_files": [
+    {
+      "path": "crates/rovai-core/src/context.rs",
+      "bytes": 675396,
+      "git_blob_sha256": "5225440baa3c75b4d2c22cec6df9796aaf36bcda28c9abac4b54abd8a11c269a"
+    },
+    {
+      "path": "crates/rovai-core/src/context/delegation_admission_tests.rs",
+      "bytes": 16510,
+      "git_blob_sha256": "f3fadd300b5d74b717544b76b7ea7f01d6d41efd1660bee503f8a7c46fbcb520"
+    },
+    {
+      "path": "crates/rovai-core/src/context/delegation_context_tests.rs",
+      "bytes": 26517,
+      "git_blob_sha256": "0e20aac13cdc577d66933aceb85db6089a74eb8d8ac505852b0c94e5d1120f11"
+    },
+    {
+      "path": "crates/rovai-core/src/delegation_admission.rs",
+      "bytes": 10724,
+      "git_blob_sha256": "8dbd85476ae85c2450ba03ac7f415fd969ba8ae2c33b886f9d0fda051484b3b6"
+    },
+    {
+      "path": "crates/rovai-core/src/lib.rs",
+      "bytes": 3813,
+      "git_blob_sha256": "938a1eb591f02defd6712eb5fab85a9c90b1f435df2fbc8301d34fc8fbc3b535"
+    },
+    {
+      "path": "crates/rovai-core/src/runtime.rs",
+      "bytes": 465190,
+      "git_blob_sha256": "709bed68a3aa65e6156199c645386834e07dc6a46606500eb83406c22d06363a"
+    },
+    {
+      "path": "docs/contracts/delegation-v1.md",
+      "bytes": 16401,
+      "git_blob_sha256": "b602a8d86de963458dc38f129fd85020ee86547ae800b7f9881c3cdb8ee13dc6"
+    },
+    {
+      "path": "docs/development/testing.md",
+      "bytes": 215754,
+      "git_blob_sha256": "e9b30215c26e84f74978b022f55fa58fdd4aa7dc00e76c4da5b3b578f70ad723"
+    }
+  ],
+  "log_files": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-codegraph-sync.log",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-compile-01.log",
+      "bytes": 2005,
+      "sha256": "f3da1b0bf52f011bfafd7fe69d9ad90fe564267770af06b3f1f9803085d5abf9"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-compile-02.log",
+      "bytes": 2005,
+      "sha256": "bcc01438178046509b5f17a0e5f17f36c90782eaa80129ca8acb48aedc220f89"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-compile-03.log",
+      "bytes": 2005,
+      "sha256": "8a5e981f94d2e5a1e2d6c0d69bf8243ad4037518bfe3a8a00da62ef3fbb5877c"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-compile-04.log",
+      "bytes": 2005,
+      "sha256": "680035a4056b6affbf3c8a3cb34c3ec58dc1d449371f0c47076d1647fce32a81"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-diff-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-doc-governance-final.log",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-doc-governance.log",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-doc-tests.log",
+      "bytes": 924,
+      "sha256": "e8870030ff41b73ee19b76943d4e3e199acbe2f77e2aba53a81992ab7a9f016e"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-doc-version.log",
+      "bytes": 79,
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-fmt-01.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-fmt-02.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-fmt-03.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-fmt-04.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-fmt-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-fmt-workspace-03.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-fmt-workspace.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-owner-01.log",
+      "bytes": 1315,
+      "sha256": "f8ab77b28d726a9ac7f1db610eb11f589d9da18e183c2adb911555a1ca49eb48"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-owner-02.log",
+      "bytes": 913,
+      "sha256": "d0e94e4309f55d7e63170cc633ce92ff68108279fb60d0b0ae9f52cb9670808a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-owner-03.log",
+      "bytes": 875,
+      "sha256": "6779edcdf4691cd9199ab6b5c0f0764352252364a1469f8ce90c5960f89c3c2e"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-owner-04.log",
+      "bytes": 228,
+      "sha256": "1a06faa6cca82b487e4035812cd766b525227b2e5b98afd80f75a304e55a03c9"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-protocol.log",
+      "bytes": 182,
+      "sha256": "044569df112d191be31ea876439bd2bd3294beb8d9fa469452c1bcc1ea893695"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-regression-batch.log",
+      "bytes": 652,
+      "sha256": "bb5c84950af21ac2284322b6966958c99ebafd80dfe934af66dfef4e6b30980a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-regression-cancel-run-list.log",
+      "bytes": 110,
+      "sha256": "9bace455c3cff10f41bf383a692254883fa5df4828c8ca957b3331ce3503345d"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-regression-cancel-run.log",
+      "bytes": 212,
+      "sha256": "dd95fa887ffc4b803fea457013ac7636f0011ae3c8a7a56f1e38b5ac25f6aaea"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-regression-frozen-role-list.log",
+      "bytes": 128,
+      "sha256": "0c4fd217c8e5862a54f9a1b076251edeadc92994a11b8fbaf6fb47985790f90d"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-regression-frozen-role.log",
+      "bytes": 230,
+      "sha256": "fbe08c1c9e69680a8658348aa05c267acb263da2e25f45967cc4d67b3a38b07a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-regression-identity-list.log",
+      "bytes": 128,
+      "sha256": "c661c1430921d980ff74940beb77b1ffbd5264d2f839672df78122799720996b"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-regression-identity.log",
+      "bytes": 230,
+      "sha256": "0fdfe50db7388397f510f2879236a2a751b0f7b4865d93667fef59ced4bf2f1d"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-regression-lease-list.log",
+      "bytes": 107,
+      "sha256": "9b5a6bd04e928b6345d1ce6b41ea30bd318566acff752d23550453af15e825d2"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-regression-lease.log",
+      "bytes": 209,
+      "sha256": "dcf886dee014c2bd8fcb3cc0e818e7d202526ec82ed9d11a8ed210fd0548ac82"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-regression-legacy-private-list.log",
+      "bytes": 930,
+      "sha256": "fbbc0f6304b8e1b5adf6fc252ff9c6192e7f7a937727039ee64d7d8ebb7c4d3f"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-regression-legacy-private.log",
+      "bytes": 1080,
+      "sha256": "53ce6604b6145228ebd15ef73a57960a7ddeee136018429030876e09802333c9"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-regression-member-binding-list.log",
+      "bytes": 127,
+      "sha256": "e21826ab180034a723bbcee47e446654108ed4e0f8c15372c16bfca4863cd2e2"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-regression-member-binding.log",
+      "bytes": 229,
+      "sha256": "02c38289d02a274b0ed3799e8c71a62510c35156a63036008f99c73f815ffa4b"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-regression-mission-worktree-list.log",
+      "bytes": 126,
+      "sha256": "880f6464e032432558410358d7805ba3d1983d4fa2db29933c78bcb0bf1fcadf"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-regression-mission-worktree.log",
+      "bytes": 228,
+      "sha256": "0a63338d87515c619d246687994d70c36b81cdbd9d2fd29686c349241d5e7975"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-regression-results.json",
+      "bytes": 1617,
+      "sha256": "b659e1cf6a528288a398a5d03b1049bc05243c6299b76c8c821cd07a7d4a6b5a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-admission-scaffold.log",
+      "bytes": 222,
+      "sha256": "01288a06b7440b08c394c6da77c7750da896b58e4bc599c2e110eb1820be4b08"
+    }
+  ]
+}
