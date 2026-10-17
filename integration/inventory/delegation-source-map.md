@@ -31,7 +31,7 @@
 
 Core 的公开执行已经是 Delivery-first，历史 `a2aParentAgentRunId`、root/depth 字段不代表新 batch 的父子权威。`runtime.rs:43` 的根输出筛选排除明确的子输出、replay 和 snapshot；本轮不放宽此筛选，不让子内容混入父 Run。
 
-现行 conversation 仍区分 camp_member/single_chat（`db.rs:5531` 的结构检查与相关迁移）；历史初始 CREATE TABLE 片段不等于当前完整 Schema。独立子会话需要的关系、约束、迁移和恢复合同尚待具体设计，本轮没有新增表、字段、业务写 API 或模型工具。
+现行 conversation 仍区分 camp_member/single_chat（`db.rs:5531` 的结构检查与相关迁移）；历史初始 CREATE TABLE 片段不等于当前完整 Schema。独立子会话的具体Core关系、约束、API、输入和恢复设计现已形成待确认r1；仍未新增生产表、字段、业务写API或模型工具，不能把提案当实现。
 
 本轮修复 `camp-world-map-model.ts` 只读投影：从目标 batch 的已接受 inputMessageIds 找到当前已加载公开消息，再核对其 Agent 作者、sourceAgentRunId 与明确接收者；只显示当前仍在执行、可见成员之间的一次会合。多输入选取一个可显示来源，不改写持久父子关系、模型输入、交接路由或成功状态。旧 a2a 仅沿原关系兼容，batch 不回退猜测旧父字段。缺来源、撤销、私聊、旧 Run、已结束或恢复阻塞均不强行连线。
 
@@ -39,8 +39,16 @@ Core 的公开执行已经是 Delivery-first，历史 `a2aParentAgentRunId`、ro
 
 ## 接下来的有限队列
 
-1. **当前进行**：形成独立子会话的 Core 记录、身份与权限设计；逐项核对会话 kind/唯一约束、工具调用幂等、执行代次、临时连接与原生 Session 恢复，不把 Codeg broker task 当业务 Task。
-2. 把模型可见的新工具、输入/返回 shape、上下文与恢复变化写成具体 revision 的完整前后方案，再按既有规则交客户确认。确认前只做调查、方案和不依赖新语义的开发，不提前改受治理实现或 Schema；不沿用技能包/私聊材料 r1 的确认。
+### 两种子会话查看器须分开移植
+
+继续核查确认两个相近文件不是同一个能力。`src/components/message/sub-agent-session-dialog.tsx:4` 是broker委派的完整只读流式查看及child权限/问题/计划入口，调用LiveTranscriptView；`:68`使用非模态可嵌套Drawer，`:81`的h-full/min-h-0容器与`:85`的16px对齐保持父页可操作。`delegated-sub-thread.tsx:9`原卡片只显示状态与导航，完整子结果不内嵌；`:59`查看器宿主跨虚拟行生命周期保留。
+
+`src/components/message/subagent-session-dialog.tsx:4`则读取Grok等Runtime自行产生的原生子Session，没有Core/broker子Conversation或child连接，不可当成前一个查看器。`:55`仅运行中每2秒读取，`:123`后台刷新不清空内容，`:127`序号围栏拒绝迟到读取，`:65`保留解析器真实状态，父执行结束不能靠旧in_progress一直转圈。其只读证据回接留在I04，不把原生工具输出归为父Run根输出，也不伪造为Core已调度子AgentRun。
+
+具体Core委派r1现位于`integration/proposals/native-delegation-r1.md`，仍pending；两种查看器的原布局和运行职责都留在移植清单。与模型新语义无关的原生子Session只读观察可独立推进；来源路径/Session ID只用于定位，不授予读取任意本机原生会话的权限。
+
+1. **具体设计完成，待对应r1确认**：独立子会话的Core记录、身份、权限、API、版本与恢复已写入`integration/proposals/native-delegation-r1.md`及完整机器附件；不能把Codeg broker task当业务Task，也不能把该设计记作已实现。
+2. 完整模型输入前后与客户故事版Word/PDF交客户审核r1。只暂缓该新语义的实现、Schema和当前合同登记；原生子Session只读回接及其余I04独立任务继续，不沿用技能包/私聊材料r1确认。
 3. 与方案并行处理现有协作展示、Runtime 兼容、停止恢复、记忆与自动化的独立缺口；严格对照原两应用 UI。
 4. 实现批准后的子执行链路与原版画布入口；权限/问题/计划、取消所有竞争窗口、原身份恢复、快速终态、未知/跨父查询分别验证。
 5. 阶段代码集齐再冻结 I04 候选，做必要构建、实际集成与平台矩阵；不逐改动 push 或触发 Actions。
