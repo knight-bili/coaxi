@@ -105,7 +105,7 @@ pub(super) fn current_input<R: ContextReadConnection>(
         |r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?,r.get(4)?)),
     ).optional()?.context("Child input message is outside its own Conversation boundary")?;
     anyhow::ensure!(
-        !body.is_empty() && !author_id.is_empty() && source_run.is_none(),
+        !author_id.is_empty() && source_run.is_none(),
         "Invalid child input author or body"
     );
     let message = if child.mode == "user_followup" {
@@ -117,8 +117,18 @@ pub(super) fn current_input<R: ContextReadConnection>(
                         .context("Missing takeover boundary")?,
             "Child User input predates takeover"
         );
+        if body.is_empty() {
+            let sources:String=database.context_connection().query_row(
+                "SELECT source_attachments_json FROM conversation_message WHERE id=?1 AND conversation_id=?2",
+                params![message_id,snapshot.conversation_id],|r|r.get(0))?;
+            anyhow::ensure!(
+                !crate::local_attachment_source::parse_source_attachments(&sources)?.is_empty(),
+                "Empty child User input"
+            );
+        }
         body.clone()
     } else {
+        anyhow::ensure!(!body.is_empty(), "Empty delegated task or resume message");
         anyhow::ensure!(author == "system", "Delegated input must be Core-owned");
         if child.mode == "initial" {
             anyhow::ensure!(

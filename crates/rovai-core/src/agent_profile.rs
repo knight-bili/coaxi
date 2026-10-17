@@ -1636,48 +1636,7 @@ impl AgentProfileService {
         database: &Database,
         frozen: &FrozenAgentRuntimeConfig,
     ) -> Result<std::result::Result<FrozenAgentRuntimeConfig, RuntimeConfigurationBlocker>> {
-        let mut model_options = frozen.model.options.clone();
-        if frozen.adapter_kind == AdapterKind::CodexCli
-            && frozen.camp_fast.is_some()
-            && let Some(options) = model_options.as_object_mut()
-        {
-            // Camp request audit is not a model descriptor option.
-            options.remove("serviceTier");
-        }
-        let model = match frozen.model.source.as_str() {
-            "runtime_default" => ModelSelection::RuntimeDefault,
-            "explicit" => ModelSelection::Explicit {
-                dsh_source: frozen.model.dsh_source,
-                model_id: frozen.model.model_id.clone(),
-                options: model_options,
-            },
-            _ => anyhow::bail!("frozen Runtime model source is invalid"),
-        };
-        let mut rebound = match resolve_frozen_runtime_binding_with_snapshot(
-            database.connection(),
-            &ResolvedRuntimeBinding {
-                adapter_kind: frozen.adapter_kind,
-                installation_id: frozen.installation_id.clone(),
-                model,
-                permissions: frozen.permissions.clone(),
-            },
-            Some(frozen.custom_api.clone()),
-            None,
-        )? {
-            Ok(runtime) => runtime,
-            Err(blocker) => return Ok(Err(blocker)),
-        };
-        // Re-probing may change executable evidence, never the admitted Run's Camp intent.
-        rebound.environment = frozen.environment.clone();
-        rebound.camp_fast = frozen.camp_fast.clone();
-        if frozen.adapter_kind == AdapterKind::CodexCli
-            && frozen.camp_fast.is_some()
-            && let Some(tier) = frozen.model.options.get("serviceTier")
-        {
-            rebound.model.options["serviceTier"] = tier.clone();
-        }
-        rebound.refresh_config_digest()?;
-        Ok(Ok(rebound))
+        resolve_rebound_runtime_on_connection(database.connection(), frozen)
     }
 
     pub fn record_verified_executable_identity(
@@ -4402,6 +4361,54 @@ where
     serde_json::from_str(&json).map_err(|error| {
         rusqlite::Error::FromSqlConversionFailure(index, rusqlite::types::Type::Text, error.into())
     })
+}
+
+pub(crate) fn resolve_rebound_runtime_on_connection(
+    connection: &Connection,
+    frozen: &FrozenAgentRuntimeConfig,
+) -> Result<std::result::Result<FrozenAgentRuntimeConfig, RuntimeConfigurationBlocker>> {
+    let mut model_options = frozen.model.options.clone();
+    if frozen.adapter_kind == AdapterKind::CodexCli
+        && frozen.camp_fast.is_some()
+        && let Some(options) = model_options.as_object_mut()
+    {
+        // Camp request audit is not a model descriptor option.
+        options.remove("serviceTier");
+    }
+    let model = match frozen.model.source.as_str() {
+        "runtime_default" => ModelSelection::RuntimeDefault,
+        "explicit" => ModelSelection::Explicit {
+            dsh_source: frozen.model.dsh_source,
+            model_id: frozen.model.model_id.clone(),
+            options: model_options,
+        },
+        _ => anyhow::bail!("frozen Runtime model source is invalid"),
+    };
+    let mut rebound = match resolve_frozen_runtime_binding_with_snapshot(
+        connection,
+        &ResolvedRuntimeBinding {
+            adapter_kind: frozen.adapter_kind,
+            installation_id: frozen.installation_id.clone(),
+            model,
+            permissions: frozen.permissions.clone(),
+        },
+        Some(frozen.custom_api.clone()),
+        None,
+    )? {
+        Ok(runtime) => runtime,
+        Err(blocker) => return Ok(Err(blocker)),
+    };
+    // Re-probing may change executable evidence, never the admitted Run's Camp intent.
+    rebound.environment = frozen.environment.clone();
+    rebound.camp_fast = frozen.camp_fast.clone();
+    if frozen.adapter_kind == AdapterKind::CodexCli
+        && frozen.camp_fast.is_some()
+        && let Some(tier) = frozen.model.options.get("serviceTier")
+    {
+        rebound.model.options["serviceTier"] = tier.clone();
+    }
+    rebound.refresh_config_digest()?;
+    Ok(Ok(rebound))
 }
 
 pub fn resolve_frozen_runtime(

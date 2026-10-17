@@ -155,4 +155,5 @@ fn assert_child_user_materials(fixture: &mut Fixture, id: &str, run: &str, legac
     assert_eq!(delegation_user::mutate_draft(&mut fixture.database,&adopt).unwrap().result.code,"single_chat.scope_must_differ");
     assert_eq!(crate::application::delegation_composer::handle(&fixture.database,&client,"delegations.composer.get",reader).unwrap(),latest);
     assert_child_upload_sources(fixture, &conversation);
+    assert_child_user_send(fixture, &conversation, run);
 }

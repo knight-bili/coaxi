@@ -132,7 +132,7 @@ impl DomainCommand for MutatePrivateComposerCommand {
 }
 
 // Selected by a sealed Core command type, never by a request's conversation kind.
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub(crate) enum ComposerOwner {
     SingleChat,
     DelegationChild,

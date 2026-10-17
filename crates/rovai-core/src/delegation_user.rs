@@ -14,6 +14,13 @@ use crate::{
     single_chat_composer_scope::SingleChatComposerScope,
 };
 
+#[path = "delegation_user_send.rs"]
+mod send;
+pub use send::{SendDelegationMessageCommand, send, send_source_inputs};
+pub(crate) use send::{
+    followup_config, followup_runtime, send_blocker, send_with_prepared_sources,
+};
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct MutateDelegationComposerCommand(pub MutatePrivateComposerCommand);

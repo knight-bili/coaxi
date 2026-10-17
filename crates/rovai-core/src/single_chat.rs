@@ -1,5 +1,6 @@
 use crate::draft_client::DraftClient;
 use crate::message_quote::{MessageQuoteSnapshot, QuoteStorage, load_quotes, store_quotes};
+use crate::single_chat_composer::ComposerOwner;
 use crate::single_chat_composer_scope::{PrivateComposerKey, SingleChatComposerScope};
 use std::collections::{BTreeSet, HashMap, HashSet};
 
@@ -89,6 +90,18 @@ impl DomainCommand for SendSingleChatMessageCommand {
     const TYPE: &'static str = "single_chat.send";
     fn draft_client(&self) -> Option<&DraftClient> {
         Some(&self.draft_client)
+    }
+}
+
+pub(crate) trait PrivateSendCommand: DomainCommand {
+    const OWNER: ComposerOwner;
+    fn input(&self) -> SendSingleChatMessageCommand;
+}
+
+impl PrivateSendCommand for SendSingleChatMessageCommand {
+    const OWNER: ComposerOwner = ComposerOwner::SingleChat;
+    fn input(&self) -> SendSingleChatMessageCommand {
+        self.clone()
     }
 }
 
@@ -353,21 +366,27 @@ impl SingleChatService {
         ))
     }
 
-    pub(crate) fn send_source_inputs(
+    pub(crate) fn send_source_inputs<C: PrivateSendCommand>(
         database: &Database,
-        envelope: &CommandEnvelope<SendSingleChatMessageCommand>,
+        envelope: &CommandEnvelope<C>,
     ) -> Result<Vec<LocalAttachmentSourceRef>> {
-        let command = &envelope.payload;
+        let command = envelope.payload.input();
         let connection = database.connection();
         if !matches!(envelope.actor, ActorRef::User { .. }) {
             return Ok(vec![]);
         }
-        let Some(target) = load_active_target(connection, &command.conversation_id)? else {
+        let Some(target) = load_owned_target(connection, &command.conversation_id, C::OWNER)?
+        else {
             return Ok(vec![]);
         };
         if target.camp_id != command.camp_id
             || envelope.camp_id.as_deref() != Some(&command.camp_id)
             || !active_member(connection, &target.camp_id, &target.agent_id)?
+        {
+            return Ok(vec![]);
+        }
+        if matches!(C::OWNER, ComposerOwner::DelegationChild)
+            && crate::delegation_user::send_blocker(connection, &command.conversation_id)?.is_some()
         {
             return Ok(vec![]);
         }
@@ -766,17 +785,26 @@ impl SingleChatService {
         database: &mut Database,
         envelope: &CommandEnvelope<SendSingleChatMessageCommand>,
     ) -> Result<CommandExecution> {
-        if envelope.payload.body.chars().count() > 100_000 {
+        self.send_owned(database, envelope)
+    }
+
+    pub(crate) fn send_owned<C: PrivateSendCommand>(
+        &self,
+        database: &mut Database,
+        envelope: &CommandEnvelope<C>,
+    ) -> Result<CommandExecution> {
+        let command = envelope.payload.input();
+        if command.body.chars().count() > 100_000 {
             anyhow::bail!("Single Chat body exceeds the 100000-character limit");
         }
-        if envelope.payload.draft_revision < 0 {
+        if command.draft_revision < 0 {
             anyhow::bail!("Single Chat Draft revision is invalid");
         }
         if let Some(execution) = self.gateway.replay_if_recorded(database, envelope)? {
             return Ok(execution);
         }
         let prepared = self.prepare_sources(|| Self::send_source_inputs(database, envelope))?;
-        let client = &envelope.payload.draft_client;
+        let client = &command.draft_client;
         self.gateway.execute(database, envelope, |transaction| {
             let ActorRef::User { user_id } = &envelope.actor else {
                 return Ok(rejected(
@@ -784,7 +812,7 @@ impl SingleChatService {
                     "Single Chat v1 is available only to the local user",
                 ));
             };
-            let Some(target) = load_active_target(transaction, &envelope.payload.conversation_id)?
+            let Some(target) = load_owned_target(transaction, &command.conversation_id, C::OWNER)?
             else {
                 return Ok(rejected(
                     "single_chat.not_active",
@@ -792,7 +820,7 @@ impl SingleChatService {
                 ));
             };
             if envelope.camp_id.as_deref() != Some(target.camp_id.as_str())
-                || envelope.payload.camp_id != target.camp_id
+                || command.camp_id != target.camp_id
             {
                 return Ok(rejected(
                     "single_chat.camp_mismatch",
@@ -805,12 +833,18 @@ impl SingleChatService {
                     "Single Chat target is not an active Thread member",
                 ));
             }
+            if matches!(C::OWNER, ComposerOwner::DelegationChild) {
+                if let Some(code) = crate::delegation_user::send_blocker(transaction, &target.conversation_id)? {
+                    return Ok(CommandHandlerResult::rejected(code, json!({})));
+                }
+            }
+
             let Some((key, registered)) = crate::single_chat_composer::resolve_scope(
                 transaction,
                 &target.camp_id,
                 &target.conversation_id,
                 client,
-                envelope.payload.composer_scope.as_ref(),
+                command.composer_scope.as_ref(),
             )?
             else {
                 return Ok(rejected(
@@ -832,15 +866,15 @@ impl SingleChatService {
             )?;
             let draft_revision = materials.revision;
             let source_attachments = materials.sources()?;
-            if draft_revision != envelope.payload.draft_revision {
+            if draft_revision != command.draft_revision {
                 return Ok(CommandHandlerResult::rejected(
                     "single_chat.draft_changed",
                     json!({ "currentDraftRevision": draft_revision }),
                 ));
             }
-            let body = envelope.payload.body.trim();
+            let body = command.body.trim();
             let quotes = materials.quotes()?;
-            if envelope.payload.composer_scope.is_some() && !quotes.is_empty() && body.is_empty() {
+            if command.composer_scope.is_some() && !quotes.is_empty() && body.is_empty() {
                 return Ok(rejected(
                     "quote.question_required",
                     "A question body is required with quotes",
@@ -865,7 +899,7 @@ impl SingleChatService {
                     json!({ "message": error.to_string() }),
                 ));
             }
-            if let Some(id)=crate::private_source_observation::changed_source(transaction,&target.conversation_id,&source_attachments,envelope.payload.composer_scope.is_some(), &prepared)? {
+            if let Some(id)=crate::private_source_observation::changed_source(transaction,&target.conversation_id,&source_attachments,command.composer_scope.is_some(), &prepared)? {
                 return Ok(CommandHandlerResult::rejected("single_chat.attachment_source_changed",
                     json!({"attachmentRefId":id,"message":"私聊附件源文件已变化，请重新选择文件后发送。"})));
             }
@@ -918,11 +952,11 @@ impl SingleChatService {
                 ));
             }
 
-            let runtime = match resolve_frozen_runtime(
-                transaction,
-                &target.conversation_id,
-                &target.agent_id,
-            )? {
+            let runtime = match if matches!(C::OWNER, ComposerOwner::DelegationChild) {
+                crate::delegation_user::followup_runtime(transaction, &target.conversation_id)?
+            } else {
+                resolve_frozen_runtime(transaction, &target.conversation_id, &target.agent_id)?
+            } {
                 Ok(runtime) => runtime,
                 Err(blocker) => {
                     return Ok(CommandHandlerResult::rejected(
@@ -949,7 +983,7 @@ impl SingleChatService {
                 &envelope.actor,
             )?;
             Ok(CommandHandlerResult::accepted(
-                "single_chat.reply_queued",
+                if matches!(C::OWNER, ComposerOwner::DelegationChild) { "delegation.reply_queued" } else { "single_chat.reply_queued" },
                 json!({
                     "conversationId": target.conversation_id,
                     "conversationVersion": admitted.conversation_version,
@@ -2028,6 +2062,8 @@ pub fn filter_single_chat_skill_exposure(
 
 #[derive(Debug)]
 struct ActiveTarget {
+    owner: ComposerOwner,
+    workspace_json: Option<String>,
     conversation_id: String,
     camp_id: String,
     agent_id: String,
@@ -2615,24 +2651,50 @@ fn admit_single_chat_message(
             version = version + 1,
             updated_at = ?3
         WHERE id = ?1 AND version = ?2
-          AND kind = 'single_chat' AND ended_at IS NULL
+          AND kind = ?4 AND ended_at IS NULL
         "#,
-        params![target.conversation_id, target.version, now],
+        params![
+            target.conversation_id,
+            target.version,
+            now,
+            private_conversation_kind(target.owner)
+        ],
     )?;
     anyhow::ensure!(updated == 1, "single_chat.version_conflict");
     let conversation_sequence = target.last_message_sequence + 1;
-    let (effective_config, runtime) = crate::collaboration::build_admitted_effective_config(
-        transaction,
-        &target.conversation_id,
-        &target.agent_id,
-        runtime,
-    )?;
-    let operation_policy_version =
-        if crate::delegation_policy::FrozenPolicy::from_config(&effective_config)?.is_some() {
-            3
-        } else {
-            SINGLE_CHAT_OPERATION_POLICY_VERSION
-        };
+    let child = matches!(target.owner, ComposerOwner::DelegationChild);
+    let invocation = if child {
+        "delegation_user"
+    } else {
+        "single_chat"
+    };
+    let operation_policy = if child {
+        "delegation_child_v1"
+    } else {
+        SINGLE_CHAT_OPERATION_POLICY
+    };
+    let (effective_config, runtime) = if child {
+        crate::delegation_user::followup_config(
+            transaction,
+            &target.conversation_id,
+            target.version + 1,
+            runtime,
+        )?
+    } else {
+        crate::collaboration::build_admitted_effective_config(
+            transaction,
+            &target.conversation_id,
+            &target.agent_id,
+            runtime,
+        )?
+    };
+    let operation_policy_version = if child {
+        1
+    } else if crate::delegation_policy::FrozenPolicy::from_config(&effective_config)?.is_some() {
+        3
+    } else {
+        SINGLE_CHAT_OPERATION_POLICY_VERSION
+    };
     transaction.execute(
         r#"
         INSERT INTO camp_turn(
@@ -2645,7 +2707,7 @@ fn admit_single_chat_message(
             execution_budget_root_agent_run_responsibilities,
             version, created_at, updated_at
         ) VALUES (
-            ?1, ?2, 'conversation_message', ?3, 'single_chat', 'running',
+            ?1, ?2, 'conversation_message', ?3, ?11, 'running',
             ?4, ?5, ?6, ?7, ?8, ?9, ?10, 1, ?5, ?5
         )
         "#,
@@ -2660,8 +2722,40 @@ fn admit_single_chat_message(
             budget.max_agent_run_responsibilities,
             budget.max_accepted_a2a,
             budget.root_agent_run_responsibilities,
+            if child { "delegation" } else { "single_chat" },
         ],
     )?;
+    let insert_message = |linked_run: Option<&str>| -> Result<()> {
+        transaction.execute(
+            r#"
+        INSERT INTO conversation_message(
+            id, conversation_id, sequence,
+            author_type, author_id, source_agent_run_id, body,
+            source_camp_message_id, source_inbox_message_id,
+            camp_turn_id, agent_run_id, source_attachments_json, created_at
+        ) VALUES (
+            ?1, ?2, ?3, 'user', ?4, NULL, ?5,
+            NULL, NULL, ?6, ?7, ?8, ?9
+        )
+        "#,
+            params![
+                conversation_message_id,
+                target.conversation_id,
+                conversation_sequence,
+                user_id,
+                body,
+                camp_turn_id,
+                linked_run,
+                source_attachments_json,
+                now,
+            ],
+        )?;
+        Ok(())
+    };
+    // Child routing must see the exact User message before admitting its Run.
+    if child {
+        insert_message(None)?;
+    }
     transaction.execute(
         r#"
         INSERT INTO agent_run(
@@ -2691,10 +2785,10 @@ fn admit_single_chat_message(
         ) VALUES (
             ?1, ?2, ?3, ?4, ?5, ?6, ?7,
             ?8, 0, 'initial', ?9, 'required',
-            ?10, NULL, 'runtime_managed_v2',
+            ?10, ?28, 'runtime_managed_v2',
             ?11, ?12, ?13, ?14, ?15, ?16, ?15, ?16,
             ?17, ?18, ?19, ?20, ?21, ?22, ?23, ?24, ?25,
-            'single_chat', 'conversation_message', 'single_chat_v1', ?27, ?3,
+            ?29, 'conversation_message', ?30, ?27, ?3,
             'queued', ?26, 1, ?5, ?5
         )
         "#,
@@ -2706,8 +2800,16 @@ fn admit_single_chat_message(
             now,
             target.current_public_boundary_sequence,
             conversation_sequence,
-            format!("single_chat/{}", target.agent_id),
-            "Respond to the user's Single Chat message",
+            if child {
+                format!("delegation_user/{}", target.conversation_id)
+            } else {
+                format!("single_chat/{}", target.agent_id)
+            },
+            if child {
+                "Respond to the user's child conversation message"
+            } else {
+                "Respond to the user's Single Chat message"
+            },
             serde_json::to_string(&effective_config)?,
             runtime.adapter_kind.as_str(),
             runtime.installation_id,
@@ -2726,32 +2828,17 @@ fn admit_single_chat_message(
             runtime.native_session_compatibility_key,
             command_id,
             operation_policy_version,
+            target.workspace_json,
+            invocation,
+            operation_policy,
         ],
     )?;
-    transaction.execute(
-        r#"
-        INSERT INTO conversation_message(
-            id, conversation_id, sequence,
-            author_type, author_id, source_agent_run_id, body,
-            source_camp_message_id, source_inbox_message_id,
-            camp_turn_id, agent_run_id, source_attachments_json, created_at
-        ) VALUES (
-            ?1, ?2, ?3, 'user', ?4, NULL, ?5,
-            NULL, NULL, ?6, ?7, ?8, ?9
-        )
-        "#,
-        params![
-            conversation_message_id,
-            target.conversation_id,
-            conversation_sequence,
-            user_id,
-            body,
-            camp_turn_id,
-            agent_run_id,
-            source_attachments_json,
-            now,
-        ],
-    )?;
+    if child {
+        let linked=transaction.execute("UPDATE conversation_message SET agent_run_id=?1 WHERE id=?2 AND conversation_id=?3 AND agent_run_id IS NULL",params![agent_run_id,conversation_message_id,target.conversation_id])?;
+        anyhow::ensure!(linked == 1, "Child User message linkage changed");
+    } else {
+        insert_message(Some(&agent_run_id))?;
+    }
     store_quotes(
         transaction,
         QuoteStorage::PrivateMessage,
@@ -2760,7 +2847,11 @@ fn admit_single_chat_message(
     )?;
     append_domain_event(
         transaction,
-        "single_chat.message_sent",
+        if child {
+            "delegation.message_sent"
+        } else {
+            "single_chat.message_sent"
+        },
         Some(&target.camp_id),
         Some(("conversation_message", &conversation_message_id)),
         actor,
@@ -2784,9 +2875,9 @@ fn admit_single_chat_message(
         &json!({
             "threadTurnId": camp_turn_id,
             "conversationId": target.conversation_id,
-            "invocationKind": "single_chat",
+            "invocationKind": invocation,
             "responseDelivery": SINGLE_CHAT_RESPONSE_DELIVERY,
-            "operationPolicy": SINGLE_CHAT_OPERATION_POLICY,
+            "operationPolicy": operation_policy,
             "operationPolicyVersion": operation_policy_version,
         }),
     )?;
@@ -2802,31 +2893,63 @@ fn load_active_target(
     transaction: &rusqlite::Connection,
     conversation_id: &str,
 ) -> Result<Option<ActiveTarget>> {
+    load_owned_target(transaction, conversation_id, ComposerOwner::SingleChat)
+}
+
+fn private_conversation_kind(owner: ComposerOwner) -> &'static str {
+    match owner {
+        ComposerOwner::SingleChat => "single_chat",
+        ComposerOwner::DelegationChild => "delegation_child",
+    }
+}
+
+fn load_owned_target(
+    transaction: &rusqlite::Connection,
+    conversation_id: &str,
+    owner: ComposerOwner,
+) -> Result<Option<ActiveTarget>> {
+    if matches!(owner, ComposerOwner::DelegationChild) {
+        let thread: Option<String> = transaction
+            .query_row(
+                "SELECT camp_id FROM conversation WHERE id=?1",
+                [conversation_id],
+                |r| r.get(0),
+            )
+            .optional()?;
+        let Some(thread) = thread else {
+            return Ok(None);
+        };
+        if !crate::delegation_user::material_owner_exists(
+            transaction,
+            &thread,
+            conversation_id,
+            true,
+        )? {
+            return Ok(None);
+        }
+    }
+    let child = matches!(owner, ComposerOwner::DelegationChild);
+    let query = if child {
+        r#"SELECT c.id,c.camp_id,c.agent_id,c.version,c.last_message_sequence,0,d.resolved_workspace_json
+        FROM conversation c JOIN camp ON camp.id=c.camp_id JOIN delegation d ON d.child_conversation_id=c.id
+        WHERE c.id=?1 AND c.kind='delegation_child' AND c.ended_at IS NULL AND camp.activation_state='active'"#
+    } else {
+        r#"SELECT c.id,c.camp_id,c.agent_id,c.version,c.last_message_sequence,camp.last_message_sequence,NULL
+        FROM conversation c JOIN camp ON camp.id=c.camp_id WHERE c.id=?1 AND c.kind='single_chat' AND c.ended_at IS NULL AND camp.activation_state='active'"#
+    };
     Ok(transaction
-        .query_row(
-            r#"
-            SELECT conversation.id, conversation.camp_id, conversation.agent_id,
-                   conversation.version, conversation.last_message_sequence,
-                   camp.last_message_sequence
-            FROM conversation
-            JOIN camp ON camp.id = conversation.camp_id
-            WHERE conversation.id = ?1
-              AND conversation.kind = 'single_chat'
-              AND conversation.ended_at IS NULL
-              AND camp.activation_state = 'active'
-            "#,
-            [conversation_id],
-            |row| {
-                Ok(ActiveTarget {
-                    conversation_id: row.get(0)?,
-                    camp_id: row.get(1)?,
-                    agent_id: row.get(2)?,
-                    version: row.get(3)?,
-                    last_message_sequence: row.get(4)?,
-                    current_public_boundary_sequence: row.get(5)?,
-                })
-            },
-        )
+        .query_row(query, [conversation_id], |row| {
+            Ok(ActiveTarget {
+                owner,
+                workspace_json: row.get(6)?,
+                conversation_id: row.get(0)?,
+                camp_id: row.get(1)?,
+                agent_id: row.get(2)?,
+                version: row.get(3)?,
+                last_message_sequence: row.get(4)?,
+                current_public_boundary_sequence: row.get(5)?,
+            })
+        })
         .optional()?)
 }
 
