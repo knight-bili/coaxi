@@ -114,6 +114,17 @@ pub struct EndSingleChatCommand {
     pub conversation_id: String,
 }
 
+pub(crate) trait PrivateEndCommand: DomainCommand {
+    const OWNER: ComposerOwner;
+    fn input(&self, thread: &str) -> EndSingleChatCommand;
+}
+impl PrivateEndCommand for EndSingleChatCommand {
+    const OWNER: ComposerOwner = ComposerOwner::SingleChat;
+    fn input(&self, _: &str) -> EndSingleChatCommand {
+        self.clone()
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct SingleChatHistoryInput {
@@ -1045,28 +1056,53 @@ impl SingleChatService {
         database: &mut Database,
         envelope: &CommandEnvelope<EndSingleChatCommand>,
     ) -> Result<CommandExecution> {
+        self.end_owned(database, envelope)
+    }
+
+    pub(crate) fn end_owned<C: PrivateEndCommand>(
+        &self,
+        database: &mut Database,
+        envelope: &CommandEnvelope<C>,
+    ) -> Result<CommandExecution> {
+        let input = envelope
+            .payload
+            .input(envelope.camp_id.as_deref().unwrap_or(""));
+        let child = matches!(C::OWNER, ComposerOwner::DelegationChild);
+        let kind = private_conversation_kind(C::OWNER);
+        let ended = if child {
+            "delegation.conversation_ended"
+        } else {
+            "single_chat.ended"
+        };
+        let reason = if child {
+            "delegation_conversation_ended"
+        } else {
+            "single_chat_ended"
+        };
         self.gateway.execute(database, envelope, |transaction| {
             let ActorRef::User { .. } = &envelope.actor else {
                 return Ok(rejected(
-                    "single_chat.local_user_required",
+                    if child { "delegation.user_required" } else { "single_chat.local_user_required" },
                     "Single Chat v1 is available only to the local user",
                 ));
             };
-            let target = load_end_target(transaction, &envelope.payload.conversation_id)?;
+            let target = load_end_target(transaction, &input.conversation_id)?;
             let Some(target) = target else {
                 return Ok(rejected(
                     "single_chat.not_active",
                     "Single Chat does not exist or has ended",
                 ));
             };
-            if target.kind != "single_chat" {
+            if target.kind != kind || (child && !crate::delegation_user::material_owner_exists(
+                transaction, &target.camp_id, &target.conversation_id, false,
+            )?) {
                 return Ok(rejected(
                     "single_chat.not_active",
                     "Single Chat does not exist or has ended",
                 ));
             }
             if envelope.camp_id.as_deref() != Some(target.camp_id.as_str())
-                || envelope.payload.camp_id != target.camp_id
+                || input.camp_id != target.camp_id
             {
                 return Ok(rejected(
                     "single_chat.camp_mismatch",
@@ -1075,7 +1111,7 @@ impl SingleChatService {
             }
             if target.ended_at.is_some() {
                 return Ok(CommandHandlerResult::applied(
-                    "single_chat.ended",
+                    ended,
                     json!({
                         "conversationId": target.conversation_id,
                         "conversationVersion": target.version,
@@ -1091,16 +1127,16 @@ impl SingleChatService {
                 SET ended_at = ?2, ended_reason = 'user_ended',
                     ended_binding_generation = native_binding_generation,
                     version = version + 1, updated_at = ?2
-                WHERE id = ?1 AND kind = 'single_chat' AND ended_at IS NULL
+                WHERE id = ?1 AND kind = ?3 AND ended_at IS NULL
                 "#,
-                params![target.conversation_id, now],
+                params![target.conversation_id, now, kind],
             )?;
             anyhow::ensure!(updated == 1, "Single Chat end update did not match its active target");
-            crate::delegation_control::cancel_for_conversation(transaction,&target.conversation_id,&envelope.actor,"single_chat_ended",&now)?;
+            crate::delegation_control::cancel_for_conversation(transaction,&target.conversation_id,&envelope.actor,reason,&now)?;
             let active_run = transaction
                 .query_row(
-                    "SELECT id, camp_turn_id, execution_epoch FROM agent_run WHERE conversation_id = ?1 AND invocation_kind = 'single_chat' AND status IN ('queued', 'running', 'waiting') ORDER BY created_at, id LIMIT 1",
-                    [&target.conversation_id],
+                    "SELECT id, camp_turn_id, execution_epoch FROM agent_run WHERE conversation_id = ?1 AND invocation_kind = ?2 AND status IN ('queued', 'running', 'waiting') ORDER BY created_at, id LIMIT 1",
+                    params![target.conversation_id, if child { "delegation_user" } else { "single_chat" }],
                     |row| Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?, row.get::<_, i64>(2)?)),
                 )
                 .optional()?;
@@ -1109,7 +1145,7 @@ impl SingleChatService {
                 settle_abortive_agent_run_in_tx(
                     transaction,
                     &agent_run_id,
-                    "single_chat_ended",
+                    reason,
                     &envelope.actor,
                     &now,
                 )?;
@@ -1148,7 +1184,7 @@ impl SingleChatService {
             )?;
             append_domain_event(
                 transaction,
-                "single_chat.ended",
+                ended,
                 Some(&target.camp_id),
                 Some(("conversation", &target.conversation_id)),
                 &envelope.actor,
@@ -1161,7 +1197,7 @@ impl SingleChatService {
                 }),
             )?;
             Ok(CommandHandlerResult::applied(
-                "single_chat.ended",
+                ended,
                 json!({
                     "conversationId": target.conversation_id,
                     "conversationVersion": target.version + 1,

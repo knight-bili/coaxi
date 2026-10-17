@@ -40,7 +40,7 @@ describe('Runtime Renderer Core method allowlist', () => {
     expect(allowlistEnd).toBeGreaterThan(allowlistStart)
     for (const method of ['singleChat.pendingInputs.edit', 'singleChat.composerDraft.mutate', 'singleChat.composerDraft.recovery',
       'delegations.composer.get', 'delegations.composer.mutate', 'delegations.composer.recovery',
-      'delegations.message.send', 'delegations.pendingInputs.get', 'delegations.pendingInputs.edit', 'delegations.takeover', 'delegations.cancel']) {
+      'delegations.message.send', 'delegations.pendingInputs.get', 'delegations.pendingInputs.edit', 'delegations.takeover', 'delegations.cancel', 'delegations.conversation.end']) {
       expect(mainSource.slice(allowlistStart, allowlistEnd)).toContain(`'${method}'`)
     }
   })

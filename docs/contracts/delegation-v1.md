@@ -51,6 +51,12 @@ control 原语按精确版本记录接管，要求旧 Run 已经终态，冻结�
 
 正常成功不触发因果取消。`delegation` 与 `delegation_user` 的成功结果沿原私有完成算法保存到自己的 Conversation，原消息、Run 终态、回执同事务提交，禁止走公开回复或业务 Task fallback；旧 Single Chat 的 policy1/2 分支不变，policy3 完整准入仍待合齐。子会话完成后保留后台帮手，待明确停止、所属会话关闭或成员失效时按相应范围处理。Thread 聚合删除须先释放 delegation/attempt/control 关系，以及已发布私有排队输入对消息/Turn/Run 的引用，再删除其 Run/Conversation；旧库不存在排队表时沿原路径，仍由原外键及事务保证完整性。这里不代表真实进程/文件清理和完整启动迁移已经通过。
 
+### User 结束子会话
+
+`delegations.conversation.end` 仅接受 `{commandId,command:{conversationId}}`，Thread 由 Core 的确切 child 派生。User 必须已经接管该会话；旧 `singleChat.end` 仍只接受 single_chat，两类命令不能相互升级。复用原私有结束事务：标记确切 Conversation 结束，取消其后续 User Run 与仍受该 Conversation 控制的全部后台子树，清空各端草稿、保留输入和编辑租约，将未发布队列改为 cancelled，保留历史消息、原 attempt 结果与接管水位。已独立接管的后代和其他会话不随旧父关闭。
+
+原 UUID 回放与 `commands.reconcile` 只返回首次结果，不重新结束或发失效通知；事务失败不留下部分关闭或回执。新 UUID 再次结束原 Conversation 返回既有结束状态，不能影响其他 Conversation。结束后发送、发布和编辑仍走原 ended gate。Native/Web 仅运输该 User 操作与安全失效事件，实际进程及输入清理由原 Runtime 管理。生产私有完成路由也用于接管后的 delegation_user 正常完成，其后台帮手继续保留。
+
 ### User 子输入运输
 
 `delegations.message.send` 使用 `{commandId,command:{conversationId,composerScope?,expectedRevision,body}}`；Core 从确切 child 派生 Thread、从可信 Request 派生编辑端，以本地 User 身份调用已经存在的整份私有材料消费算法。拒绝额外 Thread、actor、draftClient、sourcePath 或另一组附件字段；不能把其他私聊升级为 child。忙碌时整份输入进入该 child 的原 FIFO，失败保留草稿材料。

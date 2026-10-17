@@ -117,6 +117,8 @@ pub enum Operation {
     DelegationTakeover,
     #[serde(rename = "delegations.cancel")]
     DelegationCancel,
+    #[serde(rename = "delegations.conversation.end")]
+    DelegationConversationEnd,
     #[serde(rename = "delegations.pendingInputs.get")]
     DelegationPendingGet,
     #[serde(rename = "delegations.pendingInputs.edit")]
@@ -577,6 +579,7 @@ impl Operation {
             Self::DelegationMessageSend => "delegations.message.send",
             Self::DelegationTakeover => "delegations.takeover",
             Self::DelegationCancel => "delegations.cancel",
+            Self::DelegationConversationEnd => "delegations.conversation.end",
             Self::DelegationPendingGet => "delegations.pendingInputs.get",
             Self::DelegationPendingEdit => "delegations.pendingInputs.edit",
             Self::DelegationComposerMutate => "delegations.composer.mutate",
@@ -855,6 +858,10 @@ mod tests {
             ("delegations.message.send", "delegations.message.send"),
             ("delegations.takeover", "delegations.takeover"),
             ("delegations.cancel", "delegations.cancel"),
+            (
+                "delegations.conversation.end",
+                "delegations.conversation.end",
+            ),
             (
                 "delegations.pendingInputs.get",
                 "delegations.pendingInputs.get",

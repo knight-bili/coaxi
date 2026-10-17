@@ -137,6 +137,7 @@ fn assert_delegation_parent_cancellation(f: &mut Fixture, private_parent: &str) 
         JOIN delegation d ON d.child_conversation_id=c.id JOIN delegation_control control ON control.delegation_id=d.id
         WHERE r.invocation_kind='delegation_user' AND r.status='queued' AND control.takeover_at IS NOT NULL ORDER BY r.created_at DESC,r.id LIMIT 1",[],|r|r.get(0)).unwrap();
     let user_epoch = claim_context_child(f, &user_parent);
+    assert_child_user_end(f, &user_parent, user_epoch);
     let (_, member_parent, member_epoch) = context_child_of(
         f,
         &user_parent,

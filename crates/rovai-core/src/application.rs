@@ -866,6 +866,7 @@ fn request_runs_outside_main_queue(method: &str) -> bool {
             | "delegations.message.send"
             | "delegations.takeover"
             | "delegations.cancel"
+            | "delegations.conversation.end"
             | "delegations.pendingInputs.edit"
             | "delegations.composer.mutate"
             | "singleChat.end"
@@ -10571,7 +10572,7 @@ impl Core {
                         .list_active(&database, params.camp_id.as_str())?,
                 )?)
             }
-            "delegations.takeover" | "delegations.cancel" => {
+            "delegations.takeover" | "delegations.cancel" | "delegations.conversation.end" => {
                 let mut db = self.database.lock().await;
                 let reply =
                     delegation_control::handle(&mut db, &request.method, request.params.clone())?;

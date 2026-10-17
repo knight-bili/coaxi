@@ -3,6 +3,7 @@ use super::*;
 use crate::delegation_control::{
     self as control, CancelDelegationCommand, TakeoverDelegationCommand,
 };
+use crate::delegation_user::{self, EndDelegationConversationCommand};
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -36,6 +37,22 @@ pub(crate) fn cancel_envelope(
         p.command,
     ))
 }
+pub(crate) fn end_envelope(
+    db: &Database,
+    value: Value,
+) -> Result<CommandEnvelope<EndDelegationConversationCommand>> {
+    let p: Params<EndDelegationConversationCommand> = serde_json::from_value(value)?;
+    let thread: String = db
+        .connection()
+        .query_row(
+            "SELECT camp_id FROM conversation WHERE id=?1 AND kind='delegation_child'",
+            [&p.command.conversation_id],
+            |r| r.get(0),
+        )
+        .optional()?
+        .context("delegation.not_found")?;
+    Ok(user_camp_command_envelope(p.command_id, thread, p.command))
+}
 pub(crate) fn reconcile(db: &Database, method: &str, value: Value) -> Result<Value> {
     let recorded = match method {
         "delegations.takeover" => {
@@ -43,6 +60,9 @@ pub(crate) fn reconcile(db: &Database, method: &str, value: Value) -> Result<Val
         }
         "delegations.cancel" => {
             DomainCommandGateway.replay_if_recorded(db, &cancel_envelope(db, value)?)?
+        }
+        "delegations.conversation.end" => {
+            DomainCommandGateway.replay_if_recorded(db, &end_envelope(db, value)?)?
         }
         _ => anyhow::bail!("delegation.operation_not_admitted"),
     };
@@ -60,12 +80,19 @@ pub(crate) fn handle(db: &mut Database, method: &str, value: Value) -> Result<Re
             let e = cancel_envelope(db, value)?;
             (control::cancel(db, &e)?, e.camp_id.unwrap())
         }
+        "delegations.conversation.end" => {
+            let e = end_envelope(db, value)?;
+            (
+                delegation_user::end_conversation(db, &e)?,
+                e.camp_id.unwrap(),
+            )
+        }
         _ => anyhow::bail!("delegation.operation_not_admitted"),
     };
     let changed = (!execution.replayed
         && matches!(
             execution.result.code.as_str(),
-            "delegation.taken_over" | "delegation.cancelled"
+            "delegation.taken_over" | "delegation.cancelled" | "delegation.conversation_ended"
         ))
     .then(|| {
         (

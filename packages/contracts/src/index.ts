@@ -4826,6 +4826,7 @@ export type CoreMethod =
   | 'delegations.message.send'
   | 'delegations.takeover'
   | 'delegations.cancel'
+  | 'delegations.conversation.end'
   | 'delegations.pendingInputs.get'
   | 'delegations.pendingInputs.edit'
   | 'delegations.composer.mutate'

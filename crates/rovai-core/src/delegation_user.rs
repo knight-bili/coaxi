@@ -33,6 +33,31 @@ pub(crate) use send::{
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct EndDelegationConversationCommand {
+    pub conversation_id: String,
+}
+impl sealed::Sealed for EndDelegationConversationCommand {}
+impl DomainCommand for EndDelegationConversationCommand {
+    const TYPE: &'static str = "delegations.conversation.end";
+}
+impl crate::single_chat::PrivateEndCommand for EndDelegationConversationCommand {
+    const OWNER: ComposerOwner = ComposerOwner::DelegationChild;
+    fn input(&self, thread: &str) -> crate::single_chat::EndSingleChatCommand {
+        crate::single_chat::EndSingleChatCommand {
+            camp_id: thread.into(),
+            conversation_id: self.conversation_id.clone(),
+        }
+    }
+}
+pub fn end_conversation(
+    database: &mut Database,
+    envelope: &CommandEnvelope<EndDelegationConversationCommand>,
+) -> Result<CommandExecution> {
+    crate::single_chat::SingleChatService::default().end_owned(database, envelope)
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct MutateDelegationComposerCommand(pub MutatePrivateComposerCommand);
 
