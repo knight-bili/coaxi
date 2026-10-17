@@ -78,7 +78,7 @@ fn assert_legacy_delegation_upgrade(
             .unwrap(),
         "queued"
     );
-    // Reopen this populated old139 file through the entire production upgrade.
+    // Reopen this populated old140 file through the entire production upgrade.
     let upgraded = Database::open(&fixture.directory).unwrap();
     assert!(
         matches!(crate::db::classify_database_contract(upgraded.connection()).unwrap(),crate::db::DatabaseContractClassification::Current(ref marker) if marker.contract_version=="v1.73" && marker.projection_schema_version==160)
