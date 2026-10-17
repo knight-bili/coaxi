@@ -2105,3 +2105,15 @@ I04 旧 CLI 租约的回执恢复扩展原 `builtin_tool_runtime::tests::lease_r
 原临时目录清理 owner 验证清理仍在全局门外，原 Gateway 六项与严格参数 owner 回归；不新增 Rust owner 或隔离整库。
 这是进程期、最多1024份退役租约凭据的内部组件；只保存完整认证元组摘要及私有绑定，不保留旧结果缓存或临时目录。
 实际 CLI/IPC39 接线、Core 进程重启后的原请求处理与凭据过期/淘汰错误仍须后续集成验证，不将该组件称为端到端恢复通过。
+
+I04 生产 start 准备扩同一 Context owner，helper `context/delegation_start_tests.rs`，不新增 Rust owner或数据库。
+不再由测试调用者提供目标配置或 task Blob：经生产选择器取得 managed default/精确 typed custom 安装、原 Registry 默认与冻结 User preset，
+在独立工作线程完成目录和完整任务文件写入，再由同一 Gateway 事务登记 Blob、子任务图和回执。
+覆盖大段中文全文、准备/观察零数据库写入、回执故障整图及 Blob 元数据回滚、原准备重试、改 call 拒绝、
+原 Task Blob 动态引用保护、内置跨 Runtime 和 typed custom、真实 Core 轻发现登记前失败及失败回执保留、
+目标禁用时旧结果回放、目录失效、早/晚关闭开关以及外部目录仍走原用户审批。
+原 `managed_blob::tests::targeted_gc_uses_detach_time_and_rechecks_all_foreign_key_references` 扩 `managed_blob/candidate_tests.rs`，
+在原数据库验证锁外 worker 写入、登记回滚、活跃 intent/旧候选保护、丢弃后原恢复清理、内容替换拒绝、两个同内容并发写者及引用保留。
+原两个 Blob crash recovery owner 及 execution_text/evidence/file-change/image 使用者按相关路径回归；不把文件/SQLite 组件当作真实 Host/模型运行。
+预约必须在 Core 数据库互斥内取得；清理器只跳过活跃预约、不等待写者，避免持库锁等写锁造成死锁。
+进程崩溃后的持久 intent 仍由原恢复算法处理，不新增 Schema 或自建第二套任务/Blob 权威；原生租约的观察后重验和完整六操作运输另行接线。

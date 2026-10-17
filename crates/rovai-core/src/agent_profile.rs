@@ -5428,7 +5428,7 @@ fn model_option_validation_rejects_preserved_effort_after_catalog_refresh() {
     }
 }
 
-fn member_runtime_defaults(adapter_kind: AdapterKind) -> MemberRuntimeConfiguration {
+pub(crate) fn member_runtime_defaults(adapter_kind: AdapterKind) -> MemberRuntimeConfiguration {
     MemberRuntimeConfiguration {
         adapter_kind,
         model: ModelSelection::RuntimeDefault,

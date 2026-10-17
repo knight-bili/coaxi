@@ -12,6 +12,9 @@ use uuid::Uuid;
 
 use crate::db::Database;
 
+mod candidate;
+pub(crate) use candidate::{CandidateReservation, PreparedBlobCandidate};
+
 pub(crate) const MAX_BLOB_BYTES: u64 = 64 * 1024 * 1024;
 
 pub(crate) const GC_OWNER_EXECUTION_LIFECYCLE: &str = "execution_lifecycle";
@@ -188,109 +191,15 @@ impl ManagedBlobStore {
         sensitivity: &str,
         owner: &str,
     ) -> Result<ManagedBlobMetadata> {
-        validate_gc_owner(owner)?;
-        validate_media_type(media_type)?;
-        if !matches!(sensitivity, "normal" | "sensitive") {
-            anyhow::bail!("Blob sensitivity must be normal or sensitive");
-        }
-        anyhow::ensure!(
-            bytes.len() as u64 <= self.max_blob_bytes,
-            "Managed Blob exceeds {} bytes",
-            self.max_blob_bytes
-        );
-
-        let digest = format!("{:x}", Sha256::digest(bytes));
-        let blob_id = format!("blob-sha256-{digest}");
-        let relative_path = blob_relative_path(&digest);
-        let final_path = self.root.join(&relative_path);
-        let temporary_dir = self.root.join("tmp");
-        fs::create_dir_all(&temporary_dir)?;
-        let intent_id = Uuid::new_v4();
-        let intent_path = temporary_dir.join(format!("candidate-intent-{intent_id}.json"));
-        let intent_staging_path = temporary_dir.join(format!("candidate-intent-write-{intent_id}"));
-        let data_path = temporary_dir.join(format!("candidate-data-{intent_id}"));
-        let now = chrono::Utc::now().to_rfc3339();
-        let intent = serde_json::to_vec(&CandidateWriteIntent {
-            version: 1,
-            digest: digest.clone(),
-            owner: owner.to_string(),
-            created_at: now.clone(),
-        })?;
-        let mut intent_file = OpenOptions::new()
-            .create_new(true)
-            .write(true)
-            .open(&intent_staging_path)?;
-        intent_file.write_all(&intent)?;
-        intent_file.sync_all()?;
-        drop(intent_file);
-        fs::rename(&intent_staging_path, &intent_path)?;
-        sync_parent(&intent_path)?;
-
-        let mut data_file = OpenOptions::new()
-            .create_new(true)
-            .write(true)
-            .open(&data_path)?;
-        data_file.write_all(bytes)?;
-        data_file.sync_all()?;
-        drop(data_file);
-        if let Some(parent) = final_path.parent() {
-            fs::create_dir_all(parent)?;
-        }
-        if final_path.exists() {
-            let (existing_digest, existing_size) = hash_file(&final_path)?;
-            anyhow::ensure!(
-                existing_digest == digest && existing_size == bytes.len() as u64,
-                "Managed Blob digest collision or corrupted existing content"
-            );
-            fs::remove_file(&data_path)?;
-        } else {
-            fs::rename(&data_path, &final_path)?;
-            sync_parent(&final_path)?;
-        }
-
+        let candidate = self
+            .reserve_candidate(database, bytes, media_type, sensitivity, owner)?
+            .write(bytes)?;
         let transaction = database
             .connection_mut()
             .transaction_with_behavior(TransactionBehavior::Immediate)?;
-        if let Some((existing_size, existing_path)) = transaction
-            .query_row(
-                "SELECT byte_size, storage_relative_path FROM managed_blob WHERE sha256 = ?1",
-                [&digest],
-                |row| Ok((row.get::<_, i64>(0)?, row.get::<_, String>(1)?)),
-            )
-            .optional()?
-            && (existing_size != bytes.len() as i64 || existing_path != relative_path)
-        {
-            anyhow::bail!("Managed Blob metadata conflicts with content address");
-        }
-        transaction.execute(
-            r#"
-            INSERT INTO managed_blob(
-                id, sha256, byte_size, media_type, storage_relative_path,
-                state, sensitivity, created_at, verified_at, updated_at,
-                gc_candidate_at, gc_candidate_owner
-            ) VALUES (?1, ?2, ?3, ?4, ?5, 'present', ?6, ?7, ?7, ?7, ?7, ?8)
-            ON CONFLICT(sha256) DO UPDATE SET
-                state = 'present', verified_at = excluded.verified_at,
-                updated_at = excluded.updated_at,
-                gc_candidate_at = excluded.gc_candidate_at,
-                gc_candidate_owner = excluded.gc_candidate_owner
-            "#,
-            params![
-                blob_id,
-                digest,
-                bytes.len() as i64,
-                media_type,
-                relative_path,
-                sensitivity,
-                now,
-                owner,
-            ],
-        )?;
-        let metadata = load_blob_metadata(&transaction, &blob_id)?
-            .context("Managed Blob candidate metadata was not persisted")?;
+        let metadata = candidate.register(&transaction)?;
         transaction.commit()?;
-        fs::remove_file(&intent_path)?;
-        sync_parent(&intent_path)?;
+        candidate.finish()?;
         Ok(metadata)
     }
 
@@ -307,6 +216,9 @@ impl ManagedBlobStore {
             let Some(digest) = name.strip_prefix("gc-").filter(|value| valid_digest(value)) else {
                 continue;
             };
+            if candidate::active_digest(&self.root, digest) {
+                continue;
+            }
             let quarantine = entry.path();
             let final_path = safe_blob_path(&self.root, digest)?;
             let metadata_exists: bool = database.connection().query_row(
@@ -336,6 +248,9 @@ impl ManagedBlobStore {
             let Some(intent_id) = candidate_intent_id(&name) else {
                 continue;
             };
+            if candidate::active_intent(&self.root, &intent_id) {
+                continue;
+            }
             let intent: CandidateWriteIntent = serde_json::from_slice(
                 &fs::read(entry.path())
                     .with_context(|| format!("failed to read Managed Blob intent {name}"))?,
@@ -350,6 +265,9 @@ impl ManagedBlobStore {
                 "Managed Blob intent digest is invalid"
             );
             validate_gc_owner(&intent.owner)?;
+            if candidate::active_digest(&self.root, &intent.digest) {
+                continue;
+            }
             chrono::DateTime::parse_from_rfc3339(&intent.created_at)
                 .context("Managed Blob intent time is invalid")?;
             let data_path = temporary_dir.join(format!("candidate-data-{intent_id}"));
@@ -407,6 +325,12 @@ impl ManagedBlobStore {
         for entry in fs::read_dir(&temporary_dir)? {
             let entry = entry?;
             let name = entry.file_name().to_string_lossy().into_owned();
+            if candidate_staging_id(&name)
+                .or_else(|| candidate_data_id(&name))
+                .is_some_and(|id| candidate::active_intent(&self.root, &id))
+            {
+                continue;
+            }
             if candidate_staging_id(&name).is_some()
                 || candidate_data_id(&name).is_some_and(|intent_id| {
                     !temporary_dir
@@ -521,8 +445,14 @@ impl ManagedBlobStore {
                 })?
                 .collect::<rusqlite::Result<Vec<_>>>()?
         };
+        let references = managed_blob_reference_columns(database.connection())?;
         let mut collected = Vec::new();
         for (blob_id, digest) in candidates {
+            if candidate::active_digest(&self.root, &digest)
+                || blob_is_referenced(database.connection(), &references, &blob_id)?
+            {
+                continue;
+            }
             let path = safe_blob_path(&self.root, &digest)?;
             match fs::remove_file(&path) {
                 Ok(()) => {}
@@ -595,6 +525,9 @@ impl ManagedBlobStore {
         let references = managed_blob_reference_columns(database.connection())?;
         let mut collected = Vec::new();
         for (blob_id, digest) in candidates {
+            if candidate::active_digest(&self.root, &digest) {
+                continue;
+            }
             let transaction = database
                 .connection_mut()
                 .transaction_with_behavior(TransactionBehavior::Immediate)?;
@@ -733,7 +666,7 @@ fn managed_blob_reference_columns(connection: &Connection) -> Result<Vec<(String
 }
 
 fn blob_is_referenced(
-    transaction: &Transaction<'_>,
+    transaction: &Connection,
     references: &[(String, String)],
     blob_id: &str,
 ) -> Result<bool> {
@@ -859,6 +792,7 @@ fn sync_parent(path: &Path) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    include!("managed_blob/candidate_tests.rs");
 
     #[test]
     fn targeted_gc_uses_detach_time_and_rechecks_all_foreign_key_references() {
@@ -866,6 +800,7 @@ mod tests {
             std::env::temp_dir().join(format!("rovai-managed-blob-targeted-gc-{}", Uuid::new_v4()));
         let mut database = crate::test_support::fresh_schema_database_fast_at(&directory);
         let store = ManagedBlobStore::new(&directory);
+        assert_reserved_candidate_lifecycle(&mut database, &store);
         let unowned = store
             .put_bytes(&mut database, b"historical", "text/plain", "normal")
             .unwrap();

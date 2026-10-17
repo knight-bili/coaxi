@@ -169,6 +169,24 @@ pub(crate) fn start(
     invocation: &Invocation<'_, StartParams>,
     prepared: PreparedStart<'_>,
 ) -> Result<CommandExecution> {
+    start_inner(db, invocation, prepared, None)
+}
+
+pub(crate) fn start_with_candidate(
+    db: &mut Database,
+    invocation: &Invocation<'_, StartParams>,
+    prepared: PreparedStart<'_>,
+    candidate: &crate::managed_blob::PreparedBlobCandidate,
+) -> Result<CommandExecution> {
+    start_inner(db, invocation, prepared, Some(candidate))
+}
+
+fn start_inner(
+    db: &mut Database,
+    invocation: &Invocation<'_, StartParams>,
+    prepared: PreparedStart<'_>,
+    candidate: Option<&crate::managed_blob::PreparedBlobCandidate>,
+) -> Result<CommandExecution> {
     let command = envelope(db.connection(), invocation, Start)?;
     DomainCommandGateway.execute(db, &command, |tx| {
         ensure!(
@@ -194,6 +212,13 @@ pub(crate) fn start(
             "delegation.preparation_input_mismatch"
         );
         tx.execute_batch("SAVEPOINT delegation_model_start;")?;
+        if let Some(candidate) = candidate {
+            ensure!(
+                candidate.id() == prepared.request.task_blob_id,
+                "delegation.task_candidate_mismatch"
+            );
+            candidate.register(tx)?;
+        }
         let at = chrono::Utc::now().to_rfc3339();
         let registered = if prepared.observation.requires_user_permission() {
             prepared
@@ -231,6 +256,9 @@ pub(crate) fn start(
                 ));
             }
         };
+        if candidate.is_some() {
+            crate::managed_blob::attach_gc_candidate(tx, prepared.request.task_blob_id)?;
+        }
         tx.execute_batch("RELEASE delegation_model_start;")?;
         let report = task_report(
             tx,
@@ -250,6 +278,34 @@ pub(crate) fn start(
             "delegation.started",
             report,
             None,
+        ))
+    })
+}
+
+pub(crate) fn reject_start(
+    db: &mut Database,
+    invocation: &Invocation<'_, StartParams>,
+    code: &str,
+) -> Result<CommandExecution> {
+    ensure!(
+        code.starts_with("delegation.")
+            && code
+                .bytes()
+                .all(|b| b.is_ascii_alphanumeric() || b == b'.' || b == b'_'),
+        "delegation.invalid_rejection"
+    );
+    let command = envelope(db.connection(), invocation, Start)?;
+    DomainCommandGateway.execute(db, &command, |tx| {
+        authenticate_operation(
+            tx,
+            invocation.binding,
+            invocation.source,
+            invocation.tool_call,
+            "delegation.status",
+        )?;
+        Ok(CommandHandlerResult::rejected(
+            code,
+            json!({"status":"failed","error_code":code}),
         ))
     })
 }

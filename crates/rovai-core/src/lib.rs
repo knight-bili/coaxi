@@ -73,6 +73,7 @@ pub mod delegation_policy;
 pub(crate) mod delegation_resume;
 pub(crate) mod delegation_runtime_defaults;
 pub mod delegation_settings;
+pub(crate) mod delegation_start;
 pub mod delegation_user;
 pub(crate) mod delegation_workspace_permission;
 pub mod delivery_queue;
