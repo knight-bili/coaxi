@@ -100,6 +100,11 @@ pub(crate) fn source(connection: &Connection) {
     for (table, from, to) in [
         (
             "conversation",
+            "CHECK(kind IN ('camp_member','single_chat'))",
+            "CHECK(kind IN ('camp_member','single_chat')) CHECK(kind<>'delegation_child')",
+        ),
+        (
+            "conversation",
             "kind IN ('camp_member','single_chat')",
             "kind IN ('camp_member','single_chat','intruder')",
         ),
@@ -175,7 +180,7 @@ pub(crate) fn source(connection: &Connection) {
         "kind IN ('camp_member','single_chat')",
         "\"kind\" in ( /* compatible */ 'camp_member', 'single_chat' )",
     );
-    tx.execute_batch("ALTER TABLE agent_run ADD COLUMN preserved_usage_extra TEXT;")
+    tx.execute_batch("ALTER TABLE agent_run ADD COLUMN preserved_usage_extra TEXT CHECK(preserved_usage_extra IS NULL OR length(preserved_usage_extra)<=100);")
         .unwrap();
     assert!(source_schema_matches(&tx).unwrap());
     install_identity_schema(&tx).unwrap();
@@ -212,6 +217,11 @@ pub(crate) fn target(connection: &Connection) {
         .execute_batch("PRAGMA foreign_keys=OFF;")
         .unwrap();
     for (table, from, to) in [
+        (
+            "conversation",
+            "CHECK(kind IN ('camp_member','single_chat','delegation_child'))",
+            "CHECK(kind IN ('camp_member','single_chat','delegation_child')) CHECK(kind<>'delegation_child')",
+        ),
         (
             "conversation",
             "kind IN ('camp_member','single_chat','delegation_child')",

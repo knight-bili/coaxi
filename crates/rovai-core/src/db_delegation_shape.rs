@@ -320,10 +320,22 @@ pub(super) fn matches(connection: &Connection, target: bool) -> Result<bool> {
         }
         let expected_metadata = metadata(&reference, name)?;
         let actual_metadata = metadata(connection, name)?;
+        let changed = changed_columns(old, &new).context("Invalid compiled source columns")?;
+        // An extra CHECK can veto every new child even when all required
+        // expressions are present. Preserve unrelated legacy checks only.
+        if actual_checks.iter().any(|check| {
+            check.iter().any(|token| {
+                token
+                    .strip_prefix("w:")
+                    .is_some_and(|column| changed.contains(column))
+            }) && !required.contains(check)
+        }) {
+            return Ok(false);
+        }
         let Some(actual_columns) = column_items(&actual) else {
             return Ok(false);
         };
-        for column in changed_columns(old, &new).context("Invalid compiled source columns")? {
+        for column in changed {
             if actual_metadata.get(&column) != expected_metadata.get(&column)
                 || !actual_columns
                     .get(&column)

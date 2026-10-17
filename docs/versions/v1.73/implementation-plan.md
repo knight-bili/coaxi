@@ -38,5 +38,6 @@ User list/get/history/read、设置读取/全局CAS保存已接Core与Native/Web
 User resume已编码Core/两端运输/原请求恢复：独立User授权支持父Run终态，复用原计划/Session与attempt工厂；候选owned guard凭精确同事务User事件准入，模型活跃父分支不放宽。目录worker锁外、提交重验、事件/回执完整回滚须留定向证据。
 接续完整160/210结构分类/升级、执行恢复协调、真实Host/Runtime与原UI；其他I04工作包和全部正式场景保持。
 完整delta只读结构分类已编码：settings、全部新增对象、五扩展旧表和十个改动旧guard共用安装转换；旧159来源拒绝部分目标和被删改的旧约束。沿原身份迁移owner补来源/目标篡改、无害格式与额外列兼容、晚期故障回滚验证。接下来补policy3与新Run冻结资格、显式旧v1.72来源和两条升级链，再登记160/210；本项不提前改变现行159/209。
+候选delta及额外冲突约束的[结构分项证据](../../../integration/execution/i04-delegation-schema-result.json)记录定向原Rust owner、文档门禁、源码与日志核定；没有新增owner、启动登记或阶段完成声明。
 
 依赖与客户事项以[执行计划](../../../integration/execution/i04-execution-plan.md)和[客户待办](../../../integration/execution/customer-todos.json)为准。
