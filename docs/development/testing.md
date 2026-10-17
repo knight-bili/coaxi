@@ -94,7 +94,14 @@ owner，覆盖冻结 Codex adapter、明确协作事件、父会话一致性、�
 复用 `evidence_is_durable_blob_backed_agent_inaccessible_and_cancel_fenced` 的真实 SQLite/Context 夹具，
 验证原 Evidence 读取、错 Camp 拒绝、原事件回放、旧 epoch/取消围栏，以及该观察不进入模型输入；不新增 Rust owner。
 最低命令 `cargo test -p rovai-core --features extended-tests --lib execution_evidence::tests`，先同过滤 `-- --list` 确认非零。
-此次是新增用户证据字段的局部契约验证，不执行整包构建或 Actions；Grok、新版 Codex 原生活动和完整查看器仍待实现及真实 Runtime 验证。
+后续仍扩展这两个owner：新版Codex `subAgentActivity.kind` 与外层Item完成分开，覆盖started/completed/interrupted/interacted、
+坏身份、逻辑队员路径、实际Codec→SQLite读取/回放以及不进入Context。Grok的spawned/finished只声明原生Session子代理观察，
+验证显式child_session_id与subagent_id分离、不默认成功、闭合重投影、稳定事件去重、错adapter/epoch与模型输入隔离。
+`acp::route_policy_tests::grok_turn_usage_reaches_active_prompt_without_poisoning_late_idle_route` 扩展活动/空闲分类及
+该观察不证明当前输入已接受；`application::tests::kimi_and_grok_agent_text_use_the_generic_acp_delta_path_verbatim`
+只拥有两种实际扩展方法到闭合Evidence的归一化接线，不平行重测持久化矩阵。均无新增Rust owner。
+这批合并Core lib编译并列出非零清单，再执行上述17项Evidence与两个精确owner；失败修复做必要复验，不执行整包构建或Actions。
+Grok进度、父轮次结束后的背景观察、精确工具关联、完整查看器及真实Runtime仍归阶段未完项，不以这些局部检查代替。
 
 I04 单次自动化停止扩展既有 `automation::tests::manual_run_atomically_freezes_snapshot_and_replays_without_a_second_camp`
 owner，复用其真实 SQLite/回执/Delivery 夹具，覆盖 User/错归属拒绝、waiting/claimed 精确停止、原UUID回放与迟到请求不误停后来运行。

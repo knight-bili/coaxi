@@ -51,7 +51,24 @@ Core 的公开执行已经是 Delivery-first，历史 `a2aParentAgentRunId`、ro
 来源的新版Codex内置团队还存在不同协议：`src-tauri/src/acp/connection.rs:14179`明确指出
 不能只依赖旧 `collabAgentToolCall` 观察spawn；`:22154`的旧 `_meta.codex.subagent` 与新版rawInput兼容测试亦需保留。
 Grok `grok_subagent_meta`（同文件`:15957`）由Codeg本身组合，不能假设Rovai现有ACP已经提供该字段。
-本批只完成上述明确Codex事件的Core持久证据，其他格式、完整只读查看器和真实Runtime验证继续属于I04未完项。
+首批只完成上述明确Codex事件的Core持久证据；后续格式补充见下节。完整只读查看器和真实Runtime验证继续属于I04未完项。
+
+### 新版Codex与Grok的原生观察补充
+
+本机官方 `codex-cli 0.154.0` 直接导出的 `ItemStartedNotification` / `ItemCompletedNotification` schema
+确认：`subAgentActivity` 使用 `id/agentThreadId/agentPath/kind`，kind是started/interacted/interrupted/completed；
+Codeg ACP封装中的activityKind不是这层原生字段。Core现按该原生shape保存有界引用；外层item/completed不等于子代理完成。
+activityId不伪装成工具编号，逻辑agentPath只供展示，不用于文件或会话定位，父自身、坏编号及控制字符拒绝。
+
+Grok固定来源 `map_grok_subagent_notification_inner`（Codeg `connection.rs:15744`）明确没有工具编号；
+其FIFO/描述匹配不搬成Core业务权威。当前Core仅在已有活动Prompt的实际Session路由里接收两个确切扩展方法的
+subagent_spawned/subagent_finished，标明runtime_reported_session_child和originatingRunKnown=false；
+不捏造发起Run或父工具，亦不以这个观察证明当前Prompt输入已被接受。
+child_session_id与subagent_id分别保留；缺确切子Session时不以另一个编号自动补齐。结束未给结果状态时保留unknown。
+原ready/PromptCompleted/恢复replay门禁不放宽，progress仍按既有元数据处理；不因此声称已支持完整后台生命周期。
+
+Grok记录从闭合字段生成稳定观察摘要编号，重复事实回放原记录，不复制子任务/报告/私有包。现有User Evidence读取继续使用所属Thread，
+这些引用仍不授予原生文件读取权限。完整查看器、精确源文件归属证明、进度/后台回接和真实Runtime验证继续保留。
 
 ## 接下来的有限队列
 

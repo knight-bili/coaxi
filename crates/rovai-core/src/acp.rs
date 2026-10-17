@@ -376,6 +376,9 @@ pub(crate) fn is_session_catalog_update(message: &Value) -> bool {
 }
 
 fn is_prompt_metadata_only(adapter_kind: AdapterKind, message: &Value) -> bool {
+    if is_grok_subagent_observation(adapter_kind, message) {
+        return false;
+    }
     let carries_context = adapter_kind == AdapterKind::GrokBuild
         && crate::runtime::is_root_output(&message["params"])
         && crate::runtime::is_root_output(&message["params"]["update"])
@@ -387,6 +390,22 @@ fn is_prompt_metadata_only(adapter_kind: AdapterKind, message: &Value) -> bool {
     // active prompt's numeric collector observe it before dropping the catalog.
     (is_session_catalog_update(message) && !carries_context)
         || is_known_session_lifecycle_extension(adapter_kind, message)
+}
+
+fn is_grok_subagent_observation(adapter_kind: AdapterKind, message: &Value) -> bool {
+    adapter_kind == AdapterKind::GrokBuild
+        && message.get("id").is_none()
+        && message
+            .get("method")
+            .and_then(Value::as_str)
+            .is_some_and(|method| {
+                crate::runtime_subagent_observation::grok_observation(method, &message["params"])
+                    .is_some()
+            })
+}
+
+fn is_prompt_activity_evidence(adapter_kind: AdapterKind, message: &Value) -> bool {
+    !is_session_catalog_update(message) && !is_grok_subagent_observation(adapter_kind, message)
 }
 
 fn is_known_session_lifecycle_extension(adapter_kind: AdapterKind, message: &Value) -> bool {
@@ -3103,10 +3122,8 @@ impl AcpHost {
                 if is_prompt_metadata_only(self.adapter_kind, message) {
                     return AcpSessionMessageRoute::SessionMetadata;
                 }
-                // Catalog metadata may report the previous context before a
-                // prompt is accepted. Collect its numbers without treating it
-                // as proof that a rejected input was consumed.
-                if !is_session_catalog_update(message) {
+                // 目录和子代理观察可能来自此前活动；它们不能证明当前输入已被接受。
+                if is_prompt_activity_evidence(self.adapter_kind, message) {
                     active_prompt.prompt_activity_observed = true;
                 }
                 route.sequence = route.sequence.saturating_add(1);
@@ -8613,6 +8630,31 @@ mod route_policy_tests {
 
     #[test]
     fn grok_turn_usage_reaches_active_prompt_without_poisoning_late_idle_route() {
+        let mut child = json!({"method": "_x.ai/session_notification", "params": {
+            "sessionId": "session-grok", "update": {"sessionUpdate": "subagent_spawned", "subagent_id": "child-grok"}
+        }});
+        for method in ["_x.ai/session_notification", "_x.ai/session/update"] {
+            child["method"] = json!(method);
+            assert!(is_grok_subagent_observation(AdapterKind::GrokBuild, &child));
+            assert!(!is_prompt_metadata_only(AdapterKind::GrokBuild, &child));
+            assert!(!is_prompt_activity_evidence(AdapterKind::GrokBuild, &child));
+            assert!(is_idle_session_metadata(AdapterKind::GrokBuild, &child));
+            assert!(!is_grok_subagent_observation(
+                AdapterKind::TraeCnCli,
+                &child
+            ));
+        }
+        child["params"]["update"]["sessionUpdate"] = json!("subagent_finished");
+        assert!(is_grok_subagent_observation(AdapterKind::GrokBuild, &child));
+        assert!(!is_prompt_activity_evidence(AdapterKind::GrokBuild, &child));
+        child["params"]["update"]["sessionUpdate"] = json!("subagent_progress");
+        assert!(is_prompt_metadata_only(AdapterKind::GrokBuild, &child));
+        child["params"]["update"]["sessionUpdate"] = json!("subagent_spawned");
+        child["id"] = json!(99);
+        assert!(!is_grok_subagent_observation(
+            AdapterKind::GrokBuild,
+            &child
+        ));
         let usage = json!({
             "method": "_x.ai/session_notification",
             "params": {

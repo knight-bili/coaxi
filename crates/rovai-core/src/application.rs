@@ -22340,6 +22340,15 @@ fn normalize_acp_event_with_completion(
     params: &Value,
     completion: Option<&acp::CompletedAcpAction>,
 ) -> (&'static str, Value) {
+    if adapter_kind == AdapterKind::GrokBuild
+        && let Some(observation) =
+            crate::runtime_subagent_observation::grok_observation(method, params)
+    {
+        return (
+            crate::runtime_subagent_observation::GROK_OBSERVATION_EVENT,
+            observation,
+        );
+    }
     if method == "rovai/acp_prompt_completed" {
         return ("runtime.turn.completed", params.clone());
     }
@@ -33555,6 +33564,26 @@ for line in sys.stdin:
 
     #[test]
     fn kimi_and_grok_agent_text_use_the_generic_acp_delta_path_verbatim() {
+        for method in ["_x.ai/session_notification", "_x.ai/session/update"] {
+            let (event, payload) = normalize_acp_event(
+                AdapterKind::GrokBuild,
+                method,
+                &json!({
+                    "sessionId": "grok-parent", "update": {"sessionUpdate": "subagent_finished", "subagent_id": "grok-child",
+                        "output": "PRIVATE_CHILD_REPORT", "rawInput": {"task": "PRIVATE_CHILD_TASK"}}
+                }),
+            );
+            assert_eq!(
+                event,
+                crate::runtime_subagent_observation::GROK_OBSERVATION_EVENT
+            );
+            assert_eq!(
+                payload["nativeSubagents"]["children"][0]["status"],
+                "unknown"
+            );
+            assert_eq!(payload["nativeSubagents"]["originatingRunKnown"], false);
+            assert!(!payload.to_string().contains("PRIVATE_CHILD"));
+        }
         let text = "<think>provider reasoning</think>\nPUBLIC";
         for adapter_kind in [AdapterKind::KimiCodeCli, AdapterKind::GrokBuild] {
             let incoming = AcpIncoming::Message {

@@ -122,6 +122,7 @@ pub mod runtime_probe_process;
 pub mod runtime_resolution;
 pub mod runtime_search_operation;
 pub mod runtime_startup;
+mod runtime_subagent_observation;
 mod runtime_thinking;
 pub mod single_chat;
 pub mod single_chat_composer;

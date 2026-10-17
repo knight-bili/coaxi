@@ -21,6 +21,7 @@ use crate::{
         self, FILE_OPERATION_SCHEMA_VERSION, RUNTIME_FILE_OPERATION_MANAGED_OUTPUT_ROOT,
     },
     runtime_search_operation,
+    runtime_subagent_observation::{self, GROK_OBSERVATION_EVENT},
 };
 
 const INLINE_PAYLOAD_LIMIT_BYTES: usize = 16 * 1024;
@@ -213,6 +214,7 @@ impl ExecutionEvidenceService {
                 | "runtime.diagnostic"
                 | "runtime.fast.observed"
                 | RUNTIME_COMPACTION_DISPLAY_EVENT
+                | GROK_OBSERVATION_EVENT
                 | "file.change.updated"
                 | "runtime.file_changes.snapshot"
                 | "runtime.action"
@@ -778,6 +780,13 @@ impl ExecutionEvidenceService {
             || (!matches!(status.as_str(), "running" | "waiting")
                 && !(allow_fenced_terminal_tool_result
                     && matches!(status.as_str(), "succeeded" | "failed" | "cancelled")))
+        {
+            return Ok(None);
+        }
+
+        if event_type == GROK_OBSERVATION_EVENT
+            && (runtime_adapter_kind.as_deref() != Some("grok-build")
+                || runtime_subagent_observation::public_grok_observation(payload).is_none())
         {
             return Ok(None);
         }
@@ -2410,6 +2419,7 @@ fn evidence_classification(
         "runtime.plan" | "runtime.plan.delta" => Some(("plan", "updated")),
         "runtime.diagnostic" => Some(("step", "updated")),
         "runtime.fast.observed" => Some(("step", "updated")),
+        GROK_OBSERVATION_EVENT => Some(("step", "updated")),
         RUNTIME_COMPACTION_DISPLAY_EVENT => match payload.get("phase").and_then(Value::as_str) {
             Some("imminent" | "started") => Some(("step", "started")),
             Some("completed") => Some(("step", "completed")),
@@ -2437,6 +2447,9 @@ fn evidence_classification(
 
 fn normalize_public_payload(event_type: &str, payload: &Value) -> Value {
     match event_type {
+        GROK_OBSERVATION_EVENT => {
+            runtime_subagent_observation::public_grok_observation(payload).unwrap_or(Value::Null)
+        }
         "agent.reasoning.summary.delta" | "agent.thought.delta" => serde_json::json!({
             "itemId": payload.get("itemId").or_else(|| payload.get("toolCallId")),
             "delta": payload
@@ -2614,12 +2627,52 @@ fn insert_native_subagent_observation(
         return;
     }
     let item = &source_payload["item"];
+    let Some(item_id) = native_subagent_identity(&item["id"]) else {
+        return;
+    };
+    if item["type"] == "subAgentActivity" {
+        let (Some(parent), Some(child), Some(agent_path), Some(activity)) = (
+            native_subagent_identity(&source_payload["threadId"]),
+            native_subagent_identity(&item["agentThreadId"]),
+            item["agentPath"].as_str(),
+            item["kind"].as_str(),
+        ) else {
+            return;
+        };
+        // agentPath 是运行器的逻辑队员路径，只作展示，不作为文件或会话读取地址。
+        if parent == child
+            || agent_path == "/root"
+            || agent_path.is_empty()
+            || agent_path.len() > 512
+            || agent_path.chars().any(char::is_control)
+        {
+            return;
+        }
+        let status = match activity {
+            "started" => "running",
+            "completed" => "completed",
+            "interrupted" => "interrupted",
+            _ => "unknown",
+        };
+        public_payload["nativeSubagents"] = serde_json::json!({
+            "schemaVersion": 1,
+            "adapterKind": "codex-cli",
+            "source": "codex-app-server.subAgentActivity",
+            "relationship": "runtime_reported_child_activity",
+            "activityId": item_id,
+            "activity": match activity {
+                "started" | "completed" | "interrupted" | "interacted" => activity,
+                _ => "unknown",
+            },
+            "children": [{"nativeSessionId": child, "agentPath": agent_path, "status": status}],
+            "receiverCount": 1,
+            "omittedReceiverCount": 0,
+        });
+        return;
+    }
     if item["type"] != "collabAgentToolCall" {
         return;
     }
-    let Some(tool_call_id) = native_subagent_identity(&item["id"]) else {
-        return;
-    };
     let Some(sender) = native_subagent_identity(&item["senderThreadId"]) else {
         return;
     };
@@ -2665,7 +2718,7 @@ fn insert_native_subagent_observation(
         "adapterKind": "codex-cli",
         "source": "codex-app-server.collabAgentToolCall",
         "relationship": "runtime_reported_receiver",
-        "toolCallId": tool_call_id,
+        "toolCallId": item_id,
         "children": children,
         "receiverCount": seen.len(),
         "omittedReceiverCount": seen.len().saturating_sub(64),
@@ -3054,6 +3107,7 @@ fn activity_kind(payload: &Value) -> &'static str {
         "fileChange" => "file_change",
         "reasoning" => "reasoning_summary",
         "plan" => "plan",
+        "subAgentActivity" => "step",
         "agentMessage" | "userMessage" => "narration",
         "mcpToolCall"
         | "dynamicToolCall"
@@ -3765,6 +3819,139 @@ mod tests {
 
     #[test]
     fn provider_packets_are_reduced_to_public_evidence_fields() {
+        let grok = json!({"sessionId": "grok-parent", "update": {
+            "sessionUpdate": "subagent_spawned", "subagent_id": "grok-subagent", "child_session_id": "grok-child",
+            "description": "PRIVATE_GROK_TASK", "output": "PRIVATE_GROK_REPORT"
+        }});
+        let projected =
+            runtime_subagent_observation::grok_observation("_x.ai/session_notification", &grok)
+                .unwrap();
+        assert_eq!(projected["nativeSubagents"]["originatingRunKnown"], false);
+        assert_eq!(
+            projected["nativeSubagents"]["children"][0]["nativeSessionId"],
+            "grok-child"
+        );
+        assert!(!projected.to_string().contains("PRIVATE_GROK"));
+        assert!(projected["nativeSubagents"].get("toolCallId").is_none());
+        let mut forged = projected.clone();
+        forged["eventId"] = json!("forged-event-id");
+        forged["privatePacket"] = json!("PRIVATE_GROK_PACKET");
+        forged["nativeSubagents"]["originatingRunKnown"] = json!(true);
+        assert_eq!(
+            normalize_public_payload(GROK_OBSERVATION_EVENT, &forged),
+            projected
+        );
+        for (pointer, value) in [
+            ("/sessionId", json!("../parent")),
+            ("/update/subagent_id", json!({"id": "child"})),
+            ("/update/child_session_id", json!("../../other")),
+            ("/update/child_session_id", json!("grok-parent")),
+            ("/update/sessionUpdate", json!("subagent_progress")),
+        ] {
+            let mut invalid = grok.clone();
+            *invalid.pointer_mut(pointer).unwrap() = value;
+            assert!(
+                runtime_subagent_observation::grok_observation(
+                    "_x.ai/session_notification",
+                    &invalid
+                )
+                .is_none()
+            );
+        }
+        for (status, expected) in [
+            (json!("completed"), "completed"),
+            (json!("failed"), "failed"),
+            (json!("cancelled"), "cancelled"),
+            (json!("interrupted"), "interrupted"),
+            (Value::Null, "unknown"),
+            (json!("future"), "unknown"),
+        ] {
+            let mut finished = grok.clone();
+            finished["update"]["sessionUpdate"] = json!("subagent_finished");
+            finished["update"]["status"] = status;
+            finished["update"]
+                .as_object_mut()
+                .unwrap()
+                .remove("child_session_id");
+            let observed =
+                runtime_subagent_observation::grok_observation("_x.ai/session/update", &finished)
+                    .unwrap();
+            assert_eq!(
+                observed["nativeSubagents"]["children"][0]["status"],
+                expected
+            );
+            assert!(
+                observed["nativeSubagents"]["children"][0]
+                    .get("nativeSessionId")
+                    .is_none()
+            );
+        }
+        let native_activity = json!({
+            "threadId": "native-parent", "turnId": "parent-turn",
+            "item": {"id": "activity-1", "type": "subAgentActivity",
+                "agentThreadId": "native-child", "agentPath": "/root/reviewer", "kind": "started",
+                "task": "DO_NOT_COPY_TASK", "message": "DO_NOT_COPY_REPORT", "rolloutPath": "/private/native-rollout"}
+        });
+        for (activity, expected) in [
+            ("started", "running"),
+            ("completed", "completed"),
+            ("interrupted", "interrupted"),
+            ("interacted", "unknown"),
+            ("future", "unknown"),
+        ] {
+            let mut source = native_activity.clone();
+            source["item"]["kind"] = json!(activity);
+            // Item完成只说明该活动通知已结束；子代理状态必须取kind，不能取外层方法。
+            let (event, payload) = crate::codex::normalize_event("item/completed", &source);
+            assert_eq!(
+                evidence_classification(event, &payload),
+                Some(("step", "completed"))
+            );
+            let mut normalized = normalize_public_payload(event, &payload);
+            insert_native_subagent_observation(&mut normalized, event, &payload, Some("codex-cli"));
+            assert_eq!(
+                normalized["nativeSubagents"]["children"][0]["status"],
+                expected
+            );
+            assert_eq!(normalized["nativeSubagents"]["activityId"], "activity-1");
+            assert!(normalized["nativeSubagents"].get("toolCallId").is_none());
+            for excluded in [
+                "DO_NOT_COPY_TASK",
+                "DO_NOT_COPY_REPORT",
+                "/private/native-rollout",
+            ] {
+                assert!(!normalized.to_string().contains(excluded));
+            }
+        }
+        for (pointer, value) in [
+            ("/threadId", json!(null)),
+            ("/item/agentThreadId", json!("native-parent")),
+            ("/item/agentThreadId", json!("../other")),
+            ("/item/agentPath", json!("/root")),
+            ("/item/agentPath", json!("x".repeat(513))),
+            ("/item/kind", json!({"completed": true})),
+        ] {
+            let mut source = native_activity.clone();
+            *source.pointer_mut(pointer).unwrap() = value;
+            let mut normalized = normalize_public_payload("activity.completed", &source);
+            insert_native_subagent_observation(
+                &mut normalized,
+                "activity.completed",
+                &source,
+                Some("codex-cli"),
+            );
+            assert!(normalized.get("nativeSubagents").is_none());
+        }
+        for adapter in [None, Some("grok-build")] {
+            let mut normalized = normalize_public_payload("activity.completed", &native_activity);
+            insert_native_subagent_observation(
+                &mut normalized,
+                "activity.completed",
+                &native_activity,
+                adapter,
+            );
+            assert!(normalized.get("nativeSubagents").is_none());
+        }
         let source = json!({
             "threadId": "native-parent",
             "nativeSubagents": {"forged": true},
@@ -5754,6 +5941,132 @@ mod tests {
                 .unwrap()
                 .is_none()
         );
+        let mut last_native_sequence = native_observation.sequence;
+        for (id, kind, expected) in [
+            ("native-activity-start", "started", "running"),
+            ("native-activity-end", "completed", "completed"),
+            ("native-activity-stop", "interrupted", "interrupted"),
+        ] {
+            let (event, payload) = crate::codex::normalize_event(
+                "item/completed",
+                &json!({
+                    "threadId": "native-parent", "turnId": "native-parent-turn",
+                    "item": {"id": id, "type": "subAgentActivity", "kind": kind,
+                        "agentThreadId": "EVIDENCE_ONLY_NEW_NATIVE_CHILD", "agentPath": "/root/reviewer"}
+                }),
+            );
+            let recorded = ExecutionEvidenceService
+                .record_runtime_event(
+                    &mut database,
+                    &blob_store,
+                    &run_id,
+                    execution_epoch,
+                    event,
+                    &payload,
+                )
+                .unwrap()
+                .unwrap();
+            assert_eq!(recorded.sequence, last_native_sequence + 1);
+            last_native_sequence = recorded.sequence;
+            let saved = ExecutionEvidenceService
+                .read_full_payload(&database, &blob_store, &camp_id, &recorded.id)
+                .unwrap();
+            assert_eq!(saved["nativeSubagents"]["children"][0]["status"], expected);
+            let replay = ExecutionEvidenceService
+                .record_runtime_event(
+                    &mut database,
+                    &blob_store,
+                    &run_id,
+                    execution_epoch,
+                    event,
+                    &payload,
+                )
+                .unwrap()
+                .unwrap();
+            assert_eq!(replay.id, recorded.id);
+            assert_eq!(replay.sequence, recorded.sequence);
+        }
+        let grok_spawned = runtime_subagent_observation::grok_observation("_x.ai/session_notification", &json!({
+            "sessionId": "grok-parent", "update": {"sessionUpdate": "subagent_spawned",
+                "subagent_id": "EVIDENCE_ONLY_GROK_SUBAGENT", "child_session_id": "grok-native-child"}
+        })).unwrap();
+        assert!(
+            ExecutionEvidenceService
+                .record_runtime_event(
+                    &mut database,
+                    &blob_store,
+                    &run_id,
+                    execution_epoch,
+                    GROK_OBSERVATION_EVENT,
+                    &grok_spawned,
+                )
+                .unwrap()
+                .is_none()
+        );
+        database
+            .connection()
+            .execute(
+                "UPDATE agent_run SET runtime_adapter_kind = 'grok-build' WHERE id = ?1",
+                [&run_id],
+            )
+            .unwrap();
+        let grok_finished = runtime_subagent_observation::grok_observation(
+            "_x.ai/session_notification",
+            &json!({
+                "sessionId": "grok-parent", "update": {"sessionUpdate": "subagent_finished",
+                    "subagent_id": "EVIDENCE_ONLY_GROK_SUBAGENT", "output": "PRIVATE_GROK_REPORT"}
+            }),
+        )
+        .unwrap();
+        for observed in [&grok_spawned, &grok_finished] {
+            let recorded = ExecutionEvidenceService
+                .record_runtime_event(
+                    &mut database,
+                    &blob_store,
+                    &run_id,
+                    execution_epoch,
+                    GROK_OBSERVATION_EVENT,
+                    observed,
+                )
+                .unwrap()
+                .unwrap();
+            assert_eq!(recorded.sequence, last_native_sequence + 1);
+            last_native_sequence = recorded.sequence;
+            let saved = ExecutionEvidenceService
+                .read_full_payload(&database, &blob_store, &camp_id, &recorded.id)
+                .unwrap();
+            assert_eq!(saved["nativeSubagents"]["originatingRunKnown"], false);
+            assert_eq!(
+                saved["nativeSubagents"]["children"][0]["status"],
+                observed["nativeSubagents"]["children"][0]["status"]
+            );
+            assert!(!saved.to_string().contains("PRIVATE_GROK_REPORT"));
+            let replay = ExecutionEvidenceService
+                .record_runtime_event(
+                    &mut database,
+                    &blob_store,
+                    &run_id,
+                    execution_epoch,
+                    GROK_OBSERVATION_EVENT,
+                    observed,
+                )
+                .unwrap()
+                .unwrap();
+            assert_eq!(replay.id, recorded.id);
+        }
+        assert!(
+            ExecutionEvidenceService
+                .record_runtime_event(
+                    &mut database,
+                    &blob_store,
+                    &run_id,
+                    execution_epoch + 1,
+                    GROK_OBSERVATION_EVENT,
+                    &grok_spawned,
+                )
+                .unwrap()
+                .is_none()
+        );
         database
             .connection()
             .execute(
@@ -5784,6 +6097,16 @@ mod tests {
                 .contains("EVIDENCE_ONLY_NATIVE_CHILD")
         );
         assert!(!context.rendered_payload.contains("PRIVATE_NATIVE"));
+        assert!(
+            !context
+                .rendered_payload
+                .contains("EVIDENCE_ONLY_GROK_SUBAGENT")
+        );
+        assert!(
+            !context
+                .rendered_payload
+                .contains("EVIDENCE_ONLY_NEW_NATIVE_CHILD")
+        );
 
         let run_version: i64 = database
             .connection()
@@ -5900,7 +6223,7 @@ mod tests {
             .unwrap()
             .expect("terminal Team Tool result must survive the Turn fence");
         assert!(failed.inserted);
-        assert_eq!(failed.sequence, native_observation.sequence + 1);
+        assert_eq!(failed.sequence, last_native_sequence + 1);
         assert_eq!(
             failed.payload["errorCode"],
             "team_tool.execution_budget_exhausted"
