@@ -2570,6 +2570,13 @@ fn normalize_public_payload(event_type: &str, payload: &Value) -> Value {
             if let Some(background) = payload.get("zcodeBackground") {
                 normalized["zcodeBackground"] = background.clone();
             }
+            if payload.get("sourceAuthority").and_then(Value::as_str) == Some("core")
+                && let Some(request_id) = payload.get("coreRequestId").and_then(Value::as_str)
+                && Uuid::parse_str(request_id).is_ok()
+            {
+                // Correlation only, never authority or a result replay index.
+                normalized["coreRequestId"] = Value::String(request_id.to_owned());
+            }
             if let Some(core_envelope) = payload.get("coreEnvelope") {
                 normalized["coreEnvelope"] = public_core_envelope(core_envelope);
             }
@@ -3708,6 +3715,18 @@ mod tests {
 
     #[test]
     fn builtin_agent_output_digest_keeps_carrier_proof_without_a_second_result_body() {
+        let request = "7b5db24c-4a43-4cab-9217-d982b08f7691";
+        for (authority, value, expected) in [
+            ("core", request, true),
+            ("runtime", request, false),
+            ("core", "not-a-uuid", false),
+        ] {
+            let normalized = normalize_public_payload(
+                "runtime.action",
+                &json!({"sourceAuthority":authority,"coreRequestId":value}),
+            );
+            assert_eq!(normalized.get("coreRequestId").is_some(), expected);
+        }
         let raw_result = json!({
             "status": "accepted",
             "messageId": "msg_123",

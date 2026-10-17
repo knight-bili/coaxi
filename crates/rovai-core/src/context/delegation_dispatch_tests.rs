@@ -1,5 +1,17 @@
 // All six calls use the shared dispatcher, original Context owner's Database,
 // real files/Registry/Gateway and original native Session/input fixtures.
+fn delegation_dispatch_business(f: &Fixture) -> Value {
+    let runs=f.database.connection().prepare("SELECT id,conversation_id,status,execution_epoch,cancel_requested_at FROM agent_run ORDER BY id").unwrap().query_map([],|r|Ok(json!([r.get::<_,String>(0)?,r.get::<_,String>(1)?,r.get::<_,String>(2)?,r.get::<_,i64>(3)?,r.get::<_,Option<String>>(4)?]))).unwrap().collect::<rusqlite::Result<Vec<_>>>().unwrap();
+    let messages: i64 = f
+        .database
+        .connection()
+        .query_row("SELECT COUNT(*) FROM conversation_message", [], |r| {
+            r.get(0)
+        })
+        .unwrap();
+    json!({"graph":factory_counts(f),"runs":runs,"messages":messages})
+}
+
 fn delegation_cli_request(
     auth: &crate::builtin_tool_transport::BuiltinToolAuth,
     operation: &str,
@@ -94,6 +106,7 @@ fn assert_delegation_dispatch(
     assert!(replay.replayed);
     assert_eq!(replay.payload, initial.payload);
     assert_eq!(f.database.connection().total_changes(), changes);
+    let business = delegation_dispatch_business(f);
     let read = delegation_cli_request(
         &auth,
         "delegation.read",
@@ -128,10 +141,10 @@ fn assert_delegation_dispatch(
         status.payload["tasks"][1],
         json!({"task_id":"not-owned","status":"unknown"})
     );
-    assert_eq!(f.database.connection().total_changes(), changes);
+    assert_eq!(delegation_dispatch_business(f), business);
 
-    // No locks survive the wait. A socket disconnect interrupts the wait only,
-    // with zero writes and no child cancellation.
+    // Observation rows record start/end, but no business state changes and no
+    // locks survive the wait. Disconnect never cancels the child.
     let wait = delegation_cli_request(
         &auth,
         "delegation.status",
@@ -157,9 +170,9 @@ fn assert_delegation_dispatch(
             "delegation.status_disconnected"
         );
     });
-    assert_eq!(f.database.connection().total_changes(), changes);
+    assert_eq!(delegation_dispatch_business(f), business);
 
-    // Two waiters see one same-Run lease rotation without a DB notification.
+    // Two waiters see one same-Run lease rotation without a business notification.
     let auth2 = rt.block_on(async {
         let db = tokio::sync::Mutex::new(&mut f.database);
         let a = invoke(&db, &leases, &f.directory, &wait, std::future::pending());
@@ -192,11 +205,12 @@ fn assert_delegation_dispatch(
         }
         auth2
     });
-    assert_eq!(f.database.connection().total_changes(), changes);
+    assert_eq!(delegation_dispatch_business(f), business);
     assert_eq!(
         delegation_dispatch_call(&rt, f, &leases, &start).payload,
         initial.payload
     );
+    let changes = f.database.connection().total_changes();
     rt.block_on(async {
         let db = tokio::sync::Mutex::new(&mut f.database);
         for request in [&read, &history, &snapshot] {

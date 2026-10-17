@@ -26,9 +26,13 @@ start/cancel/resume 在新工作鉴权之前通过不暴露身份的证明查询
 Builtin39/36项、六命令/四原别名、封闭输出/安全错误/证据投影元数据与无限等待读取截止已接线；IPC3/Envelope2/AgentOutput10及实际159/209保持。
 批准的输入/说明/TaskReport和帮助文本使用原全文；原30项黄金结果保持。条件输出规则实际校验，未知结果不能夹带私有字段。
 同一 Context owner 借用原数据库验证真实 Windows 管道帧和断线，不启动 Host 或模型；CLI虚拟时钟验证无限读取和原有界超时。
-此批不等于真实 Host、全部 Runtime/平台、正式场景或 I04 完成；原执行证据起止写入和 provider工具调用关联仍须补齐，不能把投影函数当完整活动记录。
+此批不等于真实 Host、全部 Runtime/平台、正式场景或 I04 完成。
 旧无资格 Run 仍不能调用新业务操作，Bootstrap/Charter冻结内容不因目录版本补权；完整160/210与旧来源资格仍按原计划推进。
 实际159无委派表时先在原 agent_run 核对冻结资格，旧Run的六操作稳定拒绝，不借查新表报内部错误；同一 owner 在候选表安装前验证零写入。
-下一项接完整执行证据生命周期，再继续 User 查询、设置和父 Run 已终态时的 User resume。
+统一执行器的起止已接原 ExecutionEvidenceService/canonical lifecycle，共用实际返回封套；
+原回执早返回不记第二笔，每次实际执行尝试独立，避免同号新查询/提交前失败重试污染旧观察。
+关联使用原读模型的精确操作/输出摘要载体判定，provider事件夹具与真实Core调用分开标明。
+开始记录失败不派任务；结束记录故障保住原提交和回执，started行供后续Host重启核对，不宣称自动补齐。
+下一项继续 User 查询、设置和父 Run 已终态时的 User resume；真实 Host/Runtime、恢复协调和原 UI 资格仍按完整清单推进。
 
 依赖与客户事项以[执行计划](../../../integration/execution/i04-execution-plan.md)和[客户待办](../../../integration/execution/customer-todos.json)为准。

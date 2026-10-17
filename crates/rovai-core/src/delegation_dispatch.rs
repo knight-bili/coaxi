@@ -7,6 +7,8 @@ use serde::de::DeserializeOwned;
 use serde_json::Value;
 use tokio::sync::{Mutex, MutexGuard};
 
+mod evidence;
+
 use crate::{
     builtin_tool_runtime::{AuthorizedBuiltinToolInvocation, BuiltinToolLeaseRegistry},
     builtin_tool_transport::{
@@ -29,6 +31,7 @@ pub(crate) struct Outcome {
     pub operation: &'static str,
     pub payload: Value,
     pub replayed: bool,
+    receipt_id: Option<String>,
 }
 impl Outcome {
     fn command(operation: &'static str, execution: CommandExecution) -> Self {
@@ -37,6 +40,7 @@ impl Outcome {
             operation,
             payload: execution.result.payload,
             replayed: execution.replayed,
+            receipt_id: Some(execution.result.command_id),
         }
     }
     fn query(operation: &'static str, payload: Value) -> Self {
@@ -44,6 +48,7 @@ impl Outcome {
             operation,
             payload,
             replayed: false,
+            receipt_id: None,
         }
     }
 }
@@ -207,121 +212,155 @@ where
             .map_err(|_| anyhow::anyhow!("builtin_tool.run_not_bound"))?;
         ActiveInvocation::new(&request.auth, authorized, db, request_id)?
     };
-    match input_typed {
-        Input::Start(input) => {
-            let prepared = {
-                let _gate = active.guard(leases).await?;
-                let mut db = database.lock().await;
-                crate::delegation_start::prepare(
-                    BorrowMut::<Database>::borrow_mut(&mut *db),
-                    &ManagedBlobStore::new(data_dir),
-                    &active.invocation(&input),
-                )?
-            };
-            let observed = tokio::task::spawn_blocking(move || prepared.observe())
-                .await
-                .context("delegation.worker_failed")??;
-            let execution = active
-                .commit_start(database, leases, &input, &observed)
-                .await?;
-            // A committed receipt wins over failure to remove its durable file
-            // intent. GC recovery owns any retained intent after worker failure.
-            let cleanup_result = execution.clone();
-            if tokio::task::spawn_blocking(move || observed.finish_after(&cleanup_result))
-                .await
-                .map_or(true, |r| r.is_err())
-            {
-                eprintln!("delegation task intent cleanup deferred to Core recovery");
-            }
-            Ok(Outcome::command(operation, execution))
-        }
-        Input::Resume(input) => {
-            let prepared = {
-                let _gate = active.guard(leases).await?;
-                let mut db = database.lock().await;
-                crate::delegation_resume::prepare(
-                    BorrowMut::<Database>::borrow_mut(&mut *db),
-                    &active.invocation(&input),
-                )?
-            };
-            let (prepared, directory) = tokio::task::spawn_blocking(move || {
-                let directory = prepared.observe_directory();
-                (prepared, directory)
-            })
-            .await
-            .context("delegation.worker_failed")?;
-            let execution = active
-                .commit_resume(database, leases, &input, &prepared, &directory)
-                .await?;
-            Ok(Outcome::command(operation, execution))
-        }
-        Input::Status(input) => {
-            let notify = {
-                let mut db = database.lock().await;
-                BorrowMut::<Database>::borrow_mut(&mut *db)
-                    .execution_wake
-                    .delegation
-                    .clone()
-            };
-            let interrupted = async {
-                tokio::select! {
-                    _ = disconnected => {},
-                    _ = leases.wait_until_retired(&request.auth) => {},
-                }
-            };
-            let result = query::wait_for_status(
-                notify,
-                &input,
-                || async {
+    let observation = evidence::Observation::prepare(&active, operation, request_id, input)?;
+    {
+        let _gate = active.guard(leases).await?;
+        let mut db = database.lock().await;
+        let db = BorrowMut::<Database>::borrow_mut(&mut *db);
+        // Reader admission can record a legitimate disabled-start refusal.
+        // Legacy/no-role callers remain zero-write.
+        crate::delegation_admission::authenticate_operation(
+            db.connection(),
+            &active.authorized.native_binding,
+            &active.source,
+            &active.tool_call,
+            "delegation.status",
+        )?;
+        observation.start(db, data_dir)?;
+    }
+    let result: Result<Outcome> = async {
+        match input_typed {
+            Input::Start(input) => {
+                let prepared = {
                     let _gate = active.guard(leases).await?;
                     let mut db = database.lock().await;
-                    query::status_snapshot(
+                    crate::delegation_start::prepare(
+                        BorrowMut::<Database>::borrow_mut(&mut *db),
+                        &ManagedBlobStore::new(data_dir),
+                        &active.invocation(&input),
+                    )?
+                };
+                let observed = tokio::task::spawn_blocking(move || prepared.observe())
+                    .await
+                    .context("delegation.worker_failed")??;
+                let execution = active
+                    .commit_start(database, leases, &input, &observed)
+                    .await?;
+                // A committed receipt wins over failure to remove its durable file
+                // intent. GC recovery owns any retained intent after worker failure.
+                let cleanup_result = execution.clone();
+                if tokio::task::spawn_blocking(move || observed.finish_after(&cleanup_result))
+                    .await
+                    .map_or(true, |r| r.is_err())
+                {
+                    eprintln!("delegation task intent cleanup deferred to Core recovery");
+                }
+                Ok(Outcome::command(operation, execution))
+            }
+            Input::Resume(input) => {
+                let prepared = {
+                    let _gate = active.guard(leases).await?;
+                    let mut db = database.lock().await;
+                    crate::delegation_resume::prepare(
                         BorrowMut::<Database>::borrow_mut(&mut *db),
                         &active.invocation(&input),
-                    )
-                },
-                interrupted,
-            )
-            .await;
-            if result.is_err() && leases.authenticate(&request.auth).await.is_err() {
-                anyhow::bail!("builtin_tool.run_not_bound");
+                    )?
+                };
+                let (prepared, directory) = tokio::task::spawn_blocking(move || {
+                    let directory = prepared.observe_directory();
+                    (prepared, directory)
+                })
+                .await
+                .context("delegation.worker_failed")?;
+                let execution = active
+                    .commit_resume(database, leases, &input, &prepared, &directory)
+                    .await?;
+                Ok(Outcome::command(operation, execution))
             }
-            Ok(Outcome::query(operation, result?))
-        }
-        Input::Cancel(input) => {
-            let _gate = active.guard(leases).await?;
-            let mut db = database.lock().await;
-            Ok(Outcome::command(
-                operation,
-                model::cancel(
-                    BorrowMut::<Database>::borrow_mut(&mut *db),
-                    &active.invocation(&input),
-                )?,
-            ))
-        }
-        Input::Read(input) => {
-            let _gate = active.guard(leases).await?;
-            let mut db = database.lock().await;
-            Ok(Outcome::query(
-                operation,
-                query::read(
-                    BorrowMut::<Database>::borrow_mut(&mut *db),
-                    &active.invocation(&input),
-                )?,
-            ))
-        }
-        Input::History(input) => {
-            let _gate = active.guard(leases).await?;
-            let mut db = database.lock().await;
-            Ok(Outcome::query(
-                operation,
-                query::history(
-                    BorrowMut::<Database>::borrow_mut(&mut *db),
-                    &active.invocation(&input),
-                )?,
-            ))
+            Input::Status(input) => {
+                let notify = {
+                    let mut db = database.lock().await;
+                    BorrowMut::<Database>::borrow_mut(&mut *db)
+                        .execution_wake
+                        .delegation
+                        .clone()
+                };
+                let interrupted = async {
+                    tokio::select! {
+                        _ = disconnected => {},
+                        _ = leases.wait_until_retired(&request.auth) => {},
+                    }
+                };
+                let result = query::wait_for_status(
+                    notify,
+                    &input,
+                    || async {
+                        let _gate = active.guard(leases).await?;
+                        let mut db = database.lock().await;
+                        query::status_snapshot(
+                            BorrowMut::<Database>::borrow_mut(&mut *db),
+                            &active.invocation(&input),
+                        )
+                    },
+                    interrupted,
+                )
+                .await;
+                if result.is_err() && leases.authenticate(&request.auth).await.is_err() {
+                    anyhow::bail!("builtin_tool.run_not_bound");
+                }
+                Ok(Outcome::query(operation, result?))
+            }
+            Input::Cancel(input) => {
+                let _gate = active.guard(leases).await?;
+                let mut db = database.lock().await;
+                Ok(Outcome::command(
+                    operation,
+                    model::cancel(
+                        BorrowMut::<Database>::borrow_mut(&mut *db),
+                        &active.invocation(&input),
+                    )?,
+                ))
+            }
+            Input::Read(input) => {
+                let _gate = active.guard(leases).await?;
+                let mut db = database.lock().await;
+                Ok(Outcome::query(
+                    operation,
+                    query::read(
+                        BorrowMut::<Database>::borrow_mut(&mut *db),
+                        &active.invocation(&input),
+                    )?,
+                ))
+            }
+            Input::History(input) => {
+                let _gate = active.guard(leases).await?;
+                let mut db = database.lock().await;
+                Ok(Outcome::query(
+                    operation,
+                    query::history(
+                        BorrowMut::<Database>::borrow_mut(&mut *db),
+                        &active.invocation(&input),
+                    )?,
+                ))
+            }
         }
     }
+    .await;
+    {
+        let mut db = database.lock().await;
+        if observation
+            .finish(
+                BorrowMut::<Database>::borrow_mut(&mut *db),
+                data_dir,
+                input,
+                &result,
+            )
+            .is_err()
+        {
+            eprintln!("delegation activity completion deferred to Core reconciliation");
+        }
+    }
+    result
 }
 
 /// Public IPC adapter. It runs before the generic active-only path so a retired
@@ -338,10 +377,7 @@ where
     B: BorrowMut<Database>,
     D: Future<Output = ()>,
 {
-    use crate::builtin_tool_transport::{
-        BuiltinToolError, BuiltinToolInvocationEnvelope, BuiltinToolIpcResponse,
-        recovery_for_operation_error,
-    };
+    use crate::builtin_tool_transport::BuiltinToolIpcResponse;
     let BuiltinToolIpcRequestBody::Invoke {
         request_id,
         operation,
@@ -371,44 +407,7 @@ where
     } else {
         invoke(database, leases, data_dir, request, disconnected).await
     };
-    let envelope = match result {
-        Ok(outcome) => {
-            if crate::delegation_catalog::validate_output(outcome.operation, &outcome.payload)
-                .is_err()
-            {
-                return BuiltinToolIpcResponse::Envelope {
-                    envelope: BuiltinToolInvocationEnvelope::rejected(
-                        operation,
-                        request_id,
-                        BuiltinToolError {
-                            code: "builtin_tool.output_contract_mismatch".into(),
-                            message: "Core result could not be safely projected".into(),
-                            recovery: recovery_for_operation_error(
-                                operation,
-                                "builtin_tool.output_contract_mismatch",
-                            ),
-                            details: None,
-                        },
-                    )
-                    .expect("known operation and UUID"),
-                };
-            }
-            BuiltinToolInvocationEnvelope::success(outcome.operation, request_id, outcome.payload)
-        }
-        Err(error) => {
-            let (code, message) = public_error(&error);
-            BuiltinToolInvocationEnvelope::rejected(
-                operation,
-                request_id,
-                BuiltinToolError {
-                    code: code.into(),
-                    message: message.into(),
-                    recovery: recovery_for_operation_error(operation, code),
-                    details: None,
-                },
-            )
-        }
-    };
+    let envelope = operation_envelope(operation, request_id, &result);
     match envelope {
         Ok(envelope) => BuiltinToolIpcResponse::Envelope { envelope },
         Err(_) => BuiltinToolIpcResponse::ipc_error(
@@ -417,6 +416,43 @@ where
         ),
     }
 }
+fn operation_envelope(
+    operation: &str,
+    request_id: &str,
+    result: &Result<Outcome>,
+) -> Result<crate::builtin_tool_transport::BuiltinToolInvocationEnvelope> {
+    use crate::builtin_tool_transport::{
+        BuiltinToolError, BuiltinToolInvocationEnvelope, recovery_for_operation_error,
+    };
+    let (code, message) = match result {
+        Ok(outcome)
+            if crate::delegation_catalog::validate_output(outcome.operation, &outcome.payload)
+                .is_ok() =>
+        {
+            return BuiltinToolInvocationEnvelope::success(
+                outcome.operation,
+                request_id,
+                outcome.payload.clone(),
+            );
+        }
+        Ok(_) => (
+            "builtin_tool.output_contract_mismatch",
+            "Core result could not be safely projected",
+        ),
+        Err(error) => public_error(error),
+    };
+    BuiltinToolInvocationEnvelope::rejected(
+        operation,
+        request_id,
+        BuiltinToolError {
+            code: code.into(),
+            message: message.into(),
+            recovery: recovery_for_operation_error(operation, code),
+            details: None,
+        },
+    )
+}
+
 fn public_error(error: &anyhow::Error) -> (&'static str, &'static str) {
     if matches!(
         error.downcast_ref::<crate::command::CommandGatewayError>(),

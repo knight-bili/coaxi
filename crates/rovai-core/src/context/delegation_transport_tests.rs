@@ -199,9 +199,9 @@ fn assert_delegation_transport(
             crate::builtin_tool_cli_output::project_envelope(envelope).unwrap();
         }
     });
-    // Only the resume-unknown mutation may have written its sole receipt.
+    // Queries record observations; resume-unknown also records its sole receipt.
     assert!(f.database.connection().total_changes() > before);
-    let changes = f.database.connection().total_changes();
+    let business = delegation_dispatch_business(f);
     let wait = delegation_cli_request(
         &auth,
         "delegation.status",
@@ -239,7 +239,7 @@ fn assert_delegation_transport(
         };
         tokio::join!(server,client);
     });
-    assert_eq!(f.database.connection().total_changes(), changes);
+    assert_eq!(delegation_dispatch_business(f), business);
     let cancel = delegation_cli_request(&auth, "cancel_delegation", json!({"task_id":&task}));
     rt.block_on(async {
         let db = tokio::sync::Mutex::new(&mut f.database);

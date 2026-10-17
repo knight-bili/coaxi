@@ -2144,3 +2144,13 @@ I04 Builtin39 继续扩该 Context owner，helper `context/delegation_transport_
 同一 owner 在安装候选委派表之前，用实际旧 SingleChat Run/Binding 测六操作：
 完整 CLI 租约仍不能给无冻结角色的旧 Run 补权，统一返回稳定 access_denied 且零数据库写入。
 准入先验证原 Native Binding，再在旧 agent_run 表核对冻结资格；缺资格时不得触碰尚未安装的委派表而变成内部存储错误。
+
+I04 执行证据接线继续扩同一 Context owner，helper `context/delegation_evidence_tests.rs`，不新增 owner 或整库。
+实际派发的开始/结束走原服务、原单行 lifecycle 和同一封套，原回执/旧凭据/无Role/非法输入继续核对 total_changes 零；
+合法查询会记观察，等待/断线/换租约改核对业务图、Run状态/epoch/取消标识和消息数不变，不混淆诊断写入与业务效果。
+同号新快照和提交前失败后的实际重试各留独立输入/输出观察，不把一次失败与后来成功合成矛盾终态。
+用原 read_full_payload、canonical window 与明确 provider Shell 观察夹具，核对只有一份受限输出、准确Agent输出摘要和载体关联。
+注入开始记录、命令回执、结束记录三处存储故障；开始失败阻断派发，回执失败整图回滚后可按原参数重试，结束失败不能覆盖已提交任务/回执。
+独立源子Run由原父模型取消后，既有 status 等待仍能补原终态；失效源不能新建任务。原Scope与真机/模型资格分开。
+低层摘要 owner 验证 coreRequestId 仅保留 Core 声明的合法UUID；它不能充当业务鉴权或回执索引。
+真实 provider事件、完整Host、崩溃后遗留 started 行自动核对、GUI仍待；不以这些组件验证替代阶段正式场景。
