@@ -2,6 +2,18 @@
 use serde::{Deserialize, Deserializer, Serialize};
 use std::path::Path;
 
+pub(crate) fn canonical_operation(operation: &str) -> Option<&'static str> {
+    Some(match operation {
+        "delegation.start" | "delegate_to_agent" => "delegation.start",
+        "delegation.status" | "get_delegation_status" => "delegation.status",
+        "delegation.cancel" | "cancel_delegation" => "delegation.cancel",
+        "delegation.resume" | "resume_delegation" => "delegation.resume",
+        "delegation.read" => "delegation.read",
+        "delegation.history" => "delegation.history",
+        _ => return None,
+    })
+}
+
 pub const RUNTIME_TARGETS: &[&str] = &[
     "antigravity",
     "claude_code",

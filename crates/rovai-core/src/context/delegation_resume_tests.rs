@@ -126,6 +126,7 @@ fn assert_delegation_resume(
     request: &crate::delegation::FrozenRequest<'_>,
     plan: &crate::delegation_factory::ChildRunPlan<'_>,
     completed: &str,
+    receipt_proof: &crate::builtin_tool_runtime::ReceiptOnlyInvocation,
 ) {
     use crate::{
         delegation_contract::{CancelParams, ResumeParams, StatusParams},
@@ -326,6 +327,19 @@ fn assert_delegation_resume(
     let changes = f.database.connection().total_changes();
     assert_eq!(
         model_resume(f, binding, source, invocation.tool_call, &input)
+            .unwrap()
+            .result,
+        resumed.result
+    );
+    assert_eq!(
+        receipt_proof
+            .replay(
+                &f.database,
+                "resume_delegation",
+                invocation.tool_call,
+                &serde_json::to_value(&input).unwrap()
+            )
+            .unwrap()
             .unwrap()
             .result,
         resumed.result

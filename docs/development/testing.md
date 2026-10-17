@@ -2095,3 +2095,13 @@ Native Session ID、原生输入回执和清理完成信号由明确夹具提供
 Registry 启动前配置不提供原生会话凭据，续做保留原冻结执行依据并由原启动核验处理兼容变动；
 原 Session 的可空 compatibility key 保持原值，实际原生加载必须成功，续做禁止冷启动回退或改 Session/Binding。
 完整 Host/Fleet/writer、User resume、六操作运输、启动迁移160/210及正式场景继续归阶段候选，不能由此测试代替。
+
+I04 旧 CLI 租约的回执恢复扩展原 `builtin_tool_runtime::tests::lease_rotates_fences_and_replays_exact_request`，
+覆盖轮换、解绑、全局停止、注销后普通鉴权继续拒绝而回执证明保留、五个凭据字段任一变化拒绝及原 Run/epoch 不跟随新租约。
+回执证明不暴露 Run/Binding/tmp，不持有 ProcessConfig 或文件句柄，只能查 start/cancel/resume 的原 Gateway 回执；
+其他查询、业务操作和未记录请求都不能借它派发。六个 canonical 名与四个批准别名使用闭合映射，暂未激活到目录或 CLI。
+实际持久回执继续扩同一 Context owner，复用原数据库、真实源 Binding、工厂、停止、接管和原命令结果，
+核对原结果、同号改参数冲突、未记录请求零写入和禁止 status/read/history/send；resume 原回执也从同一只读证明查回。
+原临时目录清理 owner 验证清理仍在全局门外，原 Gateway 六项与严格参数 owner 回归；不新增 Rust owner 或隔离整库。
+这是进程期、最多1024份退役租约凭据的内部组件；只保存完整认证元组摘要及私有绑定，不保留旧结果缓存或临时目录。
+实际 CLI/IPC39 接线、Core 进程重启后的原请求处理与凭据过期/淘汰错误仍须后续集成验证，不将该组件称为端到端恢复通过。

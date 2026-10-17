@@ -80,6 +80,35 @@ fn assert_delegation_model_commands(
     };
     let source = &source_owner;
     let binding = &source_binding;
+    let lease_runtime = tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .unwrap();
+    let lease_registry = crate::builtin_tool_runtime::BuiltinToolLeaseRegistry::default();
+    let lease_config = crate::builtin_tool_runtime::BuiltinToolProcessConfig::create(
+        &std::env::current_exe().unwrap(),
+        &crate::builtin_tool_transport::LocalIpcEndpoint::UnixSocket {
+            path: f
+                .directory
+                .join("receipt-only-fixture.sock")
+                .to_string_lossy()
+                .into_owned(),
+        },
+        &f.directory,
+    )
+    .unwrap();
+    let lease_auth = lease_runtime
+        .block_on(lease_registry.bind(
+            &lease_config,
+            &source.agent_run_id,
+            source.execution_epoch,
+            binding,
+            &f.directory,
+        ))
+        .unwrap();
+    let receipt_proof = lease_runtime
+        .block_on(lease_registry.authenticate_receipt(&lease_auth))
+        .unwrap();
     let parent = crate::delegation_admission::authenticate_new_child(
         f.database.connection(),
         binding,
@@ -105,6 +134,20 @@ fn assert_delegation_model_commands(
             .unwrap()
             .is_none()
     );
+    let receipt_input = serde_json::to_value(&input).unwrap();
+    let receipt_changes = f.database.connection().total_changes();
+    assert!(
+        receipt_proof
+            .replay(
+                &f.database,
+                "delegate_to_agent",
+                invocation.tool_call,
+                &receipt_input
+            )
+            .unwrap()
+            .is_none()
+    );
+    assert_eq!(f.database.connection().total_changes(), receipt_changes);
     let before = factory_counts(f);
     // A failure while committing the sole receipt must erase the complete child
     // graph and domain event. Retrying the same original request is then valid.
@@ -378,7 +421,7 @@ fn assert_delegation_model_commands(
         .unwrap();
     assert_eq!(final_body, full_output);
     assert_delegation_model_queries(f, binding, source, request, plan, &id, &run, &full_output);
-    assert_delegation_resume(f, binding, source, request, plan, &id);
+    assert_delegation_resume(f, binding, source, request, plan, &id, &receipt_proof);
     assert_eq!(
         model::replay_start(&f.database, &invocation)
             .unwrap()
@@ -671,4 +714,84 @@ fn assert_delegation_model_commands(
         stopped.result
     );
     assert!(model_start(f, binding, source, request, plan, "stopped-source-new-work").is_err());
+    lease_runtime.block_on(lease_registry.unbind(
+        lease_config.process_id(),
+        &source.agent_run_id,
+        source.execution_epoch,
+    ));
+    assert!(
+        lease_runtime
+            .block_on(lease_registry.authenticate(&lease_auth))
+            .is_err()
+    );
+    let retired = lease_runtime
+        .block_on(lease_registry.authenticate_receipt(&lease_auth))
+        .unwrap();
+    let before = factory_counts(f);
+    let changes = f.database.connection().total_changes();
+    assert_eq!(
+        retired
+            .replay(
+                &f.database,
+                "delegate_to_agent",
+                invocation.tool_call,
+                &receipt_input
+            )
+            .unwrap()
+            .unwrap()
+            .result,
+        first.result
+    );
+    assert_eq!(
+        retired
+            .replay(
+                &f.database,
+                "cancel_delegation",
+                cancel.tool_call,
+                &serde_json::to_value(cancel.input).unwrap()
+            )
+            .unwrap()
+            .unwrap()
+            .result,
+        stopped.result
+    );
+    assert!(
+        retired
+            .replay(
+                &f.database,
+                "delegation.start",
+                "unrecorded-new-call",
+                &receipt_input
+            )
+            .unwrap()
+            .is_none()
+    );
+    for operation in [
+        "delegation.status",
+        "delegation.read",
+        "delegation.history",
+        "thread.message.send",
+        "delegate_to_agent_extra",
+    ] {
+        assert!(
+            retired
+                .replay(&f.database, operation, invocation.tool_call, &receipt_input)
+                .is_err()
+        );
+    }
+    let mut changed_input = receipt_input.clone();
+    changed_input["task"] = json!("不能以旧租约替换原任务");
+    assert!(
+        retired
+            .replay(
+                &f.database,
+                "delegation.start",
+                invocation.tool_call,
+                &changed_input
+            )
+            .is_err()
+    );
+    assert_eq!(factory_counts(f), before);
+    assert_eq!(f.database.connection().total_changes(), changes);
+    lease_runtime.block_on(lease_registry.unregister(lease_config.process_id()));
 }

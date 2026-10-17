@@ -20,6 +20,7 @@ use rovai_core::{
     team_tool::BuiltinToolBindingCredential,
 };
 use serde_json::json;
+use sha2::{Digest, Sha256};
 use tokio::{
     process::Command,
     sync::{Mutex, MutexGuard},
@@ -202,10 +203,99 @@ struct RegisteredProcess {
     active: Option<ActiveLease>,
 }
 
+// No process/config/tmp handles and no public source/binding access. This proof
+// can only consult an already recorded delegation mutation, never dispatch work.
+pub(crate) struct ReceiptOnlyInvocation {
+    agent_run_id: String,
+    execution_epoch: i64,
+    native_binding: BuiltinToolBindingCredential,
+}
+impl ReceiptOnlyInvocation {
+    pub(crate) fn replay(
+        &self,
+        database: &crate::db::Database,
+        operation: &str,
+        tool_call: &str,
+        input: &serde_json::Value,
+    ) -> Result<Option<crate::command::CommandExecution>> {
+        use crate::delegation_model_command::{self as model, Invocation};
+        let operation = crate::delegation_contract::canonical_operation(operation)
+            .filter(|op| {
+                matches!(
+                    *op,
+                    "delegation.start" | "delegation.cancel" | "delegation.resume"
+                )
+            })
+            .context("delegation.receipt_operation_required")?;
+        let (camp_id, agent_id) = database.connection().query_row(
+            "SELECT c.camp_id,c.agent_id FROM agent_run r JOIN conversation c ON c.id=r.conversation_id WHERE r.id=?1",
+            [&self.agent_run_id], |r| Ok((r.get(0)?,r.get(1)?)),
+        )?;
+        let source = crate::team_tool::AuthenticatedTeamToolRun {
+            camp_id,
+            agent_id,
+            agent_run_id: self.agent_run_id.clone(),
+            execution_epoch: self.execution_epoch,
+        };
+        match operation {
+            "delegation.start" => model::replay_start(
+                database,
+                &Invocation {
+                    binding: &self.native_binding,
+                    source: &source,
+                    tool_call,
+                    input: &serde_json::from_value(input.clone())?,
+                },
+            ),
+            "delegation.cancel" => model::replay_cancel(
+                database,
+                &Invocation {
+                    binding: &self.native_binding,
+                    source: &source,
+                    tool_call,
+                    input: &serde_json::from_value(input.clone())?,
+                },
+            ),
+            "delegation.resume" => model::replay_resume(
+                database,
+                &Invocation {
+                    binding: &self.native_binding,
+                    source: &source,
+                    tool_call,
+                    input: &serde_json::from_value(input.clone())?,
+                },
+            ),
+            _ => unreachable!(),
+        }
+    }
+}
+
+struct RetiredReceiptLease {
+    auth_digest: String,
+    proof: ReceiptOnlyInvocation,
+}
+
+fn receipt_auth_digest(auth: &BuiltinToolAuth) -> String {
+    let mut digest = Sha256::new();
+    digest.update(b"rovai.builtin-receipt-lease.v1");
+    for value in [
+        &auth.process_id,
+        &auth.process_token,
+        &auth.lease_id,
+        &auth.lease_token,
+    ] {
+        digest.update((value.len() as u64).to_be_bytes());
+        digest.update(value.as_bytes());
+    }
+    digest.update(auth.lease_generation.to_be_bytes());
+    format!("{digest:x}", digest = digest.finalize())
+}
+
 #[derive(Default)]
 pub(crate) struct BuiltinToolLeaseRegistry {
     processes: Mutex<HashMap<String, RegisteredProcess>>,
     invocation_gate: Mutex<()>,
+    retired_receipts: Mutex<VecDeque<RetiredReceiptLease>>,
 }
 
 impl BuiltinToolLeaseRegistry {
@@ -251,6 +341,8 @@ impl BuiltinToolLeaseRegistry {
                 {
                     bail!("Built-in Tool process is already bound to another AgentRun");
                 }
+                self.remember_receipt_lease(config.process_id(), &process.process_token, active)
+                    .await;
                 process.active = None;
                 process.config.write_context(None)?;
             }
@@ -310,7 +402,10 @@ impl BuiltinToolLeaseRegistry {
             if !matches {
                 return;
             }
-            process.active = None;
+            if let Some(active) = process.active.take() {
+                self.remember_receipt_lease(process_id, &process.process_token, &active)
+                    .await;
+            }
             if let Err(error) = process.config.write_context(None) {
                 eprintln!("failed to fence Built-in Tool context: {error:#}");
             }
@@ -332,6 +427,10 @@ impl BuiltinToolLeaseRegistry {
             let Some(process) = process else {
                 return;
             };
+            if let Some(active) = &process.active {
+                self.remember_receipt_lease(process_id, &process.process_token, active)
+                    .await;
+            }
             let _ = process.config.write_context(None);
             let retired = match process.config.retire_run_tmp() {
                 Ok(retired) => retired,
@@ -354,8 +453,10 @@ impl BuiltinToolLeaseRegistry {
             let mut processes = self.processes.lock().await;
             let mut fenced = 0;
             let mut retired_run_tmps = Vec::with_capacity(processes.len());
-            for process in processes.values_mut() {
-                if process.active.take().is_some() {
+            for (process_id, process) in processes.iter_mut() {
+                if let Some(active) = process.active.take() {
+                    self.remember_receipt_lease(process_id, &process.process_token, &active)
+                        .await;
                     fenced += 1;
                 }
                 if let Err(error) = process.config.write_context(None) {
@@ -415,6 +516,59 @@ impl BuiltinToolLeaseRegistry {
             .await
             .get(process_id)
             .is_some_and(|process| process.process_token == process_token)
+    }
+
+    async fn remember_receipt_lease(
+        &self,
+        process_id: &str,
+        process_token: &str,
+        active: &ActiveLease,
+    ) {
+        let auth = BuiltinToolAuth {
+            process_id: process_id.into(),
+            process_token: process_token.into(),
+            lease_id: active.lease_id.clone(),
+            lease_generation: active.lease_generation,
+            lease_token: active.lease_token.clone(),
+        };
+        let mut retired = self.retired_receipts.lock().await;
+        retired.push_back(RetiredReceiptLease {
+            auth_digest: receipt_auth_digest(&auth),
+            proof: ReceiptOnlyInvocation {
+                agent_run_id: active.agent_run_id.clone(),
+                execution_epoch: active.execution_epoch,
+                native_binding: active.native_binding.clone(),
+            },
+        });
+        while retired.len() > BUILTIN_TOOL_REPLAY_CACHE_CAPACITY {
+            retired.pop_front();
+        }
+    }
+
+    pub(crate) async fn authenticate_receipt(
+        &self,
+        auth: &BuiltinToolAuth,
+    ) -> std::result::Result<ReceiptOnlyInvocation, BuiltinToolLeaseError> {
+        if let Ok(active) = self.authenticate(auth).await {
+            return Ok(ReceiptOnlyInvocation {
+                agent_run_id: active.agent_run_id,
+                execution_epoch: active.execution_epoch,
+                native_binding: active.native_binding,
+            });
+        }
+        let digest = receipt_auth_digest(auth);
+        let retired = self.retired_receipts.lock().await;
+        let proof = &retired
+            .iter()
+            .rev()
+            .find(|lease| lease.auth_digest == digest)
+            .ok_or_else(run_not_bound)?
+            .proof;
+        Ok(ReceiptOnlyInvocation {
+            agent_run_id: proof.agent_run_id.clone(),
+            execution_epoch: proof.execution_epoch,
+            native_binding: proof.native_binding.clone(),
+        })
     }
 
     pub(crate) async fn replay(
@@ -834,6 +988,25 @@ mod tests {
         assert!(rotated.lease_generation > first.lease_generation);
         assert_ne!(rotated.lease_id, first.lease_id);
         assert!(registry.authenticate(&first).await.is_err());
+        assert_eq!(
+            registry
+                .authenticate_receipt(&first)
+                .await
+                .unwrap()
+                .agent_run_id,
+            "run-1"
+        );
+        for field in 0..5 {
+            let mut wrong = first.clone();
+            match field {
+                0 => wrong.process_id.push('x'),
+                1 => wrong.process_token.push('x'),
+                2 => wrong.lease_id.push('x'),
+                3 => wrong.lease_token.push('x'),
+                _ => wrong.lease_generation += 1,
+            }
+            assert!(registry.authenticate_receipt(&wrong).await.is_err());
+        }
         assert!(config.run_tmp().is_dir());
         assert!(!config.run_tmp().join("stale-from-first-lease.txt").exists());
         assert!(!Path::new(&member_image).exists());
@@ -875,6 +1048,14 @@ mod tests {
         );
         registry.unbind(config.process_id(), "run-1", 1).await;
         assert!(registry.authenticate(&rotated).await.is_err());
+        assert_eq!(
+            registry
+                .authenticate_receipt(&rotated)
+                .await
+                .unwrap()
+                .execution_epoch,
+            1
+        );
         assert!(!config.run_tmp().exists());
         let second = registry
             .bind(&config, "run-2", 2, &binding(), &root)
@@ -891,6 +1072,47 @@ mod tests {
                 .exists()
         );
         registry.unbind(config.process_id(), "run-2", 2).await;
+        let third = registry
+            .bind(&config, "run-3", 3, &binding(), &root)
+            .await
+            .unwrap();
+        assert_eq!(registry.fence_all().await, 1);
+        assert!(registry.authenticate(&third).await.is_err());
+        assert_eq!(
+            registry
+                .authenticate_receipt(&third)
+                .await
+                .unwrap()
+                .agent_run_id,
+            "run-3"
+        );
+        let fourth = registry
+            .bind(&config, "run-4", 4, &binding(), &root)
+            .await
+            .unwrap();
+        registry.unregister(config.process_id()).await;
+        assert!(
+            !registry
+                .authenticate_process(config.process_id(), config.process_token())
+                .await
+        );
+        assert!(registry.authenticate(&fourth).await.is_err());
+        assert_eq!(
+            registry
+                .authenticate_receipt(&fourth)
+                .await
+                .unwrap()
+                .execution_epoch,
+            4
+        );
+        assert_eq!(
+            registry
+                .authenticate_receipt(&rotated)
+                .await
+                .unwrap()
+                .agent_run_id,
+            "run-1"
+        );
         drop(config);
         let _ = fs::remove_dir_all(root);
     }

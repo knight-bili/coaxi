@@ -132,6 +132,13 @@ pub(crate) fn replay_resume(
 ) -> Result<Option<CommandExecution>> {
     DomainCommandGateway.replay_if_recorded(db, &envelope(db.connection(), invocation, Resume)?)
 }
+pub(crate) fn replay_cancel(
+    db: &Database,
+    invocation: &Invocation<'_, CancelParams>,
+) -> Result<Option<CommandExecution>> {
+    DomainCommandGateway.replay_if_recorded(db, &envelope(db.connection(), invocation, Cancel)?)
+}
+
 pub(crate) fn resume(
     db: &mut Database,
     invocation: &Invocation<'_, ResumeParams>,
