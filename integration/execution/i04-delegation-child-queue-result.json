@@ -1,0 +1,350 @@
+{
+  "schema_version": 1,
+  "stage": "I04",
+  "task": "I04-T01",
+  "checked_at": "2026-10-17T09:48:20.621840+00:00",
+  "status": "child_fifo_editor_lease_and_publish_components_verified_queued_upload_preview_user_api_and_lifecycle_pending",
+  "source_commit": "62654d638ea6b393b62281c63d162b00f4b038dc",
+  "implementation_baseline": "822534dfa38c1a11e43f77149afdaafc4d91b6fa",
+  "confirmation_record": "i04-delegation-r1-confirmation.json",
+  "runtime_data_contract": {
+    "version": "v1.72",
+    "schema": 159,
+    "migration": 209
+  },
+  "target_data_contract": {
+    "version": "v1.73",
+    "schema": 160,
+    "migration": 210,
+    "status": "not_registered"
+  },
+  "implemented": [
+    "Child User sends now consume the exact draft into the existing private FIFO while another User Run is active; the interim delegation.user_run_active rejection is removed",
+    "Original delegation-tree cleanup still blocks first User admission; prior User active/cleanup/recovery or prepared/unknown input blocks queue publication without discarding queued input",
+    "Separate sealed child edit/publish command identities reuse the original action, source-preparation, CAS, lease, quote, retained-return and publication algorithms; legacy SingleChat commands keep their original owner",
+    "Child queue reads expose safe material views, with edit session visible only to the exact trusted editor/scope; ready discovery admits only the exact active controlled child and ready head",
+    "Child publication uses its first owned attempt Runtime and frozen workspace through the previous send admission path, creates an independent delegation_user Run and preserves original attempts",
+    "Production asynchronous private queue pump discovers both families and uses the child typed publisher with source preparation outside the database lock; it emits delegation.changed for child outcomes",
+    "Pending migration preserves the old single_chat_pending_input_scope_insert predicate and adds controlled child ownership; complete startup classification is still unregistered"
+  ],
+  "pending_migration_modified_legacy_guards": [
+    "context_manifest_v34_only_insert",
+    "context_manifest_quote_profile_insert",
+    "agent_run_input_v34_only_insert",
+    "single_chat_composer_draft_scope_insert",
+    "single_chat_retained_input_insert_guard",
+    "single_chat_source_observation_owner",
+    "conversation_message_single_chat_attachment_insert_guard",
+    "conversation_message_single_chat_attachment_update_guard",
+    "single_chat_pending_input_scope_insert"
+  ],
+  "checks": {
+    "main_owner": {
+      "log": "delegation-child-queue-owner-02.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 1251
+    },
+    "regressions": [
+      {
+        "name": "legacy-private",
+        "filter": "single_chat::tests::",
+        "listed": 9,
+        "exit_code": 0,
+        "passed": 9,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "name": "composer",
+        "filter": "single_chat_composer::tests::",
+        "listed": 3,
+        "exit_code": 0,
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "name": "identity",
+        "filter": "delegation::tests::identity_graph_preserves_core_rows_and_fences_scope_replay_depth_and_takeover",
+        "listed": 1,
+        "exit_code": 0,
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "rust_total_passed": 14,
+    "full_rust_suite_run": false,
+    "docs_tests_passed": 10,
+    "source_version_governance_scaffold_protocol_fmt_diff_and_existing_codegraph_sync": "passed",
+    "typescript_or_js_rerun": false,
+    "typescript_or_js_reason": "No TypeScript or renderer change",
+    "current_protocol_methods": 189,
+    "locked_source_operations_reported_by_checker": 161,
+    "new_formal_cases_fully_passed": 0
+  },
+  "verified_behaviors": [
+    "Native and verified Web editors enqueue into one child FIFO; repeated send UUID performs no second database write",
+    "Legacy edit entry rejects child; Web takeover fences the old Native lease and wrong editor gets no source preparation or edit session",
+    "Attachment order and quotes survive queue save; duplicate order is rejected; restart recovery fences the old lease until explicit takeover",
+    "No next publication before prior cleanup acknowledgement; later queue entry cannot overtake its head; publications create private messages and independent User Runs",
+    "Return to occupied input creates a client-owned retained input and keeps current draft unchanged; injected retained insert failure rolls back and saves no receipt",
+    "Same-size source modification makes head needs_repair and blocks its successor; removing the invalid source and saving restores ordered publication"
+  ],
+  "failures": [],
+  "self_review_adjustments_before_execution": [
+    "Distinct UUIDs are used for legacy rejection versus child editing, since command identity includes its sealed type",
+    "Source-change fixture preserves byte size to exercise the digest fence precisely"
+  ],
+  "limitations": [
+    "Control/terminal rows, including inter-publication completion, are isolated SQL fixtures; one cleanup acknowledgement uses the actual Core service but no real process exists",
+    "Actual Gateway enqueue/edit/retain/publish and file observations run; production asynchronous queue pump is compiled but not exercised in a full Host event loop",
+    "No new User send/queue protocol operation is admitted yet; canonical current method count remains 189. delegation.changed subscription/projection belongs to the upcoming transport/UI wiring",
+    "Child pending-edit upload targets and exact pending/pending-edit preview locators, User API original-request recovery and original UI are still pending",
+    "Positive child Canvas/adopt flows, nonempty Skill choices, full Context delivery, all 21 plus custom initial target admission and authenticated takeover/cancel/restart/native-session/Fleet lifecycle remain pending",
+    "Complete160/210 admission must classify all nine modified legacy guards plus settings, owned objects and extended tables. Marker/receipt are unchanged; real startup/reopen is not claimed",
+    "No full app build, TypeScript rerun, actual Runtime/MCP/model, Host/GUI, push/Actions, main merge or release; final compiler has six existing helper warnings"
+  ],
+  "next_actions": [
+    "Child pending upload and precise preview ownership",
+    "User send and queue API/native/Web/original UUID recovery wiring",
+    "Authenticated takeover/cancellation/cleanup and initial target factory",
+    "Complete migration admission, original UI transplantation and remaining I04 packages"
+  ],
+  "external_actions": {
+    "push": false,
+    "actions": false,
+    "main_merge": false,
+    "release": false,
+    "real_model_budget": 0
+  },
+  "approved_artifacts": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1",
+      "unchanged": true
+    }
+  ],
+  "source_files": [
+    {
+      "path": "crates/rovai-core/src/application.rs",
+      "git_blob_sha256": "32be3f8ac96195fcf388695e32fe38846ee937e25c4693790d775c18aa726595",
+      "bytes": 1405693
+    },
+    {
+      "path": "crates/rovai-core/src/context.rs",
+      "git_blob_sha256": "246a2309cae39957c793aa37c87a8857a25e503b766cd2da059e3f8c90186443",
+      "bytes": 674874
+    },
+    {
+      "path": "crates/rovai-core/src/context/delegation_queue_tests.rs",
+      "git_blob_sha256": "30d395836fc621510d1c175d404203860ebae7329b94c64363f08475545335c5",
+      "bytes": 20739
+    },
+    {
+      "path": "crates/rovai-core/src/context/delegation_send_tests.rs",
+      "git_blob_sha256": "b22fef0bc305bbde482363e65c24118517e0e0411f31a07c7c823f096b4f5981",
+      "bytes": 18348
+    },
+    {
+      "path": "crates/rovai-core/src/db_delegation.rs",
+      "git_blob_sha256": "d8827432e35e4ef6268b011dea52865976bdc1428bf68adbb22a32ed03f5327b",
+      "bytes": 13275
+    },
+    {
+      "path": "crates/rovai-core/src/delegation_user.rs",
+      "git_blob_sha256": "78dedebcdec3659e70ca5d45af91e0a0843c5a13e2c616af94cc49fbbadc9ad0",
+      "bytes": 5166
+    },
+    {
+      "path": "crates/rovai-core/src/delegation_user_queue.rs",
+      "git_blob_sha256": "7bec310aa16a22a13b06a84031fb00d72972b1097f68b1b96166c13db55c069e",
+      "bytes": 4273
+    },
+    {
+      "path": "crates/rovai-core/src/delegation_user_send.rs",
+      "git_blob_sha256": "8feaa6d97ab92fbc86e4d033859e119e9b6b7cd82b9eeb7d1c89c7fb33c827a0",
+      "bytes": 7870
+    },
+    {
+      "path": "crates/rovai-core/src/single_chat.rs",
+      "git_blob_sha256": "f3e5a93870a7e8b0c233b41d298c5472ff4448eb321d01d84b53bb545f0ebb9d",
+      "bytes": 212635
+    },
+    {
+      "path": "docs/development/testing.md",
+      "git_blob_sha256": "a08298ac4b83458eac259611ab576ed025a7e771a72252dabcedf95aacb661d6",
+      "bytes": 208422
+    }
+  ],
+  "log_files": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-approved-files.json",
+      "sha256": "5d271f25d2868bc14447ab28030dd1b3a58108343594c74e1802f1edf85946fc",
+      "bytes": 1887
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-codegraph-final.log",
+      "sha256": "9e405f8d5c2b9d7a4bbdef8c214a0b2439eea66c6c58077f0a3351d264194a2c",
+      "bytes": 250
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-codegraph.log",
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef",
+      "bytes": 88
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-compile-01.log",
+      "sha256": "8129d3da2355298070efea4ba8c89a9ac5a8d6cb0e123c73edcb612f4b79867e",
+      "bytes": 2005
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-compile-02.log",
+      "sha256": "d040883ebaa9d2f0187500f5d95e506b2aec32d91c361ce2a2c4efcd6ff4c7cf",
+      "bytes": 2005
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-compile-03.log",
+      "sha256": "d44c05468d67e42ea4cc0ad78ed8340c23cdb2144f83d4d2a815ab56c8a7304b",
+      "bytes": 2005
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-diff-final.log",
+      "sha256": "c8c2290512ce695ab9c84b6a9acbf51f5cbef1fe75d3db79615c75e8229d5c4f",
+      "bytes": 121
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-doc-governance.log",
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a",
+      "bytes": 170
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-doc-tests.log",
+      "sha256": "19ccac1be17c3708b066274fe185950cfefdec034bf5282608d6c90dee312b46",
+      "bytes": 925
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-doc-version.log",
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335",
+      "bytes": 79
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-fmt-02.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-fmt-03.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-fmt-final.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-owner-01.log",
+      "sha256": "695127ef5d661d671e8d93efeec90b186171fd7adeae61a0f1e76c4bad73e408",
+      "bytes": 227
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-owner-02.log",
+      "sha256": "943e90d90c8787dafe0cb43ba31600d84323e18454b58327eac81483e089ac4c",
+      "bytes": 227
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-owner-list.log",
+      "sha256": "8d7c39b86e00e4e7eee958d5210fe31c3224cf0ebf2bba69b1e95c305acee56d",
+      "bytes": 125
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-protocol.log",
+      "sha256": "044569df112d191be31ea876439bd2bd3294beb8d9fa469452c1bcc1ea893695",
+      "bytes": 182
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-regression-composer-list.log",
+      "sha256": "e8782a2dee0018db9cef95310240565849de5558d40b95d1ee30b2c67c3b0d23",
+      "bytes": 378
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-regression-composer.log",
+      "sha256": "7e6245a898d0eb41e81bb458a8a9c311da439bfc7e90fa5584edcd88f109ae42",
+      "bytes": 492
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-regression-identity-list.log",
+      "sha256": "c661c1430921d980ff74940beb77b1ffbd5264d2f839672df78122799720996b",
+      "bytes": 128
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-regression-identity.log",
+      "sha256": "14961d63a5c5ecf7bec0e926fdf7fbd7271006191040ec43438d48f822fe7e0b",
+      "bytes": 230
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-regression-legacy-private-list.log",
+      "sha256": "fbbc0f6304b8e1b5adf6fc252ff9c6192e7f7a937727039ee64d7d8ebb7c4d3f",
+      "bytes": 930
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-regression-legacy-private.log",
+      "sha256": "49579fa53568d2dcc791fceee2cb99b4b507c34c3c35d422554ddec35078b97b",
+      "bytes": 1080
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-regression-results.json",
+      "sha256": "b81dde3fd65bccbabccaa3636dca370a28b2ea527d5c4f3de36e2515d65fa661",
+      "bytes": 600
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-scaffold.log",
+      "sha256": "899dab604ac7f85562aab489b6c0f0730065bba54b60543d95ce3bcc2cd9765a",
+      "bytes": 343
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-child-queue-source-commit.log",
+      "sha256": "a7fc0d00253456494e7d054018970773e82992b4e955f2412483550622d5261f",
+      "bytes": 321
+    }
+  ]
+}
