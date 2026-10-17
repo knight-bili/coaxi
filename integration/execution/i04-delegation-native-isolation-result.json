@@ -1,0 +1,396 @@
+{
+  "schema_version": 1,
+  "stage": "I04",
+  "task": "I04-T01",
+  "checked_at": "2026-10-17T07:40:03.479445+00:00",
+  "status": "native_preparation_component_boundaries_verified_user_material_admission_and_lifecycle_pending",
+  "source_commit": "5cf35c5ed1d70e94449158083c0deca34488f8a0",
+  "implementation_baseline": "69037c8191cf624a8843e1236f7c60b49a764208",
+  "confirmation_record": "i04-delegation-r1-confirmation.json",
+  "runtime_data_contract": {
+    "version": "v1.72",
+    "schema": 159,
+    "migration": 209
+  },
+  "target_data_contract": {
+    "version": "v1.73",
+    "schema": 160,
+    "migration": 210,
+    "status": "not_registered"
+  },
+  "changes": [
+    "Actual Context preparation filters Core platform Skill source identities, including canonical path aliases; same-name user Native Skills survive; no obsolete project Skill projection restored",
+    "Selection3 policy_restricted is frozen in existing evidence/digest; legacy Selection2 omission reasons remain unchanged; child Context and existing-Manifest recovery reject inherited project exposure",
+    "Actual MCP prepare validates frozen child role, owned Conversation/Thread, current epoch/active status, target Runtime/version and canonical workspace before either cache reads or current assignment selection",
+    "Runtime source attachment loader has an owned child route using the actual Core Conversation/Turn and initial input boundary; initial/resume sources must be empty and User sources require post-takeover input",
+    "No new Rust owner; existing materialization owner owns the new SQLite/projection checks; existing MCP/Skill/source/Manifest owners provide targeted regression"
+  ],
+  "checks": {
+    "rust_owner_passed": 1,
+    "rust_regressions": [
+      {
+        "name": "mcp",
+        "filter": "mcp_projection::tests::",
+        "listed": 8,
+        "exit_code": 0,
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0,
+        "filtered": 1244
+      },
+      {
+        "name": "skills",
+        "filter": "current_input_skill::tests::",
+        "listed": 4,
+        "exit_code": 0,
+        "passed": 4,
+        "failed": 0,
+        "ignored": 0,
+        "filtered": 1248
+      },
+      {
+        "name": "sources",
+        "filter": "local_attachment_source::tests::",
+        "listed": 3,
+        "exit_code": 0,
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "filtered": 1249
+      },
+      {
+        "name": "manifest-mcp",
+        "filter": "context::slow_tests::context_manifest_recovers_redacted_frozen_mcp_exposure_without_digests",
+        "listed": 1,
+        "exit_code": 0,
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "filtered": 1251
+      }
+    ],
+    "rust_total_passed": 17,
+    "rust_failed": 0,
+    "rust_full_suite_run": false,
+    "documentation_tests_passed": 10,
+    "contract_types": "passed targeted contracts compilation",
+    "version_gate": "v1.73 / 173 directories passed",
+    "governance_gate": "passed with explicit DOCS_BASE_REF",
+    "fmt": "passed",
+    "diff": "passed",
+    "codegraph_sync": "completed existing index only"
+  },
+  "qualified_boundaries": [
+    "Core child row comes from explicit SQL fixture factory, then real dispatch/claim/binding and Context calls; not authenticated start or target Runtime selection",
+    "Native Skill selection is a fixture RunSnapshot passed through production preparation; not an authenticated User draft/send",
+    "Child MCP verifies assigned/unassigned selection, five cached-request mismatches and unchanged bytes/digest after config disable; no MCP server or agent process was launched",
+    "Initial child Runtime source attachment read tested empty; takeover/User branch is implemented but not qualified by a real User admission/material transaction",
+    "No actual cross-Runtime target factory, native provider discovery isolation, cancellation, resume, restart, UI or complete D01-D32 / DG-G01..05 qualification"
+  ],
+  "failures_retained": [
+    "owner-01: missing receiving-member preparation in fixture; changed fixture to existing production pack preparer",
+    "owner-02: fixture Native ID double-prefixed hash; now uses existing Native reader identity",
+    "owner-03: legacy compatibility fixture kept child invocation after removing its policy; now asserts refusal first, then uses a legacy invocation",
+    "owner-04: Windows rejected non-private config parent; fixture now uses a separate private home/.rovai directory without weakening security",
+    "owner-05: create API accepts one MCP server; fixture now creates each server through the existing API",
+    "compile-06: fixture mixed boxed and plain configuration views; normalized fixture type; owner-06 used the previous binary and is explicitly excluded from qualification",
+    "owner-07: new SQL used snapshot field names as columns; production queries corrected to actual Conversation owner, Turn Thread and initial conversation input boundary",
+    "types-01/02: standalone compiler needed ignoreConfig and existing Node types; types-03 passed",
+    "governance-01: base is supplied via DOCS_BASE_REF, not --base; corrected explicit-base gate passed"
+  ],
+  "formal_scope": {
+    "clusters": 81,
+    "work_packages": 48,
+    "cases": 324,
+    "i04_clusters": 21,
+    "i04_cases": 84,
+    "new_complete_formal_cases_passed": 0
+  },
+  "approved_files": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1",
+      "unchanged": true
+    }
+  ],
+  "source_files": [
+    {
+      "path": "crates/rovai-core/src/context.rs",
+      "git_blob": "c890fd4f69f5290bc7dbb2041497eab894263cfa",
+      "sha256": "6ee0bbd3e8fbeaa302b3cbf10549ac9cc3f6c5d6f3fd62072cb6ff3095b2bf48"
+    },
+    {
+      "path": "crates/rovai-core/src/context/delegation_context.rs",
+      "git_blob": "b89d559e1218e7863218c495d98537cd744526ee",
+      "sha256": "59fecad2b2ae48833c3c4dcee1d2c7a8b9a5f680d7f8c7280b650d4777ce3fea"
+    },
+    {
+      "path": "crates/rovai-core/src/context/delegation_context_tests.rs",
+      "git_blob": "454b8cab6d2a280c5cfda7699f63714fc6fd7f20",
+      "sha256": "cf562348dd2a7ab364122ca33b2354cf2bbb96001092c42a3f1eae0ea209c57b"
+    },
+    {
+      "path": "crates/rovai-core/src/current_input_skill.rs",
+      "git_blob": "bf8c085298ac3ca76d364f4f592afd0e2fff2334",
+      "sha256": "404ede1da39eac66dea033222d362797d74aace21d9b47583ea951bc17798700"
+    },
+    {
+      "path": "crates/rovai-core/src/local_attachment_source.rs",
+      "git_blob": "50f6dd77459fc3488be218515ac03323cd5e636e",
+      "sha256": "f7430eba604d77858770be419f97ce59d11a89f2c44504c92b706aa94c4b43a7"
+    },
+    {
+      "path": "crates/rovai-core/src/mcp_projection.rs",
+      "git_blob": "067f9649f72a8c639484b853c56bff067d4add0f",
+      "sha256": "22c74db1fb790a47ee2dbb22eee80ebd2b02afd0655f1a93899c7f3afe1cff66"
+    },
+    {
+      "path": "docs/development/testing.md",
+      "git_blob": "0076e4952b432779eb812d845ba5dd8be1a99ff3",
+      "sha256": "c6f12e5f457d172a5b5f178b8ca4642f5191aa295bd2a441f11bc7dd0d39655f"
+    },
+    {
+      "path": "packages/contracts/src/index.ts",
+      "git_blob": "eaa56ac7d680fad528f80a8e77eae85d5d7f27e1",
+      "sha256": "1507c585b983a32d994c936c21a57669acfc6c78d105ebeaf36fb2a76516692b"
+    }
+  ],
+  "logs": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-codegraph-sync-final.log",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-codegraph-sync.log",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-compile-01.log",
+      "bytes": 2005,
+      "sha256": "8d9dfbe7d5e07df930b092e36bb8062c8ec93cda8108134aa4f4588ec5aad57e"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-compile-02.log",
+      "bytes": 2005,
+      "sha256": "6254a97f5523395630a7d568138cf3a41d1afa89eb179864839cb87b0ff03840"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-compile-03.log",
+      "bytes": 2005,
+      "sha256": "6d6072e80efa52d4d80648d337e1bb90d7e573c3c4fb22ebb8d764f10b42fb33"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-compile-04.log",
+      "bytes": 2005,
+      "sha256": "8b63e0895d19144e8accc0a166dd5059474221b975ed5da4acc20fac7d00057f"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-compile-05.log",
+      "bytes": 2005,
+      "sha256": "19ed41b14fcee480c1afbfca323f0b101c1fb165ba5c6a0dec44bce9f43427b8"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-compile-06.log",
+      "bytes": 2105,
+      "sha256": "8ce0c46382c749d6a88eeac9b9b0a5db349e10641709e2ffc5cb5791eeca9b9c"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-compile-07.log",
+      "bytes": 2005,
+      "sha256": "2e0cfd96528d028f35be694d32c79b7910e978969e5d23178aacf68fcf4fa67e"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-compile-08.log",
+      "bytes": 2005,
+      "sha256": "259ee1ef12891e72467c742243879afb371d28ed794ae7d5043554e551f74434"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-contract-types-02.log",
+      "bytes": 89,
+      "sha256": "0c5032854c8cb13e3697c2cf145aa361fecf550f64347c07874a9309856fa5c6"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-contract-types-03.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-contract-types.log",
+      "bytes": 143,
+      "sha256": "2aca6e97df20568a3ecdd4c85c18ef3022dd6ad833c64efce5d723ea24846276"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-diff-final.log",
+      "bytes": 121,
+      "sha256": "c8c2290512ce695ab9c84b6a9acbf51f5cbef1fe75d3db79615c75e8229d5c4f"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-doc-governance-02.log",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-doc-governance.log",
+      "bytes": 66,
+      "sha256": "105bfa9a72ea67d57adfedcf5922b7c0371f180335a420d2039fa097049000b1"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-doc-tests.log",
+      "bytes": 922,
+      "sha256": "77ac39a2a8c3204195fefbc214363d4045f3d75938b2ad5c0b3fef844f54c05b"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-doc-version.log",
+      "bytes": 79,
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-fmt-before.log",
+      "bytes": 10929,
+      "sha256": "696acf841679649afa5ad2d27462c22a70329b02d068d7bcb20e67bb8a767794"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-fmt-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-owner-01.log",
+      "bytes": 739,
+      "sha256": "d51b676acde09376dc19a57c096f7bafbab5b8d7bc5068480499db55d77ca3ea"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-owner-02.log",
+      "bytes": 724,
+      "sha256": "b99e48b39c24117cbc40e276fff28f8d12eaee76a685dd616e6bb88a00c1e112"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-owner-03.log",
+      "bytes": 716,
+      "sha256": "c5c43271ddd0903cbb26d62edb50995deb302c4d3fc77d3a11b615d450391ddf"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-owner-04.log",
+      "bytes": 733,
+      "sha256": "fe3f879199afa846859cd4ab09f04b20a80e0cc947c3f74731c6a05bcde314d8"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-owner-05.log",
+      "bytes": 658,
+      "sha256": "4eedf02d6b7c104ac51148ef449a42387d95e4f6fc9dd908bb0128b589c0022a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-owner-06.log",
+      "bytes": 658,
+      "sha256": "6f28e9676d76ade476c08e1ce1e3298c90fb2dbe3294bb6b4b0079304b57307b"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-owner-07.log",
+      "bytes": 1034,
+      "sha256": "375b3c141af9ccb25456da2608669a9509020ca99660966db0b70e0efc553178"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-owner-08.log",
+      "bytes": 227,
+      "sha256": "5521e4ddef610c1bf89219a4fa5fb77dce98241db8fe7e5299dfad4d71c9b3da"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-owner-list.log",
+      "bytes": 125,
+      "sha256": "8d7c39b86e00e4e7eee958d5210fe31c3224cf0ebf2bba69b1e95c305acee56d"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-regression-manifest-mcp-list.log",
+      "bytes": 123,
+      "sha256": "0b3f42c8dc92c430278559058ec7dbe66137445cb5d16701360893438a11ebfb"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-regression-manifest-mcp.log",
+      "bytes": 225,
+      "sha256": "17f6a4512eb632be99df72ff80872e69745878ec9edff642005175fe09414dc2"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-regression-mcp-list.log",
+      "bytes": 829,
+      "sha256": "8f54a9e235138b9a7a9ca614ca1cee9fa39c3ad4e460046f0b5947c83902aaa4"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-regression-mcp.log",
+      "bytes": 974,
+      "sha256": "09480ed00fa0d683e78bbba6527cbdeae4ba04d5346aa9f9d53a98683b41e701"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-regression-results.json",
+      "bytes": 859,
+      "sha256": "807712b91a7d235175b4f2b1c42b818531ef916ccf28f5cda5b091725baa1abc"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-regression-skills-list.log",
+      "bytes": 407,
+      "sha256": "84d0c2a6ca9c9981d94135682c900973e626908d6f97eeac3d1efef198171bb0"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-regression-skills.log",
+      "bytes": 527,
+      "sha256": "27653ef4ffe7525eb0152ec2c08d8a1f2ca18454e7bc200900a64000b928d64e"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-regression-sources-list.log",
+      "bytes": 325,
+      "sha256": "303a32c85c072a3f9e99e1bc4bf0ed5998af11b2cb5c20df80d4d4b7a5019176"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-native-isolation-regression-sources.log",
+      "bytes": 439,
+      "sha256": "8f30e7e1c4b82760ac5e029b2f70f84ba586348f3e2fe68f7d8dabb7c00edd45"
+    }
+  ],
+  "external_actions": {
+    "push": false,
+    "actions": false,
+    "host_or_agent_started": false,
+    "paid_model": false,
+    "main_merge": false,
+    "release": false
+  },
+  "remaining": [
+    "Child User draft/quote/source observation/upload/send authority",
+    "Custom target display name and actual target Runtime preparation",
+    "Complete Schema160/Migration210 classifier, startup chains and policy3 gateway",
+    "Six operations/CLI/authentication plus cancellation/takeover/resume and owned history",
+    "Source UI and remaining I04-T02/T03/T04, followed by consolidated stage integration"
+  ]
+}
