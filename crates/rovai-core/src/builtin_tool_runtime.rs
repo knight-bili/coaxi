@@ -211,6 +211,22 @@ pub(crate) struct ReceiptOnlyInvocation {
     native_binding: BuiltinToolBindingCredential,
 }
 impl ReceiptOnlyInvocation {
+    pub(crate) fn replay_cli(
+        &self,
+        database: &crate::db::Database,
+        operation: &str,
+        request_id: &str,
+        input: &serde_json::Value,
+    ) -> Result<Option<crate::command::CommandExecution>> {
+        uuid::Uuid::parse_str(request_id).context("delegation.invalid_request_id")?;
+        self.replay(
+            database,
+            operation,
+            &format!("agent-run:{}:builtin-cli:{request_id}", self.agent_run_id),
+            input,
+        )
+    }
+
     pub(crate) fn replay(
         &self,
         database: &crate::db::Database,
@@ -296,9 +312,22 @@ pub(crate) struct BuiltinToolLeaseRegistry {
     processes: Mutex<HashMap<String, RegisteredProcess>>,
     invocation_gate: Mutex<()>,
     retired_receipts: Mutex<VecDeque<RetiredReceiptLease>>,
+    lease_changes: tokio::sync::Notify,
 }
 
 impl BuiltinToolLeaseRegistry {
+    pub(crate) async fn wait_until_retired(&self, auth: &BuiltinToolAuth) {
+        loop {
+            let changed = self.lease_changes.notified();
+            tokio::pin!(changed);
+            changed.as_mut().enable();
+            if self.authenticate(auth).await.is_err() {
+                return;
+            }
+            changed.await;
+        }
+    }
+
     pub(crate) async fn invocation_guard(&self) -> MutexGuard<'_, ()> {
         self.invocation_gate.lock().await
     }
@@ -543,6 +572,10 @@ impl BuiltinToolLeaseRegistry {
         while retired.len() > BUILTIN_TOOL_REPLAY_CACHE_CAPACITY {
             retired.pop_front();
         }
+        // Waiters register before checking the exact auth tuple. Retirement
+        // holds the process lock until the old active lease is removed, so a
+        // woken waiter observes the fence even when the Run/Binding is unchanged.
+        self.lease_changes.notify_waiters();
     }
 
     pub(crate) async fn authenticate_receipt(

@@ -2117,3 +2117,15 @@ I04 生产 start 准备扩同一 Context owner，helper `context/delegation_star
 原两个 Blob crash recovery owner 及 execution_text/evidence/file-change/image 使用者按相关路径回归；不把文件/SQLite 组件当作真实 Host/模型运行。
 预约必须在 Core 数据库互斥内取得；清理器只跳过活跃预约、不等待写者，避免持库锁等写锁造成死锁。
 进程崩溃后的持久 intent 仍由原恢复算法处理，不新增 Schema 或自建第二套任务/Blob 权威；原生租约的观察后重验和完整六操作运输另行接线。
+
+I04 六操作统一执行器继续扩同一 Context owner，helper `context/delegation_dispatch_tests.rs`，不增加 Rust owner 或数据库。
+通过实际 CLI 请求 shape、真实租约 registry、源 Binding、Core 工厂/Gateway/文件/Manifest/输入接收与取消，
+验证六操作、四别名的原身份回放、结果/历史分页、重复有序 status、查询不复用旧缓存、严格输入与零写入拒绝。
+start/cancel/resume 的旧请求在换租约/注销后只查原持久回执；新 UUID、改参数、旧租约查询均拒绝。
+原 Session、ACK 与清理观察为明确夹具；继续成功前须实际记录清理，清理前原拒绝回执保持不变。
+无限等待通过手工轮询到 Pending 后检查两个锁均可取得，不靠睡眠推测；断线不写库、不取消子 Run。
+两个等待者共用一次同 Run 租约旋转，未写数据库/未发业务通知仍全部退出；通知登记在鉴权之前防止丢失唤醒。
+执行器内部的测试 helper 在实际 observe/commit 边界插入一次租约旋转，复用生产提交函数，
+分别验证文件写入后 start、目录检查后 resume 不写 Blob 元数据/任务图/回执。
+原租约与清理两个 owner、Gateway 六项和严格合同原 owner 做相关回归。
+公开 IPC/socket、39目录/CLI/输出错误/证据、进程重启与 Host 生命周期尚待，不将这些组件验证记成正式 D 场景或真实模型验证。
