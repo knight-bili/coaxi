@@ -32,6 +32,7 @@ CREATE TABLE delegation (
 CREATE INDEX delegation_parent_idx ON delegation(parent_conversation_id,created_at,id);
 CREATE INDEX delegation_root_idx ON delegation(root_conversation_id,id);
 CREATE INDEX delegation_parent_delegation_idx ON delegation(parent_delegation_id,id);
+CREATE INDEX delegation_task_blob_idx ON delegation(task_blob_id);
 
 CREATE TABLE delegation_attempt (
     delegation_id TEXT NOT NULL REFERENCES delegation(id) ON DELETE CASCADE,
@@ -156,6 +157,40 @@ END;
 
 CREATE UNIQUE INDEX agent_run_active_delegation_conversation_unique ON agent_run(conversation_id)
     WHERE invocation_kind IN ('delegation','delegation_user') AND status IN ('queued','running','waiting');
+CREATE TRIGGER delegation_manifest_route_insert BEFORE INSERT ON context_manifest
+WHEN NEW.context_manifest_version=35 BEGIN
+    SELECT CASE WHEN NOT EXISTS (
+        SELECT 1 FROM agent_run r JOIN conversation c ON c.id=r.conversation_id
+        JOIN native_session_bootstrap_evidence b ON b.id=NEW.bootstrap_evidence_id
+          AND b.conversation_id=c.id AND b.native_binding_generation=NEW.native_binding_generation
+        WHERE r.id=NEW.agent_run_id
+          AND NEW.formatter_version=35 AND json_extract(r.skill_selection_snapshot_json,'$.schemaVersion')=3
+          AND json_extract(r.effective_config_json,'$.delegationPolicy.schemaVersion')=1
+          AND json_type(r.effective_config_json,'$.delegationPolicy.enabled') IN ('true','false')
+          AND json_extract(r.effective_config_json,'$.delegationPolicy.depthLimit') BETWEEN 1 AND 8
+          AND ((NEW.context_delivery_profile_version=12 AND NEW.run_facts_schema_version=9
+                AND r.invocation_kind IN ('batch','direct','a2a','gather_completion')
+                AND c.kind='camp_member'
+                AND json_extract(r.effective_config_json,'$.delegationPolicy.role')='public_parent'
+                AND (r.invocation_kind<>'batch' OR (
+                    r.claim_previous_public_boundary_sequence IS NOT NULL
+                    AND r.claim_has_additional_public_messages IS NOT NULL
+                    AND EXISTS(SELECT 1 FROM agent_run_input i WHERE i.agent_run_id=r.id AND i.context_manifest_version=35)
+                    AND NOT EXISTS(SELECT 1 FROM agent_run_input i WHERE i.agent_run_id=r.id AND i.context_manifest_version IS NOT 35))))
+            OR (NEW.context_delivery_profile_version=13 AND NEW.run_facts_schema_version=6
+                AND r.invocation_kind='single_chat' AND c.kind='single_chat'
+                AND r.operation_policy='single_chat_v1' AND r.operation_policy_version=3
+                AND json_extract(r.effective_config_json,'$.delegationPolicy.role')='private_parent')
+            OR (NEW.context_delivery_profile_version=11 AND NEW.run_facts_schema_version=10
+                AND r.invocation_kind IN ('delegation','delegation_user') AND c.kind='delegation_child'
+                AND r.operation_policy='delegation_child_v1' AND r.operation_policy_version=1
+                AND json_extract(r.effective_config_json,'$.delegationPolicy.role')='child'
+                AND NEW.collaboration_state_included=0 AND NEW.workspace_fact_included=0
+                AND NEW.recent_message_refs_json='[]' AND NEW.reference_closure_refs_json='[]'
+                AND NEW.shared_message_evidence_json='[]' AND NEW.originating_public_user_message_ref_json IS NULL
+                AND NEW.global_public_message_boundary=0 AND NEW.mission_details_version IS NULL))
+    ) THEN RAISE(ABORT,'delegation Context format or private scope mismatch') END;
+END;
 CREATE TRIGGER delegation_run_route_insert BEFORE INSERT ON agent_run
 WHEN NEW.invocation_kind IN ('delegation','delegation_user')
   OR EXISTS(SELECT 1 FROM conversation WHERE id=NEW.conversation_id AND kind='delegation_child') BEGIN

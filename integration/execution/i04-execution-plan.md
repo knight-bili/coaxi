@@ -74,3 +74,10 @@ delegation/attempt/control、从实际父Run及绑定派生的归属/父链、�
 帮手Profile11、公开父会话12、私聊父会话13及格式35合法元组已编码，批准的父/私聊/帮手Charter全文严格比对通过。帮手独立身份、空记忆入口/平台技能索引不读取父Mission/渠道，原私聊实际输入装配和Scheduler刷新回归通过；本批共9项定向Rust检查，其他过滤项未执行。
 首次全文测试发现新资源的Windows换行改变批准字节，已改为原始LF并复验，未放宽断言。完整[本批记录](i04-delegation-policy-bootstrap-result.json)保留首次失败和资格局限。当前仅有冻结/Bootstrap组件证据，尚无实际子Runtime、模型工具鉴权或完整35最终输入资格。
 下一步直接接格式35实际Dynamic Context、最终Blob/Manifest和冻结回放、child材料精确归属与原生技能/MCP过滤，再合齐160/210严格分类和原子升级。暂时显式阻止新角色降级到旧输入格式；实际数据库仍159/209，不提前开通。六操作/CLI、执行生命周期、两类原UI和T02/T03/T04原剩余项不遗漏，不新增客户阶段验收。
+
+## 格式35与最终输入分项
+
+已用实际角色分支替换上述临时拒绝守卫：child不选公屏/队员任务/父Mission/跨Thread历史，按批准顺序生成完整任务和RunFacts10；父指南在Skill Packs后计入相同UTF-8预算。最终受管Blob/Manifest和两处Bootstrap恢复身份已接原Core链路，旧运行不会因当前设置改变而重选输入。
+原单聊owner扩实际Core child领取Accepted、独立绑定、35/11/10最终Blob、同Manifest原字节回放、完整UTF8任务超限拒绝及父35/12/9指南；resume/User后续只有本child消息投影证据，尚无真实取消/接管/恢复资格。候选DDL也扩context_manifest/agent_run_input和旧格式约束；旧条件保留，35另校验冻结角色、Selection3、Bootstrap归属和公屏批次水位，原不可变RunInput保护保持。
+本批7个定向Rust owner通过，包含关系回滚/旧行保留、Charter、MCP回放、旧批次、原A2A恢复与RunInput名字冻结。公开父35以SQL构造未来角色和完整快照的投影夹具验证，不算真实准入、旧Run升级或生产迁移。测试工厂曾缺预算/工作区、错误期待Applied等问题均修正；实际Scheduler和Claim约束未放宽，完整失败及局限见[本批记录](i04-delegation-format35-result.json)。
+下一步直接补child User材料delegation_child合法来源、原生技能/MCP投影、完整160/210旧源分类和原子升级，再接User/模型/CLI、回执事件及真实执行生命周期。父preflight35/私聊父35的完整准入仍需后续链路取证；两个原查看器、原生读取/后台观察和T02/T03/T04继续保留。运行数据仍159/209，不新增客户阶段验收。

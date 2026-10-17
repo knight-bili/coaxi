@@ -213,4 +213,4 @@ pub fn record_takeover_boundary(
 
 #[cfg(all(test, feature = "extended-tests"))]
 #[path = "delegation_tests.rs"]
-mod tests;
+pub(crate) mod tests;

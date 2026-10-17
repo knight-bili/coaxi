@@ -43,6 +43,8 @@ Profile11为child的publicHistory/taskAwareness/memoryEntrypoint三个none；Pro
 
 父/私聊/child Charter使用批准r1全文。child按实际冻结Runtime种类展示独立名称和稳定短编号，不读取父人设；无Memory入口，Bootstrap v5仍存空入口Blob及摘要，平台技能索引为空。新证据不查询父Mission/渠道；旧child证据拒绝带Memory、旧v4或非空平台技能。此处不代表原生Runtime目录中的技能/MCP投影已经过滤完成。
 
-完整160/210开通之前，不生成新角色。格式35装配未接通时显式阻止新角色进入旧Dynamic Context格式；不得降级到公屏/普通私聊来绕过隔离。完整35分支、Manifest/Blob和重放必须在开通前实现并验证。
+完整160/210开通之前，生产者不生成新角色。格式35现已接原装配、Manifest/Blob和回放：child只渲染原Additional Skills、Skill Packs、DELEGATION_CONTEXT、RUN_FACTS10、CURRENT_INPUT；父指南在Skill Packs后，原父段与预算算法保留。child不查询/投影父公屏历史、成员协作、Task、Mission或跨Thread历史；两种恢复入口都使用独立身份。初始正文与原任务Blob的SHA一致；resume只使用批准的固定继续提示及可选中断说明；User后续正文按本child和接管序号校验。超限抛出原context_payload_too_large错误，不截断任务。
 
-目标 v1.73/Schema160/Migration210 尚未登记启动链。必须集齐格式35、父冻结工具资格、子 Bootstrap、数据合同分类/旧来源升级，然后接 User/模型/CLI、回执事件、调度与输入接收、取消清理、原 Session 恢复、接管发送与原界面。Run 仍是唯一执行终态权威；这些存储原语不构成完整身份认证或 Runtime 准入，不得据此启动真实进程。当前运行数据和旧模型输入保持，正式场景不据分项测试记为完成。
+候选DDL扩展context_manifest/agent_run_input的35及Profile11/12/13、Facts10闭集；35元组不能写到旧版本，child Manifest无公屏/跨Thread历史证据，角色必须匹配Run/Conversation。完整旧表真结构分类、User后续材料的delegation_child来源及原生技能/MCP过滤尚未合齐，当前不是完整启动迁移资格。格式分项检查不证明User/模型鉴权或真实取消/恢复/接管已完成。
+
+目标 v1.73/Schema160/Migration210 尚未登记启动链。格式35/冻结资格/子Bootstrap组件接线后，继续合齐材料/原生投影、完整数据合同分类及旧来源升级，再接 User/模型/CLI、回执事件、调度与输入接收、取消清理、原 Session 恢复、接管发送与原界面。Run 仍是唯一执行终态权威；这些组件不构成完整身份认证或 Runtime 准入，不得据此启动真实进程。当前运行数据和旧模型输入保持，正式场景不据分项测试记为完成。

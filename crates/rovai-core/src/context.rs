@@ -12,6 +12,8 @@ use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use uuid::Uuid;
 
+mod delegation_context;
+
 const BUILTIN_CLI_CHARTER: &str = include_str!("../resources/charter-rovai-cli.md");
 const SINGLE_CHAT_SESSION_CHARTER: &str = include_str!("../resources/charter-rovai-single-chat.md");
 const DELEGATION_PARENT_CHARTER: &str =
@@ -76,6 +78,13 @@ pub const DEFAULT_MAX_CONTEXT_PAYLOAD_BYTES: usize = 96 * 1024;
 const MIN_CONTEXT_PAYLOAD_BYTES: usize = 8 * 1024;
 const DELIVERY_FIRST_PAYLOAD_BOOTSTRAP_RESERVE_BYTES: usize = 32 * 1024;
 fn run_facts_schema_version(manifest_version: i64, invocation_kind: &str) -> i64 {
+    if manifest_version == crate::context_contract::DELEGATION_CONTEXT_VERSION {
+        return match invocation_kind {
+            "delegation" | "delegation_user" => 10,
+            "single_chat" => 6,
+            _ => 9,
+        };
+    }
     if invocation_kind == "batch" {
         match manifest_version {
             32 | 33 | 34 => 9,
@@ -511,7 +520,13 @@ impl ContextService {
         let max_payload_bytes = request.max_payload_bytes.max(MIN_CONTEXT_PAYLOAD_BYTES);
         let snapshot = load_run_snapshot(database, request.agent_run_id, request.execution_epoch)?
             .context("AgentRun is not active for context materialization")?;
-        require_legacy_dynamic_formatter(&snapshot)?;
+        let delegation_policy = frozen_delegation_policy(&snapshot)?;
+        let child_context = delegation_context::load(database, &snapshot)?;
+        let child = child_context.is_some();
+        let delegation_guidance = delegation_policy
+            .filter(|policy| policy.role != crate::delegation_policy::Role::Child)
+            .map(|policy| policy.guidance())
+            .transpose()?;
         let frozen_delivery_context = load_frozen_delivery_context(database, &snapshot)?;
         if let Some(existing) = load_existing_manifest(
             database,
@@ -535,6 +550,14 @@ impl ContextService {
         if batch_context_manifest_version == Some(30) {
             anyhow::bail!(
                 "Unmaterialized public v30 input has no frozen Additional Skills evidence"
+            );
+        }
+        if snapshot.invocation_kind == "batch" {
+            anyhow::ensure!(
+                (batch_context_manifest_version
+                    == Some(crate::context_contract::DELEGATION_CONTEXT_VERSION))
+                    == delegation_policy.is_some(),
+                "Batch input version does not match frozen delegation capability"
             );
         }
         if !snapshot.skill_selection_snapshot.entries.is_empty()
@@ -613,18 +636,26 @@ impl ContextService {
             );
         }
 
-        let members = load_collaboration_projection_members(database, &snapshot.camp_id)?;
-        let collaboration_state = build_collaboration_state(&members, &snapshot.agent_id);
+        let collaboration_state = if child {
+            Value::Null
+        } else {
+            let members = load_collaboration_projection_members(database, &snapshot.camp_id)?;
+            build_collaboration_state(&members, &snapshot.agent_id)
+        };
         let collaboration_state_digest = canonical_json_digest(&collaboration_state)?;
-        let collaboration_changed = bootstrap_required
-            || snapshot.native_collaboration_state_digest.as_deref()
-                != Some(collaboration_state_digest.as_str());
-        let profile = match batch_context_manifest_version {
-            Some(29) => {
-                crate::context_delivery::PUBLIC_CAMP_BATCH_CONTEXT_DELIVERY_PROFILE_V9.validate()?
+        let collaboration_changed = !child
+            && (bootstrap_required
+                || snapshot.native_collaboration_state_digest.as_deref()
+                    != Some(collaboration_state_digest.as_str()));
+        let profile = if let Some(policy) = delegation_policy {
+            policy.profile().validate()?
+        } else {
+            match batch_context_manifest_version {
+                Some(29) => crate::context_delivery::PUBLIC_CAMP_BATCH_CONTEXT_DELIVERY_PROFILE_V9
+                    .validate()?,
+                Some(_) => current_public_camp_batch_context_delivery_profile()?,
+                None => current_context_delivery_profile()?,
             }
-            Some(_) => current_public_camp_batch_context_delivery_profile()?,
-            None => current_context_delivery_profile()?,
         };
         let batch_model_context = (snapshot.invocation_kind == "batch")
             .then(|| {
@@ -637,12 +668,12 @@ impl ContextService {
             })
             .transpose()?;
         let (mut self_active_tasks, mut self_active_task_omitted_count) =
-            if snapshot.invocation_kind == "single_chat" {
+            if snapshot.invocation_kind == "single_chat" || child {
                 (Vec::new(), 0)
             } else {
                 load_self_active_tasks(database, &snapshot, profile.max_self_active_tasks)?
             };
-        let mut recent_messages = if snapshot.invocation_kind == "batch" {
+        let mut recent_messages = if snapshot.invocation_kind == "batch" || child {
             Vec::new()
         } else {
             load_recent_public_messages(
@@ -653,7 +684,7 @@ impl ContextService {
                 profile,
             )?
         };
-        let reference_selection = if snapshot.invocation_kind == "batch" {
+        let reference_selection = if snapshot.invocation_kind == "batch" || child {
             ReferenceClosureSelection {
                 messages: Vec::new(),
                 omissions: Vec::new(),
@@ -668,7 +699,7 @@ impl ContextService {
             .map(|entry| entry.message.message_id.clone())
             .collect::<HashSet<_>>();
         recent_messages.retain(|message| !closure_message_ids.contains(&message.message_id));
-        let mut originating_public_user_message = if snapshot.invocation_kind == "batch" {
+        let mut originating_public_user_message = if snapshot.invocation_kind == "batch" || child {
             None
         } else {
             load_originating_public_user_message(database, &snapshot, profile, None)?
@@ -681,7 +712,7 @@ impl ContextService {
         {
             originating_public_user_message = None;
         }
-        if snapshot.invocation_kind != "batch" {
+        if snapshot.invocation_kind != "batch" && !child {
             retain_complete_quote_history(
                 &mut recent_messages,
                 &originating_public_user_message,
@@ -704,8 +735,19 @@ impl ContextService {
             .map(|attachment| attachment.path.clone())
             .collect::<Vec<_>>();
         attachment_paths.extend_from_slice(source_attachment_paths);
-        if !matches!(snapshot.invocation_kind.as_str(), "direct" | "batch")
-            && !snapshot.skill_selection_snapshot.entries.is_empty()
+        if child_context
+            .as_ref()
+            .is_some_and(|context| context.mode != "user_followup")
+        {
+            anyhow::ensure!(
+                attachment_paths.is_empty(),
+                "Initial and resumed delegation inputs cannot absorb parent attachments"
+            );
+        }
+        if !matches!(
+            snapshot.invocation_kind.as_str(),
+            "direct" | "batch" | "delegation_user"
+        ) && !snapshot.skill_selection_snapshot.entries.is_empty()
         {
             anyhow::bail!("Non-direct AgentRun has a non-empty Skill selection snapshot");
         }
@@ -722,16 +764,22 @@ impl ContextService {
             adapter_kind,
             skill_packs.as_ref(),
         )?;
-        let a2a_count = if snapshot.invocation_kind == "batch" {
+        let a2a_count = if snapshot.invocation_kind == "batch" || child {
             0
         } else {
             count_a2a_runs(database, &snapshot.camp_turn_id)?
         };
         let collaboration_state_section = collaboration_changed.then_some(collaboration_state);
-        let (mut run_facts, mission_details_version) =
-            build_run_facts(database, &snapshot, requires_new_native_session, a2a_count)?;
+        let (run_facts, mission_details_version) = if child {
+            (None, None)
+        } else {
+            let (facts, version) =
+                build_run_facts(database, &snapshot, requires_new_native_session, a2a_count)?;
+            (Some(facts), version)
+        };
+        let mut run_facts = run_facts;
         if snapshot.invocation_kind == "batch" {
-            run_facts.history_hint = Some(
+            run_facts.as_mut().expect("parent batch facts").history_hint = Some(
                 if batch_context_manifest_version.is_some_and(|version| version >= 31) {
                     public_history_hint(
                         previous_accepted_public_boundary_sequence,
@@ -745,11 +793,18 @@ impl ContextService {
             );
         }
         if batch_context_manifest_version.is_some_and(|version| version < 32) {
-            if let Some(hint) = run_facts.history_hint.as_mut() {
+            if let Some(hint) = run_facts
+                .as_mut()
+                .and_then(|facts| facts.history_hint.as_mut())
+            {
                 *hint = hint.replace("Thread", "Camp");
             }
         }
-        let rendered_run_facts = render_run_facts(&run_facts)?;
+        let rendered_run_facts = if let Some(context) = &child_context {
+            delegation_context::facts(&snapshot, context)?
+        } else {
+            render_run_facts(run_facts.as_ref().expect("parent facts"))?
+        };
         let bootstrap_redelivery_revision = pending_redelivery_revision(
             database,
             bootstrap_binding_id,
@@ -791,8 +846,15 @@ impl ContextService {
             None
         };
 
-        let workspace_fact =
-            prepare_workspace_fact(database, &snapshot, requires_new_native_session, false)?;
+        let workspace_fact = if child {
+            PreparedWorkspaceFact {
+                value: None,
+                digest: None,
+                included: false,
+            }
+        } else {
+            prepare_workspace_fact(database, &snapshot, requires_new_native_session, false)?
+        };
         let mut additional_skills = (batch_context_manifest_version != Some(29))
             .then(|| {
                 prepare_additional_skills(
@@ -834,7 +896,7 @@ impl ContextService {
                         .map(|entry| entry.message.message_id.clone()),
                 )
                 .collect::<HashSet<_>>();
-            let omitted_messages = if snapshot.invocation_kind == "batch" {
+            let omitted_messages = if snapshot.invocation_kind == "batch" || child {
                 None
             } else {
                 omitted_public_messages(
@@ -853,12 +915,15 @@ impl ContextService {
                 omitted_messages,
                 omission_entries: omission_entries.clone(),
             };
-            let self_active_tasks_section =
-                self_active_task_projection(&self_active_tasks, self_active_task_omitted_count);
+            let self_active_tasks_section = (!child)
+                .then(|| {
+                    self_active_task_projection(&self_active_tasks, self_active_task_omitted_count)
+                })
+                .flatten();
             let payload = render_payload(RenderPayloadInput {
                 collaboration_state: collaboration_state_section.as_ref(),
                 self_active_tasks: self_active_tasks_section.as_ref(),
-                shared_conversation: (snapshot.invocation_kind != "batch")
+                shared_conversation: (snapshot.invocation_kind != "batch" && !child)
                     .then_some(&shared_conversation),
                 run_facts: &rendered_run_facts,
                 workspace: workspace_fact.section(),
@@ -866,6 +931,8 @@ impl ContextService {
                     .as_ref()
                     .map(|skills| skills.section.as_str()),
                 skill_packs: skill_pack_section.as_deref(),
+                delegation_guidance: delegation_guidance.as_ref(),
+                delegation_context: child_context.as_ref().map(|context| &context.context),
                 a2a_guidance: a2a_guidance.payload_json.as_deref(),
                 single_chat_guidance: (snapshot.invocation_kind == "single_chat")
                     .then_some(SINGLE_CHAT_GUIDANCE.trim()),
@@ -993,7 +1060,7 @@ impl ContextService {
         } else {
             shared_conversation.projection_evidence()
         };
-        let current_input_source = if let Some(batch) = batch_model_context.as_ref() {
+        let mut current_input_source = if let Some(batch) = batch_model_context.as_ref() {
             let mut evidence = batch.run_input_evidence();
             evidence["invocationKind"] = json!(snapshot.invocation_kind);
             evidence
@@ -1003,13 +1070,16 @@ impl ContextService {
                 "sourceCampMessageId": current_input.source_camp_message_id,
                 "conversationMessageId": current_input.source_conversation_message_id,
                 "sourceContentDigest": current_input.source_content_digest,
-                "missionStart": mission_start_evidence(database.context_connection(),&snapshot,&current_input)?,
+                "missionStart": if child {None} else {mission_start_evidence(database.context_connection(),&snapshot,&current_input)?},
 
                 "quotedInputEvidence": current_input.quote_evidence(),
                 "mentionsCurrentUser": current_input.mentions_current_user,
                 "gatherCompletion": gather_completion_manifest_evidence(&snapshot, &current_input)?,
             })
         };
+        if let Some(context) = &child_context {
+            current_input_source["delegation"] = delegation_context::evidence(context);
+        }
         let originating_public_user_message_ref = (snapshot.invocation_kind != "batch")
             .then(|| {
                 shared_conversation
@@ -1088,19 +1158,31 @@ impl ContextService {
         if revalidated_skill_resolution != current_input_skill_resolution {
             anyhow::bail!("Current Input Skill availability changed during materialization");
         }
-        let (global_public_message_boundary, history_camps) =
-            capture_cross_camp_history_fence(&transaction, &snapshot)?;
-        let context_manifest_version =
+        if let Some(context) = &child_context {
+            anyhow::ensure!(
+                delegation_context::load(&transaction, &snapshot)?.as_ref() == Some(context),
+                "Delegation input control changed during materialization"
+            );
+        }
+        let (global_public_message_boundary, history_camps) = if child {
+            (0, Vec::new())
+        } else {
+            capture_cross_camp_history_fence(&transaction, &snapshot)?
+        };
+        let context_manifest_version = if delegation_policy.is_some() {
+            crate::context_contract::DELEGATION_CONTEXT_VERSION
+        } else {
             batch_context_manifest_version.unwrap_or(if skill_packs.is_some() {
                 CONTEXT_MANIFEST_VERSION
             } else {
                 28
-            });
+            })
+        };
         let context_formatter_version = batch_context_manifest_version
             .inspect(|&version| {
                 debug_assert!(matches!(
                     version,
-                    29 | 30 | 31 | 32 | 33 | PUBLIC_CAMP_BATCH_CONTEXT_FORMATTER_VERSION
+                    29 | 30 | 31 | 32 | 33 | 35 | PUBLIC_CAMP_BATCH_CONTEXT_FORMATTER_VERSION
                 ));
             })
             .unwrap_or(context_manifest_version);
@@ -1335,7 +1417,15 @@ impl ContextService {
         request: &DeliveryContextPreview<'_>,
     ) -> Result<FrozenDeliveryContext> {
         let snapshot = prospective_delivery_snapshot(transaction, request)?;
-        require_legacy_dynamic_formatter(&snapshot)?;
+        let delegation_policy = frozen_delegation_policy(&snapshot)?;
+        anyhow::ensure!(
+            delegation_policy
+                .is_none_or(|policy| policy.role == crate::delegation_policy::Role::PublicParent),
+            "Public Delivery requires a public parent role"
+        );
+        let delegation_guidance = delegation_policy
+            .map(|policy| policy.guidance())
+            .transpose()?;
         let skill_packs = prepare_run_skill_packs(transaction, &snapshot)?;
         let skill_pack_section = skill_packs
             .as_ref()
@@ -1355,7 +1445,11 @@ impl ContextService {
             })
             .transpose()?;
         let max_payload_bytes = request.max_payload_bytes.max(MIN_CONTEXT_PAYLOAD_BYTES);
-        let profile = current_context_delivery_profile()?;
+        let profile = if let Some(policy) = delegation_policy {
+            policy.profile().validate()?
+        } else {
+            current_context_delivery_profile()?
+        };
         let (mut self_active_tasks, mut self_active_task_omitted_count) =
             load_self_active_tasks(transaction, &snapshot, profile.max_self_active_tasks)?;
         let members = load_collaboration_projection_members(transaction, &snapshot.camp_id)?;
@@ -1515,6 +1609,8 @@ impl ContextService {
                 workspace: workspace_fact.section(),
                 additional_skills: Some(&additional_skills.section),
                 skill_packs: skill_pack_section.as_deref(),
+                delegation_guidance: delegation_guidance.as_ref(),
+                delegation_context: None,
                 a2a_guidance: a2a_guidance.payload_json.as_deref(),
                 single_chat_guidance: None,
                 current_input: Some(&current_input_value),
@@ -1655,8 +1751,8 @@ impl ContextService {
 
             "messageProjectionAudience": AGENT_MESSAGE_PROJECTION_AUDIENCE,
 
-            "contextManifestVersion": if skill_packs.is_some() { CONTEXT_MANIFEST_VERSION } else { 28 },
-            "runFactsSchemaVersion": 6,
+            "contextManifestVersion": if delegation_policy.is_some() {crate::context_contract::DELEGATION_CONTEXT_VERSION} else if skill_packs.is_some() { CONTEXT_MANIFEST_VERSION } else { 28 },
+            "runFactsSchemaVersion": if delegation_policy.is_some() {9} else {6},
             "currentInputSkillResolution": pack_resolution.as_ref().map(|resolved| &resolved.resolution),
             "workspaceFact": workspace_fact.value,
             "workspaceFactDigest": workspace_fact.digest,
@@ -3070,13 +3166,25 @@ fn frozen_delegation_policy(
     Ok(policy)
 }
 
-fn require_legacy_dynamic_formatter(snapshot: &RunSnapshot) -> Result<()> {
-    // The new role must never fall through the public/Single Chat history selector.
-    // Complete format35 materialization and 160/210 admission are connected together next.
-    anyhow::ensure!(
-        frozen_delegation_policy(snapshot)?.is_none(),
-        "Delegation format35 materialization is not connected yet"
-    );
+fn validate_frozen_delegation_format(
+    snapshot: &RunSnapshot,
+    manifest: i64,
+    profile: i64,
+    facts: i64,
+) -> Result<()> {
+    if let Some(policy) = frozen_delegation_policy(snapshot)? {
+        anyhow::ensure!(
+            manifest == crate::context_contract::DELEGATION_CONTEXT_VERSION
+                && profile == policy.profile().profile_version
+                && facts == run_facts_schema_version(manifest, &snapshot.invocation_kind),
+            "Frozen Context format does not match its Run role"
+        );
+    } else {
+        anyhow::ensure!(
+            manifest != crate::context_contract::DELEGATION_CONTEXT_VERSION,
+            "Legacy Run cannot gain a delegation Context"
+        );
+    }
     Ok(())
 }
 
@@ -3398,26 +3506,7 @@ fn format_session_bootstrap_for_snapshot(
     snapshot: &RunSnapshot,
     evidence: PreparedBootstrapEvidence,
 ) -> Result<PreparedSessionBootstrap> {
-    let member_identity = if frozen_delegation_policy(snapshot)?
-        .is_some_and(|p| p.role == crate::delegation_policy::Role::Child)
-    {
-        let (delegation_id, target) = crate::delegation_policy::child_identity(
-            database.connection(),
-            &snapshot.conversation_id,
-            &snapshot.agent_id,
-            &snapshot.camp_id,
-        )?;
-        let label = if target.starts_with("custom:") {
-            format!("Custom ACP {}", target.trim_start_matches("custom:"))
-        } else {
-            run_snapshot_adapter_kind(snapshot)?
-                .display_name()
-                .to_string()
-        };
-        delegated_member_identity(&label, &delegation_id)
-    } else {
-        load_latest_member_identity(database, &snapshot.agent_id)?
-    };
+    let member_identity = bootstrap_member_identity(database, snapshot)?;
     let payload = render_session_bootstrap(
         &evidence.session_charter,
         &member_identity,
@@ -3432,6 +3521,34 @@ fn format_session_bootstrap_for_snapshot(
         native_binding_generation: evidence.native_binding_generation,
         delivery_mode: evidence.delivery_mode,
     })
+}
+
+fn bootstrap_member_identity(
+    database: &Database,
+    snapshot: &RunSnapshot,
+) -> Result<MemberIdentityBootstrapProjection> {
+    Ok(
+        if frozen_delegation_policy(snapshot)?
+            .is_some_and(|p| p.role == crate::delegation_policy::Role::Child)
+        {
+            let (delegation_id, target) = crate::delegation_policy::child_identity(
+                database.connection(),
+                &snapshot.conversation_id,
+                &snapshot.agent_id,
+                &snapshot.camp_id,
+            )?;
+            let label = if target.starts_with("custom:") {
+                format!("Custom ACP {}", target.trim_start_matches("custom:"))
+            } else {
+                run_snapshot_adapter_kind(snapshot)?
+                    .display_name()
+                    .to_string()
+            };
+            delegated_member_identity(&label, &delegation_id)
+        } else {
+            load_latest_member_identity(database, &snapshot.agent_id)?
+        },
+    )
 }
 
 fn delegated_member_identity(
@@ -4583,7 +4700,7 @@ fn frozen_batch_context_manifest_version(
     anyhow::ensure!(
         matches!(
             version,
-            29 | 30 | 31 | 32 | 33 | PUBLIC_CAMP_BATCH_CONTEXT_MANIFEST_VERSION
+            29 | 30 | 31 | 32 | 33 | 35 | PUBLIC_CAMP_BATCH_CONTEXT_MANIFEST_VERSION
         ),
         "Batch AgentRun uses an unsupported context version"
     );
@@ -6296,6 +6413,7 @@ fn load_current_input<R: ContextReadConnection>(
     snapshot: &RunSnapshot,
 ) -> Result<CurrentInput> {
     let mut input = load_current_input_body(database, snapshot)?;
+    let child = delegation_context::load(database, snapshot)?;
     input.quotes = if let Some(id) = input.source_camp_message_id.as_deref() {
         load_agent_visible_camp_quotes(
             database.context_connection(),
@@ -6314,10 +6432,16 @@ fn load_current_input<R: ContextReadConnection>(
         Vec::new()
     };
     if !input.quotes.is_empty() {
+        anyhow::ensure!(
+            child
+                .as_ref()
+                .is_none_or(|context| context.mode == "user_followup"),
+            "Initial and resumed delegation inputs cannot absorb quotes"
+        );
         for quote in &input.quotes {
             anyhow::ensure!(
                 quote.source.camp_id == snapshot.camp_id
-                    && if snapshot.invocation_kind == "single_chat" {
+                    && if snapshot.invocation_kind == "single_chat" || child.is_some() {
                         quote.source.conversation_id.as_deref()
                             == Some(snapshot.conversation_id.as_str())
                     } else {
@@ -6342,6 +6466,9 @@ fn load_current_input_body<R: ContextReadConnection>(
     database: &R,
     snapshot: &RunSnapshot,
 ) -> Result<CurrentInput> {
+    if let Some(child) = delegation_context::load(database, snapshot)? {
+        return delegation_context::current_input(database, snapshot, &child);
+    }
     if snapshot.invocation_kind == "batch" {
         let row = database.context_connection().query_row(
             r#"
@@ -7061,6 +7188,8 @@ struct RenderPayloadInput<'a> {
     workspace: Option<&'a Value>,
     additional_skills: Option<&'a str>,
     skill_packs: Option<&'a str>,
+    delegation_guidance: Option<&'a Value>,
+    delegation_context: Option<&'a Value>,
     a2a_guidance: Option<&'a str>,
     single_chat_guidance: Option<&'a str>,
     current_input: Option<&'a Value>,
@@ -7069,6 +7198,34 @@ struct RenderPayloadInput<'a> {
 
 fn render_payload(input: RenderPayloadInput<'_>) -> Result<String> {
     let mut output = String::new();
+    if let Some(context) = input.delegation_context {
+        anyhow::ensure!(
+            input.collaboration_state.is_none()
+                && input.self_active_tasks.is_none()
+                && input.shared_conversation.is_none()
+                && input.workspace.is_none()
+                && input.delegation_guidance.is_none()
+                && input.a2a_guidance.is_none()
+                && input.single_chat_guidance.is_none()
+                && input.run_input.is_none(),
+            "Child Context cannot contain parent sections"
+        );
+        for section in [input.additional_skills, input.skill_packs]
+            .into_iter()
+            .flatten()
+        {
+            output.push_str(section);
+            output.push_str("\n\n");
+        }
+        append_json_section(&mut output, "DELEGATION_CONTEXT", context)?;
+        append_json_text_section(&mut output, "RUN_FACTS", &input.run_facts.payload_json);
+        append_json_section(
+            &mut output,
+            "CURRENT_INPUT",
+            input.current_input.context("Missing child Current Input")?,
+        )?;
+        return Ok(output);
+    }
     if let Some(collaboration_state) = input.collaboration_state {
         append_json_section(&mut output, "COLLABORATION_STATE", collaboration_state)?;
     }
@@ -7106,6 +7263,9 @@ fn render_payload(input: RenderPayloadInput<'_>) -> Result<String> {
     if let Some(skill_packs) = input.skill_packs {
         output.push_str(skill_packs);
         output.push_str("\n\n");
+    }
+    if let Some(guidance) = input.delegation_guidance {
+        append_json_section(&mut output, "DELEGATION_GUIDANCE", guidance)?;
     }
     if let Some(a2a_guidance) = input.a2a_guidance {
         append_json_text_section(&mut output, "A2A_GUIDANCE", a2a_guidance);
@@ -7387,6 +7547,9 @@ fn load_existing_manifest(
     let Some(row) = row else {
         return Ok(None);
     };
+    let (manifest_version,profile_version,facts_version):(i64,i64,i64)=database.connection().query_row(
+        "SELECT context_manifest_version,context_delivery_profile_version,run_facts_schema_version FROM context_manifest WHERE id=?1",[&row.0],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?)))?;
+    validate_frozen_delegation_format(snapshot, manifest_version, profile_version, facts_version)?;
     if row.2 != snapshot.camp_message_boundary_sequence {
         anyhow::bail!("Stored ContextManifest no longer matches its frozen AgentRun input");
     }
@@ -7428,6 +7591,30 @@ fn load_existing_manifest(
         platform_digest.as_deref(),
         &row.11,
     )?;
+    if frozen_delegation_policy(snapshot)?
+        .is_some_and(|policy| policy.role == crate::delegation_policy::Role::Child)
+    {
+        anyhow::ensure!(
+            bootstrap_contract == NATIVE_SESSION_BOOTSTRAP_CONTRACT_VERSION
+                && charter == DELEGATION_CHILD_CHARTER.trim()
+                && entrypoint.is_empty()
+                && sha256_text(&charter) == row.9
+                && sha256_text(&entrypoint) == row.11,
+            "Stored child Bootstrap is not isolated"
+        );
+        let platform = platform_section
+            .as_deref()
+            .context("Missing child platform Skills evidence")?;
+        let index = platform
+            .strip_prefix("[ROVAI_PLATFORM_SKILLS]\n")
+            .and_then(|value| value.strip_suffix("\n[/ROVAI_PLATFORM_SKILLS]"))
+            .context("Invalid child platform Skills")?;
+        let index: Value = serde_json::from_str(index)?;
+        anyhow::ensure!(
+            index["skills"] == json!([]) && Some(sha256_text(platform)) == platform_digest,
+            "Stored child platform Skills are not isolated"
+        );
+    }
     let bootstrap_required = requires_new_native_session
         || snapshot.native_charter_digest.as_deref() != Some(bootstrap_digest.as_str());
     let bootstrap_redelivery_revision = if row.13 {
@@ -7446,7 +7633,7 @@ fn load_existing_manifest(
         && bootstrap_required)
         || bootstrap_redelivery_revision.is_some();
     let runtime_payload = if bootstrap_in_runtime_payload {
-        let member_identity = load_latest_member_identity(database, &snapshot.agent_id)?;
+        let member_identity = bootstrap_member_identity(database, snapshot)?;
         let bootstrap = render_session_bootstrap(
             &charter,
             &member_identity,
@@ -7774,6 +7961,12 @@ fn materialize_frozen_delivery_context(
     let run_facts_schema_version = required("runFactsSchemaVersion")?
         .as_i64()
         .context("Frozen Delivery Context Run Facts schema version is invalid")?;
+    validate_frozen_delegation_format(
+        snapshot,
+        context_manifest_version,
+        profile_version,
+        run_facts_schema_version,
+    )?;
     anyhow::ensure!(
         crate::context_contract::skill_pack_context_format(
             &snapshot.invocation_kind,
@@ -8819,6 +9012,7 @@ mod tests {
 #[cfg(all(test, feature = "slow-tests"))]
 mod slow_tests {
     use super::*;
+    include!("context/delegation_context_tests.rs");
     use crate::{
         agent_profile::{
             AdapterCapabilitySnapshot, AdapterKind, AdapterPermissionConfig, AgentProfileService,
@@ -9100,6 +9294,8 @@ mod slow_tests {
             workspace: None,
             additional_skills: None,
             skill_packs: None,
+            delegation_guidance: None,
+            delegation_context: None,
             a2a_guidance: None,
             single_chat_guidance: Some(SINGLE_CHAT_GUIDANCE.trim()),
             current_input: Some(&json!({
@@ -14223,6 +14419,7 @@ mod slow_tests {
             )
             .unwrap();
         assert_eq!(memory_access_count, 0);
+        assert_delegation_materialization(&mut fixture, &run_id);
         fixture.cleanup();
     }
 
@@ -15049,7 +15246,7 @@ mod slow_tests {
             let policy = crate::delegation_policy::FrozenPolicy::new(true, 1, role).unwrap();
             snapshot.effective_config["delegationPolicy"] = serde_json::to_value(policy).unwrap();
             snapshot.invocation_kind = invocation.into();
-            assert!(require_legacy_dynamic_formatter(&snapshot).is_err());
+            assert_eq!(frozen_delegation_policy(&snapshot).unwrap(), Some(policy));
             let tagged = policy.freeze_resolved_runtime(&base_runtime).unwrap();
             assert_ne!(
                 tagged.binding_compatibility_digest,
@@ -15557,6 +15754,8 @@ mod slow_tests {
             workspace: None,
             additional_skills: None,
             skill_packs: None,
+            delegation_guidance: None,
+            delegation_context: None,
             a2a_guidance: None,
             single_chat_guidance: None,
             current_input: Some(&json!({"source":{"type":"user"},"body":"work"})),

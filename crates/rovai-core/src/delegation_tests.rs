@@ -40,18 +40,68 @@ fn rows(connection: &Connection, table: &str) -> Vec<Vec<rusqlite::types::Value>
         .unwrap()
 }
 
-fn child(
+pub(crate) fn child(
     tx: &Transaction<'_>,
     identity: &Identity,
     source_run: &str,
     owner_override: Option<&str>,
 ) -> Result<String> {
+    child_with_task(tx, identity, source_run, owner_override, TASK, None)
+}
+
+pub(crate) fn child_with_task(
+    tx: &Transaction<'_>,
+    identity: &Identity,
+    source_run: &str,
+    owner_override: Option<&str>,
+    task: &str,
+    workspace: Option<&serde_json::Value>,
+) -> Result<String> {
     let at = "2026-10-17T00:00:00Z";
     tx.execute("INSERT INTO conversation(id,camp_id,agent_id,kind,created_at,updated_at,last_message_sequence) VALUES(?1,?2,?3,'delegation_child',?4,?4,1)",params![identity.child_conversation_id,identity.camp_id,owner_override.unwrap_or(&identity.owner_agent_id),at])?;
     let message = Uuid::new_v4().to_string();
-    tx.execute("INSERT INTO conversation_message(id,conversation_id,sequence,author_type,author_id,body,created_at) VALUES(?1,?2,1,'system','delegation-parent',?3,?4)",params![message,identity.child_conversation_id,TASK,at])?;
+    tx.execute("INSERT INTO conversation_message(id,conversation_id,sequence,author_type,author_id,body,created_at) VALUES(?1,?2,1,'system','delegation-parent',?3,?4)",params![message,identity.child_conversation_id,task,at])?;
     let turn = Uuid::new_v4().to_string();
-    tx.execute("INSERT INTO camp_turn(id,camp_id,trigger_type,trigger_id,status,kind,created_at,updated_at) VALUES(?1,?2,'conversation_message',?3,'running','delegation',?4,?4)",params![turn,identity.camp_id,message,at])?;
+    let budget =
+        crate::execution_budget::freeze_camp_turn_execution_budget(None, chrono::Utc::now(), 1)?;
+    tx.execute("INSERT INTO camp_turn(id,camp_id,trigger_type,trigger_id,status,kind,created_at,updated_at,
+        execution_budget_schema_version,execution_budget_accepted_at,execution_budget_deadline_at,
+        execution_budget_elapsed_seconds,execution_budget_max_agent_run_responsibilities,
+        execution_budget_max_accepted_a2a,execution_budget_root_agent_run_responsibilities)
+        VALUES(?1,?2,'conversation_message',?3,'running','delegation',?4,?4,?5,?6,?7,?8,?9,?10,?11)",params![turn,identity.camp_id,message,at,budget.schema_version,budget.accepted_at,budget.deadline_at,budget.elapsed_seconds,budget.max_agent_run_responsibilities,budget.max_accepted_a2a,budget.root_agent_run_responsibilities])?;
+    let source_config: String = tx.query_row(
+        "SELECT effective_config_json FROM agent_run WHERE id=?1",
+        [source_run],
+        |r| r.get(0),
+    )?;
+    let mut config: serde_json::Value = serde_json::from_str(&source_config)?;
+    let base_runtime: crate::agent_profile::FrozenAgentRuntimeConfig =
+        serde_json::from_value(config["runtime"].clone())?;
+    let policy = crate::delegation_policy::FrozenPolicy::new(
+        true,
+        8,
+        crate::delegation_policy::Role::Child,
+    )?;
+    let runtime = if crate::delegation_policy::FrozenPolicy::from_config(&config)?
+        .is_some_and(|p| p.role == crate::delegation_policy::Role::Child)
+    {
+        base_runtime
+    } else {
+        policy.freeze_resolved_runtime(&base_runtime)?
+    };
+    config["runtime"] = serde_json::to_value(&runtime)?;
+    config["delegationPolicy"] = serde_json::to_value(policy)?;
+    config.as_object_mut().unwrap().remove("configDigest");
+    config["configDigest"] = serde_json::json!(crate::command::canonical_json_digest(&config)?);
+    let workspace_json = if let Some(workspace) = workspace {
+        Some(serde_json::to_string(workspace)?)
+    } else {
+        tx.query_row(
+            "SELECT workspace_json FROM agent_run WHERE id=?1",
+            [source_run],
+            |r| r.get::<_, Option<String>>(0),
+        )?
+    };
     // Copy a valid Core-owned fixture row; this is not Runtime configuration admission or launch.
     let mut statement =
         tx.prepare("SELECT name FROM pragma_table_info('agent_run') ORDER BY cid")?;
@@ -70,6 +120,12 @@ fn child(
             "response_delivery" => "'conversation_message'".into(),
             "status" => "'queued'".into(),
             "execution_epoch" | "runtime_recovery_required" => "0".into(),
+            "initial_camp_context_through_sequence" => "0".into(),
+            "initial_conversation_context_through_sequence" => "1".into(),
+            "effective_config_json" => "?6".into(),
+            "runtime_binding_compatibility_digest" => "?7".into(),
+            "runtime_native_session_compatibility_key" => "?8".into(),
+            "workspace_json" => "?9".into(),
             "version" | "operation_policy_version" => "1".into(),
             "task_id"
             | "camp_id"
@@ -104,7 +160,11 @@ fn child(
             identity.child_conversation_id,
             turn,
             message,
-            source_run
+            source_run,
+            serde_json::to_string(&config)?,
+            runtime.binding_compatibility_digest,
+            runtime.native_session_compatibility_key,
+            workspace_json,
         ],
     )?;
     Ok(run)

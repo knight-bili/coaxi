@@ -24,7 +24,7 @@ Core 新增六操作的严格输入类型及 User-only 设置存储原语，默�
 当前运行数据仍是 v1.72/Schema159/Migration209；目标 v1.73/Schema160/Migration210 将在完整关系、kind、Run policy 和格式约束集齐后原子接入。
 文档 current 表示本轮研发目标，不表示数据合同已经升级。旧 Run、回执、Bootstrap 和模型输入字节没有因这批基础类型改变。
 子 Run 调度、完整工具输出、接收/取消/恢复/接管、材料、原 UI 和阶段验证均未完成；不得把这些基础类型称为功能交付。
-格式35的完整Dynamic Context装配、最终Blob/Manifest存储与冻结回放尚未接入；新角色当前显式拒绝进入旧装配器，不允许借用公屏或普通私聊输入。该守卫须由完整35分支替换后才能登记启动迁移。
+格式35的角色分支、最终Dynamic Context Blob/Manifest和已有Manifest回放已接入，并有隔离Core分项证据；此前的临时拒绝守卫已由实际格式分支替换。child不读取公屏/队员任务/父Mission，恢复入口也使用child身份；完整User后续材料归属、原生技能/MCP过滤及完整160/210启动准入仍须合齐，不能提前开通生产执行。
 
 ## 跨版本文档影响
 
@@ -45,5 +45,6 @@ Core 新增六操作的严格输入类型及 User-only 设置存储原语，默�
 检查执行结果在[本轮执行记录](../../../integration/execution/i04-delegation-foundation-result.json)逐项记录。
 后续身份约束、候选 DDL 和接管存储分项见[关系执行记录](../../../integration/execution/i04-delegation-identity-result.json)。
 冻结资格、Bootstrap与默认路径回归见[冻结输入分项记录](../../../integration/execution/i04-delegation-policy-bootstrap-result.json)。
+格式35、最终Blob/Manifest、组件回放及默认路径回归见[输入格式分项记录](../../../integration/execution/i04-delegation-format35-result.json)；测试工厂、实际Core调用和待完整准入的资格分别列明。
 本批存储夹具不代表完整 Core 启动迁移或命令回执集成。D01–D32、真实 Gate 与 I04 原 84 正式场景仍按实际运行逐项取证。
 专用身份/硬预算、平台条件留册；不新增客户阶段验收，I12 后才交用户使用软件。

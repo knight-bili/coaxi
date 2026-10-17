@@ -986,7 +986,10 @@ fn insert_batch_run(
                 delivery.message_id,
                 delivery.sequence,
                 delivery.content_digest,
-                if skill_selection.schema_version == 3 {
+                if crate::delegation_policy::FrozenPolicy::from_config(effective_config)?.is_some()
+                {
+                    crate::context_contract::DELEGATION_CONTEXT_VERSION
+                } else if skill_selection.schema_version == 3 {
                     PUBLIC_CAMP_BATCH_CONTEXT_MANIFEST_VERSION
                 } else {
                     33

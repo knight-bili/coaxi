@@ -1,4 +1,4 @@
-//! The identity portion of the pending 160/210 migration. No startup registration until formats land.
+//! Identity and Context format portions of the pending 160/210 migration. No startup registration.
 use super::*;
 
 const IDENTITY_SQL: &str = include_str!("delegation_schema.sql");
@@ -66,7 +66,13 @@ pub(crate) fn install_identity_schema(tx: &Transaction<'_>) -> Result<()> {
         matches!(classify_database_contract(tx)?,DatabaseContractClassification::Current(ref marker) | DatabaseContractClassification::SupportedMigrationSource(ref marker) if marker.contract_version=="v1.72" && marker.projection_schema_version==159),
         "Delegation identity requires exact schema159 source"
     );
-    for table in ["conversation", "camp_turn", "agent_run"] {
+    for table in [
+        "conversation",
+        "camp_turn",
+        "agent_run",
+        "context_manifest",
+        "agent_run_input",
+    ] {
         let original: String = tx.query_row(
             "SELECT sql FROM sqlite_schema WHERE type='table' AND name=?1",
             [table],
@@ -81,6 +87,30 @@ pub(crate) fn install_identity_schema(tx: &Transaction<'_>) -> Result<()> {
             &[],
         )?;
     }
+    let legacy_guard:String=tx.query_row("SELECT sql FROM sqlite_schema WHERE type='trigger' AND name='context_manifest_v34_only_insert'",[],|r|r.get(0))?;
+    let extended_guard = replace_once(
+        legacy_guard,
+        "BEFORE INSERT ON context_manifest WHEN NOT",
+        "BEFORE INSERT ON context_manifest WHEN NEW.context_manifest_version<>35 AND NOT",
+    )?;
+    tx.execute_batch("DROP TRIGGER context_manifest_v34_only_insert;")?;
+    tx.execute_batch(&extended_guard)?;
+    let profile_guard:String=tx.query_row("SELECT sql FROM sqlite_schema WHERE type='trigger' AND name='context_manifest_quote_profile_insert'",[],|r|r.get(0))?;
+    let profile_guard = replace_once(
+        profile_guard,
+        "WHEN NOT (",
+        "WHEN NEW.context_manifest_version<>35 AND NOT (",
+    )?;
+    tx.execute_batch("DROP TRIGGER context_manifest_quote_profile_insert;")?;
+    tx.execute_batch(&profile_guard)?;
+    tx.execute_batch("DROP TRIGGER agent_run_input_v34_only_insert;
+        CREATE TRIGGER agent_run_input_v34_only_insert BEFORE INSERT ON agent_run_input
+        WHEN NOT EXISTS(SELECT 1 FROM agent_run r WHERE r.id=NEW.agent_run_id AND r.invocation_kind='batch'
+            AND json_extract(r.skill_selection_snapshot_json,'$.schemaVersion')=3
+            AND ((NEW.context_manifest_version=34 AND json_type(r.effective_config_json,'$.delegationPolicy') IS NULL)
+                OR (NEW.context_manifest_version=35 AND json_extract(r.effective_config_json,'$.delegationPolicy.role')='public_parent'
+                    AND json_extract(r.effective_config_json,'$.delegationPolicy.schemaVersion')=1)))
+        BEGIN SELECT RAISE(ABORT,'New public RunInput must match its frozen role and pack selection'); END;")?;
     tx.execute_batch(crate::delegation_settings::SCHEMA)?;
     tx.execute_batch(IDENTITY_SQL)?;
     anyhow::ensure!(
@@ -93,6 +123,8 @@ pub(crate) fn install_identity_schema(tx: &Transaction<'_>) -> Result<()> {
             "conversation",
             "camp_turn",
             "agent_run",
+            "context_manifest",
+            "agent_run_input",
             "delegation",
             "delegation_attempt",
             "delegation_control",
@@ -128,6 +160,10 @@ fn extend_table(table: &str, source: String) -> Result<String> {
             )
         }
         "agent_run" => {
+            let source = source.replace(
+                "operation_policy_version IN (1, 2)",
+                "operation_policy_version IN (1, 2, 3)",
+            );
             let sql = replace_once(
                 source,
                 "invocation_kind IN ('direct', 'a2a', 'gather_completion', 'single_chat', 'batch')",
@@ -149,6 +185,41 @@ fn extend_table(table: &str, source: String) -> Result<String> {
                     OR
                     (invocation_kind NOT IN ('single_chat', 'delegation', 'delegation_user')"#,
             )
+        }
+        "agent_run_input" => replace_once(
+            source,
+            "context_manifest_version IN (26, 27, 28, 29, 30, 31, 32, 33, 34)",
+            "context_manifest_version IN (26, 27, 28, 29, 30, 31, 32, 33, 34, 35)",
+        ),
+        "context_manifest" => {
+            let mut sql = source;
+            for (old, new) in [
+                (
+                    "context_delivery_profile_version IN (4, 5, 6, 7, 8, 9, 10)",
+                    "context_delivery_profile_version IN (4, 5, 6, 7, 8, 9, 10, 11, 12, 13)",
+                ),
+                (
+                    "formatter_version IN (20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34)",
+                    "formatter_version IN (20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35)",
+                ),
+                (
+                    "context_manifest_version IN (19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34)",
+                    "context_manifest_version IN (19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35)",
+                ),
+                (
+                    "run_facts_schema_version IN (1, 2, 3, 4, 5, 6, 7, 8, 9)",
+                    "run_facts_schema_version IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)",
+                ),
+                (
+                    "(context_manifest_version = 34 AND",
+                    "(context_manifest_version = 35 AND formatter_version = 35 AND run_facts_schema_version IN (6,9,10) AND ((camp_attachment_view_receipt_version IS NULL AND camp_attachment_view_receipt_json IS NULL AND camp_attachment_view_receipt_digest IS NULL) OR (camp_attachment_view_receipt_version = 2 AND camp_attachment_view_receipt_json IS NOT NULL AND camp_attachment_view_receipt_digest IS NOT NULL))) OR (context_manifest_version = 34 AND",
+                ),
+            ] {
+                sql = replace_once(sql, old, new)?;
+            }
+            let end = sql.rfind(')').context("Invalid Context Manifest schema")?;
+            sql.insert_str(end,", CHECK((context_manifest_version<>35 AND context_delivery_profile_version<=10) OR (context_manifest_version=35 AND ((context_delivery_profile_version=11 AND run_facts_schema_version=10) OR (context_delivery_profile_version=12 AND run_facts_schema_version=9) OR (context_delivery_profile_version=13 AND run_facts_schema_version=6))))");
+            Ok(sql)
         }
         _ => anyhow::bail!("Unexpected delegation table"),
     }
