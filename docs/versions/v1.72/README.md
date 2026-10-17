@@ -1,7 +1,7 @@
 ---
 document_type: version-overview
 version: v1.72
-lifecycle: current
+lifecycle: historical
 authority: version-scope-and-status
 design_status: confirmed
 implementation_status: in_progress
@@ -10,6 +10,8 @@ last_updated: 2026-10-13
 ---
 
 # Rovai-ai v1.72：Lark 独立渠道
+
+后续研发入口：[v1.73 Core 独立帮手](../v1.73/README.md)。本页保留版本切换时的范围和实现事实。
 
 ## 融合定时任务单次停止（2026-10-17）
 

@@ -62,6 +62,8 @@ pub mod current_input_skill;
 pub mod current_user;
 pub mod database_admission;
 pub mod db;
+pub mod delegation_contract;
+pub mod delegation_settings;
 pub mod delivery_queue;
 pub mod diagnostics;
 pub mod dsh;

@@ -2,7 +2,7 @@
 document_type: version-decisions
 version: v1.72
 authority: decision-rationale
-lifecycle: current
+lifecycle: historical
 last_updated: 2026-10-12
 ---
 

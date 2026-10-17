@@ -1999,3 +1999,7 @@ _Avoid_: stable process credential, Native Session identity, model-supplied Agen
 **Built-in Tool Execution Authority Boundary**:
 The accepted Shell-transport boundary in which a valid invocation from the current Runtime process or any subprocess it launches is attributed to the same AgentRun and Member. Core can prove the active lease and enforce domain rules but cannot reliably prove whether the model typed the invocation directly or project code triggered it indirectly; every accepted invocation remains independently audited and the authority ends when the lease is fenced.
 _Avoid_: model-intent attestation, separately trusted project subprocess, parent-process heuristic, post-Run authority
+
+## Delegation
+
+DelegationId 是 Core 独立帮手的逻辑身份，关联真实发起成员与独立子 Conversation；attempt 复用既有 AgentRun 执行权威。它不等于业务 Task、Mission、正式成员或 Runtime 原生子代理，见 [Delegation v1](docs/contracts/delegation-v1.md)。

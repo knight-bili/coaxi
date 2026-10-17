@@ -14,7 +14,7 @@
   "current_branch": "phase/i04-collaboration-runtime",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I04-T01",
-  "current_slice": "新版Codex原生活动和Grok创建/结束Session子代理观察已接入Core，19项定向检查通过；继续精确只读读取与原版查看器、Grok进度及后台回接，独立帮手r1新模型语义仍待具体确认。",
+  "current_slice": "I04 独立帮手 r1 已确认；六操作严格输入与设置存储基础已编码并通过两个最低层 owner。继续持久父子关系、完整迁移和执行接线；原生查看器保留。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,16 +33,14 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "先实现Core推导精确引用的User只读子会话读取和原版查看器；Grok进度/父轮次结束后背景观察及有证据工具关联继续补齐。已验的是原生协议观察，不是完整子会话功能；独立帮手r1仍待具体revision确认，不阻塞独立研发。",
-    "按I04原四工作包与84正式场景推进：协作全流程、21种Runtime并集、执行恢复、记忆和自动化；普通实现自行推进，模型输入语义变化仍遵守已确认revision。",
-    "I03平台及尺寸诊断按独立编号保留，不重新打开已通过的本机清单。阶段集中push/必要Actions，等待期间继续独立编码。",
-    "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
-    "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
-    "继续I02剩余、I04–I12与BUF全部既定范围，未补齐必需验收不得标MVP完成。"
+    "I04-T01：按已确认 r1 实现持久委派身份、设置、Core 生命周期及版本迁移；不重复索要确认",
+    "I04-T01：六个模型操作、CLI/原别名、冻结输入及接收/恢复围栏",
+    "I04-T01：按 Codeg 原版委派和原生子代理查看器接入两端 UI，保留 User-only 原生读取与后台观察队列",
+    "I04-T02/T03/T04：Runtime 并集、恢复、记忆及自动化；阶段候选集中验证，缺外部条件留待办"
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "native_protocol_observations_locally_verified_reader_progress_and_background_pending",
+  "current_slice_status": "input_and_settings_primitives_locally_verified_complete_core_integration_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -250,5 +248,7 @@
   "i04_automation_run_stop_evidence": "i04-automation-run-stop-result.json",
   "i04_delegation_proposal_evidence": "i04-delegation-proposal-result.json",
   "i04_native_subagent_observation_evidence": "i04-native-subagent-observation-result.json",
-  "i04_native_subagent_protocol_evidence": "i04-native-subagent-protocol-result.json"
+  "i04_native_subagent_protocol_evidence": "i04-native-subagent-protocol-result.json",
+  "delegation_r1_confirmation": "i04-delegation-r1-confirmation.json",
+  "i04_delegation_foundation_evidence": "i04-delegation-foundation-result.json"
 }

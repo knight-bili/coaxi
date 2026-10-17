@@ -2010,3 +2010,5 @@ Windows 当前候选已通过这四项检查，并保存实际显示 `2+3` 与 `
 既有显式具体文件访问策略保持：文件位于项目外不自动构成拒绝条件；具体文件访问不产生目录 grant。
 这部分不代替文件卡片完整交互、HTML 页面、私聊附件授权或完整冷路由/多卡规模资格。
 本批实际结果和源码/产物绑定见 `integration/execution/i03-c06-native-result.json`。
+
+I04 已确认委派基础新增两个最低层 owner：`delegation_contract::tests::approved_wire_inputs_reject_authority_injection_and_preserve_status_order` 拥有六操作严格 JSON/UTF-8 字节限制/等待和分页边界，既有协作测试不拥有该新闭集；`delegation_settings::tests::settings_patch_is_atomic_durable_and_preserves_other_saved_fields` 拥有新设置表 CAS、局部开关、失败回滚和重开保留。前者为纯解析，后者仅临时 SQLite，事务/重开无法用纯解析证明，不构造完整 Core/Runtime。最低命令为 `cargo test -p rovai-core --lib delegation_ -- --list` 后按同过滤执行；不重复其他 owner 的输入矩阵，不把它们标作完整迁移/API/D01-D32通过。

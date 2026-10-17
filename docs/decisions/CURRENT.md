@@ -303,3 +303,7 @@ Cline 认证交还原生、撤销 D25 后续的专属认证独占与强制 cold�
 同类 CLI 优先恢复与 Adapter 证据限定降级：当前规范为 [Runtime Launch v60](../contracts/runtime-launch-and-verification-v60.md)
 和 [Session continuity](../architecture/foundational-invariants.md#session-continuity-与-bootstrap)，取舍见
 [V1.72-D37](../versions/v1.72/decisions.md#v1-72-d37)。
+
+## 独立帮手
+
+当前权威：[Core 委派](../architecture/delegation.md)、[Delegation v1](../contracts/delegation-v1.md)。理由：[V1.73-D01](../versions/v1.73/decisions.md#v1-73-d01)；当前基础实现不代表完整执行资格。

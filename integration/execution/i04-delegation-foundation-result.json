@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "stage": "I04",
+  "task": "I04-T01",
+  "status": "input_and_settings_primitives_locally_verified_complete_core_integration_pending",
+  "implementation_baseline": "d2006d5d5151fcdd1460a02a955090f1b0fa2e50",
+  "confirmation_record": "i04-delegation-r1-confirmation.json",
+  "runtime_data_contract": {
+    "version": "v1.72",
+    "schema": 159,
+    "migration": 209
+  },
+  "target_data_contract": {
+    "version": "v1.73",
+    "schema": 160,
+    "migration": 210,
+    "status": "not_installed_pending_complete_schema"
+  },
+  "checks": {
+    "core_lib_extended_build": "passed; only matching owners executed, no full suite",
+    "listed_matching_tests": 2,
+    "executed_tests": 2,
+    "passed": 2,
+    "failed": 0,
+    "filtered_out": 969,
+    "pure_input_owner": "approved_wire_inputs_reject_authority_injection_and_preserve_status_order",
+    "isolated_sqlite_owner": "settings_patch_is_atomic_durable_and_preserves_other_saved_fields",
+    "limitations": "SQLite contains only the settings table; no full Core boot migration, authenticated command receipt/event, Host, transport, UI or real Runtime qualification",
+    "scope": "81 clusters /48 packages /324 cases /21 runtimes; unchanged",
+    "foundation_checker": "source/fixture consistency only: 161 operations,10 HTTP fixture cases,6 migration-design cases; not live Host",
+    "version_check": "v1.73,173 version directories",
+    "documentation_governance": "passed with explicit DOCS_BASE_REF; final recheck recorded separately",
+    "format": "passed after using workspace Rust 2024 style",
+    "codegraph": "explicit sync completed",
+    "formal_cases_new_passed": 0
+  },
+  "not_implemented": [
+    "durable delegation/attempt/control and complete migration",
+    "User commands and receipt/events",
+    "Host/CLI/model tool routing",
+    "Scheduler/Fleet and all execution lifecycle",
+    "Bootstrap/Dynamic Context version branches",
+    "child materials and takeover",
+    "both original viewers, native reader and background observation"
+  ],
+  "no_push": true,
+  "no_actions": true,
+  "real_model_budget": 0,
+  "no_main_merge_or_release": true,
+  "checked_at": "2026-10-17T04:46:36.698908+00:00",
+  "previous_goal_turn": {
+    "classification": "progress",
+    "evidence": "92bccfb5d4d5c02157f7352fa6b2d5692fa9cff5 + d2006d5d5151fcdd1460a02a955090f1b0fa2e50"
+  },
+  "approved_source_hashes_verified": 27,
+  "immutable_artifacts_verified": 6,
+  "implementation": [
+    "Six strict input codecs; no parent/run/epoch/binding authority accepted from model JSON",
+    "21 approved targets and stable custom syntax; availability and permission admission still pending",
+    "Whole task retained, host absolute-directory syntax only, reason UTF-8 bytes, wait modes and paging limits",
+    "User settings storage primitives: defaults, strict outer patch, exact-version CAS, transaction rollback, reopen and read-zero-writes",
+    "Original Codeg nested mode_id/config_values omission/null encoding preserved separately from strict outer patch",
+    "v1.73 development version, complete approved statement and authority routing registered; active database and runtime remain unchanged"
+  ],
+  "self_review_repairs": [
+    "Optional null rejected in all six wire inputs and outer settings patch; cannot inject parent authority",
+    "Codeg source inspection caught required config_values incompatibility; made empty map optional/omitted and retained nullable mode_id source behavior, then recompiled and reran both owners",
+    "SQLite integer checks reject fractional version/depth/cache; added original settings read-zero-write and complete large-task/boundary assertions",
+    "Added missing version-decision lifecycle, canonical architecture index, explicit stable anchors and explicit base environment; generic gates unchanged",
+    "First formatting invocation used Rust2021 style; normalized only new modules to workspace Rust2024; no unrelated source formatting"
+  ],
+  "verification_frequency_reason": "New strict model input boundary and durable settings CAS are prerequisite owners; one local lib verification batch with added-boundary and source-compatibility repair rebuilds. No full workspace build, release/package, push or Actions.",
+  "real_runtime_calls": 0,
+  "real_model_calls": 0,
+  "source_files": [
+    {
+      "path": "crates/rovai-core/src/delegation_contract.rs",
+      "sha256": "308a2aa2ed964a08c6a99f5f0c90ff29ea510791049a89cca9cb3996e5b2b8c0"
+    },
+    {
+      "path": "crates/rovai-core/src/delegation_settings.rs",
+      "sha256": "52685977c642b1930b83f7fce4c832a3879008873a2e9abdf636c0d6e1aa8d40"
+    },
+    {
+      "path": "crates/rovai-core/src/delegation_settings_schema.sql",
+      "sha256": "8d05f5bc2cf604cb090dd914bbb7407cdd2c5381b9712d8a10dafcd62a939efe"
+    },
+    {
+      "path": "crates/rovai-core/src/lib.rs",
+      "sha256": "f2bac968a4143cf6ff988ea9548c73f7c51819305648be3898706a651c358f6a"
+    }
+  ],
+  "logs": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-foundation-codegraph-final.log",
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-foundation-codegraph.log",
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-foundation-diff.log",
+      "sha256": "1f50fe0378e5f367dcebdec6ede779f9ce3200bfd079507844b888c86a7efd4b"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-foundation-doc-decisions-final.log",
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-foundation-doc-decisions-initial.log",
+      "sha256": "c161aeb205e6b8d56f69e837f83e6370039d1a2cdaf7c4526066100aec4ccbd5"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-foundation-doc-decisions-reviewed.log",
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-foundation-doc-decisions.log",
+      "sha256": "c161aeb205e6b8d56f69e837f83e6370039d1a2cdaf7c4526066100aec4ccbd5"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-foundation-doc-version-final.log",
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-foundation-doc-version.log",
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-foundation-fmt-final.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-foundation-fmt-reviewed.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-foundation-fmt.log",
+      "sha256": "ddd2174efa2c9b0772c66ad224c0a0f93501f88d14120cbb254fbd0abe263688"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-foundation-list-final.log",
+      "sha256": "fa58ecd257c764108c6161378ae66a980b9e9671dacda3ed709f875ad42440aa"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-foundation-list-reviewed.log",
+      "sha256": "cdc122e16e6567e1ecdfa7801d766b2b208ca8a0809de20ab2b57ed325f8a33a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-foundation-list.log",
+      "sha256": "f8f665520405defb3d62841fbafa48b3ea9c15279e1b81930af64a1ee9b69a80"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-foundation-protocol.log",
+      "sha256": "044569df112d191be31ea876439bd2bd3294beb8d9fa469452c1bcc1ea893695"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-foundation-scope.log",
+      "sha256": "80b015d52e964962c42c260bf848b218c1eef17992b424ae199b209dc55abcf9"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-foundation-tests-final.log",
+      "sha256": "31830d23d3815e6571d49829236f058f00d6a83b0d1edf03189b34bd51655788"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-foundation-tests-reviewed.log",
+      "sha256": "31830d23d3815e6571d49829236f058f00d6a83b0d1edf03189b34bd51655788"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-foundation-tests.log",
+      "sha256": "e16f4849b92d3b1b0541af28fddbacb9b95805d973fd2d01fbff25ad6eb6e0b7"
+    }
+  ],
+  "formal_cases": {
+    "D01-D32": "not_run_as_complete_scenarios",
+    "DG-G01..G05": "not_run_budget0",
+    "I04_required": 84,
+    "new_passed": 0
+  }
+}

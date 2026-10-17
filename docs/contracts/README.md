@@ -636,3 +636,7 @@ Architecture 解释组件如何组成，Version 概览记录交付范围；它�
 | [Run Process Detail Surface v1 (historical)](run-process-detail-surface-v1.md) | Scheme C 的逐 AgentRun Run Pulse/Drawer 与四 Tab Inspector；不作为当前 Renderer 入口 |
 
 - [Message Quotes v1](message-quotes-v1.md)：多段消息选文、草稿与不可变输入快照。
+
+## 独立帮手
+
+[Delegation v1](delegation-v1.md)记录 I04 已确认严格输入和设置基础，以及待接入的持久身份、执行与模型边界。

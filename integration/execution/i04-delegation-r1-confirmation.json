@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "artifact_id": "I04-NATIVE-DELEGATION-R1",
+  "revision": 1,
+  "confirmed_revision": 1,
+  "confirmation_status": "confirmed",
+  "confirmed_by": "User",
+  "confirmed_at": "2026-10-17T04:28:25Z",
+  "timestamp_basis": "first clock observation after receiving the direct human confirmation; not a claimed message creation timestamp",
+  "question_item_id": "[\"request_user_input_async\",\"call_cf816418d75249998399a5a068b098b3\",0]",
+  "human_reply": "确认，按 I04 独立帮手 r1 实施",
+  "proposal_commit": "807a9f449946a2a3a01b77f6b3803b98eba86ec4",
+  "gate_definition_commit": "fabc271ca4fbccef5579922a92d489f608f9af61",
+  "approved_baseline": "5f86ac6354068641d3d4a83e286dd38183fda819",
+  "implementation_baseline": "d2006d5d5151fcdd1460a02a955090f1b0fa2e50",
+  "approved_files": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    }
+  ],
+  "baseline_changed_approved_source_files": [],
+  "baseline_changed_core_files": [
+    "crates/rovai-core/src/acp.rs",
+    "crates/rovai-core/src/application.rs",
+    "crates/rovai-core/src/execution_evidence.rs",
+    "crates/rovai-core/src/lib.rs",
+    "crates/rovai-core/src/runtime_subagent_observation.rs"
+  ],
+  "baseline_review": "Intervening native observation work adds User-only evidence projection and changes ACP observation routing; no delegation tools, Bootstrap, Context format, data contract or migration changes. Schema159/Migration209 remain current. Approved r1 semantics stay frozen; immutable delivery files verified before implementation.",
+  "implementation_status": "authorized_in_progress",
+  "real_model_budget": 0,
+  "main_merge_authorized": false,
+  "release_authorized": false
+}
