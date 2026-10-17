@@ -1,0 +1,479 @@
+{
+  "schema_version": 1,
+  "stage": "I04",
+  "task": "I04-T01",
+  "checked_at": "2026-10-17T10:14:32.158194+00:00",
+  "status": "child_pending_upload_preview_save_publish_components_verified_user_transport_and_lifecycle_pending",
+  "source_commit": "557c12915895cdd395bb9fc60471de4bd8e23787",
+  "implementation_baseline": "9f82ca5474216a7424a5672b8e32b1a0ed854878",
+  "confirmation_record": "i04-delegation-r1-confirmation.json",
+  "runtime_data_contract": {
+    "version": "v1.72",
+    "schema": 159,
+    "migration": 209
+  },
+  "target_data_contract": {
+    "version": "v1.73",
+    "schema": 160,
+    "migration": 210,
+    "status": "not_registered"
+  },
+  "pending_migration_modified_legacy_guards": [
+    "context_manifest_v34_only_insert",
+    "context_manifest_quote_profile_insert",
+    "agent_run_input_v34_only_insert",
+    "single_chat_composer_draft_scope_insert",
+    "single_chat_retained_input_insert_guard",
+    "single_chat_source_observation_owner",
+    "conversation_message_single_chat_attachment_insert_guard",
+    "conversation_message_single_chat_attachment_update_guard",
+    "single_chat_pending_input_scope_insert"
+  ],
+  "implemented": [
+    "Dedicated child pending upload target freezes conversation, pending ID, edit token, scope and trusted editor; existing Host upload operations and private source transaction are reused",
+    "Native preflight rejects fenced or recovery-required leases before observing source bytes; binding revalidates the exact current revision and lease inside the Gateway transaction",
+    "Separate saved pending and working edit preview locators verify controlled child ownership; working material requires exact trusted editor, scope, token and current base revision",
+    "Recovery preview remains available to its original editor, while new uploads require explicit lease takeover; failed child source lookup never falls back to public managed attachments",
+    "Native and Web upload preparation journals include both child draft and pending targets, retain the exact original request, and exclude legacy private family listings",
+    "Client request parsing, controller cache and preview session keys include the new pending identity; Web safe snapshot reuses the existing SingleChatGet projection sanitizer only, not legacy business authorization"
+  ],
+  "checks": {
+    "main_owner": {
+      "log": "delegation-pending-upload-owner-03.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 1251
+    },
+    "regressions": [
+      {
+        "name": "sources",
+        "filter": "local_attachment_source::tests::",
+        "listed": 3,
+        "exit_code": 0,
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "name": "composer",
+        "filter": "single_chat_composer::tests::",
+        "listed": 3,
+        "exit_code": 0,
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "name": "legacy-private",
+        "filter": "single_chat::tests::",
+        "listed": 9,
+        "exit_code": 0,
+        "passed": 9,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "name": "web-projection",
+        "filter": "operations::tests::public_projection_excludes_mcp_credentials_and_desktop_mutation_actions",
+        "listed": 1,
+        "exit_code": 0,
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "name": "web-sources",
+        "filter": "resources::tests::core_file_sources_include_exact_run_activity_files",
+        "listed": 1,
+        "exit_code": 0,
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "rust_total_passed": 18,
+    "js_passed": 78,
+    "js_files": 5,
+    "typescript": {
+      "status": "passed",
+      "observed_exit_code": 0,
+      "log": "delegation-pending-upload-typecheck-04.log"
+    },
+    "docs_tests_passed": 10,
+    "full_rust_suite_run": false,
+    "version_governance_scaffold_protocol_fmt_diff_existing_codegraph_sync": "passed",
+    "current_protocol_methods": 189,
+    "locked_source_operations_reported_by_checker": 161,
+    "new_formal_cases_fully_passed": 0
+  },
+  "verified_behaviors": [
+    "Actual Native directory binding and location preview, wrong editor and legacy locator rejection, working versus saved queue separation, removal followed by original UUID readonly replay without resurrection",
+    "Recovery-required Native upload rejects before a nonexistent source can be read; unbound original observation is rejected after Web lease takeover even after the source is deleted",
+    "Actual verified-Web-editor spool file binding, exact preview, old token/wrong pending/wrong Canvas scope rejection and pathless snapshots",
+    "New Web file survives sorting, pending save and FIFO publication with the same reference; saved material is readable from another editor only after save, and the ended edit locator no longer resolves",
+    "Native/Web original-request journal replay, identity mismatch rejection, private family listing separation, strict IPC parser and distinct controller/preview keys"
+  ],
+  "corrected_failures": [
+    "The invalid Web retry identity fails synchronously before transport; the test was corrected from asynchronous rejection to synchronous throw",
+    "The changed target test now freezes its narrowed pending target before the callback, resolving a TypeScript narrowing error",
+    "One unused import left by the stronger save/publication test was removed; final Core compilation retains only six pre-existing helper warnings"
+  ],
+  "limitations": [
+    "Control/terminal fixtures remain SQL constructions; real Gateway, temporary NTFS files, source observations, queue save and publication run without an actual Runtime or Host loop",
+    "Web spool uses actual bytes and a verified editor but no HTTP request; Native/Web journal and IPC checks use Core/fetch substitutes and do not prove real IPC, process restart or GUI",
+    "Positive Canvas scope/adopt, User send/queue API and original UUID recovery wiring, delegation.changed subscription, original UI and complete Context delivery remain pending",
+    "Authenticated takeover/cancel/cleanup, all 21 plus custom initial target admission, native session/Fleet lifecycle and other I04 packages remain pending",
+    "Complete160/210 admission must still classify all nine legacy guards plus settings/owned/extended DDL. Startup marker remains159/209; no fake receipt or reopen claim",
+    "No full application build, actual Runtime/MCP/model, Host/GUI, push/Actions, main merge or release; no new formal case is fully passed"
+  ],
+  "next_actions": [
+    "User send and queue API/trusted Native/Web/original UUID recovery",
+    "Authenticated takeover/cancel/cleanup and initial target factory",
+    "Complete migration admission, original UI and remaining I04 packages"
+  ],
+  "external_actions": {
+    "push": false,
+    "actions": false,
+    "main_merge": false,
+    "release": false,
+    "real_model_budget": 0
+  },
+  "approved_artifacts": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1",
+      "unchanged": true
+    }
+  ],
+  "source_files": [
+    {
+      "path": "apps/desktop/src/main/file-preview/file-preview-ipc-input.test.ts",
+      "git_blob_sha256": "35a19ddbda16921efedd2ae2851c663150194f2ccfd98fd56ee1b266b1ea987c",
+      "bytes": 7238
+    },
+    {
+      "path": "apps/desktop/src/main/private-attachment-preparation.test.ts",
+      "git_blob_sha256": "139bf2806ce60f2daad9091d589dbb39e1746f5a7cd0b64abdd0bab59402bc29",
+      "bytes": 19042
+    },
+    {
+      "path": "apps/desktop/src/main/private-attachment-preparation.ts",
+      "git_blob_sha256": "5c58913da27995639ac2639366736705be209438f8c285d6458229595086e423",
+      "bytes": 16774
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/file-preview-session.test.ts",
+      "git_blob_sha256": "5500aa897766dc41104c08f62f86b59d64ea7e2e49529134d332b7845a6bd770",
+      "bytes": 11574
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/file-preview-session.ts",
+      "git_blob_sha256": "3889c2a4d7199f83cc81a8e8e33cb6fe8da28e9580b3436ffbdb47040ff6cd5e",
+      "bytes": 12025
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/private-upload-controller.test.ts",
+      "git_blob_sha256": "70cfd53798879c331d516ebf20afe77eb45685ea5c83f85d48641cad9f7a9b69",
+      "bytes": 12804
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/private-upload-controller.ts",
+      "git_blob_sha256": "29a7c1272fec1da345638b2b838c5d5cf9d093c449776f0a21fa2d77bc2831d0",
+      "bytes": 10520
+    },
+    {
+      "path": "apps/desktop/src/shared/private-attachment-locator.ts",
+      "git_blob_sha256": "cb706b70a88c0a28ff2176a1bc225dbe0f40cba5b33c20abbaef5d73dd53db69",
+      "bytes": 6629
+    },
+    {
+      "path": "apps/desktop/src/shared/private-upload-request.ts",
+      "git_blob_sha256": "fec9936a2e63c8fccedcfa4398560b78f476369adabb97e6224394884942f154",
+      "bytes": 2504
+    },
+    {
+      "path": "apps/web/src/private-upload-preparations.test.ts",
+      "git_blob_sha256": "96ab6dbe030d0b88f79288e82e38cd2ea7950687c3317c2aa14a8511169a8109",
+      "bytes": 15512
+    },
+    {
+      "path": "apps/web/src/private-upload-preparations.ts",
+      "git_blob_sha256": "7f0b2556d41143af4066ebc6e32df136f8191a21e1ccf8f2a5727af3861e3af7",
+      "bytes": 13385
+    },
+    {
+      "path": "crates/rovai-core/src/application.rs",
+      "git_blob_sha256": "3c52e64e8c961f6c256be036b8f3ca5bf69f2f47dc54cb9587cdb764c8e61272",
+      "bytes": 1405574
+    },
+    {
+      "path": "crates/rovai-core/src/camp_attachment.rs",
+      "git_blob_sha256": "8d065558a28e0472a4ef5a9588a3b73beec33e2cc27a41a1ad76f9acb1727296",
+      "bytes": 198196
+    },
+    {
+      "path": "crates/rovai-core/src/context.rs",
+      "git_blob_sha256": "43b0d701f2e4e9054e9dbe9dadf1cb6ec4faf7fb31f73f37bcce2ef6b8a1f690",
+      "bytes": 674934
+    },
+    {
+      "path": "crates/rovai-core/src/context/delegation_pending_upload_tests.rs",
+      "git_blob_sha256": "a56a79b6ab7942b2774a62a29343dc622040521a9ea0bda24d18b2c4e3f6dcfd",
+      "bytes": 12862
+    },
+    {
+      "path": "crates/rovai-core/src/context/delegation_queue_tests.rs",
+      "git_blob_sha256": "0cbec04921971461b94e05dfe6351fd9a9d7be58684c512989e0a000576b81fa",
+      "bytes": 21978
+    },
+    {
+      "path": "crates/rovai-core/src/local_attachment_source.rs",
+      "git_blob_sha256": "658d6fade75e9cc9a11c5b3ed8c30803cab1347e632a4eac68261119951e5f93",
+      "bytes": 44255
+    },
+    {
+      "path": "crates/rovai-core/src/single_chat_composer.rs",
+      "git_blob_sha256": "357e77db75aaae8213434d43d3bde148335c64f88f4a7bbb67dc5f7ecbb03e26",
+      "bytes": 44337
+    },
+    {
+      "path": "crates/rovai-core/src/web_upload.rs",
+      "git_blob_sha256": "6c8fc1dd59e3d90c693f9d3d658c7dafd89236572a4797a7e8383d8ba37f5669",
+      "bytes": 22598
+    },
+    {
+      "path": "crates/rovai-web/src/uploads.rs",
+      "git_blob_sha256": "5b214dd8a941665bbe1b9824488c3e0313b0baaf8e8d15d3c24b57ee37e1f18a",
+      "bytes": 14531
+    },
+    {
+      "path": "docs/development/testing.md",
+      "git_blob_sha256": "de0655e0e5d29dded82b6e6dae8859f4c31af828aae7a601f6141dfcee455aa7",
+      "bytes": 209501
+    },
+    {
+      "path": "packages/contracts/src/index.ts",
+      "git_blob_sha256": "d7cd945b17b507b136847f0359da3845f95d1c590c0816d1935f2feae1de3cbd",
+      "bytes": 147281
+    }
+  ],
+  "log_files": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-codegraph-sync.log",
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef",
+      "bytes": 88
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-compile-01.log",
+      "sha256": "37dfb5291514d51683b127e02597f7c6e5a8600c2228ac338b44671308a78d3f",
+      "bytes": 2005
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-compile-02.log",
+      "sha256": "68ef385e8bc088885bdb7627b93ae06745372be6f6f1e0235bc597dc5e5f694b",
+      "bytes": 2546
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-compile-03.log",
+      "sha256": "234697e99be43de443b7a86bb2071502dbe37e45018688fe5d066fafa8a210cf",
+      "bytes": 2005
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-diff-check.log",
+      "sha256": "b83f5bbbbdd50b90216e43271fa58099024b8d262ebc53ff4c279efbedc7e294",
+      "bytes": 264
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-doc-governance.log",
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a",
+      "bytes": 170
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-doc-tests.log",
+      "sha256": "3c0eb72f522f21d4912b44d4584e601e9b43e7f4a411d5dd13887f72f04e5c73",
+      "bytes": 924
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-doc-version.log",
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335",
+      "bytes": 79
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-fmt-02.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-fmt-03.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-fmt-final.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-js-01.log",
+      "sha256": "cca38bfd838dd8ebaa0774dc1dee40f0ddf87ee0f36268f68310575222f772a2",
+      "bytes": 1676
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-js-02.log",
+      "sha256": "ff6cb5c27649dd85fbe6468a92a2034b35a99aa439c41d0008cc1950ae65dea8",
+      "bytes": 286
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-js-03.log",
+      "sha256": "43f46583f42084258841054199b307aea7664924d411ea276c96fdc9caca7ad2",
+      "bytes": 286
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-owner-01.log",
+      "sha256": "6d40ec79c584cee8bb55bfcb9cf66795ab2b1b93cc048c2e716870a5d8bc4578",
+      "bytes": 227
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-owner-02.log",
+      "sha256": "b3b6e3e941d87794267c7ab23f71dd6f3454958951194145a286283b622e6883",
+      "bytes": 227
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-owner-03.log",
+      "sha256": "ecf0214f726c44b3c1f0d5a2eecff10abfb3bfc818b62f53dddb01211373fd8c",
+      "bytes": 227
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-owner-list.log",
+      "sha256": "8d7c39b86e00e4e7eee958d5210fe31c3224cf0ebf2bba69b1e95c305acee56d",
+      "bytes": 125
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-protocol.log",
+      "sha256": "044569df112d191be31ea876439bd2bd3294beb8d9fa469452c1bcc1ea893695",
+      "bytes": 182
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-regression-composer-list.log",
+      "sha256": "e8782a2dee0018db9cef95310240565849de5558d40b95d1ee30b2c67c3b0d23",
+      "bytes": 378
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-regression-composer.log",
+      "sha256": "5c4d95a53bbd657129342b2d822c5b9d8b4ae8d5053ed50060d7d46b0f126c6a",
+      "bytes": 492
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-regression-legacy-private-list.log",
+      "sha256": "fbbc0f6304b8e1b5adf6fc252ff9c6192e7f7a937727039ee64d7d8ebb7c4d3f",
+      "bytes": 930
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-regression-legacy-private.log",
+      "sha256": "c3854dfbcf2ccd4b8987adfb704b74b980a75da83d2e5dc20f001f0d5a368dec",
+      "bytes": 1080
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-regression-results.json",
+      "sha256": "f76591f29120b4589fd74300263948c6c3ca46c2286a1ac6deaa0b08d3c36a18",
+      "bytes": 998
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-regression-sources-list.log",
+      "sha256": "303a32c85c072a3f9e99e1bc4bf0ed5998af11b2cb5c20df80d4d4b7a5019176",
+      "bytes": 325
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-regression-sources.log",
+      "sha256": "8f30e7e1c4b82760ac5e029b2f70f84ba586348f3e2fe68f7d8dabb7c00edd45",
+      "bytes": 439
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-regression-web-projection-list.log",
+      "sha256": "12b33d7dff39abc5e17f62036d4b5b6b5a59cb87114540e8e20bf9fc0b079ddd",
+      "bytes": 122
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-regression-web-projection.log",
+      "sha256": "1ff7eab8d1d03957113c01363ffee903dab3bc75ed5abbe21f9e39a4edbb44cc",
+      "bytes": 222
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-regression-web-sources-list.log",
+      "sha256": "59eef156a5ad4f7813d64e0b702fb58ffa563b7328d66713ca45ba557bd3dfa1",
+      "bytes": 100
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-regression-web-sources.log",
+      "sha256": "271967aec13e4f0c17167d1c1c598fbbb40d05c7d9bcc470974e784628cf82af",
+      "bytes": 200
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-scaffold.log",
+      "sha256": "899dab604ac7f85562aab489b6c0f0730065bba54b60543d95ce3bcc2cd9765a",
+      "bytes": 343
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-typecheck-01.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-typecheck-02.log",
+      "sha256": "c9a904834b7f66beb9a4092b8aa29f677f7d838a017c9191b6d3132388fb56d0",
+      "bytes": 638
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-typecheck-03.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-typecheck-04.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-pending-upload-web-compile.log",
+      "sha256": "091ba5d9bc6a0cfc79e7252928daac0bc347bb6bf9e3f9df936f3c38141a3d1a",
+      "bytes": 3558
+    }
+  ]
+}
