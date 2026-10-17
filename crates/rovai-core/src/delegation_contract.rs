@@ -138,12 +138,16 @@ impl From<InterruptionReason> for String {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct StartParams {
     pub agent_type: RuntimeTarget,
     pub task: NonEmpty,
-    #[serde(default, deserialize_with = "present")]
+    #[serde(
+        default,
+        deserialize_with = "present",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub working_dir: Option<WorkingDirectory>,
 }
 
@@ -174,7 +178,7 @@ fn nonempty_ids<'de, D: Deserializer<'de>>(d: D) -> Result<Vec<NonEmpty>, D::Err
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct CancelParams {
     pub task_id: NonEmpty,

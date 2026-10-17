@@ -163,7 +163,7 @@ pub(crate) fn cancel_for_member(
     runs.dedup();
     Ok(runs)
 }
-fn cancel_tree(
+pub(crate) fn cancel_tree(
     tx: &Transaction<'_>,
     id: &str,
     actor: &ActorRef,

@@ -29,12 +29,22 @@ pub struct ParentStartAdmission {
     fingerprint: String,
 }
 
-pub fn authenticate_new_child(
+pub(crate) struct OperationAdmission {
+    pub conversation: String,
+    pub config: Value,
+    pub workspace: AgentRunWorkspace,
+    pub settings: DelegationSettings,
+    pub policy: FrozenPolicy,
+    pub depth: i64,
+}
+
+pub(crate) fn authenticate_operation(
     connection: &Connection,
     binding: &BuiltinToolBindingCredential,
     source: &AuthenticatedTeamToolRun,
     tool_call: &str,
-) -> Result<ParentStartAdmission> {
+    operation: &str,
+) -> Result<OperationAdmission> {
     let actual = TeamToolService::default().authenticate_attested_binding_on_connection(
         connection,
         &binding.native_binding_id,
@@ -117,18 +127,42 @@ pub fn authenticate_new_child(
     }
     let settings = crate::delegation_settings::read(connection)?;
     ensure!(
-        frozen.allows("delegation.start", settings.enabled),
+        frozen.allows(operation, settings.enabled),
         "delegation.start_disabled"
     );
-    let limit = frozen.depth_limit.min(settings.depth_limit);
+    let workspace: AgentRunWorkspace = serde_json::from_str(&workspace)?;
+    workspace.validate()?;
+    Ok(OperationAdmission {
+        conversation,
+        config,
+        workspace,
+        settings,
+        policy: frozen,
+        depth,
+    })
+}
+
+pub fn authenticate_new_child(
+    connection: &Connection,
+    binding: &BuiltinToolBindingCredential,
+    source: &AuthenticatedTeamToolRun,
+    tool_call: &str,
+) -> Result<ParentStartAdmission> {
+    let OperationAdmission {
+        conversation,
+        config,
+        workspace,
+        settings,
+        policy,
+        depth,
+    } = authenticate_operation(connection, binding, source, tool_call, "delegation.start")?;
+    let limit = policy.depth_limit.min(settings.depth_limit);
     ensure!(
         depth
             .checked_add(1)
             .is_some_and(|next| next <= i64::from(limit)),
         "delegation.depth_limit"
     );
-    let workspace: AgentRunWorkspace = serde_json::from_str(&workspace)?;
-    workspace.validate()?;
     let child_policy = FrozenPolicy::new(true, limit, Role::Child)?;
     let fingerprint = canonical_json_digest(
         &json!({"run":source.agent_run_id,"epoch":source.execution_epoch,
@@ -137,7 +171,7 @@ pub fn authenticate_new_child(
     )?;
     Ok(ParentStartAdmission {
         binding: binding.clone(),
-        source: actual,
+        source: source.clone(),
         tool_call: tool_call.into(),
         conversation,
         workspace,
@@ -156,6 +190,19 @@ impl ParentStartAdmission {
     }
     pub fn child_policy(&self) -> FrozenPolicy {
         self.child_policy
+    }
+    pub(crate) fn matches_invocation(
+        &self,
+        binding: &BuiltinToolBindingCredential,
+        source: &AuthenticatedTeamToolRun,
+        call: &str,
+    ) -> bool {
+        self.source == *source
+            && self.tool_call == call
+            && self.binding.native_binding_id == binding.native_binding_id
+            && self.binding.native_binding_generation == binding.native_binding_generation
+            && self.binding.binding_compatibility_digest == binding.binding_compatibility_digest
+            && self.binding.binding_credential == binding.binding_credential
     }
     pub fn revalidate(&self, connection: &Connection) -> Result<()> {
         let current =

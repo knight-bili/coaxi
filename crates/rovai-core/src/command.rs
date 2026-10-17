@@ -20,6 +20,8 @@ pub(crate) mod sealed {
 pub trait DomainCommand: sealed::Sealed + Serialize {
     const TYPE: &'static str;
     const ALLOWED_WHILE_CAMP_DELETING: bool = false;
+    // Opt-in only. Existing commands retain their original first-result semantics.
+    const EXACT_REPLAY: bool = false;
 
     /// Existing private draft commands belong to a Host-verified editor.
     fn draft_client(&self) -> Option<&crate::draft_client::DraftClient> {
@@ -232,7 +234,7 @@ impl DomainCommandGateway {
     {
         validate_envelope::<C>(envelope)?;
         load_stored_result(database.connection(), &envelope.command_id)?
-            .map(|result| replay_or_conflict(result, envelope))
+            .map(|result| replay_or_conflict(database.connection(), result, envelope))
             .transpose()
     }
 
@@ -249,7 +251,7 @@ impl DomainCommandGateway {
         validate_envelope::<C>(envelope)?;
 
         if let Some(result) = load_stored_result(database.connection(), &envelope.command_id)? {
-            return replay_or_conflict(result, envelope);
+            return replay_or_conflict(database.connection(), result, envelope);
         }
 
         let message_output = database.message_changes.clone();
@@ -259,8 +261,9 @@ impl DomainCommandGateway {
             .context("failed to start domain command transaction")?;
 
         if let Some(result) = load_stored_result(&transaction, &envelope.command_id)? {
+            let replay = replay_or_conflict(&transaction, result, envelope)?;
             transaction.commit()?;
-            return replay_or_conflict(result, envelope);
+            return Ok(replay);
         }
 
         let message_changes =
@@ -423,15 +426,28 @@ pub(crate) fn write_canonical_json(writer: &mut dyn Write, value: &Value) -> Res
 }
 
 fn replay_or_conflict<C>(
+    connection: &rusqlite::Connection,
     mut result: StoredCommandResult,
     envelope: &CommandEnvelope<C>,
 ) -> Result<CommandExecution>
 where
     C: DomainCommand,
 {
-    // commandId names the first submission. A retry returns that result even
-    // if its payload changed; a new operation must use a new commandId.
+    let exact = if C::EXACT_REPLAY {
+        let stored: (Option<String>, Option<i64>) = connection.query_row(
+            "SELECT request_digest,request_digest_version FROM event_log WHERE event_type='command.result' AND command_id=?1",
+            [&envelope.command_id], |row| Ok((row.get(0)?,row.get(1)?)),
+        )?;
+        stored
+            == (
+                Some(canonical_json_digest(&serde_json::to_value(envelope)?)?),
+                Some(1),
+            )
+    } else {
+        true
+    };
     if result.command_type == C::TYPE
+        && exact
         && result.actor_type == envelope.actor.actor_type()
         && result.actor_id == envelope.actor.actor_id()
         && result.source_agent_run_id.as_deref() == envelope.actor.source_agent_run_id()
@@ -605,13 +621,14 @@ where
             payload_json, camp_id, entity_type, entity_id, actor_type, actor_id,
             source_agent_run_id, execution_epoch, command_id, command_type,
             result_status, result_code,
-            result_payload_json, result_entity_type, result_entity_id, created_at, command_client_id
+            result_payload_json, result_entity_type, result_entity_id, created_at, command_client_id,
+            request_digest, request_digest_version
         ) VALUES (
             ?1, NULL, NULL, NULL, 'command.result', NULL,
             ?2, ?3, ?4, ?5, ?6, ?7,
             ?8, ?9, ?10, ?11,
             ?12, ?13, ?14, ?15,
-            ?16, ?17, ?18
+            ?16, ?17, ?18, ?19, ?20
         )
         "#,
         params![
@@ -633,6 +650,8 @@ where
             result_entity_id,
             result.recorded_at,
             result.command_client_id,
+            if C::EXACT_REPLAY { Some(canonical_json_digest(&serde_json::to_value(envelope)?)?) } else { None },
+            if C::EXACT_REPLAY { Some(1_i64) } else { None },
         ],
     )?;
     Ok(())
