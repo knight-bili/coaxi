@@ -89,6 +89,13 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 
 ## Rust 测试准入与退役门槛
 
+I04 原生子代理引用扩展既有 `execution_evidence::tests::provider_packets_are_reduced_to_public_evidence_fields`
+owner，覆盖冻结 Codex adapter、明确协作事件、父会话一致性、编号类型/去重/上限、未知状态及不复制子报告/任务/路径。
+复用 `evidence_is_durable_blob_backed_agent_inaccessible_and_cancel_fenced` 的真实 SQLite/Context 夹具，
+验证原 Evidence 读取、错 Camp 拒绝、原事件回放、旧 epoch/取消围栏，以及该观察不进入模型输入；不新增 Rust owner。
+最低命令 `cargo test -p rovai-core --features extended-tests --lib execution_evidence::tests`，先同过滤 `-- --list` 确认非零。
+此次是新增用户证据字段的局部契约验证，不执行整包构建或 Actions；Grok、新版 Codex 原生活动和完整查看器仍待实现及真实 Runtime 验证。
+
 I04 单次自动化停止扩展既有 `automation::tests::manual_run_atomically_freezes_snapshot_and_replays_without_a_second_camp`
 owner，复用其真实 SQLite/回执/Delivery 夹具，覆盖 User/错归属拒绝、waiting/claimed 精确停止、原UUID回放与迟到请求不误停后来运行。
 同一夹具在用户停止前执行 Schema158→159/Migration209 的整行/回执保留、失败回滚、外键和伪造原因集合拒绝；不另建整库或 Rust owner。

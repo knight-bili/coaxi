@@ -785,6 +785,12 @@ impl ExecutionEvidenceService {
         let source_event_key = source_event_key(event_type, payload);
         let source_payload = payload;
         let mut payload = normalize_public_payload(event_type, source_payload);
+        insert_native_subagent_observation(
+            &mut payload,
+            event_type,
+            source_payload,
+            runtime_adapter_kind.as_deref(),
+        );
         insert_codex_command_read_candidate(
             &mut payload,
             event_type,
@@ -2594,6 +2600,88 @@ fn normalize_public_payload(event_type: &str, payload: &Value) -> Value {
     }
 }
 
+// 用户执行证据中的原生接收会话引用；不创建 Core 子 Run，也不授予原生会话读取权。
+fn insert_native_subagent_observation(
+    public_payload: &mut Value,
+    event_type: &str,
+    source_payload: &Value,
+    frozen_adapter_kind: Option<&str>,
+) {
+    if frozen_adapter_kind != Some("codex-cli")
+        || !matches!(event_type, "activity.started" | "activity.completed")
+        || !crate::runtime::is_root_output(source_payload)
+    {
+        return;
+    }
+    let item = &source_payload["item"];
+    if item["type"] != "collabAgentToolCall" {
+        return;
+    }
+    let Some(tool_call_id) = native_subagent_identity(&item["id"]) else {
+        return;
+    };
+    let Some(sender) = native_subagent_identity(&item["senderThreadId"]) else {
+        return;
+    };
+    if source_payload
+        .get("threadId")
+        .is_some_and(|thread| native_subagent_identity(thread) != Some(sender))
+    {
+        return;
+    }
+    let Some(receivers) = item["receiverThreadIds"].as_array() else {
+        return;
+    };
+    let mut seen = std::collections::HashSet::new();
+    let mut children = Vec::new();
+    for receiver in receivers {
+        let Some(id) = native_subagent_identity(receiver) else {
+            continue;
+        };
+        if id == sender || !seen.insert(id) || children.len() >= 64 {
+            continue;
+        }
+        let native_status = item["agentsStates"]
+            .get(id)
+            .and_then(|state| state.get("status"))
+            .and_then(Value::as_str);
+        let status = match native_status {
+            Some("pendingInit") => "waiting",
+            Some("running") => "running",
+            Some("completed") => "completed",
+            Some("interrupted") => "interrupted",
+            Some("errored") => "failed",
+            Some("shutdown") => "shutdown",
+            Some("notFound") => "not_found",
+            _ => "unknown",
+        };
+        children.push(serde_json::json!({ "nativeSessionId": id, "status": status }));
+    }
+    if children.is_empty() {
+        return;
+    }
+    public_payload["nativeSubagents"] = serde_json::json!({
+        "schemaVersion": 1,
+        "adapterKind": "codex-cli",
+        "source": "codex-app-server.collabAgentToolCall",
+        "relationship": "runtime_reported_receiver",
+        "toolCallId": tool_call_id,
+        "children": children,
+        "receiverCount": seen.len(),
+        "omittedReceiverCount": seen.len().saturating_sub(64),
+    });
+}
+
+fn native_subagent_identity(value: &Value) -> Option<&str> {
+    value.as_str().filter(|id| {
+        !id.is_empty()
+            && id.len() <= 256
+            && id
+                .bytes()
+                .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b'_'))
+    })
+}
+
 fn builtin_agent_output_digest(payload: &Value) -> Option<String> {
     let envelope = serde_json::from_value::<BuiltinToolInvocationEnvelope>(
         payload.get("coreEnvelope")?.clone(),
@@ -3677,6 +3765,102 @@ mod tests {
 
     #[test]
     fn provider_packets_are_reduced_to_public_evidence_fields() {
+        let source = json!({
+            "threadId": "native-parent",
+            "nativeSubagents": {"forged": true},
+            "item": {
+                "id": "native-call", "type": "collabAgentToolCall", "status": "completed",
+                "senderThreadId": "native-parent",
+                "receiverThreadIds": ["native-child-1", "native-child-2", "native-child-1", "native-parent", "../other", null],
+                "agentsStates": {
+                    "native-child-1": {"status": "completed", "message": "PRIVATE_CHILD_REPORT"},
+                    "native-child-2": {"status": "future-status", "path": "/private/rollout"},
+                    "unlisted-child": {"status": "running"}
+                },
+                "prompt": "PRIVATE_CHILD_TASK"
+            }
+        });
+        for event in ["activity.started", "activity.completed"] {
+            let mut normalized = normalize_public_payload(event, &source);
+            insert_native_subagent_observation(&mut normalized, event, &source, Some("codex-cli"));
+            assert_eq!(normalized["nativeSubagents"]["receiverCount"], 2);
+            assert_eq!(
+                normalized["nativeSubagents"]["children"],
+                json!([
+                    {"nativeSessionId": "native-child-1", "status": "completed"},
+                    {"nativeSessionId": "native-child-2", "status": "unknown"}
+                ])
+            );
+            for excluded in [
+                "PRIVATE_CHILD_REPORT",
+                "PRIVATE_CHILD_TASK",
+                "/private/rollout",
+                "unlisted-child",
+                "forged",
+            ] {
+                assert!(!normalized.to_string().contains(excluded));
+            }
+        }
+        for adapter in [None, Some("grok-build"), Some("claude-code-cli")] {
+            let mut normalized = normalize_public_payload("activity.completed", &source);
+            insert_native_subagent_observation(
+                &mut normalized,
+                "activity.completed",
+                &source,
+                adapter,
+            );
+            assert!(normalized.get("nativeSubagents").is_none());
+        }
+        for (pointer, value) in [
+            ("/item/type", json!("mcpToolCall")),
+            ("/item/id", json!({"id": "not-a-string"})),
+            ("/item/senderThreadId", json!("other-parent")),
+            ("/item/receiverThreadIds", json!({"native-child-1": true})),
+        ] {
+            let mut invalid = source.clone();
+            *invalid.pointer_mut(pointer).unwrap() = value;
+            let mut normalized = normalize_public_payload("activity.completed", &invalid);
+            insert_native_subagent_observation(
+                &mut normalized,
+                "activity.completed",
+                &invalid,
+                Some("codex-cli"),
+            );
+            assert!(normalized.get("nativeSubagents").is_none());
+        }
+        let mut replay = source.clone();
+        replay["replay"] = json!(true);
+        let mut normalized = normalize_public_payload("activity.completed", &replay);
+        insert_native_subagent_observation(
+            &mut normalized,
+            "activity.completed",
+            &replay,
+            Some("codex-cli"),
+        );
+        assert!(normalized.get("nativeSubagents").is_none());
+        let mut many = source.clone();
+        many["item"]["receiverThreadIds"] =
+            json!((0..70).map(|n| format!("child-{n}")).collect::<Vec<_>>());
+        let mut normalized = normalize_public_payload("activity.completed", &many);
+        insert_native_subagent_observation(
+            &mut normalized,
+            "activity.completed",
+            &many,
+            Some("codex-cli"),
+        );
+        assert_eq!(
+            normalized["nativeSubagents"]["children"]
+                .as_array()
+                .unwrap()
+                .len(),
+            64
+        );
+        assert_eq!(normalized["nativeSubagents"]["receiverCount"], 70);
+        assert_eq!(normalized["nativeSubagents"]["omittedReceiverCount"], 6);
+        assert_eq!(
+            normalized["nativeSubagents"]["children"][0]["status"],
+            "unknown"
+        );
         let normalized = normalize_public_payload(
             "activity.completed",
             &json!({
@@ -5502,6 +5686,82 @@ mod tests {
             .unwrap();
         assert_eq!(interrupted_started.sequence, 12);
 
+        let original_adapter: Option<String> = database
+            .connection()
+            .query_row(
+                "SELECT runtime_adapter_kind FROM agent_run WHERE id = ?1",
+                [&run_id],
+                |row| row.get(0),
+            )
+            .unwrap();
+        database
+            .connection()
+            .execute(
+                "UPDATE agent_run SET runtime_adapter_kind = 'codex-cli' WHERE id = ?1",
+                [&run_id],
+            )
+            .unwrap();
+        let native_source = json!({"threadId": "native-parent", "item": {
+            "id": "native-child-observation", "type": "collabAgentToolCall", "status": "completed",
+            "senderThreadId": "native-parent", "receiverThreadIds": ["EVIDENCE_ONLY_NATIVE_CHILD"],
+            "agentsStates": {"EVIDENCE_ONLY_NATIVE_CHILD": {"status": "running", "message": "PRIVATE_NATIVE_REPORT"}},
+            "prompt": "PRIVATE_NATIVE_TASK"
+        }});
+        let native_observation = ExecutionEvidenceService
+            .record_runtime_event(
+                &mut database,
+                &blob_store,
+                &run_id,
+                execution_epoch,
+                "activity.completed",
+                &native_source,
+            )
+            .unwrap()
+            .unwrap();
+        let saved = ExecutionEvidenceService
+            .read_full_payload(&database, &blob_store, &camp_id, &native_observation.id)
+            .unwrap();
+        assert_eq!(native_observation.sequence, 13);
+        assert_eq!(saved["nativeSubagents"]["children"][0]["status"], "running");
+        assert!(!saved.to_string().contains("PRIVATE_NATIVE"));
+        assert!(
+            ExecutionEvidenceService
+                .read_full_payload(&database, &blob_store, "other-camp", &native_observation.id,)
+                .is_err()
+        );
+        let replay = ExecutionEvidenceService
+            .record_runtime_event(
+                &mut database,
+                &blob_store,
+                &run_id,
+                execution_epoch,
+                "activity.completed",
+                &native_source,
+            )
+            .unwrap()
+            .unwrap();
+        assert_eq!(replay.id, native_observation.id);
+        assert!(
+            ExecutionEvidenceService
+                .record_runtime_event(
+                    &mut database,
+                    &blob_store,
+                    &run_id,
+                    execution_epoch + 1,
+                    "activity.completed",
+                    &native_source,
+                )
+                .unwrap()
+                .is_none()
+        );
+        database
+            .connection()
+            .execute(
+                "UPDATE agent_run SET runtime_adapter_kind = ?2 WHERE id = ?1",
+                params![run_id, original_adapter],
+            )
+            .unwrap();
+
         let materialized = ContextService
             .materialize(
                 &mut database,
@@ -5518,6 +5778,12 @@ mod tests {
             panic!("small Camp context should materialize");
         };
         assert!(!context.rendered_payload.contains(discarded_output_marker));
+        assert!(
+            !context
+                .rendered_payload
+                .contains("EVIDENCE_ONLY_NATIVE_CHILD")
+        );
+        assert!(!context.rendered_payload.contains("PRIVATE_NATIVE"));
 
         let run_version: i64 = database
             .connection()
@@ -5582,6 +5848,19 @@ mod tests {
             )
             .unwrap();
         assert!(late.is_none());
+        assert!(
+            ExecutionEvidenceService
+                .record_runtime_event(
+                    &mut database,
+                    &blob_store,
+                    &run_id,
+                    execution_epoch,
+                    "activity.completed",
+                    &native_source,
+                )
+                .unwrap()
+                .is_none()
+        );
         let fenced_batch = ["late one", "late two"]
             .into_iter()
             .map(|delta| {
@@ -5621,7 +5900,7 @@ mod tests {
             .unwrap()
             .expect("terminal Team Tool result must survive the Turn fence");
         assert!(failed.inserted);
-        assert_eq!(failed.sequence, 13);
+        assert_eq!(failed.sequence, native_observation.sequence + 1);
         assert_eq!(
             failed.payload["errorCode"],
             "team_tool.execution_budget_exhausted"
@@ -5654,7 +5933,7 @@ mod tests {
             .expect("the first replay observation must remain visible");
         assert!(!replay.inserted);
         assert_eq!(replay.id, failed.id);
-        assert_eq!(replay.sequence, 13);
+        assert_eq!(replay.sequence, failed.sequence);
         assert_eq!(replay.payload["idempotentReplay"], true);
 
         let replay_duplicate = ExecutionEvidenceService
@@ -5669,7 +5948,7 @@ mod tests {
             .unwrap();
         assert!(!replay_duplicate.inserted);
         assert_eq!(replay_duplicate.id, replay.id);
-        assert_eq!(replay_duplicate.sequence, 13);
+        assert_eq!(replay_duplicate.sequence, failed.sequence);
 
         // Extend the existing durable fencing owner: only a registered ZCode
         // background identity may update its original completed epoch.

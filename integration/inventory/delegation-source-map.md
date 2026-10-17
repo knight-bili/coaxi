@@ -37,6 +37,22 @@ Core 的公开执行已经是 Delivery-first，历史 `a2aParentAgentRunId`、ro
 
 单元及静态页面检查不替代真实 Core/Runtime 执行。原生独立子会话与 84 个 I04 正式场景仍待相应实现和验证。
 
+## 原生接收会话的证据回接（首批代码）
+
+`crates/rovai-core/src/execution_evidence.rs` 现从已冻结为 `codex-cli` 的 Run 接受明确的
+`collabAgentToolCall` 接收会话观察，在现有用户 Evidence 的 `nativeSubagents` 中保留稳定工具编号、
+接收会话编号和明确报告的状态。父编号与事件 Thread 不一致、非根输出、错误 adapter、未知字段或路径式编号不进入该投影；
+编号去重并排除父会话，最多保留64个引用，完整有效接收者数与省略数另列。子状态未知不由工具完成推断为完成。
+
+这里的关系明确标为 `runtime_reported_receiver`，不能当成已批准r1的Core委派关系、独立业务Task或新子Run。
+不复制子任务、完整报告、原生文件路径和provider私有包；不增加模型工具、模型输入或原生会话读取API。
+用户仍通过原 `agentRunEvidence.getContent` 所属Thread入口读取；引用本身不授予任意原生Session的读取权限。
+
+来源的新版Codex内置团队还存在不同协议：`src-tauri/src/acp/connection.rs:14179`明确指出
+不能只依赖旧 `collabAgentToolCall` 观察spawn；`:22154`的旧 `_meta.codex.subagent` 与新版rawInput兼容测试亦需保留。
+Grok `grok_subagent_meta`（同文件`:15957`）由Codeg本身组合，不能假设Rovai现有ACP已经提供该字段。
+本批只完成上述明确Codex事件的Core持久证据，其他格式、完整只读查看器和真实Runtime验证继续属于I04未完项。
+
 ## 接下来的有限队列
 
 ### 两种子会话查看器须分开移植
