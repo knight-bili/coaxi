@@ -43,7 +43,13 @@ control 原语按精确版本记录接管，要求旧 Run 已经终态，冻结�
 
 接管在同一 Gateway 事务内核对 control 版本、调用原 Run 取消结算关闭受控树的活跃输出、冻结 child 的当前消息序号并持久保存 control 与回执；任一后续写入失败整体回滚。已经终态的原 Run 保持原结果，接管仍关闭它下面尚受控的后台子树。单项取消仅接受当前 attempt，终态根为 no-op，不借此停止后台孙会话；父 Conversation 整体关闭另行接线。
 
-树遍历使用当前 attempt 的触发父 Run，独立接管的后代切断整个分支，后续 User Run 不属于旧 delegation_attempt 树。清理门禁与树取消共用同一范围；取消业务终态和真实清理确认分开，未确认清理、恢复或未知输入时不得准入新的 User 发送。接口响应保存当次 `cleanupPending` 事实，原 UUID 回放不根据当前状态重写首次回执。当前只接 User 控制入口；父 Run 异常、父 Conversation/成员关闭的因果取消、真实进程/writer/Fleet 与完整恢复仍须接续验证。
+树遍历使用当前 attempt 的触发父 Run，独立接管的后代切断整个分支，后续 User Run 不属于旧 delegation_attempt 树。清理门禁与树取消共用同一范围；取消业务终态和真实清理确认分开，未确认清理、恢复或未知输入时不得准入新的 User 发送。接口响应保存当次 `cleanupPending` 事实，原 UUID 回放不根据当前状态重写首次回执。User 控制及下述父级因果入口已接 Core；真实进程/writer/Fleet 与完整恢复仍须接续验证。
+
+### 父级因果取消与私有完成
+
+父 Run 停止、失败、派发失败或未知输入终结，在原事务内按当前 attempt 的 `trigger_parent_run_id + trigger_parent_epoch` 选取直接委派，再关闭仍归其控制的子树。不同轮次、已独立接管的分支和后续 User Run 不属于旧父运行；终态中间节点不阻挡父运行或父 Conversation 整体关闭时对后台后代的处理。Single Chat 结束使用父 Conversation 范围，成员离队使用该 Thread 内归属成员的父 Conversation 范围；成员失效本身仍有权结算其新的 User Run，不能把这种权限与旧父运行权限混用。
+
+正常成功不触发因果取消。`delegation` 与 `delegation_user` 的成功结果沿原私有完成算法保存到自己的 Conversation，原消息、Run 终态、回执同事务提交，禁止走公开回复或业务 Task fallback；旧 Single Chat 的 policy1/2 分支不变，policy3 完整准入仍待合齐。子会话完成后保留后台帮手，待明确停止、所属会话关闭或成员失效时按相应范围处理。Thread 聚合删除须先释放 delegation/attempt/control 关系，以及已发布私有排队输入对消息/Turn/Run 的引用，再删除其 Run/Conversation；旧库不存在排队表时沿原路径，仍由原外键及事务保证完整性。这里不代表真实进程/文件清理和完整启动迁移已经通过。
 
 ### User 子输入运输
 

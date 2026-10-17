@@ -78,6 +78,91 @@ pub(crate) fn cleanup_pending(connection: &Connection, id: &str) -> Result<bool>
           OR EXISTS(SELECT 1 FROM runtime_input_delivery input WHERE input.agent_run_id=run.id
             AND input.status IN ('prepared','delivery_unknown')))") ,[id],|r|r.get(0))?)
 }
+fn cancel_roots(
+    tx: &Transaction<'_>,
+    roots: Vec<String>,
+    actor: &ActorRef,
+    reason: &str,
+    at: &str,
+) -> Result<Vec<String>> {
+    let mut runs = Vec::new();
+    for root in roots {
+        runs.extend(cancel_tree(tx, &root, actor, reason, at)?);
+    }
+    runs.sort();
+    runs.dedup();
+    Ok(runs)
+}
+fn installed(connection: &Connection) -> Result<bool> {
+    Ok(connection.query_row(
+        "SELECT EXISTS(SELECT 1 FROM sqlite_schema WHERE type='table' AND name='delegation')",
+        [],
+        |r| r.get(0),
+    )?)
+}
+pub(crate) fn cancel_for_parent_run(
+    tx: &Transaction<'_>,
+    run: &str,
+    epoch: i64,
+    actor: &ActorRef,
+    reason: &str,
+    at: &str,
+) -> Result<Vec<String>> {
+    if !installed(tx)? {
+        return Ok(Vec::new());
+    }
+    let roots=tx.prepare("SELECT d.id FROM delegation d JOIN delegation_control c ON c.delegation_id=d.id
+        JOIN delegation_attempt a ON a.delegation_id=d.id AND a.attempt_no=c.current_attempt_no
+        WHERE a.trigger_parent_run_id=?1 AND a.trigger_parent_epoch=?2 AND c.takeover_at IS NULL ORDER BY d.id")?
+        .query_map(rusqlite::params![run,epoch],|r|r.get::<_,String>(0))?.collect::<rusqlite::Result<Vec<_>>>()?;
+    cancel_roots(tx, roots, actor, reason, at)
+}
+pub(crate) fn cancel_for_conversation(
+    tx: &Transaction<'_>,
+    conversation: &str,
+    actor: &ActorRef,
+    reason: &str,
+    at: &str,
+) -> Result<Vec<String>> {
+    if !installed(tx)? {
+        return Ok(Vec::new());
+    }
+    let roots = tx
+        .prepare(
+            "SELECT d.id FROM delegation d JOIN delegation_control c ON c.delegation_id=d.id
+        WHERE d.parent_conversation_id=?1 AND c.takeover_at IS NULL ORDER BY d.id",
+        )?
+        .query_map([conversation], |r| r.get::<_, String>(0))?
+        .collect::<rusqlite::Result<Vec<_>>>()?;
+    cancel_roots(tx, roots, actor, reason, at)
+}
+pub(crate) fn cancel_for_member(
+    tx: &Transaction<'_>,
+    thread: &str,
+    member: &str,
+    actor: &ActorRef,
+    at: &str,
+) -> Result<Vec<String>> {
+    if !installed(tx)? {
+        return Ok(Vec::new());
+    }
+    let conversations=tx.prepare("SELECT DISTINCT d.parent_conversation_id FROM delegation d
+        JOIN conversation c ON c.id=d.parent_conversation_id WHERE c.camp_id=?1 AND c.agent_id=?2 ORDER BY c.id")?
+        .query_map(rusqlite::params![thread,member],|r|r.get::<_,String>(0))?.collect::<rusqlite::Result<Vec<_>>>()?;
+    let mut runs = Vec::new();
+    for conversation in conversations {
+        runs.extend(cancel_for_conversation(
+            tx,
+            &conversation,
+            actor,
+            "camp_membership_ended",
+            at,
+        )?);
+    }
+    runs.sort();
+    runs.dedup();
+    Ok(runs)
+}
 fn cancel_tree(
     tx: &Transaction<'_>,
     id: &str,

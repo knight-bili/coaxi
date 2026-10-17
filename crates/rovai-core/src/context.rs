@@ -9036,6 +9036,7 @@ mod slow_tests {
     include!("context/delegation_queue_tests.rs");
     include!("context/delegation_pending_upload_tests.rs");
     include!("context/delegation_control_tests.rs");
+    include!("context/delegation_parent_lifecycle_tests.rs");
     use crate::{
         agent_profile::{
             AdapterCapabilitySnapshot, AdapterKind, AdapterPermissionConfig, AgentProfileService,
@@ -14443,6 +14444,7 @@ mod slow_tests {
             .unwrap();
         assert_eq!(memory_access_count, 0);
         assert_delegation_materialization(&mut fixture, &run_id);
+        assert_delegation_parent_cancellation(&mut fixture, &run_id);
         fixture.cleanup();
     }
 

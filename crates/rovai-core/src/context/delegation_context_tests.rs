@@ -56,6 +56,10 @@ fn context_child_of(fixture: &mut Fixture, parent: &str, parent_epoch: i64, task
         )
         .unwrap();
     tx.commit().unwrap();
+    let epoch = claim_context_child(fixture, &run);
+    (registered.identity.id, run, epoch)
+}
+fn claim_context_child(fixture: &mut Fixture, run: &str) -> i64 {
     let candidate = ExecutionRuntimeService::default()
         .list_dispatchable_agent_runs(&fixture.database, 8)
         .unwrap()
@@ -74,7 +78,7 @@ fn context_child_of(fixture: &mut Fixture, parent: &str, parent_epoch: i64, task
                 expected_versions: Vec::new(),
                 execution_epoch: None,
                 payload: ClaimAgentRunCommand {
-                    agent_run_id: run.clone(),
+                    agent_run_id: run.to_string(),
                     expected_version: candidate.version,
                     lease_owner: "context-child-fixture".into(),
                     lease_seconds: 60,
@@ -98,7 +102,7 @@ fn context_child_of(fixture: &mut Fixture, parent: &str, parent_epoch: i64, task
     TeamToolService::default()
         .prepare_binding_credential(&mut fixture.database, &run, epoch, false)
         .unwrap();
-    (registered.identity.id, run, epoch)
+    epoch
 }
 
 fn context_section(payload: &str, name: &str) -> Value {

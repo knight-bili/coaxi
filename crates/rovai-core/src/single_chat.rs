@@ -1096,6 +1096,7 @@ impl SingleChatService {
                 params![target.conversation_id, now],
             )?;
             anyhow::ensure!(updated == 1, "Single Chat end update did not match its active target");
+            crate::delegation_control::cancel_for_conversation(transaction,&target.conversation_id,&envelope.actor,"single_chat_ended",&now)?;
             let active_run = transaction
                 .query_row(
                     "SELECT id, camp_turn_id, execution_epoch FROM agent_run WHERE conversation_id = ?1 AND invocation_kind = 'single_chat' AND status IN ('queued', 'running', 'waiting') ORDER BY created_at, id LIMIT 1",

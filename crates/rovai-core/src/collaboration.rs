@@ -5433,6 +5433,14 @@ pub(crate) fn exhaust_camp_turn_execution_budget(
 
 pub(crate) fn delete_camp_aggregate(transaction: &Connection, camp_id: &str) -> Result<()> {
     crate::message_changes::record_deleted_thread(transaction, camp_id)?;
+    if transaction.query_row(
+        "SELECT EXISTS(SELECT 1 FROM sqlite_schema WHERE type='table' AND name='delegation')",
+        [],
+        |r| r.get::<_, bool>(0),
+    )? {
+        // Release the deferred identity/control cycle before deleting its Runs and Conversations.
+        transaction.execute("DELETE FROM delegation WHERE camp_id=?1", [camp_id])?;
+    }
     transaction.execute(
         r#"
         DELETE FROM legacy_import_map
@@ -5449,6 +5457,19 @@ pub(crate) fn delete_camp_aggregate(transaction: &Connection, camp_id: &str) -> 
         "DELETE FROM camp_composer_draft WHERE camp_id = ?1",
         [camp_id],
     )?;
+    // Published private inputs reference messages, Turns and Runs. Release those
+    // edges before deleting their targets; editing sessions cascade with inputs.
+    let private_queue_exists: bool = transaction.query_row(
+        "SELECT EXISTS(SELECT 1 FROM sqlite_schema WHERE type='table' AND name='single_chat_pending_input')",
+        [],
+        |row| row.get(0),
+    )?;
+    if private_queue_exists {
+        transaction.execute(
+            "DELETE FROM single_chat_pending_input WHERE conversation_id IN (SELECT id FROM conversation WHERE camp_id=?1)",
+            [camp_id],
+        )?;
+    }
     transaction.execute(
         "DELETE FROM message_attachment WHERE camp_id = ?1",
         [camp_id],
@@ -6304,6 +6325,13 @@ pub(crate) fn end_camp_membership(
             .collect::<rusqlite::Result<Vec<_>>>()?
     };
     affected_run_ids.extend(batch_run_ids);
+    affected_run_ids.extend(crate::delegation_control::cancel_for_member(
+        transaction,
+        camp_id,
+        agent_id,
+        actor,
+        now,
+    )?);
     affected_run_ids.sort();
     affected_run_ids.dedup();
 

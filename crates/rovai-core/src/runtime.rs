@@ -2650,6 +2650,14 @@ impl ExecutionRuntimeService {
                     "AgentRun changed before the recovery blocker was closed",
                 ));
             }
+            crate::delegation_control::cancel_for_parent_run(
+                transaction,
+                &envelope.payload.agent_run_id,
+                execution_epoch,
+                &envelope.actor,
+                "parent_input_outcome_unknown",
+                &now,
+            )?;
             append_domain_event(
                 transaction,
                 "agent_run.accepted_input_outcome_unknown",
@@ -3714,8 +3722,8 @@ impl ExecutionRuntimeService {
             )? {
                 return Ok(rejection);
             }
-            if target.invocation_kind == "single_chat" {
-                return persist_single_chat_success(
+            if matches!(target.invocation_kind.as_str(),"single_chat"|"delegation"|"delegation_user") {
+                return persist_private_conversation_success(
                     transaction,
                     &target,
                     envelope,
@@ -4220,6 +4228,14 @@ impl ExecutionRuntimeService {
                     "AgentRun changed before dispatch rejection was persisted",
                 ));
             }
+            crate::delegation_control::cancel_for_parent_run(
+                transaction,
+                &target.agent_run_id,
+                target.execution_epoch,
+                &envelope.actor,
+                "parent_dispatch_failed",
+                &target.now,
+            )?;
             append_domain_event(
                 transaction,
                 "agent_run.failed",
@@ -4922,6 +4938,14 @@ fn settle_failed_agent_run_in_tx(
     if updated != 1 {
         anyhow::bail!("AgentRun changed inside its failure transaction");
     }
+    crate::delegation_control::cancel_for_parent_run(
+        transaction,
+        &target.agent_run_id,
+        failure.execution_epoch,
+        actor,
+        "parent_run_failed",
+        &target.now,
+    )?;
     let native_turn_id: Option<String> = if terminal_resolution_source == Some("runtime_terminal") {
         transaction.query_row(
             "SELECT native_input_id FROM runtime_input_delivery WHERE agent_run_id=?1 AND execution_epoch=?2 AND status='accepted'",
@@ -5233,13 +5257,27 @@ struct TerminalTarget {
     now: String,
 }
 
-fn persist_single_chat_success(
+fn persist_private_conversation_success(
     transaction: &Transaction<'_>,
     target: &TerminalTarget,
     envelope: &CommandEnvelope<SucceedAgentRunCommand>,
     terminal_reason_code: Option<&str>,
     cleanup_required: bool,
 ) -> Result<CommandHandlerResult> {
+    let child = matches!(
+        target.invocation_kind.as_str(),
+        "delegation" | "delegation_user"
+    );
+    let conversation_kind = if child {
+        "delegation_child"
+    } else {
+        "single_chat"
+    };
+    let policy = if child {
+        "delegation_child_v1"
+    } else {
+        "single_chat_v1"
+    };
     let final_output_digest = canonical_content_digest(&[StructuredThreadMessageSegment::Text {
         text: envelope.payload.final_output.clone(),
     }])?;
@@ -5255,9 +5293,9 @@ fn persist_single_chat_success(
         UPDATE conversation
         SET last_message_sequence = last_message_sequence + 1,
             version = version + 1, updated_at = ?2
-        WHERE id = ?1 AND kind = 'single_chat' AND ended_at IS NULL
+        WHERE id = ?1 AND kind = ?3 AND ended_at IS NULL
         "#,
-        params![target.conversation_id, target.now],
+        params![target.conversation_id, target.now, conversation_kind],
     )?;
     if conversation_updated != 1 {
         return Ok(rejected(
@@ -5306,10 +5344,9 @@ fn persist_single_chat_success(
             ended_at = ?3, version = version + 1, updated_at = ?3
         WHERE id = ?1 AND status = 'running'
           AND version = ?4 AND execution_epoch = ?5
-          AND invocation_kind = 'single_chat'
           AND response_delivery = 'conversation_message'
-          AND operation_policy = 'single_chat_v1'
-          AND operation_policy_version IN (1, 2)
+          AND ((invocation_kind='single_chat' AND operation_policy='single_chat_v1' AND operation_policy_version IN (1,2))
+            OR (invocation_kind IN ('delegation','delegation_user') AND operation_policy='delegation_child_v1' AND operation_policy_version=1))
           AND destination_conversation_id = ?8
         "#,
         params![
@@ -5341,7 +5378,7 @@ fn persist_single_chat_success(
             "finalThreadMessageId": Value::Null,
             "finalOutputDigest": final_output_digest,
             "responseDelivery": "conversation_message",
-            "operationPolicy": "single_chat_v1",
+            "operationPolicy": policy,
             "terminalResolutionSource": "runtime_terminal",
             "terminalReasonCode": terminal_reason_code,
             "endingGitObservation": envelope.payload.ending_git_observation,
@@ -6042,6 +6079,14 @@ fn settle_interrupted_run_in_tx(
             Option::<&str>::None,
             (!runtime_cleanup_required).then_some(now),
         ],
+    )?;
+    crate::delegation_control::cancel_for_parent_run(
+        transaction,
+        agent_run_id,
+        execution_epoch,
+        actor,
+        reason_code,
+        now,
     )?;
     if requested_at.is_none() {
         append_domain_event(
