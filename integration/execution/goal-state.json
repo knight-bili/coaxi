@@ -14,7 +14,7 @@
   "current_branch": "phase/i04-collaboration-runtime",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I04-T01",
-  "current_slice": "已完成Codex明确协作事件的原生接收会话Core证据投影，原17项Core检查通过；其他原生格式、精确只读读取及原版查看器继续开发，委派r1新模型语义仍待该revision确认。",
+  "current_slice": "新版Codex原生活动和Grok创建/结束Session子代理观察已接入Core，19项定向检查通过；继续精确只读读取与原版查看器、Grok进度及后台回接，独立帮手r1新模型语义仍待具体确认。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "先继续新版Codex/Grok原生事件的精确只读观察和原版子会话查看器；当前仅明确collabAgentToolCall接收引用Core证据已验。独立帮手r1仍待具体revision确认，不阻塞其余研发。",
+    "先实现Core推导精确引用的User只读子会话读取和原版查看器；Grok进度/父轮次结束后背景观察及有证据工具关联继续补齐。已验的是原生协议观察，不是完整子会话功能；独立帮手r1仍待具体revision确认，不阻塞独立研发。",
     "按I04原四工作包与84正式场景推进：协作全流程、21种Runtime并集、执行恢复、记忆和自动化；普通实现自行推进，模型输入语义变化仍遵守已确认revision。",
     "I03平台及尺寸诊断按独立编号保留，不重新打开已通过的本机清单。阶段集中push/必要Actions，等待期间继续独立编码。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
@@ -42,7 +42,7 @@
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "codex_explicit_receiver_evidence_locally_verified_other_formats_and_viewer_pending",
+  "current_slice_status": "native_protocol_observations_locally_verified_reader_progress_and_background_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -249,5 +249,6 @@
   "i03_platform_batch_result": "i03-stage-platform-followup-20261017.json",
   "i04_automation_run_stop_evidence": "i04-automation-run-stop-result.json",
   "i04_delegation_proposal_evidence": "i04-delegation-proposal-result.json",
-  "i04_native_subagent_observation_evidence": "i04-native-subagent-observation-result.json"
+  "i04_native_subagent_observation_evidence": "i04-native-subagent-observation-result.json",
+  "i04_native_subagent_protocol_evidence": "i04-native-subagent-protocol-result.json"
 }

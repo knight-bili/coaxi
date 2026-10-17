@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "stage": "I04",
+  "task": "I04-T01",
+  "checked_at": "2026-10-17T04:19:09.798304+00:00",
+  "status": "native_protocol_observations_locally_verified_reader_progress_and_background_pending",
+  "implementation_commit": "92bccfb5d4d5c02157f7352fa6b2d5692fa9cff5",
+  "previous_goal_turn": {
+    "classification": "progress",
+    "evidence": "4e13b45ae5bbe33d77a0abc0b7d3f0777583df66 + e3e8fb516"
+  },
+  "authority": "Rovai Core existing user Execution Evidence; no new business parent/child authority",
+  "codex": {
+    "source": "official local codex-cli 0.154.0 app-server generate-json-schema",
+    "schemas": {
+      "ItemStartedNotification.json": {
+        "sha256": "c4c34f47db6326cd4841bae428f23d08eb285077ffad35be9772b928c65bb912",
+        "required": [
+          "agentPath",
+          "agentThreadId",
+          "id",
+          "kind",
+          "type"
+        ],
+        "kinds": [
+          "started",
+          "interacted",
+          "interrupted",
+          "completed"
+        ]
+      },
+      "ItemCompletedNotification.json": {
+        "sha256": "69aba3fe5f72f38bf5c541e7e2c09de40778abe65ff969d9fc73372037812091",
+        "required": [
+          "agentPath",
+          "agentThreadId",
+          "id",
+          "kind",
+          "type"
+        ],
+        "kinds": [
+          "started",
+          "interacted",
+          "interrupted",
+          "completed"
+        ]
+      }
+    },
+    "item_type": "subAgentActivity",
+    "native_activity_field": "kind",
+    "outer_item_completed_means_child_completed": false,
+    "activity_id_is_tool_call_id": false,
+    "agent_path": "bounded logical display path only; never used for filesystem or session reads",
+    "classification": "explicit native step, preserving existing database constraint"
+  },
+  "grok": {
+    "methods": [
+      "_x.ai/session_notification",
+      "_x.ai/session/update"
+    ],
+    "phases": [
+      "subagent_spawned",
+      "subagent_finished"
+    ],
+    "core_event": "runtime.subagent.observed",
+    "relationship": "runtime_reported_session_child",
+    "originating_run_known": false,
+    "tool_identity_guessed": false,
+    "missing_child_session_falls_back_to_subagent_id": false,
+    "missing_terminal_status": "unknown",
+    "deduplication": "canonical digest of closed public observation, scoped by original Run/epoch evidence",
+    "active_prompt": "exact existing Session route may forward observation without treating it as input-acceptance evidence",
+    "idle_completed_and_replay_policy": "unchanged; no background or replay qualification claimed"
+  },
+  "checks": {
+    "core_lib_listed": 969,
+    "executed": 19,
+    "failed": 0,
+    "groups": {
+      "execution_evidence": 17,
+      "acp_route_policy": 1,
+      "application_normalization": 1
+    },
+    "new_rust_test_owners": 0,
+    "database_fixture": "actual isolated SQLite and Context, no real Runtime",
+    "first_attempt": {
+      "passed": 16,
+      "failed": 1,
+      "cause": "new Codex subAgentActivity fell through to runtime_activity, rejected by existing database kind constraint",
+      "repair": "map this known native activity to existing step; preserve database constraints and event names",
+      "rerun": "all 19 selected checks passed"
+    },
+    "boundaries": [
+      "native Codex kind is independent from outer Item completion",
+      "invalid/self/path-shaped identifiers and invalid display path rejected",
+      "Grok explicit child Session id and subagent id remain distinct",
+      "no implicit originating Run/tool binding or success",
+      "closed public reprojection excludes child task/report/private packet",
+      "frozen adapter, existing User Evidence content scope, replay and stale epoch/cancellation boundaries",
+      "new Codex and Grok markers excluded from actual Context materialization"
+    ],
+    "rust_format": "passed",
+    "diff_check": "passed",
+    "source_contract_and_fixture_gates": "passed_not_live_host",
+    "docs_and_decisions": "passed",
+    "codegraph_sync": "passed"
+  },
+  "unchanged": {
+    "schema": 159,
+    "migration": 209,
+    "data_contract": "v1.72",
+    "bootstrap_and_dynamic_context": true,
+    "model_tools": true,
+    "runtime_root_output_filter": true,
+    "i03_frozen_followups": true
+  },
+  "remaining": [
+    "Core-derived exact User-only native transcript lookup and actual parent/session proof, no arbitrary path or session capability",
+    "original Codeg native session drawer/card integration, live refresh and late-response fencing, actual visual comparison",
+    "Grok progress, post-parent-completion background observation and evidence-backed tool association",
+    "real Runtime, full integration and platform matrix",
+    "specific independent-helper r1 confirmation before its separate model/input/Schema implementation"
+  ],
+  "qualification": {
+    "renderer": "not_changed_or_verified_this_slice",
+    "native_transcript_reader": "not_implemented",
+    "real_runtime": "not_run",
+    "package_build": "not_run",
+    "i04_formal_cases": 84,
+    "new_formal_passes": 0
+  },
+  "scope": {
+    "source_feature_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_feature_clusters": 21,
+    "i04_work_packages": 4
+  },
+  "external_actions": {
+    "push": false,
+    "actions_triggered": false,
+    "paid_model_requests": 0,
+    "main_merge": false,
+    "release": false
+  },
+  "source_reference": {
+    "codeg_commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+    "rovai_commit": "cc465dda562536b94f23787759e3206324baa29e",
+    "map": "../inventory/delegation-source-map.md"
+  },
+  "log_sha256": {
+    "native-protocol-codex-version.log": "0de21533521a975184e7c2d8a22012236302d61186027e8618f193c2c8ec9b4c",
+    "native-protocol-core-list-fixed.log": "8a524209df412926eefd36d0f09fa92cb7c14a9b6ee56fd16edc882886a559e5",
+    "native-protocol-core-list.log": "4972977b3574c5ff537ee0c66fdcc84e688df81cc005498354d8d638079abaf1",
+    "native-protocol-core-tests-fixed.log": "79a47473cc5b4804d172ca70be2fb5ab3d102741a5e98c15f70347e157313c37",
+    "native-protocol-core-tests.log": "750e311c3030103fd119b1f78b72182c8c99af01a4973bc94d9fa48ce5120b8d",
+    "native-protocol-doc-decisions.log": "d58168f462b9dd5bd281a72af820169f9a7e92d02aa34b1c51c5aef9e29aa77e",
+    "native-protocol-doc-version.log": "01dbc9daf44dff0600954e17b82ec917ad4998a3eb5eefa32505c4ca15a8552d",
+    "native-protocol-foundation.log": "044569df112d191be31ea876439bd2bd3294beb8d9fa469452c1bcc1ea893695",
+    "native-protocol-scaffold.log": "01288a06b7440b08c394c6da77c7750da896b58e4bc599c2e110eb1820be4b08",
+    "native-protocol-sync.log": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+  },
+  "source_sha256": {
+    "execution_evidence.rs": "467a4935f96db2f0ba6f7b418be49e2299b9421037c7e88f112a63866d4e70c3",
+    "runtime_subagent_observation.rs": "f168a66bda58953a13e5ffd48c48935a6f07cfb178d2f7b3754dad293909e9e8",
+    "acp.rs": "c0e65e951eddd572f87cf714d669fd6f934534c7b412f2276eef9b7a9dc1cfb6",
+    "application.rs": "e2e0aebf3286b69d736f611e981266715682cfd3e70b8fd02c53a6cfde94a118",
+    "lib.rs": "fe1171b6a498227e57049708442f8074b607e6f1d470d8531caf0d84f5fb634f"
+  }
+}
