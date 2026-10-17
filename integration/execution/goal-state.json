@@ -115,7 +115,7 @@
     "source_progress_continued": true
   },
   "project_groups_evidence": "i03-project-groups-result.json",
-  "checked_at": "2026-10-17T06:05:10.261193+00:00",
+  "checked_at": "2026-10-17T06:10:07.331166+00:00",
   "project_layout_evidence": "i03-project-layout-result.json",
   "project_tree_evidence": "i03-project-tree-result.json",
   "navigation_activity_evidence": "i03-navigation-activity-result.json",
@@ -254,5 +254,6 @@
   "i04_delegation_foundation_source_commit": "e0b2f60905e232b9615de83ba9905d613d00deba",
   "i04_delegation_identity_evidence": "i04-delegation-identity-result.json",
   "i04_delegation_identity_source_commit": "6eb79f06932580a46d4e6aaae0a42eedf3eb5ab5",
-  "i04_delegation_policy_bootstrap_evidence": "i04-delegation-policy-bootstrap-result.json"
+  "i04_delegation_policy_bootstrap_evidence": "i04-delegation-policy-bootstrap-result.json",
+  "i04_delegation_policy_bootstrap_source_commit": "6dc17b047b4c68b1d567ab23c1b597967d5cb01d"
 }

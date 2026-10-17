@@ -5,7 +5,7 @@
   "status": "frozen_policy_and_bootstrap_components_locally_verified_complete_format35_and_migration_pending",
   "checked_at": "2026-10-17T06:08:17.460486+00:00",
   "implementation_baseline": "807da987b59364b368836d69b1f3a329962bd321",
-  "source_commit": null,
+  "source_commit": "6dc17b047b4c68b1d567ab23c1b597967d5cb01d",
   "confirmation_record": "i04-delegation-r1-confirmation.json",
   "runtime_data_contract": {
     "version": "v1.72",
@@ -317,5 +317,6 @@
       "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-slow-list.log",
       "sha256": "e56974f94332db8e44b3f29a4b7a714ba623474754fd8a4ebb59a99d848496dc"
     }
-  ]
+  ],
+  "source_hash_basis": "All14 source file SHA256 values verified against this exact committed Git blob after local tests."
 }
