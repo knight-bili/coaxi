@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import {randomUUID,createHash} from 'node:crypto'
-import {readFile,writeFile,mkdir,rename} from 'node:fs/promises'
+import {readFile,writeFile,mkdir,rename as renameFile} from 'node:fs/promises'
 import {join,dirname} from 'node:path'
 import {launchHost,within} from '../lib/host-test-client.mjs'
 import {coreDataDirectoryArguments} from '../lib/runtime-camp-files-root.mjs'
@@ -100,10 +100,10 @@ export async function qualifyCanvasFinalWeb({binary,uiDirectory,chrome,output,ch
   await record('actual_web_current_board_confirmed_delete_selects_existing_fallback_without_deleting_or_mutating_the_two_original_boards')
   // 只移动已保存完整快照的隔离测试源；失败时finally恢复原字节。
   const sourceBytes=await readFile(context.sourceFile);assert.equal(createHash('sha256').update(sourceBytes).digest('hex'),context.sourceSha256)
-  missingBackup=context.sourceFile+'.r10-'+randomUUID();await writeFile(join(output,'source-before-missing.json'),JSON.stringify({path:context.sourceFile,backup:missingBackup,sha256:context.sourceSha256,bytesBase64:sourceBytes.toString('base64')},null,2)+'\n',{flag:'wx'});await rename(context.sourceFile,missingBackup)
+  const backup=context.sourceFile+'.r10-'+randomUUID();await writeFile(join(output,'source-before-missing.json'),JSON.stringify({path:context.sourceFile,backup,sha256:context.sourceSha256,bytesBase64:sourceBytes.toString('base64')},null,2)+'\n',{flag:'wx'});await renameFile(context.sourceFile,backup);missingBackup=backup
   await browser.reload();await browser.wait('Boolean(document.querySelector("button[aria-label=无限画布]"))',30000);await open(context.boardId)
   await browser.wait('Boolean(document.querySelector(".canvas-card-file [role=alert]"))',30000);const missing=await browser.evaluate('document.querySelector(".canvas-card-file").textContent');assert.ok(!missing.includes(context.sourceText.trim()));report.missingFileMessage=missing
-  await rename(missingBackup,context.sourceFile);missingBackup=null
+  await renameFile(missingBackup,context.sourceFile);missingBackup=null
   await browser.click('Array.from(document.querySelector(".canvas-card-file").querySelectorAll("button")).find(n=>n.textContent.trim()==="重试")');await browser.wait(`document.querySelector('.canvas-card-file')?.textContent.includes(${JSON.stringify(context.sourceText.trim())})`,30000)
   await record('actual_web_reload_missing_source_shows_original_file_error_without_foreign_fallback_and_explicit_retry_recovers_restored_bytes')
   const target={boardId:context.boardId,nodeId:context.nodes.find(n=>n.data.kind==='terminal').id}
@@ -135,7 +135,7 @@ export async function qualifyCanvasFinalWeb({binary,uiDirectory,chrome,output,ch
   report.status='passed'
  }catch(error){report.status='failed';report.error=String(error.stack??error);if(browser){report.browserErrors=browser.errors;report.windowErrors=await browser.evaluate('window.r10WindowErrors').catch(()=>null);report.dom=await browser.evaluate('document.body.innerText.slice(-2200)').catch(()=>null);await browser.capture(join(output,'failure.png')).catch(()=>{})}}
  finally{
-  if(missingBackup)try{await rename(missingBackup,context.sourceFile)}catch(error){report.status='failed';report.restoreSourceError=String(error)}
+  if(missingBackup)try{await renameFile(missingBackup,context.sourceFile)}catch(error){report.status='failed';report.restoreSourceError=String(error)}
   stopEvents?.();if(browser)try{await browser.close()}catch(error){report.status='failed';report.browserCloseError=String(error)}
   if(host){try{await host.close({timeoutMs:15000})}catch(error){report.status='failed';report.hostCloseError=String(error)}report.hostExit={code:host.child.exitCode,signal:host.child.signalCode};if(host.child.exitCode!==0||host.child.signalCode!==null)report.status='failed'}
   report.finishedAt=new Date().toISOString();await writeFile(join(output,'result.json'),JSON.stringify(report,null,2)+'\n')
