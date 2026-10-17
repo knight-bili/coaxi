@@ -247,5 +247,5 @@
   },
   "latest_group_verification": "i03-r08-complete-local-verification.json",
   "latest_preparation": "i03-r01-private-workflow-preparation.json",
-  "latest_partial_verification": "i03-r08-complete-local-verification.json"
+  "latest_partial_verification": "i03-r09-source-ui-progress.json"
 }

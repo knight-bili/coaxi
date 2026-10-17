@@ -427,13 +427,13 @@
         "I03-C06"
       ],
       "done_when": "八类创建/编辑/排列/折叠/错误态、画板CRUD、原菜单键/旧Host提示、日夜小窗口和末项可达通过；源码参考中已登记的模型/分支/子会话/运行状态有真实Core投影或逐项有依据的适用性结论；尺寸告警形成定位及影响记录。",
-      "next_action": "当前Core/Renderer已构建，复用rc22继续实际动态摘要、八类UI、主题/尺寸及告警定位，不重复全量构建。",
+      "next_action": "复用rc24补真实交错活动/最近模型/分支、旧Host、剩余主题/缩放/长标题与尺寸告警影响；既过八类CRUD/画板/菜单键不重跑，随后R10。",
       "owner": "Codex",
       "external_condition": "none_confirmed_blocking_current_independent_work",
       "known_ui_followups": [
         "attachment_missing目前显示保留输入的通用错误指引；R09既定错误态应具体提示文件缺失与重新选择，不把本次通过写成全部文案/UI通过。"
       ],
-      "latest_partial_verification": "i03-r09-model-build-verification.json",
+      "latest_partial_verification": "i03-r09-source-ui-progress.json",
       "implemented_source": [
         "Codeg14px元信息/6px活动点/左右紧凑页脚；四行标题不变",
         "精确active成员的明确模型配置；默认模型与缺失观测不生成名称",
@@ -442,16 +442,18 @@
         "Native桥接错误对象保留具体附件缺失/源变化指引；输入和恢复语义不变"
       ],
       "pending_candidate_verification": [
-        "真实Host多Thread/公开和精确私聊交错活动、模型最近运行/配置差异的界面验证",
-        "八类创建/编辑/排列/折叠/错误态、画板CRUD、菜单键/旧Host提示的完整当前候选运行",
-        "日夜主题、小窗口/缩放/末项可达和四行长标题的实际同场景对照",
-        "已收集ResizeObserver只读调用栈、目标及错误；继续定位和影响评估，不能以通过的功能测试宣告告警无影响"
+        "真实Core多Thread公开/精确私聊交错活动、最近实际运行模型与当前配置差异、真实分支摘要；不调用付费模型。",
+        "原八类在日间/小窗口/缩放和四行长标题的剩余同场景对照；已过夜间100%与画板列表日夜小窗口不重复。",
+        "旧Host能力缺失的原界面指引；错误态逐项按现有能力保留，不能绕过准入。",
+        "卡片运行的6条ResizeObserver告警继续定位和实际帧/输入/命中影响记录；列表整批无告警不覆盖卡片。"
       ],
       "source_dependency": {
         "source_feature": "C08",
         "planned_stage": "I04",
         "work": "Codeg真实父子会话/异步委派完成后补child_count画布投影和回归，不能拿私聊数量替代；功能仍在完整一期"
-      }
+      },
+      "verified_native_card_checks": 25,
+      "verified_native_board_checks": 6
     },
     {
       "id": "I03-R10",
@@ -674,5 +676,5 @@
   ],
   "change_control": "剩余编号固定；发现缺陷归入已有组并说明影响。新增必需范围须有来源和编号变更记录；不能为减少数量合并隐藏未完成条件。",
   "latest_verification": "i03-r08-complete-local-verification.json",
-  "latest_partial_verification": "i03-r08-complete-local-verification.json"
+  "latest_partial_verification": "i03-r09-source-ui-progress.json"
 }

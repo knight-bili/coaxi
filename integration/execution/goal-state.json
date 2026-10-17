@@ -14,7 +14,7 @@
   "current_branch": "phase/i03-canvas-nodes",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I03-T01/I03-T02/I03-T03",
-  "current_slice": "R08本机工程边界已核定：真实通知八场景、全部监听释放、真实文件IO等待取消/超时及名额释放完成。剩余R09、R10两组；不等于I03整阶段完成。",
+  "current_slice": "R01–R08本机工程边界完成；R09八类实际操作25项及画板/日夜小窗口/Windows菜单键6项通过，两个真实产品缺陷修复。R09剩动态摘要/兼容/部分视觉/告警影响，R10随后。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "复用rc23推进R09八类CRUD/原菜单键/旧Host、日夜小窗口/缩放/末项可达、实际活动和最近模型摘要及尺寸告警定位影响；随后R10正式12场景与开发预览。已核定R08不重复，不逐切片push/Actions。",
+    "复用rc24补真实交错活动/最近模型/分支、旧Host、剩余主题/缩放/长标题与尺寸告警影响；既过八类CRUD/画板/菜单键不重跑，随后R10。 不逐切片push/Actions；除新增真实产品缺陷外不增加构建。",
     "阶段剩余清单固定为i03-closeout-ledger.json的I03-R01–R10，原C01–C06均有映射；暂缺环境只单列待办，继续可独立的I02余项和I04-I12/BUF，不把后续功能提前塞入I03。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
     "专用测试身份与硬预算到位后执行SP12真实指南/工具Gate及完整Runtime/平台矩阵；不自动付费。",
@@ -41,7 +41,7 @@
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "r08_local_engineering_verified_r09_r10_open",
+  "current_slice_status": "r09_actual_card_board_ui_partially_verified_rc24",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -240,5 +240,6 @@
   "latest_r07_native_input_verification": "i03-r07-native-input-verification.json",
   "latest_r08_native_large_input_verification": "i03-r08-native-large-input-verification.json",
   "latest_r08_notification_progress": "i03-r08-notification-progress.json",
-  "latest_r08_complete_local_verification": "i03-r08-complete-local-verification.json"
+  "latest_r08_complete_local_verification": "i03-r08-complete-local-verification.json",
+  "latest_r09_source_ui_progress": "i03-r09-source-ui-progress.json"
 }
