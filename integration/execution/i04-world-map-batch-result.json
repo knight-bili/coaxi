@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "stage": "I04",
+  "task": "I04-T01",
+  "checked_at": "2026-10-17T02:04:45.512538+00:00",
+  "status": "partial_implementation_verified_full_stage_pending",
+  "commit": "a1fe686dd070b06aae5b85175404cdba884a8e8a",
+  "problem": "world map only projected historical a2a parent runs, hiding current multi-input batch handoffs",
+  "change": "readonly pairing from exact accepted public input IDs, source run/author and addressed recipient; preserve old UI and legacy a2a compatibility",
+  "negative_boundaries": [
+    "missing or withdrawn input",
+    "user or mismatched author",
+    "not addressed to recipient",
+    "private or terminal source",
+    "stale active run",
+    "recovery blocked",
+    "do not infer a batch parent from legacy fields"
+  ],
+  "evidence": {
+    "red_before_fix": {
+      "failed": 2,
+      "passed": 10
+    },
+    "map_after_fix": {
+      "passed": 12
+    },
+    "related_after_fix": {
+      "passed": 220
+    },
+    "app_baseline_before_change": {
+      "failed": 7,
+      "passed": 184,
+      "reason": "SSR recovery storage used default native client without window; same preexisting failure reproduced by loading the previous two production modules through a test-only transform"
+    },
+    "test_fixture_repair": "provide the existing ThreadClientProvider recovery-store seam in App static tests; production storage unchanged",
+    "typescript_no_emit": "passed",
+    "codegraph_sync": "passed"
+  },
+  "scope": {
+    "source_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_formal_cases": 84,
+    "new_formal_cases_passed": 0
+  },
+  "not_proven": [
+    "no current built Desktop/Web visual qualification for map repair",
+    "no real Core/Runtime handoff qualification in this slice",
+    "no independent native child implementation",
+    "unit count is not formal scenario completion"
+  ],
+  "external_models_used": false,
+  "new_push": false,
+  "new_actions": false,
+  "files": [
+    {
+      "path": "integration/apps/desktop/src/renderer/src/camp-world-map-model.ts",
+      "sha256": "fa2cfbdb00d896e92936a123b3db6cd40a6488520c6ffe935da5111d1c46c9dd"
+    },
+    {
+      "path": "integration/apps/desktop/src/renderer/src/camp-world-map-model.test.ts",
+      "sha256": "0e18df6d16dd32281d2eb8bf6db2447b25b86672307f934535d4e861ad866b91"
+    },
+    {
+      "path": "integration/apps/desktop/src/renderer/src/ThreadWorkspace.tsx",
+      "sha256": "40c874d1b7123b61ee524da40e2d605fd0ba15ac4eb10b7a59b2764118ffd7d1"
+    },
+    {
+      "path": "integration/apps/desktop/src/renderer/src/App.test.ts",
+      "sha256": "9390501a77a36fa01a7a90a96c74fa4c8bc50fee834cb154b4c0286ee9ae429c"
+    }
+  ],
+  "logs": [
+    {
+      "path": "i04/world-map-batch-red.log",
+      "sha256": "15a9001099007a2ff882be5b5d71956f0018a27e9212f0898432721473bff75d"
+    },
+    {
+      "path": "i04/world-map-batch-green.log",
+      "sha256": "e2f08111a64ee7151da0584aaec95573f0198e0878e37b3b7d9bcf81ee4eb713"
+    },
+    {
+      "path": "i04/world-map-before-change-app-baseline.log",
+      "sha256": "d36d6cf0cd0a6fc6a2820d741dfdbe41b532287faa61c3ed520548bcc273a1d1"
+    },
+    {
+      "path": "i04/world-map-batch-related-fixed.log",
+      "sha256": "7f0c17882d11820e56a0b0c19fb9c88afa1be35d631a618f8d7cf766343a589f"
+    },
+    {
+      "path": "i04/world-map-batch-final-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "i04/world-map-batch-final-sync.log",
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "i04/mac-project-registration-related.log",
+      "sha256": "1e5d40e6ada7475e73d353ae4346f1f8c108a8ffcdd80aabea7425ea5eb17f1e"
+    },
+    {
+      "path": "i04/mac-project-registration-sync-final.log",
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    }
+  ],
+  "repository_gates": {
+    "verify-scaffold.log": {
+      "status": "passed",
+      "path": "i04/verify-scaffold.log",
+      "sha256": "01288a06b7440b08c394c6da77c7750da896b58e4bc599c2e110eb1820be4b08"
+    },
+    "verify-foundation.log": {
+      "status": "passed",
+      "path": "i04/verify-foundation.log",
+      "sha256": "044569df112d191be31ea876439bd2bd3294beb8d9fa469452c1bcc1ea893695"
+    },
+    "docs-version.log": {
+      "status": "passed",
+      "path": "i04/docs-version.log",
+      "sha256": "01dbc9daf44dff0600954e17b82ec917ad4998a3eb5eefa32505c4ca15a8552d"
+    },
+    "docs-decisions.log": {
+      "status": "passed",
+      "path": "i04/docs-decisions.log",
+      "sha256": "d58168f462b9dd5bd281a72af820169f9a7e92d02aa34b1c51c5aef9e29aa77e"
+    }
+  }
+}

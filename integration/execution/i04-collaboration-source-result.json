@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "stage": "I04",
+  "task": "I04-T01",
+  "checked_at": "2026-10-17T02:04:45.512538+00:00",
+  "status": "source_boundaries_mapped_independent_delegation_design_pending",
+  "donor_codeg_commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+  "implementation_commit": "a1fe686dd070b06aae5b85175404cdba884a8e8a",
+  "source_map": "integration/inventory/delegation-source-map.md",
+  "current_public_execution": "Delivery-first: public message, per-target waiting Delivery, immutable multi-input batch AgentRun with ordered AgentRunInput",
+  "identity_boundaries": [
+    "public handoff is not native child session",
+    "broker task is not business Task",
+    "private session count is not child count",
+    "message anchor is not authorization or success"
+  ],
+  "mapped_owners": [
+    "frontend binding and child permission identity",
+    "launch-scoped caller authentication",
+    "setup and first-terminal races",
+    "turn vs connection cancellation",
+    "status wait and blocking request identity",
+    "durable parent ownership and native-session resume",
+    "source persistence and original canvas child entry"
+  ],
+  "not_implemented": [
+    "independent native child schema and execution service",
+    "delegation model tools and input contracts",
+    "native child canvas integration",
+    "real two-Runtime child execution and full I04 84 formal cases"
+  ],
+  "governance": "new model semantics require a specific revision before implementation or Schema change; no new approval requested for readonly map repair",
+  "source_files": [
+    {
+      "path": "source-reference/codeg/src/contexts/delegation-context.tsx",
+      "sha256": "3d7a8d2655a0d5dc40876692877e5cc0c9f439c9800e5e31fd48ee791112051e"
+    },
+    {
+      "path": "source-reference/codeg/src-tauri/src/commands/delegation.rs",
+      "sha256": "ff1d3f4cb9201c8fcce7b1414a09fefba6df856503d1c1333bcc8e2f1958397a"
+    },
+    {
+      "path": "source-reference/codeg/src-tauri/src/acp/delegation/types.rs",
+      "sha256": "9f5082b36e7af588c9a72106628ef08f9cae526023c529471e235d6909b0803c"
+    },
+    {
+      "path": "source-reference/codeg/src-tauri/src/acp/delegation/broker.rs",
+      "sha256": "9c0fd5addd0a6fa007ea3a27918ce340145fd90d0a45e919556fd7ac40ba47b4"
+    },
+    {
+      "path": "source-reference/codeg/src-tauri/src/acp/delegation/listener.rs",
+      "sha256": "572bb464e527947a648aafc1360fefe7003bbac4386b523ff4d9bedeeec24414"
+    },
+    {
+      "path": "source-reference/codeg/src-tauri/src/acp/delegation/spawner.rs",
+      "sha256": "63a0594ebfc877ad8b5bcee5fd60fec6b6fc303c7f09be3c94744cfb678c66c4"
+    },
+    {
+      "path": "source-reference/codeg/src-tauri/src/db/migration/m20260522_000001_delegation_columns.rs",
+      "sha256": "de317c13c4fa97131631520b3c8f2e97fca242136e5e510c71d59d66e55bb7db"
+    },
+    {
+      "path": "source-reference/codeg/src/components/canvas/nodes/conversation-card-node.tsx",
+      "sha256": "0fe35566a55757a6475cc7436f99a844237df8968aec734c4364204289b98b31"
+    },
+    {
+      "path": "integration/crates/rovai-core/src/runtime.rs",
+      "sha256": "0ec79e72db375ce0c9a0cd772476263ed479e0bf449e6b1ca983ba7b076579de"
+    },
+    {
+      "path": "integration/crates/rovai-core/src/claude.rs",
+      "sha256": "1060e586d8db3015c512ab285c18c749a079ec22d24a35cecf05ed72e18bd0f9"
+    },
+    {
+      "path": "integration/crates/rovai-core/src/collaboration.rs",
+      "sha256": "3db4059270473baffe0a1001d4c262c60dc7622b17ae9fb07ad3463b25642f48"
+    },
+    {
+      "path": "integration/crates/rovai-core/src/db.rs",
+      "sha256": "4514402dec91c8c37e5b6cf7046913242df2e0fc08a9915b303fe6b1621a7f49"
+    },
+    {
+      "path": "integration/docs/architecture/public-a2a-message-delivery.md",
+      "sha256": "d3e173b8083f2476afcb51e62ec39af111e406774edef41d79072e292f20a4d9"
+    },
+    {
+      "path": "integration/integration/inventory/delegation-source-map.md",
+      "sha256": "5e950fac3985f7b827d448d4ce902a50633de85329e15f7da32f66e2bac67a71"
+    }
+  ],
+  "next": "design Core durable child ownership/API/constraint/recovery against current schema; prepare concrete model-input revision while continuing independent I04 work"
+}

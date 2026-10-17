@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "stage": "I03",
+  "checked_at": "2026-10-17T02:04:45.512538+00:00",
+  "batch": "I03-stage-platform-batch-20261017",
+  "original_dispatch": "i03-stage-platform-batch.json",
+  "source_commit": "a672ad1bf1cfff78d68b4eecf6436af3e5032a29",
+  "macos": {
+    "run_id": 38991420493,
+    "status": "completed",
+    "conclusion": "failure",
+    "architectures": [
+      "arm64",
+      "x64"
+    ],
+    "core_desktop_web_compilation": "passed_both_architectures",
+    "native_and_web_live": "failed_at_fixture_seeded_project_sidebar_visibility_before_real_shared_editor_checks",
+    "failure": "fixture creates a directory-bound Camp through Core after initial legacy import, but never registers the directory with Desktop Main navigation preferences; the saved directory projection correctly omits it",
+    "source_proof": [
+      "scripts/lib/host-web-live.test.mjs:58 before repair",
+      "apps/desktop/src/renderer/src/new-conversation-preferences.ts:255",
+      "apps/desktop/src/renderer/src/BusinessApp.tsx:1426",
+      "apps/desktop/src/preload/index.ts:362"
+    ],
+    "local_fix_commit": "c86110fece68ee6b9bac5b408644017d2b981c26",
+    "fix": "register the seeded project through original Main API and assert saved membership; retain actual click/reauth/editor assertions; capture general Desktop failure state and screenshots in artifacts",
+    "local_checks": {
+      "navigation_related_tests": 29,
+      "node_syntax": "passed",
+      "diff_check": "passed",
+      "codegraph_sync": "passed"
+    },
+    "fixed_macos_rerun": "not_run_accumulate_for_next_stage_repair_batch",
+    "qualification": "compile success only; do not mark real Mac editor checks or all I03 platform cases passed",
+    "failure_evidence_privacy_commit": "a5fb8e13f01e0db454caa4dbeeb188e98d891725",
+    "failure_evidence_privacy": "hide temporary remote/login credential inputs before exporting a failure screenshot; skip screenshot when hiding fails",
+    "repaired_source_files": [
+      {
+        "path": "integration/scripts/lib/host-web-live.test.mjs",
+        "sha256": "20eae741b13ff676a445982be77a29c01903707ed01e91a72dc7f845cf1925ad"
+      },
+      {
+        "path": "integration/.github/workflows/workbench-native-web.yml",
+        "sha256": "ff7b6cffcc84e710051978edc01175684b5d4fc0c1f894fb63c1fa7b06ae8677"
+      }
+    ]
+  },
+  "linux": {
+    "run_id": 38991417893,
+    "status": "in_progress",
+    "conclusion": null,
+    "snapshot": {
+      "path": "i04/i03-linux-checkpoint4.json",
+      "sha256": "5049c049890db389414135073f9d7999d51bae074242de8a7403c903131b5957"
+    },
+    "qualification": "last observed state, not a completion claim"
+  },
+  "evidence": [
+    {
+      "path": "i04/i03-macos-checkpoint3.json",
+      "sha256": "a230e8ffde0ad059f8ba43caa36f43a8115750b6c5a4dd23f6b05a98e7242793"
+    },
+    {
+      "path": "i04/i03-macos-batch1/arm64/native-test.log",
+      "sha256": "7c1477c86039362891273887ae6a8112ccba2c6a0dfccd8129538483a21299e6"
+    },
+    {
+      "path": "i04/i03-macos-batch1/x64/native-test.log",
+      "sha256": "b2097a2f584cbf0177b803177790de409fbf0195c65648566b8c773a5388a5cd"
+    }
+  ],
+  "new_runs_or_reruns": 0,
+  "next": "keep I03 local R01-R10 closed; accumulate Mac fixture fix and further defects for necessary stage repair batch, continue I04 independently"
+}

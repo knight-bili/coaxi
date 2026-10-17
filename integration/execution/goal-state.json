@@ -11,10 +11,10 @@
     "phase_two": "一期完整融合交付后才开始自主新增"
   },
   "authorization": "客户授权完整一期持续开发；2026-10-14更新为多次本地commit、阶段编码/review集齐后冻结候选版本、集中验证和少量push/Actions；main合入及发布仍由客户控制；2026-10-16用户明确研发阶段由Codex自行工程验证，I12后才由用户使用软件验收",
-  "current_branch": "phase/i03-canvas-nodes",
+  "current_branch": "phase/i04-collaboration-runtime",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I04-T01",
-  "current_slice": "I03固定10组本机研发及工程验证收口；正式12条Windows/本机Host+Chrome适用面登记完毕，其他平台和尺寸诊断保留。开始I04原生父子/委派来源与Core映射。",
+  "current_slice": "完成父子委派主干身份/取消/恢复来源映射；修复公开batch交接地图漏显并通过220相关检查。Mac双架构编译通过、联调fixture工程注册缺失已本地修复待集中复测；继续独立子会话Core合同与I04独立功能。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "I04先核查Codeg原生父子会话/委派与Rovai Task/Thread/Run映射，再补实现并回接画布；不把私聊数量冒充子会话。",
+    "I04父子/委派来源主干已映射，继续Core持久身份、约束、API与恢复具体设计；新模型输入需具体revision确认，独立开发并行推进。",
     "按I04原四工作包与84正式场景推进：协作全流程、21种Runtime并集、执行恢复、记忆和自动化；普通实现自行推进，模型输入语义变化仍遵守已确认revision。",
     "I03平台及尺寸诊断按独立编号保留，不重新打开已通过的本机清单。阶段集中push/必要Actions，等待期间继续独立编码。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
@@ -42,7 +42,7 @@
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "r09_local_engineering_verified_r10_open",
+  "current_slice_status": "i04_partial_implementation_verified_delegation_design_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -58,7 +58,7 @@
   "skill_catalog_evidence": "i02-skill-catalog-result.json",
   "skill_install_evidence": "i02-skill-install-result.json",
   "system_goal_status": "active",
-  "system_goal_verified_at": "2026-10-16T11:54:50.025Z",
+  "system_goal_verified_at": "2026-10-17T02:04:45.512538+00:00",
   "skill_members_evidence": "i02-skill-members-result.json",
   "canvas_boards_evidence": "i03-canvas-boards-result.json",
   "skill_delivery_preparation_evidence": "i02-skill-delivery-preparation-result.json",
@@ -66,7 +66,7 @@
   "ci_cost_policy": "integration/ci-cost-policy.md",
   "ci_access_evidence": "ci-free-result.json",
   "ci_access_status": "public_runner_verified_windows_and_linux_database_regression_passed",
-  "ci_next_action": "run38589903091已因客户调整验证频率取消；不重启或补调同一切片。当前I03最新完整Linux回归延期至阶段候选，先继续独立编码。",
+  "ci_next_action": "I03本阶段批次已执行：Mac两架构编译通过、实际联调fixture失败已修复待后续集中复测；Linux最近状态见i03-stage-platform-result.json。当前不为小修另触发Actions，继续I04。",
   "skill_delivery_matrix_evidence": "i02-skill-delivery-matrix-result.json",
   "database_regression_repair_evidence": "i02-db153-regression-repair-result.json",
   "skill_process_recovery_evidence": "i02-skill-process-recovery-result.json",
@@ -117,7 +117,7 @@
     "source_progress_continued": true
   },
   "project_groups_evidence": "i03-project-groups-result.json",
-  "checked_at": "2026-10-16T23:03:38.119701+00:00",
+  "checked_at": "2026-10-17T02:04:45.512538+00:00",
   "project_layout_evidence": "i03-project-layout-result.json",
   "project_tree_evidence": "i03-project-tree-result.json",
   "navigation_activity_evidence": "i03-navigation-activity-result.json",
@@ -225,7 +225,7 @@
   "canvas_loading_transition_observation": "i03-c06-loading-transition-observation.json",
   "i03_remaining_ledger": "i03-closeout-ledger.json",
   "i03_evidence_settlement": "i03-closeout-settlement.json",
-  "i03_latest_group_verification": "i03-r09-complete-local-verification.json",
+  "i03_latest_group_verification": "i03-r10-local-closeout-verification.json",
   "i03_latest_preparation": "i03-r01-private-workflow-preparation.json",
   "latest_r01_cross_core_verification": "i03-r01-cross-core-upload-verification.json",
   "latest_r02_native_send_verification": "i03-r02-native-send-verification.json",
@@ -243,5 +243,8 @@
   "latest_r08_notification_progress": "i03-r08-notification-progress.json",
   "latest_r08_complete_local_verification": "i03-r08-complete-local-verification.json",
   "latest_r09_source_ui_progress": "i03-r09-source-ui-progress.json",
-  "latest_r09_complete_local_verification": "i03-r09-complete-local-verification.json"
+  "latest_r09_complete_local_verification": "i03-r09-complete-local-verification.json",
+  "i04_source_evidence": "i04-collaboration-source-result.json",
+  "i04_world_map_evidence": "i04-world-map-batch-result.json",
+  "i03_platform_batch_result": "i03-stage-platform-result.json"
 }
