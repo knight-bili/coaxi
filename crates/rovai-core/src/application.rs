@@ -17771,6 +17771,19 @@ impl Core {
         execution: &AgentRunExecution,
         digest: String,
     ) -> Result<String> {
+        let defaults = {
+            let database = self.database.lock().await;
+            crate::delegation_runtime_defaults::for_run(
+                database.connection(),
+                &execution.agent_run_id,
+            )?
+        };
+        let digest = match defaults {
+            Some(defaults) => canonical_json_digest(
+                &json!({"runtime":digest,"delegationRuntimeDefaults":defaults}),
+            )?,
+            None => digest,
+        };
         if execution.runtime.adapter_kind != AdapterKind::ClineCli {
             return Ok(digest);
         }
@@ -17934,9 +17947,20 @@ impl Core {
             .await?;
         let resumable_session_id = binding_credential.native_session_id.clone();
         let model = execution.runtime.model.model_id.as_str();
+        let delegation_defaults = {
+            let database = self.database.lock().await;
+            crate::delegation_runtime_defaults::for_run(
+                database.connection(),
+                &execution.agent_run_id,
+            )?
+            .map(|defaults| {
+                crate::delegation_runtime_defaults::pending_acp(&defaults, &execution.runtime)
+            })
+            .transpose()?
+        };
         launch_permit.check_cancelled()?;
         let session = runtime
-            .start_or_resume_session_with_native_rules(
+            .start_or_resume_session_with_delegation_defaults(
                 resumable_session_id.as_deref(),
                 session_capabilities,
                 &execution.runtime.model.source,
@@ -17944,6 +17968,7 @@ impl Core {
                 &execution.runtime.model.options,
                 &mcp_projection.servers,
                 new_session_native_rules.as_deref(),
+                delegation_defaults.as_ref(),
             )
             .await;
         let session_id = match session {
@@ -18041,7 +18066,7 @@ impl Core {
                 .await?;
                 launch_permit.check_cancelled()?;
                 let session_id = runtime
-                    .start_or_resume_session_with_native_rules(
+                    .start_or_resume_session_with_delegation_defaults(
                         None,
                         session_capabilities,
                         &execution.runtime.model.source,
@@ -18049,6 +18074,7 @@ impl Core {
                         &execution.runtime.model.options,
                         &mcp_projection.servers,
                         replacement_native_rules.as_deref(),
+                        delegation_defaults.as_ref(),
                     )
                     .await
                     .with_context(|| {

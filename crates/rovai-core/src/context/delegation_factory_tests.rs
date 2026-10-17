@@ -169,7 +169,7 @@ fn assert_initial_child_factory(f: &mut Fixture) {
     assert_eq!(factory_counts(f), count);
     let tx = f.database.connection_mut().transaction().unwrap();
     assert!(
-        factory::create_child(&tx, &created.identity, &plan, "2026-10-17T00:00:00Z")
+        factory::create_child(&tx, &created.identity, &plan, &json!({}), "2026-10-17T00:00:00Z")
             .unwrap_err()
             .to_string()
             .contains("adapter_installation_disabled")
@@ -233,6 +233,7 @@ fn assert_initial_child_factory(f: &mut Fixture) {
             &tx,
             &custom_child.identity,
             &wrong_plan,
+            &json!({}),
             "2026-10-17T00:00:00Z"
         )
         .unwrap_err()

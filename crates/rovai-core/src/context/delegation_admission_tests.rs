@@ -409,6 +409,7 @@ fn assert_parent_start_admission(f: &mut Fixture, legacy_private_run: &str) {
     );
     let child_epoch = claim_context_child(f, &child_run);
     assert_delegation_workspace_permission(f, &binding, &source, &external_request, &external_plan);
+    assert_delegation_runtime_defaults(f, &binding, &source, &request, &plan);
     // Actual takeover fences the old source; the new User Run has its own authenticated authority.
     crate::application::delegation_control::handle(
         &mut f.database,

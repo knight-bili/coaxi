@@ -76,6 +76,17 @@ User 沿用 `action.approval.resolve` 回答，核对本地身份、Thread、审
 
 ### 初始子运行工厂
 
+目标 Runtime 的默认设置来自已认证父请求所观察的 User 设置，登记时核对精确 `runtime_preset_json`，不接受另填一份参数。
+工厂在原 Registry 解析前选择模型和原生权限；原 Registry 继续核对安装、模型、权限 schema 与支持值，未知值不会改用默认值。
+新模型选择不沿用另一个模型的选项或 DSH 来源；同一明确模型保留原来源。原生模式只按目标已登记的权限选项值匹配，歧义或无法映射时明确拒绝。
+非 ACP 的其他模型选项要求明确模型，并沿原模型校验与执行路径；ACP 其他选项保留给真实 Session catalog 核对，不静默丢弃。
+
+执行、User 后续 Run 与恢复只读此委派固定的 preset，不重读当前全局设置；ACP Host 兼容摘要同时冻结这份设置。
+原 ACP Session 建立/恢复后先应用尚需原生协议设置的 mode，再沿原模型/权限准备流程选择模型，最后按稳定键序设置其余 config，均在会话就绪和首条 prompt 前完成。不能在明确模型已选好后再用新增 mode 设置改变它；无法映射的 mode 类型 config 也不能在末尾悄悄改模式。
+Host 只更新自己已知 Session 的模式/参数目录缓存，其他 Session 或请求帧不能写入；模式切换后必要时有界等待目录更新，不把目录通知当作任务已接受。
+核对实际模式、select 选项、合法值与配置回执；设置失败、返回值不符或只读目录下试图改变权限相关选项时停止准备，不发送任务。
+没有设置时沿用原调用和字节；原生 Runtime 与供体模式 ID 的完整别名兼容、各目标真实执行及完整恢复资格仍需补齐，不能以明确拒绝代替已支持。
+
 `delegation_factory::create_child` 在原关系登记事务中按显式列创建独立 Conversation、完整任务消息、私有 Turn 与 queued Run。它从 Core 选择的安装和目标配置调用原 Adapter Registry 重新冻结目标，只应用一次 child 角色摘要；不复制父 Run 的 Session、Lease、接收证据、终态、恢复或未知未来列。21个内置 wire 名称映射到原 closed Adapter；custom 稳定编号必须精确对应已登记的 custom 安装，并保留其真实 Adapter，不能猜另一个产品作为运行载体。平台未准入、安装缺失/禁用、Adapter/权限配置错配、非法 workspace/policy 拒绝，不回退目标。
 
 该工厂不是模型鉴权或目录授权入口；父 Run/epoch/Binding、当前与冻结深度、工作范围审批、User 默认模式及 config 的实际投递仍由完整 start/Host 链路拥有。现有 typed custom 安装映射也不等于已接入任意 generic ACP 程序。外层命令必须传播错误并回滚全部关系/子行，或者在保存拒绝回执前先回滚其 savepoint；工厂和原 `register` 都不启动进程。原请求回放先返回固定身份，不重新选择或再创建目标。

@@ -273,6 +273,16 @@ impl ParentStartAdmission {
         observation: &WorkspaceObservation,
     ) -> Result<()> {
         self.revalidate(tx)?;
+        let defaults = self
+            .settings
+            .per_runtime_defaults
+            .get(request.runtime)
+            .cloned()
+            .unwrap_or_default();
+        ensure!(
+            *request.runtime_preset == serde_json::to_value(defaults)?,
+            "delegation.runtime_defaults_plan_changed"
+        );
         ensure!(
             observation.parent_fingerprint == self.fingerprint,
             "delegation.workspace_owner_mismatch"

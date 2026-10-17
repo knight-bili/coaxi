@@ -68,6 +68,7 @@ pub mod delegation_contract;
 pub mod delegation_control;
 pub mod delegation_factory;
 pub mod delegation_policy;
+pub(crate) mod delegation_runtime_defaults;
 pub mod delegation_settings;
 pub mod delegation_user;
 pub(crate) mod delegation_workspace_permission;

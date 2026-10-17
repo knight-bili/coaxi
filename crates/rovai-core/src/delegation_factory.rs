@@ -71,7 +71,7 @@ pub fn register_initial(
         "Initial delegation workspace plan mismatch"
     );
     crate::delegation::register(tx, parent, request, at, |tx, identity| {
-        create_child(tx, identity, plan, at)
+        create_child(tx, identity, plan, request.runtime_preset, at)
     })
 }
 
@@ -81,6 +81,7 @@ pub(crate) fn create_child(
     tx: &Transaction<'_>,
     identity: &Identity,
     plan: &ChildRunPlan<'_>,
+    preset: &serde_json::Value,
     at: &str,
 ) -> Result<String> {
     ensure!(!plan.task.is_empty(), "Missing complete delegation task");
@@ -124,13 +125,17 @@ pub(crate) fn create_child(
         admission.allows_runtime_use(),
         "Delegation Runtime is not admitted on this platform"
     );
+    let defaults =
+        serde_json::from_value(preset.clone()).context("Invalid delegation Runtime defaults")?;
+    let selected =
+        crate::delegation_runtime_defaults::configuration(plan.configuration, &defaults)?;
     let base = crate::agent_profile::resolve_frozen_runtime_binding(
         tx,
         &ResolvedRuntimeBinding {
             adapter_kind: plan.configuration.adapter_kind,
             installation_id: plan.installation_id.into(),
-            model: plan.configuration.model.clone(),
-            permissions: plan.configuration.permissions.clone(),
+            model: selected.model,
+            permissions: selected.permissions,
         },
     )?
     .map_err(|blocker| anyhow::anyhow!("{}", blocker.code))?;

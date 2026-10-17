@@ -1416,6 +1416,7 @@ pub(crate) struct AcpHost {
     zcode_detached_prompts: RwLock<HashMap<String, AcpSessionRoute>>,
     zcode_cleanup_confirmed: AtomicBool,
     session_results: RwLock<HashMap<String, Value>>,
+    session_catalog_changed: tokio::sync::watch::Sender<u64>,
     incoming: mpsc::UnboundedSender<AcpIncoming>,
     alive: AtomicBool,
     exit_handled: AtomicBool,
@@ -1813,6 +1814,7 @@ impl AcpHost {
             zcode_detached_prompts: RwLock::new(HashMap::new()),
             zcode_cleanup_confirmed: AtomicBool::new(false),
             session_results: RwLock::new(HashMap::new()),
+            session_catalog_changed: tokio::sync::watch::channel(0).0,
             incoming,
             alive: AtomicBool::new(true),
             exit_handled: AtomicBool::new(false),
@@ -3054,9 +3056,24 @@ impl AcpHost {
         message: &Value,
         message_bytes: usize,
     ) -> AcpSessionMessageRoute {
+        let catalog_updated = {
+            let mut snapshots = self.session_results.write().await;
+            snapshots.get_mut(session_id).is_some_and(|catalog| {
+                crate::delegation_runtime_defaults::merge_catalog_update(
+                    catalog, session_id, message,
+                )
+            })
+        };
+        if catalog_updated {
+            self.session_catalog_changed
+                .send_modify(|generation| *generation = generation.wrapping_add(1));
+        }
         let mut routes = self.routes.write().await;
         let Some(route) = routes.get_mut(session_id) else {
             drop(routes);
+            if catalog_updated {
+                return AcpSessionMessageRoute::SessionMetadata;
+            }
             if is_late_session_context_gauge(message)
                 && let Some((owner, detached_at)) = self
                     .late_context_owners
@@ -4622,6 +4639,31 @@ impl AcpRuntime {
         external_mcp_servers: &BTreeMap<String, McpServerDefinition>,
         new_session_native_rules: Option<&str>,
     ) -> Result<String> {
+        self.start_or_resume_session_with_delegation_defaults(
+            existing_session_id,
+            capabilities,
+            model_source,
+            model,
+            model_options,
+            external_mcp_servers,
+            new_session_native_rules,
+            None,
+        )
+        .await
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) async fn start_or_resume_session_with_delegation_defaults(
+        &self,
+        existing_session_id: Option<&str>,
+        capabilities: AcpSessionCapabilities,
+        model_source: &str,
+        model: &str,
+        model_options: &Value,
+        external_mcp_servers: &BTreeMap<String, McpServerDefinition>,
+        new_session_native_rules: Option<&str>,
+        delegation_defaults: Option<&crate::delegation_settings::RuntimeDefaults>,
+    ) -> Result<String> {
         if self.host.adapter_kind == AdapterKind::OpenClawCli {
             anyhow::ensure!(
                 model_options
@@ -4831,6 +4873,39 @@ impl AcpRuntime {
             && let Some(result) = self.host.session_result(&session_id).await
         {
             *self.session_result.write().await = Some(result);
+        }
+        // A mode may change the Session's model/catalog. Apply it before the
+        // original explicit-model validation/selection, never after that choice.
+        if let Some(mode) = delegation_defaults.and_then(|defaults| defaults.mode_id.as_ref()) {
+            anyhow::ensure!(
+                self.session_permissions
+                    .mode
+                    .as_ref()
+                    .is_none_or(|frozen| frozen == mode),
+                "delegation.runtime_mode_mapping_required"
+            );
+            let catalog = self
+                .session_result
+                .read()
+                .await
+                .clone()
+                .context("delegation.runtime_session_catalog_unavailable")?;
+            let preference = crate::delegation_settings::RuntimeDefaults {
+                mode_id: Some(mode.clone()),
+                config_values: BTreeMap::new(),
+            };
+            let applied = crate::delegation_runtime_defaults::apply_acp(
+                &preference,
+                &session_id,
+                &catalog,
+                self.workspace_access == "read_only",
+                |method, params| self.host.rpc(method, params),
+            )
+            .await?;
+            *self.session_result.write().await = Some(applied.clone());
+            self.host
+                .remember_session(&session_id, Some(&applied))
+                .await;
         }
         if let Some(gateway) = &self.host.openclaw_gateway {
             let configured = self
@@ -5101,6 +5176,53 @@ impl AcpRuntime {
                 )
                 .await?;
             }
+        }
+        if let Some(defaults) =
+            delegation_defaults.filter(|defaults| !defaults.config_values.is_empty())
+        {
+            let mut changes = self.host.session_catalog_changed.subscribe();
+            let mut catalog = self
+                .session_result
+                .read()
+                .await
+                .clone()
+                .context("delegation.runtime_session_catalog_unavailable")?;
+            if defaults.mode_id.is_some() {
+                let deadline = tokio::time::Instant::now() + Duration::from_secs(2);
+                loop {
+                    if let Some(current) = self.host.session_result(&session_id).await
+                        && crate::delegation_runtime_defaults::has_choices(&current, defaults)
+                    {
+                        catalog["configOptions"] = current["configOptions"].clone();
+                        break;
+                    }
+                    if crate::delegation_runtime_defaults::has_choices(&catalog, defaults) {
+                        break;
+                    }
+                    if !matches!(
+                        tokio::time::timeout_at(deadline, changes.changed()).await,
+                        Ok(Ok(()))
+                    ) {
+                        anyhow::bail!("delegation.runtime_config_catalog_unavailable_after_mode");
+                    }
+                }
+            }
+            let preference = crate::delegation_settings::RuntimeDefaults {
+                mode_id: None,
+                config_values: defaults.config_values.clone(),
+            };
+            let applied = crate::delegation_runtime_defaults::apply_acp(
+                &preference,
+                &session_id,
+                &catalog,
+                self.workspace_access == "read_only",
+                |method, params| self.host.rpc(method, params),
+            )
+            .await?;
+            *self.session_result.write().await = Some(applied.clone());
+            self.host
+                .remember_session(&session_id, Some(&applied))
+                .await;
         }
         if prebound_session {
             self.host

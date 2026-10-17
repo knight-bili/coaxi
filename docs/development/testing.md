@@ -89,6 +89,16 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 
 ## Rust 测试准入与退役门槛
 
+I04 Runtime 默认设置新增唯一低层 owner
+`delegation_runtime_defaults::tests::frozen_target_defaults_use_native_configuration_and_acknowledged_acp_choices`。
+原 owner 没有覆盖目标设置的原生字段映射及 ACP mode/config 回执顺序；此 owner 仅使用原 Registry 描述和可记录 RPC 回执替身，
+覆盖空设置不变、模型/权限精确映射、冲突与无法映射拒绝、真实协议 shape、分组选项、稳定应用顺序、
+缺失/非法 catalog、RPC 失败、缺失或错误回执、模式切换后的选项消失及只读权限冲突，不建立 SQLite/进程。
+同一低层 owner 验证模式更新后的新目录可用、已知精确 Session 目录通知合并及错 Session 不写入；Host 的通知等待与真实 stdio 仍须平台执行取证。
+持久冻结、原工厂/Registry/领取、变更全局设置及另一个 SQLite 连接、真实 User 接管与后续发送继续扩展原 Context owner，
+helper `context/delegation_runtime_defaults_tests.rs`。它证明 Core 配置与存储路径，不代表真实目标 Runtime 或完整 Host 重启。
+真实 ACP/原生 Runtime、模式 ID 别名与各平台资格仍归阶段执行验证，不用明确拒绝冒充支持。
+
 I04 外部目录审批继续扩展同一 Context materialization owner，helper 位于
 `context/delegation_workspace_permission_tests.rs`，不新增 Rust owner。
 使用实际父 Binding、生产 child 工厂、原 User 审批命令、原 Run 准备/领取/取消和真实 SQLite，
