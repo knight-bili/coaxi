@@ -1,0 +1,1 @@
+Continue the original delegated task in this Native Session from the recorded interruption point. Preserve completed work and do not repeat completed external actions. Do not add new work from the interruption context. If prior acceptance or an external action is unresolved, stop and report the concrete unresolved fact instead of guessing or retrying it.

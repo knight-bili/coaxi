@@ -12,7 +12,7 @@ use uuid::Uuid;
 use crate::{
     agent_profile::resolve_frozen_runtime,
     camp_attachment::MAX_PREPARED_ATTACHMENTS,
-    collaboration::{append_domain_event, build_effective_config},
+    collaboration::append_domain_event,
     command::{
         ActorRef, CommandEnvelope, CommandExecution, CommandHandlerResult, DomainCommand,
         DomainCommandGateway, EntityReference, canonical_json_digest, sealed,
@@ -2621,12 +2621,18 @@ fn admit_single_chat_message(
     )?;
     anyhow::ensure!(updated == 1, "single_chat.version_conflict");
     let conversation_sequence = target.last_message_sequence + 1;
-    let effective_config = build_effective_config(
+    let (effective_config, runtime) = crate::collaboration::build_admitted_effective_config(
         transaction,
         &target.conversation_id,
         &target.agent_id,
         runtime,
     )?;
+    let operation_policy_version =
+        if crate::delegation_policy::FrozenPolicy::from_config(&effective_config)?.is_some() {
+            3
+        } else {
+            SINGLE_CHAT_OPERATION_POLICY_VERSION
+        };
     transaction.execute(
         r#"
         INSERT INTO camp_turn(
@@ -2688,7 +2694,7 @@ fn admit_single_chat_message(
             ?10, NULL, 'runtime_managed_v2',
             ?11, ?12, ?13, ?14, ?15, ?16, ?15, ?16,
             ?17, ?18, ?19, ?20, ?21, ?22, ?23, ?24, ?25,
-            'single_chat', 'conversation_message', 'single_chat_v1', 2, ?3,
+            'single_chat', 'conversation_message', 'single_chat_v1', ?27, ?3,
             'queued', ?26, 1, ?5, ?5
         )
         "#,
@@ -2719,6 +2725,7 @@ fn admit_single_chat_message(
             runtime.search_environment_generation,
             runtime.native_session_compatibility_key,
             command_id,
+            operation_policy_version,
         ],
     )?;
     transaction.execute(
@@ -2780,7 +2787,7 @@ fn admit_single_chat_message(
             "invocationKind": "single_chat",
             "responseDelivery": SINGLE_CHAT_RESPONSE_DELIVERY,
             "operationPolicy": SINGLE_CHAT_OPERATION_POLICY,
-            "operationPolicyVersion": SINGLE_CHAT_OPERATION_POLICY_VERSION,
+            "operationPolicyVersion": operation_policy_version,
         }),
     )?;
     Ok(AdmittedSingleChatMessage {

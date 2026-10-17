@@ -5006,6 +5006,28 @@ pub(crate) fn task_link_admission(
     Ok(true)
 }
 
+pub(crate) fn build_admitted_effective_config(
+    transaction: &Transaction<'_>,
+    conversation_id: &str,
+    agent_id: &str,
+    runtime: &FrozenAgentRuntimeConfig,
+) -> Result<(Value, FrozenAgentRuntimeConfig)> {
+    let policy = crate::delegation_policy::freeze_for_conversation(transaction, conversation_id)?;
+    let runtime = match policy {
+        Some(policy) => policy.freeze_resolved_runtime(runtime)?,
+        None => runtime.clone(),
+    };
+    let mut config = build_effective_config(transaction, conversation_id, agent_id, &runtime)?;
+    if let Some(policy) = policy {
+        let object = config.as_object_mut().context("Invalid effective config")?;
+        object.remove("configDigest");
+        object.insert("delegationPolicy".into(), serde_json::to_value(policy)?);
+        let digest = canonical_json_digest(&config)?;
+        config["configDigest"] = Value::String(digest);
+    }
+    Ok((config, runtime))
+}
+
 pub(crate) fn build_effective_config(
     transaction: &Transaction<'_>,
     conversation_id: &str,

@@ -14,6 +14,12 @@ use uuid::Uuid;
 
 const BUILTIN_CLI_CHARTER: &str = include_str!("../resources/charter-rovai-cli.md");
 const SINGLE_CHAT_SESSION_CHARTER: &str = include_str!("../resources/charter-rovai-single-chat.md");
+const DELEGATION_PARENT_CHARTER: &str =
+    include_str!("../resources/charter-rovai-delegation-parent.md");
+const DELEGATION_CHILD_CHARTER: &str =
+    include_str!("../resources/charter-rovai-delegation-child.md");
+const DELEGATION_PRIVATE_CHARTER: &str =
+    include_str!("../resources/charter-rovai-single-chat-delegation.md");
 const SINGLE_CHAT_GUIDANCE: &str = include_str!("../resources/single-chat-guidance-v3.json");
 const FEISHU_FILE_DELIVERY_GUIDANCE: &str = "This Thread is connected to an external channel. Local file paths and Runtime image previews are not delivered there; when the recipient needs the file itself, include `--file <path>` in the corresponding `rovai send` message.";
 // Historical ContextManifest v22-v25 rows remain readable after the v1.60
@@ -505,6 +511,7 @@ impl ContextService {
         let max_payload_bytes = request.max_payload_bytes.max(MIN_CONTEXT_PAYLOAD_BYTES);
         let snapshot = load_run_snapshot(database, request.agent_run_id, request.execution_epoch)?
             .context("AgentRun is not active for context materialization")?;
+        require_legacy_dynamic_formatter(&snapshot)?;
         let frozen_delivery_context = load_frozen_delivery_context(database, &snapshot)?;
         if let Some(existing) = load_existing_manifest(
             database,
@@ -1328,6 +1335,7 @@ impl ContextService {
         request: &DeliveryContextPreview<'_>,
     ) -> Result<FrozenDeliveryContext> {
         let snapshot = prospective_delivery_snapshot(transaction, request)?;
+        require_legacy_dynamic_formatter(&snapshot)?;
         let skill_packs = prepare_run_skill_packs(transaction, &snapshot)?;
         let skill_pack_section = skill_packs
             .as_ref()
@@ -3046,13 +3054,49 @@ fn camp_has_active_feishu_binding(connection: &Connection, camp_id: &str) -> Res
     )?)
 }
 
+fn frozen_delegation_policy(
+    snapshot: &RunSnapshot,
+) -> Result<Option<crate::delegation_policy::FrozenPolicy>> {
+    let policy = crate::delegation_policy::FrozenPolicy::from_config(&snapshot.effective_config)?
+        .map(|p| p.validate_invocation(&snapshot.invocation_kind))
+        .transpose()?;
+    anyhow::ensure!(
+        !matches!(
+            snapshot.invocation_kind.as_str(),
+            "delegation" | "delegation_user"
+        ) || policy.is_some(),
+        "Delegation child has no frozen policy"
+    );
+    Ok(policy)
+}
+
+fn require_legacy_dynamic_formatter(snapshot: &RunSnapshot) -> Result<()> {
+    // The new role must never fall through the public/Single Chat history selector.
+    // Complete format35 materialization and 160/210 admission are connected together next.
+    anyhow::ensure!(
+        frozen_delegation_policy(snapshot)?.is_none(),
+        "Delegation format35 materialization is not connected yet"
+    );
+    Ok(())
+}
+
 fn build_session_charter(
     snapshot: &RunSnapshot,
     has_active_feishu_binding: bool,
     is_mission: bool,
 ) -> Result<String> {
+    let policy = frozen_delegation_policy(snapshot)?;
+    if policy.is_some_and(|p| p.role == crate::delegation_policy::Role::Child) {
+        return Ok(DELEGATION_CHILD_CHARTER.trim().to_string());
+    }
     if snapshot.invocation_kind == "single_chat" {
-        return Ok(SINGLE_CHAT_SESSION_CHARTER.trim().to_string());
+        return Ok(if policy.is_some() {
+            DELEGATION_PRIVATE_CHARTER
+        } else {
+            SINGLE_CHAT_SESSION_CHARTER
+        }
+        .trim()
+        .to_string());
     }
     let file_guidance = if has_active_feishu_binding {
         format!("\n- {FEISHU_FILE_DELIVERY_GUIDANCE}")
@@ -3064,7 +3108,7 @@ fn build_session_charter(
          - The User owns the Thread objective. The User or current Default Lead defines Task responsibilities; other Agents execute assigned Tasks.\n\
          - Follow current user instructions; preserve existing user work. Prefer current evidence to Memory, history and cached context.\n\
          - Use `rovai thread read` only for needed, missing context. History boundaries do not prove reading or completion.";
-    Ok(format!(
+    let legacy = format!(
         "Rovai-ai Session Charter\n\n{authority_guidance}\n\
          - When no work can proceed without another Agent's reply, end the Run and resume on reply. Do not poll history or execution status.\n\n{}{}{}",
         BUILTIN_CLI_CHARTER.trim(),
@@ -3074,7 +3118,12 @@ fn build_session_charter(
         } else {
             ""
         },
-    ))
+    );
+    Ok(if policy.is_some() {
+        format!("{legacy}\n\n{}", DELEGATION_PARENT_CHARTER.trim())
+    } else {
+        legacy
+    })
 }
 
 #[derive(Debug, Clone)]
@@ -3095,6 +3144,8 @@ fn prepare_session_bootstrap_evidence_for_snapshot(
     native_binding_generation: i64,
     delivery_mode: CharterDeliveryMode,
 ) -> Result<PreparedBootstrapEvidence> {
+    let child = frozen_delegation_policy(snapshot)?
+        .is_some_and(|p| p.role == crate::delegation_policy::Role::Child);
     // A fresh Run assembles its own startup instructions. Only this Run's
     // prepared bytes are reused; old Session Bootstrap records are audit data.
     let run_evidence_id = format!(
@@ -3149,6 +3200,10 @@ fn prepare_session_bootstrap_evidence_for_snapshot(
         }
         let charter = blob_store.read_text(database, &charter_blob_id)?;
         let entrypoint = blob_store.read_text(database, &entrypoint_blob_id)?;
+        anyhow::ensure!(
+            !child || (entrypoint.is_empty() && charter == DELEGATION_CHILD_CHARTER.trim()),
+            "Frozen delegation Bootstrap has unexpected memory or Charter"
+        );
         if sha256_text(&charter) != charter_digest || sha256_text(&entrypoint) != entrypoint_digest
         {
             anyhow::bail!("Native Session Bootstrap evidence Blob digest mismatch");
@@ -3157,13 +3212,26 @@ fn prepare_session_bootstrap_evidence_for_snapshot(
             let section = platform_skills
                 .as_deref()
                 .context("new Bootstrap platform Skills are missing")?;
+            if child {
+                let index = section
+                    .strip_prefix("[ROVAI_PLATFORM_SKILLS]\n")
+                    .and_then(|value| value.strip_suffix("\n[/ROVAI_PLATFORM_SKILLS]"))
+                    .context("Invalid child platform Skills section")?;
+                let index: Value = serde_json::from_str(index)?;
+                anyhow::ensure!(
+                    index["skills"] == json!([]),
+                    "Child platform Skills must remain empty"
+                );
+            }
             anyhow::ensure!(
                 Some(sha256_text(section)) == platform_digest,
                 "Bootstrap platform Skills digest mismatch"
             );
         } else {
             anyhow::ensure!(
-                contract_version == "native_session_bootstrap_v4" && platform_skills.is_none(),
+                !child
+                    && contract_version == "native_session_bootstrap_v4"
+                    && platform_skills.is_none(),
                 "unsupported frozen Bootstrap Skills evidence"
             );
         }
@@ -3185,15 +3253,17 @@ fn prepare_session_bootstrap_evidence_for_snapshot(
     }
 
     // Channel guidance is selected only for new evidence, never when replaying a Binding.
-    let has_active_feishu_binding =
-        camp_has_active_feishu_binding(database.connection(), &snapshot.camp_id)?;
-    let charter = build_session_charter(
-        snapshot,
-        has_active_feishu_binding,
-        mission_facts(database.connection(), snapshot)?.is_some(),
-    )?;
+    let (has_active_feishu_binding, is_mission) = if child {
+        (false, false)
+    } else {
+        (
+            camp_has_active_feishu_binding(database.connection(), &snapshot.camp_id)?,
+            mission_facts(database.connection(), snapshot)?.is_some(),
+        )
+    };
+    let charter = build_session_charter(snapshot, has_active_feishu_binding, is_mission)?;
     let (entrypoint, observed, authorization_basis_digest) =
-        if snapshot.invocation_kind == "single_chat" {
+        if snapshot.invocation_kind == "single_chat" || child {
             (
                 String::new(),
                 Vec::new(),
@@ -3214,7 +3284,11 @@ fn prepare_session_bootstrap_evidence_for_snapshot(
             .context("Core data directory is unavailable")?,
     )?;
     managed_skills.sync()?;
-    let (platform_entries, omitted) = managed_skills.index(crate::managed_skills::PLATFORM_SKILLS);
+    let (platform_entries, omitted) = managed_skills.index(
+        crate::managed_skills::PLATFORM_SKILLS
+            .into_iter()
+            .filter(|_| !child),
+    );
     anyhow::ensure!(
         omitted.is_empty(),
         "platform Skill source is unavailable: {}",
@@ -3324,7 +3398,26 @@ fn format_session_bootstrap_for_snapshot(
     snapshot: &RunSnapshot,
     evidence: PreparedBootstrapEvidence,
 ) -> Result<PreparedSessionBootstrap> {
-    let member_identity = load_latest_member_identity(database, &snapshot.agent_id)?;
+    let member_identity = if frozen_delegation_policy(snapshot)?
+        .is_some_and(|p| p.role == crate::delegation_policy::Role::Child)
+    {
+        let (delegation_id, target) = crate::delegation_policy::child_identity(
+            database.connection(),
+            &snapshot.conversation_id,
+            &snapshot.agent_id,
+            &snapshot.camp_id,
+        )?;
+        let label = if target.starts_with("custom:") {
+            format!("Custom ACP {}", target.trim_start_matches("custom:"))
+        } else {
+            run_snapshot_adapter_kind(snapshot)?
+                .display_name()
+                .to_string()
+        };
+        delegated_member_identity(&label, &delegation_id)
+    } else {
+        load_latest_member_identity(database, &snapshot.agent_id)?
+    };
     let payload = render_session_bootstrap(
         &evidence.session_charter,
         &member_identity,
@@ -3339,6 +3432,24 @@ fn format_session_bootstrap_for_snapshot(
         native_binding_generation: evidence.native_binding_generation,
         delivery_mode: evidence.delivery_mode,
     })
+}
+
+fn delegated_member_identity(
+    label: &str,
+    delegation_id: &str,
+) -> MemberIdentityBootstrapProjection {
+    MemberIdentityBootstrapProjection {
+        name: format!(
+            "{} {}",
+            label,
+            delegation_id.chars().take(8).collect::<String>()
+        ),
+        team_role: "Delegated executor".into(),
+        professional_responsibilities: String::new(),
+        personality_traits: Vec::new(),
+        working_principles: String::new(),
+        growth_topic: String::new(),
+    }
 }
 
 fn load_latest_member_identity(
@@ -14899,6 +15010,112 @@ mod slow_tests {
         let single_chat_charter = build_session_charter(&snapshot, false, true).unwrap();
         assert_eq!(single_chat_charter, SINGLE_CHAT_SESSION_CHARTER.trim());
         assert!(!single_chat_charter.contains("Rovai Mission Contract"));
+        let approved: Value = serde_json::from_str(include_str!(
+            "../../../integration/proposals/native-delegation-r1-contract.json"
+        ))
+        .unwrap();
+        let base_runtime: FrozenAgentRuntimeConfig =
+            serde_json::from_value(snapshot.effective_config["runtime"].clone()).unwrap();
+        {
+            let tx = fixture.database.connection_mut().transaction().unwrap();
+            let legacy = crate::collaboration::build_effective_config(
+                &tx,
+                &snapshot.conversation_id,
+                &snapshot.agent_id,
+                &base_runtime,
+            )
+            .unwrap();
+            let (admitted, runtime) = crate::collaboration::build_admitted_effective_config(
+                &tx,
+                &snapshot.conversation_id,
+                &snapshot.agent_id,
+                &base_runtime,
+            )
+            .unwrap();
+            assert_eq!(
+                admitted, legacy,
+                "Default admission preserves the complete effective config"
+            );
+            assert_eq!(
+                serde_json::to_value(runtime).unwrap(),
+                serde_json::to_value(&base_runtime).unwrap()
+            );
+        }
+        for (role, invocation) in [
+            (crate::delegation_policy::Role::PublicParent, "batch"),
+            (crate::delegation_policy::Role::PrivateParent, "single_chat"),
+            (crate::delegation_policy::Role::Child, "delegation"),
+        ] {
+            let policy = crate::delegation_policy::FrozenPolicy::new(true, 1, role).unwrap();
+            snapshot.effective_config["delegationPolicy"] = serde_json::to_value(policy).unwrap();
+            snapshot.invocation_kind = invocation.into();
+            assert!(require_legacy_dynamic_formatter(&snapshot).is_err());
+            let tagged = policy.freeze_resolved_runtime(&base_runtime).unwrap();
+            assert_ne!(
+                tagged.binding_compatibility_digest,
+                base_runtime.binding_compatibility_digest
+            );
+            assert_eq!(tagged.host_config_digest, base_runtime.host_config_digest);
+            assert_eq!(tagged.permissions, base_runtime.permissions);
+            assert_eq!(tagged.model, base_runtime.model);
+            let mut no_session = base_runtime.clone();
+            no_session.native_session_compatibility_key = None;
+            assert!(
+                policy
+                    .freeze_resolved_runtime(&no_session)
+                    .unwrap()
+                    .native_session_compatibility_key
+                    .is_none()
+            );
+            let disabled = crate::delegation_policy::FrozenPolicy::new(false, 8, role)
+                .unwrap()
+                .freeze_resolved_runtime(&base_runtime)
+                .unwrap();
+            assert_eq!(
+                tagged.binding_compatibility_digest, disabled.binding_compatibility_digest,
+                "switch/depth do not change the same Charter role"
+            );
+            match role {
+                crate::delegation_policy::Role::PublicParent => {
+                    for feishu in [false, true] {
+                        for mission in [false, true] {
+                            assert_eq!(
+                                build_session_charter(&snapshot, feishu, mission).unwrap(),
+                                approved["after"]["public_charters_enabled"]
+                                    [format!("feishu_{feishu}_mission_{mission}")]
+                                .as_str()
+                                .unwrap()
+                            );
+                        }
+                    }
+                }
+                crate::delegation_policy::Role::PrivateParent => assert_eq!(
+                    build_session_charter(&snapshot, false, false).unwrap(),
+                    approved["after"]["single_chat_charter_enabled"]
+                        .as_str()
+                        .unwrap()
+                ),
+                crate::delegation_policy::Role::Child => {
+                    let child_charter = build_session_charter(&snapshot, true, true).unwrap();
+                    assert_eq!(
+                        child_charter,
+                        approved["after"]["child_charter"].as_str().unwrap()
+                    );
+                    let identity = delegated_member_identity("Codex CLI", "12345678-identity");
+                    let projected = serde_json::to_value(&identity).unwrap();
+                    assert_eq!(
+                        projected,
+                        json!({"name":"Codex CLI 12345678","teamRole":"Delegated executor","professionalResponsibilities":"","personalityTraits":[],"workingPrinciples":"","growthTopic":""})
+                    );
+                    let bootstrap=render_session_bootstrap(&child_charter,&identity,Some("[ROVAI_PLATFORM_SKILLS]\n{\"root\":\"fixture\",\"skills\":[]}\n[/ROVAI_PLATFORM_SKILLS]"),"").unwrap();
+                    assert!(
+                        !bootstrap.contains("[MEMORY_ENTRYPOINT]")
+                            && !bootstrap.contains("cli-operations")
+                            && !bootstrap.contains("memory-stewardship")
+                    );
+                }
+            }
+        }
         fixture.cleanup();
     }
 

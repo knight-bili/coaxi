@@ -14,7 +14,7 @@
   "current_branch": "phase/i04-collaboration-runtime",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I04-T01",
-  "current_slice": "I04 已确认r1的持久关系、父链、原请求回放、私有运行约束及接管序号存储已编码，单个真实Core数据库owner通过；继续合齐完整160/210格式与准入，尚未开放执行/API。",
+  "current_slice": "I04 已确认r1的冻结资格/新运行准入、三类Profile和独立Bootstrap已编码，默认Core路径及定向检查通过；下一步实际格式35、材料/原生投影及完整160/210升级。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,14 +33,14 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "I04-T01：身份存储/候选DDL分项已验证；下一步合齐格式35/父冻结工具资格/子Bootstrap、完整数据分类与旧源升级，一次登记Schema160/Migration210；不再重复批准",
-    "I04-T01：六个模型操作、CLI/原别名、冻结输入及接收/恢复围栏",
-    "I04-T01：按 Codeg 原版委派和原生子代理查看器接入两端 UI，保留 User-only 原生读取与后台观察队列",
-    "I04-T02/T03/T04：Runtime 并集、恢复、记忆及自动化；阶段候选集中验证，缺外部条件留待办"
+    "I04-T01：直接完成格式35实际装配/最终Blob/Manifest/冻结回放、child材料精确owner及原生技能/MCP过滤；新角色不得降级进入旧格式",
+    "I04-T01：合齐完整Schema160/Migration210分类、旧源支持和两条升级链，再开放User/模型/CLI/回执事件与实际执行生命周期",
+    "I04-T01：两个Codeg原查看器、User-only原生读取/背景观察和完整材料交互",
+    "I04-T02/T03/T04：Runtime并集、恢复、记忆与自动化原剩余项；阶段候选集中构建，外部条件先留册"
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "identity_graph_and_candidate_ddl_locally_verified_full_contract_migration_and_runtime_pending",
+  "current_slice_status": "frozen_policy_and_bootstrap_components_locally_verified_complete_format35_and_migration_pending",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -115,7 +115,7 @@
     "source_progress_continued": true
   },
   "project_groups_evidence": "i03-project-groups-result.json",
-  "checked_at": "2026-10-17T03:35:34.833607+00:00",
+  "checked_at": "2026-10-17T06:05:10.261193+00:00",
   "project_layout_evidence": "i03-project-layout-result.json",
   "project_tree_evidence": "i03-project-tree-result.json",
   "navigation_activity_evidence": "i03-navigation-activity-result.json",
@@ -253,5 +253,6 @@
   "i04_delegation_foundation_evidence": "i04-delegation-foundation-result.json",
   "i04_delegation_foundation_source_commit": "e0b2f60905e232b9615de83ba9905d613d00deba",
   "i04_delegation_identity_evidence": "i04-delegation-identity-result.json",
-  "i04_delegation_identity_source_commit": "6eb79f06932580a46d4e6aaae0a42eedf3eb5ab5"
+  "i04_delegation_identity_source_commit": "6eb79f06932580a46d4e6aaae0a42eedf3eb5ab5",
+  "i04_delegation_policy_bootstrap_evidence": "i04-delegation-policy-bootstrap-result.json"
 }

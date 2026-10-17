@@ -37,4 +37,12 @@ control 原语按精确版本记录接管，要求旧 Run 已经终态，冻结�
 
 ## 完整执行待接入
 
+新Run的`delegationPolicy`冻结schemaVersion=1、enabled、depthLimit和public_parent/private_parent/child角色。缺失即旧资格；null、未知字段、非法版本/深度拒绝，不能从当前全局开关补给旧Run。新的start/resume还要求当前设置启用；既有关系的status/cancel/read/history不因关开关消失。该判断只是资格原语，完整工具网关仍要校验当前执行、绑定、直接父及控制权。
+
+Profile11为child的publicHistory/taskAwareness/memoryEntrypoint三个none；Profile12保留公共maxSelfActiveTasks=8；Profile13沿用原私聊数值边界。格式35只接受(public batch/direct/a2a/gather_completion,12,9)、(single_chat,13,6)和(delegation/delegation_user,11,10)元组。默认Profile7/10、格式29/34和既有摘要不改。
+
+父/私聊/child Charter使用批准r1全文。child按实际冻结Runtime种类展示独立名称和稳定短编号，不读取父人设；无Memory入口，Bootstrap v5仍存空入口Blob及摘要，平台技能索引为空。新证据不查询父Mission/渠道；旧child证据拒绝带Memory、旧v4或非空平台技能。此处不代表原生Runtime目录中的技能/MCP投影已经过滤完成。
+
+完整160/210开通之前，不生成新角色。格式35装配未接通时显式阻止新角色进入旧Dynamic Context格式；不得降级到公屏/普通私聊来绕过隔离。完整35分支、Manifest/Blob和重放必须在开通前实现并验证。
+
 目标 v1.73/Schema160/Migration210 尚未登记启动链。必须集齐格式35、父冻结工具资格、子 Bootstrap、数据合同分类/旧来源升级，然后接 User/模型/CLI、回执事件、调度与输入接收、取消清理、原 Session 恢复、接管发送与原界面。Run 仍是唯一执行终态权威；这些存储原语不构成完整身份认证或 Runtime 准入，不得据此启动真实进程。当前运行数据和旧模型输入保持，正式场景不据分项测试记为完成。

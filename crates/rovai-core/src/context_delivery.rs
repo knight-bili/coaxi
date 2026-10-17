@@ -17,6 +17,24 @@ pub struct ContextDeliveryProfile {
 
 impl ContextDeliveryProfile {
     pub fn validate(self) -> Result<Self> {
+        if self.profile_version == 11 {
+            anyhow::ensure!(
+                self == DELEGATION_CHILD_PROFILE_V11,
+                "Invalid child Context Delivery Profile"
+            );
+            return Ok(self);
+        }
+        if self.profile_version == 12 || self.profile_version == 13 {
+            anyhow::ensure!(
+                self == if self.profile_version == 12 {
+                    DELEGATION_PUBLIC_PROFILE_V12
+                } else {
+                    DELEGATION_PRIVATE_PROFILE_V13
+                },
+                "Invalid delegation parent profile limits"
+            );
+            return Ok(self);
+        }
         if !matches!(self.profile_version, 5..=10) {
             anyhow::bail!("unsupported Context Delivery Profile version");
         }
@@ -43,12 +61,20 @@ impl ContextDeliveryProfile {
     }
 
     pub fn frozen_json(self) -> Result<Value> {
-        if matches!(self.profile_version, 9 | 10) {
+        if self.profile_version == 11 {
+            self.validate()?;
+            Ok(
+                json!({"profileVersion":11,"publicHistory":"none","taskAwareness":"none","memoryEntrypoint":"none"}),
+            )
+        } else if matches!(self.profile_version, 9 | 10 | 12) {
             self.validate()?;
             Ok(json!({
                 "profileVersion": self.profile_version,
                 "maxSelfActiveTasks": self.max_self_active_tasks,
             }))
+        } else if self.profile_version == 13 {
+            self.validate()?;
+            Ok(serde_json::to_value(self)?)
         } else {
             Ok(serde_json::to_value(self)?)
         }
@@ -56,7 +82,14 @@ impl ContextDeliveryProfile {
 
     pub fn from_frozen_json(value: &str) -> Result<Self> {
         let value: Value = serde_json::from_str(value)?;
-        if matches!(value.get("profileVersion"), Some(version) if version == &json!(9) || version == &json!(10))
+        if value.get("profileVersion") == Some(&json!(11)) {
+            anyhow::ensure!(
+                value == DELEGATION_CHILD_PROFILE_V11.frozen_json()?,
+                "Invalid frozen child Context Delivery Profile"
+            );
+            return Ok(DELEGATION_CHILD_PROFILE_V11);
+        }
+        if matches!(value.get("profileVersion"), Some(version) if version == &json!(9) || version == &json!(10) || version==&json!(12))
         {
             #[derive(Deserialize)]
             #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -119,6 +152,23 @@ pub const PUBLIC_CAMP_BATCH_CONTEXT_DELIVERY_PROFILE_V10: ContextDeliveryProfile
         profile_version: 10,
         ..PUBLIC_CAMP_BATCH_CONTEXT_DELIVERY_PROFILE_V9
     };
+
+pub const DELEGATION_CHILD_PROFILE_V11: ContextDeliveryProfile = ContextDeliveryProfile {
+    profile_version: 11,
+    max_public_messages: 0,
+    max_public_history_chars: 0,
+    max_message_body_chars: 0,
+    max_public_reference_chain_messages: 0,
+    max_self_active_tasks: 0,
+};
+pub const DELEGATION_PUBLIC_PROFILE_V12: ContextDeliveryProfile = ContextDeliveryProfile {
+    profile_version: 12,
+    ..PUBLIC_CAMP_BATCH_CONTEXT_DELIVERY_PROFILE_V10
+};
+pub const DELEGATION_PRIVATE_PROFILE_V13: ContextDeliveryProfile = ContextDeliveryProfile {
+    profile_version: 13,
+    ..CURRENT_CONTEXT_DELIVERY_PROFILE_V7
+};
 
 pub fn current_context_delivery_profile() -> Result<ContextDeliveryProfile> {
     CURRENT_CONTEXT_DELIVERY_PROFILE_V7.validate()
@@ -185,6 +235,29 @@ mod tests {
             CONTEXT_DELIVERY_PROFILE_V5.canonical_digest().unwrap(),
             "707f88f4ed1c657b59b48f77ab82d1baf5b2663f3b8faf997a4802402e981352"
         );
+        for (profile, expected) in [
+            (
+                DELEGATION_CHILD_PROFILE_V11,
+                json!({"profileVersion":11,"publicHistory":"none","taskAwareness":"none","memoryEntrypoint":"none"}),
+            ),
+            (
+                DELEGATION_PUBLIC_PROFILE_V12,
+                json!({"profileVersion":12,"maxSelfActiveTasks":8}),
+            ),
+            (
+                DELEGATION_PRIVATE_PROFILE_V13,
+                json!({"profileVersion":13,"maxPublicMessages":15,"maxPublicHistoryChars":24000,"maxMessageBodyChars":2000,"maxPublicReferenceChainMessages":3,"maxSelfActiveTasks":8}),
+            ),
+        ] {
+            assert_eq!(profile.frozen_json().unwrap(), expected);
+            assert_eq!(
+                ContextDeliveryProfile::from_frozen_json(&expected.to_string()).unwrap(),
+                profile
+            );
+            let mut extra = expected.clone();
+            extra["extra"] = json!(true);
+            assert!(ContextDeliveryProfile::from_frozen_json(&extra.to_string()).is_err());
+        }
     }
 
     #[test]

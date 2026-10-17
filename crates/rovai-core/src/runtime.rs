@@ -3996,9 +3996,28 @@ impl ExecutionRuntimeService {
                 ));
             }
 
-            replace_effective_runtime(&mut effective_config, &envelope.payload.effective_runtime)?;
+            // Refresh identity from the Run's frozen role, never from today's feature switch.
+            let rebound_runtime =
+                match crate::delegation_policy::FrozenPolicy::from_config(&effective_config)? {
+                    Some(policy)
+                        if envelope
+                            .payload
+                            .effective_runtime
+                            .binding_compatibility_digest
+                            != frozen_runtime.binding_compatibility_digest
+                            || envelope
+                                .payload
+                                .effective_runtime
+                                .native_session_compatibility_key
+                                != frozen_runtime.native_session_compatibility_key =>
+                    {
+                        policy.freeze_resolved_runtime(&envelope.payload.effective_runtime)?
+                    }
+                    _ => envelope.payload.effective_runtime.clone(),
+                };
+            replace_effective_runtime(&mut effective_config, &rebound_runtime)?;
             let effective_config_json = serde_json::to_string(&effective_config)?;
-            let runtime = &envelope.payload.effective_runtime;
+            let runtime = &rebound_runtime;
             let updated = transaction.execute(
                 r#"
                 UPDATE agent_run

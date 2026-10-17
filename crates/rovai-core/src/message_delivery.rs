@@ -13,7 +13,7 @@ use crate::{
         AGENT_USER_DISPLAY_NAME, LEGACY_AGENT_USER_DISPLAY_NAME, StructuredThreadMessageSegment,
         canonical_content_digest, normalize_content, render_current_plain_text,
     },
-    collaboration::{append_domain_event, build_effective_config},
+    collaboration::append_domain_event,
     command::{ActorRef, CommandHandlerResult, EntityReference, canonical_json_digest},
     context::{
         ContextService, DEFAULT_MAX_CONTEXT_PAYLOAD_BYTES, DeliveryContextPreview,
@@ -1377,7 +1377,7 @@ fn process_dispatch_attempt(
         return Ok(outcome);
     }
 
-    let effective_config = build_effective_config(
+    let (effective_config, runtime) = crate::collaboration::build_admitted_effective_config(
         &transaction,
         &conversation_id,
         &delivery.recipient_agent_id,

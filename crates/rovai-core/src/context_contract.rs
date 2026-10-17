@@ -8,6 +8,9 @@ pub const AGENT_RUN_CONTEXT_FORMATTER_VERSION: i64 = 29;
 pub const CONTEXT_MANIFEST_VERSION: i64 = 29;
 pub const PUBLIC_CAMP_BATCH_CONTEXT_FORMATTER_VERSION: i64 = 34;
 pub const PUBLIC_CAMP_BATCH_CONTEXT_MANIFEST_VERSION: i64 = 34;
+pub const DELEGATION_CONTEXT_VERSION: i64 = 35;
+pub const DELEGATION_SESSION_CHARTER_REVISION: i64 = 23;
+pub const DELEGATION_BINDING_REVISION: i64 = 17;
 
 pub(crate) const PACK_CONTEXT_MANIFEST_VERSION: i64 = 29;
 pub(crate) const PACK_PUBLIC_CONTEXT_MANIFEST_VERSION: i64 = 34;
@@ -20,6 +23,18 @@ pub(crate) fn skill_pack_context_format(
     profile_version: i64,
     facts_version: i64,
 ) -> anyhow::Result<bool> {
+    if manifest_version == DELEGATION_CONTEXT_VERSION {
+        anyhow::ensure!(
+            matches!(
+                (invocation_kind, profile_version, facts_version),
+                ("delegation" | "delegation_user", 11, 10)
+                    | ("single_chat", 13, 6)
+                    | ("batch" | "direct" | "a2a" | "gather_completion", 12, 9)
+            ),
+            "Delegation Context format/profile/Run Facts pairing is invalid"
+        );
+        return Ok(true);
+    }
     let batch = invocation_kind == "batch";
     anyhow::ensure!(
         batch
@@ -94,6 +109,10 @@ mod tests {
         assert_eq!(PUBLIC_CAMP_BATCH_CONTEXT_FORMATTER_VERSION, 34);
         assert_eq!(PUBLIC_CAMP_BATCH_CONTEXT_MANIFEST_VERSION, 34);
         for (kind, manifest, profile, facts, packs) in [
+            ("batch", 35, 12, 9, true),
+            ("single_chat", 35, 13, 6, true),
+            ("delegation", 35, 11, 10, true),
+            ("delegation_user", 35, 11, 10, true),
             ("batch", 29, 9, 7, false),
             ("batch", 33, 10, 9, false),
             ("batch", 34, 10, 9, true),
@@ -109,6 +128,9 @@ mod tests {
             );
         }
         for (kind, manifest, profile, facts) in [
+            ("delegation", 35, 12, 9),
+            ("single_chat", 35, 11, 10),
+            ("batch", 35, 13, 6),
             ("batch", 29, 7, 6),
             ("single_chat", 29, 9, 7),
             ("batch", 34, 9, 7),

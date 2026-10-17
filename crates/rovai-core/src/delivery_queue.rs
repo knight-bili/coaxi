@@ -6,7 +6,6 @@ use uuid::Uuid;
 use crate::{
     agent_profile::{FrozenAgentRuntimeConfig, resolve_frozen_runtime},
     camp_content::StructuredThreadMessageContent,
-    collaboration::build_effective_config,
     context::{
         project_batch_run_input_for_claim, public_history_hint, runtime_max_context_payload_bytes,
         serialized_batch_run_input_len,
@@ -467,8 +466,13 @@ pub fn claim_waiting_delivery_batches(database: &mut Database, limit: i64) -> Re
                     continue;
                 }
             };
-            let effective_config =
-                build_effective_config(&transaction, &conversation_id, &agent_id, &runtime)?;
+            let (effective_config, runtime) =
+                crate::collaboration::build_admitted_effective_config(
+                    &transaction,
+                    &conversation_id,
+                    &agent_id,
+                    &runtime,
+                )?;
             let max_payload_bytes = runtime_max_context_payload_bytes(&runtime);
             let selection = select_batch_prefix(
                 &transaction,

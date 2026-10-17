@@ -1,0 +1,321 @@
+{
+  "schema_version": 1,
+  "stage": "I04",
+  "task": "I04-T01",
+  "status": "frozen_policy_and_bootstrap_components_locally_verified_complete_format35_and_migration_pending",
+  "checked_at": "2026-10-17T06:08:17.460486+00:00",
+  "implementation_baseline": "807da987b59364b368836d69b1f3a329962bd321",
+  "source_commit": null,
+  "confirmation_record": "i04-delegation-r1-confirmation.json",
+  "runtime_data_contract": {
+    "version": "v1.72",
+    "schema": 159,
+    "migration": 209
+  },
+  "target_data_contract": {
+    "version": "v1.73",
+    "schema": 160,
+    "migration": 210,
+    "status": "not_registered"
+  },
+  "changes": [
+    "Strict frozen role/capability metadata; global toggle cannot grant missing legacy capability; current disable additionally denies start/resume",
+    "Public delivery, A2A and SingleChat Run admission call one marker-gated freeze helper; before complete 160/210 it returns the original effective config and Runtime",
+    "Runtime role binding digest retains model/host/permissions and absent native-session capability; rebind uses frozen role rather than current settings",
+    "Profiles11/12/13 and only valid invocation/profile/facts format35 tuples; default7/10 and29/34 unchanged",
+    "Approved parent/private/child Charter and fixed resume resource, exact LF bytes from immutable r1 annex",
+    "Child Bootstrap independent identity, empty memory Blob/digest with omitted MEMORY_ENTRYPOINT, empty platform index, no parent Mission/channel lookup; frozen child replay rejects old v4/memory/nonempty platform skills",
+    "Explicit temporary guard rejects new delegation roles entering legacy Dynamic Context; full format35 must replace it before contract activation"
+  ],
+  "checks": {
+    "core_lib_extended_build": "passed; matching owners only",
+    "core_lib_slow_build": "passed; matching owners only",
+    "tests": [
+      {
+        "log": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-owner-1.log",
+        "passed": 1,
+        "failed": 0,
+        "filtered_out": 972
+      },
+      {
+        "log": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-owner-2.log",
+        "passed": 3,
+        "failed": 0,
+        "filtered_out": 970
+      },
+      {
+        "log": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-owner-3.log",
+        "passed": 1,
+        "failed": 0,
+        "filtered_out": 972
+      },
+      {
+        "log": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-runtime_rebind_allows_default_version_drift_but_not_logical_identity_changes.log",
+        "passed": 1,
+        "failed": 0,
+        "filtered_out": 972
+      },
+      {
+        "log": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-scheduler_rebinds_one_compatible_runtime_drift_and_preserves_initial_audit.log",
+        "passed": 1,
+        "failed": 0,
+        "filtered_out": 972
+      },
+      {
+        "log": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-bootstrap-1-final.log",
+        "passed": 1,
+        "failed": 0,
+        "filtered_out": 1251
+      },
+      {
+        "log": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-bootstrap-2-final.log",
+        "passed": 1,
+        "failed": 0,
+        "filtered_out": 1251
+      }
+    ],
+    "passed_tests": 9,
+    "failed_tests_final": 0,
+    "scope_notes": "extended binary has 973 tests; slow binary has 1252 tests; filtered tests were not executed",
+    "approved_files_unchanged": 6,
+    "approved_resources": [
+      {
+        "path": "crates/rovai-core/resources/charter-rovai-delegation-parent.md",
+        "bytes": 1712,
+        "sha256": "04c8fe02ecfc0462a2d72640a52202deefc990937f4b89f87de5faed4ede3318",
+        "approved_key": "after.parent_guidance"
+      },
+      {
+        "path": "crates/rovai-core/resources/charter-rovai-delegation-child.md",
+        "bytes": 1711,
+        "sha256": "c06aa9f7e2307e564bbc64394984b34c3538b7ea59ed3221d0f7e842efed740b",
+        "approved_key": "after.child_charter"
+      },
+      {
+        "path": "crates/rovai-core/resources/charter-rovai-single-chat-delegation.md",
+        "bytes": 3400,
+        "sha256": "167fc48009154eccd1707bc6151b39a627ade486b2f9ce90d51eae0193c63170",
+        "approved_key": "after.single_chat_charter_enabled"
+      },
+      {
+        "path": "crates/rovai-core/resources/delegation-resume.txt",
+        "bytes": 357,
+        "sha256": "50a1e7821404fd15d0f31b4fce5a725e44bc89cb24ebb3ae6b674c55188dd150",
+        "approved_key": "after.resume_message"
+      }
+    ],
+    "first_failures": [
+      "Context owners were not in extended-tests. Nonzero-list guard stopped execution; rebuilt with slow-tests and ran exact owners. No zero-test pass claimed.",
+      "Strict parent Charter comparison exposed Windows CRLF in newly extracted resources. Wrote exact approved LF bytes without weakening assertions; final two Bootstrap owners passed."
+    ],
+    "phase_checks": {
+      "scope": "passed; 81/48/324/21 unchanged; no new complete formal case",
+      "source_protocol": "passed; 161 canonical operations /10HTTP/6migration design; no live Host",
+      "version": "passed v1.73/173 version directories",
+      "governance": "passed with explicit807da baseline",
+      "docs_tests": "10 passed /0 failed",
+      "rustfmt": "passed workspace check; no build",
+      "diff": "passed",
+      "codegraph": "explicit existing-index sync passed, already up to date"
+    }
+  },
+  "explicit_limits": [
+    "No complete 160/210 startup classifier, old-source upgrade or receipt; current actual data remains159/209.",
+    "New-profile codecs and pure Bootstrap projections are component evidence. No actual child Runtime, final35 Blob/Manifest, frozen delivery replay, authenticated tools or cancellation/resume/takeover qualification.",
+    "Native Runtime skill/MCP directory filtering and actual custom Runtime display-name resolution still require integration; child fixed identity is not a parent AgentProfile.",
+    "SingleChat policy3 is selected only under the dormant full-contract gate; complete SQL shape and gateway policy3 support remain pending.",
+    "Default Core admission equality, legacy SingleChat materialization and actual Scheduler rebind passed; the new role rebind branch still needs full candidate execution evidence."
+  ],
+  "remaining": [
+    "Implement actual format35 Dynamic Context, final Blob/Manifest persistence and frozen replay; precise child material ownership and native skill/MCP filtering",
+    "Complete full schema160/migration210 shape classification, supported old sources and both atomic upgrade chains, then enable admission",
+    "Wire authenticated User Command/receipts/events, model six operations/CLI/aliases, real target Runtime and Scheduler/Fleet lifecycle",
+    "Keep both Codeg viewers, User-only native-session reading/background observation, and I04-T02/T03/T04 remaining work"
+  ],
+  "scope": {
+    "source_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_clusters": 21,
+    "i04_formal_cases": 84,
+    "new_fully_passed_formal_cases": 0
+  },
+  "no_push": true,
+  "no_actions": true,
+  "real_runtime_calls": 0,
+  "real_model_calls": 0,
+  "real_model_budget": 0,
+  "no_main_merge_or_release": true,
+  "source_files": [
+    {
+      "path": "crates/rovai-core/src/collaboration.rs",
+      "sha256": "67cee7460cb1391588630a8f4ac80db81fda9e604db80c76aa06b13623a1c010"
+    },
+    {
+      "path": "crates/rovai-core/src/context.rs",
+      "sha256": "cd2a3444f908d5ca636c7957d4aa347177a5af16103823fe7491f44076a70393"
+    },
+    {
+      "path": "crates/rovai-core/src/context_contract.rs",
+      "sha256": "63d76e9074fbfd55b078a250fbe5b25932fb71a7f5d232e99b52f6aa64b62150"
+    },
+    {
+      "path": "crates/rovai-core/src/context_delivery.rs",
+      "sha256": "3526d94bb25cab528a8e1a0a377abeae99d80c8019abf64afdb081d97b04a898"
+    },
+    {
+      "path": "crates/rovai-core/src/delegation_policy.rs",
+      "sha256": "9cb4a2021c8341a09bf1b74e807c8cff5b169556cb0e57a65d375b4a48dd33de"
+    },
+    {
+      "path": "crates/rovai-core/src/delivery_queue.rs",
+      "sha256": "9e4698480b413b6fca7e18fe9469f487f19c5980011c3f4ae9939deef40777b6"
+    },
+    {
+      "path": "crates/rovai-core/src/lib.rs",
+      "sha256": "0184f88b11d1103f1e0e1549eac298e80b0af5b5efee50761df4aff9120ec491"
+    },
+    {
+      "path": "crates/rovai-core/src/message_delivery.rs",
+      "sha256": "548262b11da53db5953aa58fd265a851ad0a10fd3273682c1d568b1abd86015b"
+    },
+    {
+      "path": "crates/rovai-core/src/runtime.rs",
+      "sha256": "5ec155039f257bfa3a9ed2f3134f87d4158e30a05d803c793a363928e2a4230a"
+    },
+    {
+      "path": "crates/rovai-core/src/single_chat.rs",
+      "sha256": "b5a77dfaff5e4137bf83d1cca3df5bc9d7b2f70a4ceaa092682faa9881113078"
+    },
+    {
+      "path": "crates/rovai-core/resources/charter-rovai-delegation-parent.md",
+      "sha256": "04c8fe02ecfc0462a2d72640a52202deefc990937f4b89f87de5faed4ede3318"
+    },
+    {
+      "path": "crates/rovai-core/resources/charter-rovai-delegation-child.md",
+      "sha256": "c06aa9f7e2307e564bbc64394984b34c3538b7ea59ed3221d0f7e842efed740b"
+    },
+    {
+      "path": "crates/rovai-core/resources/charter-rovai-single-chat-delegation.md",
+      "sha256": "167fc48009154eccd1707bc6151b39a627ade486b2f9ce90d51eae0193c63170"
+    },
+    {
+      "path": "crates/rovai-core/resources/delegation-resume.txt",
+      "sha256": "50a1e7821404fd15d0f31b4fce5a725e44bc89cb24ebb3ae6b674c55188dd150"
+    }
+  ],
+  "local_logs": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-bootstrap-1-final.log",
+      "sha256": "4295cd10c070a654347238f3800d70d082898fefdeca12e795af2b5d483a0d08"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-bootstrap-1-list-final.log",
+      "sha256": "edd475714e1271f9aa1c7edad485e8aefe927ec9f3e5f5ae01fb25247a4a863e"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-bootstrap-1-list.log",
+      "sha256": "edd475714e1271f9aa1c7edad485e8aefe927ec9f3e5f5ae01fb25247a4a863e"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-bootstrap-1.log",
+      "sha256": "58f56d155c3c9595647b404ad05ede30b9a3436edf51471d7344d1617b199ef0"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-bootstrap-2-final.log",
+      "sha256": "3f363e400497d7dd092453b7e0df7593c1f283956906b3500f8c53e2ba91d5a4"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-bootstrap-2-list-final.log",
+      "sha256": "8d7c39b86e00e4e7eee958d5210fe31c3224cf0ebf2bba69b1e95c305acee56d"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-codegraph.log",
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-diff-final.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-diff.log",
+      "sha256": "7c39fd86b45a8fe8a79efbcb5504087652695442e7fe003937cd8d999eef2bbf"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-doc-governance-final.log",
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-doc-governance.log",
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-doc-tests.log",
+      "sha256": "09332e4e74fe96f2ea1406e060a66601c15480d0db3ad4ff2c637713753fcba9"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-doc-version.log",
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-list-final.log",
+      "sha256": "21e0be5a1df51a41f27997292b9c6a4044be500652ba66f9ddcb27572008d90e"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-list-initial.log",
+      "sha256": "da47727f1c6a0f97d3bc3866a3de38f94bc4c00c1970339fc29211b487949951"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-owner-1-list.log",
+      "sha256": "0c4fd217c8e5862a54f9a1b076251edeadc92994a11b8fbaf6fb47985790f90d"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-owner-1.log",
+      "sha256": "ccef0905245034f0501ab69bc7bcc4c27e52dcf0051483291bed203da5519a8f"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-owner-2-list.log",
+      "sha256": "5396f1327184211ac8ca4a1126b824cc795ee4af99a9aa44d4817ee9a7ccb086"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-owner-2.log",
+      "sha256": "99558e54e459a4931acf010cb8b5f174e33296f4b3e38a2a0d5ee741cf38553f"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-owner-3-list.log",
+      "sha256": "f4251778e55cb2f5f09fcf83932f99232421b9f721b904346c600540528b6cbe"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-owner-3.log",
+      "sha256": "089e2aa628e87a7d0f7fb53ed8fee17bd97647e5188a6e5effd9f6132ce2a332"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-protocol.log",
+      "sha256": "044569df112d191be31ea876439bd2bd3294beb8d9fa469452c1bcc1ea893695"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-runtime_rebind_allows_default_version_drift_but_not_logical_identity_changes.log",
+      "sha256": "a81c9fba270db225753d463aede34f0cd6d5bdae2af7fe06503786aac8e6f1fe"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-scheduler_rebinds_one_compatible_runtime_drift_and_preserves_initial_audit.log",
+      "sha256": "1ad6c39fa6d68d95202e4bc186a7edf174d8098a19c02c08eaa58dfca3e42a26"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-scope.log",
+      "sha256": "899dab604ac7f85562aab489b6c0f0730065bba54b60543d95ce3bcc2cd9765a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-slow-list-final.log",
+      "sha256": "920775ad005e0fc6b0df60d20b088fa38bb8272bd6e036477a3ed50f57c1686e"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-policy-slow-list.log",
+      "sha256": "e56974f94332db8e44b3f29a4b7a714ba623474754fd8a4ebb59a99d848496dc"
+    }
+  ]
+}
