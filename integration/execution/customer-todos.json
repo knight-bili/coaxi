@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "date": "2026-10-16",
+  "date": "2026-10-17",
   "policy": "用户在I12前只做方案审核与无法自行解决的环境协助；工程验证由Codex执行，最终用户软件使用验收在I12工程完成后。",
   "items": [
     {
@@ -142,6 +142,30 @@
         "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I03_私聊材料隔离_r1\\final\\I03_私聊材料怎么分开用_客户确认版_r1.pdf"
       ],
       "software_workaround": "r1已确认，按阶段批量验证规则继续本地实现；真实模型身份/预算与设备仍另补，不自动付费"
+    },
+    {
+      "id": "INPUT-I04-DELEGATION-R1",
+      "required_for": "I04-T01新增委派模型工具、输入及关联Schema实施，不阻塞其他I04任务",
+      "need": "阅读I04独立帮手r1完整方案后明确确认该revision；属于方案审核，不是工程测试或阶段客户验收。",
+      "status": "pending_specific_revision_confirmation",
+      "revision": 1,
+      "artifact_id": "I04-NATIVE-DELEGATION-R1",
+      "evidence": "integration/execution/i04-delegation-proposal-result.json",
+      "artifacts": [
+        {
+          "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+          "bytes": 67619,
+          "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+        },
+        {
+          "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+          "bytes": 809962,
+          "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+        }
+      ],
+      "rule": "docs/development/model-context-change-governance.md:49-56",
+      "software_workaround": "只暂缓新委派模型语义和Schema；继续原生内置子代理只读观察、Runtime兼容、现有执行恢复、记忆和自动化。",
+      "scope": "不包括付费模型、main合入、正式发布；用户不承担D01-D32或324场景执行。"
     }
   ]
 }

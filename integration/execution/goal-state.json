@@ -14,7 +14,7 @@
   "current_branch": "phase/i04-collaboration-runtime",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I04-T01",
-  "current_slice": "I04-T04 单次定时运行停止已完成本地实现和原版 UI 对照；Core 自动化9项、相关TS43项、浏览器6项通过。Linux旧准入检查助手两项失败已本地修复，远程复测汇集到阶段批次；继续独立原生子会话设计及其他I04任务。",
+  "current_slice": "独立帮手具体r1、完整模型输入前后、Core/API/Schema/恢复/接管/原UI移植及验证计划已自审并交付21页Word/PDF，待该revision确认；继续原生内置子代理的只读证据回接和I04独立任务，未实施新模型语义。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "I04父子/委派来源主干已映射，继续Core持久身份、约束、API与恢复具体设计；新模型输入需具体revision确认，独立开发并行推进。",
+    "I04独立帮手r1具体方案已完成，按模型输入治理等对应revision确认后实施；等待仅限新语义分支，继续Runtime原生内置子代理只读证据/查看器和其余I04任务。",
     "按I04原四工作包与84正式场景推进：协作全流程、21种Runtime并集、执行恢复、记忆和自动化；普通实现自行推进，模型输入语义变化仍遵守已确认revision。",
     "I03平台及尺寸诊断按独立编号保留，不重新打开已通过的本机清单。阶段集中push/必要Actions，等待期间继续独立编码。",
     "I02其余SP场景保留：依现行Accepted Input Recovery v8区分未发送、明确拒绝、已接受和未知，不预设所有Core硬重启都自动重放；冻结之后的发送前窗口需找真实边界验证。",
@@ -42,7 +42,7 @@
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "i04_t04_single_stop_locally_verified_t01_delegation_design_pending",
+  "current_slice_status": "i04_delegation_revision_ready_pending_confirmation_independent_work_continues",
   "evidence": "i02-navigation-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -58,7 +58,7 @@
   "skill_catalog_evidence": "i02-skill-catalog-result.json",
   "skill_install_evidence": "i02-skill-install-result.json",
   "system_goal_status": "active",
-  "system_goal_verified_at": "2026-10-17T02:54:37.773588+00:00",
+  "system_goal_verified_at": "2026-10-17T03:35:34.833607+00:00",
   "skill_members_evidence": "i02-skill-members-result.json",
   "canvas_boards_evidence": "i03-canvas-boards-result.json",
   "skill_delivery_preparation_evidence": "i02-skill-delivery-preparation-result.json",
@@ -117,7 +117,7 @@
     "source_progress_continued": true
   },
   "project_groups_evidence": "i03-project-groups-result.json",
-  "checked_at": "2026-10-17T02:54:37.773588+00:00",
+  "checked_at": "2026-10-17T03:35:34.833607+00:00",
   "project_layout_evidence": "i03-project-layout-result.json",
   "project_tree_evidence": "i03-project-tree-result.json",
   "navigation_activity_evidence": "i03-navigation-activity-result.json",
@@ -247,5 +247,6 @@
   "i04_source_evidence": "i04-collaboration-source-result.json",
   "i04_world_map_evidence": "i04-world-map-batch-result.json",
   "i03_platform_batch_result": "i03-stage-platform-followup-20261017.json",
-  "i04_automation_run_stop_evidence": "i04-automation-run-stop-result.json"
+  "i04_automation_run_stop_evidence": "i04-automation-run-stop-result.json",
+  "i04_delegation_proposal_evidence": "i04-delegation-proposal-result.json"
 }
