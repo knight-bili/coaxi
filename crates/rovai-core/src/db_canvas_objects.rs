@@ -126,6 +126,7 @@ pub(super) fn verify_fixture(database: &mut Database) {
         .unwrap();
     migrate(database).unwrap();
     super::canvas_files::migrate(database).unwrap();
+    super::automation_run_control::migrate(database).unwrap();
     assert!(connection_has_current_data_contract(database.connection()).unwrap());
     assert_eq!(rows(database.connection()), before);
     let tx = database.connection().unchecked_transaction().unwrap();

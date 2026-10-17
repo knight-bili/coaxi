@@ -353,7 +353,7 @@
     "url": "https://github.com/spacering-net/codeg/blob/aff1e6c278453ed8d0b96a5f664edcdca621aa3f/src-tauri/src/commands/automation.rs#L198",
     "phase": "I04",
     "scope": "一期必须",
-    "implementation_status": "not_started",
+    "implementation_status": "in_progress",
     "acceptance_status": "not_run",
     "source_sha256": "99c416cb2c1c97c7324109743752edba74d45018b6a5f52bc37b9f490233d7e4",
     "primary_work_packages": [
@@ -2329,7 +2329,7 @@
     "url": "https://github.com/murray17/rovai-ai/blob/cc465dda562536b94f23787759e3206324baa29e/crates/rovai-core/src/automation.rs#L541",
     "phase": "I04",
     "scope": "一期必须",
-    "implementation_status": "not_started",
+    "implementation_status": "in_progress",
     "acceptance_status": "not_run",
     "source_sha256": "cdfbb29ae6b9dcd9791fcd4b74641a2dbe8d3320e0faf8534588036459de4bbc",
     "primary_work_packages": [

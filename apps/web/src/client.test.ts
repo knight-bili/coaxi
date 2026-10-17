@@ -477,7 +477,7 @@ describe('tab session recovery', () => {
     }
   })
   it('restores unknown command identities and only reconciles on startup; explicit retry reuses exact payload', async () => {
-    for (const operation of ['thread.messages.send', 'canvas.boards.create', 'canvas.boards.update', 'canvas.boards.delete', 'canvas.nodes.apply'] as const) {
+    for (const operation of ['thread.messages.send', 'canvas.boards.create', 'canvas.boards.update', 'canvas.boards.delete', 'canvas.nodes.apply', 'automations.cancelRun'] as const) {
       const storage = memory()
       let recorded = false
       const dispatches: unknown[] = []
@@ -493,6 +493,7 @@ describe('tab session recovery', () => {
       const params = operation === 'thread.messages.send'
         ? { commandId: newCommandId(), threadId: 'original', draftRevision: 7 }
         : { commandId: newCommandId(), command: operation === 'canvas.boards.create' ? { name: '原画板' }
+          : operation === 'automations.cancelRun' ? { automationId: 'original-definition', runId: 'original-occurrence' }
           : operation === 'canvas.nodes.apply' ? { boardId: 'original', expectedRevision: 7, mutation: { type: 'move', moves: [{ nodeId: 'node', x: 12, y: 24 }] } }
             : { boardId: 'original', expectedRevision: 7 } }
       void first.request(operation, params).catch(() => undefined)

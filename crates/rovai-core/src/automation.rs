@@ -237,6 +237,18 @@ impl DomainCommand for RunAutomationCommand {
     const TYPE: &'static str = "automation.run";
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct CancelAutomationRunCommand {
+    pub automation_id: String,
+    pub run_id: String,
+}
+
+impl sealed::Sealed for CancelAutomationRunCommand {}
+impl DomainCommand for CancelAutomationRunCommand {
+    const TYPE: &'static str = "automation.run.cancel";
+}
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct AutomationListQuery {
@@ -877,6 +889,95 @@ impl AutomationService {
                 Some(entity("automation_run", &occurrence.run_id)),
             ))
         })
+    }
+
+    /// Stop one immutable occurrence, never the definition's newest run or an
+    /// unrelated Run subsequently created in its Camp. Runtime cleanup remains
+    /// separately acknowledged through the existing cancellation supervisor.
+    pub fn cancel_run(
+        &self,
+        database: &mut Database,
+        envelope: &CommandEnvelope<CancelAutomationRunCommand>,
+    ) -> Result<CommandExecution> {
+        let command = &envelope.payload;
+        let mut cancelled_runs = Vec::new();
+        let execution = self.gateway.execute(database, envelope, |transaction| {
+            if !matches!(envelope.actor, ActorRef::User { .. }) {
+                return Ok(rejected(
+                    "automation.cancel_user_required",
+                    "Only a User can stop an Automation occurrence",
+                ));
+            }
+            let owner: Option<Option<String>> = transaction.query_row(
+                "SELECT camp_id FROM automation_run WHERE id = ?1 AND automation_id = ?2",
+                params![command.run_id, command.automation_id],
+                |row| row.get(0),
+            ).optional()?;
+            let Some(camp_id) = owner else {
+                return Ok(rejected("automation.run_not_found", "Automation occurrence does not exist"));
+            };
+            let mut state = load_run_state(transaction, &command.run_id)?
+                .context("Automation occurrence is unavailable")?;
+            let now = Utc::now();
+            if matches!(state.status.as_str(), "running" | "cancelling") {
+                // Reconcile an already committed terminal result first. A late
+                // click must not replace a completed result with cancellation.
+                if let Some(turn_id) = state.camp_turn_id.as_deref() {
+                    let terminal: bool = transaction.query_row(
+                        "SELECT status IN ('completed', 'failed', 'cancelled') FROM camp_turn WHERE id = ?1",
+                        [turn_id], |row| row.get(0),
+                    )?;
+                    if terminal { settle_terminal_turn_in_tx(transaction, &state, now)?; }
+                } else {
+                    let settled = settle_delivery_occurrence_in_tx(transaction, &state, now)?;
+                    if let Some(run_id) = settled.cancelled_agent_run_id { cancelled_runs.push(run_id); }
+                }
+                state = load_run_state(transaction, &command.run_id)?
+                    .context("Automation occurrence is unavailable")?;
+            }
+            let stopping = matches!(state.status.as_str(), "running" | "cancelling");
+            if stopping {
+                let reason = "user_requested_automation_stop";
+                let now_text = timestamp(now);
+                if let Some(turn_id) = state.camp_turn_id.as_deref() {
+                    let settlement = cancel_automation_camp_turn_in_tx(
+                        transaction, &state.id, turn_id, reason, &now_text,
+                    )?;
+                    cancelled_runs.extend(settlement.runs.into_iter().map(|run| run.agent_run_id));
+                } else {
+                    let delivery_id = state.trigger_delivery_id.as_deref()
+                        .context("Automation occurrence has no execution route")?;
+                    let claimed: Option<String> = transaction.query_row(
+                        "SELECT claimed_agent_run_id FROM camp_message_delivery WHERE id = ?1",
+                        [delivery_id], |row| row.get(0),
+                    )?;
+                    if let Some(run_id) = claimed {
+                        settle_abortive_agent_run_in_tx(transaction, &run_id, reason, &envelope.actor, &now_text)?;
+                        cancelled_runs.push(run_id);
+                    } else {
+                        transaction.execute(
+                            "UPDATE camp_message_delivery SET status = 'cancelled', failure_code = ?2,
+                             ended_at = ?3, version = version + 1, updated_at = ?3
+                             WHERE id = ?1 AND status = 'waiting'",
+                            params![delivery_id, reason, now_text],
+                        )?;
+                    }
+                }
+                finalize_run_in_tx(transaction, &state, "failed", Some(reason), None, now)?;
+            }
+            let (status, reason): (String, Option<String>) = transaction.query_row(
+                "SELECT status, reason FROM automation_run WHERE id = ?1",
+                [&state.id], |row| Ok((row.get(0)?, row.get(1)?)),
+            )?;
+            Ok(CommandHandlerResult::applied(
+                if stopping { "automation.run_cancelled" } else { "automation.run_already_terminal" },
+                json!({ "automationId": command.automation_id, "runId": command.run_id,
+                    "threadId": camp_id, "status": status, "reason": reason }),
+                Some(entity("automation_run", &state.id)),
+            ))
+        })?;
+        pump_targets_after_runs_terminal(database, &cancelled_runs)?;
+        Ok(execution)
     }
 
     pub fn get(&self, database: &Database, automation_id: &str) -> Result<Option<AutomationView>> {
@@ -2001,6 +2102,9 @@ fn finalize_run_in_tx(
 }
 
 fn failure_notification_body(reason: &str) -> String {
+    if reason == "user_requested_automation_stop" {
+        return "Rovai 定时任务的本次运行已由用户停止，执行记录已保留。".to_string();
+    }
     let detail = match reason {
         "interaction_required" => "运行需要用户输入或权限审批，已停止",
         "timeout" => "运行超出后台时限，已停止",
@@ -3182,12 +3286,149 @@ mod tests {
                 .list_runs(
                     &database,
                     &AutomationRunListQuery {
-                        automation_id,
+                        automation_id: automation_id.clone(),
                         cursor: None,
                         limit: 0,
                     }
                 )
                 .is_err()
+        );
+
+        crate::db::verify_automation_stop_migration_fixture(&mut database);
+
+        let waiting = service
+            .run_now(
+                &mut database,
+                &user_command(
+                    "manual-stop-waiting",
+                    RunAutomationCommand {
+                        automation_id: automation_id.clone(),
+                    },
+                ),
+                CURRENT_USER_ID,
+                &quick_chat_path,
+            )
+            .unwrap();
+        let waiting_id = waiting.result.payload["runId"]
+            .as_str()
+            .unwrap()
+            .to_string();
+        let stop = user_command(
+            "manual-stop-command",
+            CancelAutomationRunCommand {
+                automation_id: automation_id.clone(),
+                run_id: waiting_id.clone(),
+            },
+        );
+        let mut forbidden = stop.clone();
+        forbidden.command_id = "manual-stop-system".into();
+        forbidden.actor = ActorRef::System {
+            component_id: "test".into(),
+        };
+        assert_eq!(
+            service
+                .cancel_run(&mut database, &forbidden)
+                .unwrap()
+                .result
+                .code,
+            "automation.cancel_user_required"
+        );
+        let wrong_owner = user_command(
+            "manual-stop-wrong-owner",
+            CancelAutomationRunCommand {
+                automation_id: "another-definition".into(),
+                run_id: waiting_id.clone(),
+            },
+        );
+        assert_eq!(
+            service
+                .cancel_run(&mut database, &wrong_owner)
+                .unwrap()
+                .result
+                .code,
+            "automation.run_not_found"
+        );
+        let stopped = service.cancel_run(&mut database, &stop).unwrap();
+        assert_eq!(stopped.result.code, "automation.run_cancelled");
+        assert_eq!(
+            stopped.result.payload["reason"],
+            "user_requested_automation_stop"
+        );
+        let delivery_state: String = database.connection().query_row(
+            "SELECT delivery.status FROM automation_run occurrence JOIN camp_message_delivery delivery ON delivery.id=occurrence.trigger_delivery_id WHERE occurrence.id=?1",
+            [&waiting_id], |row| row.get(0),
+        ).unwrap();
+        assert_eq!(delivery_state, "cancelled");
+        let replay = service.cancel_run(&mut database, &stop).unwrap();
+        assert!(replay.replayed);
+        assert_eq!(replay.result, stopped.result);
+
+        let active = service
+            .run_now(
+                &mut database,
+                &user_command(
+                    "manual-stop-next",
+                    RunAutomationCommand {
+                        automation_id: automation_id.clone(),
+                    },
+                ),
+                CURRENT_USER_ID,
+                &quick_chat_path,
+            )
+            .unwrap();
+        let active_id = active.result.payload["runId"].as_str().unwrap().to_string();
+        crate::delivery_queue::claim_waiting_delivery_batches(&mut database, 100).unwrap();
+        let active_run: String = database.connection().query_row(
+            "SELECT delivery.claimed_agent_run_id FROM automation_run occurrence JOIN camp_message_delivery delivery ON delivery.id=occurrence.trigger_delivery_id WHERE occurrence.id=?1",
+            [&active_id], |row| row.get(0),
+        ).unwrap();
+        let late = user_command("manual-stop-late", stop.payload.clone());
+        assert_eq!(
+            service
+                .cancel_run(&mut database, &late)
+                .unwrap()
+                .result
+                .code,
+            "automation.run_already_terminal"
+        );
+        let active_state: String = database
+            .connection()
+            .query_row(
+                "SELECT status FROM agent_run WHERE id=?1",
+                [&active_run],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert!(!matches!(
+            active_state.as_str(),
+            "succeeded" | "failed" | "cancelled"
+        ));
+        service
+            .cancel_run(
+                &mut database,
+                &user_command(
+                    "manual-stop-active",
+                    CancelAutomationRunCommand {
+                        automation_id: automation_id.clone(),
+                        run_id: active_id,
+                    },
+                ),
+            )
+            .unwrap();
+        let cancelled: String = database
+            .connection()
+            .query_row(
+                "SELECT status FROM agent_run WHERE id=?1",
+                [&active_run],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(cancelled, "cancelled");
+        assert!(
+            serde_json::from_value::<CancelAutomationRunCommand>(
+                json!({"automationId":"a","runId":"b","agentRunId":"forged"})
+            )
+            .is_err()
         );
 
         remove_test_database(database, directory);

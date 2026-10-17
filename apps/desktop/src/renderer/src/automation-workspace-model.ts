@@ -165,6 +165,9 @@ export function dateTimeLabel(value: string | null): string {
 
 export function runStatus(run: AutomationRunSummary | null): { label: string; tone: string; detail: string | null } {
   if (!run) return { label: uiAttribute('尚未运行'), tone: 'idle', detail: null }
+  if (run.status === 'failed' && run.reason === 'user_requested_automation_stop') {
+    return { label: uiAttribute('已停止'), tone: 'idle', detail: uiAttribute('本次运行已由用户停止，执行记录已保留。') }
+  }
   if (run.status === 'completed' && ['failed', 'partial'].includes(run.notificationStatus)) {
     return { label: uiAttribute('运行成功 · 通知失败'), tone: 'attention', detail: uiAttribute('任务结果已保留，可在运行对话中查看。') }
   }

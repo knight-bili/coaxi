@@ -1,7 +1,8 @@
 import { useThreadClient } from './camp-client'
 import { useCallback, useEffect, useId, useRef, useState, type Dispatch, type SetStateAction } from 'react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import type { AgentProfile, AutomationRunListPage, AutomationRunSummary, AutomationView, ChannelSettingsSnapshot, ProjectNavigationGroup } from '@contracts'
+import type { AgentProfile, AutomationRunListPage, AutomationRunSummary, AutomationView, ChannelSettingsSnapshot, ProjectNavigationGroup, StoredCommandResult } from '@contracts'
+import { newCommandId } from '../../shared/command-id'
 import { MemberAvatar } from './MemberAvatar'
 import { AutomationGlyph, type AutomationIcon } from './AutomationControls'
 import { dateTimeLabel, projectValue, projectFromValue, runStatus, scheduleKinds, scheduleWithKind, weekdays, type AutomationDraft } from './automation-workspace-model'
@@ -44,6 +45,9 @@ function RunHistory({ automation, onOpenThread }: { automation: AutomationView; 
   const [cursor, setCursor] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [stoppingRunId, setStoppingRunId] = useState<string | null>(null)
+  const [stopError, setStopError] = useState<{ runId: string; message: string } | null>(null)
+  const stopRequests = useRef(new Map<string, { commandId: string; command: { automationId: string; runId: string } }>())
   const generation = useRef(0)
   const runsRef = useRef(runs)
   const loadingRef = useRef(false)
@@ -77,6 +81,26 @@ function RunHistory({ automation, onOpenThread }: { automation: AutomationView; 
       if (request === generation.current) { loadingRef.current = false; setLoading(false) }
     }
   }, [client, automation.automationId])
+  const stop = async (run: AutomationRunSummary): Promise<void> => {
+    if (stoppingRunId) return
+    const params = stopRequests.current.get(run.runId) ?? {
+      commandId: newCommandId(), command: { automationId: automation.automationId, runId: run.runId }
+    }
+    // Preserve the original identity when a reply is lost. A retry must never
+    // resolve "the latest run" or create a different cancellation request.
+    stopRequests.current.set(run.runId, params)
+    setStoppingRunId(run.runId)
+    setStopError(null)
+    try {
+      const result = await client.request<StoredCommandResult>('automations.cancelRun', params)
+      if (result.status === 'rejected') throw new Error(typeof result.payload.message === 'string' ? result.payload.message : result.code)
+      await load()
+    } catch (nextError) {
+      setStopError({ runId: run.runId, message: readErrorMessage(nextError) })
+    } finally {
+      setStoppingRunId(null)
+    }
+  }
   useEffect(() => {
     void load()
     const interval = window.setInterval(() => void load(), 5_000)
@@ -98,10 +122,13 @@ function RunHistory({ automation, onOpenThread }: { automation: AutomationView; 
     <div aria-busy={loading}>
       {runs.map((run) => {
         const state = runStatus(run)
-        const icon: AutomationIcon = run.status === 'completed' ? 'check' : run.status === 'failed' ? 'failed' : run.status === 'skipped' ? 'skip' : 'clock'
-        return <button key={run.runId} className={`automation-history-row ${state.tone}`} type="button" disabled={!run.threadId} onClick={() => { if (run.threadId) onOpenThread(run.threadId) }} title={state.detail ?? state.label} aria-label={`${state.label}${uiAttribute('，')}${dateTimeLabel(run.createdAt)}${run.threadId ? uiAttribute("，打开执行对话") : ''}`}>
+        const stopped = run.status === 'failed' && run.reason === 'user_requested_automation_stop'
+        const icon: AutomationIcon = stopped ? 'close' : run.status === 'completed' ? 'check' : run.status === 'failed' ? 'failed' : run.status === 'skipped' ? 'skip' : 'clock'
+        return <div key={run.runId} className="automation-history-entry"><div className="automation-history-actions"><button className={`automation-history-row ${state.tone}`} type="button" disabled={!run.threadId} onClick={() => { if (run.threadId) onOpenThread(run.threadId) }} title={state.detail ?? state.label} aria-label={`${state.label}${uiAttribute('，')}${dateTimeLabel(run.createdAt)}${run.threadId ? uiAttribute("，打开执行对话") : ''}`}>
           <AutomationGlyph name={icon} /><span><time dateTime={run.createdAt}>{dateTimeLabel(run.createdAt)}</time><small>{state.detail ?? state.label}</small></span><span className="automation-history-state">{state.label}</span>{run.threadId && <span className="automation-history-open"><AutomationGlyph name="chat" /></span>}
-        </button>
+        </button>{run.status === 'running' && <button className="icon-button automation-history-stop" type="button" disabled={stoppingRunId !== null} onClick={() => void stop(run)} title={uiAttribute('停止本次运行')} aria-label={uiAttribute('停止本次运行')} aria-busy={stoppingRunId === run.runId}><AutomationGlyph name="close" /></button>}</div>
+          {stopError?.runId === run.runId && <p className="automation-history-error" role="alert">{stopError.message}</p>}
+        </div>
       })}
     </div>
     {error && <div className="automation-history-error" role="alert"><span>{error}</span><button type="button" className="quiet-button compact" onClick={() => void load()}><UiText zh={"重试读取"} /></button></div>}

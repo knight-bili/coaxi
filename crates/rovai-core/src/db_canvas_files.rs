@@ -49,7 +49,7 @@ pub(super) fn migrate(database: &mut Database) -> Result<()> {
         UPDATE rovai_data_contract SET projection_schema_version=158,updated_at=datetime('now') WHERE singleton=1;")?;
     validate_migration_foreign_keys(&tx, &["canvas_node_file_reference"])?;
     anyhow::ensure!(
-        matches!(classify_database_contract(&tx)?,DatabaseContractClassification::Current(ref marker) if marker.projection_schema_version==158),
+        matches!(classify_database_contract(&tx)?,DatabaseContractClassification::Current(ref marker) | DatabaseContractClassification::SupportedMigrationSource(ref marker) if marker.projection_schema_version==158),
         "Canvas file admission failed"
     );
     tx.commit()?;
@@ -57,6 +57,7 @@ pub(super) fn migrate(database: &mut Database) -> Result<()> {
 }
 #[cfg(test)]
 pub(super) fn downgrade_for_test(connection: &Connection) {
+    super::automation_run_control::downgrade_for_test(connection);
     if !connection
         .table_exists(None, "canvas_node_file_reference")
         .unwrap()
@@ -106,6 +107,7 @@ pub(super) fn verify_fixture(database: &mut Database) {
         .execute_batch("DROP TRIGGER reject_canvas_file_migration;")
         .unwrap();
     migrate(database).unwrap();
+    super::automation_run_control::migrate(database).unwrap();
     assert!(connection_has_current_data_contract(database.connection()).unwrap());
     assert_eq!(count(database.connection()), before);
     let tx = database.connection().unchecked_transaction().unwrap();

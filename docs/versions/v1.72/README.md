@@ -11,6 +11,13 @@ last_updated: 2026-10-13
 
 # Rovai-ai v1.72：Lark 独立渠道
 
+## 融合定时任务单次停止（2026-10-17）
+
+I04-T04 补齐 Codeg 原运行历史的单次停止入口，复用原 Rovai 页面和 Core 精确取消链。
+用户命令、原 occurrence 归属、迟到/回执和 Schema159/Migration209 见
+[Automation Run Control v1](../../contracts/automation-run-control-v1.md)。不新增 Agent CLI 工具、不改模型输入合同；
+本地工程证据与实际 Host/Runtime 尚待边界见融合执行记录，不能把页面内存夹具作为全平台通过。
+
 ## 融合画布私聊材料隔离 r1（2026-10-15）
 
 客户阅读16页说明后明确回复“确认，按私聊材料隔离 r1 实施”。

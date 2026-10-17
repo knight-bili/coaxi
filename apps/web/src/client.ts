@@ -120,6 +120,7 @@ export const WEB_OPERATIONS = [
   'automations.close',
   'automations.delete',
   'automations.run',
+  'automations.cancelRun',
   'app.info',
   'navigation.snapshot',
   'navigation.activity',
@@ -244,6 +245,7 @@ const RECONCILABLE_COMMANDS = new Set<WebOperation>([
   'automations.close',
   'automations.delete',
   'automations.run',
+  'automations.cancelRun',
 
   'thread.messages.send', 'thread.messages.withdraw', 'action.approvals.resolve', 'agentRuns.cancel', 'agentRuns.continue',
   'threads.create', 'threads.changeDefaultLead', 'threads.members.add', 'threads.members.remove',

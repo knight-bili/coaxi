@@ -6146,7 +6146,7 @@ pub(crate) fn cancel_automation_camp_turn_in_tx(
 ) -> Result<AbortiveTurnSettlement> {
     if !matches!(
         reason_code,
-        "interaction_required" | "timeout" | "interrupted"
+        "interaction_required" | "timeout" | "interrupted" | "user_requested_automation_stop"
     ) {
         anyhow::bail!("Automation cancellation reason is not allowed");
     }

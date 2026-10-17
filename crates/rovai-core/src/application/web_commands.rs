@@ -145,6 +145,7 @@ pub(super) fn reconcile(
         "automations.close" => user!(CloseAutomationCommand),
         "automations.delete" => user!(DeleteAutomationCommand),
         "automations.run" => user!(RunAutomationCommand),
+        "automations.cancelRun" => user!(CancelAutomationRunCommand),
         "tasks.create" => {
             let params: CreateTaskParams = serde_json::from_value(query.params)?;
             receipt(

@@ -1,5 +1,7 @@
 #[path = "db_attachment_paths.rs"]
 mod attachment_paths;
+#[path = "db_automation_run_control.rs"]
+mod automation_run_control;
 #[path = "db_canvas_files.rs"]
 mod canvas_files;
 #[path = "db_canvas_objects.rs"]
@@ -45,6 +47,13 @@ pub(crate) fn upgrade_canvas_object_fixture(database: &mut Database) {
     if !database.schema_migration_applied(208).unwrap() {
         canvas_files::migrate(database).unwrap();
     }
+    if !database.schema_migration_applied(209).unwrap() {
+        automation_run_control::migrate(database).unwrap();
+    }
+}
+#[cfg(test)]
+pub(crate) fn verify_automation_stop_migration_fixture(database: &mut Database) {
+    automation_run_control::verify_fixture(database);
 }
 #[cfg(test)]
 pub(crate) fn verify_canvas_object_fixture(database: &mut Database) {
@@ -387,8 +396,8 @@ impl MainThreadMigrationSource {
 }
 
 pub(crate) const CURRENT_DATA_CONTRACT_VERSION: &str = "v1.72";
-pub(crate) const CURRENT_PROJECTION_SCHEMA_VERSION: i64 = 158;
-const CURRENT_SCHEMA_MIGRATION_VERSION: i64 = 208;
+pub(crate) const CURRENT_PROJECTION_SCHEMA_VERSION: i64 = 159;
+const CURRENT_SCHEMA_MIGRATION_VERSION: i64 = 209;
 const V147_MIGRATION_SOURCE_DATA_CONTRACT_VERSION: &str = "v1.54";
 const V147_MIGRATION_SOURCE_PROJECTION_SCHEMA_VERSION: i64 = 96;
 const V145_MIGRATION_SOURCE_DATA_CONTRACT_VERSION: &str = "v1.53";
@@ -2991,11 +3000,10 @@ fn connection_has_admissible_data_contract(connection: &Connection) -> rusqlite:
         .ok()
         .and_then(Option::as_ref)
         .is_some_and(|(contract, schema, _)| {
-            contract == CURRENT_DATA_CONTRACT_VERSION
-                && matches!(
-                    schema,
-                    145 | 146 | 147 | 148 | 149 | 150 | 151 | 152 | 153 | 154 | 155
-                )
+            // This legacy test/slow-check helper must use the production
+            // classifier for later fusion schemas too. The classifier, not a
+            // second list here, rejects future markers and missing current facts.
+            contract == CURRENT_DATA_CONTRACT_VERSION && *schema >= 145
         })
     {
         return Ok(matches!(
@@ -3404,11 +3412,12 @@ pub(crate) fn classify_database_contract(
     if marker.contract_version == CURRENT_DATA_CONTRACT_VERSION
         && matches!(
             marker.projection_schema_version,
-            145 | 146 | 147 | 148 | 149 | 150 | 151 | 152 | 153 | 154 | 155 | 156 | 157 | 158
+            145 | 146 | 147 | 148 | 149 | 150 | 151 | 152 | 153 | 154 | 155 | 156 | 157 | 158 | 159
         )
     {
         let expected_migration = match marker.projection_schema_version {
-            158 => CURRENT_SCHEMA_MIGRATION_VERSION,
+            159 => CURRENT_SCHEMA_MIGRATION_VERSION,
+            158 => 208,
             157 => 207,
             156 => 206,
             155 => 205,
@@ -3459,6 +3468,10 @@ pub(crate) fn classify_database_contract(
                 || private_source_observation::schema_matches(connection)?)
             && (marker.projection_schema_version < 158
                 || canvas_files::schema_matches(connection)?)
+            && (marker.projection_schema_version < 159
+                || automation_run_control::schema_matches(connection)?)
+            && (marker.projection_schema_version != 158
+                || automation_run_control::source_schema_matches(connection)?)
             && (marker.projection_schema_version != 157
                 || canvas_files::source_schema_matches(connection)?)
             && (marker.projection_schema_version < 157
@@ -9181,6 +9194,9 @@ impl Database {
             if !self.schema_migration_applied(208)? {
                 migration_step!("migration_208", canvas_files::migrate(self));
             }
+            if !self.schema_migration_applied(209)? {
+                migration_step!("migration_209", automation_run_control::migrate(self));
+            }
             if let Err(error) =
                 crate::notification::maintain_notification_episode_retention(self.connection())
             {
@@ -10023,6 +10039,9 @@ impl Database {
         }
         if !self.schema_migration_applied(208)? {
             migration_step!("migration_208", canvas_files::migrate(self));
+        }
+        if !self.schema_migration_applied(209)? {
+            migration_step!("migration_209", automation_run_control::migrate(self));
         }
         if let Err(error) =
             crate::notification::maintain_notification_episode_retention(self.connection())

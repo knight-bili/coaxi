@@ -8620,6 +8620,9 @@ html[lang="en"] .runtime-parameter-picker-menu:has(.permission-menu-guidance) { 
 .automation-create-actions { display: flex; width: 100%; align-items: center; justify-content: flex-end; gap: 16px; margin-top: 6px; }
 .automation-history { width: min(900px, 100%); margin-top: 30px; }
 .automation-history h2 { margin-bottom: 12px; }
+.automation-history-actions { display: flex; min-width: 0; align-items: center; gap: 4px; }
+.automation-history-stop { width: 24px; height: 24px; flex: 0 0 24px; color: var(--muted); }
+.automation-history-stop:hover:not(:disabled) { color: var(--danger); }
 .automation-history-row { display: flex; width: 100%; min-width: 0; min-height: 48px; align-items: center; gap: 10px; padding: 9px 7px; border: 0; border-radius: 7px; color: var(--muted); background: transparent; text-align: left; cursor: pointer; }
 .automation-history-row:hover:not(:disabled) { background: var(--surface-hover); }
 .automation-history-row:disabled { opacity: 1; }

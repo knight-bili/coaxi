@@ -287,6 +287,8 @@
   "等待中": "Waiting",
   "未完成": "Not completed",
   "已停止": "Stopped",
+  "停止本次运行": "Stop this run",
+  "本次运行已由用户停止，执行记录已保留。": "This run was stopped by the user. Its execution history is preserved.",
   "已移除": "Removed",
   "当前版本无法读取移出影响。": "Current version cannot read removal impact.",
   "文件超过 25 MiB": "File exceeds 25 MiB",

@@ -41,8 +41,9 @@ if (params.has('no-members')) agents.splice(0)
 let failNextSave = params.has('save-failure')
 let conflictNextSave = params.has('conflict')
 let failNextList = params.has('load-failure')
+let failNextStop = params.has('stop-failure')
 const listeners = new Set<(event: CoreEvent) => void>()
-const calls: Array<{ method: string; command: unknown }> = []
+const calls: Array<{ method: string; commandId: unknown; command: unknown }> = []
 const callListeners = new Set<() => void>()
 function changed(): void {
   queueMicrotask(() => listeners.forEach(listener => listener({ method: 'automations.updated', params: {} } as CoreEvent)))
@@ -63,7 +64,7 @@ window.rovai = {
       const end = offset + args.limit
       return structuredClone({ runs: records.slice(offset, end), nextCursor: end < records.length ? String(end) : null, truncated: end < records.length })
     }
-    calls.push({ method, command: structuredClone(command) })
+    calls.push({ method, commandId: args.commandId ?? null, command: structuredClone(command) })
     callListeners.forEach(listener => listener())
     const current = automations.find(item => item.automationId === command.automationId)
     if (method === 'automations.update' && failNextSave) { failNextSave = false; throw new Error('测试：保存失败，草稿应保留') }
@@ -88,6 +89,12 @@ window.rovai = {
     } else if (current && method === 'automations.delete') {
       automations = automations.filter(item => item !== current)
       result = {}
+    } else if (current && method === 'automations.cancelRun') {
+      if (failNextStop) { failNextStop = false; throw new Error('测试：停止请求回执丢失') }
+      const run = history[current.automationId]?.find(item => item.runId === command.runId)
+      if (!run) return { status: 'rejected', code: 'automation.run_not_found', payload: {} }
+      Object.assign(run, { status: 'failed', reason: 'user_requested_automation_stop', endedAt: now })
+      result = { automationId: current.automationId, runId: run.runId, status: run.status, reason: run.reason }
     } else if (current && method === 'automations.run') {
       result = { status: 'running' }
     } else throw new Error(`Unexpected fixture RPC: ${method}`)
@@ -110,9 +117,9 @@ function Fixture(): React.JSX.Element {
     <WindowDragStrip page="automations" />
     <ThreadNavigation view="automations" state="ready" navigation={{ schemaVersion: 3, throughGlobalSequence: 0, quickChat: { totalCount: 0, recentThreads: [] }, projects }} activeThreadId={null}
       onNewConversation={idle} onMembers={idle} onAutomations={() => setKey(value => value + 1)} onMemory={idle} pendingMemoryCount={0} onSettings={idle}
-      onOpenProject={idle} onCamp={idle} onRemoveProject={async () => undefined} onRename={async () => undefined} onDelete={async () => undefined} onError={error => setNotice(String(error))} />
+      onOpenProject={idle} onThread={idle} onRemoveProject={async () => undefined} onRename={async () => undefined} onDelete={async () => undefined} onError={error => setNotice(String(error))} />
     <main className="content automation-content"><AutomationWorkspace key={key} agents={agents} projects={projects} defaultMemberId={agents[0]?.agentId ?? ''}
-      onNotify={setNotice} onOpenCamp={threadId => setNotice(`打开执行对话：${threadId}`)} /></main>
+      onNotify={setNotice} onOpenThread={threadId => setNotice(`打开执行对话：${threadId}`)} /></main>
     {notice && <output role="status" style={{ position: 'fixed', bottom: 20, left: 290, padding: '10px 14px', color: 'var(--ink)', background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 7 }}>{notice}</output>}
     <details style={{ position: 'fixed', left: 10, bottom: 42, maxWidth: 245, fontSize: 10, color: 'var(--muted)' }}><summary>验收记录</summary><pre style={{ maxHeight: 220, overflow: 'auto' }}>{JSON.stringify(calls, null, 2)}</pre></details>
   </div>

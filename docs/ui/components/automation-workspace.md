@@ -71,6 +71,11 @@ Renderer 使用 `cron-parser` 提供就地反馈，最终接受与求值仍由 C
 
 ## 可访问性与主题
 
+运行历史保留原 Rovai 行布局，参考 Codeg 原运行历史的紧凑 X 操作，在仍运行的行右侧提供“停止本次运行”。
+停止与打开对话是相邻独立按钮，不嵌套按钮；提交中禁用再次停止，失败保留原请求身份并允许明确重试。
+Core 原因 `user_requested_automation_stop` 显示为灰色“已停止”，保留历史与打开原对话；不伪装成成功或应用退出。
+准确作用域及清理资格见 [Automation Run Control v1](../../contracts/automation-run-control-v1.md)。
+
 所有表单控件有持久 label，计划参数仅在对应类型下出现；通知组合使用 fieldset/legend。任务行、模板和操作均可键盘触发，
 保留 DOM 焦点与键盘交互，焦点装饰遵循当前 DESIGN；手机不新增 focus ring。状态不能只依靠颜色；Day/Night 只使用现有语义 token，不增加主题专属业务结构。
 

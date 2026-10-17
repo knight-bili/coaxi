@@ -218,6 +218,7 @@ const allowedMethods = new Set<CoreMethod>([
   'automations.close',
   'automations.delete',
   'automations.run',
+  'automations.cancelRun',
   'memory.list',
   'memory.get',
   'memory.create',

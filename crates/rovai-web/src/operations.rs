@@ -204,6 +204,8 @@ pub enum Operation {
     AutomationDelete,
     #[serde(rename = "automations.run")]
     AutomationRun,
+    #[serde(rename = "automations.cancelRun")]
+    AutomationCancelRun,
 
     #[serde(rename = "threads.open", alias = "camps.open")]
     CampOpen,
@@ -571,6 +573,7 @@ impl Operation {
             Self::AutomationClose => "automations.close",
             Self::AutomationDelete => "automations.delete",
             Self::AutomationRun => "automations.run",
+            Self::AutomationCancelRun => "automations.cancelRun",
 
             Self::RuntimeEnsure => "runtime.product.ensure",
             Self::RuntimeCheck => "runtime.product.check",

@@ -93,10 +93,10 @@ use rovai_core::{
         AUTOMATION_UPDATE_TOOL_NAME, AutomationCreateToolInput, AutomationGetToolInput,
         AutomationListQuery, AutomationListToolInput, AutomationProjectRef, AutomationRunListQuery,
         AutomationRunToolInput, AutomationService, AutomationUpdateToolInput,
-        AutomationVersionedToolInput, CloseAutomationCommand, ConfigureAutomationTimeLimitCommand,
-        CreateAutomationCommand, DeleteAutomationCommand, RunAutomationCommand,
-        UpdateAutomationCommand, resolve_tool_automation_id, resolve_tool_member,
-        resolve_tool_project, schedule_from_tool_fields,
+        AutomationVersionedToolInput, CancelAutomationRunCommand, CloseAutomationCommand,
+        ConfigureAutomationTimeLimitCommand, CreateAutomationCommand, DeleteAutomationCommand,
+        RunAutomationCommand, UpdateAutomationCommand, resolve_tool_automation_id,
+        resolve_tool_member, resolve_tool_project, schedule_from_tool_fields,
     },
     builtin_tool_evidence_projection::{
         BUILTIN_TOOL_EVIDENCE_PROJECTION_SCHEMA_VERSION, project_builtin_tool_invocation,
@@ -836,6 +836,7 @@ fn request_runs_outside_main_queue(method: &str) -> bool {
             | "userAutomation.camp.send"
             | "automations.schedulerControl"
             | "automations.run"
+            | "automations.cancelRun"
             | "missions.createWithAttachments"
             | "missions.updateWithAttachments"
             | "camp.attachments.location"
@@ -7655,6 +7656,39 @@ impl Core {
                 Ok(serde_json::to_value(
                     AutomationService::default().list_runs(&database, &params)?,
                 )?)
+            }
+            "automations.cancelRun" => {
+                let params: UserCommandParams<CancelAutomationRunCommand> =
+                    serde_json::from_value(request.params.clone())?;
+                let mut database = self.database.lock().await;
+                let execution = AutomationService::default().cancel_run(
+                    &mut database,
+                    &user_command_envelope(params.command_id, params.command),
+                )?;
+                drop(database);
+                if execution.result.status == CommandResultStatus::Applied {
+                    self.agent_run_cancellation_notify.notify_one();
+                    self.delivery_batch_scheduler_notify.notify_one();
+                    self.execution_wake.runs.notify_one();
+                    self.execution_wake.automation.notify_one();
+                    emit(
+                        &self.output,
+                        "automations.updated",
+                        json!({ "reason": "cancel_run" }),
+                    );
+                    let camp_id = execution
+                        .result
+                        .payload
+                        .get("threadId")
+                        .and_then(Value::as_str);
+                    emit_agent_run_terminal(
+                        &self.output,
+                        camp_id,
+                        json!({ "threadId": camp_id, "result": execution.result }),
+                    );
+                    emit_navigation_invalidated(&self.output, "automations.cancelRun", camp_id);
+                }
+                Ok(serde_json::to_value(execution.result)?)
             }
             "automations.get" => {
                 let params: AutomationGetParams = serde_json::from_value(request.params.clone())?;
