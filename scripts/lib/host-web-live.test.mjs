@@ -58,6 +58,10 @@ test('actual Desktop and browser share Camp geometry while three drafts and reau
     await writeFile(join(projectPath, 'child.md'), '# Details\n\nCHILD_GUIDE_MARKER')
     await writeFile(join(projectPath, 'inline.png'), Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScLbtAAAAABJRU5ErkJggg==', 'base64'))
     const projectWorkspace = await request('workspaces.inspect', { path: projectPath })
+    // Core creation does not add a directory to the Desktop sidebar. Use the
+    // same Main-owned registration as opening a project, before seeding its Camp.
+    const navigation = await desktop.evaluate(`window.rovai.navigationPreferences.registerProjects([${JSON.stringify(projectWorkspace.projectPath)}])`)
+    assert.ok(navigation.registeredProjects.includes(projectWorkspace.projectPath))
     const created = await request('threads.create', { commandId: crypto.randomUUID(), name: 'Desktop and Web live parity', workspace: { projectPath: projectWorkspace.projectPath }, memberAgentIds: [profiles[0].agentId], defaultLeadAgentId: profiles[0].agentId, collaborationMode: 'peer' })
     assert.equal(created.status, 'applied', JSON.stringify(created)); const threadId = created.payload.threadId
     for (let i = 1; i <= 8; i++) {
@@ -305,6 +309,11 @@ test('actual Desktop and browser share Camp geometry while three drafts and reau
     await writeFile(join(output, 'desktop-web-live.json'), JSON.stringify({ ...evidence, coreAliveAfterWebStop: true }, null, 2))
     console.log(JSON.stringify({ ...evidence, coreAliveAfterWebStop: true }))
   } catch (error) {
+    if (desktop) {
+      await desktop.capture(join(output, 'desktop-failure.png')).catch(() => undefined)
+      const navigation = await desktop.evaluate(`window.rovai.navigationPreferences.get().then(s=>({schemaVersion:s.schemaVersion,legacyProjectsSynced:s.legacyProjectsSynced,registeredProjectCount:s.registeredProjects.length,readError:Boolean(s.readError)}))`).catch(() => null)
+      await writeFile(join(output, 'desktop-failure-state.json'), JSON.stringify({ stage, navigation }, null, 2))
+    }
     if (desktop && stage === 'native startup') {
       const startup = await desktop.evaluate(`window.rovai.supervisor.getSnapshot().then(s=>({schemaVersion:s.schemaVersion,runtimeMode:s.runtimeMode,fullCoreState:s.fullCoreState,authorityKind:s.authorityState.kind,startupPhase:s.startupPhase,lastErrorCode:s.lastError?.code??null,subsystems:s.coreSubsystems.map(item=>({id:item.id,state:item.state,errorCode:item.error?.code??null}))}))`).catch(() => null)
       await writeFile(join(output, 'desktop-startup-state.json'), JSON.stringify({ stage, snapshot: startup }, null, 2))

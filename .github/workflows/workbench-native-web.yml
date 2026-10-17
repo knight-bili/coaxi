@@ -71,6 +71,9 @@ jobs:
             ${{ env.ROVAI_HOST_WEB_LIVE_OUTPUT }}/native-test.log
             ${{ env.ROVAI_HOST_WEB_LIVE_OUTPUT }}/desktop-startup-state.json
             ${{ env.ROVAI_HOST_WEB_LIVE_OUTPUT }}/desktop-startup-failure.png
+            ${{ env.ROVAI_HOST_WEB_LIVE_OUTPUT }}/desktop-failure-state.json
+            ${{ env.ROVAI_HOST_WEB_LIVE_OUTPUT }}/desktop-failure.png
+            ${{ env.ROVAI_HOST_WEB_LIVE_OUTPUT }}/web-failure.png
             ${{ env.ROVAI_HOST_WEB_LIVE_OUTPUT }}/desktop-web-live.json
             ${{ env.ROVAI_HOST_WEB_LIVE_OUTPUT }}/desktop-day.png
             ${{ env.ROVAI_HOST_WEB_LIVE_OUTPUT }}/desktop-night.png
