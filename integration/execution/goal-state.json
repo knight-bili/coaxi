@@ -252,5 +252,6 @@
   "delegation_r1_confirmation": "i04-delegation-r1-confirmation.json",
   "i04_delegation_foundation_evidence": "i04-delegation-foundation-result.json",
   "i04_delegation_foundation_source_commit": "e0b2f60905e232b9615de83ba9905d613d00deba",
-  "i04_delegation_identity_evidence": "i04-delegation-identity-result.json"
+  "i04_delegation_identity_evidence": "i04-delegation-identity-result.json",
+  "i04_delegation_identity_source_commit": "6eb79f06932580a46d4e6aaae0a42eedf3eb5ab5"
 }
