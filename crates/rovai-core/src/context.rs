@@ -471,7 +471,7 @@ impl ContextService {
         agent_run_id: &str,
         execution_epoch: i64,
     ) -> Result<PreparedSkillExposure> {
-        let _snapshot = load_run_snapshot(database, agent_run_id, execution_epoch)?
+        let snapshot = load_run_snapshot(database, agent_run_id, execution_epoch)?
             .context("AgentRun is not active for Skill exposure preparation")?;
         let existing = database
             .connection()
@@ -490,6 +490,7 @@ impl ContextService {
             if persisted_snapshot.schema_version != 2 {
                 anyhow::bail!("stored ContextManifest Skill exposure schema is invalid");
             }
+            delegation_context::validate_skill_exposure(&snapshot, &persisted_snapshot)?;
             return Ok(PreparedSkillExposure {
                 digest: canonical_json_digest(&serde_json::to_value(&persisted_snapshot)?)?,
                 snapshot: persisted_snapshot,
@@ -575,6 +576,7 @@ impl ContextService {
             fallback_skill_exposure = PreparedSkillExposure { snapshot, digest };
             &fallback_skill_exposure
         };
+        delegation_context::validate_skill_exposure(&snapshot, &prepared_skill_exposure.snapshot)?;
         let fallback_mcp_snapshot = McpExposureSnapshot::default();
         let mcp_exposure = prepared_mcp_projection
             .map(|prepared| &prepared.snapshot)
@@ -2918,7 +2920,7 @@ fn resolve_run_skills(
     adapter: AdapterKind,
     packs: Option<&PreparedMemberSkillPacks>,
 ) -> Result<PreparedCurrentInputSkillResolution> {
-    if let Some(packs) = packs {
+    let mut prepared = if let Some(packs) = packs {
         resolve_current_input_skills_with_packs(
             connection,
             &snapshot.skill_selection_snapshot,
@@ -2935,7 +2937,13 @@ fn resolve_run_skills(
             exposure,
             adapter,
         )
+    }?;
+    if frozen_delegation_policy(snapshot)?
+        .is_some_and(|policy| policy.role == crate::delegation_policy::Role::Child)
+    {
+        crate::current_input_skill::restrict_child_platform_skills(connection, &mut prepared)?;
     }
+    Ok(prepared)
 }
 
 fn prospective_delivery_snapshot(
@@ -7557,6 +7565,7 @@ fn load_existing_manifest(
         anyhow::bail!("Stored ContextManifest projection audience is invalid");
     }
     let stored_skill_exposure: SkillExposureSnapshot = serde_json::from_str(&row.15)?;
+    delegation_context::validate_skill_exposure(snapshot, &stored_skill_exposure)?;
     if prepared_skill_exposure.is_some_and(|prepared| prepared.snapshot != stored_skill_exposure) {
         anyhow::bail!("Stored ContextManifest Skill exposure cannot change during recovery");
     }

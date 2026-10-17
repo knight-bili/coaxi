@@ -1415,6 +1415,7 @@ export type CurrentInputSkillOmissionReason =
   | 'skill_file_unavailable'
   | 'source_missing'
   | 'source_unreadable'
+  | 'policy_restricted'
   | 'legacy_unresolved'
   | 'pack_not_selected'
   | 'pack_not_installed'

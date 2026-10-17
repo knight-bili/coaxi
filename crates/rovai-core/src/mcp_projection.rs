@@ -157,6 +157,7 @@ impl McpProjectionService {
         request: &McpProjectionRequest<'_>,
     ) -> Result<PreparedMcpProjection> {
         validate_request(request)?;
+        validate_child_run_request(database, request)?;
         let frozen = load_frozen_projection(database, request.agent_run_id)?;
         let target = self.target_path(request.agent_run_id, request.execution_epoch);
         if target.exists() {
@@ -730,6 +731,86 @@ fn validate_request(request: &McpProjectionRequest<'_>) -> Result<()> {
     if !request.execution_root.is_dir() {
         anyhow::bail!("AgentRun execution root is unavailable");
     }
+    Ok(())
+}
+
+// Validate before either reading a cached projection or selecting today's servers.
+// The owner AgentProfile identifies MCP assignments, not the child's target Runtime.
+fn validate_child_run_request(
+    database: &Database,
+    request: &McpProjectionRequest<'_>,
+) -> Result<()> {
+    let row = database
+        .connection()
+        .query_row(
+            "SELECT c.agent_id,r.execution_epoch,r.status,r.invocation_kind,r.effective_config_json,
+                r.workspace_json,r.runtime_adapter_kind,r.conversation_id,COALESCE(r.camp_id,t.camp_id)
+         FROM agent_run r LEFT JOIN conversation c ON c.id=r.conversation_id
+         LEFT JOIN camp_turn t ON t.id=r.camp_turn_id WHERE r.id=?1",
+            [request.agent_run_id],
+            |r| {
+                Ok((
+                    r.get::<_, Option<String>>(0)?,
+                    r.get::<_, i64>(1)?,
+                    r.get::<_, String>(2)?,
+                    r.get::<_, String>(3)?,
+                    r.get::<_, String>(4)?,
+                    r.get::<_, Option<String>>(5)?,
+                    r.get::<_, Option<String>>(6)?,
+                    r.get::<_, Option<String>>(7)?,
+                    r.get::<_, Option<String>>(8)?,
+                ))
+            },
+        )
+        .optional()?;
+    let Some((owner, epoch, status, invocation, config, workspace, adapter, conversation, camp)) =
+        row
+    else {
+        return Ok(());
+    };
+    let config: serde_json::Value = serde_json::from_str(&config)?;
+    let policy = crate::delegation_policy::FrozenPolicy::from_config(&config)?;
+    if !policy.is_some_and(|p| p.role == crate::delegation_policy::Role::Child) {
+        anyhow::ensure!(
+            !matches!(invocation.as_str(), "delegation" | "delegation_user"),
+            "Child MCP projection is missing its frozen policy"
+        );
+        return Ok(());
+    }
+    policy
+        .context("Missing child MCP policy")?
+        .validate_invocation(&invocation)?;
+    let runtime: crate::agent_profile::FrozenAgentRuntimeConfig = serde_json::from_value(
+        config
+            .get("runtime")
+            .context("Missing child target Runtime")?
+            .clone(),
+    )?;
+    let conversation = conversation.context("Missing child Conversation")?;
+    let owner = owner.context("Missing child owner")?;
+    let camp = camp.context("Missing child Thread")?;
+    let workspace: serde_json::Value =
+        serde_json::from_str(&workspace.context("Missing child workspace")?)?;
+    let root = workspace["executionRoot"]
+        .as_str()
+        .context("Missing child execution root")?;
+    let owned: bool = database.connection().query_row(
+        "SELECT EXISTS(SELECT 1 FROM conversation c JOIN delegation d ON d.child_conversation_id=c.id
+         WHERE c.id=?1 AND c.camp_id=?2 AND c.agent_id=?3 AND c.kind='delegation_child'
+           AND c.ended_at IS NULL AND d.camp_id=c.camp_id AND d.owner_agent_id=c.agent_id)",
+        rusqlite::params![conversation,camp,owner], |r| r.get(0),
+    )?;
+    anyhow::ensure!(
+        owned
+            && owner == request.agent_id
+            && epoch == request.execution_epoch
+            && matches!(status.as_str(), "running" | "waiting")
+            && runtime.adapter_kind == request.adapter_kind
+            && adapter.as_deref() == Some(runtime.adapter_kind.as_str())
+            && runtime.reported_version.as_deref() == request.reported_runtime_version
+            && fs::canonicalize(root)? == fs::canonicalize(request.execution_root)?,
+        "MCP projection does not match the owned child Run, epoch, target Runtime or workspace"
+    );
     Ok(())
 }
 

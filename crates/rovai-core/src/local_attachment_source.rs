@@ -775,6 +775,52 @@ pub fn load_agent_run_source_attachments(
             .transpose()
             .map(Option::unwrap_or_default);
     }
+    if matches!(
+        invocation_kind.as_deref(),
+        Some("delegation" | "delegation_user")
+    ) {
+        let (invocation,config,author,sequence,takeover,sources):
+            (String,String,String,i64,Option<i64>,String) = database.connection().query_row(
+            "SELECT r.invocation_kind,r.effective_config_json,m.author_type,m.sequence,
+                    control.takeover_message_sequence,m.source_attachments_json
+             FROM agent_run r JOIN conversation c ON c.id=r.conversation_id
+             LEFT JOIN camp_turn t ON t.id=r.camp_turn_id
+             JOIN conversation_message m ON m.id=r.trigger_conversation_message_id AND m.conversation_id=c.id
+             JOIN delegation d ON d.child_conversation_id=c.id
+             JOIN delegation_control control ON control.delegation_id=d.id
+             WHERE r.id=?1 AND r.execution_epoch=?2 AND c.kind='delegation_child'
+               AND c.camp_id=COALESCE(r.camp_id,t.camp_id)
+               AND d.camp_id=c.camp_id AND d.owner_agent_id=c.agent_id
+               AND r.destination_conversation_id=c.id AND r.response_delivery='conversation_message'
+               AND r.operation_policy='delegation_child_v1' AND r.operation_policy_version=1
+               AND r.task_id IS NULL AND r.trigger_camp_message_id IS NULL
+               AND r.trigger_message_delivery_id IS NULL AND r.a2a_parent_agent_run_id IS NULL
+               AND m.source_agent_run_id IS NULL AND m.sequence<=r.initial_conversation_context_through_sequence",
+            params![agent_run_id,execution_epoch],
+            |r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?,r.get(4)?,r.get(5)?)),
+        ).optional()?.context("Child attachments do not belong to the current child input")?;
+        let config: serde_json::Value = serde_json::from_str(&config)?;
+        let policy = crate::delegation_policy::FrozenPolicy::from_config(&config)?
+            .context("Child attachments require a frozen policy")?
+            .validate_invocation(&invocation)?;
+        anyhow::ensure!(
+            policy.role == crate::delegation_policy::Role::Child,
+            "Child attachments require the child policy"
+        );
+        let sources = parse_source_attachments(&sources)?;
+        if invocation == "delegation_user" {
+            anyhow::ensure!(
+                author == "user" && takeover.is_some_and(|boundary| sequence > boundary),
+                "Child attachments require an owned User message after takeover"
+            );
+        } else {
+            anyhow::ensure!(
+                author == "system" && takeover.is_none() && sources.is_empty(),
+                "Initial and resumed delegation inputs cannot inherit attachments"
+            );
+        }
+        return Ok(sources);
+    }
     let json = database
         .connection()
         .query_row(

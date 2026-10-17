@@ -111,6 +111,114 @@ fn context_section(payload: &str, name: &str) -> Value {
     .unwrap()
 }
 
+// These assertions own the projection seam, not authenticated User takeover or a real Runtime.
+fn assert_child_native_projections(fixture: &Fixture, run: &str, epoch: i64) -> PreparedMcpProjection {
+    use crate::current_input_skill::{CurrentInputSkillOmissionReason, CurrentInputSkillResolutionOutcome};
+    let mut snapshot = load_run_snapshot(&fixture.database, run, epoch).unwrap().unwrap();
+    let runtime: crate::agent_profile::FrozenAgentRuntimeConfig =
+        serde_json::from_value(snapshot.effective_config["runtime"].clone()).unwrap();
+    let root = crate::managed_skills::managed_skills_root(&fixture.directory).unwrap();
+    let mut entries = Vec::new();
+    for (index,(name,base)) in [
+        ("cli-operations", root.clone()),
+        ("memory-stewardship", root.clone()),
+        ("cli-operations", fixture.directory.join("user-skills")),
+    ].into_iter().enumerate() {
+        let dir = base.join(name);
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("SKILL.md");
+        std::fs::write(&path,format!("---\nname: {name}\ndescription: Test native Skill\n---\nIndependent test content\n")).unwrap();
+        let canonical = path.canonicalize().unwrap();
+        let native = crate::native_skills::read_native_skill(&path,&canonical,"user",runtime.adapter_kind).unwrap();
+        // A lexical alias must not bypass the official source check.
+        let selected_path = if index==0 { dir.join("..").join(name).join("SKILL.md") } else { path };
+        entries.push(json!({"skillId":native.id,
+            "nameAtSend":name,"firstSegmentIndex":index,"firstMessageIndex":0,
+            "source":"native","sourcePath":selected_path}));
+    }
+    snapshot.skill_selection_snapshot = serde_json::from_value(json!({"schemaVersion":3,"entries":entries})).unwrap();
+    snapshot.skill_selection_snapshot_digest = snapshot.skill_selection_snapshot.canonical_digest().unwrap();
+    let selected = snapshot.skill_selection_snapshot.canonical_json_and_digest().unwrap();
+    let exposure = SkillExposureSnapshot::default();
+    let exposure = PreparedSkillExposure {
+        digest:canonical_json_digest(&serde_json::to_value(&exposure).unwrap()).unwrap(), snapshot:exposure,
+    };
+    let packs = prepare_run_skill_packs(fixture.database.connection(), &snapshot).unwrap();
+    let resolved = resolve_run_skills(fixture.database.connection(),&snapshot,&exposure,runtime.adapter_kind,packs.as_ref()).unwrap();
+    assert_eq!(resolved.links.len(),1, "custom same-name Skill must survive");
+    assert!(resolved.links[0].path.contains("user-skills"));
+    for entry in &resolved.resolution.entries[..2] {
+        assert_eq!(entry.outcome,CurrentInputSkillResolutionOutcome::Unavailable);
+        assert_eq!(entry.reason,Some(CurrentInputSkillOmissionReason::PolicyRestricted));
+        assert!(entry.path.is_none());
+    }
+    assert_eq!(selected,snapshot.skill_selection_snapshot.canonical_json_and_digest().unwrap());
+    let frozen = resolution_from_frozen(&serde_json::to_value(&resolved.resolution).unwrap(),
+        &snapshot.skill_selection_snapshot,&snapshot.skill_selection_snapshot_digest).unwrap();
+    assert_eq!(frozen.digest,resolved.digest);
+    assert_eq!(frozen.links,resolved.links);
+    assert_eq!(serde_json::to_value(&frozen.resolution).unwrap(),serde_json::to_value(&resolved.resolution).unwrap());
+    snapshot.effective_config.as_object_mut().unwrap().remove("delegationPolicy");
+    assert!(resolve_run_skills(fixture.database.connection(),&snapshot,&exposure,runtime.adapter_kind,packs.as_ref()).is_err());
+    snapshot.invocation_kind = "single_chat".into();
+    let legacy = resolve_run_skills(fixture.database.connection(),&snapshot,&exposure,runtime.adapter_kind,packs.as_ref()).unwrap();
+    assert_eq!(legacy.links.len(),3,"legacy parent Skill selection must remain unchanged");
+
+    let config_store = McpConfigStore::new(fixture.directory.join("delegation-home/.rovai/mcp.json"));
+    let known = ["agent_1".to_string()].into_iter().collect();
+    let mut config = Box::new(config_store.get(&known).unwrap());
+    for name in ["delegation-selected","delegation-unassigned"] {
+        let mut servers=serde_json::Map::new();
+        servers.insert(name.to_string(),json!({"command":"node","args":[format!("{name}.js")]}));
+        let McpMutationResult::Ok { config:created,.. } = config_store.create(CreateMcpServerParams {
+            expected_config_digest:config.config_digest,
+            definition_json:json!({"mcpServers":servers}).to_string(),
+        },&known).unwrap() else { panic!("create one child MCP fixture server") };
+        config=created;
+        let id = config.servers.iter().find(|s|s.name==name).unwrap().server_id.clone();
+        let McpMutationResult::Ok { config:enabled,.. } = config_store.set_enabled(SetMcpServerEnabledParams {
+            expected_config_digest:config.config_digest,server_id:id.clone(),enabled:true,acknowledge_high_risk:false,
+        },&known).unwrap() else { panic!("enable MCP fixture") };
+        config=enabled;
+        if name=="delegation-selected" {
+            let McpMutationResult::Ok { config:assigned,.. } = config_store.set_assignment(SetMcpAssignmentParams {
+                expected_config_digest:config.config_digest,server_id:id,agent_id:"agent_1".into(),assigned:true,acknowledge_high_risk:false,
+            },&known).unwrap() else { panic!("assign MCP fixture") };
+            config=assigned;
+        }
+    }
+    let root = std::path::PathBuf::from(snapshot.workspace["executionRoot"].as_str().unwrap());
+    let service = McpProjectionService::new(&fixture.directory);
+    let request = McpProjectionRequest {agent_run_id:run,execution_epoch:epoch,agent_id:"agent_1",
+        adapter_kind:runtime.adapter_kind,reported_runtime_version:runtime.reported_version.as_deref(),execution_root:&root};
+    let prepared = service.prepare(&fixture.database,&config_store,&request).unwrap();
+    assert_eq!(prepared.servers.keys().map(String::as_str).collect::<Vec<_>>(),vec!["delegation-selected"]);
+    let canonical:Value=serde_json::from_slice(&std::fs::read(&prepared.canonical_path).unwrap()).unwrap();
+    assert!(canonical["servers"].get("delegation-selected").is_some());
+    assert!(canonical["servers"].get("delegation-unassigned").is_none());
+    let other_root=fixture.directory.join("wrong-child-root");
+    std::fs::create_dir_all(&other_root).unwrap();
+    for wrong in [
+        McpProjectionRequest {agent_id:"another-member",..request.clone()},
+        McpProjectionRequest {adapter_kind:AdapterKind::ClaudeCodeCli,..request.clone()},
+        McpProjectionRequest {reported_runtime_version:Some("wrong-version"),..request.clone()},
+        McpProjectionRequest {execution_root:&other_root,..request.clone()},
+        McpProjectionRequest {execution_epoch:epoch+1,..request.clone()},
+    ] {
+        assert!(service.prepare(&fixture.database,&config_store,&wrong).is_err(),
+            "cached MCP must not bypass child ownership/target validation");
+    }
+    let selected_id=config.servers.iter().find(|s|s.name=="delegation-selected").unwrap().server_id.clone();
+    assert!(matches!(config_store.set_enabled(SetMcpServerEnabledParams {
+        expected_config_digest:config.config_digest,server_id:selected_id,enabled:false,acknowledge_high_risk:false,
+    },&known).unwrap(),McpMutationResult::Ok{..}));
+    let replay=service.prepare(&fixture.database,&config_store,&request).unwrap();
+    assert_eq!(prepared.snapshot,replay.snapshot);
+    assert_eq!(prepared.projection_digest,replay.projection_digest);
+    assert!(crate::local_attachment_source::load_agent_run_source_attachments(&fixture.database,run,epoch).unwrap().is_empty());
+    prepared
+}
+
 fn assert_delegation_materialization(fixture: &mut Fixture, legacy_private_run: &str) {
     let old_manifest: String = fixture
         .database
@@ -144,6 +252,12 @@ fn assert_delegation_materialization(fixture: &mut Fixture, legacy_private_run: 
     );
     let task = "完整独立任务：只检查自己的输入。";
     let (id, run, epoch) = context_child(fixture, task, "context-child-initial");
+    let mcp = assert_child_native_projections(fixture, &run, epoch);
+    let skill_snapshot = SkillExposureSnapshot::default();
+    let skill_exposure = PreparedSkillExposure {
+        digest: canonical_json_digest(&serde_json::to_value(&skill_snapshot).unwrap()).unwrap(),
+        snapshot: skill_snapshot,
+    };
     let store = ManagedBlobStore::new(&fixture.directory);
     let request = MaterializeContextRequest {
         agent_run_id: &run,
@@ -151,8 +265,18 @@ fn assert_delegation_materialization(fixture: &mut Fixture, legacy_private_run: 
         charter_delivery_mode: CharterDeliveryMode::FirstPayload,
         max_payload_bytes: DEFAULT_MAX_CONTEXT_PAYLOAD_BYTES,
     };
+    let mut inherited = skill_exposure.clone();
+    inherited.snapshot.skills.push(crate::skill_projection::SkillExposureEntry {
+        skill_id:"parent-platform-skill".into(),name:"cli-operations".into(),revision_id:"parent-revision".into(),
+        content_digest:"sha256:parent".into(),group_key:"codex".into(),delivered_via_group_key:None,
+        status:"ready".into(),entry_path:None,reason_code:None,conflict_statuses:Vec::new(),
+    });
+    inherited.digest=canonical_json_digest(&serde_json::to_value(&inherited.snapshot).unwrap()).unwrap();
+    assert!(ContextService.materialize_with_exposures(&mut fixture.database,&store,&inherited,&mcp,&request).is_err(),
+        "child cannot inherit a parent/legacy project projection");
+    assert_eq!(fixture.database.connection().query_row("SELECT count(*) FROM context_manifest WHERE agent_run_id=?1",[&run],|r|r.get::<_,i64>(0)).unwrap(),0);
     let ContextMaterialization::Ready(first) = ContextService
-        .materialize(&mut fixture.database, &store, &request)
+        .materialize_with_exposures(&mut fixture.database, &store, &skill_exposure, &mcp, &request)
         .unwrap()
     else {
         panic!("child Context not ready")

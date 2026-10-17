@@ -11,6 +11,19 @@ pub(super) struct ChildContext {
     pub takeover_sequence: Option<i64>,
 }
 
+pub(super) fn validate_skill_exposure(
+    snapshot: &RunSnapshot,
+    exposure: &SkillExposureSnapshot,
+) -> Result<()> {
+    if frozen_delegation_policy(snapshot)?.is_some_and(|policy| policy.role == Role::Child) {
+        anyhow::ensure!(
+            exposure == &SkillExposureSnapshot::default(),
+            "Child Run cannot inherit a legacy project Skill exposure"
+        );
+    }
+    Ok(())
+}
+
 pub(super) fn load<R: ContextReadConnection>(
     database: &R,
     snapshot: &RunSnapshot,

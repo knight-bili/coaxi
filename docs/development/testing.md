@@ -89,6 +89,17 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 
 ## Rust 测试准入与退役门槛
 
+I04 独立帮手的技能、MCP 与材料执行入口继续扩展既有
+`context::slow_tests::single_chat_materializes_conversation_input_with_a_memory_free_bootstrap`，
+复用其候选 SQLite、真实领取与 Context 夹具，不新增 Rust owner。
+覆盖 Core 平台技能的路径别名过滤、同名自定义技能保留、Selection3 省略原因冻结和旧路径不变；
+MCP 校验实际成员、执行轮次、冻结目标 Runtime/版本和工作目录，缓存存在时同样拒绝错配，
+仅投影已分配连接且配置变更不重选已准备的内容。原 `mcp_projection::tests`、
+`current_input_skill::tests` 及 `context_manifest_recovers_redacted_frozen_mcp_exposure_without_digests`
+作为相关回归；先列出非零测试，再定向执行，不运行全部 slow-tests。
+这些 SQL/投影夹具不证明已认证接管、用户草稿发送、真实 Runtime 启动或完整 D01–D32；
+用户材料 API、源观察、完整取消/恢复和阶段集成仍须另外完成。
+
 I04 原生子代理引用扩展既有 `execution_evidence::tests::provider_packets_are_reduced_to_public_evidence_fields`
 owner，覆盖冻结 Codex adapter、明确协作事件、父会话一致性、编号类型/去重/上限、未知状态及不复制子报告/任务/路径。
 复用 `evidence_is_durable_blob_backed_agent_inaccessible_and_cancel_fenced` 的真实 SQLite/Context 夹具，

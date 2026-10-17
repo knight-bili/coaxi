@@ -182,6 +182,7 @@ pub enum CurrentInputSkillOmissionReason {
     SkillFileUnavailable,
     SourceMissing,
     SourceUnreadable,
+    PolicyRestricted,
     LegacyUnresolved,
     PackNotSelected,
     PackNotInstalled,
@@ -960,6 +961,48 @@ fn resolve_v2_source(
     Ok(Ok(path.to_owned()))
 }
 
+/// Filter the two Core platform Skills by source identity, including symlink aliases.
+/// User Skills with the same display name remain eligible. No project links are created.
+pub(crate) fn restrict_child_platform_skills(
+    connection: &Connection,
+    prepared: &mut PreparedCurrentInputSkillResolution,
+) -> Result<()> {
+    anyhow::ensure!(
+        prepared.resolution.schema_version == 3,
+        "Child Skill resolution requires Selection3"
+    );
+    let db_path: String = connection.query_row("PRAGMA database_list", [], |r| r.get(2))?;
+    let data_dir = Path::new(&db_path)
+        .parent()
+        .filter(|_| !db_path.is_empty())
+        .context("Child Skill resolution requires an owned Core directory")?;
+    let root = crate::managed_skills::managed_skills_root(data_dir)?;
+    let platform: Vec<_> = crate::managed_skills::PLATFORM_SKILLS
+        .iter()
+        .map(|name| root.join(name).join("SKILL.md"))
+        .map(|path| path.canonicalize().unwrap_or(path))
+        .collect();
+    let restricted = |path: &str| {
+        let path = Path::new(path);
+        let canonical = path.canonicalize().unwrap_or_else(|_| path.to_path_buf());
+        platform.contains(&canonical)
+    };
+    for entry in &mut prepared.resolution.entries {
+        if entry.path.as_deref().is_some_and(restricted) {
+            anyhow::ensure!(
+                entry.source != Some(SkillSource::Pack),
+                "Skill Pack resolved outside its owned package"
+            );
+            entry.outcome = CurrentInputSkillResolutionOutcome::Unavailable;
+            entry.reason = Some(CurrentInputSkillOmissionReason::PolicyRestricted);
+            entry.path = None;
+        }
+    }
+    prepared.links.retain(|link| !restricted(&link.path));
+    prepared.digest = canonical_json_digest(&serde_json::to_value(&prepared.resolution)?)?;
+    Ok(())
+}
+
 /// The delivery preview already froze these facts with its payload. Recovery
 /// validates that frozen selection instead of consulting today's installations.
 pub(crate) fn resolution_from_frozen(
@@ -1083,7 +1126,9 @@ pub fn validate_persisted_resolution(
                             | CurrentInputSkillOmissionReason::SourceUnreadable
                             | CurrentInputSkillOmissionReason::LegacyUnresolved
                     )
-                )
+                ) || (resolution.schema_version == 3
+                    && matches!(entry.source, Some(SkillSource::Native | SkillSource::Rovai))
+                    && entry.reason == Some(CurrentInputSkillOmissionReason::PolicyRestricted))
             };
             if entry.skill_id != selected.skill_id
                 || entry.name_at_send != selected.name_at_send
