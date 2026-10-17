@@ -1,6 +1,9 @@
 # I04 执行队列
 
-2026-10-18 最新检查点：User resume 已接 Core、Native/Web 与原请求恢复。原Context owner同库验证父正常结束/实际取消两种原任务恢复、精确Session和固定继续输入；接管/并发竞争及缺少User证明、事件/回执存储故障均拒绝或整笔回滚。
+2026-10-18 最新检查点：当前实际源码已登记 Core v1.73/Schema160/Migration210，完整启动升级、授权票据及未结工具记录启动核对均已有分项证据。重启时已接受但丢失结果的 Run 现复用原失败结算事务，按父先子后处理受控树；已接管的分支和后续 User 排队输入保留，未知输入等待原请求核对且禁止领取。未知输入已处于正确恢复状态时不重复改写版本。
+本批扩原Context owner及6项原Runtime/Fleet owner，7项定向Rust与10项文档测试通过；没有新增整库owner或84正式场景通过。Session/输入ACK/清理ACK及FakeHost是明确夹具，完整Host进程/真实Runtime协调、原查看器与其余I04工作包继续。本页后续159/209与“下一项”表述保留当时检查点，不覆盖本段当前状态。
+
+2026-10-18 此前检查点：User resume 已接 Core、Native/Web 与原请求恢复。原Context owner同库验证父正常结束/实际取消两种原任务恢复、精确Session和固定继续输入；接管/并发竞争及缺少User证明、事件/回执存储故障均拒绝或整笔回滚。
 本批13项定向Rust、47项两端运输和10项文档测试通过，见[用户恢复分项记录](i04-delegation-user-resume-result.json)；原生会话/接收/终态是明确夹具，不是真实Host或模型运行。当前源码方法202，实际159/209及模型预算0保持；完整210、执行协调、原UI及其他I04包继续保留。
 
 2026-10-18 此前检查点：独立帮手的 User list/get/history/read 和 settings.get/update 已接 Core、Native/Web 方法与原请求恢复。

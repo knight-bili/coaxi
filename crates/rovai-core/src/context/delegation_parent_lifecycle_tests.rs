@@ -282,6 +282,8 @@ fn assert_delegation_parent_cancellation(f: &mut Fixture, private_parent: &str) 
     assert_eq!(lifecycle_status(f, &closed_child), "cancelled");
     assert_eq!(lifecycle_status(f, &member_child), "running");
 
+    assert_delegation_restart_settlement(f, &user_parent, user_epoch);
+
     // The base Context fixture has one current member. Add a real replacement before removal.
     let peer = AgentProfileService::default()
         .get_profile(&f.database, "agent_2")

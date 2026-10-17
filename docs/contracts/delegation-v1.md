@@ -9,6 +9,13 @@ last_updated: 2026-10-18
 
 # Delegation v1
 
+### 重启后的接受结果与清理
+
+既有启动恢复筛出的无其他阻塞、已接受但结果遗失的输入，必须通过原 Runtime 失败结算事务处理，保留 `accepted_input_outcome_unknown` 原因和接受证据，不自动重发。
+父子同时符合条件时按持久委派深度先父后子；受控子树取消、私有投递及 Turn 状态与父结算同事务提交，任一失败整笔回滚。接管切断旧父控制，接管后的 User 排队输入不受旧父恢复影响。
+仅派发而未取得接受确认的 `delivery_unknown` 保持等待原请求核对，调度领取必须拒绝。输入摘要、Manifest、原绑定/代次、原生输入编号及任务 Blob 不替换。
+Runtime 清理确认是单独的 Adapter 事实；接管或业务失败不等于旧进程已停止，清理尚未完成时原发送/恢复门禁继续生效。
+
 ### User 查询与设置运输
 
 `delegations.list` 接 `{parentConversationId,cursor?,limit?}`，默认20、最大100，按确切父 Conversation 和 Thread 读取；按创建时间及稳定ID倒序分页。

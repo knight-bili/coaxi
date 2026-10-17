@@ -89,6 +89,11 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 
 ## Rust 测试准入与退役门槛
 
+I04 重启接受输入结算扩原 Context materialization owner 的 `context/delegation_restart_tests.rs`，沿同一 SQLite/Blob 及原运行树，不新增 Rust owner。
+覆盖父子均已接受时的父先结算/子树取消、事务故障完整回滚、接管后 User 输入保留、未知输入待核对及直接领取拒绝、原接受凭据/任务/配置保持、重复恢复零写。
+提供方 Session 尚不存在时，以真实 Core 绑定编号驱动原 Fleet manager，配 FakeHost 验证隔离及温复用；Session/输入 ACK/清理 ACK 明确使用夹具，不作为真实提供方或完整 Host 重启证据。
+相关原 Runtime 启动、丢失、关闭、调度及 Fleet 作用域 owner 作定向回归，仍不增加84正式场景通过数；不因本分项默认运行全部1253项或平台打包。
+
 I04 未结工具记录恢复继续扩展原 Context materialization owner 的 `context/delegation_evidence_tests.rs`，
 复用同一真实 SQLite/Blob/dispatcher/回执；先保留旧159无能力拒绝，再经完整210迁移进入当前合同，以真实新SQLite连接读取持久关联。
 覆盖开始/结束/回执故障、同事务尝试关联、相同请求的另一观察不能借回执、恢复单行失败后继续其他行与下次重试、

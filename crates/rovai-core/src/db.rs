@@ -8109,6 +8109,14 @@ impl Database {
                 last_error_code = 'input_delivery_outcome_unknown',
                 version = version + 1, updated_at = ?1
             WHERE status IN ('running', 'waiting')
+              AND (
+                  status != 'waiting'
+                  OR wait_reason IS NOT 'delivery_unknown'
+                  OR runtime_recovery_required != 1
+                  OR execution_lease_owner IS NOT NULL
+                  OR execution_lease_expires_at IS NOT NULL
+                  OR last_error_code IS NOT 'input_delivery_outcome_unknown'
+              )
               AND EXISTS (
                   SELECT 1 FROM runtime_input_delivery
                   WHERE runtime_input_delivery.agent_run_id = agent_run.id
@@ -8233,25 +8241,10 @@ impl Database {
                 &now,
             )?;
         }
-        let accepted_input_recovery_blockers_created = transaction.execute(
-            r#"
-            UPDATE agent_run
-            SET status = 'failed',
-                wait_reason = NULL,
-                wait_deadline_at = NULL,
-                runtime_recovery_required = 0,
-                execution_lease_owner = NULL,
-                execution_lease_expires_at = NULL,
-                last_error_code = 'accepted_input_outcome_unknown',
-                manual_retry_allowed = 0,
-                cancel_requested_at = COALESCE(cancel_requested_at, ?1),
-                cancel_reason_code = COALESCE(
-                    cancel_reason_code,
-                    'accepted_input_outcome_unknown'
-                ),
-                ended_at = COALESCE(ended_at, ?1),
-                version = version + 1,
-                updated_at = ?1
+        let uncertain_accepted_runs = {
+            let mut statement = transaction.prepare(
+                r#"
+            SELECT id FROM agent_run
             WHERE status = 'waiting'
               AND wait_reason = 'runtime_recovery'
               AND runtime_recovery_required = 1
@@ -8289,8 +8282,53 @@ impl Database {
                     AND runtime_input_delivery.status IN ('prepared', 'delivery_unknown')
               )
             "#,
-            [&now],
-        )? as i64;
+            )?;
+            statement
+                .query_map([], |row| row.get::<_, String>(0))?
+                .collect::<rusqlite::Result<Vec<_>>>()?
+        };
+        // Settle parents before their controlled descendants, independent of
+        // timestamps/UUID order. A takeover remains outside the old parent's tree.
+        let has_delegation = transaction.table_exists(None, "delegation")?;
+        let mut ranked = Vec::with_capacity(uncertain_accepted_runs.len());
+        for run in uncertain_accepted_runs {
+            let depth = if has_delegation {
+                transaction
+                    .query_row(
+                        "SELECT d.depth FROM delegation d
+                    JOIN delegation_attempt a ON a.delegation_id=d.id WHERE a.agent_run_id=?1",
+                        [&run],
+                        |row| row.get::<_, i64>(0),
+                    )
+                    .optional()?
+                    .unwrap_or(0)
+            } else {
+                0
+            };
+            ranked.push((depth, run));
+        }
+        ranked.sort();
+        let actor = crate::command::ActorRef::System {
+            component_id: "runtime-recovery-coordinator".into(),
+        };
+        let mut accepted_input_recovery_blockers_created = 0;
+        for (_, run) in ranked {
+            let settled =
+                crate::runtime::settle_lost_agent_run_in_tx(&transaction, &run, &actor, &now)?;
+            if settled.terminal_code == "agent_run.failed" {
+                accepted_input_recovery_blockers_created += 1;
+            }
+            if !settled.camp_turn_id.is_empty() {
+                crate::runtime::recompute_camp_turn(
+                    &transaction,
+                    &settled.camp_id,
+                    &settled.camp_turn_id,
+                    &actor,
+                    Some(settled.execution_epoch),
+                    &now,
+                )?;
+            }
+        }
         transaction.execute(
             r#"
             UPDATE camp_message_delivery

@@ -5995,7 +5995,7 @@ pub(crate) fn settle_abortive_agent_run_in_tx(
     settle_interrupted_run_in_tx(transaction, agent_run_id, reason_code, actor, now, false)
 }
 
-/// A lost accepted/possibly accepted public input must fail without replay.
+/// A lost accepted/possibly accepted input must fail without replay.
 /// Cleanup acknowledgement remains a separate, adapter-owned isolation fact.
 pub(crate) fn settle_lost_agent_run_in_tx(
     transaction: &Transaction<'_>,
