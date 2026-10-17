@@ -1,0 +1,292 @@
+{
+  "schema_version": 1,
+  "stage": "I04",
+  "task": "I04-T01",
+  "checked_at": "2026-10-17T16:22:15.240852+00:00",
+  "status": "retired_lease_receipt_only_primitive_verified_outer_ipc_cli_integration_pending",
+  "source_commit": "e3c124a90756f36c9ad425332718cf38c60049be",
+  "implementation_baseline": "da60e69c3a73f42cf4da9cfcb3b414af15c58d52",
+  "confirmation_record": "i04-delegation-r1-confirmation.json",
+  "implemented": [
+    "Retirement of an active Built-in lease on same-Run rotation, unbind, fence_all and unregister retains a separate process-lifetime receipt-only proof. Ordinary authenticate/replay/record and new-work admission still reject retired credentials",
+    "The retired index stores a domain-separated SHA256 of the complete process/lease auth tuple, original Run/epoch and private Binding. Every string is length-framed and the lease generation is fixed-width. No raw process/lease token is retained in the retired index",
+    "ReceiptOnlyInvocation has private fields and no Debug/Serialize, exposes no source/Binding/tmp/config handles and can only invoke existing read-only Gateway receipt lookups for delegation.start/cancel/resume",
+    "Read/status/history/other operations cannot be dispatched through this proof. A supported unrecorded request returns None, a different payload for an existing identity conflicts, and no fallback can issue a fresh mutation",
+    "Immutable original Run ownership reconstructs source scope; exact original request digest includes the retained private Binding credential digest. It does not authenticate new work from a stopped or taken-over Run",
+    "Six canonical operations and four approved Codeg names have one closed normalization helper. No catalog/CLI/IPC/tool advertisement is activated by this internal mapping",
+    "The in-memory retired index is bounded by the existing1024-entry replay capacity, does not retain replay bodies or ProcessConfig/tmp ownership, and preserves the original cleanup outside the global invocation gate"
+  ],
+  "checks": {
+    "rust": [
+      {
+        "owner": "core-owner",
+        "log": "delegation-receipt-lease-core-owner-01.log",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "owner": "lease-runtime",
+        "log": "delegation-receipt-lease-runtime.log",
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "owner": "gateway",
+        "log": "delegation-receipt-lease-gateway.log",
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "owner": "contract",
+        "log": "delegation-receipt-lease-contract.log",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "rust_total_passed": 10,
+    "docs_tests_passed": 10,
+    "rust_owners_in_binary": 1253,
+    "new_rust_owners": 0,
+    "full_rust_suite_run": false,
+    "final_compile": "delegation-receipt-lease-compile-02.log",
+    "compiler_warnings": 7,
+    "warning_details": "Six original helper warnings plus the still unconnected status Mutex wrapper",
+    "version_governance_scaffold_protocol_fmt_diff_existing_codegraph_sync": "passed",
+    "governance_base": "da60e69c3a73f42cf4da9cfcb3b414af15c58d52",
+    "current_protocol_methods": 195,
+    "builtin_transport_version": 38,
+    "builtin_catalog_operations": 30,
+    "locked_source_operations_reported_by_checker": 161,
+    "new_formal_cases_fully_passed": 0,
+    "ts_js_rerun": false
+  },
+  "verified_behaviors": [
+    "Original lease owner exercises actual rotation/unbind/global fence/unregister, rejects ordinary retired authentication, recovers original Run/epoch rather than later lease scope, and rejects a change in any of process ID/token, lease ID/token or generation",
+    "Original cleanup owner still proves cleanup does not hold the global invocation gate; no real agent/runtime or network is launched",
+    "Same actual Context owner and SQLite use a real Core source Binding and original domain commands. Before a command exists, receipt proof returns None with zero writes",
+    "After the real source Binding generation changes and actual User takeover cancels that source Run, an actually unbound lease still restores exact start and cancel results through their approved aliases",
+    "Resume receipt is restored through the same sealed proof and alias. New tool-call identity returns None, changed task conflicts, status/read/history/send/unknown operation refuse, and all recovery checks leave graph counts and total_changes unchanged",
+    "The separate proof never calls factory/FS observation/mutation handlers; recorded Gateway result is the sole outcome source, not the retired response cache"
+  ],
+  "failures_and_repairs": [
+    "compile01 found an incorrect test variable name; using the actual cancel.input fixed it. Final compile02 and all four owner groups pass; original failure log is retained"
+  ],
+  "runtime_data_contract": {
+    "version": "v1.72",
+    "schema": 159,
+    "migration": 209
+  },
+  "target_data_contract": {
+    "version": "v1.73",
+    "schema": 160,
+    "migration": 210,
+    "status": "not_registered"
+  },
+  "pending_migration_modified_legacy_guards": [
+    "context_manifest_v34_only_insert",
+    "context_manifest_quote_profile_insert",
+    "agent_run_input_v34_only_insert",
+    "single_chat_composer_draft_scope_insert",
+    "single_chat_retained_input_insert_guard",
+    "single_chat_source_observation_owner",
+    "conversation_message_single_chat_attachment_insert_guard",
+    "conversation_message_single_chat_attachment_update_guard",
+    "single_chat_pending_input_scope_insert",
+    "runtime_input_delivery_attachment_auth_insert"
+  ],
+  "qualification_limits": [
+    "This is an internal primitive: handle_builtin_tool_ipc still requires active authentication before dispatch. End-to-end IPC/CLI old-lease recovery is not connected or qualified yet",
+    "The retired proof index is process-local and bounded. Core restart, expired/evicted proof errors, outer outcome-indeterminate handling and actual transport disconnect/retry are pending; persistent command receipts alone do not prove restart authentication",
+    "Native Session/terminal/ACK/cleanup observations in the reused Core owner remain explicit fixtures. No real Agent/Host/Fleet/GUI/model/MCP process was run",
+    "Full start target/Blob preparation, status disconnect integration, Native/CLI six operations and aliases, transport39/catalog closed outputs/error mapping, User queries/settings/resume, question/plan backend, full210/real lifecycle/original UI and remaining I04 packages remain mandatory",
+    "No full1253-owner/workspace/default suite, app/platform builds, push/Actions/main merge/release or paid project model. No new complete D01-D32 or84 formal scenario is claimed"
+  ],
+  "next_actions": [
+    "Implement production outer start target/Blob/workspace planning, lease revalidation and six-operation dispatch with status waiting outside locks",
+    "Connect receipt-only handling before active-only denial, then the approved39 catalog/CLI/output/alias contract and exact request retry errors",
+    "Continue User queries/settings/resume and real Host/Fleet/writer/full210/Context/Canvas/original UI and other I04 packages"
+  ],
+  "external_actions": {
+    "push": false,
+    "actions": false,
+    "main_merge": false,
+    "release": false,
+    "real_model_budget": 0
+  },
+  "approved_artifacts": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1",
+      "unchanged": true
+    }
+  ],
+  "source_files": [
+    {
+      "path": "crates/rovai-core/src/builtin_tool_runtime.rs",
+      "bytes": 43933,
+      "git_blob_sha256": "1dc0c46d8da67604b69b9ac298a8ec32cacc195405909383eec64fabfd541ce8"
+    },
+    {
+      "path": "crates/rovai-core/src/context/delegation_model_command_tests.rs",
+      "bytes": 26220,
+      "git_blob_sha256": "126eb968eb6578784b8ae0004e31001b088b50951343cc20d3d7f2d830bf2017"
+    },
+    {
+      "path": "crates/rovai-core/src/context/delegation_resume_tests.rs",
+      "bytes": 25350,
+      "git_blob_sha256": "bd624aa78f6903d01c60db7fe6d04235730247ddbc313f13e57e7a75b8ae8002"
+    },
+    {
+      "path": "crates/rovai-core/src/delegation_contract.rs",
+      "bytes": 11933,
+      "git_blob_sha256": "6eafc42eeadaac7581bdbcd2dabfc712be9e0a4f875ed17619c88496be9340ca"
+    },
+    {
+      "path": "crates/rovai-core/src/delegation_model_command.rs",
+      "bytes": 17696,
+      "git_blob_sha256": "bcbf0098571c4951d9cc8e7452aea9c1773a014163b70183c0d57e522cf2f156"
+    },
+    {
+      "path": "docs/development/testing.md",
+      "bytes": 224342,
+      "git_blob_sha256": "45a4756f0443f3a1bc8e41b285f1e7c34c068544a6c32eb4241aae1b16b2ab62"
+    }
+  ],
+  "log_files": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-receipt-lease-codegraph-sync.log",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-receipt-lease-compile-01.log",
+      "bytes": 632,
+      "sha256": "6ada58e32be4b312f76296caf133bcaad10bb6e9075daff0028e74c6dff5070a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-receipt-lease-compile-02.log",
+      "bytes": 2225,
+      "sha256": "b181d63b5a8e8cf40de187bd0e2f1a28c04bb56bcc0270e73171fdc6e0359286"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-receipt-lease-contract-list.log",
+      "bytes": 133,
+      "sha256": "b96f69c07095baa9bd20c031e6864f90c99ec8bbbadd3945fefdd2bd946f6d2c"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-receipt-lease-contract.log",
+      "bytes": 235,
+      "sha256": "bdd5cc2e267b97d6d2550f0573aaacd6050f4a00a611e7f5a8271f459ad1c638"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-receipt-lease-core-owner-01-list.log",
+      "bytes": 125,
+      "sha256": "8d7c39b86e00e4e7eee958d5210fe31c3224cf0ebf2bba69b1e95c305acee56d"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-receipt-lease-core-owner-01.log",
+      "bytes": 228,
+      "sha256": "2abf9805a7cafc46e177f90aae7e3be7cb1a37b808bf95cb8bbc25917e23148a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-receipt-lease-diff.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-receipt-lease-doc-governance.log",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-receipt-lease-doc-tests.log",
+      "bytes": 922,
+      "sha256": "0ce7c4047a1b90010461081d3ff430a97b67c68659fead573b60bb5e766fe040"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-receipt-lease-doc-version.log",
+      "bytes": 79,
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-receipt-lease-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-receipt-lease-gateway-list.log",
+      "bytes": 601,
+      "sha256": "27429c5e0de6d679a747caf79c0db93cba531861e57ec00e22ccbc3465777efe"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-receipt-lease-gateway.log",
+      "bytes": 734,
+      "sha256": "78575de478a1762fe18d7952ff4ebdf5694d875b4e9252f9072d9e12bb715a09"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-receipt-lease-include-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-receipt-lease-protocol.log",
+      "bytes": 182,
+      "sha256": "044569df112d191be31ea876439bd2bd3294beb8d9fa469452c1bcc1ea893695"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-receipt-lease-regression-results.json",
+      "bytes": 152,
+      "sha256": "d100d977baabe907d818c66a9e5e463f99267f1aa32b92c95565504e55149915"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-receipt-lease-runtime-list.log",
+      "bytes": 201,
+      "sha256": "2b2f1572212c6df3c3129b3692a5ad67e050efeb774ae7975fe0172d0fe6d86d"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-receipt-lease-runtime.log",
+      "bytes": 309,
+      "sha256": "0678385d15acfd6c73bd9a821c18a0d0f1cf7031844ef2515f485e8290bc03d1"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-receipt-lease-scaffold.log",
+      "bytes": 222,
+      "sha256": "01288a06b7440b08c394c6da77c7750da896b58e4bc599c2e110eb1820be4b08"
+    }
+  ]
+}
