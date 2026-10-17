@@ -1,4 +1,4 @@
-import {spawn} from 'node:child_process'
+import {spawn,execFileSync} from 'node:child_process'
 import {createHash} from 'node:crypto'
 import {readFile,mkdir,access} from 'node:fs/promises'
 import {dirname,join,resolve,sep} from 'node:path'
@@ -13,7 +13,7 @@ export async function previewConfiguration(){
  if(manifest.candidate!=='fusion-i03-rc.25')throw Error('开发预览版本不匹配，请保留原预览目录。')
  const hash=async path=>createHash('sha256').update(await readFile(path)).digest('hex')
  for(const item of manifest.files){const path=resolve(app,item.path);if(!path.startsWith(app+sep))throw Error('开发预览清单包含目录外路径。');if(await hash(path)!==item.sha256)throw Error('开发预览文件已变化：'+item.path)}
- const dataRoot=assertUserDataIsIsolated(join(directory,'user-data')),home=join(directory,'isolation/home'),temporary=join(directory,'isolation/tmp')
+ const dataRoot=assertUserDataIsIsolated(join(directory,'user-data-v2')),home=join(directory,'isolation/home'),temporary=join(directory,'isolation/tmp')
  const electron=join(repositoryRoot,'node_modules/electron/dist/electron.exe');await access(electron)
  const env={};for(const key of ['SystemRoot','WINDIR','COMSPEC','PATHEXT'])if(process.env[key])env[key]=process.env[key]
  Object.assign(env,{PATH:[dirname(process.execPath),'E:/software/encoding/common/Git/bin',join(process.env.SystemRoot,'System32')].join(';'),HOME:home,USERPROFILE:home,APPDATA:join(home,'AppData/Roaming'),LOCALAPPDATA:join(home,'AppData/Local'),TEMP:temporary,TMP:temporary,SHELL:process.env.COMSPEC??join(process.env.SystemRoot,'System32/cmd.exe'),NODE_REPL_HISTORY:'',ROVAI_ALLOW_ISOLATED_INSTANCE:'1',ROVAI_DISABLE_AUTO_UPDATE_CHECKS:'1',ROVAI_HOST_BIN:join(app,'resources/bin/windows-x64/rovai-host.exe')})
@@ -21,7 +21,9 @@ export async function previewConfiguration(){
 }
 
 export async function preparePreviewHome(config){
- // dataRoot交给原Windows原生入口创建私有布局，不能先用普通mkdir建立。
+ // Chromium会在Main之前触碰显式目录，须先由原生helper创建受保护布局。
+ const prepared=JSON.parse(execFileSync(config.env.ROVAI_HOST_BIN,['--prepare-windows-data-root',config.dataRoot],{env:config.env,encoding:'utf8',windowsHide:true}))
+ if(resolve(prepared.root)!==resolve(config.dataRoot)||resolve(prepared.core)!==resolve(config.dataRoot,'Core'))throw Error('开发预览原生目录准备结果不匹配。')
  for(const path of [config.env.HOME,config.env.APPDATA,config.env.LOCALAPPDATA,config.env.TEMP])await mkdir(path,{recursive:true})
 }
 
