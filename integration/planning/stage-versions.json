@@ -975,7 +975,8 @@
       },
       "r09_complete_local_verification": "i03-r09-complete-local-verification.json",
       "latest_verification": "i03-r10-local-closeout-verification.json",
-      "formal_platform_matrix": "i03-formal-platform-matrix.json"
+      "formal_platform_matrix": "i03-formal-platform-matrix.json",
+      "remote_platform_batch": "integration/execution/i03-stage-platform-batch.json"
     },
     {
       "stage_id": "I04",

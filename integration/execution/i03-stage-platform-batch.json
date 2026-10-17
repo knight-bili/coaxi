@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "stage": "I03",
+  "batch": "I03-stage-platform-batch-20261017",
+  "source_commit": "a672ad1bf1cfff78d68b4eecf6436af3e5032a29",
+  "branch": "phase/i03-canvas-nodes",
+  "repository_visibility_verified": "PUBLIC",
+  "pr": {
+    "number": 55,
+    "url": "https://github.com/knight-bili/codeg-rovai-workbench/pull/55",
+    "draft": true,
+    "base": "phase/i02-skill-delivery"
+  },
+  "push": "succeeded_once_for_stage",
+  "runs": [
+    {
+      "workflow": "core-integration.yml",
+      "inputs": {
+        "platform": "linux"
+      },
+      "run_id": 38991417893,
+      "source_commit": "a672ad1bf1cfff78d68b4eecf6436af3e5032a29",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/actions/runs/38991417893",
+      "observed_at": "2026-10-17T01:36:11.493914+00:00",
+      "status": "in_progress",
+      "conclusion": null,
+      "jobs": [
+        {
+          "name": "Core ubuntu-latest",
+          "status": "in_progress",
+          "conclusion": ""
+        }
+      ]
+    },
+    {
+      "workflow": "workbench-native-web.yml",
+      "inputs": {
+        "arch": "all"
+      },
+      "run_id": 38991420493,
+      "source_commit": "a672ad1bf1cfff78d68b4eecf6436af3e5032a29",
+      "url": "https://github.com/knight-bili/codeg-rovai-workbench/actions/runs/38991420493",
+      "observed_at": "2026-10-17T01:36:11.493914+00:00",
+      "status": "in_progress",
+      "conclusion": null,
+      "jobs": [
+        {
+          "name": "Desktop and Web macOS arm64",
+          "status": "in_progress",
+          "conclusion": ""
+        },
+        {
+          "name": "Desktop and Web macOS x64",
+          "status": "in_progress",
+          "conclusion": ""
+        }
+      ]
+    }
+  ],
+  "qualification": "仅实际发起和初始状态，不是平台通过；这些工作流不能替代I03全部Native画布正式场景或移动真机。",
+  "next": "后台运行期间继续I04；下一检查点再取结果，不频繁轮询。"
+}
