@@ -716,6 +716,69 @@ impl ExecutionEvidenceService {
         )
     }
 
+    // Startup maintenance can settle only an existing Core-owned observation.
+    // It never admits a new operation, even after the original Run epoch retires.
+    pub(crate) fn record_recovered_builtin_result(
+        &self,
+        database: &mut Database,
+        blob_store: &ManagedBlobStore,
+        evidence_id: &str,
+        payload: &Value,
+    ) -> Result<Option<RecordedExecutionEvidence>> {
+        let (run, epoch, phase): (String, i64, String) = database.connection().query_row(
+            "SELECT agent_run_id,execution_epoch,phase FROM agent_run_execution_evidence WHERE id=?1",
+            [evidence_id], |row| Ok((row.get(0)?,row.get(1)?,row.get(2)?)),
+        )?;
+        if !matches!(phase.as_str(), "started" | "updated" | "progress") {
+            return Ok(None);
+        }
+        let original = self.read_full_payload_unscoped(database, blob_store, evidence_id)?;
+        anyhow::ensure!(
+            original["sourceAuthority"] == "core"
+                && original["kind"] == "builtin_tool_invocation"
+                && crate::delegation_contract::canonical_operation(
+                    original["canonicalTool"].as_str().unwrap_or("")
+                )
+                .is_some_and(|operation| original["canonicalTool"] == operation)
+                && original["toolCallId"].is_string()
+                && [
+                    "toolCallId",
+                    "sourceAuthority",
+                    "kind",
+                    "canonicalTool",
+                    "coreRequestId",
+                    "rawInputDigest",
+                    "coreCommandReceipt"
+                ]
+                .iter()
+                .all(|key| payload[key] == original[key])
+                && lifecycle_terminal_status(payload).is_some(),
+            "Invalid recovered Core invocation identity"
+        );
+        let (kind, phase) = evidence_classification("runtime.action", payload)
+            .context("Recovered Core invocation is not activity evidence")?;
+        let key = source_event_key("runtime.action", payload);
+        let payload = normalize_public_payload("runtime.action", payload);
+        let update = persistable_output_update("runtime.action", &payload);
+        let persisted = prepare_persistable_result("runtime.action", payload, update)?;
+        self.record_operation_lifecycle(
+            database,
+            blob_store,
+            &run,
+            epoch,
+            "runtime.action",
+            kind,
+            phase,
+            key.as_deref(),
+            &persisted.payload,
+            persisted.output_update,
+            persisted.output_truncated,
+            true,
+            Some(evidence_id),
+        )?
+        .context("Recovered Core invocation has no existing lifecycle")
+    }
+
     #[allow(clippy::too_many_arguments)]
     fn record_runtime_event_with_fence_policy(
         &self,
@@ -851,6 +914,7 @@ impl ExecutionEvidenceService {
             output_update,
             output_truncated,
             allow_fenced_terminal_tool_result,
+            None,
         )? {
             return Ok(recorded);
         }
@@ -1076,6 +1140,7 @@ impl ExecutionEvidenceService {
         output_update: Option<PersistableOutputUpdate>,
         incoming_output_truncated: Option<bool>,
         allow_fenced_terminal_tool_result: bool,
+        recovery_evidence_id: Option<&str>,
     ) -> Result<Option<Option<RecordedExecutionEvidence>>> {
         let proposed_id = Uuid::new_v4().to_string();
         let proposed_facts = canonical_activity::classify_evidence(
@@ -1098,6 +1163,12 @@ impl ExecutionEvidenceService {
             execution_epoch,
             &operation_id,
         )?;
+        if let Some(id) = recovery_evidence_id {
+            anyhow::ensure!(
+                existing.as_ref().is_some_and(|row| row.id == id),
+                "Recovery cannot create or replace a lifecycle"
+            );
+        }
         if existing.is_none() {
             let legacy_started: bool = database.connection().query_row(
                 r#"
@@ -1240,6 +1311,21 @@ impl ExecutionEvidenceService {
 
         let occurred_at = chrono::Utc::now().to_rfc3339();
         let still_current = |transaction: &rusqlite::Transaction<'_>| -> Result<bool> {
+            if let Some(id) = recovery_evidence_id {
+                return Ok(transaction.query_row(
+                    "SELECT EXISTS(SELECT 1 FROM agent_run_execution_evidence
+                     WHERE id=?1 AND agent_run_id=?2 AND execution_epoch=?3
+                     AND operation_id=?4 AND phase IN ('started','updated','progress') AND revision=?5)",
+                    params![
+                        id,
+                        agent_run_id,
+                        execution_epoch,
+                        operation_id,
+                        existing.as_ref().unwrap().revision
+                    ],
+                    |row| row.get(0),
+                )?);
+            }
             Ok(transaction.query_row(
                 r#"
                 SELECT EXISTS(
@@ -2576,6 +2662,29 @@ fn normalize_public_payload(event_type: &str, payload: &Value) -> Value {
             {
                 // Correlation only, never authority or a result replay index.
                 normalized["coreRequestId"] = Value::String(request_id.to_owned());
+                if matches!(
+                    payload["canonicalTool"].as_str(),
+                    Some("delegation.start" | "delegation.cancel" | "delegation.resume")
+                ) && let Some(proof) =
+                    payload
+                        .get("coreCommandReceipt")
+                        .cloned()
+                        .and_then(|value| {
+                            serde_json::from_value::<
+                                crate::delegation_model_command::ReceiptObservation,
+                            >(value)
+                            .ok()
+                        })
+                    && proof.valid()
+                {
+                    normalized["coreCommandReceipt"] = serde_json::json!(proof);
+                }
+                if let Some(state) = payload["coreReconciliation"]
+                    .as_str()
+                    .filter(|state| matches!(*state, "receipt_confirmed" | "result_unconfirmed"))
+                {
+                    normalized["coreReconciliation"] = serde_json::json!(state);
+                }
             }
             if let Some(core_envelope) = payload.get("coreEnvelope") {
                 normalized["coreEnvelope"] = public_core_envelope(core_envelope);
@@ -3726,6 +3835,34 @@ mod tests {
                 &json!({"sourceAuthority":authority,"coreRequestId":value}),
             );
             assert_eq!(normalized.get("coreRequestId").is_some(), expected);
+        }
+        let proof = serde_json::json!({"commandId":format!("delegation-{}","a".repeat(64)),"requestDigest":"b".repeat(64)});
+        for (authority, operation, receipt, expected) in [
+            ("core", "delegation.start", proof.clone(), true),
+            ("runtime", "delegation.start", proof.clone(), false),
+            ("core", "delegation.read", proof.clone(), false),
+            (
+                "core",
+                "delegation.start",
+                serde_json::json!({"commandId":"bad","requestDigest":"bad"}),
+                false,
+            ),
+            (
+                "core",
+                "delegation.start",
+                serde_json::json!({"commandId":proof["commandId"],"requestDigest":proof["requestDigest"],"credential":"must-not-copy"}),
+                false,
+            ),
+        ] {
+            let normalized = normalize_public_payload(
+                "runtime.action",
+                &serde_json::json!({
+                "sourceAuthority":authority,"canonicalTool":operation,"coreRequestId":request,
+                "coreCommandReceipt":receipt,"coreReconciliation":"invented-state"}),
+            );
+            assert_eq!(normalized.get("coreCommandReceipt").is_some(), expected);
+            assert!(normalized.get("coreReconciliation").is_none());
+            assert!(!normalized.to_string().contains("must-not-copy"));
         }
         let raw_result = json!({
             "status": "accepted",

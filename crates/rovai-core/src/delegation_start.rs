@@ -208,6 +208,14 @@ impl ObservedStart {
         db: &mut Database,
         inv: &Invocation<'_, StartParams>,
     ) -> Result<CommandExecution> {
+        self.commit_observed(db, inv, None)
+    }
+    pub(crate) fn commit_observed(
+        &self,
+        db: &mut Database,
+        inv: &Invocation<'_, StartParams>,
+        observation: Option<&str>,
+    ) -> Result<CommandExecution> {
         ensure!(
             self.invocation == fingerprint(inv)?,
             "delegation.preparation_scope_mismatch"
@@ -217,7 +225,7 @@ impl ObservedStart {
         }
         match &self.state {
             Observation::Recorded => anyhow::bail!("delegation.receipt_missing"),
-            Observation::Denied(code) => model::reject_start(db, inv, code),
+            Observation::Denied(code) => model::reject_start(db, inv, code, observation),
             Observation::Ready(plan) => {
                 let workspace = serde_json::to_value(plan.workspace.candidate())?;
                 let request = crate::delegation::FrozenRequest {
@@ -245,6 +253,7 @@ impl ObservedStart {
                         plan: &child,
                     },
                     &plan.blob,
+                    observation,
                 )
             }
         }

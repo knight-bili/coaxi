@@ -66,7 +66,7 @@ working_dir 须为 Host 绝对路径；语法通过不是目录授权。reason �
 
 表 delegation_settings 为 singleton=1，version>=1；enabled 默认 false、depth_limit 默认1且范围1..8、per_runtime_defaults 默认空对象、completed_cache_max_mb 默认512且0不限。每个目标配置沿用 Codeg mode_id/config_values 形状：mode_id 可省略或 null（表示无覆盖），config_values 可省略且空映射不序列化；值是配置字符串，不是凭据或执行授权。嵌套供体默认配置的 null 规则不同于外层严格 patch，不能混用。
 User API 更新输入为 {expectedVersion,patch}，patch 仅 enabled/depthLimit/perRuntimeDefaults/completedCacheMaxMb。缺字段保持原值，显式 null/未知字段拒绝。深度/缓存非法时零写入。每次成功更新精确比较版本并递增；开关请求只携带 enabled，不覆盖其他配置。
-更新原语接受调用者事务；随后回执/事件失败应回滚同一事务。读取只读，不懒建表、不重设配置。SCHEMA 只在隔离 SQLite 存储夹具执行；启动迁移、Command Gateway User-only 鉴权、幂等回执/事件及 Host 两端入口仍待集齐，不允许生产路径自行执行建表字符串。
+更新原语接受调用者事务；随后回执/事件失败应回滚同一事务。读取只读，不懒建表、不重设配置。SCHEMA 已由完整 Migration210 登记到新库/旧库启动链；User-only Command Gateway、幂等回执/事件与 Host 两端入口有分项实现，产品页面及完整执行资格仍按实施计划推进。业务路径不自行执行建表字符串。
 
 ## 持久身份与接管存储
 
@@ -169,3 +169,14 @@ Profile11为child的publicHistory/taskAwareness/memoryEntrypoint三个none；Pro
 v1.73/Schema160/Migration210已登记两条启动链，原v1.72来源经既有历史迁移推进到159，再安装同一完整210事务。当前技能包能力允许由完整新合同证明，不因已清理203历史回执而停用；不得补写伪造的历史回执。旧Run的配置、选择、输入和已保存正文不转换，已冻结版本优先于当前开关。
 
 测试专用159来源从真实历史启动链的210之前取得；原更早来源的测试降级链只允许在无委派数据/新冻结Run时恢复159，保留旧行和无关扩展列，不提供产品降级入口。实际Host/Runtime调度、输入接受/清理、原Session恢复及原界面仍按工程计划验证，Run仍是唯一终态权威，正式场景不按这些组件测试记为完成。
+
+### 工具记录的启动核对
+
+三项模型写操作的开始记录只增加原命令编号与完整请求摘要的观察信息，不保存凭据或任务正文。
+真正执行的尝试在原 Gateway 事务内追加 `delegation.tool_receipt_confirmed`，与业务变化及首次回执一起提交或回滚。
+重启核对须同时匹配这份尝试关联与原回执的操作、成员、Thread、Run、epoch 和摘要；仅找到同请求回执不够。
+查询、未提交调用、旧观察缺少可靠关联时，工具记录以 `builtin_tool.result_unconfirmed` 结束并要求核对原任务，不补发操作、不重发模型输入，不把观察失败改写为任务失败。
+开始时捕获未结 Evidence 的精确 UUID 集合，后台按64条处理并在批次间释放数据库锁；不把可被重用的 SQLite rowid 当作启动边界，新调用不纳入旧记录扫描。
+维护入口只更新精确已有、未终结的 Core 观察及其原 revision；允许处理退休 epoch，不放宽 Runtime 事件或业务命令授权，也不生成新的工具调用。
+投影复用原输入摘要与脱敏元数据，按原生命周期存储省略 null 的规则恢复摘要验证，不复制原始任务或生成另一份结果正文。
+此为工程接线；完整 Host/Fleet/Runtime 的重启、执行、writer 与清理资格仍须阶段验证。

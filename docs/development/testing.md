@@ -89,6 +89,19 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 
 ## Rust 测试准入与退役门槛
 
+I04 未结工具记录恢复继续扩展原 Context materialization owner 的 `context/delegation_evidence_tests.rs`，
+复用同一真实 SQLite/Blob/dispatcher/回执；先保留旧159无能力拒绝，再经完整210迁移进入当前合同，以真实新SQLite连接读取持久关联。
+覆盖开始/结束/回执故障、同事务尝试关联、相同请求的另一观察不能借回执、恢复单行失败后继续其他行与下次重试、
+恢复只改变观察而不派任务，以及旧epoch维护与普通晚期Runtime事件零写拒绝。
+启动快照固定UUID：删除已捕获的最高rowid，再创建真实新调用并确认复用了该rowid，原快照仍不处理它；已删除记录跳过。
+原始输入投影及摘要保持，已有完成记录不再处理，重复核对零写；原生身份/Session/ACK仍为明确夹具，不是完整App/Runtime重启。
+原 `every_current_builtin_catalog_operation_has_start_and_terminal_projections` 增存储省略null后的原摘要恢复、原输入投影等价及篡改拒绝；
+原 `builtin_agent_output_digest_keeps_carrier_proof_without_a_second_result_body` 增Core-only闭合回执观察、非法摘要/多余凭据字段/未知状态拒绝。
+原Runtime Evidence持久化围栏owner作相关回归，不新增Rust owner。
+I04-TMP-CLEANUP-01沿原 `run_tmp_cleanup_does_not_hold_the_global_invocation_gate` 补真实晚期NotFound、根目录仍存在及PermissionDenied；
+只有确认整个退役根已消失才将NotFound视为幂等成功。原lease轮换owner一起回归，不增加重型fixture，不吞其他IO异常。
+上述定向检查不增加84正式场景通过数；完整Host/Fleet/Runtime、writer及执行恢复仍按阶段候选验证。
+
 I04 完整210启动迁移沿原身份owner验证同一填充159文件经真实旧库启动升级、全结构/标记/回执故障回滚、FK恢复和零写重复调用；原私聊最终回复owner覆盖新库默认启动，原preflight/分类器升级owner验证当前与旧/未来来源。
 原更早夹具沿已有209降级链先恢复159，只在无新委派记录/冻结角色时工作，复用同一delta并保留旧行/无关扩展列；不提供产品降级入口，不新建重型owner。
 原 `context::slow_tests::claimed_legacy_batch_keeps_its_format_after_mention_upgrade` 扩同一数据库的历史选择1和排队选择2，helper为 `context/delegation_legacy_upgrade_tests.rs`。

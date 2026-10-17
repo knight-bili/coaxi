@@ -759,14 +759,27 @@ fn remove_retired_run_tmp(path: &Path) -> Result<()> {
         Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(()),
         Err(error) => return Err(error.into()),
     };
-    if metadata.file_type().is_symlink() || !metadata.is_dir() {
+    let result = if metadata.file_type().is_symlink() || !metadata.is_dir() {
         fs::remove_file(path)
-            .with_context(|| format!("failed to remove unsafe Run tmp {}", path.display()))?;
+            .with_context(|| format!("failed to remove unsafe Run tmp {}", path.display()))
     } else {
         rovai_core::local_attachment_snapshot::remove_local_snapshot_tree(path)
-            .with_context(|| format!("failed to remove Run tmp tree {}", path.display()))?;
+            .with_context(|| format!("failed to remove Run tmp tree {}", path.display()))
+    };
+    accept_removed_run_tmp(path, result)
+}
+
+fn accept_removed_run_tmp(path: &Path, result: Result<()>) -> Result<()> {
+    if result.as_ref().is_err_and(|error| {
+        error
+            .downcast_ref::<std::io::Error>()
+            .is_some_and(|error| error.kind() == std::io::ErrorKind::NotFound)
+            && fs::symlink_metadata(path)
+                .is_err_and(|error| error.kind() == std::io::ErrorKind::NotFound)
+    }) {
+        return Ok(());
     }
-    Ok(())
+    result
 }
 
 pub(crate) fn bundled_cli_executable() -> Result<PathBuf> {
@@ -1245,6 +1258,30 @@ mod tests {
             second_bind.is_some(),
             "recursive cleanup for one Process must not block another Process lease"
         );
+
+        // A concurrent owner completed deletion after our metadata probe. Only
+        // the fully absent root makes that late NotFound an idempotent success.
+        let late = root.join("late-retired-tmp");
+        fs::create_dir(&late).unwrap();
+        fs::remove_dir(&late).unwrap();
+        accept_removed_run_tmp(&late, fs::remove_dir(&late).map_err(Into::into)).unwrap();
+        assert!(
+            accept_removed_run_tmp(
+                &late,
+                Err(std::io::Error::from(std::io::ErrorKind::PermissionDenied).into())
+            )
+            .is_err()
+        );
+        fs::create_dir(&late).unwrap();
+        assert!(
+            accept_removed_run_tmp(
+                &late,
+                fs::remove_file(late.join("missing-child")).map_err(Into::into)
+            )
+            .is_err()
+        );
+        remove_retired_run_tmp(&late).unwrap();
+        remove_retired_run_tmp(&late).unwrap();
 
         drop(registry);
         drop(first_config);

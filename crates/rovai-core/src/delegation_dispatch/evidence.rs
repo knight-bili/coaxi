@@ -11,6 +11,7 @@ pub(super) struct Observation {
     tool_call_id: String,
     input_digest: String,
     projection: Value,
+    receipt: Option<model::ReceiptObservation>,
 }
 impl Observation {
     pub(super) fn prepare(
@@ -41,12 +42,21 @@ impl Observation {
             tool_call_id: canonical_json_digest(&identity)?,
             input_digest,
             projection,
+            receipt: None,
         })
+    }
+    pub(super) fn with_receipt(mut self, receipt: model::ReceiptObservation) -> Self {
+        self.receipt = Some(receipt);
+        self
+    }
+    pub(super) fn tool_call_id(&self) -> &str {
+        &self.tool_call_id
     }
     pub(super) fn start(&self, db: &mut Database, directory: &Path) -> Result<()> {
         let payload = json!({"toolCallId":self.tool_call_id,"coreRequestId":self.request_id,"status":"started","kind":"builtin_tool_invocation",
             "title":self.operation,"sourceAuthority":"core","canonicalTool":self.operation,"authorizationDecision":"allowed",
-            "rawInputDigest":self.input_digest,"rawOutputDigest":null,"errorCode":null,"idempotentReplay":false,"receiptId":null,"operationProjection":self.projection});
+            "rawInputDigest":self.input_digest,"rawOutputDigest":null,"errorCode":null,"idempotentReplay":false,"receiptId":null,"operationProjection":self.projection,
+            "coreCommandReceipt":self.receipt});
         ExecutionEvidenceService
             .record_builtin_tool_started(
                 db,

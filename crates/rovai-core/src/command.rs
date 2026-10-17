@@ -472,7 +472,7 @@ where
     .into())
 }
 
-fn load_stored_result(
+pub(crate) fn load_stored_result(
     connection: &rusqlite::Connection,
     command_id: &str,
 ) -> Result<Option<StoredCommandResult>> {

@@ -8,6 +8,7 @@ use serde_json::Value;
 use tokio::sync::{Mutex, MutexGuard};
 
 mod evidence;
+pub(crate) mod recovery;
 
 use crate::{
     builtin_tool_runtime::{AuthorizedBuiltinToolInvocation, BuiltinToolLeaseRegistry},
@@ -116,12 +117,14 @@ impl<'a> ActiveInvocation<'a> {
         leases: &BuiltinToolLeaseRegistry,
         input: &StartParams,
         observed: &crate::delegation_start::ObservedStart,
+        observation: &str,
     ) -> Result<CommandExecution> {
         let _gate = self.guard(leases).await?;
         let mut db = database.lock().await;
-        observed.commit(
+        observed.commit_observed(
             BorrowMut::<Database>::borrow_mut(&mut *db),
             &self.invocation(input),
+            Some(observation),
         )
     }
     async fn commit_resume<B: BorrowMut<Database>>(
@@ -131,14 +134,16 @@ impl<'a> ActiveInvocation<'a> {
         input: &ResumeParams,
         prepared: &crate::delegation_resume::PreparedResume,
         directory: &crate::delegation_resume::DirectoryObservation,
+        observation: &str,
     ) -> Result<CommandExecution> {
         let _gate = self.guard(leases).await?;
         let mut db = database.lock().await;
-        model::resume(
+        model::resume_observed(
             BorrowMut::<Database>::borrow_mut(&mut *db),
             &self.invocation(input),
             prepared,
             directory,
+            Some(observation),
         )
     }
 }
@@ -212,11 +217,32 @@ where
             .map_err(|_| anyhow::anyhow!("builtin_tool.run_not_bound"))?;
         ActiveInvocation::new(&request.auth, authorized, db, request_id)?
     };
-    let observation = evidence::Observation::prepare(&active, operation, request_id, input)?;
+    let mut observation = evidence::Observation::prepare(&active, operation, request_id, input)?;
     {
         let _gate = active.guard(leases).await?;
         let mut db = database.lock().await;
         let db = BorrowMut::<Database>::borrow_mut(&mut *db);
+        let receipt = match &input_typed {
+            Input::Start(value) => Some(model::receipt_observation(
+                db,
+                &active.invocation(value),
+                operation,
+            )?),
+            Input::Cancel(value) => Some(model::receipt_observation(
+                db,
+                &active.invocation(value),
+                operation,
+            )?),
+            Input::Resume(value) => Some(model::receipt_observation(
+                db,
+                &active.invocation(value),
+                operation,
+            )?),
+            _ => None,
+        };
+        if let Some(receipt) = receipt {
+            observation = observation.with_receipt(receipt);
+        }
         // Reader admission can record a legitimate disabled-start refusal.
         // Legacy/no-role callers remain zero-write.
         crate::delegation_admission::authenticate_operation(
@@ -244,7 +270,13 @@ where
                     .await
                     .context("delegation.worker_failed")??;
                 let execution = active
-                    .commit_start(database, leases, &input, &observed)
+                    .commit_start(
+                        database,
+                        leases,
+                        &input,
+                        &observed,
+                        observation.tool_call_id(),
+                    )
                     .await?;
                 // A committed receipt wins over failure to remove its durable file
                 // intent. GC recovery owns any retained intent after worker failure.
@@ -273,7 +305,14 @@ where
                 .await
                 .context("delegation.worker_failed")?;
                 let execution = active
-                    .commit_resume(database, leases, &input, &prepared, &directory)
+                    .commit_resume(
+                        database,
+                        leases,
+                        &input,
+                        &prepared,
+                        &directory,
+                        observation.tool_call_id(),
+                    )
                     .await?;
                 Ok(Outcome::command(operation, execution))
             }
@@ -315,9 +354,10 @@ where
                 let mut db = database.lock().await;
                 Ok(Outcome::command(
                     operation,
-                    model::cancel(
+                    model::cancel_observed(
                         BorrowMut::<Database>::borrow_mut(&mut *db),
                         &active.invocation(&input),
+                        Some(observation.tool_call_id()),
                     )?,
                 ))
             }
@@ -590,7 +630,7 @@ pub(crate) mod tests {
             .unwrap();
         assert_eq!(
             active
-                .commit_start(database, leases, &input, &observed)
+                .commit_start(database, leases, &input, &observed, "fenced-uncommitted")
                 .await
                 .err()
                 .unwrap()
@@ -646,7 +686,14 @@ pub(crate) mod tests {
             .unwrap();
         assert_eq!(
             active
-                .commit_resume(database, leases, &input, &prepared, &directory)
+                .commit_resume(
+                    database,
+                    leases,
+                    &input,
+                    &prepared,
+                    &directory,
+                    "fenced-uncommitted"
+                )
                 .await
                 .err()
                 .unwrap()

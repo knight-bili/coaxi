@@ -5519,6 +5519,47 @@ impl Core {
         Ok(RuntimeCheckOutcome::StableFailure)
     }
 
+    async fn reconcile_delegation_observations(
+        &self,
+        mut cursor: crate::delegation_dispatch::recovery::Cursor,
+    ) {
+        while !cursor.done() && !self.planned_shutdown.shutdown_started() {
+            let batch = {
+                let mut database = self.database.lock().await;
+                cursor.next(&mut database, &self.data_dir)
+            };
+            let batch = match batch {
+                Ok(batch) => batch,
+                Err(_) => {
+                    eprintln!(
+                        "Core delegation observation reconciliation unavailable; retained for next startup"
+                    );
+                    return;
+                }
+            };
+            if batch.failures > 0 {
+                eprintln!(
+                    "Core delegation observations retained for next startup: {}",
+                    batch.failures
+                );
+            }
+            for evidence in batch.updated {
+                emit(
+                    &self.output,
+                    &evidence.event_type,
+                    json!({
+                        "agentRunId": evidence.agent_run_id, "executionEpoch": evidence.execution_epoch,
+                        "nativeMethod":"core/reconciliation", "evidenceId": evidence.id,
+                        "revision": evidence.revision, "changeSequence": evidence.change_sequence,
+                        "outputTruncated": evidence.output_truncated, "payload": evidence.payload,
+                        "canonical": evidence.canonical,
+                    }),
+                );
+            }
+            tokio::task::yield_now().await;
+        }
+    }
+
     async fn recover_pending_execution_intents(&self) {
         if self.planned_shutdown.shutdown_started() {
             return;
@@ -19300,6 +19341,14 @@ async fn run_core(
         )?;
         return Ok(());
     }
+    let delegation_observation_recovery =
+        crate::delegation_dispatch::recovery::Cursor::capture(&database)
+            .map_err(|_| {
+                eprintln!(
+                    "Core delegation observation snapshot unavailable; skipped for this startup"
+                );
+            })
+            .ok();
     // Freeze candidate IDs before exposing RPC, then recheck eligibility at
     // deletion time. A failed optional snapshot skips cleanup for this boot;
     // neither fail authority readiness nor rescan newly created Camps on retry.
@@ -19649,6 +19698,11 @@ async fn run_core(
     eprintln!("rovai-core {} ready", env!("CARGO_PKG_VERSION"));
     let runtime_discovery_core = core.clone();
     let mut runtime_discovery_handle = tokio::spawn(async move {
+        if let Some(cursor) = delegation_observation_recovery {
+            runtime_discovery_core
+                .reconcile_delegation_observations(cursor)
+                .await;
+        }
         runtime_discovery_core
             .initialize_optional_subsystems()
             .await;

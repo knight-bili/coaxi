@@ -233,15 +233,8 @@ fn assert_delegation_materialization(fixture: &mut Fixture, legacy_private_run: 
             |r| r.get(0),
         )
         .unwrap();
-    fixture
-        .database
-        .connection()
-        .execute_batch("PRAGMA foreign_keys=OFF;")
-        .unwrap();
-    let tx = fixture.database.connection_mut().transaction().unwrap();
-    crate::db::delegation::install_identity_schema(&tx).unwrap();
-    tx.commit().unwrap();
-    fixture.database.connection().execute_batch("PRAGMA foreign_keys=ON; UPDATE delegation_settings SET enabled=1,depth_limit=8 WHERE singleton=1;").unwrap();
+    crate::db::delegation::migrate_connection(fixture.database.connection()).unwrap();
+    fixture.database.connection().execute_batch("UPDATE delegation_settings SET enabled=1,depth_limit=8 WHERE singleton=1;").unwrap();
     assert_eq!(
         fixture
             .database
@@ -433,8 +426,8 @@ fn assert_delegation_materialization(fixture: &mut Fixture, legacy_private_run: 
         0
     );
 
-    // Construct the future public role directly in this formatter fixture; production
-    // remains gated until the complete160/210 startup migration is registered.
+    // Construct the public role directly in this formatter fixture; actual Runtime
+    // authentication and native acknowledgements retain their explicit fixture boundary.
     let mut parent = load_run_snapshot(&fixture.database, &fixture.run_id, fixture.execution_epoch)
         .unwrap()
         .unwrap();

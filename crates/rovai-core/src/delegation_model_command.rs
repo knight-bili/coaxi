@@ -1,7 +1,7 @@
 //! Model commands use Core-attested identity and the original command receipt transaction.
 //! No process launch, directory observation or task-blob preparation belongs in this lock.
 use anyhow::{Context, Result, ensure};
-use rusqlite::{Connection, OptionalExtension, params};
+use rusqlite::{Connection, OptionalExtension, Transaction, params};
 use serde::Serialize;
 use serde_json::{Value, json};
 
@@ -119,6 +119,67 @@ fn envelope<T: Serialize, C: DomainCommand>(
     })
 }
 
+#[derive(Clone, Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub(crate) struct ReceiptObservation {
+    pub command_id: String,
+    pub request_digest: String,
+}
+impl ReceiptObservation {
+    pub(crate) fn valid(&self) -> bool {
+        let hash =
+            |value: &str| value.len() == 64 && value.bytes().all(|byte| byte.is_ascii_hexdigit());
+        self.command_id
+            .strip_prefix("delegation-")
+            .is_some_and(hash)
+            && hash(&self.request_digest)
+    }
+}
+
+// Observation only: the digest cannot authorize or dispatch a command.
+pub(crate) fn receipt_observation<T: Serialize>(
+    db: &Database,
+    invocation: &Invocation<'_, T>,
+    operation: &str,
+) -> Result<ReceiptObservation> {
+    fn key<C: DomainCommand>(envelope: CommandEnvelope<C>) -> Result<ReceiptObservation> {
+        Ok(ReceiptObservation {
+            request_digest: canonical_json_digest(&serde_json::to_value(&envelope)?)?,
+            command_id: envelope.command_id,
+        })
+    }
+    match operation {
+        "delegation.start" => key(envelope(db.connection(), invocation, Start)?),
+        "delegation.cancel" => key(envelope(db.connection(), invocation, Cancel)?),
+        "delegation.resume" => key(envelope(db.connection(), invocation, Resume)?),
+        _ => anyhow::bail!("delegation.invalid_receipt_operation"),
+    }
+}
+
+fn execute_observed<C: DomainCommand>(
+    db: &mut Database,
+    command: &CommandEnvelope<C>,
+    observation: Option<&str>,
+    handler: impl FnOnce(&Transaction<'_>) -> Result<CommandHandlerResult>,
+) -> Result<CommandExecution> {
+    DomainCommandGateway.execute(db, command, |tx| {
+        let result = handler(tx)?;
+        if let Some(tool_call) = observation {
+            crate::collaboration::append_domain_event(
+                tx,
+                "delegation.tool_receipt_confirmed",
+                command.camp_id.as_deref(),
+                None,
+                &command.actor,
+                command.execution_epoch,
+                &json!({"toolCallId":tool_call,"commandId":command.command_id,
+                    "requestDigest":canonical_json_digest(&serde_json::to_value(command)?)?}),
+            )?;
+        }
+        Ok(result)
+    })
+}
+
 pub(crate) fn replay_start(
     db: &Database,
     invocation: &Invocation<'_, StartParams>,
@@ -145,8 +206,17 @@ pub(crate) fn resume(
     prepared: &crate::delegation_resume::PreparedResume,
     directory: &crate::delegation_resume::DirectoryObservation,
 ) -> Result<CommandExecution> {
+    resume_observed(db, invocation, prepared, directory, None)
+}
+pub(crate) fn resume_observed(
+    db: &mut Database,
+    invocation: &Invocation<'_, ResumeParams>,
+    prepared: &crate::delegation_resume::PreparedResume,
+    directory: &crate::delegation_resume::DirectoryObservation,
+    observation: Option<&str>,
+) -> Result<CommandExecution> {
     let command = envelope(db.connection(), invocation, Resume)?;
-    DomainCommandGateway.execute(db, &command, |tx| {
+    execute_observed(db, &command, observation, |tx| {
         prepared.commit(
             tx,
             invocation,
@@ -169,7 +239,7 @@ pub(crate) fn start(
     invocation: &Invocation<'_, StartParams>,
     prepared: PreparedStart<'_>,
 ) -> Result<CommandExecution> {
-    start_inner(db, invocation, prepared, None)
+    start_inner(db, invocation, prepared, None, None)
 }
 
 pub(crate) fn start_with_candidate(
@@ -177,8 +247,9 @@ pub(crate) fn start_with_candidate(
     invocation: &Invocation<'_, StartParams>,
     prepared: PreparedStart<'_>,
     candidate: &crate::managed_blob::PreparedBlobCandidate,
+    observation: Option<&str>,
 ) -> Result<CommandExecution> {
-    start_inner(db, invocation, prepared, Some(candidate))
+    start_inner(db, invocation, prepared, Some(candidate), observation)
 }
 
 fn start_inner(
@@ -186,9 +257,10 @@ fn start_inner(
     invocation: &Invocation<'_, StartParams>,
     prepared: PreparedStart<'_>,
     candidate: Option<&crate::managed_blob::PreparedBlobCandidate>,
+    observation: Option<&str>,
 ) -> Result<CommandExecution> {
     let command = envelope(db.connection(), invocation, Start)?;
-    DomainCommandGateway.execute(db, &command, |tx| {
+    execute_observed(db, &command, observation, |tx| {
         ensure!(
             prepared.admission.matches_invocation(
                 invocation.binding,
@@ -286,6 +358,7 @@ pub(crate) fn reject_start(
     db: &mut Database,
     invocation: &Invocation<'_, StartParams>,
     code: &str,
+    observation: Option<&str>,
 ) -> Result<CommandExecution> {
     ensure!(
         code.starts_with("delegation.")
@@ -295,7 +368,7 @@ pub(crate) fn reject_start(
         "delegation.invalid_rejection"
     );
     let command = envelope(db.connection(), invocation, Start)?;
-    DomainCommandGateway.execute(db, &command, |tx| {
+    execute_observed(db, &command, observation, |tx| {
         authenticate_operation(
             tx,
             invocation.binding,
@@ -314,9 +387,16 @@ pub(crate) fn cancel(
     db: &mut Database,
     invocation: &Invocation<'_, CancelParams>,
 ) -> Result<CommandExecution> {
+    cancel_observed(db, invocation, None)
+}
+pub(crate) fn cancel_observed(
+    db: &mut Database,
+    invocation: &Invocation<'_, CancelParams>,
+    observation: Option<&str>,
+) -> Result<CommandExecution> {
     let command = envelope(db.connection(), invocation, Cancel)?;
     let mut stopped = Vec::new();
-    let result = DomainCommandGateway.execute(db, &command, |tx| {
+    let result = execute_observed(db, &command, observation, |tx| {
         let scope = authenticate_operation(
             tx,
             invocation.binding,

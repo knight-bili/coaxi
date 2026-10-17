@@ -1,4 +1,4 @@
-use anyhow::{Result, ensure};
+use anyhow::{Context, Result, ensure};
 use serde_json::{Map, Value, json};
 
 use crate::{
@@ -87,6 +87,50 @@ pub fn project_builtin_tool_invocation(
     });
     let projection_digest = canonical_json_digest(&projection)?;
     projection["projectionDigest"] = json!(projection_digest);
+    Ok(projection)
+}
+
+// Recovery has the original sanitized projection, never a second raw task copy.
+pub(crate) fn complete_saved_invocation(
+    operation: &str,
+    saved: &Value,
+    raw_result: &Value,
+) -> Result<Value> {
+    let mut projection = saved.clone();
+    let digest = projection
+        .as_object_mut()
+        .context("Missing saved projection")?
+        .remove("projectionDigest")
+        .context("Missing saved projection digest")?;
+    // Lifecycle persistence omits canonicalResult to keep one result body.
+    // A start projection originally hashed that exact field as JSON null.
+    if projection.get("canonicalResult").is_none() {
+        projection["canonicalResult"] = Value::Null;
+    }
+    ensure!(
+        digest.as_str() == Some(canonical_json_digest(&projection)?.as_str())
+            && projection["schemaVersion"] == BUILTIN_TOOL_EVIDENCE_PROJECTION_SCHEMA_VERSION
+            && projection["operation"] == operation
+            && projection["canonicalResult"].is_null()
+            && projection["resultDigest"].is_null()
+            && projection["canonicalInput"].is_object()
+            && projection["digestBinding"]["result"].is_null()
+            && projection["digestBinding"]["input"]["evidenceField"] == "rawInputDigest"
+            && projection["inputDigest"]
+                .as_str()
+                .is_some_and(|digest| digest.len() == 64
+                    && digest.bytes().all(|byte| byte.is_ascii_hexdigit()))
+            && projection["digestBinding"]["input"]["digest"] == projection["inputDigest"],
+        "Invalid saved invocation projection"
+    );
+    let output_digest = canonical_json_digest(raw_result)?;
+    let mut result = raw_result.clone();
+    crate::thread_compat::project_builtin_result(operation, &mut result)?;
+    projection["canonicalResult"] = project_result(operation, &result)?;
+    projection["digestBinding"]["result"] =
+        json!({"evidenceField":"rawOutputDigest","digest":output_digest});
+    projection["resultDigest"] = json!(output_digest);
+    projection["projectionDigest"] = json!(canonical_json_digest(&projection)?);
     Ok(projection)
 }
 
@@ -1204,6 +1248,34 @@ mod tests {
             assert!(!serialized.contains(secret));
         }
         assert_eq!(projection["operation"], "delegation.start");
+        let result = json!({"task_id":"task-1","status":"running"});
+        let recovered =
+            complete_saved_invocation("delegation.start", &projection, &result).unwrap();
+        let mut persisted_start = projection.clone();
+        persisted_start
+            .as_object_mut()
+            .unwrap()
+            .remove("canonicalResult");
+        assert_eq!(
+            complete_saved_invocation("delegation.start", &persisted_start, &result).unwrap(),
+            recovered
+        );
+        assert_eq!(
+            recovered,
+            project_builtin_tool_invocation(
+                "delegation.start",
+                &input,
+                Some(&result),
+                &digest(&input),
+                Some(&digest(&result))
+            )
+            .unwrap()
+        );
+        let mut changed = projection.clone();
+        changed["canonicalInput"]["agent_type"] = json!("different-target");
+        assert!(complete_saved_invocation("delegation.start", &changed, &result).is_err());
+        assert!(complete_saved_invocation("delegation.cancel", &projection, &result).is_err());
+        assert!(complete_saved_invocation("delegation.start", &recovered, &result).is_err());
         for operation in TEAM_TOOL_NAMES {
             let input = json!({});
             let result = json!({});

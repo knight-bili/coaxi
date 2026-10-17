@@ -262,6 +262,16 @@ fn assert_delegation_evidence(
         delegation_activity(f, &source.agent_run_id, "delegation.start", &uncertain),
         unfinished
     );
+    assert_delegation_observation_recovery(
+        f,
+        &rt,
+        &leases,
+        &auth,
+        source,
+        &uncertain,
+        &committed,
+        &unfinished,
+    );
     delegation_dispatch_call(
         &rt,
         f,
@@ -330,6 +340,13 @@ fn assert_delegation_evidence(
         "delegation.status",
         json!({"task_ids":["unknown"],"wait_ms":0,"after_cursor":snap.payload["cursor"]}),
     );
+    f.database
+        .connection()
+        .execute_batch(&format!(
+        "CREATE TEMP TRIGGER lose_fenced_activity_end BEFORE UPDATE ON agent_run_execution_evidence
+         WHEN OLD.agent_run_id='{run}' BEGIN SELECT RAISE(ABORT,'lost fenced result'); END;"
+    ))
+        .unwrap();
     rt.block_on(async {
         let db = tokio::sync::Mutex::new(&mut f.database);
         let future = crate::delegation_dispatch::invoke(
@@ -364,12 +381,54 @@ fn assert_delegation_evidence(
         );
     });
     let BuiltinToolIpcRequestBody::Invoke { request_id, .. } = &wait.body;
+    f.database
+        .connection()
+        .execute_batch("DROP TRIGGER lose_fenced_activity_end;")
+        .unwrap();
     let closed = delegation_activities(f, &run)
         .into_iter()
-        .find(|(_, p)| p["coreEnvelope"]["requestId"] == *request_id)
+        .find(|(_, p)| p["coreRequestId"] == *request_id)
         .unwrap();
-    assert_eq!(closed.1["status"], "failed");
-    assert_eq!(closed.1["errorCode"], "builtin_tool.run_not_bound");
+    assert_eq!(closed.1["status"], "started");
+    f.database
+        .connection()
+        .execute(
+            "UPDATE agent_run SET execution_epoch=execution_epoch+1 WHERE id=?1",
+            [&run],
+        )
+        .unwrap();
+    let before_late = f.database.connection().total_changes();
+    let mut late = closed.1.clone();
+    late["status"] = json!("failed");
+    assert!(
+        ExecutionEvidenceService
+            .record_builtin_tool_result(
+                &mut f.database,
+                &ManagedBlobStore::new(&f.directory),
+                &run,
+                epoch,
+                &late
+            )
+            .unwrap()
+            .is_none()
+    );
+    assert_eq!(f.database.connection().total_changes(), before_late);
+    let mut cursor = crate::delegation_dispatch::recovery::Cursor::capture(&f.database).unwrap();
+    let count = factory_counts(f);
+    while !cursor.done() {
+        assert_eq!(
+            cursor.next(&mut f.database, &f.directory).unwrap().failures,
+            0
+        );
+    }
+    let recovered = delegation_activities(f, &run)
+        .into_iter()
+        .find(|(id, _)| id == &closed.0)
+        .unwrap()
+        .1;
+    assert_eq!(recovered["status"], "failed");
+    assert_eq!(recovered["errorCode"], "builtin_tool.result_unconfirmed");
+    assert_eq!(factory_counts(f), count);
     let count = factory_counts(f);
     let denied = delegation_cli_request(
         &fenced_auth,
@@ -387,4 +446,169 @@ fn assert_delegation_evidence(
     assert_eq!(factory_counts(f), count);
     rt.block_on(leases.unregister(&fenced_auth.process_id));
     rt.block_on(leases.unregister(config.process_id()));
+}
+
+fn assert_delegation_observation_recovery(
+    f: &mut Fixture,
+    rt: &tokio::runtime::Runtime,
+    leases: &crate::builtin_tool_runtime::BuiltinToolLeaseRegistry,
+    auth: &crate::builtin_tool_transport::BuiltinToolAuth,
+    source: &crate::team_tool::AuthenticatedTeamToolRun,
+    request: &crate::builtin_tool_transport::BuiltinToolIpcRequest,
+    result: &crate::delegation_dispatch::Outcome,
+    unfinished: &(String, Value),
+) {
+    use crate::{
+        delegation_dispatch::recovery::Cursor, execution_evidence::ExecutionEvidenceService,
+    };
+    let store = ManagedBlobStore::new(&f.directory);
+    // Same request proof, different actual attempt: the committed receipt must
+    // never be borrowed without its atomic attempt association.
+    let mut other = unfinished.1.clone();
+    other["toolCallId"] = json!(Uuid::new_v4().to_string());
+    let orphan = ExecutionEvidenceService
+        .record_builtin_tool_started(
+            &mut f.database,
+            &store,
+            &source.agent_run_id,
+            source.execution_epoch,
+            &other,
+        )
+        .unwrap()
+        .unwrap()
+        .id
+        .clone();
+    other["toolCallId"] = json!(Uuid::new_v4().to_string());
+    let gone = ExecutionEvidenceService
+        .record_builtin_tool_started(
+            &mut f.database,
+            &store,
+            &source.agent_run_id,
+            source.execution_epoch,
+            &other,
+        )
+        .unwrap()
+        .unwrap()
+        .id
+        .clone();
+    let gone_rowid: i64 = f
+        .database
+        .connection()
+        .query_row(
+            "SELECT rowid FROM agent_run_execution_evidence WHERE id=?1",
+            [&gone],
+            |r| r.get(0),
+        )
+        .unwrap();
+    let mut cursor = Cursor::capture(&f.database).unwrap();
+    f.database
+        .connection()
+        .execute(
+            "DELETE FROM canonical_runtime_activity WHERE EXISTS
+        (SELECT 1 FROM json_each(source_evidence_ids_json) WHERE value=?1)",
+            [&gone],
+        )
+        .unwrap();
+    f.database
+        .connection()
+        .execute(
+            "DELETE FROM agent_run_execution_evidence WHERE id=?1",
+            [&gone],
+        )
+        .unwrap();
+    f.database.connection().execute_batch("CREATE TEMP TRIGGER lose_later_activity_end BEFORE UPDATE ON agent_run_execution_evidence BEGIN SELECT RAISE(ABORT,'lost later result'); END;").unwrap();
+    let later = delegation_cli_request(
+        auth,
+        "delegation.status",
+        json!({"task_ids":[result.payload["task_id"]]}),
+    );
+    delegation_dispatch_call(rt, f, leases, &later);
+    let later_id = delegation_activity(f, &source.agent_run_id, "delegation.status", &later).0;
+    let later_rowid: i64 = f
+        .database
+        .connection()
+        .query_row(
+            "SELECT rowid FROM agent_run_execution_evidence WHERE id=?1",
+            [&later_id],
+            |r| r.get(0),
+        )
+        .unwrap();
+    assert_eq!(
+        later_rowid, gone_rowid,
+        "SQLite reused the deleted rowid; recovery must pin UUIDs"
+    );
+    f.database
+        .connection()
+        .execute_batch("DROP TRIGGER lose_later_activity_end;")
+        .unwrap();
+    f.database
+        .connection()
+        .execute_batch(&format!(
+            "CREATE TEMP TRIGGER lose_reconciliation BEFORE UPDATE ON agent_run_execution_evidence
+         WHEN OLD.id='{}' BEGIN SELECT RAISE(ABORT,'reconciliation write fault'); END;",
+            unfinished.0
+        ))
+        .unwrap();
+    let counts = factory_counts(f);
+    let batch = cursor.next(&mut f.database, &f.directory).unwrap();
+    assert_eq!(batch.failures, 1);
+    assert!(batch.updated.iter().any(|e| e.id == orphan));
+    assert_eq!(
+        delegation_activity(f, &source.agent_run_id, "delegation.status", &later).1["status"],
+        "started"
+    );
+    assert_eq!(factory_counts(f), counts);
+    f.database
+        .connection()
+        .execute_batch("DROP TRIGGER lose_reconciliation;")
+        .unwrap();
+    // A new real SQLite connection consumes the durable proof. Native identity
+    // remains the owner's fixture; this is not an App/provider restart.
+    f.database = Database::open(&f.directory).unwrap();
+    let mut retry = Cursor::capture(&f.database).unwrap();
+    while !retry.done() {
+        assert_eq!(
+            retry.next(&mut f.database, &f.directory).unwrap().failures,
+            0
+        );
+    }
+    // request ID alone now has two observations; choose the original exact row.
+    let saved = delegation_activities(f, &source.agent_run_id)
+        .into_iter()
+        .find(|(id, _)| id == &unfinished.0)
+        .unwrap()
+        .1;
+    assert_eq!(saved["status"], "completed");
+    let crate::builtin_tool_transport::BuiltinToolIpcRequestBody::Invoke { request_id, .. } =
+        &request.body;
+    assert_eq!(saved["coreEnvelope"]["requestId"], *request_id);
+    assert_eq!(saved["coreReconciliation"], "receipt_confirmed");
+    assert_eq!(
+        saved["agentOutputDigest"],
+        crate::command::canonical_json_digest(&result.payload).unwrap()
+    );
+    let other = delegation_activities(f, &source.agent_run_id)
+        .into_iter()
+        .find(|(id, _)| id == &orphan)
+        .unwrap()
+        .1;
+    assert_eq!(other["errorCode"], "builtin_tool.result_unconfirmed");
+    assert_eq!(
+        delegation_activity(f, &source.agent_run_id, "delegation.status", &later).1["errorCode"],
+        "builtin_tool.result_unconfirmed"
+    );
+    assert!(!saved.to_string().contains("committed-receipt-must-win"));
+    assert_eq!(factory_counts(f), counts);
+    let changes = f.database.connection().total_changes();
+    let mut again = Cursor::capture(&f.database).unwrap();
+    while !again.done() {
+        assert!(
+            again
+                .next(&mut f.database, &f.directory)
+                .unwrap()
+                .updated
+                .is_empty()
+        );
+    }
+    assert_eq!(f.database.connection().total_changes(), changes);
 }
