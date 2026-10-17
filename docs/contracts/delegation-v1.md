@@ -37,6 +37,16 @@ control 原语按精确版本记录接管，要求旧 Run 已经终态，冻结�
 
 ## 完整执行待接入
 
+### User 子输入运输
+
+`delegations.message.send` 使用 `{commandId,command:{conversationId,composerScope?,expectedRevision,body}}`；Core 从确切 child 派生 Thread、从可信 Request 派生编辑端，以本地 User 身份调用已经存在的整份私有材料消费算法。拒绝额外 Thread、actor、draftClient、sourcePath 或另一组附件字段；不能把其他私聊升级为 child。忙碌时整份输入进入该 child 的原 FIFO，失败保留草稿材料。
+
+`delegations.pendingInputs.get` 只接 `{conversationId,composerScope?}`，返回安全队列及该编辑端在该位置的工作副本；`delegations.pendingInputs.edit` 使用 `{commandId,command:{conversationId,pendingInputId,expectedRevision,editToken,composerScope?,action}}`，沿原 begin/takeover/save/remove/reorder/quote/cancel/delete/return 动作。这里的 takeover 仅接管排队编辑租约，不是原委派执行的控制权接管。
+
+两项写操作通过 `commands.reconcile` 重建同一密封命令并只读核对原 UUID；查询不补发。Web 分组按操作、child 和输入位置隔离，明确重试须保持原编号和完整参数；Native Main 与 Web Operation 只放行这三项，不开放内部 pending publish。源文件观察沿原有界 worker 在数据库锁外执行，事务内再核对原 owner/CAS/租约；首次成功或拒绝回执仍由 Core Gateway 持久保存。新写入成功后发 `delegation.changed`，回放不另发；Web 原失效通知流会要求重新读取授权快照。
+
+这些接口不激活候选160/210迁移，不代替原委派真实接管、取消清理、目标 Runtime 初始准入、完整 Context 投递、原界面或阶段集成验证。
+
 新Run的`delegationPolicy`冻结schemaVersion=1、enabled、depthLimit和public_parent/private_parent/child角色。缺失即旧资格；null、未知字段、非法版本/深度拒绝，不能从当前全局开关补给旧Run。新的start/resume还要求当前设置启用；既有关系的status/cancel/read/history不因关开关消失。该判断只是资格原语，完整工具网关仍要校验当前执行、绑定、直接父及控制权。
 
 Profile11为child的publicHistory/taskAwareness/memoryEntrypoint三个none；Profile12保留公共maxSelfActiveTasks=8；Profile13沿用原私聊数值边界。格式35只接受(public batch/direct/a2a/gather_completion,12,9)、(single_chat,13,6)和(delegation/delegation_user,11,10)元组。默认Profile7/10、格式29/34和既有摘要不改。

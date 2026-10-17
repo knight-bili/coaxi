@@ -33,6 +33,7 @@ impl ExecutionWake {
             self.automation.notify_one();
             self.authorization.notify_one();
         } else if command.starts_with("single_chat.")
+            || command.starts_with("delegations.")
             || command.starts_with("agent_run.")
             || command.starts_with("camp_turn.")
             || command.starts_with("camp.")

@@ -49,6 +49,9 @@ pub(super) fn reconcile(
         }};
     }
     match query.operation.as_str() {
+        "delegations.message.send" | "delegations.pendingInputs.edit" => {
+            delegation_input::reconcile(database, client, &query.operation, query.params)
+        }
         "delegations.composer.mutate" => {
             delegation_composer::reconcile(database, client, query.params)
         }

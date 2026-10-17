@@ -1158,6 +1158,14 @@ export interface EditSingleChatPendingInputCommand {
   action: SingleChatPendingInputEditAction
 }
 
+export type EditDelegationPendingInputCommand = Omit<EditSingleChatPendingInputCommand, 'threadId'>
+export interface SendDelegationMessageCommand {
+  conversationId: string
+  composerScope?: SingleChatComposerScope | null
+  expectedRevision: number
+  body: string
+}
+
 export type SingleChatPendingReturnPayload = {
   pendingInputId: string
   body: string
@@ -4813,6 +4821,9 @@ export type CoreMethod =
   | 'singleChat.composerDraft.removeAttachment'
   | 'singleChat.composerDraft.mutate'
   | 'delegations.composer.get'
+  | 'delegations.message.send'
+  | 'delegations.pendingInputs.get'
+  | 'delegations.pendingInputs.edit'
   | 'delegations.composer.mutate'
   | 'delegations.composer.recovery'
   | 'singleChat.composerDraft.recovery'

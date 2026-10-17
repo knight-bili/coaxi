@@ -111,6 +111,12 @@ pub enum Operation {
     SingleChatComposerRecovery,
     #[serde(rename = "delegations.composer.get")]
     DelegationComposerGet,
+    #[serde(rename = "delegations.message.send")]
+    DelegationMessageSend,
+    #[serde(rename = "delegations.pendingInputs.get")]
+    DelegationPendingGet,
+    #[serde(rename = "delegations.pendingInputs.edit")]
+    DelegationPendingEdit,
     #[serde(rename = "delegations.composer.mutate")]
     DelegationComposerMutate,
     #[serde(rename = "delegations.composer.recovery")]
@@ -564,6 +570,9 @@ impl Operation {
             Self::SingleChatComposerMutate => "singleChat.composerDraft.mutate",
             Self::SingleChatComposerRecovery => "singleChat.composerDraft.recovery",
             Self::DelegationComposerGet => "delegations.composer.get",
+            Self::DelegationMessageSend => "delegations.message.send",
+            Self::DelegationPendingGet => "delegations.pendingInputs.get",
+            Self::DelegationPendingEdit => "delegations.pendingInputs.edit",
             Self::DelegationComposerMutate => "delegations.composer.mutate",
             Self::DelegationComposerRecovery => "delegations.composer.recovery",
 
@@ -837,6 +846,15 @@ mod tests {
         assert_eq!(withdraw.method(), "camp.messages.withdraw");
         for (public, internal) in [
             ("delegations.composer.get", "delegations.composer.get"),
+            ("delegations.message.send", "delegations.message.send"),
+            (
+                "delegations.pendingInputs.get",
+                "delegations.pendingInputs.get",
+            ),
+            (
+                "delegations.pendingInputs.edit",
+                "delegations.pendingInputs.edit",
+            ),
             ("delegations.composer.mutate", "delegations.composer.mutate"),
             (
                 "delegations.composer.recovery",

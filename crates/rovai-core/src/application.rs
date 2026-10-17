@@ -5,6 +5,7 @@ mod canvas_terminal;
 mod config;
 mod conversation_preferences;
 pub(crate) mod delegation_composer;
+pub(crate) mod delegation_input;
 mod mission;
 pub(crate) mod private_composer;
 mod private_sources;
@@ -861,6 +862,9 @@ fn request_runs_outside_main_queue(method: &str) -> bool {
             | "singleChat.pendingInputs.addSourceAttachmentFromPath"
             | "singleChat.pendingInputs.edit"
             | "singleChat.send"
+            | "delegations.message.send"
+            | "delegations.pendingInputs.edit"
+            | "delegations.composer.mutate"
             | "singleChat.end"
             | "channels.executionConsole.agentRun.cancel"
             | "channels.dingtalk.executionConsole.agentRun.cancel"
@@ -10563,6 +10567,28 @@ impl Core {
                     SingleChatService::for_client(request.client.clone())
                         .list_active(&database, params.camp_id.as_str())?,
                 )?)
+            }
+            "delegations.message.send" | "delegations.pendingInputs.edit" => {
+                let reply = delegation_input::handle_mutation(
+                    &self.database,
+                    &self.private_source_read_capacity,
+                    &request.client,
+                    &request.method,
+                    request.params.clone(),
+                )
+                .await?;
+                if let Some((thread_id, conversation_id)) = reply.changed {
+                    emit(
+                        &self.output,
+                        "delegation.changed",
+                        json!({"threadId":thread_id,"conversationId":conversation_id}),
+                    );
+                }
+                Ok(reply.result)
+            }
+            "delegations.pendingInputs.get" => {
+                let database = self.database.lock().await;
+                delegation_input::read(&database, &request.client, request.params.clone())
             }
             "delegations.composer.mutate" => {
                 let reply = delegation_composer::handle_mutation(

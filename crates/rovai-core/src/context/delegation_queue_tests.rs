@@ -23,7 +23,7 @@ fn queue_read(
     c: &crate::draft_client::DraftClient,
     conversation: &str,
 ) -> crate::single_chat::SingleChatPendingInputsView {
-    crate::delegation_user::read_pending_inputs(
+    let view = crate::delegation_user::read_pending_inputs(
         &f.database,
         &queue_actor(),
         c,
@@ -31,7 +31,16 @@ fn queue_read(
         conversation,
         None,
     )
-    .unwrap()
+    .unwrap();
+    let api = crate::application::delegation_input::read(
+        &f.database,
+        c,
+        json!({"conversationId":conversation}),
+    )
+    .unwrap();
+    assert_eq!(api, serde_json::to_value(&view).unwrap());
+    assert!(!serde_json::to_string(&api).unwrap().contains("sourcePath"));
+    view
 }
 fn queue_send(
     f: &mut Fixture,
@@ -42,21 +51,33 @@ fn queue_send(
     let revision = queue_draft(f, c, conversation)["revision"]
         .as_i64()
         .unwrap();
-    let command = CommandEnvelope {
-        command_id: Uuid::new_v4().to_string(),
-        actor: queue_actor(),
-        camp_id: Some(f.camp_id.clone()),
-        expected_versions: vec![],
-        execution_epoch: None,
-        payload: crate::delegation_user::SendDelegationMessageCommand {
-            draft_client: c.clone(),
-            camp_id: f.camp_id.clone(),
-            conversation_id: conversation.into(),
-            composer_scope: None,
-            expected_revision: revision,
-            body: body.into(),
-        },
-    };
+    let request = json!({"commandId":Uuid::new_v4().to_string(),"command":{
+        "conversationId":conversation,"expectedRevision":revision,"body":body}});
+    use crate::application::delegation_input as api;
+    let command = api::send_envelope(&f.database, c, request.clone()).unwrap();
+    assert_eq!(command.camp_id.as_deref(), Some(f.camp_id.as_str()));
+    assert_eq!(command.payload.draft_client, *c);
+    for field in [
+        "threadId",
+        "draftClient",
+        "sourcePath",
+        "actor",
+        "attachments",
+    ] {
+        let mut forged = request.clone();
+        forged["command"][field] = json!("forged");
+        assert!(
+            api::send_envelope(&f.database, c, forged).is_err(),
+            "{field}"
+        );
+    }
+    let before = f.database.connection().total_changes();
+    assert_eq!(
+        api::reconcile(&f.database, c, "delegations.message.send", request.clone()).unwrap()
+            ["state"],
+        "unknown"
+    );
+    assert_eq!(before, f.database.connection().total_changes());
     let result = crate::delegation_user::send(&mut f.database, &command).unwrap();
     assert_eq!(
         result.result.status,
@@ -85,6 +106,18 @@ fn queue_send(
             .query_row("SELECT total_changes()", [], |r| r.get::<_, i64>(0))
             .unwrap()
     );
+    let stored =
+        api::reconcile(&f.database, c, "delegations.message.send", request.clone()).unwrap();
+    assert_eq!(stored["state"], "recorded");
+    assert_eq!(
+        stored["result"],
+        serde_json::to_value(&result.result).unwrap()
+    );
+    let mut changed = request;
+    changed["command"]["body"] = json!("different input");
+    // Gateway returns the first submission even when retry payload bytes change.
+    assert_eq!(api::reconcile(&f.database, c, "delegations.message.send", changed).unwrap(), stored);
+    assert_eq!(changes,f.database.connection().query_row("SELECT total_changes()", [], |r|r.get::<_,i64>(0)).unwrap());
     id
 }
 fn queue_edit_command(
@@ -96,25 +129,20 @@ fn queue_edit_command(
     token: Option<&str>,
     action: crate::single_chat::SingleChatPendingInputEditAction,
 ) -> CommandEnvelope<crate::delegation_user::EditDelegationPendingInputCommand> {
-    CommandEnvelope {
-        command_id: Uuid::new_v4().to_string(),
-        actor: queue_actor(),
-        camp_id: Some(f.camp_id.clone()),
-        expected_versions: vec![],
-        execution_epoch: None,
-        payload: crate::delegation_user::EditDelegationPendingInputCommand(
-            crate::single_chat::EditSingleChatPendingInputCommand {
-                draft_client: c.clone(),
-                camp_id: f.camp_id.clone(),
-                conversation_id: conversation.into(),
-                pending_input_id: id.into(),
-                expected_revision: revision,
-                edit_token: token.map(str::to_string),
-                composer_scope: None,
-                action,
-            },
-        ),
+    let request = json!({"commandId":Uuid::new_v4().to_string(),"command":{
+        "conversationId":conversation,"pendingInputId":id,"expectedRevision":revision,
+        "editToken":token,"action":action}});
+    let envelope =
+        crate::application::delegation_input::edit_envelope(&f.database, c, request.clone())
+            .unwrap();
+    for field in ["threadId", "draftClient", "sourcePath", "actor"] {
+        let mut forged = request.clone();
+        forged["command"][field] = json!("forged");
+        assert!(
+            crate::application::delegation_input::edit_envelope(&f.database, c, forged).is_err()
+        );
     }
+    envelope
 }
 fn queue_edit(
     f: &mut Fixture,
@@ -124,7 +152,37 @@ fn queue_edit(
     let prepared = std::sync::Arc::new(
         crate::private_source_observation::PreparedSources::capture(sources).unwrap(),
     );
-    crate::delegation_user::edit_with_prepared_sources(&mut f.database, command, prepared).unwrap()
+    let result =
+        crate::delegation_user::edit_with_prepared_sources(&mut f.database, command, prepared)
+            .unwrap();
+    let mut input = serde_json::to_value(&command.payload.0).unwrap();
+    input.as_object_mut().unwrap().remove("threadId");
+    input.as_object_mut().unwrap().remove("draftClient");
+    let request = json!({"commandId":command.command_id,"command":input});
+    let before = f.database.connection().total_changes();
+    use crate::application::delegation_input as api;
+    let stored = api::reconcile(
+        &f.database,
+        &command.payload.0.draft_client,
+        "delegations.pendingInputs.edit",
+        request.clone(),
+    )
+    .unwrap();
+    assert_eq!(stored["state"], "recorded");
+    assert_eq!(
+        stored["result"],
+        serde_json::to_value(&result.result).unwrap()
+    );
+    let other = crate::draft_client::DraftClient::verified_web(&"c".repeat(64)).unwrap();
+    assert!(api::reconcile(
+        &f.database,
+        &other,
+        "delegations.pendingInputs.edit",
+        request
+    )
+    .is_err());
+    assert_eq!(before, f.database.connection().total_changes());
+    result
 }
 fn queue_publish(
     f: &mut Fixture,
@@ -204,6 +262,13 @@ fn assert_child_user_queue(f: &mut Fixture, conversation: &str, active: &str) {
         single_chat::{PublishSingleChatPendingInput, SingleChatPendingInputEditAction as Action},
     };
     let native = crate::draft_client::DraftClient::default();
+    for command in ["delegations.message.send","delegations.pending_input.edit","delegations.pending_input.publish"] {
+        let wake = crate::execution_wake::ExecutionWake::default();
+        wake.command_committed(command);
+        let mut notified = std::pin::pin!(wake.runs.notified());
+        let mut context = std::task::Context::from_waker(std::task::Waker::noop());
+        assert!(std::future::Future::poll(notified.as_mut(), &mut context).is_ready(), "{command} must wake dispatch");
+    }
     let web = crate::draft_client::DraftClient::verified_web(&"b".repeat(64)).unwrap();
     let first = queue_upload(f, conversation, "queue-first.txt");
     let second = queue_upload(f, conversation, "queue-second.txt");

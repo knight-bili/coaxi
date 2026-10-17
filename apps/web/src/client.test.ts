@@ -196,9 +196,12 @@ describe('console transport', () => {
     expect(fetcher.mock.calls.filter(([, init]) => init?.body && JSON.parse(String(init.body)).operation === operation)).toHaveLength(1)
   })
 
-  it.each(['singleChat.composerDraft.mutate', 'delegations.composer.mutate'] as const)('keeps an unknown private card independent and settles the original promise through an explicit receipt read: %s', async operation => {
+  it.each(['singleChat.composerDraft.mutate', 'delegations.composer.mutate', 'delegations.message.send', 'delegations.pendingInputs.edit'] as const)('keeps an unknown private card independent and settles the original promise through an explicit receipt read: %s', async operation => {
     let recorded = false
-    const params = (nodeId: string) => ({ commandId: newCommandId(), command: { threadId: 'thread', conversationId: operation === 'delegations.composer.mutate' ? `child-${nodeId}` : 'private', ...(operation === 'singleChat.composerDraft.mutate' ? { composerScope: { kind: 'canvas', boardId: 'board', nodeId } } : {}), expectedDraftRevision: 0, action: { type: 'register_scope' } } })
+    const params = (nodeId: string) => ({ commandId: newCommandId(), command:
+      operation === 'delegations.message.send' ? { conversationId: `child-${nodeId}`, expectedRevision: 0, body: `输入${nodeId}` }
+        : operation === 'delegations.pendingInputs.edit' ? { conversationId: `child-${nodeId}`, pendingInputId: `pending-${nodeId}`, expectedRevision: 1, editToken: null, action: { type: 'begin' } }
+          : { threadId: 'thread', conversationId: operation === 'delegations.composer.mutate' ? `child-${nodeId}` : 'private', ...(operation === 'singleChat.composerDraft.mutate' ? { composerScope: { kind: 'canvas', boardId: 'board', nodeId } } : {}), expectedDraftRevision: 0, action: { type: 'register_scope' } } })
     const first = params('A'), second = params('B')
     const result = { status: 'applied', code: 'single_chat.composer_draft_updated', payload: {} }
     const fetcher = vi.fn<typeof fetch>().mockImplementation(async (url, options) => {
@@ -222,9 +225,9 @@ describe('console transport', () => {
     expect(fetcher.mock.calls.filter(([, init]) => { const body = JSON.parse(String(init?.body)); return body.operation === operation && body.params.commandId === first.commandId })).toHaveLength(1)
   })
 
-  it('retries only the exact original private request and resolves its retained transport promise', async () => {
+  it.each(['singleChat.pendingInputs.edit', 'delegations.pendingInputs.edit'] as const)('retries only the exact original private request and resolves its retained transport promise: %s', async operation => {
     let permit = false
-    const params = { commandId: newCommandId(), command: { threadId: 'thread', conversationId: 'private', action: { type: 'return_to_composer', targetBody: '完整当前正文', expectedDraftRevision: 1 } } }
+    const params = { commandId: newCommandId(), command: { ...(operation === 'singleChat.pendingInputs.edit' ? { threadId: 'thread' } : {}), conversationId: 'private', pendingInputId: 'pending', expectedRevision: 1, editToken: 'lease', action: { type: 'return_to_composer', targetBody: '完整当前正文', expectedDraftRevision: 1 } } }
     const result = { status: 'applied', payload: { placement: 'retained' } }
     const fetcher = vi.fn<typeof fetch>().mockImplementation(async (url, options) => {
       if (String(url).endsWith('/login')) return Response.json({ protocolVersion: 4, token: 'a'.repeat(64), clientId: 'd'.repeat(64), editorProof: 'e'.repeat(64), ownerId: 'local_user' })
@@ -236,11 +239,11 @@ describe('console transport', () => {
     })
     const client = new ConsoleClient('http://localhost:4317', fetcher)
     await client.login('b'.repeat(64))
-    const pending = client.request('singleChat.pendingInputs.edit', params)
+    const pending = client.request(operation, params)
     await vi.waitFor(() => expect(client.pendingCommandCount).toBe(1))
-    await expect(client.retryPendingCommand('singleChat.pendingInputs.edit', { ...params, command: { ...params.command, action: { ...params.command.action, targetBody: '变更正文' } } })).rejects.toThrow('参数不一致')
+    await expect(client.retryPendingCommand(operation, { ...params, command: { ...params.command, action: { ...params.command.action, targetBody: '变更正文' } } })).rejects.toThrow('参数不一致')
     permit = true
-    await client.retryPendingCommand('singleChat.pendingInputs.edit', params)
+    await client.retryPendingCommand(operation, params)
     await expect(pending).resolves.toEqual(result)
     expect(client.pendingCommandCount).toBe(0)
   })
