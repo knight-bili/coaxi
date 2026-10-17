@@ -55,3 +55,11 @@ User resume已编码Core/两端运输/原请求恢复：独立User授权支持�
 没有新建普通升级快照/切换流程，没有完整Host/Fleet/App或模型运行；真实执行、重启未结活动、cleanup、原UI及其他I04工作继续。
 
 依赖与客户事项以[执行计划](../../../integration/execution/i04-execution-plan.md)和[客户待办](../../../integration/execution/customer-todos.json)为准。
+
+未结工具记录的[启动核对分项证据](../../../integration/execution/i04-delegation-reconciliation-result.json)对应源码 `92ea14624`：
+Core 启动前捕获旧观察 UUID，原后台启动任务按批核对原回执与同事务的实际工具尝试关联，不重派业务命令。
+缺少可靠证明时只记工具结果未确认，不改任务状态；退休 epoch 仅可维护精确原记录，普通 Runtime 过期围栏保持。
+原 Context owner 通过真实210迁移与SQLite新连接、单行恢复故障/重试、原输出摘要、重复零写及实际rowid重用反例。
+I04-TMP-CLEANUP-01 的晚期NotFound与其他IO分类修复及原全局gate不阻塞检查通过；完整进程/writer/清理资格仍按后续生命周期验证。
+19个原Rust owner与10项文档测试取得定向成功，15源码Gitblob/40日志/6批准工件核定；不增加owner或84正式场景通过数。
+完整Host/Fleet/App/真实Runtime未在此分项运行，原Session、输入unknown、目录/权限/模式/away及原UI与其他I04包继续。

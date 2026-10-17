@@ -1,0 +1,432 @@
+{
+  "schema_version": 1,
+  "component": "I04-DELEGATION-STARTUP-OBSERVATION-RECONCILIATION",
+  "recorded_at": "2026-10-17T23:18:48.687579+00:00",
+  "baseline_commit": "cfa3737798a6253bcdf3d3fb51eced59ba21bb0a",
+  "source_commit": "92ea146249b691400a0e4df970ba62369cf67bef",
+  "status": "component_checks_passed_startup_wired_not_full_Host_Runtime_or_phase_completion",
+  "implemented": [
+    "开始记录保存闭合的原命令编号/完整请求摘要；三项写操作在原Gateway事务内将精确toolCallId关联与业务/首次回执一起提交或回滚，不借后来重试的回执证明早先尝试。",
+    "恢复仅读原回执与关联，逐一验证操作/actor/Thread/Run/epoch/请求摘要；缺证据和查询结果标记result_unconfirmed，不改任务业务状态，不派任务或重发模型输入。",
+    "Core在RPC readiness前冻结精确未结Evidence UUID，原后台启动任务64条一批，批次间释放数据库锁并yield；删除旧行并复用rowid的新调用仍排除。",
+    "原生命周期维护只更新精确已存在的Core未结记录及revision；原epoch退休仍可维护，普通Runtime旧epoch/新工作围栏不变，不创建新操作。",
+    "恢复输入投影验证原摘要，按生命周期已省略canonicalResult:null的实际存储规则还原后核验；输出复用原单一载体，任务原文/凭据不复制。",
+    "I04-TMP-CLEANUP-01：晚期NotFound且根已确认不存在时幂等成功；根仍存在、PermissionDenied及其他IO错误保留；清理不持全局invocation gate。",
+    "原Context owner保留旧159无能力拒绝后改走完整210迁移，实际SQLite新连接验证持久关联；不另建Core全库或Rust owner。"
+  ],
+  "checks": {
+    "rust": [
+      {
+        "log": "delegation-reconciliation-context-final.log",
+        "passed": 1,
+        "failed": 0
+      },
+      {
+        "log": "delegation-reconciliation-tmp-final.log",
+        "passed": 2,
+        "failed": 0
+      },
+      {
+        "log": "delegation-reconciliation-projection-current.log",
+        "passed": 14,
+        "failed": 0
+      },
+      {
+        "log": "delegation-reconciliation-normalizer-final.log",
+        "passed": 1,
+        "failed": 0
+      },
+      {
+        "log": "delegation-reconciliation-evidence-final.log",
+        "passed": 1,
+        "failed": 0
+      }
+    ],
+    "rust_distinct_existing_owners": 19,
+    "new_rust_owners": 0,
+    "total_existing_owners": 1253,
+    "all_1253_executed": false,
+    "compile": "compile-07 passed, 7 existing warnings",
+    "docs_tests": 10,
+    "version_and_governance": "passed, explicit cfa373779 base",
+    "fmt": "cargo fmt all plus expanded raw evidence helper check passed; old compact Context helper keeps its existing style",
+    "codegraph": "explicit final sync passed, 15 unresolved is not graph-wide qualification",
+    "integration": "real Core dispatcher/Gateway/SQLite/Blob/observation lifecycle; compiled actual startup wiring; no full Host process restart or provider"
+  },
+  "verified_behaviors": [
+    "完成记录不再扫描；同请求另一toolCallId不能借回执；真实写故障只留下未结记录，其他记录继续、下一轮可恢复；重复恢复零写。",
+    "开始/业务回执/结束存储故障、业务结果保留、原UUID只读回放，原尝试关联与原输出摘要精确一致。",
+    "真实删最高SQLite rowid后新调用复用同rowid，原UUID快照仍跳过新调用；删除的快照ID无副作用跳过。",
+    "旧child取消后提升epoch的明确夹具：普通晚期Runtime结果零写拒绝，维护只结算旧记录；Native Session/ACK和终态仍有原夹具边界。",
+    "原投影/恢复投影等价、存储省略null的兼容、篡改/错操作/已结束投影拒绝，Core-only有效证明及未知字段/原始凭据字段/未知恢复状态拒绝。"
+  ],
+  "retained_failures": [
+    {
+      "logs": [
+        "compile-01"
+      ],
+      "cause": "两个既有失效lease测试调用漏新增内部观察参数，已补，不改生产围栏。"
+    },
+    {
+      "logs": [
+        "context-01"
+      ],
+      "cause": "旧Context手装候选结构不能当完整当前合同重开，改为在旧159拒绝后实际迁移210。"
+    },
+    {
+      "logs": [
+        "context-02",
+        "diagnosis-02"
+      ],
+      "cause": "闭合runtime.action normalizer未保留新回执观察，修为Core-only严格类型和摘要格式白名单。"
+    },
+    {
+      "logs": [
+        "context-03",
+        "context-04",
+        "diagnosis-03"
+      ],
+      "cause": "Evidence阶段与canonical阶段不同，且原存储省略projection canonicalResult:null；按真实阶段筛选、恢复原null后核验，不跳过摘要保护。"
+    }
+  ],
+  "self_review": "Context05通过后发现rowid可重用，自审改为UUID集合，新增实际复用反例后compile07/Context-final通过。此类修复均为必要定向复验，未触发全量编译/回归/远程CI。",
+  "limits": [
+    "未运行完整Host/Fleet/App进程重启、真实Runtime/模型、平台打包或Actions；完整执行/输入unknown核对/原Session/writer和其他清理资格仍待。",
+    "I04四包21簇84正式场景新增通过0；总81簇48包324场景及I00-I12/BUF范围不变。",
+    "无Renderer/UI变化，rc25和日常用户数据不变；客户仍在I12后进行软件使用验收。"
+  ],
+  "external_actions": {
+    "push": false,
+    "actions": false,
+    "main_merge": false,
+    "release": false,
+    "paid_model": false,
+    "cost": 0
+  },
+  "source_files": [
+    {
+      "path": "crates/rovai-core/src/application.rs",
+      "git_blob": "407486fd6c0f36cd161ab339d373fb208d186905",
+      "bytes": 1413315,
+      "sha256": "cb81139ddc07b81a2b63eb7fe6ce9b9e3f0cb0010419746e81c02b8b26d56ebe"
+    },
+    {
+      "path": "crates/rovai-core/src/builtin_tool_evidence_projection.rs",
+      "git_blob": "4bf81adeecadbbdda30698c9fb4043b065a00dda",
+      "bytes": 65224,
+      "sha256": "12348a20f005bf48b4ade592e07441f2e6c8fc6d2df35d677743114856024363"
+    },
+    {
+      "path": "crates/rovai-core/src/builtin_tool_runtime.rs",
+      "git_blob": "b1cb95588c42a26a6b78c44d8504c4fcbed85105",
+      "bytes": 46521,
+      "sha256": "9670b2137d4f4bf6b2e1f813cfb4cd6e08fa9cfd945d591c70038dcbd605bf6a"
+    },
+    {
+      "path": "crates/rovai-core/src/command.rs",
+      "git_blob": "b2a1334067fac5b3de8d769078c101c579d64f51",
+      "bytes": 42960,
+      "sha256": "88456aa99147760594b3282715b0dd6114a0379926775032194b1caf985c69c3"
+    },
+    {
+      "path": "crates/rovai-core/src/context/delegation_context_tests.rs",
+      "git_blob": "b03f31843605989a7e788216a1a801303add0701",
+      "bytes": 26352,
+      "sha256": "f6cb9617fe9c9c055ba4ce8d979bfda21bcf41bb5c9ff5f45c713d1ce9733f75"
+    },
+    {
+      "path": "crates/rovai-core/src/context/delegation_evidence_tests.rs",
+      "git_blob": "a3c810d868697c3c21c44b425d4fa49de2102e2a",
+      "bytes": 22981,
+      "sha256": "67ebfc4f0c0937721f23c350eedb1294b412f84b9e3da49e7966fea66912abfd"
+    },
+    {
+      "path": "crates/rovai-core/src/delegation_dispatch.rs",
+      "git_blob": "256b6b3b8d7a7444665993614b39ec0a67cdf807",
+      "bytes": 25966,
+      "sha256": "228a4873e36f6b0b78b9be8b3900d1632142f35abc9c2bb2f42e3110856f0afb"
+    },
+    {
+      "path": "crates/rovai-core/src/delegation_dispatch/evidence.rs",
+      "git_blob": "61689ece03e27a7b957538aa5cd8b34b3ea3b734",
+      "bytes": 4814,
+      "sha256": "a4c151ace764e60857409abb561026c7dc24bc15d8208931f87f12156215a02c"
+    },
+    {
+      "path": "crates/rovai-core/src/delegation_dispatch/recovery.rs",
+      "git_blob": "0fb6222d081a0ba14e940cd60aee96c1bc194a4d",
+      "bytes": 7550,
+      "sha256": "64f175e4f1867232a4297ad1abe5a23b04953163a61eaf4de5cd4c19025ec5d9"
+    },
+    {
+      "path": "crates/rovai-core/src/delegation_model_command.rs",
+      "git_blob": "e69477a5efcca8138a5f92e7f12febfa0bcc4aed",
+      "bytes": 22556,
+      "sha256": "e3f1ff05f404c33f37f0be9660883dceaa5f9126d5da878aeeaed2f424fd72e2"
+    },
+    {
+      "path": "crates/rovai-core/src/delegation_start.rs",
+      "git_blob": "0ca807ef87427fd6886107f7c5c53fa9a6a6ec3b",
+      "bytes": 9907,
+      "sha256": "7be520fbffff22fecf4c0fb2dfbe0e10a68854d0770909cb2b1c09426aade41c"
+    },
+    {
+      "path": "crates/rovai-core/src/execution_evidence.rs",
+      "git_blob": "854e8517aadd9881a617654994673456a18ad59f",
+      "bytes": 251438,
+      "sha256": "11db113ec8a65043655a5ab7dbcbe3ee2af61b10f34016ed2c15b1e1c18ff7ff"
+    },
+    {
+      "path": "docs/architecture/delegation.md",
+      "git_blob": "6515a8a0edbd848e3d75ea92cba174638fb751e7",
+      "bytes": 4981,
+      "sha256": "9634cb428da5a4101035d68cae9032c9521423b0e9b2886f550c4444500519aa"
+    },
+    {
+      "path": "docs/contracts/delegation-v1.md",
+      "git_blob": "885a20a2310c6fc95b172ee3f09182aa3022e3a5",
+      "bytes": 29011,
+      "sha256": "49b17230a0330d7b139dee0faf3e1daf1980716385456ef24f0ca080ae3b76d5"
+    },
+    {
+      "path": "docs/development/testing.md",
+      "git_blob": "4c757903fa4f68734ea2c2c40825e9d7fa43c9e4",
+      "bytes": 236523,
+      "sha256": "2fe45e8f415a0aeb7ffa1ae616e2160847b8651fdd4223ced849ba27deb97509"
+    }
+  ],
+  "logs": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-compile-01.log",
+      "bytes": 1985,
+      "sha256": "145522c06f5d393eac6ebb2321373fba06e0f8d86f0ba98153697f413f35129d"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-compile-02.log",
+      "bytes": 2225,
+      "sha256": "93af068aca3a434471c0bb7eb055c80fb0a7f5811b412fd75432e39fcae1bb51"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-compile-03.log",
+      "bytes": 2225,
+      "sha256": "cd55b11871e065ca73de4ed5136ed10a6f485bf2109343feade14968bfcee85e"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-compile-04.log",
+      "bytes": 2225,
+      "sha256": "cc671bdd9f6fb263c8afcc3090472ff9b09753ff99f7a87a03273a557f389e93"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-compile-05.log",
+      "bytes": 2225,
+      "sha256": "23aa8d6b51ffb3ac132b889008662e8cf615ac6caffacff568e58d90412ab59f"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-compile-06.log",
+      "bytes": 2225,
+      "sha256": "5a57def776758873654c0e86572592322fe9e59eb456d9bb8289ac13e8671fa4"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-compile-07.log",
+      "bytes": 2225,
+      "sha256": "c1bbaac690f9a2184345c4905e67fc7a7556f3b0e08bbf7b1a0ca24c93c1e6fb"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-context-01.log",
+      "bytes": 951,
+      "sha256": "171edcf1e82e278e6e8d6dffc4ac28d10963b5f3433d7c002a4186b251d7277a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-context-02.log",
+      "bytes": 933,
+      "sha256": "2be53f4db240cdb20508ff3159da73b9431bc833a5ad7449216f98822b2f8f12"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-context-03.log",
+      "bytes": 2001,
+      "sha256": "0361294b06c4dc0a739f1d204f6868696c0effb75266ee5cc275d6639cb8c0f1"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-context-04.log",
+      "bytes": 2937,
+      "sha256": "f1c7863df411313a6811a99ad9c09dfac3c5849434c1035c53f4903c9bb6853a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-context-05.log",
+      "bytes": 610,
+      "sha256": "8ac113bdca1eb76489f2bb1eae79b63bf8efc4854ef63140e80c998591167056"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-context-final.log",
+      "bytes": 610,
+      "sha256": "b8f5cd398690a14526193e2b7f1cfd939146f30a059f4b98b094eb01986ca616"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-context-list-01.log",
+      "bytes": 125,
+      "sha256": "8d7c39b86e00e4e7eee958d5210fe31c3224cf0ebf2bba69b1e95c305acee56d"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-diagnosis-02.log",
+      "bytes": 355,
+      "sha256": "915966c89c144d410dc023486e6daf9aa15d44dbc92cbfc9ac0498174fdf9f7a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-diagnosis-03.log",
+      "bytes": 344,
+      "sha256": "485ab153745619450d3a2fb73192ad56e63dbc09dd921aec1699011250cc670b"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-diff-final.log",
+      "bytes": 250,
+      "sha256": "2a58200b15a2f8892f47424b7d7192f554710c940524d1806bfdf5b2d7d91840"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-doc-governance-01.log",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-doc-tests-01.log",
+      "bytes": 924,
+      "sha256": "1ceb409df3dfbcbd9d746bd9d545789434678d5f419e9918ef983e080b809dd6"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-doc-version-01.log",
+      "bytes": 79,
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-evidence-01.log",
+      "bytes": 229,
+      "sha256": "91e1c625f481ded56d73bbbd3e4bb2313487006d39f069ae8506e94864269b59"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-evidence-final.log",
+      "bytes": 229,
+      "sha256": "afbe8f168a5ef9f42633aba6f0bd74883fcfcd8be1433796e056f85bbfa96931"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-evidence-list-01.log",
+      "bytes": 127,
+      "sha256": "2243c3743bf782c20fc3e5a551c6f514248ff0b0d1bc82cbbe2b77402cdb7825"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-fmt-01.log",
+      "bytes": 44,
+      "sha256": "83cee69214da2175b5033379ed8853ff7990d883aa32a0acf6b28bef6f404b66"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-helper-fmt-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-normalizer-01.log",
+      "bytes": 237,
+      "sha256": "023febb105d18930e31d2761b5f4943275fac44fb106961ffdd7a0af26289eb0"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-normalizer-final.log",
+      "bytes": 237,
+      "sha256": "023febb105d18930e31d2761b5f4943275fac44fb106961ffdd7a0af26289eb0"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-normalizer-list-01.log",
+      "bytes": 135,
+      "sha256": "4f03e0eaa7ac52165190dab1051fce3b13d0b90da33b0d7d98f87cb2da5ddfa5"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-projection-01.log",
+      "bytes": 1785,
+      "sha256": "882ffe199ea7ab27e14ab5b660f5e5dac2c54550eeb0220826d75801ae8a6ef9"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-projection-current.log",
+      "bytes": 1785,
+      "sha256": "ba41343e4c9460d77f0f38e28bd23093fa8ca1e9968ae69c11d0b894f3a719fc"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-projection-final.log",
+      "bytes": 1785,
+      "sha256": "5d5709587210a91781d107323c77ca48f3ceb392bb8817b823af2f32cccc2805"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-projection-list-01.log",
+      "bytes": 1604,
+      "sha256": "935d14deeb4b1d1cc4b6f5c3fc272762bc162b56a25aaac5e48816908970d4a3"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-sync-01.log",
+      "bytes": 351,
+      "sha256": "306a1bcfc2e95f9932f9ef46136190dfb77ebf22c5f24d0eca0798a59258b69d"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-sync-02.log",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-sync-03.log",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-sync-04.log",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-sync-final.log",
+      "bytes": 250,
+      "sha256": "a7d634028462a25d1b77c62790ee7e82ea91fcaf216d95a8aa47b44bb4fbbbf1"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-tmp-01.log",
+      "bytes": 309,
+      "sha256": "ca0fc0364f8c1378497a0906aeaca583cdbb1829fdaf8c9639c1fe881a696101"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-tmp-final.log",
+      "bytes": 309,
+      "sha256": "0678385d15acfd6c73bd9a821c18a0d0f1cf7031844ef2515f485e8290bc03d1"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-reconciliation-tmp-list-01.log",
+      "bytes": 201,
+      "sha256": "2b2f1572212c6df3c3129b3692a5ad67e050efeb774ae7975fe0172d0fe6d86d"
+    }
+  ],
+  "approved_files_verified_unchanged": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    }
+  ]
+}
