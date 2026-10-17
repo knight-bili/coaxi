@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "stage": "I03",
-  "status": "in_progress",
+  "status": "local_engineering_verified_environment_validation_pending",
   "engineering_owner": "Codex",
   "customer_stage_gate": false,
   "basis": [
@@ -71,7 +71,8 @@
           ],
           "qualification": "startup missing empty view logged then rebuilt; no nonempty attachment recovery claim"
         }
-      ]
+      ],
+      "current_verification": "i03-r10-local-closeout-verification.json"
     },
     {
       "id": "I03-C02",
@@ -84,7 +85,8 @@
         "最终当前候选与原正式场景继续R10；其他平台资格不由Windows结果替代。"
       ],
       "ready_git_native_evidence": "i03-c02-ready-diff-public-cold-native-verification.json",
-      "verified_ready_git": "真实Core创建固定基准Mission worktree，实际三文件变更及中文精确Diff；真实索引SHA/mtime与条目均保持；原画布pin打开原MissionDiff并显示正确增删行，文件变干净后明确提示而无替代"
+      "verified_ready_git": "真实Core创建固定基准Mission worktree，实际三文件变更及中文精确Diff；真实索引SHA/mtime与条目均保持；原画布pin打开原MissionDiff并显示正确增删行，文件变干净后明确提示而无替代",
+      "current_verification": "i03-r10-local-closeout-verification.json"
     },
     {
       "id": "I03-C03",
@@ -92,7 +94,8 @@
       "status": "engineering_verified_within_declared_local_scope",
       "done_when": "路径不能绕过现行文件权限，卡片间身份隔离，关闭/恢复与变化处理有证据",
       "latest_partial_evidence": "i03-r06-file-html-verification.json",
-      "remaining_verification": "rc22跨Thread、4实际HTML/释放重试/同源多卡、三次启动恢复及缺失重试和9项交互回归通过；最终正式场景及其他平台仍归R10。"
+      "remaining_verification": "rc22跨Thread、4实际HTML/释放重试/同源多卡、三次启动恢复及缺失重试和9项交互回归通过；最终正式场景及其他平台仍归R10。",
+      "current_verification": "i03-r10-local-closeout-verification.json"
     },
     {
       "id": "I03-C04",
@@ -101,51 +104,55 @@
       "done_when": "真实临时PTY启动、输出、resize、关闭、删除及重连符合现行合同；不把I05完整Git工程工作区提前并入",
       "latest_partial_evidence": "i03-r07-native-input-verification.json",
       "remaining_implementation_batches": [],
-      "remaining_verification": "原Core/Host16/17容量和真实重连，加rc22 Windows实际IME/剪贴板、折叠重开、受控Native读取故障恢复和回收均核定；跨平台及正式场景继续R10。"
+      "remaining_verification": "原Core/Host16/17容量和真实重连，加rc22 Windows实际IME/剪贴板、折叠重开、受控Native读取故障恢复和回收均核定；跨平台及正式场景继续R10。",
+      "current_verification": "i03-r10-local-closeout-verification.json"
     },
     {
       "id": "I03-C05",
       "name": "冷启动与多卡交互兼容",
-      "status": "implementation_ready_for_stage_verification",
+      "status": "engineering_verified_within_declared_local_scope",
       "done_when": "真实Desktop冷路由、旧焦点/编辑器保持、恢复与本阶段规模检查完成；平台资源缺项单列",
       "latest_partial_evidence": "i03-c02-ready-diff-public-cold-native-verification.json",
       "checked_subtasks": [
         {
           "id": "C05-cold",
-          "status": "partial_warm_cold_and_renderer_crash_private_note_recovery_native_verified",
-          "scope": "Host/Core/board展示恢复、真实pin隔离、只读Thread恢复和原工作区导航"
+          "scope": "Host/Core/board展示恢复、真实pin隔离、只读Thread恢复和原工作区导航",
+          "status": "engineering_verified_within_declared_local_scope",
+          "current_evidence": "i03-r10-local-closeout-verification.json"
         },
         {
           "id": "C05-window",
-          "status": "partial_public_readers_release_and_64_summaries_native_verified_other_budgets_pending",
-          "scope": "每Thread一个读者、5空闲投影、64窗口终端controller和原文件资源预算"
+          "scope": "每Thread一个读者、5空闲投影、64窗口终端controller和原文件资源预算",
+          "status": "engineering_verified_within_declared_local_scope",
+          "current_evidence": "i03-r10-local-closeout-verification.json"
         },
         {
           "id": "C05-visibility",
-          "status": "implemented_local_logic_verified",
-          "scope": "视觉视口、原监听释放、64卡片单次枚举与遮挡消息排除"
+          "scope": "视觉视口、原监听释放、64卡片单次枚举与遮挡消息排除",
+          "status": "engineering_verified_within_declared_local_scope",
+          "current_evidence": "i03-r10-local-closeout-verification.json"
         },
         {
           "id": "C05-material-scan",
-          "status": "implemented_runtime_verification_pending",
-          "scope": "完整内容hash/递归目录观察移到Core数据库锁外限量worker；原事务对有序材料/身份/CAS及回放作最终核对，真实响应/退出/负载待C06"
+          "scope": "完整内容hash/递归目录观察移到Core数据库锁外限量worker；原事务对有序材料/身份/CAS及回放作最终核对，真实响应/退出/负载待C06",
+          "status": "engineering_verified_within_declared_local_scope",
+          "current_evidence": "i03-r10-local-closeout-verification.json"
         }
       ],
       "remaining_implementation_batches": [],
       "remaining_verification": [
-        "整App/Core异常与未知请求归R04；不重做已过的renderer两次硬中断。",
-        "5空闲快照/64控制器算法证据已复用；实际文件/HTML、PTY容量、源IO与通知缺口分别归R06/R07/R08。",
-        "当前候选及未验证平台归R10，缺环境继续独立I04。"
+        "本机研发和运行队列已核定；待环境验证及诊断见i03-r10-retained-followups.json"
       ],
-      "partial_runtime_evidence": "同私聊双pin暖态编辑器/滚动/正文及材料scope隔离、新App进程冷恢复；便笺拖动/行内保存/冲突/离开保护及renderer硬中断后独立本机副本恢复；公开三卡双Thread独立输入/原生焦点/同DOM布局/收起重开、一Thread一个读者和全部窗口监听释放；另一板64摘要卡实际渲染与可信滚轮平移。未覆盖整App/Core硬中断、未知在途请求、五空闲快照预算、各Thread真实文件预览、HTML/终端窗口上限、大材料IO和IME。；本轮公开三卡正文与64节点的新App显式重开恢复通过，受控协议准备的可用Git精确Diff及失效不替代通过。",
+      "partial_runtime_evidence": "历史局部资格见Git旧版；当前实际冷恢复/规模/IO/通知按R04–R10核定，其他平台未验。",
       "public_multi_native_evidence": "i03-c05-public-multi-native-verification.json",
-      "public_cold_native_evidence": "i03-c02-ready-diff-public-cold-native-verification.json"
+      "public_cold_native_evidence": "i03-c02-ready-diff-public-cold-native-verification.json",
+      "current_verification": "i03-r10-local-closeout-verification.json"
     },
     {
       "id": "I03-C06",
       "name": "阶段候选集中工程验证",
-      "status": "in_progress",
-      "done_when": "功能集齐冻结fusion-i03-rc.1，相关编译/集成/回归/平台检查由Codex执行，记录缺陷和必要复验，不等待客户阶段验收",
+      "status": "engineering_verified_within_declared_local_scope",
+      "done_when": "当前候选集中工程验证及正式12条平台登记、可运行开发预览齐备；跨平台未验继续留册。",
       "latest_partial_evidence": "i03-c06-candidate-result.json",
       "completed_checks": [
         "rc.1源码冻结f2630de0、当前Windows Core/Host/CLI生产构建exit0和3新二进制SHA",
@@ -176,13 +183,13 @@
         "rc14复用无新构建：renderer两次实际crashed及进程PID更替，双私聊最后字符/独立正文、未失焦便笺副本与Core原文分开、原引用/无模型3场景通过；当前44个不同Native场景，r3受控退出。r1/r2旧失败不计重复通过，r2无受控退出回执。",
         "rc14复用：公开三卡/双Thread实际独立草稿、原生焦点、同DOM布局、ThreadReader数0/1/1/2/2/1/0/0与全监听签名回到baseline、收起重开及无发送；64真实摘要卡/原生滚轮平移等8场景通过，当前52不同Native场景。成功及旧失败均受控completed，无deadline/forcedSignal。",
         "rc14复用：真实Core+本地ACP协议创建Mission Git worktree，中文精确Diff/索引字节mtime/目标干净无替代5不同场景；新App公开三卡正文/64节点显式恢复3项。当前60不同Native场景，全部本批run正常受控退出，无deadline/forcedSignal、无真实模型或新构建。",
-        "rc15/e0c4fad7将累计31文件集中构建：新Core/Host/CLI及Desktop/Web通过；原board生命周期扩展owner1pass/1247过滤。真实列表7场景、公开多卡/64摘要相关8场景及真实终端相关5场景通过；仅该候选20个不同相关场景，不累加历史资格。全部本批App受控completed，无deadline/forcedSignal；r1功能失败保留，导航helper修复后r2/r3/r4通过。"
+        "rc15/e0c4fad7将累计31文件集中构建：新Core/Host/CLI及Desktop/Web通过；原board生命周期扩展owner1pass/1247过滤。真实列表7场景、公开多卡/64摘要相关8场景及真实终端相关5场景通过；仅该候选20个不同相关场景，不累加历史资格。全部本批App受控completed，无deadline/forcedSignal；r1功能失败保留，导航helper修复后r2/r3/r4通过。",
+        "R10当前Native双进程3+4、实际Host/Chrome 11、原Main预览3项通过；正式12条按平台和源码复用边界登记，不称全平台通过。"
       ],
       "open_findings": [],
       "remaining_checks": [
-        "以i03-closeout-ledger.json的I03-R01–R10为唯一有限剩余队列，原场景和完成条件保留。",
-        "源码参考已登记的模型/分支/子会话/运行状态真实投影缺口明确归R09；不得把缺字段简单当作UI美化。",
-        "12个正式场景按平台逐项记录，整体未通过；最终候选与开发预览归R10。"
+        "macOS/Linux及其他Host/浏览器逐项补验，不算通过。",
+        "尺寸诊断沿BUF和后续集成跟踪，最终一期须结算。"
       ],
       "resolved_findings": [
         "Windows私有目录夹具按原规则创建并通过",
@@ -198,10 +205,7 @@
       ],
       "latest_native_evidence": "i03-c02-ready-diff-public-cold-native-verification.json",
       "ui_remaining": [
-        "rc14空私聊viewport extraY0与紧凑旧材料入口已实际通过；两种主题/其他高度与有消息状态仍按完整UI清单继续",
-        "rc15完整App回调观察已实际运行，列表/多会话仍记录ResizeObserver提示；保留来源、元素与最近回调，未改回调调度或过滤错误。纯画布之前未复现不覆盖完整App，根因和修复仍待。",
-        "rc15真实Core轮廓/节点数与同版本投影、原生右键/Shift+F10/回焦、删除前3节点/1终端卡、取消零写入与省略号编辑通过。截图发现纵向SVG撑高整组行，当前CSS已修且日夜实际组件两窗口/单滚动/末卡可达通过；完整App集成、旧服务提示与完整八类仍待下一累计候选。",
-        "当前Codeg分型卡片、私聊贴合、终端窄宽控制、便笺拖动/行内编辑/冲突及renderer恢复已有rc14对应证据；完整日夜主题/八类创建与错误态、悬停键盘及摘要/区域视觉仍需核对。便笺SafeMarkdown document覆盖已局部修正为13px/1.625，卡片正文选择/光标及标题禁选同时补正；当前CSS日夜Renderer正文选择/便笺13px检查通过，下一冻结候选补完整App集成；rc14不代证新CSS。 可用Diff已实际查看；失效路径态搜索框双边框/40px撑高已修；当前CSS日夜原组件实际贴合/聚焦及普通表单不回退通过，完整App候选集成待补。"
+        "R09八类原版UI及R10当前装配已核定；I03-UI-RO-01仍open，见i03-r10-retained-followups.json"
       ],
       "latest_card_style_evidence": "i03-c06-card-source-style-result.json",
       "latest_note_terminal_evidence": "i03-c06-note-terminal-interaction-result.json",
@@ -215,7 +219,8 @@
       "latest_source_search_layout_evidence": "i03-c06-source-search-layout-verification.json",
       "latest_board_preview_projection": "i03-c06-board-preview-projection-result.json",
       "latest_rc15_list_native_evidence": "i03-c06-rc15-list-native-verification.json",
-      "latest_board_compact_renderer_evidence": "i03-c06-board-compact-renderer-verification.json"
+      "latest_board_compact_renderer_evidence": "i03-c06-board-compact-renderer-verification.json",
+      "current_verification": "i03-r10-local-closeout-verification.json"
     }
   ],
   "state_rule": "代码完成、工程验证通过、待环境验证分别记录；无代码缺口且工程验证满足时由Codex收口；缺环境继续独立后续工作，最终MVP不豁免",
@@ -229,23 +234,24 @@
   },
   "plan_preview": "i03-closeout-plan-r1.md",
   "planning_target": {
-    "kind": "remaining_work_estimate",
-    "local_engineering_workdays": 5,
-    "repair_buffer_workdays": 2,
-    "target": "2026-10-23",
-    "buffer_until": "2026-10-27",
+    "kind": "local_target_achieved_environment_followup_retained",
+    "actual_local_closed_at": "2026-10-17T01:26:47.212096+00:00",
+    "previous_estimate": "2026-10-23，缓冲至2026-10-27；已提前完成本机队列，不等待日期",
     "external_unverified_is_not_passed": true
   },
   "remaining_ledger": "i03-closeout-ledger.json",
   "latest_settlement": "i03-closeout-settlement.json",
   "remaining_queue_counts": {
     "settled_obligations": 17,
-    "open_work_groups": 1,
+    "open_work_groups": 0,
     "private_cases_verified": 24,
     "private_cases_open": 0,
-    "verified_work_groups": 9
+    "verified_work_groups": 10
   },
-  "latest_group_verification": "i03-r09-complete-local-verification.json",
+  "latest_group_verification": "i03-r10-local-closeout-verification.json",
   "latest_preparation": "i03-r01-private-workflow-preparation.json",
-  "latest_partial_verification": "i03-r09-complete-local-verification.json"
+  "latest_partial_verification": "i03-r10-local-closeout-verification.json",
+  "local_closed_at": "2026-10-17T01:26:47.212096+00:00",
+  "formal_platform_matrix": "i03-formal-platform-matrix.json",
+  "retained_followups": "i03-r10-retained-followups.json"
 }

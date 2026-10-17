@@ -38,7 +38,7 @@
       "stage_id": "I03",
       "name": "完整无限画布与对象绑定",
       "candidate_version": "fusion-i03-rc.25",
-      "status": "frozen_with_partial_engineering_evidence",
+      "status": "local_engineering_verified_environment_validation_pending",
       "frozen_commit": "af544d3e0765b735c8e1e3eb74f0af71f1de0a01",
       "validation_batch": "I03-R09-nullable-private-activity-repair",
       "validation_runs": [
@@ -710,9 +710,30 @@
           "kind": "native-old-contract-eight-card-theme-fit-5",
           "source_commit": "af544d3e0765b735c8e1e3eb74f0af71f1de0a01",
           "exit_code": 0
+        },
+        {
+          "kind": "native-final-recovery-prepare-resume",
+          "candidate_version": "fusion-i03-rc.25",
+          "status": "passed",
+          "evidence": "i03-r10-local-closeout-verification.json",
+          "source_commit": "af544d3e0765b735c8e1e3eb74f0af71f1de0a01"
+        },
+        {
+          "kind": "actual-host-chrome-final-eleven",
+          "candidate_version": "fusion-i03-rc.25",
+          "status": "passed",
+          "evidence": "i03-r10-local-closeout-verification.json",
+          "source_commit": "af544d3e0765b735c8e1e3eb74f0af71f1de0a01"
+        },
+        {
+          "kind": "original-main-isolated-preview",
+          "candidate_version": "fusion-i03-rc.25",
+          "status": "passed",
+          "evidence": "i03-r10-local-closeout-verification.json",
+          "source_commit": "af544d3e0765b735c8e1e3eb74f0af71f1de0a01"
         }
       ],
-      "engineering_validation": "in_progress",
+      "engineering_validation": "Windows/Desktop及本机Host/Chrome适用面已核定；其他平台与诊断保留",
       "engineering_owner": "Codex",
       "customer_stage_gate": false,
       "previous_candidates": [
@@ -952,7 +973,9 @@
         "next": "只构建Core25，复用24相同前端；重跑完整摘要交错与视觉观察。",
         "verification": "i03-r09-complete-local-verification.json"
       },
-      "r09_complete_local_verification": "i03-r09-complete-local-verification.json"
+      "r09_complete_local_verification": "i03-r09-complete-local-verification.json",
+      "latest_verification": "i03-r10-local-closeout-verification.json",
+      "formal_platform_matrix": "i03-formal-platform-matrix.json"
     },
     {
       "stage_id": "I04",

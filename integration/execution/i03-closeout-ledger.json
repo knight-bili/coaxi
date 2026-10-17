@@ -14,10 +14,10 @@
   },
   "counts": {
     "settled_obligations": 17,
-    "open_work_groups": 1,
+    "open_work_groups": 0,
     "private_cases_verified": 24,
     "private_cases_open": 0,
-    "verified_work_groups": 9
+    "verified_work_groups": 10
   },
   "count_boundary": "不同层级不相加；17条为限定范围旧待办，固定10组按状态计算剩余；私聊按原24场景逐项核定，不计算完成百分比",
   "settled_obligations": [
@@ -470,223 +470,404 @@
     {
       "id": "I03-R10",
       "name": "最终候选、正式场景与开发预览交接",
-      "status": "open",
+      "status": "engineering_verified",
       "private_cases": [],
       "original_groups": [
         "I03-C06"
       ],
       "done_when": "累计代码和自审集齐后冻结，当前Windows/Web适用面集中构建/运行；12个正式场景按平台登记；可运行开发预览及说明齐备。",
-      "next_action": "核对C12/C13/C14各N/F/R/P共12正式场景，按Windows/Web当前适用面和其他平台分别登记；原已核定输入未变的证据精确复用。准备隔离可运行开发预览和说明，登记未验证环境后继续I04，不转客户做阶段技术验收。",
+      "next_action": "本机队列已收口；跨平台与诊断按独立编号继续，转I04。",
       "owner": "Codex",
-      "external_condition": "none_confirmed_blocking_current_independent_work"
+      "external_condition": "none_confirmed_blocking_current_independent_work",
+      "latest_verification": "i03-r10-local-closeout-verification.json"
     }
   ],
   "formal_cases": [
     {
       "id": "C12-N",
-      "status": "engineering_verification_in_progress",
-      "evidence_scope": "Core CRUD/回放与实际创建/切板/原菜单已有证据",
-      "remaining_work": [
-        "I03-R09",
-        "I03-R10"
+      "status": "local_engineering_verified_environment_validation_pending",
+      "requirement": {
+        "steps": "创建、重命名、切换及删除画板",
+        "expected": "布局属于对应画板，重启保持一致",
+        "platforms": [
+          "Windows Desktop",
+          "macOS Desktop",
+          "Linux Desktop",
+          "Web/Server按源适用面验证"
+        ]
+      },
+      "local_scope": "画板新建/改名/切换/删除及独立布局",
+      "evidence_scope": "R10 Web原UI创建和删除、HTTP改名；Native独立双板和新进程恢复。",
+      "shared_source_evidence": [
+        "i03-r09-source-ui-progress.json"
       ],
+      "current_candidate_evidence": "i03-r10-local-closeout-verification.json",
       "platform_state": {
-        "Windows Desktop": "partial_verified",
+        "Windows Desktop": "engineering_verified_within_declared_local_scope",
         "macOS Desktop": "not_verified_for_current_fusion",
         "Linux Desktop": "not_verified_for_current_fusion",
-        "Web/Server按源适用面验证": "not_verified_for_current_fusion"
-      }
+        "Web/Server按源适用面验证": "windows_host_chrome_web_verified_with_shared_component_evidence_other_hosts_browsers_pending"
+      },
+      "remaining": [
+        "macOS Desktop",
+        "Linux Desktop",
+        "其他Host操作系统/浏览器适用面按平台计划核定"
+      ]
     },
     {
       "id": "C12-F",
-      "status": "engineering_verification_in_progress",
-      "evidence_scope": "Core并发版本拒绝/原子性已验证；实际删除当前板的替代视图仍补",
-      "remaining_work": [
-        "I03-R09",
-        "I03-R10"
+      "status": "local_engineering_verified_environment_validation_pending",
+      "requirement": {
+        "steps": "删除当前画板或并发修改/删除触发版本冲突",
+        "expected": "选择合理替代视图，不删除其他画板",
+        "platforms": [
+          "Windows Desktop",
+          "macOS Desktop",
+          "Linux Desktop",
+          "Web/Server按源适用面验证"
+        ]
+      },
+      "local_scope": "删除当前板回退与并发版本冲突",
+      "evidence_scope": "R10 Web确认删除临时板后回退到真实现存板，原两板逐节点保持；旧版本命令拒绝，事件游标不误当布局。",
+      "shared_source_evidence": [
+        "i03-r09-source-ui-progress.json"
       ],
+      "current_candidate_evidence": "i03-r10-local-closeout-verification.json",
       "platform_state": {
-        "Windows Desktop": "partial_verified",
+        "Windows Desktop": "engineering_verified_within_declared_local_scope",
         "macOS Desktop": "not_verified_for_current_fusion",
         "Linux Desktop": "not_verified_for_current_fusion",
-        "Web/Server按源适用面验证": "not_verified_for_current_fusion"
-      }
+        "Web/Server按源适用面验证": "windows_host_chrome_web_verified_with_shared_component_evidence_other_hosts_browsers_pending"
+      },
+      "remaining": [
+        "macOS Desktop",
+        "Linux Desktop",
+        "其他Host操作系统/浏览器适用面按平台计划核定"
+      ]
     },
     {
       "id": "C12-R",
-      "status": "engineering_verification_in_progress",
-      "evidence_scope": "公开/私聊板新App显式重开已有证据；完整多板与中断仍补",
-      "remaining_work": [
-        "I03-R04",
-        "I03-R09",
-        "I03-R10"
+      "status": "local_engineering_verified_environment_validation_pending",
+      "requirement": {
+        "steps": "完成正常流程后重启或重连，再定位多画板相关对象、设置或工程",
+        "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+        "platforms": [
+          "Windows Desktop",
+          "macOS Desktop",
+          "Linux Desktop",
+          "Web/Server按源适用面验证"
+        ]
+      },
+      "local_scope": "双板与原对象/配置的进程恢复",
+      "evidence_scope": "Native两个App/Core进程原身份与摄像机精确恢复；Web刷新保持原绑定。浏览器设备分组明确独立。",
+      "shared_source_evidence": [
+        "i03-r04-process-interruption-verification.json"
       ],
+      "current_candidate_evidence": "i03-r10-local-closeout-verification.json",
       "platform_state": {
-        "Windows Desktop": "partial_verified",
+        "Windows Desktop": "engineering_verified_within_declared_local_scope",
         "macOS Desktop": "not_verified_for_current_fusion",
         "Linux Desktop": "not_verified_for_current_fusion",
-        "Web/Server按源适用面验证": "not_verified_for_current_fusion"
-      }
+        "Web/Server按源适用面验证": "windows_host_chrome_web_verified_with_shared_component_evidence_other_hosts_browsers_pending"
+      },
+      "remaining": [
+        "macOS Desktop",
+        "Linux Desktop",
+        "其他Host操作系统/浏览器适用面按平台计划核定"
+      ]
     },
     {
       "id": "C12-P",
-      "status": "engineering_verification_in_progress",
-      "evidence_scope": "Core actor/归属负例有逻辑证据；Host撤销及多平台未完整",
-      "remaining_work": [
-        "I03-R10"
+      "status": "local_engineering_verified_environment_validation_pending",
+      "requirement": {
+        "steps": "在约定平台检查多画板及源支持的远程适用面；撤销Actor或目标授权",
+        "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+        "platforms": [
+          "Windows Desktop",
+          "macOS Desktop",
+          "Linux Desktop",
+          "Web/Server按源适用面验证"
+        ]
+      },
+      "local_scope": "源适用平台与撤销后的多板权限",
+      "evidence_scope": "实际浏览器Bearer撤销后板读取/更新401，独立健康会话仍可核对无变化；Mac/Linux保持未验。",
+      "shared_source_evidence": [
+        "i03-r03-host-private-verification.json"
       ],
+      "current_candidate_evidence": "i03-r10-local-closeout-verification.json",
       "platform_state": {
-        "Windows Desktop": "partial_verified",
+        "Windows Desktop": "engineering_verified_within_declared_local_scope",
         "macOS Desktop": "not_verified_for_current_fusion",
         "Linux Desktop": "not_verified_for_current_fusion",
-        "Web/Server按源适用面验证": "not_verified_for_current_fusion"
+        "Web/Server按源适用面验证": "windows_host_chrome_web_verified_with_shared_component_evidence_other_hosts_browsers_pending"
       },
-      "verified_work_groups": [
-        "I03-R03"
-      ],
-      "api_verification": "i03-r03-host-private-verification.json"
+      "remaining": [
+        "macOS Desktop",
+        "Linux Desktop",
+        "其他Host操作系统/浏览器适用面按平台计划核定"
+      ]
     },
     {
       "id": "C13-N",
-      "status": "engineering_verification_in_progress",
-      "evidence_scope": "便笺/会话/文件/终端真实交互已有证据；完整八类仍补",
-      "remaining_work": [
-        "I03-R01",
-        "I03-R09",
-        "I03-R10"
+      "status": "local_engineering_verified_environment_validation_pending",
+      "requirement": {
+        "steps": "创建八类节点并拖动、缩放、分组和布局",
+        "expected": "节点类型与对象绑定正确，布局可恢复",
+        "platforms": [
+          "Windows Desktop",
+          "macOS Desktop",
+          "Linux Desktop",
+          "Web/Server按源适用面验证"
+        ]
+      },
+      "local_scope": "八类节点创建/编辑/布局/缩放/分组",
+      "evidence_scope": "原Native八类CRUD和键盘/布局资格；当前Native八类及Web原UI新建板、HTTP八类增改删、原排列/查看全部/键盘5px移动。Web不冒充八类均由弹窗创建。",
+      "shared_source_evidence": [
+        "i03-r09-source-ui-progress.json"
       ],
+      "current_candidate_evidence": "i03-r10-local-closeout-verification.json",
       "platform_state": {
-        "Windows Desktop": "partial_verified",
+        "Windows Desktop": "engineering_verified_within_declared_local_scope",
         "macOS Desktop": "not_verified_for_current_fusion",
         "Linux Desktop": "not_verified_for_current_fusion",
-        "Web/Server按源适用面验证": "not_verified_for_current_fusion"
-      }
+        "Web/Server按源适用面验证": "windows_host_chrome_web_verified_with_shared_component_evidence_other_hosts_browsers_pending"
+      },
+      "remaining": [
+        "macOS Desktop",
+        "Linux Desktop",
+        "其他Host操作系统/浏览器适用面按平台计划核定"
+      ]
     },
     {
       "id": "C13-F",
-      "status": "engineering_verification_in_progress",
-      "evidence_scope": "便笺冲突、伪造引用和Diff失效不替代已有证据；完整失效状态仍补",
-      "remaining_work": [
-        "I03-R01",
-        "I03-R05",
-        "I03-R09",
-        "I03-R10"
+      "status": "local_engineering_verified_environment_validation_pending",
+      "requirement": {
+        "steps": "对象已删除或并发改布局",
+        "expected": "显示失效引用或冲突，不错误绑定其他对象",
+        "platforms": [
+          "Windows Desktop",
+          "macOS Desktop",
+          "Linux Desktop",
+          "Web/Server按源适用面验证"
+        ]
+      },
+      "local_scope": "失效对象与并发布局不错误换绑",
+      "evidence_scope": "原对象失效、编辑器CAS保留；Web真实设备分组不可用提示、旧revision拒绝。已核定共享组件资格与实际HTTP接线组合，不冒称所有失败方式都重复运行。",
+      "shared_source_evidence": [
+        "i03-r05-object-cold-diff-verification.json",
+        "i03-r09-source-ui-progress.json"
       ],
+      "current_candidate_evidence": "i03-r10-local-closeout-verification.json",
       "platform_state": {
-        "Windows Desktop": "partial_verified",
+        "Windows Desktop": "engineering_verified_within_declared_local_scope",
         "macOS Desktop": "not_verified_for_current_fusion",
         "Linux Desktop": "not_verified_for_current_fusion",
-        "Web/Server按源适用面验证": "not_verified_for_current_fusion"
-      }
+        "Web/Server按源适用面验证": "windows_host_chrome_web_verified_with_shared_component_evidence_other_hosts_browsers_pending"
+      },
+      "remaining": [
+        "macOS Desktop",
+        "Linux Desktop",
+        "其他Host操作系统/浏览器适用面按平台计划核定"
+      ]
     },
     {
       "id": "C13-R",
-      "status": "engineering_verification_in_progress",
-      "evidence_scope": "renderer/公开私聊板恢复已有证据；整App/Core和全部类型仍补",
-      "remaining_work": [
-        "I03-R04",
-        "I03-R09",
-        "I03-R10"
+      "status": "local_engineering_verified_environment_validation_pending",
+      "requirement": {
+        "steps": "完成正常流程后重启或重连，再定位画布区域与布局相关对象、设置或工程",
+        "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+        "platforms": [
+          "Windows Desktop",
+          "macOS Desktop",
+          "Linux Desktop",
+          "Web/Server按源适用面验证"
+        ]
+      },
+      "local_scope": "八类身份/布局/绑定冷恢复",
+      "evidence_scope": "当前Native全部八类与第二板独立精确核对，原入口自然恢复摄像机；Web重载及同一Core来源读回。",
+      "shared_source_evidence": [
+        "i03-r04-process-interruption-verification.json"
       ],
+      "current_candidate_evidence": "i03-r10-local-closeout-verification.json",
       "platform_state": {
-        "Windows Desktop": "partial_verified",
+        "Windows Desktop": "engineering_verified_within_declared_local_scope",
         "macOS Desktop": "not_verified_for_current_fusion",
         "Linux Desktop": "not_verified_for_current_fusion",
-        "Web/Server按源适用面验证": "not_verified_for_current_fusion"
-      }
+        "Web/Server按源适用面验证": "windows_host_chrome_web_verified_with_shared_component_evidence_other_hosts_browsers_pending"
+      },
+      "remaining": [
+        "macOS Desktop",
+        "Linux Desktop",
+        "其他Host操作系统/浏览器适用面按平台计划核定"
+      ]
     },
     {
       "id": "C13-P",
-      "status": "engineering_verification_in_progress",
-      "evidence_scope": "Core绑定和实际文件越权拒绝已有证据；Host与平台未完整",
-      "remaining_work": [
-        "I03-R10"
+      "status": "local_engineering_verified_environment_validation_pending",
+      "requirement": {
+        "steps": "在约定平台检查画布区域与布局及源支持的远程适用面；撤销Actor或目标授权",
+        "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+        "platforms": [
+          "Windows Desktop",
+          "macOS Desktop",
+          "Linux Desktop",
+          "Web/Server按源适用面验证"
+        ]
+      },
+      "local_scope": "节点Actor/引用/授权边界",
+      "evidence_scope": "Web实际撤销会话节点snapshot/apply401；Native既有绑定/跨卡负例，其他平台未验。",
+      "shared_source_evidence": [
+        "i03-r03-host-private-verification.json",
+        "i03-r06-file-html-verification.json"
       ],
+      "current_candidate_evidence": "i03-r10-local-closeout-verification.json",
       "platform_state": {
-        "Windows Desktop": "partial_verified",
+        "Windows Desktop": "engineering_verified_within_declared_local_scope",
         "macOS Desktop": "not_verified_for_current_fusion",
         "Linux Desktop": "not_verified_for_current_fusion",
-        "Web/Server按源适用面验证": "not_verified_for_current_fusion"
+        "Web/Server按源适用面验证": "windows_host_chrome_web_verified_with_shared_component_evidence_other_hosts_browsers_pending"
       },
-      "verified_work_groups": [
-        "I03-R03"
-      ],
-      "api_verification": "i03-r03-host-private-verification.json"
+      "remaining": [
+        "macOS Desktop",
+        "Linux Desktop",
+        "其他Host操作系统/浏览器适用面按平台计划核定"
+      ]
     },
     {
       "id": "C14-N",
-      "status": "engineering_verification_in_progress",
-      "evidence_scope": "Windows真实文件路径与PTY键盘/绘制已有证据；其余平台未验",
-      "remaining_work": [
-        "I03-R10"
+      "status": "local_engineering_verified_environment_validation_pending",
+      "requirement": {
+        "steps": "打开画布文件卡与终端卡并输入命令",
+        "expected": "文件指向真实路径，PTY输入回显正确",
+        "platforms": [
+          "Windows Desktop",
+          "macOS Desktop",
+          "Linux Desktop",
+          "Web/Server按源适用面验证"
+        ]
+      },
+      "local_scope": "原文件与真实OS PTY输入输出",
+      "evidence_scope": "当前Native原启动按钮与精确输出；Web实际文件正文、真实PTY输出到原终端，非模型执行。",
+      "shared_source_evidence": [
+        "i03-r07-native-input-verification.json"
       ],
+      "current_candidate_evidence": "i03-r10-local-closeout-verification.json",
       "platform_state": {
-        "Windows Desktop": "partial_verified",
+        "Windows Desktop": "engineering_verified_within_declared_local_scope",
         "macOS Desktop": "not_verified_for_current_fusion",
         "Linux Desktop": "not_verified_for_current_fusion",
-        "Web/Server按源适用面验证": "not_verified_for_current_fusion"
-      }
+        "Web/Server按源适用面验证": "windows_host_chrome_web_verified_with_shared_component_evidence_other_hosts_browsers_pending"
+      },
+      "remaining": [
+        "macOS Desktop",
+        "Linux Desktop",
+        "其他Host操作系统/浏览器适用面按平台计划核定"
+      ]
     },
     {
       "id": "C14-F",
-      "status": "engineering_verification_in_progress",
-      "evidence_scope": "真实Host进程退出/停止与文件pin删除不删原文件已有证据；原文件被删的UI仍补",
-      "remaining_work": [
-        "I03-R06",
-        "I03-R07",
-        "I03-R10"
+      "status": "local_engineering_verified_environment_validation_pending",
+      "requirement": {
+        "steps": "文件删除或PTY进程退出",
+        "expected": "卡片显示明确状态，终端不冒充持久Thread",
+        "platforms": [
+          "Windows Desktop",
+          "macOS Desktop",
+          "Linux Desktop",
+          "Web/Server按源适用面验证"
+        ]
+      },
+      "local_scope": "源文件缺失及PTY自然退出",
+      "evidence_scope": "Web先保存原字节快照再移走隔离源，刷新后原卡错误、恢复后显式重试；真实PTY自然退出/新generation重开。",
+      "shared_source_evidence": [
+        "i03-r06-file-html-verification.json",
+        "i03-r07-core-terminal-capacity-verification.json"
       ],
+      "current_candidate_evidence": "i03-r10-local-closeout-verification.json",
       "platform_state": {
-        "Windows Desktop": "partial_verified",
+        "Windows Desktop": "engineering_verified_within_declared_local_scope",
         "macOS Desktop": "not_verified_for_current_fusion",
         "Linux Desktop": "not_verified_for_current_fusion",
-        "Web/Server按源适用面验证": "not_verified_for_current_fusion"
-      }
+        "Web/Server按源适用面验证": "windows_host_chrome_web_verified_with_shared_component_evidence_other_hosts_browsers_pending"
+      },
+      "remaining": [
+        "macOS Desktop",
+        "Linux Desktop",
+        "其他Host操作系统/浏览器适用面按平台计划核定"
+      ]
     },
     {
       "id": "C14-R",
-      "status": "engineering_verification_in_progress",
-      "evidence_scope": "实际Host终端生命周期及附件新App恢复有证据；完整冷恢复/重连仍补",
-      "remaining_work": [
-        "I03-R04",
-        "I03-R06",
-        "I03-R07",
-        "I03-R10"
+      "status": "local_engineering_verified_environment_validation_pending",
+      "requirement": {
+        "steps": "完成正常流程后重启或重连，再定位画布文件与终端相关对象、设置或工程",
+        "expected": "仍定位同一对象；持久事实、来源和配置一致；临时资源按源生命周期重建，不伪造恢复",
+        "platforms": [
+          "Windows Desktop",
+          "macOS Desktop",
+          "Linux Desktop",
+          "Web/Server按源适用面验证"
+        ]
+      },
+      "local_scope": "文件原绑定与临时资源生命周期",
+      "evidence_scope": "当前Native进程恢复原文件/节点，未伪造旧PTY；原重连生命周期沿未变模块复用，Web自然退出新代际不重放输入。",
+      "shared_source_evidence": [
+        "i03-r06-file-html-verification.json",
+        "i03-r07-core-terminal-capacity-verification.json"
       ],
+      "current_candidate_evidence": "i03-r10-local-closeout-verification.json",
       "platform_state": {
-        "Windows Desktop": "partial_verified",
+        "Windows Desktop": "engineering_verified_within_declared_local_scope",
         "macOS Desktop": "not_verified_for_current_fusion",
         "Linux Desktop": "not_verified_for_current_fusion",
-        "Web/Server按源适用面验证": "not_verified_for_current_fusion"
-      }
+        "Web/Server按源适用面验证": "windows_host_chrome_web_verified_with_shared_component_evidence_other_hosts_browsers_pending"
+      },
+      "remaining": [
+        "macOS Desktop",
+        "Linux Desktop",
+        "其他Host操作系统/浏览器适用面按平台计划核定"
+      ]
     },
     {
       "id": "C14-P",
-      "status": "engineering_verification_in_progress",
-      "evidence_scope": "实际跨卡文件拒绝/CSP隔离有证据；撤销和平台仍补",
-      "remaining_work": [
-        "I03-R06",
-        "I03-R07",
-        "I03-R10"
+      "status": "local_engineering_verified_environment_validation_pending",
+      "requirement": {
+        "steps": "在约定平台检查画布文件与终端及源支持的远程适用面；撤销Actor或目标授权",
+        "expected": "支持的平台行为一致；原生限制有具体依据；撤销后禁止越权，未实测保持未完成",
+        "platforms": [
+          "Windows Desktop",
+          "macOS Desktop",
+          "Linux Desktop",
+          "Web/Server按源适用面验证"
+        ]
+      },
+      "local_scope": "跨卡文件、CSP及终端撤权",
+      "evidence_scope": "原绑定/CSP负例沿未变文件模块；Web撤销实际曾获准的原文件请求及PTYwrite/stop均401，原文件SHA和输入序号保持。",
+      "shared_source_evidence": [
+        "i03-r03-host-private-verification.json",
+        "i03-r06-file-html-verification.json"
       ],
+      "current_candidate_evidence": "i03-r10-local-closeout-verification.json",
       "platform_state": {
-        "Windows Desktop": "partial_verified",
+        "Windows Desktop": "engineering_verified_within_declared_local_scope",
         "macOS Desktop": "not_verified_for_current_fusion",
         "Linux Desktop": "not_verified_for_current_fusion",
-        "Web/Server按源适用面验证": "not_verified_for_current_fusion"
+        "Web/Server按源适用面验证": "windows_host_chrome_web_verified_with_shared_component_evidence_other_hosts_browsers_pending"
       },
-      "verified_work_groups": [
-        "I03-R03"
-      ],
-      "api_verification": "i03-r03-host-private-verification.json"
+      "remaining": [
+        "macOS Desktop",
+        "Linux Desktop",
+        "其他Host操作系统/浏览器适用面按平台计划核定"
+      ]
     }
   ],
   "known_environment_deferrals": [
-    "Mac/Linux桌面及Web/Server未具备当前融合运行证据的适用项，不用原仓构建代替；分别记录到正式场景平台矩阵",
+    "macOS/Linux桌面、其他Host操作系统与浏览器适用面仍未验；Windows桌面与本机Host/Chrome已按正式12条登记，不再写Web全部未验。",
     "私聊24项当前Windows/Core本机边界已核定；标准ACP/整进程恢复不外推外部模型推理、其他平台或I02真正冻结后尚未投递窗口。其余环境和身份义务仍在原平台/阶段矩阵，不自动付费。",
     "真实移动平台按I10推进；终端平台专属保护按相应平台阶段补齐，不能被Windows结果代替"
   ],
   "change_control": "剩余编号固定；发现缺陷归入已有组并说明影响。新增必需范围须有来源和编号变更记录；不能为减少数量合并隐藏未完成条件。",
-  "latest_verification": "i03-r09-complete-local-verification.json",
-  "latest_partial_verification": "i03-r09-complete-local-verification.json"
+  "latest_verification": "i03-r10-local-closeout-verification.json",
+  "latest_partial_verification": "i03-r10-local-closeout-verification.json",
+  "retained_followups": "i03-r10-retained-followups.json"
 }

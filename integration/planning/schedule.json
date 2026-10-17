@@ -61,9 +61,10 @@
       "day_start": 18,
       "day_end": 27,
       "acceptance": "八类节点全部可交互；从画布发起真实任务并回到 Mission、Thread、Diff，重启后布局和绑定不丢失。",
-      "status": "研发中",
+      "status": "本机工程已核定，待跨平台验证",
       "engineering_owner": "Codex",
-      "customer_stage_gate": false
+      "customer_stage_gate": false,
+      "actual_local_closed_at": "2026-10-17T01:26:47.212096+00:00"
     },
     {
       "id": "I04",
@@ -75,9 +76,10 @@
       "day_start": 28,
       "day_end": 37,
       "acceptance": "至少两种可用 Runtime 完成真实协作作为早期检查点；最终所有约定平台可支持的 Runtime 均完成矩阵测试，不以两种通过替代全部准入。",
-      "status": "待实施",
+      "status": "实施中",
       "engineering_owner": "Codex",
-      "customer_stage_gate": false
+      "customer_stage_gate": false,
+      "actual_start": "2026-10-17T01:26:47.212096+00:00"
     },
     {
       "id": "I05",

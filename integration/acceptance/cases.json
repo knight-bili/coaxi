@@ -761,7 +761,7 @@
       "Linux Desktop",
       "Web/Server按源适用面验证"
     ],
-    "status": "engineering_verification_in_progress",
+    "status": "local_engineering_verified_environment_validation_pending",
     "evidence": "integration/execution/i03-closeout-ledger.json#C12-N"
   },
   {
@@ -778,7 +778,7 @@
       "Linux Desktop",
       "Web/Server按源适用面验证"
     ],
-    "status": "engineering_verification_in_progress",
+    "status": "local_engineering_verified_environment_validation_pending",
     "evidence": "integration/execution/i03-closeout-ledger.json#C12-F"
   },
   {
@@ -795,7 +795,7 @@
       "Linux Desktop",
       "Web/Server按源适用面验证"
     ],
-    "status": "engineering_verification_in_progress",
+    "status": "local_engineering_verified_environment_validation_pending",
     "evidence": "integration/execution/i03-closeout-ledger.json#C12-R"
   },
   {
@@ -812,7 +812,7 @@
       "Linux Desktop",
       "Web/Server按源适用面验证"
     ],
-    "status": "engineering_verification_in_progress",
+    "status": "local_engineering_verified_environment_validation_pending",
     "evidence": "integration/execution/i03-closeout-ledger.json#C12-P"
   },
   {
@@ -829,7 +829,7 @@
       "Linux Desktop",
       "Web/Server按源适用面验证"
     ],
-    "status": "engineering_verification_in_progress",
+    "status": "local_engineering_verified_environment_validation_pending",
     "evidence": "integration/execution/i03-closeout-ledger.json#C13-N"
   },
   {
@@ -846,7 +846,7 @@
       "Linux Desktop",
       "Web/Server按源适用面验证"
     ],
-    "status": "engineering_verification_in_progress",
+    "status": "local_engineering_verified_environment_validation_pending",
     "evidence": "integration/execution/i03-closeout-ledger.json#C13-F"
   },
   {
@@ -863,7 +863,7 @@
       "Linux Desktop",
       "Web/Server按源适用面验证"
     ],
-    "status": "engineering_verification_in_progress",
+    "status": "local_engineering_verified_environment_validation_pending",
     "evidence": "integration/execution/i03-closeout-ledger.json#C13-R"
   },
   {
@@ -880,7 +880,7 @@
       "Linux Desktop",
       "Web/Server按源适用面验证"
     ],
-    "status": "engineering_verification_in_progress",
+    "status": "local_engineering_verified_environment_validation_pending",
     "evidence": "integration/execution/i03-closeout-ledger.json#C13-P"
   },
   {
@@ -897,7 +897,7 @@
       "Linux Desktop",
       "Web/Server按源适用面验证"
     ],
-    "status": "engineering_verification_in_progress",
+    "status": "local_engineering_verified_environment_validation_pending",
     "evidence": "integration/execution/i03-closeout-ledger.json#C14-N"
   },
   {
@@ -914,7 +914,7 @@
       "Linux Desktop",
       "Web/Server按源适用面验证"
     ],
-    "status": "engineering_verification_in_progress",
+    "status": "local_engineering_verified_environment_validation_pending",
     "evidence": "integration/execution/i03-closeout-ledger.json#C14-F"
   },
   {
@@ -931,7 +931,7 @@
       "Linux Desktop",
       "Web/Server按源适用面验证"
     ],
-    "status": "engineering_verification_in_progress",
+    "status": "local_engineering_verified_environment_validation_pending",
     "evidence": "integration/execution/i03-closeout-ledger.json#C14-R"
   },
   {
@@ -948,7 +948,7 @@
       "Linux Desktop",
       "Web/Server按源适用面验证"
     ],
-    "status": "engineering_verification_in_progress",
+    "status": "local_engineering_verified_environment_validation_pending",
     "evidence": "integration/execution/i03-closeout-ledger.json#C14-P"
   },
   {
