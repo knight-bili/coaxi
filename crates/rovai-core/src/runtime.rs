@@ -1479,6 +1479,17 @@ impl ExecutionRuntimeService {
               AND camp_member.status = 'active'
               AND camp_member.leave_requested_at IS NULL
               AND agent_profile.profile_status = 'present'
+              AND NOT EXISTS (
+                  SELECT 1 FROM action_execution workspace_permission
+                  JOIN agent_run initial_child ON initial_child.id = workspace_permission.agent_run_id
+                  LEFT JOIN approval directory_approval ON directory_approval.action_id = workspace_permission.id
+                  WHERE initial_child.conversation_id = agent_run.conversation_id
+                    AND workspace_permission.policy_version = 'delegation-workspace-v1'
+                    AND COALESCE(workspace_permission.status = 'succeeded'
+                        AND directory_approval.status = 'approved'
+                        AND directory_approval.resolved_by_type = 'user'
+                        AND directory_approval.resolved_by_id = 'local_user', 0) = 0
+              )
               AND (
                   ?3 = 'all'
                   OR (?3 = 'batch'
@@ -6651,6 +6662,15 @@ fn claim_admission_rejection(
         return Ok(Some(rejected(
             "agent_run.delegation_workspace_mismatch",
             "Child AgentRun workspace differs from its persisted delegation scope",
+        )));
+    }
+    if crate::delegation_policy::FrozenPolicy::from_config(&run.effective_config)?
+        .is_some_and(|p| p.role == crate::delegation_policy::Role::Child)
+        && !crate::delegation_workspace_permission::covers_run(transaction, &run.id)?
+    {
+        return Ok(Some(rejected(
+            "agent_run.delegation_workspace_permission_required",
+            "Child workspace requires its exact User permission before preparation or claim",
         )));
     }
     if !current_authorization_covers_snapshot(

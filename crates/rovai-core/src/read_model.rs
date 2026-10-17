@@ -1967,7 +1967,7 @@ fn load_camp_open_counts(transaction: &Transaction<'_>, camp_id: &str) -> Result
                JOIN conversation ON conversation.id = agent_run.conversation_id
                WHERE COALESCE(agent_run.camp_id, camp_turn.camp_id) = ?1
                  AND approval.status = 'pending'
-                 AND conversation.kind <> 'single_chat')
+                 AND conversation.kind NOT IN ('single_chat', 'delegation_child'))
             "#,
             [camp_id],
             |row| {
@@ -4104,8 +4104,8 @@ pub(crate) fn load_conversation_approvals(
         JOIN conversation ON conversation.id = agent_run.conversation_id
         WHERE COALESCE(agent_run.camp_id, camp_turn.camp_id) = ?1
           AND (?2 = 0 OR approval.status = 'pending')
-          AND ((?4 IS NULL AND conversation.kind <> 'single_chat')
-            OR (?4 IS NOT NULL AND conversation.kind = 'single_chat' AND conversation.id = ?4))
+          AND ((?4 IS NULL AND conversation.kind NOT IN ('single_chat', 'delegation_child'))
+            OR (?4 IS NOT NULL AND conversation.kind IN ('single_chat', 'delegation_child') AND conversation.id = ?4))
         ORDER BY approval.requested_at DESC, approval.id
         LIMIT COALESCE(?3, -1)
         "#,
@@ -4176,7 +4176,9 @@ fn load_actions(transaction: &Transaction<'_>, camp_id: &str) -> Result<Vec<Acti
         FROM action_execution
         JOIN agent_run ON agent_run.id = action_execution.agent_run_id
         LEFT JOIN camp_turn ON camp_turn.id = agent_run.camp_turn_id
+        JOIN conversation ON conversation.id = agent_run.conversation_id
         WHERE COALESCE(agent_run.camp_id, camp_turn.camp_id) = ?1
+          AND conversation.kind <> 'delegation_child'
         ORDER BY action_execution.created_at DESC, action_execution.id
         "#,
     )?;

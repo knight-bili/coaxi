@@ -1262,6 +1262,9 @@ impl ActionSafetyService {
                     "Only the target user can resolve an Action Approval",
                 ));
             };
+            if let Some(result) = crate::delegation_workspace_permission::resolve(transaction, envelope)? {
+                return Ok(result);
+            }
             let row = transaction
                 .query_row(
                     r#"
@@ -1595,6 +1598,13 @@ impl ActionSafetyService {
             }
             if envelope.payload.lease_owner.trim().is_empty() || envelope.payload.lease_seconds <= 0 {
                 return Ok(rejected("action.invalid_lease", "Action lease is invalid"));
+            }
+            let core_workspace_permission: bool = transaction.query_row(
+                "SELECT EXISTS(SELECT 1 FROM action_execution WHERE id=?1 AND policy_version='delegation-workspace-v1')",
+                [&envelope.payload.action_id], |r| r.get(0),
+            )?;
+            if core_workspace_permission {
+                return Ok(rejected("action.core_permission_decision_only", "A Core directory grant cannot be dispatched as a Runtime action"));
             }
             let row = transaction
                 .query_row(

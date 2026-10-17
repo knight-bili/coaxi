@@ -169,6 +169,7 @@ pub(crate) fn install_identity_schema(tx: &Transaction<'_>) -> Result<()> {
             "delegation",
             "delegation_attempt",
             "delegation_control",
+            "delegation_workspace_permission",
         ],
     )?;
     Ok(())

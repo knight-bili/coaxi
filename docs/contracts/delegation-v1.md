@@ -59,6 +59,21 @@ control 原语按精确版本记录接管，要求旧 Run 已经终态，冻结�
 
 超出父范围只能得到“需要 User 权限”的观察结果，不能从观察直接构造可登记 Workspace。本批没有创建或消费持久审批；真实权限请求/决定/停止与重启协调仍是必需后续。该组件只用于新的工作准入；完整模型入口必须先按原请求身份恢复首次结果，再做新准入，不能用新资格校验替代既有请求恢复。
 
+### 执行前的外部目录审批
+
+已认证的父请求可以在同一事务内登记外部目录 child、初始排队 Run 与原 `action_execution` / `approval` 请求。
+`delegation_workspace_permission` 只保存不可变的归属及初始配置摘要，批准/拒绝仍由原审批表和 User 命令决定；不增加另一套审批状态，不伪造 Runtime 原生请求。
+请求冻结原任务摘要、目标 Runtime、原目录参数、真实目录与访问范围、初始配置、父 Run/epoch/Binding generation/tool call 和 child 身份。
+外部目录登记必须使用真实父身份与锁外目录观察的同一计划；失败时全部回滚，原请求重试不新增审批。
+审批按精确 child Conversation 读取；公开 Thread 的审批、待审批计数和动作列表排除 child，目录摘要不进入新建审批事件的公共通知载荷。旧 SingleChat 路径保持。
+
+调度候选在分页前排除未批准的目录请求；即使持有旧候选，目录准备与领取仍在原事务中核对精确授权。
+User 沿用 `action.approval.resolve` 回答，核对本地身份、Thread、审批版本、排队 child/epoch、当前成员和原父绑定。
+父正常完成不单独撤销已登记的后台工作；父停止、非正常结束、成员失效、Conversation 关闭或 child 取消仍走原因果取消和审批收尾。
+批准只完成本次目录授权这一 Core 动作，允许后续原执行流程；不投递原生许可回包，不运行文件操作或进程，不提升目标 Runtime 权限。
+拒绝复用原 Run 取消结算；重复原 UUID 回放原结果，停止后的迟到批准不能启动后来运行。通用动作执行器不能领取这种目录授权。
+该分支目前在候选160/210隔离 Core 验证；完整模型入口、Host 启动前文件系统重验、原界面及完整应用重启恢复仍须接入，不代表已开通生产执行。
+
 ### 初始子运行工厂
 
 `delegation_factory::create_child` 在原关系登记事务中按显式列创建独立 Conversation、完整任务消息、私有 Turn 与 queued Run。它从 Core 选择的安装和目标配置调用原 Adapter Registry 重新冻结目标，只应用一次 child 角色摘要；不复制父 Run 的 Session、Lease、接收证据、终态、恢复或未知未来列。21个内置 wire 名称映射到原 closed Adapter；custom 稳定编号必须精确对应已登记的 custom 安装，并保留其真实 Adapter，不能猜另一个产品作为运行载体。平台未准入、安装缺失/禁用、Adapter/权限配置错配、非法 workspace/policy 拒绝，不回退目标。

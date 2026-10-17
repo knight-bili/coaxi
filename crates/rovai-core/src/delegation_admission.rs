@@ -206,22 +206,10 @@ impl ParentStartAdmission {
         observation: &WorkspaceObservation,
         at: &str,
     ) -> Result<Registration> {
-        self.revalidate(tx)?;
-        ensure!(
-            observation.parent_fingerprint == self.fingerprint,
-            "delegation.workspace_owner_mismatch"
-        );
-        ensure!(
-            request.working_dir.map(|p| p.as_path()) == observation.requested.as_deref(),
-            "delegation.directory_request_changed"
-        );
+        self.validate_plan(tx, request, plan, observation)?;
         ensure!(
             plan.workspace == observation.authorized_workspace()?,
             "delegation.workspace_plan_changed"
-        );
-        ensure!(
-            plan.policy == self.child_policy,
-            "delegation.child_policy_changed"
         );
         crate::delegation_factory::register_initial(
             tx,
@@ -236,6 +224,72 @@ impl ParentStartAdmission {
             plan,
             at,
         )
+    }
+
+    /// Persist the queued child and its mandatory Core permission request in one
+    /// transaction. This does not authorize workspace preparation or spawn.
+    pub fn register_initial_awaiting_workspace_permission(
+        &self,
+        tx: &Transaction<'_>,
+        request: &FrozenRequest<'_>,
+        plan: &ChildRunPlan<'_>,
+        observation: &WorkspaceObservation,
+        at: &str,
+    ) -> Result<Registration> {
+        self.validate_plan(tx, request, plan, observation)?;
+        ensure!(
+            observation.requires_user_permission(),
+            "delegation.external_directory_required"
+        );
+        let registered = crate::delegation_factory::register_initial(
+            tx,
+            &ParentInvocation {
+                run_id: &self.source.agent_run_id,
+                epoch: self.source.execution_epoch,
+                binding_id: &self.binding.native_binding_id,
+                binding_generation: self.binding.native_binding_generation,
+                tool_call_id: &self.tool_call,
+            },
+            request,
+            plan,
+            at,
+        )?;
+        if !registered.replayed {
+            crate::delegation_workspace_permission::prepare(tx, &registered.identity.id, at)?;
+        } else {
+            ensure!(
+                crate::delegation_workspace_permission::exists(tx, &registered.identity.id)?,
+                "delegation.workspace_permission_missing"
+            );
+        }
+        Ok(registered)
+    }
+
+    fn validate_plan(
+        &self,
+        tx: &Transaction<'_>,
+        request: &FrozenRequest<'_>,
+        plan: &ChildRunPlan<'_>,
+        observation: &WorkspaceObservation,
+    ) -> Result<()> {
+        self.revalidate(tx)?;
+        ensure!(
+            observation.parent_fingerprint == self.fingerprint,
+            "delegation.workspace_owner_mismatch"
+        );
+        ensure!(
+            request.working_dir.map(|p| p.as_path()) == observation.requested.as_deref(),
+            "delegation.directory_request_changed"
+        );
+        ensure!(
+            plan.workspace == observation.candidate(),
+            "delegation.workspace_plan_changed"
+        );
+        ensure!(
+            plan.policy == self.child_policy,
+            "delegation.child_policy_changed"
+        );
+        Ok(())
     }
 }
 

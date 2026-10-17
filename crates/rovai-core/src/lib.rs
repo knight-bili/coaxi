@@ -70,6 +70,7 @@ pub mod delegation_factory;
 pub mod delegation_policy;
 pub mod delegation_settings;
 pub mod delegation_user;
+pub(crate) mod delegation_workspace_permission;
 pub mod delivery_queue;
 pub mod diagnostics;
 pub mod dsh;

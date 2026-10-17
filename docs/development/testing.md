@@ -89,6 +89,16 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 
 ## Rust 测试准入与退役门槛
 
+I04 外部目录审批继续扩展同一 Context materialization owner，helper 位于
+`context/delegation_workspace_permission_tests.rs`，不新增 Rust owner。
+使用实际父 Binding、生产 child 工厂、原 User 审批命令、原 Run 准备/领取/取消和真实 SQLite，
+验证审批写入故障的整图回滚、原请求单次登记、禁止更新/拆除权限归属、分页前阻断调度、
+旧候选准备与直接领取拒绝、通用动作执行器拒绝、错误 actor/Thread/版本/选项与旧父绑定拒绝，
+以及 User 批准后准备/领取、拒绝后取消、取消后迟到批准拒绝和原命令 UUID 回放。
+核对 child 私有审批可读取完整目录和两项 Core 选择，原生请求字段为空；公开 Thread snapshot/open 的审批与动作列表不出现该 child 申请。
+另一个 SQLite 连接核对持久批准；这不等于完整 Host 重启。安装信息和 transport attestation 仍为夹具，
+没有真实 Runtime/模型或完整正式 D 场景。原审批、取消和 Mission/私聊 owner 作为相关回归。
+
 I04 独立帮手的技能、MCP 与材料执行入口继续扩展既有
 `context::slow_tests::single_chat_materializes_conversation_input_with_a_memory_free_bootstrap`，
 复用其候选 SQLite、真实领取与 Context 夹具，不新增 Rust owner。

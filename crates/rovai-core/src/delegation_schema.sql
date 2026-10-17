@@ -232,3 +232,33 @@ CREATE TRIGGER delegation_turn_scope_update BEFORE UPDATE OF camp_id,kind,trigge
 WHEN OLD.kind='delegation' AND (NEW.camp_id IS NOT OLD.camp_id OR NEW.kind IS NOT OLD.kind
     OR NEW.trigger_type IS NOT OLD.trigger_type OR NEW.trigger_id IS NOT OLD.trigger_id)
 BEGIN SELECT RAISE(ABORT,'delegation Turn identity is immutable'); END;
+
+CREATE TABLE delegation_workspace_permission (
+    delegation_id TEXT PRIMARY KEY REFERENCES delegation(id) ON DELETE CASCADE,
+    action_id TEXT NOT NULL UNIQUE REFERENCES action_execution(id),
+    initial_config_digest TEXT NOT NULL CHECK(length(initial_config_digest)>0),
+    created_at TEXT NOT NULL
+);
+CREATE TRIGGER delegation_workspace_permission_insert BEFORE INSERT ON delegation_workspace_permission BEGIN
+    SELECT CASE WHEN NOT EXISTS(
+        SELECT 1 FROM delegation d JOIN delegation_attempt a ON a.delegation_id=d.id AND a.attempt_no=1
+        JOIN agent_run r ON r.id=a.agent_run_id JOIN action_execution x ON x.id=NEW.action_id
+        JOIN approval p ON p.action_id=x.id
+        WHERE d.id=NEW.delegation_id AND x.agent_run_id=r.id
+          AND r.status='queued' AND r.execution_epoch=0 AND r.cancel_requested_at IS NULL
+          AND NEW.initial_config_digest=json_extract(r.effective_config_json,'$.configDigest')
+          AND x.action_kind='runtime_permission_grant' AND x.policy_version='delegation-workspace-v1'
+          AND x.execution_authority='core' AND x.control_mode='mediated' AND x.policy_decision='ask'
+          AND x.source_agent_run_execution_epoch=0 AND x.status='prepared'
+          AND x.native_action_id IS NULL AND x.native_request_method IS NULL AND x.native_request_id_json IS NULL
+          AND json_extract(x.canonical_input_json,'$.cwd')=json_extract(d.resolved_workspace_json,'$.executionRoot')
+          AND json_extract(x.canonical_input_json,'$.permissions.workspace')=json(d.resolved_workspace_json)
+          AND p.status='pending' AND p.action_digest=x.action_digest
+          AND p.request_policy_version=x.policy_version AND p.requested_for_user_id='local_user'
+    ) THEN RAISE(ABORT,'delegation workspace permission scope mismatch') END;
+END;
+CREATE TRIGGER delegation_workspace_permission_immutable BEFORE UPDATE ON delegation_workspace_permission
+BEGIN SELECT RAISE(ABORT,'delegation workspace permission is immutable'); END;
+CREATE TRIGGER delegation_workspace_permission_delete BEFORE DELETE ON delegation_workspace_permission
+WHEN EXISTS(SELECT 1 FROM delegation WHERE id=OLD.delegation_id)
+BEGIN SELECT RAISE(ABORT,'delegation workspace permission belongs to its retained delegation'); END;
