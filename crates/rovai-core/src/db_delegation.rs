@@ -1,17 +1,111 @@
-//! Identity and Context format portions of the pending 160/210 migration. No startup registration.
+//! Complete delegation schema delta and source checks for pending160/210. No startup registration.
 use super::*;
 
 const IDENTITY_SQL: &str = include_str!("delegation_schema.sql");
 
-// New owned objects only; complete 210 admission must also check settings, extended legacy tables and formats.
-pub(crate) fn identity_schema_matches(connection: &Connection) -> rusqlite::Result<bool> {
-    let normalize = |s: &str| {
-        s.trim()
-            .trim_end_matches(';')
-            .split_whitespace()
-            .collect::<Vec<_>>()
-            .join(" ")
+// The old159 reference is structural input only; Core remains the business authority.
+#[cfg(all(test, feature = "extended-tests"))]
+#[path = "db_delegation_shape_tests.rs"]
+pub(crate) mod checks;
+#[path = "db_delegation_shape.rs"]
+mod shape;
+const MODIFIED_GUARDS: &[&str] = &[
+    "context_manifest_v34_only_insert",
+    "context_manifest_quote_profile_insert",
+    "runtime_input_delivery_attachment_auth_insert",
+    "agent_run_input_v34_only_insert",
+    "single_chat_composer_draft_scope_insert",
+    "single_chat_pending_input_scope_insert",
+    "single_chat_retained_input_insert_guard",
+    "single_chat_source_observation_owner",
+    "conversation_message_single_chat_attachment_insert_guard",
+    "conversation_message_single_chat_attachment_update_guard",
+];
+const TARGET_RUN_INPUT_GUARD: &str = r#"CREATE TRIGGER agent_run_input_v34_only_insert BEFORE INSERT ON agent_run_input
+        WHEN NOT EXISTS(SELECT 1 FROM agent_run r WHERE r.id=NEW.agent_run_id AND r.invocation_kind='batch'
+            AND json_extract(r.skill_selection_snapshot_json,'$.schemaVersion')=3
+            AND ((NEW.context_manifest_version=34 AND json_type(r.effective_config_json,'$.delegationPolicy') IS NULL)
+                OR (NEW.context_manifest_version=35 AND json_extract(r.effective_config_json,'$.delegationPolicy.role')='public_parent'
+                    AND json_extract(r.effective_config_json,'$.delegationPolicy.schemaVersion')=1)))
+        BEGIN SELECT RAISE(ABORT,'New public RunInput must match its frozen role and pack selection'); END;"#;
+
+fn extend_guard(name: &str, source: String) -> Result<String> {
+    let replacement = match name {
+        "context_manifest_v34_only_insert" => {
+            return replace_once(
+                source,
+                "BEFORE INSERT ON context_manifest WHEN NOT",
+                "BEFORE INSERT ON context_manifest WHEN NEW.context_manifest_version<>35 AND NOT",
+            );
+        }
+        "context_manifest_quote_profile_insert" => {
+            return replace_once(
+                source,
+                "WHEN NOT (",
+                "WHEN NEW.context_manifest_version<>35 AND NOT (",
+            );
+        }
+        "runtime_input_delivery_attachment_auth_insert" => {
+            return replace_once(source, "31, 32, 33, 34)", "31, 32, 33, 34, 35)");
+        }
+        "agent_run_input_v34_only_insert" => return Ok(TARGET_RUN_INPUT_GUARD.into()),
+        "single_chat_composer_draft_scope_insert" => (
+            "conversation.kind = 'single_chat'",
+            "(conversation.kind = 'single_chat' OR (conversation.kind='delegation_child' AND EXISTS(SELECT 1 FROM delegation d JOIN delegation_control control ON control.delegation_id=d.id WHERE d.child_conversation_id=conversation.id AND control.takeover_at IS NOT NULL AND control.takeover_message_sequence IS NOT NULL)))",
+        ),
+        "single_chat_pending_input_scope_insert" => (
+            "conversation.kind = 'single_chat'",
+            "(conversation.kind = 'single_chat' OR (conversation.kind='delegation_child' AND EXISTS(SELECT 1 FROM delegation d JOIN delegation_control control ON control.delegation_id=d.id WHERE d.child_conversation_id=conversation.id AND control.takeover_at IS NOT NULL AND control.takeover_message_sequence IS NOT NULL)))",
+        ),
+        "single_chat_retained_input_insert_guard" => (
+            "kind='single_chat'",
+            "(kind='single_chat' OR (kind='delegation_child' AND EXISTS(SELECT 1 FROM delegation d JOIN delegation_control control ON control.delegation_id=d.id WHERE d.child_conversation_id=conversation.id AND control.takeover_at IS NOT NULL AND control.takeover_message_sequence IS NOT NULL)))",
+        ),
+        "single_chat_source_observation_owner" => (
+            "kind='single_chat'",
+            "(kind='single_chat' OR (kind='delegation_child' AND EXISTS(SELECT 1 FROM delegation d JOIN delegation_control control ON control.delegation_id=d.id WHERE d.child_conversation_id=conversation.id AND control.takeover_at IS NOT NULL AND control.takeover_message_sequence IS NOT NULL)))",
+        ),
+        "conversation_message_single_chat_attachment_insert_guard" => (
+            "conversation.kind = 'single_chat'",
+            "(conversation.kind = 'single_chat' OR (conversation.kind='delegation_child' AND EXISTS(SELECT 1 FROM delegation d JOIN delegation_control control ON control.delegation_id=d.id WHERE d.child_conversation_id=conversation.id AND control.takeover_at IS NOT NULL AND control.takeover_message_sequence IS NOT NULL)))",
+        ),
+        "conversation_message_single_chat_attachment_update_guard" => (
+            "conversation.kind = 'single_chat'",
+            "(conversation.kind = 'single_chat' OR (conversation.kind='delegation_child' AND EXISTS(SELECT 1 FROM delegation d JOIN delegation_control control ON control.delegation_id=d.id WHERE d.child_conversation_id=conversation.id AND control.takeover_at IS NOT NULL AND control.takeover_message_sequence IS NOT NULL)))",
+        ),
+        _ => anyhow::bail!("Unexpected delegation source guard"),
     };
+    replace_once(source, replacement.0, replacement.1)
+}
+
+pub(crate) fn schema_matches(connection: &Connection) -> Result<bool> {
+    shape::matches(connection, true)
+}
+pub(crate) fn source_schema_matches(connection: &Connection) -> Result<bool> {
+    shape::matches(connection, false)
+}
+pub(crate) fn source_matches_for_classifier(connection: &Connection) -> rusqlite::Result<bool> {
+    source_schema_matches(connection)
+        .map_err(|error| rusqlite::Error::ToSqlConversionFailure(error.into()))
+}
+
+pub(crate) fn source_objects_absent(connection: &Connection) -> rusqlite::Result<bool> {
+    for (name, _) in owned_objects()
+        .into_iter()
+        .chain(std::iter::once(("delegation_settings", "")))
+    {
+        if connection.query_row(
+            "SELECT EXISTS(SELECT 1 FROM sqlite_schema WHERE name=?1 COLLATE NOCASE)",
+            [name],
+            |r| r.get::<_, bool>(0),
+        )? {
+            return Ok(false);
+        }
+    }
+    Ok(true)
+}
+
+fn owned_objects() -> Vec<(&'static str, &'static str)> {
     let mut offsets = Vec::new();
     let mut offset = 0;
     // Every top-level CREATE in this migration-owned source starts at column zero.
@@ -23,26 +117,41 @@ pub(crate) fn identity_schema_matches(connection: &Connection) -> rusqlite::Resu
         offset += line.len();
     }
     if offsets.is_empty() {
+        return Vec::new();
+    }
+    offsets
+        .iter()
+        .enumerate()
+        .map(|(index, start)| {
+            let expected = &IDENTITY_SQL[*start
+                ..offsets
+                    .get(index + 1)
+                    .copied()
+                    .unwrap_or(IDENTITY_SQL.len())];
+            let tokens = expected.split_whitespace().collect::<Vec<_>>();
+            (
+                if tokens[1] == "UNIQUE" {
+                    tokens[3]
+                } else {
+                    tokens[2]
+                },
+                expected,
+            )
+        })
+        .collect()
+}
+pub(crate) fn identity_schema_matches(connection: &Connection) -> rusqlite::Result<bool> {
+    let objects = owned_objects();
+    if objects.is_empty() {
         return Ok(false);
     }
-    for (index, start) in offsets.iter().enumerate() {
-        let expected = &IDENTITY_SQL[*start
-            ..offsets
-                .get(index + 1)
-                .copied()
-                .unwrap_or(IDENTITY_SQL.len())];
-        let tokens = expected.split_whitespace().collect::<Vec<_>>();
-        let name = if tokens[1] == "UNIQUE" {
-            tokens[3]
-        } else {
-            tokens[2]
-        };
+    for (name, expected) in objects {
         let actual: Option<String> = connection
             .query_row("SELECT sql FROM sqlite_schema WHERE name=?1", [name], |r| {
                 r.get(0)
             })
             .optional()?;
-        if !actual.is_some_and(|s| normalize(&s) == normalize(expected)) {
+        if !actual.is_some_and(|sql| shape::equivalent(&sql, expected)) {
             return Ok(false);
         }
     }
@@ -50,11 +159,7 @@ pub(crate) fn identity_schema_matches(connection: &Connection) -> rusqlite::Resu
 }
 
 fn replace_once(source: String, from: &str, to: &str) -> Result<String> {
-    anyhow::ensure!(
-        source.matches(from).count() == 1,
-        "Unexpected delegation migration source: {from}"
-    );
-    Ok(source.replacen(from, to, 1))
+    shape::replace(source, from, to, true)
 }
 
 pub(crate) fn install_identity_schema(tx: &Transaction<'_>) -> Result<()> {
@@ -65,6 +170,10 @@ pub(crate) fn install_identity_schema(tx: &Transaction<'_>) -> Result<()> {
     anyhow::ensure!(
         matches!(classify_database_contract(tx)?,DatabaseContractClassification::Current(ref marker) | DatabaseContractClassification::SupportedMigrationSource(ref marker) if marker.contract_version=="v1.72" && marker.projection_schema_version==159),
         "Delegation identity requires exact schema159 source"
+    );
+    anyhow::ensure!(
+        source_schema_matches(tx)?,
+        "Delegation migration source delta is incomplete"
     );
     for table in [
         "conversation",
@@ -79,92 +188,24 @@ pub(crate) fn install_identity_schema(tx: &Transaction<'_>) -> Result<()> {
             |r| r.get(0),
         )?;
         let extended = extend_table(table, original)?;
-        rebuild_table_v171(
-            tx,
-            table,
-            &replacement_table_schema_v171(extended, table),
-            &[],
-            &[],
+        let replacement = shape::replace(
+            extended,
+            &format!("CREATE TABLE {table}"),
+            &format!("CREATE TABLE {table}_v171"),
+            true,
         )?;
+        rebuild_table_v171(tx, table, &replacement, &[], &[])?;
     }
-    let legacy_guard:String=tx.query_row("SELECT sql FROM sqlite_schema WHERE type='trigger' AND name='context_manifest_v34_only_insert'",[],|r|r.get(0))?;
-    let extended_guard = replace_once(
-        legacy_guard,
-        "BEFORE INSERT ON context_manifest WHEN NOT",
-        "BEFORE INSERT ON context_manifest WHEN NEW.context_manifest_version<>35 AND NOT",
-    )?;
-    tx.execute_batch("DROP TRIGGER context_manifest_v34_only_insert;")?;
-    tx.execute_batch(&extended_guard)?;
-    let profile_guard:String=tx.query_row("SELECT sql FROM sqlite_schema WHERE type='trigger' AND name='context_manifest_quote_profile_insert'",[],|r|r.get(0))?;
-    let profile_guard = replace_once(
-        profile_guard,
-        "WHEN NOT (",
-        "WHEN NEW.context_manifest_version<>35 AND NOT (",
-    )?;
-    tx.execute_batch("DROP TRIGGER context_manifest_quote_profile_insert;")?;
-    tx.execute_batch(&profile_guard)?;
-    let attachment_guard: String = tx.query_row(
-        "SELECT sql FROM sqlite_schema WHERE type='trigger' AND name='runtime_input_delivery_attachment_auth_insert'",
-        [], |r| r.get(0),
-    )?;
-    let attachment_guard =
-        replace_once(attachment_guard, "31, 32, 33, 34)", "31, 32, 33, 34, 35)")?;
-    tx.execute_batch("DROP TRIGGER runtime_input_delivery_attachment_auth_insert;")?;
-    tx.execute_batch(&attachment_guard)?;
-    tx.execute_batch("DROP TRIGGER agent_run_input_v34_only_insert;
-        CREATE TRIGGER agent_run_input_v34_only_insert BEFORE INSERT ON agent_run_input
-        WHEN NOT EXISTS(SELECT 1 FROM agent_run r WHERE r.id=NEW.agent_run_id AND r.invocation_kind='batch'
-            AND json_extract(r.skill_selection_snapshot_json,'$.schemaVersion')=3
-            AND ((NEW.context_manifest_version=34 AND json_type(r.effective_config_json,'$.delegationPolicy') IS NULL)
-                OR (NEW.context_manifest_version=35 AND json_extract(r.effective_config_json,'$.delegationPolicy.role')='public_parent'
-                    AND json_extract(r.effective_config_json,'$.delegationPolicy.schemaVersion')=1)))
-        BEGIN SELECT RAISE(ABORT,'New public RunInput must match its frozen role and pack selection'); END;")?;
     tx.execute_batch(crate::delegation_settings::SCHEMA)?;
     tx.execute_batch(IDENTITY_SQL)?;
-    for (name, old, new) in [
-        (
-            "single_chat_composer_draft_scope_insert",
-            "conversation.kind = 'single_chat'",
-            "(conversation.kind = 'single_chat' OR (conversation.kind='delegation_child' AND EXISTS(SELECT 1 FROM delegation d JOIN delegation_control control ON control.delegation_id=d.id WHERE d.child_conversation_id=conversation.id AND control.takeover_at IS NOT NULL AND control.takeover_message_sequence IS NOT NULL)))",
-        ),
-        (
-            "single_chat_pending_input_scope_insert",
-            "conversation.kind = 'single_chat'",
-            "(conversation.kind = 'single_chat' OR (conversation.kind='delegation_child' AND EXISTS(SELECT 1 FROM delegation d JOIN delegation_control control ON control.delegation_id=d.id WHERE d.child_conversation_id=conversation.id AND control.takeover_at IS NOT NULL AND control.takeover_message_sequence IS NOT NULL)))",
-        ),
-        (
-            "single_chat_retained_input_insert_guard",
-            "kind='single_chat'",
-            "(kind='single_chat' OR (kind='delegation_child' AND EXISTS(SELECT 1 FROM delegation d JOIN delegation_control control ON control.delegation_id=d.id WHERE d.child_conversation_id=conversation.id AND control.takeover_at IS NOT NULL AND control.takeover_message_sequence IS NOT NULL)))",
-        ),
-        (
-            "single_chat_source_observation_owner",
-            "kind='single_chat'",
-            "(kind='single_chat' OR (kind='delegation_child' AND EXISTS(SELECT 1 FROM delegation d JOIN delegation_control control ON control.delegation_id=d.id WHERE d.child_conversation_id=conversation.id AND control.takeover_at IS NOT NULL AND control.takeover_message_sequence IS NOT NULL)))",
-        ),
-        (
-            "conversation_message_single_chat_attachment_insert_guard",
-            "conversation.kind = 'single_chat'",
-            "(conversation.kind = 'single_chat' OR (conversation.kind='delegation_child' AND EXISTS(SELECT 1 FROM delegation d JOIN delegation_control control ON control.delegation_id=d.id WHERE d.child_conversation_id=conversation.id AND control.takeover_at IS NOT NULL AND control.takeover_message_sequence IS NOT NULL)))",
-        ),
-        (
-            "conversation_message_single_chat_attachment_update_guard",
-            "conversation.kind = 'single_chat'",
-            "(conversation.kind = 'single_chat' OR (conversation.kind='delegation_child' AND EXISTS(SELECT 1 FROM delegation d JOIN delegation_control control ON control.delegation_id=d.id WHERE d.child_conversation_id=conversation.id AND control.takeover_at IS NOT NULL AND control.takeover_message_sequence IS NOT NULL)))",
-        ),
-    ] {
-        let original: String = tx.query_row(
-            "SELECT sql FROM sqlite_schema WHERE type='trigger' AND name=?1",
-            [name],
-            |r| r.get(0),
-        )?;
-        let extended = replace_once(original, old, new)?;
+    for name in MODIFIED_GUARDS {
+        let extended = shape::target_guard(name)?;
         tx.execute_batch(&format!("DROP TRIGGER {name};"))?;
         tx.execute_batch(&extended)?;
     }
     anyhow::ensure!(
-        identity_schema_matches(tx)?,
-        "Delegation identity schema admission failed"
+        schema_matches(tx)?,
+        "Complete delegation schema admission failed"
     );
     validate_migration_foreign_keys(
         tx,
@@ -210,10 +251,12 @@ fn extend_table(table: &str, source: String) -> Result<String> {
             )
         }
         "agent_run" => {
-            let source = source.replace(
+            let source = shape::replace(
+                source,
                 "operation_policy_version IN (1, 2)",
                 "operation_policy_version IN (1, 2, 3)",
-            );
+                false,
+            )?;
             let sql = replace_once(
                 source,
                 "invocation_kind IN ('direct', 'a2a', 'gather_completion', 'single_chat', 'batch')",
@@ -267,7 +310,7 @@ fn extend_table(table: &str, source: String) -> Result<String> {
             ] {
                 sql = replace_once(sql, old, new)?;
             }
-            let end = sql.rfind(')').context("Invalid Context Manifest schema")?;
+            let end = shape::table_end(&sql).context("Invalid Context Manifest schema")?;
             sql.insert_str(end,", CHECK((context_manifest_version<>35 AND context_delivery_profile_version<=10) OR (context_manifest_version=35 AND ((context_delivery_profile_version=11 AND run_facts_schema_version=10) OR (context_delivery_profile_version=12 AND run_facts_schema_version=9) OR (context_delivery_profile_version=13 AND run_facts_schema_version=6))))");
             Ok(sql)
         }

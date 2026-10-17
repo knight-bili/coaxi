@@ -3441,6 +3441,9 @@ pub(crate) fn classify_database_contract(
         )?;
         let valid = completed
             && marker.classifier_version == V147_CLASSIFIER_VERSION
+            && delegation::source_objects_absent(connection)?
+            && (marker.projection_schema_version != 159
+                || delegation::source_matches_for_classifier(connection)?)
             && simplification::current_structure_matches(connection)?
             && (marker.projection_schema_version < 146
                 || simplification::schema_matches(connection)?)

@@ -151,6 +151,10 @@ Profile11为child的publicHistory/taskAwareness/memoryEntrypoint三个none；Pro
 
 完整160/210开通之前，生产者不生成新角色。格式35现已接原装配、Manifest/Blob和回放：child只渲染原Additional Skills、Skill Packs、DELEGATION_CONTEXT、RUN_FACTS10、CURRENT_INPUT；父指南在Skill Packs后，原父段与预算算法保留。child不查询/投影父公屏历史、成员协作、Task、Mission或跨Thread历史；两种恢复入口都使用独立身份。初始正文与原任务Blob的SHA一致；resume只使用批准的固定继续提示及可选中断说明；User后续正文按本child和接管序号校验。超限抛出原context_payload_too_large错误，不截断任务。
 
-候选DDL扩展context_manifest/agent_run_input的35及Profile11/12/13、Facts10闭集；35元组不能写到旧版本，child Manifest无公屏/跨Thread历史证据，角色必须匹配Run/Conversation。完整旧表真结构分类、User后续材料的delegation_child来源及原生技能/MCP过滤尚未合齐，当前不是完整启动迁移资格。格式分项检查不证明User/模型鉴权或真实取消/恢复/接管已完成。
+候选DDL扩展context_manifest/agent_run_input的35及Profile11/12/13、Facts10闭集；35元组不能写到旧版本，child Manifest无公屏/跨Thread历史证据，角色必须匹配Run/Conversation。材料来源、原生技能/MCP过滤及执行资格已有分项接线，完整启动迁移资格还须与旧来源升级、policy3和执行协调合齐；各分项结果不代替真实Host/Runtime验证。
+
+候选结构检查覆盖settings、新增表/索引/guard、conversation/camp_turn/agent_run/context_manifest/agent_run_input五表，以及格式4个和材料6个改动旧guard。约束比较保留完整CHECK表达式和字符串值，核对变动字段的类型、非空、默认值、主键、隐藏属性和比较规则；不以字段名存在或SQL片段出现代替完整约束。安装器与验证器共用转换，兼容空白、注释、标识符引号及不相关旧扩展列；未改变的旧结构继续由原Core分类器核对。
+
+旧159来源必须保留本次将修改的完整旧约束且不存在新增保留对象（表名大小写不构成绕过）；部分settings/identity安装、同名空壳guard和放宽约束拒绝升级。重建与对象安装使用同一事务，失败不留下目标对象；仍不写160标记或210回执。只有完整启动链、冻结资格和policy3合齐后才能正式开通。
 
 目标 v1.73/Schema160/Migration210 尚未登记启动链。格式35/冻结资格/子Bootstrap组件接线后，继续合齐材料/原生投影、完整数据合同分类及旧来源升级，再接 User/模型/CLI、回执事件、调度与输入接收、取消清理、原 Session 恢复、接管发送与原界面。Run 仍是唯一执行终态权威；这些组件不构成完整身份认证或 Runtime 准入，不得据此启动真实进程。当前运行数据和旧模型输入保持，正式场景不据分项测试记为完成。

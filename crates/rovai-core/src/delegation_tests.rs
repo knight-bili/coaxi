@@ -300,6 +300,7 @@ fn identity_graph_preserves_core_rows_and_fences_scope_replay_depth_and_takeover
             |r| r.get(0),
         )
         .unwrap();
+    crate::db::delegation::checks::source(connection);
     connection
         .execute_batch(
             "PRAGMA foreign_keys=OFF; CREATE TABLE delegation_control(collision INTEGER);",
@@ -328,6 +329,7 @@ fn identity_graph_preserves_core_rows_and_fences_scope_replay_depth_and_takeover
     tx.commit().unwrap();
     connection.execute_batch("PRAGMA foreign_keys=ON;").unwrap();
     assert!(crate::db::delegation::identity_schema_matches(connection).unwrap());
+    crate::db::delegation::checks::target(connection);
     let tx = connection.unchecked_transaction().unwrap();
     tx.execute_batch("DROP TRIGGER delegation_owner_insert; CREATE TRIGGER delegation_owner_insert BEFORE INSERT ON delegation BEGIN SELECT 1; END;").unwrap();
     assert!(

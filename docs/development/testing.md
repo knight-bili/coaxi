@@ -89,6 +89,13 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 
 ## Rust 测试准入与退役门槛
 
+I04 完整迁移delta的结构验证扩展原
+`delegation::tests::identity_graph_preserves_core_rows_and_fences_scope_replay_depth_and_takeover`，
+helper为 `db_delegation_shape_tests.rs`，复用同一真实Core数据库，不新增owner或整库。
+覆盖旧159与候选结构、十旧guard同名空壳、五旧表约束放宽、部分安装及大小写绕过、
+字段非空/比较规则与CHECK放宽、无害排版/额外列保留、重建后的故障回滚和只读分类零写入。
+原Context materialization owner和v147分类器升级owner作相关回归；候选检查通过不等于启动160/210或真实Runtime验证。
+
 I04 Runtime 默认设置新增唯一低层 owner
 `delegation_runtime_defaults::tests::frozen_target_defaults_use_native_configuration_and_acknowledged_acp_choices`。
 原 owner 没有覆盖目标设置的原生字段映射及 ACP mode/config 回执顺序；此 owner 仅使用原 Registry 描述和可记录 RPC 回执替身，
