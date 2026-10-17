@@ -5,6 +5,10 @@ fn context_child(fixture: &mut Fixture, task: &str, call: &str) -> (String, Stri
     context_child_of(fixture,&parent,epoch,task,call)
 }
 fn context_child_of(fixture: &mut Fixture, parent: &str, parent_epoch: i64, task: &str, call: &str) -> (String, String, i64) {
+    let workspace=json!({"executionRoot":fixture.directory,"access":"read_only","isolation":"shared"});
+    context_child_in(fixture,parent,parent_epoch,task,call,&workspace)
+}
+fn context_child_in(fixture: &mut Fixture, parent: &str, parent_epoch: i64, task: &str, call: &str, workspace: &Value) -> (String, String, i64) {
     let blob = ManagedBlobStore::new(&fixture.directory)
         .put_bytes(
             &mut fixture.database,
@@ -15,8 +19,6 @@ fn context_child_of(fixture: &mut Fixture, parent: &str, parent_epoch: i64, task
         .unwrap();
     let (binding,generation):(String,i64)=fixture.database.connection().query_row("SELECT c.native_binding_id,c.native_binding_generation FROM agent_run r JOIN conversation c ON c.id=r.conversation_id WHERE r.id=?1",[parent],|r|Ok((r.get(0)?,r.get(1)?))).unwrap();
     let target = crate::delegation_contract::RuntimeTarget::try_from("codex".to_string()).unwrap();
-    let workspace =
-        json!({"executionRoot":fixture.directory,"access":"read_only","isolation":"shared"});
     let preset = json!({});
     // Fixture-selected target; the production factory resolves a fresh Registry snapshot.
     let config: String = fixture.database.connection().query_row("SELECT effective_config_json FROM agent_run WHERE id=?1",[parent],|r|r.get(0)).unwrap();
@@ -60,6 +62,8 @@ fn claim_context_child(fixture: &mut Fixture, run: &str) -> i64 {
         .into_iter()
         .find(|candidate| candidate.agent_run_id == run)
         .expect("child dispatch candidate");
+    let workspace_json: String = fixture.database.connection().query_row("SELECT workspace_json FROM agent_run WHERE id=?1",[run],|r|r.get(0)).unwrap();
+    let workspace: AgentRunWorkspace = serde_json::from_str(&workspace_json).unwrap();
     let claimed = ExecutionRuntimeService::default()
         .claim_agent_run(
             &mut fixture.database,
@@ -76,11 +80,7 @@ fn claim_context_child(fixture: &mut Fixture, run: &str) -> i64 {
                     expected_version: candidate.version,
                     lease_owner: "context-child-fixture".into(),
                     lease_seconds: 60,
-                    workspace: Some(AgentRunWorkspace {
-                        execution_root: fixture.directory.display().to_string(),
-                        access: "read_only".into(),
-                        isolation: "shared".into(),
-                    }),
+                    workspace: Some(workspace),
                     starting_git_observation: None,
                 },
             },

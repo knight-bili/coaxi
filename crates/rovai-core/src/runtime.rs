@@ -1903,6 +1903,7 @@ impl ExecutionRuntimeService {
                 (None, None) => None,
             };
             if let Some(workspace) = frozen_workspace.as_ref()
+                && delegation_workspace_scope(transaction, &run)?.is_none()
                 && !workspace_matches_camp(transaction, &run.camp_id, workspace)?
             {
                 return Ok(rejected(
@@ -6646,6 +6647,12 @@ fn claim_admission_rejection(
             "Agent is no longer an executable current Camp member",
         )));
     }
+    if delegation_workspace_scope(transaction, run)? == Some(false) {
+        return Ok(Some(rejected(
+            "agent_run.delegation_workspace_mismatch",
+            "Child AgentRun workspace differs from its persisted delegation scope",
+        )));
+    }
     if !current_authorization_covers_snapshot(
         &run.effective_config,
         &run.current_default_capabilities,
@@ -6931,6 +6938,32 @@ fn has_recovery_safety_blocker(transaction: &Transaction<'_>, run_id: &str) -> R
         |row| row.get(0),
     )?;
     Ok(blockers != 0)
+}
+
+fn delegation_workspace_scope(
+    transaction: &Transaction<'_>,
+    run: &ClaimableRun,
+) -> Result<Option<bool>> {
+    let child = crate::delegation_policy::FrozenPolicy::from_config(&run.effective_config)?
+        .is_some_and(|p| p.role == crate::delegation_policy::Role::Child);
+    if !child {
+        return Ok(None);
+    }
+    let expected:Option<String>=transaction.query_row(
+        "SELECT d.resolved_workspace_json FROM delegation d JOIN conversation c ON c.id=d.child_conversation_id
+         JOIN agent_run r ON r.conversation_id=c.id JOIN camp_turn t ON t.id=r.camp_turn_id
+         WHERE r.id=?1 AND d.camp_id=?2 AND t.camp_id=d.camp_id AND c.camp_id=d.camp_id
+           AND c.agent_id=d.owner_agent_id AND c.kind='delegation_child' AND c.ended_at IS NULL
+           AND r.invocation_kind IN ('delegation','delegation_user') AND r.operation_policy='delegation_child_v1'
+           AND r.operation_policy_version=1 AND r.response_delivery='conversation_message' AND r.destination_conversation_id=c.id",
+        params![run.id,run.camp_id],|r|r.get(0),
+    ).optional()?;
+    Ok(Some(match (expected, run.workspace.as_ref()) {
+        (Some(expected), Some(workspace)) => {
+            serde_json::from_str::<Value>(&expected)? == *workspace
+        }
+        _ => false,
+    }))
 }
 
 fn workspace_matches_camp(

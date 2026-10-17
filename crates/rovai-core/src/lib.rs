@@ -63,6 +63,7 @@ pub mod current_user;
 pub mod database_admission;
 pub mod db;
 pub mod delegation;
+pub mod delegation_admission;
 pub mod delegation_contract;
 pub mod delegation_control;
 pub mod delegation_factory;

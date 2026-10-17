@@ -51,6 +51,14 @@ control 原语按精确版本记录接管，要求旧 Run 已经终态，冻结�
 
 正常成功不触发因果取消。`delegation` 与 `delegation_user` 的成功结果沿原私有完成算法保存到自己的 Conversation，原消息、Run 终态、回执同事务提交，禁止走公开回复或业务 Task fallback；旧 Single Chat 的 policy1/2 分支不变，policy3 完整准入仍待合齐。子会话完成后保留后台帮手，待明确停止、所属会话关闭或成员失效时按相应范围处理。Thread 聚合删除须先释放 delegation/attempt/control 关系，以及已发布私有排队输入对消息/Turn/Run 的引用，再删除其 Run/Conversation；旧库不存在排队表时沿原路径，仍由原外键及事务保证完整性。这里不代表真实进程/文件清理和完整启动迁移已经通过。
 
+### 新工作父身份与目录观察
+
+`delegation_admission` 从原 Team Tool attested Binding 验证当前 Run/epoch、实际成员和 Thread，不接收模型自报的父身份。新工作必须具有匹配 Conversation/invocation 的冻结角色、完整配置摘要、未结束的绑定、在场成员，以及同时有效的冻结/当前开关和深度。旧私聊没有资格时不能因当前开关开启而获得委派工具；接管前的原 attempt 和接管后的 User Run 使用各自当前控制状态。内部证明携带短期凭据，不可调试输出或序列化。
+
+目录观察在数据库锁外进行，默认取该 Run 冻结的实际 executionRoot；显式目录须存在且为目录，按真实 canonical 路径判定范围，父目录跳转、前缀相似目录及目录链接不能扩大范围。观察保持原 access/isolation，不授予额外写权限。原范围内登记在同一事务重验父身份、设置、配置、请求编号、原目录请求及计划，之后接原生产工厂。观察 token 不能跨运行或原 tool call 使用。原 Core 准备/claim 对 child 的目录改为核对同归属 delegation 中冻结的完整 workspace，而不是要求等于当前 Camp 根；Run/关系的目录、access 或 isolation 错配拒绝。旧 public/SingleChat 的原 Camp/Mission 目录校验保持；完整 Host 在各边界的观察与权限重验仍需接齐。
+
+超出父范围只能得到“需要 User 权限”的观察结果，不能从观察直接构造可登记 Workspace。本批没有创建或消费持久审批；真实权限请求/决定/停止与重启协调仍是必需后续。该组件只用于新的工作准入；完整模型入口必须先按原请求身份恢复首次结果，再做新准入，不能用新资格校验替代既有请求恢复。
+
 ### 初始子运行工厂
 
 `delegation_factory::create_child` 在原关系登记事务中按显式列创建独立 Conversation、完整任务消息、私有 Turn 与 queued Run。它从 Core 选择的安装和目标配置调用原 Adapter Registry 重新冻结目标，只应用一次 child 角色摘要；不复制父 Run 的 Session、Lease、接收证据、终态、恢复或未知未来列。21个内置 wire 名称映射到原 closed Adapter；custom 稳定编号必须精确对应已登记的 custom 安装，并保留其真实 Adapter，不能猜另一个产品作为运行载体。平台未准入、安装缺失/禁用、Adapter/权限配置错配、非法 workspace/policy 拒绝，不回退目标。
