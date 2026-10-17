@@ -23,6 +23,10 @@ const privateBase = {
   composerScope: { kind: 'canvas', boardId: '22222222-2222-4222-8222-222222222222', nodeId: '33333333-3333-4333-8333-333333333333' }
 }
 it.each([
+  { owner: 'delegation_child_pending', threadId: privateBase.threadId, conversationId: privateBase.conversationId,
+    attachmentRefId: privateBase.attachmentRefId, pendingInputId: '44444444-4444-4444-8444-444444444444' },
+  { ...privateBase, owner: 'delegation_child_pending_edit', pendingInputId: '44444444-4444-4444-8444-444444444444', editToken: '55555555-5555-4555-8555-555555555555' },
+  { ...privateBase, owner: 'delegation_child_pending_edit', composerScope: null, pendingInputId: '44444444-4444-4444-8444-444444444444', editToken: '55555555-5555-4555-8555-555555555555' },
   { ...privateBase, owner: 'single_chat_scoped_composer' },
   { ...privateBase, owner: 'single_chat_scoped_pending_edit', pendingInputId: '44444444-4444-4444-8444-444444444444', editToken: '55555555-5555-4555-8555-555555555555' },
   { ...privateBase, owner: 'single_chat_retained', retainedInputId: '44444444-4444-4444-8444-444444444444' },

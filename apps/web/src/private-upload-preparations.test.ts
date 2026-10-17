@@ -64,9 +64,9 @@ async function fixture(capability = true, lifecycle = false) {
 }
 
 describe('Web 私聊文件原请求与重选', () => {
-  it('子会话刷新仍绑定原目标，普通私聊列表不收取子会话上传', async () => {
+  it.each(['delegation_child', 'delegation_child_pending'] as const)('%s 刷新仍绑定原目标，普通私聊列表不收取子会话上传', async kind => {
     const f = await fixture(true, true), input = request()
-    input.target = { kind: 'delegation_child', conversationId: ids[1] }
+    input.target = kind === 'delegation_child' ? { kind, conversationId: ids[1] } : { kind, conversationId: ids[1], pendingInputId: ids[4], editToken: ids[5] }
     const api = f.client.privateUploadPreparations(f.storage)
     expect(await api.prepareInput(input, file())).toMatchObject({ state: 'unknown' })
     const restored = f.client.privateUploadPreparations(f.storage)
@@ -75,6 +75,10 @@ describe('Web 私聊文件原请求与重选', () => {
     expect(await restored.pendingPreparations(childOwner)).toMatchObject([{ request: input, state: 'unknown' }])
     expect(await restored.reconcileInput(input)).toMatchObject({ state: 'unknown' })
     expect(f.posts).toHaveLength(1)
+    if (input.target.kind === 'delegation_child_pending') {
+      const changed = { ...input, target: { ...input.target, editToken: ids[0] } }
+      expect(() => restored.reconcileInput(changed)).toThrow()
+    }
     const original = structuredClone(f.posts[0].intent)
     await expect(restored.retryInput(input, file('other'))).rejects.toThrow('source_changed')
     f.mode('success')

@@ -111,6 +111,20 @@ pub struct UploadIntent {
 pub enum UploadTarget {
     #[default]
     Camp,
+    DelegationChildPending {
+        #[serde(rename = "conversationId")]
+        conversation_id: String,
+        #[serde(rename = "pendingInputId")]
+        pending_input_id: String,
+        #[serde(rename = "editToken")]
+        edit_token: String,
+        #[serde(
+            rename = "composerScope",
+            default,
+            skip_serializing_if = "Option::is_none"
+        )]
+        composer_scope: Option<crate::single_chat_composer_scope::SingleChatComposerScope>,
+    },
     DelegationChild {
         #[serde(rename = "conversationId")]
         conversation_id: String,
@@ -147,6 +161,12 @@ pub enum UploadTarget {
     },
 }
 impl UploadTarget {
+    pub fn is_child(&self) -> bool {
+        matches!(
+            self,
+            Self::DelegationChild { .. } | Self::DelegationChildPending { .. }
+        )
+    }
     fn is_camp(&self) -> bool {
         matches!(self, Self::Camp)
     }
@@ -159,6 +179,19 @@ pub fn snapshot(
     intent: &UploadIntent,
 ) -> Result<serde_json::Value> {
     match &intent.target {
+        UploadTarget::DelegationChildPending {
+            conversation_id,
+            composer_scope,
+            ..
+        } => {
+            let actor = ActorRef::User {
+                user_id: crate::current_user::CURRENT_USER_ID.into(),
+            };
+            Ok(json!({
+                "draft":crate::delegation_user::read_draft(database,&actor,client,&intent.camp_id,conversation_id,composer_scope.as_ref())?,
+                "pendingInputs":crate::delegation_user::read_pending_inputs(database,&actor,client,&intent.camp_id,conversation_id,composer_scope.as_ref())?,
+            }))
+        }
         UploadTarget::DelegationChild {
             conversation_id,
             composer_scope,
@@ -400,7 +433,7 @@ pub(crate) fn bind_with_prepared(
             }
             UploadTarget::SingleChat { composer_scope: Some(_), .. }
             | UploadTarget::SingleChatPending { composer_scope: Some(_), .. }
-            | UploadTarget::DelegationChild { .. } => {
+            | UploadTarget::DelegationChild { .. } | UploadTarget::DelegationChildPending { .. } => {
                 crate::single_chat_composer::bind_uploaded_source(transaction, client, intent, source.clone())?;
             }
             UploadTarget::SingleChat { conversation_id, composer_scope: None } => {
@@ -410,7 +443,7 @@ pub(crate) fn bind_with_prepared(
             UploadTarget::SingleChatPending { conversation_id, pending_input_id, edit_token, composer_scope: None } => crate::single_chat::SingleChatService::for_client(client.clone()).commit_pending_source_attachment_in_transaction(transaction, &intent.camp_id, conversation_id, pending_input_id, intent.expected_revision, edit_token, source.clone(), prepared)?,
         }
         if let UploadTarget::SingleChat { conversation_id, .. } | UploadTarget::SingleChatPending { conversation_id, .. }
-            | UploadTarget::DelegationChild { conversation_id, .. } = &intent.target {
+            | UploadTarget::DelegationChild { conversation_id, .. } | UploadTarget::DelegationChildPending { conversation_id, .. } = &intent.target {
             crate::private_source_observation::capture_upload(transaction,conversation_id,&source,&intent.sha256,intent.byte_size, prepared)?;
         }
         let payload = if matches!(intent.target, UploadTarget::Camp) {
@@ -445,7 +478,7 @@ pub fn preflight_child_native(
     client: &DraftClient,
     params: &NativeUploadPreparation,
 ) -> Result<()> {
-    if matches!(params.target, UploadTarget::DelegationChild { .. }) {
+    if params.target.is_child() {
         ensure!(
             client.is_desktop(),
             "native upload requires the desktop editor"
@@ -475,6 +508,17 @@ fn private_target_rejection(
     use crate::single_chat_composer::ComposerOwner;
     let (conversation, scope, pending, owner) = match target {
         UploadTarget::Camp => return Ok(None),
+        UploadTarget::DelegationChildPending {
+            conversation_id,
+            composer_scope,
+            pending_input_id,
+            edit_token,
+        } => (
+            conversation_id,
+            composer_scope.as_ref(),
+            Some((pending_input_id, edit_token)),
+            ComposerOwner::DelegationChild,
+        ),
         UploadTarget::DelegationChild {
             conversation_id,
             composer_scope,

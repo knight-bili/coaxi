@@ -119,6 +119,30 @@ impl LocalAttachmentSourceRef {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "owner", rename_all = "snake_case", deny_unknown_fields)]
 pub enum LocalAttachmentOwnerLocator {
+    DelegationChildPending {
+        #[serde(rename = "threadId", alias = "campId")]
+        camp_id: String,
+        #[serde(rename = "conversationId")]
+        conversation_id: String,
+        #[serde(rename = "pendingInputId")]
+        pending_input_id: String,
+        #[serde(rename = "attachmentRefId")]
+        attachment_ref_id: String,
+    },
+    DelegationChildPendingEdit {
+        #[serde(rename = "threadId", alias = "campId")]
+        camp_id: String,
+        #[serde(rename = "conversationId")]
+        conversation_id: String,
+        #[serde(rename = "pendingInputId")]
+        pending_input_id: String,
+        #[serde(rename = "editToken")]
+        edit_token: String,
+        #[serde(rename = "composerScope")]
+        composer_scope: Option<crate::single_chat_composer_scope::SingleChatComposerScope>,
+        #[serde(rename = "attachmentRefId")]
+        attachment_ref_id: String,
+    },
     DelegationChildComposer {
         #[serde(rename = "threadId", alias = "campId")]
         camp_id: String,
@@ -272,7 +296,9 @@ pub enum LocalAttachmentOwnerLocator {
 impl LocalAttachmentOwnerLocator {
     pub fn camp_id(&self) -> &str {
         match self {
-            Self::DelegationChildComposer { camp_id, .. }
+            Self::DelegationChildPending { camp_id, .. }
+            | Self::DelegationChildPendingEdit { camp_id, .. }
+            | Self::DelegationChildComposer { camp_id, .. }
             | Self::DelegationChildRetained { camp_id, .. }
             | Self::DelegationChildMessage { camp_id, .. }
             | Self::Composer { camp_id, .. }
@@ -292,7 +318,13 @@ impl LocalAttachmentOwnerLocator {
 
     pub fn attachment_ref_id(&self) -> &str {
         match self {
-            Self::DelegationChildComposer {
+            Self::DelegationChildPending {
+                attachment_ref_id, ..
+            }
+            | Self::DelegationChildPendingEdit {
+                attachment_ref_id, ..
+            }
+            | Self::DelegationChildComposer {
                 attachment_ref_id, ..
             }
             | Self::DelegationChildRetained {
@@ -606,6 +638,19 @@ pub fn load_source_attachment_for_client(
 ) -> Result<Option<LocalAttachmentSourceRef>> {
     let connection = database.connection();
     let json = match locator {
+        LocalAttachmentOwnerLocator::DelegationChildPending {camp_id,conversation_id,pending_input_id,..} => {
+            if !crate::delegation_user::material_owner_exists(connection,camp_id,conversation_id,false)? {return Ok(None);}
+            connection.query_row("SELECT source_attachments_json FROM single_chat_pending_input WHERE conversation_id=?1 AND id=?2",params![conversation_id,pending_input_id],|r|r.get::<_,String>(0)).optional()?
+        }
+        LocalAttachmentOwnerLocator::DelegationChildPendingEdit {camp_id,conversation_id,pending_input_id,edit_token,composer_scope,..} => {
+            if !crate::delegation_user::material_owner_exists(connection,camp_id,conversation_id,false)? {return Ok(None);}
+            let key=crate::single_chat_composer_scope::PrivateComposerKey::for_scope(composer_scope.as_ref())?;
+            connection.query_row("SELECT edit.working_source_attachments_json FROM single_chat_pending_input_edit_session edit
+                JOIN single_chat_pending_input input ON input.id=edit.pending_input_id AND input.conversation_id=edit.conversation_id
+                WHERE edit.conversation_id=?1 AND edit.pending_input_id=?2 AND edit.edit_token=?3
+                  AND edit.client_id=?4 AND edit.scope_key=?5 AND input.revision=edit.base_pending_revision",
+                params![conversation_id,pending_input_id,edit_token,client.id(),key.sql_key()],|r|r.get::<_,String>(0)).optional()?
+        }
         LocalAttachmentOwnerLocator::DelegationChildComposer { camp_id, conversation_id, composer_scope, .. } => {
             if !crate::delegation_user::material_owner_exists(connection,camp_id,conversation_id,false)? {return Ok(None);}
             let key=crate::single_chat_composer_scope::PrivateComposerKey::for_scope(composer_scope.as_ref())?;

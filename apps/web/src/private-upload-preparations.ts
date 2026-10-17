@@ -160,7 +160,7 @@ export class BrowserPrivateUploadPreparations {
       expectedRevision: 0, target: { kind: owner.conversationKind ?? 'single_chat', conversationId: owner.conversationId, composerScope: owner.composerScope } })
     return Object.values(this.entries()).filter(entry => entry.phase !== 'rejected' && entry.request.threadId === canonical.threadId
       && entry.request.target.conversationId === canonical.target.conversationId
-      && (entry.request.target.kind === 'delegation_child') === (canonical.target.kind === 'delegation_child')
+      && (entry.request.target.kind === 'delegation_child' || entry.request.target.kind === 'delegation_child_pending') === (canonical.target.kind === 'delegation_child' || canonical.target.kind === 'delegation_child_pending')
       && equal(entry.request.target.composerScope ?? null, canonical.target.composerScope ?? null))
       .map(entry => ({ request: structuredClone(entry.request), displayName: entry.intent.displayName, state: entry.phase as 'prepared' | 'unknown' | 'recorded' }))
   }

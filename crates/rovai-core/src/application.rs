@@ -7570,10 +7570,7 @@ impl Core {
                 )
                 .await?;
                 let database = self.database.lock().await;
-                let draft = if matches!(
-                    params.intent.target,
-                    rovai_core::web_upload::UploadTarget::DelegationChild { .. }
-                ) {
+                let draft = if params.intent.target.is_child() {
                     // The saved receipt remains authoritative if this optional projection is no longer available.
                     rovai_core::web_upload::snapshot(
                         &database,

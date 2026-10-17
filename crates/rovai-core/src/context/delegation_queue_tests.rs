@@ -262,6 +262,7 @@ fn assert_child_user_queue(f: &mut Fixture, conversation: &str, active: &str) {
         .as_str()
         .unwrap()
         .to_string();
+    let frozen_pending_upload = assert_pending_native_upload(f, conversation, &a, &old_token);
     assert!(queue_read(f, &web, conversation).edit_session.is_none());
     command = queue_edit_command(f, &web, conversation, &a, 1, None, Action::Takeover);
     let reopened = queue_edit(f, &command);
@@ -270,6 +271,15 @@ fn assert_child_user_queue(f: &mut Fixture, conversation: &str, active: &str) {
         .unwrap()
         .to_string();
     assert_ne!(token, old_token);
+    let uploaded_pending = assert_pending_web_upload(
+        f,
+        conversation,
+        &a,
+        &b,
+        &old_token,
+        &token,
+        frozen_pending_upload,
+    );
     let stale = queue_edit_command(
         f,
         &native,
@@ -296,7 +306,11 @@ fn assert_child_user_queue(f: &mut Fixture, conversation: &str, active: &str) {
         1,
         Some(&token),
         Action::ReorderAttachments {
-            attachment_ref_ids: vec![second.id.clone(), first.id.clone()],
+            attachment_ref_ids: vec![
+                second.id.clone(),
+                first.id.clone(),
+                uploaded_pending.clone(),
+            ],
         },
     );
     assert_eq!(
@@ -332,6 +346,31 @@ fn assert_child_user_queue(f: &mut Fixture, conversation: &str, active: &str) {
     assert_eq!(
         queue_edit(f, &save).result.status,
         crate::command::CommandResultStatus::Applied
+    );
+    let saved_upload =
+        crate::local_attachment_source::LocalAttachmentOwnerLocator::DelegationChildPending {
+            camp_id: f.camp_id.clone(),
+            conversation_id: conversation.into(),
+            pending_input_id: a.clone(),
+            attachment_ref_id: uploaded_pending.clone(),
+        };
+    assert!(
+        crate::local_attachment_source::load_source_attachment_for_client(
+            &f.database,
+            &saved_upload,
+            &native
+        )
+        .unwrap()
+        .is_some()
+    );
+    assert!(
+        crate::local_attachment_source::load_source_attachment_for_client(
+            &f.database,
+            &pending_edit_locator(f, conversation, &a, &token, &uploaded_pending),
+            &web
+        )
+        .unwrap()
+        .is_none()
     );
     let begin = queue_edit_command(f, &web, conversation, &a, 2, None, Action::Begin);
     let begun = queue_edit(f, &begin);
@@ -437,7 +476,11 @@ fn assert_child_user_queue(f: &mut Fixture, conversation: &str, active: &str) {
     let refs = crate::local_attachment_source::parse_source_attachments(&sources).unwrap();
     assert_eq!(
         refs.iter().map(|i| i.id.as_str()).collect::<Vec<_>>(),
-        [second.id.as_str(), first.id.as_str()]
+        [
+            second.id.as_str(),
+            first.id.as_str(),
+            uploaded_pending.as_str()
+        ]
     );
     assert_eq!(
         crate::message_quote::parse_quotes(&quotes).unwrap().len(),

@@ -36,6 +36,10 @@ describe('私聊文件原请求共享控制器', () => {
     const f = fixture(), child = { ...target, kind: 'delegation_child' as const }
     const childOwner = { ...owner, conversationKind: 'delegation_child' as const }
     const controller = privateUploadController(f.api, childOwner, child)
+    const pending = { ...child, kind: 'delegation_child_pending' as const, pendingInputId: 'queued', editToken: 'lease-a' }
+    const editing = privateUploadController(f.api, childOwner, pending)
+    expect(editing).not.toBe(controller)
+    expect(privateUploadController(f.api, childOwner, { ...pending, editToken: 'lease-b' })).not.toBe(editing)
     expect(controller.target).toEqual(child)
     expect(privateUploadController(f.api, childOwner, child)).toBe(controller)
     expect(() => privateUploadController(f.api, owner, child)).toThrow('context_changed')

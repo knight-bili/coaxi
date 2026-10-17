@@ -94,9 +94,9 @@ const owner = (item: PrivateAttachmentPreparationRequest) => ({
 })
 
 describe('Native 私聊上传原请求恢复', () => {
-  it('子会话独立列出原请求，重启只核对原回执且不串入普通私聊', async () => {
+  it.each(['delegation_child', 'delegation_child_pending'] as const)('%s 独立列出原请求，重启只核对原回执且不串入普通私聊', async kind => {
     const f = await fixture(), input = request()
-    input.target = { kind: 'delegation_child', conversationId: ids[1] }
+    input.target = kind === 'delegation_child' ? { kind, conversationId: ids[1] } : { kind, conversationId: ids[1], pendingInputId: ids[4], editToken: ids[5] }
     f.core.mode = 'lost'
     expect(await f.service.prepare(input, { ...metadata, sourcePath: f.sourcePath })).toMatchObject({ state: 'recorded' })
     const restored = new PrivateAttachmentPreparations(f.directory, f.core)
@@ -109,6 +109,7 @@ describe('Native 私聊上传原请求恢复', () => {
     expect(await restored.reconcile(input)).toMatchObject({ state: 'recorded', receipt: { status: 'applied' } })
     expect(f.core.binds).toBe(binds)
     await expect(restored.reconcile({ ...input, target: { ...input.target, kind: 'single_chat' } })).rejects.toThrow()
+    if (input.target.kind === 'delegation_child_pending') await expect(restored.reconcile({ ...input, target: { ...input.target, editToken: ids[0] } })).rejects.toThrow()
   })
 
   it('没有原文件也能查明旧意图拒绝，不再观察或绑定文件', async () => {

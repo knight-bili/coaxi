@@ -987,6 +987,12 @@ export type PrivateAttachmentUploadTarget = {
   conversationId: string
   composerScope?: SingleChatComposerScope | null
 } | {
+  kind: 'delegation_child_pending'
+  conversationId: string
+  composerScope?: SingleChatComposerScope | null
+  pendingInputId: string
+  editToken: string
+} | {
   kind: 'single_chat_pending'
   conversationId: string
   composerScope?: SingleChatComposerScope | null
@@ -1532,6 +1538,8 @@ export type LocalAttachmentAvailability =
 export type LocalAttachmentSourceView = ThreadMessageAttachmentView
 
 export type LocalAttachmentOwnerLocator =
+  | { owner: 'delegation_child_pending'; threadId: string; conversationId: string; pendingInputId: string; attachmentRefId: string }
+  | { owner: 'delegation_child_pending_edit'; threadId: string; conversationId: string; composerScope: SingleChatComposerScope | null; pendingInputId: string; editToken: string; attachmentRefId: string }
   | { owner: 'single_chat_scoped_composer'; threadId: string; conversationId: string; composerScope: SingleChatComposerScope; attachmentRefId: string }
   | { owner: 'single_chat_scoped_pending_edit'; threadId: string; conversationId: string; composerScope: SingleChatComposerScope; pendingInputId: string; editToken: string; attachmentRefId: string }
   | { owner: 'single_chat_retained'; threadId: string; conversationId: string; composerScope: SingleChatComposerScope | null; retainedInputId: string; attachmentRefId: string }

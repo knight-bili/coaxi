@@ -216,7 +216,7 @@ export class PrivateAttachmentPreparations {
       if (!isAttachmentId(id)) return fail()
       const entry = await this.#read(id)
       if (entry?.request.threadId === identity.threadId && entry.request.target.conversationId === identity.target.conversationId
-        && (entry.request.target.kind === 'delegation_child') === (identity.target.kind === 'delegation_child')
+        && (entry.request.target.kind === 'delegation_child' || entry.request.target.kind === 'delegation_child_pending') === (identity.target.kind === 'delegation_child' || identity.target.kind === 'delegation_child_pending')
         && isDeepStrictEqual(entry.request.target.composerScope, identity.target.composerScope)) {
         results.push({ request: entry.request, displayName: entry.source.displayName, state: entry.phase })
       }

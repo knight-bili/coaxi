@@ -29,6 +29,9 @@ describe('file preview session identity', () => {
     const key = (locator: import('@contracts').LocalAttachmentOwnerLocator) => filePreviewSourceKey({ kind: 'attachment', threadId: base.threadId, locator })
     const child = { ...base, owner: 'delegation_child_composer' as const }
     const keys = [
+      key({ ...base, owner: 'delegation_child_pending', pendingInputId: 'queued' }),
+      key({ ...base, owner: 'delegation_child_pending_edit', pendingInputId: 'queued', editToken: 'lease-a' }),
+      key({ ...base, owner: 'delegation_child_pending_edit', pendingInputId: 'queued', editToken: 'lease-b' }),
       key(child), key({ ...child, conversationId: 'other-child' }),
       key({ ...child, composerScope: { kind: 'canvas', boardId: 'board', nodeId: 'node' } }),
       key({ ...base, owner: 'delegation_child_retained', retainedInputId: 'retained' }),

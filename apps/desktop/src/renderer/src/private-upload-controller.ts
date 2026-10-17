@@ -18,8 +18,8 @@ export interface PrivateUploadState {
 const scopeKey = (scope: PrivateAttachmentUploadTarget['composerScope']) => scope ? JSON.stringify([scope.kind, scope.boardId, scope.nodeId]) : ''
 const targetKey = (target: PrivateAttachmentUploadTarget) => JSON.stringify([
   target.kind, target.conversationId, scopeKey(target.composerScope),
-  target.kind === 'single_chat_pending' ? target.pendingInputId : null,
-  target.kind === 'single_chat_pending' ? target.editToken : null
+  (target.kind === 'single_chat_pending' || target.kind === 'delegation_child_pending') ? target.pendingInputId : null,
+  (target.kind === 'single_chat_pending' || target.kind === 'delegation_child_pending') ? target.editToken : null
 ])
 export { targetKey as privateUploadTargetKey }
 const failure = (code: string) => new Error(code)
@@ -40,7 +40,7 @@ export class PrivateUploadController {
     this.owner = structuredClone(owner)
     this.target = structuredClone(target)
     if (owner.conversationId !== target.conversationId || scopeKey(owner.composerScope) !== scopeKey(target.composerScope)
-      || (owner.conversationKind === 'delegation_child') !== (target.kind === 'delegation_child')) throw failure('private_upload.context_changed')
+      || (owner.conversationKind === 'delegation_child') !== (target.kind === 'delegation_child' || target.kind === 'delegation_child_pending')) throw failure('private_upload.context_changed')
     this.supported = Boolean(api.prepareInput && api.reconcileInput && api.retryInput && api.pendingPreparations)
   }
   getSnapshot = (): PrivateUploadState => this.state
@@ -157,7 +157,7 @@ export class PrivateUploadController {
 const controllers = new WeakMap<Api, Map<string, PrivateUploadController>>()
 export function privateUploadController(api: Api, owner: PrivateAttachmentPreparationOwner, target: PrivateAttachmentUploadTarget): PrivateUploadController {
   if (owner.conversationId !== target.conversationId || scopeKey(owner.composerScope) !== scopeKey(target.composerScope)
-    || (owner.conversationKind === 'delegation_child') !== (target.kind === 'delegation_child')) throw failure('private_upload.context_changed')
+    || (owner.conversationKind === 'delegation_child') !== (target.kind === 'delegation_child' || target.kind === 'delegation_child_pending')) throw failure('private_upload.context_changed')
   let entries = controllers.get(api)
   if (!entries) { entries = new Map(); controllers.set(api, entries) }
   const key = `${owner.threadId}:${targetKey(target)}`

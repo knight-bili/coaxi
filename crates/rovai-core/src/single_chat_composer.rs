@@ -592,6 +592,17 @@ pub(crate) fn bind_uploaded_source(
     source: LocalAttachmentSourceRef,
 ) -> Result<()> {
     let (conversation, scope, pending, owner) = match &intent.target {
+        crate::web_upload::UploadTarget::DelegationChildPending {
+            conversation_id,
+            pending_input_id,
+            edit_token,
+            composer_scope,
+        } => (
+            conversation_id,
+            composer_scope.as_ref(),
+            Some((pending_input_id, edit_token)),
+            ComposerOwner::DelegationChild,
+        ),
         crate::web_upload::UploadTarget::SingleChat {
             conversation_id,
             composer_scope: Some(scope),
