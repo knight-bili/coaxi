@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import {randomUUID,createHash} from 'node:crypto'
-import {readFile,writeFile,mkdir} from 'node:fs/promises'
+import {readFile,writeFile,mkdir,rename} from 'node:fs/promises'
 import {join,dirname} from 'node:path'
 import {launchHost,within} from '../lib/host-test-client.mjs'
 import {coreDataDirectoryArguments} from '../lib/runtime-camp-files-root.mjs'
@@ -14,7 +14,7 @@ export async function qualifyCanvasFinalWeb({binary,uiDirectory,chrome,output,ch
  const env={};for(const key of ['SystemRoot','WINDIR','COMSPEC','PATHEXT'])if(process.env[key])env[key]=process.env[key]
  Object.assign(env,{PATH:[dirname(process.execPath),'E:/software/encoding/common/Git/bin',join(process.env.SystemRoot,'System32')].join(';'),HOME:home,USERPROFILE:home,APPDATA:join(home,'AppData/Roaming'),LOCALAPPDATA:join(home,'AppData/Local'),TEMP:join(dirname(context.dataRoot),'tmp'),TMP:join(dirname(context.dataRoot),'tmp'),SHELL:process.execPath,ROVAI_DISABLE_AUTO_UPDATE_CHECKS:'1'})
  const report={status:'running',channel:'automatic_acceptance',source,dataDir,skillLibraryRoot:join(dataDir,'managed-skill-library'),mcpConfig:join(dataDir,'mcp.json'),profile,checks:[],startedAt:new Date().toISOString(),externalModelCalls:0}
- let host,browser,stopEvents,browserBearer,fileReadBody
+ let host,browser,stopEvents,browserBearer,fileReadBody,missingBackup
  const record=async name=>{report.checks.push({name,passed:true});await writeFile(join(output,'progress.json'),JSON.stringify({checks:report.checks,at:new Date().toISOString()},null,2)+'\n');console.log(JSON.stringify({check:name,passed:true}))}
  const until=async predicate=>{const end=Date.now()+20000;while(Date.now()<end){const value=await predicate();if(value)return value;await pause(70)}throw Error('Actual Host state did not settle')}
  try{
@@ -75,15 +75,48 @@ export async function qualifyCanvasFinalWeb({binary,uiDirectory,chrome,output,ch
   await browser.wait(`document.querySelector('.canvas-card-file')?.textContent.includes(${JSON.stringify(context.sourceText.trim())})`,30000)
   assert.deepEqual((await snapshot()).nodes,beforeConflict.nodes);assert.deepEqual((await call(healthy.token,'canvas.nodes.snapshot',{boardId:context.otherBoardId})).nodes,context.secondary.nodes)
   await record('production_web_reload_preserves_same_board_nodes_file_binding_and_independent_second_board')
+  // 对同一生产Web入口补真实新增/删除；临时板不改变前面的原生冷恢复事实。
+  await browser.click('document.querySelector(".canvas-breadcrumb-root")');await browser.wait('Boolean(document.querySelector(".canvas-boards-home .canvas-primary-button:not(:disabled)"))')
+  await browser.click('document.querySelector(".canvas-boards-home .canvas-primary-button")');await browser.wait('Boolean(document.querySelector(".canvas-board-dialog input[data-dialog-autofocus]"))')
+  const temporaryName='R10 Web临时板 '+randomUUID();await browser.click('document.querySelector(".canvas-board-dialog input[data-dialog-autofocus]")');await browser.send('Input.dispatchKeyEvent',{type:'keyDown',key:'a',code:'KeyA',windowsVirtualKeyCode:65,modifiers:2});await browser.send('Input.dispatchKeyEvent',{type:'keyUp',key:'a',code:'KeyA',windowsVirtualKeyCode:65,modifiers:2});await browser.send('Input.insertText',{text:temporaryName})
+  await browser.click('document.querySelector(".canvas-board-dialog button[type=submit]")');await browser.wait('!document.querySelector(".canvas-board-dialog")&&Boolean(document.querySelector(".canvas-board-title:not(:disabled)"))')
+  const temporaryId=(await call(healthy.token,'canvas.boards.list')).boards.find(b=>b.name===temporaryName).id,tempGraph=()=>call(healthy.token,'canvas.nodes.snapshot',{boardId:temporaryId})
+  for(const original of context.nodes){const s=await tempGraph();assert.equal((await call(browserBearer,'canvas.nodes.apply',{commandId:randomUUID(),command:{boardId:temporaryId,expectedRevision:s.board.revision,mutation:{type:'create',node:original.data}}})).status,'applied')}
+  let temporary=await tempGraph();assert.equal(temporary.nodes.length,8)
+  for(const n of temporary.nodes)await browser.wait(`Boolean(document.querySelector('.react-flow__node[data-id="${n.id}"] article'))`)
+  await browser.click('document.querySelector(\'.canvas-dock-panel button[aria-label="自动排列"]\')');await pause(250);await browser.click('document.querySelector(\'.canvas-dock-panel button[aria-label="查看全部"]\')');await pause(450)
+  temporary=await tempGraph();const tempNote=temporary.nodes.find(n=>n.data.kind==='note');await browser.evaluate(`document.querySelector('.react-flow__node[data-id="${tempNote.id}"]').focus()`)
+  await browser.send('Input.dispatchKeyEvent',{type:'keyDown',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39});await browser.send('Input.dispatchKeyEvent',{type:'keyUp',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39})
+  await until(async()=>{const s=await tempGraph();return s.nodes.find(n=>n.id===tempNote.id).data.x===tempNote.data.x+5})
+  await browser.capture(join(output,'web-created-eight.png'))
+  for(const n of temporary.nodes){let s=await tempGraph();assert.equal((await call(browserBearer,'canvas.nodes.apply',{commandId:randomUUID(),command:{boardId:temporaryId,expectedRevision:s.board.revision,mutation:{type:'update',nodeId:n.id,patch:{title:'Web已编辑 '+n.data.kind}}}})).status,'applied');s=await tempGraph();const changed=s.nodes.find(v=>v.id===n.id);for(const binding of ['folderPath','folderGroupId','agentId','path','conversation','conversations','fileReference'])assert.deepEqual(changed.data[binding],n.data[binding]);assert.equal((await call(browserBearer,'canvas.nodes.apply',{commandId:randomUUID(),command:{boardId:temporaryId,expectedRevision:s.board.revision,mutation:{type:'delete',nodeId:n.id}}})).status,'applied');await browser.wait(`!document.querySelector('.react-flow__node[data-id="${n.id}"]')`)}
+  assert.equal((await tempGraph()).nodes.length,0);await record('actual_web_ui_creates_board_http_creates_edits_deletes_all_eight_types_and_original_arrange_fit_keyboard_move_preserve_bindings')
+  const menu=text=>`Array.from(document.querySelectorAll('[role="menuitem"]')).find(n=>n.textContent.trim()===${JSON.stringify(text)})`
+  await browser.click('document.querySelector(".canvas-board-title")');await browser.click(menu('删除画板'));await browser.wait('Boolean(document.querySelector(".canvas-board-dialog"))');await browser.click('document.querySelector(".canvas-board-dialog button[type=submit]")');await browser.wait('!document.querySelector(".canvas-board-dialog")&&Boolean(document.querySelector(".canvas-board-title:not(:disabled)"))')
+  const boardsAfterDelete=(await call(healthy.token,'canvas.boards.list')).boards,fallbackId=await browser.evaluate('document.querySelector(".canvas-board-title").dataset.boardId');assert.ok(!boardsAfterDelete.some(b=>b.id===temporaryId));assert.ok(boardsAfterDelete.some(b=>b.id===fallbackId))
+  assert.deepEqual((await snapshot()).nodes,beforeConflict.nodes);assert.deepEqual((await call(healthy.token,'canvas.nodes.snapshot',{boardId:context.otherBoardId})).nodes,context.secondary.nodes)
+  await record('actual_web_current_board_confirmed_delete_selects_existing_fallback_without_deleting_or_mutating_the_two_original_boards')
+  // 只移动已保存完整快照的隔离测试源；失败时finally恢复原字节。
+  const sourceBytes=await readFile(context.sourceFile);assert.equal(createHash('sha256').update(sourceBytes).digest('hex'),context.sourceSha256)
+  missingBackup=context.sourceFile+'.r10-'+randomUUID();await writeFile(join(output,'source-before-missing.json'),JSON.stringify({path:context.sourceFile,backup:missingBackup,sha256:context.sourceSha256,bytesBase64:sourceBytes.toString('base64')},null,2)+'\n',{flag:'wx'});await rename(context.sourceFile,missingBackup)
+  await browser.reload();await browser.wait('Boolean(document.querySelector("button[aria-label=无限画布]"))',30000);await open(context.boardId)
+  await browser.wait('Boolean(document.querySelector(".canvas-card-file [role=alert]"))',30000);const missing=await browser.evaluate('document.querySelector(".canvas-card-file").textContent');assert.ok(!missing.includes(context.sourceText.trim()));report.missingFileMessage=missing
+  await rename(missingBackup,context.sourceFile);missingBackup=null
+  await browser.click('Array.from(document.querySelector(".canvas-card-file").querySelectorAll("button")).find(n=>n.textContent.trim()==="重试")');await browser.wait(`document.querySelector('.canvas-card-file')?.textContent.includes(${JSON.stringify(context.sourceText.trim())})`,30000)
+  await record('actual_web_reload_missing_source_shows_original_file_error_without_foreign_fallback_and_explicit_retry_recovers_restored_bytes')
   const target={boardId:context.boardId,nodeId:context.nodes.find(n=>n.data.kind==='terminal').id}
-  let term=await call(browserBearer,'canvas.terminals.snapshot',{target,afterSeq:0});assert.equal(term.exists,false)
-  term=await call(browserBearer,'canvas.terminals.start',{target,coreGeneration:term.coreGeneration,requestId:randomUUID(),expectedGeneration:null,cols:80,rows:20})
+  let term=await call(browserBearer,'canvas.terminals.snapshot',{target,afterSeq:0});assert.ok(!term.exists||term.cleanupComplete)
+  term=await call(browserBearer,'canvas.terminals.start',{target,coreGeneration:term.coreGeneration,requestId:randomUUID(),expectedGeneration:term.generation,cols:80,rows:20})
   await until(async()=>{term=await call(healthy.token,'canvas.terminals.snapshot',{target,afterSeq:0});return term.phase==='running'})
   const marker='R10_WEB_'+randomUUID().replaceAll('-',''),input={target,generation:term.generation,inputId:randomUUID(),expectedInputSequence:term.inputSequence,bytesBase64:Buffer.from(`console.log(${JSON.stringify(marker)})\r`).toString('base64')}
   await call(browserBearer,'canvas.terminals.write',input)
   term=await until(async()=>{const s=await call(healthy.token,'canvas.terminals.snapshot',{target,afterSeq:0}),out=stripVTControlCharacters(Buffer.concat(s.chunks.map(c=>Buffer.from(c.bytesBase64,'base64'))).toString('utf8'));return out.split(/\r?\n/).some(x=>x.trim()===marker)?s:false})
   await browser.wait(`document.querySelector('.canvas-terminal')?.textContent.includes(${JSON.stringify(marker)})`,30000)
   await record('actual_host_web_pty_generation_and_exact_output_reach_the_original_browser_terminal')
+  await call(browserBearer,'canvas.terminals.write',{...input,inputId:randomUUID(),expectedInputSequence:term.inputSequence,bytesBase64:Buffer.from('.exit\r').toString('base64')});await until(async()=>{const s=await call(healthy.token,'canvas.terminals.snapshot',{target,afterSeq:0});return s.cleanupComplete&&s.phase==='exited'?s:false})
+  await browser.wait('document.querySelector(".canvas-terminal")?.textContent.includes("已退出")',30000)
+  const exited=await call(healthy.token,'canvas.terminals.snapshot',{target,afterSeq:0});await call(browserBearer,'canvas.terminals.start',{target,coreGeneration:exited.coreGeneration,requestId:randomUUID(),expectedGeneration:exited.generation,cols:80,rows:20});term=await until(async()=>{const s=await call(healthy.token,'canvas.terminals.snapshot',{target,afterSeq:0});return s.phase==='running'?s:false});assert.notEqual(term.generation,exited.generation)
+  await record('actual_web_pty_natural_exit_is_explicit_in_original_card_and_restart_uses_new_generation_without_thread_or_input_replay')
   const baseline=await snapshot(),sequence=term.inputSequence,logout=await fetch(web.origin+'/api/v1/logout',{method:'POST',headers:{Authorization:'Bearer '+browserBearer},signal:AbortSignal.timeout(15000)});assert.equal(logout.status,204)
   const forbidden=[['canvas.boards.list',{}],['canvas.boards.update',{commandId:randomUUID(),command:{boardId:context.boardId,expectedRevision:baseline.board.revision,name:'不得越权改名'}}],['canvas.nodes.snapshot',{boardId:context.boardId}],['canvas.nodes.apply',{commandId:randomUUID(),command:{boardId:context.boardId,expectedRevision:baseline.board.revision,mutation:move}}],['canvas.terminals.write',{...input,inputId:randomUUID(),expectedInputSequence:sequence}],['canvas.terminals.stop',{target,generation:term.generation}]]
   for(const [operation,params] of forbidden)assert.equal((await raw(browserBearer,operation,params)).status,401,operation)
@@ -100,6 +133,7 @@ export async function qualifyCanvasFinalWeb({binary,uiDirectory,chrome,output,ch
   report.status='passed'
  }catch(error){report.status='failed';report.error=String(error.stack??error);if(browser){report.browserErrors=browser.errors;report.windowErrors=await browser.evaluate('window.r10WindowErrors').catch(()=>null);report.dom=await browser.evaluate('document.body.innerText.slice(-2200)').catch(()=>null);await browser.capture(join(output,'failure.png')).catch(()=>{})}}
  finally{
+  if(missingBackup)try{await rename(missingBackup,context.sourceFile)}catch(error){report.status='failed';report.restoreSourceError=String(error)}
   stopEvents?.();if(browser)try{await browser.close()}catch(error){report.status='failed';report.browserCloseError=String(error)}
   if(host){try{await host.close({timeoutMs:15000})}catch(error){report.status='failed';report.hostCloseError=String(error)}report.hostExit={code:host.child.exitCode,signal:host.child.signalCode};if(host.child.exitCode!==0||host.child.signalCode!==null)report.status='failed'}
   report.finishedAt=new Date().toISOString();await writeFile(join(output,'result.json'),JSON.stringify(report,null,2)+'\n')
