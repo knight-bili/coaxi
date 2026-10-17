@@ -32,7 +32,8 @@
     "documentation_governance": "passed with explicit DOCS_BASE_REF; final recheck recorded separately",
     "format": "passed after using workspace Rust 2024 style",
     "codegraph": "explicit sync completed",
-    "formal_cases_new_passed": 0
+    "formal_cases_new_passed": 0,
+    "diff_check": "passed after removing only the extra architecture-index EOF blank line"
   },
   "not_implemented": [
     "durable delegation/attempt/control and complete migration",
@@ -170,6 +171,10 @@
     {
       "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-foundation-tests.log",
       "sha256": "e16f4849b92d3b1b0541af28fddbacb9b95805d973fd2d01fbff25ad6eb6e0b7"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-foundation-diff-final.log",
+      "sha256": "908763050e5e9a91266cc003aaca671c86fac245fb0ce462cc62e325f8bbd74b"
     }
   ],
   "formal_cases": {
@@ -177,5 +182,6 @@
     "DG-G01..G05": "not_run_budget0",
     "I04_required": 84,
     "new_passed": 0
-  }
+  },
+  "source_commit": "e0b2f60905e232b9615de83ba9905d613d00deba"
 }

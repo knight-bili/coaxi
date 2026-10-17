@@ -250,5 +250,6 @@
   "i04_native_subagent_observation_evidence": "i04-native-subagent-observation-result.json",
   "i04_native_subagent_protocol_evidence": "i04-native-subagent-protocol-result.json",
   "delegation_r1_confirmation": "i04-delegation-r1-confirmation.json",
-  "i04_delegation_foundation_evidence": "i04-delegation-foundation-result.json"
+  "i04_delegation_foundation_evidence": "i04-delegation-foundation-result.json",
+  "i04_delegation_foundation_source_commit": "e0b2f60905e232b9615de83ba9905d613d00deba"
 }
