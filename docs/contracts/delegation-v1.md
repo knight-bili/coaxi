@@ -51,6 +51,12 @@ control 原语按精确版本记录接管，要求旧 Run 已经终态，冻结�
 
 正常成功不触发因果取消。`delegation` 与 `delegation_user` 的成功结果沿原私有完成算法保存到自己的 Conversation，原消息、Run 终态、回执同事务提交，禁止走公开回复或业务 Task fallback；旧 Single Chat 的 policy1/2 分支不变，policy3 完整准入仍待合齐。子会话完成后保留后台帮手，待明确停止、所属会话关闭或成员失效时按相应范围处理。Thread 聚合删除须先释放 delegation/attempt/control 关系，以及已发布私有排队输入对消息/Turn/Run 的引用，再删除其 Run/Conversation；旧库不存在排队表时沿原路径，仍由原外键及事务保证完整性。这里不代表真实进程/文件清理和完整启动迁移已经通过。
 
+### 初始子运行工厂
+
+`delegation_factory::create_child` 在原关系登记事务中按显式列创建独立 Conversation、完整任务消息、私有 Turn 与 queued Run。它从 Core 选择的安装和目标配置调用原 Adapter Registry 重新冻结目标，只应用一次 child 角色摘要；不复制父 Run 的 Session、Lease、接收证据、终态、恢复或未知未来列。21个内置 wire 名称映射到原 closed Adapter；custom 稳定编号必须精确对应已登记的 custom 安装，并保留其真实 Adapter，不能猜另一个产品作为运行载体。平台未准入、安装缺失/禁用、Adapter/权限配置错配、非法 workspace/policy 拒绝，不回退目标。
+
+该工厂不是模型鉴权或目录授权入口；父 Run/epoch/Binding、当前与冻结深度、工作范围审批、User 默认模式及 config 的实际投递仍由完整 start/Host 链路拥有。现有 typed custom 安装映射也不等于已接入任意 generic ACP 程序。外层命令必须传播错误并回滚全部关系/子行，或者在保存拒绝回执前先回滚其 savepoint；工厂和原 `register` 都不启动进程。原请求回放先返回固定身份，不重新选择或再创建目标。
+
 ### User 结束子会话
 
 `delegations.conversation.end` 仅接受 `{commandId,command:{conversationId}}`，Thread 由 Core 的确切 child 派生。User 必须已经接管该会话；旧 `singleChat.end` 仍只接受 single_chat，两类命令不能相互升级。复用原私有结束事务：标记确切 Conversation 结束，取消其后续 User Run 与仍受该 Conversation 控制的全部后台子树，清空各端草稿、保留输入和编辑租约，将未发布队列改为 cancelled，保留历史消息、原 attempt 结果与接管水位。已独立接管的后代和其他会话不随旧父关闭。

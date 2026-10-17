@@ -4546,7 +4546,6 @@ pub fn resolve_frozen_runtime(
     Ok(result)
 }
 
-#[cfg(test)]
 pub(crate) fn resolve_frozen_runtime_binding(
     transaction: &Connection,
     binding: &ResolvedRuntimeBinding,

@@ -65,6 +65,7 @@ pub mod db;
 pub mod delegation;
 pub mod delegation_contract;
 pub mod delegation_control;
+pub mod delegation_factory;
 pub mod delegation_policy;
 pub mod delegation_settings;
 pub mod delegation_user;

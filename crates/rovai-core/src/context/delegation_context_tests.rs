@@ -18,36 +18,30 @@ fn context_child_of(fixture: &mut Fixture, parent: &str, parent_epoch: i64, task
     let workspace =
         json!({"executionRoot":fixture.directory,"access":"read_only","isolation":"shared"});
     let preset = json!({});
+    // Fixture-selected target; the production factory resolves a fresh Registry snapshot.
+    let config: String = fixture.database.connection().query_row("SELECT effective_config_json FROM agent_run WHERE id=?1",[parent],|r|r.get(0)).unwrap();
+    let value: Value = serde_json::from_str(&config).unwrap();
+    let runtime: crate::agent_profile::FrozenAgentRuntimeConfig = serde_json::from_value(value["runtime"].clone()).unwrap();
+    let model = if runtime.model.source == "runtime_default" { crate::agent_profile::ModelSelection::RuntimeDefault }
+        else { crate::agent_profile::ModelSelection::Explicit {model_id:runtime.model.model_id.clone(),options:runtime.model.options.clone(),dsh_source:runtime.model.dsh_source} };
+    let configuration = crate::agent_profile::MemberRuntimeConfiguration { adapter_kind:runtime.adapter_kind, model, permissions:runtime.permissions.clone() };
+    let typed_workspace = serde_json::from_value(workspace.clone()).unwrap();
+    let plan = crate::delegation_factory::ChildRunPlan {
+        task,target:&target,installation_id:&runtime.installation_id,configuration:&configuration,workspace:&typed_workspace,
+        policy:crate::delegation_policy::FrozenPolicy::new(true,8,crate::delegation_policy::Role::Child).unwrap(),
+    };
     let tx = fixture.database.connection_mut().transaction().unwrap();
-    let registered = crate::delegation::register(
+    let registered = crate::delegation_factory::register_initial(
         &tx,
         &crate::delegation::ParentInvocation {
-            run_id: parent,
-            epoch: parent_epoch,
-            binding_id: &binding,
-            binding_generation: generation,
-            tool_call_id: call,
+            run_id: parent,epoch: parent_epoch,binding_id: &binding,binding_generation: generation,tool_call_id: call,
         },
         &crate::delegation::FrozenRequest {
-            task_blob_id: &blob.id,
-            runtime: &target,
-            working_dir: None,
-            workspace: &workspace,
-            runtime_preset: &preset,
+            task_blob_id: &blob.id,runtime: &target,working_dir: None,workspace: &workspace,runtime_preset: &preset,
         },
+        &plan,
         "2026-10-17T00:00:00Z",
-        |tx, identity| {
-            crate::delegation::tests::child_with_task(
-                tx,
-                identity,
-                parent,
-                None,
-                task,
-                Some(&workspace),
-            )
-        },
-    )
-    .unwrap();
+    ).unwrap();
     let run: String = tx
         .query_row(
             "SELECT agent_run_id FROM delegation_attempt WHERE delegation_id=?1",
