@@ -1,0 +1,415 @@
+{
+  "schema_version": 1,
+  "stage": "I04",
+  "task": "I04-T01",
+  "checked_at": "2026-10-17T08:25:36.022402+00:00",
+  "status": "child_composer_user_boundaries_and_component_requests_verified_full_ingestion_send_and_takeover_lifecycle_pending",
+  "source_commit": "24a6078fe9b37e376ce4a8424b50402916ac51c6",
+  "implementation_baseline": "4ffef9d1ca25bbef97c71fa162907772a5a23c37",
+  "confirmation_record": "i04-delegation-r1-confirmation.json",
+  "runtime_data_contract": {
+    "version": "v1.72",
+    "schema": 159,
+    "migration": 209
+  },
+  "target_data_contract": {
+    "version": "v1.73",
+    "schema": 160,
+    "migration": 210,
+    "status": "not_registered"
+  },
+  "implemented": [
+    "Three exact r1 User operations wired through Core dispatch, typed command identity, Native allowlist, Rust Web Operation and browser transport: composer get/mutate/recovery",
+    "Sealed command type selects the trusted owner; old Single Chat APIs retain their Single Chat owner; no request flag can upgrade their scope",
+    "Child material reads/writes require owned child Conversation/Thread and persisted takeover facts; active writes also validate Camp/member/profile; editor comes from trusted Request and participates in UUID identity",
+    "Reuses existing private draft/CAS, seven action algorithms, retained input, source preparation outside the DB lock and bounded recovery; child receipt reconciliation only reads the original command",
+    "Stored quote scope gains delegation_child; capture/restore/current input enforce exact same child; child assistant quotes use frozen target Runtime plus stable delegation ID instead of parent profile display name",
+    "Pending migration candidate extends three material triggers with a controlled-child branch while retaining old predicates; startup and complete 160/210 admission remain unchanged",
+    "Browser unknown-command grouping includes exact child/editor input, and read-only receipt settlement does not resend the original mutation"
+  ],
+  "checks": {
+    "core_owner": {
+      "log": "delegation-user-materials-owner-02.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 1251
+    },
+    "core_regressions": [
+      {
+        "name": "composer",
+        "filter": "single_chat_composer::tests::",
+        "listed": 3,
+        "exit_code": 0,
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "filtered": 1249
+      },
+      {
+        "name": "quotes",
+        "filter": "message_quote::tests::",
+        "listed": 3,
+        "exit_code": 0,
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "filtered": 1249
+      },
+      {
+        "name": "identity",
+        "filter": "delegation::tests::identity_graph_preserves_core_rows_and_fences_scope_replay_depth_and_takeover",
+        "listed": 1,
+        "exit_code": 0,
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "filtered": 1251
+      }
+    ],
+    "web_owner": {
+      "log": "delegation-user-materials-web-owner.log",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 10
+    },
+    "rust_total_passed": 9,
+    "full_rust_suite_run": false,
+    "transport_test_files": 2,
+    "transport_tests_passed": 37,
+    "typescript": {
+      "command": "tsc --noEmit -p tsconfig.json",
+      "observed_exit_code": 0,
+      "output_log": "delegation-user-materials-types.log"
+    },
+    "documentation_tests_passed": 10,
+    "version_gate": "v1.73 / 173 directories passed",
+    "governance": "passed with explicit base 4ffef9d1c",
+    "scaffold": {
+      "status": "passed",
+      "features": 81,
+      "cases": 324,
+      "workPackages": 48,
+      "sourceEntrypoints": 1936,
+      "runtimeKinds": 21,
+      "totalDays": 157,
+      "fullyPassedCases": 0,
+      "localCasesPendingEnvironment": 12,
+      "productExecution": "see_per_case_evidence"
+    },
+    "protocol": {
+      "locked_source_operations": 161,
+      "previous_current_operations": 186,
+      "current_operations": 189,
+      "added": [
+        "delegations.composer.get",
+        "delegations.composer.mutate",
+        "delegations.composer.recovery"
+      ],
+      "source_contract_and_fixture_check": "passed",
+      "live_http": false
+    },
+    "fmt": "passed",
+    "diff": "passed",
+    "codegraph_sync": "completed existing index only"
+  },
+  "qualification_limits": [
+    "Child identity and old Run terminal/takeover facts are prepared through explicit isolated SQL and the control primitive; no authenticated takeover/cancel/cleanup lifecycle was exercised",
+    "Actual Core command gateway, query handlers, quote/CAS/storage/replay and source observation methods executed; material/retained rows for browser editing were seeded in the isolated fixture",
+    "Two trusted editor IDs prove Core draft/retained separation; browser transport uses a mocked authenticated server, not real simultaneous Native/Web clients",
+    "Seven action algorithms are shared; register/adopt under unsupported/default scopes are rejection cases, not complete positive child scope/legacy adoption qualification",
+    "Native/Web upload, preview owner locator, attachment binding/observations at real ingestion, full child message send and actual User model input remain unqualified",
+    "No real Host/IPC, agent/MCP process, target Runtime selection, full migration startup, restart, cancellation/resume, GUI or full D01-D32/DG-G01..05 run"
+  ],
+  "failure_retained": "owner-01 reached the final assertion but incorrectly expected explicit null composerScope to fail; the existing contract selects the default scope, so the fixture was corrected to verify equality without changing production semantics. owner-02 passed with expanded browser material/retained cases.",
+  "formal_scope": {
+    "clusters": 81,
+    "work_packages": 48,
+    "cases": 324,
+    "i04_clusters": 21,
+    "i04_cases": 84,
+    "new_complete_formal_cases_passed": 0
+  },
+  "approved_files_unchanged": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    }
+  ],
+  "source_files": [
+    {
+      "path": "apps/desktop/src/main/index.ts",
+      "git_blob": "9c4897ede51c80ce0e1605d53c0aa2727b2d1eb3",
+      "sha256": "3f1cbf4d579d737af6033541fef127c375e18873bb61dbb0986c6d5fb245bdb2"
+    },
+    {
+      "path": "apps/desktop/src/main/runtime-core-methods.test.ts",
+      "git_blob": "79e1fea6665e7ee14ddca880cef15d3e9882c3e4",
+      "sha256": "952731c39f3d1510478d44b53276cefc309d2f3de7693b46a22f6461b28c1e8e"
+    },
+    {
+      "path": "apps/web/src/client.test.ts",
+      "git_blob": "ec28ff1a6b47bd7e10dd1935a8642725af7c9410",
+      "sha256": "5c2fcf6ba5b74e9458f022ab0e969f9123163a7ef486f951a214d1acf2664e65"
+    },
+    {
+      "path": "apps/web/src/client.ts",
+      "git_blob": "f14c820ba7beef96300a9a1669eeeccb397b5f84",
+      "sha256": "0129be36636dbe1fec6155d13cd402f9ab5f53f505781463d32ce6acbd2ee412"
+    },
+    {
+      "path": "crates/rovai-core/src/application.rs",
+      "git_blob": "c9ca8a52a7abe3386d81c394c551c40b32757f01",
+      "sha256": "c4c01de81c7c47c099a4854ab4b363907e9f2f39c54c84bc5e0479ee965ffb0f"
+    },
+    {
+      "path": "crates/rovai-core/src/application/delegation_composer.rs",
+      "git_blob": "d93007a4eca7e2a6889cbf1423c7207261f54170",
+      "sha256": "1e6a8a80343ea7c9e7786dc5a5e2fb87934bbd7ce4ca0e19397da07762d36da5"
+    },
+    {
+      "path": "crates/rovai-core/src/application/web_commands.rs",
+      "git_blob": "31b3111fdbd5e52ebfba086fcd52be2fb457171e",
+      "sha256": "92e1b89387c438a684e2ce1ad8d21019dbf61526bba585e80e3356a6e0d27c00"
+    },
+    {
+      "path": "crates/rovai-core/src/context.rs",
+      "git_blob": "32934608add176027a80b6164fee27dab1e8595a",
+      "sha256": "177dbe9422b83ed486ac0c5aae6ce0a091b647696398aa3eef783dfa9fc47046"
+    },
+    {
+      "path": "crates/rovai-core/src/context/delegation_context_tests.rs",
+      "git_blob": "8b6f0bd2c6ccb0c0abdc081259b2d1023131b3ba",
+      "sha256": "09646c7b78552002799ed7ccbca1b8ab9128fdb36ba63a87e524577148e585b7"
+    },
+    {
+      "path": "crates/rovai-core/src/context/delegation_material_tests.rs",
+      "git_blob": "b445e43f0f1d5b0450e4989028c6cda11887690a",
+      "sha256": "146697f16d11293c00ec524036913d99614b2efc5271f2a09cf180355e44e734"
+    },
+    {
+      "path": "crates/rovai-core/src/db_delegation.rs",
+      "git_blob": "0f338e63f7fcdaa8fff7957e9e0be150edab2369",
+      "sha256": "b5208682ea70a88ecbbae1570664813d012a729747ca4c612705e9a00ab70719"
+    },
+    {
+      "path": "crates/rovai-core/src/delegation_policy.rs",
+      "git_blob": "54bf18af4d1783fee0c54a17dfb93ad01ea05c47",
+      "sha256": "5b2d95d64d63c5bccaaafc9dbc73787c879e2387671d2ea5a3972bcae05ccdf7"
+    },
+    {
+      "path": "crates/rovai-core/src/delegation_user.rs",
+      "git_blob": "e68932661f29570a2e67856bf679c510b0b441fa",
+      "sha256": "ef92eea3b8218be4016bdd59b5069d802ea0ec93134b6a81490a8053b3f3c173"
+    },
+    {
+      "path": "crates/rovai-core/src/lib.rs",
+      "git_blob": "4f7f9548fad0969d1d0faff9f6a60f3f7ce0e6e9",
+      "sha256": "e4ebfefed52301968589bb830b3414b7dd38451f90a428fce26a60cff5434aa3"
+    },
+    {
+      "path": "crates/rovai-core/src/message_quote.rs",
+      "git_blob": "5a9f1f0bbaf2f6c783a31b51f46296f127d28221",
+      "sha256": "19e24b3473631df261ad22b6ff1e65355944634fa60c7051fbfdb056d5f29256"
+    },
+    {
+      "path": "crates/rovai-core/src/single_chat_composer.rs",
+      "git_blob": "bbd8b791a80dd68e9a8e13bcf41ac18ed4a9f9be",
+      "sha256": "b70fa39ba737516481664cd30238a0cca90047e141b2969e0464328a874a0821"
+    },
+    {
+      "path": "crates/rovai-web/src/operations.rs",
+      "git_blob": "37c72627df8601a1f99fbcec610bb04fb6100108",
+      "sha256": "d82a9fc6352ab1e5e542d0f53320880e41dff471da8c559ce314ec13d56ed4a5"
+    },
+    {
+      "path": "docs/development/testing.md",
+      "git_blob": "34083eb609a5680cb83e122d590ba8c425ac7e71",
+      "sha256": "6a932a19e09b86df67e45f72613dbc58583e8a786e3a4c53c33cc320563a5218"
+    },
+    {
+      "path": "integration/foundation/current-protocol.json",
+      "git_blob": "f95e461f924a331ab66a15630b50d378dab98e46",
+      "sha256": "cecf8d1129707b478b4429200dfc772ef376668911d1d56b2aa3271edfbedeea"
+    },
+    {
+      "path": "packages/contracts/src/index.ts",
+      "git_blob": "868e13513bb43caa4380edc84a0707a7de7c9a24",
+      "sha256": "9cfbc5a179bda2c757e801bdbda07b717f9f30300184274ca6ea1c5eaca4ec35"
+    }
+  ],
+  "logs": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-codegraph-sync.log",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-compile-01.log",
+      "bytes": 2005,
+      "sha256": "0ba3ec1e91ec7cf20c4f1f2a582b5f723c2c2b35d2cdb88423c476b6439ea9a1"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-compile-02.log",
+      "bytes": 2005,
+      "sha256": "7ae89f0669aa1753ae7a58019b68c02c471e8cc852ea13ad8e3864ad483b5e2c"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-diff-final.log",
+      "bytes": 237,
+      "sha256": "809f1a40f8d9a370adfca370cf971e78d28753b9aa8fd06675d2a0e0f387b045"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-doc-tests.log",
+      "bytes": 924,
+      "sha256": "c2ebc681a409c2aa598c8b40488158418beb68033ec3f5cfeebd7f248b8d9d79"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-doc-version.log",
+      "bytes": 79,
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-fmt-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-fmt-initial.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-governance.log",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-owner-01.log",
+      "bytes": 843,
+      "sha256": "1c8ed71cba2bb9b0f641a041116dd7f5b68718ca6cabf23f97ee6d2291f34f41"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-owner-02.log",
+      "bytes": 227,
+      "sha256": "9a363af61235065685460809a02cdd488c86959c3f507860546aa7ca8d278b07"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-owner-list.log",
+      "bytes": 125,
+      "sha256": "8d7c39b86e00e4e7eee958d5210fe31c3224cf0ebf2bba69b1e95c305acee56d"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-protocol.log",
+      "bytes": 182,
+      "sha256": "044569df112d191be31ea876439bd2bd3294beb8d9fa469452c1bcc1ea893695"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-regression-composer-list.log",
+      "bytes": 378,
+      "sha256": "e8782a2dee0018db9cef95310240565849de5558d40b95d1ee30b2c67c3b0d23"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-regression-composer.log",
+      "bytes": 492,
+      "sha256": "200b42e978b043577f81579b6d9af6774ec1e2ab869a9590e3c786203d212c74"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-regression-identity-list.log",
+      "bytes": 128,
+      "sha256": "c661c1430921d980ff74940beb77b1ffbd5264d2f839672df78122799720996b"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-regression-identity.log",
+      "bytes": 230,
+      "sha256": "e211b53cf72fc99a96196b5f04aeee0eb9f899f49f286701bc4f9cb5e3056776"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-regression-quotes-list.log",
+      "bytes": 317,
+      "sha256": "558defab274dd7328833609935942761ac2215cf03eaf255f7ee3b455ca1ef82"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-regression-quotes.log",
+      "bytes": 431,
+      "sha256": "b156132f9b61497b300ff974084fd5a45b995af9498f06d726527560e46f9910"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-regression-results.json",
+      "bytes": 663,
+      "sha256": "b605073210fea2b088beef9b171e4bc80ce3677bc2fbfd3585ce8cdf0c5d5750"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-scaffold.log",
+      "bytes": 459,
+      "sha256": "d79c4889ff44f4b8d6feb641b4f3b0ca3b852281f7d8074a5877c9285fac29a0"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-transport-tests.log",
+      "bytes": 286,
+      "sha256": "25f6e7606491d0741f0680e50400049edc1e48d6c184f02c26ac6f4e8ec7c1c0"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-types.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-web-compile.log",
+      "bytes": 2300,
+      "sha256": "ba98e443a678fd852ee2937090e32de7e40d48dc496528b2352bf42de6ed370a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-web-owner-list.log",
+      "bytes": 122,
+      "sha256": "12b33d7dff39abc5e17f62036d4b5b6b5a59cb87114540e8e20bf9fc0b079ddd"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-user-materials-web-owner.log",
+      "bytes": 222,
+      "sha256": "1ff7eab8d1d03957113c01363ffee903dab3bc75ed5abbe21f9e39a4edbb44cc"
+    }
+  ],
+  "external_actions": {
+    "push": false,
+    "actions": false,
+    "host_or_agent_started": false,
+    "paid_model": false,
+    "main_merge": false,
+    "release": false
+  },
+  "remaining": [
+    "Child Native/Web upload and precise preview/source binding owners",
+    "Whole-draft User send and original-request recovery through real admission",
+    "Real takeover/cancel/cleanup/resume, target Runtime and policy/CLI operations",
+    "Complete 160/210 startup classifier including all six modified legacy guards",
+    "Original Codeg/Rovai UI connection and remaining I04-T02/T03/T04"
+  ]
+}
