@@ -64,6 +64,7 @@ pub mod database_admission;
 pub mod db;
 pub mod delegation;
 pub mod delegation_admission;
+pub(crate) mod delegation_catalog;
 pub mod delegation_contract;
 pub mod delegation_control;
 pub(crate) mod delegation_dispatch;

@@ -35,6 +35,9 @@ pub(crate) fn deserialize_host_method<'de, D: serde::Deserializer<'de>>(
 }
 
 pub fn canonical_operation(operation: &str) -> &str {
+    if let Some(operation) = crate::delegation_contract::canonical_operation(operation) {
+        return operation;
+    }
     match operation {
         "camp.list" => "thread.list",
         "camp.search" => "thread.search",

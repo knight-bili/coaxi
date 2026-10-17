@@ -1,7 +1,7 @@
 ---
 document_type: contracts-index
 authority: protocol-contract-routing
-last_updated: 2026-10-14
+last_updated: 2026-10-18
 ---
 
 # 长期接口合同
@@ -370,7 +370,8 @@ Architecture 解释组件如何组成，Version 概览记录交付范围；它�
 | [Memory Capture v3（当前）](memory-capture-v3.md) | v2 边界加 complete exact-Scope View、copyable Revision target、active body aggregate quota、64 KiB production projection limit 与 Memory-domain clean break |
 | [Memory Capture v2 (historical)](memory-capture-v2.md) | v1 捕获/Review/Forget 边界加 flat Agent-relative Scope identity、revise target assertion、durable domain rejection 与 Supersession 原子顺序 |
 | [Memory Capture v1 (historical)](memory-capture-v1.md) | 初版 best-effort 在线捕获、actor-bounded add/revise、隔离 Hearth Review Item、双 CAS、候选清除与 Forget safeguard；不含 Scope-identified revise |
-| [Built-in Tool Transport v38（当前）](builtin-tool-transport-v38.md) | 删除工具结果和目录摘要，静态目录复用；IPC 3、Envelope 2 |
+| [Built-in Tool Transport v38](builtin-tool-transport-v38.md) | 删除工具结果和目录摘要，静态目录复用；IPC 3、Envelope 2 |
+| [Built-in Tool Transport v39（当前）](builtin-tool-transport-v39.md) | 增加六项委派、原别名、精确租约重验及可断线无限等待；IPC 3、Envelope 2、Agent Output 10 |
 | [Domain Command Result v2（当前）](domain-command-result-v2.md) | 取消请求摘要；同命令身份与归属返回首次结果，保留查询 |
 | [Input Snapshot Storage v1（当前）](input-snapshot-storage-v1.md) | 最终输入与必要材料、当前结构准入、Migration 196/schema 146 |
 | [Built-in Tool Transport v37（历史）](builtin-tool-transport-v37.md) | Send 正文文件、严格旧请求识别、输入冲突诊断及冻结 Session 兼容；其他操作输入和 Core Send 合同不变 |

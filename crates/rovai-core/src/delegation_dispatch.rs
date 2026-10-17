@@ -324,6 +324,178 @@ where
     }
 }
 
+/// Public IPC adapter. It runs before the generic active-only path so a retired
+/// proof can recover a recorded mutation, and it bypasses the lease result cache
+/// for scoped reads/waits. No raw error text is copied into the envelope.
+pub(crate) async fn invoke_ipc<B, D>(
+    database: &Mutex<B>,
+    leases: &BuiltinToolLeaseRegistry,
+    data_dir: &Path,
+    request: &BuiltinToolIpcRequest,
+    disconnected: D,
+) -> crate::builtin_tool_transport::BuiltinToolIpcResponse
+where
+    B: BorrowMut<Database>,
+    D: Future<Output = ()>,
+{
+    use crate::builtin_tool_transport::{
+        BuiltinToolError, BuiltinToolInvocationEnvelope, BuiltinToolIpcResponse,
+        recovery_for_operation_error,
+    };
+    let BuiltinToolIpcRequestBody::Invoke {
+        request_id,
+        operation,
+        input,
+    } = &request.body;
+    if request.ipc_protocol_version != BUILTIN_TOOL_IPC_PROTOCOL_VERSION {
+        return BuiltinToolIpcResponse::ipc_error(
+            "builtin_tool.unsupported_ipc_version",
+            "Built-in Tool IPC protocol version is unsupported",
+        );
+    }
+    let Some(operation) = contract::canonical_operation(operation) else {
+        return BuiltinToolIpcResponse::ipc_error(
+            "builtin_tool.unknown_operation",
+            "Requested operation is unavailable",
+        );
+    };
+    if uuid::Uuid::parse_str(request_id).is_err() {
+        return BuiltinToolIpcResponse::ipc_error(
+            "builtin_tool.invalid_request_id",
+            "requestId must be a UUID",
+        );
+    }
+    let result = if crate::team_tool_catalog::validate_builtin_tool_input(operation, input).is_err()
+    {
+        Err(anyhow::anyhow!("builtin_tool.invalid_input"))
+    } else {
+        invoke(database, leases, data_dir, request, disconnected).await
+    };
+    let envelope = match result {
+        Ok(outcome) => {
+            if crate::delegation_catalog::validate_output(outcome.operation, &outcome.payload)
+                .is_err()
+            {
+                return BuiltinToolIpcResponse::Envelope {
+                    envelope: BuiltinToolInvocationEnvelope::rejected(
+                        operation,
+                        request_id,
+                        BuiltinToolError {
+                            code: "builtin_tool.output_contract_mismatch".into(),
+                            message: "Core result could not be safely projected".into(),
+                            recovery: recovery_for_operation_error(
+                                operation,
+                                "builtin_tool.output_contract_mismatch",
+                            ),
+                            details: None,
+                        },
+                    )
+                    .expect("known operation and UUID"),
+                };
+            }
+            BuiltinToolInvocationEnvelope::success(outcome.operation, request_id, outcome.payload)
+        }
+        Err(error) => {
+            let (code, message) = public_error(&error);
+            BuiltinToolInvocationEnvelope::rejected(
+                operation,
+                request_id,
+                BuiltinToolError {
+                    code: code.into(),
+                    message: message.into(),
+                    recovery: recovery_for_operation_error(operation, code),
+                    details: None,
+                },
+            )
+        }
+    };
+    match envelope {
+        Ok(envelope) => BuiltinToolIpcResponse::Envelope { envelope },
+        Err(_) => BuiltinToolIpcResponse::ipc_error(
+            "builtin_tool.internal_error",
+            "Core could not form the operation response",
+        ),
+    }
+}
+fn public_error(error: &anyhow::Error) -> (&'static str, &'static str) {
+    if matches!(
+        error.downcast_ref::<crate::command::CommandGatewayError>(),
+        Some(crate::command::CommandGatewayError::IdempotencyConflict { .. })
+    ) {
+        return (
+            "builtin_tool.idempotency_conflict",
+            "The original request identity was reused with different input",
+        );
+    }
+    if error.chain().any(|cause| cause.is::<rusqlite::Error>()) {
+        return (
+            "builtin_tool.internal_error",
+            "Core could not complete the delegation request",
+        );
+    }
+    match error.to_string().as_str() {
+        "builtin_tool.invalid_input" => (
+            "builtin_tool.invalid_input",
+            "Command input does not match the accepted arguments",
+        ),
+        "builtin_tool.run_not_bound" => (
+            "builtin_tool.run_not_bound",
+            "The exact Run lease is no longer active",
+        ),
+        "delegation.cursor_invalid" => (
+            "delegation.cursor_invalid",
+            "The cursor does not belong to this scoped request; request a fresh page",
+        ),
+        "delegation.result_unavailable" => (
+            "delegation.result_unavailable",
+            "The task has no readable fixed final result yet",
+        ),
+        "delegation.result_changed" => (
+            "delegation.result_changed",
+            "The original fixed result no longer matches its saved identity",
+        ),
+        "delegation.page_limit_too_small" => (
+            "delegation.page_limit_too_small",
+            "Increase limit_bytes to include the next complete UTF-8 character",
+        ),
+        "delegation.status_disconnected" => (
+            "delegation.status_disconnected",
+            "Waiting ended; the delegated work was not canceled",
+        ),
+        code if code.starts_with("delegation.")
+            && code
+                .bytes()
+                .all(|b| b.is_ascii_alphanumeric() || b == b'.' || b == b'_') =>
+        {
+            (
+                "delegation.access_denied",
+                "The current frozen Run has no authority for this delegation operation",
+            )
+        }
+        _ if error
+            .downcast_ref::<crate::team_tool::TeamToolInvocationError>()
+            .is_some() =>
+        {
+            (
+                "builtin_tool.run_not_bound",
+                "The native Run binding is no longer active",
+            )
+        }
+        _ => (
+            "builtin_tool.internal_error",
+            "Core could not complete the delegation request",
+        ),
+    }
+}
+
+pub(crate) async fn connection_ended(reader: &mut (impl tokio::io::AsyncRead + Unpin)) {
+    use tokio::io::AsyncReadExt;
+    let mut probe = [0u8; 1];
+    // One request per connection. EOF, IO error or extra protocol bytes ends
+    // this wait; it never becomes authority to stop the underlying task.
+    let _ = reader.read(&mut probe).await;
+}
+
 #[cfg(all(test, feature = "slow-tests"))]
 pub(crate) mod tests {
     use super::*;

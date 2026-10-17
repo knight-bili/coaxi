@@ -51,6 +51,30 @@ pub fn validate_builtin_tool_input(canonical_name: &str, input: &Value) -> Resul
         return serde_json::from_value::<MemberUpdateInput>(input.clone())?.validate();
     }
     let valid = match canonical_name {
+        "delegation.start" => {
+            serde_json::from_value::<crate::delegation_contract::StartParams>(input.clone())
+                .map(|_| ())
+        }
+        "delegation.status" => {
+            serde_json::from_value::<crate::delegation_contract::StatusParams>(input.clone())
+                .map(|_| ())
+        }
+        "delegation.cancel" => {
+            serde_json::from_value::<crate::delegation_contract::CancelParams>(input.clone())
+                .map(|_| ())
+        }
+        "delegation.resume" => {
+            serde_json::from_value::<crate::delegation_contract::ResumeParams>(input.clone())
+                .map(|_| ())
+        }
+        "delegation.read" => {
+            serde_json::from_value::<crate::delegation_contract::ReadParams>(input.clone())
+                .map(|_| ())
+        }
+        "delegation.history" => {
+            serde_json::from_value::<crate::delegation_contract::HistoryParams>(input.clone())
+                .map(|_| ())
+        }
         MEMBER_LIST_TOOL_NAME => Ok(()),
         MEMBER_GET_TOOL_NAME => serde_json::from_value::<MemberGetInput>(input.clone()).map(|_| ()),
         CAMP_MESSAGE_SEND_TOOL_NAME => {
@@ -963,7 +987,7 @@ pub fn builtin_tool_definitions() -> &'static [Value] {
 }
 
 fn build_builtin_tool_definitions() -> Vec<Value> {
-    vec![
+    let mut definitions = vec![
         json!({
             "name": "mission.list",
             "title": "List Missions",
@@ -1290,7 +1314,9 @@ fn build_builtin_tool_definitions() -> Vec<Value> {
                 ]
             }
         }),
-    ]
+    ];
+    definitions.extend(crate::delegation_catalog::definitions());
+    definitions
 }
 
 #[cfg(test)]

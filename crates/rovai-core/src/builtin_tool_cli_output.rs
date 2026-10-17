@@ -128,6 +128,12 @@ pub fn agent_output_schema(operation: &str) -> Result<Value> {
         | "automation.run"
         | "automation.close"
         | "automation.update"
+        | "delegation.start"
+        | "delegation.status"
+        | "delegation.cancel"
+        | "delegation.resume"
+        | "delegation.read"
+        | "delegation.history"
         | "automation.delete" => builtin_tool_definitions()
             .iter()
             .find(|definition| definition["name"].as_str() == Some(operation))
@@ -160,6 +166,10 @@ pub fn project_envelope(envelope: BuiltinToolInvocationEnvelope) -> Result<Value
 }
 
 fn project_success(operation: &str, result: Value) -> Result<Value> {
+    if let Some(operation) = crate::delegation_contract::canonical_operation(operation) {
+        crate::delegation_catalog::validate_output(operation, &result)?;
+        return Ok(result);
+    }
     match operation {
         "thread.message.send" => {
             let object = result
@@ -508,6 +518,16 @@ fn agent_error_schema() -> Value {
 /// It supports only the keywords used by the catalog output schemas; it is not a general-purpose
 /// schema engine and it does not implement a global forbidden-field rule.
 pub fn validate_schema(value: &Value, schema: &Value) -> Result<()> {
+    if let Some(condition) = schema.get("if") {
+        let branch = if validate_schema(value, condition).is_ok() {
+            "then"
+        } else {
+            "else"
+        };
+        if let Some(branch) = schema.get(branch) {
+            validate_schema(value, branch)?;
+        }
+    }
     if let Some(variants) = schema.get("oneOf").and_then(Value::as_array) {
         if variants
             .iter()
@@ -587,6 +607,22 @@ pub fn validate_schema(value: &Value, schema: &Value) -> Result<()> {
             if !object.contains_key(key) {
                 bail!("schema requires property {key}");
             }
+        }
+    }
+    if let Some(object) = value.as_object() {
+        if schema
+            .get("maxProperties")
+            .and_then(Value::as_u64)
+            .is_some_and(|max| object.len() as u64 > max)
+        {
+            bail!("object has too many properties");
+        }
+        if schema
+            .get("minProperties")
+            .and_then(Value::as_u64)
+            .is_some_and(|min| (object.len() as u64) < min)
+        {
+            bail!("object has too few properties");
         }
     }
     if let Some(properties) = schema.get("properties").and_then(Value::as_object) {
@@ -764,6 +800,30 @@ mod tests {
 
     #[test]
     fn closed_agent_output_schemas_reject_extra_and_invalid_fields() {
+        for invalid in [
+            json!({"status":"unknown","task_id":"missing","message":"private text"}),
+            json!({"status":"unknown"}),
+            json!({"status":"failed","text":"wrong route"}),
+            json!({"status":"completed","text":"missing fixed reference"}),
+            json!({"status":"running","result_ref":{"conversation_id":"c","message_id":"m","truncated":false}}),
+            json!({"status":"completed","blocked_on":{"kind":"permission","request_id":"approval"}}),
+            json!({"status":"running","cleanup_pending":true}),
+            json!({"status":"running","agent_type":"custom:../../escape"}),
+            json!({"status":"running","credential":"secret"}),
+        ] {
+            assert!(
+                crate::delegation_catalog::validate_output("delegation.start", &invalid).is_err(),
+                "{invalid}"
+            );
+        }
+        for valid in [
+            json!({"status":"unknown","task_id":"missing"}),
+            json!({"status":"failed","error_code":"delegation.start_disabled"}),
+            json!({"status":"running","agent_type":"custom:my.runtime-1","blocked_on":{"kind":"question","request_id":"q"}}),
+        ] {
+            crate::delegation_catalog::validate_output("delegation.start", &valid).unwrap();
+        }
+        assert!(crate::delegation_catalog::validate_output("delegation.history", &json!({"task_id":"t","conversation_id":"c","messages":[{"id":"m","sequence":1,"author_type":"assistant","body":"text","created_at":"now","attachments":[{"id":"a","name":"file","kind":"file","path":"private-path"}]}]})).is_err());
         let profile = json!({"agentId":"agent_2","displayName":"Nova","teamRole":"","professionalResponsibilities":"","personalityTraits":[],"workingPrinciples":"","growthTopic":"","version":1,"images":{"icon":null,"portrait":null},"imageStatus":{"icon":"absent","portrait":"absent"}});
         let profile_schema = agent_output_schema("member.get").unwrap();
         validate_schema(&profile, &profile_schema).unwrap();

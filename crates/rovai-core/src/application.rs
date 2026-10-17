@@ -5917,10 +5917,22 @@ impl Core {
         }
     }
 
-    async fn handle_builtin_tool_ipc(
+    async fn handle_builtin_tool_ipc<D: std::future::Future<Output = ()>>(
         &self,
         request: BuiltinToolIpcRequest,
+        disconnected: D,
     ) -> BuiltinToolIpcResponse {
+        let BuiltinToolIpcRequestBody::Invoke { operation, .. } = &request.body;
+        if crate::delegation_contract::canonical_operation(operation).is_some() {
+            return crate::delegation_dispatch::invoke_ipc(
+                &self.database,
+                &self.builtin_tool_leases,
+                &self.data_dir,
+                &request,
+                disconnected,
+            )
+            .await;
+        }
         let BuiltinToolIpcRequest {
             ipc_protocol_version,
             auth,
@@ -26468,7 +26480,13 @@ async fn handle_builtin_tool_connection(core: Arc<Core>, stream: LocalIpcStream)
                 let response = match value
                     .and_then(|value| serde_json::from_value::<BuiltinToolIpcRequest>(value).ok())
                 {
-                    Some(request) => core.handle_builtin_tool_ipc(request).await,
+                    Some(request) => {
+                        core.handle_builtin_tool_ipc(
+                            request,
+                            crate::delegation_dispatch::connection_ended(&mut reader),
+                        )
+                        .await
+                    }
                     None => BuiltinToolIpcResponse::ipc_error(
                         "builtin_tool.invalid_ipc_request",
                         "Built-in Tool IPC request is malformed",

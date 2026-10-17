@@ -54,6 +54,18 @@ pub(crate) fn authenticate_operation(
         source.execution_epoch,
     )?;
     ensure!(&actual == source, "delegation.source_scope_mismatch");
+    // Legacy/default Runs carry no delegation role. Refuse before touching any
+    // new feature table: the still-current159 database intentionally has none.
+    // The full join below independently validates the frozen digest and route.
+    let legacy_config: String = connection.query_row(
+        "SELECT effective_config_json FROM agent_run WHERE id=?1 AND execution_epoch=?2",
+        params![source.agent_run_id, source.execution_epoch],
+        |r| r.get(0),
+    )?;
+    ensure!(
+        FrozenPolicy::from_config(&serde_json::from_str::<Value>(&legacy_config)?)?.is_some(),
+        "delegation.frozen_policy_required"
+    );
     let (conversation,kind,invocation,policy_name,policy_version,response,destination,config,workspace,depth):
         (String,String,String,String,i64,String,Option<String>,String,String,i64)=connection.query_row(
         "SELECT c.id,c.kind,r.invocation_kind,r.operation_policy,r.operation_policy_version,

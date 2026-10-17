@@ -49,7 +49,7 @@ pub const TEAM_CREATE_TASK_TOOL_NAME: &str = "team.create_task";
 pub const TEAM_GET_TASK_TOOL_NAME: &str = "team.get_task";
 pub const TEAM_UPDATE_TASK_TOOL_NAME: &str = "team.update_task";
 pub const TEAM_LIST_TASKS_TOOL_NAME: &str = "team.list_tasks";
-pub const TEAM_TOOL_NAMES: [&str; 30] = [
+pub const TEAM_TOOL_NAMES: [&str; 36] = [
     "mission.list",
     "mission.get",
     "mission.update",
@@ -80,6 +80,12 @@ pub const TEAM_TOOL_NAMES: [&str; 30] = [
     "memory.search",
     "memory.read",
     "memory.write",
+    "delegation.start",
+    "delegation.status",
+    "delegation.cancel",
+    "delegation.resume",
+    "delegation.read",
+    "delegation.history",
 ];
 pub const MAX_A2A_DEPTH: i64 = 5;
 pub const MAX_A2A_RUNS_PER_TURN: i64 = PRODUCT_MAX_ACCEPTED_A2A;

@@ -424,6 +424,7 @@ fn assert_delegation_model_commands(
     assert_delegation_resume(f, binding, source, request, plan, &id, &receipt_proof);
     assert_production_start(f, binding, source);
     assert_delegation_dispatch(f, binding, source, &id);
+    assert_delegation_transport(f, binding, source, &id);
     assert_eq!(
         model::replay_start(&f.database, &invocation)
             .unwrap()

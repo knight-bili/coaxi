@@ -1,7 +1,7 @@
 ---
 document_type: development-guide
 authority: test-policy-and-command-routing
-last_updated: 2026-10-17
+last_updated: 2026-10-18
 ---
 
 # 测试与 Smoke Test
@@ -2129,3 +2129,18 @@ start/cancel/resume 的旧请求在换租约/注销后只查原持久回执；�
 分别验证文件写入后 start、目录检查后 resume 不写 Blob 元数据/任务图/回执。
 原租约与清理两个 owner、Gateway 六项和严格合同原 owner 做相关回归。
 公开 IPC/socket、39目录/CLI/输出错误/证据、进程重启与 Host 生命周期尚待，不将这些组件验证记成正式 D 场景或真实模型验证。
+
+I04 Builtin39 继续扩该 Context owner，helper `context/delegation_transport_tests.rs`；不增加 owner 或整库。
+借用原 Database、真实原生租约和实际 Core IPC adapter，通过原 LocalIpcListener/Client 的真实 Windows 命名管道发送完整请求/结果帧，
+测试原别名 start、封闭页/状态/继续拒绝、取消与注销后原回执，以及实际管道断线只结束无限等待、不写业务库或取消帮手。
+这不等于完整 Core Host 已运行，实际 provider/session/接收/清理仍沿此前明确夹具；实际 Host/Runtime 与平台资格须继续补齐。
+原 catalog/transport/CLI output/evidence projection/Thread alias owner 做相关回归；v10黄金文件只追加六项，原30项语义值保持。
+原封闭输出 owner 增 unknown最小字段、正文/引用/blocked/cleanup状态条件、custom Runtime合法标识、附件不得含路径/凭据的反例。
+原CLI参数 owner 验证批准的短横线参数、完整正文与重复有序task-id，以及快照/正数上限/零无限的读取期限；
+原完整帧 owner 使用虚拟时钟验证无限读取跨120秒后仍能返回，有界读取仍会超时，不耗实际分钟等待。
+已确认的r1原输入/说明/TaskReport与帮助须逐值/逐字核对；新运输版本不升级候选Schema、不自动给旧Run补资格。
+原证据投影只输出身份/状态/内容长度摘要与游标存在性，测试私有正文、路径和凭据不进入投影；
+真实派发起止证据写入、provider关联与最终UI仍待后续接线，不能把投影函数本身当作完整观察链。
+同一 owner 在安装候选委派表之前，用实际旧 SingleChat Run/Binding 测六操作：
+完整 CLI 租约仍不能给无冻结角色的旧 Run 补权，统一返回稳定 access_denied 且零数据库写入。
+准入先验证原 Native Binding，再在旧 agent_run 表核对冻结资格；缺资格时不得触碰尚未安装的委派表而变成内部存储错误。

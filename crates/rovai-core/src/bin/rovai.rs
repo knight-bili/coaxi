@@ -119,6 +119,13 @@ async fn run() -> Result<u8> {
         print!("{}", task_family_help_text());
         return Ok(0);
     }
+    if args.as_slice() == ["delegation", "--help"] {
+        print!(
+            "{}",
+            include_str!("../../resources/delegation-cli-help-r1.txt")
+        );
+        return Ok(0);
+    }
     if let Some(description) = operation_help(&args)? {
         print_operation_help(&description);
         return Ok(0);
@@ -1346,7 +1353,14 @@ async fn send_with_retry(
         serde_json::to_vec(request).map_err(|_| BuiltinToolIpcFailure::BeforeDispatch)?;
     let mut dispatch_became_indeterminate = false;
     for attempt in 0..CORE_ATTEMPTS {
-        match exchange_local_ipc_frame(endpoint, &serialized, CORE_TIMEOUT).await {
+        match exchange_local_ipc_frame_with_response_timeout(
+            endpoint,
+            &serialized,
+            CORE_TIMEOUT,
+            response_timeout(request),
+        )
+        .await
+        {
             Err((LocalIpcRoundTripFailure::InvalidFrame, _)) => {
                 return Err(BuiltinToolIpcFailure::Predictable);
             }
@@ -1382,6 +1396,34 @@ async fn exchange_local_ipc_frame(
     serialized: &[u8],
     timeout: Duration,
 ) -> std::result::Result<String, (LocalIpcRoundTripFailure, anyhow::Error)> {
+    exchange_local_ipc_frame_with_response_timeout(endpoint, serialized, timeout, Some(timeout))
+        .await
+}
+
+fn response_timeout(request: &BuiltinToolIpcRequest) -> Option<Duration> {
+    let BuiltinToolIpcRequestBody::Invoke {
+        operation, input, ..
+    } = &request.body;
+    if rovai_core::thread_compat::canonical_operation(operation) == "delegation.status" {
+        if let Ok(input) =
+            serde_json::from_value::<rovai_core::delegation_contract::StatusParams>(input.clone())
+        {
+            match input.bounded_wait_ms() {
+                Some(0) => return None,
+                Some(ms) => return Some(CORE_TIMEOUT + Duration::from_millis(ms)),
+                None => {}
+            }
+        }
+    }
+    Some(CORE_TIMEOUT)
+}
+
+async fn exchange_local_ipc_frame_with_response_timeout(
+    endpoint: &LocalIpcEndpoint,
+    serialized: &[u8],
+    timeout: Duration,
+    response_timeout: Option<Duration>,
+) -> std::result::Result<String, (LocalIpcRoundTripFailure, anyhow::Error)> {
     let mut stream = tokio::time::timeout(timeout, LocalIpcClientStream::connect(endpoint))
         .await
         .map_err(|error| (LocalIpcRoundTripFailure::BeforeDispatch, error.into()))?
@@ -1394,17 +1436,27 @@ async fn exchange_local_ipc_frame(
     .await
     .map_err(|error| (LocalIpcRoundTripFailure::AfterDispatch, error.into()))?
     .map_err(|error| (LocalIpcRoundTripFailure::AfterDispatch, error.into()))?;
-    tokio::time::timeout(timeout, read_response_frame(stream))
-        .await
-        .map_err(|error| (LocalIpcRoundTripFailure::AfterDispatch, error.into()))?
-        .map_err(|error| {
-            let kind = if error.kind() == std::io::ErrorKind::InvalidData {
-                LocalIpcRoundTripFailure::InvalidFrame
-            } else {
-                LocalIpcRoundTripFailure::AfterDispatch
-            };
-            (kind, error.into())
-        })
+    read_operation_response(stream, response_timeout).await
+}
+
+async fn read_operation_response(
+    stream: impl AsyncRead + Unpin,
+    response_timeout: Option<Duration>,
+) -> std::result::Result<String, (LocalIpcRoundTripFailure, anyhow::Error)> {
+    let response = match response_timeout {
+        Some(timeout) => tokio::time::timeout(timeout, read_response_frame(stream))
+            .await
+            .map_err(|error| (LocalIpcRoundTripFailure::AfterDispatch, error.into()))?,
+        None => read_response_frame(stream).await,
+    };
+    response.map_err(|error| {
+        let kind = if error.kind() == std::io::ErrorKind::InvalidData {
+            LocalIpcRoundTripFailure::InvalidFrame
+        } else {
+            LocalIpcRoundTripFailure::AfterDispatch
+        };
+        (kind, error.into())
+    })
 }
 
 async fn read_response_frame(stream: impl AsyncRead + Unpin) -> std::io::Result<String> {
@@ -1450,7 +1502,7 @@ fn print_root_help() {
 }
 
 fn root_help_text(managed_runtime: bool) -> String {
-    let mut text = "Rovai CLI\n\nAgent operations:\n  rovai send\n  rovai member list|get|create|update\n  rovai task create|get|list|update\n  rovai thread list|search|read|runs\n  rovai history search\n  rovai memory view|search|read|write\n  rovai automation list|get|create|run|close|update|delete\n  rovai mission list|get|update|status\n\nRun an Agent operation's exact `--help` for its closed inputs.\n".to_string();
+    let mut text = "Rovai CLI\n\nAgent operations:\n  rovai send\n  rovai member list|get|create|update\n  rovai task create|get|list|update\n  rovai thread list|search|read|runs\n  rovai history search\n  rovai memory view|search|read|write\n  rovai automation list|get|create|run|close|update|delete\n  rovai mission list|get|update|status\n  rovai delegation start|status|cancel|resume|read|history\n\nRun an Agent operation's exact `--help` for its closed inputs.\n".to_string();
     if !managed_runtime {
         text.push_str("\nUser Automation:\n  rovai app --help\n\nAgent operations keep their process-private transport. `rovai app` uses the running Desktop App's separate User Automation transport.\n");
     }
@@ -2101,6 +2153,22 @@ mod tests {
                 .unwrap(),
             large.trim_end()
         );
+        tokio::time::pause();
+        let (mut writer, reader) = tokio::io::duplex(64);
+        let read = read_operation_response(reader, None);
+        let reply = async move {
+            tokio::time::advance(Duration::from_secs(120)).await;
+            writer.write_all(b"{}\n").await.unwrap();
+        };
+        let (result, ()) = tokio::join!(read, reply);
+        assert_eq!(result.unwrap(), "{}");
+        let (_writer, reader) = tokio::io::duplex(64);
+        let read = read_operation_response(reader, Some(Duration::from_secs(5)));
+        let (result, ()) = tokio::join!(read, tokio::time::advance(Duration::from_secs(6)));
+        assert_eq!(
+            result.err().unwrap().0,
+            LocalIpcRoundTripFailure::AfterDispatch
+        );
     }
 
     #[test]
@@ -2124,6 +2192,59 @@ mod tests {
 
     #[test]
     fn direct_flags_use_canonical_fields_and_repeated_arrays() {
+        let description = builtin_tool_description("delegation.start").unwrap();
+        let parsed = parse_operation_input(
+            &description,
+            &[
+                "--agent-type".into(),
+                "codex".into(),
+                "--task".into(),
+                "完整任务".into(),
+            ],
+        )
+        .unwrap();
+        assert_eq!(parsed, json!({"agent_type":"codex","task":"完整任务"}));
+        let description = builtin_tool_description("delegation.status").unwrap();
+        let parsed = parse_operation_input(
+            &description,
+            &[
+                "--task-id".into(),
+                "b".into(),
+                "--task-id".into(),
+                "a".into(),
+                "--task-id".into(),
+                "b".into(),
+                "--wait-ms".into(),
+                "0".into(),
+            ],
+        )
+        .unwrap();
+        assert_eq!(parsed, json!({"task_ids":["b","a","b"],"wait_ms":0}));
+        let mut request = BuiltinToolIpcRequest {
+            ipc_protocol_version: BUILTIN_TOOL_IPC_PROTOCOL_VERSION,
+            auth: rovai_core::builtin_tool_transport::BuiltinToolAuth {
+                process_id: "fixture".into(),
+                process_token: "fixture".into(),
+                lease_id: "fixture".into(),
+                lease_generation: 1,
+                lease_token: "fixture".into(),
+            },
+            body: BuiltinToolIpcRequestBody::Invoke {
+                request_id: Uuid::new_v4().to_string(),
+                operation: "delegation.status".into(),
+                input: parsed,
+            },
+        };
+        assert_eq!(response_timeout(&request), None);
+        let BuiltinToolIpcRequestBody::Invoke { input, .. } = &mut request.body;
+        input["wait_ms"] = json!(90000);
+        assert_eq!(
+            response_timeout(&request),
+            Some(CORE_TIMEOUT + Duration::from_secs(60))
+        );
+        let BuiltinToolIpcRequestBody::Invoke { input, .. } = &mut request.body;
+        input.as_object_mut().unwrap().remove("wait_ms");
+        assert_eq!(response_timeout(&request), Some(CORE_TIMEOUT));
         let description = builtin_tool_description("memory.read").unwrap();
         let mut direct = Map::new();
         let argument = description

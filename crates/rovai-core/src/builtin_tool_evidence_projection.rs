@@ -93,6 +93,31 @@ pub fn project_builtin_tool_invocation(
 fn project_input(operation: &str, input: &Value) -> Result<Value> {
     let mut projected = Map::new();
     match operation {
+        "delegation.start" | "delegation.status" | "delegation.cancel" | "delegation.resume"
+        | "delegation.read" | "delegation.history" => {
+            for field in ["agent_type", "task_id"] {
+                insert_identifier(&mut projected, field, input.get(field));
+            }
+            insert_string_array(&mut projected, "task_ids", input.get("task_ids"));
+            for field in ["wait_ms", "limit_bytes", "limit"] {
+                insert_i64(&mut projected, field, input.get(field));
+            }
+            insert_content_facts(
+                &mut projected,
+                input.get("task").or_else(|| input.get("reason")),
+            );
+            projected.insert(
+                "workingDirectoryPresent".into(),
+                json!(input.get("working_dir").is_some()),
+            );
+            insert_opaque_cursor(
+                &mut projected,
+                input
+                    .get("cursor")
+                    .or_else(|| input.get("after_cursor"))
+                    .or_else(|| input.get("before_cursor")),
+            );
+        }
         "thread.runs" => {
             for field in ["threadId", "agentId"] {
                 insert_identifier(&mut projected, field, input.get(field));
@@ -354,6 +379,33 @@ fn project_memory_mutation_input(projected: &mut Map<String, Value>, input: &Val
 fn project_result(operation: &str, result: &Value) -> Result<Value> {
     let mut projected = Map::new();
     match operation {
+        "delegation.start" | "delegation.cancel" | "delegation.resume" => {
+            return Ok(project_delegation_report(result));
+        }
+        "delegation.status" => {
+            let tasks = project_object_array(result.get("tasks"), project_delegation_report);
+            projected.insert("tasks".into(), json!(tasks.values));
+            projected.insert("taskCount".into(), json!(tasks.total));
+            projected.insert("tasksTruncated".into(), json!(tasks.truncated));
+            insert_opaque_cursor(&mut projected, result.get("cursor"));
+        }
+        "delegation.read" | "delegation.history" => {
+            for field in ["task_id", "conversation_id", "status"] {
+                insert_identifier(&mut projected, field, result.get(field));
+            }
+            insert_content_facts(&mut projected, result.get("text"));
+            if let Some(messages) = result.get("messages").and_then(Value::as_array) {
+                projected.insert("messageCount".into(), json!(messages.len()));
+            }
+            insert_opaque_cursor(&mut projected, result.get("next_cursor"));
+            if let Some(reference) = result.get("result_ref") {
+                let mut ids = Map::new();
+                for field in ["conversation_id", "message_id"] {
+                    insert_identifier(&mut ids, field, reference.get(field));
+                }
+                projected.insert("result_ref".into(), Value::Object(ids));
+            }
+        }
         "thread.runs" => {
             insert_identifier(&mut projected, "threadId", result.get("threadId"));
             insert_bounded_string(&mut projected, "observedAt", result.get("observedAt"), 64);
@@ -664,6 +716,30 @@ fn project_read_item(item: &Value) -> Value {
         );
     }
     Value::Object(projected)
+}
+
+fn project_delegation_report(report: &Value) -> Value {
+    let mut value = Map::new();
+    for field in [
+        "task_id",
+        "status",
+        "child_conversation_id",
+        "agent_type",
+        "error_code",
+    ] {
+        insert_identifier(&mut value, field, report.get(field));
+    }
+    insert_bool(&mut value, "cleanup_pending", report.get("cleanup_pending"));
+    insert_i64(&mut value, "duration_ms", report.get("duration_ms"));
+    if let Some(block) = report.get("blocked_on") {
+        let mut ids = Map::new();
+        for field in ["kind", "request_id"] {
+            insert_identifier(&mut ids, field, block.get(field));
+        }
+        value.insert("blocked_on".into(), Value::Object(ids));
+    }
+    insert_content_facts(&mut value, report.get("text"));
+    Value::Object(value)
 }
 
 fn project_memory_result(item: &Value, include_body: bool) -> Value {
@@ -1114,6 +1190,20 @@ mod tests {
 
     #[test]
     fn every_current_builtin_catalog_operation_has_start_and_terminal_projections() {
+        let input = json!({"agent_type":"codex","task":"private task body","working_dir":"private-path","credential":"secret-token"});
+        let projection = project_builtin_tool_invocation(
+            "delegate_to_agent",
+            &input,
+            None,
+            &digest(&input),
+            None,
+        )
+        .unwrap();
+        let serialized = projection.to_string();
+        for secret in ["private task body", "private-path", "secret-token"] {
+            assert!(!serialized.contains(secret));
+        }
+        assert_eq!(projection["operation"], "delegation.start");
         for operation in TEAM_TOOL_NAMES {
             let input = json!({});
             let result = json!({});

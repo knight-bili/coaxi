@@ -10,12 +10,12 @@ use serde_json::{Map, Value, json};
 
 use crate::team_tool_catalog::builtin_tool_definitions;
 
-pub const BUILTIN_TOOL_CONTRACT_VERSION: u32 = 38;
+pub const BUILTIN_TOOL_CONTRACT_VERSION: u32 = 39;
 pub const BUILTIN_TOOL_IPC_PROTOCOL_VERSION: u32 = 3;
 pub const BUILTIN_TOOL_ENVELOPE_VERSION: u32 = 2;
-pub const BUILTIN_TOOL_CLI_COMMAND_VERSION: u32 = 38;
+pub const BUILTIN_TOOL_CLI_COMMAND_VERSION: u32 = 39;
 pub const BUILTIN_TOOL_AGENT_OUTPUT_CONTRACT_VERSION: u32 = 10;
-pub const BUILTIN_TOOL_RUNTIME_CAPABILITY: &str = "builtin_cli.transport.v38";
+pub const BUILTIN_TOOL_RUNTIME_CAPABILITY: &str = "builtin_cli.transport.v39";
 pub const ROVAI_AGENT_CLI_ENV: &str = "ROVAI_AGENT_CLI";
 pub const ROVAI_CLI_CONTEXT_ENV: &str = "ROVAI_CLI_CONTEXT";
 pub const ROVAI_RUN_TMP_ENV: &str = "ROVAI_RUN_TMP";
@@ -176,7 +176,37 @@ pub struct BuiltinToolCliIdentity {
     pub action: &'static str,
 }
 
-pub const BUILTIN_TOOL_CLI_IDENTITIES: [BuiltinToolCliIdentity; 30] = [
+pub const BUILTIN_TOOL_CLI_IDENTITIES: [BuiltinToolCliIdentity; 36] = [
+    BuiltinToolCliIdentity {
+        operation: "delegation.start",
+        group: "delegation",
+        action: "start",
+    },
+    BuiltinToolCliIdentity {
+        operation: "delegation.status",
+        group: "delegation",
+        action: "status",
+    },
+    BuiltinToolCliIdentity {
+        operation: "delegation.cancel",
+        group: "delegation",
+        action: "cancel",
+    },
+    BuiltinToolCliIdentity {
+        operation: "delegation.resume",
+        group: "delegation",
+        action: "resume",
+    },
+    BuiltinToolCliIdentity {
+        operation: "delegation.read",
+        group: "delegation",
+        action: "read",
+    },
+    BuiltinToolCliIdentity {
+        operation: "delegation.history",
+        group: "delegation",
+        action: "history",
+    },
     BuiltinToolCliIdentity {
         operation: "thread.message.send",
         group: "send",
@@ -699,6 +729,13 @@ fn direct_arguments(input_schema: &Value) -> Vec<BuiltinToolArgument> {
 
 fn direct_argument_flag(field: &str) -> String {
     match field {
+        "agent_type" => "--agent-type".into(),
+        "working_dir" => "--working-dir".into(),
+        "task_id" | "task_ids" => "--task-id".into(),
+        "wait_ms" => "--wait-ms".into(),
+        "after_cursor" => "--after-cursor".into(),
+        "before_cursor" => "--before-cursor".into(),
+        "limit_bytes" => "--limit-bytes".into(),
         // Keep the legacy --to-principal alias in the parser only.
         "mentionUser" => "--to-user".to_string(),
         "files" => "--file".to_string(),
@@ -751,6 +788,15 @@ fn required_in_every_variant(schema: &Value) -> BTreeSet<String> {
 }
 
 fn schema_value_kind(schema: &Value) -> String {
+    if let Some(variants) = schema.get("anyOf").and_then(Value::as_array) {
+        let kinds = variants
+            .iter()
+            .map(schema_value_kind)
+            .collect::<BTreeSet<_>>();
+        if kinds.len() == 1 {
+            return kinds.into_iter().next().unwrap();
+        }
+    }
     if schema.get("type").and_then(Value::as_str) == Some("array") {
         return "array".to_string();
     }
@@ -807,6 +853,21 @@ fn error_contracts(operation: &str) -> Vec<BuiltinToolErrorContract> {
             recovery: BuiltinToolRecovery::Stop,
         },
     ];
+    if crate::delegation_contract::canonical_operation(operation).is_some() {
+        for code in [
+            "delegation.access_denied",
+            "delegation.cursor_invalid",
+            "delegation.result_unavailable",
+            "delegation.result_changed",
+            "delegation.page_limit_too_small",
+            "delegation.status_disconnected",
+        ] {
+            errors.push(BuiltinToolErrorContract {
+                code: code.into(),
+                recovery: recovery_for_error_code(code),
+            });
+        }
+    }
     if matches!(
         operation,
         "thread.list" | "thread.search" | "thread.read" | "history.search"
@@ -981,12 +1042,25 @@ pub fn projection_identity(operation: &str) -> Result<&'static str> {
         | "automation.run"
         | "automation.close"
         | "automation.update"
+        | "delegation.start"
+        | "delegation.status"
+        | "delegation.cancel"
+        | "delegation.resume"
+        | "delegation.read"
+        | "delegation.history"
         | "automation.delete" => Ok("canonical-result-v1"),
         _ => bail!("unknown built-in operation for Agent output projection"),
     }
 }
 
 pub fn recovery_for_error_code(code: &str) -> BuiltinToolRecovery {
+    match code {
+        "delegation.cursor_invalid" | "delegation.page_limit_too_small" => {
+            return BuiltinToolRecovery::FixInput;
+        }
+        "delegation.result_unavailable" => return BuiltinToolRecovery::RefreshThenDecide,
+        _ => {}
+    }
     if code.ends_with(".version_conflict")
         || code.ends_with(".revision_conflict")
         || code.ends_with(".review_conflict")
@@ -1100,9 +1174,9 @@ mod tests {
 
     #[test]
     fn cli_mapping_is_complete_unique_and_contract_valid() {
-        assert_eq!(BUILTIN_TOOL_CONTRACT_VERSION, 38);
-        assert_eq!(BUILTIN_TOOL_CLI_COMMAND_VERSION, 38);
-        assert_eq!(BUILTIN_TOOL_RUNTIME_CAPABILITY, "builtin_cli.transport.v38");
+        assert_eq!(BUILTIN_TOOL_CONTRACT_VERSION, 39);
+        assert_eq!(BUILTIN_TOOL_CLI_COMMAND_VERSION, 39);
+        assert_eq!(BUILTIN_TOOL_RUNTIME_CAPABILITY, "builtin_cli.transport.v39");
         validate_builtin_tool_contract().unwrap();
         let operations = BUILTIN_TOOL_CLI_IDENTITIES
             .iter()
@@ -1112,8 +1186,8 @@ mod tests {
             .iter()
             .map(|identity| (identity.group, identity.action))
             .collect::<BTreeSet<_>>();
-        assert_eq!(operations.len(), 30);
-        assert_eq!(commands.len(), 30);
+        assert_eq!(operations.len(), 36);
+        assert_eq!(commands.len(), 36);
     }
 
     #[test]

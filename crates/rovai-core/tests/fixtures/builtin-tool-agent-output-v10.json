@@ -890,5 +890,135 @@
       "version": 3,
       "changed": true
     }
+  },
+  "delegation.start": {
+    "canonicalResult": {
+      "task_id": "delegation_fixture",
+      "child_conversation_id": "private_child",
+      "agent_type": "codex",
+      "status": "running"
+    },
+    "agentOutput": {
+      "task_id": "delegation_fixture",
+      "child_conversation_id": "private_child",
+      "agent_type": "codex",
+      "status": "running"
+    }
+  },
+  "delegation.status": {
+    "canonicalResult": {
+      "tasks": [
+        {
+          "task_id": "delegation_fixture",
+          "status": "running"
+        },
+        {
+          "task_id": "unknown",
+          "status": "unknown"
+        }
+      ],
+      "cursor": "opaque-status"
+    },
+    "agentOutput": {
+      "tasks": [
+        {
+          "task_id": "delegation_fixture",
+          "status": "running"
+        },
+        {
+          "task_id": "unknown",
+          "status": "unknown"
+        }
+      ],
+      "cursor": "opaque-status"
+    }
+  },
+  "delegation.cancel": {
+    "canonicalResult": {
+      "task_id": "delegation_fixture",
+      "status": "canceled",
+      "cleanup_pending": true
+    },
+    "agentOutput": {
+      "task_id": "delegation_fixture",
+      "status": "canceled",
+      "cleanup_pending": true
+    }
+  },
+  "delegation.resume": {
+    "canonicalResult": {
+      "task_id": "delegation_fixture",
+      "status": "failed",
+      "error_code": "delegation.cleanup_pending"
+    },
+    "agentOutput": {
+      "task_id": "delegation_fixture",
+      "status": "failed",
+      "error_code": "delegation.cleanup_pending"
+    }
+  },
+  "delegation.read": {
+    "canonicalResult": {
+      "task_id": "delegation_fixture",
+      "result_ref": {
+        "conversation_id": "private_child",
+        "message_id": "final_message"
+      },
+      "text": "准确的最终结果",
+      "next_cursor": "opaque-read"
+    },
+    "agentOutput": {
+      "task_id": "delegation_fixture",
+      "result_ref": {
+        "conversation_id": "private_child",
+        "message_id": "final_message"
+      },
+      "text": "准确的最终结果",
+      "next_cursor": "opaque-read"
+    }
+  },
+  "delegation.history": {
+    "canonicalResult": {
+      "task_id": "delegation_fixture",
+      "conversation_id": "private_child",
+      "messages": [
+        {
+          "id": "message_fixture",
+          "sequence": 1,
+          "author_type": "delegation_parent",
+          "body": "完整任务",
+          "created_at": "2026-10-18T00:00:00Z",
+          "attachments": [
+            {
+              "id": "attachment_fixture",
+              "name": "需求.txt",
+              "kind": "file",
+              "size_bytes": 12
+            }
+          ]
+        }
+      ]
+    },
+    "agentOutput": {
+      "task_id": "delegation_fixture",
+      "conversation_id": "private_child",
+      "messages": [
+        {
+          "id": "message_fixture",
+          "sequence": 1,
+          "author_type": "delegation_parent",
+          "body": "完整任务",
+          "created_at": "2026-10-18T00:00:00Z",
+          "attachments": [
+            {
+              "id": "attachment_fixture",
+              "name": "需求.txt",
+              "kind": "file",
+              "size_bytes": 12
+            }
+          ]
+        }
+      ]
+    }
   }
 }

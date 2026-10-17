@@ -3,7 +3,7 @@ document_type: implementation-plan
 version: v1.73
 authority: version-implementation-and-acceptance
 status: in_progress
-last_updated: 2026-10-17
+last_updated: 2026-10-18
 ---
 
 # v1.73 实施计划
@@ -15,7 +15,7 @@ last_updated: 2026-10-17
 5. 移植 Codeg 原 DelegationSettings、工具卡、分组、委派查看器；User-only 原生子会话读取、另一原生查看器、Grok 进度和后台观察也保留，不能互相替代。
 6. 与 I04-T02/T03/T04 共同冻结阶段候选，集中构建/真实 Core 与 Runtime/必要平台验证、修复失败，再作阶段收口。当前不 push/Actions，不消耗模型预算。
 
-六操作统一执行器 `delegation_dispatch` 已接实际 Core 内核，尚未挂到公开 IPC/CLI：
+六操作统一执行器 `delegation_dispatch` 已接实际 Core 内核及公开 IPC/CLI：
 start/resume 的目录与文件工作在独立线程执行，提交前重新取得原全局调用门并核对完整 CLI 租约，
 不能仅凭同一个 Run/Native Binding 继续提交；status 使用原通知快照等待，等待时不占数据库或调用门。
 同 Run 换租约会唤醒全部旧等待者，断线只结束等待、不取消帮手。
@@ -23,8 +23,12 @@ start/cancel/resume 在新工作鉴权之前通过不暴露身份的证明查询
 退役租约没有记录就拒绝，改变参数仍冲突，read/history/status 每次重新鉴权和查询，不缓存旧页。
 原 Context owner 复用同库覆盖完整六操作、同一请求别名回放、旧回执零写入、继续原 Session、
 清理前拒绝保留、两种观察后换租约拒绝、双等待者和断线无副作用。
-这批保持 Builtin38/30项与实际159/209，不提前宣称39目录、实际 socket、Host/模型或正式场景通过。
-下一项接实际 IPC 及完整39目录/CLI/四别名、闭合输出/错误/证据映射和无限等待读超时，
-同时保留旧无资格 Run 的 Bootstrap/Charter 字节与权限；之后继续 User 查询、设置和父 Run 已终态时的 User resume。
+Builtin39/36项、六命令/四原别名、封闭输出/安全错误/证据投影元数据与无限等待读取截止已接线；IPC3/Envelope2/AgentOutput10及实际159/209保持。
+批准的输入/说明/TaskReport和帮助文本使用原全文；原30项黄金结果保持。条件输出规则实际校验，未知结果不能夹带私有字段。
+同一 Context owner 借用原数据库验证真实 Windows 管道帧和断线，不启动 Host 或模型；CLI虚拟时钟验证无限读取和原有界超时。
+此批不等于真实 Host、全部 Runtime/平台、正式场景或 I04 完成；原执行证据起止写入和 provider工具调用关联仍须补齐，不能把投影函数当完整活动记录。
+旧无资格 Run 仍不能调用新业务操作，Bootstrap/Charter冻结内容不因目录版本补权；完整160/210与旧来源资格仍按原计划推进。
+实际159无委派表时先在原 agent_run 核对冻结资格，旧Run的六操作稳定拒绝，不借查新表报内部错误；同一 owner 在候选表安装前验证零写入。
+下一项接完整执行证据生命周期，再继续 User 查询、设置和父 Run 已终态时的 User resume。
 
 依赖与客户事项以[执行计划](../../../integration/execution/i04-execution-plan.md)和[客户待办](../../../integration/execution/customer-todos.json)为准。

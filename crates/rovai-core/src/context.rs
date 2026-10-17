@@ -9047,6 +9047,7 @@ mod slow_tests {
     include!("context/delegation_resume_tests.rs");
     include!("context/delegation_start_tests.rs");
     include!("context/delegation_dispatch_tests.rs");
+    include!("context/delegation_transport_tests.rs");
     use crate::{
         agent_profile::{
             AdapterCapabilitySnapshot, AdapterKind, AdapterPermissionConfig, AgentProfileService,
@@ -14453,6 +14454,7 @@ mod slow_tests {
             )
             .unwrap();
         assert_eq!(memory_access_count, 0);
+        assert_legacy_delegation_transport_denied(&mut fixture, &binding, &run_id);
         assert_delegation_materialization(&mut fixture, &run_id);
         assert_initial_child_factory(&mut fixture);
         assert_parent_start_admission(&mut fixture, &run_id);
