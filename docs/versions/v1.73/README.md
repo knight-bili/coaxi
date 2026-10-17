@@ -42,7 +42,8 @@ Core 新增六操作的严格输入类型及 User-only 设置存储原语，默�
 
 ## 验证与收口
 
-User 查询与设置的后端及 Native/Web 接线见[查询设置分项记录](../../../integration/execution/i04-delegation-user-queries-result.json)：12项定向Rust、45项两端运输和10项文档测试通过，父Run停止仍可读、游标受众隔离、设置事件/回执失败整笔回滚。User resume、原页面、完整启动迁移与真实Host/Runtime仍待；本批不授予正式场景或阶段收口资格。
+User 查询与设置的后端及 Native/Web 接线见[查询设置分项记录](../../../integration/execution/i04-delegation-user-queries-result.json)：12项定向Rust、45项两端运输和10项文档测试通过，父Run停止仍可读、游标受众隔离、设置事件/回执失败整笔回滚。
+后续User resume见[用户恢复分项记录](../../../integration/execution/i04-delegation-user-resume-result.json)：13项定向Rust、47项两端运输和10项文档测试通过，父实际正常结束/取消、原Session边界、User同事务证明、并发/接管/闭父及故障回滚均有组件证据；原生接收/终态仍是夹具。原页面、完整启动迁移与真实Host/Runtime仍待，不授予正式场景或阶段收口资格。
 
 检查执行结果在[本轮执行记录](../../../integration/execution/i04-delegation-foundation-result.json)逐项记录。
 后续身份约束、候选 DDL 和接管存储分项见[关系执行记录](../../../integration/execution/i04-delegation-identity-result.json)。
