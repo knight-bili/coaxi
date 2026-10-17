@@ -14,11 +14,22 @@ use crate::{
     single_chat_composer_scope::SingleChatComposerScope,
 };
 
+#[path = "delegation_user_queue.rs"]
+mod queue;
 #[path = "delegation_user_send.rs"]
 mod send;
+pub use queue::{
+    EditDelegationPendingInputCommand, PublishDelegationPendingInput, edit_pending_input,
+    publish_pending_input, read_pending_inputs, ready_pending_inputs,
+};
+pub(crate) use queue::{
+    edit_source_inputs, edit_with_prepared_sources, publish_source_inputs,
+    publish_with_prepared_sources,
+};
 pub use send::{SendDelegationMessageCommand, send, send_source_inputs};
 pub(crate) use send::{
-    followup_config, followup_runtime, send_blocker, send_with_prepared_sources,
+    followup_config, followup_runtime, original_cleanup_blocker, send_with_prepared_sources,
+    user_execution_pending,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

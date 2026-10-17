@@ -73,7 +73,7 @@ pub(crate) fn send_with_prepared_sources(
         .send_owned(database, envelope)
 }
 
-pub(crate) fn send_blocker(
+pub(crate) fn original_cleanup_blocker(
     connection: &Connection,
     conversation: &str,
 ) -> Result<Option<&'static str>> {
@@ -94,10 +94,14 @@ pub(crate) fn send_blocker(
     if pending {
         return Ok(Some("delegation.cleanup_pending"));
     }
+    Ok(None)
+}
+
+pub(crate) fn user_execution_pending(connection: &Connection, conversation: &str) -> Result<bool> {
     let busy:bool=connection.query_row("SELECT EXISTS(SELECT 1 FROM agent_run WHERE conversation_id=?1
         AND invocation_kind='delegation_user' AND (status IN ('queued','running','waiting') OR runtime_recovery_required<>0
-            OR (cancel_requested_at IS NOT NULL AND cancel_acknowledged_at IS NULL)))",[conversation],|r|r.get(0))?;
-    Ok(busy.then_some("delegation.user_run_active"))
+            OR (cancel_requested_at IS NOT NULL AND cancel_acknowledged_at IS NULL) OR EXISTS(SELECT 1 FROM runtime_input_delivery input WHERE input.agent_run_id=agent_run.id AND input.status IN ('prepared','delivery_unknown'))))",[conversation],|r|r.get(0))?;
+    Ok(busy)
 }
 
 fn original_config(connection: &Connection, conversation: &str) -> Result<Value> {

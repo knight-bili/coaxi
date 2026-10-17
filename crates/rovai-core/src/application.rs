@@ -25346,7 +25346,18 @@ async fn process_agent_run_exit(
 async fn dispatch_pending_single_chat_inputs(core: &Core) -> Result<()> {
     let candidates = {
         let database = core.database.lock().await;
-        rovai_core::single_chat::ready_pending_inputs(&database)
+        (|| -> Result<Vec<_>> {
+            let mut commands = rovai_core::single_chat::ready_pending_inputs(&database)?
+                .into_iter()
+                .map(|command| (command, false))
+                .collect::<Vec<_>>();
+            commands.extend(
+                rovai_core::delegation_user::ready_pending_inputs(&database)?
+                    .into_iter()
+                    .map(|command| (command.0, true)),
+            );
+            Ok(commands)
+        })()
     };
     let candidates = match candidates {
         Ok(candidates) => candidates,
@@ -25355,7 +25366,12 @@ async fn dispatch_pending_single_chat_inputs(core: &Core) -> Result<()> {
             return Err(error);
         }
     };
-    for command in candidates {
+    for (command, child) in candidates {
+        let changed_event = if child {
+            "delegation.changed"
+        } else {
+            "single_chat.changed"
+        };
         let camp_id = command.camp_id.clone();
         let conversation_id = command.conversation_id.clone();
         let envelope = CommandEnvelope {
@@ -25368,22 +25384,47 @@ async fn dispatch_pending_single_chat_inputs(core: &Core) -> Result<()> {
             execution_epoch: None,
             payload: command.clone(),
         };
-        let result = private_sources::command(
-            &core.database,
-            &core.private_source_read_capacity,
-            &envelope,
-            |database| SingleChatService::publish_source_inputs(database, &envelope),
-            |database, prepared| {
-                SingleChatService::default()
-                    .with_prepared_sources(prepared)
-                    .publish_pending_input(database, &envelope)
-            },
-        )
-        .await;
+        let result = if child {
+            let envelope = CommandEnvelope {
+                command_id: envelope.command_id.clone(),
+                actor: envelope.actor.clone(),
+                camp_id: envelope.camp_id.clone(),
+                expected_versions: vec![],
+                execution_epoch: None,
+                payload: rovai_core::delegation_user::PublishDelegationPendingInput(
+                    command.clone(),
+                ),
+            };
+            private_sources::command(
+                &core.database,
+                &core.private_source_read_capacity,
+                &envelope,
+                |db| rovai_core::delegation_user::publish_source_inputs(db, &envelope),
+                |db, prepared| {
+                    rovai_core::delegation_user::publish_with_prepared_sources(
+                        db, &envelope, prepared,
+                    )
+                },
+            )
+            .await
+        } else {
+            private_sources::command(
+                &core.database,
+                &core.private_source_read_capacity,
+                &envelope,
+                |database| SingleChatService::publish_source_inputs(database, &envelope),
+                |database, prepared| {
+                    SingleChatService::default()
+                        .with_prepared_sources(prepared)
+                        .publish_pending_input(database, &envelope)
+                },
+            )
+            .await
+        };
         match result {
             Ok(execution) if execution.result.status != CommandResultStatus::Rejected => emit(
                 &core.output,
-                "single_chat.changed",
+                changed_event,
                 json!({
                     "threadId": camp_id,
                     "conversationId": conversation_id,
@@ -25392,7 +25433,7 @@ async fn dispatch_pending_single_chat_inputs(core: &Core) -> Result<()> {
             ),
             Ok(_) => emit(
                 &core.output,
-                "single_chat.changed",
+                changed_event,
                 json!({
                     "threadId": camp_id,
                     "conversationId": conversation_id,
@@ -25424,7 +25465,7 @@ async fn dispatch_pending_single_chat_inputs(core: &Core) -> Result<()> {
                 }
                 emit(
                     &core.output,
-                    "single_chat.changed",
+                    changed_event,
                     json!({
                         "threadId": camp_id,
                         "conversationId": conversation_id,

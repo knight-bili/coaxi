@@ -315,6 +315,17 @@ impl DomainCommand for EditSingleChatPendingInputCommand {
     }
 }
 
+pub(crate) trait PrivatePendingEditCommand: DomainCommand {
+    const OWNER: ComposerOwner;
+    fn input(&self) -> EditSingleChatPendingInputCommand;
+}
+impl PrivatePendingEditCommand for EditSingleChatPendingInputCommand {
+    const OWNER: ComposerOwner = ComposerOwner::SingleChat;
+    fn input(&self) -> EditSingleChatPendingInputCommand {
+        self.clone()
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct PublishSingleChatPendingInput {
@@ -329,6 +340,17 @@ pub struct PublishSingleChatPendingInput {
 impl sealed::Sealed for PublishSingleChatPendingInput {}
 impl DomainCommand for PublishSingleChatPendingInput {
     const TYPE: &'static str = "single_chat.pending_input.publish";
+}
+
+pub(crate) trait PrivatePublishCommand: DomainCommand {
+    const OWNER: ComposerOwner;
+    fn input(&self) -> PublishSingleChatPendingInput;
+}
+impl PrivatePublishCommand for PublishSingleChatPendingInput {
+    const OWNER: ComposerOwner = ComposerOwner::SingleChat;
+    fn input(&self) -> PublishSingleChatPendingInput {
+        self.clone()
+    }
 }
 
 #[derive(Debug, Default)]
@@ -386,7 +408,11 @@ impl SingleChatService {
             return Ok(vec![]);
         }
         if matches!(C::OWNER, ComposerOwner::DelegationChild)
-            && crate::delegation_user::send_blocker(connection, &command.conversation_id)?.is_some()
+            && crate::delegation_user::original_cleanup_blocker(
+                connection,
+                &command.conversation_id,
+            )?
+            .is_some()
         {
             return Ok(vec![]);
         }
@@ -423,11 +449,11 @@ impl SingleChatService {
         )
     }
 
-    pub(crate) fn edit_source_inputs(
+    pub(crate) fn edit_source_inputs<C: PrivatePendingEditCommand>(
         database: &Database,
-        envelope: &CommandEnvelope<EditSingleChatPendingInputCommand>,
+        envelope: &CommandEnvelope<C>,
     ) -> Result<Vec<LocalAttachmentSourceRef>> {
-        let command = &envelope.payload;
+        let command = envelope.payload.input();
         if !matches!(
             command.action,
             SingleChatPendingInputEditAction::Save { .. }
@@ -437,12 +463,7 @@ impl SingleChatService {
             return Ok(vec![]);
         }
         let connection = database.connection();
-        if !crate::single_chat_composer::owner_exists(
-            connection,
-            &command.camp_id,
-            &command.conversation_id,
-            true,
-        )? {
+        if !C::OWNER.exists(connection, &command.camp_id, &command.conversation_id, true)? {
             return Ok(vec![]);
         }
         let Some((key, _)) = crate::single_chat_composer::resolve_scope(
@@ -496,11 +517,33 @@ impl SingleChatService {
         parse_source_attachments(&session.working_source_attachments_json)
     }
 
-    pub(crate) fn publish_source_inputs(
+    pub(crate) fn publish_source_inputs<C: PrivatePublishCommand>(
         database: &Database,
-        envelope: &CommandEnvelope<PublishSingleChatPendingInput>,
+        envelope: &CommandEnvelope<C>,
     ) -> Result<Vec<LocalAttachmentSourceRef>> {
-        let command = &envelope.payload;
+        let command = envelope.payload.input();
+        if matches!(C::OWNER, ComposerOwner::DelegationChild) {
+            let user = match &envelope.actor {
+                ActorRef::User { user_id } => user_id,
+                _ => return Ok(vec![]),
+            };
+            let Some(target) =
+                load_owned_target(database.connection(), &command.conversation_id, C::OWNER)?
+            else {
+                return Ok(vec![]);
+            };
+            if user != &command.user_id
+                || target.camp_id != command.camp_id
+                || envelope.camp_id.as_deref() != Some(command.camp_id.as_str())
+                || private_has_active_run(
+                    database.connection(),
+                    &command.conversation_id,
+                    C::OWNER,
+                )?
+            {
+                return Ok(vec![]);
+            }
+        }
         let Some(pending) = load_pending_input(
             database.connection(),
             &command.conversation_id,
@@ -834,7 +877,7 @@ impl SingleChatService {
                 ));
             }
             if matches!(C::OWNER, ComposerOwner::DelegationChild) {
-                if let Some(code) = crate::delegation_user::send_blocker(transaction, &target.conversation_id)? {
+                if let Some(code) = crate::delegation_user::original_cleanup_blocker(transaction, &target.conversation_id)? {
                     return Ok(CommandHandlerResult::rejected(code, json!({})));
                 }
             }
@@ -904,7 +947,7 @@ impl SingleChatService {
                     json!({"attachmentRefId":id,"message":"私聊附件源文件已变化，请重新选择文件后发送。"})));
             }
 
-            if single_chat_has_active_run(transaction, &target.conversation_id)?
+            if private_has_active_run(transaction, &target.conversation_id, C::OWNER)?
                 || single_chat_has_pending_queue(transaction, &target.conversation_id)?
             {
                 let pending_input_id = enqueue_single_chat_input(
@@ -1372,11 +1415,20 @@ impl SingleChatService {
         database: &mut Database,
         envelope: &CommandEnvelope<EditSingleChatPendingInputCommand>,
     ) -> Result<CommandExecution> {
+        self.edit_owned_pending_input(database, envelope)
+    }
+    pub(crate) fn edit_owned_pending_input<C: PrivatePendingEditCommand>(
+        &self,
+        database: &mut Database,
+        envelope: &CommandEnvelope<C>,
+    ) -> Result<CommandExecution> {
+        let command = envelope.payload.input();
+
         if let Some(execution) = self.gateway.replay_if_recorded(database, envelope)? {
             return Ok(execution);
         }
         let prepared = self.prepare_sources(|| Self::edit_source_inputs(database, envelope))?;
-        let client = &envelope.payload.draft_client;
+        let client = &command.draft_client;
         self.gateway.execute(database, envelope, |transaction| {
             if !matches!(envelope.actor, ActorRef::User { .. }) {
                 return Ok(rejected(
@@ -1384,8 +1436,7 @@ impl SingleChatService {
                     "Only the local user can edit Single Chat pending inputs",
                 ));
             }
-            let command = &envelope.payload;
-            let Some(target) = load_active_target(transaction, &command.conversation_id)? else {
+            let Some(target) = load_owned_target(transaction, &command.conversation_id, C::OWNER)? else {
                 return Ok(rejected(
                     "single_chat.not_active",
                     "Single Chat does not exist or has ended",
@@ -1399,7 +1450,7 @@ impl SingleChatService {
                     "Single Chat command is outside the Thread",
                 ));
             }
-            if !crate::single_chat_composer::owner_exists(transaction, &command.camp_id, &command.conversation_id, true)? {
+            if !C::OWNER.exists(transaction, &command.camp_id, &command.conversation_id, true)? {
                 return Ok(rejected("single_chat.not_active", "The private conversation is unavailable"));
             }
             let Some((key, registered)) = crate::single_chat_composer::resolve_scope(
@@ -1450,7 +1501,7 @@ impl SingleChatService {
                     if session.as_ref().is_some_and(|session| session.pending_input_id == command.pending_input_id) {
                         return Ok(rejected("single_chat.pending_input_edit_open", "Save or cancel this edit before returning the pending input"));
                     }
-                    let result = crate::single_chat_composer::return_pending_input(transaction, command, &key, registered,
+                    let result = crate::single_chat_composer::return_pending_input(transaction, &command, &key, registered,
                         &body, &source_attachments_json, &quotes_json, &prepared)?;
                     if result.status != crate::command::CommandResultStatus::Rejected {
                         append_domain_event(transaction, "single_chat.pending_input_updated", Some(&target.camp_id),
@@ -1724,6 +1775,15 @@ impl SingleChatService {
         database: &mut Database,
         envelope: &CommandEnvelope<PublishSingleChatPendingInput>,
     ) -> Result<CommandExecution> {
+        self.publish_owned_pending_input(database, envelope)
+    }
+    pub(crate) fn publish_owned_pending_input<C: PrivatePublishCommand>(
+        &self,
+        database: &mut Database,
+        envelope: &CommandEnvelope<C>,
+    ) -> Result<CommandExecution> {
+        let command = envelope.payload.input();
+
         if let Some(execution) = self.gateway.replay_if_recorded(database, envelope)? {
             return Ok(execution);
         }
@@ -1732,15 +1792,14 @@ impl SingleChatService {
             let ActorRef::User { user_id } = &envelope.actor else {
                 anyhow::bail!("Single Chat pending input must publish as its original user");
             };
-            let command = &envelope.payload;
             anyhow::ensure!(
                 command.user_id == *user_id,
                 "single_chat.pending_user_changed"
             );
-            let target = load_active_target(transaction, &command.conversation_id)?
+            let target = load_owned_target(transaction, &command.conversation_id, C::OWNER)?
                 .context("Single Chat pending input target is no longer active")?;
             anyhow::ensure!(
-                target.camp_id == command.camp_id,
+                target.camp_id == command.camp_id && envelope.camp_id.as_deref()==Some(command.camp_id.as_str()),
                 "single_chat.camp_mismatch"
             );
             let pending = load_pending_input(
@@ -1774,7 +1833,7 @@ impl SingleChatService {
                 || pending.state != "queued"
                 || head.as_deref() != Some(command.pending_input_id.as_str())
                 || edit_open
-                || single_chat_has_active_run(transaction, &command.conversation_id)?
+                || private_has_active_run(transaction, &command.conversation_id, C::OWNER)?
             {
                 return Ok(rejected(
                     "single_chat.pending_input_not_ready",
@@ -1783,12 +1842,13 @@ impl SingleChatService {
             }
             validate_source_attachments(&pending.source_attachments).map_err(anyhow::Error::new)?;
             if let Some(id)=crate::private_source_observation::changed_source(transaction,&command.conversation_id,&pending.source_attachments,false, &prepared)? {
-                record_pending_publish_failure_on(transaction,command,"single_chat.attachment_source_changed")?;
+                record_pending_publish_failure_on(transaction,&command,"single_chat.attachment_source_changed")?;
                 return Ok(CommandHandlerResult::rejected("single_chat.attachment_source_changed",
                     json!({"attachmentRefId":id,"message":"排队消息的附件源文件已变化，请编辑并重新选择文件。"})));
             }
             let runtime =
-                resolve_frozen_runtime(transaction, &target.conversation_id, &target.agent_id)?
+                (if matches!(C::OWNER,ComposerOwner::DelegationChild) { crate::delegation_user::followup_runtime(transaction,&target.conversation_id)? }
+                else {resolve_frozen_runtime(transaction, &target.conversation_id, &target.agent_id)?})
                     .map_err(|blocker| {
                         anyhow::anyhow!(
                             "single_chat.runtime_not_ready: {}: {}",
@@ -2318,6 +2378,12 @@ pub fn recover_pending_edit_sessions(database: &Database) -> Result<()> {
 }
 
 pub fn ready_pending_inputs(database: &Database) -> Result<Vec<PublishSingleChatPendingInput>> {
+    ready_owned_pending_inputs(database, ComposerOwner::SingleChat)
+}
+pub(crate) fn ready_owned_pending_inputs(
+    database: &Database,
+    owner: ComposerOwner,
+) -> Result<Vec<PublishSingleChatPendingInput>> {
     let mut statement = database.connection().prepare(
         r#"
         SELECT input.conversation_id, conversation.camp_id,
@@ -2325,7 +2391,7 @@ pub fn ready_pending_inputs(database: &Database) -> Result<Vec<PublishSingleChat
         FROM single_chat_pending_input AS input
         JOIN conversation ON conversation.id = input.conversation_id
         WHERE input.state = 'queued'
-          AND conversation.kind = 'single_chat'
+          AND conversation.kind = ?1
           AND conversation.ended_at IS NULL
           AND NOT EXISTS(
               SELECT 1 FROM single_chat_pending_input AS older
@@ -2341,7 +2407,7 @@ pub fn ready_pending_inputs(database: &Database) -> Result<Vec<PublishSingleChat
         "#,
     )?;
     let candidates = statement
-        .query_map([], |row| {
+        .query_map([private_conversation_kind(owner)], |row| {
             Ok(PublishSingleChatPendingInput {
                 conversation_id: row.get(0)?,
                 camp_id: row.get(1)?,
@@ -2354,9 +2420,22 @@ pub fn ready_pending_inputs(database: &Database) -> Result<Vec<PublishSingleChat
     candidates
         .into_iter()
         .filter_map(|candidate| {
-            match single_chat_has_active_run(database.connection(), &candidate.conversation_id) {
-                Ok(false) => Some(Ok(candidate)),
-                Ok(true) => None,
+            let available = (|| -> Result<bool> {
+                if matches!(owner, ComposerOwner::DelegationChild)
+                    && load_owned_target(database.connection(), &candidate.conversation_id, owner)?
+                        .is_none()
+                {
+                    return Ok(false);
+                }
+                Ok(!private_has_active_run(
+                    database.connection(),
+                    &candidate.conversation_id,
+                    owner,
+                )?)
+            })();
+            match available {
+                Ok(true) => Some(Ok(candidate)),
+                Ok(false) => None,
                 Err(error) => Some(Err(error)),
             }
         })
@@ -2396,6 +2475,21 @@ fn read_single_chat_pending_inputs(
     conversation_id: &str,
     client: &DraftClient,
     key: &PrivateComposerKey,
+) -> Result<SingleChatPendingInputsView> {
+    read_owned_pending_inputs(
+        database,
+        conversation_id,
+        client,
+        key,
+        ComposerOwner::SingleChat,
+    )
+}
+pub(crate) fn read_owned_pending_inputs(
+    database: &Database,
+    conversation_id: &str,
+    client: &DraftClient,
+    key: &PrivateComposerKey,
+    owner: ComposerOwner,
 ) -> Result<SingleChatPendingInputsView> {
     let mut statement = database.connection().prepare(
         r#"
@@ -2496,7 +2590,7 @@ fn read_single_chat_pending_inputs(
         )
         .transpose()?;
     Ok(SingleChatPendingInputsView {
-        execution_active: single_chat_has_active_run(database.connection(), conversation_id)?,
+        execution_active: private_has_active_run(database.connection(), conversation_id, owner)?,
         items,
         edit_session,
     })
@@ -2535,6 +2629,22 @@ fn consume_single_chat_draft(
     )?;
     anyhow::ensure!(updated == 1, "single_chat.draft_changed");
     Ok(())
+}
+
+fn private_has_active_run(
+    connection: &rusqlite::Connection,
+    conversation_id: &str,
+    owner: ComposerOwner,
+) -> Result<bool> {
+    match owner {
+        ComposerOwner::SingleChat => single_chat_has_active_run(connection, conversation_id),
+        ComposerOwner::DelegationChild => Ok(crate::delegation_user::original_cleanup_blocker(
+            connection,
+            conversation_id,
+        )?
+        .is_some()
+            || crate::delegation_user::user_execution_pending(connection, conversation_id)?),
+    }
 }
 
 fn single_chat_has_active_run(

@@ -397,7 +397,7 @@ fn assert_child_user_send(fixture: &mut Fixture, conversation: &str, original_ru
             .unwrap()
             .result
             .code,
-        "delegation.user_run_active"
+        "single_chat.draft_changed"
     );
     assert_eq!(
         fixture
@@ -505,4 +505,5 @@ fn assert_child_user_send(fixture: &mut Fixture, conversation: &str, original_ru
         .len(),
         1
     );
+    assert_child_user_queue(fixture,conversation,second_run);
 }
