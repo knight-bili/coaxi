@@ -1165,6 +1165,8 @@ export interface SendDelegationMessageCommand {
   expectedRevision: number
   body: string
 }
+export interface TakeoverDelegationCommand { delegationId: string; expectedControlVersion: number }
+export interface CancelDelegationCommand { delegationId: string; attemptNo: number }
 
 export type SingleChatPendingReturnPayload = {
   pendingInputId: string
@@ -4822,6 +4824,8 @@ export type CoreMethod =
   | 'singleChat.composerDraft.mutate'
   | 'delegations.composer.get'
   | 'delegations.message.send'
+  | 'delegations.takeover'
+  | 'delegations.cancel'
   | 'delegations.pendingInputs.get'
   | 'delegations.pendingInputs.edit'
   | 'delegations.composer.mutate'

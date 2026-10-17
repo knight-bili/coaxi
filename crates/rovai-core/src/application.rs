@@ -5,6 +5,7 @@ mod canvas_terminal;
 mod config;
 mod conversation_preferences;
 pub(crate) mod delegation_composer;
+pub(crate) mod delegation_control;
 pub(crate) mod delegation_input;
 mod mission;
 pub(crate) mod private_composer;
@@ -863,6 +864,8 @@ fn request_runs_outside_main_queue(method: &str) -> bool {
             | "singleChat.pendingInputs.edit"
             | "singleChat.send"
             | "delegations.message.send"
+            | "delegations.takeover"
+            | "delegations.cancel"
             | "delegations.pendingInputs.edit"
             | "delegations.composer.mutate"
             | "singleChat.end"
@@ -10567,6 +10570,21 @@ impl Core {
                     SingleChatService::for_client(request.client.clone())
                         .list_active(&database, params.camp_id.as_str())?,
                 )?)
+            }
+            "delegations.takeover" | "delegations.cancel" => {
+                let mut db = self.database.lock().await;
+                let reply =
+                    delegation_control::handle(&mut db, &request.method, request.params.clone())?;
+                drop(db);
+                if let Some((thread_id, conversation_id)) = reply.changed {
+                    self.agent_run_cancellation_notify.notify_one();
+                    emit(
+                        &self.output,
+                        "delegation.changed",
+                        json!({"threadId":thread_id,"conversationId":conversation_id}),
+                    );
+                }
+                Ok(reply.result)
             }
             "delegations.message.send" | "delegations.pendingInputs.edit" => {
                 let reply = delegation_input::handle_mutation(

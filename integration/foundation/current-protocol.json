@@ -56,6 +56,8 @@
     "singleChat.composerDraft.recovery",
     "delegations.composer.get",
     "delegations.message.send",
+    "delegations.takeover",
+    "delegations.cancel",
     "delegations.pendingInputs.get",
     "delegations.pendingInputs.edit",
     "delegations.composer.mutate",

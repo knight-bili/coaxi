@@ -113,6 +113,10 @@ pub enum Operation {
     DelegationComposerGet,
     #[serde(rename = "delegations.message.send")]
     DelegationMessageSend,
+    #[serde(rename = "delegations.takeover")]
+    DelegationTakeover,
+    #[serde(rename = "delegations.cancel")]
+    DelegationCancel,
     #[serde(rename = "delegations.pendingInputs.get")]
     DelegationPendingGet,
     #[serde(rename = "delegations.pendingInputs.edit")]
@@ -571,6 +575,8 @@ impl Operation {
             Self::SingleChatComposerRecovery => "singleChat.composerDraft.recovery",
             Self::DelegationComposerGet => "delegations.composer.get",
             Self::DelegationMessageSend => "delegations.message.send",
+            Self::DelegationTakeover => "delegations.takeover",
+            Self::DelegationCancel => "delegations.cancel",
             Self::DelegationPendingGet => "delegations.pendingInputs.get",
             Self::DelegationPendingEdit => "delegations.pendingInputs.edit",
             Self::DelegationComposerMutate => "delegations.composer.mutate",
@@ -847,6 +853,8 @@ mod tests {
         for (public, internal) in [
             ("delegations.composer.get", "delegations.composer.get"),
             ("delegations.message.send", "delegations.message.send"),
+            ("delegations.takeover", "delegations.takeover"),
+            ("delegations.cancel", "delegations.cancel"),
             (
                 "delegations.pendingInputs.get",
                 "delegations.pendingInputs.get",

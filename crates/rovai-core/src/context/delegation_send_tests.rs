@@ -1,4 +1,4 @@
-// Initial child/terminal/takeover rows are fixtures, not authenticated lifecycle proof.
+// Child creation is a fixture; User takeover now uses actual wire/Gateway/Run cancellation.
 fn assert_child_user_send(fixture: &mut Fixture, conversation: &str, original_run: &str) {
     use crate::{
         delegation_user::{self, SendDelegationMessageCommand},
@@ -52,14 +52,6 @@ fn assert_child_user_send(fixture: &mut Fixture, conversation: &str, original_ru
         },
     };
     let mut command = make();
-    fixture
-        .database
-        .connection()
-        .execute(
-            "UPDATE agent_run SET cancel_requested_at='2026-10-17T00:00:09Z',cancel_reason_code='user_takeover' WHERE id=?1",
-            [original_run],
-        )
-        .unwrap();
     assert!(
         delegation_user::send_source_inputs(&fixture.database, &command)
             .unwrap()

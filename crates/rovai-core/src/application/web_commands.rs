@@ -49,6 +49,9 @@ pub(super) fn reconcile(
         }};
     }
     match query.operation.as_str() {
+        "delegations.takeover" | "delegations.cancel" => {
+            delegation_control::reconcile(database, &query.operation, query.params)
+        }
         "delegations.message.send" | "delegations.pendingInputs.edit" => {
             delegation_input::reconcile(database, client, &query.operation, query.params)
         }

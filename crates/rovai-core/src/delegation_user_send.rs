@@ -79,18 +79,12 @@ pub(crate) fn original_cleanup_blocker(
 ) -> Result<Option<&'static str>> {
     // Only the original attempt tree participates. A separately taken-over descendant or a new
     // child created by a later User Run is outside the old parent's cancellation authority.
-    let pending:bool=connection.query_row("WITH RECURSIVE tree(id) AS (
-        SELECT d.id FROM delegation d WHERE d.child_conversation_id=?1
-        UNION ALL SELECT child.id FROM delegation child JOIN tree ON child.parent_delegation_id=tree.id
-        JOIN delegation_control control ON control.delegation_id=child.id
-        WHERE control.takeover_at IS NULL AND EXISTS(SELECT 1 FROM delegation_attempt origin
-            WHERE origin.delegation_id=tree.id AND origin.agent_run_id=child.origin_parent_run_id)
-    ) SELECT EXISTS(SELECT 1 FROM tree JOIN delegation_attempt attempt ON attempt.delegation_id=tree.id
-        JOIN agent_run run ON run.id=attempt.agent_run_id
-        WHERE run.status IN ('queued','running','waiting') OR run.runtime_recovery_required<>0
-          OR (run.cancel_requested_at IS NOT NULL AND run.cancel_acknowledged_at IS NULL)
-          OR EXISTS(SELECT 1 FROM runtime_input_delivery input WHERE input.agent_run_id=run.id
-              AND input.status IN ('prepared','delivery_unknown')))",[conversation],|r|r.get(0))?;
+    let id: String = connection.query_row(
+        "SELECT id FROM delegation WHERE child_conversation_id=?1",
+        [conversation],
+        |r| r.get(0),
+    )?;
+    let pending = crate::delegation_control::cleanup_pending(connection, &id)?;
     if pending {
         return Ok(Some("delegation.cleanup_pending"));
     }

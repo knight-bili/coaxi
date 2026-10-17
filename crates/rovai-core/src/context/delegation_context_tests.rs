@@ -1,5 +1,10 @@
 // Extends the existing materialization owner; fixture SQL is not authenticated admission.
 fn context_child(fixture: &mut Fixture, task: &str, call: &str) -> (String, String, i64) {
+    let parent=fixture.run_id.clone();
+    let epoch=fixture.execution_epoch;
+    context_child_of(fixture,&parent,epoch,task,call)
+}
+fn context_child_of(fixture: &mut Fixture, parent: &str, parent_epoch: i64, task: &str, call: &str) -> (String, String, i64) {
     let blob = ManagedBlobStore::new(&fixture.directory)
         .put_bytes(
             &mut fixture.database,
@@ -8,7 +13,7 @@ fn context_child(fixture: &mut Fixture, task: &str, call: &str) -> (String, Stri
             "sensitive",
         )
         .unwrap();
-    let (binding,generation):(String,i64)=fixture.database.connection().query_row("SELECT c.native_binding_id,c.native_binding_generation FROM agent_run r JOIN conversation c ON c.id=r.conversation_id WHERE r.id=?1",[&fixture.run_id],|r|Ok((r.get(0)?,r.get(1)?))).unwrap();
+    let (binding,generation):(String,i64)=fixture.database.connection().query_row("SELECT c.native_binding_id,c.native_binding_generation FROM agent_run r JOIN conversation c ON c.id=r.conversation_id WHERE r.id=?1",[parent],|r|Ok((r.get(0)?,r.get(1)?))).unwrap();
     let target = crate::delegation_contract::RuntimeTarget::try_from("codex".to_string()).unwrap();
     let workspace =
         json!({"executionRoot":fixture.directory,"access":"read_only","isolation":"shared"});
@@ -17,8 +22,8 @@ fn context_child(fixture: &mut Fixture, task: &str, call: &str) -> (String, Stri
     let registered = crate::delegation::register(
         &tx,
         &crate::delegation::ParentInvocation {
-            run_id: &fixture.run_id,
-            epoch: fixture.execution_epoch,
+            run_id: parent,
+            epoch: parent_epoch,
             binding_id: &binding,
             binding_generation: generation,
             tool_call_id: call,
@@ -35,7 +40,7 @@ fn context_child(fixture: &mut Fixture, task: &str, call: &str) -> (String, Stri
             crate::delegation::tests::child_with_task(
                 tx,
                 identity,
-                &fixture.run_id,
+                parent,
                 None,
                 task,
                 Some(&workspace),

@@ -47,10 +47,8 @@ fn assert_child_user_materials(fixture: &mut Fixture, id: &str, run: &str, legac
     let tx=fixture.database.connection_mut().transaction().unwrap();
     tx.execute("INSERT INTO conversation_message(id,conversation_id,sequence,author_type,author_id,body,source_agent_run_id,created_at) VALUES(?1,?2,4,'agent','agent_1',?3,?4,'2026-10-17T00:00:03Z')",params![assistant,conversation,assistant_body,run]).unwrap();
     tx.execute("UPDATE conversation SET last_message_sequence=4 WHERE id=?1",[&conversation]).unwrap();
-    tx.execute("UPDATE agent_run SET status='cancelled',ended_at='2026-10-17T00:00:04Z' WHERE id=?1",[run]).unwrap();
-    let takeover=crate::delegation::record_takeover_boundary(&tx,id,1,&Uuid::new_v4().to_string(),"2026-10-17T00:00:05Z").unwrap();
-    assert_eq!(takeover.takeover_message_sequence,Some(4));
     tx.commit().unwrap();
+    assert_child_takeover(fixture,id,run);
     let tx=fixture.database.connection_mut().transaction().unwrap();
     assert!(crate::private_source_observation::capture_sources(&tx,&conversation,std::slice::from_ref(&source),&sources).unwrap().is_none());
     tx.commit().unwrap();

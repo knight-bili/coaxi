@@ -196,10 +196,12 @@ describe('console transport', () => {
     expect(fetcher.mock.calls.filter(([, init]) => init?.body && JSON.parse(String(init.body)).operation === operation)).toHaveLength(1)
   })
 
-  it.each(['singleChat.composerDraft.mutate', 'delegations.composer.mutate', 'delegations.message.send', 'delegations.pendingInputs.edit'] as const)('keeps an unknown private card independent and settles the original promise through an explicit receipt read: %s', async operation => {
+  it.each(['singleChat.composerDraft.mutate', 'delegations.composer.mutate', 'delegations.message.send', 'delegations.pendingInputs.edit', 'delegations.takeover', 'delegations.cancel'] as const)('keeps an unknown private card independent and settles the original promise through an explicit receipt read: %s', async operation => {
     let recorded = false
     const params = (nodeId: string) => ({ commandId: newCommandId(), command:
-      operation === 'delegations.message.send' ? { conversationId: `child-${nodeId}`, expectedRevision: 0, body: `输入${nodeId}` }
+      operation === 'delegations.takeover' ? { delegationId: `child-${nodeId}`, expectedControlVersion: 1 }
+        : operation === 'delegations.cancel' ? { delegationId: `child-${nodeId}`, attemptNo: 1 }
+        : operation === 'delegations.message.send' ? { conversationId: `child-${nodeId}`, expectedRevision: 0, body: `输入${nodeId}` }
         : operation === 'delegations.pendingInputs.edit' ? { conversationId: `child-${nodeId}`, pendingInputId: `pending-${nodeId}`, expectedRevision: 1, editToken: null, action: { type: 'begin' } }
           : { threadId: 'thread', conversationId: operation === 'delegations.composer.mutate' ? `child-${nodeId}` : 'private', ...(operation === 'singleChat.composerDraft.mutate' ? { composerScope: { kind: 'canvas', boardId: 'board', nodeId } } : {}), expectedDraftRevision: 0, action: { type: 'register_scope' } } })
     const first = params('A'), second = params('B')
