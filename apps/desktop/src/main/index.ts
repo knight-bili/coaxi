@@ -338,6 +338,7 @@ const allowedMethods = new Set<CoreMethod>([
   'singleChat.end',
   'singleChat.pendingInputs.edit',
   'singleChat.composerDraft.mutate',
+  'delegations.resume',
   'delegations.list',
   'delegations.get',
   'delegations.history',

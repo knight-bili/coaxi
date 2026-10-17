@@ -111,7 +111,19 @@ CREATE TRIGGER delegation_attempt_insert BEFORE INSERT ON delegation_attempt BEG
         WHERE relation.id=NEW.delegation_id AND member.status='active'
           AND parent.ended_at IS NULL AND child.ended_at IS NULL
           AND parent_run.conversation_id=parent.id AND parent_run.execution_epoch=NEW.trigger_parent_epoch
-          AND parent_run.status IN ('running','waiting') AND parent_run.cancel_requested_at IS NULL
+          AND ((parent_run.status IN ('running','waiting') AND parent_run.cancel_requested_at IS NULL)
+            OR (NEW.kind='resume' AND EXISTS(
+                SELECT 1 FROM delegation_attempt basis JOIN event_log proof
+                  ON proof.event_type='delegation.resumed' AND proof.actor_type='user'
+                 AND proof.source_agent_run_id IS NULL AND proof.execution_epoch IS NULL
+                 AND proof.camp_id=relation.camp_id AND proof.entity_type='delegation' AND proof.entity_id=relation.id
+                 AND json_extract(proof.payload_json,'$.delegationId')=relation.id
+                 AND json_type(proof.payload_json,'$.attemptNo')='integer'
+                 AND json_extract(proof.payload_json,'$.attemptNo')=NEW.attempt_no
+                 AND json_extract(proof.payload_json,'$.agentRunId')=child_run.id
+                 AND NEW.trigger_tool_call_id='user-command:'||json_extract(proof.payload_json,'$.commandId')
+                WHERE basis.delegation_id=relation.id AND basis.attempt_no=NEW.attempt_no-1
+                  AND basis.trigger_parent_run_id=NEW.trigger_parent_run_id AND basis.trigger_parent_epoch=NEW.trigger_parent_epoch)))
           AND COALESCE(parent_run.camp_id,parent_turn.camp_id)=relation.camp_id
           AND child_run.conversation_id=child.id AND child_run.task_id IS NULL
           AND child_run.invocation_kind='delegation' AND child_run.operation_policy='delegation_child_v1'

@@ -423,6 +423,7 @@ fn assert_delegation_model_commands(
     assert_delegation_model_queries(f, binding, source, request, plan, &id, &run, &full_output);
     assert_user_delegation_queries(f, binding, source, &id, &full_output);
     assert_delegation_resume(f, binding, source, request, plan, &id, &receipt_proof);
+    assert_user_delegation_resume(f, binding, source, request, plan);
     assert_production_start(f, binding, source);
     assert_delegation_dispatch(f, binding, source, &id);
     assert_delegation_transport(f, binding, source, &id);

@@ -57,6 +57,7 @@ export const WEB_OPERATIONS = [
   'singleChat.pendingInputs.edit',
   'singleChat.composerDraft.removeAttachment',
   'singleChat.composerDraft.mutate',
+  'delegations.resume',
   'delegations.list',
   'delegations.get',
   'delegations.history',
@@ -235,7 +236,7 @@ const RECONCILABLE_COMMANDS = new Set<WebOperation>([
   'singleChat.open', 'singleChat.send', 'singleChat.end', 'singleChat.pendingInputs.edit',
   'singleChat.composerDraft.mutate',
   'delegations.composer.mutate',
-  'delegations.settings.update',
+  'delegations.settings.update', 'delegations.resume',
   'delegations.message.send', 'delegations.pendingInputs.edit',
   'delegations.takeover', 'delegations.cancel', 'delegations.conversation.end',
   'skills.import.commit',
@@ -273,7 +274,7 @@ const RECONCILABLE_COMMANDS = new Set<WebOperation>([
 ])
 
 function commandGroup(operation: WebOperation, params: unknown): string {
-  if (operation === 'delegations.takeover' || operation === 'delegations.cancel') {
+  if (operation === 'delegations.takeover' || operation === 'delegations.cancel' || operation === 'delegations.resume') {
     return JSON.stringify([operation, (params as { command?: { delegationId?: string } })?.command?.delegationId])
   }
   if (operation !== 'delegations.conversation.end' && operation !== 'singleChat.composerDraft.mutate' && operation !== 'delegations.composer.mutate' && operation !== 'delegations.message.send' && operation !== 'delegations.pendingInputs.edit' && operation !== 'singleChat.pendingInputs.edit' && operation !== 'singleChat.send') return operation
@@ -650,7 +651,7 @@ export class ConsoleClient {
     })
   }
 
-  async retryPendingCommand(operation: 'delegations.settings.update' | 'singleChat.composerDraft.mutate' | 'delegations.composer.mutate' | 'delegations.message.send' | 'delegations.pendingInputs.edit' | 'delegations.takeover' | 'delegations.cancel' | 'delegations.conversation.end' | 'singleChat.pendingInputs.edit' | 'singleChat.send', params: unknown): Promise<void> {
+  async retryPendingCommand(operation: 'delegations.resume' | 'delegations.settings.update' | 'singleChat.composerDraft.mutate' | 'delegations.composer.mutate' | 'delegations.message.send' | 'delegations.pendingInputs.edit' | 'delegations.takeover' | 'delegations.cancel' | 'delegations.conversation.end' | 'singleChat.pendingInputs.edit' | 'singleChat.send', params: unknown): Promise<void> {
     const id = params && typeof params === 'object' && 'commandId' in params ? params.commandId : undefined
     const entry = typeof id === 'string' ? this.#pending.get(id) : undefined
     if (!entry) { await this.request(operation, structuredClone(params)); return }

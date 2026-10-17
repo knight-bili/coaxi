@@ -109,6 +109,8 @@ pub enum Operation {
     SingleChatComposerMutate,
     #[serde(rename = "singleChat.composerDraft.recovery")]
     SingleChatComposerRecovery,
+    #[serde(rename = "delegations.resume")]
+    DelegationResume,
     #[serde(rename = "delegations.list")]
     DelegationList,
     #[serde(rename = "delegations.get")]
@@ -587,6 +589,7 @@ impl Operation {
             Self::SingleChatRemoveAttachment => "singleChat.composerDraft.removeAttachment",
             Self::SingleChatComposerMutate => "singleChat.composerDraft.mutate",
             Self::SingleChatComposerRecovery => "singleChat.composerDraft.recovery",
+            Self::DelegationResume => "delegations.resume",
             Self::DelegationList => "delegations.list",
             Self::DelegationGet => "delegations.get",
             Self::DelegationHistory => "delegations.history",
@@ -872,6 +875,7 @@ mod tests {
             .expect("User message withdrawal should be admitted by the Web Host");
         assert_eq!(withdraw.method(), "camp.messages.withdraw");
         for (public, internal) in [
+            ("delegations.resume", "delegations.resume"),
             ("delegations.list", "delegations.list"),
             ("delegations.get", "delegations.get"),
             ("delegations.history", "delegations.history"),

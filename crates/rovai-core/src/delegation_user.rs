@@ -1,4 +1,5 @@
 //! User-only child materials. Takeover/cleanup and execution admission remain separate commands.
+pub use crate::delegation_resume::user::ResumeDelegationCommand;
 use anyhow::{Result, ensure};
 use rusqlite::{Connection, params};
 use serde::{Deserialize, Serialize};

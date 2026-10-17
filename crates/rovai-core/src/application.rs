@@ -868,6 +868,7 @@ fn request_runs_outside_main_queue(method: &str) -> bool {
             | "delegations.takeover"
             | "delegations.cancel"
             | "delegations.settings.update"
+            | "delegations.resume"
             | "delegations.conversation.end"
             | "delegations.pendingInputs.edit"
             | "delegations.composer.mutate"
@@ -10604,6 +10605,22 @@ impl Core {
                         &self.output,
                         "delegation.settings_changed",
                         json!({"version":execution.result.payload["version"]}),
+                    );
+                }
+                Ok(serde_json::to_value(execution.result)?)
+            }
+            "delegations.resume" => {
+                let execution = delegation_queries::resume(
+                    &self.database,
+                    &self.private_source_read_capacity,
+                    request.params.clone(),
+                )
+                .await?;
+                if !execution.replayed && execution.result.code == "delegation.resumed" {
+                    emit(
+                        &self.output,
+                        "delegation.changed",
+                        json!({"threadId":execution.result.payload["threadId"],"conversationId":execution.result.payload["conversationId"]}),
                     );
                 }
                 Ok(serde_json::to_value(execution.result)?)

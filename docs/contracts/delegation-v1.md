@@ -27,7 +27,23 @@ User/model游标有独立受众，不能交叉使用。纯查询不写数据库�
 `commands.reconcile` 对此命令只核对原编号与完整原参数，不派发保存；同号改参数冲突，旧回执零写入，事件或回执存储故障整笔回滚。
 公开 `delegation.settings_changed` 仅有版本，不广播设置值。Native/Main和Web只放行已接线方法；Web丢回复后保留未知请求，明确重试须原UUID及参数。
 当前真实159库未安装委派表时查询返回 `delegation.unavailable`，设置写入保存明确拒绝，不做部分DDL安装或假写160/210标记。
-这些是已接线的后端入口；User resume、原页面、完整迁移与真实Host/Runtime验证仍按实施队列推进，不能算整项交付。
+这些是已接线的后端入口；原页面、完整迁移与真实Host/Runtime验证仍按实施队列推进，不能算整项交付。
+
+### User 恢复原任务
+
+`delegations.resume` 接 `{commandId,command:{delegationId,expectedAttemptNo,reason?}}`；reason沿批准的非空UTF-8、最多2KiB规则，不接受task、目录、Runtime或伪造父身份。
+这是独立全局User命令：先按原编号与完整参数只读恢复首次回执，再查询目标；目标后来关闭或删除不导致重派，也不要求旧模型租约仍有效。
+新工作核对确切父Conversation仍开放、Thread/成员/权限有效、原冻结资格与当前开关/深度、展示attempt未过期。父Run可已正常结束或被取消，不能因终态伪造新的活跃父Run。
+复用模型恢复的原任务Blob/初始消息摘要、原attempt取消和清理确认、accepted输入、原Runtime/Session/Binding/兼容依据、未结动作/审批/checkpoint/writer与目录检查。
+准备和目录观察分开，等待有界worker和观察文件时不持数据库锁；提交前重新核对全部状态及原请求，接管或attempt竞争拒绝。
+比较影响原任务的身份与执行事实；父会话无关消息或缓存设置的版本变化本身不使恢复失败，开关/深度及成员资格仍每次重验。
+
+保存仍复用原私有attempt工厂、控制/Conversation CAS、批准的固定继续正文和可选中断说明，不重发原输入或冷建新会话，不改旧Manifest/结果。
+User恢复保留上一attempt的持久父Run/epoch作为因果依据，trigger call为 `user-command:原UUID`；User事件与新Run/attempt在同一事务提交，事件只含稳定ID与版本。
+候选 `delegation_attempt_insert` 的模型活跃父分支保持原条件；独立User分支必须存在精确对应该Delegation、新Run、attempt、原UUID及User actor的同事务恢复事件，并核对上一attempt原父依据。
+缺少或写不下该事件仍拒绝终态父运行，回执写入失败整笔回滚。事件是Core核定的User操作事实，不能用模型输入或运行观察冒充。
+成功返回原Delegation/child、当前attempt/control version及新queued Run；公开失效只含Thread/Conversation ID。Web未知结果先核对，明确重试保留原UUID和参数，按具体Delegation分组。
+模型的恢复入口继续认证活跃父Run/Binding，不能使用User的终态父分支；实际原生恢复仍必须成功，原有禁止cold fallback的六处执行边界不变。
 
 完整批准边界见[独立变更说明](../versions/v1.73/model-context-change-native-delegation.md)。本合同区分基础实现和待接线能力，不能据此判断一期或 I04 已完成。
 

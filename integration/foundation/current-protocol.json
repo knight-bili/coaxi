@@ -54,6 +54,7 @@
     "singleChat.composerDraft.removeAttachment",
     "singleChat.composerDraft.mutate",
     "singleChat.composerDraft.recovery",
+    "delegations.resume",
     "delegations.list",
     "delegations.get",
     "delegations.history",

@@ -1166,6 +1166,7 @@ export interface SendDelegationMessageCommand {
   body: string
 }
 export interface TakeoverDelegationCommand { delegationId: string; expectedControlVersion: number }
+export interface ResumeDelegationCommand { delegationId: string; expectedAttemptNo: number; reason?: string }
 export interface CancelDelegationCommand { delegationId: string; attemptNo: number }
 export type DelegationRuntimeTarget =
   | 'antigravity' | 'claude_code' | 'cline' | 'code_buddy' | 'codex' | 'command_code'
@@ -4880,6 +4881,7 @@ export type CoreMethod =
   | 'singleChat.sourceAttachments.addFromPath'
   | 'singleChat.composerDraft.removeAttachment'
   | 'singleChat.composerDraft.mutate'
+  | 'delegations.resume'
   | 'delegations.list'
   | 'delegations.get'
   | 'delegations.history'

@@ -35,6 +35,7 @@ Builtin39/36项、六命令/四原别名、封闭输出/安全错误/证据投�
 开始记录失败不派任务；结束记录故障保住原提交和回执，started行供后续Host重启核对，不宣称自动补齐。
 User list/get/history/read、设置读取/全局CAS保存已接Core与Native/Web方法及原UUID恢复；原分页算法复用，User/model游标隔离，User可读接管后历史而父模型水位不变，原attempt结果不被后续User回复替换。
 父Run结束仍可读；设置事件仅版本，旧Run配置不重写；旧159库明确不可用，不装候选表。问题/计划等其他阻塞摘要仍待。
-下一项继续父 Run 已终态时的 User resume；真实 Host/Runtime、恢复协调和原 UI 资格仍按完整清单推进。
+User resume已编码Core/两端运输/原请求恢复：独立User授权支持父Run终态，复用原计划/Session与attempt工厂；候选owned guard凭精确同事务User事件准入，模型活跃父分支不放宽。目录worker锁外、提交重验、事件/回执完整回滚须留定向证据。
+接续完整160/210结构分类/升级、执行恢复协调、真实Host/Runtime与原UI；其他I04工作包和全部正式场景保持。
 
 依赖与客户事项以[执行计划](../../../integration/execution/i04-execution-plan.md)和[客户待办](../../../integration/execution/customer-todos.json)为准。

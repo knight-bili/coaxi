@@ -15,6 +15,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 
+#[path = "delegation_user_resume.rs"]
+pub(crate) mod user;
+
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub(crate) struct ExpectedSession {
@@ -106,7 +109,7 @@ fn prepare_on(
     let task = inv.input.task_id.as_str();
     let state = match crate::delegation::find_for_parent(connection, task, &parent.conversation)? {
         None => Preparation::Unknown,
-        Some(identity) => match load_plan(connection, identity, &parent) {
+        Some(identity) => match load_plan(connection, identity, &parent.policy, &parent.settings) {
             Ok(plan) => Preparation::Ready(Box::new(plan)),
             Err(error) => {
                 if error.chain().any(|cause| cause.is::<rusqlite::Error>()) {
@@ -126,16 +129,15 @@ fn prepare_on(
 fn load_plan(
     connection: &Connection,
     identity: Identity,
-    parent: &crate::delegation_admission::OperationAdmission,
+    policy: &crate::delegation_policy::FrozenPolicy,
+    settings: &crate::delegation_settings::DelegationSettings,
 ) -> Result<Plan> {
     ensure!(
-        parent
-            .policy
-            .allows("delegation.resume", parent.settings.enabled),
+        policy.allows("delegation.resume", settings.enabled),
         "delegation.start_disabled"
     );
     ensure!(
-        identity.depth <= i64::from(parent.policy.depth_limit.min(parent.settings.depth_limit)),
+        identity.depth <= i64::from(policy.depth_limit.min(settings.depth_limit)),
         "delegation.depth_limit"
     );
     let (attempt,control_version,taken,conversation_version,sequence,ended,session,binding,generation,installation,session_key,digest,run,epoch,status,ack,recovery,config,workspace):
@@ -293,6 +295,72 @@ fn load_plan(
     })
 }
 
+struct ResumeTrigger<'a> {
+    parent_run: &'a str,
+    parent_epoch: i64,
+    call: &'a str,
+    reason: Option<&'a str>,
+    actor: &'a ActorRef,
+    user_command: Option<&'a str>,
+}
+fn append_resume_attempt(
+    tx: &Transaction<'_>,
+    plan: &Plan,
+    trigger: &ResumeTrigger<'_>,
+    at: &str,
+) -> Result<String> {
+    let next_sequence = plan
+        .sequence
+        .checked_add(1)
+        .context("delegation.not_resumable")?;
+    ensure!(tx.execute("UPDATE delegation_control SET current_attempt_no=?2,control_version=control_version+1 WHERE delegation_id=?1 AND control_version=?3 AND takeover_at IS NULL",params![plan.identity.id,plan.attempt,plan.control_version])?==1,"delegation.control_changed");
+    ensure!(tx.execute("UPDATE conversation SET last_message_sequence=?2,version=version+1,updated_at=?4 WHERE id=?1 AND version=?3 AND ended_at IS NULL",params![plan.identity.child_conversation_id,next_sequence,plan.conversation_version,at])?==1,"delegation.conversation_changed");
+    let mut config = plan.config.clone();
+    config
+        .as_object_mut()
+        .context("delegation.invalid_config")?
+        .remove("configDigest");
+    config["conversationVersion"] = json!(plan.conversation_version + 1);
+    config["runtime"] = serde_json::to_value(&plan.runtime)?;
+    config["runtimeAdapter"] = json!(plan.runtime.adapter_kind);
+    config["provider"] = json!(plan.runtime.adapter_kind);
+    config["model"] = json!(plan.runtime.model.model_id);
+    config["delegationResume"] = serde_json::to_value(&plan.expected)?;
+    config["configDigest"] = json!(canonical_json_digest(&config)?);
+    let run = crate::delegation_factory::append_attempt(
+        tx,
+        &plan.identity,
+        include_str!("../resources/delegation-resume.txt").trim(),
+        &config,
+        &plan.runtime,
+        &plan.workspace,
+        next_sequence,
+        plan.attempt,
+        at,
+    )?;
+    if let Some(command) = trigger.user_command {
+        ensure!(
+            matches!(trigger.actor, ActorRef::User { .. })
+                && trigger.call == format!("user-command:{command}"),
+            "delegation.user_required"
+        );
+        // Same-transaction User provenance admits the historical parent basis.
+        // The SQL guard binds this event to this exact new Run and attempt.
+        crate::collaboration::append_domain_event(
+            tx,
+            "delegation.resumed",
+            Some(&plan.identity.camp_id),
+            Some(("delegation", &plan.identity.id)),
+            trigger.actor,
+            None,
+            &json!({"delegationId":plan.identity.id,"attemptNo":plan.attempt,"agentRunId":run,"commandId":command}),
+        )?;
+    }
+    tx.execute("INSERT INTO delegation_attempt(delegation_id,attempt_no,agent_run_id,trigger_parent_run_id,trigger_parent_epoch,trigger_tool_call_id,kind,interruption_reason,created_at)
+        VALUES(?1,?2,?3,?4,?5,?6,'resume',?7,?8)",params![plan.identity.id,plan.attempt,run,trigger.parent_run,trigger.parent_epoch,trigger.call,trigger.reason,at])?;
+    Ok(run)
+}
+
 impl PreparedResume {
     pub(crate) fn observe_directory(&self) -> DirectoryObservation {
         let (plan, error) = match &self.state {
@@ -363,37 +431,19 @@ impl PreparedResume {
         }
         tx.execute_batch("SAVEPOINT delegation_resume;")?;
         let result = (|| -> Result<CommandHandlerResult> {
-            let next_sequence = plan
-                .sequence
-                .checked_add(1)
-                .context("delegation.not_resumable")?;
-            ensure!(tx.execute("UPDATE delegation_control SET current_attempt_no=?2,control_version=control_version+1 WHERE delegation_id=?1 AND control_version=?3 AND takeover_at IS NULL",params![self.task,plan.attempt,plan.control_version])?==1,"delegation.control_changed");
-            ensure!(tx.execute("UPDATE conversation SET last_message_sequence=?2,version=version+1,updated_at=?4 WHERE id=?1 AND version=?3 AND ended_at IS NULL",params![plan.identity.child_conversation_id,next_sequence,plan.conversation_version,at])?==1,"delegation.conversation_changed");
-            let mut config = plan.config.clone();
-            config
-                .as_object_mut()
-                .context("delegation.invalid_config")?
-                .remove("configDigest");
-            config["conversationVersion"] = json!(plan.conversation_version + 1);
-            config["runtime"] = serde_json::to_value(&plan.runtime)?;
-            config["runtimeAdapter"] = json!(plan.runtime.adapter_kind);
-            config["provider"] = json!(plan.runtime.adapter_kind);
-            config["model"] = json!(plan.runtime.model.model_id);
-            config["delegationResume"] = serde_json::to_value(&plan.expected)?;
-            config["configDigest"] = json!(canonical_json_digest(&config)?);
-            let run = crate::delegation_factory::append_attempt(
+            let run = append_resume_attempt(
                 tx,
-                &plan.identity,
-                include_str!("../resources/delegation-resume.txt").trim(),
-                &config,
-                &plan.runtime,
-                &plan.workspace,
-                next_sequence,
-                plan.attempt,
+                plan,
+                &ResumeTrigger {
+                    parent_run: &inv.source.agent_run_id,
+                    parent_epoch: inv.source.execution_epoch,
+                    call: inv.tool_call,
+                    reason: inv.input.reason.as_ref().map(|r| r.as_str()),
+                    actor,
+                    user_command: None,
+                },
                 at,
             )?;
-            tx.execute("INSERT INTO delegation_attempt(delegation_id,attempt_no,agent_run_id,trigger_parent_run_id,trigger_parent_epoch,trigger_tool_call_id,kind,interruption_reason,created_at)
-                VALUES(?1,?2,?3,?4,?5,?6,'resume',?7,?8)",params![self.task,plan.attempt,run,inv.source.agent_run_id,inv.source.execution_epoch,inv.tool_call,inv.input.reason.as_ref().map(|r|r.as_str()),at])?;
             let report =
                 crate::delegation_model_command::task_report(tx, &self.task, &self.parent)?;
             crate::collaboration::append_domain_event(

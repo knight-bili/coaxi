@@ -9050,6 +9050,7 @@ mod slow_tests {
     include!("context/delegation_transport_tests.rs");
     include!("context/delegation_evidence_tests.rs");
     include!("context/delegation_user_query_tests.rs");
+    include!("context/delegation_user_resume_tests.rs");
     use crate::{
         agent_profile::{
             AdapterCapabilitySnapshot, AdapterKind, AdapterPermissionConfig, AgentProfileService,
