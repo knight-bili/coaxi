@@ -983,6 +983,10 @@ export type PrivateAttachmentUploadTarget = {
   conversationId: string
   composerScope?: SingleChatComposerScope | null
 } | {
+  kind: 'delegation_child'
+  conversationId: string
+  composerScope?: SingleChatComposerScope | null
+} | {
   kind: 'single_chat_pending'
   conversationId: string
   composerScope?: SingleChatComposerScope | null
@@ -1016,6 +1020,7 @@ export type PrivateAttachmentPreparationResult = {
 }
 
 export interface PrivateAttachmentPreparationOwner {
+  conversationKind?: 'single_chat' | 'delegation_child'
   threadId: string
   conversationId: string
   composerScope: SingleChatComposerScope | null
@@ -1530,6 +1535,9 @@ export type LocalAttachmentOwnerLocator =
   | { owner: 'single_chat_scoped_composer'; threadId: string; conversationId: string; composerScope: SingleChatComposerScope; attachmentRefId: string }
   | { owner: 'single_chat_scoped_pending_edit'; threadId: string; conversationId: string; composerScope: SingleChatComposerScope; pendingInputId: string; editToken: string; attachmentRefId: string }
   | { owner: 'single_chat_retained'; threadId: string; conversationId: string; composerScope: SingleChatComposerScope | null; retainedInputId: string; attachmentRefId: string }
+  | { owner: 'delegation_child_composer'; threadId: string; conversationId: string; composerScope: SingleChatComposerScope | null; attachmentRefId: string }
+  | { owner: 'delegation_child_retained'; threadId: string; conversationId: string; composerScope: SingleChatComposerScope | null; retainedInputId: string; attachmentRefId: string }
+  | { owner: 'delegation_child_message'; threadId: string; conversationId: string; conversationMessageId: string; attachmentRefId: string }
   | { owner: 'composer'; threadId: string; attachmentRefId: string }
   | { owner: 'pending'; threadId: string; pendingInputId: string; attachmentRefId: string }
   | {

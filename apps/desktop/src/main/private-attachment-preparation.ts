@@ -198,11 +198,12 @@ export class PrivateAttachmentPreparations {
   async list(value: unknown): Promise<Array<{
     request: PrivateAttachmentPreparationRequest; displayName: string; state: Entry['phase']
   }>> {
-    if (!object(value) || !fields(value, ['threadId', 'conversationId', 'composerScope'])) return fail()
+    if (!object(value) || !fields(value, ['threadId', 'conversationId', 'composerScope', ...(Object.hasOwn(value, 'conversationKind') ? ['conversationKind'] : [])])
+      || (Object.hasOwn(value, 'conversationKind') && value.conversationKind !== 'single_chat' && value.conversationKind !== 'delegation_child')) return fail()
     const owner = value as unknown as PrivateAttachmentPreparationOwner
     const identity = parsePrivatePreparation({ commandId: '00000000-0000-4000-8000-000000000000',
       threadId: owner.threadId, expectedRevision: 0,
-      target: { kind: 'single_chat', conversationId: owner.conversationId, composerScope: owner.composerScope } })
+      target: { kind: owner.conversationKind ?? 'single_chat', conversationId: owner.conversationId, composerScope: owner.composerScope } })
     let names: string[]
     try { names = await readdir(this.#root) } catch (error) {
       if (object(error) && error.code === 'ENOENT') return []
@@ -215,6 +216,7 @@ export class PrivateAttachmentPreparations {
       if (!isAttachmentId(id)) return fail()
       const entry = await this.#read(id)
       if (entry?.request.threadId === identity.threadId && entry.request.target.conversationId === identity.target.conversationId
+        && (entry.request.target.kind === 'delegation_child') === (identity.target.kind === 'delegation_child')
         && isDeepStrictEqual(entry.request.target.composerScope, identity.target.composerScope)) {
         results.push({ request: entry.request, displayName: entry.source.displayName, state: entry.phase })
       }

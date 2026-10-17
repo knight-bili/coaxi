@@ -445,7 +445,10 @@ pub fn legacy_attachment_belongs_to_owner(
             params![camp_id, message_id, attachment_ref_id],
             |row| row.get(0),
         )?,
-        LocalAttachmentOwnerLocator::Pending { .. }
+        LocalAttachmentOwnerLocator::DelegationChildComposer {..}
+        | LocalAttachmentOwnerLocator::DelegationChildRetained {..}
+        | LocalAttachmentOwnerLocator::DelegationChildMessage {..}
+        | LocalAttachmentOwnerLocator::Pending { .. }
         | LocalAttachmentOwnerLocator::PendingEdit { .. }
         | LocalAttachmentOwnerLocator::Mission { .. }
         | LocalAttachmentOwnerLocator::SingleChatComposer { .. }

@@ -2,6 +2,7 @@ import { isThreadId, type LocalAttachmentOwnerLocator, type SingleChatComposerSc
 
 export type PrivateAttachmentLocator = Extract<LocalAttachmentOwnerLocator, {
   owner: 'single_chat_scoped_composer' | 'single_chat_scoped_pending_edit' | 'single_chat_retained'
+    | 'delegation_child_composer' | 'delegation_child_retained' | 'delegation_child_message'
 }>
 const object = (value: unknown): value is Record<string, unknown> => Boolean(value && typeof value === 'object' && !Array.isArray(value))
 const id = (value: unknown): value is string => typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(value)
@@ -14,6 +15,22 @@ function scope(value: unknown): SingleChatComposerScope {
 
 /** 只解析位置；可信编辑端和实际材料归属仍由 Core 核对。旧 owner 不在此升级或改写。 */
 export function parsePrivateAttachmentLocator(value: unknown): PrivateAttachmentLocator | null {
+  if (object(value) && ['delegation_child_composer', 'delegation_child_retained', 'delegation_child_message'].includes(String(value.owner))) {
+    const baseFields = ['owner', 'threadId', 'conversationId', 'attachmentRefId']
+    if (!isThreadId(value.threadId) || !id(value.conversationId) || !id(value.attachmentRefId)) return invalid()
+    const base = { threadId: value.threadId, conversationId: value.conversationId, attachmentRefId: value.attachmentRefId }
+    if (value.owner === 'delegation_child_message') {
+      if (!fields(value, [...baseFields, 'conversationMessageId']) || !id(value.conversationMessageId)) return invalid()
+      return { ...base, owner: value.owner, conversationMessageId: value.conversationMessageId }
+    }
+    const position = value.composerScope === null ? null : scope(value.composerScope)
+    if (value.owner === 'delegation_child_composer') {
+      if (!fields(value, [...baseFields, 'composerScope'])) return invalid()
+      return { ...base, owner: value.owner, composerScope: position }
+    }
+    if (!fields(value, [...baseFields, 'composerScope', 'retainedInputId']) || !id(value.retainedInputId)) return invalid()
+    return { ...base, owner: 'delegation_child_retained', composerScope: position, retainedInputId: value.retainedInputId }
+  }
   if (object(value) && ['single_chat_composer', 'single_chat_pending_edit', 'single_chat_pending', 'single_chat_message'].includes(String(value.owner))
     && ['composerScope', 'scopeKey', 'clientId'].some(key => Object.hasOwn(value, key))) return invalid()
   if (!object(value) || !['single_chat_scoped_composer', 'single_chat_scoped_pending_edit', 'single_chat_retained'].includes(String(value.owner))) return null
@@ -33,6 +50,12 @@ export function parsePrivateAttachmentLocator(value: unknown): PrivateAttachment
 }
 
 export function privateAttachmentOwnerKey(locator: LocalAttachmentOwnerLocator): string | null {
+  if (locator.owner === 'delegation_child_message') return JSON.stringify([locator.owner, locator.threadId, locator.conversationId, locator.conversationMessageId])
+  if (locator.owner === 'delegation_child_composer' || locator.owner === 'delegation_child_retained') {
+    return JSON.stringify([locator.owner, locator.threadId, locator.conversationId,
+      locator.composerScope ? [locator.composerScope.boardId, locator.composerScope.nodeId] : null,
+      locator.owner === 'delegation_child_retained' ? locator.retainedInputId : null])
+  }
   if (locator.owner !== 'single_chat_scoped_composer' && locator.owner !== 'single_chat_scoped_pending_edit' && locator.owner !== 'single_chat_retained') return null
   const position = locator.composerScope ? [locator.composerScope.boardId, locator.composerScope.nodeId] : null
   return JSON.stringify([locator.owner, locator.threadId, locator.conversationId, position,

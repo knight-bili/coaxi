@@ -139,7 +139,7 @@ pub(crate) enum ComposerOwner {
 }
 
 impl ComposerOwner {
-    fn exists(
+    pub(crate) fn exists(
         self,
         connection: &Connection,
         thread: &str,
@@ -591,24 +591,43 @@ pub(crate) fn bind_uploaded_source(
     intent: &crate::web_upload::UploadIntent,
     source: LocalAttachmentSourceRef,
 ) -> Result<()> {
-    let (conversation, scope, pending) = match &intent.target {
+    let (conversation, scope, pending, owner) = match &intent.target {
         crate::web_upload::UploadTarget::SingleChat {
             conversation_id,
             composer_scope: Some(scope),
-        } => (conversation_id, scope, None),
+        } => (
+            conversation_id,
+            Some(scope),
+            None,
+            ComposerOwner::SingleChat,
+        ),
         crate::web_upload::UploadTarget::SingleChatPending {
             conversation_id,
             pending_input_id,
             edit_token,
             composer_scope: Some(scope),
-        } => (conversation_id, scope, Some((pending_input_id, edit_token))),
+        } => (
+            conversation_id,
+            Some(scope),
+            Some((pending_input_id, edit_token)),
+            ComposerOwner::SingleChat,
+        ),
+        crate::web_upload::UploadTarget::DelegationChild {
+            conversation_id,
+            composer_scope,
+        } => (
+            conversation_id,
+            composer_scope.as_ref(),
+            None,
+            ComposerOwner::DelegationChild,
+        ),
         _ => anyhow::bail!("single_chat.scope_required"),
     };
     ensure!(
-        owner_exists(tx, &intent.camp_id, conversation, true)?,
-        "single_chat.not_active"
+        owner.exists(tx, &intent.camp_id, conversation, true)?,
+        owner.unavailable()
     );
-    let (key, registered) = resolve_scope(tx, &intent.camp_id, conversation, client, Some(scope))?
+    let (key, registered) = resolve_scope(tx, &intent.camp_id, conversation, client, scope)?
         .context("single_chat.scope_unavailable")?;
     crate::local_attachment_source::validate_source_attachment(&source)
         .map_err(anyhow::Error::new)?;
@@ -664,7 +683,7 @@ pub(crate) fn bind_uploaded_source(
         );
         refs.push(source);
         draft.source_json = serialize_source_attachments(&refs)?;
-        register(tx, conversation, client, Some(scope), &key, registered)?;
+        register(tx, conversation, client, scope, &key, registered)?;
         draft.store(tx, conversation, client, &key)?;
     }
     Ok(())

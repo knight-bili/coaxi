@@ -377,6 +377,7 @@ fn receipt_response(value: serde_json::Value, empty_state: &str) -> Response {
 fn project_upload(intent: &UploadIntent, value: serde_json::Value) -> serde_json::Value {
     use rovai_core::web_upload::UploadTarget;
     let operation = match intent.target {
+        UploadTarget::DelegationChild { .. } => operations::Operation::DelegationComposerGet,
         UploadTarget::Camp => return value,
         UploadTarget::SingleChat { .. } | UploadTarget::SingleChatPending { .. } => {
             operations::Operation::SingleChatGet

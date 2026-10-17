@@ -94,6 +94,23 @@ const owner = (item: PrivateAttachmentPreparationRequest) => ({
 })
 
 describe('Native 私聊上传原请求恢复', () => {
+  it('子会话独立列出原请求，重启只核对原回执且不串入普通私聊', async () => {
+    const f = await fixture(), input = request()
+    input.target = { kind: 'delegation_child', conversationId: ids[1] }
+    f.core.mode = 'lost'
+    expect(await f.service.prepare(input, { ...metadata, sourcePath: f.sourcePath })).toMatchObject({ state: 'recorded' })
+    const restored = new PrivateAttachmentPreparations(f.directory, f.core)
+    expect(await restored.list(owner(input))).toEqual([])
+    const entries = await restored.list({ ...owner(input), conversationKind: 'delegation_child' })
+    expect(entries).toMatchObject([{ request: input, state: 'recorded' }])
+    expect(JSON.stringify(entries)).not.toContain(f.sourcePath)
+    const binds = f.core.binds
+    await unlink(f.sourcePath)
+    expect(await restored.reconcile(input)).toMatchObject({ state: 'recorded', receipt: { status: 'applied' } })
+    expect(f.core.binds).toBe(binds)
+    await expect(restored.reconcile({ ...input, target: { ...input.target, kind: 'single_chat' } })).rejects.toThrow()
+  })
+
   it('没有原文件也能查明旧意图拒绝，不再观察或绑定文件', async () => {
     const f = await fixture(), input = request()
     f.core.mode = 'unknown'

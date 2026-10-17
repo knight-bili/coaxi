@@ -7523,7 +7523,12 @@ impl Core {
             }
             "host.upload.observe" => {
                 let client = request.client.clone();
-                let params = serde_json::from_value(request.params.clone())?;
+                let params: rovai_core::web_upload::NativeUploadPreparation =
+                    serde_json::from_value(request.params.clone())?;
+                {
+                    let database = self.database.lock().await;
+                    rovai_core::web_upload::preflight_child_native(&database, &client, &params)?;
+                }
                 private_sources::worker(&self.private_source_read_capacity, move || {
                     rovai_core::web_upload::observe_native(&client, params)
                 })
@@ -7565,8 +7570,28 @@ impl Core {
                 )
                 .await?;
                 let database = self.database.lock().await;
+                let draft = if matches!(
+                    params.intent.target,
+                    rovai_core::web_upload::UploadTarget::DelegationChild { .. }
+                ) {
+                    // The saved receipt remains authoritative if this optional projection is no longer available.
+                    rovai_core::web_upload::snapshot(
+                        &database,
+                        &self.data_dir,
+                        &request.client,
+                        &params.intent,
+                    )
+                    .unwrap_or(Value::Null)
+                } else {
+                    rovai_core::web_upload::snapshot(
+                        &database,
+                        &self.data_dir,
+                        &request.client,
+                        &params.intent,
+                    )?
+                };
                 Ok(
-                    json!({"receipt":execution.result, "replayed":execution.replayed, "draft":rovai_core::web_upload::snapshot(&database, &self.data_dir, &request.client, &params.intent)?}),
+                    json!({"receipt":execution.result, "replayed":execution.replayed, "draft":draft}),
                 )
             }
             "host.upload.receipt" => {

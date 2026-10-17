@@ -39,7 +39,8 @@ export class PrivateUploadController {
   constructor(private readonly api: Api, owner: PrivateAttachmentPreparationOwner, target: PrivateAttachmentUploadTarget) {
     this.owner = structuredClone(owner)
     this.target = structuredClone(target)
-    if (owner.conversationId !== target.conversationId || scopeKey(owner.composerScope) !== scopeKey(target.composerScope)) throw failure('private_upload.context_changed')
+    if (owner.conversationId !== target.conversationId || scopeKey(owner.composerScope) !== scopeKey(target.composerScope)
+      || (owner.conversationKind === 'delegation_child') !== (target.kind === 'delegation_child')) throw failure('private_upload.context_changed')
     this.supported = Boolean(api.prepareInput && api.reconcileInput && api.retryInput && api.pendingPreparations)
   }
   getSnapshot = (): PrivateUploadState => this.state
@@ -155,7 +156,8 @@ export class PrivateUploadController {
 
 const controllers = new WeakMap<Api, Map<string, PrivateUploadController>>()
 export function privateUploadController(api: Api, owner: PrivateAttachmentPreparationOwner, target: PrivateAttachmentUploadTarget): PrivateUploadController {
-  if (owner.conversationId !== target.conversationId || scopeKey(owner.composerScope) !== scopeKey(target.composerScope)) throw failure('private_upload.context_changed')
+  if (owner.conversationId !== target.conversationId || scopeKey(owner.composerScope) !== scopeKey(target.composerScope)
+    || (owner.conversationKind === 'delegation_child') !== (target.kind === 'delegation_child')) throw failure('private_upload.context_changed')
   let entries = controllers.get(api)
   if (!entries) { entries = new Map(); controllers.set(api, entries) }
   const key = `${owner.threadId}:${targetKey(target)}`

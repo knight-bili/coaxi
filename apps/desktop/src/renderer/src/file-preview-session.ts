@@ -198,6 +198,9 @@ export function filePreviewSourceKey(request: OpenFilePreviewRequest): string {
     case 'attachment': {
       const locator = request.locator
       switch (locator.owner) {
+        case 'delegation_child_composer':
+        case 'delegation_child_retained':
+        case 'delegation_child_message':
         case 'single_chat_scoped_composer':
         case 'single_chat_scoped_pending_edit':
         case 'single_chat_retained':

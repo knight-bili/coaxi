@@ -21,6 +21,7 @@ fn assert_child_user_materials(fixture: &mut Fixture, id: &str, run: &str, legac
     let client=DraftClient::default();
     let conversation:String=fixture.database.connection().query_row(
         "SELECT child_conversation_id FROM delegation WHERE id=?1",[id],|r|r.get(0)).unwrap();
+    assert_child_upload_gate(fixture, &conversation);
     let foreign:String=fixture.database.connection().query_row(
         "SELECT conversation_id FROM agent_run WHERE id=?1",[legacy_run],|r|r.get(0)).unwrap();
     let reader=json!({"conversationId":conversation});
@@ -153,4 +154,5 @@ fn assert_child_user_materials(fixture: &mut Fixture, id: &str, run: &str, legac
     let adopt=child_material_command(fixture,&web,&conversation,4,json!({"type":"adopt_legacy_materials","expectedSourceRevision":4,"targetBody":""}));
     assert_eq!(delegation_user::mutate_draft(&mut fixture.database,&adopt).unwrap().result.code,"single_chat.scope_must_differ");
     assert_eq!(crate::application::delegation_composer::handle(&fixture.database,&client,"delegations.composer.get",reader).unwrap(),latest);
+    assert_child_upload_sources(fixture, &conversation);
 }

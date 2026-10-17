@@ -129,6 +129,16 @@ pub(crate) fn install_identity_schema(tx: &Transaction<'_>) -> Result<()> {
             "kind='single_chat'",
             "(kind='single_chat' OR (kind='delegation_child' AND EXISTS(SELECT 1 FROM delegation d JOIN delegation_control control ON control.delegation_id=d.id WHERE d.child_conversation_id=conversation.id AND control.takeover_at IS NOT NULL AND control.takeover_message_sequence IS NOT NULL)))",
         ),
+        (
+            "conversation_message_single_chat_attachment_insert_guard",
+            "conversation.kind = 'single_chat'",
+            "(conversation.kind = 'single_chat' OR (conversation.kind='delegation_child' AND EXISTS(SELECT 1 FROM delegation d JOIN delegation_control control ON control.delegation_id=d.id WHERE d.child_conversation_id=conversation.id AND control.takeover_at IS NOT NULL AND control.takeover_message_sequence IS NOT NULL)))",
+        ),
+        (
+            "conversation_message_single_chat_attachment_update_guard",
+            "conversation.kind = 'single_chat'",
+            "(conversation.kind = 'single_chat' OR (conversation.kind='delegation_child' AND EXISTS(SELECT 1 FROM delegation d JOIN delegation_control control ON control.delegation_id=d.id WHERE d.child_conversation_id=conversation.id AND control.takeover_at IS NOT NULL AND control.takeover_message_sequence IS NOT NULL)))",
+        ),
     ] {
         let original: String = tx.query_row(
             "SELECT sql FROM sqlite_schema WHERE type='trigger' AND name=?1",

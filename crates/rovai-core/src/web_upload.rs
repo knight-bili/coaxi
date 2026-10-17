@@ -111,6 +111,16 @@ pub struct UploadIntent {
 pub enum UploadTarget {
     #[default]
     Camp,
+    DelegationChild {
+        #[serde(rename = "conversationId")]
+        conversation_id: String,
+        #[serde(
+            rename = "composerScope",
+            default,
+            skip_serializing_if = "Option::is_none"
+        )]
+        composer_scope: Option<crate::single_chat_composer_scope::SingleChatComposerScope>,
+    },
     SingleChat {
         #[serde(rename = "conversationId")]
         conversation_id: String,
@@ -149,6 +159,19 @@ pub fn snapshot(
     intent: &UploadIntent,
 ) -> Result<serde_json::Value> {
     match &intent.target {
+        UploadTarget::DelegationChild {
+            conversation_id,
+            composer_scope,
+        } => Ok(serde_json::to_value(crate::delegation_user::read_draft(
+            database,
+            &ActorRef::User {
+                user_id: crate::current_user::CURRENT_USER_ID.into(),
+            },
+            client,
+            &intent.camp_id,
+            conversation_id,
+            composer_scope.as_ref(),
+        )?)?),
         UploadTarget::Camp => {
             let recorded = reconcile(database, client, intent.clone())?
                 .ok_or_else(|| anyhow::anyhow!("upload receipt is missing"))?;
@@ -376,7 +399,8 @@ pub(crate) fn bind_with_prepared(
                 );
             }
             UploadTarget::SingleChat { composer_scope: Some(_), .. }
-            | UploadTarget::SingleChatPending { composer_scope: Some(_), .. } => {
+            | UploadTarget::SingleChatPending { composer_scope: Some(_), .. }
+            | UploadTarget::DelegationChild { .. } => {
                 crate::single_chat_composer::bind_uploaded_source(transaction, client, intent, source.clone())?;
             }
             UploadTarget::SingleChat { conversation_id, composer_scope: None } => {
@@ -385,7 +409,8 @@ pub(crate) fn bind_with_prepared(
             }
             UploadTarget::SingleChatPending { conversation_id, pending_input_id, edit_token, composer_scope: None } => crate::single_chat::SingleChatService::for_client(client.clone()).commit_pending_source_attachment_in_transaction(transaction, &intent.camp_id, conversation_id, pending_input_id, intent.expected_revision, edit_token, source.clone(), prepared)?,
         }
-        if let UploadTarget::SingleChat { conversation_id, .. } | UploadTarget::SingleChatPending { conversation_id, .. } = &intent.target {
+        if let UploadTarget::SingleChat { conversation_id, .. } | UploadTarget::SingleChatPending { conversation_id, .. }
+            | UploadTarget::DelegationChild { conversation_id, .. } = &intent.target {
             crate::private_source_observation::capture_upload(transaction,conversation_id,&source,&intent.sha256,intent.byte_size, prepared)?;
         }
         let payload = if matches!(intent.target, UploadTarget::Camp) {
@@ -404,12 +429,70 @@ fn private_binding_rejection(
     client: &DraftClient,
     intent: &UploadIntent,
 ) -> Result<Option<CommandHandlerResult>> {
-    let (conversation, scope, pending) = match &intent.target {
+    private_target_rejection(
+        transaction,
+        client,
+        &intent.target,
+        &intent.camp_id,
+        intent.expected_revision,
+        &intent.command_id,
+    )
+}
+
+// Called before Native file observation, then revalidated by the binding transaction.
+pub fn preflight_child_native(
+    database: &Database,
+    client: &DraftClient,
+    params: &NativeUploadPreparation,
+) -> Result<()> {
+    if matches!(params.target, UploadTarget::DelegationChild { .. }) {
+        ensure!(
+            client.is_desktop(),
+            "native upload requires the desktop editor"
+        );
+        if let Some(rejected) = private_target_rejection(
+            database.connection(),
+            client,
+            &params.target,
+            &params.camp_id,
+            params.expected_revision,
+            &params.command_id,
+        )? {
+            anyhow::bail!(rejected.code);
+        }
+    }
+    Ok(())
+}
+
+fn private_target_rejection(
+    transaction: &rusqlite::Connection,
+    client: &DraftClient,
+    target: &UploadTarget,
+    camp_id: &str,
+    expected_revision: i64,
+    command_id: &str,
+) -> Result<Option<CommandHandlerResult>> {
+    use crate::single_chat_composer::ComposerOwner;
+    let (conversation, scope, pending, owner) = match target {
         UploadTarget::Camp => return Ok(None),
+        UploadTarget::DelegationChild {
+            conversation_id,
+            composer_scope,
+        } => (
+            conversation_id,
+            composer_scope.as_ref(),
+            None,
+            ComposerOwner::DelegationChild,
+        ),
         UploadTarget::SingleChat {
             conversation_id,
             composer_scope,
-        } => (conversation_id, composer_scope.as_ref(), None),
+        } => (
+            conversation_id,
+            composer_scope.as_ref(),
+            None,
+            ComposerOwner::SingleChat,
+        ),
         UploadTarget::SingleChatPending {
             conversation_id,
             composer_scope,
@@ -419,16 +502,22 @@ fn private_binding_rejection(
             conversation_id,
             composer_scope.as_ref(),
             Some((pending_input_id, edit_token)),
+            ComposerOwner::SingleChat,
         ),
     };
     let rejected = |code| Some(CommandHandlerResult::rejected(code, json!({})));
-    if !crate::single_chat_composer::owner_exists(transaction, &intent.camp_id, conversation, true)?
-    {
-        return Ok(rejected("single_chat.not_active"));
+    if !owner.exists(transaction, camp_id, conversation, true)? {
+        return Ok(rejected(
+            if matches!(owner, ComposerOwner::DelegationChild) {
+                "delegation.not_user_controlled"
+            } else {
+                "single_chat.not_active"
+            },
+        ));
     }
     let Some((key, _)) = crate::single_chat_composer::resolve_scope(
         transaction,
-        &intent.camp_id,
+        camp_id,
         conversation,
         client,
         scope,
@@ -443,7 +532,7 @@ fn private_binding_rejection(
              WHERE e.conversation_id=?1 AND e.client_id=?2 AND e.scope_key=?3 AND e.pending_input_id=?4
                AND e.edit_token=?5 AND e.base_pending_revision=?6 AND e.recovery_required=0
                AND p.revision=?6 AND p.state IN ('queued','needs_repair')",
-            rusqlite::params![conversation,client.id(),key.sql_key(),pending_id,token,intent.expected_revision], |row| row.get(0),
+            rusqlite::params![conversation,client.id(),key.sql_key(),pending_id,token,expected_revision], |row| row.get(0),
         ).optional()?;
         let Some(working) = working else {
             return Ok(rejected("single_chat.pending_input_edit_fenced"));
@@ -456,7 +545,7 @@ fn private_binding_rejection(
             client,
             &key,
         )?;
-        if draft.revision != intent.expected_revision {
+        if draft.revision != expected_revision {
             return Ok(Some(CommandHandlerResult::rejected(
                 "single_chat.draft_changed",
                 json!({"currentRevision":draft.revision}),
@@ -467,7 +556,7 @@ fn private_binding_rejection(
     if refs.len() >= crate::camp_attachment::MAX_PREPARED_ATTACHMENTS {
         return Ok(rejected("attachment_count_exceeded"));
     }
-    if refs.iter().any(|source| source.id == intent.command_id) {
+    if refs.iter().any(|source| source.id == command_id) {
         return Ok(rejected("attachment_reference_conflict"));
     }
     Ok(None)

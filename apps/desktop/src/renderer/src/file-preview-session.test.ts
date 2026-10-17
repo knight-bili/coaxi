@@ -24,6 +24,21 @@ function snapshot(fileName: string): FilePreviewSessionSnapshot {
 }
 
 describe('file preview session identity', () => {
+  it('keeps child draft, retained and published message previews separate from ordinary private previews', () => {
+    const base = { threadId: 'thread', conversationId: 'conversation', attachmentRefId: 'file', composerScope: null }
+    const key = (locator: import('@contracts').LocalAttachmentOwnerLocator) => filePreviewSourceKey({ kind: 'attachment', threadId: base.threadId, locator })
+    const child = { ...base, owner: 'delegation_child_composer' as const }
+    const keys = [
+      key(child), key({ ...child, conversationId: 'other-child' }),
+      key({ ...child, composerScope: { kind: 'canvas', boardId: 'board', nodeId: 'node' } }),
+      key({ ...base, owner: 'delegation_child_retained', retainedInputId: 'retained' }),
+      key({ threadId: base.threadId, conversationId: base.conversationId, attachmentRefId: base.attachmentRefId,
+        owner: 'delegation_child_message', conversationMessageId: 'message' }),
+      key({ ...base, owner: 'single_chat_retained', retainedInputId: 'retained' })
+    ]
+    expect(new Set(keys).size).toBe(keys.length)
+    expect(keys.every(value => value.startsWith('attachment:'))).toBe(true)
+  })
   it('keeps private card, pending lease and retained input resources distinct', () => {
     const scope = { kind: 'canvas' as const, boardId: 'board', nodeId: 'card-a' }
     const base = { threadId: 'thread', conversationId: 'conversation', attachmentRefId: 'file', composerScope: scope }

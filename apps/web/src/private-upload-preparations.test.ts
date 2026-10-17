@@ -64,6 +64,25 @@ async function fixture(capability = true, lifecycle = false) {
 }
 
 describe('Web 私聊文件原请求与重选', () => {
+  it('子会话刷新仍绑定原目标，普通私聊列表不收取子会话上传', async () => {
+    const f = await fixture(true, true), input = request()
+    input.target = { kind: 'delegation_child', conversationId: ids[1] }
+    const api = f.client.privateUploadPreparations(f.storage)
+    expect(await api.prepareInput(input, file())).toMatchObject({ state: 'unknown' })
+    const restored = f.client.privateUploadPreparations(f.storage)
+    const childOwner = { threadId: input.threadId, conversationId: ids[1], composerScope: null, conversationKind: 'delegation_child' as const }
+    expect(await restored.pendingPreparations({ ...childOwner, conversationKind: 'single_chat' })).toEqual([])
+    expect(await restored.pendingPreparations(childOwner)).toMatchObject([{ request: input, state: 'unknown' }])
+    expect(await restored.reconcileInput(input)).toMatchObject({ state: 'unknown' })
+    expect(f.posts).toHaveLength(1)
+    const original = structuredClone(f.posts[0].intent)
+    await expect(restored.retryInput(input, file('other'))).rejects.toThrow('source_changed')
+    f.mode('success')
+    expect(await restored.retryInput(input, file())).toMatchObject({ state: 'recorded' })
+    expect(f.posts.map(post => post.intent)).toEqual([original, original])
+    f.client.clear()
+  })
+
   it('新能力先用原意图判断失效，无字节也能取得真实拒绝', async () => {
     const f = await fixture(true, true), api = f.client.privateUploadPreparations(f.storage)
     await api.prepareInput(request(), file())

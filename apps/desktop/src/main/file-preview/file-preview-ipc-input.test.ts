@@ -26,7 +26,12 @@ it.each([
   { ...privateBase, owner: 'single_chat_scoped_composer' },
   { ...privateBase, owner: 'single_chat_scoped_pending_edit', pendingInputId: '44444444-4444-4444-8444-444444444444', editToken: '55555555-5555-4555-8555-555555555555' },
   { ...privateBase, owner: 'single_chat_retained', retainedInputId: '44444444-4444-4444-8444-444444444444' },
-  { ...privateBase, owner: 'single_chat_retained', composerScope: null, retainedInputId: '44444444-4444-4444-8444-444444444444' }
+  { ...privateBase, owner: 'single_chat_retained', composerScope: null, retainedInputId: '44444444-4444-4444-8444-444444444444' },
+  { ...privateBase, owner: 'delegation_child_composer' },
+  { ...privateBase, owner: 'delegation_child_composer', composerScope: null },
+  { ...privateBase, owner: 'delegation_child_retained', composerScope: null, retainedInputId: '44444444-4444-4444-8444-444444444444' },
+  { owner: 'delegation_child_message', threadId: privateBase.threadId, conversationId: privateBase.conversationId,
+    attachmentRefId: privateBase.attachmentRefId, conversationMessageId: '44444444-4444-4444-8444-444444444444' }
 ])('preserves the full $owner identity through open and restore parsing', locator => {
   const request = { kind: 'attachment', threadId: privateBase.threadId, locator }
   expect(parseOpenFilePreviewRequest(request)).toEqual(request)
@@ -41,6 +46,9 @@ it('rejects malformed scope, forged owners and attempted legacy scope stripping'
     expect(() => parseOpenFilePreviewRequest({ ...request, locator: { ...request.locator, composerScope } })).toThrow()
   }
   expect(() => parseOpenFilePreviewRequest({ ...request, locator: { ...request.locator, owner: 'single_chat_composer' } })).toThrow()
+  const child = { ...request, locator: { ...privateBase, owner: 'delegation_child_composer', composerScope: null } }
+  expect(() => parseOpenFilePreviewRequest({ ...child, locator: { ...child.locator, sourcePath: 'C:/private.txt' } })).toThrow()
+  expect(() => parseOpenFilePreviewRequest({ ...child, locator: { ...child.locator, composerScope: undefined } })).toThrow()
 })
 
 describe('parseOpenFilePreviewRequest', () => {

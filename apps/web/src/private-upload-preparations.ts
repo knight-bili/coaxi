@@ -154,11 +154,13 @@ export class BrowserPrivateUploadPreparations {
   }
   async pendingPreparations(owner: PrivateAttachmentPreparationOwner): Promise<Array<{ request: Request; displayName: string; state: 'prepared' | 'unknown' | 'recorded' }>> {
     this.transport.guard()
-    if (!object(owner) || !fields(owner, ['threadId', 'conversationId', 'composerScope'])) return invalid()
+    if (!object(owner) || !fields(owner, ['threadId', 'conversationId', 'composerScope', ...(Object.hasOwn(owner, 'conversationKind') ? ['conversationKind'] : [])])
+      || (Object.hasOwn(owner, 'conversationKind') && owner.conversationKind !== 'single_chat' && owner.conversationKind !== 'delegation_child')) return invalid()
     const canonical = parsePrivatePreparation({ commandId: '00000000-0000-4000-8000-000000000000', threadId: owner.threadId,
-      expectedRevision: 0, target: { kind: 'single_chat', conversationId: owner.conversationId, composerScope: owner.composerScope } })
+      expectedRevision: 0, target: { kind: owner.conversationKind ?? 'single_chat', conversationId: owner.conversationId, composerScope: owner.composerScope } })
     return Object.values(this.entries()).filter(entry => entry.phase !== 'rejected' && entry.request.threadId === canonical.threadId
       && entry.request.target.conversationId === canonical.target.conversationId
+      && (entry.request.target.kind === 'delegation_child') === (canonical.target.kind === 'delegation_child')
       && equal(entry.request.target.composerScope ?? null, canonical.target.composerScope ?? null))
       .map(entry => ({ request: structuredClone(entry.request), displayName: entry.intent.displayName, state: entry.phase as 'prepared' | 'unknown' | 'recorded' }))
   }

@@ -60,6 +60,30 @@ pub(crate) fn material_owner_exists(
     )?)
 }
 
+// Published User-message sources can be inspected before takeover; draft and retained input cannot.
+pub(crate) fn conversation_owner_exists(
+    connection: &Connection,
+    thread: &str,
+    conversation: &str,
+) -> Result<bool> {
+    let installed: bool = connection.query_row(
+        "SELECT EXISTS(SELECT 1 FROM sqlite_schema WHERE type='table' AND name='delegation')",
+        [],
+        |r| r.get(0),
+    )?;
+    if !installed {
+        return Ok(false);
+    }
+    Ok(connection.query_row(
+        "SELECT EXISTS(SELECT 1 FROM conversation c JOIN camp ON camp.id=c.camp_id
+        JOIN delegation d ON d.child_conversation_id=c.id WHERE c.id=?1 AND c.camp_id=?2
+        AND c.kind='delegation_child' AND d.camp_id=c.camp_id AND d.owner_agent_id=c.agent_id
+        AND camp.deletion_operation_id IS NULL)",
+        params![conversation, thread],
+        |r| r.get(0),
+    )?)
+}
+
 pub fn read_draft(
     database: &Database,
     actor: &ActorRef,

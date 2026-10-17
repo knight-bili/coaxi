@@ -13,7 +13,7 @@ export function parsePrivatePreparation(value: unknown): PrivateAttachmentPrepar
     || !Number.isSafeInteger(value.expectedRevision) || Number(value.expectedRevision) < 0 || !object(value.target)) return fail()
   const target = value.target
   const pending = target.kind === 'single_chat_pending'
-  if ((target.kind !== 'single_chat' && !pending) || !isAttachmentId(target.conversationId)
+  if ((target.kind !== 'single_chat' && target.kind !== 'delegation_child' && !pending) || !isAttachmentId(target.conversationId)
     || !fields(target, ['kind', 'conversationId', 'composerScope', ...(pending ? ['pendingInputId', 'editToken'] : [])],
       ['kind', 'conversationId', ...(pending ? ['pendingInputId', 'editToken'] : [])])
     || (pending && (!isAttachmentId(target.pendingInputId) || !isAttachmentId(target.editToken)))) return fail()

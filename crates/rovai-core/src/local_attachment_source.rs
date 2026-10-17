@@ -119,6 +119,38 @@ impl LocalAttachmentSourceRef {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "owner", rename_all = "snake_case", deny_unknown_fields)]
 pub enum LocalAttachmentOwnerLocator {
+    DelegationChildComposer {
+        #[serde(rename = "threadId", alias = "campId")]
+        camp_id: String,
+        #[serde(rename = "conversationId")]
+        conversation_id: String,
+        #[serde(rename = "composerScope")]
+        composer_scope: Option<crate::single_chat_composer_scope::SingleChatComposerScope>,
+        #[serde(rename = "attachmentRefId")]
+        attachment_ref_id: String,
+    },
+    DelegationChildRetained {
+        #[serde(rename = "threadId", alias = "campId")]
+        camp_id: String,
+        #[serde(rename = "conversationId")]
+        conversation_id: String,
+        #[serde(rename = "composerScope")]
+        composer_scope: Option<crate::single_chat_composer_scope::SingleChatComposerScope>,
+        #[serde(rename = "retainedInputId")]
+        retained_input_id: String,
+        #[serde(rename = "attachmentRefId")]
+        attachment_ref_id: String,
+    },
+    DelegationChildMessage {
+        #[serde(rename = "threadId", alias = "campId")]
+        camp_id: String,
+        #[serde(rename = "conversationId")]
+        conversation_id: String,
+        #[serde(rename = "conversationMessageId")]
+        conversation_message_id: String,
+        #[serde(rename = "attachmentRefId")]
+        attachment_ref_id: String,
+    },
     Composer {
         #[serde(rename = "threadId", alias = "campId")]
         camp_id: String,
@@ -240,7 +272,10 @@ pub enum LocalAttachmentOwnerLocator {
 impl LocalAttachmentOwnerLocator {
     pub fn camp_id(&self) -> &str {
         match self {
-            Self::Composer { camp_id, .. }
+            Self::DelegationChildComposer { camp_id, .. }
+            | Self::DelegationChildRetained { camp_id, .. }
+            | Self::DelegationChildMessage { camp_id, .. }
+            | Self::Composer { camp_id, .. }
             | Self::Pending { camp_id, .. }
             | Self::PendingEdit { camp_id, .. }
             | Self::Message { camp_id, .. }
@@ -257,7 +292,16 @@ impl LocalAttachmentOwnerLocator {
 
     pub fn attachment_ref_id(&self) -> &str {
         match self {
-            Self::Composer {
+            Self::DelegationChildComposer {
+                attachment_ref_id, ..
+            }
+            | Self::DelegationChildRetained {
+                attachment_ref_id, ..
+            }
+            | Self::DelegationChildMessage {
+                attachment_ref_id, ..
+            }
+            | Self::Composer {
                 attachment_ref_id, ..
             }
             | Self::Pending {
@@ -562,6 +606,23 @@ pub fn load_source_attachment_for_client(
 ) -> Result<Option<LocalAttachmentSourceRef>> {
     let connection = database.connection();
     let json = match locator {
+        LocalAttachmentOwnerLocator::DelegationChildComposer { camp_id, conversation_id, composer_scope, .. } => {
+            if !crate::delegation_user::material_owner_exists(connection,camp_id,conversation_id,false)? {return Ok(None);}
+            let key=crate::single_chat_composer_scope::PrivateComposerKey::for_scope(composer_scope.as_ref())?;
+            connection.query_row("SELECT source_attachments_json FROM single_chat_composer_draft
+                WHERE conversation_id=?1 AND client_id=?2 AND scope_key=?3",params![conversation_id,client.id(),key.sql_key()],|r|r.get::<_,String>(0)).optional()?
+        }
+        LocalAttachmentOwnerLocator::DelegationChildRetained { camp_id, conversation_id, composer_scope, retained_input_id, .. } => {
+            if !crate::delegation_user::material_owner_exists(connection,camp_id,conversation_id,false)? {return Ok(None);}
+            let key=crate::single_chat_composer_scope::PrivateComposerKey::for_scope(composer_scope.as_ref())?;
+            connection.query_row("SELECT source_attachments_json FROM single_chat_retained_input
+                WHERE conversation_id=?1 AND client_id=?2 AND scope_key=?3 AND id=?4",params![conversation_id,client.id(),key.sql_key(),retained_input_id],|r|r.get::<_,String>(0)).optional()?
+        }
+        LocalAttachmentOwnerLocator::DelegationChildMessage { camp_id, conversation_id, conversation_message_id, .. } => {
+            if !crate::delegation_user::conversation_owner_exists(connection,camp_id,conversation_id)? {return Ok(None);}
+            connection.query_row("SELECT source_attachments_json FROM conversation_message
+                WHERE conversation_id=?1 AND id=?2 AND author_type='user'",params![conversation_id,conversation_message_id],|r|r.get::<_,String>(0)).optional()?
+        }
         LocalAttachmentOwnerLocator::Composer { camp_id, .. } => connection
             .query_row(
                 "SELECT source_attachments_json FROM camp_composer_draft WHERE camp_id = ?1 AND client_id = ?2",

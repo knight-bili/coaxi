@@ -32,6 +32,15 @@ function fixture(records = new Map<string, PrivateAttachmentPreparationRequest>(
 }
 
 describe('私聊文件原请求共享控制器', () => {
+  it('子会话目标须与 owner 类型一致，即使控制器已经缓存也拒绝混用', () => {
+    const f = fixture(), child = { ...target, kind: 'delegation_child' as const }
+    const childOwner = { ...owner, conversationKind: 'delegation_child' as const }
+    const controller = privateUploadController(f.api, childOwner, child)
+    expect(controller.target).toEqual(child)
+    expect(privateUploadController(f.api, childOwner, child)).toBe(controller)
+    expect(() => privateUploadController(f.api, owner, child)).toThrow('context_changed')
+    expect(() => new PrivateUploadController(f.api, childOwner, target)).toThrow('context_changed')
+  })
   it('结束准备先查原结果，重复点击合并，只采纳真实终结回执', async () => {
     const f = fixture()
     const finish = vi.fn(async (input: PrivateAttachmentPreparationRequest) => {
