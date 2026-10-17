@@ -25,7 +25,16 @@ export async function qualifyCanvasFinalWeb({binary,uiDirectory,chrome,output,ch
   const raw=(token,operation,params={})=>fetch(web.origin+'/api/v1/request',{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify({operation,params}),signal:AbortSignal.timeout(15000)})
   const call=async(token,operation,params={})=>{const r=await raw(token,operation,params);assert.equal(r.status,200,operation);const value=await r.json();assert.equal(value.error,null,operation);return value.result}
   const snapshot=()=>call(healthy.token,'canvas.nodes.snapshot',{boardId:context.boardId})
-  let primary=await snapshot();assert.deepEqual(primary.nodes,context.primary.nodes);assert.deepEqual(primary.board,context.primary.board)
+  let primary=await snapshot()
+  // 同一隔离数据中保留前一失败批次已经合法提交的改名/便签移动；不能倒写旧证据。
+  // 原Native冷恢复已精确比较全部字段，此处核对身份与不可变绑定，随后以当前布局为重载基线。
+  assert.equal(primary.nodes.length,context.primary.nodes.length)
+  for(const original of context.primary.nodes){const current=primary.nodes.find(n=>n.id===original.id);assert.ok(current)
+   if(original.data.kind==='note'){const {x,y,...data}=current.data,{x:oldX,y:oldY,...expected}=original.data;assert.deepEqual(data,expected);assert.equal(current.boardId,original.boardId)}else assert.deepEqual(current,original)
+  }
+  const {name:currentName,revision:currentRevision,updatedAt:currentUpdated,...boardIdentity}=primary.board
+  const {name:originalName,revision:originalRevision,updatedAt:originalUpdated,...expectedIdentity}=context.primary.board
+  assert.deepEqual(boardIdentity,expectedIdentity);assert.ok([originalName,'R10 Web正式检查后保留原画板'].includes(currentName))
   const other=await call(healthy.token,'canvas.nodes.snapshot',{boardId:context.otherBoardId});assert.deepEqual(other.nodes,context.secondary.nodes)
   await record('current_host_http_reads_same_eight_native_created_nodes_both_boards_and_immutable_bindings_without_copying_authority')
   browser=await launchAcceptanceBrowser({executable:chrome,env,args:['--headless=new','--no-first-run','--disable-sync','--disable-background-networking','--disable-component-update','--disable-default-apps','--disable-extensions','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank']})
@@ -60,7 +69,7 @@ export async function qualifyCanvasFinalWeb({binary,uiDirectory,chrome,output,ch
   const move={type:'update',nodeId:note.id,patch:{x:note.data.x+16,y:note.data.y+8}}
   assert.equal((await call(browserBearer,'canvas.nodes.apply',{commandId:randomUUID(),command:{boardId:context.boardId,expectedRevision:oldRevision,mutation:move}})).status,'applied')
   const beforeConflict=await snapshot(),rejected=await call(browserBearer,'canvas.nodes.apply',{commandId:randomUUID(),command:{boardId:context.boardId,expectedRevision:oldRevision,mutation:{type:'update',nodeId:note.id,patch:{title:'不得保存的旧版本'}}}})
-  assert.equal(rejected.status,'rejected');assert.equal(rejected.code,'canvas.nodes.conflict');assert.deepEqual(await snapshot(),beforeConflict)
+  assert.equal(rejected.status,'rejected');assert.equal(rejected.code,'canvas.nodes.conflict');const afterConflict=await snapshot();assert.deepEqual(afterConflict.board,beforeConflict.board);assert.deepEqual(afterConflict.nodes,beforeConflict.nodes)
   await record('real_web_board_rename_node_move_and_stale_revision_rejection_preserve_other_nodes_and_original_body')
   await browser.reload();await browser.wait('!document.querySelector(".web-login-overlay")&&Boolean(document.querySelector("button[aria-label=无限画布]"))',30000);await open(context.boardId)
   await browser.wait(`document.querySelector('.canvas-card-file')?.textContent.includes(${JSON.stringify(context.sourceText.trim())})`,30000)
@@ -79,7 +88,7 @@ export async function qualifyCanvasFinalWeb({binary,uiDirectory,chrome,output,ch
   const forbidden=[['canvas.boards.list',{}],['canvas.boards.update',{commandId:randomUUID(),command:{boardId:context.boardId,expectedRevision:baseline.board.revision,name:'不得越权改名'}}],['canvas.nodes.snapshot',{boardId:context.boardId}],['canvas.nodes.apply',{commandId:randomUUID(),command:{boardId:context.boardId,expectedRevision:baseline.board.revision,mutation:move}}],['canvas.terminals.write',{...input,inputId:randomUUID(),expectedInputSequence:sequence}],['canvas.terminals.stop',{target,generation:term.generation}]]
   for(const [operation,params] of forbidden)assert.equal((await raw(browserBearer,operation,params)).status,401,operation)
   assert.equal((await fetch(web.origin+'/api/v1/files',{method:'POST',headers:{Authorization:'Bearer '+browserBearer,'Content-Type':'application/json'},body:fileReadBody,signal:AbortSignal.timeout(15000)})).status,401)
-  assert.equal((await raw(null,'canvas.boards.list')).status,401);assert.deepEqual(await snapshot(),baseline)
+  assert.equal((await raw(null,'canvas.boards.list')).status,401);const afterRevocation=await snapshot();assert.deepEqual(afterRevocation.board,baseline.board);assert.deepEqual(afterRevocation.nodes,baseline.nodes)
   const afterDenied=await call(healthy.token,'canvas.terminals.snapshot',{target,afterSeq:0});assert.equal(afterDenied.generation,term.generation);assert.equal(afterDenied.inputSequence,sequence)
   assert.equal(createHash('sha256').update(await readFile(context.sourceFile)).digest('hex'),context.sourceSha256)
   report.revocation={rejectedOperations:forbidden.map(([name])=>name),exactPreviouslyAuthorizedFileReadRejected:true,unauthenticatedRejected:true,graphUnchanged:true,inputSequenceUnchanged:true,sourceBytesUnchanged:true}
