@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "stage": "I04",
+  "task": "I04-T01",
+  "checked_at": "2026-10-17T03:53:31.698075+00:00",
+  "status": "codex_explicit_receiver_evidence_locally_verified_other_formats_and_viewer_pending",
+  "implementation_commit": "4e13b45ae5bbe33d77a0abc0b7d3f0777583df66",
+  "previous_goal_turn": {
+    "classification": "progress",
+    "evidence": "16ebc1140000e9bb4073822f46cd602e2635a5bf"
+  },
+  "problem": "Core识别Codex协作工具事件，但公开Evidence投影原先丢弃接收会话编号和报告状态。",
+  "implementation": {
+    "authority": "rovai-core existing Execution Evidence service",
+    "event_types": [
+      "activity.started",
+      "activity.completed"
+    ],
+    "frozen_adapter": "codex-cli",
+    "native_item_type": "collabAgentToolCall",
+    "field": "nativeSubagents",
+    "field_schema_version": 1,
+    "relationship": "runtime_reported_receiver; not a Core delegation or child AgentRun",
+    "read_surface": "existing user agentRunEvidence.getContent scoped to the owning Thread",
+    "receiver_limit": 64,
+    "status": "only observed structured status; missing/unrecognized is unknown, never inherited from parent tool completion",
+    "identity": "non-empty ASCII identifier at most 256 bytes; letters, digits, hyphen and underscore; exclude the sender and duplicates",
+    "omission": "exact unique valid receiver count and omittedReceiverCount; existing bounded preview may additionally defer full payload",
+    "excluded": [
+      "child task",
+      "child report",
+      "raw native path",
+      "provider private metadata",
+      "unlisted state-map entries"
+    ],
+    "schema": 159,
+    "migration": 209,
+    "data_contract": "v1.72",
+    "schema_changed": false,
+    "model_input_changed": false,
+    "new_model_tools": 0,
+    "new_native_session_read_api": false,
+    "renderer_changed": false
+  },
+  "checks": {
+    "core_existing_owners": {
+      "listed": 17,
+      "passed": 17,
+      "failed": 0,
+      "new_test_owners": 0,
+      "fixture": "isolated actual SQLite and Context, no Runtime"
+    },
+    "boundaries": [
+      "frozen adapter and explicit event shape",
+      "sender and event Thread consistency",
+      "duplicate/self/path/type rejection",
+      "64-reference cap and omission count",
+      "unknown child status does not become completed",
+      "existing Evidence content read and wrong Camp rejection",
+      "original event replay",
+      "stale epoch and cancellation fences",
+      "native observation does not enter materialized model context"
+    ],
+    "first_compile": "test used Value.payload incorrectly; corrected to actual existing Value API",
+    "first_test_run": {
+      "passed": 16,
+      "failed": 1,
+      "cause": "new evidence occupies sequence 13, prior later tool result expected literal 13; now explicitly assert native sequence and preserve later relative order and replay assertions"
+    },
+    "final_rust_format": "passed",
+    "diff_check": "passed",
+    "documentation_version": "passed_v1.72",
+    "decision_governance": "passed_require_base_16ebc114",
+    "scaffold": "passed",
+    "foundation": "passed_source_contract_and_fixture_consistency_only",
+    "codegraph_sync": "passed"
+  },
+  "remaining": [
+    "newer Codex native-team activity protocol and Grok native extension observation, verified against actual producer shapes",
+    "read-only native transcript lookup with Core-derived exact reference and parent ownership; never accept arbitrary local path or session capability",
+    "reuse Codeg native session drawer and card, preserve parent readability, refresh/error/late response behavior, and compare actual running UI",
+    "real Runtime, full integration, platform and all 84 I04 formal cases",
+    "specific independent-helper r1 confirmation before its separate model semantics, business relations or Schema changes"
+  ],
+  "scope": {
+    "feature_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_work_packages": 4,
+    "i04_feature_clusters": 21,
+    "i04_formal_cases": 84,
+    "new_formal_passes": 0
+  },
+  "actual_runtime": "not_run",
+  "complete_viewer": "not_implemented_by_this_slice",
+  "build_package": "not_run",
+  "push": "not_run",
+  "actions": "not_triggered",
+  "main_merge": "not_run",
+  "paid_model_requests": 0,
+  "source": {
+    "codeg_commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+    "map": "../inventory/delegation-source-map.md",
+    "runtime_root_filter": "unchanged"
+  },
+  "log_sha256": {
+    "native-subagents-core-list-fixed.log": "ad41d4145ba37ddc31d5d91c63cbeac453b6fab63e3dae4a75cd09d11d18711d",
+    "native-subagents-core-list.log": "5205dc338a45f83e2a06e162586e2db6612d9153bc090779f9cf5eea92e2ca01",
+    "native-subagents-core-test-fixed.log": "bae14aaade55798d89fbfee8085abfafb4248b21918489ebe54c8d8c0556d184",
+    "native-subagents-core-test.log": "6d03e6260c27bf933a55db127a1a754c5b133b35b5a9313edd22e590af08572c",
+    "native-subagents-doc-decisions.log": "d58168f462b9dd5bd281a72af820169f9a7e92d02aa34b1c51c5aef9e29aa77e",
+    "native-subagents-doc-version.log": "01dbc9daf44dff0600954e17b82ec917ad4998a3eb5eefa32505c4ca15a8552d",
+    "native-subagents-foundation.log": "044569df112d191be31ea876439bd2bd3294beb8d9fa469452c1bcc1ea893695",
+    "native-subagents-scaffold.log": "01288a06b7440b08c394c6da77c7750da896b58e4bc599c2e110eb1820be4b08",
+    "native-subagents-sync.log": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+  },
+  "source_sha256": "395055ed46b21ea2877bd890da160708516e59880a8055241c02ba7ae4619617"
+}
