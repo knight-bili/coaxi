@@ -1287,6 +1287,33 @@ mod tests {
     };
     use std::process::{Command, Stdio};
 
+    fn fresh_authority_database_at(directory: &Path) -> Database {
+        prepare_private_directory(directory).unwrap();
+        let database = crate::test_support::fresh_schema_database_fast_at(directory);
+        // Historical backup recovery reads a native private file. Copy only the
+        // closed fixture's bytes into that file; CopyFile also copies its ACL.
+        #[cfg(windows)]
+        let database = {
+            drop(database);
+            let path = directory.join("rovai.sqlite");
+            let copied = directory.join("template.test-copy");
+            std::fs::rename(&path, &copied).unwrap();
+            {
+                let mut source = std::fs::File::open(&copied).unwrap();
+                let mut destination = create_private_new_file(&path).unwrap();
+                std::io::copy(&mut source, &mut destination).unwrap();
+                destination.sync_all().unwrap();
+            }
+            std::fs::remove_file(copied).unwrap();
+            Database::open_verified_test_clone(
+                directory,
+                crate::db::TestDatabaseOpenMode::FastIsolated,
+            )
+            .unwrap()
+        };
+        database
+    }
+
     #[test]
     fn manifest_paths_reject_parent_traversal() {
         assert!(is_leaf("rovai.sqlite"));
@@ -1298,6 +1325,7 @@ mod tests {
     #[test]
     fn supported_database_is_migrated_in_place_and_readmitted_without_snapshots() {
         for source in [
+            "delegation_v159",
             "v115",
             "channel_v125",
             "main_pending",
@@ -1315,7 +1343,7 @@ mod tests {
         ] {
             let directory = std::env::temp_dir()
                 .join(format!("rovai-authority-migration-test-{}", Uuid::new_v4()));
-            let mut database = crate::test_support::fresh_schema_database_fast_at(&directory);
+            let mut database = fresh_authority_database_at(&directory);
             database
                 .connection()
                 .execute(
@@ -1330,7 +1358,17 @@ mod tests {
             INSERT INTO camp_composer_draft(camp_id, body, structured_content_json, revision, created_at, updated_at, expires_at)
             VALUES ('camp-join', 'kept draft', '[{"kind":"text","text":"kept draft"}]', 7, datetime('now'), datetime('now'), datetime('now', '+1 day'));
         "#).unwrap();
-            if source == "message_quotes_v148" {
+            if source == "delegation_v159" {
+                crate::db::delegation::downgrade_for_test(database.connection());
+                database
+                    .connection()
+                    .execute_batch(
+                        "UPDATE schema_migration SET applied_at='retained-209' WHERE version=209;
+                     CREATE TRIGGER reject_210 BEFORE INSERT ON schema_migration
+                     WHEN NEW.version=210 BEGIN SELECT RAISE(ABORT,'injected 210 failure'); END;",
+                    )
+                    .unwrap();
+            } else if source == "message_quotes_v148" {
                 crate::db::downgrade_current_schema_to_v147_source_for_test(database.connection());
             } else if source == "pi_edit_diff_v147" {
                 crate::db::downgrade_current_schema_to_v146_source_for_test(database.connection());
@@ -1368,7 +1406,7 @@ mod tests {
                         )
                         .unwrap();
                 }
-                "scheduled_automation_v145" => {}
+                "scheduled_automation_v145" | "delegation_v159" => {}
                 "pi_edit_diff_v147" | "message_quotes_v148" => {}
                 "deployed_tool_v141" => {
                     crate::db::downgrade_current_schema_to_v140_source_for_test(
@@ -1452,6 +1490,56 @@ mod tests {
             let original_identity =
                 crate::core_data_dir_lock::FilesystemObjectIdentity::observe(&source_path).unwrap();
             let lease = CoreDataDirLease::acquire(&directory).unwrap();
+            if source == "delegation_v159" {
+                let AdmissionAssessment::RequiresMigration(ticket) =
+                    DatabaseAdmission::assess(&lease).unwrap()
+                else {
+                    panic!("exact159 must produce an upgrade ticket");
+                };
+                let error = match AuthorityMigrationRunner::run(
+                    *ticket,
+                    &runtime_root,
+                    &runtime_root_identity,
+                ) {
+                    Err(error) => error,
+                    Ok(_) => panic!("210 receipt failure must abort the whole step"),
+                };
+                assert_eq!(error.code(), "authority_migration_schema_failed");
+                assert!(!error.retryable());
+                let connection = Connection::open_with_flags(
+                    &source_path,
+                    OpenFlags::SQLITE_OPEN_READ_WRITE | OpenFlags::SQLITE_OPEN_NOFOLLOW,
+                )
+                .unwrap();
+                assert!(matches!(
+                    classify_database_contract(&connection).unwrap(),
+                    DatabaseContractClassification::SupportedMigrationSource(ref marker)
+                        if marker.contract_version == "v1.72" && marker.projection_schema_version == 159
+                ));
+                assert_eq!(
+                    connection
+                        .query_row("SELECT MAX(version) FROM schema_migration", [], |row| row
+                            .get::<_, i64>(
+                            0
+                        ),)
+                        .unwrap(),
+                    209
+                );
+                assert!(!connection.table_exists(None, "delegation").unwrap());
+                assert_eq!(connection.query_row(
+                    "SELECT body, revision FROM camp_composer_draft WHERE camp_id='camp-join'",
+                    [], |row| Ok((row.get::<_, String>(0)?, row.get::<_, i64>(1)?)),
+                ).unwrap(), ("kept draft".into(), 7));
+                assert_eq!(
+                    original_identity,
+                    crate::core_data_dir_lock::FilesystemObjectIdentity::observe(&source_path)
+                        .unwrap()
+                );
+                assert!(!directory.join(MIGRATION_BACKUP_ROOT).exists());
+                assert!(!directory.join(AUTHORITY_MIGRATION_MANIFEST_FILE).exists());
+                connection.execute_batch("DROP TRIGGER reject_210").unwrap();
+                drop(connection);
+            }
             let AdmissionAssessment::RequiresMigration(ticket) =
                 DatabaseAdmission::assess(&lease).unwrap()
             else {
@@ -1505,9 +1593,26 @@ mod tests {
                     .query_row("SELECT COUNT(*) FROM camp_composer_draft", [], |row| row
                         .get::<_, i64>(0))
                     .unwrap(),
-                0,
+                i64::from(source == "delegation_v159"),
                 "{source}: v1.60 must clean-break legacy Camp drafts"
             );
+            if source == "delegation_v159" {
+                assert_eq!(
+                    migrated
+                        .connection()
+                        .query_row(
+                            "SELECT applied_at FROM schema_migration WHERE version=209",
+                            [],
+                            |row| row.get::<_, String>(0),
+                        )
+                        .unwrap(),
+                    "retained-209"
+                );
+                assert_eq!(migrated.connection().query_row(
+                    "SELECT body, revision FROM camp_composer_draft WHERE camp_id='camp-join'", [],
+                    |row| Ok((row.get::<_, String>(0)?, row.get::<_, i64>(1)?)),
+                ).unwrap(), ("kept draft".into(), 7));
+            }
             if source == "channel_v125" {
                 let credential: (String, i64) = migrated.connection().query_row(
                 "SELECT payload_json, revision FROM channel_credentials WHERE credential_ref = 'fixture-ref'",
@@ -1580,6 +1685,25 @@ mod tests {
             }));
 
             drop(migrated);
+            if source == "delegation_v159" {
+                let AdmissionAssessment::AdmittedExisting(ticket) =
+                    DatabaseAdmission::assess(&lease).unwrap()
+                else {
+                    panic!("completed210 must be readmitted as current without another upgrade");
+                };
+                let reopened = Database::open_admitted_with_runtime_camp_files_root(
+                    *ticket,
+                    &runtime_root,
+                    &runtime_root_identity,
+                )
+                .unwrap();
+                crate::test_support::assert_production_database_configuration(&reopened);
+                assert!(matches!(
+                    classify_database_contract(reopened.connection()).unwrap(),
+                    DatabaseContractClassification::Current(_)
+                ));
+                drop(reopened);
+            }
             drop(lease);
             std::fs::remove_dir_all(directory).unwrap();
         }
@@ -1592,7 +1716,7 @@ mod tests {
 
         let directory =
             std::env::temp_dir().join(format!("rovai-migration-provenance-{}", Uuid::new_v4()));
-        let database = crate::test_support::fresh_schema_database_fast_at(&directory);
+        let database = fresh_authority_database_at(&directory);
         database
             .connection()
             .execute(
@@ -1669,7 +1793,7 @@ mod tests {
     fn failed_step_rolls_back_its_ddl_and_resumes_after_the_last_receipt() {
         let directory =
             std::env::temp_dir().join(format!("rovai-migration-step-failure-{}", Uuid::new_v4()));
-        let database = crate::test_support::fresh_schema_database_fast_at(&directory);
+        let database = fresh_authority_database_at(&directory);
         crate::db::downgrade_current_schema_to_v125_source_for_test(database.connection());
         // Upgrades must not replay fresh-install DDL outside a versioned step.
         database
@@ -1759,7 +1883,7 @@ mod tests {
         ] {
             let directory =
                 std::env::temp_dir().join(format!("rovai-migration-path-fence-{}", Uuid::new_v4()));
-            let database = crate::test_support::fresh_schema_database_fast_at(&directory);
+            let database = fresh_authority_database_at(&directory);
             crate::db::downgrade_current_schema_to_v128_source_for_test(database.connection());
             let root = database.runtime_camp_files_root().to_path_buf();
             let identity = database
@@ -1850,6 +1974,8 @@ mod tests {
     #[test]
     fn process_kill_resumes_committed_migrations_and_both_legacy_switch_sides() {
         for interruption in [
+            "before_210",
+            "after_210",
             "legacy_switch",
             "legacy_published",
             "after_reconciliation",
@@ -1861,7 +1987,7 @@ mod tests {
                 "rovai-authority-migration-kill-test-{}",
                 Uuid::new_v4()
             ));
-            let mut database = crate::test_support::fresh_schema_database_fast_at(&directory);
+            let mut database = fresh_authority_database_at(&directory);
             database
                 .connection()
                 .execute(
@@ -1870,6 +1996,12 @@ mod tests {
                 )
                 .unwrap();
             match interruption {
+                "before_210" | "after_210" => {
+                    crate::db::delegation::downgrade_for_test(database.connection());
+                    database.connection().execute_batch(
+                        "UPDATE schema_migration SET applied_at='kept-before-210' WHERE version=209",
+                    ).unwrap();
+                }
                 "after_130" => crate::db::downgrade_current_schema_to_v129_source_for_test(
                     database.connection(),
                 ),
@@ -1948,14 +2080,24 @@ mod tests {
             );
 
             let lease = CoreDataDirLease::acquire(&directory).unwrap();
-            let AdmissionAssessment::RequiresMigration(ticket) =
-                DatabaseAdmission::assess(&lease).unwrap()
-            else {
-                panic!("interrupted switch must be represented by a recovery ticket");
+            let migrated = match DatabaseAdmission::assess(&lease).unwrap() {
+                AdmissionAssessment::RequiresMigration(ticket) if interruption != "after_210" => {
+                    AuthorityMigrationRunner::run(*ticket, &runtime_root, &runtime_root_identity)
+                        .unwrap()
+                }
+                AdmissionAssessment::AdmittedExisting(ticket) if interruption == "after_210" => {
+                    Database::open_admitted_with_runtime_camp_files_root(
+                        *ticket,
+                        &runtime_root,
+                        &runtime_root_identity,
+                    )
+                    .unwrap()
+                }
+                _ => panic!(
+                    "interrupted upgrade must resume only missing steps; committed210 is current"
+                ),
             };
-            let migrated =
-                AuthorityMigrationRunner::run(*ticket, &runtime_root, &runtime_root_identity)
-                    .unwrap();
+            crate::test_support::assert_production_database_configuration(&migrated);
             assert!(matches!(
                 classify_database_contract(migrated.connection()).unwrap(),
                 DatabaseContractClassification::Current(_)
@@ -1970,6 +2112,20 @@ mod tests {
                 .unwrap();
             assert_eq!(display_name, "中断后仍保留");
             assert!(!directory.join(AUTHORITY_MIGRATION_MANIFEST_FILE).exists());
+            if matches!(interruption, "before_210" | "after_210") {
+                assert_eq!(
+                    migrated
+                        .connection()
+                        .query_row(
+                            "SELECT applied_at FROM schema_migration WHERE version=209",
+                            [],
+                            |row| row.get::<_, String>(0),
+                        )
+                        .unwrap(),
+                    "kept-before-210"
+                );
+                assert!(!directory.join(MIGRATION_BACKUP_ROOT).exists());
+            }
 
             drop(migrated);
             drop(lease);
@@ -1996,6 +2152,8 @@ mod tests {
         };
         let interruption = std::env::var("ROVAI_MIGRATION_KILL_HELPER_INTERRUPTION").unwrap();
         let target_phase = match interruption.as_str() {
+            "before_210" => AuthorityMigrationPhase::OpeningAuthority,
+            "after_210" => AuthorityMigrationPhase::Migrating { version: 210 },
             "legacy_switch" => AuthorityMigrationPhase::SwitchingAuthority,
             "legacy_published" => AuthorityMigrationPhase::SnapshotPublished,
             "after_reconciliation" | "after_lifetime_reconciliation" => {

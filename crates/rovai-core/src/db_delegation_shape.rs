@@ -225,7 +225,7 @@ pub(super) fn legacy_table(name: &str, actual: &str) -> Result<String> {
         .remove(name)
         .context("Unknown fixture table")?;
     let new = extend_table(name, old.clone())?;
-    let (_, _, old_groups) = groups(&old)?;
+    let (old_begin, old_end, old_groups) = groups(&old)?;
     let (_, _, new_groups) = groups(&new)?;
     let old_columns = old_groups
         .iter()
@@ -267,6 +267,25 @@ pub(super) fn legacy_table(name: &str, actual: &str) -> Result<String> {
         if !new_constraints.contains(&key) {
             restored.push(group.clone());
         }
+    }
+    // Older fixture downgrades still replace exact historical SQL fragments.
+    // Restore their original spelling only when every actual definition matches;
+    // optional legacy columns/constraints must continue through the preserving path.
+    let mut original_definitions = old_groups
+        .iter()
+        .map(|g| tokens(g).unwrap())
+        .collect::<Vec<_>>();
+    let mut restored_definitions = restored
+        .iter()
+        .map(|g| tokens(g).unwrap())
+        .collect::<Vec<_>>();
+    original_definitions.sort();
+    restored_definitions.sort();
+    if original_definitions == restored_definitions
+        && equivalent(&actual[..begin], &old[..old_begin])
+        && equivalent(&actual[end..], &old[old_end..])
+    {
+        return Ok(old);
     }
     Ok(format!(
         "{}\n{}\n{}",

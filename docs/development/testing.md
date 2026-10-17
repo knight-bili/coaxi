@@ -92,8 +92,19 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 I04 完整210启动迁移沿原身份owner验证同一填充159文件经真实旧库启动升级、全结构/标记/回执故障回滚、FK恢复和零写重复调用；原私聊最终回复owner覆盖新库默认启动，原preflight/分类器升级owner验证当前与旧/未来来源。
 原更早夹具沿已有209降级链先恢复159，只在无新委派记录/冻结角色时工作，复用同一delta并保留旧行/无关扩展列；不提供产品降级入口，不新建重型owner。
 原 `context::slow_tests::claimed_legacy_batch_keeps_its_format_after_mention_upgrade` 扩同一数据库的历史选择1和排队选择2，helper为 `context/delegation_legacy_upgrade_tests.rs`。
-选择1是显式合法历史数据夹具，旧源码路径先实际装配32；同一旧140文件经生产迁移函数到160后开启新设置，验证原正文/摘要与选择/配置不变，以及原queued选择2真实Core领取后仍装配32。完整授权票据/备份切换及Host重启另行验证。
+选择1是显式合法历史数据夹具，旧源码路径先实际装配32；同一旧140文件经生产迁移函数到160后开启新设置，验证原正文/摘要与选择/配置不变，以及原queued选择2真实Core领取后仍装配32。授权票据和原库事务升级沿 `authority_migration` 原 owner 验证；生产不创建新的备份/切换，历史切换仅保留中断恢复。完整 Host 重启另行验证。
 Native执行与ACK仍为原夹具边界，数据升级通过不代替真实Host/Runtime或完整正式场景；不增加Rust owner或在该owner另建Core全库。
+
+授权迁移继续扩原 `supported_database_is_migrated_in_place_and_readmitted_without_snapshots`：
+加入精确159来源，在真实 lease/ticket/Runner 路径注入210回执故障，确认完整回滚到159、原 main 身份/草稿/209回执保留，
+移除故障后重取票据升级，并以 Current 票据按正式连接配置重开。原历史来源矩阵保持，不新增 owner。
+原 `process_kill_resumes_committed_migrations_and_both_legacy_switch_sides` 增210前/提交后终止测试自有 child，
+前者继续缺失步骤，后者直接 Current 打开；连同六个原分支共八个中断恢复分支。只终止本测试创建的子进程，helper不独立执行。
+Windows authority fixture 的新UUID根目录和SQLite文件采用原生私有创建，文件仅复制已关闭数据库的内容；不放宽生产ACL或修改用户目录。
+原159逆变换在完整定义与编译旧源一致时恢复历史SQL排版，有额外列/约束则继续原保留路径；原身份与旧Context owner定向回归。
+最低入口仍为 `cargo test -p rovai-core --features slow-tests --lib authority_migration::tests:: -- --skip migration_process_kill_helper`，
+先列出非零清单；修复失败项后只复验该 owner，不因原批有一次失败重跑全部历史来源或1253项测试。
+这些进程属于迁移测试，未启动完整 Host、Fleet、App 或真实模型；不增加84正式场景通过数。
 
 I04 私聊policy3扩展原 `single_chat::tests::built_in_policy_is_a_closed_allowlist_and_restart_cancels_only_the_reply`，
 helper为 `single_chat_policy3_tests.rs`，复用同一Core数据库，不新增owner。
