@@ -5,7 +5,7 @@
   "checked_at": "2026-10-17T06:56:20.533399+00:00",
   "status": "format35_blob_manifest_and_component_replay_locally_verified_full_admission_pending",
   "implementation_baseline": "495c59e728cdc4fe72956af33b9bb40c53e3f2b6",
-  "source_commit": null,
+  "source_commit": "f9384af4ca43273a477ffd51c605ac39cc0bc6c4",
   "confirmation_record": "i04-delegation-r1-confirmation.json",
   "runtime_data_contract": {
     "version": "v1.72",
@@ -344,5 +344,6 @@
       "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-format35-scope.log",
       "sha256": "899dab604ac7f85562aab489b6c0f0730065bba54b60543d95ce3bcc2cd9765a"
     }
-  ]
+  ],
+  "source_hash_basis": "All8 SHA256 values verified against exact committed Git blobs after local tests."
 }
