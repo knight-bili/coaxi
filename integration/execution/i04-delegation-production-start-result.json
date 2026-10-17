@@ -1,0 +1,409 @@
+{
+  "schema_version": 1,
+  "stage": "I04",
+  "task": "I04-T01",
+  "checked_at": "2026-10-17T16:52:47.085464+00:00",
+  "status": "production_core_start_planning_and_outside_db_candidate_io_with_atomic_reference_and_receipt_verified_outer_dispatch_pending",
+  "source_commit": "676e939b3d2adc2749ed6e1d8300f8b9c8721f16",
+  "implementation_baseline": "f3294002b7a1440306d3a0d0063eaba9edcb9bb4",
+  "confirmation_record": "i04-delegation-r1-confirmation.json",
+  "implemented": [
+    "Opaque production start prepare/observe/commit pipeline accepts only original Core binding/source/tool-call and strict StartParams; callers no longer construct a target configuration, task Blob or workspace plan",
+    "Original receipt lookup precedes new admission and filesystem work. New planning requires the original attested frozen parent and current enabled/depth. New refusals use the same exact-request Start Gateway receipt; an old refusal is not replaced after installation or settings repair",
+    "Built-in target selects its enabled managed_default/default-auth installation; typed custom selects only its exact enabled custom ID and actual adapter. Both retain original platform admission, use original Registry member defaults and freeze User per-runtime preset; no parent Runtime/model/persona/session/default installation is copied",
+    "Reservation is taken under the Core database mutex, with existing metadata validation and content address. The owned plan carries no Database/Connection; directory observation and full task file writing run in an independent worker",
+    "Existing managed candidate-intent/staging/data naming, hash verification, sensitivity/media/owner/size rules and durable recovery are extracted into a two-stage API. Original put_bytes_candidate keeps its behavior through this API",
+    "Process-local reservations protect active intent IDs and shared content digests. Original recovery, staging cleanup, quarantine reconciliation and both collection entrypoints skip active writers without waiting for them under the DB mutex",
+    "Concurrent outside-lock same-content writers handle the Windows exists/rename race by validating the published address before discarding only their own staging file. Different content cannot replace a reserved candidate",
+    "Prepared Blob metadata registers inside the original Start savepoint, then child/attempt/control graph and metadata-only domain event/command result share one transaction. Successful original task references detach the candidate GC marker in that transaction",
+    "A receipt or factory failure rolls back metadata and child graph. The durable intent survives abandonment for original GC recovery. Successful intent cleanup is outside the DB mutex and must not replace an already committed result if cleanup later fails",
+    "Legacy unreferenced collection now reuses the existing dynamic FK reference scan before physical deletion, including the new delegation task reference. It does not add a feature-specific schema/collector exception"
+  ],
+  "checks": {
+    "owners": [
+      {
+        "log": "delegation-production-start-core-owner-02.log",
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "log": "delegation-production-start-blob-owner-02.log",
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "regressions": [
+      {
+        "name": "text",
+        "filter": "execution_text::slow_tests::text_blocks_preserve_interleaving_live_reads_and_shutdown_without_fragment_writes",
+        "listed": 1,
+        "exit_code": 0,
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "name": "evidence",
+        "filter": "execution_evidence::tests::evidence_is_durable_blob_backed_agent_inaccessible_and_cancel_fenced",
+        "listed": 1,
+        "exit_code": 0,
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "name": "file-change",
+        "filter": "agent_run_file_change::tests::terminal_runs_in_a_non_git_directory_project_independent_replayable_cards",
+        "listed": 1,
+        "exit_code": 0,
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "name": "image-mixed",
+        "filter": "agent_run_image::tests::mixed_storage_survives_temporary_cleanup_without_copying_stable_paths",
+        "listed": 1,
+        "exit_code": 0,
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "name": "image-attachment",
+        "filter": "agent_run_image::tests::published_attachment_replaces_matching_runtime_image_presentation",
+        "listed": 1,
+        "exit_code": 0,
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      }
+    ],
+    "rust_total_passed": 9,
+    "docs_tests_passed": 10,
+    "final_compile": "delegation-production-start-compile-02.log",
+    "rust_owners_in_binary": 1253,
+    "new_rust_owners": 0,
+    "full_rust_suite_run": false,
+    "compiler_warnings": 7,
+    "warning_details": "Six original helper warnings and the still unconnected status Mutex wrapper",
+    "version_governance_scaffold_protocol_fmt_diff_existing_codegraph_sync": "passed",
+    "codegraph_unresolved_references": 48,
+    "governance_base": "f3294002b7a1440306d3a0d0063eaba9edcb9bb4",
+    "current_protocol_methods": 195,
+    "builtin_transport_version": 38,
+    "builtin_catalog_operations": 30,
+    "locked_source_operations_reported_by_checker": 161,
+    "ts_js_rerun": false,
+    "new_formal_cases_fully_passed": 0
+  },
+  "verified_behaviors": [
+    "Same original Core owner and SQLite prepare and worker observation perform zero DB writes. A large unique Chinese task is saved exactly; no supplied caller Blob/target plan is used",
+    "Injected command.result failure rolls back task metadata and all five graph row counts with no receipt. The same observed files/preparation then commit successfully after removing only the injected trigger; another call cannot reuse that preparation",
+    "Actual User target preset freezes alternate model/read-only/on-request in new Codex runtime; original managed Task Blob remains exact and survives both targeted and legacy collectors through its real foreign-key reference",
+    "Pi target without managed registration is a recorded refusal, distinct from an existing custom Pi installation. Actual Core lightweight discovered-entry verification/registration of an explicit fake executable makes a fresh built-in Pi request admissible, while the original refused request still replays unchanged",
+    "Fresh Pi child uses its actual registered managed installation independently of Codex source. Disabled target refuses new work but recorded success replays zero writes. Exact typed custom Pi uses its original custom installation identity",
+    "Missing directory is a recorded refusal even after the directory is later created. Early global disable remains the original refusal after re-enable; late disable after worker observation rolls back Blob metadata and the complete child graph",
+    "External directory still creates the original pending User permission and reports blocked_on.permission. Test-created queued children are stopped through actual model cancel, not left as unrelated dispatch backlog",
+    "Original targeted-GC owner exercises worker write before metadata, recover/collect while active, registration rollback, committed unreferenced active metadata, abandonment cleanup, prior detached candidate protection, changed-content refusal and two concurrent same-content writers",
+    "Original two crash-recovery owners pass. Existing streamed text/shutdown, durable evidence/cancel fence, real non-Git file-change projection, mixed image storage and published attachment owners pass through the shared candidate/legacy collection changes"
+  ],
+  "failures_and_repairs": [
+    "compile01 succeeded. blob-owner01 exposed a missed active-digest check in targeted collection; the legacy collection check alone was insufficient. Targeted check added and original owner02 passes",
+    "core-owner01 rejected built-in Pi because the reused fixture had only a custom Pi installation. Production admission correctly remained unchanged; test now performs original Core lightweight discovered-entry registration and separately proves both built-in and typed custom paths",
+    "Review found old hardcoded unreferenced collection did not include the new task FK. Reusing original dynamic-reference check prevents deleting a live task file; actual Core owner02 checks both collectors",
+    "Final compile02, Core owner02, Blob owner02 and all five related regressions pass. Earlier failure logs are retained; no model or external runtime retry was made"
+  ],
+  "runtime_data_contract": {
+    "version": "v1.72",
+    "schema": 159,
+    "migration": 209
+  },
+  "target_data_contract": {
+    "version": "v1.73",
+    "schema": 160,
+    "migration": 210,
+    "status": "not_registered"
+  },
+  "pending_migration_modified_legacy_guards": [
+    "context_manifest_v34_only_insert",
+    "context_manifest_quote_profile_insert",
+    "agent_run_input_v34_only_insert",
+    "single_chat_composer_draft_scope_insert",
+    "single_chat_retained_input_insert_guard",
+    "single_chat_source_observation_owner",
+    "conversation_message_single_chat_attachment_insert_guard",
+    "conversation_message_single_chat_attachment_update_guard",
+    "single_chat_pending_input_scope_insert",
+    "runtime_input_delivery_attachment_auth_insert"
+  ],
+  "qualification_limits": [
+    "This is the production Core preparation component, not an activated CLI/IPC/Host endpoint. Actual outer dispatcher must reauthenticate the exact transport lease after filesystem work; original Native Binding/Run/epoch alone cannot replace that outer check",
+    "Reservations coordinate one Core and the same managed data root, acquired under its DB mutex. Workers contain no DB handle. Real Host scheduling/disconnect/restart/multi-platform process behavior is not proved by these file/SQLite tests",
+    "Filesystem publication, real OS threads, actual Core transactions/Registry/factory/permission request and lightweight entry registration are exercised. Executable, provider metadata/native Session/ACK/cleanup remain explicit fixtures; no real target process/model/probe is launched",
+    "Existing persistent intent recovery is retained and directly exercised after reservation drop. Complete process crash/restart and real parent/child lifecycle remain mandatory phase qualification",
+    "Current195 Host methods, Builtin38/30 operations and schema159/209 are unchanged. Full six-operation dispatcher,39 catalog/CLI/four aliases/closed output/errors, retired-lease actual IPC recovery, zero-wait disconnect, User queries/settings/resume, question/plan, genericACP/21+custom real targets, full210/Context/Canvas/original UI and all other I04 packages remain required",
+    "No full1253-owner/default/workspace suite, full app/platform build, Agent/MCP/GUI, push/Actions/main merge/release or paid project model. Existing CodeGraph sync with48 unresolved references is not full call-graph qualification; no new complete formal scenario is claimed"
+  ],
+  "next_actions": [
+    "Wire actual six-operation outer dispatch with prepared start, exact lease revalidation, original receipt before new admission, status subscription/disconnect outside DB and invocation locks",
+    "Connect retired receipt proof before active-only denial, then approved39 catalog/CLI/aliases/closed projections and errors without granting old/disabled runs new tools",
+    "Continue User query/settings/resume, real Host/Fleet/writer/native loading/full210/Context/Canvas/original UI and remaining I04 packages"
+  ],
+  "external_actions": {
+    "push": false,
+    "actions": false,
+    "main_merge": false,
+    "release": false,
+    "real_model_budget": 0
+  },
+  "approved_artifacts": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1",
+      "unchanged": true
+    }
+  ],
+  "source_files": [
+    {
+      "path": "crates/rovai-core/src/agent_profile.rs",
+      "bytes": 375395,
+      "git_blob_sha256": "bc0942897a96123f1cc2d71a2b970fb9206a220d4da7e8dd2a2f5a4da25577f5"
+    },
+    {
+      "path": "crates/rovai-core/src/context.rs",
+      "bytes": 675743,
+      "git_blob_sha256": "29ff7d3e5c4c3862b77ad9d3a7a56efca3b7c4c1ce31c0026ff1b02013cb5b06"
+    },
+    {
+      "path": "crates/rovai-core/src/context/delegation_model_command_tests.rs",
+      "bytes": 26269,
+      "git_blob_sha256": "f0218bca200fd68971d94cf7506480468bf26f99496d836aca29556137304af6"
+    },
+    {
+      "path": "crates/rovai-core/src/context/delegation_start_tests.rs",
+      "bytes": 15589,
+      "git_blob_sha256": "3dd5f6e12fdb831667d4198277667a0fee7678ea1a8114e017863976d978358e"
+    },
+    {
+      "path": "crates/rovai-core/src/delegation_model_command.rs",
+      "bytes": 19453,
+      "git_blob_sha256": "c9b71acee8a8a058f300399d7681b8c839a5ac7c976920291576c4121e586ce6"
+    },
+    {
+      "path": "crates/rovai-core/src/delegation_start.rs",
+      "bytes": 9620,
+      "git_blob_sha256": "29e46d6afce664764c3a675be024d740b33ff1a5b38517d882ef30d701e19bf5"
+    },
+    {
+      "path": "crates/rovai-core/src/lib.rs",
+      "bytes": 4052,
+      "git_blob_sha256": "c548e9f98df13241dd646e10740122673c6979b78440cc989315a6d1366a2ffb"
+    },
+    {
+      "path": "crates/rovai-core/src/managed_blob.rs",
+      "bytes": 37724,
+      "git_blob_sha256": "16405fe07931c4e51ea35d1db47e7cf2175cdabcf1cf485f5c12b74701c44e24"
+    },
+    {
+      "path": "crates/rovai-core/src/managed_blob/candidate.rs",
+      "bytes": 7983,
+      "git_blob_sha256": "92bab75cd671f5e909491fa175b55e30e0d1fda3802496d489d147151dd98763"
+    },
+    {
+      "path": "crates/rovai-core/src/managed_blob/candidate_tests.rs",
+      "bytes": 5690,
+      "git_blob_sha256": "3e74c3ad9607ac4cab2c990a2ffe07e39e716328dd33f250a2fb6038c2fdeacc"
+    },
+    {
+      "path": "docs/development/testing.md",
+      "bytes": 225984,
+      "git_blob_sha256": "0e3b33aa00bd8c16a92640dbc03f4938fdcb448193e5690d5f12bdab52f16908"
+    }
+  ],
+  "log_files": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-blob-owner-01-list.log",
+      "bytes": 313,
+      "sha256": "a101b532a9a5abbe7bba6913ac158f95a6758b1c39475361fc81f1411a56d61a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-blob-owner-01.log",
+      "bytes": 936,
+      "sha256": "500e4d985175adf85a9a20ee74736ff503bed5821f13c0eb4b2741b9885e5306"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-blob-owner-02-list.log",
+      "bytes": 313,
+      "sha256": "a101b532a9a5abbe7bba6913ac158f95a6758b1c39475361fc81f1411a56d61a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-blob-owner-02.log",
+      "bytes": 427,
+      "sha256": "9ecc819109893a1151092563386a91806a7b34aca7842f420b4540bae2fb753e"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-codegraph-sync.log",
+      "bytes": 250,
+      "sha256": "d69ee6a6762fc170bc60b1260233991c63e2d9be36e4d441039092436e3c3a1a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-compile-01.log",
+      "bytes": 2225,
+      "sha256": "7c6097d2c299aa7cdb382a9a0cb427ba3ad3d054915bccb7cf0086d2a34e818b"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-compile-02.log",
+      "bytes": 2225,
+      "sha256": "751c592fe1f1ee50ad4a06423a92283026b5b70deac15206772865cdacdbd5a8"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-core-owner-01-list.log",
+      "bytes": 125,
+      "sha256": "8d7c39b86e00e4e7eee958d5210fe31c3224cf0ebf2bba69b1e95c305acee56d"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-core-owner-01.log",
+      "bytes": 700,
+      "sha256": "13602e51263c01e620abcff83f8d217b7f9f89cb1ea5fa56b0c5646e2474fc8e"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-core-owner-02-list.log",
+      "bytes": 125,
+      "sha256": "8d7c39b86e00e4e7eee958d5210fe31c3224cf0ebf2bba69b1e95c305acee56d"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-core-owner-02.log",
+      "bytes": 228,
+      "sha256": "d858880a3739e996d68f0c38245476fd7de0949fe5f68830c200fc44a70a4486"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-diff.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-doc-governance.log",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-doc-tests.log",
+      "bytes": 923,
+      "sha256": "425b73dc5d024df21df61d04de44f4d2d16c4cf60d6bfb42a76d9254258d7b53"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-doc-version.log",
+      "bytes": 79,
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-include-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-protocol.log",
+      "bytes": 182,
+      "sha256": "044569df112d191be31ea876439bd2bd3294beb8d9fa469452c1bcc1ea893695"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-regression-evidence-list.log",
+      "bytes": 127,
+      "sha256": "2243c3743bf782c20fc3e5a551c6f514248ff0b0d1bc82cbbe2b77402cdb7825"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-regression-evidence.log",
+      "bytes": 229,
+      "sha256": "0cdecd61d2052fab86bc46a1f258c5e7cd086dd374bee063586c60d4c6f14d68"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-regression-file-change-list.log",
+      "bytes": 135,
+      "sha256": "df5c1e52b5bcad9f8e134d53ed24631785a29a1eb7de81a2ba784ef0f601c93b"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-regression-file-change.log",
+      "bytes": 237,
+      "sha256": "c956bb40d235d4cd9bec868ddea5334180b7d02bd9c9e1cbb4f2825d952dccf0"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-regression-image-attachment-list.log",
+      "bytes": 121,
+      "sha256": "1e9d4c854400c928662e86744593841127fff76066937a32e063bc92fb1fb781"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-regression-image-attachment.log",
+      "bytes": 223,
+      "sha256": "52563bb07368a3a4445f0da4334cf3d1ec2a348ec508bb891b1f73ea3551087c"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-regression-image-mixed-list.log",
+      "bytes": 125,
+      "sha256": "54ffcda03a78d24dcc22a6f803542db5db17ec8854319592edb422d45853adab"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-regression-image-mixed.log",
+      "bytes": 227,
+      "sha256": "aaa4b9b8a335003b9b18c6cf70b9456649dad9828217f39818626dc57500de31"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-regression-results.json",
+      "bytes": 1244,
+      "sha256": "19b4688b83820e694323c1a0402f851be6f64b8c062fc693403c4777712177b7"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-regression-text-list.log",
+      "bytes": 141,
+      "sha256": "6b6404654e975352d276e1058894161c1078400f1c2bfab5b95d5e724d5a5276"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-regression-text.log",
+      "bytes": 243,
+      "sha256": "6665c559fcded369dc3d7daf6607a71037bf253b3ecca541666d873dacf2e9f9"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-production-start-scaffold.log",
+      "bytes": 222,
+      "sha256": "01288a06b7440b08c394c6da77c7750da896b58e4bc599c2e110eb1820be4b08"
+    }
+  ]
+}
