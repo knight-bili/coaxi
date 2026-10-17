@@ -1,4 +1,5 @@
-//! Process-local hints. Each Notify has one consumer; durable state still authorizes work.
+//! Process-local hints. Driver Notify values have one consumer; delegation broadcasts
+//! to its independent waiters. Durable state still authorizes every operation.
 use std::sync::Arc;
 use tokio::sync::Notify;
 
@@ -11,10 +12,12 @@ pub(crate) struct ExecutionWake {
     pub authorization: Arc<Notify>,
     pub budgets: Arc<Notify>,
     pub text: Arc<Notify>,
+    pub delegation: Arc<Notify>,
 }
 
 impl ExecutionWake {
     pub fn execution_changed(&self) {
+        self.delegation.notify_waiters();
         self.delivery.notify_one();
         self.runs.notify_one();
         self.automation.notify_one();
@@ -24,6 +27,7 @@ impl ExecutionWake {
     }
 
     pub fn command_committed(&self, command: &str) {
+        self.delegation.notify_waiters();
         if command.starts_with("automation.") || command == "channel_delivery.settle" {
             self.automation.notify_one();
         } else if command.starts_with("action.")
@@ -33,6 +37,7 @@ impl ExecutionWake {
             self.automation.notify_one();
             self.authorization.notify_one();
         } else if command.starts_with("single_chat.")
+            || command.starts_with("delegation.")
             || command.starts_with("delegations.")
             || command.starts_with("agent_run.")
             || command.starts_with("camp_turn.")

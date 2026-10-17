@@ -284,20 +284,80 @@ fn unknown(id: &str) -> Value {
     json!({"task_id":id,"status":"unknown"})
 }
 
+// Shared by inline reports, fixed-result paging and final-only history. A raw
+// agent message or a late User result is never a delegated result by itself.
+pub(crate) const FIXED_FINAL: &str = "r.status='succeeded' AND r.terminal_resolution_source='runtime_terminal'
+    AND COALESCE(r.terminal_reason_code,'') NOT IN ('auth_required','authentication_required','rejected','refusal','max_tokens','unknown_stop')
+    AND r.invocation_kind IN ('delegation','delegation_user') AND r.operation_policy='delegation_child_v1' AND r.operation_policy_version=1
+    AND r.response_delivery='conversation_message' AND r.destination_conversation_id=m.conversation_id
+    AND r.conversation_id=m.conversation_id AND r.final_conversation_message_id=m.id
+    AND m.author_type='agent' AND m.agent_run_id=r.id AND m.source_agent_run_id=r.id";
+
+pub(crate) struct FixedFinal {
+    pub message: String,
+    pub version: String,
+    pub body: String,
+}
+
+pub(crate) fn fixed_final(
+    connection: &Connection,
+    run: &str,
+    conversation: &str,
+    through: i64,
+) -> Result<Option<FixedFinal>> {
+    let row:Option<(String,i64,String)>=connection.query_row(&format!(
+        "SELECT m.id,m.sequence,m.body FROM agent_run r JOIN conversation_message m ON m.id=r.final_conversation_message_id
+         WHERE r.id=?1 AND m.conversation_id=?2 AND m.sequence<=?3 AND {FIXED_FINAL}"),
+        params![run,conversation,through],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?))).optional()?;
+    row.map(|(message, sequence, body)| {
+        // conversation_message has no mutable numeric version column. Its
+        // exact persisted content digest is the cursor's fixed result version.
+        let version = crate::command::canonical_json_digest_with(|writer| {
+            serde_json::to_writer(writer, &(&message, sequence, &body))?;
+            Ok(())
+        })?;
+        Ok(FixedFinal {
+            message,
+            version,
+            body,
+        })
+    })
+    .transpose()
+}
+
 /// Only the current attempt's persisted final is a result. Never use the latest
 /// message in the child, which may belong to a later User after takeover.
 pub(crate) fn task_report(connection: &Connection, id: &str, parent: &str) -> Result<Value> {
     let Some(identity) = crate::delegation::find_for_parent(connection, id, parent)? else {
         return Ok(unknown(id));
     };
-    let (run,status,runtime,epoch,started,ended,final_id,resolution,reason,boundary):
-        (String,String,String,i64,Option<String>,Option<String>,Option<String>,Option<String>,Option<String>,Option<i64>)=connection.query_row(
+    let (run, status, runtime, epoch, started, ended, boundary): (
+        String,
+        String,
+        String,
+        i64,
+        Option<String>,
+        Option<String>,
+        Option<i64>,
+    ) = connection.query_row(
         "SELECT r.id,r.status,d.requested_runtime,r.execution_epoch,r.started_at,r.ended_at,
-            r.final_conversation_message_id,r.terminal_resolution_source,r.terminal_reason_code,c.takeover_message_sequence
+            c.takeover_message_sequence
          FROM delegation d JOIN delegation_control c ON c.delegation_id=d.id
          JOIN delegation_attempt a ON a.delegation_id=d.id AND a.attempt_no=c.current_attempt_no
-         JOIN agent_run r ON r.id=a.agent_run_id WHERE d.id=?1",[id],
-        |r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?,r.get(4)?,r.get(5)?,r.get(6)?,r.get(7)?,r.get(8)?,r.get(9)?)))?;
+         JOIN agent_run r ON r.id=a.agent_run_id WHERE d.id=?1",
+        [id],
+        |r| {
+            Ok((
+                r.get(0)?,
+                r.get(1)?,
+                r.get(2)?,
+                r.get(3)?,
+                r.get(4)?,
+                r.get(5)?,
+                r.get(6)?,
+            ))
+        },
+    )?;
     let mut report = json!({"task_id":id,"child_conversation_id":identity.child_conversation_id,"agent_type":runtime});
     match status.as_str() {
         "queued" | "running" | "waiting" => {
@@ -323,29 +383,13 @@ pub(crate) fn task_report(connection: &Connection, id: &str, parent: &str) -> Re
             }
         }
         "succeeded" => {
-            let body: Option<String> = if resolution.as_deref() == Some("runtime_terminal")
-                && !matches!(
-                    reason.as_deref(),
-                    Some(
-                        "auth_required"
-                            | "authentication_required"
-                            | "rejected"
-                            | "refusal"
-                            | "max_tokens"
-                            | "unknown_stop"
-                    )
-                ) {
-                if let Some(message) = final_id.as_deref() {
-                    connection.query_row("SELECT body FROM conversation_message WHERE id=?1 AND conversation_id=?2
-                        AND author_type='agent' AND agent_run_id=?3 AND source_agent_run_id=?3 AND (?4 IS NULL OR sequence<=?4)",
-                        params![message,identity.child_conversation_id,run,boundary],|r|r.get(0)).optional()?
-                } else {
-                    None
-                }
-            } else {
-                None
-            };
-            if let Some(mut body) = body {
+            if let Some(final_result) = fixed_final(
+                connection,
+                &run,
+                &identity.child_conversation_id,
+                boundary.unwrap_or(i64::MAX),
+            )? {
+                let mut body = final_result.body;
                 let truncated = body.len() > 256 * 1024;
                 if truncated {
                     let mut end = 256 * 1024 - "…".len();
@@ -357,7 +401,7 @@ pub(crate) fn task_report(connection: &Connection, id: &str, parent: &str) -> Re
                 }
                 report["status"] = json!("completed");
                 report["text"] = json!(body);
-                report["result_ref"] = json!({"conversation_id":identity.child_conversation_id,"message_id":final_id,"truncated":truncated});
+                report["result_ref"] = json!({"conversation_id":identity.child_conversation_id,"message_id":final_result.message,"truncated":truncated});
             } else {
                 report["status"] = json!("failed");
                 report["error_code"] = json!("delegation.result_unavailable");

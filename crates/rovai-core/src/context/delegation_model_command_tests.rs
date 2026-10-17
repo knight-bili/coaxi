@@ -377,6 +377,7 @@ fn assert_delegation_model_commands(
         )
         .unwrap();
     assert_eq!(final_body, full_output);
+    assert_delegation_model_queries(f, binding, source, request, plan, &id, &run, &full_output);
     assert_eq!(
         model::replay_start(&f.database, &invocation)
             .unwrap()
