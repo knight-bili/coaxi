@@ -467,6 +467,17 @@ Rust owner 分成四个可执行层级；feature gating 只改变日常路由，
 `slow-tests`，则使用 `--features slow-tests`。过滤命令显示 `0 tests` 不构成验证证据，提交前先用
 `-- --list` 确认目标 owner 实际进入清单。
 
+I04 原生交互的耦合 owner 为
+`application::native_interactions::tests::native_child_questions_cross_the_core_reader_and_exact_user_reply_then_close_on_host_exit`，
+位于 `application/native_interactions/tests.rs`，复用既有 `runtime_resolution_test_core` 的隔离 Core/SQLite/Skill Library；
+仅增加一个受管 Node ACP 假进程，不连接 provider、不执行 Built-in CLI。它拥有跨界失败语义：原 listener
+漏登记/等待 User 阻塞 reader、User 决定未到达原请求、重复回放造成二次写入、Host Exited 未封旧请求。
+内存 writer 与存储 owner 分别只能证明写端围栏或数据库事务，不能证明两者经真实 stdout/stdin 与 Core 分派连通；
+现有 Cursor 进程 owner 为 Unix 专项，也不覆盖本桥。转换/权限/CAS 的输入矩阵仍归原较低层 owner，不在此复制。
+此 owner 随原 Core fixture 进入 `slow-tests`（包含 extended），当前支持 Windows/macOS；默认快速层预算不变。
+最小命令为 `cargo test -p rovai-core --features slow-tests --lib application::native_interactions::tests::native_child_questions_cross_the_core_reader_and_exact_user_reply_then_close_on_host_exit -- --exact`。
+它不证明完整 Core main/Host 启动、HTTP/IPC、GUI、真实模型、Grok 修改意见的原队列投递或平台资格；结果须另附当次日志。
+
 ## Command Code headless 测试退役（2026-10-09，User 105）
 
 User 已停止 headless 候选；删除唯一消费者 `command_code.rs`、其专属 `command_code_activity.rs`、

@@ -92,3 +92,11 @@ Core实际指针推进至v1.73/161/211，旧160是受支持来源，210仍独立
 新增唯一最低层extended内存AsyncWrite owner，覆盖旧六身份、排队后换运行、Completed拒绝、JSON整帧、部分写超时/flush失败及隔离后不续写；原Context同库owner扩范围关闭/重复零写/回滚和单请求不动其他请求，原Grok分类owner回归。未创建新SQLite/Runtime fixture，未启用Cursor平台资格。自审修正writer坏与进程退出的含义分离，不用alive=false伪造清理；错误响应后的reap交原任务集合，不让reader回调长期持permit。
 
 完整Native桥循环仍待可控Host耦合验证；组件通过不作为真模型、实际Host进程、HTTP/GUI或正式84场景通过。Grok修改反馈原User队列目前仍有明确发送围栏，必须随后接完；再接r1安全阻塞摘要、原卡片和两类查看器，以及其他Runtime格式/平台矩阵。I04其余工作包和阶段候选验证保持。
+
+## 原生交互受控进程耦合接续（2026-10-18）
+
+[本轮记录](../../../integration/execution/i04-native-interaction-coupled-result.json)补上前批明确未验的连接处：复用原隔离Core fixture，经真实Grok子会话工厂/领取/Binding/Context/输入dispatch标记、原ACP listener、受管Node假进程及Core.handle User三入口完成往返。两个请求先于任何User答案同时登记；完整原RPC字符串及问题/计划结果到达原stdin；原UUID重放不二次写入；第三个未答请求由原Host Exited封闭并核对closeReason。此为本机Windows的耦合验证，不是完整Core main/Host/HTTP/IPC、GUI、真实模型或逐平台资格。
+
+新增一个slow-tests seam owner，转换/CAS/写端围栏仍归原较低层测试，不复制输入矩阵。测试准备中发现默认委派开关、Windows脚本执行身份/长路径及受控认证握手缺项，均修正假进程或使用原设置/文件身份登记入口；未放宽产品准入、伪造Ready或使用真实账号。失败日志保留。假进程脚本从精确源码位置复制到隔离目录，后续只改协议夹具无需重编Rust。
+
+Grok修改反馈原User队列、安全blocked_summary及原广播、固定Codeg卡片/两类查看器仍是下一有限队列；其余I04工作包、21簇和84正式场景不减少，本批正式场景新增通过0。完整一期81簇/48包/324场景及I12后客户使用验收保持。

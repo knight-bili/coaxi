@@ -8,6 +8,9 @@ use crate::{
 use anyhow::ensure;
 use rusqlite::params;
 
+#[cfg(all(test, feature = "slow-tests", any(target_os = "macos", windows)))]
+mod tests;
+
 #[allow(clippy::too_many_arguments)]
 pub(super) async fn capture(
     core: &Arc<Core>,

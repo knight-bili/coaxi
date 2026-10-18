@@ -54,3 +54,5 @@ User 查询与设置的后端及 Native/Web 接线见[查询设置分项记录](
 格式35、最终Blob/Manifest、组件回放及默认路径回归见[输入格式分项记录](../../../integration/execution/i04-delegation-format35-result.json)；测试工厂、实际Core调用和待完整准入的资格分别列明。
 本批存储夹具不代表完整 Core 启动迁移或命令回执集成。D01–D32、真实 Gate 与 I04 原 84 正式场景仍按实际运行逐项取证。
 专用身份/硬预算、平台条件留册；不新增客户阶段验收，I12 后才交用户使用软件。
+
+原生User交互的[受控进程耦合证据](../../../integration/execution/i04-native-interaction-coupled-result.json)补Windows原Core listener与User分派的真实stdout/stdin往返、重复回执不二发和Host退出关闭。Node假进程不连接provider，此结果不授予真实模型、完整Host启动、GUI或平台资格；Grok修改反馈原队列及原卡片/查看器仍继续。
