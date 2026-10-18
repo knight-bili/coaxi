@@ -88,6 +88,7 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 该夹具不证明实际 Host/Native、多窗口、源文件摘要/授权、最终模型 Blob 或完整 PC01–PC24；正式324场景保持未验。
 
 ## Rust 测试准入与退役门槛
+User原生交互API继续扩原Context materialization owner同库helper，不新增Rust owner。验证Host闭合参数派生User、摘要分页/正文分离、跨会话/超限拒绝、未知回执只读、完整原UUID与目标删除后的回执恢复；原Grok工厂/绑定/ACK夹具边界保持。原Web operation owner扩三接口准入，桌面runtime-core-methods原owner检查实际Native名单，Web client原未知私聊参数矩阵增加原生答复，覆盖同题未知阻挡/不同题独立、原Promise核对结清及只发一次。第一次矩阵捕获默认group过宽，按interactionId修生产实现；不以fetch替身或静态名单称真实Native/HTTP/GUI通过。
 原生User交互存储继续扩原Context materialization owner，helper为context/native_interaction_tests.rs，不新增Rust owner或Core数据库。复用同一SQLite/Blob，真实Grok工厂/Registry/领取/绑定和输入投递；可执行身份、Session及ACK是明确夹具，未启动原生进程。覆盖211回执失败回滚、完整160来源/161目标、篡改/多余对象、重复零写；原生帧和RPC冲突、错归属、User-only/CAS、原回执故障、精确恢复、成功/未知发送token、修改反馈围栏及取消/绑定/重启关闭。Cursor保持现有未准入事实，不为测试放开。
 
 原identity owner先实际打开同一159文件到161，再仅移除空的211表，继续完整210/160结构矩阵，不把历史目标断言改成未来版本；原policy owner补精确161+211正向资格，161缺211仍拒绝。原authority进程中断owner保留八分支并新增211前/提交后两分支；210已提交而211未完成属于受支持来源，不能提前当Current。只终止测试自己创建的子进程。旧/未来预检及新库权威准入作定向回归；不因本批默认执行全部1254项、完整App/Runtime、平台构建或Actions，不增加84正式场景通过数。

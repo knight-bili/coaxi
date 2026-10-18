@@ -76,3 +76,11 @@ Core实际指针推进至v1.73/161/211，旧160是受支持来源，210仍独立
 复用原Context materialization owner的同一SQLite/Blob：真实Grok工厂/领取/绑定/输入投递，验证prepared发送边界、重复/冲突、错归属、User拒绝/CAS、回执失败回滚、精确回放、原生回复、发送未知不重发、计划反馈围栏和取消/重启关闭。Native Session/ACK及可执行文件身份为夹具，无实际模型进程；Cursor仍遵守现有未准入事实，不在测试里放开。原authority进程中断owner增加211前/提交后两分支，210提交后现在继续缺失211而非误称Current。
 
 下一分项固定为可信Native回调及Host失效收口、User读取/决定运输入口、Grok原User队列登记；之后接r1阻塞摘要/原等待广播、原Codeg卡片与两类查看器，再补其他格式及真实Runtime/平台矩阵。I04其他工作包和原84正式场景不删减，阶段候选才集中验证；用户不承担阶段工程测试。
+
+## User交互接口接续（2026-10-18）
+
+完成runtime.interactions.list/get/resolve的Core服务、Application分派/原独立请求通道、CURRENT_USER封闭envelope、Native IPC名单、Web Operation和共享TS DTO。list默认20/上限50且只摘要；get返回原Core显式视图。全局User原UUID可在原目标删除后核对，不依赖UI重交归属。Web未知命令按问题编号隔离，保持同题未知阻挡、不同题独立、完整原Answer和原Promise只读核对结清。
+
+扩原Context同库owner及Web原operation owner定向通过；两文件48项运输/allowlist检查、根类型检查通过。Web首次检查发现原默认操作分组把不同问题互相阻挡，改为interactionId后通过；保留失败日志。Native Session/输入ACK、程序身份及fetch为夹具，未验证实际HTTP、Native管道或GUI，不增加正式场景通过数，也不重复全量1254/平台构建。
+
+下一动作保留为可信process_agent_run_acp_message回调和Host失效封旧、Grok原User队列登记；随后r1安全阻塞摘要、原广播、固定Codeg卡片及两类查看器，再完整Runtime矩阵与I04其他包。三接口已登记不表示Native模型请求可用，阶段仍研发中。

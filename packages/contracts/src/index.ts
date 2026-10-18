@@ -4629,6 +4629,45 @@ export interface CanvasTerminalSnapshot {
   cleanupComplete: boolean
 }
 
+export type RuntimeInteractionKind = 'question' | 'plan_approval'
+export type RuntimeInteractionStatus = 'pending' | 'resolved' | 'dispatching' | 'sent' | 'closed' | 'delivery_unknown'
+
+export type RuntimeInteractionAnswer =
+  | { kind: 'question'; answers: { questionId: string; labels: string[] }[]; declined: boolean }
+  | { kind: 'plan_approval'; decision: 'approve' | 'request_changes' | 'abandon'; feedback: string | null }
+
+export type RuntimeInteractionBody =
+  | { kind: 'question'; questions: {
+      id: string
+      question: string
+      header: string
+      multiSelect: boolean
+      options: { label: string; description: string }[]
+    }[] }
+  | { kind: 'plan_approval'; planMarkdown: string }
+
+export interface RuntimeInteractionView {
+  id: string
+  conversationId: string
+  kind: RuntimeInteractionKind
+  status: RuntimeInteractionStatus
+  version: number
+  body: RuntimeInteractionBody
+  answer: RuntimeInteractionAnswer | null
+  closeReason: string | null
+}
+
+export interface RuntimeInteractionPage {
+  conversationId: string
+  items: { id: string; kind: RuntimeInteractionKind; status: RuntimeInteractionStatus; version: number; createdAt: string }[]
+  nextCursor: string | null
+}
+
+export interface ResolveRuntimeInteractionParams {
+  commandId: string
+  command: { interactionId: string; expectedVersion: number; answer: RuntimeInteractionAnswer }
+}
+
 export type CoreMethod =
   | 'commands.reconcile'
   | 'preferences.newConversation.get'
@@ -4888,6 +4927,9 @@ export type CoreMethod =
   | 'delegations.read'
   | 'delegations.settings.get'
   | 'delegations.settings.update'
+  | 'runtime.interactions.list'
+  | 'runtime.interactions.get'
+  | 'runtime.interactions.resolve'
   | 'delegations.composer.get'
   | 'delegations.message.send'
   | 'delegations.takeover'

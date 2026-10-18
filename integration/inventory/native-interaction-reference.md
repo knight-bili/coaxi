@@ -25,3 +25,5 @@ Core问题位置编号在同一完整请求内确定性生成，不是鉴权标�
 6. 补其他来源格式及真实Runtime/平台矩阵，与I04其他工作包一同候选验证；本批不增加84正式场景通过数。
 
 Core存储接续：独立Migration211/Schema161已编码，旧210仍精确生成160。storage.rs提供可信帧登记、脱敏User视图、CURRENT_USER唯一决定、原UUID回放和先标记发送；schema.sql在Run/Binding变化时封旧请求，原启动恢复也同事务封旧。当前没有Native handler/IPC/Web/界面接线，Grok修改原文在原User队列完成前明确禁止原生发送。原Context owner复用同库实际Grok工厂/领取与投递，Session/ACK仍为夹具；Cursor的运行准入未放开。上方六项队列据此推进，不把存储内核作为完整功能完成。
+
+User运输接续：runtime.interactions.list/get/resolve已经接Application、Desktop Native名单和Web操作。列表有界摘要，完整题目按原Core UUID取；User只发版本和Answer，Core代次取原planned_shutdown。原命令以全局User envelope精确恢复，目标删除后仍可核对；Web按interactionId隔离未知命令，保留同号原Answer，不自动重发。Native请求回调、Grok原User队列、阻塞摘要、原卡片和完整Runtime仍待，不能将API注册作真实使用证据。

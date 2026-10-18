@@ -29,3 +29,5 @@ User恢复以原UUID和持久父Conversation归属授权，允许父Run已经终
 新Run从可信Conversation和完整合同开通标记冻结角色及资格；Runtime刷新沿用该Run的冻结资格，不读取当前设置授予旧Run新能力。角色绑定摘要保留原Runtime模型、权限及无原生Session恢复能力的事实。子Bootstrap按已批准文本使用独立身份、空记忆/平台技能，不查询父Mission或渠道事实；模型输入和原生技能/MCP的完整隔离仍须格式35与执行准入共同实现。
 格式35继续使用原Core装配器、受管Blob、Manifest和恢复入口。child有独立顺序与闭集数据，不查询父历史、任务、Mission、A2A或跨Thread历史；初始任务核对原Blob摘要，恢复仅固定继续提示，User后续正文必须来自本child且在接管边界之后。父指南计入相同UTF-8预算；超限不保存部分任务。已有Manifest回放不重选当前设置，child身份也不回退到父Profile。此处是格式与存储接线，材料授权、原生目录投影和真实执行准入仍须单独取证。
 完整行为、上下文隔离和原界面职责在[已确认 r1](../versions/v1.73/model-context-change-native-delegation.md)，取舍理由见[V1.73-D01](../versions/v1.73/decisions.md#v1-73-d01)。
+
+原生交互的User读/答入口复用同一Core记录和Gateway：有界摘要列表与完整内容分开，Host派生CURRENT_USER，UI不重交问题或Native身份。全局User envelope使首次精确回执不依赖目标还存在；首次决定仍核定实际owner和live代次，不跳过Camp删除/失效检查。Native IPC/Web只逐项准入三接口，SSE只作安全失效通知；Web未知命令按Core interactionId隔离，原请求只读核对，不因连接丢失换号或自动发送。具体字段和当前证据边界见[User交互接口](../contracts/delegation-v1.md#user交互读取与答复接口)。原生回调、原队列反馈和卡片不由API登记推断完成。

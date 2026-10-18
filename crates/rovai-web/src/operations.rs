@@ -123,6 +123,12 @@ pub enum Operation {
     DelegationSettingsGet,
     #[serde(rename = "delegations.settings.update")]
     DelegationSettingsUpdate,
+    #[serde(rename = "runtime.interactions.list")]
+    RuntimeInteractionList,
+    #[serde(rename = "runtime.interactions.get")]
+    RuntimeInteractionGet,
+    #[serde(rename = "runtime.interactions.resolve")]
+    RuntimeInteractionResolve,
     #[serde(rename = "delegations.composer.get")]
     DelegationComposerGet,
     #[serde(rename = "delegations.message.send")]
@@ -596,6 +602,9 @@ impl Operation {
             Self::DelegationRead => "delegations.read",
             Self::DelegationSettingsGet => "delegations.settings.get",
             Self::DelegationSettingsUpdate => "delegations.settings.update",
+            Self::RuntimeInteractionList => "runtime.interactions.list",
+            Self::RuntimeInteractionGet => "runtime.interactions.get",
+            Self::RuntimeInteractionResolve => "runtime.interactions.resolve",
             Self::DelegationComposerGet => "delegations.composer.get",
             Self::DelegationMessageSend => "delegations.message.send",
             Self::DelegationTakeover => "delegations.takeover",
@@ -882,6 +891,12 @@ mod tests {
             ("delegations.read", "delegations.read"),
             ("delegations.settings.get", "delegations.settings.get"),
             ("delegations.settings.update", "delegations.settings.update"),
+            ("runtime.interactions.list", "runtime.interactions.list"),
+            ("runtime.interactions.get", "runtime.interactions.get"),
+            (
+                "runtime.interactions.resolve",
+                "runtime.interactions.resolve",
+            ),
             ("delegations.composer.get", "delegations.composer.get"),
             ("delegations.message.send", "delegations.message.send"),
             ("delegations.takeover", "delegations.takeover"),

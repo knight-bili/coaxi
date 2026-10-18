@@ -64,6 +64,9 @@ export const WEB_OPERATIONS = [
   'delegations.read',
   'delegations.settings.get',
   'delegations.settings.update',
+  'runtime.interactions.list',
+  'runtime.interactions.get',
+  'runtime.interactions.resolve',
   'delegations.composer.get',
   'delegations.message.send',
   'delegations.takeover',
@@ -237,6 +240,7 @@ const RECONCILABLE_COMMANDS = new Set<WebOperation>([
   'singleChat.composerDraft.mutate',
   'delegations.composer.mutate',
   'delegations.settings.update', 'delegations.resume',
+  'runtime.interactions.resolve',
   'delegations.message.send', 'delegations.pendingInputs.edit',
   'delegations.takeover', 'delegations.cancel', 'delegations.conversation.end',
   'skills.import.commit',
@@ -274,6 +278,9 @@ const RECONCILABLE_COMMANDS = new Set<WebOperation>([
 ])
 
 function commandGroup(operation: WebOperation, params: unknown): string {
+  if (operation === 'runtime.interactions.resolve') {
+    return JSON.stringify([operation, (params as { command?: { interactionId?: string } })?.command?.interactionId])
+  }
   if (operation === 'delegations.takeover' || operation === 'delegations.cancel' || operation === 'delegations.resume') {
     return JSON.stringify([operation, (params as { command?: { delegationId?: string } })?.command?.delegationId])
   }
@@ -651,7 +658,7 @@ export class ConsoleClient {
     })
   }
 
-  async retryPendingCommand(operation: 'delegations.resume' | 'delegations.settings.update' | 'singleChat.composerDraft.mutate' | 'delegations.composer.mutate' | 'delegations.message.send' | 'delegations.pendingInputs.edit' | 'delegations.takeover' | 'delegations.cancel' | 'delegations.conversation.end' | 'singleChat.pendingInputs.edit' | 'singleChat.send', params: unknown): Promise<void> {
+  async retryPendingCommand(operation: 'runtime.interactions.resolve' | 'delegations.resume' | 'delegations.settings.update' | 'singleChat.composerDraft.mutate' | 'delegations.composer.mutate' | 'delegations.message.send' | 'delegations.pendingInputs.edit' | 'delegations.takeover' | 'delegations.cancel' | 'delegations.conversation.end' | 'singleChat.pendingInputs.edit' | 'singleChat.send', params: unknown): Promise<void> {
     const id = params && typeof params === 'object' && 'commandId' in params ? params.commandId : undefined
     const entry = typeof id === 'string' ? this.#pending.get(id) : undefined
     if (!entry) { await this.request(operation, structuredClone(params)); return }

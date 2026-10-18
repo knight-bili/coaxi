@@ -271,7 +271,50 @@ fn assert_native_interaction_storage(f: &mut Fixture) {
     };
     let denied = command(system, 1, answer.clone());
     let stale = command(actor.clone(), 2, answer.clone());
-    let accepted = command(actor.clone(), 1, answer.clone());
+    let user_request = json!({"commandId":Uuid::new_v4().to_string(),"command":{
+        "interactionId":id,"expectedVersion":1,"answer":answer}});
+    let accepted =
+        crate::application::runtime_interactions::envelope(user_request.clone()).unwrap();
+    assert!(accepted.camp_id.is_none());
+    assert_eq!(accepted.actor, actor);
+    for field in ["actor", "agentRunId", "request", "nativeSessionId"] {
+        let mut changed = user_request.clone();
+        changed[field] = json!("cannot choose authority");
+        assert!(
+            crate::application::runtime_interactions::envelope(changed).is_err(),
+            "{field}"
+        );
+        let mut changed = user_request.clone();
+        changed["command"][field] = json!("cannot rebind");
+        assert!(
+            crate::application::runtime_interactions::envelope(changed).is_err(),
+            "{field}"
+        );
+    }
+    let changes = f.database.connection().total_changes();
+    assert_eq!(
+        crate::application::runtime_interactions::read(
+            &f.database,
+            "runtime.interactions.get",
+            json!({"interactionId":id})
+        )
+        .unwrap(),
+        serde_json::to_value(&view).unwrap()
+    );
+    assert!(
+        crate::application::runtime_interactions::read(
+            &f.database,
+            "runtime.interactions.get",
+            json!({"interactionId":id,"request":params})
+        )
+        .is_err()
+    );
+    assert_eq!(
+        crate::application::runtime_interactions::reconcile(&f.database, user_request.clone())
+            .unwrap(),
+        json!({"state":"unknown"})
+    );
+    assert_eq!(f.database.connection().total_changes(), changes);
     assert_eq!(
         storage::resolve(&mut f.database, &denied, &frame.core_generation)
             .unwrap()
@@ -305,7 +348,12 @@ fn assert_native_interaction_storage(f: &mut Fixture) {
         .connection()
         .execute_batch("DROP TRIGGER reject_interaction_decision;")
         .unwrap();
-    let result = storage::resolve(&mut f.database, &accepted, &frame.core_generation).unwrap();
+    let result = crate::application::runtime_interactions::resolve(
+        &mut f.database,
+        user_request.clone(),
+        &frame.core_generation,
+    )
+    .unwrap();
     assert_eq!(result.result.code, "interaction.resolved");
     let changes = f.database.connection().total_changes();
     assert_eq!(
@@ -315,6 +363,43 @@ fn assert_native_interaction_storage(f: &mut Fixture) {
         result.result
     );
     assert_eq!(f.database.connection().total_changes(), changes);
+    let recovered =
+        crate::application::runtime_interactions::reconcile(&f.database, user_request.clone())
+            .unwrap();
+    assert_eq!(recovered["state"], "recorded");
+    assert_eq!(
+        recovered["result"],
+        serde_json::to_value(&result.result).unwrap()
+    );
+    // Original global User identity and full payload can recover a receipt even
+    // if its target row is gone. This savepoint is an explicit storage fixture.
+    f.database
+        .connection()
+        .execute_batch("SAVEPOINT interaction_removed_target")
+        .unwrap();
+    f.database
+        .connection()
+        .execute("DELETE FROM runtime_user_interaction WHERE id=?1", [&id])
+        .unwrap();
+    assert_eq!(
+        crate::application::runtime_interactions::reconcile(&f.database, user_request.clone())
+            .unwrap(),
+        recovered
+    );
+    assert_eq!(
+        crate::application::runtime_interactions::resolve(
+            &mut f.database,
+            user_request.clone(),
+            "another-process"
+        )
+        .unwrap()
+        .result,
+        result.result
+    );
+    f.database
+        .connection()
+        .execute_batch("ROLLBACK TO interaction_removed_target; RELEASE interaction_removed_target")
+        .unwrap();
     let mut conflict = accepted.clone();
     conflict.payload.answer = Answer::Question {
         answers: vec![],
@@ -375,6 +460,46 @@ fn assert_native_interaction_storage(f: &mut Fixture) {
     frame.sequence += 1;
     let second = storage::capture(&mut f.database, &frame, &params).unwrap();
     assert_ne!(second, id);
+    let list_params = json!({"conversationId":created.identity.child_conversation_id,"limit":1});
+    let changes = f.database.connection().total_changes();
+    let page = crate::application::runtime_interactions::read(
+        &f.database,
+        "runtime.interactions.list",
+        list_params.clone(),
+    )
+    .unwrap();
+    assert_eq!(page["items"][0]["id"], second);
+    let cursor = page["nextCursor"].as_str().unwrap().to_owned();
+    // The id exists, but belongs to the child, never this parent Conversation.
+    assert!(
+        crate::application::runtime_interactions::read(
+            &f.database,
+            "runtime.interactions.list",
+            json!({"conversationId":created.identity.parent_conversation_id,"cursor":id})
+        )
+        .is_err()
+    );
+    assert!(
+        !serde_json::to_string(&page)
+            .unwrap()
+            .contains("先完成哪个模块")
+    );
+    for value in [
+        json!({"conversationId":created.identity.child_conversation_id,"limit":0}),
+        json!({"conversationId":created.identity.child_conversation_id,"limit":51}),
+        json!({"conversationId":created.identity.child_conversation_id,"cursor":"other-conversation-request"}),
+        json!({"conversationId":created.identity.child_conversation_id,"actor":"agent"}),
+    ] {
+        assert!(
+            crate::application::runtime_interactions::read(
+                &f.database,
+                "runtime.interactions.list",
+                value
+            )
+            .is_err()
+        );
+    }
+    assert_eq!(f.database.connection().total_changes(), changes);
     frame.sequence += 1;
     frame.rpc_id = json!(3);
     frame.method = "_x.ai/exit_plan_mode".into();
@@ -384,6 +509,14 @@ fn assert_native_interaction_storage(f: &mut Fixture) {
         &json!({"planContent":"先补兼容，再做集成"}),
     )
     .unwrap();
+    let continuation = crate::application::runtime_interactions::read(
+        &f.database,
+        "runtime.interactions.list",
+        json!({"conversationId":created.identity.child_conversation_id,"limit":1,"cursor":cursor}),
+    )
+    .unwrap();
+    assert_eq!(continuation["items"][0]["id"], id);
+    assert_eq!(continuation["nextCursor"], Value::Null);
     let resolve_plan = CommandEnvelope {
         command_id: Uuid::new_v4().to_string(),
         actor: actor.clone(),

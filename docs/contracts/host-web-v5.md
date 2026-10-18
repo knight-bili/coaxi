@@ -55,3 +55,9 @@ finish 只由用户明确点击发起，原首次结果优先；未提交时记�
 两者返回 recorded 时沿用原安全回执投影，存储或运输错误仍返回未知，由客户端只读核对，不能本地伪造完成。
 
 本批已编码并完成客户端定向检查；新 Core 与实际 HTTP 路径留待阶段候选编译及运行验证。
+
+## 原生User交互三接口（2026-10-18）
+
+已认证User新增逐项准入的runtime.interactions.list/get/resolve；闭合参数和业务权威见[User交互接口](delegation-v1.md#user交互读取与答复接口)。只读列表有界且不返回题目/答案，完整内容单独取；resolve由Host/Core派生CURRENT_USER及归属，不接Agent或Native身份。网络运输不新增HTTP路由、凭据或Session字段，protocolVersion保持4。
+
+resolve纳入原commands.reconcile精确回执核对和显式同号重试。浏览器按interactionId分隔待核命令；不同问题互不阻挡，同一问题未知时不能换号提交，断线不自动重发。回执可结清原Promise，保留原完整Answer。未改公开Agent权限、模型工具allowlist或权限审批grant，也不代表原生请求/原卡片已经可用。Native回调及真实HTTP/GUI端到端继续按阶段验证。

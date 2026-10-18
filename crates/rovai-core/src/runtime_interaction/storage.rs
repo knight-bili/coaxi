@@ -64,6 +64,98 @@ fn user(actor: &ActorRef) -> bool {
     matches!(actor, ActorRef::User { user_id } if user_id == CURRENT_USER_ID)
 }
 
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct ListInteractions {
+    pub conversation_id: String,
+    pub cursor: Option<String>,
+    pub limit: Option<usize>,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct InteractionSummary {
+    pub id: String,
+    pub kind: String,
+    pub status: String,
+    pub version: i64,
+    pub created_at: String,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct InteractionPage {
+    pub conversation_id: String,
+    pub items: Vec<InteractionSummary>,
+    pub next_cursor: Option<String>,
+}
+
+pub(crate) fn owner(connection: &Connection, id: &str) -> Result<Option<(String, String)>> {
+    Ok(connection
+        .query_row(
+            "SELECT camp_id,conversation_id FROM runtime_user_interaction WHERE id=?1",
+            [id],
+            |r| Ok((r.get(0)?, r.get(1)?)),
+        )
+        .optional()?)
+}
+
+pub fn list(
+    database: &Database,
+    actor: &ActorRef,
+    params: &ListInteractions,
+) -> Result<InteractionPage> {
+    ensure!(user(actor), "interaction.user_required");
+    let limit = params.limit.unwrap_or(20);
+    ensure!((1..=50).contains(&limit), "interaction.page_limit_invalid");
+    let connection = database.connection();
+    ensure!(
+        connection.query_row(
+            "SELECT EXISTS(SELECT 1 FROM conversation WHERE id=?1)",
+            [&params.conversation_id],
+            |r| r.get::<_, bool>(0)
+        )?,
+        "interaction.conversation_not_found"
+    );
+    let cursor_time:Option<String>=params.cursor.as_ref().map(|cursor| {
+        connection.query_row("SELECT created_at FROM runtime_user_interaction WHERE id=?1 AND conversation_id=?2",
+            params![cursor,params.conversation_id],|r|r.get::<_,String>(0)).optional()?
+            .context("interaction.cursor_invalid")
+    }).transpose()?;
+    let mut statement = connection.prepare(
+        "SELECT id,kind,status,version,created_at FROM runtime_user_interaction
+        WHERE conversation_id=?1 AND (?2 IS NULL OR created_at<?2 OR (created_at=?2 AND id<?3))
+        ORDER BY created_at DESC,id DESC LIMIT ?4",
+    )?;
+    let mut items = statement
+        .query_map(
+            params![
+                params.conversation_id,
+                cursor_time,
+                params.cursor,
+                (limit + 1) as i64
+            ],
+            |r| {
+                Ok(InteractionSummary {
+                    id: r.get(0)?,
+                    kind: r.get(1)?,
+                    status: r.get(2)?,
+                    version: r.get(3)?,
+                    created_at: r.get(4)?,
+                })
+            },
+        )?
+        .collect::<rusqlite::Result<Vec<_>>>()?;
+    let more = items.len() > limit;
+    items.truncate(limit);
+    let next_cursor = more.then(|| items.last().expect("nonempty bounded page").id.clone());
+    Ok(InteractionPage {
+        conversation_id: params.conversation_id.clone(),
+        items,
+        next_cursor,
+    })
+}
+
 // All decision/send fences consult the frozen owner, not caller-supplied scope.
 fn live(connection: &Connection, id: &str, generation: &str, host: Option<&str>) -> Result<bool> {
     Ok(connection.query_row(
@@ -210,7 +302,9 @@ pub fn resolve(
             "SELECT camp_id,status,version,request_json FROM runtime_user_interaction WHERE id=?1",
             [&envelope.payload.interaction_id],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?))).optional()?;
         let Some((camp,status,version,request))=row else{return reject("interaction.not_found");};
-        if envelope.camp_id.as_deref()!=Some(&camp) {return reject("interaction.not_found");}
+        // Host uses a global User envelope so its exact receipt survives target
+        // deletion. Legacy scoped callers still cannot claim a different Camp.
+        if envelope.camp_id.as_deref().is_some_and(|scope|scope!=camp) {return reject("interaction.not_found");}
         if status!="pending" || version!=envelope.payload.expected_version {return reject("interaction.stale");}
         if !live(tx,&envelope.payload.interaction_id,current_generation,None)? {return reject("interaction.scope_not_live");}
         let request:Request=serde_json::from_str(&request)?;

@@ -196,10 +196,11 @@ describe('console transport', () => {
     expect(fetcher.mock.calls.filter(([, init]) => init?.body && JSON.parse(String(init.body)).operation === operation)).toHaveLength(1)
   })
 
-  it.each(['singleChat.composerDraft.mutate', 'delegations.composer.mutate', 'delegations.message.send', 'delegations.pendingInputs.edit', 'delegations.takeover', 'delegations.cancel', 'delegations.resume', 'delegations.conversation.end'] as const)('keeps an unknown private card independent and settles the original promise through an explicit receipt read: %s', async operation => {
+  it.each(['singleChat.composerDraft.mutate', 'delegations.composer.mutate', 'delegations.message.send', 'delegations.pendingInputs.edit', 'delegations.takeover', 'delegations.cancel', 'delegations.resume', 'delegations.conversation.end', 'runtime.interactions.resolve'] as const)('keeps an unknown private card independent and settles the original promise through an explicit receipt read: %s', async operation => {
     let recorded = false
     const params = (nodeId: string) => ({ commandId: newCommandId(), command:
-      operation === 'delegations.resume' ? { delegationId: `child-${nodeId}`, expectedAttemptNo: 1, reason: '继续原任务' }
+      operation === 'runtime.interactions.resolve' ? { interactionId: `question-${nodeId}`, expectedVersion: 1, answer: { kind: 'question', answers: [{ questionId: 'q0', labels: [`保留完整回答${nodeId}`] }], declined: false } }
+      : operation === 'delegations.resume' ? { delegationId: `child-${nodeId}`, expectedAttemptNo: 1, reason: '继续原任务' }
       : operation === 'delegations.takeover' ? { delegationId: `child-${nodeId}`, expectedControlVersion: 1 }
         : operation === 'delegations.cancel' ? { delegationId: `child-${nodeId}`, attemptNo: 1 }
         : operation === 'delegations.conversation.end' ? { conversationId: `child-${nodeId}` }

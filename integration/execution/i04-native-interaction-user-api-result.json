@@ -1,0 +1,248 @@
+{
+  "schema_version": 1,
+  "artifact_id": "I04-NATIVE-INTERACTION-USER-API",
+  "recorded_at": "2026-10-18T09:25:22.7224452+08:00",
+  "source_baseline": "5d8ecea8caeea83a38e98787f3c3b4194da894ae",
+  "branch": "phase/i04-collaboration-runtime",
+  "core_contract": "v1.73",
+  "projection_schema": 161,
+  "migration": 211,
+  "implementation_status": "core_user_api_and_transport_admission_verified_native_callback_and_ui_pending",
+  "scope": {
+    "new_formal_passes": 0,
+    "i04_packages": 4,
+    "i04_clusters": 21,
+    "packages": 48,
+    "i04_formal_cases": 84,
+    "formal_cases": 324,
+    "clusters": 81
+  },
+  "implemented": [
+    "runtime.interactions.list：默认20/最多50的同Conversation摘要键分页，不含题目和答案",
+    "runtime.interactions.get：按原Core编号读取显式User视图，隐藏Native元数据",
+    "runtime.interactions.resolve：Host派生CURRENT_USER、全局User envelope、首次按持久owner/Camp/live Core代次核定、完整原UUID回执",
+    "原Application分派和独立请求通道；安全失效事件不带正文或原生身份",
+    "Desktop Native IPC名单、Rust Web Operation、Web client准入及共享TS DTO",
+    "Web未知命令按interactionId隔离；同题未知阻挡、不同题独立，原Promise精确核对，不自动重发"
+  ],
+  "checks": {
+    "new_rust_owners": 0,
+    "rust_checks": [
+      {
+        "log": "interaction-api-owner-02.log",
+        "test": "context::slow_tests::single_chat_materializes_conversation_input_with_a_memory_free_bootstrap"
+      },
+      {
+        "log": "interaction-api-web-operation-01.log",
+        "test": "operations::tests::public_projection_excludes_mcp_credentials_and_desktop_mutation_actions"
+      }
+    ],
+    "typecheck": "interaction-api-types-02.log",
+    "doc_base": "5d8ecea8caeea83a38e98787f3c3b4194da894ae",
+    "docs_tests_passed": 10,
+    "docs_log": "interaction-api-doc-tests-01.log",
+    "current_canonical_web_operations": 205,
+    "rust_owners_passed": 2,
+    "transport_log": "interaction-api-transport-02.log",
+    "doc_governance": "interaction-api-doc-governance-01.log",
+    "transport_tests_passed": 48,
+    "full_core_suite_run": false,
+    "codegraph": "interaction-api-codegraph-02.log",
+    "source_protocol_baseline_unchanged": true
+  },
+  "fixture_boundaries": [
+    "原Context同库真实SQLite/Blob/Grok工厂/Registry/领取/绑定/投递，Session/ACK/程序身份为夹具",
+    "API helper为实际Host派生入口，generation参数为夹具值，未执行完整Core请求循环或Native管道",
+    "目标删除回执使用显式SQLite savepoint，不称真实UI删除流程；游标不承诺跨请求数据库快照",
+    "Web客户端为fetch替身，Native检查为实际allowlist，Web Operation原Rust owner为真；无HTTP或GUI端到端",
+    "原单聊/委派Context owner内既有故障注入与非fatal tmp清理诊断保留；本批未改其cleanup实现"
+  ],
+  "failures_resolved": [
+    "transport01发现原默认operation分组使不同问题互相阻挡，按持久interactionId分组后transport02全部48通过"
+  ],
+  "pending": [
+    "可信ACP Native callback和Host失效封旧/原路由writer资格",
+    "Grok修改意见原Core User队列登记，未完成前仍禁止dispatch",
+    "r1 question/plan_approval安全阻塞摘要、原广播、Codeg原卡片与两类查看器",
+    "其他原生格式、完整Runtime/平台矩阵与I04 T02/T03/T04全部既定范围"
+  ],
+  "approved_files_unchanged": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    }
+  ],
+  "source_blobs": [
+    {
+      "path": "apps/desktop/src/main/index.ts",
+      "git_blob": "6f605f3d986da2474eecea34944ace36eef3866c"
+    },
+    {
+      "path": "apps/desktop/src/main/runtime-core-methods.test.ts",
+      "git_blob": "d677feb59cb0b697866806de608c5d3309fc0693"
+    },
+    {
+      "path": "apps/web/src/client.test.ts",
+      "git_blob": "2d7656475623d606dd2d62c46d96c4de3566f4a6"
+    },
+    {
+      "path": "apps/web/src/client.ts",
+      "git_blob": "5fa69a75af168414e02d7bbfc7d9a11c80f30b87"
+    },
+    {
+      "path": "crates/rovai-core/src/application.rs",
+      "git_blob": "05e520e412f43b3ef10839eea4e9d9df80f03177"
+    },
+    {
+      "path": "crates/rovai-core/src/application/runtime_interactions.rs",
+      "git_blob": "4a0f4c8bdbdff9533051ae63205feb6989a3f6e2"
+    },
+    {
+      "path": "crates/rovai-core/src/application/web_commands.rs",
+      "git_blob": "291a5a6f0bb28baf9a7c2be843534d6611f66537"
+    },
+    {
+      "path": "crates/rovai-core/src/context/native_interaction_tests.rs",
+      "git_blob": "4330da98b6b20c30441d33c4882cc9f03cfbf855"
+    },
+    {
+      "path": "crates/rovai-core/src/runtime_interaction/storage.rs",
+      "git_blob": "27860f4dd6df8f1028fc1e3c195a5e91fc8db2c3"
+    },
+    {
+      "path": "crates/rovai-web/src/operations.rs",
+      "git_blob": "bd7abeea413eae7e759e2fbed212217a75629f96"
+    },
+    {
+      "path": "packages/contracts/src/index.ts",
+      "git_blob": "0280c303c6d55ce633123752539652d4bee90361"
+    }
+  ],
+  "logs": [
+    {
+      "path": "work/i04/logs/interaction-api-approved-check-01.json",
+      "bytes": 1743,
+      "sha256": "09f9d236c7a8f5438e930c915fa9b5a9d94d0bc4e167edaf57305913180b95f4"
+    },
+    {
+      "path": "work/i04/logs/interaction-api-codegraph-01.log",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "work/i04/logs/interaction-api-codegraph-02.log",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "work/i04/logs/interaction-api-compile-01.log",
+      "bytes": 2225,
+      "sha256": "ca0063922e171219d9b64ba3402bf9523c3a84d97f76c9f5afd4389dda1a48bc"
+    },
+    {
+      "path": "work/i04/logs/interaction-api-diff-01.log",
+      "bytes": 250,
+      "sha256": "2a58200b15a2f8892f47424b7d7192f554710c940524d1806bfdf5b2d7d91840"
+    },
+    {
+      "path": "work/i04/logs/interaction-api-doc-governance-01.log",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "work/i04/logs/interaction-api-doc-tests-01.log",
+      "bytes": 922,
+      "sha256": "92553cdce32583368cf5665dfdfda8f4f5532dafff162374f36d4ce772264935"
+    },
+    {
+      "path": "work/i04/logs/interaction-api-doc-version-01.log",
+      "bytes": 79,
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "work/i04/logs/interaction-api-fmt-01.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "work/i04/logs/interaction-api-include-fmt-01.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "work/i04/logs/interaction-api-operation-count-01.json",
+      "bytes": 143,
+      "sha256": "89609ec69d3888c0ee7f79456e2c5a735e1f44f75356b3b3f26c9dde82a3839e"
+    },
+    {
+      "path": "work/i04/logs/interaction-api-owner-01.log",
+      "bytes": 1279,
+      "sha256": "6a0b51b560d7b5e9cf4245db30abee16b9420c7c16f374aefd511db3774fe2b2"
+    },
+    {
+      "path": "work/i04/logs/interaction-api-owner-02.log",
+      "bytes": 2453,
+      "sha256": "e275177fb5bfaa592269631319f1f7bb4dbd633f9a0195815e69cfa6f8c92e60"
+    },
+    {
+      "path": "work/i04/logs/interaction-api-transport-01.log",
+      "bytes": 1663,
+      "sha256": "899ad876f80d5bbe6791b7df3cba5c2b74d56fbe3d61d4fe03c9bf43456581f6"
+    },
+    {
+      "path": "work/i04/logs/interaction-api-transport-02.log",
+      "bytes": 286,
+      "sha256": "f9744117424f64b723982ccfbe0c6504e03c0b5e7a3716b2235dee907e359c02"
+    },
+    {
+      "path": "work/i04/logs/interaction-api-types-01.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "work/i04/logs/interaction-api-types-02.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "work/i04/logs/interaction-api-web-operation-01.log",
+      "bytes": 3613,
+      "sha256": "f4644e6ca84fc0cadf3b16cfc5254189e240269c8b3c49f5264b61d3da7051b0"
+    }
+  ],
+  "external": {
+    "main_merge": false,
+    "paid_model": false,
+    "actions": false,
+    "daily_data_used": false,
+    "user_action_required": false,
+    "release": false,
+    "push": false
+  }
+}

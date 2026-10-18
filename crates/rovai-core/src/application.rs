@@ -11,6 +11,7 @@ pub(crate) mod delegation_queries;
 mod mission;
 pub(crate) mod private_composer;
 mod private_sources;
+pub(crate) mod runtime_interactions;
 mod transport;
 mod web_commands;
 pub use config::{CoreConfig, RemovedSkillProjectRoots};
@@ -868,6 +869,7 @@ fn request_runs_outside_main_queue(method: &str) -> bool {
             | "delegations.takeover"
             | "delegations.cancel"
             | "delegations.settings.update"
+            | "runtime.interactions.resolve"
             | "delegations.resume"
             | "delegations.conversation.end"
             | "delegations.pendingInputs.edit"
@@ -10635,6 +10637,39 @@ impl Core {
             | "delegations.settings.get" => {
                 let db = self.database.lock().await;
                 delegation_queries::read(&db, &request.method, request.params.clone())
+            }
+            "runtime.interactions.list" | "runtime.interactions.get" => {
+                let database = self.database.lock().await;
+                runtime_interactions::read(&database, &request.method, request.params.clone())
+            }
+            "runtime.interactions.resolve" => {
+                let mut database = self.database.lock().await;
+                let execution = runtime_interactions::resolve(
+                    &mut database,
+                    request.params.clone(),
+                    self.planned_shutdown.generation(),
+                )?;
+                let changed =
+                    if !execution.replayed && execution.result.code == "interaction.resolved" {
+                        crate::runtime_interaction::storage::owner(
+                            database.connection(),
+                            execution.result.payload["interactionId"]
+                                .as_str()
+                                .context("interaction.result_invalid")?,
+                        )?
+                    } else {
+                        None
+                    };
+                drop(database);
+                if let Some((thread_id, conversation_id)) = changed {
+                    emit(
+                        &self.output,
+                        "runtime.interaction.changed",
+                        json!({"threadId":thread_id,"conversationId":conversation_id,
+                        "interactionId":execution.result.payload["interactionId"],"version":execution.result.payload["version"]}),
+                    );
+                }
+                Ok(serde_json::to_value(execution.result)?)
             }
             "delegations.settings.update" => {
                 let mut db = self.database.lock().await;
