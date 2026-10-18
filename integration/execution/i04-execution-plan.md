@@ -4,6 +4,8 @@
 
 接管后的聊天已挂到实际 SingleChatPanel：明确 child 模式固定原会话和发起队员，清理完成后开放聊天；原任务说明及原 Run、消息、附件、引用与恢复入口沿共享组件。普通私聊的未绑定草稿不能迁入 child。接管/取消/恢复/结束控制保存原 UUID 和完整参数，未知先核对；输入交接未结时阻止关闭、同层替换及 Thread 离开，隐藏再显示保留原编辑器和阅读位置。结束保留已保存历史，禁止继续发送。此前的[共享基础记录](i04-child-chat-foundation-result.json)保持原批事实；本批界面证据见[接管聊天界面记录](i04-child-chat-ui-result.json)。
 
+继续第二类 Runtime 原生子代理：已按[原源码映射和有限队列](../inventory/native-subagent-viewer-reference.md)编码内部可信目标解析。只收原 Thread/Run/证据/接收序号，核对 Context/Bootstrap 和原 binding/epoch；Grok 短编号不作 Session，终态父运行不持续动画。原生文件定位、完整内容/分页、两端运输和原只读查看器仍待接，不把内部准入当公开读取或 UI 完成。分项验证见[本批记录](i04-native-child-authority-result.json)，原完整 I04 队列继续。
+
 固定Codeg问答/计划共享卡片已挂Rovai原公屏与精确私聊入口；其原请求核对、版本、状态和隔离Renderer资格见[卡片映射](../inventory/runtime-interaction-ui-reference.md)及[交互记录](i04-native-interaction-ui-result.json)。本批继续接入Core委派会话查看器：原BaseUI1.7.0抽屉/Runtime静态图标、父页面仍可操作、单层替换/嵌套退层/右滑关闭、共享审批/问题/执行过程，Core User get仅增确切child活动只读投影；完整history仍用原signed cursor。见[查看器映射](../inventory/delegation-viewer-ui-reference.md)及[本批记录](i04-delegation-viewer-result.json)。原同库Core owner与隔离Renderer分别取证，未产生84正式场景新增通过。
 
 下一队列保持有限且按依赖推进：① Codeg 另一类 Runtime 原生子代理的可信只读读取与原查看器；② Grok 修改意见原 User 输入/队列与生命周期衔接，语义超出 r1 时先形成具体客户故事版 revision；③ 实际 Core/运输/原生 Host 与产品界面的完整往返，以及原完整正文同场景对照；④ T01 其他协作缺口和 T02/T03/T04 的 Runtime 并集、恢复、记忆与自动化；⑤ I04 候选集中检查 84 项。当前已完成的抽屉、聊天和输入组件不重复排为待编码，也不据模拟传输授予真实模型或正式场景通过。两类查看器来自 Codeg，融合正文复用 Rovai 原组件。完整一期 81 簇/48 包/324 场景不缩减；阶段集齐才冻候选集中构建和 Actions，用户 I12 后使用软件验收。

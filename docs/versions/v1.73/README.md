@@ -29,6 +29,8 @@ last_updated: 2026-10-18
 
 Core 委派查看器已复用 Codeg 原抽屉、卡片、图标和 Rovai 原执行组件；接管后共享聊天与材料、控制回执、隐藏恢复和离开保护已有隔离生产 Renderer 证据，见[本批记录](../../../integration/execution/i04-child-chat-ui-result.json)。尚未完成的产品工作包括完整 Host/Runtime 生命周期、Grok 反馈队列、away/manual 资格、原 Codeg 设置和另一类 Runtime 原生子代理查看器、原完整 App 同场景、三类记忆和自动化等 I04 既定工作，以及阶段候选验证。I04 仍为研发中；全部 21 簇、4 个工作包、84 个正式场景保留。
 
+第二类原生子会话的内部候选解析已编码：Current User、原 Evidence/Run/epoch/Context/Bootstrap/binding 校验，无额外 Session/路径输入；观察 receiver 不自动授予子会话内容读取权。[本批记录](../../../integration/execution/i04-native-child-authority-result.json)只记录内部准入与同库断言；原生来源/父子证明、全文与分页、Native/Web 和原 UI 仍依[有限队列](../../../integration/inventory/native-subagent-viewer-reference.md)继续，不改变模型输入、Schema 或公共方法名单。
+
 ## 跨版本文档影响
 
 | 范围 | 结论 | 证据或理由 |

@@ -9052,6 +9052,7 @@ mod slow_tests {
     include!("context/delegation_dispatch_tests.rs");
     include!("context/delegation_transport_tests.rs");
     include!("context/delegation_evidence_tests.rs");
+    include!("context/native_child_session_tests.rs");
     include!("context/delegation_user_query_tests.rs");
     include!("context/delegation_user_resume_tests.rs");
     use crate::{
@@ -13007,6 +13008,7 @@ mod slow_tests {
         else {
             panic!("redelivery Context should be ready");
         };
+        assert_native_child_session_reference(&mut fixture);
         let delivery = service
             .prepare_input_delivery_for_context(
                 &mut fixture.database,

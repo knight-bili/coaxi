@@ -88,6 +88,8 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 该夹具不证明实际 Host/Native、多窗口、源文件摘要/授权、最终模型 Blob 或完整 PC01–PC24；正式324场景保持未验。
 
 ## Rust 测试准入与退役门槛
+原生子会话可信读取目标继续扩原 `context::slow_tests::delivery_unknown_never_consumes_a_redelivery_requirement`，原 Core bind_native_session 完成后在同一 Fixture/SQLite/Blob 扩展，helper 为 `context/native_child_session_tests.rs`。真实 Core 记录观察后检验 User-only、原 Thread/Run/证据、接收序号、Context/Bootstrap/当前 binding/epoch/compatibility、读取零写入及父终态关闭 live；用 savepoint 恢复反例，不新增整库或 Rust owner。原 `execution_evidence::tests::provider_packets_are_reduced_to_public_evidence_fields` 验证既有 Grok 闭合来源、父 Session、错 adapter 和缺少显式 Session 不能回退 subagent_id。使用 `--features slow-tests`，两个 owner 先各自 `--exact --list` 确认非零再运行。本批不读开发者原生日志或凭据、不启动 Runtime；文件解析/历史绑定/两端运输/原 UI 的失败语义留到对应实现，不用身份检查替代全文资格。
+
 原生答复新增唯一最低层owner acp::user_reply::tests::native_user_reply_rechecks_the_exact_prompt_at_the_writer_and_poisoned_frames_never_continue，放extended-tests。它拥有排队后路由改变、PromptCompleted不能答复、半帧/flush失败/写途中取消及禁止续写的独立失败语义；原纯codec owner不做I/O，旧Cursor实际进程owner仅Unix，均不能替代本owner。只用Tokio/内存AsyncWrite，不创建SQLite、文件、进程或网络。显式poll在占用writer时确认pending，再换epoch，不依赖线程先后碰运气；预算触发被阻塞I/O超时，隔离标记不伪造进程退出。最小命令：cargo test -p rovai-core --features extended-tests --lib acp::user_reply::tests::native_user_reply_rechecks_the_exact_prompt_at_the_writer_and_poisoned_frames_never_continue -- --exact；先同过滤--list确认非零。slow清单1254→1255，无删除owner，默认400预算不增加此并发owner。
 
 原Context materialization owner同库增加精确Host失效四身份拒绝、pending/resolved/dispatching分别关闭或unknown、重复零写、单请求不动另一请求及savepoint回滚；原重启矩阵继续保留，不新建整库。原Grok route_policy owner作活动/空闲分类回归。内存writer和Core记录分别拥有自己的边界，不重复问答codec参数矩阵；完整Core listener/ACP进程/User循环、原生writer cleanup及平台/模型仍归阶段验证，组件通过不增加84正式场景数。

@@ -16,3 +16,5 @@ Codeg broker 已拥有 task、connection 与缓存，直接保留它并与 Rovai
 规范由[委派架构](../../architecture/delegation.md)和[Delegation v1](../../contracts/delegation-v1.md)拥有；完整批准快照与确认另存[变更说明](model-context-change-native-delegation.md)。该取舍不表示执行实现已经完成。
 
 User 接管后的 UI 继续遵循同一权威：复用 Codeg 抽屉和 Rovai 聊天组件，并以明确 child 操作族连接 Core，避免另一份会话/材料状态。代价是原单聊组件需适配固定 owner、共享输入恢复及嵌入几何；这使原任务、后续 User 聊天和已有输入保护沿同一投影工作。控制回执可持久关闭恢复，输入交接未结仍围栏离开，不靠 Drawer 的开关推断业务结束。具体行为和资格由当前合同与分项证据拥有。
+
+Runtime 原生查看器同样不能直接移植 Codeg 的 agentType/Session 泛读取入口：被报告为工具 receiver 不一定已证明是该父的子代理。选择先由 Core 原证据和绑定构造不可反序列化候选，再由原生来源核对父子记录后读取；代价是多一层来源验证，并须明确补全历史绑定来源。它不引入 Core 子任务，也不能把候选解析测试称为全文查看器完成。

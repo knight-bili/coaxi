@@ -265,3 +265,9 @@ User 显式接管沿既有 delegations.takeover；清理完成后才挂原 Singl
 四个既有控制入口 takeover/cancel/resume/conversation.end 先保存原 UUID/完整命令，再派发；规范 commandType 原样校验。丢回执只核对原请求，显式重试复用原参数；未知控制可关闭后重开恢复，未知输入交接仍由原输入 guard 围栏。只有 Core 确认 ended 才禁发并保留已保存历史；结束说明不沿用普通私聊删除历史的文案。
 
 抽屉遵循固定 Codeg 的非模态/单槽/嵌套规则，聊天正文、执行、材料和恢复复用 Rovai 既有组件。父页面隐藏时子层及内层结束弹窗不可见，重新显示只重读同一身份，保留本机编辑状态。以上没有新增模型可见输入、数据库迁移或 Runtime 准入；[分项证据](../../integration/execution/i04-child-chat-ui-result.json)的模拟 UI 传输与真实 Core/Host/模型资格分别记录。
+
+### Runtime 原生子会话读取目标
+
+与上述 Core 委派 child 分开。内部 `NativeChildSessionService::resolve` 只接受 Current User 和 `threadId/agentRunId/evidenceId/receiverIndex`，沿持久 Evidence、真实 Run/epoch、Thread/Conversation、Context Manifest、Bootstrap binding id/generation 与当前 Native binding/installation/compatibility 校验，构造不实现 Serialize/Deserialize 的内部读取目标。未知或变化的归属明确拒绝，不把 UI 参数升级为 Native Session 地址。此内部解析没有登记公共 Core method，也不执行原生文件 I/O。
+
+观察只承认 Core 既有闭合的 Codex collab/subAgentActivity、Grok subagent notification 三类来源。Grok 的 subagent_id 不能替代缺失的 child_session_id；其观察归属 Run 也不能被称作创建该子代理的 Run。父运行结束保留观察状态，实时资格 live=false，不能据旧 running 伪造成功或永久转圈。候选保留 relationship：runtime_reported_receiver 不是已证明的子代理，解析器必须再校验原生父子记录后才可返回正文，不能凭可见 receiver 编号读取其他原生会话。历史绑定来源、内容读取/分页、Native/Web 和原只读 UI 按[完整队列](../../integration/inventory/native-subagent-viewer-reference.md)接续，本分项没有授予这些未实现能力。

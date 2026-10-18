@@ -114,3 +114,7 @@ Grok修改意见仍未完成。核对固定Codeg的lifecycleSend/mqEnqueue和已
 此前已验证的 child 快照和共享输入控制器现挂到生产 SingleChatPanel：固定原 child/发起队员，清理完成开放编辑，原任务说明和 Run 不丢。附件、引用、排队及保留输入复用 child 归属；普通私聊未绑定草稿不迁入。控制入口持久保存 UUID/命令并核对原回执，结束保留历史；抽屉和 Thread 离开保护贯通嵌套输入，隐藏恢复保持编辑器与阅读位置。
 
 界面沿 Codeg 原抽屉与 Rovai 原聊天组件，只有 child 模式、容器嵌入和具体归属适配；日夜宽窄图及生产 Renderer 运输夹具结果见[接管聊天记录](../../../integration/execution/i04-child-chat-ui-result.json)。当前没有 Rust、Schema、依赖或模型输入变化，不因本切片重编 Core 或触发远程 Actions；原完整 App 对照、第二类原生子代理、实际 Core/Host/GUI/模型往返及其他 I04 包仍必需，正式场景新增通过 0。
+
+## 原生子会话可信目标接续（2026-10-18）
+
+第二类原查看器先接 Core 内部身份准入：从既有真实 Evidence/Run/Context/Bootstrap/binding 推导只读原生目标，Current User-only，不收 UI Native ID/路径/Runtime override；Grok 无显式 Session 不回退短编号，父运行终态停止旧状态动画。扩同一 Context 和原 Evidence 投影两个 owner，无新 SQLite 或测试 owner；[分项记录](../../../integration/execution/i04-native-child-authority-result.json)区分内部准入与未接的文件/运输/UI。没有新模型输入、Schema 或新公共 method，完整 I04 范围继续。
