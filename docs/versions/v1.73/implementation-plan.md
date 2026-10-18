@@ -3,7 +3,7 @@ document_type: implementation-plan
 version: v1.73
 authority: version-implementation-and-acceptance
 status: in_progress
-last_updated: 2026-10-18
+last_updated: 2026-10-19
 ---
 
 # v1.73 实施计划
@@ -23,6 +23,9 @@ last_updated: 2026-10-18
 源码 `7c13ccb10` 的[重启结算分项证据](../../../integration/execution/i04-delegation-restart-result.json)固定10个源码Git blob、48份日志及6份批准工件核定，保留测试准备错误和重复写缺陷的失败记录。
 
 ## 分项记录
+
+执行分页先补 Core 独立卡片投影与旧3兼容、跨块 support、同水位成对位置及展开组精确移除，再接客户端能力协商、
+缓存和原 Renderer。复用原分页 slow owner，不新增整库/进程；原完整 App、真实 Core/Native/Web 与阶段候选仍保留。
 
 以下按实现先后记录，旧分项中的159/209及未登记状态保留当时事实；当前登记状态以上方实施步骤及最新迁移记录为准。
 

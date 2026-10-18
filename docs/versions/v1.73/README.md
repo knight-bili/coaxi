@@ -6,7 +6,7 @@ authority: version-scope-and-status
 design_status: confirmed
 implementation_status: in_progress
 model_context_change: true
-last_updated: 2026-10-18
+last_updated: 2026-10-19
 ---
 
 # v1.73：Core 独立帮手
@@ -35,6 +35,9 @@ Codex 原消息解析主体及代码模式/MCP/延迟等待、目标/计划、�
 
 ## 研发状态
 
+分页执行主线新增可协商的委派独立块后端；原 schema3 保留，跨块 Shell support 与成对增量位置由
+[v52](../../contracts/run-process-detail-surface-v52.md)拥有。客户端启用和完整产品链路继续开发，I04不提前收口。
+
 当前源码登记 Core v1.73/Schema161/Migration211。原完整160/210委派迁移保持独立目标，160现在是受支持来源；211单独增加原生User交互存储，不重写210或旧输入。两条启动链按原事务顺序安装，旧v1.72/159仍可沿原链升级。此前160/210的[启动升级分项证据](../../../integration/execution/i04-delegation-startup-result.json)保留原时点，当前211边界见[原生交互合同](../../contracts/delegation-v1.md#原生user交互存储)。不表示用户日常数据库已升级。
 
 原生提问和计划审批已有纯转换、Core 持久请求、User-only 答复/CAS/原回执及可信回调，写端在同一串行锁内重验活跃 prompt；Windows 受控假进程耦合已另有分项证据。安全阻塞摘要、广播和固定 Codeg 问答/计划卡片已接公屏、精确私聊与 Core 委派查看器。Run 取消、绑定失效与启动恢复会封旧请求；Grok 修改意见已保存，原 User 队列尚未接入前仍明确禁止发送。完整 Core main/Host/GUI/provider 往返和平台矩阵仍待，不以组件或假进程替代。没有改变批准 r1 文本、Bootstrap 或父模型历史。
@@ -54,8 +57,8 @@ Core 委派查看器已复用 Codeg 原抽屉、卡片、图标和 Rovai 原执�
 | 范围 | 结论 | 证据或理由 |
 | --- | --- | --- |
 | Version lifecycle | 已更新 | 本概览、[实施计划](implementation-plan.md)、[版本索引](../README.md)与旧版 lifecycle 同步；旧实现事实不改写。 |
-| Decisions | 已更新 | [V1.73-D01](decisions.md#v1-73-d01) 说明为何复用 Core 而不移植第二套 broker 业务权威，[导航](../../decisions/CURRENT.md)同步。 |
-| Contracts | 已更新 | [Delegation v1](../../contracts/delegation-v1.md) 区分已实现基础输入/设置与待接入执行合同；[Builtin Transport v39](../../contracts/builtin-tool-transport-v39.md) 增六项委派、精确租约回放、封闭输出与无限等待，完整Host生命周期资格单独留证。 |
+| Decisions | 已更新 | [V1.73-D01](decisions.md#v1-73-d01)与[V1.73-D02](decisions.md#v1-73-d02)分别说明单一执行权威与兼容投影；D01说明为何复用 Core 而不移植第二套 broker 业务权威，[导航](../../decisions/CURRENT.md)同步。 |
+| Contracts | 已更新 | [Delegation v1](../../contracts/delegation-v1.md) 区分已实现基础输入/设置与待接入执行合同；[Builtin Transport v39](../../contracts/builtin-tool-transport-v39.md) 增六项委派、精确租约回放、封闭输出与无限等待，完整Host生命周期资格单独留证；[执行主线v52](../../contracts/run-process-detail-surface-v52.md)拥有可协商独立卡片、支持记录及成对位置。 |
 | Architecture | 已更新 | [委派架构](../../architecture/delegation.md)规定单一权威和原生子代理区别；领域词汇在根 CONTEXT.md 同步。 |
 | UI | 已更新 | [源码映射](../../../integration/inventory/delegation-viewer-ui-reference.md)与[会话呈现](../../ui/components/conversation-workspace.md#已接管的独立帮手)记录 Codeg 原抽屉/Rovai 原聊天的复用及 child 边界；第二类原生子代理、设置及原完整 App 对照仍待。 |
 | Runtime Activity | 确认无需更新 | 本批无新活动映射；前两批 User-only 原生观察证据保持。 |

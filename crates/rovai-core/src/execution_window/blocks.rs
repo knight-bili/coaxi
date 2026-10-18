@@ -18,6 +18,8 @@ pub struct ToolCounts {
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ExecutionBlock {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub projection_version: Option<i64>,
     pub key: String,
     pub kind: &'static str,
     pub sequence: i64,
@@ -26,12 +28,15 @@ pub struct ExecutionBlock {
     pub tool_count: usize,
     pub counts: ToolCounts,
     pub evidence: Vec<AgentRunExecutionEvidenceView>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub supporting_evidence: Vec<AgentRunExecutionEvidenceView>,
 }
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ExecutionBlockPage {
     pub schema_version: i64,
+    pub delegation_blocks_version: i64,
     pub thread_id: String,
     pub agent_run_id: String,
     pub requested_before_sequence: Option<i64>,
@@ -49,6 +54,10 @@ pub struct ExecutionBlockPage {
 #[serde(rename_all = "camelCase")]
 pub struct ExecutionBlockChanges {
     pub schema_version: i64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub requested_after_entry_sequence: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub next_after_entry_sequence: Option<i64>,
     pub thread_id: String,
     pub agent_run_id: String,
     pub requested_after_change_sequence: i64,
@@ -76,6 +85,7 @@ pub struct ExecutionGroupPage {
     pub evidence: Vec<AgentRunExecutionEvidenceView>,
 }
 
+#[derive(Clone)]
 struct Item {
     sequence: i64,
     ids: String,
@@ -83,10 +93,13 @@ struct Item {
     metadata: AgentRunExecutionEvidenceView,
     visible: bool,
     carrier_for: Option<String>,
+    support_only: bool,
 }
 struct Block {
     items: Vec<Item>,
     tool: bool,
+    supporting: Vec<Item>,
+    projection_version: Option<i64>,
 }
 impl Block {
     fn sequence(&self) -> i64 {
@@ -96,7 +109,12 @@ impl Block {
         self.items.last().unwrap().sequence
     }
     fn change(&self) -> i64 {
-        self.items.iter().map(|item| item.change).max().unwrap_or(0)
+        self.items
+            .iter()
+            .chain(&self.supporting)
+            .map(|item| item.change)
+            .max()
+            .unwrap_or(0)
     }
     fn visible(&self) -> impl Iterator<Item = &Item> {
         self.items.iter().filter(|item| item.visible)
@@ -138,7 +156,7 @@ fn status(item: &AgentRunExecutionEvidenceView) -> &'static str {
 
 // This index carries classification inputs, never result text, diffs or full narration.
 // All logical selection and hydration happen in the same SQLite read transaction.
-fn index(connection: &Connection, run: &str) -> Result<Vec<Block>> {
+fn index(connection: &Connection, run: &str, delegations: bool) -> Result<Vec<Block>> {
     let logical = select_items(connection, run, None, None, None, None, i64::MAX)?;
     let mut statement = connection.prepare(r#"
         SELECT id, agent_run_id, execution_epoch, sequence, event_type, kind, phase,
@@ -205,27 +223,93 @@ fn index(connection: &Connection, run: &str) -> Result<Vec<Block>> {
         .collect::<Vec<_>>();
     crate::read_model::attach_canonical_activity_projection(connection, &mut metadata, true)?;
     let mut associations = super::associations::carrier_targets(connection, &metadata)?;
-    let mut blocks: Vec<Block> = Vec::new();
+    let is_standalone = |item: &AgentRunExecutionEvidenceView| {
+        item.canonical.as_ref().is_some_and(|canonical| {
+            delegations
+                && canonical.source_authority == "core"
+                && canonical.credibility == "core_verified"
+                && item.payload["sourceAuthority"] == "core"
+                && canonical.tool_name.as_deref() == item.payload["canonicalTool"].as_str()
+                && matches!(
+                    item.payload["canonicalTool"].as_str(),
+                    Some("delegation.start" | "delegation.resume")
+                )
+        })
+    };
+    let standalone: std::collections::HashSet<(i64, String)> = metadata
+        .iter()
+        .filter(|item| is_standalone(item))
+        .map(|item| {
+            (
+                item.execution_epoch,
+                item.canonical.as_ref().unwrap().operation_id.clone(),
+            )
+        })
+        .collect();
+    if delegations {
+        let mut counts: HashMap<(i64, String), usize> = HashMap::new();
+        for item in &metadata {
+            if let Some(target) = associations.get(&item.id) {
+                *counts
+                    .entry((item.execution_epoch, target.clone()))
+                    .or_default() += 1;
+            }
+        }
+        for item in &metadata {
+            if let Some(target) = associations.get(&item.id) {
+                let key = (item.execution_epoch, target.clone());
+                if standalone.contains(&key) && counts.get(&key) != Some(&1) {
+                    associations.remove(&item.id);
+                }
+            }
+        }
+    }
+    let mut items = Vec::with_capacity(indexed.len());
     for ((sequence, ids, change, _), metadata) in indexed.into_iter().zip(metadata) {
         let tool = matches!(
             metadata.event_type.as_str(),
             "activity.started" | "activity.completed" | "runtime.action"
         );
         let carrier_for = associations.remove(&metadata.id);
+        let support_only = carrier_for
+            .as_ref()
+            .is_some_and(|id| standalone.contains(&(metadata.execution_epoch, id.clone())));
         let visible = if tool {
             carrier_for.is_none() && visible_tool(&metadata)
         } else {
             metadata.payload["hasContent"].as_i64() == Some(1)
         };
-        let item = Item {
+        items.push(Item {
             sequence,
             ids,
             change,
             metadata,
             visible,
             carrier_for,
-        };
-        if tool
+            support_only,
+        });
+    }
+    if delegations {
+        propagate_delegation_changes(&mut items, &is_standalone);
+    }
+    let mut supports: HashMap<(i64, String), Vec<Item>> = HashMap::new();
+    let mut blocks: Vec<Block> = Vec::new();
+    for item in items {
+        let tool = matches!(
+            item.metadata.event_type.as_str(),
+            "activity.started" | "activity.completed" | "runtime.action"
+        );
+        let groupable = tool && !is_standalone(&item.metadata);
+        if item.support_only {
+            supports
+                .entry((
+                    item.metadata.execution_epoch,
+                    item.carrier_for.clone().unwrap(),
+                ))
+                .or_default()
+                .push(item.clone());
+        }
+        if groupable
             && blocks.last().is_some_and(|block| {
                 block.tool
                     && block.items[0].metadata.execution_epoch == item.metadata.execution_epoch
@@ -235,11 +319,107 @@ fn index(connection: &Connection, run: &str) -> Result<Vec<Block>> {
         } else {
             blocks.push(Block {
                 items: vec![item],
-                tool,
+                tool: groupable,
+                supporting: Vec::new(),
+                projection_version: delegations.then_some(4),
             });
         }
     }
+    for block in &mut blocks {
+        let item = &block.items[0].metadata;
+        if is_standalone(item) {
+            let key = (
+                item.execution_epoch,
+                item.canonical.as_ref().unwrap().operation_id.clone(),
+            );
+            // Exactly one proven transport. Never guess among duplicate carriers.
+            if let Some(items) = supports.remove(&key)
+                && items.len() == 1
+            {
+                block.supporting = items;
+            }
+        }
+    }
     Ok(blocks)
+}
+
+// A native correction can revoke a proof or introduce a second candidate. All
+// temporally related rows must then refresh together, including the old native
+// group. This dependency only advances read-time watermarks; it grants no proof.
+fn propagate_delegation_changes(
+    items: &mut [Item],
+    standalone: &impl Fn(&AgentRunExecutionEvidenceView) -> bool,
+) {
+    let mut anchors: HashMap<i64, BTreeMap<i64, Vec<(usize, i64)>>> = HashMap::new();
+    for (index, item) in items.iter().enumerate() {
+        if standalone(&item.metadata) {
+            let canonical = item.metadata.canonical.as_ref().unwrap();
+            anchors
+                .entry(item.metadata.execution_epoch)
+                .or_default()
+                .entry(canonical.first_evidence_sequence)
+                .or_default()
+                .push((index, canonical.last_evidence_sequence));
+        }
+    }
+    if anchors.is_empty() {
+        return;
+    }
+    let mut changes = items.iter().map(|item| item.change).collect::<Vec<_>>();
+    let mut edges = Vec::new();
+    for (index, item) in items.iter().enumerate() {
+        if !matches!(
+            item.metadata.event_type.as_str(),
+            "activity.started" | "activity.completed" | "runtime.action"
+        ) {
+            continue;
+        }
+        let Some(canonical) =
+            item.metadata.canonical.as_ref().filter(|value| {
+                value.source_authority != "core" && value.activity_domain == "shell"
+            })
+        else {
+            continue;
+        };
+        let Some(candidates) = anchors.get(&item.metadata.execution_epoch) else {
+            continue;
+        };
+        let first = canonical.first_evidence_sequence;
+        let last = canonical.last_evidence_sequence;
+        let single = first == last;
+        if first <= 0 || last < first || (!single && last - first <= 1) {
+            continue;
+        }
+        let range = if single {
+            first.saturating_sub(1)..=first.saturating_add(1)
+        } else {
+            first.saturating_add(1)..=last.saturating_sub(1)
+        };
+        for (sequence, entries) in candidates.range(range) {
+            for (candidate, end) in entries {
+                if !((single && *sequence == *end && (*sequence - first).abs() == 1)
+                    || (!single && *end < last))
+                {
+                    continue;
+                }
+                edges.push((index, *candidate));
+                // A carrier proof depends on its own row and candidate Core rows.
+                changes[index] = changes[index].max(items[*candidate].change);
+            }
+        }
+    }
+    // Core support uniqueness depends on each candidate's proof. Native visibility
+    // then depends on that uniqueness. Stop after these directed passes: a full
+    // connected-component maximum would invalidate an entire alternating history.
+    for &(native, core) in &edges {
+        changes[core] = changes[core].max(changes[native]);
+    }
+    for &(native, core) in &edges {
+        changes[native] = changes[native].max(changes[core]);
+    }
+    for (index, item) in items.iter_mut().enumerate() {
+        item.change = changes[index];
+    }
 }
 
 fn visible_tool(item: &AgentRunExecutionEvidenceView) -> bool {
@@ -325,6 +505,48 @@ pub fn read_group_changes(
     to: Option<i64>,
     limit: i64,
 ) -> Result<ExecutionWindowChanges> {
+    read_group_changes_for(
+        database, thread, run, group, after, from, to, limit, false, None,
+    )
+}
+
+pub fn read_delegation_group_changes(
+    database: &mut Database,
+    thread: &str,
+    run: &str,
+    group: i64,
+    after: i64,
+    from: i64,
+    to: Option<i64>,
+    limit: i64,
+    after_entry: Option<i64>,
+) -> Result<ExecutionWindowChanges> {
+    read_group_changes_for(
+        database,
+        thread,
+        run,
+        group,
+        after,
+        from,
+        to,
+        limit,
+        true,
+        after_entry,
+    )
+}
+
+fn read_group_changes_for(
+    database: &mut Database,
+    thread: &str,
+    run: &str,
+    group: i64,
+    after: i64,
+    from: i64,
+    to: Option<i64>,
+    limit: i64,
+    delegations: bool,
+    after_entry: Option<i64>,
+) -> Result<ExecutionWindowChanges> {
     ensure!(
         group > 0 && from >= group && to.is_none_or(|end| end >= from),
         "Invalid execution group range"
@@ -335,7 +557,15 @@ pub fn read_group_changes(
         after >= 0 && after <= through_change_sequence,
         "Invalid execution change cursor"
     );
-    let blocks = index(&tx, run)?;
+    ensure!(
+        after_entry.is_none_or(|entry| delegations
+            && after > 0
+            && entry >= from
+            && entry <= through_sequence
+            && to.is_none_or(|end| entry <= end)),
+        "Invalid execution group tie cursor"
+    );
+    let blocks = index(&tx, run, delegations)?;
     let block = blocks
         .iter()
         .find(|block| block.tool && block.sequence() == group)
@@ -344,7 +574,8 @@ pub fn read_group_changes(
         .items
         .iter()
         .filter(|item| {
-            item.change > after
+            (item.change > after
+                || after_entry.is_some_and(|entry| item.change == after && item.sequence > entry))
                 && item.sequence >= from
                 && to.is_none_or(|end| item.sequence <= end)
         })
@@ -358,16 +589,38 @@ pub fn read_group_changes(
     } else {
         through_change_sequence
     };
-    let evidence = project_items(
+    let next_entry = if delegations && has_more {
+        selected.last().map(|item| item.sequence)
+    } else {
+        None
+    };
+    let suppressed_operations = selected
+        .iter()
+        .filter(|item| item.support_only)
+        .map(|item| SuppressedExecutionOperation {
+            sequence: item.sequence,
+            execution_epoch: item.metadata.execution_epoch,
+            operation_id: item
+                .metadata
+                .canonical
+                .as_ref()
+                .unwrap()
+                .operation_id
+                .clone(),
+        })
+        .collect();
+    let evidence = project_item_views(
         &tx,
         run,
-        selected
-            .into_iter()
-            .map(|item| (item.sequence, item.ids.clone())),
+        selected.iter().copied().filter(|item| !item.support_only),
+        delegations,
     )?;
     tx.commit()?;
     Ok(ExecutionWindowChanges {
-        schema_version: 2,
+        schema_version: if delegations { 4 } else { 2 },
+        requested_after_entry_sequence: after_entry,
+        next_after_entry_sequence: next_entry,
+        suppressed_operations,
         camp_id: thread.into(),
         agent_run_id: run.into(),
         requested_after_change_sequence: after,
@@ -458,6 +711,7 @@ fn project(connection: &Connection, run: &str, block: &Block) -> Result<Executio
         }
     }
     Ok(ExecutionBlock {
+        projection_version: block.projection_version,
         key: format!(
             "{}:{}",
             if block.tool { "tools" } else { "item" },
@@ -469,13 +723,47 @@ fn project(connection: &Connection, run: &str, block: &Block) -> Result<Executio
         change_sequence: block.change(),
         tool_count: if block.tool { visible.len() } else { 0 },
         counts,
-        evidence: project_items(connection, run, selected.into_iter())?,
+        evidence: project_item_views(
+            connection,
+            run,
+            block
+                .items
+                .iter()
+                .filter(|item| selected.contains_key(&item.sequence)),
+            block.projection_version.is_some(),
+        )?,
+        supporting_evidence: project_item_views(connection, run, block.supporting.iter(), true)?,
     })
+}
+
+fn project_item_views<'a>(
+    connection: &Connection,
+    run: &str,
+    items: impl Iterator<Item = &'a Item>,
+    derived: bool,
+) -> Result<Vec<AgentRunExecutionEvidenceView>> {
+    let items = items.collect::<Vec<_>>();
+    let mut evidence = project_items(
+        connection,
+        run,
+        items.iter().map(|item| (item.sequence, item.ids.clone())),
+    )?;
+    if derived {
+        let changes: HashMap<_, _> = items
+            .iter()
+            .map(|item| (item.sequence, item.change))
+            .collect();
+        for item in &mut evidence {
+            item.change_sequence = changes.get(&item.sequence).copied();
+        }
+    }
+    Ok(evidence)
 }
 
 fn overlay(database: &Database, blocks: &mut [ExecutionBlock]) -> Result<()> {
     for block in blocks {
         crate::execution_text::overlay(database, &mut block.evidence)?;
+        crate::execution_text::overlay(database, &mut block.supporting_evidence)?;
     }
     Ok(())
 }
@@ -488,6 +776,29 @@ pub fn read_block_page(
     after: Option<i64>,
     limit: i64,
 ) -> Result<ExecutionBlockPage> {
+    read_block_page_for(database, thread, run, before, after, limit, false)
+}
+
+pub fn read_delegation_block_page(
+    database: &mut Database,
+    thread: &str,
+    run: &str,
+    before: Option<i64>,
+    after: Option<i64>,
+    limit: i64,
+) -> Result<ExecutionBlockPage> {
+    read_block_page_for(database, thread, run, before, after, limit, true)
+}
+
+fn read_block_page_for(
+    database: &mut Database,
+    thread: &str,
+    run: &str,
+    before: Option<i64>,
+    after: Option<i64>,
+    limit: i64,
+    delegations: bool,
+) -> Result<ExecutionBlockPage> {
     ensure!(
         !(before.is_some() && after.is_some())
             && before.is_none_or(|n| n > 0)
@@ -496,7 +807,7 @@ pub fn read_block_page(
     );
     let tx = database.connection_mut().transaction()?;
     let (through_sequence, through_change_sequence) = watermarks(&tx, thread, run)?;
-    let blocks = index(&tx, run)?;
+    let blocks = index(&tx, run, delegations)?;
     let limit = limit.clamp(1, 48) as usize;
     let mut selected = blocks
         .iter()
@@ -540,7 +851,8 @@ pub fn read_block_page(
     overlay(database, &mut projected)?;
     overlay(database, &mut active_blocks)?;
     Ok(ExecutionBlockPage {
-        schema_version: 3,
+        schema_version: if delegations { 4 } else { 3 },
+        delegation_blocks_version: 4,
         thread_id: thread.into(),
         agent_run_id: run.into(),
         requested_before_sequence: before,
@@ -571,6 +883,40 @@ pub fn read_block_changes(
     watched: &[String],
     limit: i64,
 ) -> Result<ExecutionBlockChanges> {
+    read_block_changes_for(database, thread, run, after, watched, limit, false, None)
+}
+
+pub fn read_delegation_block_changes(
+    database: &mut Database,
+    thread: &str,
+    run: &str,
+    after: i64,
+    watched: &[String],
+    limit: i64,
+    after_entry: Option<i64>,
+) -> Result<ExecutionBlockChanges> {
+    read_block_changes_for(
+        database,
+        thread,
+        run,
+        after,
+        watched,
+        limit,
+        true,
+        after_entry,
+    )
+}
+
+fn read_block_changes_for(
+    database: &mut Database,
+    thread: &str,
+    run: &str,
+    after: i64,
+    watched: &[String],
+    limit: i64,
+    delegations: bool,
+    after_entry: Option<i64>,
+) -> Result<ExecutionBlockChanges> {
     ensure!(watched.len() <= 256, "Invalid execution refresh set");
     let tx = database.connection_mut().transaction()?;
     let (through_sequence, through_change_sequence) = watermarks(&tx, thread, run)?;
@@ -578,11 +924,21 @@ pub fn read_block_changes(
         after >= 0 && after <= through_change_sequence,
         "Invalid execution change cursor"
     );
-    let blocks = index(&tx, run)?;
+    ensure!(
+        after_entry
+            .is_none_or(|block| delegations && after > 0 && block > 0 && block <= through_sequence),
+        "Invalid execution block change cursor"
+    );
+    let blocks = index(&tx, run, delegations)?;
+    let beyond = |block: &Block| {
+        block.change() > after
+            || after_entry
+                .is_some_and(|sequence| block.change() == after && block.sequence() > sequence)
+    };
     // Empty groups are tombstones when a formerly visible carrier becomes folded.
     let mut changed = blocks
         .iter()
-        .filter(|block| block.change() > after)
+        .filter(|block| beyond(block))
         .collect::<Vec<_>>();
     changed.sort_by_key(|block| (block.change(), block.sequence()));
     let limit = limit.clamp(1, 96) as usize;
@@ -593,10 +949,15 @@ pub fn read_block_changes(
     } else {
         through_change_sequence
     };
+    let next_block = if delegations && has_more {
+        changed.last().map(|block| block.sequence())
+    } else {
+        None
+    };
     let mut refreshed_blocks = blocks
         .iter()
         .filter(|block| {
-            block.change() <= after
+            !beyond(block)
                 && block
                     .items
                     .iter()
@@ -612,7 +973,9 @@ pub fn read_block_changes(
     overlay(database, &mut blocks)?;
     overlay(database, &mut refreshed_blocks)?;
     Ok(ExecutionBlockChanges {
-        schema_version: 3,
+        schema_version: if delegations { 4 } else { 3 },
+        requested_after_entry_sequence: after_entry,
+        next_after_entry_sequence: next_block,
         thread_id: thread.into(),
         agent_run_id: run.into(),
         requested_after_change_sequence: after,
@@ -634,6 +997,31 @@ pub fn read_group_page(
     after: Option<i64>,
     limit: i64,
 ) -> Result<ExecutionGroupPage> {
+    read_group_page_for(database, thread, run, group, before, after, limit, false)
+}
+
+pub fn read_delegation_group_page(
+    database: &mut Database,
+    thread: &str,
+    run: &str,
+    group: i64,
+    before: Option<i64>,
+    after: Option<i64>,
+    limit: i64,
+) -> Result<ExecutionGroupPage> {
+    read_group_page_for(database, thread, run, group, before, after, limit, true)
+}
+
+fn read_group_page_for(
+    database: &mut Database,
+    thread: &str,
+    run: &str,
+    group: i64,
+    before: Option<i64>,
+    after: Option<i64>,
+    limit: i64,
+    delegations: bool,
+) -> Result<ExecutionGroupPage> {
     ensure!(
         group > 0
             && !(before.is_some() && after.is_some())
@@ -643,7 +1031,7 @@ pub fn read_group_page(
     );
     let tx = database.connection_mut().transaction()?;
     let (_, through_change_sequence) = watermarks(&tx, thread, run)?;
-    let blocks = index(&tx, run)?;
+    let blocks = index(&tx, run, delegations)?;
     let block = blocks
         .iter()
         .find(|block| block.tool && block.sequence() == group)
@@ -653,7 +1041,8 @@ pub fn read_group_page(
         .items
         .iter()
         .filter(|item| {
-            before.is_none_or(|cursor| item.sequence < cursor)
+            !item.support_only
+                && before.is_none_or(|cursor| item.sequence < cursor)
                 && after.is_none_or(|cursor| item.sequence > cursor)
         })
         .collect::<Vec<_>>();
@@ -664,16 +1053,10 @@ pub fn read_group_page(
     selected.truncate(limit);
     let cursor = selected.last().map(|item| item.sequence);
     selected.sort_by_key(|item| item.sequence);
-    let evidence = project_items(
-        &tx,
-        run,
-        selected
-            .into_iter()
-            .map(|item| (item.sequence, item.ids.clone())),
-    )?;
+    let evidence = project_item_views(&tx, run, selected.into_iter(), delegations)?;
     tx.commit()?;
     Ok(ExecutionGroupPage {
-        schema_version: 3,
+        schema_version: if delegations { 4 } else { 3 },
         thread_id: thread.into(),
         agent_run_id: run.into(),
         group_sequence: group,

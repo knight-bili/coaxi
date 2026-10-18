@@ -14,7 +14,7 @@
   "current_branch": "develop/V1.0.0",
   "base_branch": "main",
   "current_task": "I04-T01",
-  "current_slice": "父工具生产卡片已接核实来源；初始/恢复/拒绝、完整task/reason与原记录可达，metadata共享刷新、授权失效清空和打开查看器的迟到回复隔离已接；158项9文件、33组实际Renderer通过。",
+  "current_slice": "Core可协商委派独立分页已定向验证：旧3兼容、跨块唯一support、主线/组成对游标、精确移除和撤销；10k局部刷新检查通过。客户端与真实产品链路继续。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,14 +33,14 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "I04-T01：原父工具卡片已接Core核实来源并本地验证；下一步补分页Core块中start/resume独立分类及Shell carrier保持，不用非windowed历史或直挂Renderer替代。继续完整统计/Markdown/HTML/图片与原完整App、真实Core/Native/Web候选；ANSI完整许可分发前补齐。",
+    "I04-T01：Core独立分页后端已验证，继续客户端能力协商/v4解码、主线与组的成对游标和抑制记录、已读组首刷新、support组装与主序号定位；随后实际Renderer、完整统计/Markdown/HTML/图片、原完整App及真实Core/Native/Web候选。ANSI完整许可仍待。",
     "I04-T01/T02：Claude旧agent完整parser、实际home捕获和Core证据关联；Qoder独立根/producer，以及旧无来源的明确导入与完整格式语料核验",
     "I04-T01：Grok修改意见与r1三Context mode/接管衔接；真实Core/Host/Runtime生命周期、Schema升级和恢复矩阵集中候选",
     "I04-T02/T03/T04：Runtime并集、恢复、记忆与自动化原剩余项；完整四包21簇84场景保持，阶段集齐集中构建/少量push和Actions"
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "parent_tool_source_cards_local_verified_windowed_core_classification_full_content_and_stage_candidate_pending",
+  "current_slice_status": "delegation_blocks_core_read_verified_client_negotiation_window_and_real_chain_pending",
   "evidence": "i04-legacy-agent-source-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -298,5 +298,6 @@
   "i04_native_agent_question_evidence": "integration/execution/i04-native-agent-question-result.json",
   "native_delegation_background_evidence": "i04-native-delegation-background-result.json",
   "i04_parent_tool_source_evidence": "i04-tool-source-result.json",
-  "i04_parent_tool_source_ui_evidence": "i04-tool-source-ui-result.json"
+  "i04_parent_tool_source_ui_evidence": "i04-tool-source-ui-result.json",
+  "delegation_blocks_evidence": "i04-delegation-blocks-result.json"
 }

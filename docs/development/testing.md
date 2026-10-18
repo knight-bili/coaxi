@@ -105,6 +105,13 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 
 ## Rust 测试准入与退役门槛
 
+I04 委派区块扩原 `read_model::slow_tests::execution_evidence_is_counted_in_snapshot_and_paged_by_agent_run`，
+helper 为 `read_model/delegation_block_tests.rs`，复用原同库与10,000操作夹具，不新增测试 owner/数据库/进程。
+修复前中间委派被普通组折叠；拆组后还会丢跨块载体及同 change 的第二个更新。覆盖旧3兼容、可信独立开始态、
+跨块唯一支持/原输出按需读取、冒名/越域、竞争/撤销、主线及组内 limit1 成对位置、移除及重新可见、零写和扫描实测。
+先 `cargo test -p rovai-core --lib --features slow-tests --no-run`，新产物对上述 owner `--exact --list` 确认1项后运行。
+SQL 构造的展示证明不代表认证模型命令或完整 Core.handle/Native/Web/Renderer；客户端启用及真实链路仍须后续补齐。
+
 Grok 统计/目录接续仍扩原 source filesystem owner 和同一受控目录：原缓存→配置→模型名的优先级、稀疏/非法辅助源、独立占用与累计花费、标题/模型/时间及显示摘要不含启动/凭据字段。仅辅助目录初次不可读时允许未知/原fallback，正文与父链准入不放宽，已捕获快照中改写仍拒绝；不新增 Rust owner、数据库或真实 Runtime。两原 parser 的完整差分须另由固定供体原源码只读参考程序对照，同一受控文件/记录并报告真实案例数量；参考程序只读自建夹具，子进程 HOME/CODEX_HOME/GROK_HOME 必须隔离，不读取日常账号或原生日志。原 parser body 不改，不共享融合解析器实现；缺参考二进制时不能把普通 owner 通过写成差分通过。参考程序是解析测试进程，不是提供方或完整 App，长正文等有意差异逐字段取证，不裁剪 Core 内容制造相等。
 
 

@@ -1,5 +1,7 @@
 # Codeg 与 Rovai 一期完整融合
 
+- [I04 委派独立分页后端记录](execution/i04-delegation-blocks-result.json)：旧3兼容、跨块唯一来源、主线/组成对位置与精确移除已定向验证；10k检查约束局部更新范围。客户端协商和真实界面链路继续，I04未收口。
+
 - [I04 父工具原卡片接线记录](execution/i04-tool-source-ui-result.json)：生产工具行使用核实来源显示原委派/恢复卡片，完整任务、恢复原因与原记录可达，元数据共享刷新和授权失效清空已接；分页Core工具块分类及真实两端整链继续。
 
 - [I04 父工具来源读取工程记录](execution/i04-tool-source-result.json)：Core 按真实观察、回执与 attempt 核对完整任务和恢复原因，拒绝不关联子正文；Native/Web 方法已接。原 Context 与 Web 投影 owner、90 项 TS 检查通过，父工具生产卡片接线和真实两端联调继续，I04 未收口。

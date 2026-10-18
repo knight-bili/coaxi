@@ -2396,6 +2396,8 @@ export interface AgentRunExecutionWindowChanges {
 
 /** A read-time presentation boundary; tools inside it have a separate cursor. */
 export interface AgentRunExecutionBlock {
+  /** Present only in the opt-in delegationBlocks projection. */
+  projectionVersion?: 4
   key: string
   kind: 'item' | 'toolGroup'
   sequence: number
@@ -2405,10 +2407,14 @@ export interface AgentRunExecutionBlock {
   counts: Record<'completed' | 'failed' | 'stopped' | 'recorded' | 'running' | 'waiting', number>
   /** One root item, or latest/active operations with their proven Shell supports (at most four rows). */
   evidence: AgentRunExecutionEvidenceView[]
+  /** At most one Core-proven Shell support, outside the primary cursor interval. */
+  supportingEvidence?: AgentRunExecutionEvidenceView[]
 }
 
 export interface AgentRunExecutionBlockPage extends Omit<AgentRunExecutionWindowPage, 'schemaVersion' | 'evidence' | 'activeEvidence'> {
   schemaVersion: 3
+  /** Capability advertisement; legacy blocks keep their original boundaries. */
+  delegationBlocksVersion?: 4
   blocks: AgentRunExecutionBlock[]
   activeBlocks?: AgentRunExecutionBlock[]
 }
@@ -2418,6 +2424,31 @@ export interface AgentRunExecutionBlockChanges extends Omit<AgentRunExecutionWin
   blocks: AgentRunExecutionBlock[]
   /** Watched in-memory text may grow without advancing the durable change cursor. */
   refreshedBlocks?: AgentRunExecutionBlock[]
+}
+
+export type AgentRunDelegationBlock = AgentRunExecutionBlock & { projectionVersion: 4 }
+export interface AgentRunDelegationBlockPage extends Omit<AgentRunExecutionBlockPage, 'schemaVersion' | 'blocks' | 'activeBlocks'> {
+  schemaVersion: 4
+  blocks: AgentRunDelegationBlock[]
+  activeBlocks?: AgentRunDelegationBlock[]
+}
+export interface AgentRunDelegationBlockChanges extends Omit<AgentRunExecutionBlockChanges, 'schemaVersion' | 'blocks' | 'refreshedBlocks'> {
+  schemaVersion: 4
+  requestedAfterEntrySequence?: number | null
+  /** Continue after (nextAfterChangeSequence,nextAfterEntrySequence); absent/null means the change watermark is fully drained. */
+  nextAfterEntrySequence?: number | null
+  blocks: AgentRunDelegationBlock[]
+  refreshedBlocks?: AgentRunDelegationBlock[]
+}
+export interface AgentRunDelegationGroupPage extends Omit<AgentRunExecutionGroupPage, 'schemaVersion'> {
+  schemaVersion: 4
+}
+export interface AgentRunDelegationGroupChanges extends Omit<AgentRunExecutionWindowChanges, 'schemaVersion'> {
+  schemaVersion: 4
+  requestedAfterEntrySequence?: number | null
+  nextAfterEntrySequence?: number | null
+  /** Remove the exact previously loaded operation when its transport moves under a Core card. */
+  suppressedOperations?: Array<{ executionEpoch: number; operationId: string; sequence: number }>
 }
 
 export interface AgentRunExecutionGroupPage {

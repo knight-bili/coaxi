@@ -1541,10 +1541,11 @@ struct ExecutionWindowParams {
     group_sequence: Option<i64>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Copy, PartialEq)]
 #[serde(rename_all = "camelCase")]
 enum ExecutionWindowProjection {
     Blocks,
+    DelegationBlocks,
 }
 
 #[derive(Debug, Deserialize)]
@@ -1554,6 +1555,7 @@ struct ExecutionChangesParams {
     camp_id: ThreadId,
     agent_run_id: String,
     after_change_sequence: i64,
+    after_entry_sequence: Option<i64>,
     #[serde(default)]
     refresh_evidence_ids: Vec<String>,
     limit: Option<i64>,
@@ -11430,21 +11432,53 @@ impl Core {
                     "Execution group range requires a group"
                 );
                 anyhow::ensure!(
-                    params.group_sequence.is_none() || params.projection.is_none(),
+                    params.group_sequence.is_none()
+                        || params.projection.is_none()
+                        || params.projection == Some(ExecutionWindowProjection::DelegationBlocks),
                     "Execution blocks and group cursors cannot be combined"
                 );
+                anyhow::ensure!(
+                    params.after_entry_sequence.is_none()
+                        || params.projection == Some(ExecutionWindowProjection::DelegationBlocks),
+                    "Execution block tie cursor requires delegationBlocks projection"
+                );
                 let changes = if let Some(group) = params.group_sequence {
-                    serde_json::to_value(rovai_core::execution_window::read_group_changes(
+                    let from = params
+                        .from_sequence
+                        .context("Execution group range is required")?;
+                    if params.projection == Some(ExecutionWindowProjection::DelegationBlocks) {
+                        serde_json::to_value(rovai_core::execution_window::read_delegation_group_changes(
+                            &mut database,
+                            params.camp_id.as_str(),
+                            &params.agent_run_id,
+                            group,
+                            params.after_change_sequence,
+                            from,
+                            params.to_sequence,
+                            params.limit.unwrap_or(96),
+                            params.after_entry_sequence,
+                        )?)?
+                    } else {
+                        serde_json::to_value(rovai_core::execution_window::read_group_changes(
+                            &mut database,
+                            params.camp_id.as_str(),
+                            &params.agent_run_id,
+                            group,
+                            params.after_change_sequence,
+                            from,
+                            params.to_sequence,
+                            params.limit.unwrap_or(96),
+                        )?)?
+                    }
+                } else if params.projection == Some(ExecutionWindowProjection::DelegationBlocks) {
+                    serde_json::to_value(rovai_core::execution_window::read_delegation_block_changes(
                         &mut database,
                         params.camp_id.as_str(),
                         &params.agent_run_id,
-                        group,
                         params.after_change_sequence,
-                        params
-                            .from_sequence
-                            .context("Execution group range is required")?,
-                        params.to_sequence,
+                        &params.refresh_evidence_ids,
                         params.limit.unwrap_or(96),
+                        params.after_entry_sequence,
                     )?)?
                 } else if params.projection.is_some() {
                     serde_json::to_value(rovai_core::execution_window::read_block_changes(
@@ -11500,11 +11534,18 @@ impl Core {
                 let lock_ms = lock_started_at.elapsed().as_millis();
                 let read_started_at = Instant::now();
                 anyhow::ensure!(
-                    params.projection.is_none() || params.group_sequence.is_none(),
+                    params.projection.is_none()
+                        || params.group_sequence.is_none()
+                        || params.projection == Some(ExecutionWindowProjection::DelegationBlocks),
                     "Execution blocks and group cursors cannot be combined"
                 );
                 let page = if let Some(group) = params.group_sequence {
-                    serde_json::to_value(rovai_core::execution_window::read_group_page(
+                    let reader = if params.projection == Some(ExecutionWindowProjection::DelegationBlocks) {
+                        rovai_core::execution_window::read_delegation_group_page
+                    } else {
+                        rovai_core::execution_window::read_group_page
+                    };
+                    serde_json::to_value(reader(
                         &mut database,
                         params.camp_id.as_str(),
                         &params.agent_run_id,
@@ -11512,6 +11553,15 @@ impl Core {
                         params.before_sequence,
                         params.after_sequence,
                         params.limit.unwrap_or(24),
+                    )?)?
+                } else if params.projection == Some(ExecutionWindowProjection::DelegationBlocks) {
+                    serde_json::to_value(rovai_core::execution_window::read_delegation_block_page(
+                        &mut database,
+                        params.camp_id.as_str(),
+                        &params.agent_run_id,
+                        params.before_sequence,
+                        params.after_sequence,
+                        params.limit.unwrap_or(12),
                     )?)?
                 } else if params.projection.is_some() {
                     serde_json::to_value(rovai_core::execution_window::read_block_page(

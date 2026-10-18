@@ -6658,6 +6658,7 @@ mod slow_tests {
         );
 
         assert_execution_block_and_group_cursors(&mut database, camp_id, agent_run_id, &now);
+        assert_delegation_execution_blocks(&mut database, camp_id, agent_run_id, &now, &directory);
 
         // Historical Runs still resolve their Camp through CampTurn after the
         // delivery-first batch model moved new Runs to agent_run.camp_id.
@@ -6707,6 +6708,8 @@ mod slow_tests {
         drop(database);
         std::fs::remove_dir_all(directory).unwrap();
     }
+
+    include!("read_model/delegation_block_tests.rs");
 
     // This extends the existing SQLite pagination owner: a large collapsed group must
     // stay one block, and an old child can change without the group's tail moving.

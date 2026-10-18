@@ -3,10 +3,20 @@ document_type: version-decisions
 version: v1.73
 authority: decision-rationale
 lifecycle: current
-last_updated: 2026-10-17
+last_updated: 2026-10-19
 ---
 
 # v1.73 重要取舍
+
+<a id="v1-73-d02"></a>
+## V1.73-D02：委派主线使用可协商的独立投影
+
+直接改旧 schema3 分组会使旧客户端按原连续区间归并，卡片可能再次被隐藏；把外层 Shell 移入卡片主区间则会改变
+分页边界并与穿插的工具冲突。选择保留旧投影，由能力声明启用独立卡片及单独 support；代价是客户端需处理两种
+读取模式。同一次持久更新还会改变多个展示块，因此选择成对位置而非突破 limit 或沿用会跳项的单水位。
+这增加协议与缓存接线工作，但不建立持久分组/第二业务权威，也不让展示依赖授予来源证明。
+规范见 [v52](../../contracts/run-process-detail-surface-v52.md)与[委派架构](../../architecture/delegation.md)。
+后端实现和客户端启用分别留证，不以合同接受表示完整链路完成。
 
 <a id="v1-73-d01"></a>
 ## V1.73-D01：委派复用 Core 执行与持久身份

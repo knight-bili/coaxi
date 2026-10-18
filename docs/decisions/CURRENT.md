@@ -1,10 +1,14 @@
 ---
 document_type: current-decision-navigation
 authority: current-authority-and-rationale-routing
-last_updated: 2026-10-13
+last_updated: 2026-10-19
 ---
 
 # 当前规范与决定理由导航
+
+委派执行主线的当前读取规范为 [Run Process Detail Surface v52](../contracts/run-process-detail-surface-v52.md)与
+[委派架构](../architecture/delegation.md)；旧投影兼容、独立 support 及成对位置的取舍见
+[V1.73-D02](../versions/v1.73/decisions.md#v1-73-d02)。
 
 内部减重当前规范：[输入快照/数据库准入](../contracts/input-snapshot-storage-v1.md)、[Built-in Tool Transport v38](../contracts/builtin-tool-transport-v38.md)、[Domain Command Result v2](../contracts/domain-command-result-v2.md)；取舍见 [V1.72-D38](../versions/v1.72/decisions.md#v1-72-d38)。
 

@@ -21,6 +21,10 @@ mod associations;
 mod blocks;
 mod carrier;
 pub use blocks::{read_block_changes, read_block_page, read_group_changes, read_group_page};
+pub use blocks::{
+    read_delegation_block_changes, read_delegation_block_page, read_delegation_group_changes,
+    read_delegation_group_page,
+};
 
 fn agent_run_belongs_to_camp(
     connection: &Connection,
@@ -264,6 +268,20 @@ pub struct ExecutionWindowChanges {
     pub has_more: bool,
     pub evidence: Vec<AgentRunExecutionEvidenceView>,
     pub refreshed_evidence: Vec<AgentRunExecutionEvidenceView>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub requested_after_entry_sequence: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub next_after_entry_sequence: Option<i64>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub suppressed_operations: Vec<SuppressedExecutionOperation>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SuppressedExecutionOperation {
+    pub execution_epoch: i64,
+    pub operation_id: String,
+    pub sequence: i64,
 }
 
 /// Advance by the persisted Run-wide change sequence, never the stable display position.
@@ -341,6 +359,9 @@ pub fn read_changes(
     crate::execution_text::overlay(database, &mut evidence)?;
     crate::execution_text::overlay(database, &mut refreshed_evidence)?;
     Ok(ExecutionWindowChanges {
+        requested_after_entry_sequence: None,
+        next_after_entry_sequence: None,
+        suppressed_operations: Vec::new(),
         schema_version: 2,
         camp_id: camp_id.to_owned(),
         agent_run_id: agent_run_id.to_owned(),

@@ -1,0 +1,322 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-18T20:08:49.757762+00:00",
+  "stage": "I04",
+  "task": "I04-T01",
+  "branch": "develop/V1.0.0",
+  "baseline_commit": "5f11a9ac74419f45e13a4bb0b0d12f2d7c8b077d",
+  "status": "delegation_blocks_core_read_verified_client_negotiation_window_and_real_chain_pending",
+  "scope_preserved": {
+    "source_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_packages": 4,
+    "i04_clusters": 21,
+    "i04_formal_cases": 84,
+    "new_formal_cases_passed": 0
+  },
+  "facts": [
+    "Legacy blocks projection keeps schema3 and boundaries; page advertises capability4 for future explicit negotiation",
+    "Opt-in delegationBlocks schema4 splits trusted Core start/resume, including active start, with runtime-name spoof rejected",
+    "One exact same-epoch native support remains outside primary interval without moving primary key/cursor; ambiguity retains native records",
+    "Read-time directed dependency passes refresh proof/uniqueness/visibility without invalidating an entire connected alternating history",
+    "Top-level and group deltas preserve hard limit with paired change/entry cursors; suppression descriptors remove old cached native supports",
+    "Proof revocation reveals native again; duplicate operation ids in another epoch cannot steal support; same owner reads have zero total_changes",
+    "Full original native output stays behind existing exact evidence content read, never prefetched into folded metadata"
+  ],
+  "verification": {
+    "rust_owner": "read_model::slow_tests::execution_evidence_is_counted_in_snapshot_and_paged_by_agent_run",
+    "rust_exact_listed": 1,
+    "rust_passed": 1,
+    "new_rust_owners": 0,
+    "core_slow_lib_compiled": true,
+    "core_application_bins_checked": true,
+    "typecheck_exit": 0,
+    "documentation_tests_passed": 10,
+    "documentation_version_gate": true,
+    "documentation_diff_gate_base": "5f11a9ac74419f45e13a4bb0b0d12f2d7c8b077d",
+    "scale_probe": {
+      "operations": 10000,
+      "potential_anchors": 5000,
+      "page_blocks": 48,
+      "response_bytes": 54305,
+      "read_ms": 3188,
+      "single_update_changed_blocks": 7
+    },
+    "fixture": "Original pagination SQLite owner, explicit raw/canonical presentation evidence; no real delegation or provider execution",
+    "codegraph_synced": true,
+    "schema_or_model_input_changes": 0,
+    "client_projection_activated": false,
+    "actual_core_native_web_e2e": false,
+    "full_original_app": false,
+    "stage_complete": false
+  },
+  "self_review_fixes": [
+    "Added missing Clone required by existing Clone changes struct; retained initial compiler failure",
+    "Corrected an invalid full-output-in-page test assertion to enforce metadata-only and verify actual lazy content read; retained failure",
+    "Corrected competing-callback fixture to use distinct persisted raw change sequences; only derived presentation watermarks can tie",
+    "Replaced whole connected-component maximum with three directed dependency passes; 10000-operation locality guard retained",
+    "Scoped standalone and support/count keys by execution epoch; reused operation-id test guards cross-epoch leakage",
+    "Kept old v3 serialized fields absent except capability; no existing test retired or independent heavy fixture added"
+  ],
+  "remaining": [
+    "Client legacy capability probe, v4 decoders, paired cursor cache and suppressed-operation handling; group refresh from boundary when earliest loaded",
+    "Window evidence/support assembly and primary viewport anchors; real production Renderer same-scene and Core.handle -> Native/Web candidate",
+    "Complete original statistics/Markdown/HTML/images and full original App, clipping/scale/memory/reauthorization/recovery",
+    "Claude full parser/producer/Core, independent Qoder roots/producer, explicit legacy import, Grok feedback/three Context/takeover",
+    "I04 original T02/T03/T04 runtime union/recovery/memory/automation and ANSI full license evidence or replacement before public binaries"
+  ],
+  "goal_status": "active",
+  "customer_action_required": false,
+  "push": false,
+  "actions_dispatched": 0,
+  "main_merge": false,
+  "release": false,
+  "paid_usage": false,
+  "approved_r1_artifacts": [
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    },
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    }
+  ],
+  "source_files": [
+    {
+      "path": "crates/rovai-core/src/application.rs",
+      "sha256": "754f3184d12048828fff81d15dc62888c86065ba438c9f8a9c459c8a9243fdd2",
+      "git_blob_with_filters": "ff78703276aba1607f117512bf8c30e42e393633"
+    },
+    {
+      "path": "crates/rovai-core/src/execution_window.rs",
+      "sha256": "0d42efd00d491b183d849701993ea704da6d2b868e50fe5b199417975de70f5c",
+      "git_blob_with_filters": "b3e1932addbec7233769a521971a75b2012267d0"
+    },
+    {
+      "path": "crates/rovai-core/src/execution_window/blocks.rs",
+      "sha256": "3f34a72b84bd727925e74069f2b9448eb24abaa5287df5ac40b694410b2078e0",
+      "git_blob_with_filters": "bfa68a8a86885139adf860a902f5008b255a1886"
+    },
+    {
+      "path": "crates/rovai-core/src/read_model.rs",
+      "sha256": "2eaeb8db8b07d0b98ffb044d47d0777648a5a37d31667402850b485b2700abe9",
+      "git_blob_with_filters": "ccbfcd99b8285bd15adc0758246c8cc465560a82"
+    },
+    {
+      "path": "docs/architecture/delegation.md",
+      "sha256": "838ef220404b269dc7cd57727a3c072ef3ec07e6405a9d0b3411243eedcd790c",
+      "git_blob_with_filters": "910666e174e5192e376c7a5bc0eade0671808af1"
+    },
+    {
+      "path": "docs/contracts/README.md",
+      "sha256": "d0ca3f94ba9f0fdddbcac7573b2ff1f8b48f73fc0ed2dacde503d4364cc905cd",
+      "git_blob_with_filters": "eb1637fc4dcb7425825c7a3331d3f377f077a63b"
+    },
+    {
+      "path": "docs/decisions/CURRENT.md",
+      "sha256": "992e582d834cf61d7b6ab23ac17d2fe82dae10ab6b36c0c613f6ae7da72df488",
+      "git_blob_with_filters": "1b5e4ac392c2acc98e87eb0e34901e1f03c8c394"
+    },
+    {
+      "path": "docs/development/testing.md",
+      "sha256": "97f4cfe1a1c27040d14a4c0eaffc63bc989ea35fe5815101403425854547fac5",
+      "git_blob_with_filters": "44abebbe3d7518e71b026d300470560644da46d1"
+    },
+    {
+      "path": "docs/versions/v1.73/README.md",
+      "sha256": "32958a18a9f7f1c2b328ad02a7e9ab25bf55c1772b5b05e1d4a4721161dcabd1",
+      "git_blob_with_filters": "b2ef47794c6b27674daa3941993baa779b8439e1"
+    },
+    {
+      "path": "docs/versions/v1.73/decisions.md",
+      "sha256": "6abbd4efb93d98b4261e68c16d1774b6f151b96fb7dc25e28dff5c6a98da7b77",
+      "git_blob_with_filters": "2c7dd86baacd5317802d56ca5bdfb4d91bfc54ac"
+    },
+    {
+      "path": "docs/versions/v1.73/implementation-plan.md",
+      "sha256": "547a127c50e9ac618573832ff2bb174196a2e0593b3ffada26d001dbc664ff16",
+      "git_blob_with_filters": "f510f9667174bd3ffec30005eb1801fdd53fef9c"
+    },
+    {
+      "path": "integration/README.md",
+      "sha256": "6cae1eb77485b589a23e05cf12e6077c80049d084a01f1ca57c5c4aed372e275",
+      "git_blob_with_filters": "9dddb3e938356b04cf61e7ec371c417dc04b98e4"
+    },
+    {
+      "path": "integration/execution/goal-state.json",
+      "sha256": "544af4d7a35b85ce4f196a653e9a7d9eec3fa78cc06c11acfa491539289256ba",
+      "git_blob_with_filters": "55ace7097f0acc7fe8bfcb6b82bf98ccd1577b89"
+    },
+    {
+      "path": "packages/contracts/src/index.ts",
+      "sha256": "35304cb050ad8df6019c987174a56a87123b1ea6a9fcdbffdbe1909a8acabcd6",
+      "git_blob_with_filters": "9ec6d47e8d0088c897eb937eb3a13a95856de8ee"
+    },
+    {
+      "path": "crates/rovai-core/src/read_model/delegation_block_tests.rs",
+      "sha256": "d5dafb7827d713471f63fbad1b2e451dbc7e9c80dae6df5f051cf31b9200b714",
+      "git_blob_with_filters": "331f441a694d4ac8b2b816ca60cbb971114ec1e1"
+    },
+    {
+      "path": "docs/contracts/run-process-detail-surface-v52.md",
+      "sha256": "6a5f19aa654bb7698ca05fb7314bf59aa02e6f2f8e996fec6b9485431a57a862",
+      "git_blob_with_filters": "aa060cea5653db6427113a0044c2b3544234c6b6"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "file/I04分页委派区块/checkpoint.py",
+      "bytes": 9660,
+      "sha256": "3e44d9b620a50715c27c02f0429199bf48a722db64fa00af6402c3171a8d686d"
+    },
+    {
+      "path": "file/I04分页委派区块/commit.py",
+      "bytes": 1189,
+      "sha256": "7cde365c4b520e645803f8de27ee3e15c17ebd66cd916f7fe7196d57c5ff3b3f"
+    },
+    {
+      "path": "file/I04分页委派区块/compile.ps1",
+      "bytes": 2047,
+      "sha256": "7c801def4b97be1a5a2ae3f17f1347355d99cf961f0e64a4157cf5ea7d8dfecf"
+    },
+    {
+      "path": "file/I04分页委派区块/edit-blocks.py",
+      "bytes": 3849,
+      "sha256": "0ae8fc82ad7e08d2a77116faaa4c0f32867d24839ee3c4e10725d70b8ff37427"
+    },
+    {
+      "path": "file/I04分页委派区块/finish.py",
+      "bytes": 3673,
+      "sha256": "0edb4ad2a4a2e9bfb64ba4ce0d1ec1252bb697ff0c14afff48ee7f62588cc0a1"
+    },
+    {
+      "path": "file/I04分页委派区块/format-changes.rs",
+      "bytes": 2261,
+      "sha256": "414885624cf3dced243c4d1229e240967c37c219d34ad0870902e6ed0f489f4a"
+    },
+    {
+      "path": "file/I04分页委派区块/format-page.rs",
+      "bytes": 1740,
+      "sha256": "dbced89f65126acb9b2d61ed7b554b48542f5e627cb0edd9c7b01d7b0fd754f3"
+    },
+    {
+      "path": "file/I04分页委派区块/format-transport.py",
+      "bytes": 1084,
+      "sha256": "7ceb35defde859578830dbf67fafb388c84c5d75b195e6429302537b776cfe43"
+    },
+    {
+      "path": "file/I04分页委派区块/logs/app-check.jsonl",
+      "bytes": 218659,
+      "sha256": "a8c5b9905d5410b3aaccbd13cb5dee06ad078c87c732caa1e76d35b2339e2857"
+    },
+    {
+      "path": "file/I04分页委派区块/logs/codegraph-sync.txt",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "file/I04分页委派区块/logs/docs-decisions.txt",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "file/I04分页委派区块/logs/docs-tests.txt",
+      "bytes": 925,
+      "sha256": "d9f6392b2f04470db4b23768a1e30733b3360754206a8f8000f494f829d4adc0"
+    },
+    {
+      "path": "file/I04分页委派区块/logs/docs-version.txt",
+      "bytes": 79,
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "file/I04分页委派区块/logs/rust-build-before-fixture-constraint-fix.jsonl",
+      "bytes": 220186,
+      "sha256": "9993205d929b9b112e776f535ed984b2b414e8d3fa4144952647589febd174d4"
+    },
+    {
+      "path": "file/I04分页委派区块/logs/rust-build-before-locality-review.jsonl",
+      "bytes": 220186,
+      "sha256": "aabd6a5424ed4d6e7ab018f7d495044b2c24b392aad697c175947393a91bf361"
+    },
+    {
+      "path": "file/I04分页委派区块/logs/rust-build-before-output-assertion.jsonl",
+      "bytes": 220185,
+      "sha256": "4039332d794e58aefb48429bbabe0545bb1e92c4c03b34cef4592ec3e67053bc"
+    },
+    {
+      "path": "file/I04分页委派区块/logs/rust-build-missing-clone.jsonl",
+      "bytes": 213643,
+      "sha256": "a0c7ef33a8efceec9c573e8a44e1a7eef4965864b91974298e2338ab69a7340b"
+    },
+    {
+      "path": "file/I04分页委派区块/logs/rust-build.jsonl",
+      "bytes": 220186,
+      "sha256": "2a01e715ff2b8519c7d66705eac1a74aa4e70a173026e50a8041eaa87ebed265"
+    },
+    {
+      "path": "file/I04分页委派区块/logs/rust-list.txt",
+      "bytes": 344,
+      "sha256": "06a63fc7e68443b6397beb7ed1c9583919763508eaaea2bbe843f7485ed4b282"
+    },
+    {
+      "path": "file/I04分页委派区块/logs/rust-test-duplicate-fixture-change.txt",
+      "bytes": 1213,
+      "sha256": "b8f88e24d0fc7a9bcb0db3d9c34bdb2dcb41bedc0825f3232fbf9c8aa3c14600"
+    },
+    {
+      "path": "file/I04分页委派区块/logs/rust-test-wrong-output-assertion.txt",
+      "bytes": 1049,
+      "sha256": "b533d3373c1ee29bdbe1a7a87f802c2a86b4e793d1b802096e6e111eedcdeeeb"
+    },
+    {
+      "path": "file/I04分页委派区块/logs/rust-test.txt",
+      "bytes": 749,
+      "sha256": "a8146cbc252649f0a60112a6b0afaf853d70608136f8828416ba843a3bb172ee"
+    },
+    {
+      "path": "file/I04分页委派区块/logs/test-binary.txt",
+      "bytes": 82,
+      "sha256": "19ee02cbfbbde1988a7479bea13376365e7bfa6719bdcf912bd588d721271183"
+    },
+    {
+      "path": "file/I04分页委派区块/logs/typecheck.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "file/I04分页委派区块/refine-index.py",
+      "bytes": 7187,
+      "sha256": "c0221e279d88ea6c9471e4fa9c2550129dde9325747086af171a11c1f9121c1c"
+    },
+    {
+      "path": "file/I04分页委派区块/verify.ps1",
+      "bytes": 1451,
+      "sha256": "03cbcacadbff7f1702be5968fbf11f68aa7f246954110e326b0f335f5f8b4cac"
+    }
+  ]
+}
