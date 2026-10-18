@@ -84,3 +84,11 @@ Core实际指针推进至v1.73/161/211，旧160是受支持来源，210仍独立
 扩原Context同库owner及Web原operation owner定向通过；两文件48项运输/allowlist检查、根类型检查通过。Web首次检查发现原默认操作分组把不同问题互相阻挡，改为interactionId后通过；保留失败日志。Native Session/输入ACK、程序身份及fetch为夹具，未验证实际HTTP、Native管道或GUI，不增加正式场景通过数，也不重复全量1254/平台构建。
 
 下一动作保留为可信process_agent_run_acp_message回调和Host失效封旧、Grok原User队列登记；随后r1安全阻塞摘要、原广播、固定Codeg卡片及两类查看器，再完整Runtime矩阵与I04其他包。三接口已登记不表示Native模型请求可用，阶段仍研发中。
+
+## 原生回调接续（2026-10-18）
+
+四方法从原ACP listener接入持久登记和后台答复，原Cursor直接skipped/rejected分支退出。原Host句柄及确切Native prompt只在可信运输Target中保存；DB业务归属仍由原Core记录拥有。User等待不阻塞reader或持DB锁，原广播加5秒失联回查；答复走原Runtime route admission、持久token和写端重验，不在补回执时重写原生响应。Host退出和单请求失效关闭采用精确Core/Host/Run/epoch。
+
+新增唯一最低层extended内存AsyncWrite owner，覆盖旧六身份、排队后换运行、Completed拒绝、JSON整帧、部分写超时/flush失败及隔离后不续写；原Context同库owner扩范围关闭/重复零写/回滚和单请求不动其他请求，原Grok分类owner回归。未创建新SQLite/Runtime fixture，未启用Cursor平台资格。自审修正writer坏与进程退出的含义分离，不用alive=false伪造清理；错误响应后的reap交原任务集合，不让reader回调长期持permit。
+
+完整Native桥循环仍待可控Host耦合验证；组件通过不作为真模型、实际Host进程、HTTP/GUI或正式84场景通过。Grok修改反馈原User队列目前仍有明确发送围栏，必须随后接完；再接r1安全阻塞摘要、原卡片和两类查看器，以及其他Runtime格式/平台矩阵。I04其余工作包和阶段候选验证保持。

@@ -609,6 +609,119 @@ fn assert_native_interaction_storage(f: &mut Fixture) {
     )
     .unwrap();
     // Restart closure is atomic and repeatable, without inventing skip/approval responses.
+    for (generation, host, source, expected_epoch) in [
+        (
+            "other-core",
+            frame.host_instance.as_str(),
+            run.as_str(),
+            epoch,
+        ),
+        (
+            frame.core_generation.as_str(),
+            "other-host",
+            run.as_str(),
+            epoch,
+        ),
+        (
+            frame.core_generation.as_str(),
+            frame.host_instance.as_str(),
+            "other-run",
+            epoch,
+        ),
+        (
+            frame.core_generation.as_str(),
+            frame.host_instance.as_str(),
+            run.as_str(),
+            epoch + 1,
+        ),
+    ] {
+        assert_eq!(
+            storage::close_host_run(&mut f.database, generation, host, source, expected_epoch)
+                .unwrap(),
+            0
+        );
+    }
+    assert_eq!(
+        storage::close_request(
+            &mut f.database,
+            &second,
+            "other-core",
+            &frame.host_instance,
+            "fixture"
+        )
+        .unwrap(),
+        0
+    );
+    f.database
+        .connection()
+        .execute_batch("SAVEPOINT native_host_exit")
+        .unwrap();
+    assert_eq!(
+        storage::close_host_run(
+            &mut f.database,
+            &frame.core_generation,
+            &frame.host_instance,
+            &run,
+            epoch
+        )
+        .unwrap(),
+        3
+    );
+    assert_eq!(
+        storage::read(&f.database, &actor, &f.camp_id, &second)
+            .unwrap()
+            .unwrap()
+            .status,
+        "closed"
+    );
+    assert_eq!(
+        storage::read(&f.database, &actor, &f.camp_id, &inflight)
+            .unwrap()
+            .unwrap()
+            .status,
+        "delivery_unknown"
+    );
+    assert_eq!(
+        storage::close_host_run(
+            &mut f.database,
+            &frame.core_generation,
+            &frame.host_instance,
+            &run,
+            epoch
+        )
+        .unwrap(),
+        0
+    );
+    f.database
+        .connection()
+        .execute_batch("ROLLBACK TO native_host_exit; RELEASE native_host_exit")
+        .unwrap();
+    f.database
+        .connection()
+        .execute_batch("SAVEPOINT native_one_request")
+        .unwrap();
+    assert_eq!(
+        storage::close_request(
+            &mut f.database,
+            &second,
+            &frame.core_generation,
+            &frame.host_instance,
+            "native_route_closed"
+        )
+        .unwrap(),
+        1
+    );
+    assert_eq!(
+        storage::read(&f.database, &actor, &f.camp_id, &plan)
+            .unwrap()
+            .unwrap()
+            .status,
+        "resolved"
+    );
+    f.database
+        .connection()
+        .execute_batch("ROLLBACK TO native_one_request; RELEASE native_one_request")
+        .unwrap();
     let tx = f.database.connection_mut().transaction().unwrap();
     assert_eq!(
         storage::close_on_restart(&tx, "2026-10-18T00:00:01Z").unwrap(),

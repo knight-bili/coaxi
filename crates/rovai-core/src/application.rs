@@ -9,6 +9,7 @@ pub(crate) mod delegation_control;
 pub(crate) mod delegation_input;
 pub(crate) mod delegation_queries;
 mod mission;
+mod native_interactions;
 pub(crate) mod private_composer;
 mod private_sources;
 pub(crate) mod runtime_interactions;
@@ -21772,6 +21773,20 @@ async fn process_acp_events(
             } => {
                 if let Err(error) = {
                     let mut database = core.database.lock().await;
+                    crate::runtime_interaction::storage::close_host_run(
+                        &mut database,
+                        core.planned_shutdown.generation(),
+                        &host_instance_id,
+                        &agent_run_id,
+                        execution_epoch,
+                    )
+                } {
+                    eprintln!(
+                        "native User requests could not be closed after Host exit: {error:#}"
+                    );
+                }
+                if let Err(error) = {
+                    let mut database = core.database.lock().await;
                     reconcile_compaction_observation_outbox(
                         &mut database,
                         &core.data_dir.join("runtime"),
@@ -22287,23 +22302,47 @@ async fn process_agent_run_acp_message(
                         .await
                 }
             },
-            "cursor/ask_question" if adapter_kind == AdapterKind::CursorAgent => {
-                runtime
-                    .respond(id, json!({"outcome": {"outcome": "skipped"}}))
-                    .await
+            "cursor/ask_question" | "cursor/create_plan"
+                if adapter_kind == AdapterKind::CursorAgent =>
+            {
+                native_interactions::capture(
+                    core,
+                    runtime.clone(),
+                    crate::acp::user_reply::Target {
+                        host: host_instance_id.into(),
+                        run: agent_run_id.into(),
+                        epoch: execution_epoch,
+                        session: native_session_id.into(),
+                        prompt: native_prompt_id.into(),
+                        delivery: delivery_id.into(),
+                    },
+                    id,
+                    &method,
+                    sequence,
+                    &params,
+                )
+                .await
             }
-            "cursor/create_plan" if adapter_kind == AdapterKind::CursorAgent => {
-                runtime
-                    .respond(
-                        id,
-                        json!({
-                            "outcome": {
-                                "outcome": "rejected",
-                                "reason": "Rovai-ai does not yet expose Cursor Plan Review"
-                            }
-                        }),
-                    )
-                    .await
+            "_x.ai/ask_user_question" | "_x.ai/exit_plan_mode"
+                if adapter_kind == AdapterKind::GrokBuild =>
+            {
+                native_interactions::capture(
+                    core,
+                    runtime.clone(),
+                    crate::acp::user_reply::Target {
+                        host: host_instance_id.into(),
+                        run: agent_run_id.into(),
+                        epoch: execution_epoch,
+                        session: native_session_id.into(),
+                        prompt: native_prompt_id.into(),
+                        delivery: delivery_id.into(),
+                    },
+                    id,
+                    &method,
+                    sequence,
+                    &params,
+                )
+                .await
             }
             _ => {
                 runtime

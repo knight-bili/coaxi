@@ -382,6 +382,51 @@ pub(crate) fn finish_dispatch(
     Ok(changed > 0)
 }
 
+/// Only the original generation-local coordinator can close this captured request.
+pub(crate) fn close_request(
+    database: &mut Database,
+    id: &str,
+    generation: &str,
+    host: &str,
+    reason: &str,
+) -> Result<usize> {
+    let now = chrono::Utc::now().to_rfc3339();
+    let count = database.connection().execute(
+        "UPDATE runtime_user_interaction SET
+        status=CASE WHEN status='dispatching' THEN 'delivery_unknown' ELSE 'closed' END,
+        close_reason=?4,finished_at=?5,updated_at=?5,version=version+1
+        WHERE id=?1 AND core_generation=?2 AND host_instance_id=?3
+          AND status IN ('pending','resolved','dispatching')",
+        params![id, generation, host, reason, now],
+    )?;
+    if count > 0 {
+        database.execution_wake.delegation.notify_waiters();
+    }
+    Ok(count)
+}
+
+pub(crate) fn close_host_run(
+    database: &mut Database,
+    generation: &str,
+    host: &str,
+    run: &str,
+    epoch: i64,
+) -> Result<usize> {
+    let now = chrono::Utc::now().to_rfc3339();
+    let count = database.connection().execute(
+        "UPDATE runtime_user_interaction SET
+        status=CASE WHEN status='dispatching' THEN 'delivery_unknown' ELSE 'closed' END,
+        close_reason='native_host_exited',finished_at=?5,updated_at=?5,version=version+1
+        WHERE core_generation=?1 AND host_instance_id=?2 AND agent_run_id=?3 AND execution_epoch=?4
+          AND status IN ('pending','resolved','dispatching')",
+        params![generation, host, run, epoch, now],
+    )?;
+    if count > 0 {
+        database.execution_wake.delegation.notify_waiters();
+    }
+    Ok(count)
+}
+
 /// Called in startup recovery's original transaction, before any new native reader.
 pub(crate) fn close_on_restart(tx: &Transaction<'_>, now: &str) -> Result<usize> {
     let exists:bool=tx.query_row("SELECT EXISTS(SELECT 1 FROM sqlite_schema WHERE type='table' AND name='runtime_user_interaction')",[],|r|r.get(0))?;

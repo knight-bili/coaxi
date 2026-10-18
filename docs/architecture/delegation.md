@@ -31,3 +31,5 @@ User恢复以原UUID和持久父Conversation归属授权，允许父Run已经终
 完整行为、上下文隔离和原界面职责在[已确认 r1](../versions/v1.73/model-context-change-native-delegation.md)，取舍理由见[V1.73-D01](../versions/v1.73/decisions.md#v1-73-d01)。
 
 原生交互的User读/答入口复用同一Core记录和Gateway：有界摘要列表与完整内容分开，Host派生CURRENT_USER，UI不重交问题或Native身份。全局User envelope使首次精确回执不依赖目标还存在；首次决定仍核定实际owner和live代次，不跳过Camp删除/失效检查。Native IPC/Web只逐项准入三接口，SSE只作安全失效通知；Web未知命令按Core interactionId隔离，原请求只读核对，不因连接丢失换号或自动发送。具体字段和当前证据边界见[User交互接口](../contracts/delegation-v1.md#user交互读取与答复接口)。原生回调、原队列反馈和卡片不由API登记推断完成。
+
+原生User请求沿现有ACP listener和Host/Run/epoch/Session/prompt/delivery运输关联登记，后台等待只保留原生句柄与不可反序列化Target，不维护另一套业务状态。Core唯一请求记录及原Gateway答案决定是否可领取发送token；写端持原Host串行锁后重验仍活跃的确切输入，路由read guard保持到flush，数据库锁和User等待不跨原生I/O。半帧/超时先隔离writer，不把protocol-violated当OS进程已退出，再交原reap/cleanup资格。Host Exited只封当前代次对应Host/Run/epoch，恢复不重发。实现和证据边界见[原生回调合同](../contracts/delegation-v1.md#原生回调与串行答复)；原队列、界面与完整回调循环仍须完成。

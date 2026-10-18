@@ -48,6 +48,7 @@ use rovai_core::{
     storage_layout::ThreadOutputDirectory,
 };
 use serde_json::{Value, json};
+pub(crate) mod user_reply;
 use tokio::{
     io::{AsyncBufReadExt, AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt, BufReader},
     process::Command,
@@ -3986,6 +3987,10 @@ impl AcpHost {
 
     async fn send(&self, message: Value) -> Result<()> {
         let mut stdin = self.stdin.lock().await;
+        ensure!(
+            self.is_alive() && !self.protocol_violated.load(Ordering::Acquire),
+            "ACP Host writer is fenced"
+        );
         stdin
             .write_all(serde_json::to_string(&message)?.as_bytes())
             .await?;
@@ -5526,6 +5531,66 @@ impl AcpRuntime {
         self.host
             .send(json!({"jsonrpc": "2.0", "id": id, "result": result}))
             .await
+    }
+
+    pub(crate) async fn respond_user_interaction(
+        &self,
+        target: &user_reply::Target,
+        id: Value,
+        response: std::result::Result<Value, &'static str>,
+    ) -> user_reply::Outcome {
+        if target.host != self.host.host_instance_id
+            || target.run != self.owner.agent_run_id
+            || target.epoch != self.owner.execution_epoch
+        {
+            return user_reply::Outcome::Fenced;
+        }
+        let session = self.session_id.read().await;
+        if session.as_deref() != Some(&target.session) {
+            return user_reply::Outcome::Fenced;
+        }
+        let message = match response {
+            Ok(result) => json!({"jsonrpc":"2.0","id":id,"result":result}),
+            Err(message) => {
+                json!({"jsonrpc":"2.0","id":id,"error":{"code":-32000,"message":message}})
+            }
+        };
+        let outcome = user_reply::write(
+            &self.host.stdin,
+            &self.host.routes,
+            &self.host.alive,
+            &self.host.protocol_violated,
+            &self.host.host_instance_id,
+            &self.owner,
+            target,
+            message,
+            Duration::from_secs(5),
+        )
+        .await;
+        drop(session);
+        outcome
+    }
+
+    pub(crate) async fn retire_failed_user_reply(&self) {
+        if !self.host.is_alive() || self.host.protocol_violated.load(Ordering::Acquire) {
+            self.host.shutdown_and_reap().await;
+        }
+    }
+
+    pub(crate) fn user_reply_host_is_alive(&self) -> bool {
+        self.host.is_alive() && !self.host.protocol_violated.load(Ordering::Acquire)
+    }
+
+    pub(crate) async fn user_reply_target_is_current(&self, target: &user_reply::Target) -> bool {
+        if !self.user_reply_host_is_alive() || target.host != self.host.host_instance_id {
+            return false;
+        }
+        let session = self.session_id.read().await;
+        if session.as_deref() != Some(&target.session) {
+            return false;
+        }
+        let routes = self.host.routes.read().await;
+        user_reply::route_matches(&routes, &self.owner, target)
     }
 
     pub async fn respond_error(&self, id: Value, code: i64, message: &str) -> Result<()> {
