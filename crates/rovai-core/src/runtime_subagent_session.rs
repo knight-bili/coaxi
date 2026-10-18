@@ -8,6 +8,7 @@ use serde_json::Value;
 
 pub(crate) mod content;
 mod origin;
+pub(crate) mod snapshot;
 pub(crate) mod source;
 pub use origin::CapturedNativeSource;
 pub(crate) use origin::ORIGIN_EVENT;
@@ -236,6 +237,19 @@ impl NativeChildSessionService {
     ) -> Result<content::NativeContent> {
         let target = Self::resolve(database, blobs, actor, reference)?;
         content::read(&target, fallback, stop)
+    }
+
+    pub(crate) fn read_snapshot(
+        database: &Database,
+        blobs: &ManagedBlobStore,
+        actor: &ActorRef,
+        reference: &NativeChildSessionReference,
+        fallback: chrono::DateTime<chrono::Utc>,
+        stop: &std::sync::atomic::AtomicBool,
+    ) -> Result<snapshot::NativeSnapshot> {
+        let target = Self::resolve(database, blobs, actor, reference)?;
+        let content = content::read(&target, fallback, stop)?;
+        snapshot::NativeSnapshot::new(actor, &target, content, stop)
     }
 }
 

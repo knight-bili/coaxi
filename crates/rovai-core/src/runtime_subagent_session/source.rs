@@ -6,7 +6,7 @@
 use std::{
     collections::HashSet,
     fs::{self, File, Metadata, OpenOptions},
-    io::{BufRead, BufReader, Read, Seek, SeekFrom},
+    io::{Read, Seek, SeekFrom},
     path::{Component, Path, PathBuf},
 };
 
@@ -69,6 +69,15 @@ impl NativeDocuments {
     /// Filesystem seam only. Production launch capture/historical binding lookup
     /// must establish `binding_home`; this is not a grant to select arbitrary roots.
     pub(crate) fn open(binding_home: &Path, target: &ObservedNativeSessionTarget) -> Result<Self> {
+        Self::open_cancellable(binding_home, target, &std::sync::atomic::AtomicBool::new(false))
+    }
+
+    pub(crate) fn open_recorded_cancellable(target: &ObservedNativeSessionTarget, stop: &std::sync::atomic::AtomicBool) -> Result<Self> {
+        Self::open_cancellable(target.recorded_home.as_deref().context("native_child.origin_unavailable")?, target, stop)
+    }
+
+    pub(crate) fn open_cancellable(binding_home: &Path, target: &ObservedNativeSessionTarget, stop: &std::sync::atomic::AtomicBool) -> Result<Self> {
+        ensure!(!stop.load(std::sync::atomic::Ordering::Acquire), "native_child.read_cancelled");
         ensure!(
             binding_home.is_absolute(),
             "native_child.invalid_source_root"
@@ -81,8 +90,8 @@ impl NativeDocuments {
         );
         let home = fs::canonicalize(binding_home).context("native_child.source_unavailable")?;
         let (documents, unavailable_advisories) = match target.adapter_kind.as_str() {
-            "codex-cli" => (codex_documents(&home, target)?, 0),
-            "grok-build" => grok_documents(&home, target)?,
+            "codex-cli" => (codex_documents(&home, target, stop)?, 0),
+            "grok-build" => grok_documents(&home, target, stop)?,
             _ => bail!("native_child.unsupported_source"),
         };
         Ok(Self { documents, unavailable_advisories })
@@ -90,10 +99,6 @@ impl NativeDocuments {
 }
 
 impl NativeDocument {
-    fn open(home: &Path, path: &Path, kind: DocumentKind) -> Result<Self> {
-        Self::open_with_cancel(home, path, kind, None)
-    }
-
     pub(super) fn open_project(
         home: &Path,
         path: &Path,
@@ -181,9 +186,10 @@ impl NativeDocument {
         self.chunk_digests.len()
     }
 
-    fn header(&mut self) -> Result<Value> {
+    fn header(&mut self, stop: &std::sync::atomic::AtomicBool) -> Result<Value> {
         let mut bytes = Vec::new();
         for index in 0..self.chunk_count().min(HEADER_BYTES as usize / CHUNK_BYTES) {
+            ensure!(!stop.load(std::sync::atomic::Ordering::Acquire), "native_child.read_cancelled");
             bytes.extend(self.read_chunk(index)?);
             for line in bytes.split(|byte| *byte == b'\n').take(4) {
                 if let Ok(value) = serde_json::from_slice::<Value>(line)
@@ -282,10 +288,6 @@ fn open_contained(home: &Path, path: &Path) -> Result<File> {
         "native_child.source_changed"
     );
     Ok(file)
-}
-
-fn entries(home: &Path, root: &Path, max_depth: usize) -> Result<Vec<PathBuf>> {
-    entries_with_stop(home, root, max_depth, None)
 }
 
 fn entries_with_stop(
@@ -399,9 +401,10 @@ fn history_pointer(payload: &Value) -> Result<Option<(String, u64)>> {
 fn codex_documents(
     home: &Path,
     target: &ObservedNativeSessionTarget,
+    stop: &std::sync::atomic::AtomicBool,
 ) -> Result<Vec<NativeDocument>> {
-    let mut paths = entries(home, &home.join("sessions"), 4)?;
-    paths.extend(entries(home, &home.join("archived_sessions"), 1)?);
+    let mut paths = entries_with_stop(home, &home.join("sessions"), 4, Some(stop))?;
+    paths.extend(entries_with_stop(home, &home.join("archived_sessions"), 1, Some(stop))?);
     let rollouts: Vec<_> = paths.into_iter().filter_map(Rollout::from_path).collect();
     let mut current = rollouts
         .iter()
@@ -424,8 +427,8 @@ fn codex_documents(
             visited.insert(current.rollout.clone()),
             "native_child.history_cycle"
         );
-        let mut document = NativeDocument::open(home, &current.path, DocumentKind::CodexRollout)?;
-        let header = document.header()?;
+        let mut document = NativeDocument::open_with_cancel(home, &current.path, DocumentKind::CodexRollout, Some(stop))?;
+        let header = document.header(stop)?;
         let payload = &header["payload"];
         ensure!(
             payload["id"] == current.thread,
@@ -475,54 +478,30 @@ fn grok_session(home: &Path, paths: &[PathBuf], id: &str) -> Result<PathBuf> {
     Ok(path)
 }
 
-fn grok_link(home: &Path, parent: &Path, target: &ObservedNativeSessionTarget) -> Result<bool> {
-    let file = open_contained(home, &parent.join("updates.jsonl"))?;
-    let mut reader = BufReader::new(file);
-    loop {
-        let mut line = Vec::new();
-        let read = (&mut reader)
-            .take(HEADER_BYTES + 1)
-            .read_until(b'\n', &mut line)?;
-        if read == 0 {
-            break;
-        }
-        if read as u64 > HEADER_BYTES {
-            if line.last() != Some(&b'\n') {
-                reader.skip_until(b'\n')?;
-            }
-            continue;
-        }
-        let Ok(value) = serde_json::from_slice::<Value>(&line) else {
-            continue;
-        };
+fn grok_link(home: &Path, parent: &Path, target: &ObservedNativeSessionTarget, stop: &std::sync::atomic::AtomicBool) -> Result<bool> {
+    use super::content::records::{JsonRecords, ParseNotes, json_document};
+    let mut parent_updates = NativeDocument::open_with_cancel(home, &parent.join("updates.jsonl"), DocumentKind::GrokUpdates, Some(stop))?;
+    let mut notes = ParseNotes::default();
+    for record in JsonRecords::new(&mut parent_updates, stop, &mut notes) {
+        let value = record?;
         let update = &value["params"]["update"];
-        if matches!(
-            update["sessionUpdate"].as_str(),
-            Some("subagent_spawned" | "subagent_finished")
-        ) && update["child_session_id"] == target.child_native_session_id
-            && update
-                .get("parent_session_id")
-                .is_none_or(|v| v == &target.parent_native_session_id)
+        if matches!(update["sessionUpdate"].as_str(), Some("subagent_spawned" | "subagent_finished"))
+            && update["child_session_id"] == target.child_native_session_id
+            && update.get("parent_session_id").is_none_or(|v| v == &target.parent_native_session_id)
         {
             return Ok(true);
         }
     }
-    for path in entries(home, &parent.join("subagents"), 1)? {
-        if path.file_name().is_none_or(|name| name != "meta.json") {
-            continue;
-        }
-        let mut bytes = Vec::new();
-        open_contained(home, &path)?
-            .take(HEADER_BYTES + 1)
-            .read_to_end(&mut bytes)?;
-        if bytes.len() as u64 > HEADER_BYTES {
-            continue;
-        }
-        if let Ok(value) = serde_json::from_slice::<Value>(&bytes)
-            && value["child_session_id"] == target.child_native_session_id
-            && value
-                .get("parent_session_id")
-                .is_none_or(|v| v == &target.parent_native_session_id)
+    for path in entries_with_stop(home, &parent.join("subagents"), 1, Some(stop))? {
+        if path.file_name().is_none_or(|name| name != "meta.json") { continue; }
+        let mut document = NativeDocument::open_with_cancel(home, &path, DocumentKind::GrokSubagentMetadata, Some(stop))?;
+        let value = match json_document(&mut document, stop) {
+            Ok(value) => value,
+            Err(error) if error.is::<serde_json::Error>() => continue,
+            Err(error) => return Err(error),
+        };
+        if value["child_session_id"] == target.child_native_session_id
+            && value.get("parent_session_id").is_none_or(|v| v == &target.parent_native_session_id)
         {
             return Ok(true);
         }
@@ -533,35 +512,38 @@ fn grok_link(home: &Path, parent: &Path, target: &ObservedNativeSessionTarget) -
 fn grok_documents(
     home: &Path,
     target: &ObservedNativeSessionTarget,
+    stop: &std::sync::atomic::AtomicBool,
 ) -> Result<(Vec<NativeDocument>, usize)> {
-    let paths = entries(home, &home.join("sessions"), 2)?;
+    let paths = entries_with_stop(home, &home.join("sessions"), 2, Some(stop))?;
     let parent = grok_session(home, &paths, &target.parent_native_session_id)?;
     let child = grok_session(home, &paths, &target.child_native_session_id)?;
     ensure!(
-        grok_link(home, &parent, target)?,
+        grok_link(home, &parent, target, stop)?,
         "native_child.parent_mismatch"
     );
-    let mut documents = vec![NativeDocument::open(
+    let mut documents = vec![NativeDocument::open_with_cancel(
         home,
         &child.join("updates.jsonl"),
         DocumentKind::GrokUpdates,
+        Some(stop),
     )?];
     let answers = child.join("chat_history.jsonl");
     if answers.try_exists()? {
-        documents.push(NativeDocument::open(
+        documents.push(NativeDocument::open_with_cancel(
             home,
             &answers,
             DocumentKind::GrokChatHistory,
+            Some(stop),
         )?);
     }
     let summary = child.join("summary.json");
     if summary.try_exists()? {
-        documents.push(NativeDocument::open(home, &summary, DocumentKind::GrokSummary)?);
+        documents.push(NativeDocument::open_with_cancel(home, &summary, DocumentKind::GrokSummary, Some(stop))?);
     }
-    for path in entries(home, &child.join("subagents"), 1)? {
+    for path in entries_with_stop(home, &child.join("subagents"), 1, Some(stop))? {
         if path.file_name().is_none_or(|name| name != "meta.json") { continue; }
         let Some(id) = path.parent().and_then(Path::file_name).and_then(|name| name.to_str()).filter(|id| identity(id)) else { continue; };
-        let mut document = NativeDocument::open(home, &path, DocumentKind::GrokSubagentMetadata)?;
+        let mut document = NativeDocument::open_with_cancel(home, &path, DocumentKind::GrokSubagentMetadata, Some(stop))?;
         document.source_label = Some(id.into());
         documents.push(document);
     }
@@ -572,8 +554,9 @@ fn grok_documents(
     for (name, kind) in [("models_cache.json", DocumentKind::GrokModelsCache), ("config.toml", DocumentKind::GrokConfig)] {
         let path = home.join(name);
         if matches!(path.try_exists(), Ok(false)) { continue; }
-        match NativeDocument::open(home, &path, kind) {
+        match NativeDocument::open_with_cancel(home, &path, kind, Some(stop)) {
             Ok(document) => documents.push(document),
+            Err(error) if stop.load(std::sync::atomic::Ordering::Acquire) => return Err(error),
             Err(_) => unavailable_advisories += 1,
         }
     }

@@ -14,6 +14,8 @@ last_updated: 2026-10-18
 集中到阶段候选；公共契约、安全/迁移或阻断后续开发时允许有原因的最小验证。
 以下owner、命令和测试准入规则继续有效，未执行的检查登记待验，不因减少触发次数而删测试或假报通过。
 
+I04 原生完整投影分页继续扩现有 `runtime_subagent_session::source::tests::lineage_sources_keep_exact_rollouts_and_lossless_stable_chunks`，helper为 `source/snapshot_tests.rs` 和私有 `snapshot_tests.rs`，复用原文件owner的同一自建目录，不新增Rust测试owner、数据库或进程。此前大于1MiB的Grok父关联记录/metadata会被跳过，完整JSON直接跨运输也缺少冻结身份与边界；本批验证完整父关联解码、首次发现/hash前取消、整份原消息/工具JSON/统计的UTF8分页重组与摘要、签名篡改/快照混用/越界/错User或身份来源拒绝、仅为已核实后代签发引用、序列化分块停止后零追加。调用者仍须在每页重新做Core授权；这些组件检查不证明后台任务注册、公开Native/Web运输、原版UI或真实Runtime已完成。因签名读取权限和来源边界需先核实再接公开运输，允许一次最低 `cargo test --locked -p rovai-core --features extended-tests --lib --no-run`，然后同二进制精确列册并运行该原owner；不运行整套slow/App/Actions，不增加84正式场景通过数。
+
 I04 旧Claude agent文件来源扩同一个 `runtime_subagent_session::source::tests::lineage_sources_keep_exact_rollouts_and_lossless_stable_chunks`，helper为 `source/claude_tests.rs`，沿该owner的同一自建目录，不新增Rust owner/数据库/进程。验证固定Codeg布局下精确父工具调用与结构化agentId双重关联、缺失/矛盾/错工具/重名父源拒绝、完整长UTF8和相同长度改写核对、取消及路径遍历拒绝。agentId、message parentUuid与Session身份保持分离，不因子文件名创建Native Session引用；Unix外链场景只归对应平台。该来源边界在完整Claude parser/生产关联接线前做一次最低extended编译及精确原owner，不能用该检查证明Claude Runtime、User API或完整旧代理查看器已可用。Qoder只确认复用部分原解析规则，其root/producer另核，不自动复用Claude授权。
 
 I04 可信补丁工程读取继续扩原 source filesystem owner与 `context::slow_tests::delivery_unknown_never_consumes_a_redelivery_requirement`，不新增Rust owner、数据库或进程。前者沿同一自建目录核对完整UTF-8行、根内相对/绝对/嵌套路径、越界/非法/非文件拒绝、Windows备用数据流拒绝、单次读取缓存、快照改写和取消；Unix符号链接场景只在对应平台执行，不能写成本机Windows已验。

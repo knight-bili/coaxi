@@ -278,6 +278,14 @@ Codex 两类观察补显式 parentNativeSessionId，Grok 保持既有显式父�
 
 内部 `NativeDocuments::open_recorded` 使用上述持久来源，Codex 校验精确标准 rollout 和原头部父链，保留历史 cut/seed；Grok 校验父更新或子元数据中的显式 child_session_id，不回退短编号。64KiB块与整体摘要保留完整字节，追加不扩旧快照，同长度改写拒绝。原文可能包含启动字段，必须经 Core 消息/工具/答案投影后才能给 UI，不能直接输出 raw JSON 或送回模型。签名客户端游标、可取消后台 I/O、Native/Web、原只读 UI 及真实 Host/Runtime 同场景仍按[完整队列](../../integration/inventory/native-subagent-viewer-reference.md)接续；当前分项检查不授予这些资格。
 
+### 原生完整快照与分页的内部边界
+
+`NativeChildSessionService::read_snapshot` 沿同一Current User解析及可信来源读取，生成不可变的完整消息/工具/统计投影。私有 `NativeSnapshot` 以进程密钥签名快照引用、按UTF8字节偏移的后续游标和已核实后代引用；签名绑定随机快照身份、精确Thread/Conversation/Run/epoch/Evidence/Runtime/installation/binding及来源目录摘要。状态与live可随当前Core目标变化，不改旧正文。引用中不携带原生路径或可自行更换的Session编号。
+
+一次窗口允许4至32768个原始UTF8字节，只在字符边界切开；客户端须按偏移收齐所有片段、核对整份投影摘要后再解析JSON，不把单片段当独立JSON或逐字段裁正文。长工具输入输出、嵌套元数据、消息、摘要和统计全部进入同一冻结投影。只有 `verified_children` 内的后代获得签名引用；后代状态unknown且非live，后续仍须验证其父子来源。篡改、混用快照/游标、错身份/来源、越界偏移及非User拒绝。
+
+首次目录发现、文件hash、Grok完整父关联JSON及内容序列化均接同一停止标记；不再以旧1MiB预览上限丢弃Grok父关联记录或metadata。取消仅终止阅读，不操作Runtime。内部对象不代替Core授权：未来后台/运输调用者每次取页及打开后代都必须重新解析原Core引用，资源生命周期、重启失效与销毁仍由后续注册层接线。当前未注册公共Native/Web读取method，也未接原只读UI，组件检查不能授予这些资格。
+
 ### 原生内容投影的当前实现边界
 
 Core 私有 `content` 层移植固定 Codeg 的 Grok 消息模型、提示材料投影、消息/思考/图片、累计工具更新、MCP 解包、TaskOutput、原问答答案和压缩标记。保留原 promptIndex 合并、内部提醒过滤、空工具完成与原生命周期语义；花费用量与上下文占用分开。直接正文及工具 JSON 不永久截断，后续运输通过有界窗口读取完整内容；后代卡片统计仍用原版500字符预览。后代 Session 只取显式原生身份，再经过同一来源文件层核对父链；尚未签发客户端嵌套读取引用。

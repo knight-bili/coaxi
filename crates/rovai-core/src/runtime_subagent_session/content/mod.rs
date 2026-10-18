@@ -121,7 +121,7 @@ pub(crate) fn grok_content(
         target.adapter_kind == "grok-build",
         "native_child.unsupported_source"
     );
-    let documents = NativeDocuments::open_recorded(target)?;
+    let documents = NativeDocuments::open_recorded_cancellable(target, stop)?;
     let root_digest = fingerprint(&documents.documents);
     let mut digest = Sha256::new();
     digest.update(root_digest.as_bytes());
@@ -208,7 +208,7 @@ pub(crate) fn grok_content(
                 let mut child = target.clone();
                 child.parent_native_session_id = target.child_native_session_id.clone();
                 child.child_native_session_id = id.into();
-                let mut documents = NativeDocuments::open_recorded(&child)?;
+                let mut documents = NativeDocuments::open_recorded_cancellable(&child, stop)?;
                 let source_digest = fingerprint(&documents.documents);
                 let document = documents
                     .documents
@@ -341,7 +341,7 @@ pub(crate) fn codex_content(
         "native_child.invalid_adapter"
     );
     ensure!(!stop.load(Ordering::Acquire), "native_child.read_cancelled");
-    let mut documents = NativeDocuments::open_recorded(target)?;
+    let mut documents = NativeDocuments::open_recorded_cancellable(target, stop)?;
     let mut digest = Sha256::new();
     digest.update(fingerprint(&documents.documents).as_bytes());
     digest.update(fallback.to_rfc3339().as_bytes());
@@ -364,7 +364,7 @@ pub(crate) fn codex_content(
                 let mut child = target.clone();
                 child.parent_native_session_id = target.child_native_session_id.clone();
                 child.child_native_session_id = id.to_owned();
-                let mut documents = NativeDocuments::open_recorded(&child)?;
+                let mut documents = NativeDocuments::open_recorded_cancellable(&child, stop)?;
                 let source_digest = fingerprint(&documents.documents);
                 let document = documents
                     .documents

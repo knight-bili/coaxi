@@ -160,3 +160,11 @@ Grok标题/型号/分支/时间、原统计和上下文窗口cache→config→id
 [分项记录](../../../integration/execution/i04-legacy-agent-source-result.json)保存锁定源码、初次缺测试导入的编译错误和修复后最低extended编译/精确原owner。无新Rust owner/数据库/进程、无模型输入/Schema/依赖变化，Source层不是Core User grant或完整Claude parser。
 
 下一队列优先让已接C/G完整解析进入有界签名读取、后台取消和原只读UI；Claude完整消息/用量/生命周期、生产捕获与证据关联、Qoder独立来源和旧源明确导入并行列入本I04剩余清单。四包21簇84及一期81簇48包324保持，不把本次分类纠正当作删除能力或阶段完成。
+
+## 原生完整签名快照与可取消分页
+
+Core User解析后生成整份不可变投影，私有NativeSnapshot按4至32768原始UTF8字节输出窗口，保留所有消息、工具正文/JSON、嵌套元数据、摘要和统计。客户端收齐、按偏移及完整摘要核对后再解析；单窗口不是独立JSON。快照/游标签名绑定精确身份、来源摘要和冻结内容，仅核实后代有引用；状态/live沿当前Core目标，不在冻结内容内伪造活跃状态。
+
+首次目录扫描、源文件hash与Grok父关联完整解码及投影序列化使用同一停止标记。自审纠正write_all会重试Interrupted的取消隐患，改为终止错误，避免取消后无限重试。原Grok大于1MiB的父更新或meta不再因旧预览上限被跳过。复用既有安全打开/完整记录解码和原parser，无依赖/Schema/模型输入变更。
+
+[本批记录](../../../integration/execution/i04-native-snapshot-result.json)保存最低extended编译、精确原文件owner及自审结果；一个既有owner扩同一目录，检查完整长内容重组、UTF8/转义、签名篡改/混用/错误身份和来源/越界、后代隔离和取消后零追加。未新增Rust owner或数据库/进程夹具，84正式场景新增通过0。后台任务注册/销毁、每页Core重新授权、Native/Web运输、原Codeg只读UI及同场景、真实Runtime/平台仍须继续；组件对象不构成公共授权或I04完成。

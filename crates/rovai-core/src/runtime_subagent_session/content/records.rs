@@ -113,7 +113,10 @@ impl Iterator for JsonRecords<'_> {
     }
 }
 
-pub(super) fn json_document(document: &mut NativeDocument, stop: &AtomicBool) -> Result<Value> {
+pub(in crate::runtime_subagent_session) fn json_document(
+    document: &mut NativeDocument,
+    stop: &AtomicBool,
+) -> Result<Value> {
     let mut bytes = Vec::new();
     for index in 0..document.chunk_count() {
         ensure!(!stop.load(Ordering::Acquire), "native_child.read_cancelled");

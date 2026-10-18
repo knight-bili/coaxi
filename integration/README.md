@@ -1,5 +1,7 @@
 # Codeg 与 Rovai 一期完整融合
 
+- [I04完整签名快照与分页分项](execution/i04-native-snapshot-result.json)：已接私有整份原投影UTF8分页、冻结快照/游标/核实后代引用签名与首次发现/hash/序列化取消。最低编译和精确原文件owner通过；后台任务注册/销毁、每页Core重授权、Native/Web及原只读UI继续，完整I04未收口。
+
 - [I04旧代理文件来源分项](execution/i04-legacy-agent-source-result.json)：Claude旧agent文件已单独建来源校验，不把agentId/消息parentUuid当Session；原文件owner通过，完整parser/生产关联及Qoder来源继续。现有Codex/Grok接口与原查看器可独立推进，完整I04范围不变。
 
 - [I04可信工程补丁读取](execution/i04-native-project-patch-result.json)：原Core用户准入、持久Host目录、核验文件及原Codex补丁行号已接，旧来源兼容和边界分项通过；旧agent文件、完整有界运输/后台取消、原UI及完整运行资格继续。

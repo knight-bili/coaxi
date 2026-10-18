@@ -14,7 +14,7 @@
   "current_branch": "phase/i04-collaboration-runtime",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I04-T01",
-  "current_slice": "旧agent文件已核为Claude类，与C/G Session分离；私有来源层验证父Agent/Task调用+结构化agentId及精确子文件，原文件owner分项通过。完整Claude parser/捕获/证据关联及Qoder根继续；现有C/G有界签名/后台取消和原UI可独立推进，I04全四包84正式场景未收口。",
+  "current_slice": "原生完整投影私有签名快照/UTF8分页/核实后代引用及首次发现/hash/序列化取消已接，最低extended编译与精确原文件owner通过。下一项后台注册/销毁与每页Core重授权，再Native/Web和固定原只读UI；Claude完整parser/生产关联/Qoder及I04四包84正式场景继续。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -268,5 +268,6 @@
   "i04_native_codex_content_evidence": "i04-native-codex-content-result.json",
   "i04_native_parser_parity_evidence": "i04-native-parser-parity-result.json",
   "i04_native_project_patch_evidence": "i04-native-project-patch-result.json",
-  "i04_legacy_agent_source_evidence": "i04-legacy-agent-source-result.json"
+  "i04_legacy_agent_source_evidence": "i04-legacy-agent-source-result.json",
+  "i04_native_snapshot_evidence": "i04-native-snapshot-result.json"
 }
