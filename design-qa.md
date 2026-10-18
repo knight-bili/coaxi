@@ -232,3 +232,13 @@ final result: local scope verified; I03 final review pending R10
 实际交互覆盖单/多选、推荐原文、真实__other__与宿主Other、Tab/键盘、折叠、三个计划决定、反馈取消保留、重复点击、未知核对与更换Host隔离。多个请求切换/隐藏各自未提交选择保留，仍需真实App/画布多来源挤压及端到端Core运输复验。原非空计划Markdown同场景、完整原App/Tauri/WebKit、真实模型与其余原生格式未授资格，I04保持实施中。
 
 final result: source-based cards and isolated Renderer verified; stage qualification pending
+
+## I04 Core 委派查看器（2026-10-18，组件与只读投影）
+
+固定 Codeg 两种查看器已区分，本批实现跨 Runtime 委派这一种的只读正文/执行/阻塞答复职责，复用 Rovai 原执行历史与审批组件。原 Base UI 1.7.0 抽屉与静态 Runtime 图标按源码移植；非模态、单层槽、嵌套退层、手势关闭、焦点与 Radix 上层保护均由隔离 Renderer 实际操作。原壳宽576/窄374、8px边距、26px圆角与16px正文列保留，日夜颜色走既有主题；没有统一隐藏滚动条。长结果仅正文滚动，关闭始终可达，短结果没有强造满高内卡。
+
+目视检查原夜间宽屏/日间窄屏与融合同主题组件截图，标题、图标与边距对齐；公开父页面保持可操作。原 Codeg 只实际运行 Drawer/Header/AgentIcon，正文明确为标记夹具，不能声称原完整 LiveTranscriptView 或原 App 的全文对照通过。生产截图含真实生产组件配模拟运输；状态/刷新及已保存原回答核对是 Core 接线差异。完整各格式、实际App/画布挂载和隐藏保留会话的抽屉恢复仍待候选资格。
+
+自审修复：断线时 latest20 与旧页之间必须追原签名页链，避免中间缺消息；换父会话读取失败不能重新标记旧列表；按 final Message ID 去重正文时保留附件。隐藏测试窗口的 CSS 过渡冻结单独在夹具收尾，不改变生产动效；触控测试是可信 Chromium 输入，不当移动真机。Core 原同库 owner 与 UI 模拟分别取证，来源、完整日志和局限见 integration/execution/i04-delegation-viewer-result.json 与 integration/inventory/delegation-viewer-ui-reference.md。
+
+final result: source drawer and isolated component verified; complete viewer and stage qualification pending

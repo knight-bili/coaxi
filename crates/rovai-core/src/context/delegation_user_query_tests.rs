@@ -17,6 +17,36 @@ fn assert_user_delegation_queries(
     assert_eq!(detail["status"], "succeeded");
     assert_eq!(detail["takenOver"], true);
     assert_eq!(detail["currentAttemptNo"], 1);
+    let activity = &detail["activity"];
+    let expected_runs: Vec<String> = f.database.connection().prepare(
+        "SELECT id FROM agent_run WHERE conversation_id=?1 AND invocation_kind IN ('delegation','delegation_user') ORDER BY created_at,id"
+    ).unwrap().query_map([detail["conversationId"].as_str().unwrap()], |row| row.get(0)).unwrap()
+        .collect::<rusqlite::Result<_>>().unwrap();
+    assert!(!expected_runs.is_empty());
+    assert_eq!(
+        activity["runs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|run| run["id"].as_str().unwrap().to_owned())
+            .collect::<Vec<_>>(),
+        expected_runs
+    );
+    for evidence in activity["executionEvidence"].as_array().unwrap() {
+        assert!(
+            expected_runs
+                .iter()
+                .any(|run| Some(run.as_str()) == evidence["agentRunId"].as_str())
+        );
+    }
+    for approval in activity["approvals"].as_array().unwrap() {
+        assert!(
+            expected_runs
+                .iter()
+                .any(|run| Some(run.as_str()) == approval["agentRunId"].as_str())
+        );
+        assert_eq!(approval["status"], "pending");
+    }
     for forbidden in [
         "task",
         "text",
@@ -44,6 +74,10 @@ fn assert_user_delegation_queries(
     let expected = full_list["items"].as_array().unwrap();
     assert!(expected.len() > 1);
     for item in expected {
+        assert!(
+            item.get("activity").is_none(),
+            "list must not fetch child activity bodies"
+        );
         if item["takenOver"] == false
             && matches!(
                 item["status"].as_str(),

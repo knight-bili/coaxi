@@ -69,6 +69,7 @@
     "test:capability-workspace": "node --test scripts/lib/capability-workspace.test.mjs",
     "test:approval-dock": "node --test scripts/lib/approval-dock.test.mjs",
     "test:runtime-interactions": "node --test scripts/lib/runtime-interactions.test.mjs",
+    "test:delegation-viewer": "node --test scripts/lib/delegation-viewer.test.mjs",
     "test:html-preview": "node --test scripts/lib/html-preview-site.test.mjs scripts/lib/html-preview-browser.test.mjs",
     "test:file-preview-layout": "node --test scripts/lib/file-preview-layout.test.mjs",
     "test:file-reference-navigation": "node --test scripts/lib/file-reference-navigation.test.mjs",
@@ -179,6 +180,7 @@
     "test:run-presence-ui": "node --test scripts/lib/run-presence.test.mjs"
   },
   "dependencies": {
+    "@base-ui/react": "1.7.0",
     "@codemirror/language": "6.12.4",
     "@codemirror/language-data": "6.5.2",
     "@codemirror/search": "6.7.2",

@@ -1210,6 +1210,15 @@ export interface DelegationDetail {
   endedAt: string | null
   cleanupPending: boolean
   blockedOn?: { kind: 'permission'; request_id: string; title: string }
+    | { kind: 'question' | 'plan_approval'; request_id: string }
+}
+/** Full User viewer only. List/model status never carry these bodies. */
+export interface DelegationConversationView extends DelegationDetail {
+  activity: {
+    runs: SingleChatRunView[]
+    executionEvidence: AgentRunExecutionEvidenceView[]
+    approvals: ActionApprovalView[]
+  }
 }
 export interface DelegationListPage { parentConversationId: string; items: DelegationDetail[]; nextCursor?: string }
 export interface DelegationReadPage {

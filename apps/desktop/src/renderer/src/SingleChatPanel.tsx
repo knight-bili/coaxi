@@ -10,6 +10,7 @@ import { PrivatePendingEditor } from './PrivatePendingEditor'
 import { canvasComposerContextKey, type CanvasComposerContext } from './canvas-composer-drafts'
 import { useThreadClient } from './camp-client'
 import { RuntimeInteractionDock } from './RuntimeInteractionDock'
+import { DelegationChildren } from './DelegationViewer'
 import { useMobileLayout } from './MobileLayout'
 import { newCommandId } from '../../shared/command-id'
 import { RunningText } from './RunningText'
@@ -1724,6 +1725,7 @@ export function SingleChatPanel({
         onLatest={() => { followLatestRef.current = true }}
       />
       </div>
+      {currentSnapshot && <DelegationChildren parentConversationId={currentSnapshot.conversation.id} visible={visible} environment={{ threadId, profileById, busy, onResolveApproval, onNotify }} />}
       {currentSnapshot && <RuntimeInteractionDock conversationId={currentSnapshot.conversation.id} sourceLabel={selectedMember?.displayName} visible={visible} />}
       {currentSnapshot && currentSnapshot.approvals.length > 0 && <ApprovalDock
         approvals={currentSnapshot.approvals} profileById={profileById} busy={busy}

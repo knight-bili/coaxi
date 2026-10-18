@@ -1,0 +1,75 @@
+{
+  "sourceComponent": "Codeg drawer, fixed source aff1e6c",
+  "directDependency": "@base-ui/react@1.7.0",
+  "lockFreeze": {
+    "baseline": "bcf27b298730ab1da1f1aab117cb555cd0f33af7",
+    "addedPackages": [
+      "@babel/runtime@7.29.10",
+      "@base-ui/react@1.7.0",
+      "@base-ui/utils@0.3.2",
+      "reselect@5.3.0"
+    ],
+    "addedSnapshots": [
+      "@babel/runtime@7.29.10",
+      "@base-ui/react@1.7.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)",
+      "@base-ui/utils@0.3.2(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)",
+      "reselect@5.3.0"
+    ],
+    "existingPackagesPreserved": 777,
+    "existingSnapshotsPreserved": 777,
+    "originalImportersPreserved": true
+  },
+  "packages": [
+    {
+      "name": "@babel/runtime",
+      "version": "7.29.10",
+      "license": "MIT",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/babel/babel.git",
+        "directory": "packages/babel-runtime"
+      },
+      "integrity": "sha512-NpugTzbKgGrNe45Ui32cN8vCFFMxVtP/9rtfwv0nP5FRDAjvYBxJcLVpYA9mr1jxP6cnIT7x9LUzuDTbWYYNRA==",
+      "licenseFile": "babel-runtime/LICENSE",
+      "licenseSha256": "117da2af0d4ce0fe1c8e19b5cff9dcd806adf973d328d27b11d4448c4ff24f76"
+    },
+    {
+      "name": "@base-ui/react",
+      "version": "1.7.0",
+      "license": "MIT",
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/mui/base-ui.git",
+        "directory": "packages/react"
+      },
+      "integrity": "sha512-j+8QjX44C32jrXD/qyEAGpFr70FRpGL2CY61mQd9nBPWN737CK0xxD1ceJ055rW4RtdvFDT1e7otzdlfxvsYug==",
+      "licenseFile": "base-ui-react/LICENSE",
+      "licenseSha256": "07fc1b39d69d14bc7d40482a628f47226258eb01265db68ae684944b916beb2a"
+    },
+    {
+      "name": "@base-ui/utils",
+      "version": "0.3.2",
+      "license": "MIT",
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/mui/base-ui.git",
+        "directory": "packages/utils"
+      },
+      "integrity": "sha512-oWy1aq/I2GmYjpl4PhEAhzflF8VPGKgZeq0xAWTbfD5KBWyxcN0ZP2+WHSUm/5Z6lVMBDLReLcoXwSYoRc/zNQ==",
+      "licenseFile": "base-ui-utils/LICENSE",
+      "licenseSha256": "07fc1b39d69d14bc7d40482a628f47226258eb01265db68ae684944b916beb2a"
+    },
+    {
+      "name": "reselect",
+      "version": "5.3.0",
+      "license": "MIT",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/reduxjs/reselect.git"
+      },
+      "integrity": "sha512-XGoLeRAVzUTcJ1qkxPQhDJyIZ5d6zzZD9nT7AEZOaaU9UbWclhycElmhO+VD5bFeLuzhPBaOV2oXC8uG35ZSpg==",
+      "licenseFile": "reselect/LICENSE",
+      "licenseSha256": "e98047a5dee068b33f82e8c4b7a63037b5108c93393198efd4097753004af5dd"
+    }
+  ]
+}

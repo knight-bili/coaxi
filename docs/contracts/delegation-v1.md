@@ -9,6 +9,14 @@ last_updated: 2026-10-18
 
 # Delegation v1
 
+### User 查看器活动投影
+
+User-only `delegations.get` 在既有身份和 Thread 核对的只读事务中，增加 `activity`：确切 child Conversation 的 `delegation/delegation_user` Run 摘要、按原 Run/Epoch 读取的执行证据及原 pending 审批。Run 字段复用 `SingleChatRunView`，证据复用现有安全投影和受管文本 overlay，审批复用原 Conversation 查询；不从 Renderer 传 Session/Run/actor 来补归属。原 `delegations.list` 和模型 status 继续只返回元数据，不预取正文；完整历史继续走原 signed cursor。
+
+查看器打开、关闭、刷新及历史翻页均为读取，不 attach、启动、接管、取消或续做。审批与问题/计划决定分别调用原审批入口和 `runtime.interactions.resolve`，保留真实 child 绑定、版本与原命令核对规则。旧 Host 缺少活动投影时展示读取失败，不使用父会话活动冒充。临时刷新失败保留该 client/Thread/parent/delegation 原内容，身份或父会话变更后不能重新标记旧缓存归属。
+
+本分项不改变模型输入、Schema161/Migration211 或批准 r1；普通用户接管后的完整编辑、Runtime 原生子代理只读读取及真实 Core→Host→UI 往返资格仍由各自后续项完成。隔离 Renderer 的模拟传输和原抽屉外壳截图，不能替代原 App 或真实 Runtime 资格。
+
 ### 重启后的接受结果与清理
 
 既有启动恢复筛出的无其他阻塞、已接受但结果遗失的输入，必须通过原 Runtime 失败结算事务处理，保留 `accepted_input_outcome_unknown` 原因和接受证据，不自动重发。

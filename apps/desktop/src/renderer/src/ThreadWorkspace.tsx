@@ -166,6 +166,7 @@ import { runtimeEditorInstallation } from './MemberRuntimeParameters'
 import { mentionCandidateRuntime } from './mention-runtime'
 import { SafeMarkdown } from './SafeMarkdown'
 import { RuntimeInteractionDock } from './RuntimeInteractionDock'
+import { DelegationViewerHost, DelegationChildren } from './DelegationViewer'
 import { FilePreviewPane } from './FilePreviewPane'
 import { FilePreviewResizeHandle, FilePreviewWorkspace, useInitializeFilePreviewMinimumWidth, useOptionalFilePreviewLayout } from './FilePreviewLayout'
 import { useExecutionPreviewHost, useOptionalFilePreview } from './FilePreviewContext'
@@ -1621,7 +1622,10 @@ export function ThreadWorkspace(props: Parameters<typeof ThreadWorkspaceContent>
   if (props.composerContext && props.composerContext.threadId !== props.snapshot.thread.id) throw new Error('Canvas draft belongs to another Thread.')
   if (owner.current.client !== client) owner.current = { client, generation: owner.current.generation + 1 }
   const key = JSON.stringify([owner.current.generation, props.snapshot.thread.id, props.composerContext ? canvasComposerContextKey(props.composerContext) : null])
-  return <ThreadWorkspaceContent key={key} {...props} />
+  return <DelegationViewerHost key={key} threadId={props.snapshot.thread.id} profileById={new Map(props.agents.map(agent => [agent.agentId, agent]))}
+    busy={props.busy} onResolveApproval={props.onResolveApproval} onNotify={props.onNotify}>
+    <ThreadWorkspaceContent {...props} />
+  </DelegationViewerHost>
 }
 
 function ThreadWorkspaceContent({
@@ -5798,6 +5802,8 @@ function ThreadWorkspaceContent({
           onDrop={dropAttachments}
         >
           <div className="native-interactions-group">
+            {[...new Set(snapshot.agentRuns.filter(run => ['direct', 'a2a', 'gather_completion', 'batch'].includes(run.invocationKind)).map(run => run.conversationId))]
+              .map(parentConversationId => <DelegationChildren key={parentConversationId} parentConversationId={parentConversationId} />)}
             {[...new Map(snapshot.agentRuns.filter(run => ['direct', 'a2a', 'gather_completion', 'batch'].includes(run.invocationKind))
               .map(run => [run.conversationId, run.agentId])).entries()].map(([conversationId, agentId]) => (
                 <RuntimeInteractionDock key={conversationId} conversationId={conversationId} sourceLabel={profileById.get(agentId)?.displayName ?? agentId} />

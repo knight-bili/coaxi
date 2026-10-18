@@ -2,9 +2,9 @@
 
 2026-10-18 当前检查点：原生提问/计划的持久化、User API、可信原生回调及安全阻塞摘要已分别提交；实际Core仍为v1.73/Schema161/Migration211。本文后面的“未接User API/原生回调”等段落保留为历史，不覆盖此处当前事实。
 
-本批新增固定Codeg问答/计划共享卡片，挂Rovai原公屏与精确私聊入口，Desktop/Web/画布共享ThreadClient；原请求答案、版本和UUID保留，先核对再显式重试，历史/保存/正在投递/未知/关闭状态不冒充执行完成。多请求切换及隐藏保留各自未提交选择，更换真实client/Conversation不继承。源码与视觉边界见[卡片映射](../inventory/runtime-interaction-ui-reference.md)，结果见[i04-native-interaction-ui-result.json](i04-native-interaction-ui-result.json)。这是组件接线与隔离Renderer验证，未产生84正式场景新增通过。
+固定Codeg问答/计划共享卡片已挂Rovai原公屏与精确私聊入口；其原请求核对、版本、状态和隔离Renderer资格见[卡片映射](../inventory/runtime-interaction-ui-reference.md)及[交互记录](i04-native-interaction-ui-result.json)。本批继续接入Core委派会话查看器：原BaseUI1.7.0抽屉/Runtime静态图标、父页面仍可操作、单层替换/嵌套退层/右滑关闭、共享审批/问题/执行过程，Core User get仅增确切child活动只读投影；完整history仍用原signed cursor。见[查看器映射](../inventory/delegation-viewer-ui-reference.md)及[本批记录](i04-delegation-viewer-result.json)。原同库Core owner与隔离Renderer分别取证，未产生84正式场景新增通过。
 
-下一队列保持有限且按依赖推进：Grok修改意见原User输入/队列与生命周期衔接；原Codeg独立帮手查看器和原Rovai查看器；与真实Core/运输/原生Host的挂载往返及完整原生格式/Runtime/平台矩阵。T02/T03/T04其他原包继续，完整一期81簇/48包/324场景不缩减。阶段集齐才冻候选集中构建和Actions，用户I12后使用软件验收，当前不要求客户执行工程检查。
+下一队列保持有限且按依赖推进：Grok修改意见原User输入/队列与生命周期衔接；Core委派查看器的完整产品挂载、接管后原聊天/材料和控制入口；Codeg另一类Runtime原生子代理只读读取与查看器；真实Core/运输/原生Host往返、完整原生格式/Runtime/平台矩阵。两类查看器来自Codeg，融合正文复用Rovai已有组件，此处纠正上一检查点“原Rovai查看器”的误称。隐藏但保留会话时抽屉隐藏/恢复、完整原会话正文同场景仍在候选资格内。T02/T03/T04其他原包继续，完整一期81簇/48包/324场景不缩减。阶段集齐才冻候选集中构建和Actions，用户I12后使用软件验收，当前不要求客户执行工程检查。
 
 2026-10-18 原生问题/计划第一批：按固定Codeg源码实现Cursor/Grok四个ACP阻塞方法的纯转换层，原ID、Other、三种计划决定及Grok独立修改反馈已有类型与纯owner证据。见[源码对照和后续队列](../inventory/native-interaction-reference.md)。当前仍未注册持久请求、接User API、原生发送或UI；Rovai原跳过/拒绝入口尚未替换，不据转换测试称功能可用。下一项Core持久请求/命令/重启失效，再接原路由及原界面。
 

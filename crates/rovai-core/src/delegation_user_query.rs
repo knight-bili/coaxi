@@ -136,9 +136,51 @@ pub(crate) fn get(db: &Database, actor: &ActorRef, input: &GetParams) -> Result<
     let tx = db.connection().unchecked_transaction()?;
     require_installed(&tx)?;
     let id = identity(&tx, input.delegation_id.as_str())?.context("delegation.not_found")?;
-    let value = detail(&tx, &id)?;
+    let mut value = detail(&tx, &id)?;
+    value["activity"] = activity(db, &tx, &id)?;
     tx.commit()?;
     Ok(value)
+}
+
+// User-only viewer projection. List/model status stay metadata-only; the child
+// identity was authorized above, and every activity comes from that exact child.
+fn activity(db: &Database, conn: &Connection, id: &Identity) -> Result<Value> {
+    let runs = {
+        let mut statement = conn.prepare(
+            "SELECT r.id,r.execution_epoch,r.status,r.created_at,r.started_at,r.ended_at,
+                r.camp_turn_id,r.trigger_conversation_message_id,r.version,r.cancel_requested_at,
+                r.last_error_code,r.final_conversation_message_id,r.execution_evidence_change_sequence,
+                (SELECT count(*) FROM agent_run_execution_evidence e WHERE e.agent_run_id=r.id)
+             FROM agent_run r WHERE r.conversation_id=?1
+               AND r.invocation_kind IN ('delegation','delegation_user') ORDER BY r.created_at,r.id",
+        )?;
+        let rows = statement.query_map([&id.child_conversation_id], |row| {
+            Ok(json!({"id":row.get::<_,String>(0)?,"executionEpoch":row.get::<_,i64>(1)?,
+                "status":row.get::<_,String>(2)?,"createdAt":row.get::<_,String>(3)?,
+                "startedAt":row.get::<_,Option<String>>(4)?,"endedAt":row.get::<_,Option<String>>(5)?,
+                "threadTurnId":row.get::<_,String>(6)?,"triggerConversationMessageId":row.get::<_,String>(7)?,
+                "version":row.get::<_,i64>(8)?,"cancelRequestedAt":row.get::<_,Option<String>>(9)?,
+                "lastErrorCode":row.get::<_,Option<String>>(10)?,"finalConversationMessageId":row.get::<_,Option<String>>(11)?,
+                "executionEvidenceChangeSequence":row.get::<_,i64>(12)?,"executionEvidenceCount":row.get::<_,i64>(13)?}))
+        })?;
+        rows.collect::<rusqlite::Result<Vec<_>>>()?
+    };
+    let mut evidence = Vec::new();
+    for run in &runs {
+        evidence.extend(crate::read_model::public_execution_evidence_for_agent_run(
+            conn,
+            run["id"].as_str().context("delegation.activity_invalid")?,
+        )?);
+    }
+    crate::execution_text::overlay(db, &mut evidence)?;
+    let approvals = crate::read_model::load_conversation_approvals(
+        conn,
+        &id.camp_id,
+        Some(&id.child_conversation_id),
+        true,
+        None,
+    )?;
+    Ok(json!({"runs":runs,"executionEvidence":evidence,"approvals":approvals}))
 }
 pub(crate) fn list(db: &Database, actor: &ActorRef, input: &ListParams) -> Result<Value> {
     let reader = reader(actor)?;

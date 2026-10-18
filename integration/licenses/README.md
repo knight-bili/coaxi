@@ -61,3 +61,9 @@ I04原生提问/计划卡片按固定Codeg的`ask-question-card.tsx`、`plan-app
 保留上述Apache-2.0来源注释与许可；组件、样式、交互及运行对照见[源码UI映射](../inventory/runtime-interaction-ui-reference.md)。
 生产继续使用已有React、Radix Tabs、lucide-react与Rovai安全Markdown，没有新增依赖或修改锁文件。
 原组件隔离视觉对照的测试专用依赖位于仓库外，不打入产品；其版本、安装锁及原源码摘要随本批证据记录。
+
+I04 Core委派查看器按固定Codeg `sub-agent-session-dialog.tsx`、`session-viewer-host.tsx`、`ui/drawer.tsx`和委派行组件适配，
+`CodegRuntimeMark.tsx`保留`agent-icon.tsx`静态SVG原区域及Apache-2.0来源通知，业务/状态不移植。
+抽屉使用与原源码一致的BaseUI1.7.0；新增四个生产包各自MIT正文、版本、lock完整性及既有777包保持证明见
+[BaseUI来源记录](base-ui/source.json)。原生浏览器表面未在本批移植，不声称该能力完成。映射和实际运行边界见
+[查看器源码UI映射](../inventory/delegation-viewer-ui-reference.md)。
