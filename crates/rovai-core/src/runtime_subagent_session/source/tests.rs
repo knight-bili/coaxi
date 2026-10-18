@@ -278,6 +278,7 @@ fn lineage_sources_keep_exact_rollouts_and_lossless_stable_chunks() {
     bad.child_native_session_id = "../child".into();
     assert!(NativeDocuments::open(&f.0, &bad).is_err());
     assert!(open_contained(&f.0, &f.0.join("sessions/../outside")).is_err());
+    crate::runtime_subagent_session::content::tests::assert_content_projection(&f.0,&grok);
     #[cfg(unix)]
     {
         let external = SourceFixture::new();

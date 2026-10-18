@@ -41,3 +41,5 @@ User恢复以原UUID和持久父Conversation归属授权，允许父Run已经终
 Runtime 原生子会话仍是原生观察，不创建 Core Delegation。内部候选由现有 Evidence/Run/Context/Bootstrap 及精确持久启动来源解析（旧观察仅保留当前 Binding 围栏），不能由界面自报 Session 或文件路径。观察归属与创建因果分开，reported receiver 与原生子代理父子证明分开；来源解析器尚须验证原生父子记录后才能返回正文。该候选不构成公共读取 API，文件/运输/原 UI 仍待接。当前边界见[原生子会话目标合同](../contracts/delegation-v1.md#runtime-原生子会话读取目标)，全部后续项见[源码映射](../../integration/inventory/native-subagent-viewer-reference.md)。
 
 原生文件层仍在 Core 内部：候选先验证原生父链，再按精确 Codex rollout/Grok 父元数据定位原文件，保存完整字节快照和分块摘要；读取不 attach/start 或写业务库。原生元数据与正文不直接序列化给 Renderer，后续仍由 Core 内容投影拥有消息/工具/问答顺序。Codex/Grok Host 已从最终 ManagedProcessLaunchSpec 捕获非凭据目录，原 Native bind 事务保存 System 来源事件；历史读取沿原 Run/epoch/父 Session 和绑定恢复原来源。未记录来源仍不可打开正文，不能从当前设置或 UI 路径补猜。实现状态和未完边界见[文件来源映射](../../integration/inventory/native-subagent-viewer-reference.md)。
+
+私有内容层现以逐行 JSON 迭代器消费这些核验块，移植固定 Codeg Grok 的原消息模型和纯解析/材料/归并规则，摘要元数据只取模型名称。完整直接正文留在内容模型，运输窗口、签名快照和嵌套来源引用留给后续统一 User API，不在 parser 引入文件路径入口或业务写入。Codex 历史输入按原版 cut/seed 拼接，完整消息 parser 仍待移植；Grok 全会话统计/上下文窗口目录及原完整 parser 差分也未授予资格。具体当前行为与限制由[内容合同](../contracts/delegation-v1.md#原生内容投影的当前实现边界)拥有，不从本层检查外推 UI、真实模型或 I04 完成。

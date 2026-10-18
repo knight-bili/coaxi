@@ -88,6 +88,8 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 该夹具不证明实际 Host/Native、多窗口、源文件摘要/授权、最终模型 Blob 或完整 PC01–PC24；正式324场景保持未验。
 
 ## Rust 测试准入与退役门槛
+原生正文归并继续扩原 source::tests::lineage_sources_keep_exact_rollouts_and_lossless_stable_chunks，helper 为 content/tests.rs，同一受控文件夹，不新增 Rust owner/数据库/进程。拥有固定 Codeg 消息/图像/内部提醒、累计工具更新和空完成、原问答答案、超原预览上限正文、占用与花费分离、压缩标记、显式后代来源及 Codex cut/seed 历史输入拼接。原 source owner 已拥有实际文件/快照，故在其上扩内容而不重建 I/O 夹具；原 Core 来源 owner 继续拥有权限/绑定。先 extended-tests 编译及精确列册，再执行该 owner；通过仅证明 Grok 本层及 Codex 历史输入，不授予未移植 Codex 完整消息/代码模式、公共分页/运输、原UI或真实模型资格。
+
 
 原生来源持久化继续扩原 Context delivery_unknown owner 和 native_child_session_tests.rs，同一数据库/Blob/真实源文件，不新增 Rust owner。先保留旧无来源围栏，再用真实 bind_native_session_with_source 检查来源与绑定/回执原事务、重复/回放、错误Runtime、故障回滚、原文件读取、绑定/epoch变更后的历史来源、冲突拒绝和模型输入不含来源/凭据。冲突须通过真实 Gateway 创建，不能把 Domain Command 嵌进 savepoint；只清理该夹具创建的精确冲突来源行。原 provider_packets 与 source 文件 owner 定向回归。Core lib slow-tests 和主程序 bins check 分别验证库/实际生产接线，未启动真实provider/完整App；bins 的暂未被公开API消费的文件读取未使用警告必须如实记录，不授予运输/UI资格。
 

@@ -29,3 +29,7 @@
 完整 I04 四包/21簇/84正式场景保持，本批正式场景新增通过0。原许可通知见[来源许可](../licenses/README.md)。
 
 启动来源接续（2026-10-18）：`origin.rs` 的 CapturedNativeSource 来自 Codex/Acp Host 最终 ManagedProcessLaunchSpec，保留在原 Host 上；Application 的既有绑定路径从精确 Runtime 取得它。Core 绑定、来源事件与原回执同事务，未保存完整环境/凭据或改变模型输入。已记录来源支持后来绑定/epoch变化后的历史只读；旧未记录来源只保留原当前绑定候选，正文明确不可用，不用当前配置补猜。原 source 文件层通过 open_recorded 消费持久目录。当前仍必须完成消息/工具/问答、Codex cut/seed 的归并、签名游标、可取消I/O、两端API和原UI；主程序编译检查与同库/文件夹具分别留证，不代替真实 Runtime/GUI。
+
+内容归并接续（2026-10-18）：私有 `content` 层已移植 Grok 原模型、材料投影与本层解析/工具/问答/压缩/用量规则，Codex 历史 cut/seed 输入已实际拼接；超原预览上限的正文/JSON保持完整。后代统计只从显式 child_session_id 和 Core 再次核验的父链读取，卡片预览保持原500字符规则，不向客户端授予任意 Session 读取。逐条 JSON 与稳定 fallback 时间、坏行/部分尾帧说明、解析取消、摘要秘密不渲染及重复投影有原 filesystem owner 证据。固定源码、原范围和适配记录在[移植清单](native-grok-content-port.json)，实际结果见[分项证据](../execution/i04-native-content-result.json)。
+
+本层未完清单：Codex 原完整消息/代码模式/目标/用量解析；Grok 完整会话统计/上下文窗口目录及原完整 parser 差分；完整有界分页/签名快照及后代引用；首次快照发现/哈希的后台取消；两端公共读取与原 UI/同场景。旧无记录来源导入和真实 Host/Runtime/平台也继续。上述“待接”旧段落保留当批事实，以本段为最新细分状态，不能把本层或历史来源检查当成完整查看器资格。

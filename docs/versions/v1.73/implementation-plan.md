@@ -120,3 +120,11 @@ Grok修改意见仍未完成。核对固定Codeg的lifecycleSend/mqEnqueue和已
 ## 原生子会话可信目标接续（2026-10-18）
 
 第二类原查看器先接 Core 内部身份准入：从既有真实 Evidence/Run/Context/Bootstrap/binding 推导只读原生目标，Current User-only，不收 UI Native ID/路径/Runtime override；Grok 无显式 Session 不回退短编号，父运行终态停止旧状态动画。扩同一 Context 和原 Evidence 投影两个 owner，无新 SQLite 或测试 owner；[分项记录](../../../integration/execution/i04-native-child-authority-result.json)区分内部准入与未接的文件/运输/UI。没有新模型输入、Schema 或新公共 method，完整 I04 范围继续。
+
+## 原生内容归并接续（2026-10-18）
+
+已移植固定 Codeg Grok 的本层消息/思考/图片、promptIndex、累计工具和空完成、MCP/TaskOutput、已知问答答案、压缩与用量；直接长中文与工具 JSON 完整保留，显式后代文件再核父链。逐行消费核验块，记录坏行/尾帧且允许解析取消；稳定 fallback 时间消除重读漂移。Codex cut/seed 历史输入按精确来源拼接，保留原头部和回退替换。来源范围及有依据的适配见[移植清单](../../../integration/inventory/native-grok-content-port.json)。
+
+复用原 source 文件 owner 和受控目录，无新 Rust owner、数据库或进程。extended-tests 库编译及精确列册1项/实际1项通过，10项现有警告保持；首次编译的重复derive边界错误已修，原失败保留。本批没有启动 main、公共运输、GUI 或真实 provider，不增加84正式场景通过数。具体证据见[本批记录](../../../integration/execution/i04-native-content-result.json)。
+
+下一有限队列：Codex 原完整消息/代码模式/目标/用量解析；Grok 完整会话统计/模型上下文窗口目录及原完整 parser 差分；有界完整内容与签名快照/后代引用、可取消后台快照打开；Native/Web 共用 User-only 读取；固定 Codeg 原只读卡片/抽屉及同场景验证。旧无来源导入、真实 Host/Runtime/平台和完整 I04 四包/21簇/84正式场景继续，未完成项不因本层通过删除。

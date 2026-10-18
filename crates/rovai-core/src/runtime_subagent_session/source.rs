@@ -25,6 +25,8 @@ pub(crate) enum DocumentKind {
     CodexRollout,
     GrokUpdates,
     GrokChatHistory,
+    GrokSummary,
+    GrokSubagentMetadata,
 }
 
 /// A Codex link names an exact rollout, not whichever newer file has that thread.
@@ -47,6 +49,7 @@ pub(crate) struct NativeDocument {
     pub(crate) own_header: Option<Value>,
     pub(crate) snapshot_bytes: u64,
     pub(crate) snapshot_digest: String,
+    pub(crate) source_label: Option<String>,
     file: File,
     chunk_digests: Vec<[u8; 32]>,
 }
@@ -107,6 +110,7 @@ impl NativeDocument {
             own_header: None,
             snapshot_bytes: length,
             snapshot_digest: format!("{:x}", digest.finalize()),
+            source_label: None,
             file,
             chunk_digests: chunks,
         })
@@ -495,6 +499,17 @@ fn grok_documents(
             &answers,
             DocumentKind::GrokChatHistory,
         )?);
+    }
+    let summary = child.join("summary.json");
+    if summary.try_exists()? {
+        documents.push(NativeDocument::open(home, &summary, DocumentKind::GrokSummary)?);
+    }
+    for path in entries(home, &child.join("subagents"), 1)? {
+        if path.file_name().is_none_or(|name| name != "meta.json") { continue; }
+        let Some(id) = path.parent().and_then(Path::file_name).and_then(|name| name.to_str()).filter(|id| identity(id)) else { continue; };
+        let mut document = NativeDocument::open(home, &path, DocumentKind::GrokSubagentMetadata)?;
+        document.source_label = Some(id.into());
+        documents.push(document);
     }
     Ok(documents)
 }

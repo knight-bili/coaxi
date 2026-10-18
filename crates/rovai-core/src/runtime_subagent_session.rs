@@ -8,6 +8,7 @@ use serde_json::Value;
 
 mod origin;
 pub(crate) mod source;
+pub(crate) mod content;
 pub use origin::CapturedNativeSource;
 pub(crate) use origin::ORIGIN_EVENT;
 

@@ -14,7 +14,7 @@
   "current_branch": "phase/i04-collaboration-runtime",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I04-T01",
-  "current_slice": "I04 原生问题/计划已接父安全阻塞摘要、User详情和两类仅ID/版本事件；原父Binding鉴权的status等待、同题/无关唤醒去重、问题转计划及新问题唤醒通过受控ACP进程验证。Grok修改反馈与显式接管的衔接已定位设计边界，继续核定完整方案并推进固定Codeg卡片/两查看器及其余I04包；真实模型/完整Host/UI与正式84场景未验。",
+  "current_slice": "I04 原生子会话已接实际Host启动来源持久化及历史读取；本批移植固定Codeg Grok消息/工具/答案本层与共享归并，Codex cut/seed历史输入拼接已验证。Codex完整解析、Grok完整会话统计/原完整parser差分、签名有界运输及原只读UI继续；完整Host/Runtime/平台及I04四包84正式场景未收口。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,15 +33,15 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "I04-T01：直接补child User材料delegation_child合法来源/权限与原生技能MCP过滤；当前35最终Blob/回放分项已过，不重复基础确认",
-    "I04-T01：完整Schema160/Migration210旧源分类及原子升级、旧冻结/排队兼容；单聊policy3/父preflight35真实准入待全链验证",
-    "I04-T01：User与六模型操作/CLI别名、UUID回执事件和实际目标Runtime/停止恢复接管，两个Codeg原查看器及User-only原生读取/后台观察",
-    "I04-T02/T03/T04：Runtime并集、恢复、记忆与自动化原剩余项；阶段候选集中构建，外部条件留册"
+    "I04-T01：移植Codex原完整消息/代码模式/目标/用量解析，补Grok完整会话统计/上下文窗口目录及与原完整parser差分",
+    "I04-T01：签名快照/后代引用、完整有界内容分页及可取消后台快照读取；Native/Web共用User-only原生读取，固定Codeg只读卡片/抽屉与同场景",
+    "I04-T01：Grok修改意见原队列与r1接管/Context mode衔接核定；旧无记录来源显式导入及真实Core/Host/Runtime生命周期与完整Schema升级/恢复矩阵集中验证",
+    "I04-T02/T03/T04：Runtime并集、恢复、记忆与自动化原剩余项；完整I04四包21簇84场景冻结候选集中构建，外部条件留册"
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "native_blocked_summary_and_status_wake_verified_grok_feedback_design_and_ui_pending",
-  "evidence": "i04-native-interaction-blocked-result.json",
+  "current_slice_status": "native_grok_message_layer_and_codex_history_input_verified_full_parser_transport_ui_pending",
+  "evidence": "i04-native-content-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
   "draft_restart_evidence": "i02-draft-restart-result.json",
@@ -56,7 +56,7 @@
   "skill_catalog_evidence": "i02-skill-catalog-result.json",
   "skill_install_evidence": "i02-skill-install-result.json",
   "system_goal_status": "active",
-  "system_goal_verified_at": "2026-10-17T03:35:34.833607+00:00",
+  "system_goal_verified_at": "2026-10-18T07:41:09.117284+00:00",
   "skill_members_evidence": "i02-skill-members-result.json",
   "canvas_boards_evidence": "i03-canvas-boards-result.json",
   "skill_delivery_preparation_evidence": "i02-skill-delivery-preparation-result.json",
@@ -260,5 +260,9 @@
   "i04_delegation_format35_source_commit": "f9384af4ca43273a477ffd51c605ac39cc0bc6c4",
   "i04_native_interaction_coupled_evidence": "i04-native-interaction-coupled-result.json",
   "i04_native_interaction_blocked_evidence": "i04-native-interaction-blocked-result.json",
-  "i04_grok_feedback_boundary": "i04-grok-feedback-boundary.json"
+  "i04_grok_feedback_boundary": "i04-grok-feedback-boundary.json",
+  "i04_native_child_authority_evidence": "i04-native-child-authority-result.json",
+  "i04_native_child_source_evidence": "i04-native-child-source-result.json",
+  "i04_native_source_origin_evidence": "i04-native-source-origin-result.json",
+  "i04_native_content_evidence": "i04-native-content-result.json"
 }

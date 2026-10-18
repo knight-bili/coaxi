@@ -276,4 +276,12 @@ Application 的既有 bind_prepared_native_session 从精确 Run/epoch 的实际
 
 Codex 两类观察补显式 parentNativeSessionId，Grok 保持既有显式父身份。读取已记录来源时按 System actor、Thread/Conversation、原 Run/epoch、父 Session、冻结 installation/compatibility 和原绑定记录恢复原目录；后来的绑定或 epoch 改变不把旧证据指向新目录。相互冲突的 Host 来源明确拒绝，不按最近一条猜选。历史目标实时资格为false。未记录来源的旧观察保持原 current-binding 围栏且不能打开正文，不从当前环境补猜旧目录。
 
-内部 `NativeDocuments::open_recorded` 使用上述持久来源，Codex 校验精确标准 rollout 和原头部父链，保留历史 cut/seed；Grok 校验父更新或子元数据中的显式 child_session_id，不回退短编号。64KiB块与整体摘要保留完整字节，追加不扩旧快照，同长度改写拒绝。原文可能包含启动字段，必须经 Core 消息/工具/答案投影后才能给 UI，不能直接输出 raw JSON 或送回模型。完整内容归并、签名客户端游标、可取消后台 I/O、Native/Web、原只读 UI 及真实 Host/Runtime 同场景仍按[完整队列](../../integration/inventory/native-subagent-viewer-reference.md)接续；当前分项检查不授予这些资格。
+内部 `NativeDocuments::open_recorded` 使用上述持久来源，Codex 校验精确标准 rollout 和原头部父链，保留历史 cut/seed；Grok 校验父更新或子元数据中的显式 child_session_id，不回退短编号。64KiB块与整体摘要保留完整字节，追加不扩旧快照，同长度改写拒绝。原文可能包含启动字段，必须经 Core 消息/工具/答案投影后才能给 UI，不能直接输出 raw JSON 或送回模型。签名客户端游标、可取消后台 I/O、Native/Web、原只读 UI 及真实 Host/Runtime 同场景仍按[完整队列](../../integration/inventory/native-subagent-viewer-reference.md)接续；当前分项检查不授予这些资格。
+
+### 原生内容投影的当前实现边界
+
+Core 私有 `content` 层移植固定 Codeg 的 Grok 消息模型、提示材料投影、消息/思考/图片、累计工具更新、MCP 解包、TaskOutput、原问答答案和压缩标记。保留原 promptIndex 合并、内部提醒过滤、空工具完成与原生命周期语义；花费用量与上下文占用分开。直接正文及工具 JSON 不永久截断，后续运输通过有界窗口读取完整内容；后代卡片统计仍用原版500字符预览。后代 Session 只取显式原生身份，再经过同一来源文件层核对父链；尚未签发客户端嵌套读取引用。
+
+JSON 行从已核验文件块逐条读取，可中止解析；坏完整行及未写完尾行分别记读取说明，不把中途源文件改写吞成空内容。摘要只取模型名称，原生启动字段和无关问答历史不进入消息。缺时间戳使用调用方稳定来源时间，同一快照得到相同投影。快照发现/首次哈希的完整取消和后台执行仍待接。
+
+Codex 已按原版 cut/seed 规则拼接已核验历史输入，保留当前头部、精确历史前缀、回退替换及无法确定 ordinal 的记录；这还不是 Codex 完整消息解析。原版消息去重/提升、代码模式、目标轮次、工具与用量解析仍须移植；Grok 完整会话统计、模型上下文窗口目录及与原完整 parser 的差分也继续保留。当前[分项记录](../../integration/execution/i04-native-content-result.json)只证明私有 Grok 本层和 Codex 历史输入，无新模型输入、公共接口、Schema 或 Runtime 准入。

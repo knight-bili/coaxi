@@ -11,6 +11,8 @@ last_updated: 2026-10-18
 
 # v1.73：Core 独立帮手
 
+本批移植固定 Codeg 的 Grok 消息/工具/答案纯解析及共享材料/归并规则，并接通 Codex cut/seed 历史输入拼接。[内容分项记录](../../../integration/execution/i04-native-content-result.json)保留编译、原文件 owner 定向检查与来源清单。Codex 完整消息/代码模式/目标/用量、Grok 完整会话统计与原完整 parser 差分、公共有界运输及原 UI 仍待；没有改变模型输入、Schema 或正式场景通过数。
+
 本批启动来源及历史读取沿现有 Core 权威接线，未改模型输入或 Schema161/Migration211；主程序检查与同库/文件分项结果见[来源持久化记录](../../../integration/execution/i04-native-source-origin-result.json)。这不表示真实 provider、公共运输或原查看器已完成。
 
 原生子会话文件来源层已编码：核对 Codex 原生父链/精确历史 rollout 和 Grok 父更新/子元数据，保留完整分块字节与问答历史。实际启动来源捕获、原绑定事务持久化和已记录历史来源读取已编码并分项检查；消息工具归并、签名游标、公共运输和原UI仍待接。分项验证见[原生文件来源记录](../../../integration/execution/i04-native-child-source-result.json)，不得据此称完整查看器或I04完成。
