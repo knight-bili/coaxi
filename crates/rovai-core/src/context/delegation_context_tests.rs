@@ -234,6 +234,7 @@ fn assert_delegation_materialization(fixture: &mut Fixture, legacy_private_run: 
         )
         .unwrap();
     crate::db::delegation::migrate_connection(fixture.database.connection()).unwrap();
+    assert_native_interaction_migration(fixture);
     fixture.database.connection().execute_batch("UPDATE delegation_settings SET enabled=1,depth_limit=8 WHERE singleton=1;").unwrap();
     assert_eq!(
         fixture

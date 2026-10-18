@@ -30,6 +30,8 @@ mod private_composer_scope;
 mod private_source_observation;
 #[path = "db_run_continuation.rs"]
 mod run_continuation;
+#[path = "db_runtime_interaction.rs"]
+pub(crate) mod runtime_interactions;
 #[path = "db_simplification.rs"]
 mod simplification;
 #[path = "db_skill_pack_context.rs"]
@@ -404,8 +406,8 @@ impl MainThreadMigrationSource {
 
 const V172_DATA_CONTRACT_VERSION: &str = "v1.72";
 pub(crate) const CURRENT_DATA_CONTRACT_VERSION: &str = "v1.73";
-pub(crate) const CURRENT_PROJECTION_SCHEMA_VERSION: i64 = 160;
-const CURRENT_SCHEMA_MIGRATION_VERSION: i64 = 210;
+pub(crate) const CURRENT_PROJECTION_SCHEMA_VERSION: i64 = 161;
+const CURRENT_SCHEMA_MIGRATION_VERSION: i64 = 211;
 const V147_MIGRATION_SOURCE_DATA_CONTRACT_VERSION: &str = "v1.54";
 const V147_MIGRATION_SOURCE_PROJECTION_SCHEMA_VERSION: i64 = 96;
 const V145_MIGRATION_SOURCE_DATA_CONTRACT_VERSION: &str = "v1.53";
@@ -3376,6 +3378,25 @@ fn connection_has_legacy_feishu_migration_collision(
 pub(crate) fn classify_database_contract(
     connection: &Connection,
 ) -> rusqlite::Result<DatabaseContractClassification> {
+    classify_database_contract_for_target(
+        connection,
+        CURRENT_PROJECTION_SCHEMA_VERSION,
+        CURRENT_SCHEMA_MIGRATION_VERSION,
+    )
+}
+
+// Migration210 retains its exact original target, independent of future current pointers.
+pub(crate) fn classify_delegation_160_contract(
+    connection: &Connection,
+) -> rusqlite::Result<DatabaseContractClassification> {
+    classify_database_contract_for_target(connection, 160, 210)
+}
+
+fn classify_database_contract_for_target(
+    connection: &Connection,
+    target_projection: i64,
+    target_migration: i64,
+) -> rusqlite::Result<DatabaseContractClassification> {
     let required_tables_present: bool = connection.query_row(
         r#"
         SELECT EXISTS(
@@ -3416,17 +3437,20 @@ pub(crate) fn classify_database_contract(
     let Some(marker) = marker else {
         return Ok(DatabaseContractClassification::Unknown(None));
     };
+    if marker.projection_schema_version != 161 && !runtime_interactions::absent(connection)? {
+        return Ok(DatabaseContractClassification::Unknown(Some(marker)));
+    }
     // Current databases do not re-prove every historical migration's SQL text.
     // Older layouts retain their migration-specific source recognition below.
     if connection.query_row(
         "SELECT EXISTS(SELECT 1 FROM schema_migration WHERE version>?1)",
-        [CURRENT_SCHEMA_MIGRATION_VERSION],
+        [target_migration],
         |row| row.get::<_, bool>(0),
     )? {
         return Ok(DatabaseContractClassification::Unknown(Some(marker)));
     }
     let delegation_current = marker.contract_version == CURRENT_DATA_CONTRACT_VERSION
-        && marker.projection_schema_version == CURRENT_PROJECTION_SCHEMA_VERSION;
+        && matches!(marker.projection_schema_version, 160 | 161);
     if delegation_current
         || (marker.contract_version == V172_DATA_CONTRACT_VERSION
             && matches!(
@@ -3448,7 +3472,11 @@ pub(crate) fn classify_database_contract(
             ))
     {
         let expected_migration = if delegation_current {
-            CURRENT_SCHEMA_MIGRATION_VERSION
+            if marker.projection_schema_version == 161 {
+                211
+            } else {
+                210
+            }
         } else {
             match marker.projection_schema_version {
                 159 => 209,
@@ -3475,6 +3503,11 @@ pub(crate) fn classify_database_contract(
         )?;
         let valid = completed
             && marker.classifier_version == V147_CLASSIFIER_VERSION
+            && if marker.projection_schema_version == 161 {
+                runtime_interactions::schema_matches(connection)?
+            } else {
+                runtime_interactions::absent(connection)?
+            }
             && if delegation_current {
                 delegation::matches_for_classifier(connection)?
             } else {
@@ -3535,7 +3568,7 @@ pub(crate) fn classify_database_contract(
                 || private_composer_scope::source_schema_matches(connection)?);
         return Ok(if !valid {
             DatabaseContractClassification::Unknown(Some(marker))
-        } else if delegation_current {
+        } else if delegation_current && marker.projection_schema_version == target_projection {
             DatabaseContractClassification::Current(marker)
         } else {
             DatabaseContractClassification::SupportedMigrationSource(marker)
@@ -3704,7 +3737,7 @@ pub(crate) fn classify_database_contract(
         return Ok(DatabaseContractClassification::Unknown(Some(marker)));
     }
     if marker.contract_version == CURRENT_DATA_CONTRACT_VERSION
-        && marker.projection_schema_version == CURRENT_PROJECTION_SCHEMA_VERSION
+        && marker.projection_schema_version == target_projection
         && marker.classifier_version == V147_CLASSIFIER_VERSION
     {
         Ok(DatabaseContractClassification::Current(marker))
@@ -7955,6 +7988,7 @@ impl Database {
     pub fn prepare_v2_recovery(&mut self) -> Result<V2RecoverySummary> {
         let now = chrono::Utc::now().to_rfc3339();
         let transaction = self.connection.transaction()?;
+        crate::runtime_interaction::storage::close_on_restart(&transaction, &now)?;
         // The live network scheduler is intentionally process-local. If Core
         // restarts, hand its durable waiting marker back to the existing
         // startup recovery path instead of recreating or persisting backoff.
@@ -9293,6 +9327,9 @@ impl Database {
             if !self.schema_migration_applied(210)? {
                 migration_step!("migration_210", delegation::migrate(self));
             }
+            if !self.schema_migration_applied(211)? {
+                migration_step!("migration_211", runtime_interactions::migrate(self));
+            }
             if let Err(error) =
                 crate::notification::maintain_notification_episode_retention(self.connection())
             {
@@ -10145,6 +10182,9 @@ impl Database {
         }
         if !self.schema_migration_applied(210)? {
             migration_step!("migration_210", delegation::migrate(self));
+        }
+        if !self.schema_migration_applied(211)? {
+            migration_step!("migration_211", runtime_interactions::migrate(self));
         }
         if let Err(error) =
             crate::notification::maintain_notification_episode_retention(self.connection())

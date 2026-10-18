@@ -1,4 +1,5 @@
 //! Complete delegation migration and exact source/target schema admission.
+use super::classify_delegation_160_contract as classify_database_contract;
 use super::*;
 
 const IDENTITY_SQL: &str = include_str!("delegation_schema.sql");
@@ -126,6 +127,11 @@ pub(crate) fn migrate_connection(connection: &Connection) -> Result<()> {
         connection.is_autocommit(),
         "Delegation migration requires an idle connection"
     );
+    if matches!(super::classify_database_contract(connection)?, DatabaseContractClassification::Current(ref marker)
+        if marker.contract_version=="v1.73" && marker.projection_schema_version==161)
+    {
+        return Ok(());
+    }
     if matches!(classify_database_contract(connection)?, DatabaseContractClassification::Current(ref marker)
         if marker.contract_version==CURRENT_DATA_CONTRACT_VERSION && marker.projection_schema_version==160)
     {

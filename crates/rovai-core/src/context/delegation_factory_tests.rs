@@ -278,6 +278,7 @@ fn assert_initial_child_factory(f: &mut Fixture) {
     );
     tx.rollback().unwrap();
     assert_eq!(factory_counts(f), count);
+    assert_native_interaction_storage(f);
     f.database
         .connection()
         .execute(

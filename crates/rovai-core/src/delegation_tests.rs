@@ -329,8 +329,11 @@ fn identity_graph_preserves_core_rows_and_fences_scope_replay_depth_and_takeover
     // startup chain. This is another handle, not another Core fixture.
     let upgraded = crate::db::Database::open(&directory).unwrap();
     assert!(
-        matches!(crate::db::classify_database_contract(upgraded.connection()).unwrap(),crate::db::DatabaseContractClassification::Current(ref marker) if marker.contract_version=="v1.73" && marker.projection_schema_version==160)
+        matches!(crate::db::classify_database_contract(upgraded.connection()).unwrap(),crate::db::DatabaseContractClassification::Current(ref marker) if marker.contract_version=="v1.73" && marker.projection_schema_version==161)
     );
+    // Keep the original Migration210 shape/tamper matrix on its exact160 target.
+    // The new211 table is empty; do not discard any interaction data.
+    crate::db::runtime_interactions::downgrade_for_test(upgraded.connection()).unwrap();
     drop(upgraded);
     assert!(crate::db::delegation::identity_schema_matches(connection).unwrap());
     crate::db::delegation::checks::target(connection);

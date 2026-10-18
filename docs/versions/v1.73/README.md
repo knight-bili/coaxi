@@ -17,7 +17,9 @@ last_updated: 2026-10-18
 
 ## 研发状态
 
-当前源码已登记 Core v1.73/Schema160/Migration210。新库和受支持旧库共用完整迁移，逐步事务内提交结构、标记与完成回执；旧 v1.72/Schema159 是明确的受支持来源。已完成的启动函数、数据兼容与回滚检查见[启动升级分项证据](../../../integration/execution/i04-delegation-startup-result.json)，不表示用户日常数据库已被升级。
+当前源码登记 Core v1.73/Schema161/Migration211。原完整160/210委派迁移保持独立目标，160现在是受支持来源；211单独增加原生User交互存储，不重写210或旧输入。两条启动链按原事务顺序安装，旧v1.72/159仍可沿原链升级。此前160/210的[启动升级分项证据](../../../integration/execution/i04-delegation-startup-result.json)保留原时点，当前211边界见[原生交互合同](../../contracts/delegation-v1.md#原生user交互存储)。不表示用户日常数据库已升级。
+
+原生提问和计划审批已有纯转换及Core持久请求、User-only答复/CAS/原回执、先标记发送和未知结果不重发的内核。Run取消、绑定失效与启动恢复会封旧请求；Grok修改意见已保存，原User队列尚未接入前明确禁止发送。Host/Native回调、User运输入口、阻塞摘要与原卡片仍待接线，不能称该功能已可实际使用。没有改变批准r1文本、Bootstrap或父模型历史。
 
 六项模型操作、四个兼容别名、User 查询/设置/恢复及材料操作已接入 Core 与相应运输入口，并有分项证据。设置仍默认关闭，深度 1..8、缓存 512 MiB/0 不限、精确版本更新；原 Codeg 设置界面和完整产品使用流程仍待接入。
 持久委派/attempt/control、父链、任务 Blob、原请求回放、独立私有路由、接管序号、取消及原 Session 恢复已有 Core 实现。真实 Host/Fleet 调度、writer/cleanup、输入接受结果核对和进程重启协调仍须完成，不能将分项运输或数据库检查称为完整执行交付。

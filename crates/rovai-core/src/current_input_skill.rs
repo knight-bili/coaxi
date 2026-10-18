@@ -38,7 +38,8 @@ pub(crate) fn pack_context_enabled(connection: &Connection) -> Result<bool> {
     Ok(present
         && matches!(crate::db::classify_database_contract(connection)?,
         crate::db::DatabaseContractClassification::Current(ref marker)
-            if marker.contract_version=="v1.73" && marker.projection_schema_version==160))
+            | crate::db::DatabaseContractClassification::SupportedMigrationSource(ref marker)
+            if marker.contract_version=="v1.73" && matches!(marker.projection_schema_version,160|161)))
 }
 
 pub(crate) fn empty_selection(connection: &Connection) -> Result<SkillSelectionSnapshot> {

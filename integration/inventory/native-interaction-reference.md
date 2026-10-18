@@ -23,3 +23,5 @@ Core问题位置编号在同一完整请求内确定性生成，不是鉴权标�
 4. Grok修改意见以明确User输入登记到Core原发送队列并可见；不由Renderer隐式追加隐藏Native prompt。
 5. 接已确认r1的question/plan_approval阻塞投影、原状态等待广播、原卡片和两类查看器；模型仅读已有r1安全摘要，完整问题/答复走User与确切child读取权限，不追加到Bootstrap或父历史，接管水位继续生效。字段存在不代表请求可用。
 6. 补其他来源格式及真实Runtime/平台矩阵，与I04其他工作包一同候选验证；本批不增加84正式场景通过数。
+
+Core存储接续：独立Migration211/Schema161已编码，旧210仍精确生成160。storage.rs提供可信帧登记、脱敏User视图、CURRENT_USER唯一决定、原UUID回放和先标记发送；schema.sql在Run/Binding变化时封旧请求，原启动恢复也同事务封旧。当前没有Native handler/IPC/Web/界面接线，Grok修改原文在原User队列完成前明确禁止原生发送。原Context owner复用同库实际Grok工厂/领取与投递，Session/ACK仍为夹具；Cursor的运行准入未放开。上方六项队列据此推进，不把存储内核作为完整功能完成。

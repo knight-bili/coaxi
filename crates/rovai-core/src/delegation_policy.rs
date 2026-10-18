@@ -104,13 +104,15 @@ impl FrozenPolicy {
     }
 }
 
-/// Core startup must have admitted the complete 160/210 contract before producers can opt in.
+/// Core startup must have admitted the exact 160/210 or 161/211 contract before producers can opt in.
 /// The unregistered identity prototype, or a settings table on its own, never activates the feature.
 pub(crate) fn freeze_for_conversation(
     connection: &Connection,
     conversation_id: &str,
 ) -> Result<Option<FrozenPolicy>> {
-    let ready:bool=connection.query_row("SELECT EXISTS(SELECT 1 FROM rovai_data_contract WHERE singleton=1 AND contract_version='v1.73' AND projection_schema_version=160) AND EXISTS(SELECT 1 FROM schema_migration WHERE version=210)",[],|r|r.get(0))?;
+    let ready:bool=connection.query_row("SELECT EXISTS(SELECT 1 FROM rovai_data_contract WHERE singleton=1 AND contract_version='v1.73'
+        AND ((projection_schema_version=160 AND EXISTS(SELECT 1 FROM schema_migration WHERE version=210) AND NOT EXISTS(SELECT 1 FROM schema_migration WHERE version>210))
+         OR (projection_schema_version=161 AND EXISTS(SELECT 1 FROM schema_migration WHERE version=211) AND NOT EXISTS(SELECT 1 FROM schema_migration WHERE version>211))))",[],|r|r.get(0))?;
     if !ready {
         return Ok(None);
     }
@@ -289,6 +291,28 @@ mod tests {
             .unwrap()
             .unwrap();
         assert_eq!(frozen.role, Role::PublicParent);
+        connection
+            .execute(
+                "UPDATE rovai_data_contract SET projection_schema_version=161",
+                [],
+            )
+            .unwrap();
+        connection
+            .execute("INSERT INTO schema_migration VALUES(211)", [])
+            .unwrap();
+        assert_eq!(
+            freeze_for_conversation(&connection, "parent").unwrap(),
+            Some(frozen)
+        );
+        connection
+            .execute("DELETE FROM schema_migration WHERE version=211", [])
+            .unwrap();
+        connection
+            .execute(
+                "UPDATE rovai_data_contract SET projection_schema_version=160",
+                [],
+            )
+            .unwrap();
         let config = json!({"delegationPolicy":frozen});
         assert_eq!(
             freeze_for_conversation(&connection, "private")

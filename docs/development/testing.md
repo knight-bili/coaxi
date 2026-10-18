@@ -88,6 +88,9 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 该夹具不证明实际 Host/Native、多窗口、源文件摘要/授权、最终模型 Blob 或完整 PC01–PC24；正式324场景保持未验。
 
 ## Rust 测试准入与退役门槛
+原生User交互存储继续扩原Context materialization owner，helper为context/native_interaction_tests.rs，不新增Rust owner或Core数据库。复用同一SQLite/Blob，真实Grok工厂/Registry/领取/绑定和输入投递；可执行身份、Session及ACK是明确夹具，未启动原生进程。覆盖211回执失败回滚、完整160来源/161目标、篡改/多余对象、重复零写；原生帧和RPC冲突、错归属、User-only/CAS、原回执故障、精确恢复、成功/未知发送token、修改反馈围栏及取消/绑定/重启关闭。Cursor保持现有未准入事实，不为测试放开。
+
+原identity owner先实际打开同一159文件到161，再仅移除空的211表，继续完整210/160结构矩阵，不把历史目标断言改成未来版本；原policy owner补精确161+211正向资格，161缺211仍拒绝。原authority进程中断owner保留八分支并新增211前/提交后两分支；210已提交而211未完成属于受支持来源，不能提前当Current。只终止测试自己创建的子进程。旧/未来预检及新库权威准入作定向回归；不因本批默认执行全部1254项、完整App/Runtime、平台构建或Actions，不增加84正式场景通过数。
 
 原生问题/计划转换新增唯一最低层纯函数owner
 `runtime_interaction::tests::native_questions_and_plan_decisions_preserve_wire_identity_and_user_words`。

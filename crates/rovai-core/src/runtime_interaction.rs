@@ -2,13 +2,15 @@
 //! Adapted from Codeg aff1e6c278453ed8d0b96a5f664edcdca621aa3f,
 //! src-tauri/src/acp/{question,cursor_ext,plan_approval}.rs (Apache-2.0).
 //! Retained license: integration/licenses/codeg/LICENSE.
-//! This module does not register a request, authorize an answer or dispatch a reply.
+//! Wire conversion is pure; storage owns frozen requests and User-only decisions.
 use anyhow::{Context, Result, ensure};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use std::collections::HashSet;
 
 use crate::agent_profile::AdapterKind;
+
+pub mod storage;
 
 pub const MAX_QUESTIONS: usize = 4;
 pub const MAX_OPTIONS: usize = 4;

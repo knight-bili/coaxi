@@ -1689,7 +1689,9 @@ mod tests {
                 let AdmissionAssessment::AdmittedExisting(ticket) =
                     DatabaseAdmission::assess(&lease).unwrap()
                 else {
-                    panic!("completed210 must be readmitted as current without another upgrade");
+                    panic!(
+                        "completed current migrations must be readmitted without another upgrade"
+                    );
                 };
                 let reopened = Database::open_admitted_with_runtime_camp_files_root(
                     *ticket,
@@ -1974,6 +1976,8 @@ mod tests {
     #[test]
     fn process_kill_resumes_committed_migrations_and_both_legacy_switch_sides() {
         for interruption in [
+            "before_211",
+            "after_211",
             "before_210",
             "after_210",
             "legacy_switch",
@@ -1996,6 +2000,13 @@ mod tests {
                 )
                 .unwrap();
             match interruption {
+                "before_211" | "after_211" => {
+                    crate::db::runtime_interactions::downgrade_for_test(database.connection())
+                        .unwrap();
+                    database.connection().execute_batch(
+                        "UPDATE schema_migration SET applied_at='kept-before-211' WHERE version=210",
+                    ).unwrap();
+                }
                 "before_210" | "after_210" => {
                     crate::db::delegation::downgrade_for_test(database.connection());
                     database.connection().execute_batch(
@@ -2081,11 +2092,11 @@ mod tests {
 
             let lease = CoreDataDirLease::acquire(&directory).unwrap();
             let migrated = match DatabaseAdmission::assess(&lease).unwrap() {
-                AdmissionAssessment::RequiresMigration(ticket) if interruption != "after_210" => {
+                AdmissionAssessment::RequiresMigration(ticket) if interruption != "after_211" => {
                     AuthorityMigrationRunner::run(*ticket, &runtime_root, &runtime_root_identity)
                         .unwrap()
                 }
-                AdmissionAssessment::AdmittedExisting(ticket) if interruption == "after_210" => {
+                AdmissionAssessment::AdmittedExisting(ticket) if interruption == "after_211" => {
                     Database::open_admitted_with_runtime_camp_files_root(
                         *ticket,
                         &runtime_root,
@@ -2094,7 +2105,7 @@ mod tests {
                     .unwrap()
                 }
                 _ => panic!(
-                    "interrupted upgrade must resume only missing steps; committed210 is current"
+                    "interrupted upgrade must resume only missing steps; committed211 is current"
                 ),
             };
             crate::test_support::assert_production_database_configuration(&migrated);
@@ -2112,6 +2123,20 @@ mod tests {
                 .unwrap();
             assert_eq!(display_name, "中断后仍保留");
             assert!(!directory.join(AUTHORITY_MIGRATION_MANIFEST_FILE).exists());
+            if matches!(interruption, "before_211" | "after_211") {
+                assert_eq!(
+                    migrated
+                        .connection()
+                        .query_row(
+                            "SELECT applied_at FROM schema_migration WHERE version=210",
+                            [],
+                            |r| r.get::<_, String>(0)
+                        )
+                        .unwrap(),
+                    "kept-before-211"
+                );
+                assert!(!directory.join(MIGRATION_BACKUP_ROOT).exists());
+            }
             if matches!(interruption, "before_210" | "after_210") {
                 assert_eq!(
                     migrated
@@ -2152,6 +2177,8 @@ mod tests {
         };
         let interruption = std::env::var("ROVAI_MIGRATION_KILL_HELPER_INTERRUPTION").unwrap();
         let target_phase = match interruption.as_str() {
+            "before_211" => AuthorityMigrationPhase::OpeningAuthority,
+            "after_211" => AuthorityMigrationPhase::Migrating { version: 211 },
             "before_210" => AuthorityMigrationPhase::OpeningAuthority,
             "after_210" => AuthorityMigrationPhase::Migrating { version: 210 },
             "legacy_switch" => AuthorityMigrationPhase::SwitchingAuthority,

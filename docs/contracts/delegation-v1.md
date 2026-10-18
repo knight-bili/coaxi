@@ -173,7 +173,7 @@ Profile11为child的publicHistory/taskAwareness/memoryEntrypoint三个none；Pro
 旧159来源必须保留本次将修改的完整旧约束且不存在新增保留对象（表名大小写不构成绕过）；部分settings/identity安装、同名空壳guard和放宽约束拒绝升级。重建、对象安装、210回执和v1.73/160标记使用同一事务；收尾重验完整目标合同后提交，失败完整回滚并恢复外键ON。重复完整迁移零写；旧159固定209完成记录，当前210缺失、未来记录或错误标记均不能准入。
 变动字段上额外的非合同CHECK同样拒绝，避免所有新约束都存在却被另一条条件禁止子会话；不相关旧扩展字段及其原有CHECK继续保留。
 
-v1.73/Schema160/Migration210已登记两条启动链，原v1.72来源经既有历史迁移推进到159，再安装同一完整210事务。当前技能包能力允许由完整新合同证明，不因已清理203历史回执而停用；不得补写伪造的历史回执。旧Run的配置、选择、输入和已保存正文不转换，已冻结版本优先于当前开关。
+v1.73/Schema160/Migration210是独立的委派开通步骤；两条启动链现继续安装211并到达161。原v1.72来源经既有历史迁移推进到159，再安装完整210与211事务。当前技能包能力允许由完整160或161合同证明，不因已清理203历史回执而停用；不得补写伪造的历史回执。旧Run的配置、选择、输入和已保存正文不转换，已冻结版本优先于当前开关。
 
 测试专用159来源从真实历史启动链的210之前取得；原更早来源的测试降级链只允许在无委派数据/新冻结Run时恢复159，保留旧行和无关扩展列，不提供产品降级入口。实际Host/Runtime调度、输入接受/清理、原Session恢复及原界面仍按工程计划验证，Run仍是唯一终态权威，正式场景不按这些组件测试记为完成。
 
@@ -187,3 +187,15 @@ v1.73/Schema160/Migration210已登记两条启动链，原v1.72来源经既有�
 维护入口只更新精确已有、未终结的 Core 观察及其原 revision；允许处理退休 epoch，不放宽 Runtime 事件或业务命令授权，也不生成新的工具调用。
 投影复用原输入摘要与脱敏元数据，按原生命周期存储省略 null 的规则恢复摘要验证，不复制原始任务或生成另一份结果正文。
 此为工程接线；完整 Host/Fleet/Runtime 的重启、执行、writer 与清理资格仍须阶段验证。
+
+### 原生User交互存储
+
+Migration211将完整v1.73/160来源迁到161；原210的DDL、159→160转换和目标保持。211所有保留对象与回执/标记同事务提交，完整形状与多余保留对象共同检查；大小写不绕过来源占用检查。测试降级只允许空的精确交互表，先删除附在原Run/Conversation的两道触发器，不提供产品降级。
+
+Core的runtime_user_interaction是原生待答请求的唯一持久业务记录，不能用可清理event_log或权限grant替代。它冻结真实Run/epoch、输入投递、Thread/Conversation、Core/Host代次、原生帧序号、RPC id/method、Session/Binding、原问题和摘要。只有已开始投递的prepared或accepted输入可登记。原帧重复只读返回原编号，改正文冲突拒绝；同Host未结RPC唯一，终结后新帧可以使用原生端重新分配的RPC编号。
+
+ResolveInteractionCommand仅接Core编号、版本和Answer；封闭DTO与原Gateway EXACT_REPLAY持久回执生效，仅CURRENT_USER可首次决定。原问题/协议/原生ID从Core读取；错Camp隐藏记录、过期状态/版本/代次拒绝。决定与回执同事务，故障不留半份答案；原UUID精确回放先于当前运行围栏，不能因此改写旧答案。User读取显式投影，不携带Native ID、工具调用ID或Host代次。
+
+状态为pending→resolved→dispatching→sent或delivery_unknown。发送前先保存唯一token；重复领取拒绝，只有原token可结束，sent只证明运输写出，不证明模型执行。Run取消/结束/epoch变化/恢复失效或Conversation绑定改变会同事务关闭pending/resolved，将dispatching改为delivery_unknown。原启动恢复先关闭所有旧请求，重复恢复零写。UI断线本身不代用户选择；不生成批准或跳过答案。
+
+Grok RequestChanges的原文和回复持久保存，原User队列登记仍待接入，未取得登记证明前begin_dispatch明确拒绝，不能由Renderer隐式追加prompt。当前只有Core服务内核，NativeFrame只能由可信原生协调器构造且不支持反序列化；结构值本身不构成真实Host运输证明。Host回调、IPC/Web、待答列表、完整原卡片、r1安全阻塞摘要和完整Runtime矩阵继续待实现。四个已转换方法不代表其他Runtime准入或84正式场景通过。
