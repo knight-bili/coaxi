@@ -89,6 +89,14 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 
 ## Rust 测试准入与退役门槛
 
+原生问题/计划转换新增唯一最低层纯函数owner
+`runtime_interaction::tests::native_questions_and_plan_decisions_preserve_wire_identity_and_user_words`。
+它拥有Cursor/Grok原生请求到Core类型及反向回复的边界；现有delegation_contract只拥有模型工具参数，权限/Fleet owner不编码这些回复，不能复用其断言冒充覆盖。
+此前Cursor入口跳过问题/拒绝计划，Grok这些扩展也未接入；新owner验证原问题/选项ID、Other混合回答、Grok单选string/多选array、三计划决定、修改反馈独立携带、断线非批准及闭合字段/边界/重复/超限拒绝。
+全部使用内存Value，无SQLite/Runtime/网络/新依赖，默认层可执行；slow-tests清单从1253增为1254只是新增此纯owner，不新增重型fixture或正式场景通过。
+最小验证：`cargo test -p rovai-core --lib runtime_interaction::tests::native_questions_and_plan_decisions_preserve_wire_identity_and_user_words -- --exact`。
+转换不是Core持久请求、User API、原生交付或Renderer完成；这些后续分项须执行自己的最低owner，不重复这个输入矩阵。
+
 I04 启动/取消协调继续扩原 `application::execution_drivers::tests::non_batch_preparation_rechecks_coalesced_wakes_once_without_spinning`。
 沿同一 Core/SQLite，保留准备阻塞与通知合并的全部断言，再经真实 User 私聊结束命令验证未领取 Run 在原事务中收尾，后台清理查询不再选中；原协调器不再派清理任务、发清理事件或改写数据库。
 缺少租约的非零 epoch 仍由真实 Core 清理入口返回 Unproven，不据“没有租约”伪造进程退出。该 owner 拥有准备到取消的实际协调入口，纯 Fleet/Notify 测试不足；不新增 owner、数据库或真实提供方。

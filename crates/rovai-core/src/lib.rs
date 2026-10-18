@@ -133,6 +133,7 @@ pub mod runtime_discovery;
 mod runtime_discovery_windows;
 pub mod runtime_failure;
 pub mod runtime_file_operation;
+pub mod runtime_interaction;
 pub mod runtime_platform_admission;
 pub mod runtime_probe_process;
 pub mod runtime_resolution;

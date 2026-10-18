@@ -1,5 +1,7 @@
 # I04 执行队列
 
+2026-10-18 原生问题/计划第一批：按固定Codeg源码实现Cursor/Grok四个ACP阻塞方法的纯转换层，原ID、Other、三种计划决定及Grok独立修改反馈已有类型与纯owner证据。见[源码对照和后续队列](../inventory/native-interaction-reference.md)。当前仍未注册持久请求、接User API、原生发送或UI；Rovai原跳过/拒绝入口尚未替换，不据转换测试称功能可用。下一项Core持久请求/命令/重启失效，再接原路由及原界面。
+
 2026-10-18 追加核查：原Core准备/通知owner沿同库实际User结束未领取运行，原取消事务已完成收尾，未发现“无进程租约导致未领取运行永久等待清理”的缺陷；未放宽进程回收保护。4个原Rust owner定向通过，其中Core协调入口实际执行，Fleet回收凭据/FakeHost仍为明确夹具。
 核查与回归见[未领取取消协调记录](i04-delegation-unclaimed-result.json)，不计为完整Host/Runtime或阶段完成。
 另定位到问题/计划的具体缺口：`application.rs` 的 `cursor/ask_question` 当前直接跳过、`cursor/create_plan` 直接拒绝，`delegation_model_command::blocked_summary` 只读权限审批。不能靠给TaskReport补字段宣称支持；后续按I04-T03接原生请求的Core持久归属、User答复/决定及重启失效，再接T01阻塞投影和原应用界面。这些工作保留在I04，真实Session/writer/OS回收与模型矩阵仍归阶段集中验证。
