@@ -6,6 +6,8 @@ use rusqlite::{OptionalExtension, params};
 use serde::Deserialize;
 use serde_json::Value;
 
+pub(crate) mod source;
+
 use crate::{
     command::ActorRef, current_user::CURRENT_USER_ID, db::Database,
     execution_evidence::ExecutionEvidenceService, managed_blob::ManagedBlobStore,

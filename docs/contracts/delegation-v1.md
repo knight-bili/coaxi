@@ -268,6 +268,8 @@ User 显式接管沿既有 delegations.takeover；清理完成后才挂原 Singl
 
 ### Runtime 原生子会话读取目标
 
+内部文件层 `NativeDocuments` 只接 Core 候选和可信启动来源，读取标准 Codex/Grok 原文件并核验原生父子记录；不能被公共参数反序列化。Codex 的历史指针只解到精确 rollout，保留 cut/seed 供后续内容投影按原规则归并；缺源、循环及歧义不返回部分成功。Grok 短编号不作为 child Session，问答历史作为独立来源保留。每份文件捕获长度、整体与64KiB块摘要，返回原快照字节前校验对应块；追加不扩进旧快照，同长度改写不因长度相同获得资格。原文可能含启动元数据，严禁直接序列化给UI或送回模型。实际启动根捕获/历史绑定持久来源、内容归并、签名游标、公共接口和UI仍未实现；本层只是不执行写入、attach、start 的私有文件I/O入口。
+
 与上述 Core 委派 child 分开。内部 `NativeChildSessionService::resolve` 只接受 Current User 和 `threadId/agentRunId/evidenceId/receiverIndex`，沿持久 Evidence、真实 Run/epoch、Thread/Conversation、Context Manifest、Bootstrap binding id/generation 与当前 Native binding/installation/compatibility 校验，构造不实现 Serialize/Deserialize 的内部读取目标。未知或变化的归属明确拒绝，不把 UI 参数升级为 Native Session 地址。此内部解析没有登记公共 Core method，也不执行原生文件 I/O。
 
 观察只承认 Core 既有闭合的 Codex collab/subAgentActivity、Grok subagent notification 三类来源。Grok 的 subagent_id 不能替代缺失的 child_session_id；其观察归属 Run 也不能被称作创建该子代理的 Run。父运行结束保留观察状态，实时资格 live=false，不能据旧 running 伪造成功或永久转圈。候选保留 relationship：runtime_reported_receiver 不是已证明的子代理，解析器必须再校验原生父子记录后才可返回正文，不能凭可见 receiver 编号读取其他原生会话。历史绑定来源、内容读取/分页、Native/Web 和原只读 UI 按[完整队列](../../integration/inventory/native-subagent-viewer-reference.md)接续，本分项没有授予这些未实现能力。

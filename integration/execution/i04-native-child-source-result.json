@@ -1,0 +1,251 @@
+{
+  "schema_version": 1,
+  "artifact_id": "I04-NATIVE-CHILD-SOURCE",
+  "recorded_at": "2026-10-18T06:31:07.753106+00:00",
+  "source_baseline": "ab58774a0ae2fa76034674563bed05f64bf6be79",
+  "branch": "phase/i04-collaboration-runtime",
+  "implementation_status": "internal_native_lineage_and_lossless_file_chunks_verified_production_capture_projection_api_ui_pending",
+  "core_contract": "v1.73",
+  "projection_schema": 161,
+  "migration": 211,
+  "scope": {
+    "clusters": 81,
+    "packages": 48,
+    "formal_cases": 324,
+    "i04_clusters": 21,
+    "i04_packages": 4,
+    "i04_formal_cases": 84,
+    "new_formal_passes": 0
+  },
+  "implemented": [
+    "Core 私有 NativeDocuments，不实现序列化，不注册公共方法；候选和生产绑定原 home 才是后续调用前提",
+    "Codex 标准文件名精确 thread/最新 rollout，原头部 id/两种 parent 来源核对；不靠文件名子串猜会话",
+    "history_base 优先 forked_from_id，精确 rollout 链、cut/seed 和原头部保留；循环/缺源/重复来源明确拒绝而非部分成功",
+    "Grok 跨 cwd group 子来源，原父 updates 生命周期或 subagents/id/meta 明确 child_session_id；短编号不回退；保留 chat_history 问答来源",
+    "原生文件仅只读打开，逐层拒绝链接/reparse，根内路径和打开文件身份复核；64KiB块及整体摘要，无正文截断",
+    "快照按原长度分块，追加不扩入旧页，每次返回原块前核对摘要，同长度改写和截断明确失败"
+  ],
+  "checks": {
+    "core_test_library_compile_passed": true,
+    "feature": "extended-tests",
+    "compile_log": "native-child-source-compile-02.log",
+    "compiled_executable": "target\\debug\\deps\\rovai_core-44829caacc4b5efb.exe",
+    "warnings": 10,
+    "warning_messages_match_existing_extended_build": true,
+    "filesystem_owner": {
+      "filter": "runtime_subagent_session::source::tests::lineage_sources_keep_exact_rollouts_and_lossless_stable_chunks",
+      "listed": 1,
+      "exit": 0,
+      "passed": 1,
+      "failed": 0,
+      "filtered": 976,
+      "feature": "extended-tests"
+    },
+    "new_rust_test_owners": 1,
+    "new_database_fixtures": 0,
+    "docs_tests_passed": 10,
+    "docs_version_and_base_governance_passed": true,
+    "explicit_codegraph_sync_passed": true,
+    "actual_windows_regular_file_handles": true,
+    "actual_unix_symlinks": false,
+    "actual_windows_reparse": false,
+    "production_root_capture": false,
+    "historical_binding_recovery": false,
+    "content_projection": false,
+    "signed_client_cursor": false,
+    "public_method_registered": false,
+    "actual_http_ipc": false,
+    "renderer_verified": false,
+    "real_provider": false,
+    "complete_source_app_equivalence": false
+  },
+  "self_review": [
+    "原文文档含启动元数据，只作 Core 内容投影输入，不能把 raw JSON/路径直接交 UI 或模型",
+    "文件层调用 home 是生产启动捕获/历史绑定的内部 seam，本批只有隔离夹具；禁止用当前成员环境补猜旧来源",
+    "块字节完全保留，UTF-8可跨块，客户端后续须按块拼接；本层没有声称消息/工具/答案或 cut/seed 已归并",
+    "全文件摘要捕获在后台文件层完成，元数据变化拒绝新快照；每块独立校验避免每页重哈希全文",
+    "发现预算超过100000条会明确拒绝，不静默漏文件；大目录索引与可取消 I/O 仍须随生产调用接线核查",
+    "平台分支和 Root/Actor/transport 的完整耦合不能据当前 Windows 文件夹具授予"
+  ],
+  "failure_history": [
+    "首轮编译捕获 Rollout 路径借用与闭包移动冲突；改为先验证和构造自有字段，第二轮编译与实际 owner 通过，原失败日志保留"
+  ],
+  "remaining": [
+    "实际 Runtime 启动时捕获并持久保存非凭据源目录/精确绑定，历史绑定来源恢复及 Core 身份再次核对",
+    "按固定源规则归并 Codex 历史 cut/seed 与消息工具、Grok 消息/累计工具输出/问答答案，禁止原文启动字段暴露",
+    "签名的上下文/源快照客户端游标、后台可取消 I/O、User-only Native/Web 和原只读卡片抽屉/刷新/迟到围栏",
+    "真实 Core-文件-产品页面、原应用同场景、Windows reparse 与 Unix 真实执行、Runtime/平台及84正式场景集中候选",
+    "Grok 修改意见队列及 I04 其他协作/Runtime/恢复/记忆/自动化工作包"
+  ],
+  "not_performed": [
+    "push",
+    "GitHub Actions",
+    "付费模型",
+    "main 合入",
+    "发布",
+    "新增客户工程验收"
+  ],
+  "fixed_donors": [
+    {
+      "name": "codeg",
+      "commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "rovai-ai",
+      "commit": "cc465dda562536b94f23787759e3206324baa29e",
+      "license": "MIT"
+    }
+  ],
+  "source_files": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\crates\\rovai-core\\src\\runtime_subagent_session.rs",
+      "bytes": 9135,
+      "sha256": "df735e55091724d78a019e6c78b148c4cca34a988e891d54c0d112464fbfe064",
+      "repository_path": "crates/rovai-core/src/runtime_subagent_session.rs",
+      "git_blob": "12a9ed4ac4f9c380958de1c8c18ce2969f0fc7af"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\architecture\\delegation.md",
+      "bytes": 10155,
+      "sha256": "9c1297d163dd40d4404dc456ce4cc49b2e57566b58611fe9f75b2180e201f1f2",
+      "repository_path": "docs/architecture/delegation.md",
+      "git_blob": "3b6e47c60eedc862c65112563ae7465391e5fbec"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\contracts\\delegation-v1.md",
+      "bytes": 47417,
+      "sha256": "b87e995bf94450b75dfe40bbcbd9fac9da2de99df4cd532d152911d8f7d5989c",
+      "repository_path": "docs/contracts/delegation-v1.md",
+      "git_blob": "aad86471a827dcf02b2ba31d82f1544719ade4f6"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\development\\testing.md",
+      "bytes": 246716,
+      "sha256": "22243e3aa01f0b4997873b14fa0199e81009a65f79fcbabca0b3d3bdea27cbec",
+      "repository_path": "docs/development/testing.md",
+      "git_blob": "6d3b6fb816f8fa5ded5699174d866199d89ed3a0"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\versions\\v1.73\\README.md",
+      "bytes": 8528,
+      "sha256": "2f068a2ddbfee1b5cbd11e4aec8d31dcc93265ebddd3fb39c00dcf615316eb5c",
+      "repository_path": "docs/versions/v1.73/README.md",
+      "git_blob": "eeff9752580758b73d2b414bb8a5b9a3c5b610ed"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\versions\\v1.73\\implementation-plan.md",
+      "bytes": 18781,
+      "sha256": "305a917ff269ea7fe7113ab96298fd9497c71dad2cb413f71587fead0ab43ae2",
+      "repository_path": "docs/versions/v1.73/implementation-plan.md",
+      "git_blob": "1aa1647ce2beb8d00222b7536f2722923048a163"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\execution\\i04-execution-plan.md",
+      "bytes": 21616,
+      "sha256": "0e9bde3f5ff5ba05b31627139c4afdbc488fb136a0b504efefe748b747dff5cc",
+      "repository_path": "integration/execution/i04-execution-plan.md",
+      "git_blob": "cfdb292b387ee818230d02f1cd8c4438e99c8b52"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\inventory\\native-subagent-viewer-reference.md",
+      "bytes": 5791,
+      "sha256": "4951c25c2f07553bc56b49f8541d5abb9ca62b4e18b1a7182e6ab95d92f440c2",
+      "repository_path": "integration/inventory/native-subagent-viewer-reference.md",
+      "git_blob": "b5190cb57b4ba157ce3d403cc00b2826790b6409"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\crates\\rovai-core\\src\\runtime_subagent_session\\source.rs",
+      "bytes": 17302,
+      "sha256": "7421b602d114cd6768e672553fa9fbf033095fdce23a3f9ba3225d87100afd50",
+      "repository_path": "crates/rovai-core/src/runtime_subagent_session/source.rs",
+      "git_blob": "e77172f39b941f76cc1b2302bae0945e9558288f"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\crates\\rovai-core\\src\\runtime_subagent_session\\source\\tests.rs",
+      "bytes": 10693,
+      "sha256": "05270f2391e73a0a8baf881635eb89023a3119a02dc4a535444e1936aceea9b9",
+      "repository_path": "crates/rovai-core/src/runtime_subagent_session/source/tests.rs",
+      "git_blob": "9acc151da038b7da321ab7ae2c4340a357ee514e"
+    }
+  ],
+  "evidence_files": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\native-child-source-codegraph-sync-01.log",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\native-child-source-compile-01.log",
+      "bytes": 1020,
+      "sha256": "a8047e41b99bff5fa5a028f023198d3e94074acb3d280ca047a861d8930b24f3"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\native-child-source-compile-02.log",
+      "bytes": 2647,
+      "sha256": "515573bdf5a0e36ae6c4a996439d2d4e24b978c51b5b3d2ba6fc89b434ccc68c"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\native-child-source-docs-base-01.log",
+      "bytes": 342,
+      "sha256": "44f5d6acb4b8547acc2047b37fe8e61b6ccebc65493125d6f9c652bc8561779b"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\native-child-source-docs-check-01.log",
+      "bytes": 383,
+      "sha256": "16bce0a37352b15346f9ca47a95ad285dcd572da97b82b07d1cc349b4d23bf76"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\native-child-source-docs-tests-01.log",
+      "bytes": 974,
+      "sha256": "01a42631933c4b90746b7bb2c190849a7acd7ff1ebd430292d24b74fc896411a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\native-child-source-owner-01-list.log",
+      "bytes": 135,
+      "sha256": "b526a13549a40c0288fb51d06ed416244e04f8abe79716b3dc5cba37754d3b89"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\native-child-source-owner-01-result.json",
+      "bytes": 239,
+      "sha256": "0cc6c9b76664d7fca091e7dc43944e00e1a8bdf6201476c9f1b898b8559a3211"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\native-child-source-owner-01.log",
+      "bytes": 236,
+      "sha256": "fe412d504325e3b3ecbee8aa81918679e654faba177972fd42bf18e85babde4d"
+    }
+  ],
+  "approved_r1_artifacts": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    }
+  ]
+}

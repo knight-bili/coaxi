@@ -22,4 +22,8 @@
 3. **两端运输与原 UI**：User-only Native/Web 接同一 Core 读取；原抽屉、卡片、2秒刷新/迟到围栏/嵌套/隐藏和只读呈现，不能复用可审批委派入口。
 4. **同场景验证**：隔离真实原生文件 → Core → 产品页面，与原 Codeg 组件做宽窄/日夜/空/活动/终态/失败恢复对照；真实 Runtime 格式和平台资格归阶段集中候选。
 
+文件来源接续（2026-10-18）：`runtime_subagent_session/source.rs` 已编码内部文件层。Codex 只选标准文件名中的精确 thread/最新 rollout，核对原头部 `id` 和两种原 parent 字段；`history_base` 优先于 `forked_from_id`，按精确 rollout 索引保留每份原文件、cut 和 seed，缺源/循环/重复来源明确报错。Grok 在原父 `updates.jsonl` 的显式生命周期或 `subagents/<id>/meta.json` 核对 `child_session_id`，跨 cwd group 的子文件可定位；保留子 `chat_history.jsonl` 供原问答答案恢复。不回退短编号或仅凭相邻目录读取。
+
+文件层以只读句柄和64KiB块摘要保留完整字节，长UTF-8/工具输出不转为截断预览；追加后原快照页保持，同长度改写按块摘要拒绝。路径逐层拒绝链接/reparse，打开后核对根内路径与文件身份。所有原文文档及元数据仅在 Core 内部，不可序列化，也没有注册API；`binding_home` 是待由生产启动捕获/历史绑定恢复提供的内部来源，不从UI或当前配置推断。原文件归并为消息/工具/答案的内容投影、历史 cut/seed 的实际拼接、源目录持久捕获、签名客户端游标、API/原UI和平台资格仍待接；分块来源检查不能称为全文查看器已可用。
+
 完整 I04 四包/21簇/84正式场景保持，本批正式场景新增通过0。原许可通知见[来源许可](../licenses/README.md)。
