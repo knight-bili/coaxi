@@ -1,5 +1,7 @@
 # Codeg 与 Rovai 一期完整融合
 
+- [I04可信工程补丁读取](execution/i04-native-project-patch-result.json)：原Core用户准入、持久Host目录、核验文件及原Codex补丁行号已接，旧来源兼容和边界分项通过；旧agent文件、完整有界运输/后台取消、原UI及完整运行资格继续。
+
 I00已自审修正并合入，I01基础证据及环境待验项保留；I02继续补齐，I03本机工程验证已有记录，当前推进I04。实际阶段资格以[持续状态](execution/goal-state.json)为准，完整一期终点不变。Rovai Core唯一业务与执行权威，Codeg与双原生移动按模块移植；第二阶段才开发自主新增能力。
 
 - [I04原解析器对照检查点](execution/i04-native-parser-parity-result.json)：Grok统计及原模型窗口目录已接；两固定原parser的31组受控案例中30组完整投影相同、1组仅保留原版截断的工具正文，0项未解释差异。公开查看器运输、原UI、真实Host/Runtime/平台及I04其余工作包继续，不能按组件对照称阶段完成。

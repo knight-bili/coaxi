@@ -11,6 +11,8 @@ last_updated: 2026-10-18
 
 # v1.73：Core 独立帮手
 
+原生子会话的工程补丁读取已接Current User服务入口：可信Host最终启动cwd随来源持久保存，原生cwd只选根内位置，后来的绑定/epoch不会改用当前目录；旧v1缺目录仍保留完整原文。两个既有owner验证实际Core/SQLite/文件到原Codex行号的链路及越界、改写、取消和Windows备用流拒绝，[本批记录](../../../integration/execution/i04-native-project-patch-result.json)保留失败修复及资格。没有公共运输或UI变更，Schema161/Migration211和模型输入保持；旧agent来源、分页/后台取消与原查看器继续。
+
 Grok 完整会话统计、显示摘要及原模型窗口缓存→配置→型号回落已接入。两份固定原解析器已实际运行31组受控文件对照：Codex24、Grok7，其中30组完整投影相同，1组仅完整保留原版截断的两段工具正文，未发现未解释差异。[本批证据](../../../integration/execution/i04-native-parser-parity-result.json)与[复现配方](../../../integration/verification/native-parser-reference/README.md)保留源码、依赖和验证边界。该结果不代表完整原App、公共运输、原UI、真实Host/模型或84项正式场景通过；模型输入、Schema161/Migration211、产品依赖不变。
 
 Codex 原消息解析主体及代码模式/MCP/延迟等待、目标/计划、去重/提升、思考/图片与用量已接同一核验文件链路，具体[接续证据](../../../integration/execution/i04-native-codex-content-result.json)区分原版断言与实际受控文件、完整差分及公共查看器资格。新增依赖仅为供体锁定 regex1.12.3 图和已存在的 percent-encoding2.3.2，无其他包升级；模型输入、Schema 和正式场景数量不变。

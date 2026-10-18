@@ -53,6 +53,7 @@ fn target(adapter: &str) -> ObservedNativeSessionTarget {
         relationship: "runtime_reported_receiver".into(),
         live: true,
         recorded_home: None,
+        recorded_working_directory: None,
     }
 }
 

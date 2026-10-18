@@ -22,6 +22,7 @@ use super::{
 use model::MessageTurn;
 mod codex;
 mod grok_stats;
+mod project;
 
 pub(crate) use records::ParseNotes;
 use records::{JsonRecords, json_document, text_document};
@@ -36,6 +37,24 @@ pub(crate) struct NativeContent {
     /// Observed Native ids are not UI grants. Later transport mints references
     /// only for entries whose full parent/child source was verified here.
     pub(crate) verified_children: Vec<String>,
+}
+
+pub(super) fn read(
+    target: &ObservedNativeSessionTarget,
+    fallback: DateTime<Utc>,
+    stop: &AtomicBool,
+) -> Result<NativeContent> {
+    match target.adapter_kind.as_str() {
+        "codex-cli" => {
+            let mut files =
+                project::ProjectFiles::new(target.recorded_working_directory.as_deref());
+            codex_content(target, fallback, stop, &mut |path, cwd| {
+                files.lines(path, cwd, stop)
+            })
+        }
+        "grok-build" => grok_content(target, fallback, stop),
+        _ => anyhow::bail!("native_child.unsupported_source"),
+    }
 }
 
 fn merge_notes(into: &mut ParseNotes, other: ParseNotes) {

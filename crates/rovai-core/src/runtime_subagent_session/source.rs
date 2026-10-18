@@ -29,6 +29,7 @@ pub(crate) enum DocumentKind {
     GrokSubagentMetadata,
     GrokModelsCache,
     GrokConfig,
+    ProjectPatch,
 }
 
 /// A Codex link names an exact rollout, not whichever newer file has that thread.
@@ -86,6 +87,27 @@ impl NativeDocuments {
 
 impl NativeDocument {
     fn open(home: &Path, path: &Path, kind: DocumentKind) -> Result<Self> {
+        Self::open_with_cancel(home, path, kind, None)
+    }
+
+    pub(super) fn open_project(
+        home: &Path,
+        path: &Path,
+        stop: &std::sync::atomic::AtomicBool,
+    ) -> Result<Self> {
+        Self::open_with_cancel(home, path, DocumentKind::ProjectPatch, Some(stop))
+    }
+
+    fn open_with_cancel(
+        home: &Path,
+        path: &Path,
+        kind: DocumentKind,
+        stop: Option<&std::sync::atomic::AtomicBool>,
+    ) -> Result<Self> {
+        ensure!(
+            !stop.is_some_and(|stop| stop.load(std::sync::atomic::Ordering::Acquire)),
+            "native_child.read_cancelled"
+        );
         let mut file = open_contained(home, path)?;
         let before = file.metadata()?;
         let length = before.len();
@@ -94,6 +116,10 @@ impl NativeDocument {
         let mut chunks = Vec::new();
         let mut digest = Sha256::new();
         while remaining > 0 {
+            ensure!(
+                !stop.is_some_and(|stop| stop.load(std::sync::atomic::Ordering::Acquire)),
+                "native_child.read_cancelled"
+            );
             let count = remaining.min(CHUNK_BYTES as u64) as usize;
             file.read_exact(&mut buffer[..count])
                 .context("native_child.source_changed")?;
@@ -102,6 +128,10 @@ impl NativeDocument {
             remaining -= count as u64;
         }
         let after = file.metadata()?;
+        ensure!(
+            !stop.is_some_and(|stop| stop.load(std::sync::atomic::Ordering::Acquire)),
+            "native_child.read_cancelled"
+        );
         ensure!(
             before.len() == after.len() && before.modified()? == after.modified()?,
             "native_child.source_changed"

@@ -164,6 +164,9 @@ fn assert_native_source_origin(f: &mut Fixture) {
         CapturedNativeSource, NativeChildSessionReference, NativeChildSessionService,
     };
     let root = f.directory.join("ORIGIN_ONLY_NOT_MODEL");
+    let project = f.directory.join("PATCH_SOURCE_ONLY_NOT_MODEL");
+    std::fs::create_dir_all(project.join("src")).unwrap();
+    std::fs::write(project.join("src/file.ts"), "head\nold\nend\n").unwrap();
     let mut environment = [
         (
             std::ffi::OsString::from("CODEX_HOME"),
@@ -183,7 +186,7 @@ fn assert_native_source_origin(f: &mut Fixture) {
     let captured = CapturedNativeSource::capture(
         AdapterKind::CodexCli,
         &environment,
-        &f.directory,
+        &project,
         "host-origin-fixture",
     )
     .unwrap();
@@ -338,14 +341,17 @@ fn assert_native_source_origin(f: &mut Fixture) {
     };
     let target = read(&f.database).unwrap();
     assert_eq!(target.recorded_home.as_ref(), Some(&root));
+    assert_eq!(target.recorded_working_directory.as_ref(), Some(&project));
     assert!(target.live);
     assert!(!format!("{target:?}").contains("ORIGIN_ONLY_NOT_MODEL"));
     let folder = root.join("sessions/2026/10/18");
     std::fs::create_dir_all(&folder).unwrap();
+    let patch = "*** Begin Patch\n*** Update File: src/file.ts\n@@\n-old\n+new\n*** End Patch";
     let body = format!(
-        "{}\n{}\n",
+        "{}\n{}\n{}\n",
         json!({"type":"session_meta","payload":{"id":child,"parent_thread_id":retained}}),
-        json!({"type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"EXACT_ORIGIN_CHILD_BODY"}]}})
+        json!({"type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"EXACT_ORIGIN_CHILD_BODY"}]}}),
+        json!({"type":"response_item","payload":{"type":"function_call","name":"apply_patch","call_id":"trusted-patch","arguments":patch}})
     );
     std::fs::write(
         folder.join(format!("rollout-2026-10-18T12-00-00-{child}.jsonl")),
@@ -359,6 +365,124 @@ fn assert_native_source_origin(f: &mut Fixture) {
         body.as_bytes()
     );
     drop(documents);
+    let content = |db: &Database, actor: &ActorRef, input: &NativeChildSessionReference| {
+        NativeChildSessionService::read_content(
+            db,
+            &ManagedBlobStore::new(&f.directory),
+            actor,
+            input,
+            chrono::DateTime::parse_from_rfc3339("2026-10-18T00:00:00Z")
+                .unwrap()
+                .to_utc(),
+            &std::sync::atomic::AtomicBool::new(false),
+        )
+    };
+    let projected = content(&f.database, &user, &reference).unwrap();
+    let projected_body = serde_json::to_string(&projected.turns).unwrap();
+    assert!(projected_body.contains("EXACT_ORIGIN_CHILD_BODY"));
+    assert!(projected_body.contains("@@ -2,1 +2,1 @@"));
+    let changes = f.database.connection().total_changes();
+    assert_eq!(
+        content(&f.database, &user, &reference)
+            .unwrap()
+            .snapshot_digest,
+        projected.snapshot_digest
+    );
+    assert_eq!(f.database.connection().total_changes(), changes);
+    assert!(
+        content(
+            &f.database,
+            &ActorRef::System {
+                component_id: "not-user".into()
+            },
+            &reference
+        )
+        .is_err()
+    );
+    let mut wrong_reference = reference.clone();
+    wrong_reference.thread_id = "wrong-thread".into();
+    assert!(content(&f.database, &user, &wrong_reference).is_err());
+    assert!(
+        NativeChildSessionService::read_content(
+            &f.database,
+            &ManagedBlobStore::new(&f.directory),
+            &user,
+            &reference,
+            chrono::DateTime::parse_from_rfc3339("2026-10-18T00:00:00Z")
+                .unwrap()
+                .to_utc(),
+            &std::sync::atomic::AtomicBool::new(true)
+        )
+        .err()
+        .unwrap()
+        .to_string()
+        .contains("read_cancelled")
+    );
+
+    // Reading mixed v1 provenance is a storage fixture. The initial event above
+    // was produced by the real binding command; never nest that command inside
+    // a fixture savepoint just to manufacture an additional historical event.
+    let duplicate_origin = |database: &Database, payload: &serde_json::Value| {
+        database.connection().execute(
+            "INSERT INTO event_log(event_id,event_type,payload_json,camp_id,entity_type,entity_id,
+                actor_type,actor_id,source_agent_run_id,execution_epoch,created_at)
+             SELECT ?1,event_type,?2,camp_id,entity_type,entity_id,actor_type,actor_id,
+                source_agent_run_id,execution_epoch,created_at FROM event_log
+             WHERE event_type='conversation.native_source.recorded' LIMIT 1",
+            params![Uuid::new_v4().to_string(),payload.to_string()],
+        ).unwrap();
+    };
+    let original_origin: serde_json::Value = serde_json::from_str(&saved[0]).unwrap();
+    f.database
+        .connection()
+        .execute_batch("SAVEPOINT legacy_patch_origin")
+        .unwrap();
+    f.database.connection().execute("UPDATE event_log SET payload_json=json_remove(payload_json,'$.workingDirectory') WHERE event_type='conversation.native_source.recorded'",[]).unwrap();
+    assert!(
+        read(&f.database)
+            .unwrap()
+            .recorded_working_directory
+            .is_none()
+    );
+    let legacy = content(&f.database, &user, &reference).unwrap();
+    assert!(
+        !serde_json::to_string(&legacy.turns)
+            .unwrap()
+            .contains("@@ -2,1 +2,1 @@")
+    );
+    assert!(
+        serde_json::to_string(&legacy.turns)
+            .unwrap()
+            .contains("EXACT_ORIGIN_CHILD_BODY")
+    );
+    duplicate_origin(&f.database, &original_origin);
+    assert_eq!(source_rows(&f.database).len(), 2);
+    assert!(
+        serde_json::to_string(&content(&f.database, &user, &reference).unwrap().turns)
+            .unwrap()
+            .contains("@@ -2,1 +2,1 @@")
+    );
+    f.database
+        .connection()
+        .execute_batch("ROLLBACK TO legacy_patch_origin; RELEASE legacy_patch_origin")
+        .unwrap();
+
+    f.database
+        .connection()
+        .execute_batch("SAVEPOINT conflicting_patch_origin")
+        .unwrap();
+    let mut contradictory = original_origin;
+    contradictory["workingDirectory"] = json!(f.directory.to_string_lossy());
+    duplicate_origin(&f.database, &contradictory);
+    assert!(
+        read(&f.database).is_err(),
+        "same Host with contradictory captured directories is not chosen by recency"
+    );
+    f.database
+        .connection()
+        .execute_batch("ROLLBACK TO conflicting_patch_origin; RELEASE conflicting_patch_origin")
+        .unwrap();
+    assert_eq!(source_rows(&f.database), saved);
     let changes = f.database.connection().total_changes();
     read(&f.database).unwrap();
     assert_eq!(f.database.connection().total_changes(), changes);
@@ -378,6 +502,15 @@ fn assert_native_source_origin(f: &mut Fixture) {
         let historical = read(&f.database).unwrap();
         assert!(!historical.live);
         assert_eq!(historical.recorded_home.as_ref(), Some(&root));
+        assert_eq!(
+            historical.recorded_working_directory.as_ref(),
+            Some(&project)
+        );
+        assert!(
+            serde_json::to_string(&content(&f.database, &user, &reference).unwrap().turns)
+                .unwrap()
+                .contains("@@ -2,1 +2,1 @@")
+        );
         assert_eq!(historical.parent_native_session_id, retained);
         f.database
             .connection()
@@ -431,6 +564,11 @@ fn assert_native_source_origin(f: &mut Fixture) {
         panic!("frozen context should remain ready")
     };
     assert!(!prepared.rendered_payload.contains("ORIGIN_ONLY_NOT_MODEL"));
+    assert!(
+        !prepared
+            .rendered_payload
+            .contains("PATCH_SOURCE_ONLY_NOT_MODEL")
+    );
     assert!(
         !prepared
             .runtime_payload

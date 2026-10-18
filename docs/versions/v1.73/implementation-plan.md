@@ -144,3 +144,11 @@ Grok标题/型号/分支/时间、原统计和上下文窗口cache→config→id
 [本批证据](../../../integration/execution/i04-native-parser-parity-result.json)包含实际31组对照、参考程序原主体与102包锁图、普通及启用参考进程的精确原owner结果，以及明确长正文差异。参考配方入库，不依赖未提交的临时修改。没有新Rust owner/数据库，只有测试专用原parser进程夹具；不授予完整App/Host/运输/UI/模型/平台或84正式场景资格。Schema161/Migration211、产品依赖及6份批准r1不变。
 
 下一项补可信工程patch行/旧agent显式父链，再推进有界签名读取、首次发现/hash后台取消、原版只读UI及同场景。Grok修改意见r1衔接、旧来源显式导入、Runtime/平台和其余I04工作包保持，阶段集齐再集中验证。上方旧检查点“完整统计/差分未接”保留当批事实，本节覆盖其当前状态。
+
+## 可信Host工程目录与补丁源行接续
+
+可信最终Host启动cwd随原来源事件持久保存为可选workingDirectory；旧v1没有字段仍读完整正文，只有另一份同Host/Run/epoch/绑定的明确来源记录才能补足，互相矛盾的目录拒绝选择。不从当前Camp、Run workspace或原生cwd补授旧权限。原User-only准入后统一读取Codex/Grok，Codex用根内实际核验文件提供原补丁几何，文件失败保留原patch；完整UTF8、单次读取缓存、快照改写及取消保持，Windows备用数据流拒绝。
+
+[本批记录](../../../integration/execution/i04-native-project-patch-result.json)区分实际Core初始绑定写入、SQLite/Blob/真实文件读取，以及新旧历史记录兼容夹具；后者不当作完整Host复用。原source owner与原slow Context owner分层实际执行，没有新Rust owner/数据库/进程或正式场景通过；首轮误选feature、检查脚本和嵌套事务夹具错误保留，修夹具不放宽生产事务。Schema161/Migration211、依赖和模型输入不变。
+
+下一项保留旧agent显式父链/旧来源导入、有界签名内容与后代引用、首次原生来源发现/hash后台取消和资源回收，再两端公共读取及原Codeg只读UI/同场景。完整Host/Runtime/平台、Grok反馈r1衔接及I04其他包继续；不重做已提交的工程回调，不将本内部读取入口当公共API或产品查看器完成。

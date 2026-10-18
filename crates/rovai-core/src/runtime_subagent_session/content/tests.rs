@@ -12,6 +12,86 @@ fn write(home: &Path, path: &str, bytes: impl AsRef<[u8]>) {
 fn row(update: Value) -> Value {
     json!({"timestamp":1700000000,"params":{"update":update}})
 }
+
+fn assert_project_files(home: &Path) {
+    use super::project::ProjectFiles;
+    use crate::runtime_subagent_session::source::NativeDocument;
+    let root = home.join("trusted-patch");
+    let nested = root.join("nested");
+    fs::create_dir_all(&nested).unwrap();
+    let file = root.join("file.ts");
+    let outside = home.join("outside-patch.txt");
+    fs::write(&file, "甲\r\n乙\n").unwrap();
+    fs::write(&outside, "OUTSIDE_MUST_NOT_READ\n").unwrap();
+    let stop = AtomicBool::new(false);
+    let expected = vec!["甲".to_owned(), "乙".to_owned()];
+    let mut files = ProjectFiles::new(Some(&root));
+    assert_eq!(files.lines("file.ts", None, &stop), Some(expected.clone()));
+    assert_eq!(
+        files.lines("../file.ts", nested.to_str(), &stop),
+        Some(expected.clone())
+    );
+    assert_eq!(
+        files.lines(file.to_str().unwrap(), home.to_str(), &stop),
+        Some(expected.clone())
+    );
+    assert!(files.lines("file.ts", home.to_str(), &stop).is_none());
+    assert!(files.lines("../outside-patch.txt", None, &stop).is_none());
+    assert!(
+        files
+            .lines(outside.to_str().unwrap(), None, &stop)
+            .is_none()
+    );
+    assert!(files.lines("nested", None, &stop).is_none());
+    assert!(files.lines("missing", None, &stop).is_none());
+    assert!(files.lines("file.ts\0", None, &stop).is_none());
+    assert!(
+        ProjectFiles::new(None)
+            .lines(file.to_str().unwrap(), None, &stop)
+            .is_none()
+    );
+    fs::write(&file, "later\n").unwrap();
+    assert_eq!(files.lines("file.ts", None, &stop), Some(expected));
+    assert_eq!(
+        ProjectFiles::new(Some(&root)).lines("file.ts", None, &stop),
+        Some(vec!["later".into()])
+    );
+    fs::write(root.join("invalid"), [0xff, 0xfe]).unwrap();
+    assert!(files.lines("invalid", None, &stop).is_none());
+    assert!(
+        files
+            .lines("file.ts", None, &AtomicBool::new(true))
+            .is_none()
+    );
+    let canonical = fs::canonicalize(&root).unwrap();
+    let mut captured =
+        NativeDocument::open_project(&canonical, &canonical.join("file.ts"), &stop).unwrap();
+    fs::write(&file, "other\n").unwrap();
+    assert!(captured.read_chunk(0).is_err());
+    assert!(
+        NativeDocument::open_project(
+            &canonical,
+            &canonical.join("file.ts"),
+            &AtomicBool::new(true)
+        )
+        .is_err()
+    );
+    #[cfg(windows)]
+    {
+        fs::write(root.join("file.ts:private"), "STREAM_MUST_NOT_READ").unwrap();
+        assert!(files.lines("file.ts:private", None, &stop).is_none());
+    }
+    #[cfg(unix)]
+    {
+        std::os::unix::fs::symlink(&outside, root.join("outside-link")).unwrap();
+        assert!(files.lines("outside-link", None, &stop).is_none());
+        std::os::unix::fs::symlink(&file, root.join("inside-link")).unwrap();
+        assert_eq!(
+            ProjectFiles::new(Some(&root)).lines("inside-link", None, &stop),
+            Some(vec!["other".into()])
+        );
+    }
+}
 fn lines(rows: &[Value]) -> Vec<u8> {
     rows.iter()
         .flat_map(|value| {
@@ -26,6 +106,7 @@ fn lines(rows: &[Value]) -> Vec<u8> {
 pub(crate) fn assert_content_projection(home: &Path, base: &ObservedNativeSessionTarget) {
     super::codex::tests::assert_original_rules();
     assert_codex_file_content(home, base);
+    assert_project_files(home);
     let mut target = base.clone();
     target.adapter_kind = "grok-build".into();
     target.recorded_home = Some(home.into());

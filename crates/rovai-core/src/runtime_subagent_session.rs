@@ -6,9 +6,9 @@ use rusqlite::{OptionalExtension, params};
 use serde::Deserialize;
 use serde_json::Value;
 
+pub(crate) mod content;
 mod origin;
 pub(crate) mod source;
-pub(crate) mod content;
 pub use origin::CapturedNativeSource;
 pub(crate) use origin::ORIGIN_EVENT;
 
@@ -47,6 +47,7 @@ pub struct ObservedNativeSessionTarget {
     pub(crate) relationship: String,
     pub(crate) live: bool,
     pub(crate) recorded_home: Option<std::path::PathBuf>,
+    pub(crate) recorded_working_directory: Option<std::path::PathBuf>,
 }
 
 impl std::fmt::Debug for ObservedNativeSessionTarget {
@@ -145,48 +146,50 @@ impl NativeChildSessionService {
         } else {
             None
         };
-        let (parent, binding_id, binding_generation, recorded_home) = if let Some(origin) = recorded
-        {
-            ensure!(
-                row.0 >= 1
-                    && row.6 == row.15
-                    && row.14 == row.16
-                    && origin.installation_id == row.3
-                    && origin.compatibility_digest == row.11,
-                "native_child.binding_changed"
-            );
-            (
-                origin.parent_native_session_id,
-                origin.binding_id,
-                origin.binding_generation,
-                Some(std::path::PathBuf::from(origin.home_path)),
-            )
-        } else {
-            // Legacy observations retain the prior current-binding fence. An
-            // absent captured source never becomes a guess at today's home.
-            ensure!(
-                row.0 == row.1
-                    && row.0 >= 1
-                    && row.9 >= 1
-                    && row.8.as_deref() == Some(row.13.as_str())
-                    && row.9 == row.14
-                    && row.9 == row.16
-                    && row.6 == row.15
-                    && row.10.as_deref() == Some(row.3.as_str())
-                    && row.12.as_deref() == Some(row.11.as_str()),
-                "native_child.binding_changed"
-            );
-            (
-                row.7
-                    .as_deref()
-                    .filter(|id| identity(id))
-                    .context("native_child.reference_unavailable")?
-                    .to_owned(),
-                row.13,
-                row.14,
-                None,
-            )
-        };
+        let (parent, binding_id, binding_generation, recorded_home, recorded_working_directory) =
+            if let Some(origin) = recorded {
+                ensure!(
+                    row.0 >= 1
+                        && row.6 == row.15
+                        && row.14 == row.16
+                        && origin.installation_id == row.3
+                        && origin.compatibility_digest == row.11,
+                    "native_child.binding_changed"
+                );
+                (
+                    origin.parent_native_session_id,
+                    origin.binding_id,
+                    origin.binding_generation,
+                    Some(std::path::PathBuf::from(origin.home_path)),
+                    origin.working_directory.map(std::path::PathBuf::from),
+                )
+            } else {
+                // Legacy observations retain the prior current-binding fence. An
+                // absent captured source never becomes a guess at today's home.
+                ensure!(
+                    row.0 == row.1
+                        && row.0 >= 1
+                        && row.9 >= 1
+                        && row.8.as_deref() == Some(row.13.as_str())
+                        && row.9 == row.14
+                        && row.9 == row.16
+                        && row.6 == row.15
+                        && row.10.as_deref() == Some(row.3.as_str())
+                        && row.12.as_deref() == Some(row.11.as_str()),
+                    "native_child.binding_changed"
+                );
+                (
+                    row.7
+                        .as_deref()
+                        .filter(|id| identity(id))
+                        .context("native_child.reference_unavailable")?
+                        .to_owned(),
+                    row.13,
+                    row.14,
+                    None,
+                    None,
+                )
+            };
         let child = observed_child(&payload, &row.2, &parent, reference.receiver_index)?;
         let current = row.0 == row.1
             && row.8.as_deref() == Some(binding_id.as_str())
@@ -217,7 +220,22 @@ impl NativeChildSessionService {
                 .into(),
             live,
             recorded_home,
+            recorded_working_directory,
         })
+    }
+
+    /// Read only a User-correlated native child. Project geometry uses the
+    /// captured Host directory, never a caller-supplied root or today's Camp.
+    pub(crate) fn read_content(
+        database: &Database,
+        blobs: &ManagedBlobStore,
+        actor: &ActorRef,
+        reference: &NativeChildSessionReference,
+        fallback: chrono::DateTime<chrono::Utc>,
+        stop: &std::sync::atomic::AtomicBool,
+    ) -> Result<content::NativeContent> {
+        let target = Self::resolve(database, blobs, actor, reference)?;
+        content::read(&target, fallback, stop)
     }
 }
 

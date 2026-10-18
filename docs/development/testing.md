@@ -14,6 +14,9 @@ last_updated: 2026-10-18
 集中到阶段候选；公共契约、安全/迁移或阻断后续开发时允许有原因的最小验证。
 以下owner、命令和测试准入规则继续有效，未执行的检查登记待验，不因减少触发次数而删测试或假报通过。
 
+I04 可信补丁工程读取继续扩原 source filesystem owner与 `context::slow_tests::delivery_unknown_never_consumes_a_redelivery_requirement`，不新增Rust owner、数据库或进程。前者沿同一自建目录核对完整UTF-8行、根内相对/绝对/嵌套路径、越界/非法/非文件拒绝、Windows备用数据流拒绝、单次读取缓存、快照改写和取消；Unix符号链接场景只在对应平台执行，不能写成本机Windows已验。
+后者沿原SQLite/Blob/原生来源记录，经实际Current User解析→固定文件→原Codex补丁展示链验证行号、重复零写、错误User/Thread拒绝、旧无目录记录的原文保留、同Host新旧来源记录兼容及矛盾目录拒绝；后来的绑定/epoch变化不替换已捕获目录。初始来源由真实Core绑定写入，追加历史记录是同库读取夹具，不冒充真实Host重观察。只保存最终Host启动cwd，不从当前Camp、Run路径或原生cwd给旧记录补权，不改变模型输入或Schema。最低分层是slow-tests（包含extended），只运行两个原owner，不运行整套slow-tests。完整Host/平台、旧agent显式来源和公共运输/UI仍待阶段验证。
+
 I03 编辑端归属扩展现有 `host-web.test.mjs`，定向运行 `node --test --test-name-pattern="^Host private composer" scripts/lib/host-web.test.mjs`。
 该 owner 使用真实隔离 Host/Core、两个实际登录端及同一画布 pin，检查材料与完整保留正文隔离、跨端回执/retained ID、
 身份与恢复证明伪造、游标篡改、原身份重登及默认响应兼容；不种入 Pending/Run、不发送消息、不启动模型或 Renderer。

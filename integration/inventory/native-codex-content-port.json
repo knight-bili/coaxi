@@ -91,7 +91,7 @@
   "implementation_status": "original_codex_body_and_fixed_component_differential_targeted_passed_full_app_transport_ui_pending",
   "remaining": [
     "Further original-format corpus and complete source App comparisons remain outside the31 controlled component fixtures",
-    "Production authorized project patch-line reader and legacy agent-*.jsonl with explicit native lineage",
+    "Legacy agent-*.jsonl with explicit native lineage and old unrecorded origins",
     "Complete bounded content, signed snapshots/descendant references, cancellable background initial discovery/hash and resource lifecycle",
     "User-only Native/Web and original Codeg readonly UI, same-scenario full App/Host/Runtime/platform validation"
   ],
@@ -108,5 +108,6 @@
       "sha256": "a94c95b68b9e1d68946b881ffc4109dce1fc667f1db2b0b45d1bb4097162ff5c"
     }
   },
-  "stats_and_differential_followup": "native-grok-stats-port.json; integration/execution/i04-native-parser-parity-result.json"
+  "stats_and_differential_followup": "native-grok-stats-port.json; integration/execution/i04-native-parser-parity-result.json",
+  "trusted_project_reader_followup": "integration/execution/i04-native-project-patch-result.json"
 }

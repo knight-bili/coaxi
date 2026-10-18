@@ -1,4 +1,4 @@
-//! Captures only the native home from the final child launch snapshot. Never
+//! Captures the native home and cwd from the final child launch snapshot. Never
 //! serializes the environment or looks up today's configuration for old Runs.
 use std::{
     collections::BTreeMap,
@@ -19,6 +19,7 @@ pub struct CapturedNativeSource {
     adapter: AdapterKind,
     host: String,
     home: PathBuf,
+    working_directory: PathBuf,
 }
 
 impl std::fmt::Debug for CapturedNativeSource {
@@ -44,6 +45,10 @@ impl CapturedNativeSource {
             _ => return None,
         };
         if !cwd.is_absolute() || !super::identity(host) {
+            return None;
+        }
+        let directory = cwd.to_str()?;
+        if directory.len() > 32768 || directory.contains('\0') {
             return None;
         }
         let get = |name: &str| {
@@ -79,6 +84,7 @@ impl CapturedNativeSource {
             adapter,
             host: host.into(),
             home,
+            working_directory: cwd.to_path_buf(),
         })
     }
 
@@ -105,6 +111,7 @@ impl CapturedNativeSource {
             parent_native_session_id: command.native_session_id.clone(),
             host_instance_id: self.host.clone(),
             home_path: self.home.to_str().unwrap().into(),
+            working_directory: Some(self.working_directory.to_str().unwrap().into()),
         }
     }
 }
@@ -126,6 +133,8 @@ pub(crate) struct OriginRecord {
     pub(crate) parent_native_session_id: String,
     pub(crate) host_instance_id: String,
     pub(crate) home_path: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub(crate) working_directory: Option<String>,
 }
 
 pub(crate) fn lookup(
@@ -172,10 +181,27 @@ pub(crate) fn lookup(
                 && Path::new(&record.home_path).is_absolute(),
             "native_child.invalid_origin"
         );
-        if let Some(previous) = &origin {
+        ensure!(
+            record.working_directory.as_deref().is_none_or(|directory| {
+                directory.len() <= 32768
+                    && !directory.contains('\0')
+                    && Path::new(directory).is_absolute()
+            }),
+            "native_child.invalid_origin"
+        );
+        if let Some(previous) = &mut origin {
             // Re-observation of the identical Host is harmless; conflicting
             // origins cannot be chosen by recency or UI preference.
-            ensure!(previous == &record, "native_child.ambiguous_origin");
+            let mut comparable = record.clone();
+            comparable.working_directory = previous.working_directory.clone();
+            ensure!(*previous == comparable, "native_child.ambiguous_origin");
+            if let (Some(old), Some(new)) = (&previous.working_directory, &record.working_directory)
+            {
+                ensure!(old == new, "native_child.ambiguous_origin");
+            }
+            if previous.working_directory.is_none() {
+                previous.working_directory = record.working_directory;
+            }
         } else {
             origin = Some(record);
         }
