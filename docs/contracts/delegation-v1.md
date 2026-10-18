@@ -268,8 +268,12 @@ User 显式接管沿既有 delegations.takeover；清理完成后才挂原 Singl
 
 ### Runtime 原生子会话读取目标
 
-内部文件层 `NativeDocuments` 只接 Core 候选和可信启动来源，读取标准 Codex/Grok 原文件并核验原生父子记录；不能被公共参数反序列化。Codex 的历史指针只解到精确 rollout，保留 cut/seed 供后续内容投影按原规则归并；缺源、循环及歧义不返回部分成功。Grok 短编号不作为 child Session，问答历史作为独立来源保留。每份文件捕获长度、整体与64KiB块摘要，返回原快照字节前校验对应块；追加不扩进旧快照，同长度改写不因长度相同获得资格。原文可能含启动元数据，严禁直接序列化给UI或送回模型。实际启动根捕获/历史绑定持久来源、内容归并、签名游标、公共接口和UI仍未实现；本层只是不执行写入、attach、start 的私有文件I/O入口。
+与 Core 委派 child 分开。`NativeChildSessionService::resolve` 只接受 Current User 和 `threadId/agentRunId/evidenceId/receiverIndex`，检查同一 Thread、Run、持久 Evidence 和 Context/Bootstrap 所属；界面不能自报 Session、路径、Runtime 或 binding。候选和原文文档均不可序列化，未注册公共读取 method。reported receiver 不等于已证明子代理，文件层仍须验证真实原生父子记录后才可读取内容。
 
-与上述 Core 委派 child 分开。内部 `NativeChildSessionService::resolve` 只接受 Current User 和 `threadId/agentRunId/evidenceId/receiverIndex`，沿持久 Evidence、真实 Run/epoch、Thread/Conversation、Context Manifest、Bootstrap binding id/generation 与当前 Native binding/installation/compatibility 校验，构造不实现 Serialize/Deserialize 的内部读取目标。未知或变化的归属明确拒绝，不把 UI 参数升级为 Native Session 地址。此内部解析没有登记公共 Core method，也不执行原生文件 I/O。
+Codex/Grok Host 在创建进程时从最终 `ManagedProcessLaunchSpec` 的环境和 cwd 提取 CODEX_HOME/GROK_HOME 或对应 Home 默认目录，仅保留目录与 Host 身份；warm reuse 沿原 Host 的捕获值，不重新读取当前成员设置。`CapturedNativeSource` 不实现反序列化或普通序列化，Debug 不显示目录；不保存环境、API key 或凭据。缺少可靠 Home 时不猜目录，不阻断其他 Runtime 的原绑定路径。
 
-观察只承认 Core 既有闭合的 Codex collab/subAgentActivity、Grok subagent notification 三类来源。Grok 的 subagent_id 不能替代缺失的 child_session_id；其观察归属 Run 也不能被称作创建该子代理的 Run。父运行结束保留观察状态，实时资格 live=false，不能据旧 running 伪造成功或永久转圈。候选保留 relationship：runtime_reported_receiver 不是已证明的子代理，解析器必须再校验原生父子记录后才可返回正文，不能凭可见 receiver 编号读取其他原生会话。历史绑定来源、内容读取/分页、Native/Web 和原只读 UI 按[完整队列](../../integration/inventory/native-subagent-viewer-reference.md)接续，本分项没有授予这些未实现能力。
+Application 的既有 bind_prepared_native_session 从精确 Run/epoch 的实际 Runtime 取得来源，调用 Core bind_native_session_with_source。来源只在 Runtime System actor、冻结 adapter/installation/config 与原绑定检查通过后，以 schemaVersion=1 的 `conversation.native_source.recorded` 事件和绑定、原 command.result 同事务持久化。字段为 conversationId、agentRunId、executionEpoch、adapterKind、installationId、bindingId、bindingGeneration、compatibilityDigest、parentNativeSessionId、hostInstanceId、homePath；不进入绑定结果、Bootstrap、Formatter、builtin 目录或模型输入。同一 Host/绑定重复观察不重复来源事件，原 UUID 回放不更换来源，来源/回执故障整体回滚。没有新增数据库表或迁移。
+
+Codex 两类观察补显式 parentNativeSessionId，Grok 保持既有显式父身份。读取已记录来源时按 System actor、Thread/Conversation、原 Run/epoch、父 Session、冻结 installation/compatibility 和原绑定记录恢复原目录；后来的绑定或 epoch 改变不把旧证据指向新目录。相互冲突的 Host 来源明确拒绝，不按最近一条猜选。历史目标实时资格为false。未记录来源的旧观察保持原 current-binding 围栏且不能打开正文，不从当前环境补猜旧目录。
+
+内部 `NativeDocuments::open_recorded` 使用上述持久来源，Codex 校验精确标准 rollout 和原头部父链，保留历史 cut/seed；Grok 校验父更新或子元数据中的显式 child_session_id，不回退短编号。64KiB块与整体摘要保留完整字节，追加不扩旧快照，同长度改写拒绝。原文可能包含启动字段，必须经 Core 消息/工具/答案投影后才能给 UI，不能直接输出 raw JSON 或送回模型。完整内容归并、签名客户端游标、可取消后台 I/O、Native/Web、原只读 UI 及真实 Host/Runtime 同场景仍按[完整队列](../../integration/inventory/native-subagent-viewer-reference.md)接续；当前分项检查不授予这些资格。

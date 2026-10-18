@@ -3155,6 +3155,24 @@ impl ExecutionRuntimeService {
         database: &mut Database,
         envelope: &CommandEnvelope<BindNativeSessionCommand>,
     ) -> Result<CommandExecution> {
+        self.bind_native_session_inner(database, envelope, None)
+    }
+
+    pub fn bind_native_session_with_source(
+        &self,
+        database: &mut Database,
+        envelope: &CommandEnvelope<BindNativeSessionCommand>,
+        source: Option<&crate::runtime_subagent_session::CapturedNativeSource>,
+    ) -> Result<CommandExecution> {
+        self.bind_native_session_inner(database, envelope, source)
+    }
+
+    fn bind_native_session_inner(
+        &self,
+        database: &mut Database,
+        envelope: &CommandEnvelope<BindNativeSessionCommand>,
+        source: Option<&crate::runtime_subagent_session::CapturedNativeSource>,
+    ) -> Result<CommandExecution> {
         if envelope.payload.adapter_installation_id.trim().is_empty()
             || envelope.payload.native_session_id.trim().is_empty()
             || envelope
@@ -3263,6 +3281,15 @@ impl ExecutionRuntimeService {
                     "Conversation and AgentRun binding does not exist",
                 ));
             };
+            if let Some(source) = source {
+                let adapter: String = transaction.query_row("SELECT runtime_adapter_kind FROM agent_run WHERE id=?1",
+                    [&envelope.payload.agent_run_id], |row| row.get(0))?;
+                if source.adapter_kind().as_str() != adapter
+                    || !matches!(&envelope.actor, ActorRef::System { component_id } if component_id == &format!("runtime-adapter:{adapter}"))
+                {
+                    return Ok(rejected("native_source.runtime_mismatch", "Native source must belong to the actual Runtime Host"));
+                }
+            }
             if envelope.camp_id.as_deref() != Some(camp_id.as_str())
                 || version != envelope.payload.expected_conversation_version
                 || epoch != envelope.payload.expected_execution_epoch
@@ -3506,6 +3533,21 @@ impl ExecutionRuntimeService {
                     "nativeSessionCompatibilityKey": frozen_session_compatibility_key,
                 }),
             )?;
+            if let Some(source) = source {
+                let record = source.binding_record(&envelope.payload, &binding_id, binding_generation);
+                let payload = serde_json::to_value(record)?;
+                let exists: bool = transaction.query_row(
+                    "SELECT EXISTS(SELECT 1 FROM event_log WHERE event_type=?1 AND camp_id=?2 AND entity_type='conversation'
+                     AND entity_id=?3 AND actor_type='system' AND actor_id=?4 AND execution_epoch=?5 AND payload_json=?6)",
+                    params![crate::runtime_subagent_session::ORIGIN_EVENT, camp_id, envelope.payload.conversation_id,
+                        format!("runtime-adapter:{}",source.adapter_kind().as_str()), envelope.payload.expected_execution_epoch,
+                        serde_json::to_string(&payload)?], |row| row.get(0))?;
+                if !exists {
+                    append_domain_event(transaction, crate::runtime_subagent_session::ORIGIN_EVENT, &camp_id,
+                        ("conversation", &envelope.payload.conversation_id), &envelope.actor,
+                        Some(envelope.payload.expected_execution_epoch), &payload)?;
+                }
+            }
             if native_session_replaced {
                 append_domain_event(transaction, "agent_run.native_session_continuity_lost", &camp_id,
                     ("agent_run", &envelope.payload.agent_run_id), &envelope.actor,

@@ -11,7 +11,9 @@ last_updated: 2026-10-18
 
 # v1.73：Core 独立帮手
 
-原生子会话文件来源层已编码：核对 Codex 原生父链/精确历史 rollout 和 Grok 父更新/子元数据，保留完整分块字节与问答历史。当前仅是私有文件I/O层；生产启动来源、历史绑定持久资格、消息工具归并、签名游标、公共运输和原UI仍待接。分项验证见[原生文件来源记录](../../../integration/execution/i04-native-child-source-result.json)，不得据此称完整查看器或I04完成。
+本批启动来源及历史读取沿现有 Core 权威接线，未改模型输入或 Schema161/Migration211；主程序检查与同库/文件分项结果见[来源持久化记录](../../../integration/execution/i04-native-source-origin-result.json)。这不表示真实 provider、公共运输或原查看器已完成。
+
+原生子会话文件来源层已编码：核对 Codex 原生父链/精确历史 rollout 和 Grok 父更新/子元数据，保留完整分块字节与问答历史。实际启动来源捕获、原绑定事务持久化和已记录历史来源读取已编码并分项检查；消息工具归并、签名游标、公共运输和原UI仍待接。分项验证见[原生文件来源记录](../../../integration/execution/i04-native-child-source-result.json)，不得据此称完整查看器或I04完成。
 
 上一版本 [v1.72](../v1.72/README.md) 的历史记录及未完成环境验证保留。
 本版本落实客户直接确认的 [I04 独立帮手 r1](model-context-change-native-delegation.md)。

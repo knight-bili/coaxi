@@ -15171,9 +15171,20 @@ impl Core {
         credential: &BuiltinToolBindingCredential,
         native_session_id: &str,
     ) -> Result<()> {
+        let native_source = match execution.runtime.adapter_kind {
+            AdapterKind::CodexCli => self.codex_cli.get_agent_run(&execution.agent_run_id, execution.execution_epoch)
+                .await.and_then(|runtime| runtime.native_source()),
+            AdapterKind::GrokBuild => {
+                if let Some(adapter) = self.acp_adapter(AdapterKind::GrokBuild) {
+                    adapter.get_agent_run(&execution.agent_run_id, execution.execution_epoch)
+                        .await.and_then(|runtime| runtime.native_source())
+                } else { None }
+            }
+            _ => None,
+        };
         let binding = {
             let mut database = self.database.lock().await;
-            ExecutionRuntimeService::default().bind_native_session(
+            ExecutionRuntimeService::default().bind_native_session_with_source(
                 &mut database,
                 &CommandEnvelope {
                     command_id: uuid::Uuid::new_v4().to_string(),
@@ -15206,6 +15217,7 @@ impl Core {
                             .clone(),
                     },
                 },
+                native_source.as_ref(),
             )
         }?;
         if binding.result.status == CommandResultStatus::Rejected {

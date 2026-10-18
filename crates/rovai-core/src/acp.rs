@@ -1391,6 +1391,7 @@ struct ZcodeBackgroundRoute {
 }
 
 pub(crate) struct AcpHost {
+    native_source: Option<rovai_core::runtime_subagent_session::CapturedNativeSource>,
     credential_redactor: Option<rovai_core::runtime_custom_api::CredentialRedactor>,
     adapter_kind: AdapterKind,
     reported_version: Option<String>,
@@ -1733,6 +1734,9 @@ impl AcpHost {
             None
         };
         // From this point a process may exist; its owner handles cleanup.
+        let native_source = rovai_core::runtime_subagent_session::CapturedNativeSource::capture(
+            frozen_runtime.adapter_kind, spec.environment(), spec.working_directory(), &host_instance_id,
+        );
         if let Some(config) = private_config.as_mut() {
             config.preparing = false;
         }
@@ -1796,6 +1800,7 @@ impl AcpHost {
             codebuddy_config_dir,
             client_terminal_bridge,
             host_instance_id,
+            native_source,
             child: Mutex::new(child),
             openclaw_gateway,
             stdin: Mutex::new(stdin),
@@ -5815,6 +5820,10 @@ impl AcpRuntime {
 
     pub fn host_instance_id(&self) -> &str {
         &self.host.host_instance_id
+    }
+
+    pub(crate) fn native_source(&self) -> Option<rovai_core::runtime_subagent_session::CapturedNativeSource> {
+        self.host.native_source.clone()
     }
 
     pub(crate) fn builtin_tool_process_config(&self) -> Option<&BuiltinToolProcessConfig> {

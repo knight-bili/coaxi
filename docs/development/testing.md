@@ -88,6 +88,9 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 该夹具不证明实际 Host/Native、多窗口、源文件摘要/授权、最终模型 Blob 或完整 PC01–PC24；正式324场景保持未验。
 
 ## Rust 测试准入与退役门槛
+
+原生来源持久化继续扩原 Context delivery_unknown owner 和 native_child_session_tests.rs，同一数据库/Blob/真实源文件，不新增 Rust owner。先保留旧无来源围栏，再用真实 bind_native_session_with_source 检查来源与绑定/回执原事务、重复/回放、错误Runtime、故障回滚、原文件读取、绑定/epoch变更后的历史来源、冲突拒绝和模型输入不含来源/凭据。冲突须通过真实 Gateway 创建，不能把 Domain Command 嵌进 savepoint；只清理该夹具创建的精确冲突来源行。原 provider_packets 与 source 文件 owner 定向回归。Core lib slow-tests 和主程序 bins check 分别验证库/实际生产接线，未启动真实provider/完整App；bins 的暂未被公开API消费的文件读取未使用警告必须如实记录，不授予运输/UI资格。
+
 原生子会话文件来源新增唯一最低层 `runtime_subagent_session::source::tests::lineage_sources_keep_exact_rollouts_and_lossless_stable_chunks`，放 `extended-tests`。它拥有实际只读文件句柄、Codex 原生头部/精确 rollout 与历史引用、Grok 原生父更新/元数据、分块完整字节和同长度改写拒绝；原 Context owner 只拥有数据库归属，原 Native Usage owner 只拥有用量游标，均不能替代这一文件来源边界。只建独立临时文件，不建 SQLite、不启动 Runtime 或网络；Unix 符号链接分支只在该平台执行，Windows 的实际 junction/reparse 资格仍须补验。先编译该 feature，再用新产物 `--exact --list` 确认1项后执行同一过滤；最小过滤为上述完整函数名。本层没有生产根目录捕获、历史绑定恢复、全文内容投影、API/GUI 资格，不以夹具根目录替代真实来源绑定。
 
 原生子会话可信读取目标继续扩原 `context::slow_tests::delivery_unknown_never_consumes_a_redelivery_requirement`，原 Core bind_native_session 完成后在同一 Fixture/SQLite/Blob 扩展，helper 为 `context/native_child_session_tests.rs`。真实 Core 记录观察后检验 User-only、原 Thread/Run/证据、接收序号、Context/Bootstrap/当前 binding/epoch/compatibility、读取零写入及父终态关闭 live；用 savepoint 恢复反例，不新增整库或 Rust owner。原 `execution_evidence::tests::provider_packets_are_reduced_to_public_evidence_fields` 验证既有 Grok 闭合来源、父 Session、错 adapter 和缺少显式 Session 不能回退 subagent_id。使用 `--features slow-tests`，两个 owner 先各自 `--exact --list` 确认非零再运行。本批不读开发者原生日志或凭据、不启动 Runtime；文件解析/历史绑定/两端运输/原 UI 的失败语义留到对应实现，不用身份检查替代全文资格。

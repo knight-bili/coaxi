@@ -6,7 +6,10 @@ use rusqlite::{OptionalExtension, params};
 use serde::Deserialize;
 use serde_json::Value;
 
+mod origin;
 pub(crate) mod source;
+pub use origin::CapturedNativeSource;
+pub(crate) use origin::ORIGIN_EVENT;
 
 use crate::{
     command::ActorRef, current_user::CURRENT_USER_ID, db::Database,
@@ -26,7 +29,7 @@ pub struct NativeChildSessionReference {
 /// A reported receiver is not necessarily a child: the transcript reader must
 /// verify native parent/child lineage before returning any transcript content.
 /// No Serialize/Deserialize: native addresses are not UI input.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct ObservedNativeSessionTarget {
     pub(crate) thread_id: String,
     pub(crate) conversation_id: String,
@@ -42,6 +45,19 @@ pub struct ObservedNativeSessionTarget {
     pub(crate) status: String,
     pub(crate) relationship: String,
     pub(crate) live: bool,
+    pub(crate) recorded_home: Option<std::path::PathBuf>,
+}
+
+impl std::fmt::Debug for ObservedNativeSessionTarget {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ObservedNativeSessionTarget")
+            .field("agent_run_id", &self.agent_run_id)
+            .field("execution_epoch", &self.execution_epoch)
+            .field("binding_id", &self.binding_id)
+            .field("binding_generation", &self.binding_generation)
+            .field("source_recorded", &self.recorded_home.is_some())
+            .finish_non_exhaustive()
+    }
 }
 
 pub struct NativeChildSessionService;
@@ -106,31 +122,79 @@ impl NativeChildSessionService {
             )
             .optional()?
             .context("native_child.reference_unavailable")?;
-        ensure!(
-            row.0 == row.1
-                && row.0 >= 1
-                && row.9 >= 1
-                && row.8.as_deref() == Some(row.13.as_str())
-                && row.9 == row.14
-                && row.9 == row.16
-                && row.6 == row.15
-                && row.10.as_deref() == Some(row.3.as_str())
-                && row.12.as_deref() == Some(row.11.as_str()),
-            "native_child.binding_changed"
-        );
-        let parent = row
-            .7
-            .as_deref()
-            .filter(|id| identity(id))
-            .context("native_child.reference_unavailable")?;
         let payload = ExecutionEvidenceService.read_full_payload(
             database,
             blobs,
             &reference.thread_id,
             &reference.evidence_id,
         )?;
-        let child = observed_child(&payload, &row.2, parent, reference.receiver_index)?;
-        let live = matches!(row.4.as_str(), "queued" | "running" | "waiting")
+        let recorded = if let Some(parent) = payload["nativeSubagents"]["parentNativeSessionId"]
+            .as_str()
+            .filter(|id| identity(id))
+        {
+            origin::lookup(
+                database,
+                &reference.thread_id,
+                &row.6,
+                &reference.agent_run_id,
+                row.0,
+                &row.2,
+                parent,
+            )?
+        } else {
+            None
+        };
+        let (parent, binding_id, binding_generation, recorded_home) = if let Some(origin) = recorded
+        {
+            ensure!(
+                row.0 >= 1
+                    && row.6 == row.15
+                    && row.14 == row.16
+                    && origin.installation_id == row.3
+                    && origin.compatibility_digest == row.11,
+                "native_child.binding_changed"
+            );
+            (
+                origin.parent_native_session_id,
+                origin.binding_id,
+                origin.binding_generation,
+                Some(std::path::PathBuf::from(origin.home_path)),
+            )
+        } else {
+            // Legacy observations retain the prior current-binding fence. An
+            // absent captured source never becomes a guess at today's home.
+            ensure!(
+                row.0 == row.1
+                    && row.0 >= 1
+                    && row.9 >= 1
+                    && row.8.as_deref() == Some(row.13.as_str())
+                    && row.9 == row.14
+                    && row.9 == row.16
+                    && row.6 == row.15
+                    && row.10.as_deref() == Some(row.3.as_str())
+                    && row.12.as_deref() == Some(row.11.as_str()),
+                "native_child.binding_changed"
+            );
+            (
+                row.7
+                    .as_deref()
+                    .filter(|id| identity(id))
+                    .context("native_child.reference_unavailable")?
+                    .to_owned(),
+                row.13,
+                row.14,
+                None,
+            )
+        };
+        let child = observed_child(&payload, &row.2, &parent, reference.receiver_index)?;
+        let current = row.0 == row.1
+            && row.8.as_deref() == Some(binding_id.as_str())
+            && row.9 == binding_generation
+            && row.7.as_deref() == Some(parent.as_str())
+            && row.10.as_deref() == Some(row.3.as_str())
+            && row.12.as_deref() == Some(row.11.as_str());
+        let live = current
+            && matches!(row.4.as_str(), "queued" | "running" | "waiting")
             && row.5.is_none()
             && matches!(child.1.as_str(), "running" | "waiting");
         Ok(ObservedNativeSessionTarget {
@@ -141,9 +205,9 @@ impl NativeChildSessionService {
             evidence_id: reference.evidence_id.clone(),
             adapter_kind: row.2,
             installation_id: row.3,
-            binding_id: row.13,
-            binding_generation: row.14,
-            parent_native_session_id: parent.into(),
+            binding_id,
+            binding_generation,
+            parent_native_session_id: parent,
             child_native_session_id: child.0,
             status: child.1,
             relationship: payload["nativeSubagents"]["relationship"]
@@ -151,6 +215,7 @@ impl NativeChildSessionService {
                 .unwrap()
                 .into(),
             live,
+            recorded_home,
         })
     }
 }
@@ -167,6 +232,12 @@ pub(crate) fn observed_child(
         "native_child.invalid_observation"
     );
     let source = observation["source"].as_str().unwrap_or_default();
+    ensure!(
+        observation
+            .get("parentNativeSessionId")
+            .is_none_or(|value| value == parent),
+        "native_child.parent_mismatch"
+    );
     let relationship = observation["relationship"].as_str().unwrap_or_default();
     ensure!(
         matches!(

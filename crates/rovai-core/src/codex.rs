@@ -134,6 +134,7 @@ impl CodexRuntimeOwner {
 }
 
 pub(crate) struct CodexHost {
+    native_source: Option<rovai_core::runtime_subagent_session::CapturedNativeSource>,
     initialized: tokio::sync::OnceCell<()>,
     credential_redactor: Option<rovai_core::runtime_custom_api::CredentialRedactor>,
     host_instance_id: String,
@@ -419,6 +420,11 @@ impl CodexHost {
             ManagedWindowsArgvDialect::MicrosoftCrt,
             "runtime-host:codex-cli",
         )?;
+        let host_instance_id = uuid::Uuid::new_v4().to_string();
+        let native_source = rovai_core::runtime_subagent_session::CapturedNativeSource::capture(
+            rovai_core::agent_profile::AdapterKind::CodexCli,
+            spec.environment(), spec.working_directory(), &host_instance_id,
+        );
         let mut child = ManagedProcess::spawn(spec)
             .with_context(|| format!("failed to start {} app-server", codex_path.display()))?;
         let stdin = child
@@ -450,7 +456,8 @@ impl CodexHost {
                             }),
                     ),
             ),
-            host_instance_id: uuid::Uuid::new_v4().to_string(),
+            host_instance_id,
+            native_source,
             #[cfg(windows)]
             windows_job_name: child.windows_job_name().to_owned(),
             child: Mutex::new(child),
@@ -1233,6 +1240,10 @@ impl CodexRuntime {
 
     pub fn host_instance_id(&self) -> &str {
         &self.host.host_instance_id
+    }
+
+    pub(crate) fn native_source(&self) -> Option<rovai_core::runtime_subagent_session::CapturedNativeSource> {
+        self.host.native_source.clone()
     }
 
     pub(crate) fn builtin_tool_process_config(&self) -> Option<&BuiltinToolProcessConfig> {

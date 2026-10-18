@@ -2774,6 +2774,7 @@ fn insert_native_subagent_observation(
             "schemaVersion": 1,
             "adapterKind": "codex-cli",
             "source": "codex-app-server.subAgentActivity",
+            "parentNativeSessionId": parent,
             "relationship": "runtime_reported_child_activity",
             "activityId": item_id,
             "activity": match activity {
@@ -2833,6 +2834,7 @@ fn insert_native_subagent_observation(
         "schemaVersion": 1,
         "adapterKind": "codex-cli",
         "source": "codex-app-server.collabAgentToolCall",
+        "parentNativeSessionId": sender,
         "relationship": "runtime_reported_receiver",
         "toolCallId": item_id,
         "children": children,

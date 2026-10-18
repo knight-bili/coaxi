@@ -52,6 +52,9 @@ pub(crate) struct NativeDocument {
 }
 
 impl NativeDocuments {
+    pub(crate) fn open_recorded(target: &ObservedNativeSessionTarget) -> Result<Self> {
+        Self::open(target.recorded_home.as_deref().context("native_child.origin_unavailable")?, target)
+    }
     /// Filesystem seam only. Production launch capture/historical binding lookup
     /// must establish `binding_home`; this is not a grant to select arbitrary roots.
     pub(crate) fn open(binding_home: &Path, target: &ObservedNativeSessionTarget) -> Result<Self> {
