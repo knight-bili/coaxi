@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "recorded_at": "2026-10-18T22:39:08+08:00",
-  "status": "all_branch_history_included_backups_verified_policy_applied_remote_sync_pending",
+  "status": "completed_all_developed_commits_consolidated_old_branches_retired_local_origin_synchronized_development_paused",
   "repository": "knight-bili/codeg-rovai-workbench",
   "development_branch": "develop/V1.0.0",
   "upstream": "origin/develop/V1.0.0",
@@ -16,96 +16,6 @@
     "i04_packages": 4,
     "i04_clusters": 21,
     "i04_cases": 84
-  },
-  "retired_branches_planned": {
-    "local": [
-      {
-        "ref": "refs/heads/phase/i00-initialization",
-        "sha": "50fb0b9d0a545d54d9eb990e70ba70512478e95d",
-        "missing_from_current": 0,
-        "current_ahead": 410,
-        "included_in_current": true
-      },
-      {
-        "ref": "refs/heads/phase/i01-foundation",
-        "sha": "a76596b5e782cf392816726e8f8623faef1ebae2",
-        "missing_from_current": 0,
-        "current_ahead": 395,
-        "included_in_current": true
-      },
-      {
-        "ref": "refs/heads/phase/i02-skill-delivery",
-        "sha": "2b5f6fcf846238025a549bda4054235da2029645",
-        "missing_from_current": 0,
-        "current_ahead": 365,
-        "included_in_current": true
-      },
-      {
-        "ref": "refs/heads/phase/i02-workbench",
-        "sha": "87d686443179b3175e44b5e964f7a1d83d3209e5",
-        "missing_from_current": 0,
-        "current_ahead": 375,
-        "included_in_current": true
-      },
-      {
-        "ref": "refs/heads/phase/i03-canvas",
-        "sha": "4ece845b8c1e1689c6faf2f5a11a1c4da776f416",
-        "missing_from_current": 0,
-        "current_ahead": 374,
-        "included_in_current": true
-      },
-      {
-        "ref": "refs/heads/phase/i03-canvas-nodes",
-        "sha": "48b70e521f7f44cbb5abe40a2a1aab098dc044bb",
-        "missing_from_current": 0,
-        "current_ahead": 106,
-        "included_in_current": true
-      },
-      {
-        "ref": "refs/heads/phase/i04-collaboration-runtime",
-        "sha": "39899099fe44da7f96eab7c047aeee4f292c4f99",
-        "missing_from_current": 0,
-        "current_ahead": 0,
-        "included_in_current": true
-      }
-    ],
-    "origin": [
-      {
-        "ref": "refs/remotes/origin/phase/i01-foundation",
-        "sha": "a76596b5e782cf392816726e8f8623faef1ebae2",
-        "missing_from_current": 0,
-        "current_ahead": 395,
-        "included_in_current": true
-      },
-      {
-        "ref": "refs/remotes/origin/phase/i02-skill-delivery",
-        "sha": "2b5f6fcf846238025a549bda4054235da2029645",
-        "missing_from_current": 0,
-        "current_ahead": 365,
-        "included_in_current": true
-      },
-      {
-        "ref": "refs/remotes/origin/phase/i02-workbench",
-        "sha": "87d686443179b3175e44b5e964f7a1d83d3209e5",
-        "missing_from_current": 0,
-        "current_ahead": 375,
-        "included_in_current": true
-      },
-      {
-        "ref": "refs/remotes/origin/phase/i03-canvas",
-        "sha": "4ece845b8c1e1689c6faf2f5a11a1c4da776f416",
-        "missing_from_current": 0,
-        "current_ahead": 374,
-        "included_in_current": true
-      },
-      {
-        "ref": "refs/remotes/origin/phase/i03-canvas-nodes",
-        "sha": "a672ad1bf1cfff78d68b4eecf6436af3e5032a29",
-        "missing_from_current": 0,
-        "current_ahead": 107,
-        "included_in_current": true
-      }
-    ]
   },
   "merge_method": "new branch at existing descendant commit; every old tip already ancestor, no duplicate merges or code changes",
   "backups": {
@@ -331,8 +241,9 @@
     }
   ],
   "actions": {
-    "push": "pending",
-    "retire_old_branches": "after remote new head verified",
+    "push": true,
+    "retire_old_branches": true,
+    "old_draft_prs_closed_without_merge": 5,
     "main_merge": false,
     "release": false,
     "workflow_dispatch": false,
@@ -373,5 +284,219 @@
     ],
     "introduced_by_branch_unification": false,
     "action": "retain as engineering todo for resumed development; no checker weakening or feature repair while paused"
-  }
+  },
+  "completed_at": "2026-10-18T22:46:18+08:00",
+  "verified_publish_head": "1ecb5b9dca4b3696a9fb330e3dbae122e3f90f16",
+  "retired_branches": {
+    "local": [
+      {
+        "ref": "refs/heads/phase/i00-initialization",
+        "sha": "50fb0b9d0a545d54d9eb990e70ba70512478e95d",
+        "missing_from_current": 0,
+        "current_ahead": 410,
+        "included_in_current": true
+      },
+      {
+        "ref": "refs/heads/phase/i01-foundation",
+        "sha": "a76596b5e782cf392816726e8f8623faef1ebae2",
+        "missing_from_current": 0,
+        "current_ahead": 395,
+        "included_in_current": true
+      },
+      {
+        "ref": "refs/heads/phase/i02-skill-delivery",
+        "sha": "2b5f6fcf846238025a549bda4054235da2029645",
+        "missing_from_current": 0,
+        "current_ahead": 365,
+        "included_in_current": true
+      },
+      {
+        "ref": "refs/heads/phase/i02-workbench",
+        "sha": "87d686443179b3175e44b5e964f7a1d83d3209e5",
+        "missing_from_current": 0,
+        "current_ahead": 375,
+        "included_in_current": true
+      },
+      {
+        "ref": "refs/heads/phase/i03-canvas",
+        "sha": "4ece845b8c1e1689c6faf2f5a11a1c4da776f416",
+        "missing_from_current": 0,
+        "current_ahead": 374,
+        "included_in_current": true
+      },
+      {
+        "ref": "refs/heads/phase/i03-canvas-nodes",
+        "sha": "48b70e521f7f44cbb5abe40a2a1aab098dc044bb",
+        "missing_from_current": 0,
+        "current_ahead": 106,
+        "included_in_current": true
+      },
+      {
+        "ref": "refs/heads/phase/i04-collaboration-runtime",
+        "sha": "39899099fe44da7f96eab7c047aeee4f292c4f99",
+        "missing_from_current": 0,
+        "current_ahead": 0,
+        "included_in_current": true
+      }
+    ],
+    "origin": [
+      {
+        "ref": "refs/remotes/origin/phase/i01-foundation",
+        "sha": "a76596b5e782cf392816726e8f8623faef1ebae2",
+        "missing_from_current": 0,
+        "current_ahead": 395,
+        "included_in_current": true
+      },
+      {
+        "ref": "refs/remotes/origin/phase/i02-skill-delivery",
+        "sha": "2b5f6fcf846238025a549bda4054235da2029645",
+        "missing_from_current": 0,
+        "current_ahead": 365,
+        "included_in_current": true
+      },
+      {
+        "ref": "refs/remotes/origin/phase/i02-workbench",
+        "sha": "87d686443179b3175e44b5e964f7a1d83d3209e5",
+        "missing_from_current": 0,
+        "current_ahead": 375,
+        "included_in_current": true
+      },
+      {
+        "ref": "refs/remotes/origin/phase/i03-canvas",
+        "sha": "4ece845b8c1e1689c6faf2f5a11a1c4da776f416",
+        "missing_from_current": 0,
+        "current_ahead": 374,
+        "included_in_current": true
+      },
+      {
+        "ref": "refs/remotes/origin/phase/i03-canvas-nodes",
+        "sha": "a672ad1bf1cfff78d68b4eecf6436af3e5032a29",
+        "missing_from_current": 0,
+        "current_ahead": 107,
+        "included_in_current": true
+      }
+    ]
+  },
+  "retirement_result": {
+    "ok": true,
+    "verified_publish_head": "1ecb5b9dca4b3696a9fb330e3dbae122e3f90f16",
+    "local_retired": [
+      {
+        "name": "phase/i00-initialization",
+        "old_sha": "50fb0b9d0a545d54d9eb990e70ba70512478e95d",
+        "deleted": true
+      },
+      {
+        "name": "phase/i01-foundation",
+        "old_sha": "a76596b5e782cf392816726e8f8623faef1ebae2",
+        "deleted": true
+      },
+      {
+        "name": "phase/i02-skill-delivery",
+        "old_sha": "2b5f6fcf846238025a549bda4054235da2029645",
+        "deleted": true
+      },
+      {
+        "name": "phase/i02-workbench",
+        "old_sha": "87d686443179b3175e44b5e964f7a1d83d3209e5",
+        "deleted": true
+      },
+      {
+        "name": "phase/i03-canvas",
+        "old_sha": "4ece845b8c1e1689c6faf2f5a11a1c4da776f416",
+        "deleted": true
+      },
+      {
+        "name": "phase/i03-canvas-nodes",
+        "old_sha": "48b70e521f7f44cbb5abe40a2a1aab098dc044bb",
+        "deleted": true
+      },
+      {
+        "name": "phase/i04-collaboration-runtime",
+        "old_sha": "39899099fe44da7f96eab7c047aeee4f292c4f99",
+        "deleted": true
+      }
+    ],
+    "origin_retired": [
+      {
+        "ref": "refs/remotes/origin/phase/i01-foundation",
+        "sha": "a76596b5e782cf392816726e8f8623faef1ebae2",
+        "missing_from_current": 0,
+        "current_ahead": 395,
+        "included_in_current": true
+      },
+      {
+        "ref": "refs/remotes/origin/phase/i02-skill-delivery",
+        "sha": "2b5f6fcf846238025a549bda4054235da2029645",
+        "missing_from_current": 0,
+        "current_ahead": 365,
+        "included_in_current": true
+      },
+      {
+        "ref": "refs/remotes/origin/phase/i02-workbench",
+        "sha": "87d686443179b3175e44b5e964f7a1d83d3209e5",
+        "missing_from_current": 0,
+        "current_ahead": 375,
+        "included_in_current": true
+      },
+      {
+        "ref": "refs/remotes/origin/phase/i03-canvas",
+        "sha": "4ece845b8c1e1689c6faf2f5a11a1c4da776f416",
+        "missing_from_current": 0,
+        "current_ahead": 374,
+        "included_in_current": true
+      },
+      {
+        "ref": "refs/remotes/origin/phase/i03-canvas-nodes",
+        "sha": "a672ad1bf1cfff78d68b4eecf6436af3e5032a29",
+        "missing_from_current": 0,
+        "current_ahead": 107,
+        "included_in_current": true
+      }
+    ],
+    "old_prs_closed_without_merge": [
+      {
+        "headRefName": "phase/i03-canvas-nodes",
+        "mergedAt": null,
+        "number": 55,
+        "state": "CLOSED",
+        "url": "https://github.com/knight-bili/codeg-rovai-workbench/pull/55"
+      },
+      {
+        "headRefName": "phase/i02-skill-delivery",
+        "mergedAt": null,
+        "number": 54,
+        "state": "CLOSED",
+        "url": "https://github.com/knight-bili/codeg-rovai-workbench/pull/54"
+      },
+      {
+        "headRefName": "phase/i03-canvas",
+        "mergedAt": null,
+        "number": 53,
+        "state": "CLOSED",
+        "url": "https://github.com/knight-bili/codeg-rovai-workbench/pull/53"
+      },
+      {
+        "headRefName": "phase/i02-workbench",
+        "mergedAt": null,
+        "number": 52,
+        "state": "CLOSED",
+        "url": "https://github.com/knight-bili/codeg-rovai-workbench/pull/52"
+      },
+      {
+        "headRefName": "phase/i01-foundation",
+        "mergedAt": null,
+        "number": 51,
+        "state": "CLOSED",
+        "url": "https://github.com/knight-bili/codeg-rovai-workbench/pull/51"
+      }
+    ],
+    "main_unchanged": "9d1ad55eeb18c0bc359d6f575afe9a9936055040",
+    "remote_heads": {
+      "refs/heads/develop/V1.0.0": "1ecb5b9dca4b3696a9fb330e3dbae122e3f90f16",
+      "refs/heads/main": "9d1ad55eeb18c0bc359d6f575afe9a9936055040"
+    },
+    "workflow_dispatch": false
+  },
+  "final_verification": "Final audit-only result commit is pushed and verified separately in file/V1.0.0统一开发分支/logs/final-verification.json; this record does not claim a self-referential commit SHA."
 }

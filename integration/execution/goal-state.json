@@ -274,7 +274,7 @@
   "i04_native_viewer_ui_evidence": "integration/execution/i04-native-viewer-ui-result.json",
   "i04_native_rich_content_evidence": "integration/execution/i04-native-rich-content-result.json",
   "i04_native_tool_primitives_evidence": "integration/execution/i04-native-tool-primitives-result.json",
-  "current_operation": "branch_unification",
+  "current_operation": "branch_unification_completed_development_paused",
   "development_status": "paused_by_user",
   "branch_policy": "integration/branch-policy.md",
   "branch_unification": {
@@ -284,6 +284,11 @@
     "future_stage_branches": false,
     "main_merge": "only after I12 engineering and customer software acceptance plus explicit User instruction",
     "uncommitted_wip": "preserved separately; known type errors; not completed",
-    "resume": "continue on develop/V1.0.0 when User resumes development"
+    "resume": "continue on develop/V1.0.0 when User resumes development",
+    "status": "completed",
+    "verified_publish_head": "1ecb5b9dca4b3696a9fb330e3dbae122e3f90f16",
+    "evidence": "integration/execution/v1-branch-unification.json",
+    "retired_local_stage_branches": 7,
+    "retired_origin_stage_branches": 5
   }
 }
