@@ -354,3 +354,15 @@ export interface QuestionAnswer {
   answers: QuestionAnswerItem[]
   declined: boolean
 }
+
+
+
+/** True for a user-registered ACP agent. */
+export function isCustomAgentType(agentType: AgentType): boolean {
+  return agentType.startsWith(CUSTOM_AGENT_PREFIX)
+}
+
+
+
+/** Wire prefix marking a custom (user-registered) ACP agent. */
+export const CUSTOM_AGENT_PREFIX = "custom:"

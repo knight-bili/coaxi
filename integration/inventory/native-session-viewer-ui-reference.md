@@ -63,3 +63,16 @@ Codeg 固定 aff1e6c278453ed8d0b96a5f664edcdca621aa3f，Rovai 固定 cc465dda562
 - 八个固定直接依赖、十五个新增lock包节点；795个既有包/快照及旧importer保持。26个所需包发布物逐项SRI核验，MIT许可保留，未执行生命周期脚本或全量重装。原shadcn 3.8.4状态CSS只作构建输入，未引入其CLI/runtime；无React副本。
 
 87项定向、28组实际产品Renderer、普通工具/Diff与前批专用卡回归，类型检查及源码审计详见[工程记录](../execution/i04-native-agent-question-result.json)。实际生产与固定原组件分别4张双主题截图已检查；原参考也用同份真实适配后的数据，明确宿主接缝。受控只读运输不资格真实Core/Host/Native/Web、真实模型、全局原App或完整恢复矩阵；客户仍仅在I12工程后使用软件验收。完整四包21簇84场景不减，新增正式通过0。
+
+
+## 委派、恢复主卡与后台查询接续（2026-10-19）
+
+原 `DelegatedSubThread`、`ResumedDelegationCard`、`DelegationCardRow`、`BackgroundTaskCard` 四份完整展示组件、完整 `delegation-card` 纯解析，以及两份原测试已移植。七份文件仅改import，函数/JSX与固定Codeg相同；两组双语scope一致。五个声明（含既有ALL_AGENT_TYPES、原自定义队员前缀/判断及纯类型DelegationBinding/Status）按原声明核对；不启用供体全局连接store、DB或附着执行。
+
+Core User子列表直接驱动原主卡：当前attempt大于1才出现原恢复角标；Core当前blocked/cleanup优先于历史成功状态，取消与未知不当作成功。Core UUID保持字符串，不伪造供体numeric conversation id。`SourceDelegationProvider`是明确模型/Host接缝，不冒充原全局hook；点击仍打开当前已授权父列表里的确切子会话，保留原trigger供返回焦点。列表未新增正文预取，原Core合同不提供task/reason预览，正文与真实恢复说明仍在原子窗/原始记录，原父工具的完整来源关联继续补齐，不能标为完整原功能已收口。
+
+后台连续查询使用原 `buildBackgroundTaskRows` 与原完整卡：一任务一行、查询次数、最新状态、非零退出码、停止结果；终端沿原ANSI组件，子代理结果沿Rovai Markdown明确接缝。每份原始查询输入/结果/meta/stats独立保留，已结束但报告running不旋转，没有输出就不造空展开。长日志的最后一行在原TerminalContent真实原生滚动容器可达；它不是Overlay viewport，夹具据实际组件修正了检查位置。
+
+定向116项通过、types0，实际生产查看器两模式回归（22组行为及原组件/恢复角标/主题的额外断言）和后台15组检查通过。原查看器定位改为Core稳定ID和原按钮可访问名称，保留全部原断言，没有削弱审批/回答、scope、接管/丢失回执、草稿/附件、排队输入移回、隐藏、返回和窄屏末尾验证。测试进程单独关闭GPU；隐藏窗口主题过渡停在中途的问题用完成有限CSSTransition后取图修复，实际计算色值对照已验证，不更改生产主题或暂停无限状态动画。
+
+原组件参考使用固定供体的真正模块，明确Core UUID模型、Runtime图标/标签、既有Terminal和Rovai Markdown接缝，不是完整供体App。背景查询采用同份真正适配后的payload；两主题及生产窄屏的最终截图按[本批记录](../execution/i04-native-delegation-background-result.json)记录。此次无新依赖、Rust/API/schema/模型输入变更、付费模型、完整编译、push或Actions。完整I04四包21簇84与一期81/48/324不减，本批正式场景通过仍为0，真实Core至Native/Web候选保留。

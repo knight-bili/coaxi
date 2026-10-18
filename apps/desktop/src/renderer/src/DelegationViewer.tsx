@@ -3,7 +3,7 @@
 // Drawer owns presentation only; Core owns every child, Run, approval and answer.
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { Drawer } from '@base-ui/react/drawer'
-import { ChevronDown, ChevronUp, Eye, Loader2, RefreshCw, X } from 'lucide-react'
+import { ChevronDown, ChevronUp, Loader2, RefreshCw, X } from 'lucide-react'
 import type { ActionApprovalView, AgentProfile, DelegationDetail, DelegationHistoryPage, SingleChatMessageView, ThreadMemberView } from '@contracts'
 import { useThreadClient } from './camp-client'
 import { useUiText } from './interface-language'
@@ -12,6 +12,7 @@ import { SingleChatPanel, SingleChatRunHistory, singleChatEvidenceForRun } from 
 import { ApprovalDock, type ThreadLeavePreparation } from './ThreadWorkspace'
 import { RuntimeInteractionDock } from './RuntimeInteractionDock'
 import { CodegRuntimeMark } from './CodegRuntimeMark'
+import { CoreDelegationCard } from './CoreDelegationCard'
 import { delegationActionController } from './delegation-action-controller'
 import type { DelegationActionMethod } from '../../shared/private-conversation-operations'
 import { delegationChildren, delegationRuntimeLabel, delegationViewerController, type DelegationViewerTarget } from './delegation-viewer-controller'
@@ -153,13 +154,9 @@ function DelegationChildrenContent({ parentConversationId, visible = true }: { p
   const shown = expanded ? rows : rows.slice(0, 3)
   return <section className="delegation-children" aria-label={t('独立帮手')}>
     {state.error && <p role="alert">{t('帮手列表暂时无法读取，将重新核对。')}</p>}
-    {shown.map(detail => <div className="delegation-card" key={detail.delegationId}>
-      <span className="delegation-avatar"><CodegRuntimeMark target={detail.agentType} /></span>
-      <div className="delegation-card-description"><div><strong>{delegationRuntimeLabel(detail.agentType)}</strong><code title={detail.delegationId}>#{detail.delegationId.slice(-8)}</code>
-        <span className={`delegation-status is-${detail.status}`}>{t(delegationStatus(detail))}</span></div>
-        {detail.blockedOn && <small>{t(detail.blockedOn.kind === 'permission' ? '等待审批' : detail.blockedOn.kind === 'question' ? '等待回答' : '等待计划确认')}</small>}
-      </div>
-      <button type="button" className="delegation-open" aria-label={t('查看帮手会话')} onClick={event => host.open({ delegationId: detail.delegationId, parentConversationId, threadId: host.environment.threadId }, event.currentTarget)}><Eye size={14} /><span>{t('查看会话')}</span></button>
+    {shown.map(detail => <div key={detail.delegationId}>
+      <CoreDelegationCard detail={detail} onOpen={trigger => host.open({ delegationId: detail.delegationId, parentConversationId, threadId: host.environment.threadId }, trigger)} />
+      {(detail.blockedOn && detail.blockedOn.kind !== 'permission' || detail.takenOver || detail.cleanupPending || detail.status === 'waiting' && !detail.blockedOn) && <small className="delegation-status">{t(delegationStatus(detail))}</small>}
     </div>)}
     {rows.length > 3 && <div className="delegation-list-controls"><button type="button" onClick={() => setExpanded(value => !value)}>{expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}{t(expanded ? '收起帮手列表' : '展开帮手列表')}</button></div>}
   </section>

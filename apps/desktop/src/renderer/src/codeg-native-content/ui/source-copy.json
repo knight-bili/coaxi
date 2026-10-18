@@ -520,6 +520,18 @@
       "thinking": "思考中…",
       "thoughtForFewSeconds": "思考",
       "thoughtForSeconds": "思考"
+    },
+    "Folder.chat.contentParts.backgroundTask": {
+      "title": "后台任务",
+      "titleWithId": "后台任务 · {id}",
+      "running": "运行中",
+      "completed": "已完成",
+      "failed": "失败",
+      "stopped": "已停止",
+      "exitCode": "退出码 {code}",
+      "polledTimes": "轮询 {count} 次",
+      "runningInBackground": "后台运行",
+      "launchNote": "已在后台运行 · {id}"
     }
   },
   "en": {
@@ -1043,6 +1055,18 @@
       "thinking": "Thinking…",
       "thoughtForFewSeconds": "Thought",
       "thoughtForSeconds": "Thought"
+    },
+    "Folder.chat.contentParts.backgroundTask": {
+      "title": "Background task",
+      "titleWithId": "Background task · {id}",
+      "running": "Running",
+      "completed": "Completed",
+      "failed": "Failed",
+      "stopped": "Stopped",
+      "exitCode": "exit {code}",
+      "polledTimes": "Polled {count} times",
+      "runningInBackground": "Background",
+      "launchNote": "Running in background · {id}"
     }
   }
 }

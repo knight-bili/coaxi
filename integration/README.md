@@ -1,5 +1,7 @@
 # Codeg 与 Rovai 一期完整融合
 
+- [I04 原委派、恢复主卡与后台任务分组工程记录](execution/i04-native-delegation-background-result.json)：完整原组件接入Core User列表与原后台合并；保留元数据/正文边界，真实链路候选仍待集中验证。
+
 当前唯一开发分支为 **`develop/V1.0.0`**，跟踪同名origin分支；一期全部阶段在此累计，不再建立阶段分支。I12工程与客户软件使用验收全部通过后，仍须客户明确指令才合入main。详见[单分支约定](branch-policy.md)。
 
 - [I04 原版帮手、问答、分组与细滚动](execution/i04-native-agent-question-result.json)：原Agent/collab胶囊、完整只读问答/工具分组与Overlay细滚动已接；87项定向、28组产品窗口通过，原函数体和状态/文案可追溯。打开下级仍走Core签发引用；完整委派/恢复/后台、图片和真实链路继续，I04未收口。

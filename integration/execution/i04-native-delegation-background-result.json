@@ -1,0 +1,529 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-18T18:09:00.840344+00:00",
+  "stage": "I04",
+  "task": "I04-T01",
+  "branch": "develop/V1.0.0",
+  "baseline_commit": "243e72676838bcdda03f394a48acfeff72ffd710",
+  "status": "original_core_delegated_resumed_and_background_cards_local_verified_native_tool_correlation_full_content_and_stage_candidate_pending",
+  "scope_preserved": {
+    "source_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_packages": 4,
+    "i04_clusters": 21,
+    "i04_formal_cases": 84,
+    "new_formal_cases_passed": 0
+  },
+  "facts": {
+    "original_complete_presenter_files": 4,
+    "original_complete_pure_parser_files": 1,
+    "original_complete_parser_test_files": 2,
+    "source_ast_body_equal_complete_files": 7,
+    "original_bilingual_catalog_scopes": 2,
+    "original_declarations_verified": 5,
+    "core_current_attempt_required_for_resumed_marker": true,
+    "core_uuid_kept_as_string": true,
+    "core_current_blocked_cleanup_overrides_historical_success": true,
+    "cancelled_and_unknown_never_success": true,
+    "exact_current_parent_list_and_shared_host_navigation": true,
+    "original_trigger_preserved_for_return_focus": true,
+    "body_prefetch_added": false,
+    "raw_query_records_all_preserved": true,
+    "background_poll_latest_status_and_count": true,
+    "settled_running_query_not_spinning": true,
+    "shell_ansi_and_subagent_prose_kept_distinct": true,
+    "source_terminal_real_native_scroll_final_line_reachable": true,
+    "duplicate_permission_note_removed": true,
+    "new_dependencies": 0,
+    "new_rust_api_schema_or_model_input_changes": 0
+  },
+  "seams": [
+    "Core per-card UUID/status/viewer model explicitly replaces original numeric DB/global connection hook; no donor store or execution authority",
+    "existing Core Runtime labels and source Runtime marks replace donor custom-agent registry lookup",
+    "original presentational and pure parser bodies unchanged apart imports; existing Rovai Markdown/Terminal/locale seams remain explicit",
+    "existing Core User list is metadata-only: no fabricated task body or resume reason, child bodies stay in existing viewer; full original parent-tool correlation remains pending"
+  ],
+  "verification": {
+    "targeted_files": 6,
+    "targeted_tests_passed": 116,
+    "typecheck_exit": 0,
+    "source_ast_catalog_types_audit": true,
+    "host_fixture_modes": 2,
+    "host_regression_behavior_groups": 22,
+    "host_additional_source_card_assertions": 4,
+    "background_production_renderer_groups": 15,
+    "original_reference_groups": 4,
+    "visual_review": "4 final rest-state actual production Core list, 2 production native background and 4 fixed original reference screenshots inspected individually; wide/narrow, both themes, meaningful scroll and source status/navigation affordances",
+    "host_regression_screenshots": 8,
+    "host_regression_screenshots_visual_qualification": false,
+    "host_visual_limitation": "behavior fixture screenshots retained; some transition frames stale, not golden visuals; separate settled actual-production list capture is the reviewed final source-card evidence",
+    "same_background_payload_adapted_for_product_and_original": true,
+    "source_reference_full_app": false,
+    "synthetic_transport": true,
+    "real_core_native_web_e2e": false,
+    "real_runtime_or_model": false,
+    "docs_gates": [
+      {
+        "name": "docs-tests",
+        "exit": 0
+      },
+      {
+        "name": "docs-version",
+        "exit": 0
+      },
+      {
+        "name": "docs-base",
+        "exit": 0
+      },
+      {
+        "name": "codegraph-sync",
+        "exit": 0
+      }
+    ],
+    "public_actions_dispatched": 0
+  },
+  "self_review_fixes": [
+    "original custom-agent helper dependency CUSTOM_AGENT_PREFIX restored and five declarations audited",
+    "native TerminalContent uses its own real overflow container, not an Overlay viewport; final-line range geometry checked",
+    "Core view trigger captured from original source button to retain focus for trusted and programmatic activation",
+    "legacy CSS selectors in viewer fixture replaced with stable Core IDs and original accessible labels; every prior behavioral assertion retained",
+    "hidden fixture CSS transitions finish before computed-style checking, separate final frame capture proves actual theme colors; no production theme or GPU setting changed",
+    "reference scene uses explicit display because inline grid overrode native hidden styling",
+    "duplicate permission text removed while preserving question/plan/takeover/cleanup-specific Core notes"
+  ],
+  "remaining": [
+    "full original parent delegate/resume tool association with Core source evidence, original task/resume-reason display and refusal correlation; current metadata-only User list is not substituted for this",
+    "actual statistics and complete original Markdown/HTML interactions, original image gallery/zoom/copy/download and full original App comparisons",
+    "real Core.handle -> Native/Web -> production UI stage candidate, clipped top-level fields, scale/memory/per-page reauthorization/recovery",
+    "Claude full parser/producer/Core association, Qoder root/producer, explicit legacy import, Grok feedback and original T02/T03/T04 union/recovery/memory/automation",
+    "original ansi-to-react complete license evidence or replacement before public binary distribution"
+  ],
+  "current_stage_completed": false,
+  "goal_status": "active",
+  "push": false,
+  "main_merge": false,
+  "release": false,
+  "paid_usage": false,
+  "approved_r1_artifacts": [
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    },
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    }
+  ],
+  "source_files": [
+    {
+      "path": "apps/desktop/src/renderer/src/DelegationViewer.tsx",
+      "sha256": "84feaf6cb19e507e56018159049a718d4637362008f3d373fcd1a539488a71d7",
+      "git_blob_with_filters": "f7fb98bea2ea13a29bcbd720e26af1512df750d4"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/NativeSessionViewer.tsx",
+      "sha256": "582054c0b3475c8d60a35bf62685c1983573d4beb25a9f56cba5b06c0fd8c50a",
+      "git_blob_with_filters": "95525fe9f627d1aab55c7185a58ced2ff208664d"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/types.ts",
+      "sha256": "19ed3a158cbb06b3342f32b0c42b1a9950d4093ac79802cac5b7cd2d9506e987",
+      "git_blob_with_filters": "11debdff3d0daa0d27ebefa080d73d07c3206eea"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/source-rich.css",
+      "sha256": "4b43745e6b896dd9f8303d16522fed83abcc29124950980b1b1edaea84914178",
+      "git_blob_with_filters": "699c027c3fa070942bdd0ac5f9cbffbf2f216541"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-copy.json",
+      "sha256": "37e59b0a288181a05c3447791747aed74f77264c962f7a2c68a02d280b2e5bf7",
+      "git_blob_with_filters": "5c1a94870b11076e313096a1f374b4e61b74f87c"
+    },
+    {
+      "path": "integration/README.md",
+      "sha256": "7866125e8de5ca519fe553d1fe9bebe8d49cddc3367223f972ff1d6ea1c2bcfc",
+      "git_blob_with_filters": "511d60e5738c9e6b6d88247e63d9cfb901c29aab"
+    },
+    {
+      "path": "integration/execution/goal-state.json",
+      "sha256": "03f3e3f0982d79674050fb1592b932b79994443ef3d965c9efb16ba54737aa5d",
+      "git_blob_with_filters": "c5bbb03beac7800479e557af964e483d1878ecd0"
+    },
+    {
+      "path": "integration/inventory/native-session-viewer-ui-reference.md",
+      "sha256": "dbe342b47c1895ebc54284b95d55a1415d14c9f01fd161ccf907c839551b185e",
+      "git_blob_with_filters": "8673766ade2a2be577b81cef1b88d6580e844c40"
+    },
+    {
+      "path": "scripts/fixtures/delegation-viewer/chat-checks.cjs",
+      "sha256": "253374e61c3a24fd81876a5c254f4e42aaf2a2f75fadd1eaf47e4dfca5db1242",
+      "git_blob_with_filters": "1a5a29ac24c73f55726fbb72b7041ae7b35f0769"
+    },
+    {
+      "path": "scripts/fixtures/delegation-viewer/main.cjs",
+      "sha256": "30558c282682c511af693b6e3ac50a02fbd908abfbbd04258eb2c271f1317b8b",
+      "git_blob_with_filters": "d024111ce73e6a66bbd6e08a4a8f1e2085bedb5d"
+    },
+    {
+      "path": "scripts/fixtures/delegation-viewer/renderer.tsx",
+      "sha256": "11db03a18397af1984a66d945fef09257c31db30616cc982e465212c2a4967ff",
+      "git_blob_with_filters": "f90cb86bb98b08f221f62aff195133c17374af38"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/CoreDelegationCard.tsx",
+      "sha256": "d2adf22374ff04b46e15a59dc9b6e786d35168db7914f9d159e6afa65d7b0a62",
+      "git_blob_with_filters": "3f6a715f8be084333081fd77ac77d3c57dbc9aa4"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/background-task-card.tsx",
+      "sha256": "c506cc6ff054fa2ad23a940ba1b6b27772c8700de7a26bb71c93a8c00ef41637",
+      "git_blob_with_filters": "3a72f96cbce9b9a8549c1be3350c893f42f521df"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/delegated-sub-thread.tsx",
+      "sha256": "bbc446edbc54e0248647c58ff650f65c14945697b04b0f3ddfbb319d068a68d0",
+      "git_blob_with_filters": "1d4f2acd84b15bd52ef8259c8c9c664766d4ea4e"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/delegation-card-row.tsx",
+      "sha256": "cd863817fa443793984a01819456c990d075ed9cd251a14cf55ef2379d04b9ed",
+      "git_blob_with_filters": "2773f31f6238dd56c075040b4462b73e21244373"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/resumed-delegation-card.tsx",
+      "sha256": "3d15f852a3ca0c00d3fda0b1f29fe5f16c378e99619e6e4ff6f5841cc277268a",
+      "git_blob_with_filters": "6d71e416f5c394b3d34e4e3e35e957b8e9f6041d"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/background-task.test.ts",
+      "sha256": "75d9b5b0e83f2abf77858dd19c056bc8896b7993e5410e518387e80cc55973c7",
+      "git_blob_with_filters": "87855d03e632ee4701ff2eab0d5c2133470f3d20"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/delegation-card.test.ts",
+      "sha256": "de5d0e7d1dcbec81e27e30e1cd846e0edfb7b11e006e77a2bd61710b68a1d499",
+      "git_blob_with_filters": "fd28cb782eb008855f58689f6e04972f03038eea"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/delegation-card.ts",
+      "sha256": "531955d644c437d4add6d4668669dc017c851a17c51ad8b91ceb37903e28c665",
+      "git_blob_with_filters": "f5f56900e0dea747bfb244b8091e0635265dea4c"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-agent-label.tsx",
+      "sha256": "c8fa9935bc7a81a65ed3f64af1119defb1ca0b69326992064f727f8862a9ed56",
+      "git_blob_with_filters": "34380740b8f08b5ab4fa5588970348782cfa4219"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-delegation-host.tsx",
+      "sha256": "bc0884771b819f09f6ce64c89993b74ea2f4755ee025d8c490974e0305470418",
+      "git_blob_with_filters": "17d0801faabbd5052e4178632c936c1985c25a6b"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-delegation-types.ts",
+      "sha256": "74e6cbad149f798297c22fde88f7a087c8a7b6c28a657565dd1a27fc3bdf3e73",
+      "git_blob_with_filters": "2f5791e3b3ecfd4c25b14ae081de237ae634df2d"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/core-delegation-card.test.ts",
+      "sha256": "251a181d2673af594620dd35af0ff4715beaaebc5a2450fdf4429f1060feccba",
+      "git_blob_with_filters": "27c5244bdf262982d1837b5998e4f206f018bd44"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/core-delegation-card.ts",
+      "sha256": "09f403ec53c9152b3ddbd91a129b3fec84f7ca50587cbfbd4dbb25915c8c2357",
+      "git_blob_with_filters": "eeced88a7b09a11a1eed0002a9cfc75157c76432"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "file/I04委派恢复与后台卡/build-source-style.mjs",
+      "bytes": 8026,
+      "sha256": "5d5c4f69151a1b9d7c79e398de99ae5367fec1a36c095aa80a02e6c59a2fccf8"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/capture-core-list.mjs",
+      "bytes": 1286,
+      "sha256": "e963daf4df3b6986980c27e04131d0a881ff4ca42e7c1a5cad50166f897b40f4"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/card-data.ts",
+      "bytes": 2435,
+      "sha256": "794c11ba01a8039d2ac3970529faa6374dcd1599d25c02f0cc4732a1b4ccf85e"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/extract-types.mjs",
+      "bytes": 2081,
+      "sha256": "9048f4825cd9b5f534cd93bc764611492ffc106d0ee8abcc15d89885dcccfce3"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/inspect-host.cjs",
+      "bytes": 2835,
+      "sha256": "6fcc0f3d4d2b5740a3618ebc4adabf2ebe189e6326e2f0deb74aa6acc04bdf18"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/inspect-host.mjs",
+      "bytes": 728,
+      "sha256": "13f2f25af23de5341c8c8a22495c1ffb3cfbb38e3dd0cf7267479debc552a989"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/port.py",
+      "bytes": 3064,
+      "sha256": "ca84a42e3f1eb6b3a7cecdd33e59788e28c04b52a07fe27658b6ba66d9eb34c9"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/postverify.py",
+      "bytes": 2864,
+      "sha256": "6c37b93433ec7c8599972de393feaebf01dfb48da15a1988add84a8a4ddb4866"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/prepare-record.py",
+      "bytes": 8610,
+      "sha256": "82fba3bd3495f9eaf9058067b52996ff2ed5f4b6e2773aa2cfe4ba590004d698"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/reference-main.cjs",
+      "bytes": 2616,
+      "sha256": "e00984abe74bf9da3ee596d86b922c24ee33d32b034c8f8f38f162cf5f1efbdc"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/reference-renderer.tsx",
+      "bytes": 2157,
+      "sha256": "ba2b975a5ef2146089dddea7a8d32d90f7e2d9cfe7863e033e9281f66e2604f8"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/render-reference.mjs",
+      "bytes": 5061,
+      "sha256": "e3cc15afda5e796f8f4056dfe30b2975e66aa32a7cce6bf94dd83170e354db75"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/render-tools.mjs",
+      "bytes": 2027,
+      "sha256": "c0dd6ea568fd4d10f4fa43e8475ddcc64b70edee1fd6163df566692129057e71"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/renderer.tsx",
+      "bytes": 4205,
+      "sha256": "26f669c5bd8fbbe8943ff7301bc2d2e6fe918cd2664283fe96a52d998d6ce95f"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/source-audit.mjs",
+      "bytes": 3335,
+      "sha256": "92e6ee6446a29d0ff41cac5f06931282a451751dbdad3040d31d7dc7d3056594"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/tools-main.cjs",
+      "bytes": 5561,
+      "sha256": "6dc6a6c550fdabf356500f610768ea60fddcf86e9b05045f50a35b962600fa26"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/verify-docs.ps1",
+      "bytes": 1229,
+      "sha256": "5dddea13a53c7eba58bbaf044562bab6ac236e8423ae18044332e5a19ec01a66"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/logs/source-port.json",
+      "bytes": 2709,
+      "sha256": "a792e6277a025da772975c4037a9213a44bcae88aa4f6499f8d81b860b613b9e"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/logs/source-audit.json",
+      "bytes": 3509,
+      "sha256": "729e3662bc274214e02bba1d8996e21d84a874783cf4d900220e12af20cf8a13"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/logs/types-port.json",
+      "bytes": 448,
+      "sha256": "2de80d157a26acdc4fe2d96cd8c8ac47fbb3a1ec9b9806d355570a4c13f3c8cb"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/logs/style-generation.json",
+      "bytes": 4795,
+      "sha256": "9b778c19e39f99f881a56d1dc227c4fd62d25885389b5ad3809e9a42a884c41f"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/logs/ui-result.json",
+      "bytes": 1995,
+      "sha256": "61969af887b1542240fcbaaa43156ed19ed869b24d35e95ffbf1ab0ea1bf5db5"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/logs/reference-ui.json",
+      "bytes": 1098,
+      "sha256": "b711ec0d5f125d7cf48eda0064e179c75bae9e25c6b6094c51a365539de29f6d"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/logs/host-regression.json",
+      "bytes": 3140,
+      "sha256": "ffdfd88b5a2cc42711446bb59d189f374d77ed77815fd029f6b72784dd1611d1"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/logs/host-regression.log",
+      "bytes": 2516,
+      "sha256": "60b654b463775ad6b1b30085d0beaf2008d3f67cb5e83a1fa98c00e15246e49a"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/logs/host-list-ui.json",
+      "bytes": 775,
+      "sha256": "c81961bbcd2fdcbff574beca51b3ed03968c290cf2e4c9b44e127abe4d42643e"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/logs/host-styles.json",
+      "bytes": 15021,
+      "sha256": "4cdfea3778cdd69c89e70aa18867e9ae9336dd47639fc1d00237a76d4455336f"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/logs/host-styles-before-settled.json",
+      "bytes": 15023,
+      "sha256": "7dc6ed0bc70c79f723c42b5670066bb84dc0d0e5008dc4ec3ca96b7c772008b0"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/logs/tests.log",
+      "bytes": 499,
+      "sha256": "35498bcb760634c01bf59a7a9ff6409d61a2dc73d7165924f32b5e2324fbeb5f"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/logs/types.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/logs/docs-checks.json",
+      "bytes": 222,
+      "sha256": "96450883a2ab502dd6adbd7b2f41fbab28adfc2ccee410e9e99eeb779ebcb70d"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/logs/docs-tests.log",
+      "bytes": 925,
+      "sha256": "d8d03d5bb8dd3a5976570b1f1011eea6801cf75ef35bf19d81186acd489314c5"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/logs/docs-version.log",
+      "bytes": 79,
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/logs/docs-base.log",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/logs/codegraph-sync.log",
+      "bytes": 195,
+      "sha256": "d09ca8783520e4ae210e5a2e88111ff35a69584436053895dd16e8654a959944"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/drafts/product/background-night.png",
+      "bytes": 109848,
+      "sha256": "9294d629b2d33cca245d6f74afcb57607e2ec16e724dde3b4e1dec6b29f2eb4a"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/drafts/product/background-day.png",
+      "bytes": 80137,
+      "sha256": "f1373ac561c6ee3c39252e3c0873ae7ccd54bc42766366c1ebf33ea13f5aeed7"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/drafts/reference/source-night-delegation.png",
+      "bytes": 26606,
+      "sha256": "3630ce24baa8f14f2aaff16a383625a629690c306b47a06c2238670bc02f7dcd"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/drafts/reference/source-night-background.png",
+      "bytes": 76727,
+      "sha256": "df4a5df9305ed52b13321e6338ed6511510b46f5067ac660c312807b756614ef"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/drafts/reference/source-day-delegation.png",
+      "bytes": 26650,
+      "sha256": "a433edb10521696ba3cfad32ed8326893a44a5c5c8d20e9c2d48e8737fa090d9"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/drafts/reference/source-day-background.png",
+      "bytes": 77576,
+      "sha256": "f815b6b13df40062fa780de180eb6efa8b1cb7ad929a3b6cd0a9c7b74f2fbeb8"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/drafts/list-product/list-night-660.png",
+      "bytes": 31392,
+      "sha256": "491eeb436dd412a304a6af51af964cbe60d888d2e141d317dd3501419fdf4aa7"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/drafts/list-product/list-night-390.png",
+      "bytes": 29661,
+      "sha256": "6a60b8551c5dfce37d54e4f0f1293b65d65c0ae60659478a03cea1d980087733"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/drafts/list-product/list-day-660.png",
+      "bytes": 31389,
+      "sha256": "e9bb92a1c57a50cef9f5732e6041e8c697c5c2af12c4cccaf377f429af93f4f1"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/drafts/list-product/list-day-390.png",
+      "bytes": 29601,
+      "sha256": "96e2a045ce0aaa92615b652c3769e5edf76561f5b5c24e52520d35683f2bede8"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/drafts/host-regression/rovai-delegation-viewer-UFz5MR/viewer-day-narrow.png",
+      "bytes": 77287,
+      "sha256": "5b21f2c18545781fb11c2e80dce1d6dc89712133bf4e3e66d88297a8653bc061"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/drafts/host-regression/rovai-delegation-viewer-UFz5MR/viewer-day-wide.png",
+      "bytes": 109855,
+      "sha256": "11b04d1f057b23212fc909883b0be1946474d2b4345fbb4758ad303897e0e055"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/drafts/host-regression/rovai-delegation-viewer-UFz5MR/viewer-night-narrow.png",
+      "bytes": 76833,
+      "sha256": "c4efcda3ff73043ea9dcf62abac1fc903a19575be4bbddb822eaa735143e81ac"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/drafts/host-regression/rovai-delegation-viewer-UFz5MR/viewer-night-wide.png",
+      "bytes": 110118,
+      "sha256": "8f157bed17e6941db0b4d2caa32f984a68e64730f3b5e3bfc5e930a7eb792d9e"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/drafts/host-regression/rovai-delegation-viewer-71TjU7/child-chat-day-narrow.png",
+      "bytes": 60447,
+      "sha256": "15d92ec584b9e1b7347fce762c7b8c9ea90d5f06129666d74f05128522893459"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/drafts/host-regression/rovai-delegation-viewer-71TjU7/child-chat-day-wide.png",
+      "bytes": 128636,
+      "sha256": "717d0e7516e61c8c2e91f47ecfe7f28c3e7bd3f736852f4b9d3561490bf4e2b4"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/drafts/host-regression/rovai-delegation-viewer-71TjU7/child-chat-night-narrow.png",
+      "bytes": 62583,
+      "sha256": "679aed06f2c5cb6197c64e8e50c3dbf4fb69f087fe6305714b33bcee17710716"
+    },
+    {
+      "path": "file/I04委派恢复与后台卡/drafts/host-regression/rovai-delegation-viewer-71TjU7/child-chat-night-wide.png",
+      "bytes": 128467,
+      "sha256": "041094a574f22ecb6bf8e59cfc74c2d10d64b96ba3b3098b410b83f90ef2cc19"
+    }
+  ]
+}

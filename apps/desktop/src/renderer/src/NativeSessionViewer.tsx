@@ -34,6 +34,7 @@ import { NativeFileActionsProvider } from './codeg-native-content/ui/native-file
 import { ReadonlyToolCard, readonlyToolCardKind } from './codeg-native-content/ui/readonly-tool-card'
 import { DelegationStatusGroupCard } from './codeg-native-content/components/message/delegation-status-group-card'
 import { ToolGroupPart } from './codeg-native-content/components/message/tool-group-part'
+import { BackgroundTaskCard } from './codeg-native-content/components/message/background-task-card'
 import { AgentToolCallPart } from './codeg-native-content/components/message/agent-tool-call'
 import { CollabAgentCard } from './codeg-native-content/components/message/collab-agent-card'
 import { SubagentSessionButton } from './codeg-native-content/components/message/subagent-session-button'
@@ -148,7 +149,7 @@ function NativeTranscriptBody({ turns, reader, target, live }: { turns: NativeTr
     if (part.type === 'tool-call') return tool(part, key)
     if (part.type === 'tool-group') return <ToolGroupPart key={key} part={part} renderItem={tool} />
     if (part.type === 'delegation-status-group') return <div className="native-session-source-tool" key={key}><DelegationStatusGroupCard polls={part.polls} />{part.polls.map(item => <NativeRawTool key={item.toolCallId} part={item} />)}</div>
-    if (part.type === 'background-task-group') return <div className="native-session-part-group" key={key}>{part.polls.map((item, index) => tool(item, `${key}:${index}`))}</div>
+    if (part.type === 'background-task-group') return <div className="native-session-source-tool" key={key}><BackgroundTaskCard polls={part.polls} />{part.polls.map(item => <NativeRawTool key={item.toolCallId} part={item} />)}</div>
     if (part.type === 'tool-result') return <NativeTool key={key} result={{ type: 'tool_result', tool_use_id: part.toolCallId, output_preview: part.errorText ?? part.output, is_error: part.state === 'output-error', agent_stats: part.agentStats ? { ...part.agentStats } : null }} reader={reader} target={target} live={false} />
     if (part.type === 'generated-image') return <div key={key}>{part.label && <small>{part.label}</small>}{part.image && <NativeImage image={part.image} />}{part.revisedPrompt && <NativeReasoning text={part.revisedPrompt} imagePrompt />}{!part.image && <p className="native-session-note">{t(part.status === 'failed' ? '图片生成失败。' : live ? '图片尚未生成。' : '这份记录中没有图片内容。')}</p>}</div>
     return null

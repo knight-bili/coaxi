@@ -14,7 +14,7 @@
   "current_branch": "develop/V1.0.0",
   "base_branch": "main",
   "current_task": "I04-T01",
-  "current_slice": "原Agent/collab胶囊、完整只读问答、工具分组及原Overlay细滚动已接；18原文件body/8组双语文案、5问答类型和9思考状态声明核对。87项定向、28组产品窗口与前批回归通过；完整委派/恢复/后台主卡、图片及真实链路继续。",
+  "current_slice": "原委派/恢复主卡与后台任务分组已接；7完整文件/2双语scope，Core列表元数据驱动原主卡、真实attempt恢复标记和当前等待状态；116项定向、生产查看器只读/接管回归与后台界面通过。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,14 +33,14 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "I04-T01：继续原委派/恢复帮手主卡、后台查询组合及统计/Markdown/HTML/图片全部交互；Agent/collab/历史问答/工具组/原细滚动已本地接入验证。完整原App与真实Core/Native/Web候选，阶段分发前补ANSI完整许可。",
+    "I04-T01：原持久工具的委派/恢复父调用与Core来源关联、完整任务/恢复原因展示；当前User子列表按既有合同仅元数据不预读正文。继续实际统计/完整Markdown/HTML/图片，原App同场景与真实Core/Native/Web阶段候选；分发前补ANSI完整许可。",
     "I04-T01/T02：Claude旧agent完整parser、实际home捕获和Core证据关联；Qoder独立根/producer，以及旧无来源的明确导入与完整格式语料核验",
     "I04-T01：Grok修改意见与r1三Context mode/接管衔接；真实Core/Host/Runtime生命周期、Schema升级和恢复矩阵集中候选",
     "I04-T02/T03/T04：Runtime并集、恢复、记忆与自动化原剩余项；完整四包21簇84场景保持，阶段集齐集中构建/少量push和Actions"
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "original_agent_collab_question_group_scroll_local_verified_remaining_delegation_background_images_live_candidate_pending",
+  "current_slice_status": "original_core_delegation_resumed_and_background_cards_local_verified_native_tool_correlation_full_content_and_stage_candidate_pending",
   "evidence": "i04-legacy-agent-source-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -274,7 +274,7 @@
   "i04_native_viewer_ui_evidence": "integration/execution/i04-native-viewer-ui-result.json",
   "i04_native_rich_content_evidence": "integration/execution/i04-native-rich-content-result.json",
   "i04_native_tool_primitives_evidence": "integration/execution/i04-native-tool-primitives-result.json",
-  "current_operation": "I04_original_agent_collab_question_group_scroll_local_verification",
+  "current_operation": "I04原委派/恢复与后台卡已编码且本地验证：当前Core User元数据驱动原主卡和真实恢复标记，后台完整原组件合并查询并保留全部原记录。原父工具来源关联与完整富内容继续，无新增客户依赖。",
   "development_status": "in_progress",
   "branch_policy": "integration/branch-policy.md",
   "branch_unification": {
@@ -295,5 +295,6 @@
   "app_goal_resume": "User confirmed resume on goal card; get_goal verified active 2026-10-19",
   "i04_native_ordinary_tool_evidence": "integration/execution/i04-native-ordinary-tools-result.json",
   "i04_native_specialized_status_evidence": "integration/execution/i04-native-specialized-status-result.json",
-  "i04_native_agent_question_evidence": "integration/execution/i04-native-agent-question-result.json"
+  "i04_native_agent_question_evidence": "integration/execution/i04-native-agent-question-result.json",
+  "native_delegation_background_evidence": "i04-native-delegation-background-result.json"
 }

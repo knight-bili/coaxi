@@ -21,7 +21,7 @@ const approval: ActionApprovalView = { id: 'approval-1', actionId: 'action-1', a
   options: [{ optionId: 'allow-child-1', kind: 'allow_once', label: 'Allow exact child once', consequence: '', nativeResponseDigest: 'response-1' }] }
 const makeDetail = (n: number): DelegationConversationView => ({ delegationId: `delegation-${n}`, threadId: 'thread-a', ownerAgentId: 'owner-a',
   rootConversationId: 'parent-a', parentConversationId: n === 3 ? 'child-1' : 'parent-a', parentDelegationId: n === 3 ? 'delegation-1' : null,
-  conversationId: `child-${n}`, depth: n === 3 ? 2 : 1, currentAttemptNo: 1, controlVersion: 1, takenOver: false, agentRunId: `run-${n}`, executionEpoch: 1,
+  conversationId: `child-${n}`, depth: n === 3 ? 2 : 1, currentAttemptNo: n === 2 ? 2 : 1, controlVersion: 1, takenOver: false, agentRunId: `run-${n}`, executionEpoch: 1,
   status: 'succeeded', agentType: n === 2 ? 'claude_code' : 'codex', createdAt: at, startedAt: at, endedAt: at, cleanupPending: false,
   ...(n === 1 ? { blockedOn: { kind: 'permission' as const, request_id: 'approval-1', title: 'Read child workspace' } } : {}),
   activity: { runs: [run(n)], executionEvidence: [evidence(n)], approvals: n === 1 ? [approval] : [] } })
