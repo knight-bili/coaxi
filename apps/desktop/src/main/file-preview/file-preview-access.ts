@@ -10,6 +10,7 @@ export class FilePreviewAccessError extends Error {
       | 'file_not_found'
       | 'not_regular_file'
       | 'outside_authorized_root'
+      | 'source_not_authorized'
       | 'read_failed',
     message: string
   ) {

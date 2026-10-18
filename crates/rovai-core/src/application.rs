@@ -11815,6 +11815,9 @@ impl Core {
                 Ok(serde_json::to_value(target)?)
             }
             "filePreview.resolveSource" => {
+                if request.params.get("kind").and_then(Value::as_str) == Some("native_child_file") {
+                    return self.native_child_file_source(request.params.clone()).await;
+                }
                 let params: ResolveFilePreviewSourceParams =
                     serde_json::from_value(request.params.clone())?;
                 let database = self.database.lock().await;

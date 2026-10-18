@@ -56,6 +56,15 @@ it('rejects malformed scope, forged owners and attempted legacy scope stripping'
 })
 
 describe('parseOpenFilePreviewRequest', () => {
+  it('accepts only a transient native read reference, never a caller-provided root or restore source', () => {
+    const request = { kind: 'native_child_file', threadId: missionAttachmentRequest.threadId,
+      readId: '11111111-1111-4111-8111-111111111111', rawReference: 'src/中文.ts:5' }
+    expect(parseOpenFilePreviewRequest(request)).toEqual(request)
+    expect(() => parseRestoreFilePreviewRequest(request)).toThrow('Unsupported file preview restore source')
+    for (const extra of [{ rootPath: 'C:/private' }, { workingDirectory: 'D:/current' }, { nativeSessionId: 'arbitrary' }]) {
+      expect(() => parseOpenFilePreviewRequest({ ...request, ...extra })).toThrow('Unsupported native file preview source')
+    }
+  })
   it('accepts a Mission attachment locator', () => {
     expect(parseOpenFilePreviewRequest(missionAttachmentRequest)).toEqual(missionAttachmentRequest)
   })

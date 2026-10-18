@@ -20,8 +20,12 @@ import {
   XCircleIcon,
 } from "lucide-react"
 import { useTranslations } from "../../ui/source-primitives"
+import { isValidElement } from "react"
 
 import { CodeBlock } from "./code-block"
+import { JsonTreeView, parseJsonForTree } from "./json-tree"
+import { UnifiedDiffPreview } from "../diff/unified-diff-preview"
+import { MessageResponse } from "../../ui/source-primitives"
 
 export type ToolProps = ComponentProps<typeof Collapsible>
 
@@ -159,6 +163,252 @@ export const ToolInput = ({ className, input, ...props }: ToolInputProps) => {
       </h4>
       <div className="rounded-md bg-muted/50">
         <CodeBlock code={formattedCode} language="json" />
+      </div>
+    </div>
+  )
+}
+
+function detectOutputLanguage(text: string) {
+  const trimmed = text.trimStart()
+  if (
+    (trimmed.startsWith("{") || trimmed.startsWith("[")) &&
+    (() => {
+      try {
+        JSON.parse(trimmed)
+        return true
+      } catch {
+        return false
+      }
+    })()
+  ) {
+    return "json" as const
+  }
+  if (trimmed.includes("diff --git") || trimmed.includes("@@")) {
+    return "diff" as const
+  }
+  if (trimmed.startsWith("<")) {
+    return "xml" as const
+  }
+  return "log" as const
+}
+
+const ERROR_LIKE_KEYS = [
+  "error",
+  "message",
+  "stderr",
+  "detail",
+  "details",
+  "reason",
+  "text",
+  "output",
+  "formatted_output",
+  "aggregated_output",
+  "result",
+]
+
+function stripErrorPrefix(text: string): string {
+  return text
+    .trim()
+    .replace(/^error:\s*/i, "")
+    .trim()
+}
+
+function normalizeErrorForCompare(text: string): string {
+  return stripErrorPrefix(text).replace(/\s+/g, " ")
+}
+
+function collectErrorCandidates(value: unknown): string[] {
+  if (!value) {
+    return []
+  }
+
+  if (typeof value === "string") {
+    return [value]
+  }
+
+  if (Array.isArray(value)) {
+    return value.flatMap((item) => collectErrorCandidates(item))
+  }
+
+  if (typeof value !== "object") {
+    return []
+  }
+
+  const obj = value as Record<string, unknown>
+  const candidates: string[] = []
+
+  for (const key of ERROR_LIKE_KEYS) {
+    if (!(key in obj)) continue
+    candidates.push(...collectErrorCandidates(obj[key]))
+  }
+
+  return candidates
+}
+
+function parseJson(value: string): unknown | null {
+  try {
+    return JSON.parse(value)
+  } catch {
+    return null
+  }
+}
+
+function formatErrorFieldValue(value: unknown): string {
+  if (typeof value === "string") {
+    return value
+  }
+  try {
+    return JSON.stringify(value, null, 2)
+  } catch {
+    return String(value)
+  }
+}
+
+function renderErrorText(errorText: string): ReactNode {
+  const parsed = parseJson(errorText.trim())
+
+  if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+    const entries = Object.entries(parsed as Record<string, unknown>)
+    if (entries.length > 0) {
+      return (
+        <div className="space-y-2 p-3">
+          {entries.map(([key, value]) => (
+            <div key={key} className="space-y-1">
+              <div className="text-2xs font-medium uppercase tracking-wide text-destructive/80">
+                {key}
+              </div>
+              <pre className="whitespace-pre-wrap break-words font-mono text-xs text-destructive">
+                {formatErrorFieldValue(value)}
+              </pre>
+            </div>
+          ))}
+        </div>
+      )
+    }
+  }
+
+  return (
+    <pre className="whitespace-pre-wrap break-words p-3 font-mono text-xs text-destructive">
+      {errorText}
+    </pre>
+  )
+}
+
+function isDuplicateErrorOutput(
+  output: ToolPart["output"],
+  normalizedErrorText: string | null
+): boolean {
+  if (!normalizedErrorText || !output) {
+    return false
+  }
+
+  const rawCandidates: string[] = []
+  if (typeof output === "string") {
+    rawCandidates.push(output)
+    const parsed = parseJson(output)
+    if (parsed) {
+      rawCandidates.push(...collectErrorCandidates(parsed))
+    }
+  } else if (typeof output === "object" && !isValidElement(output)) {
+    rawCandidates.push(...collectErrorCandidates(output))
+  }
+
+  return rawCandidates.some((candidate) => {
+    const normalizedCandidate = normalizeErrorForCompare(candidate)
+    return (
+      normalizedCandidate.length > 0 &&
+      normalizedCandidate === normalizedErrorText
+    )
+  })
+}
+
+export type ToolOutputProps = ComponentProps<"div"> & {
+  output: ToolPart["output"]
+  errorText: ToolPart["errorText"]
+  renderAsMarkdown?: boolean
+}
+
+const MD_INDICATORS = [
+  /^#{1,6}\s/m,
+  /^\s*[-*+]\s/m,
+  /^\s*\d+\.\s/m,
+  /\*\*[^*]+\*\*/,
+  /\[.+\]\(.+\)/,
+  /```[\s\S]*?```/,
+  /^\s*>/m,
+  /^\|.+\|$/m,
+]
+
+function looksLikeMarkdown(text: string): boolean {
+  let count = 0
+  for (const re of MD_INDICATORS) {
+    if (re.test(text)) count++
+    if (count >= 2) return true
+  }
+  return false
+}
+
+export const ToolOutput = ({
+  className,
+  output,
+  errorText,
+  renderAsMarkdown,
+  ...props
+}: ToolOutputProps) => {
+  const t = useTranslations("Folder.chat.tool")
+  if (!(output || errorText)) {
+    return null
+  }
+
+  const normalizedErrorText =
+    typeof errorText === "string" ? normalizeErrorForCompare(errorText) : null
+  const hasDuplicateErrorOutput = isDuplicateErrorOutput(
+    output,
+    normalizedErrorText
+  )
+
+  let Output = <div>{output as ReactNode}</div>
+
+  if (typeof output === "object" && !isValidElement(output)) {
+    // Unadapted structured result: a collapsible tree instead of a wall of
+    // pretty-printed JSON (`JsonTreeView` falls back to the code block itself
+    // for scalars and oversized payloads).
+    Output = <JsonTreeView value={output} />
+  } else if (typeof output === "string") {
+    const lang = detectOutputLanguage(output)
+    const jsonValue = lang === "json" ? parseJsonForTree(output) : undefined
+    const shouldRenderMd =
+      renderAsMarkdown ?? (lang === "log" && looksLikeMarkdown(output))
+    if (jsonValue !== undefined) {
+      Output = <JsonTreeView value={jsonValue} rawText={output} />
+    } else if (shouldRenderMd) {
+      Output = (
+        <div className="prose prose-sm dark:prose-invert max-w-none p-3 text-sm [&_ul]:list-inside [&_ol]:list-inside">
+          <MessageResponse>{output}</MessageResponse>
+        </div>
+      )
+    } else if (lang === "diff") {
+      Output = <UnifiedDiffPreview diffText={output} clickableFilePath />
+    } else {
+      Output = <CodeBlock code={output} language={lang} />
+    }
+  }
+
+  return (
+    <div className={cn("space-y-2", className)} {...props}>
+      <h4 className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
+        {errorText ? t("error") : t("result")}
+      </h4>
+      <div
+        className={cn(
+          "overflow-x-auto rounded-md text-xs [&_table]:w-full",
+          errorText
+            ? "bg-destructive/10 text-destructive"
+            : "bg-muted/50 text-foreground"
+        )}
+      >
+        {typeof errorText === "string" && renderErrorText(errorText)}
+        {!hasDuplicateErrorOutput && Output}
       </div>
     </div>
   )

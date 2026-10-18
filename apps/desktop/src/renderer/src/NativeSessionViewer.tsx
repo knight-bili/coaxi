@@ -1,7 +1,7 @@
 // Codeg aff1e6c components/message/subagent-session-dialog.tsx: readonly
 // non-modal drawer, 16px body column, role asides and preserved refresh body.
 // Core authority + shared Rovai Markdown are the integration seams.
-import { useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
+import { useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { Drawer } from '@base-ui/react/drawer'
 import { Brain, ChevronDown, Eye, Loader2, RefreshCw, X } from 'lucide-react'
 import { NativeChildReader, type NativeTranscriptBlock, type NativeTranscriptTurn } from './native-child-reader'
@@ -29,6 +29,9 @@ import { JsonTreeView, parseJsonForTree } from './codeg-native-content/component
 import { Terminal } from './codeg-native-content/components/ai-elements/terminal'
 import { parseCodexCommandEnvelope } from './codeg-native-content/lib/codex-command-action'
 import { isShellSessionToolName } from './codeg-native-content/lib/shell-session-tool'
+import { ToolCallPart as OrdinaryToolCallPart } from './codeg-native-content/components/message/ordinary-tool-call'
+import { NativeFileActionsProvider } from './codeg-native-content/ui/native-file-actions'
+import { useOptionalFilePreview } from './FilePreviewContext'
 import './codeg-native-content/source-rich.css'
 
 function readMessage(code: string): string {
@@ -86,6 +89,15 @@ type ToolUse = Extract<NativeTranscriptBlock, { type: 'tool_use' }>
 type ToolResult = Extract<NativeTranscriptBlock, { type: 'tool_result' }>
 function NativeTranscriptBody({ turns, reader, target, live }: { turns: NativeTranscriptTurn[]; reader: NativeChildReader; target: NativeSessionTarget; live: boolean }): React.JSX.Element {
   const language = useInterfaceLanguage(), t = useUiText(), planText = useTranslations('Folder.chat.proposedPlan')
+  const filePreview = useOptionalFilePreview()
+  const openFile = useCallback(async (rawReference: string, line?: number | null): Promise<void> => {
+    const source = reader.fileSource()
+    if (!source || !filePreview) throw new Error('native_child.source_unavailable')
+    const outcome = await filePreview.open({ kind: 'native_child_file', ...source, rawReference },
+      line != null && Number.isSafeInteger(line) && line > 0 ? { line } : undefined,
+      undefined, { commitOnSuccess: true, revalidateSource: true })
+    if (outcome.kind === 'error') throw new Error('native_child.file_unavailable')
+  }, [reader, filePreview])
   const text = useMemo<AdapterMessageText>(() => ({
     attachedResources: language === 'en' ? 'Attached resources' : '附加资源',
     toolCallFailed: language === 'en' ? 'Tool call failed' : '工具调用失败',
@@ -105,6 +117,11 @@ function NativeTranscriptBody({ turns, reader, target, live }: { turns: NativeTr
     const original = raw?.type === 'tool_use' ? results.get(raw) : undefined
     const result: ToolResult | undefined = original ? { ...original, images: undefined } : part.output !== undefined || part.errorText !== undefined
       ? { type: 'tool_result', tool_use_id: part.toolCallId, output_preview: part.errorText ?? part.output ?? null, is_error: part.state === 'output-error', agent_stats: part.agentStats ? { ...part.agentStats } : null } : undefined
+    // Dedicated agent/interaction cards retain their existing child-session route
+    // until their fixed source components are ported in the next finite batch.
+    const specialized = /^(agent|task|collab_agent|delegate_to_agent|check_delegation|cancel_delegation|resume_delegation|ask_user_question|check_user_feedback)$/.test(name.toLowerCase())
+      || name.startsWith('mcp__') || nativeToolChildren(use, result).length > 0
+    if (!specialized) return <NativeOrdinaryTool key={key} part={part} />
     return <NativeTool key={key} use={use} result={result} reader={reader} target={target} live={live} />
   }
   const renderPart = (part: AdaptedContentPart, key: string, user = false): React.ReactNode => {
@@ -121,11 +138,23 @@ function NativeTranscriptBody({ turns, reader, target, live }: { turns: NativeTr
     if (part.type === 'generated-image') return <div key={key}>{part.label && <small>{part.label}</small>}{part.image && <NativeImage image={part.image} />}{part.revisedPrompt && <NativeReasoning text={part.revisedPrompt} imagePrompt />}{!part.image && <p className="native-session-note">{t(part.status === 'failed' ? '图片生成失败。' : live ? '图片尚未生成。' : '这份记录中没有图片内容。')}</p>}</div>
     return null
   }
-  return <div className="native-session-transcript codeg-native-rich">{messages.map((message, turnIndex) => <section key={`${message.id}:${turnIndex}`} className={message.role === 'user' ? 'native-session-input-turn' : 'native-session-turn'}>
+  return <NativeFileActionsProvider open={filePreview ? openFile : null}><div className="native-session-transcript codeg-native-rich">{messages.map((message, turnIndex) => <section key={`${message.id}:${turnIndex}`} className={message.role === 'user' ? 'native-session-input-turn' : 'native-session-turn'}>
     {message.content.map((part, index) => renderPart(part, `${message.id}:${index}`, message.role === 'user'))}
     {message.userResources?.map((resource, index) => <span className="native-session-resource" title={resource.uri} key={`resource:${index}`}>{resource.name}</span>)}
     {message.userImages?.map((image, index) => <NativeImage image={image} key={`image:${index}`} />)}
-  </section>)}</div>
+  </section>)}</div></NativeFileActionsProvider>
+}
+function NativeOrdinaryTool({ part }: { part: AdaptedToolCallPart }): React.JSX.Element {
+  const t = useUiText()
+  return <div className="native-session-source-tool"><OrdinaryToolCallPart part={part} />
+    <details className="native-session-reasoning"><summary><span>{t('原始工具记录')}</span><ChevronDown size={14} /></summary>
+      {part.input != null && <NativeToolValue label={t('输入')} value={part.input} />}
+      {part.output != null && <NativeToolValue label={t('原始结果')} value={part.output} />}
+      {part.errorText != null && <NativeToolValue label={t('错误')} value={part.errorText} />}
+      {part.meta != null && <NativeToolValue label={t('工具信息')} value={JSON.stringify(part.meta, null, 2)} />}
+      {part.agentStats != null && <NativeToolValue label={t('帮手执行记录')} value={JSON.stringify(part.agentStats, null, 2)} />}
+    </details>
+  </div>
 }
 function NativeReasoning({ text, imagePrompt = false }: { text: string; imagePrompt?: boolean }): React.JSX.Element {
   const t = useUiText()

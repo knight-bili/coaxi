@@ -185,6 +185,10 @@ function referenceFileName(value: string): string {
 
 export function filePreviewSourceKey(request: OpenFilePreviewRequest): string {
   switch (request.kind) {
+    case 'native_child_file': {
+      const path = parseFileReference(request.rawReference)?.pathPart ?? request.rawReference
+      return `native-child:${request.threadId}:${request.readId}:${path}`
+    }
     case 'skill_reference':
       return `skill:${request.threadId}:${request.skillId}`
     case 'message_reference': {
@@ -248,7 +252,7 @@ export function stableFilePreviewSourceKey(
   request: OpenFilePreviewRequest,
   presentation: Pick<FilePreviewPresentation, 'displayPath' | 'pathPresentation'>
 ): string {
-  if ('threadId' in request && presentation.pathPresentation === 'project_relative') {
+  if ('threadId' in request && request.kind !== 'native_child_file' && presentation.pathPresentation === 'project_relative') {
     return `workspace:${request.threadId}:${presentation.displayPath}`
   }
   return filePreviewSourceKey(request)
@@ -257,7 +261,7 @@ export function stableFilePreviewSourceKey(
 export function restorableFilePreviewRequest(
   request: OpenFilePreviewRequest
 ): RestorableFilePreviewRequest | null {
-  return request.kind === 'child_of_handle' || request.kind === 'authorized_root'
+  return request.kind === 'child_of_handle' || request.kind === 'authorized_root' || request.kind === 'native_child_file'
     ? null
     : request
 }
@@ -267,6 +271,9 @@ export function resolvedFilePreviewSource(
   file: Pick<ResolvedFilePreview, 'displayPath' | 'pathPresentation' | 'restoreRequest'>,
   fallbackRequest?: OpenFilePreviewRequest | null
 ): { sourceRequest: OpenFilePreviewRequest; sourceKey: string } {
+  if (request.kind === 'native_child_file') {
+    return { sourceRequest: request, sourceKey: filePreviewSourceKey(request) }
+  }
   const sourceRequest = file.restoreRequest
     ?? restorableFilePreviewRequest(request)
     ?? (fallbackRequest ? restorableFilePreviewRequest(fallbackRequest) : null)

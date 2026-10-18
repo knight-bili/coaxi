@@ -24,6 +24,20 @@ function snapshot(fileName: string): FilePreviewSessionSnapshot {
 }
 
 describe('file preview session identity', () => {
+  it('keeps native read leases separate from current workspace and refuses durable restoration', () => {
+    const request = { kind: 'native_child_file' as const, threadId: 'thread', readId: 'lease-a', rawReference: 'src/a.ts:20' }
+    const key = filePreviewSourceKey(request)
+    expect(key).toBe(filePreviewSourceKey({ ...request, rawReference: 'src/a.ts#L3' }))
+    expect(key).not.toBe(filePreviewSourceKey({ ...request, readId: 'lease-b' }))
+    expect(key).not.toBe(filePreviewSourceKey({ ...request, threadId: 'other' }))
+    expect(key).not.toBe(filePreviewSourceKey({ kind: 'camp_workspace', threadId: 'thread', rawReference: 'src/a.ts' }))
+    expect(stableFilePreviewSourceKey(request, { displayPath: 'src/a.ts', pathPresentation: 'project_relative' })).toBe(key)
+    expect(restorableFilePreviewRequest(request)).toBeNull()
+    expect(resolvedFilePreviewSource(request, { displayPath: 'src/a.ts', pathPresentation: 'project_relative',
+      restoreRequest: { kind: 'camp_workspace', threadId: 'thread', rawReference: 'src/a.ts' } },
+      { kind: 'camp_workspace', threadId: 'thread', rawReference: 'src/a.ts' }))
+      .toEqual({ sourceRequest: request, sourceKey: key })
+  })
   it('keeps child draft, retained and published message previews separate from ordinary private previews', () => {
     const base = { threadId: 'thread', conversationId: 'conversation', attachmentRefId: 'file', composerScope: null }
     const key = (locator: import('@contracts').LocalAttachmentOwnerLocator) => filePreviewSourceKey({ kind: 'attachment', threadId: base.threadId, locator })

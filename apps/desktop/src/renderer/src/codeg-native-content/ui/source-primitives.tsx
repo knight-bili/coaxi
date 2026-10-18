@@ -15,8 +15,8 @@ export function useTranslations(scope: string): (key: string, values?: Record<st
   return (key, values) => formatSourceCopy(language, scope, key, values)
 }
 export function MessageResponse({ children }: { children: string }): React.JSX.Element { return <SafeMarkdown>{children}</SafeMarkdown> }
-export function ScrollArea({ children, className }: { children: ReactNode; className?: string }): React.JSX.Element {
-  return <div className={cn('codeg-source-scroll', className)}>{children}</div>
+export function ScrollArea({ children, className, x, y, onViewportRef, ...props }: ComponentProps<'div'> & { x?: 'scroll' | 'hidden'; y?: 'scroll' | 'hidden'; onViewportRef?: React.Ref<HTMLDivElement> }): React.JSX.Element {
+  return <div {...props} ref={onViewportRef} className={cn('codeg-source-scroll', className)} style={{ ...props.style, ...(x ? { overflowX: x === 'hidden' ? 'hidden' : 'auto' } : {}), ...(y ? { overflowY: y === 'hidden' ? 'hidden' : 'auto' } : {}) }}>{children}</div>
 }
 // Original Badge's outline/secondary variants used by PlanCard. No link or
 // mutable badge action exists in this readonly surface.

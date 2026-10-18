@@ -68,6 +68,7 @@ export function parseCoreFilePreviewAuthorityResult(
     || !isAbsolute(value.basePath)
     || value.allowChildren !== true
   ) return null
+  if (request.kind === 'native_child_file' && value.sourceIdentity !== `native-child:${request.readId}`) return null
   if (request.kind === 'run_evidence') {
     if (value.sourceKind !== 'run_evidence' || !boundedString(value.rawReference)) return null
   } else if (value.rawReference !== request.rawReference) return null

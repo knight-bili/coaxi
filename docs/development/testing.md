@@ -14,6 +14,13 @@ last_updated: 2026-10-18
 集中到阶段候选；公共契约、安全/迁移或阻断后续开发时允许有原因的最小验证。
 以下owner、命令和测试准入规则继续有效，未执行的检查登记待验，不因减少触发次数而删测试或假报通过。
 
+I04 原生工具文件点击扩原 source filesystem owner 的 `reader_tests.rs`，不新增 Rust owner、SQLite 或进程。
+沿同一已核实读取验证 Ready、原 User/绑定、捕获目录、关闭和 Reading 状态；旧无目录记录不能回退当前工程。
+Main 原 file-preview-service owner 负责真实受控文件、绝对/相对/目录联接越界、后续链接继承与每次读前后重授权；
+Renderer 原 reader/session/IPC owner 负责完整页发布后才有来源、刷新换代及禁止持久恢复瞬时 readId。
+这项安全边界允许一次最低 locked extended lib 编译，精确列册并运行原 source owner；不执行整套编译/回归或 Actions。
+组件与替身通过不等于真实 Core.handle、Native/Web、完整原 App 或真实模型验证，不增加 84 个正式场景通过数。
+
 I04 原生后台读取继续扩同一source filesystem owner，helper为 `runtime_subagent_session/reader_tests.rs`，沿该owner的原自建文件目录，无新Rust owner/SQLite/外部进程。原读取只在调用线程执行、没有后台槽位和关闭租约；本批检查真实Codex源经worker返回完整页（Grok完整源解码沿同一原owner保留前批资格）、原readId重试不新开worker、错User/scope/未知字段拒绝、核实后代及父窗口关闭后仍复核原Core归属、错误脱敏、四个真实线程由通道固定在读取中、关闭后槽位不提前释放/迟到成功不发布、16缓存上限/确定性空闲过期/快照释放和关闭先于启动的租约墓碑。使用有界独立std线程而非Tokio blocking池，卡住FS不阻止Runtime退出；不依赖睡眠碰线程时序。公共Core四入口每次poll/page重做resolve，关闭只清理阅读；Native名单、Web方法和投影由原Desktop runtime-core-methods、Web client既有owner和rovai-web原projection owner扩展，不把名单/替身当真实HTTP/GUI。后台取消及User-only公共边界接线前允许一次最低locked extended lib编译并精确运行source owner，同时只编译/运行rovai-web原projection owner；不执行整套slow/App/Actions，实际Core/Host/HTTP/原UI仍留候选验证，不增加84正式通过数。
 
 I04 原生完整投影分页继续扩现有 `runtime_subagent_session::source::tests::lineage_sources_keep_exact_rollouts_and_lossless_stable_chunks`，helper为 `source/snapshot_tests.rs` 和私有 `snapshot_tests.rs`，复用原文件owner的同一自建目录，不新增Rust测试owner、数据库或进程。此前大于1MiB的Grok父关联记录/metadata会被跳过，完整JSON直接跨运输也缺少冻结身份与边界；本批验证完整父关联解码、首次发现/hash前取消、整份原消息/工具JSON/统计的UTF8分页重组与摘要、签名篡改/快照混用/越界/错User或身份来源拒绝、仅为已核实后代签发引用、序列化分块停止后零追加。调用者仍须在每页重新做Core授权；这些组件检查不证明后台任务注册、公开Native/Web运输、原版UI或真实Runtime已完成。因签名读取权限和来源边界需先核实再接公开运输，允许一次最低 `cargo test --locked -p rovai-core --features extended-tests --lib --no-run`，然后同二进制精确列册并运行该原owner；不运行整套slow/App/Actions，不增加84正式场景通过数。

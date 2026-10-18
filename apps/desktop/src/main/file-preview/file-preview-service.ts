@@ -79,7 +79,7 @@ export type FilePreviewAuthorityResult =
   | {
       kind: 'file_target'
       threadId: string
-      sourceKind: 'skill_reference' | 'message_reference' | 'camp_workspace' | 'attachment' | 'run_evidence' | 'run_activity_file'
+      sourceKind: 'skill_reference' | 'message_reference' | 'camp_workspace' | 'attachment' | 'run_evidence' | 'run_activity_file' | 'native_child_file'
       sourceIdentity: string
       rootPath: string
       basePath: string
@@ -122,6 +122,7 @@ interface ResolvedTarget {
   canShowPath?: boolean
   allowChildren: boolean
   projectRoot?: string | null
+  nativeAuthority?: Extract<OpenFilePreviewRequest, { kind: 'native_child_file' }>
 }
 
 type SupportedClassification = Omit<FilePreviewClassification, 'kind'> & { kind: FilePreviewKind }
@@ -398,7 +399,7 @@ export class FilePreviewService {
     webContentsId: number,
     request: OpenFilePreviewRequest
   ): Promise<FilePreviewOperationResult<OpenFilePreviewResult>> {
-    if (request.kind === 'child_of_handle' || request.kind === 'authorized_root') {
+    if (request.kind === 'child_of_handle' || request.kind === 'authorized_root' || request.kind === 'native_child_file') {
       return failed('source_not_authorized', '这个文件访问已失效。')
     }
     return this.#open(webContentsId, request, RESTORE_OPEN_POLICY)
@@ -699,6 +700,7 @@ export class FilePreviewService {
 
     let opened: OpenedPreviewFile | null = null
     try {
+      if (record.reopenTarget.nativeAuthority) await this.#resolveReopenTarget(record)
       const relativePath = parsed.pathSegments.join('/')
       const mime = htmlAssetMime(relativePath)
       if (!mime) return new Response(null, { status: 415 })
@@ -709,6 +711,7 @@ export class FilePreviewService {
       if (opened.version.size > limit) return new Response(null, { status: 413 })
       const bytes = Buffer.alloc(opened.version.size)
       const { bytesRead } = await opened.file.read(bytes, 0, bytes.byteLength, 0)
+      if (record.reopenTarget.nativeAuthority) await this.#resolveReopenTarget(record)
       token.expiresAt = Number.POSITIVE_INFINITY
       record.lastUsedAt = Date.now()
       const headers = {
@@ -914,17 +917,20 @@ export class FilePreviewService {
       const parent = this.#recordOrNull(webContentsId, request.parentHandleId)
       if (!parent || !parent.allowChildren) return null
       this.#requireSession(webContentsId, parent.threadId)
+      const inherited = parent.reopenTarget.nativeAuthority
+        ? await this.#resolveReopenTarget(parent) : parent.reopenTarget
       return {
         kind: 'file_target',
         threadId: parent.threadId,
-        sourceKind: request.kind,
+        sourceKind: inherited.nativeAuthority ? 'native_child_file' : request.kind,
         sourceIdentity: `child:${parent.previewKey}:${request.rawReference}`,
         rootPath: parent.canonicalRoot,
         basePath: dirname(parent.canonicalPath),
         rawReference: request.rawReference,
         openRisk: 'normal',
         allowChildren: true,
-        projectRoot: parent.projectRoot
+        projectRoot: parent.projectRoot,
+        nativeAuthority: inherited.nativeAuthority
       }
     }
     if (request.kind === 'authorized_root') {
@@ -962,6 +968,11 @@ export class FilePreviewService {
     policy: FilePreviewOpenPolicy,
     protectedHandleId?: string
   ): Promise<FilePreviewOperationResult<OpenFilePreviewResult>> {
+    const nativeAuthority = request.kind === 'native_child_file' ? request
+      : 'nativeAuthority' in target ? target.nativeAuthority : undefined
+    if (target.sourceKind === 'native_child_file' && !nativeAuthority) {
+      return failed('source_not_authorized', '文件访问已失效')
+    }
     const parsed = this.#parsedReference(target)
     const candidatePath = await this.#candidatePath(target, parsed)
     const fileAccessOptions = this.#fileAccessOptions(target)
@@ -1058,7 +1069,7 @@ export class FilePreviewService {
     }
     const handleId = randomUUID()
     const previewKey = createHash('sha256')
-      .update(`${webContentsId}\0${target.threadId}\0${opened.canonicalPath}`)
+      .update(`${webContentsId}\0${target.threadId}\0${opened.canonicalPath}${nativeAuthority ? `\0native-child:${nativeAuthority.readId}` : ''}`)
       .digest('hex')
     const allowChildren = target.allowChildren ?? target.sourceKind !== 'attachment'
     const capabilities: FilePreviewCapability[] = ['read', 'open_in_system']
@@ -1067,7 +1078,8 @@ export class FilePreviewService {
       capabilities.push('preview_asset')
     }
     const pathProjection = await this.#pathProjection(target, opened)
-    const restoreRequest = await this.#independentRestoreRequest(request, target.threadId, opened.canonicalPath)
+    const restoreRequest = target.sourceKind === 'native_child_file' ? undefined
+      : await this.#independentRestoreRequest(request, target.threadId, opened.canonicalPath)
     try {
       this.#requireBinding(webContentsId, binding, target.threadId)
     } catch (error) {
@@ -1097,6 +1109,7 @@ export class FilePreviewService {
       request,
       reopenTarget: {
         ...target,
+        nativeAuthority,
         target: parsed.target,
         openRisk: target.openRisk ?? 'normal',
         allowChildren,
@@ -1211,7 +1224,7 @@ export class FilePreviewService {
   }
 
   #fileAccessOptions(target: { sourceKind: OpenFilePreviewRequest['kind'] }): { allowExternalFile: boolean } {
-    return { allowExternalFile: target.sourceKind !== 'authorized_root' }
+    return { allowExternalFile: target.sourceKind !== 'authorized_root' && target.sourceKind !== 'native_child_file' }
   }
 
   #parsedReference(target: { rawReference?: string; candidatePath?: string; target?: FileLocationTarget }): ParsedFileReference {
@@ -1351,6 +1364,7 @@ export class FilePreviewService {
   async #readAt(record: PreviewHandleRecord, position: number, length: number): Promise<Uint8Array> {
     record.activeReads = (record.activeReads ?? 0) + 1
     try {
+    if (record.reopenTarget.nativeAuthority) await this.#resolveReopenTarget(record)
     const buffer = Buffer.alloc(length)
     const file = await this.#ensureFile(record)
     const before = await fileHandleVersion(file)
@@ -1359,6 +1373,7 @@ export class FilePreviewService {
       throw new FilePreviewAccessError('read_failed', '文件已有更新，请重新加载。')
     }
     const { bytesRead } = await file.read(buffer, 0, length, position)
+    if (record.reopenTarget.nativeAuthority) await this.#resolveReopenTarget(record)
     const after = await fileHandleVersion(file)
     if (!contentVersionMatches(record.version, after)) {
       await this.#retireChangedFile(record, file)
@@ -1447,6 +1462,15 @@ export class FilePreviewService {
   }
 
   async #resolveReopenTarget(record: PreviewHandleRecord): Promise<ResolvedTarget> {
+    if (record.reopenTarget.nativeAuthority) {
+      const source = await this.#authority.resolve(record.reopenTarget.nativeAuthority)
+      if (!source || source.kind !== 'file_target' || source.sourceKind !== 'native_child_file'
+        || source.threadId !== record.threadId || !source.allowChildren
+        || await canonicalizeExistingPath(source.rootPath).catch(() => null) !== record.canonicalRoot) {
+        throw new FilePreviewAccessError('source_not_authorized', '文件访问已失效')
+      }
+      return record.reopenTarget
+    }
     if (record.request.kind === 'child_of_handle') return record.reopenTarget
     const target = await this.#resolveTarget(record.webContentsId, record.request)
     if (

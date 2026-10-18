@@ -81,6 +81,40 @@ pub(in crate::runtime_subagent_session) fn assert_read_workers(root: &ObservedNa
     let view = registry.poll(&actor, &first.read_id, root).unwrap();
     assert_eq!(view.state, "ready");
     assert_eq!(view.core_generation, "core-generation");
+    assert!(
+        registry.file_target(&actor, &first.read_id, root).is_err(),
+        "old records without a captured working directory cannot acquire today's directory"
+    );
+    let mut captured = root.clone();
+    captured.recorded_working_directory = root.recorded_home.clone();
+    let file_registry = Registry::new("file-generation".into());
+    let file_read = request(&captured);
+    file_registry
+        .start_with(file_read.clone(), &captured, &actor, |target, _| {
+            Ok(empty_snapshot(&target, &[]))
+        })
+        .unwrap();
+    settled(&file_registry);
+    assert_eq!(
+        file_registry
+            .file_target(&actor, &file_read.read_id, &captured)
+            .unwrap()
+            .recorded_working_directory,
+        captured.recorded_working_directory
+    );
+    let mut wrong_root = captured.clone();
+    wrong_root.binding_generation += 1;
+    assert!(
+        file_registry
+            .file_target(&actor, &file_read.read_id, &wrong_root)
+            .is_err()
+    );
+    file_registry.close(&actor, &file_read.read_id).unwrap();
+    assert!(
+        file_registry
+            .file_target(&actor, &file_read.read_id, &captured)
+            .is_err()
+    );
     let reference = view.snapshot_reference.unwrap();
     let body = registry
         .page(&actor, page(&first, reference.clone()), root)
@@ -149,6 +183,7 @@ pub(in crate::runtime_subagent_session) fn assert_read_workers(root: &ObservedNa
                 .is_err()
         );
         assert!(registry.close(&bad, &first.read_id).is_err());
+        assert!(registry.file_target(&bad, &first.read_id, root).is_err());
     }
     let mut invalid = first.clone();
     invalid.read_id = "arbitrary-source-path".into();
@@ -272,6 +307,11 @@ pub(in crate::runtime_subagent_session) fn assert_read_workers(root: &ObservedNa
             })
             .unwrap();
         assert_eq!(view.state, "reading");
+        assert!(
+            registry
+                .file_target(&actor, ids.last().unwrap(), root)
+                .is_err()
+        );
         stops.push(receive_start.recv_timeout(Duration::from_secs(3)).unwrap());
         controls.push(release);
     }

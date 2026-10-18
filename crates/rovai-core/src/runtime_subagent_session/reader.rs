@@ -376,6 +376,36 @@ impl Registry {
             request.max_bytes.unwrap_or(snapshot::MAX_WINDOW_BYTES),
         )
     }
+    /// File actions share the active, lineage-verified read and its captured
+    /// Host directory; today's Camp and transcript text cannot mint a root.
+    pub(crate) fn file_target(
+        &self,
+        actor: &ActorRef,
+        id: &str,
+        root: &ObservedNativeSessionTarget,
+    ) -> Result<ObservedNativeSessionTarget> {
+        user(actor)?;
+        read_id(id)?;
+        let mut entries = self.entries()?;
+        self.reap(&mut entries)?;
+        let entry = entries.get(id).context("native_child.read_missing")?;
+        let target = entry.target(actor, root)?;
+        let mut data = entry.data()?;
+        ensure!(
+            matches!(&data.state, State::Ready(_)),
+            "native_child.read_not_ready"
+        );
+        ensure!(
+            target
+                .recorded_working_directory
+                .as_ref()
+                .is_some_and(|path| path.is_absolute()),
+            "native_child.source_unavailable"
+        );
+        data.last_used = Instant::now();
+        Ok(target)
+    }
+
     /// Cleanup is Current User-only and idempotent even after source deletion.
     /// It grants no content and never sends cancellation to the agent Runtime.
     pub(crate) fn close(&self, actor: &ActorRef, id: &str) -> Result<()> {

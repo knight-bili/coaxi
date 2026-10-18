@@ -173,6 +173,11 @@ export function parseOpenFilePreviewRequest(value: unknown): OpenFilePreviewRequ
         evidenceFileId: string(input.evidenceFileId, 256),
         action: input.action
       }
+    case 'native_child_file':
+      if (Object.keys(input).some(key => !['kind', 'threadId', 'readId', 'rawReference'].includes(key))) {
+        throw new Error('Unsupported native file preview source')
+      }
+      return { kind: input.kind, threadId: threadId(input.threadId), readId: string(input.readId, 128), rawReference: string(input.rawReference) }
     case 'run_activity_file':
       return {
         kind: input.kind,
@@ -206,7 +211,7 @@ export function parseOpenFilePreviewRequest(value: unknown): OpenFilePreviewRequ
 
 export function parseRestoreFilePreviewRequest(value: unknown): RestoreFilePreviewRequest {
   const request = parseOpenFilePreviewRequest(value)
-  if (request.kind === 'child_of_handle' || request.kind === 'authorized_root') {
+  if (request.kind === 'child_of_handle' || request.kind === 'authorized_root' || request.kind === 'native_child_file') {
     throw new Error('Unsupported file preview restore source')
   }
   return request

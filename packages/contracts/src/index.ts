@@ -1813,6 +1813,7 @@ export interface AttachmentRevealResult {
 }
 
 export type OpenFilePreviewRequest =
+  | { kind: 'native_child_file'; threadId: string; readId: string; rawReference: string }
   | {
       kind: 'skill_reference'
       threadId: string

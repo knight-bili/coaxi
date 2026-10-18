@@ -5,5 +5,6 @@ export interface ToolUIPart {
   state: 'approval-requested' | 'approval-responded' | 'input-available' | 'input-streaming' | 'output-available' | 'output-denied' | 'output-error'
   input?: unknown
   output?: unknown
+  errorText?: string
 }
 export interface DynamicToolUIPart extends Omit<ToolUIPart, 'type'> { type: 'dynamic-tool' }

@@ -6,6 +6,62 @@ use crate::runtime_subagent_session::{
 };
 
 impl Core {
+    pub(super) async fn native_child_file_source(&self, value: Value) -> Result<Value> {
+        #[derive(serde::Deserialize)]
+        #[serde(rename_all = "camelCase", deny_unknown_fields)]
+        struct Request {
+            kind: String,
+            thread_id: String,
+            read_id: String,
+            raw_reference: String,
+        }
+        let request: Request = serde_json::from_value(value)?;
+        anyhow::ensure!(
+            request.kind == "native_child_file",
+            "native_child.invalid_reference"
+        );
+        anyhow::ensure!(
+            !request.raw_reference.is_empty()
+                && request.raw_reference.len() <= 16_384
+                && !request.raw_reference.contains(['\0', '\r', '\n']),
+            "native_child.invalid_reference"
+        );
+        let actor = ActorRef::User {
+            user_id: CURRENT_USER_ID.into(),
+        };
+        let reference = self
+            .native_child_readers
+            .reference(&actor, &request.read_id)?;
+        anyhow::ensure!(
+            reference.thread_id == request.thread_id,
+            "native_child.scope_changed"
+        );
+        let database = self.database.lock().await;
+        let root = NativeChildSessionService::resolve(
+            &database,
+            &ManagedBlobStore::new(&self.data_dir),
+            &actor,
+            &reference,
+        )?;
+        let target = self
+            .native_child_readers
+            .file_target(&actor, &request.read_id, &root)?;
+        let directory = target
+            .recorded_working_directory
+            .context("native_child.source_unavailable")?;
+        Ok(serde_json::to_value(
+            crate::file_preview_authority::ResolvedFilePreviewSource::FileTarget {
+                camp_id: reference.thread_id,
+                source_kind: "native_child_file".into(),
+                source_identity: format!("native-child:{}", request.read_id),
+                root_path: directory.to_string_lossy().into_owned(),
+                base_path: directory.to_string_lossy().into_owned(),
+                raw_reference: request.raw_reference,
+                allow_children: true,
+            },
+        )?)
+    }
+
     pub(super) async fn native_child_read(&self, method: &str, value: Value) -> Result<Value> {
         let actor = ActorRef::User {
             user_id: CURRENT_USER_ID.into(),

@@ -1,0 +1,679 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-18T16:05:41.962499+00:00",
+  "stage": "I04",
+  "task": "I04-T01",
+  "branch": "develop/V1.0.0",
+  "baseline_commit": "e274cc40ad8e1be19529ba90935896add65933b8",
+  "status": "ordinary_source_tools_search_diff_integrated_targeted_and_renderer_verified_stage_integration_pending",
+  "scope_preserved": {
+    "source_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_packages": 4,
+    "i04_clusters": 21,
+    "i04_formal_cases": 84,
+    "new_formal_cases_passed": 0
+  },
+  "facts": {
+    "wip_restored": 28,
+    "source_dependency_files_ast_equal": 11,
+    "ordinary_declarations_ast_equal": 73,
+    "specialized_branches_separately_pending": 11,
+    "full_tool_output": true,
+    "source_search": true,
+    "source_unified_and_split_diff": true,
+    "synced_scroll_two_axes": true,
+    "real_pointer_resize": true,
+    "native_raw_details_preserved": true,
+    "core_authorized_file_source": true,
+    "native_file_scope": "captured Host directory, exact published read; no current workspace fallback",
+    "file_child_links_inherit_scope": true,
+    "read_before_and_after_authorization": true,
+    "preview_keys_separate_native_reads_and_workspace": true,
+    "transient_read_not_restored": true,
+    "snapshot_schema": 161,
+    "existing_operations_newly_recorded": 8,
+    "new_runtime_dependency": "react-resizable-panels@2.1.9; MIT; SRI checked; React peers 19.2.7",
+    "existing_lock_packages_preserved": 794
+  },
+  "verification": {
+    "targeted_files": 7,
+    "targeted_passed": 149,
+    "targeted_skipped": 1,
+    "skip_reason": "existing Windows exclusion for literal colon filenames",
+    "typecheck_exit": 0,
+    "core_exact_source_owner_passed": 1,
+    "new_rust_owners": 0,
+    "core_minimal_compile_reason": "new file-authority security boundary",
+    "core_warnings": "11 existing unused-item warnings retained in logs",
+    "core_first_attempt": "failed: MSVC environment not loaded; rerun with existing project toolchain passed",
+    "production_renderer_groups": 15,
+    "product_screenshots": 4,
+    "source_screenshots": 2,
+    "visual_review": "six screenshots manually inspected; source component baseline reused; errors wrap in narrow headers",
+    "source_reference_full_app": false,
+    "real_core_native_web_end_to_end": false,
+    "real_model": false,
+    "cross_platform_runtime": false,
+    "public_actions_dispatched": 0
+  },
+  "self_review_fixes": [
+    "transient readId excluded from restore and workspace cache aliases",
+    "absolute and junction escape blocked including nested links",
+    "closed source revalidated for already open handles and HTML assets",
+    "source response identity checked against readId",
+    "unhandled file click rejection and missing-provider false success removed",
+    "peer lock references corrected to existing React 19.2.7",
+    "source custom 11px typography and original opaque resize-handle colors mapped"
+  ],
+  "remaining": [
+    "原 Agent/collab/MCP/委派/后台/问题与反馈专用卡片、实际统计及完整 Markdown/HTML 交互；不能用普通卡片代替完成",
+    "原图片 Gallery、缩放、复制及下载；完整 Codeg/Rovai App 同场景对照",
+    "真实 Core.handle→Native/Web→生产 UI 候选验证；完全裁剪的顶层元数据与规模/内存/逐页复核",
+    "Claude 完整 parser/生产关联、Qoder 原生来源、旧无来源显式导入、Grok 反馈边界及 I04-T02/T03/T04 原联合恢复/记忆/自动化范围",
+    "ansi-to-react 原发布物缺少完整许可文件：公开阶段二进制分发前补齐或替换，不能伪造版权"
+  ],
+  "current_stage_completed": false,
+  "app_goal_status": "paused; supported tool cannot resume; User UI action requested; current-turn coding resumed",
+  "push": "local commits only; stage candidate will batch remote push and Actions",
+  "source_files": [
+    {
+      "path": "apps/desktop/src/main/file-preview/file-preview-access.ts",
+      "bytes": 5698,
+      "sha256": "af10f1a7bca5604336cf712afb2e5bd3a750d7d7f671a5f7125c839c96b9d321",
+      "git_blob_with_filters": "b50ba0608a2546a2be3c829fc93b3c2fa97a5b48"
+    },
+    {
+      "path": "apps/desktop/src/main/file-preview/file-preview-authority.test.ts",
+      "bytes": 4841,
+      "sha256": "553735abafe19fbbec4520fbc82885a9a17e7b1858f6acb208efc3737a1d3898",
+      "git_blob_with_filters": "c44b2ff4b486835f21e24b97c61dfa93a6683995"
+    },
+    {
+      "path": "apps/desktop/src/main/file-preview/file-preview-authority.ts",
+      "bytes": 5657,
+      "sha256": "b6c84cc3c85dc927fb89ec6696cd166ad1f3d22ae1c741c0418951989a27f6c5",
+      "git_blob_with_filters": "b0156e396698cbac091482c2d97fa5d59c2d323b"
+    },
+    {
+      "path": "apps/desktop/src/main/file-preview/file-preview-ipc-input.test.ts",
+      "bytes": 7967,
+      "sha256": "37ae4838f61f4207517a832db213c21a06eeea514d7a1acd4f2a6c7ef410e095",
+      "git_blob_with_filters": "a498bddb506439b7094f7f88eabc792c6af2d513"
+    },
+    {
+      "path": "apps/desktop/src/main/file-preview/file-preview-ipc-input.ts",
+      "bytes": 10739,
+      "sha256": "04b3eeab65150a0a159d0eb75178bcd357d24f9afdb33fca638eb6a1f7637459",
+      "git_blob_with_filters": "26e66a452eae58d536a017aec66c60b568f9c29e"
+    },
+    {
+      "path": "apps/desktop/src/main/file-preview/file-preview-service.test.ts",
+      "bytes": 73596,
+      "sha256": "fc05fcfc492532e0adc3a05768ef1d22f5077544c8583ca812871536a5b3c4cf",
+      "git_blob_with_filters": "56112559e4a10a19e881b16ad6daa384a8bf9f02"
+    },
+    {
+      "path": "apps/desktop/src/main/file-preview/file-preview-service.ts",
+      "bytes": 67954,
+      "sha256": "77360d6af0d88cafd6ace3349bfd50d78afad6ce2871cd778a6671f1c5597c39",
+      "git_blob_with_filters": "8e64b26be29f08b8760a5f3c900ad305b221f184"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/NativeSessionViewer.tsx",
+      "bytes": 19386,
+      "sha256": "7bfbbe6b1b2cd301c2e90dd4b454b2144e64b45cf1045e85d8f36a4dc5bc0032",
+      "git_blob_with_filters": "5ff3141d07d9101dc708011cdbec05b53f21b548"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/link-safety.tsx",
+      "bytes": 1800,
+      "sha256": "48e155e5cf1a0b322de59a9fbab2df3362ce4a948412e385e198f4211cd6d578",
+      "git_blob_with_filters": "5e612f381f2532e2abac019f58422ea5671d0174"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/tool.tsx",
+      "bytes": 11352,
+      "sha256": "79347e83b278fe3ef70a186b181c21d601a62c9c3a99e3bd2a0f5487daf30582",
+      "git_blob_with_filters": "460e5bc4e28a929da37dc624e6bcf47e8a28418e"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/diff/unified-diff-preview.tsx",
+      "bytes": 41215,
+      "sha256": "3d8de4b8cc37bbc0b36914ce2aea774f2f96bcba36ad5ca269f2783212c59353",
+      "git_blob_with_filters": "cedede2e1fd567a34d91047ad965f7f5de76c4a5"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/diff/use-synced-scroll.ts",
+      "bytes": 5064,
+      "sha256": "9f726c4963caf74348e2ad059883c7b77892f9c840818279b31a4bb85dcc9181",
+      "git_blob_with_filters": "9b1d671ec4b133ed735072e5ec9cdffe2557439f"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/merge/merge-diff.ts",
+      "bytes": 10528,
+      "sha256": "9a166fab2fa0c491c42e670a7c21c0807b6dad38ac73412d0eac2c3e5e5867d7",
+      "git_blob_with_filters": "a2a28cae86ecf3dd62c0263343d974ed2394dc97"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/ordinary-tool-call.tsx",
+      "bytes": 87379,
+      "sha256": "6628ff5a65253a448bedb27e6c0f809c728453279b485c035fa06f922b959d06",
+      "git_blob_with_filters": "a6fb4212f44b1aaa8f1e33c56370fff1fc85266f"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/search-results-output.tsx",
+      "bytes": 6439,
+      "sha256": "6f51c5471e0f80852f0ffca2bb86972a5f78cfdd45d56612dbd4bb79831f1468",
+      "git_blob_with_filters": "a617dc73fbcdfce49e0e70be183f55eeaa587152"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/resizable.tsx",
+      "bytes": 4287,
+      "sha256": "5023bdcb990f9c12d033d3754fae662af032ee90058d903cd9198ce8c361f8b3",
+      "git_blob_with_filters": "85dd7372e13b5427cfc21b8abccbd293b12efc54"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/diff-view-mode-prefs.ts",
+      "bytes": 3180,
+      "sha256": "5b64d44c3debc564154018699405cd3197b58d519cfc03b3c48ced6483dfc4ab",
+      "git_blob_with_filters": "b89e4cc0945bc869b5f30a39e8d875f4610d3672"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/line-change-stats.ts",
+      "bytes": 7802,
+      "sha256": "6f6de0b8b2677e0d03d98b4362a5123ba2354e0423108d0aaa035fe7b168a1d1",
+      "git_blob_with_filters": "16c80e4b74d125cad59727b2598302c07a161c8e"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/path-utils.ts",
+      "bytes": 5163,
+      "sha256": "86ea2465d3cddcd56deac1015f422a64e608c4abddc6e0ae0b3ade11c979be8c",
+      "git_blob_with_filters": "cf8a6c24453606202fe0b82a354d3154f24bf343"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/search-output.test.ts",
+      "bytes": 5723,
+      "sha256": "e759facc9ef900a924cfe620d2c5f3d5a804a3d5360931a4b0f2e9c7fea3fe6f",
+      "git_blob_with_filters": "1dc4320d5d938249d5991413b3a4bbe278c95ccc"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/search-output.ts",
+      "bytes": 6115,
+      "sha256": "e6e9521f5a8c894e8b44cf9764a17798d1e44d977f0ffaef7b217d9107ad4512",
+      "git_blob_with_filters": "e15ab7360f1f86978234d2bf418d126f736c2c69"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/unified-diff-generator.test.ts",
+      "bytes": 10112,
+      "sha256": "692e2b47aa44df4fce8ad2b2710830ffbc8db83b41697e3d6076eab92b2a7b3f",
+      "git_blob_with_filters": "3d33e1217074490f3aff4329b8cd9fa4e6e2932e"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/unified-diff-generator.ts",
+      "bytes": 7315,
+      "sha256": "75ce637ac5d9075b475329b11399e67b3a1cfef3bd9d18cb1e51dbbb3767eab7",
+      "git_blob_with_filters": "71ef8f1975249c5604324d6bdfe42b2a73c68b17"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/source-rich.css",
+      "bytes": 56393,
+      "sha256": "352dbea596f464393bb5425f657d53cd5888edb190c1f8d054dc56b97571ee40",
+      "git_blob_with_filters": "abb3062169240a300e6b8647279f663d3f8fcd74"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-file-actions.tsx",
+      "bytes": 792,
+      "sha256": "0c88e1e5506925a242b2bfd342c104e061610cf3b68a88ab1938d6f32cef74b2",
+      "git_blob_with_filters": "3b8afd1ce21d71cd9e7b535a47e9b9a15d101b49"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-copy.json",
+      "bytes": 21395,
+      "sha256": "70e1214793055d51f51a94db5cb8e573894d40ef7ca8d710e0b3c98bf6c1284c",
+      "git_blob_with_filters": "226627012292e2bec072a2d6dd9b018ddb337b17"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-primitives.tsx",
+      "bytes": 2777,
+      "sha256": "46ffbe63ee6cbd8878394c575f13f80fb45ef6312002dabd5c3adb5adc26b1d5",
+      "git_blob_with_filters": "5038706262f95f21edb727686c267676fd25618e"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/tool-types.ts",
+      "bytes": 506,
+      "sha256": "4e0449e78d15602c2ee7b60e1e44748d91761f193a9349261be58de7b611b9f4",
+      "git_blob_with_filters": "b498d4c315ed16469d80c5e4c975a3a493e9b335"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/file-preview-session.test.ts",
+      "bytes": 12765,
+      "sha256": "9866de39f910d4dceab920f319ff3d388c77fb90e2c37bf0c75a4d4f3011a85f",
+      "git_blob_with_filters": "0df7b0b2ff12376a743aa2af33ad8017f0ae19af"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/file-preview-session.ts",
+      "bytes": 12441,
+      "sha256": "7a0e97973423eb025df375c1946455360bfb9c7e56d18ba7feab9a7916037e67",
+      "git_blob_with_filters": "1085bfcb2cdf91707f3111bc645a452c6a8f9432"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/native-child-reader.test.ts",
+      "bytes": 13978,
+      "sha256": "99235b83e746895b7e77e5fca1d63a4956871a5cff76b6bbcc5ce0bbee7db63e",
+      "git_blob_with_filters": "a21c63f01040d3482ffc4094ad119fe64eaf6c7f"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/native-child-reader.ts",
+      "bytes": 16621,
+      "sha256": "26c4569b1edaada814eee1c9e1ce7f8861cdda3b3cbbf3be37383bdfb53785ae",
+      "git_blob_with_filters": "116d7c9b8a3b095c51dbf9efc63153d1595d6599"
+    },
+    {
+      "path": "crates/rovai-core/src/application.rs",
+      "bytes": 1417779,
+      "sha256": "4848dc099e5e77c8acead3c4ffdbe00b0fffd4e0614636ada480bc5a5876c0c1",
+      "git_blob_with_filters": "e3924112ca751497facce6a88a8c2b9a43254106"
+    },
+    {
+      "path": "crates/rovai-core/src/application/native_child_reads.rs",
+      "bytes": 6180,
+      "sha256": "3223b134f123d6df79e7f02088628376a2a9cd1ca5a7555053370128df8a12d1",
+      "git_blob_with_filters": "703cbd95c28224bb3afd33678a99b55ec35b443f"
+    },
+    {
+      "path": "crates/rovai-core/src/runtime_subagent_session/reader.rs",
+      "bytes": 14837,
+      "sha256": "4dfc0babdf051902ef22d1364f9f7031b6f327e4602587c002d11942c5d4723e",
+      "git_blob_with_filters": "1904386a3e3894799c48aed3c3dfcb67657209df"
+    },
+    {
+      "path": "crates/rovai-core/src/runtime_subagent_session/reader_tests.rs",
+      "bytes": 15329,
+      "sha256": "a8d8efbeff523ad9b55ee9404e9b8776ebf9bc01a598c4b9235656a00a57ba0b",
+      "git_blob_with_filters": "d30a3867b8d689205acaf7409392d3a29661ad7f"
+    },
+    {
+      "path": "docs/development/testing.md",
+      "bytes": 255798,
+      "sha256": "58fc423b7d6e6feb725f5c7f43626bc6b5723dc84524bd94a05cc1bf01e66a9e",
+      "git_blob_with_filters": "b7ae3644ba3adf707600bcbc3b9b686bd229c9dd"
+    },
+    {
+      "path": "integration/branch-policy.md",
+      "bytes": 2243,
+      "sha256": "517fe8042d143f4cd9e6f9faefb720d1a93ca1b0a6aeab74bffd93dfb4e47bbe",
+      "git_blob_with_filters": "ef1262fa198a8743f9c4becdd3c986282dc11f49"
+    },
+    {
+      "path": "integration/foundation/contracts.md",
+      "bytes": 6480,
+      "sha256": "dc3f23a7be691654a8e751a88467b458856d209d5b464f4981cffe978e927122",
+      "git_blob_with_filters": "82c6ba6941b8e7b36c8e281bade614f358d4ea83"
+    },
+    {
+      "path": "integration/foundation/current-protocol.json",
+      "bytes": 8046,
+      "sha256": "10499a6c67dc46749452b5e2ff0312ff1716ba1ae4e1358d6cf225ef6249955b",
+      "git_blob_with_filters": "7f9dabe5d4780dc9c338d4ab774ba95120a70306"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/react-resizable-panels/LICENSE",
+      "bytes": 1069,
+      "sha256": "8b21167f99f3c016b39473b2984ceb03b54bf796dd9a7c74fcb80cfd513fe8a8",
+      "git_blob_with_filters": "b82ec77829ada9b6e82987f4c5fbc2043db28f49"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/react-resizable-panels/source.json",
+      "bytes": 214,
+      "sha256": "4abb71bc64b4dba61338b94d947eb171c406a0e439be8af74955f1e08191ef4e",
+      "git_blob_with_filters": "639f3512bf175f9ae6f5b901d5573cfc4746b6ae"
+    },
+    {
+      "path": "package.json",
+      "bytes": 24922,
+      "sha256": "fe4ce4424919a717133dec4d8117d64f91b82af02b016f08a773b0e11c3d1b3a",
+      "git_blob_with_filters": "a68931ace26bc10e938d914acd6b1a459769cf62"
+    },
+    {
+      "path": "packages/contracts/src/index.ts",
+      "bytes": 152877,
+      "sha256": "8eb8ac86113862df0660055b37815396469a0edb7c87c15df66d3580a4f8c804",
+      "git_blob_with_filters": "75ce4ce4a4b16f5754657b6ed120f717abbdf7bf"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "bytes": 281859,
+      "sha256": "903b1c2d4df1984a61f9a510c8be554f9cdb3056a26a518b3fd983eac6de8ea1",
+      "git_blob_with_filters": "1d37012f3a872b73d87a3e983fc89ea9336f5809"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "file/I04普通工具搜索Diff/build-source-style.mjs",
+      "bytes": 4998,
+      "sha256": "f36581b74171f7a335cee49d6e06c7fc9b77f01b205133fd6bba61af21df39c6"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/check-core.ps1",
+      "bytes": 1838,
+      "sha256": "ede77c096a0daf1a13911fa5ff613dc48b8693fde4bf4afc9f33afd9cc4a78de"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/dependencies.mjs",
+      "bytes": 8921,
+      "sha256": "e74b4d60166fa5142947878dd4c8b082bd6bb6c0a64d6e03635c0caf75b366d4"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/drafts/product/tools-day-diff.png",
+      "bytes": 69269,
+      "sha256": "b7b267c86677f4daad655f0ceeebbe5124e5ce154b0ecae5b3618592972efadd"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/drafts/product/tools-day-search.png",
+      "bytes": 54957,
+      "sha256": "fabb6da46a9a9b90a12bea7687ecc628b15aff0d36ab25831ac100ad9faab285"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/drafts/product/tools-night-diff.png",
+      "bytes": 115452,
+      "sha256": "94a1ed38d130bc19cbdff51880f3cc45f687544d592211609ac232f76e8909da"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/drafts/product/tools-night-search.png",
+      "bytes": 96785,
+      "sha256": "477b38a96503ded143fabc9811931de78aa113d49eac0fb191ab411c26c9e8b4"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/drafts/reference/source-day-ordinary.png",
+      "bytes": 121454,
+      "sha256": "1619297e017f4bdf4c61426a2038f16c0301f5c4b25ebd1011f56e37df8db8d5"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/drafts/reference/source-night-ordinary.png",
+      "bytes": 123428,
+      "sha256": "4c65edcf1ec5499478c7f472a483c13a11fd0778628d6e5029ec11aade4b7b08"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/extract.mjs",
+      "bytes": 3834,
+      "sha256": "ae37477f716eb065bdd8c2194f3131105c1a2242760c2ce9d2e56a297b7f8125"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/codegraph-sync.log",
+      "bytes": 198,
+      "sha256": "f5f859a935d89978d27cdc158e0ac2b1ac87d632f0c6df0379348033fbd4ee90"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/core-guard-02.log",
+      "bytes": 224,
+      "sha256": "81a5bd48e60e2c7bd71c9c23c19c52ff56c4803057661d09ebb8a581ba6f65e8"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/core-list-02.log",
+      "bytes": 9602,
+      "sha256": "9bd1a646a3eec16c8d27a03d64cf78ee6ed6b93d710caf9624bb7e51b4e41686"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/core-list.log",
+      "bytes": 2353,
+      "sha256": "962810faed92101aef8aff97fb85554a81edacf67c16b3305db6c1d23785da88"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/core-owner.log",
+      "bytes": 3213,
+      "sha256": "20ad4823f47961b31a043af392136eff2774aa25e410e2370d7e9395f732d0a6"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/dependencies-run.log",
+      "bytes": 279,
+      "sha256": "a5e76751b426194d5d97c624cc75f22c1fc4bd1296f86bd2d18d5b05ecc7a652"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/dependencies.json",
+      "bytes": 722,
+      "sha256": "ac66ca2dbf8e581623899c6333a6d6c3b0a79faf346805f8be03c960581bcd79"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/dependency-port.json",
+      "bytes": 4377,
+      "sha256": "cfaf3447a655a4e323c7cb11350df8d40ed12ea022c38141053491f9a4a23f44"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/docs-base.log",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/docs-checks.json",
+      "bytes": 222,
+      "sha256": "96450883a2ab502dd6adbd7b2f41fbab28adfc2ccee410e9e99eeb779ebcb70d"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/docs-tests.log",
+      "bytes": 924,
+      "sha256": "991e233aea400fba670734752af369f2f5afe51327a4956b6423571d77f970a9"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/docs-version.log",
+      "bytes": 79,
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/extraction.json",
+      "bytes": 4475,
+      "sha256": "51af9d21d1d09e959181e356b6764b653e8053b7334e31cf72ca30d615b20da5"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/foundation-final.log",
+      "bytes": 182,
+      "sha256": "044569df112d191be31ea876439bd2bd3294beb8d9fa469452c1bcc1ea893695"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/lock-audit.json",
+      "bytes": 193,
+      "sha256": "34deb36be76084be85b988a6b14f81bef597fc6f1ba2f20ec3bc848f250e4e77"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/reference-build-01.log",
+      "bytes": 6496,
+      "sha256": "5674957628288a2bc99d7191fdf937d55c5bde3ab1942cb25d61fb504de0e25f"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/reference-build-02.log",
+      "bytes": 20151,
+      "sha256": "ff9bc89bd07195ac67480c002904fa3fc81ac427ec3b0afb47232527b8c208bd"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/reference-build-03.log",
+      "bytes": 20948,
+      "sha256": "d951ed07c0ca37c519c6b58d4ef558563e53ad77563864531499410f619bb169"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/reference-build-04.log",
+      "bytes": 260,
+      "sha256": "61be6ec8be5eb50a351d026e2bd799e7a670071b4de43272bba0f56e02a78fc4"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/reference-build-final.log",
+      "bytes": 259,
+      "sha256": "68fa3e9a2219bff47799e789119860feaf991bee210ad9b6a0d28680b682fa65"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/reference-ui.json",
+      "bytes": 780,
+      "sha256": "dc829098ed2bf8edb4f339cafb0ce4a836438847d681957e425193cbe9f49451"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/scaffold-final.log",
+      "bytes": 325,
+      "sha256": "43b8e64eabdcfb78f0127755fb01177fdf630532097b6fd87362a580e3e6846c"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/source-audit-final.log",
+      "bytes": 101,
+      "sha256": "1dde3ea2966acaddda95ffd773e4e473835ac7600b5dfb3e69d13066ab28d723"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/source-audit.json",
+      "bytes": 5200,
+      "sha256": "0655dace430ed0c7a7323178f10a9af7be3edcb115f03035747e8a822756eb65"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/style-generation.json",
+      "bytes": 1920,
+      "sha256": "2ff0f576d1ecb947e742c8cf9695981dc78833a6945111a14ccc1c6f3e82c202"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/targeted-01.log",
+      "bytes": 288,
+      "sha256": "4a21e24903d94bdf933e3e749bf7bc93f13df5c84bf23451ee8f995d9e20c014"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/targeted-02.log",
+      "bytes": 288,
+      "sha256": "5b10f9d0126fd5439b2b5b30dc93b402f2e91985a3e97f99324b49d89110a593"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/typecheck-01.log",
+      "bytes": 3569,
+      "sha256": "67f481f849bcdfa0600e475829a95d0d78178932a289fc31ca2e750f50a952f7"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/typecheck-02.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/typecheck-03.log",
+      "bytes": 251,
+      "sha256": "649297158abc2df9cc66e8e8b625018ac49f63c479bbadf95ae82f666d39aae4"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/typecheck-04.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/typecheck-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/ui-build-01.log",
+      "bytes": 721,
+      "sha256": "f0f4853b391a011af661fdcd48de099b578a6935273a34ee9a3e37cc9f15ce9e"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/ui-build-02.log",
+      "bytes": 680,
+      "sha256": "f544845daae62a87b2235372565edca631297eb044e1bb5212a5d70279739135"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/ui-build-03.log",
+      "bytes": 934,
+      "sha256": "4c4ef90afb14223facc69ed33bac231fefc961f005425555233d55ff19683e9d"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/ui-build-04.log",
+      "bytes": 635,
+      "sha256": "9ac2d9d7b6110444ce0d295647e2e1558782a846172662ede02575a24365c944"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/ui-build-05.log",
+      "bytes": 633,
+      "sha256": "74070c83bc106f567b7f20d4e2d7d93f76360781c18764b1bf0d80cc2d90675a"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/ui-result-01.json",
+      "bytes": 650,
+      "sha256": "c56f360dc4bc95be72712e947c219db47f04cad2807fef8acbbf8bf0dcc191ca"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/ui-result-02.json",
+      "bytes": 729,
+      "sha256": "78f714832c251c39c98015e65632591796bafc5f9c8fd42487c8f786a51aea59"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/ui-result-03.json",
+      "bytes": 965,
+      "sha256": "5fe9d8656b0c1c9536cc738cbbae8f7eddf0d756c4712556649cc921cb765104"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/ui-result.json",
+      "bytes": 3049,
+      "sha256": "9f414d3f2d378f036fde29e91278a266c16d8b98b31951deb77200f7f3966e72"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/logs/wip-restored.json",
+      "bytes": 181,
+      "sha256": "115ebb1fb91a97fd400b782b9df3697c097c691f2dd1063ae37002c4962099e6"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/normalize-source.mjs",
+      "bytes": 701,
+      "sha256": "8d2f8e1b8e238a0db9ed83b534448d6c98601786d51d029a438a2ce64b7de8e6"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/port-dependencies.mjs",
+      "bytes": 2544,
+      "sha256": "09fea42e7b103efbbe0a85f864517b492d2234a807ded7ceca7e2ce30ff45659"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/prepare-record.py",
+      "bytes": 10012,
+      "sha256": "a941d195d71ab118be09a93d67ce3e30f4f2a65fecd7c817838b8a10feb06ef5"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/reference-renderer.tsx",
+      "bytes": 488,
+      "sha256": "bad5667e2eb188b0d76cddb90e3aababfc7fd48a17604eb27699e0399b21dfe2"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/render-reference.mjs",
+      "bytes": 3826,
+      "sha256": "4bbce987d1eae7ad3d2640e7af7a2aa9de1214e3a470785088afe40ef00025dd"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/render-tools.mjs",
+      "bytes": 2006,
+      "sha256": "d56395b2ec8b254840f17e6eea8f4415fc56588f6f5b762b366c8dc998f9536a"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/renderer.tsx",
+      "bytes": 4107,
+      "sha256": "faad4115e9b1c9f4152cc5183dc77c3b3ce2c6f9b8bfddffd9499838f7eb1aaa"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/restore-wip.py",
+      "bytes": 2119,
+      "sha256": "1f3a0da6787e2187c8925df7acf5e64833aee49fae3df14d5c0885590e29c2c0"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/resume-state.py",
+      "bytes": 3454,
+      "sha256": "996084a8e1a95d84fac06788419b519756bca5a135bd5b45d5b580c5352b3dd5"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/source-audit.mjs",
+      "bytes": 4162,
+      "sha256": "b3f15e93ed37bf93abc172918c6dc53bfe07006a3d68cb6bbc26094dab67ca59"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/stage.py",
+      "bytes": 1241,
+      "sha256": "69c1e3c65f5ff1fde6915567f470a79c0494f68eb3cbe8581c02cf2e6d919aae"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/tool-data.ts",
+      "bytes": 2490,
+      "sha256": "523e18372ffac0204c9abc0e3e9a22631f4694bb1781a74f8a3217ab86d18d9f"
+    },
+    {
+      "path": "file/I04普通工具搜索Diff/verify-docs.ps1",
+      "bytes": 1208,
+      "sha256": "0b097ae535d310b7c8133a8a8dab1ca3550f22973be8069004368b553a135798"
+    }
+  ]
+}

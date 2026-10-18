@@ -3,6 +3,21 @@ import { resolve } from 'node:path'
 import type { CoreMethod } from '@contracts'
 import { CoreFilePreviewSourceAuthority, parseCoreFilePreviewAuthorityResult } from './file-preview-authority'
 
+it('validates native file replies against the exact read identity and forwards no caller root', async () => {
+  const source = { kind: 'native_child_file' as const, threadId: 'thread', readId: 'read-a', rawReference: 'src/a.ts' }
+  const target = { kind: 'file_target', threadId: source.threadId, sourceKind: source.kind,
+    sourceIdentity: 'native-child:read-a', rootPath: resolve('fixture'), basePath: resolve('fixture'),
+    rawReference: source.rawReference, allowChildren: true }
+  const request = vi.fn(async () => target)
+  const authority = new CoreFilePreviewSourceAuthority({ request: request as any })
+  expect(await authority.resolve(source)).toMatchObject(target)
+  expect(request).toHaveBeenCalledWith('filePreview.resolveSource', source)
+  for (const delta of [{ threadId: 'another' }, { sourceKind: 'camp_workspace' },
+    { sourceIdentity: 'native-child:read-b' }, { rawReference: '../other' }, { rootPath: 'relative' }]) {
+    expect(parseCoreFilePreviewAuthorityResult({ ...target, ...delta }, source)).toBeNull()
+  }
+})
+
 it('forwards the complete private locator to Core and separates authority identities across scopes', async () => {
   const target = { attachmentId: '8b85752a-76a5-4b9d-92d8-a70b6285a0d0', displayName: 'file.txt', kind: 'file',
     mediaType: 'text/plain', path: resolve('fixture.txt'), openRisk: 'normal', canShowPath: true }

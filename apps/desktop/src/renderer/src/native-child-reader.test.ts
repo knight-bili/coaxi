@@ -52,6 +52,26 @@ function transport() {
 afterEach(() => vi.useRealTimers())
 
 describe('Core native read snapshot transport and display lifetime', () => {
+  it('binds file actions to the fully published read, preserves it during refresh and revokes it on stop', async () => {
+    const server = transport(), reader = new NativeChildReader(server.client, { reference })
+    expect(reader.fileSource()).toBeNull()
+    await reader.refresh()
+    const first = reader.fileSource()!
+    expect(first).toEqual({ threadId: reference.threadId, readId: server.request.mock.calls[0]![1]!.readId })
+    const entered = deferred<void>(), released = deferred<void>()
+    server.state.intercept = async (method, _params, next) => {
+      if (method === 'runtime.childReads.page') { entered.resolve(); await released.promise }
+      return next()
+    }
+    const flight = reader.refresh(); await entered.promise
+    expect(reader.fileSource()).toEqual(first)
+    released.resolve(); await flight
+    expect(reader.fileSource()!.readId).not.toBe(first.readId)
+    reader.stop()
+    expect(reader.getSnapshot().data).not.toBeNull()
+    expect(reader.fileSource()).toBeNull()
+    reader.dispose()
+  })
   it('reassembles full long Unicode/tool JSON with independent SHA256 before publishing, without native path/session inputs', async () => {
     const server = transport(), long = '长中文😀\\\"\n'.repeat(12000)
     server.state.data = transcript(long)

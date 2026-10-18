@@ -96,6 +96,61 @@ function request(rawReference: string): OpenFilePreviewRequest {
 }
 
 describe('FilePreviewService', () => {
+  it('confines native files and nested links to the captured root and revalidates every read after lease changes', async () => {
+    const { root, authority, service, native } = await fixture()
+    const outside = await mkdtemp(join(tmpdir(), 'rovai-native-outside-'))
+    directories.push(outside)
+    await mkdir(join(root, 'docs'))
+    await writeFile(join(root, 'docs', 'index.md'), '[next](child.txt)')
+    await writeFile(join(root, 'docs', 'child.txt'), '原目录内容')
+    await writeFile(join(outside, 'secret.txt'), '不可访问')
+    await symlink(outside, join(root, 'outside-link'), 'junction')
+    let active = true, capturedRoot = root
+    const queries: unknown[] = []
+    const workspaceResolve = authority.resolve.bind(authority)
+    authority.resolve = async request => {
+      queries.push(request)
+      if (request.kind === 'camp_workspace') return workspaceResolve(request)
+      if (!active || request.kind !== 'native_child_file' || !['read-a', 'read-b'].includes(request.readId)) return null
+      return { kind: 'file_target', threadId: request.threadId, sourceKind: 'native_child_file',
+        sourceIdentity: `native-child:${request.readId}`, rootPath: capturedRoot, basePath: capturedRoot,
+        rawReference: request.rawReference, allowChildren: true }
+    }
+    const source = { kind: 'native_child_file' as const, threadId: 'camp-1', readId: 'read-a', rawReference: 'docs/index.md' }
+    const result = await service.open(1, source)
+    if (!result.ok || result.value.kind !== 'file_preview') throw new Error('expected native preview')
+    const file = result.value.file
+    const workspace = await service.open(1, { kind: 'camp_workspace', threadId: 'camp-1', rawReference: 'docs/index.md' })
+    const nextRead = await service.open(1, { ...source, readId: 'read-b' })
+    if (!workspace.ok || workspace.value.kind !== 'file_preview' || !nextRead.ok || nextRead.value.kind !== 'file_preview') throw new Error('expected distinct previews')
+    expect(new Set([file.previewKey, workspace.value.file.previewKey, nextRead.value.file.previewKey]).size).toBe(3)
+    expect(file.restoreRequest).toBeUndefined()
+    expect(file.pathPresentation).not.toBe('project_relative')
+    const child = await service.open(1, { kind: 'child_of_handle', parentHandleId: file.handleId, rawReference: 'child.txt' })
+    if (!child.ok || child.value.kind !== 'file_preview') throw new Error('expected native child preview')
+    const childFile = child.value.file
+    expect(childFile.restoreRequest).toBeUndefined()
+    const read = () => service.readText(1, { handleId: childFile.handleId, expectedGeneration: childFile.contentGeneration })
+    expect(await read()).toMatchObject({ ok: true, value: { text: '原目录内容' } })
+    for (const rawReference of [join(outside, 'secret.txt'), '../' + basename(outside) + '/secret.txt', 'outside-link/secret.txt']) {
+      expect(await service.open(1, { ...source, rawReference })).toMatchObject({ ok: false })
+      expect(await service.open(1, { kind: 'child_of_handle', parentHandleId: file.handleId, rawReference }))
+        .toMatchObject({ ok: false })
+    }
+    expect(await service.restore(1, source)).toMatchObject({ ok: false, error: { code: 'source_not_authorized' } })
+    active = false
+    expect(await read()).toMatchObject({ ok: false, error: { code: 'source_not_authorized' } })
+    expect(await service.open(1, { kind: 'child_of_handle', parentHandleId: file.handleId, rawReference: 'child.txt' }))
+      .toMatchObject({ ok: false })
+    active = true; capturedRoot = outside
+    expect(await read()).toMatchObject({ ok: false, error: { code: 'source_not_authorized' } })
+    expect(queries.filter(query => (query as { kind: string }).kind !== 'native_child_file')).toEqual([
+      { kind: 'camp_workspace', threadId: 'camp-1', rawReference: 'docs/index.md' }
+    ])
+    expect(native.selectRoot).not.toHaveBeenCalled()
+    expect(native.revealPath).not.toHaveBeenCalled()
+    expect(native.openPath).not.toHaveBeenCalled()
+  })
   it('reclaims background handles by user LRU, protecting visible and busy handles under concurrent allocation', async () => {
     const { root, service, native } = await fixture()
     native.publishResourcesReleased = vi.fn()

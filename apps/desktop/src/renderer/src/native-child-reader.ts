@@ -121,6 +121,10 @@ export class NativeChildReader {
     this.target = { reference: Object.freeze({ ...target.reference }), ...(target.descendant ? { descendant: { ...target.descendant } } : {}) }
   }
   getSnapshot = (): NativeReaderState => this.state
+  fileSource(): { threadId: string; readId: string } | null {
+    return this.current && !this.current.retired && !this.current.closed && this.state.data
+      ? { threadId: this.target.reference.threadId, readId: this.current.id } : null
+  }
   subscribe = (listener: () => void): (() => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener) } }
   private publish(next: Partial<NativeReaderState>): void { this.state = { ...this.state, ...next }; for (const listener of this.listeners) listener() }
   private resource(): Resource { return { id: newCommandId(), refs: 1, retired: false, closed: false, publishedAt: 0 } }
