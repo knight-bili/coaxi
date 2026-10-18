@@ -1,0 +1,345 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-18T18:44:00.924743+00:00",
+  "stage": "I04",
+  "task": "I04-T01",
+  "branch": "develop/V1.0.0",
+  "baseline_commit": "d35be63288ac7706ff3fee8f4dc98c691f91dda8",
+  "status": "core_parent_tool_source_local_verified_renderer_integration_and_stage_candidate_pending",
+  "scope_preserved": {
+    "source_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_packages": 4,
+    "i04_clusters": 21,
+    "i04_formal_cases": 84,
+    "new_formal_cases_passed": 0
+  },
+  "facts": [
+    "User-only delegations.source accepts exact Thread/evidence only, derives source Run/epoch/Conversation from stored evidence",
+    "Unique Core observation, original command receipt and atomic confirmation event plus exact attempt trigger prove the association",
+    "Full initial task is read from original system task and verified against original Managed Blob SHA256; exact attempt reason including whitespace/Unicode preserved",
+    "Initial source remains attempt1 after current detail becomes attempt2; earlier refused resume remains refused after later acceptance",
+    "Unconfirmed precommit attempt cannot borrow later retry receipt; native shell cannot claim Core source; reads do not dispatch/reconcile/write",
+    "Desktop bridge, Web client and Web Host admit same User read; Web projection omits unknown top-level fields without clipping task/reason",
+    "Web client discards late replies across reauthentication and does not persist source bodies or register reads as pending commands",
+    "Six missing display names match real original 36-operation CLI catalog; internal operation and model/tool input protocol unchanged"
+  ],
+  "verification": {
+    "rust_owners": [
+      {
+        "executable": "D:\\soft\\codex\\build-cache\\codeg-rovai\\debug\\deps\\rovai_core-ca977d36cd3fbfc1.exe",
+        "owner": "context::slow_tests::delivery_unknown_never_consumes_a_redelivery_requirement",
+        "exact_list": true,
+        "binary_sha256": "2a7eeea0e9656e6a1e4a52e7687c8b7bbbb9cd0d8e58741a2c18d331581f941c"
+      },
+      {
+        "executable": "D:\\soft\\codex\\build-cache\\codeg-rovai\\debug\\deps\\rovai_web-311f613b2b5f850c.exe",
+        "owner": "operations::tests::public_projection_excludes_mcp_credentials_and_desktop_mutation_actions",
+        "exact_list": true,
+        "binary_sha256": "6b346f7edf537fd1932dedc39c39b21651d005cb019bbf474cacd0bd73ecb2bc"
+      }
+    ],
+    "new_rust_owners": 0,
+    "new_databases_or_external_runtimes": 0,
+    "targeted_ts_files": 3,
+    "targeted_ts_tests_passed": 90,
+    "typecheck_exit": 0,
+    "docs_gates": [
+      {
+        "name": "docs-tests",
+        "exit": 0
+      },
+      {
+        "name": "docs-version",
+        "exit": 0
+      },
+      {
+        "name": "docs-base",
+        "exit": 0
+      },
+      {
+        "name": "codegraph-sync",
+        "exit": 0
+      }
+    ],
+    "codegraph_synced": true,
+    "real_core_dispatch_receipt_attempt_user_query": true,
+    "native_session_input_ack_and_cleanup": "explicit original-owner fixtures",
+    "public_core_handle_http_renderer_e2e": false,
+    "new_ui_visual_qualification": false,
+    "stage_complete": false,
+    "full_app_or_platform_build": false,
+    "actions_dispatched": 0
+  },
+  "self_review": [
+    "Initial compiler invocation lacked installed MSVC/SDK environment; fixed with validated existing local paths, failed log retained",
+    "First catalog assertion incorrectly assumed30; actual backend has36, restored catalog-derived equality and all tests pass",
+    "Web Rust method enum was separately required in addition to client allowlist; both are now wired and original Web owner executed",
+    "No model catalog, Charter, Manifest, source donor, database schema, approved proposal or actual product UI component changed"
+  ],
+  "remaining": [
+    "Production original parent DelegatedSubThread/ResumedDelegationCard source integration, refusal/error/raw-record/retry and metadata refresh",
+    "Actual statistics and complete original Markdown/HTML/image interactions and complete original App same-scene comparisons",
+    "Real Core.handle -> Native/Web -> production UI candidate, clipping/scale/memory/reauthorization/recovery",
+    "Claude full parser/producer/Core, Qoder independent root/producer, explicit legacy import, Grok feedback, original T02/T03/T04 runtime union/recovery/memory/automation",
+    "Complete original ANSI dependency license evidence or replacement before public binaries"
+  ],
+  "goal_status": "active",
+  "customer_action_required": false,
+  "push": false,
+  "main_merge": false,
+  "release": false,
+  "paid_usage": false,
+  "approved_r1_artifacts": [
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    },
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    }
+  ],
+  "source_files": [
+    {
+      "path": "apps/desktop/src/main/index.ts",
+      "sha256": "8b04e5196f8c1ce033e33e496170094ab6726046072e3ec261c5b1875ebc919e",
+      "git_blob_with_filters": "e480b148cf5e7018a85c295debaba5ec1edb79e4"
+    },
+    {
+      "path": "apps/desktop/src/main/runtime-core-methods.test.ts",
+      "sha256": "03abdcf00f6e932821f75d28ae81a05656950df62ee93d4cedb59e3534957ce0",
+      "git_blob_with_filters": "048af183de4d93e294226976e8dfcad4c08f5db5"
+    },
+    {
+      "path": "apps/desktop/src/shared/execution-presentation/builtin-tools.test.ts",
+      "sha256": "c013bd973a6ce6dcbb10c9230f193938d4a3b8acf27f31f0c51237eb54fab776",
+      "git_blob_with_filters": "a6e7e2a4f0356e8d04e39845696cda1c3f9c1a21"
+    },
+    {
+      "path": "apps/desktop/src/shared/execution-presentation/builtin-tools.ts",
+      "sha256": "c284f4b5a24640e97db05ba3c747ef5ef0b6e007c8dc088e8463e347ba556b71",
+      "git_blob_with_filters": "5fea543d05639f8c51ecd91768af2d1b48619f64"
+    },
+    {
+      "path": "apps/web/src/client.test.ts",
+      "sha256": "dff8a12caf9556021506b2dd8c006e67c6800bfe72b4e198d596072b3ad04d47",
+      "git_blob_with_filters": "3dcfe6097b05e7479238b3da943c7c953481b4bf"
+    },
+    {
+      "path": "apps/web/src/client.ts",
+      "sha256": "05f1a09d1183479e4ab1cc91b36f1d1a22b05e2a03497c86c8e1b1da75292522",
+      "git_blob_with_filters": "a734da5c3bf62ceb2bf15ba2a350e5cb75902de9"
+    },
+    {
+      "path": "crates/rovai-core/src/application.rs",
+      "sha256": "24618125f5896e25bd47b1121ccf18a35c649b137452450ff09830f23ec65301",
+      "git_blob_with_filters": "9eebeebd131049009e87df96daef7022ef34e215"
+    },
+    {
+      "path": "crates/rovai-core/src/application/delegation_queries.rs",
+      "sha256": "c398ef18bd0eaba8c7ce609940d80d5b02c7f0e34162d60d7ca0144c3a3e2b14",
+      "git_blob_with_filters": "d9f9b7e874e8d0aeaeb4148e35111591000aba02"
+    },
+    {
+      "path": "crates/rovai-core/src/context/delegation_dispatch_tests.rs",
+      "sha256": "7110024ccb9f31037a2befaf57e0d3e403b18c445355a7613405daecc7235dd3",
+      "git_blob_with_filters": "6005074c346a98d1372628bde6bd267caeca22f9"
+    },
+    {
+      "path": "crates/rovai-core/src/context/delegation_evidence_tests.rs",
+      "sha256": "3bd4043553c06329cc42e9fb78cffa9fa68c3d4b1034091342fad562f36a642d",
+      "git_blob_with_filters": "ec3563ab4e300c5e97eae261b07d9964a88b017f"
+    },
+    {
+      "path": "crates/rovai-core/src/delegation_dispatch/recovery.rs",
+      "sha256": "a180f2df7bbfb63db8a19fdbc98cafa00984755dd50a88fead806dd371980b00",
+      "git_blob_with_filters": "b109bf650a7a42917f9b027ff36889683e07e2eb"
+    },
+    {
+      "path": "crates/rovai-core/src/delegation_user_query.rs",
+      "sha256": "b742e342f8a216d52bb5ad4a329d57098a6d4c280ffb988599ee57ae18910f45",
+      "git_blob_with_filters": "d8aa09f3250894008c4c0b39ef30988b178d3654"
+    },
+    {
+      "path": "crates/rovai-web/src/operations.rs",
+      "sha256": "0776b567afc8167dcac7f48ad1b7370024de1215965a2b1b598bcd177b7ab159",
+      "git_blob_with_filters": "124575a31806a21532d9942558fe827fc674e250"
+    },
+    {
+      "path": "docs/contracts/delegation-v1.md",
+      "sha256": "0237147955bdba2334f5ea3c34dcce62ef15304463ad9c9f3135a89ce96401c3",
+      "git_blob_with_filters": "99187c56cf53a560714555d3d538deaf302d4df0"
+    },
+    {
+      "path": "docs/development/testing.md",
+      "sha256": "a07ee0350af9fcf9843c242e5cd14c2af5e9d9158d298194fa4a2b7fa3c7d98a",
+      "git_blob_with_filters": "ba8db8091577ea0442a65c00067b401f287196b9"
+    },
+    {
+      "path": "integration/README.md",
+      "sha256": "651de4d6feb76147eb39bdb7df81843852dcf8402cd657bf266d6f646b3202d0",
+      "git_blob_with_filters": "725695b73ef44b8194eae8053664c96d91d99557"
+    },
+    {
+      "path": "integration/execution/goal-state.json",
+      "sha256": "c937ca74dfd687e748269c9418631d125b365e02208645d01cd7077b89be6fbc",
+      "git_blob_with_filters": "e81b4165ca70978a007ea4cf5633c6c35555d414"
+    },
+    {
+      "path": "packages/contracts/src/index.ts",
+      "sha256": "6f8cf724bc6b946e1461651eae41f870b4b622f88eb1606afe9401937072e310",
+      "git_blob_with_filters": "f35afb537f0f1cbd24b5d4fd10e551e4b725c31a"
+    },
+    {
+      "path": "crates/rovai-core/src/delegation_user_tool_source.rs",
+      "sha256": "9ea9370f8b0fc8307276b9461e77b4b2bf344183c108fdafc96b9dbe476fb257",
+      "git_blob_with_filters": "51be0dfccd56f9eb7682414d3ae5e1303767a201"
+    },
+    {
+      "path": "packages/contracts/src/delegation-tool-source.ts",
+      "sha256": "fde08691002e1464737bbbf3eb89547b818af8868ae64fd951d4eddcad3f625e",
+      "git_blob_with_filters": "0d5176ca5c607d4aed83ff16ec7baec388543d83"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "file/I04父工具关联/checkpoint.py",
+      "bytes": 9483,
+      "sha256": "6ae13f7cb31d1dc55be283c1dfa5397fcf03f492fed0ad41a20f7ea827af77b0"
+    },
+    {
+      "path": "file/I04父工具关联/compile-web.ps1",
+      "bytes": 1684,
+      "sha256": "f146894f6a05e5a77b5ccf0bb817366c4714584cd24461871741ec66eefc00f8"
+    },
+    {
+      "path": "file/I04父工具关联/compile.ps1",
+      "bytes": 1705,
+      "sha256": "d7c84e134937dbb283dd0e4a843f93ce0d2d95dddc1a67fe53710f7518d84846"
+    },
+    {
+      "path": "file/I04父工具关联/verify-docs.ps1",
+      "bytes": 1229,
+      "sha256": "0b6cf5e840fb154545177e8c473c2c79d7e4e2af44c40ef1ad77279dcd45a864"
+    },
+    {
+      "path": "file/I04父工具关联/logs/codegraph-sync.log",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "file/I04父工具关联/logs/core-artifact.json",
+      "bytes": 227,
+      "sha256": "8915268887525c5ff6c4132b2aa59ad8d563be428c5065be5e89175f150aced3"
+    },
+    {
+      "path": "file/I04父工具关联/logs/core-list.log",
+      "bytes": 109,
+      "sha256": "4ad92f6add18cfe50ae0f8831a28dd592b452428f2db89677dbb69465667bf49"
+    },
+    {
+      "path": "file/I04父工具关联/logs/core-owner.log",
+      "bytes": 431,
+      "sha256": "79390959f82bc5cfa73f9331779d23b425b1d7bd3e443a605ac3187dd1cea19f"
+    },
+    {
+      "path": "file/I04父工具关联/logs/docs-base.log",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "file/I04父工具关联/logs/docs-checks.json",
+      "bytes": 222,
+      "sha256": "96450883a2ab502dd6adbd7b2f41fbab28adfc2ccee410e9e99eeb779ebcb70d"
+    },
+    {
+      "path": "file/I04父工具关联/logs/docs-tests.log",
+      "bytes": 925,
+      "sha256": "ac86addf927a5194a737f9988e1886232eb6464f66d31751664b8492c9c1917d"
+    },
+    {
+      "path": "file/I04父工具关联/logs/docs-version.log",
+      "bytes": 79,
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "file/I04父工具关联/logs/rust-build-final.jsonl",
+      "bytes": 226762,
+      "sha256": "9cafe62898eac1030f7317a460beb367e89efc0a326d6a634f2c3325a5a96763"
+    },
+    {
+      "path": "file/I04父工具关联/logs/rust-build.jsonl",
+      "bytes": 49924,
+      "sha256": "ed1cc86c776da29a2b3ba5af3beda725ff3d040aa6a1847be9f2cd46e6f15a70"
+    },
+    {
+      "path": "file/I04父工具关联/logs/targeted-ts-final.log",
+      "bytes": 273,
+      "sha256": "558e197cb34b8980bae3580fe0f9cf50aa53c919b020d545e384da1be8d748b3"
+    },
+    {
+      "path": "file/I04父工具关联/logs/targeted-ts.log",
+      "bytes": 1478,
+      "sha256": "9126e6b200162b761a8af91277d540027cceeca6ccc72b19a5b74d03cca470c3"
+    },
+    {
+      "path": "file/I04父工具关联/logs/types-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "file/I04父工具关联/logs/types.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "file/I04父工具关联/logs/web-artifact.json",
+      "bytes": 239,
+      "sha256": "d1b0540c008172471528a280f18becddf3252db9781ba6c4595ea660db19f191"
+    },
+    {
+      "path": "file/I04父工具关联/logs/web-build.jsonl",
+      "bytes": 255770,
+      "sha256": "d9d369bdec60a0d088ad310dcc19e8046679089996ae46afdfc0d4b36adb0d24"
+    },
+    {
+      "path": "file/I04父工具关联/logs/web-client.log",
+      "bytes": 274,
+      "sha256": "2084961b67dcbcd6577394a8127bbe5a56694cfb1f0ffbb88881109f87c0c048"
+    },
+    {
+      "path": "file/I04父工具关联/logs/web-list.log",
+      "bytes": 122,
+      "sha256": "12b33d7dff39abc5e17f62036d4b5b6b5a59cb87114540e8e20bf9fc0b079ddd"
+    },
+    {
+      "path": "file/I04父工具关联/logs/web-owner.log",
+      "bytes": 444,
+      "sha256": "0c83b4f27aa23f60b5509289576517c9f6f13c7901b8a4f88e683d1237cb73f2"
+    }
+  ]
+}

@@ -2,6 +2,12 @@ import type { LiveRuntimeEvent } from './index'
 
 /** Display vocabulary only. Protocol identities, receipts and stored evidence stay unchanged. */
 export const BUILTIN_CLI_NAMES: Readonly<Record<string, string>> = Object.freeze({
+  'delegation.start': 'rovai delegation start',
+  'delegation.status': 'rovai delegation status',
+  'delegation.cancel': 'rovai delegation cancel',
+  'delegation.resume': 'rovai delegation resume',
+  'delegation.read': 'rovai delegation read',
+  'delegation.history': 'rovai delegation history',
   'thread.message.send': 'rovai send',
   'member.list': 'rovai member list',
   'member.get': 'rovai member get',

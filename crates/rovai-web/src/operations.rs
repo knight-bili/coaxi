@@ -115,6 +115,8 @@ pub enum Operation {
     DelegationList,
     #[serde(rename = "delegations.get")]
     DelegationGet,
+    #[serde(rename = "delegations.source")]
+    DelegationSource,
     #[serde(rename = "delegations.history")]
     DelegationHistory,
     #[serde(rename = "delegations.read")]
@@ -465,6 +467,8 @@ impl Operation {
         use serde_json::json;
         match self {
             Self::AppInfo => json!({"name":value["name"],"version":value["version"]}),
+            Self::DelegationSource => select_fields(&value,
+                &["state", "source", "operation", "attemptNo", "detail", "task", "reason", "code"]),
             Self::NativeChildReadStart | Self::NativeChildReadPoll => select_fields(&value,
                 &["readId", "coreGeneration", "state", "snapshotReference", "code"]),
             Self::NativeChildReadPage => select_fields(&value, &["snapshotReference", "projectionDigest", "sourceDigest",
@@ -613,6 +617,7 @@ impl Operation {
             Self::DelegationResume => "delegations.resume",
             Self::DelegationList => "delegations.list",
             Self::DelegationGet => "delegations.get",
+            Self::DelegationSource => "delegations.source",
             Self::DelegationHistory => "delegations.history",
             Self::DelegationRead => "delegations.read",
             Self::DelegationSettingsGet => "delegations.settings.get",
@@ -886,6 +891,12 @@ mod tests {
                 "state":"ready","snapshotReference":"signed","code":null}));
         }
         let long = "完整中文😀".repeat(8000);
+        let source = json!({"state":"bound", "source":{"threadId":"thread","evidenceId":"evidence"},
+            "operation":"delegation.resume", "attemptNo":2, "detail":{"delegationId":"child"},
+            "task":long,"reason":"  恢复中文😀\n保留空白  ","futurePrivatePath":"private-source"});
+        let mut expected_source = source.clone();
+        expected_source.as_object_mut().unwrap().remove("futurePrivatePath");
+        assert_eq!(Operation::DelegationSource.project(source), expected_source);
         let page = Operation::NativeChildReadPage.project(json!({"snapshotReference":"signed","projectionDigest":"projection",
             "sourceDigest":"source","offset":0,"totalBytes":long.len(),"fragment":long,"nextCursor":null,
             "complete":true,"reportedStatus":"completed","live":false,"futurePrivatePath":"private-source"}));
@@ -920,6 +931,7 @@ mod tests {
             ("delegations.resume", "delegations.resume"),
             ("delegations.list", "delegations.list"),
             ("delegations.get", "delegations.get"),
+            ("delegations.source", "delegations.source"),
             ("delegations.history", "delegations.history"),
             ("delegations.read", "delegations.read"),
             ("delegations.settings.get", "delegations.settings.get"),

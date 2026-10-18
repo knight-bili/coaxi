@@ -341,6 +341,7 @@ const allowedMethods = new Set<CoreMethod>([
   'delegations.resume',
   'delegations.list',
   'delegations.get',
+  'delegations.source',
   'delegations.history',
   'delegations.read',
   'delegations.settings.get',

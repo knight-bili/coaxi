@@ -2270,3 +2270,7 @@ I04 执行证据接线继续扩同一 Context owner，helper `context/delegation
 独立源子Run由原父模型取消后，既有 status 等待仍能补原终态；失效源不能新建任务。原Scope与真机/模型资格分开。
 低层摘要 owner 验证 coreRequestId 仅保留 Core 声明的合法UUID；它不能充当业务鉴权或回执索引。
 真实 provider事件、完整Host、崩溃后遗留 started 行自动核对、GUI仍待；不以这些组件验证替代阶段正式场景。
+
+I04 父工具来源读取继续扩原 Context slow owner的 `context/delegation_evidence_tests.rs` 与 `context/delegation_dispatch_tests.rs`，复用同一DB/Blob和实际CLI派发，不新增Rust owner或整库。验证完整长Unicode任务、exact evidence/Thread/Run/epoch、Agent与额外字段拒绝、原生shell不能冒充Core委派、预览操作失配和回滚、失败观察不能借同号后续成功、拒绝resume无子正文、已接受恢复的原原因和空白/Unicode不丢失，以及纯读取total_changes为零。恢复后initial观察仍为attempt1、当前detail为attempt2，早先拒绝不借后来成功关联。先slow-tests最低编译、`--exact --list`确认 `context::slow_tests::delivery_unknown_never_consumes_a_redelivery_requirement` 为唯一原owner，再执行同一owner。Native Session/输入ACK/清理观察仍为明确夹具，真实Host/UI另验，不用本层替代。
+
+公开运输继续扩原Web `operations::tests::public_projection_excludes_mcp_credentials_and_desktop_mutation_actions`，核对 `delegations.source` 方法准入、完整长正文与恢复原因无截断、未来私有字段不透出；只做该库最低编译和精确原owner，不运行全套。原Web客户端owner核对只读请求不持久化正文、不登记为待重发命令，重登录丢弃迟到回复；Desktop原名单owner核对同方法。这些不替代真实Core.handle、HTTP与Renderer联调。

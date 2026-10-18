@@ -33,6 +33,9 @@ pub(crate) fn read(db: &Database, method: &str, value: Value) -> Result<Value> {
         _ => anyhow::bail!("delegation.operation_not_admitted"),
     }
 }
+pub(crate) fn source(db: &Database, directory: &std::path::Path, value: Value) -> Result<Value> {
+    user::tool_source::read(db, directory, &actor(), &serde_json::from_value(value)?)
+}
 fn settings_envelope(
     value: Value,
 ) -> Result<CommandEnvelope<delegation_settings::UpdateSettingsParams>> {

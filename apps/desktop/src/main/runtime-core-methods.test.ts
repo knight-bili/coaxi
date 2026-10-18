@@ -39,7 +39,7 @@ describe('Runtime Renderer Core method allowlist', () => {
     expect(allowlistStart).toBeGreaterThan(-1)
     expect(allowlistEnd).toBeGreaterThan(allowlistStart)
     for (const method of ['singleChat.pendingInputs.edit', 'singleChat.composerDraft.mutate', 'singleChat.composerDraft.recovery',
-      'delegations.resume', 'delegations.list', 'delegations.get', 'delegations.history', 'delegations.read', 'delegations.settings.get', 'delegations.settings.update',
+      'delegations.resume', 'delegations.list', 'delegations.get', 'delegations.source', 'delegations.history', 'delegations.read', 'delegations.settings.get', 'delegations.settings.update',
       'runtime.interactions.list', 'runtime.interactions.get', 'runtime.interactions.resolve',
       'runtime.childReads.start', 'runtime.childReads.poll', 'runtime.childReads.page', 'runtime.childReads.close',
       'delegations.composer.get', 'delegations.conversation.get', 'delegations.composer.mutate', 'delegations.composer.recovery',

@@ -336,7 +336,7 @@ fn assert_delegation_dispatch(
     let accepted = delegation_cli_request(
         &auth3,
         "delegation.resume",
-        json!({"task_id":&task,"reason":"保留原会话继续"}),
+        json!({"task_id":&task,"reason":"  保留原会话继续\n核对中文和😀  "}),
     );
     let resumed = delegation_dispatch_call(&rt, f, &leases, &accepted);
     assert_eq!(resumed.payload["task_id"], task);
@@ -351,6 +351,33 @@ fn assert_delegation_dispatch(
         )
         .unwrap();
     assert_eq!(attempts, 2);
+    // The User card reads this exact accepted observation. The initial tool
+    // remains an initial tool after a later resume; a denied resume stays denied.
+    let source_before = f.database.connection().total_changes();
+    for (request, operation, number) in [(&start, "delegation.start", 1), (&accepted, "delegation.resume", 2)] {
+        let (evidence_id, _) = delegation_activity(f, &source.agent_run_id, operation, request);
+        let view = crate::application::delegation_queries::source(&f.database, &f.directory,
+            json!({"threadId":f.camp_id,"evidenceId":evidence_id})).unwrap();
+        assert_eq!(view["state"], "bound");
+        assert_eq!(view["operation"], operation);
+        assert_eq!(view["attemptNo"], number);
+        assert_eq!(view["detail"]["currentAttemptNo"], 2);
+        assert_eq!(view["detail"]["delegationId"], task);
+        let BuiltinToolIpcRequestBody::Invoke { input, .. } = &start.body;
+        assert_eq!(view["task"], input["task"]);
+        if number == 1 { assert!(view["reason"].is_null()); }
+        else {
+            let BuiltinToolIpcRequestBody::Invoke { input, .. } = &accepted.body;
+            assert_eq!(view["reason"], input["reason"]);
+        }
+    }
+    let (denied_id, _) = delegation_activity(f, &source.agent_run_id, "delegation.resume", &pending);
+    let denied_view = crate::application::delegation_queries::source(&f.database, &f.directory,
+        json!({"threadId":f.camp_id,"evidenceId":denied_id})).unwrap();
+    assert_eq!(denied_view["state"], "refused");
+    assert_eq!(denied_view["code"], "delegation.cleanup_pending");
+    assert!(denied_view.get("task").is_none() && denied_view.get("reason").is_none());
+    assert_eq!(f.database.connection().total_changes(), source_before);
     let changes = f.database.connection().total_changes();
     assert_eq!(
         delegation_dispatch_call(&rt, f, &leases, &pending).payload,

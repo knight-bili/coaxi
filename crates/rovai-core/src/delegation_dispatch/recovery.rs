@@ -57,6 +57,32 @@ impl Cursor {
     }
 }
 
+/// User views may read a terminal observation whose raw request claim was
+/// intentionally removed from the public payload. Recover only the claim
+/// already committed with this exact Core observation, never a caller's id.
+pub(crate) fn source_receipt(
+    db: &Database,
+    evidence_id: &str,
+    payload: &Value,
+) -> Result<Option<Outcome>> {
+    let claims = db.connection().prepare(
+        "SELECT json_extract(link.payload_json,'$.commandId'),json_extract(link.payload_json,'$.requestDigest')
+         FROM agent_run_execution_evidence e JOIN agent_run r ON r.id=e.agent_run_id
+         JOIN conversation c ON c.id=r.conversation_id
+         JOIN event_log link ON link.event_type='delegation.tool_receipt_confirmed'
+         WHERE e.id=?1 AND link.actor_type='agent' AND link.actor_id=c.agent_id
+           AND link.source_agent_run_id=e.agent_run_id AND link.execution_epoch=e.execution_epoch
+           AND link.camp_id=c.camp_id AND json_extract(link.payload_json,'$.toolCallId')=?2
+         ORDER BY link.rowid LIMIT 2",
+    )?.query_map(params![evidence_id,payload["toolCallId"].as_str()], |row|
+        Ok(model::ReceiptObservation { command_id: row.get(0)?, request_digest: row.get(1)? }))?
+        .collect::<rusqlite::Result<Vec<_>>>()?;
+    let [claim] = claims.as_slice() else { return Ok(None) };
+    let mut observed = payload.clone();
+    observed["coreCommandReceipt"] = serde_json::to_value(claim)?;
+    confirmed(db, evidence_id, &observed)
+}
+
 fn confirmed(db: &Database, evidence_id: &str, payload: &Value) -> Result<Option<Outcome>> {
     let Some(proof) = payload
         .get("coreCommandReceipt")

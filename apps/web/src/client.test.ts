@@ -6,6 +6,35 @@ import { newCommandId } from '../../desktop/src/shared/command-id'
 // cannot detect a client adding cookies, following a redirect, or accepting a
 // late response from a replaced session.
 describe('console transport', () => {
+  it('reads full delegation tool sources without retaining bodies and fences a late source after reauthentication', async () => {
+    const values = new Map<string, string>()
+    const storage = { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => { values.set(key, value) }, removeItem: (key: string) => { values.delete(key) } }
+    const identity = { protocolVersion: 4, token: 'a'.repeat(64), clientId: 'b'.repeat(64), editorProof: 'c'.repeat(64), ownerId: 'local_user' }
+    const input = { threadId: 'source-thread', evidenceId: 'source-evidence' }
+    const view = { state: 'bound', source: { ...input, agentRunId: 'source-run', executionEpoch: 2, parentConversationId: 'source-parent' },
+      operation: 'delegation.resume', attemptNo: 2, task: 'PRIVATE_SOURCE_TASK中文😀\n'.repeat(8000), reason: '  中断后继续\n完整😀  ' }
+    let resolveSource: ((value: Response) => void) | undefined
+    let hold = true
+    const fetcher = vi.fn<typeof fetch>(async (url, init) => {
+      if (String(url).endsWith('/login')) return Response.json(identity)
+      expect(JSON.parse(String(init?.body))).toEqual({ operation: 'delegations.source', params: input })
+      return hold ? new Promise(resolve => { resolveSource = resolve }) : Response.json({ result: view })
+    })
+    const client = new ConsoleClient('http://localhost:4317', fetcher, storage)
+    await client.login('d'.repeat(64))
+    const old = client.request('delegations.source', input)
+    await vi.waitFor(() => expect(resolveSource).toBeTypeOf('function'))
+    await client.login('d'.repeat(64))
+    resolveSource!(Response.json({ result: view }))
+    await expect(old).rejects.toMatchObject({ name: 'AbortError' })
+    hold = false
+    await expect(client.request('delegations.source', input)).resolves.toEqual(view)
+    expect(client.pendingCommandCount).toBe(0)
+    expect([...values.values()].join('')).not.toContain('PRIVATE_SOURCE_TASK')
+    expect([...values.values()].join('')).not.toContain('中断后继续')
+    client.clear()
+  })
+
   it('scopes Web canvas state to a verified editor without exposing server directories or credentials', async () => {
     const origin = 'http://127.0.0.1:4317'
     const connect = async (clientId: string) => {

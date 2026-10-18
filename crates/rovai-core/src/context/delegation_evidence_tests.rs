@@ -1,5 +1,49 @@
 // Same original Context owner/store. Provider observations are explicit fixtures,
 // while the dispatcher, lifecycle, canonical read model and receipts are real.
+fn assert_user_tool_source(
+    f: &mut Fixture,
+    source: &crate::team_tool::AuthenticatedTeamToolRun,
+    evidence: &str,
+    task: &str,
+    full: &str,
+) {
+    let read = |f: &Fixture, input| crate::application::delegation_queries::source(&f.database, &f.directory, input);
+    let input = json!({"threadId":f.camp_id,"evidenceId":evidence});
+    let before = f.database.connection().total_changes();
+    let view = read(f, input.clone()).unwrap();
+    assert_eq!(view["state"], "bound");
+    assert_eq!(view["source"]["agentRunId"], source.agent_run_id);
+    assert_eq!(view["source"]["executionEpoch"], source.execution_epoch);
+    assert_eq!(view["detail"]["delegationId"], task);
+    assert_eq!(view["attemptNo"], 1);
+    assert_eq!(view["task"], full);
+    assert!(view["reason"].is_null());
+    assert!(full.len() > 100_000);
+    assert_eq!(f.database.connection().total_changes(), before);
+    for invalid in [json!({"threadId":"other-thread","evidenceId":evidence}),
+        json!({"threadId":f.camp_id,"evidenceId":"missing"}),
+        json!({"threadId":f.camp_id,"evidenceId":evidence,"delegationId":task}),
+        json!({"threadId":f.camp_id,"evidenceId":evidence,"actor":"user"})] {
+        assert!(read(f, invalid).is_err());
+    }
+    let params = serde_json::from_value(input.clone()).unwrap();
+    assert!(crate::delegation_model_query::user::tool_source::read(
+        &f.database, &f.directory, &crate::command::ActorRef::Agent {
+            agent_id: source.agent_id.clone(), source_agent_run_id: source.agent_run_id.clone(),
+        }, &params).is_err());
+    assert_eq!(f.database.connection().total_changes(), before);
+    // Same original store; only the projection preview changes temporarily.
+    // A caller cannot substitute another canonical operation for the full row.
+    f.database.connection().execute_batch("SAVEPOINT source_preview_fence").unwrap();
+    f.database.connection().execute(
+        "UPDATE agent_run_execution_evidence SET payload_preview_json=json_set(payload_preview_json,'$.canonicalTool','delegation.resume') WHERE id=?1",
+        [evidence],
+    ).unwrap();
+    assert_eq!(read(f, input.clone()).unwrap()["state"], "unresolved");
+    f.database.connection().execute_batch("ROLLBACK TO source_preview_fence; RELEASE source_preview_fence").unwrap();
+    assert_eq!(read(f, input).unwrap()["task"], full);
+}
+
 fn delegation_activities(f: &Fixture, run: &str) -> Vec<(String, Value)> {
     let ids = f
         .database
@@ -78,7 +122,7 @@ fn assert_delegation_evidence(
     let start = delegation_cli_request(
         &auth,
         "delegation.start",
-        json!({"agent_type":"codex","task":"private-evidence-task-do-not-copy"}),
+        json!({"agent_type":"codex","task":("private-evidence-task-do-not-copy 汉字😀\n").repeat(4096)}),
     );
     let initial = delegation_dispatch_call(&rt, f, &leases, &start);
     let task = initial.payload["task_id"].as_str().unwrap().to_owned();
@@ -99,6 +143,16 @@ fn assert_delegation_evidence(
     assert!(f.database.connection().query_row("SELECT EXISTS(SELECT 1 FROM event_log WHERE command_id=?1 AND event_type='command.result')",[receipt],|r|r.get::<_,bool>(0)).unwrap());
     let stored:(i64,i64)=f.database.connection().query_row("SELECT revision,(SELECT COUNT(*) FROM agent_run_execution_evidence WHERE agent_run_id=?2) FROM agent_run_execution_evidence WHERE id=?1",params![activity_id,source.agent_run_id],|r|Ok((r.get(0)?,r.get(1)?))).unwrap();
     assert_eq!(stored.0, 2);
+    let BuiltinToolIpcRequestBody::Invoke { input: start_input, .. } = &start.body;
+    assert_user_tool_source(f, source, &activity_id, &task, start_input["task"].as_str().unwrap());
+    let refused_resume = delegation_cli_request(&auth, "delegation.resume", json!({"task_id":task,"reason":"只核对中断说明😀"}));
+    let refused = delegation_dispatch_call(&rt, f, &leases, &refused_resume);
+    assert!(refused.payload["error_code"].is_string());
+    let (refused_id, _) = delegation_activity(f, &source.agent_run_id, "delegation.resume", &refused_resume);
+    let refused_view = crate::application::delegation_queries::source(&f.database, &f.directory,
+        json!({"threadId":f.camp_id,"evidenceId":refused_id})).unwrap();
+    assert_eq!(refused_view["state"], "refused");
+    assert!(refused_view.get("detail").is_none() && refused_view.get("task").is_none());
     let changes = f.database.connection().total_changes();
     assert_eq!(
         delegation_dispatch_call(&rt, f, &leases, &start).payload,
@@ -123,6 +177,8 @@ fn assert_delegation_evidence(
     let status = delegation_dispatch_call(&rt, f, &leases, &query);
     let native=ExecutionEvidenceService.record_runtime_event(&mut f.database,&ManagedBlobStore::new(&f.directory),&source.agent_run_id,source.execution_epoch,"runtime.action",&json!({"toolCallId":shell,"kind":"execute","input":command,"status":"completed","exitCode":0,"output":serde_json::to_string(&status.payload).unwrap()})).unwrap().unwrap();
     let native_id = native.id.clone();
+    assert_eq!(crate::application::delegation_queries::source(&f.database, &f.directory,
+        json!({"threadId":f.camp_id,"evidenceId":native_id})).unwrap()["state"], "unresolved");
     let page = crate::execution_window::read_page(
         &mut f.database,
         &f.camp_id,
@@ -223,6 +279,10 @@ fn assert_delegation_evidence(
     assert_eq!(attempts.len(), 2);
     assert_eq!(attempts[0].1["status"], "failed");
     assert_eq!(attempts[1].1["status"], "completed");
+    assert_eq!(crate::application::delegation_queries::source(&f.database, &f.directory,
+        json!({"threadId":f.camp_id,"evidenceId":attempts[0].0})).unwrap()["state"], "unresolved");
+    assert_eq!(crate::application::delegation_queries::source(&f.database, &f.directory,
+        json!({"threadId":f.camp_id,"evidenceId":attempts[1].0})).unwrap()["detail"]["delegationId"], retried.payload["task_id"]);
     assert!(
         attempts
             .iter()

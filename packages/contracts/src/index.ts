@@ -5,6 +5,7 @@ import type { BuiltinMemberAvatarRole } from './member-avatar'
 export * from './member-avatar'
 export * from './current-user-profile'
 export type { NativeChildReadReference, NativeChildReadStart, NativeChildReadView, NativeChildReadPageRequest, NativeChildReadPage } from './native-child-reads'
+export type { DelegationToolSourceParams, DelegationToolSourceIdentity, DelegationToolSourceView } from './delegation-tool-source'
 
 export const THREAD_ID_PATTERN = /^rvcamp_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$/u
 
@@ -4934,6 +4935,7 @@ export type CoreMethod =
   | 'delegations.resume'
   | 'delegations.list'
   | 'delegations.get'
+  | 'delegations.source'
   | 'delegations.history'
   | 'delegations.read'
   | 'delegations.settings.get'

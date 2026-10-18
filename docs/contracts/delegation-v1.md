@@ -4,7 +4,7 @@ contract: delegation-v1
 authority: core-delegation-identity-settings-and-wire
 status: accepted
 version: 1
-last_updated: 2026-10-18
+last_updated: 2026-10-19
 ---
 
 # Delegation v1
@@ -18,6 +18,14 @@ User-only `delegations.conversation.get` 接 `{conversationId,composerScope?}`�
 原提交的 UUID、完整参数、资源类别和原正文持久保留。未确认时只调用 `commands.reconcile`；明确重试沿同一操作和参数，不自动重发。错误命令族回执和被改成另一族的方法均拒绝，正文保持；仅成功核对原提交后清除原正文。旧 single_chat 的存储键、方法和参数保持，child 在原位置身份中额外冻结 `conversationKind`，恢复目录、保留输入附件与排队编辑附件沿同一类别。类型字段只是展示/调用选择，Core 权限继续来自专用入口与真实接管事实。
 
 本分项是共享读取、输入和材料控件基础，不授予完整聊天页面或生命周期按钮完成资格。实际 SingleChatPanel 的 child 模式、接管清理后挂载、停止/结束/恢复、离开保护与查看器隐藏恢复仍需随后接线和隔离 Renderer 验证；真实 Core/Host/模型/平台验证仍按 I04 候选汇集。Schema161/Migration211、模型输入与批准 r1 不变。
+
+### User 父工具来源读取
+
+User-only `delegations.source` 严格接 `{threadId,evidenceId}`，不接 task、actor、Run、epoch、Binding、Session 或目录覆盖。Core从该Thread中已保存的执行证据派生父Run/epoch/Conversation，并仅处理自己生成的`delegation.start/resume`观察；观察编号必须唯一对应本行。再核对同次原命令回执和`delegation.tool_receipt_confirmed`持久事件，以及attempt真实触发Run/epoch/CLI调用身份。未确认的尝试不能借后来重试的回执补成已执行，也不能仅凭结果中自报task_id关联子会话。
+
+返回`source`固定evidence/Run/epoch/父Conversation/Thread。`bound`含确切attempt号、当前原detail元数据、完整原task和该次reason；task来自首次system委派消息并与原Managed Blob摘要核对，reason仅来自该次attempt。`refused`只含原操作和Core拒绝码，不补其他任务的正文或子入口；无法核定为`unresolved`。父列表、既有详情及模型输出仍保持原元数据边界，本入口没有新增CLI/model工具，不改变Charter/Manifest/输入协议。完整文本沿现有User原历史读取语义，不引入预览截断。
+
+读取只核对持久事实，不attach、启动、恢复、补发或自动reconcile，不写入观察或命令。返回不含凭据、Runtime配置或运行目录；任务正文自身的用户内容不被当作新授权。User窗口继续按当前client/Thread/父Run/证据核对来源并复用原Core查看器。新增接口和本地组件验证不授予真实Core至Native/Web或整阶段资格；原模型r1及Schema161/Migration211不变。
 
 ### User 查看器活动投影
 

@@ -1,5 +1,7 @@
 //! User read authority comes from the Host actor and the durable Thread, never an active parent Run.
 use super::*;
+#[path = "delegation_user_tool_source.rs"]
+pub(crate) mod tool_source;
 use crate::{command::ActorRef, delegation::Identity};
 
 #[derive(Deserialize)]

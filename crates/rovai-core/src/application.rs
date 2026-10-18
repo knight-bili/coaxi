@@ -10633,6 +10633,10 @@ impl Core {
                         .list_active(&database, params.camp_id.as_str())?,
                 )?)
             }
+            "delegations.source" => {
+                let db = self.database.lock().await;
+                delegation_queries::source(&db, &self.data_dir, request.params.clone())
+            }
             "delegations.list"
             | "delegations.get"
             | "delegations.history"
