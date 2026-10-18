@@ -31,6 +31,8 @@ import { currentUserDisplayName } from '@contracts'
 import { CurrentUserAvatar, useCurrentUserProfile } from './CurrentUserProfile'
 import { markdownInlineContentPrefix } from './safe-markdown-model'
 import { ExecutionLatestContext, ExecutionReadingContext, useExecutionWindow } from './useExecutionWindow'
+import { executionBlockEvidence } from './execution-block-contract'
+import type { AgentRunExecutionBlock } from '@contracts'
 import { ReturnToLatest } from './ReturnToLatest'
 import { UserMessageAnchors } from './UserMessageAnchors'
 import { useThreadUserAnchors } from './useThreadUserAnchors'
@@ -10551,15 +10553,17 @@ function RunExecutionContent({
   ).filter((item) =>
     item.kind !== 'narration' || !finalKey || comparableMessageText(item.body) !== finalKey
   ), [effectiveProgress?.items, finalKey, narrationBodies])
-  const groupedProcessItems = useMemo(() => {
+  const groupedProcessItems = useMemo<Array<GroupedExecutionProgressItem & { sourceBlock?: AgentRunExecutionBlock }>>(() => {
     if (!windowedEvidence) return groupConsecutiveToolItems(processItems)
-    return windowPage.blocks.flatMap((block): GroupedExecutionProgressItem[] => {
-      const progress = buildLiveExecutionProgress(block.evidence.map(liveRuntimeEventFromExecutionEvidence), run.id, { includePublicResults: false })
+    return windowPage.blocks.flatMap((block): Array<GroupedExecutionProgressItem & { sourceBlock?: AgentRunExecutionBlock }> => {
+      const progress = buildLiveExecutionProgress(executionBlockEvidence(block).map(liveRuntimeEventFromExecutionEvidence), run.id, { includePublicResults: false })
       if (block.kind === 'toolGroup') {
         const items = progress.items.filter((item): item is ToolProgressItem => item.kind === 'tool')
         return block.toolCount > 0 && items.length ? [{ key: block.key, kind: 'toolGroup' as const, items, block }] : []
       }
       return progress.items.filter(item => item.kind !== 'narration' || !finalKey || comparableMessageText(item.body) !== finalKey)
+        .map(item => block.projectionVersion === 4 ? { ...item, sourceBlock: block,
+          ...(item.kind === 'tool' ? { key: `${block.key}:${item.key}` } : {}) } : item)
     })
   }, [processItems, windowedEvidence, windowPage.blocks, run.id, finalKey])
   const activeToolItems = useMemo(
@@ -10601,10 +10605,15 @@ function RunExecutionContent({
       : activeRetryDiagnostic
         ? uiAttribute("等待 Claude Code 自动重试（{0}/{1}）", String(activeRetryDiagnostic.attempt), String(activeRetryDiagnostic.maxAttempts))
         : phaseFeedback
-  const sequenceByKey = useMemo(() => new Map<string, number>((displayedEvidence ?? []).flatMap(item => [
-    [`narration:${item.id}`, item.sequence] as const,
-    [`tool:${item.canonical?.operationId ?? item.id}`, item.sequence] as const
-  ])), [displayedEvidence])
+  const sequenceByKey = useMemo(() => new Map<string, number>(windowedEvidence
+    ? windowPage.blocks.flatMap(block => executionBlockEvidence(block).flatMap(item => [
+      [`narration:${item.id}`, block.sequence] as const,
+      [`tool:${item.canonical?.operationId ?? item.id}`, block.sequence] as const
+    ]))
+    : (displayedEvidence ?? []).flatMap(item => [
+      [`narration:${item.id}`, item.sequence] as const,
+      [`tool:${item.canonical?.operationId ?? item.id}`, item.sequence] as const
+    ])), [displayedEvidence, windowedEvidence, windowPage.blocks])
   const narrationByKey = useMemo(() => new Map((displayedEvidence ?? []).map(item => [`narration:${item.id}`, item])), [displayedEvidence])
   const earlierLoadError = windowPage.direction === 'newer' ? null : windowPage.error
   // A live Run already presents its connection/thinking feedback. Stacking the
@@ -10647,7 +10656,8 @@ function RunExecutionContent({
         gapAfter={(item, next) => (item.kind === 'toolGroup' && next.kind === 'compaction')
           || (item.kind === 'compaction' && (next.kind === 'toolGroup' || next.kind === 'compaction')) ? 4 : processItemGap}
         onVisible={visible => {
-        const sequences = visible.flatMap(item => item.kind === 'toolGroup' && item.block ? [item.block.sequence]
+        const sequences = visible.flatMap(item => 'sourceBlock' in item && item.sourceBlock ? [item.sourceBlock.sequence]
+          : item.kind === 'toolGroup' && item.block ? [item.block.sequence]
           : sequenceByKey.has(item.key) ? [sequenceByKey.get(item.key)!] : [])
         if (sequences.length) windowPage.setViewport(Math.min(...sequences), Math.max(...sequences))
       }}>{(item) => {
@@ -10745,7 +10755,9 @@ function RunExecutionContent({
             />
           )
         }
-        const fullEvidence = completeEvidence.byToolId.get(step.detailOperationId ?? step.id)
+        const sourceBlock = 'sourceBlock' in item ? item.sourceBlock : undefined
+        const scopedEvidence = sourceBlock ? selectCompletePresentableExecutionEvidence(executionBlockEvidence(sourceBlock)) : completeEvidence
+        const fullEvidence = scopedEvidence.byToolId.get(step.detailOperationId ?? step.id)
         return (
           <ToolCallRow
             key={item.key}
@@ -10754,6 +10766,11 @@ function RunExecutionContent({
             runId={run.id}
             runStatus={run.status}
             completeEvidence={fullEvidence}
+            sourceEvidence={sourceBlock ? sourceBlock.evidence.find(evidence => evidence.canonical?.sourceAuthority === 'core'
+              && evidence.canonical.credibility === 'core_verified' && evidence.canonical.toolName === step.builtinOperation)
+              : scopedEvidence.byCoreToolId?.get(step.id)}
+            itemKey={sourceBlock ? item.key : undefined}
+            resultScope={sourceBlock ? `${run.id}:${sourceBlock.key}` : undefined}
             onFileOpenError={onFileOpenError}
           />
         )

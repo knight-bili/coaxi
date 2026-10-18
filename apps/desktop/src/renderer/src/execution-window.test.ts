@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { AgentRunExecutionEvidenceView as Evidence, AgentRunExecutionBlock, AgentRunExecutionBlockPage } from '@contracts'
 import { ExecutionWindow, ExecutionWindowCache, executionWindowCacheFor, executionWindowPageSize, type ExecutionChangesRequest, type ExecutionWindowRequest } from './execution-window'
+import type { AgentRunDelegationBlock, AgentRunDelegationBlockPage, AgentRunDelegationBlockChanges, AgentRunExecutionBlockChanges } from '@contracts'
 
 function evidence(sequence: number): Evidence {
   return { id: `e-${sequence}`, agentRunId: 'run', executionEpoch: 1, sequence,
@@ -16,7 +17,7 @@ function block(item: Evidence): AgentRunExecutionBlock {
 }
 function source(initial = 100) {
   const state = { through: initial, offline: false, refreshed: [] as Evidence[] }
-  const request = vi.fn<ExecutionWindowRequest>(async params => {
+  const request = vi.fn(async (params: Parameters<ExecutionWindowRequest>[0]): Promise<AgentRunExecutionBlockPage> => {
     if (state.offline) throw new Error('offline')
     const start = params.afterSequence === undefined
       ? Math.max(1, Math.min(state.through, (params.beforeSequence ?? state.through + 1) - 1) - params.limit + 1)
@@ -30,7 +31,7 @@ function source(initial = 100) {
       throughSequence: state.through, throughChangeSequence: state.through, hasMore,
       blocks: Array.from({ length: Math.max(0, end - start + 1) }, (_, offset) => block(evidence(start + offset))) }
   })
-  const changes = vi.fn<ExecutionChangesRequest>(async params => {
+  const changes = vi.fn(async (params: Parameters<ExecutionChangesRequest>[0]): Promise<AgentRunExecutionBlockChanges> => {
     if (state.offline) throw new Error('offline')
     const end = Math.min(state.through, params.afterChangeSequence + params.limit)
     return { schemaVersion: 3, threadId: 'camp', agentRunId: 'run', requestedAfterChangeSequence: params.afterChangeSequence,
@@ -41,6 +42,115 @@ function source(initial = 100) {
   })
   return { state, request, changes }
 }
+
+function delegationSource() {
+  const canonical = (sequence: number, core: boolean): NonNullable<Evidence['canonical']> => ({
+    operationId: core ? 'core-start' : 'native-start', classifierVersion: 'activity-v3', activityDomain: core ? 'tool' : 'shell',
+    semanticKind: null, toolName: core ? 'delegation.start' : 'shell', presentationHint: null, phase: 'terminal', outcome: 'succeeded',
+    credibility: core ? 'core_verified' : 'runtime_structured', coverageLevel: 'fine_grained', sourceAuthority: core ? 'core' : 'runtime',
+    sourceEvidenceIds: [`e-${sequence}`], firstEvidenceSequence: sequence, lastEvidenceSequence: sequence, revision: 1
+  })
+  const primary: Evidence = { ...evidence(3), eventType: 'runtime.action', kind: 'tool_call',
+    payload: { sourceAuthority: 'core', canonicalTool: 'delegation.start' }, canonical: canonical(3, true) }
+  const support: Evidence = { ...evidence(1), eventType: 'activity.completed', kind: 'command',
+    payload: { executionWindowBuiltinOperation: 'delegation.start', item: { type: 'commandExecution', command: 'rovai delegation start --task fixture' } },
+    canonical: canonical(1, false) }
+  const item: AgentRunDelegationBlock = { ...block(primary), projectionVersion: 4, changeSequence: 5, supportingEvidence: [support] }
+  const page: AgentRunDelegationBlockPage = { schemaVersion: 4, delegationBlocksVersion: 4, threadId: 'camp', agentRunId: 'run',
+    requestedBeforeSequence: null, throughSequence: 5, throughChangeSequence: 5, hasMore: false, nextBeforeSequence: null, blocks: [item] }
+  const legacy = source(5)
+  const request = vi.fn<ExecutionWindowRequest>(async params => params.projection === 'delegationBlocks' ? page
+    : { ...await legacy.request(params), delegationBlocksVersion: 4 })
+  const changes = vi.fn<ExecutionChangesRequest>(async params => ({ schemaVersion: 4, threadId: 'camp', agentRunId: 'run',
+    requestedAfterChangeSequence: params.afterChangeSequence, requestedAfterEntrySequence: params.afterEntrySequence,
+    throughSequence: 5, throughChangeSequence: 5, nextAfterChangeSequence: 5, hasMore: false, blocks: [] }))
+  const window = new ExecutionWindow('camp', 'run', 12, request, () => {}, changes)
+  return { request, changes, window, item, primary, support, page }
+}
+
+describe('negotiated delegation blocks', () => {
+  it('probes old blocks once, uses only v4 boundaries, and keeps external support out of the primary cursor', async () => {
+    const { request, window, support } = delegationSource()
+    await window.latest()
+    expect(request.mock.calls.map(([params]) => params.projection)).toEqual(['blocks', 'delegationBlocks'])
+    expect(window.blocks.map(item => item.sequence)).toEqual([3])
+    expect(window.evidence.map(item => item.sequence)).toEqual([1, 3])
+    expect(window.blocks[0].evidence.map(item => item.sequence)).toEqual([3])
+    expect(window.blocks[0].supportingEvidence).toEqual([support])
+    await window.latest()
+    expect(request).toHaveBeenCalledTimes(2)
+  })
+  it('retries the selected projection after failure without merging the old probe or silently downgrading', async () => {
+    const { request, window } = delegationSource()
+    const original = request.getMockImplementation()!
+    let failed = false
+    request.mockImplementation(async params => {
+      if (params.projection === 'delegationBlocks' && !failed) { failed = true; throw new Error('offline') }
+      return original(params)
+    })
+    await window.latest()
+    expect(window.loaded).toBe(false); expect(window.blocks).toEqual([])
+    await window.retry()
+    expect(window.loaded).toBe(true)
+    expect(request.mock.calls.map(([params]) => params.projection)).toEqual(['blocks', 'delegationBlocks', 'delegationBlocks'])
+  })
+  it('does not start a capability follow-up after the original window was disposed', async () => {
+    const { request, window } = delegationSource()
+    let resolve!: (page: AgentRunExecutionBlockPage) => void
+    request.mockImplementationOnce(() => new Promise(done => { resolve = done }))
+    const pending = window.latest(); window.dispose()
+    resolve({ schemaVersion: 3, threadId: 'camp', agentRunId: 'run', requestedBeforeSequence: null,
+      nextBeforeSequence: null, throughSequence: 5, throughChangeSequence: 5, hasMore: false, blocks: [], delegationBlocksVersion: 4 })
+    await pending
+    expect(request).toHaveBeenCalledTimes(1); expect(window.blocks).toEqual([])
+    expect(window.projectionVersion).toBe(3)
+  })
+  it.each(['run', 'epoch', 'claim', 'primary'] as const)('rejects invalid external support: %s', async field => {
+    const { window, page, support, primary } = delegationSource()
+    page.blocks[0] = { ...page.blocks[0], supportingEvidence: [{ ...support,
+      ...(field === 'run' ? { agentRunId: 'other-run' } : {}),
+      ...(field === 'epoch' ? { executionEpoch: 2 } : {}),
+      ...(field === 'claim' ? { payload: {} } : {}) }],
+      ...(field === 'primary' ? { evidence: [{ ...primary, canonical: { ...primary.canonical!, sourceAuthority: 'runtime' } }] } : {}) }
+    await window.latest()
+    expect(window.loaded).toBe(false); expect(window.blocks).toEqual([])
+    expect(window.error).toBe('执行记录分页数据不兼容')
+  })
+  it('drains tied block changes and removes a revoked support without losing the original carrier', async () => {
+    const { window, changes, item, support } = delegationSource()
+    await window.latest()
+    const native: AgentRunDelegationBlock = { ...block(support), key: 'tools:1', kind: 'toolGroup', projectionVersion: 4,
+      changeSequence: 6, toolCount: 1 }
+    const make = (params: Parameters<ExecutionChangesRequest>[0], blocks: AgentRunDelegationBlock[], more: boolean): AgentRunDelegationBlockChanges => ({
+      schemaVersion: 4, threadId: 'camp', agentRunId: 'run', requestedAfterChangeSequence: params.afterChangeSequence,
+      requestedAfterEntrySequence: params.afterEntrySequence, nextAfterChangeSequence: 6,
+      ...(more ? { nextAfterEntrySequence: 1 } : {}), throughSequence: 5, throughChangeSequence: 6, hasMore: more, blocks })
+    changes.mockImplementation(async params => params.afterEntrySequence === undefined
+      ? make(params, [native], true) : make(params, [{ ...item, changeSequence: 6, supportingEvidence: [] }], false))
+    await window.refresh()
+    expect(changes.mock.calls.map(([params]) => [params.afterChangeSequence, params.afterEntrySequence])).toEqual([[5, undefined], [6, 1]])
+    expect(window.blocks.map(item => item.sequence)).toEqual([1, 3])
+    expect(window.blocks[1].supportingEvidence).toEqual([])
+    expect(window.evidence.filter(item => item.sequence === 1)).toHaveLength(1)
+  })
+  it('retains the paired root cursor after a later page fails, then resumes the same change watermark', async () => {
+    const { window, changes, item } = delegationSource()
+    await window.latest()
+    const first = { ...item, sequence: 2, lastSequence: 2, key: 'item:2', changeSequence: 6,
+      evidence: [{ ...item.evidence[0], sequence: 2 }], supportingEvidence: [] } satisfies AgentRunDelegationBlock
+    let failed = false
+    changes.mockImplementation(async params => {
+      if (params.afterEntrySequence === 2 && !failed) { failed = true; throw new Error('offline') }
+      return { schemaVersion: 4, threadId: 'camp', agentRunId: 'run', requestedAfterChangeSequence: params.afterChangeSequence,
+        requestedAfterEntrySequence: params.afterEntrySequence, nextAfterChangeSequence: 6, throughSequence: 5, throughChangeSequence: 6,
+        hasMore: params.afterEntrySequence === undefined, ...(params.afterEntrySequence === undefined ? { nextAfterEntrySequence: 2 } : {}),
+        blocks: params.afterEntrySequence === undefined ? [first] : [{ ...item, changeSequence: 6 }] }
+    })
+    await window.refresh(); await window.refresh()
+    expect(changes.mock.calls.map(([params]) => [params.afterChangeSequence, params.afterEntrySequence])).toEqual([[5, undefined], [6, 2], [6, 2]])
+    expect(window.blocks.find(block => block.sequence === 3)?.changeSequence).toBe(6)
+  })
+})
 
 describe('continuous execution history', () => {
   it('recovers a failed initial tail on invalidation without polling or warming an unopened window', async () => {

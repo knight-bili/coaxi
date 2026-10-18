@@ -1,12 +1,13 @@
 import { ExecutionContentCache } from './execution-content-cache'
-import type { AgentRunExecutionEvidenceView as Evidence, AgentRunExecutionBlock as Block, AgentRunExecutionBlockChanges, AgentRunExecutionBlockPage as Page } from '@contracts'
+import type { AgentRunExecutionEvidenceView as Evidence, AgentRunExecutionBlock as Block } from '@contracts'
+import { executionBlockEvidence, validExecutionBlocks, validExecutionDeltaPosition, type ExecutionBlockPage as Page, type ExecutionBlockChanges, type ExecutionProjection } from './execution-block-contract'
 
 export type ExecutionWindowRequest = (params: {
-  threadId: string; agentRunId: string; beforeSequence: number | null; afterSequence?: number; limit: number
+  threadId: string; agentRunId: string; beforeSequence: number | null; afterSequence?: number; limit: number; projection?: ExecutionProjection
 }) => Promise<Page>
 export type ExecutionChangesRequest = (params: {
-  threadId: string; agentRunId: string; afterChangeSequence: number; refreshEvidenceIds: string[]; limit: number
-}) => Promise<AgentRunExecutionBlockChanges>
+  threadId: string; agentRunId: string; afterChangeSequence: number; afterEntrySequence?: number; refreshEvidenceIds: string[]; limit: number; projection?: ExecutionProjection
+}) => Promise<ExecutionBlockChanges>
 type Direction = 'earlier' | 'newer' | 'latest'
 type CacheBudget = { maxItems: number; maxBytes: number }
 const DEFAULT_BUDGET: CacheBudget = { maxItems: 2048, maxBytes: 8 * 1024 * 1024 }
@@ -24,7 +25,12 @@ export class ExecutionWindow {
   private evidenceProjection: { blocks: Block[]; evidence: Evidence[] } | null = null
   get evidence(): Evidence[] {
     if (this.evidenceProjection?.blocks !== this.blocks) {
-      this.evidenceProjection = { blocks: this.blocks, evidence: this.blocks.flatMap(block => block.evidence) }
+      const evidence = new Map<number, Evidence>()
+      for (const block of this.blocks) for (const item of executionBlockEvidence(block)) {
+        const prior = evidence.get(item.sequence)
+        if (!prior || (item.changeSequence ?? 0) >= (prior.changeSequence ?? 0)) evidence.set(item.sequence, item)
+      }
+      this.evidenceProjection = { blocks: this.blocks, evidence: [...evidence.values()].sort((a, b) => a.sequence - b.sequence) }
     }
     return this.evidenceProjection.evidence
   }
@@ -37,6 +43,10 @@ export class ExecutionWindow {
   runtimePhase: Page['runtimePhase'] = undefined
   runtimeThinkingTitle: Page['runtimeThinkingTitle'] = null
   private cursor = 0
+  private entryCursor: number | undefined
+  private projectionMode: ExecutionProjection = 'blocks'
+  private negotiated = false
+  get projectionVersion(): 3 | 4 { return this.projectionMode === 'delegationBlocks' ? 4 : 3 }
   private before: number | null = null
   private neighbor: Page | null = null
   private latestPage: Page | null = null
@@ -73,27 +83,28 @@ export class ExecutionWindow {
     return bytes
   }
   private merge(items: Block[]): void {
-    const entries = new Map(this.blocks.map(item => [item.key, item]))
+    const entries = new Map(this.blocks.map(item => [item.sequence, item]))
     let dirty = false
     for (const item of items) {
-      const previous = entries.get(item.key)
+      const previous = entries.get(item.sequence)
       if (previous && (item.changeSequence) < (previous.changeSequence)) continue
       if (previous && JSON.stringify(previous) === JSON.stringify(item)) continue
-      entries.set(item.key, item); dirty = true
+      entries.set(item.sequence, item); dirty = true
     }
     if (!dirty) return
     this.blocks = [...entries.values()].sort((a, b) => a.sequence - b.sequence)
   }
   private valid(items: Block[], through: number): boolean {
-    return items.every(item => (item.kind === 'item' || item.kind === 'toolGroup') && typeof item.key === 'string'
-      && Number.isSafeInteger(item.changeSequence) && item.changeSequence >= 0
-      && Number.isSafeInteger(item.lastSequence) && item.lastSequence >= item.sequence && item.lastSequence <= through
-      && Number.isSafeInteger(item.toolCount) && item.toolCount >= 0 && item.evidence.length <= 4
-      && Object.values(item.counts).every(count => Number.isSafeInteger(count) && count >= 0)
-      && item.evidence.every(evidence => evidence.agentRunId === this.agentRunId
-        && Number.isSafeInteger(evidence.sequence) && evidence.sequence >= item.sequence && evidence.sequence <= item.lastSequence)
-      && Number.isSafeInteger(item.sequence)
-      && item.sequence > 0 && item.sequence <= through)
+    return validExecutionBlocks(items, this.agentRunId, through, this.projectionVersion)
+  }
+  private validDeltaEntries(page: Extract<ExecutionBlockChanges, { schemaVersion: 4 }>, after: number, entry: number | undefined): boolean {
+    return new Set(page.blocks.map(item => item.sequence)).size === page.blocks.length
+      && page.blocks.every(item => item.changeSequence <= page.throughChangeSequence
+        && (item.changeSequence > after || (entry !== undefined && item.changeSequence === after && item.sequence > entry))
+        && (!page.hasMore || item.changeSequence < page.nextAfterChangeSequence
+          || item.changeSequence === page.nextAfterChangeSequence && item.sequence <= page.nextAfterEntrySequence!))
+      && (!page.hasMore || page.blocks.some(item => item.changeSequence === page.nextAfterChangeSequence
+        && item.sequence === page.nextAfterEntrySequence))
   }
   private async fetch(before: number | null, after?: number): Promise<Page> {
     const key = after === undefined ? `before:${before}` : `after:${after}`
@@ -101,10 +112,11 @@ export class ExecutionWindow {
     if (pending) return pending
     const limit = before === null && after === undefined ? this.limit : HISTORY_LIMIT
     const generation = this.generation
-    const promise = this.request({ threadId: this.threadId, agentRunId: this.agentRunId, beforeSequence: before,
-      ...(after === undefined ? {} : { afterSequence: after }), limit }).then(page => {
+    const params = { threadId: this.threadId, agentRunId: this.agentRunId, beforeSequence: before,
+      ...(after === undefined ? {} : { afterSequence: after }), limit }
+    const validate = (page: Page) => {
       const items = page.blocks
-      if (page.schemaVersion !== 3 || page.threadId !== this.threadId || page.agentRunId !== this.agentRunId
+      if (page.schemaVersion !== this.projectionVersion || page.threadId !== this.threadId || page.agentRunId !== this.agentRunId
         || page.requestedBeforeSequence !== before || (page.requestedAfterSequence ?? undefined) !== after
         || !Number.isSafeInteger(page.throughSequence) || page.throughSequence < 0 || items.length > limit
         || !Number.isSafeInteger(page.throughChangeSequence) || page.throughChangeSequence < 0
@@ -115,9 +127,23 @@ export class ExecutionWindow {
         || (after !== undefined && (page.hasMore ? page.nextAfterSequence !== items.at(-1)?.sequence : page.nextAfterSequence != null))) {
         throw new Error('执行记录分页数据不兼容')
       }
-      if (before !== null && before === this.before && generation === this.generation) this.neighbor = page
+    }
+    const promise = (async () => {
+      let page = await this.request({ ...params, projection: this.projectionMode })
+      if (generation !== this.generation) return page
+      validate(page)
+      if (!this.negotiated && this.projectionMode === 'blocks' && page.delegationBlocksVersion === 4) {
+        // Never merge legacy group boundaries before the explicit new projection
+        // arrives. A failed v4 read retries v4, not a silently mixed old snapshot.
+        this.projectionMode = 'delegationBlocks'
+        page = await this.request({ ...params, projection: this.projectionMode })
+        if (generation !== this.generation) return page
+        validate(page)
+      }
+      this.negotiated = true
+      if (before !== null && before === this.before) this.neighbor = page
       return page
-    })
+    })()
     this.pending.set(key, promise)
     try { return await promise } finally { if (this.pending.get(key) === promise) this.pending.delete(key) }
   }
@@ -148,7 +174,7 @@ export class ExecutionWindow {
           this.blocks = []; this.before = page.nextBeforeSequence; this.hasEarlier = page.hasMore
         }
         this.merge([...page.blocks, ...(page.activeBlocks ?? [])])
-        this.latestPage = page; this.cursor = page.throughChangeSequence
+        this.latestPage = page; this.cursor = page.throughChangeSequence; this.entryCursor = undefined
         this.runtimePhase = page.runtimePhase
         this.runtimeThinkingTitle = page.runtimePhase === 'thinking' ? page.runtimeThinkingTitle : null
         this.latestDirty = false; this.hasNewer = false; this.viewport = null
@@ -158,7 +184,7 @@ export class ExecutionWindow {
         this.before = page.nextBeforeSequence; this.hasEarlier = page.hasMore; this.neighbor = null
       } else {
         this.merge(page.blocks); this.hasNewer = page.hasMore
-        if (!page.hasMore) this.cursor = page.throughChangeSequence
+        if (!page.hasMore) { this.cursor = page.throughChangeSequence; this.entryCursor = undefined }
       }
       this.loaded = true
       this.prune(direction === 'earlier')
@@ -188,21 +214,22 @@ export class ExecutionWindow {
       let more = true
       while (more && generation === this.generation && !this.hasNewer) {
         const after = this.cursor
+        const entry = this.entryCursor
         const refreshEvidenceIds = this.evidence.filter(item =>
           item.eventType === 'agent.text.block' && item.payload !== null && typeof item.payload === 'object'
             && 'status' in item.payload && item.payload.status === 'streaming'
           || item.revision == null && (item.phase === 'updated' || item.phase === 'started'))
           .slice(0, 256).map(item => item.id)
         const page = await this.changes({ threadId: this.threadId, agentRunId: this.agentRunId,
-          afterChangeSequence: after, refreshEvidenceIds, limit: 96 })
+          afterChangeSequence: after, ...(entry === undefined ? {} : { afterEntrySequence: entry }),
+          refreshEvidenceIds, limit: 96, projection: this.projectionMode })
         if (generation !== this.generation) return
-        if (page.schemaVersion !== 3 || page.threadId !== this.threadId || page.agentRunId !== this.agentRunId
-          || page.requestedAfterChangeSequence !== after || !Number.isSafeInteger(page.nextAfterChangeSequence)
-          || !Number.isSafeInteger(page.throughChangeSequence) || page.nextAfterChangeSequence < after
-          || page.nextAfterChangeSequence > page.throughChangeSequence || (page.hasMore && page.nextAfterChangeSequence <= after)
-          || (!page.hasMore && page.nextAfterChangeSequence !== page.throughChangeSequence)
+        if (page.schemaVersion !== this.projectionVersion || page.threadId !== this.threadId || page.agentRunId !== this.agentRunId
+          || !validExecutionDeltaPosition(page, after, entry, this.projectionVersion)
+          || !Number.isSafeInteger(page.throughSequence) || page.throughSequence < 0
           || page.blocks.length > 96 || (page.refreshedBlocks?.length ?? 0) > 256
-          || !this.valid([...page.blocks, ...(page.refreshedBlocks ?? [])], page.throughSequence)) {
+          || !this.valid([...page.blocks, ...(page.refreshedBlocks ?? [])], page.throughSequence)
+          || (this.projectionVersion === 4 && !this.validDeltaEntries(page as Extract<ExecutionBlockChanges, { schemaVersion: 4 }>, after, entry))) {
           throw new Error('执行记录增量数据不兼容')
         }
         // Returning after a long absence must not replay an entire Run before reaching its tail.
@@ -212,17 +239,18 @@ export class ExecutionWindow {
           return
         }
         this.cursor = page.nextAfterChangeSequence
+        this.entryCursor = page.schemaVersion === 4 ? page.nextAfterEntrySequence ?? undefined : undefined
         this.runtimePhase = page.runtimePhase
         this.runtimeThinkingTitle = page.runtimePhase === 'thinking' ? page.runtimeThinkingTitle : null
         // Ignore old operation updates outside the contiguous loaded interval.
         const first = this.before === null ? 0 : this.before
         this.merge([...page.blocks, ...(page.refreshedBlocks ?? [])].filter(item => item.sequence >= first
           || this.blocks.some(old => old.sequence === item.sequence)))
-        this.latestPage = { schemaVersion: 3, threadId: this.threadId, agentRunId: this.agentRunId,
+        this.latestPage = page.hasMore ? null : { schemaVersion: this.projectionVersion, threadId: this.threadId, agentRunId: this.agentRunId,
           requestedBeforeSequence: null, throughSequence: page.throughSequence,
           throughChangeSequence: this.cursor, runtimePhase: this.runtimePhase, runtimeThinkingTitle: this.runtimeThinkingTitle, blocks: this.blocks.slice(-this.limit),
           hasMore: this.hasEarlier || this.blocks.length > this.limit,
-          nextBeforeSequence: this.hasEarlier || this.blocks.length > this.limit ? this.blocks.slice(-this.limit)[0]?.sequence ?? null : null }
+          nextBeforeSequence: this.hasEarlier || this.blocks.length > this.limit ? this.blocks.slice(-this.limit)[0]?.sequence ?? null : null } as Page
         this.prune(!accept())
         this.changed()
         more = page.hasMore
@@ -230,7 +258,7 @@ export class ExecutionWindow {
       }
     } catch {
       // Preserve readable data; invalidation or explicit latest retries a bounded snapshot.
-      this.latestDirty = true
+      if (generation === this.generation) this.latestDirty = true
     } finally {
       if (generation === this.generation) {
         this.refreshing = false
@@ -267,6 +295,7 @@ export class ExecutionWindow {
     if (start > 0 || end < this.blocks.length) {
       // Active operations can precede the historical cursor and must remain visible until settled.
       const active = (item: Block) => item.counts.running > 0 || item.counts.waiting > 0
+        || item.kind === 'item' && item.evidence.some(value => value.canonical && value.canonical.phase !== 'terminal')
       this.blocks = [...this.blocks.slice(0, start).filter(active), ...this.blocks.slice(start, end),
         ...this.blocks.slice(end).filter(active)]
     }

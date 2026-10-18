@@ -10,7 +10,13 @@ last_updated: 2026-10-19
 外层 Shell 的唯一精确证明另作为 support，不移动卡片主区间，也不建立第二份执行事实。关联变化同时使卡片和原组
 重读；成对增量位置防止同一次变更影响多个块时漏项。展开组的精确移除与重新可见均由 Core 投影决定。
 字段与旧调用兼容见 [Run Process Detail Surface v52](../contracts/run-process-detail-surface-v52.md)。
-本批只有后端与类型，客户端启用和完整链路尚待；不将读取投影当作模型委派执行资格。
+客户端先核对旧页的能力声明，再以新方式重读同一页；旧边界不进入新窗口。主线保存成对位置；展开组在完整批次
+读完前保留原已完成水位，失败/重开回放原范围，避免只保存半个位置。组首边界独立于当前可见项，隐藏/移除载体
+不会丢失随后重新出现的更早记录。旧模式与新模式的组缓存分开。
+
+来源与输出分别保留原证据身份：Core 卡片使用原 Core 观察，合并的 Shell 仍负责原命令/输出读取。
+新模式逐主块选择证据，并按主块区分虚拟行、展开与结果缓存；跨 epoch 重复 operationId 不得借用另一张卡片。
+读取投影不授予模型委派资格；实际 Core/Host/Runtime、两端与完整 App 的候选结果仍单独留证。
 
 Core 是委派业务与执行权威。DelegationId 关联真实发起成员、父/根 Conversation、原 Run/epoch/Binding/tool-call 和独立 child Conversation；恢复增加 attempt，不替换逻辑编号。它不是 Task、Mission、正式成员或提供方原生子代理。
 User 查询依据 Host 身份及确切持久 Thread/child 关系，父 Run 终态不撤销用户查看历史的能力；模型侧仍每次核对原活跃运行与接管水位。

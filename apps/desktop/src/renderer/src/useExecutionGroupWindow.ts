@@ -16,11 +16,11 @@ export function useExecutionGroupWindow(
   const tail = useRef(liveTail); tail.current = liveTail
   const mounted = useRef(false), automaticPages = useRef(0)
   const anchor = useRef<{ element: HTMLElement; top: number; host: HTMLElement } | null>(null)
-  const key = block ? `group-window:${runId}:${block.key}` : ''
+  const key = block ? `group-window:${runId}:${block.key}${block.projectionVersion === 4 ? ':v4' : ''}` : ''
   const window = useMemo(() => block ? new ExecutionGroupWindow(threadId, runId, block.sequence, () => tail.current,
-    params => client.request<AgentRunExecutionGroupPage>('agentRunExecution.page', params),
-    params => client.request<AgentRunExecutionWindowChanges>('agentRunExecution.changes', params),
-    () => { if (mounted.current) changed(value => value + 1) }, cache?.get<GroupSnapshot>(key)) : null,
+    params => client.request<AgentRunExecutionGroupPage | import('@contracts').AgentRunDelegationGroupPage>('agentRunExecution.page', params),
+    params => client.request<AgentRunExecutionWindowChanges | import('@contracts').AgentRunDelegationGroupChanges>('agentRunExecution.changes', params),
+    () => { if (mounted.current) changed(value => value + 1) }, cache?.get<GroupSnapshot>(key), block.projectionVersion ?? 3) : null,
   [client, cache, key, threadId, runId])
   const host = () => root.current?.closest<HTMLElement>('.execution-drawer-body') ?? null
   const capture = () => {

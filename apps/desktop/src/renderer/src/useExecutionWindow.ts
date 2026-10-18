@@ -1,6 +1,7 @@
 import { useThreadClient } from './camp-client'
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import type { AgentRunView, AgentRunExecutionBlockPage, AgentRunExecutionBlockChanges, AgentRunExecutionEvidenceView } from '@contracts'
+import type { AgentRunView, AgentRunExecutionEvidenceView } from '@contracts'
+import type { ExecutionBlockPage, ExecutionBlockChanges } from './execution-block-contract'
 import { ExecutionWindow, executionWindowPageSize, executionWindowCacheFor } from './execution-window'
 
 export const ExecutionReadingContext = createContext<((following: boolean) => void) | null>(null)
@@ -74,8 +75,8 @@ export function useExecutionWindow(enabled: boolean, threadId: string, run: Agen
     // drawer's historical reading window, using the same bounded reader/cache.
     const retained = executionWindowCacheFor(client).acquire(`${threadId}:${run.id}:${run.executionEpoch}${tailOnly ? ':tail' : ''}`,
       notify => new ExecutionWindow(threadId, run.id, tailOnly ? 1 : executionWindowPageSize(host?.clientHeight || 500),
-        params => client.request<AgentRunExecutionBlockPage>('agentRunExecution.page', { ...params, projection: 'blocks' }), notify,
-        params => client.request<AgentRunExecutionBlockChanges>('agentRunExecution.changes', { ...params, projection: 'blocks' })),
+        params => client.request<ExecutionBlockPage>('agentRunExecution.page', params), notify,
+        params => client.request<ExecutionBlockChanges>('agentRunExecution.changes', params)),
       () => changed(value => value + 1))
     const current = retained.window
     const wasLoaded = current.loaded

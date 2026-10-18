@@ -10,6 +10,7 @@ import {
   ToolOutputTruncationNotice,
   selectCompletePresentableExecutionEvidence
 } from './ExecutionToolGroup'
+import { buildLiveExecutionProgress, liveRuntimeEventFromExecutionEvidence } from './ui-model'
 import type { ToolProgressItem } from './execution-tool-grouping'
 import { runtimeCompactionDetailText, runtimeCompactionTitle, type ActivityIconKind, type RuntimeCompactionDisplayItem } from './ui-model'
 import { openAgentRunActivityFilePreview } from './agent-run-file-preview'
@@ -21,6 +22,31 @@ const tool = (id: string, iconKind: ActivityIconKind, status: ToolProgressItem['
     id, iconKind, status, title: `指令 ${id}`, publicCommand: null, publicResult: null,
     detail: `指令 ${id} 结果`, activityDomain: 'shell', toolName: null, credibility: 'runtime_structured'
   }
+})
+
+it.each([true, false])('keeps Core source identity separate from its Shell output when metadata is deferred=%s', deferred => {
+  const make = (id: string, sequence: number, core: boolean): AgentRunExecutionEvidenceView => ({
+    id, agentRunId: 'run', executionEpoch: 1, sequence, eventType: core ? 'runtime.action' : 'activity.completed',
+    kind: core ? 'tool_call' : 'command', phase: 'completed', revision: 1, isTruncated: core ? deferred : true,
+    contentBlobId: null, contentByteCount: 100, occurredAt: '2026-10-19T00:00:00Z',
+    payload: core ? { sourceAuthority: 'core', canonicalTool: 'delegation.start', kind: 'builtin_tool_invocation', status: 'completed',
+      operationProjection: { schemaVersion: 3, operation: 'delegation.start', canonicalInput: {}, canonicalResult: null } }
+      : { executionWindowBuiltinOperation: 'delegation.start', item: { type: 'commandExecution', command: 'rovai delegation start --task fixture', status: 'completed' } },
+    canonical: { operationId: id, activityDomain: core ? 'tool' : 'shell', semanticKind: null, toolName: core ? 'delegation.start' : 'shell',
+      presentationHint: null, phase: 'terminal', outcome: 'succeeded', credibility: core ? 'core_verified' : 'runtime_structured',
+      coverageLevel: 'fine_grained', sourceAuthority: core ? 'core' : 'runtime', sourceEvidenceIds: [id], classifierVersion: 'activity-v3',
+      firstEvidenceSequence: sequence, lastEvidenceSequence: core ? sequence : 5, revision: 1 }
+  })
+  const native = make('native-output', 1, false), core = make('core-observation', 3, true)
+  const records = [native, core]
+  const progress = buildLiveExecutionProgress(records.map(liveRuntimeEventFromExecutionEvidence), 'run', { includePublicResults: false })
+  const item = progress.items.find(item => item.kind === 'tool')!
+  if (item.kind !== 'tool') throw new Error('Expected actual merged Core tool')
+  expect(item.step.id).toBe(core.canonical!.operationId)
+  expect(item.step.detailOperationId).toBe(native.canonical!.operationId)
+  const selected = selectCompletePresentableExecutionEvidence(records)
+  expect(selected.byCoreToolId?.get(item.step.id)?.id).toBe(core.id)
+  expect(selected.byToolId.get(item.step.detailOperationId!)?.id).toBe(native.id)
 })
 const renderGroup = (items: ToolProgressItem[], expanded = false, liveTail = false,
   runStatus: AgentRunView['status'] = 'running', cancelling = false) => renderToStaticMarkup(

@@ -105,6 +105,11 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 
 ## Rust 测试准入与退役门槛
 
+I04 分页客户端沿原 execution-window/group-window、ExecutionToolGroup、builtin-tools、工具分组与Web adapter owner扩新4，
+核对旧3探测、同水位续页/失败、支持跨区间、来源/输出不同身份、逻辑开始/完成换id、组移除/重新出现及跨epoch隔离。
+实际 RunExecutionDisclosure→Hook→虚拟列表/组→原卡片另用隔离Renderer及受控运输验证，不作为真实Core/HTTP/Runtime资格。
+原 ThreadWorkspace.history-loader SSR owner在基线也有两项缺client上下文；只补明确Provider，不建window.rovai假桥、不改产品。
+
 I04 委派区块扩原 `read_model::slow_tests::execution_evidence_is_counted_in_snapshot_and_paged_by_agent_run`，
 helper 为 `read_model/delegation_block_tests.rs`，复用原同库与10,000操作夹具，不新增测试 owner/数据库/进程。
 修复前中间委派被普通组折叠；拆组后还会丢跨块载体及同 change 的第二个更新。覆盖旧3兼容、可信独立开始态、

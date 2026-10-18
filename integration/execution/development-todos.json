@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "date": "2026-10-15",
+  "date": "2026-10-19",
   "policy": "研发可修问题由研发继续处理，不列为客户资源阻塞",
   "items": [
     {
@@ -134,6 +134,15 @@
       "problem": "I03私聊材料r1的Core单租约scope接管/旧token拒绝与完整移回已实现；17项Core和56项既存/模拟客户端检查通过。Renderer尚缺targetBody/placement/完整保留选择及本机意图，上传准备/授权仍待，不判端到端或产品验收通过。",
       "confirmation": "i03-private-materials-proposal-result.json",
       "evidence": "i03-private-pending-edit-result.json"
+    },
+    {
+      "id": "DEV-EXECUTION-WINDOW-AUTH-RECOVERY",
+      "task": "I04-T01/I12",
+      "owner": "研发",
+      "status": "pending_current_cache_authorization_proof",
+      "file": "apps/desktop/src/renderer/src/execution-window.ts / execution-content-cache.ts",
+      "problem": "原执行窗口缓存按client保留，尚无完整认证代次回收及正文在途回复的资格证据；需核对Web恢复/失效与普通同Owner断线保留的区别，复现并补围栏，不能将本轮Host对象替换检查写成同client认证恢复通过",
+      "evidence": "i04-delegation-block-client-result.json；当前仅来源/输出分离、两窗口generation/范围及替换client的实际Renderer资格"
     }
   ]
 }

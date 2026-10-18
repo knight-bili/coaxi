@@ -83,7 +83,7 @@ it('admits the shared canvas operations through the authenticated Web adapter an
   } finally { transport.clear() }
 })
 
-it('loads a command after an initially empty Web Run and refreshes its completion', async () => {
+it.each([false, true])('loads and refreshes an initially empty Web Run with delegation blocks=%s', async supported => {
   const storage = { getItem: () => null, setItem: () => undefined, removeItem: () => undefined }
   vi.stubGlobal('sessionStorage', storage)
   vi.stubGlobal('localStorage', storage)
@@ -97,14 +97,16 @@ it('loads a command after an initially empty Web Run and refreshes its completio
     if (String(url).endsWith('/login')) return Response.json({ protocolVersion: 4, token: 'a'.repeat(64), clientId: 'd'.repeat(64), editorProof: 'e'.repeat(64), ownerId: 'local_user' })
     const { operation, params } = JSON.parse(String(options?.body))
     operations.push(operation)
-    expect(params.projection).toBe('blocks')
+    const delegated = params.projection === 'delegationBlocks'
+    expect(params.projection).toBe(supported && operations.length > 1 ? 'delegationBlocks' : 'blocks')
     const blocks = evidence.map(item => ({
       key: 'tools:1', kind: 'toolGroup', sequence: 1, lastSequence: 1, changeSequence,
+      ...(delegated ? { projectionVersion: 4 } : {}),
       toolCount: 1, counts: { completed: Number(item.phase === 'completed'), running: Number(item.phase !== 'completed'),
         failed: 0, stopped: 0, waiting: 0, recorded: 0 }, evidence: [item]
     }))
     const common = {
-      schemaVersion: 3,
+      schemaVersion: delegated ? 4 : 3,
       threadId: 'camp',
       agentRunId: 'run',
       throughSequence: evidence.at(-1)?.sequence ?? 0,
@@ -112,7 +114,8 @@ it('loads a command after an initially empty Web Run and refreshes its completio
       hasMore: false
     }
     if (operation === 'agentRunExecution.page') return Response.json({ result: {
-      ...common, requestedBeforeSequence: params.beforeSequence, nextBeforeSequence: null, blocks
+      ...common, ...(supported ? { delegationBlocksVersion: 4 } : {}),
+      requestedBeforeSequence: params.beforeSequence, nextBeforeSequence: null, blocks
     } })
     if (operation === 'agentRunExecution.changes') return Response.json({ result: {
       ...common,
@@ -127,8 +130,8 @@ it('loads a command after an initially empty Web Run and refreshes its completio
   const adapter = createThreadAdapter(transport, async () => null)
   const client = adapter.environment.client
   const current = new ExecutionWindow('camp', 'run', 12,
-    params => client.request('agentRunExecution.page', { ...params, projection: 'blocks' }), () => undefined,
-    params => client.request('agentRunExecution.changes', { ...params, projection: 'blocks' }))
+    params => client.request('agentRunExecution.page', params), () => undefined,
+    params => client.request('agentRunExecution.changes', params))
   try {
     await current.latest()
     expect(current.loaded).toBe(true)
@@ -147,7 +150,8 @@ it('loads a command after an initially empty Web Run and refreshes its completio
       payload: { command: 'printf WEB_LIVE_COMMAND_MARKER', exitCode: 0 } }]
     await current.refresh()
     expect(current.evidence[0].phase).toBe('completed')
-    expect(operations).toEqual(['agentRunExecution.page', 'agentRunExecution.changes', 'agentRunExecution.changes'])
+    expect(operations).toEqual([...(supported ? ['agentRunExecution.page'] : []),
+      'agentRunExecution.page', 'agentRunExecution.changes', 'agentRunExecution.changes'])
   } finally { current.dispose(); transport.clear() }
 })
 

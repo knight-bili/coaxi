@@ -1,0 +1,1112 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-18T20:53:35.136967+00:00",
+  "stage": "I04",
+  "task": "I04-T01",
+  "branch": "develop/V1.0.0",
+  "baseline_commit": "efb6f0bbc7b8d03bcda6f9c085a48efcb45f1680",
+  "status": "delegation_blocks_client_and_production_renderer_verified_real_core_auth_full_content_pending",
+  "scope_preserved": {
+    "source_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_packages": 4,
+    "i04_clusters": 21,
+    "i04_formal_cases": 84,
+    "new_formal_cases_passed": 0
+  },
+  "facts": [
+    "Actual execution disclosure and hooks probe legacy3, validate capability4 and fetch new4 before merging any legacy boundaries; old Core remains3",
+    "Root saves paired change/entry cursor, retries exact tied position; expanded group drains pairs locally and commits cached watermark only after complete batch",
+    "Group v4 snapshot stores loaded bounds separately from visible rows; suppression/reappearance preserve group-start and historical ranges",
+    "Navigation invalidates in-flight old range before refreshing new range; changing physical end id does not duplicate a logical operation",
+    "External support participates in original tool projection without expanding the primary interval or using earlier support for viewport retention",
+    "Source cards use exact Core observation metadata; original Shell remains independent command/output identity; no eager full-output fetch",
+    "Per-block source selection, virtual item keys and expanded/result cache scopes isolate equal canonical/toolCall ids across epochs",
+    "Web ConsoleClient/production adapter retains legacy3 and negotiated4 fields through explicit fetch replacement"
+  ],
+  "verification": {
+    "targeted_files": 7,
+    "targeted_tests_passed": 130,
+    "typecheck_exit": 0,
+    "production_renderer_groups": 18,
+    "screenshots_reviewed": 8,
+    "docs_tests_passed": 10,
+    "docs_version_gate": true,
+    "docs_diff_gate_base": "efb6f0bbc7b8d03bcda6f9c085a48efcb45f1680",
+    "codegraph_synced": true,
+    "transport": "explicit synthetic read responses, actual production RunExecutionDisclosure/hook/window/virtual list/group/ToolCallRow/viewer host; ConsoleClient uses fetch replacement",
+    "source_reference": "Fixed original Codeg delegated/resumed/card-row bodies and actual donor reference imports with declared host seams; original Rovai Run disclosure/layout retained",
+    "source_audit_unchanged": {
+      "ok": true,
+      "donorCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+      "files": [
+        {
+          "name": "delegated-sub-thread.tsx",
+          "sourceSha256": "671938eb41af1ebbe5893ed2f618286d5432afa7ee57cdfddbafd8f9f74b396a",
+          "portedSha256": "bbc446edbc54e0248647c58ff650f65c14945697b04b0f3ddfbb319d068a68d0",
+          "bodyEqualAfterDeclaredWhitespaceFix": true
+        },
+        {
+          "name": "delegation-card-row.tsx",
+          "sourceSha256": "ab9d0c4a3b334cb70929f8becf473a56d929d1d18a4d12037f812f501e68041d",
+          "portedSha256": "cd863817fa443793984a01819456c990d075ed9cd251a14cf55ef2379d04b9ed",
+          "bodyEqualAfterDeclaredWhitespaceFix": true
+        },
+        {
+          "name": "resumed-delegation-card.tsx",
+          "sourceSha256": "8b7e100dca214c70c0801cbd43997b54561727e97c412aba134178dd774deb9c",
+          "portedSha256": "329c091e865023f7a49e900de3aa7b8fa2f55fd966edf0f89ef59d68b1ed3fef",
+          "bodyEqualAfterDeclaredWhitespaceFix": true
+        }
+      ],
+      "parserOnlyChangeSinceBaseline": "preserve complete original interruption reason instead of str() trimming",
+      "declaredPresenterChange": "two lines preserve raw reason while whitespace-only remains non-expandable",
+      "referenceUsesActualDonorModules": true,
+      "fullOriginalApp": false
+    },
+    "full_original_app": false,
+    "actual_core_native_web_e2e": false,
+    "real_provider": false,
+    "new_rust_builds": 0,
+    "schema_or_model_input_changes": 0,
+    "stage_complete": false
+  },
+  "visual_review": {
+    "completed": true,
+    "scenes": [
+      "night1000",
+      "day1000",
+      "night390",
+      "day390"
+    ],
+    "findings": "Original card geometry/style/affordances retained in both themes, complete task and resume reason accessible, narrow actions visible and no horizontal overflow. Production has ordinary tool groups and original-record disclosure. Original Rovai Drawer padding makes card host width different from isolated donor reference; no pixel-equality or full original App claim."
+  },
+  "self_review_fixes": [
+    "Actual Renderer exposed wrong Shell id used for delegation source; added separate Core metadata identity while preserving Shell output path",
+    "Same operation id across epochs required per-block metadata/key/state scope, not a global operation-id map; actual reused canonical and call-id case verifies independent output expansion",
+    "Legacy-only test fixtures return schema3 explicitly after production request union widened; missing source-map prop annotation fixed without type casts",
+    "Baseline read-only source overlay reproduced two existing history-loader SSR failures; explicit client Provider fixes fixture without a fake global Desktop bridge",
+    "Positive wrong-epoch suppression and non-advancing tied cursor rejected; group snapshot replay preserves original complete watermark on failed later page"
+  ],
+  "remaining": [
+    "Full same-client authentication recovery/invalidation and retained full-content cache fencing; ordinary same-owner offline preservation must be distinguished",
+    "Real Core.handle -> Native/Web -> production UI candidate and complete original App same-scene, large content/scale/memory/recovery",
+    "Complete original statistics/Markdown/HTML/image interactions; Claude full parser/producer/Core, independent Qoder roots/producer and explicit legacy import",
+    "Grok feedback/three Context/takeover and original T02/T03/T04 runtime union/recovery/memory/automation",
+    "Complete original ANSI license evidence or replacement before public binaries"
+  ],
+  "goal_status": "active",
+  "customer_action_required": false,
+  "push": false,
+  "actions_dispatched": 0,
+  "main_merge": false,
+  "release": false,
+  "paid_usage": false,
+  "approved_r1_artifacts": [
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    },
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    }
+  ],
+  "source_files": [
+    {
+      "path": "apps/desktop/src/renderer/src/ExecutionToolGroup.test.tsx",
+      "sha256": "3b7eab0ed5a2479a699bfac00253f9234ba7140867e886f7141879f7168c3df2",
+      "git_blob_with_filters": "747cf906e11e5ca7c29b26d66d09baad432eab08"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/ExecutionToolGroup.tsx",
+      "sha256": "e8319877dc5140550456896e4be908b2f0cf07dcf0da6061d53453531824529c",
+      "git_blob_with_filters": "6124c20f4761f95d6e855e0c0f7be430cb537f44"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/ThreadWorkspace.history-loader.test.ts",
+      "sha256": "2a045ff3b08acb917a816c57e2afb0d1f95e45cc26256591bce2e3adf45fcb8d",
+      "git_blob_with_filters": "f5b9909b5f95a7254441b0f42281aa4a06d3ad3a"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/ThreadWorkspace.tsx",
+      "sha256": "ea18aea25a149828f56dc137414c906b5b9fde15df268e6b2d9341b05c583416",
+      "git_blob_with_filters": "feea76720b7be82933e333d1420f46c51d0c7d84"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/execution-group-window.test.ts",
+      "sha256": "015b1b810c0b17792f299096f2f1a0bbf0ada8052716a398b02c213bcf07513d",
+      "git_blob_with_filters": "5de453b7a211c2681ed11dbde3e42eefe93fbb49"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/execution-group-window.ts",
+      "sha256": "ffd109410d7aaebe4987e273918199511322a43f5836453aa20fd36b9fa22cab",
+      "git_blob_with_filters": "cacbcce14e1683b6f2c90a66f86c0da5c8bac15a"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/execution-window.test.ts",
+      "sha256": "9f3bd292f553be3d40f3239b6c108ed100af45d1c41d3e34d399348d38f7b98b",
+      "git_blob_with_filters": "3eb4048e5a00557ea490f235e9a3a3c62fd4053e"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/execution-window.ts",
+      "sha256": "7756cfc6f9c5ab24f826e5e72d0817ac2521f59cc0fbc3c688266ac0e19c83bd",
+      "git_blob_with_filters": "1cbe3cc19607a75646355a54bc2f50f2dfb686a5"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/useExecutionGroupWindow.ts",
+      "sha256": "a071231f2dec22b8a697948595182128970930edbb36a89f10ddb81b64532297",
+      "git_blob_with_filters": "30cea4b9d1bb0a294a1b59b41108dba7c2e3406b"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/useExecutionWindow.ts",
+      "sha256": "23b70b1282557d8c8b01a7af80aa56eb0f97c922ecd469dc605df23f68079e16",
+      "git_blob_with_filters": "23f2096a390c2018b70b99b57e80dc952958037d"
+    },
+    {
+      "path": "apps/web/src/camp-adapter.test.ts",
+      "sha256": "db935ca0d731723bdd9612ee950d87c290abac2027ab6fd091de1b7978834062",
+      "git_blob_with_filters": "d4b95e2fe44607299e5ecac5e4f6de01aa41ceab"
+    },
+    {
+      "path": "docs/architecture/delegation.md",
+      "sha256": "ecf94afc52f63ba2039abbdc2d49ed7704fb9926e4755ffd2d1a8a5ec797b48e",
+      "git_blob_with_filters": "80fdba837b596e13f7c1c495850c93c78f9256dd"
+    },
+    {
+      "path": "docs/development/testing.md",
+      "sha256": "c9232408b771982cef2f38bbf2490338a892ee0a5ca31ec095bf9f1b3343b7f7",
+      "git_blob_with_filters": "6584dc16b390d11296cd5bf054dd9e077e36aa42"
+    },
+    {
+      "path": "docs/versions/v1.73/README.md",
+      "sha256": "e4890f9ba3c890e6603c065d72b3d45a4972378ee668d2a7e556d69c23fd708d",
+      "git_blob_with_filters": "c97a61e957d369cda3a7c27ddaadb272dace2d58"
+    },
+    {
+      "path": "docs/versions/v1.73/implementation-plan.md",
+      "sha256": "3381979972dee1ecfdce302dd2583c047169144cb07b77c609cce6d9b184cfc6",
+      "git_blob_with_filters": "66295c429f18a9a8622ab62504eff2fc507d964f"
+    },
+    {
+      "path": "integration/README.md",
+      "sha256": "a6ecc114f8908e410334734b77a9a7d6ac5606ddc6a5cbc92056ad3551cadbc6",
+      "git_blob_with_filters": "b8b7f93e3ec244cbf646e697e474f9b26a6183ce"
+    },
+    {
+      "path": "integration/execution/development-todos.json",
+      "sha256": "d7dac013853ba9c1fc59fb61c6a1bc9cb296c84584de96002607cca302c7bea1",
+      "git_blob_with_filters": "0413bcb4e93f96ecc55359414d5ef2b4c323a618"
+    },
+    {
+      "path": "integration/execution/goal-state.json",
+      "sha256": "53a7746ea910f98031f30f8d0c8a1657f9af88a7c0e1f948059752ed45b34c3f",
+      "git_blob_with_filters": "d8c770e8342800a56a0e3fa8877dbc4fb4ae7685"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/execution-block-contract.ts",
+      "sha256": "0143703972adca333f17e7ef165277a5dfb39c64dbc1f95901456591c16f9435",
+      "git_blob_with_filters": "845c0acce27eb86a2bc68b1a24eaee2415d1761a"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "file/I04分页客户端/baseline.config.mjs",
+      "bytes": 891,
+      "sha256": "6b95e29d2663414f40d46c758c3515cd9b445759eb005c0a3c51c72194aaaac7"
+    },
+    {
+      "path": "file/I04分页客户端/checkpoint.py",
+      "bytes": 9482,
+      "sha256": "acdcf56d0f0fc11d60ac3418c45800fec87bb53151029cd00ec5f349cbf6a343"
+    },
+    {
+      "path": "file/I04分页客户端/commit.py",
+      "bytes": 1138,
+      "sha256": "74b774766e888a102602c299afde77a361e54e03966f9c3921b561c84c88af0e"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/antigravity-color-DgAQAdn3.svg",
+      "bytes": 7634,
+      "sha256": "652128cf55a28bb958563ee372d0bd00208d9e6fd446f523f77aafd811eef8ca"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/apl-fqmucPXA.js",
+      "bytes": 3573,
+      "sha256": "5be3458b72027a2151b231faa2e30eaf16e1e29067222e232694f25418c2a140"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/asciiarmor-DucZyvP0.js",
+      "bytes": 1531,
+      "sha256": "01c94e79d596371ae8d7fb8f8e9d7f7c136b9c9cbd1f7f1124949ee0216d4816"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/asn1-BnOEsgAm.js",
+      "bytes": 6540,
+      "sha256": "bb17319ceb5860451c6822bfadacfcedd6f972cfafbe016b36dfe6ac23f73551"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/asterisk-QAlztEwS.js",
+      "bytes": 6665,
+      "sha256": "6df194920c95ba624a8fda9ecc6fb9bb3e8c608635a2d0b0f4b2610cce4e6fc3"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/brainfuck-DZVCuF_t.js",
+      "bytes": 1193,
+      "sha256": "71ae5a627c032ec5f0333e28a4fc02da543a8faf15f2705c0e1f69f7df69c812"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/clike-xqXYL6ge.js",
+      "bytes": 35079,
+      "sha256": "1acda985c43e1ca1c234bc64cd7b495850069c0c10cd1a433d89c2005dcb503a"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/clojure-BhXMqnxz.js",
+      "bytes": 14874,
+      "sha256": "e6c5a1b8eead561531a1fe6afc42ebd3541913ac87645794bee5b2e42222ff2e"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/cmake-BGaNd9E7.js",
+      "bytes": 1598,
+      "sha256": "319d4983f4e2c2934fdbf67a567ad183211c15a618df3d9e7ad270a188f63c1a"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/cobol-4yqQntpt.js",
+      "bytes": 8051,
+      "sha256": "f541e17f367fb16b84f1c4585dc6b96436fab9b9984351746b8d6b7e4be77533"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/coffeescript-D2dXvhEc.js",
+      "bytes": 7885,
+      "sha256": "fd8b8081e6c6d0b3a5a1d5159ea923fa92de6b16498672ac8ffb3a85d0f074ff"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/command-code-D8gwtO8i.ico",
+      "bytes": 15086,
+      "sha256": "1c77333db1896f681078ced8ccaea0f2410b7f06f2dffcc8b7150a5045590686"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/commonlisp-CF_VNHQR.js",
+      "bytes": 4045,
+      "sha256": "f0e48e905937a107e453a06c0eb54a8f1e536fc0fc63c5b58b9551c8f7fe49cb"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/crystal-DyuLTqLs.js",
+      "bytes": 10531,
+      "sha256": "c1628558768374a78a1fa71c26feaf44bfc6c5161bf81d964490416d1af1f38f"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/css-c-jst79C.js",
+      "bytes": 40347,
+      "sha256": "41425a19b41f83ae573be2f495236cd1161392d1ef66eb2d23d2784510746818"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/cypher-Dlu_3r4V.js",
+      "bytes": 5505,
+      "sha256": "80cff481ed4632ecfbe5952d4c60f15227c66f04dfea646c32852a2b090d19ca"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/d-UURgV0Ux.js",
+      "bytes": 6499,
+      "sha256": "df60654c2550e460276b5522896ee99ab6516252a0016a0fafa21875641b72b9"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/diff-B_Bi2Crb.js",
+      "bytes": 564,
+      "sha256": "efa42a61215071dc4d677dab004a6f77c34b41825d87a7dc42303302c35b4b4a"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/dockerfile-Bvk733Ga.js",
+      "bytes": 3834,
+      "sha256": "31f1f2e8d8f9f2eeeb29f6d4b56e4632654d2f2a5b352a4febc9bf2f1984d29c"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/dtd-Dy74G54E.js",
+      "bytes": 3811,
+      "sha256": "cfaec369fbea7351fc6a8fb7c990f2fbc5a0d1730467e51935deb1965fccaa2a"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/dylan-TSb-Nfix.js",
+      "bytes": 8427,
+      "sha256": "b0c2026d9bb4917eccab491f63e56d95ceb4a8e01e42062a843c35ea29121607"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/ebnf-4fKAGW3a.js",
+      "bytes": 4022,
+      "sha256": "b21fa7b0323bdc0ab31713d74038dfef58b32305d3775c98547a3a23f143e16a"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/ecl-B59qGGVg.js",
+      "bytes": 7786,
+      "sha256": "4f1c8ae6eaddfd15d73523014b684fc2ae7160b0c10d0680812497b4f1254192"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/eiffel-Dze7nlu3.js",
+      "bytes": 2931,
+      "sha256": "a0fc308a8415ecaf7e5ffe28d9192c23f5b6e81d995eb7df35894a1b307a6606"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/elm-DG7jkhNZ.js",
+      "bytes": 4025,
+      "sha256": "c077dc7257d0e460440d911f88d5783e18ca8c58146fd9126e9e13a0897bcb5b"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/erlang-BO6gOnGA.js",
+      "bytes": 15208,
+      "sha256": "a7ff36cb6624f8cb2eedd1f201678c122f7d861f901c2b4465532dc9b10fb48e"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/factor-CMxFHDqz.js",
+      "bytes": 2613,
+      "sha256": "b249da83526bbefb5f5c5621c3cd3410f0f26edc9368cec95a585dbf5c6d0fd7"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/fcl-CDDUNjTj.js",
+      "bytes": 3749,
+      "sha256": "223f8c7838620a68cbcb74e4e40d10c5eb20fdd2fbe6d32e44bce2d1d2c28ed2"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/file-find.worker-CHoXCmE8.js",
+      "bytes": 1523,
+      "sha256": "80cfe35f96f8384c3f07480916e2786129ac31f1d7d839816bda104764da27c8"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/forth-B9D2JCeE.js",
+      "bytes": 3858,
+      "sha256": "2db6c4dd8f293410bd0de0a25f1dad21a1ee1990ddb816a4c783e86213e1e302"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/fortran-CAG2BFbe.js",
+      "bytes": 6675,
+      "sha256": "df8788d58683ac6188c9038802b9cc8483344dc447ff9854b818c5171c006401"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/gas-d3KEcW3x.js",
+      "bytes": 7823,
+      "sha256": "a699545574b2f6e9d0d502fe4536ef23b977a8f03ef284520247350ac240ab33"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/gherkin-DhZlEZiy.js",
+      "bytes": 11789,
+      "sha256": "86e76fdd8bbec4e37db05eebadde43a0761cddc0786f28f42befef6addaaefcb"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/groovy-CpwJiBl7.js",
+      "bytes": 7469,
+      "sha256": "6b1705ee26bb3827a73e657f0b58a16c84004135a5e237501d919b9cb868ca0e"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/harbor-city-2k-Dk6mtn28.webp",
+      "bytes": 841664,
+      "sha256": "a2f8bdd324331d46a31ba1f2771defe4fda22a131a15654a30915e62b8107d94"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/haskell-ySd-OUo8.js",
+      "bytes": 7626,
+      "sha256": "ff8a9df8c8df8f199ad3b7000aff670c061d0c760ba213d94f52a6f92024e0f8"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/haxe-7MlzfeYV.js",
+      "bytes": 15668,
+      "sha256": "df08c4d4f5bf41a8e63335fa1650e2d5dd4de28c5760ebd6ab47ee0c3fbdb606"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/hermes-agent-2xQZASMR.svg",
+      "bytes": 19748,
+      "sha256": "f660a2312f42c1d9d21daa5c7dfe1d666901030a42a469edc014678314d0ec8a"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/http-BqypyemW.js",
+      "bytes": 1774,
+      "sha256": "552d89ffbe4662e2a8a6ef42b9608509b6654b7de1f836e6c05c2b7ebc81e0f6"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/icon-192-C06667az.png",
+      "bytes": 81948,
+      "sha256": "2680338ed6d3557b6ab543b97460c4620ecffe0d3a801bd34c3c3c06a6eefe9a"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/icon-192-DrQKUdSk.png",
+      "bytes": 79330,
+      "sha256": "9fbd4eb0e7356b4c6ddf2d86a676178476b93747a4687a6e89d06684014ed142"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/icon-192-OagIfT5q.png",
+      "bytes": 74993,
+      "sha256": "9abc0b6b53cef994b32e8c14c02fa8cad3be5325168d1f6907c47b327a024438"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/icon-192-R53lTr_5.png",
+      "bytes": 81172,
+      "sha256": "2f40a6ee8f0a0d1cfc11d8010fc9d990d9dd2dfbb14ea27bbdf97e2c50619a4d"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/idl-4HIGJlDI.js",
+      "bytes": 15127,
+      "sha256": "0ec3441d716383be06d8b9abe052499551a470877e9fb3701ebc09ab590c70b1"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/index--7qMN5wu.js",
+      "bytes": 44040,
+      "sha256": "00f679bf87f5c4a808915a57d642a5eaf4b3b34a2c0165a9ddcd098c4d76be01"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/index-7NZTQciz.js",
+      "bytes": 19883,
+      "sha256": "be03e880749df08bd172625b7d5cd7437879308fa585f229591e66bfdc2b5ac4"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/index-B0k9UQ4l.js",
+      "bytes": 4703,
+      "sha256": "d777a6fd3885488855d9add69efbf95e07b09a79683a2cda9662940cc2d52f17"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/index-BiDEnSrC.js",
+      "bytes": 35734,
+      "sha256": "b75eb1bba053c184d9d0c1686fa4946912590f04c743f86e36ab6920dba9731e"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/index-BO8Q6EiN.js",
+      "bytes": 54938,
+      "sha256": "3b1e02da7102616ae187d11d1b1b60dc66d34d49d9359d09b30995b653eb8d6a"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/index-C3PaybHN.js",
+      "bytes": 106789,
+      "sha256": "5f79c41fb9306cc8738df8f91c773031510191847552a9fa374c498afd8f244e"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/index-CcbP3Dtl.js",
+      "bytes": 103231,
+      "sha256": "af9d257a154aa3df6333dd0075b8148871107902d911f2bde4db35e11283b6df"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/index-CIR2v7MY.js",
+      "bytes": 43902,
+      "sha256": "6d6d03acf9c8a61c98b0cd3eb9b4df3c321cee2020de5a9ea065b501e229aa6a"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/index-CKSdstIi.js",
+      "bytes": 73511,
+      "sha256": "c76c06ce956fdcb19c6c258a7a2b7a7921223e846f27887491e1977283fd334d"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/index-CQUDlQ0F.js",
+      "bytes": 28931,
+      "sha256": "c95995e3ec994458a1ec87ad3a4c3ca0e3b06c715a3d0298be7e30c5585c82ab"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/index-Crn7TTJN.js",
+      "bytes": 35453,
+      "sha256": "a0b19c64ac5ffac3c4c08c9f87856a32f40669cd7ef6969da8655ea89d6dcfa3"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/index-D7dfnpin.js",
+      "bytes": 42178,
+      "sha256": "ecae6bbeae208d2224e45c7517fa7affcc05292ef62de538bbebc25c8c0ed97f"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/index-DdzgPMT1.js",
+      "bytes": 25969,
+      "sha256": "ae50f92ec315b09850fed243ccfc46cd7088e71293df81cd19f61450ab7258a4"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/index-DE5GDOts.js",
+      "bytes": 3450,
+      "sha256": "49efdf0fbfd1eb08dd61bd38d16493e032bfcbc0ffbcf26707e47a2159fb7498"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/index-DGG-gdwx.js",
+      "bytes": 3308,
+      "sha256": "09913e6533a7a5dbe9f54ec01ce3db018ba80fc57cf0ad8d42ccbec74e395942"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/index-DKaVm16f.js",
+      "bytes": 5277073,
+      "sha256": "d5bf63e111945106abf3ca320a3a993f64115b2c69703137062bc9e4cd82076b"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/index-DlEwC2Xs.js",
+      "bytes": 26859,
+      "sha256": "3df6530dae8d0e499747493bd560cb1de7d96f5a511758764c12916ea2ad4404"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/index-DTahdsIv.js",
+      "bytes": 55797,
+      "sha256": "2fbcf5c04b04755d32e1c215db97c1a381d69cbadaecf6786c88952668353e78"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/index-DuqhIeot.js",
+      "bytes": 7233,
+      "sha256": "ef93c1efaafb23dd211eb964cc398797de82359c5c7aff9e49eece902c5841c7"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/index-DZyojt2K.js",
+      "bytes": 97422,
+      "sha256": "db822ad01b16cdcff3c18bdc3af913b783442da26bf565f1d7d6c0f0e620bd62"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/index-FrV_K256.js",
+      "bytes": 22072,
+      "sha256": "936c92e8c09ca0c761f1a96189f7650873aee9252f1c7d131735ee95505ae132"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/index-mfzDj5cC.js",
+      "bytes": 18245,
+      "sha256": "8e991a7c0aaabfda10e533837b3a83a8febe9d5c819dfe85b235a17c9701abfb"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/index-PfVSiUSO.css",
+      "bytes": 897806,
+      "sha256": "adf6a35fa835dbb04990d807a5b224f995a8772bd26e7ac81e82bf6746766729"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/index-V7QAlP3t.js",
+      "bytes": 86737,
+      "sha256": "f8c7015a089acc6a4b03f7da121351f3eff3ae7b7f54ae3df2b973e383e8d926"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/javascript-C_OHM9hj.js",
+      "bytes": 37132,
+      "sha256": "95b09f0b3fb5fdd9b2d10f6984118bbea38a78a51286f4d862b86a01094ddd8f"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/julia-Bs6JJhYG.js",
+      "bytes": 9647,
+      "sha256": "0d8127c7275ab1371ec839ec976879685017db1cf04c55095e651e48fe103196"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/livescript-BMWCDuIE.js",
+      "bytes": 6483,
+      "sha256": "b39453a81de0238efd37ac1306f2f004f305cbd745be57e1728a17625f013401"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/lua-Cvg8VrAA.js",
+      "bytes": 5229,
+      "sha256": "165c413653092708d81ff649b3d4a63df2eedc0b50c8f249b9667b4e75fe959d"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/mathematica-DNLOL9PQ.js",
+      "bytes": 3436,
+      "sha256": "acc57c8c8a74626a6b9423988f92155410b79196d13c9c6a78047d51ae130c68"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/mbox-Ga7d4MMN.js",
+      "bytes": 2883,
+      "sha256": "fc425b9a3a312399b3ff6adfec040828ff7c8789f0d31b96e73bde2dce902355"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/mirc-Dma3B8rS.js",
+      "bytes": 7292,
+      "sha256": "0ddcb9e79952a15f12935311af85affb24054773404adfdd1d437cc0080a21e2"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/mllike-DHn7xckP.js",
+      "bytes": 8183,
+      "sha256": "adc3b1b7f8aa916812cd4d8bdf8cc1bce352786e3df54c560c5b9067b4fe6d5b"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/modelica-0d55jYY0.js",
+      "bytes": 4784,
+      "sha256": "53c8da4f56d1dd592c1710d4b2735aa9904eb2306f365b56aa7074837c59526b"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/mscgen-DdqZYINH.js",
+      "bytes": 5426,
+      "sha256": "7e91513474f40739574f20f1b1f38659a476b68b39ee260c7e13132e20d66fc6"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/mumps-Btr8VblO.js",
+      "bytes": 3348,
+      "sha256": "aea5f291cf40bcc124e9ff104dedf8df38d630d3112f62d1051118f1ce16b80b"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/nginx-DTDtBDVN.js",
+      "bytes": 9302,
+      "sha256": "715cac7cfdb61a1efd09d43ec2c5e6d8e1bd491be679ac56df795a913e6eaf21"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/nsis-CyKBdPWp.js",
+      "bytes": 7857,
+      "sha256": "57f398b99c2ea986b5e4673709aa470f0fb4b42cb04188cf4044e52475c4ff61"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/ntriples-CvgOYMpL.js",
+      "bytes": 4754,
+      "sha256": "239581b9922c933f3427296d14f18a1febb1db49283e6e4aa3331f4e2b9bc3a9"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/octave-DYBj3-tl.js",
+      "bytes": 3863,
+      "sha256": "57d7b87692fe3ab14a413456a3ea0fb201a3052057b77a55604863fa5064c495"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/oz-R_e8WMIi.js",
+      "bytes": 5329,
+      "sha256": "a19a6ffdf1e6eb10fe9c4937cfb31303c9ec5bb723c73df1a71ef43c82cdd020"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/pascal-GD8iposT.js",
+      "bytes": 3495,
+      "sha256": "e5a1f91525017a8bf777f9c04f990c65a6a876b26e9b803ba4fddbcc6a68ccac"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/perl-DL9mHpoi.js",
+      "bytes": 28648,
+      "sha256": "8c4df1964a2fe9a690f2493217ed9f70d1f7e2f026ea515f3b226b3b39370b17"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/pig-C_4T4YIV.js",
+      "bytes": 3908,
+      "sha256": "82df721874d4623ebcfa10b27ea6eb9e3992ff4c28e2d838f8d166ab73abb91d"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/powershell-B0suO7Vd.js",
+      "bytes": 11424,
+      "sha256": "3de01d37e183594d3bb94dc474f6324219cb209d162b202f82b12c77d2370410"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/properties-BR-vP1aU.js",
+      "bytes": 1475,
+      "sha256": "b758d2ccb06eaaf23dbbc110988e64a57e55a5923a262c60432397feeef0c9c3"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/protobuf-BxgpyhoW.js",
+      "bytes": 1451,
+      "sha256": "ed0b3d7fbe3b079db99443170bd20dba78ba27f42043ad6efebd4b714ef4a364"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/pug-CTXt1f8z.js",
+      "bytes": 11711,
+      "sha256": "48c244b81b114de6a5e5adefc5c7715f6eba241d58edd162713fd21007afdb2c"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/puppet-Bdao66PW.js",
+      "bytes": 4091,
+      "sha256": "7985d1f812327008fe34d375ab1849a12e903d3e9507b7fa14253ba17dbdd596"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/python-CvWbmiX4.js",
+      "bytes": 12822,
+      "sha256": "219d8f4b9588956ac747cc56503e568fbf3aff3ab5e34e400a6cd21c86e2273f"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/q-CrbCVq4a.js",
+      "bytes": 6286,
+      "sha256": "ded6c3f92101aee3b6214667f489d691936350d01b61e69fdb2b8e2104afcacd"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/qoder-color-CCjsVbDP.svg",
+      "bytes": 6196,
+      "sha256": "396596d247477e2a036c141a16ec266df7b14c0130b777a68fd04bc89af50bc8"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/r-V7nswm59.js",
+      "bytes": 5639,
+      "sha256": "78772777dc6085a89ba3ed5f6fcd5fe46c7ff6cdb849c3c967ce0c1273b4f4a2"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/rpm-C-DLY-If.js",
+      "bytes": 2851,
+      "sha256": "e39a41ec2ab1ba47f2ef4ac46afda8ab6157df5f4388c70b332e2ebf154e1997"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/ruby-CQTpZw6f.js",
+      "bytes": 9595,
+      "sha256": "d66865a01096abcd291b833e0cd3d64881860acbd99b094fb5cf1cd134e2743c"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/sas-D2UG-yhZ.js",
+      "bytes": 11997,
+      "sha256": "015ef33927a3a7749cad183ad9e96b0dbf9df616080054b9e581486effc05bef"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/scheme-BKzrkGJD.js",
+      "bytes": 10560,
+      "sha256": "f0e7bc170c1987a1a0734b905eee725b83cca6aa8fa597457fec67670a555cc9"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/shell-BlsXDxCn.js",
+      "bytes": 4630,
+      "sha256": "476e685b723e32c63fec792d4266c65b3facfe8feb349b6a2dff9b6c749d9fde"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/sieve-CjwBwOY5.js",
+      "bytes": 3085,
+      "sha256": "084c9f5e19ccf7382ebe97bc97676ba143d9a36fad9b096cb4b3f99cf3c81df6"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/simple-mode-DMneyfDu.js",
+      "bytes": 4350,
+      "sha256": "bf2199ce2b8baa53cef87a5bc3a72c68817223b26167c168c645fe78be9280f4"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/smalltalk-BOIGQuhN.js",
+      "bytes": 3806,
+      "sha256": "7d696f35a8e402a8b6c2ac1db57c92af865ec665cd63d827689c46e58b9b295d"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/solr-CwD7U71z.js",
+      "bytes": 1796,
+      "sha256": "9e9b3bf9c4c0a208effcc6283428b25a30e935eeefa58fc34629947c040beb7e"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/source-BBnh_UZi.avif",
+      "bytes": 65400,
+      "sha256": "76da2efcd588b17589955391962024e47d2667e8e84e4744acef11f89d5f0626"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/source-BF5gqZd_.avif",
+      "bytes": 98972,
+      "sha256": "217b1a6e6333d55ddb5b884da74d77cb794416553a3225637e321ed8594b1cc5"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/source-eX5wQyix.avif",
+      "bytes": 56108,
+      "sha256": "73b5cabd1b68af9fef692c6c80a3e9773afd62dc7de2af853bbb3fb7dab9c369"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/source-pMlGT7XI.avif",
+      "bytes": 75133,
+      "sha256": "dda274619f2efe5882dbf24566837bea0b87067b1bfcc147bf3e0ed63c121649"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/sparql-DYskk2vE.js",
+      "bytes": 5954,
+      "sha256": "0573590f5173a33d2c988a89048fccb66706d9d2b1d1e01c42dd864c7b664422"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/spreadsheet-Bgtt3oLP.js",
+      "bytes": 2213,
+      "sha256": "453eff194470639d89a69e4cdf76b8e58773b5ab307554feed6d826b20a058c4"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/sql-BSrOzCRI.js",
+      "bytes": 42670,
+      "sha256": "dc7e3ba15d3123633b1a12391213fafb05a5abdcc9829498793b3d467a1d3fbd"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/stex-B6LNC55o.js",
+      "bytes": 6332,
+      "sha256": "350838050b62d1c5f9821e86a9bb0ee45f0c61628eadc676c126359a41a5f2a5"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/stylus-BkS-boTH.js",
+      "bytes": 38258,
+      "sha256": "2d50cfa755d2ad2fc7302164938caf2b4421003f3c3fb9eb02314a230a514cd9"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/swift-FRZi1uvB.js",
+      "bytes": 6767,
+      "sha256": "526e30f380c612526c4f06a3085c392bda84ede2673fff42b1d2dd7a205377d4"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/tcl-CUcaCdmq.js",
+      "bytes": 3837,
+      "sha256": "aa90d12c1490ebb77e68e6ce90fd35b0b312e5510f9753f1072c629c43e9c05c"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/textile-BnFpjsrl.js",
+      "bytes": 12175,
+      "sha256": "de9336373ae050e5a1ff954d462dd129d09f31c02951e27ede260fba1c054bad"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/tiddlywiki-CjprD-Qp.js",
+      "bytes": 5631,
+      "sha256": "5a80d8ec11cdad4503ab1462ed24e2bd7a1b09b787e815fbdfd4b7a454242fce"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/tiki-DK9DOeWn.js",
+      "bytes": 7119,
+      "sha256": "d307359b562484e7c25803b60349d4aa86e6351400f9612a3b78048f8451b847"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/toml-BOuWGMcf.js",
+      "bytes": 2104,
+      "sha256": "fddf8a802721005715a22746b28e0b87ac56a8f77caa41075f9142150e588fb3"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/troff-E1bJ0PPL.js",
+      "bytes": 1679,
+      "sha256": "ea32a0126878e2cd1198e94abcee48cbcd2131de1d80195e1267ad5b0cab82bf"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/ttcn-cfg-Dc39-fIP.js",
+      "bytes": 6021,
+      "sha256": "743ddd5c09b350d33149497d4177895083f584712019a20e88a3c9ded8b62fb9"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/ttcn-tKd4HLu4.js",
+      "bytes": 7900,
+      "sha256": "b9af59a0022981562d7482bf0125dc1b6bfdbb40ea1214807db4abbcb783059b"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/turtle-Dq7-1WAf.js",
+      "bytes": 3817,
+      "sha256": "7e505e9051b7e3c8ecebea47e4fd43b1e6b2b6ccd7334fd25fc267dc82ee0e4d"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/vb-Dp90gtsv.js",
+      "bytes": 7098,
+      "sha256": "049ed5cc9eb5958257497e1c018cd8aa6ff558760d7d9bca5d0d84db8573e19f"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/vbscript-CI6_mxxU.js",
+      "bytes": 11321,
+      "sha256": "61890fbc79e2fa6eed6ec2f556916d57712d58fa394f140b09af6c50fece5855"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/velocity-BwIZK1TH.js",
+      "bytes": 4749,
+      "sha256": "630eef603fbca377c8e48679bf30198dce1f27d1a72123bdd72f1eada28f4bbd"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/verilog-DDCYnHN8.js",
+      "bytes": 16118,
+      "sha256": "a38956f338156db5f9b6fd4644f88cd1f81d7dc726a78b882b1ee62f0e70f45a"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/vhdl-DCkMIyT9.js",
+      "bytes": 5732,
+      "sha256": "b0e803173743715af902fa2508c4da88a2e97f9b4782f33c6064a17db505bc05"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/webidl-BTLTThCm.js",
+      "bytes": 4771,
+      "sha256": "07aaaed4cf1b1adc2d5f705b656e0e3a4b0d4bddaf4ad998e488d3ca3450a290"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/xquery-BrBUuxMR.js",
+      "bytes": 12194,
+      "sha256": "96459fe2892ccdce0b57439307eeeaa9d82fd2663f2a0f4364a849dba3374e74"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/yacas-b5lAVEIl.js",
+      "bytes": 3866,
+      "sha256": "95c453f73dd9a218385c018b692c4af134b02d5131bea8dd957ca887a5cdd8bd"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/z80-BZV19vqv.js",
+      "bytes": 3042,
+      "sha256": "51594b00905d1522d2f64113beae4943577338f0ff5af4503dd9ee49dc3957eb"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/assets/zcode-BnwZhfO-.png",
+      "bytes": 215707,
+      "sha256": "edd87a182097389b0f59c07f8de283dbe433c9d37cd6e9a2a372611516ab81eb"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/out/index.html",
+      "bytes": 348,
+      "sha256": "15f02e69e0e2371768df877226cfa6708233871e2cd1b9d31623976b6cb0583f"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/verified-captures/original-day-1000.png",
+      "bytes": 79271,
+      "sha256": "aebf42c4d29c86c762ef994e8284a0c07dc50ae8dd363b8df6c6132d2a1cc490"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/verified-captures/original-day-390.png",
+      "bytes": 62677,
+      "sha256": "42cbffc49168508687eaeda7f12c6f72030be09f7c23ffe4a80a8ab5444019bb"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/verified-captures/original-night-1000.png",
+      "bytes": 82941,
+      "sha256": "0c493f8e34b231c62ace22b72406cf5d1ad752e8bdf32981a7087a8f068b9fbc"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/verified-captures/original-night-390.png",
+      "bytes": 66446,
+      "sha256": "1d0d6f943684561522bbd22e10eb67970816e2e0cb82f8b18150c6718cacbf3e"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/verified-captures/product-day-1000.png",
+      "bytes": 110731,
+      "sha256": "766875fe183016ea8515417c87c755ebfdeec05c4bdb00c2e02b67b4bdc28b43"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/verified-captures/product-day-390.png",
+      "bytes": 95558,
+      "sha256": "710e940b71627ebdf6e678e86409da7d78d3a292f3b71b9b0aab2f5cc95f0457"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/verified-captures/product-night-1000.png",
+      "bytes": 114498,
+      "sha256": "199670e2a0855c8fc3d638c63839e6ffa8df81c8ca8ee7bdeaad65b5fb8f9857"
+    },
+    {
+      "path": "file/I04分页客户端/drafts/product/verified-captures/product-night-390.png",
+      "bytes": 98440,
+      "sha256": "4c8f16848b982964ad5b2456b7b3a7c9dc28a38399ca57fdebe407cc52f4ceda"
+    },
+    {
+      "path": "file/I04分页客户端/edit-window.py",
+      "bytes": 3966,
+      "sha256": "05a9b00a3f17fdc5e32ac992f90b6c4cbe4a0d17c4118d8ae8aa21affe85c8cc"
+    },
+    {
+      "path": "file/I04分页客户端/finalize.py",
+      "bytes": 4267,
+      "sha256": "60dec19c0ed1d24ebe20b4c6060f2a9ea5e458cb70fb7e66b9e0661231df9572"
+    },
+    {
+      "path": "file/I04分页客户端/index.html",
+      "bytes": 248,
+      "sha256": "7c75b40cad7bf91e9e548e4c0152a1ce687872085a50ee978a79d6059d87f443"
+    },
+    {
+      "path": "file/I04分页客户端/logs/codegraph-sync.txt",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "file/I04分页客户端/logs/docs-decisions.txt",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "file/I04分页客户端/logs/docs-tests.txt",
+      "bytes": 925,
+      "sha256": "651663d7aa11329a367141cee0b7fd331fa2641a4278f685dc717337eaa20264"
+    },
+    {
+      "path": "file/I04分页客户端/logs/docs-version.txt",
+      "bytes": 79,
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "file/I04分页客户端/logs/history-owner-baseline.txt",
+      "bytes": 2661,
+      "sha256": "5062cc85823490214bbddd892197fc2c45154c89d34be19a99cc77d9cfa5e7df"
+    },
+    {
+      "path": "file/I04分页客户端/logs/history-owner-fixed.txt",
+      "bytes": 273,
+      "sha256": "8267f99543ab1c5a59081827dd0595d4ab7bb5efea280d817da0041c42f385bb"
+    },
+    {
+      "path": "file/I04分页客户端/logs/initial-tests.txt",
+      "bytes": 274,
+      "sha256": "c6e225a1b8758ef01b03397d636904269456f0b0bbbbe4908400dbdc38932e41"
+    },
+    {
+      "path": "file/I04分页客户端/logs/related-tests-before-ssr-fixture.txt",
+      "bytes": 2676,
+      "sha256": "ac0010de62511d5eb0f880609e36756e797fe20c454dcfe9f65622e52747ae70"
+    },
+    {
+      "path": "file/I04分页客户端/logs/related-tests.txt",
+      "bytes": 276,
+      "sha256": "837cf68b833c2f5082c66381c635c2a4f2c8fd2d3c5742419560236d02fa64ce"
+    },
+    {
+      "path": "file/I04分页客户端/logs/typecheck-legacy-fixture-union.txt",
+      "bytes": 2956,
+      "sha256": "509bd06232b0bfb80edbd4e71c9c00fe174d25da9481e4318b17ea60456b714e"
+    },
+    {
+      "path": "file/I04分页客户端/logs/typecheck-missing-source-prop.txt",
+      "bytes": 288,
+      "sha256": "48b965bb028aa033af0f68b13fa841cb61fecb476c48bc5454a7c4af7cdcbaaf"
+    },
+    {
+      "path": "file/I04分页客户端/logs/typecheck.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "file/I04分页客户端/logs/ui-result-before-epoch.json",
+      "bytes": 1798,
+      "sha256": "1111d769ec2113eefe02ffafd880334775624f35900d6c9e1bff821276c04bab"
+    },
+    {
+      "path": "file/I04分页客户端/logs/ui-result-before-shared-tool-id.json",
+      "bytes": 2532,
+      "sha256": "15609dedcbdd62cea17a13ada2bc00bb19ec4098239319b674771acccaf1558c"
+    },
+    {
+      "path": "file/I04分页客户端/logs/ui-result-wrong-source.json",
+      "bytes": 290,
+      "sha256": "f7232d214a9a47f1f77a7d1575c230317c10ff297334ebd3c6f331d11eb118fa"
+    },
+    {
+      "path": "file/I04分页客户端/logs/ui-result.json",
+      "bytes": 2606,
+      "sha256": "5028ebcc7cc599d90444023bbd7ca2c1ae25f7af68b525b20fc2447aecf432ec"
+    },
+    {
+      "path": "file/I04分页客户端/logs/ui-run-before-epoch.txt",
+      "bytes": 267,
+      "sha256": "f6f6b1b6d0cb248ff388cb75834e25e39e91b6eab224593a297d7761c1c6f645"
+    },
+    {
+      "path": "file/I04分页客户端/logs/ui-run-wrong-source.txt",
+      "bytes": 681,
+      "sha256": "46274f3e06b29125193ba4d9fa5f1d96f0226631a39030062670fdde24d22b5d"
+    },
+    {
+      "path": "file/I04分页客户端/logs/ui-run.txt",
+      "bytes": 267,
+      "sha256": "7d7ae70c3308b35be710b798e98b608a7b75bbb704b9ec0c19793506ee15c17a"
+    },
+    {
+      "path": "file/I04分页客户端/logs/window-tests.txt",
+      "bytes": 274,
+      "sha256": "6be1e22dd9a48b31fe18a73529876c3f3a1bc556c8693f4b0f8789c79a5e5f05"
+    },
+    {
+      "path": "file/I04分页客户端/logs/wrong-source.html",
+      "bytes": 119944,
+      "sha256": "094c6257e0c4cc22e8d4351cd6af7c3255ebe480ca5bf05145b7440b09eae5eb"
+    },
+    {
+      "path": "file/I04分页客户端/logs/wrong-source.png",
+      "bytes": 115979,
+      "sha256": "b0f204987de785eefd44c1c18f680b10059fcbd86fc35624e4118c26477cf687"
+    },
+    {
+      "path": "file/I04分页客户端/main.cjs",
+      "bytes": 9202,
+      "sha256": "5bf0b01cb4c50b08ef772022883df9b6f0ccc2179f2e90a5d1d0fafc8fa8f0c7"
+    },
+    {
+      "path": "file/I04分页客户端/prepare-fixture.py",
+      "bytes": 9602,
+      "sha256": "55f65683d330d3f0af623c88eccd2d925dc8cd5acc1745cb0e664406e62deb19"
+    },
+    {
+      "path": "file/I04分页客户端/render.mjs",
+      "bytes": 5073,
+      "sha256": "00c7d7fb5a5e1da5db14ef83035f71330e72c1ae8a935bdf82cfa33fb62e3854"
+    },
+    {
+      "path": "file/I04分页客户端/renderer.tsx",
+      "bytes": 14797,
+      "sha256": "1a62be6b8b8b699d8106bbafe942c82f36b810ff0449ed6ac49e5db0ce090650"
+    }
+  ]
+}

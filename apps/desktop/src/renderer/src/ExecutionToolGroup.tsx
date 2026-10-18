@@ -52,6 +52,7 @@ export function selectCompletePresentableExecutionEvidence(
   evidence: AgentRunExecutionEvidenceView[]
 ): ReturnType<typeof selectCompleteExecutionEvidence<PresentableExecutionEvidence>> & {
   byFileOperationToolId: Map<string, PresentableExecutionEvidence>
+  byCoreToolId?: Map<string, PresentableExecutionEvidence>
 } {
   // Deferred payloads, permanently bounded output and Canonical diffs need their
   // exact Evidence identity even when the saved result projection is already inline.
@@ -65,7 +66,11 @@ export function selectCompletePresentableExecutionEvidence(
   const byFileOperationToolId = selectCompleteExecutionEvidence(
     presentable.filter((item) => runFileOperationEvidencePath(item) !== null)
   ).byToolId
-  return { ...selected, byFileOperationToolId }
+  // Source identity belongs to the Core observation. A proven Shell can remain
+  // the distinct full-output identity after the two presentation steps merge.
+  const byCoreToolId = new Map(presentable.filter(item => item.canonical?.sourceAuthority === 'core'
+    && item.canonical.credibility === 'core_verified').map(item => [item.canonical!.operationId, item]))
+  return { ...selected, byFileOperationToolId, byCoreToolId }
 }
 
 type ToolResultLoadStatus = 'idle' | 'loading' | 'ready' | 'empty' | 'failed'
@@ -504,16 +509,22 @@ type ToolCallRowProps = {
   runId: string
   runStatus: AgentRunView['status']
   completeEvidence?: PresentableExecutionEvidence
+  sourceEvidence?: AgentRunExecutionEvidenceView
+  itemKey?: string
+  resultScope?: string
   onFileOpenError(message: string): void
 }
 export function ToolCallRow(props: ToolCallRowProps): JSX.Element {
-  const evidence = props.completeEvidence
+  const evidence = props.sourceEvidence ?? props.completeEvidence
   if (['delegation.start', 'delegation.resume'].includes(props.step.builtinOperation ?? '')
-    && evidence?.agentRunId === props.runId && Number.isSafeInteger(evidence.executionEpoch)) {
-    return <DelegationToolCard target={{ threadId: props.threadId, evidenceId: evidence.id,
+    && evidence?.agentRunId === props.runId && Number.isSafeInteger(evidence.executionEpoch)
+    && evidence.canonical?.sourceAuthority === 'core' && evidence.canonical.credibility === 'core_verified'
+    && evidence.canonical.toolName === props.step.builtinOperation) {
+    const card = <DelegationToolCard target={{ threadId: props.threadId, evidenceId: evidence.id,
       agentRunId: props.runId, executionEpoch: evidence.executionEpoch }} revision={evidence.revision ?? 0}>
       <GenericToolCallRow {...props} />
     </DelegationToolCard>
+    return props.itemKey ? <div data-execution-item-key={props.itemKey}>{card}</div> : card
   }
   return <GenericToolCallRow {...props} />
 }
@@ -523,12 +534,15 @@ function GenericToolCallRow({
   runId,
   runStatus,
   completeEvidence,
+  itemKey,
+  resultScope,
   onFileOpenError
 }: ToolCallRowProps): JSX.Element {
   const t = useUiText()
   const filePreview = useOptionalFilePreview()
-  const [expanded, setExpanded] = useExecutionRetainedState(`tool-expanded:${runId}:${step.id}`, false)
-  const [activated, setActivated] = useExecutionRetainedState(`tool-activated:${runId}:${step.id}`, false)
+  const scope = resultScope ?? runId
+  const [expanded, setExpanded] = useExecutionRetainedState(`tool-expanded:${scope}:${step.id}`, false)
+  const [activated, setActivated] = useExecutionRetainedState(`tool-activated:${scope}:${step.id}`, false)
   const summaryRef = useRef<HTMLElement>(null)
   const status = activityStatusForAgentRun(step.status, runStatus)
   const publicTitle = localizedExecutionStepTitle(step, false, t)
@@ -592,7 +606,7 @@ function GenericToolCallRow({
     return (
       <div
         className={`process-action tool-call-summary tool-call-static status-${status}${readSummary ? ' has-shell-read-summary' : ''}`}
-        data-execution-item-key={`tool:${step.id}`}
+        data-execution-item-key={itemKey ?? `tool:${step.id}`}
         data-activity-domain={step.activityDomain}
       >
         {summary}
@@ -604,7 +618,7 @@ function GenericToolCallRow({
     <details
       className={`process-action tool-call-disclosure status-${status}`}
       open={expanded}
-      data-execution-item-key={`tool:${step.id}`}
+      data-execution-item-key={itemKey ?? `tool:${step.id}`}
       data-activity-domain={step.activityDomain}
       onToggle={(event) => {
         const nextExpanded = event.currentTarget.open
@@ -620,7 +634,7 @@ function GenericToolCallRow({
           completeEvidence={inputOnly ? undefined : completeEvidence}
           inputOnly={inputOnly}
           expanded={expanded}
-          resultKey={`${runId}:${step.id}`}
+          resultKey={`${scope}:${step.id}`}
           title={publicTitle}
           summaryRef={summaryRef}
         />
@@ -760,6 +774,7 @@ export function ToolActivityGroup({
   completeEvidence: {
     byToolId: Map<string, PresentableExecutionEvidence>
     byFileOperationToolId?: Map<string, PresentableExecutionEvidence>
+    byCoreToolId?: Map<string, PresentableExecutionEvidence>
   }
   block?: AgentRunExecutionBlock
   onFileOpenError(message: string): void
@@ -899,6 +914,9 @@ export function ToolActivityGroup({
               runId={runId}
               runStatus={runStatus}
               completeEvidence={childCompleteEvidence.byToolId.get(step.detailOperationId ?? step.id)}
+              sourceEvidence={childCompleteEvidence.byCoreToolId?.get(step.id)}
+              itemKey={block?.projectionVersion === 4 ? `${block.key}:${item.key}` : undefined}
+              resultScope={block?.projectionVersion === 4 ? `${runId}:${block.key}` : undefined}
               onFileOpenError={onFileOpenError}
             />
           )

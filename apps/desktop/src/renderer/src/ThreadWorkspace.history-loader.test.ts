@@ -2,6 +2,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import type { ThreadSnapshot } from '@contracts'
+import { ThreadClientProvider, type ThreadClient } from './camp-client'
 import {
   ThreadWorkspace,
   campHistoryKeyboardInputMovesEarlier
@@ -40,7 +41,7 @@ function renderHistoryLoader(hasEarlier = true): string {
     timeline: []
   }
 
-  return renderToStaticMarkup(createElement(ThreadWorkspace, {
+  const workspace = createElement(ThreadWorkspace, {
     snapshot,
     messageHistory: {
       loadedCount: 20,
@@ -62,6 +63,11 @@ function renderHistoryLoader(hasEarlier = true): string {
     stopping: false,
     onStop: () => undefined,
     worldMapEnabled: false
+  })
+  // SSR owns no Desktop bridge. Supply its read-only host boundary explicitly.
+  return renderToStaticMarkup(createElement(ThreadClientProvider, {
+    client: { platform: 'linux', request: async () => { throw new Error('Unexpected SSR request') } } as unknown as ThreadClient,
+    children: workspace
   }))
 }
 

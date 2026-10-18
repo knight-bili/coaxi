@@ -36,7 +36,8 @@ Codex 原消息解析主体及代码模式/MCP/延迟等待、目标/计划、�
 ## 研发状态
 
 分页执行主线新增可协商的委派独立块后端；原 schema3 保留，跨块 Shell support 与成对增量位置由
-[v52](../../contracts/run-process-detail-surface-v52.md)拥有。客户端启用和完整产品链路继续开发，I04不提前收口。
+[v52](../../contracts/run-process-detail-surface-v52.md)拥有。客户端协商、成对位置、展开组移除和原卡片已接；
+受控运输下的实际执行窗口有分项验证，真实 Core/两端及完整产品链路继续，I04不提前收口。
 
 当前源码登记 Core v1.73/Schema161/Migration211。原完整160/210委派迁移保持独立目标，160现在是受支持来源；211单独增加原生User交互存储，不重写210或旧输入。两条启动链按原事务顺序安装，旧v1.72/159仍可沿原链升级。此前160/210的[启动升级分项证据](../../../integration/execution/i04-delegation-startup-result.json)保留原时点，当前211边界见[原生交互合同](../../contracts/delegation-v1.md#原生user交互存储)。不表示用户日常数据库已升级。
 
