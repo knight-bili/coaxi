@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "date": "2026-10-19",
-  "status": "paused",
+  "status": "active",
   "objective": "持续推进 Codeg × Rovai 完整一期融合项目，完成既定 I00–I12 及 BUF。以 Rovai Core 为唯一业务、执行和数据库权威，保留已确认的 81 个来源功能簇、48 个工作包和 324 个工程验证场景，交付完整、高可用、可扩展、可以实际使用的融合 MVP。一期包含两个应用的既定融合范围，以及必要的整改、兼容、迁移和缺陷修复；不得为了缩短工期擅自删除功能。第二阶段才规划自主新增能力。\n**分工：**Codex 负责设计细化、技术架构、编码、自审、代码审查、测试、构建、集成、GitHub 仓库及 PR 管理、阶段收口和缺陷修复。I12 工程完成前，用户只审核确需确认的方案，并提供 Codex 无法自行解决的环境、身份、预算、设备等外部条件。已经确认的方案直接实施，普通实现选择和修复由 Codex 自行处理。\n**验收定义：**“客户验收”仅指 I12 必需研发和工程验证完成后，用户拿到可运行的完整软件，以真实用户身份使用并反馈是否满足需求。用户不承担阶段技术测试、PR 审查、测试报告审核或逐项执行 324 个场景。上述工程工作全部由 Codex 完成；客户使用反馈引出的缺陷仍由 Codex 修复并回归。\n**阶段推进：**I00–I12 内部使用“研发实现”和“工程验证”表述，准确区分开发中、代码完成、工程验证中、工程验证通过、待环境验证。每阶段维护有限的剩余清单、完成条件和下一动作，由 Codex 自行判断是否满足阶段收口条件，不将“等待客户验收”作为推进障碍。发现问题按所属阶段处理；不能把后续阶段全部提前塞入当前阶段，也不能遗漏当前阶段的必需工作。暂缺外部条件时登记待办，继续可以独立完成的工作，最终 MVP 的必需实现和验证仍须补齐。\n**提交与验证频率：**采用多次本地 commit、阶段集中验证、少量 push。小功能、缺陷和调整先编码、自审并完成适当的低成本检查，再用中文本地提交；不逐切片默认全量编译、全仓回归、推送或触发 Actions。I01–I12 正常各一个阶段候选验证批次，共 12 批；阶段代码与审查集齐后冻结候选版本，集中执行相关构建、测试、集成和平台验证，再推送并触发必要的 Actions。修复失败项时增加候选批次，记录原因并完成必要回归。等待远程结果期间继续独立开发。\n**资源与授权：**优先使用免费资源，不提高支出上限、不自动采购或运行付费模型。确需用户协助时提出具体事项，同时继续独立工作。main 最终合入、正式发布及费用支出保留用户授权。\n**交付与汇报：**I12 工程完成后交付可运行软件、必要使用说明、完整范围对照、工程验证结果和真实遗留问题，再交用户使用验收。每轮报告新增完成、实际验证、具体未完项、下一动作及确需用户处理的事项；不以局部测试数量代替阶段完成。全部必需研发、工程验证和最终客户软件使用验收完成前，不将持续目标标记为完成。\n**统一开发分支：**一期 I00–I12 与 BUF 统一在 develop/V1.0.0 开发，跟踪 origin/develop/V1.0.0，不再按阶段建分支；阶段候选以版本标识和冻结 SHA 记录。I12 必需研发、工程验证及客户软件使用验收全部通过后，仍须客户明确指令才能合入 main，不自动合并或发布。",
   "scope": {
     "source_feature_clusters": 81,
@@ -14,7 +14,7 @@
   "current_branch": "develop/V1.0.0",
   "base_branch": "main",
   "current_task": "I04-T01",
-  "current_slice": "固定Codeg工具外壳、命令ANSI输出、JSON/代码与完整折叠原语已接只读产品页；40项定向和24组实际产品窗口检查通过，普通完整工具路由/搜索/Diff/专用卡片及真实Core链路继续；四包21簇84场景不减。",
+  "current_slice": "原压缩摘要、反馈、MCP工作台与委派状态/合并查询卡已接只读生产页，82项定向与19组窗口/15组普通工具回归通过；继续原帮手/collab/委派主卡、问答/后台、统计和图片，再真实Core/Native/Web集中候选。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,14 +33,14 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "I04-T01：完成原ToolCallPart/ToolOutput普通结构化读写/补丁、命令会话状态与代码模式；接搜索/Core授权文件动作及统一/左右Diff，再代理/MCP/后台卡/统计和图片操作；完整原App及真实Core/Native/Web候选，阶段对外分发前补上游ANSI许可文件依据",
+    "I04-T01：原帮手/collab/委派及恢复主卡、问答/后台卡、实际统计和Markdown/HTML/图片操作；压缩/反馈/MCP工作台/状态组已本地验证。完整原App与真实Core/Native/Web候选，阶段分发前补原ANSI完整许可依据。",
     "I04-T01/T02：Claude旧agent完整parser、实际home捕获和Core证据关联；Qoder独立根/producer，以及旧无来源的明确导入与完整格式语料核验",
     "I04-T01：Grok修改意见与r1三Context mode/接管衔接；真实Core/Host/Runtime生命周期、Schema升级和恢复矩阵集中候选",
     "I04-T02/T03/T04：Runtime并集、恢复、记忆与自动化原剩余项；完整四包21簇84场景保持，阶段集齐集中构建/少量push和Actions"
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "native_tool_primitives_targeted_and_renderer_verified_complete_tool_router_and_live_integration_pending",
+  "current_slice_status": "source_compaction_feedback_mcp_status_cards_local_verified_remaining_specialized_and_live_integration_pending",
   "evidence": "i04-legacy-agent-source-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -56,7 +56,7 @@
   "skill_catalog_evidence": "i02-skill-catalog-result.json",
   "skill_install_evidence": "i02-skill-install-result.json",
   "system_goal_status": "active",
-  "system_goal_verified_at": "2026-10-18T08:13:57.947279+00:00",
+  "system_goal_verified_at": "2026-10-18T16:21:01.386166+00:00",
   "skill_members_evidence": "i02-skill-members-result.json",
   "canvas_boards_evidence": "i03-canvas-boards-result.json",
   "skill_delivery_preparation_evidence": "i02-skill-delivery-preparation-result.json",
@@ -274,8 +274,8 @@
   "i04_native_viewer_ui_evidence": "integration/execution/i04-native-viewer-ui-result.json",
   "i04_native_rich_content_evidence": "integration/execution/i04-native-rich-content-result.json",
   "i04_native_tool_primitives_evidence": "integration/execution/i04-native-tool-primitives-result.json",
-  "current_operation": "I04_ordinary_tool_search_diff_local_checkpoint_ready_next_specialized_cards",
-  "development_status": "resumed_by_user",
+  "current_operation": "I04_source_status_cards_local_checkpoint_next_agent_question_cards",
+  "development_status": "in_progress",
   "branch_policy": "integration/branch-policy.md",
   "branch_unification": {
     "requested_by": "User",
@@ -291,7 +291,8 @@
     "retired_local_stage_branches": 7,
     "retired_origin_stage_branches": 5
   },
-  "app_goal_status": "paused",
-  "app_goal_resume": "UI resume required; current-turn development is authorized and continues",
-  "i04_native_ordinary_tool_evidence": "integration/execution/i04-native-ordinary-tools-result.json"
+  "app_goal_status": "active",
+  "app_goal_resume": "User confirmed resume on goal card; get_goal verified active 2026-10-19",
+  "i04_native_ordinary_tool_evidence": "integration/execution/i04-native-ordinary-tools-result.json",
+  "i04_native_specialized_status_evidence": "integration/execution/i04-native-specialized-status-result.json"
 }

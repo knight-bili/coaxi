@@ -31,6 +31,8 @@ import { parseCodexCommandEnvelope } from './codeg-native-content/lib/codex-comm
 import { isShellSessionToolName } from './codeg-native-content/lib/shell-session-tool'
 import { ToolCallPart as OrdinaryToolCallPart } from './codeg-native-content/components/message/ordinary-tool-call'
 import { NativeFileActionsProvider } from './codeg-native-content/ui/native-file-actions'
+import { ReadonlyToolCard, readonlyToolCardKind } from './codeg-native-content/ui/readonly-tool-card'
+import { DelegationStatusGroupCard } from './codeg-native-content/components/message/delegation-status-group-card'
 import { useOptionalFilePreview } from './FilePreviewContext'
 import './codeg-native-content/source-rich.css'
 
@@ -108,6 +110,7 @@ function NativeTranscriptBody({ turns, reader, target, live }: { turns: NativeTr
   const messages = useMemo(() => adaptNativeMessages(turns, live, text), [turns, live, text])
   const { results } = useMemo(() => nativeToolPairs(turns), [turns])
   const tool = (part: AdaptedToolCallPart, key: string): React.JSX.Element => {
+    if (readonlyToolCardKind(part)) return <NativeSourceTool key={key} part={part}><ReadonlyToolCard part={part} /></NativeSourceTool>
     const name = normalizeToolName(part.toolName)
     if (isPlanModeToolName(name)) return <PlanModeCard key={key} toolName={name} input={part.input} output={part.output} errorText={part.errorText ?? null} state={part.state} />
     if (name === 'create_goal' || name === 'update_goal') return <GoalToolCallPart key={key} part={part} />
@@ -121,7 +124,7 @@ function NativeTranscriptBody({ turns, reader, target, live }: { turns: NativeTr
     // until their fixed source components are ported in the next finite batch.
     const specialized = /^(agent|task|collab_agent|delegate_to_agent|check_delegation|cancel_delegation|resume_delegation|ask_user_question|check_user_feedback)$/.test(name.toLowerCase())
       || name.startsWith('mcp__') || nativeToolChildren(use, result).length > 0
-    if (!specialized) return <NativeOrdinaryTool key={key} part={part} />
+    if (!specialized) return <NativeSourceTool key={key} part={part}><OrdinaryToolCallPart part={part} /></NativeSourceTool>
     return <NativeTool key={key} use={use} result={result} reader={reader} target={target} live={live} />
   }
   const renderPart = (part: AdaptedContentPart, key: string, user = false): React.ReactNode => {
@@ -133,7 +136,8 @@ function NativeTranscriptBody({ turns, reader, target, live }: { turns: NativeTr
     if (part.type === 'goal-run') return <GoalRunPart key={key} part={live ? part : { ...part, isRunning: false }} renderPart={(child, childKey) => renderPart(child, childKey, user)} />
     if (part.type === 'tool-call') return tool(part, key)
     if (part.type === 'tool-group') return <div className="native-session-part-group" key={key}>{part.items.map((item, index) => tool(item, `${key}:${index}`))}</div>
-    if (part.type === 'delegation-status-group' || part.type === 'background-task-group') return <div className="native-session-part-group" key={key}>{part.polls.map((item, index) => tool(item, `${key}:${index}`))}</div>
+    if (part.type === 'delegation-status-group') return <div className="native-session-source-tool" key={key}><DelegationStatusGroupCard polls={part.polls} />{part.polls.map(item => <NativeRawTool key={item.toolCallId} part={item} />)}</div>
+    if (part.type === 'background-task-group') return <div className="native-session-part-group" key={key}>{part.polls.map((item, index) => tool(item, `${key}:${index}`))}</div>
     if (part.type === 'tool-result') return <NativeTool key={key} result={{ type: 'tool_result', tool_use_id: part.toolCallId, output_preview: part.errorText ?? part.output, is_error: part.state === 'output-error', agent_stats: part.agentStats ? { ...part.agentStats } : null }} reader={reader} target={target} live={false} />
     if (part.type === 'generated-image') return <div key={key}>{part.label && <small>{part.label}</small>}{part.image && <NativeImage image={part.image} />}{part.revisedPrompt && <NativeReasoning text={part.revisedPrompt} imagePrompt />}{!part.image && <p className="native-session-note">{t(part.status === 'failed' ? '图片生成失败。' : live ? '图片尚未生成。' : '这份记录中没有图片内容。')}</p>}</div>
     return null
@@ -144,17 +148,18 @@ function NativeTranscriptBody({ turns, reader, target, live }: { turns: NativeTr
     {message.userImages?.map((image, index) => <NativeImage image={image} key={`image:${index}`} />)}
   </section>)}</div></NativeFileActionsProvider>
 }
-function NativeOrdinaryTool({ part }: { part: AdaptedToolCallPart }): React.JSX.Element {
+function NativeSourceTool({ part, children }: { part: AdaptedToolCallPart; children: React.ReactNode }): React.JSX.Element {
+  return <div className="native-session-source-tool">{children}<NativeRawTool part={part} /></div>
+}
+function NativeRawTool({ part }: { part: AdaptedToolCallPart }): React.JSX.Element {
   const t = useUiText()
-  return <div className="native-session-source-tool"><OrdinaryToolCallPart part={part} />
-    <details className="native-session-reasoning"><summary><span>{t('原始工具记录')}</span><ChevronDown size={14} /></summary>
+  return <details className="native-session-reasoning"><summary><span>{t('原始工具记录')}</span><ChevronDown size={14} /></summary>
       {part.input != null && <NativeToolValue label={t('输入')} value={part.input} />}
       {part.output != null && <NativeToolValue label={t('原始结果')} value={part.output} />}
       {part.errorText != null && <NativeToolValue label={t('错误')} value={part.errorText} />}
       {part.meta != null && <NativeToolValue label={t('工具信息')} value={JSON.stringify(part.meta, null, 2)} />}
       {part.agentStats != null && <NativeToolValue label={t('帮手执行记录')} value={JSON.stringify(part.agentStats, null, 2)} />}
     </details>
-  </div>
 }
 function NativeReasoning({ text, imagePrompt = false }: { text: string; imagePrompt?: boolean }): React.JSX.Element {
   const t = useUiText()

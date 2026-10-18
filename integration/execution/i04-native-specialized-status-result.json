@@ -1,0 +1,458 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-18T16:40:14.146073+00:00",
+  "stage": "I04",
+  "task": "I04-T01",
+  "branch": "develop/V1.0.0",
+  "baseline_commit": "790e12f54d7ae5465c686a0e03f3a77237ee4be2",
+  "status": "source_compaction_feedback_mcp_status_cards_integrated_local_verified_remaining_specialized_and_stage_candidate_pending",
+  "scope_preserved": {
+    "source_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_packages": 4,
+    "i04_clusters": 21,
+    "i04_formal_cases": 84,
+    "new_formal_cases_passed": 0
+  },
+  "facts": {
+    "complete_original_presenter_files": 7,
+    "complete_pure_parser_files": 4,
+    "original_test_files": 2,
+    "source_ast_body_equal_files": 13,
+    "original_bilingual_catalog_scopes": 7,
+    "complete_original_badge_base": true,
+    "raw_payloads_and_every_poll_retained": true,
+    "summary_requires_original_explicit_claim": true,
+    "settled_running_query_does_not_spin": true,
+    "readonly_history_actions_do_not_execute": true,
+    "new_dependencies": 0,
+    "new_rust_owners": 0,
+    "core_authority_unchanged": true
+  },
+  "seams": [
+    "Rovai safe Markdown; source mode/incomplete flags are display hints only",
+    "Rovai locale and original Codeg ICU catalogs",
+    "existing Badge outline/secondary span and native Button seams; original full Badge base styles restored",
+    "Core remains sole execution/DB/authorization; no donor store or Runtime imported"
+  ],
+  "verification": {
+    "targeted_files": 5,
+    "targeted_passed": 82,
+    "typecheck_exit": 0,
+    "source_ast_and_catalog_audit": true,
+    "production_renderer_groups": 19,
+    "ordinary_tools_search_diff_renderer_regression_groups": 15,
+    "product_screenshots": 4,
+    "source_component_screenshots": 2,
+    "visual_review": "product 4 and original component 2 screenshots manually inspected; semantic tokens, icon size, list reset, wide/night and narrow/day checked",
+    "source_reference_full_app": false,
+    "real_core_native_web_end_to_end": false,
+    "real_model": false,
+    "public_actions_dispatched": 0,
+    "docs_gates": [
+      {
+        "name": "docs-tests",
+        "exit": 0
+      },
+      {
+        "name": "docs-version",
+        "exit": 0
+      },
+      {
+        "name": "docs-base",
+        "exit": 0
+      },
+      {
+        "name": "codegraph-sync",
+        "exit": 0
+      }
+    ]
+  },
+  "self_review_fixes": [
+    "restored source Badge 12px SVG styles",
+    "TypeScript literal extraction retains complete arbitrary selectors",
+    "undefined accent replaced by real host brand token",
+    "original feedback list reset confined to that list",
+    "test-only missing explicit summary marker and string escaping fixed before final pass",
+    "offscreen source reference painting settled before capture; original body unchanged"
+  ],
+  "remaining": [
+    "original Agent/collab/delegated/resumed cards, readonly questions and background groups, statistics and complete Markdown/HTML actions",
+    "original image Gallery/zoom/copy/download and full original App same-scene comparisons",
+    "actual Core.handle -> Native/Web -> production UI candidate, clipped top-level fields, scale/memory/per-page reauthorization",
+    "Claude full parser/producer and Core correlation, Qoder root/producer, explicit legacy import, Grok feedback and original T02/T03/T04 union/recovery/memory/automation",
+    "original ansi-to-react complete license evidence or replacement before public binary distribution"
+  ],
+  "current_stage_completed": false,
+  "app_goal_status": "active_verified_by_get_goal_after_User_card_resume",
+  "push": false,
+  "main_merge": false,
+  "paid_usage": false,
+  "approved_r1_artifacts": [
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    },
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    }
+  ],
+  "source_files": [
+    {
+      "path": "apps/desktop/src/renderer/src/NativeSessionViewer.tsx",
+      "sha256": "eeb0b5bdc4edae54615181a3493d6a6eaa94696958de57b46bc4cdc168eb2057",
+      "git_blob_with_filters": "effc4ff6edbb15e74f6638aa13b5b6fd857263ff"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/source-rich.css",
+      "sha256": "44ec6444aad1da0dd6e8d772652296627c24d1a55be35b99db3bfdc949bb36d2",
+      "git_blob_with_filters": "adc99d70e6c0a82bbe5ee3f5cad9fd8862824e19"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-copy.json",
+      "sha256": "745accd9820495226fa8ba493184a35f4121c15678701669b10089b73c8fcaa2",
+      "git_blob_with_filters": "378ca698da754fdc811d736e6215079ede5990d5"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-primitives.tsx",
+      "sha256": "2978a364c36e3324bb4fc50df6706b943a37edc036b08d64a8466e312905100a",
+      "git_blob_with_filters": "f3b760b8ab1f9785d575cac52d8625984c5cb934"
+    },
+    {
+      "path": "integration/README.md",
+      "sha256": "00d14e3d26a7595b39d26c7864985468117e4923e1c4c84afa4f12f9ea23f398",
+      "git_blob_with_filters": "fc623c55965af0eaf28d3034995da3e70ab18ded"
+    },
+    {
+      "path": "integration/execution/goal-state.json",
+      "sha256": "4126b59a6285868834d2897f24a37d46dfbaf206d3d035b8ff32b72899532d7c",
+      "git_blob_with_filters": "b93efa0ba50a632b20195a36b94a7f6e6ae64db0"
+    },
+    {
+      "path": "integration/inventory/native-session-viewer-ui-reference.md",
+      "sha256": "44edf082e616312b5fda6a4b8c19610c65344b2d4be2633a194467b07230c593",
+      "git_blob_with_filters": "85a1b17fe84b4f9278df3c4e99dd6cb1559273cc"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/codeg-mcp-tool-card.tsx",
+      "sha256": "599fafcf8b314c57fffdee4a08dead7a1963b0fa497509b13a8049f62fb6ec97",
+      "git_blob_with_filters": "581e0ee926ddc01199842ba9f1aeb50dbaa78184"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/context-compaction-card.tsx",
+      "sha256": "e4364f1e06f519b5ea0d9e4ecaf8e0cca62fdd0688b3f12ae0e6bbd2efbc03cb",
+      "git_blob_with_filters": "ee3141898669e947355f84ec37c2a8de42b37cba"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/delegation-status-badge.tsx",
+      "sha256": "951ba2613ed3e350db7b7e1e6e97671e8f2ece48b06cec8d4ae75a33421b7276",
+      "git_blob_with_filters": "6e0917a14b0c4c156d7240d8d44ae138fbad4743"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/delegation-status-card.tsx",
+      "sha256": "accc7a502210805ef27d6dfe15c883407f7752faff39bd143ee6e5a89967015a",
+      "git_blob_with_filters": "11bf0379aecad981e1212008607c151a41132210"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/delegation-status-group-card.tsx",
+      "sha256": "969d8faf24e95cedf4a248ce6637722268682a7ca79bbf94e3c914b5f1a318d7",
+      "git_blob_with_filters": "6c57e7f88936daae988654b593a051322b545954"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/delegation-status-row.tsx",
+      "sha256": "25900a5b283dffe32d53be43bdef788dea4b73d1ad511c5ac2adf6a20a1740ae",
+      "git_blob_with_filters": "1a86702e31ff2a3b59668724f09eea0f64edc54c"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/feedback-check-result-card.tsx",
+      "sha256": "8e82d157d29a3c5cca5dede4544b3f5b3220beb0873e46c2408fdf7b75dc18a5",
+      "git_blob_with_filters": "6983319dce7891419ee2f9daceca81268bddc45c"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/codeg-mcp-tool.test.ts",
+      "sha256": "467fa70fb81ff9bf433b64bc14f3cae4f7027a8c228b3c93aa8d31a232a69508",
+      "git_blob_with_filters": "d562dbc7738e1921f53decb303a1850027283a94"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/codeg-mcp-tool.ts",
+      "sha256": "60f122762500dd9c8780752934c23b1873b85f98b6e5306bc9b4039ff645d1f0",
+      "git_blob_with_filters": "4fcfb91885bbb74b5bc62f046f2852ad4545d82a"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/delegation-status.test.ts",
+      "sha256": "6ba3af1aa4b9d96bc5cad6259deaadaa17779cff08b78b6c214c5504377d6843",
+      "git_blob_with_filters": "6c4065521c4c14c1415009efa7e66c772b13a909"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/delegation-status.ts",
+      "sha256": "52ff33659dddea656a2dda36a6c9617e8faaf90a0ae548f983042fda3880e7b8",
+      "git_blob_with_filters": "d3eefb72c21cb0b5e821e294081a576a1c200e88"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/embedded-json.ts",
+      "sha256": "d90a985da5a1bd213b0403201a4bb696e835bbd7c7038f918c559717e77759cc",
+      "git_blob_with_filters": "9a70a4941de7ed2d655a5a8a7afdc851a410ba9f"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/feedback-check.test.ts",
+      "sha256": "431439b198e91faa2086ef3d51614851d9ec5f0c43cae08c397e36cf4fc4bb92",
+      "git_blob_with_filters": "e52691f874798c905d4c1643b15588931b4fe7ee"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/mcp-result-envelope.ts",
+      "sha256": "4b827e642c01af609ab95443e63c064d85f8c582f77905d5c64a163583093446",
+      "git_blob_with_filters": "338e1e8614cbf9edf0d4630e03bcfb1163949009"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/readonly-tool-card.tsx",
+      "sha256": "85f2b7a936f14db28eb4b02d35d22a5525c940fc9234fb0a44a4b0400b5798b1",
+      "git_blob_with_filters": "d0c2312c18a3265c3fbb454200eb59cd3f860692"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "file/I04专用卡片/build-source-style.mjs",
+      "bytes": 5794,
+      "sha256": "3a8ed124326189a56fa241dfa8bb40db7924288c27b4c72ac107bb12424b83c5"
+    },
+    {
+      "path": "file/I04专用卡片/card-data.ts",
+      "bytes": 3606,
+      "sha256": "8b4519e37a4ed631df2686b6b3ce4bef9cc57ef7a535bc49177fecd20aedaedc"
+    },
+    {
+      "path": "file/I04专用卡片/drafts/ordinary-regression/tools-day-diff.png",
+      "bytes": 69570,
+      "sha256": "f9d69bd6db4e14ccce1aee268201296fb53061481c9fb7b2611a3e70bc76536f"
+    },
+    {
+      "path": "file/I04专用卡片/drafts/ordinary-regression/tools-day-search.png",
+      "bytes": 54645,
+      "sha256": "151140c19c84ea130ab06e4edf1fde8a7bcfff18fe3ce4d130d689fd43c71bbc"
+    },
+    {
+      "path": "file/I04专用卡片/drafts/ordinary-regression/tools-night-diff.png",
+      "bytes": 115286,
+      "sha256": "c16b0bbea918c905b4fcd6614b4fe6f80ad97c9d6eb8226a2ee8b998eaaf9bb2"
+    },
+    {
+      "path": "file/I04专用卡片/drafts/ordinary-regression/tools-night-search.png",
+      "bytes": 96450,
+      "sha256": "01cbbed433d66e547d33cc5687447f6ca6cf508c804af8cac427bf405a6acbf1"
+    },
+    {
+      "path": "file/I04专用卡片/drafts/product/failure.png",
+      "bytes": 137326,
+      "sha256": "c54de9ab4df2a000b3dd303020f0259f4cd08de94a974cef2be303e4edd3b375"
+    },
+    {
+      "path": "file/I04专用卡片/drafts/product/special-day-feedback.png",
+      "bytes": 71090,
+      "sha256": "db4f84fcb49c361d776ecf03eb5e92892429e82a6dcaa7e22d5e4940c201f74d"
+    },
+    {
+      "path": "file/I04专用卡片/drafts/product/special-day-status.png",
+      "bytes": 72366,
+      "sha256": "9383dcb12706ade624bb804a6c05a7547f2784a7fdc2ecdaaa1eb1dcdacd5232"
+    },
+    {
+      "path": "file/I04专用卡片/drafts/product/special-night-feedback.png",
+      "bytes": 111136,
+      "sha256": "837b4ad02517c74a202bbccd24cff684fc9b2610a7b7fdc95e5032a65b1a26b9"
+    },
+    {
+      "path": "file/I04专用卡片/drafts/product/special-night-status.png",
+      "bytes": 110732,
+      "sha256": "4ee9fcc9164fe87d128d91eda3e27dedf4f865602ea85c6b46eb98d357e93076"
+    },
+    {
+      "path": "file/I04专用卡片/drafts/reference/source-day-special.png",
+      "bytes": 102487,
+      "sha256": "2cc0249f62ba488e0959456121637617d13aa3c3b34a048359b55895a69f04d3"
+    },
+    {
+      "path": "file/I04专用卡片/drafts/reference/source-night-special.png",
+      "bytes": 103312,
+      "sha256": "b0e437fe141fec0b7695e04c54068ad6aab183618d82d96b4566532b2dbdef8e"
+    },
+    {
+      "path": "file/I04专用卡片/logs/attempt2-script-error/failure.png",
+      "bytes": 137326,
+      "sha256": "c54de9ab4df2a000b3dd303020f0259f4cd08de94a974cef2be303e4edd3b375"
+    },
+    {
+      "path": "file/I04专用卡片/logs/attempt2-script-error/renderer.log",
+      "bytes": 624,
+      "sha256": "6cec4dbb5380d816ba6d5512a88ceed505f75dcd70023591f13efa4dcb68c68d"
+    },
+    {
+      "path": "file/I04专用卡片/logs/attempt2-script-error/ui-result.json",
+      "bytes": 846,
+      "sha256": "83a9c891add0cbf9f56f15ff9308c78da682cf118fe128f42d7e07aa43b86816"
+    },
+    {
+      "path": "file/I04专用卡片/logs/codegraph-sync.log",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "file/I04专用卡片/logs/codegraph.log",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "file/I04专用卡片/logs/docs-base.log",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "file/I04专用卡片/logs/docs-checks.json",
+      "bytes": 222,
+      "sha256": "96450883a2ab502dd6adbd7b2f41fbab28adfc2ccee410e9e99eeb779ebcb70d"
+    },
+    {
+      "path": "file/I04专用卡片/logs/docs-tests.log",
+      "bytes": 922,
+      "sha256": "1bd6d3ff6072ac705667026c39e68ae54de449788417d474dd4d13ec591deb3b"
+    },
+    {
+      "path": "file/I04专用卡片/logs/docs-version.log",
+      "bytes": 79,
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "file/I04专用卡片/logs/ordinary-regression.json",
+      "bytes": 3057,
+      "sha256": "f9c6bb703fa4478d0cefe532f59a8dc13dac21853e5964fccabd0c2e69be8b4a"
+    },
+    {
+      "path": "file/I04专用卡片/logs/ordinary-regression.log",
+      "bytes": 634,
+      "sha256": "52454beb09240a9aba08e908e60b5a8f88dfa4eed7780b4893ecd73d7a265e7c"
+    },
+    {
+      "path": "file/I04专用卡片/logs/reference-ui.json",
+      "bytes": 1044,
+      "sha256": "9894913d0ad16e3826c5f85c373c80374c04f40dff22102ddd48ef9d2d5059db"
+    },
+    {
+      "path": "file/I04专用卡片/logs/reference.log",
+      "bytes": 591,
+      "sha256": "3d390810f97840feadead48129ca35540470589c8b379a8e1ce535157748eb7d"
+    },
+    {
+      "path": "file/I04专用卡片/logs/renderer.log",
+      "bytes": 267,
+      "sha256": "94c79686403fe620ce3b0c4c7a7f99f22f4129db639a41344692f8135b26a2d6"
+    },
+    {
+      "path": "file/I04专用卡片/logs/source-audit.json",
+      "bytes": 5526,
+      "sha256": "3bec44bb83d0fd53e6ce3cf990bf8e1432e34bf49bb5211bd88fed231b15cb6d"
+    },
+    {
+      "path": "file/I04专用卡片/logs/source-port.json",
+      "bytes": 5110,
+      "sha256": "9d9ffce46c7e756d31ea90644888192ca7c724c2b4dd9d40cb36792b31e87211"
+    },
+    {
+      "path": "file/I04专用卡片/logs/style-generation.json",
+      "bytes": 2419,
+      "sha256": "e3e9971c263d7178a01245b7fd516653c3e2ad461075f9e6515b49d8761fd84d"
+    },
+    {
+      "path": "file/I04专用卡片/logs/tests.log",
+      "bytes": 495,
+      "sha256": "57fb6a32ae6f12c1ae86a82cf027e8a1d6655b85b284314d7830fea81283f90c"
+    },
+    {
+      "path": "file/I04专用卡片/logs/types.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "file/I04专用卡片/logs/ui-result.json",
+      "bytes": 2529,
+      "sha256": "13316ffb0c469ac39f1fed8275b7f9ed001927a69b3b4b3af6e2b1b2e540557c"
+    },
+    {
+      "path": "file/I04专用卡片/port.py",
+      "bytes": 3230,
+      "sha256": "cb03c35ebb2cbf16c4ca3803b43d90e63e8dc0c3a73c62b40938298865b5c77b"
+    },
+    {
+      "path": "file/I04专用卡片/prepare-record.py",
+      "bytes": 6396,
+      "sha256": "0b704d7d69ad18a5d1a50a19097770bf9193742cbd568569d0134045767ffc40"
+    },
+    {
+      "path": "file/I04专用卡片/reference-main.cjs",
+      "bytes": 2666,
+      "sha256": "2802c986e397f7ddef79208f20787c28798a07fe298cad7a9a3f9b81dedc63ba"
+    },
+    {
+      "path": "file/I04专用卡片/reference-renderer.tsx",
+      "bytes": 1554,
+      "sha256": "52e154bfa9657cb88a5b8472dbab49a645f83c1dc2bb412b392069407602505a"
+    },
+    {
+      "path": "file/I04专用卡片/render-ordinary-regression.mjs",
+      "bytes": 1713,
+      "sha256": "163d062f92696d648569e8b9c26a1baf21bbca32de432717e9d04ef37174dbaf"
+    },
+    {
+      "path": "file/I04专用卡片/render-reference.mjs",
+      "bytes": 3957,
+      "sha256": "0bee55ceb0abb51b32266dd502071b7e44ba2ea9a74ec089928414dea2f75ba7"
+    },
+    {
+      "path": "file/I04专用卡片/render-tools.mjs",
+      "bytes": 2027,
+      "sha256": "c0dd6ea568fd4d10f4fa43e8475ddcc64b70edee1fd6163df566692129057e71"
+    },
+    {
+      "path": "file/I04专用卡片/renderer.tsx",
+      "bytes": 4156,
+      "sha256": "c16f9337cb4ba4be5824401bd3ff09bcb3678fe8187808724b2cf75db261c58f"
+    },
+    {
+      "path": "file/I04专用卡片/source-audit.mjs",
+      "bytes": 2958,
+      "sha256": "21ea8d57b7c25afd18a7963cd7a4d0e35067bdc664f22403cc356cb5e1156bb4"
+    },
+    {
+      "path": "file/I04专用卡片/tools-main.cjs",
+      "bytes": 8138,
+      "sha256": "c8e7872f0ba9765f4a7e9aadd0cb78823a17b14cb4b2fdf8d2da84f0e6668d63"
+    },
+    {
+      "path": "file/I04专用卡片/verify-docs.ps1",
+      "bytes": 1229,
+      "sha256": "7c81a8ba8fc946c09495d1c32a5705e63a0d11af9a713c0c90119097ab757da6"
+    }
+  ]
+}

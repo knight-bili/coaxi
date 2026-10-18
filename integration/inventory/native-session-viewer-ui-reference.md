@@ -12,7 +12,7 @@ Codeg 固定 aff1e6c278453ed8d0b96a5f664edcdca621aa3f，Rovai 固定 cc465dda562
 | Rovai 原 User证据读取与执行卡片 | `NativeSubagentEntries.tsx`、`native-subagent-entries.ts`，公开与私聊原执行记录；已知截断观察显式读完整内容、原receiverIndex保留 | 实际 Renderer 32项、最后索引31；短Grok编号无独立会话只展示状态；终态旧running注明上次记录 |
 | Rovai `SafeMarkdown`/原主题tokens/运行标记 | 原安全Markdown与两套同结构主题；不引入新主题或输入/审批/模型入口 | 原/融合外壳各两张已检查；不宣称像素等价或完整原富内容更好 |
 
-当前标题、刷新错误与只读说明因 Core 权限/读取生命周期适配；刷新错误条位于滚动体之外。实际第一次界面检查发现插入错误条使250px位置变299.333px，修正后刷新失败及恢复均保持250px。完整工具字符串/meta/stats保留在读取模型；当前工具正文采用初始展开容器，不能视为最终原工具设计。
+当前标题、刷新错误与只读说明因 Core 权限/读取生命周期适配；刷新错误条位于滚动体之外。实际第一次界面检查发现插入错误条使250px位置变299.333px，修正后刷新失败及恢复均保持250px。完整工具字符串/meta/stats保留在读取模型；正文后续原普通工具与专用卡片的实施状态分别见下方接续记录，不能把初始通用容器当作最终原工具设计。
 
 ## 本批证据范围
 
@@ -43,3 +43,13 @@ Codeg 固定 aff1e6c278453ed8d0b96a5f664edcdca621aa3f，Rovai 固定 cc465dda562
 实际产品24组交互与原组件两张日夜截图已检查；6张产品截图覆盖已有原生窗口及工具状态，复制验证包含Windows系统LF到CRLF的转换。原ToolShell/Terminal/JSON/折叠/Button/Badge在参考窗口实际运行，代码框及翻译是明确宿主适配，完整原ContentPartsRenderer/App和主题管线仍未资格。详情、源码Git blob及依赖在[本批证据](../execution/i04-native-tool-primitives-result.json)和[当前清单](native-content-ui-port.json)。
 
 下一有限队列仍是完整普通ToolCallPart/ToolOutput及命令会话状态、结构化读写/补丁、搜索与Core授权文件跳转、统一/左右Diff，然后代理/MCP/后台卡、统计和图片动作；不得把这一批通用路由当成完整富内容。ansi-to-react原发布包及精确gitHead缺许可证文件，原README/SPDX保留，阶段对外分发前解决。完整I04四包21簇84场景和81簇48包324总范围不变。
+
+## 压缩、反馈、MCP 与状态卡接续（2026-10-19）
+
+固定 Codeg 的 `context-compaction-card`、`feedback-check-result-card`、`codeg-mcp-tool-card`、`delegation-status-card/row/group-card/badge` 七个完整展示文件，以及四个完整纯解析文件已接入 NativeSessionViewer。两份原解析测试也完整移植；13文件函数体/JSX与原版本一致（仅import及同名re-export路径适配），7组中英文原文案逐项相同。`ReadonlyToolCard` 只沿用原路由条件，不启用供体store、DB、执行或答复入口；`resume_delegation` 继续留给完整恢复帮手卡，不冒充普通MCP完成。
+
+摘要必须有原 `codeg.compactionSummary` 显式标记才显示。状态组仍一任务一行，完整保留每次结果、原分页和原始输入输出/meta/stats；已结束但报告running的查询使用不旋转的“已查询”。展示历史取消请求不会重新发起取消。Markdown仍用Rovai安全组件，源streaming参数只作为更新正文的展示提示，不执行HTML或启动Runtime。
+
+自审发现Badge少了原SVG尺寸样式，以及旧提取方式拆断含 `&`/`>` 的选择器；已补完整原Badge基础类并改用TS字符串节点提取，实测图标12px。原primary接入实际存在的Rovai `--brand`，反馈列表仅局部补原Tailwind列表reset；不修改App全局样式，也不裁掉Markdown列表。原Badge/Button/Markdown/i18n仍是明确宿主接缝，不把参考夹具称为完整原App。
+
+82项定向、19组生产Renderer实际检查和15组普通工具/搜索/Diff回归通过；类型检查0错误、CodeGraph已sync。产品4张与固定原组件2张截图已检查（两主题；产品含390px窄屏）。运输是显式替身，无真实Core/Host/Native/Web/模型资格；完整原App、帮手主卡/collab、委派/恢复、问答/后台、图片和真实链路仍在原有限剩余中。详见[本批记录](../execution/i04-native-specialized-status-result.json)。
