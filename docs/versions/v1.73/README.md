@@ -11,6 +11,8 @@ last_updated: 2026-10-18
 
 # v1.73：Core 独立帮手
 
+Codex 原消息解析主体及代码模式/MCP/延迟等待、目标/计划、去重/提升、思考/图片与用量已接同一核验文件链路，具体[接续证据](../../../integration/execution/i04-native-codex-content-result.json)区分原版断言与实际受控文件、完整差分及公共查看器资格。新增依赖仅为供体锁定 regex1.12.3 图和已存在的 percent-encoding2.3.2，无其他包升级；模型输入、Schema 和正式场景数量不变。
+
 本批移植固定 Codeg 的 Grok 消息/工具/答案纯解析及共享材料/归并规则，并接通 Codex cut/seed 历史输入拼接。[内容分项记录](../../../integration/execution/i04-native-content-result.json)保留编译、原文件 owner 定向检查与来源清单。Codex 完整消息/代码模式/目标/用量、Grok 完整会话统计与原完整 parser 差分、公共有界运输及原 UI 仍待；没有改变模型输入、Schema 或正式场景通过数。
 
 本批启动来源及历史读取沿现有 Core 权威接线，未改模型输入或 Schema161/Migration211；主程序检查与同库/文件分项结果见[来源持久化记录](../../../integration/execution/i04-native-source-origin-result.json)。这不表示真实 provider、公共运输或原查看器已完成。

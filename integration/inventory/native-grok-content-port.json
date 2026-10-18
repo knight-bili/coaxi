@@ -54,5 +54,6 @@
     "Codex full original message/code-mode/goal/usage parser",
     "Grok session stats/context window catalogue and full original parser differential",
     "User-only bounded transport/signed nested references and original UI"
-  ]
+  ],
+  "shared_model_followup": "native-codex-content-port.json restores actual UnifiedMessage/MessageRole consumer and adds SessionStats/selected Core display summary; current source qualification is the Codex followup record"
 }

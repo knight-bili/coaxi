@@ -128,3 +128,11 @@ Grok修改意见仍未完成。核对固定Codeg的lifecycleSend/mqEnqueue和已
 复用原 source 文件 owner 和受控目录，无新 Rust owner、数据库或进程。extended-tests 库编译及精确列册1项/实际1项通过，10项现有警告保持；首次编译的重复derive边界错误已修，原失败保留。本批没有启动 main、公共运输、GUI 或真实 provider，不增加84正式场景通过数。具体证据见[本批记录](../../../integration/execution/i04-native-content-result.json)。
 
 下一有限队列：Codex 原完整消息/代码模式/目标/用量解析；Grok 完整会话统计/模型上下文窗口目录及原完整 parser 差分；有界完整内容与签名快照/后代引用、可取消后台快照打开；Native/Web 共用 User-only 读取；固定 Codeg 原只读卡片/抽屉及同场景验证。旧无来源导入、真实 Host/Runtime/平台和完整 I04 四包/21簇/84正式场景继续，未完成项不因本层通过删除。
+
+## Codex 原消息主体接续（2026-10-18）
+
+原消息主体及其纯依赖现接核验记录：去重/promotion、思考/图片、计划确认/目标开闭与首问、代码模式/MCP/延迟 wait/shell、collab 与累计花费/占用保持原规则。直接输出完整保留，后代预览保持；原读取路径替换为 Core 后代/工程源行回调，未结后代统计按来源顺序稳定。显示摘要去掉原生路径/身份/启动字段，流式指纹覆盖实际投影与 patch 几何。原列表专用和 live 控制未用代码不为只读路径保留，也不加 dead-code 抑制。
+
+沿原文件 owner 扩固定 Codeg 的22组断言和受控文件→wrapper场景，无新 Rust owner/数据库/进程；原版断言只换输入夹具适配，未改期望。新增正则依赖固定供体1.12.3及原图，percent-encoding复用已锁2.3.2，无其他依赖升级。实际编译、定向结果、失败历史和边界见[本批记录](../../../integration/execution/i04-native-codex-content-result.json)，不是原完整 App 差分、公共运输/GUI/真实模型或84正式场景资格。
+
+下一有限队列：Grok 完整会话统计/上下文窗口目录和两原 parser 差分；可信工程文件回调与旧 agent 文件显式父链；完整有界内容/签名快照和后代引用、首次 snapshot 发现/hash后台取消；User-only Native/Web 与固定 Codeg 原只读 UI/同场景，再阶段 Runtime/平台和其余工作包集中候选。完整 I04 四包/21簇/84和一期81簇/48包/324不减，不新增客户工程测试事项。

@@ -43,3 +43,5 @@ Runtime 原生子会话仍是原生观察，不创建 Core Delegation。内部�
 原生文件层仍在 Core 内部：候选先验证原生父链，再按精确 Codex rollout/Grok 父元数据定位原文件，保存完整字节快照和分块摘要；读取不 attach/start 或写业务库。原生元数据与正文不直接序列化给 Renderer，后续仍由 Core 内容投影拥有消息/工具/问答顺序。Codex/Grok Host 已从最终 ManagedProcessLaunchSpec 捕获非凭据目录，原 Native bind 事务保存 System 来源事件；历史读取沿原 Run/epoch/父 Session 和绑定恢复原来源。未记录来源仍不可打开正文，不能从当前设置或 UI 路径补猜。实现状态和未完边界见[文件来源映射](../../integration/inventory/native-subagent-viewer-reference.md)。
 
 私有内容层现以逐行 JSON 迭代器消费这些核验块，移植固定 Codeg Grok 的原消息模型和纯解析/材料/归并规则，摘要元数据只取模型名称。完整直接正文留在内容模型，运输窗口、签名快照和嵌套来源引用留给后续统一 User API，不在 parser 引入文件路径入口或业务写入。Codex 历史输入按原版 cut/seed 拼接，完整消息 parser 仍待移植；Grok 全会话统计/上下文窗口目录及原完整 parser 差分也未授予资格。具体当前行为与限制由[内容合同](../contracts/delegation-v1.md#原生内容投影的当前实现边界)拥有，不从本层检查外推 UI、真实模型或 I04 完成。
+
+Codex 内容接续已将原消息主体和代码模式/目标/上下文/附件/内部 route 的纯依赖移入相同 Core 边界。读取只消费核验记录，后代和工程 patch 源行由可信回调提供，不导入原文件猜选或执行路径。Root/父身份仍由 Core 持有，显示摘要类型只含 title/model/branch/时间/数量；实际内容、统计和该摘要纳入流式快照指纹，避免工程行号变化后拼接旧页。完整原 parser 差分、生产工程文件回调、旧 agent 文件显式父链和运输/原 UI 资格继续单列，具体[当前合同](../contracts/delegation-v1.md#原生内容投影的当前实现边界)及[本批记录](../../integration/execution/i04-native-codex-content-result.json)取代上一段“消息主体待移植”的分项状态。

@@ -20,12 +20,16 @@ use super::{
     source::{DocumentKind, NativeDocument, NativeDocuments},
 };
 use model::MessageTurn;
+mod codex;
+
 pub(crate) use records::ParseNotes;
 use records::{JsonRecords, json_document};
 
 pub(crate) struct NativeContent {
     pub(crate) turns: Vec<MessageTurn>,
     pub(crate) context_tokens: Option<u64>,
+    pub(crate) session_stats: Option<model::SessionStats>,
+    pub(crate) summary: Option<model::NativeTranscriptSummary>,
     pub(crate) snapshot_digest: String,
     pub(crate) notes: ParseNotes,
     /// Observed Native ids are not UI grants. Later transport mints references
@@ -57,6 +61,34 @@ fn fingerprint(documents: &[NativeDocument]) -> String {
         digest.update(serde_json::to_vec(&item).unwrap());
     }
     format!("{:x}", digest.finalize())
+}
+
+fn hash_projection(
+    digest: &mut Sha256,
+    turns: &[MessageTurn],
+    stats: Option<&model::SessionStats>,
+    summary: Option<&model::NativeTranscriptSummary>,
+) -> Result<()> {
+    struct DigestWriter<'a>(&'a mut Sha256);
+    impl std::io::Write for DigestWriter<'_> {
+        fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+            self.0.update(bytes);
+            Ok(bytes.len())
+        }
+        fn flush(&mut self) -> std::io::Result<()> {
+            Ok(())
+        }
+    }
+    serde_json::to_writer(DigestWriter(digest), &(turns, stats, summary))?;
+    Ok(())
+}
+
+fn hash_child_sources(digest: &mut Sha256, sources: &mut [(String, String)]) {
+    sources.sort();
+    for (id, source_digest) in sources {
+        digest.update(id.as_bytes());
+        digest.update(source_digest.as_bytes());
+    }
 }
 
 pub(crate) fn grok_content(
@@ -124,6 +156,7 @@ pub(crate) fn grok_content(
     };
     let mut child_notes = ParseNotes::default();
     let mut verified = Vec::new();
+    let mut child_sources = Vec::new();
     let mut cached = HashMap::<String, Vec<model::AgentToolCall>>::new();
     let parsed = grok::project(
         rows,
@@ -151,8 +184,7 @@ pub(crate) fn grok_content(
                     JsonRecords::new(document, stop, &mut child_notes),
                     fallback,
                 )?;
-                digest.update(id.as_bytes());
-                digest.update(source_digest.as_bytes());
+                child_sources.push((id.to_owned(), source_digest));
                 verified.push(id.into());
                 Ok(tools)
             })();
@@ -171,9 +203,15 @@ pub(crate) fn grok_content(
     merge_notes(&mut notes, update_notes);
     merge_notes(&mut notes, answer_notes);
     merge_notes(&mut notes, child_notes);
+    hash_child_sources(&mut digest, &mut child_sources);
+    verified.sort();
+    verified.dedup();
+    hash_projection(&mut digest, &parsed.turns, None, None)?;
     Ok(NativeContent {
         turns: parsed.turns,
         context_tokens: parsed.context_tokens,
+        session_stats: None,
+        summary: None,
         snapshot_digest: format!("{:x}", digest.finalize()),
         notes,
         verified_children: verified,
@@ -247,6 +285,94 @@ pub(crate) fn codex_history_records(
         assembled = spliced;
     }
     Ok(assembled)
+}
+
+/// Pure Codex parsing over the same captured provenance and checked files as
+/// Grok. The caller supplies an authorized project-file reader for optional
+/// patch geometry; a native transcript's cwd never grants filesystem access.
+pub(crate) fn codex_content(
+    target: &ObservedNativeSessionTarget,
+    fallback: DateTime<Utc>,
+    stop: &AtomicBool,
+    patch_lines: &mut impl FnMut(&str, Option<&str>) -> Option<Vec<String>>,
+) -> Result<NativeContent> {
+    ensure!(
+        target.adapter_kind == "codex-cli",
+        "native_child.invalid_adapter"
+    );
+    ensure!(!stop.load(Ordering::Acquire), "native_child.read_cancelled");
+    let mut documents = NativeDocuments::open_recorded(target)?;
+    let mut digest = Sha256::new();
+    digest.update(fingerprint(&documents.documents).as_bytes());
+    digest.update(fallback.to_rfc3339().as_bytes());
+    let mut notes = ParseNotes::default();
+    let rows = codex_history_records(&mut documents, stop, &mut notes)?;
+    let mut child_notes = ParseNotes::default();
+    let mut verified = Vec::new();
+    let mut child_sources = Vec::new();
+    let mut cached = HashMap::<String, Option<model::AgentExecutionStats>>::new();
+    let detail = codex::project(
+        rows.into_iter().map(Ok),
+        fallback,
+        stop,
+        &mut |id| {
+            if let Some(stats) = cached.get(id) {
+                return stats.clone();
+            }
+            let read = (|| -> Result<_> {
+                ensure!(!stop.load(Ordering::Acquire), "native_child.read_cancelled");
+                let mut child = target.clone();
+                child.parent_native_session_id = target.child_native_session_id.clone();
+                child.child_native_session_id = id.to_owned();
+                let mut documents = NativeDocuments::open_recorded(&child)?;
+                let source_digest = fingerprint(&documents.documents);
+                let document = documents
+                    .documents
+                    .first_mut()
+                    .ok_or_else(|| anyhow::anyhow!("native_child.source_unavailable"))?;
+                let stats = codex::subagent_stats(
+                    JsonRecords::new(document, stop, &mut child_notes),
+                    stop,
+                )?;
+                child_sources.push((id.to_owned(), source_digest));
+                verified.push(id.to_owned());
+                Ok(stats)
+            })();
+            let stats = match read {
+                Ok(stats) => stats,
+                Err(_) => {
+                    child_notes.unavailable_children += 1;
+                    None
+                }
+            };
+            cached.insert(id.to_owned(), stats.clone());
+            stats
+        },
+        patch_lines,
+    )?;
+    ensure!(!stop.load(Ordering::Acquire), "native_child.read_cancelled");
+    merge_notes(&mut notes, child_notes);
+    hash_child_sources(&mut digest, &mut child_sources);
+    verified.sort();
+    verified.dedup();
+    hash_projection(
+        &mut digest,
+        &detail.turns,
+        detail.session_stats.as_ref(),
+        Some(&detail.summary),
+    )?;
+    Ok(NativeContent {
+        turns: detail.turns,
+        context_tokens: detail
+            .session_stats
+            .as_ref()
+            .and_then(|s| s.context_window_used_tokens),
+        session_stats: detail.session_stats,
+        summary: Some(detail.summary),
+        snapshot_digest: format!("{:x}", digest.finalize()),
+        notes,
+        verified_children: verified,
+    })
 }
 
 #[cfg(all(test, feature = "extended-tests"))]

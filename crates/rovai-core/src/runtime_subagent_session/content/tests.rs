@@ -24,6 +24,8 @@ fn lines(rows: &[Value]) -> Vec<u8> {
 
 // Extends the existing filesystem owner; no second database/process fixture.
 pub(crate) fn assert_content_projection(home: &Path, base: &ObservedNativeSessionTarget) {
+    super::codex::tests::assert_original_rules();
+    assert_codex_file_content(home, base);
     let mut target = base.clone();
     target.adapter_kind = "grok-build".into();
     target.recorded_home = Some(home.into());
@@ -227,6 +229,53 @@ pub(crate) fn assert_content_projection(home: &Path, base: &ObservedNativeSessio
     assert_eq!(content.snapshot_digest, repeated.snapshot_digest);
     assert!(grok_content(&target, fallback, &AtomicBool::new(true)).is_err());
 
+    // Two independently proven descendants exercise the actual lifecycle map,
+    // whose iteration order must not change the content/cursor identity.
+    let second_spawn: Vec<_> = rows
+        .iter()
+        .filter(|value| {
+            let update = &value["params"]["update"];
+            update["toolCallId"] == "spawn" || update["subagent_id"] == "nested-short"
+        })
+        .map(|value| {
+            serde_json::from_str::<Value>(
+                &value
+                    .to_string()
+                    .replace("nested-short", "nested-other")
+                    .replace("\"spawn\"", "\"spawn-other\""),
+            )
+            .unwrap()
+        })
+        .collect();
+    assert_eq!(second_spawn.len(), 4);
+    rows.extend(second_spawn);
+    write(home, "sessions/group-b/child/updates.jsonl", lines(&rows));
+    write(home,"sessions/group-b/child/subagents/nested-other/meta.json",serde_json::to_vec(&json!({"child_session_id":"grandchild-other","parent_session_id":"child","status":"completed","tool_calls":1})).unwrap());
+    write(
+        home,
+        "sessions/group-c/grandchild-other/updates.jsonl",
+        lines(&[
+            row(
+                json!({"sessionUpdate":"tool_call","toolCallId":"other-read","title":"read_file","rawInput":{"path":"other.ts"}}),
+            ),
+            row(
+                json!({"sessionUpdate":"tool_call_update","toolCallId":"other-read","status":"completed","content":[{"type":"content","content":{"type":"text","text":"other child contents"}}]}),
+            ),
+        ]),
+    );
+    let multiple = grok_content(&target, fallback, &stop).unwrap();
+    assert_eq!(
+        multiple.verified_children,
+        ["grandchild", "grandchild-other"]
+    );
+    let multiple_wire = serde_json::to_value(&multiple.turns).unwrap();
+    for _ in 0..4 {
+        let reread = grok_content(&target, fallback, &stop).unwrap();
+        assert_eq!(reread.snapshot_digest, multiple.snapshot_digest);
+        assert_eq!(reread.verified_children, multiple.verified_children);
+        assert_eq!(serde_json::to_value(reread.turns).unwrap(), multiple_wire);
+    }
+
     let mut codex = base.clone();
     codex.adapter_kind = "codex-cli".into();
     codex.recorded_home = Some(home.into());
@@ -258,4 +307,150 @@ pub(crate) fn assert_content_projection(home: &Path, base: &ObservedNativeSessio
     assert!(joined.contains(&newest[1]));
     assert!(!joined.contains(&oldest[1]));
     assert!(!joined.contains(&oldest[3]));
+}
+
+fn assert_codex_file_content(home: &Path, base: &ObservedNativeSessionTarget) {
+    use super::codex_content;
+    let mut target = base.clone();
+    target.adapter_kind = "codex-cli".into();
+    target.child_native_session_id = "codex-content".into();
+    target.recorded_home = Some(home.into());
+    let record = |second: u32, kind: &str, payload: Value| json!({"timestamp": format!("2026-10-18T13:00:{second:02}Z"), "type":kind, "payload":payload});
+    let patch = "*** Begin Patch\n*** Update File: src/file.ts\n@@\n-old\n+new\n*** End Patch";
+    let long = "完整结果中文".repeat(40_000);
+    let rows = vec![
+        record(
+            0,
+            "session_meta",
+            json!({"id":"codex-content","parent_thread_id":target.parent_native_session_id,"cwd":"C:/native-cwd-is-not-a-file-grant","api_key":"PRIVATE_CODEX_STARTUP"}),
+        ),
+        record(
+            1,
+            "event_msg",
+            json!({"type":"thread_goal_updated","goal":{"objective":"完成修改","status":"active"}}),
+        ),
+        record(2, "turn_context", json!({"model":"gpt-5-codex"})),
+        record(3, "event_msg", json!({"type":"task_started"})),
+        record(
+            4,
+            "event_msg",
+            json!({"type":"user_message","message":"收到"}),
+        ),
+        record(
+            4,
+            "response_item",
+            json!({"type":"message","role":"user","content":[{"type":"input_text","text":"收到"}]}),
+        ),
+        record(
+            5,
+            "event_msg",
+            json!({"type":"agent_reasoning","text":"先检查"}),
+        ),
+        record(
+            6,
+            "event_msg",
+            json!({"type":"agent_reasoning","text":"再修改"}),
+        ),
+        record(
+            7,
+            "response_item",
+            json!({"type":"custom_tool_call","call_id":"patch-1","name":"apply_patch","input":patch}),
+        ),
+        record(
+            8,
+            "response_item",
+            json!({"type":"custom_tool_call_output","call_id":"patch-1","output":"Applied"}),
+        ),
+        record(
+            9,
+            "response_item",
+            json!({"type":"function_call","call_id":"long-1","name":"exec_command","arguments":"{\"cmd\":\"echo complete\"}"}),
+        ),
+        record(
+            10,
+            "response_item",
+            json!({"type":"function_call_output","call_id":"long-1","output":long}),
+        ),
+        record(
+            11,
+            "event_msg",
+            json!({"type":"agent_message","message":"完成"}),
+        ),
+        record(
+            12,
+            "event_msg",
+            json!({"type":"token_count","info":{"total_token_usage":{"input_tokens":100,"cached_input_tokens":20,"output_tokens":10},"last_token_usage":{"input_tokens":100,"cached_input_tokens":20,"output_tokens":10},"model_context_window":200000}}),
+        ),
+        record(
+            13,
+            "event_msg",
+            json!({"type":"thread_goal_updated","goal":null}),
+        ),
+    ];
+    write(
+        home,
+        "sessions/2026/10/18/rollout-2026-10-18T13-00-00-codex-content.jsonl",
+        lines(&rows),
+    );
+    let stop = AtomicBool::new(false);
+    let fallback = Utc.timestamp_opt(1600000000, 0).single().unwrap();
+    let mut reads = 0;
+    let content = codex_content(&target, fallback, &stop, &mut |path, cwd| {
+        assert_eq!(path, "src/file.ts");
+        assert_eq!(cwd, Some("C:/native-cwd-is-not-a-file-grant"));
+        reads += 1;
+        Some(vec!["old".into()])
+    })
+    .unwrap();
+    assert_eq!(reads, 1);
+    let summary = content.summary.as_ref().unwrap();
+    assert_eq!(summary.title.as_deref(), Some("完成修改"));
+    assert_eq!(summary.model.as_deref(), Some("gpt-5-codex"));
+    let summary_wire = serde_json::to_string(summary).unwrap();
+    assert!(!summary_wire.contains("native-cwd-is-not-a-file-grant"));
+    assert!(!summary_wire.contains("PRIVATE_CODEX_STARTUP"));
+    let users: Vec<_> = content
+        .turns
+        .iter()
+        .filter(|t| matches!(t.role, super::model::TurnRole::User))
+        .flat_map(|t| &t.blocks)
+        .filter_map(|b| {
+            if let super::model::ContentBlock::Text { text } = b {
+                Some(text.as_str())
+            } else {
+                None
+            }
+        })
+        .collect();
+    assert_eq!(users, ["/goal 完成修改", "收到"]);
+    let wire = serde_json::to_value(&content.turns).unwrap();
+    let text = wire.to_string();
+    assert!(!text.contains("PRIVATE_CODEX_STARTUP"));
+    assert!(text.contains("@@ -1,1 +1,1 @@"));
+    let blocks: Vec<_> = content.turns.iter().flat_map(|t| &t.blocks).collect();
+    assert!(blocks.iter().any(|b|matches!(b,super::model::ContentBlock::ToolResult{tool_use_id:Some(id),output_preview:Some(output),..} if id=="long-1" && output==&long)));
+    for name in ["create_goal", "update_goal"] {
+        assert_eq!(blocks.iter().filter(|b|matches!(b,super::model::ContentBlock::ToolUse{tool_name,..} if tool_name==name)).count(), 1);
+    }
+    let stats = content.session_stats.as_ref().unwrap();
+    assert_eq!(stats.total_tokens, Some(110));
+    assert_eq!(
+        stats.total_usage.as_ref().unwrap().cache_read_input_tokens,
+        20
+    );
+    assert_eq!(stats.context_window_max_tokens, Some(200000));
+    let repeated = codex_content(&target, fallback, &stop, &mut |_, _| {
+        Some(vec!["old".into()])
+    })
+    .unwrap();
+    assert_eq!(serde_json::to_value(repeated.turns).unwrap(), wire);
+    assert_eq!(content.snapshot_digest, repeated.snapshot_digest);
+    assert!(codex_content(&target, fallback, &AtomicBool::new(true), &mut |_, _| None).is_err());
+    let without_files = codex_content(&target, fallback, &stop, &mut |_, _| None).unwrap();
+    assert_ne!(content.snapshot_digest, without_files.snapshot_digest);
+    assert!(
+        !serde_json::to_string(&without_files.turns)
+            .unwrap()
+            .contains("@@ -1,1 +1,1 @@")
+    );
 }

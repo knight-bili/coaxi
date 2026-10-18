@@ -1,0 +1,113 @@
+{
+  "donor_commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+  "license": "Apache-2.0",
+  "sources": {
+    "src-tauri/src/models/message.rs": {
+      "bytes": 14275,
+      "sha256": "b34343a8a8cbfb4a6300aeb17a9c067230d81c17e97afbc0a84e98698e10e6b2"
+    },
+    "src-tauri/src/models/conversation.rs": {
+      "bytes": 16743,
+      "sha256": "6bd159fc7a78c935449fe157215997adb52039429d0664576db4845af7a4aac7"
+    },
+    "src-tauri/src/parsers/codex_code_mode.rs": {
+      "bytes": 128513,
+      "sha256": "878b0de286a84dbd0d2e89e63e117f06d8f9cc7450b795077341b2e169310892"
+    },
+    "src-tauri/src/acp/codex_goal.rs": {
+      "bytes": 20214,
+      "sha256": "8c70251de5d8604f0c889f873c0628ba5f9b809db9006f62558daf4dfdc4c937"
+    },
+    "src-tauri/src/acp/codex_context.rs": {
+      "bytes": 5648,
+      "sha256": "500c7591bf2b59d9621660afcafb830cbed1b5bbedc9f4a653549e884a4ce7d0"
+    },
+    "src-tauri/src/acp/js_text.rs": {
+      "bytes": 1917,
+      "sha256": "42c1b9ad07eedd3c6db24a31314a51464e35e5ebb27393b2df3eafbb837dc111"
+    },
+    "src-tauri/src/parsers/codex_desktop_attachments.rs": {
+      "bytes": 24167,
+      "sha256": "40b1ed9747a077f4ba554d8de64ac348335eb33f0fe5f5033bb555a59f2d0374"
+    },
+    "src-tauri/src/acp/agent_mentions.rs": {
+      "bytes": 40200,
+      "sha256": "b371ebd2b654640e9fe0d4a7a50f0d28f34bfbcdae3575162c3c364f1acdfb27"
+    },
+    "src-tauri/src/models/agent.rs": {
+      "bytes": 13959,
+      "sha256": "d3cf2e73e01083038ab3bfb6c40ce67192cd17c2a951e469be7db6c244d611dc"
+    },
+    "src-tauri/src/acp/service_error.rs": {
+      "bytes": 13377,
+      "sha256": "03694d3384265f2d0b8fe40ebaa0f4a8abd4c87357fa0f672f364dc0df774e29"
+    },
+    "src-tauri/src/parsers/mod.rs": {
+      "bytes": 108012,
+      "sha256": "06a43b8597edb1c6167143f1434e4260d9171b72eafbd3b114d36dc2e8160c2b"
+    },
+    "src-tauri/src/parsers/claude.rs": {
+      "bytes": 367323,
+      "sha256": "6e71571b0b300cc954343ceba89308134c0fc1fd41009c43560cf2161f8b0e51"
+    },
+    "src-tauri/src/parsers/pi.rs": {
+      "bytes": 121573,
+      "sha256": "6a74d175601c915dc844390241a35fe256395d8f40f7a5332e0583f396283cd0"
+    },
+    "src-tauri/src/parsers/codex.rs": {
+      "bytes": 796430,
+      "sha256": "5a7653c083c394c7bc1a973ef566a4db67b1a8f5d20501572a8a8a1a74511428"
+    },
+    "src-tauri/Cargo.lock": {
+      "bytes": 244330,
+      "sha256": "73c3e00f9d836027dfa44b8640f207a811cebb264c9e41f46f3bb8711c6c6cb6"
+    }
+  },
+  "ranges": {
+    "mod.rs": "parsers/codex.rs:950-2815,3065-6861; subagent pure rules2817-3062",
+    "code_mode.rs": "parsers/codex_code_mode.rs:1-2376",
+    "goal.rs": "acp/codex_goal.rs:1-201",
+    "context.rs": "acp/codex_context.rs:1-72 ContextReadings; live-only web-search helper and its import excluded",
+    "routes.rs": "acp/agent_mentions.rs:10-47,153-442 plus original custom slug validator and frozen built-in wire set",
+    "attachments.rs": "parsers/codex_desktop_attachments.rs before tests",
+    "support.rs": "parsers/mod.rs:578-753,906-946,1268-1300,1498-1591,1612-1731 plus truncate_str/turn_error_message/message_turn_count; claude.rs:808-826 displayed title; pi.rs:1225-1238 tool-result text",
+    "model.rs": "models/message.rs:1-292; models/conversation.rs:100-112 SessionStats; Core-selected NativeTranscriptSummary"
+  },
+  "changes": [
+    "Consume Core-verified Value records; no native path/env discovery",
+    "Stable fallback timestamp and cooperative cancellation",
+    "Complete primary tool/text/JSON content instead of irreversible preview caps; nested stats keep original previews",
+    "Child stats and patch source lines provided by trusted Core callbacks; no suffix path guessing or native cwd file grant",
+    "Private summary without donor AgentType/DB state; shared turn shape remains donor-compatible",
+    "Regex exact donor version1.12.3 graph and existing percent-encoding2.3.2; no other dependency version upgrade",
+    "Read-only history route normalization excludes model prompt injection/writer functions",
+    "Rust2024 default binding-mode syntax compatibility without changed borrow semantics",
+    "Original pending child tool records ordered by arrival ordinal rather than randomized HashMap iteration",
+    "Exclude summary-list-only fingerprints/helpers, native live-control fields and unused catalogue/window inference until their actual consumer is ported",
+    "Core-selected NativeTranscriptSummary contains display title/model/branch/timestamps/count; no native ids, cwd, launch or donor database fields",
+    "Projection digest streams actual turns/stats/selected summary so authorized patch geometry changes cannot reuse the old snapshot identity",
+    "Child source fingerprints and verified-reference sets sorted before hashing/returning; multiple native children cannot randomize snapshot identity"
+  ],
+  "implementation_status": "original_codex_message_body_and_core_verified_file_pipeline_targeted_passed_full_differential_transport_ui_pending",
+  "remaining": [
+    "Full differential against both fixed original parsers, beyond the22 preserved regression bodies and seam cases",
+    "Grok complete session stats and original model context-window catalogue",
+    "Production authorized project patch-line reader and legacy agent-*.jsonl with explicit native lineage",
+    "Complete bounded content, signed snapshots/descendant references, cancellable background initial discovery/hash and resource lifecycle",
+    "User-only Native/Web and original Codeg readonly UI, same-scenario full App/Host/Runtime/platform validation"
+  ],
+  "excluded_from_readonly_port": [
+    "Source app filesystem/environment/list-index discovery",
+    "Summary-list-only UserTurnFingerprint, text/image detection and duplicate-record helpers",
+    "Unused code-mode is_empty, goal live-control constants/title, route writer/title-cut helpers",
+    "Unused common model-capacity inference; actual Grok catalogue/session consumer remains planned",
+    "Native/raw summary ids/cwd/folder paths and unused watermark; Core owns source identities/paths"
+  ],
+  "original_regression_inventory": "integration/inventory/native-codex-original-cases.json",
+  "reference_only_not_transplanted": {
+    "src-tauri/src/acp/air_contract.rs": {
+      "bytes": 34221,
+      "sha256": "a94c95b68b9e1d68946b881ffc4109dce1fc667f1db2b0b45d1bb4097162ff5c"
+    }
+  }
+}

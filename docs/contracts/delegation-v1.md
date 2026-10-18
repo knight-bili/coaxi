@@ -284,4 +284,8 @@ Core 私有 `content` 层移植固定 Codeg 的 Grok 消息模型、提示材料
 
 JSON 行从已核验文件块逐条读取，可中止解析；坏完整行及未写完尾行分别记读取说明，不把中途源文件改写吞成空内容。摘要只取模型名称，原生启动字段和无关问答历史不进入消息。缺时间戳使用调用方稳定来源时间，同一快照得到相同投影。快照发现/首次哈希的完整取消和后台执行仍待接。
 
-Codex 已按原版 cut/seed 规则拼接已核验历史输入，保留当前头部、精确历史前缀、回退替换及无法确定 ordinal 的记录；这还不是 Codex 完整消息解析。原版消息去重/提升、代码模式、目标轮次、工具与用量解析仍须移植；Grok 完整会话统计、模型上下文窗口目录及与原完整 parser 的差分也继续保留。当前[分项记录](../../integration/execution/i04-native-content-result.json)只证明私有 Grok 本层和 Codex 历史输入，无新模型输入、公共接口、Schema 或 Runtime 准入。
+Codex 按原版 cut/seed 规则拼接已核验历史输入，保留当前头部、精确历史前缀、回退替换及无法确定 ordinal 的记录。随后已移植原消息解析主体：event_msg/response_item 去重与延迟提升、思考合并、图片去重、计划确认、目标开闭与合成首问、代码模式/MCP 拆分、延迟 wait/shell session 结果归并、collab 原结果和用量累计差分/上下文占用。代码模式仅作原版字面量扫描，不执行脚本或工具。
+
+后代统计由 Core 证明的父链和来源回调读取，不照搬 suffix 猜文件。patch 行号计算保留原纯规则，但源行必须由可信 Core 工程文件回调提供；原生 cwd 不授予文件权限。没有回调时保留原 patch，不伪造行号；生产工程文件读取接线仍待。完整直接工具正文/JSON不永久裁剪，后代折叠统计保留原预览；未结后代工具按原记录顺序稳定归并。`NativeTranscriptSummary` 只选 title/model/branch/时间/数量，原生路径、身份和启动字段由 Core 拥有，不进入该显示类型。内容指纹流式覆盖实际消息、统计及显示摘要，patch 几何变化不能复用旧快照身份。
+
+此前[第一批内容记录](../../integration/execution/i04-native-content-result.json)只证明 Grok 本层和 Codex 历史输入；本批 Codex 主体和原版断言的实际资格见[接续记录](../../integration/execution/i04-native-codex-content-result.json)。完整原 parser 差分、Grok 完整会话统计/模型上下文窗口目录、旧 agent 文件的显式父链来源、公共有界签名读取和原 UI/Runtime/平台仍待补，无新模型输入、公共接口、Schema 或 Runtime 准入。

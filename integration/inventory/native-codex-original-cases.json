@@ -1,0 +1,50 @@
+{
+  "source": "src-tauri/src/parsers/codex.rs",
+  "donor_commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+  "original_regression_bodies": [
+    "extracts_turn_usage_from_codex_usage_payload",
+    "a_cache_write_is_split_out_of_codex_input",
+    "an_over_reported_codex_cache_write_cannot_inflate_the_input",
+    "every_model_round_trip_of_a_turn_is_counted",
+    "a_restated_token_count_is_not_counted_twice",
+    "a_round_that_ran_before_any_assistant_message_is_not_lost",
+    "a_transcript_without_cumulative_totals_still_counts_each_call_once",
+    "a_transcript_that_mixes_both_shapes_counts_each_round_exactly_once",
+    "a_rollout_with_no_assistant_message_still_reports_its_spend",
+    "a_counter_that_restarts_after_compaction_does_not_wrap_to_zero",
+    "code_mode_single_call_renders_as_the_inner_tool",
+    "code_mode_parallel_calls_split_output_per_card",
+    "completed_mcp_items_split_a_two_call_one_chunk_script",
+    "a_failed_semantic_mcp_item_settles_its_card_as_failed",
+    "a_thrown_script_keeps_its_own_card_over_a_matching_semantic_item",
+    "code_mode_mismatched_chunks_keep_the_script_card",
+    "code_mode_script_failure_marks_the_result_as_an_error",
+    "a_deferred_scripts_result_lands_on_its_own_card",
+    "a_script_still_running_after_a_wait_stays_collectable",
+    "a_script_cell_is_never_mistaken_for_a_shell_session",
+    "consecutive_promotions_land_in_place_and_keep_their_order",
+    "promoted_assistant_text_keeps_its_whitespace"
+  ],
+  "original_helpers": [
+    "turn_texts",
+    "code_mode_rollout",
+    "rollout_line",
+    "tool_uses",
+    "deferred_script_rollout",
+    "tool_results",
+    "tool_use_statuses",
+    "turn_usage_total"
+  ],
+  "not_ported_by_this_fixture_adapter": [
+    "canonical_channel_suppresses_the_response_item_twin",
+    "approving_a_plan_settles_the_card_instead_of_faking_a_user_turn"
+  ],
+  "test_owners_added": 0,
+  "qualification": "extended-tests source owner list1/run1 passed, compile05/owner04; original22 bodies plus content seams, not full donor differential",
+  "additional_content_seams": [
+    "Original plan fixture builders: approved/repeated context vs typed same words",
+    "Compaction handoff/divider identity and preserved surrounding text",
+    "Actual Core-verified files: long UTF8/tool result, goal opener/clear, channel dedup, patch callback, native stats, stable digest/cancellation",
+    "Actual Grok two-child native lineage files: repeated projection, stable ordered references and snapshot identity"
+  ]
+}

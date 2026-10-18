@@ -88,6 +88,9 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 该夹具不证明实际 Host/Native、多窗口、源文件摘要/授权、最终模型 Blob 或完整 PC01–PC24；正式324场景保持未验。
 
 ## Rust 测试准入与退役门槛
+
+Codex 完整内容移植继续复用原 source 文件 owner，同一目录扩 `content/tests.rs` 的真实核验文件→Core wrapper、完整长输出、目标开闭与合成首问、双通道去重、稳定重读、取消及授权 patch 回调；Grok 同一目录增加两个显式后代及重复读取，核对生命周期 HashMap 顺序不能改变正文、引用集合或快照。`content/codex/tests.rs` 保留固定 Codeg 原解析断言，只将写临时文件的 helper 换成核验记录入口适配，另加原计划夹具和压缩正文场景；无新 Rust owner、SQLite 或进程。原 parser 的用量累计/重述、代码模式/MCP/延迟等待、shell session 和 promotion 属于本层规则，不再复制 Core 权限测试。先 extended-tests 最低编译，再原完整 owner 精确列册1项并实际运行；没有公共 API、原 UI、真实模型/平台或完整原 parser 差分资格。原 cwd 不能直接授予工作文件读取，生产工程文件回调仍须独立接入与验证。
+
 原生正文归并继续扩原 source::tests::lineage_sources_keep_exact_rollouts_and_lossless_stable_chunks，helper 为 content/tests.rs，同一受控文件夹，不新增 Rust owner/数据库/进程。拥有固定 Codeg 消息/图像/内部提醒、累计工具更新和空完成、原问答答案、超原预览上限正文、占用与花费分离、压缩标记、显式后代来源及 Codex cut/seed 历史输入拼接。原 source owner 已拥有实际文件/快照，故在其上扩内容而不重建 I/O 夹具；原 Core 来源 owner 继续拥有权限/绑定。先 extended-tests 编译及精确列册，再执行该 owner；通过仅证明 Grok 本层及 Codex 历史输入，不授予未移植 Codex 完整消息/代码模式、公共分页/运输、原UI或真实模型资格。
 
 

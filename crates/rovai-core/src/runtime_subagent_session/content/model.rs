@@ -1,7 +1,16 @@
 // Adapted from fixed Codeg aff1e6c (Apache-2.0).
-// Source ranges and changes: integration/inventory/native-grok-content-port.json.
+// Source ranges and changes: integration/inventory/native-codex-content-port.json.
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum MessageRole {
+    User,
+    Assistant,
+    System,
+    Tool,
+}
 
 /// A single tool call record from a subagent's execution transcript.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -210,6 +219,35 @@ pub struct TurnUsage {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UnifiedMessage {
+    pub id: String,
+    pub role: MessageRole,
+    pub content: Vec<ContentBlock>,
+    pub timestamp: DateTime<Utc>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub usage: Option<TurnUsage>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub duration_ms: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub model: Option<String>,
+    /// Wall-clock time the message finished. Each parser sets this to the
+    /// best end-marker it has access to (e.g. Codex's `token_count` event,
+    /// OpenCode's `completed_ms`, or just the event-log `timestamp` for
+    /// agents that log post-generation). Crucially this is NOT computed as
+    /// `timestamp + duration_ms` — those two fields encode unrelated spans
+    /// in most parsers and adding them produces wrong completion times.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<DateTime<Utc>>,
+    /// The agent's own id for this message, when it differs from [`Self::id`].
+    ///
+    /// `id` is whatever the parser keys messages by (Claude uses the record
+    /// `uuid`); this is the id the AGENT would recognise. Propagated into
+    /// [`MessageTurn::agent_message_id`], which documents what it is for.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub agent_message_id: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum TurnRole {
     User,
@@ -253,4 +291,30 @@ pub struct MessageTurn {
     /// synthesized turns, which name nothing the agent stored.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub agent_message_id: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SessionStats {
+    pub total_usage: Option<TurnUsage>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_tokens: Option<u64>,
+    pub total_duration_ms: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub context_window_used_tokens: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub context_window_max_tokens: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub context_window_usage_percent: Option<f64>,
+}
+
+/// Display metadata selected from the source transcript. Core owns identities,
+/// workspace paths and access; native launch fields cannot enter this shape.
+#[derive(Debug, Clone, Serialize)]
+pub(crate) struct NativeTranscriptSummary {
+    pub title: Option<String>,
+    pub model: Option<String>,
+    pub git_branch: Option<String>,
+    pub started_at: DateTime<Utc>,
+    pub ended_at: Option<DateTime<Utc>>,
+    pub message_count: u32,
 }

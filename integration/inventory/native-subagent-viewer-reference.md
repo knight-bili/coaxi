@@ -33,3 +33,7 @@
 内容归并接续（2026-10-18）：私有 `content` 层已移植 Grok 原模型、材料投影与本层解析/工具/问答/压缩/用量规则，Codex 历史 cut/seed 输入已实际拼接；超原预览上限的正文/JSON保持完整。后代统计只从显式 child_session_id 和 Core 再次核验的父链读取，卡片预览保持原500字符规则，不向客户端授予任意 Session 读取。逐条 JSON 与稳定 fallback 时间、坏行/部分尾帧说明、解析取消、摘要秘密不渲染及重复投影有原 filesystem owner 证据。固定源码、原范围和适配记录在[移植清单](native-grok-content-port.json)，实际结果见[分项证据](../execution/i04-native-content-result.json)。
 
 本层未完清单：Codex 原完整消息/代码模式/目标/用量解析；Grok 完整会话统计/上下文窗口目录及原完整 parser 差分；完整有界分页/签名快照及后代引用；首次快照发现/哈希的后台取消；两端公共读取与原 UI/同场景。旧无记录来源导入和真实 Host/Runtime/平台也继续。上述“待接”旧段落保留当批事实，以本段为最新细分状态，不能把本层或历史来源检查当成完整查看器资格。
+
+Codex 主体接续（2026-10-18）：原消息 parser 与代码模式/MCP/延迟等待、去重/promotion、计划/目标、思考/图片、collab/花费与占用已移植；固定[来源范围和适配](native-codex-content-port.json)可查。输入来自现有 Core 核验文件和历史拼接，后代/工程 patch 源行使用可信回调，不导入原 suffix 文件猜选、任意 cwd 读取或执行代码。显示摘要只有 title/model/branch/时间/数量，投影内容变化进入快照指纹。22组原版断言与实际文件分项的资格由[接续证据](../execution/i04-native-codex-content-result.json)拥有。
+
+当前剩余：Grok 完整统计/上下文窗口目录、两原 parser 完整差分、生产工程文件回调和旧 agent 文件显式父链、有界签名运输/后台取消、原只读 UI/同场景、真实 Host/Runtime/平台及 I04 其余工作包。前述旧“Codex主体待移植”段落是当批状态，不据历史文字重做已提交分项，也不将主体移植当完整查看器或I04完成。
