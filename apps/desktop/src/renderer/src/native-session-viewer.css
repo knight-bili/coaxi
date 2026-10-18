@@ -30,6 +30,10 @@
 .native-session-tool-content pre { white-space: pre-wrap; overflow-wrap: anywhere; overflow: auto; max-height: 320px; margin: 0; padding: 8px; border-radius: 6px; background: var(--input); font-size: 12px; }
 .native-session-note { color: var(--muted); font-size: 12px; }
 .native-session-note.is-error, .native-session-tool.is-error { color: var(--danger); }
+.native-session-source-tool { min-width: 0; }
+.native-session-source-tool > .native-session-open-child { display: inline-flex; align-items: center; gap: 6px; margin: 0 12px 8px; }
+.native-session-tool-value { min-width: 0; }
+.native-session-tool-value > small { display: block; margin-bottom: 6px; color: var(--muted); }
 .native-session-spinner { flex: none; animation: native-session-spin 1s linear infinite; }
 @keyframes native-session-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .native-session-spinner { animation: none; } }

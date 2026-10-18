@@ -1334,3 +1334,5 @@ title 和 aria-label 为“继续执行”，键盘可达；提交中禁用。�
 头部和正文遵循 Codeg 原 subagent-session-dialog / Drawer：16px 内容列、16px 消息间隔、用户输入的浅色容器及32px关闭点击区域；宽屏最大36rem，窄屏四周8px贴合。只有正文承担外层滚动；读取失败提示不插入正文，刷新失败保留内容和位置。当前接原布局/角色容器及初始消息/工具展示，完整原工具、代码模式、计划/目标/搜索/Diff和图片查看交互继续在I04移植，不以通用 JSON 卡片替代最终原功能。源码、实际日夜宽窄检查及原参考外壳的资格边界见[原生查看器来源映射](../../../integration/inventory/native-session-viewer-ui-reference.md)。
 
 原生计划与目标呈现接续：已沿固定 Codeg 原 `PlanCard`、`PlanMarkdownCard`、`PlanModeCard`、`GoalRunPart`和`GoalToolCallPart`的组件主体接线。计划清单保留完成数量、状态及优先级；长提案按原288px高度收起，可完整展开再收起；计划审核标记读取原结果，不构造审批动作。目标卡保留原展开/收起、正文和用量/耗时，原生只读页不提供暂停/清除目标按钮。用户原文保留字面文字。原组件通过隔离生成的样式词汇与Rovai token衔接，不向其他页面引入全局preflight；具体工具卡片、代码模式/搜索/Diff与图片查看仍在同I04队列。
+
+原生工具外壳及内容原语接续：工具折叠头、状态徽章、命令ANSI输出、JSON树/原文切换与代码框主体沿固定Codeg组件；JSON特殊字段使用独立的JSON Pointer身份，修复点号、空键和嵌套路径串开合。原版完整受控/非受控折叠及退出presence已接入。代码行号/复制保留，语法高亮复用Rovai；原版片段缓存会让同长同首尾的中间修改显示旧代码，本实现取消该正文缓存。明确命令信封才解包，原始结果仍可展开。当前不是完整ToolCallPart/ToolOutput：结构化读写/补丁、搜索/文件跳转、Diff、代码模式和代理/后台等专用卡片继续移植。实际原组件及产品窗口对照、24组受控运输检查见[分项记录](../../../integration/execution/i04-native-tool-primitives-result.json)，不授予完整原App或真实Core/两端/Runtime资格。

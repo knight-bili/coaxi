@@ -14,7 +14,7 @@
   "current_branch": "phase/i04-collaboration-runtime",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I04-T01",
-  "current_slice": "原生完整纯内容适配、原计划清单/提案/模式/目标组件与字面用户输入已接；图片混合文字及未配对多图/统计保留，182项定向与17组受控Renderer通过。下一继续具体工具/代码模式/搜索/Diff/图片查看及真实Core/两端候选，四包21簇84不减。",
+  "current_slice": "固定Codeg工具外壳、命令ANSI输出、JSON/代码与完整折叠原语已接只读产品页；40项定向和24组实际产品窗口检查通过，普通完整工具路由/搜索/Diff/专用卡片及真实Core链路继续；四包21簇84场景不减。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,14 +33,14 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "I04-T01：继续固定Codeg具体工具/代码模式/搜索/Diff、代理/后台状态卡片及原实际统计入口，图片组/放大/复制下载和Core授权的文件/HTML动作；完整原内容/App及真实Core/Native/Web集中候选，不重做已完成原适配层和计划/目标组件",
+    "I04-T01：完成原ToolCallPart/ToolOutput普通结构化读写/补丁、命令会话状态与代码模式；接搜索/Core授权文件动作及统一/左右Diff，再代理/MCP/后台卡/统计和图片操作；完整原App及真实Core/Native/Web候选，阶段对外分发前补上游ANSI许可文件依据",
     "I04-T01/T02：Claude旧agent完整parser、实际home捕获和Core证据关联；Qoder独立根/producer，以及旧无来源的明确导入与完整格式语料核验",
     "I04-T01：Grok修改意见与r1三Context mode/接管衔接；真实Core/Host/Runtime生命周期、Schema升级和恢复矩阵集中候选",
     "I04-T02/T03/T04：Runtime并集、恢复、记忆与自动化原剩余项；完整四包21簇84场景保持，阶段集齐集中构建/少量push和Actions"
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "native_original_adapter_plan_goal_and_complete_tool_image_details_targeted_verified_other_rich_ui_and_live_integration_pending",
+  "current_slice_status": "native_tool_primitives_targeted_and_renderer_verified_complete_tool_router_and_live_integration_pending",
   "evidence": "i04-legacy-agent-source-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -115,7 +115,7 @@
     "source_progress_continued": true
   },
   "project_groups_evidence": "i03-project-groups-result.json",
-  "checked_at": "2026-10-18T21:24:09+08:00",
+  "checked_at": "2026-10-18T22:13:38+08:00",
   "project_layout_evidence": "i03-project-layout-result.json",
   "project_tree_evidence": "i03-project-tree-result.json",
   "navigation_activity_evidence": "i03-navigation-activity-result.json",
@@ -272,5 +272,6 @@
   "i04_native_snapshot_evidence": "i04-native-snapshot-result.json",
   "i04_native_reader_evidence": "i04-native-reader-result.json",
   "i04_native_viewer_ui_evidence": "integration/execution/i04-native-viewer-ui-result.json",
-  "i04_native_rich_content_evidence": "integration/execution/i04-native-rich-content-result.json"
+  "i04_native_rich_content_evidence": "integration/execution/i04-native-rich-content-result.json",
+  "i04_native_tool_primitives_evidence": "integration/execution/i04-native-tool-primitives-result.json"
 }

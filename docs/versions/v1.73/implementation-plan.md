@@ -186,3 +186,7 @@ NativeChildReader 已接完整分页/摘要核对、关闭/迟到围栏、只在
 固定 Codeg ai-elements-adapter 及必要纯依赖已移植，原类型按实际引用抽取，不导入原应用 store、工具执行或Tauri。原计划/模式/提案、目标组件与溢出测量主体仅换import，接Rovai安全Markdown、语言和只读界面原语；样式用供体已锁Tailwind4.1.18生成并隔离，不增加生产Tailwind或全局preflight。仅新增供体已用的tailwind-merge3.4.0解决原class冲突；781个旧package/snapshot及原importers保持，MIT通知保留。
 
 [本批证据](../../../integration/execution/i04-native-rich-content-result.json)记录原适配器148项、原生边界5项及既有读取/配对29项共182项定向通过，实际生产Renderer17组检查与原组件参考。供体原测试中只有1904–1959的live producer参数化用例未移入；只读数据不来自该store，其他期望不改。自审补齐重复ID/跨turn结果，以及图片伴随完整工具文字、未配对结果多图/统计；原适配器通过默认false内部选项保持原调用结果。参考运行原NativeDialog/adapter/计划目标JSX，部分宿主原语显式适配、其他内容路由为标记子集，不授予完整原ContentParts/App/主题或真实Core/两端/Runtime资格。具体工具/代码模式/搜索/Diff、图片交互、旧格式及I04其余包保持，84正式场景新增通过0。
+
+## 原生工具外壳与内容原语
+
+固定来源Tool/Header/Content、Terminal、JSON树、代码框UI声明及完整instant-collapsible已接只读产品页。40项定向检查及实际产品窗口24组交互通过，包含已有阅读/窗口围栏；原组件单独运行2张日夜截图，代码高亮采用明确的Rovai宿主适配，不代表完整原应用。完整ToolCallPart/ToolOutput、搜索/Diff和各专用卡片仍待，84正式场景新增通过0。依赖按供体锁定并保留782个旧包/快照节点和原importers；ansi-to-react的发布包及精确源码提交没有许可证文件，已保留原README/SPDX声明，阶段对外分发前必须补齐依据，不能当许可已完整确认。详见[本批记录](../../../integration/execution/i04-native-tool-primitives-result.json)。

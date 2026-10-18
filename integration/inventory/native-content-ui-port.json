@@ -346,15 +346,22 @@
     "noGlobalPreflight": true,
     "scope": ".codeg-native-rich",
     "files": [
+      "ui/source-button.tsx",
+      "ui/source-primitives.tsx",
+      "components/ui/instant-collapsible.tsx",
+      "components/message/goal-control-context.tsx",
+      "components/message/goal-tool-call.tsx",
       "components/message/plan-card.tsx",
       "components/message/plan-mode-card.tsx",
-      "components/message/goal-tool-call.tsx",
-      "ui/source-primitives.tsx"
+      "components/ai-elements/code-block.tsx",
+      "components/ai-elements/json-tree.tsx",
+      "components/ai-elements/terminal.tsx",
+      "components/ai-elements/tool.tsx"
     ],
-    "candidates": 1210,
-    "generatedBytes": 16668,
-    "sha256": "7feadca75335f69e3d0118a7e48be05a14045c5a269ff049388091a7d61dccd6",
-    "input": "@import \"tailwindcss/theme.css\" layer(theme);\n@import \"tailwindcss/utilities.css\" layer(utilities);\n@custom-variant dark (&:where([data-theme=\"night\"] *));\n@theme inline {\n --color-foreground: var(--ink); --color-background: var(--surface);\n --color-card: var(--surface); --color-border: var(--line);\n --color-input: var(--input); --color-muted: var(--surface-muted);\n --color-muted-foreground: var(--muted); --color-primary: var(--accent);\n --color-primary-foreground: var(--surface); --color-secondary: var(--surface-muted);\n --color-secondary-foreground: var(--ink); --color-destructive: var(--danger);\n --text-3xs: 0.625rem;\n}"
+    "candidates": 2400,
+    "generatedBytes": 36671,
+    "sha256": "f6bd625753667c35dfad0bd5854b7a4cfaff572ec4b2c08a62b35ce794c95d2e",
+    "input": "@import \"tailwindcss/theme.css\" layer(theme);\n@import \"tailwindcss/utilities.css\" layer(utilities);\n@custom-variant dark (&:where([data-theme=\"night\"] *));\n@theme inline {\n --color-foreground: var(--ink); --color-background: var(--surface);\n --color-card: var(--surface); --color-border: var(--line);\n --color-input: var(--input); --color-muted: var(--surface-muted);\n --color-muted-foreground: var(--muted); --color-primary: var(--accent);\n --color-primary-foreground: var(--surface); --color-secondary: var(--surface-muted);\n --color-secondary-foreground: var(--ink); --color-destructive: var(--danger);\n --color-card-foreground: var(--ink); --color-popover-foreground: var(--ink);\n --color-accent: var(--surface-muted); --color-accent-foreground: var(--ink);\n --color-ring: var(--accent);\n --text-3xs: 0.625rem;\n}"
   },
   "runtimeDependency": {
     "baseline": "899fff9b4ba6e93f2062d3027490433ca4253ed0",
@@ -407,5 +414,337 @@
     "full concrete source tool cards/code-mode/search/diff/agent and background status rendering",
     "source image group/zoom/copy/download and valid file/HTML actions under Core authorization",
     "source-reference full content/app/theme qualification and integrated actual Core/Native/Web/Runtime/platform candidates"
-  ]
+  ],
+  "nativeToolUI": {
+    "sourceAudit": {
+      "ok": true,
+      "sourceCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+      "files": [
+        {
+          "source": "src/components/ui/instant-collapsible.tsx",
+          "mode": "original body and imports",
+          "sourceSha256": "322a3abbe2520ba3274dbe95627300b8826f9c6d9cc881454b1b2072d6fd82e2",
+          "portedSha256": "deb90e04a3fab2aab7fc4e9616128fa96ffc054d9a6d9572b9e4e13ccb17343c",
+          "sourceGitBlob": "357805e722f38471f7144db672da7c7efac73f68"
+        },
+        {
+          "source": "src/components/ai-elements/terminal.tsx",
+          "mode": "original body; host imports only",
+          "sourceSha256": "b8cfef8b4ac734cf09fa0d1fe131dad50bca2aecff80eca4a58f5b6386b3d5e7",
+          "portedSha256": "4ac0ac85463f5d1f7ce6f230364b1c02bff6799379a76fd004ff02c7b57e312a",
+          "sourceGitBlob": "0cf4046f292247a6a50f0803c6aecf79ec791c8c"
+        },
+        {
+          "source": "src/components/ai-elements/json-tree.tsx",
+          "mode": "original body and host imports; collision-free JSON Pointer paths",
+          "sourceSha256": "110db85574b5d3f184c4d75ac21a0bdf2f30ec11c0b3257eb368e4d8ef2f66e7",
+          "portedSha256": "402a213ffa2c2559ff83131dfc4d0da35daa05f6eb304d7a0aa70a52424d4141",
+          "sourceGitBlob": "821cdb96d0c004d7205f911f1c1e88da58f64320"
+        },
+        {
+          "source": "src/components/ai-elements/tool.tsx",
+          "mode": "AST top-level prefix Tool/Header/Content/Input only; specialized ToolOutput/Diff stays required next",
+          "sourceSha256": "6e0a565259074efbe40a38545998d5e75d6bfd312869cb3e6687a014579c35a5",
+          "portedSha256": "2416b78b2b45ce0b02087663f4c5e38cc3c8462f9d1c42c28a0c2afdef1dfa66",
+          "sourceGitBlob": "67d74256c71230846db4742cb8f707f36bc8657d"
+        },
+        {
+          "source": "src/components/ai-elements/code-block.tsx",
+          "mode": "source JSX/control declarations; existing Rovai syntax backend; unused language selector not ported",
+          "sourceSha256": "f35f8ee99ab2cef0c9ec58dc0022d880ccf386b7b32d208248c37a9607ad84c1",
+          "portedSha256": "dfb880c37a766f2da466678549a85e8c175cef15df03ed2f148406a3cf34f76e",
+          "sourceGitBlob": "169cc6279007b389a53ecc17507ba6d4b215b882"
+        }
+      ],
+      "bodies": [
+        {
+          "file": "components/ui/instant-collapsible.tsx",
+          "unchangedDeclarations": [
+            "InstantCollapsibleContextValue",
+            "InstantCollapsibleContext",
+            "useInstantCollapsible",
+            "CollapsibleProps",
+            "Collapsible",
+            "CollapsibleTrigger",
+            "parseCssTimeListMs",
+            "exitTimeoutMs",
+            "CollapsibleContent"
+          ],
+          "adaptedDeclarations": []
+        },
+        {
+          "file": "components/ai-elements/terminal.tsx",
+          "unchangedDeclarations": [
+            "TerminalContextType",
+            "TerminalContext",
+            "normalizeTerminalOutput",
+            "TerminalProps",
+            "Terminal",
+            "TerminalHeaderProps",
+            "TerminalHeader",
+            "TerminalTitleProps",
+            "TerminalTitle",
+            "TerminalStatusProps",
+            "TerminalStatus",
+            "TerminalActionsProps",
+            "TerminalActions",
+            "TerminalCopyButtonProps",
+            "TerminalCopyButton",
+            "TerminalClearButtonProps",
+            "TerminalClearButton",
+            "TerminalContentProps",
+            "TerminalContent"
+          ],
+          "adaptedDeclarations": []
+        },
+        {
+          "file": "components/ai-elements/json-tree.tsx",
+          "unchangedDeclarations": [
+            "MAX_NODES",
+            "AUTO_EXPAND_ROWS",
+            "INLINE_STRING_MAX",
+            "Container",
+            "isContainer",
+            "entriesOf",
+            "countJsonNodes",
+            "parseJsonForTree",
+            "ValueText",
+            "StringValue",
+            "RowProps",
+            "JsonTreeViewProps",
+            "JsonTreeView"
+          ],
+          "adaptedDeclarations": [
+            "defaultExpanded",
+            "JsonRow"
+          ]
+        },
+        {
+          "file": "components/ai-elements/tool.tsx",
+          "unchangedDeclarations": [
+            "ToolProps",
+            "Tool",
+            "ToolPart",
+            "ToolHeaderProps",
+            "statusIcons",
+            "getStatusBadge",
+            "ToolHeader",
+            "ToolContentProps",
+            "ToolContent",
+            "ToolInputProps",
+            "ToolInput"
+          ],
+          "adaptedDeclarations": []
+        },
+        {
+          "file": "components/ai-elements/code-block.tsx",
+          "unchangedDeclarations": [
+            "isItalic",
+            "isBold",
+            "isUnderline",
+            "KeyedToken",
+            "KeyedLine",
+            "addKeysToTokens",
+            "LineSpan",
+            "CodeBlockProps",
+            "TokenizedCode",
+            "CodeBlockContextType",
+            "CodeBlockContext",
+            "LINE_NUMBER_CLASSES",
+            "CodeBlockBody",
+            "CodeBlockContainer",
+            "CodeBlockHeader",
+            "CodeBlockTitle",
+            "CodeBlockFilename",
+            "CodeBlockActions",
+            "CodeBlock",
+            "CodeBlockCopyButtonProps",
+            "CodeBlockCopyButton"
+          ],
+          "adaptedDeclarations": [
+            "TokenSpan",
+            "CodeBlockContent"
+          ]
+        }
+      ],
+      "originalCodeCacheCollisionReproduced": true,
+      "originalJsonPathsCollision": "empty root versus empty-key; dotted key versus nested key",
+      "sourceCodeBlockNoSharedContentCache": true,
+      "fullToolCallPart": false,
+      "fullToolOutput": false,
+      "originalLanguageSelectorUnusedAndNotPorted": true
+    },
+    "dependencies": {
+      "ok": true,
+      "direct": {
+        "intl-messageformat": "11.1.2",
+        "ansi-to-react": "6.2.6",
+        "@radix-ui/react-use-controllable-state": "1.2.3"
+      },
+      "packages": [
+        {
+          "name": "intl-messageformat",
+          "version": "11.1.2",
+          "integrity": "sha512-ucSrQmZGAxfiBHfBRXW/k7UC8MaGFlEj4Ry1tKiDcmgwQm1y3EDl40u+4VNHYomxJQMJi9NEI3riDRlth96jKg==",
+          "bytes": 22859,
+          "license": "BSD-3-Clause"
+        },
+        {
+          "name": "@formatjs/ecma402-abstract",
+          "version": "3.1.1",
+          "integrity": "sha512-jhZbTwda+2tcNrs4kKvxrPLPjx8QsBCLCUgrrJ/S+G9YrGHWLhAyFMMBHJBnBoOwuLHd7L14FgYudviKaxkO2Q==",
+          "bytes": 40973,
+          "license": "MIT"
+        },
+        {
+          "name": "@formatjs/fast-memoize",
+          "version": "3.1.0",
+          "integrity": "sha512-b5mvSWCI+XVKiz5WhnBCY3RJ4ZwfjAidU0yVlKa3d3MSgKmH1hC3tBGEAtYyN5mqL7N0G5x0BOUYyO8CEupWgg==",
+          "bytes": 2142,
+          "license": "MIT"
+        },
+        {
+          "name": "tslib",
+          "version": "2.8.1",
+          "integrity": "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==",
+          "bytes": 18477,
+          "license": "0BSD"
+        },
+        {
+          "name": "@formatjs/intl-localematcher",
+          "version": "0.8.1",
+          "integrity": "sha512-xwEuwQFdtSq1UKtQnyTZWC+eHdv7Uygoa+H2k/9uzBVQjDyp9r20LNDNKedWXll7FssT3GRHvqsdJGYSUWqYFA==",
+          "bytes": 19383,
+          "license": "MIT"
+        },
+        {
+          "name": "decimal.js",
+          "version": "10.6.0",
+          "integrity": "sha512-YpgQiITW3JXGntzdUmyUR1V812Hn8T1YVXhCu+wO3OpS4eU9l4YdD3qjyiKdV6mvV29zapkMeD390UVEf2lkUg==",
+          "bytes": 69924,
+          "license": "MIT"
+        },
+        {
+          "name": "@formatjs/icu-messageformat-parser",
+          "version": "3.5.1",
+          "integrity": "sha512-sSDmSvmmoVQ92XqWb499KrIhv/vLisJU8ITFrx7T7NZHUmMY7EL9xgRowAosaljhqnj/5iufG24QrdzB6X3ItA==",
+          "bytes": 19775,
+          "license": "MIT"
+        },
+        {
+          "name": "@formatjs/icu-skeleton-parser",
+          "version": "2.1.1",
+          "integrity": "sha512-PSFABlcNefjI6yyk8f7nyX1DC7NHmq6WaCHZLySEXBrXuLOB2f935YsnzuPjlz+ibhb9yWTdPeVX1OVcj24w2Q==",
+          "bytes": 4498,
+          "license": "MIT"
+        },
+        {
+          "name": "ansi-to-react",
+          "version": "6.2.6",
+          "integrity": "sha512-Eqi0iaMK5OZ3jsVFxWvU2B74UZBnGuHlkflKMX6wTOeH+luy9KE2O0gUkc2PxhIP1R4IO0xohv62UMFInQOSeg==",
+          "bytes": 4229,
+          "license": "BSD-3-Clause",
+          "licenseEvidence": {
+            "gitHead": "145140971e9d83ccac32265f24b1c55dea437896",
+            "declaredLicense": "BSD-3-Clause",
+            "upstreamLicenseFileMissing": true,
+            "readmeSha256": "b681c6d6ab80ff5412c6b377a8b88941d2aefa312a7d74e32972ae5eadceb67a",
+            "status": "publisher SPDX and README retained; full license-file gap remains pending before stage public distribution"
+          }
+        },
+        {
+          "name": "anser",
+          "version": "2.3.5",
+          "integrity": "sha512-vcZjxvvVoxTeR5XBNJB38oTu/7eDCZlwdz32N1eNgpyPF7j/Z7Idf+CUwQOkKKpJ7RJyjxgLHCM7vdIK0iCNMQ==",
+          "bytes": 10072,
+          "license": "MIT"
+        },
+        {
+          "name": "escape-carriage",
+          "version": "1.3.1",
+          "integrity": "sha512-GwBr6yViW3ttx1kb7/Oh+gKQ1/TrhYwxKqVmg5gS+BK+Qe2KrOa/Vh7w3HPBvgGf0LfcDGoY9I6NHKoA5Hozhw==",
+          "bytes": 3169,
+          "license": "MIT"
+        },
+        {
+          "name": "linkify-it",
+          "version": "3.0.3",
+          "integrity": "sha512-ynTsyrFSdE5oZ/O9GEf00kPngmOfVwazR5GKDq6EYfhlpFug3J2zybX56a2PRRpc9P+FuSoGNAwjlbDs9jJBPQ==",
+          "bytes": 11885,
+          "license": "MIT"
+        },
+        {
+          "name": "uc.micro",
+          "version": "1.0.6",
+          "integrity": "sha512-8Y75pvTYkLJW2hWQHXxoqRgV7qb9B+9vFEtidML+7koHUFapnVJAZ6cKs+Qjz5Aw3aZWHMC6u0wJE3At+nSGwA==",
+          "bytes": 3061,
+          "license": "MIT"
+        },
+        {
+          "name": "@radix-ui/react-use-controllable-state",
+          "version": "1.2.3",
+          "integrity": "sha512-PLzC90MS+ReootmjC597dvopoelpZ8Q61HJkDXZSExitIq7PL55vHNnesAHwguHK0aPfBnpdNzQtv1uliaqQrA==",
+          "bytes": 6269,
+          "license": "MIT"
+        },
+        {
+          "name": "@radix-ui/react-use-effect-event",
+          "version": "0.0.3",
+          "integrity": "sha512-6c8ZqvPTWILEKnyVkP53EGRCcpnJiKTC21sS/6R1GF5xKyHJJWQEPfkqlcgUkdRQivd6tb23abUwe4ngWmY0JA==",
+          "bytes": 3561,
+          "license": "MIT"
+        },
+        {
+          "name": "@radix-ui/react-use-layout-effect",
+          "version": "1.1.2",
+          "integrity": "sha512-jrBWOxZITuGcnjRCM2t2U5ZPkCLxD+Ym6DjfssS5haTj2iiak/DOb64JeN6OdLfLgptb6/e2kKR+ZuTrGoZTPA==",
+          "bytes": 2714,
+          "license": "MIT"
+        }
+      ],
+      "baseline": "b492e6ee6e40582e99fca99a416aef92d866f09a",
+      "existingPackagesPreserved": 782,
+      "existingSnapshotsPreserved": 782,
+      "oldImportersPreserved": true,
+      "newPackages": [
+        "intl-messageformat@11.1.2",
+        "@formatjs/ecma402-abstract@3.1.1",
+        "@formatjs/fast-memoize@3.1.0",
+        "@formatjs/intl-localematcher@0.8.1",
+        "decimal.js@10.6.0",
+        "@formatjs/icu-messageformat-parser@3.5.1",
+        "@formatjs/icu-skeleton-parser@2.1.1",
+        "ansi-to-react@6.2.6",
+        "anser@2.3.5",
+        "escape-carriage@1.3.1",
+        "linkify-it@3.0.3",
+        "uc.micro@1.0.6"
+      ],
+      "newSnapshots": [
+        "intl-messageformat@11.1.2",
+        "@formatjs/ecma402-abstract@3.1.1",
+        "@formatjs/fast-memoize@3.1.0",
+        "@formatjs/intl-localematcher@0.8.1",
+        "decimal.js@10.6.0",
+        "@formatjs/icu-messageformat-parser@3.5.1",
+        "@formatjs/icu-skeleton-parser@2.1.1",
+        "ansi-to-react@6.2.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)",
+        "anser@2.3.5",
+        "escape-carriage@1.3.1",
+        "linkify-it@3.0.3",
+        "uc.micro@1.0.6"
+      ],
+      "noLifecycleScripts": true,
+      "noGlobalConfig": true
+    },
+    "transitionalRouter": "NativeTool still dispatches generic values; complete ToolCallPart / ToolOutput / search / Diff and specialized cards remain mandatory",
+    "sourceBodyOptimizations": [
+      "collision-free JSON Pointer expansion identities",
+      "Rovai existing syntax backend instead of donor partial-content cache; full text is dependency identity",
+      "real ICU named/plural formatting",
+      "original full instant-collapsible replaces earlier reduced disclosure"
+    ],
+    "clipboard": "original helpers; Windows system clipboard normalizes LF to CRLF without dropping characters",
+    "licenseGap": "ansi-to-react publisher SPDX BSD-3-Clause + README retained; upstream published package and exact gitHead have no license file; must resolve before stage public distribution"
+  }
 }

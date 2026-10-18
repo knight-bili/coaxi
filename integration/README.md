@@ -95,3 +95,5 @@ I00已自审修正并合入，I01基础证据及环境待验项保留；I02继�
 - [I03临时终端移植基础](execution/i03-terminal-foundation-result.json)：闭合请求、原节点来源查询、进程代次和有界原始字节回放、PTY辅助进程源码已加入。纯状态源单独编译执行2项通过，11项原文SQL只读见证通过；helper/完整Core尚未编译，父端受管进程、API/Native/Web/UI和关闭接线继续，C04开发中。
 
 - [I03终端父端与关闭接线](execution/i03-terminal-parent-result.json)：Core会话registry、受管helper、原输入顺序/回执、删除和计划退出已编码；状态源2项复验通过，Core语法与模块格式通过。新增manager/codec、实际PTY/进程树尚未运行，Native/Web/API与终端读者继续，C04开发中，用户无需阶段技术验收。
+
+- [I04原生工具外壳与内容原语](execution/i04-native-tool-primitives-result.json)：40项定向与24组实际产品窗口检查通过；JSON键身份及代码片段缓存缺陷已修复。完整普通/专用工具卡片、搜索/Diff、真实Core链路和一项上游许可文件缺口继续，I04范围不减。

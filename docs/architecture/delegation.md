@@ -49,3 +49,5 @@ Codex 内容接续已将原消息主体和代码模式/目标/上下文/附件/�
 原生查看器客户端接续：Renderer 的 NativeChildReader 按同一 Core reference 消费四个 User 读取方法，收齐精确 UTF-8 偏移、快照和整份摘要后才发布内容。阅读实例只属于当前 client/Thread/目标，后代启动期间短暂持有父快照，隐藏/关闭停止阅读，不能控制 Agent Runtime。原生只读页与 Core Delegation 共用每层一个 Host；虚拟行卸载不销毁查看器，替换现有可写 child 仍经过原离开保护。正文、思考、图片及工具内容已接初始展示，完整 Codeg 富内容组件仍待按[源码映射](../../integration/inventory/native-session-viewer-ui-reference.md)完成，不能把外壳和受控运输的 Renderer 检查当成真实 Core/Host/原完整 App 资格。
 
 原生富内容接续：读取后的冻结消息由移植的固定 Codeg ai-elements-adapter 及必要纯依赖整理，原计划清单、计划提案/模式与目标组件进入同一只读 Renderer。原字面解析和计划/目标/工具分组不执行其记录的任何工具，也不调用供体 store/Tauri/模型；类型中的 Runtime 名称不代表新增 Runtime 支持。重复原生tool ID与跨轮结果沿既有到达顺序核对后使用仅本地的关联编号，原冻结内容不改。来源、只读适配与其余富内容队列由[内容移植清单](../../integration/inventory/native-content-ui-port.json)和[UI映射](../../integration/inventory/native-session-viewer-ui-reference.md)记录。
+
+原生工具卡片接续：只读页接固定来源 Tool/Header/Content、Terminal、JSON树和代码展示的原UI声明。原完整instant-collapsible替换早期精简接口；代码着色复用Rovai既有语法引擎，按完整输入和语言/主题更新，无供体的片段key或全局正文缓存。工具执行、Core授权、文件动作和会话归属不交给UI；当前路由仍是过渡的通用值展示，完整ToolCallPart/搜索/Diff/代理及图片动作保持必做项。

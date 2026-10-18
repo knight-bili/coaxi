@@ -3,7 +3,7 @@
 // Core authority + shared Rovai Markdown are the integration seams.
 import { useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { Drawer } from '@base-ui/react/drawer'
-import { Brain, Check, ChevronDown, Eye, Loader2, RefreshCw, Wrench, X, XCircle } from 'lucide-react'
+import { Brain, ChevronDown, Eye, Loader2, RefreshCw, X } from 'lucide-react'
 import { NativeChildReader, type NativeTranscriptBlock, type NativeTranscriptTurn } from './native-child-reader'
 import type { NativeSessionTarget } from './native-session-viewer-context'
 import { NativeSessionViewerContext } from './native-session-viewer-context'
@@ -23,6 +23,12 @@ import { PlanCard } from './codeg-native-content/components/message/plan-card'
 import { PlanMarkdownCard, PlanModeCard } from './codeg-native-content/components/message/plan-mode-card'
 import { GoalRunPart, GoalToolCallPart } from './codeg-native-content/components/message/goal-tool-call'
 import { useTranslations } from './codeg-native-content/ui/source-primitives'
+import { Tool, ToolHeader, ToolContent } from './codeg-native-content/components/ai-elements/tool'
+import { CodeBlock, CodeBlockHeader, CodeBlockTitle, CodeBlockCopyButton } from './codeg-native-content/components/ai-elements/code-block'
+import { JsonTreeView, parseJsonForTree } from './codeg-native-content/components/ai-elements/json-tree'
+import { Terminal } from './codeg-native-content/components/ai-elements/terminal'
+import { parseCodexCommandEnvelope } from './codeg-native-content/lib/codex-command-action'
+import { isShellSessionToolName } from './codeg-native-content/lib/shell-session-tool'
 import './codeg-native-content/source-rich.css'
 
 function readMessage(code: string): string {
@@ -136,21 +142,32 @@ function NativeTool({ use, result, reader, target, live }: { use?: ToolUse; resu
   const [expanded, setExpanded] = useState(false)
   const pending = live && !result && (use?.status === 'pending' || use?.status === 'in_progress')
   const failed = result?.is_error === true || use?.status === 'failed'
+  const command = use ? ['bash', 'exec_command'].includes(normalizeToolName(use.tool_name).toLowerCase()) || isShellSessionToolName(normalizeToolName(use.tool_name)) : false
+  const output = result?.output_preview
+  const commandOutput = command && output != null ? parseCodexCommandEnvelope(output)?.output ?? output : ''
   const children = nativeToolChildren(use, result).flatMap(id => { const source = reader.child(id); return source ? [{ id, source }] : [] })
   const openChild = (child: typeof children[number], trigger: HTMLElement): void => host?.open({ ...target,
     identity: `${target.identity}:${child.id}`, parentConversationId: `native-view:${target.identity}`, source: child.source, subtitle: `#${child.id.slice(-8)}` }, trigger)
-  return <section className={`native-session-tool${failed ? ' is-error' : ''}`}>
-    <div className="native-session-tool-heading"><button type="button" aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>
-      <Wrench size={14} /><span>{use?.tool_name ?? t('工具结果')}</span>{pending ? <Loader2 size={13} className="native-session-spinner" /> : failed ? <XCircle size={13} /> : result || use?.status === 'completed' ? <Check size={13} /> : null}<ChevronDown size={13} /></button>
-      {children.length === 1 && host && <button className="native-session-open-child" type="button" aria-label={t('查看下级帮手会话')} onClick={event => openChild(children[0]!, event.currentTarget)}><Eye size={14} /><span>{t('查看会话')}</span></button>}
-    </div>
-    {expanded && <div className="native-session-tool-content">
+  return <Tool className="native-session-source-tool" open={expanded || pending && command} onOpenChange={setExpanded}>
+    <ToolHeader type="dynamic-tool" toolName={use?.tool_name ?? t('工具结果')} state={failed ? 'output-error' : pending ? 'input-available' : result || use?.status === 'completed' ? 'output-available' : 'input-streaming'} />
+    {children.length === 1 && host && <button className="native-session-open-child" type="button" aria-label={t('查看下级帮手会话')} onClick={event => openChild(children[0]!, event.currentTarget)}><Eye size={14} /><span>{t('查看会话')}</span></button>}
+    <ToolContent>
       {children.length > 1 && children.map(child => <button key={child.id} className="quiet-button" type="button" onClick={event => openChild(child, event.currentTarget)}><Eye size={14} />#{child.id.slice(-8)} {t('查看会话')}</button>)}
-      {use?.input_preview != null && <><small>{t('输入')}</small><pre>{use.input_preview}</pre></>}
-      {result?.output_preview != null && <><small>{t('结果')}</small><pre>{result.output_preview}</pre></>}
-      {use?.meta != null && <details><summary>{t('工具信息')}</summary><pre>{JSON.stringify(use.meta, null, 2)}</pre></details>}
-      {result?.agent_stats && <details><summary>{t('帮手执行记录')}</summary><pre>{JSON.stringify(result.agent_stats, null, 2)}</pre></details>}
-    </div>}
+      {use?.input_preview != null && <NativeToolValue label={t('输入')} value={use.input_preview} />}
+      {output != null && (command ? <Terminal output={commandOutput} isStreaming={pending} /> : <NativeToolValue label={t('结果')} value={output} />)}
+      {command && output != null && commandOutput !== output && <details><summary>{t('原始结果')}</summary><NativeToolValue label={t('原始结果')} value={output} /></details>}
+      {use?.meta != null && <details><summary>{t('工具信息')}</summary><NativeToolValue label={t('工具信息')} value={JSON.stringify(use.meta, null, 2)} /></details>}
+      {result?.agent_stats && <details><summary>{t('帮手执行记录')}</summary><NativeToolValue label={t('帮手执行记录')} value={JSON.stringify(result.agent_stats, null, 2)} /></details>}
+    </ToolContent>
     {result?.images?.map((image, index) => <NativeImage image={image} key={index} />)}
-  </section>
+  </Tool>
+}
+
+function NativeToolValue({ label, value }: { label: string; value: string }): React.JSX.Element {
+  const t = useUiText()
+  const parsed = useMemo(() => parseJsonForTree(value), [value])
+  return <div className="native-session-tool-value"><small>{label}</small>{parsed !== undefined
+    ? <JsonTreeView value={parsed} rawText={value} />
+    : <CodeBlock code={value} language="text"><CodeBlockHeader><CodeBlockTitle>{label}</CodeBlockTitle><CodeBlockCopyButton aria-label={t('复制{0}', label)} /></CodeBlockHeader></CodeBlock>}
+  </div>
 }

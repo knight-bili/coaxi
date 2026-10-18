@@ -56,6 +56,30 @@
     "Folder.chat.messageList": {
       "showMore": "展开",
       "showLess": "收起"
+    },
+    "Folder.chat.tool": {
+      "parameters": "参数",
+      "error": "错误",
+      "result": "结果",
+      "status": {
+        "approvalRequested": "等待授权",
+        "approvalResponded": "已响应",
+        "inputAvailable": "运行中",
+        "inputStreaming": "等待中",
+        "outputAvailable": "已完成",
+        "outputDenied": "已拒绝",
+        "outputError": "错误"
+      }
+    },
+    "Folder.chat.terminal": {
+      "title": "终端",
+      "running": "运行中"
+    },
+    "Folder.chat.jsonTree": {
+      "viewRaw": "查看原始 JSON",
+      "viewTree": "查看树状视图",
+      "fields": "{count} 个字段",
+      "items": "{count} 项"
     }
   },
   "en": {
@@ -115,6 +139,30 @@
     "Folder.chat.messageList": {
       "showMore": "Show more",
       "showLess": "Show less"
+    },
+    "Folder.chat.tool": {
+      "parameters": "Parameters",
+      "error": "Error",
+      "result": "Result",
+      "status": {
+        "approvalRequested": "Awaiting Approval",
+        "approvalResponded": "Responded",
+        "inputAvailable": "Running",
+        "inputStreaming": "Pending",
+        "outputAvailable": "Completed",
+        "outputDenied": "Denied",
+        "outputError": "Error"
+      }
+    },
+    "Folder.chat.terminal": {
+      "title": "Terminal",
+      "running": "Running"
+    },
+    "Folder.chat.jsonTree": {
+      "viewRaw": "Show raw JSON",
+      "viewTree": "Show tree",
+      "fields": "{count, plural, one {# field} other {# fields}}",
+      "items": "{count, plural, one {# item} other {# items}}"
     }
   }
 }

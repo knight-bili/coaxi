@@ -1,0 +1,14 @@
+{
+  "name": "ansi-to-react",
+  "version": "6.2.6",
+  "integrity": "sha512-Eqi0iaMK5OZ3jsVFxWvU2B74UZBnGuHlkflKMX6wTOeH+luy9KE2O0gUkc2PxhIP1R4IO0xohv62UMFInQOSeg==",
+  "bytes": 4229,
+  "license": "BSD-3-Clause",
+  "licenseEvidence": {
+    "gitHead": "145140971e9d83ccac32265f24b1c55dea437896",
+    "declaredLicense": "BSD-3-Clause",
+    "upstreamLicenseFileMissing": true,
+    "readmeSha256": "b681c6d6ab80ff5412c6b377a8b88941d2aefa312a7d74e32972ae5eadceb67a",
+    "status": "publisher SPDX and README retained; full license-file gap remains pending before stage public distribution"
+  }
+}

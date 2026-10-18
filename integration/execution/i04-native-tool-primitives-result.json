@@ -1,0 +1,2140 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-18T22:17:08+08:00",
+  "stage": "I04",
+  "task": "I04-T01",
+  "baseline_commit": "b492e6ee6e40582e99fca99a416aef92d866f09a",
+  "status": "native_source_tool_shell_terminal_json_code_primitives_targeted_and_renderer_verified_complete_router_and_live_integration_pending",
+  "scope_preserved": {
+    "source_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_packages": 4,
+    "i04_clusters": 21,
+    "i04_formal_cases": 84,
+    "new_formal_cases_passed": 0
+  },
+  "facts": {
+    "source_ui_files": 5,
+    "unchanged_source_declarations": 73,
+    "source_original_code_cache_collision_reproduced": true,
+    "json_expansion_identity_fixed": true,
+    "source_full_instant_disclosure": true,
+    "syntax_backend": "existing Rovai; no Shiki or shared code cache",
+    "source_full_clipboard_helpers": true,
+    "windows_clipboard_lf_to_crlf_verified": true,
+    "icu_named_values_and_plural_formatting": true,
+    "command_envelope_original_remains_expandable": true,
+    "source_tool_call_part_and_tool_output_complete": false,
+    "targeted_tests": 40,
+    "targeted_files": 4,
+    "actual_production_renderer_groups": 24,
+    "source_reference_screenshots": 2,
+    "product_screenshots": 6,
+    "source_reference_full_app": false,
+    "new_formal_cases_passed": 0
+  },
+  "verification": {
+    "typecheck_exit": 0,
+    "docs_checks": [
+      {
+        "name": "docs-tests",
+        "exit": 0
+      },
+      {
+        "name": "docs-version",
+        "exit": 0
+      },
+      {
+        "name": "docs-base",
+        "exit": 0
+      },
+      {
+        "name": "diff-check",
+        "exit": 0
+      },
+      {
+        "name": "codegraph-sync",
+        "exit": 0
+      }
+    ],
+    "source_audit": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\source-audit.json",
+    "renderer": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\native-renderer-result.json",
+    "reference": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\source-reference-result.json",
+    "dependencies": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\dependencies.json",
+    "core": false,
+    "native_ipc": false,
+    "web_http": false,
+    "provider": false,
+    "visual_inspection": [
+      "source night wide",
+      "source day narrow",
+      "product tools night wide",
+      "product tools day narrow",
+      "product rich night wide"
+    ],
+    "last_renderer": "native-render-04.log",
+    "after_last_renderer": "only redundant EOF empty lines removed from five new source files; declaration audit rerun unchanged"
+  },
+  "self_review": [
+    "No source business store/Tauri/model authority imported",
+    "Old snapshots and frozen inputs are unchanged",
+    "Native read-only actions retain ownership and child scope",
+    "Unknown historical tool state does not claim completed",
+    "All raw command envelope fields remain reachable",
+    "Complete source tools/search/Diff/specialized cards remain mandatory",
+    "No new user technical acceptance gate"
+  ],
+  "failure_history": [
+    "First dependency gate found missing upstream ansi-to-react license file; original SPDX/README preserved and unresolved before public distribution",
+    "Node direct metadata fetch timed out; explicit environment proxy used",
+    "Reference first build lacked explicit lucide alias; corrected without changing donor source",
+    "First UI assertions still selected old DOM or isolated fixture; corrected to specific production card",
+    "System Windows clipboard changed LF to CRLF; full expected OS representation verified",
+    "Source AST audit initially included shifted comments; switched to declaration body comparison with comments excluded"
+  ],
+  "remaining": [
+    "Complete ordinary ToolCallPart/ToolOutput, command/session metadata, code mode, read/write/edit/apply_patch",
+    "Source search and Core-authorized file actions; unified and split Diff",
+    "Agent/collab/MCP/delegation/background/feedback cards and full actual statistics",
+    "Image gallery/zoom/copy/download and full Markdown/HTML actions",
+    "Complete original app same-scene parity, actual Core.handle to Native/Web/production UI, live producers/platforms",
+    "Earlier Claude/Qoder/missing-source import and Grok feedback r1 queues; other I04 packages T02/T03/T04 remain",
+    "ansi-to-react exact upstream commit and published package lack LICENSE: publisher BSD-3-Clause declaration preserved, full file evidence or dependency replacement required before stage public distribution"
+  ],
+  "actions": {
+    "commit": "pending_local_commit",
+    "push": false,
+    "actions": false,
+    "main_merge": false,
+    "release": false,
+    "paid_model": false
+  },
+  "sources": [
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\NativeSessionViewer.tsx",
+      "bytes": 16973,
+      "sha256": "7e3bcc7b9af0a76027cc1f44d95eac9ae515905ac879cca06eecdc24fd702a57",
+      "repo_path": "apps/desktop/src/renderer/src/NativeSessionViewer.tsx",
+      "git_blob": "44c6404876ee2c580833b0604a1fea2a188beb3d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\code-block.tsx",
+      "bytes": 9360,
+      "sha256": "dfb880c37a766f2da466678549a85e8c175cef15df03ed2f148406a3cf34f76e",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/code-block.tsx",
+      "git_blob": "a1dbb64d08cdcf59ba132d7d965e9b56b3d5741f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\json-tree.tsx",
+      "bytes": 9850,
+      "sha256": "402a213ffa2c2559ff83131dfc4d0da35daa05f6eb304d7a0aa70a52424d4141",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/json-tree.tsx",
+      "git_blob": "e5a2ef9ea8cb21d8ddb98da8d8d4eac1943ad4d0"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\terminal.tsx",
+      "bytes": 7500,
+      "sha256": "4ac0ac85463f5d1f7ce6f230364b1c02bff6799379a76fd004ff02c7b57e312a",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/terminal.tsx",
+      "git_blob": "4a35ac9dbfab3b1172993a24ba453e4641a96513"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\tool.tsx",
+      "bytes": 5100,
+      "sha256": "2416b78b2b45ce0b02087663f4c5e38cc3c8462f9d1c42c28a0c2afdef1dfa66",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/tool.tsx",
+      "git_blob": "f11dc6b8f875308c5a5dcf4b26f7167416eca81e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ui\\instant-collapsible.tsx",
+      "bytes": 7565,
+      "sha256": "deb90e04a3fab2aab7fc4e9616128fa96ffc054d9a6d9572b9e4e13ccb17343c",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/instant-collapsible.tsx",
+      "git_blob": "55262aba747650268b15ad3550cd4e8804206c16"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\source-rich.css",
+      "bytes": 36671,
+      "sha256": "f6bd625753667c35dfad0bd5854b7a4cfaff572ec4b2c08a62b35ce794c95d2e",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/source-rich.css",
+      "git_blob": "15f8184d97fe932eae99eef791af4b867ddcb006"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\ui\\native-primitives.test.ts",
+      "bytes": 3029,
+      "sha256": "6b28bd6b9559e6a0c0447961eafb3206e94f9da827806304b71b1b043f2801d8",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-primitives.test.ts",
+      "git_blob": "ca9a6b4ed0973919a8bbebd9a21a0ab194c9f274"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\ui\\native-syntax.ts",
+      "bytes": 1595,
+      "sha256": "211f893b76b9055f48762fc8350a5178b8c367af1ddb962bb61c579de932e783",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-syntax.ts",
+      "git_blob": "4b180e0144b0b0edd50838ee80ea55a8e4bddfc6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\ui\\source-button.tsx",
+      "bytes": 2822,
+      "sha256": "8588d4798b21dc9d625fb19c42e7f0225d09dc1b149d19f147841fa85cf891db",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-button.tsx",
+      "git_blob": "e1d3242bf4d1748222bf4d74f03749a01989dca7"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\ui\\source-clipboard.ts",
+      "bytes": 2109,
+      "sha256": "9656795dff0fdfed80195175bf82b447abecffdc35bdcf4cf7f9b8a557d7f4f2",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-clipboard.ts",
+      "git_blob": "268c2f81eb82865c0c73c62b74d1f58fa4ac3c05"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\ui\\source-copy.json",
+      "bytes": 4754,
+      "sha256": "a36402e1b1a5979bf0e250b2967aa42bdf973bc78c9db6ee586af041e6273a05",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-copy.json",
+      "git_blob": "8be6c46bea75378c1cb5122c6a8cff69f703c228"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\ui\\source-primitives.tsx",
+      "bytes": 2482,
+      "sha256": "ad5a69ed08a05f33c74144736a7b3e47c9b91d09b7cb084973b704caa6207c32",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-primitives.tsx",
+      "git_blob": "99119bab583690b390d798404c50b8b89eda94fd"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\ui\\source-translations.ts",
+      "bytes": 1219,
+      "sha256": "4682fd9f41acf443b28fdc5825b524aecc676be00a2e1eb37013a34c958074ae",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-translations.ts",
+      "git_blob": "8d248bc5a424cd169a369e12922d953aacebc5b3"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\ui\\tool-types.ts",
+      "bytes": 485,
+      "sha256": "7c671f9423f226372537b4285dbc2e1ced6d94bec39aaba29769809aec0d55e8",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/ui/tool-types.ts",
+      "git_blob": "940badd3d0d7abae4cfacedcdf62421b53339c13"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\native-session-viewer.css",
+      "bytes": 4201,
+      "sha256": "0b651bde1cafe126b48f2e7ddcdd3598c28669719dcd14eae1ad6883267aa107",
+      "repo_path": "apps/desktop/src/renderer/src/native-session-viewer.css",
+      "git_blob": "ff7c33b0a79a6fd1a94751577473d367969b869e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\architecture\\delegation.md",
+      "bytes": 14255,
+      "sha256": "afa40b930f4e0ac1de682e37a5994c74a7b1b0e76750d6e4e14b05ac7aa96a5f",
+      "repo_path": "docs/architecture/delegation.md",
+      "git_blob": "70c2428cadc220ac117abec2dcda680b3eb24399"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\ui\\components\\conversation-workspace.md",
+      "bytes": 147474,
+      "sha256": "9ede3391e5c93f96dafd54d048b8ee450d169dffc31b8c23fddb6c145090b2e8",
+      "repo_path": "docs/ui/components/conversation-workspace.md",
+      "git_blob": "bfd4368f869fd3fd3cb09a45faffdf15ee9809a8"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\versions\\v1.73\\README.md",
+      "bytes": 14397,
+      "sha256": "b7a6837d72b5f90ea469b60ad171d886af18fca2da608ef62c2b81b4bb63aef2",
+      "repo_path": "docs/versions/v1.73/README.md",
+      "git_blob": "11bb6018b789ad2ce4c8da436c66746a2f329ae8"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\versions\\v1.73\\implementation-plan.md",
+      "bytes": 32325,
+      "sha256": "364d26bf50f7592bac397eeac8a9d01e2ed64d51036780a531074a3ac97643d9",
+      "repo_path": "docs/versions/v1.73/implementation-plan.md",
+      "git_blob": "bea0678223c20ec4b85d44894272c60ce1aaa9dd"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\README.md",
+      "bytes": 18202,
+      "sha256": "388b00a14647525716e3223037f0a5a2c43640948f896dec6c4196bb847f1e4f",
+      "repo_path": "integration/README.md",
+      "git_blob": "844637c5ebd253223135ebc052d15abd8cc27dda"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\execution\\goal-state.json",
+      "bytes": 22283,
+      "sha256": "41ebdc1b5182f37c31f5676801ee77885fa0b984ac8b7369b0aefe555c806d74",
+      "repo_path": "integration/execution/goal-state.json",
+      "git_blob": "0e50535e552ec292232aba467d45f3b1776da9c1"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\inventory\\native-content-ui-port.json",
+      "bytes": 36085,
+      "sha256": "b39404237168da8bb2cabfe01261ca453bbda3af670efc36b1bddf19632b830e",
+      "repo_path": "integration/inventory/native-content-ui-port.json",
+      "git_blob": "e50c23161ca91c043ef50106d3555879e4633294"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\inventory\\native-session-viewer-ui-reference.md",
+      "bytes": 7954,
+      "sha256": "f96ad4ab3f24a70b5c6a6b94e73213bca918ce4be22e956ddd7ae8c047c68d17",
+      "repo_path": "integration/inventory/native-session-viewer-ui-reference.md",
+      "git_blob": "8b03e815055ee613c2ad428bbaeace1180dc56dd"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\README.md",
+      "bytes": 9047,
+      "sha256": "52b88d518a669728a17f979b6ca3a5c63f92c5dec558ee1a5ac68706d7940367",
+      "repo_path": "integration/licenses/README.md",
+      "git_blob": "843e660caf77bf25f69155cce57c561d6d9eb8a6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\@formatjs-ecma402-abstract\\LICENSE.md",
+      "bytes": 1065,
+      "sha256": "b1cc980e28e9e48f377db191578a9361494ca7117185b69dd66cabaf5b460fb7",
+      "repo_path": "integration/licenses/native-tool-ui/@formatjs-ecma402-abstract/LICENSE.md",
+      "git_blob": "479ee16faa726e67271b765e8c71a28f6063993e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\@formatjs-ecma402-abstract\\source.json",
+      "bytes": 217,
+      "sha256": "db68ac7bde6597fe29b47db748e4b472ceb19694f1820a269d33a90fa5a9a465",
+      "repo_path": "integration/licenses/native-tool-ui/@formatjs-ecma402-abstract/source.json",
+      "git_blob": "7f574bc701640071182c02d2556ec1a0fc58c0f2"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\@formatjs-fast-memoize\\LICENSE.md",
+      "bytes": 1065,
+      "sha256": "b1cc980e28e9e48f377db191578a9361494ca7117185b69dd66cabaf5b460fb7",
+      "repo_path": "integration/licenses/native-tool-ui/@formatjs-fast-memoize/LICENSE.md",
+      "git_blob": "479ee16faa726e67271b765e8c71a28f6063993e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\@formatjs-fast-memoize\\source.json",
+      "bytes": 212,
+      "sha256": "03611a77b7353bbc6948cfc20ab25a9732be5ea612a61557f2d58cd47bde6965",
+      "repo_path": "integration/licenses/native-tool-ui/@formatjs-fast-memoize/source.json",
+      "git_blob": "eac6fd49f19b0b6298e5f5ad77eb9d7c3c7abf75"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\@formatjs-icu-messageformat-parser\\LICENSE.md",
+      "bytes": 1065,
+      "sha256": "b1cc980e28e9e48f377db191578a9361494ca7117185b69dd66cabaf5b460fb7",
+      "repo_path": "integration/licenses/native-tool-ui/@formatjs-icu-messageformat-parser/LICENSE.md",
+      "git_blob": "479ee16faa726e67271b765e8c71a28f6063993e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\@formatjs-icu-messageformat-parser\\source.json",
+      "bytes": 225,
+      "sha256": "4b5eed80cdbfd693b129b1e26dd6bd156e547ae130f04b90ac4745f7ebe26d51",
+      "repo_path": "integration/licenses/native-tool-ui/@formatjs-icu-messageformat-parser/source.json",
+      "git_blob": "afe1a78f56ae9e6d6145490bdbece5f1cb55768a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\@formatjs-icu-skeleton-parser\\LICENSE.md",
+      "bytes": 1065,
+      "sha256": "b1cc980e28e9e48f377db191578a9361494ca7117185b69dd66cabaf5b460fb7",
+      "repo_path": "integration/licenses/native-tool-ui/@formatjs-icu-skeleton-parser/LICENSE.md",
+      "git_blob": "479ee16faa726e67271b765e8c71a28f6063993e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\@formatjs-icu-skeleton-parser\\source.json",
+      "bytes": 219,
+      "sha256": "8a2ec7b6ffebd8034eb4b72a86dd4aad105ba815bae73c1be4cdbff142e3abaa",
+      "repo_path": "integration/licenses/native-tool-ui/@formatjs-icu-skeleton-parser/source.json",
+      "git_blob": "836140cf920ed7a56adc0be925ab7365bacfa924"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\@formatjs-intl-localematcher\\LICENSE.md",
+      "bytes": 1065,
+      "sha256": "b1cc980e28e9e48f377db191578a9361494ca7117185b69dd66cabaf5b460fb7",
+      "repo_path": "integration/licenses/native-tool-ui/@formatjs-intl-localematcher/LICENSE.md",
+      "git_blob": "479ee16faa726e67271b765e8c71a28f6063993e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\@formatjs-intl-localematcher\\source.json",
+      "bytes": 219,
+      "sha256": "2bebff2e63412e433237daa0b0be6384ae0e0f29478b0ec6964ce08b4686b973",
+      "repo_path": "integration/licenses/native-tool-ui/@formatjs-intl-localematcher/source.json",
+      "git_blob": "1197142f9e843fc1c5bb98e8725190c7594b0250"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\@radix-ui-react-use-controllable-state\\LICENSE",
+      "bytes": 1063,
+      "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "repo_path": "integration/licenses/native-tool-ui/@radix-ui-react-use-controllable-state/LICENSE",
+      "git_blob": "a18858fb7b014098cba85703e66609be66a26ef5"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\@radix-ui-react-use-controllable-state\\source.json",
+      "bytes": 228,
+      "sha256": "ad442181cc79539020929b982e8f105376d1de1f77451a71a47844e2aeb28c71",
+      "repo_path": "integration/licenses/native-tool-ui/@radix-ui-react-use-controllable-state/source.json",
+      "git_blob": "db4b741d345f4828147010388ab54064cf47d37a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\@radix-ui-react-use-effect-event\\LICENSE",
+      "bytes": 1063,
+      "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "repo_path": "integration/licenses/native-tool-ui/@radix-ui-react-use-effect-event/LICENSE",
+      "git_blob": "a18858fb7b014098cba85703e66609be66a26ef5"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\@radix-ui-react-use-effect-event\\source.json",
+      "bytes": 222,
+      "sha256": "0349e751fdafd77f141696aaafbb4ad318f98d1d789e132418358919a5253c8d",
+      "repo_path": "integration/licenses/native-tool-ui/@radix-ui-react-use-effect-event/source.json",
+      "git_blob": "993e40b689de8ae2c94e64c38313a3788e3e87ec"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\@radix-ui-react-use-layout-effect\\LICENSE",
+      "bytes": 1063,
+      "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "repo_path": "integration/licenses/native-tool-ui/@radix-ui-react-use-layout-effect/LICENSE",
+      "git_blob": "a18858fb7b014098cba85703e66609be66a26ef5"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\@radix-ui-react-use-layout-effect\\source.json",
+      "bytes": 223,
+      "sha256": "17b4b17e87df01cd2fba690d3146befb0fc1331ad8731fa96afc22a9a65918da",
+      "repo_path": "integration/licenses/native-tool-ui/@radix-ui-react-use-layout-effect/source.json",
+      "git_blob": "e305e44bdeedd5077ee0428a2909f7d6a3c306c5"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\anser\\LICENSE",
+      "bytes": 1134,
+      "sha256": "4643a4e712246eca7684de8ea540b7d3d5c557f7e05402d5c88003dacc6b04b2",
+      "repo_path": "integration/licenses/native-tool-ui/anser/LICENSE",
+      "git_blob": "c7b67ede1dd62f7ddfd5794fefa8ccf6ce3ab098"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\anser\\source.json",
+      "bytes": 196,
+      "sha256": "0d542deab994f1f4287e737012242eaeca95363693f9465b1eec98b51cf322e6",
+      "repo_path": "integration/licenses/native-tool-ui/anser/source.json",
+      "git_blob": "622450eff67aa9655c50512ae6d22f6e84a3c7ef"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\ansi-to-react\\UPSTREAM-README.md",
+      "bytes": 2064,
+      "sha256": "b681c6d6ab80ff5412c6b377a8b88941d2aefa312a7d74e32972ae5eadceb67a",
+      "repo_path": "integration/licenses/native-tool-ui/ansi-to-react/UPSTREAM-README.md",
+      "git_blob": "381492897f5348e6f565452190cf47e38a4712d8"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\ansi-to-react\\UPSTREAM-package.json",
+      "bytes": 1845,
+      "sha256": "6669789531a5fb393815b54aaa6ee853be53a60e00054c9de436dfc11a90c6ae",
+      "repo_path": "integration/licenses/native-tool-ui/ansi-to-react/UPSTREAM-package.json",
+      "git_blob": "21f675b951961a15614bda0a5b96fc0b492b49b6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\ansi-to-react\\source.json",
+      "bytes": 589,
+      "sha256": "a51a07c1e5b79ccac62d171ef93df642d2c45f0d4cbc9d687fc4c9d414c6802f",
+      "repo_path": "integration/licenses/native-tool-ui/ansi-to-react/source.json",
+      "git_blob": "f08959ba4470037b4a443512ab2561340d7f85a9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\decimal.js\\LICENCE.md",
+      "bytes": 1104,
+      "sha256": "3108b546bcff5d346923a82f48b2d252ca722f9088076db6d145f6b67757ad6c",
+      "repo_path": "integration/licenses/native-tool-ui/decimal.js/LICENCE.md",
+      "git_blob": "57740b9d4d86aedf5d518f2f363d5cf192c54127"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\decimal.js\\source.json",
+      "bytes": 202,
+      "sha256": "102cf265923d1ce92ba3f5eef9fe969fa7a304e6dbf6a0766f327e413b661257",
+      "repo_path": "integration/licenses/native-tool-ui/decimal.js/source.json",
+      "git_blob": "2ae4c5698fadc718ad38082e083ed76a64e499c5"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\escape-carriage\\LICENSE",
+      "bytes": 1069,
+      "sha256": "9a508cd4122f2dc1cc39f8ab0b6950efbc49fb087a581c7177a4b8c9d5d0d6a1",
+      "repo_path": "integration/licenses/native-tool-ui/escape-carriage/LICENSE",
+      "git_blob": "5513de0dac227e711f80c9504d181f95a8395cd1"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\escape-carriage\\source.json",
+      "bytes": 205,
+      "sha256": "4fc0c800b45a4e292177d4a623fb79e3034f6b4489c13b56a850f67f823d70d0",
+      "repo_path": "integration/licenses/native-tool-ui/escape-carriage/source.json",
+      "git_blob": "cb96d04a84e1ad63cab277f67432a9b217f6a38b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\intl-messageformat\\LICENSE.md",
+      "bytes": 1560,
+      "sha256": "cc4143615b27c66eafbe913f132a9e41ac14c1e2ec6b2df24dafeaa97f028850",
+      "repo_path": "integration/licenses/native-tool-ui/intl-messageformat/LICENSE.md",
+      "git_blob": "a9e40cb107846bae9c032344d548950a3890ad0a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\intl-messageformat\\source.json",
+      "bytes": 219,
+      "sha256": "c7ce8978b95ee62a2a16050d6288a7905ef699606e3be496688c28a142c0a5d1",
+      "repo_path": "integration/licenses/native-tool-ui/intl-messageformat/source.json",
+      "git_blob": "6ca86009329693f397bce1749f0ede9bbda50870"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\linkify-it\\LICENSE",
+      "bytes": 1058,
+      "sha256": "95e3f7f0e81e9b4940cdfaa1956aaff5e4dfd2fb1565041e7c78eb9a606f23e3",
+      "repo_path": "integration/licenses/native-tool-ui/linkify-it/LICENSE",
+      "git_blob": "67596f5f24007c3e42773400a7bfd57effe20160"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\linkify-it\\source.json",
+      "bytes": 201,
+      "sha256": "ee49474fd5a723bb3cd5e08911eb7adc04778fa74f429490712f4ecd898dd7ae",
+      "repo_path": "integration/licenses/native-tool-ui/linkify-it/source.json",
+      "git_blob": "fcec8a20b50ba5b1fbc42a8341d47cb67dc161e1"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\tslib\\LICENSE.txt",
+      "bytes": 655,
+      "sha256": "210b19e543130388c68654b7497e967119ce17145f66ab7d85688fbd70f08751",
+      "repo_path": "integration/licenses/native-tool-ui/tslib/LICENSE.txt",
+      "git_blob": "bfe6430cb0d83f34f5ed859d118dd3dc8ec1f7e8"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\tslib\\source.json",
+      "bytes": 197,
+      "sha256": "ec28613b54b4fc1738c0a0d63b1f2ee82a506c2ba2a7445e77dc7f0771765cf5",
+      "repo_path": "integration/licenses/native-tool-ui/tslib/source.json",
+      "git_blob": "9ac68a150e4b72d05826f172ed2d02e7b8f411e2"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\uc.micro\\LICENSE.txt",
+      "bytes": 1077,
+      "sha256": "483acb265f182907d1caf6cff9c16c96f31325ed23792832cc5d8b12d5f88c8a",
+      "repo_path": "integration/licenses/native-tool-ui/uc.micro/LICENSE.txt",
+      "git_blob": "a41e0a7ef970ecdd83d82cd99bda97b22077bc62"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\native-tool-ui\\uc.micro\\source.json",
+      "bytes": 198,
+      "sha256": "395001862272c93cecdab2b58577d7968508997516b7da65a9bf5114f576fdc5",
+      "repo_path": "integration/licenses/native-tool-ui/uc.micro/source.json",
+      "git_blob": "554fa6c89a70337f53a93d564ab117e9d1d5cea9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\tailwindcss\\source.json",
+      "bytes": 479,
+      "sha256": "32c93bf1c8e8f48f8295ad61aac0b9ff38964c9911ae48bd8dfce8705721a615",
+      "repo_path": "integration/licenses/tailwindcss/source.json",
+      "git_blob": "894c38ab4f2f582c640589812ec615eeb8b352ac"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\package.json",
+      "bytes": 24883,
+      "sha256": "f6ef8a664058bf05aedbfd42463a3f1537c2f368d9a7a46189006ab34651d84f",
+      "repo_path": "package.json",
+      "git_blob": "ac66de85d6e389efd6eb01724c856d457b24aa12"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\pnpm-lock.yaml",
+      "bytes": 281254,
+      "sha256": "307b5ada2b731d9b57dd879b2fbb2fc86d4156b22d2432229a8a54a0480237af",
+      "repo_path": "pnpm-lock.yaml",
+      "git_blob": "530da81d6b70647158d283b2b4091082f612b7ea"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\build-source-style.mjs",
+      "bytes": 4785,
+      "sha256": "691e65584b4d6d9f9b253a495fe8133776f049de003453e70348a10292b4083b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\dependencies.mjs",
+      "bytes": 8901,
+      "sha256": "9ab4e7aa99f5ed90544265669b0f7aa4cd9a7664de2acfaa55131b01bda280dc"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\native-product-day-narrow.png",
+      "bytes": 103582,
+      "sha256": "02a65de1331df1871fc78a5405ca93add93167711443d3d6812152bef13b0a7e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\native-product-night-wide.png",
+      "bytes": 186722,
+      "sha256": "3d11d8bbb50a3f8a0f787c0ec0e66dabfa3ec8be7e5b3c2bcfd3be5dc1ba8490"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\native-rich-day-narrow.png",
+      "bytes": 86016,
+      "sha256": "61a411006e75f6016734f981dd0fbadd3876ce06a4063e3ad1fede71d6d268d6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\native-rich-night-wide.png",
+      "bytes": 159320,
+      "sha256": "077256609dd48f65b7e9ee12a801591a0d9f3656bc36cc36a7266b3ccde61b56"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\native-tools-day-narrow.png",
+      "bytes": 55194,
+      "sha256": "e66c8dc71ba1a26d8d6014c7b6caea256891f900b78b1c97d18778d49e64ab1c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\native-tools-night-wide.png",
+      "bytes": 118292,
+      "sha256": "0ad9625f4d05107ddedfd28bc9e10551a58c8cd907eae1469d1a77dc9f898931"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\apl-fqmucPXA.js",
+      "bytes": 3573,
+      "sha256": "5be3458b72027a2151b231faa2e30eaf16e1e29067222e232694f25418c2a140"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\asciiarmor-DucZyvP0.js",
+      "bytes": 1531,
+      "sha256": "01c94e79d596371ae8d7fb8f8e9d7f7c136b9c9cbd1f7f1124949ee0216d4816"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\asn1-BnOEsgAm.js",
+      "bytes": 6540,
+      "sha256": "bb17319ceb5860451c6822bfadacfcedd6f972cfafbe016b36dfe6ac23f73551"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\asterisk-QAlztEwS.js",
+      "bytes": 6665,
+      "sha256": "6df194920c95ba624a8fda9ecc6fb9bb3e8c608635a2d0b0f4b2610cce4e6fc3"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\brainfuck-DZVCuF_t.js",
+      "bytes": 1193,
+      "sha256": "71ae5a627c032ec5f0333e28a4fc02da543a8faf15f2705c0e1f69f7df69c812"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\clike-xqXYL6ge.js",
+      "bytes": 35079,
+      "sha256": "1acda985c43e1ca1c234bc64cd7b495850069c0c10cd1a433d89c2005dcb503a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\clojure-BhXMqnxz.js",
+      "bytes": 14874,
+      "sha256": "e6c5a1b8eead561531a1fe6afc42ebd3541913ac87645794bee5b2e42222ff2e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\cmake-BGaNd9E7.js",
+      "bytes": 1598,
+      "sha256": "319d4983f4e2c2934fdbf67a567ad183211c15a618df3d9e7ad270a188f63c1a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\cobol-4yqQntpt.js",
+      "bytes": 8051,
+      "sha256": "f541e17f367fb16b84f1c4585dc6b96436fab9b9984351746b8d6b7e4be77533"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\coffeescript-D2dXvhEc.js",
+      "bytes": 7885,
+      "sha256": "fd8b8081e6c6d0b3a5a1d5159ea923fa92de6b16498672ac8ffb3a85d0f074ff"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\commonlisp-CF_VNHQR.js",
+      "bytes": 4045,
+      "sha256": "f0e48e905937a107e453a06c0eb54a8f1e536fc0fc63c5b58b9551c8f7fe49cb"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\crystal-DyuLTqLs.js",
+      "bytes": 10531,
+      "sha256": "c1628558768374a78a1fa71c26feaf44bfc6c5161bf81d964490416d1af1f38f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\css-c-jst79C.js",
+      "bytes": 40347,
+      "sha256": "41425a19b41f83ae573be2f495236cd1161392d1ef66eb2d23d2784510746818"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\cypher-Dlu_3r4V.js",
+      "bytes": 5505,
+      "sha256": "80cff481ed4632ecfbe5952d4c60f15227c66f04dfea646c32852a2b090d19ca"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\d-UURgV0Ux.js",
+      "bytes": 6499,
+      "sha256": "df60654c2550e460276b5522896ee99ab6516252a0016a0fafa21875641b72b9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\diff-B_Bi2Crb.js",
+      "bytes": 564,
+      "sha256": "efa42a61215071dc4d677dab004a6f77c34b41825d87a7dc42303302c35b4b4a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\dockerfile-Bvk733Ga.js",
+      "bytes": 3834,
+      "sha256": "31f1f2e8d8f9f2eeeb29f6d4b56e4632654d2f2a5b352a4febc9bf2f1984d29c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\dtd-Dy74G54E.js",
+      "bytes": 3811,
+      "sha256": "cfaec369fbea7351fc6a8fb7c990f2fbc5a0d1730467e51935deb1965fccaa2a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\dylan-TSb-Nfix.js",
+      "bytes": 8427,
+      "sha256": "b0c2026d9bb4917eccab491f63e56d95ceb4a8e01e42062a843c35ea29121607"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\ebnf-4fKAGW3a.js",
+      "bytes": 4022,
+      "sha256": "b21fa7b0323bdc0ab31713d74038dfef58b32305d3775c98547a3a23f143e16a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\ecl-B59qGGVg.js",
+      "bytes": 7786,
+      "sha256": "4f1c8ae6eaddfd15d73523014b684fc2ae7160b0c10d0680812497b4f1254192"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\eiffel-Dze7nlu3.js",
+      "bytes": 2931,
+      "sha256": "a0fc308a8415ecaf7e5ffe28d9192c23f5b6e81d995eb7df35894a1b307a6606"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\elm-DG7jkhNZ.js",
+      "bytes": 4025,
+      "sha256": "c077dc7257d0e460440d911f88d5783e18ca8c58146fd9126e9e13a0897bcb5b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\erlang-BO6gOnGA.js",
+      "bytes": 15208,
+      "sha256": "a7ff36cb6624f8cb2eedd1f201678c122f7d861f901c2b4465532dc9b10fb48e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\factor-CMxFHDqz.js",
+      "bytes": 2613,
+      "sha256": "b249da83526bbefb5f5c5621c3cd3410f0f26edc9368cec95a585dbf5c6d0fd7"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\fcl-CDDUNjTj.js",
+      "bytes": 3749,
+      "sha256": "223f8c7838620a68cbcb74e4e40d10c5eb20fdd2fbe6d32e44bce2d1d2c28ed2"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\file-find.worker-CHoXCmE8.js",
+      "bytes": 1523,
+      "sha256": "80cfe35f96f8384c3f07480916e2786129ac31f1d7d839816bda104764da27c8"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\forth-B9D2JCeE.js",
+      "bytes": 3858,
+      "sha256": "2db6c4dd8f293410bd0de0a25f1dad21a1ee1990ddb816a4c783e86213e1e302"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\fortran-CAG2BFbe.js",
+      "bytes": 6675,
+      "sha256": "df8788d58683ac6188c9038802b9cc8483344dc447ff9854b818c5171c006401"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\gas-d3KEcW3x.js",
+      "bytes": 7823,
+      "sha256": "a699545574b2f6e9d0d502fe4536ef23b977a8f03ef284520247350ac240ab33"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\gherkin-DhZlEZiy.js",
+      "bytes": 11789,
+      "sha256": "86e76fdd8bbec4e37db05eebadde43a0761cddc0786f28f42befef6addaaefcb"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\groovy-CpwJiBl7.js",
+      "bytes": 7469,
+      "sha256": "6b1705ee26bb3827a73e657f0b58a16c84004135a5e237501d919b9cb868ca0e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\haskell-ySd-OUo8.js",
+      "bytes": 7626,
+      "sha256": "ff8a9df8c8df8f199ad3b7000aff670c061d0c760ba213d94f52a6f92024e0f8"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\haxe-7MlzfeYV.js",
+      "bytes": 15668,
+      "sha256": "df08c4d4f5bf41a8e63335fa1650e2d5dd4de28c5760ebd6ab47ee0c3fbdb606"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\http-BqypyemW.js",
+      "bytes": 1774,
+      "sha256": "552d89ffbe4662e2a8a6ef42b9608509b6654b7de1f836e6c05c2b7ebc81e0f6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\icon-192-C06667az.png",
+      "bytes": 81948,
+      "sha256": "2680338ed6d3557b6ab543b97460c4620ecffe0d3a801bd34c3c3c06a6eefe9a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\icon-192-DrQKUdSk.png",
+      "bytes": 79330,
+      "sha256": "9fbd4eb0e7356b4c6ddf2d86a676178476b93747a4687a6e89d06684014ed142"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\icon-192-OagIfT5q.png",
+      "bytes": 74993,
+      "sha256": "9abc0b6b53cef994b32e8c14c02fa8cad3be5325168d1f6907c47b327a024438"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\icon-192-R53lTr_5.png",
+      "bytes": 81172,
+      "sha256": "2f40a6ee8f0a0d1cfc11d8010fc9d990d9dd2dfbb14ea27bbdf97e2c50619a4d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\idl-4HIGJlDI.js",
+      "bytes": 15127,
+      "sha256": "0ec3441d716383be06d8b9abe052499551a470877e9fb3701ebc09ab590c70b1"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\index-_zFCO1Jt.js",
+      "bytes": 19883,
+      "sha256": "1203d211a8a0618f71d2eab0c38963230d1e9a827be1a8e118ffaee0fda7f8e0"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\index-B4iA7Ca1.js",
+      "bytes": 44040,
+      "sha256": "787ef6dd7e2371d52f6bd58e04a8bd7386b8025b2cc58bfb57bfb1e8a8e2b22e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\index-BhD6WcP6.js",
+      "bytes": 97422,
+      "sha256": "c675dd9f69ecf39a962c85a24ccee2cde88b5a611ccda939bda57e606c8c450b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\index-BJZIGdxN.js",
+      "bytes": 106789,
+      "sha256": "49fd917878733f7983e1ac155e649a21293e628c3697fd31bdc96e297cd6216d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\index-Bs5V-BZY.js",
+      "bytes": 4536039,
+      "sha256": "b770bfe5d2a849a7e865602429e09e8bb793badb84e45bf50e7533aea7521402"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\index-BUly3OID.css",
+      "bytes": 832872,
+      "sha256": "bc782d975d766f546c5e1948e46b848fedc785475ffc6b3c988b34e3002d17e6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\index-BupxyykV.js",
+      "bytes": 4703,
+      "sha256": "5b427ca4dde1828891cff826f1b2d71e388c28f8c38afa6bdf0ff32765f39a73"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\index-BwmjR-x5.js",
+      "bytes": 3450,
+      "sha256": "0b11817f3d5bf83e1b0e2799872f9264b70858501d3a9251b8d8201176063c63"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\index-BxO8v4io.js",
+      "bytes": 28931,
+      "sha256": "0719197c03a15ade49a92b725d6c5adc2eecd3ab3aebf529cd663a373cf8b1bd"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\index-By3-C53T.js",
+      "bytes": 35453,
+      "sha256": "bc2b66bbc650d15da1021e92d3e1346631c24c55306a21ec96f7a92d142d30d2"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\index-C3QQKWEK.js",
+      "bytes": 3308,
+      "sha256": "71bf75c28d4e204bdaf688912db464c9b6522aaedd47fa717d037b4c3eba21a0"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\index-CEf7jIdr.js",
+      "bytes": 43902,
+      "sha256": "bfa9b08097119368e19e1a318dd461904a872bcb356ea51510baec85ed7e16da"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\index-Ceghxv7x.js",
+      "bytes": 25969,
+      "sha256": "e6ea6abb8ceafc5de34e1ebf0a9a06e78297fa4fc022d4860ef89a82ca4c2634"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\index-cNUzWwFP.js",
+      "bytes": 18245,
+      "sha256": "443577ca06fa346556a1bb3fe7423d6d03be83d9f3e6166ce605928044dcf75e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\index-CZjQHvGJ.js",
+      "bytes": 73511,
+      "sha256": "0f4624531597398f6febadf29d4f9b9e232127ce4866d8a1b5488eacb61caed6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\index-D9s2rJFV.js",
+      "bytes": 7233,
+      "sha256": "0feee8029adccb1f2c223e92526e0b94cca65578a22fa46545c7005622f75a36"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\index-DaWSjmCx.js",
+      "bytes": 103231,
+      "sha256": "98cb96479e0b1d3466ea42ce01d39d83c0f3af97169491133f2030d28fa884f6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\index-DlId0Irw.js",
+      "bytes": 55797,
+      "sha256": "dfcdf49318551845d277eb3aafcf557ffb5d5a7b2b2635c06aed0f3761beeecb"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\index-Dw90BROR.js",
+      "bytes": 86737,
+      "sha256": "4fef42742fd9e9daf6fad3fd14e4b56f30a9222284cf7d12df19378831ebf8d3"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\index-DxfzsljO.js",
+      "bytes": 42178,
+      "sha256": "9d8dc6d2baf8e81e62301ca6bc3533970038e7216db8e7c561ef7e7b6943218c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\index-etdOLoYx.js",
+      "bytes": 22072,
+      "sha256": "9b4014dbb06fe019f0e9ddbed82250f9e864c1eb06ad33abe443e71d98ad179e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\index-M4Z3ReiL.js",
+      "bytes": 26859,
+      "sha256": "1b8c0d10763f8365eca932cf1d852b59e8c9e00a939c3af4ea7c8ecbbe8b26c9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\index-qs0_PcLU.js",
+      "bytes": 54938,
+      "sha256": "18912b0a3afe2177bf17db6d3e0c1284310df7175b8b04d0bad87ccd1bee32b1"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\index-wgZEgv_R.js",
+      "bytes": 35734,
+      "sha256": "5075c9fca4c86187203e5ccc6a96736c14379cc797b7b9ab360fb5a0ecaa3605"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\javascript-C_OHM9hj.js",
+      "bytes": 37132,
+      "sha256": "95b09f0b3fb5fdd9b2d10f6984118bbea38a78a51286f4d862b86a01094ddd8f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\julia-Bs6JJhYG.js",
+      "bytes": 9647,
+      "sha256": "0d8127c7275ab1371ec839ec976879685017db1cf04c55095e651e48fe103196"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\livescript-BMWCDuIE.js",
+      "bytes": 6483,
+      "sha256": "b39453a81de0238efd37ac1306f2f004f305cbd745be57e1728a17625f013401"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\lua-Cvg8VrAA.js",
+      "bytes": 5229,
+      "sha256": "165c413653092708d81ff649b3d4a63df2eedc0b50c8f249b9667b4e75fe959d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\mathematica-DNLOL9PQ.js",
+      "bytes": 3436,
+      "sha256": "acc57c8c8a74626a6b9423988f92155410b79196d13c9c6a78047d51ae130c68"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\mbox-Ga7d4MMN.js",
+      "bytes": 2883,
+      "sha256": "fc425b9a3a312399b3ff6adfec040828ff7c8789f0d31b96e73bde2dce902355"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\mirc-Dma3B8rS.js",
+      "bytes": 7292,
+      "sha256": "0ddcb9e79952a15f12935311af85affb24054773404adfdd1d437cc0080a21e2"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\mllike-DHn7xckP.js",
+      "bytes": 8183,
+      "sha256": "adc3b1b7f8aa916812cd4d8bdf8cc1bce352786e3df54c560c5b9067b4fe6d5b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\modelica-0d55jYY0.js",
+      "bytes": 4784,
+      "sha256": "53c8da4f56d1dd592c1710d4b2735aa9904eb2306f365b56aa7074837c59526b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\mscgen-DdqZYINH.js",
+      "bytes": 5426,
+      "sha256": "7e91513474f40739574f20f1b1f38659a476b68b39ee260c7e13132e20d66fc6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\mumps-Btr8VblO.js",
+      "bytes": 3348,
+      "sha256": "aea5f291cf40bcc124e9ff104dedf8df38d630d3112f62d1051118f1ce16b80b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\nginx-DTDtBDVN.js",
+      "bytes": 9302,
+      "sha256": "715cac7cfdb61a1efd09d43ec2c5e6d8e1bd491be679ac56df795a913e6eaf21"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\nsis-CyKBdPWp.js",
+      "bytes": 7857,
+      "sha256": "57f398b99c2ea986b5e4673709aa470f0fb4b42cb04188cf4044e52475c4ff61"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\ntriples-CvgOYMpL.js",
+      "bytes": 4754,
+      "sha256": "239581b9922c933f3427296d14f18a1febb1db49283e6e4aa3331f4e2b9bc3a9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\octave-DYBj3-tl.js",
+      "bytes": 3863,
+      "sha256": "57d7b87692fe3ab14a413456a3ea0fb201a3052057b77a55604863fa5064c495"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\oz-R_e8WMIi.js",
+      "bytes": 5329,
+      "sha256": "a19a6ffdf1e6eb10fe9c4937cfb31303c9ec5bb723c73df1a71ef43c82cdd020"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\pascal-GD8iposT.js",
+      "bytes": 3495,
+      "sha256": "e5a1f91525017a8bf777f9c04f990c65a6a876b26e9b803ba4fddbcc6a68ccac"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\perl-DL9mHpoi.js",
+      "bytes": 28648,
+      "sha256": "8c4df1964a2fe9a690f2493217ed9f70d1f7e2f026ea515f3b226b3b39370b17"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\pig-C_4T4YIV.js",
+      "bytes": 3908,
+      "sha256": "82df721874d4623ebcfa10b27ea6eb9e3992ff4c28e2d838f8d166ab73abb91d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\powershell-B0suO7Vd.js",
+      "bytes": 11424,
+      "sha256": "3de01d37e183594d3bb94dc474f6324219cb209d162b202f82b12c77d2370410"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\properties-BR-vP1aU.js",
+      "bytes": 1475,
+      "sha256": "b758d2ccb06eaaf23dbbc110988e64a57e55a5923a262c60432397feeef0c9c3"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\protobuf-BxgpyhoW.js",
+      "bytes": 1451,
+      "sha256": "ed0b3d7fbe3b079db99443170bd20dba78ba27f42043ad6efebd4b714ef4a364"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\pug-CTXt1f8z.js",
+      "bytes": 11711,
+      "sha256": "48c244b81b114de6a5e5adefc5c7715f6eba241d58edd162713fd21007afdb2c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\puppet-Bdao66PW.js",
+      "bytes": 4091,
+      "sha256": "7985d1f812327008fe34d375ab1849a12e903d3e9507b7fa14253ba17dbdd596"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\python-CvWbmiX4.js",
+      "bytes": 12822,
+      "sha256": "219d8f4b9588956ac747cc56503e568fbf3aff3ab5e34e400a6cd21c86e2273f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\q-CrbCVq4a.js",
+      "bytes": 6286,
+      "sha256": "ded6c3f92101aee3b6214667f489d691936350d01b61e69fdb2b8e2104afcacd"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\r-V7nswm59.js",
+      "bytes": 5639,
+      "sha256": "78772777dc6085a89ba3ed5f6fcd5fe46c7ff6cdb849c3c967ce0c1273b4f4a2"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\rpm-C-DLY-If.js",
+      "bytes": 2851,
+      "sha256": "e39a41ec2ab1ba47f2ef4ac46afda8ab6157df5f4388c70b332e2ebf154e1997"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\ruby-CQTpZw6f.js",
+      "bytes": 9595,
+      "sha256": "d66865a01096abcd291b833e0cd3d64881860acbd99b094fb5cf1cd134e2743c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\sas-D2UG-yhZ.js",
+      "bytes": 11997,
+      "sha256": "015ef33927a3a7749cad183ad9e96b0dbf9df616080054b9e581486effc05bef"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\scheme-BKzrkGJD.js",
+      "bytes": 10560,
+      "sha256": "f0e7bc170c1987a1a0734b905eee725b83cca6aa8fa597457fec67670a555cc9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\shell-BlsXDxCn.js",
+      "bytes": 4630,
+      "sha256": "476e685b723e32c63fec792d4266c65b3facfe8feb349b6a2dff9b6c749d9fde"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\sieve-CjwBwOY5.js",
+      "bytes": 3085,
+      "sha256": "084c9f5e19ccf7382ebe97bc97676ba143d9a36fad9b096cb4b3f99cf3c81df6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\simple-mode-DMneyfDu.js",
+      "bytes": 4350,
+      "sha256": "bf2199ce2b8baa53cef87a5bc3a72c68817223b26167c168c645fe78be9280f4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\smalltalk-BOIGQuhN.js",
+      "bytes": 3806,
+      "sha256": "7d696f35a8e402a8b6c2ac1db57c92af865ec665cd63d827689c46e58b9b295d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\solr-CwD7U71z.js",
+      "bytes": 1796,
+      "sha256": "9e9b3bf9c4c0a208effcc6283428b25a30e935eeefa58fc34629947c040beb7e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\sparql-DYskk2vE.js",
+      "bytes": 5954,
+      "sha256": "0573590f5173a33d2c988a89048fccb66706d9d2b1d1e01c42dd864c7b664422"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\spreadsheet-Bgtt3oLP.js",
+      "bytes": 2213,
+      "sha256": "453eff194470639d89a69e4cdf76b8e58773b5ab307554feed6d826b20a058c4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\sql-BSrOzCRI.js",
+      "bytes": 42670,
+      "sha256": "dc7e3ba15d3123633b1a12391213fafb05a5abdcc9829498793b3d467a1d3fbd"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\stex-B6LNC55o.js",
+      "bytes": 6332,
+      "sha256": "350838050b62d1c5f9821e86a9bb0ee45f0c61628eadc676c126359a41a5f2a5"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\stylus-BkS-boTH.js",
+      "bytes": 38258,
+      "sha256": "2d50cfa755d2ad2fc7302164938caf2b4421003f3c3fb9eb02314a230a514cd9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\swift-FRZi1uvB.js",
+      "bytes": 6767,
+      "sha256": "526e30f380c612526c4f06a3085c392bda84ede2673fff42b1d2dd7a205377d4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\tcl-CUcaCdmq.js",
+      "bytes": 3837,
+      "sha256": "aa90d12c1490ebb77e68e6ce90fd35b0b312e5510f9753f1072c629c43e9c05c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\textile-BnFpjsrl.js",
+      "bytes": 12175,
+      "sha256": "de9336373ae050e5a1ff954d462dd129d09f31c02951e27ede260fba1c054bad"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\tiddlywiki-CjprD-Qp.js",
+      "bytes": 5631,
+      "sha256": "5a80d8ec11cdad4503ab1462ed24e2bd7a1b09b787e815fbdfd4b7a454242fce"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\tiki-DK9DOeWn.js",
+      "bytes": 7119,
+      "sha256": "d307359b562484e7c25803b60349d4aa86e6351400f9612a3b78048f8451b847"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\toml-BOuWGMcf.js",
+      "bytes": 2104,
+      "sha256": "fddf8a802721005715a22746b28e0b87ac56a8f77caa41075f9142150e588fb3"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\troff-E1bJ0PPL.js",
+      "bytes": 1679,
+      "sha256": "ea32a0126878e2cd1198e94abcee48cbcd2131de1d80195e1267ad5b0cab82bf"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\ttcn-cfg-Dc39-fIP.js",
+      "bytes": 6021,
+      "sha256": "743ddd5c09b350d33149497d4177895083f584712019a20e88a3c9ded8b62fb9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\ttcn-tKd4HLu4.js",
+      "bytes": 7900,
+      "sha256": "b9af59a0022981562d7482bf0125dc1b6bfdbb40ea1214807db4abbcb783059b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\turtle-Dq7-1WAf.js",
+      "bytes": 3817,
+      "sha256": "7e505e9051b7e3c8ecebea47e4fd43b1e6b2b6ccd7334fd25fc267dc82ee0e4d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\vb-Dp90gtsv.js",
+      "bytes": 7098,
+      "sha256": "049ed5cc9eb5958257497e1c018cd8aa6ff558760d7d9bca5d0d84db8573e19f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\vbscript-CI6_mxxU.js",
+      "bytes": 11321,
+      "sha256": "61890fbc79e2fa6eed6ec2f556916d57712d58fa394f140b09af6c50fece5855"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\velocity-BwIZK1TH.js",
+      "bytes": 4749,
+      "sha256": "630eef603fbca377c8e48679bf30198dce1f27d1a72123bdd72f1eada28f4bbd"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\verilog-DDCYnHN8.js",
+      "bytes": 16118,
+      "sha256": "a38956f338156db5f9b6fd4644f88cd1f81d7dc726a78b882b1ee62f0e70f45a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\vhdl-DCkMIyT9.js",
+      "bytes": 5732,
+      "sha256": "b0e803173743715af902fa2508c4da88a2e97f9b4782f33c6064a17db505bc05"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\webidl-BTLTThCm.js",
+      "bytes": 4771,
+      "sha256": "07aaaed4cf1b1adc2d5f705b656e0e3a4b0d4bddaf4ad998e488d3ca3450a290"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\xquery-BrBUuxMR.js",
+      "bytes": 12194,
+      "sha256": "96459fe2892ccdce0b57439307eeeaa9d82fd2663f2a0f4364a849dba3374e74"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\yacas-b5lAVEIl.js",
+      "bytes": 3866,
+      "sha256": "95c453f73dd9a218385c018b692c4af134b02d5131bea8dd957ca887a5cdd8bd"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\z80-BZV19vqv.js",
+      "bytes": 3042,
+      "sha256": "51594b00905d1522d2f64113beae4943577338f0ff5af4503dd9ee49dc3957eb"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\assets\\zcode-BnwZhfO-.png",
+      "bytes": 215707,
+      "sha256": "edd87a182097389b0f59c07f8de283dbe433c9d37cd6e9a2a372611516ab81eb"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\product\\out\\index.html",
+      "bytes": 365,
+      "sha256": "d31c70335eb0041ce5b90f50eb9441a69ab53943ba9d8fd91fb84cbca687fe05"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\entry.tsx",
+      "bytes": 1329,
+      "sha256": "e54bc887931a47a5c1d5d25d30cf49973cfe253bf8525848c6890e5738ada272"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\index.html",
+      "bytes": 260,
+      "sha256": "b1f527688a93a4073650f1d78c52084515c6ea2977f798d8cdb888ba2a9b3a15"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\intl.ts",
+      "bytes": 186,
+      "sha256": "8ecb0d5c2f32652c32737009286d14d4f5b932672cb15e2c5fcdd59768a80093"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\main.cjs",
+      "bytes": 1710,
+      "sha256": "72c3df17f1f8f21d312d44ebfae8958c4fd34b46543c64d391e598bca495f6ec"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\apl-fqmucPXA.js",
+      "bytes": 3573,
+      "sha256": "5be3458b72027a2151b231faa2e30eaf16e1e29067222e232694f25418c2a140"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\asciiarmor-DucZyvP0.js",
+      "bytes": 1531,
+      "sha256": "01c94e79d596371ae8d7fb8f8e9d7f7c136b9c9cbd1f7f1124949ee0216d4816"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\asn1-BnOEsgAm.js",
+      "bytes": 6540,
+      "sha256": "bb17319ceb5860451c6822bfadacfcedd6f972cfafbe016b36dfe6ac23f73551"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\asterisk-QAlztEwS.js",
+      "bytes": 6665,
+      "sha256": "6df194920c95ba624a8fda9ecc6fb9bb3e8c608635a2d0b0f4b2610cce4e6fc3"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\brainfuck-DZVCuF_t.js",
+      "bytes": 1193,
+      "sha256": "71ae5a627c032ec5f0333e28a4fc02da543a8faf15f2705c0e1f69f7df69c812"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\clike-xqXYL6ge.js",
+      "bytes": 35079,
+      "sha256": "1acda985c43e1ca1c234bc64cd7b495850069c0c10cd1a433d89c2005dcb503a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\clojure-BhXMqnxz.js",
+      "bytes": 14874,
+      "sha256": "e6c5a1b8eead561531a1fe6afc42ebd3541913ac87645794bee5b2e42222ff2e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\cmake-BGaNd9E7.js",
+      "bytes": 1598,
+      "sha256": "319d4983f4e2c2934fdbf67a567ad183211c15a618df3d9e7ad270a188f63c1a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\cobol-4yqQntpt.js",
+      "bytes": 8051,
+      "sha256": "f541e17f367fb16b84f1c4585dc6b96436fab9b9984351746b8d6b7e4be77533"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\coffeescript-D2dXvhEc.js",
+      "bytes": 7885,
+      "sha256": "fd8b8081e6c6d0b3a5a1d5159ea923fa92de6b16498672ac8ffb3a85d0f074ff"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\commonlisp-CF_VNHQR.js",
+      "bytes": 4045,
+      "sha256": "f0e48e905937a107e453a06c0eb54a8f1e536fc0fc63c5b58b9551c8f7fe49cb"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\crystal-DyuLTqLs.js",
+      "bytes": 10531,
+      "sha256": "c1628558768374a78a1fa71c26feaf44bfc6c5161bf81d964490416d1af1f38f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\css-c-jst79C.js",
+      "bytes": 40347,
+      "sha256": "41425a19b41f83ae573be2f495236cd1161392d1ef66eb2d23d2784510746818"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\cypher-Dlu_3r4V.js",
+      "bytes": 5505,
+      "sha256": "80cff481ed4632ecfbe5952d4c60f15227c66f04dfea646c32852a2b090d19ca"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\d-UURgV0Ux.js",
+      "bytes": 6499,
+      "sha256": "df60654c2550e460276b5522896ee99ab6516252a0016a0fafa21875641b72b9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\diff-B_Bi2Crb.js",
+      "bytes": 564,
+      "sha256": "efa42a61215071dc4d677dab004a6f77c34b41825d87a7dc42303302c35b4b4a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\dockerfile-Bvk733Ga.js",
+      "bytes": 3834,
+      "sha256": "31f1f2e8d8f9f2eeeb29f6d4b56e4632654d2f2a5b352a4febc9bf2f1984d29c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\dtd-Dy74G54E.js",
+      "bytes": 3811,
+      "sha256": "cfaec369fbea7351fc6a8fb7c990f2fbc5a0d1730467e51935deb1965fccaa2a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\dylan-TSb-Nfix.js",
+      "bytes": 8427,
+      "sha256": "b0c2026d9bb4917eccab491f63e56d95ceb4a8e01e42062a843c35ea29121607"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\ebnf-4fKAGW3a.js",
+      "bytes": 4022,
+      "sha256": "b21fa7b0323bdc0ab31713d74038dfef58b32305d3775c98547a3a23f143e16a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\ecl-B59qGGVg.js",
+      "bytes": 7786,
+      "sha256": "4f1c8ae6eaddfd15d73523014b684fc2ae7160b0c10d0680812497b4f1254192"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\eiffel-Dze7nlu3.js",
+      "bytes": 2931,
+      "sha256": "a0fc308a8415ecaf7e5ffe28d9192c23f5b6e81d995eb7df35894a1b307a6606"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\elm-DG7jkhNZ.js",
+      "bytes": 4025,
+      "sha256": "c077dc7257d0e460440d911f88d5783e18ca8c58146fd9126e9e13a0897bcb5b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\erlang-BO6gOnGA.js",
+      "bytes": 15208,
+      "sha256": "a7ff36cb6624f8cb2eedd1f201678c122f7d861f901c2b4465532dc9b10fb48e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\factor-CMxFHDqz.js",
+      "bytes": 2613,
+      "sha256": "b249da83526bbefb5f5c5621c3cd3410f0f26edc9368cec95a585dbf5c6d0fd7"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\fcl-CDDUNjTj.js",
+      "bytes": 3749,
+      "sha256": "223f8c7838620a68cbcb74e4e40d10c5eb20fdd2fbe6d32e44bce2d1d2c28ed2"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\forth-B9D2JCeE.js",
+      "bytes": 3858,
+      "sha256": "2db6c4dd8f293410bd0de0a25f1dad21a1ee1990ddb816a4c783e86213e1e302"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\fortran-CAG2BFbe.js",
+      "bytes": 6675,
+      "sha256": "df8788d58683ac6188c9038802b9cc8483344dc447ff9854b818c5171c006401"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\gas-d3KEcW3x.js",
+      "bytes": 7823,
+      "sha256": "a699545574b2f6e9d0d502fe4536ef23b977a8f03ef284520247350ac240ab33"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\gherkin-DhZlEZiy.js",
+      "bytes": 11789,
+      "sha256": "86e76fdd8bbec4e37db05eebadde43a0761cddc0786f28f42befef6addaaefcb"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\groovy-CpwJiBl7.js",
+      "bytes": 7469,
+      "sha256": "6b1705ee26bb3827a73e657f0b58a16c84004135a5e237501d919b9cb868ca0e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\haskell-ySd-OUo8.js",
+      "bytes": 7626,
+      "sha256": "ff8a9df8c8df8f199ad3b7000aff670c061d0c760ba213d94f52a6f92024e0f8"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\haxe-7MlzfeYV.js",
+      "bytes": 15668,
+      "sha256": "df08c4d4f5bf41a8e63335fa1650e2d5dd4de28c5760ebd6ab47ee0c3fbdb606"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\http-BqypyemW.js",
+      "bytes": 1774,
+      "sha256": "552d89ffbe4662e2a8a6ef42b9608509b6654b7de1f836e6c05c2b7ebc81e0f6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\idl-4HIGJlDI.js",
+      "bytes": 15127,
+      "sha256": "0ec3441d716383be06d8b9abe052499551a470877e9fb3701ebc09ab590c70b1"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\index-B0KGANp2.js",
+      "bytes": 28931,
+      "sha256": "bd0f1f34e9d32e14af711815412a13ddd0e3987bc76996293105b5db79ad2308"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\index-bA7cACXN.js",
+      "bytes": 55797,
+      "sha256": "ee304812757de1dbab66da9553b971ec46a0fff48ef273eb023f536483caccfa"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\index-Bb4Hh2eY.js",
+      "bytes": 43902,
+      "sha256": "c1cd6adc9b980af9bbfaf0a0ebc0485f0a0c40bf2f2bc14c71eae56e9e9c0bfc"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\index-bGfPDxQb.js",
+      "bytes": 18245,
+      "sha256": "16ff7ffb0bf5101ad8fb1952b6c610e49c01ce873b44ad68e68ae89d88360f26"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\index-BGWn32pn.js",
+      "bytes": 106789,
+      "sha256": "509e071b8657e75cc68a69966e189f52e562a5f09c15b4d86ffa06516c3124b3"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\index-Bm7LWbsk.js",
+      "bytes": 35453,
+      "sha256": "b0c2e8ba7e57729dbf6e3a8cdee94b6e8754ee230dc246d8b11b5a9c5e10a41f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\index-BPV5PHCB.js",
+      "bytes": 3450,
+      "sha256": "8224aec2b2b052fb7e317e2f0caeac04214fb1748953d5dec5cd32845d40d498"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\index-BriNv2Mu.js",
+      "bytes": 54938,
+      "sha256": "5649ac5b370dafae533b6bc12a697ab3cf8bb4548c78bf0e0e7699cc2f53d31b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\index-BuB27Ozm.js",
+      "bytes": 103231,
+      "sha256": "5bbb83a9ab4468df581039bfc3a2735219d6cffd20fcc31ffab4819c7e5ae820"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\index-BuM9U95D.js",
+      "bytes": 25969,
+      "sha256": "f5c04896f05a4446a563a4bd37ff91bac2e11c7eef7665e1314fef041d2d577f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\index-Cl_ISEfc.js",
+      "bytes": 42178,
+      "sha256": "5a8ef43f72b4b974312923bc9244a05d651bb02b028c15d3347ebe41817b1df8"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\index-CMwODbLi.js",
+      "bytes": 97422,
+      "sha256": "2abbf2d599055682397d58849235478b3fa27422b981318964a384021f76d05f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\index-CqfbwDh7.js",
+      "bytes": 35734,
+      "sha256": "47aa6d5472bfbb91fe5a699410565b9ef8ae572fcbeb4765ce98755561fa8d13"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\index-CwpWID2f.js",
+      "bytes": 19883,
+      "sha256": "3ecf7a5855f79336a767bd106c9fb5d7840a71fff11cf6edbae8c4d804bb8b87"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\index-DdBSx7L1.js",
+      "bytes": 86737,
+      "sha256": "1422aa03a1f6362433541efe6153a0565204b5d76c6652b4880719f9d3304652"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\index-DSMutP03.js",
+      "bytes": 4703,
+      "sha256": "cfd5672d22264d5153f82ecb52f2e801f8ae324728c61e0c49e0a59a53f8d041"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\index-hRbesAoM.js",
+      "bytes": 7233,
+      "sha256": "facd3df102c7fdcaf7b8b23bc64edb6a18d6af6d1168850cae11038f7755c01d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\index-kk4yTFHi.js",
+      "bytes": 3308,
+      "sha256": "b95677c3b78aeb99da160d0de54246d5a0069e2ae654dca9ef96f3b6c004c4a9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\index-Lfm6zpKE.js",
+      "bytes": 26859,
+      "sha256": "4360fe23850eb65525bbdd16d3827c0a16f5732a3c07303a4ca12bd6be96340f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\index-onCNhBkg.js",
+      "bytes": 44040,
+      "sha256": "70bfac28e0d6e4f55c7b6b44a9847ed408c4080658b40a834bc5313108fb0926"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\index-tqyQ-5we.css",
+      "bytes": 33535,
+      "sha256": "359d95e6e5db8947f6114924b2de8b6c5d59d18be0b119f624eefb4ad9869ed4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\index-vOIFv6DY.js",
+      "bytes": 73511,
+      "sha256": "44b7a72253e58c82fd7f7fc34d799685f51dd384fae6d1ed4a8f15a46c8cca2b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\index-Vrrw3cKy.js",
+      "bytes": 2047375,
+      "sha256": "dfc564717a406adbe50359e6450031fd1eb62fe4427624c91eedcbeffb9d86c1"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\index-YKqeg9L8.js",
+      "bytes": 22072,
+      "sha256": "5dbdf542ec659f9428704439d7f059708cb34b1fb27cb1d2a63988ca61336b51"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\javascript-C_OHM9hj.js",
+      "bytes": 37132,
+      "sha256": "95b09f0b3fb5fdd9b2d10f6984118bbea38a78a51286f4d862b86a01094ddd8f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\julia-Bs6JJhYG.js",
+      "bytes": 9647,
+      "sha256": "0d8127c7275ab1371ec839ec976879685017db1cf04c55095e651e48fe103196"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\livescript-BMWCDuIE.js",
+      "bytes": 6483,
+      "sha256": "b39453a81de0238efd37ac1306f2f004f305cbd745be57e1728a17625f013401"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\lua-Cvg8VrAA.js",
+      "bytes": 5229,
+      "sha256": "165c413653092708d81ff649b3d4a63df2eedc0b50c8f249b9667b4e75fe959d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\mathematica-DNLOL9PQ.js",
+      "bytes": 3436,
+      "sha256": "acc57c8c8a74626a6b9423988f92155410b79196d13c9c6a78047d51ae130c68"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\mbox-Ga7d4MMN.js",
+      "bytes": 2883,
+      "sha256": "fc425b9a3a312399b3ff6adfec040828ff7c8789f0d31b96e73bde2dce902355"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\mirc-Dma3B8rS.js",
+      "bytes": 7292,
+      "sha256": "0ddcb9e79952a15f12935311af85affb24054773404adfdd1d437cc0080a21e2"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\mllike-DHn7xckP.js",
+      "bytes": 8183,
+      "sha256": "adc3b1b7f8aa916812cd4d8bdf8cc1bce352786e3df54c560c5b9067b4fe6d5b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\modelica-0d55jYY0.js",
+      "bytes": 4784,
+      "sha256": "53c8da4f56d1dd592c1710d4b2735aa9904eb2306f365b56aa7074837c59526b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\mscgen-DdqZYINH.js",
+      "bytes": 5426,
+      "sha256": "7e91513474f40739574f20f1b1f38659a476b68b39ee260c7e13132e20d66fc6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\mumps-Btr8VblO.js",
+      "bytes": 3348,
+      "sha256": "aea5f291cf40bcc124e9ff104dedf8df38d630d3112f62d1051118f1ce16b80b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\nginx-DTDtBDVN.js",
+      "bytes": 9302,
+      "sha256": "715cac7cfdb61a1efd09d43ec2c5e6d8e1bd491be679ac56df795a913e6eaf21"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\nsis-CyKBdPWp.js",
+      "bytes": 7857,
+      "sha256": "57f398b99c2ea986b5e4673709aa470f0fb4b42cb04188cf4044e52475c4ff61"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\ntriples-CvgOYMpL.js",
+      "bytes": 4754,
+      "sha256": "239581b9922c933f3427296d14f18a1febb1db49283e6e4aa3331f4e2b9bc3a9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\octave-DYBj3-tl.js",
+      "bytes": 3863,
+      "sha256": "57d7b87692fe3ab14a413456a3ea0fb201a3052057b77a55604863fa5064c495"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\oz-R_e8WMIi.js",
+      "bytes": 5329,
+      "sha256": "a19a6ffdf1e6eb10fe9c4937cfb31303c9ec5bb723c73df1a71ef43c82cdd020"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\pascal-GD8iposT.js",
+      "bytes": 3495,
+      "sha256": "e5a1f91525017a8bf777f9c04f990c65a6a876b26e9b803ba4fddbcc6a68ccac"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\perl-DL9mHpoi.js",
+      "bytes": 28648,
+      "sha256": "8c4df1964a2fe9a690f2493217ed9f70d1f7e2f026ea515f3b226b3b39370b17"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\pig-C_4T4YIV.js",
+      "bytes": 3908,
+      "sha256": "82df721874d4623ebcfa10b27ea6eb9e3992ff4c28e2d838f8d166ab73abb91d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\powershell-B0suO7Vd.js",
+      "bytes": 11424,
+      "sha256": "3de01d37e183594d3bb94dc474f6324219cb209d162b202f82b12c77d2370410"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\properties-BR-vP1aU.js",
+      "bytes": 1475,
+      "sha256": "b758d2ccb06eaaf23dbbc110988e64a57e55a5923a262c60432397feeef0c9c3"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\protobuf-BxgpyhoW.js",
+      "bytes": 1451,
+      "sha256": "ed0b3d7fbe3b079db99443170bd20dba78ba27f42043ad6efebd4b714ef4a364"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\pug-CTXt1f8z.js",
+      "bytes": 11711,
+      "sha256": "48c244b81b114de6a5e5adefc5c7715f6eba241d58edd162713fd21007afdb2c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\puppet-Bdao66PW.js",
+      "bytes": 4091,
+      "sha256": "7985d1f812327008fe34d375ab1849a12e903d3e9507b7fa14253ba17dbdd596"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\python-CvWbmiX4.js",
+      "bytes": 12822,
+      "sha256": "219d8f4b9588956ac747cc56503e568fbf3aff3ab5e34e400a6cd21c86e2273f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\q-CrbCVq4a.js",
+      "bytes": 6286,
+      "sha256": "ded6c3f92101aee3b6214667f489d691936350d01b61e69fdb2b8e2104afcacd"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\r-V7nswm59.js",
+      "bytes": 5639,
+      "sha256": "78772777dc6085a89ba3ed5f6fcd5fe46c7ff6cdb849c3c967ce0c1273b4f4a2"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\rpm-C-DLY-If.js",
+      "bytes": 2851,
+      "sha256": "e39a41ec2ab1ba47f2ef4ac46afda8ab6157df5f4388c70b332e2ebf154e1997"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\ruby-CQTpZw6f.js",
+      "bytes": 9595,
+      "sha256": "d66865a01096abcd291b833e0cd3d64881860acbd99b094fb5cf1cd134e2743c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\sas-D2UG-yhZ.js",
+      "bytes": 11997,
+      "sha256": "015ef33927a3a7749cad183ad9e96b0dbf9df616080054b9e581486effc05bef"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\scheme-BKzrkGJD.js",
+      "bytes": 10560,
+      "sha256": "f0e7bc170c1987a1a0734b905eee725b83cca6aa8fa597457fec67670a555cc9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\shell-BlsXDxCn.js",
+      "bytes": 4630,
+      "sha256": "476e685b723e32c63fec792d4266c65b3facfe8feb349b6a2dff9b6c749d9fde"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\sieve-CjwBwOY5.js",
+      "bytes": 3085,
+      "sha256": "084c9f5e19ccf7382ebe97bc97676ba143d9a36fad9b096cb4b3f99cf3c81df6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\simple-mode-DMneyfDu.js",
+      "bytes": 4350,
+      "sha256": "bf2199ce2b8baa53cef87a5bc3a72c68817223b26167c168c645fe78be9280f4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\smalltalk-BOIGQuhN.js",
+      "bytes": 3806,
+      "sha256": "7d696f35a8e402a8b6c2ac1db57c92af865ec665cd63d827689c46e58b9b295d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\solr-CwD7U71z.js",
+      "bytes": 1796,
+      "sha256": "9e9b3bf9c4c0a208effcc6283428b25a30e935eeefa58fc34629947c040beb7e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\sparql-DYskk2vE.js",
+      "bytes": 5954,
+      "sha256": "0573590f5173a33d2c988a89048fccb66706d9d2b1d1e01c42dd864c7b664422"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\spreadsheet-Bgtt3oLP.js",
+      "bytes": 2213,
+      "sha256": "453eff194470639d89a69e4cdf76b8e58773b5ab307554feed6d826b20a058c4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\sql-BSrOzCRI.js",
+      "bytes": 42670,
+      "sha256": "dc7e3ba15d3123633b1a12391213fafb05a5abdcc9829498793b3d467a1d3fbd"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\stex-B6LNC55o.js",
+      "bytes": 6332,
+      "sha256": "350838050b62d1c5f9821e86a9bb0ee45f0c61628eadc676c126359a41a5f2a5"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\stylus-BkS-boTH.js",
+      "bytes": 38258,
+      "sha256": "2d50cfa755d2ad2fc7302164938caf2b4421003f3c3fb9eb02314a230a514cd9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\swift-FRZi1uvB.js",
+      "bytes": 6767,
+      "sha256": "526e30f380c612526c4f06a3085c392bda84ede2673fff42b1d2dd7a205377d4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\tcl-CUcaCdmq.js",
+      "bytes": 3837,
+      "sha256": "aa90d12c1490ebb77e68e6ce90fd35b0b312e5510f9753f1072c629c43e9c05c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\textile-BnFpjsrl.js",
+      "bytes": 12175,
+      "sha256": "de9336373ae050e5a1ff954d462dd129d09f31c02951e27ede260fba1c054bad"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\tiddlywiki-CjprD-Qp.js",
+      "bytes": 5631,
+      "sha256": "5a80d8ec11cdad4503ab1462ed24e2bd7a1b09b787e815fbdfd4b7a454242fce"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\tiki-DK9DOeWn.js",
+      "bytes": 7119,
+      "sha256": "d307359b562484e7c25803b60349d4aa86e6351400f9612a3b78048f8451b847"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\toml-BOuWGMcf.js",
+      "bytes": 2104,
+      "sha256": "fddf8a802721005715a22746b28e0b87ac56a8f77caa41075f9142150e588fb3"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\troff-E1bJ0PPL.js",
+      "bytes": 1679,
+      "sha256": "ea32a0126878e2cd1198e94abcee48cbcd2131de1d80195e1267ad5b0cab82bf"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\ttcn-cfg-Dc39-fIP.js",
+      "bytes": 6021,
+      "sha256": "743ddd5c09b350d33149497d4177895083f584712019a20e88a3c9ded8b62fb9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\ttcn-tKd4HLu4.js",
+      "bytes": 7900,
+      "sha256": "b9af59a0022981562d7482bf0125dc1b6bfdbb40ea1214807db4abbcb783059b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\turtle-Dq7-1WAf.js",
+      "bytes": 3817,
+      "sha256": "7e505e9051b7e3c8ecebea47e4fd43b1e6b2b6ccd7334fd25fc267dc82ee0e4d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\vb-Dp90gtsv.js",
+      "bytes": 7098,
+      "sha256": "049ed5cc9eb5958257497e1c018cd8aa6ff558760d7d9bca5d0d84db8573e19f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\vbscript-CI6_mxxU.js",
+      "bytes": 11321,
+      "sha256": "61890fbc79e2fa6eed6ec2f556916d57712d58fa394f140b09af6c50fece5855"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\velocity-BwIZK1TH.js",
+      "bytes": 4749,
+      "sha256": "630eef603fbca377c8e48679bf30198dce1f27d1a72123bdd72f1eada28f4bbd"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\verilog-DDCYnHN8.js",
+      "bytes": 16118,
+      "sha256": "a38956f338156db5f9b6fd4644f88cd1f81d7dc726a78b882b1ee62f0e70f45a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\vhdl-DCkMIyT9.js",
+      "bytes": 5732,
+      "sha256": "b0e803173743715af902fa2508c4da88a2e97f9b4782f33c6064a17db505bc05"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\webidl-BTLTThCm.js",
+      "bytes": 4771,
+      "sha256": "07aaaed4cf1b1adc2d5f705b656e0e3a4b0d4bddaf4ad998e488d3ca3450a290"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\xquery-BrBUuxMR.js",
+      "bytes": 12194,
+      "sha256": "96459fe2892ccdce0b57439307eeeaa9d82fd2663f2a0f4364a849dba3374e74"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\yacas-b5lAVEIl.js",
+      "bytes": 3866,
+      "sha256": "95c453f73dd9a218385c018b692c4af134b02d5131bea8dd957ca887a5cdd8bd"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\assets\\z80-BZV19vqv.js",
+      "bytes": 3042,
+      "sha256": "51594b00905d1522d2f64113beae4943577338f0ff5af4503dd9ee49dc3957eb"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\out\\index.html",
+      "bytes": 363,
+      "sha256": "edd23d0378016b8453a211a6a993da379b2ff961448a60fae37fc8319b1c1fda"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\source-tools-day.png",
+      "bytes": 50202,
+      "sha256": "780e23295faa1e3fefa3ff8977bfec4428c8b2c33799dc8b62dd59a96606d3d9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\source-tools-night.png",
+      "bytes": 57849,
+      "sha256": "eae054f914a720bf61cf9fe8a3ab2d73c5449bb4c2a05ee67d5aacd64ac23e57"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\style.css",
+      "bytes": 33535,
+      "sha256": "359d95e6e5db8947f6114924b2de8b6c5d59d18be0b119f624eefb4ad9869ed4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\drafts\\reference\\tool.tsx",
+      "bytes": 4987,
+      "sha256": "639c088218ba0844e4b39cd0d7548d60c30d5f464768e72ac14eb9875576e6c7"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\index.html",
+      "bytes": 265,
+      "sha256": "ae9184d7d20d1eddcb7fd5448539b4e71a3cc64c0a25bc2c2db66897c70fd4e4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\license-inspect.mjs",
+      "bytes": 506,
+      "sha256": "7a4313a1b6fd13fa1682e40f8992d77a3bb5cfb5c15e8904040427ef05fdfe10"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\codegraph-final-exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\codegraph-final-sync.log",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\codegraph-sync.log",
+      "bytes": 206,
+      "sha256": "1c8ae2ee4c29eaf69e5d6822588e43ab568bc0dd60b530d9db4689f697e9694e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\dependencies-run-02.log",
+      "bytes": 724,
+      "sha256": "4032501c97cb38e9da307d8a36681794094d9131c40d22e3661031fc8580563a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\dependencies-run-03.log",
+      "bytes": 784,
+      "sha256": "1de43561ad6f8f8c576871c87d860a668615940daa209705a20fcc238f16ca5d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\dependencies-run-04.log",
+      "bytes": 783,
+      "sha256": "b15151e2222b038ba11a40a74bb76008f6aa69b1fcf52844733ada2026dae035"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\dependencies-run-05.log",
+      "bytes": 281,
+      "sha256": "cd65b21ae2accb7cc01c6b00036edfb90d87c96af8f2c2dedefeb5639acb7616"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\dependencies-run.log",
+      "bytes": 673,
+      "sha256": "52108e940f4d1735f7ccf2fa600f9123ec4fa527ddb3bff839d413b302a8df93"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\dependencies.json",
+      "bytes": 5529,
+      "sha256": "85cfe250cb682cd8c81c81e59bdd0fb6e86e164562cd00c787b44efb0cd75537"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\diff-check.log",
+      "bytes": 1167,
+      "sha256": "5a36f5f8c142f5ffa36fe699a8bf2d3ebcb332561434dbb6f93e053981c259c2"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\docs-base.log",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\docs-checks.json",
+      "bytes": 275,
+      "sha256": "a2ffeb32ca5c9902f1e2c4c097b3d2e4c7f34e716d14380fb50e144e197823e4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\docs-tests.log",
+      "bytes": 924,
+      "sha256": "e03cdc370b012b3c426a49dfeeb157fdd418bff44a779bd01a61d63cc242efd9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\docs-version.log",
+      "bytes": 79,
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\governance-run.log",
+      "bytes": 275,
+      "sha256": "a2ffeb32ca5c9902f1e2c4c097b3d2e4c7f34e716d14380fb50e144e197823e4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\license-tree.json",
+      "bytes": 2897,
+      "sha256": "ed816367a5ef5eda24a9ff222105b6b93928455de136907b0a4be938f0cc297f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\native-render-01.log",
+      "bytes": 679,
+      "sha256": "12b9834451cd3dd1b367b05e6c8a9e28cf56505d4a8262e63f4951b996866f33"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\native-render-02.log",
+      "bytes": 664,
+      "sha256": "e38f2c016cd76d4113cdde48f16518e4fe2b51081016e0021436ebdb2d12bf3b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\native-render-03.log",
+      "bytes": 797,
+      "sha256": "3087bf5df9513bcbfb9414c391b5cff9495425675776d672abfc38f73c372fa2"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\native-render-04.log",
+      "bytes": 284,
+      "sha256": "b9ce1ce49831913ad111d9ec4f1643d4692f5b22ddc7bfb59fc133948e3141b9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\native-renderer-result.json",
+      "bytes": 12051,
+      "sha256": "6a4a13ae683086c61ae6c321ff00cefa9b7f7d7884f7968c1d166067c441c365"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\port-manifest.json",
+      "bytes": 1978,
+      "sha256": "8301d468fa01e11ca61c2b3f5a938b6a9d244d074514f1ad2e9a429987d2ce5e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\reference-provenance.json",
+      "bytes": 1432,
+      "sha256": "d0ba7fecf429790f08e0ef7f22ff35f5d9cd1c209c8bdc5ff19b2adf1a8607a2"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\reference-render-01.log",
+      "bytes": 4176,
+      "sha256": "6899fb269ee12f6aa0a3da2f66b3ec0a12473dca9a51611482799f31d49f1fc5"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\reference-render-02.log",
+      "bytes": 254,
+      "sha256": "e48146fc31b714829b915a519499d474c2e8862e533a0eb6edc0e7c2a2eb35fd"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\source-audit.json",
+      "bytes": 5165,
+      "sha256": "3b101e780c9938151243fef95c5e58d74af67345ef938662bceb74368f95a4ce"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\source-reference-result.json",
+      "bytes": 545,
+      "sha256": "1ce2ffcecfc89baaac84688d3fd43abceda3df8c914e1c6d3078f76311460f1f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\staged-diff-check.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\style-generation.json",
+      "bytes": 1591,
+      "sha256": "8aed3b4ea99540477ae2b55c53e372daa7fb1812760aab25f6c3d91e7886a597"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\targeted-01.log",
+      "bytes": 274,
+      "sha256": "78ec408d5428ba8e39bb4e91df9da39643abaa85bba68d16119e18620bd897de"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\typecheck-01.log",
+      "bytes": 383,
+      "sha256": "ba4b4bb84dd2157c370af763019551835fc5e7784dfeecbc20489b39278bb7c4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\typecheck-02.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\typecheck-final-exit.txt",
+      "bytes": 3,
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\logs\\typecheck-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\native-main.cjs",
+      "bytes": 13984,
+      "sha256": "893d8dda952ffa885b17c38ffd7e8a0c716436eeda3d6148ddb696289a9cadac"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\port.mjs",
+      "bytes": 8865,
+      "sha256": "af69401ad39d8dcab6c1b20b9ae4e5b3da5ddbe90a33d53d9a714c8328587183"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\postverify.py",
+      "bytes": 1603,
+      "sha256": "1225d73e2e9b4b0835b2c6e66fa9c8dde9686751b712f3e04390cb78cde10e15"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\prepare-fixture.py",
+      "bytes": 6957,
+      "sha256": "e72bbd7ec1f860987fb9750da32d87a4d1d2c15c94955e1fe0ede6c259a35013"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\render-native.mjs",
+      "bytes": 1971,
+      "sha256": "601422e1504c4b741b1601747120e7e923d55703b89060ab096beda5f02d1b41"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\render-reference.mjs",
+      "bytes": 8434,
+      "sha256": "da23bc65bcf928cfb74623b2619098690fd6d639b6f0c7f632058b30434d38e7"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\renderer.tsx",
+      "bytes": 10386,
+      "sha256": "51dbd65ade3880ffdffde4286b4499a6ea53edd121d43f1db3ebddb524756164"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\rich-data.ts",
+      "bytes": 3712,
+      "sha256": "821802d4ec3fa292cf7381aaea82411cdbed832551a2e23ebebf94b0ddbe65e6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\source-audit.mjs",
+      "bytes": 3198,
+      "sha256": "af519707098562842cc1a209f2e45b0fa63e8a1f6c73645e5de10539bacf24a4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\update-docs.py",
+      "bytes": 8681,
+      "sha256": "32ce8ff22189b1b2c8d896cf7c907adaf1fa366e3031c5c5d7a86fd002880c4f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生工具卡片\\verify-docs.ps1",
+      "bytes": 1473,
+      "sha256": "3f56a0bb33d3686710e202c2756358bccf4308cd269acf7932b2db0927b854df"
+    }
+  ],
+  "fixed_donors": [
+    {
+      "name": "codeg",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\source-reference\\codeg",
+      "commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+      "tracked_clean": true
+    },
+    {
+      "name": "rovai-ai",
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\source-reference\\rovai-ai",
+      "commit": "cc465dda562536b94f23787759e3206324baa29e",
+      "tracked_clean": true
+    }
+  ],
+  "approved_r1_artifacts": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    }
+  ],
+  "external_migration_rule": {
+    "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\AGENTS.md",
+    "bytes": 6371,
+    "sha256": "38ab74dc7dc68bb61097ec4f0684e3d8fcc11a9abaf5c56d6ee14132ca81043d"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "@formatjs/icu-messageformat-parser",
+  "version": "3.5.1",
+  "integrity": "sha512-sSDmSvmmoVQ92XqWb499KrIhv/vLisJU8ITFrx7T7NZHUmMY7EL9xgRowAosaljhqnj/5iufG24QrdzB6X3ItA==",
+  "bytes": 19775,
+  "license": "MIT"
+}
