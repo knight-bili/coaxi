@@ -1,0 +1,13 @@
+{
+  "name": "@asamuzakjp/css-color",
+  "version": "3.2.0",
+  "url": "https://registry.npmjs.org/@asamuzakjp/css-color/-/css-color-3.2.0.tgz",
+  "integrity": "sha512-K1A6z8tS3XsmCMM86xoWdn7Fkdn9m6RSVtocUrJYIwZnFVkng/PvkEoWtOWmP+Scc6saYWHWZYbndEEXxl24jw==",
+  "bytes": 387190,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

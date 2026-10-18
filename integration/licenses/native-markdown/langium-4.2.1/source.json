@@ -1,0 +1,13 @@
+{
+  "name": "langium",
+  "version": "4.2.1",
+  "url": "https://registry.npmjs.org/langium/-/langium-4.2.1.tgz",
+  "integrity": "sha512-zu9QWmjpzJcomzdJQAHgDVhLGq5bLosVak1KVa40NzQHXfqr4eAHupvnPOVXEoLkg6Ocefvf/93d//SB7du4YQ==",
+  "bytes": 640257,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

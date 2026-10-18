@@ -1,0 +1,13 @@
+{
+  "name": "delaunator",
+  "version": "5.0.1",
+  "url": "https://registry.npmjs.org/delaunator/-/delaunator-5.0.1.tgz",
+  "integrity": "sha512-8nvh+XBe96aCESrGOqMp/84b13H9cdKbG5P2ejQCh4d4sK9RL4371qou9drQjMhvnPmhWl5hnmqbEE0fXr9Xnw==",
+  "bytes": 12504,
+  "license": "ISC",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

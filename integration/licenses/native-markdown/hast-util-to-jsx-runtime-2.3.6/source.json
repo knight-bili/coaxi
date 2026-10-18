@@ -1,0 +1,13 @@
+{
+  "name": "hast-util-to-jsx-runtime",
+  "version": "2.3.6",
+  "url": "https://registry.npmjs.org/hast-util-to-jsx-runtime/-/hast-util-to-jsx-runtime-2.3.6.tgz",
+  "integrity": "sha512-zl6s8LwNyo1P9uw+XJGvZtdFF1GdAkOg8ujOw+4Pyb76874fLps4ueHXDhXWdk6YHQ6OgUtinliG7RsYvCbbBg==",
+  "bytes": 14718,
+  "license": "MIT",
+  "licenseFiles": [
+    "license"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

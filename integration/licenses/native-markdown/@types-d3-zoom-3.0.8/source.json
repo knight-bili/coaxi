@@ -1,0 +1,13 @@
+{
+  "name": "@types/d3-zoom",
+  "version": "3.0.8",
+  "url": "https://registry.npmjs.org/@types/d3-zoom/-/d3-zoom-3.0.8.tgz",
+  "integrity": "sha512-iqMC4/YlFCSlO8+2Ii1GGGliCAY4XdeG748w5vQUbevlbDu0zSjH/+jojorQVBK/se0j6DUFNPBGSqD3YWYnDw==",
+  "bytes": 8320,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

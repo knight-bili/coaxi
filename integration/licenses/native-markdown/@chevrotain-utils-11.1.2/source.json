@@ -1,0 +1,13 @@
+{
+  "name": "@chevrotain/utils",
+  "version": "11.1.2",
+  "url": "https://registry.npmjs.org/@chevrotain/utils/-/utils-11.1.2.tgz",
+  "integrity": "sha512-4mudFAQ6H+MqBTfqLmU7G1ZwRzCLfJEooL/fsF6rCX5eePMbGhoy5n4g+G4vlh2muDcsCTJtL+uKbOzWxs5LHA==",
+  "bytes": 6532,
+  "license": "Apache-2.0",
+  "licenseFiles": [
+    "LICENSE.txt"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

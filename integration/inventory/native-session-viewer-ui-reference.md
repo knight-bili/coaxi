@@ -86,3 +86,15 @@ Core User子列表直接驱动原主卡：当前attempt大于1才出现原恢复
 普通文本当前是原 Rovai SafeMarkdown/GFM，加原 Codeg 代码头/复制控件及原 visualize 解析；显式 HTML 标记自动展开、普通文件提及手动展开，流式隐式提及不抢先打开。HTML 采用原 Rovai PinnedFilePreview/HtmlPreviewSite，隔离域名与脚本操作、源码切换、收起已实际验证。完整原 Streamdown/math/mermaid/spec/交互卡引擎、完整原 HTML 控制与完整 App 同场景仍是本阶段必需项，不能以本批入口替代。
 
 定向12文件205项通过；原来就因 Windows 不支持冒号文件名而跳过的1项保留，未新增跳过。实际生产查看器34项行为通过并核对日/夜与390px窄屏，固定原组件采用相同图片/统计输入及声明宿主接缝运行；截图人工逐张检查容器贴合、原图比例、卡片与操作布局。此对照不是完整供体 App；真实 Core/IPC/Web Host/provider、生命周期/规模/内存恢复仍随集中候选补齐。[本批工程证据](../execution/i04-native-media-stats-result.json)记录资格边界及原失败检查。完整一期81簇48包324/I04四包21簇84保持，本批正式场景通过新增0。无新依赖、Rust构建、模型输入/HTTP schema/数据库变更、付费模型、push或Actions。
+
+## 原 Markdown 引擎接续（2026-10-19）
+
+现已用固定 Codeg 的完整 `MessageResponse` 及归一化闭包替换原生会话材料层的 SafeMarkdown 替身，保留完整流式/静态规则、CJK、代码字面量与高亮、数学懒加载、原 remark/rehype，以及原 Mermaid、spec 卡与七类图表组件。39份原模块/用例逐文件对比，只允许记录的导入/宿主接缝、主题选择器及两处有实测依据的修复，见[源码清单](native-content-ui-port.json)的 `markdownEngine`。助手正文才能启用 spec 本地内置状态；工具输出、思考和用户输入不成为交互卡。原 catalog 的 actions 为空，未移植 Skill 或提示词，模型输入与六份确认 r1 均不变。
+
+实际对照复现原版冷加载块公式出现而行内公式停留字面文本：Streamdown 2.2的容器 memo 不比较迟到的子树，只比较源位置与 className。宿主在原懒加载数学转换完成后，给含 KaTeX 的祖先加无样式修订 class；不改变节点类型/key、源位置或重挂整条消息。三项真实引擎回归覆盖冷公式、嵌套列表/表格和追加公式时保留卡片状态。Mermaid 原 Blob SVG 路径在 Chromium 的 HTML 标签栅格化中抛 DOMException；改用自包含 SVG data URL，保留完整 viewBox、标签和原3倍 PNG，MMD/SVG/PNG均实际保存并核对完整内容。
+
+样式补入固定原 globals.css 的行内代码、深色 Shiki、表格/列表和 Mermaid 规则，以现有 Rovai 主题令牌和原组件布局呈现；无全局 preflight。13份源引擎测试文件168项、11份相关文件184项通过，1项原Windows冒号文件名不适用跳过保持；类型检查通过。实际生产 Renderer 引擎21项及旧图片/统计/HTML回归34项通过，深/浅与1000/390视口8张组件对照和完整图示PNG人工检查。引用侧是固定原组件加声明的 Core 宿主接缝，尚不是完整供体 App；图表实际运行证据为 BarChart，不将七份组件代码称为七种真实运行验证。[本批证据](../execution/i04-native-markdown-engine-result.json)保留失败诊断和资格边界。
+
+新增依赖严格固定在供体 lock 所用版本（13生产、3开发），旧810个包版本与原 importer 保留，增加280个包节点。自审修复新增 peer 映射，并修复此前 ANSI 组件两条已断开的 React peer；旧809个快照完全不变，另1个只修上述两条边，所有810个快照仍保留。全部依赖引用闭合；独立最小清单目录用固定 pnpm11.20.0 通过离线、禁脚本、冻结 lockfile-only 检查和1090条 supply-chain 检查，YAML只格式归一，语义相等。这不代表全新完整安装/编译已完成。311个实际下载包逐个校验SRI，许可原文与来源保留；9个根许可遗漏补准确源码/包内原文，之前ANSI完整许可缺口仍待发布资格。
+
+完整原链接徽标/菜单/打开目标等业务操作当前仍接 Rovai 入口，完整原HTML控制、完整App同场景及真实Core/Native/Web授权/生命周期/规模恢复仍是有限剩余清单；当前不可标I04收口。原生浏览器租约归I07，DOM iframe接缝不冒称原生能力。下载采用实际Electron会话，剪贴板API为显式替身，不称系统剪贴板通过。完整81簇48包324/I04四包21簇84不减，本批正式场景新增0；无Rust构建、模型输入/HTTP schema/DB变更、付费、push、Actions或main合入。

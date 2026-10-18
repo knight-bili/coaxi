@@ -1,0 +1,13 @@
+{
+  "name": "@reduxjs/toolkit",
+  "version": "2.13.0",
+  "url": "https://registry.npmjs.org/@reduxjs/toolkit/-/toolkit-2.13.0.tgz",
+  "integrity": "sha512-f6jwVRfwW30+tnllz4YcsHHpPYYOE7abcHkyUCovD+P7DyhdAI5prz2Fh/8TLhakjpN+7aIEion1s5L/tvlYlA==",
+  "bytes": 1444642,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

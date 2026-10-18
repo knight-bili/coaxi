@@ -1,0 +1,13 @@
+{
+  "name": "@radix-ui/react-dialog",
+  "version": "1.1.17",
+  "url": "https://registry.npmjs.org/@radix-ui/react-dialog/-/react-dialog-1.1.17.tgz",
+  "integrity": "sha512-TDTYmpdq8dI2+Xgvgj9AJ8Ghqq+Eph/TRVEdaFQPDItIY+6QSkU7MJMeevw1568Yw/2Ijz8BTphPSP2XejKphw==",
+  "bytes": 13149,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

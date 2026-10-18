@@ -1,0 +1,13 @@
+{
+  "name": "@types/d3-force",
+  "version": "3.0.10",
+  "url": "https://registry.npmjs.org/@types/d3-force/-/d3-force-3.0.10.tgz",
+  "integrity": "sha512-ZYeSaCF3p73RdOKcjj+swRlZfnYpK1EbaDiYICEEp5Q6sUiqFaFQ9qgoshp5CzIyyb/yD09kD9o2zEltCexlgw==",
+  "bytes": 10124,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

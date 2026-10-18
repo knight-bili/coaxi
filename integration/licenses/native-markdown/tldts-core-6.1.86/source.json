@@ -1,0 +1,13 @@
+{
+  "name": "tldts-core",
+  "version": "6.1.86",
+  "url": "https://registry.npmjs.org/tldts-core/-/tldts-core-6.1.86.tgz",
+  "integrity": "sha512-Je6p7pkk+KMzMv2XXKmAE3McmolOQFdxkKw0R8EYNr7sELW46JqnNeTX8ybPiQgvg1ymCoF8LXs5fzFaZvJPTA==",
+  "bytes": 45526,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

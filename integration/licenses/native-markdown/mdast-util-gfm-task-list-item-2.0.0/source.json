@@ -1,0 +1,13 @@
+{
+  "name": "mdast-util-gfm-task-list-item",
+  "version": "2.0.0",
+  "url": "https://registry.npmjs.org/mdast-util-gfm-task-list-item/-/mdast-util-gfm-task-list-item-2.0.0.tgz",
+  "integrity": "sha512-IrtvNvjxC1o06taBAVJznEnkiHxLFTzgonUdy8hzFVeDun0uTjxxrRGVaNFqkU1wJR3RBPEfsxmU6jDWPofrTQ==",
+  "bytes": 5740,
+  "license": "MIT",
+  "licenseFiles": [
+    "license"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

@@ -1,0 +1,13 @@
+{
+  "name": "hast-util-from-parse5",
+  "version": "8.0.3",
+  "url": "https://registry.npmjs.org/hast-util-from-parse5/-/hast-util-from-parse5-8.0.3.tgz",
+  "integrity": "sha512-3kxEVkEKt0zvcZ3hCRYI8rqrgwtlIOFMWkbclACvjlDw8Li9S2hk/d51OI0nr/gIpdMHNepwgOKqZ/sy0Clpyg==",
+  "bytes": 8004,
+  "license": "MIT",
+  "licenseFiles": [
+    "license"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

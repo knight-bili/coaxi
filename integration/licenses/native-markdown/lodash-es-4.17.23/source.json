@@ -1,0 +1,13 @@
+{
+  "name": "lodash-es",
+  "version": "4.17.23",
+  "url": "https://registry.npmjs.org/lodash-es/-/lodash-es-4.17.23.tgz",
+  "integrity": "sha512-kVI48u3PZr38HdYz98UmfPnXl2DXrpdctLrFLCd3kOx1xUkOmpFPx7gCWWM5MPkL/fD8zb+Ph0QzjGFs4+hHWg==",
+  "bytes": 149733,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

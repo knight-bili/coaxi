@@ -1,0 +1,13 @@
+{
+  "name": "@radix-ui/react-context-menu",
+  "version": "2.3.1",
+  "url": "https://registry.npmjs.org/@radix-ui/react-context-menu/-/react-context-menu-2.3.1.tgz",
+  "integrity": "sha512-XbrxS68W5dyiE4fAb96yvJwSVU5x66B20A99sD5Mk3xSWK/LqeOnx6TZnim1KieMjXS/CTFq8reOAjWxas2G8Q==",
+  "bytes": 18375,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

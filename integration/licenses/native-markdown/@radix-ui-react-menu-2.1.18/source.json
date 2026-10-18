@@ -1,0 +1,13 @@
+{
+  "name": "@radix-ui/react-menu",
+  "version": "2.1.18",
+  "url": "https://registry.npmjs.org/@radix-ui/react-menu/-/react-menu-2.1.18.tgz",
+  "integrity": "sha512-lj8Rxjtn6zJq1oSbE/uDtAwCbB9BnxgHD+8MwJMuTh6u1dPamYhW9iuELr/Z8d0D/UysFblYYHeBPwi7T4k0YQ==",
+  "bytes": 51569,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

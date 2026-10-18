@@ -1,0 +1,13 @@
+{
+  "name": "@radix-ui/react-menubar",
+  "version": "1.1.18",
+  "url": "https://registry.npmjs.org/@radix-ui/react-menubar/-/react-menubar-1.1.18.tgz",
+  "integrity": "sha512-hX7EGx/oFq6DPY27GQuP/2wP48GHf5LG6r06VgNJlG+znmDS8OfopZcRcGly3L4lsB9FqpmLx6JQSE9P3BUpyw==",
+  "bytes": 25259,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

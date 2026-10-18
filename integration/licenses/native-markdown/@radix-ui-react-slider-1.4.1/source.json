@@ -1,0 +1,13 @@
+{
+  "name": "@radix-ui/react-slider",
+  "version": "1.4.1",
+  "url": "https://registry.npmjs.org/@radix-ui/react-slider/-/react-slider-1.4.1.tgz",
+  "integrity": "sha512-r91WSpQucNGFKAIxT8FT0H0zyjd5tJlqObLp7LOMV4z49KoDCwjy01w3vDOU4e1wxhF9IgjYco7SB6byOW7Buw==",
+  "bytes": 34771,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

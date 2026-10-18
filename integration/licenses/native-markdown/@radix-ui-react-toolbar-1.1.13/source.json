@@ -1,0 +1,13 @@
+{
+  "name": "@radix-ui/react-toolbar",
+  "version": "1.1.13",
+  "url": "https://registry.npmjs.org/@radix-ui/react-toolbar/-/react-toolbar-1.1.13.tgz",
+  "integrity": "sha512-Za1l4f6fzTkGgz/iynAMN8iaqiKff2wm2/QwiLmHPtDQreWEBrvSimgQFIekxMUdRPhILM7xdIXxuS/o/DGZag==",
+  "bytes": 7387,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@radix-ui/react-presence",
+  "version": "1.1.6",
+  "url": "https://registry.npmjs.org/@radix-ui/react-presence/-/react-presence-1.1.6.tgz",
+  "integrity": "sha512-zdTk4PlUO0E18HnZ3wYbW0KkJJxWCdiNYp6g6X1PtONFhxVkg01vliTJAmwIszU6mHiyBOoW9P0rAugl5/hULQ==",
+  "bytes": 9087,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

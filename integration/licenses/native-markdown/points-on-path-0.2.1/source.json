@@ -1,0 +1,13 @@
+{
+  "name": "points-on-path",
+  "version": "0.2.1",
+  "url": "https://registry.npmjs.org/points-on-path/-/points-on-path-0.2.1.tgz",
+  "integrity": "sha512-25ClnWWuw7JbWZcgqY/gJ4FQWadKxGWk+3kR/7kD0tCaDtPPMj7oHu2ToLaVhfpnHrZzYby2w6tUA0eOIuUg8g==",
+  "bytes": 3429,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

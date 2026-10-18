@@ -1,0 +1,13 @@
+{
+  "name": "@types/d3-geo",
+  "version": "3.1.0",
+  "url": "https://registry.npmjs.org/@types/d3-geo/-/d3-geo-3.1.0.tgz",
+  "integrity": "sha512-856sckF0oP/diXtS4jNsiQw/UuK5fQG8l/a9VVLeSouf1/PPbBE1i1W852zVwKwYCBkFJJB7nCFTbk6UMEXBOQ==",
+  "bytes": 13678,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

@@ -1,0 +1,13 @@
+{
+  "name": "shiki",
+  "version": "3.22.0",
+  "url": "https://registry.npmjs.org/shiki/-/shiki-3.22.0.tgz",
+  "integrity": "sha512-LBnhsoYEe0Eou4e1VgJACes+O6S6QC0w71fCSp5Oya79inkwkm15gQ1UF6VtQ8j/taMDh79hAB49WUk8ALQW3g==",
+  "bytes": 189491,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

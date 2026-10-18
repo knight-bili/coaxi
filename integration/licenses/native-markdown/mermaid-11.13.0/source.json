@@ -1,0 +1,13 @@
+{
+  "name": "mermaid",
+  "version": "11.13.0",
+  "url": "https://registry.npmjs.org/mermaid/-/mermaid-11.13.0.tgz",
+  "integrity": "sha512-fEnci+Immw6lKMFI8sqzjlATTyjLkRa6axrEgLV2yHTfv8r+h1wjFbV6xeRtd4rUV1cS4EpR9rwp3Rci7TRWDw==",
+  "bytes": 15377401,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

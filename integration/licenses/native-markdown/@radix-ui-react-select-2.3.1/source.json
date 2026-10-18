@@ -1,0 +1,13 @@
+{
+  "name": "@radix-ui/react-select",
+  "version": "2.3.1",
+  "url": "https://registry.npmjs.org/@radix-ui/react-select/-/react-select-2.3.1.tgz",
+  "integrity": "sha512-w6eDvY78LE9ZUiNnXCA1QVK8RYN7k9galFv09kjVydJqBAgHd7Y9A6h0UJ/6DCZNGZMZrB2ohcSW1Bo9d8+wWA==",
+  "bytes": 73876,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

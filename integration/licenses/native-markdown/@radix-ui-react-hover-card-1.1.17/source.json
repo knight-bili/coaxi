@@ -1,0 +1,13 @@
+{
+  "name": "@radix-ui/react-hover-card",
+  "version": "1.1.17",
+  "url": "https://registry.npmjs.org/@radix-ui/react-hover-card/-/react-hover-card-1.1.17.tgz",
+  "integrity": "sha512-GjZQIEANVkuuWeztlKz6QEHe31ZX2iDfHzcTMCQVZXC0JyQrgfKWSC+LOOEw6aVV64zyjzobIzSA4AU4eKWrHA==",
+  "bytes": 11761,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

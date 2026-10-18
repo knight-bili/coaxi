@@ -1,0 +1,13 @@
+{
+  "name": "@radix-ui/react-form",
+  "version": "0.1.10",
+  "url": "https://registry.npmjs.org/@radix-ui/react-form/-/react-form-0.1.10.tgz",
+  "integrity": "sha512-1NfuvctVtX4sU3Mmq/IdrR8UunxiCMiVg3A5UENKhFzxUBeOyaQQ+lmaQaV7Tc8cqvBKsJL3/KGBsixK0D8WFg==",
+  "bytes": 25521,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

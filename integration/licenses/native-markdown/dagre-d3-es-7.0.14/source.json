@@ -1,0 +1,13 @@
+{
+  "name": "dagre-d3-es",
+  "version": "7.0.14",
+  "url": "https://registry.npmjs.org/dagre-d3-es/-/dagre-d3-es-7.0.14.tgz",
+  "integrity": "sha512-P4rFMVq9ESWqmOgK+dlXvOtLwYg0i7u0HBGJER0LZDJT2VHIPAMZ/riPxqJceWMStH5+E61QxFra9kIS3AqdMg==",
+  "bytes": 64093,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE.md"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

@@ -1,0 +1,13 @@
+{
+  "name": "stylis",
+  "version": "4.3.6",
+  "url": "https://registry.npmjs.org/stylis/-/stylis-4.3.6.tgz",
+  "integrity": "sha512-yQ3rwFWRfwNUY7H5vpU0wfdkNSnvnJinhF9830Swlaxl03zsOjCfmX0ugac+3LtK0lYSgwL/KXc8oYL3mG4YFQ==",
+  "bytes": 41641,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

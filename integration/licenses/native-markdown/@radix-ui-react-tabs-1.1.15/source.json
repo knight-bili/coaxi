@@ -1,0 +1,13 @@
+{
+  "name": "@radix-ui/react-tabs",
+  "version": "1.1.15",
+  "url": "https://registry.npmjs.org/@radix-ui/react-tabs/-/react-tabs-1.1.15.tgz",
+  "integrity": "sha512-kxc9gI6/HfcU4nfMMVS3AmQK414kbU1IE6UCJmMmxjhO3cRPXOyYnmvyKD+ODt7q56nRq9l7Wovi6uaGwKgMlg==",
+  "bytes": 8688,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

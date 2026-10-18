@@ -1,0 +1,13 @@
+{
+  "name": "roughjs",
+  "version": "4.6.6",
+  "url": "https://registry.npmjs.org/roughjs/-/roughjs-4.6.6.tgz",
+  "integrity": "sha512-ZUz/69+SYpFN/g/lUlo2FXcIjRkSu3nDarreVdGGndHEBJ6cXPdKguS8JGxwj5HA5xIbVKSmLgr5b3AWxtRfvQ==",
+  "bytes": 32624,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

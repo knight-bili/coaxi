@@ -1,0 +1,13 @@
+{
+  "name": "nwsapi",
+  "version": "2.2.23",
+  "url": "https://registry.npmjs.org/nwsapi/-/nwsapi-2.2.23.tgz",
+  "integrity": "sha512-7wfH4sLbt4M0gCDzGE6vzQBo0bfTKjU7Sfpqy/7gs1qBfYz2vEJH6vXcBKpO3+6Yu1telwd0t9HpyOoLEQQbIQ==",
+  "bytes": 21605,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

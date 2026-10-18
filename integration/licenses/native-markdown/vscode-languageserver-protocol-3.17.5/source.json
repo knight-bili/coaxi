@@ -1,0 +1,13 @@
+{
+  "name": "vscode-languageserver-protocol",
+  "version": "3.17.5",
+  "url": "https://registry.npmjs.org/vscode-languageserver-protocol/-/vscode-languageserver-protocol-3.17.5.tgz",
+  "integrity": "sha512-mb1bvRJN8SVznADSGWM9u/b07H7Ecg0I3OgXDuLdn307rl/J3A9YD6/eYOssqhecL27hK1IPZAsaqh00i/Jljg==",
+  "bytes": 59008,
+  "license": "MIT",
+  "licenseFiles": [
+    "License.txt"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

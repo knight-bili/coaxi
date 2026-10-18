@@ -1,0 +1,13 @@
+{
+  "name": "remend",
+  "version": "1.2.0",
+  "url": "https://registry.npmjs.org/remend/-/remend-1.2.0.tgz",
+  "integrity": "sha512-NbKrdWweTRuByPYErzQCNpNtsR9M1QQ0hK2UzmnmlSaEqHnkQ5Korlyi8KpdbOJ0rImJfRy4EAY0uDxYnL9Plw==",
+  "bytes": 7713,
+  "license": "Apache-2.0",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

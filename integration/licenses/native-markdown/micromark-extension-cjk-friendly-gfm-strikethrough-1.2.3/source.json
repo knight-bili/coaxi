@@ -1,0 +1,13 @@
+{
+  "name": "micromark-extension-cjk-friendly-gfm-strikethrough",
+  "version": "1.2.3",
+  "url": "https://registry.npmjs.org/micromark-extension-cjk-friendly-gfm-strikethrough/-/micromark-extension-cjk-friendly-gfm-strikethrough-1.2.3.tgz",
+  "integrity": "sha512-gSPnxgHDDqXYOBvQRq6lerrq9mjDhdtKn+7XETuXjxWcL62yZEfUdA28Ml1I2vDIPfAOIKLa0h2XDSGkInGHFQ==",
+  "bytes": 7344,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

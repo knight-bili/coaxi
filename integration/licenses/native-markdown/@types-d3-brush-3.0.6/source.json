@@ -1,0 +1,13 @@
+{
+  "name": "@types/d3-brush",
+  "version": "3.0.6",
+  "url": "https://registry.npmjs.org/@types/d3-brush/-/d3-brush-3.0.6.tgz",
+  "integrity": "sha512-nH60IZNNxEcrh6L1ZSMNA28rj27ut/2ZmI3r96Zd+1jrZD++zD3LsMIjWlvg4AYrHn/Pqz4CF3veCxGjtbqt7A==",
+  "bytes": 4498,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

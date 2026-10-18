@@ -1,0 +1,13 @@
+{
+  "name": "d3-dsv",
+  "version": "3.0.1",
+  "url": "https://registry.npmjs.org/d3-dsv/-/d3-dsv-3.0.1.tgz",
+  "integrity": "sha512-UG6OvdI5afDIFP9w4G0mNq50dSOsXHJaRE8arAS5o9ApWnIElp8GZw1Dun8vP8OyHOZ/QJUKUJwxiiCCnUwm+Q==",
+  "bytes": 12063,
+  "license": "ISC",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

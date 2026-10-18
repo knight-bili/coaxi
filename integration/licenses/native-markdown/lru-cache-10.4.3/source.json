@@ -1,0 +1,13 @@
+{
+  "name": "lru-cache",
+  "version": "10.4.3",
+  "url": "https://registry.npmjs.org/lru-cache/-/lru-cache-10.4.3.tgz",
+  "integrity": "sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==",
+  "bytes": 181128,
+  "license": "ISC",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

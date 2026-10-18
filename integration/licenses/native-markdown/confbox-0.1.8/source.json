@@ -1,0 +1,13 @@
+{
+  "name": "confbox",
+  "version": "0.1.8",
+  "url": "https://registry.npmjs.org/confbox/-/confbox-0.1.8.tgz",
+  "integrity": "sha512-RMtmw0iFkeR4YV+fUOSucriAQNb9g8zFR52MWCtl+cCZOFRNL6zeB395vPzFhEjjn4fMxXudmELnl/KF/WrK6w==",
+  "bytes": 73509,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

@@ -1,0 +1,20 @@
+{
+  "name": "rehype-katex",
+  "version": "7.0.1",
+  "url": "https://registry.npmjs.org/rehype-katex/-/rehype-katex-7.0.1.tgz",
+  "integrity": "sha512-OiM2wrZ/wuhKkigASodFoo8wimG3H12LWQaH8qSPVJn9apWKFSH3YOCtbKpBorTVw/eI7cuT21XBbvwEswbIOA==",
+  "bytes": 5863,
+  "license": "MIT",
+  "licenseFiles": [],
+  "licenseGap": false,
+  "noLifecycleScripts": true,
+  "additionalLicenseEvidence": [
+    {
+      "url": "https://raw.githubusercontent.com/remarkjs/remark-math/88a9497e1ede93b958237c85edbf5651faeca7af/license",
+      "gitHead": "88a9497e1ede93b958237c85edbf5651faeca7af",
+      "versionTag": null,
+      "path": "license",
+      "sha256": "cb992262f361a5359e6771c28740d33c7041e15332ae8537fae40538992591a9"
+    }
+  ]
+}

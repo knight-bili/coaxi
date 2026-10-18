@@ -1,0 +1,13 @@
+{
+  "name": "@types/d3-shape",
+  "version": "3.1.8",
+  "url": "https://registry.npmjs.org/@types/d3-shape/-/d3-shape-3.1.8.tgz",
+  "integrity": "sha512-lae0iWfcDeR7qt7rA88BNiqdvPS5pFVPpo5OfjElwNaT2yyekbM0C9vK+yqBqEmHr6lDkRnYNoTBYlAgJa7a4w==",
+  "bytes": 17761,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

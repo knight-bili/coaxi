@@ -1,0 +1,13 @@
+{
+  "name": "@radix-ui/react-portal",
+  "version": "1.1.12",
+  "url": "https://registry.npmjs.org/@radix-ui/react-portal/-/react-portal-1.1.12.tgz",
+  "integrity": "sha512-m309havGzsjLHHaIX50G5PlvRs3xkgPCsGk/5PTvYm8D5q33yG0J7w/712PTOhid7NTaFETtnSXjngHQavvhVw==",
+  "bytes": 3531,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

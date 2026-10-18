@@ -1,0 +1,13 @@
+{
+  "name": "tr46",
+  "version": "5.1.1",
+  "url": "https://registry.npmjs.org/tr46/-/tr46-5.1.1.tgz",
+  "integrity": "sha512-hdF5ZgjTqgAntKkklYw0R03MG2x/bSzTtkxmIRw/sTNV8YXsCJ1tfLAX23lhxhHJlEf3CRCOCGGWw3vI3GaSPw==",
+  "bytes": 64015,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE.md"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

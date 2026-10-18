@@ -1,0 +1,13 @@
+{
+  "name": "@types/d3-selection",
+  "version": "3.0.11",
+  "url": "https://registry.npmjs.org/@types/d3-selection/-/d3-selection-3.0.11.tgz",
+  "integrity": "sha512-bhAXu23DJWsrI45xafYpkQ4NtcKMwWnAC/vKrd2l+nxMFuvOT3XMYTIj2opv8vq8AO5Yh7Qac/nSeP/3zjTK0w==",
+  "bytes": 12691,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

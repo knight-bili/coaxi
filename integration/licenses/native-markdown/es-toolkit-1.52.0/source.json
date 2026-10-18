@@ -1,0 +1,14 @@
+{
+  "name": "es-toolkit",
+  "version": "1.52.0",
+  "url": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.52.0.tgz",
+  "integrity": "sha512-XTNEJQh1tY1ZJVcf6ayP/2n4ZPyaHlW2FWs7xvw5ddPuhUVjLD3olQVQS7kf58JbAB48iL0uL/jerTrjtV3lDA==",
+  "bytes": 515327,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE",
+    "NOTICE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

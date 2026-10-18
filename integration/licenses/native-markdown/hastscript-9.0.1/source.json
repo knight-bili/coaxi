@@ -1,0 +1,13 @@
+{
+  "name": "hastscript",
+  "version": "9.0.1",
+  "url": "https://registry.npmjs.org/hastscript/-/hastscript-9.0.1.tgz",
+  "integrity": "sha512-g7df9rMFX/SPi34tyGCyUBREQoKkapwdY/T04Qn9TDWfHhAYt4/I0gMVirzK5wEzeUqIjEB+LXC/ypb7Aqno5w==",
+  "bytes": 12725,
+  "license": "MIT",
+  "licenseFiles": [
+    "license"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

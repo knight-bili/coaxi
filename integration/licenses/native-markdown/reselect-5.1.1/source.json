@@ -1,0 +1,13 @@
+{
+  "name": "reselect",
+  "version": "5.1.1",
+  "url": "https://registry.npmjs.org/reselect/-/reselect-5.1.1.tgz",
+  "integrity": "sha512-K/BG6eIky/SBpzfHZv/dd+9JBFiS4SWV7FIujVyJRux6e45+73RaUHXLmIR1f7WOMaQ0U1km6qwklRQxpJJY0w==",
+  "bytes": 133635,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

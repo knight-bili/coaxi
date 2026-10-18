@@ -1,0 +1,17 @@
+{
+  "name": "is-potential-custom-element-name",
+  "version": "1.0.1",
+  "url": "https://registry.npmjs.org/is-potential-custom-element-name/-/is-potential-custom-element-name-1.0.1.tgz",
+  "integrity": "sha512-bCYeRA2rVibKZd+s2625gGnGF/t7DSqDs4dP7CrLA1m7jKWz6pps0LpYLJN8Q64HtmPKJ1hrN3nzPNKFEKOUiQ==",
+  "bytes": 1905,
+  "license": "MIT",
+  "licenseFiles": [],
+  "licenseGap": false,
+  "noLifecycleScripts": true,
+  "additionalLicenseEvidence": [
+    {
+      "packagePath": "LICENSE-MIT.txt",
+      "sha256": "483acb265f182907d1caf6cff9c16c96f31325ed23792832cc5d8b12d5f88c8a"
+    }
+  ]
+}

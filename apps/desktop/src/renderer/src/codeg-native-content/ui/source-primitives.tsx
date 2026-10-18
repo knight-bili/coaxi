@@ -5,6 +5,7 @@ import { createContext, useContext, type ElementType, type ReactNode } from 'rea
 import { SafeMarkdown } from '../../SafeMarkdown'
 import { useInterfaceLanguage } from '../../interface-language'
 import { twMerge } from 'tailwind-merge'
+import { cx } from 'class-variance-authority'
 import { formatSourceCopy } from './source-translations'
 export { Collapsible, CollapsibleTrigger, CollapsibleContent } from '../components/ui/instant-collapsible'
 export { copyTextToClipboard } from './source-clipboard'
@@ -12,7 +13,7 @@ export { Badge } from '../components/ui/badge'
 export { ScrollArea } from '../components/ui/scroll-area'
 export const SourceMarkdownRenderer = createContext<((text: string, streaming: boolean) => ReactNode) | null>(null)
 
-export function cn(...values: Array<string | false | null | undefined>): string { return twMerge(values.filter(Boolean).join(' ')) }
+export function cn(...values: Parameters<typeof cx>): string { return twMerge(cx(...values)) }
 export function useTranslations(scope: string): (key: string, values?: Record<string, unknown>) => string {
   const language = useInterfaceLanguage()
   return (key, values) => formatSourceCopy(language, scope, key, values)

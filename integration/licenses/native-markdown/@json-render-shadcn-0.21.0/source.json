@@ -1,0 +1,13 @@
+{
+  "name": "@json-render/shadcn",
+  "version": "0.21.0",
+  "url": "https://registry.npmjs.org/@json-render/shadcn/-/shadcn-0.21.0.tgz",
+  "integrity": "sha512-EfrRBsuvzRS6f2N4natyjBDSe/ijsiTO+Cs2uxsw2vgVYwW78gqqe/h0cSMpgXwx9T68sxMW2z4U9Cu+mpQ/lg==",
+  "bytes": 105113,
+  "license": "Apache-2.0",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

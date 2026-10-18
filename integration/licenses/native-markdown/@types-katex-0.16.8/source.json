@@ -1,0 +1,13 @@
+{
+  "name": "@types/katex",
+  "version": "0.16.8",
+  "url": "https://registry.npmjs.org/@types/katex/-/katex-0.16.8.tgz",
+  "integrity": "sha512-trgaNyfU+Xh2Tc+ABIb44a5AYUpicB3uwirOioeOkNPPbmgRNtcWyDeeFRzjPZENO9Vq8gvVqfhaaXWLlevVwg==",
+  "bytes": 3815,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

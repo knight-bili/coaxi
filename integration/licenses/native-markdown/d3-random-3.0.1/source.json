@@ -1,0 +1,13 @@
+{
+  "name": "d3-random",
+  "version": "3.0.1",
+  "url": "https://registry.npmjs.org/d3-random/-/d3-random-3.0.1.tgz",
+  "integrity": "sha512-FXMe9GfxTxqd5D6jFsQ+DJ8BJS4E/fT5mqqdjovykEB2oFbTMDVdg1MGFxfQW+FBOGoB++k8swBrgwSHT1cUXQ==",
+  "bytes": 8791,
+  "license": "ISC",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

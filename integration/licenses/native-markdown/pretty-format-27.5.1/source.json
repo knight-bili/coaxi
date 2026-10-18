@@ -1,0 +1,13 @@
+{
+  "name": "pretty-format",
+  "version": "27.5.1",
+  "url": "https://registry.npmjs.org/pretty-format/-/pretty-format-27.5.1.tgz",
+  "integrity": "sha512-Qb1gy5OrP5+zDf2Bvnzdl3jsTf1qXVMazbvCoKhtKqVs4/YK4ozX4gKQJJVyNe+cajNPn0KoC0MC3FUmaHWEmQ==",
+  "bytes": 15790,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

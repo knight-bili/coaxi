@@ -1,0 +1,13 @@
+{
+  "name": "@radix-ui/react-context",
+  "version": "1.1.4",
+  "url": "https://registry.npmjs.org/@radix-ui/react-context/-/react-context-1.1.4.tgz",
+  "integrity": "sha512-QwH4PO5urrbO+FaGd5Aglg+YJgWTyyuZ3g/6mKvsqraLkglDdckw9JafgL5McL5VEJ6EPNduPaT3ZE9BttDAqg==",
+  "bytes": 5258,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

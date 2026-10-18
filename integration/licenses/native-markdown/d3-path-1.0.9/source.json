@@ -1,0 +1,13 @@
+{
+  "name": "d3-path",
+  "version": "1.0.9",
+  "url": "https://registry.npmjs.org/d3-path/-/d3-path-1.0.9.tgz",
+  "integrity": "sha512-VLaYcn81dtHVTjEHd8B+pbe9yHWpXKZUC87PzoFmsFrJqgFwDe/qxfp5MlfsfM1V5E/iVt0MmEbWQ7FVIXh/bg==",
+  "bytes": 5697,
+  "license": "BSD-3-Clause",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@radix-ui/react-radio-group",
+  "version": "1.4.1",
+  "url": "https://registry.npmjs.org/@radix-ui/react-radio-group/-/react-radio-group-1.4.1.tgz",
+  "integrity": "sha512-/SSxZdKEo2Eo29FFRKd06EfFDYp8HryKg0WYg7QLXaydPzl52YfSvCH2a3QDBRdtcuwACroJT8UVjQVgOJ7P9A==",
+  "bytes": 15672,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

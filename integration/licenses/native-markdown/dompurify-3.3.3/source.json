@@ -1,0 +1,13 @@
+{
+  "name": "dompurify",
+  "version": "3.3.3",
+  "url": "https://registry.npmjs.org/dompurify/-/dompurify-3.3.3.tgz",
+  "integrity": "sha512-Oj6pzI2+RqBfFG+qOaOLbFXLQ90ARpcGG6UePL82bJLtdsa6CYJD7nmiU8MW9nQNOtCHV3lZ/Bzq1X0QYbBZCA==",
+  "bytes": 214125,
+  "license": "(MPL-2.0 OR Apache-2.0)",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

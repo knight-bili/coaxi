@@ -1,0 +1,13 @@
+{
+  "name": "rrweb-cssom",
+  "version": "0.7.1",
+  "url": "https://registry.npmjs.org/rrweb-cssom/-/rrweb-cssom-0.7.1.tgz",
+  "integrity": "sha512-TrEMa7JGdVm0UThDJSx7ddw5nVm3UJS9o9CCIZ72B1vSyEZoziDqBYP3XIoi/12lKrJR8rE3jeFHMok2F/Mnsg==",
+  "bytes": 20038,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE.txt"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

@@ -1,0 +1,13 @@
+{
+  "name": "decimal.js-light",
+  "version": "2.5.1",
+  "url": "https://registry.npmjs.org/decimal.js-light/-/decimal.js-light-2.5.1.tgz",
+  "integrity": "sha512-qIMFpTMZmny+MMIitAB6D7iVPEorVw6YQRWkvarTkT4tBeSLLiHzcwj6q0MmYSFCiVpiqPJTJEYIrpcPzVEIvg==",
+  "bytes": 57282,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENCE.md"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

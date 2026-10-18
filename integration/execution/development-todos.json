@@ -152,7 +152,22 @@
       "status": "media_stats_and_scoped_materials_local_verified_full_engine_and_candidate_pending",
       "problem": "原用户图/生成图/完整图预览与统计复用固定Codeg；Core精确readId读取与原Rovai图片菜单、HTML服务已接。修复父窗Esc、模块循环和临时来源不能restore的问题；原生自动预览禁止系统启动/新根授权。",
       "evidence": "i04-native-media-stats-result.json",
-      "remaining": "完整原Streamdown/math/mermaid/spec/动态卡、完整原HTML控制及完整App同场景、真实Core/Native/Web与生命周期规模恢复仍待。205项定向测试/34项Renderer属于分项本地工程，不增加84正式场景通过数，不要求客户技术验收。"
+      "remaining": "原完整Markdown引擎已接并回归；原链接业务操作/完整HTML控制、完整App和真实Core/Native/Web生命周期规模恢复仍待，见i04-native-markdown-engine-result.json。"
+    },
+    {
+      "id": "DEV-NATIVE-MARKDOWN-ENGINE",
+      "task": "I04-T01/I12",
+      "owner": "研发",
+      "status": "local_engineering_verified_source_link_html_and_candidate_pending",
+      "problem": "原完整MessageResponse闭包及39份原模块/用例移植；修复实际原版冷公式memo和Chromium PNG导出，保留图表/spec本地状态、流式/静态字节及原图片HTML功能。",
+      "evidence": "i04-native-markdown-engine-result.json",
+      "remaining": [
+        "原Codeg MarkdownLink文件徽标/上下文菜单/打开目标等完整操作与宿主路由衔接；当前沿Rovai原文件/HTTPS入口，不冒称完整原链接组件",
+        "完整原HTML控制与完整供体App同场景运行对照；已有原生HTML入口和实际隔离HTML服务回归通过",
+        "真实Core/Native/Web集中候选、授权/生命周期/长历史/规模/内存恢复；七种原图表代码已保留，实际本批图表运行验证为BarChart",
+        "I04其他parser/home关联、Runtime并集、恢复、记忆、自动化；此前ANSI完整许可文件缺口仍归发布资格"
+      ],
+      "qualification": "352定向测试/55实际Renderer检查为本地分项；不增加I04的84正式场景通过数，不要求客户技术验收。"
     }
   ]
 }

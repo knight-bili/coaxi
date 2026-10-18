@@ -1,0 +1,13 @@
+{
+  "name": "react-redux",
+  "version": "9.3.0",
+  "url": "https://registry.npmjs.org/react-redux/-/react-redux-9.3.0.tgz",
+  "integrity": "sha512-KQopgqFo/p/fgmAs5qz6p5RWaNAzq40WAu7fJIXnQpYxFPbJYtsJPWvGeF2rOBaY/kEuV77AVsX8TsQzKm+A/g==",
+  "bytes": 191692,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE.md"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

@@ -1,0 +1,13 @@
+{
+  "name": "commander",
+  "version": "8.3.0",
+  "url": "https://registry.npmjs.org/commander/-/commander-8.3.0.tgz",
+  "integrity": "sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==",
+  "bytes": 39361,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

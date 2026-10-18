@@ -1,0 +1,13 @@
+{
+  "name": "d3-array",
+  "version": "3.2.4",
+  "url": "https://registry.npmjs.org/d3-array/-/d3-array-3.2.4.tgz",
+  "integrity": "sha512-tdQAmyA18i4J7wprpYq8ClcxZy3SC31QMeByyCFyRt7BVHdREQZ5lpzoe5mFEYZUWe+oq8HBvk9JjpibyEV4Jg==",
+  "bytes": 38377,
+  "license": "ISC",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

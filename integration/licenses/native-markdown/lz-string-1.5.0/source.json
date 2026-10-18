@@ -1,0 +1,13 @@
+{
+  "name": "lz-string",
+  "version": "1.5.0",
+  "url": "https://registry.npmjs.org/lz-string/-/lz-string-1.5.0.tgz",
+  "integrity": "sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==",
+  "bytes": 36908,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

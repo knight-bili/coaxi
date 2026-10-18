@@ -850,9 +850,565 @@
     "dependenciesChanged": false,
     "qualification": "actual native viewer and fixed original component references under declared host seams; synthetic ThreadClient/FilePreviewApi plus actual isolated HTML service; not full original App or Core/IPC/Web Host/provider qualification",
     "remaining": [
-      "full original Streamdown/math/mermaid/spec/interactive-card engine",
-      "complete source HTML controls and full original App scene parity",
-      "actual Core/Native/Web candidate, lifecycle/scale/memory/recovery and other I04 packages"
+      "原Codeg MarkdownLink文件徽标/上下文菜单/打开目标等完整操作与宿主路由衔接；当前沿Rovai原文件/HTTPS入口，不冒称完整原链接组件",
+      "完整原HTML控制与完整供体App同场景运行对照；已有原生HTML入口和实际隔离HTML服务回归通过",
+      "真实Core/Native/Web集中候选、授权/生命周期/长历史/规模/内存恢复；七种原图表代码已保留，实际本批图表运行验证为BarChart",
+      "I04其他parser/home关联、Runtime并集、恢复、记忆、自动化；此前ANSI完整许可文件缺口仍归发布资格"
+    ]
+  },
+  "markdownEngine": {
+    "sourceCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+    "baseline": "09739b481a940c28c99441640449d9f088a4a712",
+    "files": [
+      {
+        "source": "src/components/ai-elements/markdown-mask.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/markdown-mask.ts",
+        "sourceSha256": "e7d3e54697645b0005aca1a4d51e07d057eaa188c53ebb2751ed32ffb8c8e9a4",
+        "portedSha256": "b6799c1b33ee2ad6e6a6b15e73dfa285f6b74b055741ecbb44de56ffe19d1129",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/ai-elements/remark-cjk-autolink-tail.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-cjk-autolink-tail.ts",
+        "sourceSha256": "97929cf8fd4bb7ccdc1c09be614457d579efadf426082082cd5255d4edddf76d",
+        "portedSha256": "4f1edfc89b4f63afad5e351a00f4e26fdf9540d1b0302181479ef46bd0b5d178",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/ai-elements/remark-file-uri-links.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-file-uri-links.ts",
+        "sourceSha256": "1e8997a2525e1a9ab4cfac6e776cc39da691a8fc8f03f7aead7dd89253ee2184",
+        "portedSha256": "e076c3e46b6ee10040e8467d07e44ee43093c4d540a22dd9c36c3af5852eb4e0",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/ai-elements/remark-windows-paths.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-windows-paths.ts",
+        "sourceSha256": "260b2f4dd86e699807db9f32a34886d2dba07c23b967228cf0b7645c70e82336",
+        "portedSha256": "ed1199d66d2ac50ab8761ca2c1cd4ad936b0628dda29b4fca3e2890f6073d816",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/ai-elements/remark-local-images.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-local-images.ts",
+        "sourceSha256": "905ba3da3d5dc3792419f7a5f4efefd8a62ae352ae70b7fcacdfab245916264b",
+        "portedSha256": "f46ee73c2ab357cb4ae4ec440e43b05271048ac7e9f48771eed569fe100665a1",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/ai-elements/rehype-allow-codeg.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/rehype-allow-codeg.ts",
+        "sourceSha256": "6836aea2de95984257e09b44e5519311759d899c0c63ce2aef667b80ed6bb38e",
+        "portedSha256": "a3f12597ddcfc2662d9e2f668805d13dc4220d3c340a11ef1e67a7f581a05f4a",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/ai-elements/rehype-relative-file-links.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/rehype-relative-file-links.ts",
+        "sourceSha256": "39e5ca3927df8744ce73666847cf73cb3fefe5b74de0b553095be8a3d2c63049",
+        "portedSha256": "8c653b11a191a54571b16df2e012d796027327c6f29af9b5a92293ee9ba5c164",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/ai-elements/streamdown-plugins.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/streamdown-plugins.ts",
+        "sourceSha256": "09c974ac22203e589af8e0410a5f5534d6e25df31c8a1ad4d75c09e5911c5244",
+        "portedSha256": "f0b66d900ed22b855709a8c939ad53c9b9cc75b8bf15f369e61c640849b05b1a",
+        "extraction": null,
+        "bodyChanges": [
+          "original lazy math plugin wrapped with inert HAST container class revision; fixes original same-position memo ignoring updated children, retains UI state"
+        ]
+      },
+      {
+        "source": "src/components/ai-elements/mermaid-view.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/mermaid-view.ts",
+        "sourceSha256": "03957f93080d2aaee86cda58756397113a85192bfc291be6cbbacc3616335016",
+        "portedSha256": "5cdb8d32673bad8c1f65c22f799fa5c04bf96fde340451f6b67fcfc52190c21f",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/ai-elements/json-render-pre.tsx",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/json-render-pre.tsx",
+        "sourceSha256": "4fae70b3c008f292a4ac7fe3578f9e92b7b0e816870416daf934976c2a29857c",
+        "portedSha256": "51114f767ac97d3f0a53e8fce411a9076967898ab89369d55bf472bee11faa58",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/ai-elements/mermaid-block.tsx",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/mermaid-block.tsx",
+        "sourceSha256": "d2fb3510464651b2b0a57c1e240b73f3c53662d35d8b143e222ff4ca3b43aad1",
+        "portedSha256": "33b072e1e5ca05b84682693ab89d22c5dcd59b4920e423a8592f1e91738f25e0",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/message/json-render-block.tsx",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/json-render-block.tsx",
+        "sourceSha256": "ed7ccdd7d1d613f2e25723447800be805773ca87967a84e24dda9005d12e710a",
+        "portedSha256": "0dc587b39f137d2e297a8f90aa6061c3fd713b21e3059c919ffa7b01fd9f0365",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/message/json-render-charts.tsx",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/json-render-charts.tsx",
+        "sourceSha256": "3443e02389e53471c2074eb273c9d05a5e7ef4e1c63b7540a59f86ef2b0b85d5",
+        "portedSha256": "fcc9c2dd2bdec228e078e3d38fbd756796fbabe96f945744487fdf5f24ce03be",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/ui/button.tsx",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/button.tsx",
+        "sourceSha256": "704cbe3b92f902b0b9b14c4c0852b29b102969d0d242cbc0295f6936748042c5",
+        "portedSha256": "17dd5ec5fb08747676b892191b0be7155f9f05d64e4e113f36840f326b066bda",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/ui/dialog.tsx",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/dialog.tsx",
+        "sourceSha256": "6577d31e246d646acbd7323d0524a6ca4d7aa257bce93d94d741cd8fa0d72a42",
+        "portedSha256": "1ae8ed6bd5a3907a47810c92432c853cab30119d484c0f1217656be4c8b4fc6b",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/ui/dropdown-menu.tsx",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/dropdown-menu.tsx",
+        "sourceSha256": "e6f14b7623f50c4bf42e98d886916a38042d9055676766d854a72df5c408c995",
+        "portedSha256": "04508995f1a0b92b74e360c47ce8b6e782679dc9b9a85ff26a39156a09985b87",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/ui/overlay-portal-container.tsx",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/overlay-portal-container.tsx",
+        "sourceSha256": "e3956775c458d478bacd78aef8849f43a8bf955080efa807d7bf3d48a12caa55",
+        "portedSha256": "c2cba79b60004422caa72b09874de6b619d0cb108efe51688ef33b195f4e7683",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/ui/chart.tsx",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/chart.tsx",
+        "sourceSha256": "03639ebf3196101417ff8cea5e7d04de32b0af09c3c4ecfc4997d5d7a9ef1002",
+        "portedSha256": "70c6bf8cf8f64ed8b8332471204b808062a70e8f044986b88c1062d6c9a6f87d",
+        "extraction": null,
+        "bodyChanges": [
+          "theme selector matches original Rovai data-theme"
+        ]
+      },
+      {
+        "source": "src/components/ui/skeleton.tsx",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/skeleton.tsx",
+        "sourceSha256": "5983a7f85ec4d194bc66c6c5e2516bd082276411120821169c35e055e8e1df9a",
+        "portedSha256": "ac93b18ba16ffe901f35e53594c29c468ae687769ddf2dcce1cfc5af3fab68e4",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/hooks/use-nested-layer-dismiss-guard.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/hooks/use-nested-layer-dismiss-guard.ts",
+        "sourceSha256": "f253f1ba2519ba1439b1265c5d7384eaf678df5e3853fb9a375c969b08d9409a",
+        "portedSha256": "61dd487b5213a2010a3300a9a4239f58ab2e84981a2b057680d35ee86881cbbe",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/lib/attach-ref.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/attach-ref.ts",
+        "sourceSha256": "dc2a2d5fcc6428bcbdb1ad803d7b4b62a9448ec9d21af9b0e1dcab7652382876",
+        "portedSha256": "caa2041e5b8acd74bf52f8d70829a8b03937e261fea45a24148d52237a606247",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/lib/mermaid-export.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/mermaid-export.ts",
+        "sourceSha256": "a12e726e886c9bfa73dcf5bc11c51dcc477efec78068b74c62a9aca47c4451c1",
+        "portedSha256": "d01e3348b1e283636794c2c82ea289dc038f48e9ef78f3033da47f1a35c3f870",
+        "extraction": null,
+        "bodyChanges": [
+          "original full-viewBox 3x raster body retained; self-contained SVG data URL replaces tainted Blob URL so Chromium exports complete foreignObject HTML labels; obsolete object URL releases removed"
+        ]
+      },
+      {
+        "source": "src/lib/json-render/catalog.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/catalog.ts",
+        "sourceSha256": "a3f59a1adf10a577d969221eff01efa9d9c605ec01651fd88807c1abc1230fa0",
+        "portedSha256": "530c6aa03216eb3f5f43112112573759994608696632d202691dc508f98f7546",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/lib/json-render/spec.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/spec.ts",
+        "sourceSha256": "30ce537a1dfd21735182f17bdcaf1db42c28bf9ba0bc8613caf91107a5655909",
+        "portedSha256": "9c291352d1f6272cf52d62cdfb073f16c940cd687a9ab75d4af9a82a632987da",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/lib/json-render/charts.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/charts.ts",
+        "sourceSha256": "8baa9175f05fb2ce5cfc16e9432f0dd0452f860efbedcdf76bfa54e297b28752",
+        "portedSha256": "971c64f65b6b83d86afe60115533739f9c8fec3d8c1836da72a35250d6fc9ae6",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/lib/json-render/chart-data.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/chart-data.ts",
+        "sourceSha256": "31f0d58c2d3ce80d6a46231dd8e0d991e8c95c6c058b2dd0558ea97941ea449d",
+        "portedSha256": "5099d78a30637b0b02bec94d3ae66a4f76690bfdb1145ab641cb0195992aadea",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/ai-elements/remark-cjk-autolink-tail.test.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-cjk-autolink-tail.test.ts",
+        "sourceSha256": "6ed1b2308cd0fa658ab3e9a23c656ec7813eb514400c9b3aefd584efdb39ef91",
+        "portedSha256": "01623be631d7322bdbfb11066fcade8fd09b6a06beb1ee9b7d74b9bed3ce8ec9",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/ai-elements/remark-file-uri-links.test.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-file-uri-links.test.ts",
+        "sourceSha256": "d072f868e8b7cdb3dd05e3057339b8bebfad1af9abdd96790d25b65993916703",
+        "portedSha256": "652b07590bbfb64737ad207101b621c25350999a9a8afaaa3343adae909fe4b8",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/ai-elements/remark-windows-paths.test.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/remark-windows-paths.test.ts",
+        "sourceSha256": "b898298f54d691d23913e497ab2785a0cd25c565fc9696b58a4cfc2b83b305fc",
+        "portedSha256": "54fd1828e00665cfd7e8c803417cec59236cf4841f4d6675b4f4695d4d3abb6f",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/ai-elements/rehype-allow-codeg.test.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/rehype-allow-codeg.test.ts",
+        "sourceSha256": "c2d730d75f34382a54ec8b029376c997086cebd5566154122abb841a027f3422",
+        "portedSha256": "d3fa25f5a333847e4329223853fcec2ef24681a78bc275e24548bae266bce485",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/ai-elements/rehype-relative-file-links.test.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/rehype-relative-file-links.test.ts",
+        "sourceSha256": "b248d41b2454ff06a98bd8fe7458c8cf886c8104b2b2f2ff89372bb64610698e",
+        "portedSha256": "798a1756828c89eed72eeaab8a1506c725cce6956e41d57890235305af0e0b6a",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/ai-elements/math-delimiters.parse.test.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/math-delimiters.parse.test.ts",
+        "sourceSha256": "7ef8dbebc7e3eb55946354256a383eb60bebf177738cdbb4582398b63d12313d",
+        "portedSha256": "74fc14348810cf775f6c9b795fa703a712ff91a94ad636ea8def0f7d46f51b24",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/ai-elements/math-fence-pad.katex.test.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/math-fence-pad.katex.test.ts",
+        "sourceSha256": "06d8fafe1df3f90de437fbffe85baf53e505f836142cff7a4ca50335115313a4",
+        "portedSha256": "1031da508030e626f6f6103a1988d2a54bc96c0901a6b70484d5ea0719bed12f",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/ai-elements/streamdown-plugins.test.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/streamdown-plugins.test.ts",
+        "sourceSha256": "9fe9eb8d0ac09ff323bb349e7b8647fe8715958e8cc6a1cf01ad1ecbd11e3e48",
+        "portedSha256": "7b2434d4b1319b35c2ec4d5da7e1fe439d2fa29f7760e1e03892cd6282933655",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/ai-elements/mermaid-view.test.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/mermaid-view.test.ts",
+        "sourceSha256": "d4f92257b294c08640dde2e3beb54192be037ee5b7c12e0c90d241f03f8200c2",
+        "portedSha256": "9e0ad292421cf418372045ac0cd223fc3a8ea217de0c7e94cf3ee2faf720d3cc",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/lib/json-render/spec.test.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/spec.test.ts",
+        "sourceSha256": "19389a44ca8e6f3f9b0f43f91b5ad521b40d28b8325afa6db7e82cae81136454",
+        "portedSha256": "d7a553e4ad5d2e43d4bcb285466b109e210af744aa0db9a1ec42234591aa8f75",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/lib/json-render/chart-data.test.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/json-render/chart-data.test.ts",
+        "sourceSha256": "0bdc223eb5c0bb8fb1d172f0573ee262e8c58d16352f14613a21bebe6227969f",
+        "portedSha256": "b3bcb398dbecf0f6f04a709d97a939015e59a85f9b14821aa1d01ad1dc1fc1ff",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/components/ai-elements/message.tsx",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/source-message-response.tsx",
+        "sourceSha256": "f73b8f05e1bffc8aa639d40f6a52a8c9533ffddd0c27613d1d08e1fc91c227e6",
+        "portedSha256": "c82f97ea4749bfb192ceaebff330a761b7f9f1e14a6ea945980028c4c6e1d354",
+        "extraction": "complete MessageResponse and normalization closure from export type MessageResponseProps to EOF; unrelated message action/branch business widgets excluded",
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      },
+      {
+        "source": "src/lib/markdown-local-image.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/markdown-local-image.ts",
+        "sourceSha256": "a23804d28766a9a965d5d6497b474db34d3d4f9a1e167516383f52eaa7b8d67f",
+        "portedSha256": "a2fae5becf5e1267481130e53b680c837901a0da214f2a4f857e74fa9e35317f",
+        "extraction": "exact localImagePath parser only, LF and single EOF newline; root resolution and IO stay Core-owned",
+        "bodyChanges": [
+          "provenance/import bindings only; EOL normalization allowed"
+        ]
+      }
+    ],
+    "modelInputFilesPorted": false,
+    "skillModulePorted": false,
+    "scope": "完整原MessageResponse及归一化闭包、原插件/remark/rehype、Mermaid/缩放/全屏/三格式导出、助手正文spec本地状态及7种原图表组件；不含完整供体App或未移植的链接业务操作",
+    "hostSeams": [
+      "Core精确readId的文件/本地图片与原Rovai文件、HTTPS入口",
+      "既有Radix/主题/翻译/通知和DOM下载，门户随reader/visible回收",
+      "cn沿原clsx对象/数组语义；不在共享primitives直接导入引擎，避免原模块循环",
+      "DOM iframe层叠适配；原生浏览器遮挡租约仍属于I07，不将no-op称原生能力完成"
+    ],
+    "repairs": [
+      {
+        "file": "ui/native-math-hydration.ts",
+        "reason": "实际对照复现原Streamdown冷加载只呈现块公式；memo只看源位置/className，忽略迟到KaTeX子树",
+        "change": "原lazy rehype后仅为含KaTeX的祖先附加无样式修订class；不改DOM类型/key、源位置或重挂整段，保留spec交互状态",
+        "evidence": "file/I04原版Markdown引擎/logs/math-cold-reference.json"
+      },
+      {
+        "file": "lib/mermaid-export.ts",
+        "reason": "实际PNG导出Blob SVG含foreignObject时抛DOMException，SVG与MMD导出正常",
+        "change": "完整SVG改成自包含data URL；保留全部标签、原viewBox与3倍像素，不去掉HTML标签或禁用导出",
+        "evidence": "file/I04原版Markdown引擎/logs/ui-result.json"
+      }
+    ],
+    "style": {
+      "file": "apps/desktop/src/renderer/src/codeg-native-content/source-markdown.css",
+      "sha256": "0a70d57fa34b7c289ee2c10cc1f49eb6c62908e09fc0167e96db1e50a6f77dc4",
+      "generator": "file/I04原版Markdown引擎/build-style.mjs",
+      "source": {
+        "files": [
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\markdown-mask.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\remark-cjk-autolink-tail.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\remark-file-uri-links.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\remark-windows-paths.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\remark-local-images.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\rehype-allow-codeg.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\rehype-relative-file-links.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\streamdown-plugins.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\mermaid-view.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\json-render-pre.tsx",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\mermaid-block.tsx",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\message\\json-render-block.tsx",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\message\\json-render-charts.tsx",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ui\\button.tsx",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ui\\dialog.tsx",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ui\\dropdown-menu.tsx",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ui\\overlay-portal-container.tsx",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ui\\chart.tsx",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ui\\skeleton.tsx",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\hooks\\use-nested-layer-dismiss-guard.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\attach-ref.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\mermaid-export.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\json-render\\catalog.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\json-render\\spec.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\json-render\\charts.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\json-render\\chart-data.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\ai-elements\\source-message-response.tsx",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\markdown-local-image.ts",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\node_modules\\streamdown\\dist\\chunk-LPQFK2AO.js",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\node_modules\\streamdown\\dist\\code-block-OCS4YCEC.js",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\node_modules\\streamdown\\dist\\index.js",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\node_modules\\streamdown\\dist\\mermaid-NOHMQCX5.js",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\node_modules\\@json-render\\shadcn\\dist\\catalog.js",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\node_modules\\@json-render\\shadcn\\dist\\catalog.mjs",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\node_modules\\@json-render\\shadcn\\dist\\chunk-L37EOULD.mjs",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\node_modules\\@json-render\\shadcn\\dist\\index.js",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\node_modules\\@json-render\\shadcn\\dist\\index.mjs",
+          "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\ui\\native-markdown.tsx"
+        ],
+        "tokens": 2289,
+        "bytes": 118201,
+        "sha256": "0a70d57fa34b7c289ee2c10cc1f49eb6c62908e09fc0167e96db1e50a6f77dc4",
+        "tailwindVersion": "4.1.18",
+        "noGlobalPreflight": true,
+        "originalGlobal": {
+          "source": "src/app/globals.css",
+          "sha256": "ccb4298dff0d8e4ee70f158f2c59651f1ce0190d12b1f6783c8a40a1f6c007cd",
+          "ranges": [
+            [
+              47183,
+              47344
+            ],
+            [
+              60383,
+              65155
+            ]
+          ],
+          "hostChanges": [
+            "scope namespace",
+            "resolved data-theme night instead of dark class",
+            "border token to existing line"
+          ]
+        }
+      },
+      "noGlobalPreflight": true
+    },
+    "dependencies": {
+      "direct": 13,
+      "development": 3,
+      "newPackages": 280,
+      "oldPackagesPreserved": 810,
+      "oldSnapshotsPresent": 810,
+      "oldSnapshotsUnchanged": 809,
+      "oldAnsiPeerRepair": {
+        "key": "ansi-to-react@6.2.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)",
+        "before": {
+          "anser": "2.3.5",
+          "escape-carriage": "1.3.1",
+          "linkify-it": "3.0.3",
+          "react": "19.2.4",
+          "react-dom": "19.2.4(react@19.2.7)"
+        },
+        "after": {
+          "anser": "2.3.5",
+          "escape-carriage": "1.3.1",
+          "linkify-it": "3.0.3",
+          "react": "19.2.7",
+          "react-dom": "19.2.7(react@19.2.7)"
+        }
+      },
+      "oldImportersPreserved": true,
+      "allSnapshotReferencesResolved": true,
+      "licensePackages": 311
+    },
+    "qualification": {
+      "sourceTests": 168,
+      "relatedTests": 184,
+      "existingWindowsSkip": 1,
+      "sourceTestFiles": 13,
+      "relatedTestFiles": 11,
+      "engineRendererChecks": 21,
+      "mediaRendererChecks": 34,
+      "screenshotsReviewed": 8,
+      "fullDiagramPngReviewed": true,
+      "typecheck": true,
+      "frozenLock": {
+        "ok": true,
+        "pnpm": "11.20.0",
+        "offline": true,
+        "ignoreScripts": true,
+        "lockfileOnly": true,
+        "workspaceProjects": 4,
+        "entries": 1090,
+        "semanticLockPreserved": true,
+        "fixtureYamlFormattingNormalized": true,
+        "lockSha256": "6dd1d1e2cbeaf6b2677e40c1861ca17c22ca9f0cb0fc77c97c9f6e7c4b2e7662",
+        "scope": "fresh manifests/patches only; CLI supply-chain check and frozen offline lock validation; no full dependency materialization, build or runtime"
+      },
+      "transport": "actual NativeSessionViewer and complete fixed original response closure; actual Streamdown/Shiki/KaTeX/Mermaid/json-render/Recharts; synthetic ThreadClient/FilePreviewApi; no Core/IPC/Web Host/provider/full App",
+      "clipboard": "explicit text clipboard API substitute; download uses real Electron session",
+      "fullOriginalApp": false,
+      "actualCoreNativeWeb": false,
+      "realProvider": false
+    },
+    "remaining": [
+      "原Codeg MarkdownLink文件徽标/上下文菜单/打开目标等完整操作与宿主路由衔接；当前沿Rovai原文件/HTTPS入口，不冒称完整原链接组件",
+      "完整原HTML控制与完整供体App同场景运行对照；已有原生HTML入口和实际隔离HTML服务回归通过",
+      "真实Core/Native/Web集中候选、授权/生命周期/长历史/规模/内存恢复；七种原图表代码已保留，实际本批图表运行验证为BarChart",
+      "I04其他parser/home关联、Runtime并集、恢复、记忆、自动化；此前ANSI完整许可文件缺口仍归发布资格"
     ]
   }
 }

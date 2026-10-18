@@ -1,0 +1,13 @@
+{
+  "name": "oniguruma-to-es",
+  "version": "4.3.4",
+  "url": "https://registry.npmjs.org/oniguruma-to-es/-/oniguruma-to-es-4.3.4.tgz",
+  "integrity": "sha512-3VhUGN3w2eYxnTzHn+ikMI+fp/96KoRSVK9/kMTcFqj1NRDh2IhQCKvYxDnWePKRXY/AqH+Fuiyb7VHSzBjHfA==",
+  "bytes": 275987,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

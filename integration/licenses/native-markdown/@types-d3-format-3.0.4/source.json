@@ -1,0 +1,13 @@
+{
+  "name": "@types/d3-format",
+  "version": "3.0.4",
+  "url": "https://registry.npmjs.org/@types/d3-format/-/d3-format-3.0.4.tgz",
+  "integrity": "sha512-fALi2aI6shfg7vM5KiR1wNJnZ7r6UuggVqtDA+xiEdPZQwy/trcQaHnwShLuLdta2rTymCNpxYTiMZX/e09F4g==",
+  "bytes": 4410,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

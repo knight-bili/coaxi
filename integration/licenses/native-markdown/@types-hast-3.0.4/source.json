@@ -1,0 +1,13 @@
+{
+  "name": "@types/hast",
+  "version": "3.0.4",
+  "url": "https://registry.npmjs.org/@types/hast/-/hast-3.0.4.tgz",
+  "integrity": "sha512-WPs+bbQw5aCj+x6laNGWLH3wviHtoCv/P3+otBhbOhJgG8qtpdAMlTCxLtsTWA7LH1Oh/bFCHsBn0TPS5m30EQ==",
+  "bytes": 3175,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

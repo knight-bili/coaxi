@@ -1,0 +1,13 @@
+{
+  "name": "package-manager-detector",
+  "version": "1.6.0",
+  "url": "https://registry.npmjs.org/package-manager-detector/-/package-manager-detector-1.6.0.tgz",
+  "integrity": "sha512-61A5ThoTiDG/C8s8UMZwSorAGwMJ0ERVGj2OjoW5pAalsNOg15+iQiPzrLJ4jhZ1HJzmC2PIHT2oEiH3R5fzNA==",
+  "bytes": 7095,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

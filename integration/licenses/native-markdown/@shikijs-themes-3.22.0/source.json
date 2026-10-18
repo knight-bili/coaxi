@@ -1,0 +1,13 @@
+{
+  "name": "@shikijs/themes",
+  "version": "3.22.0",
+  "url": "https://registry.npmjs.org/@shikijs/themes/-/themes-3.22.0.tgz",
+  "integrity": "sha512-o+tlOKqsr6FE4+mYJG08tfCFDS+3CG20HbldXeVoyP+cYSUxDhrFf3GPjE60U55iOkkjbpY2uC3It/eeja35/g==",
+  "bytes": 172892,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

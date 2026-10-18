@@ -1,0 +1,13 @@
+{
+  "name": "cose-base",
+  "version": "1.0.3",
+  "url": "https://registry.npmjs.org/cose-base/-/cose-base-1.0.3.tgz",
+  "integrity": "sha512-s9whTXInMSgAp/NVXVNuVxVKzGH2qck3aQlVHxDCdAEPgtMKwc4Wq6/QKhgdEdgbLSi9rBTAcPoRa6JpiG4ksg==",
+  "bytes": 22534,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

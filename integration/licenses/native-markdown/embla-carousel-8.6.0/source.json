@@ -1,0 +1,20 @@
+{
+  "name": "embla-carousel",
+  "version": "8.6.0",
+  "url": "https://registry.npmjs.org/embla-carousel/-/embla-carousel-8.6.0.tgz",
+  "integrity": "sha512-SjWyZBHJPbqxHOzckOfo8lHisEaJWmwd23XppYFYVh10bU66/Pn5tkVkbkCMZVdbUE5eTCI2nD8OyIP4Z+uwkA==",
+  "bytes": 116467,
+  "license": "MIT",
+  "licenseFiles": [],
+  "licenseGap": false,
+  "noLifecycleScripts": true,
+  "additionalLicenseEvidence": [
+    {
+      "url": "https://raw.githubusercontent.com/davidjerleke/embla-carousel/0fe65834136f1aa35e4c1a4a477e5ccb4bb5ee54/LICENSE",
+      "gitHead": "0fe65834136f1aa35e4c1a4a477e5ccb4bb5ee54",
+      "versionTag": null,
+      "path": "LICENSE",
+      "sha256": "992490064b90ec94c302fe5f29dcc14cb44145857064e46f9ffe6c8f511c1093"
+    }
+  ]
+}

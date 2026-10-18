@@ -1,0 +1,13 @@
+{
+  "name": "@mermaid-js/parser",
+  "version": "1.0.1",
+  "url": "https://registry.npmjs.org/@mermaid-js/parser/-/parser-1.0.1.tgz",
+  "integrity": "sha512-opmV19kN1JsK0T6HhhokHpcVkqKpF+x2pPDKKM2ThHtZAB5F4PROopk0amuVYK5qMrIA4erzpNm8gmPNJgMDxQ==",
+  "bytes": 1293901,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@radix-ui/react-accordion",
+  "version": "1.2.14",
+  "url": "https://registry.npmjs.org/@radix-ui/react-accordion/-/react-accordion-1.2.14.tgz",
+  "integrity": "sha512-iE8YB9nmTBH8zd73ofBISZ8JCzgMoMkATJr7qDwa6u5F1+7mTM81V6fa71jgZ65rpjVpecDf1vSnwIFP9Ly1zw==",
+  "bytes": 12543,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

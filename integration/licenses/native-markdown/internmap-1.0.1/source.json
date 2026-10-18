@@ -1,0 +1,13 @@
+{
+  "name": "internmap",
+  "version": "1.0.1",
+  "url": "https://registry.npmjs.org/internmap/-/internmap-1.0.1.tgz",
+  "integrity": "sha512-lDB5YccMydFBtasVtxnZ3MRBHuaoE8GKsppq+EchKL2U4nK/DmEpPHNH8MZe5HkMtpSiTSOZwfN0tzYjO/lJEw==",
+  "bytes": 3578,
+  "license": "ISC",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@types/d3-axis",
+  "version": "3.0.6",
+  "url": "https://registry.npmjs.org/@types/d3-axis/-/d3-axis-3.0.6.tgz",
+  "integrity": "sha512-pYeijfZuBd87T0hGn0FO1vQ/cgLk6E1ALJjfkC0oJ8cbwkZl3TpgS8bVBLZN+2jjGgg38epgxb2zmoGtSfvgMw==",
+  "bytes": 4502,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

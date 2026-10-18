@@ -1,0 +1,13 @@
+{
+  "name": "@radix-ui/react-arrow",
+  "version": "1.1.10",
+  "url": "https://registry.npmjs.org/@radix-ui/react-arrow/-/react-arrow-1.1.10.tgz",
+  "integrity": "sha512-j2VTDz1vgCsmuG0k5lBfOcM8n5JPFqZBcMryasFjHYMhwxYL5SRUV5lMSUpRdNtw3D/Sv8pzJtrlAgkssYSsQQ==",
+  "bytes": 3403,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

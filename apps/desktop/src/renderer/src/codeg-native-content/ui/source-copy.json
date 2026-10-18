@@ -825,6 +825,25 @@
       "deliverPrBackSubmit": "推送",
       "deliverPrBackDone": "已推回 PR",
       "deliverPrBackDoneMr": "已推回合并请求"
+    },
+    "Folder.chat.mermaid": {
+      "diagram": "图表",
+      "loading": "正在渲染图表…",
+      "zoomIn": "放大",
+      "zoomOut": "缩小",
+      "resetView": "复位视图",
+      "fullscreen": "全屏查看",
+      "close": "关闭",
+      "download": "下载",
+      "downloadSvg": "下载为 SVG",
+      "downloadPng": "下载为 PNG",
+      "downloadMmd": "下载源码（.mmd）",
+      "downloadFailed": "图表保存失败",
+      "copySource": "复制源码",
+      "copied": "已复制",
+      "renderFailed": "Mermaid 错误：{message}",
+      "showSource": "查看源码",
+      "retry": "重试"
     }
   },
   "en": {
@@ -1653,6 +1672,25 @@
       "deliverPrBackSubmit": "Push",
       "deliverPrBackDone": "Pushed to the pull request",
       "deliverPrBackDoneMr": "Pushed to the merge request"
+    },
+    "Folder.chat.mermaid": {
+      "diagram": "Diagram",
+      "loading": "Rendering diagram…",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "resetView": "Reset view",
+      "fullscreen": "View fullscreen",
+      "close": "Close",
+      "download": "Download",
+      "downloadSvg": "Download as SVG",
+      "downloadPng": "Download as PNG",
+      "downloadMmd": "Download source (.mmd)",
+      "downloadFailed": "Could not save the diagram",
+      "copySource": "Copy source",
+      "copied": "Copied",
+      "renderFailed": "Mermaid error: {message}",
+      "showSource": "Show source",
+      "retry": "Retry"
     }
   }
 }

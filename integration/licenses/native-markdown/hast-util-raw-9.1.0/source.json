@@ -1,0 +1,13 @@
+{
+  "name": "hast-util-raw",
+  "version": "9.1.0",
+  "url": "https://registry.npmjs.org/hast-util-raw/-/hast-util-raw-9.1.0.tgz",
+  "integrity": "sha512-Y8/SBAHkZGoNkpzqqfCldijcuUKh7/su31kEBp67cFY09Wy0mTRgtsLYsiIxMJxlu0f6AA5SUTbDR8K0rxnbUw==",
+  "bytes": 10943,
+  "license": "MIT",
+  "licenseFiles": [
+    "license"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

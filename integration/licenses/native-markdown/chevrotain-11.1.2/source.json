@@ -1,0 +1,13 @@
+{
+  "name": "chevrotain",
+  "version": "11.1.2",
+  "url": "https://registry.npmjs.org/chevrotain/-/chevrotain-11.1.2.tgz",
+  "integrity": "sha512-opLQzEVriiH1uUQ4Kctsd49bRoFDXGGSC4GUqj7pGyxM3RehRhvTlZJc1FL/Flew2p5uwxa1tUDWKzI4wNM8pg==",
+  "bytes": 298709,
+  "license": "Apache-2.0",
+  "licenseFiles": [
+    "LICENSE.txt"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

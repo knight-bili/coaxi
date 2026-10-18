@@ -1,0 +1,13 @@
+{
+  "name": "layout-base",
+  "version": "2.0.1",
+  "url": "https://registry.npmjs.org/layout-base/-/layout-base-2.0.1.tgz",
+  "integrity": "sha512-dp3s92+uNI1hWIpPGH3jK2kxE2lMjdXdr+DH8ynZHpd6PUlH6x6cbuXnoMmiNumznqaNO31xu9e79F0uuZ0JFg==",
+  "bytes": 175302,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

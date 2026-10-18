@@ -48,6 +48,8 @@ import { GeneratedImagesBlock } from './codeg-native-content/components/message/
 import { TurnStats } from './codeg-native-content/components/message/turn-stats'
 import './codeg-native-content/source-rich.css'
 import './codeg-native-content/source-media.css'
+import './codeg-native-content/source-markdown.css'
+import 'katex/dist/katex.min.css'
 
 function readMessage(code: string): string {
   if (/origin_unavailable|source_unavailable/.test(code)) return '暂时找不到这份会话记录。'
@@ -109,6 +111,12 @@ function NativeTranscriptBody({ data, reader, target, live, visible }: { data: N
   const previewOpen = filePreview?.open
   const fileApi = useOptionalFilePreviewApi(), transcript = useRef<HTMLDivElement>(null)
   const [notice, setNotice] = useState<string | null>(null)
+  useEffect(() => {
+    if (!visible) return
+    const update = (event: Event) => { if (event instanceof CustomEvent && typeof event.detail === 'string') setNotice(event.detail) }
+    window.addEventListener('native-content-notice', update)
+    return () => window.removeEventListener('native-content-notice', update)
+  }, [visible])
   const openFile = useCallback(async (rawReference: string, line?: number | null): Promise<void> => {
     const source = reader.fileSource()
     if (!source || !previewOpen) throw new Error('native_child.source_unavailable')
@@ -157,13 +165,13 @@ function NativeTranscriptBody({ data, reader, target, live, visible }: { data: N
     if (!specialized) return <NativeSourceTool key={key} part={part}><OrdinaryToolCallPart part={part} /></NativeSourceTool>
     return <NativeTool key={key} use={use} result={result} reader={reader} target={target} live={live} />
   }
-  const renderPart = (part: AdaptedContentPart, key: string, user = false, streaming = false): React.ReactNode => {
-    if (part.type === 'text') return user ? <div className="native-session-plain-text" key={key}>{part.text}</div> : <NativeMarkdown key={key} streaming={streaming}>{part.text}</NativeMarkdown>
+  const renderPart = (part: AdaptedContentPart, key: string, user = false, streaming = false, assistantReply = false): React.ReactNode => {
+    if (part.type === 'text') return user ? <div className="native-session-plain-text" key={key}>{part.text}</div> : <NativeMarkdown key={key} streaming={streaming} assistantReply={assistantReply}>{part.text}</NativeMarkdown>
     if (part.type === 'reasoning') return <NativeReasoning key={key} text={part.content} />
     if (part.type === 'turn-error') return <p key={key} className="native-session-note is-error" role="status">{part.message}</p>
     if (part.type === 'plan') return <PlanCard key={key} entries={part.entries} isStreaming={live && part.isStreaming} />
     if (part.type === 'proposed-plan') return <PlanMarkdownCard key={key} markdown={part.markdown.trim()} label={planText('title')} emptyLabel={planText('planning')} />
-    if (part.type === 'goal-run') return <GoalRunPart key={key} part={live ? part : { ...part, isRunning: false }} renderPart={(child, childKey) => renderPart(child, childKey, user, streaming)} />
+    if (part.type === 'goal-run') return <GoalRunPart key={key} part={live ? part : { ...part, isRunning: false }} renderPart={(child, childKey) => renderPart(child, childKey, user, streaming, assistantReply)} />
     if (part.type === 'tool-call') return tool(part, key)
     if (part.type === 'tool-group') return <ToolGroupPart key={key} part={part} renderItem={tool} />
     if (part.type === 'delegation-status-group') return <div className="native-session-source-tool" key={key}><DelegationStatusGroupCard polls={part.polls} />{part.polls.map(item => <NativeRawTool key={item.toolCallId} part={item} />)}</div>
@@ -178,7 +186,7 @@ function NativeTranscriptBody({ data, reader, target, live, visible }: { data: N
     <div ref={transcript} className="native-session-transcript codeg-native-rich">{messages.map((message, turnIndex) => {
       const previousUserIndex = turns.slice(0, turnIndex).findLastIndex(turn => turn.role === 'user')
       return <section data-native-turn-index={turnIndex} key={`${message.id}:${turnIndex}`} className={message.role === 'user' ? 'native-session-input-turn' : 'native-session-turn'}>
-    {message.content.map((part, index) => renderPart(part, `${message.id}:${index}`, message.role === 'user', live && turnIndex === messages.length - 1))}
+    {message.content.map((part, index) => renderPart(part, `${message.id}:${index}`, message.role === 'user', live && turnIndex === messages.length - 1, message.role === 'assistant'))}
     {message.userResources?.map((resource, index) => <button type="button" className="native-session-resource" title={resource.uri} key={`resource:${index}`}
       onClick={() => { void openFile(resource.uri).catch(() => setNotice(t('暂时无法打开这份文件。'))) }}>{resource.name}</button>)}
     {message.userImages && <UserImageAttachments images={message.userImages} />}

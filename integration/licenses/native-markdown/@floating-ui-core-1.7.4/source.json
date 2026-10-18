@@ -1,0 +1,13 @@
+{
+  "name": "@floating-ui/core",
+  "version": "1.7.4",
+  "url": "https://registry.npmjs.org/@floating-ui/core/-/core-1.7.4.tgz",
+  "integrity": "sha512-C3HlIdsBxszvm5McXlB8PeOEWfBhcGBTZGkGlWc2U0KFY5IwG5OQEuQ8rq52DZmcHDlPLd+YFBK+cZcytwIFWg==",
+  "bytes": 44166,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

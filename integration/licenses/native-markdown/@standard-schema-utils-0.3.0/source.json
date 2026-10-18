@@ -1,0 +1,13 @@
+{
+  "name": "@standard-schema/utils",
+  "version": "0.3.0",
+  "url": "https://registry.npmjs.org/@standard-schema/utils/-/utils-0.3.0.tgz",
+  "integrity": "sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g==",
+  "bytes": 3137,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

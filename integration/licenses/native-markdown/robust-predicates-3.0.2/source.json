@@ -1,0 +1,13 @@
+{
+  "name": "robust-predicates",
+  "version": "3.0.2",
+  "url": "https://registry.npmjs.org/robust-predicates/-/robust-predicates-3.0.2.tgz",
+  "integrity": "sha512-IXgzBWvWQwE6PrDI05OvmXUIruQTcoMDzRsOd5CDvHCVLcLHMTSYvOK5Cm46kWqlV3yAbuSpBZdJ5oP5OUoStg==",
+  "bytes": 40958,
+  "license": "Unlicense",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

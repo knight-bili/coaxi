@@ -1,0 +1,13 @@
+{
+  "name": "@streamdown/code",
+  "version": "1.0.2",
+  "url": "https://registry.npmjs.org/@streamdown/code/-/code-1.0.2.tgz",
+  "integrity": "sha512-QKLS3sC8no5y0YvhGLA+ZjtNhznWU09IvFcjRKgSA35ulckMLw3b5T1ha+o1DaW8BS8l0zceLPFZa3/X9+agWQ==",
+  "bytes": 2149,
+  "license": "Apache-2.0",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

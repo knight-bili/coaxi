@@ -1,0 +1,13 @@
+{
+  "name": "@shikijs/types",
+  "version": "3.22.0",
+  "url": "https://registry.npmjs.org/@shikijs/types/-/types-3.22.0.tgz",
+  "integrity": "sha512-491iAekgKDBFE67z70Ok5a8KBMsQ2IJwOWw3us/7ffQkIBCyOQfm/aNwVMBUriP02QshIfgHCBSIYAl3u2eWjg==",
+  "bytes": 8908,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

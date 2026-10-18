@@ -1,0 +1,13 @@
+{
+  "name": "vaul",
+  "version": "1.1.2",
+  "url": "https://registry.npmjs.org/vaul/-/vaul-1.1.2.tgz",
+  "integrity": "sha512-ZFkClGpWyI2WUQjdLJ/BaGuV6AVQiJ3uELGk3OYtP+B6yCO7Cmn9vPFXVJkRaGkOJu3m8bQMgtyzNHixULceQA==",
+  "bytes": 38562,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE.md"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

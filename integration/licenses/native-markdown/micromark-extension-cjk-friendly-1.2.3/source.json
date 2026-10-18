@@ -1,0 +1,13 @@
+{
+  "name": "micromark-extension-cjk-friendly",
+  "version": "1.2.3",
+  "url": "https://registry.npmjs.org/micromark-extension-cjk-friendly/-/micromark-extension-cjk-friendly-1.2.3.tgz",
+  "integrity": "sha512-gRzVLUdjXBLX6zNPSnHGDoo+ZTp5zy+MZm0g3sv+3chPXY7l9gW+DnrcHcZh/jiPR6MjPKO4AEJNp4Aw6V9z5Q==",
+  "bytes": 10050,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

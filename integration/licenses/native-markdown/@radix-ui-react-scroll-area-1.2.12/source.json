@@ -1,0 +1,13 @@
+{
+  "name": "@radix-ui/react-scroll-area",
+  "version": "1.2.12",
+  "url": "https://registry.npmjs.org/@radix-ui/react-scroll-area/-/react-scroll-area-1.2.12.tgz",
+  "integrity": "sha512-xuafVzQiTCLsyEjakowTdG3OgTXsmO7IdCiO77otIa+z44xoLNs9Do5eg7POFumIOCjtG6djfm6RKUKpUa/csA==",
+  "bytes": 39534,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

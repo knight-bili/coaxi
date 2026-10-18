@@ -1,0 +1,17 @@
+{
+  "name": "punycode",
+  "version": "2.3.1",
+  "url": "https://registry.npmjs.org/punycode/-/punycode-2.3.1.tgz",
+  "integrity": "sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==",
+  "bytes": 7603,
+  "license": "MIT",
+  "licenseFiles": [],
+  "licenseGap": false,
+  "noLifecycleScripts": true,
+  "additionalLicenseEvidence": [
+    {
+      "packagePath": "LICENSE-MIT.txt",
+      "sha256": "483acb265f182907d1caf6cff9c16c96f31325ed23792832cc5d8b12d5f88c8a"
+    }
+  ]
+}

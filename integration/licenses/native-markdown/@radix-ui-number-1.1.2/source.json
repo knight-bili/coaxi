@@ -1,0 +1,13 @@
+{
+  "name": "@radix-ui/number",
+  "version": "1.1.2",
+  "url": "https://registry.npmjs.org/@radix-ui/number/-/number-1.1.2.tgz",
+  "integrity": "sha512-ceTwaxc4I5IOi97DgCotl3pqiyRGvffcc0oOsE2dQYaJOFIDsDt4VWG6xEbg1QePv9QWausCEIppud/tJ1wNig==",
+  "bytes": 2144,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

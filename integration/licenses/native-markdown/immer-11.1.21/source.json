@@ -1,0 +1,13 @@
+{
+  "name": "immer",
+  "version": "11.1.21",
+  "url": "https://registry.npmjs.org/immer/-/immer-11.1.21.tgz",
+  "integrity": "sha512-bZSadeCPGdaY5/qRLgr6mDSH1ra21rD3rqpiWk7+QTr4ayYPTE9qZYdLh/NdPhMe0wSrTvHD/Lk8q5EwhUs0aw==",
+  "bytes": 257957,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

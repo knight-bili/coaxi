@@ -1,0 +1,13 @@
+{
+  "name": "@radix-ui/react-toast",
+  "version": "1.2.17",
+  "url": "https://registry.npmjs.org/@radix-ui/react-toast/-/react-toast-1.2.17.tgz",
+  "integrity": "sha512-uL4kyyWy000pPL43fGGCV5qT6ZchCWEQZOSlkYiPwPt8Hy1iW38RjeptIvz1/SZesrW6Vn58Ct3sV7tfEfiAbw==",
+  "bytes": 41771,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

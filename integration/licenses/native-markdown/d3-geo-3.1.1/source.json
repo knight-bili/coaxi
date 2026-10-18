@@ -1,0 +1,13 @@
+{
+  "name": "d3-geo",
+  "version": "3.1.1",
+  "url": "https://registry.npmjs.org/d3-geo/-/d3-geo-3.1.1.tgz",
+  "integrity": "sha512-637ln3gXKXOwhalDzinUgY83KzNWZRKbYubaG+fGVuc/dxO64RRljtCTnf5ecMyE1RIdtqpkVcq0IbtU2S8j2Q==",
+  "bytes": 61257,
+  "license": "ISC",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

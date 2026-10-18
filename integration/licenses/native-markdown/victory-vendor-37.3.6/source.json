@@ -1,0 +1,154 @@
+{
+  "name": "victory-vendor",
+  "version": "37.3.6",
+  "url": "https://registry.npmjs.org/victory-vendor/-/victory-vendor-37.3.6.tgz",
+  "integrity": "sha512-SbPDPdDBYp+5MJHhBCAyI7wKM3d5ivekigc2Dk2s7pgbZ9wIgIBYGVw4zGHBml/qTFbexrofXW6Gu4noGxrOwQ==",
+  "bytes": 82782,
+  "license": "MIT AND ISC",
+  "licenseFiles": [],
+  "licenseGap": false,
+  "noLifecycleScripts": true,
+  "additionalLicenseEvidence": [
+    {
+      "packagePath": "lib-vendor/d3-array/LICENSE",
+      "sha256": "faa682e3e430941f958d26180458f5934a62f58dac4d70ccdd15608c15d0f884"
+    },
+    {
+      "packagePath": "lib-vendor/d3-color/LICENSE",
+      "sha256": "faa682e3e430941f958d26180458f5934a62f58dac4d70ccdd15608c15d0f884"
+    },
+    {
+      "packagePath": "lib-vendor/d3-ease/LICENSE",
+      "sha256": "b989d9085148d21ff64a75e14462aefa06b2589a55553b07b1460c70081c7d08"
+    },
+    {
+      "packagePath": "lib-vendor/d3-format/LICENSE",
+      "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+    },
+    {
+      "packagePath": "lib-vendor/d3-interpolate/LICENSE",
+      "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+    },
+    {
+      "packagePath": "lib-vendor/d3-path/LICENSE",
+      "sha256": "0ab21426fad1e8b819ea8ab4c7faf5a24d4fca9c01572fe722490d600bba0d22"
+    },
+    {
+      "packagePath": "lib-vendor/d3-scale/LICENSE",
+      "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+    },
+    {
+      "packagePath": "lib-vendor/d3-shape/LICENSE",
+      "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+    },
+    {
+      "packagePath": "lib-vendor/d3-time/LICENSE",
+      "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+    },
+    {
+      "packagePath": "lib-vendor/d3-time-format/LICENSE",
+      "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+    },
+    {
+      "packagePath": "lib-vendor/d3-timer/LICENSE",
+      "sha256": "e008c5e25a6be382593089c29bfabbc553c6378eee02895aec46ce396cc404ee"
+    },
+    {
+      "packagePath": "lib-vendor/d3-voronoi/LICENSE",
+      "sha256": "ad6cf57648385d6c40a29f73c55e42922dd793823df5ea265ccd834873bf09b9"
+    },
+    {
+      "packagePath": "lib-vendor/internmap/LICENSE",
+      "sha256": "9ea8903938dab5f12c4572d60725069bec2d1b0dc3bcc210b09bae946a5ebb1f"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/FormidableLabs/victory/d9d9ca2d5038d6ef9de91f2cef39e6fb2733baa6/LICENSE.txt",
+      "gitHead": "d9d9ca2d5038d6ef9de91f2cef39e6fb2733baa6",
+      "versionTag": "v37.3.6",
+      "path": "LICENSE.txt",
+      "sha256": "34dee5fd5e5cc756efb5ad4d64652bce719bdf5e900ca5d7538253e737930bc4"
+    }
+  ],
+  "remaining": "Compound MIT AND ISC: verify all vendor notices, not only upstream root MIT license, before distribution.",
+  "coverage": "Exact version tag package version verified; upstream MIT root and all 13 packaged vendor notices retained. Declared MIT AND ISC does not replace actual embedded BSD notices.",
+  "vendorNotices": [
+    {
+      "path": "lib-vendor/d3-array/LICENSE",
+      "isc": true,
+      "bsd": false,
+      "mit": false
+    },
+    {
+      "path": "lib-vendor/d3-color/LICENSE",
+      "isc": true,
+      "bsd": false,
+      "mit": false
+    },
+    {
+      "path": "lib-vendor/d3-ease/LICENSE",
+      "isc": false,
+      "bsd": true,
+      "mit": false
+    },
+    {
+      "path": "lib-vendor/d3-format/LICENSE",
+      "isc": true,
+      "bsd": false,
+      "mit": false
+    },
+    {
+      "path": "lib-vendor/d3-interpolate/LICENSE",
+      "isc": true,
+      "bsd": false,
+      "mit": false
+    },
+    {
+      "path": "lib-vendor/d3-path/LICENSE",
+      "isc": true,
+      "bsd": false,
+      "mit": false
+    },
+    {
+      "path": "lib-vendor/d3-scale/LICENSE",
+      "isc": true,
+      "bsd": false,
+      "mit": false
+    },
+    {
+      "path": "lib-vendor/d3-shape/LICENSE",
+      "isc": true,
+      "bsd": false,
+      "mit": false
+    },
+    {
+      "path": "lib-vendor/d3-time/LICENSE",
+      "isc": true,
+      "bsd": false,
+      "mit": false
+    },
+    {
+      "path": "lib-vendor/d3-time-format/LICENSE",
+      "isc": true,
+      "bsd": false,
+      "mit": false
+    },
+    {
+      "path": "lib-vendor/d3-timer/LICENSE",
+      "isc": true,
+      "bsd": false,
+      "mit": false
+    },
+    {
+      "path": "lib-vendor/d3-voronoi/LICENSE",
+      "isc": false,
+      "bsd": true,
+      "mit": true
+    },
+    {
+      "path": "lib-vendor/internmap/LICENSE",
+      "isc": true,
+      "bsd": false,
+      "mit": false
+    }
+  ]
+}

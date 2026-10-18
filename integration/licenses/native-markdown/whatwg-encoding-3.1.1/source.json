@@ -1,0 +1,13 @@
+{
+  "name": "whatwg-encoding",
+  "version": "3.1.1",
+  "url": "https://registry.npmjs.org/whatwg-encoding/-/whatwg-encoding-3.1.1.tgz",
+  "integrity": "sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ==",
+  "bytes": 4222,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE.txt"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

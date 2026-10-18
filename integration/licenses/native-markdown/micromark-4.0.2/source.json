@@ -1,0 +1,13 @@
+{
+  "name": "micromark",
+  "version": "4.0.2",
+  "url": "https://registry.npmjs.org/micromark/-/micromark-4.0.2.tgz",
+  "integrity": "sha512-zpe98Q6kvavpCr1NPVSCMebCKfD7CA2NqZ+rykeNhONIJBpc1tFKt9hucLGwha3jNTNI8lHpctWJWoimVF4PfA==",
+  "bytes": 35815,
+  "license": "MIT",
+  "licenseFiles": [
+    "license"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

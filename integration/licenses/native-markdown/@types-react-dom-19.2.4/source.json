@@ -1,0 +1,13 @@
+{
+  "name": "@types/react-dom",
+  "version": "19.2.4",
+  "url": "https://registry.npmjs.org/@types/react-dom/-/react-dom-19.2.4.tgz",
+  "integrity": "sha512-Bsc+QHgp+P/F02XDzNCY9jnZNCUuLki36KT7VKrTXXLdHf+vHMNZnW1rVu5DNW/rCK+fya3DATySbLM4yhtKUw==",
+  "bytes": 7788,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

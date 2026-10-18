@@ -1,0 +1,13 @@
+{
+  "name": "mlly",
+  "version": "1.8.0",
+  "url": "https://registry.npmjs.org/mlly/-/mlly-1.8.0.tgz",
+  "integrity": "sha512-l8D9ODSRWLe2KHJSifWGwBqpTZXIXTeo8mlKjY+E2HAakaTeNpqAyBZ8GSqLzHgw4XmHmC8whvpjJNMbFZN7/g==",
+  "bytes": 51436,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

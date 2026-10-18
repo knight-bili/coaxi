@@ -1,0 +1,13 @@
+{
+  "name": "@chevrotain/regexp-to-ast",
+  "version": "11.1.2",
+  "url": "https://registry.npmjs.org/@chevrotain/regexp-to-ast/-/regexp-to-ast-11.1.2.tgz",
+  "integrity": "sha512-nMU3Uj8naWer7xpZTYJdxbAs6RIv/dxYzkYU8GSwgUtcAAlzjcPfX1w+RKRcYG8POlzMeayOQ/znfwxEGo5ulw==",
+  "bytes": 19979,
+  "license": "Apache-2.0",
+  "licenseFiles": [
+    "LICENSE.txt"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

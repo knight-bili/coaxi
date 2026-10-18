@@ -1,0 +1,13 @@
+{
+  "name": "remark-cjk-friendly-gfm-strikethrough",
+  "version": "1.2.3",
+  "url": "https://registry.npmjs.org/remark-cjk-friendly-gfm-strikethrough/-/remark-cjk-friendly-gfm-strikethrough-1.2.3.tgz",
+  "integrity": "sha512-bXfMZtsaomK6ysNN/UGRIcasQAYkC10NtPmP0oOHOV8YOhA2TXmwRXCku4qOzjIFxAPfish5+XS0eIug2PzNZA==",
+  "bytes": 7730,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

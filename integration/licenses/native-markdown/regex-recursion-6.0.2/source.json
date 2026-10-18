@@ -1,0 +1,13 @@
+{
+  "name": "regex-recursion",
+  "version": "6.0.2",
+  "url": "https://registry.npmjs.org/regex-recursion/-/regex-recursion-6.0.2.tgz",
+  "integrity": "sha512-0YCaSCq2VRIebiaUviZNs0cBz1kg5kVS2UKUfNIx8YVs1cN3AV7NTctO5FOKBA+UT2BPJIWZauYHPqJODG50cg==",
+  "bytes": 14972,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

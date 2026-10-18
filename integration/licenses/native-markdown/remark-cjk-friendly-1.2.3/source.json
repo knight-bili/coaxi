@@ -1,0 +1,13 @@
+{
+  "name": "remark-cjk-friendly",
+  "version": "1.2.3",
+  "url": "https://registry.npmjs.org/remark-cjk-friendly/-/remark-cjk-friendly-1.2.3.tgz",
+  "integrity": "sha512-UvAgxwlNk+l9Oqgl/9MWK2eWRS7zgBW/nXX9AthV7nd/3lNejF138E7Xbmk9Zs4WjTJGs721r7fAEc7tNFoH7g==",
+  "bytes": 9554,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

@@ -1,0 +1,13 @@
+{
+  "name": "tailwindcss",
+  "version": "4.1.18",
+  "url": "https://registry.npmjs.org/tailwindcss/-/tailwindcss-4.1.18.tgz",
+  "integrity": "sha512-4+Z+0yiYyEtUVCScyfHCxOYP06L5Ne+JiHhY2IjR2KWMIWhJOYZKLSGZaP5HkZ8+bY0cxfzwDE5uOmzFXyIwxw==",
+  "bytes": 181452,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

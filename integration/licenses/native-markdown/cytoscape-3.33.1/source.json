@@ -1,0 +1,13 @@
+{
+  "name": "cytoscape",
+  "version": "3.33.1",
+  "url": "https://registry.npmjs.org/cytoscape/-/cytoscape-3.33.1.tgz",
+  "integrity": "sha512-iJc4TwyANnOGR1OmWhsS9ayRS3s+XQ185FmuHObThD+5AeJCakAAbWv8KimMTt08xCCLNgneQwFp+JRJOr9qGQ==",
+  "bytes": 1368994,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

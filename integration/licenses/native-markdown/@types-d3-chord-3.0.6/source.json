@@ -1,0 +1,13 @@
+{
+  "name": "@types/d3-chord",
+  "version": "3.0.6",
+  "url": "https://registry.npmjs.org/@types/d3-chord/-/d3-chord-3.0.6.tgz",
+  "integrity": "sha512-LFYWWd8nwfwEmTZG9PfQxd17HbNPksHBiJHaKuY1XeqscXacsS2tyoo6OdRsjf+NQYeB6XrNL3a25E3gH69lcg==",
+  "bytes": 4769,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

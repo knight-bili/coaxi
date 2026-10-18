@@ -1,0 +1,13 @@
+{
+  "name": "@radix-ui/react-popover",
+  "version": "1.1.17",
+  "url": "https://registry.npmjs.org/@radix-ui/react-popover/-/react-popover-1.1.17.tgz",
+  "integrity": "sha512-/YSAOdJ7YJvdn7bn5sdSx2egW+SKY+u7O5RyAVs94Ymrg2fg5QTSFPMRkzvhGyFuE4/qsmPBdrwYoZMZh/4f+g==",
+  "bytes": 13360,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

@@ -1,0 +1,13 @@
+{
+  "name": "d3-polygon",
+  "version": "3.0.1",
+  "url": "https://registry.npmjs.org/d3-polygon/-/d3-polygon-3.0.1.tgz",
+  "integrity": "sha512-3vbA7vXYwfe1SYhED++fPUQlWSYTTGmFmQiany/gdbiWgU/iEyQzyymwL9SkJjFFuCS4902BSzewVGsHHmHtXg==",
+  "bytes": 4870,
+  "license": "ISC",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@floating-ui/dom",
+  "version": "1.7.5",
+  "url": "https://registry.npmjs.org/@floating-ui/dom/-/dom-1.7.5.tgz",
+  "integrity": "sha512-N0bD2kIPInNHUHehXhMke1rBGs1dwqvC9O9KYMyyjK7iXt7GAhnro7UlcuYcGdS/yYOlq0MAVgrow8IbWJwyqg==",
+  "bytes": 33999,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

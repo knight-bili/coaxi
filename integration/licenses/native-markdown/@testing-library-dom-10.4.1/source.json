@@ -1,0 +1,13 @@
+{
+  "name": "@testing-library/dom",
+  "version": "10.4.1",
+  "url": "https://registry.npmjs.org/@testing-library/dom/-/dom-10.4.1.tgz",
+  "integrity": "sha512-o4PXJQidqJl82ckFaXUeoAW+XysPLauYI43Abki5hABd853iMhitooc6znOnczgbTYmEP6U6/y1ZyKAIsvMKGg==",
+  "bytes": 433710,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

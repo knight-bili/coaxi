@@ -1,0 +1,13 @@
+{
+  "name": "@radix-ui/react-password-toggle-field",
+  "version": "0.1.5",
+  "url": "https://registry.npmjs.org/@radix-ui/react-password-toggle-field/-/react-password-toggle-field-0.1.5.tgz",
+  "integrity": "sha512-fVuA82u0b/fClpbEJv8yp1nU9eSvoSEOERsU/hhf3FXGPIvkmE7oEaHEu8poowoXO39/Va7zq2E0TUcYr1dBRg==",
+  "bytes": 17675,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}
