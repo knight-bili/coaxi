@@ -1,5 +1,9 @@
 # I04 执行队列
 
+2026-10-18 最新检查点：Grok会话统计、窗口目录及两固定原parser的31组受控文件对照已完成分项验证，30组完整投影相等、1组明确保留全量工具正文、0项未解释差异。实际结果及限制见[本批记录](i04-native-parser-parity-result.json)。这不授予完整原App、Host/模型/GUI/平台资格，正式新增通过0；下方旧检查点的“统计/差分仍待”不覆盖此处当前事实。
+
+下一有限队列：可信工程patch行读取与旧agent文件显式父链；有界完整内容/签名快照及后代引用、首次发现/hash后台取消与资源回收；User-only Native/Web与固定Codeg原只读UI及同场景；Grok修改意见r1衔接、旧来源显式导入与真实Host/Runtime/平台矩阵。T02/T03/T04及I04四包21簇84项仍保留，阶段集齐后集中验证，不增加客户工程验收或逐切片Actions。
+
 2026-10-18 启动来源接续：Codex/Grok 从实际进程最终环境提取非凭据目录，warm reuse 保留原 Host 来源；原 Core Native bind 同事务保存来源并核对 Runtime。已记录来源按原 Run/epoch/父 Session/绑定读取历史，不改指向新目录，旧未记录来源不猜。当前三项 Core/文件 owner 和主程序检查结果见[来源持久化记录](i04-native-source-origin-result.json)；消息工具归并、签名游标、公共运输、原UI和同场景仍待，正式新增通过0。
 
 2026-10-18 原生文件层接续：已编码 Codex 原生头部/精确 rollout 历史来源与 Grok 父生命周期/子元数据来源核对，以及完整字节分块与改写拒绝。该层只在Core内部，生产启动根/已记录历史来源已接，完整消息工具归并、签名游标、Native/Web及原只读界面仍待接，不能按文件夹具称产品查看器完成。细节见[源码映射当前接续](../inventory/native-subagent-viewer-reference.md)。

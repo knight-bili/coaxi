@@ -88,10 +88,9 @@
     "Projection digest streams actual turns/stats/selected summary so authorized patch geometry changes cannot reuse the old snapshot identity",
     "Child source fingerprints and verified-reference sets sorted before hashing/returning; multiple native children cannot randomize snapshot identity"
   ],
-  "implementation_status": "original_codex_message_body_and_core_verified_file_pipeline_targeted_passed_full_differential_transport_ui_pending",
+  "implementation_status": "original_codex_body_and_fixed_component_differential_targeted_passed_full_app_transport_ui_pending",
   "remaining": [
-    "Full differential against both fixed original parsers, beyond the22 preserved regression bodies and seam cases",
-    "Grok complete session stats and original model context-window catalogue",
+    "Further original-format corpus and complete source App comparisons remain outside the31 controlled component fixtures",
     "Production authorized project patch-line reader and legacy agent-*.jsonl with explicit native lineage",
     "Complete bounded content, signed snapshots/descendant references, cancellable background initial discovery/hash and resource lifecycle",
     "User-only Native/Web and original Codeg readonly UI, same-scenario full App/Host/Runtime/platform validation"
@@ -100,7 +99,6 @@
     "Source app filesystem/environment/list-index discovery",
     "Summary-list-only UserTurnFingerprint, text/image detection and duplicate-record helpers",
     "Unused code-mode is_empty, goal live-control constants/title, route writer/title-cut helpers",
-    "Unused common model-capacity inference; actual Grok catalogue/session consumer remains planned",
     "Native/raw summary ids/cwd/folder paths and unused watermark; Core owns source identities/paths"
   ],
   "original_regression_inventory": "integration/inventory/native-codex-original-cases.json",
@@ -109,5 +107,6 @@
       "bytes": 34221,
       "sha256": "a94c95b68b9e1d68946b881ffc4109dce1fc667f1db2b0b45d1bb4097162ff5c"
     }
-  }
+  },
+  "stats_and_differential_followup": "native-grok-stats-port.json; integration/execution/i04-native-parser-parity-result.json"
 }

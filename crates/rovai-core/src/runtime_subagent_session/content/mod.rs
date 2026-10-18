@@ -21,9 +21,10 @@ use super::{
 };
 use model::MessageTurn;
 mod codex;
+mod grok_stats;
 
 pub(crate) use records::ParseNotes;
-use records::{JsonRecords, json_document};
+use records::{JsonRecords, json_document, text_document};
 
 pub(crate) struct NativeContent {
     pub(crate) turns: Vec<MessageTurn>,
@@ -41,6 +42,7 @@ fn merge_notes(into: &mut ParseNotes, other: ParseNotes) {
     into.malformed_records += other.malformed_records;
     into.incomplete_tail |= other.incomplete_tail;
     into.unavailable_children += other.unavailable_children;
+    into.unavailable_advisories += other.unavailable_advisories;
 }
 
 fn fingerprint(documents: &[NativeDocument]) -> String {
@@ -108,8 +110,13 @@ pub(crate) fn grok_content(
     let mut updates = None;
     let mut history = None;
     let mut metadata = HashMap::new();
-    let mut session_model = None;
-    let mut notes = ParseNotes::default();
+    let mut summary_meta = grok_stats::SummaryMeta::default();
+    let mut model_cache = None;
+    let mut model_config = None;
+    let mut notes = ParseNotes {
+        unavailable_advisories: documents.unavailable_advisories,
+        ..Default::default()
+    };
     for mut document in documents.documents {
         match document.kind {
             DocumentKind::GrokUpdates => {
@@ -120,7 +127,9 @@ pub(crate) fn grok_content(
                 ensure!(history.is_none(), "native_child.ambiguous_source");
                 history = Some(document);
             }
-            DocumentKind::GrokSummary | DocumentKind::GrokSubagentMetadata => {
+            DocumentKind::GrokSummary
+            | DocumentKind::GrokSubagentMetadata
+            | DocumentKind::GrokModelsCache => {
                 let value = match json_document(&mut document, stop) {
                     Ok(value) => value,
                     Err(error) if error.is::<serde_json::Error>() => {
@@ -130,11 +139,9 @@ pub(crate) fn grok_content(
                     Err(error) => return Err(error),
                 };
                 if document.kind == DocumentKind::GrokSummary {
-                    session_model = value["current_model_id"]
-                        .as_str()
-                        .map(str::trim)
-                        .filter(|s| !s.is_empty())
-                        .map(str::to_owned);
+                    summary_meta = grok_stats::summary_meta(&value);
+                } else if document.kind == DocumentKind::GrokModelsCache {
+                    model_cache = Some(value);
                 } else if value
                     .get("parent_session_id")
                     .is_none_or(|v| v == &target.child_native_session_id)
@@ -143,6 +150,13 @@ pub(crate) fn grok_content(
                     metadata.insert(label, value);
                 }
             }
+            DocumentKind::GrokConfig => match text_document(&mut document, stop) {
+                Ok(value) => model_config = Some(value),
+                Err(error) if error.is::<std::string::FromUtf8Error>() => {
+                    notes.malformed_records += 1
+                }
+                Err(error) => return Err(error),
+            },
             _ => anyhow::bail!("native_child.invalid_document"),
         }
     }
@@ -162,7 +176,9 @@ pub(crate) fn grok_content(
         rows,
         answers,
         fallback,
-        session_model.as_deref(),
+        &summary_meta,
+        model_cache.as_ref(),
+        model_config.as_deref(),
         &metadata,
         |id| {
             if let Some(tools) = cached.get(id) {
@@ -206,12 +222,17 @@ pub(crate) fn grok_content(
     hash_child_sources(&mut digest, &mut child_sources);
     verified.sort();
     verified.dedup();
-    hash_projection(&mut digest, &parsed.turns, None, None)?;
+    hash_projection(
+        &mut digest,
+        &parsed.turns,
+        parsed.session_stats.as_ref(),
+        Some(&parsed.summary),
+    )?;
     Ok(NativeContent {
         turns: parsed.turns,
         context_tokens: parsed.context_tokens,
-        session_stats: None,
-        summary: None,
+        session_stats: parsed.session_stats,
+        summary: Some(parsed.summary),
         snapshot_digest: format!("{:x}", digest.finalize()),
         notes,
         verified_children: verified,
@@ -377,3 +398,6 @@ pub(crate) fn codex_content(
 
 #[cfg(all(test, feature = "extended-tests"))]
 pub(crate) mod tests;
+
+#[cfg(all(test, feature = "extended-tests"))]
+mod reference_tests;

@@ -1,6 +1,8 @@
 # Codeg 与 Rovai 一期完整融合
 
-I00已自审修正并合入，I01基础构建与契约证据保留草稿；I02继续补齐，按已确认r1补齐实际输入并推进独立I03画布基础，完整一期终点不变。Rovai Core唯一业务与执行权威，Codeg与双原生移动按模块移植；第二阶段才开发自主新增能力。
+I00已自审修正并合入，I01基础证据及环境待验项保留；I02继续补齐，I03本机工程验证已有记录，当前推进I04。实际阶段资格以[持续状态](execution/goal-state.json)为准，完整一期终点不变。Rovai Core唯一业务与执行权威，Codeg与双原生移动按模块移植；第二阶段才开发自主新增能力。
+
+- [I04原解析器对照检查点](execution/i04-native-parser-parity-result.json)：Grok统计及原模型窗口目录已接；两固定原parser的31组受控案例中30组完整投影相同、1组仅保留原版截断的工具正文，0项未解释差异。公开查看器运输、原UI、真实Host/Runtime/平台及I04其余工作包继续，不能按组件对照称阶段完成。
 
 - [完整计划](planning/plan-v4.md)、[日历基准](planning/schedule.json)、[源码锁定](sources.lock.json)。
 - [功能账本](planning/features.json)、[研发工作包](planning/work-packages.json)、[验收场景](acceptance/cases.json)。

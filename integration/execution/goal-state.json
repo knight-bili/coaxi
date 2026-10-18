@@ -14,7 +14,7 @@
   "current_branch": "phase/i04-collaboration-runtime",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I04-T01",
-  "current_slice": "I04 原生子会话已接实际Host来源、精确文件和历史输入；本批固定Codeg Codex消息主体/代码模式/MCP/等待/目标计划/去重提升/思考图片/用量已接同一Core读取链路，原22组断言及受控文件分项验证，最终记录见对应证据。Grok完整统计/目录、两原parser差分、可信工程/旧agent来源、有界签名运输和原UI继续；完整Host/Runtime/平台与I04四包84正式场景未收口。",
+  "current_slice": "I04原生子会话：Grok完整统计、显示摘要和模型窗口cache→config→id回落已接；固定原parser31组受控对照（Codex24/Grok7）中30相等、1组仅完整保留长工具正文、0未解释差异。可信工程patch/旧agent显式来源、有界签名运输/后台取消和原UI继续；真实Host/Runtime/平台及I04四包84正式场景未收口。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,7 +33,7 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "I04-T01：Grok完整会话统计/原模型上下文窗口目录，以及两固定原parser完整差分；补可信工程patch源行和旧agent文件的显式父链读取",
+    "I04-T01：接可信工程patch源行和旧agent文件显式父链；原parser更广格式语料及完整App同场景留阶段验证",
     "I04-T01：Core完整有界内容分页、签名快照/后代引用及首次文件发现/hash后台取消，Native/Web共用User-only读取和固定Codeg原只读UI/同场景",
     "I04-T01：Grok修改意见与r1三Context mode/接管衔接核定；旧无记录来源显式导入及真实Core/Host/Runtime生命周期/Schema升级与恢复矩阵集中候选",
     "I04-T02/T03/T04：Runtime并集、恢复、记忆与自动化原剩余项；完整四包21簇84场景保留，阶段集齐集中构建/少量push和Actions"
@@ -41,7 +41,7 @@
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
   "current_slice_status": "native_codex_message_body_and_verified_file_pipeline_targeted_passed_full_differential_transport_ui_pending",
-  "evidence": "i04-native-codex-content-result.json",
+  "evidence": "i04-native-parser-parity-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
   "draft_restart_evidence": "i02-draft-restart-result.json",
@@ -265,5 +265,6 @@
   "i04_native_child_source_evidence": "i04-native-child-source-result.json",
   "i04_native_source_origin_evidence": "i04-native-source-origin-result.json",
   "i04_native_content_evidence": "i04-native-content-result.json",
-  "i04_native_codex_content_evidence": "i04-native-codex-content-result.json"
+  "i04_native_codex_content_evidence": "i04-native-codex-content-result.json",
+  "i04_native_parser_parity_evidence": "i04-native-parser-parity-result.json"
 }

@@ -228,6 +228,48 @@ pub(crate) fn assert_content_projection(home: &Path, base: &ObservedNativeSessio
     assert_eq!(serde_json::to_value(repeated.turns).unwrap(), wire);
     assert_eq!(content.snapshot_digest, repeated.snapshot_digest);
     assert!(grok_content(&target, fallback, &AtomicBool::new(true)).is_err());
+    if super::reference_tests::enabled() {
+        let mut exact_rows = rows.clone();
+        for (index, value) in exact_rows.iter_mut().enumerate() {
+            value["timestamp"] = (1700000000_i64 + index as i64).into();
+        }
+        write(
+            home,
+            "sessions/group-b/child/updates.jsonl",
+            lines(&exact_rows),
+        );
+        let complete = grok_content(&target, fallback, &stop).unwrap();
+        super::reference_tests::compare_native(
+            "grok-long-complete",
+            home,
+            "grok-build",
+            &home.join("sessions/group-b/child"),
+            "child",
+            &complete,
+            Some(("mcp", &long)),
+        );
+        let small_rows: Vec<Value> = exact_rows
+            .iter()
+            .map(|value| {
+                serde_json::from_str(&value.to_string().replace(&long, "完整工具JSON")).unwrap()
+            })
+            .collect();
+        write(
+            home,
+            "sessions/group-b/child/updates.jsonl",
+            lines(&small_rows),
+        );
+        let compact = grok_content(&target, fallback, &stop).unwrap();
+        super::reference_tests::compare_native(
+            "grok-compact-tools",
+            home,
+            "grok-build",
+            &home.join("sessions/group-b/child"),
+            "child",
+            &compact,
+            None,
+        );
+    }
 
     // Two independently proven descendants exercise the actual lifecycle map,
     // whose iteration order must not change the content/cursor identity.
@@ -307,6 +349,218 @@ pub(crate) fn assert_content_projection(home: &Path, base: &ObservedNativeSessio
     assert!(joined.contains(&newest[1]));
     assert!(!joined.contains(&oldest[1]));
     assert!(!joined.contains(&oldest[3]));
+    assert_grok_stats(home, base);
+}
+
+fn assert_grok_stats(home: &Path, base: &ObservedNativeSessionTarget) {
+    let mut target = base.clone();
+    target.adapter_kind = "grok-build".into();
+    target.child_native_session_id = "grok-stats".into();
+    target.recorded_home = Some(home.into());
+    write(
+        home,
+        "sessions/group-a/parent/updates.jsonl",
+        lines(&[row(
+            json!({"sessionUpdate":"subagent_spawned","subagent_id":"stats-short","child_session_id":"grok-stats","parent_session_id":target.parent_native_session_id}),
+        )]),
+    );
+    let mut rows = vec![
+        row(
+            json!({"sessionUpdate":"user_message_chunk","content":{"type":"text","text":"请检查"}}),
+        ),
+        row(
+            json!({"sessionUpdate":"agent_message_chunk","content":{"type":"text","text":"第一段"}}),
+        ),
+        json!({"params":{"_meta":{"totalTokens":80000},"update":{"sessionUpdate":"turn_completed","usage":{"inputTokens":100,"cachedReadTokens":20,"cacheCreationTokens":5,"outputTokens":10}}}}),
+        row(
+            json!({"sessionUpdate":"agent_message_chunk","content":{"type":"text","text":"第二段"}}),
+        ),
+        row(
+            json!({"sessionUpdate":"turn_completed","usage":{"inputTokens":200,"cachedReadTokens":50,"cacheCreationTokens":10,"outputTokens":20}}),
+        ),
+    ];
+    for (index, value) in rows.iter_mut().enumerate() {
+        value["timestamp"] = (1700000000_i64 + index as i64).into();
+    }
+    write(
+        home,
+        "sessions/group-b/grok-stats/updates.jsonl",
+        lines(&rows),
+    );
+    let summary = |model: &str| {
+        serde_json::to_vec(&json!({"current_model_id":model,"generated_title":" 摘要标题 ","session_summary":"次选标题","head_branch":" feat/stats ","created_at":"2026-10-18T16:00:00+08:00","updated_at":"2026-10-18T17:00:00+08:00","info":{"cwd":"PRIVATE_GROK_CWD"},"api_key":"PRIVATE_GROK_SUMMARY"})).unwrap()
+    };
+    write(
+        home,
+        "sessions/group-b/grok-stats/summary.json",
+        summary("custom-native"),
+    );
+    write(home,"models_cache.json",serde_json::to_vec(&json!({"models":{"custom-native":{"info":{"context_window":320000}}},"api_key":"PRIVATE_GROK_CACHE"})).unwrap());
+    write(
+        home,
+        "config.toml",
+        "[model.custom-native]\ncontext_window=640000\napi_key='PRIVATE_GROK_CONFIG'\n",
+    );
+    let stop = AtomicBool::new(false);
+    let fallback = Utc.timestamp_opt(1600000000, 0).single().unwrap();
+    let content = grok_content(&target, fallback, &stop).unwrap();
+    super::reference_tests::compare_native(
+        "grok-cache-priority",
+        home,
+        "grok-build",
+        &home.join("sessions/group-b/grok-stats"),
+        "grok-stats",
+        &content,
+        None,
+    );
+    let stats = content.session_stats.as_ref().unwrap();
+    assert_eq!(stats.context_window_used_tokens, Some(80000));
+    assert_eq!(stats.context_window_max_tokens, Some(320000));
+    assert_eq!(stats.context_window_usage_percent, Some(25.0));
+    assert_eq!(stats.total_tokens, Some((100 + 10) + (200 + 20)));
+    let usage = stats.total_usage.as_ref().unwrap();
+    assert_eq!(usage.input_tokens, (100 - 20 - 5) + (200 - 50 - 10));
+    assert_eq!(usage.output_tokens, 10 + 20);
+    assert_eq!(usage.cache_creation_input_tokens, 5 + 10);
+    assert_eq!(usage.cache_read_input_tokens, 20 + 50);
+    let meta = content.summary.as_ref().unwrap();
+    assert_eq!(meta.title.as_deref(), Some("摘要标题"));
+    assert_eq!(meta.model.as_deref(), Some("custom-native"));
+    assert_eq!(meta.git_branch.as_deref(), Some("feat/stats"));
+    assert_eq!(meta.started_at.to_rfc3339(), "2026-10-18T08:00:00+00:00");
+    assert_eq!(
+        meta.ended_at.unwrap().to_rfc3339(),
+        "2026-10-18T09:00:00+00:00"
+    );
+    assert_eq!(meta.message_count, 3);
+    let wire =
+        serde_json::to_string(&(&content.turns, &content.session_stats, &content.summary)).unwrap();
+    for marker in [
+        "PRIVATE_GROK_CWD",
+        "PRIVATE_GROK_SUMMARY",
+        "PRIVATE_GROK_CACHE",
+        "PRIVATE_GROK_CONFIG",
+    ] {
+        assert!(!wire.contains(marker));
+    }
+    let again = grok_content(&target, fallback, &stop).unwrap();
+    assert_eq!(again.snapshot_digest, content.snapshot_digest);
+    write(home, "models_cache.json", "{\"models\":{}}");
+    let configured = grok_content(&target, fallback, &stop).unwrap();
+    super::reference_tests::compare_native(
+        "grok-config-fallback",
+        home,
+        "grok-build",
+        &home.join("sessions/group-b/grok-stats"),
+        "grok-stats",
+        &configured,
+        None,
+    );
+    assert_eq!(
+        configured
+            .session_stats
+            .as_ref()
+            .unwrap()
+            .context_window_max_tokens,
+        Some(640000)
+    );
+    assert_ne!(configured.snapshot_digest, content.snapshot_digest);
+    write(home, "models_cache.json", "broken json");
+    write(
+        home,
+        "sessions/group-b/grok-stats/summary.json",
+        summary("grok-4.5"),
+    );
+    let inferred = grok_content(&target, fallback, &stop).unwrap();
+    super::reference_tests::compare_native(
+        "grok-id-inference",
+        home,
+        "grok-build",
+        &home.join("sessions/group-b/grok-stats"),
+        "grok-stats",
+        &inferred,
+        None,
+    );
+    assert_eq!(
+        inferred
+            .session_stats
+            .as_ref()
+            .unwrap()
+            .context_window_max_tokens,
+        Some(500000)
+    );
+    assert_eq!(inferred.notes.malformed_records, 1);
+    write(
+        home,
+        "sessions/group-b/grok-stats/summary.json",
+        summary("unknown-native"),
+    );
+    write(
+        home,
+        "models_cache.json",
+        "{\"models\":{\"unknown-native\":{\"info\":{\"context_window\":0}}}}",
+    );
+    write(
+        home,
+        "config.toml",
+        "[model.unknown-native]\ncontext_window=-1\n",
+    );
+    let unknown = grok_content(&target, fallback, &stop).unwrap();
+    super::reference_tests::compare_native(
+        "grok-unknown-window",
+        home,
+        "grok-build",
+        &home.join("sessions/group-b/grok-stats"),
+        "grok-stats",
+        &unknown,
+        None,
+    );
+    assert_eq!(
+        unknown
+            .session_stats
+            .as_ref()
+            .unwrap()
+            .context_window_max_tokens,
+        None
+    );
+    assert_eq!(
+        unknown
+            .session_stats
+            .as_ref()
+            .unwrap()
+            .context_window_usage_percent,
+        None
+    );
+    fs::remove_file(home.join("models_cache.json")).unwrap();
+    fs::create_dir(home.join("models_cache.json")).unwrap();
+    write(
+        home,
+        "config.toml",
+        "[model.unknown-native]\ncontext_window=123456\napi_key='PRIVATE_GROK_CONFIG'\n",
+    );
+    let advisory = grok_content(&target, fallback, &stop).unwrap();
+    super::reference_tests::compare_native(
+        "grok-unreadable-advisory",
+        home,
+        "grok-build",
+        &home.join("sessions/group-b/grok-stats"),
+        "grok-stats",
+        &advisory,
+        None,
+    );
+    assert_eq!(
+        advisory
+            .session_stats
+            .as_ref()
+            .unwrap()
+            .context_window_max_tokens,
+        Some(123456)
+    );
+    assert_eq!(advisory.notes.unavailable_advisories, 1);
+    assert_eq!(
+        serde_json::to_value(&advisory.turns).unwrap(),
+        serde_json::to_value(&unknown.turns).unwrap()
+    );
 }
 
 fn assert_codex_file_content(home: &Path, base: &ObservedNativeSessionTarget) {
@@ -317,12 +571,14 @@ fn assert_codex_file_content(home: &Path, base: &ObservedNativeSessionTarget) {
     target.recorded_home = Some(home.into());
     let record = |second: u32, kind: &str, payload: Value| json!({"timestamp": format!("2026-10-18T13:00:{second:02}Z"), "type":kind, "payload":payload});
     let patch = "*** Begin Patch\n*** Update File: src/file.ts\n@@\n-old\n+new\n*** End Patch";
+    let project_path = home.join("project").to_string_lossy().into_owned();
+    write(home, "project/src/file.ts", "old\n");
     let long = "完整结果中文".repeat(40_000);
     let rows = vec![
         record(
             0,
             "session_meta",
-            json!({"id":"codex-content","parent_thread_id":target.parent_native_session_id,"cwd":"C:/native-cwd-is-not-a-file-grant","api_key":"PRIVATE_CODEX_STARTUP"}),
+            json!({"id":"codex-content","parent_thread_id":target.parent_native_session_id,"cwd":project_path,"api_key":"PRIVATE_CODEX_STARTUP"}),
         ),
         record(
             1,
@@ -397,17 +653,26 @@ fn assert_codex_file_content(home: &Path, base: &ObservedNativeSessionTarget) {
     let mut reads = 0;
     let content = codex_content(&target, fallback, &stop, &mut |path, cwd| {
         assert_eq!(path, "src/file.ts");
-        assert_eq!(cwd, Some("C:/native-cwd-is-not-a-file-grant"));
+        assert_eq!(cwd, Some(project_path.as_str()));
         reads += 1;
         Some(vec!["old".into()])
     })
     .unwrap();
     assert_eq!(reads, 1);
+    super::reference_tests::compare_native(
+        "codex-file-long-complete",
+        home,
+        "codex-cli",
+        &home.join("sessions/2026/10/18/rollout-2026-10-18T13-00-00-codex-content.jsonl"),
+        "codex-content",
+        &content,
+        Some(("long-1", &long)),
+    );
     let summary = content.summary.as_ref().unwrap();
     assert_eq!(summary.title.as_deref(), Some("完成修改"));
     assert_eq!(summary.model.as_deref(), Some("gpt-5-codex"));
     let summary_wire = serde_json::to_string(summary).unwrap();
-    assert!(!summary_wire.contains("native-cwd-is-not-a-file-grant"));
+    assert!(!summary_wire.contains(&project_path));
     assert!(!summary_wire.contains("PRIVATE_CODEX_STARTUP"));
     let users: Vec<_> = content
         .turns

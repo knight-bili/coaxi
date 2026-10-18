@@ -27,6 +27,8 @@ pub(crate) enum DocumentKind {
     GrokChatHistory,
     GrokSummary,
     GrokSubagentMetadata,
+    GrokModelsCache,
+    GrokConfig,
 }
 
 /// A Codex link names an exact rollout, not whichever newer file has that thread.
@@ -40,6 +42,7 @@ pub(crate) struct HistoryLink {
 /// No Serialize/Deserialize: a future API must return the content projection.
 pub(crate) struct NativeDocuments {
     pub(crate) documents: Vec<NativeDocument>,
+    pub(crate) unavailable_advisories: usize,
 }
 
 pub(crate) struct NativeDocument {
@@ -72,12 +75,12 @@ impl NativeDocuments {
             "native_child.invalid_reference"
         );
         let home = fs::canonicalize(binding_home).context("native_child.source_unavailable")?;
-        let documents = match target.adapter_kind.as_str() {
-            "codex-cli" => codex_documents(&home, target)?,
+        let (documents, unavailable_advisories) = match target.adapter_kind.as_str() {
+            "codex-cli" => (codex_documents(&home, target)?, 0),
             "grok-build" => grok_documents(&home, target)?,
             _ => bail!("native_child.unsupported_source"),
         };
-        Ok(Self { documents })
+        Ok(Self { documents, unavailable_advisories })
     }
 }
 
@@ -479,7 +482,7 @@ fn grok_link(home: &Path, parent: &Path, target: &ObservedNativeSessionTarget) -
 fn grok_documents(
     home: &Path,
     target: &ObservedNativeSessionTarget,
-) -> Result<Vec<NativeDocument>> {
+) -> Result<(Vec<NativeDocument>, usize)> {
     let paths = entries(home, &home.join("sessions"), 2)?;
     let parent = grok_session(home, &paths, &target.parent_native_session_id)?;
     let child = grok_session(home, &paths, &target.child_native_session_id)?;
@@ -511,7 +514,19 @@ fn grok_documents(
         document.source_label = Some(id.into());
         documents.push(document);
     }
-    Ok(documents)
+    // These are advisory display sources, not transcript/lineage evidence.
+    // Preserve the original catalogue fallback when absent or unreadable,
+    // while still refusing links, non-regular files and paths outside home.
+    let mut unavailable_advisories = 0;
+    for (name, kind) in [("models_cache.json", DocumentKind::GrokModelsCache), ("config.toml", DocumentKind::GrokConfig)] {
+        let path = home.join(name);
+        if matches!(path.try_exists(), Ok(false)) { continue; }
+        match NativeDocument::open(home, &path, kind) {
+            Ok(document) => documents.push(document),
+            Err(_) => unavailable_advisories += 1,
+        }
+    }
+    Ok((documents, unavailable_advisories))
 }
 
 #[cfg(all(test, feature = "extended-tests"))]

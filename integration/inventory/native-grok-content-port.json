@@ -49,11 +49,12 @@
     "Grok lifecycle enrichment uses Core-verified child loader and explicit native Session ids; nested cards keep donor previews",
     "Exclude unused MessageRole/UnifiedMessage/wire adapter until Codex consumer is actually ported; no dead-code suppression"
   ],
-  "implementation_status": "grok_message_layer_and_codex_history_input_verified_codex_full_parser_transport_ui_pending",
+  "implementation_status": "message_layer_codex_followup_grok_stats_and_fixed_component_differential_verified_public_transport_ui_pending",
   "remaining": [
-    "Codex full original message/code-mode/goal/usage parser",
-    "Grok session stats/context window catalogue and full original parser differential",
-    "User-only bounded transport/signed nested references and original UI"
+    "Trusted production project patch reader and explicit legacy lineage",
+    "User-only bounded transport/signed nested references and original UI",
+    "Complete original App/Host/Runtime/platform validation"
   ],
-  "shared_model_followup": "native-codex-content-port.json restores actual UnifiedMessage/MessageRole consumer and adds SessionStats/selected Core display summary; current source qualification is the Codex followup record"
+  "shared_model_followup": "native-codex-content-port.json restores actual UnifiedMessage/MessageRole consumer and adds SessionStats/selected Core display summary; current source qualification is the Codex followup record",
+  "stats_and_differential_followup": "native-grok-stats-port.json; integration/execution/i04-native-parser-parity-result.json"
 }

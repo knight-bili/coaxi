@@ -36,4 +36,6 @@
 
 Codex 主体接续（2026-10-18）：原消息 parser 与代码模式/MCP/延迟等待、去重/promotion、计划/目标、思考/图片、collab/花费与占用已移植；固定[来源范围和适配](native-codex-content-port.json)可查。输入来自现有 Core 核验文件和历史拼接，后代/工程 patch 源行使用可信回调，不导入原 suffix 文件猜选、任意 cwd 读取或执行代码。显示摘要只有 title/model/branch/时间/数量，投影内容变化进入快照指纹。22组原版断言与实际文件分项的资格由[接续证据](../execution/i04-native-codex-content-result.json)拥有。
 
-当前剩余：Grok 完整统计/上下文窗口目录、两原 parser 完整差分、生产工程文件回调和旧 agent 文件显式父链、有界签名运输/后台取消、原只读 UI/同场景、真实 Host/Runtime/平台及 I04 其余工作包。前述旧“Codex主体待移植”段落是当批状态，不据历史文字重做已提交分项，也不将主体移植当完整查看器或I04完成。
+统计与原parser对照接续（2026-10-18）：Grok完整统计、原cache→config→id窗口回落及显示摘要已接核验源。两份固定原parser实际31组受控文件对照中30组完整投影相同、1组保留原版截断的工具正文、0项未解释差异，见[本批记录](../execution/i04-native-parser-parity-result.json)和[可复现配方](../verification/native-parser-reference/README.md)。原主体字节、22源文件、102包锁图及受控fixture边界已核对，不能称完整原App或全部用户语料等价。
+
+当前剩余：生产工程文件回调和旧agent文件显式父链、有界签名运输/后台取消、原只读UI/同场景、真实Host/Runtime/平台及I04其余工作包。前述“Codex主体/完整统计/原parser差分待做”是当批状态，不据历史文字重做已验证分项，也不将组件对照当完整查看器或I04完成。

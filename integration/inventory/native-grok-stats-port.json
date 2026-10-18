@@ -1,0 +1,37 @@
+{
+  "donor_commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+  "license": "Apache-2.0",
+  "sources": {
+    "src-tauri/src/parsers/mod.rs": {
+      "bytes": 108012,
+      "sha256": "06a43b8597edb1c6167143f1434e4260d9171b72eafbd3b114d36dc2e8160c2b"
+    },
+    "src-tauri/src/parsers/grok.rs": {
+      "bytes": 168501,
+      "sha256": "ba9fe75f5a01f28e2b764c5c61cffc494aa9f1bdfc45a95e4641b6c5db6e8439"
+    }
+  },
+  "ranges": {
+    "grok_stats.rs": "grok.rs:109-134,531-598; exclude source cwd/session_kind display fields",
+    "common.rs": "existing shared title/reference and compute stats moved unchanged from codex/support; parsers/mod.rs:947-1152,1187-1217",
+    "grok.rs": "original build_detail:273-341 and summary_from:244-271 over verified documents"
+  },
+  "changes": [
+    "Read model cache/config only through captured Core root and verified private snapshots",
+    "Core display metadata excludes native cwd/session identity/launch or credential fields",
+    "Preserve cache/config/id-inference priority and native occupancy vs cumulative spend",
+    "Advisory open failures fall back without granting links/paths; in-flight snapshot changes still reject",
+    "Reuse one shared stats/title implementation across Grok/Codex; no model inputs, public API or dependency changes"
+  ],
+  "implementation_status": "grok_stats_and_fixed_original_parser_components_targeted_differential_passed_public_transport_ui_pending",
+  "evidence": "integration/execution/i04-native-parser-parity-result.json",
+  "differential": {
+    "cases": 31,
+    "codex": 24,
+    "grok": 7,
+    "exact": 30,
+    "intentional_complete_content": 1,
+    "unexpected": 0,
+    "complete_original_app": false
+  }
+}

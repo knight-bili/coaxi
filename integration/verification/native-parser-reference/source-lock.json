@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+  "license": "Apache-2.0",
+  "sources": {
+    "src-tauri/src/parsers/codex.rs": {
+      "sha256": "5a7653c083c394c7bc1a973ef566a4db67b1a8f5d20501572a8a8a1a74511428",
+      "bytes": 796430
+    },
+    "src-tauri/src/parsers/grok.rs": {
+      "sha256": "ba9fe75f5a01f28e2b764c5c61cffc494aa9f1bdfc45a95e4641b6c5db6e8439",
+      "bytes": 168501
+    },
+    "src-tauri/src/parsers/codex_code_mode.rs": {
+      "sha256": "878b0de286a84dbd0d2e89e63e117f06d8f9cc7450b795077341b2e169310892",
+      "bytes": 128513
+    },
+    "src-tauri/src/parsers/codex_desktop_attachments.rs": {
+      "sha256": "40b1ed9747a077f4ba554d8de64ac348335eb33f0fe5f5033bb555a59f2d0374",
+      "bytes": 24167
+    },
+    "src-tauri/src/acp/agent_mentions.rs": {
+      "sha256": "b371ebd2b654640e9fe0d4a7a50f0d28f34bfbcdae3575162c3c364f1acdfb27",
+      "bytes": 40200
+    },
+    "src-tauri/src/acp/codex_context.rs": {
+      "sha256": "500c7591bf2b59d9621660afcafb830cbed1b5bbedc9f4a653549e884a4ce7d0",
+      "bytes": 5648
+    },
+    "src-tauri/src/acp/codex_goal.rs": {
+      "sha256": "8c70251de5d8604f0c889f873c0628ba5f9b809db9006f62558daf4dfdc4c937",
+      "bytes": 20214
+    },
+    "src-tauri/src/acp/js_text.rs": {
+      "sha256": "42c1b9ad07eedd3c6db24a31314a51464e35e5ebb27393b2df3eafbb837dc111",
+      "bytes": 1917
+    },
+    "src-tauri/src/acp/service_error.rs": {
+      "sha256": "03694d3384265f2d0b8fe40ebaa0f4a8abd4c87357fa0f672f364dc0df774e29",
+      "bytes": 13377
+    },
+    "src-tauri/src/models/agent.rs": {
+      "sha256": "d3cf2e73e01083038ab3bfb6c40ce67192cd17c2a951e469be7db6c244d611dc",
+      "bytes": 13959
+    },
+    "src-tauri/src/models/message.rs": {
+      "sha256": "b34343a8a8cbfb4a6300aeb17a9c067230d81c17e97afbc0a84e98698e10e6b2",
+      "bytes": 14275
+    },
+    "src-tauri/src/intern.rs": {
+      "sha256": "5c34c7a022c58dd275a41bdb8df3324a09695d0eb8e981b7b120ea0164f73857",
+      "bytes": 4459
+    },
+    "src-tauri/src/models/conversation.rs": {
+      "sha256": "6bd159fc7a78c935449fe157215997adb52039429d0664576db4845af7a4aac7",
+      "bytes": 16743
+    },
+    "src-tauri/src/acp/types.rs": {
+      "sha256": "96e29fe6caec082d3af255a0cb530a082f87c80910e55909a6f38305c4b15a9f",
+      "bytes": 118414
+    },
+    "src-tauri/src/acp/connection.rs": {
+      "sha256": "7359afd3dc32066df9d15658b556be42ab6d308912e5b7df1516f9287b2cb352",
+      "bytes": 1617268
+    },
+    "src-tauri/src/acp/air_contract.rs": {
+      "sha256": "a94c95b68b9e1d68946b881ffc4109dce1fc667f1db2b0b45d1bb4097162ff5c",
+      "bytes": 34221
+    },
+    "src-tauri/src/acp/session_title.rs": {
+      "sha256": "3dd0412949907363db6e16e8580afb5220f1af4f7e41a996144ed0e9f3c9a4ff",
+      "bytes": 23712
+    },
+    "src-tauri/src/parsers/claude.rs": {
+      "sha256": "6e71571b0b300cc954343ceba89308134c0fc1fd41009c43560cf2161f8b0e51",
+      "bytes": 367323
+    },
+    "src-tauri/src/parsers/pi.rs": {
+      "sha256": "6a74d175601c915dc844390241a35fe256395d8f40f7a5332e0583f396283cd0",
+      "bytes": 121573
+    },
+    "src-tauri/src/parsers/mod.rs": {
+      "sha256": "06a43b8597edb1c6167143f1434e4260d9171b72eafbd3b114d36dc2e8160c2b",
+      "bytes": 108012
+    },
+    "src-tauri/src/browser/types.rs": {
+      "sha256": "b26aa59257e68c46f5febf8116ca455377031a55edef96d6dacbdfdda1493bcb",
+      "bytes": 23074
+    },
+    "src-tauri/Cargo.lock": {
+      "sha256": "73c3e00f9d836027dfa44b8640f207a811cebb264c9e41f46f3bb8711c6c6cb6",
+      "bytes": 244330
+    }
+  },
+  "parser_bodies_byte_identical": true,
+  "reference_only": true,
+  "boundary_bridges": [
+    "Original message/agent/intern and pure ACP helpers",
+    "Original shared functions/summary-detail model slices",
+    "DB error variant omitted; list-cache pass-through and unused custom display registry return None; none participates in body parse"
+  ]
+}

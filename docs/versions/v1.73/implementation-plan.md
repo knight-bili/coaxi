@@ -136,3 +136,11 @@ Grok修改意见仍未完成。核对固定Codeg的lifecycleSend/mqEnqueue和已
 沿原文件 owner 扩固定 Codeg 的22组断言和受控文件→wrapper场景，无新 Rust owner/数据库/进程；原版断言只换输入夹具适配，未改期望。新增正则依赖固定供体1.12.3及原图，percent-encoding复用已锁2.3.2，无其他依赖升级。实际编译、定向结果、失败历史和边界见[本批记录](../../../integration/execution/i04-native-codex-content-result.json)，不是原完整 App 差分、公共运输/GUI/真实模型或84正式场景资格。
 
 下一有限队列：Grok 完整会话统计/上下文窗口目录和两原 parser 差分；可信工程文件回调与旧 agent 文件显式父链；完整有界内容/签名快照和后代引用、首次 snapshot 发现/hash后台取消；User-only Native/Web 与固定 Codeg 原只读 UI/同场景，再阶段 Runtime/平台和其余工作包集中候选。完整 I04 四包/21簇/84和一期81簇/48包/324不减，不新增客户工程测试事项。
+
+## Grok 统计与固定原 parser 对照分项
+
+Grok标题/型号/分支/时间、原统计和上下文窗口cache→config→id回落已接Core核验文件；缓存/配置只提供显示数值，不输出原路径或凭据。辅助源初次不可读可回落，已捕获源中途改写及取消继续拒绝。Codex原统计/标题规则移入共享实现，函数正文不变，模型推断/窗口合并也保持固定供体正文。
+
+[本批证据](../../../integration/execution/i04-native-parser-parity-result.json)包含实际31组对照、参考程序原主体与102包锁图、普通及启用参考进程的精确原owner结果，以及明确长正文差异。参考配方入库，不依赖未提交的临时修改。没有新Rust owner/数据库，只有测试专用原parser进程夹具；不授予完整App/Host/运输/UI/模型/平台或84正式场景资格。Schema161/Migration211、产品依赖及6份批准r1不变。
+
+下一项补可信工程patch行/旧agent显式父链，再推进有界签名读取、首次发现/hash后台取消、原版只读UI及同场景。Grok修改意见r1衔接、旧来源显式导入、Runtime/平台和其余I04工作包保持，阶段集齐再集中验证。上方旧检查点“完整统计/差分未接”保留当批事实，本节覆盖其当前状态。

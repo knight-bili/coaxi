@@ -10,6 +10,7 @@ pub(crate) struct ParseNotes {
     pub(crate) malformed_records: usize,
     pub(crate) incomplete_tail: bool,
     pub(crate) unavailable_children: usize,
+    pub(crate) unavailable_advisories: usize,
 }
 
 /// UTF-8/JSON records may span any number of verified byte chunks. Only one
@@ -119,4 +120,13 @@ pub(super) fn json_document(document: &mut NativeDocument, stop: &AtomicBool) ->
         bytes.extend(document.read_chunk(index)?);
     }
     Ok(serde_json::from_slice(&bytes)?)
+}
+
+pub(super) fn text_document(document: &mut NativeDocument, stop: &AtomicBool) -> Result<String> {
+    let mut bytes = Vec::new();
+    for index in 0..document.chunk_count() {
+        ensure!(!stop.load(Ordering::Acquire), "native_child.read_cancelled");
+        bytes.extend(document.read_chunk(index)?);
+    }
+    Ok(String::from_utf8(bytes)?)
 }

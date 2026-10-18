@@ -11,9 +11,11 @@ last_updated: 2026-10-18
 
 # v1.73：Core 独立帮手
 
+Grok 完整会话统计、显示摘要及原模型窗口缓存→配置→型号回落已接入。两份固定原解析器已实际运行31组受控文件对照：Codex24、Grok7，其中30组完整投影相同，1组仅完整保留原版截断的两段工具正文，未发现未解释差异。[本批证据](../../../integration/execution/i04-native-parser-parity-result.json)与[复现配方](../../../integration/verification/native-parser-reference/README.md)保留源码、依赖和验证边界。该结果不代表完整原App、公共运输、原UI、真实Host/模型或84项正式场景通过；模型输入、Schema161/Migration211、产品依赖不变。
+
 Codex 原消息解析主体及代码模式/MCP/延迟等待、目标/计划、去重/提升、思考/图片与用量已接同一核验文件链路，具体[接续证据](../../../integration/execution/i04-native-codex-content-result.json)区分原版断言与实际受控文件、完整差分及公共查看器资格。新增依赖仅为供体锁定 regex1.12.3 图和已存在的 percent-encoding2.3.2，无其他包升级；模型输入、Schema 和正式场景数量不变。
 
-本批移植固定 Codeg 的 Grok 消息/工具/答案纯解析及共享材料/归并规则，并接通 Codex cut/seed 历史输入拼接。[内容分项记录](../../../integration/execution/i04-native-content-result.json)保留编译、原文件 owner 定向检查与来源清单。Codex 完整消息/代码模式/目标/用量、Grok 完整会话统计与原完整 parser 差分、公共有界运输及原 UI 仍待；没有改变模型输入、Schema 或正式场景通过数。
+此前固定 Codeg 的 Grok 消息/工具/答案纯解析、共享材料/归并规则及 Codex cut/seed 历史输入拼接见[内容分项记录](../../../integration/execution/i04-native-content-result.json)。该记录保留当批资格，后续消息解析、统计及受控原parser对照以本页上方接续为准；公共有界运输、原UI及完整应用同场景仍待，没有新增正式场景通过数。
 
 本批启动来源及历史读取沿现有 Core 权威接线，未改模型输入或 Schema161/Migration211；主程序检查与同库/文件分项结果见[来源持久化记录](../../../integration/execution/i04-native-source-origin-result.json)。这不表示真实 provider、公共运输或原查看器已完成。
 

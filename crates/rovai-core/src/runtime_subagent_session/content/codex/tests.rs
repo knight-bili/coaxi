@@ -2,19 +2,35 @@
 // Invoked by the existing source filesystem owner, with no new test/DB/process owner.
 use super::*;
 
-fn parse_rollout(_label: &str, content: &str, _session_id: &str) -> ConversationDetail {
-    let rows = content
+fn parse_rollout(label: &str, content: &str, session_id: &str) -> ConversationDetail {
+    let mut rows: Vec<Value> = content
         .lines()
         .filter(|s| !s.trim().is_empty())
-        .map(|s| Ok(serde_json::from_str::<Value>(s).unwrap()));
-    project(
-        rows,
+        .map(|s| serde_json::from_str::<Value>(s).unwrap())
+        .collect();
+    let reference = super::super::reference_tests::prepare_codex(label, &mut rows);
+    let detail = project(
+        rows.into_iter().map(Ok),
         DateTime::from_timestamp(1_600_000_000, 0).unwrap(),
         &AtomicBool::new(false),
         &mut |_| None,
         &mut |_, _| None,
     )
-    .unwrap()
+    .unwrap();
+    if let Some((home, path, case)) = reference {
+        super::super::reference_tests::compare(
+            &case,
+            &home,
+            "codex-cli",
+            &path,
+            session_id,
+            &detail.turns,
+            detail.session_stats.as_ref(),
+            Some(&detail.summary),
+            None,
+        );
+    }
+    detail
 }
 
 fn parse_lines(lines: &[String], tag: &str) -> ConversationDetail {

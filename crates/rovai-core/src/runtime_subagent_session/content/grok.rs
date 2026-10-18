@@ -1175,12 +1175,16 @@ fn truncate_str(value: &str, _cap: usize) -> String {
 pub(super) struct GrokContent {
     pub(super) turns: Vec<MessageTurn>,
     pub(super) context_tokens: Option<u64>,
+    pub(super) session_stats: Option<SessionStats>,
+    pub(super) summary: NativeTranscriptSummary,
 }
 pub(super) fn project(
     rows: impl IntoIterator<Item = Result<Value>>,
     answers: impl IntoIterator<Item = Result<Value>>,
     fallback: DateTime<Utc>,
-    session_model: Option<&str>,
+    summary_meta: &super::grok_stats::SummaryMeta,
+    model_cache: Option<&Value>,
+    model_config: Option<&str>,
     metadata: &HashMap<String, Value>,
     mut child_tools: impl FnMut(&str) -> Vec<AgentToolCall>,
 ) -> Result<GrokContent> {
@@ -1189,17 +1193,47 @@ pub(super) fn project(
     super::common::structurize_read_tool_output(&mut parsed.turns);
     inject_grok_ask_answers(&mut parsed.turns, answers)?;
     enrich_subagents(&mut parsed, metadata, &mut child_tools);
-    if let Some(model) = session_model.map(str::to_owned).or(parsed.model) {
+    let session_model = summary_meta.model.as_deref().or(parsed.model.as_deref());
+    if let Some(model) = session_model {
         for turn in &mut parsed.turns {
             if matches!(turn.role, TurnRole::Assistant) && turn.model.is_none() {
-                turn.model = Some(model.clone());
+                turn.model = Some(model.to_owned());
             }
         }
     }
     super::common::backfill_turn_durations(&mut parsed.turns, &[]);
+    let context_window = session_model.and_then(|model| {
+        model_cache
+            .and_then(|cache| super::grok_stats::cache_window(cache, model))
+            .or_else(|| model_config.and_then(|raw| super::grok_stats::config_window(raw, model)))
+            .or_else(|| super::common::infer_context_window_max_tokens(Some(model)))
+    });
+    let session_stats = super::common::merge_context_window_stats(
+        super::common::compute_session_stats(&parsed.turns),
+        parsed.context_tokens,
+        context_window,
+    );
+    let summary = NativeTranscriptSummary {
+        title: summary_meta.title.clone().or_else(|| {
+            parsed
+                .first_user_text
+                .as_deref()
+                .map(super::common::title_from_user_text)
+        }),
+        model: summary_meta.model.clone().or(parsed.model),
+        git_branch: summary_meta.git_branch.clone(),
+        started_at: summary_meta
+            .created_at
+            .or(parsed.first_ts)
+            .unwrap_or(fallback),
+        ended_at: summary_meta.updated_at.or(parsed.last_ts),
+        message_count: parsed.turns.len() as u32,
+    };
     Ok(GrokContent {
         turns: parsed.turns,
         context_tokens: parsed.context_tokens,
+        session_stats,
+        summary,
     })
 }
 
