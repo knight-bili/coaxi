@@ -174,3 +174,9 @@ Core User解析后生成整份不可变投影，私有NativeSnapshot按4至32768
 先前完整快照检查点的后台/重授权待接项，本批已进入源码。进程内Registry、独立std线程和4个工作名额负责首次发现/hash/解析；16缓存及按访问清理的5分钟空闲租约、关闭墓碑/饱和保护、Core退出及迟到结果丢弃保持阅读独立。每poll/page重做原Core resolve，后代沿原root核对，不接受UI自报原生Session/目录。Core原运行创建时间作为缺原生时间戳的固定回落，不用打开时的当前时间。
 
 Native renderer和Web加入start/poll/page/close四方法；Web闭合过滤字段并保留完整fragment，User actor由Core封闭派生，Builtin/模型目录不增加方法。沿原source owner实际受控线程/文件、原Web projection owner和原Desktop/Web client owner检查，不新建数据库或外部进程；名单和受控运输不能当实际Core handle/Host HTTP/IPC/GUI资格。[本批记录](../../../integration/execution/i04-native-reader-result.json)保留首次通过后自审时间回落修正及最终验证证据。下一项接实际Core/两端调用与固定Codeg原只读UI/同场景；Claude/Qoder旧格式、Grok反馈r1及完整I04四包84仍保持。
+
+## 原生只读查看器客户端与共享窗口
+
+NativeChildReader 已接完整分页/摘要核对、关闭/迟到围栏、只在 live 刷新、失败保留正文和后代父快照租约。公开执行区及私聊原执行记录接结构化原生帮手入口，已知截断列表沿现有证据完整读取 API 保留原 receiverIndex。原生与 Core Delegation 每层共用一个 Host，保留原操作的离开保护；原 Codeg collab-tool 纯辅助文件加来源头后原文移植，未增加依赖、Schema 或模型输入。
+
+[本批记录](../../../integration/execution/i04-native-viewer-ui-result.json)区分29项新读取/模型检查、82项既有检查、9项离开/动作检查、实际生产 Renderer 的原生场景与两项既有委派场景。Renderer 使用受控运输；参考运行只包含原生 Drawer/header/角色外壳，正文适配器明确为标记夹具，不等于完整原 App 对照。实际发现并修复错误提示插入正文造成阅读位置跳动，关闭点击区域按原32px修正。完整原富内容仍按[有限清单](../../../integration/inventory/native-session-viewer-ui-reference.md)继续，真实Core/两端/Runtime、Claude/Qoder和其他I04工作包保持，84正式场景新增通过0。

@@ -47,3 +47,5 @@ Codex 主体接续（2026-10-18）：原消息 parser 与代码模式/MCP/延迟
 完整快照接续（2026-10-18）：新私有snapshot.rs沿既有Core用户准入与固定原parser，完整消息/工具JSON/统计进入不可变JSON投影，按UTF8边界分页；进程密钥签名快照、游标和已核实后代入口，引用不携带原生路径，状态/live随当前Core目标。Grok父关联记录和meta复用完整验证解码，不再受旧1MiB预览截断。首次发现/hash/序列化均有取消检查，取消不控制Runtime。[分项记录](../execution/i04-native-snapshot-result.json)仅授予本机最低编译/原文件owner资格；后台注册、重授权、运输与原UI仍未接，不重复宣称31组原parser完整App资格。
 
 后台阅读接续（2026-10-18）：Registry沿原Core引用与固定C/G parser，用有界独立std线程读取，不将SQLite跨线程或占用Tokio blocking池；关闭不提前释放worker名额，迟到成功不发布，缓存/空闲和关闭墓碑有限。四个User方法每次poll/page重做Core resolve，后代保留原root归属，Web按闭合字段投影；缺原生日志时间沿Core持久创建时间。见[本批记录](../execution/i04-native-reader-result.json)。原source owner真实Codex文件/受控线程、原Web projection和客户端owner拥有各自分项，不代表实际Host/网络/原UI或全部Grok生命周期资格。
+
+查看器客户端接续（2026-10-18）：四个 User 方法已接完整分页客户端和原生入口，原生与 Core 委派共用单层/嵌套 Host；隐藏/关闭回收阅读、签名后代父租约、完整元数据列表及刷新失败保留位置已有定向及实际 Renderer 检查。原 Codeg Drawer/header/角色容器有实际日夜宽窄外壳对照，正文适配器为明确标记夹具，完整原富内容尚未完成。来源、32px点击区修正、实际资格与有限剩余见[本批UI映射](native-session-viewer-ui-reference.md)和[工程证据](../execution/i04-native-viewer-ui-result.json)。以上旧待接段落仅保留当批事实，不重做已完成来源/parser/快照/后台/API；下一项集中补富内容与真实Core/两端候选。

@@ -45,3 +45,5 @@ Runtime 原生子会话仍是原生观察，不创建 Core Delegation。内部�
 私有内容层现以逐行 JSON 迭代器消费这些核验块，移植固定 Codeg Grok 的原消息模型和纯解析/材料/归并规则，摘要元数据只取模型名称。完整直接正文留在内容模型，运输窗口、签名快照和嵌套来源引用留给后续统一 User API，不在 parser 引入文件路径入口或业务写入。Codex 历史输入按原版 cut/seed 拼接，完整消息 parser 仍待移植；Grok 全会话统计/上下文窗口目录及原完整 parser 差分也未授予资格。具体当前行为与限制由[内容合同](../contracts/delegation-v1.md#原生内容投影的当前实现边界)拥有，不从本层检查外推 UI、真实模型或 I04 完成。
 
 Codex 内容接续已将原消息主体和代码模式/目标/上下文/附件/内部 route 的纯依赖移入相同 Core 边界。读取只消费核验记录，后代和工程 patch 源行由可信回调提供，不导入原文件猜选或执行路径。Root/父身份仍由 Core 持有，显示摘要类型只含 title/model/branch/时间/数量；实际内容、统计和该摘要纳入流式快照指纹，避免工程行号变化后拼接旧页。完整原 parser 差分、生产工程文件回调、旧 agent 文件显式父链和运输/原 UI 资格继续单列，具体[当前合同](../contracts/delegation-v1.md#原生内容投影的当前实现边界)及[本批记录](../../integration/execution/i04-native-codex-content-result.json)取代上一段“消息主体待移植”的分项状态。
+
+原生查看器客户端接续：Renderer 的 NativeChildReader 按同一 Core reference 消费四个 User 读取方法，收齐精确 UTF-8 偏移、快照和整份摘要后才发布内容。阅读实例只属于当前 client/Thread/目标，后代启动期间短暂持有父快照，隐藏/关闭停止阅读，不能控制 Agent Runtime。原生只读页与 Core Delegation 共用每层一个 Host；虚拟行卸载不销毁查看器，替换现有可写 child 仍经过原离开保护。正文、思考、图片及工具内容已接初始展示，完整 Codeg 富内容组件仍待按[源码映射](../../integration/inventory/native-session-viewer-ui-reference.md)完成，不能把外壳和受控运输的 Renderer 检查当成真实 Core/Host/原完整 App 资格。

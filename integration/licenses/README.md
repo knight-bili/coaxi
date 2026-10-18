@@ -67,3 +67,6 @@ I04 Core委派查看器按固定Codeg `sub-agent-session-dialog.tsx`、`session-
 抽屉使用与原源码一致的BaseUI1.7.0；新增四个生产包各自MIT正文、版本、lock完整性及既有777包保持证明见
 [BaseUI来源记录](base-ui/source.json)。原生浏览器表面未在本批移植，不声称该能力完成。映射和实际运行边界见
 [查看器源码UI映射](../inventory/delegation-viewer-ui-reference.md)。
+
+I04 原生只读查看器继续按固定 Codeg `message/subagent-session-dialog.tsx`、`session-viewer-host.tsx`和原 Drawer/header/角色容器适配。
+`codeg-collab-tool.ts`在Apache-2.0来源头之后保留固定`src/lib/collab-tool.ts`完整原文字节，来源摘要与正文等价检查见[UI映射](../inventory/native-session-viewer-ui-reference.md)。复用原已准入BaseUI及现有Rovai安全Markdown，不新增产品依赖；原 ContentPartsRenderer 完整富内容仍在移植队列，参考外壳运行不冒称其完成。

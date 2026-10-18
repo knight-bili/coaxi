@@ -16,6 +16,9 @@ import { delegationActionController } from './delegation-action-controller'
 import type { DelegationActionMethod } from '../../shared/private-conversation-operations'
 import { delegationChildren, delegationRuntimeLabel, delegationViewerController, type DelegationViewerTarget } from './delegation-viewer-controller'
 import './delegation-viewer.css'
+import { NativeSessionViewer } from './NativeSessionViewer'
+import { NativeSessionViewerContext, type NativeSessionTarget } from './native-session-viewer-context'
+import { shieldedDismissal, useEscapeShield } from './session-viewer-dismissal'
 
 interface ViewerEnvironment {
   threadId: string
@@ -48,7 +51,7 @@ function useViewer(): NonNullable<React.ContextType<typeof ViewerContext>> {
 export function DelegationViewerHost({ children, visible = true, onLeaveGuardChange, onViewerOpenChange, ...environment }: ViewerEnvironment & { children: ReactNode; visible?: boolean; onLeaveGuardChange?: BindLeaveGuard; onViewerOpenChange?(open: boolean): void }): React.JSX.Element {
   const ancestor = useContext(ViewerContext)
   const surfaceVisible = visible && (ancestor?.visible ?? true)
-  const [target, setTarget] = useState<DelegationViewerTarget | null>(null)
+  const [target, setTarget] = useState<DelegationViewerTarget | NativeSessionTarget | null>(null)
   const [open, setOpen] = useState(false)
   const [sources, setSources] = useState<Record<string, boolean>>({})
   const sourceVisibility = useCallback((parent: string, next: boolean) => setSources(current => current[parent] === next ? current : { ...current, [parent]: next }), [])
@@ -71,7 +74,7 @@ export function DelegationViewerHost({ children, visible = true, onLeaveGuardCha
   }
   const value = { environment, visible: surfaceVisible, sourceVisibility, open: (next: DelegationViewerTarget, trigger?: HTMLElement): void => {
     if (next.threadId !== environment.threadId) return
-    if (open && target?.delegationId === next.delegationId && target.parentConversationId === next.parentConversationId) { sourceVisibility(next.parentConversationId, true); return }
+    if (open && target && !('kind' in target) && target.delegationId === next.delegationId && target.parentConversationId === next.parentConversationId) { sourceVisibility(next.parentConversationId, true); return }
     let prepared: ThreadLeavePreparation
     try { prepared = prepareLeave() } catch { environment.onNotify?.('原操作尚未确认，请先核对后再离开。'); return }
     returnFocus.current = trigger
@@ -79,9 +82,18 @@ export function DelegationViewerHost({ children, visible = true, onLeaveGuardCha
     setTarget(next); setOpen(true)
     prepared.complete(true)
   } }
-  return <ViewerContext.Provider value={value}>{children}
-    {target && <DelegationDrawer key={JSON.stringify([owner.generation, target])} target={target} open={open} visible={surfaceVisible && sources[target.parentConversationId] !== false} onOpenChange={changeOpen} onLeaveGuardChange={bindDrawerGuard} environment={environment} returnFocus={returnFocus.current} />}
-  </ViewerContext.Provider>
+  const native = { visible: surfaceVisible, open: (next: NativeSessionTarget, trigger?: HTMLElement): void => {
+    if (!surfaceVisible || next.threadId !== environment.threadId || next.source.reference.threadId !== environment.threadId) return
+    if (open && target && 'kind' in target && target.identity === next.identity && target.parentConversationId === next.parentConversationId) return
+    let prepared: ThreadLeavePreparation
+    try { prepared = prepareLeave() } catch { environment.onNotify?.('原操作尚未确认，请先核对后再离开。'); return }
+    returnFocus.current = trigger; sourceVisibility(next.parentConversationId, true); setTarget(next); setOpen(true); prepared.complete(true)
+  } }
+  return <ViewerContext.Provider value={value}><NativeSessionViewerContext.Provider value={native}>{children}
+    {target && ('kind' in target
+      ? <NativeSessionViewer key={`${owner.generation}:${target.identity}`} target={target} open={open} visible={surfaceVisible && sources[target.parentConversationId] !== false} onOpenChange={changeOpen} environment={environment} returnFocus={returnFocus.current} />
+      : <DelegationDrawer key={JSON.stringify([owner.generation, target])} target={target} open={open} visible={surfaceVisible && sources[target.parentConversationId] !== false} onOpenChange={changeOpen} onLeaveGuardChange={bindDrawerGuard} environment={environment} returnFocus={returnFocus.current} />)}
+  </NativeSessionViewerContext.Provider></ViewerContext.Provider>
 }
 
 export function DelegationChildren({ environment, onLeaveGuardChange, ...props }: { parentConversationId: string; visible?: boolean; environment?: ViewerEnvironment; onLeaveGuardChange?: BindLeaveGuard }): React.JSX.Element | null {
@@ -156,25 +168,6 @@ function delegationStatus(detail: DelegationDetail): string {
   if (detail.takenOver) return detail.cleanupPending ? '已接管，正在收尾' : '已接管'
   if (detail.blockedOn) return detail.blockedOn.kind === 'permission' ? '等待审批' : detail.blockedOn.kind === 'question' ? '等待回答' : '等待计划确认'
   return ({ queued: '等待开始', running: '正在执行', waiting: '等待继续', succeeded: '已完成', failed: '执行失败', cancelled: '已取消' } as Record<string, string>)[detail.status] ?? '状态待核对'
-}
-
-// Ported from Codeg ui/drawer.tsx: Radix and Base UI have independent dismissal
-// stacks. Capture the shield before Radix synchronously unmounts its modal.
-let escapeProbeUsers = 0
-let lastEscape: { event: KeyboardEvent; shielded: boolean } | null = null
-const radixModalOpen = (): boolean => document.body.style.pointerEvents === 'none'
-function sampleEscapeShield(event: KeyboardEvent): void {
-  if (event.key === 'Escape') lastEscape = { event, shielded: radixModalOpen() }
-}
-function useEscapeShield(): void {
-  useEffect(() => {
-    if (escapeProbeUsers++ === 0) document.addEventListener('keydown', sampleEscapeShield, true)
-    return () => { if (--escapeProbeUsers === 0) { document.removeEventListener('keydown', sampleEscapeShield, true); lastEscape = null } }
-  }, [])
-}
-function shieldedDismissal(details: Drawer.Root.ChangeEventDetails): boolean {
-  if (!['outside-press', 'escape-key', 'focus-out'].includes(details.reason)) return false
-  return details.reason === 'escape-key' && lastEscape?.event === details.event ? lastEscape.shielded : radixModalOpen()
 }
 
 function DelegationDrawer({ target, open, visible, onOpenChange, onLeaveGuardChange, environment, returnFocus }: { target: DelegationViewerTarget; open: boolean; visible: boolean; onOpenChange(open: boolean): boolean; onLeaveGuardChange: BindLeaveGuard; environment: ViewerEnvironment; returnFocus?: HTMLElement }): React.JSX.Element {

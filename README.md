@@ -1,4 +1,4 @@
-> 本仓库为Codeg与Rovai完整融合私有研发仓，当前I00工程初始化，产品融合尚未实现。先读[融合项目入口](integration/README.md)，以下保留上游文档。
+> 本仓库为Codeg与Rovai完整融合研发工程。范围、当前进度和工程资格统一见[融合项目入口](integration/README.md)，以下保留上游文档。
 
 <div align="center">
 

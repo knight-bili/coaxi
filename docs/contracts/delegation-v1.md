@@ -307,3 +307,11 @@ User入口为 `runtime.childReads.start/poll/page/close`，三类输入均闭合
 close只停止阅读、幂等且不返回内容，来源已删除时仍能清理。关闭先到/启动迟到和已关闭UUID重试，在5分钟租约墓碑内拒绝复活；墓碑软上限1024，饱和时拒绝新读取，已接受UUID的相同重试及现存阅读取消仍可执行。Core退出关闭准入、清空条目并置stop，重启后的旧条目不可用；不等待卡住的FS线程，也不取消Agent Runtime。读取失败只投影静态错误码，不发送原生路径、工具正文或任意解析错误。
 
 四方法只进入User App、Native renderer和已鉴权Web的准入名单，不加入Builtin/模型工具。Web再次按闭合字段投影进度/分页/关闭回执，不截fragment；客户端不把此进程内阅读当持久业务命令排队或自动重放。实际Core handle、Host HTTP/IPC及原版查看器的端到端资格仍按阶段候选补齐，静态名单与受控worker检查不能代替。
+
+### 原生只读查看器客户端生命周期
+
+客户端首次读取只提交 `threadId/agentRunId/evidenceId/receiverIndex`，后代只提交原 Core reference、parentReadId 和 Core 签发的 descendantReference；原生 ID、逻辑 agentPath、短 agent 编号均不是读取参数。进入新 client、Thread 或 resync 代次后，旧结果不得发布。完整分页校验快照身份、UTF-8 字节偏移、总量、来源/投影摘要、重复游标和最终整份摘要，验证通过后才解析 JSON；保留完整工具字符串及 metadata/stats，不把预览截断当全文。
+
+父运行 live 时以原版2秒节奏刷新，同一阅读不重叠；刷新失败保留已显示正文与阅读位置。错误提示位于滚动正文之外，重试不插入正文导致位置跳动。关闭/隐藏关闭当前与未完成读取，迟到成功不复活页面；关闭阅读不停止 Runtime。后代启动请求在途时保留对应父快照租约，防止父刷新先清理签名来源；父快照过旧则核对刷新后再启动。原始观察状态与当前 live 分开，终态父运行中的旧 running/waiting 只能作为上次记录展示。
+
+帮手列表从 Core 结构化观察派生，截断的已知观察可显式调用既有 `agentRunEvidence.getContent` 读取完整列表，沿原数组索引打开，不改排/猜测接收者。完整结果以 client/Thread/Run 与证据 epoch/revision/changeSequence/blob 围栏核对，短 Grok ID 只有状态、没有可用独立 Session 时不提供打开动作。完整原富内容、真实 Core/HTTP/IPC 和格式/平台资格仍由 I04 候选核验，不由本客户端检查外推。

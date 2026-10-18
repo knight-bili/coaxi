@@ -167,6 +167,7 @@ import { mentionCandidateRuntime } from './mention-runtime'
 import { SafeMarkdown } from './SafeMarkdown'
 import { RuntimeInteractionDock } from './RuntimeInteractionDock'
 import { DelegationViewerHost, DelegationChildren } from './DelegationViewer'
+import { NativeSubagentEntries } from './NativeSubagentEntries'
 import { FilePreviewPane } from './FilePreviewPane'
 import { FilePreviewResizeHandle, FilePreviewWorkspace, useInitializeFilePreviewMinimumWidth, useOptionalFilePreviewLayout } from './FilePreviewLayout'
 import { useExecutionPreviewHost, useOptionalFilePreview } from './FilePreviewContext'
@@ -10812,6 +10813,7 @@ function RunExecutionContent({
         <div className="process-action cancelling" role="status"><UiText zh={"正在提交停止请求，完成后即可继续发送。"} /></div>
       )}
       {run.nativeSessionReplaced && <p className="process-copy" role="status"><UiText zh="原生会话未能恢复，已新建会话继续。Camp 中的消息保留。" /></p>}
+      {run.conversationId && <NativeSubagentEntries threadId={threadId} runId={run.id} parentConversationId={run.conversationId} evidence={narrationEvidence} parentLive={nonTerminal && !cancelling} />}
       {publicFailure && <RuntimeFailureNotice failure={publicFailure} presentation="agent-run" />}
     </div>
     </ExecutionContentContext.Provider>

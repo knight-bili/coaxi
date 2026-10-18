@@ -84,6 +84,7 @@ import {
   type ToolProgressItem
 } from './execution-tool-grouping'
 import { UiText, uiAttribute } from './interface-language'
+import { NativeSubagentEntries } from './NativeSubagentEntries'
 import { useThreadDetailCopy } from './camp-detail-copy'
 
 const NON_TERMINAL_RUNS = new Set<SingleChatRunView['status']>(['queued', 'running', 'waiting'])
@@ -450,6 +451,7 @@ export function SingleChatRunHistory({
           <div className="single-chat-execution-content process-content">
             {run.nativeSessionReplaced && <p className="single-chat-process-note" role="status"><UiText zh="原生会话未能恢复，已新建会话继续。Camp 中的消息保留。" /></p>}
             {grouped.map(renderItem)}
+            <NativeSubagentEntries threadId={threadId} runId={run.id} parentConversationId={conversationId} evidence={evidence} parentLive={!terminal && !stopping} />
             {!terminal && !stopping && (!hasActiveTool || showThinking) && !hasActiveCompaction && liveTailKey === null && feedback && (
               <div className="process-action current" role="status">
                 <span className="process-spinner" aria-hidden="true" />
