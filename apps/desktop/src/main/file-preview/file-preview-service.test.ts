@@ -96,6 +96,34 @@ function request(rawReference: string): OpenFilePreviewRequest {
 }
 
 describe('FilePreviewService', () => {
+  it('reads ephemeral snapshot previews without launching programs, revealing directories or requesting new roots', async () => {
+    const { root, authority, service, native } = await fixture()
+    await writeFile(join(root, 'page.html'), '<!doctype html><h1>完整预览</h1>')
+    await writeFile(join(root, 'unknown.bin'), Buffer.from([0, 1, 2, 3, 255]))
+    await mkdir(join(root, 'directory'))
+    const outside = await mkdtemp(join(tmpdir(), 'rovai-native-media-outside-'))
+    directories.push(outside)
+    await writeFile(join(outside, 'private.txt'), '不可访问')
+    authority.resolve = async request => request.kind !== 'native_child_file' ? null : {
+      kind: 'file_target', threadId: request.threadId, sourceKind: 'native_child_file',
+      sourceIdentity: `native-child:${request.readId}`, rootPath: root, basePath: root,
+      rawReference: request.rawReference, allowChildren: true
+    }
+    const source = { kind: 'native_child_file' as const, threadId: 'camp-1', readId: 'media-reader' }
+    const opened = await service.open(1, { ...source, rawReference: 'page.html' })
+    expect(opened).toMatchObject({ ok: true, value: { kind: 'file_preview', file: { kind: 'html' } } })
+    if (!opened.ok || opened.value.kind !== 'file_preview') throw new Error('expected HTML preview')
+    expect(opened.value.file.restoreRequest).toBeUndefined()
+    for (const rawReference of ['unknown.bin', 'directory', join(outside, 'private.txt')]) {
+      const result = await service.open(1, { ...source, rawReference })
+      expect(result).toMatchObject({ ok: false })
+      if (!result.ok) expect(result.error.authorizationChallenge).toBeUndefined()
+    }
+    expect(native.openPath).not.toHaveBeenCalled()
+    expect(native.revealPath).not.toHaveBeenCalled()
+    expect(native.confirmOpen).not.toHaveBeenCalled()
+    expect(native.selectRoot).not.toHaveBeenCalled()
+  })
   it('confines native files and nested links to the captured root and revalidates every read after lease changes', async () => {
     const { root, authority, service, native } = await fixture()
     const outside = await mkdtemp(join(tmpdir(), 'rovai-native-outside-'))

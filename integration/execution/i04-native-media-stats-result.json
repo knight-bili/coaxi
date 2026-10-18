@@ -1,0 +1,1188 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-18T22:06:44.717235+00:00",
+  "stage": "I04",
+  "task": "I04-T01",
+  "branch": "develop/V1.0.0",
+  "baseline_commit": "4a4a855701f147b625e7284fa5eff94884f477e6",
+  "status": "native_media_stats_and_scoped_materials_local_verified_full_original_engine_and_candidate_pending",
+  "scope_preserved": {
+    "source_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_packages": 4,
+    "i04_clusters": 21,
+    "i04_formal_cases": 84,
+    "new_formal_cases_passed": 0
+  },
+  "facts": [
+    "Fixed original UserImageAttachments, GeneratedImagesBlock, ImagePreviewDialog, TurnStats, token-format and codex-visualize including original tests retained with declared seams",
+    "TurnStats has one readonly owner guard; copy/jump/model/token/completion controls retained, no task write or session fork invented",
+    "Complete source summary/session_stats/per-turn metadata remain accessible; invalid optional metrics do not become zero usage",
+    "Original Rovai image menu and clipboard encoder operate complete decoded bytes; image dialog/menu and delayed copy follow exact reader/visibility lifetime",
+    "Local image API reads exact native thread/readId, validates type/MIME/generation and always releases temporary handles; stale owner cannot publish late bytes",
+    "Native snapshot source remains non-restorable; pinned media uses Core open with readonly preview policy rather than persisting readId or launching system programs",
+    "SafeMarkdown trusted callbacks keep existing default behavior; SourceMarkdownRenderer injection avoids a real module initialization cycle",
+    "Explicit original visualize reference auto-opens HTML; ordinary HTML mentions manually open after streaming, using original Rovai production isolated HTML preview and source controls",
+    "Dedicated generated CSS is scoped with no global preflight; previous rich/tool/delegation source styles and card bodies unchanged"
+  ],
+  "verification": {
+    "targeted_files": 12,
+    "targeted_tests_passed": 205,
+    "existing_platform_skipped": 1,
+    "skip_reason": "unchanged non-Windows literal colon filename case; no new test skip",
+    "production_renderer_checks": 34,
+    "screenshots_reviewed": 4,
+    "typecheck_exit": 0,
+    "docs_tests_passed": 10,
+    "docs_version_gate": true,
+    "docs_diff_gate_base": "4a4a855701f147b625e7284fa5eff94884f477e6",
+    "codegraph_synced": true,
+    "original_media_source_audit": {
+      "sourceCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+      "baseline": "4a4a855701f147b625e7284fa5eff94884f477e6",
+      "files": [
+        {
+          "source": "src/components/ui/image-preview-dialog.tsx",
+          "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/image-preview-dialog.tsx",
+          "sourceSha256": "506225d9649be077a7f00145de8fa06d4edddc4ec9582eefedc2399a515c9d24",
+          "portedSha256": "b5daa874f17284c5b29a842f4af3526452474e137a6d8550577d2c60ebb6d420",
+          "sourceGitBlob": "4387289fe3b86eeb12026abb4ffe26ed713c0de3",
+          "bodyChange": "none; provenance header and declared import seams only"
+        },
+        {
+          "source": "src/components/message/user-image-attachments.tsx",
+          "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/user-image-attachments.tsx",
+          "sourceSha256": "c7fc804213903812bf962897d6589f70ec20a134af32ce21318c73673ee359bd",
+          "portedSha256": "47102989cc94d14744be4345f4ec2accb0aae53185d04ae1f9406faf77b470b4",
+          "sourceGitBlob": "18dd4e1927d36bb0169b62d509725c6676f417c6",
+          "bodyChange": "none; provenance header and declared import seams only"
+        },
+        {
+          "source": "src/components/message/generated-images-block.tsx",
+          "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/generated-images-block.tsx",
+          "sourceSha256": "b4e3ebff6d719996226b57d7c7effd9d0ba07573b89e101f9401cbffb3e1847d",
+          "portedSha256": "e9ea4f80193e9f1958e46ca1ed1d5b6344b86ceee368d1214356ede476165081",
+          "sourceGitBlob": "08cdd2767def4193e044208639ffd106d14db0c0",
+          "bodyChange": "none; provenance header and declared import seams only"
+        },
+        {
+          "source": "src/lib/token-format.ts",
+          "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/token-format.ts",
+          "sourceSha256": "d466ce87c003f6afd6fdc8a69cb231752de3b05252d42d070b6b88f469753721",
+          "portedSha256": "b3809cf0d961f4a03269b7ced26d64e895679f4f60ac5ee0ba2080542a69881b",
+          "sourceGitBlob": "95acfbcb373d6da702f6314a1a02652aa948bbbf",
+          "bodyChange": "none; provenance header and declared import seams only"
+        },
+        {
+          "source": "src/lib/codex-visualize.ts",
+          "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/codex-visualize.ts",
+          "sourceSha256": "73785cdc6e167cdd81e7c8d64bca8e9b1f1d06ec39592b9aae9a9ebbf119ac8a",
+          "portedSha256": "eb771ea9bcf70df635879463d47476929c450232ffebf66ca51c88d0b8825f03",
+          "sourceGitBlob": "84ee630cddc58928abb74e243d611be4ec3b5c47",
+          "bodyChange": "none; provenance header and declared import seams only"
+        },
+        {
+          "source": "src/lib/codex-visualize.test.ts",
+          "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/codex-visualize.test.ts",
+          "sourceSha256": "695a089e1d40ea3f36cfeb9b86d6b56e193f566abca2485c6cfff327d287ee69",
+          "portedSha256": "26bb1a31f374eda366f5d52d66d49f537acdb07c8e40398f901daf489b6e1a83",
+          "sourceGitBlob": "8be812614bce974567a441fcfb030d19ef1811ab",
+          "bodyChange": "none; provenance header and declared import seams only"
+        },
+        {
+          "source": "src/components/message/turn-stats.tsx",
+          "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/turn-stats.tsx",
+          "sourceSha256": "0aea39e463ed54080e0009b206ea52f5e3048b885b50b260355064346fe8dff7",
+          "portedSha256": "8d23aef6553398090e9aca74495fdad5ddb78a050ac063218ff23ff674a8cd89",
+          "sourceGitBlob": "d2234f0cd9fcf3316d8ef2567976303abbdd102e",
+          "bodyChange": "guard task creation by a real write owner"
+        }
+      ],
+      "catalogs": [
+        {
+          "locale": "zh-CN",
+          "source": "src/i18n/messages/zh-CN.json",
+          "sourceSha256": "91746e1c52b4aed7b40f2b65937e0f76e0b6456146c7c2b14fdb1e8467e1816f",
+          "scopes": [
+            "Folder.chat.messageList",
+            "Tasks"
+          ],
+          "exactEquality": true
+        },
+        {
+          "locale": "en",
+          "source": "src/i18n/messages/en.json",
+          "sourceSha256": "fc1803936e805b448a66c44141a0f3fc10d602ddc0bf7935f01b4e79c3f26f2e",
+          "scopes": [
+            "Folder.chat.messageList",
+            "Tasks"
+          ],
+          "exactEquality": true
+        }
+      ],
+      "hostSeams": [
+        "Next Image to strict data-URI img; no direct external resource fetch",
+        "original Rovai clipboard encoding and image context menu; actual Chromium decode, OS clipboard not asserted",
+        "existing Radix Dialog and Base UI Tooltip; portals follow exact reader/visibility lifetime and preserve parent Esc",
+        "original message scroll adapter and raw model label fallback; no backend catalog invented",
+        "native Core-scoped file/image reads and original Rovai PinnedFilePreview / HtmlPreviewSite",
+        "SourceMarkdownRenderer context avoids dependency cycle and confines the new parser seam to native sources"
+      ],
+      "readonlyTaskAction": "TurnStats hides create-task when its owning Thread write callback is unavailable; original onFork remains optional. Thread task/Mission flows remain owned by Core.",
+      "style": {
+        "file": "apps/desktop/src/renderer/src/codeg-native-content/source-media.css",
+        "sha256": "203df27bb442601ec74cb1d391893bc8786c963e994ada6391bee5e12de8c380",
+        "generator": "file/I04会话图片统计/build-style.mjs",
+        "scope": ".codeg-native-rich",
+        "noGlobalPreflight": true,
+        "oldRichStyleUnchanged": true
+      },
+      "dependenciesChanged": false,
+      "qualification": "actual native viewer and fixed original component references under declared host seams; synthetic ThreadClient/FilePreviewApi plus actual isolated HTML service; not full original App or Core/IPC/Web Host/provider qualification",
+      "remaining": [
+        "full original Streamdown/math/mermaid/spec/interactive-card engine",
+        "complete source HTML controls and full original App scene parity",
+        "actual Core/Native/Web candidate, lifecycle/scale/memory/recovery and other I04 packages"
+      ]
+    },
+    "previous_card_source_audit_unchanged": {
+      "ok": true,
+      "donorCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+      "files": [
+        {
+          "name": "delegated-sub-thread.tsx",
+          "sourceSha256": "671938eb41af1ebbe5893ed2f618286d5432afa7ee57cdfddbafd8f9f74b396a",
+          "portedSha256": "bbc446edbc54e0248647c58ff650f65c14945697b04b0f3ddfbb319d068a68d0",
+          "bodyEqualAfterDeclaredWhitespaceFix": true
+        },
+        {
+          "name": "delegation-card-row.tsx",
+          "sourceSha256": "ab9d0c4a3b334cb70929f8becf473a56d929d1d18a4d12037f812f501e68041d",
+          "portedSha256": "cd863817fa443793984a01819456c990d075ed9cd251a14cf55ef2379d04b9ed",
+          "bodyEqualAfterDeclaredWhitespaceFix": true
+        },
+        {
+          "name": "resumed-delegation-card.tsx",
+          "sourceSha256": "8b7e100dca214c70c0801cbd43997b54561727e97c412aba134178dd774deb9c",
+          "portedSha256": "329c091e865023f7a49e900de3aa7b8fa2f55fd966edf0f89ef59d68b1ed3fef",
+          "bodyEqualAfterDeclaredWhitespaceFix": true
+        }
+      ],
+      "parserOnlyChangeSinceBaseline": "preserve complete original interruption reason instead of str() trimming",
+      "declaredPresenterChange": "two lines preserve raw reason while whitespace-only remains non-expandable",
+      "referenceUsesActualDonorModules": true,
+      "fullOriginalApp": false
+    },
+    "clipboard": "explicit mock clipboard API; real Chromium decode/canvas PNG dimensions, not real OS clipboard",
+    "transport": "synthetic ThreadClient/FilePreviewApi; actual native viewer, original components and HTML preview service; no Core/IPC/Web Host/provider/full App",
+    "html_service": "actual HtmlPreviewSite with isolated localhost origin and real iframe script interaction",
+    "full_original_app": false,
+    "actual_core_native_web_e2e": false,
+    "real_provider": false,
+    "new_rust_builds": 0,
+    "schema_or_model_input_changes": 0,
+    "dependency_changes": 0,
+    "stage_complete": false
+  },
+  "visual_review": {
+    "completed": true,
+    "scenes": [
+      "night1000 product/source",
+      "day390 product/source"
+    ],
+    "findings": "Actual fixed source media modules run under declared Next/i18n/actions/tooltip seams with the same source image and stats input; original user thumbnail/generation card composition and source action row retained. Production drawer clips/scrolls only its necessary content, card/media fit narrow width with no horizontal page overflow. Themes use existing Rovai tokens. Original reference is component-level, not a full original App. Full Markdown/code/content engine and HTML control parity remain mandatory."
+  },
+  "self_review_fixes": [
+    "Removed direct native-Markdown import from common primitives after real Renderer exposed twMerge temporal-dead-zone cycle; injected scoped renderer callback",
+    "Base UI tooltip Escape initially dismissed parent native drawer; preserve event-specific shield and close portals when owner hides",
+    "Pinned native source initially tried api.restore, which correctly rejects ephemeral grants; narrow source union and use native readonly api.open with no persistence",
+    "Native automatic open initially inherited interactive system-launch policy; direct native open now uses readonly policy, real FilePreviewService fixture checks no launch/reveal/challenge",
+    "Owner update now closes old image dialogs/menus and cancels delayed image actions in addition to stale local-image read fences"
+  ],
+  "fixture_corrections": [
+    "Strict native page DTO/digest fields corrected without weakening production reader",
+    "Original tooltip uses actual hover and smooth jump requires geometry completion, not fixed short delay",
+    "Real HTML service uses per-site .localhost origin, not hardcoded 127.0.0.1; driver checks loaded/connected state and exact frame origin",
+    "Late old image proof uses distinct actual decoded image bytes rather than matching only text"
+  ],
+  "remaining": [
+    "full original Streamdown/math/mermaid/spec/interactive-card engine",
+    "full original HTML controls/full App scene parity and actual Core/Native/Web candidate",
+    "lifecycle/auth/scale/memory/schema/recovery matrix, ANSI license gap, Claude/Qoder/Grok work and T02/T03/T04 complete original union"
+  ],
+  "preserved_dirty_agents_sha256": "6d5c55bc4069cd453a36a38d9b0f48c112f1c256982388a27629c12f962c9f4b",
+  "approved_r1_artifacts": [
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    },
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    }
+  ],
+  "source_files": [
+    {
+      "path": "apps/desktop/src/main/file-preview/file-preview-service.test.ts",
+      "sha256": "25bd7d318de959b715e43d091c3768c3ddf7d177f50b65703b7acec68b7c5cda",
+      "git_blob_with_filters": "4675318408416569fa892814a5fb7bf76142f802"
+    },
+    {
+      "path": "apps/desktop/src/main/file-preview/file-preview-service.ts",
+      "sha256": "3ca9b4cebb065203bc5516e1ca9c7fd665d66f4d5695274293fa0fa2f6c43fbb",
+      "git_blob_with_filters": "5d9217d614e8420eb9224f4d1267adfd64d53143"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/FilePreviewContext.tsx",
+      "sha256": "df2efecfeca3e1ad1749729caa84ea6acb5f882702abf3ec58dcfed3d94a218c",
+      "git_blob_with_filters": "b0be215dfd0bb0bb74e73171fb3cd679eab6f343"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/NativeSessionViewer.tsx",
+      "sha256": "ae9635e999d20d05a66cbca5c93240ad7e49192bb1e322af0a09214e34d6811f",
+      "git_blob_with_filters": "c8a3fbdbae524bc1d192008240f9711035d10ea6"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/SafeMarkdown.test.ts",
+      "sha256": "ff2115ea3f699bee4eb7d138381a4abb1c94074df620cc84685c3670799f9992",
+      "git_blob_with_filters": "ec6eeef8992a0668ece2cbbfcb1e753710e8c0ff"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/SafeMarkdown.tsx",
+      "sha256": "808cf8e1fabc37bbe0110540b7b9a0c4e87093b72709a9f04f2c11351266518c",
+      "git_blob_with_filters": "1d0013aef314f28e16625b699bd125199478cdec"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-copy.json",
+      "sha256": "4e8887cc3350f408df3dcb534d6b5398a35b456eff3453ab79459ae782d4053c",
+      "git_blob_with_filters": "05069cabae7ee92e473cb981ad255e41b3b15152"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-primitives.tsx",
+      "sha256": "8e61c13a283cd8961fe7270c4537700ed3b364ecd3e26cc72a57872137fef0ca",
+      "git_blob_with_filters": "e484ed281dc73dd5f5078cb534c9999425f72ba6"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/native-content-adapter.test.ts",
+      "sha256": "939ed2bee4976229dd9c6c04f9e65738db2fc2c0d73635398fffde346413d78c",
+      "git_blob_with_filters": "e1ac83ed1a77b4d91cd6698b1a50c2624a01b2db"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/native-content-adapter.ts",
+      "sha256": "cff55cdf1dc0e2d67c50d7bc5c898c6b4e51f5bc54f76e91500dfb66535133ba",
+      "git_blob_with_filters": "03edab22eb5198342e48908d46fb9bc0a095d45e"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/native-session-viewer.css",
+      "sha256": "263533484817c28684f0806ff7826b052f8564ab3bfb312e9a5bf5ad9b211084",
+      "git_blob_with_filters": "5f413daf2eab4c131214f8594483bfb526fbb6b8"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/session-viewer-dismissal.ts",
+      "sha256": "0703628c46e4e1e7ea8f4dd82a8980b61e6d90e58e083c588eefd3b9a1f440ee",
+      "git_blob_with_filters": "3069780eeea24249f75b5115ac6b2e668abdbb3d"
+    },
+    {
+      "path": "integration/execution/development-todos.json",
+      "sha256": "d28e701c5b7d56b738efbf20f363ff4b6c9d3182d11de26e55a8ce1e088ef30a",
+      "git_blob_with_filters": "1d2347853932357a058a8fac57750e300735aba1"
+    },
+    {
+      "path": "integration/execution/goal-state.json",
+      "sha256": "febe07a6a18de984b940fc49f756a562cf5727b4d73e281c538609aaa450b36f",
+      "git_blob_with_filters": "967992857c3b3f12752c195f84b370e4be7b9228"
+    },
+    {
+      "path": "integration/inventory/native-content-ui-port.json",
+      "sha256": "5da6cb7e88d4c75c99ffab7e8e56fff9f20e9589ced95d0d15eff650ea274366",
+      "git_blob_with_filters": "83cb1d598581244063f78e7a922c076af22366ac"
+    },
+    {
+      "path": "integration/inventory/native-session-viewer-ui-reference.md",
+      "sha256": "2834e50d4f0b782d3be34b6520739ce02c9c69ea64b4d0f8bd0f41d4df344146",
+      "git_blob_with_filters": "2081291b2b2d9b1e3a7231ac4c7b4f0061d1276e"
+    },
+    {
+      "path": "integration/licenses/README.md",
+      "sha256": "dfac2c9bbd37a7af1ca707c55dc9a5ac6f5327a2f77af7339b626ebf238691e6",
+      "git_blob_with_filters": "f5b582d99b8f660cc1ef494ef392029c21acb0e5"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/generated-images-block.tsx",
+      "sha256": "e9ea4f80193e9f1958e46ca1ed1d5b6344b86ceee368d1214356ede476165081",
+      "git_blob_with_filters": "05fdb1d934c946b39e1df22cc5b8f0ef322514f4"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/turn-stats.tsx",
+      "sha256": "8d23aef6553398090e9aca74495fdad5ddb78a050ac063218ff23ff674a8cd89",
+      "git_blob_with_filters": "1c90e443ebdbb955e16bf7c8a29fda323e6974e5"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/user-image-attachments.tsx",
+      "sha256": "47102989cc94d14744be4345f4ec2accb0aae53185d04ae1f9406faf77b470b4",
+      "git_blob_with_filters": "79d273cfb081dcf622eacefba607f51bd8656b44"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/image-preview-dialog.tsx",
+      "sha256": "b5daa874f17284c5b29a842f4af3526452474e137a6d8550577d2c60ebb6d420",
+      "git_blob_with_filters": "24689956caca705f5cee9cc2e46b6c6ec0722d24"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/codex-visualize.test.ts",
+      "sha256": "26bb1a31f374eda366f5d52d66d49f537acdb07c8e40398f901daf489b6e1a83",
+      "git_blob_with_filters": "84caac93767505cc464ba0d7edc217b92c5a2e40"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/codex-visualize.ts",
+      "sha256": "eb771ea9bcf70df635879463d47476929c450232ffebf66ca51c88d0b8825f03",
+      "git_blob_with_filters": "d328f00c9b06a29268062d0cd1f0a4fd218db41f"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/token-format.ts",
+      "sha256": "b3809cf0d961f4a03269b7ced26d64e895679f4f60ac5ee0ba2080542a69881b",
+      "git_blob_with_filters": "3ad0448727bc2d08bdc677f4fff57887dc12eae5"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/source-media.css",
+      "sha256": "203df27bb442601ec74cb1d391893bc8786c963e994ada6391bee5e12de8c380",
+      "git_blob_with_filters": "f3d42f8d46a44a393fa4ed71b5da2ac576379f19"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-image-actions.tsx",
+      "sha256": "8cc9eb181e5fcf187b051f0c4d82b99dacfdb42c1e5a31af3879a3f8d7fdb8b1",
+      "git_blob_with_filters": "b3c4709fca87f9091675fef5c57997a0327a8d05"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-image.tsx",
+      "sha256": "2c28507f59c7ef0fb5ccd61e59a1a584cc514e82b667d1244840352694e5e306",
+      "git_blob_with_filters": "1fc7111ee5d4cb64278ec35207888a962727913d"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-markdown.tsx",
+      "sha256": "2c5d6439bd9ffc631e2c901ef70bf7f8c85b05eb7b13fb7f49e4046f6dd1a064",
+      "git_blob_with_filters": "c2b2fe2cfe735a16233e1716eeb0dd14e7e8ff8a"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-tooltip.tsx",
+      "sha256": "bb9bd96fd80a190a5b3d6647ab52bd476ae67964b95d40f52c0afda7f21cd6dd",
+      "git_blob_with_filters": "a3dec8b8c8eb8a5d128cbc0d3c015b986265e366"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-turn-actions.tsx",
+      "sha256": "766aff5221c35b5b0440f1d10e915c3ce47ee7b86f4c5e5183965412d8531da7",
+      "git_blob_with_filters": "483017888728cc16fe1cdde907285c9e54b0a2a3"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/native-transcript-files.test.ts",
+      "sha256": "c03729532931ca0a8376878fea7b10e13619675d812d1907b01dec90d8d7a195",
+      "git_blob_with_filters": "e15c5a1dd9ae3fcdd3d2b0d3ee88e36d930728e5"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/native-transcript-files.ts",
+      "sha256": "2bcbfce972667e167e34fbabbae236e7a4e6546cceedf927157f2864859553b2",
+      "git_blob_with_filters": "7abfb602aab87d2125b4f527108e32cd969c6081"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "file/I04会话图片统计/build-style.mjs",
+      "sha256": "96797e9daacda9c9c2bbf52e8b1948cf8b1b3c7f8d0e984fea4a7987f2949379"
+    },
+    {
+      "path": "file/I04会话图片统计/checkpoint.py",
+      "sha256": "7e2ebfe9ba95d78992c495f237c090f250af6636899d29250a0129adad0fa4dc"
+    },
+    {
+      "path": "file/I04会话图片统计/commit.py",
+      "sha256": "f646bce9491f5bc3d6a5f0aeedaa84bef1a0c3b7c5a02189021205266059a0bb"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/captures/original-day-390.png",
+      "sha256": "06879c25ef17202168019a4549f61ecd4374d0f2b55a8424eaabc2e11bd35b87"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/captures/original-night-1000.png",
+      "sha256": "daa81d5f1f0ec24656608abb02c79fc2de2631a74230dab1e47a998b4ec0c492"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/captures/product-day-390.png",
+      "sha256": "9640a64f5539f0fb030b91c5834240939db7fbae11f0da57be74d5e73bed5288"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/captures/product-night-1000.png",
+      "sha256": "cfc221c64098ef9f4312bcb064d01f3ee4328d574168ef2e3aabc43196b0af27"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/captures/完整图.png",
+      "sha256": "e0fe82b5a4380dcef2c1bfe4c8e70d5031eafaf245d028a8abd9dd72f50e1237"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/antigravity-color-DgAQAdn3.svg",
+      "sha256": "652128cf55a28bb958563ee372d0bd00208d9e6fd446f523f77aafd811eef8ca"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/apl-fqmucPXA.js",
+      "sha256": "5be3458b72027a2151b231faa2e30eaf16e1e29067222e232694f25418c2a140"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/asciiarmor-DucZyvP0.js",
+      "sha256": "01c94e79d596371ae8d7fb8f8e9d7f7c136b9c9cbd1f7f1124949ee0216d4816"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/asn1-BnOEsgAm.js",
+      "sha256": "bb17319ceb5860451c6822bfadacfcedd6f972cfafbe016b36dfe6ac23f73551"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/asterisk-QAlztEwS.js",
+      "sha256": "6df194920c95ba624a8fda9ecc6fb9bb3e8c608635a2d0b0f4b2610cce4e6fc3"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/brainfuck-DZVCuF_t.js",
+      "sha256": "71ae5a627c032ec5f0333e28a4fc02da543a8faf15f2705c0e1f69f7df69c812"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/clike-xqXYL6ge.js",
+      "sha256": "1acda985c43e1ca1c234bc64cd7b495850069c0c10cd1a433d89c2005dcb503a"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/clojure-BhXMqnxz.js",
+      "sha256": "e6c5a1b8eead561531a1fe6afc42ebd3541913ac87645794bee5b2e42222ff2e"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/cmake-BGaNd9E7.js",
+      "sha256": "319d4983f4e2c2934fdbf67a567ad183211c15a618df3d9e7ad270a188f63c1a"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/cobol-4yqQntpt.js",
+      "sha256": "f541e17f367fb16b84f1c4585dc6b96436fab9b9984351746b8d6b7e4be77533"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/coffeescript-D2dXvhEc.js",
+      "sha256": "fd8b8081e6c6d0b3a5a1d5159ea923fa92de6b16498672ac8ffb3a85d0f074ff"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/command-code-D8gwtO8i.ico",
+      "sha256": "1c77333db1896f681078ced8ccaea0f2410b7f06f2dffcc8b7150a5045590686"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/commonlisp-CF_VNHQR.js",
+      "sha256": "f0e48e905937a107e453a06c0eb54a8f1e536fc0fc63c5b58b9551c8f7fe49cb"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/crystal-DyuLTqLs.js",
+      "sha256": "c1628558768374a78a1fa71c26feaf44bfc6c5161bf81d964490416d1af1f38f"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/css-c-jst79C.js",
+      "sha256": "41425a19b41f83ae573be2f495236cd1161392d1ef66eb2d23d2784510746818"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/cypher-Dlu_3r4V.js",
+      "sha256": "80cff481ed4632ecfbe5952d4c60f15227c66f04dfea646c32852a2b090d19ca"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/d-UURgV0Ux.js",
+      "sha256": "df60654c2550e460276b5522896ee99ab6516252a0016a0fafa21875641b72b9"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/diff-B_Bi2Crb.js",
+      "sha256": "efa42a61215071dc4d677dab004a6f77c34b41825d87a7dc42303302c35b4b4a"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/dockerfile-Bvk733Ga.js",
+      "sha256": "31f1f2e8d8f9f2eeeb29f6d4b56e4632654d2f2a5b352a4febc9bf2f1984d29c"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/dtd-Dy74G54E.js",
+      "sha256": "cfaec369fbea7351fc6a8fb7c990f2fbc5a0d1730467e51935deb1965fccaa2a"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/dylan-TSb-Nfix.js",
+      "sha256": "b0c2026d9bb4917eccab491f63e56d95ceb4a8e01e42062a843c35ea29121607"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/ebnf-4fKAGW3a.js",
+      "sha256": "b21fa7b0323bdc0ab31713d74038dfef58b32305d3775c98547a3a23f143e16a"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/ecl-B59qGGVg.js",
+      "sha256": "4f1c8ae6eaddfd15d73523014b684fc2ae7160b0c10d0680812497b4f1254192"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/eiffel-Dze7nlu3.js",
+      "sha256": "a0fc308a8415ecaf7e5ffe28d9192c23f5b6e81d995eb7df35894a1b307a6606"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/elm-DG7jkhNZ.js",
+      "sha256": "c077dc7257d0e460440d911f88d5783e18ca8c58146fd9126e9e13a0897bcb5b"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/erlang-BO6gOnGA.js",
+      "sha256": "a7ff36cb6624f8cb2eedd1f201678c122f7d861f901c2b4465532dc9b10fb48e"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/factor-CMxFHDqz.js",
+      "sha256": "b249da83526bbefb5f5c5621c3cd3410f0f26edc9368cec95a585dbf5c6d0fd7"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/fcl-CDDUNjTj.js",
+      "sha256": "223f8c7838620a68cbcb74e4e40d10c5eb20fdd2fbe6d32e44bce2d1d2c28ed2"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/file-find.worker-CHoXCmE8.js",
+      "sha256": "80cfe35f96f8384c3f07480916e2786129ac31f1d7d839816bda104764da27c8"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/forth-B9D2JCeE.js",
+      "sha256": "2db6c4dd8f293410bd0de0a25f1dad21a1ee1990ddb816a4c783e86213e1e302"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/fortran-CAG2BFbe.js",
+      "sha256": "df8788d58683ac6188c9038802b9cc8483344dc447ff9854b818c5171c006401"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/gas-d3KEcW3x.js",
+      "sha256": "a699545574b2f6e9d0d502fe4536ef23b977a8f03ef284520247350ac240ab33"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/gherkin-DhZlEZiy.js",
+      "sha256": "86e76fdd8bbec4e37db05eebadde43a0761cddc0786f28f42befef6addaaefcb"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/groovy-CpwJiBl7.js",
+      "sha256": "6b1705ee26bb3827a73e657f0b58a16c84004135a5e237501d919b9cb868ca0e"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/harbor-city-2k-Dk6mtn28.webp",
+      "sha256": "a2f8bdd324331d46a31ba1f2771defe4fda22a131a15654a30915e62b8107d94"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/haskell-ySd-OUo8.js",
+      "sha256": "ff8a9df8c8df8f199ad3b7000aff670c061d0c760ba213d94f52a6f92024e0f8"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/haxe-7MlzfeYV.js",
+      "sha256": "df08c4d4f5bf41a8e63335fa1650e2d5dd4de28c5760ebd6ab47ee0c3fbdb606"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/hermes-agent-2xQZASMR.svg",
+      "sha256": "f660a2312f42c1d9d21daa5c7dfe1d666901030a42a469edc014678314d0ec8a"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/http-BqypyemW.js",
+      "sha256": "552d89ffbe4662e2a8a6ef42b9608509b6654b7de1f836e6c05c2b7ebc81e0f6"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/icon-192-C06667az.png",
+      "sha256": "2680338ed6d3557b6ab543b97460c4620ecffe0d3a801bd34c3c3c06a6eefe9a"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/icon-192-DrQKUdSk.png",
+      "sha256": "9fbd4eb0e7356b4c6ddf2d86a676178476b93747a4687a6e89d06684014ed142"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/icon-192-OagIfT5q.png",
+      "sha256": "9abc0b6b53cef994b32e8c14c02fa8cad3be5325168d1f6907c47b327a024438"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/icon-192-R53lTr_5.png",
+      "sha256": "2f40a6ee8f0a0d1cfc11d8010fc9d990d9dd2dfbb14ea27bbdf97e2c50619a4d"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/idl-4HIGJlDI.js",
+      "sha256": "0ec3441d716383be06d8b9abe052499551a470877e9fb3701ebc09ab590c70b1"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/index-9fFlFe6Y.js",
+      "sha256": "c168511a9822e610e5253a3ea5b24840c363d1c8b481a62e6e2fa1749a1e00cc"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/index-BBspTMFs.js",
+      "sha256": "acb3998870d3a1101decffd5f816fbac678bc590db22d049b2732b691561a504"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/index-Bgqcauyw.js",
+      "sha256": "675b0b3138533151b8d54e860008f7a619241051d07d8bc056be1b2fced4e707"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/index-BISAMuhb.css",
+      "sha256": "8a7eaf6b157510b19325bf1dcc498fed7671d2f9e3e5b42e9cb83bd0fbf28920"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/index-BZcEft8j.js",
+      "sha256": "2eecbe7b0e884c062d581c542d86812c92fbabd06bbb629d3d86c4f45bb45f53"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/index-C6HKUbuF.js",
+      "sha256": "2dc063f3ad6305d4a7b050119c1de8a935a662288c5ad83b44edbc194c3c1e0c"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/index-CIpa31_i.js",
+      "sha256": "c45b0ed25cf61479e6e3514a40551506a02702361b7f7c73548f1a0e5e7f1b85"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/index-CJvaNww6.js",
+      "sha256": "115cae19d5b440bf8580ef3bf426a89855c689bcf8fa331f3b9f41d7033269d0"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/index-CNnAYhrR.js",
+      "sha256": "555f14ca1aa758eed93362b9971a943c56f5692023665975bd9892599da1596b"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/index-CoLxe6Xz.js",
+      "sha256": "1bb21ea3fd5b7dc198778ab790e8ee35fe748432f1867dcddc2a6fa6200b0e18"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/index-CtEDwm_o.js",
+      "sha256": "4c3035d1fca868193b118024d316aabdcb3047421314bf24ddd9f39669325ead"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/index-D1XgBUBi.js",
+      "sha256": "41fd872264db32623afa815232e21f96f6b8a87b390661c94ebfdf60f3fd3c13"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/index-D4So33GA.js",
+      "sha256": "480cbbb909f75d0f90058825ff94b0fc5c362ef1f07561d8986ee10e20ae358e"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/index-DAhZB4pp.js",
+      "sha256": "9f73ae688b2d8f1f10d1d88c77212501b6d7200acd392d7833c24c95d27ab35e"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/index-DgiEgDP5.js",
+      "sha256": "f344baf1377c0735bad8dd33fb1ac9ad0a1934780e57beaa9482be58a0a27838"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/index-Dy8UsgI0.js",
+      "sha256": "241b25069ce32a54612e23f9389a0dcbecc690e159793746232235c1dc768be3"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/index-DyiNY8Km.js",
+      "sha256": "7fa3d40f07ad51f729df4d65fd1b0ed0f886f6f239803e241f320b06b805019c"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/index-eglFdK8g.js",
+      "sha256": "d6bb89fe1d3306b240f911000277b9de4050bc16aed9be1ebbf288ace3d03001"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/index-qrrco6xh.js",
+      "sha256": "7feb7aa4d6b7bb198343070295e11b4264d84494b5a63cfa88da0b2023f74e4f"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/index-R26ZlYjz.js",
+      "sha256": "b03e389bbe29b938e105883886418d62817b0a2f52262cbc02bf72ad5927a427"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/index-rQy2aVbu.js",
+      "sha256": "ae5f29dc6bcc9a6b0ce0d975bacc5a69622892352808d960a42dd8dff4edb654"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/index-UVmBIwO5.js",
+      "sha256": "b8e78c610d1314462a491ba2e5f23fc0074c253b055252bdb05df9d252c73789"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/index-uxy5LP96.js",
+      "sha256": "0d8c972ac478f5733e273793296eecfde32ff9d7ecc900c5766ef9906b1445b4"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/index-ZUTz_IXH.js",
+      "sha256": "0866c1392f7b0a757f3253cfbfbc13f96353bf7cce16bc80715bd545e053135a"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/javascript-C_OHM9hj.js",
+      "sha256": "95b09f0b3fb5fdd9b2d10f6984118bbea38a78a51286f4d862b86a01094ddd8f"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/julia-Bs6JJhYG.js",
+      "sha256": "0d8127c7275ab1371ec839ec976879685017db1cf04c55095e651e48fe103196"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/livescript-BMWCDuIE.js",
+      "sha256": "b39453a81de0238efd37ac1306f2f004f305cbd745be57e1728a17625f013401"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/lua-Cvg8VrAA.js",
+      "sha256": "165c413653092708d81ff649b3d4a63df2eedc0b50c8f249b9667b4e75fe959d"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/mathematica-DNLOL9PQ.js",
+      "sha256": "acc57c8c8a74626a6b9423988f92155410b79196d13c9c6a78047d51ae130c68"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/mbox-Ga7d4MMN.js",
+      "sha256": "fc425b9a3a312399b3ff6adfec040828ff7c8789f0d31b96e73bde2dce902355"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/mirc-Dma3B8rS.js",
+      "sha256": "0ddcb9e79952a15f12935311af85affb24054773404adfdd1d437cc0080a21e2"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/mllike-DHn7xckP.js",
+      "sha256": "adc3b1b7f8aa916812cd4d8bdf8cc1bce352786e3df54c560c5b9067b4fe6d5b"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/modelica-0d55jYY0.js",
+      "sha256": "53c8da4f56d1dd592c1710d4b2735aa9904eb2306f365b56aa7074837c59526b"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/mscgen-DdqZYINH.js",
+      "sha256": "7e91513474f40739574f20f1b1f38659a476b68b39ee260c7e13132e20d66fc6"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/mumps-Btr8VblO.js",
+      "sha256": "aea5f291cf40bcc124e9ff104dedf8df38d630d3112f62d1051118f1ce16b80b"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/nginx-DTDtBDVN.js",
+      "sha256": "715cac7cfdb61a1efd09d43ec2c5e6d8e1bd491be679ac56df795a913e6eaf21"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/nsis-CyKBdPWp.js",
+      "sha256": "57f398b99c2ea986b5e4673709aa470f0fb4b42cb04188cf4044e52475c4ff61"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/ntriples-CvgOYMpL.js",
+      "sha256": "239581b9922c933f3427296d14f18a1febb1db49283e6e4aa3331f4e2b9bc3a9"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/octave-DYBj3-tl.js",
+      "sha256": "57d7b87692fe3ab14a413456a3ea0fb201a3052057b77a55604863fa5064c495"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/oz-R_e8WMIi.js",
+      "sha256": "a19a6ffdf1e6eb10fe9c4937cfb31303c9ec5bb723c73df1a71ef43c82cdd020"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/pascal-GD8iposT.js",
+      "sha256": "e5a1f91525017a8bf777f9c04f990c65a6a876b26e9b803ba4fddbcc6a68ccac"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/perl-DL9mHpoi.js",
+      "sha256": "8c4df1964a2fe9a690f2493217ed9f70d1f7e2f026ea515f3b226b3b39370b17"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/pig-C_4T4YIV.js",
+      "sha256": "82df721874d4623ebcfa10b27ea6eb9e3992ff4c28e2d838f8d166ab73abb91d"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/powershell-B0suO7Vd.js",
+      "sha256": "3de01d37e183594d3bb94dc474f6324219cb209d162b202f82b12c77d2370410"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/properties-BR-vP1aU.js",
+      "sha256": "b758d2ccb06eaaf23dbbc110988e64a57e55a5923a262c60432397feeef0c9c3"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/protobuf-BxgpyhoW.js",
+      "sha256": "ed0b3d7fbe3b079db99443170bd20dba78ba27f42043ad6efebd4b714ef4a364"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/pug-CTXt1f8z.js",
+      "sha256": "48c244b81b114de6a5e5adefc5c7715f6eba241d58edd162713fd21007afdb2c"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/puppet-Bdao66PW.js",
+      "sha256": "7985d1f812327008fe34d375ab1849a12e903d3e9507b7fa14253ba17dbdd596"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/python-CvWbmiX4.js",
+      "sha256": "219d8f4b9588956ac747cc56503e568fbf3aff3ab5e34e400a6cd21c86e2273f"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/q-CrbCVq4a.js",
+      "sha256": "ded6c3f92101aee3b6214667f489d691936350d01b61e69fdb2b8e2104afcacd"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/qoder-color-CCjsVbDP.svg",
+      "sha256": "396596d247477e2a036c141a16ec266df7b14c0130b777a68fd04bc89af50bc8"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/r-V7nswm59.js",
+      "sha256": "78772777dc6085a89ba3ed5f6fcd5fe46c7ff6cdb849c3c967ce0c1273b4f4a2"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/rpm-C-DLY-If.js",
+      "sha256": "e39a41ec2ab1ba47f2ef4ac46afda8ab6157df5f4388c70b332e2ebf154e1997"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/ruby-CQTpZw6f.js",
+      "sha256": "d66865a01096abcd291b833e0cd3d64881860acbd99b094fb5cf1cd134e2743c"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/sas-D2UG-yhZ.js",
+      "sha256": "015ef33927a3a7749cad183ad9e96b0dbf9df616080054b9e581486effc05bef"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/scheme-BKzrkGJD.js",
+      "sha256": "f0e7bc170c1987a1a0734b905eee725b83cca6aa8fa597457fec67670a555cc9"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/shell-BlsXDxCn.js",
+      "sha256": "476e685b723e32c63fec792d4266c65b3facfe8feb349b6a2dff9b6c749d9fde"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/sieve-CjwBwOY5.js",
+      "sha256": "084c9f5e19ccf7382ebe97bc97676ba143d9a36fad9b096cb4b3f99cf3c81df6"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/simple-mode-DMneyfDu.js",
+      "sha256": "bf2199ce2b8baa53cef87a5bc3a72c68817223b26167c168c645fe78be9280f4"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/smalltalk-BOIGQuhN.js",
+      "sha256": "7d696f35a8e402a8b6c2ac1db57c92af865ec665cd63d827689c46e58b9b295d"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/solr-CwD7U71z.js",
+      "sha256": "9e9b3bf9c4c0a208effcc6283428b25a30e935eeefa58fc34629947c040beb7e"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/source-BBnh_UZi.avif",
+      "sha256": "76da2efcd588b17589955391962024e47d2667e8e84e4744acef11f89d5f0626"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/source-BF5gqZd_.avif",
+      "sha256": "217b1a6e6333d55ddb5b884da74d77cb794416553a3225637e321ed8594b1cc5"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/source-eX5wQyix.avif",
+      "sha256": "73b5cabd1b68af9fef692c6c80a3e9773afd62dc7de2af853bbb3fb7dab9c369"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/source-pMlGT7XI.avif",
+      "sha256": "dda274619f2efe5882dbf24566837bea0b87067b1bfcc147bf3e0ed63c121649"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/sparql-DYskk2vE.js",
+      "sha256": "0573590f5173a33d2c988a89048fccb66706d9d2b1d1e01c42dd864c7b664422"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/spreadsheet-Bgtt3oLP.js",
+      "sha256": "453eff194470639d89a69e4cdf76b8e58773b5ab307554feed6d826b20a058c4"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/sql-BSrOzCRI.js",
+      "sha256": "dc7e3ba15d3123633b1a12391213fafb05a5abdcc9829498793b3d467a1d3fbd"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/stex-B6LNC55o.js",
+      "sha256": "350838050b62d1c5f9821e86a9bb0ee45f0c61628eadc676c126359a41a5f2a5"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/stylus-BkS-boTH.js",
+      "sha256": "2d50cfa755d2ad2fc7302164938caf2b4421003f3c3fb9eb02314a230a514cd9"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/swift-FRZi1uvB.js",
+      "sha256": "526e30f380c612526c4f06a3085c392bda84ede2673fff42b1d2dd7a205377d4"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/tcl-CUcaCdmq.js",
+      "sha256": "aa90d12c1490ebb77e68e6ce90fd35b0b312e5510f9753f1072c629c43e9c05c"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/textile-BnFpjsrl.js",
+      "sha256": "de9336373ae050e5a1ff954d462dd129d09f31c02951e27ede260fba1c054bad"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/tiddlywiki-CjprD-Qp.js",
+      "sha256": "5a80d8ec11cdad4503ab1462ed24e2bd7a1b09b787e815fbdfd4b7a454242fce"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/tiki-DK9DOeWn.js",
+      "sha256": "d307359b562484e7c25803b60349d4aa86e6351400f9612a3b78048f8451b847"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/toml-BOuWGMcf.js",
+      "sha256": "fddf8a802721005715a22746b28e0b87ac56a8f77caa41075f9142150e588fb3"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/troff-E1bJ0PPL.js",
+      "sha256": "ea32a0126878e2cd1198e94abcee48cbcd2131de1d80195e1267ad5b0cab82bf"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/ttcn-cfg-Dc39-fIP.js",
+      "sha256": "743ddd5c09b350d33149497d4177895083f584712019a20e88a3c9ded8b62fb9"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/ttcn-tKd4HLu4.js",
+      "sha256": "b9af59a0022981562d7482bf0125dc1b6bfdbb40ea1214807db4abbcb783059b"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/turtle-Dq7-1WAf.js",
+      "sha256": "7e505e9051b7e3c8ecebea47e4fd43b1e6b2b6ccd7334fd25fc267dc82ee0e4d"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/vb-Dp90gtsv.js",
+      "sha256": "049ed5cc9eb5958257497e1c018cd8aa6ff558760d7d9bca5d0d84db8573e19f"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/vbscript-CI6_mxxU.js",
+      "sha256": "61890fbc79e2fa6eed6ec2f556916d57712d58fa394f140b09af6c50fece5855"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/velocity-BwIZK1TH.js",
+      "sha256": "630eef603fbca377c8e48679bf30198dce1f27d1a72123bdd72f1eada28f4bbd"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/verilog-DDCYnHN8.js",
+      "sha256": "a38956f338156db5f9b6fd4644f88cd1f81d7dc726a78b882b1ee62f0e70f45a"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/vhdl-DCkMIyT9.js",
+      "sha256": "b0e803173743715af902fa2508c4da88a2e97f9b4782f33c6064a17db505bc05"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/webidl-BTLTThCm.js",
+      "sha256": "07aaaed4cf1b1adc2d5f705b656e0e3a4b0d4bddaf4ad998e488d3ca3450a290"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/xquery-BrBUuxMR.js",
+      "sha256": "96459fe2892ccdce0b57439307eeeaa9d82fd2663f2a0f4364a849dba3374e74"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/yacas-b5lAVEIl.js",
+      "sha256": "95c453f73dd9a218385c018b692c4af134b02d5131bea8dd957ca887a5cdd8bd"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/z80-BZV19vqv.js",
+      "sha256": "51594b00905d1522d2f64113beae4943577338f0ff5af4503dd9ee49dc3957eb"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/assets/zcode-BnwZhfO-.png",
+      "sha256": "edd87a182097389b0f59c07f8de283dbe433c9d37cd6e9a2a372611516ab81eb"
+    },
+    {
+      "path": "file/I04会话图片统计/drafts/product/out/index.html",
+      "sha256": "51db529a338244f571105b12a085f7b38419cef31a6143669ff79d2dc3b36941"
+    },
+    {
+      "path": "file/I04会话图片统计/html-site.json",
+      "sha256": "8f308b8be41f283a3da5fd260ebfea356a18d847ef0e0c46cd142cf3db7978d2"
+    },
+    {
+      "path": "file/I04会话图片统计/index.html",
+      "sha256": "7c75b40cad7bf91e9e548e4c0152a1ce687872085a50ee978a79d6059d87f443"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/codegraph-owner-lock.txt",
+      "sha256": "81c5de01d36a02632f7873b14443b00ee65a1f6d9501d7f2bdbedd20b69efd6e"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/codegraph-sync-final.txt",
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/codegraph-sync.txt",
+      "sha256": "81c5de01d36a02632f7873b14443b00ee65a1f6d9501d7f2bdbedd20b69efd6e"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/docs-decisions.txt",
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/docs-tests.txt",
+      "sha256": "6e83dd6f284a02f39db5a478f024d263f305445971c657d36f6dc256703ee513"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/docs-version.txt",
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/owner-first.txt",
+      "sha256": "14c9d8f76a1aaed066b92da40d10eed60cfecc241b1d0e1195e1cf17a76cb262"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/related-tests-final.txt",
+      "sha256": "c4cd8faf18121f6e87d58e29b86fe8b2676e4dac79a02c7d0c530ba709dcca35"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/related-tests.txt",
+      "sha256": "a187a6ae59f2644020351854b1b382a3bdff20ab26d49ef52f7f4ba496704ae9"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/renderer-eighth.txt",
+      "sha256": "a1efadc84b7d7e3e914069fad00e3dd29e0dddf72eb0b0bd566526c6e2f84ac0"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/renderer-eleventh.txt",
+      "sha256": "cd4460c4a5c9529a7adae224a28ad388d3d62530f7b3e0d701cdb2090fb3d0a1"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/renderer-fifth.txt",
+      "sha256": "d9f52209cc939d42f2060c888f5cbca095a1a3bcc07987f209ad2bac2261fb78"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/renderer-final-owner.txt",
+      "sha256": "07e3f648f609be00c7a1d3e1e7dc4f13b5fa4d9cd3805fa3c2354ecac8012ea4"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/renderer-final.txt",
+      "sha256": "ad26de7f5fd84c913ac036440212f9ad314d379500bda1e41fbb31c402b916b7"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/renderer-first.txt",
+      "sha256": "e4f0d71354c222e66708dea5a049afcf9f27a4d1ddbfd75a3338893844dc2eac"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/renderer-fourth.txt",
+      "sha256": "a764e76ae7eef76ae4c97efbcfa632d7b6d9b3455a358581e41c0c0883bb5d95"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/renderer-ninth.txt",
+      "sha256": "5ccdcf71362ea15d78263b88863bbc3b6ef24ddaa0d8c450660c3ec9bbec6287"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/renderer-second.txt",
+      "sha256": "250bf85726d4274f7ed5eef092f53285cca92b3f5b80bec5927211e1458b3915"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/renderer-seventh.txt",
+      "sha256": "9788bbc4b1638070dfdd69d949b4e2ecdfc168178b24e4863bd78d9477cb6faf"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/renderer-sixth.txt",
+      "sha256": "00bb6a52c2cf9d6ac1fad6f66d66b92f227c6eba9c269c54fba4cf050527ac09"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/renderer-tenth.txt",
+      "sha256": "3aeec93cfdd9e964491c2fcb36ef3c4685cf3a5a3a78c4a28eb9c2b902f6d758"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/renderer-third.txt",
+      "sha256": "6ec9d0a22aa1b2bdaffef5d8d3aa13f256e1bd004658f3984da250f67a4996b8"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/source-audit.json",
+      "sha256": "21a08afa9d70e40782d7c5ba7ca5c067bca8ab6a3885a8325a2b5f4f7cf50ba9"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/style-generation.json",
+      "sha256": "dbf492e62854997fdf0ad24b8c55d57c1d0d8c122e39ea922ee69ed050469ac0"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/typecheck-final.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/typecheck-first.txt",
+      "sha256": "c2c2ee57bb736f7eaf950cfaf560c85a84114208dea9d9d05e7e6a1cb50b1f8b"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/typecheck-second.txt",
+      "sha256": "47e1b5c6f2e9051875efd6e87db7375c319823c0a8e1d5497d492dc1adec8679"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/typecheck-third.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/ui-eighth-html-viewport.json",
+      "sha256": "2bb7e4905429cc7ece3632a526d53ce06d9ff451c54de9884a1b196117574424"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/ui-eleventh-first-pass.json",
+      "sha256": "734b2c34c57c017dcd0402dddb2911b34bd99a154784102cd26ebc1789606d79"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/ui-fifth-tooltip-escape.json",
+      "sha256": "d00c35d017b7b2a45b564e16094d099a9a1965fe47ef662ecbd3ab569d954fa7"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/ui-first-invalid-fixture-page.json",
+      "sha256": "eab151de2d0a14b900a932ebed385211b47bc34e1a39b63bd533350012fb4c73"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/ui-fourth-tooltip-dismissal.json",
+      "sha256": "66555a3594e86caaf5507c0893479655c4db075e77e0ae17264164660e0f47b1"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/ui-menu-and-retry-pass.json",
+      "sha256": "ece845f295143c1331799d6cb11f426ac26ce7f98ea967bbce30fc9307fd8542"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/ui-ninth-ephemeral-restore.json",
+      "sha256": "2bb7e4905429cc7ece3632a526d53ce06d9ff451c54de9884a1b196117574424"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/ui-result.json",
+      "sha256": "4adfac4055262da262eb881b12f640d1cbc44881bf52f55161bac23e66a5ff6a"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/ui-second-renderer-cycle.json",
+      "sha256": "93de2c8e2f99215799664c93d9c2d5885eeb7feec252d0b467dc71c9422aaad0"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/ui-seventh-smooth-jump.json",
+      "sha256": "b313ccbd50a6045a22ba6787bf1249dd3d8abbe4be6f73a9c479a85f95c5bb57"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/ui-sixth-driver-escape.json",
+      "sha256": "266773e57f8871d279691258110108273b80fbcc3e478281c4f73c7abb9660df"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/ui-tenth-expected-origin.json",
+      "sha256": "411cc2487da0d859e8ff430d4197892586c6eb5e114297a12350ea4a55c5f25f"
+    },
+    {
+      "path": "file/I04会话图片统计/logs/ui-third-tooltip-driver.json",
+      "sha256": "94b1a2bec2c61ad199430c2b5770aa5685712f47cc0b9a9b1d0221376d09bf95"
+    },
+    {
+      "path": "file/I04会话图片统计/main.cjs",
+      "sha256": "eac8496ce9c63f6349c97aa9e49d6e22a1bffc2ee99d9c897223da9692341a56"
+    },
+    {
+      "path": "file/I04会话图片统计/port.py",
+      "sha256": "62c1ebf9accc23b330c89dc41b2d8163e1064652dfb580ccfa08b54c0430d677"
+    },
+    {
+      "path": "file/I04会话图片统计/reference-radix.tsx",
+      "sha256": "65de764246047c2ca70d84f5550b64d8e52efd9dae07f6f3b190d92ae05c6f4e"
+    },
+    {
+      "path": "file/I04会话图片统计/render.mjs",
+      "sha256": "4413a72a15caf8134f69fbc55385164a32ad40571a583cf50e7b1c53c415211b"
+    },
+    {
+      "path": "file/I04会话图片统计/renderer.tsx",
+      "sha256": "1e2e08ce154420cbb8b9d2b5e673641f18483a1cc651d2057c64e6ca0fac26b5"
+    },
+    {
+      "path": "file/I04会话图片统计/site-entry.ts",
+      "sha256": "41b4bd30378549db44921ea8873cf1036e8c0f4774eb04d23a69d6f4932a95db"
+    },
+    {
+      "path": "file/I04会话图片统计/update-records.py",
+      "sha256": "6473ad05acb0e066d736a4b4077ece61b8150489696d25ec28382d220468aa7c"
+    }
+  ],
+  "push": false,
+  "actions_triggered": false,
+  "main_merged": false,
+  "paid_models": false,
+  "customer_action_required": false
+}

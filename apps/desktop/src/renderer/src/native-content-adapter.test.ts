@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { adaptNativeMessages, nativeAdapterTurns } from './native-content-adapter'
+import { adaptNativeMessages, nativeAdapterTurns, nativeTurnStats } from './native-content-adapter'
 import type { NativeTranscriptTurn, NativeTranscriptBlock } from './native-child-reader'
 import type { AdaptedContentPart } from './codeg-native-content/lib/adapters/ai-elements-adapter'
 
@@ -7,6 +7,14 @@ const turn = (blocks: NativeTranscriptBlock[], id = 'turn'): NativeTranscriptTur
 const use = (id: string): NativeTranscriptBlock => ({ type: 'tool_use', tool_use_id: id, tool_name: 'read_file', input_preview: '{"path":"src/保留.ts"}', meta: { untouched: id } })
 const result = (id: string, text: string): NativeTranscriptBlock => ({ type: 'tool_result', tool_use_id: id, output_preview: text, is_error: false })
 const text = { attachedResources: '材料', toolCallFailed: '失败', pageHandoffName: () => '页面材料' }
+it('preserves valid metrics while unknown or malformed metrics stay in raw metadata rather than become zero usage', () => {
+  const original = { ...turn([]), usage: { input_tokens: 1200, output_tokens: 340, cache_creation_input_tokens: 0, cache_read_input_tokens: 50 }, model: 'source-model', duration_ms: 4321, completed_at: '2026-10-19T00:00:00Z' }
+  const before = JSON.stringify(original)
+  expect(nativeTurnStats(original)).toEqual({ usage: original.usage, model: 'source-model', duration_ms: 4321, completedAt: original.completed_at })
+  expect(nativeTurnStats({ ...original, usage: { input_tokens: -1 }, duration_ms: Number.NaN })).toMatchObject({ usage: null, duration_ms: null })
+  expect(nativeTurnStats({ ...original, usage: null })).toMatchObject({ usage: null })
+  expect(JSON.stringify(original)).toBe(before)
+})
 function calls(parts: AdaptedContentPart[]): Array<Extract<AdaptedContentPart, { type: 'tool-call' }>> {
   return parts.flatMap(part => part.type === 'tool-call' ? [part] : part.type === 'tool-group' ? part.items : part.type === 'goal-run' ? calls([part.start, ...part.items, ...(part.end ? [part.end] : [])]) : [])
 }

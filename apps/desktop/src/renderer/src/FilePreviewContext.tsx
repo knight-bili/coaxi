@@ -166,6 +166,7 @@ export function useFilePreview(): FilePreviewContextValue {
   return value
 }
 export function useOptionalFilePreview(): FilePreviewContextValue | null { return useContext(FilePreviewContext) }
+export function useOptionalFilePreviewApi(): FilePreviewApi | null { return useContext(FilePreviewApiContext) }
 export function useFilePreviewApi(): FilePreviewApi {
   const api = useContext(FilePreviewApiContext)
   if (!api) throw new Error('FilePreviewApi is unavailable')
@@ -182,7 +183,7 @@ export function useExecutionPreviewHost(threadId: string): HTMLDivElement | null
 
 /** A fixed file presentation shares the original Thread session and window resource pool. */
 export function PinnedFilePreview({ api, source, resolvedTheme, actionsHost, onNavigate, onWorkspace }: {
-  api: FilePreviewApi; source: RestoreFilePreviewRequest; resolvedTheme: ResolvedTheme
+  api: FilePreviewApi; source: RestoreFilePreviewRequest | Extract<import('@contracts').OpenFilePreviewRequest, { kind: 'native_child_file' }>; resolvedTheme: ResolvedTheme
   actionsHost: HTMLElement | null
   onNavigate?: FilePreviewContextValue['open']
   onWorkspace?(tabId: string): Promise<void>
@@ -215,7 +216,8 @@ export function PinnedFilePreview({ api, source, resolvedTheme, actionsHost, onN
     if (!armed) return
     let current = true
     pending.current = true; setError(null); setTabId(null)
-    void session.actions.open(source, undefined, undefined, { commitOnSuccess: true, previewOnly: true, revalidateSource: true, background: true }).then(outcome => {
+    // Native snapshots are ephemeral Core grants, never persisted restore paths.
+    void session.actions.open(source, undefined, undefined, { commitOnSuccess: true, previewOnly: source.kind !== 'native_child_file', revalidateSource: true, background: true }).then(outcome => {
       if (!current) return
       if (outcome.kind === 'preview') setTabId(outcome.tabId)
       else setError(outcome.kind === 'error' ? outcome.error.message : uiAttribute('无法在这里预览这个文件'))
@@ -226,7 +228,7 @@ export function PinnedFilePreview({ api, source, resolvedTheme, actionsHost, onN
   useEffect(() => {
     if (tabId && !tab && !pending.current) { setTabId(null); setRetry(value => value + 1) }
   }, [tabId, tab])
-  useEffect(() => { if (visible && tab?.loadState === 'cold') void session.actions.reopen(tab.id, true) }, [visible, tab?.id, tab?.loadState, session])
+  useEffect(() => { if (visible && tab?.loadState === 'cold') void session.actions.reopen(tab.id, source.kind !== 'native_child_file') }, [visible, tab?.id, tab?.loadState, session, source.kind])
   const value: FilePreviewContextValue = { ...sessionValue(session, resolvedTheme), domScope,
     activeTab: tab ?? null, activeTabId: tab?.id ?? null, tabs: tab ? [tab] : [], paneVisible: true,
     isCurrentThread: true, isFocusedSurface: resources.isFocused(owner),

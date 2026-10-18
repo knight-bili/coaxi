@@ -77,3 +77,5 @@ I04 原生富内容的纯适配层、必要类型/引用/工具分类辅助及�
 I04 原生工具原语沿固定Codeg Apache-2.0组件，出处与声明级比较见[内容来源清单](../inventory/native-content-ui-port.json)。新增直接依赖intl-messageformat11.1.2、ansi-to-react6.2.6以及已在锁中存在的Radix受控状态1.2.3；共16个必要图节点，SRI逐包核对，新增12个包节点，782个既有包/快照及原importers不改，无生命周期脚本或全量重装。逐包原许可/来源位于native-tool-ui/。
 
 许可未结项：ansi-to-react发布tar和精确Git提交145140971e9d83ccac32265f24b1c55dea437896均无LICENSE文件，原package.json及README声明BSD-3-Clause，已原样保存到[native-tool-ui/ansi-to-react](native-tool-ui/ansi-to-react/source.json)。没有伪造版权人或许可证正文，也不把该项记为许可完整确认；阶段对外分发前必须补齐可据来源或替换此依赖。
+
+I04 会话图片/生成图/完整图片弹窗、TurnStats、token-format 与 codex-visualize（含原用例）继续使用固定 Codeg Apache-2.0 来源，逐文件摘要/原 Git blob/唯一只读按钮 guard 见[内容来源清单](../inventory/native-content-ui-port.json)的 mediaStats。双语目录按原 zh-CN/en 精确提取。图片菜单/剪贴板、Dialog、Tooltip 和文件/HTML服务均复用已准入 Rovai 依赖；隔离 source-media.css 仍由已记录的 Tailwind4.1.18 生成，不新增生产依赖或全局 preflight。完整原 Markdown/动态卡引擎仍待，不以本批称全部内容引擎许可已完成。

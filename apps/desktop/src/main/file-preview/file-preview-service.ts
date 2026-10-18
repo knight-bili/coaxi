@@ -392,7 +392,9 @@ export class FilePreviewService {
     webContentsId: number,
     request: OpenFilePreviewRequest
   ): Promise<FilePreviewOperationResult<OpenFilePreviewResult>> {
-    return this.#open(webContentsId, request, INTERACTIVE_OPEN_POLICY)
+    // Snapshot media can be opened automatically by the transcript renderer.
+    return this.#open(webContentsId, request,
+      request.kind === 'native_child_file' ? RESTORE_OPEN_POLICY : INTERACTIVE_OPEN_POLICY)
   }
 
   async restore(

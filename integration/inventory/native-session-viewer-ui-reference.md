@@ -76,3 +76,13 @@ Core User子列表直接驱动原主卡：当前attempt大于1才出现原恢复
 定向116项通过、types0，实际生产查看器两模式回归（22组行为及原组件/恢复角标/主题的额外断言）和后台15组检查通过。原查看器定位改为Core稳定ID和原按钮可访问名称，保留全部原断言，没有削弱审批/回答、scope、接管/丢失回执、草稿/附件、排队输入移回、隐藏、返回和窄屏末尾验证。测试进程单独关闭GPU；隐藏窗口主题过渡停在中途的问题用完成有限CSSTransition后取图修复，实际计算色值对照已验证，不更改生产主题或暂停无限状态动画。
 
 原组件参考使用固定供体的真正模块，明确Core UUID模型、Runtime图标/标签、既有Terminal和Rovai Markdown接缝，不是完整供体App。背景查询采用同份真正适配后的payload；两主题及生产窄屏的最终截图按[本批记录](../execution/i04-native-delegation-background-result.json)记录。此次无新依赖、Rust/API/schema/模型输入变更、付费模型、完整编译、push或Actions。完整I04四包21簇84与一期81/48/324不减，本批正式场景通过仍为0，真实Core至Native/Web候选保留。
+
+## 会话图片、统计与材料入口接续（2026-10-19）
+
+用户图片、生成图、完整图片弹窗及逐轮统计使用固定 Codeg 原组件，完整 token/visualize 纯解析与原用例一起保留；[逐文件来源](native-content-ui-port.json)的 `mediaStats` 明确每份原 Git blob、摘要和宿主接缝。除 import/来源头外，TurnStats 只有一处只读适配：没有真正的任务写入 owner 就隐藏创建任务；原可选 fork 不伪造，当前 Thread 的任务与 Mission 继续走原 Core。模型名无原 catalog 时显示原始 ID，非法/不完整可选统计不补零，原始 summary/session_stats/turn metadata 全量可达。
+
+图片沿原 Rovai 编码与右键菜单，原图放大/完整像素复制/完整 PNG 下载、隐藏/刷新与旧客户端迟到隔离均由实际 Chromium 验证；剪贴板 API 显式替身，不冒称系统剪贴板通过。图片、HTML 与文件链接使用当前 Core 原生 readId；客户端不猜工程根。本地图片严格核对类型、MIME、内容代次，每个临时句柄完成或失败后释放。原生来源不能成为可持久恢复路径，PinnedFilePreview 对此走 Core open，其他来源继续原 restore；Main 对直接原生 open 采用只读预览策略，自动呈现不能启动程序、展示目录或索取新根。
+
+普通文本当前是原 Rovai SafeMarkdown/GFM，加原 Codeg 代码头/复制控件及原 visualize 解析；显式 HTML 标记自动展开、普通文件提及手动展开，流式隐式提及不抢先打开。HTML 采用原 Rovai PinnedFilePreview/HtmlPreviewSite，隔离域名与脚本操作、源码切换、收起已实际验证。完整原 Streamdown/math/mermaid/spec/交互卡引擎、完整原 HTML 控制与完整 App 同场景仍是本阶段必需项，不能以本批入口替代。
+
+定向12文件205项通过；原来就因 Windows 不支持冒号文件名而跳过的1项保留，未新增跳过。实际生产查看器34项行为通过并核对日/夜与390px窄屏，固定原组件采用相同图片/统计输入及声明宿主接缝运行；截图人工逐张检查容器贴合、原图比例、卡片与操作布局。此对照不是完整供体 App；真实 Core/IPC/Web Host/provider、生命周期/规模/内存恢复仍随集中候选补齐。[本批工程证据](../execution/i04-native-media-stats-result.json)记录资格边界及原失败检查。完整一期81簇48包324/I04四包21簇84保持，本批正式场景通过新增0。无新依赖、Rust构建、模型输入/HTTP schema/数据库变更、付费模型、push或Actions。

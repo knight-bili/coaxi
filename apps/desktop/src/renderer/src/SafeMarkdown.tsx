@@ -158,6 +158,8 @@ export function SafeMarkdown({
   onFileReference,
   localImageUrl,
   localImageContent,
+  renderLocalImage,
+  renderCodeBlock,
   headingTarget,
   onHeadingTargetResult,
   leadingContent,
@@ -171,6 +173,8 @@ export function SafeMarkdown({
   onFileReference?: FileReferenceActivation
   localImageUrl?(rawReference: string): string | null
   localImageContent?(rawReference: string): Promise<FilePreviewOperationResult<FilePreviewBinaryContent>>
+  renderLocalImage?(reference: string, alt: string): ReactNode
+  renderCodeBlock?(code: string, language?: string): ReactNode
   headingTarget?: string
   onHeadingTargetResult?(found: boolean): void
   /** Trusted inline UI, never parsed from the Markdown source. */
@@ -235,7 +239,7 @@ export function SafeMarkdown({
         rehypePlugins={[[rehypeInlineContent, { tokens: JSON.parse(inlineContentKeys) as string[] }]]}
         skipHtml
         disallowedElements={[
-          ...(!localImageUrl && !localImageContent ? ['img'] : []),
+          ...(!localImageUrl && !localImageContent && !renderLocalImage ? ['img'] : []),
           'iframe', 'object', 'embed', 'script', 'style'
         ]}
         unwrapDisallowed
@@ -260,6 +264,7 @@ export function SafeMarkdown({
           ...(mode === 'document' ? {
             pre({ children: preChildren }) {
               const block = markdownCodeBlock(preChildren)
+              if (block && renderCodeBlock) return renderCodeBlock(block.code, block.languageName)
               return block
                 ? <MarkdownCodeBlock code={block.code} languageName={block.languageName} theme={theme} />
                 : <pre>{preChildren}</pre>
@@ -318,21 +323,22 @@ export function SafeMarkdown({
             )
           },
           img({ src, alt }) {
-            if ((!localImageUrl && !localImageContent) || !src) return null
+            if ((!localImageUrl && !localImageContent && !renderLocalImage) || !src) return null
             const rawReference = src.startsWith(FILE_REFERENCE_FRAGMENT)
               ? decodeURIComponent(src.slice(FILE_REFERENCE_FRAGMENT.length))
               : src
+            if (renderLocalImage) return renderLocalImage(rawReference, alt ?? '')
             if (localImageContent) return <LocalMarkdownImage reference={rawReference} alt={alt ?? ''} read={localImageContent} />
             const safeUrl = localImageUrl?.(rawReference)
             return safeUrl ? <img src={safeUrl} alt={alt ?? ''} loading="lazy" /> : null
           }
         }}
-        urlTransform={defaultUrlTransform}
+        urlTransform={(url, _key, node) => renderLocalImage && node.tagName === 'img' ? url : defaultUrlTransform(url)}
       >
         {children}
       </Markdown>
     )
-  }, [children, fileReferencesEnabled, localImageUrl, localImageContent, hasLeadingContent, inlineLeadingContent, inlineContentKeys, mode, theme])
+  }, [children, fileReferencesEnabled, localImageUrl, localImageContent, renderLocalImage, renderCodeBlock, hasLeadingContent, inlineLeadingContent, inlineContentKeys, mode, theme])
 
   return (
     <LeadingMarkdownContentContext.Provider value={leadingContent}>

@@ -4,6 +4,17 @@ import { describe, expect, it } from 'vitest'
 import { SafeMarkdown } from './SafeMarkdown'
 
 describe('SafeMarkdown file preview references', () => {
+  it('passes original image references only to an explicit trusted renderer without assigning them to browser image URLs', () => {
+    const references: string[] = []
+    const markup = renderToStaticMarkup(createElement(SafeMarkdown, {
+      children: '![本地](file:///C:/work/pic.png)\n\n![远程](https://example.test/private.png)\n\n<script>window.bad=1</script>',
+      renderLocalImage(reference, alt) { references.push(reference); return createElement('span', { 'data-image-reference': reference }, alt) }
+    }))
+    expect(references).toEqual(['file:///C:/work/pic.png', 'https://example.test/private.png'])
+    expect(markup).not.toContain('<img'); expect(markup).not.toContain('<script')
+    const original = renderToStaticMarkup(createElement(SafeMarkdown, { children: '![本地](file:///C:/work/pic.png)' }))
+    expect(original).not.toContain('<img')
+  })
   it('keeps document headings at their native levels without changing the default message hierarchy', () => {
     const source = [
       '# 一级',

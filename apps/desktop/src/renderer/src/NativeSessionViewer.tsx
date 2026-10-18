@@ -4,25 +4,24 @@
 import { useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { Drawer } from '@base-ui/react/drawer'
 import { Brain, ChevronDown, Eye, Loader2, RefreshCw, X } from 'lucide-react'
-import { NativeChildReader, type NativeTranscriptBlock, type NativeTranscriptTurn } from './native-child-reader'
+import { NativeChildReader, type NativeTranscript, type NativeTranscriptBlock } from './native-child-reader'
 import type { NativeSessionTarget } from './native-session-viewer-context'
 import { NativeSessionViewerContext } from './native-session-viewer-context'
 import { useThreadClient } from './camp-client'
 import { useInterfaceLanguage, useUiText } from './interface-language'
 import { CodegRuntimeMark } from './CodegRuntimeMark'
-import { SafeMarkdown } from './SafeMarkdown'
 import { DelegationViewerHost } from './DelegationViewer'
 import { useEscapeShield, shieldedDismissal } from './session-viewer-dismissal'
 import './native-session-viewer.css'
 import { nativeToolChildren, nativeToolPairs } from './native-transcript-model'
-import { adaptNativeMessages } from './native-content-adapter'
+import { adaptNativeMessages, nativeTurnStats } from './native-content-adapter'
 import type { AdaptedContentPart, AdaptedToolCallPart, AdapterMessageText } from './codeg-native-content/lib/adapters/ai-elements-adapter'
 import { normalizeToolName } from './codeg-native-content/lib/tool-call-normalization'
 import { isPlanModeToolName } from './codeg-native-content/lib/plan-parse'
 import { PlanCard } from './codeg-native-content/components/message/plan-card'
 import { PlanMarkdownCard, PlanModeCard } from './codeg-native-content/components/message/plan-mode-card'
 import { GoalRunPart, GoalToolCallPart } from './codeg-native-content/components/message/goal-tool-call'
-import { useTranslations } from './codeg-native-content/ui/source-primitives'
+import { SourceMarkdownRenderer, useTranslations } from './codeg-native-content/ui/source-primitives'
 import { Tool, ToolHeader, ToolContent } from './codeg-native-content/components/ai-elements/tool'
 import { CodeBlock, CodeBlockHeader, CodeBlockTitle, CodeBlockCopyButton } from './codeg-native-content/components/ai-elements/code-block'
 import { JsonTreeView, parseJsonForTree } from './codeg-native-content/components/ai-elements/json-tree'
@@ -40,8 +39,15 @@ import { CollabAgentCard } from './codeg-native-content/components/message/colla
 import { SubagentSessionButton } from './codeg-native-content/components/message/subagent-session-button'
 import { NativeSessionActionsProvider, type SourceSessionTarget } from './codeg-native-content/ui/native-session-actions'
 import { COLLAB_AGENT_TOOL_NAME } from './codeg-collab-tool'
-import { useOptionalFilePreview } from './FilePreviewContext'
+import { useOptionalFilePreview, useOptionalFilePreviewApi } from './FilePreviewContext'
+import { NativeMarkdown, NativeMarkdownScope } from './codeg-native-content/ui/native-markdown'
+import { NativeImageScope } from './codeg-native-content/ui/native-image-actions'
+import { NativeMessageScroll } from './codeg-native-content/ui/native-turn-actions'
+import { UserImageAttachments } from './codeg-native-content/components/message/user-image-attachments'
+import { GeneratedImagesBlock } from './codeg-native-content/components/message/generated-images-block'
+import { TurnStats } from './codeg-native-content/components/message/turn-stats'
 import './codeg-native-content/source-rich.css'
+import './codeg-native-content/source-media.css'
 
 function readMessage(code: string): string {
   if (/origin_unavailable|source_unavailable/.test(code)) return '暂时找不到这份会话记录。'
@@ -82,7 +88,7 @@ export function NativeSessionViewer({ target, open, visible, onOpenChange, retur
           <div className="native-session-body" ref={body} onScroll={event => { scroll.current = event.currentTarget.scrollTop }}>
             {!state.data && state.loading && <p className="delegation-empty"><Loader2 size={14} className="native-session-spinner" />{t('正在读取会话…')}</p>}
             {state.data && <DelegationViewerHost {...environment} visible={visible}>
-              <NativeTranscriptBody turns={state.data.turns} reader={reader} target={target} live={open && visible && state.live} />
+              <NativeTranscriptBody data={state.data} reader={reader} target={target} live={open && visible && state.live} visible={open && visible} />
               {state.data.turns.length === 0 && <p className="delegation-empty">{t('还没有可显示的会话内容。')}</p>}
               {(state.data.notes.malformed_records > 0 || state.data.notes.incomplete_tail || state.data.notes.unavailable_children > 0)
                 && <p className="native-session-note" role="status">{t('部分记录暂时无法读取，可刷新后再核对。')}</p>}
@@ -96,17 +102,29 @@ export function NativeSessionViewer({ target, open, visible, onOpenChange, retur
 
 type ToolUse = Extract<NativeTranscriptBlock, { type: 'tool_use' }>
 type ToolResult = Extract<NativeTranscriptBlock, { type: 'tool_result' }>
-function NativeTranscriptBody({ turns, reader, target, live }: { turns: NativeTranscriptTurn[]; reader: NativeChildReader; target: NativeSessionTarget; live: boolean }): React.JSX.Element {
+function NativeTranscriptBody({ data, reader, target, live, visible }: { data: NativeTranscript; reader: NativeChildReader; target: NativeSessionTarget; live: boolean; visible: boolean }): React.JSX.Element {
+  const turns = data.turns
   const language = useInterfaceLanguage(), t = useUiText(), planText = useTranslations('Folder.chat.proposedPlan')
   const filePreview = useOptionalFilePreview()
+  const previewOpen = filePreview?.open
+  const fileApi = useOptionalFilePreviewApi(), transcript = useRef<HTMLDivElement>(null)
+  const [notice, setNotice] = useState<string | null>(null)
   const openFile = useCallback(async (rawReference: string, line?: number | null): Promise<void> => {
     const source = reader.fileSource()
-    if (!source || !filePreview) throw new Error('native_child.source_unavailable')
-    const outcome = await filePreview.open({ kind: 'native_child_file', ...source, rawReference },
+    if (!source || !previewOpen) throw new Error('native_child.source_unavailable')
+    const outcome = await previewOpen({ kind: 'native_child_file', ...source, rawReference },
       line != null && Number.isSafeInteger(line) && line > 0 ? { line } : undefined,
       undefined, { commitOnSuccess: true, revalidateSource: true })
     if (outcome.kind === 'error') throw new Error('native_child.file_unavailable')
-  }, [reader, filePreview])
+  }, [reader, previewOpen])
+  const source = reader.fileSource()
+  const scope = useMemo(() => ({ source, api: fileApi, theme: filePreview?.resolvedTheme ?? 'day' as const, visible, open: filePreview ? openFile : null }),
+    [source?.threadId, source?.readId, fileApi, filePreview?.resolvedTheme, visible, Boolean(previewOpen), openFile])
+  const imageScope = useMemo(() => ({ visible, notice: setNotice }), [visible, source?.threadId, source?.readId])
+  const renderMarkdown = useCallback((text: string, streaming: boolean) => <NativeMarkdown streaming={streaming}>{text}</NativeMarkdown>, [])
+  const scrolling = useMemo(() => ({ scrollToIndex(index: number, options: { smooth: boolean }) {
+    transcript.current?.querySelector<HTMLElement>(`[data-native-turn-index="${index}"]`)?.scrollIntoView({ block: 'start', behavior: options.smooth ? 'smooth' : 'instant' })
+  } }), [])
   const text = useMemo<AdapterMessageText>(() => ({
     attachedResources: language === 'en' ? 'Attached resources' : '附加资源',
     toolCallFailed: language === 'en' ? 'Tool call failed' : '工具调用失败',
@@ -139,26 +157,36 @@ function NativeTranscriptBody({ turns, reader, target, live }: { turns: NativeTr
     if (!specialized) return <NativeSourceTool key={key} part={part}><OrdinaryToolCallPart part={part} /></NativeSourceTool>
     return <NativeTool key={key} use={use} result={result} reader={reader} target={target} live={live} />
   }
-  const renderPart = (part: AdaptedContentPart, key: string, user = false): React.ReactNode => {
-    if (part.type === 'text') return user ? <div className="native-session-plain-text" key={key}>{part.text}</div> : <SafeMarkdown key={key}>{part.text}</SafeMarkdown>
+  const renderPart = (part: AdaptedContentPart, key: string, user = false, streaming = false): React.ReactNode => {
+    if (part.type === 'text') return user ? <div className="native-session-plain-text" key={key}>{part.text}</div> : <NativeMarkdown key={key} streaming={streaming}>{part.text}</NativeMarkdown>
     if (part.type === 'reasoning') return <NativeReasoning key={key} text={part.content} />
     if (part.type === 'turn-error') return <p key={key} className="native-session-note is-error" role="status">{part.message}</p>
     if (part.type === 'plan') return <PlanCard key={key} entries={part.entries} isStreaming={live && part.isStreaming} />
     if (part.type === 'proposed-plan') return <PlanMarkdownCard key={key} markdown={part.markdown.trim()} label={planText('title')} emptyLabel={planText('planning')} />
-    if (part.type === 'goal-run') return <GoalRunPart key={key} part={live ? part : { ...part, isRunning: false }} renderPart={(child, childKey) => renderPart(child, childKey, user)} />
+    if (part.type === 'goal-run') return <GoalRunPart key={key} part={live ? part : { ...part, isRunning: false }} renderPart={(child, childKey) => renderPart(child, childKey, user, streaming)} />
     if (part.type === 'tool-call') return tool(part, key)
     if (part.type === 'tool-group') return <ToolGroupPart key={key} part={part} renderItem={tool} />
     if (part.type === 'delegation-status-group') return <div className="native-session-source-tool" key={key}><DelegationStatusGroupCard polls={part.polls} />{part.polls.map(item => <NativeRawTool key={item.toolCallId} part={item} />)}</div>
     if (part.type === 'background-task-group') return <div className="native-session-source-tool" key={key}><BackgroundTaskCard polls={part.polls} />{part.polls.map(item => <NativeRawTool key={item.toolCallId} part={item} />)}</div>
     if (part.type === 'tool-result') return <NativeTool key={key} result={{ type: 'tool_result', tool_use_id: part.toolCallId, output_preview: part.errorText ?? part.output, is_error: part.state === 'output-error', agent_stats: part.agentStats ? { ...part.agentStats } : null }} reader={reader} target={target} live={false} />
-    if (part.type === 'generated-image') return <div key={key}>{part.label && <small>{part.label}</small>}{part.image && <NativeImage image={part.image} />}{part.revisedPrompt && <NativeReasoning text={part.revisedPrompt} imagePrompt />}{!part.image && <p className="native-session-note">{t(part.status === 'failed' ? '图片生成失败。' : live ? '图片尚未生成。' : '这份记录中没有图片内容。')}</p>}</div>
+    if (part.type === 'generated-image') return <GeneratedImagesBlock key={key} label={part.label} image={part.image} revisedPrompt={part.revisedPrompt}
+      status={!live && !part.image && part.status !== 'failed' ? 'completed' : part.status} />
     return null
   }
-  return <NativeFileActionsProvider open={filePreview ? openFile : null}><div className="native-session-transcript codeg-native-rich">{messages.map((message, turnIndex) => <section key={`${message.id}:${turnIndex}`} className={message.role === 'user' ? 'native-session-input-turn' : 'native-session-turn'}>
-    {message.content.map((part, index) => renderPart(part, `${message.id}:${index}`, message.role === 'user'))}
-    {message.userResources?.map((resource, index) => <span className="native-session-resource" title={resource.uri} key={`resource:${index}`}>{resource.name}</span>)}
-    {message.userImages?.map((image, index) => <NativeImage image={image} key={`image:${index}`} />)}
-  </section>)}</div></NativeFileActionsProvider>
+  return <NativeFileActionsProvider open={filePreview ? openFile : null}><NativeMarkdownScope.Provider value={scope}><SourceMarkdownRenderer.Provider value={renderMarkdown}><NativeImageScope.Provider value={imageScope}><NativeMessageScroll.Provider value={scrolling}>
+    {notice && <p className="native-session-note" role="status">{notice}</p>}
+    <div ref={transcript} className="native-session-transcript codeg-native-rich">{messages.map((message, turnIndex) => {
+      const previousUserIndex = turns.slice(0, turnIndex).findLastIndex(turn => turn.role === 'user')
+      return <section data-native-turn-index={turnIndex} key={`${message.id}:${turnIndex}`} className={message.role === 'user' ? 'native-session-input-turn' : 'native-session-turn'}>
+    {message.content.map((part, index) => renderPart(part, `${message.id}:${index}`, message.role === 'user', live && turnIndex === messages.length - 1))}
+    {message.userResources?.map((resource, index) => <button type="button" className="native-session-resource" title={resource.uri} key={`resource:${index}`}
+      onClick={() => { void openFile(resource.uri).catch(() => setNotice(t('暂时无法打开这份文件。'))) }}>{resource.name}</button>)}
+    {message.userImages && <UserImageAttachments images={message.userImages} />}
+    {message.role === 'assistant' && <TurnStats {...nativeTurnStats(turns[turnIndex])} copyText={turns[turnIndex].blocks.flatMap(block => block.type === 'text' ? [block.text] : []).join('\n\n')}
+      isResponseComplete={!live || turnIndex < turns.length - 1} previousUserIndex={previousUserIndex < 0 ? undefined : previousUserIndex} />}
+  </section>})}<details className="native-session-reasoning"><summary>{t('会话统计与原始信息')}</summary><JsonTreeView value={{ context_tokens: data.context_tokens, session_stats: data.session_stats, summary: data.summary,
+    turns: turns.map(({ blocks: _blocks, ...metadata }) => metadata) }} /></details></div>
+  </NativeMessageScroll.Provider></NativeImageScope.Provider></SourceMarkdownRenderer.Provider></NativeMarkdownScope.Provider></NativeFileActionsProvider>
 }
 function NativeSourceTool({ part, children }: { part: AdaptedToolCallPart; children: React.ReactNode }): React.JSX.Element {
   return <div className="native-session-source-tool">{children}<NativeRawTool part={part} /></div>
@@ -191,15 +219,9 @@ function NativeRawTool({ part }: { part: AdaptedToolCallPart }): React.JSX.Eleme
       {part.agentStats != null && <NativeToolValue label={t('帮手执行记录')} value={JSON.stringify(part.agentStats, null, 2)} />}
     </details>
 }
-function NativeReasoning({ text, imagePrompt = false }: { text: string; imagePrompt?: boolean }): React.JSX.Element {
+function NativeReasoning({ text }: { text: string }): React.JSX.Element {
   const t = useUiText()
-  return <details className="native-session-reasoning"><summary><Brain size={14} /><span>{t(imagePrompt ? '生成说明' : '思考')}</span><ChevronDown size={14} /></summary><SafeMarkdown>{text}</SafeMarkdown></details>
-}
-function NativeImage({ image }: { image: { data: string; mime_type: string } }): React.JSX.Element {
-  const t = useUiText()
-  const valid = /^image\/(png|jpeg|gif|webp|avif|bmp)$/i.test(image.mime_type)
-  const src = valid ? `data:${image.mime_type};base64,${image.data}` : null
-  return src ? <img className="native-session-image" alt={t('会话图片')} src={src} loading="lazy" /> : <p className="native-session-note">{t('该图片格式暂不支持预览。')}</p>
+  return <details className="native-session-reasoning"><summary><Brain size={14} /><span>{t('思考')}</span><ChevronDown size={14} /></summary><NativeMarkdown>{text}</NativeMarkdown></details>
 }
 function NativeTool({ use, result, reader, target, live }: { use?: ToolUse; result?: ToolResult; reader: NativeChildReader; target: NativeSessionTarget; live: boolean }): React.JSX.Element {
   const t = useUiText(), host = useContext(NativeSessionViewerContext)
@@ -223,7 +245,7 @@ function NativeTool({ use, result, reader, target, live }: { use?: ToolUse; resu
       {use?.meta != null && <details><summary>{t('工具信息')}</summary><NativeToolValue label={t('工具信息')} value={JSON.stringify(use.meta, null, 2)} /></details>}
       {result?.agent_stats && <details><summary>{t('帮手执行记录')}</summary><NativeToolValue label={t('帮手执行记录')} value={JSON.stringify(result.agent_stats, null, 2)} /></details>}
     </ToolContent>
-    {result?.images?.map((image, index) => <NativeImage image={image} key={index} />)}
+    {result?.images && <UserImageAttachments images={result.images.map((image, index) => ({ ...image, name: `${t('会话图片')}-${index + 1}` }))} />}
   </Tool>
 }
 

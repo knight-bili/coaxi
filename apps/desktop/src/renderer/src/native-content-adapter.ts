@@ -1,5 +1,5 @@
 import { adaptMessageTurns, type AdaptedMessage, type AdapterMessageText } from './codeg-native-content/lib/adapters/ai-elements-adapter'
-import type { ContentBlock, MessageTurn } from './codeg-native-content/lib/types'
+import type { ContentBlock, MessageTurn, TurnUsage } from './codeg-native-content/lib/types'
 import type { NativeTranscriptTurn } from './native-child-reader'
 import { nativeToolPairs } from './native-transcript-model'
 
@@ -26,4 +26,15 @@ export function adaptNativeMessages(turns: NativeTranscriptTurn[], live: boolean
     if (ids.length) progress.set(index, new Set(ids))
   })
   return adaptMessageTurns(source, text, undefined, progress, true)
+}
+
+/** Invalid optional provider metrics remain in raw metadata, never become zero counts. */
+export function nativeTurnStats(turn: NativeTranscriptTurn): { usage: TurnUsage | null; duration_ms: number | null; model: string | null; completedAt: string | null } {
+  const usage = turn.usage
+  const valid = usage && ['input_tokens', 'output_tokens', 'cache_creation_input_tokens', 'cache_read_input_tokens']
+    .every(key => Number.isSafeInteger(usage[key]) && usage[key] >= 0)
+  return { usage: valid ? usage as unknown as TurnUsage : null,
+    duration_ms: typeof turn.duration_ms === 'number' && Number.isFinite(turn.duration_ms) && turn.duration_ms >= 0 ? turn.duration_ms : null,
+    model: typeof turn.model === 'string' ? turn.model : null,
+    completedAt: typeof turn.completed_at === 'string' ? turn.completed_at : null }
 }
