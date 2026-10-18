@@ -4,6 +4,7 @@ import * as Dialog from '@radix-ui/react-dialog'
 import type { ActionApprovalView, AgentRunExecutionEvidenceView, CoreEvent, DelegationConversationView, RuntimeInteractionView, SingleChatRunView, StoredCommandResult } from '@contracts'
 import { ThreadClientProvider, type ThreadClient } from '../../../apps/desktop/src/renderer/src/camp-client'
 import { DelegationChildren, DelegationViewerHost } from '../../../apps/desktop/src/renderer/src/DelegationViewer'
+import { childChatFixture, chatMembers } from './child-chat'
 import '../../../apps/desktop/src/renderer/src/styles.css'
 
 const at = '2026-10-18T00:00:00Z'
@@ -34,10 +35,16 @@ let question: RuntimeInteractionView = { id: 'question-child-1', conversationId:
 const events = [new Set<(event: CoreEvent) => void>(), new Set<(event: CoreEvent) => void>()]
 const emit = (n = 1): void => events.forEach(set => set.forEach(listener => listener({ method: 'delegation.changed', params: { threadId: 'thread-a', delegationId: `delegation-${n}`, conversationId: `child-${n}` } })))
 let fail = false, hold = false, delayed: (() => void) | null = null
-let showRows: (show: boolean) => void = () => {}, hostChange: (host: number) => void = () => {}, changeParent: (parent: string) => void = () => {}
+let showRows: (show: boolean) => void = () => {}, hostChange: (host: number) => void = () => {}, changeParent: (parent: string) => void = () => {}, showSurface: (show: boolean) => void = () => {}
+let leaveGuard: (() => { complete(didLeave: boolean): void }) | null = null
+const chat = childChatFixture(() => details[0], detail => { details[0] = detail }, () => emit())
 const clients = [0, 1].map(host => ({ platform: 'win32', onEvent: (listener: (event: CoreEvent) => void) => { events[host].add(listener); return () => { events[host].delete(listener) } },
+  editingRecovery: chat.editingRecovery, singleChatAttachments: chat.attachments,
+  attachments: { kind: 'download', download: async () => ({ opened: false }), preview: async () => null },
   request: async (method: string, params: unknown) => {
     requests.push({ method, params: structuredClone(params), host })
+    const reply = await chat.request(method, params)
+    if (reply.handled) return reply.value
     if (method === 'delegations.list') {
       const parent = (params as { parentConversationId: string }).parentConversationId
       if (parent === 'unavailable-parent') throw Error('The new parent is unavailable')
@@ -71,9 +78,9 @@ const clients = [0, 1].map(host => ({ platform: 'win32', onEvent: (listener: (ev
   }
 } as ThreadClient))
 function Fixture(): React.JSX.Element {
-  const [rows, setRows] = useState(true), [host, setHost] = useState(0), [parent, setParent] = useState('parent-a')
-  showRows = setRows; hostChange = setHost; changeParent = setParent
-  return <ThreadClientProvider client={clients[host]}><DelegationViewerHost threadId="thread-a" profileById={new Map()} busy={false} onResolveApproval={(approval, optionId) => {
+  const [rows, setRows] = useState(true), [host, setHost] = useState(0), [parent, setParent] = useState('parent-a'), [visible, setVisible] = useState(true)
+  showRows = setRows; hostChange = setHost; changeParent = setParent; showSurface = setVisible
+  return <ThreadClientProvider client={clients[host]}><DelegationViewerHost threadId="thread-a" members={chatMembers} visible={visible} onLeaveGuardChange={guard => { leaveGuard = guard }} profileById={new Map()} busy={false} onResolveApproval={(approval, optionId) => {
     permissionAnswers.push({ id: approval.id, runId: approval.agentRunId, version: approval.version, optionId })
     details[0] = { ...details[0], blockedOn: { kind: 'question', request_id: 'question-child-1' }, activity: { ...details[0].activity, approvals: [] } }; emit()
   }}>
@@ -88,6 +95,8 @@ Object.assign(window, { viewerTest: {
   settle: () => new Promise(resolve => setTimeout(resolve, 550)),
   rows: showRows, setRows: (value: boolean) => showRows(value), host: (value: number) => hostChange(value), parent: (value: string) => changeParent(value),
   fail: (value: boolean) => { fail = value }, hold: () => { hold = true }, release: () => delayed?.(), refresh: () => emit(),
+  chat, visible: (value: boolean) => showSurface(value),
+  prepareLeave: () => { try { const preparation = leaveGuard?.(); preparation?.complete(false); return true } catch { return false } },
   finish: () => {
     question = { ...question, status: 'sent', version: question.version + 1 }
     details[0] = { ...details[0], status: 'succeeded', endedAt: at, blockedOn: undefined, activity: { ...details[0].activity, runs: [run(1)] } }; emit()

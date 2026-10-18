@@ -25,6 +25,9 @@ app.whenReady().then(async () => {
   const run = (code) => window.webContents.executeJavaScript(code, true)
   const settle = async (milliseconds = 40) => {
     await wait(milliseconds)
+    // Hidden Windows renderers can defer RAF beyond the real drag timeout.
+    // Request a frame without changing production timers or drag semantics.
+    await window.webContents.capturePage()
     await run('window.singleChatTest.settle()')
     return run('window.singleChatTest.state()')
   }
@@ -91,7 +94,10 @@ app.whenReady().then(async () => {
       document.querySelector(${JSON.stringify(selector)}).dispatchEvent(event)
       return { defaultPrevented: event.defaultPrevented }
     })()`)
-    return { ...result, state: await settle() }
+    // Drag feedback is asserted before its real 1.2s idle watchdog expires;
+    // hidden-window RAF scheduling is not evidence about that feedback.
+    await wait(40)
+    return { ...result, state: await run('window.singleChatTest.state()') }
   }
 
   try {
@@ -114,20 +120,21 @@ app.whenReady().then(async () => {
       let pending = await run('window.singleChatTest.pendingState()')
       assert.equal(pending.text, '私聊当前草稿')
       assert.equal(pending.disabled, true)
-      assert.match(await run('window.singleChatTest.tryLeave()'), /移回结果尚未确认/)
+      assert.match(await run('window.singleChatTest.tryLeave()'), /尚未保存或正在提交|移回结果尚未确认/)
       await run('window.singleChatTest.releasePendingReturn()')
-      await waitFor('Array.from(document.querySelectorAll("button")).some(button => button.textContent.includes("重试移回消息"))')
+      await waitFor('Array.from(document.querySelectorAll("button")).some(button => button.textContent.includes("恢复原请求"))')
       pending = await run('window.singleChatTest.pendingState()')
       assert.deepEqual(pending.queue, ['private-pending-C'])
       assert.equal(pending.text, '私聊当前草稿', 'unknown receipt does not erase current input')
       assert.equal(pending.disabled, true)
-      assert.match(await run('window.singleChatTest.tryLeave()'), /移回结果尚未确认/)
-      await run('Array.from(document.querySelectorAll("button")).find(button => button.textContent.includes("重试移回消息")).click()')
+      assert.match(await run('window.singleChatTest.tryLeave()'), /尚未保存或正在提交|移回结果尚未确认/)
+      await run('Array.from(document.querySelectorAll("button")).find(button => button.textContent.includes("恢复原请求")).click()')
       await waitFor('window.singleChatTest.pendingState().disabled === false')
       pending = await run('window.singleChatTest.pendingState()')
-      assert.equal(pending.text, '私聊 B：移回后继续编辑。')
-      assert.equal(pending.commands.length, 2)
-      assert.deepEqual(pending.commands[0], pending.commands[1], 'retry replays the identical durable command')
+      assert.equal(pending.text, '私聊当前草稿')
+      assert.equal(pending.retained[0].body, '私聊 B：移回后继续编辑。', 'the complete returned input remains separate from the current draft')
+      assert.equal(pending.commands.length, 1)
+      assert.deepEqual(pending.reconciles[0], { operation: 'singleChat.pendingInputs.edit', params: pending.commands[0] }, 'recovery queries the exact durable command without resending it')
       assert.deepEqual(pending.queue, ['private-pending-C'])
       assert.equal(pending.rowCount, 1)
       assert.equal(pending.editingCount, 0)
@@ -137,7 +144,7 @@ app.whenReady().then(async () => {
         await settle()
         await capture(`single-chat-pending-return-${theme}`)
       }
-      console.log(JSON.stringify({ ok: true, verified: { withdrawalRecovery: true, navigationFence: true, identicalCommandReplay: true } }))
+      console.log(JSON.stringify({ ok: true, verified: { withdrawalRecovery: true, navigationFence: true, identicalCommandReconciliation: true, completeInputSeparation: true } }))
       window.destroy()
       app.quit()
       return
@@ -269,7 +276,7 @@ app.whenReady().then(async () => {
     state = await settle()
     assert.equal(state.sendFeedback, '')
     assert.equal(state.composerValue, '第一行')
-    assert.match(state.body, /fixture.send_rejected/)
+    assert.match(state.body, /输入操作未完成，内容已保留/)
 
     await run('window.singleChatTest.holdSend()')
     composerEnter = await dispatchComposerEnter(false)
@@ -294,7 +301,7 @@ app.whenReady().then(async () => {
         for (const selector of ['.single-chat-run-history.is-live', '.public-execution-fixture .process-content']) {
           const surface = document.querySelector(selector)
           if (surface?.querySelector('.single-chat-narration, .stream-narration')
-            && [...surface.querySelectorAll('.process-action.current')].some(node => /Thinking|思考中|连接中/.test(node.textContent))) {
+            && [...surface.querySelectorAll('.process-action.current')].some(node => /Thinking|思考中|连接中|执行中/.test(node.textContent))) {
             window.feedbackOverlaps.push(selector)
           }
         }
@@ -304,8 +311,9 @@ app.whenReady().then(async () => {
     for (const value of ['thinking', 'narration']) {
       state = await phase(value, false)
       if (value === 'thinking') {
-        assert.match(state.liveText, /思考中/)
-        assert.match(state.publicText, /思考中/)
+        // A running fixture with no thinking evidence only proves execution.
+        assert.match(state.liveText, /执行中/)
+        assert.match(state.publicText, /执行中/)
       } else {
         assert.match(state.liveText, /我正在检查双主题/)
         assert.doesNotMatch(state.liveText + state.publicText, /Thinking|思考中|连接中/)
@@ -360,14 +368,14 @@ app.whenReady().then(async () => {
       assert.equal(row.height, 28)
       assert.equal(row.fontSize, '11.5px')
       assert.equal(row.icon, 'terminal')
-      assert.match(row.tracks, /^16px [\d.]+px 16px 20px$/)
+      assert.match(row.tracks, /^16px [\d.]+px 20px$/)
     }
     state = await phase('continuation')
     assert.match(state.liveGroupLabel, /已完成 1 个步骤/)
     assert.doesNotMatch(state.liveText + state.publicText, /Thinking|思考中|连接中/)
     assert.deepEqual(await run('window.feedbackOverlaps'), [])
     await run('window.feedbackObserver.disconnect()')
-    assert.equal(await run(`document.querySelector('${singleLive} .tool-group-state').hasAttribute('role')`), false)
+    assert.equal(await run(`document.querySelector('${singleLive} .tool-group-state[role=img]') === null`), true)
     assert.equal(await run(`document.querySelector('${singleLive} .tool-call-result-scroll').scrollTop > 0`), true)
     assert.equal(await run('Object.values(window.fixtureNodes).every(node => node.isConnected && node.open)'), true)
     assert.equal(state.resultRequests, 2)

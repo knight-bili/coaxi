@@ -62,7 +62,7 @@ export class DelegationViewerController {
     if (this.timer) clearTimeout(this.timer)
     this.timer = null
     if (this.users === 0) return
-    if (this.state.error || this.state.detail?.activity.runs.some(run => ['queued', 'running', 'waiting'].includes(run.status))) {
+    if (this.state.error || this.state.detail?.cleanupPending || this.state.detail?.activity.runs.some(run => ['queued', 'running', 'waiting'].includes(run.status))) {
       this.timer = setTimeout(() => { this.timer = null; void this.refresh() }, 2_000)
     }
   }

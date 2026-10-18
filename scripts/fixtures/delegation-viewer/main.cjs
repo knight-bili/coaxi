@@ -2,7 +2,7 @@ const assert = require('node:assert/strict')
 const { writeFileSync } = require('node:fs')
 const { isAbsolute, join, dirname } = require('node:path')
 const { app, BrowserWindow } = require('electron')
-const [renderer, userData] = process.argv.slice(2)
+const [renderer, userData, mode] = process.argv.slice(2)
 assert.ok(isAbsolute(renderer) && isAbsolute(userData))
 app.setPath('userData', userData)
 app.setPath('sessionData', join(userData, 'session'))
@@ -39,6 +39,12 @@ app.whenReady().then(async () => {
     writeFileSync(join(dirname(userData), 'geometry.json'), JSON.stringify(screenshots, null, 2))
   }
   try {
+    if (mode === '--chat') {
+      const checks = await require('./chat-checks.cjs')({ window, run, settle, click, button, escape, capture })
+      assert.deepEqual(errors, [])
+      console.log(JSON.stringify({ ok: true, rendererOnly: true, core: false, provider: false, checks }))
+      app.exit(0); return
+    }
     let state = await settle()
     assert.equal(state.dialogs, 0)
     state = await click('main .delegation-open')

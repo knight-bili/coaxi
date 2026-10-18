@@ -2,11 +2,11 @@
 
 2026-10-18 当前检查点：原生提问/计划的持久化、User API、可信原生回调及安全阻塞摘要已分别提交；实际Core仍为v1.73/Schema161/Migration211。本文后面的“未接User API/原生回调”等段落保留为历史，不覆盖此处当前事实。
 
-本批推进接管后的原聊天复用基础：`delegations.conversation.get` 只读返回真实已接管 child 的共享会话/材料/活动投影，旧单聊入口不能升级；共享 PrivateInputController、恢复目录与保留/排队材料控件加入明确 child 操作族，保留 UUID/完整参数、规范回执和错误时原正文。当前尚未在实际 SingleChatPanel 中启用 child 模式，不据控制器测试称聊天页面已可用。结果见[接管聊天基础记录](i04-child-chat-foundation-result.json)。下一步直接接 SingleChatPanel 固定 child、精确附件/引用归属及 Viewer 清理完成后的挂载，补生命周期按钮、嵌套离开保护和隐藏/恢复，再整批隔离界面检查。
+接管后的聊天已挂到实际 SingleChatPanel：明确 child 模式固定原会话和发起队员，清理完成后开放聊天；原任务说明及原 Run、消息、附件、引用与恢复入口沿共享组件。普通私聊的未绑定草稿不能迁入 child。接管/取消/恢复/结束控制保存原 UUID 和完整参数，未知先核对；输入交接未结时阻止关闭、同层替换及 Thread 离开，隐藏再显示保留原编辑器和阅读位置。结束保留已保存历史，禁止继续发送。此前的[共享基础记录](i04-child-chat-foundation-result.json)保持原批事实；本批界面证据见[接管聊天界面记录](i04-child-chat-ui-result.json)。
 
 固定Codeg问答/计划共享卡片已挂Rovai原公屏与精确私聊入口；其原请求核对、版本、状态和隔离Renderer资格见[卡片映射](../inventory/runtime-interaction-ui-reference.md)及[交互记录](i04-native-interaction-ui-result.json)。本批继续接入Core委派会话查看器：原BaseUI1.7.0抽屉/Runtime静态图标、父页面仍可操作、单层替换/嵌套退层/右滑关闭、共享审批/问题/执行过程，Core User get仅增确切child活动只读投影；完整history仍用原signed cursor。见[查看器映射](../inventory/delegation-viewer-ui-reference.md)及[本批记录](i04-delegation-viewer-result.json)。原同库Core owner与隔离Renderer分别取证，未产生84正式场景新增通过。
 
-下一队列保持有限且按依赖推进：Grok修改意见原User输入/队列与生命周期衔接；Core委派查看器的完整产品挂载、接管后原聊天/材料和控制入口；Codeg另一类Runtime原生子代理只读读取与查看器；真实Core/运输/原生Host往返、完整原生格式/Runtime/平台矩阵。两类查看器来自Codeg，融合正文复用Rovai已有组件，此处纠正上一检查点“原Rovai查看器”的误称。隐藏但保留会话时抽屉隐藏/恢复、完整原会话正文同场景仍在候选资格内。T02/T03/T04其他原包继续，完整一期81簇/48包/324场景不缩减。阶段集齐才冻候选集中构建和Actions，用户I12后使用软件验收，当前不要求客户执行工程检查。
+下一队列保持有限且按依赖推进：① Codeg 另一类 Runtime 原生子代理的可信只读读取与原查看器；② Grok 修改意见原 User 输入/队列与生命周期衔接，语义超出 r1 时先形成具体客户故事版 revision；③ 实际 Core/运输/原生 Host 与产品界面的完整往返，以及原完整正文同场景对照；④ T01 其他协作缺口和 T02/T03/T04 的 Runtime 并集、恢复、记忆与自动化；⑤ I04 候选集中检查 84 项。当前已完成的抽屉、聊天和输入组件不重复排为待编码，也不据模拟传输授予真实模型或正式场景通过。两类查看器来自 Codeg，融合正文复用 Rovai 原组件。完整一期 81 簇/48 包/324 场景不缩减；阶段集齐才冻候选集中构建和 Actions，用户 I12 后使用软件验收。
 
 2026-10-18 原生问题/计划第一批：按固定Codeg源码实现Cursor/Grok四个ACP阻塞方法的纯转换层，原ID、Other、三种计划决定及Grok独立修改反馈已有类型与纯owner证据。见[源码对照和后续队列](../inventory/native-interaction-reference.md)。当前仍未注册持久请求、接User API、原生发送或UI；Rovai原跳过/拒绝入口尚未替换，不据转换测试称功能可用。下一项Core持久请求/命令/重启失效，再接原路由及原界面。
 

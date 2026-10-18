@@ -63,7 +63,7 @@ async function runFixture(t, mode = '--panel') {
       return
     }
     if (mode === '--pending-return') {
-      assert.deepEqual(report.verified, { withdrawalRecovery: true, navigationFence: true, identicalCommandReplay: true })
+      assert.deepEqual(report.verified, { withdrawalRecovery: true, navigationFence: true, identicalCommandReconciliation: true, completeInputSeparation: true })
       process.stdout.write(`${JSON.stringify(report)}\n`)
       return
     }

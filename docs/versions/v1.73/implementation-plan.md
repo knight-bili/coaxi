@@ -108,3 +108,9 @@ Grok修改反馈原User队列、安全blocked_summary及原广播、固定Codeg�
 扩原Context与受控ACP耦合两个owner，没有新增完整fixture或Rust测试函数。真实父Binding鉴权、原status等待、SQLite可取得、User详情、原Core事件输出，以及问题→计划→新问题的等待链路已验证；默认栈复验通过。测试栈溢出与Windows旧产物占用诊断保留，未提高默认栈或终止进程来取得最终通过。完整1256、真实模型/GUI/Host全链及平台矩阵未由这两个owner替代，正式84场景不计新增通过。
 
 Grok修改意见仍未完成。核对固定Codeg的lifecycleSend/mqEnqueue和已确认r1的显式接管/三种Context mode，发现不能直接把Native计划答案塞进普通接管后消息队列。具体[核查记录](../../../integration/execution/i04-grok-feedback-boundary.json)保留原来源、必需结果和设计待核定项；尚未改相关输入/Schema或发起新的客户确认。先核定完整衔接，再按仓库治理决定是否需要独立revision，同时继续已授权原卡片/查看器和其余I04包，不缩减该功能。
+
+## 接管后聊天界面接续（2026-10-18）
+
+此前已验证的 child 快照和共享输入控制器现挂到生产 SingleChatPanel：固定原 child/发起队员，清理完成开放编辑，原任务说明和 Run 不丢。附件、引用、排队及保留输入复用 child 归属；普通私聊未绑定草稿不迁入。控制入口持久保存 UUID/命令并核对原回执，结束保留历史；抽屉和 Thread 离开保护贯通嵌套输入，隐藏恢复保持编辑器与阅读位置。
+
+界面沿 Codeg 原抽屉与 Rovai 原聊天组件，只有 child 模式、容器嵌入和具体归属适配；日夜宽窄图及生产 Renderer 运输夹具结果见[接管聊天记录](../../../integration/execution/i04-child-chat-ui-result.json)。当前没有 Rust、Schema、依赖或模型输入变化，不因本切片重编 Core 或触发远程 Actions；原完整 App 对照、第二类原生子代理、实际 Core/Host/GUI/模型往返及其他 I04 包仍必需，正式场景新增通过 0。

@@ -188,6 +188,9 @@ const requests: Array<{ method: string; params: unknown }> = []
 let pendingReturnGate: Promise<void> | null = null
 let releasePendingReturn: (() => void) | null = null
 const pendingReturnReceipts = new Map<string, StoredCommandResult>()
+const retainedInputs: import('@contracts').RetainedPrivateInput[] = []
+const scopedDraft = () => ({ ...currentSnapshot.draft, scopeVersion: 1 as const, scopeKey: '', composerScope: null })
+const commandReceipt = (commandId: string, commandType: string, status: StoredCommandResult['status'], code: string, payload: StoredCommandResult['payload']): StoredCommandResult => ({ commandId, commandType, status, code, payload, resultEntity: null, recordedAt: '2026-10-18T00:00:00Z' })
 type LeavePreparation = { complete(didLeave: boolean): void }
 let leaveGuard: (() => LeavePreparation) | null = null
 const pendingLeaves: LeavePreparation[] = []
@@ -297,7 +300,15 @@ Object.assign(window, {
     request: async (method: string, params?: Record<string, unknown>): Promise<unknown> => {
       requests.push({ method, params })
       if (method === 'singleChat.list') return [currentSnapshot.conversation]
-      if (method === 'singleChat.get') return currentSnapshot
+      if (method === 'singleChat.get') return params?.conversationId === conversationId ? { ...currentSnapshot, draft: scopedDraft(), pendingInputs: { ...currentSnapshot.pendingInputs, editingElsewhere: false } } : null
+      if (method === 'delegations.list') return { parentConversationId: params?.parentConversationId, items: [] }
+      if (method === 'runtime.interactions.list') return { conversationId: params?.conversationId, items: [], nextCursor: null }
+      if (method === 'singleChat.composerDraft.recovery') return { items: retainedInputs.map(input => ({ kind: 'retained', input })), complete: true, nextCursor: null, throughGlobalSequence: 1 }
+      if (method === 'commands.reconcile') {
+        const original = params as unknown as { params: { commandId: string } }
+        const result = pendingReturnReceipts.get(original.params.commandId)
+        return result ? { state: 'recorded', result } : { state: 'unknown' }
+      }
       if (method === 'singleChat.pendingInputs.edit') {
         const { commandId, command } = params as unknown as { commandId: string,
           command: { pendingInputId: string, expectedRevision: number,
@@ -311,11 +322,10 @@ Object.assign(window, {
           || currentSnapshot.draft.revision !== command.action.expectedDraftRevision) {
           throw new Error('Unexpected pending return fixture command')
         }
-        currentSnapshot = { ...currentSnapshot,
-          draft: { revision: currentSnapshot.draft.revision + 1, attachments: [], quotes: [], updatedAt: '2026-09-12T00:00:00Z' },
-          pendingInputs: { ...currentSnapshot.pendingInputs, items: currentSnapshot.pendingInputs.items.filter(entry => entry.id !== item.id) } }
-        pendingReturnReceipts.set(commandId, { status: 'applied', code: 'single_chat.pending_input_returned_to_composer',
-          payload: { pendingInputId: item.id, body: item.body, draft: structuredClone(currentSnapshot.draft) } } as unknown as StoredCommandResult)
+        retainedInputs.push({ id: 'retained-' + item.id, conversationId, scopeKey: '', revision: 1, body: item.body, attachments: item.attachments, quotes: item.quotes, updatedAt: '2026-10-18T00:00:00Z' })
+        currentSnapshot = { ...currentSnapshot, pendingInputs: { ...currentSnapshot.pendingInputs, items: currentSnapshot.pendingInputs.items.filter(entry => entry.id !== item.id) } }
+        pendingReturnReceipts.set(commandId, commandReceipt(commandId, 'single_chat.pending_input.edit', 'applied', 'single_chat.pending_input_returned_to_composer',
+          { placement: 'retained', pendingInputId: item.id, draft: scopedDraft(), retainedInput: retainedInputs.at(-1) }))
         for (const listener of eventListeners) listener({ method: 'single_chat.changed', params: { threadId, conversationId, reason: 'pending_input_edited' } })
         throw new Error('Fixture lost the successful withdrawal response')
       }
@@ -334,18 +344,16 @@ Object.assign(window, {
         if (sendHeld) await new Promise<void>((resolve) => { releaseSend = resolve })
         if (rejectSend) {
           rejectSend = false
-          return { status: 'rejected', code: 'fixture.send_rejected', payload: {} }
+          return commandReceipt(String(params?.commandId), 'single_chat.send', 'rejected', 'fixture.send_rejected', {})
         }
         setMode('queued', false)
-        return {
-        status: 'accepted', code: 'single_chat.reply_queued', payload: {
+        return commandReceipt(String(params?.commandId), 'single_chat.send', 'accepted', 'single_chat.reply_queued', {
           conversationId,
           conversationVersion: currentSnapshot.conversation.version + 1,
           conversationMessageId: 'message-keyboard-fixture',
           threadTurnId: 'turn-keyboard-fixture',
           agentRunId: 'run-keyboard-fixture'
-        }
-      } satisfies StoredCommandResult
+        })
       }
       if (method === 'agentRuns.cancel') {
         const running = currentSnapshot.agentRuns.find((run) => run.id === 'run-running')
@@ -457,6 +465,8 @@ Object.assign(window, {
     repeatLeaveCancellation: () => { lastCancelledLeave?.complete(false) },
     pendingState: () => ({
       commands: requests.filter(request => request.method === 'singleChat.pendingInputs.edit').map(request => request.params),
+      reconciles: requests.filter(request => request.method === 'commands.reconcile').map(request => request.params),
+      retained: structuredClone(retainedInputs),
       queue: currentSnapshot.pendingInputs.items.map(item => item.id),
       text: document.querySelector<HTMLTextAreaElement>('.single-chat-composer textarea')?.value,
       disabled: document.querySelector<HTMLTextAreaElement>('.single-chat-composer textarea')?.disabled,
@@ -490,7 +500,7 @@ Object.assign(window, {
         liveText: document.querySelector('.single-chat-run-history.is-live')?.textContent ?? '',
         sendFeedback: document.querySelector('.single-chat-send-feedback')?.textContent ?? '',
         liveSummaryVisible: Boolean(document.querySelector('.single-chat-run-history.is-live > summary')?.getBoundingClientRect().height),
-        liveGroupLabel: document.querySelector('.single-chat-run-history.is-live .tool-group-summary')?.textContent ?? '',
+        liveGroupLabel: document.querySelector('.single-chat-run-history.is-live .tool-group-summary')?.getAttribute('aria-label') ?? '',
         publicText: document.querySelector('.public-execution-fixture')?.textContent ?? '',
         publicOpen: document.querySelector<HTMLDetailsElement>('.public-execution-fixture .execution-disclosure')?.open ?? null,
         resultRequests: requests.filter((request) => request.method === 'agentRunEvidence.getContent').length,

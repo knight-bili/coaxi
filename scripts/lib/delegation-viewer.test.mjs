@@ -10,7 +10,9 @@ import electron from 'electron'
 import { build } from 'vite'
 import { admitElectronIntegrationTest } from './electron-sandbox-capability.mjs'
 
-test('delegated viewer preserves child authority, non-modal stacked drawers and source-row-independent lifetime', { timeout: 90_000 }, async t => {
+test('delegated viewer preserves child authority, non-modal stacked drawers and source-row-independent lifetime', { timeout: 90_000 }, t => runFixture(t))
+test('taken-over child chat preserves exact owner, input recovery and embedded drawer layout', { timeout: 90_000 }, t => runFixture(t, '--chat'))
+async function runFixture(t, mode = '--readonly') {
   if (!admitElectronIntegrationTest(t)) return
   const root = resolve(import.meta.dirname, '../..'), source = join(root, 'scripts/fixtures/delegation-viewer')
   const fixture = await mkdtemp(join(tmpdir(), 'rovai-delegation-viewer-'))
@@ -20,7 +22,7 @@ test('delegated viewer preserves child authority, non-modal stacked drawers and 
       resolve: { alias: { '@contracts': join(root, 'packages/contracts/src/index.ts') } }, build: { outDir: join(fixture, 'renderer'), minify: false } })
     const env = { ...process.env, ELECTRON_DISABLE_SECURITY_WARNINGS: 'true' }; delete env.ELECTRON_RUN_AS_NODE
     process.stdout.write(`Automatic verification: ${fixture}; Renderer-only userData/session, no Core/Runtime/SQLite/Skill Library/MCP\n`)
-    child = spawn(electron, [join(source, 'main.cjs'), join(fixture, 'renderer/index.html'), join(fixture, 'user-data'), ...(process.platform === 'linux' ? ['--no-sandbox'] : [])], { env, stdio: ['ignore', 'pipe', 'pipe'] })
+    child = spawn(electron, [join(source, 'main.cjs'), join(fixture, 'renderer/index.html'), join(fixture, 'user-data'), mode, ...(process.platform === 'linux' ? ['--no-sandbox'] : [])], { env, stdio: ['ignore', 'pipe', 'pipe'] })
     closed = once(child, 'close')
     let output = ''
     child.stdout.on('data', data => { output += data.toString() }); child.stderr.on('data', data => { output += data.toString() })
@@ -35,4 +37,4 @@ test('delegated viewer preserves child authority, non-modal stacked drawers and 
     if (process.env.ROVAI_KEEP_DELEGATION_VIEWER_FIXTURE === '1') process.stdout.write(`Viewer screenshots: ${fixture}\n`)
     else await rm(fixture, { recursive: true, force: true })
   }
-})
+}

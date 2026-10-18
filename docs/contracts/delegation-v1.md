@@ -257,3 +257,11 @@ Native登记/关闭/答复和首次User决定共用Core失效通知：runtime.in
 答案保存、写入原生通道、投递未知、请求关闭各自显示，`sent`不表示提供方已执行或任务完成。Grok修改反馈仍按原登记围栏等待队列衔接，本批不移除围栏、不隐式接管或改写模型输入。隔离Renderer的模拟传输、原组件视觉对照与真实Core/Host/provider资格分别记录；本批不改变Schema、Core版本或已确认r1全文。
 
 本批不改变Bootstrap、Formatter35或新的User工作准入。Grok修改意见与显式接管的衔接见[核查记录](../../integration/execution/i04-grok-feedback-boundary.json)，仍为必需待实现项；本节不授权把计划回答变成隐式接管。
+
+### 已接管 child 的共享聊天呈现
+
+User 显式接管沿既有 delegations.takeover；清理完成后才挂原 SingleChatPanel 的 child 模式。固定 conversationId/ownerAgentId 来源于同一 Core User detail 与当前真实成员，不能选择另一队员、新建替代私聊，或在 child 读取/上传能力缺失时降级到 SingleChat 方法。普通私聊未绑定正文不迁入 child；消息、草稿、排队、保留材料和引用的资源归属均保持 child。
+
+四个既有控制入口 takeover/cancel/resume/conversation.end 先保存原 UUID/完整命令，再派发；规范 commandType 原样校验。丢回执只核对原请求，显式重试复用原参数；未知控制可关闭后重开恢复，未知输入交接仍由原输入 guard 围栏。只有 Core 确认 ended 才禁发并保留已保存历史；结束说明不沿用普通私聊删除历史的文案。
+
+抽屉遵循固定 Codeg 的非模态/单槽/嵌套规则，聊天正文、执行、材料和恢复复用 Rovai 既有组件。父页面隐藏时子层及内层结束弹窗不可见，重新显示只重读同一身份，保留本机编辑状态。以上没有新增模型可见输入、数据库迁移或 Runtime 准入；[分项证据](../../integration/execution/i04-child-chat-ui-result.json)的模拟 UI 传输与真实 Core/Host/模型资格分别记录。

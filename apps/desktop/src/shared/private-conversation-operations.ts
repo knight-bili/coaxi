@@ -17,6 +17,7 @@ export function privateConversationOperations(kind?: PrivateConversationKind): t
   return kind === 'delegation_child' ? child : singleChat
 }
 export type PrivateInputMethod = typeof singleChat['mutate' | 'edit' | 'send'] | typeof child['mutate' | 'edit' | 'send']
+export type DelegationActionMethod = 'delegations.takeover' | 'delegations.cancel' | 'delegations.resume' | 'delegations.conversation.end'
 export function privateInputCommandType(method: PrivateInputMethod): string {
   if (method.startsWith('delegations.')) return method
   return method === 'singleChat.send' ? 'single_chat.send' : method === 'singleChat.pendingInputs.edit' ? 'single_chat.pending_input.edit' : 'single_chat.composer_draft.mutate'

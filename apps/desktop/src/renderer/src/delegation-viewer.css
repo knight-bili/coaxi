@@ -19,6 +19,18 @@
 .delegation-runtime-mark > svg { display: block; }
 .delegation-runtime-initial { display: inline-flex; align-items: center; justify-content: center; width: 100%; height: 100%; border-radius: 50%; color: var(--brand-ink); background: var(--brand-soft); font-size: 11px; font-weight: 600; }
 .delegation-drawer-viewport { pointer-events: none; position: fixed; inset: 0; z-index: 90; }
+.delegation-drawer-viewport[data-host-hidden] { visibility: hidden; }
+.delegation-drawer-viewport[data-host-hidden] * { visibility: hidden !important; }
+.delegation-controls { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 16px; border-bottom: 1px solid var(--line); font-size: 12px; }
+.delegation-controls:empty { display: none; }
+.delegation-controls small, .delegation-controls p { flex-basis: 100%; margin: 0; color: var(--muted); }
+.delegation-controls > div { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.delegation-controls textarea { display: block; width: 100%; margin: 8px 0; }
+.delegation-drawer-body.has-chat { display: flex; padding: 0; overflow: hidden; }
+.delegation-chat-surface.single-chat-popover { position: relative; inset: auto; display: flex; flex: 1; flex-direction: column; min-width: 0; min-height: 0; width: 100%; height: 100%; max-height: none; max-width: none; border: 0; border-radius: 0; box-shadow: none; }
+.delegation-chat-surface.single-chat-popover[hidden] { display: none; }
+.delegation-chat-surface .single-chat-target-trigger { pointer-events: none; }
+.delegation-chat-surface .single-chat-target-chevron { display: none; }
 /* Codeg's right-hand Base UI drawer: same swipe variables, stack and motion. */
 .delegation-drawer { pointer-events: auto; --stack-step: .05; --peek: 1rem; --stack-progress: clamp(0, var(--drawer-swipe-progress, 0), 1); --stack-scale-base: max(0, calc(1 - var(--nested-drawers, 0) * var(--stack-step))); --stack-scale: clamp(0, calc(var(--stack-scale-base) + var(--stack-step) * var(--stack-progress)), 1); --stack-shrink: calc(1 - var(--stack-scale)); --stack-peek-offset: max(0px, calc((var(--nested-drawers, 0) - var(--stack-progress)) * var(--peek))); transform: translate3d(calc(var(--drawer-swipe-movement-x, 0px) - var(--stack-peek-offset) - var(--stack-shrink) * 100%), 0, 0) scale(var(--stack-scale)); transition: transform 450ms cubic-bezier(.22, 1, .36, 1), filter 450ms; outline: none; }
 .delegation-drawer[data-starting-style], .delegation-drawer[data-ending-style] { transform: translate3d(calc(100% + 10px), 0, 0); }

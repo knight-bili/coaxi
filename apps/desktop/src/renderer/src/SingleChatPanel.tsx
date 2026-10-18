@@ -13,6 +13,7 @@ import { RuntimeInteractionDock } from './RuntimeInteractionDock'
 import { DelegationChildren } from './DelegationViewer'
 import { useMobileLayout } from './MobileLayout'
 import { newCommandId } from '../../shared/command-id'
+import { privateConversationOperations, type PrivateConversationKind } from '../../shared/private-conversation-operations'
 import { RunningText } from './RunningText'
 import { useRuntimePhase } from './useRuntimePhase'
 import { revealMessageQuote } from './message-quote-reveal'
@@ -333,6 +334,7 @@ function memberCanSingleChat(member: ThreadMemberView): boolean {
 export function SingleChatRunHistory({
   threadId,
   conversationId,
+  conversationKind = 'single_chat',
   run,
   evidence,
   finalMessage,
@@ -342,6 +344,7 @@ export function SingleChatRunHistory({
 }: {
   threadId: string
   conversationId: string
+  conversationKind?: PrivateConversationKind
   run: SingleChatRunView
   evidence: AgentRunExecutionEvidenceView[]
   finalMessage: SingleChatMessageView | null
@@ -461,7 +464,7 @@ export function SingleChatRunHistory({
         </details>
         {finalMessage && <>
           <hr className="single-chat-final-rule" />
-          <div className="single-chat-final" data-agent-run-id={run.id} data-single-chat-message-id={finalMessage.id} data-message-quote-body={finalMessage.id} data-quote-owner={`single_chat:${conversationId}`} data-notification-turn-id={run.threadTurnId}><SafeMarkdown>{finalMessage.body}</SafeMarkdown></div>
+          <div className="single-chat-final" data-agent-run-id={run.id} data-single-chat-message-id={finalMessage.id} data-message-quote-body={finalMessage.id} data-quote-owner={`${conversationKind}:${conversationId}`} data-notification-turn-id={run.threadTurnId}><SafeMarkdown>{finalMessage.body}</SafeMarkdown></div>
         </>}
       </div>
     </section>
@@ -477,11 +480,13 @@ async function revealPrivateQuote(quote: MessageQuoteSnapshot): Promise<void> {
 
 function SingleChatTranscript({
   snapshot,
+  conversationKind = 'single_chat',
   now,
   cancelling,
   onNotify
 }: {
   snapshot: SingleChatSnapshot
+  conversationKind?: PrivateConversationKind
   now: string
   cancelling: boolean
   onNotify(message: string): void
@@ -500,7 +505,7 @@ function SingleChatTranscript({
   return <>
     {snapshot.messages.map((message) => {
       if (message.authorType === 'agent') return null
-      if (message.authorType === 'system') {
+      if (message.authorType === 'system' && !(conversationKind === 'delegation_child' && message.authorId === 'delegation-parent')) {
         return <p className="single-chat-system-message" key={message.id}>{message.body}</p>
       }
       const run = runsByTrigger.get(message.id) ?? null
@@ -509,14 +514,15 @@ function SingleChatTranscript({
           <div className="single-chat-user-message">
             <div className="single-chat-user-content">
               <MessageQuotes history quotes={message.quotes ?? []} onReveal={revealPrivateQuote} />
-              {message.body && <div className="single-chat-user-bubble" data-message-quote-body={message.id} data-quote-owner={`single_chat:${snapshot.conversation.id}`}>{message.body}</div>}
+              {message.authorType === 'system' && <small><UiText zh="任务说明" /></small>}
+              {message.body && <div className="single-chat-user-bubble" data-message-quote-body={message.id} data-quote-owner={`${conversationKind}:${snapshot.conversation.id}`}>{message.body}</div>}
               {message.attachments.length > 0 && (
                 <div className="single-chat-message-attachments" role="group" aria-label={uiAttribute("附件 {0} 个", String(message.attachments.length))}>
                   {message.attachments.map((attachment) => (
                     <AttachmentCard
                       attachment={attachment}
                       locator={{
-                        owner: 'single_chat_message',
+                        owner: conversationKind === 'delegation_child' ? 'delegation_child_message' : 'single_chat_message',
                         threadId: snapshot.conversation.threadId,
                         conversationId: snapshot.conversation.id,
                         conversationMessageId: message.id,
@@ -533,6 +539,7 @@ function SingleChatTranscript({
           </div>
           {run && (
             <SingleChatRunHistory
+              conversationKind={conversationKind}
               conversationId={snapshot.conversation.id}
               threadId={snapshot.conversation.threadId}
               cancelling={cancelling && run.id === snapshot.conversation.activeAgentRunId}
@@ -572,8 +579,8 @@ function SingleChatPendingQueue({ snapshot, input, bodies, busyOutside, onRefres
   const session = queue.editSession
   const client = useThreadClient()
   const pendingUploads = useMemo(() => input && session ? privateUploadController(client.singleChatAttachments,
-    { threadId: input.origin.threadId, conversationId: input.origin.conversationId, composerScope: input.origin.scope },
-    { kind: 'single_chat_pending', conversationId: input.origin.conversationId, pendingInputId: session.pendingInputId,
+    { ...(input.origin.conversationKind === 'delegation_child' ? { conversationKind: 'delegation_child' as const } : {}), threadId: input.origin.threadId, conversationId: input.origin.conversationId, composerScope: input.origin.scope },
+    { kind: input.origin.conversationKind === 'delegation_child' ? 'delegation_child_pending' : 'single_chat_pending', conversationId: input.origin.conversationId, pendingInputId: session.pendingInputId,
       editToken: session.editToken, ...(input.origin.scope ? { composerScope: input.origin.scope } : {}) }) : null,
     [client, input, session?.pendingInputId, session?.editToken])
   const pendingUploadState = useSyncExternalStore(pendingUploads?.subscribe ?? noPrivateInputSubscription,
@@ -632,7 +639,7 @@ function SingleChatPendingQueue({ snapshot, input, bodies, busyOutside, onRefres
                       key={attachment.id}
                       attachment={attachment}
                       locator={{
-                        owner: 'single_chat_pending',
+                        owner: input?.origin.conversationKind === 'delegation_child' ? 'delegation_child_pending' : 'single_chat_pending',
                         threadId: snapshot.conversation.threadId,
                         conversationId: snapshot.conversation.id,
                         pendingInputId: item.id,
@@ -672,6 +679,9 @@ export function SingleChatPanel({
   onNotify = () => undefined,
   target,
   boundConversationId,
+  conversationKind = 'single_chat',
+  embedded = false,
+  onEndConversation,
   composerContext,
   recoveryBrowser = true,
   notificationFocus,
@@ -683,6 +693,9 @@ export function SingleChatPanel({
 }: {
   target?: SingleChatPanelTarget | null
   boundConversationId?: string
+  conversationKind?: PrivateConversationKind
+  embedded?: boolean
+  onEndConversation?(target: SingleChatEndTarget): Promise<void>
   composerContext?: CanvasComposerContext
   recoveryBrowser?: boolean
   notificationFocus?: NotificationFocusTarget | null
@@ -701,6 +714,9 @@ export function SingleChatPanel({
   onNotify?(message: string): void
 }): React.JSX.Element {
   const client = useThreadClient()
+  const child = conversationKind === 'delegation_child'
+  const operations = privateConversationOperations(conversationKind)
+  const endConfirmationKey = child ? 'rovai.delegation-child.skip-end-confirmation.v1' : END_CONFIRMATION_STORAGE_KEY
   const mobile = useMobileLayout()
   const copy = useThreadDetailCopy()
   const panelId = useId()
@@ -756,6 +772,8 @@ export function SingleChatPanel({
   const [leaving, setLeaving] = useState(false)
   const recoveryLeaveGuard = useRef<(() => ThreadLeavePreparation) | null>(null)
   const bindRecoveryLeaveGuard = useCallback((guard: (() => ThreadLeavePreparation) | null) => { recoveryLeaveGuard.current = guard }, [])
+  const childViewerLeaveGuard = useRef<(() => ThreadLeavePreparation) | null>(null)
+  const bindChildViewerLeaveGuard = useCallback((guard: (() => ThreadLeavePreparation) | null) => { childViewerLeaveGuard.current = guard }, [])
   useLayoutEffect(() => {
     onLeaveGuardChange?.(() => {
       if (!draftStore.canLeave()) throw new Error(uiAttribute('单聊草稿尚未保存或正在提交，请稍后再离开。'))
@@ -763,12 +781,15 @@ export function SingleChatPanel({
         throw new Error(uiAttribute('单聊消息移回结果尚未确认，请先在单聊中重试恢复消息。'))
       }
       const recoveryPreparation = recoveryLeaveGuard.current?.()
+      let viewerPreparation: ThreadLeavePreparation | undefined
+      try { viewerPreparation = childViewerLeaveGuard.current?.() } catch (error) { recoveryPreparation?.complete(false); throw error }
       leaveLeaseCountRef.current += 1
       setLeaving(true)
       let completed = false
       return { complete(didLeave) {
         if (completed) return
         completed = true
+        viewerPreparation?.complete(didLeave)
         recoveryPreparation?.complete(didLeave)
         if (!didLeave) {
           leaveLeaseCountRef.current -= 1
@@ -791,27 +812,28 @@ export function SingleChatPanel({
   const memberByIdRef = useRef(memberById)
   const selectedMember = selectedAgentId ? memberById.get(selectedAgentId) ?? null : null
   const currentTargetReady = singleChatConversationReady(snapshot, selectedAgentId, loading, boundConversationId)
-  const currentSnapshot = currentTargetReady ? snapshot : null
+  const currentSnapshot = currentTargetReady || (child && !loading && snapshot !== null && snapshot.conversation.id === boundConversationId && snapshot.conversation.agentId === selectedAgentId) ? snapshot : null
   const bodyDraftKey = snapshot?.conversation.agentId === selectedAgentId
-    ? `${threadId}:${snapshot.conversation.id}` : `${threadId}:pending:${selectedAgentId ?? ''}`
+    ? `${threadId}:${snapshot.conversation.id}` : child ? `${threadId}:${boundConversationId ?? 'unavailable-child'}` : `${threadId}:pending:${selectedAgentId ?? ''}`
   const sending = localSending || sharedDraftState.sendingKeys.includes(bodyDraftKey)
   const draft = bodyDrafts[bodyDraftKey] ?? ''
   const getInputController = useCallback((conversationId: string) => privateInputController(client, {
+    ...(child ? { conversationKind: 'delegation_child' as const } : {}),
     threadId, conversationId, contextKey: contextIdentity ?? 'default',
     scope: composerContext ? { kind: 'canvas', boardId: composerContext.boardId, nodeId: composerContext.nodeId } : null
-  }, draftStore), [client, threadId, contextIdentity, draftStore])
+  }, draftStore), [client, threadId, contextIdentity, draftStore, conversationKind])
   const input = useMemo(() => currentSnapshot ? getInputController(currentSnapshot.conversation.id) : null,
     [getInputController, currentSnapshot?.conversation.id])
   const inputState = useSyncExternalStore(input?.subscribe ?? noPrivateInputSubscription, input?.getSnapshot ?? emptyPrivateInput, input?.getSnapshot ?? emptyPrivateInput)
   const uploads = useMemo(() => input ? privateUploadController(client.singleChatAttachments,
-    { threadId, conversationId: input.origin.conversationId, composerScope: input.origin.scope },
-    { kind: 'single_chat', conversationId: input.origin.conversationId, ...(input.origin.scope ? { composerScope: input.origin.scope } : {}) }) : null,
+    { ...(child ? { conversationKind: 'delegation_child' as const } : {}), threadId, conversationId: input.origin.conversationId, composerScope: input.origin.scope },
+    { kind: child ? 'delegation_child' : 'single_chat', conversationId: input.origin.conversationId, ...(input.origin.scope ? { composerScope: input.origin.scope } : {}) }) : null,
     [client, input, threadId])
   const uploadState = useSyncExternalStore(uploads?.subscribe ?? noPrivateInputSubscription, uploads?.getSnapshot ?? emptyPrivateUpload, uploads?.getSnapshot ?? emptyPrivateUpload)
   const uploadBusy = Boolean(uploads?.supported && (!uploadState.loaded || uploadState.rows.some(row => row.state !== 'rejected')))
   const returningPending = sharedDraftState.mutatingKeys.includes(bodyDraftKey)
   returningPendingRef.current = returningPending
-  const pendingBodyKey = `${threadId}:pending:${selectedAgentId ?? ''}`
+  const pendingBodyKey = child ? `${threadId}:pending:delegation:${boundConversationId ?? ''}` : `${threadId}:pending:${selectedAgentId ?? ''}`
   const retainedInputKeys = currentSnapshot ? Object.keys(bodyDrafts).filter(key =>
     (key === pendingBodyKey || key.startsWith(`${bodyDraftKey}:returned:`)) && bodyDrafts[key] && bodyDrafts[key] !== draft) : []
   const [retainedInputSelection, setRetainedInputSelection] = useState('')
@@ -824,10 +846,14 @@ export function SingleChatPanel({
     } catch (error) { setError(privateInputErrorMessage(error)) }
   }
   useEffect(() => {
+    if (child) return
     if (!snapshot || snapshot.conversation.agentId !== selectedAgentId) return
     const pendingKey = `${threadId}:pending:${selectedAgentId ?? ''}`
     draftStore.migratePending(pendingKey, bodyDraftKey)
-  }, [threadId, selectedAgentId, snapshot?.conversation.id, bodyDraftKey, draftStore, sharedDraftState.sendingKeys, sharedDraftState.ready])
+  }, [threadId, selectedAgentId, snapshot?.conversation.id, bodyDraftKey, draftStore, sharedDraftState.sendingKeys, sharedDraftState.ready, conversationKind])
+  useEffect(() => {
+    if (child && currentSnapshot?.conversation.status === 'ended') { setEndDialogOpen(false); setEndTarget(null) }
+  }, [conversationKind, currentSnapshot?.conversation.id, currentSnapshot?.conversation.status])
   const activeRun = currentSnapshot?.agentRuns.find((run) => NON_TERMINAL_RUNS.has(run.status)) ?? null
   const runningCount = conversations.filter((conversation) => (
     conversation.id === currentSnapshot?.conversation.id
@@ -919,7 +945,8 @@ export function SingleChatPanel({
         try {
           let loaded: SingleChatSnapshot | null
           try { loaded = await getInputController(currentRead.conversationId).refresh() }
-          catch {
+          catch (error) {
+            if (child) throw error
             const history = await client.request<SingleChatSnapshot | null>('singleChat.get', { conversationId: currentRead.conversationId })
             loaded = history && composerContext ? { ...history, draft: { revision: 0, quotes: [], attachments: [], updatedAt: null },
               pendingInputs: { ...history.pendingInputs, editSession: null } } : history
@@ -996,7 +1023,10 @@ export function SingleChatPanel({
   const refreshList = useCallback(async (): Promise<SingleChatConversationView[] | undefined> => {
     if (!visibleRef.current || campIdRef.current !== threadId) return undefined
     try {
-      const nextConversations = await client.request<SingleChatConversationView[]>('singleChat.list', { threadId })
+      if (child && (!boundConversationId || !target || boundConversationId !== target.conversationId)) throw new Error('delegation.viewer_scope_mismatch')
+      const fixed = child ? await client.request<SingleChatSnapshot | null>(operations.get, { conversationId: boundConversationId, composerScope: composerContext ? { kind: 'canvas', boardId: composerContext.boardId, nodeId: composerContext.nodeId } : null }) : null
+      if (fixed && (fixed.conversation.id !== boundConversationId || fixed.conversation.threadId !== threadId || fixed.conversation.agentId !== target?.agentId)) throw new Error('delegation.viewer_scope_mismatch')
+      const nextConversations = child ? (fixed ? [fixed.conversation] : []) : await client.request<SingleChatConversationView[]>('singleChat.list', { threadId })
       if (!visibleRef.current || campIdRef.current !== threadId) return undefined
       conversationsRef.current = nextConversations
       setConversations(nextConversations)
@@ -1007,7 +1037,7 @@ export function SingleChatPanel({
       }
       return undefined
     }
-  }, [threadId])
+  }, [threadId, client, boundConversationId, target?.agentId, conversationKind, contextIdentity])
 
   useEffect(() => {
     if (!visible) {
@@ -1021,6 +1051,14 @@ export function SingleChatPanel({
       && campIdRef.current === threadId
       && requestSequence === targetRequestSequenceRef.current
     )
+    // A hidden delegated viewer keeps the same editor and reading position.
+    // Revalidate its exact child without rebuilding the surface on reveal.
+    if (child && boundConversationId && target && memberByIdRef.current.has(target.agentId)
+      && snapshotRef.current?.conversation.id === boundConversationId
+      && snapshotRef.current.conversation.agentId === target.agentId) {
+      void refreshCurrent(boundConversationId)
+      return () => { ++targetRequestSequenceRef.current; currentReadAgainRef.current = false }
+    }
     followLatestRef.current = true
     setPreparingAttachments([])
     currentConversationIdRef.current = null
@@ -1087,6 +1125,11 @@ export function SingleChatPanel({
   useEffect(() => {
     if (!visible) return
     return client.onEvent?.((event) => {
+      if (child) {
+        const params = event.params as { threadId?: string; conversationId?: string }
+        if (event.method === 'delegation.changed' && params.threadId === threadId && params.conversationId === currentConversationIdRef.current) void refreshCurrent().catch(() => undefined)
+        return
+      }
       const target = singleChatChangeRefreshTarget(
         event,
         threadId,
@@ -1098,7 +1141,7 @@ export function SingleChatPanel({
         void refreshList().catch(() => undefined)
       }
     })
-  }, [threadId, client, refreshCurrent, refreshList, visible])
+  }, [threadId, client, refreshCurrent, refreshList, visible, conversationKind])
 
   useEffect(() => {
     if (!visible) return
@@ -1122,7 +1165,7 @@ export function SingleChatPanel({
   }, [visible, mobile])
 
   useEffect(() => {
-    if (!visible) return
+    if (!visible || embedded) return
     const dismissOnEscape = (event: KeyboardEvent): void => {
       if (event.key !== 'Escape' || event.defaultPrevented) return
       if (composerContext && !panelRef.current?.contains(document.activeElement)) return
@@ -1132,7 +1175,7 @@ export function SingleChatPanel({
     }
     document.addEventListener('keydown', dismissOnEscape)
     return () => document.removeEventListener('keydown', dismissOnEscape)
-  }, [onClose, visible, contextIdentity])
+  }, [onClose, visible, contextIdentity, embedded])
 
   useEffect(() => {
     if (!visible) return
@@ -1230,7 +1273,7 @@ export function SingleChatPanel({
       sequence: targetRequestSequenceRef.current
     }
   ): Promise<SingleChatSnapshot | null> => {
-    if (boundConversationId) throw new Error(uiAttribute('原单聊暂不可用，请重新读取，不能新建替代对话。'))
+    if (boundConversationId || child) throw new Error(uiAttribute('原单聊暂不可用，请重新读取，不能新建替代对话。'))
     const result = await client.request<StoredCommandResult>('singleChat.open', {
       commandId: newCommandId(),
       command: { threadId, agentId }
@@ -1262,7 +1305,7 @@ export function SingleChatPanel({
   }
 
   const chooseTarget = async (agentId: string): Promise<void> => {
-    if (boundConversationId || returningPendingRef.current) return
+    if (boundConversationId || child || returningPendingRef.current) return
     const targetRequest: SingleChatTargetRequest = {
       agentId,
       sequence: ++targetRequestSequenceRef.current
@@ -1298,7 +1341,7 @@ export function SingleChatPanel({
   }
 
   const prepareFiles = async (files: File[]): Promise<void> => {
-    if (composerContext && !uploads?.supported) { setError(privateUploadErrorMessage(new Error('private_upload.capability_required'))); return }
+    if ((composerContext || child) && !uploads?.supported) { setError(privateUploadErrorMessage(new Error('private_upload.capability_required'))); return }
     if (returningPendingRef.current || inputState.pending || (uploads?.supported && uploads.blocked)) return
     const agentId = selectedAgentIdRef.current
     if (
@@ -1377,7 +1420,7 @@ export function SingleChatPanel({
     }, 1_200)
   }
 
-  const attachmentDropBlocked = !currentTargetReady || ending || sending || quoteBusy || inputState.pending || uploadBusy || (Boolean(composerContext) && !uploads?.supported)
+  const attachmentDropBlocked = !currentTargetReady || ending || sending || quoteBusy || inputState.pending || uploadBusy || ((Boolean(composerContext) || child) && !uploads?.supported)
     || returningPending || preparingAttachments.some((item) => !item.error)
 
   const enterAttachmentDropSurface = (event: ReactDragEvent<HTMLElement>): void => {
@@ -1491,7 +1534,7 @@ export function SingleChatPanel({
     const agentId = selectedAgentIdRef.current
     const originalBody = draftStore.getSnapshot().drafts[bodyDraftKey] ?? ''
     if (!agentId || !singleChatConversationReady(snapshotRef.current, agentId, loadingRef.current, boundConversationId)
-      || sending || returningPending || ending || quoteBusy || inputState.pending || (uploads?.supported && uploads.blocked) || preparingAttachments.some(item => !item.error)) return
+      || (child && busy) || sending || returningPending || ending || quoteBusy || inputState.pending || (uploads?.supported && uploads.blocked) || preparingAttachments.some(item => !item.error)) return
     setSending(true); setError(null); followLatestRef.current = true
     try {
       let current = snapshotRef.current?.conversation.agentId === agentId ? snapshotRef.current : await openConversation(agentId)
@@ -1544,12 +1587,14 @@ export function SingleChatPanel({
     setEnding(true)
     setError(null)
     try {
-      const result = await client.request<StoredCommandResult>('singleChat.end', {
-        commandId: newCommandId(),
-        command: singleChatEndCommand(target)
-      })
-      if (result.status === 'rejected') throw new Error(resultMessage(result))
-      if (skipEndConfirmation) storeBoolean(END_CONFIRMATION_STORAGE_KEY, true)
+      if (child) {
+        if (!onEndConversation) throw new Error('delegation.control_unavailable')
+        await onEndConversation(target)
+      } else {
+        const result = await client.request<StoredCommandResult>(operations.end, { commandId: newCommandId(), command: singleChatEndCommand(target) })
+        if (result.status === 'rejected') throw new Error(resultMessage(result))
+      }
+      if (skipEndConfirmation) storeBoolean(endConfirmationKey, true)
       setEndDialogOpen(false)
       setEndTarget(null)
       if (
@@ -1557,10 +1602,13 @@ export function SingleChatPanel({
         && currentConversationIdRef.current === target.conversationId
       ) {
         setPreparingAttachments([])
-        currentConversationIdRef.current = null
-        currentReadAgainRef.current = false
-        snapshotRef.current = null
-        setSnapshot(null)
+        if (child) await refreshCurrent(target.conversationId)
+        else {
+          currentConversationIdRef.current = null
+          currentReadAgainRef.current = false
+          snapshotRef.current = null
+          setSnapshot(null)
+        }
       }
       if (campIdRef.current === target.threadId) {
         const remainingConversations = conversationsRef.current.filter((conversation) => (
@@ -1570,7 +1618,7 @@ export function SingleChatPanel({
         setConversations(remainingConversations)
         await refreshList()
       }
-      onNotify(uiAttribute('单聊已结束'))
+      onNotify(uiAttribute(child ? '帮手会话已结束，历史已保留' : '单聊已结束'))
     } catch (nextError) {
       setError(readErrorMessage(nextError, uiAttribute('单聊未结束，请重试。')))
     } finally {
@@ -1590,7 +1638,7 @@ export function SingleChatPanel({
       current,
       memberByIdRef.current.get(current.conversation.agentId)?.displayName ?? uiAttribute('这位队员')
     )
-    if (safeStoredBoolean(END_CONFIRMATION_STORAGE_KEY)) {
+    if (safeStoredBoolean(endConfirmationKey)) {
       void endConversation(target)
       return
     }
@@ -1631,15 +1679,16 @@ export function SingleChatPanel({
   )
 
   return <>
-    {!mobile && (entryHost ? createPortal(entries, entryHost) : <div className="camp-detail-entry-fallback">{entries}</div>)}
+    {!embedded && !mobile && (entryHost ? createPortal(entries, entryHost) : <div className="camp-detail-entry-fallback">{entries}</div>)}
     <aside
       ref={panelRef}
       id={panelId}
       data-single-chat-owner={currentSnapshot?.conversation.id}
-      className={`single-chat-popover${attachmentDragState ? ' is-dragging-attachments' : ''}`}
-      role="dialog"
+      className={`single-chat-popover${embedded ? ' delegation-chat-surface' : ''}${attachmentDragState ? ' is-dragging-attachments' : ''}`}
+      role={embedded ? 'region' : 'dialog'}
       aria-modal={false}
-      aria-labelledby={`${panelId}-title`}
+      aria-labelledby={embedded ? undefined : `${panelId}-title`}
+      aria-label={embedded ? uiAttribute('已接管的帮手会话') : undefined}
       tabIndex={-1}
       hidden={!visible}
       onDragEnter={enterAttachmentDropSurface}
@@ -1647,14 +1696,14 @@ export function SingleChatPanel({
       onDragLeave={leaveAttachmentDropSurface}
       onDrop={dropAttachments}
     >
-      <header className="single-chat-heading">
+      {!embedded && <header className="single-chat-heading">
         <SingleChatGlyph />
         <strong id={`${panelId}-title`}>{copy.singleChatTitle}</strong>
         <span><UiText zh={"当前会话"} /></span>
         <button className="icon-button" type="button" aria-label={uiAttribute("收起单聊")} title={uiAttribute("收起 · Esc")} onClick={() => {
           onClose()
         }}><CloseGlyph /></button>
-      </header>
+      </header>}
 
       <div className="single-chat-target-bar">
         <DropdownMenu.Root>
@@ -1709,7 +1758,7 @@ export function SingleChatPanel({
           {!loading && !selectedMember && <div className="single-chat-empty"><strong><UiText zh={"当前没有可单聊的队员"} /></strong><span><UiText zh={"队员回到当前会话后即可开始单聊。"} /></span></div>}
           {!loading && !sending && selectedMember && !currentSnapshot && <div className="single-chat-empty"><strong><UiText zh={"和 "} />{selectedMember.displayName}<UiText zh={" 单独聊聊"} /></strong><span><UiText zh={"发送第一条消息开始这段对话。"} /></span></div>}
           {!sending && currentSnapshot && currentSnapshot.messages.length === 0 && <div className="single-chat-empty"><strong><UiText zh={"和 "} />{selectedMember?.displayName}<UiText zh={" 单独聊聊"} /></strong><span><UiText zh={"发送第一条消息开始这段对话。"} /></span></div>}
-          {currentSnapshot && <SingleChatTranscript snapshot={currentSnapshot} now={now} cancelling={cancelling} onNotify={onNotify} />}
+          {currentSnapshot && <SingleChatTranscript conversationKind={conversationKind} snapshot={currentSnapshot} now={now} cancelling={cancelling} onNotify={onNotify} />}
           {sending && !activeRun && <div className="process-action current single-chat-send-feedback" role="status">
             <span className="process-spinner" aria-hidden="true" /><RunningText text={uiAttribute("连接中")} />
           </div>}
@@ -1725,7 +1774,7 @@ export function SingleChatPanel({
         onLatest={() => { followLatestRef.current = true }}
       />
       </div>
-      {currentSnapshot && <DelegationChildren parentConversationId={currentSnapshot.conversation.id} visible={visible} environment={{ threadId, profileById, busy, onResolveApproval, onNotify }} />}
+      {currentSnapshot && <DelegationChildren parentConversationId={currentSnapshot.conversation.id} visible={visible} onLeaveGuardChange={bindChildViewerLeaveGuard} environment={{ threadId, members, profileById, busy, onResolveApproval, onNotify }} />}
       {currentSnapshot && <RuntimeInteractionDock conversationId={currentSnapshot.conversation.id} sourceLabel={selectedMember?.displayName} visible={visible} />}
       {currentSnapshot && currentSnapshot.approvals.length > 0 && <ApprovalDock
         approvals={currentSnapshot.approvals} profileById={profileById} busy={busy}
@@ -1749,7 +1798,7 @@ export function SingleChatPanel({
       )}
 
       {currentSnapshot && <MessageQuoteSelectionToolbar key={currentSnapshot.conversation.id}
-        ownerKey={`single_chat:${currentSnapshot.conversation.id}`} messages={currentSnapshot.messages}
+        ownerKey={`${conversationKind}:${currentSnapshot.conversation.id}`} messages={currentSnapshot.messages}
         disabled={!visible || sending || quoteBusy || returningPending || preparingAttachments.some((item) => !item.error)}
         onAdd={(selection) => mutateDraftQuote({ type: 'add', selection })} />}
       <form className="composer single-chat-composer" onSubmit={(event) => void send(event)}>
@@ -1760,7 +1809,7 @@ export function SingleChatPanel({
                 {currentSnapshot?.draft.attachments.map((attachment) => (
                   <AttachmentCard
                     attachment={attachment}
-                    locator={input?.origin.scope ? {
+                    locator={child && input ? { owner: 'delegation_child_composer', threadId, conversationId: input.origin.conversationId, composerScope: input.origin.scope, attachmentRefId: attachment.id } : input?.origin.scope ? {
                       owner: 'single_chat_scoped_composer',
                       threadId: input.origin.threadId,
                       conversationId: input.origin.conversationId,
@@ -1838,7 +1887,7 @@ export function SingleChatPanel({
                 type="button"
                 aria-label={uiAttribute("添加文件")}
                 title={uiAttribute("添加文件")}
-                disabled={(Boolean(composerContext) && (!uploads?.supported || !inputState.snapshot)) || uploadBusy || inputState.pending || !selectedMember || !currentTargetReady || sending || returningPending || ending || quoteBusy || preparingAttachments.some((item) => !item.error)}
+                disabled={((Boolean(composerContext) || child) && (!uploads?.supported || !inputState.snapshot)) || uploadBusy || inputState.pending || !selectedMember || !currentTargetReady || sending || returningPending || ending || quoteBusy || preparingAttachments.some((item) => !item.error)}
                 onClick={() => fileInputRef.current?.click()}
               >
                 <svg aria-hidden="true" viewBox="0 0 18 18"><path d="m6.2 9.8 4.65-4.65a2.5 2.5 0 0 1 3.54 3.54l-6.1 6.1a4 4 0 0 1-5.66-5.66l6.1-6.1" /></svg>
@@ -1881,7 +1930,7 @@ export function SingleChatPanel({
           busy={busy || leaving || inputState.pending || sending || ending || quoteBusy || uploadBusy} onError={setError} />}
         {uploads?.supported && <PrivateUploadRecoveryPanel controller={uploads} reselect={client.attachments.kind === 'download'} />}
         {uploads?.supported && input && <PrivateUploadHistoryPanel api={client.singleChatAttachments} owner={uploads.owner} enabled={visible}
-          activeTargets={[uploads.target, ...(currentSnapshot?.pendingInputs.editSession ? [{ kind: 'single_chat_pending' as const,
+          activeTargets={[uploads.target, ...(currentSnapshot?.pendingInputs.editSession ? [{ kind: child ? 'delegation_child_pending' as const : 'single_chat_pending' as const,
             conversationId: input.origin.conversationId, composerScope: input.origin.scope,
             pendingInputId: currentSnapshot.pendingInputs.editSession.pendingInputId, editToken: currentSnapshot.pendingInputs.editSession.editToken }] : [])]}
           reselect={client.attachments.kind === 'download'} onApplied={() => { void input.refresh().catch(() => undefined) }} />}
@@ -1891,7 +1940,7 @@ export function SingleChatPanel({
         busy={busy || leaving || inputState.pending || sending || ending || quoteBusy || uploadBusy}
         onLeaveGuardChange={bindRecoveryLeaveGuard}
         renderEditor={(location, close, bindGuard, recoveryLeaving) => <SingleChatPanel key={location.id} threadId={threadId}
-          members={members} boundConversationId={input.origin.conversationId} composerContext={location.context} recoveryBrowser={false}
+          members={members} conversationKind={conversationKind} onEndConversation={onEndConversation} boundConversationId={input.origin.conversationId} target={child ? target : undefined} composerContext={location.context} recoveryBrowser={false}
           visible={true} onOpen={() => undefined} onClose={close} onLeaveGuardChange={bindGuard} onNotify={onNotify}
           busy={busy || recoveryLeaving} profileById={profileById} onResolveApproval={onResolveApproval} />} />}
       <footer className="single-chat-footer">
@@ -1915,7 +1964,7 @@ export function SingleChatPanel({
       </span>
     </aside>
 
-    <Dialog.Root open={endDialogOpen} onOpenChange={(open) => {
+    <Dialog.Root open={endDialogOpen && (!child || visible)} onOpenChange={(open) => {
       if (ending) return
       setEndDialogOpen(open)
       if (!open) setEndTarget(null)
@@ -1924,8 +1973,8 @@ export function SingleChatPanel({
         <Dialog.Overlay className="dialog-overlay" />
         <AppDialogContent tone="danger" aria-describedby={`${panelId}-end-description`}>
           <AppDialogHeader
-            title={endTarget ? uiAttribute("结束与{0}的单聊？", String(endTarget.displayName)) : uiAttribute("结束单聊？")}
-            description={uiAttribute("这段对话将被删除且无法回复。")}
+            title={child ? uiAttribute('结束帮手会话？') : endTarget ? uiAttribute("结束与{0}的单聊？", String(endTarget.displayName)) : uiAttribute("结束单聊？")}
+            description={uiAttribute(child ? '结束后无法继续发送。已保存聊天会保留，未发送的附件和引用将清理。' : "这段对话将被删除且无法回复。")}
             descriptionId={`${panelId}-end-description`}
             icon="trash"
             hideClose

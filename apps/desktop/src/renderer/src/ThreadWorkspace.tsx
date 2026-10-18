@@ -1619,12 +1619,22 @@ function RevealNotificationConversation({ active, onHidePreview }: { active: boo
 
 export function ThreadWorkspace(props: Parameters<typeof ThreadWorkspaceContent>[0]): JSX.Element {
   const client = useThreadClient(), owner = useRef({ client, generation: 0 })
+  const viewerGuard = useRef<(() => ThreadLeavePreparation) | null>(null)
+  const bindViewerGuard = useCallback((guard: (() => ThreadLeavePreparation) | null) => { viewerGuard.current = guard }, [])
+  const bindWorkspaceGuard = useCallback((threadId: string, guard: ThreadLeaveGuard | null) => {
+    props.onThreadLeaveGuardChange?.(threadId, guard ? async () => {
+      const viewer = viewerGuard.current?.()
+      let workspace: ThreadLeavePreparation
+      try { workspace = await guard() } catch (error) { viewer?.complete(false); throw error }
+      return { complete(didLeave) { try { workspace.complete(didLeave) } finally { viewer?.complete(didLeave) } } }
+    } : null)
+  }, [props.onThreadLeaveGuardChange])
   if (props.composerContext && props.composerContext.threadId !== props.snapshot.thread.id) throw new Error('Canvas draft belongs to another Thread.')
   if (owner.current.client !== client) owner.current = { client, generation: owner.current.generation + 1 }
   const key = JSON.stringify([owner.current.generation, props.snapshot.thread.id, props.composerContext ? canvasComposerContextKey(props.composerContext) : null])
-  return <DelegationViewerHost key={key} threadId={props.snapshot.thread.id} profileById={new Map(props.agents.map(agent => [agent.agentId, agent]))}
+  return <DelegationViewerHost key={key} visible={props.surfaceVisible} onLeaveGuardChange={bindViewerGuard} threadId={props.snapshot.thread.id} members={props.snapshot.members} profileById={new Map(props.agents.map(agent => [agent.agentId, agent]))}
     busy={props.busy} onResolveApproval={props.onResolveApproval} onNotify={props.onNotify}>
-    <ThreadWorkspaceContent {...props} />
+    <ThreadWorkspaceContent {...props} onThreadLeaveGuardChange={bindWorkspaceGuard} />
   </DelegationViewerHost>
 }
 
@@ -1693,6 +1703,7 @@ function ThreadWorkspaceContent({
   onNotifyError
 }: {
   snapshot: ThreadSnapshot
+  surfaceVisible?: boolean
   composerContext?: CanvasComposerContext
   userAnchorNavigation?: ThreadUserAnchorNavigation
   missionBoard?: React.ReactNode

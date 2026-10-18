@@ -19,7 +19,7 @@ last_updated: 2026-10-18
 
 当前源码登记 Core v1.73/Schema161/Migration211。原完整160/210委派迁移保持独立目标，160现在是受支持来源；211单独增加原生User交互存储，不重写210或旧输入。两条启动链按原事务顺序安装，旧v1.72/159仍可沿原链升级。此前160/210的[启动升级分项证据](../../../integration/execution/i04-delegation-startup-result.json)保留原时点，当前211边界见[原生交互合同](../../contracts/delegation-v1.md#原生user交互存储)。不表示用户日常数据库已升级。
 
-原生提问和计划审批已有纯转换及Core持久请求、User-only答复/CAS/原回执、先标记发送和未知结果不重发的内核。User有界摘要列表、完整读取和答复已接Application、Native IPC准入及Web操作；原UUID未知结果核对和不同问题隔离有运输分项验证。四种原生回调、原Host/输入身份及后台答复驱动已编码，写端在同一串行锁内重验活跃prompt；组件检查通过，完整回调循环仍待耦合验证。Run取消、绑定失效与启动恢复会封旧请求；Grok修改意见已保存，原User队列尚未接入前明确禁止发送。阻塞摘要与原卡片仍待接线，不能称该功能已可实际使用。没有改变批准r1文本、Bootstrap或父模型历史。
+原生提问和计划审批已有纯转换、Core 持久请求、User-only 答复/CAS/原回执及可信回调，写端在同一串行锁内重验活跃 prompt；Windows 受控假进程耦合已另有分项证据。安全阻塞摘要、广播和固定 Codeg 问答/计划卡片已接公屏、精确私聊与 Core 委派查看器。Run 取消、绑定失效与启动恢复会封旧请求；Grok 修改意见已保存，原 User 队列尚未接入前仍明确禁止发送。完整 Core main/Host/GUI/provider 往返和平台矩阵仍待，不以组件或假进程替代。没有改变批准 r1 文本、Bootstrap 或父模型历史。
 
 六项模型操作、四个兼容别名、User 查询/设置/恢复及材料操作已接入 Core 与相应运输入口，并有分项证据。设置仍默认关闭，深度 1..8、缓存 512 MiB/0 不限、精确版本更新；原 Codeg 设置界面和完整产品使用流程仍待接入。
 持久委派/attempt/control、父链、任务 Blob、原请求回放、独立私有路由、接管序号、取消及原 Session 恢复已有 Core 实现。真实 Host/Fleet 调度、writer/cleanup、输入接受结果核对和进程重启协调仍须完成，不能将分项运输或数据库检查称为完整执行交付。
@@ -27,7 +27,7 @@ last_updated: 2026-10-18
 新 Run 按冻结资格选择帮手 Profile11、公开父 Profile12 或私聊父 Profile13，使用合法的格式35和批准的 Charter；私聊父权限为独立 policy3，普通私聊默认 policy2 保持。帮手使用独立身份、空记忆和空平台技能入口，材料及原生技能/MCP过滤已有分项检查，完整 Runtime 资格另行验证。
 旧 Run 不因设置变化而补权；旧选择1、排队选择2、原配置、Blob 正文和摘要的兼容回放已沿原 Context owner 验证。该证据使用真实 SQLite/Blob 和 Core 路径，原生 Session、输入 ACK 与终态仍有明确夹具边界，未证明真实模型运行。
 
-尚未完成的产品工作包括完整 Host/Runtime 生命周期、问题/计划阻塞摘要、away/manual 资格、原 Codeg 设置与两类子代理查看器、三类记忆和自动化等 I04 既定工作，以及阶段候选验证。I04 仍为研发中；全部 21 簇、4 个工作包、84 个正式场景保留。
+Core 委派查看器已复用 Codeg 原抽屉、卡片、图标和 Rovai 原执行组件；接管后共享聊天与材料、控制回执、隐藏恢复和离开保护已有隔离生产 Renderer 证据，见[本批记录](../../../integration/execution/i04-child-chat-ui-result.json)。尚未完成的产品工作包括完整 Host/Runtime 生命周期、Grok 反馈队列、away/manual 资格、原 Codeg 设置和另一类 Runtime 原生子代理查看器、原完整 App 同场景、三类记忆和自动化等 I04 既定工作，以及阶段候选验证。I04 仍为研发中；全部 21 簇、4 个工作包、84 个正式场景保留。
 
 ## 跨版本文档影响
 
@@ -37,7 +37,7 @@ last_updated: 2026-10-18
 | Decisions | 已更新 | [V1.73-D01](decisions.md#v1-73-d01) 说明为何复用 Core 而不移植第二套 broker 业务权威，[导航](../../decisions/CURRENT.md)同步。 |
 | Contracts | 已更新 | [Delegation v1](../../contracts/delegation-v1.md) 区分已实现基础输入/设置与待接入执行合同；[Builtin Transport v39](../../contracts/builtin-tool-transport-v39.md) 增六项委派、精确租约回放、封闭输出与无限等待，完整Host生命周期资格单独留证。 |
 | Architecture | 已更新 | [委派架构](../../architecture/delegation.md)规定单一权威和原生子代理区别；领域词汇在根 CONTEXT.md 同步。 |
-| UI | 确认无需更新 | 本批没有 Renderer 或跨版本 UX 改动；原 Codeg 两类查看器及设置页仍按已确认 r1 待移植。 |
+| UI | 已更新 | [源码映射](../../../integration/inventory/delegation-viewer-ui-reference.md)与[会话呈现](../../ui/components/conversation-workspace.md#已接管的独立帮手)记录 Codeg 原抽屉/Rovai 原聊天的复用及 child 边界；第二类原生子代理、设置及原完整 App 对照仍待。 |
 | Runtime Activity | 确认无需更新 | 本批无新活动映射；前两批 User-only 原生观察证据保持。 |
 | Runtime compatibility | 确认无需更新 | 没有启动实际 Runtime 或新增适用平台资格。 |
 | Documentation routing | 已更新 | 版本、合同及架构索引补委派入口；具体批准记录独立保存。 |
