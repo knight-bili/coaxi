@@ -14,6 +14,8 @@ last_updated: 2026-10-18
 集中到阶段候选；公共契约、安全/迁移或阻断后续开发时允许有原因的最小验证。
 以下owner、命令和测试准入规则继续有效，未执行的检查登记待验，不因减少触发次数而删测试或假报通过。
 
+I04 旧Claude agent文件来源扩同一个 `runtime_subagent_session::source::tests::lineage_sources_keep_exact_rollouts_and_lossless_stable_chunks`，helper为 `source/claude_tests.rs`，沿该owner的同一自建目录，不新增Rust owner/数据库/进程。验证固定Codeg布局下精确父工具调用与结构化agentId双重关联、缺失/矛盾/错工具/重名父源拒绝、完整长UTF8和相同长度改写核对、取消及路径遍历拒绝。agentId、message parentUuid与Session身份保持分离，不因子文件名创建Native Session引用；Unix外链场景只归对应平台。该来源边界在完整Claude parser/生产关联接线前做一次最低extended编译及精确原owner，不能用该检查证明Claude Runtime、User API或完整旧代理查看器已可用。Qoder只确认复用部分原解析规则，其root/producer另核，不自动复用Claude授权。
+
 I04 可信补丁工程读取继续扩原 source filesystem owner与 `context::slow_tests::delivery_unknown_never_consumes_a_redelivery_requirement`，不新增Rust owner、数据库或进程。前者沿同一自建目录核对完整UTF-8行、根内相对/绝对/嵌套路径、越界/非法/非文件拒绝、Windows备用数据流拒绝、单次读取缓存、快照改写和取消；Unix符号链接场景只在对应平台执行，不能写成本机Windows已验。
 后者沿原SQLite/Blob/原生来源记录，经实际Current User解析→固定文件→原Codex补丁展示链验证行号、重复零写、错误User/Thread拒绝、旧无目录记录的原文保留、同Host新旧来源记录兼容及矛盾目录拒绝；后来的绑定/epoch变化不替换已捕获目录。初始来源由真实Core绑定写入，追加历史记录是同库读取夹具，不冒充真实Host重观察。只保存最终Host启动cwd，不从当前Camp、Run路径或原生cwd给旧记录补权，不改变模型输入或Schema。最低分层是slow-tests（包含extended），只运行两个原owner，不运行整套slow-tests。完整Host/平台、旧agent显式来源和公共运输/UI仍待阶段验证。
 

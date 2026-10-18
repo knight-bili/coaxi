@@ -4,6 +4,8 @@ use serde_json::json;
 
 use super::*;
 
+include!("claude_tests.rs");
+
 struct SourceFixture(PathBuf);
 impl SourceFixture {
     fn new() -> Self {
@@ -280,6 +282,7 @@ fn lineage_sources_keep_exact_rollouts_and_lossless_stable_chunks() {
     assert!(NativeDocuments::open(&f.0, &bad).is_err());
     assert!(open_contained(&f.0, &f.0.join("sessions/../outside")).is_err());
     crate::runtime_subagent_session::content::tests::assert_content_projection(&f.0,&grok);
+    assert_legacy_claude_agent_documents(&f);
     #[cfg(unix)]
     {
         let external = SourceFixture::new();

@@ -1,5 +1,7 @@
 # I04 执行队列
 
+2026-10-18 旧格式接续：固定源码确认agent-*.jsonl属于Claude类代理文件，Qoder只共享部分parser规则。单独私有来源层已过原文件owner，[分项证据](i04-legacy-agent-source-result.json)不授予完整parser/生产Runtime/公开读取资格。依赖顺序据此细化：先独立推进已接C/G的有界签名、后台快照取消与原UI；Claude完整parser/来源关联、Qoder根及旧源导入仍在同一I04格式/Runtime并集收口，不删范围，也不把旧代理强塞进Session身份。
+
 2026-10-18 最新接续：可信Host工程目录已持久化，Current User读取→核验文件→原Codex补丁行号已通过两个既有owner分项验证，[证据](i04-native-project-patch-result.json)区分来源兼容夹具和真实Core绑定。下方“工程回调待做”属于旧检查点；当前继续旧agent显式父链、有界签名/后台取消、公共运输和原UI，同场景、真实Host/Runtime/平台及其余I04包保持。没有新增正式场景通过，也不新增客户工程测试。
 
 2026-10-18 最新检查点：Grok会话统计、窗口目录及两固定原parser的31组受控文件对照已完成分项验证，30组完整投影相等、1组明确保留全量工具正文、0项未解释差异。实际结果及限制见[本批记录](i04-native-parser-parity-result.json)。这不授予完整原App、Host/模型/GUI/平台资格，正式新增通过0；下方旧检查点的“统计/差分仍待”不覆盖此处当前事实。

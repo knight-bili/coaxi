@@ -4,7 +4,7 @@ mod common;
 mod grok;
 pub(crate) mod model;
 mod prompt;
-mod records;
+pub(super) mod records;
 
 use anyhow::{Result, ensure};
 use chrono::{DateTime, Utc};

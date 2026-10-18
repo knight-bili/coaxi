@@ -1,0 +1,371 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-18T18:45:28+08:00",
+  "stage": "I04",
+  "task": "I04-T01/T02",
+  "baseline_commit": "438d73e80d8922455f83a07ea37346c481fad229",
+  "status": "private_legacy_agent_source_layer_targeted_verified_full_parser_and_producer_pending",
+  "scope_preserved": {
+    "source_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_packages": 4,
+    "i04_clusters": 21,
+    "i04_formal_cases": 84,
+    "new_formal_cases_passed": 0
+  },
+  "source_inventory": "integration/inventory/native-legacy-agent-source.json",
+  "facts": {
+    "legacy_agent_not_cast_to_codex_or_grok_native_session": true,
+    "separate_private_claude_agent_link": true,
+    "exact_agent_or_task_call_and_structured_agent_ack_required": true,
+    "ambiguous_parent_and_conflicting_link_rejected": true,
+    "whole_long_utf8_child_document_preserved": true,
+    "same_length_chunk_rewrite_rejected": true,
+    "cooperative_discovery_hash_record_cancellation": true,
+    "shared_json_record_decoder_body_unchanged": true,
+    "new_rust_test_owners": 0,
+    "new_database_fixtures": 0,
+    "new_process_fixtures": 0,
+    "exact_source_owner_passed": 1,
+    "docs_tests_passed": 10,
+    "docs_version_base_diff_passed": true,
+    "explicit_codegraph_sync_passed": true,
+    "new_formal_cases_passed": 0,
+    "model_inputs_changed": false,
+    "schema_or_migration_changed": false,
+    "dependencies_changed": false,
+    "approved_r1_artifacts_unchanged": 6,
+    "production_claude_runtime_or_viewer_enabled": false,
+    "claude_final_home_capture_and_core_evidence_gate_connected": false,
+    "full_claude_message_timeline_usage_lifecycle_parser_ported": false,
+    "qoder_authority_or_root_reused": false,
+    "unix_symlink_case_executed_on_this_windows_host": false,
+    "actual_host_native_web_ui_real_provider_or_platform_this_batch": false
+  },
+  "self_review": [
+    "Fixed Codeg proves this is a Claude-family agent document. Qoder shares some parsing but needs independent root/producer; existing C/G Session gate is unchanged.",
+    "The private filesystem seam is not an authenticated grant. Future producer must supply captured home and Core-correlated parent tool; no current environment/cwd/project-name guessing or public path/id parameter was added.",
+    "Parent metadata, typed Agent/Task call, structured acknowledgement and prescribed nested file are verified together. Conflicting ack/agent metadata and duplicate parent paths reject instead of choosing latest.",
+    "parentUuid is a message pointer; child sessionId can be shared or separate and never creates a Native Session address. Child agentId, when supplied, must match.",
+    "Complete multi-chunk UTF8 bytes and stable fingerprints are checked; optional cancellation is added to directory discovery while existing callers still use None.",
+    "JsonRecords decoder was not duplicated or changed; only visibility inside runtime_subagent_session widened. No root UI/public method, Native producer, full parser or database import is enabled by this helper.",
+    "Source owner extended its same fixture and passed. This is not full Claude/Qoder compatibility, actual Host or UI qualification."
+  ],
+  "failure_history": [
+    "compile01 failed two E0433 uses because the added test helper lacked AtomicBool import; added only that import. compile02 passed with12 unchanged warnings, then exact source owner passed1/976filtered."
+  ],
+  "dependency_order": [
+    "Continue C/G bounded signed snapshots/descendant refs, cancellable initial native discovery/hash and resource lifecycle, then Native/Web and fixed original readonly UI.",
+    "Keep full Claude parser/final-home capture/Core evidence association, Qoder independent source and explicit old-origin import within this I04 format/Runtime union closeout.",
+    "Grok feedback/r1 handoff, real Host/Runtime/platform matrix and I04 other packages remain; no feature/package/formal case removed."
+  ],
+  "not_performed": [
+    "push",
+    "GitHub Actions",
+    "paid model",
+    "main merge",
+    "release",
+    "customer engineering acceptance"
+  ],
+  "fixed_donors": [
+    {
+      "name": "codeg",
+      "commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "rovai-ai",
+      "commit": "cc465dda562536b94f23787759e3206324baa29e",
+      "license": "MIT"
+    }
+  ],
+  "donor_audit": {
+    "fixed_commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+    "license": "Apache-2.0",
+    "sources": [
+      {
+        "path": "src-tauri/src/parsers/claude.rs",
+        "bytes": 367323,
+        "sha256": "6e71571b0b300cc954343ceba89308134c0fc1fd41009c43560cf2161f8b0e51",
+        "ranges": [
+          "1153-1214: configured projects root and exact parent filename",
+          "1564-1574: CLAUDE_CONFIG_DIR selection",
+          "2117-2201: Agent/Task acknowledgement, structured agentId and scoped agent-file path",
+          "3239-3393: separate agent transcript and timeline parsing"
+        ]
+      },
+      {
+        "path": "src-tauri/src/parsers/qoder.rs",
+        "bytes": 149073,
+        "sha256": "696238da466f84924a5982d596fe47bf5ab4a6d724664722ed1970ee6b1e2844",
+        "ranges": [
+          "1094-1216,1250-1281,1335: related layout/shared Claude transcript parser; separate Qoder attribution"
+        ]
+      }
+    ],
+    "finding": "agent-*.jsonl is a legacy Claude-family agent document, not a Codex/Grok Session id",
+    "core_adaptation": "separate private ClaudeAgentLink, exact parent tool plus structured acknowledgement and prescribed nested path; no native Session grant",
+    "unconnected": [
+      "Claude final-home capture and Core event projection",
+      "full Claude message/timeline/usage/lifecycle parser",
+      "User-only production adapter gate",
+      "Qoder root and producer",
+      "signed transport and original UI"
+    ],
+    "raw_donor_source_not_modified": true
+  },
+  "owner": {
+    "filter": "runtime_subagent_session::source::tests::lineage_sources_keep_exact_rollouts_and_lossless_stable_chunks",
+    "listed": 1,
+    "exit": 0,
+    "passed": 1,
+    "failed": 0,
+    "ignored": 0,
+    "filtered": 976,
+    "feature": "extended-tests",
+    "binary": "D:\\soft\\codex\\build-cache\\codeg-rovai\\debug\\deps\\rovai_core-5094fd0f04990c63.exe",
+    "compile_log": "core-compile-02.log"
+  },
+  "checks": [
+    {
+      "name": "docs-tests",
+      "exit": 0
+    },
+    {
+      "name": "docs-version",
+      "exit": 0
+    },
+    {
+      "name": "docs-base",
+      "exit": 0
+    },
+    {
+      "name": "diff-check",
+      "exit": 0
+    },
+    {
+      "name": "codegraph-sync",
+      "exit": 0
+    }
+  ],
+  "source_files": [
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\crates\\rovai-core\\src\\runtime_subagent_session\\content\\mod.rs",
+      "bytes": 15579,
+      "sha256": "58c7cdef0d71e7aecf58ad67c6dc6253847ed2497998d16b6e2633e8cca1fec3",
+      "repo_path": "crates/rovai-core/src/runtime_subagent_session/content/mod.rs",
+      "git_blob": "4351278ee0a1589c4a0338725cdd52f8bbcd65f3"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\crates\\rovai-core\\src\\runtime_subagent_session\\content\\records.rs",
+      "bytes": 4432,
+      "sha256": "9dd88ef00ee6027ec4a98f90f55ffaca3065d9365ca251996aafd6660b2f6c0c",
+      "repo_path": "crates/rovai-core/src/runtime_subagent_session/content/records.rs",
+      "git_blob": "76b3bb680d7d2ebce74990afcc5deb187490b0d6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\crates\\rovai-core\\src\\runtime_subagent_session\\source.rs",
+      "bytes": 20663,
+      "sha256": "2a7722dfa0e76866776030b552f2d28193e2c1c7176964a10988b9c8ae489d30",
+      "repo_path": "crates/rovai-core/src/runtime_subagent_session/source.rs",
+      "git_blob": "099249a53a680bcce5a6f37e6fb717a6a8446cf7"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\crates\\rovai-core\\src\\runtime_subagent_session\\source\\claude.rs",
+      "bytes": 5111,
+      "sha256": "23ea5bb919e5d8339f5c03a330318168a3b7998113452f89141bd74a3d7ab8f8",
+      "repo_path": "crates/rovai-core/src/runtime_subagent_session/source/claude.rs",
+      "git_blob": "b28a6e5c5043ea3d6813f910f3ac534f69af748e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\crates\\rovai-core\\src\\runtime_subagent_session\\source\\claude_tests.rs",
+      "bytes": 4977,
+      "sha256": "83d45c4e12f840640bef8beea6f265eb6216f86109f30c461f2da680f520cc11",
+      "repo_path": "crates/rovai-core/src/runtime_subagent_session/source/claude_tests.rs",
+      "git_blob": "dcaad0289eb657b8b4a3d8894b1947812320f5e2"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\crates\\rovai-core\\src\\runtime_subagent_session\\source\\tests.rs",
+      "bytes": 10932,
+      "sha256": "215d02dd05af2627c998444333ea1b5640c41c98c7e88de7caae49223c93e8dd",
+      "repo_path": "crates/rovai-core/src/runtime_subagent_session/source/tests.rs",
+      "git_blob": "78cf06e0f17ce811b485ac2cc997cbf0ffcfca85"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\development\\testing.md",
+      "bytes": 254719,
+      "sha256": "2c26c10fc64210e6d3803f6b096ca5c15222cccec52a6d4e5d07074a0cf8e69d",
+      "repo_path": "docs/development/testing.md",
+      "git_blob": "afdaab7a12910f6afb84bd51c559cc01bcf628e3"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\versions\\v1.73\\README.md",
+      "bytes": 11768,
+      "sha256": "480874e554c632146b80ad777a999f53199637f85dba65266a6d88932b2ce0b4",
+      "repo_path": "docs/versions/v1.73/README.md",
+      "git_blob": "a4237e99da1c0d18951b23ba386c2ab66dbcf873"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\versions\\v1.73\\implementation-plan.md",
+      "bytes": 25970,
+      "sha256": "817fd2fa496a117cf70893ce3d83d0af004c6139bc6c93bff2e5b030ce0263d5",
+      "repo_path": "docs/versions/v1.73/implementation-plan.md",
+      "git_blob": "8c48fa55bd4be75a80ab3b30c912471ff4a72d87"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\README.md",
+      "bytes": 16529,
+      "sha256": "af907dabd76c782cb60cb5ac1e61611b8568e5d947b013e624251834fa0af51c",
+      "repo_path": "integration/README.md",
+      "git_blob": "8d9b2b447a16c78577891d49a9f64e2358771cab"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\execution\\goal-state.json",
+      "bytes": 21511,
+      "sha256": "ec6fcd3000f25aab6b6d7d43747fdc59ae0d14e32cd45ae97248cf634da3ebc0",
+      "repo_path": "integration/execution/goal-state.json",
+      "git_blob": "986f0252c88662133682015f4d8ce49f1bab0310"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\execution\\i04-execution-plan.md",
+      "bytes": 24108,
+      "sha256": "a97334ea612be52ccf5e58ec02e58317d48264b24cdceea6c0f8c356ddae5693",
+      "repo_path": "integration/execution/i04-execution-plan.md",
+      "git_blob": "96942fa3bcda28f3a3ea03e3b55d801e663aacfb"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\inventory\\native-legacy-agent-source.json",
+      "bytes": 2217,
+      "sha256": "9feee2838fc129befaf65d2d54599dd7f6dd9c93c2e066d55ea8fd26390ee8fc",
+      "repo_path": "integration/inventory/native-legacy-agent-source.json",
+      "git_blob": "93d91baf5aa7d74e5851a2777e19253161dff863"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\inventory\\native-subagent-viewer-reference.md",
+      "bytes": 10771,
+      "sha256": "53b07284c75b4087a39039a11806129a8927048aa9db3188be0a70848a62d8cc",
+      "repo_path": "integration/inventory/native-subagent-viewer-reference.md",
+      "git_blob": "c561221e37833fe1d71eec8fe49a49ae5d4cec1b"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04旧代理来源\\logs\\codegraph-sync.log",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04旧代理来源\\logs\\core-compile-01.log",
+      "bytes": 1432,
+      "sha256": "18ddb7dc33b25af045c2e0dcf5c569338e6092d2916264143c0d5f769a224272"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04旧代理来源\\logs\\core-compile-02.log",
+      "bytes": 3176,
+      "sha256": "0c5f57299ab772e455c6ffef0fc95b4cbf5d4f6707e4633ce636fc5c881f227e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04旧代理来源\\logs\\diff-check.log",
+      "bytes": 498,
+      "sha256": "a9b08153d253f7aadaf76298f55ee15701f07f378fc45fd7e30719dbcf156c73"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04旧代理来源\\logs\\docs-base.log",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04旧代理来源\\logs\\docs-checks.json",
+      "bytes": 275,
+      "sha256": "a2ffeb32ca5c9902f1e2c4c097b3d2e4c7f34e716d14380fb50e144e197823e4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04旧代理来源\\logs\\docs-tests.log",
+      "bytes": 924,
+      "sha256": "62da886070ffc5ed923f7a4f02a5d36762c397af26f8dafeaeb21a04de805b98"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04旧代理来源\\logs\\docs-version.log",
+      "bytes": 79,
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04旧代理来源\\logs\\donor-layout-audit.json",
+      "bytes": 1487,
+      "sha256": "0fb2d1d0f4d2b11c208e26063fb64585d953314703a42e115ce407d90bbdfaa5"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04旧代理来源\\logs\\rustfmt-01.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04旧代理来源\\logs\\rustfmt-02.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04旧代理来源\\logs\\source-owner-list.log",
+      "bytes": 135,
+      "sha256": "b526a13549a40c0288fb51d06ed416244e04f8abe79716b3dc5cba37754d3b89"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04旧代理来源\\logs\\source-owner-result.json",
+      "bytes": 401,
+      "sha256": "741159ae06bc4426b59cf4ab5fe0a1f81b360b9c618e240b8d0cacdebb896604"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04旧代理来源\\logs\\source-owner.log",
+      "bytes": 236,
+      "sha256": "4aab1f7341939f44aa75a33d88617b9777c7cc3c938e36f369a1d05efdeebbb7"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04旧代理来源\\logs\\space-checkpoints.jsonl",
+      "bytes": 442,
+      "sha256": "fee3eba989b5b007b923542fb9e30e3ef8e2178f29a66df85524a4e63282657d"
+    },
+    {
+      "path": "D:\\soft\\codex\\build-cache\\codeg-rovai\\debug\\deps\\rovai_core-5094fd0f04990c63.exe",
+      "bytes": 98176000,
+      "sha256": "36abf798cebe601595f79316b62b0519b34e03964de8d9493b5a618bfdbccb1c"
+    }
+  ],
+  "approved_r1_artifacts": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    }
+  ],
+  "external_migration_rule": {
+    "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\AGENTS.md",
+    "bytes": 6371,
+    "sha256": "38ab74dc7dc68bb61097ec4f0684e3d8fcc11a9abaf5c56d6ee14132ca81043d"
+  }
+}

@@ -15,7 +15,7 @@ pub(crate) struct ParseNotes {
 
 /// UTF-8/JSON records may span any number of verified byte chunks. Only one
 /// record is buffered; raw launch metadata never becomes a public response.
-pub(super) struct JsonRecords<'a> {
+pub(in crate::runtime_subagent_session) struct JsonRecords<'a> {
     document: &'a mut NativeDocument,
     stop: &'a AtomicBool,
     notes: &'a mut ParseNotes,
@@ -27,7 +27,7 @@ pub(super) struct JsonRecords<'a> {
 }
 
 impl<'a> JsonRecords<'a> {
-    pub(super) fn new(
+    pub(in crate::runtime_subagent_session) fn new(
         document: &'a mut NativeDocument,
         stop: &'a AtomicBool,
         notes: &'a mut ParseNotes,

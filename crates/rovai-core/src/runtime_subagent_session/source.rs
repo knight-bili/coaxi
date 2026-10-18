@@ -16,6 +16,8 @@ use sha2::{Digest, Sha256};
 
 use super::{ObservedNativeSessionTarget, identity};
 
+pub(super) mod claude;
+
 pub(crate) const CHUNK_BYTES: usize = 64 * 1024;
 const HEADER_BYTES: u64 = 1024 * 1024;
 const DISCOVERY_ENTRIES: usize = 100_000;
@@ -30,6 +32,8 @@ pub(crate) enum DocumentKind {
     GrokModelsCache,
     GrokConfig,
     ProjectPatch,
+    ClaudeParent,
+    ClaudeAgent,
 }
 
 /// A Codex link names an exact rollout, not whichever newer file has that thread.
@@ -281,6 +285,19 @@ fn open_contained(home: &Path, path: &Path) -> Result<File> {
 }
 
 fn entries(home: &Path, root: &Path, max_depth: usize) -> Result<Vec<PathBuf>> {
+    entries_with_stop(home, root, max_depth, None)
+}
+
+fn entries_with_stop(
+    home: &Path,
+    root: &Path,
+    max_depth: usize,
+    stop: Option<&std::sync::atomic::AtomicBool>,
+) -> Result<Vec<PathBuf>> {
+    ensure!(
+        !stop.is_some_and(|stop| stop.load(std::sync::atomic::Ordering::Acquire)),
+        "native_child.read_cancelled"
+    );
     if !root.try_exists()? {
         return Ok(Vec::new());
     }
@@ -293,6 +310,10 @@ fn entries(home: &Path, root: &Path, max_depth: usize) -> Result<Vec<PathBuf>> {
     let mut count = 0;
     while let Some((directory, depth)) = pending.pop() {
         for entry in fs::read_dir(directory)? {
+            ensure!(
+                !stop.is_some_and(|stop| stop.load(std::sync::atomic::Ordering::Acquire)),
+                "native_child.read_cancelled"
+            );
             count += 1;
             ensure!(count <= DISCOVERY_ENTRIES, "native_child.discovery_limit");
             let path = entry?.path();

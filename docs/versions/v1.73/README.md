@@ -11,6 +11,8 @@ last_updated: 2026-10-18
 
 # v1.73：Core 独立帮手
 
+旧 `agent-*.jsonl` 已核为Claude一类的子代理文件，不能混作Codex/Grok Session；Qoder只确认复用部分原解析规则。[来源清单](../../../integration/inventory/native-legacy-agent-source.json)与[本批记录](../../../integration/execution/i04-legacy-agent-source-result.json)保存精确父Agent/Task调用、结构化agentId及对应子文件的私有读取分项。原文件owner实际验证完整长正文、错源/矛盾/遍历/改写与取消；这不是完整Claude parser、生产来源关联或用户查看器完成。现有C/G有界接口和原UI可独立推进，各格式仍在I04统一收口。
+
 原生子会话的工程补丁读取已接Current User服务入口：可信Host最终启动cwd随来源持久保存，原生cwd只选根内位置，后来的绑定/epoch不会改用当前目录；旧v1缺目录仍保留完整原文。两个既有owner验证实际Core/SQLite/文件到原Codex行号的链路及越界、改写、取消和Windows备用流拒绝，[本批记录](../../../integration/execution/i04-native-project-patch-result.json)保留失败修复及资格。没有公共运输或UI变更，Schema161/Migration211和模型输入保持；旧agent来源、分页/后台取消与原查看器继续。
 
 Grok 完整会话统计、显示摘要及原模型窗口缓存→配置→型号回落已接入。两份固定原解析器已实际运行31组受控文件对照：Codex24、Grok7，其中30组完整投影相同，1组仅完整保留原版截断的两段工具正文，未发现未解释差异。[本批证据](../../../integration/execution/i04-native-parser-parity-result.json)与[复现配方](../../../integration/verification/native-parser-reference/README.md)保留源码、依赖和验证边界。该结果不代表完整原App、公共运输、原UI、真实Host/模型或84项正式场景通过；模型输入、Schema161/Migration211、产品依赖不变。

@@ -152,3 +152,11 @@ Grok标题/型号/分支/时间、原统计和上下文窗口cache→config→id
 [本批记录](../../../integration/execution/i04-native-project-patch-result.json)区分实际Core初始绑定写入、SQLite/Blob/真实文件读取，以及新旧历史记录兼容夹具；后者不当作完整Host复用。原source owner与原slow Context owner分层实际执行，没有新Rust owner/数据库/进程或正式场景通过；首轮误选feature、检查脚本和嵌套事务夹具错误保留，修夹具不放宽生产事务。Schema161/Migration211、依赖和模型输入不变。
 
 下一项保留旧agent显式父链/旧来源导入、有界签名内容与后代引用、首次原生来源发现/hash后台取消和资源回收，再两端公共读取及原Codeg只读UI/同场景。完整Host/Runtime/平台、Grok反馈r1衔接及I04其他包继续；不重做已提交的工程回调，不将本内部读取入口当公共API或产品查看器完成。
+
+## 旧Claude代理文件来源分项
+
+固定Codeg的agent-*.jsonl来自Claude类代理日志；Qoder有部分共享解析但自身根/producer独立。Core以单独ClaudeAgentLink表达父Session、父工具和agentId；只在可信根内读取唯一父文件，核对原Agent/Task调用及结构化确认，再取精确父目录下的子文件。消息parentUuid不当Session，子文件sessionId也不创建独立Session授权；改写、遍历、矛盾/缺确认及重名父文件拒绝，完整UTF8不裁剪。复用原JsonRecords和快照，仅在runtime_subagent_session内部扩大可见性；目录扫描新增可选取消，现有无取消调用保持。
+
+[分项记录](../../../integration/execution/i04-legacy-agent-source-result.json)保存锁定源码、初次缺测试导入的编译错误和修复后最低extended编译/精确原owner。无新Rust owner/数据库/进程、无模型输入/Schema/依赖变化，Source层不是Core User grant或完整Claude parser。
+
+下一队列优先让已接C/G完整解析进入有界签名读取、后台取消和原只读UI；Claude完整消息/用量/生命周期、生产捕获与证据关联、Qoder独立来源和旧源明确导入并行列入本I04剩余清单。四包21簇84及一期81簇48包324保持，不把本次分类纠正当作删除能力或阶段完成。

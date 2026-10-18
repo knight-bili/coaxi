@@ -1,0 +1,44 @@
+{
+  "donor_commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+  "license": "Apache-2.0",
+  "sources": [
+    {
+      "path": "src-tauri/src/parsers/claude.rs",
+      "bytes": 367323,
+      "sha256": "6e71571b0b300cc954343ceba89308134c0fc1fd41009c43560cf2161f8b0e51",
+      "ranges": [
+        "1153-1214: configured projects root and exact parent filename",
+        "1564-1574: CLAUDE_CONFIG_DIR selection",
+        "2117-2201: Agent/Task acknowledgement, structured agentId and scoped agent-file path",
+        "3239-3393: separate agent transcript and timeline parsing"
+      ]
+    },
+    {
+      "path": "src-tauri/src/parsers/qoder.rs",
+      "bytes": 149073,
+      "sha256": "696238da466f84924a5982d596fe47bf5ab4a6d724664722ed1970ee6b1e2844",
+      "ranges": [
+        "1094-1216,1250-1281,1335: related layout/shared Claude transcript parser; separate Qoder attribution"
+      ]
+    }
+  ],
+  "classification": "Claude legacy agent document; Qoder shares some parser rules but retains separate authority/root",
+  "source_only_entry": "runtime_subagent_session/source/claude.rs::open_agent",
+  "identity": "ClaudeAgentLink(parent_session_id,parent_tool_use_id,agent_id); not ObservedNativeSessionTarget",
+  "adaptations": [
+    "Captured home only; no current environment, native cwd or project-name decoding",
+    "Exact scoped Agent/Task call plus structured agentId acknowledgement; missing proof never grants a file",
+    "Ambiguous parent file and contradictory acknowledgements/agent metadata reject",
+    "Raw verified bytes retain complete UTF8 and reject changed chunks; existing JsonRecords reused within module boundary",
+    "Optional cancellation during directory enumeration/hash/record decoding; existing non-cancellable caller semantics unchanged"
+  ],
+  "implementation_status": "private_source_layer_targeted_passed_production_gate_full_parser_transport_ui_pending",
+  "remaining": [
+    "Claude final-home capture and Core event projection",
+    "full Claude message/timeline/usage/lifecycle parser",
+    "User-only production adapter gate",
+    "Qoder root and producer",
+    "signed transport and original UI"
+  ],
+  "evidence": "integration/execution/i04-legacy-agent-source-result.json"
+}

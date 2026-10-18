@@ -40,4 +40,6 @@ Codex 主体接续（2026-10-18）：原消息 parser 与代码模式/MCP/延迟
 
 可信工程回调接续（2026-10-18）：`NativeChildSessionService::read_content` 已沿原Current User准入与持久来源接完整内容。最终Host启动cwd作为可选私有字段保留，不读当前Camp或当前Run来回填旧目录，原生cwd只可选根内位置；旧v1缺字段保留原补丁，互相矛盾的已记录目录拒绝选择。新增 `content/project.rs` 复用原文件快照及原Codex几何算法，完整UTF8、单次读取缓存、改写核对/取消和Windows备用流拒绝由两个原owner分层核验。实际[本批证据](../execution/i04-native-project-patch-result.json)不授予完整Host复用、公共API、UI或平台资格。
 
-当前剩余：旧agent文件显式父链及旧无记录来源的明确导入、有界签名运输/后台取消、原只读UI/同场景、真实Host/Runtime/平台及I04其余工作包。前述“Codex主体/完整统计/原parser差分/生产工程回调待做”是当批状态，不据历史文字重做已验证分项，也不将组件对照当完整查看器或I04完成。
+旧格式分类接续（2026-10-18）：固定Claude parser的`toolUseResult.agentId`对应父文件同名目录下的`subagents/agent-ID.jsonl`，Qoder复用部分读取规则但根与producer独立。Core新增单独`ClaudeAgentLink`私有文件层，以精确Agent/Task调用与结构化确认同时核对，不把短agentId、消息parentUuid或子文件内sessionId当作独立Session授权；完整正文保持。见[固定来源与改动](native-legacy-agent-source.json)及[实际分项结果](../execution/i04-legacy-agent-source-result.json)。没有给现有C/G准入添加Claude分支，不能以文件层测试声称Claude Runtime或完整parser可用。
+
+当前剩余：先推进现有C/G有界签名运输、首次快照后台取消和原只读UI/同场景；Claude旧格式完整parser/实际来源捕获与证据关联、Qoder独立根及旧无记录来源导入同步留在I04格式与Runtime并集收口。真实Host/Runtime/平台及其余工作包保持。前述旧检查点不据历史文字重做已验证分项，也不将组件通过当完整查看器或I04完成。
