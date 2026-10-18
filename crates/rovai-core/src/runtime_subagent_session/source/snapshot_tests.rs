@@ -109,4 +109,5 @@ fn assert_complete_source_discovery_and_windows(f: &SourceFixture) {
             .contains("read_cancelled")
     );
     crate::runtime_subagent_session::snapshot::tests::assert_signed_windows(&codex);
+    crate::runtime_subagent_session::reader::tests::assert_read_workers(&codex);
 }

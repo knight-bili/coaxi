@@ -11,7 +11,9 @@ last_updated: 2026-10-18
 
 # v1.73：Core 独立帮手
 
-原生完整投影已有私有签名快照及UTF8窗口，整份消息、长工具JSON、嵌套元数据、摘要和统计不逐字段裁剪。引用绑定冻结身份与来源摘要，仅为核实后代签发入口；首次发现/hash及序列化可取消。最低extended编译和精确原文件owner通过，[本批证据](../../../integration/execution/i04-native-snapshot-result.json)不包含后台任务注册/销毁、公共Native/Web运输或原只读UI；每页Core重授权仍需在后续注册层接通，I04全范围不变。
+原生后台阅读及四个User读取入口已编码：注册层持有真实worker名额至结束，关闭/迟到/重试和空闲租约分离于Runtime控制；每次取页重新解析原Core引用，后代保留原root归属。Native/Web名单和闭合Web投影已接。[本批记录](../../../integration/execution/i04-native-reader-result.json)区分源码/组件资格与实际Core/Host/网络/原UI资格，I04仍开发中。
+
+原生完整投影已有私有签名快照及UTF8窗口，整份消息、长工具JSON、嵌套元数据、摘要和统计不逐字段裁剪。引用绑定冻结身份与来源摘要，仅为核实后代签发入口；首次发现/hash及序列化可取消。最低extended编译和精确原文件owner通过，[本批证据](../../../integration/execution/i04-native-snapshot-result.json)不包含该批当时未接的后台任务注册/销毁和每页Core重授权，现已按上方新记录接入源码；其旧分项记录仍不授予原只读UI或实际网络资格，I04全范围不变。
 
 旧 `agent-*.jsonl` 已核为Claude一类的子代理文件，不能混作Codex/Grok Session；Qoder只确认复用部分原解析规则。[来源清单](../../../integration/inventory/native-legacy-agent-source.json)与[本批记录](../../../integration/execution/i04-legacy-agent-source-result.json)保存精确父Agent/Task调用、结构化agentId及对应子文件的私有读取分项。原文件owner实际验证完整长正文、错源/矛盾/遍历/改写与取消；这不是完整Claude parser、生产来源关联或用户查看器完成。现有C/G有界接口和原UI可独立推进，各格式仍在I04统一收口。
 

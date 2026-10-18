@@ -4,6 +4,7 @@ import type { BuiltinMemberAvatarRole } from './member-avatar'
 
 export * from './member-avatar'
 export * from './current-user-profile'
+export type { NativeChildReadReference, NativeChildReadStart, NativeChildReadView, NativeChildReadPageRequest, NativeChildReadPage } from './native-child-reads'
 
 export const THREAD_ID_PATTERN = /^rvcamp_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$/u
 
@@ -4939,6 +4940,10 @@ export type CoreMethod =
   | 'runtime.interactions.list'
   | 'runtime.interactions.get'
   | 'runtime.interactions.resolve'
+  | 'runtime.childReads.start'
+  | 'runtime.childReads.poll'
+  | 'runtime.childReads.page'
+  | 'runtime.childReads.close'
   | 'delegations.composer.get'
   | 'delegations.conversation.get'
   | 'delegations.message.send'

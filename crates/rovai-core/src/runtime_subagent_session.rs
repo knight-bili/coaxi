@@ -8,6 +8,7 @@ use serde_json::Value;
 
 pub(crate) mod content;
 mod origin;
+pub(crate) mod reader;
 pub(crate) mod snapshot;
 pub(crate) mod source;
 pub use origin::CapturedNativeSource;
@@ -18,7 +19,7 @@ use crate::{
     execution_evidence::ExecutionEvidenceService, managed_blob::ManagedBlobStore,
 };
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct NativeChildSessionReference {
     pub thread_id: String,

@@ -168,3 +168,9 @@ Core User解析后生成整份不可变投影，私有NativeSnapshot按4至32768
 首次目录扫描、源文件hash与Grok父关联完整解码及投影序列化使用同一停止标记。自审纠正write_all会重试Interrupted的取消隐患，改为终止错误，避免取消后无限重试。原Grok大于1MiB的父更新或meta不再因旧预览上限被跳过。复用既有安全打开/完整记录解码和原parser，无依赖/Schema/模型输入变更。
 
 [本批记录](../../../integration/execution/i04-native-snapshot-result.json)保存最低extended编译、精确原文件owner及自审结果；一个既有owner扩同一目录，检查完整长内容重组、UTF8/转义、签名篡改/混用/错误身份和来源/越界、后代隔离和取消后零追加。未新增Rust owner或数据库/进程夹具，84正式场景新增通过0。后台任务注册/销毁、每页Core重新授权、Native/Web运输、原Codeg只读UI及同场景、真实Runtime/平台仍须继续；组件对象不构成公共授权或I04完成。
+
+## 原生后台阅读与四个User入口
+
+先前完整快照检查点的后台/重授权待接项，本批已进入源码。进程内Registry、独立std线程和4个工作名额负责首次发现/hash/解析；16缓存及按访问清理的5分钟空闲租约、关闭墓碑/饱和保护、Core退出及迟到结果丢弃保持阅读独立。每poll/page重做原Core resolve，后代沿原root核对，不接受UI自报原生Session/目录。Core原运行创建时间作为缺原生时间戳的固定回落，不用打开时的当前时间。
+
+Native renderer和Web加入start/poll/page/close四方法；Web闭合过滤字段并保留完整fragment，User actor由Core封闭派生，Builtin/模型目录不增加方法。沿原source owner实际受控线程/文件、原Web projection owner和原Desktop/Web client owner检查，不新建数据库或外部进程；名单和受控运输不能当实际Core handle/Host HTTP/IPC/GUI资格。[本批记录](../../../integration/execution/i04-native-reader-result.json)保留首次通过后自审时间回落修正及最终验证证据。下一项接实际Core/两端调用与固定Codeg原只读UI/同场景；Claude/Qoder旧格式、Grok反馈r1及完整I04四包84仍保持。

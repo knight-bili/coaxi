@@ -1,5 +1,7 @@
 # Codeg 与 Rovai 一期完整融合
 
+- [I04原生后台阅读与User接口分项](execution/i04-native-reader-result.json)：有界后台FS线程、取消/回收/关闭租约、每页Core重授权及Native/Web四方法已编码，原source与Web/客户端owner定向验证；实际Core/Host/网络及原Codeg只读UI继续，完整I04未完成。
+
 - [I04完整签名快照与分页分项](execution/i04-native-snapshot-result.json)：已接私有整份原投影UTF8分页、冻结快照/游标/核实后代引用签名与首次发现/hash/序列化取消。最低编译和精确原文件owner通过；后台任务注册/销毁、每页Core重授权、Native/Web及原只读UI继续，完整I04未收口。
 
 - [I04旧代理文件来源分项](execution/i04-legacy-agent-source-result.json)：Claude旧agent文件已单独建来源校验，不把agentId/消息parentUuid当Session；原文件owner通过，完整parser/生产关联及Qoder来源继续。现有Codex/Grok接口与原查看器可独立推进，完整I04范围不变。

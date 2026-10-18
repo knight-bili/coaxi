@@ -129,6 +129,14 @@ pub enum Operation {
     RuntimeInteractionGet,
     #[serde(rename = "runtime.interactions.resolve")]
     RuntimeInteractionResolve,
+    #[serde(rename = "runtime.childReads.start")]
+    NativeChildReadStart,
+    #[serde(rename = "runtime.childReads.poll")]
+    NativeChildReadPoll,
+    #[serde(rename = "runtime.childReads.page")]
+    NativeChildReadPage,
+    #[serde(rename = "runtime.childReads.close")]
+    NativeChildReadClose,
     #[serde(rename = "delegations.composer.get")]
     DelegationComposerGet,
     #[serde(rename = "delegations.conversation.get")]
@@ -457,6 +465,11 @@ impl Operation {
         use serde_json::json;
         match self {
             Self::AppInfo => json!({"name":value["name"],"version":value["version"]}),
+            Self::NativeChildReadStart | Self::NativeChildReadPoll => select_fields(&value,
+                &["readId", "coreGeneration", "state", "snapshotReference", "code"]),
+            Self::NativeChildReadPage => select_fields(&value, &["snapshotReference", "projectionDigest", "sourceDigest",
+                "offset", "totalBytes", "fragment", "nextCursor", "complete", "reportedStatus", "live"]),
+            Self::NativeChildReadClose => select_fields(&value, &["closed"]),
             Self::CanvasTerminalStart | Self::CanvasTerminalSnapshot => {
                 project_terminal_snapshot(value)
             }
@@ -607,6 +620,10 @@ impl Operation {
             Self::RuntimeInteractionList => "runtime.interactions.list",
             Self::RuntimeInteractionGet => "runtime.interactions.get",
             Self::RuntimeInteractionResolve => "runtime.interactions.resolve",
+            Self::NativeChildReadStart => "runtime.childReads.start",
+            Self::NativeChildReadPoll => "runtime.childReads.poll",
+            Self::NativeChildReadPage => "runtime.childReads.page",
+            Self::NativeChildReadClose => "runtime.childReads.close",
             Self::DelegationComposerGet => "delegations.composer.get",
             Self::DelegationConversationGet => "delegations.conversation.get",
             Self::DelegationMessageSend => "delegations.message.send",
@@ -862,6 +879,19 @@ mod tests {
     // Owns the network projection boundary, not Core's internal MCP model.
     #[test]
     fn public_projection_excludes_mcp_credentials_and_desktop_mutation_actions() {
+        let read_view = json!({"readId":"read", "coreGeneration":"generation", "state":"ready",
+            "snapshotReference":"signed", "code":null, "futurePath":"private-source", "futureToken":"credential"});
+        for operation in [Operation::NativeChildReadStart, Operation::NativeChildReadPoll] {
+            assert_eq!(operation.project(read_view.clone()), json!({"readId":"read","coreGeneration":"generation",
+                "state":"ready","snapshotReference":"signed","code":null}));
+        }
+        let long = "完整中文😀".repeat(8000);
+        let page = Operation::NativeChildReadPage.project(json!({"snapshotReference":"signed","projectionDigest":"projection",
+            "sourceDigest":"source","offset":0,"totalBytes":long.len(),"fragment":long,"nextCursor":null,
+            "complete":true,"reportedStatus":"completed","live":false,"futurePrivatePath":"private-source"}));
+        assert_eq!(page["fragment"], long);
+        assert!(page.get("futurePrivatePath").is_none());
+        assert_eq!(Operation::NativeChildReadClose.project(json!({"closed":true,"futureSecret":"credential"})), json!({"closed":true}));
         let projected = Operation::Mcp.project(json!({"servers":[{
             "serverId":"fixture", "name":"Example", "enabled":true,
             "transport":"http", "assignedAgentIds":[],
@@ -900,6 +930,10 @@ mod tests {
                 "runtime.interactions.resolve",
                 "runtime.interactions.resolve",
             ),
+            ("runtime.childReads.start", "runtime.childReads.start"),
+            ("runtime.childReads.poll", "runtime.childReads.poll"),
+            ("runtime.childReads.page", "runtime.childReads.page"),
+            ("runtime.childReads.close", "runtime.childReads.close"),
             ("delegations.composer.get", "delegations.composer.get"),
             ("delegations.conversation.get", "delegations.conversation.get"),
             ("delegations.message.send", "delegations.message.send"),

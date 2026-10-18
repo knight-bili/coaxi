@@ -409,13 +409,20 @@ describe('tab session recovery', () => {
       if (operation === 'canvas.terminals.write') await expect(client.request(operation, params)).rejects.toThrow('terminal reply lost')
       else await client.request(operation, { target: params.target })
     }
+    for (const operation of ['runtime.childReads.start', 'runtime.childReads.poll', 'runtime.childReads.page', 'runtime.childReads.close'] as const) {
+      expect(WEB_OPERATIONS).toContain(operation)
+      await client.request(operation, operation === 'runtime.childReads.start'
+        ? { readId: params.generation, reference: { threadId: 'thread', agentRunId: 'run', evidenceId: 'evidence', receiverIndex: 0 } }
+        : { readId: params.generation, ...(operation === 'runtime.childReads.page' ? { snapshotReference: 'signed-snapshot' } : {}) })
+    }
     expect(client.pendingCommandCount).toBe(0)
     expect(JSON.parse(storage.getItem('rovai.web.session.v1')!).pending).toEqual([])
     expect(storage.getItem('rovai.web.session.v1')).not.toContain(params.bytesBase64)
     expect(storage.getItem('rovai.web.edits.v1')).toBeNull()
     client.clear(); await client.login('d'.repeat(64))
     await client.reconcilePending(); await client.retryPending()
-    expect(operations).toEqual(['canvas.terminals.start', 'canvas.terminals.snapshot', 'canvas.terminals.write', 'canvas.terminals.resize', 'canvas.terminals.stop'])
+    expect(operations).toEqual(['canvas.terminals.start', 'canvas.terminals.snapshot', 'canvas.terminals.write', 'canvas.terminals.resize', 'canvas.terminals.stop',
+      'runtime.childReads.start', 'runtime.childReads.poll', 'runtime.childReads.page', 'runtime.childReads.close'])
     expect(client.pendingCommandCount).toBe(0)
     client.clear()
   })

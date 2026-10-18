@@ -10,6 +10,7 @@ pub(crate) mod delegation_input;
 pub(crate) mod delegation_queries;
 mod mission;
 mod native_interactions;
+mod native_child_reads;
 pub(crate) mod private_composer;
 mod private_sources;
 pub(crate) mod runtime_interactions;
@@ -2405,6 +2406,7 @@ struct ClaudeInputAcceptanceTarget<'a> {
 }
 
 struct Core {
+    native_child_readers: crate::runtime_subagent_session::reader::Registry,
     canvas_terminals: Arc<crate::canvas_terminal::manager::Manager>,
     execution_wake: crate::execution_wake::ExecutionWake,
     non_batch_retry_at: Mutex<Option<tokio::time::Instant>>,
@@ -10638,6 +10640,9 @@ impl Core {
             | "delegations.settings.get" => {
                 let db = self.database.lock().await;
                 delegation_queries::read(&db, &request.method, request.params.clone())
+            }
+            "runtime.childReads.start" | "runtime.childReads.poll" | "runtime.childReads.page" | "runtime.childReads.close" => {
+                self.native_child_read(&request.method, request.params.clone()).await
             }
             "runtime.interactions.list" | "runtime.interactions.get" => {
                 let database = self.database.lock().await;
@@ -19434,6 +19439,7 @@ async fn run_core(
         planned_shutdown.generation().to_owned(),
     )?;
     let core = Arc::new(Core {
+        native_child_readers: crate::runtime_subagent_session::reader::Registry::new(planned_shutdown.generation().to_owned()),
         canvas_terminals,
         execution_wake: database.execution_wake.clone(),
         delivery_batch_scheduler_notify: database.execution_wake.delivery.clone(),
@@ -19931,6 +19937,7 @@ async fn run_core(
         // signals follow it, so no new recovery or scheduler launch can enter.
         core.planned_shutdown.close_launch_admission();
         core.canvas_terminals.begin_shutdown();
+        core.native_child_readers.begin_shutdown();
         let _ = network_recovery_shutdown_tx.send(());
         let _ = scheduler_shutdown_tx.send(());
         let _ = execution_shutdown_tx.send(true);
@@ -27642,6 +27649,7 @@ mod tests {
 
         let planned_shutdown = PlannedShutdownCoordinator::new(uuid::Uuid::new_v4().to_string());
         Ok(Core {
+            native_child_readers: crate::runtime_subagent_session::reader::Registry::new(planned_shutdown.generation().to_owned()),
             canvas_terminals: crate::canvas_terminal::manager::Manager::new(
                 data_dir.clone(),
                 planned_shutdown.generation().to_owned(),

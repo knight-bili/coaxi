@@ -268,7 +268,7 @@ User 显式接管沿既有 delegations.takeover；清理完成后才挂原 Singl
 
 ### Runtime 原生子会话读取目标
 
-与 Core 委派 child 分开。`NativeChildSessionService::resolve` 只接受 Current User 和 `threadId/agentRunId/evidenceId/receiverIndex`，检查同一 Thread、Run、持久 Evidence 和 Context/Bootstrap 所属；界面不能自报 Session、路径、Runtime 或 binding。候选和原文文档均不可序列化，未注册公共读取 method。reported receiver 不等于已证明子代理，文件层仍须验证真实原生父子记录后才可读取内容。
+与 Core 委派 child 分开。`NativeChildSessionService::resolve` 只接受 Current User 和 `threadId/agentRunId/evidenceId/receiverIndex`，检查同一 Thread、Run、持久 Evidence 和 Context/Bootstrap 所属；界面不能自报 Session、路径、Runtime 或 binding。候选和原文文档均不可序列化；公共读取只接Core引用、读取UUID和签名快照/游标，不接原生Session或路径。reported receiver 不等于已证明子代理，文件层仍须验证真实原生父子记录后才可读取内容。
 
 Codex/Grok Host 在创建进程时从最终 `ManagedProcessLaunchSpec` 的环境和 cwd 提取 CODEX_HOME/GROK_HOME 或对应 Home 默认目录，仅保留目录与 Host 身份；warm reuse 沿原 Host 的捕获值，不重新读取当前成员设置。`CapturedNativeSource` 不实现反序列化或普通序列化，Debug 不显示目录；不保存环境、API key 或凭据。缺少可靠 Home 时不猜目录，不阻断其他 Runtime 的原绑定路径。
 
@@ -276,7 +276,7 @@ Application 的既有 bind_prepared_native_session 从精确 Run/epoch 的实际
 
 Codex 两类观察补显式 parentNativeSessionId，Grok 保持既有显式父身份。读取已记录来源时按 System actor、Thread/Conversation、原 Run/epoch、父 Session、冻结 installation/compatibility 和原绑定记录恢复原目录；后来的绑定或 epoch 改变不把旧证据指向新目录。相互冲突的 Host 来源明确拒绝，不按最近一条猜选。历史目标实时资格为false。未记录来源的旧观察保持原 current-binding 围栏且不能打开正文，不从当前环境补猜旧目录。
 
-内部 `NativeDocuments::open_recorded` 使用上述持久来源，Codex 校验精确标准 rollout 和原头部父链，保留历史 cut/seed；Grok 校验父更新或子元数据中的显式 child_session_id，不回退短编号。64KiB块与整体摘要保留完整字节，追加不扩旧快照，同长度改写拒绝。原文可能包含启动字段，必须经 Core 消息/工具/答案投影后才能给 UI，不能直接输出 raw JSON 或送回模型。签名客户端游标、可取消后台 I/O、Native/Web、原只读 UI 及真实 Host/Runtime 同场景仍按[完整队列](../../integration/inventory/native-subagent-viewer-reference.md)接续；当前分项检查不授予这些资格。
+内部 `NativeDocuments::open_recorded` 使用上述持久来源，Codex 校验精确标准 rollout 和原头部父链，保留历史 cut/seed；Grok 校验父更新或子元数据中的显式 child_session_id，不回退短编号。64KiB块与整体摘要保留完整字节，追加不扩旧快照，同长度改写拒绝。原文可能包含启动字段，必须经 Core 消息/工具/答案投影后才能给 UI，不能直接输出 raw JSON 或送回模型。签名快照、可取消后台注册及Native/Web方法准入已接；原只读UI及实际Core/Host/Runtime/网络同场景仍按[完整队列](../../integration/inventory/native-subagent-viewer-reference.md)接续；当前分项检查不授予这些资格。
 
 ### 原生完整快照与分页的内部边界
 
@@ -284,7 +284,7 @@ Codex 两类观察补显式 parentNativeSessionId，Grok 保持既有显式父�
 
 一次窗口允许4至32768个原始UTF8字节，只在字符边界切开；客户端须按偏移收齐所有片段、核对整份投影摘要后再解析JSON，不把单片段当独立JSON或逐字段裁正文。长工具输入输出、嵌套元数据、消息、摘要和统计全部进入同一冻结投影。只有 `verified_children` 内的后代获得签名引用；后代状态unknown且非live，后续仍须验证其父子来源。篡改、混用快照/游标、错身份/来源、越界偏移及非User拒绝。
 
-首次目录发现、文件hash、Grok完整父关联JSON及内容序列化均接同一停止标记；不再以旧1MiB预览上限丢弃Grok父关联记录或metadata。取消仅终止阅读，不操作Runtime。内部对象不代替Core授权：未来后台/运输调用者每次取页及打开后代都必须重新解析原Core引用，资源生命周期、重启失效与销毁仍由后续注册层接线。当前未注册公共Native/Web读取method，也未接原只读UI，组件检查不能授予这些资格。
+首次目录发现、文件hash、Grok完整父关联JSON及内容序列化均接同一停止标记；不再以旧1MiB预览上限丢弃Grok父关联记录或metadata。取消仅终止阅读，不操作Runtime。内部对象不代替Core授权：未来后台/运输调用者每次取页及打开后代都必须重新解析原Core引用，资源生命周期、重启失效和销毁已接下述进程内注册层。公共Native/Web读取method已注册，原只读UI尚未接，组件检查不授予实际Host/网络或GUI资格。
 
 ### 原生内容投影的当前实现边界
 
@@ -297,3 +297,13 @@ Codex 按原版 cut/seed 规则拼接已核验历史输入，保留当前头部�
 后代统计由 Core 证明的父链和来源回调读取，不照搬 suffix 猜文件。patch 行号计算保留原纯规则，但源行必须由可信 Core 工程文件回调提供；原生 cwd 不授予文件权限。没有回调时保留原 patch，不伪造行号；生产工程文件读取接线仍待。完整直接工具正文/JSON不永久裁剪，后代折叠统计保留原预览；未结后代工具按原记录顺序稳定归并。`NativeTranscriptSummary` 只选 title/model/branch/时间/数量，原生路径、身份和启动字段由 Core 拥有，不进入该显示类型。内容指纹流式覆盖实际消息、统计及显示摘要，patch 几何变化不能复用旧快照身份。
 
 此前[第一批内容记录](../../integration/execution/i04-native-content-result.json)只证明 Grok 本层和 Codex 历史输入；本批 Codex 主体和原版断言的实际资格见[接续记录](../../integration/execution/i04-native-codex-content-result.json)。完整原 parser 差分、Grok 完整会话统计/模型上下文窗口目录、旧 agent 文件的显式父链来源、公共有界签名读取和原 UI/Runtime/平台仍待补，无新模型输入、公共接口、Schema 或 Runtime 准入。
+
+### 原生阅读后台与User读取入口
+
+进程内Registry最多16个阅读缓存、4个实际FS线程。独立std线程仿照既有目录读取模式，不占Tokio blocking池；线程持有并发许可直到实际退出，关闭UI条目不会提前释放许可或把迟到结果发布给另一条目。原Core引用和精确scope随条目保留，SQLite不进入线程；新读取缺省时间取Core已持久运行创建时间，刷新不将缺时间戳的历史记录改成本次打开时间。条目空闲5分钟在后续访问时清理，不声称定时器精确到点回收；完整投影驻内存，缓存数量上限不代表总字节上限。
+
+User入口为 `runtime.childReads.start/poll/page/close`，三类输入均闭合字段。start接受客户端UUID readId、原Core reference，以及可选parentReadId/descendantReference；同UUID原参数重试复用已接受工作，不新开线程。poll/page从注册的原reference重新执行Core resolve，再核对scope；派生后代仍保留同一Core root归属，父窗口关闭不补授任何新原生身份。Core resolve失败会停止并清理该阅读。page接受已签名snapshotReference、cursor和可选maxBytes；每个窗口仍守完整UTF8与摘要合同。
+
+close只停止阅读、幂等且不返回内容，来源已删除时仍能清理。关闭先到/启动迟到和已关闭UUID重试，在5分钟租约墓碑内拒绝复活；墓碑软上限1024，饱和时拒绝新读取，已接受UUID的相同重试及现存阅读取消仍可执行。Core退出关闭准入、清空条目并置stop，重启后的旧条目不可用；不等待卡住的FS线程，也不取消Agent Runtime。读取失败只投影静态错误码，不发送原生路径、工具正文或任意解析错误。
+
+四方法只进入User App、Native renderer和已鉴权Web的准入名单，不加入Builtin/模型工具。Web再次按闭合字段投影进度/分页/关闭回执，不截fragment；客户端不把此进程内阅读当持久业务命令排队或自动重放。实际Core handle、Host HTTP/IPC及原版查看器的端到端资格仍按阶段候选补齐，静态名单与受控worker检查不能代替。

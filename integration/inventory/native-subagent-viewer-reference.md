@@ -42,6 +42,8 @@ Codex 主体接续（2026-10-18）：原消息 parser 与代码模式/MCP/延迟
 
 旧格式分类接续（2026-10-18）：固定Claude parser的`toolUseResult.agentId`对应父文件同名目录下的`subagents/agent-ID.jsonl`，Qoder复用部分读取规则但根与producer独立。Core新增单独`ClaudeAgentLink`私有文件层，以精确Agent/Task调用与结构化确认同时核对，不把短agentId、消息parentUuid或子文件内sessionId当作独立Session授权；完整正文保持。见[固定来源与改动](native-legacy-agent-source.json)及[实际分项结果](../execution/i04-legacy-agent-source-result.json)。没有给现有C/G准入添加Claude分支，不能以文件层测试声称Claude Runtime或完整parser可用。
 
-当前剩余：私有完整签名快照/UTF8分页及首次发现/hash/序列化取消已接；继续后台任务注册/销毁、每页Core重授权，再现有C/G Native/Web运输和原只读UI/同场景；Claude旧格式完整parser/实际来源捕获与证据关联、Qoder独立根及旧无记录来源导入同步留在I04格式与Runtime并集收口。真实Host/Runtime/平台及其余工作包保持。前述旧检查点不据历史文字重做已验证分项，也不将组件通过当完整查看器或I04完成。
+当前剩余：私有完整签名快照、后台注册/销毁/租约及每页原Core重授权已接，Native/Web四方法名单和Web闭合投影已编码；接下来实际Core/两端调用与固定原只读UI/同场景；Claude旧格式完整parser/实际来源捕获与证据关联、Qoder独立根及旧无记录来源导入同步留在I04格式与Runtime并集收口。真实Host/Runtime/平台及其余工作包保持。前述旧检查点不据历史文字重做已验证分项，也不将组件通过当完整查看器或I04完成。
 
 完整快照接续（2026-10-18）：新私有snapshot.rs沿既有Core用户准入与固定原parser，完整消息/工具JSON/统计进入不可变JSON投影，按UTF8边界分页；进程密钥签名快照、游标和已核实后代入口，引用不携带原生路径，状态/live随当前Core目标。Grok父关联记录和meta复用完整验证解码，不再受旧1MiB预览截断。首次发现/hash/序列化均有取消检查，取消不控制Runtime。[分项记录](../execution/i04-native-snapshot-result.json)仅授予本机最低编译/原文件owner资格；后台注册、重授权、运输与原UI仍未接，不重复宣称31组原parser完整App资格。
+
+后台阅读接续（2026-10-18）：Registry沿原Core引用与固定C/G parser，用有界独立std线程读取，不将SQLite跨线程或占用Tokio blocking池；关闭不提前释放worker名额，迟到成功不发布，缓存/空闲和关闭墓碑有限。四个User方法每次poll/page重做Core resolve，后代保留原root归属，Web按闭合字段投影；缺原生日志时间沿Core持久创建时间。见[本批记录](../execution/i04-native-reader-result.json)。原source owner真实Codex文件/受控线程、原Web projection和客户端owner拥有各自分项，不代表实际Host/网络/原UI或全部Grok生命周期资格。

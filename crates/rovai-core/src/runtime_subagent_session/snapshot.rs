@@ -85,7 +85,7 @@ fn decode(value: &str) -> Result<Token> {
     serde_json::from_slice(&body).context("native_child.cursor_invalid")
 }
 
-fn scope(actor: &ActorRef, target: &ObservedNativeSessionTarget) -> Result<String> {
+pub(super) fn scope(actor: &ActorRef, target: &ObservedNativeSessionTarget) -> Result<String> {
     ensure!(
         matches!(actor, ActorRef::User { user_id } if user_id == CURRENT_USER_ID),
         "native_child.user_required"

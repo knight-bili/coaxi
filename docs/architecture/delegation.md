@@ -38,7 +38,7 @@ User恢复以原UUID和持久父Conversation归属授权，允许父Run已经终
 
 共享聊天选择明确的 child 操作族，不给普通 SingleChat 请求增加可升级的 owner override。Core detail 的接管事实/清理状态与真实成员决定是否挂编辑器；既有 scoped snapshot、输入/上传控制器仍分别拥有材料和原请求恢复，Drawer Host 只拥有呈现、嵌套和离开准备。控制请求持久化不等于输入交接完成：前者可关闭后恢复，后者沿原输入 guard 阻止未结离开。具体边界由[共享聊天合同](../contracts/delegation-v1.md#已接管-child-的共享聊天呈现)拥有，不创建第二份任务状态或模型输入。
 
-Runtime 原生子会话仍是原生观察，不创建 Core Delegation。内部候选由现有 Evidence/Run/Context/Bootstrap 及精确持久启动来源解析（旧观察仅保留当前 Binding 围栏），不能由界面自报 Session 或文件路径。观察归属与创建因果分开，reported receiver 与原生子代理父子证明分开；私有文件层验证真实父子来源后，固定原parser生成完整投影。签名快照按UTF8窗口输出完整JSON，游标绑定精确身份和冻结投影，仅为核实后代签发引用；首次发现/hash及序列化沿同一取消标记。该内部组件不构成公共读取API，后台注册/销毁、每页Core重授权、两端运输与原UI仍待接。当前边界见[原生子会话目标合同](../contracts/delegation-v1.md#runtime-原生子会话读取目标)，全部后续项见[源码映射](../../integration/inventory/native-subagent-viewer-reference.md)。
+Runtime 原生子会话仍是原生观察，不创建 Core Delegation。内部候选由现有 Evidence/Run/Context/Bootstrap 及精确持久启动来源解析（旧观察仅保留当前 Binding 围栏），不能由界面自报 Session 或文件路径。观察归属与创建因果分开，reported receiver 与原生子代理父子证明分开；私有文件层验证真实父子来源后，固定原parser生成完整投影。签名快照按UTF8窗口输出完整JSON，游标绑定精确身份和冻结投影，仅为核实后代签发引用；首次发现/hash及序列化沿同一取消标记。进程内注册层已接有界std后台线程、取消/销毁/租约和每页原Core重授权，四个User读取方法已进入Native/Web准入；原UI及实际Core/Host/网络同场景仍待验证。内部快照和方法名单不代替该资格。当前边界见[原生子会话目标合同](../contracts/delegation-v1.md#runtime-原生子会话读取目标)，全部后续项见[源码映射](../../integration/inventory/native-subagent-viewer-reference.md)。
 
 原生文件层仍在 Core 内部：候选先验证原生父链，再按精确 Codex rollout/Grok 父元数据定位原文件，保存完整字节快照和分块摘要；读取不 attach/start 或写业务库。原生元数据与正文不直接序列化给 Renderer，后续仍由 Core 内容投影拥有消息/工具/问答顺序。Codex/Grok Host 已从最终 ManagedProcessLaunchSpec 捕获非凭据目录，原 Native bind 事务保存 System 来源事件；历史读取沿原 Run/epoch/父 Session 和绑定恢复原来源。未记录来源仍不可打开正文，不能从当前设置或 UI 路径补猜。实现状态和未完边界见[文件来源映射](../../integration/inventory/native-subagent-viewer-reference.md)。
 

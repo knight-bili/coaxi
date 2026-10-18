@@ -41,6 +41,7 @@ describe('Runtime Renderer Core method allowlist', () => {
     for (const method of ['singleChat.pendingInputs.edit', 'singleChat.composerDraft.mutate', 'singleChat.composerDraft.recovery',
       'delegations.resume', 'delegations.list', 'delegations.get', 'delegations.history', 'delegations.read', 'delegations.settings.get', 'delegations.settings.update',
       'runtime.interactions.list', 'runtime.interactions.get', 'runtime.interactions.resolve',
+      'runtime.childReads.start', 'runtime.childReads.poll', 'runtime.childReads.page', 'runtime.childReads.close',
       'delegations.composer.get', 'delegations.conversation.get', 'delegations.composer.mutate', 'delegations.composer.recovery',
       'delegations.message.send', 'delegations.pendingInputs.get', 'delegations.pendingInputs.edit', 'delegations.takeover', 'delegations.cancel', 'delegations.conversation.end']) {
       expect(mainSource.slice(allowlistStart, allowlistEnd)).toContain(`'${method}'`)

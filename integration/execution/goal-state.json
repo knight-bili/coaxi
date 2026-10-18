@@ -14,7 +14,7 @@
   "current_branch": "phase/i04-collaboration-runtime",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I04-T01",
-  "current_slice": "原生完整投影私有签名快照/UTF8分页/核实后代引用及首次发现/hash/序列化取消已接，最低extended编译与精确原文件owner通过。下一项后台注册/销毁与每页Core重授权，再Native/Web和固定原只读UI；Claude完整parser/生产关联/Qoder及I04四包84正式场景继续。",
+  "current_slice": "原生后台阅读注册/取消/回收、关闭与迟到租约、每页原Core重授权、Native/Web四方法及闭合投影已接源码；缺原生时间戳沿持久Core运行创建时间。下一实际Core/两端调用与固定Codeg原只读UI/同场景；完整Claude/Qoder/Grok反馈及I04四包84保持，组件检查不代实际Host/HTTP/IPC/GUI。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -269,5 +269,6 @@
   "i04_native_parser_parity_evidence": "i04-native-parser-parity-result.json",
   "i04_native_project_patch_evidence": "i04-native-project-patch-result.json",
   "i04_legacy_agent_source_evidence": "i04-legacy-agent-source-result.json",
-  "i04_native_snapshot_evidence": "i04-native-snapshot-result.json"
+  "i04_native_snapshot_evidence": "i04-native-snapshot-result.json",
+  "i04_native_reader_evidence": "i04-native-reader-result.json"
 }
