@@ -4940,6 +4940,7 @@ export type CoreMethod =
   | 'runtime.interactions.get'
   | 'runtime.interactions.resolve'
   | 'delegations.composer.get'
+  | 'delegations.conversation.get'
   | 'delegations.message.send'
   | 'delegations.takeover'
   | 'delegations.cancel'

@@ -10751,7 +10751,7 @@ impl Core {
                 }
                 Ok(reply.result)
             }
-            "delegations.composer.get" | "delegations.composer.recovery" => {
+            "delegations.composer.get" | "delegations.composer.recovery" | "delegations.conversation.get" => {
                 let database = self.database.lock().await;
                 delegation_composer::handle(
                     &database,

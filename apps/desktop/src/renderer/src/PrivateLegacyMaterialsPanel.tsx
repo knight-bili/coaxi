@@ -20,7 +20,7 @@ export function PrivateLegacyMaterialsPanel({ controller, busy, onError }: {
   if (!controller.origin.scope) return null
   const inspect = async (): Promise<void> => {
     setReadingOwner(controller)
-    try { const snapshot = await readScopedPrivateChat(client, controller.origin.threadId, controller.origin.conversationId, null); if (current()) setPreview({ controller, snapshot }) }
+    try { const snapshot = await readScopedPrivateChat(client, controller.origin.threadId, controller.origin.conversationId, null, controller.origin.conversationKind); if (current()) setPreview({ controller, snapshot }) }
     catch (error) { if (current()) onError(privateInputErrorMessage(error)) }
     finally { setReadingOwner(previous => previous === controller ? null : previous) }
   }

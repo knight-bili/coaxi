@@ -1957,6 +1957,22 @@ impl SingleChatService {
         conversation_id: &str,
         key: &PrivateComposerKey,
     ) -> Result<Option<SingleChatSnapshot>> {
+        self.snapshot_for_owner(database, conversation_id, key, ComposerOwner::SingleChat)
+    }
+
+    // The entry point selects the owner; a User request cannot upgrade a
+    // single-chat read into a child read by supplying its kind.
+    pub(crate) fn snapshot_for_owner(
+        &self,
+        database: &Database,
+        conversation_id: &str,
+        key: &PrivateComposerKey,
+        owner: ComposerOwner,
+    ) -> Result<Option<SingleChatSnapshot>> {
+        let kind = match owner {
+            ComposerOwner::SingleChat => "single_chat",
+            ComposerOwner::DelegationChild => "delegation_child",
+        };
         let conversation = database
             .connection()
             .query_row(
@@ -1967,19 +1983,25 @@ impl SingleChatService {
                        conversation.created_at, conversation.updated_at, conversation.ended_at,
                        (SELECT id FROM agent_run
                         WHERE agent_run.conversation_id = conversation.id
-                          AND agent_run.invocation_kind = 'single_chat'
+                          AND ((?2='single_chat' AND agent_run.invocation_kind='single_chat')
+                            OR (?2='delegation_child' AND agent_run.invocation_kind IN ('delegation','delegation_user')))
                           AND agent_run.status IN ('queued', 'running', 'waiting')
                         ORDER BY agent_run.created_at, agent_run.id LIMIT 1)
                 FROM conversation
-                WHERE conversation.id = ?1 AND conversation.kind = 'single_chat'
+                WHERE conversation.id = ?1 AND conversation.kind = ?2
                 "#,
-                [conversation_id],
+                [conversation_id, kind],
                 conversation_view_from_row,
             )
             .optional()?;
         let Some(conversation) = conversation else {
             return Ok(None);
         };
+        if matches!(owner, ComposerOwner::DelegationChild)
+            && !owner.exists(database.connection(), &conversation.camp_id, conversation_id, false)?
+        {
+            anyhow::bail!("delegation.takeover_required");
+        }
         let messages = {
             let mut statement = database.connection().prepare(
                 r#"
@@ -2035,7 +2057,7 @@ impl SingleChatService {
                 )
                 .collect::<Result<Vec<_>>>()?
         };
-        let draft = if key.sql_key().is_empty() {
+        let draft = if matches!(owner, ComposerOwner::SingleChat) && key.sql_key().is_empty() {
             load_single_chat_draft(database, conversation_id, &self.client)?
         } else {
             crate::single_chat_composer::DraftMaterials::load(
@@ -2047,8 +2069,10 @@ impl SingleChatService {
             .view(key, None)?
             .draft
         };
-        let pending_inputs =
-            read_single_chat_pending_inputs(database, conversation_id, &self.client, key)?;
+        let pending_inputs = match owner {
+            ComposerOwner::SingleChat => read_single_chat_pending_inputs(database, conversation_id, &self.client, key)?,
+            ComposerOwner::DelegationChild => read_owned_pending_inputs(database, conversation_id, &self.client, key, owner)?,
+        };
         let agent_runs = {
             let mut statement = database.connection().prepare(
                 r#"
@@ -2067,12 +2091,13 @@ impl SingleChatService {
                  AND json_extract(e.payload_json, '$.continuation')='native_session_replaced')
                 FROM agent_run
                 WHERE agent_run.conversation_id = ?1
-                  AND agent_run.invocation_kind = 'single_chat'
+                  AND ((?2='single_chat' AND agent_run.invocation_kind='single_chat')
+                    OR (?2='delegation_child' AND agent_run.invocation_kind IN ('delegation','delegation_user')))
                 ORDER BY agent_run.created_at, agent_run.id
                 "#,
             )?;
             statement
-                .query_map([conversation_id], |row| {
+                .query_map([conversation_id, kind], |row| {
                     Ok(SingleChatRunView {
                         id: row.get(0)?,
                         native_session_replaced: row.get(14)?,

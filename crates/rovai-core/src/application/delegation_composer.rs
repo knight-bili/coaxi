@@ -66,7 +66,7 @@ pub(crate) fn handle(
     value: Value,
 ) -> Result<Value> {
     let (conversation, scope, cursor, limit) = match method {
-        "delegations.composer.get" => {
+        "delegations.composer.get" | "delegations.conversation.get" => {
             let p: SnapshotParams = serde_json::from_value(value)?;
             (p.conversation_id, p.composer_scope, None, None)
         }
@@ -97,6 +97,20 @@ pub(crate) fn handle(
         scope.scope(),
     )?;
     match method {
+        "delegations.conversation.get" => {
+            let key = crate::single_chat_composer_scope::PrivateComposerKey::for_scope(scope.scope())?;
+            let snapshot = SingleChatService::for_client(client.clone())
+                .snapshot_for_owner(database, &conversation, &key, single_chat_composer::ComposerOwner::DelegationChild)?
+                .context("delegation.not_found")?;
+            let editing_elsewhere: bool = database.connection().query_row(
+                "SELECT EXISTS(SELECT 1 FROM single_chat_pending_input_edit_session WHERE conversation_id=?1 AND (client_id<>?2 OR scope_key<>?3))",
+                rusqlite::params![conversation, client.id(), key.sql_key()], |row| row.get(0),
+            )?;
+            let mut value = serde_json::to_value(snapshot)?;
+            value["draft"] = serde_json::to_value(draft)?;
+            value["pendingInputs"]["editingElsewhere"] = json!(editing_elsewhere);
+            Ok(value)
+        }
         "delegations.composer.get" => Ok(serde_json::to_value(draft)?),
         "delegations.composer.recovery" => Ok(serde_json::to_value(delegation_user::recovery(
             database,

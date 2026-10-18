@@ -26,6 +26,7 @@ fn assert_child_user_materials(fixture: &mut Fixture, id: &str, run: &str, legac
         "SELECT conversation_id FROM agent_run WHERE id=?1",[legacy_run],|r|r.get(0)).unwrap();
     let reader=json!({"conversationId":conversation});
     assert!(crate::application::delegation_composer::handle(&fixture.database,&client,"delegations.composer.get",reader.clone()).is_err());
+    assert!(crate::application::delegation_composer::handle(&fixture.database,&client,"delegations.conversation.get",reader.clone()).is_err());
     let before=child_material_command(fixture,&client,&conversation,0,json!({"type":"register_scope"}));
     let denied=delegation_user::mutate_draft(&mut fixture.database,&before).unwrap();
     assert_eq!(denied.result.status,crate::command::CommandResultStatus::Rejected);
@@ -54,6 +55,16 @@ fn assert_child_user_materials(fixture: &mut Fixture, id: &str, run: &str, legac
     tx.commit().unwrap();
     let snapshot=crate::application::delegation_composer::handle(&fixture.database,&client,"delegations.composer.get",reader.clone()).unwrap();
     assert_eq!(snapshot["revision"],0);
+    let before_read = fixture.database.connection().total_changes();
+    let conversation_snapshot = crate::application::delegation_composer::handle(&fixture.database,&client,"delegations.conversation.get",reader.clone()).unwrap();
+    assert_eq!(conversation_snapshot["conversation"]["id"], conversation);
+    assert_eq!(conversation_snapshot["conversation"]["threadId"], fixture.camp_id);
+    assert_eq!(conversation_snapshot["draft"], snapshot);
+    assert!(conversation_snapshot["messages"].as_array().unwrap().iter().all(|m| m["body"].is_string()));
+    assert_eq!(fixture.database.connection().total_changes(), before_read);
+    assert!(crate::single_chat::SingleChatService::for_client(client.clone()).snapshot(&fixture.database,&conversation).unwrap().is_none());
+    assert!(crate::application::delegation_composer::handle(&fixture.database,&client,"delegations.conversation.get",json!({"conversationId":foreign})).is_err());
+    assert!(crate::application::delegation_composer::handle(&fixture.database,&client,"delegations.conversation.get",json!({"conversationId":conversation,"conversationKind":"single_chat"})).is_err());
     for actor in [ActorRef::System {component_id:"material-test".into()},ActorRef::Agent {agent_id:"agent_1".into(),source_agent_run_id:fixture.run_id.clone()}] {
         assert!(delegation_user::read_draft(&fixture.database,&actor,&client,&fixture.camp_id,&conversation,None).is_err());
         let mut command=child_material_command(fixture,&client,&conversation,0,json!({"type":"register_scope"}));

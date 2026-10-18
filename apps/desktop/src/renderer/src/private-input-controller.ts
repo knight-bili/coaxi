@@ -4,20 +4,22 @@ import type {
   SingleChatPendingInputEditAction, SingleChatPendingInputView, SingleChatSnapshot, StoredCommandResult
 } from '@contracts'
 import { readScopedPrivateChat, matchesPrivateComposerScope } from '../../shared/private-composer-scope'
+import { privateConversationOperations, privateInputCommandType, type PrivateConversationKind, type PrivateInputMethod } from '../../shared/private-conversation-operations'
 import { newCommandId } from '../../shared/command-id'
 import type { EditingRecovery, ThreadClient } from './camp-client'
 import { singleChatRecoveryStorage, type SingleChatComposerStore, type SingleChatMutationLease, type SingleChatSendLease } from './single-chat-composer-store'
 
 type Client = Pick<ThreadClient, 'request' | 'editingRecovery' | 'privateInputRecovery' | 'onInvalidated'> & {
-  retryPendingCommand?: (method: 'singleChat.composerDraft.mutate' | 'singleChat.pendingInputs.edit' | 'singleChat.send', params: unknown) => Promise<void>
+  retryPendingCommand?: (method: PrivateInputMethod, params: unknown) => Promise<void>
 }
 export interface PrivateInputOrigin {
   threadId: string
   conversationId: string
   scope: SingleChatComposerScope | null
   contextKey: string
+  conversationKind?: PrivateConversationKind
 }
-type Method = 'singleChat.composerDraft.mutate' | 'singleChat.pendingInputs.edit' | 'singleChat.send'
+type Method = PrivateInputMethod
 type Kind = 'return' | 'swap' | 'mutation' | 'edit' | 'send'
 interface Intent {
   version: 1
@@ -61,17 +63,19 @@ function parseIntent(value: unknown, origin: PrivateInputOrigin): Intent | null 
     || !object(value.params) || typeof value.params.commandId !== 'string'
     || typeof value.originalBody !== 'string' || !object(value.params.command)) throw failure('private_input.recovery_invalid')
   const command = value.params.command
-  if (command.threadId !== origin.threadId || command.conversationId !== origin.conversationId
+  const operations = privateConversationOperations(origin.conversationKind)
+  const coreDerivesThread = origin.conversationKind === 'delegation_child' && (value.method === operations.send || value.method === operations.edit)
+  if ((coreDerivesThread ? command.threadId !== undefined : command.threadId !== origin.threadId) || command.conversationId !== origin.conversationId
     || !equal(command.composerScope ?? null, origin.scope)) throw failure('private_input.recovery_invalid')
   if (value.result !== undefined && (!object(value.result) || !['applied', 'rejected', 'accepted'].includes(String(value.result.status)) || !object(value.result.payload))) throw failure('private_input.recovery_invalid')
   if (value.kind === 'send') {
-    if (value.method !== 'singleChat.send' || typeof command.body !== 'string' || !Number.isSafeInteger(command.draftRevision)) throw failure('private_input.recovery_invalid')
+    if (value.method !== operations.send || typeof command.body !== 'string' || !Number.isSafeInteger(origin.conversationKind === 'delegation_child' ? command.expectedRevision : command.draftRevision)) throw failure('private_input.recovery_invalid')
     return value as unknown as Intent
   }
   if (!object(command.action)) throw failure('private_input.recovery_invalid')
   const action = String(command.action.type)
-  const pending = value.method === 'singleChat.pendingInputs.edit'
-  const mutation = value.method === 'singleChat.composerDraft.mutate'
+  const pending = value.method === operations.edit
+  const mutation = value.method === operations.mutate
   if ((!pending && !mutation) || (value.kind === 'return' && (!pending || action !== 'return_to_composer'))
     || (value.kind === 'swap' && (!mutation || action !== 'swap_retained'))
     || (value.kind === 'edit' && (!pending || !['begin', 'takeover', 'save', 'cancel', 'delete', 'quote', 'remove_attachment', 'reorder_attachments'].includes(action)))
@@ -99,6 +103,7 @@ export class PrivateInputController {
   private completion: { id: string; promise: Promise<void>; resolve(): void; reject(error: unknown): void } | null = null
 
   constructor(private readonly client: Client, origin: PrivateInputOrigin, private readonly bodies: SingleChatComposerStore) {
+    if (origin.conversationKind !== undefined && !['single_chat', 'delegation_child'].includes(origin.conversationKind)) throw failure('private_input.recovery_invalid')
     this.origin = structuredClone(origin)
     this.storage = singleChatRecoveryStorage(client)
     this.storageKey = `single-chat-input-intent:v1:${JSON.stringify(this.origin)}`
@@ -125,7 +130,7 @@ export class PrivateInputController {
 
   refresh(): Promise<ScopedSingleChatSnapshot | null> {
     if (this.reading) return this.reading
-    this.reading = readScopedPrivateChat(this.client, this.origin.threadId, this.origin.conversationId, this.origin.scope)
+    this.reading = readScopedPrivateChat(this.client, this.origin.threadId, this.origin.conversationId, this.origin.scope, this.origin.conversationKind)
       .then(snapshot => { this.publish({ snapshot, error: this.state.pending ? this.state.error : null }); return snapshot })
       .catch(error => { this.publish({ snapshot: null, error }); throw error })
       .finally(() => { this.reading = null })
@@ -137,8 +142,8 @@ export class PrivateInputController {
       const cursor = restart ? null : this.state.nextCursor
       if (!restart && !cursor) return
       if (restart) this.enumerated = new Map()
-      const page = await this.client.request<PrivateComposerRecoveryResult>('singleChat.composerDraft.recovery', {
-        threadId: this.origin.threadId, conversationId: this.origin.conversationId, cursor, limit: 50
+      const page = await this.client.request<PrivateComposerRecoveryResult>(privateConversationOperations(this.origin.conversationKind).recovery, {
+        ...(this.origin.conversationKind === 'delegation_child' ? {} : { threadId: this.origin.threadId }), conversationId: this.origin.conversationId, cursor, limit: 50
       })
       for (const item of page.items) {
         if (item.kind === 'scope' && item.scope.scopeKey === scopeKey(this.origin.scope)) this.registered = true
@@ -153,19 +158,20 @@ export class PrivateInputController {
   }
 
   async returnPending(item: SingleChatPendingInputView, editToken: string | null): Promise<void> {
-    await this.start('return', 'singleChat.pendingInputs.edit', snapshot => ({
+    await this.start('return', privateConversationOperations(this.origin.conversationKind).edit, snapshot => ({
       threadId: this.origin.threadId, conversationId: this.origin.conversationId, composerScope: this.origin.scope,
       pendingInputId: item.id, expectedRevision: item.revision, editToken,
       action: { type: 'return_to_composer', expectedDraftRevision: snapshot.draft.revision, targetBody: this.bodies.getSnapshot().drafts[bodyKey(this.origin)] ?? '' }
     }))
   }
   async send(originalBody: string): Promise<void> {
-    await this.start('send', 'singleChat.send', snapshot => ({ threadId: this.origin.threadId, conversationId: this.origin.conversationId,
-      body: originalBody.trim(), draftRevision: snapshot.draft.revision, ...(this.origin.scope ? { composerScope: this.origin.scope } : {}) }), undefined, originalBody)
+    await this.start('send', privateConversationOperations(this.origin.conversationKind).send, snapshot => ({
+      ...(this.origin.conversationKind === 'delegation_child' ? { expectedRevision: snapshot.draft.revision } : { threadId: this.origin.threadId, draftRevision: snapshot.draft.revision }), conversationId: this.origin.conversationId,
+      body: originalBody.trim(), ...(this.origin.scope ? { composerScope: this.origin.scope } : {}) }), undefined, originalBody)
   }
   async swap(input: RetainedPrivateInput): Promise<void> {
     if (input.conversationId !== this.origin.conversationId || input.scopeKey !== scopeKey(this.origin.scope)) throw failure('private_input.context_changed')
-    await this.start('swap', 'singleChat.composerDraft.mutate', snapshot => ({
+    await this.start('swap', privateConversationOperations(this.origin.conversationKind).mutate, snapshot => ({
       threadId: this.origin.threadId, conversationId: this.origin.conversationId, composerScope: this.origin.scope,
       expectedDraftRevision: snapshot.draft.revision,
       action: { type: 'swap_retained', retainedInputId: input.id, expectedRetainedRevision: input.revision, currentBody: this.bodies.getSnapshot().drafts[bodyKey(this.origin)] ?? '' }
@@ -174,15 +180,15 @@ export class PrivateInputController {
   edit(item: SingleChatPendingInputView, action: Exclude<SingleChatPendingInputEditAction, { type: 'return_to_composer' }>, editToken: string | null): Promise<void> {
     const command: EditSingleChatPendingInputCommand = { threadId: this.origin.threadId, conversationId: this.origin.conversationId, composerScope: this.origin.scope,
       pendingInputId: item.id, expectedRevision: item.revision, editToken, action }
-    return this.start('edit', 'singleChat.pendingInputs.edit', () => command as unknown as Record<string, unknown>)
+    return this.start('edit', privateConversationOperations(this.origin.conversationKind).edit, () => command as unknown as Record<string, unknown>)
   }
   mutate(action: Exclude<PrivateComposerAction, { type: 'swap_retained' }>): Promise<void> {
-    return this.start('mutation', 'singleChat.composerDraft.mutate', snapshot => ({ threadId: this.origin.threadId, conversationId: this.origin.conversationId,
+    return this.start('mutation', privateConversationOperations(this.origin.conversationKind).mutate, snapshot => ({ threadId: this.origin.threadId, conversationId: this.origin.conversationId,
       composerScope: this.origin.scope, expectedDraftRevision: snapshot.draft.revision, action }), action)
   }
   adoptLegacyMaterials(expectedSourceRevision: number): Promise<void> {
     if (!this.origin.scope || !Number.isSafeInteger(expectedSourceRevision) || expectedSourceRevision < 0) return Promise.reject(failure('private_input.context_changed'))
-    return this.start('mutation', 'singleChat.composerDraft.mutate', snapshot => ({
+    return this.start('mutation', privateConversationOperations(this.origin.conversationKind).mutate, snapshot => ({
       threadId: this.origin.threadId, conversationId: this.origin.conversationId, composerScope: this.origin.scope,
       expectedDraftRevision: snapshot.draft.revision,
       action: { type: 'adopt_legacy_materials', expectedSourceRevision, targetBody: this.bodies.getSnapshot().drafts[bodyKey(this.origin)] ?? '' }
@@ -223,13 +229,15 @@ export class PrivateInputController {
     let prepared: Intent | null = null
     try {
       this.rememberBody()
-      const snapshot = kind === 'send' && !this.origin.scope
+      const snapshot = kind === 'send' && !this.origin.scope && this.origin.conversationKind !== 'delegation_child'
         ? await this.client.request<SingleChatSnapshot | null>('singleChat.get', { conversationId: this.origin.conversationId })
         : await this.refresh()
       if (!snapshot || snapshot.conversation.status !== 'active') throw failure('private_input.context_changed')
       if (snapshot.conversation.id !== this.origin.conversationId || snapshot.conversation.threadId !== this.origin.threadId) throw failure('private_input.context_changed')
+      const input = command(snapshot)
+      if (this.origin.conversationKind === 'delegation_child' && method === privateConversationOperations(this.origin.conversationKind).edit) delete input.threadId
       prepared = { version: 1, origin: this.origin, kind, method,
-        params: structuredClone({ commandId: newCommandId(), command: command(snapshot) }), originalBody: originalBody ?? this.bodies.getSnapshot().drafts[bodyKey(this.origin)] ?? '' }
+        params: structuredClone({ commandId: newCommandId(), command: input }), originalBody: originalBody ?? this.bodies.getSnapshot().drafts[bodyKey(this.origin)] ?? '' }
       this.save(prepared)
       this.intent = prepared
     } catch (error) {
@@ -264,7 +272,7 @@ export class PrivateInputController {
   }
   private accept(intent: Intent, result: StoredCommandResult): Promise<void> {
     if (!this.same(intent)) return Promise.resolve()
-    const expectedType = intent.method === 'singleChat.send' ? 'single_chat.send' : intent.method === 'singleChat.pendingInputs.edit' ? 'single_chat.pending_input.edit' : 'single_chat.composer_draft.mutate'
+    const expectedType = privateInputCommandType(intent.method)
     if (result.commandId !== intent.params.commandId || result.commandType !== expectedType) return Promise.reject(failure('private_input.context_changed'))
     if (this.completing) return this.completing
     this.completing = Promise.resolve().then(async () => {

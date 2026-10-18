@@ -48,7 +48,7 @@ export function PrivateInputRecoveryPanel({ controller, state, busy, onError }: 
         <pre className="single-chat-pending-copy">{selected.body}</pre>
         {selected.attachments.length > 0 && <div className="single-chat-pending-attachments">{selected.attachments.map(attachment => <AttachmentCard
           key={attachment.id} attachment={attachment} presentation="user-timeline" disabled={busy || state.pending}
-          locator={{ owner: 'single_chat_retained', threadId: controller.origin.threadId,
+          locator={{ owner: controller.origin.conversationKind === 'delegation_child' ? 'delegation_child_retained' : 'single_chat_retained', threadId: controller.origin.threadId,
             conversationId: controller.origin.conversationId, composerScope: controller.origin.scope,
             retainedInputId: selected.id, attachmentRefId: attachment.id }} onNotify={onError} />)}</div>}
         {selected.quotes.map(quote => <blockquote key={quote.quoteId}>{quote.text}</blockquote>)}

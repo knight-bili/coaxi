@@ -9,6 +9,16 @@ last_updated: 2026-10-18
 
 # Delegation v1
 
+### 已接管 child 的共享聊天读取与输入控制器
+
+User-only `delegations.conversation.get` 接 `{conversationId,composerScope?}`，仅返回有完整持久接管事实的确切 child，Thread 与编辑端由 Core 派生；不接受 actor、Thread、kind 或 Session 覆盖。返回复用 `ScopedSingleChatSnapshot` 的字段形状：Conversation、完整消息/引用/附件、原 Run 与执行证据/pending 审批、同编辑端和位置的 draft/pendingInputs。新增入口复用封闭的内部 `ComposerOwner::DelegationChild` 读取，保留原 `singleChat.get` 的 SingleChat owner，旧接口收到 child 仍不可读取；读取不登记位置、不驱动 Runtime、不发失效事件。
+
+共享私有输入控制器现在显式区分 single_chat 与 delegation_child 的既有 Core 操作族。child 使用 `delegations.composer.mutate/recovery`、`delegations.pendingInputs.edit`、`delegations.message.send`；发送冻结 `expectedRevision`，Thread 不由发送或排队编辑请求传入。材料编辑沿既有封闭命令校验 Thread/Conversation 与编辑端。规范回执类型保持真实 Core 类型，不把 child 回执改写成 single_chat 回执。
+
+原提交的 UUID、完整参数、资源类别和原正文持久保留。未确认时只调用 `commands.reconcile`；明确重试沿同一操作和参数，不自动重发。错误命令族回执和被改成另一族的方法均拒绝，正文保持；仅成功核对原提交后清除原正文。旧 single_chat 的存储键、方法和参数保持，child 在原位置身份中额外冻结 `conversationKind`，恢复目录、保留输入附件与排队编辑附件沿同一类别。类型字段只是展示/调用选择，Core 权限继续来自专用入口与真实接管事实。
+
+本分项是共享读取、输入和材料控件基础，不授予完整聊天页面或生命周期按钮完成资格。实际 SingleChatPanel 的 child 模式、接管清理后挂载、停止/结束/恢复、离开保护与查看器隐藏恢复仍需随后接线和隔离 Renderer 验证；真实 Core/Host/模型/平台验证仍按 I04 候选汇集。Schema161/Migration211、模型输入与批准 r1 不变。
+
 ### User 查看器活动投影
 
 User-only `delegations.get` 在既有身份和 Thread 核对的只读事务中，增加 `activity`：确切 child Conversation 的 `delegation/delegation_user` Run 摘要、按原 Run/Epoch 读取的执行证据及原 pending 审批。Run 字段复用 `SingleChatRunView`，证据复用现有安全投影和受管文本 overlay，审批复用原 Conversation 查询；不从 Renderer 传 Session/Run/actor 来补归属。原 `delegations.list` 和模型 status 继续只返回元数据，不预取正文；完整历史继续走原 signed cursor。

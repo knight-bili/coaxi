@@ -25,7 +25,7 @@ export type ThreadClient = Pick<RovaiApi,
   }
   editingRecovery?: EditingRecovery
   privateInputRecovery?: RovaiApi['privateInputRecovery']
-  retryPendingCommand?: (method: 'runtime.interactions.resolve' | 'singleChat.composerDraft.mutate' | 'singleChat.pendingInputs.edit' | 'singleChat.send', params: unknown) => Promise<void>
+  retryPendingCommand?: (method: 'runtime.interactions.resolve' | import('../../shared/private-conversation-operations').PrivateInputMethod, params: unknown) => Promise<void>
   /** Authenticated Host/Owner identity for advisory presentation preferences; never a resource grant. */
   presentationScope?: string
   /** Web uses a live, Core-verified editor identity instead of exposing the server data directory. */

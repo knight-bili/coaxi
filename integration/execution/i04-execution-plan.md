@@ -2,6 +2,8 @@
 
 2026-10-18 当前检查点：原生提问/计划的持久化、User API、可信原生回调及安全阻塞摘要已分别提交；实际Core仍为v1.73/Schema161/Migration211。本文后面的“未接User API/原生回调”等段落保留为历史，不覆盖此处当前事实。
 
+本批推进接管后的原聊天复用基础：`delegations.conversation.get` 只读返回真实已接管 child 的共享会话/材料/活动投影，旧单聊入口不能升级；共享 PrivateInputController、恢复目录与保留/排队材料控件加入明确 child 操作族，保留 UUID/完整参数、规范回执和错误时原正文。当前尚未在实际 SingleChatPanel 中启用 child 模式，不据控制器测试称聊天页面已可用。结果见[接管聊天基础记录](i04-child-chat-foundation-result.json)。下一步直接接 SingleChatPanel 固定 child、精确附件/引用归属及 Viewer 清理完成后的挂载，补生命周期按钮、嵌套离开保护和隐藏/恢复，再整批隔离界面检查。
+
 固定Codeg问答/计划共享卡片已挂Rovai原公屏与精确私聊入口；其原请求核对、版本、状态和隔离Renderer资格见[卡片映射](../inventory/runtime-interaction-ui-reference.md)及[交互记录](i04-native-interaction-ui-result.json)。本批继续接入Core委派会话查看器：原BaseUI1.7.0抽屉/Runtime静态图标、父页面仍可操作、单层替换/嵌套退层/右滑关闭、共享审批/问题/执行过程，Core User get仅增确切child活动只读投影；完整history仍用原signed cursor。见[查看器映射](../inventory/delegation-viewer-ui-reference.md)及[本批记录](i04-delegation-viewer-result.json)。原同库Core owner与隔离Renderer分别取证，未产生84正式场景新增通过。
 
 下一队列保持有限且按依赖推进：Grok修改意见原User输入/队列与生命周期衔接；Core委派查看器的完整产品挂载、接管后原聊天/材料和控制入口；Codeg另一类Runtime原生子代理只读读取与查看器；真实Core/运输/原生Host往返、完整原生格式/Runtime/平台矩阵。两类查看器来自Codeg，融合正文复用Rovai已有组件，此处纠正上一检查点“原Rovai查看器”的误称。隐藏但保留会话时抽屉隐藏/恢复、完整原会话正文同场景仍在候选资格内。T02/T03/T04其他原包继续，完整一期81簇/48包/324场景不缩减。阶段集齐才冻候选集中构建和Actions，用户I12后使用软件验收，当前不要求客户执行工程检查。

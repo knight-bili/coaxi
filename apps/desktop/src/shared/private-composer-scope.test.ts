@@ -3,6 +3,16 @@ import type { RovaiApi, SingleChatComposerScope } from '@contracts'
 import { matchesPrivateComposerScope, readScopedPrivateChat } from './private-composer-scope'
 
 describe('私聊材料能力与归属', () => {
+  it('独立帮手只读取专用已接管会话投影，旧能力缺失时不尝试单聊降级', async () => {
+    const request = vi.fn().mockResolvedValueOnce(snapshot()).mockResolvedValueOnce({ conversation: { id: 'private-a', threadId: 'thread-a' }, draft: {} })
+    const api = { request } as Pick<RovaiApi, 'request'>
+    await expect(readScopedPrivateChat(api, 'thread-a', 'private-a', scope, 'delegation_child')).resolves.toEqual(snapshot())
+    await expect(readScopedPrivateChat(api, 'thread-a', 'private-a', scope, 'delegation_child')).rejects.toThrow('scope_capability_required')
+    expect(request.mock.calls).toEqual([
+      ['delegations.conversation.get', { conversationId: 'private-a', composerScope: scope }],
+      ['delegations.conversation.get', { conversationId: 'private-a', composerScope: scope }]
+    ])
+  })
   const scope: SingleChatComposerScope = { kind: 'canvas', boardId: 'board-a', nodeId: 'node-a' }
   const snapshot = () => ({
     conversation: { id: 'private-a', threadId: 'thread-a' },

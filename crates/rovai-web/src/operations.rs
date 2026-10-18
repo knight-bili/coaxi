@@ -131,6 +131,8 @@ pub enum Operation {
     RuntimeInteractionResolve,
     #[serde(rename = "delegations.composer.get")]
     DelegationComposerGet,
+    #[serde(rename = "delegations.conversation.get")]
+    DelegationConversationGet,
     #[serde(rename = "delegations.message.send")]
     DelegationMessageSend,
     #[serde(rename = "delegations.takeover")]
@@ -606,6 +608,7 @@ impl Operation {
             Self::RuntimeInteractionGet => "runtime.interactions.get",
             Self::RuntimeInteractionResolve => "runtime.interactions.resolve",
             Self::DelegationComposerGet => "delegations.composer.get",
+            Self::DelegationConversationGet => "delegations.conversation.get",
             Self::DelegationMessageSend => "delegations.message.send",
             Self::DelegationTakeover => "delegations.takeover",
             Self::DelegationCancel => "delegations.cancel",
@@ -898,6 +901,7 @@ mod tests {
                 "runtime.interactions.resolve",
             ),
             ("delegations.composer.get", "delegations.composer.get"),
+            ("delegations.conversation.get", "delegations.conversation.get"),
             ("delegations.message.send", "delegations.message.send"),
             ("delegations.takeover", "delegations.takeover"),
             ("delegations.cancel", "delegations.cancel"),

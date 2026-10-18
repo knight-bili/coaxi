@@ -15,7 +15,7 @@ const result = (placement: 'active' | 'retained'): StoredCommandResult => ({ sta
   commandId: 'fixture', commandType: 'single_chat.pending_input.edit', resultEntity: null, recordedAt: 'now' })
 const retained: RetainedPrivateInput = { id: 'saved', conversationId: 'private', scopeKey: '', revision: 1, body: '排队问题', attachments: [], quotes: [], updatedAt: 'now' }
 
-function fixture(body = '', values = new Map<string, unknown>()) {
+function fixture(body = '', values = new Map<string, unknown>(), selectedOrigin = origin) {
   let failPrepare = false, loseReply = false, recorded: StoredCommandResult | null = null
   let response = result(body ? 'retained' : 'active')
   let currentDraft = draft()
@@ -28,13 +28,14 @@ function fixture(body = '', values = new Map<string, unknown>()) {
   const identify = (value: StoredCommandResult, params?: unknown) => {
     const saved = [...values.entries()].find(([key]) => key.startsWith('single-chat-input-intent:'))?.[1] as { method?: string; params?: { commandId: string } } | undefined
     return { ...value, commandId: (params as { commandId?: string } | undefined)?.commandId ?? saved?.params?.commandId ?? value.commandId,
-      commandType: saved?.method === 'singleChat.send' ? 'single_chat.send' : saved?.method === 'singleChat.composerDraft.mutate' ? 'single_chat.composer_draft.mutate' : value.commandType }
+      commandType: saved?.method?.startsWith('delegations.') ? saved.method : saved?.method === 'singleChat.send' ? 'single_chat.send' : saved?.method === 'singleChat.composerDraft.mutate' ? 'single_chat.composer_draft.mutate' : value.commandType }
   }
   const request = vi.fn(async (method: string, params?: unknown): Promise<unknown> => {
-    if (method === 'singleChat.get') return { ...snapshot(), draft: currentDraft }
-    if (method === 'singleChat.composerDraft.recovery') return page
+    if (method === 'singleChat.get' || method === 'delegations.conversation.get') return { ...snapshot(), draft: currentDraft }
+    if (method === 'singleChat.composerDraft.recovery' || method === 'delegations.composer.recovery') return page
     if (method === 'commands.reconcile') return recorded ? { state: 'recorded', result: recorded } : { state: 'unknown' }
-    if (method === 'singleChat.pendingInputs.edit' || method === 'singleChat.composerDraft.mutate' || method === 'singleChat.send') {
+    if (method === 'singleChat.pendingInputs.edit' || method === 'singleChat.composerDraft.mutate' || method === 'singleChat.send'
+      || method === 'delegations.message.send' || method === 'delegations.composer.mutate' || method === 'delegations.pendingInputs.edit') {
       if (delay) return new Promise(resolve => { continuation = value => { if (value.payload.draft) currentDraft = value.payload.draft as ReturnType<typeof draft>; resolve(identify(value, params)) } })
       if (loseReply) throw new Error('reply lost')
       if (response.payload.draft) currentDraft = response.payload.draft as ReturnType<typeof draft>
@@ -45,7 +46,7 @@ function fixture(body = '', values = new Map<string, unknown>()) {
   const client = { request: request as never, editingRecovery }
   const bodies = new SingleChatComposerStore(client, 'thread')
   if (body && !values.has('single-chat:thread')) bodies.update(() => ({ 'thread:private': body }))
-  const controller = new PrivateInputController(client, origin, bodies)
+  const controller = new PrivateInputController(client, selectedOrigin, bodies)
   return { controller, bodies, client, values, request, editingRecovery,
     failPrepare: (value: boolean) => { failPrepare = value }, loseReply: (value: boolean) => { loseReply = value },
     recorded: (value: StoredCommandResult) => { recorded = identify(value); if (value.payload.draft) currentDraft = value.payload.draft as ReturnType<typeof draft> }, response: (value: StoredCommandResult) => { response = value },
@@ -53,6 +54,71 @@ function fixture(body = '', values = new Map<string, unknown>()) {
     page: (value: typeof page) => { page = value } }
 }
 const writes = (f: ReturnType<typeof fixture>) => f.request.mock.calls.filter(([method]) => method === 'singleChat.pendingInputs.edit' || method === 'singleChat.composerDraft.mutate' || method === 'singleChat.send')
+
+const childOrigin: PrivateInputOrigin = { ...origin, conversationKind: 'delegation_child' }
+it('独立帮手使用确切Core入口、编辑端原版本与规范回执，不通过原单聊接口升级', async () => {
+  const f = fixture('接管后的新要求', new Map(), childOrigin)
+  await f.controller.refresh()
+  await f.controller.mutate({ type: 'register_scope' })
+  await f.controller.edit(item, { type: 'delete' }, null)
+  await f.controller.send('接管后的新要求')
+  expect(f.request.mock.calls.some(([method]) => method.startsWith('singleChat.'))).toBe(false)
+  expect(f.request).toHaveBeenCalledWith('delegations.conversation.get', { conversationId: 'private', composerScope: null })
+  const send = f.request.mock.calls.find(([method]) => method === 'delegations.message.send')![1] as { command: Record<string, unknown> }
+  expect(send.command).toEqual({ conversationId: 'private', expectedRevision: 2, body: '接管后的新要求' })
+  const edit = f.request.mock.calls.find(([method]) => method === 'delegations.pendingInputs.edit')![1] as { command: Record<string, unknown> }
+  expect(edit.command).toEqual({ conversationId: 'private', composerScope: null, pendingInputId: 'pending', expectedRevision: 3, editToken: null, action: { type: 'delete' } })
+  const mutation = f.request.mock.calls.find(([method]) => method === 'delegations.composer.mutate')![1] as { command: Record<string, unknown> }
+  expect(mutation.command).toMatchObject({ threadId: 'thread', conversationId: 'private', expectedDraftRevision: 2 })
+  expect(f.request).toHaveBeenCalledWith('delegations.composer.recovery', { conversationId: 'private', cursor: null, limit: 50 })
+  expect(f.bodies.getSnapshot().drafts['thread:private']).toBe('')
+})
+
+it('独立帮手发送丢回执后重启只核对原UUID和完整参数，核对成功才清原正文', async () => {
+  const f = fixture('原完整正文', new Map(), childOrigin)
+  f.loseReply(true)
+  await expect(f.controller.send('原完整正文')).rejects.toThrow('reply lost')
+  const original = structuredClone(f.request.mock.calls.find(([method]) => method === 'delegations.message.send')![1])
+  const restartedClient = { ...f.client }, restartedBodies = new SingleChatComposerStore(restartedClient, 'thread')
+  const restored = new PrivateInputController(restartedClient, childOrigin, restartedBodies)
+  await restored.recover()
+  expect(restored.getSnapshot().unknown).toBe(true)
+  expect(restartedBodies.getSnapshot().drafts['thread:private']).toBe('原完整正文')
+  expect(f.request.mock.calls.filter(([method]) => method === 'delegations.message.send')).toHaveLength(1)
+  expect(f.request).toHaveBeenLastCalledWith('commands.reconcile', { operation: 'delegations.message.send', params: original })
+  f.recorded({ ...result('active'), status: 'accepted', commandType: 'delegations.message.send' })
+  await restored.recover()
+  expect(restored.getSnapshot().pending).toBe(false)
+  expect(restartedBodies.getSnapshot().drafts['thread:private']).toBe('')
+  expect(f.request.mock.calls.filter(([method]) => method === 'delegations.message.send')).toHaveLength(1)
+})
+
+it('独立帮手拒绝错误命令族的回执并保留待核对输入', async () => {
+  const f = fixture('不能误清空', new Map(), childOrigin)
+  const original = f.request.getMockImplementation()!
+  f.request.mockImplementation(async (method, params) => {
+    const reply = await original(method, params)
+    return method === 'delegations.message.send' ? { ...reply as StoredCommandResult, commandType: 'single_chat.send' } : reply
+  })
+  await expect(f.controller.send('不能误清空')).rejects.toThrow('context_changed')
+  expect(f.controller.getSnapshot().pending).toBe(true)
+  expect(f.bodies.getSnapshot().drafts['thread:private']).toBe('不能误清空')
+})
+
+it('独立帮手持久原提交不能被改成单聊方法再恢复', async () => {
+  const f = fixture('保留原件', new Map(), childOrigin)
+  f.loseReply(true)
+  await expect(f.controller.send('保留原件')).rejects.toThrow()
+  const [key, value] = [...f.values.entries()].find(([key]) => key.startsWith('single-chat-input-intent:'))!
+  f.values.set(key, { ...value as object, method: 'singleChat.send' })
+  const client = { ...f.client }, bodies = new SingleChatComposerStore(client, 'thread')
+  const restored = new PrivateInputController(client, childOrigin, bodies)
+  expect(restored.getSnapshot().error?.message).toBe('private_input.recovery_invalid')
+  const calls = f.request.mock.calls.length
+  await expect(restored.recover()).rejects.toThrow('recovery_invalid')
+  expect(f.request.mock.calls).toHaveLength(calls)
+  expect(bodies.getSnapshot().drafts['thread:private']).toBe('保留原件')
+})
 
 it('迁入默认材料锁定当前正文和双版本，既有正文与默认正文均不移动', async () => {
   const f = fixture('默认问题')

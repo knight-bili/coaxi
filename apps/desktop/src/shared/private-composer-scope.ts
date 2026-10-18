@@ -1,4 +1,5 @@
 import type { RovaiApi, ScopedSingleChatSnapshot, SingleChatComposerScope } from '@contracts'
+import { privateConversationOperations, type PrivateConversationKind } from './private-conversation-operations'
 
 /** 只核对服务端能力与精确归属，不登记草稿或发送输入。 */
 export function matchesPrivateComposerScope(
@@ -22,10 +23,11 @@ export async function readScopedPrivateChat(
   api: Pick<RovaiApi, 'request'>,
   threadId: string,
   conversationId: string,
-  scope: SingleChatComposerScope | null
+  scope: SingleChatComposerScope | null,
+  kind?: PrivateConversationKind
 ): Promise<ScopedSingleChatSnapshot | null> {
   const frozen = scope === null ? null : { kind: 'canvas' as const, boardId: scope.boardId, nodeId: scope.nodeId }
-  const value = await api.request<unknown>('singleChat.get', { conversationId, composerScope: frozen })
+  const value = await api.request<unknown>(privateConversationOperations(kind).get, { conversationId, composerScope: frozen })
   if (value === null) return null
   if (!matchesPrivateComposerScope(value, threadId, conversationId, frozen)) {
     throw new Error('single_chat.scope_capability_required')

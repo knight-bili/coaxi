@@ -20,8 +20,8 @@ export function PrivatePendingEditor({ item, session, controller, bodies, busy, 
   const client = useThreadClient()
   const fileInput = useRef<HTMLInputElement>(null)
   const uploads = useMemo(() => privateUploadController(client.singleChatAttachments,
-    { threadId: controller.origin.threadId, conversationId: controller.origin.conversationId, composerScope: controller.origin.scope },
-    { kind: 'single_chat_pending', conversationId: controller.origin.conversationId, pendingInputId: item.id,
+    { ...(controller.origin.conversationKind === 'delegation_child' ? { conversationKind: 'delegation_child' as const } : {}), threadId: controller.origin.threadId, conversationId: controller.origin.conversationId, composerScope: controller.origin.scope },
+    { kind: controller.origin.conversationKind === 'delegation_child' ? 'delegation_child_pending' : 'single_chat_pending', conversationId: controller.origin.conversationId, pendingInputId: item.id,
       editToken: session.editToken, ...(controller.origin.scope ? { composerScope: controller.origin.scope } : {}) }),
     [client, controller, item.id, session.editToken])
   const uploadState = useSyncExternalStore(uploads.subscribe, uploads.getSnapshot, uploads.getSnapshot)
@@ -44,7 +44,10 @@ export function PrivatePendingEditor({ item, session, controller, bodies, busy, 
     </label>
     {session.workingAttachments.length > 0 && <div className="single-chat-pending-attachments">{session.workingAttachments.map(attachment => <AttachmentCard
       key={attachment.id} attachment={attachment} disabled={busy || uploadBusy || session.recoveryRequired}
-      locator={controller.origin.scope ? { owner: 'single_chat_scoped_pending_edit', threadId: controller.origin.threadId,
+      locator={controller.origin.conversationKind === 'delegation_child' ? { owner: 'delegation_child_pending_edit', threadId: controller.origin.threadId,
+        conversationId: controller.origin.conversationId, composerScope: controller.origin.scope,
+        pendingInputId: item.id, editToken: session.editToken, attachmentRefId: attachment.id }
+        : controller.origin.scope ? { owner: 'single_chat_scoped_pending_edit', threadId: controller.origin.threadId,
         conversationId: controller.origin.conversationId, composerScope: controller.origin.scope,
         pendingInputId: item.id, editToken: session.editToken, attachmentRefId: attachment.id }
         : { owner: 'single_chat_pending_edit', threadId: controller.origin.threadId, conversationId: controller.origin.conversationId,

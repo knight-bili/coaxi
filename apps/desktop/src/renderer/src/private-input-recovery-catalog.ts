@@ -3,6 +3,7 @@ import type { ThreadClient } from './camp-client'
 import { canvasComposerContext, canvasComposerContextKey, parseCanvasComposerContext, type CanvasComposerContext } from './canvas-composer-drafts'
 import type { CanvasViewScope } from './canvas-view-state'
 import { privateInputBodyIndex, type PrivateInputOrigin } from './private-input-controller'
+import { privateConversationOperations } from '../../shared/private-conversation-operations'
 import { singleChatComposerStore, type SingleChatComposerState } from './single-chat-composer-store'
 
 export interface PrivateRecoveryLocation {
@@ -43,7 +44,8 @@ export class PrivateInputRecoveryCatalog {
     const prefix = `${this.origin.threadId}:${this.origin.conversationId}`
     for (const entry of Object.values(privateInputBodyIndex(this.client))) {
       const source = entry.origin
-      if (source.threadId !== this.origin.threadId || source.conversationId !== this.origin.conversationId) continue
+      if (source.threadId !== this.origin.threadId || source.conversationId !== this.origin.conversationId
+        || (source.conversationKind ?? 'single_chat') !== (this.origin.conversationKind ?? 'single_chat')) continue
       const context = source.contextKey === 'default' ? undefined : parseCanvasComposerContext(source.contextKey) ?? invalid()
       if (context && (context.host !== this.view.host || context.core !== this.view.core)) continue
       if ((context && (context.threadId !== source.threadId || (context.conversationId !== null && context.conversationId !== source.conversationId)
@@ -72,8 +74,8 @@ export class PrivateInputRecoveryCatalog {
       this.publish({ loading: true, error: null })
       if (restart) this.enumerated = new Map()
       this.publish({ locations: this.merge() })
-      const page = await this.client.request<PrivateComposerRecoveryResult>('singleChat.composerDraft.recovery', {
-        threadId: this.origin.threadId, conversationId: this.origin.conversationId, cursor: restart ? null : this.state.nextCursor, limit: 50
+      const page = await this.client.request<PrivateComposerRecoveryResult>(privateConversationOperations(this.origin.conversationKind).recovery, {
+        ...(this.origin.conversationKind === 'delegation_child' ? {} : { threadId: this.origin.threadId }), conversationId: this.origin.conversationId, cursor: restart ? null : this.state.nextCursor, limit: 50
       })
       for (const item of page.items) if (item.kind === 'scope') {
         this.location(item.scope)
