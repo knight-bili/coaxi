@@ -1,0 +1,12 @@
+{
+  "name": "overlayscrollbars",
+  "version": "2.15.1",
+  "integrity": "sha512-glX26JwjL+Tkzv0JNOWdW4VozP5dGXO+Wx8+TPrdTEJTSYT/8eJS8yXM+fewjU0nFq/JeCa+X+BqABNjC4YZSA==",
+  "bytes": 747224,
+  "license": "MIT",
+  "licenseSource": {
+    "url": "https://raw.githubusercontent.com/KingSora/OverlayScrollbars/ade6e45d84e434355e075ed58add75c431eb3b3e/LICENSE",
+    "gitHead": "ade6e45d84e434355e075ed58add75c431eb3b3e",
+    "sha256": "e15ad22c5d4a4e4d63ddfe8cf1993e9fecfcf87dd320a701daa939d55beeefbc"
+  }
+}

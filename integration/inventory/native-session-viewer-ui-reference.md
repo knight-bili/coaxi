@@ -53,3 +53,13 @@ Codeg 固定 aff1e6c278453ed8d0b96a5f664edcdca621aa3f，Rovai 固定 cc465dda562
 自审发现Badge少了原SVG尺寸样式，以及旧提取方式拆断含 `&`/`>` 的选择器；已补完整原Badge基础类并改用TS字符串节点提取，实测图标12px。原primary接入实际存在的Rovai `--brand`，反馈列表仅局部补原Tailwind列表reset；不修改App全局样式，也不裁掉Markdown列表。原Badge/Button/Markdown/i18n仍是明确宿主接缝，不把参考夹具称为完整原App。
 
 82项定向、19组生产Renderer实际检查和15组普通工具/搜索/Diff回归通过；类型检查0错误、CodeGraph已sync。产品4张与固定原组件2张截图已检查（两主题；产品含390px窄屏）。运输是显式替身，无真实Core/Host/Native/Web/模型资格；完整原App、帮手主卡/collab、委派/恢复、问答/后台、图片和真实链路仍在原有限剩余中。详见[本批记录](../execution/i04-native-specialized-status-result.json)。
+
+## 帮手、问答、分组与细滚动接续（2026-10-19）
+
+- 原 `agent-tool-call`、`collab-agent-card`、`agent-capsule`、`subagent-session-button`、`tool-group-part`、`ask-question-result-card`、完整 `AskQuestionCard` 与原控件/纯解析已接；18个完整文件保持原函数体/JSX（仅模块导入及Radix聚合导出改等价叶模块），5个原问答类型完整加入，8组双语原文案一致。`Reasoning` 的9个状态/计时/触发声明保持原版；`ReasoningContent` 外层类/props沿原版，正文明确用Rovai SafeMarkdown，不伪造Streamdown插件已接入或资格完整原Markdown/HTML性能。
+- 原历史问答控制是只读：标签含逗号、多选和补充文字、无完整问题仍可恢复的答案、忽略结果、键盘切换均由原组件呈现。原交互组件完整保留；实际提交入口继续既有Core运行交互，不把历史记录卡变成新的发送端。
+- 原 `session-viewer-host` 与独立Dialog回退都接同一Core查看器宿主。显示编号仅是候选；点击时重新与当前读取中已签发的后代引用相交，校验宿主可见及Runtime，错误在当前卡内显示。卡片的live提示不决定可读权限或轮询状态；Core返回值拥有真源。多个帮手的有效目的地全部可达，名称键名单不生成会话入口。
+- 原 `ScrollArea`（OverlayScrollbars）替换早期div接缝，保留延迟初始化、真实viewport回调、横/纵事件、移开自动收起以及原6px/悬停8px主题。问答原生滚动使用源fallback的thin规则；仅局部补Tailwind段落reset以消除浏览器默认间隔，SafeMarkdown原有无layer样式保留。库的body环境探针CSS保留原唯一选择器；所有可见控件CSS限定在codeg-native-rich，不启用供体整页滚动器，不隐藏内容。
+- 八个固定直接依赖、十五个新增lock包节点；795个既有包/快照及旧importer保持。26个所需包发布物逐项SRI核验，MIT许可保留，未执行生命周期脚本或全量重装。原shadcn 3.8.4状态CSS只作构建输入，未引入其CLI/runtime；无React副本。
+
+87项定向、28组实际产品Renderer、普通工具/Diff与前批专用卡回归，类型检查及源码审计详见[工程记录](../execution/i04-native-agent-question-result.json)。实际生产与固定原组件分别4张双主题截图已检查；原参考也用同份真实适配后的数据，明确宿主接缝。受控只读运输不资格真实Core/Host/Native/Web、真实模型、全局原App或完整恢复矩阵；客户仍仅在I12工程后使用软件验收。完整四包21簇84场景不减，新增正式通过0。

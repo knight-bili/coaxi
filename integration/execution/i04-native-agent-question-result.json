@@ -1,0 +1,819 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-18T17:41:43.072792+00:00",
+  "stage": "I04",
+  "task": "I04-T01",
+  "branch": "develop/V1.0.0",
+  "baseline_commit": "893e14e06e6719684b86ba6e7f3fe5152cf54cb4",
+  "status": "source_agent_collab_question_tool_group_and_scroll_area_integrated_local_verified_remaining_delegation_and_stage_candidate_pending",
+  "scope_preserved": {
+    "source_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_packages": 4,
+    "i04_clusters": 21,
+    "i04_formal_cases": 84,
+    "new_formal_cases_passed": 0
+  },
+  "facts": {
+    "source_ast_body_equal_complete_files": 18,
+    "original_question_types": 5,
+    "original_reasoning_state_declarations": 9,
+    "original_bilingual_catalog_scopes": 8,
+    "original_question_card_readonly_history": true,
+    "original_tool_group_default_collapsed": true,
+    "original_overlay_scroll_area_with_real_viewport_and_xy_events": true,
+    "source_scrollbar_px": 6,
+    "source_scrollbar_hover_px": 8,
+    "all_verified_multi_child_destinations_reachable": true,
+    "roster_name_keys_never_session_ids": true,
+    "session_navigation_requires_current_core_descendant_reference_runtime_and_host_visibility": true,
+    "raw_input_output_meta_stats_preserved": true,
+    "core_authority_unchanged": true,
+    "new_answer_or_execution_ipc": 0,
+    "new_rust_owners": 0
+  },
+  "dependencies": {
+    "direct_pinned_packages": {
+      "@radix-ui/react-progress": "1.1.10",
+      "@radix-ui/react-radio-group": "1.4.1",
+      "@radix-ui/react-checkbox": "1.3.5",
+      "@radix-ui/react-label": "2.1.10",
+      "@radix-ui/react-slot": "1.3.3",
+      "class-variance-authority": "0.7.1",
+      "overlayscrollbars": "2.15.1",
+      "overlayscrollbars-react": "0.5.6"
+    },
+    "new_package_nodes": 15,
+    "existing_packages_and_snapshots_preserved": 795,
+    "published_tarballs_sri_verified": 26,
+    "all_new_snapshot_references_closed": true,
+    "single_existing_root_react": true,
+    "multi_version_license_evidence_packages": 2,
+    "licenses": "exact publisher MIT texts; each multi-version license and SRI retained",
+    "source_state_css": {
+      "name": "shadcn",
+      "version": "3.8.4",
+      "integrity": "sha512-pSad/m1+PGzB0aLsRBV0EkyGg9al1nJqYUuucg6d8v8xZspPZ5/ehGNEp5M4b1KQYqdO5/gGPbkhVbgmXqG9Pw==",
+      "url": "https://registry.npmjs.org/shadcn/-/shadcn-3.8.4.tgz",
+      "sourcePath": "package/dist/tailwind.css",
+      "cssSha256": "146941ac3ff65496fdf1cb306e697255328e4dadc7c105d66e36bb031b00f6d6",
+      "usage": "source data-state variants only; no shadcn Runtime or CLI dependency"
+    },
+    "lifecycle_scripts_run": 0,
+    "full_reinstall": false,
+    "global_config_modified": false,
+    "clean_install_and_public_ci_qualified": false
+  },
+  "seams": [
+    "ReasoningContent outer original classes/props; body uses existing Rovai SafeMarkdown, without source Streamdown plugins or full Markdown/HTML qualification",
+    "Original Radix monolith imports mapped to equivalent pinned leaf namespaces; original bodies unchanged",
+    "Rovai locale and native Button; full original Badge and OverlayScrollbars ScrollArea now replace early minimal seams",
+    "Source session host and standalone dialog fallback join shared Core viewer; no donor DB, store, filesystem reader or execution authority",
+    "Visible scroll/control CSS scoped to codeg-native-rich; only library unique invisible body measurement probe selectors global"
+  ],
+  "verification": {
+    "targeted_files": 6,
+    "targeted_tests_passed": 87,
+    "typecheck_exit": 0,
+    "source_ast_types_reasoning_and_catalog_audit": true,
+    "production_renderer_groups": 28,
+    "ordinary_tools_search_diff_renderer_regression_groups": 16,
+    "previous_specialized_status_renderer_regression_groups": 19,
+    "product_screenshots": 4,
+    "original_component_screenshots": 4,
+    "visual_review": "all 8 final screenshots inspected individually; night wide and day narrow product, fixed original components with same adapted data; no pixel-equivalence/full-App claim",
+    "transport": "explicit synthetic read-only Core transport; production Renderer, actual CDP keyboard, actual Overlay viewport, pointer resize and navigation",
+    "source_reference_full_app": false,
+    "real_core_native_web_end_to_end": false,
+    "real_runtime_or_model": false,
+    "live_question_submission_qualified": false,
+    "docs_gates": [
+      {
+        "name": "docs-tests",
+        "exit": 0
+      },
+      {
+        "name": "docs-version",
+        "exit": 0
+      },
+      {
+        "name": "docs-base",
+        "exit": 0
+      },
+      {
+        "name": "codegraph-sync",
+        "exit": 0
+      }
+    ],
+    "public_actions_dispatched": 0
+  },
+  "self_review_fixes": [
+    "53 invalid donor React/types lock references detected before commit, repaired by named peer boundary canonicalization and dependency-value normalization; all new graph edges verified closed",
+    "Preserved two multi-version publisher licenses instead of overwriting same-name notice",
+    "Replaced early div scrolling seam with full original OverlayScrollbars implementation and exact original theme",
+    "Scoped each CSS selector individually, preserved original invisible environment probe and layered paragraph reset",
+    "Reference fixture now consumes same actual adapted payload; normalized Windows module IDs to avoid duplicate Context",
+    "UI harness uses real CDP keyboard and test-process-only software capture; regression targets actual Overlay viewport, no assertions weakened",
+    "Only generated comment trailing whitespace trimmed after renderer pass; CSS declarations unchanged"
+  ],
+  "remaining": [
+    "original delegated/resumed main cards and background query/status groups; actual statistics, complete Markdown/HTML interactions and live Core question/recovery matrix",
+    "original image gallery/zoom/copy/download and full original App same-scene comparisons",
+    "actual Core.handle -> Native/Web -> production UI stage candidate, clipped top-level fields, scale/memory/per-page reauthorization/recovery",
+    "Claude full parser/producer/Core association, Qoder independent root/producer, explicit legacy import, Grok feedback and original T02/T03/T04 union/recovery/memory/automation",
+    "original ansi-to-react complete license evidence or replacement before public binary distribution"
+  ],
+  "current_stage_completed": false,
+  "app_goal_status": "active_verified_after_user_card_resume",
+  "push": false,
+  "main_merge": false,
+  "release": false,
+  "paid_usage": false,
+  "approved_r1_artifacts": [
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    },
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    }
+  ],
+  "source_files": [
+    {
+      "path": "apps/desktop/src/renderer/src/NativeSessionViewer.tsx",
+      "sha256": "3a120672c99a9abbcc385a038848cb87454c4014f282b90ed20620d1903e049d",
+      "git_blob_with_filters": "1e1b1b34375c550a943ab3bf2a6e53a188b8ec13"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/types.ts",
+      "sha256": "74593f9c9e7a33a570f596f0ec67d5722551d4097ab1e395d3022e2a7bb9e97f",
+      "git_blob_with_filters": "a6dc5c54bee4515367c2c78dab2fbe6a41060b6b"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/source-rich.css",
+      "sha256": "570337eeb6a3e5eb651f757bbe8a267f2bad2d31068dc382d0ac143158ed76db",
+      "git_blob_with_filters": "a102527688aea15ca6d2d56009737cdefb7eb26b"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/readonly-tool-card.tsx",
+      "sha256": "ca20084c82f8bd17567debd7f9807958a3e2cd95b6bcb0caadb234202ab8c734",
+      "git_blob_with_filters": "ae1fcefadd846874670b039e239dc9f4439d906a"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-copy.json",
+      "sha256": "7b6e0c2c4a0b0ad56032fbf929c3bf258ec483a042277c8fc1db9bf825f32352",
+      "git_blob_with_filters": "3f59176d4391094a0d2898bd150ef395d1bb1400"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-primitives.tsx",
+      "sha256": "2bcb22f5801099bc4798ce5989e3df1badf3d2e8c1492ba9cb188a0ee039e527",
+      "git_blob_with_filters": "3d3fb84819e2623be586a0af9080f0778bee9c11"
+    },
+    {
+      "path": "integration/README.md",
+      "sha256": "a9149bfbdf27b6baa37be1c287686df8fa5c268350760786dd2e958c0d217d66",
+      "git_blob_with_filters": "f3fe3db34306d388fda3ed49b76cac3752b14ece"
+    },
+    {
+      "path": "integration/execution/goal-state.json",
+      "sha256": "29be39d8ac11bbbe44dc6a678aa96f95001bd0d9810f33f00f665e85ac77132f",
+      "git_blob_with_filters": "310e1aeab5f5d1316f7218f6fd8f7c4249edd650"
+    },
+    {
+      "path": "integration/inventory/native-session-viewer-ui-reference.md",
+      "sha256": "f2906f3e1a17049448801de6c73da9d524430151ae441c6bc45ce697a25187f0",
+      "git_blob_with_filters": "7d56e30b735cac669452444ea2e0a742b6c4ae56"
+    },
+    {
+      "path": "package.json",
+      "sha256": "65a57c8c7866d7f0df14f2310b5687a37dcad20088989ad394abd67c84d341af",
+      "git_blob_with_filters": "e34b2475ada9014d3594d6d448b59272759d2b1e"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "4d677fdac515529c2fda42a972780c33f8a1dd71d5a589223a98b046015b6371",
+      "git_blob_with_filters": "1c0c7db769ad625e6a390c0f4873beb7fcdf55bc"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/reasoning.tsx",
+      "sha256": "bb532f8f121ec57db62a220252be667f0cecca8c1aa41a8dc3542a756bede5bf",
+      "git_blob_with_filters": "a7f192c8c29695e195997cc03098d8f39f09c843"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/ask-question-card.tsx",
+      "sha256": "19aead54fb54b9f08a9e44fc5e4da803cfa95f0f2f5b3834ac0fb862114bffa6",
+      "git_blob_with_filters": "e49534e8a947baaf30719cd0aec082da3c7a73d9"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/agent-capsule.tsx",
+      "sha256": "e07c285d1ba31eff20ce49fa1173408d2f5db96103b1df548fbc7e90cf99835d",
+      "git_blob_with_filters": "88bab06dce337c527466ff09e0b77f84206e6c9a"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/agent-tool-call.tsx",
+      "sha256": "2130baaa8c492a47e6ec5c4b609b29748135b2220c83f26714377df1b5549aed",
+      "git_blob_with_filters": "c099d60e82ab05a02d412e4a17dbae58950ae587"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/ask-question-result-card.tsx",
+      "sha256": "954155d21360e2d2c6d95b0a67e80fdfb8ce18d6505407315377dbf117ee85c3",
+      "git_blob_with_filters": "a396c20cc629e77aed5cd64a8e005f3f3148d826"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/collab-agent-card.tsx",
+      "sha256": "b9055956da71a94c70aeb188bc2f6ed5e9432b3c467095868aacfd0d9fe2ee1f",
+      "git_blob_with_filters": "b4ae71ff236906f31c772ad4a8750963a73a41fa"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/subagent-session-button.tsx",
+      "sha256": "b595c293fca1a83a09def63728bcbe67e7f2c470e9b0915799bc7f1c269ccd17",
+      "git_blob_with_filters": "3c292f0c4c4ac903bc76063693ae7f0d929d060f"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/tool-group-part.tsx",
+      "sha256": "b2db2b1404de08007504cc755930420f7c32c6a9153c453ee37d019f35839d61",
+      "git_blob_with_filters": "7f139d4f9e66c93e4dbb467ffcbd3cedf2a3a17a"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/badge.tsx",
+      "sha256": "6b35aa9c8cfc8eba80f5459e6513cd7e4b657b48936b53646d4491e3b406a338",
+      "git_blob_with_filters": "df7e459b8ed6f1883edc78f14818559b19b47be6"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/checkbox.tsx",
+      "sha256": "e980e1b08d1f015db11d3268965c13fb476bccd71ae24c53fbb0d9ebf45c16dd",
+      "git_blob_with_filters": "7233d0c2a97802e51a01f6e468d53c7a45bda6ae"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/label.tsx",
+      "sha256": "b1bac3e9351577d28123f5ef6aa113e56040288e733b252b791b694a04c69161",
+      "git_blob_with_filters": "716b27db21e91aca770eefa99c0dbdc0d9829f2d"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/progress.tsx",
+      "sha256": "b072a17abbaf0dff593dee0a185e411b5cbd7ac0bdf293e3c10e3ac8b74c1726",
+      "git_blob_with_filters": "0ae876f12b59a4492fcc5f57c845c7b674b4aff2"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/radio-group.tsx",
+      "sha256": "1d4027750ae71bd00bffe11414de825625dd6391647094383955a78a19727974",
+      "git_blob_with_filters": "4b1a1103214f6d108166cb14cf51d8f67e03ef05"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/scroll-area.tsx",
+      "sha256": "41c218dbc7429ae1353efc66764646157897cf47e8373c5425fe8e5e1c11ef13",
+      "git_blob_with_filters": "ca1abe8440212b35e715cf6cd24b855bd111d0a0"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/tabs.tsx",
+      "sha256": "e5c09410d087c97aa800167c0df3ed2198b1376bb3da317d4cffda1baeca2798",
+      "git_blob_with_filters": "4932060ae66003936c8be04987b6ebed8cec0573"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/ask-question.test.ts",
+      "sha256": "5d5360b231baea8276ac498fc68b3e01964f2dd0c07171ed51906caff86bb70f",
+      "git_blob_with_filters": "c2711ed6726826355aed399d0c6d931af578046f"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/ask-question.ts",
+      "sha256": "03891004793b75e4f7441d63d49a01bfb61a88caacb4ffff390b8101b5924c62",
+      "git_blob_with_filters": "8bfcb8a0ef9c993952912a7a0bd053e5375a0e42"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/background-agent.test.ts",
+      "sha256": "1e8bd6759ffcbce23c3c806d1ef70f3f7a918566d097cea1af19adc8369fe207",
+      "git_blob_with_filters": "ec1dc30e74c1c70b5890391ea736a44d654cf850"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/background-agent.ts",
+      "sha256": "088986ee09b6aad4a7515f73718b28c82cdd9ee7922cb04588896b74e3cf4682",
+      "git_blob_with_filters": "45a1b0e72a87e07d5a232b588b1ec28f0c6fe08e"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-session-actions.tsx",
+      "sha256": "3356d55f2f9f4dfdcb23850561d263947601a2a5edb74be323a80348e1d04d93",
+      "git_blob_with_filters": "328838efe763867b5140c54fec49417181e0abdc"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-primitive/LICENSE",
+      "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "git_blob_with_filters": "a18858fb7b014098cba85703e66609be66a26ef5"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-primitive/source.json",
+      "sha256": "d451339dfd0cca9494251451c8ed165f125123d06fdb7821bef26ad3f4788d3e",
+      "git_blob_with_filters": "0caada5326b1da80093665e123709a78600d0b0e"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-checkbox/LICENSE",
+      "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "git_blob_with_filters": "a18858fb7b014098cba85703e66609be66a26ef5"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-checkbox/source.json",
+      "sha256": "41d0069c237d31be09ebc5627c7f6e913dbe0b5d40fcffa0309a7a24bfc6b458",
+      "git_blob_with_filters": "046a577efd2a6f35a70db8d0ab506552526750f7"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-collection/LICENSE",
+      "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "git_blob_with_filters": "a18858fb7b014098cba85703e66609be66a26ef5"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-collection/source.json",
+      "sha256": "da013e2e947d0af2755c49803a8bab641b75319ac7ee817384ce28f7c9b938f0",
+      "git_blob_with_filters": "0a524bbaf593a5a259eddab6699cce6e85f0ea51"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-compose-refs/LICENSE",
+      "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "git_blob_with_filters": "a18858fb7b014098cba85703e66609be66a26ef5"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-compose-refs/LICENSE-1.1.3",
+      "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "git_blob_with_filters": "a18858fb7b014098cba85703e66609be66a26ef5"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-compose-refs/LICENSE-1.1.5",
+      "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "git_blob_with_filters": "a18858fb7b014098cba85703e66609be66a26ef5"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-compose-refs/source.json",
+      "sha256": "4064a0a99a3d3d0ee9f82d91411a35b1e487ff9718f6023c71e2406009c7f758",
+      "git_blob_with_filters": "642ca5164e8ca9290343367909c370814570a592"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-compose-refs/versions.json",
+      "sha256": "8007cedc1767b26149e1f05f283fa7d6d4e3052390233d14048e40ee6f5185ee",
+      "git_blob_with_filters": "e4d85c14adad50256f9a61b5dbf8862b28ff8ffe"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-context/LICENSE",
+      "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "git_blob_with_filters": "a18858fb7b014098cba85703e66609be66a26ef5"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-context/source.json",
+      "sha256": "4fab8d96bbbbd387e2fdacef95aacfc1e49809421094c28a562cee4e0b81b9dd",
+      "git_blob_with_filters": "eac424ea1903d8171eddce224d03f944a91d8432"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-direction/LICENSE",
+      "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "git_blob_with_filters": "a18858fb7b014098cba85703e66609be66a26ef5"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-direction/source.json",
+      "sha256": "d4260f65411e5d3bd2adf6dcaac5da04181b246bef4a88b77e62bb3b8d75b961",
+      "git_blob_with_filters": "aeb1022adca2c051e1cc53c5b6ac7f5640c175e7"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-id/LICENSE",
+      "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "git_blob_with_filters": "a18858fb7b014098cba85703e66609be66a26ef5"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-id/source.json",
+      "sha256": "96127b60c27a40774c81f6c3118e9dbac6ba9720924c2fbddba07aade6039069",
+      "git_blob_with_filters": "86241881265de836ce45af317e4e0d61d658a1fc"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-label/LICENSE",
+      "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "git_blob_with_filters": "a18858fb7b014098cba85703e66609be66a26ef5"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-label/source.json",
+      "sha256": "e66254420f04242804c0afa640ef69755146837acc1348870496ee3be4a648fd",
+      "git_blob_with_filters": "35670c27b175f996f6445d54d30552c82c31c262"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-presence/LICENSE",
+      "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "git_blob_with_filters": "a18858fb7b014098cba85703e66609be66a26ef5"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-presence/source.json",
+      "sha256": "e7e5dfba3b42fc223201b4248b38f006c248413511f6dd0154c58e5c5c5a28a5",
+      "git_blob_with_filters": "22ed2052a96f81f91b2c854c8e5a5e0b31c4a41e"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-primitive/LICENSE",
+      "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "git_blob_with_filters": "a18858fb7b014098cba85703e66609be66a26ef5"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-primitive/source.json",
+      "sha256": "c32b8793be4a181006a020b1e5ff08aa18afc41aa033ac2e5b67801e5d9f1438",
+      "git_blob_with_filters": "9e4e578f5652ef02e0838327052f4d78fbb4a030"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-progress/LICENSE",
+      "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "git_blob_with_filters": "a18858fb7b014098cba85703e66609be66a26ef5"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-progress/source.json",
+      "sha256": "59e3a4444e71844ddea3566a9098c8acb318445dfad6392e42725adad22c37ec",
+      "git_blob_with_filters": "db17678768a9b6b6c9c76b047111ec68b3a07d32"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-radio-group/LICENSE",
+      "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "git_blob_with_filters": "a18858fb7b014098cba85703e66609be66a26ef5"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-radio-group/source.json",
+      "sha256": "d6414b4dc9a6cb73d10f46d7f55ae2610886836d47375d934e2ea116b843028a",
+      "git_blob_with_filters": "73ee71203d381fd49c1fab1754354634da719807"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-roving-focus/LICENSE",
+      "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "git_blob_with_filters": "a18858fb7b014098cba85703e66609be66a26ef5"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-roving-focus/source.json",
+      "sha256": "473a82893822a0ae6a7ba68999770c752284efa4db65b639ec77e2b6a259ce49",
+      "git_blob_with_filters": "f397e9b3cf33224e4958b9828a8f973a98513b40"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-slot/LICENSE",
+      "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "git_blob_with_filters": "a18858fb7b014098cba85703e66609be66a26ef5"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-slot/LICENSE-1.3.0",
+      "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "git_blob_with_filters": "a18858fb7b014098cba85703e66609be66a26ef5"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-slot/LICENSE-1.3.3",
+      "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "git_blob_with_filters": "a18858fb7b014098cba85703e66609be66a26ef5"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-slot/source.json",
+      "sha256": "aa0cdd2e4fbdb9c5b60cc434a7ef91a7e10dccae0829561ede463079eb3fedf8",
+      "git_blob_with_filters": "ea4162ea2636b1f38206344c670fbbd020f3e72c"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-slot/versions.json",
+      "sha256": "ed8a5810800bca0a703d3ed6cac3b2dbca70b3026869972f46b75c8dd2d4f52f",
+      "git_blob_with_filters": "a46311c0748cbb205bcd29e6a2c0db2513aa9a32"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-use-callback-ref/LICENSE",
+      "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "git_blob_with_filters": "a18858fb7b014098cba85703e66609be66a26ef5"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-use-callback-ref/source.json",
+      "sha256": "3a7583eb1e96968508d87db12b958f641e387f3ef45743f930537dc8d987fabe",
+      "git_blob_with_filters": "bc15916f60464a826d53b97aa7d770b387752df7"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-use-previous/LICENSE",
+      "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "git_blob_with_filters": "a18858fb7b014098cba85703e66609be66a26ef5"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-use-previous/source.json",
+      "sha256": "962f4e4d4c6fbddd6dd04e12321dff0b4ecf306ca9e4f8559612d7ad72bbed16",
+      "git_blob_with_filters": "4ee6635f9249f4569d2a9797ef93bac8809a20d7"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-use-size/LICENSE",
+      "sha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "git_blob_with_filters": "a18858fb7b014098cba85703e66609be66a26ef5"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/@radix-ui-react-use-size/source.json",
+      "sha256": "25492a988562fbbbea8198d250ffc600ab1486506174a87838913ce808713958",
+      "git_blob_with_filters": "73629b8d71f6fc3779e29ea9cb9f12983203709d"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/class-variance-authority/LICENSE",
+      "sha256": "0ccbf956cffc8dcf515809433cb5242ee67c94513d46e48c261d68d0880de406",
+      "git_blob_with_filters": "380ac719506bc4a8e2dfb75349c8d4b448d4b5b1"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/class-variance-authority/source.json",
+      "sha256": "e24a8a9dc3b18bb4ef5dd3a55f7cffc5614bca865c1cd1e96e987303a014f7cf",
+      "git_blob_with_filters": "8d25915af7066a98f12cafc0a681bc065cb13aa9"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/clsx/license",
+      "sha256": "9a9edad7baae52622bddf3c15b2ef8a33d2c89f2d25408ad13e8a7481c6b0c97",
+      "git_blob_with_filters": "fa6089faba3cf381229744c9f21ed3ae9ed5014a"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/clsx/source.json",
+      "sha256": "9b834b1a690c1c07e1be5b399ec5b5c30090d52cfe932dafcb0a7f2ac6f2eb87",
+      "git_blob_with_filters": "ed5ce8818e027c4dafcad549d0e7a16973963c2f"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/overlayscrollbars-react/LICENSE",
+      "sha256": "e15ad22c5d4a4e4d63ddfe8cf1993e9fecfcf87dd320a701daa939d55beeefbc",
+      "git_blob_with_filters": "bf9c8bd985a12c95e5636fa6a7fedd1376263476"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/overlayscrollbars-react/source.json",
+      "sha256": "4fcf8d67b8031f450caf67da8adf307c941a1e965253011fe469bef8a6959699",
+      "git_blob_with_filters": "3f2c654ed1d78988c58e876c5fd7e1fbcf6d6103"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/overlayscrollbars/LICENSE",
+      "sha256": "e15ad22c5d4a4e4d63ddfe8cf1993e9fecfcf87dd320a701daa939d55beeefbc",
+      "git_blob_with_filters": "bf9c8bd985a12c95e5636fa6a7fedd1376263476"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/overlayscrollbars/source.json",
+      "sha256": "4e8977619af6a4540ebcc47398d59c24afe5dad5628c04e016e18cfe1633bf20",
+      "git_blob_with_filters": "5bc0943b0deb3861ffcfe0821913c041d5cc8c67"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/shadcn-css/LICENSE.md",
+      "sha256": "1564074e13439397221ffd522e2e504d56561994a23d371aa5e3ad43e4f5423f",
+      "git_blob_with_filters": "fad4d887a681dd49233e5ed01ee2c7a1513089a0"
+    },
+    {
+      "path": "integration/licenses/native-tool-ui/shadcn-css/source.json",
+      "sha256": "d391b4012b80ea5f5d5f1721c20c7d204be7f09e420301ca47b762ffaa910ef4",
+      "git_blob_with_filters": "628ee4488bbb4a35837f23a17b2e750a46c0376d"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "file/I04帮手与问答/build-source-style.mjs",
+      "bytes": 8004,
+      "sha256": "a57ab74f87422ef4d52f3a5dcdf561c8223e54c1de34c513211c8bf59e8a39fa"
+    },
+    {
+      "path": "file/I04帮手与问答/card-data.ts",
+      "bytes": 4773,
+      "sha256": "97f766dbea5ef10606c71dd23f36658fd76f659bfe5acac2d51933de729e5b63"
+    },
+    {
+      "path": "file/I04帮手与问答/dependencies.mjs",
+      "bytes": 9328,
+      "sha256": "505a76b83e0607ba4f914ee66c54d7fa0d424b8ab3c812c8543fe2ef25e204a4"
+    },
+    {
+      "path": "file/I04帮手与问答/ordinary-main.cjs",
+      "bytes": 9242,
+      "sha256": "503907f2b783d546e6e4e98d8043d51d7801277abcb02c70292194c9156075cf"
+    },
+    {
+      "path": "file/I04帮手与问答/port-reasoning.mjs",
+      "bytes": 2855,
+      "sha256": "3139582ea27c27f48694ef61d6c28f427eed8a715abcb09186d3231808d515bc"
+    },
+    {
+      "path": "file/I04帮手与问答/port.py",
+      "bytes": 3855,
+      "sha256": "48ecb7f1841e250534134eef381fac9d9ef2a6b1c93ee64854b78aff1ba91287"
+    },
+    {
+      "path": "file/I04帮手与问答/postverify.py",
+      "bytes": 2801,
+      "sha256": "8a70b9f90a69703c23d0cfcd6969752243d52571b041ea1863cbd42a04b007e8"
+    },
+    {
+      "path": "file/I04帮手与问答/prepare-record.py",
+      "bytes": 9547,
+      "sha256": "9347af091546083694219c574b72f561d5955cc2a01ddfb5aad878e65f2d73cb"
+    },
+    {
+      "path": "file/I04帮手与问答/reference-main.cjs",
+      "bytes": 2631,
+      "sha256": "c129fa04d647b2641534ed135b8dfb5b037bfd359e855df41dfb138dd9aabcbf"
+    },
+    {
+      "path": "file/I04帮手与问答/reference-renderer.tsx",
+      "bytes": 1850,
+      "sha256": "1ace5edc4219201186a67b0e1f7c91b3dd205ec77f5208b2bd01ff8e4bf05f63"
+    },
+    {
+      "path": "file/I04帮手与问答/render-ordinary-regression.mjs",
+      "bytes": 1730,
+      "sha256": "f49486819e9860842fbff69987981371ad58bfc0eea60bcd3c3d78020edfd11e"
+    },
+    {
+      "path": "file/I04帮手与问答/render-reference.mjs",
+      "bytes": 4432,
+      "sha256": "bc08283993f3a3f8a759587eb90bf6515551b6f0f44a59a3beb00c802c34e57a"
+    },
+    {
+      "path": "file/I04帮手与问答/render-status-regression.mjs",
+      "bytes": 1706,
+      "sha256": "f1310bb8c0d1f1c2730ba1da3eef3a16da816ca7a08fe3162028171b009f5d18"
+    },
+    {
+      "path": "file/I04帮手与问答/render-tools.mjs",
+      "bytes": 2027,
+      "sha256": "c0dd6ea568fd4d10f4fa43e8475ddcc64b70edee1fd6163df566692129057e71"
+    },
+    {
+      "path": "file/I04帮手与问答/renderer.tsx",
+      "bytes": 4205,
+      "sha256": "26f669c5bd8fbbe8943ff7301bc2d2e6fe918cd2664283fe96a52d998d6ce95f"
+    },
+    {
+      "path": "file/I04帮手与问答/source-audit.mjs",
+      "bytes": 4062,
+      "sha256": "3bb9320b8ce8c1e26cfbf5a0e03fe7ab5f1a0465aaee5e04995b9110a83bc234"
+    },
+    {
+      "path": "file/I04帮手与问答/source-css.mjs",
+      "bytes": 2165,
+      "sha256": "13fca5a405400e6ed58158a028907523e630d175abc8c215d9a179b9fa3d115d"
+    },
+    {
+      "path": "file/I04帮手与问答/tools-main.cjs",
+      "bytes": 11062,
+      "sha256": "82751d1bbac2389dd7641e28c3091699b735ca14b59dd898173aa906fdaac78d"
+    },
+    {
+      "path": "file/I04帮手与问答/types.mjs",
+      "bytes": 1147,
+      "sha256": "799a8f09d56a60a4aeb1a57afe375410490ad65c158cdda212357bc842df3ea6"
+    },
+    {
+      "path": "file/I04帮手与问答/verify-dependencies.mjs",
+      "bytes": 3348,
+      "sha256": "7c68e85a365a26e6a81c766c434f82dcbdb50a58d2a646bf1f378dcb32e688d9"
+    },
+    {
+      "path": "file/I04帮手与问答/verify-docs.ps1",
+      "bytes": 1229,
+      "sha256": "a19de5390de010dd43d9d592f4f28b6045f12fd33dcdd712a34e8dc96a948756"
+    },
+    {
+      "path": "file/I04帮手与问答/logs/source-audit.json",
+      "bytes": 7899,
+      "sha256": "edcec6929db37a24343544ac28ca8d00308118bd004e329d7cfabb579e24bc75"
+    },
+    {
+      "path": "file/I04帮手与问答/logs/ui-result.json",
+      "bytes": 4198,
+      "sha256": "ea44621945288689d3ffa06a2d104f37bd4ab672a8cf9df24ad40d9aa8b42ae8"
+    },
+    {
+      "path": "file/I04帮手与问答/logs/ordinary-regression.json",
+      "bytes": 3125,
+      "sha256": "7d635f2baadf9b3d7d318181063c3f68b7c1e88343ba65dd8165795ddea9ce33"
+    },
+    {
+      "path": "file/I04帮手与问答/logs/status-regression.json",
+      "bytes": 2581,
+      "sha256": "05ae3b27d723a3a99873afbbc2aeef308d6747d4df8fdc072a1dec6aaf9502d1"
+    },
+    {
+      "path": "file/I04帮手与问答/logs/reference-ui.json",
+      "bytes": 964,
+      "sha256": "1410b25290025e656b71a4b225cb722da5790110a5bd84914081fdee980db0d5"
+    },
+    {
+      "path": "file/I04帮手与问答/logs/dependencies.json",
+      "bytes": 9745,
+      "sha256": "d52c5b3c0e69689f18f78b8fdf9a4e37613e1c2de40a05bca18475a2d621ec66"
+    },
+    {
+      "path": "file/I04帮手与问答/logs/dependency-verification.json",
+      "bytes": 2492,
+      "sha256": "448c4d0c4f4a3553dd6f68a22bf06bc9c0de6472bf0fe19b5f8cd7e8382625c5"
+    },
+    {
+      "path": "file/I04帮手与问答/logs/dependency-before.json",
+      "bytes": 13148,
+      "sha256": "51b32f9f20fdec5ecdd038f465e4efcdc63e47ce55facc00578daf3579f13cd4"
+    },
+    {
+      "path": "file/I04帮手与问答/logs/dependency-before-lock.yaml",
+      "bytes": 295361,
+      "sha256": "1af716b7561c295c4f19e2e410f7cf90af8bf3217e8ba13ce405a839e1bd34ce"
+    },
+    {
+      "path": "file/I04帮手与问答/logs/source-css.json",
+      "bytes": 435,
+      "sha256": "d391b4012b80ea5f5d5f1721c20c7d204be7f09e420301ca47b762ffaa910ef4"
+    },
+    {
+      "path": "file/I04帮手与问答/logs/reasoning-port.json",
+      "bytes": 723,
+      "sha256": "17fef7a6f3a3798b699a050266f82c0240d76ce0e72f804ad3af41311d16fd3a"
+    },
+    {
+      "path": "file/I04帮手与问答/logs/source-port.json",
+      "bytes": 6785,
+      "sha256": "f730f86bc3e5cb47e73dcc68931f5c4773781ec51e3f492ecd3c4a50c9d2c615"
+    },
+    {
+      "path": "file/I04帮手与问答/logs/style-generation.json",
+      "bytes": 4518,
+      "sha256": "826b254116e6318971a4971be3ebcf2f69fe9de87b613064a315a68eac57f80b"
+    },
+    {
+      "path": "file/I04帮手与问答/logs/tests.log",
+      "bytes": 498,
+      "sha256": "a6ff549ad45bac2bd9e7287fcaab99c8c9a9c07bd4f640b1415b91c1bd38ddf1"
+    },
+    {
+      "path": "file/I04帮手与问答/logs/types.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "file/I04帮手与问答/logs/docs-checks.json",
+      "bytes": 222,
+      "sha256": "96450883a2ab502dd6adbd7b2f41fbab28adfc2ccee410e9e99eeb779ebcb70d"
+    },
+    {
+      "path": "file/I04帮手与问答/logs/docs-tests.log",
+      "bytes": 921,
+      "sha256": "03152cfc6ededa786216cf7a1a82637427a790f93d5f953c3552c66acf2b1218"
+    },
+    {
+      "path": "file/I04帮手与问答/logs/docs-version.log",
+      "bytes": 79,
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "file/I04帮手与问答/logs/docs-base.log",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "file/I04帮手与问答/logs/codegraph-sync.log",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "file/I04帮手与问答/drafts/product/cards-day-question.png",
+      "bytes": 67723,
+      "sha256": "79053e75ed6b048e4eb3d5e79123bb71e8f580612340eb703f84cf295673af18"
+    },
+    {
+      "path": "file/I04帮手与问答/drafts/product/cards-day-agent.png",
+      "bytes": 69428,
+      "sha256": "bda7e20f96a2d13f834f2c4e12ed4d8238f1de5885b28cdf1d9542749daa7b3d"
+    },
+    {
+      "path": "file/I04帮手与问答/drafts/product/cards-night-question.png",
+      "bytes": 101673,
+      "sha256": "59c18ab82671912960d343a02558ceaf2514b2f065aca65e9afd1d35396765c5"
+    },
+    {
+      "path": "file/I04帮手与问答/drafts/product/cards-night-agent.png",
+      "bytes": 108902,
+      "sha256": "5f77fcb7f1478be3a7eaa6c5657913a4743afab0e6d05132f99ed96eb17232ba"
+    },
+    {
+      "path": "file/I04帮手与问答/drafts/reference/source-day-question.png",
+      "bytes": 40615,
+      "sha256": "a6aa1bf41159b25193ffce0bff26f9707c13c76c7c7a6f90e1abeb13e05b026f"
+    },
+    {
+      "path": "file/I04帮手与问答/drafts/reference/source-day-agent.png",
+      "bytes": 46316,
+      "sha256": "073c1fb88a62a02aebc0264a7fb176d666ab8de6d899ddcd6df424656c61a4c9"
+    },
+    {
+      "path": "file/I04帮手与问答/drafts/reference/source-night-question.png",
+      "bytes": 40360,
+      "sha256": "2f649bfeb354df7cc98d355d574ac5be7c462e72b0bd865ef1525cbec74aa23e"
+    },
+    {
+      "path": "file/I04帮手与问答/drafts/reference/source-night-agent.png",
+      "bytes": 47439,
+      "sha256": "6ca07198ca7662d69c2606a65a6108285b41fe9782abccdffea73b5ec0d1b990"
+    }
+  ]
+}

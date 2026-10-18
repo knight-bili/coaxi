@@ -1,0 +1,9 @@
+{
+  "name": "shadcn",
+  "version": "3.8.4",
+  "integrity": "sha512-pSad/m1+PGzB0aLsRBV0EkyGg9al1nJqYUuucg6d8v8xZspPZ5/ehGNEp5M4b1KQYqdO5/gGPbkhVbgmXqG9Pw==",
+  "url": "https://registry.npmjs.org/shadcn/-/shadcn-3.8.4.tgz",
+  "sourcePath": "package/dist/tailwind.css",
+  "cssSha256": "146941ac3ff65496fdf1cb306e697255328e4dadc7c105d66e36bb031b00f6d6",
+  "usage": "source data-state variants only; no shadcn Runtime or CLI dependency"
+}

@@ -306,3 +306,51 @@ export interface PlanEntryInfo {
 // --- LiveSessionSnapshot wire types (mirror src-tauri/src/acp/session_state.rs) ---
 
 export type ToolCallStatus = "pending" | "in_progress" | "completed" | "failed"
+
+
+// --- ask_user_question (mirror of Rust `crate::acp::question`) ---
+
+/** One selectable choice in an `ask_user_question` (mirror of `QuestionOption`). */
+export interface QuestionOption {
+  label: string
+  description: string
+}
+
+
+/** A single multiple-choice question (mirror of Rust `QuestionSpec`). `id` is
+ *  the backend-minted correlation key the answer is submitted against. Empty
+ *  `options` means free-text: the card renders only its "Other" input (codex
+ *  elicitation / MCP-server forms ask open questions this way). `is_secret`
+ *  masks that input (absent on the wire for non-secret sources). */
+export interface QuestionSpec {
+  id: string
+  question: string
+  header: string
+  multi_select: boolean
+  options: QuestionOption[]
+  is_secret?: boolean
+}
+
+
+/** Awaiting-answer question set on the session (mirror of `PendingQuestionState`). */
+export interface PendingQuestionState {
+  question_id: string
+  questions: QuestionSpec[]
+  created_at: string
+}
+
+
+/** One question's answer submitted to `acp_answer_question`. `labels` carries
+ *  the selected option labels plus any free-text "Other" the user typed. */
+export interface QuestionAnswerItem {
+  questionId: string
+  labels: string[]
+}
+
+
+/** The full submission to `acp_answer_question`. `declined` is set when the
+ *  user dismissed the card without choosing. */
+export interface QuestionAnswer {
+  answers: QuestionAnswerItem[]
+  declined: boolean
+}

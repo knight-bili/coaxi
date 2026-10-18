@@ -33,6 +33,12 @@ import { ToolCallPart as OrdinaryToolCallPart } from './codeg-native-content/com
 import { NativeFileActionsProvider } from './codeg-native-content/ui/native-file-actions'
 import { ReadonlyToolCard, readonlyToolCardKind } from './codeg-native-content/ui/readonly-tool-card'
 import { DelegationStatusGroupCard } from './codeg-native-content/components/message/delegation-status-group-card'
+import { ToolGroupPart } from './codeg-native-content/components/message/tool-group-part'
+import { AgentToolCallPart } from './codeg-native-content/components/message/agent-tool-call'
+import { CollabAgentCard } from './codeg-native-content/components/message/collab-agent-card'
+import { SubagentSessionButton } from './codeg-native-content/components/message/subagent-session-button'
+import { NativeSessionActionsProvider, type SourceSessionTarget } from './codeg-native-content/ui/native-session-actions'
+import { COLLAB_AGENT_TOOL_NAME } from './codeg-collab-tool'
 import { useOptionalFilePreview } from './FilePreviewContext'
 import './codeg-native-content/source-rich.css'
 
@@ -120,6 +126,11 @@ function NativeTranscriptBody({ turns, reader, target, live }: { turns: NativeTr
     const original = raw?.type === 'tool_use' ? results.get(raw) : undefined
     const result: ToolResult | undefined = original ? { ...original, images: undefined } : part.output !== undefined || part.errorText !== undefined
       ? { type: 'tool_result', tool_use_id: part.toolCallId, output_preview: part.errorText ?? part.output ?? null, is_error: part.state === 'output-error', agent_stats: part.agentStats ? { ...part.agentStats } : null } : undefined
+    if (name.toLowerCase() === 'agent' || name.toLowerCase() === COLLAB_AGENT_TOOL_NAME) return <NativeAgentSourceTool key={key} part={part} reader={reader} target={target} childIds={nativeToolChildren(use, result)}>
+      {name.toLowerCase() === 'agent'
+        ? <AgentToolCallPart part={part} renderToolCall={(child, childKey) => tool({ ...child, agentStats: undefined, agentTranscript: undefined }, childKey)} />
+        : <CollabAgentCard input={part.input ?? null} errorText={part.errorText ?? null} state={part.state} />}
+    </NativeAgentSourceTool>
     // Dedicated agent/interaction cards retain their existing child-session route
     // until their fixed source components are ported in the next finite batch.
     const specialized = /^(agent|task|collab_agent|delegate_to_agent|check_delegation|cancel_delegation|resume_delegation|ask_user_question|check_user_feedback)$/.test(name.toLowerCase())
@@ -135,7 +146,7 @@ function NativeTranscriptBody({ turns, reader, target, live }: { turns: NativeTr
     if (part.type === 'proposed-plan') return <PlanMarkdownCard key={key} markdown={part.markdown.trim()} label={planText('title')} emptyLabel={planText('planning')} />
     if (part.type === 'goal-run') return <GoalRunPart key={key} part={live ? part : { ...part, isRunning: false }} renderPart={(child, childKey) => renderPart(child, childKey, user)} />
     if (part.type === 'tool-call') return tool(part, key)
-    if (part.type === 'tool-group') return <div className="native-session-part-group" key={key}>{part.items.map((item, index) => tool(item, `${key}:${index}`))}</div>
+    if (part.type === 'tool-group') return <ToolGroupPart key={key} part={part} renderItem={tool} />
     if (part.type === 'delegation-status-group') return <div className="native-session-source-tool" key={key}><DelegationStatusGroupCard polls={part.polls} />{part.polls.map(item => <NativeRawTool key={item.toolCallId} part={item} />)}</div>
     if (part.type === 'background-task-group') return <div className="native-session-part-group" key={key}>{part.polls.map((item, index) => tool(item, `${key}:${index}`))}</div>
     if (part.type === 'tool-result') return <NativeTool key={key} result={{ type: 'tool_result', tool_use_id: part.toolCallId, output_preview: part.errorText ?? part.output, is_error: part.state === 'output-error', agent_stats: part.agentStats ? { ...part.agentStats } : null }} reader={reader} target={target} live={false} />
@@ -150,6 +161,24 @@ function NativeTranscriptBody({ turns, reader, target, live }: { turns: NativeTr
 }
 function NativeSourceTool({ part, children }: { part: AdaptedToolCallPart; children: React.ReactNode }): React.JSX.Element {
   return <div className="native-session-source-tool">{children}<NativeRawTool part={part} /></div>
+}
+function NativeAgentSourceTool({ part, reader, target, childIds, children }: { part: AdaptedToolCallPart; reader: NativeChildReader; target: NativeSessionTarget; childIds: string[]; children: React.ReactNode }): React.JSX.Element {
+  const t = useUiText(), host = useContext(NativeSessionViewerContext)
+  const [unavailable, setUnavailable] = useState(false)
+  const open = useCallback((request: SourceSessionTarget): void => {
+    const source = reader.child(request.sessionId)
+    if (!host?.visible || request.agentType !== target.runtime || !source) { setUnavailable(true); return }
+    setUnavailable(false)
+    host.open({ ...target, identity: `${target.identity}:${request.sessionId}`, parentConversationId: `native-view:${target.identity}`,
+      source, subtitle: request.description || `#${request.sessionId.slice(-8)}` }, document.activeElement instanceof HTMLElement ? document.activeElement : undefined)
+  }, [reader, target, host])
+  // A multi-agent source capsule deliberately has no one-child header action.
+  // Keep every verified destination reachable instead of choosing the first.
+  const destinations = childIds.length > 1 ? childIds.filter(id => reader.child(id)) : []
+  return <NativeSourceTool part={part}><NativeSessionActionsProvider open={open}>{children}
+    {destinations.map(id => <div className="native-session-open-child" key={id}><span>#{id.slice(-8)}</span><SubagentSessionButton onClick={() => open({ kind: 'agentSession', sessionId: id, agentType: target.runtime, subagentType: null, description: null })} /></div>)}
+    {unavailable && <p className="native-session-note is-error" role="alert">{t(readMessage('native_child.child_unavailable'))}</p>}
+  </NativeSessionActionsProvider></NativeSourceTool>
 }
 function NativeRawTool({ part }: { part: AdaptedToolCallPart }): React.JSX.Element {
   const t = useUiText()

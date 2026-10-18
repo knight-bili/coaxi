@@ -2,6 +2,8 @@
 
 当前唯一开发分支为 **`develop/V1.0.0`**，跟踪同名origin分支；一期全部阶段在此累计，不再建立阶段分支。I12工程与客户软件使用验收全部通过后，仍须客户明确指令才合入main。详见[单分支约定](branch-policy.md)。
 
+- [I04 原版帮手、问答、分组与细滚动](execution/i04-native-agent-question-result.json)：原Agent/collab胶囊、完整只读问答/工具分组与Overlay细滚动已接；87项定向、28组产品窗口通过，原函数体和状态/文案可追溯。打开下级仍走Core签发引用；完整委派/恢复/后台、图片和真实链路继续，I04未收口。
+
 - [I04 原版压缩、反馈、MCP 与委派状态卡](execution/i04-native-specialized-status-result.json)：四类只读专用卡及合并查询已接生产页；82项定向、19组实际窗口与15组普通工具回归通过。原函数体/JSX与7组双语文案核对通过，帮手主卡、问答/后台、图片和真实两端候选继续；I04未收口。
 
 - [I04 原版普通工具、搜索与 Diff](execution/i04-native-ordinary-tools-result.json)：完整普通分支、搜索分组、统一/左右 Diff 和 Core 原生文件来源已接；149 项定向通过、1 项原有平台跳过、原文件 owner 及 15 组生产 Renderer 检查通过。专用卡片接续见上条；图片与真实两端候选验证继续，I04 未收口。

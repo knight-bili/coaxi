@@ -1,0 +1,12 @@
+{
+  "name": "overlayscrollbars-react",
+  "version": "0.5.6",
+  "integrity": "sha512-E5To04bL5brn9GVCZ36SnfGanxa2I2MDkWoa4Cjo5wol7l+diAgi4DBc983V7l2nOk/OLJ6Feg4kySspQEGDBw==",
+  "bytes": 12376,
+  "license": "MIT",
+  "licenseSource": {
+    "url": "https://raw.githubusercontent.com/KingSora/OverlayScrollbars/e0ad5d026909b85d10e9ed0f7605cddd067408c9/LICENSE",
+    "gitHead": "e0ad5d026909b85d10e9ed0f7605cddd067408c9",
+    "sha256": "e15ad22c5d4a4e4d63ddfe8cf1993e9fecfcf87dd320a701daa939d55beeefbc"
+  }
+}

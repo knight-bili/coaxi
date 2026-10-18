@@ -452,6 +452,74 @@
       "expand": "展开全部反馈",
       "collapse": "收起",
       "errorTitle": "反馈检查失败"
+    },
+    "Folder.chat.contentParts.toolGroup": {
+      "search": "搜索 {count} 次",
+      "command": "运行 {count} 个命令",
+      "read": "读取 {count} 次文件",
+      "memory": "回忆 {count} 项记忆",
+      "edit": "编辑 {count} 次文件",
+      "fetch": "抓取 {count} 个资源",
+      "think": "思考 {count} 次",
+      "todo": "更新 {count} 项待办",
+      "task": "执行 {count} 个任务",
+      "other": "调用 {count} 个工具",
+      "errorSuffix": "{count} 个失败",
+      "joiner": " · "
+    },
+    "Folder.chat.askQuestionResult": {
+      "title": "提问",
+      "answeredLabel": "提问回答：",
+      "awaiting": "等待你的回答…",
+      "declined": "你已忽略此问题 — 代理已自行判断。",
+      "noSelection": "未选择"
+    },
+    "Folder.chat.askQuestion": {
+      "title": "智能体需要你的选择",
+      "subtitle": "回答后点击提交，可随时跳过",
+      "recommended": "推荐",
+      "other": "其他",
+      "otherPlaceholder": "输入你的回答…",
+      "singleSelect": "单选",
+      "multiSelect": "多选",
+      "skip": "跳过",
+      "next": "下一题",
+      "submit": "提交",
+      "submitError": "提交失败，请重试。",
+      "collapse": "折叠",
+      "expand": "展开"
+    },
+    "Folder.chat.backgroundTasks": {
+      "settledFallback": "后台任务已结束（{status}）",
+      "notifySettledOne": "{agent}：一个后台任务已结束",
+      "notifySettledMany": "{agent}：{count} 个后台任务已结束",
+      "cardRunning": "后台运行中",
+      "cardLaunchedPending": "已启动后台任务",
+      "cardCompleted": "后台任务已完成",
+      "cardFinishedWithStatus": "后台任务已结束（{status}）",
+      "cardResultPending": "结果尚未返回"
+    },
+    "Folder.chat.collabAgent": {
+      "title": "子智能体",
+      "errorTitle": "子智能体任务失败",
+      "statesLabel": "子智能体",
+      "statusRunning": "运行中",
+      "statusCompleted": "已完成",
+      "statusFailed": "失败",
+      "statusPending": "初始化中",
+      "statusInterrupted": "已中断",
+      "statusClosed": "已关闭",
+      "statusNotFound": "未找到",
+      "opSpawn": "启动子智能体",
+      "opWait": "获取子智能体结果",
+      "opClose": "结束子智能体",
+      "opResume": "恢复子智能体",
+      "opList": "查看子智能体"
+    },
+    "Folder.chat.reasoning": {
+      "thinking": "思考中…",
+      "thoughtForFewSeconds": "思考",
+      "thoughtForSeconds": "思考"
     }
   },
   "en": {
@@ -907,6 +975,74 @@
       "expand": "Show all feedback",
       "collapse": "Collapse",
       "errorTitle": "Feedback check failed"
+    },
+    "Folder.chat.contentParts.toolGroup": {
+      "search": "{count, plural, one {Explored # search} other {Explored # searches}}",
+      "command": "{count, plural, one {Ran # command} other {Ran # commands}}",
+      "read": "{count, plural, one {Read files # time} other {Read files # times}}",
+      "memory": "{count, plural, one {Recalled # memory} other {Recalled # memories}}",
+      "edit": "{count, plural, one {Edited files # time} other {Edited files # times}}",
+      "fetch": "{count, plural, one {Fetched # resource} other {Fetched # resources}}",
+      "think": "{count, plural, one {Thought # time} other {Thought # times}}",
+      "todo": "{count, plural, one {Updated # todo} other {Updated # todos}}",
+      "task": "{count, plural, one {Ran # task} other {Ran # tasks}}",
+      "other": "{count, plural, one {Used # tool} other {Used # tools}}",
+      "errorSuffix": "{count, plural, one {# failed} other {# failed}}",
+      "joiner": " · "
+    },
+    "Folder.chat.askQuestionResult": {
+      "title": "Question",
+      "answeredLabel": "Q&A:",
+      "awaiting": "Waiting for your answer…",
+      "declined": "You dismissed this — the agent used its own judgment.",
+      "noSelection": "No selection"
+    },
+    "Folder.chat.askQuestion": {
+      "title": "The agent needs your input",
+      "subtitle": "Answer below, then submit. You can skip anytime.",
+      "recommended": "Recommended",
+      "other": "Other",
+      "otherPlaceholder": "Type your answer…",
+      "singleSelect": "Single",
+      "multiSelect": "Multiple",
+      "skip": "Skip",
+      "next": "Next",
+      "submit": "Submit",
+      "submitError": "Couldn't submit. Please try again.",
+      "collapse": "Collapse",
+      "expand": "Expand"
+    },
+    "Folder.chat.backgroundTasks": {
+      "settledFallback": "Background task finished ({status})",
+      "notifySettledOne": "{agent}: a background task finished",
+      "notifySettledMany": "{agent}: {count} background tasks finished",
+      "cardRunning": "Running in background",
+      "cardLaunchedPending": "Launched in background",
+      "cardCompleted": "Background task completed",
+      "cardFinishedWithStatus": "Background task finished ({status})",
+      "cardResultPending": "Result not returned yet"
+    },
+    "Folder.chat.collabAgent": {
+      "title": "Sub-agent",
+      "errorTitle": "Sub-agent task failed",
+      "statesLabel": "Sub-agents",
+      "statusRunning": "Running",
+      "statusCompleted": "Completed",
+      "statusFailed": "Failed",
+      "statusPending": "Starting",
+      "statusInterrupted": "Interrupted",
+      "statusClosed": "Closed",
+      "statusNotFound": "Not found",
+      "opSpawn": "Starting sub-agent",
+      "opWait": "Fetching sub-agent result",
+      "opClose": "Closing sub-agent",
+      "opResume": "Resuming sub-agent",
+      "opList": "Listing sub-agents"
+    },
+    "Folder.chat.reasoning": {
+      "thinking": "Thinking…",
+      "thoughtForFewSeconds": "Thought",
+      "thoughtForSeconds": "Thought"
     }
   }
 }
