@@ -14,7 +14,7 @@
   "current_branch": "phase/i04-collaboration-runtime",
   "base_branch": "phase/i02-skill-delivery",
   "current_task": "I04-T01",
-  "current_slice": "I04 原生提问/计划的持久存储、User接口及原ACP回调已接通；Windows隔离Core与真实受管Node假进程的耦合检查通过，覆盖双请求不阻塞、精确答复、原UUID不二发及Host Exited关闭。继续Grok修改反馈原User队列、安全阻塞摘要和原Codeg卡片/两查看器；真实模型/完整Host/UI与正式84场景未验。",
+  "current_slice": "I04 原生问题/计划已接父安全阻塞摘要、User详情和两类仅ID/版本事件；原父Binding鉴权的status等待、同题/无关唤醒去重、问题转计划及新问题唤醒通过受控ACP进程验证。Grok修改反馈与显式接管的衔接已定位设计边界，继续核定完整方案并推进固定Codeg卡片/两查看器及其余I04包；真实模型/完整Host/UI与正式84场景未验。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -40,8 +40,8 @@
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "native_user_interaction_controlled_acp_loop_verified_followup_queue_and_ui_pending",
-  "evidence": "i04-native-interaction-coupled-result.json",
+  "current_slice_status": "native_blocked_summary_and_status_wake_verified_grok_feedback_design_and_ui_pending",
+  "evidence": "i04-native-interaction-blocked-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
   "draft_restart_evidence": "i02-draft-restart-result.json",
@@ -258,5 +258,7 @@
   "i04_delegation_policy_bootstrap_source_commit": "6dc17b047b4c68b1d567ab23c1b597967d5cb01d",
   "i04_delegation_format35_evidence": "i04-delegation-format35-result.json",
   "i04_delegation_format35_source_commit": "f9384af4ca43273a477ffd51c605ac39cc0bc6c4",
-  "i04_native_interaction_coupled_evidence": "i04-native-interaction-coupled-result.json"
+  "i04_native_interaction_coupled_evidence": "i04-native-interaction-coupled-result.json",
+  "i04_native_interaction_blocked_evidence": "i04-native-interaction-blocked-result.json",
+  "i04_grok_feedback_boundary": "i04-grok-feedback-boundary.json"
 }

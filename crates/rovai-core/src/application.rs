@@ -10652,23 +10652,18 @@ impl Core {
                 )?;
                 let changed =
                     if !execution.replayed && execution.result.code == "interaction.resolved" {
-                        crate::runtime_interaction::storage::owner(
-                            database.connection(),
+                        Some(
                             execution.result.payload["interactionId"]
                                 .as_str()
-                                .context("interaction.result_invalid")?,
-                        )?
+                                .context("interaction.result_invalid")?
+                                .to_owned(),
+                        )
                     } else {
                         None
                     };
                 drop(database);
-                if let Some((thread_id, conversation_id)) = changed {
-                    emit(
-                        &self.output,
-                        "runtime.interaction.changed",
-                        json!({"threadId":thread_id,"conversationId":conversation_id,
-                        "interactionId":execution.result.payload["interactionId"],"version":execution.result.payload["version"]}),
-                    );
+                if let Some(id) = changed {
+                    runtime_interactions::changed(self, &id).await;
                 }
                 Ok(serde_json::to_value(execution.result)?)
             }

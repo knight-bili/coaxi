@@ -1,5 +1,6 @@
 //! Trusted ACP callback bridge. SQLite owns business state; this task owns only
 //! the original generation-local Runtime handle and prompt writer correlation.
+use super::runtime_interactions::changed;
 use super::*;
 use crate::{
     acp::user_reply::{Outcome, Target},
@@ -100,20 +101,6 @@ pub(super) async fn capture(
         drive(weak, runtime, target, generation, id).await;
     });
     Ok(())
-}
-
-async fn changed(core: &Core, id: &str) {
-    let owner = {
-        let db = core.database.lock().await;
-        storage::owner(db.connection(), id)
-    };
-    if let Ok(Some((thread, conversation))) = owner {
-        emit(
-            &core.output,
-            "runtime.interaction.changed",
-            json!({"threadId":thread,"conversationId":conversation,"interactionId":id}),
-        );
-    }
 }
 
 async fn drive(

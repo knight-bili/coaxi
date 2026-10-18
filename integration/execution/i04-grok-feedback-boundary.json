@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "status": "implementation_design_pending_no_customer_question_yet",
+  "recorded_date": "2026-10-18",
+  "source_baseline": "b1551dfa87a31e066768aeaaa403de98807c29f8",
+  "source_evidence": [
+    {
+      "path": "work/source-reference/codeg/src/components/conversations/conversation-detail-panel.tsx",
+      "source_commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+      "lines": [1680, 1744],
+      "finding": "RequestChanges先答keep_planning，再把修改意见作为普通User turn经lifecycleSend发送；原turn未结束时入mqEnqueue，空闲后发送。"
+    },
+    {
+      "path": "integration/proposals/native-delegation-r1.md",
+      "lines": [156, 164, 207, 211],
+      "finding": "已确认r1的普通child User followup要求显式takeover；三个Context mode仅initial/resume/user_followup，user_followup只消费接管后的当前User正文。Native提问/计划回答进入原等待者，不能由此推定为普通接管。"
+    },
+    {
+      "path": "crates/rovai-core/src/single_chat.rs",
+      "symbol": "SingleChatService::send_owned",
+      "finding": "现有delegation User队列和发送先核定ComposerOwner::DelegationChild的接管资格，并沿原完整草稿、引用、附件及FIFO准入；不能把计划答案伪装成已接管消息。"
+    },
+    {
+      "path": "docs/development/model-context-change-governance.md",
+      "lines": [8, 25, 49, 56],
+      "finding": "若衔接需新增Dynamic Context发送条件/选择/语义或Runtime Input Delivery Evidence，须先提供完整具体revision并取得用户确认；不沿用不同语义的r1确认。"
+    }
+  ],
+  "preserved_current_behavior": "原Grok修改意见、原命令和原生回复均保存在Core；begin_dispatch保留followup_registration_required围栏，当前未声称反馈已送达。",
+  "required_design_outcome": [
+    "修改意见作为原计划问题的User答案完整持久化和投递，保持对应child/Run/epoch/原Native Session，不隐式取得普通接管权",
+    "不改写初始task或复用其已接受输入；原生keep_planning与反馈的队列/发送/接受/未知/中断必须各有确切Core证据",
+    "防止先结算原attempt为完成导致反馈无主，或把反馈重复执行成新任务；取消、父停止、接管和重启明确失效/核对",
+    "保持固定Codeg RequestChanges的最终用户体验，既不静默丢意见，也不要求用户再次手工复制发送"
+  ],
+  "model_input_or_schema_change_implemented": false,
+  "automatic_takeover_implemented": false,
+  "customer_confirmation_requested": false,
+  "next_action": "先核定可审阅的完整输入/证据与生命周期方案；确需超出已确认r1时再生成故事版完整Word/PDF及具体revision供客户确认，同时继续原卡片/查看器等已授权工作。",
+  "scope_unchanged": "完整一期81簇/48包/324场景；I04四包21簇84场景，Grok反馈仍属一期必需项。"
+}

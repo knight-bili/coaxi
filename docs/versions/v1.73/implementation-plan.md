@@ -100,3 +100,11 @@ Core实际指针推进至v1.73/161/211，旧160是受支持来源，210仍独立
 新增一个slow-tests seam owner，转换/CAS/写端围栏仍归原较低层测试，不复制输入矩阵。测试准备中发现默认委派开关、Windows脚本执行身份/长路径及受控认证握手缺项，均修正假进程或使用原设置/文件身份登记入口；未放宽产品准入、伪造Ready或使用真实账号。失败日志保留。假进程脚本从精确源码位置复制到隔离目录，后续只改协议夹具无需重编Rust。
 
 Grok修改反馈原User队列、安全blocked_summary及原广播、固定Codeg卡片/两类查看器仍是下一有限队列；其余I04工作包、21簇和84正式场景不减少，本批正式场景新增通过0。完整一期81簇/48包/324场景及I12后客户使用验收保持。
+
+## 原生请求阻塞摘要与等待接续（2026-10-18）
+
+[本批记录](../../../integration/execution/i04-native-interaction-blocked-result.json)接通r1允许的question/plan_approval安全blocked_on及User详情blockedOn；原permission输出和优先级保持。最早仍live的pending请求可见，决定后消失，题目/计划正文/答案/Native ID不进入父模型摘要。沿原status cursor与广播，无关唤醒和同一问题不重复返回，队首处理后下一请求使等待结束；Native和User路径共用仅ID/版本的两类失效通知。
+
+扩原Context与受控ACP耦合两个owner，没有新增完整fixture或Rust测试函数。真实父Binding鉴权、原status等待、SQLite可取得、User详情、原Core事件输出，以及问题→计划→新问题的等待链路已验证；默认栈复验通过。测试栈溢出与Windows旧产物占用诊断保留，未提高默认栈或终止进程来取得最终通过。完整1256、真实模型/GUI/Host全链及平台矩阵未由这两个owner替代，正式84场景不计新增通过。
+
+Grok修改意见仍未完成。核对固定Codeg的lifecycleSend/mqEnqueue和已确认r1的显式接管/三种Context mode，发现不能直接把Native计划答案塞进普通接管后消息队列。具体[核查记录](../../../integration/execution/i04-grok-feedback-boundary.json)保留原来源、必需结果和设计待核定项；尚未改相关输入/Schema或发起新的客户确认。先核定完整衔接，再按仓库治理决定是否需要独立revision，同时继续已授权原卡片/查看器和其余I04包，不缩减该功能。

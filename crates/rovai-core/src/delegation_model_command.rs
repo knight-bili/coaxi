@@ -510,9 +510,12 @@ pub(crate) fn blocked_summary(
          WHERE x.agent_run_id=?1 AND x.source_agent_run_execution_epoch=?2 AND x.status='prepared' AND x.action_kind='runtime_permission_grant'
            AND p.status='pending' AND p.requested_for_user_id=?3 ORDER BY p.requested_at,p.id LIMIT 1",
         params![run,epoch,crate::current_user::CURRENT_USER_ID],|r|r.get(0)).optional()?;
-    Ok(permission.map(
-        |permission| json!({"kind":"permission","request_id":permission,"title":"需要用户授权"}),
-    ))
+    if let Some(permission) = permission {
+        return Ok(Some(
+            json!({"kind":"permission","request_id":permission,"title":"需要用户授权"}),
+        ));
+    }
+    crate::runtime_interaction::storage::blocked_summary(connection, run, epoch)
 }
 
 /// Only the current attempt's persisted final is a result. Never use the latest
@@ -556,7 +559,11 @@ pub(crate) fn task_report(connection: &Connection, id: &str, parent: &str) -> Re
                 report["message"] = json!("等待资源");
             }
             if let Some(blocked) = blocked_summary(connection, &run, epoch)? {
-                report["message"] = json!("等待用户授权");
+                report["message"] = json!(match blocked["kind"].as_str() {
+                    Some("question") => "等待用户回答",
+                    Some("plan_approval") => "等待用户确认计划",
+                    _ => "等待用户授权",
+                });
                 report["blocked_on"] = blocked;
             }
         }

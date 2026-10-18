@@ -32,4 +32,6 @@ User恢复以原UUID和持久父Conversation归属授权，允许父Run已经终
 
 原生交互的User读/答入口复用同一Core记录和Gateway：有界摘要列表与完整内容分开，Host派生CURRENT_USER，UI不重交问题或Native身份。全局User envelope使首次精确回执不依赖目标还存在；首次决定仍核定实际owner和live代次，不跳过Camp删除/失效检查。Native IPC/Web只逐项准入三接口，SSE只作安全失效通知；Web未知命令按Core interactionId隔离，原请求只读核对，不因连接丢失换号或自动发送。具体字段和当前证据边界见[User交互接口](../contracts/delegation-v1.md#user交互读取与答复接口)。原生回调、原队列反馈和卡片不由API登记推断完成。
 
+原TaskReport和User委派详情现从同一Core记录选择仍live且pending的question/plan_approval，只投影类型与请求编号；原permission优先级保持。完整问题、计划、答案与Native身份不进入父摘要。等待沿原签名cursor和广播，在User处理队首后观察下一个请求，同题和无关唤醒不重复返回；不持SQLite等待。Native与User变更共用安全runtime.interaction.changed和原delegation.changed失效通知，具体字段见[阻塞摘要合同](../contracts/delegation-v1.md#原生提问的安全阻塞摘要)。Grok修改意见与普通接管的衔接须继续核定，不能把该Native答案冒充普通新任务。
+
 原生User请求沿现有ACP listener和Host/Run/epoch/Session/prompt/delivery运输关联登记，后台等待只保留原生句柄与不可反序列化Target，不维护另一套业务状态。Core唯一请求记录及原Gateway答案决定是否可领取发送token；写端持原Host串行锁后重验仍活跃的确切输入，路由read guard保持到flush，数据库锁和User等待不跨原生I/O。半帧/超时先隔离writer，不把protocol-violated当OS进程已退出，再交原reap/cleanup资格。Host Exited只封当前代次对应Host/Run/epoch，恢复不重发。实现和证据边界见[原生回调合同](../contracts/delegation-v1.md#原生回调与串行答复)。[受控进程耦合记录](../../integration/execution/i04-native-interaction-coupled-result.json)补Windows原listener、同一Core/SQLite、真实受管假ACP进程与User分派的往返，包含双请求不阻塞、原UUID不重复发送和Host Exited封旧请求；这不等于完整Core main/Host启动、真实provider或平台资格。Grok修改意见的原队列及原卡片/查看器仍须完成。

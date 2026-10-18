@@ -220,4 +220,14 @@ process_agent_run_acp_message的Cursor ask_question/create_plan和Grok ask_user_
 
 Native Exited只按当前Core代次和确切Host/Run/epoch关闭所属请求；pending/resolved转closed，已领取发送的转delivery_unknown，重复关闭零写，不碰另一个Host或后来epoch。原路由失效也关闭该原请求，不替User生成批准或跳过。原生登记失败只返回受原路由围栏保护的通用RPC错误；若是同Host未结RPC冲突，先封旧请求，避免迟到User决定回应已拒绝的原生编号。
 
-当前组件证据为同库Core关闭围栏、内存AsyncWrite串行/半帧测试及原Grok分类回归；没有执行完整Core listener→真实/可控ACP进程→User端到端循环。Cursor既有未准入状态保持，Grok修改反馈原队列、原卡片、r1安全阻塞摘要与完整Runtime矩阵仍待。不能从代码接线或组件通过推断原生完整功能或I04阶段完成。
+当前有同库Core关闭围栏、内存AsyncWrite串行/半帧测试及Windows隔离Core listener→受管Node假ACP进程→Core User入口的[耦合证据](../../integration/execution/i04-native-interaction-coupled-result.json)；后续[阻塞等待记录](../../integration/execution/i04-native-interaction-blocked-result.json)增加真实父Binding鉴权的status等待、同请求去重、下一问题唤醒、User详情与安全事件检查。这不等于完整Core main/Host/HTTP/IPC、GUI、真实provider或逐平台资格。Cursor既有未准入状态保持，Grok修改反馈原队列、原卡片与完整Runtime矩阵仍待；不能据此授予I04阶段完成。
+
+### 原生提问的安全阻塞摘要
+
+r1的TaskReport.blocked_on与User详情blockedOn共用原Core摘要选择：原permission优先级和输出保持；没有待授权时，按原Run/epoch及created_at/id选择最早仍live且pending的question或plan_approval，只返回kind和request_id。摘要不含题目、计划正文、答案、工具调用ID或任何Native运输资料，原完整内容仍走User-only interaction get。首次决定后不再把resolved/dispatching/unknown/sent伪装成等待User作答。原Run、Binding、Input或Camp失效的待答记录不能显示为新的用户授权。
+
+沿用原status的签名cursor、先订阅再读、广播和无锁等待。观察标记仍只消费status/attempt及blocked kind/id；同一请求和无关唤醒不重复提前返回，处理队首后下一请求可使等待结束。已消费的输入不重发，原父鉴权/跨父unknown/接管范围保持。
+
+Native登记/关闭/答复和首次User决定共用Core失效通知：runtime.interaction.changed只含threadId/conversationId/interactionId/version；对应委派另发原delegation.changed，payload为threadId/conversationId/delegationId/interactionId/interactionVersion。version来自读取时的当前Core记录，不是原命令结果的替代回执；重放原User命令不主动重发失效通知。两类事件都不携带正文或凭据。旧完整160来源没有211对象时无原生阻塞；部分保留对象不按空状态吞错。
+
+本批不改变Bootstrap、Formatter35或新的User工作准入。Grok修改意见与显式接管的衔接见[核查记录](../../integration/execution/i04-grok-feedback-boundary.json)，仍为必需待实现项；本节不授权把计划回答变成隐式接管。

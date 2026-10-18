@@ -63,3 +63,45 @@ pub(crate) fn reconcile(database: &Database, value: Value) -> Result<Value> {
         .map(|execution| json!({"state":"recorded","result":execution.result}))
         .unwrap_or_else(|| json!({"state":"unknown"})))
 }
+
+/// Both native callbacks and User decisions invalidate the same authoritative
+/// child views. Notifications contain only stable IDs and versions.
+pub(super) async fn changed(core: &Core, id: &str) {
+    let metadata = {
+        let db = core.database.lock().await;
+        db.connection()
+            .query_row(
+                "SELECT i.camp_id,i.conversation_id,i.version,d.id FROM runtime_user_interaction i
+             LEFT JOIN delegation d ON d.child_conversation_id=i.conversation_id WHERE i.id=?1",
+                [id],
+                |r| {
+                    Ok((
+                        r.get::<_, String>(0)?,
+                        r.get::<_, String>(1)?,
+                        r.get::<_, i64>(2)?,
+                        r.get::<_, Option<String>>(3)?,
+                    ))
+                },
+            )
+            .optional()
+    };
+    if let Ok(Some((thread, conversation, version, delegation))) = metadata {
+        emit(
+            &core.output,
+            "runtime.interaction.changed",
+            json!({
+                "threadId":thread,"conversationId":conversation,"interactionId":id,"version":version
+            }),
+        );
+        if let Some(delegation) = delegation {
+            emit(
+                &core.output,
+                "delegation.changed",
+                json!({
+                    "threadId":thread,"conversationId":conversation,"delegationId":delegation,
+                    "interactionId":id,"interactionVersion":version
+                }),
+            );
+        }
+    }
+}

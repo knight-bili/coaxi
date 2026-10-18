@@ -478,6 +478,12 @@ I04 原生交互的耦合 owner 为
 最小命令为 `cargo test -p rovai-core --features slow-tests --lib application::native_interactions::tests::native_child_questions_cross_the_core_reader_and_exact_user_reply_then_close_on_host_exit -- --exact`。
 它不证明完整 Core main/Host 启动、HTTP/IPC、GUI、真实模型、Grok 修改意见的原队列投递或平台资格；结果须另附当次日志。
 
+该耦合 owner 后续扩原夹具验证：父Binding/Run真实鉴权的原status无限等待、订阅前登记、等待释放SQLite、
+同题cursor及无关广播不重复唤醒，回答问题后转计划、计划后新问题；Core实际输出的两类变更事件仅携带ID与版本。
+Context原owner同库增User详情/父摘要一致、错父/Run/epoch隐藏、正文/计划/Native字段不泄漏、队首先后及关闭消失；
+不新增Rust owner或另一份Core/数据库夹具。完整Core dispatcher的有限Future在测试调用处装箱，默认线程栈复验，
+不靠提高RUST_MIN_STACK取得通过；临时大栈诊断与失败日志不计作最终通过。
+
 ## Command Code headless 测试退役（2026-10-09，User 105）
 
 User 已停止 headless 候选；删除唯一消费者 `command_code.rs`、其专属 `command_code_activity.rs`、

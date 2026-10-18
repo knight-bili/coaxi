@@ -174,6 +174,54 @@ fn assert_native_interaction_storage(f: &mut Fixture) {
     );
     let id = storage::capture(&mut f.database, &frame, &params).unwrap();
     let changes = f.database.connection().total_changes();
+    let report = crate::delegation_model_command::task_report(
+        f.database.connection(),
+        &created.identity.id,
+        &created.identity.parent_conversation_id,
+    )
+    .unwrap();
+    assert_eq!(report["status"], "running");
+    assert_eq!(report["message"], "等待用户回答");
+    assert_eq!(
+        report["blocked_on"],
+        json!({"kind":"question","request_id":id})
+    );
+    let detail = crate::application::delegation_queries::read(
+        &f.database,
+        "delegations.get",
+        json!({"delegationId":created.identity.id}),
+    )
+    .unwrap();
+    assert_eq!(detail["blockedOn"], report["blocked_on"]);
+    for private in [
+        "先完成哪个模块",
+        "private-native-call",
+        "native-interaction-fixture-session",
+        "native-rpc",
+    ] {
+        assert!(!serde_json::to_string(&report).unwrap().contains(private));
+        assert!(!serde_json::to_string(&detail).unwrap().contains(private));
+    }
+    assert_eq!(
+        crate::delegation_model_command::task_report(
+            f.database.connection(),
+            &created.identity.id,
+            "another-parent"
+        )
+        .unwrap(),
+        json!({"task_id":created.identity.id,"status":"unknown"})
+    );
+    assert!(
+        storage::blocked_summary(f.database.connection(), "another-run", epoch)
+            .unwrap()
+            .is_none()
+    );
+    assert!(
+        storage::blocked_summary(f.database.connection(), &run, epoch + 1)
+            .unwrap()
+            .is_none()
+    );
+    assert_eq!(f.database.connection().total_changes(), changes);
     assert_eq!(
         storage::capture(&mut f.database, &frame, &params).unwrap(),
         id
@@ -355,6 +403,11 @@ fn assert_native_interaction_storage(f: &mut Fixture) {
     )
     .unwrap();
     assert_eq!(result.result.code, "interaction.resolved");
+    assert!(
+        storage::blocked_summary(f.database.connection(), &run, epoch)
+            .unwrap()
+            .is_none()
+    );
     let changes = f.database.connection().total_changes();
     assert_eq!(
         storage::resolve(&mut f.database, &accepted, "new-process-generation")
@@ -509,6 +562,44 @@ fn assert_native_interaction_storage(f: &mut Fixture) {
         &json!({"planContent":"先补兼容，再做集成"}),
     )
     .unwrap();
+    // The oldest still-pending question remains first. Once it closes, the next
+    // plan is observable; rolling back preserves the original restart matrix.
+    assert_eq!(
+        storage::blocked_summary(f.database.connection(), &run, epoch).unwrap(),
+        Some(json!({"kind":"question","request_id":second}))
+    );
+    f.database
+        .connection()
+        .execute_batch("SAVEPOINT native_blocked_summary")
+        .unwrap();
+    storage::close_request(
+        &mut f.database,
+        &second,
+        &frame.core_generation,
+        &frame.host_instance,
+        "fixture_closed",
+    )
+    .unwrap();
+    let report = crate::delegation_model_command::task_report(
+        f.database.connection(),
+        &created.identity.id,
+        &created.identity.parent_conversation_id,
+    )
+    .unwrap();
+    assert_eq!(
+        report["blocked_on"],
+        json!({"kind":"plan_approval","request_id":plan})
+    );
+    assert_eq!(report["message"], "等待用户确认计划");
+    assert!(
+        !serde_json::to_string(&report)
+            .unwrap()
+            .contains("先补兼容，再做集成")
+    );
+    f.database
+        .connection()
+        .execute_batch("ROLLBACK TO native_blocked_summary; RELEASE native_blocked_summary")
+        .unwrap();
     let continuation = crate::application::runtime_interactions::read(
         &f.database,
         "runtime.interactions.list",
@@ -827,5 +918,10 @@ fn assert_native_interaction_storage(f: &mut Fixture) {
             ))
             .unwrap(),
         0
+    );
+    assert!(
+        storage::blocked_summary(f.database.connection(), &run, epoch)
+            .unwrap()
+            .is_none()
     );
 }

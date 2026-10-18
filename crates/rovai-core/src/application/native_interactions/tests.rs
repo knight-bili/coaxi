@@ -66,9 +66,54 @@ fn claim(
 }
 
 async fn request(core: &Arc<Core>, method: &str, params: Value) -> Value {
-    core.handle(&serde_json::from_value(json!({"id":1,"method":method,"params":params})).unwrap())
-        .await
-        .unwrap()
+    let request = serde_json::from_value(json!({"id":1,"method":method,"params":params})).unwrap();
+    // The full Core dispatcher has a large finite Future. Keep it out of this
+    // coupled scenario's state/stack, rather than raising the test thread limit.
+    let reply = Box::pin(core.handle(&request));
+    static SIZE_LOG: std::sync::Once = std::sync::Once::new();
+    SIZE_LOG.call_once(|| {
+        eprintln!(
+            "[controlled-core-dispatch] future_bytes={}",
+            std::mem::size_of_val(reply.as_ref().get_ref())
+        )
+    });
+    reply.await.unwrap()
+}
+
+async fn parent_status(
+    core: &Arc<Core>,
+    binding: &crate::team_tool::BuiltinToolBindingCredential,
+    source: &crate::team_tool::AuthenticatedTeamToolRun,
+    input: &crate::delegation_contract::StatusParams,
+) -> Value {
+    let wake = core.execution_wake.delegation.clone();
+    crate::delegation_model_query::wait_for_status(
+        wake,
+        input,
+        || async {
+            let db = core.database.lock().await;
+            crate::delegation_model_query::status_snapshot(
+                &db,
+                &crate::delegation_model_command::Invocation {
+                    binding,
+                    source,
+                    tool_call: "controlled-parent-status",
+                    input,
+                },
+            )
+        },
+        std::future::pending(),
+    )
+    .await
+    .unwrap()
+}
+
+fn assert_waiting<F: std::future::Future>(future: std::pin::Pin<&mut F>) {
+    assert!(
+        future
+            .poll(&mut std::task::Context::from_waker(std::task::Waker::noop()))
+            .is_pending()
+    );
 }
 
 async fn wait_items(
@@ -157,6 +202,8 @@ async fn native_child_questions_cross_the_core_reader_and_exact_user_reply_then_
     .unwrap()
     .unwrap();
     let mut core = super::super::tests::runtime_resolution_test_core(&root).unwrap();
+    let (output, mut events) = mpsc::unbounded_channel();
+    core.output = output;
     let (incoming, mut receiver) = mpsc::unbounded_channel();
     core.grok_build = AcpCliRuntimeAdapter::new(
         AdapterKind::GrokBuild,
@@ -180,7 +227,7 @@ async fn native_child_questions_cross_the_core_reader_and_exact_user_reply_then_
     let workspace = crate::runtime::AgentRunWorkspace::runtime_managed_path(
         workspace_path.to_string_lossy().into_owned(),
     );
-    let (camp, child, run, epoch, credential, execution) = {
+    let (camp, child, run, epoch, credential, execution, delegation, parent_binding, parent_source) = {
         let mut db = core.database.lock().await;
         crate::agent_profile::configure_test_runtime(&db, &["agent_1"]);
         let camp_result = CollaborationService::default()
@@ -320,6 +367,12 @@ async fn native_child_questions_cross_the_core_reader_and_exact_user_reply_then_
             .load_agent_run_execution(&db, &run, epoch)
             .unwrap()
             .unwrap();
+        let parent_source = crate::team_tool::AuthenticatedTeamToolRun {
+            camp_id: camp.clone(),
+            agent_id: "agent_1".into(),
+            agent_run_id: parent.into(),
+            execution_epoch: parent_epoch,
+        };
         (
             camp,
             created.identity.child_conversation_id,
@@ -327,6 +380,9 @@ async fn native_child_questions_cross_the_core_reader_and_exact_user_reply_then_
             epoch,
             credential,
             execution,
+            created.identity.id,
+            parent_credential,
+            parent_source,
         )
     };
     let tools = BuiltinToolProcessConfig::create(
@@ -437,11 +493,96 @@ async fn native_child_questions_cross_the_core_reader_and_exact_user_reply_then_
         core.output.clone(),
         shutdown,
     ));
+    let first_input: crate::delegation_contract::StatusParams =
+        serde_json::from_value(json!({"task_ids":[delegation],"wait_ms":0})).unwrap();
+    let mut first_wait = Box::pin(parent_status(
+        &core,
+        &parent_binding,
+        &parent_source,
+        &first_input,
+    ));
+    assert_waiting(first_wait.as_mut());
+    assert!(
+        core.database.try_lock().is_ok(),
+        "a status wait must release SQLite"
+    );
     runtime
         .start_prompt(&delivery.0, &delivery.1)
         .await
         .unwrap();
-    let pending = wait_items(&core, &child, 2, "pending").await;
+    let first = tokio::time::timeout(Duration::from_secs(15), first_wait)
+        .await
+        .unwrap();
+    let mut pending = wait_items(&core, &child, 2, "pending").await;
+    pending.sort_by_key(|item| if item["kind"] == "question" { 0 } else { 1 });
+    let plan_id = pending[1]["id"].clone();
+    assert_eq!(
+        first["tasks"][0]["blocked_on"],
+        json!({"kind":"question","request_id":pending[0]["id"]})
+    );
+    let user_view = request(&core, "delegations.get", json!({"delegationId":delegation})).await;
+    assert_eq!(user_view["blockedOn"], first["tasks"][0]["blocked_on"]);
+    for private in [
+        "先做哪一项",
+        "受控计划",
+        "private-",
+        "controlled-native-session",
+        "plan-rpc",
+    ] {
+        assert!(!first.to_string().contains(private));
+        assert!(!user_view.to_string().contains(private));
+    }
+    // Read actual Core notifications, not a helper's imagined event projection.
+    tokio::time::timeout(Duration::from_secs(15), async {
+        let mut changed = std::collections::BTreeSet::new();
+        while changed.len() < 2 {
+            let event: Value = serde_json::from_str(&events.recv().await.unwrap()).unwrap();
+            if !matches!(
+                event["method"].as_str(),
+                Some("runtime.interaction.changed" | "delegation.changed")
+            ) {
+                continue;
+            }
+            let body = event["params"].as_object().unwrap();
+            let allowed = if event["method"] == "delegation.changed" {
+                &[
+                    "threadId",
+                    "conversationId",
+                    "delegationId",
+                    "interactionId",
+                    "interactionVersion",
+                ][..]
+            } else {
+                &["threadId", "conversationId", "interactionId", "version"][..]
+            };
+            assert!(body.keys().all(|key| allowed.contains(&key.as_str())));
+            assert_eq!(body["conversationId"], child);
+            assert_eq!(body["threadId"], camp);
+            if event["method"] == "delegation.changed" {
+                assert_eq!(body["delegationId"], delegation);
+                assert!(body["interactionVersion"].as_i64().unwrap() >= 1);
+                changed.insert(body["interactionId"].as_str().unwrap().to_owned());
+            }
+        }
+    })
+    .await
+    .unwrap();
+    let next_input: crate::delegation_contract::StatusParams = serde_json::from_value(
+        json!({"task_ids":[delegation],"wait_ms":0,"after_cursor":first["cursor"]}),
+    )
+    .unwrap();
+    let mut next_wait = Box::pin(parent_status(
+        &core,
+        &parent_binding,
+        &parent_source,
+        &next_input,
+    ));
+    assert_waiting(next_wait.as_mut());
+    // A coalesced/unrelated wake cannot report the same request twice.
+    core.execution_wake.delegation.notify_waiters();
+    assert_waiting(next_wait.as_mut());
+    assert!(core.database.try_lock().is_ok());
+    let mut next = None;
     let mut decisions = vec![];
     for item in pending {
         let view = request(
@@ -461,10 +602,36 @@ async fn native_child_questions_cross_the_core_reader_and_exact_user_reply_then_
             "interactionId":item["id"],"expectedVersion":item["version"],"answer":answer}});
         let result = request(&core, "runtime.interactions.resolve", params.clone()).await;
         assert_eq!(result["code"], "interaction.resolved", "{result:?}");
+        if view["kind"] == "question" {
+            let value = tokio::time::timeout(Duration::from_secs(15), next_wait.as_mut())
+                .await
+                .unwrap();
+            assert_eq!(
+                value["tasks"][0]["blocked_on"],
+                json!({"kind":"plan_approval","request_id":plan_id})
+            );
+            next = Some(value);
+        }
         decisions.push((params, result));
     }
+    drop(next_wait);
     wait_items(&core, &child, 2, "sent").await;
     wait_items(&core, &child, 1, "pending").await;
+    let next_input: crate::delegation_contract::StatusParams = serde_json::from_value(
+        json!({"task_ids":[delegation],"wait_ms":0,"after_cursor":next.unwrap()["cursor"]}),
+    )
+    .unwrap();
+    let third = tokio::time::timeout(
+        Duration::from_secs(15),
+        parent_status(&core, &parent_binding, &parent_source, &next_input),
+    )
+    .await
+    .unwrap();
+    assert_eq!(third["tasks"][0]["blocked_on"]["kind"], "question");
+    assert_ne!(
+        third["tasks"][0]["blocked_on"],
+        first["tasks"][0]["blocked_on"]
+    );
     let trace = std::fs::read_to_string(root.join("wire.jsonl")).unwrap();
     let replies: Vec<Value> = trace
         .lines()

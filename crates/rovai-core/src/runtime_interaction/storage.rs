@@ -176,6 +176,39 @@ fn live(connection: &Connection, id: &str, generation: &str, host: Option<&str>)
     )?)
 }
 
+/// Parent status may reveal that the User is needed, never the child question,
+/// plan, answer or native transport identity. The full body remains User-only.
+pub(crate) fn blocked_summary(
+    connection: &Connection,
+    run: &str,
+    epoch: i64,
+) -> Result<Option<Value>> {
+    // Exact pre-211 sources have no native interactions. A partially installed
+    // reserved namespace still fails its query rather than masquerading as empty.
+    if crate::db::runtime_interactions::absent(connection)? {
+        return Ok(None);
+    }
+    let mut statement = connection.prepare(
+        "SELECT id,kind,core_generation FROM runtime_user_interaction
+         WHERE agent_run_id=?1 AND execution_epoch=?2 AND status='pending'
+         ORDER BY created_at,id",
+    )?;
+    let rows = statement.query_map(params![run, epoch], |r| {
+        Ok((
+            r.get::<_, String>(0)?,
+            r.get::<_, String>(1)?,
+            r.get::<_, String>(2)?,
+        ))
+    })?;
+    for row in rows {
+        let (id, kind, generation) = row?;
+        if live(connection, &id, &generation, None)? {
+            return Ok(Some(json!({"kind":kind,"request_id":id})));
+        }
+    }
+    Ok(None)
+}
+
 pub(crate) fn capture(
     database: &mut Database,
     frame: &NativeFrame,

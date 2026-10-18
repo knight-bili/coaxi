@@ -1,0 +1,273 @@
+{
+  "schema_version": 1,
+  "artifact_id": "I04-NATIVE-INTERACTION-BLOCKED",
+  "recorded_at": "2026-10-18T10:49:44.2092957+08:00",
+  "source_baseline": "b1551dfa87a31e066768aeaaa403de98807c29f8",
+  "branch": "phase/i04-collaboration-runtime",
+  "core_contract": "v1.73",
+  "projection_schema": 161,
+  "migration": 211,
+  "implementation_status": "native_question_and_plan_safe_summary_status_wait_and_notifications_verified_feedback_design_and_ui_pending",
+  "scope": {
+    "clusters": 81,
+    "packages": 48,
+    "formal_cases": 324,
+    "i04_clusters": 21,
+    "i04_packages": 4,
+    "i04_formal_cases": 84,
+    "new_formal_passes": 0
+  },
+  "implemented": [
+    "原permission优先级/输出保持，原TaskReport及User详情共用仍live且pending的question/plan_approval摘要，仅kind/request_id",
+    "按实际Run/epoch/Binding/Input/Camp围栏选择最早请求，不返回正文、计划、答案、Native或工具ID；决定/关闭后不伪装成等待User",
+    "原签名cursor/广播/无锁等待：同题及无关唤醒不重复报告，回答后下一个计划或新问题可唤醒，不另建轮询器",
+    "Native及User首次决定共用原Core失效通知；runtime.interaction.changed与对应delegation.changed仅ID/当前版本",
+    "确切旧160来源无211表时无Native阻塞；部分保留对象不按空记录吞错；原父鉴权、跨父unknown和接管范围保持"
+  ],
+  "checks": {
+    "rust_owners_passed": 6,
+    "docs_tests_passed": 10,
+    "new_rust_owners": 0,
+    "new_core_or_sqlite_fixtures": 0,
+    "slow_core_list_count": 1256,
+    "full_1256_not_run": true,
+    "default_fast_budget_unchanged": 400,
+    "compile_passed": true,
+    "existing_rust_warnings": 7,
+    "cargo_fmt_and_raw_include_fmt_passed": true,
+    "generic_decision_gate_passed": true,
+    "docs_version_gate_passed": true,
+    "docs_base_ref": "b1551dfa87a31e066768aeaaa403de98807c29f8",
+    "explicit_codegraph_sync_passed": true,
+    "index_is_not_complete_call_graph_proof": true,
+    "final_coupled_test_uses_default_stack": true,
+    "measured_dispatch_future_bytes": 38192,
+    "successful_fixture_root_removed": true,
+    "approved_artifacts_unchanged": 6
+  },
+  "owner_coverage": [
+    "Context原同库owner：User详情/父摘要一致、错父/Run/epoch隐藏、正文和Native资料不泄漏、队首转计划、决定/取消后消失，原存储/权限/恢复矩阵继续",
+    "原受控ACP owner：本次Core创建领取的父Run/Binding真实鉴权，status无限等待手工poll到Pending后验证DB可取；同题无关广播不提前返回，问题→计划→新问题唤醒；Core实际事件只含ID/版本",
+    "原内存writer owner：身份围栏、排队后重验、部分写与flush未知隔离；无Native发送代码变更",
+    "原两个CLI封闭输出/golden owner与严格委派wire owner：r1输出字段和输入拒绝保持"
+  ],
+  "diagnostics_not_counted_as_pass": [
+    "coupled-01在默认线程栈溢出；8MiB临时诊断确认有限Future可完成，该诊断不计通过；测试Core调用装箱后coupled-02在默认栈通过",
+    "compile-02因旧测试映像占用触发LNK1104；精确观察其0线程/0句柄/0CPU，保留旧exe在target/debug/deps后compile-03成功，未终止进程/删除源码"
+  ],
+  "remaining": [
+    "Grok RequestChanges反馈仍未投递；固定Codeg普通User队列与r1显式takeover/Context模式的衔接已记录，先核定完整具体方案，必要时提供独立revision后再请求客户确认",
+    "固定Codeg提问/计划卡片、两个子会话查看器及真实日夜/窄宽UI对照继续；本轮未改Renderer组件",
+    "完整Core main/Host/HTTP/IPC/GUI、真实父模型/子provider及逐平台资格未执行；父status在原生产query处调用，未证明模型CLI/IPC完整链路",
+    "I04其他Runtime并集、自定义ACP、恢复、记忆和自动化以及原84正式场景仍继续"
+  ],
+  "grok_feedback_finding": "i04-grok-feedback-boundary.json",
+  "external_actions": {
+    "push": 0,
+    "github_actions": 0,
+    "paid_model_calls": 0,
+    "main_merge": 0,
+    "release": 0,
+    "new_customer_help_required": false,
+    "customer_confirmation_requested": false
+  },
+  "source_blobs": [
+    {
+      "path": "crates/rovai-core/src/application.rs",
+      "git_blob": "883e11a136b9b0b07198e4a0faddf99e42b7bff1",
+      "sha256": "02b6035ac2340dc68cb55a38ba66477e7d81c7d8e42611407bb4f0fb724e397d"
+    },
+    {
+      "path": "crates/rovai-core/src/application/native_interactions.rs",
+      "git_blob": "027721da32603f09bb6f65403df46a3729d0830c",
+      "sha256": "f05b4644eaa81df21c349b44218126967cd239993ff26b04747b09d8a53d7612"
+    },
+    {
+      "path": "crates/rovai-core/src/application/runtime_interactions.rs",
+      "git_blob": "d79d695fd5670ccb5977745c02a4bf5ee56e7868",
+      "sha256": "70f5f91c7b40503b642c0cbc28b8498f09094680fdfc9e82cc14cc0bc70c5fff"
+    },
+    {
+      "path": "crates/rovai-core/src/application/native_interactions/tests.rs",
+      "git_blob": "c6987d43a9f4cea544af18a30e8f329afd0639d6",
+      "sha256": "399c0e0385953e2257e85624994c84c68771318e0a53ce97c7f745944114318c"
+    },
+    {
+      "path": "crates/rovai-core/src/context/native_interaction_tests.rs",
+      "git_blob": "62488f19129840e56fdd18c0f2511504a179ea39",
+      "sha256": "5c73c9f68ea9652004e1aa1329ed1c1aaa6ee0c7c5830daba2a1d28d086bd53c"
+    },
+    {
+      "path": "crates/rovai-core/src/delegation_model_command.rs",
+      "git_blob": "4a120d5f64c55493a62738639772c6f1eb698a56",
+      "sha256": "d3700e4e7975d59e790844e3a3f0dc4a34da92453d77e96fbbb3a39aa83963e0"
+    },
+    {
+      "path": "crates/rovai-core/src/runtime_interaction/storage.rs",
+      "git_blob": "a440ac8df24ba9c32bc86d3fa34ecf7f719e2939",
+      "sha256": "7eaa9f32860c2e8eedc28b0ebc7063b0138c8884a1f5d4b2427658e9f1698167"
+    }
+  ],
+  "fixed_donor_sources": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\source-reference\\codeg",
+      "source_commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+      "only_untracked_authorized_codegraph_index": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\source-reference\\rovai-ai",
+      "source_commit": "cc465dda562536b94f23787759e3206324baa29e",
+      "only_untracked_authorized_codegraph_index": true
+    }
+  ],
+  "approved_files": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1",
+      "unchanged": true
+    }
+  ],
+  "logs": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-blocked-build-artifact.json",
+      "bytes": 913,
+      "sha256": "3a8eb9bbf8f6b8f6ff62530c717115430a0af947722c93167dc2a2d8c89c01ea"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-blocked-codegraph.log",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-blocked-compile-01.log",
+      "bytes": 2225,
+      "sha256": "ddfb5bca09229204dfc1b4cddb23127ea39586decf35942b8dcfb30df5e11b16"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-blocked-compile-02.log",
+      "bytes": 9253,
+      "sha256": "ad323ef88d148979c836e7677cbf4fe4115a6d58ad0d842d0f9471b8e1f1c66e"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-blocked-compile-03.log",
+      "bytes": 2225,
+      "sha256": "17e2c668fa718a88c4eee595037b800980024b2172172e0fee6de91062e65131"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-blocked-context-01.log",
+      "bytes": 776,
+      "sha256": "b1a718e59a3b20b2b4296b332a8f998f1c8d9affce5c80f66a9ccd5c1784ae3d"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-blocked-context-list.log",
+      "bytes": 125,
+      "sha256": "8d7c39b86e00e4e7eee958d5210fe31c3224cf0ebf2bba69b1e95c305acee56d"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-blocked-coupled-01.log",
+      "bytes": 328,
+      "sha256": "9fa2d3bd35a4a0603b93714c47470628cd413edd21515a4f8556188dc1b3aee8"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-blocked-coupled-02.log",
+      "bytes": 444,
+      "sha256": "f063f228206df9b0a3d25bc2b1c87288cc62ea4ec68dd948b3d1c227f080506b"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-blocked-coupled-list.log",
+      "bytes": 162,
+      "sha256": "e1740105e5a84daf66aef51ddd83c9046fa0bcd30ff856ea70c6f8d05e650585"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-blocked-coupled-stack-diagnostic.log",
+      "bytes": 397,
+      "sha256": "fb339c8e452e18103cfc69be76efdc4c535d2643c896141c5440faf70cd332a4"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-blocked-doc-decisions.log",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-blocked-doc-tests.log",
+      "bytes": 925,
+      "sha256": "063aeae940afc0e6a6c43a2d95b4156edc30df568c1fa2d01b6ffb420f4d4a57"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-blocked-doc-version.log",
+      "bytes": 79,
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-blocked-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-blocked-include-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-blocked-output-closed.log",
+      "bytes": 225,
+      "sha256": "0084eb03a7a3c81c90edf5a313465c3f7fafa05a763917751b480841b3174f09"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-blocked-output-golden.log",
+      "bytes": 218,
+      "sha256": "04766ccb55ae60720a875b71d236cfb6fed904d631101b0db0491c2bb189f624"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-blocked-slow-list.log",
+      "bytes": 119639,
+      "sha256": "4017be15e8a7aa463625f64951579ae5eb25adae8796818ee3c86c5b2bf43c7a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-blocked-wire-contract.log",
+      "bytes": 235,
+      "sha256": "1d938f51635fd6d3840bba46f68ae1e409f8114e4b38c755bd1932f7a3059e7d"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-blocked-writer-list.log",
+      "bytes": 148,
+      "sha256": "aff08f0d7a23f953630083d9f01757290973a2c632966494c97e567514fe9c9c"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-blocked-writer.log",
+      "bytes": 250,
+      "sha256": "233094e3afea851daab4fb5dfe0eed309112bcbcf45b49118caa5e8ca72be4c3"
+    }
+  ]
+}
