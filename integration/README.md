@@ -1,5 +1,7 @@
 # Codeg 与 Rovai 一期完整融合
 
+当前唯一开发分支为 **`develop/V1.0.0`**，跟踪同名origin分支；一期全部阶段在此累计，不再建立阶段分支。I12工程与客户软件使用验收全部通过后，仍须客户明确指令才合入main。详见[单分支约定](branch-policy.md)。
+
 - [I04原生计划与目标富内容](execution/i04-native-rich-content-result.json)：固定原纯适配层及计划/目标组件已接只读页，182项定向与17组受控Renderer检查通过；完整工具卡片、图片查看和真实Core/两端仍待，I04范围不减。
 
 - [I04原生后台阅读与User接口分项](execution/i04-native-reader-result.json)：有界后台FS线程、取消/回收/关闭租约、每页Core重授权及Native/Web四方法已编码，原source与Web/客户端owner定向验证；实际Core/Host/网络及原Codeg只读UI继续，完整I04未完成。

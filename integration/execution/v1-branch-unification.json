@@ -1,0 +1,377 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-18T22:39:08+08:00",
+  "status": "all_branch_history_included_backups_verified_policy_applied_remote_sync_pending",
+  "repository": "knight-bili/codeg-rovai-workbench",
+  "development_branch": "develop/V1.0.0",
+  "upstream": "origin/develop/V1.0.0",
+  "previous_development_head": "39899099fe44da7f96eab7c047aeee4f292c4f99",
+  "main_unchanged": "9d1ad55eeb18c0bc359d6f575afe9a9936055040",
+  "main_merge_authorization": "I12 engineering and customer real software acceptance all passed plus later explicit User instruction",
+  "goal_status": "paused_by_user",
+  "scope": {
+    "source_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_packages": 4,
+    "i04_clusters": 21,
+    "i04_cases": 84
+  },
+  "retired_branches_planned": {
+    "local": [
+      {
+        "ref": "refs/heads/phase/i00-initialization",
+        "sha": "50fb0b9d0a545d54d9eb990e70ba70512478e95d",
+        "missing_from_current": 0,
+        "current_ahead": 410,
+        "included_in_current": true
+      },
+      {
+        "ref": "refs/heads/phase/i01-foundation",
+        "sha": "a76596b5e782cf392816726e8f8623faef1ebae2",
+        "missing_from_current": 0,
+        "current_ahead": 395,
+        "included_in_current": true
+      },
+      {
+        "ref": "refs/heads/phase/i02-skill-delivery",
+        "sha": "2b5f6fcf846238025a549bda4054235da2029645",
+        "missing_from_current": 0,
+        "current_ahead": 365,
+        "included_in_current": true
+      },
+      {
+        "ref": "refs/heads/phase/i02-workbench",
+        "sha": "87d686443179b3175e44b5e964f7a1d83d3209e5",
+        "missing_from_current": 0,
+        "current_ahead": 375,
+        "included_in_current": true
+      },
+      {
+        "ref": "refs/heads/phase/i03-canvas",
+        "sha": "4ece845b8c1e1689c6faf2f5a11a1c4da776f416",
+        "missing_from_current": 0,
+        "current_ahead": 374,
+        "included_in_current": true
+      },
+      {
+        "ref": "refs/heads/phase/i03-canvas-nodes",
+        "sha": "48b70e521f7f44cbb5abe40a2a1aab098dc044bb",
+        "missing_from_current": 0,
+        "current_ahead": 106,
+        "included_in_current": true
+      },
+      {
+        "ref": "refs/heads/phase/i04-collaboration-runtime",
+        "sha": "39899099fe44da7f96eab7c047aeee4f292c4f99",
+        "missing_from_current": 0,
+        "current_ahead": 0,
+        "included_in_current": true
+      }
+    ],
+    "origin": [
+      {
+        "ref": "refs/remotes/origin/phase/i01-foundation",
+        "sha": "a76596b5e782cf392816726e8f8623faef1ebae2",
+        "missing_from_current": 0,
+        "current_ahead": 395,
+        "included_in_current": true
+      },
+      {
+        "ref": "refs/remotes/origin/phase/i02-skill-delivery",
+        "sha": "2b5f6fcf846238025a549bda4054235da2029645",
+        "missing_from_current": 0,
+        "current_ahead": 365,
+        "included_in_current": true
+      },
+      {
+        "ref": "refs/remotes/origin/phase/i02-workbench",
+        "sha": "87d686443179b3175e44b5e964f7a1d83d3209e5",
+        "missing_from_current": 0,
+        "current_ahead": 375,
+        "included_in_current": true
+      },
+      {
+        "ref": "refs/remotes/origin/phase/i03-canvas",
+        "sha": "4ece845b8c1e1689c6faf2f5a11a1c4da776f416",
+        "missing_from_current": 0,
+        "current_ahead": 374,
+        "included_in_current": true
+      },
+      {
+        "ref": "refs/remotes/origin/phase/i03-canvas-nodes",
+        "sha": "a672ad1bf1cfff78d68b4eecf6436af3e5032a29",
+        "missing_from_current": 0,
+        "current_ahead": 107,
+        "included_in_current": true
+      }
+    ]
+  },
+  "merge_method": "new branch at existing descendant commit; every old tip already ancestor, no duplicate merges or code changes",
+  "backups": {
+    "bundle": "file/V1.0.0统一开发分支/drafts/all-refs-before-unification.bundle",
+    "bundle_bytes": 127865351,
+    "bundle_sha256": "e4402ce7d972ff35cba569fcf59aaadee04cd71af6d6538452b8136775cbef3a",
+    "bundle_complete_and_verified": true,
+    "uncommitted_stash": "07a1662f76dff4c0c60ef5ac0077b3911147fbfb",
+    "uncommitted_files": 28,
+    "uncommitted_zip_sha256": "7aa8cb1677177d1cd8289800e3db07653415295d38162312a9869870c329d896",
+    "uncommitted_typecheck": "failed before pause; incomplete changes preserved, not published as completed",
+    "unrelated_agents_edit_preserved": true
+  },
+  "sensitive_history_scan": {
+    "tool": "gitleaks 8.30.1",
+    "range": "a532697656049d91947e46b9cda8d52260384fd2..39899099fe44da7f96eab7c047aeee4f292c4f99",
+    "commits": 372,
+    "findings": 14,
+    "confirmed_secrets": 0,
+    "triage": [
+      {
+        "finding_index": 0,
+        "file": "integration/execution/i03-c06-candidate-result.json",
+        "line": 20,
+        "classification": "actual_file_sha256_verified",
+        "json_paths": [
+          [
+            "source_binding",
+            "files",
+            "apps/desktop/src/main/file-preview/file-preview-access.ts"
+          ]
+        ]
+      },
+      {
+        "finding_index": 1,
+        "file": "integration/execution/i03-c06-native-result.json",
+        "line": 180,
+        "classification": "actual_file_sha256_verified",
+        "json_paths": [
+          [
+            "source_binding",
+            "files",
+            "apps/desktop/src/main/file-preview/file-preview-access.ts"
+          ]
+        ]
+      },
+      {
+        "finding_index": 2,
+        "file": "integration/execution/i03-c06-native-result.json",
+        "line": 278,
+        "classification": "actual_file_sha256_verified",
+        "json_paths": [
+          [
+            "artifact_binding",
+            "work/i03/prepare-native-key-diagnostic.py"
+          ]
+        ]
+      },
+      {
+        "finding_index": 3,
+        "file": "integration/execution/i03-terminal-ui-result.json",
+        "line": 61,
+        "classification": "actual_file_sha256_verified",
+        "json_paths": [
+          [
+            "artifact_binding",
+            "work/i03/terminal-ui-source/src/lib/terminal/keybar.ts"
+          ]
+        ]
+      },
+      {
+        "finding_index": 4,
+        "file": "integration/execution/i03-terminal-api-result.json",
+        "line": 34,
+        "classification": "actual_file_sha256_verified",
+        "json_paths": [
+          [
+            "artifact_binding",
+            "work/i03/canvas-terminal-api-typecheck.json"
+          ]
+        ]
+      },
+      {
+        "finding_index": 5,
+        "file": "integration/execution/i03-terminal-api-result.json",
+        "line": 35,
+        "classification": "actual_file_sha256_verified",
+        "json_paths": [
+          [
+            "artifact_binding",
+            "work/i03/canvas-terminal-api-tests-initial.log"
+          ]
+        ]
+      },
+      {
+        "finding_index": 6,
+        "file": "integration/execution/i03-terminal-api-result.json",
+        "line": 36,
+        "classification": "actual_file_sha256_verified",
+        "json_paths": [
+          [
+            "artifact_binding",
+            "work/i03/canvas-terminal-api-tests-final.log"
+          ]
+        ]
+      },
+      {
+        "finding_index": 7,
+        "file": "integration/execution/i03-terminal-api-result.json",
+        "line": 37,
+        "classification": "actual_file_sha256_verified",
+        "json_paths": [
+          [
+            "artifact_binding",
+            "work/i03/canvas-terminal-api-types-initial.log"
+          ]
+        ]
+      },
+      {
+        "finding_index": 8,
+        "file": "integration/execution/i03-terminal-api-result.json",
+        "line": 38,
+        "classification": "actual_file_sha256_verified",
+        "json_paths": [
+          [
+            "artifact_binding",
+            "work/i03/canvas-terminal-api-types-final.log"
+          ]
+        ]
+      },
+      {
+        "finding_index": 9,
+        "file": "integration/execution/i03-terminal-api-result.json",
+        "line": 39,
+        "classification": "actual_file_sha256_verified",
+        "json_paths": [
+          [
+            "artifact_binding",
+            "work/i03/terminal-api-rust-format.log"
+          ]
+        ]
+      },
+      {
+        "finding_index": 10,
+        "file": "integration/execution/i03-terminal-api-result.json",
+        "line": 41,
+        "classification": "actual_file_sha256_verified",
+        "json_paths": [
+          [
+            "artifact_binding",
+            "work/i03/terminal-api-protocol-update.log"
+          ]
+        ]
+      },
+      {
+        "finding_index": 11,
+        "file": "integration/execution/i03-terminal-api-result.json",
+        "line": 43,
+        "classification": "actual_file_sha256_verified",
+        "json_paths": [
+          [
+            "artifact_binding",
+            "work/i03/update-terminal-api-protocol.py"
+          ]
+        ]
+      },
+      {
+        "finding_index": 12,
+        "file": "integration/execution/i03-terminal-api-result.json",
+        "line": 44,
+        "classification": "actual_file_sha256_verified",
+        "json_paths": [
+          [
+            "artifact_binding",
+            "work/i03/record-canvas-terminal-api.py"
+          ]
+        ]
+      },
+      {
+        "finding_index": 13,
+        "file": "integration/execution/i03-terminal-api-result.json",
+        "line": 45,
+        "classification": "actual_file_sha256_verified",
+        "json_paths": [
+          [
+            "artifact_binding",
+            "work/i03/canvas-terminal-api-docs.log"
+          ]
+        ]
+      }
+    ]
+  },
+  "old_draft_prs": [
+    {
+      "number": 55,
+      "head": "phase/i03-canvas-nodes",
+      "base": "phase/i02-skill-delivery",
+      "planned_action": "close_without_merge"
+    },
+    {
+      "number": 54,
+      "head": "phase/i02-skill-delivery",
+      "base": "phase/i03-canvas",
+      "planned_action": "close_without_merge"
+    },
+    {
+      "number": 53,
+      "head": "phase/i03-canvas",
+      "base": "phase/i02-workbench",
+      "planned_action": "close_without_merge"
+    },
+    {
+      "number": 52,
+      "head": "phase/i02-workbench",
+      "base": "phase/i01-foundation",
+      "planned_action": "close_without_merge"
+    },
+    {
+      "number": 51,
+      "head": "phase/i01-foundation",
+      "base": "main",
+      "planned_action": "close_without_merge"
+    }
+  ],
+  "actions": {
+    "push": "pending",
+    "retire_old_branches": "after remote new head verified",
+    "main_merge": false,
+    "release": false,
+    "workflow_dispatch": false,
+    "feature_development_resumed": false
+  },
+  "local_checks": [
+    {
+      "name": "docs-tests",
+      "exit": 0
+    },
+    {
+      "name": "docs-version",
+      "exit": 0
+    },
+    {
+      "name": "docs-base",
+      "exit": 0
+    },
+    {
+      "name": "scaffold",
+      "exit": 0
+    },
+    {
+      "name": "foundation",
+      "exit": 1
+    }
+  ],
+  "preexisting_foundation_issue": {
+    "check": "tools/integration/verify-foundation.mjs:37",
+    "actual_snapshot": 160,
+    "current_core_schema": 161,
+    "checker_and_all_relevant_inputs_identical_to_previous_head": [
+      "tools/integration/verify-foundation.mjs",
+      "integration/foundation/current-protocol.json",
+      "crates/rovai-core/src/db.rs",
+      "crates/rovai-web/src/lib.rs",
+      "crates/rovai-web/src/operations.rs"
+    ],
+    "introduced_by_branch_unification": false,
+    "action": "retain as engineering todo for resumed development; no checker weakening or feature repair while paused"
+  }
+}

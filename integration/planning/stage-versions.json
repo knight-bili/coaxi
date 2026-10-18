@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "policy_revision": "2026-10-14-stage-batch-v1",
+  "policy_revision": "2026-10-18-single-development-branch-v1",
   "policy": "../ci-cost-policy.md#阶段版本与验证频率",
   "status": "planned_candidates_not_releases",
   "normal_phase_batches": 12,
-  "version_semantics": "融合阶段候选标识；不更改源架构current_version或应用包版本，不自动创建Git发布标签/Release。阶段代码与review集齐后才冻结commit和开启首批验证。",
+  "version_semantics": "融合阶段候选标识；不更改源架构current_version或应用包版本，不自动创建Git发布标签/Release。阶段代码与review集齐后才冻结commit和开启首批验证。 阶段候选均在同一develop/V1.0.0冻结，不按阶段建立开发分支。",
   "excluded": {
     "I00": "初始化已完成，不重跑凑次数",
     "BUF": "按缺陷/兼容整改补验并记录原因"
@@ -1107,7 +1107,7 @@
       "审阅测试或数据库报告"
     ],
     "environment_deferral": "未验证项明确保留，继续独立研发，不假通过；最终MVP仍必须补齐",
-    "main_and_release": "保留最终授权，阶段分支持续推进，不增加阶段客户验收等待",
+    "main_and_release": "I12工程及客户软件使用验收全部通过后，仍由客户明确指令决定main合入/发布；只在develop/V1.0.0开发，不增加阶段客户验收等待",
     "effective_immediately": true,
     "wait_for_app_goal_text_update": false
   },
@@ -1116,5 +1116,7 @@
     "kind": "real_user_software_trial",
     "status": "not_due",
     "owner": "User"
-  }
+  },
+  "development_branch": "develop/V1.0.0",
+  "branch_policy": "../branch-policy.md"
 }

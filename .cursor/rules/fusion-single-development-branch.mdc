@@ -1,0 +1,13 @@
+---
+description: Codeg 与 Rovai 一期 V1.0.0 统一开发分支及 main 合入约束
+alwaysApply: true
+---
+
+# 一期只使用统一开发分支
+
+- 唯一开发分支：`develop/V1.0.0`，跟踪 `origin/develop/V1.0.0`。
+- 所有 I00–I12 与 BUF 功能、整改和修复都在此累计；不再按阶段新建分支。
+- 阶段候选只记录候选版本和冻结 SHA，沿多次本地提交、阶段集中验证、少量推送规则。
+- 推送固定本项目 `origin`，不向源应用 `upstream` 推送。
+- I12 工程验证和客户软件使用验收全部通过后，仍须客户明确指令才能合入 `main`；不得自动合入或发布。
+- 完整约定见 `integration/branch-policy.md`；分支归并不改变一期范围或既定工程待办。
