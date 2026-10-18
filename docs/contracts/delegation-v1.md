@@ -230,4 +230,12 @@ r1的TaskReport.blocked_on与User详情blockedOn共用原Core摘要选择：原p
 
 Native登记/关闭/答复和首次User决定共用Core失效通知：runtime.interaction.changed只含threadId/conversationId/interactionId/version；对应委派另发原delegation.changed，payload为threadId/conversationId/delegationId/interactionId/interactionVersion。version来自读取时的当前Core记录，不是原命令结果的替代回执；重放原User命令不主动重发失效通知。两类事件都不携带正文或凭据。旧完整160来源没有211对象时无原生阻塞；部分保留对象不按空状态吞错。
 
+### User原生交互卡片
+
+共享`RuntimeInteractionDock`沿原ThreadClient接`runtime.interactions.list/get/resolve`，公屏仅接公开invocation的Conversation，私聊仅接当前精确Conversation；独立帮手查看器继续实施，不能把child请求从公屏运行列表混入公屏卡片。元数据分页、显式读取正文、Core事件/Web失效后重读均不授予额外资源权限。
+
+问答与计划控件按[固定Codeg源码映射](../../integration/inventory/runtime-interaction-ui-reference.md)保留，界面只传interactionId/expectedVersion/Answer和命令UUID。每次提交冻结完整参数，未结结果禁止产生第二命令；核对使用原回执，只有用户显式重试才重放原完整命令，重试不会直接写原生通道。Core拒绝后按最新请求开放操作，旧版本正文不能覆盖较新版本。UI未提交选择仅在本client/Conversation当前呈现内保留，不变成跨进程材料或模型输入。
+
+答案保存、写入原生通道、投递未知、请求关闭各自显示，`sent`不表示提供方已执行或任务完成。Grok修改反馈仍按原登记围栏等待队列衔接，本批不移除围栏、不隐式接管或改写模型输入。隔离Renderer的模拟传输、原组件视觉对照与真实Core/Host/provider资格分别记录；本批不改变Schema、Core版本或已确认r1全文。
+
 本批不改变Bootstrap、Formatter35或新的User工作准入。Grok修改意见与显式接管的衔接见[核查记录](../../integration/execution/i04-grok-feedback-boundary.json)，仍为必需待实现项；本节不授权把计划回答变成隐式接管。

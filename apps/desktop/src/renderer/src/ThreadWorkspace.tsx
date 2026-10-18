@@ -165,6 +165,7 @@ import { runtimeReadinessLabel } from './runtime-status'
 import { runtimeEditorInstallation } from './MemberRuntimeParameters'
 import { mentionCandidateRuntime } from './mention-runtime'
 import { SafeMarkdown } from './SafeMarkdown'
+import { RuntimeInteractionDock } from './RuntimeInteractionDock'
 import { FilePreviewPane } from './FilePreviewPane'
 import { FilePreviewResizeHandle, FilePreviewWorkspace, useInitializeFilePreviewMinimumWidth, useOptionalFilePreviewLayout } from './FilePreviewLayout'
 import { useExecutionPreviewHost, useOptionalFilePreview } from './FilePreviewContext'
@@ -5796,6 +5797,12 @@ function ThreadWorkspaceContent({
           onDragLeave={leaveAttachmentDropSurface}
           onDrop={dropAttachments}
         >
+          <div className="native-interactions-group">
+            {[...new Map(snapshot.agentRuns.filter(run => ['direct', 'a2a', 'gather_completion', 'batch'].includes(run.invocationKind))
+              .map(run => [run.conversationId, run.agentId])).entries()].map(([conversationId, agentId]) => (
+                <RuntimeInteractionDock key={conversationId} conversationId={conversationId} sourceLabel={profileById.get(agentId)?.displayName ?? agentId} />
+              ))}
+          </div>
           {pendingApprovals.length > 0 && (
             <ApprovalDock
               approvals={pendingApprovals}

@@ -1,0 +1,507 @@
+{
+  "schema_version": 1,
+  "artifact_id": "I04-NATIVE-INTERACTION-UI",
+  "recorded_at": "2026-10-18T03:30:55.336211+00:00",
+  "source_baseline": "4e579fca156ca6407105025dad72f7d2245d485a",
+  "branch": "phase/i04-collaboration-runtime",
+  "core_contract": "v1.73",
+  "projection_schema": 161,
+  "migration": 211,
+  "implementation_status": "source_based_shared_cards_and_existing_conversation_mounts_verified_in_isolated_renderer_stage_in_progress",
+  "scope": {
+    "clusters": 81,
+    "packages": 48,
+    "formal_cases": 324,
+    "i04_clusters": 21,
+    "i04_packages": 4,
+    "i04_formal_cases": 84,
+    "new_formal_passes": 0
+  },
+  "implemented": [
+    "固定Codeg问答/计划卡片接Core原list/get/resolve，真实公屏与精确私聊入口复用Desktop/Web/画布ThreadClient",
+    "多题Tab、进度、单/多选、原推荐label、Other、自由填写、下一题、折叠、独立跳过及三种计划决定保留",
+    "同一client/Conversation内多请求选择及隐藏保留各自未提交回答；Host/Owner client或Conversation更换不继承",
+    "冻结原UUID、完整Answer及版本，重复点击不建第二命令；未知先核对，仅显式原参数重试；目标消失及新题出现不藏原提交核对",
+    "保存、投递中、已发送、关闭和未知分别显示；Grok反馈保存不冒充投递，未改Bootstrap/Dynamic/Manifest或批准r1",
+    "短题按Codeg原20/16行高容器贴合，208/208无冗余滚动；长计划保留实际局部滚动和尾部决定可达",
+    "原有语言系统补50个英译条目，不改现有翻译，不新增生产依赖或锁文件"
+  ],
+  "checks": {
+    "typescript_passed": true,
+    "typescript_test_files": 2,
+    "typescript_tests_passed": 48,
+    "renderer_test_owners": 1,
+    "renderer": {
+      "ok": true,
+      "channel": "isolated_renderer",
+      "core": false,
+      "runtime": false,
+      "provider": false,
+      "initialGeometry": {
+        "height": 208,
+        "scrollHeight": 208
+      },
+      "checks": [
+        "exact_answer_double_click",
+        "unknown_no_automatic_retry",
+        "saved_vs_sent",
+        "host_conversation_isolation",
+        "replacement_and_hide",
+        "single_multiselect_other_tabs_collapse",
+        "all_plan_decisions_feedback_retained",
+        "per_request_unsent_answers_survive_switch_and_hide",
+        "deleted_target_keeps_original_reconciliation",
+        "day_night_wide_narrow_geometry"
+      ]
+    },
+    "docs_tests_passed": 10,
+    "docs_version_and_base_decision_gates_passed": true,
+    "docs_base_ref": "4e579fca156ca6407105025dad72f7d2245d485a",
+    "explicit_codegraph_sync_passed": true,
+    "codegraph_new_symbols_queried_after_sync": true,
+    "not_complete_call_graph_proof": true,
+    "new_rust_owners": 0,
+    "new_core_or_sqlite_fixtures": 0,
+    "rust_compilation_or_full_tests_run_this_batch": false,
+    "production_lockfile_changed": false
+  },
+  "visual_comparison": {
+    "source_commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+    "source_manifest": {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\source-interaction-renderer\\source-manifest.json",
+      "bytes": 2468,
+      "sha256": "1199a189c803ea850ff1bad7f1ef56d5539cef6434c3f694f2a3e3d6697f549a"
+    },
+    "source_files": [
+      {
+        "path": "src/components/chat/ask-question-card.tsx",
+        "sha256": "6b1e83998044636b123257de7c249afd4bfaa6b694a179bc1a37589296743879"
+      },
+      {
+        "path": "src/components/chat/plan-approval-card.tsx",
+        "sha256": "9b0f91a50dc2dda37836bac4be30b32ecc046ad518d18deb50d47f19fd193682"
+      },
+      {
+        "path": "src/components/ui/button.tsx",
+        "sha256": "704cbe3b92f902b0b9b14c4c0852b29b102969d0d242cbc0295f6936748042c5"
+      },
+      {
+        "path": "src/components/ui/badge.tsx",
+        "sha256": "82abb6ffe3217c6712f3532ec167be86f9c19a8c81bf2c6733a75bdc5601140c"
+      },
+      {
+        "path": "src/components/ui/progress.tsx",
+        "sha256": "735499ea40523ee39272307366c5969bf414097117f142cad7cc7e6dfd061b47"
+      },
+      {
+        "path": "src/components/ui/label.tsx",
+        "sha256": "8a4ddcc890666379ab51c028e7f1b30c9668270fe0bd505e5a030a53fee36608"
+      },
+      {
+        "path": "src/components/ui/radio-group.tsx",
+        "sha256": "4dff571ad634d87499c18c8ecb99eea6eff00cb905b5ad60290e8e0e3ee07b12"
+      },
+      {
+        "path": "src/components/ui/checkbox.tsx",
+        "sha256": "c4a3c203d5f4330b67e5a470f699a5a9dad8970b8bdc3194dc329d70f565920e"
+      },
+      {
+        "path": "src/components/ui/tabs.tsx",
+        "sha256": "b6593e008f5e48f95862974a024b54053ca19b690f4de270979f3910119f2e9c"
+      },
+      {
+        "path": "src/components/ui/textarea.tsx",
+        "sha256": "aeaa16429fd3fd06f638eb51b452004fb48d1f91cb23504aa0f051ab8b0741bf"
+      },
+      {
+        "path": "src/lib/utils.ts",
+        "sha256": "d4dfb81a4cd7f2e4206cec563fb3478ae731f16c7073c2e3cfa7e3e01cfc008c"
+      },
+      {
+        "path": "src/lib/ask-question.ts",
+        "sha256": "22a3fae56e82191a8969cf042beb86bf9a58cdf18fd4f37e494afe0543eab191"
+      },
+      {
+        "path": "src/app/globals.css",
+        "sha256": "ccb4298dff0d8e4ee70f158f2c59651f1ce0190d12b1f6783c8a40a1f6c007cd"
+      },
+      {
+        "path": "src/i18n/messages/zh-CN.json",
+        "sha256": "91746e1c52b4aed7b40f2b65937e0f76e0b6456146c7c2b14fdb1e8467e1816f"
+      }
+    ],
+    "reference_dependencies_lock": {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\source-ui-deps\\package-lock.json",
+      "bytes": 68414,
+      "sha256": "c9a4a2104172ba8c8333d13d403e59bb1842a2bf40bda6a2e32062eb49573646"
+    },
+    "source_runner": {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\render-source-interactions.mjs",
+      "bytes": 8109,
+      "sha256": "aaf37b18a3fd58c7827f8a436d279bb08a6f9bf16dfb582b141c2c8580161df2"
+    },
+    "qualified_reference_iteration": "interaction-source-renderer-03.log",
+    "earlier_reference_iterations_not_visual_qualification": [
+      "interaction-source-renderer-01.log",
+      "interaction-source-renderer-02.log"
+    ],
+    "viewport_css_pixels": [
+      [
+        1000,
+        920
+      ],
+      [
+        390,
+        720
+      ]
+    ],
+    "system_pixel_ratio": 1.5,
+    "screenshots": [
+      {
+        "kind": "production",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\ui-evidence\\final\\fused-empty-plan-day-narrow.png",
+        "bytes": 26233,
+        "sha256": "f7d0992cea28915a9449efc25d54d547c31898c42b5098c651bc453509e18d77"
+      },
+      {
+        "kind": "production",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\ui-evidence\\final\\fused-empty-plan-night-narrow.png",
+        "bytes": 26399,
+        "sha256": "ebc4f3690784495183091e170b9a69f3154fde5b30103a0929a715171f075abf"
+      },
+      {
+        "kind": "production",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\ui-evidence\\final\\fused-empty-plan-night-wide.png",
+        "bytes": 32372,
+        "sha256": "847f1fbe1ac6c025eeb70116150570cd8a85994a93c85346dfba9564104bfdf7"
+      },
+      {
+        "kind": "production",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\ui-evidence\\final\\fused-plan-feedback-night-wide.png",
+        "bytes": 48002,
+        "sha256": "896c9a18fbc8526dd62e059d847766b1b26a6a66f7738dda2fe188c60c5b7ff4"
+      },
+      {
+        "kind": "production",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\ui-evidence\\final\\fused-question-day-narrow.png",
+        "bytes": 48037,
+        "sha256": "d4982e0c289aeec8b7f79aaba3728ef5ea4904cf656c65ae2b474f3a50831840"
+      },
+      {
+        "kind": "production",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\ui-evidence\\final\\fused-question-day-wide.png",
+        "bytes": 56595,
+        "sha256": "9da8cd98423391f4a04fe6e5c3fe51171d52a9a8a1b74ee54bd6d1f36df8cae5"
+      },
+      {
+        "kind": "production",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\ui-evidence\\final\\fused-question-night-narrow.png",
+        "bytes": 31250,
+        "sha256": "6c42a2eab2e5fd0f6b278541f3c054c382455ee211e93720ecb6c5a2ec1f4d85"
+      },
+      {
+        "kind": "production",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\ui-evidence\\final\\fused-question-night-wide.png",
+        "bytes": 57107,
+        "sha256": "f5b72ebfae0517b4a6ad1f415810dc20d195307c6f1bcb1741214518a965ef70"
+      },
+      {
+        "kind": "source",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\ui-evidence\\final\\source-empty-plan-day-narrow.png",
+        "bytes": 20558,
+        "sha256": "6c6bae3190c37badd6f618550f312228c202886e01f5cc7dd235863f473f9a8f"
+      },
+      {
+        "kind": "source",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\ui-evidence\\final\\source-empty-plan-day-wide.png",
+        "bytes": 26738,
+        "sha256": "22d224c5f842eb796b18d7ab50e90fd5d0a8ea19c319caef91f6a87a6767b963"
+      },
+      {
+        "kind": "source",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\ui-evidence\\final\\source-empty-plan-night-narrow.png",
+        "bytes": 20844,
+        "sha256": "01d46ee1f5a5cdc61c9f2897c039b8dfd7ecae199f392cced93abcdc5c55dad2"
+      },
+      {
+        "kind": "source",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\ui-evidence\\final\\source-empty-plan-night-wide.png",
+        "bytes": 26758,
+        "sha256": "a894a26067cc817515af6b6dbabc939166cd7ad6b5d53ad7ac4c6f40751749f9"
+      },
+      {
+        "kind": "source",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\ui-evidence\\final\\source-question-day-narrow.png",
+        "bytes": 41116,
+        "sha256": "9b868f20d6418e688906ce8f1b38d32e0e8835bd58df3d48c23d2d3a82ed2f19"
+      },
+      {
+        "kind": "source",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\ui-evidence\\final\\source-question-day-wide.png",
+        "bytes": 47932,
+        "sha256": "1231ca33dd188ef90afd94ef4431b3618ab504e00d5e366eee39c3eb51bf3043"
+      },
+      {
+        "kind": "source",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\ui-evidence\\final\\source-question-night-narrow.png",
+        "bytes": 40002,
+        "sha256": "90d0543b6bda98a87830d3a154208ddf86b9372d8f9b0a42b41d309d1e28e064"
+      },
+      {
+        "kind": "source",
+        "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\ui-evidence\\final\\source-question-night-wide.png",
+        "bytes": 47759,
+        "sha256": "080780fda0d0ccdd41a37d833fd5c77128aa9c2b69e0db0b4e71e414749355c1"
+      }
+    ],
+    "source_scope": "实际原问答组件、八个原UI依赖及空计划外壳；语言hook读原目录，CSS使用原root/neutral/theme/base/text-3xs与Tailwind4.1.18，未调用的MessageResponse抛错",
+    "reviewed": [
+      "原问答夜间宽屏/融合夜间宽屏",
+      "融合日间窄屏与尾部操作",
+      "原空计划/融合空计划夜间宽屏"
+    ],
+    "differences": [
+      "Rovai日夜语义色及队员用语",
+      "真实Core多请求选择与原提交核对",
+      "控件采用既有Radix Tabs和有完整键盘语义的原生表单",
+      "无App/Tauri外壳，不宣称逐像素相同或优于完整原App"
+    ]
+  },
+  "retained_failures": [
+    "renderer01发现已发送结果立即折起，已保留本次结果并优先新pending",
+    "renderer02隐藏窗口resize后双rAF夹具等待超时，加入有界150ms等待且仍断言实际布局",
+    "renderer03夹具对旧ID返回另一请求正文，被真实scope围栏拒绝；修正夹具保留精确历史，不放宽生产校验",
+    "source01/02分别补齐原neutral主题与base继承，只有03作为最终对照"
+  ],
+  "remaining_required": [
+    "Grok RequestChanges原User队列与输入接受/未知/取消/重启生命周期，保留原围栏",
+    "固定Codeg独立帮手查看器及Rovai原查看器",
+    "完整Core main/Host/HTTP/IPC与实际挂载往返、多来源挤压、非空计划原Markdown/工具链接同场景对照",
+    "其他原生格式、完整Runtime/custom与平台矩阵、I04其余T02/T03/T04工作包及84正式场景",
+    "跨进程未提交UI选择恢复不在本批资格中；已保存Core答案仍按原合同恢复"
+  ],
+  "approved_files_unchanged": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    }
+  ],
+  "source_snapshots": [
+    {
+      "path": "apps/desktop/src/renderer/src/RuntimeInteractionDock.tsx",
+      "git_blob": "ffbe0ffe43a317cf2dd25f28006a4a1f82e64965"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/SingleChatPanel.tsx",
+      "git_blob": "55e16f00b4d6eab6963d15275927ff1d833845c3"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/ThreadWorkspace.tsx",
+      "git_blob": "67682628a2e7f2a78a7564e61114784779365d3c"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/camp-client.tsx",
+      "git_blob": "acefba7f0376b29ef90ff793b7f70a12f412b4be"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/locales/en.json",
+      "git_blob": "c0cad7f9b69c00bcc3ef0d54b3ef23e9d05806d2"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/runtime-interaction-controller.test.ts",
+      "git_blob": "83aef224c724950e9e8ffe0002632b8c52810f3a"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/runtime-interaction-controller.ts",
+      "git_blob": "60a58727457ae769227204906149fb19e5e81d27"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/runtime-interactions.css",
+      "git_blob": "d5eb7215eec8e40225d50c177865051e07477239"
+    },
+    {
+      "path": "package.json",
+      "git_blob": "0361db2e4418715a9b8014077de751ba1bf7b3f1"
+    },
+    {
+      "path": "scripts/fixtures/runtime-interactions/index.html",
+      "git_blob": "0a27f6dcd894628600f5fa7b3610947d59800540"
+    },
+    {
+      "path": "scripts/fixtures/runtime-interactions/main.cjs",
+      "git_blob": "3dcc420839d03b3b4a719bbaeafe4bee8983435b"
+    },
+    {
+      "path": "scripts/fixtures/runtime-interactions/renderer.tsx",
+      "git_blob": "993bc5c0e48b5bc99f64f45595279f97a153fb21"
+    },
+    {
+      "path": "scripts/lib/runtime-interactions.test.mjs",
+      "git_blob": "dd8ad06a078d69d45e08ef881a9c9782349f6fe2"
+    }
+  ],
+  "logs": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-source-renderer-01.log",
+      "bytes": 133,
+      "sha256": "f87d423361b41e7e0889501997e4e02b9f59514030d9a443b0cfa2cf4980fcff"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-source-renderer-02.log",
+      "bytes": 133,
+      "sha256": "f87d423361b41e7e0889501997e4e02b9f59514030d9a443b0cfa2cf4980fcff"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-source-renderer-03.log",
+      "bytes": 133,
+      "sha256": "f87d423361b41e7e0889501997e4e02b9f59514030d9a443b0cfa2cf4980fcff"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-source-ui-deps-01.log",
+      "bytes": 243,
+      "sha256": "fe0824800cfb3ce7a919cc746dd140646785dcd4b2b41b70eebecc6b2ece8110"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-ui-codegraph-sync-final.log",
+      "bytes": 195,
+      "sha256": "bf48807c69bd12a0de28380c14b8f2142feac05d6782bd53cbe46fd9b7b942f7"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-ui-codegraph-sync.log",
+      "bytes": 235,
+      "sha256": "25cb189fdc39c771a549e150395dfc891cb7e375d5703b3e4e2fa08d94ba1ecd"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-ui-controller-01.log",
+      "bytes": 286,
+      "sha256": "ecf448625ac5acc44e9557d7dd5296cb7f2411290d4be8a79d8d737ec481b5dd"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-ui-controller-final.log",
+      "bytes": 286,
+      "sha256": "548fb27b68f46bdfe9b33ab3c7394721850c3896c13108a20a15a062ee7e820e"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-ui-doc-decisions-final.log",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-ui-doc-decisions.log",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-ui-doc-tests.log",
+      "bytes": 925,
+      "sha256": "f6a4c13734fc0daf83ff0a6f0f17f4d87f4755e509256047ea6ebca8da3dd145"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-ui-doc-version-final.log",
+      "bytes": 79,
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-ui-doc-version.log",
+      "bytes": 79,
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-ui-renderer-01.log",
+      "bytes": 1780,
+      "sha256": "b5b3c4598039265902bbaf21805d8d5ae165af9506aebc6137d7fbe7afded253"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-ui-renderer-02.log",
+      "bytes": 1345,
+      "sha256": "13f52808326776954a45c8eb087815705b4b221fb422491dceeec10d041bbb40"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-ui-renderer-03.log",
+      "bytes": 1782,
+      "sha256": "90279a78b516de2896cccbfd04f6e6620af9aaced2a3d30031794b9e0d208273"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-ui-renderer-04.log",
+      "bytes": 862,
+      "sha256": "c3a09e5bcdd059b70514392cce763e6835ef2f3dfebe865d6a962e0695c31c1c"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-ui-renderer-05.log",
+      "bytes": 914,
+      "sha256": "4db9377b621c6ed7106fed0d7aefdc3b36bed754462d799a3f1a404b59f6c0a4"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-ui-renderer-06.log",
+      "bytes": 914,
+      "sha256": "5ee2c1bc684d2ec58ab665e6f5b1cf2c361f2862878f6f7ce74bdf397d41b9bf"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-ui-renderer-07.log",
+      "bytes": 962,
+      "sha256": "87b6efa3e000ea011f099ea6d76db27dc11aaf5b24061ddb843b057b6692679c"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-ui-renderer-final-02.log",
+      "bytes": 1009,
+      "sha256": "3dd5292e4b500cde2d47c38df24e785cbeb720fc11620edb3d387f16a3eeb84a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-ui-renderer-final.log",
+      "bytes": 1009,
+      "sha256": "4021f95353819292af537b89e7932a29133f81ab13927cd84764794c7024a1fd"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-ui-typecheck-01.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-ui-typecheck-final-02.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\interaction-ui-typecheck-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "execution_boundaries": {
+    "core_started": false,
+    "real_runtime_or_paid_model_started": false,
+    "daily_data_modified": false,
+    "push": false,
+    "github_actions": false,
+    "main_merge": false,
+    "release": false
+  },
+  "customer_action_required_now": false,
+  "goal_not_complete": true
+}

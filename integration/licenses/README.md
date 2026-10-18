@@ -56,3 +56,8 @@ PTY后续移植及I12最终发布包仍分别核对，不将本批通知保留�
 `terminal/types.rs` 适配代次、整块回放和PTY生命周期，保留上述Apache-2.0来源通知。
 新增Rust直接依赖锁定为供体使用的portable-pty0.8.1，crate校验值与[原MIT许可证](portable-pty/LICENSE.md)见
 [来源记录](portable-pty/source.json)。该次锁定新增21包，既有278包版本和校验保持；完整传递依赖通知仍纳入I12发布资格，当前不宣称全部通知已完成。
+
+I04原生提问/计划卡片按固定Codeg的`ask-question-card.tsx`、`plan-approval-card.tsx`和`ask-question.ts::splitRecommended`适配，
+保留上述Apache-2.0来源注释与许可；组件、样式、交互及运行对照见[源码UI映射](../inventory/runtime-interaction-ui-reference.md)。
+生产继续使用已有React、Radix Tabs、lucide-react与Rovai安全Markdown，没有新增依赖或修改锁文件。
+原组件隔离视觉对照的测试专用依赖位于仓库外，不打入产品；其版本、安装锁及原源码摘要随本批证据记录。

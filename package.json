@@ -68,6 +68,7 @@
     "test:release-notes-ui": "node --test scripts/lib/release-notes-localization-ui.test.mjs",
     "test:capability-workspace": "node --test scripts/lib/capability-workspace.test.mjs",
     "test:approval-dock": "node --test scripts/lib/approval-dock.test.mjs",
+    "test:runtime-interactions": "node --test scripts/lib/runtime-interactions.test.mjs",
     "test:html-preview": "node --test scripts/lib/html-preview-site.test.mjs scripts/lib/html-preview-browser.test.mjs",
     "test:file-preview-layout": "node --test scripts/lib/file-preview-layout.test.mjs",
     "test:file-reference-navigation": "node --test scripts/lib/file-reference-navigation.test.mjs",

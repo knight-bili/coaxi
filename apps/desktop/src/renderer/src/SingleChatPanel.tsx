@@ -9,6 +9,7 @@ import { privateUploadController, type PrivateUploadState } from './private-uplo
 import { PrivatePendingEditor } from './PrivatePendingEditor'
 import { canvasComposerContextKey, type CanvasComposerContext } from './canvas-composer-drafts'
 import { useThreadClient } from './camp-client'
+import { RuntimeInteractionDock } from './RuntimeInteractionDock'
 import { useMobileLayout } from './MobileLayout'
 import { newCommandId } from '../../shared/command-id'
 import { RunningText } from './RunningText'
@@ -1723,6 +1724,7 @@ export function SingleChatPanel({
         onLatest={() => { followLatestRef.current = true }}
       />
       </div>
+      {currentSnapshot && <RuntimeInteractionDock conversationId={currentSnapshot.conversation.id} sourceLabel={selectedMember?.displayName} visible={visible} />}
       {currentSnapshot && currentSnapshot.approvals.length > 0 && <ApprovalDock
         approvals={currentSnapshot.approvals} profileById={profileById} busy={busy}
         onResolve={onResolveApproval} containerRef={approvalRef}

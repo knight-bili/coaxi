@@ -1,0 +1,76 @@
+/* Codeg question / plan card geometry, using Rovai's existing semantic theme.
+ * Fixed source and Apache-2.0 notice: RuntimeInteractionDock.tsx. */
+.native-interaction-dock { flex: none; min-width: 0; max-width: 100%; color: var(--ink); font-size: 14px; }
+.native-interactions-group { min-height: 0; max-height: 70svh; overflow-y: auto; }
+.native-interaction-toolbar { display: flex; align-items: center; gap: 8px; min-width: 0; margin-bottom: 6px; font-size: 12px; color: var(--muted); }
+.native-interaction-toolbar > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.native-interaction-toolbar select { min-width: 0; max-width: 100%; margin-left: auto; border: 1px solid var(--line); border-radius: 8px; padding: 4px 8px; color: var(--ink); background: var(--input); font: inherit; }
+.native-question-card { display: flex; flex-direction: column; max-height: 88svh; overflow: hidden; border: 1px solid color-mix(in srgb, var(--brand) 30%, transparent); border-radius: 14px; background: var(--surface-raised); margin-bottom: 8px; }
+.native-question-inner { display: flex; flex-direction: column; min-height: 0; gap: 12px; padding: 12px; }
+.native-question-card.is-collapsed .native-question-inner { padding: 8px; }
+.native-card-heading { display: flex; flex: none; align-items: center; gap: 10px; min-width: 0; font-size: 14px; }
+.native-card-heading > div { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.native-card-heading strong { font-size: 14px; font-weight: 500; }
+.native-card-heading small, .native-option-body small { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; line-height: 16px; }
+.native-question-icon { display: flex; align-items: center; justify-content: center; flex: none; width: 32px; height: 32px; border-radius: 8px; color: var(--brand); background: var(--surface-muted); }
+.native-question-count { flex: none; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.native-icon-button { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 24px; height: 24px; border: 0; border-radius: 8px; background: transparent; color: var(--ink); cursor: pointer; }
+.native-icon-button:hover { background: var(--surface-muted); }
+.native-question-progress { height: 4px; flex: none; background: var(--surface-muted); }
+.native-question-progress > span { display: block; height: 100%; background: var(--brand); transition: width 120ms; }
+.native-question-tabs { display: flex; flex-direction: column; min-height: 0; gap: 8px; }
+.native-tabs-list { display: flex; flex: none; gap: 2px; min-height: 36px; padding: 3px; border-radius: 999px; background: var(--surface-muted); overflow-x: auto; }
+.native-tab { display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex: 1; min-width: 48px; padding: 4px 8px; border: 0; border-radius: 14px; color: var(--muted); background: transparent; font: inherit; font-size: 14px; cursor: pointer; }
+.native-tab > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.native-tab[data-state=active] { background: var(--surface-raised); color: var(--ink); }
+.native-tab[data-answered=true] { color: var(--brand-ink); }
+.native-tab svg, .native-tab-number { flex: none; }
+.native-tab-number { display: flex; align-items: center; justify-content: center; width: 16px; height: 16px; border: 1px solid currentColor; border-radius: 50%; font-size: 10px; }
+.native-question-body { min-height: 0; overflow-y: auto; padding-right: 4px; }
+.native-question-body[data-state=inactive] { display: none; }
+.native-question-content { display: flex; flex-direction: column; gap: 10px; }
+.native-question-heading { display: flex; align-items: flex-start; gap: 8px; }
+.native-question-heading p { margin: 0; font-weight: 400; line-height: 20px; overflow-wrap: anywhere; }
+.native-badge { display: inline-flex; align-items: center; flex: none; border: 1px solid var(--line); border-radius: 6px; padding: 1px 5px; font-size: 10px; line-height: 16px; white-space: nowrap; }
+.native-badge.recommended { margin-left: 6px; border: 0; background: var(--surface-muted); color: var(--ink); }
+.native-options { display: flex; flex-direction: column; gap: 6px; }
+.native-option { display: flex; align-items: flex-start; gap: 10px; width: 100%; min-width: 0; border: 1px solid color-mix(in srgb, var(--line-strong) 60%, transparent); border-radius: 10px; padding: 10px; font-size: 14px; line-height: 20px; cursor: pointer; transition: background 120ms, border-color 120ms; }
+.native-option.is-selected { border-color: var(--brand); background: color-mix(in srgb, var(--brand) 10%, transparent); }
+.native-option:hover:not(.is-selected):not(.is-locked) { background: color-mix(in srgb, var(--surface-muted) 40%, transparent); }
+.native-option.is-locked { cursor: default; }
+.native-option input { appearance: none; position: relative; flex: none; margin: 2px 0 0; width: 16px; height: 16px; border: 1px solid var(--line-strong); background: transparent; }
+.native-option input[type=radio] { border-radius: 50%; }
+.native-option input[type=checkbox] { border-radius: 4px; }
+.native-option input:checked { border-color: var(--brand); background-color: var(--brand); }
+.native-option input[type=radio]:checked { background-image: radial-gradient(circle at center, var(--brand-contrast) 3px, transparent 3.5px); }
+.native-option input[type=checkbox]:checked::after { content: ''; position: absolute; left: 4px; top: 1px; width: 5px; height: 9px; border: solid var(--brand-contrast); border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.native-option input:disabled { opacity: 1; }
+.native-option-body { min-width: 0; flex: 1; overflow-wrap: anywhere; }
+.native-option-body > span { font-weight: 500; }
+.native-answer-text, .native-plan-changes textarea { width: 100%; min-width: 0; border: 1px solid color-mix(in srgb, var(--line-strong) 60%, transparent); border-radius: 6px; background: var(--input); color: var(--ink); padding: 6px 10px; font: inherit; line-height: 1.5; }
+.native-answer-text::placeholder, .native-plan-changes textarea::placeholder { color: var(--muted); }
+.native-card-actions { display: flex; flex: none; align-items: center; flex-wrap: wrap; gap: 8px; }
+.native-actions-end { display: flex; align-items: center; gap: 8px; margin-left: auto; justify-content: flex-end; }
+.native-button { display: inline-flex; align-items: center; justify-content: center; flex: none; gap: 4px; min-height: 32px; padding: 4px 12px; border: 1px solid transparent; border-radius: 32px; font: inherit; font-size: 14px; font-weight: 500; color: var(--brand-contrast); background: var(--brand); cursor: pointer; }
+.native-button:hover:not(:disabled) { background: var(--brand-hover); }
+.native-button.outline { border-color: var(--line); color: var(--ink); background: var(--input); }
+.native-button.ghost { color: var(--ink); background: transparent; }
+.native-button.danger { color: var(--danger); background: color-mix(in srgb, var(--danger) 10%, transparent); }
+.native-button.outline:hover:not(:disabled), .native-button.ghost:hover:not(:disabled) { background: var(--surface-muted); }
+.native-button.danger:hover:not(:disabled) { background: color-mix(in srgb, var(--danger) 20%, transparent); }
+.native-button:disabled { opacity: .5; cursor: not-allowed; }
+.native-interaction-dock :is(button, input, select, textarea, [role=region]):focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.native-plan-card { display: flex; flex-direction: column; gap: 12px; padding: 16px; margin-bottom: 8px; border: 1px solid color-mix(in srgb, var(--line-strong) 60%, transparent); border-radius: 10px; background: color-mix(in srgb, var(--surface-raised) 60%, transparent); }
+.native-plan-body { max-height: 20rem; overflow: auto; border: 1px solid var(--line); border-radius: 6px; background: color-mix(in srgb, var(--surface-muted) 30%, transparent); padding: 12px 14px; overflow-wrap: anywhere; }
+.native-plan-body .markdown-content { font-size: 14px; }
+.native-plan-empty { margin: 0; padding: 16px 12px; border: 1px dashed var(--line); border-radius: 6px; color: var(--muted); }
+.native-plan-changes { display: flex; flex-direction: column; gap: 8px; }
+.native-plan-changes textarea { resize: vertical; min-height: 5rem; max-height: 35svh; }
+.native-plan-record p { white-space: pre-wrap; overflow-wrap: anywhere; margin: 6px 0 0; }
+.native-interaction-status, .native-interaction-notice { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 4px 0 8px; font-size: 12px; color: var(--muted); }
+.native-interaction-notice[role=alert] { color: var(--danger); }
+.native-interaction-notice .native-button { font-size: 12px; }
+.native-spinner { animation: native-interaction-spin 1s linear infinite; }
+@keyframes native-interaction-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .native-spinner { animation: none; } .native-question-progress > span, .native-option { transition: none; } }
+@media (max-width: 480px) { .native-card-actions, .native-actions-end { gap: 6px; } .native-button { padding-inline: 9px; } }

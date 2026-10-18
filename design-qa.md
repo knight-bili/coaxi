@@ -222,3 +222,13 @@ rc23实际八类入口检查中，前五类CRUD/冲突/适用折叠/排列/删�
 真实私聊活动漏计通过原Rust owner的red/green和实际交错运行修复；最近模型查询原本沿轮次关联正确，不作多余修改。尺寸告警与因果不确定性保留在integration/execution/i03-ui-diagnostic-followups.json，本批展开后帧/命中/输入正常不等于告警已修复。依原计划限定诊断投入，R09限定本机范围完成，正式场景/平台/开发预览仍R10。
 
 final result: local scope verified; I03 final review pending R10
+
+## I04 原生问答与计划卡片（2026-10-18，组件范围）
+
+固定Codeg aff1e6c的AskQuestionCard/PlanApprovalCard及UI原语逐项映射，采用原胶囊Tab、14/10圆角、20/16行高和10选项内距；颜色沿Rovai日夜既有合同。原问答及空计划外壳通过仓库外独立源码构建运行，融合侧实际加载生产共享组件；同输入1000×920与390×720、1.5系统像素比截图分开保留，不把模拟传输说成真实Core/provider。路径、源码/截图摘要及通过结果见integration/execution/i04-native-interaction-ui-result.json，详细来源与明确适配见integration/inventory/runtime-interaction-ui-reference.md。
+
+已实际查看原问答夜间宽屏与融合夜间宽屏、融合日间窄屏、原空计划与融合空计划夜间宽屏。标题/队员用语、原提交核对与多请求队列为真实Core集成差异；控件和选项保留。原先描述行高18造成小量多余滚动，改回原16后短题clientHeight/scrollHeight均208；长计划确实超出时正文局部滚动，所有尾部决定可达。没有统一隐藏滚动条、裁正文或用空数据避开长计划。
+
+实际交互覆盖单/多选、推荐原文、真实__other__与宿主Other、Tab/键盘、折叠、三个计划决定、反馈取消保留、重复点击、未知核对与更换Host隔离。多个请求切换/隐藏各自未提交选择保留，仍需真实App/画布多来源挤压及端到端Core运输复验。原非空计划Markdown同场景、完整原App/Tauri/WebKit、真实模型与其余原生格式未授资格，I04保持实施中。
+
+final result: source-based cards and isolated Renderer verified; stage qualification pending
