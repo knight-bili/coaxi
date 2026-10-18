@@ -32,6 +32,16 @@ function tool(
 }
 
 describe('execution Tool grouping', () => {
+  it('keeps parent delegation start and resume cards outside ordinary consecutive tools', () => {
+    const start = tool('start'), resume = tool('resume'), status = tool('status')
+    start.step.builtinOperation = 'delegation.start'
+    resume.step.builtinOperation = 'delegation.resume'
+    status.step.builtinOperation = 'delegation.status'
+    const grouped = groupConsecutiveToolItems([tool('before'), start, status, resume, tool('after')])
+    expect(grouped.map(item => item.kind)).toEqual(['toolGroup', 'tool', 'toolGroup', 'tool', 'toolGroup'])
+    expect(grouped[1]).toBe(start); expect(grouped[3]).toBe(resume)
+    expect(grouped[2]).toMatchObject({ items: [status] })
+  })
   it('groups only maximal consecutive Tool items and keeps a stable first-item key', () => {
     const items: ExecutionProgressItem[] = [
       tool('one'),

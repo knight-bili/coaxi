@@ -3,6 +3,10 @@ import { parseCodegMcpToolCall, parseResumeTaskId } from './codeg-mcp-tool'
 import { peelMcpResultEnvelope } from './mcp-result-envelope'
 
 describe('native MCP history envelopes', () => {
+  it('keeps the exact interruption reason, including outer whitespace and Unicode', () => {
+    const reason = '  保留原文\n😀  '
+    expect(parseCodegMcpToolCall({ tool: 'resume_delegation', input: JSON.stringify({ task_id: 'original', reason }) }).reason).toBe(reason)
+  })
   it.each([
     { content: [{ type: 'text', text: '已记录😀' }] },
     { result: { content: [{ type: 'text', text: '已记录😀' }] }, error: null },

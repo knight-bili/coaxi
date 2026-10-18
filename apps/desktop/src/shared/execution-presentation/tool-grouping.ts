@@ -39,6 +39,11 @@ export function groupConsecutiveToolItems(
   let currentGroup: ToolActivityGroup | null = null
 
   for (const item of items) {
+    if (item.kind === 'tool' && ['delegation.start', 'delegation.resume'].includes(item.step.builtinOperation ?? '')) {
+      currentGroup = null
+      grouped.push(item)
+      continue
+    }
     if (item.kind === 'tool') {
       if (currentGroup === null) {
         currentGroup = {

@@ -1,0 +1,485 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-18T19:15:55.252939+00:00",
+  "stage": "I04",
+  "task": "I04-T01",
+  "branch": "develop/V1.0.0",
+  "baseline_commit": "d2eaf0ee1773aba3d2311a07851406a6567fc9b7",
+  "status": "parent_tool_source_cards_local_verified_windowed_core_classification_full_content_and_stage_candidate_pending",
+  "scope_preserved": {
+    "source_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_packages": 4,
+    "i04_clusters": 21,
+    "i04_formal_cases": 84,
+    "new_formal_cases_passed": 0
+  },
+  "facts": [
+    "Actual ToolCallRow uses Core-attested source/evidence/Run/epoch and original delegated/resumed source presenters, opaque UUID remains string",
+    "Initial observation keeps initial marker at current attempt2; exact resume reason includes outer whitespace/newlines/Unicode; task reaches original single-line preview and original child history",
+    "Refused resume uses original MCP fallback with no child link; unresolved/error keep original raw tool and read-only retry; raw subtree mounts lazily",
+    "One metadata-only page chain/timer per client/Thread/parent shared by parent list and multiple tools, no full-body status polling",
+    "Source, metadata and opened transcript clear on authenticated invalidation; late replies/pagination/closed leases cannot refill old generation",
+    "Actual shared viewer survives virtual source row removal; Host/Thread changes close old target and clear private task",
+    "Non-windowed delegation start/resume flush ordinary groups; existing windowed Core grouping/carrier preservation explicitly remains unfinished",
+    "Thirty-four catalog omissions discovered by full Renderer catalog owner corrected, most were pre-existing copy"
+  ],
+  "verification": {
+    "targeted_files": 9,
+    "targeted_tests_passed": 158,
+    "typecheck_exit": 0,
+    "production_renderer_groups": 33,
+    "screenshots_reviewed": 8,
+    "original_reference_modules": true,
+    "source_audit": {
+      "ok": true,
+      "donorCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+      "files": [
+        {
+          "name": "delegated-sub-thread.tsx",
+          "sourceSha256": "671938eb41af1ebbe5893ed2f618286d5432afa7ee57cdfddbafd8f9f74b396a",
+          "portedSha256": "bbc446edbc54e0248647c58ff650f65c14945697b04b0f3ddfbb319d068a68d0",
+          "bodyEqualAfterDeclaredWhitespaceFix": true
+        },
+        {
+          "name": "delegation-card-row.tsx",
+          "sourceSha256": "ab9d0c4a3b334cb70929f8becf473a56d929d1d18a4d12037f812f501e68041d",
+          "portedSha256": "cd863817fa443793984a01819456c990d075ed9cd251a14cf55ef2379d04b9ed",
+          "bodyEqualAfterDeclaredWhitespaceFix": true
+        },
+        {
+          "name": "resumed-delegation-card.tsx",
+          "sourceSha256": "8b7e100dca214c70c0801cbd43997b54561727e97c412aba134178dd774deb9c",
+          "portedSha256": "329c091e865023f7a49e900de3aa7b8fa2f55fd966edf0f89ef59d68b1ed3fef",
+          "bodyEqualAfterDeclaredWhitespaceFix": true
+        }
+      ],
+      "parserOnlyChangeSinceBaseline": "preserve complete original interruption reason instead of str() trimming",
+      "declaredPresenterChange": "two lines preserve raw reason while whitespace-only remains non-expandable",
+      "referenceUsesActualDonorModules": true,
+      "fullOriginalApp": false
+    },
+    "pixel_comparison": {
+      "comparison_completed": true,
+      "checks": [
+        {
+          "theme": "night",
+          "viewport_width": 1000,
+          "image_size": [
+            1500,
+            1413
+          ],
+          "first_card_pixel_equal": false,
+          "difference_bounds": [
+            261,
+            22,
+            275,
+            107
+          ]
+        },
+        {
+          "theme": "night",
+          "viewport_width": 390,
+          "image_size": [
+            587,
+            1233
+          ],
+          "first_card_pixel_equal": true,
+          "difference_bounds": null
+        },
+        {
+          "theme": "day",
+          "viewport_width": 1000,
+          "image_size": [
+            1500,
+            1413
+          ],
+          "first_card_pixel_equal": true,
+          "difference_bounds": null
+        },
+        {
+          "theme": "day",
+          "viewport_width": 390,
+          "image_size": [
+            587,
+            1233
+          ],
+          "first_card_pixel_equal": true,
+          "difference_bounds": null
+        }
+      ],
+      "edits_or_generated_images": false,
+      "scope": "raw screenshot differences are reported, not assumed equal or a whole-App visual pass"
+    },
+    "docs_gates": [
+      {
+        "name": "docs-tests",
+        "exit": 0
+      },
+      {
+        "name": "docs-version",
+        "exit": 0
+      },
+      {
+        "name": "docs-base",
+        "exit": 0
+      },
+      {
+        "name": "codegraph-sync",
+        "exit": 0
+      }
+    ],
+    "codegraph_synced": true,
+    "transport": "explicit synthetic Core transport; actual production ToolCallRow, complete viewer host and fixed donor reference modules",
+    "new_rust_builds": 0,
+    "schema_or_model_input_changes": 0,
+    "actual_core_native_web_e2e": false,
+    "full_original_app": false,
+    "stage_complete": false
+  },
+  "self_review_fixes": [
+    "Source change received during unresolved first fetch is queued, bound/refused immutable source is not polled",
+    "Separate context keeps generic tool rows from importing entire viewer cycle; missing host preserves old raw renderer without a fake client",
+    "Current metadata cannot substitute another child/owner and an older attempt cannot replace the accepted source attempt",
+    "Existing opened viewer previously retained old transcript on auth invalidation; cleared and fenced, ordinary same-owner offline preservation retained",
+    "Initial catalog gate failure fixed rather than suppressed; original unknown history test accidentally requested another refresh, corrected synchronization",
+    "Capture attempts retained; final captures use fresh WebContents at rest. Pixel differences reported, never silently declared exact parity",
+    "Process notes use bundled Python after default Python3.9 rejected Unicode source; no user environment configuration changed"
+  ],
+  "remaining": [
+    "Windowed Core execution blocks must keep start/resume standalone while preserving proven original Shell carrier and cursor/range semantics",
+    "Complete statistics, original Markdown/HTML/image interactions and full original App same-scene comparisons",
+    "Real Core.handle -> Native/Web -> production UI candidate, clipping/scale/memory/reauthorization/recovery",
+    "Claude parser/producer/Core, independent Qoder root/producer, explicit legacy import, Grok feedback, original T02/T03/T04 union/recovery/memory/automation",
+    "Complete original ANSI license evidence or replacement before public binaries"
+  ],
+  "goal_status": "active",
+  "customer_action_required": false,
+  "push": false,
+  "actions_dispatched": 0,
+  "main_merge": false,
+  "release": false,
+  "paid_usage": false,
+  "approved_r1_artifacts": [
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    },
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    }
+  ],
+  "source_files": [
+    {
+      "path": "apps/desktop/src/renderer/src/CoreDelegationCard.tsx",
+      "sha256": "f058579ce9b500b1ae331a844d6a211e3f5f55803ab1e958a0d0255ffa6bc515",
+      "git_blob_with_filters": "27de272a4d2e54850d832b29497a0e2000230ff3"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/DelegationViewer.tsx",
+      "sha256": "5cd7d9908fde7e973e1f2d0b8d7c23535314058a78909ffa753959fe8c4c49c7",
+      "git_blob_with_filters": "426b14505012a993d035988d129b7e9c248ac3d2"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/ExecutionToolGroup.tsx",
+      "sha256": "d1aa6de6bdfd9af7450663f8841808dca97bce8d85841a1acbb0ff952bcd2599",
+      "git_blob_with_filters": "1539506f1c80f8eb2bf01ae89d58fb9442a2838d"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/resumed-delegation-card.tsx",
+      "sha256": "329c091e865023f7a49e900de3aa7b8fa2f55fd966edf0f89ef59d68b1ed3fef",
+      "git_blob_with_filters": "5a542e13d4e7ae21bdc6647297f45b6cacef1f90"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/codeg-mcp-tool.test.ts",
+      "sha256": "1c0436a1e9fb487ba3807fbfac4340c352654a1d8163e180a008024616a1f9bc",
+      "git_blob_with_filters": "65adf51b337037a656d3c811ccaa3de1601c4dd1"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/codeg-mcp-tool.ts",
+      "sha256": "115091c57d395ff621f737bf92bd9db908513212c3f8575b83efd5619950732e",
+      "git_blob_with_filters": "1d437c44bd7a08ec1dd0749590d15bc4c0590e6b"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/delegation-viewer-controller.test.ts",
+      "sha256": "d5227d4fb936946812886ffb95e0c74d015eda874ae7500f6c31e656253be391",
+      "git_blob_with_filters": "e3f748eeb76a4073ed31c31510bef65cb7587c37"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/delegation-viewer-controller.ts",
+      "sha256": "73cc5fd2f44384abad4c936cc2daa799731907b36616a0ef5c72ce801a326215",
+      "git_blob_with_filters": "ddb728e938df5a023fbfc89db2186dcf870fdc97"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/delegation-viewer.css",
+      "sha256": "c1ba4a5a1975888020f7dee001802eb95dd48b67a404e579c1195b629634182c",
+      "git_blob_with_filters": "adc8d8ad5e60fe83f71886c5da352d76e4ae05d4"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/execution-tool-grouping.test.ts",
+      "sha256": "8d1a0baa1a73c698164227b306c5e5805d855018add96df8882a46da32545c0c",
+      "git_blob_with_filters": "a136aa03e50cf3de5487d106125db67251548ffe"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/locales/en.json",
+      "sha256": "4a918c0dc7ae54b6cd4e5c36a1777cb443298e211713fdad97e77045862e3ebf",
+      "git_blob_with_filters": "3e22ff60039fb7f5f64f6eabfeb1da970e4e9a14"
+    },
+    {
+      "path": "apps/desktop/src/shared/execution-presentation/tool-grouping.ts",
+      "sha256": "ce61cd2b707205c62bf9fd81af4ff33b6e5f659a287e5975734fbacf2f04906d",
+      "git_blob_with_filters": "747a7e0362b534f46e5d2a4ead729d8df7c1b343"
+    },
+    {
+      "path": "design-qa.md",
+      "sha256": "c8bb9adbeee5a2e327fb92b168a568f97fa956f19e5b926508b46d13e12ce38f",
+      "git_blob_with_filters": "526babf0118cf7d04f5c9dad3cbf48c509be9d00"
+    },
+    {
+      "path": "docs/contracts/delegation-v1.md",
+      "sha256": "822d6b76d9bfbf391c765fd7fd4fb2f5507222fe42a89e80b6160e91f35dd236",
+      "git_blob_with_filters": "5d572505daacb78da07a1f9392001f2e6c96d9e6"
+    },
+    {
+      "path": "integration/README.md",
+      "sha256": "042811792d08c6c45079235008fe5596b2951c92fc35e053c7214b797b2e72de",
+      "git_blob_with_filters": "6d60067362e3e895b77a28726277f3e866f1f6a1"
+    },
+    {
+      "path": "integration/execution/goal-state.json",
+      "sha256": "138a6c4b9e407901f2bafd09a82fff0a626c79a243ce30ee7ffbde7e635a134c",
+      "git_blob_with_filters": "32ba086850d5b4a09d308acbde87aef2f9f92c46"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/DelegationToolCard.tsx",
+      "sha256": "d4297b08caeb764667c19873ddc55eb9bab63be8e371dbb9ccb1b95c255df2d3",
+      "git_blob_with_filters": "6f8714801dc6be7e23a60275d7455a8645de11bb"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/delegation-children-controller.ts",
+      "sha256": "df500c45ecb7e4ef0779f7e5f3a9017ccf4f06142a292f78c745e1725fb130ca",
+      "git_blob_with_filters": "5f981ff707151e4fd443cab0fd7fb75050774140"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/delegation-tool-source-controller.ts",
+      "sha256": "04a4caf874479c16af3c9944d9503f5c441708b9c96d9e97d993d993faec4e0f",
+      "git_blob_with_filters": "a9b504c33c2f3f8df8bcfd537152e0158646469f"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/delegation-viewer-context.ts",
+      "sha256": "8a41628cbe5f044a4578c867c8454464984af25bcfb6410540945138c5646771",
+      "git_blob_with_filters": "558c622a1071b87d8852b7d8b58ebbeec8b5eb4f"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "file/I04父工具卡片接线/checkpoint.py",
+      "bytes": 8753,
+      "sha256": "4d474125d707afdd9a1b1090a8c5531f99a760692a7309b382e66e74ba4b7fec"
+    },
+    {
+      "path": "file/I04父工具卡片接线/inspect.cjs",
+      "bytes": 1385,
+      "sha256": "280ec954fa543019d42578f30ed771e8ed129b75cf190c9a890842d45fa685ee"
+    },
+    {
+      "path": "file/I04父工具卡片接线/inspect.mjs",
+      "bytes": 5115,
+      "sha256": "0fed7aff72c7e77facadd2ece786a2d06d36e6050e730cfbe660988bca9fab34"
+    },
+    {
+      "path": "file/I04父工具卡片接线/main-before-fresh.cjs",
+      "bytes": 10471,
+      "sha256": "8677af8235d6fd5b8ef5a93250ee2db103cf9796bdb277f5607aaab3b6527c63"
+    },
+    {
+      "path": "file/I04父工具卡片接线/main-before-offscreen.cjs",
+      "bytes": 10421,
+      "sha256": "e84bc4abef62040bc00f84606e2469398342d4984ce7d8771847c0a39655802e"
+    },
+    {
+      "path": "file/I04父工具卡片接线/main-before-scroll.cjs",
+      "bytes": 9662,
+      "sha256": "9fbdbbf196d8f717dd303bb648e902394a19c6a94daf8f4a637aa054d570d878"
+    },
+    {
+      "path": "file/I04父工具卡片接线/main.cjs",
+      "bytes": 12623,
+      "sha256": "b8a3f8c8612b94bc7c0e5b5352587df2b84ad4ca58cf2d178b321f230edf7ff7"
+    },
+    {
+      "path": "file/I04父工具卡片接线/notes.py",
+      "bytes": 4559,
+      "sha256": "0f97108f0eb29ced3207beb8662644738747d4811aaa18f243e5eb1885e7a85c"
+    },
+    {
+      "path": "file/I04父工具卡片接线/pixel-compare.py",
+      "bytes": 1250,
+      "sha256": "3a8b383bfb6f28d89820c0376cfd588a771dad94005b7176d4cc08a88331ba93"
+    },
+    {
+      "path": "file/I04父工具卡片接线/render-before-scroll.mjs",
+      "bytes": 5018,
+      "sha256": "a5ab055e69e3a08b49d19ea4e17c7cd97ccdd62fb253f1c60fec51f71753dd6f"
+    },
+    {
+      "path": "file/I04父工具卡片接线/render.mjs",
+      "bytes": 5121,
+      "sha256": "138cec2efaf9d48dbf37656f982078a72e63982f785f30ce2618842148d334d6"
+    },
+    {
+      "path": "file/I04父工具卡片接线/renderer.tsx",
+      "bytes": 9518,
+      "sha256": "100b97ee3dab9f24931d7d2ce7745fb31124a7c9663c1de498565731c720d9cb"
+    },
+    {
+      "path": "file/I04父工具卡片接线/source-audit.mjs",
+      "bytes": 2715,
+      "sha256": "644451cd7bf2f3c43e5b6481b8715b37177095d5ebb78dbc52c549ec913a7bc1"
+    },
+    {
+      "path": "file/I04父工具卡片接线/verify-docs.ps1",
+      "bytes": 1229,
+      "sha256": "6f161653e487cd9add6a72b1eb6abdb1c245a9703b108d923316935ec32952ef"
+    },
+    {
+      "path": "file/I04父工具卡片接线/logs/tests-verified.log",
+      "bytes": 276,
+      "sha256": "1533a8f7583a4f2200f19955c5e994b53a2fb5e511b6171cd4f1546c3216a5c7"
+    },
+    {
+      "path": "file/I04父工具卡片接线/logs/types-verified.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "file/I04父工具卡片接线/logs/source-audit.json",
+      "bytes": 1241,
+      "sha256": "28f2d354ca693924f227a78c6ef7a0d71104d2453c79c34674700a4100c87817"
+    },
+    {
+      "path": "file/I04父工具卡片接线/logs/pixel-compare.json",
+      "bytes": 1071,
+      "sha256": "70a66b2357c05a4e040f96d139c8144e489377411bc23cdbac580558bc646576"
+    },
+    {
+      "path": "file/I04父工具卡片接线/logs/ui-result-verified.json",
+      "bytes": 12296,
+      "sha256": "3f60ba90b350052b367efe8551e3777b016ddea44544d250d8e5ce1e67c16fb2"
+    },
+    {
+      "path": "file/I04父工具卡片接线/logs/ui-verified.log",
+      "bytes": 267,
+      "sha256": "2c6c0802be7037ee794db1f6613f6da5c1f59c0dc8c98df0d0acb93f6294f24c"
+    },
+    {
+      "path": "file/I04父工具卡片接线/logs/docs-checks.json",
+      "bytes": 222,
+      "sha256": "96450883a2ab502dd6adbd7b2f41fbab28adfc2ccee410e9e99eeb779ebcb70d"
+    },
+    {
+      "path": "file/I04父工具卡片接线/logs/docs-tests.log",
+      "bytes": 925,
+      "sha256": "3e656d69542da08573a009dd83debefe2e374b7f91f694e28f38ec2ae22170ce"
+    },
+    {
+      "path": "file/I04父工具卡片接线/logs/docs-version.log",
+      "bytes": 79,
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "file/I04父工具卡片接线/logs/docs-base.log",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "file/I04父工具卡片接线/logs/codegraph-sync.log",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "file/I04父工具卡片接线/logs/tests-final.log",
+      "bytes": 2591,
+      "sha256": "db7c342b4a91ac0181cf52d6f4f7e8371fc13f67b9926d155b9c42782c797f9c"
+    },
+    {
+      "path": "file/I04父工具卡片接线/logs/catalog-fixed.log",
+      "bytes": 272,
+      "sha256": "0c472a277b6b3346ece6bf6b2f6ba956f69206737b4d9126212c6f043514b3b8"
+    },
+    {
+      "path": "file/I04父工具卡片接线/logs/viewer-auth.log",
+      "bytes": 1419,
+      "sha256": "990218590a938ce10f27468d234ff830f736aca3594fcebe958c46c07dfdc769"
+    },
+    {
+      "path": "file/I04父工具卡片接线/logs/viewer-auth-final.log",
+      "bytes": 272,
+      "sha256": "6d4a771a82968e3b4d160dd9ce468b642832f25b0654635288896977ece14cbf"
+    },
+    {
+      "path": "file/I04父工具卡片接线/drafts/product/verified-captures/product-night-1000.png",
+      "bytes": 162279,
+      "sha256": "fead2b0f336e82e9dea7da07293f48fde7c538f9c2907284ad9c3ff89e47fdff"
+    },
+    {
+      "path": "file/I04父工具卡片接线/drafts/product/verified-captures/product-night-390.png",
+      "bytes": 139901,
+      "sha256": "7e4a87b8eac71156891b1d6a4e6005818ae453714e48b0db0927951bee97a42e"
+    },
+    {
+      "path": "file/I04父工具卡片接线/drafts/product/verified-captures/product-day-1000.png",
+      "bytes": 156340,
+      "sha256": "8ea3d3fa3616c5a34bdbda67ba9b57bb503611f98571d31c09a8e2ada2495399"
+    },
+    {
+      "path": "file/I04父工具卡片接线/drafts/product/verified-captures/product-day-390.png",
+      "bytes": 134794,
+      "sha256": "1cae6552496b6b0f288fdfd5ffd5c25b7bda5998715dadc6df7b4632c69d9df1"
+    },
+    {
+      "path": "file/I04父工具卡片接线/drafts/product/verified-captures/original-night-1000.png",
+      "bytes": 82977,
+      "sha256": "2c5bba968e248fd7b31b05de47275de7a2ba8da04c7c69e5bfb86ed8c676936c"
+    },
+    {
+      "path": "file/I04父工具卡片接线/drafts/product/verified-captures/original-night-390.png",
+      "bytes": 66446,
+      "sha256": "1d0d6f943684561522bbd22e10eb67970816e2e0cb82f8b18150c6718cacbf3e"
+    },
+    {
+      "path": "file/I04父工具卡片接线/drafts/product/verified-captures/original-day-1000.png",
+      "bytes": 79271,
+      "sha256": "aebf42c4d29c86c762ef994e8284a0c07dc50ae8dd363b8df6c6132d2a1cc490"
+    },
+    {
+      "path": "file/I04父工具卡片接线/drafts/product/verified-captures/original-day-390.png",
+      "bytes": 62677,
+      "sha256": "42cbffc49168508687eaeda7f12c6f72030be09f7c23ffe4a80a8ab5444019bb"
+    }
+  ]
+}

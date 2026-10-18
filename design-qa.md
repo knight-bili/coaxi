@@ -242,3 +242,12 @@ final result: source-based cards and isolated Renderer verified; stage qualifica
 自审修复：断线时 latest20 与旧页之间必须追原签名页链，避免中间缺消息；换父会话读取失败不能重新标记旧列表；按 final Message ID 去重正文时保留附件。隐藏测试窗口的 CSS 过渡冻结单独在夹具收尾，不改变生产动效；触控测试是可信 Chromium 输入，不当移动真机。Core 原同库 owner 与 UI 模拟分别取证，来源、完整日志和局限见 integration/execution/i04-delegation-viewer-result.json 与 integration/inventory/delegation-viewer-ui-reference.md。
 
 final result: source drawer and isolated component verified; complete viewer and stage qualification pending
+
+
+## I04 父工具委派／恢复原卡片（2026-10-19）
+
+固定 Codeg aff1e6c 的 DelegatedSubThread、ResumedDelegationCard、DelegationCardRow 直接驱动 Core 已核实的 User 来源。父工具 ToolCallRow 接入原组件；首次观察仍显示首次委派，恢复观察显示原角标与原展开区，拒绝沿原 MCP 卡显示失败且没有子入口。原工具记录保留为懒挂载的次级 disclosure；新旧入口共用原 Core 查看器，虚拟行卸载不关闭查看器。task/reason 不从 native 文本或当前工程猜测；任务完整传入原单行预览，全文沿原 child 历史可读，恢复原因保持换行、首尾空白与Unicode。
+
+原首次主卡与行组件函数体/JSX与固定供体一致；恢复组件仅两行移除显示前的trim，纯解析器相对本批基线仅一处保留reason原文，展开条件仍拒绝纯空白。直接运行供体组件作参考，明确 Core UUID/模型/查看器、Runtime标签/图标和既有主题/本地化接缝，不是完整Codeg App。生产与参考同为1000/390宽、日/夜两套主题，8张新窗口静止帧已检查；首卡4组像素检查3组完全一致、夜间宽屏仅左侧14px窄边带不同，不宣称全App逐像素一致。隐藏窗口复用会出现陈旧合成帧；过程截图保留，最终静止对照每张使用独立WebContents，原始像素差异如实记录，不改生产动画或GPU配置。原原因区有实际长内容时才滚动，末行可达，不统一隐藏滚动条。
+
+生产组件33组检查包括完整任务/原因、拒绝、原记录、状态共享、错误/只读重试、原会话导航、行卸载后查看器保留、换Host/Thread、隐藏以及已打开正文认证失效清空。运输明确为synthetic Core；不冒充真实Core/Host/Runtime/完整App或正式84场景资格。非windowed完整历史已单列start/resume，分页Core block的独立分类与Shell carrier保持仍待补齐；完整富内容、原完整App和真实两端继续按I04候选处理。

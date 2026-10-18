@@ -1,20 +1,24 @@
-import type { DelegationDetail } from '@contracts'
+import type { DelegationDetail, DelegationToolSourceView } from '@contracts'
 import { useRef } from 'react'
 import { DelegatedSubThread } from './codeg-native-content/components/message/delegated-sub-thread'
 import { ResumedDelegationCard } from './codeg-native-content/components/message/resumed-delegation-card'
 import { SourceDelegationProvider } from './codeg-native-content/ui/source-delegation-host'
 import { coreDelegationCardModel } from './core-delegation-card'
 
-export function CoreDelegationCard({ detail, onOpen }: { detail: DelegationDetail; onOpen(trigger?: HTMLElement): void }): React.JSX.Element {
+export function CoreDelegationCard({ detail, source, onOpen }: { detail: DelegationDetail; source?: Extract<DelegationToolSourceView, { state: 'bound' }>; onOpen(trigger?: HTMLElement): void }): React.JSX.Element {
   const trigger = useRef<HTMLElement | undefined>(undefined)
-  return <div className="codeg-native-rich" data-core-delegation-id={detail.delegationId} onClickCapture={event => {
+  const sourceId = source?.source.evidenceId ?? detail.delegationId
+  const model = coreDelegationCardModel(detail)
+  if (source) model.task = source.task
+  const resumed = source ? source.operation === 'delegation.resume' : detail.currentAttemptNo > 1
+  return <div className="codeg-native-rich" data-core-delegation-id={detail.delegationId} data-core-delegation-source={source?.source.evidenceId} onClickCapture={event => {
     trigger.current = event.target instanceof Element ? event.target.closest('button') ?? undefined : undefined
-  }}><SourceDelegationProvider value={{ sourceId: detail.delegationId, model: coreDelegationCardModel(detail), open: request => {
-    if (request.source.parentToolUseId !== detail.delegationId) throw new Error('delegation.viewer_scope_mismatch')
+  }}><SourceDelegationProvider value={{ sourceId, model, open: request => {
+    if (request.source.parentToolUseId !== sourceId) throw new Error('delegation.viewer_scope_mismatch')
     onOpen(trigger.current)
   } }}>
-    {detail.currentAttemptNo > 1
-      ? <ResumedDelegationCard toolCallId={detail.delegationId} input={JSON.stringify({ task_id: detail.delegationId })} />
-      : <DelegatedSubThread parentToolUseId={detail.delegationId} />}
+    {resumed
+      ? <ResumedDelegationCard toolCallId={sourceId} input={JSON.stringify({ task_id: detail.delegationId, ...(source?.reason == null ? {} : { reason: source.reason }) })} />
+      : <DelegatedSubThread parentToolUseId={sourceId} />}
   </SourceDelegationProvider></div>
 }

@@ -9,6 +9,9 @@
 .delegation-card-description code { font-size: 12px; color: var(--muted); }
 .delegation-card-description small { color: var(--muted); font-size: 12px; }
 .delegation-status { color: var(--muted); font-size: 11px; line-height: 16px; }
+.delegation-tool-source { display: grid; gap: 6px; min-width: 0; }
+.delegation-tool-original { min-width: 0; color: var(--muted); font-size: 11px; }
+.delegation-tool-original > summary { cursor: pointer; padding: 2px 0; }
 .delegation-status.is-failed { color: var(--danger); }
 .delegation-open { display: inline-flex; flex: none; align-items: center; justify-content: center; gap: 6px; padding: 0 12px; border: 0; border-left: 1px solid var(--line); color: var(--ink); background: transparent; font: inherit; font-weight: 500; cursor: pointer; }
 .delegation-open:hover { background: var(--surface-muted); }

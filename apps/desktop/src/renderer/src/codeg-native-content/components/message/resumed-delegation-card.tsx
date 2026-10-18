@@ -133,8 +133,8 @@ export function ResumedDelegationCard({
   // to the LLM ("Delegation resumed. task_id=… Call get_delegation_status with
   // this id …") whose every fact — which agent, which task, which id, what
   // state — the collapsed row already states, in the reader's language.
-  const reason = call.reason?.trim() ?? ""
-  const expandable = reason !== ""
+  const reason = call.reason ?? ""
+  const expandable = reason.trim() !== ""
 
   return (
     <div

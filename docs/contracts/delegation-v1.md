@@ -25,6 +25,8 @@ User-only `delegations.source` 严格接 `{threadId,evidenceId}`，不接 task�
 
 返回`source`固定evidence/Run/epoch/父Conversation/Thread。`bound`含确切attempt号、当前原detail元数据、完整原task和该次reason；task来自首次system委派消息并与原Managed Blob摘要核对，reason仅来自该次attempt。`refused`只含原操作和Core拒绝码，不补其他任务的正文或子入口；无法核定为`unresolved`。父列表、既有详情及模型输出仍保持原元数据边界，本入口没有新增CLI/model工具，不改变Charter/Manifest/输入协议。完整文本沿现有User原历史读取语义，不引入预览截断。
 
+生产父工具行已接原 Codeg 委派/恢复卡片：来源按当前client/Thread/evidence/Run/epoch校验，首次记录按该次operation/attempt保持初始标记，不因当前attempt变化变成恢复记录。原任务仅由核实来源读取一次；当前状态与父列表共用同一client/Thread/父Conversation的元数据页链和刷新，不轮询完整任务。拒绝、未知和读取失败保留原工具记录及只读重试。来源/元数据/已打开查看器遇授权失效立即清空，旧异步回复不得回填。原恢复原因解析与展示保留完整空白及Unicode。非窗口化历史已让start/resume独立展示；分页Core工具块的独立分类及原Shell carrier保持仍须补齐，不能据本批Renderer验证宣布该链完成。
+
 读取只核对持久事实，不attach、启动、恢复、补发或自动reconcile，不写入观察或命令。返回不含凭据、Runtime配置或运行目录；任务正文自身的用户内容不被当作新授权。User窗口继续按当前client/Thread/父Run/证据核对来源并复用原Core查看器。新增接口和本地组件验证不授予真实Core至Native/Web或整阶段资格；原模型r1及Schema161/Migration211不变。
 
 ### User 查看器活动投影

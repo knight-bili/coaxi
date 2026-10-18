@@ -2,6 +2,9 @@ import { describe, expect, it, vi } from 'vitest'
 import type { DelegationConversationView, DelegationHistoryPage } from '@contracts'
 import { DelegationViewerController, delegationChildren, delegationViewerController } from './delegation-viewer-controller'
 import type { ThreadClient } from './camp-client'
+import { delegationChildrenController } from './delegation-children-controller'
+import { DelegationToolSourceController, assertDelegationToolSource } from './delegation-tool-source-controller'
+import type { DelegationToolSourceView } from '@contracts'
 
 const target = { threadId: 'thread-a', parentConversationId: 'parent-a', delegationId: 'delegation-a' }
 const detail = (): DelegationConversationView => ({ ...target, ownerAgentId: 'owner-a', rootConversationId: target.parentConversationId, parentDelegationId: null,
@@ -10,7 +13,148 @@ const detail = (): DelegationConversationView => ({ ...target, ownerAgentId: 'ow
 const message = (n: number): DelegationHistoryPage['messages'][number] => ({ id: `message-${n}`, sequence: n, author_type: n % 2 ? 'delegation_parent' : 'assistant', body: `完整消息 ${n}`, created_at: '' })
 const page = (values: number[], cursor?: string): DelegationHistoryPage => ({ task_id: target.delegationId, conversation_id: 'child-a', messages: values.map(message), ...(cursor ? { next_cursor: cursor } : {}) })
 type Client = Pick<ThreadClient, 'request' | 'onEvent' | 'onInvalidated'>
+const sourceTarget = { threadId: target.threadId, evidenceId: 'source-evidence', agentRunId: 'parent-run', executionEpoch: 3 }
+const sourceView = (): Extract<DelegationToolSourceView, { state: 'bound' }> => ({ state: 'bound',
+  source: { ...sourceTarget, parentConversationId: target.parentConversationId }, operation: 'delegation.start', attemptNo: 1,
+  task: '完整原任务中文😀\n'.repeat(8000), reason: null, detail: detail() })
+
+describe('parent tool sources and shared current metadata', () => {
+  it('rejects exchanged source identities, parent details, operation and attempt without publishing bodies', async () => {
+    const good = sourceView()
+    for (const source of [ { ...good.source, threadId: 'other' }, { ...good.source, evidenceId: 'other' },
+      { ...good.source, agentRunId: 'other' }, { ...good.source, executionEpoch: 4 }, { ...good.source, parentConversationId: 'other' } ]) {
+      expect(() => assertDelegationToolSource({ ...good, source }, sourceTarget)).toThrow()
+    }
+    for (const changed of [{ operation: 'native-tool' }, { attemptNo: 2 }, { task: undefined }, { reason: {} },
+      { operation: 'delegation.resume', attemptNo: 1 }, { detail: { ...good.detail, threadId: 'other' } }]) {
+      const client: Client = { request: vi.fn(async () => ({ ...good, ...changed })) as Client['request'] }
+      const controller = new DelegationToolSourceController(client, sourceTarget)
+      await controller.refresh()
+      expect(controller.getSnapshot()).toMatchObject({ view: null, error: true, loading: false })
+    }
+  })
+  it('keeps full immutable task/reason once and never uses native ids or polling to reread a bound body', async () => {
+    const view = { ...sourceView(), operation: 'delegation.resume', attemptNo: 2, detail: { ...detail(), currentAttemptNo: 3 }, reason: '  保留换行\n😀  ' }
+    const request = vi.fn(async () => view)
+    const client = { request } as unknown as Client
+    const controller = new DelegationToolSourceController(client, sourceTarget)
+    const stop = controller.retain()
+    await controller.refresh()
+    expect(controller.getSnapshot().view).toEqual(view)
+    controller.evidenceChanged(); controller.evidenceChanged()
+    expect(request).toHaveBeenCalledTimes(1)
+    expect(request).toHaveBeenCalledWith('delegations.source', { threadId: target.threadId, evidenceId: sourceTarget.evidenceId })
+    stop(); expect(controller.getSnapshot().view).toBeNull()
+  })
+  it('clears private data on authentication invalidation and ignores the old late reply', async () => {
+    let invalidate: (() => void) | undefined
+    let finishOld: ((value: DelegationToolSourceView) => void) | undefined
+    let finishNew: ((value: DelegationToolSourceView) => void) | undefined
+    const request = vi.fn().mockImplementationOnce(() => new Promise(resolve => { finishOld = resolve }))
+      .mockImplementationOnce(() => new Promise(resolve => { finishNew = resolve }))
+    const off = vi.fn()
+    const controller = new DelegationToolSourceController({ request, onInvalidated: listener => { invalidate = listener; return off } } as Client, sourceTarget)
+    const stop = controller.retain()
+    invalidate!()
+    expect(controller.getSnapshot().view).toBeNull()
+    finishOld!(sourceView()); await Promise.resolve(); await Promise.resolve()
+    expect(controller.getSnapshot().view).toBeNull()
+    finishNew!({ state: 'unresolved', source: sourceView().source })
+    await controller.refresh()
+    expect(controller.getSnapshot().view?.state).toBe('unresolved')
+    stop(); expect(off).toHaveBeenCalledOnce()
+  })
+  it('retains source changes arriving during the first unresolved read and clears a settled body on invalidation', async () => {
+    let finish: ((value: DelegationToolSourceView) => void) | undefined
+    let invalidate: (() => void) | undefined
+    const request = vi.fn().mockImplementationOnce(() => new Promise(resolve => { finish = resolve })).mockResolvedValue(sourceView())
+    const controller = new DelegationToolSourceController({ request, onInvalidated: listener => { invalidate = listener; return () => {} } } as Client, sourceTarget)
+    const stop = controller.retain()
+    controller.evidenceChanged()
+    finish!({ state: 'unresolved', source: sourceView().source })
+    await vi.waitFor(() => expect(controller.getSnapshot().view?.state).toBe('bound'))
+    expect(request).toHaveBeenCalledTimes(2)
+    invalidate!(); expect(controller.getSnapshot().view).toBeNull()
+    await controller.refresh(); expect(controller.getSnapshot().view?.state).toBe('bound')
+    stop()
+  })
+  it('keeps a refused source without enriching it from another existing child', async () => {
+    const refused = { state: 'refused', source: sourceView().source, operation: 'delegation.resume', code: 'delegation.not_resumable' }
+    const request = vi.fn(async () => refused)
+    const controller = new DelegationToolSourceController({ request } as unknown as Client, sourceTarget)
+    const stop = controller.retain(); await controller.refresh()
+    expect(controller.getSnapshot().view).toEqual(refused)
+    controller.evidenceChanged(); expect(request).toHaveBeenCalledTimes(1)
+    stop()
+  })
+  it('shares one exact parent metadata list and timer, with complete pages and zero body reads', async () => {
+    vi.useFakeTimers()
+    try {
+      const request = vi.fn(async (_method, params: { cursor?: string }) => params.cursor
+        ? { parentConversationId: target.parentConversationId, items: [{ ...detail(), delegationId: 'second' }] }
+        : { parentConversationId: target.parentConversationId, items: [detail()], nextCursor: 'signed-next' })
+      const off = vi.fn(), client: Client = { request: request as Client['request'], onEvent: () => off, onInvalidated: () => off }
+      const one = delegationChildrenController(client, target), two = delegationChildrenController(client, target)
+      expect(one).toBe(two)
+      expect(one).not.toBe(delegationChildrenController({ ...client }, target))
+      expect(one).not.toBe(delegationChildrenController(client, { ...target, threadId: 'other' }))
+      const releaseOne = one.retain(), releaseTwo = two.retain()
+      await vi.waitFor(() => expect(one.getSnapshot().rows).toHaveLength(2))
+      const initial = request.mock.calls.length
+      expect(initial).toBe(2)
+      expect(one.getSnapshot().rows.map(row => row.delegationId)).toEqual([target.delegationId, 'second'])
+      await vi.advanceTimersByTimeAsync(5_000)
+      expect(request.mock.calls.length).toBe(initial + 2)
+      expect(request.mock.calls.every(([method]) => method === 'delegations.list')).toBe(true)
+      releaseOne(); expect(off).not.toHaveBeenCalled()
+      releaseTwo(); expect(off).toHaveBeenCalledTimes(2)
+      expect(one.getSnapshot().rows).toEqual([])
+      const closed = request.mock.calls.length
+      await vi.advanceTimersByTimeAsync(10_000); expect(request.mock.calls.length).toBe(closed)
+    } finally { vi.useRealTimers() }
+  })
+  it('rejects a wrong Thread or repeated cursor and clears metadata before an authenticated reread', async () => {
+    for (const wrong of ['thread', 'cursor']) {
+      const client = { request: vi.fn(async () => ({ parentConversationId: target.parentConversationId,
+        items: [{ ...detail(), ...(wrong === 'thread' ? { threadId: 'other' } : {}) }], ...(wrong === 'cursor' ? { nextCursor: 'loop' } : {}) })) } as Client
+      const controller = delegationChildrenController(client, target)
+      await controller.refresh(); expect(controller.getSnapshot()).toMatchObject({ error: true, rows: [] })
+    }
+    let invalidate: (() => void) | undefined
+    let finish: ((value: unknown) => void) | undefined
+    const request = vi.fn().mockResolvedValueOnce({ parentConversationId: target.parentConversationId, items: [detail()] })
+      .mockImplementationOnce(() => new Promise(resolve => { finish = resolve }))
+    const controller = delegationChildrenController({ request, onInvalidated: listener => { invalidate = listener; return () => {} } } as Client, target)
+    const stop = controller.retain(); await Promise.resolve(); await Promise.resolve()
+    expect(controller.getSnapshot().rows).toHaveLength(1)
+    invalidate!(); expect(controller.getSnapshot().rows).toEqual([])
+    stop(); finish!({ parentConversationId: target.parentConversationId, items: [detail()] })
+    await Promise.resolve(); await Promise.resolve(); expect(controller.getSnapshot().rows).toEqual([])
+  })
+})
 describe('delegated conversation viewer authority and paging', () => {
+  it('clears the open transcript on authenticated invalidation and fences old history replies', async () => {
+    let invalidate: (() => void) | undefined
+    let finishOld: ((value: DelegationHistoryPage) => void) | undefined
+    let finishNew: ((value: DelegationHistoryPage) => void) | undefined
+    let history = 0
+    const client: Client = { onInvalidated: listener => { invalidate = listener; return () => {} }, request: vi.fn(async method => {
+      if (method === 'delegations.get') return detail()
+      if (++history === 1) return page([1])
+      return new Promise(resolve => { if (history === 2) finishOld = resolve; else finishNew = resolve })
+    }) as Client['request'] }
+    const controller = new DelegationViewerController(client, target), stop = controller.retain()
+    await vi.waitFor(() => expect(controller.getSnapshot().messages).toHaveLength(1))
+    const old = controller.refresh()
+    await vi.waitFor(() => expect(finishOld).toBeTypeOf('function'))
+    invalidate!()
+    expect(controller.getSnapshot()).toMatchObject({ detail: null, messages: [], loading: true })
+    await vi.waitFor(() => expect(finishNew).toBeTypeOf('function'))
+    finishNew!(page([3])); await vi.waitFor(() => expect(controller.getSnapshot().messages[0]?.id).toBe('message-3'))
+    finishOld!(page([2])); await old
+    expect(controller.getSnapshot().messages.map(row => row.id)).toEqual(['message-3'])
+    stop()
+  })
   it('keeps one exact client/Thread/parent/delegation and performs no execution mutation on opening', async () => {
     const calls: string[] = []
     const client: Client = { request: vi.fn(async method => { calls.push(method); return method === 'delegations.get' ? detail() : page([1, 2]) }) as Client['request'] }

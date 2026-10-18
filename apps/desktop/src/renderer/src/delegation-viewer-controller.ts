@@ -36,6 +36,7 @@ export class DelegationViewerController {
   private reading: Promise<void> | null = null
   private dirty = false
   private users = 0
+  private generation = 0
   private offEvent?: () => void
   private offInvalidation?: () => void
   private timer: ReturnType<typeof setTimeout> | null = null
@@ -51,11 +52,18 @@ export class DelegationViewerController {
         if (params.delegationId === this.target.delegationId || params.conversationId === this.state.detail?.conversationId
           || this.state.detail?.activity.runs.some(run => run.id === params.agentRunId)) void this.refresh()
       })
-      this.offInvalidation = this.client.onInvalidated?.(() => { void this.refresh() })
+      this.offInvalidation = this.client.onInvalidated?.(() => {
+        ++this.generation; this.reading = null; this.dirty = false
+        this.publish({ detail: null, messages: [], nextCursor: null, loading: true, paging: false, error: false })
+        void this.refresh()
+      })
       void this.refresh()
     }
     return () => {
-      if (--this.users === 0) { this.offEvent?.(); this.offInvalidation?.(); if (this.timer) clearTimeout(this.timer); this.timer = null }
+      if (--this.users === 0) {
+        ++this.generation; this.reading = null; this.dirty = false
+        this.offEvent?.(); this.offInvalidation?.(); if (this.timer) clearTimeout(this.timer); this.timer = null
+      }
     }
   }
   private schedule(): void {
@@ -71,15 +79,18 @@ export class DelegationViewerController {
   }
   refresh = (): Promise<void> => {
     if (this.reading) { this.dirty = true; return this.reading }
-    this.reading = (async () => {
+    const generation = this.generation
+    const reading = (async () => {
       do {
         this.dirty = false
         try {
           const detail = await this.client.request<DelegationConversationView>('delegations.get', { delegationId: this.target.delegationId })
+          if (generation !== this.generation) return
           assertDelegationScope(detail, this.target)
           if (!detail.activity || !Array.isArray(detail.activity.runs) || !Array.isArray(detail.activity.approvals) || !Array.isArray(detail.activity.executionEvidence)) throw new Error('delegation.viewer_activity_unavailable')
           if (this.state.detail && this.state.detail.conversationId !== detail.conversationId) throw new Error('delegation.viewer_child_changed')
           let page = await this.client.request<DelegationHistoryPage>('delegations.history', { task_id: this.target.delegationId, limit: 20 })
+          if (generation !== this.generation) return
           this.validateHistory(page, detail)
           const known = new Set(this.state.messages.map(message => message.id))
           let fresh = page.messages
@@ -91,29 +102,33 @@ export class DelegationViewerController {
             if (seen.has(page.next_cursor)) throw new Error('delegation.viewer_cursor_repeated')
             seen.add(page.next_cursor)
             page = await this.client.request<DelegationHistoryPage>('delegations.history', { task_id: this.target.delegationId, before_cursor: page.next_cursor, limit: 20 })
+            if (generation !== this.generation) return
             this.validateHistory(page, detail)
             fresh = mergeDelegationHistory(fresh, page.messages)
           }
           const overlaps = fresh.some(message => known.has(message.id))
           this.publish({ detail, messages: mergeDelegationHistory(overlaps ? this.state.messages : [], fresh), nextCursor: overlaps ? this.state.nextCursor : page.next_cursor ?? null,
             loading: false, error: false })
-        } catch { this.publish({ loading: false, error: true }) }
-      } while (this.dirty && this.users > 0)
-    })().finally(() => { this.reading = null; this.schedule() })
-    return this.reading
+        } catch { if (generation === this.generation) this.publish({ loading: false, error: true }) }
+      } while (this.dirty && this.users > 0 && generation === this.generation)
+    })().finally(() => { if (this.reading === reading) { this.reading = null; this.schedule() } })
+    this.reading = reading
+    return reading
   }
   loadEarlier = async (): Promise<void> => {
+    const generation = this.generation
     const detail = this.state.detail, cursor = this.state.nextCursor
     if (!detail || !cursor || this.state.paging) return
     this.publish({ paging: true })
     try {
       const page = await this.client.request<DelegationHistoryPage>('delegations.history', { task_id: this.target.delegationId, before_cursor: cursor, limit: 20 })
+      if (generation !== this.generation) return
       this.validateHistory(page, detail)
       if (this.state.nextCursor !== cursor) return
       if (page.next_cursor === cursor) throw new Error('delegation.viewer_cursor_repeated')
       this.publish({ messages: mergeDelegationHistory(this.state.messages, page.messages), nextCursor: page.next_cursor ?? null, error: false })
-    } catch { this.publish({ error: true }) }
-    finally { this.publish({ paging: false }) }
+    } catch { if (generation === this.generation) this.publish({ error: true }) }
+    finally { if (generation === this.generation) this.publish({ paging: false }) }
   }
 }
 

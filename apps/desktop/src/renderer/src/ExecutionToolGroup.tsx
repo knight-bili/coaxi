@@ -30,6 +30,7 @@ import {
 } from './execution-tool-grouping'
 import { UiText, uiAttribute, useUiText } from './interface-language'
 import { fileOperationVerb, localizedExecutionStepTitle } from './execution-step-language'
+import { DelegationToolCard } from './DelegationToolCard'
 
 /** Keep group disclosure choices when paging changes the first item of a group. */
 export const ExecutionToolGroupStateContext = createContext<{
@@ -497,21 +498,33 @@ export function FileOperationRow({ threadId, step, runStatus, completeEvidence, 
   )
 }
 
-export function ToolCallRow({
-  threadId,
-  step,
-  runId,
-  runStatus,
-  completeEvidence,
-  onFileOpenError
-}: {
+type ToolCallRowProps = {
   threadId: string
   step: ToolCallStep
   runId: string
   runStatus: AgentRunView['status']
   completeEvidence?: PresentableExecutionEvidence
   onFileOpenError(message: string): void
-}): JSX.Element {
+}
+export function ToolCallRow(props: ToolCallRowProps): JSX.Element {
+  const evidence = props.completeEvidence
+  if (['delegation.start', 'delegation.resume'].includes(props.step.builtinOperation ?? '')
+    && evidence?.agentRunId === props.runId && Number.isSafeInteger(evidence.executionEpoch)) {
+    return <DelegationToolCard target={{ threadId: props.threadId, evidenceId: evidence.id,
+      agentRunId: props.runId, executionEpoch: evidence.executionEpoch }} revision={evidence.revision ?? 0}>
+      <GenericToolCallRow {...props} />
+    </DelegationToolCard>
+  }
+  return <GenericToolCallRow {...props} />
+}
+function GenericToolCallRow({
+  threadId,
+  step,
+  runId,
+  runStatus,
+  completeEvidence,
+  onFileOpenError
+}: ToolCallRowProps): JSX.Element {
   const t = useUiText()
   const filePreview = useOptionalFilePreview()
   const [expanded, setExpanded] = useExecutionRetainedState(`tool-expanded:${runId}:${step.id}`, false)

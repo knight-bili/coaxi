@@ -1,10 +1,10 @@
 // Codeg aff1e6c: message/{sub-agent-session-dialog,session-viewer-host,
 // delegated-sub-thread,delegation-card-row}.tsx. Apache-2.0: integration/licenses/codeg/LICENSE.
 // Drawer owns presentation only; Core owns every child, Run, approval and answer.
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { Drawer } from '@base-ui/react/drawer'
 import { ChevronDown, ChevronUp, Loader2, RefreshCw, X } from 'lucide-react'
-import type { ActionApprovalView, AgentProfile, DelegationDetail, DelegationHistoryPage, SingleChatMessageView, ThreadMemberView } from '@contracts'
+import type { DelegationDetail, DelegationHistoryPage, SingleChatMessageView } from '@contracts'
 import { useThreadClient } from './camp-client'
 import { useUiText } from './interface-language'
 import { SafeMarkdown } from './SafeMarkdown'
@@ -15,20 +15,14 @@ import { CodegRuntimeMark } from './CodegRuntimeMark'
 import { CoreDelegationCard } from './CoreDelegationCard'
 import { delegationActionController } from './delegation-action-controller'
 import type { DelegationActionMethod } from '../../shared/private-conversation-operations'
-import { delegationChildren, delegationRuntimeLabel, delegationViewerController, type DelegationViewerTarget } from './delegation-viewer-controller'
+import { delegationRuntimeLabel, delegationViewerController, type DelegationViewerTarget } from './delegation-viewer-controller'
+import { delegationChildrenController } from './delegation-children-controller'
+import { DelegationViewerContext as ViewerContext, type DelegationViewerEnvironment as ViewerEnvironment } from './delegation-viewer-context'
 import './delegation-viewer.css'
 import { NativeSessionViewer } from './NativeSessionViewer'
 import { NativeSessionViewerContext, type NativeSessionTarget } from './native-session-viewer-context'
 import { shieldedDismissal, useEscapeShield } from './session-viewer-dismissal'
 
-interface ViewerEnvironment {
-  threadId: string
-  members?: ThreadMemberView[]
-  profileById: Map<string, AgentProfile>
-  busy: boolean
-  onResolveApproval(approval: ActionApprovalView, optionId: string): void
-  onNotify?(message: string): void
-}
 type LeaveGuard = () => ThreadLeavePreparation
 type BindLeaveGuard = (guard: LeaveGuard | null) => void
 const EMPTY_ACTION = { pending: false, busy: false, unknown: false, error: null, result: null }
@@ -41,7 +35,6 @@ export function prepareDelegationViewerLeave(...guards: Array<LeaveGuard | null>
   let completed = false
   return { complete(didLeave) { if (completed) return; completed = true; prepared.reverse().forEach(item => item.complete(didLeave)) } }
 }
-const ViewerContext = createContext<{ open(target: DelegationViewerTarget, trigger?: HTMLElement): void; sourceVisibility(parent: string, visible: boolean): void; visible: boolean; environment: ViewerEnvironment } | null>(null)
 function useViewer(): NonNullable<React.ContextType<typeof ViewerContext>> {
   const value = useContext(ViewerContext)
   if (!value) throw new Error('Delegation viewer host is missing')
@@ -112,45 +105,13 @@ function DelegationChildrenContent({ parentConversationId, visible = true }: { p
     host.sourceVisibility(parentConversationId, visible)
     // A virtual launch-row unmount is not a route hide. Keep its last state.
   }, [parentConversationId, visible, host.sourceVisibility])
-  const [state, setState] = useState<{ owner: object; parent: string; rows: DelegationDetail[]; error: boolean; loading: boolean }>({ owner: client, parent: parentConversationId, rows: [], error: false, loading: true })
+  const active = visible && host.visible
+  const controller = delegationChildrenController(client, { threadId: host.environment.threadId, parentConversationId })
+  const state = useSyncExternalStore(controller.subscribe, controller.getSnapshot, controller.getSnapshot)
   const [expanded, setExpanded] = useState(false)
-  const sequence = useRef(0), inFlight = useRef(false), readAgain = useRef(false)
-  const current = state.owner === client && state.parent === parentConversationId
-  const rows = current ? state.rows : []
-  useEffect(() => {
-    if (!visible) return
-    let disposed = false, timer: ReturnType<typeof setTimeout> | null = null
-    const refresh = async (): Promise<void> => {
-      if (inFlight.current) { readAgain.current = true; return }
-      inFlight.current = true
-      const request = ++sequence.current
-      try {
-        let page = await delegationChildren(client, parentConversationId)
-        const items = [...page.items], cursors = new Set<string>()
-        while (page.nextCursor) {
-          if (disposed || request !== sequence.current) return
-          if (cursors.has(page.nextCursor)) throw new Error('delegation.viewer_cursor_repeated')
-          cursors.add(page.nextCursor)
-          page = await delegationChildren(client, parentConversationId, page.nextCursor)
-          items.push(...page.items)
-        }
-        if (items.some(item => item.threadId !== host.environment.threadId)) throw new Error('delegation.viewer_thread_mismatch')
-        if (!disposed && request === sequence.current) setState({ owner: client, parent: parentConversationId, rows: items, loading: false, error: false })
-      } catch { if (!disposed && request === sequence.current) setState(previous => ({ ...previous, rows: previous.owner === client && previous.parent === parentConversationId ? previous.rows : [], owner: client, parent: parentConversationId, loading: false, error: true })) }
-      finally {
-        if (request === sequence.current) inFlight.current = false
-        if (!disposed) {
-          if (readAgain.current) { readAgain.current = false; void refresh() }
-          else timer = setTimeout(() => void refresh(), 5_000)
-        }
-      }
-    }
-    const off = client.onEvent?.(event => { if (event.method === 'delegation.changed') { if (timer) clearTimeout(timer); void refresh() } })
-    const offInvalidation = client.onInvalidated?.(() => { if (timer) clearTimeout(timer); void refresh() })
-    void refresh()
-    return () => { disposed = true; ++sequence.current; inFlight.current = false; readAgain.current = false; if (timer) clearTimeout(timer); off?.(); offInvalidation?.() }
-  }, [client, parentConversationId, visible])
-  if (!visible || (rows.length === 0 && (!current || state.loading || !state.error))) return null
+  useEffect(() => active ? controller.retain() : undefined, [controller, active])
+  const rows = state.rows
+  if (!active || (rows.length === 0 && (state.loading || !state.error))) return null
   const shown = expanded ? rows : rows.slice(0, 3)
   return <section className="delegation-children" aria-label={t('独立帮手')}>
     {state.error && <p role="alert">{t('帮手列表暂时无法读取，将重新核对。')}</p>}
@@ -235,7 +196,7 @@ function DelegationDrawer({ target, open, visible, onOpenChange, onLeaveGuardCha
       </section>}
       {open && <div className={`delegation-drawer-body${chatReady ? ' has-chat' : ''}`}>
         {state.loading && <p className="delegation-empty" role="status"><Loader2 size={15} className="native-spinner" />{t('正在读取帮手会话…')}</p>}
-        {state.error && <p className="delegation-read-error" role="alert">{t('会话暂时无法刷新，已保留上次内容。')}<button type="button" onClick={() => void controller.refresh()}>{t('重试')}</button></p>}
+        {state.error && <p className="delegation-read-error" role="alert">{t(state.detail ? '会话暂时无法刷新，已保留上次内容。' : '会话暂时无法读取，请重试。')}<button type="button" onClick={() => void controller.refresh()}>{t('重试')}</button></p>}
         {detail && <DelegationViewerHost {...environment} visible={visible} onLeaveGuardChange={bindNestedGuard}>
           {chatReady && chatTarget ? <SingleChatPanel conversationKind="delegation_child" embedded threadId={environment.threadId} members={environment.members ?? []}
             boundConversationId={detail.conversationId} target={chatTarget} visible={visible} onOpen={() => undefined} onClose={() => { onOpenChange(false) }} onLeaveGuardChange={bindLeafGuard}

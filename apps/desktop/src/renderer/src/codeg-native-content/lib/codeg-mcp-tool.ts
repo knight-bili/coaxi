@@ -336,7 +336,7 @@ export function parseCodegMcpToolCall(params: {
     verdict: params.tool === "task_complete" ? parseVerdict(args) : null,
     prompt: authoring && args ? str(args, "prompt") : null,
     reason:
-      params.tool === "resume_delegation" && args ? str(args, "reason") : null,
+      params.tool === "resume_delegation" && args && typeof args.reason === "string" ? args.reason : null,
     resultText: isError ? (params.errorText?.trim() ?? resultText) : resultText,
     status: isError
       ? "err"
