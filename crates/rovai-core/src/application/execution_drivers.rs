@@ -805,6 +805,69 @@ mod tests {
         stop.send(true).unwrap();
         driver.await;
         core.abort_agent_run_tasks().await;
+
+        // The deferred preparation never claimed this Run. Its cancellation
+        // must finish without inventing a native process or a reap receipt.
+        let changes = {
+            let mut database = core.database.lock().await;
+            let (camp, conversation, epoch, started): (String, String, i64, Option<String>) =
+                database.connection().query_row(
+                    "SELECT c.camp_id,r.conversation_id,r.execution_epoch,r.started_at FROM agent_run r JOIN conversation c ON c.id=r.conversation_id WHERE r.id=?1",
+                    [&run_id], |r| Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?)),
+                ).unwrap();
+            assert_eq!(epoch, 0);
+            assert!(started.is_none());
+            let ended = SingleChatService::default()
+                .end(
+                    &mut database,
+                    &command(
+                        "wake-end-unclaimed",
+                        Some(&camp),
+                        crate::single_chat::EndSingleChatCommand {
+                            camp_id: camp.clone(),
+                            conversation_id: conversation,
+                        },
+                    ),
+                )
+                .unwrap();
+            assert_ne!(ended.result.status, CommandResultStatus::Rejected);
+            assert!(
+                ExecutionRuntimeService::default()
+                    .list_cancellation_candidates(&database, 100)
+                    .unwrap()
+                    .into_iter()
+                    .all(|c| c.agent_run_id != run_id)
+            );
+            let settled: (String, bool) = database
+                .connection()
+                .query_row(
+                    "SELECT status,cancel_acknowledged_at IS NOT NULL FROM agent_run WHERE id=?1",
+                    [&run_id],
+                    |r| Ok((r.get(0)?, r.get(1)?)),
+                )
+                .unwrap();
+            assert_eq!(settled, ("cancelled".into(), true));
+            database.connection().total_changes()
+        };
+        // A missing lease after a claim is still not evidence of termination.
+        assert!(matches!(
+            core.cleanup_agent_run_runtime(&run_id, 1, "codex-cli")
+                .await,
+            RuntimeCancellationIngressFence::Unproven
+        ));
+        let (output, mut events) = mpsc::unbounded_channel();
+        assert!(
+            core.dispatch_agent_run_cancellations(&output)
+                .await
+                .unwrap()
+                .is_none()
+        );
+        assert!(core.agent_run_tasks.try_lock().unwrap().is_empty());
+        assert!(events.try_recv().is_err());
+        assert_eq!(
+            core.database.lock().await.connection().total_changes(),
+            changes
+        );
         drop(core);
         std::fs::remove_dir_all(root).unwrap();
     }

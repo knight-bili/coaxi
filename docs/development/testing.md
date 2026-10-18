@@ -89,6 +89,11 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 
 ## Rust 测试准入与退役门槛
 
+I04 启动/取消协调继续扩原 `application::execution_drivers::tests::non_batch_preparation_rechecks_coalesced_wakes_once_without_spinning`。
+沿同一 Core/SQLite，保留准备阻塞与通知合并的全部断言，再经真实 User 私聊结束命令验证未领取 Run 在原事务中收尾，后台清理查询不再选中；原协调器不再派清理任务、发清理事件或改写数据库。
+缺少租约的非零 epoch 仍由真实 Core 清理入口返回 Unproven，不据“没有租约”伪造进程退出。该 owner 拥有准备到取消的实际协调入口，纯 Fleet/Notify 测试不足；不新增 owner、数据库或真实提供方。
+原 Fleet 取消租约保留、跨代持久回收凭据和 PlannedShutdown 未绑定启动隔离 owner 定向回归；人工构造的回收凭据/FakeHost不等同实际OS回收。
+
 I04 重启接受输入结算扩原 Context materialization owner 的 `context/delegation_restart_tests.rs`，沿同一 SQLite/Blob 及原运行树，不新增 Rust owner。
 覆盖父子均已接受时的父先结算/子树取消、事务故障完整回滚、接管后 User 输入保留、未知输入待核对及直接领取拒绝、原接受凭据/任务/配置保持、重复恢复零写。
 提供方 Session 尚不存在时，以真实 Core 绑定编号驱动原 Fleet manager，配 FakeHost 验证隔离及温复用；Session/输入 ACK/清理 ACK 明确使用夹具，不作为真实提供方或完整 Host 重启证据。

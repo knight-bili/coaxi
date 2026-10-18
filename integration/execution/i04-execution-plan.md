@@ -1,5 +1,9 @@
 # I04 执行队列
 
+2026-10-18 追加核查：原Core准备/通知owner沿同库实际User结束未领取运行，原取消事务已完成收尾，未发现“无进程租约导致未领取运行永久等待清理”的缺陷；未放宽进程回收保护。4个原Rust owner定向通过，其中Core协调入口实际执行，Fleet回收凭据/FakeHost仍为明确夹具。
+核查与回归见[未领取取消协调记录](i04-delegation-unclaimed-result.json)，不计为完整Host/Runtime或阶段完成。
+另定位到问题/计划的具体缺口：`application.rs` 的 `cursor/ask_question` 当前直接跳过、`cursor/create_plan` 直接拒绝，`delegation_model_command::blocked_summary` 只读权限审批。不能靠给TaskReport补字段宣称支持；后续按I04-T03接原生请求的Core持久归属、User答复/决定及重启失效，再接T01阻塞投影和原应用界面。这些工作保留在I04，真实Session/writer/OS回收与模型矩阵仍归阶段集中验证。
+
 2026-10-18 最新检查点：当前实际源码已登记 Core v1.73/Schema160/Migration210，完整启动升级、授权票据及未结工具记录启动核对均已有分项证据。重启时已接受但丢失结果的 Run 现复用原失败结算事务，按父先子后处理受控树；已接管的分支和后续 User 排队输入保留，未知输入等待原请求核对且禁止领取。未知输入已处于正确恢复状态时不重复改写版本。
 本批扩原Context owner及6项原Runtime/Fleet owner，7项定向Rust与10项文档测试通过；没有新增整库owner或84正式场景通过。Session/输入ACK/清理ACK及FakeHost是明确夹具，完整Host进程/真实Runtime协调、原查看器与其余I04工作包继续。本页后续159/209与“下一项”表述保留当时检查点，不覆盖本段当前状态。
 源码 `7c13ccb10` 及原失败/修复经过见[重启结算分项记录](i04-delegation-restart-result.json)。下一项继续原Host启动协调、writer/清理资格与未知输入的原请求核对，再接原应用界面和其他工作包；本分项不等待客户技术验收。

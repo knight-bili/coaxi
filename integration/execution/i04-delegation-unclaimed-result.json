@@ -1,0 +1,221 @@
+{
+  "schema_version": 1,
+  "component": "I04-CORE-UNCLAIMED-CANCELLATION-COORDINATION",
+  "recorded_at": "2026-10-18T00:09:07.349284+00:00",
+  "baseline_commit": "49ebe5b53315783b7a93ea06398c951d77e67f1f",
+  "status": "existing_behavior_verified_and_original_owner_extended_not_phase_completion",
+  "result": "真实Core/SQLite证明未领取取消在原事务完成收尾，无需修改生产回收保护；缺租约的非零epoch仍Unproven。",
+  "production_code_changed": false,
+  "verified": [
+    "原准备/通知合并owner全部原断言保留，复用同一Core和SQLite；真实User私聊结束把epoch0/未开始Run取消且同事务记录收尾完成。",
+    "后台候选不再选择该运行；实际Core取消调度入口不派任务、不发清理完成事件、total_changes不增加；未通过夹具写入cleanup ACK。",
+    "实际Core清理入口对缺少租约的非零epoch返回Unproven，不能据无租约伪造已停止。",
+    "原Fleet未回收租约保护、持久回收凭据按Run/epoch隔离与清除、PlannedShutdown未绑定启动取消隔离取得定向成功。"
+  ],
+  "checks": {
+    "rust_existing_owners": 4,
+    "new_rust_owners": 0,
+    "rust_logs": [
+      "delegation-unclaimed-final.log",
+      "delegation-unclaimed-regression-01.log",
+      "delegation-unclaimed-regression-02.log",
+      "delegation-unclaimed-regression-03.log"
+    ],
+    "docs_tests": 10,
+    "compile": "compile-03 passed, 7 existing warnings",
+    "format_and_gates": "passed",
+    "core_contract": "v1.73/schema160/migration210",
+    "all_1253_run": false,
+    "formal_I04_cases_newly_passed": 0
+  },
+  "retained_investigation": [
+    {
+      "log": "delegation-unclaimed-before-fix.log",
+      "cause": "新测试错误地直接读取私有Run可空camp_id，已沿原Conversation派生Thread；这是测试准备错误，不是生产缺陷。"
+    },
+    {
+      "log": "delegation-unclaimed-before-fix-02.log",
+      "cause": "新测试错误预期未领取取消必须进入后台清理；只读真实SQLite证实原事务已同刻确认收尾，原假设被推翻。"
+    },
+    {
+      "log": "delegation-unclaimed-diagnosis-02.log",
+      "cause": "保留原失败临时库的只读诊断：cancelled/epoch0/codex-cli/started_at空，请求和确认时间相同；没有为通过测试清除原ACK或放宽生产保护。"
+    }
+  ],
+  "next_concrete_gap": "application.rs中cursor/ask_question仍跳过、cursor/create_plan仍拒绝；blocked_summary仅权限。按I04-T03实现原生问题/计划的Core归属、User处理和重启失效，再接T01投影，不能以填字段冒充支持。",
+  "limits": [
+    "Core进程内协调实际执行；Fleet回收凭据与FakeHost为明确夹具，非真实OS回收/Host进程重启/模型。",
+    "已启动运行的真实Session/writer/unknown原请求核对及其他I04包、原应用UI仍未完成。",
+    "81簇48包324正式场景及I04四包21簇84范围保持；用户I12后实际软件使用验收。"
+  ],
+  "external_actions": {
+    "push": false,
+    "actions": false,
+    "paid_model": false,
+    "main_merge": false,
+    "release": false,
+    "cost": 0
+  },
+  "verified_source_files": [
+    {
+      "path": "crates/rovai-core/src/application/execution_drivers.rs",
+      "git_blob": "32da2edef7dc382a31105aaae4c96851de8881e4",
+      "sha256": "867412a3a9686acb0da055d308f7801b7570dd5d7c72ad53a3505c5597ac9842",
+      "bytes": 47266
+    }
+  ],
+  "logs": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-unclaimed-before-fix-02.log",
+      "bytes": 806,
+      "sha256": "cd1ac5e09f6477b92397449877433ae2ebc28bf4e51291264a79e26431ce522a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-unclaimed-before-fix.log",
+      "bytes": 844,
+      "sha256": "ed61b143d664c8dc875909a27a70652cdce9a32ffa3f6343233a91adb715fd71"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-unclaimed-compile-01.log",
+      "bytes": 2225,
+      "sha256": "910541b9b357db622e87b6ccb6170d41281e0d7f67aa8705dc706c1e86f82a2e"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-unclaimed-compile-02.log",
+      "bytes": 2225,
+      "sha256": "ec44ddcf55171b219be4cdab77c048169d10065b236f4952337824598acb2539"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-unclaimed-compile-03.log",
+      "bytes": 2225,
+      "sha256": "d9202071331c363e69655d2b193dcba7fbdb84fee86f8e46bd7db499c68fb8fa"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-unclaimed-diagnosis-02.log",
+      "bytes": 529,
+      "sha256": "b39e9b8307714df0dafe542a541b183959f33d35b685f01e15f7bb7f5b3d044e"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-unclaimed-doc-governance-final.log",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-unclaimed-doc-governance.log",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-unclaimed-doc-tests.log",
+      "bytes": 925,
+      "sha256": "4cf91a1dbb4219d82c62630ecf693df978c83276234cbe6dc7d1d0342f05f5fd"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-unclaimed-doc-version-final.log",
+      "bytes": 79,
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-unclaimed-doc-version.log",
+      "bytes": 79,
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-unclaimed-final.log",
+      "bytes": 330,
+      "sha256": "43958b7119a3c0c964242a1b732815ac94c44c9a9eeba9942d743e5ca1464629"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-unclaimed-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-unclaimed-owner-list-01.log",
+      "bytes": 139,
+      "sha256": "e926c07d98ed6d39f6f748ff0efe51c190c3ed4c24e01f700a75883413adbaa2"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-unclaimed-regression-01-list.log",
+      "bytes": 108,
+      "sha256": "08c5c1e9d0594f54aaab74e2a189eca0a97aaf05960d8183f99cd23d6279f90f"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-unclaimed-regression-01.log",
+      "bytes": 292,
+      "sha256": "426ac3fd58fde22350c7385e172e108caec45ba3ff2c16bd0392b98b4174f858"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-unclaimed-regression-02-list.log",
+      "bytes": 111,
+      "sha256": "0b2624e0aaac9fd6cbed3c89112d81e8b7a608efb58f36736f8e409dfa13a4c4"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-unclaimed-regression-02.log",
+      "bytes": 213,
+      "sha256": "c95a417102902a6029059d7e7e3c231bd8fbf843b9a4e8961ac8e4a0e86d4ebf"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-unclaimed-regression-03-list.log",
+      "bytes": 116,
+      "sha256": "651033b70e4f8c65cc75914afb8e8c46fcea92236190b580fe42e63334f2e2e5"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-unclaimed-regression-03.log",
+      "bytes": 218,
+      "sha256": "82ff1cfdbf58b41ef88888e69ab37771e2ba00c9f3fcef0318eace7dde2efb50"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-unclaimed-staged-check.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-unclaimed-sync-01.log",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-unclaimed-sync-final.log",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\i04\\logs\\delegation-unclaimed-sync-metadata.log",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    }
+  ],
+  "approved_files_verified_unchanged": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    }
+  ]
+}
