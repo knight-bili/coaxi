@@ -1,5 +1,7 @@
 # Codeg 与 Rovai 一期完整融合
 
+- [I04原生计划与目标富内容](execution/i04-native-rich-content-result.json)：固定原纯适配层及计划/目标组件已接只读页，182项定向与17组受控Renderer检查通过；完整工具卡片、图片查看和真实Core/两端仍待，I04范围不减。
+
 - [I04原生后台阅读与User接口分项](execution/i04-native-reader-result.json)：有界后台FS线程、取消/回收/关闭租约、每页Core重授权及Native/Web四方法已编码，原source与Web/客户端owner定向验证；实际Core/Host/网络及原Codeg只读UI继续，完整I04未完成。
 
 - [I04完整签名快照与分页分项](execution/i04-native-snapshot-result.json)：已接私有整份原投影UTF8分页、冻结快照/游标/核实后代引用签名与首次发现/hash/序列化取消。最低编译和精确原文件owner通过；后台任务注册/销毁、每页Core重授权、Native/Web及原只读UI继续，完整I04未收口。

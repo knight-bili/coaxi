@@ -78,3 +78,5 @@ User 查询与设置的后端及 Native/Web 接线见[查询设置分项记录](
 原生User交互的[受控进程耦合证据](../../../integration/execution/i04-native-interaction-coupled-result.json)补Windows原Core listener与User分派的真实stdout/stdin往返、重复回执不二发和Host退出关闭。Node假进程不连接provider，此结果不授予真实模型、完整Host启动、GUI或平台资格；Grok修改反馈原队列及原卡片/查看器仍继续。
 
 原生查看器接续：已在 Renderer 接通完整分页读取、原生帮手入口和与 Core Delegation 共用的单槽/嵌套只读窗口；日夜宽窄、原列表32项、隐藏/迟到及刷新位置有受控运输的实际 UI 证据。原版参考仅核抽屉/头部/角色容器，完整富内容及真实Core/HTTP/IPC/Runtime仍待，不宣称完整原App对照或I04收口。见[本批结果](../../../integration/execution/i04-native-viewer-ui-result.json)和[原组件映射及未完项](../../../integration/inventory/native-session-viewer-ui-reference.md)。
+
+原生富内容接续：固定来源纯适配层及原计划清单、提案/模式、目标卡片已接产品只读页，182项定向与17组受控运输Renderer检查通过；原图片混合正文、未配对多图及统计保持完整。原NativeDialog/adapter和本批组件参考已运行，但内容路由及部分宿主原语有明确边界，完整原富内容/App与真实Core链路仍待。详见[分项结果](../../../integration/execution/i04-native-rich-content-result.json)及[来源清单](../../../integration/inventory/native-content-ui-port.json)。

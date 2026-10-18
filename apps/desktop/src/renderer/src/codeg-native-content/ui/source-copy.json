@@ -1,0 +1,120 @@
+{
+  "zh-CN": {
+    "Folder.chat.agentPlanOverlay": {
+      "title": "计划任务",
+      "collapsePlanAria": "折叠计划",
+      "collapsedSummary": "计划 {completed}/{total}",
+      "status": {
+        "completed": "已完成",
+        "inProgress": "进行中",
+        "pending": "待处理",
+        "unknown": "未知"
+      },
+      "priority": {
+        "high": "高",
+        "medium": "中",
+        "low": "低",
+        "unknown": "未知"
+      }
+    },
+    "Folder.chat.proposedPlan": {
+      "title": "计划提案",
+      "planning": "规划中…"
+    },
+    "Folder.chat.contentParts": {
+      "planMode": {
+        "entered": "进入计划模式",
+        "reviewApproved": "已批准执行计划",
+        "reviewKept": "保持在计划模式",
+        "reviewPending": "等待计划决定",
+        "submitted": "计划已提交",
+        "switched": "切换模式"
+      },
+      "goal": {
+        "title": "目标：",
+        "titleWithStatus": "目标{status}",
+        "objective": "目标",
+        "statusLabel": "状态",
+        "tokensUsed": "已用 tokens",
+        "budget": "预算",
+        "remaining": "剩余",
+        "elapsed": "耗时",
+        "tokens": "tokens",
+        "pause": "暂停",
+        "clear": "清除",
+        "status": {
+          "active": "进行中",
+          "paused": "已暂停",
+          "blocked": "受阻",
+          "usageLimited": "用量受限",
+          "budgetLimited": "预算受限",
+          "complete": "已完成",
+          "limited": "已达上限"
+        }
+      }
+    },
+    "Folder.chat.messageList": {
+      "showMore": "展开",
+      "showLess": "收起"
+    }
+  },
+  "en": {
+    "Folder.chat.agentPlanOverlay": {
+      "title": "Agent Plan",
+      "collapsePlanAria": "Collapse plan",
+      "collapsedSummary": "Plan {completed}/{total}",
+      "status": {
+        "completed": "Completed",
+        "inProgress": "In Progress",
+        "pending": "Pending",
+        "unknown": "Unknown"
+      },
+      "priority": {
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low",
+        "unknown": "Unknown"
+      }
+    },
+    "Folder.chat.proposedPlan": {
+      "title": "Proposed plan",
+      "planning": "Planning…"
+    },
+    "Folder.chat.contentParts": {
+      "planMode": {
+        "entered": "Entered plan mode",
+        "reviewApproved": "Plan approved — implementing",
+        "reviewKept": "Kept in plan mode",
+        "reviewPending": "Awaiting plan decision",
+        "submitted": "Plan submitted",
+        "switched": "Switched mode"
+      },
+      "goal": {
+        "title": "Goal:",
+        "titleWithStatus": "Goal {status}",
+        "objective": "Objective",
+        "statusLabel": "Status",
+        "tokensUsed": "Tokens used",
+        "budget": "Budget",
+        "remaining": "Remaining",
+        "elapsed": "Elapsed",
+        "tokens": "tokens",
+        "pause": "Pause",
+        "clear": "Clear",
+        "status": {
+          "active": "active",
+          "paused": "paused",
+          "blocked": "blocked",
+          "usageLimited": "usage limited",
+          "budgetLimited": "budget limited",
+          "complete": "complete",
+          "limited": "limit reached"
+        }
+      }
+    },
+    "Folder.chat.messageList": {
+      "showMore": "Show more",
+      "showLess": "Show less"
+    }
+  }
+}

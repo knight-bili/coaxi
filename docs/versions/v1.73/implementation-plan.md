@@ -180,3 +180,9 @@ Native renderer和Web加入start/poll/page/close四方法；Web闭合过滤字�
 NativeChildReader 已接完整分页/摘要核对、关闭/迟到围栏、只在 live 刷新、失败保留正文和后代父快照租约。公开执行区及私聊原执行记录接结构化原生帮手入口，已知截断列表沿现有证据完整读取 API 保留原 receiverIndex。原生与 Core Delegation 每层共用一个 Host，保留原操作的离开保护；原 Codeg collab-tool 纯辅助文件加来源头后原文移植，未增加依赖、Schema 或模型输入。
 
 [本批记录](../../../integration/execution/i04-native-viewer-ui-result.json)区分29项新读取/模型检查、82项既有检查、9项离开/动作检查、实际生产 Renderer 的原生场景与两项既有委派场景。Renderer 使用受控运输；参考运行只包含原生 Drawer/header/角色外壳，正文适配器明确为标记夹具，不等于完整原 App 对照。实际发现并修复错误提示插入正文造成阅读位置跳动，关闭点击区域按原32px修正。完整原富内容仍按[有限清单](../../../integration/inventory/native-session-viewer-ui-reference.md)继续，真实Core/两端/Runtime、Claude/Qoder和其他I04工作包保持，84正式场景新增通过0。
+
+## 原生纯内容适配与原计划目标组件
+
+固定 Codeg ai-elements-adapter 及必要纯依赖已移植，原类型按实际引用抽取，不导入原应用 store、工具执行或Tauri。原计划/模式/提案、目标组件与溢出测量主体仅换import，接Rovai安全Markdown、语言和只读界面原语；样式用供体已锁Tailwind4.1.18生成并隔离，不增加生产Tailwind或全局preflight。仅新增供体已用的tailwind-merge3.4.0解决原class冲突；781个旧package/snapshot及原importers保持，MIT通知保留。
+
+[本批证据](../../../integration/execution/i04-native-rich-content-result.json)记录原适配器148项、原生边界5项及既有读取/配对29项共182项定向通过，实际生产Renderer17组检查与原组件参考。供体原测试中只有1904–1959的live producer参数化用例未移入；只读数据不来自该store，其他期望不改。自审补齐重复ID/跨turn结果，以及图片伴随完整工具文字、未配对结果多图/统计；原适配器通过默认false内部选项保持原调用结果。参考运行原NativeDialog/adapter/计划目标JSX，部分宿主原语显式适配、其他内容路由为标记子集，不授予完整原ContentParts/App/主题或真实Core/两端/Runtime资格。具体工具/代码模式/搜索/Diff、图片交互、旧格式及I04其余包保持，84正式场景新增通过0。

@@ -1,0 +1,2223 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-18T21:34:11+08:00",
+  "stage": "I04",
+  "task": "I04-T01",
+  "baseline_commit": "899fff9b4ba6e93f2062d3027490433ca4253ed0",
+  "status": "native_original_adapter_plan_goal_components_and_lossless_image_details_targeted_verified_remaining_rich_and_live_integration_pending",
+  "scope_preserved": {
+    "source_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_packages": 4,
+    "i04_clusters": 21,
+    "i04_formal_cases": 84,
+    "new_formal_cases_passed": 0
+  },
+  "facts": {
+    "fixed_original_adapter_and_required_pure_dependencies": true,
+    "source_type_uuid_declarations_selected_by_ast": true,
+    "source_ui_components_only_imports_changed": 5,
+    "source_default_adapter_tests_passed": 148,
+    "source_live_producer_it_each_omitted_lines": [
+      1904,
+      1959
+    ],
+    "source_other_assertions_changed": false,
+    "native_boundary_tests_passed": 5,
+    "existing_native_reader_model_tests_passed": 29,
+    "all_targeted_files": 4,
+    "all_targeted_passed": 182,
+    "production_native_renderer_checks_passed": 17,
+    "root_types_passed": true,
+    "docs_tests_passed": 10,
+    "repeated_ids_and_cross_turn_outputs_keep_arrival_pairing": true,
+    "frozen_inputs_mutated": false,
+    "paired_image_text_input_and_metadata_preserved": true,
+    "orphan_all_images_output_and_statistics_preserved": true,
+    "original_plan_checklist_proposal_review_and_goal_ui_connected": true,
+    "literal_user_text": true,
+    "native_goal_control_provider_added": false,
+    "terminal_old_goal_animations_disabled": true,
+    "scoped_generated_utilities_no_global_preflight": true,
+    "added_production_leaf_package": "tailwind-merge@3.4.0",
+    "existing_packages_and_snapshots_preserved": 781,
+    "production_tailwind_added": false,
+    "external_dependency_download": false,
+    "licenses_preserved": true,
+    "actual_core_native_ipc_web_http_runtime_or_provider_this_batch": false,
+    "full_original_content_parts_or_app_qualification": false,
+    "schema_migration_rust_or_model_inputs_changed": false,
+    "new_formal_cases_passed": 0
+  },
+  "verification": {
+    "targeted": {
+      "files": 4,
+      "passed": 182,
+      "failed": 0
+    },
+    "production_renderer": [
+      "readonly",
+      "parent_operable",
+      "nested_one_level_escape",
+      "row_unmount_survives",
+      "same_slot_native_core_native",
+      "refresh_error_keeps_body_and_scroll",
+      "hidden_stops_reads",
+      "client_change_closes_old_scope",
+      "day_night_wide_narrow_container",
+      "complete_32_receiver_metadata_and_exact_last_index",
+      "source_plan_checklist_and_long_plan_expand_collapse",
+      "source_plan_review_outcome",
+      "source_goal_details_and_no_mutable_controls",
+      "terminal_unfinished_goal_has_no_live_animation",
+      "literal_user_text",
+      "image_and_complete_tool_output_both_retained",
+      "all_orphan_images_output_and_statistics_retained"
+    ],
+    "reference": {
+      "qualification": "original_native_drawer_adapter_and_plan_goal_component_jsx_with_explicit_markdown_scroll_shimmer_host_seams",
+      "fullContentParts": false,
+      "fullApp": false,
+      "limitations": [
+        "zh-CN label hook",
+        "neutral theme CSS from fixed original",
+        "actual original adapter; subset test content router; untested rich branches explicitly marked; synthetic API",
+        "Rovai safe Markdown, native ScrollArea and CSS shimmer seams; source Badge/instant disclosure/goal control unchanged",
+        "browser occlusion noop, no native browser surface"
+      ]
+    },
+    "typecheck_exit": 0,
+    "documentation": [
+      {
+        "name": "docs-tests",
+        "exit": 0
+      },
+      {
+        "name": "docs-version",
+        "exit": 0
+      },
+      {
+        "name": "docs-base",
+        "exit": 0
+      },
+      {
+        "name": "diff-check",
+        "exit": 0
+      },
+      {
+        "name": "codegraph-sync",
+        "exit": 0
+      }
+    ],
+    "source_audit": {
+      "ok": true,
+      "allPortedSourceHashes": 26,
+      "unmodifiedNonImportStatementBodies": [
+        "src/lib/adapters/tool-kind-classifier.ts",
+        "src/lib/tool-call-normalization.ts",
+        "src/lib/codex-command-action.ts",
+        "src/lib/grep-no-match.ts",
+        "src/lib/background-task.ts",
+        "src/lib/context-compaction.ts",
+        "src/lib/tool-call-lifecycle.ts",
+        "src/lib/feedback-check.ts",
+        "src/lib/plan-parse.ts",
+        "src/lib/reference-link.ts",
+        "src/lib/image-tool-label.ts",
+        "src/lib/browser/page-handoff-block.ts",
+        "src/components/chat/composer/reference-text.ts",
+        "src/components/chat/composer/reference-uri.ts",
+        "src/lib/shell-session-tool.ts",
+        "src/lib/codex-code-mode.ts",
+        "src/components/message/plan-card.tsx",
+        "src/components/message/plan-mode-card.tsx",
+        "src/components/message/goal-tool-call.tsx",
+        "src/components/message/goal-control-context.tsx",
+        "src/hooks/use-collapsible-overflow.ts"
+      ],
+      "selectedTypeAndUuidDeclarations": [
+        {
+          "source": "src/lib/types.ts",
+          "count": 14
+        },
+        {
+          "source": "src/components/chat/composer/types.ts",
+          "count": 3
+        },
+        {
+          "source": "src/lib/utils.ts",
+          "count": 1
+        }
+      ],
+      "nativeAdapterOptInExplicit": true,
+      "sourceTestsOneLiveProducerCaseExplicitlyOmitted": true,
+      "existingPackagesAndSnapshotsPreserved": 781,
+      "newPackageMatchesFixedDonorLock": true,
+      "otherPackageJsonAndImportersUnchanged": true,
+      "scopedStyleHashCurrent": true
+    }
+  },
+  "self_review": [
+    "All source UI card statement bodies match the fixed source apart from imports. Pure helper bodies match, with selected type/UUID declarations rather than unrelated source app types or stores. The full original adapter preserves its default behavior; only native callers opt into explicit complete result details.",
+    "Source default tests retain their assertions; only the one live-producer it.each block is omitted because readonly snapshots do not use the donor ACP store. This is not a claim that the live Runtime producer has been ported or tested.",
+    "The previous viewer already preserved arrival-order repeated call IDs and later-turn results. Ephemeral correlation IDs keep those outputs distinct before per-turn source adaptation; native input/meta and frozen Core snapshots are unchanged.",
+    "A new long mixed-image test caught the source adapter dropping its tool text. Native-only opt-in retains both text/meta/stats and source image cards. Review also found the source orphan fallback selected only its first image; native opt-in now retains every orphan image and original output/statistics. New tests and actual Renderer exercise both paths.",
+    "User text follows source literal rendering. Original plan/checklist/proposal/review/goal components are connected. Source GoalControl context remains without a provider, so there are no fake pause/clear actions; a terminal native parent does not keep stale goal animation alive.",
+    "Host primitives are explicit: Rovai safe Markdown/language, native auto scroll, controlled disclosure and source-gradient CSS shimmer. Utilities are scoped and no global preflight is added. Visual review caught currentColor borders; final source border token checks use an actual 1px probe so Windows DPI quantization is not mistaken for a defect.",
+    "The original reference runs the real native wrapper, original adapter and selected plan/goal JSX with source Badge/instant disclosure. Content routing is an explicit subset and Markdown/scroll/shimmer use host seams. It does not qualify complete source theme/Markdown/ContentPartsRenderer/App equivalence or actual Core/transport/Runtime/platform behavior.",
+    "Source-compatible class merging uses one exact leaf package and the donor integrity; all 781 old package/snapshot/importer values remain. Source UI cache copy avoids Windows pnpm project-registration symlink failures; no global config change, full reinstall, cache deletion or external package download.",
+    "Core contracts, schema/migrations and model inputs are unchanged, six approved r1 artifacts remain frozen, and full phase scope remains. Existing host/shared slot source is not changed in this batch; actual native regression scene repeats nesting, hidden, refresh/scroll, client change and 32 receivers."
+  ],
+  "failure_history": [
+    "Original dependency add failed on migrated store location, then virtual-store alias, then Windows project-registration symlink. Existing parent junction was verified. One exact leaf reused the already integrity-locked source cache; all attempts are retained.",
+    "First type extraction omitted the imported AgentType needed by ReferenceAttrs; import closure fixed, final typecheck04 passed. Initial style generator could not resolve flattened postcss from Vite; used the already locked postcss8.5.19 actual path, without adding a package.",
+    "First new boundary batch had one failure: original image card conversion omitted complete tool text. Preserved failed log and added explicit native opt-in; source148 plus native5 and existing29 all finally passed.",
+    "Visual review corrected source-card currentColor border. New combined color/literal1px assertion failed in renderer03; final scoped border rule and real 1px comparison probe passed renderer04, then final renderer05 added orphan multi-image/statistics coverage and passed.",
+    "First commit preflight rejected a trailing empty line in the newly staged generated CSS. The previous unstaged diff check did not cover untracked files. Generator now trims only that final blank line, dependent style hashes are refreshed, and final full-HEAD plus staged diff checks rerun; no gate is weakened."
+  ],
+  "remaining": [
+    "Fixed Codeg concrete tool cards/code-mode/search/diff/agent/background group rendering and actual source statistics surfaces; generic containers remain transitional, not final source parity.",
+    "Original image group/zoom/copy/download and valid file/HTML actions under Core authorization, full source content/app/theme checks, then actual Core/Native/Web/Host integrated candidate with loss/cancel/descendants/terminal/preview/scale/memory/per-page auth performance.",
+    "Claude full parser/producer/Core association, Qoder separate source/producer, explicit legacy-origin import, Grok r1 feedback/handoff and full I04 T02/T03/T04 original queue/84 scenarios."
+  ],
+  "actions": {
+    "local_commit_intended": true,
+    "push": false,
+    "actions_dispatched": false,
+    "main_merge": false,
+    "release": false,
+    "paid_model": false
+  },
+  "sources": [
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\NativeSessionViewer.tsx",
+      "bytes": 15421,
+      "sha256": "946bf624a8c5ad78620948aec058ec3d8d7cea74e19925ec3fe7468099a96191",
+      "repo_path": "apps/desktop/src/renderer/src/NativeSessionViewer.tsx",
+      "git_blob": "15e136fbf56a19fcb622ef60ad96087c60f464f1"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\chat\\composer\\reference-text.ts",
+      "bytes": 6761,
+      "sha256": "7214b4b0312b9f66100b3851e5e095f50ecc5a4ca1b1fbd705d4dbd3fb2c183e",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/reference-text.ts",
+      "git_blob": "b93d4098ad6d762291f73dc6063e2017922292c7"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\chat\\composer\\reference-uri.ts",
+      "bytes": 7980,
+      "sha256": "e564e6ed3a27c25e2a56531c566404ff796dd9377e65647464627d5b951958a5",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/reference-uri.ts",
+      "git_blob": "4dcb7da76c53e279acfc7325a0054d7405e42416"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\chat\\composer\\types.ts",
+      "bytes": 2960,
+      "sha256": "806ce8ca70f445fd765f639fa3f602e4e280efa6b18df9d04b6f66a84392e92c",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/types.ts",
+      "git_blob": "915be62914508d0c564571e292dbb0f6acc850d2"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\message\\goal-control-context.tsx",
+      "bytes": 2515,
+      "sha256": "377234369145ad67aacaeb69b6d8da39133ba0ec83bdb172edd3fcc3d4da8c50",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/goal-control-context.tsx",
+      "git_blob": "acc55e9c2cf1f2e7cdd14b8e8a89876ba86d1aac"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\message\\goal-tool-call.tsx",
+      "bytes": 15674,
+      "sha256": "7156d7aba0a1b2ba0ca0a4c1fcb2ebdeeb310adb7d27ef851609401e6f48f6e5",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/goal-tool-call.tsx",
+      "git_blob": "e454ad06f24c49a33aae92ef9185de6e400c8dc0"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\message\\plan-card.tsx",
+      "bytes": 5389,
+      "sha256": "2cce18404ece2861a164f2acbe187656285dbc3f864f72bd725d6feb87bd38d2",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/plan-card.tsx",
+      "git_blob": "e39b227737ca5db7722b11c7703b152c35fab8a2"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\components\\message\\plan-mode-card.tsx",
+      "bytes": 8602,
+      "sha256": "93eda500ae8bdc79eaa143662f34035c6d3b31ff9118b87ec3c96cd8b9adb7b5",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/plan-mode-card.tsx",
+      "git_blob": "c4b68a2719f5e9e726c24e7b00c629a77a30f649"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\hooks\\use-collapsible-overflow.ts",
+      "bytes": 2363,
+      "sha256": "9aad40147ad25bc007a0cd784fac1e20b05f86e9bee602763b6be7c9867a3e66",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/hooks/use-collapsible-overflow.ts",
+      "git_blob": "ce5b8a86914b2fda042d4a57deb56a1c2f02026c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\adapters\\ai-elements-adapter.test.ts",
+      "bytes": 100927,
+      "sha256": "f6a3400199c4a18f62942d33df0468920f94b6f8f6bfb6a3c02e8808a1ed6f7c",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/lib/adapters/ai-elements-adapter.test.ts",
+      "git_blob": "d13b8b94463e7755c00e6775d41c91792026a598"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\adapters\\ai-elements-adapter.ts",
+      "bytes": 99306,
+      "sha256": "ba41939f9ba0b55e40dc6fa6ee3efc4cd36ece10fda8ac6803e01421783019b0",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/lib/adapters/ai-elements-adapter.ts",
+      "git_blob": "bba2e9f1cd0b8fdd8193e4e188097f2a1589fa9b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\adapters\\tool-kind-classifier.ts",
+      "bytes": 8798,
+      "sha256": "922eed68176d9394493534c8de59548d5f215b4fe888a1234cb3c219a16586b0",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/lib/adapters/tool-kind-classifier.ts",
+      "git_blob": "47c11e02fe55b05a1cba3f3865114c074781cc7a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\background-task.ts",
+      "bytes": 32931,
+      "sha256": "2f7079835426d99384ecc64559b31f698fdb7bcc47a07605f512312ff29c7bfa",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/lib/background-task.ts",
+      "git_blob": "146b464c308550d1630803ad94f93e2835b1b88c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\browser\\page-handoff-block.ts",
+      "bytes": 2589,
+      "sha256": "c3dad373df6c716376c83dc7ebe1345975142375f4fa01ca83687dc0a0c3c793",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/lib/browser/page-handoff-block.ts",
+      "git_blob": "8cca74763ad7ca429351144faadc734a5f2656a6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\codex-code-mode.ts",
+      "bytes": 3727,
+      "sha256": "59715c55cb42a929a1dfdce8f85782d8e2a9139e9ee7d00a43141e70a1d53314",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/lib/codex-code-mode.ts",
+      "git_blob": "b81d1442ad312b41e78ad03508ca291b00f8d3b5"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\codex-command-action.ts",
+      "bytes": 6179,
+      "sha256": "0dbfda266dee82c87f08b6c072b3c8c0cfb4a1171bb6208a8395da2a04fad273",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/lib/codex-command-action.ts",
+      "git_blob": "49ee41ea4785e1f9b997db86a2915a5c8e890a51"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\context-compaction.ts",
+      "bytes": 4214,
+      "sha256": "353ca2dd127a9fe7caebeaffb24e38a73f8af890348d5bcab3c91ddeec6ed9e0",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/lib/context-compaction.ts",
+      "git_blob": "89ad547f17c6150389a83cbe29c0330fe4a72e2c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\feedback-check.ts",
+      "bytes": 5374,
+      "sha256": "0ee8eac8eea92c2e54a2bd497d2d17bc124a4e6dd51cd21b1d38f9c275418e72",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/lib/feedback-check.ts",
+      "git_blob": "cb53788492c22dd0e5840ad78c72eefcc7ed416a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\grep-no-match.ts",
+      "bytes": 11896,
+      "sha256": "f7f402c8ec3e014a7234478c972b97aec5cb80cecc5d16edfcaec2d6529713b4",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/lib/grep-no-match.ts",
+      "git_blob": "f90236a24b062e49f58d21a6d5f2dc197ee88998"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\image-tool-label.ts",
+      "bytes": 4730,
+      "sha256": "fbd9567edf9c86d7ed691f82dbceef3b4f6d6bcf9fc02b5c602858b1e198a3bb",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/lib/image-tool-label.ts",
+      "git_blob": "320b797dd2728de5c2246f0e7514d117d6687be0"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\plan-parse.ts",
+      "bytes": 8609,
+      "sha256": "52e743329397986775c805d6ace66123cb9232aa7aa9e5c6e61c03526f9597c0",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/lib/plan-parse.ts",
+      "git_blob": "95392816c6199b1888881a746bb256d83b7ca737"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\reference-link.ts",
+      "bytes": 13536,
+      "sha256": "d61c99bc22c16cecdafc11af24ec548f1958316556ac909a5ec08b9ef996dbbe",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/lib/reference-link.ts",
+      "git_blob": "ab6c69201b0b38d01a797d6114450c3f991a39a5"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\shell-session-tool.ts",
+      "bytes": 5120,
+      "sha256": "6f426846304c9550caebbe5080f2bfcd20882cd7fa5a0af173b262c53eae3c60",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/lib/shell-session-tool.ts",
+      "git_blob": "2f7ab1f7823cb9be66a2f9b5ef8f10b338b0171a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\tool-call-lifecycle.ts",
+      "bytes": 2166,
+      "sha256": "c42f1019bc1769f096f22d7bc66d42ec7a3cde20af2313e08b5b96f745bd87ea",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/lib/tool-call-lifecycle.ts",
+      "git_blob": "aa5e3a82f2c7c00d252f14ca7002a43aab6eafd0"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\tool-call-normalization.ts",
+      "bytes": 47336,
+      "sha256": "56b33ce6d31166665b406cc02acbc7b02d9bcc718521d9d3c2562193d3040255",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/lib/tool-call-normalization.ts",
+      "git_blob": "063b1b2652e16381563f9b2845dbd983e6da9985"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\types.ts",
+      "bytes": 12269,
+      "sha256": "51bead7635f56c95a07dd3ebbbbc4a34ac3d6f3a428da27b90f7fc564d2ff357",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/lib/types.ts",
+      "git_blob": "38b5f6487d99c1a82c886186342c15b45ecf9183"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\lib\\uuid.ts",
+      "bytes": 920,
+      "sha256": "41417bc24fa075dae9ba1f48d02b4068f22a688524fe0c1641ac98d635d6822d",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/lib/uuid.ts",
+      "git_blob": "ca8f40bf84097aae81fe3de84c1256e545cb0db4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\source-rich.css",
+      "bytes": 16668,
+      "sha256": "7feadca75335f69e3d0118a7e48be05a14045c5a269ff049388091a7d61dccd6",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/source-rich.css",
+      "git_blob": "fc0fb4950488dacf285f5d829c3c2f943a0d8701"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\ui\\source-copy.json",
+      "bytes": 3331,
+      "sha256": "f94f0ce278eea51edf5679680943047675f62127c6f50c7844c48f42e034bfd3",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-copy.json",
+      "git_blob": "59438ce7fdb91eb0dfb0f585380e92df4d23001a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\codeg-native-content\\ui\\source-primitives.tsx",
+      "bytes": 3967,
+      "sha256": "9ffcc6a909b6e003a2e720983816c18b60694a6b65c2886cce2e254697642227",
+      "repo_path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-primitives.tsx",
+      "git_blob": "a7ae3ae48ae43e7a4170614d8bba549bcbb6f9d0"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\native-content-adapter.test.ts",
+      "bytes": 4786,
+      "sha256": "f90e8aca70c8c972657aec9daaa49c209548883b63332d639db0ece0a7e8a356",
+      "repo_path": "apps/desktop/src/renderer/src/native-content-adapter.test.ts",
+      "git_blob": "594f336874087538271fb13a5fc3186be1afb9cc"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\native-content-adapter.ts",
+      "bytes": 1854,
+      "sha256": "2190e23e19529bba2c12254a99a0624caa5322e942681294d7c866777be7eb83",
+      "repo_path": "apps/desktop/src/renderer/src/native-content-adapter.ts",
+      "git_blob": "19f32fc79f0e5e6282db3c395961bf933932f232"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\apps\\desktop\\src\\renderer\\src\\native-session-viewer.css",
+      "bytes": 3880,
+      "sha256": "d2637de1eb37614d5b02e1c7b556cfad603b63f806a6a00d758aebd63a793e8f",
+      "repo_path": "apps/desktop/src/renderer/src/native-session-viewer.css",
+      "git_blob": "e282765a5ccef277f6df370fbe0e6b12c6dbfc39"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\architecture\\delegation.md",
+      "bytes": 13759,
+      "sha256": "269768ddd1d25e4391d62a30e3fe73a0c13abac4cebddd25a6f40af14746b27a",
+      "repo_path": "docs/architecture/delegation.md",
+      "git_blob": "4138bed6441826319a9780917fdd519351adc25e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\contracts\\delegation-v1.md",
+      "bytes": 57938,
+      "sha256": "279b513161da7d3d82412782179f524b39c4d2809aecd098fa83abffe3702a5e",
+      "repo_path": "docs/contracts/delegation-v1.md",
+      "git_blob": "3abdf6c654dcb7e6570bece7d72422f8a8c96497"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\ui\\components\\conversation-workspace.md",
+      "bytes": 146569,
+      "sha256": "df7c740efd8fff6e945d08e950c85cbabc7f0c6f76632ac7b043feb3f1a9d849",
+      "repo_path": "docs/ui/components/conversation-workspace.md",
+      "git_blob": "899e3261dcd1cdc6f9eba16474afe80c7070e524"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\versions\\v1.73\\README.md",
+      "bytes": 13947,
+      "sha256": "2fcd4aed8a063ee61c4ba874a8da10f0a1f0ad8dd92d3ea3084779c117dd65f8",
+      "repo_path": "docs/versions/v1.73/README.md",
+      "git_blob": "51c56e2e472467eed909e26975b087f5437c5d4b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\versions\\v1.73\\implementation-plan.md",
+      "bytes": 31507,
+      "sha256": "1c017031d284e9f8625b5bd95252b7a9a19ebda00604e1b4e573bc26f5f13a0e",
+      "repo_path": "docs/versions/v1.73/implementation-plan.md",
+      "git_blob": "721c94178726b02c0dc4ed22e3f2401b644bde35"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\README.md",
+      "bytes": 17877,
+      "sha256": "00c21725eb49c1e3326eeacf523d60b1be3f31fd2b9cdc6551cf31cdf516e780",
+      "repo_path": "integration/README.md",
+      "git_blob": "f47218888cbce55e1d53b06fab9dc353fd905a21"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\execution\\goal-state.json",
+      "bytes": 22237,
+      "sha256": "c9665ee1adf5e6db9aa9bb0b80a0580d9e09956504967fac2cca9e741112b06d",
+      "repo_path": "integration/execution/goal-state.json",
+      "git_blob": "066008eef2913f320e4dc284d4ab7c3159b707e0"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\inventory\\native-content-ui-port.json",
+      "bytes": 22412,
+      "sha256": "176a98d096446a4eb824ac9cba6312d65f30886eef19da581aa2ae7b3d936e20",
+      "repo_path": "integration/inventory/native-content-ui-port.json",
+      "git_blob": "376236bcf2428f72056c4d991fae2d133347f0de"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\inventory\\native-session-viewer-ui-reference.md",
+      "bytes": 6449,
+      "sha256": "a97c741f6eb240c1869656510faeac0d4fe3cb2f14bd0a2fde591537fb120011",
+      "repo_path": "integration/inventory/native-session-viewer-ui-reference.md",
+      "git_blob": "2c34a695b450a00d4acf6f3caca501ff019f992a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\README.md",
+      "bytes": 8170,
+      "sha256": "1a91a0bf709b2666b81ce7e5073f8a43b134444075f8a78c4313e8f2a22256e9",
+      "repo_path": "integration/licenses/README.md",
+      "git_blob": "80749356e2a32f02e2aa6f01882dae0d44bae6cd"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\tailwind-merge\\LICENSE.md",
+      "bytes": 1070,
+      "sha256": "d4c70c7ce38cea8778f0aed3fc0bef0a9dbd27f13bd8b6773cbd6d37941971e5",
+      "repo_path": "integration/licenses/tailwind-merge/LICENSE.md",
+      "git_blob": "0d2b96a2fd66a32613e70681efa4a5d8474f5946"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\tailwind-merge\\source.json",
+      "bytes": 938,
+      "sha256": "1c5a6a15a96afee758e5729aa88f7fcc1359d58f98f0c7ef1464e97656fdc049",
+      "repo_path": "integration/licenses/tailwind-merge/source.json",
+      "git_blob": "018f1ef14183e93df12e15fa6b8c398be7651392"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\tailwindcss\\LICENSE",
+      "bytes": 1071,
+      "sha256": "60e0b68c0f35c078eef3a5d29419d0b03ff84ec1df9c3f9d6e39a519a5ae7985",
+      "repo_path": "integration/licenses/tailwindcss/LICENSE",
+      "git_blob": "d6a82290738a9f78946cbcb4594535d6984086dd"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\licenses\\tailwindcss\\source.json",
+      "bytes": 479,
+      "sha256": "d75f4720ab0019763e61146f02d93f2d9581dfc213d185d2c60b029757c39090",
+      "repo_path": "integration/licenses/tailwindcss/source.json",
+      "git_blob": "a0fa02e405217ef0604893fca2d770c5e1427f87"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\package.json",
+      "bytes": 24762,
+      "sha256": "3928dffdb4982b1360218076b5dc7daade3345b7a913aa020de2c77ab595a698",
+      "repo_path": "package.json",
+      "git_blob": "874e8bf82eda2b961a6b62612356ff682c21ffb1"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\pnpm-lock.yaml",
+      "bytes": 277675,
+      "sha256": "b2711363b1228eb39a4aba91f062ed504fd3b0339f9deaa701a7bcbffbe92277",
+      "repo_path": "pnpm-lock.yaml",
+      "git_blob": "33d5923fc6352570826fe92afaa7eaa6445cf652"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\adapter-dependency-graph.json",
+      "bytes": 10171,
+      "sha256": "1dec6b8c10694064107e0e59a498b979cac5a7ed5a9762ee5a5f0063a9708ebc"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\adapter-original-tests-01.log",
+      "bytes": 275,
+      "sha256": "4d3bbdfaab87d96ff860d06bb02650d46e94ef7bb4f730ecb12f551ac3adb237"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\adapter-port-manifest.json",
+      "bytes": 13356,
+      "sha256": "179d9349b28fe139a0dfe3db780025a8c7b215d0c735a02146117ef0e28ee0e5"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\adapter-tests-02.log",
+      "bytes": 97514,
+      "sha256": "8ea04f566816e22a8da89c457cbdd51384ffd1a79e5f3baf5298b8a0d12aeaf1"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\adapter-tests-03.log",
+      "bytes": 275,
+      "sha256": "f73be248ba2ffefb990e3c37d96a0b65bdb6f438b11eed7375dd5a912111fb46"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\adapter-tests-before-image-fix.log",
+      "bytes": 97514,
+      "sha256": "8ea04f566816e22a8da89c457cbdd51384ffd1a79e5f3baf5298b8a0d12aeaf1"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\cards-port-manifest.json",
+      "bytes": 2264,
+      "sha256": "bc27b4ee4d328366be6cd970316ea9efa1af1e2b2528acfa328b5ca258784e76"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\codegraph-sync.log",
+      "bytes": 88,
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\dependency-freeze-01.log",
+      "bytes": 331,
+      "sha256": "16fcc84bad9a51e4e83a991392763da96199002c6c7ed9c6b98132b532a6ab64"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\dependency-freeze-result.json",
+      "bytes": 938,
+      "sha256": "1c5a6a15a96afee758e5729aa88f7fcc1359d58f98f0c7ef1464e97656fdc049"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\diff-check.log",
+      "bytes": 246,
+      "sha256": "293e78731cb7182eaa4fb5da0f137bcc6eb61c74c4dfd815a4af3d9d256aae8e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\docs-all.log",
+      "bytes": 275,
+      "sha256": "a2ffeb32ca5c9902f1e2c4c097b3d2e4c7f34e716d14380fb50e144e197823e4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\docs-base.log",
+      "bytes": 170,
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\docs-checks.json",
+      "bytes": 275,
+      "sha256": "a2ffeb32ca5c9902f1e2c4c097b3d2e4c7f34e716d14380fb50e144e197823e4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\docs-final.log",
+      "bytes": 275,
+      "sha256": "a2ffeb32ca5c9902f1e2c4c097b3d2e4c7f34e716d14380fb50e144e197823e4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\docs-tests.log",
+      "bytes": 924,
+      "sha256": "ab56754c35f53b98936995e9c15d35973d8e9524be976a2067c32ca37b5740a9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\docs-version.log",
+      "bytes": 79,
+      "sha256": "18aa44bf0cc0d653a3fc97fcc383a104185a97ec97dc4060f0a3b6270bc8d335"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\final-css-whitespace-proof.json",
+      "bytes": 386,
+      "sha256": "48e4d6b1a767e2bd03e6e18f51421886bf46802ae07d427818f078f642bc2fee"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\first-commit-preflight.json",
+      "bytes": 324,
+      "sha256": "e185db8888595cdfbfc39ff23ca0e41e5367408a8528b48023ccdf9a7f26004c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\native-render-01.log",
+      "bytes": 283,
+      "sha256": "765efe3aade7c203454f16cf80486aa293befb15acea5007bb44c6df25452686"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\native-render-02.log",
+      "bytes": 284,
+      "sha256": "fc02b78db54d7086dd9df75a4133d5e2b6c07001602de3eb02b14d4334f5caea"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\native-render-03.log",
+      "bytes": 932,
+      "sha256": "9314927460bfe11a46082d508a69efe54bb0885cc04813ffebcfd19deb6c6c80"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\native-render-04.log",
+      "bytes": 284,
+      "sha256": "90eb2f0f98faabe7bc9ec234cda36ebccff16a1e170f9d4ef8bc069ce57f44d0"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\native-render-05.log",
+      "bytes": 284,
+      "sha256": "daf2c481b3dc9cde23e6d3bb6569ecdecdc7f85527542116609d378c42d75c9c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\native-renderer-before-border-color.json",
+      "bytes": 10337,
+      "sha256": "cffbc138bfa853ad9b188e9901fb9fdddf53369424b8f3d9eaffb35863aaa12a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\native-renderer-result.json",
+      "bytes": 11324,
+      "sha256": "ab53647ee930f08e73710e6efb070dae6682304062e3cfd874950289bcc1c1e4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\reference-render-01.log",
+      "bytes": 284,
+      "sha256": "4b887bc23631272e6f0a0d2b77fd0a538c9f70fe344cc79a22d995478f3b1da7"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\source-audit-command.log",
+      "bytes": 69,
+      "sha256": "1aa7689e08d99562931b35dd041960836832d580defb14e53f94e97082e6a5ba"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\source-audit.json",
+      "bytes": 1493,
+      "sha256": "0e811cc6febc27b939a7507e650df96f4a64ad82f5668addc142bf46b8409126"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\source-reference-manifest.json",
+      "bytes": 9619,
+      "sha256": "993584fef59546b4d92e4276b0f7e6b44d8e1542050c8f7489994566a64746b9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\source-reference-result.json",
+      "bytes": 608,
+      "sha256": "ac405ef2a456f8590a82b76746707851f3a0a50aba9bcd446cba3469aaa49a64"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\source-ui-dependency-01.log",
+      "bytes": 855,
+      "sha256": "7398d69bf5c098266c114bb778efa438d40ed6c47bff3956ae62dad208580094"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\source-ui-dependency-02.log",
+      "bytes": 969,
+      "sha256": "56c81e192f4ecd96bce484a18fa92185e8fa511bac487bd9545728e2a82de4f5"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\source-ui-dependency-03.log",
+      "bytes": 2621,
+      "sha256": "f0628bcabaa2f918e8cb7e98baef1cfc6443cba2811b694b8d7a3f23beb8a3ce"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\space-checkpoints.jsonl",
+      "bytes": 1120,
+      "sha256": "dba7972098ff93e0b9e222289f0052e7cc475feb7a616dbc0289dfebb2c932f4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\style-generation-02.log",
+      "bytes": 40,
+      "sha256": "77ab25f457627016df59f33deb1fdd0cd090e07ac39b87fed514f156fc5e8e52"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\style-generation-03.log",
+      "bytes": 40,
+      "sha256": "31f4a1f64471bd3a9accaa8b966b4c7246adc08b7088919b24f73ffd94f116b3"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\style-generation-04.log",
+      "bytes": 40,
+      "sha256": "23dfe465afa8c39d9e638568c775b0fbcd815b7e8baaad5fe55fe37a2d7422b0"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\style-generation-05.log",
+      "bytes": 40,
+      "sha256": "091fa545439f93561cd373a1103f5915618a016acdfda5fe7908f1f1e191fb94"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\style-generation-06.log",
+      "bytes": 40,
+      "sha256": "826089331d0437a82ab8a0add641a4f989318d2f9705ee247e6117993668c9f3"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\style-generation.json",
+      "bytes": 1107,
+      "sha256": "94ca4aa4d89e9d3efe1b89641e2a54bd78856c90ae59408bb8ee33debbc1fce9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\targeted-final-01.log",
+      "bytes": 276,
+      "sha256": "d44da543aac9f8a8c1c902125860e457837c879ee67e3f41a50b5c5952a8a9dc"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\typecheck-01.log",
+      "bytes": 138,
+      "sha256": "a694746720934bc5da050e6dd3cf6ae99fe106d254b905d887555c13f7df3074"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\typecheck-02.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\typecheck-03.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\typecheck-04.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\logs\\typecheck-final-result.json",
+      "bytes": 9637,
+      "sha256": "73b46d199a73bf61ba2cc4409ef354a91d84db629e5b80f5aca55de63ac3b1a9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\audit-source.mjs",
+      "bytes": 3508,
+      "sha256": "5ef78042824e2b988d74970b175ba8ec0aab6c96b3673f09585c773644bcfb35"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\build-source-style.mjs",
+      "bytes": 4625,
+      "sha256": "614376b734b59222c5821a6cb81d0609e398e9cc92040618453e66bb7243f77c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\freeze-source-ui-dependency.mjs",
+      "bytes": 4314,
+      "sha256": "093b731d8e750dcd394dc35021d26ec08a49096cdb035bf7176b86ea2023eac1"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\inspect-adapter.mjs",
+      "bytes": 1758,
+      "sha256": "cd5f368ebd21ba56cc38cbdb24b16653b8152818befd3797ef8daeac845044b9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\native-main.cjs",
+      "bytes": 10344,
+      "sha256": "b67bddd62e28f7ae74af94a2525c2bcc8415fccf5125f28088e915a76895813e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\port-adapter.mjs",
+      "bytes": 10231,
+      "sha256": "f4c4653243d122038c1b17e6d64b910fa93d73159674a70574e50489048239b6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\port-cards.mjs",
+      "bytes": 3074,
+      "sha256": "4b285f5a9750ac711fc3bb07f02182517cbedf124fe8a6f3442d1005b756848d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\postverify.py",
+      "bytes": 1974,
+      "sha256": "91b895c9afc4d0ef797989514f3413a94138e878a30e85edcd90e10ba2648a6d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\prepare-reference.py",
+      "bytes": 4062,
+      "sha256": "04d273d7213770bb14cf7fdaf2da94168b7dd98624aaf50fdc917dec844c68b8"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\record-result.py",
+      "bytes": 13139,
+      "sha256": "9a0b4cab4c1ab65b9983f11361f754f8a4cb9acf720a8f595860a49914c2e1d4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\reference-markdown.css",
+      "bytes": 9012,
+      "sha256": "de8bf4df030796bb7c99d9b55a1f7cbc47c083976191ba5fda9100f47990780f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\reference-markdown.tsx",
+      "bytes": 249,
+      "sha256": "7e806021cc96595cabea0ef2bfe683ec292a2f40dbc7d3e972e03c8bbe62259b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\reference-parts.tsx",
+      "bytes": 1735,
+      "sha256": "0c91892bb91fafe034ba5980f013362c4ce28129806dddb6701ce7c6544016c5"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\render-native.mjs",
+      "bytes": 1971,
+      "sha256": "601422e1504c4b741b1601747120e7e923d55703b89060ab096beda5f02d1b41"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\render-reference.mjs",
+      "bytes": 9155,
+      "sha256": "8ad8d41530a76e7e6030151f3bf1278cae861e178badabd7baa8d060645050d1"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\renderer.tsx",
+      "bytes": 8849,
+      "sha256": "f49758c6e5f664123c2797a5d4544f23c0e462560ff73e99004acedc5613c04a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\rich-data.ts",
+      "bytes": 3216,
+      "sha256": "a831124cdee49b261c60b1d78b7aeb40df7a50696a6bdaf17dfd056d97065280"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\update-docs.py",
+      "bytes": 13243,
+      "sha256": "4e1765aab993ceb736fd59f8b37003c6ea1ee96782b747bb885167b269c6205b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\verify-docs.ps1",
+      "bytes": 1471,
+      "sha256": "5597834e200228923dc467e89bf383f32dc409f282b38acd2422723c5c6d36e2"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\native-product-day-narrow.png",
+      "bytes": 103216,
+      "sha256": "11ee3fcb47a27a241c069ffbf3619bb1f6f40bdfba972566a81ed3fbaf072295"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\native-product-night-wide.png",
+      "bytes": 187813,
+      "sha256": "505072839db86727c429fde850859812041ad7bf7ebe01ec9be63d68137067e5"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\native-rich-day-narrow.png",
+      "bytes": 92534,
+      "sha256": "1604d8c658358f7f46a07b8a22aefea48fa5b142d9f32b2db9f6fe1f6137a4f6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\native-rich-night-wide.png",
+      "bytes": 154231,
+      "sha256": "7ac6ed0d254b8c0dd2ae1adc480dd0dd9a288ccfe98543ad663822494081183d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\antigravity-color-DgAQAdn3.svg",
+      "bytes": 7634,
+      "sha256": "652128cf55a28bb958563ee372d0bd00208d9e6fd446f523f77aafd811eef8ca"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\apl-fqmucPXA.js",
+      "bytes": 3573,
+      "sha256": "5be3458b72027a2151b231faa2e30eaf16e1e29067222e232694f25418c2a140"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\asciiarmor-DucZyvP0.js",
+      "bytes": 1531,
+      "sha256": "01c94e79d596371ae8d7fb8f8e9d7f7c136b9c9cbd1f7f1124949ee0216d4816"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\asn1-BnOEsgAm.js",
+      "bytes": 6540,
+      "sha256": "bb17319ceb5860451c6822bfadacfcedd6f972cfafbe016b36dfe6ac23f73551"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\asterisk-QAlztEwS.js",
+      "bytes": 6665,
+      "sha256": "6df194920c95ba624a8fda9ecc6fb9bb3e8c608635a2d0b0f4b2610cce4e6fc3"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\brainfuck-DZVCuF_t.js",
+      "bytes": 1193,
+      "sha256": "71ae5a627c032ec5f0333e28a4fc02da543a8faf15f2705c0e1f69f7df69c812"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\clike-xqXYL6ge.js",
+      "bytes": 35079,
+      "sha256": "1acda985c43e1ca1c234bc64cd7b495850069c0c10cd1a433d89c2005dcb503a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\clojure-BhXMqnxz.js",
+      "bytes": 14874,
+      "sha256": "e6c5a1b8eead561531a1fe6afc42ebd3541913ac87645794bee5b2e42222ff2e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\cmake-BGaNd9E7.js",
+      "bytes": 1598,
+      "sha256": "319d4983f4e2c2934fdbf67a567ad183211c15a618df3d9e7ad270a188f63c1a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\cobol-4yqQntpt.js",
+      "bytes": 8051,
+      "sha256": "f541e17f367fb16b84f1c4585dc6b96436fab9b9984351746b8d6b7e4be77533"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\coffeescript-D2dXvhEc.js",
+      "bytes": 7885,
+      "sha256": "fd8b8081e6c6d0b3a5a1d5159ea923fa92de6b16498672ac8ffb3a85d0f074ff"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\command-code-D8gwtO8i.ico",
+      "bytes": 15086,
+      "sha256": "1c77333db1896f681078ced8ccaea0f2410b7f06f2dffcc8b7150a5045590686"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\commonlisp-CF_VNHQR.js",
+      "bytes": 4045,
+      "sha256": "f0e48e905937a107e453a06c0eb54a8f1e536fc0fc63c5b58b9551c8f7fe49cb"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\crystal-DyuLTqLs.js",
+      "bytes": 10531,
+      "sha256": "c1628558768374a78a1fa71c26feaf44bfc6c5161bf81d964490416d1af1f38f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\css-c-jst79C.js",
+      "bytes": 40347,
+      "sha256": "41425a19b41f83ae573be2f495236cd1161392d1ef66eb2d23d2784510746818"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\cypher-Dlu_3r4V.js",
+      "bytes": 5505,
+      "sha256": "80cff481ed4632ecfbe5952d4c60f15227c66f04dfea646c32852a2b090d19ca"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\d-UURgV0Ux.js",
+      "bytes": 6499,
+      "sha256": "df60654c2550e460276b5522896ee99ab6516252a0016a0fafa21875641b72b9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\diff-B_Bi2Crb.js",
+      "bytes": 564,
+      "sha256": "efa42a61215071dc4d677dab004a6f77c34b41825d87a7dc42303302c35b4b4a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\dockerfile-Bvk733Ga.js",
+      "bytes": 3834,
+      "sha256": "31f1f2e8d8f9f2eeeb29f6d4b56e4632654d2f2a5b352a4febc9bf2f1984d29c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\dtd-Dy74G54E.js",
+      "bytes": 3811,
+      "sha256": "cfaec369fbea7351fc6a8fb7c990f2fbc5a0d1730467e51935deb1965fccaa2a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\dylan-TSb-Nfix.js",
+      "bytes": 8427,
+      "sha256": "b0c2026d9bb4917eccab491f63e56d95ceb4a8e01e42062a843c35ea29121607"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\ebnf-4fKAGW3a.js",
+      "bytes": 4022,
+      "sha256": "b21fa7b0323bdc0ab31713d74038dfef58b32305d3775c98547a3a23f143e16a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\ecl-B59qGGVg.js",
+      "bytes": 7786,
+      "sha256": "4f1c8ae6eaddfd15d73523014b684fc2ae7160b0c10d0680812497b4f1254192"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\eiffel-Dze7nlu3.js",
+      "bytes": 2931,
+      "sha256": "a0fc308a8415ecaf7e5ffe28d9192c23f5b6e81d995eb7df35894a1b307a6606"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\elm-DG7jkhNZ.js",
+      "bytes": 4025,
+      "sha256": "c077dc7257d0e460440d911f88d5783e18ca8c58146fd9126e9e13a0897bcb5b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\erlang-BO6gOnGA.js",
+      "bytes": 15208,
+      "sha256": "a7ff36cb6624f8cb2eedd1f201678c122f7d861f901c2b4465532dc9b10fb48e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\factor-CMxFHDqz.js",
+      "bytes": 2613,
+      "sha256": "b249da83526bbefb5f5c5621c3cd3410f0f26edc9368cec95a585dbf5c6d0fd7"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\fcl-CDDUNjTj.js",
+      "bytes": 3749,
+      "sha256": "223f8c7838620a68cbcb74e4e40d10c5eb20fdd2fbe6d32e44bce2d1d2c28ed2"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\file-find.worker-CHoXCmE8.js",
+      "bytes": 1523,
+      "sha256": "80cfe35f96f8384c3f07480916e2786129ac31f1d7d839816bda104764da27c8"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\forth-B9D2JCeE.js",
+      "bytes": 3858,
+      "sha256": "2db6c4dd8f293410bd0de0a25f1dad21a1ee1990ddb816a4c783e86213e1e302"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\fortran-CAG2BFbe.js",
+      "bytes": 6675,
+      "sha256": "df8788d58683ac6188c9038802b9cc8483344dc447ff9854b818c5171c006401"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\gas-d3KEcW3x.js",
+      "bytes": 7823,
+      "sha256": "a699545574b2f6e9d0d502fe4536ef23b977a8f03ef284520247350ac240ab33"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\gherkin-DhZlEZiy.js",
+      "bytes": 11789,
+      "sha256": "86e76fdd8bbec4e37db05eebadde43a0761cddc0786f28f42befef6addaaefcb"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\groovy-CpwJiBl7.js",
+      "bytes": 7469,
+      "sha256": "6b1705ee26bb3827a73e657f0b58a16c84004135a5e237501d919b9cb868ca0e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\harbor-city-2k-Dk6mtn28.webp",
+      "bytes": 841664,
+      "sha256": "a2f8bdd324331d46a31ba1f2771defe4fda22a131a15654a30915e62b8107d94"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\haskell-ySd-OUo8.js",
+      "bytes": 7626,
+      "sha256": "ff8a9df8c8df8f199ad3b7000aff670c061d0c760ba213d94f52a6f92024e0f8"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\haxe-7MlzfeYV.js",
+      "bytes": 15668,
+      "sha256": "df08c4d4f5bf41a8e63335fa1650e2d5dd4de28c5760ebd6ab47ee0c3fbdb606"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\hermes-agent-2xQZASMR.svg",
+      "bytes": 19748,
+      "sha256": "f660a2312f42c1d9d21daa5c7dfe1d666901030a42a469edc014678314d0ec8a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\http-BqypyemW.js",
+      "bytes": 1774,
+      "sha256": "552d89ffbe4662e2a8a6ef42b9608509b6654b7de1f836e6c05c2b7ebc81e0f6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\icon-192-C06667az.png",
+      "bytes": 81948,
+      "sha256": "2680338ed6d3557b6ab543b97460c4620ecffe0d3a801bd34c3c3c06a6eefe9a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\icon-192-DrQKUdSk.png",
+      "bytes": 79330,
+      "sha256": "9fbd4eb0e7356b4c6ddf2d86a676178476b93747a4687a6e89d06684014ed142"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\icon-192-OagIfT5q.png",
+      "bytes": 74993,
+      "sha256": "9abc0b6b53cef994b32e8c14c02fa8cad3be5325168d1f6907c47b327a024438"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\icon-192-R53lTr_5.png",
+      "bytes": 81172,
+      "sha256": "2f40a6ee8f0a0d1cfc11d8010fc9d990d9dd2dfbb14ea27bbdf97e2c50619a4d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\idl-4HIGJlDI.js",
+      "bytes": 15127,
+      "sha256": "0ec3441d716383be06d8b9abe052499551a470877e9fb3701ebc09ab590c70b1"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\index-B7wAqbZZ.js",
+      "bytes": 97422,
+      "sha256": "793a4280d39645096976779d4836cf921eed0bb679945937eae79f4025e20501"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\index-BK2njTss.js",
+      "bytes": 3450,
+      "sha256": "dfc234ea793e5abf8545bc2cfad1474460bbfba3de825cf1f6a7467ccfd8848b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\index-Bld4Qm6y.js",
+      "bytes": 54938,
+      "sha256": "79b461c854a6c4cfdfb90bc3cb12781cd177e152a3c44e328e5cade6d2f0538e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\index-BwPImTtS.css",
+      "bytes": 812549,
+      "sha256": "1fe64ab6780a14a499083503feac2b5494167eabd7f6abdd91d3973dbfcf23e8"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\index-CbZZIws_.js",
+      "bytes": 26859,
+      "sha256": "3b58c75c0793cfc1a572011954c1b7feec2740eba008993886bee99a33eb61fb"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\index-CF8gbTYB.js",
+      "bytes": 28931,
+      "sha256": "e9d746018c2834e4681b5360322f1fe4fc18379f33a5b7cfbb8fd934886e915e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\index-CoPfJZG0.js",
+      "bytes": 4377092,
+      "sha256": "e6c86f087697f6624a20b962d8e4a0dd0c764f49bbf803d706872dc4e0924f35"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\index-Ct7pWDon.js",
+      "bytes": 44040,
+      "sha256": "f171bc16e50540529ef61a78b58b8bf7461969638821813a0e858b4247c02e63"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\index-D5LwFLw4.js",
+      "bytes": 103231,
+      "sha256": "651b443fc2a04f0a5db8043e15874266128322dfd593c09cdffbd636a36d1a74"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\index-D9TyVfMO.js",
+      "bytes": 7233,
+      "sha256": "c695077d3f12cac685c4cd190ab0f38b3ae430ce2577cde83cdd3afdd5bdd7b1"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\index-Dgk4oFLU.js",
+      "bytes": 18245,
+      "sha256": "358398904f5168ee7fe7684d3900b61bf36b5e83c3859996d7ba2f4950bc2da3"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\index-Dltaegxu.js",
+      "bytes": 73511,
+      "sha256": "6a1ba5d4c3dc6ab30f4d3f9f735f24eae4bc1c381c35c448c96f2a4f50f85430"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\index-DpGsKifa.js",
+      "bytes": 3308,
+      "sha256": "de41738fe342768534b437f6bec599aa979181724640a4729dce2255ee666e37"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\index-DSkBhcCI.js",
+      "bytes": 35453,
+      "sha256": "ad3dcad6f88821dac26ba24de572b3eabdc56ffa9cc5940ef1ea490d52651d6e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\index-DxqQjs6X.js",
+      "bytes": 22072,
+      "sha256": "3a01c4ffc58bbc2e55807b3289de228003caff1c498d6134adc5f9b356c60945"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\index-DXRf2cus.js",
+      "bytes": 4703,
+      "sha256": "624c7f1c2c8330b3b964074b8ce8fe97d32d5107664adb3e470f42c3111f12c8"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\index-fec1eWCw.js",
+      "bytes": 86737,
+      "sha256": "c5d9ba7f2cab217e467f9670473df39575e37c7511dcd82fad435bd22333c5da"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\index-fGQTkoad.js",
+      "bytes": 55797,
+      "sha256": "98c031795ecec3dcd67cd82cf028dea0caf22acec98e3109876baae8577ad489"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\index-fUxYi5DJ.js",
+      "bytes": 106789,
+      "sha256": "2d89d66a530296445c6056cd7ec6c26fcabdcc5cd4f5d7fb34fb4478c031054d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\index-JHnXGqI2.js",
+      "bytes": 35734,
+      "sha256": "52f41c2715845fd71547055310ae8b88b4f370035cb281e49a7609bb84a37312"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\index-qVNs4fyx.js",
+      "bytes": 19883,
+      "sha256": "b4ffb6d34d5b3c2161bbb498e5b49fa8d4b619c79b8c1cd92f6056ffc3ed1461"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\index-twG61FVJ.js",
+      "bytes": 42178,
+      "sha256": "ec90d45e5b63d5ac1fcd791ba0b9aff462010eaeea8636097ed01dda30438969"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\index-UlbiRJz4.js",
+      "bytes": 43902,
+      "sha256": "528eb1d86e1937092474099ced39158ee05fd331430c6c7c7f2f744ee7fb91b9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\index-ztX2SFgG.js",
+      "bytes": 25969,
+      "sha256": "30c314d924ec34dac1b2c233094a6bd69e8c321c0df668727c5685c8275090a7"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\javascript-C_OHM9hj.js",
+      "bytes": 37132,
+      "sha256": "95b09f0b3fb5fdd9b2d10f6984118bbea38a78a51286f4d862b86a01094ddd8f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\julia-Bs6JJhYG.js",
+      "bytes": 9647,
+      "sha256": "0d8127c7275ab1371ec839ec976879685017db1cf04c55095e651e48fe103196"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\livescript-BMWCDuIE.js",
+      "bytes": 6483,
+      "sha256": "b39453a81de0238efd37ac1306f2f004f305cbd745be57e1728a17625f013401"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\lua-Cvg8VrAA.js",
+      "bytes": 5229,
+      "sha256": "165c413653092708d81ff649b3d4a63df2eedc0b50c8f249b9667b4e75fe959d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\mathematica-DNLOL9PQ.js",
+      "bytes": 3436,
+      "sha256": "acc57c8c8a74626a6b9423988f92155410b79196d13c9c6a78047d51ae130c68"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\mbox-Ga7d4MMN.js",
+      "bytes": 2883,
+      "sha256": "fc425b9a3a312399b3ff6adfec040828ff7c8789f0d31b96e73bde2dce902355"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\mirc-Dma3B8rS.js",
+      "bytes": 7292,
+      "sha256": "0ddcb9e79952a15f12935311af85affb24054773404adfdd1d437cc0080a21e2"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\mllike-DHn7xckP.js",
+      "bytes": 8183,
+      "sha256": "adc3b1b7f8aa916812cd4d8bdf8cc1bce352786e3df54c560c5b9067b4fe6d5b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\modelica-0d55jYY0.js",
+      "bytes": 4784,
+      "sha256": "53c8da4f56d1dd592c1710d4b2735aa9904eb2306f365b56aa7074837c59526b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\mscgen-DdqZYINH.js",
+      "bytes": 5426,
+      "sha256": "7e91513474f40739574f20f1b1f38659a476b68b39ee260c7e13132e20d66fc6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\mumps-Btr8VblO.js",
+      "bytes": 3348,
+      "sha256": "aea5f291cf40bcc124e9ff104dedf8df38d630d3112f62d1051118f1ce16b80b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\nginx-DTDtBDVN.js",
+      "bytes": 9302,
+      "sha256": "715cac7cfdb61a1efd09d43ec2c5e6d8e1bd491be679ac56df795a913e6eaf21"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\nsis-CyKBdPWp.js",
+      "bytes": 7857,
+      "sha256": "57f398b99c2ea986b5e4673709aa470f0fb4b42cb04188cf4044e52475c4ff61"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\ntriples-CvgOYMpL.js",
+      "bytes": 4754,
+      "sha256": "239581b9922c933f3427296d14f18a1febb1db49283e6e4aa3331f4e2b9bc3a9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\octave-DYBj3-tl.js",
+      "bytes": 3863,
+      "sha256": "57d7b87692fe3ab14a413456a3ea0fb201a3052057b77a55604863fa5064c495"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\oz-R_e8WMIi.js",
+      "bytes": 5329,
+      "sha256": "a19a6ffdf1e6eb10fe9c4937cfb31303c9ec5bb723c73df1a71ef43c82cdd020"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\pascal-GD8iposT.js",
+      "bytes": 3495,
+      "sha256": "e5a1f91525017a8bf777f9c04f990c65a6a876b26e9b803ba4fddbcc6a68ccac"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\perl-DL9mHpoi.js",
+      "bytes": 28648,
+      "sha256": "8c4df1964a2fe9a690f2493217ed9f70d1f7e2f026ea515f3b226b3b39370b17"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\pig-C_4T4YIV.js",
+      "bytes": 3908,
+      "sha256": "82df721874d4623ebcfa10b27ea6eb9e3992ff4c28e2d838f8d166ab73abb91d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\powershell-B0suO7Vd.js",
+      "bytes": 11424,
+      "sha256": "3de01d37e183594d3bb94dc474f6324219cb209d162b202f82b12c77d2370410"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\properties-BR-vP1aU.js",
+      "bytes": 1475,
+      "sha256": "b758d2ccb06eaaf23dbbc110988e64a57e55a5923a262c60432397feeef0c9c3"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\protobuf-BxgpyhoW.js",
+      "bytes": 1451,
+      "sha256": "ed0b3d7fbe3b079db99443170bd20dba78ba27f42043ad6efebd4b714ef4a364"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\pug-CTXt1f8z.js",
+      "bytes": 11711,
+      "sha256": "48c244b81b114de6a5e5adefc5c7715f6eba241d58edd162713fd21007afdb2c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\puppet-Bdao66PW.js",
+      "bytes": 4091,
+      "sha256": "7985d1f812327008fe34d375ab1849a12e903d3e9507b7fa14253ba17dbdd596"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\python-CvWbmiX4.js",
+      "bytes": 12822,
+      "sha256": "219d8f4b9588956ac747cc56503e568fbf3aff3ab5e34e400a6cd21c86e2273f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\q-CrbCVq4a.js",
+      "bytes": 6286,
+      "sha256": "ded6c3f92101aee3b6214667f489d691936350d01b61e69fdb2b8e2104afcacd"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\qoder-color-CCjsVbDP.svg",
+      "bytes": 6196,
+      "sha256": "396596d247477e2a036c141a16ec266df7b14c0130b777a68fd04bc89af50bc8"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\r-V7nswm59.js",
+      "bytes": 5639,
+      "sha256": "78772777dc6085a89ba3ed5f6fcd5fe46c7ff6cdb849c3c967ce0c1273b4f4a2"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\rpm-C-DLY-If.js",
+      "bytes": 2851,
+      "sha256": "e39a41ec2ab1ba47f2ef4ac46afda8ab6157df5f4388c70b332e2ebf154e1997"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\ruby-CQTpZw6f.js",
+      "bytes": 9595,
+      "sha256": "d66865a01096abcd291b833e0cd3d64881860acbd99b094fb5cf1cd134e2743c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\sas-D2UG-yhZ.js",
+      "bytes": 11997,
+      "sha256": "015ef33927a3a7749cad183ad9e96b0dbf9df616080054b9e581486effc05bef"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\scheme-BKzrkGJD.js",
+      "bytes": 10560,
+      "sha256": "f0e7bc170c1987a1a0734b905eee725b83cca6aa8fa597457fec67670a555cc9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\shell-BlsXDxCn.js",
+      "bytes": 4630,
+      "sha256": "476e685b723e32c63fec792d4266c65b3facfe8feb349b6a2dff9b6c749d9fde"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\sieve-CjwBwOY5.js",
+      "bytes": 3085,
+      "sha256": "084c9f5e19ccf7382ebe97bc97676ba143d9a36fad9b096cb4b3f99cf3c81df6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\simple-mode-DMneyfDu.js",
+      "bytes": 4350,
+      "sha256": "bf2199ce2b8baa53cef87a5bc3a72c68817223b26167c168c645fe78be9280f4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\smalltalk-BOIGQuhN.js",
+      "bytes": 3806,
+      "sha256": "7d696f35a8e402a8b6c2ac1db57c92af865ec665cd63d827689c46e58b9b295d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\solr-CwD7U71z.js",
+      "bytes": 1796,
+      "sha256": "9e9b3bf9c4c0a208effcc6283428b25a30e935eeefa58fc34629947c040beb7e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\source-BBnh_UZi.avif",
+      "bytes": 65400,
+      "sha256": "76da2efcd588b17589955391962024e47d2667e8e84e4744acef11f89d5f0626"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\source-BF5gqZd_.avif",
+      "bytes": 98972,
+      "sha256": "217b1a6e6333d55ddb5b884da74d77cb794416553a3225637e321ed8594b1cc5"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\source-eX5wQyix.avif",
+      "bytes": 56108,
+      "sha256": "73b5cabd1b68af9fef692c6c80a3e9773afd62dc7de2af853bbb3fb7dab9c369"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\source-pMlGT7XI.avif",
+      "bytes": 75133,
+      "sha256": "dda274619f2efe5882dbf24566837bea0b87067b1bfcc147bf3e0ed63c121649"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\sparql-DYskk2vE.js",
+      "bytes": 5954,
+      "sha256": "0573590f5173a33d2c988a89048fccb66706d9d2b1d1e01c42dd864c7b664422"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\spreadsheet-Bgtt3oLP.js",
+      "bytes": 2213,
+      "sha256": "453eff194470639d89a69e4cdf76b8e58773b5ab307554feed6d826b20a058c4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\sql-BSrOzCRI.js",
+      "bytes": 42670,
+      "sha256": "dc7e3ba15d3123633b1a12391213fafb05a5abdcc9829498793b3d467a1d3fbd"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\stex-B6LNC55o.js",
+      "bytes": 6332,
+      "sha256": "350838050b62d1c5f9821e86a9bb0ee45f0c61628eadc676c126359a41a5f2a5"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\stylus-BkS-boTH.js",
+      "bytes": 38258,
+      "sha256": "2d50cfa755d2ad2fc7302164938caf2b4421003f3c3fb9eb02314a230a514cd9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\swift-FRZi1uvB.js",
+      "bytes": 6767,
+      "sha256": "526e30f380c612526c4f06a3085c392bda84ede2673fff42b1d2dd7a205377d4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\tcl-CUcaCdmq.js",
+      "bytes": 3837,
+      "sha256": "aa90d12c1490ebb77e68e6ce90fd35b0b312e5510f9753f1072c629c43e9c05c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\textile-BnFpjsrl.js",
+      "bytes": 12175,
+      "sha256": "de9336373ae050e5a1ff954d462dd129d09f31c02951e27ede260fba1c054bad"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\tiddlywiki-CjprD-Qp.js",
+      "bytes": 5631,
+      "sha256": "5a80d8ec11cdad4503ab1462ed24e2bd7a1b09b787e815fbdfd4b7a454242fce"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\tiki-DK9DOeWn.js",
+      "bytes": 7119,
+      "sha256": "d307359b562484e7c25803b60349d4aa86e6351400f9612a3b78048f8451b847"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\toml-BOuWGMcf.js",
+      "bytes": 2104,
+      "sha256": "fddf8a802721005715a22746b28e0b87ac56a8f77caa41075f9142150e588fb3"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\troff-E1bJ0PPL.js",
+      "bytes": 1679,
+      "sha256": "ea32a0126878e2cd1198e94abcee48cbcd2131de1d80195e1267ad5b0cab82bf"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\ttcn-cfg-Dc39-fIP.js",
+      "bytes": 6021,
+      "sha256": "743ddd5c09b350d33149497d4177895083f584712019a20e88a3c9ded8b62fb9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\ttcn-tKd4HLu4.js",
+      "bytes": 7900,
+      "sha256": "b9af59a0022981562d7482bf0125dc1b6bfdbb40ea1214807db4abbcb783059b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\turtle-Dq7-1WAf.js",
+      "bytes": 3817,
+      "sha256": "7e505e9051b7e3c8ecebea47e4fd43b1e6b2b6ccd7334fd25fc267dc82ee0e4d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\vb-Dp90gtsv.js",
+      "bytes": 7098,
+      "sha256": "049ed5cc9eb5958257497e1c018cd8aa6ff558760d7d9bca5d0d84db8573e19f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\vbscript-CI6_mxxU.js",
+      "bytes": 11321,
+      "sha256": "61890fbc79e2fa6eed6ec2f556916d57712d58fa394f140b09af6c50fece5855"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\velocity-BwIZK1TH.js",
+      "bytes": 4749,
+      "sha256": "630eef603fbca377c8e48679bf30198dce1f27d1a72123bdd72f1eada28f4bbd"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\verilog-DDCYnHN8.js",
+      "bytes": 16118,
+      "sha256": "a38956f338156db5f9b6fd4644f88cd1f81d7dc726a78b882b1ee62f0e70f45a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\vhdl-DCkMIyT9.js",
+      "bytes": 5732,
+      "sha256": "b0e803173743715af902fa2508c4da88a2e97f9b4782f33c6064a17db505bc05"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\webidl-BTLTThCm.js",
+      "bytes": 4771,
+      "sha256": "07aaaed4cf1b1adc2d5f705b656e0e3a4b0d4bddaf4ad998e488d3ca3450a290"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\xquery-BrBUuxMR.js",
+      "bytes": 12194,
+      "sha256": "96459fe2892ccdce0b57439307eeeaa9d82fd2663f2a0f4364a849dba3374e74"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\yacas-b5lAVEIl.js",
+      "bytes": 3866,
+      "sha256": "95c453f73dd9a218385c018b692c4af134b02d5131bea8dd957ca887a5cdd8bd"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\z80-BZV19vqv.js",
+      "bytes": 3042,
+      "sha256": "51594b00905d1522d2f64113beae4943577338f0ff5af4503dd9ee49dc3957eb"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\product\\out\\assets\\zcode-BnwZhfO-.png",
+      "bytes": 215707,
+      "sha256": "edd87a182097389b0f59c07f8de283dbe433c9d37cd6e9a2a372611516ab81eb"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\native-source-day-narrow.png",
+      "bytes": 79612,
+      "sha256": "13840a459813179ef1f832c1f4b2facf9b6f85a7bea8805c635d9bbdc96abc58"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\native-source-night-wide.png",
+      "bytes": 105108,
+      "sha256": "a7fa25f522e33c418a4cdb3a5931b893ceca8b824682dd061eb9a2bf6b08da6f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\apl-fqmucPXA.js",
+      "bytes": 3573,
+      "sha256": "5be3458b72027a2151b231faa2e30eaf16e1e29067222e232694f25418c2a140"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\asciiarmor-DucZyvP0.js",
+      "bytes": 1531,
+      "sha256": "01c94e79d596371ae8d7fb8f8e9d7f7c136b9c9cbd1f7f1124949ee0216d4816"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\asn1-BnOEsgAm.js",
+      "bytes": 6540,
+      "sha256": "bb17319ceb5860451c6822bfadacfcedd6f972cfafbe016b36dfe6ac23f73551"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\asterisk-QAlztEwS.js",
+      "bytes": 6665,
+      "sha256": "6df194920c95ba624a8fda9ecc6fb9bb3e8c608635a2d0b0f4b2610cce4e6fc3"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\brainfuck-DZVCuF_t.js",
+      "bytes": 1193,
+      "sha256": "71ae5a627c032ec5f0333e28a4fc02da543a8faf15f2705c0e1f69f7df69c812"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\clike-xqXYL6ge.js",
+      "bytes": 35079,
+      "sha256": "1acda985c43e1ca1c234bc64cd7b495850069c0c10cd1a433d89c2005dcb503a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\clojure-BhXMqnxz.js",
+      "bytes": 14874,
+      "sha256": "e6c5a1b8eead561531a1fe6afc42ebd3541913ac87645794bee5b2e42222ff2e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\cmake-BGaNd9E7.js",
+      "bytes": 1598,
+      "sha256": "319d4983f4e2c2934fdbf67a567ad183211c15a618df3d9e7ad270a188f63c1a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\cobol-4yqQntpt.js",
+      "bytes": 8051,
+      "sha256": "f541e17f367fb16b84f1c4585dc6b96436fab9b9984351746b8d6b7e4be77533"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\coffeescript-D2dXvhEc.js",
+      "bytes": 7885,
+      "sha256": "fd8b8081e6c6d0b3a5a1d5159ea923fa92de6b16498672ac8ffb3a85d0f074ff"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\commonlisp-CF_VNHQR.js",
+      "bytes": 4045,
+      "sha256": "f0e48e905937a107e453a06c0eb54a8f1e536fc0fc63c5b58b9551c8f7fe49cb"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\crystal-DyuLTqLs.js",
+      "bytes": 10531,
+      "sha256": "c1628558768374a78a1fa71c26feaf44bfc6c5161bf81d964490416d1af1f38f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\css-c-jst79C.js",
+      "bytes": 40347,
+      "sha256": "41425a19b41f83ae573be2f495236cd1161392d1ef66eb2d23d2784510746818"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\cypher-Dlu_3r4V.js",
+      "bytes": 5505,
+      "sha256": "80cff481ed4632ecfbe5952d4c60f15227c66f04dfea646c32852a2b090d19ca"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\d-UURgV0Ux.js",
+      "bytes": 6499,
+      "sha256": "df60654c2550e460276b5522896ee99ab6516252a0016a0fafa21875641b72b9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\diff-B_Bi2Crb.js",
+      "bytes": 564,
+      "sha256": "efa42a61215071dc4d677dab004a6f77c34b41825d87a7dc42303302c35b4b4a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\dockerfile-Bvk733Ga.js",
+      "bytes": 3834,
+      "sha256": "31f1f2e8d8f9f2eeeb29f6d4b56e4632654d2f2a5b352a4febc9bf2f1984d29c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\dtd-Dy74G54E.js",
+      "bytes": 3811,
+      "sha256": "cfaec369fbea7351fc6a8fb7c990f2fbc5a0d1730467e51935deb1965fccaa2a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\dylan-TSb-Nfix.js",
+      "bytes": 8427,
+      "sha256": "b0c2026d9bb4917eccab491f63e56d95ceb4a8e01e42062a843c35ea29121607"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\ebnf-4fKAGW3a.js",
+      "bytes": 4022,
+      "sha256": "b21fa7b0323bdc0ab31713d74038dfef58b32305d3775c98547a3a23f143e16a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\ecl-B59qGGVg.js",
+      "bytes": 7786,
+      "sha256": "4f1c8ae6eaddfd15d73523014b684fc2ae7160b0c10d0680812497b4f1254192"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\eiffel-Dze7nlu3.js",
+      "bytes": 2931,
+      "sha256": "a0fc308a8415ecaf7e5ffe28d9192c23f5b6e81d995eb7df35894a1b307a6606"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\elm-DG7jkhNZ.js",
+      "bytes": 4025,
+      "sha256": "c077dc7257d0e460440d911f88d5783e18ca8c58146fd9126e9e13a0897bcb5b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\erlang-BO6gOnGA.js",
+      "bytes": 15208,
+      "sha256": "a7ff36cb6624f8cb2eedd1f201678c122f7d861f901c2b4465532dc9b10fb48e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\factor-CMxFHDqz.js",
+      "bytes": 2613,
+      "sha256": "b249da83526bbefb5f5c5621c3cd3410f0f26edc9368cec95a585dbf5c6d0fd7"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\fcl-CDDUNjTj.js",
+      "bytes": 3749,
+      "sha256": "223f8c7838620a68cbcb74e4e40d10c5eb20fdd2fbe6d32e44bce2d1d2c28ed2"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\forth-B9D2JCeE.js",
+      "bytes": 3858,
+      "sha256": "2db6c4dd8f293410bd0de0a25f1dad21a1ee1990ddb816a4c783e86213e1e302"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\fortran-CAG2BFbe.js",
+      "bytes": 6675,
+      "sha256": "df8788d58683ac6188c9038802b9cc8483344dc447ff9854b818c5171c006401"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\gas-d3KEcW3x.js",
+      "bytes": 7823,
+      "sha256": "a699545574b2f6e9d0d502fe4536ef23b977a8f03ef284520247350ac240ab33"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\gherkin-DhZlEZiy.js",
+      "bytes": 11789,
+      "sha256": "86e76fdd8bbec4e37db05eebadde43a0761cddc0786f28f42befef6addaaefcb"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\groovy-CpwJiBl7.js",
+      "bytes": 7469,
+      "sha256": "6b1705ee26bb3827a73e657f0b58a16c84004135a5e237501d919b9cb868ca0e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\haskell-ySd-OUo8.js",
+      "bytes": 7626,
+      "sha256": "ff8a9df8c8df8f199ad3b7000aff670c061d0c760ba213d94f52a6f92024e0f8"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\haxe-7MlzfeYV.js",
+      "bytes": 15668,
+      "sha256": "df08c4d4f5bf41a8e63335fa1650e2d5dd4de28c5760ebd6ab47ee0c3fbdb606"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\http-BqypyemW.js",
+      "bytes": 1774,
+      "sha256": "552d89ffbe4662e2a8a6ef42b9608509b6654b7de1f836e6c05c2b7ebc81e0f6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\idl-4HIGJlDI.js",
+      "bytes": 15127,
+      "sha256": "0ec3441d716383be06d8b9abe052499551a470877e9fb3701ebc09ab590c70b1"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\index-5Y01ZEOH.js",
+      "bytes": 7233,
+      "sha256": "6f0bdb63d0beefe2976c78baf9ede2446f8b4248fde279ff7f978a9654f24240"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\index-bryz45UZ.js",
+      "bytes": 44040,
+      "sha256": "e885bd7a9e4c56c3b11087cc8602708af6b6e02a939c2b93c67ef64a6ccf530d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\index-C0zw8F3K.js",
+      "bytes": 42178,
+      "sha256": "82e93cd2411a6141e262f14784655b386f5dc1b93df453d84c4213313f0696f6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\index-C7XYyHwu.js",
+      "bytes": 54938,
+      "sha256": "8cbb7b9f894c69534a91b22e5306f6615ac8bb0a78603abdc426c03e5e0aa4a4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\index-CBHvsbig.js",
+      "bytes": 97422,
+      "sha256": "8d5307e01e1ff825d0b3befec9ad33e0dc109f7b5e5f943dc6dbf9842660ec74"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\index-CfyVavKk.js",
+      "bytes": 3308,
+      "sha256": "5b11f636b354371d0edb4d7156ba531ea2229d2277ca0f5d20a2d4771cf6ebe1"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\index-CHe-5DQd.js",
+      "bytes": 43902,
+      "sha256": "8ce6f0e9bf6b4e80439a20462fbd68ca97fde3108dd8906f8874f3924f2535da"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\index-CKv9gMQl.js",
+      "bytes": 18245,
+      "sha256": "4bac0384f73d70eb357664e15ef6861d313c8cdafe7a783bdbed03ccf4042711"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\index-CXajqKNp.js",
+      "bytes": 26859,
+      "sha256": "82a67be7ec0dc3c1dde55ea77c136916ffa4af55ad0f44b5bce480085e38b714"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\index-Dce-Og79.js",
+      "bytes": 19883,
+      "sha256": "a21b1aa6c32744e5148002c5e4d72ad9f673d2b7eb24af8a624c2ef187a67ac2"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\index-DcG-tsBE.js",
+      "bytes": 86737,
+      "sha256": "d2ab42a1d42512a76d1e64a3bc217155b76f01b2c48ee90b2af5bf5d72666379"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\index-DdzcH5gq.js",
+      "bytes": 3450,
+      "sha256": "637c77f7219c71fdcf856d6b2cd0ebaf4b3929ac9ce6e8421a1f088fab47833a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\index-De_F3A_9.js",
+      "bytes": 35453,
+      "sha256": "4376d0ea26e7a81b67cece00dfebc78feee204f62440eb7ed35e48d624e08102"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\index-DFTLl-8K.js",
+      "bytes": 3088976,
+      "sha256": "0404e3ca12496c51e90e9f53b92c63249829b9e611217590a517545ebb8288eb"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\index-DgaqTV9w.js",
+      "bytes": 73511,
+      "sha256": "92932fba7867418eb35f45063112a40436660cc2e9c42c1ec3ee2e9340772593"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\index-DpDJU_I4.js",
+      "bytes": 103231,
+      "sha256": "028e08211f89c18be1f7013ec5a7a57fc8476324034a74bdf7d7685ec5e75738"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\index-DuHFIy-h.js",
+      "bytes": 25969,
+      "sha256": "b13eb5145d393c8d771bea912845ee45673d6bb7b8bd5f3f9c6df6696856e8d7"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\index-DwOPTIRC.css",
+      "bytes": 67253,
+      "sha256": "4475ba5622ffcfa48309f087158df5ff707b0dee47381897f36063d1df175262"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\index-DzDcagfr.js",
+      "bytes": 22072,
+      "sha256": "126ee121a5bbd65d8e9d4efee96ddb2f88a820828b64aaa3feca9fbb25a430f9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\index-JTYvBac_.js",
+      "bytes": 35734,
+      "sha256": "e9c9c3e2d44f32a7e3809bd1637e74ed3df0fb3da0039d78c49a9f4bdd398b7c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\index-LSapJiwJ.js",
+      "bytes": 55797,
+      "sha256": "26e1eb2240daf0297761effae82ea9825ea5bb2b2ea5fb1869f1d718548bdb99"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\index-QQPsyh4D.js",
+      "bytes": 4703,
+      "sha256": "e8d3db673afa929e94e183662bc1c5c6919286b92bb9984fac4ca1bb1c2f6849"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\index-r9U61U8o.js",
+      "bytes": 106789,
+      "sha256": "637521d1925788c73275c78050bc404c7f70bb1ddc10a131e10b2ac3089f3c0f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\index-v_7nc-Uo.js",
+      "bytes": 28931,
+      "sha256": "c0f44412632f08835d41022a724123c22fc236bd678afbd6b3109c58c9cc136a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\javascript-C_OHM9hj.js",
+      "bytes": 37132,
+      "sha256": "95b09f0b3fb5fdd9b2d10f6984118bbea38a78a51286f4d862b86a01094ddd8f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\julia-Bs6JJhYG.js",
+      "bytes": 9647,
+      "sha256": "0d8127c7275ab1371ec839ec976879685017db1cf04c55095e651e48fe103196"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\livescript-BMWCDuIE.js",
+      "bytes": 6483,
+      "sha256": "b39453a81de0238efd37ac1306f2f004f305cbd745be57e1728a17625f013401"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\lua-Cvg8VrAA.js",
+      "bytes": 5229,
+      "sha256": "165c413653092708d81ff649b3d4a63df2eedc0b50c8f249b9667b4e75fe959d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\mathematica-DNLOL9PQ.js",
+      "bytes": 3436,
+      "sha256": "acc57c8c8a74626a6b9423988f92155410b79196d13c9c6a78047d51ae130c68"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\mbox-Ga7d4MMN.js",
+      "bytes": 2883,
+      "sha256": "fc425b9a3a312399b3ff6adfec040828ff7c8789f0d31b96e73bde2dce902355"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\mirc-Dma3B8rS.js",
+      "bytes": 7292,
+      "sha256": "0ddcb9e79952a15f12935311af85affb24054773404adfdd1d437cc0080a21e2"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\mllike-DHn7xckP.js",
+      "bytes": 8183,
+      "sha256": "adc3b1b7f8aa916812cd4d8bdf8cc1bce352786e3df54c560c5b9067b4fe6d5b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\modelica-0d55jYY0.js",
+      "bytes": 4784,
+      "sha256": "53c8da4f56d1dd592c1710d4b2735aa9904eb2306f365b56aa7074837c59526b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\mscgen-DdqZYINH.js",
+      "bytes": 5426,
+      "sha256": "7e91513474f40739574f20f1b1f38659a476b68b39ee260c7e13132e20d66fc6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\mumps-Btr8VblO.js",
+      "bytes": 3348,
+      "sha256": "aea5f291cf40bcc124e9ff104dedf8df38d630d3112f62d1051118f1ce16b80b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\nginx-DTDtBDVN.js",
+      "bytes": 9302,
+      "sha256": "715cac7cfdb61a1efd09d43ec2c5e6d8e1bd491be679ac56df795a913e6eaf21"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\nsis-CyKBdPWp.js",
+      "bytes": 7857,
+      "sha256": "57f398b99c2ea986b5e4673709aa470f0fb4b42cb04188cf4044e52475c4ff61"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\ntriples-CvgOYMpL.js",
+      "bytes": 4754,
+      "sha256": "239581b9922c933f3427296d14f18a1febb1db49283e6e4aa3331f4e2b9bc3a9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\octave-DYBj3-tl.js",
+      "bytes": 3863,
+      "sha256": "57d7b87692fe3ab14a413456a3ea0fb201a3052057b77a55604863fa5064c495"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\oz-R_e8WMIi.js",
+      "bytes": 5329,
+      "sha256": "a19a6ffdf1e6eb10fe9c4937cfb31303c9ec5bb723c73df1a71ef43c82cdd020"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\pascal-GD8iposT.js",
+      "bytes": 3495,
+      "sha256": "e5a1f91525017a8bf777f9c04f990c65a6a876b26e9b803ba4fddbcc6a68ccac"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\perl-DL9mHpoi.js",
+      "bytes": 28648,
+      "sha256": "8c4df1964a2fe9a690f2493217ed9f70d1f7e2f026ea515f3b226b3b39370b17"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\pig-C_4T4YIV.js",
+      "bytes": 3908,
+      "sha256": "82df721874d4623ebcfa10b27ea6eb9e3992ff4c28e2d838f8d166ab73abb91d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\powershell-B0suO7Vd.js",
+      "bytes": 11424,
+      "sha256": "3de01d37e183594d3bb94dc474f6324219cb209d162b202f82b12c77d2370410"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\properties-BR-vP1aU.js",
+      "bytes": 1475,
+      "sha256": "b758d2ccb06eaaf23dbbc110988e64a57e55a5923a262c60432397feeef0c9c3"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\protobuf-BxgpyhoW.js",
+      "bytes": 1451,
+      "sha256": "ed0b3d7fbe3b079db99443170bd20dba78ba27f42043ad6efebd4b714ef4a364"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\pug-CTXt1f8z.js",
+      "bytes": 11711,
+      "sha256": "48c244b81b114de6a5e5adefc5c7715f6eba241d58edd162713fd21007afdb2c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\puppet-Bdao66PW.js",
+      "bytes": 4091,
+      "sha256": "7985d1f812327008fe34d375ab1849a12e903d3e9507b7fa14253ba17dbdd596"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\python-CvWbmiX4.js",
+      "bytes": 12822,
+      "sha256": "219d8f4b9588956ac747cc56503e568fbf3aff3ab5e34e400a6cd21c86e2273f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\q-CrbCVq4a.js",
+      "bytes": 6286,
+      "sha256": "ded6c3f92101aee3b6214667f489d691936350d01b61e69fdb2b8e2104afcacd"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\r-V7nswm59.js",
+      "bytes": 5639,
+      "sha256": "78772777dc6085a89ba3ed5f6fcd5fe46c7ff6cdb849c3c967ce0c1273b4f4a2"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\rpm-C-DLY-If.js",
+      "bytes": 2851,
+      "sha256": "e39a41ec2ab1ba47f2ef4ac46afda8ab6157df5f4388c70b332e2ebf154e1997"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\ruby-CQTpZw6f.js",
+      "bytes": 9595,
+      "sha256": "d66865a01096abcd291b833e0cd3d64881860acbd99b094fb5cf1cd134e2743c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\sas-D2UG-yhZ.js",
+      "bytes": 11997,
+      "sha256": "015ef33927a3a7749cad183ad9e96b0dbf9df616080054b9e581486effc05bef"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\scheme-BKzrkGJD.js",
+      "bytes": 10560,
+      "sha256": "f0e7bc170c1987a1a0734b905eee725b83cca6aa8fa597457fec67670a555cc9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\shell-BlsXDxCn.js",
+      "bytes": 4630,
+      "sha256": "476e685b723e32c63fec792d4266c65b3facfe8feb349b6a2dff9b6c749d9fde"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\sieve-CjwBwOY5.js",
+      "bytes": 3085,
+      "sha256": "084c9f5e19ccf7382ebe97bc97676ba143d9a36fad9b096cb4b3f99cf3c81df6"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\simple-mode-DMneyfDu.js",
+      "bytes": 4350,
+      "sha256": "bf2199ce2b8baa53cef87a5bc3a72c68817223b26167c168c645fe78be9280f4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\smalltalk-BOIGQuhN.js",
+      "bytes": 3806,
+      "sha256": "7d696f35a8e402a8b6c2ac1db57c92af865ec665cd63d827689c46e58b9b295d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\solr-CwD7U71z.js",
+      "bytes": 1796,
+      "sha256": "9e9b3bf9c4c0a208effcc6283428b25a30e935eeefa58fc34629947c040beb7e"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\sparql-DYskk2vE.js",
+      "bytes": 5954,
+      "sha256": "0573590f5173a33d2c988a89048fccb66706d9d2b1d1e01c42dd864c7b664422"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\spreadsheet-Bgtt3oLP.js",
+      "bytes": 2213,
+      "sha256": "453eff194470639d89a69e4cdf76b8e58773b5ab307554feed6d826b20a058c4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\sql-BSrOzCRI.js",
+      "bytes": 42670,
+      "sha256": "dc7e3ba15d3123633b1a12391213fafb05a5abdcc9829498793b3d467a1d3fbd"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\stex-B6LNC55o.js",
+      "bytes": 6332,
+      "sha256": "350838050b62d1c5f9821e86a9bb0ee45f0c61628eadc676c126359a41a5f2a5"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\stylus-BkS-boTH.js",
+      "bytes": 38258,
+      "sha256": "2d50cfa755d2ad2fc7302164938caf2b4421003f3c3fb9eb02314a230a514cd9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\swift-FRZi1uvB.js",
+      "bytes": 6767,
+      "sha256": "526e30f380c612526c4f06a3085c392bda84ede2673fff42b1d2dd7a205377d4"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\tcl-CUcaCdmq.js",
+      "bytes": 3837,
+      "sha256": "aa90d12c1490ebb77e68e6ce90fd35b0b312e5510f9753f1072c629c43e9c05c"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\textile-BnFpjsrl.js",
+      "bytes": 12175,
+      "sha256": "de9336373ae050e5a1ff954d462dd129d09f31c02951e27ede260fba1c054bad"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\tiddlywiki-CjprD-Qp.js",
+      "bytes": 5631,
+      "sha256": "5a80d8ec11cdad4503ab1462ed24e2bd7a1b09b787e815fbdfd4b7a454242fce"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\tiki-DK9DOeWn.js",
+      "bytes": 7119,
+      "sha256": "d307359b562484e7c25803b60349d4aa86e6351400f9612a3b78048f8451b847"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\toml-BOuWGMcf.js",
+      "bytes": 2104,
+      "sha256": "fddf8a802721005715a22746b28e0b87ac56a8f77caa41075f9142150e588fb3"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\troff-E1bJ0PPL.js",
+      "bytes": 1679,
+      "sha256": "ea32a0126878e2cd1198e94abcee48cbcd2131de1d80195e1267ad5b0cab82bf"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\ttcn-cfg-Dc39-fIP.js",
+      "bytes": 6021,
+      "sha256": "743ddd5c09b350d33149497d4177895083f584712019a20e88a3c9ded8b62fb9"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\ttcn-tKd4HLu4.js",
+      "bytes": 7900,
+      "sha256": "b9af59a0022981562d7482bf0125dc1b6bfdbb40ea1214807db4abbcb783059b"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\turtle-Dq7-1WAf.js",
+      "bytes": 3817,
+      "sha256": "7e505e9051b7e3c8ecebea47e4fd43b1e6b2b6ccd7334fd25fc267dc82ee0e4d"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\vb-Dp90gtsv.js",
+      "bytes": 7098,
+      "sha256": "049ed5cc9eb5958257497e1c018cd8aa6ff558760d7d9bca5d0d84db8573e19f"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\vbscript-CI6_mxxU.js",
+      "bytes": 11321,
+      "sha256": "61890fbc79e2fa6eed6ec2f556916d57712d58fa394f140b09af6c50fece5855"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\velocity-BwIZK1TH.js",
+      "bytes": 4749,
+      "sha256": "630eef603fbca377c8e48679bf30198dce1f27d1a72123bdd72f1eada28f4bbd"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\verilog-DDCYnHN8.js",
+      "bytes": 16118,
+      "sha256": "a38956f338156db5f9b6fd4644f88cd1f81d7dc726a78b882b1ee62f0e70f45a"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\vhdl-DCkMIyT9.js",
+      "bytes": 5732,
+      "sha256": "b0e803173743715af902fa2508c4da88a2e97f9b4782f33c6064a17db505bc05"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\webidl-BTLTThCm.js",
+      "bytes": 4771,
+      "sha256": "07aaaed4cf1b1adc2d5f705b656e0e3a4b0d4bddaf4ad998e488d3ca3450a290"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\xquery-BrBUuxMR.js",
+      "bytes": 12194,
+      "sha256": "96459fe2892ccdce0b57439307eeeaa9d82fd2663f2a0f4364a849dba3374e74"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\yacas-b5lAVEIl.js",
+      "bytes": 3866,
+      "sha256": "95c453f73dd9a218385c018b692c4af134b02d5131bea8dd957ca887a5cdd8bd"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\reference\\out\\assets\\z80-BZV19vqv.js",
+      "bytes": 3042,
+      "sha256": "51594b00905d1522d2f64113beae4943577338f0ff5af4503dd9ee49dc3957eb"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\before-border-color\\native-rich-day-narrow.png",
+      "bytes": 92661,
+      "sha256": "8952c008f90a79c90b6704682a756928abd9918e1939f46c3e834d0f2e0ec2e7"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\I04原生富内容移植\\drafts\\before-border-color\\native-rich-night-wide.png",
+      "bytes": 154324,
+      "sha256": "75854f41abc86f9b289f41ec83e85408c21e599b534059ab73dc6b4c985ea9ea"
+    }
+  ],
+  "fixed_donors": [
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\source-reference\\codeg",
+      "commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+      "tracked_worktree_unchanged": true
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\source-reference\\rovai-ai",
+      "commit": "cc465dda562536b94f23787759e3206324baa29e",
+      "tracked_worktree_unchanged": true
+    }
+  ],
+  "approved_r1_artifacts": [
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "C:\\Users\\JiaLe\\Documents\\Codex\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\outputs\\I04_独立帮手_r1\\final\\native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    }
+  ],
+  "external_migration_rule": {
+    "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\AGENTS.md",
+    "bytes": 6371,
+    "sha256": "38ab74dc7dc68bb61097ec4f0684e3d8fcc11a9abaf5c56d6ee14132ca81043d"
+  }
+}

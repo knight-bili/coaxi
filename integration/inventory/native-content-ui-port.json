@@ -1,0 +1,411 @@
+{
+  "sourceCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+  "sourceAuthority": "fixed Codeg presentation only; Rovai Core remains the sole business/execution/database authority",
+  "adapter": {
+    "baseline": "899fff9b4ba6e93f2062d3027490433ca4253ed0",
+    "sourceCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+    "files": [
+      {
+        "source": "src/lib/adapters/ai-elements-adapter.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/adapters/ai-elements-adapter.ts",
+        "sourceSha256": "30472a8bc48fef60024c85403f7d9560ee00f0cb0316fbdcb8ba4f03f4261820",
+        "portedSha256": "ba41939f9ba0b55e40dc6fa6ee3efc4cd36ece10fda8ac6803e01421783019b0",
+        "modulePathRewrites": 15,
+        "nativeReadonlyOptIn": "retainNativeToolDetails defaults false; native boundary retains complete tool text/meta/stats alongside images, including all orphan-result images instead of only the donor fallback first image",
+        "originalDefaultExpectationsChanged": false,
+        "sourceGitBlob": "1b75c962ce9c9606dd35e9f6dab2e46052cb7d00"
+      },
+      {
+        "source": "src/lib/adapters/tool-kind-classifier.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/adapters/tool-kind-classifier.ts",
+        "sourceSha256": "da7ffa253f080471192b73a324d70169c512efcdffac02003d5635cdf22da75b",
+        "portedSha256": "922eed68176d9394493534c8de59548d5f215b4fe888a1234cb3c219a16586b0",
+        "modulePathRewrites": 2,
+        "sourceGitBlob": "25fde949a5cadfbd039a537689fa679aa1d10d59"
+      },
+      {
+        "source": "src/lib/tool-call-normalization.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/tool-call-normalization.ts",
+        "sourceSha256": "d95cff277eea8f0d073ac15598fdc00b9bf119dbdfc43c2b5bd6a28eb7367d06",
+        "portedSha256": "56b33ce6d31166665b406cc02acbc7b02d9bcc718521d9d3c2562193d3040255",
+        "modulePathRewrites": 4,
+        "sourceGitBlob": "af292d75b50be14969ade41867b56ddbfacfb538"
+      },
+      {
+        "source": "src/lib/codex-command-action.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/codex-command-action.ts",
+        "sourceSha256": "3ccc7badad17ac35046e0d6aec4621ccce1107d79e6d0c3a7540bebb6cbf78f1",
+        "portedSha256": "0dbfda266dee82c87f08b6c072b3c8c0cfb4a1171bb6208a8395da2a04fad273",
+        "modulePathRewrites": 0,
+        "sourceGitBlob": "6ba79d11bb8d5a1ed22096db914a0015a0b9cf04"
+      },
+      {
+        "source": "src/lib/grep-no-match.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/grep-no-match.ts",
+        "sourceSha256": "b84402eb464c5c6bf8d48ebbaaa17607d4af056ec3ac122177527950fa4c983f",
+        "portedSha256": "f7f402c8ec3e014a7234478c972b97aec5cb80cecc5d16edfcaec2d6529713b4",
+        "modulePathRewrites": 0,
+        "sourceGitBlob": "4d783197f93fee0a3d6edc2a8a2ac47480d0259f"
+      },
+      {
+        "source": "src/lib/background-task.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/background-task.ts",
+        "sourceSha256": "128a2483964034514528e891951058f21993a6b43669179761f7a0f41dbdaf9a",
+        "portedSha256": "2f7079835426d99384ecc64559b31f698fdb7bcc47a07605f512312ff29c7bfa",
+        "modulePathRewrites": 2,
+        "sourceGitBlob": "d698597436ca9995ec3570ab82b46d7f9ae98466"
+      },
+      {
+        "source": "src/lib/context-compaction.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/context-compaction.ts",
+        "sourceSha256": "9d27c161f26e315ef7d67f0ca70b9afb1afe2488554bc14a874a1ee560327c5c",
+        "portedSha256": "353ca2dd127a9fe7caebeaffb24e38a73f8af890348d5bcab3c91ddeec6ed9e0",
+        "modulePathRewrites": 0,
+        "sourceGitBlob": "908b2b27a85f1a351b7928046720aeb2c4390051"
+      },
+      {
+        "source": "src/lib/tool-call-lifecycle.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/tool-call-lifecycle.ts",
+        "sourceSha256": "0c93599d080afbbc6663da92e71b92e3d638cdcc6b6aa8cd8ab541cf0aac01c1",
+        "portedSha256": "c42f1019bc1769f096f22d7bc66d42ec7a3cde20af2313e08b5b96f745bd87ea",
+        "modulePathRewrites": 1,
+        "sourceGitBlob": "a419c274344b377c779143c4207d71c028fc6d59"
+      },
+      {
+        "source": "src/lib/feedback-check.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/feedback-check.ts",
+        "sourceSha256": "f5d033a46b0a79c61cb44219cf660ffe0634c5d0f7450fa1a07afc0cae2876b4",
+        "portedSha256": "0ee8eac8eea92c2e54a2bd497d2d17bc124a4e6dd51cd21b1d38f9c275418e72",
+        "modulePathRewrites": 0,
+        "sourceGitBlob": "afd75495ab62cc1e5b7b332968631bc7e4c33e94"
+      },
+      {
+        "source": "src/lib/plan-parse.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/plan-parse.ts",
+        "sourceSha256": "291a74f83ff9f017dc5f925df6da3adbe181de36fdc03671e6a85ede25e79f52",
+        "portedSha256": "52e743329397986775c805d6ace66123cb9232aa7aa9e5c6e61c03526f9597c0",
+        "modulePathRewrites": 1,
+        "sourceGitBlob": "7b5d8d91c7eb28760d1a601fcd9032faea1e7ac6"
+      },
+      {
+        "source": "src/lib/reference-link.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/reference-link.ts",
+        "sourceSha256": "23eaa41e0b413da4918e537eaf559e6268022cde7b479b1b85e9509a7ba5cde3",
+        "portedSha256": "d61c99bc22c16cecdafc11af24ec548f1958316556ac909a5ec08b9ef996dbbe",
+        "modulePathRewrites": 0,
+        "sourceGitBlob": "345a6e29b180ff37d94e84ec5a60e142b1cd627f"
+      },
+      {
+        "source": "src/lib/image-tool-label.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/image-tool-label.ts",
+        "sourceSha256": "1d80f2977c67bbd433d80a8de3cbf6da570722c3222965f02d34904431876698",
+        "portedSha256": "fbd9567edf9c86d7ed691f82dbceef3b4f6d6bcf9fc02b5c602858b1e198a3bb",
+        "modulePathRewrites": 0,
+        "sourceGitBlob": "6157f8eeb6844e69ce3282638a42da7bde0d438a"
+      },
+      {
+        "source": "src/lib/browser/page-handoff-block.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/browser/page-handoff-block.ts",
+        "sourceSha256": "7f7f6cef6c911fac59b7ab2aac8f5193cbee77d45e0ecbe2eb8b8aabf8584503",
+        "portedSha256": "c3dad373df6c716376c83dc7ebe1345975142375f4fa01ca83687dc0a0c3c793",
+        "modulePathRewrites": 0,
+        "sourceGitBlob": "8dc082cacf605008ab47d10884352b16eb227893"
+      },
+      {
+        "source": "src/components/chat/composer/reference-text.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/reference-text.ts",
+        "sourceSha256": "62eb80d9f289117a39cde07e35207006e2f99390f9f58ce83d0e155419d11999",
+        "portedSha256": "7214b4b0312b9f66100b3851e5e095f50ecc5a4ca1b1fbd705d4dbd3fb2c183e",
+        "modulePathRewrites": 1,
+        "sourceGitBlob": "8494204e3b8909123be21ba656cce8d55b41f966"
+      },
+      {
+        "source": "src/components/chat/composer/reference-uri.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/reference-uri.ts",
+        "sourceSha256": "4ecba4dab6cc9fd01be9d5e21ddaa1a6cb75bc371e0f9f69fbd6d3c1a6bed666",
+        "portedSha256": "e564e6ed3a27c25e2a56531c566404ff796dd9377e65647464627d5b951958a5",
+        "modulePathRewrites": 3,
+        "sourceGitBlob": "0ca3898fcefed0dae5c5d773409b90dad000b743"
+      },
+      {
+        "source": "src/lib/shell-session-tool.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/shell-session-tool.ts",
+        "sourceSha256": "ac09d8ffb190c4a0930f0091f97654d1ca5f476446e71e00af0c2555852d35b8",
+        "portedSha256": "6f426846304c9550caebbe5080f2bfcd20882cd7fa5a0af173b262c53eae3c60",
+        "modulePathRewrites": 0,
+        "sourceGitBlob": "355e8dc8aa46b9939f6edf7e5e882aca28bcd5ea"
+      },
+      {
+        "source": "src/lib/codex-code-mode.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/codex-code-mode.ts",
+        "sourceSha256": "6bf38fa52bf8d0850a9591d182c4e75cfc2a8ce58d76c6ece0061f68969e6ab7",
+        "portedSha256": "59715c55cb42a929a1dfdce8f85782d8e2a9139e9ee7d00a43141e70a1d53314",
+        "modulePathRewrites": 0,
+        "sourceGitBlob": "9ff31f0cad433c77884edd0921bf85c7bf893a2f"
+      },
+      {
+        "source": "src/lib/types.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/types.ts",
+        "sourceSha256": "8a05433a8c860e8d097e90ff7d5cee0df151e035dc340cb6005f9d57ff1ca89a",
+        "portedSha256": "51bead7635f56c95a07dd3ebbbbc4a34ac3d6f3a428da27b90f7fc564d2ff357",
+        "modulePathRewrites": 0,
+        "selectedDeclarations": [
+          {
+            "start": 2,
+            "end": 17,
+            "sha256": "faa250af27ef49b327f92b87b91d79b14a01467ff6f2d3448f3643e5c23a534d"
+          },
+          {
+            "start": 30,
+            "end": 30,
+            "sha256": "9886e2c60472ecfa5cc3c642af6202930db1e501c6d0a2422205dbdd61866949"
+          },
+          {
+            "start": 111,
+            "end": 111,
+            "sha256": "849c0cb30c47f33ccc5a51ee4f51dab963de6baa8b6e296a7799cacd592e9c58"
+          },
+          {
+            "start": 113,
+            "end": 118,
+            "sha256": "ac69af2a541d0275b0ebdb37795179ad1ebd64efd0702e16cdb68ff2e4f37380"
+          },
+          {
+            "start": 120,
+            "end": 155,
+            "sha256": "eb3084a3453de242093ec8d13cc179e3af55b575596dc9285044d5ec38dbab0c"
+          },
+          {
+            "start": 166,
+            "end": 178,
+            "sha256": "1f42ec6917e654f1b7f5accd5ab3262e6632a67b0eac73637b9f67b350d6c0cf"
+          },
+          {
+            "start": 185,
+            "end": 189,
+            "sha256": "52fcc16a6cf0a3b74a3b183a40b47d589d04ab1472986ef8da737b449d0f4329"
+          },
+          {
+            "start": 191,
+            "end": 293,
+            "sha256": "7847cd356331be7dfccbd72c55cf9dd5e7d6135698cbab874387b2cf41bb7dff"
+          },
+          {
+            "start": 295,
+            "end": 295,
+            "sha256": "3ae0cc4bd2cd3fe933c133d333b307db2a87f35f39e90ad20176e7d673118187"
+          },
+          {
+            "start": 297,
+            "end": 302,
+            "sha256": "260a90f2397b09a36d534ea7d3118081f81cef86d3ea466ea7a64f2ccdaecc75"
+          },
+          {
+            "start": 313,
+            "end": 352,
+            "sha256": "11535d603d0597b627cd52b5928e431418c3715fd4721bae346d43728b701746"
+          },
+          {
+            "start": 1120,
+            "end": 1136,
+            "sha256": "1595ddc8be175738db61d5ddc2a65a0fad4fb4f75b0e91f46db0a45db8923995"
+          },
+          {
+            "start": 2551,
+            "end": 2555,
+            "sha256": "c1abfcb4afed72867f2ae9ca6958598ef455fdf7f38dd1bf94df0aed61a0824b"
+          },
+          {
+            "start": 3057,
+            "end": 3057,
+            "sha256": "5fecd6acd899c737588ed662d8f37e890c81fd26eaa1d5be1042ff01f892714d"
+          }
+        ],
+        "sourceGitBlob": "a44d9e765f5f684bf292e005332dbd31d0cbf675"
+      },
+      {
+        "source": "src/components/chat/composer/types.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/types.ts",
+        "sourceSha256": "5c1871b4e31803edd62f1982d8f8a8478537ea793d309ec98764e8c766b712b5",
+        "portedSha256": "806ce8ca70f445fd765f639fa3f602e4e280efa6b18df9d04b6f66a84392e92c",
+        "modulePathRewrites": 1,
+        "selectedDeclarations": [
+          {
+            "start": 4,
+            "end": 4,
+            "sha256": "9e442b810e8106b4c29a6d103119716c895dc0427c5e04bbfdde52a8a4f235df"
+          },
+          {
+            "start": 20,
+            "end": 59,
+            "sha256": "f963d671ac34425f5451ccf17f55b8e0f61ce387d4571d65f3faedbfdf094cf9"
+          },
+          {
+            "start": 65,
+            "end": 81,
+            "sha256": "0b1f0967b537b689e675dc85c632e15c9fe397b242d2760aa8f328d28f1c292b"
+          }
+        ],
+        "sourceGitBlob": "0b3ae5ef78049264431f17bf1018b2671fbc5a12"
+      },
+      {
+        "source": "src/lib/utils.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/uuid.ts",
+        "sourceSha256": "d4dfb81a4cd7f2e4206cec563fb3478ae731f16c7073c2e3cfa7e3e01cfc008c",
+        "portedSha256": "41417bc24fa075dae9ba1f48d02b4068f22a688524fe0c1641ac98d635d6822d",
+        "modulePathRewrites": 0,
+        "selectedDeclarations": [
+          {
+            "start": 164,
+            "end": 179,
+            "sha256": "513155005f35a49a94e74d277f875ab810a27412f64f76bd8dd0b2c91fe71118"
+          }
+        ],
+        "sourceGitBlob": "4a42e2b0373306309097177558d887597bf72ba2"
+      },
+      {
+        "source": "src/lib/adapters/ai-elements-adapter.test.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/adapters/ai-elements-adapter.test.ts",
+        "sourceSha256": "7bf8b2c971de9ccfa0a025e6265e5e0922b102cb8839f2e1101dd0d581e4c460",
+        "portedSha256": "f6a3400199c4a18f62942d33df0468920f94b6f8f6bfb6a3c02e8808a1ed6f7c",
+        "modulePathRewrites": 4,
+        "omittedLiveProducerCases": [
+          {
+            "start": 1904,
+            "end": 1959
+          }
+        ],
+        "expectationsChanged": false,
+        "sourceGitBlob": "8e0e7bd4fcd9e6351734bf5698fca8290ba63a69"
+      }
+    ],
+    "omittedLiveProducerCases": [
+      {
+        "start": 1904,
+        "end": 1959,
+        "source": "it.each([\r\n    [\"matched nothing\", exitOne, \"output-available\"],\r\n    [\r\n      \"failed on a missing path\",\r\n      `rg: no_such_dir: IO error for operation on no_such_dir: No such file or directory (os error 2)\\n${exitOne}`,\r\n      \"output-error\",\r\n    ],\r\n  ] as const)(\r\n    \"reads the live tool call the store holds: a pipeline that %s\",\r\n    (_label, output, state) => {\r\n      const built = buildStreamingTurnsFromLiveMessage(1, {\r\n        id: \"lm-877\",\r\n        role: \"assistant\",\r\n        startedAt: 0,\r\n        content: [\r\n          {\r\n            type: \"tool_call\",\r\n            info: {\r\n              tool_call_id: \"call_c7147e5130a5\",\r\n              title: `\"${pipeline}\"`,\r\n              kind: \"execute\",\r\n              status: \"failed\",\r\n              content: null,\r\n              raw_input: shellInput(pipeline),\r\n              raw_output_chunks: [output],\r\n              raw_output_total_bytes: output.length,\r\n              locations: null,\r\n              meta: {\r\n                terminal_info: {\r\n                  cwd: \"/repo\",\r\n                  terminal_id: \"call_c7147e5130a5\",\r\n                },\r\n                terminal_exit: {\r\n                  exit_code: 1,\r\n                  signal: null,\r\n                  terminal_id: \"call_c7147e5130a5\",\r\n                },\r\n              },\r\n              images: [],\r\n            },\r\n          },\r\n        ],\r\n      })\r\n      const part = onlyToolCall(\r\n        adaptMessageTurn(\r\n          built.turns[0],\r\n          msgText,\r\n          true,\r\n          built.inProgressToolCallIds\r\n        ).content\r\n      )\r\n\r\n      expect(part.toolName).toBe(\"bash\")\r\n      expect(part.state).toBe(state)\r\n    }\r\n  )"
+      }
+    ],
+    "sharedCollabBodyReused": true,
+    "externalRuntimeDependencies": []
+  },
+  "cards": {
+    "files": [
+      {
+        "source": "src/components/message/plan-card.tsx",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/plan-card.tsx",
+        "sourceSha256": "4886b24f8286e99f796812ca5206d26c45bd92df192ef60967dbc9a6fae9166f",
+        "portedSha256": "2cce18404ece2861a164f2acbe187656285dbc3f864f72bd725d6feb87bd38d2",
+        "bodyUnchangedApartFromImports": true,
+        "sourceGitBlob": "5f4f5b1a2849a76d6299ed8e805a2ef8757e266a"
+      },
+      {
+        "source": "src/components/message/plan-mode-card.tsx",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/plan-mode-card.tsx",
+        "sourceSha256": "a86c28d77584a843b6452e64d8968438187b3a860665102bf4ab986a15991b2d",
+        "portedSha256": "93eda500ae8bdc79eaa143662f34035c6d3b31ff9118b87ec3c96cd8b9adb7b5",
+        "bodyUnchangedApartFromImports": true,
+        "sourceGitBlob": "70c22ac6c4f71253eb3bfdea7c6754c6b62a4f63"
+      },
+      {
+        "source": "src/components/message/goal-tool-call.tsx",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/goal-tool-call.tsx",
+        "sourceSha256": "464265f3ae309c291df8bd28027253a601cba992aa10e924659c1ce017f616f2",
+        "portedSha256": "7156d7aba0a1b2ba0ca0a4c1fcb2ebdeeb310adb7d27ef851609401e6f48f6e5",
+        "bodyUnchangedApartFromImports": true,
+        "sourceGitBlob": "337e379f91153a69656374411bcaf45880fe0619"
+      },
+      {
+        "source": "src/components/message/goal-control-context.tsx",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/goal-control-context.tsx",
+        "sourceSha256": "5e85a3db437a061f39452b4d5098d5bb6acb783c3719ba17019cc5f6eada9d21",
+        "portedSha256": "377234369145ad67aacaeb69b6d8da39133ba0ec83bdb172edd3fcc3d4da8c50",
+        "bodyUnchangedApartFromImports": true,
+        "sourceGitBlob": "4b0dbe5ee52bb5e5ce5a6e74d9052fa358638c99"
+      },
+      {
+        "source": "src/hooks/use-collapsible-overflow.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/hooks/use-collapsible-overflow.ts",
+        "sourceSha256": "80610ac2275eb3fac46683f4704147aee14dd6f92fb42a0a6130ba41f17dd2fd",
+        "portedSha256": "9aad40147ad25bc007a0cd784fac1e20b05f86e9bee602763b6be7c9867a3e66",
+        "bodyUnchangedApartFromImports": true,
+        "sourceGitBlob": "6c93a8d44fd92c911721c1e95bdf87d8ba1831cd"
+      }
+    ],
+    "localeScopes": [
+      "Folder.chat.agentPlanOverlay",
+      "Folder.chat.proposedPlan",
+      "Folder.chat.contentParts",
+      "Folder.chat.messageList"
+    ],
+    "readonlyGoalProviderIsAbsent": true
+  },
+  "generatedStyle": {
+    "tailwindVersion": "4.1.18",
+    "productionTailwindDependency": false,
+    "noGlobalPreflight": true,
+    "scope": ".codeg-native-rich",
+    "files": [
+      "components/message/plan-card.tsx",
+      "components/message/plan-mode-card.tsx",
+      "components/message/goal-tool-call.tsx",
+      "ui/source-primitives.tsx"
+    ],
+    "candidates": 1210,
+    "generatedBytes": 16668,
+    "sha256": "7feadca75335f69e3d0118a7e48be05a14045c5a269ff049388091a7d61dccd6",
+    "input": "@import \"tailwindcss/theme.css\" layer(theme);\n@import \"tailwindcss/utilities.css\" layer(utilities);\n@custom-variant dark (&:where([data-theme=\"night\"] *));\n@theme inline {\n --color-foreground: var(--ink); --color-background: var(--surface);\n --color-card: var(--surface); --color-border: var(--line);\n --color-input: var(--input); --color-muted: var(--surface-muted);\n --color-muted-foreground: var(--muted); --color-primary: var(--accent);\n --color-primary-foreground: var(--surface); --color-secondary: var(--surface-muted);\n --color-secondary-foreground: var(--ink); --color-destructive: var(--danger);\n --text-3xs: 0.625rem;\n}"
+  },
+  "runtimeDependency": {
+    "baseline": "899fff9b4ba6e93f2062d3027490433ca4253ed0",
+    "name": "tailwind-merge",
+    "version": "3.4.0",
+    "license": "MIT",
+    "integrity": "sha512-uSaO4gnW+b3Y2aWoWfFpX62vn2sR3skfhbjsEnaBI81WD1wBLlHZe5sWf0AqjksNdYTbGBEd0UasQMT3SNV15g==",
+    "sourceComponent": "Fixed Codeg cn class conflict resolution",
+    "sourceLock": "aff1e6c pnpm-lock.yaml",
+    "addedPackages": [
+      "tailwind-merge@3.4.0"
+    ],
+    "addedSnapshots": [
+      "tailwind-merge@3.4.0"
+    ],
+    "existingPackagesPreserved": 781,
+    "existingSnapshotsPreserved": 781,
+    "originalImportersPreserved": true,
+    "licenseSha256": "d4c70c7ce38cea8778f0aed3fc0bef0a9dbd27f13bd8b6773cbd6d37941971e5",
+    "localCache": "one leaf copied from matching integrity-locked source UI cache; no new external download",
+    "packageSha256": "f8fda2fcfb642629161a78420d448919897314285006ebd3fa0bb7aead2000a7",
+    "bundleSha256": "c04f70e24af55743473294f09f36126c6f7d74bc79006cbd2e46f3cb2dc0c6b4"
+  },
+  "hostSeams": [
+    "Rovai SafeMarkdown",
+    "Rovai interface language with exact selected source CN/EN copy",
+    "native overflow-auto ScrollArea used by the selected readonly cards",
+    "controlled disclosure without source exit-animation presence",
+    "same source shimmer gradient via scoped CSS with reduced motion"
+  ],
+  "nativeOnlyCorrections": [
+    "arrival-order repeated IDs and later-turn results use ephemeral UI correlation IDs; frozen input/meta stay unchanged",
+    "retainNativeToolDetails defaults false for source callers; native opts in, retaining full mixed text/images, all orphan images and original result statistics",
+    "terminal native parent disables stale goal live animation; no GoalControl provider or mutable goal action"
+  ],
+  "qualification": {
+    "sourceDefaultAdapterTestsPassed": 148,
+    "sourceLiveProducerItEachOmitted": {
+      "start": 1904,
+      "end": 1959,
+      "reason": "native readonly receives persisted turns, not the donor live ACP producer; all assertions outside this producer case unchanged"
+    },
+    "nativeBoundaryTestsPassed": 5,
+    "allTargetedTestsPassed": 182,
+    "productionRendererChecks": 17,
+    "referenceFullContentParts": false,
+    "referenceFullApp": false
+  },
+  "remaining": [
+    "full concrete source tool cards/code-mode/search/diff/agent and background status rendering",
+    "source image group/zoom/copy/download and valid file/HTML actions under Core authorization",
+    "source-reference full content/app/theme qualification and integrated actual Core/Native/Web/Runtime/platform candidates"
+  ]
+}

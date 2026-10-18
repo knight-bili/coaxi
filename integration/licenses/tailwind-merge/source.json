@@ -1,0 +1,22 @@
+{
+  "baseline": "899fff9b4ba6e93f2062d3027490433ca4253ed0",
+  "name": "tailwind-merge",
+  "version": "3.4.0",
+  "license": "MIT",
+  "integrity": "sha512-uSaO4gnW+b3Y2aWoWfFpX62vn2sR3skfhbjsEnaBI81WD1wBLlHZe5sWf0AqjksNdYTbGBEd0UasQMT3SNV15g==",
+  "sourceComponent": "Fixed Codeg cn class conflict resolution",
+  "sourceLock": "aff1e6c pnpm-lock.yaml",
+  "addedPackages": [
+    "tailwind-merge@3.4.0"
+  ],
+  "addedSnapshots": [
+    "tailwind-merge@3.4.0"
+  ],
+  "existingPackagesPreserved": 781,
+  "existingSnapshotsPreserved": 781,
+  "originalImportersPreserved": true,
+  "licenseSha256": "d4c70c7ce38cea8778f0aed3fc0bef0a9dbd27f13bd8b6773cbd6d37941971e5",
+  "localCache": "one leaf copied from matching integrity-locked source UI cache; no new external download",
+  "packageSha256": "f8fda2fcfb642629161a78420d448919897314285006ebd3fa0bb7aead2000a7",
+  "bundleSha256": "c04f70e24af55743473294f09f36126c6f7d74bc79006cbd2e46f3cb2dc0c6b4"
+}

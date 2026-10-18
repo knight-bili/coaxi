@@ -9,6 +9,9 @@
 .native-session-body { flex: 1; min-width: 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 12px 16px; }
 .native-session-notice { flex: none; padding: 0 16px; border-bottom: 1px solid var(--line); }
 .native-session-transcript { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.native-session-plain-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.native-session-part-group { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.native-session-resource { align-self: flex-start; max-width: 100%; overflow-wrap: anywhere; padding: 2px 8px; border: 1px solid var(--line); border-radius: 9999px; color: var(--muted); font-size: 12px; }
 .native-session-turn, .native-session-input-turn { display: flex; flex-direction: column; gap: 8px; min-width: 0; overflow-wrap: anywhere; font-size: 14px; }
 .native-session-input-turn { border-radius: 8px; background: color-mix(in srgb, var(--surface-muted) 50%, transparent); padding: 8px 12px; }
 .native-session-transcript .safe-markdown > :first-child { margin-top: 0; }

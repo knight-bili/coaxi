@@ -70,3 +70,6 @@ I04 Core委派查看器按固定Codeg `sub-agent-session-dialog.tsx`、`session-
 
 I04 原生只读查看器继续按固定 Codeg `message/subagent-session-dialog.tsx`、`session-viewer-host.tsx`和原 Drawer/header/角色容器适配。
 `codeg-collab-tool.ts`在Apache-2.0来源头之后保留固定`src/lib/collab-tool.ts`完整原文字节，来源摘要与正文等价检查见[UI映射](../inventory/native-session-viewer-ui-reference.md)。复用原已准入BaseUI及现有Rovai安全Markdown，不新增产品依赖；原 ContentPartsRenderer 完整富内容仍在移植队列，参考外壳运行不冒称其完成。
+
+I04 原生富内容的纯适配层、必要类型/引用/工具分类辅助及计划/提案/目标组件来自固定Codeg提交，保留Apache-2.0来源头；[逐文件映射](../inventory/native-content-ui-port.json)记录原Git blob、源码摘要、抽取范围与明确适配。
+原样式冲突合并使用供体相同`tailwind-merge@3.4.0`，仅新增该一个无依赖leaf，781旧package/snapshot不变；[MIT正文](tailwind-merge/LICENSE.md)与[锁定记录](tailwind-merge/source.json)保留。生成的隔离卡片CSS使用已有开发缓存中的Tailwind4.1.18；[MIT正文](tailwindcss/LICENSE)及[生成来源](tailwindcss/source.json)保留，不增加生产Tailwind依赖或全局preflight。

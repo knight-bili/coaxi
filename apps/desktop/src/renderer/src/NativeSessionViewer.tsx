@@ -8,13 +8,22 @@ import { NativeChildReader, type NativeTranscriptBlock, type NativeTranscriptTur
 import type { NativeSessionTarget } from './native-session-viewer-context'
 import { NativeSessionViewerContext } from './native-session-viewer-context'
 import { useThreadClient } from './camp-client'
-import { useUiText } from './interface-language'
+import { useInterfaceLanguage, useUiText } from './interface-language'
 import { CodegRuntimeMark } from './CodegRuntimeMark'
 import { SafeMarkdown } from './SafeMarkdown'
 import { DelegationViewerHost } from './DelegationViewer'
 import { useEscapeShield, shieldedDismissal } from './session-viewer-dismissal'
 import './native-session-viewer.css'
 import { nativeToolChildren, nativeToolPairs } from './native-transcript-model'
+import { adaptNativeMessages } from './native-content-adapter'
+import type { AdaptedContentPart, AdaptedToolCallPart, AdapterMessageText } from './codeg-native-content/lib/adapters/ai-elements-adapter'
+import { normalizeToolName } from './codeg-native-content/lib/tool-call-normalization'
+import { isPlanModeToolName } from './codeg-native-content/lib/plan-parse'
+import { PlanCard } from './codeg-native-content/components/message/plan-card'
+import { PlanMarkdownCard, PlanModeCard } from './codeg-native-content/components/message/plan-mode-card'
+import { GoalRunPart, GoalToolCallPart } from './codeg-native-content/components/message/goal-tool-call'
+import { useTranslations } from './codeg-native-content/ui/source-primitives'
+import './codeg-native-content/source-rich.css'
 
 function readMessage(code: string): string {
   if (/origin_unavailable|source_unavailable/.test(code)) return '暂时找不到这份会话记录。'
@@ -70,19 +79,46 @@ export function NativeSessionViewer({ target, open, visible, onOpenChange, retur
 type ToolUse = Extract<NativeTranscriptBlock, { type: 'tool_use' }>
 type ToolResult = Extract<NativeTranscriptBlock, { type: 'tool_result' }>
 function NativeTranscriptBody({ turns, reader, target, live }: { turns: NativeTranscriptTurn[]; reader: NativeChildReader; target: NativeSessionTarget; live: boolean }): React.JSX.Element {
-  const { results, paired } = nativeToolPairs(turns)
-  return <div className="native-session-transcript">{turns.map((turn, turnIndex) => <section key={`${turn.id}:${turnIndex}`} className={turn.role === 'user' ? 'native-session-input-turn' : 'native-session-turn'}>
-    {turn.blocks.map((block, index) => {
-      const key = `${turn.id}:${index}`
-      if (block.type === 'text') return <SafeMarkdown key={key}>{block.text}</SafeMarkdown>
-      if (block.type === 'thinking') return <NativeReasoning key={key} text={block.text} />
-      if (block.type === 'turn_error') return <p key={key} className="native-session-note is-error" role="status">{block.message}</p>
-      if (block.type === 'image') return <NativeImage key={key} image={block} />
-      if (block.type === 'image_generation') return <div key={key}>{block.image && <NativeImage image={block.image} />}{block.revised_prompt && <NativeReasoning text={block.revised_prompt} imagePrompt />}</div>
-      if (block.type === 'tool_use') return <NativeTool key={key} use={block} result={results.get(block)} reader={reader} target={target} live={live} />
-      if (block.type === 'tool_result' && !paired.has(block)) return <NativeTool key={key} result={block} reader={reader} target={target} live={false} />
-      return null
-    })}
+  const language = useInterfaceLanguage(), t = useUiText(), planText = useTranslations('Folder.chat.proposedPlan')
+  const text = useMemo<AdapterMessageText>(() => ({
+    attachedResources: language === 'en' ? 'Attached resources' : '附加资源',
+    toolCallFailed: language === 'en' ? 'Tool call failed' : '工具调用失败',
+    pageHandoffName: handoff => handoff.kind === 'element' ? handoff.label || (language === 'en' ? 'Page element' : '页面元素')
+      : handoff.kind === 'screenshot' ? language === 'en' ? 'Page screenshot' : '页面截图'
+        : language === 'en' ? `${handoff.count} console errors` : `${handoff.count} 条控制台错误`
+  }), [language])
+  const messages = useMemo(() => adaptNativeMessages(turns, live, text), [turns, live, text])
+  const { results } = useMemo(() => nativeToolPairs(turns), [turns])
+  const tool = (part: AdaptedToolCallPart, key: string): React.JSX.Element => {
+    const name = normalizeToolName(part.toolName)
+    if (isPlanModeToolName(name)) return <PlanModeCard key={key} toolName={name} input={part.input} output={part.output} errorText={part.errorText ?? null} state={part.state} />
+    if (name === 'create_goal' || name === 'update_goal') return <GoalToolCallPart key={key} part={part} />
+    const origin = /^native-view:(\d+):(\d+)$/.exec(part.toolCallId)
+    const raw = origin ? turns[Number(origin[1])]?.blocks[Number(origin[2])] : undefined
+    const use: ToolUse = raw?.type === 'tool_use' ? raw : { type: 'tool_use', tool_use_id: part.toolCallId, tool_name: part.toolName, input_preview: part.input, meta: part.meta, status: part.toolStatus }
+    const original = raw?.type === 'tool_use' ? results.get(raw) : undefined
+    const result: ToolResult | undefined = original ? { ...original, images: undefined } : part.output !== undefined || part.errorText !== undefined
+      ? { type: 'tool_result', tool_use_id: part.toolCallId, output_preview: part.errorText ?? part.output ?? null, is_error: part.state === 'output-error', agent_stats: part.agentStats ? { ...part.agentStats } : null } : undefined
+    return <NativeTool key={key} use={use} result={result} reader={reader} target={target} live={live} />
+  }
+  const renderPart = (part: AdaptedContentPart, key: string, user = false): React.ReactNode => {
+    if (part.type === 'text') return user ? <div className="native-session-plain-text" key={key}>{part.text}</div> : <SafeMarkdown key={key}>{part.text}</SafeMarkdown>
+    if (part.type === 'reasoning') return <NativeReasoning key={key} text={part.content} />
+    if (part.type === 'turn-error') return <p key={key} className="native-session-note is-error" role="status">{part.message}</p>
+    if (part.type === 'plan') return <PlanCard key={key} entries={part.entries} isStreaming={live && part.isStreaming} />
+    if (part.type === 'proposed-plan') return <PlanMarkdownCard key={key} markdown={part.markdown.trim()} label={planText('title')} emptyLabel={planText('planning')} />
+    if (part.type === 'goal-run') return <GoalRunPart key={key} part={live ? part : { ...part, isRunning: false }} renderPart={(child, childKey) => renderPart(child, childKey, user)} />
+    if (part.type === 'tool-call') return tool(part, key)
+    if (part.type === 'tool-group') return <div className="native-session-part-group" key={key}>{part.items.map((item, index) => tool(item, `${key}:${index}`))}</div>
+    if (part.type === 'delegation-status-group' || part.type === 'background-task-group') return <div className="native-session-part-group" key={key}>{part.polls.map((item, index) => tool(item, `${key}:${index}`))}</div>
+    if (part.type === 'tool-result') return <NativeTool key={key} result={{ type: 'tool_result', tool_use_id: part.toolCallId, output_preview: part.errorText ?? part.output, is_error: part.state === 'output-error', agent_stats: part.agentStats ? { ...part.agentStats } : null }} reader={reader} target={target} live={false} />
+    if (part.type === 'generated-image') return <div key={key}>{part.label && <small>{part.label}</small>}{part.image && <NativeImage image={part.image} />}{part.revisedPrompt && <NativeReasoning text={part.revisedPrompt} imagePrompt />}{!part.image && <p className="native-session-note">{t(part.status === 'failed' ? '图片生成失败。' : live ? '图片尚未生成。' : '这份记录中没有图片内容。')}</p>}</div>
+    return null
+  }
+  return <div className="native-session-transcript codeg-native-rich">{messages.map((message, turnIndex) => <section key={`${message.id}:${turnIndex}`} className={message.role === 'user' ? 'native-session-input-turn' : 'native-session-turn'}>
+    {message.content.map((part, index) => renderPart(part, `${message.id}:${index}`, message.role === 'user'))}
+    {message.userResources?.map((resource, index) => <span className="native-session-resource" title={resource.uri} key={`resource:${index}`}>{resource.name}</span>)}
+    {message.userImages?.map((image, index) => <NativeImage image={image} key={`image:${index}`} />)}
   </section>)}</div>
 }
 function NativeReasoning({ text, imagePrompt = false }: { text: string; imagePrompt?: boolean }): React.JSX.Element {
