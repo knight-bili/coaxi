@@ -139,10 +139,11 @@
       "id": "DEV-EXECUTION-WINDOW-AUTH-RECOVERY",
       "task": "I04-T01/I12",
       "owner": "研发",
-      "status": "pending_current_cache_authorization_proof",
+      "status": "local_engineering_verified_real_host_candidate_pending",
       "file": "apps/desktop/src/renderer/src/execution-window.ts / execution-content-cache.ts",
-      "problem": "原执行窗口缓存按client保留，尚无完整认证代次回收及正文在途回复的资格证据；需核对Web恢复/失效与普通同Owner断线保留的区别，复现并补围栏，不能将本轮Host对象替换检查写成同client认证恢复通过",
-      "evidence": "i04-delegation-block-client-result.json；当前仅来源/输出分离、两窗口generation/范围及替换client的实际Renderer资格"
+      "problem": "原同client认证失效后执行窗口保留旧内容已复现并修复；新增内部读取代次、活跃回收/休眠重开核对、正文永久retire及迟到拒绝、整个Disclosure状态树与tail隔离。普通断线/正常续期保留；此分项本地工程通过，不要求客户技术验收。",
+      "evidence": "i04-execution-read-auth-result.json",
+      "remaining": "生产ConsoleClient/adapter加fetch替身及实际Renderer已验；真实Core/Native/HTTP与完整原App、长历史/规模/恢复仍归I04集中候选，不由本分项替代。"
     }
   ]
 }

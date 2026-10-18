@@ -1,12 +1,72 @@
 import { afterEach, expect, it, vi } from 'vitest'
 import type { AgentRunExecutionEvidenceView, CoreMethod } from '@contracts'
-import { ExecutionWindow } from '../../desktop/src/renderer/src/execution-window'
+import { ExecutionWindow, executionWindowCacheFor } from '../../desktop/src/renderer/src/execution-window'
 import { ConsoleClient } from './client'
 import { createThreadAdapter } from './camp-adapter'
 
 // Owns the production Web adapter + execution window seam. A Host-only HTTP
 // test bypasses this adapter's allowlist; a populated page hides missing deltas.
 afterEach(() => vi.unstubAllGlobals())
+it.each(['clear', '401'] as const)('retires same-client execution bodies and late cache writes after %s and reauthentication', async failure => {
+  const storage = { getItem: () => null, setItem: () => undefined, removeItem: () => undefined }
+  vi.stubGlobal('sessionStorage', storage); vi.stubGlobal('localStorage', storage)
+  vi.stubGlobal('navigator', { platform: 'Win32' })
+  vi.stubGlobal('window', { sessionStorage: storage, history: { state: null } })
+  vi.stubGlobal('matchMedia', () => ({ matches: false }))
+  let phase = 'OLD_SCOPE', unauthorized = false, release!: () => void, ready!: () => void
+  const blocked = new Promise<void>(resolve => { release = resolve }), started = new Promise<void>(resolve => { ready = resolve })
+  const fetcher = vi.fn<typeof fetch>(async (url, options) => {
+    if (String(url).endsWith('/login')) return Response.json({ protocolVersion: 4, token: 'a'.repeat(64), clientId: 'd'.repeat(64), editorProof: 'e'.repeat(64), ownerId: 'local_user' })
+    if (unauthorized) return Response.json({ error: { code: 'session_required' } }, { status: 401 })
+    const { operation, params } = JSON.parse(String(options?.body))
+    if (operation === 'agentRunEvidence.getContent') return Response.json({ result: { payload: { text: phase } } })
+    const evidence: AgentRunExecutionEvidenceView = { id: 'body', agentRunId: 'run', executionEpoch: 1, sequence: 1,
+      eventType: 'agent.text.block', kind: 'narration', phase: 'completed', revision: 1, changeSequence: 1,
+      payload: { text: phase }, contentBlobId: null, contentByteCount: 10, isTruncated: false, occurredAt: '2026-10-19T00:00:00Z' }
+    return Response.json({ result: { schemaVersion: 3, threadId: 'camp', agentRunId: 'run', requestedBeforeSequence: params.beforeSequence,
+      nextBeforeSequence: null, throughSequence: 1, throughChangeSequence: 1, hasMore: false,
+      blocks: [{ key: 'item:1', kind: 'item', sequence: 1, lastSequence: 1, changeSequence: 1, toolCount: 0,
+        counts: { completed: 0, running: 0, failed: 0, stopped: 0, waiting: 0, recorded: 0 }, evidence: [evidence] }] } })
+  })
+  const transport = new ConsoleClient('http://127.0.0.1:8766', fetcher)
+  await transport.login('b'.repeat(64))
+  const client = createThreadAdapter(transport, async () => null).environment.client
+  const cache = executionWindowCacheFor(client)
+  const invalidated = vi.fn(), unsubscribe = client.onInvalidated!(invalidated)
+  const initialScope = client.readAuthority!.getSnapshot()
+  expect(client.readAuthority!.getSnapshot()).toBe(initialScope)
+  const create = (changed: () => void) => new ExecutionWindow('camp', 'run', 12,
+    params => client.request('agentRunExecution.page', params), changed, params => client.request('agentRunExecution.changes', params))
+  const first = cache.acquire('camp:run', create, () => {})
+  let second: typeof first | undefined
+  const old = first.window
+  try {
+    await old.latest(); old.content.set('saved-body', 'OLD_SCOPE')
+    const pending = old.content.load('late-body', async () => {
+      const value = await client.request('agentRunEvidence.getContent', { threadId: 'camp', evidenceId: 'body' })
+      ready(); await blocked; return value
+    }).then(value => ({ value }), error => ({ error }))
+    await started
+    if (failure === '401') { unauthorized = true; await expect(client.request('app.info')).rejects.toThrow(); unauthorized = false }
+    else transport.clear()
+    expect(invalidated).toHaveBeenCalledWith({ resync: true })
+    expect(client.readAuthority!.getSnapshot()).toMatchObject({ available: false })
+    expect(old.blocks).toEqual([])
+    expect(old.content.get('saved-body')).toBeUndefined()
+    expect(old.content.bytes).toBe(0)
+    release(); expect(await pending).toHaveProperty('error')
+    old.content.set('late-direct-write', 'OLD_SCOPE')
+    expect(old.content.get('late-direct-write')).toBeUndefined()
+    phase = 'NEW_SCOPE'; await transport.login('b'.repeat(64))
+    second = cache.acquire('camp:run', create, () => {})
+    expect(second.window).not.toBe(old)
+    await second.window.latest()
+    expect(second.window.evidence[0].payload).toEqual({ text: 'NEW_SCOPE' })
+    expect(second.window.content.get('saved-body')).toBeUndefined()
+    expect(client.readAuthority!.getSnapshot().generation).toBeGreaterThan(initialScope.generation)
+    unsubscribe(); invalidated.mockClear(); transport.clear(); expect(invalidated).not.toHaveBeenCalled()
+  } finally { release(); first.release(); second?.release(); unsubscribe(); transport.clear() }
+})
 it.each([false, true])('恢复与结束准备分别按服务端能力开放（结束能力 %s）', async lifecycle => {
   const values = new Map<string, string>()
   const storage = { getItem: (key: string) => values.get(key) ?? null,

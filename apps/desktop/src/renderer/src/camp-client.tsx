@@ -28,6 +28,8 @@ export type ThreadClient = Pick<RovaiApi,
   retryPendingCommand?: (method: 'runtime.interactions.resolve' | import('../../shared/private-conversation-operations').PrivateInputMethod | import('../../shared/private-conversation-operations').DelegationActionMethod, params: unknown) => Promise<void>
   /** Authenticated Host/Owner identity for advisory presentation preferences; never a resource grant. */
   presentationScope?: string
+  /** Local authentication lifetime for private read caches, never a Core grant. */
+  readAuthority?: import('./thread-read-authority').ThreadReadAuthority
   /** Web uses a live, Core-verified editor identity instead of exposing the server data directory. */
   canvasCoreIdentity?: () => Promise<string>
   /** Explicit resource/platform dependencies of the shared management pages. */
@@ -57,8 +59,8 @@ export type ThreadClient = Pick<RovaiApi,
 const ThreadClientContext = createContext<ThreadClient | null>(null)
 
 export function ThreadClientProvider({ client, children }: {
-  // Stable for one Host/Owner/editor scope. Authentication renewal changes the
-  // transport generation, not this object or the mounted Composer.
+  // Stable for one Host/Owner/editor scope. Session renewal keeps the object and
+  // mounted Composer; authentication loss/replacement retires private reads.
   client: ThreadClient
   children: ReactNode
 }): React.JSX.Element {

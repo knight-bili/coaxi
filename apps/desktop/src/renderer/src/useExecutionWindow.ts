@@ -3,6 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useLayoutEffect, use
 import type { AgentRunView, AgentRunExecutionEvidenceView } from '@contracts'
 import type { ExecutionBlockPage, ExecutionBlockChanges } from './execution-block-contract'
 import { ExecutionWindow, executionWindowPageSize, executionWindowCacheFor } from './execution-window'
+import { useThreadReadAuthority } from './thread-read-authority'
 
 export const ExecutionReadingContext = createContext<((following: boolean) => void) | null>(null)
 export const ExecutionLatestContext = createContext<{
@@ -21,8 +22,11 @@ function hasRecentExecutionReadingIntent(host: HTMLElement): boolean {
 
 export function useExecutionWindow(enabled: boolean, threadId: string, run: AgentRunView, liveRevision: unknown, contentRevision: unknown, tailOnly = false) {
   const client = useThreadClient()
+  const readScope = useThreadReadAuthority(client)
+  enabled = enabled && readScope.available
   const root = useRef<HTMLDivElement>(null)
   const store = useRef<ExecutionWindow | null>(null)
+  const storeScope = useRef<string | null>(null)
   const [revision, changed] = useState(0)
   const anchor = useRef<{ key: string; top: number; host: HTMLElement } | null>(null)
   const followAfterLoad = useRef<false | 'live' | 'explicit'>(false)
@@ -41,7 +45,7 @@ export function useExecutionWindow(enabled: boolean, threadId: string, run: Agen
 
   const move = async (direction: 'earlier' | 'newer' | 'latest' | 'retry', automatic = false): Promise<void> => {
     const current = store.current
-    if (!current || current.loading) return
+    if (!enabled || storeScope.current !== readScope.key || !current || current.loading) return
     const action = direction === 'retry' ? current.direction : direction
     const host = scrollHost()
     if (!automatic) {
@@ -81,6 +85,7 @@ export function useExecutionWindow(enabled: boolean, threadId: string, run: Agen
     const current = retained.window
     const wasLoaded = current.loaded
     store.current = current
+    storeScope.current = readScope.key
     initialInvalidation.current = true
     readingHistory.current = false
     initialFillPages.current = 0
@@ -116,7 +121,7 @@ export function useExecutionWindow(enabled: boolean, threadId: string, run: Agen
       pendingRefresh.current = null
       anchor.current = null
     }
-  }, [client, enabled, threadId, run.id, run.executionEpoch, tailOnly])
+  }, [client, enabled, readScope.key, threadId, run.id, run.executionEpoch, tailOnly])
 
   useLayoutEffect(() => {
     if (!enabled || latest?.runId !== run.id || latest.request === handledLatest.current
@@ -305,21 +310,22 @@ export function useExecutionWindow(enabled: boolean, threadId: string, run: Agen
     return () => { host.removeEventListener('scroll', onScroll); host.removeEventListener('wheel', onWheel); host.removeEventListener('keydown', onKey) }
   }, [client, enabled, threadId, run.id])
 
-  const evidence = useMemo(() => store.current?.threadId === threadId && store.current.agentRunId === run.id
-    ? store.current.evidence : [], [revision, enabled, threadId, run.id])
+  const current = enabled && storeScope.current === readScope.key ? store.current : null
+  const evidence = useMemo(() => current?.threadId === threadId && current.agentRunId === run.id
+    ? current.evidence : [], [revision, enabled, readScope.key, threadId, run.id])
   return {
-    project: <T,>(input: AgentRunExecutionEvidenceView[], build: () => T): T => store.current?.project(input, build) ?? build(),
-    contentCache: store.current?.content ?? null,
-    setViewport: (first: number, last: number) => store.current?.setViewport(first, last),
-    blocks: store.current?.blocks ?? [],
-    runtimePhase: store.current?.runtimePhase,
-    runtimeThinkingTitle: store.current?.runtimeThinkingTitle,
+    project: <T,>(input: AgentRunExecutionEvidenceView[], build: () => T): T => current?.project(input, build) ?? build(),
+    contentCache: current?.content ?? null,
+    setViewport: (first: number, last: number) => current?.setViewport(first, last),
+    blocks: current?.blocks ?? [],
+    runtimePhase: current?.runtimePhase,
+    runtimeThinkingTitle: current?.runtimeThinkingTitle,
     root, evidence,
-    loading: enabled && (store.current?.loading || (!store.current?.loaded && !store.current?.error)),
-    direction: store.current?.direction ?? 'latest',
-    error: store.current?.error ?? null,
-    hasEarlier: store.current?.hasEarlier ?? false,
-    hasNewer: Boolean(store.current?.hasNewer || readingHistory.current),
+    loading: enabled && (current?.loading || (!current?.loaded && !current?.error)),
+    direction: current?.direction ?? 'latest',
+    error: current?.error ?? null,
+    hasEarlier: current?.hasEarlier ?? false,
+    hasNewer: Boolean(enabled && (current?.hasNewer || readingHistory.current)),
     move
   }
 }

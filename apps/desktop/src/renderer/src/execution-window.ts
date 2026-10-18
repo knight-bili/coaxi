@@ -1,6 +1,7 @@
 import { ExecutionContentCache } from './execution-content-cache'
 import type { AgentRunExecutionEvidenceView as Evidence, AgentRunExecutionBlock as Block } from '@contracts'
 import { executionBlockEvidence, validExecutionBlocks, validExecutionDeltaPosition, type ExecutionBlockPage as Page, type ExecutionBlockChanges, type ExecutionProjection } from './execution-block-contract'
+import type { ThreadReadAuthority, ThreadReadSnapshot } from './thread-read-authority'
 
 export type ExecutionWindowRequest = (params: {
   threadId: string; agentRunId: string; beforeSequence: number | null; afterSequence?: number; limit: number; projection?: ExecutionProjection
@@ -52,6 +53,7 @@ export class ExecutionWindow {
   private latestPage: Page | null = null
   private latestDirty = false
   private active = true
+  private invalidated = false
   private generation = 0
   private refreshing = false
   private queuedRefresh: { accept: () => boolean; retryInitial: boolean } | null = null
@@ -72,10 +74,18 @@ export class ExecutionWindow {
       .reduce((sum, item) => sum + this.size(item), 0)
   }
   setViewport(first: number, last: number): void { this.viewport = [first, last] }
-  resume(): void { this.active = true }
+  resume(): void { if (!this.invalidated) this.active = true }
   dispose(): void {
     this.active = false; this.generation++; this.queuedRefresh = null
     this.loading = false; this.refreshing = false; this.pending.clear()
+  }
+  invalidate(): void {
+    this.invalidated = true; this.dispose()
+    this.blocks = []; this.projection = null; this.evidenceProjection = null
+    this.neighbor = null; this.latestPage = null; this.viewport = null
+    this.loaded = false; this.error = null; this.hasEarlier = false; this.hasNewer = false
+    this.runtimePhase = undefined; this.runtimeThinkingTitle = null
+    this.content.retire()
   }
   private size(item: Block): number {
     let bytes = this.sizes.get(item)
@@ -305,8 +315,24 @@ export class ExecutionWindow {
 /** Renderer session cache: inactive Runs are the first eviction candidates. */
 export class ExecutionWindowCache {
   private entries = new Map<string, { window: ExecutionWindow; listeners: Set<() => void> }>()
-  constructor(private maxRuns = 8, private maxBytes = 24 * 1024 * 1024) {}
+  private snapshot: ThreadReadSnapshot | undefined
+  private leases = 0
+  private unsubscribe: (() => void) | null = null
+  constructor(private maxRuns = 8, private maxBytes = 24 * 1024 * 1024, private authority?: ThreadReadAuthority) {
+    this.snapshot = authority?.getSnapshot()
+  }
+  private syncAuthority(): void {
+    const next = this.authority?.getSnapshot()
+    if (!next || next.generation === this.snapshot?.generation && next.available === this.snapshot?.available) return
+    this.snapshot = next
+    const retired = [...this.entries.values()]
+    this.entries.clear()
+    for (const entry of retired) { entry.window.content.onChange = null; entry.window.invalidate() }
+    for (const entry of retired) for (const listener of entry.listeners) listener()
+  }
   acquire(key: string, create: (changed: () => void) => ExecutionWindow, changed: () => void): { window: ExecutionWindow; release: () => void } {
+    this.syncAuthority()
+    if (this.snapshot?.available === false) throw new Error('请重新登录后读取执行记录')
     let entry = this.entries.get(key)
     if (!entry) {
       const listeners = new Set<() => void>()
@@ -314,12 +340,21 @@ export class ExecutionWindowCache {
     }
     entry.window.content.onChange = () => this.prune()
     this.entries.delete(key); this.entries.set(key, entry)
-    entry.listeners.add(changed); entry.window.resume(); this.prune()
+    this.leases++
+    if (!this.unsubscribe) this.unsubscribe = this.authority?.subscribe(() => this.syncAuthority()) ?? null
+    const listener = () => changed()
+    entry.listeners.add(listener); entry.window.resume(); this.prune()
     const retained = entry
+    let released = false
     return { window: retained.window, release: () => {
-      retained.listeners.delete(changed)
+      if (released) return
+      released = true
+      // React may remove its authentication listener before this cache's turn.
+      this.syncAuthority()
+      retained.listeners.delete(listener)
       if (retained.listeners.size === 0) retained.window.dispose()
       this.prune()
+      if (--this.leases === 0) { this.unsubscribe?.(); this.unsubscribe = null }
     } }
   }
   private prune(): void {
@@ -327,16 +362,17 @@ export class ExecutionWindowCache {
     for (const [key, entry] of this.entries) {
       if (this.entries.size <= this.maxRuns && bytes <= this.maxBytes) break
       if (entry.listeners.size) continue
-      bytes -= entry.window.byteSize; entry.window.dispose(); this.entries.delete(key)
+      bytes -= entry.window.byteSize; this.entries.delete(key)
+      entry.window.content.onChange = null; entry.window.invalidate()
     }
   }
 }
 // Retain Thread history within one transport/Host connection. A replacement
 // Web client must never revive a window whose fetchers hold an old credential.
 const executionWindowCaches = new WeakMap<object, ExecutionWindowCache>()
-export function executionWindowCacheFor(client: object): ExecutionWindowCache {
+export function executionWindowCacheFor(client: { readAuthority?: ThreadReadAuthority }): ExecutionWindowCache {
   let cache = executionWindowCaches.get(client)
-  if (!cache) { cache = new ExecutionWindowCache(); executionWindowCaches.set(client, cache) }
+  if (!cache) { cache = new ExecutionWindowCache(8, 24 * 1024 * 1024, client.readAuthority); executionWindowCaches.set(client, cache) }
   return cache
 }
 export function executionWindowPageSize(viewportHeight: number): number {

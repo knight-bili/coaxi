@@ -390,6 +390,8 @@ export class ConsoleClient {
     return `web:${scope}`
   }
   get authenticated(): boolean { return this.#token !== null }
+  /** Invalidates local read caches on logout/re-authentication, not session renewal. */
+  get readGeneration(): number { return this.#generation }
   onAuthenticationChanged(listener: () => void): () => void {
     this.#authListeners.add(listener)
     return () => { this.#authListeners.delete(listener) }

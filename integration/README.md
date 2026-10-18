@@ -1,5 +1,7 @@
 # Codeg 与 Rovai 一期完整融合
 
+- [I04 执行读取认证恢复记录](execution/i04-execution-read-auth-result.json)：同client重新认证回收旧窗口/完整体与展开状态，拦截迟到回复；普通断线和续期保留。182项定向、13组实际窗口及日夜两图通过；真实Host/两端与完整富内容继续，完整I04未收口。
+
 - [I04 委派分页客户端记录](execution/i04-delegation-block-client-result.json)：实际执行窗口接新分页、组内移除/恢复与原卡片；来源/输出分别取证，跨epoch编号与缓存按主块隔离。130项定向和18组实际窗口、8图对照通过，真实Core/两端/授权恢复与完整富内容继续。
 
 - [I04 委派独立分页后端记录](execution/i04-delegation-blocks-result.json)：旧3兼容、跨块唯一来源、主线/组成对位置与精确移除已定向验证；10k检查约束局部更新范围。客户端协商和真实界面链路继续，I04未收口。

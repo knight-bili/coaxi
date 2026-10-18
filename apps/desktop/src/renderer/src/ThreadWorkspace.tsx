@@ -31,6 +31,7 @@ import { currentUserDisplayName } from '@contracts'
 import { CurrentUserAvatar, useCurrentUserProfile } from './CurrentUserProfile'
 import { markdownInlineContentPrefix } from './safe-markdown-model'
 import { ExecutionLatestContext, ExecutionReadingContext, useExecutionWindow } from './useExecutionWindow'
+import { useThreadReadAuthority } from './thread-read-authority'
 import { executionBlockEvidence } from './execution-block-contract'
 import type { AgentRunExecutionBlock } from '@contracts'
 import { ReturnToLatest } from './ReturnToLatest'
@@ -10837,7 +10838,12 @@ function RunExecutionContent({
   )
 }
 
-export function RunExecutionDisclosure({
+export function RunExecutionDisclosure(props: Parameters<typeof RunExecutionDisclosureContent>[0]): JSX.Element | null {
+  const scope = useThreadReadAuthority(useThreadClient())
+  return scope.available ? <RunExecutionDisclosureContent key={scope.key} {...props} /> : null
+}
+
+function RunExecutionDisclosureContent({
   run,
   windowedEvidence = false,
   liveRevision,
@@ -10955,7 +10961,7 @@ export function RunExecutionDisclosure({
     if (!hideSummary || !expanded) return
     setContentMounted(true)
     void loadHistoricalEvidence()
-  }, [expanded, hideSummary])
+  }, [expanded, hideSummary, windowedEvidence])
 
   const shouldMountContent = windowedEvidence ? shouldActivateContent : contentMounted || shouldActivateContent
   const content = shouldMountContent ? (

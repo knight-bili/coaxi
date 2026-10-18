@@ -14,7 +14,7 @@
   "current_branch": "develop/V1.0.0",
   "base_branch": "main",
   "current_task": "I04-T01",
-  "current_slice": "客户端新分页已接实际执行窗口：旧3识别后选4、配对增量、组内撤销/重现和精确来源/输出分离；跨epoch重复编号的卡片/缓存按主块隔离。130项7文件及18组实际Renderer、8图对照通过，完整Core/两端/授权恢复/富内容仍继续。",
+  "current_slice": "同一Web客户端认证失效/重新登录的执行窗口、完整正文和行状态已隔离；拦截迟到页/正文和旧setter，普通断线/续期保留。182项8文件、13组实际Renderer与日夜两图通过；真实Core/Native/HTTP、完整富内容及其余I04继续。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,14 +33,14 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "I04-T01：补完整执行窗口/正文缓存的认证恢复围栏与迟到回复证明；继续原完整统计/Markdown/HTML/图片交互、原完整App同场景及实际Core/Native/Web候选。客户端新分页和受控运输实际窗口已接，ANSI完整许可仍待。",
+    "I04-T01：继续原完整统计/Markdown/HTML/图片交互、原完整App同场景与实际Core/Native/Web候选；同client认证缓存分项本地工程已验，不重复列作未实现。真实Host授权与长历史/规模/内存恢复仍随集中候选验证；ANSI完整许可仍待。",
     "I04-T01/T02：Claude旧agent完整parser、实际home捕获和Core证据关联；Qoder独立根/producer，以及旧无来源的明确导入与完整格式语料核验",
     "I04-T01：Grok修改意见与r1三Context mode/接管衔接；真实Core/Host/Runtime生命周期、Schema升级和恢复矩阵集中候选",
     "I04-T02/T03/T04：Runtime并集、恢复、记忆与自动化原剩余项；完整四包21簇84场景保持，阶段集齐集中构建/少量push和Actions"
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "delegation_blocks_client_and_production_renderer_verified_real_core_auth_full_content_pending",
+  "current_slice_status": "execution_read_auth_cache_and_renderer_verified_full_content_real_core_pending",
   "evidence": "i04-legacy-agent-source-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -56,7 +56,7 @@
   "skill_catalog_evidence": "i02-skill-catalog-result.json",
   "skill_install_evidence": "i02-skill-install-result.json",
   "system_goal_status": "active",
-  "system_goal_verified_at": "2026-10-18T18:42:25.227838+00:00",
+  "system_goal_verified_at": "2026-10-18T21:14:51.273256+00:00",
   "skill_members_evidence": "i02-skill-members-result.json",
   "canvas_boards_evidence": "i03-canvas-boards-result.json",
   "skill_delivery_preparation_evidence": "i02-skill-delivery-preparation-result.json",
@@ -300,5 +300,6 @@
   "i04_parent_tool_source_evidence": "i04-tool-source-result.json",
   "i04_parent_tool_source_ui_evidence": "i04-tool-source-ui-result.json",
   "delegation_blocks_evidence": "i04-delegation-blocks-result.json",
-  "delegation_block_client_evidence": "i04-delegation-block-client-result.json"
+  "delegation_block_client_evidence": "i04-delegation-block-client-result.json",
+  "execution_read_auth_evidence": "i04-execution-read-auth-result.json"
 }

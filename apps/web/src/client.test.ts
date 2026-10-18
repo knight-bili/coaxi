@@ -594,6 +594,7 @@ describe('renewable browser authentication', () => {
     const client = new ConsoleClient(origin, fetcher, storage, auth, () => now)
     await client.login('d'.repeat(64))
     const scope = client.editingScope
+    const readGeneration = client.readGeneration
     let changes = 0; client.onAuthenticationChanged(() => { changes++ })
     now = expiry - 7 * day - 1
     await client.request('app.info')
@@ -606,6 +607,7 @@ describe('renewable browser authentication', () => {
     await Promise.all([first, second])
     expect(client.editingScope).toBe(scope)
     expect(changes).toBe(0)
+    expect(client.readGeneration).toBe(readGeneration)
     expect(await auth.read()).toMatchObject({ token: identity.token, expiresAt: now + 30 * day })
     expect(storage.getItem('rovai.web.session.v1')).not.toContain(identity.token)
     expect(JSON.stringify(await auth.read())).not.toContain('d'.repeat(64))

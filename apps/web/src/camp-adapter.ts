@@ -11,6 +11,7 @@ import { createServerUpdates } from './server-updates'
 import { restorableFilePreviewRequest } from '../../desktop/src/renderer/src/file-preview-session'
 import { parseFileReference } from '../../desktop/src/file-preview-reference'
 import { writeClipboardText } from '../../desktop/src/renderer/src/clipboard'
+import type { ThreadReadSnapshot } from '../../desktop/src/renderer/src/thread-read-authority'
 
 export function browserPlatform(): ThreadClient['platform'] {
   const platform = navigator.platform.toLowerCase()
@@ -20,6 +21,7 @@ export function browserPlatform(): ThreadClient['platform'] {
 export function createThreadAdapter(transport: ConsoleClient, selectWorkspaceDirectory: BusinessEnvironment['selectWorkspaceDirectory']) {
   if (!transport.editingScope || !transport.presentationScope) throw new Error('必须先认证才能建立编辑作用域。')
   const listeners = new Set<(change?: ThreadReadInvalidation) => void>()
+  let readSnapshot: ThreadReadSnapshot
   const editingRecovery = browserEditingRecovery(transport.editingScope, sessionStorage, { ownerScope: transport.presentationScope, storage: localStorage })
   const preparations = transport.supportsPrivateUploadRecovery ? transport.privateUploadPreparations(editingRecovery) : null
   const unimplemented = async (): Promise<never> => { throw new Error('此操作的 Web 适配尚未接通。') }
@@ -35,6 +37,15 @@ export function createThreadAdapter(transport: ConsoleClient, selectWorkspaceDir
   }
   const client: ThreadClient = {
     presentationScope: transport.presentationScope,
+    readAuthority: {
+      getSnapshot: () => {
+        if (!readSnapshot || readSnapshot.generation !== transport.readGeneration || readSnapshot.available !== transport.authenticated) {
+          readSnapshot = { generation: transport.readGeneration, available: transport.authenticated }
+        }
+        return readSnapshot
+      },
+      subscribe: listener => transport.onAuthenticationChanged(listener)
+    },
     canvasCoreIdentity: () => transport.canvasCoreIdentity(),
     platform: browserPlatform(),
     missionAttachments: null,
@@ -57,7 +68,11 @@ export function createThreadAdapter(transport: ConsoleClient, selectWorkspaceDir
       const path = await transport.files<string | null>('attachmentLocation', locator)
       return typeof path === 'string' ? { path, location: 'server' } : null
     },
-    onInvalidated: listener => { listeners.add(listener); return () => { listeners.delete(listener) } },
+    onInvalidated: listener => {
+      listeners.add(listener)
+      const unsubscribe = transport.onAuthenticationChanged(() => listener({ resync: true }))
+      return () => { listeners.delete(listener); unsubscribe() }
+    },
     singleChatAttachments: {
       ...(preparations ? {
         prepareInput: (request, file) => preparations.prepareInput(request, file),

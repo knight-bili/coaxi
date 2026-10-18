@@ -2,6 +2,105 @@ import { describe, expect, it, vi } from 'vitest'
 import type { AgentRunExecutionEvidenceView as Evidence, AgentRunExecutionBlock, AgentRunExecutionBlockPage } from '@contracts'
 import { ExecutionWindow, ExecutionWindowCache, executionWindowCacheFor, executionWindowPageSize, type ExecutionChangesRequest, type ExecutionWindowRequest } from './execution-window'
 import type { AgentRunDelegationBlock, AgentRunDelegationBlockPage, AgentRunDelegationBlockChanges, AgentRunExecutionBlockChanges } from '@contracts'
+import type { ThreadReadSnapshot } from './thread-read-authority'
+import { ExecutionContentCache } from './execution-content-cache'
+
+function authentication() {
+  let snapshot: ThreadReadSnapshot = { generation: 1, available: true }
+  const listeners = new Set<() => void>()
+  return {
+    listeners,
+    authority: { getSnapshot: () => snapshot, subscribe: (listener: () => void) => { listeners.add(listener); return () => { listeners.delete(listener) } } },
+    change(available: boolean) { snapshot = { generation: snapshot.generation + 1, available }; for (const listener of listeners) listener() }
+  }
+}
+
+describe('authentication lifetime of retained execution reads', () => {
+  it('retires every active window and its projections, bodies and late page without reviving it', async () => {
+    const auth = authentication(), data = source(50), changed = vi.fn()
+    const cache = new ExecutionWindowCache(8, 24 * 1024 * 1024, auth.authority)
+    const create = (notify: () => void) => new ExecutionWindow('camp', 'run', 12, data.request, notify, data.changes)
+    const first = cache.acquire('a', create, changed), second = cache.acquire('b', create, changed)
+    await first.window.latest(); await second.window.latest()
+    first.window.content.set('body', 'private body'); first.window.project(first.window.evidence, () => 'old projection')
+    first.window.runtimeThinkingTitle = 'private title'
+    let finish!: (value: AgentRunExecutionBlockPage) => void
+    data.request.mockImplementationOnce(() => new Promise(resolve => { finish = resolve }))
+    const pending = first.window.earlier()
+    auth.change(false)
+    expect(first.window.blocks).toEqual([]); expect(second.window.blocks).toEqual([])
+    expect(first.window.evidence).toEqual([]); expect(first.window.content.bytes).toBe(0)
+    expect(first.window.runtimeThinkingTitle).toBeNull(); expect(first.window.byteSize).toBe(0)
+    expect(() => cache.acquire('a', create, changed)).toThrow('重新登录')
+    finish({ schemaVersion: 3, threadId: 'camp', agentRunId: 'run', requestedBeforeSequence: 39, nextBeforeSequence: null,
+      throughSequence: 50, throughChangeSequence: 50, hasMore: false, blocks: [block(evidence(1))] })
+    await pending; first.window.resume(); await first.window.latest()
+    expect(first.window.blocks).toEqual([])
+    auth.change(true)
+    const fresh = cache.acquire('a', create, changed)
+    expect(fresh.window).not.toBe(first.window); expect(fresh.window.content.get('body')).toBeUndefined()
+    await fresh.window.latest(); expect(fresh.window.evidence.length).toBe(12)
+    first.release(); second.release(); fresh.release(); fresh.release()
+    expect(auth.listeners.size).toBe(0)
+  })
+  it('checks dormant windows before reuse even when logout/login occurred without mounted readers', async () => {
+    const auth = authentication(), data = source(5), cache = new ExecutionWindowCache(8, undefined, auth.authority)
+    const create = (notify: () => void) => new ExecutionWindow('camp', 'run', 12, data.request, notify, data.changes)
+    const first = cache.acquire('a', create, () => {}); await first.window.latest()
+    first.window.content.set('body', 'old'); first.release()
+    expect(auth.listeners.size).toBe(0)
+    auth.change(false); auth.change(true)
+    const next = cache.acquire('a', create, () => {})
+    expect(next.window).not.toBe(first.window); expect(first.window.blocks).toEqual([])
+    expect(first.window.content.get('body')).toBeUndefined(); next.release()
+  })
+  it('retains the same authorized history and row state through offline refresh and ordinary close/reopen', async () => {
+    const auth = authentication(), data = source(50), changed = vi.fn(), cache = new ExecutionWindowCache(8, undefined, auth.authority)
+    const create = (notify: () => void) => new ExecutionWindow('camp', 'run', 12, data.request, notify, data.changes)
+    const first = cache.acquire('a', create, changed), mirror = cache.acquire('a', create, changed)
+    await first.window.latest()
+    data.state.offline = true; await first.window.refresh()
+    expect(data.changes).toHaveBeenCalledTimes(1); expect(first.window.evidence.at(-1)?.sequence).toBe(50)
+    data.state.offline = false; await first.window.earlier()
+    const sequences = first.window.evidence.map(item => item.sequence)
+    first.window.content.set('expanded', { output: 'readable while offline', opened: true })
+    first.release(); data.state.offline = true
+    await mirror.window.refresh(); expect(mirror.window.evidence.map(item => item.sequence)).toEqual(sequences)
+    expect(auth.listeners.size).toBe(1); mirror.release()
+    const next = cache.acquire('a', create, changed)
+    expect(next.window).toBe(first.window); expect(next.window.evidence.map(item => item.sequence)).toEqual(sequences)
+    expect(next.window.content.get('expanded')).toEqual({ output: 'readable while offline', opened: true })
+    next.release(); expect(auth.listeners.size).toBe(0)
+  })
+  it('fences release before the cache authentication callback and refuses late body delivery or direct setters', async () => {
+    const auth = authentication(), data = source(1), cache = new ExecutionWindowCache(8, undefined, auth.authority)
+    let retained!: ReturnType<ExecutionWindowCache['acquire']>
+    const unsubscribe = auth.authority.subscribe(() => retained.release())
+    retained = cache.acquire('a', notify => new ExecutionWindow('camp', 'run', 12, data.request, notify, data.changes), () => {})
+    let finish!: (value: string) => void
+    const pending = retained.window.content.load('body', () => new Promise<string>(resolve => { finish = resolve }))
+    const rejected = expect(pending).rejects.toThrow('失效')
+    auth.change(false); finish('old body'); await rejected
+    retained.window.content.set('body', 'late setter')
+    expect(retained.window.content.get('body')).toBeUndefined()
+    const request = vi.fn(async () => 'never')
+    await expect(retained.window.content.load('body', request)).rejects.toThrow('失效')
+    expect(request).not.toHaveBeenCalled(); unsubscribe(); expect(auth.listeners.size).toBe(0)
+  })
+  it('permanently retires a budget-evicted body cache while ordinary release still permits a pending read', async () => {
+    const data = source(1), cache = new ExecutionWindowCache(1)
+    const create = (notify: () => void) => new ExecutionWindow('camp', 'run', 12, data.request, notify, data.changes)
+    const first = cache.acquire('a', create, () => {})
+    let finish!: (value: string) => void
+    const pending = first.window.content.load('body', () => new Promise<string>(resolve => { finish = resolve }))
+    const rejected = expect(pending).rejects.toThrow('失效')
+    first.release(); const second = cache.acquire('b', create, () => {})
+    finish('late evicted body'); await rejected; expect(first.window.content.bytes).toBe(0); second.release()
+    const standalone = new ExecutionContentCache()
+    const load = standalone.load('body', async () => 'retained authorized body')
+    expect(await load).toBe('retained authorized body'); expect(standalone.get('body')).toBe('retained authorized body')
+  })
+})
 
 function evidence(sequence: number): Evidence {
   return { id: `e-${sequence}`, agentRunId: 'run', executionEpoch: 1, sequence,
