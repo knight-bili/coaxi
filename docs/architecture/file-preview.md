@@ -126,6 +126,11 @@ binding generation 和 canonical 文件身份；复制始终使用重验后的 c
 绝对复制、定位与下载继续走原句柄能力；Renderer 不猜根、不复用已撤销来源。该扩展字段与生命周期由
 [原生文件引用合同](../../integration/foundation/contracts.md#原生文件引用菜单的位置元数据)拥有。
 
+目录和系统类型文件的明确 User 操作用 `nativeReference` 与自动预览分开。Main 检查本身不启动系统操作；
+危险打开在原确认后再次核对来源与文件身份，目录始终定位。Web 仅签发元数据和临时文件下载能力，复用原认证
+资源运输，不远程运行服务器程序；原生根外路径不享有普通外部文件放宽，读取前后维持精确 readId 授权。
+详细字段、来源恢复与下载生命周期见[明确操作合同](../../integration/foundation/contracts.md#目录与系统类型引用的明确操作)。
+
 ## 窗口文件能力
 
 每个成功预览在 Main 中映射为窗口级句柄。记录包含 `webContentsId + campId + sourceIdentity + canonicalPath +

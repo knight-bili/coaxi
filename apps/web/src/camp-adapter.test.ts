@@ -7,6 +7,26 @@ import { createThreadAdapter } from './camp-adapter'
 // Owns the production Web adapter + execution window seam. A Host-only HTTP
 // test bypasses this adapter's allowlist; a populated page hides missing deltas.
 afterEach(() => vi.unstubAllGlobals())
+it('sends exact native reference sources through authenticated resource transport and preserves server-only actions', async () => {
+  const storage = { getItem: () => null, setItem: () => undefined, removeItem: () => undefined }
+  vi.stubGlobal('sessionStorage', storage); vi.stubGlobal('localStorage', storage)
+  vi.stubGlobal('navigator', { platform: 'Win32' }); vi.stubGlobal('window', { sessionStorage: storage, history: { state: null } })
+  vi.stubGlobal('matchMedia', () => ({ matches: false }))
+  const requests: unknown[] = []
+  const fetcher = vi.fn<typeof fetch>(async (url, options) => {
+    if (String(url).endsWith('/login')) return Response.json({ protocolVersion: 4, token: 'a'.repeat(64), clientId: 'd'.repeat(64), editorProof: 'e'.repeat(64), ownerId: 'local_user' })
+    const body = JSON.parse(String(options?.body)); requests.push(body)
+    return Response.json(body.request.action === 'inspect' ? { ok: true, value: { kind: 'reference', reference: { fileName: 'src', kind: 'directory', previewable: false, pathPresentation: 'external', sourceRelativePath: 'src', absolutePath: '/server/captured/src' } } }
+      : { ok: false, error: { code: 'source_not_authorized', message: 'Server-only reference', retryable: false } })
+  })
+  const transport = new ConsoleClient('http://127.0.0.1:8766', fetcher); await transport.login('b'.repeat(64))
+  const { files, client } = createThreadAdapter(transport, async () => null).environment
+  const source = { kind: 'native_child_file' as const, threadId: 'thread', readId: 'exact-reader', rawReference: './src' }
+  expect(await files.nativeReference!({ source, action: 'inspect' })).toMatchObject({ ok: true, value: { reference: { kind: 'directory', absolutePath: '/server/captured/src' } } })
+  expect(requests).toEqual([{ action: 'nativeReference', request: { source, action: 'inspect' } }])
+  expect(client.attachments?.kind).toBe('download')
+  expect(await files.nativeReference!({ source, action: 'reveal' })).toMatchObject({ ok: false })
+})
 it.each(['clear', '401'] as const)('retires same-client execution bodies and late cache writes after %s and reauthentication', async failure => {
   const storage = { getItem: () => null, setItem: () => undefined, removeItem: () => undefined }
   vi.stubGlobal('sessionStorage', storage); vi.stubGlobal('localStorage', storage)

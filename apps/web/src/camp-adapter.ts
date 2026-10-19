@@ -139,6 +139,7 @@ export function createThreadAdapter(transport: ConsoleClient, selectWorkspaceDir
     return result
   }
   const files: FilePreviewApi = {
+    nativeReference: request => transport.files('nativeReference', request),
     bindThread: async () => { /* Thread tab state stays in the shared React provider; every resource carries an exact source. */ },
     open: request => opened('open', request), restore: request => opened('restore', request), reopen: request => opened('reopen', request),
     readText: request => transport.files('readText', request),

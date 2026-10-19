@@ -105,6 +105,12 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 
 ## Rust 测试准入与退役门槛
 
+I04 原生文件引用的 Web 资源边界新增两个最低层 owner：`resources::tests::native_file_target_rejects_cross_reader_thread_and_reference_replies`
+拥有精确来源回复，旧种类白名单用例不能拒绝错 reader/Thread/原引用；`native_reference_metadata_preserves_directories_binary_downloads_and_private_paths`
+拥有新目录/二进制/name-only 元数据，旧内容扫描只拥有字节与摘要，不能证明目录及路径展示合同。后者将元数据解析抽成私有函数，
+复用真实有界扫描和隔离 TEMP 文件，不创建 SQLite、Runtime 或真实网络。最小命令 `cargo test --locked -p rovai-web --lib resources:: -- --list`
+列出非零 owner 后，同过滤执行；既有扫描和路径 owner 同批回归。此资格不代替实际 Core/HTTP/Native 的阶段候选。
+
 I04 分页客户端沿原 execution-window/group-window、ExecutionToolGroup、builtin-tools、工具分组与Web adapter owner扩新4，
 核对旧3探测、同水位续页/失败、支持跨区间、来源/输出不同身份、逻辑开始/完成换id、组移除/重新出现及跨epoch隔离。
 实际 RunExecutionDisclosure→Hook→虚拟列表/组→原卡片另用隔离Renderer及受控运输验证，不作为真实Core/HTTP/Runtime资格。

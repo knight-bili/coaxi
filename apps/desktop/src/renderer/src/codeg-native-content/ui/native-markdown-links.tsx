@@ -9,6 +9,7 @@ import { parseFileReference } from '../../../../file-preview-reference'
 import { NativeMarkdownScope, InlineImage } from './native-markdown-context'
 import { NativeImageScope } from './native-image-actions'
 import { useUiText } from '../../interface-language'
+import { activateNativeFileReference } from './native-reference-operations'
 
 export function MarkdownLink({ node: _node, href, children, className }: ComponentProps<'a'> & { node?: unknown }): React.JSX.Element {
   const scope = useContext(NativeMarkdownScope), { notice } = useContext(NativeImageScope), t = useUiText()
@@ -22,7 +23,10 @@ export function MarkdownLink({ node: _node, href, children, className }: Compone
     const displayPath = `${parsed.pathPart}${parsed.target?.line ? `:${parsed.target.line}` : ''}`
     return <FileReferenceActions key={href} target={href}>
       <button type="button" data-resource-kind="file" title={displayPath}
-        onClick={event => { event.preventDefault(); if (scope.isCurrent?.()) void scope.open!(href, parsed.target?.line).catch(() => { if (scope.isCurrent?.()) notice(t('暂时无法打开这份文件。')) }) }}
+        onClick={event => { event.preventDefault(); if (scope.source && scope.api && scope.isCurrent?.()) void activateNativeFileReference(
+          { source: scope.source, api: scope.api, current: () => Boolean(scope.isCurrent?.()) }, href,
+          () => scope.open!(href, parsed.target?.line)
+        ).catch(() => { if (scope.isCurrent?.()) notice(t('暂时无法打开这份文件。')) }) }}
         className="inline-flex max-w-full -translate-y-[1.5px] cursor-pointer appearance-none items-center align-middle leading-none hover:opacity-80">
         <ReferenceBadge data={{ refType: 'file', id: href, label: label || href, uri: displayPath, meta: { fileKind: 'file' } }} />
       </button>

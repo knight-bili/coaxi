@@ -20,10 +20,10 @@ export function systemFileManagerLabelKey():
 
 function FileReferenceActionsMenu({ target }: { target: string }) {
   const t = useTranslations("Folder.chat.fileActions")
-  const { paths, loading, error, retry, reveal: handleReveal, copy: handleCopy, download: handleDownload } = useNativeFileActions(target)
+  const { paths, downloadAvailable, loading, error, retry, reveal: handleReveal, copy: handleCopy, download: handleDownload } = useNativeFileActions(target)
   const { local, download, loadingLabel, retryLabel } = useNativeFileHost()
   const isLocalDesktop = () => local
-  const isWorkspaceFileApiAvailable = () => download
+  const isWorkspaceFileApiAvailable = () => download && downloadAvailable
   return (
     <>
       {loading && <ContextMenuItem disabled aria-busy="true">{loadingLabel}</ContextMenuItem>}

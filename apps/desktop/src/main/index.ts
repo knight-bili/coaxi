@@ -181,6 +181,7 @@ import {
   parseHandleRequest,
   parseLineRequest,
   parseOpenFilePreviewRequest,
+  parseNativeFileReferenceRequest,
   parseRestoreFilePreviewRequest,
   parsePageRequest,
   parseReloadRequest,
@@ -1335,6 +1336,9 @@ ipcMain.handle('rovai:file-preview-bind-camp', (event, value: unknown) =>
 
 ipcMain.handle('rovai:file-preview-open', (event, value: unknown) =>
   filePreview.open(requireFilePreviewSender(event), parseOpenFilePreviewRequest(value)))
+
+ipcMain.handle('rovai:file-preview-native-reference', (event, value: unknown) =>
+  filePreview.nativeReference(requireFilePreviewSender(event), parseNativeFileReferenceRequest(value)))
 
 ipcMain.handle('rovai:file-preview-restore', (event, value: unknown) =>
   filePreview.restore(requireFilePreviewSender(event), parseRestoreFilePreviewRequest(value)))

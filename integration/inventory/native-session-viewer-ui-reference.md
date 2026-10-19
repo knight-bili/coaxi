@@ -110,3 +110,13 @@ Main仅对Core已核实原生根内文件投影可选sourceRelativePath及已有
 生产直接提升已有Radix ContextMenu2.3.1节点；原Badge断言使用固定供体jest-dom6.10.0开发依赖。旧1090包与1114快照及importer保留，9个新包/快照；12个实际下载包SRI和完整许可核定。固定pnpm11.20离线/禁脚本/冻结lockfile-only及1099项供应链检查通过，不代表完整新安装。原39份引擎与旧工具/媒体样式未改；状态延续测试预载真实spec模块以隔离冷Vite转换耗时，不改断言/超时/产品引擎。见[本批结果](../execution/i04-native-reference-actions-result.json)。
 
 下一步依次补目录/系统引用User操作、完整HTML控制、完整App与真实Core/Native/Web候选，再继续I04其余有限队列。完整网页/邮件/电话与系统目标路由随I07；不删除此项。完整81簇48包324/I04四包21簇84保持，本批正式场景新增0。无模型输入、数据库、Rust构建、付费、push、Actions或main合入；目标卡片与get_goal已共同确认active，无客户技术验收事项。
+
+## 目录与系统引用接续（2026-10-19）
+
+原Codeg菜单/包装和平台标签的JSX保持，只有宿主能力绑定增加“当前文件有下载资格”条件；远程目录不显示无效下载。左键普通文件继续原预览，目录和系统文件通过明确User打开；Main目录始终定位，.app目录不执行。新增可选nativeReference宿主接口，检查没有系统副作用且不创建Main预览句柄；原自动open仍是只读策略。危险文件沿原确认，并在确认后重验Core读者、Thread导航、canonical根/文件身份及版本；越根、失效和替换均拒绝。复制只用当次授权的位置，临时服务器能力及时释放。
+
+核查发现Web原资源白名单未收native_child_file，现已补精确目标的Thread/readId/引用核对，禁止其借普通外部文件放宽。原生预览加入readId身份，取消持久restore，元数据与字节读取结束后重验同一Core来源；来源投影隐藏路径时保留name-only。认证nativeReference仅inspect，目录只给位置，文件（含二进制）可取得临时完整下载能力；不运行服务器系统程序；远程不可预览文件左键直接下载，另有实际Renderer回归。新元数据的真实文件扫描复用既有有界引擎，不以路径或size/mtime代替内容摘要。
+
+8文件132项定向、类型与5项Rust资源测试通过；新增两个Rust owner分别拥有错来源回复和目录/二进制/name-only真实FS边界，原内容扫描与路径用例一并回归。19项真实隔离Renderer检查和4张日/夜原目录菜单图通过，实际Electron下载保存含0/255及Unicode末尾的完整字节；普通预览保持自己的合法句柄，菜单检查只核对新增临时资源归零。运输、Core权威和系统剪贴板明确为替身；Main与Rust元数据测试为真实FS。原组件参考不是完整供体App，[本批记录](../execution/i04-native-reference-targets-result.json)不授予实际Core/IPC/HTTP/外部模型或正式84场景资格。
+
+本批没有依赖、模型输入或数据库变更；本地Rust资源测试是新公开运输/授权边界的最小编译验证，没有全仓构建、push、Actions或main合入。完整81簇48包324/I04四包21簇84不减。下一步完整HTML控制与完整App，再真实两端集中候选，完整网页与浏览器目标归I07；其他I04有限清单不变。

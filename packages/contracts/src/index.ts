@@ -2057,7 +2057,29 @@ export interface FilePreviewRetentionState {
   handles: { handleId: string; previewSessionId: string; tabId: string; lastUsed: number; visible: boolean; busy: boolean; recoverable: boolean }[]
 }
 
+/** An explicit User reference operation, independent of an automatically mounted preview. */
+export interface NativeFileReferenceRequest {
+  source: Extract<OpenFilePreviewRequest, { kind: 'native_child_file' }>
+  action: 'inspect' | 'reveal' | 'open'
+}
+
+export interface NativeFileReferenceInfo {
+  fileName: string
+  kind: 'file' | 'directory'
+  previewable: boolean
+  pathPresentation: FilePreviewPathPresentation
+  absolutePath?: string
+  sourceRelativePath?: string
+  /** A transient server file grant, released after inspection or the selected action. */
+  download?: { handleId: string; contentGeneration: string }
+}
+
+export type NativeFileReferenceResult =
+  | { kind: 'reference'; reference: NativeFileReferenceInfo }
+  | { kind: 'performed' }
+
 export interface FilePreviewApi {
+  nativeReference?(request: NativeFileReferenceRequest): Promise<FilePreviewOperationResult<NativeFileReferenceResult>>
   /** Browser image bytes resolved under the current, generation-bound parent. */
   readChildImage?(request: { handleId: string; expectedGeneration: string; rawReference: string }): Promise<FilePreviewOperationResult<FilePreviewBinaryContent>>
 

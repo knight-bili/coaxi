@@ -57,6 +57,6 @@ export function useNativeFileActions(target: string) {
       if (current()) imageScope.notice(t(action === 'reveal' ? 'openFailed' : action === 'download' ? 'downloadFailed' : 'copyPathFailed', { name: metadata?.fileName ?? target }))
     })
   }
-  return { paths, loading: !value, error: Boolean(value?.error), retry: () => setAttempt(value => value + 1),
+  return { paths, downloadAvailable: Boolean(metadata?.capabilities.includes('download')), loading: !value, error: Boolean(value?.error), retry: () => setAttempt(value => value + 1),
     reveal: () => run('reveal'), copy: (value: string | null) => { if (value === 'relative' || value === 'absolute') run(value) }, download: () => run('download') }
 }

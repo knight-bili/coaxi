@@ -1,0 +1,2699 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-19T03:58:23.764633+00:00",
+  "stage": "I04",
+  "task": "I04-T01",
+  "branch": "develop/V1.0.0",
+  "baseline_commit": "a274b30ad0fd32ccdfc42099747a23f8cd9cff97",
+  "status": "directory_system_reference_actions_local_verified_html_and_actual_host_candidate_pending",
+  "stage_complete": false,
+  "scope_preserved": {
+    "source_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_packages": 4,
+    "i04_clusters": 21,
+    "i04_formal_cases": 84,
+    "new_formal_cases_passed": 0
+  },
+  "facts": [
+    "Explicit Core-scoped inspect/reveal/open nativeReference API, strict IPC input, Desktop and authenticated Web adapters; no automatic OS side effects during inspection",
+    "Directories reveal without executing app bundles; risky system-file opening retains original confirmation and checks reader/thread/canonical path/file identity and version again afterwards",
+    "Current metadata gates remote binary downloads and hides directory download rows; remote binary left click downloads, regular text remains on original preview",
+    "Web native_child_file resource allowlist omission repaired, exact target identity and strict captured-root containment, readId-specific keys, no durable native restore and post-read authority checks",
+    "Directory/binary/name-only metadata reuses bounded file scanner; transient server handles released during inspection, stale-owner responses and selection; original source menu JSX/wrapper/platform label and CSS retained",
+    "132 TypeScript tests, typecheck and 5 Rust resource tests passed; actual renderer 19 checks plus 4 original-menu comparisons and exact binary/Unicode download passed",
+    "Existing local compiler and SDK used after shell lacked linker; one new reauthorization Arc partial-move compile error corrected, no dependency or global configuration change",
+    "No model-input, database, dependency, paid model, push, Actions or main merge; goal remains active"
+  ],
+  "verification": {
+    "targeted_files": 8,
+    "targeted_tests_passed": 132,
+    "existing_platform_skipped": 1,
+    "rust_resource_tests_passed": 5,
+    "rust_test_binary_provenance_at_recording": {
+      "path": "D:\\soft\\codex\\build-cache\\codeg-rovai\\debug\\deps\\rovai_web-311f613b2b5f850c.exe",
+      "sha256": "35b5503fccfcd490068021ee791b087d39cb18f33cd82acc10192a8c6c291300",
+      "scope": "rebuildable cache provenance, not an immutable archived artifact"
+    },
+    "rust_filter": "resources::",
+    "rust_features": "default",
+    "renderer_checks": 19,
+    "screenshots_reviewed": 4,
+    "actual_binary_download": true,
+    "typecheck_exit": 0,
+    "docs_tests_passed": 10,
+    "docs_version_gate": true,
+    "docs_diff_gate_base": "a274b30ad0fd32ccdfc42099747a23f8cd9cff97",
+    "codegraph_synced": true,
+    "original_source_audit": {
+      "ok": true,
+      "baseline": "a274b30ad0fd32ccdfc42099747a23f8cd9cff97",
+      "sourceModules": [
+        {
+          "path": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/badges/reference-badge.tsx",
+          "sha256": "69877e0c1b395e8b74fe06ba33ef9375257cd0403bb6b5ece4d89be3413aa5d4"
+        },
+        {
+          "path": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/badges/reference-badge.test.tsx",
+          "sha256": "54df5dfd9232a2f957119a89574e1dfef67e2b228a852f838d228b12d14e28e1"
+        },
+        {
+          "path": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/reference-uri.test.ts",
+          "sha256": "13f835944ce02e252cb0a75babcff2daa39d73868b549110b639c0a7637baafe"
+        },
+        {
+          "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/resource-kind.ts",
+          "sha256": "240412e6c6c2e9754a0547f8d8b9c49ab0f1110cfab9eaaacea3db9d7044c297"
+        },
+        {
+          "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/resource-kind.test.ts",
+          "sha256": "070a750e6f27e4411dc2dfe706861ff1401668ab7fe0796e33b5418c00248e0e"
+        },
+        {
+          "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/context-menu.tsx",
+          "sha256": "07e0d159e6d4a26ac7454e09ac5515c0f8ab3fcea7d1c2eafda8e3130f6037f8"
+        },
+        {
+          "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/file-reference-actions.tsx",
+          "sha256": "41a471c566ae6a20cd92592642d922556b0058fa33f35cd6aa341a8f07e903b3"
+        },
+        {
+          "path": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/types.ts",
+          "sha256": "806ce8ca70f445fd765f639fa3f602e4e280efa6b18df9d04b6f66a84392e92c"
+        },
+        {
+          "path": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/reference-uri.ts",
+          "sha256": "e564e6ed3a27c25e2a56531c566404ff796dd9377e65647464627d5b951958a5"
+        }
+      ],
+      "originalMenuJSXWrapperAndPlatformLabelUnchanged": true,
+      "unchangedDependencies": true,
+      "unchangedExistingStyles": true,
+      "dirtyAgentsPreserved": true,
+      "modelInputChanged": false
+    },
+    "transport": "Production NativeSessionViewer and original source badges/menus; explicitly simulated ThreadClient and nativeReference/FilePreviewApi. Real filesystem and native policy are separately tested in Main service. No actual Core/IPC/HTTP/full App qualification.",
+    "clipboard": "Explicit clipboard substitute; actual Electron binary download.",
+    "reference": "Fixed donor components with declared source host seams; no full donor App.",
+    "actual_main_and_rust_filesystem": true,
+    "core_authority_and_native_actions_simulated": true,
+    "full_original_app": false,
+    "actual_core_native_web_e2e": false,
+    "actual_ipc": false,
+    "real_provider": false,
+    "modelInputChanged": false,
+    "databaseChanged": false,
+    "dependenciesChanged": false,
+    "new_stage_formal_cases_passed": 0
+  },
+  "remaining": [
+    "完整原HTML控制、完整供体App同场景；随后实际Core/Native/Web授权/生命周期/长历史/规模/恢复集中候选。",
+    "I07接完整MarkdownLink网页/邮件/电话和内置/系统浏览器目标；当前文件/目录/系统引用分项不替代该能力。",
+    "I04其他parser/home关联、Grok修改意见与三Context模式、Runtime并集、恢复、记忆与自动化；ANSI完整许可仍待发布资格。"
+  ],
+  "approved_r1_artifacts": [
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    },
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    }
+  ],
+  "preserved_dirty_agents_sha256": "6d5c55bc4069cd453a36a38d9b0f48c112f1c256982388a27629c12f962c9f4b",
+  "source_files": [
+    {
+      "path": "apps/desktop/src/main/file-preview/file-preview-ipc-input.test.ts",
+      "sha256": "3ed7a129101b61e92319819215797c0bb91d63885ac7a3a365d02440ed7fa6f3",
+      "git_blob_with_filters": "d2c7608c9d6d090d6a667cb01d54f2695d9773c0"
+    },
+    {
+      "path": "apps/desktop/src/main/file-preview/file-preview-ipc-input.ts",
+      "sha256": "6cce002a7a1136197619885ad2d5876c8638cd422c6c8bc7eb374bb700c9b52d",
+      "git_blob_with_filters": "cec4902fe942e3cf774877c913bc5a7deb47e152"
+    },
+    {
+      "path": "apps/desktop/src/main/file-preview/file-preview-service.ts",
+      "sha256": "497e2ea4660cc62988ea8b708f2a7f2e2eec40352a99329931c5b46900694bde",
+      "git_blob_with_filters": "c4f0c5159b429809c61c5cdcad424359cf7aea9b"
+    },
+    {
+      "path": "apps/desktop/src/main/file-preview/native-reference-projection.test.ts",
+      "sha256": "223c8a0302bdd17a736dd56952c333cf37a7c3620fc78b3c52f297634d0caf95",
+      "git_blob_with_filters": "29f50bd6baa00a6b390628b80b1df5fce8a6bcdc"
+    },
+    {
+      "path": "apps/desktop/src/main/index.ts",
+      "sha256": "8a63b4fe01bc3cfbcb49508022d6840cc78d64f8357fc74ee7f7231f18c6677a",
+      "git_blob_with_filters": "504b6a2d97372db674928140729fe3c4f2bae5ee"
+    },
+    {
+      "path": "apps/desktop/src/preload/index.ts",
+      "sha256": "c5246aaba0da7ef9d44b0463a3d38cba9bfd0c03f56f3dd08073923dccf0ac2c",
+      "git_blob_with_filters": "169ed6da81ba9648454a0efe834a7c2439e86d0f"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/file-reference-actions.tsx",
+      "sha256": "41a471c566ae6a20cd92592642d922556b0058fa33f35cd6aa341a8f07e903b3",
+      "git_blob_with_filters": "57a63cdf007d2c5e956c7f139b8275b7f0c8a74a"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-markdown-links.tsx",
+      "sha256": "57006925f64aca70db83feb801e4a2203caa7fb328ae09b64a43f06ca78e531e",
+      "git_blob_with_filters": "037fd709bd2283ae7be1bf23364274d7c0aa449f"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-reference-host.tsx",
+      "sha256": "5cfaada42d457ffb6404d60d7b234f617423fb54637bb3df12d4261580b84bb4",
+      "git_blob_with_filters": "fe5eeb896b1b809e1767d413784b93796e66f72d"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-reference-operations.test.ts",
+      "sha256": "30035c6229af95f2eda747f8e8cb6212566d40d2b167bfc7d912567c901adf27",
+      "git_blob_with_filters": "ada7a728b4d12acaeb24313cad639d3f935bdb47"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-reference-operations.ts",
+      "sha256": "a6632858ae913c448653bf6f1ba1aa7e49a98480d90de89bbf12394c5fb51ff9",
+      "git_blob_with_filters": "7a816c3df2677e1fc7c55f960e9d5a07455e3868"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/desktop-file-preview-api.ts",
+      "sha256": "3d5ded9cf3f2f7d6ccca22c5bf512c6fc5b38b0ea027800f7c706127da1678cf",
+      "git_blob_with_filters": "19a1de755ec1393c65a19a8078f7dc456bc5347c"
+    },
+    {
+      "path": "apps/web/src/camp-adapter.test.ts",
+      "sha256": "b14cbbba4ce7c0a0e2b5e8c755fd8a6bf17a8b02b36047e4b264cd3727321794",
+      "git_blob_with_filters": "436c4c6b3a18422e9922eb2470e95bc6729338f5"
+    },
+    {
+      "path": "apps/web/src/camp-adapter.ts",
+      "sha256": "b1b43aa5adcd330812870e107200949bf7b4aef35737c14260bfc1dce369c1ea",
+      "git_blob_with_filters": "227d1952c754d7ef2e1a33dd89de59729137ace3"
+    },
+    {
+      "path": "crates/rovai-web/src/resources.rs",
+      "sha256": "ef8bfa7a092b8265d56323e09a281136962e0d4c15b4c6236ce45e4236497496",
+      "git_blob_with_filters": "9d6a1c103228579a83ae0dbbe51d85dfabafcf99"
+    },
+    {
+      "path": "docs/architecture/file-preview.md",
+      "sha256": "8c102c3670f98f3f49bf7c16e5e04577cc06b0b13e80206b6b1801eef40210f6",
+      "git_blob_with_filters": "e68ddb79f6b6674731a4f67b58dc20990ef1afcf"
+    },
+    {
+      "path": "docs/development/testing.md",
+      "sha256": "123f7af8ba1eeb753353d31f22a2533c1d8b8343fccdb8002bb0beafdf3f1fef",
+      "git_blob_with_filters": "97c3b5e04e56d6e2fb47f694c22fd1c57e53411a"
+    },
+    {
+      "path": "docs/ui/components/file-preview.md",
+      "sha256": "afce4dbd4c5ca65def4c912e5f91637e7aae784cd2c1563c2ce3f27205c5a5a3",
+      "git_blob_with_filters": "c5d8af36064c02a34cbd51f2a218f2442b975d3b"
+    },
+    {
+      "path": "integration/execution/development-todos.json",
+      "sha256": "f2520e5b6653cafcc242f7d62ee62d46ec684756f348a9566f857745522b08cf",
+      "git_blob_with_filters": "c0d78b40b35ae8e0340f9d9d249f8c140efa6c9a"
+    },
+    {
+      "path": "integration/execution/goal-state.json",
+      "sha256": "2dabcacb47d7bc913baac739b2333ecf8d44b1f8b97bab0d58dcfa5ea73ea192",
+      "git_blob_with_filters": "1e89fe316654577a15933705951c17ef4c5359a7"
+    },
+    {
+      "path": "integration/foundation/contracts.md",
+      "sha256": "4df713e7029ac0990564e4cfc0f2f17520b82dddb0ad9b2bcc90fe7cd21f0386",
+      "git_blob_with_filters": "e4857a9a136bc5ccf8b5c4bd556ec233870cceac"
+    },
+    {
+      "path": "integration/inventory/native-content-ui-port.json",
+      "sha256": "60d820c1cbb5bcf1f51befcfc9112b7c87b88c3b135bb164531bf2baee9c8125",
+      "git_blob_with_filters": "572d80365e91e306d474099b6c0bac963a384ddc"
+    },
+    {
+      "path": "integration/inventory/native-session-viewer-ui-reference.md",
+      "sha256": "9cde1e85658b39e7b5d1351cb63c31bb987adab4fd16fb4259ede4776f739f30",
+      "git_blob_with_filters": "b4ef005051509d35ea48c8a0eeec400f2ab733df"
+    },
+    {
+      "path": "packages/contracts/src/index.ts",
+      "sha256": "6e6f94767cab634f3a1eef6e1551e25ec5beff51560dc4c1c6da6fbafa0a4323",
+      "git_blob_with_filters": "1e4005e6ec1090126e3d8c623af354e310892f41"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "file/I04目录与系统文件操作/audit-source.mjs",
+      "sha256": "e86ea1d324fe8025ce93032b85cb62fd80b2517fda3b6bde0b97bf8d982240ce"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/check-rust.py",
+      "sha256": "d60409d8dd975d32f19f71131076a447d9b6a0eaf1393d18e033d5eaf196a4b6"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/checkpoint.py",
+      "sha256": "04a0977c822e75201b825c9eb80fb9ec4f1aa5580dd75fba298a4b6eef1cfd90"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/commit.py",
+      "sha256": "546679c42d961dcb0b6ca0b6e8f87a91dd7a3eea736864b86b942452ca6b13a9"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/captures/archive.pdf",
+      "sha256": "2d9377496de0a73a2382c2f3230bfbfb0dc597aaf2fbc08cc7ae81f91d2877ca"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/captures/original-day-390.png",
+      "sha256": "f1c7743eb4e61cc8579c0597e9658640429dfc13e55df12fcbc4fd40a1d67eea"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/captures/original-night-1000.png",
+      "sha256": "adddecfcd35dad9fd63353d6e4baf28463c059367c0f8c4c145dfb15c7b86aca"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/captures/product-day-390.png",
+      "sha256": "3ae9f2d8cc2ba5b6819ca44f0c5f417142a57223952457b4e1b75b8dae99ca33"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/captures/product-night-1000.png",
+      "sha256": "befdb815814842ff82b302087b59c77e2945bcf3374e18a10089087c7ad51a36"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/_basePickBy-4V1qJvKl.js",
+      "sha256": "7f59cc008cde49f4e411a13cfbddca6a408aded9e16072b3526e476810bfb0f8"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/_baseUniq-DfSw2Ltr.js",
+      "sha256": "c7a63e1f002e1ec2a1b9e2b143fd1be01068b9988d33b22315e6eea864772cca"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/abap-B7h4dtBh.js",
+      "sha256": "2c9ac8cb3165ee94b203dea2bd9a538b062005a482c564c43449f60a12b91667"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/actionscript-3-DtnkuHN2.js",
+      "sha256": "41378189c87b252746a48ffdd4f2cac1e48e2d407dbbd9c6c57de80105a45b35"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/ada-BZS802Se.js",
+      "sha256": "6207d735aa4628a8ebc118d71d2607f97fbe8b15397789b88ea1927513fae6d5"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/andromeeda-C847lm7Z.js",
+      "sha256": "f9ca5de4a79ac38134da818a571aed9d9f4cb1f0478d9e2e65485c735b2f74a2"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/angular-html-BYG42TJr.js",
+      "sha256": "2b9687a0d34d56555b7f7744e738080d26e5256b7925f6ef6bd6e90e8b7e90ac"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/angular-ts-BftcHvZ6.js",
+      "sha256": "c628e4b00593a49fcfd3dddfd454e9e428baa8f28952cd83d175413965acf61d"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/antigravity-color-DgAQAdn3.svg",
+      "sha256": "652128cf55a28bb958563ee372d0bd00208d9e6fd446f523f77aafd811eef8ca"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/apache-D4roVlsU.js",
+      "sha256": "3ec0fcad805353b92aff850499c29d0bbef9b1f2d1960c69ca56f53317a0ed91"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/apex-B-mI3Md2.js",
+      "sha256": "3ec9594622c4d442937b45fbd513264bef94a8b3fc6dd86f95933d8e7bcf93a8"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/apl-CGZawg-A.js",
+      "sha256": "6f216dc71bacf2bac61300db314d6cf4b9be0b497f4367dadfab79947c2705f2"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/apl-fqmucPXA.js",
+      "sha256": "5be3458b72027a2151b231faa2e30eaf16e1e29067222e232694f25418c2a140"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/applescript-C43Knf0G.js",
+      "sha256": "a95fbf665d64a6b51f94a284c9c51aab1d39bb7dd7890ab562fb7732a39343f2"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/ara-DRBH84ND.js",
+      "sha256": "1694f4d288999497453b46b3952070bbdc51e5f2e39f8fc60c0ee09e21444973"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/arc-DMwMye6v.js",
+      "sha256": "a5e45b1f8cd97874f963bf0a41097c017b8ffc01e7bec58645b76f27f1cd1cdb"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/architectureDiagram-2XIMDMQ5-DAiVOS4e.js",
+      "sha256": "e3e8976dc5d42b9f49fbf22096bdf4472022f7a8cb2534904dbff792cbdb2e6e"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/asciiarmor-DucZyvP0.js",
+      "sha256": "01c94e79d596371ae8d7fb8f8e9d7f7c136b9c9cbd1f7f1124949ee0216d4816"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/asciidoc-DAaa-hb3.js",
+      "sha256": "fcc48c5b455dfdfa0273d2a41a330436561d1bb40d2908418b757a5ed400dc3a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/asm-3tg4MVib.js",
+      "sha256": "9ff66f84da93e09a2c2f7fefd29b21f7cc89d1858c6f3478e2e6714b92394fd4"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/asn1-BnOEsgAm.js",
+      "sha256": "bb17319ceb5860451c6822bfadacfcedd6f972cfafbe016b36dfe6ac23f73551"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/asterisk-QAlztEwS.js",
+      "sha256": "6df194920c95ba624a8fda9ecc6fb9bb3e8c608635a2d0b0f4b2610cce4e6fc3"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/astro-BxdWOZvM.js",
+      "sha256": "f9b35789fd71392bb47fe0f860a16a1949275e14b230c0f83904022c602aa995"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/aurora-x-wJ4-eM2h.js",
+      "sha256": "3308f7e0be141f0771f8a8dac9fd29667e3e6d09ddf7c28268a6485d1eb4d0a3"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/awk-ChreaG-G.js",
+      "sha256": "a1e834e043858fe402c619c8747e9f3ac0107f3ee44ae41c719c2e0121b9b883"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/ayu-dark-CzSi5Etu.js",
+      "sha256": "376ffc4fc0ff7c6a5d4d4dccbef8663c52b05a1336f5f481d339ccc67a7f1e12"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/ayu-light-C_O7IUhi.js",
+      "sha256": "2fcb1d627c0d72b4b4fcae5daf3b47b30596dbb00bcdab44fa252d734a6d3b99"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/ayu-mirage-CCitYj6x.js",
+      "sha256": "a07913a3697cd358ca8e87c93f81210bcaaf667fa502368d4a2be55f1a42dcbe"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/ballerina-B0yt0TYU.js",
+      "sha256": "ee2e7e869b2bafdd7f09a7f825631b98e023979bffddfe13bc829d22a9c30af7"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/band-zXq5o_Ib.js",
+      "sha256": "b8fa3ea2ac5a244c1caab6b9c05b8cf2f848e5e28d1f2d9276887b1cecbd5989"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/bat-BzNgQIA7.js",
+      "sha256": "ee59c53c07d592c79611fbce403a8a0e1860d846c98e0136d7cef808a96c111e"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/beancount-aZWrE5WV.js",
+      "sha256": "09008a7ac673a934029dfd08d6456f51b51a3387633c12c29de6b6cd1eb4c087"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/berry--Qc8OslH.js",
+      "sha256": "b9f2d58033110e5e102b5365be645baa173111292523c74c16bd07dcb0c5d5f2"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/bibtex-BLeFwAes.js",
+      "sha256": "254a09578de84c630409d7e4c824ba05098823a52ba007aa944ce03d9d22b055"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/bicep-DbBeGdXQ.js",
+      "sha256": "dbafe36a0a4ffd4487b5538fc149d67d0dd74a9368bb91a760d16b697e60ad1c"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/blade-BbH7YAUi.js",
+      "sha256": "2359d0bb30ed41d4d60c177d3fdf0171a90e9b701658ad0b1b47c0890187c731"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/blockDiagram-WCTKOSBZ-DSg75H7p.js",
+      "sha256": "90645ed9cff4f56842ba79ead817d51bbf322ff9533f478c7bd1ed6516558f20"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/brainfuck-DZVCuF_t.js",
+      "sha256": "71ae5a627c032ec5f0333e28a4fc02da543a8faf15f2705c0e1f69f7df69c812"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/bsl-DwPS0BId.js",
+      "sha256": "29eb6c2d39c2265dea77f5aa1060fc6302a74d2c9ffe45748b6e43177ef1c11f"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/c-C4VtT7JA.js",
+      "sha256": "30cf4bb145d8ad68df0192b5b67439859b3cc3e104deabc8979adf9ae64435d1"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/c3-DCyiGUuO.js",
+      "sha256": "acc20d5d6a533d7da66f5ee4cea9fb9ebfb4a70a4dbce44821d64b43c149f7a2"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/c4Diagram-IC4MRINW-Dd90BnGk.js",
+      "sha256": "d81765a1010031b7b8902149a3c82e9c03afe9615fb1a26e21ad4e08aa659c60"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/cadence-S_NtR5Dy.js",
+      "sha256": "8646f1935c4c24e3838222ba542270075536f6c02f43f8b5b3b705795065fc5a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/cairo-BtYx2aM5.js",
+      "sha256": "2012f0ecfed1543372505818bbd99404db4a7420388c369765a4f9786bf9e31b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/catppuccin-frappe-C21OPQfC.js",
+      "sha256": "36d45f359e5616ef7a493e603a56f70cc746e4003beda7643debdeae6961ab87"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/catppuccin-latte-0ZtXlsrX.js",
+      "sha256": "c443446472d9b8f9e265b948edf134ce2c412165f59e3e9fa73d53fd40688400"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/catppuccin-macchiato-BD_FR4sl.js",
+      "sha256": "d26e7e36c7a0ae166e3bdd7ef483af713df0cb5cd02861e4d2eaf7b3724fce00"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/catppuccin-mocha-C653csR5.js",
+      "sha256": "d0ab037a5bd589ff60f10efc4b16835f3b68a835219f577c354f140cab1a47ef"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/channel-DFs3pdkf.js",
+      "sha256": "2b6571f6b20c02800b936184871cb9f2dcf4f24090d745c3b9c6cda5dbdcfc43"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/chunk-4BX2VUAB-DeO7GxM4.js",
+      "sha256": "885f4e020b69e2e7aab4a77c9502a6749b65df5e82f44e3ccdb7a72d2c2c4d04"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/chunk-55IACEB6-CF6-tvX2.js",
+      "sha256": "bb83539e444282f41db5c9548e82e95f53288e1a202aaeb0417f6bf8f859283d"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/chunk-FMBD7UC4-BzTwIQl2.js",
+      "sha256": "6f6f2209b45b425242049aace43669d57d7d9e006ff0d4b4fa2b2a362fdc893c"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/chunk-JSJVCQXG-CBXCZMXu.js",
+      "sha256": "7d10b27626c23d3fcca39d1e80b14902325a7382f468b362ef452849526b0514"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/chunk-KX2RTZJC-BdT1UqV2.js",
+      "sha256": "f76bf5af7198dab5909ed1a9bce9ddae60e7b35a6ae254c3c6c643462ef9cf16"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/chunk-NQ4KR5QH-Ey6h0W9i.js",
+      "sha256": "96cdb6c1c39c6fadc427da8143e7596168f35ebfd75701863b24aa2258a88854"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/chunk-QZHKN3VN-BRtP7Y3v.js",
+      "sha256": "0d589f611ec422731da45a7bf1397e556667ba899f36f34cf349e9f418524b27"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/chunk-WL4C6EOR-D7RdX2G5.js",
+      "sha256": "c0806f88e5921015fa4b9eee0d884891446fdaf4801c877cb41a92fc20177e1a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/clarity-D2ViJC0i.js",
+      "sha256": "b686e123e56ba9160f8cc91a320021da407253eb571e4f7a78fe1ae9ce936ea9"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/classDiagram-v2-RAHNMMFH-CtwjnJVk.js",
+      "sha256": "24f85904329aca193318cb75b823a2a7d66dd08a4c279f6da67588f4fe369c9e"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/classDiagram-VBA2DB6C-CtwjnJVk.js",
+      "sha256": "24f85904329aca193318cb75b823a2a7d66dd08a4c279f6da67588f4fe369c9e"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/clike-xqXYL6ge.js",
+      "sha256": "1acda985c43e1ca1c234bc64cd7b495850069c0c10cd1a433d89c2005dcb503a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/clojure-BhXMqnxz.js",
+      "sha256": "e6c5a1b8eead561531a1fe6afc42ebd3541913ac87645794bee5b2e42222ff2e"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/clojure-C_G4_w5x.js",
+      "sha256": "4cf737574ef231e1f706a3a1fb80cd3a27a2a7eff6c5ef2be879e44039e39b38"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/clone-WvUcO-xP.js",
+      "sha256": "0b9a73bc96799ca48b5b1c4ef15d120c8eaee88d9d59e297eaec8a09d858caae"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/cmake-BGaNd9E7.js",
+      "sha256": "319d4983f4e2c2934fdbf67a567ad183211c15a618df3d9e7ad270a188f63c1a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/cmake-CDfQILeU.js",
+      "sha256": "64fa5b2d8a3f6916fa61f84971b57054dd3b386bb54900c205f8494b56aea3a9"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/cobol-4yqQntpt.js",
+      "sha256": "f541e17f367fb16b84f1c4585dc6b96436fab9b9984351746b8d6b7e4be77533"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/cobol-B8r1pfPr.js",
+      "sha256": "57882f5f0d248e36de5bb13e7579967de80ffad6599b1d4da54982c99e49614c"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/code-block-OCS4YCEC-DNYrT1VY.js",
+      "sha256": "fd48b53d49c854aee60d1168231a8e7d69be4f4ee0eb0b16b8c969c491278be1"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/codeowners-awy7PWCD.js",
+      "sha256": "9e4f7e66e6705260b2442f1c89abe8085f4ceb4ad6dd9d96c16b047846efc4cc"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/codeql-lfK8ppuq.js",
+      "sha256": "b6f4f4bf82f0a3c6792a9430c9cc0f0b8abd7b946f8e2241938452e3b61ec5d5"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/coffee-XLjtuEYs.js",
+      "sha256": "63430279b94cd42a67dc42a9660674a3a6fbc7e51df9d9b849444ec5b3bd2aab"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/coffeescript-D2dXvhEc.js",
+      "sha256": "fd8b8081e6c6d0b3a5a1d5159ea923fa92de6b16498672ac8ffb3a85d0f074ff"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/command-code-D8gwtO8i.ico",
+      "sha256": "1c77333db1896f681078ced8ccaea0f2410b7f06f2dffcc8b7150a5045590686"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/common-lisp-DAq1kaby.js",
+      "sha256": "5f8fdd85672af0b7da183d464840a92bc7f31c67b8420e4dd9f7f865f1fed629"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/commonlisp-CF_VNHQR.js",
+      "sha256": "f0e48e905937a107e453a06c0eb54a8f1e536fc0fc63c5b58b9551c8f7fe49cb"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/coq-l_JvzFJl.js",
+      "sha256": "56048b0f5bc9d63593bfbf75a5964ec32e91063df07f6c6e4bd1548deb4ce429"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/cose-bilkent-S5V4N54A-DKU3tqza.js",
+      "sha256": "35ee5d032f89bf8a09dd545094abdcb0517b1e66b97e20e2159dd223ee945894"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/cpp-zh2ePAE_.js",
+      "sha256": "7c23492e667f139b8125de33d5edaeba7f6d62cf845965fedd36a730511a5b49"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/crystal-BqBRy7Ec.js",
+      "sha256": "dd73ddc65ea80c9e549a2430e79697de29a2430f0d984b5017f580cd5267b28a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/crystal-DyuLTqLs.js",
+      "sha256": "c1628558768374a78a1fa71c26feaf44bfc6c5161bf81d964490416d1af1f38f"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/csharp-DxX_6tHh.js",
+      "sha256": "241a03885fcb543cc857f26d2255129f415a46295365cc49688070aaf993f786"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/css-BtVcDqlU.js",
+      "sha256": "99e91e0a4714b4e44f64381ec5efa99428540b1487c1bb4bb413bdf200388772"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/css-c-jst79C.js",
+      "sha256": "41425a19b41f83ae573be2f495236cd1161392d1ef66eb2d23d2784510746818"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/csv-Ba84L8e5.js",
+      "sha256": "36f2aa9f3bb8e4b08bfe2c3a1a3dd619bad0204f461b72a9326da9666fa72eac"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/cue-BFSVLV6N.js",
+      "sha256": "dcb95f0ede249c321ba93ea972a12dca40937c77f57b09599af3419747a676c5"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/cypher-DbUmWIxC.js",
+      "sha256": "890d320a4c0b37e10a15f2918fcf7f44ab94564d140bcaa101aa18376e6ec227"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/cypher-Dlu_3r4V.js",
+      "sha256": "80cff481ed4632ecfbe5952d4c60f15227c66f04dfea646c32852a2b090d19ca"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/cytoscape.esm-DIIXql_k.js",
+      "sha256": "a9c3775542759405e1717f5b97b4381e0e3c5c66014b25cca15bf1d9f9168191"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/d-9qSZPw74.js",
+      "sha256": "219f5b27fcb3ead6608efe6e39ecff0b5564fc8af23e35077bf48c59560e243f"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/d-UURgV0Ux.js",
+      "sha256": "df60654c2550e460276b5522896ee99ab6516252a0016a0fafa21875641b72b9"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/dagre-KLK3FWXG-CB_osZdl.js",
+      "sha256": "3d258bb20f17073e8b3e4df53fe834b22c1d70f933b0bfd7daba1b70844c3b72"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/dark-plus-DmZ1Dzd4.js",
+      "sha256": "1f76e8181bf9ff4e8b36fe265207456ba5426d8017950987ff8382302950035a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/dart-CCSsOg9l.js",
+      "sha256": "0f1a8ab46d2bbb1c3306c58384abee62d6d8c65eb23e30fd9b4ce72bec83c0b8"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/dax-CvsmLV-B.js",
+      "sha256": "e53ff1081ebc0cd6614ba534998ce8f3f5a5e2187e463e933f1507b1bd8a16be"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/defaultLocale-B2RvLBDe.js",
+      "sha256": "adb5e701c410866bbb1437380bb188b83fdca516e7788df4f24faf601a470063"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/desktop-_xiGZ9X1.js",
+      "sha256": "6a0cb282468e43c82094948b158a368a88da2bac351e9829b11c5396d4168a7e"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/diagram-E7M64L7V-8jP1O3gL.js",
+      "sha256": "e950e23dd0e7697caa44a12eb0e41c03295c25bb4d1c4f75fc644633c7b8933e"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/diagram-IFDJBPK2-BDFQCfKI.js",
+      "sha256": "a1bd14ca4e199bff2c7502b57add4a4b26f661b3119aafc0a092f86f31888b00"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/diagram-P4PSJMXO-DLcOVOAF.js",
+      "sha256": "0d8567df33c7af0e3afc87382e55c01e549d669f8777184fb6bcba0440caa6fc"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/diff-B_Bi2Crb.js",
+      "sha256": "efa42a61215071dc4d677dab004a6f77c34b41825d87a7dc42303302c35b4b4a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/diff-BEdzuHlE.js",
+      "sha256": "3f48b147c209065b2b19d0e6be956132f06c5f460b7977b9c527d3befce2dca7"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/docker-CUaLOm2I.js",
+      "sha256": "6032c540b49d2975785d333c1ca6e8ad93e708ff6d81854b37f9484f0001da82"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/dockerfile-Bvk733Ga.js",
+      "sha256": "31f1f2e8d8f9f2eeeb29f6d4b56e4632654d2f2a5b352a4febc9bf2f1984d29c"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/dotenv-Bb4iNxXK.js",
+      "sha256": "c2b83ce33ae43d3bafbd0807ded1375b8ae2e28a1d9bafa859cb354138a17ff9"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/dracula-B8-AVrwI.js",
+      "sha256": "1fab6e9a8c9e529b336a1939a6b91750297a8f9749a609ade591f8e41068ddba"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/dracula-soft-BHeefow7.js",
+      "sha256": "40ac4ee6beec825c5c1d6c224f70f95a146975c8d0a0109d55e14bcab508a1ec"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/dream-maker-CNLQpoF-.js",
+      "sha256": "1aa40679bdc9241bbd9516ef2291d7ef623b903c244332655bfef79d0bce92ca"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/dtd-Dy74G54E.js",
+      "sha256": "cfaec369fbea7351fc6a8fb7c990f2fbc5a0d1730467e51935deb1965fccaa2a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/dylan-TSb-Nfix.js",
+      "sha256": "b0c2026d9bb4917eccab491f63e56d95ceb4a8e01e42062a843c35ea29121607"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/ebnf-4fKAGW3a.js",
+      "sha256": "b21fa7b0323bdc0ab31713d74038dfef58b32305d3775c98547a3a23f143e16a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/ecl-B59qGGVg.js",
+      "sha256": "4f1c8ae6eaddfd15d73523014b684fc2ae7160b0c10d0680812497b4f1254192"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/edge-CnHxQ_FD.js",
+      "sha256": "96173d2e265cd159747e0ec2ec920884e3f4321a23920484e33525cf4c74307d"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/eiffel-Dze7nlu3.js",
+      "sha256": "a0fc308a8415ecaf7e5ffe28d9192c23f5b6e81d995eb7df35894a1b307a6606"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/elixir-B_LIBv5J.js",
+      "sha256": "154a81fb171b9211dba3dd7905ee11b0764870b12e870ea8494b900bd32e1546"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/elm-BlO7pcFp.js",
+      "sha256": "ad57de8af1847f1c135c9530ef1acbe67e32a364cbf69b8fc8e534dc034a1f73"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/elm-DG7jkhNZ.js",
+      "sha256": "c077dc7257d0e460440d911f88d5783e18ca8c58146fd9126e9e13a0897bcb5b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/emacs-lisp-4gdXY_g3.js",
+      "sha256": "4af446790fdf213849144aaf0748e5eefb0c699effadbac6651383f81e25db2b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/erb-D0-JOe_j.js",
+      "sha256": "55d6e6c83ddddfa7a15572e06991d23685ce0a04d76cc7eb5f326e0e436c0ca0"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/erDiagram-INFDFZHY-B6jg5iOi.js",
+      "sha256": "0e106fd096e6c870fd10113f35da7dcc2eaaaae69aed15e8ff845af5bfcf00ee"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/erlang-BO6gOnGA.js",
+      "sha256": "a7ff36cb6624f8cb2eedd1f201678c122f7d861f901c2b4465532dc9b10fb48e"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/erlang-Ch5kuXHm.js",
+      "sha256": "72b1bd6493394dd05a2d4a1690c7d497b143df2b451b3f80a03e340275f74de3"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/everforest-dark-Cg1xdODP.js",
+      "sha256": "3714f3b3204954784e61c230cfc4f651a594b8769caaaff54bcb93c9204420c9"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/everforest-light-BmTD3bxe.js",
+      "sha256": "d9fb61a697627918d4b49412bba0b59608f69aece59e39b65c78ef1f30e393a8"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/factor-CMxFHDqz.js",
+      "sha256": "b249da83526bbefb5f5c5621c3cd3410f0f26edc9368cec95a585dbf5c6d0fd7"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/fcl-CDDUNjTj.js",
+      "sha256": "223f8c7838620a68cbcb74e4e40d10c5eb20fdd2fbe6d32e44bce2d1d2c28ed2"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/fennel-BTELNkeT.js",
+      "sha256": "2f723813e261cd0066949675f25defdce4fe95b437c48c0a8b2cfa14561726af"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/file-find.worker-CHoXCmE8.js",
+      "sha256": "80cfe35f96f8384c3f07480916e2786129ac31f1d7d839816bda104764da27c8"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/fish-kGF2-4SL.js",
+      "sha256": "274cac4046123b133ea964219e997cbb5ef0f32b624db2dbe4bffd477f734ed2"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/flowDiagram-PKNHOUZH-DPqxV8fy.js",
+      "sha256": "067e5c83ee26a2525b6b689e9dfcc5611b7857ce665bc1e0ce36f6244014c89d"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/fluent-YyC28MRr.js",
+      "sha256": "8bd74f055c5b44dfb7522a2db76d1e4b967a36b99591298d181ce4f9c60319ff"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/forth-B9D2JCeE.js",
+      "sha256": "2db6c4dd8f293410bd0de0a25f1dad21a1ee1990ddb816a4c783e86213e1e302"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/fortran-CAG2BFbe.js",
+      "sha256": "df8788d58683ac6188c9038802b9cc8483344dc447ff9854b818c5171c006401"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/fortran-fixed-form-CpmOyvS5.js",
+      "sha256": "4ac67c52d67e025a4582773a62987146bb3226d1f44f9e1a298dfc477548f299"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/fortran-free-form-5X94ETMi.js",
+      "sha256": "2d18015c9198f458952f8140462708aef319150f19fbf9706550413b1d212828"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/fsharp-5vtGqRR9.js",
+      "sha256": "999fe518ce6565712945a4201261e049daaa459a437788ae0bbe05e716b57c0a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/ganttDiagram-A5KZAMGK-C8q_ZZh8.js",
+      "sha256": "6d2d7cec09c6fa11d1b460001a3227f6ca7ab02a80736bb834c318aa65754e09"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/gas-d3KEcW3x.js",
+      "sha256": "a699545574b2f6e9d0d502fe4536ef23b977a8f03ef284520247350ac240ab33"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/gdresource-B5TLWiFO.js",
+      "sha256": "32a43d518df32c98b79b02dc37f3c6765557e8e112b722866e5c793975a9b57b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/gdscript-CNW3Aj-d.js",
+      "sha256": "afcb93923ae880366d50ef5fb9d0d24ca86f339955fda06d81dab52b63d596bf"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/gdshader-BEzE4j_3.js",
+      "sha256": "93963d4efc3e0d2bdb9fab63ce706f2570a344f7f61cebef6340fd2377b06705"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/genie-BvhtM5Ga.js",
+      "sha256": "67ca000da7afd913e78d95cc7d3462ec9551498d52dd4dfe50c588f68c6d2601"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/gherkin-DhZlEZiy.js",
+      "sha256": "86e76fdd8bbec4e37db05eebadde43a0761cddc0786f28f42befef6addaaefcb"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/gherkin-xCNF9gh8.js",
+      "sha256": "8990128805f132030dd7e45e83a94ef731c2e4c6ae01d18eb682e05004ef3285"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/git-commit-PP9xCApN.js",
+      "sha256": "170c0575cf35c7b436f886c3f87f866e9ee299ac219ce59a57e5dc738f701e53"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/git-rebase-D-XQSvDj.js",
+      "sha256": "88d0a6e714ccc97155ff22f4aea5e54a5cbd4701260c753ece3637b16b30bda5"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/gitGraphDiagram-K3NZZRJ6-CICVY9uC.js",
+      "sha256": "5a4b19a18d3f5e9f290501aece65566ec2d5cf821de9b20c156753210189f0e5"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/github-dark-default-DB2Hkvqn.js",
+      "sha256": "382491991f89fe29a45c477b3488f769db7f23985f84dac0d40430b6ed01b891"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/github-dark-dimmed-CMZ_OfqC.js",
+      "sha256": "cb4706f4519323c95cce0fe98a8ef4572ca0fba53675eb9786378336480044c3"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/github-dark-high-contrast-DmxWVmCU.js",
+      "sha256": "1f98d5b1bf5cb950c8e9387a7571efa7d556bc88211856af92554fe2d1fe8deb"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/github-dark-O22yVQaY.js",
+      "sha256": "504d46240b0a8db50c766d77975491333ac87eb8d0063c40a4513a4547b21972"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/github-light-BTbR9xVK.js",
+      "sha256": "620d9ac65c1d03aff090a6b6f7e2434a205180c9cc8998a5ab8ab20fa3cb0ae5"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/github-light-default-DWEonwFe.js",
+      "sha256": "be8bf7ee34ab3b1d6a65219f784594f80ade38519739bec259b41dc52a474a7f"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/github-light-high-contrast-WJ_cPDts.js",
+      "sha256": "935c987bd91be16bd5a8f2be11feba9bdb1144d7509f4f8e4f3f27e795682f52"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/gleam-LmNxrMsN.js",
+      "sha256": "f20f5bd7a34a2b9b492c8add86130106ee559a74192ad087eb13c36e8d98a473"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/glimmer-js-h2QNNiD7.js",
+      "sha256": "8d8635c7ffca968492eae4fa1c864b8eb514cbe3e611cb767d629366b5d1bbec"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/glimmer-ts-Bk3uX6Ae.js",
+      "sha256": "6bb87f85b05257c5faeaaccb3bf21732e0e1efb177479ec09e6d8fab0f7d37ab"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/glsl-CGsiYPcu.js",
+      "sha256": "7c37e71a7c751588097428aeae7453ef59ad8875abfd5f2677808ee76bf73e31"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/gn-OUMx7fqt.js",
+      "sha256": "64d6ad0db035828c8c974f0e0eb52a571e80628e51997cb8eecdbc6dfc546757"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/gnuplot-tV8vezdE.js",
+      "sha256": "1efdb8807af2a46b78525e65042d679345cd85b4f06eb6710bf25ac4ea509e69"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/go-DRMr3iML.js",
+      "sha256": "b675e4a0067b162a9ca31f1a988ed3d1b17e843447988b719b99d5d87b83d13e"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/graph-DgSd62St.js",
+      "sha256": "fccef23c0f5042b70d8e9212e941d21fabef792fbe14118227d073b539623642"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/graphql-CwmtR1ib.js",
+      "sha256": "f09f189daf0b8826a569066383f43a1ac812f2767d48bb67e2f70b7740fc3c1f"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/groovy-Bn4MhXgW.js",
+      "sha256": "8e451b00d6588c768de22b9bbf8491b0e393d65d0a173902f55a5c90c7b9b80a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/groovy-CpwJiBl7.js",
+      "sha256": "6b1705ee26bb3827a73e657f0b58a16c84004135a5e237501d919b9cb868ca0e"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/gruvbox-dark-hard-DVsRsETr.js",
+      "sha256": "3271e155bcdf29d2a21ce277fe29ef28fb511f07440e06f656bd52d754474400"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/gruvbox-dark-medium-B5JBrQdg.js",
+      "sha256": "2b66247f97ad2883d47297b94dad800136b7a8c3edc4ec5f801103d007b82686"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/gruvbox-dark-soft-Db-YOqRx.js",
+      "sha256": "ac85daf36f12f8bb49bf648b1f9faca93c24a083421c87b91a11c0e6e1724093"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/gruvbox-light-hard-CXzJt7DI.js",
+      "sha256": "79fa17591e15028b6e9c22cab0410a2080edb0ae0d89b45a38c7cff3c4164e3e"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/gruvbox-light-medium-B89RAI1Y.js",
+      "sha256": "638d72d3958709693740209dcefc86404c98f4ba2342ae4ad10568fed2cfeaab"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/gruvbox-light-soft-Cs0hTZYv.js",
+      "sha256": "f1aaa7e1e2604d94a25844043851869575a42a58f7c593a96f26c16eda099e6b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/hack-BTX3ICIE.js",
+      "sha256": "8a484ea606f878a2c3772079058bad92d0cc80df3dff6dfc200157f5226da6bb"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/haml-DrIklt7F.js",
+      "sha256": "f2e9946b7d7cc0790aac30a31101051b1eedf5cb91a97c90f51dcfec4b13e566"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/handlebars-yWFGGD2R.js",
+      "sha256": "c3a60766088d1118da95b274cb9cb5b0a894557fed514d71249e545a1747e747"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/harbor-city-2k-Dk6mtn28.webp",
+      "sha256": "a2f8bdd324331d46a31ba1f2771defe4fda22a131a15654a30915e62b8107d94"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/haskell-CzPS7wjM.js",
+      "sha256": "894b6836b5ae092440baa05cdfd33acfff7c07e28ec05589ece4632f3b55bf2d"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/haskell-ySd-OUo8.js",
+      "sha256": "ff8a9df8c8df8f199ad3b7000aff670c061d0c760ba213d94f52a6f92024e0f8"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/haxe-7MlzfeYV.js",
+      "sha256": "df08c4d4f5bf41a8e63335fa1650e2d5dd4de28c5760ebd6ab47ee0c3fbdb606"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/haxe-BpobLYM9.js",
+      "sha256": "ae774b9789dcdd3e7a731ccc7338dbbf6146c46fc7dc6956afb915841b6cd73d"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/hcl-axoq0Ycu.js",
+      "sha256": "24b69e43c23e62180d2b449ad142168fdbb4d7a26d163ec4f35cae74557882e9"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/hermes-agent-2xQZASMR.svg",
+      "sha256": "f660a2312f42c1d9d21daa5c7dfe1d666901030a42a469edc014678314d0ec8a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/hjson-I7LcauIB.js",
+      "sha256": "d8d962f68ec3b8c7ab2c84a65a4e1e210746d3ea0a11d961bdc498c92a834a83"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/hlsl-TRzjajlb.js",
+      "sha256": "efaaa7be91bf2b4175e8335e299a08e95a8de3c33f50acc4af343aa042f6178b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/horizon-DWzh3z5C.js",
+      "sha256": "363bf720e4718f32f39173e842b38baed804c8901535825b1b8006a92f952c17"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/houston-CF_ws8Cq.js",
+      "sha256": "83d49c7b3dbf2aaa283add7939ec278b14558b8dddd93025b7427237e91266f6"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/html-derivative-HU9p64q4.js",
+      "sha256": "96342275987cdde5c94ced488d801de34bdf91220b1ab8cc2cbb449410a1497d"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/html-GC16tDh9.js",
+      "sha256": "41b7631b5178af311b930878750b1ce40ebb4776acd84fcd9cc8ccfc2f7b46a9"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/http-BqypyemW.js",
+      "sha256": "552d89ffbe4662e2a8a6ef42b9608509b6654b7de1f836e6c05c2b7ebc81e0f6"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/http-DjsOm9E4.js",
+      "sha256": "81694d12b1f4857b39df251c1ed4f851f6bfd6dbfccc45f33d4bc2cd45356ab6"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/hurl-Am2cDU4f.js",
+      "sha256": "cdc4981e91c269a5c14eda4ad1e35861cb729aa91ddc4eb303decde832043c14"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/hxml-Jle7oGdm.js",
+      "sha256": "dfd4cf9528e4c6d081f084c9285bf2ecbc99f42b78b91263a5de2c9473e92fa7"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/hy-B1k9U6S8.js",
+      "sha256": "76cce512efb74b619cb66f22acba0729867abfc977ea877ab9d8ec4e28847ea0"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/icon-192-C06667az.png",
+      "sha256": "2680338ed6d3557b6ab543b97460c4620ecffe0d3a801bd34c3c3c06a6eefe9a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/icon-192-DrQKUdSk.png",
+      "sha256": "9fbd4eb0e7356b4c6ddf2d86a676178476b93747a4687a6e89d06684014ed142"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/icon-192-OagIfT5q.png",
+      "sha256": "9abc0b6b53cef994b32e8c14c02fa8cad3be5325168d1f6907c47b327a024438"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/icon-192-R53lTr_5.png",
+      "sha256": "2f40a6ee8f0a0d1cfc11d8010fc9d990d9dd2dfbb14ea27bbdf97e2c50619a4d"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/idl-4HIGJlDI.js",
+      "sha256": "0ec3441d716383be06d8b9abe052499551a470877e9fb3701ebc09ab590c70b1"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/imba-C4923lSV.js",
+      "sha256": "63851953f60a70e580b0c2e3934e25fa89c3c8548f9c96fb16a59d72eb19ee6c"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-B--a4Kkw.js",
+      "sha256": "3c28295d5e8c09d033f75530f60ca8e882c583b04b1a193685f49dcbddd86f91"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-B82IwJ0G.js",
+      "sha256": "68f964c05e1dd593b2a60ae85a0f187b0a4188263c51f3d95207e6be173b4d57"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-BFQD_IFq.js",
+      "sha256": "514d8d957bf597fc1c42430bf2e0e25f0dfc5c774b9e9db566be4c0ec634f180"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-BjEMkBNH.js",
+      "sha256": "9b319ed2c2a8a278a45e2ed1d42a2ee3111eb470346960f36f0270d163d9a713"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-BOnG8NHE.js",
+      "sha256": "fa98e8cdb4b4a696b697b539f16f9fae1b13251e2d7d2782abc0b7744344e3c8"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-BX0xFHqP.js",
+      "sha256": "23154608994ead4612f9b800d3bfcf7106cf6177dbee453ba3c32fa8d5448650"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-C1wPTjib.js",
+      "sha256": "2eb07be29311f3823eee961faaf9e19e6472d88f9c5079d6ffc08e1f305b13b5"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-C2hDwhUy.js",
+      "sha256": "193e712fe5b0b80f68a8746de9015190abe4cae6848a76a9a53fcecd23ae4262"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-C4-bxM_F.js",
+      "sha256": "1116033f9095bdb36a9cb287df03c24aa29aa8404f74b97e69ba62f67a241472"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-CGMEFwXb.js",
+      "sha256": "869a690e55625200d8f3eb122cba0bae7c68cf3c5dd42192c6be8db7dcc1c6a2"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-Cs2KYbbF.css",
+      "sha256": "bac1ca97693f14a6fc78ab97e72aaceb7dbbe5223c133ee8d8f3aefff44e077c"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-CsDyyUth.js",
+      "sha256": "57df88b029a4e31d6705abaf0831dc26043f1888ff76778f85d8ae2fc75da795"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-CUy4uIGv.js",
+      "sha256": "de38efa13256e40dd9e7e3a7f7e7c23039596a066df8e423204219825fc1c61a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-D110pNaW.js",
+      "sha256": "5aa0ff1f3575e0309d637d9b2db7a8d7aa0b446c67c0ab7be7099bc4e79ac923"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-D6cbqwT9.js",
+      "sha256": "c2e85029707784dc55aed70dc2d65ce3ad9a835b9871f11ec4491e2ca5107f7a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-DFKVYcZY.js",
+      "sha256": "813efe746192103c08474555803e40ad44a4e5790f83ab9ffae30138a2f6540d"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-DG6knK03.js",
+      "sha256": "71819be1ae0349487ae41cbf2d777b8da71194ba608f579d53044053fce213a9"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-DjoPbNRh.js",
+      "sha256": "075e42fe9ea042b35b746b483e2924ae7d1bea7c3b7fe94cfc4e0367255791d1"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-DlZblY3H.js",
+      "sha256": "28cee2c1d6dcaa4cb98de16ea06f303110757124063c56d4f80eeed64fa692ec"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-Dm8ycP4P.js",
+      "sha256": "9f195bffe7a5afce1f0f9bdd32514091312ad9607f86b3cb82689705a11dd626"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-DNOj_qyU.js",
+      "sha256": "6874cb9b86fb68ab2213d5642ead768df75a36ef0f97ccdba98cd20eb4fee417"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-EKlpT7GC.js",
+      "sha256": "567780ccac1efcb0d8885a2a84b6a97855aefa0408acda95d21d7abd4d686787"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-HnkEin_G.js",
+      "sha256": "fb158fcba6608c7f8487ecce47a757e3e6ffea9fb2fcf1eb566ec550af50a47c"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-KFWjwKrB.js",
+      "sha256": "36e1dc134c5db4b2a62a6972c29c3fbf30c018eb7a765e050311186a82e66cec"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-NEBhGTVQ.js",
+      "sha256": "4099c2d89b86210f5d497f06826a6bc379402f257451cf90aa3c834a4d143426"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-sigvXeT-.js",
+      "sha256": "89f4ea5ecba1d0f37a3125a427736b2be9f1cf00e87ac8ed5a6664ed99c0cfd1"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/index-XAwFq97I.js",
+      "sha256": "21c858d99a1507108fe5832039237cd6606a32b9f5304267d1e908ce3bf10173"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/infoDiagram-LFFYTUFH-DrxK9S1o.js",
+      "sha256": "0cd76d1c9babd979fa1840654f94457438bdb71f55cb0de03771ac4880ece3f2"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/ini-B84Ha1bx.js",
+      "sha256": "bcda74cfe9482897f23bd5e92da7a2c87b7255b94e90a5e3c1f010eebc0490dc"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/init-CTO7spbL.js",
+      "sha256": "3be5cde8f5c38a9ff562e5cc91189234238482c806fd32c1c81d3578e9fdd8d0"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/ishikawaDiagram-PHBUUO56-BHcxh6iB.js",
+      "sha256": "8f2fa62b567a09b024ab6c25c7db83bb4669ba69c2e5fde32f17be823f148e56"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/java-BfXh-0uJ.js",
+      "sha256": "5540cfdddc5cb7ada51189cf740074e42fd26275372445df5ba62fc7ba5e323c"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/javascript-BsAkV7mL.js",
+      "sha256": "9705c92001fff9de10c16a6bf5f1bc36cc6800dac81c7044c24a43f3b33fdc47"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/javascript-C_OHM9hj.js",
+      "sha256": "95b09f0b3fb5fdd9b2d10f6984118bbea38a78a51286f4d862b86a01094ddd8f"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/jinja-FkIlHBgj.js",
+      "sha256": "ec9286945033f35c800188028cde975ed68a382e8083dc2e78e7248f15c31ed0"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/jison-BkdOIOd4.js",
+      "sha256": "4db7533dce6e98a8d43d96d679bb71976cdba6140fe1ec9f145d29809ca87c2d"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/journeyDiagram-4ABVD52K-DZuzkoei.js",
+      "sha256": "2fd2570897840093a246bdf746f156f50ef3faeac630896755fee83324b155b6"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/json-render-block-DApK7B8l.js",
+      "sha256": "3a07020be19d12aeae9de87d3ffaa4a2ac3b69209ae1a36749d5c866d40a311a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/json-render-charts-Dw8qKLPw.js",
+      "sha256": "a12750e3c41371092c98b57a1c64e5ce912a9406d5c466789c04e295352631a7"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/json-TjWBGEk1.js",
+      "sha256": "8ce3e7a47293a63cba147d9fed32b8390b4b3b171fbc869d8b72b71a1c056dd2"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/json5-DCGCKrmX.js",
+      "sha256": "ce154b0db39dfa1985731168b91721652cd53d90d7c3d5235825f7ef868cbbdf"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/jsonc-DLVLp8id.js",
+      "sha256": "bdd552fa46fedad9291054241ed0f410c890a323d00fcc16cd77648d46d382eb"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/jsonl-B-R_pDGg.js",
+      "sha256": "f23a4111fabca720313b66dd506e4e23513dd868e5a328ec513ed7e83616d532"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/jsonnet-Cs8BnnC6.js",
+      "sha256": "5addc8dbfeb41cc03c640d9f972a5c57bef2a88db4f7160f01a40bbce5f8bb71"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/jssm-DDuANZ2u.js",
+      "sha256": "7ea2e70740905b239dc07e7f9f92a5f1d930e7a249c88dbc88095ce19b1027a7"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/jsx-BPmvoin2.js",
+      "sha256": "cd3f7d07edb464852c65cd16a35d61b1cdc1ce03b75fb4afb9c21b99059dd127"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/julia-Bs6JJhYG.js",
+      "sha256": "0d8127c7275ab1371ec839ec976879685017db1cf04c55095e651e48fe103196"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/julia-CU_UwNb8.js",
+      "sha256": "113b05431ef2f1657b7ee312505a4398aeb220517de832d274c1aae287665a77"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/kanagawa-dragon-DU8n2NNT.js",
+      "sha256": "f167a0066027029950bb380e3b45083c5ad61d5f68c1a8792314428ecf9f7ccb"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/kanagawa-lotus-Byd0CDet.js",
+      "sha256": "871ffc24552c7d64a3727b1842c5a49a878930e7ce530f032728769d513ea6a2"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/kanagawa-wave-DExoagcR.js",
+      "sha256": "1004bd37508948b9217bf76f6e6abf417715222e9455606d5fa4626d54ff4cc9"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/kanban-definition-K7BYSVSG-ColmNFGW.js",
+      "sha256": "b05c9839b0433561a2e9b5c85b157dfe60d599f6bc6e074a288ff484f40bb077"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/katex-CUTrfwKc.js",
+      "sha256": "7195070c35405ab01ddf9dd8f8aff89b7f0e5c5c48f5ffc4341a1c342b9bd9fd"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_AMS-Regular-BQhdFMY1.woff2",
+      "sha256": "0cdd387c9590a1a9f9794560022dbb59654a7d86f187aa0c81495ad42d3a7308"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_AMS-Regular-DMm9YOAa.woff",
+      "sha256": "30da91e84c893f875e252689faebdc590b2871145e8adc7f9a9d4dbd8ce0b251"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_AMS-Regular-DRggAlZN.ttf",
+      "sha256": "68534840bcfdd2bffb6f0e8deb48684dd01e7f04ea2813267577afb906de1d13"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Caligraphic-Bold-ATXxdsX0.ttf",
+      "sha256": "07d8e303ce4fc12b4bb54f1004170dd190a1f3db45d400fe68060df3e0897268"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Caligraphic-Bold-BEiXGLvX.woff",
+      "sha256": "1ae6bd7475590e97e7f145a89e09ccde322f7a6bc0b91607b1c8b8ee28290fed"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Caligraphic-Bold-Dq_IR9rO.woff2",
+      "sha256": "de7701e42cf1f4cf0b766c03fb27977207eee2f4fd5d76fa82188406da43ea4c"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Caligraphic-Regular-CTRA-rTL.woff",
+      "sha256": "3398dd02302557a793f2863f88e02d96ce10df2abffa07c8e9fa90775116e65c"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Caligraphic-Regular-Di6jR-x-.woff2",
+      "sha256": "5d53e70ad607c2352162dec9e0923fb54ecdafaccbf604cd8dcf7d00facb989b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Caligraphic-Regular-wX97UBjC.ttf",
+      "sha256": "ed0b74372feefcbb9c0666b2e210da37b7e49fa7fbbf3eeb11db5f693dacfbb7"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Fraktur-Bold-BdnERNNW.ttf",
+      "sha256": "9163df9c7122432e6495b4229fa9071cf9ae86a758ae5efc4924ec2e1a6dbce1"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Fraktur-Bold-BsDP51OF.woff",
+      "sha256": "9be7ceb88004ab8ad124082246fbfcca4091e36385d4ec6ed1df67375dad50fb"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Fraktur-Bold-CL6g_b3V.woff2",
+      "sha256": "74444efd593c005e3f4573b44524704c0af0a937fe911cca9e94068d0d140d3f"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Fraktur-Regular-CB_wures.ttf",
+      "sha256": "1e6f9579e90e2cac37f8f60a597c436e075c114385652b7cbeb0dec0421291b3"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Fraktur-Regular-CTYiF6lA.woff2",
+      "sha256": "51814d270d06ff0255dba0799994fa4d8c84d11f09951d47595f4abb1f3602dc"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Fraktur-Regular-Dxdc4cR9.woff",
+      "sha256": "5e28753be717dac97f559f49bc10be9cf3c124ddcabda6659d11cb68febc6463"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Main-Bold-Cx986IdX.woff2",
+      "sha256": "0f60d1b897938ec918c8ce073092411baf9438f6739465693ff18b0f9d20b021"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Main-Bold-Jm3AIy58.woff",
+      "sha256": "c76c5d696297d51b9cb1639c7da4334f0e7dec81b42b11213b5e25ef671bb822"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Main-Bold-waoOVXN0.ttf",
+      "sha256": "138ac28d1663b3037e9c5f52371fa5c63d8324f4a38d22cd573e6ea3a3fd0cf8"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Main-BoldItalic-DxDJ3AOS.woff2",
+      "sha256": "99cd42a3c072d918f2f44984a807cf7aa16e13545fd0875fc07c6c65f99e715b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Main-BoldItalic-DzxPMmG6.ttf",
+      "sha256": "70ee1f64a20f2048c21940ef46d0144fd215baa953ca69afd1e31e98544f708f"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Main-BoldItalic-SpSLRI95.woff",
+      "sha256": "a6f7ec0d846ac7ad975adb8959c37ed49b94acbc4ae436db9ce9e20287e4a64c"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Main-Italic-3WenGoN9.ttf",
+      "sha256": "0d85ae7cc30f23790a7f1a58c4a112fdca8aae769b6ba11429af1d98b1b6cb3a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Main-Italic-BMLOBm91.woff",
+      "sha256": "f1d6ef86f3b11a528bd5185199bd2443ecb2b0dead96d88674b5a2c12be24bdf"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Main-Italic-NWA7e6Wa.woff2",
+      "sha256": "97479ca6cce906abc961ecac96faa5f9ca2e61b8e7670d475826bcdee9a7c267"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Main-Regular-B22Nviop.woff2",
+      "sha256": "c2342cd8b869e01752a9321dc17213fc40d4d04c79688c1d43f2cf316abd7866"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Main-Regular-Dr94JaBh.woff",
+      "sha256": "c6368d87e8a1a3a5d337623d83d8dc4b868f242a9ad476237d6f8d1e0f168cdc"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Main-Regular-ypZvNtVU.ttf",
+      "sha256": "d0332f52868370fd83ae7fa46470f90c8f2eab2fcf12bc4f88080b340c95a830"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Math-BoldItalic-B3XSjfu4.ttf",
+      "sha256": "f9377ab0271cda59af24bcffbd46a4d0c8a3572ffafdbb38de2ad5ea7b0d5ee5"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Math-BoldItalic-CZnvNsCZ.woff2",
+      "sha256": "dc47344dbb6cb5b655c8460d561f4df5f501b90c804ad3c6cec65fe322351ab1"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Math-BoldItalic-iY-2wyZ7.woff",
+      "sha256": "850c0af5c2238497febaf5e461d880bf458c341f42f4f330f1b1ab5698b1998e"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Math-Italic-DA0__PXp.woff",
+      "sha256": "8a8d244581371912b8f3f5a23e2437cb2a59cd9bcaebb0346e722c05737a2571"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Math-Italic-flOr_0UB.ttf",
+      "sha256": "08ce98e51b04d58945a301e639e02b6998af29fdfd61a7b8afdd07bbfc479d4a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Math-Italic-t53AETM-.woff2",
+      "sha256": "7af58c5ec8f132a2ddde9027c6d7814decce4d3b822a11192a42a20e2e973264"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_SansSerif-Bold-CFMepnvq.ttf",
+      "sha256": "1ece03f79f95277d57dc7f6b435a74e1379b0d46104a8530286b60ff49369ea0"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_SansSerif-Bold-D1sUS0GD.woff2",
+      "sha256": "e99ae51144bf1232efcc1bfe5add36262c6866b0faab24fa75740e1b98577a62"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_SansSerif-Bold-DbIhKOiC.woff",
+      "sha256": "ece03cfd83e22c212cdef66feb8442d25a083beb988db3f1883f3f9738d750ba"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_SansSerif-Italic-C3H0VqGB.woff2",
+      "sha256": "00b26ac825e2095056396e0553b8ac26d3f8ad158c3826e28b4c45b385c4714a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_SansSerif-Italic-DN2j7dab.woff",
+      "sha256": "91ee67500cc0129aa0ace3ac5c61ff1692102f0f31d02b69347fba35dcb75bf2"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_SansSerif-Italic-YYjJ1zSn.ttf",
+      "sha256": "3931dd81faed86ba021bb2bbdc36f5bed9a38d6b4f4077aca59b265aa1b02083"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_SansSerif-Regular-BNo7hRIc.ttf",
+      "sha256": "f36ea897e19f4a2e571d1e900e4e3710e438deb05a842486045ba0a3e616a4ad"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_SansSerif-Regular-CS6fqUqJ.woff",
+      "sha256": "11e4dc8a6471ff6d6ee561d53d10fde8f7489e798257ff449c5d37c197435605"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_SansSerif-Regular-DDBCnlJ7.woff2",
+      "sha256": "68e8c73ef42afd3ccec58bf0fba302cce448938e7fc020a5e31f8a952eee1342"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Script-Regular-C5JkGWo-.ttf",
+      "sha256": "1c67f068fea8bb09bf099c088b1cf64bd27516a6e07f4684344873564bb66a67"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Script-Regular-D3wIWfF6.woff2",
+      "sha256": "036d4e95149b69ff9bcc0cd55771efeb25ffa3947293e69acd78d5ac328c684b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Script-Regular-D5yQViql.woff",
+      "sha256": "d96cdf2b3bdd4d64a8fd5f74a4c467f123a8a73931cd435889f08ffaf9bf947a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Size1-Regular-C195tn64.woff",
+      "sha256": "c943cc986384f59e86bea5fd7dc50a9c4dfe567a7c05eb40d6790720dead97c9"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Size1-Regular-Dbsnue_I.ttf",
+      "sha256": "95b6d2f1a50173bfedb8c63e1d1c99b10427d0a4df4201cb44513b226951a22b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Size1-Regular-mCD8mA8B.woff2",
+      "sha256": "6b47c40166b6dbe21a5dfca7718413f2147fd2399be1ba605d8ad39cedf25dfe"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Size2-Regular-B7gKUWhC.ttf",
+      "sha256": "a6b2099fb555c60e3a0db3a08842ebf1d732c6eb4e4bf44913613bed4fc4e39b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Size2-Regular-Dy4dx90m.woff2",
+      "sha256": "d04c54219f9eaec6d4d4fd42dfb28785975a4794d6b2fc71e566b9cd6db842dd"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Size2-Regular-oD1tc_U0.woff",
+      "sha256": "2014c523c3210bcc166648c4d4cc57f05b747df07a24277bf71c51e67dc79e3d"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Size3-Regular-CTq5MqoE.woff",
+      "sha256": "6ab6b62e9b62dae2c00dd90f791bd10950be0ecc3490d7d6045f51c2e8fe0949"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Size3-Regular-DgpXs0kz.ttf",
+      "sha256": "500e04d54f0d51666332c9d2089aa803be22aa878eca539e59fa53c6e522b082"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Size4-Regular-BF-4gkZK.woff",
+      "sha256": "99f9c6750b489c9462bf04900bd3f939df9b829339daaaaa99ef5495cdddea58"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Size4-Regular-Dl5lxZxV.woff2",
+      "sha256": "a4af7d414440a1c1790825cfb700cf9cf43b0f2c4b04f0ebc523011ad9853ec0"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Size4-Regular-DWFBv043.ttf",
+      "sha256": "c647367d1dd4e162468717d020e1fc0f1dc5c26ebfdffbe55261713bf88c5877"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Typewriter-Regular-C0xS9mPB.woff",
+      "sha256": "e14fed02b1aba7ce9f5afd5844b5d0321b22351febc720e0de8b8723527609f7"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Typewriter-Regular-CO6r4hn1.woff2",
+      "sha256": "71d517d67827787cfabdf186914cc3358eda539e37931941f2b2fd4a21f68c0b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/KaTeX_Typewriter-Regular-D3Ib7_Hf.ttf",
+      "sha256": "f01f3e87d9c6a61c0c081ceb577abd864eb00a612f7ac1620dd6915fad2ef5aa"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/kdl-DzNQTDs7.js",
+      "sha256": "74c027e2bcd6e0eb33e1ba2f8f56d114c3085ab689bd41f224d411dd9cccf4b7"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/kotlin-BM2ZNTMh.js",
+      "sha256": "59de9bd802125a8e26357b6623274e72a44cd8d544362b5d33503d527bbbe020"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/kusto-dtpuxMFE.js",
+      "sha256": "2112932192495b248643eb5ba53a18993e7d9f25c027336c37a9b0148e7bca83"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/laserwave-DF03wMlf.js",
+      "sha256": "fe2af99055f140affaf83767aad59d6d96f53bebe84df77b81aa52057e7ced30"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/latex-BRmxFpXE.js",
+      "sha256": "fe841d7deb01a9b67cb5453ebe87f12a51dc362455334ddcbb0c201aea73e700"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/layout-CVkoWsmi.js",
+      "sha256": "6365dc08a2d12183b1f70abff0d78b0b05e4c61e9c35359bd7973c23ab308e57"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/lean-CTow-IzD.js",
+      "sha256": "7a1668429383f6366dbbbe7f3fe97098e4ee97230002b343883b329da42f56c2"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/less-BAzLMJNR.js",
+      "sha256": "21765e8db86cb20601dc7ab4d25a821cb2ed61bede0598ebf0bc33850e634a92"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/light-plus-DS08Xg5J.js",
+      "sha256": "bd1191ca851ac6960031db8350ca359502280633917ce41e7e2f267927341828"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/linear-aVg_j4GG.js",
+      "sha256": "c744d238f2377cac1353cab607b99cf8dda9946b5e4add77bf535aa7fe1f1237"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/liquid-QmJ_LYTW.js",
+      "sha256": "c073d5850a1e35360b1eae9bb8207ae53d5aac579c0e73511f50ce501f1aa0e7"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/livescript-BMWCDuIE.js",
+      "sha256": "b39453a81de0238efd37ac1306f2f004f305cbd745be57e1728a17625f013401"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/llvm-Cga37tC_.js",
+      "sha256": "2e3d7a72af47808c55d441cf4fef725d1fffd915228dfb5e874131e7030fed73"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/log-BF22rfM9.js",
+      "sha256": "6979cd1fd5b1a045df91e39194bfa255a3fda4291bcd2647dbede2f47040d0c5"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/logo-D9l7oEJ8.js",
+      "sha256": "2563636bc6d8c9568f0cee4cc4904d61c6ae5f99cda1b2396668800681de91e3"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/lua-BVbbqwZC.js",
+      "sha256": "eb9d80232171b3ec29d0a6ae191f05601c9beaab50d55ec11f1a6491485490ee"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/lua-Cvg8VrAA.js",
+      "sha256": "165c413653092708d81ff649b3d4a63df2eedc0b50c8f249b9667b4e75fe959d"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/luau-CdZ6BoEa.js",
+      "sha256": "c9e4f297c867df3550cc6edceca34aa563022b9de12cce8f691c7e88f99e72d1"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/make-DLtqaK4D.js",
+      "sha256": "27841b3423f55ccbc79c7bdd9525e23b991d1dbc0ad273d981020d974ba840df"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/markdown-F_EULe_G.js",
+      "sha256": "1d3d71f31638b0fd85e4c37dea2defaa1956428edb698150d74936707f2dd73b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/marko-BDLRyCCe.js",
+      "sha256": "73c34b234300039db3acb2f414ca4385e25bfacc1f1070136e845221ccafee3f"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/material-theme-B8B2U48Q.js",
+      "sha256": "5cf1a42a125b0e4e8113ce35332ef2b6085f1542ff4e325ecdf3ffc6fe7c3c43"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/material-theme-darker-BV0iY_T3.js",
+      "sha256": "31e724d2e6d4c3fc9c0780e5ccaa31a052611fc29113884c624dcee165b6c11b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/material-theme-lighter-DrzybSTF.js",
+      "sha256": "bac34a65c97f80e7ae86a8e1a6c951cc43206dc10e55881e5f4e718803b5803f"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/material-theme-ocean-BRPLVReX.js",
+      "sha256": "5e11239fcad3ba257d7696d7f7cbc95b1decfc0d2008fe469d03c661dbbfde8e"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/material-theme-palenight-DSJwsR_D.js",
+      "sha256": "34b7bea230dd9db5306ccbee699df1d7395bc3cb085b922a824f8db6c31c6364"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/mathematica-DNLOL9PQ.js",
+      "sha256": "acc57c8c8a74626a6b9423988f92155410b79196d13c9c6a78047d51ae130c68"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/matlab-7XHduepk.js",
+      "sha256": "d723801414e6f79880d6a2cb32a7fab3be2323b07f8c93bde413474188d17f03"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/mbox-Ga7d4MMN.js",
+      "sha256": "fc425b9a3a312399b3ff6adfec040828ff7c8789f0d31b96e73bde2dce902355"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/mdc-BQMA9IL9.js",
+      "sha256": "bee58a333f2374974a750b66bfc6173353f3dc7e26758eae9d419c7eb333dc9e"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/mdx-D5wExp-O.js",
+      "sha256": "67caa9b015f13f027c05f6575e1dc5ddbf6125784b9486365812672ee6e97687"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/mermaid-z_1ejSlp.js",
+      "sha256": "ed183027814b77a9f6b90598b8a6840ef257216950c315f867821753dd87b387"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/min-dark-BNaN9fWk.js",
+      "sha256": "09da2c57f0e7494ce37a3a6f328acf788886bad44086bf08189f221df97e4f35"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/min-light-CMrjentn.js",
+      "sha256": "33e2466853d393c691c279ee15953e13c4184d2899dd76b8a359fc275330ea68"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/mindmap-definition-YRQLILUH-DYOfQAv9.js",
+      "sha256": "db735f9974fb018005b00000c779e7dca4e544d21b38bc8e42bd87d072ff7780"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/mipsasm-BQyyUrpa.js",
+      "sha256": "e78c352219af028d558eef28b21d2fa9c4e33ad27c41c6e5f9ae0949f58ad815"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/mirc-Dma3B8rS.js",
+      "sha256": "0ddcb9e79952a15f12935311af85affb24054773404adfdd1d437cc0080a21e2"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/mllike-DHn7xckP.js",
+      "sha256": "adc3b1b7f8aa916812cd4d8bdf8cc1bce352786e3df54c560c5b9067b4fe6d5b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/modelica-0d55jYY0.js",
+      "sha256": "53c8da4f56d1dd592c1710d4b2735aa9904eb2306f365b56aa7074837c59526b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/mojo-oCdXaqgR.js",
+      "sha256": "8ffee981fc0a5c584f8826aae180fe83eb7b0440a5b0e0c165f79e065363621a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/monokai-DelygWXa.js",
+      "sha256": "fe903cb744e07e3c437f2afb5f0eab64ae2a22eafbb4983523061835747eed8b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/moonbit-BJwFbXFw.js",
+      "sha256": "57f4a33c170c300a034310c6d500878cacb16be6e60386670e4df7a9b3bf17a6"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/move-DhTNmxqC.js",
+      "sha256": "b1fdab7ed9886616feb8d94644b83ef5e99e8073afcc42d38bef9372426ea755"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/mscgen-DdqZYINH.js",
+      "sha256": "7e91513474f40739574f20f1b1f38659a476b68b39ee260c7e13132e20d66fc6"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/mumps-Btr8VblO.js",
+      "sha256": "aea5f291cf40bcc124e9ff104dedf8df38d630d3112f62d1051118f1ce16b80b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/narrat-CLjGcbCy.js",
+      "sha256": "00535fa0f1128b395840c49a0be93d75d0e4b0cde4c9c205a86af545c1e03d0f"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/nextflow-B-RDCzl7.js",
+      "sha256": "9baee419e41575166341906a15431f74c48ca1977a589bd953e6727124c36c06"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/nginx-BFAkI5_-.js",
+      "sha256": "f095607dc4e851bbffd04e6ba98fbe6645d91d621285094d6d624a5661a6ea96"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/nginx-DTDtBDVN.js",
+      "sha256": "715cac7cfdb61a1efd09d43ec2c5e6d8e1bd491be679ac56df795a913e6eaf21"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/night-owl-DSS199ra.js",
+      "sha256": "7ccb122a6009d7a99f17ba43860d62d7dc75610bee77cbc381d96e0dc97bfd5d"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/night-owl-light-gC6E-Eh2.js",
+      "sha256": "83af20b1a92293336f7dc9840f94cfc188262c468b18051e1090b977ae7bc669"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/nim-B3PAIZ4D.js",
+      "sha256": "71a264de4dfceacf81d68cf35152819cca0eb5bf08f85955b91738868899d17a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/nix-ByWcmvXF.js",
+      "sha256": "79f3b2e105f425badce5deff89ac5ff81d31b342c28c463f934527a97bc16493"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/nord-CvDbBq5M.js",
+      "sha256": "843a437d6d92e165815bde9e2e8c6447029db31f0f62d82cdb7facd5a603aace"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/nsis-CyKBdPWp.js",
+      "sha256": "57f398b99c2ea986b5e4673709aa470f0fb4b42cb04188cf4044e52475c4ff61"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/ntriples-CvgOYMpL.js",
+      "sha256": "239581b9922c933f3427296d14f18a1febb1db49283e6e4aa3331f4e2b9bc3a9"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/nushell-CwevsFPL.js",
+      "sha256": "b00745174b3dbbedd0b8ce1c1dc93b0e036aaff43527bba7be960a054e9f52a1"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/objective-c-BRoNQF42.js",
+      "sha256": "3852739d3dffc3add8d1ce3fc29b10ce13866fb9d6ca97ec484702b643fb12c1"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/objective-cpp-DEoN9Fe5.js",
+      "sha256": "7a16f07926264745f1c255a2115a9b5acf41d365e4242874b6600c6e7b9bc850"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/ocaml-B1kfGk9Y.js",
+      "sha256": "bf95264e77dd6d1a916df5cb2d224030191b43615b99f3b25395392bc278d4ba"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/octave-DYBj3-tl.js",
+      "sha256": "57d7b87692fe3ab14a413456a3ea0fb201a3052057b77a55604863fa5064c495"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/odin-CNQ56Ay2.js",
+      "sha256": "8d3c38ddfd03d9219a752fa28201996972f041a4547fe3ba7f7daf3162228473"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/one-dark-pro-CsMf0BoJ.js",
+      "sha256": "45e1908f9275cb0a626a7f68ce15338660c01a130398d70d74cba13310f6d79b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/one-light-B0cTzZyr.js",
+      "sha256": "031976a8b5ee0f6c8305d8d5866005d5aa6b7fa3be36d71aa8941cb3253b29e3"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/openscad-C_m7ehZF.js",
+      "sha256": "6814877fb183e824bc3333238f5d7eee45640e59135e3c7742f53ea79a9dfecf"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/ordinal-BD3Y6v77.js",
+      "sha256": "604820fc2a09c3398d700bf93ea072621e79c111abe856f1fe69554f4facdadf"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/oz-R_e8WMIi.js",
+      "sha256": "a19a6ffdf1e6eb10fe9c4937cfb31303c9ec5bb723c73df1a71ef43c82cdd020"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/pascal-CU8Kjkr_.js",
+      "sha256": "51783713bff00fbb03a180fffdcdefe8afb1a94d8995b118f2e2263ea3532323"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/pascal-GD8iposT.js",
+      "sha256": "e5a1f91525017a8bf777f9c04f990c65a6a876b26e9b803ba4fddbcc6a68ccac"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/perl-DL9mHpoi.js",
+      "sha256": "8c4df1964a2fe9a690f2493217ed9f70d1f7e2f026ea515f3b226b3b39370b17"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/perl-HITCDkgu.js",
+      "sha256": "ba6869e9cc2516cd592f9d438657bc48339e092fa3c29b9931502b4b59945fb3"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/php-C2HieitX.js",
+      "sha256": "2659098a78a32609d2107f7fce3d41af0ec09fb9c798475ef5f66e776a201158"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/pieDiagram-SKSYHLDU-DuVTXa1i.js",
+      "sha256": "d130518aa6a6b57bb76ec386c03ac566a2501e5f547d8a464aca42f7e3ff9bb1"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/pig-C_4T4YIV.js",
+      "sha256": "82df721874d4623ebcfa10b27ea6eb9e3992ff4c28e2d838f8d166ab73abb91d"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/pkl-BsByaYax.js",
+      "sha256": "ae124b332038e99562a2d70ff27dfb781b7cf31431bf65a3b335c4915c80abd0"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/plastic-BjwMpBc0.js",
+      "sha256": "88ba183a095109418c2ae3d52a7023865d872dcddc42242e5f298015be9439ad"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/plsql-B3Na24V4.js",
+      "sha256": "77bd943f27d376b716843947cd3922bbe4d1564551f002ea06469271370de20a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/po-BajfNjc5.js",
+      "sha256": "c5af997a5b532ff95ed15f640a2003b88ef1932bed736ab0d8c874048df22113"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/poimandres-ChWyhPrn.js",
+      "sha256": "1f0d597824ad1e236ffd582419a4944310c6acf7a9f6f3fe428a5f04c8c24261"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/polar-BB-dlxnO.js",
+      "sha256": "a81222826bd6abd3f19f881c2387b8e997a2f7c521e0714497ad1109f87687ee"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/postcss-kj1IbjVd.js",
+      "sha256": "cccb39e03ef1fcc4ffad2832ec183f10265eb1b2d07f6cefe543059ffb4edf22"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/powerquery-B-e1fO-k.js",
+      "sha256": "abe97422a246cb141b375d234ab4c415d96e081167ee56fe4291d3bb9e293d02"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/powershell-B0suO7Vd.js",
+      "sha256": "3de01d37e183594d3bb94dc474f6324219cb209d162b202f82b12c77d2370410"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/powershell-BcMVbGpk.js",
+      "sha256": "aa1f2ac1433f5c0582385bf98aacee57e131788cb99d0c2325e0cb826a0ccd1e"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/prisma-bmxcSDxq.js",
+      "sha256": "81c07c7ae46b73267b49a1ceebeb12d235a4cc418c8ab7a6e2a0c9343597a940"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/prolog-BT9GCzqD.js",
+      "sha256": "3539bb0c48ad2411aa267a12ddd7f6b99a606c06cf7dfb454a89f8cce3eae4e7"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/properties-BR-vP1aU.js",
+      "sha256": "b758d2ccb06eaaf23dbbc110988e64a57e55a5923a262c60432397feeef0c9c3"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/proto-Ds-m32NR.js",
+      "sha256": "a1a57bb072ca26ff4c7b4d69f2689ce0a88c44b35e08624d6eea34912b024e22"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/protobuf-BxgpyhoW.js",
+      "sha256": "ed0b3d7fbe3b079db99443170bd20dba78ba27f42043ad6efebd4b714ef4a364"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/pug-BwQB43qN.js",
+      "sha256": "9ddf1583d958955be27a03c33d4e2043a7ea0430e2c1d6033318fee7cb82a2b1"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/pug-CTXt1f8z.js",
+      "sha256": "48c244b81b114de6a5e5adefc5c7715f6eba241d58edd162713fd21007afdb2c"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/puppet-Bdao66PW.js",
+      "sha256": "7985d1f812327008fe34d375ab1849a12e903d3e9507b7fa14253ba17dbdd596"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/puppet-N15G4Usj.js",
+      "sha256": "a2e653aab53e15202080aa84660af3f4c4de31daed9c08f7aba9f0a45d8da72b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/purescript-DrwsEYNH.js",
+      "sha256": "a62eed87e880fce2ec42e0ecf1a1f0b56101c353a1602c594df543e7fb44d88f"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/python-CrdIx4PZ.js",
+      "sha256": "7f8afbda8afea72eb7128991331387b1c4b5d0968523ade7cb14e91998c11ded"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/python-CvWbmiX4.js",
+      "sha256": "219d8f4b9588956ac747cc56503e568fbf3aff3ab5e34e400a6cd21c86e2273f"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/q-CrbCVq4a.js",
+      "sha256": "ded6c3f92101aee3b6214667f489d691936350d01b61e69fdb2b8e2104afcacd"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/qml-jtL8okyu.js",
+      "sha256": "0b9f29b4c5eaddd1d36cc7a0bfe475bbbbfb41b7b4c8bb541a4f2b15d8da5c82"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/qmldir-DuMSk0Oz.js",
+      "sha256": "dd3200a53574324b6660f4eb697c1a345d692545df57e669b7ec45edb10b2cd0"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/qoder-color-CCjsVbDP.svg",
+      "sha256": "396596d247477e2a036c141a16ec266df7b14c0130b777a68fd04bc89af50bc8"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/qss-BFrB6p4y.js",
+      "sha256": "b3c4472854e53baa3e2b5dc01534ab8f649cff91114434bbeb043d9804b5742b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/quadrantDiagram-337W2JSQ-KRzm4FSh.js",
+      "sha256": "e1f87d18e990110c0fbe29ae91421c8d99da8c86983302bf53cfa5dd0e4370e2"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/r-Dpdc-Kyk.js",
+      "sha256": "68f7460c5950028ccb1c47d24c83f9e698f91aba683233bdab1c1d16be61e6f7"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/r-V7nswm59.js",
+      "sha256": "78772777dc6085a89ba3ed5f6fcd5fe46c7ff6cdb849c3c967ce0c1273b4f4a2"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/racket-DbA06HL7.js",
+      "sha256": "35e993f65b1628459cafc49c36adaa2b97e82bc7bc3771a3734d08f65c611972"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/raku-6v-Y17bs.js",
+      "sha256": "336f783ff3dd3e9456a49bd33ab3ccbbad4fb6720279579f1d7379c2d98debf8"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/razor-gBXW6YBJ.js",
+      "sha256": "610c97a7c5107abfe6d8a2e537c8df4cbf04f67214dd7cdcec4ead8d2805f45e"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/red-DByOl5N0.js",
+      "sha256": "bb3088fd3b6f11f415ee34b9b4423479898c47237f8f26ddbf8e4f84f69c3b0f"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/reg-CULnG2WX.js",
+      "sha256": "57179c6fab224a0915d6eaef46bf9939b5a791c648a1cc1452451a5e6be7a115"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/regexp-BxWeO75u.js",
+      "sha256": "fb0da964aaa96de83c3e8f4743513fab5fac0619bd88e21c7421ee5bf8bd6247"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/rel-CHRwzjd4.js",
+      "sha256": "78f624b98e572ee58e70bd4b0ce331a650337cf44d677eb12c19f57e4077afe5"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/requirementDiagram-Z7DCOOCP-CtxzMBIl.js",
+      "sha256": "67b73d35b47dccb2fe72716ee0e9d372a642bc68caf23a5e0a7cc7d7f0f91d2e"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/riscv-BNQ9cVpw.js",
+      "sha256": "42e82436d292ca7b8dd9464f1b48dd53f83f298aa398a7384621f7929bcbb773"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/ron-mATCac1u.js",
+      "sha256": "b1eb3efb9d22a3d607c38300dcf2877884b7dc32da77ed7bd8712316ec9bb424"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/rose-pine-B-kZ4Z9q.js",
+      "sha256": "61337fa3da37095a75d3decc89520d632f267a57c86c1fdfae0ce8ad02c6e5cb"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/rose-pine-dawn-efeVGdSI.js",
+      "sha256": "add28aac76b74088c1a3ffb84475e5ccd843d83274cfedfdd337888abd07a82f"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/rose-pine-moon-DmodZNzl.js",
+      "sha256": "7da05eb198f0728e03f3028baa285c24fb64ff58f06fa9df5bff137f8e8bb17d"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/rosmsg-Bfahr6vb.js",
+      "sha256": "fc8dfa10141bbde8d0488a817485201dfeb6553698e1eeb03572925e53bbff3e"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/rpm-C-DLY-If.js",
+      "sha256": "e39a41ec2ab1ba47f2ef4ac46afda8ab6157df5f4388c70b332e2ebf154e1997"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/rst-CKCyRjfY.js",
+      "sha256": "e3cc6b4e698d4ee8951e29d1b373078ab16f75420f4847133cfd5ea918adc635"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/ruby-CPCASdTw.js",
+      "sha256": "45291eb5e373d847ac7ffdcab910e04070daf84ffc099950533330f42675a0df"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/ruby-CQTpZw6f.js",
+      "sha256": "d66865a01096abcd291b833e0cd3d64881860acbd99b094fb5cf1cd134e2743c"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/rust-CMNYZh5a.js",
+      "sha256": "3eabe521bbc0b2c8c156ee901f0f4f848c0415517c561ef8e28ed1b8aa7f444b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/sankeyDiagram-WA2Y5GQK-CsxiSCGW.js",
+      "sha256": "7312eac67cd9d872b5d2492c6944094c030b55e919db4cc74580543ca2aac302"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/sas-BLBgC3TA.js",
+      "sha256": "48ac94bb4d60d319a74a322b25ee953fdf530b02c7eec7da5be991ac60bc18ad"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/sas-D2UG-yhZ.js",
+      "sha256": "015ef33927a3a7749cad183ad9e96b0dbf9df616080054b9e581486effc05bef"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/sass-BheygBdF.js",
+      "sha256": "10d1b5d90d2e1b800278b4641a22c396553e0af8bea71c02d10619e26a4853a6"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/scala-B-_7vFVn.js",
+      "sha256": "6b276123b2d6f6ea37eb7b0ba254a990b6dd377ff1e73cd70c02c9b7bca55c35"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/scheme-BKzrkGJD.js",
+      "sha256": "f0e7bc170c1987a1a0734b905eee725b83cca6aa8fa597457fec67670a555cc9"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/scheme-BSHdPinv.js",
+      "sha256": "4fd27ddc4122ca128d7db69e264bcce846097115098c246a6a3f63aacc2779f2"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/scss-Dq-LbI_c.js",
+      "sha256": "7105f13eaadde26be3c1103ae675715e088bd9451f4a5fdf1b917eed33fd43f0"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/sdbl-BBUhycGU.js",
+      "sha256": "bff4ccd6d80705b22cbcc7001318d395889fcef36a60232875659f55fdee9362"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/sequenceDiagram-2WXFIKYE-DvS1iW3q.js",
+      "sha256": "eab4bac6bab9b8c42b91bbaf23136ff724ee4bf5073c3189989ace12301a6227"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/shaderlab-C07uO3dL.js",
+      "sha256": "43f096a0db28156dd0296440c7c7e567ab86aa8097e6e5eba04df29db6d558f9"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/shell-BlsXDxCn.js",
+      "sha256": "476e685b723e32c63fec792d4266c65b3facfe8feb349b6a2dff9b6c749d9fde"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/shellscript-CQ8MXh-D.js",
+      "sha256": "9df6809d44ef86719aa48b676ac8a3bb45fc47cf7b2bc22a6075956a6c83d421"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/shellsession-CkeTp4M1.js",
+      "sha256": "24919dea685fc302ddee4605cfeb68ad2eed21fff5022aaa72b7924d2d9475e1"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/sieve-CjwBwOY5.js",
+      "sha256": "084c9f5e19ccf7382ebe97bc97676ba143d9a36fad9b096cb4b3f99cf3c81df6"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/simple-mode-DMneyfDu.js",
+      "sha256": "bf2199ce2b8baa53cef87a5bc3a72c68817223b26167c168c645fe78be9280f4"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/slack-dark-BEe10hxO.js",
+      "sha256": "c261c97767883dc9538241b99ba695d58aaf90c38582b5b650c552d6048c5b3a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/slack-ochin-BKmu9pBc.js",
+      "sha256": "e7613c442c76a5d933ba835b20db9ff361d4bdf01a0284ec4b7a5c2883c6b926"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/smalltalk-BOIGQuhN.js",
+      "sha256": "7d696f35a8e402a8b6c2ac1db57c92af865ec665cd63d827689c46e58b9b295d"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/smalltalk-qxcGy4fT.js",
+      "sha256": "44739d2a40c6e525b93f30722a22b74c19f53869c941d095b95d669367f02fa9"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/snazzy-light-Dcvd-ZyI.js",
+      "sha256": "8a11a912f1e4a84880c6a469284e4981e3faf144713ee2b6cc2772c34363fd6d"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/solarized-dark-BBl5y5sR.js",
+      "sha256": "9ae240b5e181847328428d96a336ed51f59d0cc5134deae5aa7f689b3a9baf1f"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/solarized-light-DW9b_AY8.js",
+      "sha256": "2477f95b790e0486582fdeb9738c9b5b4b8524e7d50a18f82bea6094131c3499"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/solidity-CSTQ0FCC.js",
+      "sha256": "47b0c26d0e125282583401baaa03ea2f6ad9b643b922024c16cecb69f800dcd7"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/solr-CwD7U71z.js",
+      "sha256": "9e9b3bf9c4c0a208effcc6283428b25a30e935eeefa58fc34629947c040beb7e"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/source-BBnh_UZi.avif",
+      "sha256": "76da2efcd588b17589955391962024e47d2667e8e84e4744acef11f89d5f0626"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/source-BF5gqZd_.avif",
+      "sha256": "217b1a6e6333d55ddb5b884da74d77cb794416553a3225637e321ed8594b1cc5"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/source-eX5wQyix.avif",
+      "sha256": "73b5cabd1b68af9fef692c6c80a3e9773afd62dc7de2af853bbb3fb7dab9c369"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/source-pMlGT7XI.avif",
+      "sha256": "dda274619f2efe5882dbf24566837bea0b87067b1bfcc147bf3e0ed63c121649"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/soy-BHaHgMUy.js",
+      "sha256": "d3a70a5615cc4c8add05c575782f1edfb0232c72bf5a62884f63aa927ba5cf87"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/sparql-DswowMAp.js",
+      "sha256": "78794c0ba638fdeea7ddb032bb9da066aa5657340aec085a33020ae720067ebf"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/sparql-DYskk2vE.js",
+      "sha256": "0573590f5173a33d2c988a89048fccb66706d9d2b1d1e01c42dd864c7b664422"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/splunk-DcGJXIDa.js",
+      "sha256": "c97c084f565d382d874fff4f9ecaed9bd599205dd86cc8d78b757e4d75cba805"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/spreadsheet-Bgtt3oLP.js",
+      "sha256": "453eff194470639d89a69e4cdf76b8e58773b5ab307554feed6d826b20a058c4"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/sql-BSrOzCRI.js",
+      "sha256": "dc7e3ba15d3123633b1a12391213fafb05a5abdcc9829498793b3d467a1d3fbd"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/sql-DzUuSofg.js",
+      "sha256": "779fa107c2bbcb9a15b0a8dab33975c7c8dd6dfdcd3fac3b830ec0a35bf288f2"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/ssh-config-Bk_I5wDR.js",
+      "sha256": "98d5b21d94386c995257ed655da23dea07dfde3b2436e470a67ce10a0ebfe973"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/stata-Dl7wDdBE.js",
+      "sha256": "b8c67944b31b79cc14d3a5d8c736a59b2e8b315632bfe3d39ab9cbcf62b1f569"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/stateDiagram-RAJIS63D-CBcpQr4M.js",
+      "sha256": "1326cd3a63b1be16465025464ce0767dd9f8d1ec810bfc3dc7c378bd93a57764"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/stateDiagram-v2-FVOUBMTO-BdFY1Ffs.js",
+      "sha256": "16a9baead6c000832209598db2cc971afd05cfc7bb3c9d9aad8c2ad5f65749bf"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/step-CesuDSSf.js",
+      "sha256": "d59f05dfc9e14fa0670e5ab780599a79b3966a3decded6c3b758aeb11f21f920"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/stex-B6LNC55o.js",
+      "sha256": "350838050b62d1c5f9821e86a9bb0ee45f0c61628eadc676c126359a41a5f2a5"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/stylus-BkS-boTH.js",
+      "sha256": "2d50cfa755d2ad2fc7302164938caf2b4421003f3c3fb9eb02314a230a514cd9"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/stylus-DXFa_2Jl.js",
+      "sha256": "f8199fb981a2a35b648cd1d20acaf92daf5438b5c8e48dc5ad50347145a4b7a4"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/surrealql-Bs3vUeKA.js",
+      "sha256": "b221df3a9470cbaa73a4b2d8ccc803e44b63f044b277c4a5b84b0e39fbb43564"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/svelte-BAOk4slW.js",
+      "sha256": "e4b92d6ba721ee87b3cb95a7ee217644bb2adb6c7e2a64102cce4b9c31c828d3"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/swift-DnZ2euNj.js",
+      "sha256": "76153a88fc90680a6cc07c7779cb41d778d49da875edba9a8aaf357824fab7b5"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/swift-FRZi1uvB.js",
+      "sha256": "526e30f380c612526c4f06a3085c392bda84ede2673fff42b1d2dd7a205377d4"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/synthwave-84-CoUef9sh.js",
+      "sha256": "10aab3636d2542aa3da5bed70acc854f1f8cd106384a83d2efdd7ff009c6f3c8"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/system-verilog-BcESSvRn.js",
+      "sha256": "959bc12f55be0a1f7f57c47a67373d78e0c633266aec0d773b89890a5030b30b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/systemd-DJPFjU02.js",
+      "sha256": "48faa01254687a9a0b5aa746892802433ab823dbe338a7b0a021735d5b31eab8"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/talonscript-CEEMXJTH.js",
+      "sha256": "62cfe2fe9230b15f7638a7a15e9fb6729c3612e71fcab41a3b5366f541c72d42"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/tasl-DfOr2qHi.js",
+      "sha256": "20b17cdae92f3282c3f042b47ffd1652137bf79b7decc4c0bb9e34232d2db8d0"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/tcl-CTsc4-t7.js",
+      "sha256": "8d2558cc7ae588dcf297818790c341adc51938d044ac445d7381912bde07d584"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/tcl-CUcaCdmq.js",
+      "sha256": "aa90d12c1490ebb77e68e6ce90fd35b0b312e5510f9753f1072c629c43e9c05c"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/templ-CSEiQwNm.js",
+      "sha256": "7f108576e39f378e32ef12b3d116b5021750d636708c61ceee4f800d81e6a6be"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/terraform-CeztUfUr.js",
+      "sha256": "82f826db968b1275cc0a4ff094062f7af7f02397a6c01995d45e16f18eea6890"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/tex-CcHKQ11y.js",
+      "sha256": "f998ddf63dffd50ec3010fb86aa1f93e2a15bcf4d0c492cb53e4d2d32259e7b2"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/textile-BnFpjsrl.js",
+      "sha256": "de9336373ae050e5a1ff954d462dd129d09f31c02951e27ede260fba1c054bad"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/tiddlywiki-CjprD-Qp.js",
+      "sha256": "5a80d8ec11cdad4503ab1462ed24e2bd7a1b09b787e815fbdfd4b7a454242fce"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/tiki-DK9DOeWn.js",
+      "sha256": "d307359b562484e7c25803b60349d4aa86e6351400f9612a3b78048f8451b847"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/time-DpuX4R4S.js",
+      "sha256": "f4637162e61a83cc945eddf051e410c81ae9ef68a2a224c5cbdf322d1b0d1f61"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/timeline-definition-YZTLITO2-DGsYX_yz.js",
+      "sha256": "eb086f1918c95dabbdc7dfd837ebeb5054726959eec3bcf1529acc74bca04782"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/tokyo-night-DjtLpAEY.js",
+      "sha256": "cde53a948571ff63c68d259a47a2ffd91d7046ebdadcb40efcef8151c61d12d0"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/toml-BOuWGMcf.js",
+      "sha256": "fddf8a802721005715a22746b28e0b87ac56a8f77caa41075f9142150e588fb3"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/toml-vHPzWDj6.js",
+      "sha256": "2cca0f21be25923c9ede611d75d1e655c932739a0146feeca1209056789c945c"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/treemap-KZPCXAKY-DZP_5iKa.js",
+      "sha256": "e7e7b55ce5c149aa7e843f1af1926a3aacabc2a748a2fce9efaffd7f63746db1"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/troff-E1bJ0PPL.js",
+      "sha256": "ea32a0126878e2cd1198e94abcee48cbcd2131de1d80195e1267ad5b0cab82bf"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/ts-tags-cG2hZuda.js",
+      "sha256": "1690235aa695e8af9f27ebf9eaa410c2faa5bafd332c7d8ec89058a0eb635318"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/tsv-ChRVFvMy.js",
+      "sha256": "4771d84e193a9b8421fda073f6afafa0422450958e61defb82ce2d2ec264dd04"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/tsx-CmGGo4Hm.js",
+      "sha256": "92b7d28feb696b9e587f914d4adf0b76c5c7f2028aa734698d987265af9371d7"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/ttcn-cfg-Dc39-fIP.js",
+      "sha256": "743ddd5c09b350d33149497d4177895083f584712019a20e88a3c9ded8b62fb9"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/ttcn-tKd4HLu4.js",
+      "sha256": "b9af59a0022981562d7482bf0125dc1b6bfdbb40ea1214807db4abbcb783059b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/turtle-BnC7StHY.js",
+      "sha256": "02d498a8c754e359966e6d708cbb4db98e16467cb007a5c4a27ca30bba310cb4"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/turtle-Dq7-1WAf.js",
+      "sha256": "7e505e9051b7e3c8ecebea47e4fd43b1e6b2b6ccd7334fd25fc267dc82ee0e4d"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/twig-CDYLbMhD.js",
+      "sha256": "96672f7c76bac0da7196f4d0b4674b8d8ab0a4e0039244598b04b0897a3aa266"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/typescript-CP6ECzON.js",
+      "sha256": "26fcdf0a8b3fdb85dff7704123ad38a40eb060f106d3bbaa122c5795a930a511"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/typespec-CkDVVIcK.js",
+      "sha256": "96cdc066d5db34c0aa7c17c603998dd3c60c64e6d1b2cff87cfb456d319768e3"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/typst-XYLFxYau.js",
+      "sha256": "4024e185a03c1fe220ca7c3616de18cfa6974be636a8e070fdd4c95b352d08b4"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/v-BSYXvR4g.js",
+      "sha256": "333f09036d0992ca16b57bb2049d32ae91058679dd8a96ad7d015907d45c96f0"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/vala-qJa5rry9.js",
+      "sha256": "849590efe084105d34034ce438d32bd120de455e2dd54e62db2b0ee142677649"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/vb-Bzg9rspf.js",
+      "sha256": "796e432cb545fe00c683c1f4e605ae6d6d6edc08689ef887c1767dee555abf53"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/vb-Dp90gtsv.js",
+      "sha256": "049ed5cc9eb5958257497e1c018cd8aa6ff558760d7d9bca5d0d84db8573e19f"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/vbscript-CI6_mxxU.js",
+      "sha256": "61890fbc79e2fa6eed6ec2f556916d57712d58fa394f140b09af6c50fece5855"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/velocity-BwIZK1TH.js",
+      "sha256": "630eef603fbca377c8e48679bf30198dce1f27d1a72123bdd72f1eada28f4bbd"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/vennDiagram-LZ73GAT5-DQcMocmO.js",
+      "sha256": "88b12d4828a581f85744130dd8242007b930e315cc7411ce04c06dc3362442b1"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/verilog-CCb_iTfF.js",
+      "sha256": "17e0347e1a872bbc53d07eb9a2a8932764bf28fa5156d772fab58be37eaab0e1"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/verilog-DDCYnHN8.js",
+      "sha256": "a38956f338156db5f9b6fd4644f88cd1f81d7dc726a78b882b1ee62f0e70f45a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/vesper-4Q1cEwPL.js",
+      "sha256": "0c03f5d38e869c3e5d1ac4e0f18970ecec16288a821ef0fa7a4c9ae423e1dfaa"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/vhdl-DCkMIyT9.js",
+      "sha256": "b0e803173743715af902fa2508c4da88a2e97f9b4782f33c6064a17db505bc05"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/vhdl-DMqk4T2s.js",
+      "sha256": "c82c52fc077d4829a4320c0e48e02797e06f9074e29445798082add211f297a4"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/viml--FINbfoq.js",
+      "sha256": "809ed4fd8cf1f5adf1ce608626468874c7dc2507a329b4736248762311d243b1"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/vitesse-black-BqNLki8b.js",
+      "sha256": "88fa50fffe8dd1987d30b8b9cc960d31f79534e20b772d2a64e1f334c82243c2"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/vitesse-dark-jJ32WhwH.js",
+      "sha256": "bcc9762b8292c276c736c4baaa4332a41f400a197da98e517b8f2f719a0d4cdf"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/vitesse-light-476zM4e6.js",
+      "sha256": "3125bf5c3ffc7f438f95881241ff17830a39a2c76905bc41f4ab4a37ad3ace59"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/vue-html-DhreShjd.js",
+      "sha256": "1f0decc2c98eaa042332babd62d01bdc9ec3923cc97222ba470bf49aedd3199b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/vue-K-7Ga-y8.js",
+      "sha256": "e53985b7ceda92eb8fb1733b85f8adef69e6483221c45ea28c6bfceaf0a5db1d"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/vue-vine-rMIwOpFf.js",
+      "sha256": "b7646182cea98ebe5533519ae906432a0c7e1ebe38e1bd0326aa165a08eeafb9"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/vyper-DP4whl13.js",
+      "sha256": "cde8049b43abf4af33de82c2e27d2476ad4437e0b611db5f623518a117a5358f"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/wasm-BBh6f151.js",
+      "sha256": "3c0cbdba88ff25607d246e55f29ca3e3500477dbdef280c44bf8b2b9c73455d6"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/wasm-DDgzZJey.js",
+      "sha256": "bae38010f6d3671be9e7fa7472f11a09a61d88e31e68ba42be56d7973a97df7f"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/webidl-BTLTThCm.js",
+      "sha256": "07aaaed4cf1b1adc2d5f705b656e0e3a4b0d4bddaf4ad998e488d3ca3450a290"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/wenyan-BdqozpMZ.js",
+      "sha256": "cdeff739f9e09cd27b24120df6437593c438fec10fbfe12bc23c74b63aa4d02c"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/wgsl-Vo-hHVWH.js",
+      "sha256": "2bcdbf7bf05f76d94a7718c5771cbb0570dda1f6c7cc2136b629e9d5e001daf0"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/wikitext-BDjE6pmL.js",
+      "sha256": "cca8ac1cdbad3b183eb3fdb98028349dcd6f4f5663808716f06ce3d291e25b43"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/wit-C_nQzOkY.js",
+      "sha256": "3729fe09ffe8d2948efb428ba1ccb05a2d95b88b36354a606f8a8088923e8b4e"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/wolfram-CRmjUoI4.js",
+      "sha256": "afa6a8b23b6094f77b679056d6ae28149749952655cc4781a76ee9fcae79ce32"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/xml-BMzZeaqs.js",
+      "sha256": "381e6a40469ff09288fd134658d09d7122639a23ba8f610e2076c2e5747e718e"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/xquery-BrBUuxMR.js",
+      "sha256": "96459fe2892ccdce0b57439307eeeaa9d82fd2663f2a0f4364a849dba3374e74"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/xsl-CnwVr_6q.js",
+      "sha256": "dab5af649271f3c87a1a4557a5df77bb2acffdc7b883f4df87861c73432ebe27"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/xychartDiagram-JWTSCODW-OVwmb5ed.js",
+      "sha256": "d04b0e5f79eade2514e228069f04222cd6c0f4b07e318c28210be7dd48babb17"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/yacas-b5lAVEIl.js",
+      "sha256": "95c453f73dd9a218385c018b692c4af134b02d5131bea8dd957ca887a5cdd8bd"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/yaml-B_vW5iTY.js",
+      "sha256": "4331f98e247633711828c78f79926e688753c7775ade7b844955d03b739baab1"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/z80-BZV19vqv.js",
+      "sha256": "51594b00905d1522d2f64113beae4943577338f0ff5af4503dd9ee49dc3957eb"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/zcode-BnwZhfO-.png",
+      "sha256": "edd87a182097389b0f59c07f8de283dbe433c9d37cd6e9a2a372611516ab81eb"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/zenscript-DFINJL6j.js",
+      "sha256": "cf6f06cc1fb8315a86f9c2e4f9c5264ef4f1908db96acfb3e9370433f9486e42"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/assets/zig-CS4FMAZp.js",
+      "sha256": "c549bfe66e37f54bd4f96caf995c96915a719b9dfd0bfc68a25785142d4e32c4"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/product/out/index.html",
+      "sha256": "46c4793f9a73c1d3ff3b00b6cd82ad8f016a0bf65d343af3c7078ca8540355df"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/drafts/rust-temp/rovai-web-native-reference-0934aeff5d17a38aeb9450326b24e6501a746b09f463693ee356c05c56e0d551/archive.bin",
+      "sha256": "5bbe9c0e6e37560f220280c33bc1dc40c291f56381b5a6e16081bb9d732c6f7b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/finalize-records.mjs",
+      "sha256": "f9ccf0a0beb1334bc882a38eefea971b7126cba0644b5244df595b00846061ab"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/fix-driver.mjs",
+      "sha256": "114bc28963789a510300fcfe0512b5c67a4c47cf2a68a1d618e3ecfdd8e9085c"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/index.html",
+      "sha256": "7c75b40cad7bf91e9e548e4c0152a1ce687872085a50ee978a79d6059d87f443"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/codegraph-sync-final.txt",
+      "sha256": "4b9b4dfc6ad047b4e7d6a71430d5aed83670e8e1075c013686f1c15015a29ac9"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/codegraph-sync-first.txt",
+      "sha256": "81c5de01d36a02632f7873b14443b00ee65a1f6d9501d7f2bdbedd20b69efd6e"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/codegraph-sync-second.txt",
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/compiler-environment.json",
+      "sha256": "611a07ca086f070e319b6291d9d33d4b942b18dda4b9feaf2eda86ad29d99fa0"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/docs-command.txt",
+      "sha256": "da5bfa835cba4d35d148ff8d79156e841c0fa3c9d9f36434f202da2238d1941a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/docs-decisions.txt",
+      "sha256": "bd57f1c3a9c4155f59e96b05b1d0fc29d3306585b8defa7e026134bc90302c0a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/docs-tests.txt",
+      "sha256": "4ff4bbf0cb270b03d81f020ce496d8fe6a76a36543dc732db192132917f203c5"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/docs-version.txt",
+      "sha256": "ef767267475d9fde95f908acafe24215239740f3a2af5ddc98f4ef0cd5cd2528"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/finalize-records.txt",
+      "sha256": "6f36eae65acc71f9a0a67c3dd15fc04a6d0ee42504400c85b240261b66a5c030"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/prepare-ui.txt",
+      "sha256": "164d86aa7d7977e889fca47a82c002d3e386431fabf008298f61eb0208b0faf1"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/renderer-final.txt",
+      "sha256": "c6cfba5fbf7ba806a19f7d482f5e05d2f0d5196bf28d278b9670076004347c9c"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/renderer-first.txt",
+      "sha256": "b76c495b1cee5cc5f973c823ec2bae020c1f1dfb7c59156a2ba5da3dde7e9fd6"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/renderer-second.txt",
+      "sha256": "fbf4527e5cd8c191ecec26947ec04bb29f32dc4caa3a8f9aff5ae07c2c5c0309"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/rust-command-final.txt",
+      "sha256": "fcbc864483b328b8e57c6db245c104a922130265945dcc34f06ed8f16b39804e"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/rust-command-metadata.txt",
+      "sha256": "ff54c5c9d8c7d0f6c283eb9eda5ecf8fd2db6b39c5b184512268280b9c270640"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/rust-command-second.txt",
+      "sha256": "465123221956b0a6d43e08e6fe76a09496542799daa5af7cc60724a248bec26d"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/rust-command-third.txt",
+      "sha256": "97b6bccffb3e4168c88b95a264664bb43312f9c8b53f4a8cbeede7c59d75e931"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/rust-list-final.txt",
+      "sha256": "f3f8809cb6185aefbe7b68571bad0f9c4c0d0c364a1f5a433564d0ca1ae3dc36"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/rust-list-metadata.txt",
+      "sha256": "f2f11ed7c299c19c4d4e5667b40e25eb197bad0de888898ae75ce18cc08b66ea"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/rust-list-second.txt",
+      "sha256": "fd4fb2ef212e7cac881cc2cd04a298509b7316f96028cd8d7c808835c9e54b65"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/rust-list.txt",
+      "sha256": "4ef000e3f7aaf0ad336ef5dc787788631069f3d0c61d92d7b9aebcfc8534b751"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/rust-tests.txt",
+      "sha256": "fa9804a9be974f431678f0b516a3adb2e4dd3c900070ba775abf4b7c671d29aa"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/source-audit-command.txt",
+      "sha256": "4946ea0e5b4eaff93272846956cded83c4ddbc61d250198e57279c0dc1efd89e"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/source-audit-eol-failure.txt",
+      "sha256": "fb8e3f604e851224b94fc8a397bd24bc005a2aff2103930c69ca0fdf6e0b13ed"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/source-audit.json",
+      "sha256": "7d56478d10b863e434d74b276eb0e37ec65ffc916306bc4e6ecfe61a05e9861d"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/tests.txt",
+      "sha256": "f0501318593d45d034c16c52a22599a2c4486c1c642c23817159736e95b95a8d"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/typecheck.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/ui-result.json",
+      "sha256": "4d9a9be7f1074e214d04fe36a797cecac13509f20d2b69679799e8eb82130f3a"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/update-records.txt",
+      "sha256": "e0d52d9b94562ba607827e3c76fbeeca46e0f093b0bc80b827e2796cc7c9fc3b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/verify-final.txt",
+      "sha256": "947eed522411450a6877231cdc328d03adbff0a13e0d9921daa105cec7649437"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/verify-first.txt",
+      "sha256": "6c10d7d5c80fc978882a25c5de21bd7467bf1bda707dac7db5e4c56f80688f7d"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/logs/verify-second.txt",
+      "sha256": "5b56edae5ecc784a0ca8d384d7e15612c0f1a9b3d7c8512926ab7c3ff6e5a0b7"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/main.cjs",
+      "sha256": "ec8257ba0bf030e98c8dba688e4722e4ba870d56a354d3d04416d724ee857444"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/prepare-ui.mjs",
+      "sha256": "978bdb91ba7036cf77b38bc7ed4c0a778224fb5bf94214fe5dbf91d052bfa9e6"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/reference-host.tsx",
+      "sha256": "4b6022cf4fde19ca7c613c7ef680a914b894da3a239698139e08bf72f2e9f073"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/render-ui.mjs",
+      "sha256": "93da251876208c6fcfc4884a68b731c6bfca7491b8a8ab111d379d931001fd75"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/renderer.tsx",
+      "sha256": "cdab0895b769931558f8bfd3a865a7f516e50e08e2b164c9838376e2788a30e6"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/run-built.mjs",
+      "sha256": "17ea99fc464432e7b72d88bfebbbca95fca113ba8d53662c06b4e942eefe9361"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/update-records.mjs",
+      "sha256": "24455f68cccb7816b1d57b865d36d63f817ab35fb0d92409e115e2a3c8be4334"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/verify-docs.mjs",
+      "sha256": "493cbcb1e3f4c1fdf8a49098501e0aa9215c343cac88eabd13c536b1ecccb56b"
+    },
+    {
+      "path": "file/I04目录与系统文件操作/verify.mjs",
+      "sha256": "83d1475e4c22ff38a36dbefec4b8da94785af0cefd881aa9a5146aabe3a95eb8"
+    }
+  ],
+  "artifact_scope": "Scripts, logs, compiled isolated renderer, 4 reviewed original-menu screenshots, complete binary download, isolated Rust FS fixture; profiles and rebuildable compiler binary excluded",
+  "push": false,
+  "actions_triggered": false,
+  "main_merged": false,
+  "paid_models": false,
+  "customer_action_required": false,
+  "goal_service": "active_verified_by_get_goal"
+}

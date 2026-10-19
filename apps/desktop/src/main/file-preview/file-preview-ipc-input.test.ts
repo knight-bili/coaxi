@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   parseOpenFilePreviewRequest,
+  parseNativeFileReferenceRequest,
   parseRestoreFilePreviewRequest,
   parseRetentionState
 } from './file-preview-ipc-input'
@@ -15,6 +16,17 @@ const missionAttachmentRequest = {
     attachmentRefId: '8b85752a-76a5-4b9d-92d8-a70b6285a0d0'
   }
 }
+
+it('admits only explicit native reference actions and rejects client-supplied authority fields', () => {
+  const source = { kind: 'native_child_file', threadId: missionAttachmentRequest.threadId, readId: 'reader', rawReference: './src' }
+  expect(parseNativeFileReferenceRequest({ source, action: 'inspect' })).toEqual({ source, action: 'inspect' })
+  for (const input of [
+    { source, action: 'execute' }, { source, action: 'open', root: '/guess' },
+    { source: { ...source, actor: 'system' }, action: 'open' },
+    { source: { ...source, rootPath: '/guess' }, action: 'inspect' },
+    { source: { ...source, kind: 'camp_workspace' }, action: 'reveal' }
+  ]) expect(() => parseNativeFileReferenceRequest(input)).toThrow()
+})
 
 const privateBase = {
   threadId: missionAttachmentRequest.threadId,

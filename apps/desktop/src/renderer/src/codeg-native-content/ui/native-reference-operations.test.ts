@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
-import type { FilePreviewApi, ResolvedFilePreview } from '@contracts'
-import { inspectNativeFileActions, performNativeFileAction } from './native-reference-operations'
+import type { FilePreviewApi, ResolvedFilePreview, NativeFileReferenceInfo } from '@contracts'
+import { activateNativeFileReference, inspectNativeFileActions, performNativeFileAction } from './native-reference-operations'
 
 const file = (extra: Partial<ResolvedFilePreview> = {}): ResolvedFilePreview => ({ handleId: 'handle', reopenToken: 'never-persist', previewKey: 'key', fileName: 'a.ts', displayPath: '/source/src/a.ts', pathPresentation: 'external', sourceRelativePath: 'src/a.ts', size: 1, mime: 'text/plain', extension: '.ts', kind: 'code', hasExternalUpdate: false, contentVersion: { size: 1, mtimeMs: 1 }, contentGeneration: 'generation-1', capabilities: ['read'], ...extra })
 function fixture() {
@@ -11,6 +11,63 @@ function fixture() {
   return { api, owner: { api: api as unknown as FilePreviewApi, source: { threadId: 'thread', readId: 'exact-reader' }, current: () => active }, close: () => { active = false } }
 }
 describe('Core-scoped native file menu operations', () => {
+  function currentReference() {
+    const state = fixture(), reference: NativeFileReferenceInfo = { fileName: 'src', kind: 'directory', previewable: false, pathPresentation: 'external', sourceRelativePath: 'src', absolutePath: '/captured/src' }
+    const nativeReference = vi.fn(async (input: { action: string }) => ({ ok: true as const, value: input.action === 'inspect'
+      ? { kind: 'reference' as const, reference } : { kind: 'performed' as const } }))
+    state.owner.api.nativeReference = nativeReference
+    return { ...state, nativeReference, reference }
+  }
+  it('inspects a directory without preview opens and copies only freshly issued paths', async () => {
+    const { api, owner, nativeReference, reference } = currentReference(), copy = vi.fn(async () => true)
+    expect(await inspectNativeFileActions(owner, './src')).toMatchObject({ kind: 'directory', capabilities: [], sourceRelativePath: 'src' })
+    reference.absolutePath = '/captured/renamed-src'
+    await performNativeFileAction(owner, './src', 'absolute', copy)
+    expect(copy).toHaveBeenCalledWith('/captured/renamed-src'); expect(nativeReference).toHaveBeenCalledTimes(2)
+    expect(api.open).not.toHaveBeenCalled(); expect(api.release).not.toHaveBeenCalled()
+  })
+  it('keeps ordinary file clicks on the preview and uses explicit native opening for directories/system files', async () => {
+    const { owner, reference, nativeReference } = currentReference(), preview = vi.fn(async () => {})
+    await activateNativeFileReference(owner, './src', preview)
+    expect(nativeReference).toHaveBeenLastCalledWith({ source: { kind: 'native_child_file', ...owner.source, rawReference: './src' }, action: 'open' })
+    expect(preview).not.toHaveBeenCalled()
+    reference.previewable = true
+    await activateNativeFileReference(owner, './a.ts', preview)
+    expect(preview).toHaveBeenCalledTimes(1)
+  })
+  it('releases a transient server download grant during inspection and uses a new one for the selection', async () => {
+    const { owner, api, nativeReference, reference } = currentReference()
+    Object.assign(reference, { kind: 'file', download: { handleId: 'metadata-only', contentGeneration: 'old' } })
+    const metadata = await inspectNativeFileActions(owner, './archive.bin')
+    expect(metadata).not.toHaveProperty('download'); expect(api.release).toHaveBeenCalledWith({ handleId: 'metadata-only' })
+    Object.assign(reference, { download: { handleId: 'fresh-download', contentGeneration: 'current' } })
+    await performNativeFileAction(owner, './archive.bin', 'download', vi.fn())
+    expect(api.download).toHaveBeenCalledWith({ handleId: 'fresh-download', expectedGeneration: 'current' })
+    expect(api.release).toHaveBeenLastCalledWith({ handleId: 'fresh-download' }); expect(nativeReference).toHaveBeenCalledTimes(2)
+  })
+  it('downloads non-previewable remote files on explicit left click instead of asking the server to run a program', async () => {
+    const { owner, reference, api, nativeReference } = currentReference(), preview = vi.fn(async () => {})
+    Object.assign(reference, { kind: 'file', download: { handleId: 'binary', contentGeneration: 'current' } })
+    await activateNativeFileReference(owner, './archive.bin', preview)
+    expect(preview).not.toHaveBeenCalled(); expect(api.download).toHaveBeenCalledWith({ handleId: 'binary', expectedGeneration: 'current' })
+    expect(nativeReference.mock.calls.every(([input]) => input.action === 'inspect')).toBe(true)
+    expect(api.release).toHaveBeenCalledTimes(2)
+  })
+  it('rejects directory downloads and opaque paths without retaining any metadata grant', async () => {
+    const { owner, reference, api } = currentReference(), copy = vi.fn(async () => true)
+    await expect(performNativeFileAction(owner, './src', 'download', copy)).rejects.toThrow('download_unavailable')
+    reference.pathPresentation = 'file_name_only'
+    await expect(performNativeFileAction(owner, './src', 'absolute', copy)).rejects.toThrow('copy_unavailable')
+    expect(copy).not.toHaveBeenCalled(); expect(api.download).not.toHaveBeenCalled()
+  })
+  it('drops a late reference grant after an owner change and releases its server handle', async () => {
+    const { owner, close, api } = currentReference()
+    let finish!: (value: Awaited<ReturnType<NonNullable<FilePreviewApi['nativeReference']>>>) => void
+    owner.api.nativeReference = vi.fn(() => new Promise<Awaited<ReturnType<NonNullable<FilePreviewApi['nativeReference']>>>>(resolve => { finish = resolve }))
+    const pending = activateNativeFileReference(owner, './bin', vi.fn()); close()
+    finish({ ok: true, value: { kind: 'reference', reference: { fileName: 'bin', kind: 'file', previewable: false, pathPresentation: 'external', download: { handleId: 'late', contentGeneration: 'g' } } } })
+    await expect(pending).rejects.toThrow('scope_changed'); expect(api.release).toHaveBeenCalledWith({ handleId: 'late' })
+  })
   it('inspects exact source and releases its temporary handle without retaining IDs in menu metadata', async () => {
     const { api, owner } = fixture(), metadata = await inspectNativeFileActions(owner, './src/a.ts:2')
     expect(api.open).toHaveBeenCalledWith({ kind: 'native_child_file', threadId: 'thread', readId: 'exact-reader', rawReference: './src/a.ts:2' })

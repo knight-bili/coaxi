@@ -209,6 +209,15 @@ export function parseOpenFilePreviewRequest(value: unknown): OpenFilePreviewRequ
   }
 }
 
+export function parseNativeFileReferenceRequest(value: unknown): import('@contracts').NativeFileReferenceRequest {
+  const input = record(value)
+  if (Object.keys(input).some(key => !['source', 'action'].includes(key))
+    || !['inspect', 'reveal', 'open'].includes(input.action as string)) throw new Error('Unsupported native reference action')
+  const source = parseOpenFilePreviewRequest(input.source)
+  if (source.kind !== 'native_child_file') throw new Error('Unsupported native reference source')
+  return { source, action: input.action as 'inspect' | 'reveal' | 'open' }
+}
+
 export function parseRestoreFilePreviewRequest(value: unknown): RestoreFilePreviewRequest {
   const request = parseOpenFilePreviewRequest(value)
   if (request.kind === 'child_of_handle' || request.kind === 'authorized_root' || request.kind === 'native_child_file') {

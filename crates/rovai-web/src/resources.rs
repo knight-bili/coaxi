@@ -30,6 +30,7 @@ struct Handle {
     anchor_path: PathBuf,
     root: PathBuf,
     allow_children: bool,
+    can_show_path: bool,
     restore: Option<Value>,
     project_root: Option<PathBuf>,
     name: String,
@@ -76,12 +77,137 @@ struct ResolvedSource {
     root: PathBuf,
     name: String,
     allow_children: bool,
+    can_show_path: bool,
+}
+
+fn validate_native_file_target(source: &Value, target: &Value) -> Result<()> {
+    let read_id = source["readId"]
+        .as_str()
+        .filter(|id| !id.is_empty())
+        .context("source_not_authorized")?;
+    ensure!(
+        target["threadId"] == source["threadId"]
+            && target["sourceKind"] == "native_child_file"
+            && target["sourceIdentity"] == format!("native-child:{read_id}")
+            && target["rawReference"] == source["rawReference"],
+        "source_not_authorized"
+    );
+    Ok(())
+}
+
+async fn native_reference_metadata(
+    resolved: &ResolvedSource,
+    permit: &Arc<tokio::sync::OwnedSemaphorePermit>,
+) -> Result<(Value, Option<content::Content>)> {
+    let metadata = tokio::fs::metadata(&resolved.path)
+        .await
+        .context("file_not_found")?;
+    ensure!(metadata.is_dir() || metadata.is_file(), "not_regular_file");
+    ensure!(
+        !metadata.is_dir() || resolved.allow_children,
+        "source_not_authorized"
+    );
+    let mut reference = json!({"fileName":resolved.name,"kind":if metadata.is_dir() {"directory"} else {"file"},
+        "previewable":false,"pathPresentation":"external","absolutePath":resolved.path,
+        "sourceRelativePath":resolved.path.strip_prefix(&resolved.root)?.to_string_lossy().replace('\\', "/")});
+    if reference["sourceRelativePath"] == "" {
+        reference["sourceRelativePath"] = json!(".");
+    }
+    if !resolved.can_show_path {
+        reference["pathPresentation"] = json!("file_name_only");
+        let object = reference.as_object_mut().expect("reference");
+        object.remove("absolutePath");
+        object.remove("sourceRelativePath");
+    }
+    let content = if metadata.is_file() {
+        let content =
+            content::read(&resolved.path, Selection::Metadata, Some(permit.clone())).await?;
+        reference["previewable"] =
+            json!(image_mime(&content.prefix).is_some() || (content.text && !content.has_nul));
+        Some(content)
+    } else {
+        None
+    };
+    Ok((reference, content))
+}
+
+async fn native_reference(
+    state: &WebState,
+    client: &DraftClient,
+    session: &Arc<Session>,
+    request: Value,
+    permit: &Arc<tokio::sync::OwnedSemaphorePermit>,
+) -> Result<Value> {
+    let input = request.as_object().context("source_not_authorized")?;
+    ensure!(
+        input.len() == 2
+            && request["action"] == "inspect"
+            && request["source"]["kind"] == "native_child_file",
+        "source_not_authorized"
+    );
+    let source = &request["source"];
+    let resolved = resolve(state, client, source).await?;
+    let (mut reference, content) = native_reference_metadata(&resolved, permit).await?;
+    let pending = if let Some(content) = content {
+        let id = new_token()?;
+        reference["download"] = json!({"handleId":id,"contentGeneration":content.generation});
+        Some((
+            id,
+            Handle {
+                client: client.id().to_owned(),
+                session: session.clone(),
+                source: source.clone(),
+                path: resolved.path.clone(),
+                anchor_path: resolved.path.clone(),
+                root: resolved.root.clone(),
+                allow_children: resolved.allow_children,
+                can_show_path: resolved.can_show_path,
+                restore: None,
+                project_root: None,
+                name: resolved.name.clone(),
+                preview_token: new_token()?,
+                token: new_token()?,
+                version: content.version,
+                analysis: content.analysis,
+            },
+        ))
+    } else {
+        None
+    };
+    let current = resolve(state, client, source).await?;
+    ensure!(
+        current.path == resolved.path
+            && current.root == resolved.root
+            && current.can_show_path == resolved.can_show_path
+            && current.allow_children == resolved.allow_children,
+        "source_not_authorized"
+    );
+    if let Some((id, handle)) = pending {
+        let mut handles = state.files.0.lock().expect("file registry poisoned");
+        ensure!(
+            handles.len() < 128
+                && handles
+                    .values()
+                    .filter(|handle| handle.client == client.id())
+                    .count()
+                    < 32,
+            "too_many_open_files"
+        );
+        handles.insert(id, handle);
+    }
+    Ok(json!({"ok":true,"value":{"kind":"reference","reference":reference}}))
 }
 
 fn is_core_file_source_kind(kind: Option<&str>) -> bool {
     matches!(
         kind,
-        Some("camp_workspace" | "message_reference" | "run_evidence" | "run_activity_file")
+        Some(
+            "camp_workspace"
+                | "message_reference"
+                | "run_evidence"
+                | "run_activity_file"
+                | "native_child_file"
+        )
     )
 }
 
@@ -187,6 +313,7 @@ async fn resolve(state: &WebState, client: &DraftClient, source: &Value) -> Resu
                 .context("source_not_authorized")?
                 .to_owned(),
             allow_children: true,
+            can_show_path: true,
         });
     }
     ensure!(
@@ -195,6 +322,9 @@ async fn resolve(state: &WebState, client: &DraftClient, source: &Value) -> Resu
     );
     let target = core_value(state, client, "filePreview.resolveSource", source.clone()).await?;
     ensure!(target["kind"] == "file_target", "source_not_authorized");
+    if source["kind"] == "native_child_file" {
+        validate_native_file_target(source, &target)?;
+    }
     let mut root = tokio::fs::canonicalize(
         target["rootPath"]
             .as_str()
@@ -216,6 +346,10 @@ async fn resolve(state: &WebState, client: &DraftClient, source: &Value) -> Resu
         .await
         .context("file_not_found")?;
     if !path.starts_with(&root) {
+        ensure!(
+            source["kind"] != "native_child_file",
+            "outside_authorized_root"
+        );
         // Like Desktop, an exact Core-authorized external file uses its parent
         // only as an ephemeral child/watch boundary, never a persistent grant.
         ensure!(
@@ -234,13 +368,17 @@ async fn resolve(state: &WebState, client: &DraftClient, source: &Value) -> Resu
         root,
         name,
         allow_children: target["allowChildren"] == true,
+        can_show_path: target["canShowPath"] != false,
     })
 }
 
 async fn reauthorize(state: &WebState, client: &DraftClient, handle: &Handle) -> Result<()> {
     let source = resolve(state, client, &handle.source).await?;
     ensure!(
-        source.path == handle.anchor_path && source.root == handle.root,
+        source.path == handle.anchor_path
+            && source.root == handle.root
+            && (handle.source["kind"] != "native_child_file"
+                || source.can_show_path == handle.can_show_path),
         "source_not_authorized"
     );
     let path = tokio::fs::canonicalize(&handle.path)
@@ -278,6 +416,15 @@ fn preview_key(handle: &Handle) -> String {
     key.update(b"rovai-web-preview-v1\0");
     key.update(handle.client.as_bytes());
     key.update(handle.path.as_os_str().as_encoded_bytes());
+    if handle.source["kind"] == "native_child_file" {
+        key.update(b"\0native-child:");
+        key.update(
+            handle.source["readId"]
+                .as_str()
+                .unwrap_or_default()
+                .as_bytes(),
+        );
+    }
     format!("web:{:x}", key.finalize())
 }
 
@@ -353,6 +500,22 @@ async fn metadata(
     let mut result = json!({"handleId":handle_id,"reopenToken":handle.token,"previewKey":preview_key,
         "displayPath":format!("服务器：{display_path}"),"absolutePath":handle.path,"pathPresentation":presentation,"fileName":handle.name,"size":content.size,"mime":mime,"extension":extension,"kind":kind,
         "hasExternalUpdate":false,"contentVersion":version,"contentGeneration":generation,"capabilities":["read","download"]});
+    if handle.source["kind"] == "native_child_file" {
+        result["sourceRelativePath"] = json!(
+            handle
+                .path
+                .strip_prefix(&handle.root)?
+                .to_string_lossy()
+                .replace('\\', "/")
+        );
+    }
+    if handle.source["kind"] == "native_child_file" && !handle.can_show_path {
+        result["pathPresentation"] = json!("file_name_only");
+        result["displayPath"] = json!(handle.name);
+        let object = result.as_object_mut().expect("file metadata");
+        object.remove("absolutePath");
+        object.remove("sourceRelativePath");
+    }
     if let Some(restore) = &handle.restore {
         result["restoreRequest"] = restore.clone();
     }
@@ -413,6 +576,9 @@ async fn file_operation(
     if body.action == "attachmentLocation" {
         return core_value(state, client, "camp.attachments.location", request).await;
     }
+    if body.action == "nativeReference" {
+        return native_reference(state, client, session, request, &permit).await;
+    }
     if body.action == "updates" {
         let handles: Vec<_> = state
             .files
@@ -449,6 +615,10 @@ async fn file_operation(
         );
     }
     if matches!(body.action.as_str(), "open" | "restore") {
+        ensure!(
+            body.action != "restore" || request["kind"] != "native_child_file",
+            "source_not_authorized"
+        );
         if request["kind"] == "run_evidence" && request["action"] == "review" {
             let value = core_value(state, client, "filePreview.resolveSource", request).await?;
             ensure!(value["kind"] == "evidence_review", "source_not_authorized");
@@ -494,7 +664,9 @@ async fn file_operation(
             // Match Desktop: only project children get a durable independent
             // restore request. External children retain their exact parent source.
             let workspace = json!({"kind":"camp_workspace","threadId":parent.source["threadId"],"rawReference":"."});
-            let restore = if let Ok(root) = resolve(state, client, &workspace).await {
+            let restore = if parent.source["kind"] == "native_child_file" {
+                None
+            } else if let Ok(root) = resolve(state, client, &workspace).await {
                 path.strip_prefix(&root.root).ok().and_then(|relative| relative.to_str()).map(|relative|
                     json!({"kind":"camp_workspace","threadId":parent.source["threadId"],"rawReference":relative}))
             } else {
@@ -515,7 +687,10 @@ async fn file_operation(
             let resolved = resolve(state, client, &request).await?;
             let workspace =
                 json!({"kind":"camp_workspace","threadId":request["threadId"],"rawReference":"."});
-            let project_root = if request["kind"] == "attachment" {
+            let project_root = if matches!(
+                request["kind"].as_str(),
+                Some("attachment" | "native_child_file")
+            ) {
                 None
             } else {
                 resolve(state, client, &workspace)
@@ -527,11 +702,12 @@ async fn file_operation(
                 project_root,
                 client: client.id().to_owned(),
                 source: request.clone(),
-                restore: Some(request),
+                restore: (request["kind"] != "native_child_file").then_some(request),
                 anchor_path: resolved.path.clone(),
                 path: resolved.path,
                 root: resolved.root,
                 allow_children: resolved.allow_children,
+                can_show_path: resolved.can_show_path,
                 name: resolved.name,
                 preview_token: new_token()?,
                 session: session.clone(),
@@ -541,6 +717,9 @@ async fn file_operation(
             }
         };
         let (file, analysis) = metadata(&handle, &id, &permit).await?;
+        if handle.source["kind"] == "native_child_file" {
+            reauthorize(state, client, &handle).await?;
+        }
         handle.analysis = Some(analysis);
         handle.version = file["contentVersion"].clone();
         let mut handles = state.files.0.lock().expect("file registry poisoned");
@@ -593,6 +772,9 @@ async fn file_operation(
             "source_not_authorized"
         );
         let (value, analysis) = metadata(&handle, &id, &permit).await?;
+        if handle.source["kind"] == "native_child_file" {
+            reauthorize(state, client, &handle).await?;
+        }
         if let Some(current) = state
             .files
             .0
@@ -626,10 +808,13 @@ async fn file_operation(
         "readHtml" | "readText" => Selection::All,
         _ => anyhow::bail!("source_not_authorized"),
     };
-    let known = handle.analysis.filter(|analysis| {
+    let known = handle.analysis.clone().filter(|analysis| {
         Some(analysis.generation.as_str()) == request["expectedGeneration"].as_str()
     });
     let content = content::read_known(&handle.path, selection, known, Some(permit)).await?;
+    if handle.source["kind"] == "native_child_file" {
+        reauthorize(state, client, &handle).await?;
+    }
     let (bytes, version, generation) = (content.bytes, content.version, content.generation);
     ensure!(
         Some(generation.as_str()) == request["expectedGeneration"].as_str(),
@@ -774,6 +959,9 @@ pub async fn binary(
         } else {
             image_mime(&bytes).context("decode_failed")?
         };
+        if handle.source["kind"] == "native_child_file" {
+            reauthorize(&state, &client, &handle).await?;
+        }
         let mut response = ([(header::CONTENT_TYPE, mime)], bytes).into_response();
         response
             .headers_mut()
@@ -949,11 +1137,94 @@ mod tests {
             "message_reference",
             "run_evidence",
             "run_activity_file",
+            "native_child_file",
         ] {
             assert!(is_core_file_source_kind(Some(kind)));
         }
         assert!(!is_core_file_source_kind(Some("authorized_root")));
         assert!(!is_core_file_source_kind(None));
+    }
+
+    // This owner checks the new exact-source seam; the existing kind whitelist
+    // cannot reject a valid-looking reply for a different reader or reference.
+    #[test]
+    fn native_file_target_rejects_cross_reader_thread_and_reference_replies() {
+        let source = json!({"kind":"native_child_file","threadId":"thread","readId":"reader","rawReference":"src/a.ts:2"});
+        let target = json!({"kind":"file_target","threadId":"thread","sourceKind":"native_child_file","sourceIdentity":"native-child:reader","rawReference":"src/a.ts:2"});
+        assert!(validate_native_file_target(&source, &target).is_ok());
+        for (field, wrong) in [
+            ("threadId", "other-thread"),
+            ("sourceKind", "camp_workspace"),
+            ("sourceIdentity", "native-child:other"),
+            ("rawReference", "src/b.ts"),
+        ] {
+            let mut swapped = target.clone();
+            swapped[field] = json!(wrong);
+            assert!(
+                validate_native_file_target(&source, &swapped).is_err(),
+                "{field}"
+            );
+        }
+        let mut missing = source.clone();
+        missing["readId"] = Value::Null;
+        assert!(validate_native_file_target(&missing, &target).is_err());
+    }
+
+    // The existing content scanner owns byte/digest consistency. This owner
+    // checks the new directory/binary/name-only metadata seam without a Core DB.
+    #[tokio::test]
+    async fn native_reference_metadata_preserves_directories_binary_downloads_and_private_paths() {
+        let root = std::env::temp_dir().join(format!(
+            "rovai-web-native-reference-{}",
+            new_token().unwrap()
+        ));
+        tokio::fs::create_dir(&root).await.unwrap();
+        let permit = Arc::new(
+            Arc::new(tokio::sync::Semaphore::new(1))
+                .acquire_owned()
+                .await
+                .unwrap(),
+        );
+        let mut source = ResolvedSource {
+            root: root.clone(),
+            path: root.clone(),
+            name: "root".into(),
+            allow_children: true,
+            can_show_path: true,
+        };
+        let (directory, content) = native_reference_metadata(&source, &permit).await.unwrap();
+        assert_eq!(directory["kind"], "directory");
+        assert_eq!(directory["sourceRelativePath"], ".");
+        assert_eq!(directory["previewable"], false);
+        assert!(content.is_none());
+        source.allow_children = false;
+        assert!(native_reference_metadata(&source, &permit).await.is_err());
+        source.allow_children = true;
+        source.path = root.join("archive.bin");
+        source.name = "archive.bin".into();
+        let mut bytes = vec![0xff; 70 * 1024];
+        bytes.extend_from_slice("完整字节末尾😀".as_bytes());
+        tokio::fs::write(&source.path, &bytes).await.unwrap();
+        let (file, content) = native_reference_metadata(&source, &permit).await.unwrap();
+        assert_eq!(file["kind"], "file");
+        assert_eq!(file["previewable"], false);
+        assert_eq!(file["sourceRelativePath"], "archive.bin");
+        let content = content.unwrap();
+        assert_eq!(content.size, bytes.len());
+        assert_eq!(content.generation.len(), 64);
+        assert!(!content.text);
+        assert!(content.bytes.is_empty());
+        let download = content::read(&source.path, Selection::All, Some(permit.clone()))
+            .await
+            .unwrap();
+        assert_eq!(download.bytes, bytes);
+        assert_eq!(download.generation, content.generation);
+        source.can_show_path = false;
+        let (private, _) = native_reference_metadata(&source, &permit).await.unwrap();
+        assert_eq!(private["pathPresentation"], "file_name_only");
+        assert!(private.get("absolutePath").is_none());
+        assert!(private.get("sourceRelativePath").is_none());
+        // Fixture files remain under this test run's isolated TEMP for evidence.
     }
 
     // Owns UTF-8/byte offsets at the new HTTP paging seam. The Desktop reader

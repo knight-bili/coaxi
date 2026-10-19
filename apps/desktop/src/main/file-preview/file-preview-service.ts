@@ -4,7 +4,7 @@ import { createPreviewFileSource } from '../../../../../packages/html-preview/sr
 import { createHash, randomUUID } from 'node:crypto'
 import { homedir } from 'node:os'
 import { basename, dirname, extname, isAbsolute, relative, resolve, sep } from 'node:path'
-import type { FileHandle } from 'node:fs/promises'
+import { stat, type FileHandle } from 'node:fs/promises'
 import type {
   FilePreviewRetentionState,
   FileContentVersion,
@@ -21,6 +21,8 @@ import type {
   FilePreviewRootGrantResult,
   FilePreviewTextContent,
   FilePreviewKind,
+  NativeFileReferenceRequest,
+  NativeFileReferenceResult,
   OpenFilePreviewRequest,
   OpenFilePreviewResult,
   ParsedFileReference,
@@ -395,6 +397,53 @@ export class FilePreviewService {
     // Snapshot media can be opened automatically by the transcript renderer.
     return this.#open(webContentsId, request,
       request.kind === 'native_child_file' ? RESTORE_OPEN_POLICY : INTERACTIVE_OPEN_POLICY)
+  }
+
+  async nativeReference(webContentsId: number, request: NativeFileReferenceRequest): Promise<FilePreviewOperationResult<NativeFileReferenceResult>> {
+    try {
+      const { source, action } = request
+      const binding = this.#captureBinding(webContentsId, source.threadId), navigation = this.#windowThreads.get(webContentsId)
+      const guard = (): void => { this.#requireBinding(webContentsId, binding, source.threadId); this.#requireNavigation(webContentsId, navigation, source.threadId) }
+      const inspect = async () => {
+        const target = await this.#resolveTarget(webContentsId, source)
+        if (!target || target.kind !== 'file_target' || target.sourceKind !== 'native_child_file'
+          || target.threadId !== source.threadId || target.sourceIdentity !== `native-child:${source.readId}`
+          || target.rawReference !== source.rawReference) throw new FilePreviewAccessError('source_not_authorized', '原文件来源已失效。')
+        const path = await inspectPreviewPath(target.rootPath, await this.#candidatePath(target, this.#parsedReference(target)))
+        if (path.kind === 'directory' && target.allowChildren === false) throw new FilePreviewAccessError('source_not_authorized', '这个来源不支持文件夹。')
+        const metadata = await stat(path.canonicalPath)
+        guard()
+        return { ...path, target, identity: path.kind === 'file'
+          ? `${metadata.dev}:${metadata.ino}:${metadata.size}:${metadata.mtimeMs}` : `${metadata.dev}:${metadata.ino}` }
+      }
+      const initial = await inspect()
+      let classification: FilePreviewClassification | null = null
+      if (initial.kind === 'file') {
+        const opened = await openPreviewFile(initial.canonicalRoot, initial.canonicalPath)
+        try { classification = await this.#classify(opened) } finally { await opened.file.close() }
+      }
+      const revalidate = async (): Promise<void> => {
+        const current = await inspect()
+        if (current.canonicalRoot !== initial.canonicalRoot || current.canonicalPath !== initial.canonicalPath
+          || current.identity !== initial.identity || current.kind !== initial.kind
+          || current.target.canShowPath !== initial.target.canShowPath) throw new FilePreviewAccessError('source_not_authorized', '原文件已有变化，请重新打开。')
+      }
+      await revalidate()
+      const fileName = initial.target.displayName || basename(initial.canonicalPath)
+      if (action === 'inspect') return ok({ kind: 'reference', reference: {
+        fileName, kind: initial.kind, previewable: initial.kind === 'file' && classification?.kind !== 'system',
+        pathPresentation: initial.target.canShowPath === false ? 'file_name_only' : 'external',
+        ...(initial.target.canShowPath === false ? {} : { absolutePath: initial.canonicalPath,
+          sourceRelativePath: relative(initial.canonicalRoot, initial.canonicalPath).split(sep).join('/') || '.' })
+      } })
+      if (action === 'reveal' || initial.kind === 'directory') {
+        guard(); this.#native.revealPath(initial.canonicalPath)
+        return ok({ kind: 'performed' })
+      }
+      const result = await this.#openNative(initial.canonicalPath, fileName,
+        initial.target.openRisk === 'confirm' ? 'confirm' : classification?.openRisk ?? 'normal', guard, revalidate)
+      return result.ok ? ok({ kind: 'performed' }) : result
+    } catch (error) { return this.#errorResult(error, 'open_failed') }
   }
 
   async restore(
@@ -1510,7 +1559,8 @@ export class FilePreviewService {
     path: string,
     displayName: string,
     openRisk: 'normal' | 'confirm',
-    requireCurrentBinding: () => void = () => undefined
+    requireCurrentBinding: () => void = () => undefined,
+    revalidate?: () => Promise<void>
   ): Promise<FilePreviewOperationResult<{ opened: true }>> {
     try {
       requireCurrentBinding()
@@ -1518,6 +1568,7 @@ export class FilePreviewService {
         return failed('open_failed', '已取消打开。')
       }
       requireCurrentBinding()
+      if (revalidate) { await revalidate(); requireCurrentBinding() }
       const error = await this.#native.openPath(path)
       return error ? failed('open_failed', '系统默认应用无法打开这个文件。', true) : ok({ opened: true })
     } catch {

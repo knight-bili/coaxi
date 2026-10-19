@@ -1405,7 +1405,7 @@
       "realProvider": false
     },
     "remaining": [
-      "普通文件徽标/原菜单及Core宿主动作已本地验证；目录/系统引用、完整网页与打开目标仍待，见referenceActions。",
+      "原普通文件/目录/系统引用已实现并本地验证；完整网页/邮件/电话及浏览器目标随I07，见directoryAndSystemReferences。",
       "完整原HTML控制与完整供体App同场景运行对照；已有原生HTML入口和实际隔离HTML服务回归通过",
       "真实Core/Native/Web集中候选、授权/生命周期/长历史/规模/内存恢复；七种原图表代码已保留，实际本批图表运行验证为BarChart",
       "I04其他parser/home关联、Runtime并集、恢复、记忆、自动化；此前ANSI完整许可文件缺口仍归发布资格"
@@ -1486,10 +1486,11 @@
         "source": "src/components/message/file-reference-actions.tsx",
         "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/file-reference-actions.tsx",
         "sourceSha256": "04bdb5a003c05f65bccf6909fc254136272609e3156e546da8486cb138e5599f",
-        "portedSha256": "7e651a85c6ea853df184d693e36ecd703732e8a57bf2f2895182679f4ef38859",
+        "portedSha256": "41a471c566ae6a20cd92592642d922556b0058fa33f35cd6aa341a8f07e903b3",
         "extraction": "original systemFileManagerLabelKey, complete menu return JSX and complete FileReferenceActions wrapper; source root/path IO replaced by Core scope hook; added async loading/retry rows",
         "bodyChanges": [
-          "original platform label/menu JSX/wrapper retained; Core-issued metadata and fresh per-action grant replace frontend activeFolder path construction and Tauri; async loading/retry rows use original menu primitives"
+          "original platform label/menu JSX/wrapper retained; Core-issued metadata and fresh per-action grant replace frontend activeFolder path construction and Tauri; async loading/retry rows use original menu primitives",
+          "directory/system revision: source menu JSX unchanged; host download availability now requires a current file grant so remote directories do not show a dead download row"
         ],
         "sourceGitBlob": "197077d3a178c9e739233d054424c9fea314f65d"
       }
@@ -1568,10 +1569,45 @@
     "modelInputChanged": false,
     "skillModulePorted": false,
     "remaining": [
-      "目录与系统类型原文件引用的显式User动作解析及Native/Web实现；只读自动open仍禁止系统启动/目录定位/新根授权。",
-      "完整MarkdownLink网页/邮件/电话和内置/系统打开目标；随I07浏览器宿主能力衔接，不把当前HTTPS路由称完整原组件。",
-      "完整原HTML控制与完整供体App同场景；真实Core/Native/Web集中候选、授权/生命周期/长历史/规模/内存恢复。",
-      "I04其余parser/home关联、Runtime并集、恢复、记忆和自动化；既有ANSI完整许可缺口仍待发布资格。"
+      "完整原HTML控制、完整供体App同场景；随后实际Core/Native/Web授权/生命周期/长历史/规模/恢复集中候选。",
+      "I07接完整MarkdownLink网页/邮件/电话和内置/系统浏览器目标；当前文件/目录/系统引用分项不替代该能力。",
+      "I04其他parser/home关联、Grok修改意见与三Context模式、Runtime并集、恢复、记忆与自动化；ANSI完整许可仍待发布资格。"
     ]
+  },
+  "directoryAndSystemReferences": {
+    "baseline": "a274b30ad0fd32ccdfc42099747a23f8cd9cff97",
+    "sourceCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+    "originalMenuJSXUnchanged": true,
+    "api": "Optional FilePreviewApi.nativeReference; strict explicit User inspect/reveal/open, Core exact reader source unchanged",
+    "desktop": "Pure directory/system metadata; explicit reveal/open; dangerous confirmation rechecks reader, canonical path and file identity/version; no root grant, auto launch or new preview handle during inspection",
+    "web": "Authenticated resource action; metadata only, temporary file download grants, no remote OS execution; native source allowlist/identity/strict root/readId keys/restore/after-read authority repaired",
+    "qualification": {
+      "typescriptFiles": 8,
+      "typescriptPassed": 132,
+      "existingWindowsSkipped": 1,
+      "rustResourcesPassed": 5,
+      "rendererChecks": 19,
+      "screenshotsReviewed": 4,
+      "typecheckExit": 0,
+      "actualMainFilesystem": true,
+      "actualRustMetadataFilesystem": true,
+      "actualElectronBinaryDownload": true,
+      "simulatedCoreAuthority": true,
+      "simulatedRendererTransport": true,
+      "actualCoreNativeWeb": false,
+      "actualIPC": false,
+      "fullApp": false,
+      "systemClipboard": false,
+      "newFormalCasesPassed": 0
+    },
+    "dependenciesChanged": false,
+    "modelInputChanged": false,
+    "databaseChanged": false,
+    "remaining": [
+      "完整原HTML控制、完整供体App同场景；随后实际Core/Native/Web授权/生命周期/长历史/规模/恢复集中候选。",
+      "I07接完整MarkdownLink网页/邮件/电话和内置/系统浏览器目标；当前文件/目录/系统引用分项不替代该能力。",
+      "I04其他parser/home关联、Grok修改意见与三Context模式、Runtime并集、恢复、记忆与自动化；ANSI完整许可仍待发布资格。"
+    ],
+    "remoteBinaryLeftClick": "Explicit download with a fresh source grant; no server system-open request."
   }
 }

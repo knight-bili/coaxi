@@ -152,7 +152,7 @@
       "status": "media_stats_and_scoped_materials_local_verified_full_engine_and_candidate_pending",
       "problem": "原用户图/生成图/完整图预览与统计复用固定Codeg；Core精确readId读取与原Rovai图片菜单、HTML服务已接。修复父窗Esc、模块循环和临时来源不能restore的问题；原生自动预览禁止系统启动/新根授权。",
       "evidence": "i04-native-media-stats-result.json",
-      "remaining": "原完整Markdown引擎已接并回归；原链接业务操作/完整HTML控制、完整App和真实Core/Native/Web生命周期规模恢复仍待，见i04-native-markdown-engine-result.json。"
+      "remaining": "完整内容引擎、普通文件/目录/系统引用已本地验证；完整HTML、I07网页/目标、完整App及真实两端生命周期/规模/恢复继续。"
     },
     {
       "id": "DEV-NATIVE-MARKDOWN-ENGINE",
@@ -162,7 +162,7 @@
       "problem": "原完整MessageResponse闭包及39份原模块/用例移植；修复实际原版冷公式memo和Chromium PNG导出，保留图表/spec本地状态、流式/静态字节及原图片HTML功能。",
       "evidence": "i04-native-markdown-engine-result.json",
       "remaining": [
-        "普通文件菜单已实现并本地验证，目录/系统引用和完整网页/目标路由仍待，见i04-native-reference-actions-result.json。",
+        "文件/目录/系统引用已本地验证；完整网页/浏览器目标随I07，完整HTML及真实两端候选仍待。",
         "完整原HTML控制与完整供体App同场景运行对照；已有原生HTML入口和实际隔离HTML服务回归通过",
         "真实Core/Native/Web集中候选、授权/生命周期/长历史/规模/内存恢复；七种原图表代码已保留，实际本批图表运行验证为BarChart",
         "I04其他parser/home关联、Runtime并集、恢复、记忆、自动化；此前ANSI完整许可文件缺口仍归发布资格"
@@ -173,16 +173,16 @@
       "id": "DEV-NATIVE-REFERENCE-ACTIONS",
       "task": "I04-T01/I07/I12",
       "owner": "研发",
-      "status": "ordinary_file_menu_local_verified_directory_system_and_full_link_routes_pending",
-      "problem": "7份固定原组件/用例与2份已有纯模块复用，保留原菜单JSX和徽标；Core精确reader位置/每动作重新授权、旧owner拒绝及临时句柄释放已接。",
-      "evidence": "i04-native-reference-actions-result.json",
+      "status": "directory_system_and_ordinary_file_actions_local_verified_actual_host_and_browser_targets_pending",
+      "problem": "原菜单和徽标已支持普通文件、目录及系统类型引用；Main明确User操作/危险确认后重验及Web认证元数据/临时二进制下载能力已接。Web原生来源白名单遗漏和普通外部文件放宽、readId串键及恢复错误已修复。",
+      "evidence": "i04-native-reference-targets-result.json",
       "remaining": [
-        "目录与系统类型原文件引用的显式User动作解析及Native/Web实现；只读自动open仍禁止系统启动/目录定位/新根授权。",
-        "完整MarkdownLink网页/邮件/电话和内置/系统打开目标；随I07浏览器宿主能力衔接，不把当前HTTPS路由称完整原组件。",
-        "完整原HTML控制与完整供体App同场景；真实Core/Native/Web集中候选、授权/生命周期/长历史/规模/内存恢复。",
-        "I04其余parser/home关联、Runtime并集、恢复、记忆和自动化；既有ANSI完整许可缺口仍待发布资格。"
+        "完整原HTML控制、完整供体App同场景；随后实际Core/Native/Web授权/生命周期/长历史/规模/恢复集中候选。",
+        "I07接完整MarkdownLink网页/邮件/电话和内置/系统浏览器目标；当前文件/目录/系统引用分项不替代该能力。",
+        "I04其他parser/home关联、Grok修改意见与三Context模式、Runtime并集、恢复、记忆与自动化；ANSI完整许可仍待发布资格。"
       ],
-      "qualification": "149定向/20真实隔离Renderer检查与8图组件对照；Main真实FS，ThreadClient/FilePreviewApi及剪贴板为声明替身；实际Core/Native/Web和完整App未授予资格，正式84新增0。"
+      "qualification": "132定向/5真实Rust资源测试/19隔离Renderer检查及4原菜单图；Main和Rust真实FS，Core权威/Renderer运输与剪贴板为声明替身。实际Core/IPC/HTTP/完整App尚未授予资格，I04正式84新增0。",
+      "previous_evidence": "i04-native-reference-actions-result.json"
     }
   ]
 }
