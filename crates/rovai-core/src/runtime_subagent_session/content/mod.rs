@@ -25,6 +25,7 @@ pub(super) mod claude;
 pub(super) mod claude_read;
 pub(super) mod qoder;
 mod grok_stats;
+pub(super) mod legacy;
 mod project;
 
 pub(crate) use records::ParseNotes;

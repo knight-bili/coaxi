@@ -17,6 +17,7 @@ use sha2::{Digest, Sha256};
 use super::{
     ObservedNativeSessionTarget,
     content::{NativeContent, model},
+    legacy::{NativeAgentReadPlan, ObservedNativeAgentTarget},
 };
 use crate::{command::ActorRef, current_user::CURRENT_USER_ID};
 
@@ -85,6 +86,30 @@ fn decode(value: &str) -> Result<Token> {
     serde_json::from_slice(&body).context("native_child.cursor_invalid")
 }
 
+fn agent_scope(actor: &ActorRef, target: &ObservedNativeAgentTarget) -> Result<String> {
+    ensure!(
+        matches!(actor,ActorRef::User {user_id} if user_id==CURRENT_USER_ID),
+        "native_child.user_required"
+    );
+    Ok(format!(
+        "{:x}",
+        Sha256::digest(serde_json::to_vec(&(
+            "legacy-agent-snapshot-v1",
+            CURRENT_USER_ID,
+            &target.reference.thread_id,
+            &target.reference.agent_run_id,
+            &target.reference.evidence_id,
+            &target.conversation_id,
+            target.execution_epoch,
+            target.adapter_kind.as_str(),
+            &target.origin,
+            &target.parent_tool_use_id,
+            &target.input_digest,
+            &target.agent_id
+        ))?)
+    ))
+}
+
 pub(super) fn scope(actor: &ActorRef, target: &ObservedNativeSessionTarget) -> Result<String> {
     ensure!(
         matches!(actor, ActorRef::User { user_id } if user_id == CURRENT_USER_ID),
@@ -136,16 +161,24 @@ struct Projection<'a> {
     summary: Option<&'a model::NativeTranscriptSummary>,
     notes: Notes,
     child_references: Vec<ChildReference>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    agent_stats: Option<&'a model::AgentExecutionStats>,
+}
+
+enum SnapshotTarget {
+    Session(ObservedNativeSessionTarget),
+    Agent(ObservedNativeAgentTarget),
 }
 
 pub(crate) struct NativeSnapshot {
     id: String,
     scope: String,
-    target: ObservedNativeSessionTarget,
+    target: SnapshotTarget,
     projection: String,
     digest: String,
     source_digest: String,
     children: Vec<String>,
+    agent_status: String,
 }
 
 #[derive(Debug, Serialize)]
@@ -170,8 +203,48 @@ impl NativeSnapshot {
         content: NativeContent,
         stop: &AtomicBool,
     ) -> Result<Self> {
+        Self::build(
+            actor,
+            SnapshotTarget::Session(target.clone()),
+            content,
+            None,
+            stop,
+        )
+    }
+
+    pub(crate) fn new_agent(
+        actor: &ActorRef,
+        target: ObservedNativeAgentTarget,
+        content: NativeContent,
+        stats: model::AgentExecutionStats,
+        stop: &AtomicBool,
+    ) -> Result<Self> {
+        // Legacy agent ids must never enter the Session descendant-token path.
+        ensure!(
+            content.verified_children.is_empty(),
+            "native_agent.invalid_descendant"
+        );
+        Self::build(
+            actor,
+            SnapshotTarget::Agent(target),
+            content,
+            Some(stats),
+            stop,
+        )
+    }
+
+    fn build(
+        actor: &ActorRef,
+        target: SnapshotTarget,
+        content: NativeContent,
+        agent_stats: Option<model::AgentExecutionStats>,
+        stop: &AtomicBool,
+    ) -> Result<Self> {
         ensure!(!stop.load(Ordering::Acquire), "native_child.read_cancelled");
-        let scope = scope(actor, target)?;
+        let scope = match &target {
+            SnapshotTarget::Session(t) => scope(actor, t)?,
+            SnapshotTarget::Agent(t) => agent_scope(actor, t)?,
+        };
         let id = uuid::Uuid::new_v4().to_string();
         let mut children = content.verified_children.clone();
         children.sort();
@@ -179,7 +252,7 @@ impl NativeSnapshot {
         ensure!(
             children
                 .iter()
-                .all(|id| super::identity(id) && id != &target.child_native_session_id),
+                .all(|id| super::identity(id) && matches!(&target,SnapshotTarget::Session(t) if id != &t.child_native_session_id)),
             "native_child.invalid_reference"
         );
         let child_references = children
@@ -218,6 +291,7 @@ impl NativeSnapshot {
                     unavailable_advisories: content.notes.unavailable_advisories,
                 },
                 child_references,
+                agent_stats: agent_stats.as_ref(),
             },
         )?;
         ensure!(!stop.load(Ordering::Acquire), "native_child.read_cancelled");
@@ -226,15 +300,22 @@ impl NativeSnapshot {
         Ok(Self {
             id,
             scope,
-            target: target.clone(),
+            target,
             projection,
             digest,
             source_digest: content.snapshot_digest,
             children,
+            agent_status: agent_stats
+                .and_then(|s| s.status)
+                .unwrap_or_else(|| "unknown".into()),
         })
     }
 
     fn authorize(&self, actor: &ActorRef, expected: &ObservedNativeSessionTarget) -> Result<()> {
+        ensure!(
+            matches!(&self.target, SnapshotTarget::Session(_)),
+            "native_child.scope_changed"
+        );
         ensure!(
             scope(actor, expected)? == self.scope,
             "native_child.scope_changed"
@@ -260,6 +341,60 @@ impl NativeSnapshot {
         max_bytes: usize,
     ) -> Result<ContentWindow> {
         self.authorize(actor, expected)?;
+        self.window_authorized(
+            reference,
+            cursor,
+            max_bytes,
+            expected.status.clone(),
+            expected.live,
+        )
+    }
+
+    pub(crate) fn authorize_agent(
+        &self,
+        actor: &ActorRef,
+        plan: &NativeAgentReadPlan,
+    ) -> Result<()> {
+        let SnapshotTarget::Agent(target) = &self.target else {
+            anyhow::bail!("native_child.scope_changed")
+        };
+        plan.authorize(actor, target)?;
+        ensure!(
+            agent_scope(actor, target)? == self.scope,
+            "native_child.scope_changed"
+        );
+        Ok(())
+    }
+
+    pub(crate) fn agent_window(
+        &self,
+        actor: &ActorRef,
+        plan: &NativeAgentReadPlan,
+        reference: &str,
+        cursor: Option<&str>,
+        max_bytes: usize,
+    ) -> Result<ContentWindow> {
+        self.authorize_agent(actor, plan)?;
+        let SnapshotTarget::Agent(target) = &self.target else {
+            anyhow::bail!("native_child.scope_changed")
+        };
+        self.window_authorized(
+            reference,
+            cursor,
+            max_bytes,
+            self.agent_status.clone(),
+            plan.live(target),
+        )
+    }
+
+    fn window_authorized(
+        &self,
+        reference: &str,
+        cursor: Option<&str>,
+        max_bytes: usize,
+        status: String,
+        live: bool,
+    ) -> Result<ContentWindow> {
         ensure!(
             (4..=MAX_WINDOW_BYTES).contains(&max_bytes),
             "native_child.window_limit"
@@ -325,8 +460,8 @@ impl NativeSnapshot {
             fragment: self.projection[offset..end].to_owned(),
             next_cursor,
             complete,
-            reported_status: expected.status.clone(),
-            live: expected.live,
+            reported_status: status,
+            live,
         })
     }
 
@@ -354,7 +489,10 @@ impl NativeSnapshot {
             .children
             .get(index)
             .context("native_child.cursor_invalid")?;
-        let mut target = self.target.clone();
+        let SnapshotTarget::Session(target) = &self.target else {
+            anyhow::bail!("native_child.scope_changed")
+        };
+        let mut target = target.clone();
         target.parent_native_session_id = target.child_native_session_id;
         target.child_native_session_id = child.clone();
         target.status = "unknown".into();

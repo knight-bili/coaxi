@@ -6,6 +6,18 @@ export interface NativeChildReadReference {
   receiverIndex: number
 }
 
+/** Legacy Agent files have independent Core authority, not a Session receiver. */
+export interface NativeAgentReadReference {
+  threadId: string
+  agentRunId: string
+  evidenceId: string
+}
+
+export interface NativeAgentReadStart {
+  readId: string
+  reference: NativeAgentReadReference
+}
+
 export interface NativeChildReadStart {
   readId: string
   reference: NativeChildReadReference

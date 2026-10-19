@@ -310,4 +310,4 @@ Cline 认证交还原生、撤销 D25 后续的专属认证独占与强制 cold�
 
 ## 独立帮手
 
-当前权威：[Core 委派](../architecture/delegation.md)、[Delegation v1](../contracts/delegation-v1.md)。理由：[V1.73-D01](../versions/v1.73/decisions.md#v1-73-d01)；当前基础实现不代表完整执行资格。
+当前权威：[Core 委派](../architecture/delegation.md)、[Delegation v1](../contracts/delegation-v1.md)、[原生正文只读工作与分页](../contracts/native-transcript-reads-v1.md)。理由：[V1.73-D01](../versions/v1.73/decisions.md#v1-73-d01)；当前基础实现不代表完整执行资格。

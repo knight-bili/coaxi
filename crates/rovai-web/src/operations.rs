@@ -133,6 +133,14 @@ pub enum Operation {
     RuntimeInteractionResolve,
     #[serde(rename = "runtime.childReads.start")]
     NativeChildReadStart,
+    #[serde(rename = "runtime.agentReads.start")]
+    NativeAgentReadStart,
+    #[serde(rename = "runtime.agentReads.poll")]
+    NativeAgentReadPoll,
+    #[serde(rename = "runtime.agentReads.page")]
+    NativeAgentReadPage,
+    #[serde(rename = "runtime.agentReads.close")]
+    NativeAgentReadClose,
     #[serde(rename = "runtime.childReads.poll")]
     NativeChildReadPoll,
     #[serde(rename = "runtime.childReads.page")]
@@ -469,11 +477,11 @@ impl Operation {
             Self::AppInfo => json!({"name":value["name"],"version":value["version"]}),
             Self::DelegationSource => select_fields(&value,
                 &["state", "source", "operation", "attemptNo", "detail", "task", "reason", "code"]),
-            Self::NativeChildReadStart | Self::NativeChildReadPoll => select_fields(&value,
+            Self::NativeAgentReadStart | Self::NativeAgentReadPoll | Self::NativeChildReadStart | Self::NativeChildReadPoll => select_fields(&value,
                 &["readId", "coreGeneration", "state", "snapshotReference", "code"]),
-            Self::NativeChildReadPage => select_fields(&value, &["snapshotReference", "projectionDigest", "sourceDigest",
+            Self::NativeAgentReadPage | Self::NativeChildReadPage => select_fields(&value, &["snapshotReference", "projectionDigest", "sourceDigest",
                 "offset", "totalBytes", "fragment", "nextCursor", "complete", "reportedStatus", "live"]),
-            Self::NativeChildReadClose => select_fields(&value, &["closed"]),
+            Self::NativeAgentReadClose | Self::NativeChildReadClose => select_fields(&value, &["closed"]),
             Self::CanvasTerminalStart | Self::CanvasTerminalSnapshot => {
                 project_terminal_snapshot(value)
             }
@@ -626,6 +634,10 @@ impl Operation {
             Self::RuntimeInteractionGet => "runtime.interactions.get",
             Self::RuntimeInteractionResolve => "runtime.interactions.resolve",
             Self::NativeChildReadStart => "runtime.childReads.start",
+            Self::NativeAgentReadStart => "runtime.agentReads.start",
+            Self::NativeAgentReadPoll => "runtime.agentReads.poll",
+            Self::NativeAgentReadPage => "runtime.agentReads.page",
+            Self::NativeAgentReadClose => "runtime.agentReads.close",
             Self::NativeChildReadPoll => "runtime.childReads.poll",
             Self::NativeChildReadPage => "runtime.childReads.page",
             Self::NativeChildReadClose => "runtime.childReads.close",
@@ -886,7 +898,7 @@ mod tests {
     fn public_projection_excludes_mcp_credentials_and_desktop_mutation_actions() {
         let read_view = json!({"readId":"read", "coreGeneration":"generation", "state":"ready",
             "snapshotReference":"signed", "code":null, "futurePath":"private-source", "futureToken":"credential"});
-        for operation in [Operation::NativeChildReadStart, Operation::NativeChildReadPoll] {
+        for operation in [Operation::NativeAgentReadStart, Operation::NativeAgentReadPoll,Operation::NativeChildReadStart, Operation::NativeChildReadPoll] {
             assert_eq!(operation.project(read_view.clone()), json!({"readId":"read","coreGeneration":"generation",
                 "state":"ready","snapshotReference":"signed","code":null}));
         }
@@ -902,6 +914,9 @@ mod tests {
             "complete":true,"reportedStatus":"completed","live":false,"futurePrivatePath":"private-source"}));
         assert_eq!(page["fragment"], long);
         assert!(page.get("futurePrivatePath").is_none());
+        assert_eq!(Operation::NativeAgentReadPage.project(page.clone()),page);
+        assert!(Operation::NativeAgentReadPage.project(json!({"fragment":long,"futurePrivatePath":"private"})).get("futurePrivatePath").is_none());
+        assert_eq!(Operation::NativeAgentReadClose.project(json!({"closed":true,"futureSecret":"credential"})),json!({"closed":true}));
         assert_eq!(Operation::NativeChildReadClose.project(json!({"closed":true,"futureSecret":"credential"})), json!({"closed":true}));
         let projected = Operation::Mcp.project(json!({"servers":[{
             "serverId":"fixture", "name":"Example", "enabled":true,
@@ -943,6 +958,10 @@ mod tests {
                 "runtime.interactions.resolve",
             ),
             ("runtime.childReads.start", "runtime.childReads.start"),
+            ("runtime.agentReads.start", "runtime.agentReads.start"),
+            ("runtime.agentReads.poll", "runtime.agentReads.poll"),
+            ("runtime.agentReads.page", "runtime.agentReads.page"),
+            ("runtime.agentReads.close", "runtime.agentReads.close"),
             ("runtime.childReads.poll", "runtime.childReads.poll"),
             ("runtime.childReads.page", "runtime.childReads.page"),
             ("runtime.childReads.close", "runtime.childReads.close"),

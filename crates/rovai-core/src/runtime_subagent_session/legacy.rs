@@ -190,20 +190,68 @@ impl NativeAgentService {
         target: &ObservedNativeAgentTarget,
     ) -> Result<()> {
         let plan = Self::prepare(database, blobs, actor, &target.reference)?;
-        ensure!(
-            plan.conversation_id == target.conversation_id
-                && plan.epoch == target.execution_epoch
-                && plan.adapter == target.adapter_kind
-                && plan.tool_id == target.parent_tool_use_id
-                && plan.input_digest == target.input_digest
-                && plan.origins.contains(&target.origin),
-            "native_child.binding_changed"
-        );
-        Ok(())
+        plan.authorize(actor, target)
     }
 }
 
 impl NativeAgentReadPlan {
+    /// The caller supplies a freshly prepared Core plan on every publication.
+    pub(crate) fn authorize(
+        &self,
+        actor: &ActorRef,
+        target: &ObservedNativeAgentTarget,
+    ) -> Result<()> {
+        self.scope(actor)?;
+        ensure!(
+            self.reference == target.reference
+                && self.conversation_id == target.conversation_id
+                && self.epoch == target.execution_epoch
+                && self.adapter == target.adapter_kind
+                && self.tool_id == target.parent_tool_use_id
+                && self.input_digest == target.input_digest
+                && self.origins.contains(&target.origin),
+            "native_child.binding_changed"
+        );
+        Ok(())
+    }
+
+    pub(crate) fn reference(&self) -> &NativeAgentReference {
+        &self.reference
+    }
+
+    pub(crate) fn scope(&self, actor: &ActorRef) -> Result<String> {
+        ensure!(
+            matches!(actor,ActorRef::User{user_id} if user_id==CURRENT_USER_ID),
+            "native_child.user_required"
+        );
+        use sha2::Digest;
+        Ok(format!(
+            "{:x}",
+            sha2::Sha256::digest(serde_json::to_vec(&(
+                "legacy-agent-root-v1",
+                CURRENT_USER_ID,
+                &self.reference.thread_id,
+                &self.reference.agent_run_id,
+                &self.reference.evidence_id,
+                &self.conversation_id,
+                self.epoch,
+                self.adapter.as_str(),
+                &self.tool_id,
+                &self.input_digest
+            ))?)
+        ))
+    }
+
+    pub(crate) fn live(&self, target: &ObservedNativeAgentTarget) -> bool {
+        self.active
+            && self.current_compatible
+            && self.current_epoch == self.epoch
+            && self.current_binding.as_deref() == Some(target.origin.binding_id.as_str())
+            && self.current_generation == target.origin.binding_generation
+            && self.current_parent.as_deref()
+                == Some(target.origin.parent_native_session_id.as_str())
+    }
+
     pub(crate) fn open(
         &self,
         stop: &AtomicBool,
@@ -224,25 +272,18 @@ impl NativeAgentReadPlan {
             }
         }
         let (origin, found) = selected.context("native_child.agent_link_unavailable")?;
-        let live = self.active
-            && self.current_compatible
-            && self.current_epoch == self.epoch
-            && self.current_binding.as_deref() == Some(origin.binding_id.as_str())
-            && self.current_generation == origin.binding_generation
-            && self.current_parent.as_deref() == Some(origin.parent_native_session_id.as_str());
-        Ok((
-            ObservedNativeAgentTarget {
-                reference: self.reference.clone(),
-                conversation_id: self.conversation_id.clone(),
-                execution_epoch: self.epoch,
-                adapter_kind: self.adapter,
-                origin,
-                parent_tool_use_id: self.tool_id.clone(),
-                input_digest: self.input_digest.clone(),
-                agent_id: found.agent_id,
-                live,
-            },
-            found.documents,
-        ))
+        let mut target = ObservedNativeAgentTarget {
+            reference: self.reference.clone(),
+            conversation_id: self.conversation_id.clone(),
+            execution_epoch: self.epoch,
+            adapter_kind: self.adapter,
+            origin,
+            parent_tool_use_id: self.tool_id.clone(),
+            input_digest: self.input_digest.clone(),
+            agent_id: found.agent_id,
+            live: false,
+        };
+        target.live = self.live(&target);
+        Ok((target, found.documents))
     }
 }

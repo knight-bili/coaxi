@@ -2,10 +2,80 @@
 use super::*;
 use crate::runtime_subagent_session::{
     NativeChildSessionService,
+    legacy::NativeAgentService,
+    reader::AgentStartRead,
     reader::{PageRead, ReadId, StartRead},
 };
 
 impl Core {
+    pub(super) async fn native_agent_read(&self, method: &str, value: Value) -> Result<Value> {
+        let actor = ActorRef::User {
+            user_id: CURRENT_USER_ID.into(),
+        };
+        if method == "runtime.agentReads.close" {
+            let request: ReadId = serde_json::from_value(value)?;
+            self.native_child_readers.close(&actor, &request.read_id)?;
+            return Ok(json!({"closed":true}));
+        }
+        if method == "runtime.agentReads.start" {
+            let request: AgentStartRead = serde_json::from_value(value)?;
+            anyhow::ensure!(
+                !self.planned_shutdown.shutdown_started(),
+                "native_child.reader_closing"
+            );
+            let database = self.database.lock().await;
+            let plan = NativeAgentService::prepare(
+                &database,
+                &ManagedBlobStore::new(&self.data_dir),
+                &actor,
+                &request.reference,
+            )?;
+            let created_at: String = database.connection().query_row(
+                "SELECT created_at FROM agent_run WHERE id=?1",
+                [&request.reference.agent_run_id],
+                |r| r.get(0),
+            )?;
+            let fallback = chrono::DateTime::parse_from_rfc3339(&created_at)
+                .context("native_child.invalid_run_time")?
+                .with_timezone(&chrono::Utc);
+            return Ok(serde_json::to_value(
+                self.native_child_readers
+                    .start_agent(&actor, request, &plan, fallback)?,
+            )?);
+        }
+        let (id, page) = match method {
+            "runtime.agentReads.poll" => {
+                let request: ReadId = serde_json::from_value(value)?;
+                (request.read_id, None)
+            }
+            "runtime.agentReads.page" => {
+                let request: PageRead = serde_json::from_value(value)?;
+                (request.read_id.clone(), Some(request))
+            }
+            _ => anyhow::bail!("native_child.operation_not_admitted"),
+        };
+        let reference = self.native_child_readers.agent_reference(&actor, &id)?;
+        let database = self.database.lock().await;
+        let plan = match NativeAgentService::prepare(
+            &database,
+            &ManagedBlobStore::new(&self.data_dir),
+            &actor,
+            &reference,
+        ) {
+            Ok(plan) => plan,
+            Err(error) => {
+                let _ = self.native_child_readers.close(&actor, &id);
+                return Err(error);
+            }
+        };
+        let result = if let Some(page) = page {
+            serde_json::to_value(self.native_child_readers.page_agent(&actor, page, &plan)?)?
+        } else {
+            serde_json::to_value(self.native_child_readers.poll_agent(&actor, &id, &plan)?)?
+        };
+        Ok(result)
+    }
+
     pub(super) async fn native_child_file_source(&self, value: Value) -> Result<Value> {
         #[derive(serde::Deserialize)]
         #[serde(rename_all = "camelCase", deny_unknown_fields)]

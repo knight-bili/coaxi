@@ -68,6 +68,168 @@ fn fallback() -> chrono::DateTime<chrono::Utc> {
         .with_timezone(&chrono::Utc)
 }
 
+// Called by the original Context owner with its prepared Core plan and files.
+// The shared Registry/worker and signed pages are real; provider metadata is
+// the explicitly declared SQL fixture from that owner.
+pub(crate) fn assert_agent_workers(
+    plan: &NativeAgentReadPlan,
+    body: &str,
+) -> (Registry, AgentStartRead, String) {
+    use sha2::{Digest, Sha256};
+    let actor = ActorRef::User {
+        user_id: CURRENT_USER_ID.into(),
+    };
+    let registry = Registry::new("agent-core-generation".into());
+    let request = AgentStartRead {
+        read_id: uuid::Uuid::new_v4().to_string(),
+        reference: plan.reference().clone(),
+    };
+    registry
+        .start_agent(&actor, request.clone(), plan, fallback())
+        .unwrap();
+    settled(&registry);
+    let ready = registry.poll_agent(&actor, &request.read_id, plan).unwrap();
+    assert_eq!(ready.state, "ready");
+    assert_eq!(ready.core_generation, "agent-core-generation");
+    let snapshot = ready.snapshot_reference.unwrap();
+    assert_eq!(
+        registry.agent_reference(&actor, &request.read_id).unwrap(),
+        request.reference
+    );
+    assert!(
+        registry.reference(&actor, &request.read_id).is_err(),
+        "Agent cannot enter Session authority"
+    );
+    assert_eq!(
+        registry
+            .start_agent(&actor, request.clone(), plan, fallback())
+            .unwrap()
+            .snapshot_reference
+            .as_deref(),
+        Some(snapshot.as_str())
+    );
+    let mut joined = String::new();
+    let mut cursor = None;
+    let mut pages = 0;
+    let mut projection_digest: Option<String> = None;
+    loop {
+        let window = registry
+            .page_agent(
+                &actor,
+                PageRead {
+                    read_id: request.read_id.clone(),
+                    snapshot_reference: snapshot.clone(),
+                    cursor,
+                    max_bytes: Some(4096),
+                },
+                plan,
+            )
+            .unwrap();
+        assert_eq!(window.offset, joined.len() as u64);
+        assert!(window.fragment.len() <= 4096);
+        if let Some(expected) = &projection_digest {
+            assert_eq!(expected, &window.projection_digest)
+        } else {
+            projection_digest = Some(window.projection_digest)
+        }
+        joined.push_str(&window.fragment);
+        pages += 1;
+        cursor = window.next_cursor;
+        if window.complete {
+            assert!(cursor.is_none());
+            assert_eq!(window.total_bytes, joined.len() as u64);
+            break;
+        }
+        assert!(cursor.is_some());
+    }
+    assert!(pages > 1);
+    assert_eq!(
+        projection_digest.unwrap(),
+        format!("{:x}", Sha256::digest(joined.as_bytes()))
+    );
+    let value: serde_json::Value = serde_json::from_str(&joined).unwrap();
+    assert!(
+        value["turns"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .flat_map(|t| t["blocks"].as_array().unwrap())
+            .any(|b| b["text"] == body)
+    );
+    assert!(value["agent_stats"].is_object());
+    assert_eq!(value["child_references"], serde_json::json!([]));
+    for (reference, cursor) in [
+        (snapshot.clone() + "x", None),
+        (snapshot.clone(), Some(snapshot.clone())),
+    ] {
+        assert!(
+            registry
+                .page_agent(
+                    &actor,
+                    PageRead {
+                        read_id: request.read_id.clone(),
+                        snapshot_reference: reference,
+                        cursor,
+                        max_bytes: Some(4096)
+                    },
+                    plan
+                )
+                .is_err()
+        );
+    }
+    for actor in [
+        ActorRef::System {
+            component_id: "ui".into(),
+        },
+        ActorRef::User {
+            user_id: "other".into(),
+        },
+    ] {
+        assert!(registry.poll_agent(&actor, &request.read_id, plan).is_err());
+        assert!(registry.close(&actor, &request.read_id).is_err());
+    }
+    for key in ["path", "agentId", "descendant"] {
+        let mut value = serde_json::json!({"readId":request.read_id,"reference":{"threadId":request.reference.thread_id,"agentRunId":request.reference.agent_run_id,"evidenceId":request.reference.evidence_id}});
+        value[key] = serde_json::json!("override");
+        assert!(serde_json::from_value::<AgentStartRead>(value).is_err());
+    }
+    let second = AgentStartRead {
+        read_id: uuid::Uuid::new_v4().to_string(),
+        ..request.clone()
+    };
+    registry
+        .start_agent(&actor, second.clone(), plan, fallback())
+        .unwrap();
+    settled(&registry);
+    let second_ref = registry
+        .poll_agent(&actor, &second.read_id, plan)
+        .unwrap()
+        .snapshot_reference
+        .unwrap();
+    assert!(
+        registry
+            .page_agent(
+                &actor,
+                PageRead {
+                    read_id: request.read_id.clone(),
+                    snapshot_reference: second_ref,
+                    cursor: None,
+                    max_bytes: None
+                },
+                plan
+            )
+            .is_err()
+    );
+    registry.close(&actor, &second.read_id).unwrap();
+    registry.close(&actor, &second.read_id).unwrap();
+    assert!(
+        registry
+            .start_agent(&actor, second, plan, fallback())
+            .is_err()
+    );
+    (registry, request, snapshot)
+}
+
 pub(in crate::runtime_subagent_session) fn assert_read_workers(root: &ObservedNativeSessionTarget) {
     let actor = ActorRef::User {
         user_id: CURRENT_USER_ID.into(),

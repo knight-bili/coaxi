@@ -34,16 +34,17 @@
   ],
   "implementation_status": "core_preparation_and_native_file_join_local_verified_reader_transport_and_candidate_pending",
   "remaining": [
-    "独立Agent读取目标接现有后台reader、签名快照/分页/每页重新授权和Native/Web运输；不借Session句柄",
-    "原Codeg查看器按原Agent分类接生产目标，真实Core/Native/Web/完整App及实际C/Q Host绑定/文件roundtrip集中候选",
-    "真实版本的ACP tool/native Session身份与输入摘要映射、运行中及恢复/旁链格式语料和原parser差分；不把SQL元数据夹具当生产者资格",
-    "旧无记录来源明确导入；禁止当前home猜补或静默扫描全部历史",
-    "I04其余Runtime并集、r1接管/恢复、记忆和自动化；I07浏览器/I08增强资产和全81簇48包324保持"
+    "先核对Claude/Qoder实际ACP工具/原生Session身份和摘要映射的固定来源；真实Host绑定/提供方运行/断线恢复与平台候选继续，不能假定同名即同值",
+    "代理专用资源文件来源与原Codeg Viewer/Agent卡片接现有真实Core reader；两端Controller/按readId资源/原组件视觉及完整App联调",
+    "原生嵌套Agent来源/父链和原统计回调按独立Agent资格补齐，不发行Session后代令牌；完整语料和原parser差分",
+    "旧无记录来源明确导入；不猜当前home、不静默扫全部原生日志",
+    "I04其余Runtime并集、r1恢复/接管、记忆和自动化；I07完整浏览器/I08增强资产与全81簇48包324保持"
   ],
   "evidence": "integration/execution/i04-legacy-agent-source-result.json",
   "launch_origin_evidence": "integration/execution/i04-native-launch-origin-result.json",
   "qoder_source_evidence": "integration/execution/i04-qoder-agent-source-result.json",
   "claude_content_evidence": "integration/execution/i04-native-claude-content-result.json",
   "qoder_content_evidence": "integration/execution/i04-native-qoder-content-result.json",
-  "authority_evidence": "integration/execution/i04-legacy-agent-authority-result.json"
+  "authority_evidence": "integration/execution/i04-legacy-agent-authority-result.json",
+  "reader_evidence": "integration/execution/i04-legacy-agent-reader-result.json"
 }

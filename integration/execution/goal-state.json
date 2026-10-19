@@ -14,7 +14,7 @@
   "current_branch": "develop/V1.0.0",
   "base_branch": "main",
   "current_task": "I04-T01/T02",
-  "current_slice": "Claude/Qoder独立User Agent读取准备、Core证据/捕获来源与原文件工具编号+输入摘要关联本地已验；角色/越域/未知字段/历史/重新授权/取消/零写通过。继续独立后台reader/签名快照/运输/原UI，实际Host/provider映射与旧源导入待补。",
+  "current_slice": "旧代理共享后台worker/完整自身正文与统计/签名UTF8分页、独立Core四只读API及Native-Web方法准入本地已验；三原Rust owner、生产bins check、类型及71客户端检查通过。转真实provider身份映射查证、代理资源文件/原Viewer与嵌套来源，实际Host/两端App候选保留。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -34,14 +34,14 @@
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
     "I04-T01原Markdown/媒体/文件目录系统菜单与HTML控制已本地验证，不重复实现。阶段编码集齐后集中验真实Core/Native/Web和完整App、授权/长历史/规模/恢复；I07完整浏览器、I08增强技能资产保留。",
-    "I04-T01/T02：C/Q完整parser/home/私有父链与独立Core User准备/文件关联已本地验证；直接接独立后台reader/签名快照/分页/Native-Web运输与原UI。旧源导入/格式差分及真实Host/CLI映射/运行和平台集中候选，不重复已完层。",
+    "I04-T01/T02：C/Q完整parser/home/私有父链/Core独立准备与共享reader/签名分页/四API准入已本地验；下一编码先查真实provider身份映射，再代理文件来源/原Viewer、嵌套Agent与旧源导入/差分。真实Host/Core.handle/IPC/HTTP/完整App及平台集中候选，已完层退出编码清单。",
     "I04-T01：Grok修改意见与r1三Context mode/接管衔接；真实Core/Host/Runtime生命周期、Schema升级和恢复矩阵集中候选",
     "I04-T02/T03/T04：Runtime并集、恢复、记忆与自动化原剩余项；完整四包21簇84场景保持，阶段集齐集中构建/少量push和Actions"
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "legacy_agent_core_authority_and_file_join_local_verified_reader_transport_and_candidate_pending",
-  "evidence": "i04-legacy-agent-authority-result.json",
+  "current_slice_status": "shared_worker_signed_pages_core_api_and_transport_local_verified_viewer_file_nested_and_provider_pending",
+  "evidence": "i04-legacy-agent-reader-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
   "draft_restart_evidence": "i02-draft-restart-result.json",
@@ -116,7 +116,7 @@
     "human_card_resume_reported": true
   },
   "project_groups_evidence": "i03-project-groups-result.json",
-  "checked_at": "2026-10-19T06:51:49.810357+00:00",
+  "checked_at": "2026-10-19T07:18:15.046153+00:00",
   "project_layout_evidence": "i03-project-layout-result.json",
   "project_tree_evidence": "i03-project-tree-result.json",
   "navigation_activity_evidence": "i03-navigation-activity-result.json",
@@ -275,7 +275,7 @@
   "i04_native_viewer_ui_evidence": "integration/execution/i04-native-viewer-ui-result.json",
   "i04_native_rich_content_evidence": "integration/execution/i04-native-rich-content-result.json",
   "i04_native_tool_primitives_evidence": "integration/execution/i04-native-tool-primitives-result.json",
-  "current_operation": "旧代理独立读取资格本地收尾，下一步直接接现有后台reader和签名快照/两端运输，不重复已完parser/home/文件关系；实际Host及I04其他有限队列保持。",
+  "current_operation": "旧代理读取后台/API自审收尾和本地提交；下一步先查真实生产者身份契约，再代理资源文件/原Viewer与嵌套来源。只更新有限剩余项，不重做已完parser/home/Core准备/共享reader。",
   "development_status": "in_progress",
   "branch_policy": "integration/branch-policy.md",
   "branch_unification": {
@@ -312,5 +312,6 @@
   "qoder_agent_source_evidence": "i04-qoder-agent-source-result.json",
   "native_claude_content_evidence": "i04-native-claude-content-result.json",
   "native_qoder_content_evidence": "i04-native-qoder-content-result.json",
-  "native_legacy_agent_authority_evidence": "i04-legacy-agent-authority-result.json"
+  "native_legacy_agent_authority_evidence": "i04-legacy-agent-authority-result.json",
+  "native_legacy_agent_reader_evidence": "i04-legacy-agent-reader-result.json"
 }

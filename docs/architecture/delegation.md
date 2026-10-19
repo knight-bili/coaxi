@@ -25,6 +25,8 @@ User恢复以原UUID和持久父Conversation归属授权，允许父Run已经终
 私聊新角色使用policy3，普通私聊默认保持policy2。工具、历史和终态写回共享版本/冻结角色校验，不能只把数值3加入白名单；实际六操作仍走委派原鉴权。生产资格精确支持v1.73/160+210或161+211，不按未来schema范围猜测能力。旧Run不补角色；旧输入回放和真实原生Session执行分别保留各自验证证据。
 现有 Scheduler/Fleet、Runtime Adapter、输入接收、清理和命令回执承担执行；不能另运行具有业务权威的 Codeg broker。原生提供方的子代理通过只读证据/引用投影，缺可靠来源时显示未知，不伪造 Core 子 Run。
 
+原生 Session 与旧 Agent 正文共享唯一的有界文件 Registry、取消和签名分页，保留不同的 Core 引用及身份摘要域。Core 每次发布按原观察和捕获来源重新核定，文件 worker 不拥有数据库；原始材料解析不产生执行权。字段、窗口和两端只读运输见 [Native Transcript Reads v1](../contracts/native-transcript-reads-v1.md)。
+
 工具结束记录丢失时，Core 启动核对只读取原业务回执及同事务的 `delegation.tool_receipt_confirmed` 关联。
 关联精确绑定原工具尝试、命令编号、完整请求摘要、成员、Thread、Run 和 epoch，不能把同请求后来重试的结果借给早先尝试。
 未取得该证明的观察记录为 `builtin_tool.result_unconfirmed`，表示本次工具结果尚未确认，不推断任务失败，也不重新派发命令或模型输入。

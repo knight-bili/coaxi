@@ -15,6 +15,7 @@ use tokio::sync::Semaphore;
 
 use super::{
     NativeChildSessionReference, ObservedNativeSessionTarget, content,
+    legacy::{NativeAgentReadPlan, NativeAgentReference},
     snapshot::{self, ContentWindow, NativeSnapshot},
 };
 use crate::{command::ActorRef, current_user::CURRENT_USER_ID};
@@ -37,6 +38,13 @@ pub(crate) struct StartRead {
     pub read_id: String,
     pub reference: NativeChildSessionReference,
     pub descendant: Option<DescendantRead>,
+}
+
+#[derive(Clone, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub(crate) struct AgentStartRead {
+    pub read_id: String,
+    pub reference: NativeAgentReference,
 }
 
 #[derive(Deserialize)]
@@ -73,15 +81,49 @@ struct Data {
     state: State,
     last_used: Instant,
 }
+enum ReaderKind {
+    Session {
+        request: StartRead,
+        target: ObservedNativeSessionTarget,
+    },
+    Agent {
+        request: AgentStartRead,
+    },
+}
+impl ReaderKind {
+    fn same_request(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Session { request: a, .. }, Self::Session { request: b, .. }) => a == b,
+            (Self::Agent { request: a, .. }, Self::Agent { request: b, .. }) => a == b,
+            _ => false,
+        }
+    }
+}
 struct Entry {
-    request: StartRead,
+    kind: ReaderKind,
     root_scope: String,
-    target: ObservedNativeSessionTarget,
     stop: Arc<AtomicBool>,
     data: Mutex<Data>,
 }
 
 impl Entry {
+    fn session(&self) -> Result<(&StartRead, &ObservedNativeSessionTarget)> {
+        match &self.kind {
+            ReaderKind::Session { request, target } => Ok((request, target)),
+            _ => anyhow::bail!("native_child.scope_changed"),
+        }
+    }
+    fn agent(&self, actor: &ActorRef, plan: &NativeAgentReadPlan) -> Result<()> {
+        ensure!(
+            plan.scope(actor)? == self.root_scope,
+            "native_child.scope_changed"
+        );
+        ensure!(
+            matches!(&self.kind,ReaderKind::Agent{request,..} if &request.reference==plan.reference()),
+            "native_child.scope_changed"
+        );
+        Ok(())
+    }
     fn data(&self) -> Result<MutexGuard<'_, Data>> {
         self.data
             .lock()
@@ -96,10 +138,11 @@ impl Entry {
             snapshot::scope(actor, root)? == self.root_scope,
             "native_child.scope_changed"
         );
-        if self.request.descendant.is_none() {
+        let (request, target) = self.session()?;
+        if request.descendant.is_none() {
             Ok(root.clone())
         } else {
-            Ok(self.target.clone())
+            Ok(target.clone())
         }
     }
 }
@@ -209,7 +252,8 @@ impl Registry {
         Ok(entries
             .get(id)
             .context("native_child.read_missing")?
-            .request
+            .session()?
+            .0
             .reference
             .clone())
     }
@@ -243,43 +287,20 @@ impl Registry {
         let root_scope = snapshot::scope(actor, root)?;
         let mut entries = self.entries()?;
         self.reap(&mut entries)?;
-        ensure!(
-            !self.closing.load(Ordering::Acquire),
-            "native_child.reader_closing"
-        );
-        {
-            let closed = self
-                .closed
-                .lock()
-                .map_err(|_| anyhow::anyhow!("native_child.reader_poisoned"))?;
-            ensure!(
-                !closed.contains_key(&request.read_id),
-                "native_child.read_closed"
-            );
+        let admission_kind = ReaderKind::Session {
+            request: request.clone(),
+            target: root.clone(),
+        };
+        if let Some(view) = self.admit(&entries, &request.read_id, &root_scope, &admission_kind)? {
+            return Ok(view);
         }
-        if let Some(entry) = entries.get(&request.read_id) {
-            ensure!(
-                entry.request == request && entry.root_scope == root_scope,
-                "native_child.read_id_conflict"
-            );
-            return self.view(&request.read_id, entry);
-        }
-        ensure!(
-            self.closed
-                .lock()
-                .map_err(|_| anyhow::anyhow!("native_child.reader_poisoned"))?
-                .len()
-                < MAX_CLOSED,
-            "native_child.reader_busy"
-        );
-        ensure!(entries.len() < MAX_READERS, "native_child.reader_limit");
         let target = if let Some(descendant) = &request.descendant {
             read_id(&descendant.parent_read_id)?;
             let parent = entries
                 .get(&descendant.parent_read_id)
                 .context("native_child.read_missing")?;
             ensure!(
-                parent.request.reference == request.reference,
+                parent.session()?.0.reference == request.reference,
                 "native_child.scope_changed"
             );
             let parent_target = parent.target(actor, root)?;
@@ -291,6 +312,67 @@ impl Registry {
         } else {
             root.clone()
         };
+        let kind = ReaderKind::Session {
+            request: request.clone(),
+            target: target.clone(),
+        };
+        self.spawn(
+            &mut entries,
+            request.read_id,
+            root_scope,
+            kind,
+            move |stop| work(target, stop),
+        )
+    }
+
+    fn admit(
+        &self,
+        entries: &HashMap<String, Arc<Entry>>,
+        id: &str,
+        scope: &str,
+        kind: &ReaderKind,
+    ) -> Result<Option<ReadView>> {
+        ensure!(
+            !self.closing.load(Ordering::Acquire),
+            "native_child.reader_closing"
+        );
+        {
+            let closed = self
+                .closed
+                .lock()
+                .map_err(|_| anyhow::anyhow!("native_child.reader_poisoned"))?;
+            ensure!(!closed.contains_key(id), "native_child.read_closed");
+        }
+        if let Some(entry) = entries.get(id) {
+            ensure!(
+                entry.kind.same_request(kind) && entry.root_scope == scope,
+                "native_child.read_id_conflict"
+            );
+            return Ok(Some(self.view(id, entry)?));
+        }
+        ensure!(
+            self.closed
+                .lock()
+                .map_err(|_| anyhow::anyhow!("native_child.reader_poisoned"))?
+                .len()
+                < MAX_CLOSED,
+            "native_child.reader_busy"
+        );
+        ensure!(entries.len() < MAX_READERS, "native_child.reader_limit");
+        Ok(None)
+    }
+
+    fn spawn<F>(
+        &self,
+        entries: &mut HashMap<String, Arc<Entry>>,
+        id: String,
+        root_scope: String,
+        kind: ReaderKind,
+        work: F,
+    ) -> Result<ReadView>
+    where
+        F: FnOnce(Arc<AtomicBool>) -> Result<NativeSnapshot> + Send + 'static,
+    {
         // The worker, not the UI entry, owns this permit. Closing/removing a job
         // cannot make a stuck FS call invisible to the global concurrency bound.
         let slot = self
@@ -298,11 +380,9 @@ impl Registry {
             .clone()
             .try_acquire_owned()
             .context("native_child.reader_busy")?;
-        let id = request.read_id.clone();
         let entry = Arc::new(Entry {
-            request,
+            kind,
             root_scope,
-            target: target.clone(),
             stop: Arc::new(AtomicBool::new(false)),
             data: Mutex::new(Data {
                 state: State::Reading,
@@ -316,7 +396,7 @@ impl Registry {
             .spawn(move || {
                 let _slot = slot;
                 let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-                    work(target, worker.stop.clone())
+                    work(worker.stop.clone())
                 }));
                 if let Ok(mut data) = worker.data.lock() {
                     if !worker.stop.load(Ordering::Acquire) {
@@ -335,6 +415,103 @@ impl Registry {
         }
         self.view(&id, &entry)
     }
+    pub(crate) fn agent_reference(
+        &self,
+        actor: &ActorRef,
+        id: &str,
+    ) -> Result<NativeAgentReference> {
+        user(actor)?;
+        read_id(id)?;
+        let mut entries = self.entries()?;
+        self.reap(&mut entries)?;
+        let entry = entries.get(id).context("native_child.read_missing")?;
+        match &entry.kind {
+            ReaderKind::Agent { request, .. } => Ok(request.reference.clone()),
+            _ => anyhow::bail!("native_child.scope_changed"),
+        }
+    }
+
+    pub(crate) fn start_agent(
+        &self,
+        actor: &ActorRef,
+        request: AgentStartRead,
+        plan: &NativeAgentReadPlan,
+        fallback: chrono::DateTime<chrono::Utc>,
+    ) -> Result<ReadView> {
+        user(actor)?;
+        read_id(&request.read_id)?;
+        ensure!(
+            &request.reference == plan.reference(),
+            "native_child.scope_changed"
+        );
+        let scope = plan.scope(actor)?;
+        let mut entries = self.entries()?;
+        self.reap(&mut entries)?;
+        let kind = ReaderKind::Agent {
+            request: request.clone(),
+        };
+        if let Some(view) = self.admit(&entries, &request.read_id, &scope, &kind)? {
+            if let Some(entry) = entries.get(&request.read_id) {
+                if let State::Ready(value) = &entry.data()?.state {
+                    value.authorize_agent(actor, plan)?;
+                }
+            }
+            return Ok(view);
+        }
+        let plan = plan.clone();
+        let actor = actor.clone();
+        self.spawn(&mut entries, request.read_id, scope, kind, move |stop| {
+            let (target, content, stats) = content::legacy::read(&plan, fallback, &stop)?;
+            NativeSnapshot::new_agent(&actor, target, content, stats, &stop)
+        })
+    }
+
+    pub(crate) fn poll_agent(
+        &self,
+        actor: &ActorRef,
+        id: &str,
+        plan: &NativeAgentReadPlan,
+    ) -> Result<ReadView> {
+        user(actor)?;
+        read_id(id)?;
+        let mut entries = self.entries()?;
+        self.reap(&mut entries)?;
+        let entry = entries.get(id).context("native_child.read_missing")?;
+        entry.agent(actor, plan)?;
+        if let State::Ready(value) = &entry.data()?.state {
+            value.authorize_agent(actor, plan)?;
+        }
+        self.view(id, entry)
+    }
+
+    pub(crate) fn page_agent(
+        &self,
+        actor: &ActorRef,
+        request: PageRead,
+        plan: &NativeAgentReadPlan,
+    ) -> Result<ContentWindow> {
+        user(actor)?;
+        read_id(&request.read_id)?;
+        let mut entries = self.entries()?;
+        self.reap(&mut entries)?;
+        let entry = entries
+            .get(&request.read_id)
+            .context("native_child.read_missing")?;
+        entry.agent(actor, plan)?;
+        let mut data = entry.data()?;
+        data.last_used = Instant::now();
+        let State::Ready(value) = &data.state else {
+            anyhow::bail!("native_child.read_not_ready")
+        };
+        value.agent_window(
+            actor,
+            plan,
+            &request.snapshot_reference,
+            request.cursor.as_deref(),
+            request.max_bytes.unwrap_or(snapshot::MAX_WINDOW_BYTES),
+        )
+    }
+
     pub(crate) fn poll(
         &self,
         actor: &ActorRef,
@@ -446,4 +623,4 @@ impl Drop for Registry {
 
 #[cfg(all(test, feature = "extended-tests"))]
 #[path = "reader_tests.rs"]
-pub(super) mod tests;
+pub(crate) mod tests;

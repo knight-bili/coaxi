@@ -4,7 +4,7 @@ import type { BuiltinMemberAvatarRole } from './member-avatar'
 
 export * from './member-avatar'
 export * from './current-user-profile'
-export type { NativeChildReadReference, NativeChildReadStart, NativeChildReadView, NativeChildReadPageRequest, NativeChildReadPage } from './native-child-reads'
+export type { NativeAgentReadReference, NativeAgentReadStart, NativeChildReadReference, NativeChildReadStart, NativeChildReadView, NativeChildReadPageRequest, NativeChildReadPage } from './native-child-reads'
 export type { DelegationToolSourceParams, DelegationToolSourceIdentity, DelegationToolSourceView } from './delegation-tool-source'
 
 export const THREAD_ID_PATTERN = /^rvcamp_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$/u
@@ -5003,6 +5003,10 @@ export type CoreMethod =
   | 'runtime.interactions.get'
   | 'runtime.interactions.resolve'
   | 'runtime.childReads.start'
+  | 'runtime.agentReads.start'
+  | 'runtime.agentReads.poll'
+  | 'runtime.agentReads.page'
+  | 'runtime.agentReads.close'
   | 'runtime.childReads.poll'
   | 'runtime.childReads.page'
   | 'runtime.childReads.close'

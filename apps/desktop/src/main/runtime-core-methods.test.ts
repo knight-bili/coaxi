@@ -42,6 +42,7 @@ describe('Runtime Renderer Core method allowlist', () => {
       'delegations.resume', 'delegations.list', 'delegations.get', 'delegations.source', 'delegations.history', 'delegations.read', 'delegations.settings.get', 'delegations.settings.update',
       'runtime.interactions.list', 'runtime.interactions.get', 'runtime.interactions.resolve',
       'runtime.childReads.start', 'runtime.childReads.poll', 'runtime.childReads.page', 'runtime.childReads.close',
+      'runtime.agentReads.start', 'runtime.agentReads.poll', 'runtime.agentReads.page', 'runtime.agentReads.close',
       'delegations.composer.get', 'delegations.conversation.get', 'delegations.composer.mutate', 'delegations.composer.recovery',
       'delegations.message.send', 'delegations.pendingInputs.get', 'delegations.pendingInputs.edit', 'delegations.takeover', 'delegations.cancel', 'delegations.conversation.end']) {
       expect(mainSource.slice(allowlistStart, allowlistEnd)).toContain(`'${method}'`)

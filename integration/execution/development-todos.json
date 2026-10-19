@@ -207,13 +207,14 @@
       "evidence": "i04-native-launch-origin-result.json",
       "qualification": "两个精确Rust owner通过；132组官方纯函数合成参考，本机Windows66组；同库正向绑定仍为Codex，Claude/Qoder仅补错Runtime拒绝。未运行实际CLI/模型/完整App，不增加84正式场景通过数。",
       "remaining": [
-        "独立Agent读取目标接现有后台reader、签名快照/分页/每页重新授权和Native/Web运输；不借Session句柄",
-        "原Codeg查看器按原Agent分类接生产目标，真实Core/Native/Web/完整App及实际C/Q Host绑定/文件roundtrip集中候选",
-        "真实版本的ACP tool/native Session身份与输入摘要映射、运行中及恢复/旁链格式语料和原parser差分；不把SQL元数据夹具当生产者资格",
-        "旧无记录来源明确导入；禁止当前home猜补或静默扫描全部历史",
-        "I04其余Runtime并集、r1接管/恢复、记忆和自动化；I07浏览器/I08增强资产和全81簇48包324保持"
+        "先核对Claude/Qoder实际ACP工具/原生Session身份和摘要映射的固定来源；真实Host绑定/提供方运行/断线恢复与平台候选继续，不能假定同名即同值",
+        "代理专用资源文件来源与原Codeg Viewer/Agent卡片接现有真实Core reader；两端Controller/按readId资源/原组件视觉及完整App联调",
+        "原生嵌套Agent来源/父链和原统计回调按独立Agent资格补齐，不发行Session后代令牌；完整语料和原parser差分",
+        "旧无记录来源明确导入；不猜当前home、不静默扫全部原生日志",
+        "I04其余Runtime并集、r1恢复/接管、记忆和自动化；I07完整浏览器/I08增强资产与全81簇48包324保持"
       ],
-      "authority_evidence": "i04-legacy-agent-authority-result.json"
+      "authority_evidence": "i04-legacy-agent-authority-result.json",
+      "reader_evidence": "i04-legacy-agent-reader-result.json"
     },
     {
       "id": "DEV-QODER-AGENT-SOURCE",
@@ -224,14 +225,15 @@
       "evidence": "i04-qoder-agent-source-result.json",
       "qualification": "原source文件owner已随完整Claude批次执行通过，覆盖上轮真实文件夹具；不等于Core生产关联/真实Runtime/App，不增加84正式场景通过数。",
       "remaining": [
-        "独立Agent读取目标接现有后台reader、签名快照/分页/每页重新授权和Native/Web运输；不借Session句柄",
-        "原Codeg查看器按原Agent分类接生产目标，真实Core/Native/Web/完整App及实际C/Q Host绑定/文件roundtrip集中候选",
-        "真实版本的ACP tool/native Session身份与输入摘要映射、运行中及恢复/旁链格式语料和原parser差分；不把SQL元数据夹具当生产者资格",
-        "旧无记录来源明确导入；禁止当前home猜补或静默扫描全部历史",
-        "I04其余Runtime并集、r1接管/恢复、记忆和自动化；I07浏览器/I08增强资产和全81簇48包324保持"
+        "先核对Claude/Qoder实际ACP工具/原生Session身份和摘要映射的固定来源；真实Host绑定/提供方运行/断线恢复与平台候选继续，不能假定同名即同值",
+        "代理专用资源文件来源与原Codeg Viewer/Agent卡片接现有真实Core reader；两端Controller/按readId资源/原组件视觉及完整App联调",
+        "原生嵌套Agent来源/父链和原统计回调按独立Agent资格补齐，不发行Session后代令牌；完整语料和原parser差分",
+        "旧无记录来源明确导入；不猜当前home、不静默扫全部原生日志",
+        "I04其余Runtime并集、r1恢复/接管、记忆和自动化；I07完整浏览器/I08增强资产与全81簇48包324保持"
       ],
       "verification_evidence": "i04-native-qoder-content-result.json",
-      "authority_evidence": "i04-legacy-agent-authority-result.json"
+      "authority_evidence": "i04-legacy-agent-authority-result.json",
+      "reader_evidence": "i04-legacy-agent-reader-result.json"
     },
     {
       "id": "DEV-NATIVE-CLAUDE-CONTENT",
@@ -242,13 +244,14 @@
       "evidence": "i04-native-claude-content-result.json",
       "qualification": "66原函数主体在声明的模块路径/格式化归一后相同；54原断言和真实文件→完整UTF8/稳定快照/取消在原source owner通过，12条警告留证。来源/Core生产者、公开目标及真实Runtime/App未获资格，正式84新增0。",
       "remaining": [
-        "独立Agent读取目标接现有后台reader、签名快照/分页/每页重新授权和Native/Web运输；不借Session句柄",
-        "原Codeg查看器按原Agent分类接生产目标，真实Core/Native/Web/完整App及实际C/Q Host绑定/文件roundtrip集中候选",
-        "真实版本的ACP tool/native Session身份与输入摘要映射、运行中及恢复/旁链格式语料和原parser差分；不把SQL元数据夹具当生产者资格",
-        "旧无记录来源明确导入；禁止当前home猜补或静默扫描全部历史",
-        "I04其余Runtime并集、r1接管/恢复、记忆和自动化；I07浏览器/I08增强资产和全81簇48包324保持"
+        "先核对Claude/Qoder实际ACP工具/原生Session身份和摘要映射的固定来源；真实Host绑定/提供方运行/断线恢复与平台候选继续，不能假定同名即同值",
+        "代理专用资源文件来源与原Codeg Viewer/Agent卡片接现有真实Core reader；两端Controller/按readId资源/原组件视觉及完整App联调",
+        "原生嵌套Agent来源/父链和原统计回调按独立Agent资格补齐，不发行Session后代令牌；完整语料和原parser差分",
+        "旧无记录来源明确导入；不猜当前home、不静默扫全部原生日志",
+        "I04其余Runtime并集、r1恢复/接管、记忆和自动化；I07完整浏览器/I08增强资产与全81簇48包324保持"
       ],
-      "authority_evidence": "i04-legacy-agent-authority-result.json"
+      "authority_evidence": "i04-legacy-agent-authority-result.json",
+      "reader_evidence": "i04-legacy-agent-reader-result.json"
     },
     {
       "id": "DEV-NATIVE-QODER-CONTENT",
@@ -259,13 +262,14 @@
       "evidence": "i04-native-qoder-content-result.json",
       "qualification": "43原case与原source文件owner通过；13原函数和3用量事实函数主体核对。文件driver仅提供合成记录/子源，不证明Core生产证据/User查找/真实Runtime。三项原身份/发现/旧环境case在对应Core来源/最终launch资格，未删能力或假通过；正式84新增0。",
       "remaining": [
-        "独立Agent读取目标接现有后台reader、签名快照/分页/每页重新授权和Native/Web运输；不借Session句柄",
-        "原Codeg查看器按原Agent分类接生产目标，真实Core/Native/Web/完整App及实际C/Q Host绑定/文件roundtrip集中候选",
-        "真实版本的ACP tool/native Session身份与输入摘要映射、运行中及恢复/旁链格式语料和原parser差分；不把SQL元数据夹具当生产者资格",
-        "旧无记录来源明确导入；禁止当前home猜补或静默扫描全部历史",
-        "I04其余Runtime并集、r1接管/恢复、记忆和自动化；I07浏览器/I08增强资产和全81簇48包324保持"
+        "先核对Claude/Qoder实际ACP工具/原生Session身份和摘要映射的固定来源；真实Host绑定/提供方运行/断线恢复与平台候选继续，不能假定同名即同值",
+        "代理专用资源文件来源与原Codeg Viewer/Agent卡片接现有真实Core reader；两端Controller/按readId资源/原组件视觉及完整App联调",
+        "原生嵌套Agent来源/父链和原统计回调按独立Agent资格补齐，不发行Session后代令牌；完整语料和原parser差分",
+        "旧无记录来源明确导入；不猜当前home、不静默扫全部原生日志",
+        "I04其余Runtime并集、r1恢复/接管、记忆和自动化；I07完整浏览器/I08增强资产与全81簇48包324保持"
       ],
-      "authority_evidence": "i04-legacy-agent-authority-result.json"
+      "authority_evidence": "i04-legacy-agent-authority-result.json",
+      "reader_evidence": "i04-legacy-agent-reader-result.json"
     },
     {
       "id": "DEV-NATIVE-LEGACY-AGENT-AUTHORITY",
@@ -276,11 +280,28 @@
       "problem": "独立Agent三字段引用从Core证据和捕获来源派生，不将短agent当Session或由UI指定路径；核对原工具编号及输入摘要后才用原ack/meta关联文件。",
       "qualification": "原source与Context owner精确列册各1项并执行通过；复用同DB/Blob/根目录，C/Q适配器/evidence/来源是明确SQL夹具，真实文件完成关联/历史/取消/重授权和零写。没有RPC/UI/实际Host与提供方资格，正式84新增0。",
       "remaining": [
-        "独立Agent读取目标接现有后台reader、签名快照/分页/每页重新授权和Native/Web运输；不借Session句柄",
-        "原Codeg查看器按原Agent分类接生产目标，真实Core/Native/Web/完整App及实际C/Q Host绑定/文件roundtrip集中候选",
-        "真实版本的ACP tool/native Session身份与输入摘要映射、运行中及恢复/旁链格式语料和原parser差分；不把SQL元数据夹具当生产者资格",
-        "旧无记录来源明确导入；禁止当前home猜补或静默扫描全部历史",
-        "I04其余Runtime并集、r1接管/恢复、记忆和自动化；I07浏览器/I08增强资产和全81簇48包324保持"
+        "先核对Claude/Qoder实际ACP工具/原生Session身份和摘要映射的固定来源；真实Host绑定/提供方运行/断线恢复与平台候选继续，不能假定同名即同值",
+        "代理专用资源文件来源与原Codeg Viewer/Agent卡片接现有真实Core reader；两端Controller/按readId资源/原组件视觉及完整App联调",
+        "原生嵌套Agent来源/父链和原统计回调按独立Agent资格补齐，不发行Session后代令牌；完整语料和原parser差分",
+        "旧无记录来源明确导入；不猜当前home、不静默扫全部原生日志",
+        "I04其余Runtime并集、r1恢复/接管、记忆和自动化；I07完整浏览器/I08增强资产与全81簇48包324保持"
+      ],
+      "reader_evidence": "i04-legacy-agent-reader-result.json"
+    },
+    {
+      "id": "DEV-NATIVE-LEGACY-AGENT-READER",
+      "task": "I04-T01/T02/I12",
+      "owner": "研发",
+      "status": "shared_worker_signed_pages_core_api_and_transport_local_verified_viewer_file_nested_and_provider_pending",
+      "evidence": "i04-legacy-agent-reader-result.json",
+      "problem": "独立Agent接唯一Registry、完整自身正文/统计、域隔离签名分页和Core四只读API；Native/Web准入而不授予Session、执行或重发权。",
+      "qualification": "三个原Rust owner精确列册/执行，Core生产bins check、类型与71客户端检查通过。真实文件/worker/完整UTF8分页、历史/重授权和原Session生命周期已验；adapter/evidence/来源是SQL夹具，Web为fetch替身，不证明实际Core.handle/IPC/HTTP/provider/原UI。正式84新增0。",
+      "remaining": [
+        "先核对Claude/Qoder实际ACP工具/原生Session身份和摘要映射的固定来源；真实Host绑定/提供方运行/断线恢复与平台候选继续，不能假定同名即同值",
+        "代理专用资源文件来源与原Codeg Viewer/Agent卡片接现有真实Core reader；两端Controller/按readId资源/原组件视觉及完整App联调",
+        "原生嵌套Agent来源/父链和原统计回调按独立Agent资格补齐，不发行Session后代令牌；完整语料和原parser差分",
+        "旧无记录来源明确导入；不猜当前home、不静默扫全部原生日志",
+        "I04其余Runtime并集、r1恢复/接管、记忆和自动化；I07完整浏览器/I08增强资产与全81簇48包324保持"
       ]
     }
   ]

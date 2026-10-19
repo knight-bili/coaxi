@@ -607,6 +607,7 @@ fn assert_legacy_agent_core_reference(f: &mut Fixture) {
         user_id: crate::current_user::CURRENT_USER_ID.into(),
     };
     let stop = AtomicBool::new(false);
+    let body = format!("PRIVATE_AGENT_BODY{}完整末尾😀", "中文😀".repeat(10_000));
     for kind in [AdapterKind::ClaudeCodeCli, AdapterKind::QoderCli] {
         let home = f
             .directory
@@ -631,7 +632,7 @@ fn assert_legacy_agent_core_reference(f: &mut Fixture) {
                 + "\n",
         )
         .unwrap();
-        std::fs::write(sub.join("agent-native-agent-only.jsonl"),json!({"type":"assistant","agentId":"native-agent-only","message":{"content":[{"type":"text","text":"PRIVATE_AGENT_BODY"}]}}).to_string()+"\n").unwrap();
+        std::fs::write(sub.join("agent-native-agent-only.jsonl"),json!({"type":"assistant","uuid":"own-agent-answer","agentId":"native-agent-only","timestamp":"2026-10-19T00:00:00Z","message":{"id":"own-agent-answer","role":"assistant","content":[{"type":"text","text":body}]}}).to_string()+"\n").unwrap();
         std::fs::write(
             sub.join("agent-native-agent-only.meta.json"),
             json!({"toolUseId":"core-native-tool","agentType":"Explore"}).to_string(),
@@ -677,6 +678,8 @@ fn assert_legacy_agent_core_reference(f: &mut Fixture) {
         };
         let changes = f.database.connection().total_changes();
         let plan = prepare(&user, &reference).unwrap();
+        let (reader, read, snapshot) =
+            crate::runtime_subagent_session::reader::tests::assert_agent_workers(&plan, &body);
         assert!(!format!("{plan:?}").contains("legacy-evidence"));
         let (target, documents) = plan.open(&stop).unwrap();
         assert_eq!(target.agent_id, "native-agent-only");
@@ -748,7 +751,28 @@ fn assert_legacy_agent_core_reference(f: &mut Fixture) {
                 [&f.run_id],
             )
             .unwrap();
-        let historical = prepare(&user, &reference).unwrap().open(&stop).unwrap().0;
+        let history_plan = prepare(&user, &reference).unwrap();
+        let historical = history_plan.open(&stop).unwrap().0;
+        assert_eq!(
+            reader
+                .poll_agent(&user, &read.read_id, &history_plan)
+                .unwrap()
+                .state,
+            "ready"
+        );
+        let window = reader
+            .page_agent(
+                &user,
+                crate::runtime_subagent_session::reader::PageRead {
+                    read_id: read.read_id.clone(),
+                    snapshot_reference: snapshot,
+                    cursor: None,
+                    max_bytes: None,
+                },
+                &history_plan,
+            )
+            .unwrap();
+        assert!(!window.live);
         assert_eq!(historical.agent_id, target.agent_id);
         assert!(!historical.live);
         NativeAgentService::revalidate(
@@ -760,6 +784,12 @@ fn assert_legacy_agent_core_reference(f: &mut Fixture) {
         .unwrap();
         f.database.connection().execute("UPDATE agent_run_execution_evidence SET payload_preview_json=json_set(payload_preview_json,'$.rawInputDigest',?1) WHERE id=?2",params!["0".repeat(64),evidence]).unwrap();
         assert!(prepare(&user, &reference).unwrap().open(&stop).is_err());
+        assert!(
+            reader
+                .poll_agent(&user, &read.read_id, &prepare(&user, &reference).unwrap())
+                .is_err()
+        );
+        reader.close(&user, &read.read_id).unwrap();
         assert!(
             NativeAgentService::revalidate(
                 &f.database,

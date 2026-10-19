@@ -1,5 +1,7 @@
 # I04 执行队列
 
+2026-10-19 旧代理后台/API接续：复用唯一Registry/并发许可/关闭/闲置清理，独立Agent身份接完整原正文与自身时间线/统计、HMAC UTF8窗口和四只读API；Native/Web闭集与重登录不重发已接。三原Rust owner、实际生产bins check、类型及71客户端检查通过，见[本批结果](i04-legacy-agent-reader-result.json)与[当前只读合同](../../docs/contracts/native-transcript-reads-v1.md)。SQL producer元数据/fetch替身明确，实际Core.handle/Host/IPC/HTTP/App/平台资格未授予。下一步先查真实provider身份映射，再代理专用资源文件/原Viewer、嵌套源与旧无来源导入；parser/home/Core准备/共享reader已完层不重复编码，其他I04原包/全81簇48包324及正式84不减。
+
 2026-10-19 旧代理Core关联接续：独立User三字段引用按原Run/epoch/Context/捕获来源准备，文件层再核原Agent/Task工具编号+canonical输入摘要及Claude ack/Qoder meta；历史可读、实时资格关闭、错身份/越域/未知覆盖、取消和零写在两个原owner通过，见[本批结果](i04-legacy-agent-authority-result.json)。既有ACP→Application→Evidence字段经源码核查，实际C/Q ID/Session映射未实测，SQL适配器/来源夹具不能代替真实Host资格。独立后台reader/签名快照/每页再授权/运输与原UI是下一编码队列；原parser/home/私有父链和本准备层不重复编码，旧源导入及其他I04包保持。全81簇48包324/I04四包21簇84，正式新增0。
 
 2026-10-19 Qoder完整内容接续：原13函数/43case和3个用量事实函数核对，原source文件owner通过；完整代理正文、自己的旁链、原状态/恢复结果、缓存窗口/花费、快照/改写/取消已接，见[本批结果](i04-native-qoder-content-result.json)。普通Session旁链过滤保留，只有已核实代理文件被当作本次主体。Claude/Qoder parser/home/私有文件层退出编码清单，继续生产Core证据/独立User目标/运输、原UI真实接续、显式旧源导入与语料差分；实际Host正向绑定/CLI/App/平台与I04其他原包集中候选。原43case不代表Core producer或全部原程序资格，正式84新增0。

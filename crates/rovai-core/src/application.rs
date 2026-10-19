@@ -10647,6 +10647,9 @@ impl Core {
                 let db = self.database.lock().await;
                 delegation_queries::read(&db, &request.method, request.params.clone())
             }
+            "runtime.agentReads.start" | "runtime.agentReads.poll" | "runtime.agentReads.page" | "runtime.agentReads.close" => {
+                self.native_agent_read(&request.method, request.params.clone()).await
+            }
             "runtime.childReads.start" | "runtime.childReads.poll" | "runtime.childReads.page" | "runtime.childReads.close" => {
                 self.native_child_read(&request.method, request.params.clone()).await
             }

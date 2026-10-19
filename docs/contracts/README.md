@@ -642,3 +642,5 @@ Architecture 解释组件如何组成，Version 概览记录交付范围；它�
 ## 独立帮手
 
 [Delegation v1](delegation-v1.md)记录 I04 已确认严格输入和设置基础，以及待接入的持久身份、执行与模型边界。
+
+[Native Transcript Reads v1](native-transcript-reads-v1.md)记录独立原生 Session/Agent 引用、共享只读工作、签名 UTF-8 分页与两端运输；不授予 Core 委派或 Runtime 控制权。
