@@ -1,0 +1,13 @@
+{
+  "name": "@adobe/css-tools",
+  "version": "4.4.4",
+  "url": "https://registry.npmjs.org/@adobe/css-tools/-/css-tools-4.4.4.tgz",
+  "integrity": "sha512-Elp+iwUx5rN5+Y8xLt5/GRoG20WGoDCQ/1Fb+1LiGtvwbDavuSk0jhD/eZdckHAuzcDzccnkv+rEjyWfRx18gg==",
+  "bytes": 27587,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

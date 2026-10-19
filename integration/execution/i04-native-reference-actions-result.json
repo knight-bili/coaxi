@@ -1,0 +1,3073 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-19T03:29:47.124649+00:00",
+  "stage": "I04",
+  "task": "I04-T01",
+  "branch": "develop/V1.0.0",
+  "baseline_commit": "2bffa22db3b23aa756cdd3ba7056062a314891b1",
+  "status": "ordinary_file_reference_actions_local_verified_directory_system_html_and_actual_host_candidate_pending",
+  "stage_complete": false,
+  "scope_preserved": {
+    "source_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_packages": 4,
+    "i04_clusters": 21,
+    "i04_formal_cases": 84,
+    "new_formal_cases_passed": 0
+  },
+  "facts": [
+    "7 fixed original components/tests and 2 already-existing type/URI modules audited; original badges/menu JSX/wrapper retained with declared Core host IO replacement",
+    "Fresh precise native-reader grant for metadata and every action, temporary handles always released; no guessed current project root or reused old action handle",
+    "Readonly optional sourceRelativePath and existing absolutePath projected only for canonical files within Core-verified native root; external/name-only/restore/automatic-open boundaries preserved",
+    "Uncontrolled Radix context menu closes on reader/client/visibility changes; owner guards survive menu closure, reject late actions and discard late UI results",
+    "Actual isolated Electron menu, local/remote capability switches, exact generation download, complete UTF-8 bytes and original component visual comparison passed; transport/clipboard substitutes explicitly declared",
+    "Old 1090 packages/1114 snapshots/importers retained; ContextMenu direct uses existing node, exact source jest-dom dev adds 9 package/snapshot nodes; 12 actual downloaded packages SRI/license verified",
+    "149 tests and typecheck passed; state-continuity math test preloads real spec module to isolate cold Vite transform latency, no assertion/timeout change or engine mock",
+    "Goal service active verified this turn; no customer engineering acceptance required"
+  ],
+  "verification": {
+    "targeted_files": 11,
+    "targeted_tests_passed": 149,
+    "existing_platform_skipped": 1,
+    "renderer_checks": 20,
+    "screenshots_reviewed": 8,
+    "actual_utf8_download": true,
+    "typecheck_exit": 0,
+    "docs_tests_passed": 10,
+    "docs_version_gate": true,
+    "docs_diff_gate_base": "2bffa22db3b23aa756cdd3ba7056062a314891b1",
+    "codegraph_synced": true,
+    "source_module_count": 7,
+    "reused_original_modules": 2,
+    "original_source_audit": [
+      {
+        "source": "src/components/chat/composer/badges/reference-badge.tsx",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/badges/reference-badge.tsx",
+        "sourceSha256": "7c01ff446118e0c85f39b0adb0e800074066b83bb8d8c9c929f79dff6f0c87a4",
+        "portedSha256": "69877e0c1b395e8b74fe06ba33ef9375257cd0403bb6b5ece4d89be3413aa5d4",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import host bindings and LF/EOF normalization only"
+        ],
+        "sourceGitBlob": "efb0fcd6d574906c422fa73c5ccc2a60fa244a7b"
+      },
+      {
+        "source": "src/components/chat/composer/badges/reference-badge.test.tsx",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/badges/reference-badge.test.tsx",
+        "sourceSha256": "d91f60dcb0b411cc02454de59ebb69106d96fd56906095ce36aada8fe5cff6c1",
+        "portedSha256": "54df5dfd9232a2f957119a89574e1dfef67e2b228a852f838d228b12d14e28e1",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import host bindings and LF/EOF normalization only",
+          "test-only original matcher setup and jsdom environment restored"
+        ],
+        "sourceGitBlob": "bdd0b3257cc46545accf915eb54f08076ce9e7ac"
+      },
+      {
+        "source": "src/components/chat/composer/reference-uri.test.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/reference-uri.test.ts",
+        "sourceSha256": "d745ee30b18165ceba6da542977c601f44e8128528752d348ccf62c9ece9d95a",
+        "portedSha256": "13f835944ce02e252cb0a75babcff2daa39d73868b549110b639c0a7637baafe",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import host bindings and LF/EOF normalization only"
+        ],
+        "sourceGitBlob": "e2d46c11f03c6ad2dce8e255104957950416755f"
+      },
+      {
+        "source": "src/lib/resource-kind.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/resource-kind.ts",
+        "sourceSha256": "3a8ab2a7ec09085276886b8c2ca48f678f4f4e9211cb67f519e0fa8fc200e04c",
+        "portedSha256": "240412e6c6c2e9754a0547f8d8b9c49ab0f1110cfab9eaaacea3db9d7044c297",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import host bindings and LF/EOF normalization only"
+        ],
+        "sourceGitBlob": "514205f075efa6053c67731c4b95a9bbbedd5530"
+      },
+      {
+        "source": "src/lib/resource-kind.test.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/resource-kind.test.ts",
+        "sourceSha256": "eb3eeda10a5d021487988cfe63c5303fa5370c19cc4e3a2d4e44759ed6bbdfde",
+        "portedSha256": "070a750e6f27e4411dc2dfe706861ff1401668ab7fe0796e33b5418c00248e0e",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import host bindings and LF/EOF normalization only"
+        ],
+        "sourceGitBlob": "37eda7981dac4ed8ea95397e85b0215b09c94df5"
+      },
+      {
+        "source": "src/components/ui/context-menu.tsx",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/context-menu.tsx",
+        "sourceSha256": "208730cd12fcfa4fdd158c69225dd6026bc76a250615e9df5ffecca4d0851ce1",
+        "portedSha256": "07e0d159e6d4a26ac7454e09ac5515c0f8ab3fcea7d1c2eafda8e3130f6037f8",
+        "extraction": null,
+        "bodyChanges": [
+          "provenance/import host bindings and LF/EOF normalization only"
+        ],
+        "sourceGitBlob": "e4fd0bfe18faf0690f639ac4713214e3eafbd338"
+      },
+      {
+        "source": "src/components/message/file-reference-actions.tsx",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/file-reference-actions.tsx",
+        "sourceSha256": "04bdb5a003c05f65bccf6909fc254136272609e3156e546da8486cb138e5599f",
+        "portedSha256": "7e651a85c6ea853df184d693e36ecd703732e8a57bf2f2895182679f4ef38859",
+        "extraction": "original systemFileManagerLabelKey, complete menu return JSX and complete FileReferenceActions wrapper; source root/path IO replaced by Core scope hook; added async loading/retry rows",
+        "bodyChanges": [
+          "original platform label/menu JSX/wrapper retained; Core-issued metadata and fresh per-action grant replace frontend activeFolder path construction and Tauri; async loading/retry rows use original menu primitives"
+        ],
+        "sourceGitBlob": "197077d3a178c9e739233d054424c9fea314f65d"
+      }
+    ],
+    "reused_source_audit": [
+      {
+        "source": "src/components/chat/composer/types.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/types.ts",
+        "sourceSha256": "5c1871b4e31803edd62f1982d8f8a8478537ea793d309ec98764e8c766b712b5",
+        "portedSha256": "806ce8ca70f445fd765f639fa3f602e4e280efa6b18df9d04b6f66a84392e92c",
+        "body": "existing exact original type declarations; unused REFERENCE_KINDS constant excluded by prior extraction; not rewritten",
+        "sourceGitBlob": "0b3ae5ef78049264431f17bf1018b2671fbc5a12"
+      },
+      {
+        "source": "src/components/chat/composer/reference-uri.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/reference-uri.ts",
+        "sourceSha256": "4ecba4dab6cc9fd01be9d5e21ddaa1a6cb75bc371e0f9f69fbd6d3c1a6bed666",
+        "portedSha256": "e564e6ed3a27c25e2a56531c566404ff796dd9377e65647464627d5b951958a5",
+        "body": "existing exact source AST after excluding documented import/header/EOL bindings; not rewritten",
+        "sourceGitBlob": "0ca3898fcefed0dae5c5d773409b90dad000b743"
+      }
+    ],
+    "previous_markdown_modules_unchanged": 39,
+    "previous_media_and_tool_card_sources_unchanged": true,
+    "dependency_audit": {
+      "ok": true,
+      "baseline": "2bffa22db3b23aa756cdd3ba7056062a314891b1",
+      "production": {
+        "@radix-ui/react-context-menu": "2.3.1"
+      },
+      "development": {
+        "@testing-library/jest-dom": "6.10.0"
+      },
+      "oldPackagesPreserved": 1090,
+      "oldSnapshotsPreserved": 1114,
+      "oldImportersPreserved": true,
+      "newPackages": 9,
+      "newSnapshots": 9,
+      "allSnapshotReferencesResolved": true,
+      "licensePackages": 12,
+      "licenseDirectory": "integration/licenses/native-reference",
+      "noLifecycleScripts": true,
+      "previousAnsiLicenseGapUnchanged": true
+    },
+    "frozen_lock": {
+      "ok": true,
+      "pnpm": "11.20.0",
+      "reusedCliSriVerified": true,
+      "offline": true,
+      "ignoreScripts": true,
+      "lockfileOnly": true,
+      "importers": [
+        ".",
+        "apps/desktop",
+        "packages/contracts",
+        "packages/html-preview"
+      ],
+      "entries": 1099,
+      "semanticLockPreserved": true,
+      "lockSha256": "61dd8f2b464f8d55ca5fa775ec2c40c4409226bedce8ba3bc23db1905c5d2896",
+      "scope": "Fresh manifests and patches only; no full dependency materialization, build or runtime."
+    },
+    "transport": "actual NativeSessionViewer, current Core scope/menu helpers and fixed original badge/menu components with declared host seams; synthetic ThreadClient/FilePreviewApi; no Core/IPC/HTTP/full App qualification",
+    "clipboard": "explicit navigator clipboard substitute; real Electron DOM download with complete UTF-8 bytes",
+    "reference": "full fixed donor badge and file-actions component; fixture folder and platform APIs, original pure path helpers; screenshot comparison only, no donor authority claim",
+    "main_filesystem": "Real isolated filesystem, simulated Core source authority and OS operation methods; not actual Core/IPC/HTTP qualification",
+    "full_original_app": false,
+    "actual_core_native_web_e2e": false,
+    "real_provider": false,
+    "modelInputChanged": false,
+    "skillModulePorted": false,
+    "new_stage_formal_cases_passed": 0
+  },
+  "remaining": [
+    "目录与系统类型原文件引用的显式User动作解析及Native/Web实现；只读自动open仍禁止系统启动/目录定位/新根授权。",
+    "完整MarkdownLink网页/邮件/电话和内置/系统打开目标；随I07浏览器宿主能力衔接，不把当前HTTPS路由称完整原组件。",
+    "完整原HTML控制与完整供体App同场景；真实Core/Native/Web集中候选、授权/生命周期/长历史/规模/内存恢复。",
+    "I04其余parser/home关联、Runtime并集、恢复、记忆和自动化；既有ANSI完整许可缺口仍待发布资格。"
+  ],
+  "approved_r1_artifacts": [
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    },
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    }
+  ],
+  "preserved_dirty_agents_sha256": "6d5c55bc4069cd453a36a38d9b0f48c112f1c256982388a27629c12f962c9f4b",
+  "source_files": [
+    {
+      "path": "apps/desktop/src/main/file-preview/file-preview-service.ts",
+      "sha256": "f80b735f72729ac6a5facd3eda7abd142ba6aaf260c8fe206241fa70f033c2e7",
+      "git_blob_with_filters": "d9c7045130800652cebbf3f7ae8078fa4d9883ad"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/NativeSessionViewer.tsx",
+      "sha256": "236e77a901e9d70b579de7ef12332bb8e82c9d4ac11902a8848e414d7ac6b75d",
+      "git_blob_with_filters": "a7731038e8122f5d69d0d2e7d2f8c4cfaef71a91"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ai-elements/source-message-math.test.tsx",
+      "sha256": "64129d94182a025dc560bc9be9f0b3270df9464e34bc4ce33920e40a7e3d18e5",
+      "git_blob_with_filters": "51add30b9fc837f052c206424c68cebaea85b54b"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-markdown-context.tsx",
+      "sha256": "24a8f40d545996e1a8e0820b9dfc5a6a7af2c1fd3a3a6ca70a90b1837b5b254f",
+      "git_blob_with_filters": "0968996f681c585b4044935e9161886929a935f2"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-markdown-links.tsx",
+      "sha256": "68e3e5383c93235f61b1bee65e88cad865aebb527fc95d1fdf65167de437c928",
+      "git_blob_with_filters": "df8d67c81cf8a1f846f852f5832a48a8c45ce713"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-copy.json",
+      "sha256": "6786948aaa63a188e4d060e1050af95655e259de950e31a6beb39dc59909c4ed",
+      "git_blob_with_filters": "850af5c78c00438d2231883ec7cddef2eea58ad1"
+    },
+    {
+      "path": "docs/architecture/file-preview.md",
+      "sha256": "e8d1a4a3b99fc509b0c81c2f6609b7b7afacabb8b907f24c039154cf67c6ba8f",
+      "git_blob_with_filters": "e03aecea7e979f2524ff02c4d61cc88158884e63"
+    },
+    {
+      "path": "docs/ui/components/file-preview.md",
+      "sha256": "cba48189486e30da697c5fcf8a7669bfebcc9629df56c17e8ff304baf85070da",
+      "git_blob_with_filters": "44792488da0db4652f5e8bef168b3a80655cecc8"
+    },
+    {
+      "path": "integration/execution/development-todos.json",
+      "sha256": "e5edd03e146c8a14e27f857d7cf6f9d61c1fa86e463d3bf3e1fd5fea07e457aa",
+      "git_blob_with_filters": "5289d8f6a39639bdbd32e1c04f1077b118a4e987"
+    },
+    {
+      "path": "integration/execution/goal-state.json",
+      "sha256": "47190ca3a460ffa88d86694e9cf7608cb985d93adf45d7ae71687b3279a42aa2",
+      "git_blob_with_filters": "ac129a6ab8e0d9502e0678d87a9482d297258fa4"
+    },
+    {
+      "path": "integration/foundation/contracts.md",
+      "sha256": "a26fa9c56c0c7036da22f578d0b7fa6d1c483973072b7a60b27a41b658cf8821",
+      "git_blob_with_filters": "0b8713f42cc44e25301666780e8c5bad64320c37"
+    },
+    {
+      "path": "integration/inventory/native-content-ui-port.json",
+      "sha256": "2df3d77eb9fcb99732481779d9382b012a6acba0bf01b2399888d6dc90042ed9",
+      "git_blob_with_filters": "728bfa32f4a85449e3e5ff9c20068db546b82134"
+    },
+    {
+      "path": "integration/inventory/native-session-viewer-ui-reference.md",
+      "sha256": "9a43fa9414b58af297295d0da46a67f02ceaa30951be067ef75051f9b76b2b37",
+      "git_blob_with_filters": "77e8d28795bf19ab5285c333b13656a936764c41"
+    },
+    {
+      "path": "integration/licenses/README.md",
+      "sha256": "cbbf06282f2a9ed97855b74a49fefebcfbdb3e97b479948915e1c7d4ea8baafe",
+      "git_blob_with_filters": "84969559f68e6cfe9d449efb1451a74e47958f1f"
+    },
+    {
+      "path": "package.json",
+      "sha256": "13b7a5afd2c80f39506c56a50474cf5cc829130a5e8bab3a285be309aba204cf",
+      "git_blob_with_filters": "68f080f9c8eb758f6532bf9e84d44becca714c62"
+    },
+    {
+      "path": "packages/contracts/src/index.ts",
+      "sha256": "b3f38d1084f2628a176f9f303c47524e2bf309ab7649ac8cade8b861275b5dd2",
+      "git_blob_with_filters": "1d3dc8cfc87ae92e846e785e475d509f4252d4f0"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "61dd8f2b464f8d55ca5fa775ec2c40c4409226bedce8ba3bc23db1905c5d2896",
+      "git_blob_with_filters": "ced10b6ece9beb1d1356f19bc7661fa167263d18"
+    },
+    {
+      "path": "apps/desktop/src/main/file-preview/native-reference-projection.test.ts",
+      "sha256": "62d6d7335048de3ed259fb05b3ebcf80d332c18caba12114ec6b40fd7ea346b1",
+      "git_blob_with_filters": "2b0adf0b7c565e8b9c61c60e024433fc036855f8"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/badges/reference-badge.test.tsx",
+      "sha256": "54df5dfd9232a2f957119a89574e1dfef67e2b228a852f838d228b12d14e28e1",
+      "git_blob_with_filters": "88c1c803c7021c409571090ef27892c27ebfcfd1"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/badges/reference-badge.tsx",
+      "sha256": "69877e0c1b395e8b74fe06ba33ef9375257cd0403bb6b5ece4d89be3413aa5d4",
+      "git_blob_with_filters": "cb8629a5a00a9f15f20b9995d17a04d5d6d2cebf"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/chat/composer/reference-uri.test.ts",
+      "sha256": "13f835944ce02e252cb0a75babcff2daa39d73868b549110b639c0a7637baafe",
+      "git_blob_with_filters": "a8d0eeae71cb1501b6aa9b8b2c8fb77f23bb9609"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/file-reference-actions.tsx",
+      "sha256": "7e651a85c6ea853df184d693e36ecd703732e8a57bf2f2895182679f4ef38859",
+      "git_blob_with_filters": "29554863e251f62828c03a57b6a824f5310e2a9f"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/ui/context-menu.tsx",
+      "sha256": "07e0d159e6d4a26ac7454e09ac5515c0f8ab3fcea7d1c2eafda8e3130f6037f8",
+      "git_blob_with_filters": "19f723f1e70b944f4d42da06b120d434415d149f"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/resource-kind.test.ts",
+      "sha256": "070a750e6f27e4411dc2dfe706861ff1401668ab7fe0796e33b5418c00248e0e",
+      "git_blob_with_filters": "8a0bef673afa2fd8663a6709de987d4bb6750748"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/resource-kind.ts",
+      "sha256": "240412e6c6c2e9754a0547f8d8b9c49ab0f1110cfab9eaaacea3db9d7044c297",
+      "git_blob_with_filters": "348f7d8702656bf1a19917d1f9c1174e602912e3"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/source-reference.css",
+      "sha256": "f705e4cd3550db10b3b473b4b54e4ad807c447260f56955ae426c60c6add6c58",
+      "git_blob_with_filters": "43194a7b814b57127d2f37f5032ee3dd5d3b5b38"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-reference-agent-icon.tsx",
+      "sha256": "6560ad17aa7f1b069e3ff598c2b5d7f90cecf781d93d9766f10cab1720138647",
+      "git_blob_with_filters": "50e923f9b8d107dbc6dd555d86b9e14fedf8dd60"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-reference-host.tsx",
+      "sha256": "fe4ac7e3db409abd3c8cc58b2dd2e5249a310f0506279b2e6153948740bb0731",
+      "git_blob_with_filters": "8df5524616010d70679ecb27d5804914064799d9"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-reference-operations.test.ts",
+      "sha256": "14f15ed1775dcbb5545a2d91cd6d8fe26ca5654abf6eb44bce359bbd8600fbd1",
+      "git_blob_with_filters": "b97fbe87eff520a2faa9adbfcb77d5a7a6c13648"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-reference-operations.ts",
+      "sha256": "bd8abaa45600f03e1796430f07608570ca3bfd57a26ed5b4f17e96827f8f65a4",
+      "git_blob_with_filters": "7a0f771952c83387c6c066b39414996b65af399a"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-reference-owner.test.tsx",
+      "sha256": "7748a8b211155746780189c0caa3c27ddd4659ea8f26f7a27b48afe96893a2fc",
+      "git_blob_with_filters": "d9fdfce99f763f2afbfe2a257b33dc6792664404"
+    },
+    {
+      "path": "integration/licenses/native-reference/@adobe-css-tools-4.4.4/LICENSE",
+      "sha256": "326ff3850062286003ff4cbdaa8f61764e128f9a6532431bccf97e4e2bd75059",
+      "git_blob_with_filters": "e63de06c0b62aeb72dd761185a524d123bb0ed7b"
+    },
+    {
+      "path": "integration/licenses/native-reference/@adobe-css-tools-4.4.4/source.json",
+      "sha256": "6e0c53f6a97b6308163cdf8c37cf9a413a9944d0c5124e1a5515126b274adc28",
+      "git_blob_with_filters": "29e07893a4027839863f067f57cd1342505d08a6"
+    },
+    {
+      "path": "integration/licenses/native-reference/@babel-code-frame-7.29.0/LICENSE",
+      "sha256": "117da2af0d4ce0fe1c8e19b5cff9dcd806adf973d328d27b11d4448c4ff24f76",
+      "git_blob_with_filters": "f31575ec773bb199aeb7c0d0f1612cfe1c7038f1"
+    },
+    {
+      "path": "integration/licenses/native-reference/@babel-code-frame-7.29.0/source.json",
+      "sha256": "60397a7d56995cfa512db46b94f861174d08af818de3b8c40c44d64630143cfb",
+      "git_blob_with_filters": "8574c34195b02c313d0a3b607b9ff05fc5b1ec91"
+    },
+    {
+      "path": "integration/licenses/native-reference/@babel-runtime-7.29.2/LICENSE",
+      "sha256": "117da2af0d4ce0fe1c8e19b5cff9dcd806adf973d328d27b11d4448c4ff24f76",
+      "git_blob_with_filters": "f31575ec773bb199aeb7c0d0f1612cfe1c7038f1"
+    },
+    {
+      "path": "integration/licenses/native-reference/@babel-runtime-7.29.2/source.json",
+      "sha256": "3c52a60abbe34e581de25cbcf425409ab8607f1c922b3b5cb8bbd32354f80fd1",
+      "git_blob_with_filters": "a45af3084579a6196d99d29f1986e741daf356af"
+    },
+    {
+      "path": "integration/licenses/native-reference/@testing-library-jest-dom-6.10.0/LICENSE",
+      "sha256": "bf8fd38056b7606deccfcadb4d8ca1c210082d8ef5513426d2650daedc30bed3",
+      "git_blob_with_filters": "4c43675bc4da5d353732ebb199ebaaf5eeeef014"
+    },
+    {
+      "path": "integration/licenses/native-reference/@testing-library-jest-dom-6.10.0/source.json",
+      "sha256": "84b2575afd21da4916a92866bdec22643f5576cae465071ea4b61dc7d19e0a94",
+      "git_blob_with_filters": "0b480ff1cb229a323f587afae21e3eb55d43d129"
+    },
+    {
+      "path": "integration/licenses/native-reference/ansi-styles-5.2.0/license",
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "git_blob_with_filters": "e7af2f77107d73046421ef56c4684cbfdd3c1e89"
+    },
+    {
+      "path": "integration/licenses/native-reference/ansi-styles-5.2.0/source.json",
+      "sha256": "d894fe225d9024e625acfa573250c9e4b3a593748bc6c52462db0742659fc59d",
+      "git_blob_with_filters": "92081dece3f8cd9b15cef9d275a93220c5083615"
+    },
+    {
+      "path": "integration/licenses/native-reference/aria-query-5.3.2/LICENSE",
+      "sha256": "c8df456c7ccba74b959087dff494d4ac2a12dfb0400c08b46b2494a08a000567",
+      "git_blob_with_filters": "3a8ae7c335078c0327bdb23e0d09024e15f1d1f2"
+    },
+    {
+      "path": "integration/licenses/native-reference/aria-query-5.3.2/source.json",
+      "sha256": "64c20bb3ac7f1f3aa5254e3c5fef55c319f5d31d85d7bafb43d074159d56dad2",
+      "git_blob_with_filters": "12e87173e003beca54b65d07041ae99c874e1e08"
+    },
+    {
+      "path": "integration/licenses/native-reference/css.escape-1.5.1/LICENSE-MIT.txt",
+      "sha256": "483acb265f182907d1caf6cff9c16c96f31325ed23792832cc5d8b12d5f88c8a",
+      "git_blob_with_filters": "a41e0a7ef970ecdd83d82cd99bda97b22077bc62"
+    },
+    {
+      "path": "integration/licenses/native-reference/css.escape-1.5.1/source.json",
+      "sha256": "1e5bee57c71beaeb423d76cfcd948a82b79be93b9af7d8c0112198f8ee63d8e6",
+      "git_blob_with_filters": "36227550ad61b40cec5681650c159f7eef3b5f3d"
+    },
+    {
+      "path": "integration/licenses/native-reference/dom-accessibility-api-0.6.3/LICENSE.md",
+      "sha256": "0ffe67fe630169de46df2d29dc18f5857b4c98f0f95b0cd9e3c21fef51f9a9b8",
+      "git_blob_with_filters": "17dbaca5632de239dbab157b1597f80471b408fd"
+    },
+    {
+      "path": "integration/licenses/native-reference/dom-accessibility-api-0.6.3/source.json",
+      "sha256": "52f7ab0a05cf659109b3e6c3ef5b96df0a41fddf9ec1fda5e7345480bb168ac0",
+      "git_blob_with_filters": "2719353fa54c4cc069c7ff0d800da3d67c256b1b"
+    },
+    {
+      "path": "integration/licenses/native-reference/indent-string-4.0.0/license",
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "git_blob_with_filters": "e7af2f77107d73046421ef56c4684cbfdd3c1e89"
+    },
+    {
+      "path": "integration/licenses/native-reference/indent-string-4.0.0/source.json",
+      "sha256": "69167974783a0c89874fc17ef9d15c24cb603645012bd6297f3c0f5972cca27c",
+      "git_blob_with_filters": "3c6207caec341b092f0759a1589dabeaa6264016"
+    },
+    {
+      "path": "integration/licenses/native-reference/min-indent-1.0.1/license",
+      "sha256": "9638fa87f845af6cecc56fab498c1f74f4a98522d3b53377bedcbdb44b5a8dcc",
+      "git_blob_with_filters": "dbe9fdc76405e8bf7d12a6a08776be4441718187"
+    },
+    {
+      "path": "integration/licenses/native-reference/min-indent-1.0.1/source.json",
+      "sha256": "00c0adebff5fc4a43bcdea0c12d603d3394c0e531c62cde7fb3b85d82822ae91",
+      "git_blob_with_filters": "905718d28dae70535d7c803e3d10aad12ddf2224"
+    },
+    {
+      "path": "integration/licenses/native-reference/redent-3.0.0/license",
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "git_blob_with_filters": "e7af2f77107d73046421ef56c4684cbfdd3c1e89"
+    },
+    {
+      "path": "integration/licenses/native-reference/redent-3.0.0/source.json",
+      "sha256": "c094294a332b21f27b76dbe159c18aeaa8f08786bb7f80eb2b639db066ad85e1",
+      "git_blob_with_filters": "e1386472a362156826303e5252d957443523f183"
+    },
+    {
+      "path": "integration/licenses/native-reference/strip-indent-3.0.0/license",
+      "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0",
+      "git_blob_with_filters": "e7af2f77107d73046421ef56c4684cbfdd3c1e89"
+    },
+    {
+      "path": "integration/licenses/native-reference/strip-indent-3.0.0/source.json",
+      "sha256": "07a607d1db5573fa4d8fa9a6b2b67dc0abdfb1817785428457a4eeb511545b35",
+      "git_blob_with_filters": "69b4e4c737bd92eef7407064a11704f82c42f343"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "file/I04原版链接操作/audit-dependencies.mjs",
+      "sha256": "a863bb3735fe1eab1edfda2325d5498df28ce7375b22852b8719f9d0d72b47ee"
+    },
+    {
+      "path": "file/I04原版链接操作/audit-test-licenses.mjs",
+      "sha256": "0901ae10be0248b5700d5fb9ce91b787a51902fb94bd377927e60c3d8289c27f"
+    },
+    {
+      "path": "file/I04原版链接操作/build-style.mjs",
+      "sha256": "ae68c475011b339eaef1b5a64b5c7dd009c3784d81104ab2371871f971c24169"
+    },
+    {
+      "path": "file/I04原版链接操作/checkpoint.py",
+      "sha256": "da2be2c9e6ee38c93e9342b57cb1b04ced9c9ed27146a0eef921b46708a1167c"
+    },
+    {
+      "path": "file/I04原版链接操作/commit.py",
+      "sha256": "d5b8ced5f75726ab52667a17faddb52f5eb128dc61f31e02a1a96bf591564d5d"
+    },
+    {
+      "path": "file/I04原版链接操作/dependency.mjs",
+      "sha256": "349c16bbdcdee41a61fa71745a163939afc01785db8bc913c20805f191de3868"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/frozen-lock/apps/desktop/package.json",
+      "sha256": "e3c125951f18ab3c48fe7a8183b0c6963bbb978829795b88189ba5861e181370"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/frozen-lock/package.json",
+      "sha256": "13b7a5afd2c80f39506c56a50474cf5cc829130a5e8bab3a285be309aba204cf"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/frozen-lock/packages/contracts/package.json",
+      "sha256": "bc0daf631b5a1b5c9597ab86f688abc7aec5fcca9f55ca5e418057ae2bf9d745"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/frozen-lock/packages/html-preview/package.json",
+      "sha256": "b08183796e22326d23d87a9a39df4b821f8e78f6a01199277b4c0acd629b5940"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/frozen-lock/patches/@larksuiteoapi__node-sdk@1.73.0.patch",
+      "sha256": "97c95bd39991d6d592e6a57dc9b0f79e52f8c5a5022326c139a8745acd138af8"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/frozen-lock/pnpm-lock.yaml",
+      "sha256": "6ac263b7f1705d7137c8dfb0f876ab147344ce582cc6232f34fac6d70f4d8b44"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/frozen-lock/pnpm-workspace.yaml",
+      "sha256": "942fb44b056e5ce8e018e31b209e58111331ff861e5fe083fc7301824bb60129"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/captures/a.ts",
+      "sha256": "b940581495d789e0c9610a7d20f6fe4b59cdfea899f0dc59fa21b592e82cbfc1"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/captures/original-closed-day-390.png",
+      "sha256": "b7223c7330a6c5d516deb947230c67b5c33f70601d236fb857ea05bbce177414"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/captures/original-closed-night-1000.png",
+      "sha256": "a31aa73eea1cdedc0eafd10d21d96e1b5ba460be9d4839ca76ea51d6d8da3655"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/captures/original-day-390.png",
+      "sha256": "c95e39e6d1fa49afa294d8eac084e57eb8383d4a7bf4bed151b038b863b2ab66"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/captures/original-night-1000.png",
+      "sha256": "b623acaad2e14fa99c2d701256c7b77ea7410646fad33068632616dc21c6433f"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/captures/product-closed-day-390.png",
+      "sha256": "5871be7830cef81ef05ba4c3936d36765cf56ce2def453cda77354fba3932e46"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/captures/product-closed-night-1000.png",
+      "sha256": "0d5dce705d55862db171a9cbe3232632a959cc708d615acf34d6ec00b24dd71a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/captures/product-day-390.png",
+      "sha256": "0422bb8184321b75414dcc1b9e4e0aed22b0dd187a2247d8c8b06d6a32136d82"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/captures/product-night-1000.png",
+      "sha256": "ebc78127c1b344e523d0468b4086c8f665d28f6513806d3a1ef0a39081246ab2"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/_basePickBy-B9jMoVeE.js",
+      "sha256": "cf58cdd3c37e4b4e7774b5b04a162c9336cbef55c29215ed82702c8f333c7f2c"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/_baseUniq-bASZ4yF3.js",
+      "sha256": "bbbd34c673213352c8dce23c070f3d3e07e5b983b39c14a33b2de7df3cc009a0"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/abap-B7h4dtBh.js",
+      "sha256": "2c9ac8cb3165ee94b203dea2bd9a538b062005a482c564c43449f60a12b91667"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/actionscript-3-DtnkuHN2.js",
+      "sha256": "41378189c87b252746a48ffdd4f2cac1e48e2d407dbbd9c6c57de80105a45b35"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/ada-BZS802Se.js",
+      "sha256": "6207d735aa4628a8ebc118d71d2607f97fbe8b15397789b88ea1927513fae6d5"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/andromeeda-C847lm7Z.js",
+      "sha256": "f9ca5de4a79ac38134da818a571aed9d9f4cb1f0478d9e2e65485c735b2f74a2"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/angular-html-BYG42TJr.js",
+      "sha256": "2b9687a0d34d56555b7f7744e738080d26e5256b7925f6ef6bd6e90e8b7e90ac"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/angular-ts-BftcHvZ6.js",
+      "sha256": "c628e4b00593a49fcfd3dddfd454e9e428baa8f28952cd83d175413965acf61d"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/antigravity-color-DgAQAdn3.svg",
+      "sha256": "652128cf55a28bb958563ee372d0bd00208d9e6fd446f523f77aafd811eef8ca"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/apache-D4roVlsU.js",
+      "sha256": "3ec0fcad805353b92aff850499c29d0bbef9b1f2d1960c69ca56f53317a0ed91"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/apex-B-mI3Md2.js",
+      "sha256": "3ec9594622c4d442937b45fbd513264bef94a8b3fc6dd86f95933d8e7bcf93a8"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/apl-CGZawg-A.js",
+      "sha256": "6f216dc71bacf2bac61300db314d6cf4b9be0b497f4367dadfab79947c2705f2"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/apl-fqmucPXA.js",
+      "sha256": "5be3458b72027a2151b231faa2e30eaf16e1e29067222e232694f25418c2a140"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/applescript-C43Knf0G.js",
+      "sha256": "a95fbf665d64a6b51f94a284c9c51aab1d39bb7dd7890ab562fb7732a39343f2"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/ara-DRBH84ND.js",
+      "sha256": "1694f4d288999497453b46b3952070bbdc51e5f2e39f8fc60c0ee09e21444973"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/arc-DMwMye6v.js",
+      "sha256": "a5e45b1f8cd97874f963bf0a41097c017b8ffc01e7bec58645b76f27f1cd1cdb"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/architectureDiagram-2XIMDMQ5-CuOJB-Ax.js",
+      "sha256": "4e1d368b740f33997a4460f4947dfeb49d444e871dbacdd7263e0339fb87789b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/asciiarmor-DucZyvP0.js",
+      "sha256": "01c94e79d596371ae8d7fb8f8e9d7f7c136b9c9cbd1f7f1124949ee0216d4816"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/asciidoc-DAaa-hb3.js",
+      "sha256": "fcc48c5b455dfdfa0273d2a41a330436561d1bb40d2908418b757a5ed400dc3a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/asm-3tg4MVib.js",
+      "sha256": "9ff66f84da93e09a2c2f7fefd29b21f7cc89d1858c6f3478e2e6714b92394fd4"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/asn1-BnOEsgAm.js",
+      "sha256": "bb17319ceb5860451c6822bfadacfcedd6f972cfafbe016b36dfe6ac23f73551"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/asterisk-QAlztEwS.js",
+      "sha256": "6df194920c95ba624a8fda9ecc6fb9bb3e8c608635a2d0b0f4b2610cce4e6fc3"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/astro-BxdWOZvM.js",
+      "sha256": "f9b35789fd71392bb47fe0f860a16a1949275e14b230c0f83904022c602aa995"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/aurora-x-wJ4-eM2h.js",
+      "sha256": "3308f7e0be141f0771f8a8dac9fd29667e3e6d09ddf7c28268a6485d1eb4d0a3"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/awk-ChreaG-G.js",
+      "sha256": "a1e834e043858fe402c619c8747e9f3ac0107f3ee44ae41c719c2e0121b9b883"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/ayu-dark-CzSi5Etu.js",
+      "sha256": "376ffc4fc0ff7c6a5d4d4dccbef8663c52b05a1336f5f481d339ccc67a7f1e12"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/ayu-light-C_O7IUhi.js",
+      "sha256": "2fcb1d627c0d72b4b4fcae5daf3b47b30596dbb00bcdab44fa252d734a6d3b99"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/ayu-mirage-CCitYj6x.js",
+      "sha256": "a07913a3697cd358ca8e87c93f81210bcaaf667fa502368d4a2be55f1a42dcbe"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/ballerina-B0yt0TYU.js",
+      "sha256": "ee2e7e869b2bafdd7f09a7f825631b98e023979bffddfe13bc829d22a9c30af7"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/band-zXq5o_Ib.js",
+      "sha256": "b8fa3ea2ac5a244c1caab6b9c05b8cf2f848e5e28d1f2d9276887b1cecbd5989"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/bat-BzNgQIA7.js",
+      "sha256": "ee59c53c07d592c79611fbce403a8a0e1860d846c98e0136d7cef808a96c111e"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/beancount-aZWrE5WV.js",
+      "sha256": "09008a7ac673a934029dfd08d6456f51b51a3387633c12c29de6b6cd1eb4c087"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/berry--Qc8OslH.js",
+      "sha256": "b9f2d58033110e5e102b5365be645baa173111292523c74c16bd07dcb0c5d5f2"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/bibtex-BLeFwAes.js",
+      "sha256": "254a09578de84c630409d7e4c824ba05098823a52ba007aa944ce03d9d22b055"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/bicep-DbBeGdXQ.js",
+      "sha256": "dbafe36a0a4ffd4487b5538fc149d67d0dd74a9368bb91a760d16b697e60ad1c"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/blade-BbH7YAUi.js",
+      "sha256": "2359d0bb30ed41d4d60c177d3fdf0171a90e9b701658ad0b1b47c0890187c731"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/blockDiagram-WCTKOSBZ-9GHP7O9I.js",
+      "sha256": "71ccd0bcb58cd67dd502c5ac43a482aeee82fa8862af33b52d0999d5ad93029a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/brainfuck-DZVCuF_t.js",
+      "sha256": "71ae5a627c032ec5f0333e28a4fc02da543a8faf15f2705c0e1f69f7df69c812"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/bsl-DwPS0BId.js",
+      "sha256": "29eb6c2d39c2265dea77f5aa1060fc6302a74d2c9ffe45748b6e43177ef1c11f"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/c-C4VtT7JA.js",
+      "sha256": "30cf4bb145d8ad68df0192b5b67439859b3cc3e104deabc8979adf9ae64435d1"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/c3-DCyiGUuO.js",
+      "sha256": "acc20d5d6a533d7da66f5ee4cea9fb9ebfb4a70a4dbce44821d64b43c149f7a2"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/c4Diagram-IC4MRINW-BZS6j1ie.js",
+      "sha256": "d152db7b1499b4804dd66840682752565481d4cba4200671b299ab2c17703899"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/cadence-S_NtR5Dy.js",
+      "sha256": "8646f1935c4c24e3838222ba542270075536f6c02f43f8b5b3b705795065fc5a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/cairo-BtYx2aM5.js",
+      "sha256": "2012f0ecfed1543372505818bbd99404db4a7420388c369765a4f9786bf9e31b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/catppuccin-frappe-C21OPQfC.js",
+      "sha256": "36d45f359e5616ef7a493e603a56f70cc746e4003beda7643debdeae6961ab87"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/catppuccin-latte-0ZtXlsrX.js",
+      "sha256": "c443446472d9b8f9e265b948edf134ce2c412165f59e3e9fa73d53fd40688400"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/catppuccin-macchiato-BD_FR4sl.js",
+      "sha256": "d26e7e36c7a0ae166e3bdd7ef483af713df0cb5cd02861e4d2eaf7b3724fce00"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/catppuccin-mocha-C653csR5.js",
+      "sha256": "d0ab037a5bd589ff60f10efc4b16835f3b68a835219f577c354f140cab1a47ef"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/channel-dH36sSua.js",
+      "sha256": "b717831430f15e36cc4646c11a03be742cb0b132135a184ec4fa4f8e36a2fd4a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/chunk-4BX2VUAB-BaUbrN4W.js",
+      "sha256": "b115edd31d3d4630deb12c26f60854c551c99de29784d381d6355e94139e0da3"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/chunk-55IACEB6-ES5ckBRk.js",
+      "sha256": "84a8308e2204bc69d2193ba091b2a15c199db76e8993172ac7532e1ad047aaf4"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/chunk-FMBD7UC4-CqMUV_4T.js",
+      "sha256": "51bd51e1344cd7c19a6550049043632f87b7d0aac7dc7e55145849eb61217cf8"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/chunk-JSJVCQXG-DZpe2-Jw.js",
+      "sha256": "a2177a2f98d1a983b61afc8d7a5c042d5ad6067c6694689019ad52b621ca14c4"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/chunk-KX2RTZJC-DFKbFJUj.js",
+      "sha256": "9470d709bf84d78e9cfe24c48086060baa27e72a6201d03cb45e2864d1833c21"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/chunk-NQ4KR5QH-Dm8Olahe.js",
+      "sha256": "d058d939bf15e74bf61f35c3b0718c999d91a637a2e666a709754e960c6e71b2"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/chunk-QZHKN3VN-BJucSQ9V.js",
+      "sha256": "c41d55417f0f6cd9c86dd56dd9b4087a1ecd231594afcc1d37485859ef6d3f23"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/chunk-WL4C6EOR-C-xceskd.js",
+      "sha256": "42008b0241621647be8fa3d47a0a2c610e6d5720aadbf68a2d67a2c1c587eb32"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/clarity-D2ViJC0i.js",
+      "sha256": "b686e123e56ba9160f8cc91a320021da407253eb571e4f7a78fe1ae9ce936ea9"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/classDiagram-v2-RAHNMMFH-DjKmiprZ.js",
+      "sha256": "2b1c61ba0c98366763c76f5b95344ecd9a98b524e1172a6959394b13be53fc6d"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/classDiagram-VBA2DB6C-DjKmiprZ.js",
+      "sha256": "2b1c61ba0c98366763c76f5b95344ecd9a98b524e1172a6959394b13be53fc6d"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/clike-xqXYL6ge.js",
+      "sha256": "1acda985c43e1ca1c234bc64cd7b495850069c0c10cd1a433d89c2005dcb503a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/clojure-BhXMqnxz.js",
+      "sha256": "e6c5a1b8eead561531a1fe6afc42ebd3541913ac87645794bee5b2e42222ff2e"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/clojure-C_G4_w5x.js",
+      "sha256": "4cf737574ef231e1f706a3a1fb80cd3a27a2a7eff6c5ef2be879e44039e39b38"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/clone-CCsgbO4g.js",
+      "sha256": "f819634d2503edc7b8a8994e25c34e560e873907032b69fcad187096932ff0f0"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/cmake-BGaNd9E7.js",
+      "sha256": "319d4983f4e2c2934fdbf67a567ad183211c15a618df3d9e7ad270a188f63c1a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/cmake-CDfQILeU.js",
+      "sha256": "64fa5b2d8a3f6916fa61f84971b57054dd3b386bb54900c205f8494b56aea3a9"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/cobol-4yqQntpt.js",
+      "sha256": "f541e17f367fb16b84f1c4585dc6b96436fab9b9984351746b8d6b7e4be77533"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/cobol-B8r1pfPr.js",
+      "sha256": "57882f5f0d248e36de5bb13e7579967de80ffad6599b1d4da54982c99e49614c"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/code-block-OCS4YCEC-DTj13_vU.js",
+      "sha256": "3a5fb0aca62936ffe02564850900e72b1fc2e41ab7dbf0b545f39cfae0529080"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/codeowners-awy7PWCD.js",
+      "sha256": "9e4f7e66e6705260b2442f1c89abe8085f4ceb4ad6dd9d96c16b047846efc4cc"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/codeql-lfK8ppuq.js",
+      "sha256": "b6f4f4bf82f0a3c6792a9430c9cc0f0b8abd7b946f8e2241938452e3b61ec5d5"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/coffee-XLjtuEYs.js",
+      "sha256": "63430279b94cd42a67dc42a9660674a3a6fbc7e51df9d9b849444ec5b3bd2aab"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/coffeescript-D2dXvhEc.js",
+      "sha256": "fd8b8081e6c6d0b3a5a1d5159ea923fa92de6b16498672ac8ffb3a85d0f074ff"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/command-code-D8gwtO8i.ico",
+      "sha256": "1c77333db1896f681078ced8ccaea0f2410b7f06f2dffcc8b7150a5045590686"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/common-lisp-DAq1kaby.js",
+      "sha256": "5f8fdd85672af0b7da183d464840a92bc7f31c67b8420e4dd9f7f865f1fed629"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/commonlisp-CF_VNHQR.js",
+      "sha256": "f0e48e905937a107e453a06c0eb54a8f1e536fc0fc63c5b58b9551c8f7fe49cb"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/coq-l_JvzFJl.js",
+      "sha256": "56048b0f5bc9d63593bfbf75a5964ec32e91063df07f6c6e4bd1548deb4ce429"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/cose-bilkent-S5V4N54A-A5OSM9L2.js",
+      "sha256": "c21d250aa2aa5a897265c719ab7fed0b2340e4dd98efe557a6dd1466c5bc168d"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/cpp-zh2ePAE_.js",
+      "sha256": "7c23492e667f139b8125de33d5edaeba7f6d62cf845965fedd36a730511a5b49"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/crystal-BqBRy7Ec.js",
+      "sha256": "dd73ddc65ea80c9e549a2430e79697de29a2430f0d984b5017f580cd5267b28a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/crystal-DyuLTqLs.js",
+      "sha256": "c1628558768374a78a1fa71c26feaf44bfc6c5161bf81d964490416d1af1f38f"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/csharp-DxX_6tHh.js",
+      "sha256": "241a03885fcb543cc857f26d2255129f415a46295365cc49688070aaf993f786"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/css-BtVcDqlU.js",
+      "sha256": "99e91e0a4714b4e44f64381ec5efa99428540b1487c1bb4bb413bdf200388772"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/css-c-jst79C.js",
+      "sha256": "41425a19b41f83ae573be2f495236cd1161392d1ef66eb2d23d2784510746818"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/csv-Ba84L8e5.js",
+      "sha256": "36f2aa9f3bb8e4b08bfe2c3a1a3dd619bad0204f461b72a9326da9666fa72eac"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/cue-BFSVLV6N.js",
+      "sha256": "dcb95f0ede249c321ba93ea972a12dca40937c77f57b09599af3419747a676c5"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/cypher-DbUmWIxC.js",
+      "sha256": "890d320a4c0b37e10a15f2918fcf7f44ab94564d140bcaa101aa18376e6ec227"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/cypher-Dlu_3r4V.js",
+      "sha256": "80cff481ed4632ecfbe5952d4c60f15227c66f04dfea646c32852a2b090d19ca"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/cytoscape.esm-DIIXql_k.js",
+      "sha256": "a9c3775542759405e1717f5b97b4381e0e3c5c66014b25cca15bf1d9f9168191"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/d-9qSZPw74.js",
+      "sha256": "219f5b27fcb3ead6608efe6e39ecff0b5564fc8af23e35077bf48c59560e243f"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/d-UURgV0Ux.js",
+      "sha256": "df60654c2550e460276b5522896ee99ab6516252a0016a0fafa21875641b72b9"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/dagre-KLK3FWXG-DIbu_Pdn.js",
+      "sha256": "25822815ee16ae04f8e5bbb28b84becd6887215c931128142c04af3b15d3e816"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/dark-plus-DmZ1Dzd4.js",
+      "sha256": "1f76e8181bf9ff4e8b36fe265207456ba5426d8017950987ff8382302950035a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/dart-CCSsOg9l.js",
+      "sha256": "0f1a8ab46d2bbb1c3306c58384abee62d6d8c65eb23e30fd9b4ce72bec83c0b8"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/dax-CvsmLV-B.js",
+      "sha256": "e53ff1081ebc0cd6614ba534998ce8f3f5a5e2187e463e933f1507b1bd8a16be"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/defaultLocale-B2RvLBDe.js",
+      "sha256": "adb5e701c410866bbb1437380bb188b83fdca516e7788df4f24faf601a470063"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/desktop-_xiGZ9X1.js",
+      "sha256": "6a0cb282468e43c82094948b158a368a88da2bac351e9829b11c5396d4168a7e"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/diagram-E7M64L7V-Dv8ObERl.js",
+      "sha256": "cfd499417eeaffe633ebb5f9e917b8e3ea988ffb03eb2a7d49d2f4d2eea80da4"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/diagram-IFDJBPK2-vGoUkJ57.js",
+      "sha256": "844bcd5b1d69f640b49a82764f00ec7b1f85514b188dcdc8522f7a5e46abd214"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/diagram-P4PSJMXO-B6Xpd2wY.js",
+      "sha256": "81b8e9643165264865695567f7990d0e06b684bcba306e29508f3b3ce0589398"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/diff-B_Bi2Crb.js",
+      "sha256": "efa42a61215071dc4d677dab004a6f77c34b41825d87a7dc42303302c35b4b4a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/diff-BEdzuHlE.js",
+      "sha256": "3f48b147c209065b2b19d0e6be956132f06c5f460b7977b9c527d3befce2dca7"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/docker-CUaLOm2I.js",
+      "sha256": "6032c540b49d2975785d333c1ca6e8ad93e708ff6d81854b37f9484f0001da82"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/dockerfile-Bvk733Ga.js",
+      "sha256": "31f1f2e8d8f9f2eeeb29f6d4b56e4632654d2f2a5b352a4febc9bf2f1984d29c"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/dotenv-Bb4iNxXK.js",
+      "sha256": "c2b83ce33ae43d3bafbd0807ded1375b8ae2e28a1d9bafa859cb354138a17ff9"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/dracula-B8-AVrwI.js",
+      "sha256": "1fab6e9a8c9e529b336a1939a6b91750297a8f9749a609ade591f8e41068ddba"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/dracula-soft-BHeefow7.js",
+      "sha256": "40ac4ee6beec825c5c1d6c224f70f95a146975c8d0a0109d55e14bcab508a1ec"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/dream-maker-CNLQpoF-.js",
+      "sha256": "1aa40679bdc9241bbd9516ef2291d7ef623b903c244332655bfef79d0bce92ca"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/dtd-Dy74G54E.js",
+      "sha256": "cfaec369fbea7351fc6a8fb7c990f2fbc5a0d1730467e51935deb1965fccaa2a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/dylan-TSb-Nfix.js",
+      "sha256": "b0c2026d9bb4917eccab491f63e56d95ceb4a8e01e42062a843c35ea29121607"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/ebnf-4fKAGW3a.js",
+      "sha256": "b21fa7b0323bdc0ab31713d74038dfef58b32305d3775c98547a3a23f143e16a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/ecl-B59qGGVg.js",
+      "sha256": "4f1c8ae6eaddfd15d73523014b684fc2ae7160b0c10d0680812497b4f1254192"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/edge-CnHxQ_FD.js",
+      "sha256": "96173d2e265cd159747e0ec2ec920884e3f4321a23920484e33525cf4c74307d"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/eiffel-Dze7nlu3.js",
+      "sha256": "a0fc308a8415ecaf7e5ffe28d9192c23f5b6e81d995eb7df35894a1b307a6606"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/elixir-B_LIBv5J.js",
+      "sha256": "154a81fb171b9211dba3dd7905ee11b0764870b12e870ea8494b900bd32e1546"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/elm-BlO7pcFp.js",
+      "sha256": "ad57de8af1847f1c135c9530ef1acbe67e32a364cbf69b8fc8e534dc034a1f73"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/elm-DG7jkhNZ.js",
+      "sha256": "c077dc7257d0e460440d911f88d5783e18ca8c58146fd9126e9e13a0897bcb5b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/emacs-lisp-4gdXY_g3.js",
+      "sha256": "4af446790fdf213849144aaf0748e5eefb0c699effadbac6651383f81e25db2b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/erb-D0-JOe_j.js",
+      "sha256": "55d6e6c83ddddfa7a15572e06991d23685ce0a04d76cc7eb5f326e0e436c0ca0"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/erDiagram-INFDFZHY-sb2x3BI3.js",
+      "sha256": "53c7e0dfd57b3b716287379416921205589173c2a2d71cbf6ecba4a686dd265e"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/erlang-BO6gOnGA.js",
+      "sha256": "a7ff36cb6624f8cb2eedd1f201678c122f7d861f901c2b4465532dc9b10fb48e"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/erlang-Ch5kuXHm.js",
+      "sha256": "72b1bd6493394dd05a2d4a1690c7d497b143df2b451b3f80a03e340275f74de3"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/everforest-dark-Cg1xdODP.js",
+      "sha256": "3714f3b3204954784e61c230cfc4f651a594b8769caaaff54bcb93c9204420c9"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/everforest-light-BmTD3bxe.js",
+      "sha256": "d9fb61a697627918d4b49412bba0b59608f69aece59e39b65c78ef1f30e393a8"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/factor-CMxFHDqz.js",
+      "sha256": "b249da83526bbefb5f5c5621c3cd3410f0f26edc9368cec95a585dbf5c6d0fd7"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/fcl-CDDUNjTj.js",
+      "sha256": "223f8c7838620a68cbcb74e4e40d10c5eb20fdd2fbe6d32e44bce2d1d2c28ed2"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/fennel-BTELNkeT.js",
+      "sha256": "2f723813e261cd0066949675f25defdce4fe95b437c48c0a8b2cfa14561726af"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/file-find.worker-CHoXCmE8.js",
+      "sha256": "80cfe35f96f8384c3f07480916e2786129ac31f1d7d839816bda104764da27c8"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/fish-kGF2-4SL.js",
+      "sha256": "274cac4046123b133ea964219e997cbb5ef0f32b624db2dbe4bffd477f734ed2"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/flowDiagram-PKNHOUZH-kW5_vIpK.js",
+      "sha256": "aab47304ca217959187df41b2d2fc3435755dfa6cae8135ca457c318ddab8955"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/fluent-YyC28MRr.js",
+      "sha256": "8bd74f055c5b44dfb7522a2db76d1e4b967a36b99591298d181ce4f9c60319ff"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/forth-B9D2JCeE.js",
+      "sha256": "2db6c4dd8f293410bd0de0a25f1dad21a1ee1990ddb816a4c783e86213e1e302"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/fortran-CAG2BFbe.js",
+      "sha256": "df8788d58683ac6188c9038802b9cc8483344dc447ff9854b818c5171c006401"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/fortran-fixed-form-CpmOyvS5.js",
+      "sha256": "4ac67c52d67e025a4582773a62987146bb3226d1f44f9e1a298dfc477548f299"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/fortran-free-form-5X94ETMi.js",
+      "sha256": "2d18015c9198f458952f8140462708aef319150f19fbf9706550413b1d212828"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/fsharp-5vtGqRR9.js",
+      "sha256": "999fe518ce6565712945a4201261e049daaa459a437788ae0bbe05e716b57c0a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/ganttDiagram-A5KZAMGK-IPQvXq2k.js",
+      "sha256": "b4124090a5d5030c86869a3ef5562f81fde990570a6780b30d1d8efdf32ef0ce"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/gas-d3KEcW3x.js",
+      "sha256": "a699545574b2f6e9d0d502fe4536ef23b977a8f03ef284520247350ac240ab33"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/gdresource-B5TLWiFO.js",
+      "sha256": "32a43d518df32c98b79b02dc37f3c6765557e8e112b722866e5c793975a9b57b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/gdscript-CNW3Aj-d.js",
+      "sha256": "afcb93923ae880366d50ef5fb9d0d24ca86f339955fda06d81dab52b63d596bf"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/gdshader-BEzE4j_3.js",
+      "sha256": "93963d4efc3e0d2bdb9fab63ce706f2570a344f7f61cebef6340fd2377b06705"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/genie-BvhtM5Ga.js",
+      "sha256": "67ca000da7afd913e78d95cc7d3462ec9551498d52dd4dfe50c588f68c6d2601"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/gherkin-DhZlEZiy.js",
+      "sha256": "86e76fdd8bbec4e37db05eebadde43a0761cddc0786f28f42befef6addaaefcb"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/gherkin-xCNF9gh8.js",
+      "sha256": "8990128805f132030dd7e45e83a94ef731c2e4c6ae01d18eb682e05004ef3285"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/git-commit-PP9xCApN.js",
+      "sha256": "170c0575cf35c7b436f886c3f87f866e9ee299ac219ce59a57e5dc738f701e53"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/git-rebase-D-XQSvDj.js",
+      "sha256": "88d0a6e714ccc97155ff22f4aea5e54a5cbd4701260c753ece3637b16b30bda5"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/gitGraphDiagram-K3NZZRJ6-RP5mlL0S.js",
+      "sha256": "709c59670085e0c676d8db13db087d3029ee272b531e5a86bd836b0cc3274a68"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/github-dark-default-DB2Hkvqn.js",
+      "sha256": "382491991f89fe29a45c477b3488f769db7f23985f84dac0d40430b6ed01b891"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/github-dark-dimmed-CMZ_OfqC.js",
+      "sha256": "cb4706f4519323c95cce0fe98a8ef4572ca0fba53675eb9786378336480044c3"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/github-dark-high-contrast-DmxWVmCU.js",
+      "sha256": "1f98d5b1bf5cb950c8e9387a7571efa7d556bc88211856af92554fe2d1fe8deb"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/github-dark-O22yVQaY.js",
+      "sha256": "504d46240b0a8db50c766d77975491333ac87eb8d0063c40a4513a4547b21972"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/github-light-BTbR9xVK.js",
+      "sha256": "620d9ac65c1d03aff090a6b6f7e2434a205180c9cc8998a5ab8ab20fa3cb0ae5"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/github-light-default-DWEonwFe.js",
+      "sha256": "be8bf7ee34ab3b1d6a65219f784594f80ade38519739bec259b41dc52a474a7f"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/github-light-high-contrast-WJ_cPDts.js",
+      "sha256": "935c987bd91be16bd5a8f2be11feba9bdb1144d7509f4f8e4f3f27e795682f52"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/gleam-LmNxrMsN.js",
+      "sha256": "f20f5bd7a34a2b9b492c8add86130106ee559a74192ad087eb13c36e8d98a473"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/glimmer-js-h2QNNiD7.js",
+      "sha256": "8d8635c7ffca968492eae4fa1c864b8eb514cbe3e611cb767d629366b5d1bbec"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/glimmer-ts-Bk3uX6Ae.js",
+      "sha256": "6bb87f85b05257c5faeaaccb3bf21732e0e1efb177479ec09e6d8fab0f7d37ab"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/glsl-CGsiYPcu.js",
+      "sha256": "7c37e71a7c751588097428aeae7453ef59ad8875abfd5f2677808ee76bf73e31"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/gn-OUMx7fqt.js",
+      "sha256": "64d6ad0db035828c8c974f0e0eb52a571e80628e51997cb8eecdbc6dfc546757"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/gnuplot-tV8vezdE.js",
+      "sha256": "1efdb8807af2a46b78525e65042d679345cd85b4f06eb6710bf25ac4ea509e69"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/go-DRMr3iML.js",
+      "sha256": "b675e4a0067b162a9ca31f1a988ed3d1b17e843447988b719b99d5d87b83d13e"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/graph-DR1PbkSP.js",
+      "sha256": "6c9625ecff60fc7919cfef82837c7960cc80a9688f5f1cfe90daa0caa2966d4b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/graphql-CwmtR1ib.js",
+      "sha256": "f09f189daf0b8826a569066383f43a1ac812f2767d48bb67e2f70b7740fc3c1f"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/groovy-Bn4MhXgW.js",
+      "sha256": "8e451b00d6588c768de22b9bbf8491b0e393d65d0a173902f55a5c90c7b9b80a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/groovy-CpwJiBl7.js",
+      "sha256": "6b1705ee26bb3827a73e657f0b58a16c84004135a5e237501d919b9cb868ca0e"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/gruvbox-dark-hard-DVsRsETr.js",
+      "sha256": "3271e155bcdf29d2a21ce277fe29ef28fb511f07440e06f656bd52d754474400"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/gruvbox-dark-medium-B5JBrQdg.js",
+      "sha256": "2b66247f97ad2883d47297b94dad800136b7a8c3edc4ec5f801103d007b82686"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/gruvbox-dark-soft-Db-YOqRx.js",
+      "sha256": "ac85daf36f12f8bb49bf648b1f9faca93c24a083421c87b91a11c0e6e1724093"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/gruvbox-light-hard-CXzJt7DI.js",
+      "sha256": "79fa17591e15028b6e9c22cab0410a2080edb0ae0d89b45a38c7cff3c4164e3e"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/gruvbox-light-medium-B89RAI1Y.js",
+      "sha256": "638d72d3958709693740209dcefc86404c98f4ba2342ae4ad10568fed2cfeaab"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/gruvbox-light-soft-Cs0hTZYv.js",
+      "sha256": "f1aaa7e1e2604d94a25844043851869575a42a58f7c593a96f26c16eda099e6b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/hack-BTX3ICIE.js",
+      "sha256": "8a484ea606f878a2c3772079058bad92d0cc80df3dff6dfc200157f5226da6bb"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/haml-DrIklt7F.js",
+      "sha256": "f2e9946b7d7cc0790aac30a31101051b1eedf5cb91a97c90f51dcfec4b13e566"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/handlebars-yWFGGD2R.js",
+      "sha256": "c3a60766088d1118da95b274cb9cb5b0a894557fed514d71249e545a1747e747"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/harbor-city-2k-Dk6mtn28.webp",
+      "sha256": "a2f8bdd324331d46a31ba1f2771defe4fda22a131a15654a30915e62b8107d94"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/haskell-CzPS7wjM.js",
+      "sha256": "894b6836b5ae092440baa05cdfd33acfff7c07e28ec05589ece4632f3b55bf2d"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/haskell-ySd-OUo8.js",
+      "sha256": "ff8a9df8c8df8f199ad3b7000aff670c061d0c760ba213d94f52a6f92024e0f8"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/haxe-7MlzfeYV.js",
+      "sha256": "df08c4d4f5bf41a8e63335fa1650e2d5dd4de28c5760ebd6ab47ee0c3fbdb606"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/haxe-BpobLYM9.js",
+      "sha256": "ae774b9789dcdd3e7a731ccc7338dbbf6146c46fc7dc6956afb915841b6cd73d"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/hcl-axoq0Ycu.js",
+      "sha256": "24b69e43c23e62180d2b449ad142168fdbb4d7a26d163ec4f35cae74557882e9"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/hermes-agent-2xQZASMR.svg",
+      "sha256": "f660a2312f42c1d9d21daa5c7dfe1d666901030a42a469edc014678314d0ec8a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/hjson-I7LcauIB.js",
+      "sha256": "d8d962f68ec3b8c7ab2c84a65a4e1e210746d3ea0a11d961bdc498c92a834a83"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/hlsl-TRzjajlb.js",
+      "sha256": "efaaa7be91bf2b4175e8335e299a08e95a8de3c33f50acc4af343aa042f6178b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/horizon-DWzh3z5C.js",
+      "sha256": "363bf720e4718f32f39173e842b38baed804c8901535825b1b8006a92f952c17"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/houston-CF_ws8Cq.js",
+      "sha256": "83d49c7b3dbf2aaa283add7939ec278b14558b8dddd93025b7427237e91266f6"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/html-derivative-HU9p64q4.js",
+      "sha256": "96342275987cdde5c94ced488d801de34bdf91220b1ab8cc2cbb449410a1497d"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/html-GC16tDh9.js",
+      "sha256": "41b7631b5178af311b930878750b1ce40ebb4776acd84fcd9cc8ccfc2f7b46a9"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/http-BqypyemW.js",
+      "sha256": "552d89ffbe4662e2a8a6ef42b9608509b6654b7de1f836e6c05c2b7ebc81e0f6"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/http-DjsOm9E4.js",
+      "sha256": "81694d12b1f4857b39df251c1ed4f851f6bfd6dbfccc45f33d4bc2cd45356ab6"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/hurl-Am2cDU4f.js",
+      "sha256": "cdc4981e91c269a5c14eda4ad1e35861cb729aa91ddc4eb303decde832043c14"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/hxml-Jle7oGdm.js",
+      "sha256": "dfd4cf9528e4c6d081f084c9285bf2ecbc99f42b78b91263a5de2c9473e92fa7"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/hy-B1k9U6S8.js",
+      "sha256": "76cce512efb74b619cb66f22acba0729867abfc977ea877ab9d8ec4e28847ea0"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/icon-192-C06667az.png",
+      "sha256": "2680338ed6d3557b6ab543b97460c4620ecffe0d3a801bd34c3c3c06a6eefe9a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/icon-192-DrQKUdSk.png",
+      "sha256": "9fbd4eb0e7356b4c6ddf2d86a676178476b93747a4687a6e89d06684014ed142"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/icon-192-OagIfT5q.png",
+      "sha256": "9abc0b6b53cef994b32e8c14c02fa8cad3be5325168d1f6907c47b327a024438"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/icon-192-R53lTr_5.png",
+      "sha256": "2f40a6ee8f0a0d1cfc11d8010fc9d990d9dd2dfbb14ea27bbdf97e2c50619a4d"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/idl-4HIGJlDI.js",
+      "sha256": "0ec3441d716383be06d8b9abe052499551a470877e9fb3701ebc09ab590c70b1"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/imba-C4923lSV.js",
+      "sha256": "63851953f60a70e580b0c2e3934e25fa89c3c8548f9c96fb16a59d72eb19ee6c"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-5mUhCR-_.js",
+      "sha256": "1a796ab0727bcbd81c97f31b2c761c4291b38660bafb82e8240e4d5af3a1ab00"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-BFGF1uWX.js",
+      "sha256": "518d34b2504b323f67e0e8cc04e3e78fbc66376abcf01ff19c326e8b1dd2f28c"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-BH9Zfqni.js",
+      "sha256": "1eb7c5c150a54e0f3b5308a3c2255202edab92c744b7b3b5fbc7e6f5af5e1cf9"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-BtOTw7-h.js",
+      "sha256": "3898c374954c7e114f81a757c42e2099982acc9ca743a9de9171e14f337ea64c"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-bv-BiPCk.js",
+      "sha256": "56e2f840c7021dc6e098f2c7e5b7e3daf78bb112cf11d037900745c16441a3f7"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-Bz845hSL.js",
+      "sha256": "2dfb6748e38d85a93a36acde60e66dd44a2057f193be59b3dfa721ac60a5f916"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-C9ldUCs2.js",
+      "sha256": "aa9eaae2c649cd11f3658d5ae076ccafa5bcf75072ab87512050dd4a53aae2d9"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-CEFwmkf3.js",
+      "sha256": "7cc8b0ba1c1401fc989b079d20b72840662bcfb5babfe4bb8f15c7547b393557"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-CPmKDxgK.js",
+      "sha256": "5a7def25d07deb883af1bbc0c1ceb0dde563dbf012011ea5d7e72f1ac65925f3"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-CPV63KiP.js",
+      "sha256": "7be5f56d60d49155bb34f3a2d4447b4a10bbf8e2e32a8648b985dc1c68352be7"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-CRtttQvg.js",
+      "sha256": "1a32d3773575e14b8eff3f26677939acbf355b6aac999128ba103fc3c427a4fd"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-Cs2KYbbF.css",
+      "sha256": "bac1ca97693f14a6fc78ab97e72aaceb7dbbe5223c133ee8d8f3aefff44e077c"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-D1RkN0n3.js",
+      "sha256": "62c80d334168565690ac77f21d9296b83a9f763a36a89d941ffb814150ceaa49"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-D54Z2fy2.js",
+      "sha256": "7e4891244f1ac7460635af02b9648ead5b3544b19cb9d3135d37fda7c05d7c1a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-D5oJ4BZM.js",
+      "sha256": "db5666a8b44b8784915149f441452e7ca5c5ebadb8ef79fd7045ca793fc2541e"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-DBqcMmfA.js",
+      "sha256": "13d008999cb79a1b25395b59a68688dd03461fb775dcfe0a614a23331a6baae5"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-Dd7I9Zva.js",
+      "sha256": "8660601bd15529b3028964f8954a7ceb677d1e2f75b3e459166df773f40f77fa"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-DIXj5TYI.js",
+      "sha256": "9488fd403d1909669449c9ad058c344a66515826876aff7760d1217d4b52bf14"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-DMfcSM1_.js",
+      "sha256": "2bb6abcde9d377b37133a495e79d33ca241767dd70d685d6b2c232511202c963"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-Dp-J0uV3.js",
+      "sha256": "5c3053664b8591b0ca238bdd3abe9e4b380182af7f9ce56784312dde6158b2c4"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-DzAzKF7C.js",
+      "sha256": "bdc6a9598f4f691230297e1a4bb2af37e95c0034f90ecdace3e90991f8078436"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-K_ZAXkbY.js",
+      "sha256": "84f2e76bf8bf803fd535c45d7492aae6de5acce2fc080def6a740dfee6dca78c"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-mdWnCrV1.js",
+      "sha256": "e4b7083e1c5834e299088f62b1c6691fc7050fa072dce910be3231a12b23737a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-R2JZl4_f.js",
+      "sha256": "381f30d950efbfdf75cf48cffb222e2ee6dc4e444a8a89301ab58df52be3d0d5"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-rsuyo1R2.js",
+      "sha256": "d69d9f620aa66ea60ce918e358db6e73e3bbce93f35e96e0fd226272d2919906"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-SEnxEA-d.js",
+      "sha256": "27554a55aaf108d2350a6a3199c441675b2e5d9c0c6bb1c15a6c5828d0aea87e"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/index-TIOFiLpv.js",
+      "sha256": "434b61231d2c222916182ca3c0c3204ea21079c4959620ace7a4979437ee2318"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/infoDiagram-LFFYTUFH-B3x3F0OV.js",
+      "sha256": "944f47bcd538a9d63bd9b5739f4c353dccc1362e9aacca588a23cc6da45942ed"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/ini-B84Ha1bx.js",
+      "sha256": "bcda74cfe9482897f23bd5e92da7a2c87b7255b94e90a5e3c1f010eebc0490dc"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/init-CTO7spbL.js",
+      "sha256": "3be5cde8f5c38a9ff562e5cc91189234238482c806fd32c1c81d3578e9fdd8d0"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/ishikawaDiagram-PHBUUO56-X2EQYVtR.js",
+      "sha256": "f1453eb30f5afc20666915a08ca66128831641e808c087b2956dab2cbb00862e"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/java-BfXh-0uJ.js",
+      "sha256": "5540cfdddc5cb7ada51189cf740074e42fd26275372445df5ba62fc7ba5e323c"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/javascript-BsAkV7mL.js",
+      "sha256": "9705c92001fff9de10c16a6bf5f1bc36cc6800dac81c7044c24a43f3b33fdc47"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/javascript-C_OHM9hj.js",
+      "sha256": "95b09f0b3fb5fdd9b2d10f6984118bbea38a78a51286f4d862b86a01094ddd8f"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/jinja-FkIlHBgj.js",
+      "sha256": "ec9286945033f35c800188028cde975ed68a382e8083dc2e78e7248f15c31ed0"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/jison-BkdOIOd4.js",
+      "sha256": "4db7533dce6e98a8d43d96d679bb71976cdba6140fe1ec9f145d29809ca87c2d"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/journeyDiagram-4ABVD52K-PhkouZAo.js",
+      "sha256": "d367d026be2282d29ef18f8361bede89d1722a1d37396d2fca30dd80ea6d8398"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/json-render-block-CM6u3LVn.js",
+      "sha256": "43585c92a4ec2222500816503ed4f377f3f74f0524fa740c5cc2eb0d5a2630c2"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/json-render-charts-DPYigb2z.js",
+      "sha256": "55fa8427ccdbe1b619d833ec5b4aecb7e755f63004cc7511950a8cb97281c479"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/json-TjWBGEk1.js",
+      "sha256": "8ce3e7a47293a63cba147d9fed32b8390b4b3b171fbc869d8b72b71a1c056dd2"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/json5-DCGCKrmX.js",
+      "sha256": "ce154b0db39dfa1985731168b91721652cd53d90d7c3d5235825f7ef868cbbdf"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/jsonc-DLVLp8id.js",
+      "sha256": "bdd552fa46fedad9291054241ed0f410c890a323d00fcc16cd77648d46d382eb"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/jsonl-B-R_pDGg.js",
+      "sha256": "f23a4111fabca720313b66dd506e4e23513dd868e5a328ec513ed7e83616d532"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/jsonnet-Cs8BnnC6.js",
+      "sha256": "5addc8dbfeb41cc03c640d9f972a5c57bef2a88db4f7160f01a40bbce5f8bb71"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/jssm-DDuANZ2u.js",
+      "sha256": "7ea2e70740905b239dc07e7f9f92a5f1d930e7a249c88dbc88095ce19b1027a7"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/jsx-BPmvoin2.js",
+      "sha256": "cd3f7d07edb464852c65cd16a35d61b1cdc1ce03b75fb4afb9c21b99059dd127"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/julia-Bs6JJhYG.js",
+      "sha256": "0d8127c7275ab1371ec839ec976879685017db1cf04c55095e651e48fe103196"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/julia-CU_UwNb8.js",
+      "sha256": "113b05431ef2f1657b7ee312505a4398aeb220517de832d274c1aae287665a77"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/kanagawa-dragon-DU8n2NNT.js",
+      "sha256": "f167a0066027029950bb380e3b45083c5ad61d5f68c1a8792314428ecf9f7ccb"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/kanagawa-lotus-Byd0CDet.js",
+      "sha256": "871ffc24552c7d64a3727b1842c5a49a878930e7ce530f032728769d513ea6a2"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/kanagawa-wave-DExoagcR.js",
+      "sha256": "1004bd37508948b9217bf76f6e6abf417715222e9455606d5fa4626d54ff4cc9"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/kanban-definition-K7BYSVSG-CNk2lIPy.js",
+      "sha256": "ff49bd0c7b26d41dabeb80dd8f9a1d7a8dd2bde1e9070150d64453c8d77b976d"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/katex-CUTrfwKc.js",
+      "sha256": "7195070c35405ab01ddf9dd8f8aff89b7f0e5c5c48f5ffc4341a1c342b9bd9fd"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_AMS-Regular-BQhdFMY1.woff2",
+      "sha256": "0cdd387c9590a1a9f9794560022dbb59654a7d86f187aa0c81495ad42d3a7308"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_AMS-Regular-DMm9YOAa.woff",
+      "sha256": "30da91e84c893f875e252689faebdc590b2871145e8adc7f9a9d4dbd8ce0b251"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_AMS-Regular-DRggAlZN.ttf",
+      "sha256": "68534840bcfdd2bffb6f0e8deb48684dd01e7f04ea2813267577afb906de1d13"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Caligraphic-Bold-ATXxdsX0.ttf",
+      "sha256": "07d8e303ce4fc12b4bb54f1004170dd190a1f3db45d400fe68060df3e0897268"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Caligraphic-Bold-BEiXGLvX.woff",
+      "sha256": "1ae6bd7475590e97e7f145a89e09ccde322f7a6bc0b91607b1c8b8ee28290fed"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Caligraphic-Bold-Dq_IR9rO.woff2",
+      "sha256": "de7701e42cf1f4cf0b766c03fb27977207eee2f4fd5d76fa82188406da43ea4c"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Caligraphic-Regular-CTRA-rTL.woff",
+      "sha256": "3398dd02302557a793f2863f88e02d96ce10df2abffa07c8e9fa90775116e65c"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Caligraphic-Regular-Di6jR-x-.woff2",
+      "sha256": "5d53e70ad607c2352162dec9e0923fb54ecdafaccbf604cd8dcf7d00facb989b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Caligraphic-Regular-wX97UBjC.ttf",
+      "sha256": "ed0b74372feefcbb9c0666b2e210da37b7e49fa7fbbf3eeb11db5f693dacfbb7"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Fraktur-Bold-BdnERNNW.ttf",
+      "sha256": "9163df9c7122432e6495b4229fa9071cf9ae86a758ae5efc4924ec2e1a6dbce1"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Fraktur-Bold-BsDP51OF.woff",
+      "sha256": "9be7ceb88004ab8ad124082246fbfcca4091e36385d4ec6ed1df67375dad50fb"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Fraktur-Bold-CL6g_b3V.woff2",
+      "sha256": "74444efd593c005e3f4573b44524704c0af0a937fe911cca9e94068d0d140d3f"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Fraktur-Regular-CB_wures.ttf",
+      "sha256": "1e6f9579e90e2cac37f8f60a597c436e075c114385652b7cbeb0dec0421291b3"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Fraktur-Regular-CTYiF6lA.woff2",
+      "sha256": "51814d270d06ff0255dba0799994fa4d8c84d11f09951d47595f4abb1f3602dc"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Fraktur-Regular-Dxdc4cR9.woff",
+      "sha256": "5e28753be717dac97f559f49bc10be9cf3c124ddcabda6659d11cb68febc6463"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Main-Bold-Cx986IdX.woff2",
+      "sha256": "0f60d1b897938ec918c8ce073092411baf9438f6739465693ff18b0f9d20b021"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Main-Bold-Jm3AIy58.woff",
+      "sha256": "c76c5d696297d51b9cb1639c7da4334f0e7dec81b42b11213b5e25ef671bb822"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Main-Bold-waoOVXN0.ttf",
+      "sha256": "138ac28d1663b3037e9c5f52371fa5c63d8324f4a38d22cd573e6ea3a3fd0cf8"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Main-BoldItalic-DxDJ3AOS.woff2",
+      "sha256": "99cd42a3c072d918f2f44984a807cf7aa16e13545fd0875fc07c6c65f99e715b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Main-BoldItalic-DzxPMmG6.ttf",
+      "sha256": "70ee1f64a20f2048c21940ef46d0144fd215baa953ca69afd1e31e98544f708f"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Main-BoldItalic-SpSLRI95.woff",
+      "sha256": "a6f7ec0d846ac7ad975adb8959c37ed49b94acbc4ae436db9ce9e20287e4a64c"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Main-Italic-3WenGoN9.ttf",
+      "sha256": "0d85ae7cc30f23790a7f1a58c4a112fdca8aae769b6ba11429af1d98b1b6cb3a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Main-Italic-BMLOBm91.woff",
+      "sha256": "f1d6ef86f3b11a528bd5185199bd2443ecb2b0dead96d88674b5a2c12be24bdf"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Main-Italic-NWA7e6Wa.woff2",
+      "sha256": "97479ca6cce906abc961ecac96faa5f9ca2e61b8e7670d475826bcdee9a7c267"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Main-Regular-B22Nviop.woff2",
+      "sha256": "c2342cd8b869e01752a9321dc17213fc40d4d04c79688c1d43f2cf316abd7866"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Main-Regular-Dr94JaBh.woff",
+      "sha256": "c6368d87e8a1a3a5d337623d83d8dc4b868f242a9ad476237d6f8d1e0f168cdc"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Main-Regular-ypZvNtVU.ttf",
+      "sha256": "d0332f52868370fd83ae7fa46470f90c8f2eab2fcf12bc4f88080b340c95a830"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Math-BoldItalic-B3XSjfu4.ttf",
+      "sha256": "f9377ab0271cda59af24bcffbd46a4d0c8a3572ffafdbb38de2ad5ea7b0d5ee5"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Math-BoldItalic-CZnvNsCZ.woff2",
+      "sha256": "dc47344dbb6cb5b655c8460d561f4df5f501b90c804ad3c6cec65fe322351ab1"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Math-BoldItalic-iY-2wyZ7.woff",
+      "sha256": "850c0af5c2238497febaf5e461d880bf458c341f42f4f330f1b1ab5698b1998e"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Math-Italic-DA0__PXp.woff",
+      "sha256": "8a8d244581371912b8f3f5a23e2437cb2a59cd9bcaebb0346e722c05737a2571"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Math-Italic-flOr_0UB.ttf",
+      "sha256": "08ce98e51b04d58945a301e639e02b6998af29fdfd61a7b8afdd07bbfc479d4a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Math-Italic-t53AETM-.woff2",
+      "sha256": "7af58c5ec8f132a2ddde9027c6d7814decce4d3b822a11192a42a20e2e973264"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_SansSerif-Bold-CFMepnvq.ttf",
+      "sha256": "1ece03f79f95277d57dc7f6b435a74e1379b0d46104a8530286b60ff49369ea0"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_SansSerif-Bold-D1sUS0GD.woff2",
+      "sha256": "e99ae51144bf1232efcc1bfe5add36262c6866b0faab24fa75740e1b98577a62"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_SansSerif-Bold-DbIhKOiC.woff",
+      "sha256": "ece03cfd83e22c212cdef66feb8442d25a083beb988db3f1883f3f9738d750ba"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_SansSerif-Italic-C3H0VqGB.woff2",
+      "sha256": "00b26ac825e2095056396e0553b8ac26d3f8ad158c3826e28b4c45b385c4714a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_SansSerif-Italic-DN2j7dab.woff",
+      "sha256": "91ee67500cc0129aa0ace3ac5c61ff1692102f0f31d02b69347fba35dcb75bf2"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_SansSerif-Italic-YYjJ1zSn.ttf",
+      "sha256": "3931dd81faed86ba021bb2bbdc36f5bed9a38d6b4f4077aca59b265aa1b02083"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_SansSerif-Regular-BNo7hRIc.ttf",
+      "sha256": "f36ea897e19f4a2e571d1e900e4e3710e438deb05a842486045ba0a3e616a4ad"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_SansSerif-Regular-CS6fqUqJ.woff",
+      "sha256": "11e4dc8a6471ff6d6ee561d53d10fde8f7489e798257ff449c5d37c197435605"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_SansSerif-Regular-DDBCnlJ7.woff2",
+      "sha256": "68e8c73ef42afd3ccec58bf0fba302cce448938e7fc020a5e31f8a952eee1342"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Script-Regular-C5JkGWo-.ttf",
+      "sha256": "1c67f068fea8bb09bf099c088b1cf64bd27516a6e07f4684344873564bb66a67"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Script-Regular-D3wIWfF6.woff2",
+      "sha256": "036d4e95149b69ff9bcc0cd55771efeb25ffa3947293e69acd78d5ac328c684b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Script-Regular-D5yQViql.woff",
+      "sha256": "d96cdf2b3bdd4d64a8fd5f74a4c467f123a8a73931cd435889f08ffaf9bf947a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Size1-Regular-C195tn64.woff",
+      "sha256": "c943cc986384f59e86bea5fd7dc50a9c4dfe567a7c05eb40d6790720dead97c9"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Size1-Regular-Dbsnue_I.ttf",
+      "sha256": "95b6d2f1a50173bfedb8c63e1d1c99b10427d0a4df4201cb44513b226951a22b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Size1-Regular-mCD8mA8B.woff2",
+      "sha256": "6b47c40166b6dbe21a5dfca7718413f2147fd2399be1ba605d8ad39cedf25dfe"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Size2-Regular-B7gKUWhC.ttf",
+      "sha256": "a6b2099fb555c60e3a0db3a08842ebf1d732c6eb4e4bf44913613bed4fc4e39b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Size2-Regular-Dy4dx90m.woff2",
+      "sha256": "d04c54219f9eaec6d4d4fd42dfb28785975a4794d6b2fc71e566b9cd6db842dd"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Size2-Regular-oD1tc_U0.woff",
+      "sha256": "2014c523c3210bcc166648c4d4cc57f05b747df07a24277bf71c51e67dc79e3d"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Size3-Regular-CTq5MqoE.woff",
+      "sha256": "6ab6b62e9b62dae2c00dd90f791bd10950be0ecc3490d7d6045f51c2e8fe0949"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Size3-Regular-DgpXs0kz.ttf",
+      "sha256": "500e04d54f0d51666332c9d2089aa803be22aa878eca539e59fa53c6e522b082"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Size4-Regular-BF-4gkZK.woff",
+      "sha256": "99f9c6750b489c9462bf04900bd3f939df9b829339daaaaa99ef5495cdddea58"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Size4-Regular-Dl5lxZxV.woff2",
+      "sha256": "a4af7d414440a1c1790825cfb700cf9cf43b0f2c4b04f0ebc523011ad9853ec0"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Size4-Regular-DWFBv043.ttf",
+      "sha256": "c647367d1dd4e162468717d020e1fc0f1dc5c26ebfdffbe55261713bf88c5877"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Typewriter-Regular-C0xS9mPB.woff",
+      "sha256": "e14fed02b1aba7ce9f5afd5844b5d0321b22351febc720e0de8b8723527609f7"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Typewriter-Regular-CO6r4hn1.woff2",
+      "sha256": "71d517d67827787cfabdf186914cc3358eda539e37931941f2b2fd4a21f68c0b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/KaTeX_Typewriter-Regular-D3Ib7_Hf.ttf",
+      "sha256": "f01f3e87d9c6a61c0c081ceb577abd864eb00a612f7ac1620dd6915fad2ef5aa"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/kdl-DzNQTDs7.js",
+      "sha256": "74c027e2bcd6e0eb33e1ba2f8f56d114c3085ab689bd41f224d411dd9cccf4b7"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/kotlin-BM2ZNTMh.js",
+      "sha256": "59de9bd802125a8e26357b6623274e72a44cd8d544362b5d33503d527bbbe020"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/kusto-dtpuxMFE.js",
+      "sha256": "2112932192495b248643eb5ba53a18993e7d9f25c027336c37a9b0148e7bca83"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/laserwave-DF03wMlf.js",
+      "sha256": "fe2af99055f140affaf83767aad59d6d96f53bebe84df77b81aa52057e7ced30"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/latex-BRmxFpXE.js",
+      "sha256": "fe841d7deb01a9b67cb5453ebe87f12a51dc362455334ddcbb0c201aea73e700"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/layout--excpatH.js",
+      "sha256": "aca1cb41be373d049c479d14da3faa55bdadb9ab1cc0a922cd89ff851813a683"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/lean-CTow-IzD.js",
+      "sha256": "7a1668429383f6366dbbbe7f3fe97098e4ee97230002b343883b329da42f56c2"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/less-BAzLMJNR.js",
+      "sha256": "21765e8db86cb20601dc7ab4d25a821cb2ed61bede0598ebf0bc33850e634a92"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/light-plus-DS08Xg5J.js",
+      "sha256": "bd1191ca851ac6960031db8350ca359502280633917ce41e7e2f267927341828"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/linear-aVg_j4GG.js",
+      "sha256": "c744d238f2377cac1353cab607b99cf8dda9946b5e4add77bf535aa7fe1f1237"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/liquid-QmJ_LYTW.js",
+      "sha256": "c073d5850a1e35360b1eae9bb8207ae53d5aac579c0e73511f50ce501f1aa0e7"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/livescript-BMWCDuIE.js",
+      "sha256": "b39453a81de0238efd37ac1306f2f004f305cbd745be57e1728a17625f013401"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/llvm-Cga37tC_.js",
+      "sha256": "2e3d7a72af47808c55d441cf4fef725d1fffd915228dfb5e874131e7030fed73"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/log-BF22rfM9.js",
+      "sha256": "6979cd1fd5b1a045df91e39194bfa255a3fda4291bcd2647dbede2f47040d0c5"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/logo-D9l7oEJ8.js",
+      "sha256": "2563636bc6d8c9568f0cee4cc4904d61c6ae5f99cda1b2396668800681de91e3"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/lua-BVbbqwZC.js",
+      "sha256": "eb9d80232171b3ec29d0a6ae191f05601c9beaab50d55ec11f1a6491485490ee"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/lua-Cvg8VrAA.js",
+      "sha256": "165c413653092708d81ff649b3d4a63df2eedc0b50c8f249b9667b4e75fe959d"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/luau-CdZ6BoEa.js",
+      "sha256": "c9e4f297c867df3550cc6edceca34aa563022b9de12cce8f691c7e88f99e72d1"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/make-DLtqaK4D.js",
+      "sha256": "27841b3423f55ccbc79c7bdd9525e23b991d1dbc0ad273d981020d974ba840df"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/markdown-F_EULe_G.js",
+      "sha256": "1d3d71f31638b0fd85e4c37dea2defaa1956428edb698150d74936707f2dd73b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/marko-BDLRyCCe.js",
+      "sha256": "73c34b234300039db3acb2f414ca4385e25bfacc1f1070136e845221ccafee3f"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/material-theme-B8B2U48Q.js",
+      "sha256": "5cf1a42a125b0e4e8113ce35332ef2b6085f1542ff4e325ecdf3ffc6fe7c3c43"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/material-theme-darker-BV0iY_T3.js",
+      "sha256": "31e724d2e6d4c3fc9c0780e5ccaa31a052611fc29113884c624dcee165b6c11b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/material-theme-lighter-DrzybSTF.js",
+      "sha256": "bac34a65c97f80e7ae86a8e1a6c951cc43206dc10e55881e5f4e718803b5803f"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/material-theme-ocean-BRPLVReX.js",
+      "sha256": "5e11239fcad3ba257d7696d7f7cbc95b1decfc0d2008fe469d03c661dbbfde8e"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/material-theme-palenight-DSJwsR_D.js",
+      "sha256": "34b7bea230dd9db5306ccbee699df1d7395bc3cb085b922a824f8db6c31c6364"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/mathematica-DNLOL9PQ.js",
+      "sha256": "acc57c8c8a74626a6b9423988f92155410b79196d13c9c6a78047d51ae130c68"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/matlab-7XHduepk.js",
+      "sha256": "d723801414e6f79880d6a2cb32a7fab3be2323b07f8c93bde413474188d17f03"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/mbox-Ga7d4MMN.js",
+      "sha256": "fc425b9a3a312399b3ff6adfec040828ff7c8789f0d31b96e73bde2dce902355"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/mdc-BQMA9IL9.js",
+      "sha256": "bee58a333f2374974a750b66bfc6173353f3dc7e26758eae9d419c7eb333dc9e"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/mdx-D5wExp-O.js",
+      "sha256": "67caa9b015f13f027c05f6575e1dc5ddbf6125784b9486365812672ee6e97687"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/mermaid-z_1ejSlp.js",
+      "sha256": "ed183027814b77a9f6b90598b8a6840ef257216950c315f867821753dd87b387"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/min-dark-BNaN9fWk.js",
+      "sha256": "09da2c57f0e7494ce37a3a6f328acf788886bad44086bf08189f221df97e4f35"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/min-light-CMrjentn.js",
+      "sha256": "33e2466853d393c691c279ee15953e13c4184d2899dd76b8a359fc275330ea68"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/mindmap-definition-YRQLILUH-D5GzhZcF.js",
+      "sha256": "9c4c68c36f274f0ebf6d94e1c1b63a4c459340a1d1bdf8f4f6c8b260a80c2a28"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/mipsasm-BQyyUrpa.js",
+      "sha256": "e78c352219af028d558eef28b21d2fa9c4e33ad27c41c6e5f9ae0949f58ad815"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/mirc-Dma3B8rS.js",
+      "sha256": "0ddcb9e79952a15f12935311af85affb24054773404adfdd1d437cc0080a21e2"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/mllike-DHn7xckP.js",
+      "sha256": "adc3b1b7f8aa916812cd4d8bdf8cc1bce352786e3df54c560c5b9067b4fe6d5b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/modelica-0d55jYY0.js",
+      "sha256": "53c8da4f56d1dd592c1710d4b2735aa9904eb2306f365b56aa7074837c59526b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/mojo-oCdXaqgR.js",
+      "sha256": "8ffee981fc0a5c584f8826aae180fe83eb7b0440a5b0e0c165f79e065363621a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/monokai-DelygWXa.js",
+      "sha256": "fe903cb744e07e3c437f2afb5f0eab64ae2a22eafbb4983523061835747eed8b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/moonbit-BJwFbXFw.js",
+      "sha256": "57f4a33c170c300a034310c6d500878cacb16be6e60386670e4df7a9b3bf17a6"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/move-DhTNmxqC.js",
+      "sha256": "b1fdab7ed9886616feb8d94644b83ef5e99e8073afcc42d38bef9372426ea755"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/mscgen-DdqZYINH.js",
+      "sha256": "7e91513474f40739574f20f1b1f38659a476b68b39ee260c7e13132e20d66fc6"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/mumps-Btr8VblO.js",
+      "sha256": "aea5f291cf40bcc124e9ff104dedf8df38d630d3112f62d1051118f1ce16b80b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/narrat-CLjGcbCy.js",
+      "sha256": "00535fa0f1128b395840c49a0be93d75d0e4b0cde4c9c205a86af545c1e03d0f"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/nextflow-B-RDCzl7.js",
+      "sha256": "9baee419e41575166341906a15431f74c48ca1977a589bd953e6727124c36c06"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/nginx-BFAkI5_-.js",
+      "sha256": "f095607dc4e851bbffd04e6ba98fbe6645d91d621285094d6d624a5661a6ea96"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/nginx-DTDtBDVN.js",
+      "sha256": "715cac7cfdb61a1efd09d43ec2c5e6d8e1bd491be679ac56df795a913e6eaf21"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/night-owl-DSS199ra.js",
+      "sha256": "7ccb122a6009d7a99f17ba43860d62d7dc75610bee77cbc381d96e0dc97bfd5d"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/night-owl-light-gC6E-Eh2.js",
+      "sha256": "83af20b1a92293336f7dc9840f94cfc188262c468b18051e1090b977ae7bc669"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/nim-B3PAIZ4D.js",
+      "sha256": "71a264de4dfceacf81d68cf35152819cca0eb5bf08f85955b91738868899d17a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/nix-ByWcmvXF.js",
+      "sha256": "79f3b2e105f425badce5deff89ac5ff81d31b342c28c463f934527a97bc16493"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/nord-CvDbBq5M.js",
+      "sha256": "843a437d6d92e165815bde9e2e8c6447029db31f0f62d82cdb7facd5a603aace"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/nsis-CyKBdPWp.js",
+      "sha256": "57f398b99c2ea986b5e4673709aa470f0fb4b42cb04188cf4044e52475c4ff61"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/ntriples-CvgOYMpL.js",
+      "sha256": "239581b9922c933f3427296d14f18a1febb1db49283e6e4aa3331f4e2b9bc3a9"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/nushell-CwevsFPL.js",
+      "sha256": "b00745174b3dbbedd0b8ce1c1dc93b0e036aaff43527bba7be960a054e9f52a1"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/objective-c-BRoNQF42.js",
+      "sha256": "3852739d3dffc3add8d1ce3fc29b10ce13866fb9d6ca97ec484702b643fb12c1"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/objective-cpp-DEoN9Fe5.js",
+      "sha256": "7a16f07926264745f1c255a2115a9b5acf41d365e4242874b6600c6e7b9bc850"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/ocaml-B1kfGk9Y.js",
+      "sha256": "bf95264e77dd6d1a916df5cb2d224030191b43615b99f3b25395392bc278d4ba"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/octave-DYBj3-tl.js",
+      "sha256": "57d7b87692fe3ab14a413456a3ea0fb201a3052057b77a55604863fa5064c495"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/odin-CNQ56Ay2.js",
+      "sha256": "8d3c38ddfd03d9219a752fa28201996972f041a4547fe3ba7f7daf3162228473"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/one-dark-pro-CsMf0BoJ.js",
+      "sha256": "45e1908f9275cb0a626a7f68ce15338660c01a130398d70d74cba13310f6d79b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/one-light-B0cTzZyr.js",
+      "sha256": "031976a8b5ee0f6c8305d8d5866005d5aa6b7fa3be36d71aa8941cb3253b29e3"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/openscad-C_m7ehZF.js",
+      "sha256": "6814877fb183e824bc3333238f5d7eee45640e59135e3c7742f53ea79a9dfecf"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/ordinal-BD3Y6v77.js",
+      "sha256": "604820fc2a09c3398d700bf93ea072621e79c111abe856f1fe69554f4facdadf"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/oz-R_e8WMIi.js",
+      "sha256": "a19a6ffdf1e6eb10fe9c4937cfb31303c9ec5bb723c73df1a71ef43c82cdd020"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/pascal-CU8Kjkr_.js",
+      "sha256": "51783713bff00fbb03a180fffdcdefe8afb1a94d8995b118f2e2263ea3532323"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/pascal-GD8iposT.js",
+      "sha256": "e5a1f91525017a8bf777f9c04f990c65a6a876b26e9b803ba4fddbcc6a68ccac"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/perl-DL9mHpoi.js",
+      "sha256": "8c4df1964a2fe9a690f2493217ed9f70d1f7e2f026ea515f3b226b3b39370b17"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/perl-HITCDkgu.js",
+      "sha256": "ba6869e9cc2516cd592f9d438657bc48339e092fa3c29b9931502b4b59945fb3"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/php-C2HieitX.js",
+      "sha256": "2659098a78a32609d2107f7fce3d41af0ec09fb9c798475ef5f66e776a201158"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/pieDiagram-SKSYHLDU-B-RIF81c.js",
+      "sha256": "137ac9d306b8cfd8a2124a6f46b3c517deae715e86ec1ad38186fadd62e4de8d"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/pig-C_4T4YIV.js",
+      "sha256": "82df721874d4623ebcfa10b27ea6eb9e3992ff4c28e2d838f8d166ab73abb91d"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/pkl-BsByaYax.js",
+      "sha256": "ae124b332038e99562a2d70ff27dfb781b7cf31431bf65a3b335c4915c80abd0"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/plastic-BjwMpBc0.js",
+      "sha256": "88ba183a095109418c2ae3d52a7023865d872dcddc42242e5f298015be9439ad"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/plsql-B3Na24V4.js",
+      "sha256": "77bd943f27d376b716843947cd3922bbe4d1564551f002ea06469271370de20a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/po-BajfNjc5.js",
+      "sha256": "c5af997a5b532ff95ed15f640a2003b88ef1932bed736ab0d8c874048df22113"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/poimandres-ChWyhPrn.js",
+      "sha256": "1f0d597824ad1e236ffd582419a4944310c6acf7a9f6f3fe428a5f04c8c24261"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/polar-BB-dlxnO.js",
+      "sha256": "a81222826bd6abd3f19f881c2387b8e997a2f7c521e0714497ad1109f87687ee"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/postcss-kj1IbjVd.js",
+      "sha256": "cccb39e03ef1fcc4ffad2832ec183f10265eb1b2d07f6cefe543059ffb4edf22"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/powerquery-B-e1fO-k.js",
+      "sha256": "abe97422a246cb141b375d234ab4c415d96e081167ee56fe4291d3bb9e293d02"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/powershell-B0suO7Vd.js",
+      "sha256": "3de01d37e183594d3bb94dc474f6324219cb209d162b202f82b12c77d2370410"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/powershell-BcMVbGpk.js",
+      "sha256": "aa1f2ac1433f5c0582385bf98aacee57e131788cb99d0c2325e0cb826a0ccd1e"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/prisma-bmxcSDxq.js",
+      "sha256": "81c07c7ae46b73267b49a1ceebeb12d235a4cc418c8ab7a6e2a0c9343597a940"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/prolog-BT9GCzqD.js",
+      "sha256": "3539bb0c48ad2411aa267a12ddd7f6b99a606c06cf7dfb454a89f8cce3eae4e7"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/properties-BR-vP1aU.js",
+      "sha256": "b758d2ccb06eaaf23dbbc110988e64a57e55a5923a262c60432397feeef0c9c3"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/proto-Ds-m32NR.js",
+      "sha256": "a1a57bb072ca26ff4c7b4d69f2689ce0a88c44b35e08624d6eea34912b024e22"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/protobuf-BxgpyhoW.js",
+      "sha256": "ed0b3d7fbe3b079db99443170bd20dba78ba27f42043ad6efebd4b714ef4a364"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/pug-BwQB43qN.js",
+      "sha256": "9ddf1583d958955be27a03c33d4e2043a7ea0430e2c1d6033318fee7cb82a2b1"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/pug-CTXt1f8z.js",
+      "sha256": "48c244b81b114de6a5e5adefc5c7715f6eba241d58edd162713fd21007afdb2c"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/puppet-Bdao66PW.js",
+      "sha256": "7985d1f812327008fe34d375ab1849a12e903d3e9507b7fa14253ba17dbdd596"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/puppet-N15G4Usj.js",
+      "sha256": "a2e653aab53e15202080aa84660af3f4c4de31daed9c08f7aba9f0a45d8da72b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/purescript-DrwsEYNH.js",
+      "sha256": "a62eed87e880fce2ec42e0ecf1a1f0b56101c353a1602c594df543e7fb44d88f"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/python-CrdIx4PZ.js",
+      "sha256": "7f8afbda8afea72eb7128991331387b1c4b5d0968523ade7cb14e91998c11ded"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/python-CvWbmiX4.js",
+      "sha256": "219d8f4b9588956ac747cc56503e568fbf3aff3ab5e34e400a6cd21c86e2273f"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/q-CrbCVq4a.js",
+      "sha256": "ded6c3f92101aee3b6214667f489d691936350d01b61e69fdb2b8e2104afcacd"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/qml-jtL8okyu.js",
+      "sha256": "0b9f29b4c5eaddd1d36cc7a0bfe475bbbbfb41b7b4c8bb541a4f2b15d8da5c82"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/qmldir-DuMSk0Oz.js",
+      "sha256": "dd3200a53574324b6660f4eb697c1a345d692545df57e669b7ec45edb10b2cd0"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/qoder-color-CCjsVbDP.svg",
+      "sha256": "396596d247477e2a036c141a16ec266df7b14c0130b777a68fd04bc89af50bc8"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/qss-BFrB6p4y.js",
+      "sha256": "b3c4472854e53baa3e2b5dc01534ab8f649cff91114434bbeb043d9804b5742b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/quadrantDiagram-337W2JSQ-BcvXlBcC.js",
+      "sha256": "9d785e77262c9a3578c7380a95101d8b27bdf937a0f2119a111b724ce15848d1"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/r-Dpdc-Kyk.js",
+      "sha256": "68f7460c5950028ccb1c47d24c83f9e698f91aba683233bdab1c1d16be61e6f7"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/r-V7nswm59.js",
+      "sha256": "78772777dc6085a89ba3ed5f6fcd5fe46c7ff6cdb849c3c967ce0c1273b4f4a2"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/racket-DbA06HL7.js",
+      "sha256": "35e993f65b1628459cafc49c36adaa2b97e82bc7bc3771a3734d08f65c611972"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/raku-6v-Y17bs.js",
+      "sha256": "336f783ff3dd3e9456a49bd33ab3ccbbad4fb6720279579f1d7379c2d98debf8"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/razor-gBXW6YBJ.js",
+      "sha256": "610c97a7c5107abfe6d8a2e537c8df4cbf04f67214dd7cdcec4ead8d2805f45e"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/red-DByOl5N0.js",
+      "sha256": "bb3088fd3b6f11f415ee34b9b4423479898c47237f8f26ddbf8e4f84f69c3b0f"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/reg-CULnG2WX.js",
+      "sha256": "57179c6fab224a0915d6eaef46bf9939b5a791c648a1cc1452451a5e6be7a115"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/regexp-BxWeO75u.js",
+      "sha256": "fb0da964aaa96de83c3e8f4743513fab5fac0619bd88e21c7421ee5bf8bd6247"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/rel-CHRwzjd4.js",
+      "sha256": "78f624b98e572ee58e70bd4b0ce331a650337cf44d677eb12c19f57e4077afe5"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/requirementDiagram-Z7DCOOCP-DBVxo7Ei.js",
+      "sha256": "25e1d9d237d89f90d6243c177ac398ff5b10c772d1c5ba330b38e9257a3c04ee"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/riscv-BNQ9cVpw.js",
+      "sha256": "42e82436d292ca7b8dd9464f1b48dd53f83f298aa398a7384621f7929bcbb773"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/ron-mATCac1u.js",
+      "sha256": "b1eb3efb9d22a3d607c38300dcf2877884b7dc32da77ed7bd8712316ec9bb424"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/rose-pine-B-kZ4Z9q.js",
+      "sha256": "61337fa3da37095a75d3decc89520d632f267a57c86c1fdfae0ce8ad02c6e5cb"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/rose-pine-dawn-efeVGdSI.js",
+      "sha256": "add28aac76b74088c1a3ffb84475e5ccd843d83274cfedfdd337888abd07a82f"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/rose-pine-moon-DmodZNzl.js",
+      "sha256": "7da05eb198f0728e03f3028baa285c24fb64ff58f06fa9df5bff137f8e8bb17d"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/rosmsg-Bfahr6vb.js",
+      "sha256": "fc8dfa10141bbde8d0488a817485201dfeb6553698e1eeb03572925e53bbff3e"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/rpm-C-DLY-If.js",
+      "sha256": "e39a41ec2ab1ba47f2ef4ac46afda8ab6157df5f4388c70b332e2ebf154e1997"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/rst-CKCyRjfY.js",
+      "sha256": "e3cc6b4e698d4ee8951e29d1b373078ab16f75420f4847133cfd5ea918adc635"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/ruby-CPCASdTw.js",
+      "sha256": "45291eb5e373d847ac7ffdcab910e04070daf84ffc099950533330f42675a0df"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/ruby-CQTpZw6f.js",
+      "sha256": "d66865a01096abcd291b833e0cd3d64881860acbd99b094fb5cf1cd134e2743c"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/rust-CMNYZh5a.js",
+      "sha256": "3eabe521bbc0b2c8c156ee901f0f4f848c0415517c561ef8e28ed1b8aa7f444b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/sankeyDiagram-WA2Y5GQK-rgQUzm6G.js",
+      "sha256": "f093fa8d884e309bc6c2a77bb2dc91af118393dc4282fc018a6487c5b8c21d8c"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/sas-BLBgC3TA.js",
+      "sha256": "48ac94bb4d60d319a74a322b25ee953fdf530b02c7eec7da5be991ac60bc18ad"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/sas-D2UG-yhZ.js",
+      "sha256": "015ef33927a3a7749cad183ad9e96b0dbf9df616080054b9e581486effc05bef"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/sass-BheygBdF.js",
+      "sha256": "10d1b5d90d2e1b800278b4641a22c396553e0af8bea71c02d10619e26a4853a6"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/scala-B-_7vFVn.js",
+      "sha256": "6b276123b2d6f6ea37eb7b0ba254a990b6dd377ff1e73cd70c02c9b7bca55c35"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/scheme-BKzrkGJD.js",
+      "sha256": "f0e7bc170c1987a1a0734b905eee725b83cca6aa8fa597457fec67670a555cc9"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/scheme-BSHdPinv.js",
+      "sha256": "4fd27ddc4122ca128d7db69e264bcce846097115098c246a6a3f63aacc2779f2"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/scss-Dq-LbI_c.js",
+      "sha256": "7105f13eaadde26be3c1103ae675715e088bd9451f4a5fdf1b917eed33fd43f0"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/sdbl-BBUhycGU.js",
+      "sha256": "bff4ccd6d80705b22cbcc7001318d395889fcef36a60232875659f55fdee9362"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/sequenceDiagram-2WXFIKYE-DMcDte9l.js",
+      "sha256": "be794bae5251e3106753864df11a21331d7ad3f3e2c0566e89de1684f6337b93"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/shaderlab-C07uO3dL.js",
+      "sha256": "43f096a0db28156dd0296440c7c7e567ab86aa8097e6e5eba04df29db6d558f9"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/shell-BlsXDxCn.js",
+      "sha256": "476e685b723e32c63fec792d4266c65b3facfe8feb349b6a2dff9b6c749d9fde"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/shellscript-CQ8MXh-D.js",
+      "sha256": "9df6809d44ef86719aa48b676ac8a3bb45fc47cf7b2bc22a6075956a6c83d421"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/shellsession-CkeTp4M1.js",
+      "sha256": "24919dea685fc302ddee4605cfeb68ad2eed21fff5022aaa72b7924d2d9475e1"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/sieve-CjwBwOY5.js",
+      "sha256": "084c9f5e19ccf7382ebe97bc97676ba143d9a36fad9b096cb4b3f99cf3c81df6"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/simple-mode-DMneyfDu.js",
+      "sha256": "bf2199ce2b8baa53cef87a5bc3a72c68817223b26167c168c645fe78be9280f4"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/slack-dark-BEe10hxO.js",
+      "sha256": "c261c97767883dc9538241b99ba695d58aaf90c38582b5b650c552d6048c5b3a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/slack-ochin-BKmu9pBc.js",
+      "sha256": "e7613c442c76a5d933ba835b20db9ff361d4bdf01a0284ec4b7a5c2883c6b926"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/smalltalk-BOIGQuhN.js",
+      "sha256": "7d696f35a8e402a8b6c2ac1db57c92af865ec665cd63d827689c46e58b9b295d"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/smalltalk-qxcGy4fT.js",
+      "sha256": "44739d2a40c6e525b93f30722a22b74c19f53869c941d095b95d669367f02fa9"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/snazzy-light-Dcvd-ZyI.js",
+      "sha256": "8a11a912f1e4a84880c6a469284e4981e3faf144713ee2b6cc2772c34363fd6d"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/solarized-dark-BBl5y5sR.js",
+      "sha256": "9ae240b5e181847328428d96a336ed51f59d0cc5134deae5aa7f689b3a9baf1f"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/solarized-light-DW9b_AY8.js",
+      "sha256": "2477f95b790e0486582fdeb9738c9b5b4b8524e7d50a18f82bea6094131c3499"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/solidity-CSTQ0FCC.js",
+      "sha256": "47b0c26d0e125282583401baaa03ea2f6ad9b643b922024c16cecb69f800dcd7"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/solr-CwD7U71z.js",
+      "sha256": "9e9b3bf9c4c0a208effcc6283428b25a30e935eeefa58fc34629947c040beb7e"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/source-BBnh_UZi.avif",
+      "sha256": "76da2efcd588b17589955391962024e47d2667e8e84e4744acef11f89d5f0626"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/source-BF5gqZd_.avif",
+      "sha256": "217b1a6e6333d55ddb5b884da74d77cb794416553a3225637e321ed8594b1cc5"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/source-eX5wQyix.avif",
+      "sha256": "73b5cabd1b68af9fef692c6c80a3e9773afd62dc7de2af853bbb3fb7dab9c369"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/source-pMlGT7XI.avif",
+      "sha256": "dda274619f2efe5882dbf24566837bea0b87067b1bfcc147bf3e0ed63c121649"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/soy-BHaHgMUy.js",
+      "sha256": "d3a70a5615cc4c8add05c575782f1edfb0232c72bf5a62884f63aa927ba5cf87"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/sparql-DswowMAp.js",
+      "sha256": "78794c0ba638fdeea7ddb032bb9da066aa5657340aec085a33020ae720067ebf"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/sparql-DYskk2vE.js",
+      "sha256": "0573590f5173a33d2c988a89048fccb66706d9d2b1d1e01c42dd864c7b664422"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/splunk-DcGJXIDa.js",
+      "sha256": "c97c084f565d382d874fff4f9ecaed9bd599205dd86cc8d78b757e4d75cba805"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/spreadsheet-Bgtt3oLP.js",
+      "sha256": "453eff194470639d89a69e4cdf76b8e58773b5ab307554feed6d826b20a058c4"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/sql-BSrOzCRI.js",
+      "sha256": "dc7e3ba15d3123633b1a12391213fafb05a5abdcc9829498793b3d467a1d3fbd"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/sql-DzUuSofg.js",
+      "sha256": "779fa107c2bbcb9a15b0a8dab33975c7c8dd6dfdcd3fac3b830ec0a35bf288f2"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/ssh-config-Bk_I5wDR.js",
+      "sha256": "98d5b21d94386c995257ed655da23dea07dfde3b2436e470a67ce10a0ebfe973"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/stata-Dl7wDdBE.js",
+      "sha256": "b8c67944b31b79cc14d3a5d8c736a59b2e8b315632bfe3d39ab9cbcf62b1f569"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/stateDiagram-RAJIS63D-Bj5J9LjN.js",
+      "sha256": "a11c86060dc5303b7df3e6165319d4324bbeec76c29c4dcca71f7c18c80e39ed"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/stateDiagram-v2-FVOUBMTO-C6FIziZf.js",
+      "sha256": "1e5541fa03b201b77f49130344f89cf4b12184fe0eec8c0ad9b4fb48e2784cde"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/step-CesuDSSf.js",
+      "sha256": "d59f05dfc9e14fa0670e5ab780599a79b3966a3decded6c3b758aeb11f21f920"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/stex-B6LNC55o.js",
+      "sha256": "350838050b62d1c5f9821e86a9bb0ee45f0c61628eadc676c126359a41a5f2a5"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/stylus-BkS-boTH.js",
+      "sha256": "2d50cfa755d2ad2fc7302164938caf2b4421003f3c3fb9eb02314a230a514cd9"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/stylus-DXFa_2Jl.js",
+      "sha256": "f8199fb981a2a35b648cd1d20acaf92daf5438b5c8e48dc5ad50347145a4b7a4"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/surrealql-Bs3vUeKA.js",
+      "sha256": "b221df3a9470cbaa73a4b2d8ccc803e44b63f044b277c4a5b84b0e39fbb43564"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/svelte-BAOk4slW.js",
+      "sha256": "e4b92d6ba721ee87b3cb95a7ee217644bb2adb6c7e2a64102cce4b9c31c828d3"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/swift-DnZ2euNj.js",
+      "sha256": "76153a88fc90680a6cc07c7779cb41d778d49da875edba9a8aaf357824fab7b5"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/swift-FRZi1uvB.js",
+      "sha256": "526e30f380c612526c4f06a3085c392bda84ede2673fff42b1d2dd7a205377d4"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/synthwave-84-CoUef9sh.js",
+      "sha256": "10aab3636d2542aa3da5bed70acc854f1f8cd106384a83d2efdd7ff009c6f3c8"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/system-verilog-BcESSvRn.js",
+      "sha256": "959bc12f55be0a1f7f57c47a67373d78e0c633266aec0d773b89890a5030b30b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/systemd-DJPFjU02.js",
+      "sha256": "48faa01254687a9a0b5aa746892802433ab823dbe338a7b0a021735d5b31eab8"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/talonscript-CEEMXJTH.js",
+      "sha256": "62cfe2fe9230b15f7638a7a15e9fb6729c3612e71fcab41a3b5366f541c72d42"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/tasl-DfOr2qHi.js",
+      "sha256": "20b17cdae92f3282c3f042b47ffd1652137bf79b7decc4c0bb9e34232d2db8d0"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/tcl-CTsc4-t7.js",
+      "sha256": "8d2558cc7ae588dcf297818790c341adc51938d044ac445d7381912bde07d584"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/tcl-CUcaCdmq.js",
+      "sha256": "aa90d12c1490ebb77e68e6ce90fd35b0b312e5510f9753f1072c629c43e9c05c"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/templ-CSEiQwNm.js",
+      "sha256": "7f108576e39f378e32ef12b3d116b5021750d636708c61ceee4f800d81e6a6be"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/terraform-CeztUfUr.js",
+      "sha256": "82f826db968b1275cc0a4ff094062f7af7f02397a6c01995d45e16f18eea6890"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/tex-CcHKQ11y.js",
+      "sha256": "f998ddf63dffd50ec3010fb86aa1f93e2a15bcf4d0c492cb53e4d2d32259e7b2"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/textile-BnFpjsrl.js",
+      "sha256": "de9336373ae050e5a1ff954d462dd129d09f31c02951e27ede260fba1c054bad"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/tiddlywiki-CjprD-Qp.js",
+      "sha256": "5a80d8ec11cdad4503ab1462ed24e2bd7a1b09b787e815fbdfd4b7a454242fce"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/tiki-DK9DOeWn.js",
+      "sha256": "d307359b562484e7c25803b60349d4aa86e6351400f9612a3b78048f8451b847"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/time-DpuX4R4S.js",
+      "sha256": "f4637162e61a83cc945eddf051e410c81ae9ef68a2a224c5cbdf322d1b0d1f61"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/timeline-definition-YZTLITO2-BIRdFkxk.js",
+      "sha256": "c334efb7aebd96a6e74f249b79ead51ae64d22f4ae70d9aa8a18990b7541d38f"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/tokyo-night-DjtLpAEY.js",
+      "sha256": "cde53a948571ff63c68d259a47a2ffd91d7046ebdadcb40efcef8151c61d12d0"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/toml-BOuWGMcf.js",
+      "sha256": "fddf8a802721005715a22746b28e0b87ac56a8f77caa41075f9142150e588fb3"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/toml-vHPzWDj6.js",
+      "sha256": "2cca0f21be25923c9ede611d75d1e655c932739a0146feeca1209056789c945c"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/treemap-KZPCXAKY-B6PEUtAG.js",
+      "sha256": "399c2c8ed34208808372923d2d3fc039bc1d617e0931257e6cae4b4ce63b80d4"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/troff-E1bJ0PPL.js",
+      "sha256": "ea32a0126878e2cd1198e94abcee48cbcd2131de1d80195e1267ad5b0cab82bf"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/ts-tags-cG2hZuda.js",
+      "sha256": "1690235aa695e8af9f27ebf9eaa410c2faa5bafd332c7d8ec89058a0eb635318"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/tsv-ChRVFvMy.js",
+      "sha256": "4771d84e193a9b8421fda073f6afafa0422450958e61defb82ce2d2ec264dd04"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/tsx-CmGGo4Hm.js",
+      "sha256": "92b7d28feb696b9e587f914d4adf0b76c5c7f2028aa734698d987265af9371d7"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/ttcn-cfg-Dc39-fIP.js",
+      "sha256": "743ddd5c09b350d33149497d4177895083f584712019a20e88a3c9ded8b62fb9"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/ttcn-tKd4HLu4.js",
+      "sha256": "b9af59a0022981562d7482bf0125dc1b6bfdbb40ea1214807db4abbcb783059b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/turtle-BnC7StHY.js",
+      "sha256": "02d498a8c754e359966e6d708cbb4db98e16467cb007a5c4a27ca30bba310cb4"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/turtle-Dq7-1WAf.js",
+      "sha256": "7e505e9051b7e3c8ecebea47e4fd43b1e6b2b6ccd7334fd25fc267dc82ee0e4d"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/twig-CDYLbMhD.js",
+      "sha256": "96672f7c76bac0da7196f4d0b4674b8d8ab0a4e0039244598b04b0897a3aa266"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/typescript-CP6ECzON.js",
+      "sha256": "26fcdf0a8b3fdb85dff7704123ad38a40eb060f106d3bbaa122c5795a930a511"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/typespec-CkDVVIcK.js",
+      "sha256": "96cdc066d5db34c0aa7c17c603998dd3c60c64e6d1b2cff87cfb456d319768e3"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/typst-XYLFxYau.js",
+      "sha256": "4024e185a03c1fe220ca7c3616de18cfa6974be636a8e070fdd4c95b352d08b4"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/v-BSYXvR4g.js",
+      "sha256": "333f09036d0992ca16b57bb2049d32ae91058679dd8a96ad7d015907d45c96f0"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/vala-qJa5rry9.js",
+      "sha256": "849590efe084105d34034ce438d32bd120de455e2dd54e62db2b0ee142677649"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/vb-Bzg9rspf.js",
+      "sha256": "796e432cb545fe00c683c1f4e605ae6d6d6edc08689ef887c1767dee555abf53"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/vb-Dp90gtsv.js",
+      "sha256": "049ed5cc9eb5958257497e1c018cd8aa6ff558760d7d9bca5d0d84db8573e19f"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/vbscript-CI6_mxxU.js",
+      "sha256": "61890fbc79e2fa6eed6ec2f556916d57712d58fa394f140b09af6c50fece5855"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/velocity-BwIZK1TH.js",
+      "sha256": "630eef603fbca377c8e48679bf30198dce1f27d1a72123bdd72f1eada28f4bbd"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/vennDiagram-LZ73GAT5-l6mqYe6o.js",
+      "sha256": "8defd7966d389a29c0392f5673b2f1987750b904312f2820c029ccf1c54781b5"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/verilog-CCb_iTfF.js",
+      "sha256": "17e0347e1a872bbc53d07eb9a2a8932764bf28fa5156d772fab58be37eaab0e1"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/verilog-DDCYnHN8.js",
+      "sha256": "a38956f338156db5f9b6fd4644f88cd1f81d7dc726a78b882b1ee62f0e70f45a"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/vesper-4Q1cEwPL.js",
+      "sha256": "0c03f5d38e869c3e5d1ac4e0f18970ecec16288a821ef0fa7a4c9ae423e1dfaa"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/vhdl-DCkMIyT9.js",
+      "sha256": "b0e803173743715af902fa2508c4da88a2e97f9b4782f33c6064a17db505bc05"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/vhdl-DMqk4T2s.js",
+      "sha256": "c82c52fc077d4829a4320c0e48e02797e06f9074e29445798082add211f297a4"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/viml--FINbfoq.js",
+      "sha256": "809ed4fd8cf1f5adf1ce608626468874c7dc2507a329b4736248762311d243b1"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/vitesse-black-BqNLki8b.js",
+      "sha256": "88fa50fffe8dd1987d30b8b9cc960d31f79534e20b772d2a64e1f334c82243c2"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/vitesse-dark-jJ32WhwH.js",
+      "sha256": "bcc9762b8292c276c736c4baaa4332a41f400a197da98e517b8f2f719a0d4cdf"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/vitesse-light-476zM4e6.js",
+      "sha256": "3125bf5c3ffc7f438f95881241ff17830a39a2c76905bc41f4ab4a37ad3ace59"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/vue-html-DhreShjd.js",
+      "sha256": "1f0decc2c98eaa042332babd62d01bdc9ec3923cc97222ba470bf49aedd3199b"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/vue-K-7Ga-y8.js",
+      "sha256": "e53985b7ceda92eb8fb1733b85f8adef69e6483221c45ea28c6bfceaf0a5db1d"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/vue-vine-rMIwOpFf.js",
+      "sha256": "b7646182cea98ebe5533519ae906432a0c7e1ebe38e1bd0326aa165a08eeafb9"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/vyper-DP4whl13.js",
+      "sha256": "cde8049b43abf4af33de82c2e27d2476ad4437e0b611db5f623518a117a5358f"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/wasm-BBh6f151.js",
+      "sha256": "3c0cbdba88ff25607d246e55f29ca3e3500477dbdef280c44bf8b2b9c73455d6"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/wasm-DDgzZJey.js",
+      "sha256": "bae38010f6d3671be9e7fa7472f11a09a61d88e31e68ba42be56d7973a97df7f"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/webidl-BTLTThCm.js",
+      "sha256": "07aaaed4cf1b1adc2d5f705b656e0e3a4b0d4bddaf4ad998e488d3ca3450a290"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/wenyan-BdqozpMZ.js",
+      "sha256": "cdeff739f9e09cd27b24120df6437593c438fec10fbfe12bc23c74b63aa4d02c"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/wgsl-Vo-hHVWH.js",
+      "sha256": "2bcdbf7bf05f76d94a7718c5771cbb0570dda1f6c7cc2136b629e9d5e001daf0"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/wikitext-BDjE6pmL.js",
+      "sha256": "cca8ac1cdbad3b183eb3fdb98028349dcd6f4f5663808716f06ce3d291e25b43"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/wit-C_nQzOkY.js",
+      "sha256": "3729fe09ffe8d2948efb428ba1ccb05a2d95b88b36354a606f8a8088923e8b4e"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/wolfram-CRmjUoI4.js",
+      "sha256": "afa6a8b23b6094f77b679056d6ae28149749952655cc4781a76ee9fcae79ce32"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/xml-BMzZeaqs.js",
+      "sha256": "381e6a40469ff09288fd134658d09d7122639a23ba8f610e2076c2e5747e718e"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/xquery-BrBUuxMR.js",
+      "sha256": "96459fe2892ccdce0b57439307eeeaa9d82fd2663f2a0f4364a849dba3374e74"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/xsl-CnwVr_6q.js",
+      "sha256": "dab5af649271f3c87a1a4557a5df77bb2acffdc7b883f4df87861c73432ebe27"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/xychartDiagram-JWTSCODW-DHlmNWbr.js",
+      "sha256": "9b91857c5e6baed47d4da48d53033cf209f7b022fa6415efd27ff77895eb4cb6"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/yacas-b5lAVEIl.js",
+      "sha256": "95c453f73dd9a218385c018b692c4af134b02d5131bea8dd957ca887a5cdd8bd"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/yaml-B_vW5iTY.js",
+      "sha256": "4331f98e247633711828c78f79926e688753c7775ade7b844955d03b739baab1"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/z80-BZV19vqv.js",
+      "sha256": "51594b00905d1522d2f64113beae4943577338f0ff5af4503dd9ee49dc3957eb"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/zcode-BnwZhfO-.png",
+      "sha256": "edd87a182097389b0f59c07f8de283dbe433c9d37cd6e9a2a372611516ab81eb"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/zenscript-DFINJL6j.js",
+      "sha256": "cf6f06cc1fb8315a86f9c2e4f9c5264ef4f1908db96acfb3e9370433f9486e42"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/assets/zig-CS4FMAZp.js",
+      "sha256": "c549bfe66e37f54bd4f96caf995c96915a719b9dfd0bfc68a25785142d4e32c4"
+    },
+    {
+      "path": "file/I04原版链接操作/drafts/product/out/index.html",
+      "sha256": "1551a17cce5f42e1c8a5b1dc1225a2089b81aefbec4b1ead22e6555cf1b464e7"
+    },
+    {
+      "path": "file/I04原版链接操作/fix-owned-port.mjs",
+      "sha256": "88260e6f283706a2e79c99789d7a2abeeae1f5148f5a3ea4de36511611836c9c"
+    },
+    {
+      "path": "file/I04原版链接操作/fix-render-alias.mjs",
+      "sha256": "d32dc569a000819946aeaa02d88f048010a52e774c4b6cf26c9aeba3fd9138ae"
+    },
+    {
+      "path": "file/I04原版链接操作/index.html",
+      "sha256": "7c75b40cad7bf91e9e548e4c0152a1ce687872085a50ee978a79d6059d87f443"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/audit-dependencies-command.txt",
+      "sha256": "06b7bd32ad9a54a4eb3d1602bb8231dc49281f74da8977091270e623692aa3d7"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/codegraph-first.txt",
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/codegraph-second.txt",
+      "sha256": "10809429cb5858f6c2d4d81ed84496c0b54475cd9db70d633021178149d89728"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/codegraph-sync-final.txt",
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/dependencies.json",
+      "sha256": "ac86f1533ba2b0ad6dd9a246d30533e3939e13798cce497edd3018e11ec30494"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/dependency-audit.json",
+      "sha256": "4ed9e8c91fcfa24054fe63ef0d42565f68703a8820242d014bfc4d0d406510c2"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/dependency-plan.json",
+      "sha256": "fac26e2de15d39d107682adc1138205f326e51df0835d5fa1c7d8433a06c1244"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/dependency.json",
+      "sha256": "0817f6973fba360024470ce98ed545b30a8fbd0f8313396c04182fc6da1e8ea3"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/dependency.txt",
+      "sha256": "7c6336b16c5e139259218c141941b4e013f06752e15eefa32ac263e2c5022584"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/docs-decisions.txt",
+      "sha256": "7b2e6605b046c14aba1576e5ec3598134caa2fd954bb0a4c4860152dd05187cf"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/docs-tests.txt",
+      "sha256": "3aed37ecd266e160a9cf28d715154d45f0785123995a290687d693e75324c076"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/docs-version.txt",
+      "sha256": "ef767267475d9fde95f908acafe24215239740f3a2af5ddc98f4ef0cd5cd2528"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/download-progress.json",
+      "sha256": "eec33f41fd22ebb6c08223b49a77a211429ec4458af36a2e6eff75b458e3d250"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/frozen-lock.json",
+      "sha256": "52b43cc92c30436587583fb72f42f4057506695c9e4e8ce5364bdde8888a7b3e"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/frozen-lock.txt",
+      "sha256": "df4f2983d0b31e28102d973cd2d2a272d7687d9e57ad2fe300ac33179fa075dc"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/math-isolated.txt",
+      "sha256": "fd8fb23d54efa145e67991fee0279fd7cf8bd31a6ea8e7ed00886f9c44caf16d"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/prepare-test-dependency.txt",
+      "sha256": "3cbbcdf58986e9f6a04faf205a74b9ec772e04aad1bfca15668182802c2b71d2"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/prepare-ui.txt",
+      "sha256": "e923617a12213d69aa1882059a0bb9d7b7cc430066386bfec66809195a96c41c"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/renderer-fifth.txt",
+      "sha256": "58e4f06e1c1612d6e019b16603c13cba63d2a12ed94d736184f9a91d228ee349"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/renderer-final.txt",
+      "sha256": "88ddda1883ae7b710f617b79ee1f1adcfde5122273b411a4db35c7d0941dad7e"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/renderer-first.txt",
+      "sha256": "461dfbf1cab05a912a4cb7d4da153dacf04f91bd76ed6729086be9c3fbd77d8d"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/renderer-fourth.txt",
+      "sha256": "0fd350461ea5a3f755f4a142578a4d8dabf9d5237996e2778a37899d3fc0ce47"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/renderer-second.txt",
+      "sha256": "1921efefe632193d2a43fe14dbe13f356693c49ec9697eb688053c07b0a8b0f6"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/renderer-sixth.txt",
+      "sha256": "c9ab0a56e488d3867a2d5e753db8cdd94d7832eba975a912b32e8e28e8b59c37"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/renderer-third.txt",
+      "sha256": "e76c2a50bfb0afa12298a26c8c821a2d1ea271df8feeaed0073fca824ffe35e5"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/source-port-fifth.txt",
+      "sha256": "f8cd46e3db25faf2aed090380e01f393990682fb3a2fb0614ad1d3113fee2624"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/source-port-final.txt",
+      "sha256": "6271c34cb5d73101bf40f4d907977d84dd6e23d0e0758a3931e48d8d0e594c6a"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/source-port-first.txt",
+      "sha256": "ddf0b7c1511e228d2d142857d5c5a9254bfa01c3c39b780e48a00f716ec72e81"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/source-port-fourth.txt",
+      "sha256": "f8cd46e3db25faf2aed090380e01f393990682fb3a2fb0614ad1d3113fee2624"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/source-port-second.txt",
+      "sha256": "28854d85a598b10e35b77a3f8d93b9faba12c1d1d57449ff887ae7f20d0359cd"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/source-port-third.txt",
+      "sha256": "f168c256546240dd10e75447107913afe775656b9d78b263e4f4adbaeef33d74"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/source-port.json",
+      "sha256": "606363ddc0571c1d844cdcbb1e9ed77414fc80a04a0cc77bafc51f6c85b198e3"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/style-generation.json",
+      "sha256": "9fe97e3007392a1ce1982e8072051adb518754b9feb540d52e64ad5b57a9a332"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/style.txt",
+      "sha256": "e779afb31751252e339df63e5ada32dc16d5c7e6ede9e0e7d75f63843d028b24"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/test-dependency-final.txt",
+      "sha256": "657ae1110a1df13657da5fa7e3fb8592fe4eb2ca8c7f5f52a9fc2cbed0ad46df"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/test-dependency.txt",
+      "sha256": "90beb9b250fe20987271dbfb0091dcd4830ae0d4732fa29e8924b2dfef1a0002"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/test-license-audit.json",
+      "sha256": "399d67bdbfa056e013ecbddb4483179930de6e99b325e109dfbdda936e16fdda"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/test-license-audit.txt",
+      "sha256": "0d975a1408f707a7a1da4a666e53fc7b335450490b6f8f323181187334674496"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/tests-final.txt",
+      "sha256": "bf2ca1e0738954dec28b0cee2534f9c8545893ee9a7d5f624c4699855ada0b19"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/tests-first.txt",
+      "sha256": "4347ebcd89be652caeee2b49364c25bfec8321ef99176a60a14b13c9a9844428"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/typecheck-final.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/typecheck-first.txt",
+      "sha256": "f25f62362a802b3b6244b0f874e4e33988f3c900f52af00db2fd33c757a67f49"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/typecheck-second.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/ui-fifth-invalid-summary.json",
+      "sha256": "74e2099f9bcd462008bae98e47b30a2574deb83aa1fc06f15ecee8fc5fe54e71"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/ui-result.json",
+      "sha256": "74a8e0cce75dcd9e5bbc8cde2c754367ebb16cb12e6e4dbfd94cab8da0ed5878"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/ui-sixth-first-pass.json",
+      "sha256": "6d807bf77875e4a673213397803cc6d9d88cfe8055c7c5aead51d2316157f988"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/update-records.txt",
+      "sha256": "05a5802813055db1dc80942da526f4715f33907c6cabcb33d4e491394f6f6f41"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/verify-docs.txt",
+      "sha256": "da5bfa835cba4d35d148ff8d79156e841c0fa3c9d9f36434f202da2238d1941a"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/verify-final.txt",
+      "sha256": "6d2a1b835d26f5b73fc8f3408ebc3a71a4cc645f071a1b06b2df94425500b77a"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/verify-first.txt",
+      "sha256": "88e80787a85c62061d0baa18ba8b1e8b2ceff4870b33fe32a313c7e9367760ff"
+    },
+    {
+      "path": "file/I04原版链接操作/logs/verify-second.txt",
+      "sha256": "f2099126d0a8d82f678f1a02b92f373cf2909c5a856b200b7f361328c4934b34"
+    },
+    {
+      "path": "file/I04原版链接操作/main.cjs",
+      "sha256": "3edd2bb873e9d90e9acdb371262eff1c98ac033655bbc13d0c2a89eea960b7ca"
+    },
+    {
+      "path": "file/I04原版链接操作/port.mjs",
+      "sha256": "95a97730a1bc2489fa1204b4e2e49da20d117edf583cc8d8c5544933e725b5a3"
+    },
+    {
+      "path": "file/I04原版链接操作/prepare-test-dependency.mjs",
+      "sha256": "6aeacc1bc0aa8639e1af17fa139eed1338ce7de9c94d106e54212002d9e95e02"
+    },
+    {
+      "path": "file/I04原版链接操作/prepare-ui.mjs",
+      "sha256": "3f8799cdd5fdb56ca76eecc5975e40d2ec7f3aba319d14bf21588be9348a0b4d"
+    },
+    {
+      "path": "file/I04原版链接操作/reference-host.tsx",
+      "sha256": "4b6022cf4fde19ca7c613c7ef680a914b894da3a239698139e08bf72f2e9f073"
+    },
+    {
+      "path": "file/I04原版链接操作/render-ui.mjs",
+      "sha256": "93da251876208c6fcfc4884a68b731c6bfca7491b8a8ab111d379d931001fd75"
+    },
+    {
+      "path": "file/I04原版链接操作/renderer.tsx",
+      "sha256": "4064643c24a53f02daf2a12614c53c2b2963c75ecd98c88b2baa364cbd413237"
+    },
+    {
+      "path": "file/I04原版链接操作/test-dependency.mjs",
+      "sha256": "30151ab72bf704a8863aee6c4eaad248485c9ae5e6af13a17c8948420612ac5d"
+    },
+    {
+      "path": "file/I04原版链接操作/update-records.mjs",
+      "sha256": "09651a399a46edddce44b37f3359eb9e0a8db5bff5b69d39c6bcd9555b240af1"
+    },
+    {
+      "path": "file/I04原版链接操作/verify-docs.mjs",
+      "sha256": "84f78d65727f8cf9f96ce9ccf8fa58f3ffb1b949ea3145d72a27ff3d45fb18f5"
+    },
+    {
+      "path": "file/I04原版链接操作/verify-final.mjs",
+      "sha256": "44862ee22e9f4062ac9571bf4becbdef875a739b5d12cb0ed0a1fc4cdbb5e2a9"
+    },
+    {
+      "path": "file/I04原版链接操作/verify.mjs",
+      "sha256": "dba05f718da024e7b9c37458b44e714fa90907d9df46abc76d2841b684f613f5"
+    }
+  ],
+  "artifact_scope": "Scripts, logs, compiled isolated renderer, 8 reviewed component screenshots, actual complete UTF8 download, and frozen manifests; profiles and bulk dependency caches excluded",
+  "push": false,
+  "actions_triggered": false,
+  "main_merged": false,
+  "paid_models": false,
+  "customer_action_required": false,
+  "goal_service": "active_verified_by_get_goal"
+}

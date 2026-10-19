@@ -162,12 +162,27 @@
       "problem": "原完整MessageResponse闭包及39份原模块/用例移植；修复实际原版冷公式memo和Chromium PNG导出，保留图表/spec本地状态、流式/静态字节及原图片HTML功能。",
       "evidence": "i04-native-markdown-engine-result.json",
       "remaining": [
-        "原Codeg MarkdownLink文件徽标/上下文菜单/打开目标等完整操作与宿主路由衔接；当前沿Rovai原文件/HTTPS入口，不冒称完整原链接组件",
+        "普通文件菜单已实现并本地验证，目录/系统引用和完整网页/目标路由仍待，见i04-native-reference-actions-result.json。",
         "完整原HTML控制与完整供体App同场景运行对照；已有原生HTML入口和实际隔离HTML服务回归通过",
         "真实Core/Native/Web集中候选、授权/生命周期/长历史/规模/内存恢复；七种原图表代码已保留，实际本批图表运行验证为BarChart",
         "I04其他parser/home关联、Runtime并集、恢复、记忆、自动化；此前ANSI完整许可文件缺口仍归发布资格"
       ],
       "qualification": "352定向测试/55实际Renderer检查为本地分项；不增加I04的84正式场景通过数，不要求客户技术验收。"
+    },
+    {
+      "id": "DEV-NATIVE-REFERENCE-ACTIONS",
+      "task": "I04-T01/I07/I12",
+      "owner": "研发",
+      "status": "ordinary_file_menu_local_verified_directory_system_and_full_link_routes_pending",
+      "problem": "7份固定原组件/用例与2份已有纯模块复用，保留原菜单JSX和徽标；Core精确reader位置/每动作重新授权、旧owner拒绝及临时句柄释放已接。",
+      "evidence": "i04-native-reference-actions-result.json",
+      "remaining": [
+        "目录与系统类型原文件引用的显式User动作解析及Native/Web实现；只读自动open仍禁止系统启动/目录定位/新根授权。",
+        "完整MarkdownLink网页/邮件/电话和内置/系统打开目标；随I07浏览器宿主能力衔接，不把当前HTTPS路由称完整原组件。",
+        "完整原HTML控制与完整供体App同场景；真实Core/Native/Web集中候选、授权/生命周期/长历史/规模/内存恢复。",
+        "I04其余parser/home关联、Runtime并集、恢复、记忆和自动化；既有ANSI完整许可缺口仍待发布资格。"
+      ],
+      "qualification": "149定向/20真实隔离Renderer检查与8图组件对照；Main真实FS，ThreadClient/FilePreviewApi及剪贴板为声明替身；实际Core/Native/Web和完整App未授予资格，正式84新增0。"
     }
   ]
 }

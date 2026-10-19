@@ -1,0 +1,13 @@
+{
+  "name": "dom-accessibility-api",
+  "version": "0.6.3",
+  "url": "https://registry.npmjs.org/dom-accessibility-api/-/dom-accessibility-api-0.6.3.tgz",
+  "integrity": "sha512-7ZgogeTnjuHbo+ct10G9Ffp0mif17idi0IyWNVA/wcwcm7NPOD/WEHVP3n7n3MhXqxoIYm8d6MuZohYWIZ4T3w==",
+  "bytes": 62368,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE.md"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

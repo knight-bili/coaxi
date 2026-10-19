@@ -1934,6 +1934,8 @@ export interface ResolvedFilePreview {
   restoreRequest?: RestoreFilePreviewRequest
   displayPath: string
   absolutePath?: string
+  /** Canonical path relative to the Core-verified native reader root, not the current Camp project. */
+  sourceRelativePath?: string
   pathPresentation: FilePreviewPathPresentation
   fileName: string
   size: number

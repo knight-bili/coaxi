@@ -40,7 +40,8 @@ import { SubagentSessionButton } from './codeg-native-content/components/message
 import { NativeSessionActionsProvider, type SourceSessionTarget } from './codeg-native-content/ui/native-session-actions'
 import { COLLAB_AGENT_TOOL_NAME } from './codeg-collab-tool'
 import { useOptionalFilePreview, useOptionalFilePreviewApi } from './FilePreviewContext'
-import { NativeMarkdown, NativeMarkdownScope } from './codeg-native-content/ui/native-markdown'
+import { NativeMarkdown } from './codeg-native-content/ui/native-markdown'
+import { NativeMarkdownProvider } from './codeg-native-content/ui/native-markdown-context'
 import { NativeImageScope } from './codeg-native-content/ui/native-image-actions'
 import { NativeMessageScroll } from './codeg-native-content/ui/native-turn-actions'
 import { UserImageAttachments } from './codeg-native-content/components/message/user-image-attachments'
@@ -49,6 +50,7 @@ import { TurnStats } from './codeg-native-content/components/message/turn-stats'
 import './codeg-native-content/source-rich.css'
 import './codeg-native-content/source-media.css'
 import './codeg-native-content/source-markdown.css'
+import './codeg-native-content/source-reference.css'
 import 'katex/dist/katex.min.css'
 
 function readMessage(code: string): string {
@@ -126,8 +128,9 @@ function NativeTranscriptBody({ data, reader, target, live, visible }: { data: N
     if (outcome.kind === 'error') throw new Error('native_child.file_unavailable')
   }, [reader, previewOpen])
   const source = reader.fileSource()
-  const scope = useMemo(() => ({ source, api: fileApi, theme: filePreview?.resolvedTheme ?? 'day' as const, visible, open: filePreview ? openFile : null }),
-    [source?.threadId, source?.readId, fileApi, filePreview?.resolvedTheme, visible, Boolean(previewOpen), openFile])
+  const client = useThreadClient(), local = client.attachments?.kind !== 'download'
+  const scope = useMemo(() => ({ source, api: fileApi, theme: filePreview?.resolvedTheme ?? 'day' as const, visible, local, open: filePreview ? openFile : null }),
+    [source?.threadId, source?.readId, fileApi, filePreview?.resolvedTheme, visible, local, Boolean(previewOpen), openFile])
   const imageScope = useMemo(() => ({ visible, notice: setNotice }), [visible, source?.threadId, source?.readId])
   const renderMarkdown = useCallback((text: string, streaming: boolean) => <NativeMarkdown streaming={streaming}>{text}</NativeMarkdown>, [])
   const scrolling = useMemo(() => ({ scrollToIndex(index: number, options: { smooth: boolean }) {
@@ -181,7 +184,7 @@ function NativeTranscriptBody({ data, reader, target, live, visible }: { data: N
       status={!live && !part.image && part.status !== 'failed' ? 'completed' : part.status} />
     return null
   }
-  return <NativeFileActionsProvider open={filePreview ? openFile : null}><NativeMarkdownScope.Provider value={scope}><SourceMarkdownRenderer.Provider value={renderMarkdown}><NativeImageScope.Provider value={imageScope}><NativeMessageScroll.Provider value={scrolling}>
+  return <NativeFileActionsProvider open={filePreview ? openFile : null}><NativeMarkdownProvider value={scope}><SourceMarkdownRenderer.Provider value={renderMarkdown}><NativeImageScope.Provider value={imageScope}><NativeMessageScroll.Provider value={scrolling}>
     {notice && <p className="native-session-note" role="status">{notice}</p>}
     <div ref={transcript} className="native-session-transcript codeg-native-rich">{messages.map((message, turnIndex) => {
       const previousUserIndex = turns.slice(0, turnIndex).findLastIndex(turn => turn.role === 'user')
@@ -194,7 +197,7 @@ function NativeTranscriptBody({ data, reader, target, live, visible }: { data: N
       isResponseComplete={!live || turnIndex < turns.length - 1} previousUserIndex={previousUserIndex < 0 ? undefined : previousUserIndex} />}
   </section>})}<details className="native-session-reasoning"><summary>{t('会话统计与原始信息')}</summary><JsonTreeView value={{ context_tokens: data.context_tokens, session_stats: data.session_stats, summary: data.summary,
     turns: turns.map(({ blocks: _blocks, ...metadata }) => metadata) }} /></details></div>
-  </NativeMessageScroll.Provider></NativeImageScope.Provider></SourceMarkdownRenderer.Provider></NativeMarkdownScope.Provider></NativeFileActionsProvider>
+  </NativeMessageScroll.Provider></NativeImageScope.Provider></SourceMarkdownRenderer.Provider></NativeMarkdownProvider></NativeFileActionsProvider>
 }
 function NativeSourceTool({ part, children }: { part: AdaptedToolCallPart; children: React.ReactNode }): React.JSX.Element {
   return <div className="native-session-source-tool">{children}<NativeRawTool part={part} /></div>

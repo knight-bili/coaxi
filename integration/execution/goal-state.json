@@ -14,7 +14,7 @@
   "current_branch": "develop/V1.0.0",
   "base_branch": "main",
   "current_task": "I04-T01",
-  "current_slice": "原Markdown闭包/懒加载引擎、Mermaid三格式导出及助手专用spec/图表已接；352项定向测试与55项实际Renderer检查通过，8张组件对照及完整PNG已核对。完整链接/HTML操作、完整App与真实两端候选继续。",
+  "current_slice": "原文件/类型徽标与右键菜单已接Core精确读取身份，149项定向及20项实际Renderer检查通过，8图核对；目录/系统引用和完整链接/HTML/真实两端候选继续。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,14 +33,14 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "I04-T01：原图片/统计和完整MessageResponse引擎分项本地已验，不重复实现；接续原链接业务操作、完整HTML控制与完整App对照，随后真实Core/Native/Web授权/长历史/规模/内存恢复集中候选；ANSI完整许可仍待。",
+    "I04-T01：原图片/统计、Markdown引擎和普通文件菜单分项已验；下一步补目录/系统类型引用的显式User动作，再完整HTML控制/完整App，随后真实Core/Native/Web授权/长历史/规模/内存恢复集中候选；I07接完整网页/打开目标，ANSI完整许可仍待。",
     "I04-T01/T02：Claude旧agent完整parser、实际home捕获和Core证据关联；Qoder独立根/producer，以及旧无来源的明确导入与完整格式语料核验",
     "I04-T01：Grok修改意见与r1三Context mode/接管衔接；真实Core/Host/Runtime生命周期、Schema升级和恢复矩阵集中候选",
     "I04-T02/T03/T04：Runtime并集、恢复、记忆与自动化原剩余项；完整四包21簇84场景保持，阶段集齐集中构建/少量push和Actions"
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "source_markdown_engine_local_verified_link_html_and_candidate_pending",
+  "current_slice_status": "ordinary_file_reference_actions_local_verified_directory_system_html_and_candidate_pending",
   "evidence": "i04-legacy-agent-source-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -55,8 +55,8 @@
   "openclaw_session_evidence": "i02-openclaw-session-result.json",
   "skill_catalog_evidence": "i02-skill-catalog-result.json",
   "skill_install_evidence": "i02-skill-install-result.json",
-  "system_goal_status": "blocked",
-  "system_goal_verified_at": "2026-10-18T23:07:03.677860+00:00",
+  "system_goal_status": "active",
+  "system_goal_verified_at": "2026-10-19T03:27:13.323Z",
   "skill_members_evidence": "i02-skill-members-result.json",
   "canvas_boards_evidence": "i03-canvas-boards-result.json",
   "skill_delivery_preparation_evidence": "i02-skill-delivery-preparation-result.json",
@@ -110,13 +110,13 @@
   "canvas_worktrees_evidence": "i03-canvas-worktrees-result.json",
   "resume_confirmation": {
     "human_request": "恢复吧",
-    "automatic_goal_status": "blocked_returned_by_get_goal_after_customer_reported_resume; no resume API available; development continues without requiring duplicate confirmation",
-    "checked_at": "2026-10-15T10:52:05.881Z",
+    "automatic_goal_status": "active_verified_by_get_goal",
+    "checked_at": "2026-10-19T03:27:13.323Z",
     "source_progress_continued": true,
     "human_card_resume_reported": true
   },
   "project_groups_evidence": "i03-project-groups-result.json",
-  "checked_at": "2026-10-18T23:07:03.677860+00:00",
+  "checked_at": "2026-10-19T03:27:13.323Z",
   "project_layout_evidence": "i03-project-layout-result.json",
   "project_tree_evidence": "i03-project-tree-result.json",
   "navigation_activity_evidence": "i03-navigation-activity-result.json",
@@ -292,8 +292,8 @@
     "retired_local_stage_branches": 7,
     "retired_origin_stage_branches": 5
   },
-  "app_goal_status": "blocked_reported_by_api_despite_user_card_resume",
-  "app_goal_resume": "User confirmed resume on goal card; get_goal verified active 2026-10-19",
+  "app_goal_status": "active_verified_by_get_goal",
+  "app_goal_resume": "User confirmed card resume; get_goal active verified this turn.",
   "i04_native_ordinary_tool_evidence": "integration/execution/i04-native-ordinary-tools-result.json",
   "i04_native_specialized_status_evidence": "integration/execution/i04-native-specialized-status-result.json",
   "i04_native_agent_question_evidence": "integration/execution/i04-native-agent-question-result.json",
@@ -304,5 +304,6 @@
   "delegation_block_client_evidence": "i04-delegation-block-client-result.json",
   "execution_read_auth_evidence": "i04-execution-read-auth-result.json",
   "native_media_stats_evidence": "i04-native-media-stats-result.json",
-  "native_markdown_engine_evidence": "i04-native-markdown-engine-result.json"
+  "native_markdown_engine_evidence": "i04-native-markdown-engine-result.json",
+  "native_reference_actions_evidence": "i04-native-reference-actions-result.json"
 }

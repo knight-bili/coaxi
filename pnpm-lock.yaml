@@ -11,6 +11,9 @@ importers:
 
   .:
     dependencies:
+      "@radix-ui/react-context-menu":
+        specifier: 2.3.1
+        version: 2.3.1(@types/react-dom@19.2.4(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       streamdown:
         specifier: 2.2.0
         version: 2.2.0(react@19.2.7)
@@ -213,6 +216,9 @@ importers:
         specifier: 2.9.0
         version: 2.9.0
     devDependencies:
+      "@testing-library/jest-dom":
+        specifier: 6.10.0
+        version: 6.10.0(@testing-library/dom@10.4.1)
       remark-math:
         specifier: 6.0.0
         version: 6.0.0
@@ -285,6 +291,53 @@ importers:
         version: 7.3.0
 
 packages:
+
+  "@adobe/css-tools@4.4.4":
+    resolution:
+      integrity: sha512-Elp+iwUx5rN5+Y8xLt5/GRoG20WGoDCQ/1Fb+1LiGtvwbDavuSk0jhD/eZdckHAuzcDzccnkv+rEjyWfRx18gg==
+  aria-query@5.3.2:
+    resolution:
+      integrity: sha512-COROpnaoap1E2F000S62r6A60uHZnmlvomhfyT2DlTcrY1OrBKn2UhH7qn5wTC9zMvD0AY7csdPSNwKP+7WiQw==
+    engines:
+      node: ">= 0.4"
+  css.escape@1.5.1:
+    resolution:
+      integrity: sha512-YUifsXXuknHlUsmlgyY0PKzgPOr7/FjCePfHNt0jxm83wHZi44VDMQ7/fGNkjY3/jV1MC+1CmZbaHzugyeRtpg==
+  dom-accessibility-api@0.6.3:
+    resolution:
+      integrity: sha512-7ZgogeTnjuHbo+ct10G9Ffp0mif17idi0IyWNVA/wcwcm7NPOD/WEHVP3n7n3MhXqxoIYm8d6MuZohYWIZ4T3w==
+  indent-string@4.0.0:
+    resolution:
+      integrity: sha512-EdDDZu4A2OyIK7Lr/2zG+w5jmbuk1DVBnEwREQvBzspBJkCEbRa8GxU1lghYcaGJCnRWibjDXlq779X1/y5xwg==
+    engines:
+      node: ">=8"
+  min-indent@1.0.1:
+    resolution:
+      integrity: sha512-I9jwMn07Sy/IwOj3zVkVik2JTvgpaykDZEigL6Rx6N9LbMywwUSMtxET+7lVoDLLd3O3IXwJwvuuns8UB/HeAg==
+    engines:
+      node: ">=4"
+  strip-indent@3.0.0:
+    resolution:
+      integrity: sha512-laJTa3Jb+VQpaC6DseHhF7dXVqHTfJPCRDaEbid/drOhgitgYku/letMUqOXFoWV0zIIUbjpdH2t+tYj4bQMRQ==
+    engines:
+      node: ">=8"
+  redent@3.0.0:
+    resolution:
+      integrity: sha512-6tDA8g98We0zd0GvVeMT9arEOnTw9qM03L9cJXaCjrip1OO764RDBLBfrB4cwzNGDj5OA5ioymC9GkizgWJDUg==
+    engines:
+      node: ">=8"
+  "@testing-library/jest-dom@6.10.0":
+    resolution:
+      integrity: sha512-HQwu0KaB2zyT0iLzBL+8CLyZDL3KlZlZJ+2iyc9uCUnlJVskJU/UlPuVCyIPhtukjPQdT2QNoR5nCP5FqTmmDQ==
+    engines:
+      node: ">=22"
+      npm: ">=6"
+      yarn: ">=1"
+    deprecated: Incorrect minor release with breaking changes (Node >=22 and
+      required @testing-library/dom peer). Use 6.9.1 for the 6.x line, or upgrade
+      to 7.0.0.
+    peerDependencies:
+      "@testing-library/dom": ">=10 <11"
 
   "@types/estree@1.0.8":
     resolution:
@@ -5600,6 +5653,29 @@ packages:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
 snapshots:
+
+  "@adobe/css-tools@4.4.4": {}
+  aria-query@5.3.2: {}
+  css.escape@1.5.1: {}
+  dom-accessibility-api@0.6.3: {}
+  indent-string@4.0.0: {}
+  min-indent@1.0.1: {}
+  strip-indent@3.0.0:
+    dependencies:
+      min-indent: 1.0.1
+  redent@3.0.0:
+    dependencies:
+      indent-string: 4.0.0
+      strip-indent: 3.0.0
+  "@testing-library/jest-dom@6.10.0(@testing-library/dom@10.4.1)":
+    dependencies:
+      "@adobe/css-tools": 4.4.4
+      "@testing-library/dom": 10.4.1
+      aria-query: 5.3.2
+      css.escape: 1.5.1
+      dom-accessibility-api: 0.6.3
+      picocolors: 1.1.1
+      redent: 3.0.0
 
   "@types/estree@1.0.8": {}
   "@types/hast@3.0.4":

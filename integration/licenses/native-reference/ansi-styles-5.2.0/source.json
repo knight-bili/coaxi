@@ -1,0 +1,13 @@
+{
+  "name": "ansi-styles",
+  "version": "5.2.0",
+  "url": "https://registry.npmjs.org/ansi-styles/-/ansi-styles-5.2.0.tgz",
+  "integrity": "sha512-Cxwpt2SfTzTtXcfOlzGEee8O+c+MmUgGrNiBcXnuWxuFJHe6a5Hz7qwhwe5OgaSYI0IJvkLqWX1ASG+cJOkEiA==",
+  "bytes": 5072,
+  "license": "MIT",
+  "licenseFiles": [
+    "license"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

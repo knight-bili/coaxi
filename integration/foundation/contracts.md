@@ -58,3 +58,20 @@ readId 是瞬时资源，不持久恢复、不自动改绑当前工程；恢复�
 失败使用现有错误码及脱敏提示，不能把无权限点击处理为成功。
 
 本批原来源 owner、Main 受控文件和生产 Renderer 的替身运输验证分别记载；实际 Core.handle→Native/Web→UI 联通及完整原 App 对照仍属 I04 阶段候选验证，不由局部通过替代。
+
+### 原生文件引用菜单的位置元数据
+
+`ResolvedFilePreview` 增加可选只读 `sourceRelativePath`，仅在 `native_child_file` 已经通过 Core 来源授权、
+Main realpath 与捕获根内检查，且 `pathPresentation` 不是 `file_name_only` 时返回。它是 canonical 文件
+相对 canonical 原生读取根的路径，分隔符为 `/`；不是相对当前 Camp 工程的路径。同一条件下返回已有的
+`absolutePath` 字段。缺少字段时菜单关闭相应操作，不由 Renderer 拼工程根或补旧值。
+
+菜单检查与每次选择都以精确 `threadId/readId/rawReference` 重新打开来源；检查完成即释放临时句柄，
+不把检查得到的句柄作为动作资格。相对路径复制使用动作重新授权后返回的 `sourceRelativePath`，绝对路径
+复制与本机定位复用新句柄的既有操作；下载带精确内容代次。所有临时句柄在成功、失败或来源切换后释放。
+菜单关闭不取消已经选择的有效操作，但隐藏、关闭或更换客户端/原生读取会阻止旧操作继续或报告到新页面。
+Web 按实际 Host 能力显示下载，隐藏本机文件管理器；无新绝对位置时不能复制旧位置。
+
+此元数据不改变 `external` 呈现，不增加 Root Grant、来源恢复、模型输入或数据库字段。直接原生打开仍采用
+只读预览策略，不能因右键自动启动系统程序。目录与系统类型引用的显式 User 操作接口仍待实现，不能用普通文件
+菜单的分项结果代替这部分资格；实际 Core/Native/Web 链路仍随 I04 候选验证。

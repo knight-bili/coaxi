@@ -81,3 +81,5 @@ I04 原生工具原语沿固定Codeg Apache-2.0组件，出处与声明级比较
 I04 会话图片/生成图/完整图片弹窗、TurnStats、token-format 与 codex-visualize（含原用例）继续使用固定 Codeg Apache-2.0 来源，逐文件摘要/原 Git blob/唯一只读按钮 guard 见[内容来源清单](../inventory/native-content-ui-port.json)的 mediaStats。双语目录按原 zh-CN/en 精确提取。图片菜单/剪贴板、Dialog、Tooltip 和文件/HTML服务均复用已准入 Rovai 依赖；隔离 source-media.css 仍由已记录的 Tailwind4.1.18 生成，不新增生产依赖或全局 preflight。完整原 Markdown/动态卡引擎仍待，不以本批称全部内容引擎许可已完成。
 
 I04 原Markdown引擎的39份组件/纯模块/原用例及提取闭包继续按固定Codeg Apache-2.0来源；原翻译及globals样式来源见[源码清单](../inventory/native-content-ui-port.json)的markdownEngine。13生产/3开发直接依赖固定供体lock版本，280新增包节点；[逐包许可目录](native-markdown/)保存311个实际下载包的许可原文、精确版本、tarball/SRI及9项补取来源。victory-vendor同时保留原MIT与13份vendor通知（含ISC、BSD和MIT），不以根声明覆盖子包通知。此次补齐不消除此前ANSI完整许可文件缺口；全新完整安装/平台发布资格仍在阶段候选核对。
+
+I04 原文件/类型徽标与右键菜单继续按固定Codeg Apache-2.0组件，7份新来源与2份复用记录见[来源清单](../inventory/native-content-ui-port.json)的referenceActions。完整原菜单JSX/包装保留，Core宿主接缝和未完目录/系统引用明确记录。新增直接Radix ContextMenu2.3.1复用已锁传递节点，新增开发依赖jest-dom6.10.0保留原断言；旧1090包/1114快照不变，9新增包/快照。[本批许可目录](native-reference/)保存12个实际下载包的完整原文、精确版本、tarball/SRI和来源，css.escape保留其LICENSE-MIT.txt。已有Radix许可复用先前native-markdown记录；不声明此前ANSI完整许可缺口已消除。

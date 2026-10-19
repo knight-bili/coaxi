@@ -1,0 +1,13 @@
+{
+  "name": "strip-indent",
+  "version": "3.0.0",
+  "url": "https://registry.npmjs.org/strip-indent/-/strip-indent-3.0.0.tgz",
+  "integrity": "sha512-laJTa3Jb+VQpaC6DseHhF7dXVqHTfJPCRDaEbid/drOhgitgYku/letMUqOXFoWV0zIIUbjpdH2t+tYj4bQMRQ==",
+  "bytes": 1719,
+  "license": "MIT",
+  "licenseFiles": [
+    "license"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true
+}

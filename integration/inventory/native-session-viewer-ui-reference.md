@@ -98,3 +98,15 @@ Core User子列表直接驱动原主卡：当前attempt大于1才出现原恢复
 新增依赖严格固定在供体 lock 所用版本（13生产、3开发），旧810个包版本与原 importer 保留，增加280个包节点。自审修复新增 peer 映射，并修复此前 ANSI 组件两条已断开的 React peer；旧809个快照完全不变，另1个只修上述两条边，所有810个快照仍保留。全部依赖引用闭合；独立最小清单目录用固定 pnpm11.20.0 通过离线、禁脚本、冻结 lockfile-only 检查和1090条 supply-chain 检查，YAML只格式归一，语义相等。这不代表全新完整安装/编译已完成。311个实际下载包逐个校验SRI，许可原文与来源保留；9个根许可遗漏补准确源码/包内原文，之前ANSI完整许可缺口仍待发布资格。
 
 完整原链接徽标/菜单/打开目标等业务操作当前仍接 Rovai 入口，完整原HTML控制、完整App同场景及真实Core/Native/Web授权/生命周期/规模恢复仍是有限剩余清单；当前不可标I04收口。原生浏览器租约归I07，DOM iframe接缝不冒称原生能力。下载采用实际Electron会话，剪贴板API为显式替身，不称系统剪贴板通过。完整81簇48包324/I04四包21簇84不减，本批正式场景新增0；无Rust构建、模型输入/HTTP schema/DB变更、付费、push、Actions或main合入。
+
+## 原链接徽标与文件菜单接续（2026-10-19）
+
+固定 Codeg 原 ReferenceBadge、resource-kind、ContextMenu 和 FileReferenceActions 菜单/包装已接原生正文，保留原图标、完整标签、菜单顺序和长按/右键行为；7份新来源及2份已有类型/URI纯模块逐份核对。原前端 activeFolder/路径拼接与Tauri调用替换为Core精确readId宿主；加载/重试仅增加两行原菜单项，不声称完整原IO已移植。类型化codeg引用沿原纯解析与原徽标静态展示，不伪造会话/提交/技能跳转。普通文件左键继续原受控预览，带完整行号。
+
+Main仅对Core已核实原生根内文件投影可选sourceRelativePath及已有absolutePath，保持external分类，不借当前Camp目录。菜单检查与每次动作重新授权，临时句柄finally释放；相对复制用本次Core位置，绝对复制/本机定位走新句柄，下载绑定精确generation。菜单关闭后已选操作仍可完成；换readId/client、隐藏或关闭阻止迟到操作跨owner。Web依据真实attachments能力隐藏本机定位、保留下载；name-only及缺位置不得复用旧值。目录/系统类型的明确User动作仍待，自动open继续原只读策略。
+
+11文件149项通过，原1项Windows不适用跳过保留，类型通过；真实隔离Electron窗口20项检查及8张深浅/1000与390视口原组件对照已逐张核对，完整UTF-8下载已保存。测试用ThreadClient/FilePreviewApi和剪贴板明确为替身，Main测试为真实FS加模拟来源权威/系统操作；不是实际Core/IPC/HTTP或系统剪贴板通过。参考侧仅固定原组件和声明宿主，不是完整原App。
+
+生产直接提升已有Radix ContextMenu2.3.1节点；原Badge断言使用固定供体jest-dom6.10.0开发依赖。旧1090包与1114快照及importer保留，9个新包/快照；12个实际下载包SRI和完整许可核定。固定pnpm11.20离线/禁脚本/冻结lockfile-only及1099项供应链检查通过，不代表完整新安装。原39份引擎与旧工具/媒体样式未改；状态延续测试预载真实spec模块以隔离冷Vite转换耗时，不改断言/超时/产品引擎。见[本批结果](../execution/i04-native-reference-actions-result.json)。
+
+下一步依次补目录/系统引用User操作、完整HTML控制、完整App与真实Core/Native/Web候选，再继续I04其余有限队列。完整网页/邮件/电话与系统目标路由随I07；不删除此项。完整81簇48包324/I04四包21簇84保持，本批正式场景新增0。无模型输入、数据库、Rust构建、付费、push、Actions或main合入；目标卡片与get_goal已共同确认active，无客户技术验收事项。

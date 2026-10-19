@@ -121,6 +121,11 @@ Web 标明服务器位置，不提供本机文件管理器操作。旧存储权�
 binding generation 和 canonical 文件身份；复制始终使用重验后的 canonical 绝对路径。可见 `displayPath`
 不反向进入 Main，不创建 Root Grant，不授权父目录，也不更改 Camp、会话或 Runtime 工作目录。
 
+融合期原生只读查看器的文件引用，沿 Core 已授权的精确原生读取身份解析。Main 可额外签发相对捕获原生根的
+`sourceRelativePath`；它不是 Camp 项目路径，不改变 `external` 分类。菜单检查与操作分别取得新句柄并及时释放，
+绝对复制、定位与下载继续走原句柄能力；Renderer 不猜根、不复用已撤销来源。该扩展字段与生命周期由
+[原生文件引用合同](../../integration/foundation/contracts.md#原生文件引用菜单的位置元数据)拥有。
+
 ## 窗口文件能力
 
 每个成功预览在 Main 中映射为窗口级句柄。记录包含 `webContentsId + campId + sourceIdentity + canonicalPath +

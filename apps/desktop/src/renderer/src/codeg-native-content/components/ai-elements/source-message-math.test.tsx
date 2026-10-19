@@ -17,6 +17,9 @@ describe('actual source message math pipeline', () => {
     await waitFor(() => expect(view.container.querySelectorAll('.katex')).toHaveLength(4), { timeout: 4000 })
   })
   it('retains an interactive card state when later text introduces math', async () => {
+    // This case checks state continuity, not Vite's cold transform latency.
+    // Load the real card module before the DOM assertion; no renderer is mocked.
+    await import('../message/json-render-block')
     const patches = [
       { op: 'add', path: '/root', value: 'main' },
       { op: 'add', path: '/elements/main', value: { type: 'Stack', props: {}, children: ['action', 'status'] } },

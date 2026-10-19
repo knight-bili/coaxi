@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState } from 'react'
+import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import type { FilePreviewApi, ResolvedTheme } from '@contracts'
 import { readNativeTranscriptImage, type NativeFileSource } from '../../native-transcript-files'
 import { useUiText } from '../../interface-language'
@@ -6,8 +6,14 @@ import NativeImage from './native-image'
 import { ImageActions, useImageActions } from './native-image-actions'
 import { ImagePreviewDialog } from '../components/ui/image-preview-dialog'
 import type { UserImageDisplay } from '../lib/adapters/ai-elements-adapter'
-type Scope = { source: NativeFileSource | null; api: FilePreviewApi | null; theme: ResolvedTheme; visible: boolean; open: ((path: string, line?: number | null) => Promise<void>) | null }
+type Scope = { source: NativeFileSource | null; api: FilePreviewApi | null; theme: ResolvedTheme; visible: boolean; local?: boolean; isCurrent?(): boolean; open: ((path: string, line?: number | null) => Promise<void>) | null }
 export const NativeMarkdownScope = createContext<Scope | null>(null)
+export function NativeMarkdownProvider({ value, children }: { value: Scope; children: ReactNode }): React.JSX.Element {
+  const latest = useRef<Scope | null>(value)
+  useLayoutEffect(() => { latest.current = value; return () => { latest.current = null } }, [value])
+  const bound = useMemo(() => ({ ...value, isCurrent: () => latest.current === value && value.visible }), [value])
+  return <NativeMarkdownScope.Provider value={bound}>{children}</NativeMarkdownScope.Provider>
+}
 function InlinePicture({ image, alt, linked }: { image: UserImageDisplay; alt: string; linked?: boolean }): React.JSX.Element {
   const [preview, setPreview] = useState(false), { canCopy, copy, download } = useImageActions(), t = useUiText()
   const src = `data:${image.mime_type};base64,${image.data}`

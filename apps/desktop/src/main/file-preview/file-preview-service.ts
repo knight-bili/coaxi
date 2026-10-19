@@ -1260,12 +1260,17 @@ export class FilePreviewService {
   }
 
   #publicFile(record: PreviewHandleRecord): ResolvedFilePreview {
+    const sourceRelativePath = record.reopenTarget.nativeAuthority && record.pathPresentation !== 'file_name_only'
+      && pathIsWithin(record.canonicalRoot, record.canonicalPath)
+      ? relative(record.canonicalRoot, record.canonicalPath).split(sep).join('/') : undefined
     return {
       handleId: record.handleId,
       reopenToken: record.reopenToken,
       previewKey: record.previewKey,
       ...(record.restoreRequest ? { restoreRequest: { ...record.restoreRequest } } : {}),
       displayPath: record.displayPath,
+      ...(sourceRelativePath ? { absolutePath: record.canonicalPath } : {}),
+      ...(sourceRelativePath ? { sourceRelativePath } : {}),
       pathPresentation: record.pathPresentation,
       fileName: record.fileName,
       size: record.version.size,

@@ -1,0 +1,17 @@
+{
+  "name": "css.escape",
+  "version": "1.5.1",
+  "url": "https://registry.npmjs.org/css.escape/-/css.escape-1.5.1.tgz",
+  "integrity": "sha512-YUifsXXuknHlUsmlgyY0PKzgPOr7/FjCePfHNt0jxm83wHZi44VDMQ7/fGNkjY3/jV1MC+1CmZbaHzugyeRtpg==",
+  "bytes": 2955,
+  "license": "MIT",
+  "licenseFiles": [
+    "LICENSE-MIT.txt"
+  ],
+  "licenseGap": false,
+  "noLifecycleScripts": true,
+  "additionalEvidence": {
+    "archiveMember": "package/LICENSE-MIT.txt",
+    "sha256": "483acb265f182907d1caf6cff9c16c96f31325ed23792832cc5d8b12d5f88c8a"
+  }
+}
