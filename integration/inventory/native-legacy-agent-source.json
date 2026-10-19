@@ -32,13 +32,14 @@
     "Raw verified bytes retain complete UTF8 and reject changed chunks; existing JsonRecords reused within module boundary",
     "Optional cancellation during directory enumeration/hash/record decoding; existing non-cancellable caller semantics unchanged"
   ],
-  "implementation_status": "private_source_layer_targeted_passed_production_gate_full_parser_transport_ui_pending",
+  "implementation_status": "private_source_and_final_launch_capture_local_verified_full_parser_projection_transport_pending",
   "remaining": [
-    "Claude final-home capture and Core event projection",
-    "full Claude message/timeline/usage/lifecycle parser",
-    "User-only production adapter gate",
-    "Qoder root and producer",
-    "signed transport and original UI"
+    "Claude完整消息/工具/timeline/usage/lifecycle parser与Core证据关联",
+    "User-only生产adapter准入、签名transport与固定原UI",
+    "Qoder独立meta.toolUseId/task.parentToolUseId/active branch与producer资格",
+    "实际Claude/Qoder Host持久绑定及文件roundtrip、真实Runtime/平台集中候选",
+    "旧无记录来源显式导入；不查当前home猜补"
   ],
-  "evidence": "integration/execution/i04-legacy-agent-source-result.json"
+  "evidence": "integration/execution/i04-legacy-agent-source-result.json",
+  "launch_origin_evidence": "integration/execution/i04-native-launch-origin-result.json"
 }

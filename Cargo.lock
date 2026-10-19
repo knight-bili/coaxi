@@ -1656,6 +1656,7 @@ dependencies = [
  "tokio",
  "toml",
  "toml_edit",
+ "unicode-normalization",
  "url",
  "uuid",
  "windows-sys 0.61.2",

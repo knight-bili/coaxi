@@ -83,3 +83,8 @@ I04 会话图片/生成图/完整图片弹窗、TurnStats、token-format 与 cod
 I04 原Markdown引擎的39份组件/纯模块/原用例及提取闭包继续按固定Codeg Apache-2.0来源；原翻译及globals样式来源见[源码清单](../inventory/native-content-ui-port.json)的markdownEngine。13生产/3开发直接依赖固定供体lock版本，280新增包节点；[逐包许可目录](native-markdown/)保存311个实际下载包的许可原文、精确版本、tarball/SRI及9项补取来源。victory-vendor同时保留原MIT与13份vendor通知（含ISC、BSD和MIT），不以根声明覆盖子包通知。此次补齐不消除此前ANSI完整许可文件缺口；全新完整安装/平台发布资格仍在阶段候选核对。
 
 I04 原文件/类型徽标与右键菜单继续按固定Codeg Apache-2.0组件，7份新来源与2份复用记录见[来源清单](../inventory/native-content-ui-port.json)的referenceActions。完整原菜单JSX/包装保留，Core宿主接缝和未完目录/系统引用明确记录。新增直接Radix ContextMenu2.3.1复用已锁传递节点，新增开发依赖jest-dom6.10.0保留原断言；旧1090包/1114快照不变，9新增包/快照。[本批许可目录](native-reference/)保存12个实际下载包的完整原文、精确版本、tarball/SRI和来源，css.escape保留其LICENSE-MIT.txt。已有Radix许可复用先前native-markdown记录；不声明此前ANSI完整许可缺口已消除。
+
+I04原生来源的Qoder目录选择依据官方npm包1.1.45/1.1.68的已审阅纯函数，
+保留[Apache-2.0原文](qoder-native-origin/LICENSE)与[版本/完整性/源码函数摘要](../inventory/native-launch-origin-reference.json)。
+完整发布包仅作本地研究，不安装、不随本工程源码复制或发布；参考值只在合成环境运行纯目录函数，不启动CLI/认证/模型。
+NFC使用锁内既有unicode-normalization 0.1.25，新增Core直接依赖边，无新包或版本升级；最终依赖通知装配仍由I12核查。

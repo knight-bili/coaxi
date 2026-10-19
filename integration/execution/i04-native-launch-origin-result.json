@@ -1,0 +1,441 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-19T05:26:05.500614+00:00",
+  "stage": "I04",
+  "task": "I04-T01/T02",
+  "branch": "develop/V1.0.0",
+  "baseline_commit": "0366ffaeac94a1a40edee18cfff7387026a2971a",
+  "status": "launch_origin_local_verified_full_parser_projection_real_runtime_and_stage_candidate_pending",
+  "stage_complete": false,
+  "scope_preserved": {
+    "source_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_packages": 4,
+    "i04_clusters": 21,
+    "i04_formal_cases": 84,
+    "new_formal_cases_passed": 0
+  },
+  "facts": [
+    "Claude and Qoder capture only final ManagedProcessLaunchSpec environment/cwd retained by their actual Host; existing production capture call sites and binding transaction unchanged.",
+    "Official Qoder 1.1.45 and 1.1.68 archives verified against immutable npm SHA512 SRI; reviewed five pure functions per version, not whole bundle/CLI.",
+    "Publisher empty-value masking/name validation/NFC/path rules corrected initial source assumptions; prototype results are superseded and labeled in local research logs.",
+    "Only direct Core dependency edge to already locked unicode-normalization 0.1.25 added; no new package or version upgrade.",
+    "Current Rovai Qoder recipe has no --config-dir option, so only its final supported environment chooses captured root.",
+    "No current environment, current home, file guessing, secret persistence, Session identity promotion or public Claude/Qoder reader enablement."
+  ],
+  "verification": {
+    "rust": {
+      "ok": true,
+      "features": "slow-tests",
+      "owners": [
+        {
+          "owner": "runtime_subagent_session::origin::tests::final_launch_roots_keep_adapter_precedence_and_qoder_node_path_semantics",
+          "listed": 1,
+          "passed": true
+        },
+        {
+          "owner": "context::slow_tests::delivery_unknown_never_consumes_a_redelivery_requirement",
+          "listed": 1,
+          "passed": true
+        }
+      ]
+    },
+    "publisher_reference_vectors": 132,
+    "publisher_versions": [
+      "1.1.45",
+      "1.1.68"
+    ],
+    "windows_rust_vectors_executed": 66,
+    "posix_rust_vectors_executed": false,
+    "same_database_positive_binding_adapter": "codex_cli",
+    "claude_qoder_wrong_adapter_rejection": true,
+    "actual_claude_qoder_host_binding": false,
+    "actual_cli": false,
+    "actual_model": false,
+    "actual_core_native_web_e2e": false,
+    "full_app_built": false,
+    "rust_existing_warnings": 8,
+    "source_audit": {
+      "ok": true,
+      "baseline": "0366ffaeac94a1a40edee18cfff7387026a2971a",
+      "preserved_dirty_agents_sha256": "6d5c55bc4069cd453a36a38d9b0f48c112f1c256982388a27629c12f962c9f4b",
+      "approved_r1_artifacts": [
+        {
+          "path": "work/integration/integration/proposals/native-delegation-r1.md",
+          "bytes": 44061,
+          "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+        },
+        {
+          "path": "work/integration/integration/proposals/native-delegation-r1-contract.json",
+          "bytes": 117977,
+          "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+        },
+        {
+          "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+          "bytes": 67619,
+          "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+        },
+        {
+          "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+          "bytes": 809962,
+          "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+        },
+        {
+          "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1-contract.json",
+          "bytes": 117977,
+          "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+        },
+        {
+          "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1.md",
+          "bytes": 44061,
+          "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+        }
+      ],
+      "donors": [
+        {
+          "name": "codeg",
+          "commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+          "tracked_clean": true
+        },
+        {
+          "name": "rovai-ai",
+          "commit": "cc465dda562536b94f23787759e3206324baa29e",
+          "tracked_clean": true
+        }
+      ],
+      "binding_record_and_lookup_unchanged": true,
+      "lock_direct_existing_edge_only": true,
+      "new_packages": 0,
+      "version_upgrades": 0,
+      "html_source_files_unchanged": 19,
+      "model_input_changed": false,
+      "schema_changed": false,
+      "launch_arguments_changed": false,
+      "public_reader_gate_changed": false,
+      "main": "9d1ad55eeb18c0bc359d6f575afe9a9936055040",
+      "stash": "07a1662f76dff4c0c60ef5ac0077b3911147fbfb"
+    },
+    "model_input_changed": false,
+    "launch_args_changed": false,
+    "schema_changed": false,
+    "new_packages": 0,
+    "package_version_upgrades": 0,
+    "generic_gates": {
+      "documentation_tests": 10,
+      "version": true,
+      "decisions_with_baseline": true,
+      "diff_check": true,
+      "rustfmt_changed_files": true
+    },
+    "codegraph_sync": true
+  },
+  "remaining": [
+    "Full Claude message/tool/timeline/usage/lifecycle parsing and Core evidence association.",
+    "Qoder independent meta.toolUseId/task.parentToolUseId and active-branch relationships, captured producer qualification.",
+    "Explicit import for old unrecorded sources, never current configuration fallback.",
+    "Actual Claude/Qoder Host positive persisted binding/file roundtrip and real Runtime/platform/Core/Native/Web/full App phase candidate.",
+    "Reconcile Qoder native_usage/native_skills source selection separately; model material changes stay governed by the applicable proposal.",
+    "Other I04 T01/T02/T03/T04 remaining Runtime union, Grok r1 modes/opinions, recovery, memory and automation; I07 browser and I08 enhanced assets remain."
+  ],
+  "source_inventory": "integration/inventory/native-launch-origin-reference.json",
+  "approved_r1_artifacts": [
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    },
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    }
+  ],
+  "preserved_dirty_agents_sha256": "6d5c55bc4069cd453a36a38d9b0f48c112f1c256982388a27629c12f962c9f4b",
+  "source_files": [
+    {
+      "path": "Cargo.lock",
+      "sha256": "ce85ed18435c7a97299d06c1755828b1ed58e374c3acdab0e72950e913f4afa5",
+      "git_blob": "8d2091c761a33dd35d944e6cb16a27b371346b67"
+    },
+    {
+      "path": "crates/rovai-core/Cargo.toml",
+      "sha256": "1aff2801951f885a7bfd6d10f674e35a73c800f461b529ef11c72c65abe9e790",
+      "git_blob": "52ba3d3eac985567a400e1fb8563d9c568b0a5dd"
+    },
+    {
+      "path": "crates/rovai-core/src/context/native_child_session_tests.rs",
+      "sha256": "fd2d17c04938b0f7d1da489a9aa33ddcf1f433f0eda7f97ffcc2f7f622c5aa2a",
+      "git_blob": "a2b682850922e8928c894ca49bf88a20f248ce96"
+    },
+    {
+      "path": "crates/rovai-core/src/runtime_subagent_session/origin.rs",
+      "sha256": "48a35b9f11a3fe35a14db957e2ce890abd25b0f6b2fc390992b09137200f4fa1",
+      "git_blob": "bad266e41f84564000463802960e967cd5bbb4ce"
+    },
+    {
+      "path": "crates/rovai-core/src/runtime_subagent_session/origin/capture_tests.rs",
+      "sha256": "77ba4ac5a4bb5448c83743bea954d261ab04a6bc82da66ecb6333e2d0b430f6f",
+      "git_blob": "ad21fd4b891361ecdd7ea64107692cbf8726b7a4"
+    },
+    {
+      "path": "docs/development/testing.md",
+      "sha256": "cc9102a1b81f172592a65bd99860d425b1abfce48a1584f8fe44c92ce42a8389",
+      "git_blob": "16974afeeb6d18a68f9d95c668623a1a83fbebbe"
+    },
+    {
+      "path": "integration/execution/development-todos.json",
+      "sha256": "3da8c9ae869179e6006db798dea163f831360d3f5ae6418dcf11d23427b8bc12",
+      "git_blob": "ad871d2d4e7ec98788514d1d4e9022d033c20e6c"
+    },
+    {
+      "path": "integration/execution/goal-state.json",
+      "sha256": "4edfaf3877930b7f480cec1417fb9bd6922b15e059d0d82cb1e4867c512d88b8",
+      "git_blob": "ccd88e5999c5333185b5e6da8b48228083902680"
+    },
+    {
+      "path": "integration/execution/i04-execution-plan.md",
+      "sha256": "14c48abf4a48c3f15d5bd4184fcebe2486ce50bf9a1091808d9cce98bf1b8905",
+      "git_blob": "f11eefe50ac7da3cd46690145af648384d555cec"
+    },
+    {
+      "path": "integration/inventory/native-launch-origin-reference.json",
+      "sha256": "3d37fee2702d57eca609bde9e68963ea07e31cdd608f842aea9f51749db87eea",
+      "git_blob": "eec2d39b70ba1a291ad566d25da524a39d670764"
+    },
+    {
+      "path": "integration/inventory/native-legacy-agent-source.json",
+      "sha256": "7150717059cf527b621f21d3a45c6728295e75b11fe8a5139c2709d299c65db0",
+      "git_blob": "94500e13d2c2bd6de98a863b7c5e24b99630ddda"
+    },
+    {
+      "path": "integration/inventory/native-subagent-viewer-reference.md",
+      "sha256": "deecaab5f92dc525ac038d25d0af0083068777dbe0d3de6e53bc5e8d22197fab",
+      "git_blob": "1507c7cd1063be24509730dc328c8442a2d04741"
+    },
+    {
+      "path": "integration/licenses/README.md",
+      "sha256": "5bc40b32a84ba209c29dc4c229ea392da5480df93bb23a6b3455a209dbf64daf",
+      "git_blob": "7e97523ca2ee0c531dace8d79a306f525c10a70f"
+    },
+    {
+      "path": "integration/licenses/qoder-native-origin/LICENSE",
+      "sha256": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd",
+      "git_blob": "7a4a3ea2424c09fbe48d455aed1eaa94d9124835"
+    },
+    {
+      "path": "integration/verification/native-launch-origin/qoder-root-vectors.json",
+      "sha256": "e00df66d9b28188194569244154df926bb64dcadaf1bc7435fc5ff4d000a4dee",
+      "git_blob": "5d2b14847c8ce52cb840812ec4f214997164e230"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "file/I04旧原生来源接续/check-rust.py",
+      "sha256": "482b1369414a9d6a0bdcf956f3531e9a568a2e52486a6d4e666382650099bf7d"
+    },
+    {
+      "path": "file/I04旧原生来源接续/fetch-qoder-source.py",
+      "sha256": "984f2c19d218e7286b09b6dd713712fc7234f1b85fe6759c7d181ffe41159b7e"
+    },
+    {
+      "path": "file/I04旧原生来源接续/fetch-qoder45-source.py",
+      "sha256": "8da0abf68f5c6c957983c4367a7b88e7671acf06fb549c865f2716ccc5324355"
+    },
+    {
+      "path": "file/I04旧原生来源接续/finalize.py",
+      "sha256": "2f17766245169c313acc73c2b8f8ee837d825e7ed4608d816cd8b370df8a6235"
+    },
+    {
+      "path": "file/I04旧原生来源接续/finish-source.py",
+      "sha256": "4d18f8e08b1c128b0e1e860ccb1676ba76370db45bd763502c6f6859de6d15e4"
+    },
+    {
+      "path": "file/I04旧原生来源接续/inspect-qoder-package.mjs",
+      "sha256": "039498751af10f4e909d75b9b8645499caf4bdc5eb05806b151aecd0cfd4b46f"
+    },
+    {
+      "path": "file/I04旧原生来源接续/locate-qoder-root.mjs",
+      "sha256": "d048ba32777a408e485d7fbb37d7a912d00dccd7ed8b75e8b2e4c64d5985cd02"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/cargo-edge.json",
+      "sha256": "77c54ce7efb565a8e6084e33b4ca2096ff0f1f90356409581373522fa1d741ab"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/codegraph-sync.txt",
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/compiler-environment.json",
+      "sha256": "611a07ca086f070e319b6291d9d33d4b942b18dda4b9feaf2eda86ad29d99fa0"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/docs-decisions.txt",
+      "sha256": "7b2e6605b046c14aba1576e5ec3598134caa2fd954bb0a4c4860152dd05187cf"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/docs-tests.txt",
+      "sha256": "8183afa5dd68cebeea9716c7405fb1554778aa5396f59f4665dbe84a531eb9ee"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/docs-version.txt",
+      "sha256": "ef767267475d9fde95f908acafe24215239740f3a2af5ddc98f4ef0cd5cd2528"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/prototype-node-root-reference.json",
+      "sha256": "52d6d925649dde86bb917165fc49af3f40fff55f4defca618902303be38640e3"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/prototype-rust-check.txt",
+      "sha256": "920f44c8ca91ba6328cc830e19a3c95cff26cf1b494b369468d069cfa05050a8"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/prototype-rust-list-0.txt",
+      "sha256": "742d3410dd8bd2e9858f67885039977c9994847cd6d8c6adefa2a955300618c3"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/prototype-rust-list-1.txt",
+      "sha256": "3b9f9247828b465adda8174166def92cd4126c79f2c719b03b285b2a172c5647"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/prototype-rust-result.json",
+      "sha256": "467208344371fc61426195af9c5e13c4891e84dee01d30efaa91bb52c66579ea"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/prototype-rust-test-0.txt",
+      "sha256": "c1fd34d659db19c64ec35813b252ffab5950b5de89b35737dc060902d1926379"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/prototype-rust-test-1.txt",
+      "sha256": "db0012adf24cc4b019cdd15f5dfe18183fd33aad3974fba7af87d2769b15b0ad"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/publisher-vectors.json",
+      "sha256": "7562778dc9bfda8ae5f6f5c3115e9f6b4ba415253e60ee359e59330615dc684f"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/publisher-vectors.txt",
+      "sha256": "1c6da3632c52c0c0d543ac28353f7329083735c0f82019178757ec8eb43ffb03"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/qoder-inspect.txt",
+      "sha256": "461bb66d065d861d2f4c029b7e44a16c8249d03164392146a40beb0ef5422740"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/qoder-package-1.1.45.json",
+      "sha256": "52ea8c006c2f1515b7e2b37e11626496a7d576e2d13dc6d0d1500ed7b12556d6"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/qoder-package-1.1.68.json",
+      "sha256": "5cf754c843bbddaf18f8f02bf1bebcce8fe7adcbdae3a94486fe7d1f7fd7c217"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/qoder-package-index.json",
+      "sha256": "c6e8c3c831011e05806a91916289f2dd4e45717fcf5cbab8996542b1d51f1439"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/qoder-root-snippets.json",
+      "sha256": "682d10d30d64e7d88ca5eeb5b72fe917e16b5177fde8bee9c95104f419e48b0a"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/qoder-root-snippets.txt",
+      "sha256": "c473d15853fc0b85543f0db24828f33e95736b6d32f5a9a5891e510c9a8de41c"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/qoder-source.json",
+      "sha256": "e2d010361a5c129acdda22a318a4bde3e3b7fbb37362d0b278e947565dd04e0f"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/qoder-source.txt",
+      "sha256": "3370fa0d8b7f18e2fd022df2b39d82e95b6bbe042a567491f99c81d627b32723"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/qoder-source45.json",
+      "sha256": "0179638bd92cda4065b48df39e1a8cd1e5840ab592a139360bc0eb9af56ea452"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/qoder-source45.txt",
+      "sha256": "008edb6f965c1a5dac47a115e92f4f1cef44ce3149c68d68dda8c10b16a83897"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/rust-check.txt",
+      "sha256": "08e93dab1c20b5cad2dafb759983bd215a17586d90e0af5fa2c6c6454a4f743b"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/rust-list-0.txt",
+      "sha256": "454cbfc414cf3dce61f02a7c0d8ab6bfdf36db53f65cca52fa3351c2f3a87079"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/rust-list-1.txt",
+      "sha256": "41fdd92edb936bf5b0661773f866e01e0a8d783973942b2dab4135041b3a0cee"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/rust-result.json",
+      "sha256": "467208344371fc61426195af9c5e13c4891e84dee01d30efaa91bb52c66579ea"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/rust-test-0.txt",
+      "sha256": "80505f9ee97f48c55f6f02324afaf987b3798e63fc67e802465f60626d14123d"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/rust-test-1.txt",
+      "sha256": "846bc674113f63e1057a7c650fda2ce9aa34d4c2a3f6ebc733c68808c335ca28"
+    },
+    {
+      "path": "file/I04旧原生来源接续/logs/source-audit.json",
+      "sha256": "d39f18975369f36df2350258d59afa18a0091be744736ba47a0cebc4d22ae3e9"
+    },
+    {
+      "path": "file/I04旧原生来源接续/publisher-root-vectors.mjs",
+      "sha256": "d03aa36fafb61d66a92bdc907feeab6608168e2a5da93b042ddb51f0ccc0c64c"
+    },
+    {
+      "path": "file/I04旧原生来源接续/record-result.py",
+      "sha256": "51f8231d9e9e22b034377fef04996aecd55a62e17fe9933638804973ab3c4676"
+    },
+    {
+      "path": "file/I04旧原生来源接续/source-inventory.mjs",
+      "sha256": "22ab8632635e3690d577d6b993fd1d823bbb0369e390c8d7cec54f85fe06b408"
+    },
+    {
+      "path": "file/I04旧原生来源接续/update-lock.py",
+      "sha256": "a49f0033d56f6510608d10ae15c3a56112100c6a85add1a59430eff3ce209c44"
+    },
+    {
+      "path": "file/I04旧原生来源接续/update-root-tests.py",
+      "sha256": "d779ef53e0f3b9b0ee390db962ae0a2e3e6b50da23e7248809fe1b18d624431b"
+    },
+    {
+      "path": "file/I04旧原生来源接续/verify-docs.mjs",
+      "sha256": "d3ff042eee79eac3765d66a85f81d59a825990515c414bd25d17990b41d0324b"
+    }
+  ],
+  "artifact_scope": "Exact source inventory/verification vectors, local guarded Rust and publisher-source research scripts/logs; full archives/bundles remain local only. Mutable workflow and this record excluded.",
+  "push": false,
+  "actions_triggered": false,
+  "main_merged": false,
+  "paid_models": false,
+  "customer_action_required": false,
+  "goal_service": "active_verified_by_get_goal"
+}

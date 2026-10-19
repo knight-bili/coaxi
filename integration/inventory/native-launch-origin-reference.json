@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "baseline": "0366ffaeac94a1a40edee18cfff7387026a2971a",
+  "fixedCodegCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+  "codegSources": [
+    {
+      "path": "src-tauri/src/parsers/claude.rs",
+      "bytes": 367323,
+      "sha256": "6e71571b0b300cc954343ceba89308134c0fc1fd41009c43560cf2161f8b0e51"
+    },
+    {
+      "path": "src-tauri/src/parsers/qoder.rs",
+      "bytes": 149073,
+      "sha256": "696238da466f84924a5982d596fe47bf5ab4a6d724664722ed1970ee6b1e2844"
+    }
+  ],
+  "packages": [
+    {
+      "version": "1.1.45",
+      "registry": "https://registry.npmjs.org/@qoder-ai/qodercli/1.1.45",
+      "tarball": "https://registry.npmjs.org/@qoder-ai/qodercli/-/qodercli-1.1.45.tgz",
+      "integrity": "sha512-hQ2rZvsDu4bdqPyYcmXsDq4ENVPZTkQpsuss8cclIMOK8y0Qwwq/5x6nypZmuQmkKAAudQ6MpA7e0KTU9Dy5Jg==",
+      "archiveSha256": "675a85715534daf2b8f01eda5ad865ebd1b5576155196817b560630b054bde5e",
+      "source": {
+        "member": "package/bundle/qodercli.js",
+        "path": "drafts/official-qoder-1.1.45/qodercli.js",
+        "bytes": 32489700,
+        "sha256": "86565469a3a0dd2dcede554c6056678cb7423f12e1929b4b23b9d6c340559418"
+      },
+      "licenseSha256": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd"
+    },
+    {
+      "version": "1.1.68",
+      "registry": "https://registry.npmjs.org/@qoder-ai/qodercli/1.1.68",
+      "tarball": "https://registry.npmjs.org/@qoder-ai/qodercli/-/qodercli-1.1.68.tgz",
+      "integrity": "sha512-FBmbGOZFwmupblVes6u1pQ3bAmePmNqDhYZgBxqCL+77NsDgkmD3xf06/NiwN9r+NntnivIpIw37SfsgvuItgQ==",
+      "archiveSha256": "9d1403f6022f9755dd173a8962b2c8e1f6a0abbe63c5c934f3616f12c1911609",
+      "source": {
+        "member": "package/bundle/qodercli.js",
+        "path": "drafts/official-qoder-1.1.68/qodercli.js",
+        "bytes": 33089434,
+        "sha256": "3a9c63fd186c3d393ad39f378c72a9105f5d6a0593cb0ca36bf8cb8b4d0ab8ce"
+      },
+      "licenseSha256": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd"
+    }
+  ],
+  "preservedAuthority": "CapturedNativeSource uses the final ManagedProcessLaunchSpec environment/cwd, retained by its actual Host. Existing Core binding transaction and frozen adapter equality own persistence; C/G public reader gate is unchanged.",
+  "producerRules": {
+    "claude": "CLAUDE_CONFIG_DIR or final OS home/.claude",
+    "qoder": "CONFIG_DIR wins; CLI_HOME nullish-masks GEMINI_CLI_HOME then truthy fallback to OS home; publisher name validation and NFC/path semantics retained; no current environment/home lookup"
+  },
+  "publisherOracle": {
+    "sourceFunctions": [
+      {
+        "version": "1.1.45",
+        "functions": [
+          {
+            "key": "read",
+            "offset": 7281,
+            "sha256": "22b3eb4b4138d9ec13c019dc2b712ce3b71a24436184a54221036b8915d47dab"
+          },
+          {
+            "key": "home",
+            "offset": 447320,
+            "sha256": "18e1b5a131e3d3870173c4ec43ca6968e5e7c0758625228e9881361de571fe88"
+          },
+          {
+            "key": "root",
+            "offset": 447368,
+            "sha256": "f2fbef81c1dffa771bc4ae4eaebdecb17770350e9652f2b44c9705419654c65d"
+          },
+          {
+            "key": "valid",
+            "offset": 445744,
+            "sha256": "65e4e031ae802d5e6e45bd5c46c53d5cd2f1212aa82129cd95ba2a7ab3e44287"
+          },
+          {
+            "key": "name",
+            "offset": 445908,
+            "sha256": "4efc3166a0d83df06601d574d3da31ee1d35245cc24c9b5c3284129eac639a26"
+          }
+        ]
+      },
+      {
+        "version": "1.1.68",
+        "functions": [
+          {
+            "key": "read",
+            "offset": 12703,
+            "sha256": "ff2f269698ce4050379dff30b8fcdb20a6a9a1545d01f203b1a81f7fc2bc2a0f"
+          },
+          {
+            "key": "home",
+            "offset": 28878,
+            "sha256": "dff142a4a408532e6cc35fc7104b6182152e9699e9e158dd70e58ae5a5793f21"
+          },
+          {
+            "key": "root",
+            "offset": 28926,
+            "sha256": "9eef64b444d2000ea07804c18b3ac424b5da58eb9e8baff75142f7b11519b4e7"
+          },
+          {
+            "key": "valid",
+            "offset": 27304,
+            "sha256": "56e44198f9a059ef65147004ded2ff40e2cde82c0bf89edc293f7caa1bfd97fd"
+          },
+          {
+            "key": "name",
+            "offset": 27468,
+            "sha256": "f4df9132fc004acaec740c15404bf6a1d462df64f2805222bca85c635708a8da"
+          }
+        ]
+      }
+    ],
+    "reviewedPureFunctionsInVm": true,
+    "wholeBundleExecuted": false,
+    "cliProcessStarted": false,
+    "provider": false,
+    "syntheticCases": 132,
+    "windowsRustRows": 66,
+    "posixRustExecuted": false,
+    "fixture": "integration/verification/native-launch-origin/qoder-root-vectors.json"
+  },
+  "adaptations": [
+    "Replaces original parser live environment/directory assumptions with the existing trusted final launch snapshot.",
+    "Publisher package investigation corrected empty-value masking and supplied missing name validation/NFC; original fixed Codeg Rust helper alone was insufficient.",
+    "Windows drive-relative resolution uses only captured cwd/drive entries, never today process drive state.",
+    "Unicode normalization reuses existing locked 0.1.25 as a direct Core dependency; no package or version added/upgraded.",
+    "No original source root is selected through arbitrary UI ids/paths; parent Native Session provenance does not promote a legacy agent id to a Session."
+  ],
+  "license": "Apache-2.0, integration/licenses/qoder-native-origin/LICENSE; complete packages retained only as local research artifacts, not shipped.",
+  "qualification": "Final targeted Rust verification recorded by the execution result; this inventory is source/provenance, not real Runtime certification.",
+  "remaining": [
+    "Full Claude transcript/timeline/usage/lifecycle parser and Core evidence association.",
+    "Qoder active-branch parser and explicit meta.toolUseId/task.parentToolUseId relationship, independent root/producer qualification.",
+    "Explicit import for old unrecorded native sources; never guess from current config.",
+    "Actual Claude/Qoder Host binding/file roundtrip, Runtime/platform union and phase Core/Native/Web/full App candidate.",
+    "Reconcile Qoder native_usage/native_skills directory selectors with verified publisher behavior; model material changes require their applicable approved plan."
+  ]
+}

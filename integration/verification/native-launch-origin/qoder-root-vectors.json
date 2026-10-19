@@ -1,0 +1,1425 @@
+{
+  "schemaVersion": 1,
+  "source": "Official npm @qoder-ai/qodercli 1.1.45 and 1.1.68; unchanged, reviewed pure directory functions only.",
+  "hostSeams": "Synthetic process.env, OS home, cwd-bound Node path.resolve and unset config-dir flag; no CLI process, provider, credentials or whole bundle execution.",
+  "proof": [
+    {
+      "version": "1.1.45",
+      "functions": [
+        {
+          "key": "read",
+          "offset": 7281,
+          "sha256": "22b3eb4b4138d9ec13c019dc2b712ce3b71a24436184a54221036b8915d47dab"
+        },
+        {
+          "key": "home",
+          "offset": 447320,
+          "sha256": "18e1b5a131e3d3870173c4ec43ca6968e5e7c0758625228e9881361de571fe88"
+        },
+        {
+          "key": "root",
+          "offset": 447368,
+          "sha256": "f2fbef81c1dffa771bc4ae4eaebdecb17770350e9652f2b44c9705419654c65d"
+        },
+        {
+          "key": "valid",
+          "offset": 445744,
+          "sha256": "65e4e031ae802d5e6e45bd5c46c53d5cd2f1212aa82129cd95ba2a7ab3e44287"
+        },
+        {
+          "key": "name",
+          "offset": 445908,
+          "sha256": "4efc3166a0d83df06601d574d3da31ee1d35245cc24c9b5c3284129eac639a26"
+        }
+      ]
+    },
+    {
+      "version": "1.1.68",
+      "functions": [
+        {
+          "key": "read",
+          "offset": 12703,
+          "sha256": "ff2f269698ce4050379dff30b8fcdb20a6a9a1545d01f203b1a81f7fc2bc2a0f"
+        },
+        {
+          "key": "home",
+          "offset": 28878,
+          "sha256": "dff142a4a408532e6cc35fc7104b6182152e9699e9e158dd70e58ae5a5793f21"
+        },
+        {
+          "key": "root",
+          "offset": 28926,
+          "sha256": "9eef64b444d2000ea07804c18b3ac424b5da58eb9e8baff75142f7b11519b4e7"
+        },
+        {
+          "key": "valid",
+          "offset": 27304,
+          "sha256": "56e44198f9a059ef65147004ded2ff40e2cde82c0bf89edc293f7caa1bfd97fd"
+        },
+        {
+          "key": "name",
+          "offset": 27468,
+          "sha256": "f4df9132fc004acaec740c15404bf6a1d462df64f2805222bca85c635708a8da"
+        }
+      ]
+    }
+  ],
+  "results": [
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {},
+      "expectedHome": "Q:\\users\\captured\\.qoder"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR": "explicit",
+        "QODER_CLI_HOME": "cli",
+        "GEMINI_CLI_HOME": "gemini",
+        "QODER_CONFIG_DIR_NAME": "named"
+      },
+      "expectedHome": "Q:\\work\\app\\explicit"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR": "",
+        "QODER_CLI_HOME": "cli",
+        "GEMINI_CLI_HOME": "gemini",
+        "QODER_CONFIG_DIR_NAME": "named"
+      },
+      "expectedHome": "Q:\\work\\app\\cli\\named"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CLI_HOME": "",
+        "GEMINI_CLI_HOME": "gemini"
+      },
+      "expectedHome": "Q:\\users\\captured\\.qoder"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "GEMINI_CLI_HOME": "gemini"
+      },
+      "expectedHome": "Q:\\work\\app\\gemini\\.qoder"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CLI_HOME": "",
+        "GEMINI_CLI_HOME": "",
+        "QODER_CONFIG_DIR_NAME": ""
+      },
+      "expectedHome": "Q:\\users\\captured\\.qoder"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR": "../data/./nested/../config"
+      },
+      "expectedHome": "Q:\\work\\data\\config"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR": "../../../../.."
+      },
+      "expectedHome": "Q:\\"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR": "../café"
+      },
+      "expectedHome": "Q:\\work\\café"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CLI_HOME": "../café",
+        "QODER_CONFIG_DIR_NAME": "téam"
+      },
+      "expectedHome": "Q:\\work\\café\\téam"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "foo bar"
+      },
+      "expectedHome": "Q:\\users\\captured\\foo bar"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "材料目录"
+      },
+      "expectedHome": "Q:\\users\\captured\\材料目录"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "expectedHome": "Q:\\users\\captured\\aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "."
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": ".."
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "../named"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "/portable"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "\\portable"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "CON"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "con.txt"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "LPT9"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "COM0"
+      },
+      "expectedHome": "Q:\\users\\captured\\COM0"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "Node_Modules"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": ".Git"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "trailing."
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": " leading"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "trailing "
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "a:b"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "💡"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "x́"
+      },
+      "expectedHome": "Q:\\users\\captured\\x́"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR": "explicit",
+        "QODER_CONFIG_DIR_NAME": "../invalid"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "win32",
+      "cwd": "Q:\\work\\café",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CLI_HOME": "relative"
+      },
+      "expectedHome": "Q:\\work\\café\\relative\\.qoder"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {},
+      "expectedHome": "/users/captured/.qoder"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR": "explicit",
+        "QODER_CLI_HOME": "cli",
+        "GEMINI_CLI_HOME": "gemini",
+        "QODER_CONFIG_DIR_NAME": "named"
+      },
+      "expectedHome": "/work/app/explicit"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR": "",
+        "QODER_CLI_HOME": "cli",
+        "GEMINI_CLI_HOME": "gemini",
+        "QODER_CONFIG_DIR_NAME": "named"
+      },
+      "expectedHome": "/work/app/cli/named"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CLI_HOME": "",
+        "GEMINI_CLI_HOME": "gemini"
+      },
+      "expectedHome": "/users/captured/.qoder"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "GEMINI_CLI_HOME": "gemini"
+      },
+      "expectedHome": "/work/app/gemini/.qoder"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CLI_HOME": "",
+        "GEMINI_CLI_HOME": "",
+        "QODER_CONFIG_DIR_NAME": ""
+      },
+      "expectedHome": "/users/captured/.qoder"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR": "../data/./nested/../config"
+      },
+      "expectedHome": "/work/data/config"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR": "../../../../.."
+      },
+      "expectedHome": "/"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR": "../café"
+      },
+      "expectedHome": "/work/café"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CLI_HOME": "../café",
+        "QODER_CONFIG_DIR_NAME": "téam"
+      },
+      "expectedHome": "/work/café/téam"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "foo bar"
+      },
+      "expectedHome": "/users/captured/foo bar"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "材料目录"
+      },
+      "expectedHome": "/users/captured/材料目录"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "expectedHome": "/users/captured/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "."
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": ".."
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "../named"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "/portable"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "\\portable"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "CON"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "con.txt"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "LPT9"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "COM0"
+      },
+      "expectedHome": "/users/captured/COM0"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "Node_Modules"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": ".Git"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "trailing."
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": " leading"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "trailing "
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "a:b"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "💡"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "x́"
+      },
+      "expectedHome": "/users/captured/x́"
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR": "explicit",
+        "QODER_CONFIG_DIR_NAME": "../invalid"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.45",
+      "platform": "posix",
+      "cwd": "/work/café",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CLI_HOME": "relative"
+      },
+      "expectedHome": "/work/café/relative/.qoder"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {},
+      "expectedHome": "Q:\\users\\captured\\.qoder"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR": "explicit",
+        "QODER_CLI_HOME": "cli",
+        "GEMINI_CLI_HOME": "gemini",
+        "QODER_CONFIG_DIR_NAME": "named"
+      },
+      "expectedHome": "Q:\\work\\app\\explicit"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR": "",
+        "QODER_CLI_HOME": "cli",
+        "GEMINI_CLI_HOME": "gemini",
+        "QODER_CONFIG_DIR_NAME": "named"
+      },
+      "expectedHome": "Q:\\work\\app\\cli\\named"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CLI_HOME": "",
+        "GEMINI_CLI_HOME": "gemini"
+      },
+      "expectedHome": "Q:\\users\\captured\\.qoder"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "GEMINI_CLI_HOME": "gemini"
+      },
+      "expectedHome": "Q:\\work\\app\\gemini\\.qoder"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CLI_HOME": "",
+        "GEMINI_CLI_HOME": "",
+        "QODER_CONFIG_DIR_NAME": ""
+      },
+      "expectedHome": "Q:\\users\\captured\\.qoder"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR": "../data/./nested/../config"
+      },
+      "expectedHome": "Q:\\work\\data\\config"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR": "../../../../.."
+      },
+      "expectedHome": "Q:\\"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR": "../café"
+      },
+      "expectedHome": "Q:\\work\\café"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CLI_HOME": "../café",
+        "QODER_CONFIG_DIR_NAME": "téam"
+      },
+      "expectedHome": "Q:\\work\\café\\téam"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "foo bar"
+      },
+      "expectedHome": "Q:\\users\\captured\\foo bar"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "材料目录"
+      },
+      "expectedHome": "Q:\\users\\captured\\材料目录"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "expectedHome": "Q:\\users\\captured\\aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "."
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": ".."
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "../named"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "/portable"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "\\portable"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "CON"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "con.txt"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "LPT9"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "COM0"
+      },
+      "expectedHome": "Q:\\users\\captured\\COM0"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "Node_Modules"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": ".Git"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "trailing."
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": " leading"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "trailing "
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "a:b"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "💡"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "x́"
+      },
+      "expectedHome": "Q:\\users\\captured\\x́"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\app",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR": "explicit",
+        "QODER_CONFIG_DIR_NAME": "../invalid"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "win32",
+      "cwd": "Q:\\work\\café",
+      "home": "Q:/users/captured",
+      "environment": {
+        "QODER_CLI_HOME": "relative"
+      },
+      "expectedHome": "Q:\\work\\café\\relative\\.qoder"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {},
+      "expectedHome": "/users/captured/.qoder"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR": "explicit",
+        "QODER_CLI_HOME": "cli",
+        "GEMINI_CLI_HOME": "gemini",
+        "QODER_CONFIG_DIR_NAME": "named"
+      },
+      "expectedHome": "/work/app/explicit"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR": "",
+        "QODER_CLI_HOME": "cli",
+        "GEMINI_CLI_HOME": "gemini",
+        "QODER_CONFIG_DIR_NAME": "named"
+      },
+      "expectedHome": "/work/app/cli/named"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CLI_HOME": "",
+        "GEMINI_CLI_HOME": "gemini"
+      },
+      "expectedHome": "/users/captured/.qoder"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "GEMINI_CLI_HOME": "gemini"
+      },
+      "expectedHome": "/work/app/gemini/.qoder"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CLI_HOME": "",
+        "GEMINI_CLI_HOME": "",
+        "QODER_CONFIG_DIR_NAME": ""
+      },
+      "expectedHome": "/users/captured/.qoder"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR": "../data/./nested/../config"
+      },
+      "expectedHome": "/work/data/config"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR": "../../../../.."
+      },
+      "expectedHome": "/"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR": "../café"
+      },
+      "expectedHome": "/work/café"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CLI_HOME": "../café",
+        "QODER_CONFIG_DIR_NAME": "téam"
+      },
+      "expectedHome": "/work/café/téam"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "foo bar"
+      },
+      "expectedHome": "/users/captured/foo bar"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "材料目录"
+      },
+      "expectedHome": "/users/captured/材料目录"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "expectedHome": "/users/captured/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "."
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": ".."
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "../named"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "/portable"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "\\portable"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "CON"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "con.txt"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "LPT9"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "COM0"
+      },
+      "expectedHome": "/users/captured/COM0"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "Node_Modules"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": ".Git"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "trailing."
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": " leading"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "trailing "
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "a:b"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "💡"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR_NAME": "x́"
+      },
+      "expectedHome": "/users/captured/x́"
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/app",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CONFIG_DIR": "explicit",
+        "QODER_CONFIG_DIR_NAME": "../invalid"
+      },
+      "expectedError": true
+    },
+    {
+      "version": "1.1.68",
+      "platform": "posix",
+      "cwd": "/work/café",
+      "home": "/users/captured",
+      "environment": {
+        "QODER_CLI_HOME": "relative"
+      },
+      "expectedHome": "/work/café/relative/.qoder"
+    }
+  ]
+}

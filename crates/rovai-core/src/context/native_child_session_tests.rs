@@ -177,6 +177,14 @@ fn assert_native_source_origin(f: &mut Fixture) {
             root.clone().into_os_string(),
         ),
         (
+            std::ffi::OsString::from("CLAUDE_CONFIG_DIR"),
+            root.clone().into_os_string(),
+        ),
+        (
+            std::ffi::OsString::from("QODER_CONFIG_DIR"),
+            root.clone().into_os_string(),
+        ),
+        (
             std::ffi::OsString::from("API_TOKEN"),
             std::ffi::OsString::from("NEVER_SAVE_OR_SEND_ORIGIN_SECRET"),
         ),
@@ -264,24 +272,26 @@ fn assert_native_source_origin(f: &mut Fixture) {
             .unwrap()
             .replayed
     );
-    let other = CapturedNativeSource::capture(
+    for kind in [
         AdapterKind::GrokBuild,
-        &environment,
-        &f.directory,
-        "host-wrong-kind",
-    )
-    .unwrap();
-    let mut wrong = command.clone();
-    wrong.command_id = Uuid::new_v4().to_string();
-    assert_eq!(
-        runtime
-            .bind_native_session_with_source(&mut f.database, &wrong, Some(&other))
-            .unwrap()
-            .result
-            .status,
-        CommandResultStatus::Rejected
-    );
-    assert_eq!(source_rows(&f.database), saved);
+        AdapterKind::ClaudeCodeCli,
+        AdapterKind::QoderCli,
+    ] {
+        let other =
+            CapturedNativeSource::capture(kind, &environment, &f.directory, "host-wrong-kind")
+                .unwrap();
+        let mut wrong = command.clone();
+        wrong.command_id = Uuid::new_v4().to_string();
+        assert_eq!(
+            runtime
+                .bind_native_session_with_source(&mut f.database, &wrong, Some(&other))
+                .unwrap()
+                .result
+                .status,
+            CommandResultStatus::Rejected
+        );
+        assert_eq!(source_rows(&f.database), saved);
+    }
 
     let other_host = CapturedNativeSource::capture(
         AdapterKind::CodexCli,

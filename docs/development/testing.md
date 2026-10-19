@@ -105,6 +105,19 @@ active/retained 分支、完整交换、同 key 镜像锁、只读核对/明确�
 
 ## Rust 测试准入与退役门槛
 
+I04 Claude/Qoder启动来源新增最低层纯owner：
+`runtime_subagent_session::origin::tests::final_launch_roots_keep_adapter_precedence_and_qoder_node_path_semantics`。
+它只读取传入的最终环境/工作目录，覆盖四Runtime独立根、Qoder各变量优先级/空值回落/自定义目录名、
+Node词法路径行为、相对根/盘符工作目录与错误盘符回落/非法主机与秘密不披露；不读取本机环境、凭据或文件，不新建SQLite/进程。
+固定官方Qoder 1.1.45/1.1.68发布包经SRI校验，只提取并审阅纯目录函数，在合成环境计算132组Windows/POSIX参考值；
+本机Rust执行对应Windows的66组，POSIX值不冒充POSIX Rust实机资格。对比覆盖空值掩蔽、NFC、目录名合法性及保留名。
+NFC复用锁内既有unicode-normalization 0.1.25，仅新增Core直接依赖边，不新增包、不升级版本；无CLI安装/整包运行/认证/模型。
+既有文件source owner只拥有快照/父链，Context owner含SQLite，不能替代或作为此纯规则最低层。
+原Context来源owner沿同库扩大错adapter拒绝（目录相同也不借权），保留重观察、原回执、回滚、历史及模型输入隔离断言。
+最低验证先精确列册再运行上述纯owner；Core正向绑定/重观察/回滚回归沿
+`context::slow_tests::delivery_unknown_never_consumes_a_redelivery_requirement`。
+不默认运行全库/全App/Actions；Claude/Qoder完整parser、Core证据、真实Host/Runtime及两端资格仍须分别完成。
+
 I04 原生文件引用的 Web 资源边界新增两个最低层 owner：`resources::tests::native_file_target_rejects_cross_reader_thread_and_reference_replies`
 拥有精确来源回复，旧种类白名单用例不能拒绝错 reader/Thread/原引用；`native_reference_metadata_preserves_directories_binary_downloads_and_private_paths`
 拥有新目录/二进制/name-only 元数据，旧内容扫描只拥有字节与摘要，不能证明目录及路径展示合同。后者将元数据解析抽成私有函数，

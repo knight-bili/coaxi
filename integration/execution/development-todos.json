@@ -197,6 +197,20 @@
         "I04原剩余Claude旧agent/parser/home关联、Qoder独立来源/明确导入、Grok修改意见与三Context模式、Runtime并集、恢复、记忆及自动化不减；ANSI完整许可继续发布资格。"
       ],
       "qualification": "127定向/48隔离Chromium检查及4原组件图；真实Core/Native/Web/完整App仍待，I04正式84新增0。"
+    },
+    {
+      "id": "DEV-NATIVE-LAUNCH-ORIGIN",
+      "task": "I04-T01/T02/I12",
+      "owner": "研发",
+      "status": "four_adapter_roots_local_verified_full_legacy_parsers_and_actual_host_pending",
+      "problem": "Claude/Qoder复用实际Host最终环境/cwd捕获；Qoder按官方两版校正空值掩蔽、目录名/NFC及Windows相对盘符，只保存非凭据来源。原Core绑定/持久化格式和C/G公开读取准入不改。",
+      "evidence": "i04-native-launch-origin-result.json",
+      "qualification": "两个精确Rust owner通过；132组官方纯函数合成参考，本机Windows66组；同库正向绑定仍为Codex，Claude/Qoder仅补错Runtime拒绝。未运行实际CLI/模型/完整App，不增加84正式场景通过数。",
+      "remaining": [
+        "Claude完整正文/证据关联；Qoder meta/task/active branch和独立producer；旧无来源显式导入",
+        "实际Claude/Qoder Host持久绑定/文件roundtrip、两端完整App与Runtime平台集中候选",
+        "native_usage/native_skills的Qoder目录规则另核对；涉及模型材料继续遵守原方案治理"
+      ]
     }
   ]
 }

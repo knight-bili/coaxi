@@ -9,10 +9,15 @@ use std::{
 use anyhow::{Context, Result, ensure};
 use rusqlite::params;
 use serde::{Deserialize, Serialize};
+use unicode_normalization::UnicodeNormalization;
 
 use crate::{agent_profile::AdapterKind, db::Database, runtime::BindNativeSessionCommand};
 
 pub(crate) const ORIGIN_EVENT: &str = "conversation.native_source.recorded";
+
+#[cfg(test)]
+#[path = "origin/capture_tests.rs"]
+mod tests;
 
 #[derive(Clone)]
 pub struct CapturedNativeSource {
@@ -39,11 +44,6 @@ impl CapturedNativeSource {
         cwd: &Path,
         host: &str,
     ) -> Option<Self> {
-        let (variable, default) = match adapter {
-            AdapterKind::CodexCli => ("CODEX_HOME", ".codex"),
-            AdapterKind::GrokBuild => ("GROK_HOME", ".grok"),
-            _ => return None,
-        };
         if !cwd.is_absolute() || !super::identity(host) {
             return None;
         }
@@ -51,7 +51,7 @@ impl CapturedNativeSource {
         if directory.len() > 32768 || directory.contains('\0') {
             return None;
         }
-        let get = |name: &str| {
+        let raw = |name: &str| {
             environment
                 .iter()
                 .find(|(key, _)| {
@@ -64,12 +64,46 @@ impl CapturedNativeSource {
                     })
                 })
                 .map(|(_, value)| value)
-                .filter(|value| !value.is_empty())
         };
-        let home = if let Some(value) = get(variable) {
-            PathBuf::from(value)
-        } else {
-            PathBuf::from(get(if cfg!(windows) { "USERPROFILE" } else { "HOME" })?).join(default)
+        let get = |name: &str| raw(name).filter(|value| !value.is_empty());
+        let os_home = || get(if cfg!(windows) { "USERPROFILE" } else { "HOME" }).map(PathBuf::from);
+        let home = match adapter {
+            AdapterKind::CodexCli => get("CODEX_HOME")
+                .map(PathBuf::from)
+                .or_else(|| os_home().map(|root| root.join(".codex")))?,
+            AdapterKind::GrokBuild => get("GROK_HOME")
+                .map(PathBuf::from)
+                .or_else(|| os_home().map(|root| root.join(".grok")))?,
+            AdapterKind::ClaudeCodeCli => get("CLAUDE_CONFIG_DIR")
+                .map(PathBuf::from)
+                .or_else(|| os_home().map(|root| root.join(".claude")))?,
+            AdapterKind::QoderCli => {
+                // Qoder native config behavior: official 1.1.45/1.1.68, Apache-2.0.
+                // See integration/licenses/qoder-native-origin/LICENSE and source inventory.
+                // Both reviewed publisher versions validate
+                // the name first, use a nullish HOME fallback and normalize NFC.
+                let configured_name = match get("QODER_CONFIG_DIR_NAME") {
+                    Some(value) => Some(value.to_str()?),
+                    None => None,
+                };
+                let name = qoder_directory_name(configured_name)?;
+                if let Some(value) = get("QODER_CONFIG_DIR") {
+                    let resolved = lexical_absolute(cwd, Path::new(value), environment)?;
+                    PathBuf::from(resolved.to_str()?.nfc().collect::<String>())
+                } else {
+                    let root = raw("QODER_CLI_HOME")
+                        .or_else(|| raw("GEMINI_CLI_HOME"))
+                        .filter(|value| !value.is_empty())
+                        .map(PathBuf::from)
+                        .or_else(os_home)?;
+                    let joined = root.join(name);
+                    // A relative CLI_HOME is NFC-normalized before the OS uses
+                    // cwd. Do not normalize an unrelated cwd along with it.
+                    let normalized = PathBuf::from(joined.to_str()?.nfc().collect::<String>());
+                    lexical_absolute(cwd, &normalized, environment)?
+                }
+            }
+            _ => return None,
         };
         let home = if home.is_absolute() {
             home
@@ -77,7 +111,7 @@ impl CapturedNativeSource {
             cwd.join(home)
         };
         let text = home.to_str()?;
-        if text.len() > 32768 || text.contains('\0') {
+        if !home.is_absolute() || text.len() > 32768 || text.contains('\0') {
             return None;
         }
         Some(Self {
@@ -114,6 +148,102 @@ impl CapturedNativeSource {
             working_directory: Some(self.working_directory.to_str().unwrap().into()),
         }
     }
+}
+
+// Qoder's Node resolver uses path.resolve/path.join before opening files.
+// Collapse dots lexically, before any filesystem/symlink lookup; no host I/O.
+fn lexical_absolute(
+    cwd: &Path,
+    path: &Path,
+    environment: &BTreeMap<OsString, OsString>,
+) -> Option<PathBuf> {
+    use std::path::Component;
+    let _ = environment;
+    let joined = if path.is_absolute() {
+        path.to_path_buf()
+    } else {
+        cwd.join(path)
+    };
+    #[cfg(windows)]
+    let joined = if !path.has_root()
+        && let Some(Component::Prefix(prefix)) = path.components().next()
+        && let std::path::Prefix::Disk(drive) = prefix.kind()
+    {
+        let drive = drive.to_ascii_uppercase();
+        let same_drive = |path: &Path| {
+            matches!(path.components().next(),
+            Some(Component::Prefix(prefix)) if matches!(prefix.kind(),
+                std::path::Prefix::Disk(value) | std::path::Prefix::VerbatimDisk(value) if value.to_ascii_uppercase() == drive))
+        };
+        let key = format!("={}:", char::from(drive));
+        let base = if same_drive(cwd) {
+            cwd.to_path_buf()
+        } else {
+            environment
+                .iter()
+                .find(|(name, _)| {
+                    name.to_str()
+                        .is_some_and(|name| name.eq_ignore_ascii_case(&key))
+                })
+                .map(|(_, value)| PathBuf::from(value))
+                .filter(|value| value.is_absolute() && same_drive(value))
+                .unwrap_or_else(|| PathBuf::from(format!("{}:\\", char::from(drive))))
+        };
+        base.join(path.components().skip(1).collect::<PathBuf>())
+    } else {
+        joined
+    };
+    if !joined.is_absolute() {
+        return None;
+    }
+    let mut result = PathBuf::new();
+    for component in joined.components() {
+        match component {
+            Component::CurDir => {}
+            Component::ParentDir => {
+                result.pop();
+            }
+            other => result.push(other.as_os_str()),
+        }
+    }
+    result.is_absolute().then_some(result)
+}
+
+fn qoder_directory_name(name: Option<&str>) -> Option<String> {
+    use std::sync::OnceLock;
+    static ALLOWED: OnceLock<regex::Regex> = OnceLock::new();
+    static DEVICE: OnceLock<regex::Regex> = OnceLock::new();
+    let name = name.unwrap_or(".qoder").nfc().collect::<String>();
+    let length = name.chars().count();
+    if !(1..=64).contains(&length)
+        || name.starts_with(' ')
+        || name.ends_with(' ')
+        || name.ends_with('.')
+        || matches!(name.as_str(), "." | "..")
+        || !ALLOWED
+            .get_or_init(|| regex::Regex::new(r"^[\p{L}\p{N}\p{M}._ -]+$").unwrap())
+            .is_match(&name)
+        || DEVICE
+            .get_or_init(|| {
+                regex::Regex::new(r"(?iu)^(?:con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)").unwrap()
+            })
+            .is_match(&name)
+        || matches!(
+            name.to_lowercase().as_str(),
+            ".git"
+                | ".svn"
+                | ".hg"
+                | ".vscode"
+                | ".idea"
+                | ".husky"
+                | ".github"
+                | "node_modules"
+                | "bower_components"
+        )
+    {
+        return None;
+    }
+    Some(name)
 }
 
 /// Stored only in Core's System binding provenance event, never in Context,
