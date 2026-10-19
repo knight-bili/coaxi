@@ -32,15 +32,15 @@
     "Raw verified bytes retain complete UTF8 and reject changed chunks; existing JsonRecords reused within module boundary",
     "Optional cancellation during directory enumeration/hash/record decoding; existing non-cancellable caller semantics unchanged"
   ],
-  "implementation_status": "claude_full_content_and_qoder_private_lineage_local_verified_core_producer_and_public_reader_pending",
+  "implementation_status": "claude_qoder_full_content_private_lineage_local_verified_core_producer_and_public_reader_pending",
   "remaining": [
-    "Claude完整parser与受控文件桥本地已验；Core证据/producer及User-only读取目标继续",
-    "Qoder私有meta/task/active-branch文件层已验；完整正文/usage/lifecycle和Core producer资格继续",
-    "签名运输/固定原UI及实际Claude/Qoder Host持久绑定/文件roundtrip、Runtime/平台候选",
+    "Claude/Qoder完整parser与受控文件桥已本地验证；Core证据/producer及独立User读取目标继续",
+    "签名运输/固定原UI与实际Claude/Qoder Host持久绑定/文件roundtrip、Runtime/平台候选",
     "旧无记录来源显式导入；不查当前home猜补"
   ],
   "evidence": "integration/execution/i04-legacy-agent-source-result.json",
   "launch_origin_evidence": "integration/execution/i04-native-launch-origin-result.json",
   "qoder_source_evidence": "integration/execution/i04-qoder-agent-source-result.json",
-  "claude_content_evidence": "integration/execution/i04-native-claude-content-result.json"
+  "claude_content_evidence": "integration/execution/i04-native-claude-content-result.json",
+  "qoder_content_evidence": "integration/execution/i04-native-qoder-content-result.json"
 }

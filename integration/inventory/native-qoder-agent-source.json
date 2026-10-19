@@ -28,11 +28,11 @@
     "model_input_changed": false,
     "public_gate_changed": false
   },
-  "verification": "existing_source_filesystem_owner_passed_with_complete_claude_batch",
+  "verification": "private_lineage_and_full_qoder_content_local_verified_core_producer_pending",
   "remaining": [
-    "Qoder完整正文/usage/lifecycle parser和Core证据/producer资格",
-    "旧无记录来源显式导入；不得当前home回填",
-    "实际Host/CLI/完整App与平台集中候选、User-only目标运输与原UI"
+    "Claude/Qoder Core证据/producer与独立User目标运输、原UI真实接续",
+    "旧无记录来源显式导入；不猜当前目录",
+    "实际Host正向持久绑定/文件roundtrip、CLI/模型/完整App及平台集中候选"
   ],
-  "verification_evidence": "integration/execution/i04-native-claude-content-result.json"
+  "verification_evidence": "integration/execution/i04-native-qoder-content-result.json"
 }

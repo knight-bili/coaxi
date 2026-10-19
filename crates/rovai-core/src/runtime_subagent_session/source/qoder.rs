@@ -15,6 +15,10 @@ use crate::runtime_subagent_session::content::records::{JsonRecords, ParseNotes,
 
 mod branch;
 
+pub(in crate::runtime_subagent_session) fn replay_branch(records: &[Value]) -> Vec<usize> {
+    branch::active_branch(records)
+}
+
 pub(in crate::runtime_subagent_session) struct QoderAgentLink<'a> {
     pub parent_session_id: &'a str,
     pub parent_tool_use_id: &'a str,

@@ -1,0 +1,403 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-19T06:17:59.635820+00:00",
+  "stage": "I04",
+  "task": "I04-T01/T02",
+  "branch": "develop/V1.0.0",
+  "baseline_commit": "6d5d962b60b95afe83ef80381d415bb9d1e934e3",
+  "status": "qoder_complete_content_local_verified_core_producer_user_target_old_import_and_candidate_pending",
+  "stage_complete": false,
+  "scope_preserved": {
+    "source_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_packages": 4,
+    "i04_clusters": 21,
+    "i04_formal_cases": 84,
+    "new_formal_cases_passed": 0
+  },
+  "source_inventory": "integration/inventory/native-qoder-content-port.json",
+  "verification": {
+    "rust": {
+      "ok": true,
+      "features": "slow-tests",
+      "owners": [
+        {
+          "owner": "runtime_subagent_session::source::tests::lineage_sources_keep_exact_rollouts_and_lossless_stable_chunks",
+          "listed": 1,
+          "passed": true
+        }
+      ]
+    },
+    "original_cases_executed": 43,
+    "original_assertions_weakened": false,
+    "original_source_helpers": 7,
+    "pure_function_bodies_equal": 13,
+    "original_fact_functions_equal": 3,
+    "deferred_original_cases": {
+      "summary_reads_real_layout": "native list identity/folder authority stays with Core, not this record parser",
+      "missing_session_is_not_found": "production target/source lookup belongs to Core source authority",
+      "config_dir_env_overrides_user_home": "final launch capture separately tested against both publisher versions; do not revive original ambient resolver"
+    },
+    "actual_verified_file_full_text_own_sidechain": true,
+    "root_type_status_and_recovered_result": true,
+    "snapshot_stability_mutation_rejection_and_cancel": true,
+    "short_agent_session_promotion": false,
+    "first_compile": "failed: reference namespace/model/id adapter and original token fact dependency omitted; original assertions retained and dependencies supplied",
+    "final_compile": "passed: slow-tests targeted lib 2m55s; one exact source owner 2.57s",
+    "rust_warnings_at_execution": 17,
+    "fixture_cleanup_after_execution": {
+      "only_changes": [
+        "unused serde_json::json fixture import removed",
+        "unused LAST_PROMPT_LINE fixture constant removed"
+      ],
+      "before_sha256": "62e37a3ca776314c55ac9161498ae4bae3c07ca35764fd08e2ccd99453f01d97",
+      "after_sha256": "4e5c05c4cba5b8036364cdf3f77c6624d41233d7b7946b6f58f42e804c255d20",
+      "runtime_function_bodies_changed": false,
+      "assertions_changed": false,
+      "production_changed": false,
+      "recompiled_after_declaration_cleanup": false,
+      "after_rustfmt_sha256": "4e5c05c4cba5b8036364cdf3f77c6624d41233d7b7946b6f58f42e804c255d20"
+    },
+    "actual_core_producer": false,
+    "actual_host_cli_model": false,
+    "actual_native_web_full_app": false,
+    "full_workspace": false,
+    "source_audit": {
+      "ok": true,
+      "baseline": "6d5d962b60b95afe83ef80381d415bb9d1e934e3",
+      "source_commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+      "source_sha256": "696238da466f84924a5982d596fe47bf5ab4a6d724664722ed1970ee6b1e2844",
+      "same_function_bodies": [
+        "percent",
+        "window",
+        "qoder_turn_usage",
+        "extract_reported_context",
+        "message_count",
+        "is_content_record",
+        "is_sidechain",
+        "record_timestamp",
+        "is_non_conversational_assistant",
+        "is_transcript_furniture",
+        "raw_user_text",
+        "is_human_prompt",
+        "with_reported_context_percent"
+      ],
+      "same_function_count": 13,
+      "adapted_functions": [
+        "parse_transcript",
+        "subagent_call_usage"
+      ],
+      "original_assertions_preserved_with_declared_input_adapter": 43,
+      "source_fixture_helpers": 7,
+      "deferred_original_cases": {
+        "summary_reads_real_layout": "native list identity/folder authority stays with Core, not this record parser",
+        "missing_session_is_not_found": "production target/source lookup belongs to Core source authority",
+        "config_dir_env_overrides_user_home": "final launch capture separately tested against both publisher versions; do not revive original ambient resolver"
+      },
+      "original_fact_functions_unchanged": [
+        "facts_from_turns",
+        "clamp_i64",
+        "total_tokens"
+      ],
+      "fact_sources": [
+        {
+          "path": "src-tauri/src/commands/token_usage.rs",
+          "sha256": "db74b6d2bcfd2a581102f40f2dff5f9ad1af999e0df73a108562b9b69b855762"
+        },
+        {
+          "path": "src-tauri/src/db/service/token_usage_service.rs",
+          "sha256": "4de2f2a4082e2200d9785a3e0391c95a4a02eeea10d56dc869399be9164a70fb"
+        }
+      ],
+      "existing_private_source_gate_body_unchanged": true,
+      "protected_files_unchanged": [
+        "Cargo.lock",
+        "crates/rovai-core/Cargo.toml",
+        "crates/rovai-core/src/runtime_subagent_session.rs",
+        "crates/rovai-core/src/runtime_subagent_session/origin.rs",
+        "crates/rovai-core/src/runtime_subagent_session/source/qoder/branch.rs",
+        "crates/rovai-core/src/runtime_subagent_session/content/claude.rs",
+        "crates/rovai-core/src/runtime_subagent_session/content/claude_read.rs"
+      ],
+      "adaptations": [
+        "Record iterators/cancellation replace native file reads; original Session branch/sidechain behavior retained",
+        "Only the verified agent document is treated as the view subject; own sidechain and undated body survive; source byte snapshot unchanged",
+        "Native Session/folder identity stays Core-owned; fixture retains original request id only to preserve source assertions, not a User grant",
+        "Explicit Core-correlated children in original filename order supply task status/result and per-call spend, after parent occupancy",
+        "Current C/G target/parser and public gate unchanged; short agent ids do not become Sessions"
+      ],
+      "approved_r1_artifacts": [
+        {
+          "path": "work/integration/integration/proposals/native-delegation-r1.md",
+          "bytes": 44061,
+          "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+        },
+        {
+          "path": "work/integration/integration/proposals/native-delegation-r1-contract.json",
+          "bytes": 117977,
+          "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+        },
+        {
+          "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+          "bytes": 67619,
+          "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+        },
+        {
+          "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+          "bytes": 809962,
+          "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+        },
+        {
+          "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1-contract.json",
+          "bytes": 117977,
+          "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+        },
+        {
+          "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1.md",
+          "bytes": 44061,
+          "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+        }
+      ],
+      "preserved_dirty_agents_sha256": "6d5c55bc4069cd453a36a38d9b0f48c112f1c256982388a27629c12f962c9f4b",
+      "schema_changed": false,
+      "model_input_changed": false,
+      "dependencies_changed": false,
+      "launch_changed": false,
+      "new_rust_owner": false,
+      "public_gate_changed": false
+    },
+    "docs": {
+      "tests": 10,
+      "version": true,
+      "decisions_with_base": true
+    },
+    "codegraph": true,
+    "schema_changed": false,
+    "model_input_changed": false,
+    "dependencies_changed": false,
+    "launch_changed": false,
+    "new_rust_owner": false,
+    "public_gate_changed": false,
+    "rustfmt_changed_files": true,
+    "diff_check": true,
+    "test_binary": {
+      "path": "D:\\soft\\codex\\build-cache\\codeg-rovai\\debug\\deps\\rovai_core-73391bc2aedcb5af.exe",
+      "bytes": 131482624,
+      "sha256": "6a406379f784af362d9cecd705ee4a1b484ba1b995e194ebe1daae28e018e67a",
+      "modified_at": "2026-10-19T06:12:06.200437+00:00"
+    }
+  },
+  "remaining": [
+    "Claude/Qoder actual Core producer/evidence correlation and separate User targets/transport",
+    "Explicit import for old sources without captured provenance",
+    "Actual Host positive binding/file roundtrip, Runtime/platform/full Native/Web/App phase candidate",
+    "Original format corpus/differential checks and I04 other Runtime/recovery/memory/automation requirements"
+  ],
+  "approved_r1_artifacts": [
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    },
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    }
+  ],
+  "preserved_dirty_agents_sha256": "6d5c55bc4069cd453a36a38d9b0f48c112f1c256982388a27629c12f962c9f4b",
+  "source_files": [
+    {
+      "path": "crates/rovai-core/src/runtime_subagent_session/content/mod.rs",
+      "sha256": "f56d8618702a1f1954be166166e5affc3cefbc51055cfedda25be85ba450c7dd",
+      "git_blob": "08bbd6a14772604f6b99d877235e4d61617b5a91"
+    },
+    {
+      "path": "crates/rovai-core/src/runtime_subagent_session/content/qoder.rs",
+      "sha256": "00ca11fc8ddc671f7cb420566d66081999f5301d2aa055972bdf9aee4fff1879",
+      "git_blob": "7e8dd5b7276133b6b0282449bacd53fa80a12081"
+    },
+    {
+      "path": "crates/rovai-core/src/runtime_subagent_session/content/qoder/reference_tests.rs",
+      "sha256": "4e5c05c4cba5b8036364cdf3f77c6624d41233d7b7946b6f58f42e804c255d20",
+      "git_blob": "367bfbcab6988cff6e897056426ad4d096e7401e"
+    },
+    {
+      "path": "crates/rovai-core/src/runtime_subagent_session/source/qoder.rs",
+      "sha256": "4b1d0c9e13f7560982e704dbec17a37fa28c371630d8107509295b616493d970",
+      "git_blob": "fdf8060c5401b8822e404d2fbf57f7cb946ffce5"
+    },
+    {
+      "path": "crates/rovai-core/src/runtime_subagent_session/source/qoder_tests.rs",
+      "sha256": "c7e28b1a26bb4e5805821c5721ade07de547ad6642515053a51e03746f77636d",
+      "git_blob": "daeda8d7329f36c6b19e95a846ba96c747783fbf"
+    },
+    {
+      "path": "docs/development/testing.md",
+      "sha256": "3b841a98c9837844b9e087de121ce194b46720aa01a483d5d1842991f5100502",
+      "git_blob": "2478d9bad5db721f48ee02d19b7464121544c8d3"
+    },
+    {
+      "path": "integration/execution/development-todos.json",
+      "sha256": "85b4aa3b8183557c3f282d53cd899036df876f32555fa3f44aa1267401c2ea06",
+      "git_blob": "f1eb8e14aaa23fe17ed75b81ca2867718c49d97f"
+    },
+    {
+      "path": "integration/execution/goal-state.json",
+      "sha256": "d780d8e3d8abab8ef6c086b278f6115836adf49909341d9e5c6e974a4d3d6401",
+      "git_blob": "60934967030eb77f5a82189f67532375f340a9f5"
+    },
+    {
+      "path": "integration/execution/i04-execution-plan.md",
+      "sha256": "5a5aefc3012e8ae5d925ab40e88313536c9df47c8712c5d7e385eb0d27028f4d",
+      "git_blob": "05240c0d58d24be52faf5b80cb8009cc0a6f1d2a"
+    },
+    {
+      "path": "integration/inventory/native-legacy-agent-source.json",
+      "sha256": "817936d5dfa6f751adc7212cb26baf46755557d3081e139dc9a49fac5e34b66f",
+      "git_blob": "e07c72b0f8c7d1421c3d01cb84b3dc2d882846d5"
+    },
+    {
+      "path": "integration/inventory/native-qoder-agent-source.json",
+      "sha256": "da29053cec4b3b45dab86f3dedc5174e2143883ae34237c098caf8e871a38833",
+      "git_blob": "8e85b4953b2d2076c2536ddd820128e26f520229"
+    },
+    {
+      "path": "integration/inventory/native-qoder-content-port.json",
+      "sha256": "06275021dffadcaad6990671a8f2abad26ac545ee4c10d0a3032371beb108236",
+      "git_blob": "204042c8ae6a25ec7f5ea8a2b2461db94f5184ef"
+    },
+    {
+      "path": "integration/inventory/native-subagent-viewer-reference.md",
+      "sha256": "47ae679729e03991a1cbcfadbfd6936819a0b4f56e72b96b2494d3176bd94cda",
+      "git_blob": "aee84aa5e13b80e7ec0aae69dc26fe194107d51f"
+    },
+    {
+      "path": "integration/licenses/README.md",
+      "sha256": "60bde2eded0a4fe8eb51ab6b0d4fdcc83786821845766666661d6b65b873ee2a",
+      "git_blob": "d901a1ebc5bf8667527d304ca29ecf97ab2114ee"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "file/I04Qoder完整解析/audit.py",
+      "sha256": "c6d29e463caa34eb0e25cfd3f11678cc985926a0db1e08a55f8ebba0c4784586"
+    },
+    {
+      "path": "file/I04Qoder完整解析/check-rust.py",
+      "sha256": "5dea9d47718e76b6766ffc67e4625936c7885ec9cf0df0e3a100fd2f9eaca847"
+    },
+    {
+      "path": "file/I04Qoder完整解析/cleanup-fixture.py",
+      "sha256": "1dbd0588ab8e35896c8453a1ba268b2029f906d374231b0ddde9aa39d40bb537"
+    },
+    {
+      "path": "file/I04Qoder完整解析/complete.py",
+      "sha256": "f8b3ed3270f25640d9e4f76155013ccb96fe2f7e22b1273777d1609537210f28"
+    },
+    {
+      "path": "file/I04Qoder完整解析/logs/codegraph-sync.txt",
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "file/I04Qoder完整解析/logs/compiler-environment.json",
+      "sha256": "611a07ca086f070e319b6291d9d33d4b942b18dda4b9feaf2eda86ad29d99fa0"
+    },
+    {
+      "path": "file/I04Qoder完整解析/logs/docs-decisions.txt",
+      "sha256": "7b2e6605b046c14aba1576e5ec3598134caa2fd954bb0a4c4860152dd05187cf"
+    },
+    {
+      "path": "file/I04Qoder完整解析/logs/docs-tests.txt",
+      "sha256": "62e145da787d9a6ef49c3a72cd454c505b4f56914fd45f198065268071ababfd"
+    },
+    {
+      "path": "file/I04Qoder完整解析/logs/docs-version.txt",
+      "sha256": "ef767267475d9fde95f908acafe24215239740f3a2af5ddc98f4ef0cd5cd2528"
+    },
+    {
+      "path": "file/I04Qoder完整解析/logs/fixture-cleanup.json",
+      "sha256": "fbbc2d368c0a3f246a827240a96fb6b52f4dde05d4a68e5d0e131313e5d4868d"
+    },
+    {
+      "path": "file/I04Qoder完整解析/logs/reference-tests-port.json",
+      "sha256": "a90de69e5e303473006521789eaa9418ea58e96365b27b51c72b4e03e92f987a"
+    },
+    {
+      "path": "file/I04Qoder完整解析/logs/rust-guard-first.txt",
+      "sha256": "797f740f71cbcca29e3a078f943c47ff1c3bf268f237b8321a7397facbe2004b"
+    },
+    {
+      "path": "file/I04Qoder完整解析/logs/rust-guard.txt",
+      "sha256": "855eb2837759db9ba948c49ccfda67270cb89d152a0e1071435016c2ab4a2588"
+    },
+    {
+      "path": "file/I04Qoder完整解析/logs/rust-list-0.txt",
+      "sha256": "db52ace6103f868eacf60fdbc9ab6305fc6bda9b6eb7397349af473ad2795920"
+    },
+    {
+      "path": "file/I04Qoder完整解析/logs/rust-list-first.txt",
+      "sha256": "ce17e53854d3be5d43e2d32e2b0dc96e0b8121e4cbaf7a849320bb973f20ad63"
+    },
+    {
+      "path": "file/I04Qoder完整解析/logs/rust-result.json",
+      "sha256": "35fc841cf644814a63923b5f4e7aec329ee46c4575564411f51ed30279ed2f97"
+    },
+    {
+      "path": "file/I04Qoder完整解析/logs/rust-test-0.txt",
+      "sha256": "7606fd7e45ca4d3e95fb608270e097c2f0323604a1bdfdc45c3e22847708c67f"
+    },
+    {
+      "path": "file/I04Qoder完整解析/logs/source-audit.json",
+      "sha256": "79026b5ac450c4b282398a76cc98db75f1ec9deb9e36aaa0baab190a1d33e357"
+    },
+    {
+      "path": "file/I04Qoder完整解析/logs/source-port.json",
+      "sha256": "ff3e1ac86e526ac774addcfb864a87ec3fc70917b2a88150aacae7e544932a95"
+    },
+    {
+      "path": "file/I04Qoder完整解析/port-tests.py",
+      "sha256": "a82c4d3de2e57becbfabae18a72080680ad1bd9a9d0f1188fb7e69fb2499b6de"
+    },
+    {
+      "path": "file/I04Qoder完整解析/port.py",
+      "sha256": "54a6e62c588895ee39cbcf9b7513b9b3764940348138d9d6256f06524fe7c2e0"
+    },
+    {
+      "path": "file/I04Qoder完整解析/update-records.py",
+      "sha256": "55d203e1ee340d8439746c75d1a235f23f7d95e0d2e247518b8eeedcf3217172"
+    },
+    {
+      "path": "file/I04Qoder完整解析/verify-docs.mjs",
+      "sha256": "3edf1c570b4de6ed5ae3d4b511f843f2073e0ba5091e9bb3886efe48093b7b35"
+    }
+  ],
+  "push": false,
+  "actions_triggered": false,
+  "main_merged": false,
+  "paid_models": false,
+  "customer_action_required": false,
+  "goal_service": "active_verified_by_get_goal",
+  "artifact_scope": "Original source/reference adapter and assertions, first compiler failure/final guarded pass, declaration-only cleanup and source/generic gates. Mutable workflow/drafts/test temporary data excluded."
+}

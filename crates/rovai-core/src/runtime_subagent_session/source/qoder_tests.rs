@@ -2,6 +2,7 @@
 fn assert_qoder_agent_documents(f: &SourceFixture) {
     use super::qoder::{QoderAgentLink, open_agent};
     use std::sync::atomic::AtomicBool;
+    crate::runtime_subagent_session::content::qoder::assert_original_cases(&f.0);
     let home = f.0.join("qoder-captured");
     let parent_path = "qoder-captured/projects/opaque/parent-q.jsonl";
     let directory = "qoder-captured/projects/opaque/parent-q/subagents";
@@ -42,7 +43,7 @@ fn assert_qoder_agent_documents(f: &SourceFixture) {
     write_meta("call-q");
     let text = "完整独立代理材料".repeat(20000);
     let child = lines(&[
-        json!({"type":"assistant","agentId":"short-q","sessionId":"not-a-session-grant",
+        json!({"type":"assistant","agentId":"short-q","sessionId":"not-a-session-grant","isSidechain":true,
         "message":{"content":[{"type":"text","text":text}]}}),
     ]);
     f.write(&child_path, child.as_bytes());
@@ -91,8 +92,63 @@ fn assert_qoder_agent_documents(f: &SourceFixture) {
         read().unwrap().documents[2].snapshot_digest,
         agent.snapshot_digest
     );
+    let fallback = "2026-10-19T00:00:00Z".parse().unwrap();
+    let project = |documents: &mut NativeDocuments, stop: &AtomicBool| {
+        crate::runtime_subagent_session::content::qoder::read_agent(
+            documents,
+            fallback,
+            stop,
+            &std::collections::BTreeMap::new(),
+            &mut |_, _| None,
+        )
+    };
+    let projected = project(&mut documents, &stop).unwrap();
+    let actual: String = projected
+        .content
+        .turns
+        .iter()
+        .flat_map(|t| t.blocks.iter())
+        .filter_map(|b| {
+            if let crate::runtime_subagent_session::content::model::ContentBlock::Text { text } = b
+            {
+                Some(text.as_str())
+            } else {
+                None
+            }
+        })
+        .collect();
+    assert_eq!(
+        actual, text,
+        "the verified agent's own sidechain retains complete text"
+    );
+    assert_eq!(projected.agent_stats.agent_type.as_deref(), Some("Explore"));
+    assert_eq!(projected.agent_stats.status.as_deref(), Some("COMPLETED"));
+    assert_eq!(
+        projected.agent_stats.recovered_result.as_deref(),
+        Some("saved result")
+    );
+    assert_eq!(
+        projected.content.summary.as_ref().unwrap().started_at,
+        fallback
+    );
+    assert_eq!(
+        projected.content.snapshot_digest,
+        project(&mut read().unwrap(), &stop)
+            .unwrap()
+            .content
+            .snapshot_digest
+    );
+    assert!(
+        projected.content.verified_children.is_empty(),
+        "short agent ids never become Session grants"
+    );
+    assert!(project(&mut documents, &AtomicBool::new(true)).is_err());
     f.write(&task_a, task.replace("saved result", "edited value"));
     assert!(documents.documents[3].read_chunk(0).is_err());
+    assert!(
+        project(&mut documents, &stop).is_err(),
+        "changed metadata cannot publish a fresh full view"
+    );
     drop(documents);
     fs::remove_file(f.0.join(&task_a)).unwrap();
     fs::remove_file(f.0.join(&task_z)).unwrap();

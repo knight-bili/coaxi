@@ -1,0 +1,158 @@
+{
+  "source_commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+  "source_path": "src-tauri/src/parsers/qoder.rs",
+  "source_sha256": "696238da466f84924a5982d596fe47bf5ab4a6d724664722ed1970ee6b1e2844",
+  "ranges": [
+    "qoder.rs:197-352,358-397,616-943,1339-1384",
+    "parsers/mod.rs:1233-1255"
+  ],
+  "branch": "reuse prior unchanged original source/qoder/branch.rs",
+  "adaptations": [
+    "verified records and cancellation replace raw file reads",
+    "original native folder/Session fields stay internal, Core owns visible identity",
+    "child tasks and each-call spend supplied explicitly, no ambient directory traversal"
+  ],
+  "license": "Apache-2.0, integration/licenses/codeg/LICENSE",
+  "port": "crates/rovai-core/src/runtime_subagent_session/content/qoder.rs",
+  "scope": "complete original Session replay/metadata/cache usage/window/turns, explicit Core child/task facts and verified agent full view; no User target grant",
+  "source_audit": {
+    "ok": true,
+    "baseline": "6d5d962b60b95afe83ef80381d415bb9d1e934e3",
+    "source_commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+    "source_sha256": "696238da466f84924a5982d596fe47bf5ab4a6d724664722ed1970ee6b1e2844",
+    "same_function_bodies": [
+      "percent",
+      "window",
+      "qoder_turn_usage",
+      "extract_reported_context",
+      "message_count",
+      "is_content_record",
+      "is_sidechain",
+      "record_timestamp",
+      "is_non_conversational_assistant",
+      "is_transcript_furniture",
+      "raw_user_text",
+      "is_human_prompt",
+      "with_reported_context_percent"
+    ],
+    "same_function_count": 13,
+    "adapted_functions": [
+      "parse_transcript",
+      "subagent_call_usage"
+    ],
+    "original_assertions_preserved_with_declared_input_adapter": 43,
+    "source_fixture_helpers": 7,
+    "deferred_original_cases": {
+      "summary_reads_real_layout": "native list identity/folder authority stays with Core, not this record parser",
+      "missing_session_is_not_found": "production target/source lookup belongs to Core source authority",
+      "config_dir_env_overrides_user_home": "final launch capture separately tested against both publisher versions; do not revive original ambient resolver"
+    },
+    "original_fact_functions_unchanged": [
+      "facts_from_turns",
+      "clamp_i64",
+      "total_tokens"
+    ],
+    "fact_sources": [
+      {
+        "path": "src-tauri/src/commands/token_usage.rs",
+        "sha256": "db74b6d2bcfd2a581102f40f2dff5f9ad1af999e0df73a108562b9b69b855762"
+      },
+      {
+        "path": "src-tauri/src/db/service/token_usage_service.rs",
+        "sha256": "4de2f2a4082e2200d9785a3e0391c95a4a02eeea10d56dc869399be9164a70fb"
+      }
+    ],
+    "existing_private_source_gate_body_unchanged": true,
+    "protected_files_unchanged": [
+      "Cargo.lock",
+      "crates/rovai-core/Cargo.toml",
+      "crates/rovai-core/src/runtime_subagent_session.rs",
+      "crates/rovai-core/src/runtime_subagent_session/origin.rs",
+      "crates/rovai-core/src/runtime_subagent_session/source/qoder/branch.rs",
+      "crates/rovai-core/src/runtime_subagent_session/content/claude.rs",
+      "crates/rovai-core/src/runtime_subagent_session/content/claude_read.rs"
+    ],
+    "adaptations": [
+      "Record iterators/cancellation replace native file reads; original Session branch/sidechain behavior retained",
+      "Only the verified agent document is treated as the view subject; own sidechain and undated body survive; source byte snapshot unchanged",
+      "Native Session/folder identity stays Core-owned; fixture retains original request id only to preserve source assertions, not a User grant",
+      "Explicit Core-correlated children in original filename order supply task status/result and per-call spend, after parent occupancy",
+      "Current C/G target/parser and public gate unchanged; short agent ids do not become Sessions"
+    ],
+    "approved_r1_artifacts": [
+      {
+        "path": "work/integration/integration/proposals/native-delegation-r1.md",
+        "bytes": 44061,
+        "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+      },
+      {
+        "path": "work/integration/integration/proposals/native-delegation-r1-contract.json",
+        "bytes": 117977,
+        "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+      },
+      {
+        "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+        "bytes": 67619,
+        "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+      },
+      {
+        "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+        "bytes": 809962,
+        "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+      },
+      {
+        "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1-contract.json",
+        "bytes": 117977,
+        "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+      },
+      {
+        "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1.md",
+        "bytes": 44061,
+        "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+      }
+    ],
+    "preserved_dirty_agents_sha256": "6d5c55bc4069cd453a36a38d9b0f48c112f1c256982388a27629c12f962c9f4b",
+    "schema_changed": false,
+    "model_input_changed": false,
+    "dependencies_changed": false,
+    "launch_changed": false,
+    "new_rust_owner": false,
+    "public_gate_changed": false
+  },
+  "reference_only_sources": [
+    {
+      "path": "src-tauri/src/commands/token_usage.rs",
+      "sha256": "db74b6d2bcfd2a581102f40f2dff5f9ad1af999e0df73a108562b9b69b855762"
+    },
+    {
+      "path": "src-tauri/src/db/service/token_usage_service.rs",
+      "sha256": "4de2f2a4082e2200d9785a3e0391c95a4a02eeea10d56dc869399be9164a70fb"
+    }
+  ],
+  "reference_only_functions": [
+    "facts_from_turns",
+    "clamp_i64",
+    "total_tokens"
+  ],
+  "verification": {
+    "original_cases_executed": 43,
+    "original_source_helpers": 7,
+    "pure_original_function_bodies": 13,
+    "source_owner": {
+      "owner": "runtime_subagent_session::source::tests::lineage_sources_keep_exact_rollouts_and_lossless_stable_chunks",
+      "listed": 1,
+      "passed": true
+    },
+    "actual_verified_file_to_full_agent_content": true,
+    "own_sidechain_and_missing_time": true,
+    "actual_core_producer": false,
+    "actual_host_cli_model": false,
+    "actual_native_web_full_app": false
+  },
+  "remaining": [
+    "Claude/Qoder actual Core producer/evidence correlation and separate User targets/transport",
+    "Explicit import for old sources without captured provenance",
+    "Actual Host positive binding/file roundtrip, Runtime/platform/full Native/Web/App phase candidate",
+    "Original format corpus/differential checks and I04 other Runtime/recovery/memory/automation requirements"
+  ]
+}

@@ -23,6 +23,7 @@ use model::MessageTurn;
 mod codex;
 pub(super) mod claude;
 pub(super) mod claude_read;
+pub(super) mod qoder;
 mod grok_stats;
 mod project;
 

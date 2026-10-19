@@ -91,3 +91,5 @@ NFC使用锁内既有unicode-normalization 0.1.25，新增Core直接依赖边，
 I04 Qoder私有来源的原active-branch/压缩与并行工具恢复复用固定Codeg Apache-2.0；[源码范围与适配](../inventory/native-qoder-agent-source.json)保留原主体，沿用完整[Codeg许可](codeg/LICENSE)。独立Core文件关联是宿主适配，不复制或执行Qoder完整CLI。
 
 I04完整Claude解析和54原断言/19个原helper沿用固定Codeg Apache-2.0及[完整许可](codeg/LICENSE)；[源码闭包/函数审计与宿主适配](../inventory/native-claude-content-port.json)区分原内容规则、受控输入和独立summary。原goal、compaction/common规则复用既有移植模块，不增加依赖或复制原CLI。
+
+I04完整Qoder解析和43原case/7个helper继续沿固定Codeg [Apache-2.0完整许可](codeg/LICENSE)；[清单](../inventory/native-qoder-content-port.json)记录原函数范围、现有Claude/branch复用与宿主适配。测试依赖的3个原用量事实函数/UsageFact结构来自commands/token_usage.rs与db/service/token_usage_service.rs，仅在参考测试中执行，不代表生产用量看板已移植，不复制或执行完整CLI。

@@ -1,5 +1,7 @@
 # I04 执行队列
 
+2026-10-19 Qoder完整内容接续：原13函数/43case和3个用量事实函数核对，原source文件owner通过；完整代理正文、自己的旁链、原状态/恢复结果、缓存窗口/花费、快照/改写/取消已接，见[本批结果](i04-native-qoder-content-result.json)。普通Session旁链过滤保留，只有已核实代理文件被当作本次主体。Claude/Qoder parser/home/私有文件层退出编码清单，继续生产Core证据/独立User目标/运输、原UI真实接续、显式旧源导入与语料差分；实际Host正向绑定/CLI/App/平台与I04其他原包集中候选。原43case不代表Core producer或全部原程序资格，正式84新增0。
+
 2026-10-19 Claude完整内容接续：原helper/RecordAccumulator/分组、独立summary、后台/goal/压缩/图片及用量规则已移植并接Core核验文件；66原函数主体核对、54原断言和原source文件owner通过，同时补上轮Qoder文件关系执行，见[本批结果](i04-native-claude-content-result.json)。首次失败为原测试依赖遗漏，后补独立summary/完整helper；第二次发现六处Rust2024绑定语法，修正后通过，断言未放宽。继续完整Qoder正文/usage/lifecycle、两类Core生产证据/独立User读取目标和旧源导入；真实Host/Native/Web/App/Runtime与I04其他原包仍需阶段候选。正式84新增0，不新增客户技术验收。
 
 2026-10-19 Qoder父链接续：独立meta/toolUseId、task/parentToolUseId、原active-branch/压缩父链/并行结果与私有受控文件已编码审查，见[本批记录](i04-qoder-agent-source-result.json)。Rust尚未编译执行，挂原source owner随完整Claude/Qoder正文解析集齐后一次相关批次验证；原回放算法保持，文件授权额外拒绝不明分支。Core证据/producer、完整parser、实际Host/CLI/两端App与旧源导入继续，不启用公开读取，不替代Claude完整实现。
