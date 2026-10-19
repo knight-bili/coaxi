@@ -37,6 +37,42 @@ fn assert_legacy_claude_agent_documents(f: &SourceFixture) {
     let stop = AtomicBool::new(false);
     let read = || open_agent(&home, &link, &stop);
     let mut documents = read().unwrap();
+    let digest = crate::command::canonical_json_digest(&json!({"prompt":"do work"})).unwrap();
+    let observed = super::legacy::open_observed(
+        crate::agent_profile::AdapterKind::ClaudeCodeCli,
+        &home,
+        "legacy-parent",
+        "toolu_1",
+        &digest,
+        &stop,
+    )
+    .unwrap()
+    .unwrap();
+    assert_eq!(observed.agent_id, "abc123");
+    assert_eq!(observed.documents.documents.len(), 2);
+    assert!(
+        super::legacy::open_observed(
+            crate::agent_profile::AdapterKind::ClaudeCodeCli,
+            &home,
+            "legacy-parent",
+            "toolu_1",
+            &"0".repeat(64),
+            &stop
+        )
+        .is_err()
+    );
+    assert!(
+        super::legacy::open_observed(
+            crate::agent_profile::AdapterKind::ClaudeCodeCli,
+            &home,
+            "legacy-parent",
+            "other-tool",
+            &digest,
+            &stop
+        )
+        .unwrap()
+        .is_none()
+    );
     crate::runtime_subagent_session::content::claude::assert_original_cases();
     assert_eq!(documents.documents.len(), 2);
     assert_eq!(documents.documents[0].kind, DocumentKind::ClaudeParent);

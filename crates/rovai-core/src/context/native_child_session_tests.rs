@@ -584,4 +584,196 @@ fn assert_native_source_origin(f: &mut Fixture) {
             .runtime_payload
             .contains("NEVER_SAVE_OR_SEND_ORIGIN_SECRET")
     );
+    assert_legacy_agent_core_reference(f);
+}
+
+// Same DB/Blob/root owner. Adapter rows and provenance below are explicit
+// fixture metadata, not a real Claude/Qoder Host/binding/provider claim.
+fn assert_legacy_agent_core_reference(f: &mut Fixture) {
+    use crate::agent_profile::AdapterKind;
+    use crate::runtime_subagent_session::{
+        ORIGIN_EVENT,
+        legacy::{NativeAgentReference, NativeAgentService},
+    };
+    use std::sync::atomic::AtomicBool;
+    let template:String=f.database.connection().query_row(
+        "SELECT payload_json FROM event_log WHERE event_type=?1 AND json_extract(payload_json,'$.agentRunId')=?2 ORDER BY rowid LIMIT 1",
+        params![ORIGIN_EVENT,f.run_id],|r|r.get(0)).unwrap();
+    let template: serde_json::Value = serde_json::from_str(&template).unwrap();
+    let parent = template["parentNativeSessionId"].as_str().unwrap();
+    let input = json!({"prompt":"Core observed private native task"});
+    let digest = crate::command::canonical_json_digest(&input).unwrap();
+    let user = ActorRef::User {
+        user_id: crate::current_user::CURRENT_USER_ID.into(),
+    };
+    let stop = AtomicBool::new(false);
+    for kind in [AdapterKind::ClaudeCodeCli, AdapterKind::QoderCli] {
+        let home = f
+            .directory
+            .join(format!("legacy-evidence-{}", kind.as_str()));
+        let project = home.join("projects").join("opaque");
+        std::fs::create_dir_all(&project).unwrap();
+        let sub = project.join(parent).join("subagents");
+        std::fs::create_dir_all(&sub).unwrap();
+        let records = [
+            json!({"type":"assistant","uuid":"call-record","sessionId":parent,
+            "message":{"content":[{"type":"tool_use","id":"core-native-tool","name":"Agent","input":input}]}}),
+            json!({"type":"user","uuid":"result-record","parentUuid":"call-record","sessionId":parent,
+                "toolUseResult":{"agentId":"native-agent-only"},"message":{"content":[{"type":"tool_result","tool_use_id":"core-native-tool","content":"started"}]}}),
+        ];
+        std::fs::write(
+            project.join(format!("{parent}.jsonl")),
+            records
+                .iter()
+                .map(serde_json::Value::to_string)
+                .collect::<Vec<_>>()
+                .join("\n")
+                + "\n",
+        )
+        .unwrap();
+        std::fs::write(sub.join("agent-native-agent-only.jsonl"),json!({"type":"assistant","agentId":"native-agent-only","message":{"content":[{"type":"text","text":"PRIVATE_AGENT_BODY"}]}}).to_string()+"\n").unwrap();
+        std::fs::write(
+            sub.join("agent-native-agent-only.meta.json"),
+            json!({"toolUseId":"core-native-tool","agentType":"Explore"}).to_string(),
+        )
+        .unwrap();
+        f.database
+            .connection()
+            .execute_batch("SAVEPOINT legacy_agent_core_fixture")
+            .unwrap();
+        f.database
+            .connection()
+            .execute(
+                "UPDATE agent_run SET runtime_adapter_kind=?1 WHERE id=?2",
+                params![kind.as_str(), f.run_id],
+            )
+            .unwrap();
+        let evidence = Uuid::new_v4().to_string();
+        let payload = json!({"toolCallId":"core-native-tool","rawInputDigest":digest,"status":"in_progress","kind":"other"});
+        f.database.connection().execute(
+            "INSERT INTO agent_run_execution_evidence(id,agent_run_id,execution_epoch,sequence,event_type,kind,phase,payload_preview_json,content_byte_count,is_truncated,occurred_at,revision,change_sequence,updated_at)
+             VALUES(?1,?2,?3,100009,'runtime.action','command','started',?4,?5,0,'2026-10-19T00:00:00Z',1,100009,'2026-10-19T00:00:00Z')",
+            params![evidence,f.run_id,f.execution_epoch,payload.to_string(),payload.to_string().len() as i64]).unwrap();
+        let mut origin = template.clone();
+        origin["adapterKind"] = json!(kind.as_str());
+        origin["homePath"] = json!(home.to_str().unwrap());
+        f.database.connection().execute(
+            "INSERT INTO event_log(event_id,event_type,payload_json,camp_id,entity_type,entity_id,actor_type,actor_id,source_agent_run_id,execution_epoch,created_at)
+             SELECT ?1,event_type,?2,camp_id,entity_type,entity_id,actor_type,?3,source_agent_run_id,execution_epoch,created_at FROM event_log
+             WHERE event_type=?4 AND json_extract(payload_json,'$.agentRunId')=?5 ORDER BY rowid LIMIT 1",
+            params![Uuid::new_v4().to_string(),origin.to_string(),format!("runtime-adapter:{}",kind.as_str()),ORIGIN_EVENT,f.run_id]).unwrap();
+        let reference = NativeAgentReference {
+            thread_id: f.camp_id.clone(),
+            agent_run_id: f.run_id.clone(),
+            evidence_id: evidence.clone(),
+        };
+        let prepare = |actor: &ActorRef, reference: &NativeAgentReference| {
+            NativeAgentService::prepare(
+                &f.database,
+                &ManagedBlobStore::new(&f.directory),
+                actor,
+                reference,
+            )
+        };
+        let changes = f.database.connection().total_changes();
+        let plan = prepare(&user, &reference).unwrap();
+        assert!(!format!("{plan:?}").contains("legacy-evidence"));
+        let (target, documents) = plan.open(&stop).unwrap();
+        assert_eq!(target.agent_id, "native-agent-only");
+        assert_eq!(target.parent_tool_use_id, "core-native-tool");
+        assert_eq!(target.adapter_kind, kind);
+        assert!(documents.documents.len() >= 2);
+        assert!(!format!("{target:?}").contains("PRIVATE_AGENT_BODY"));
+        NativeAgentService::revalidate(
+            &f.database,
+            &ManagedBlobStore::new(&f.directory),
+            &user,
+            &target,
+        )
+        .unwrap();
+        assert!(plan.open(&AtomicBool::new(true)).is_err());
+        for actor in [
+            ActorRef::System {
+                component_id: "ui".into(),
+            },
+            ActorRef::Agent {
+                agent_id: "agent_1".into(),
+                source_agent_run_id: f.run_id.clone(),
+            },
+            ActorRef::User {
+                user_id: "other".into(),
+            },
+        ] {
+            assert!(prepare(&actor, &reference).is_err());
+        }
+        for input in [
+            NativeAgentReference {
+                thread_id: "other".into(),
+                ..reference.clone()
+            },
+            NativeAgentReference {
+                agent_run_id: "other".into(),
+                ..reference.clone()
+            },
+            NativeAgentReference {
+                evidence_id: "other".into(),
+                ..reference.clone()
+            },
+        ] {
+            assert!(prepare(&user, &input).is_err());
+        }
+        for key in [
+            "agentId",
+            "nativeSessionId",
+            "path",
+            "home",
+            "adapterKind",
+            "toolCallId",
+            "inputDigest",
+        ] {
+            let mut value =
+                json!({"threadId":f.camp_id,"agentRunId":f.run_id,"evidenceId":evidence});
+            value[key] = json!("override");
+            assert!(serde_json::from_value::<NativeAgentReference>(value).is_err());
+        }
+        assert_eq!(
+            f.database.connection().total_changes(),
+            changes,
+            "prepare/open/revalidation are read only"
+        );
+        f.database
+            .connection()
+            .execute(
+                "UPDATE agent_run SET execution_epoch=execution_epoch+1 WHERE id=?1",
+                [&f.run_id],
+            )
+            .unwrap();
+        let historical = prepare(&user, &reference).unwrap().open(&stop).unwrap().0;
+        assert_eq!(historical.agent_id, target.agent_id);
+        assert!(!historical.live);
+        NativeAgentService::revalidate(
+            &f.database,
+            &ManagedBlobStore::new(&f.directory),
+            &user,
+            &target,
+        )
+        .unwrap();
+        f.database.connection().execute("UPDATE agent_run_execution_evidence SET payload_preview_json=json_set(payload_preview_json,'$.rawInputDigest',?1) WHERE id=?2",params!["0".repeat(64),evidence]).unwrap();
+        assert!(prepare(&user, &reference).unwrap().open(&stop).is_err());
+        assert!(
+            NativeAgentService::revalidate(
+                &f.database,
+                &ManagedBlobStore::new(&f.directory),
+                &user,
+                &target
+            )
+            .is_err()
+        );
+        f.database
+            .connection()
+            .execute_batch(
+                "ROLLBACK TO legacy_agent_core_fixture; RELEASE legacy_agent_core_fixture",
+            )
+            .unwrap();
+    }
 }

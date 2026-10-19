@@ -7,6 +7,7 @@ use serde::Deserialize;
 use serde_json::Value;
 
 pub(crate) mod content;
+pub mod legacy;
 mod origin;
 pub(crate) mod reader;
 pub(crate) mod snapshot;

@@ -61,6 +61,42 @@ fn assert_qoder_agent_documents(f: &SourceFixture) {
         json!({"parentToolUseId":"unrelated","result":"foreign"}).to_string(),
     );
     let mut documents = read().unwrap();
+    let digest = crate::command::canonical_json_digest(&json!({"prompt":"work"})).unwrap();
+    let observed = super::legacy::open_observed(
+        crate::agent_profile::AdapterKind::QoderCli,
+        &home,
+        "parent-q",
+        "call-q",
+        &digest,
+        &stop,
+    )
+    .unwrap()
+    .unwrap();
+    assert_eq!(observed.agent_id, "short-q");
+    assert_eq!(observed.documents.documents.len(), 4);
+    assert!(
+        super::legacy::open_observed(
+            crate::agent_profile::AdapterKind::QoderCli,
+            &home,
+            "parent-q",
+            "call-q",
+            &"0".repeat(64),
+            &stop
+        )
+        .is_err()
+    );
+    assert!(
+        super::legacy::open_observed(
+            crate::agent_profile::AdapterKind::QoderCli,
+            &home,
+            "parent-q",
+            "other-tool",
+            &digest,
+            &stop
+        )
+        .unwrap()
+        .is_none()
+    );
     assert_eq!(
         documents
             .documents

@@ -32,15 +32,18 @@
     "Raw verified bytes retain complete UTF8 and reject changed chunks; existing JsonRecords reused within module boundary",
     "Optional cancellation during directory enumeration/hash/record decoding; existing non-cancellable caller semantics unchanged"
   ],
-  "implementation_status": "claude_qoder_full_content_private_lineage_local_verified_core_producer_and_public_reader_pending",
+  "implementation_status": "core_preparation_and_native_file_join_local_verified_reader_transport_and_candidate_pending",
   "remaining": [
-    "Claude/Qoder完整parser与受控文件桥已本地验证；Core证据/producer及独立User读取目标继续",
-    "签名运输/固定原UI与实际Claude/Qoder Host持久绑定/文件roundtrip、Runtime/平台候选",
-    "旧无记录来源显式导入；不查当前home猜补"
+    "独立Agent读取目标接现有后台reader、签名快照/分页/每页重新授权和Native/Web运输；不借Session句柄",
+    "原Codeg查看器按原Agent分类接生产目标，真实Core/Native/Web/完整App及实际C/Q Host绑定/文件roundtrip集中候选",
+    "真实版本的ACP tool/native Session身份与输入摘要映射、运行中及恢复/旁链格式语料和原parser差分；不把SQL元数据夹具当生产者资格",
+    "旧无记录来源明确导入；禁止当前home猜补或静默扫描全部历史",
+    "I04其余Runtime并集、r1接管/恢复、记忆和自动化；I07浏览器/I08增强资产和全81簇48包324保持"
   ],
   "evidence": "integration/execution/i04-legacy-agent-source-result.json",
   "launch_origin_evidence": "integration/execution/i04-native-launch-origin-result.json",
   "qoder_source_evidence": "integration/execution/i04-qoder-agent-source-result.json",
   "claude_content_evidence": "integration/execution/i04-native-claude-content-result.json",
-  "qoder_content_evidence": "integration/execution/i04-native-qoder-content-result.json"
+  "qoder_content_evidence": "integration/execution/i04-native-qoder-content-result.json",
+  "authority_evidence": "integration/execution/i04-legacy-agent-authority-result.json"
 }

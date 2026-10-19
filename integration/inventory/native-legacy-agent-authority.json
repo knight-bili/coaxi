@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "classification": "Legacy native Agent document; never a Session",
+  "owner": "rovai-core",
+  "input": {
+    "type": "NativeAgentReference",
+    "fields": [
+      "threadId",
+      "agentRunId",
+      "evidenceId"
+    ],
+    "actor": "CURRENT_USER only",
+    "unknown_fields": "reject"
+  },
+  "core_prepare": "crates/rovai-core/src/runtime_subagent_session/legacy.rs::NativeAgentService::prepare",
+  "worker_open": "crates/rovai-core/src/runtime_subagent_session/legacy.rs::NativeAgentReadPlan::open",
+  "file_join": "crates/rovai-core/src/runtime_subagent_session/source/legacy.rs::open_observed",
+  "provenance_lookup": "crates/rovai-core/src/runtime_subagent_session/origin.rs::for_run",
+  "source_rules": [
+    "Evidence/Run/Thread/Conversation/Context/Bootstrap exact join; only runtime.action native observations",
+    "Captured historical source per original epoch; no current settings, environment or UI native identity",
+    "Original toolCallId + canonical rawInputDigest must equal native Agent/Task call",
+    "Claude structured acknowledgement; Qoder sorted matching metadata with transcript; existing source gates retained",
+    "Final opened parent snapshot checked again; conflicts, malformed proof, changed digest and cancellation reject",
+    "Opaque target/read plan not serializable; Core revalidation before publication and each future page required",
+    "Run epoch/status or current binding changes close live eligibility but retain valid historical read authority",
+    "Observing Run id is not evidence of a separate originating Run"
+  ],
+  "actual_producer_source_review": {
+    "acp.rs": "original toolCallId and rawInput canonical digest from observed provider updates",
+    "application.rs": "active Run/epoch + native session/prompt/delivery fence then runtime.action normalization",
+    "execution_evidence.rs": "closed public native toolCallId/rawInputDigest projection; Core builtins excluded",
+    "changed": false,
+    "real_provider_mapping_qualified": false
+  },
+  "qualification": {
+    "rust": {
+      "ok": true,
+      "features": "slow-tests",
+      "owners": [
+        {
+          "owner": "runtime_subagent_session::source::tests::lineage_sources_keep_exact_rollouts_and_lossless_stable_chunks",
+          "listed": 1,
+          "passed": true
+        },
+        {
+          "owner": "context::slow_tests::delivery_unknown_never_consumes_a_redelivery_requirement",
+          "listed": 1,
+          "passed": true
+        }
+      ]
+    },
+    "fixtures": "same existing Context DB/Blob/root; explicit SQL adapter/origin/evidence metadata, real filesystem",
+    "user_scope_and_unknown_fields": true,
+    "zero_database_writes": true,
+    "history_and_revalidation": true,
+    "native_tool_input_digest_and_cancel": true,
+    "actual_host_or_runtime": false,
+    "rpc_signed_snapshot_ui": false,
+    "new_formal_cases_passed": 0
+  },
+  "implementation_status": "core_preparation_and_native_file_join_local_verified_reader_transport_and_candidate_pending",
+  "evidence": "integration/execution/i04-legacy-agent-authority-result.json",
+  "remaining": [
+    "独立Agent读取目标接现有后台reader、签名快照/分页/每页重新授权和Native/Web运输；不借Session句柄",
+    "原Codeg查看器按原Agent分类接生产目标，真实Core/Native/Web/完整App及实际C/Q Host绑定/文件roundtrip集中候选",
+    "真实版本的ACP tool/native Session身份与输入摘要映射、运行中及恢复/旁链格式语料和原parser差分；不把SQL元数据夹具当生产者资格",
+    "旧无记录来源明确导入；禁止当前home猜补或静默扫描全部历史",
+    "I04其余Runtime并集、r1接管/恢复、记忆和自动化；I07浏览器/I08增强资产和全81簇48包324保持"
+  ]
+}

@@ -17,6 +17,7 @@ use sha2::{Digest, Sha256};
 use super::{ObservedNativeSessionTarget, identity};
 
 pub(super) mod claude;
+pub(super) mod legacy;
 pub(super) mod qoder;
 
 pub(crate) const CHUNK_BYTES: usize = 64 * 1024;

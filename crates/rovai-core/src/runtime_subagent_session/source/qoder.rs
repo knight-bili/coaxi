@@ -166,7 +166,7 @@ pub(in crate::runtime_subagent_session) fn open_agent(
     })
 }
 
-fn verified_branch(records: &[Value], stop: &AtomicBool) -> Result<Vec<usize>> {
+pub(super) fn verified_branch(records: &[Value], stop: &AtomicBool) -> Result<Vec<usize>> {
     let mut by_uuid = HashMap::new();
     let mut has_links = false;
     for (index, record) in records.iter().enumerate() {

@@ -338,3 +338,45 @@ pub(crate) fn lookup(
     }
     Ok(origin)
 }
+
+/// Evidence carries the provider tool id, not an assumed native Session id.
+/// Enumerate only this exact Run/epoch's System-captured sources, then reuse
+/// the existing full origin validation; no current settings or latest-wins.
+pub(super) fn for_run(
+    database: &Database,
+    thread: &str,
+    conversation: &str,
+    run: &str,
+    epoch: i64,
+    adapter: &str,
+) -> Result<Vec<OriginRecord>> {
+    let mut query = database.connection().prepare(
+        "SELECT DISTINCT json_extract(payload_json,'$.parentNativeSessionId')
+         FROM event_log WHERE event_type=?1 AND camp_id=?2 AND entity_type='conversation'
+         AND entity_id=?3 AND actor_type='system' AND actor_id=?4 AND execution_epoch=?5
+         AND json_extract(payload_json,'$.agentRunId')=?6 ORDER BY 1 LIMIT 65",
+    )?;
+    let parents = query
+        .query_map(
+            params![
+                ORIGIN_EVENT,
+                thread,
+                conversation,
+                format!("runtime-adapter:{adapter}"),
+                epoch,
+                run
+            ],
+            |row| row.get::<_, String>(0),
+        )?
+        .collect::<rusqlite::Result<Vec<_>>>()?;
+    ensure!(parents.len() <= 64, "native_child.ambiguous_origin");
+    let mut records = Vec::new();
+    for parent in parents {
+        ensure!(super::identity(&parent), "native_child.invalid_origin");
+        if let Some(record) = lookup(database, thread, conversation, run, epoch, adapter, &parent)?
+        {
+            records.push(record);
+        }
+    }
+    Ok(records)
+}

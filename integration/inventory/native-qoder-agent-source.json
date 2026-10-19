@@ -30,9 +30,12 @@
   },
   "verification": "private_lineage_and_full_qoder_content_local_verified_core_producer_pending",
   "remaining": [
-    "Claude/Qoder Core证据/producer与独立User目标运输、原UI真实接续",
-    "旧无记录来源显式导入；不猜当前目录",
-    "实际Host正向持久绑定/文件roundtrip、CLI/模型/完整App及平台集中候选"
+    "独立Agent读取目标接现有后台reader、签名快照/分页/每页重新授权和Native/Web运输；不借Session句柄",
+    "原Codeg查看器按原Agent分类接生产目标，真实Core/Native/Web/完整App及实际C/Q Host绑定/文件roundtrip集中候选",
+    "真实版本的ACP tool/native Session身份与输入摘要映射、运行中及恢复/旁链格式语料和原parser差分；不把SQL元数据夹具当生产者资格",
+    "旧无记录来源明确导入；禁止当前home猜补或静默扫描全部历史",
+    "I04其余Runtime并集、r1接管/恢复、记忆和自动化；I07浏览器/I08增强资产和全81簇48包324保持"
   ],
-  "verification_evidence": "integration/execution/i04-native-qoder-content-result.json"
+  "verification_evidence": "integration/execution/i04-native-qoder-content-result.json",
+  "authority_evidence": "integration/execution/i04-legacy-agent-authority-result.json"
 }

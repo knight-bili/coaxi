@@ -1,5 +1,7 @@
 # I04 执行队列
 
+2026-10-19 旧代理Core关联接续：独立User三字段引用按原Run/epoch/Context/捕获来源准备，文件层再核原Agent/Task工具编号+canonical输入摘要及Claude ack/Qoder meta；历史可读、实时资格关闭、错身份/越域/未知覆盖、取消和零写在两个原owner通过，见[本批结果](i04-legacy-agent-authority-result.json)。既有ACP→Application→Evidence字段经源码核查，实际C/Q ID/Session映射未实测，SQL适配器/来源夹具不能代替真实Host资格。独立后台reader/签名快照/每页再授权/运输与原UI是下一编码队列；原parser/home/私有父链和本准备层不重复编码，旧源导入及其他I04包保持。全81簇48包324/I04四包21簇84，正式新增0。
+
 2026-10-19 Qoder完整内容接续：原13函数/43case和3个用量事实函数核对，原source文件owner通过；完整代理正文、自己的旁链、原状态/恢复结果、缓存窗口/花费、快照/改写/取消已接，见[本批结果](i04-native-qoder-content-result.json)。普通Session旁链过滤保留，只有已核实代理文件被当作本次主体。Claude/Qoder parser/home/私有文件层退出编码清单，继续生产Core证据/独立User目标/运输、原UI真实接续、显式旧源导入与语料差分；实际Host正向绑定/CLI/App/平台与I04其他原包集中候选。原43case不代表Core producer或全部原程序资格，正式84新增0。
 
 2026-10-19 Claude完整内容接续：原helper/RecordAccumulator/分组、独立summary、后台/goal/压缩/图片及用量规则已移植并接Core核验文件；66原函数主体核对、54原断言和原source文件owner通过，同时补上轮Qoder文件关系执行，见[本批结果](i04-native-claude-content-result.json)。首次失败为原测试依赖遗漏，后补独立summary/完整helper；第二次发现六处Rust2024绑定语法，修正后通过，断言未放宽。继续完整Qoder正文/usage/lifecycle、两类Core生产证据/独立User读取目标和旧源导入；真实Host/Native/Web/App/Runtime与I04其他原包仍需阶段候选。正式84新增0，不新增客户技术验收。
