@@ -17,6 +17,7 @@ use sha2::{Digest, Sha256};
 use super::{ObservedNativeSessionTarget, identity};
 
 pub(super) mod claude;
+pub(super) mod qoder;
 
 pub(crate) const CHUNK_BYTES: usize = 64 * 1024;
 const HEADER_BYTES: u64 = 1024 * 1024;
@@ -34,6 +35,10 @@ pub(crate) enum DocumentKind {
     ProjectPatch,
     ClaudeParent,
     ClaudeAgent,
+    QoderParent,
+    QoderAgent,
+    QoderAgentMetadata,
+    QoderTask,
 }
 
 /// A Codex link names an exact rollout, not whichever newer file has that thread.

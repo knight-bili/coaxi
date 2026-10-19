@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-19T05:32:53.529492+00:00",
+  "stage": "I04",
+  "task": "I04-T01/T02",
+  "branch": "develop/V1.0.0",
+  "baseline_commit": "20deea18a4f6f5269fa9d48b7bc7f96c2411744a",
+  "status": "private_qoder_lineage_code_reviewed_rust_execution_full_parser_and_core_producer_pending",
+  "stage_complete": false,
+  "scope_preserved": {
+    "source_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_packages": 4,
+    "i04_clusters": 21,
+    "i04_formal_cases": 84,
+    "new_formal_cases_passed": 0
+  },
+  "source_inventory": "integration/inventory/native-qoder-agent-source.json",
+  "source_audit": {
+    "ok": true,
+    "baseline": "20deea18a4f6f5269fa9d48b7bc7f96c2411744a",
+    "source_commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+    "original_branch_body_unchanged_after_rustfmt": true,
+    "adaptations": [
+      "private module imports and active_branch visibility",
+      "strict file-relationship wrapper rejects unresolved/cyclic/conflicting graph instead of original display fallback",
+      "captured root, verified immutable byte chunks and cancellation; no ambient filesystem selection",
+      "scoped exact Qoder meta.toolUseId, parent Agent/Task call/result, optional first-name task.parentToolUseId; no Claude ack fallback"
+    ],
+    "unchanged_existing_parser_origin_dependencies": true,
+    "new_rust_owner": false,
+    "new_database_process": false,
+    "model_input_changed": false,
+    "public_gate_changed": false
+  },
+  "verification": {
+    "rust_compiled": false,
+    "rust_executed": false,
+    "new_tests_status": "added_to_existing_source_owner_not_executed",
+    "scheduled_batch": "full Claude/Qoder parser/source batch",
+    "rustfmt": true,
+    "docs": {
+      "tests": 10,
+      "version": true,
+      "decisions_with_base": true
+    },
+    "codegraph": true,
+    "actual_core_producer": false,
+    "actual_host_cli_runtime": false,
+    "actual_native_web_full_app": false,
+    "model_input_changed": false,
+    "schema_changed": false,
+    "launch_changed": false,
+    "dependencies_changed": false,
+    "public_gate_changed": false,
+    "new_test_owner": false,
+    "diff_check": true
+  },
+  "remaining": [
+    "Actual Rust source owner execution with full Claude/Qoder parser batch",
+    "Core evidence correlation and Qoder producer qualification",
+    "Full Qoder/Claude transcript/timeline/usage/lifecycle parser; API and original UI still pending",
+    "Actual Host/CLI/full App/platform candidate and explicit old unrecorded source import"
+  ],
+  "approved_r1_artifacts": [
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    },
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    }
+  ],
+  "preserved_dirty_agents_sha256": "6d5c55bc4069cd453a36a38d9b0f48c112f1c256982388a27629c12f962c9f4b",
+  "source_files": [
+    {
+      "path": "crates/rovai-core/src/runtime_subagent_session/source.rs",
+      "sha256": "6a85260f1bec84c4ad7c746e3f96024f6b9022ff08928cae3c41b4d20f960f43",
+      "git_blob": "315bcd7262d773cf0cb782aeaadbfb001e195ead"
+    },
+    {
+      "path": "crates/rovai-core/src/runtime_subagent_session/source/qoder.rs",
+      "sha256": "e7e75fcf7ffc05665aae955ac279b60dc5da6f19eaa09c6c2586c3cbc19cf4e2",
+      "git_blob": "1cc6403d16f450186015c2959a113972446eae74"
+    },
+    {
+      "path": "crates/rovai-core/src/runtime_subagent_session/source/qoder/branch.rs",
+      "sha256": "b0b5e4ab127c8b7c674e289fc3a6049ad16325e692bcca168e4727e84ce765e9",
+      "git_blob": "175e58c28b26cd5ee9bac4383fc9a2a9d0b4fc87"
+    },
+    {
+      "path": "crates/rovai-core/src/runtime_subagent_session/source/qoder_tests.rs",
+      "sha256": "674c9c83b0e20cd3f63c3a1f02581a475560093739370c3e25040abb1f940ceb",
+      "git_blob": "d8519784bf626e4e949c5d3b7f3d87b4434a3b2d"
+    },
+    {
+      "path": "crates/rovai-core/src/runtime_subagent_session/source/tests.rs",
+      "sha256": "7afcaa5ec498363843f8c5d853496c1069b404d2e253401030ee459a17f06057",
+      "git_blob": "62cc4035daed50126e60059c6fa81320ab60cc3d"
+    },
+    {
+      "path": "docs/development/testing.md",
+      "sha256": "ecbc2764318a8a42057e70d3ca8aa24200585aa583f3680fc8e8deee41026320",
+      "git_blob": "4fdd6d0e0ef6f77fb80a3a9418c7bf8bc586b584"
+    },
+    {
+      "path": "integration/execution/development-todos.json",
+      "sha256": "50828436f04acfe412be831a70e2b94bfd6d7a72c296bdd189df5df94b8d88bc",
+      "git_blob": "f8ccee323c2946f3ff2a0244dbedffe35fef1cc2"
+    },
+    {
+      "path": "integration/execution/goal-state.json",
+      "sha256": "652b7115c07e655cdc935fe285921bb3a5eb25faab9aa4f8505e0da113b1aee0",
+      "git_blob": "52c6175ed7df137043a202834e1a884770fce3c5"
+    },
+    {
+      "path": "integration/execution/i04-execution-plan.md",
+      "sha256": "b522243e2b210cb73a34eb67953fd2926c81ef8ddc1f2a4f6194c85e06e9cb50",
+      "git_blob": "c7aaa292f279a8adfbbb2306a2b2f7615a47339d"
+    },
+    {
+      "path": "integration/inventory/native-legacy-agent-source.json",
+      "sha256": "efbfe9ad99444354b560a8986da956cf389e644e35d830f57711b9db2d889601",
+      "git_blob": "b8aa9235885d9031a591a867a6cea2435b0f72f2"
+    },
+    {
+      "path": "integration/inventory/native-qoder-agent-source.json",
+      "sha256": "bc6290382c57e1d0b6fb1b88813a46cb05d627baa651ca041ff41088266e8050",
+      "git_blob": "65f1f318c2e5637eb4c96d7da32f14c80651a924"
+    },
+    {
+      "path": "integration/inventory/native-subagent-viewer-reference.md",
+      "sha256": "3d0e6d3dd7a829a704716fc23c5250aa089bd04002985cac904c3bf43dbef82b",
+      "git_blob": "7747481af76eafc8ef567bb68d9d0ea0fd0c0ce3"
+    },
+    {
+      "path": "integration/licenses/README.md",
+      "sha256": "3809b338b397cf3bdd32ca480d94cb99a255281635e0e5e768a8794ce384d778",
+      "git_blob": "a2280412fdfd34c7eef7a42d0dd65673319dc9db"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "file/I04Qoder独立父链/complete.py",
+      "sha256": "5257b5ef758577f85d68a74fba428f7abec7c0e3b1e45a86da8dcefe22fc5e5e"
+    },
+    {
+      "path": "file/I04Qoder独立父链/logs/branch-source.json",
+      "sha256": "93670327a4e1cdbf7a422c8e9f1e5641bee895cf42afefc87e1ca469e2446c53"
+    },
+    {
+      "path": "file/I04Qoder独立父链/logs/codegraph-sync.txt",
+      "sha256": "4b5e6457c82b34383f70240f2de6ba2c4356069cd254d5755442097468fb99ef"
+    },
+    {
+      "path": "file/I04Qoder独立父链/logs/docs-decisions.txt",
+      "sha256": "7b2e6605b046c14aba1576e5ec3598134caa2fd954bb0a4c4860152dd05187cf"
+    },
+    {
+      "path": "file/I04Qoder独立父链/logs/docs-tests.txt",
+      "sha256": "3f9e0f4b7c2d01435926ecd69fc8564e794f70b08972761eb66d6cfdcf257bb9"
+    },
+    {
+      "path": "file/I04Qoder独立父链/logs/docs-version.txt",
+      "sha256": "ef767267475d9fde95f908acafe24215239740f3a2af5ddc98f4ef0cd5cd2528"
+    },
+    {
+      "path": "file/I04Qoder独立父链/logs/source-audit.json",
+      "sha256": "11e6f435824d6ee281f54174af78c68b5d4825016c467a6af272a3ecb8a8d6ff"
+    },
+    {
+      "path": "file/I04Qoder独立父链/port-branch.py",
+      "sha256": "9e0e62229c6072d544bb1898df26ebb5b1cbc1534445fecee99855a383c5ee23"
+    },
+    {
+      "path": "file/I04Qoder独立父链/update-records.py",
+      "sha256": "5245b42c07575fdb19456621d4cb6d4e681e8f597e3c922c9e6e7269119fdd0c"
+    },
+    {
+      "path": "file/I04Qoder独立父链/verify-docs.mjs",
+      "sha256": "e62bfd35b2e94b26d2c03b75b935226c54851df86e44f8fa7a596bcb21bdf23c"
+    }
+  ],
+  "push": false,
+  "actions_triggered": false,
+  "main_merged": false,
+  "paid_models": false,
+  "customer_action_required": false,
+  "goal_service": "active"
+}

@@ -1,5 +1,7 @@
 # I04 执行队列
 
+2026-10-19 Qoder父链接续：独立meta/toolUseId、task/parentToolUseId、原active-branch/压缩父链/并行结果与私有受控文件已编码审查，见[本批记录](i04-qoder-agent-source-result.json)。Rust尚未编译执行，挂原source owner随完整Claude/Qoder正文解析集齐后一次相关批次验证；原回放算法保持，文件授权额外拒绝不明分支。Core证据/producer、完整parser、实际Host/CLI/两端App与旧源导入继续，不启用公开读取，不替代Claude完整实现。
+
 2026-10-19 启动来源当前检查点：Claude/Qoder最终Host环境/cwd的来源捕获已实现并本地验证，见[本批记录](i04-native-launch-origin-result.json)。官方两版132组纯函数参考、本机Windows66组和原Context同库owner通过；复用锁内Unicode包只增直接依赖边。完整Claude parser/Core证据关联、Qoder独立meta/task/active-branch、旧无记录来源明确导入及实际Host/Runtime/平台仍在有限剩余项。不启用未完公开读取，不把合成规则测试当真实CLI或完整App资格。原HTML控制退出编码队列，I04四包21簇84与全81簇48包324保持。
 
 2026-10-19当前检查点：原HTML卡片/完整文档/片段/脚本/资源控制已完成本地分项，见[i04-native-html-card-result.json](i04-native-html-card-result.json)。127定向、48 Chromium检查及4原组件图通过；与Markdown/媒体/引用菜单退出待编码清单。真实Core/Native/Web、完整App及规模恢复在阶段集齐后集中验证。下一编码按原队列推进旧agent/parser/home关联、Qoder明确来源/导入及Runtime并集，再Grok衔接、恢复/记忆/自动化；I07完整浏览器/I08增强技能资产继续。本批不等于I04收口，不增客户工程验收。

@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "donor_commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+  "donor_path": "src-tauri/src/parsers/qoder.rs",
+  "donor_sha256": "696238da466f84924a5982d596fe47bf5ab4a6d724664722ed1970ee6b1e2844",
+  "license": "Apache-2.0, integration/licenses/codeg/LICENSE",
+  "source_ranges": [
+    "358-370,399-602 original replay branch, compaction and parallel sibling results",
+    "1090-1245 scoped agent meta and optional task status/result"
+  ],
+  "port": "crates/rovai-core/src/runtime_subagent_session/source/qoder.rs",
+  "branch_port": "crates/rovai-core/src/runtime_subagent_session/source/qoder/branch.rs",
+  "authority": "private filesystem seam only; QoderAgentLink is not serializable, not a Native Session target or User/API grant",
+  "source_audit": {
+    "ok": true,
+    "baseline": "20deea18a4f6f5269fa9d48b7bc7f96c2411744a",
+    "source_commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+    "original_branch_body_unchanged_after_rustfmt": true,
+    "adaptations": [
+      "private module imports and active_branch visibility",
+      "strict file-relationship wrapper rejects unresolved/cyclic/conflicting graph instead of original display fallback",
+      "captured root, verified immutable byte chunks and cancellation; no ambient filesystem selection",
+      "scoped exact Qoder meta.toolUseId, parent Agent/Task call/result, optional first-name task.parentToolUseId; no Claude ack fallback"
+    ],
+    "unchanged_existing_parser_origin_dependencies": true,
+    "new_rust_owner": false,
+    "new_database_process": false,
+    "model_input_changed": false,
+    "public_gate_changed": false
+  },
+  "verification": "code_and_review_complete_not_rust_compiled_or_executed_this_batch",
+  "remaining": [
+    "Actual Rust source owner execution with full Claude/Qoder parser batch",
+    "Core evidence correlation and Qoder producer qualification",
+    "Full Qoder/Claude transcript/timeline/usage/lifecycle parser; API and original UI still pending",
+    "Actual Host/CLI/full App/platform candidate and explicit old unrecorded source import"
+  ]
+}

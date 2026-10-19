@@ -35,11 +35,12 @@
   "implementation_status": "private_source_and_final_launch_capture_local_verified_full_parser_projection_transport_pending",
   "remaining": [
     "Claude完整消息/工具/timeline/usage/lifecycle parser与Core证据关联",
+    "Qoder独立meta/task/active-branch私有文件层已编码审查，Rust执行与完整正文/usage parser、Core producer资格继续",
     "User-only生产adapter准入、签名transport与固定原UI",
-    "Qoder独立meta.toolUseId/task.parentToolUseId/active branch与producer资格",
     "实际Claude/Qoder Host持久绑定及文件roundtrip、真实Runtime/平台集中候选",
     "旧无记录来源显式导入；不查当前home猜补"
   ],
   "evidence": "integration/execution/i04-legacy-agent-source-result.json",
-  "launch_origin_evidence": "integration/execution/i04-native-launch-origin-result.json"
+  "launch_origin_evidence": "integration/execution/i04-native-launch-origin-result.json",
+  "qoder_source_evidence": "integration/execution/i04-qoder-agent-source-result.json"
 }

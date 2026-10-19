@@ -211,6 +211,20 @@
         "实际Claude/Qoder Host持久绑定/文件roundtrip、两端完整App与Runtime平台集中候选",
         "native_usage/native_skills的Qoder目录规则另核对；涉及模型材料继续遵守原方案治理"
       ]
+    },
+    {
+      "id": "DEV-QODER-AGENT-SOURCE",
+      "task": "I04-T01/T02/I12",
+      "owner": "研发",
+      "status": "private_lineage_code_reviewed_rust_execution_and_full_parser_pending",
+      "problem": "独立QoderAgentLink仅用捕获根、精确父调用/结果和meta.toolUseId；原active branch/逻辑压缩父链/并行结果恢复保留。task.parentToolUseId按原文件名顺序补状态/结果，不能作为读取授权；不借Claude ack或C/G Session。",
+      "evidence": "i04-qoder-agent-source-result.json",
+      "qualification": "源码与原算法审查/rustfmt/门禁/CodeGraph；新增夹具扩原source文件owner，没有新测试owner/数据库/进程。本批不编译或执行Rust，待完整解析批次；正式84新增0。",
+      "remaining": [
+        "完整Claude/Qoder正文/timeline/usage/lifecycle parser和Core证据关联",
+        "执行原source filesystem owner，相关文件/来源/游标回归与原parser差分",
+        "实际producer/Host/CLI/App/平台、旧无记录来源明确导入及原公开UI"
+      ]
     }
   ]
 }

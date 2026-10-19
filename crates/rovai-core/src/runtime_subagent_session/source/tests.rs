@@ -5,6 +5,7 @@ use serde_json::json;
 use super::*;
 
 include!("claude_tests.rs");
+include!("qoder_tests.rs");
 include!("snapshot_tests.rs");
 
 struct SourceFixture(PathBuf);
@@ -284,6 +285,7 @@ fn lineage_sources_keep_exact_rollouts_and_lossless_stable_chunks() {
     assert!(open_contained(&f.0, &f.0.join("sessions/../outside")).is_err());
     crate::runtime_subagent_session::content::tests::assert_content_projection(&f.0,&grok);
     assert_legacy_claude_agent_documents(&f);
+    assert_qoder_agent_documents(&f);
     assert_complete_source_discovery_and_windows(&f);
     #[cfg(unix)]
     {
