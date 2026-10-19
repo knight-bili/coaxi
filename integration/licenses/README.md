@@ -89,3 +89,5 @@ I04原生来源的Qoder目录选择依据官方npm包1.1.45/1.1.68的已审阅�
 完整发布包仅作本地研究，不安装、不随本工程源码复制或发布；参考值只在合成环境运行纯目录函数，不启动CLI/认证/模型。
 NFC使用锁内既有unicode-normalization 0.1.25，新增Core直接依赖边，无新包或版本升级；最终依赖通知装配仍由I12核查。
 I04 Qoder私有来源的原active-branch/压缩与并行工具恢复复用固定Codeg Apache-2.0；[源码范围与适配](../inventory/native-qoder-agent-source.json)保留原主体，沿用完整[Codeg许可](codeg/LICENSE)。独立Core文件关联是宿主适配，不复制或执行Qoder完整CLI。
+
+I04完整Claude解析和54原断言/19个原helper沿用固定Codeg Apache-2.0及[完整许可](codeg/LICENSE)；[源码闭包/函数审计与宿主适配](../inventory/native-claude-content-port.json)区分原内容规则、受控输入和独立summary。原goal、compaction/common规则复用既有移植模块，不增加依赖或复制原CLI。

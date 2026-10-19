@@ -1,0 +1,173 @@
+{
+  "source_commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+  "source_sha256": "6e71571b0b300cc954343ceba89308134c0fc1fd41009c43560cf2161f8b0e51",
+  "ranges": [
+    "claude.rs:18-1151,1675-2708,2804-3228,3315-3775 complete helper/accumulator/content/grouping",
+    "claude.rs:1427-1528 independent summary,3262-3312 delegated attribution",
+    "parsers/mod.rs:566-573,1175-1185 shared pure helpers"
+  ],
+  "adaptations": [
+    "verified Value records replace filesystem traversal and JSONL reopening",
+    "stable captured timestamp fallback instead of ambient clock",
+    "Core callback keyed by agent and parent tool replaces arbitrary path lookup",
+    "existing original goal/compaction/common rules reused",
+    "nested timeline/tool previews retain original bounds, primary content unchanged"
+  ],
+  "ported": "crates/rovai-core/src/runtime_subagent_session/content/claude.rs",
+  "bridge": "crates/rovai-core/src/runtime_subagent_session/content/claude_read.rs",
+  "license": "Apache-2.0, integration/licenses/codeg/LICENSE",
+  "source_audit": {
+    "ok": true,
+    "baseline": "e940a663d15e65482846d62bda7cd751362738dc",
+    "source_commit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+    "source_sha256": "6e71571b0b300cc954343ceba89308134c0fc1fd41009c43560cf2161f8b0e51",
+    "function_bodies_equal_after_declared_namespace_relocation": [
+      "system_tag_regex",
+      "record_task_notification",
+      "queued_task_notification",
+      "task_notification_task_id_regex",
+      "task_notification_status_regex",
+      "task_notification_summary_regex",
+      "task_notification_tool_use_id_regex",
+      "task_notification_result_regex",
+      "capture_tag",
+      "strip_system_tags",
+      "command_name_regex",
+      "command_args_regex",
+      "slash_command_display",
+      "slash_command_value_display",
+      "is_slash_command_expansion",
+      "is_same_submission_injection",
+      "is_task_notification_record",
+      "pending_command_verdict",
+      "goal_status_transition",
+      "push_goal_marker",
+      "release_pending_goal",
+      "rebuild_diff_from_structured_patch",
+      "is_meta_message",
+      "is_interrupt_marker",
+      "queued_human_prompt",
+      "capture_title_record",
+      "displayed_session_title",
+      "context_continuation_text",
+      "continuation_preamble_regex",
+      "is_continuation_trailer",
+      "continuation_summary_text",
+      "is_compact_command",
+      "compaction_slot_is_current",
+      "compaction_blocks",
+      "is_synthetic_assistant",
+      "api_error_text",
+      "claude_context_window_max_tokens_for_model",
+      "compaction_post_tokens",
+      "latest_claude_context_window_used_tokens",
+      "merge_claude_context_window_stats",
+      "claim_assistant_usage",
+      "feed_line",
+      "apply_background_lifecycle",
+      "finalize_background_lifecycle",
+      "parse_timestamp",
+      "extract_user_text",
+      "extract_user_content",
+      "user_content_blocks",
+      "title_from_user_blocks",
+      "extract_claude_user_image",
+      "parse_data_uri_image",
+      "canonical_file_tool_input",
+      "canonical_grep_input",
+      "move_string_alias",
+      "tool_input_json",
+      "extract_assistant_content",
+      "extract_usage",
+      "extract_agent_execution_stats",
+      "unwrap_handback_frame",
+      "dedent_handback",
+      "extract_tool_result_text",
+      "extract_tool_result_images",
+      "is_tool_result_only",
+      "group_into_turns",
+      "is_safe_subagent_id",
+      "latest_turn_prompt_usage_tokens"
+    ],
+    "unchanged_body_count": 66,
+    "adapted_functions": [
+      "feed_value",
+      "new",
+      "parse_subagent_tool_calls"
+    ],
+    "adaptation_details": {
+      "new": "Core child transcript callback and stable fallback replace native path",
+      "feed_value": "same original rules, nine stable timestamp defaults, Core child callback and six Rust2024 binding modifiers",
+      "parse_subagent_tool_calls": "verified record iterator/cancellation and Result replace reopening raw path",
+      "summary": "original independent summary sweep/precedence retained, Core owns identity/workspace fields"
+    },
+    "original_assertion_cases_unchanged": 54,
+    "original_helpers": 19,
+    "source_fs_owner_added": false,
+    "protected_files_unchanged": [
+      "Cargo.lock",
+      "crates/rovai-core/Cargo.toml",
+      "crates/rovai-core/src/runtime_subagent_session.rs",
+      "crates/rovai-core/src/runtime_subagent_session/origin.rs",
+      "crates/rovai-core/src/runtime_subagent_session/source/qoder.rs",
+      "crates/rovai-core/src/runtime_subagent_session/source/claude.rs"
+    ],
+    "approved_r1_artifacts": [
+      {
+        "path": "work/integration/integration/proposals/native-delegation-r1.md",
+        "bytes": 44061,
+        "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+      },
+      {
+        "path": "work/integration/integration/proposals/native-delegation-r1-contract.json",
+        "bytes": 117977,
+        "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+      },
+      {
+        "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+        "bytes": 67619,
+        "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+      },
+      {
+        "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+        "bytes": 809962,
+        "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+      },
+      {
+        "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1-contract.json",
+        "bytes": 117977,
+        "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+      },
+      {
+        "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1.md",
+        "bytes": 44061,
+        "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+      }
+    ],
+    "preserved_dirty_agents_sha256": "6d5c55bc4069cd453a36a38d9b0f48c112f1c256982388a27629c12f962c9f4b",
+    "schema_changed": false,
+    "dependencies_changed": false,
+    "model_input_changed": false,
+    "public_reader_gate_changed": false,
+    "launch_changed": false
+  },
+  "verification": {
+    "original_assertions_executed": 54,
+    "original_helpers": 19,
+    "existing_source_owner": {
+      "owner": "runtime_subagent_session::source::tests::lineage_sources_keep_exact_rollouts_and_lossless_stable_chunks",
+      "listed": 1,
+      "passed": true
+    },
+    "actual_verified_file_to_full_content": true,
+    "actual_core_producer": false,
+    "actual_native_web_full_app": false,
+    "actual_cli_model": false
+  },
+  "remaining": [
+    "Claude Core event/producer correlation and its own User target/transport; no short agent Session promotion",
+    "Complete Qoder transcript/usage/lifecycle parser and producer qualification",
+    "Explicit import for old unrecorded sources",
+    "Actual Host binding/file roundtrip, full Native/Web/App and Runtime/platform phase candidate"
+  ]
+}

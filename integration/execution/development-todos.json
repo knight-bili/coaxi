@@ -207,7 +207,7 @@
       "evidence": "i04-native-launch-origin-result.json",
       "qualification": "两个精确Rust owner通过；132组官方纯函数合成参考，本机Windows66组；同库正向绑定仍为Codex，Claude/Qoder仅补错Runtime拒绝。未运行实际CLI/模型/完整App，不增加84正式场景通过数。",
       "remaining": [
-        "Claude完整正文/证据关联；Qoder meta/task/active branch和独立producer；旧无来源显式导入",
+        "Claude完整解析与Qoder私有文件父链已本地验证；继续Core生产证据关联、完整Qoder正文与显式旧源导入，见i04-native-claude-content-result.json",
         "实际Claude/Qoder Host持久绑定/文件roundtrip、两端完整App与Runtime平台集中候选",
         "native_usage/native_skills的Qoder目录规则另核对；涉及模型材料继续遵守原方案治理"
       ]
@@ -216,14 +216,28 @@
       "id": "DEV-QODER-AGENT-SOURCE",
       "task": "I04-T01/T02/I12",
       "owner": "研发",
-      "status": "private_lineage_code_reviewed_rust_execution_and_full_parser_pending",
+      "status": "private_lineage_local_verified_full_qoder_parser_and_producer_pending",
       "problem": "独立QoderAgentLink仅用捕获根、精确父调用/结果和meta.toolUseId；原active branch/逻辑压缩父链/并行结果恢复保留。task.parentToolUseId按原文件名顺序补状态/结果，不能作为读取授权；不借Claude ack或C/G Session。",
       "evidence": "i04-qoder-agent-source-result.json",
-      "qualification": "源码与原算法审查/rustfmt/门禁/CodeGraph；新增夹具扩原source文件owner，没有新测试owner/数据库/进程。本批不编译或执行Rust，待完整解析批次；正式84新增0。",
+      "qualification": "原source文件owner已随完整Claude批次执行通过，覆盖上轮真实文件夹具；不等于Core生产关联/真实Runtime/App，不增加84正式场景通过数。",
       "remaining": [
-        "完整Claude/Qoder正文/timeline/usage/lifecycle parser和Core证据关联",
-        "执行原source filesystem owner，相关文件/来源/游标回归与原parser差分",
-        "实际producer/Host/CLI/App/平台、旧无记录来源明确导入及原公开UI"
+        "Qoder完整正文/usage/lifecycle parser及Core证据/producer",
+        "实际Host/CLI/App/平台、显式旧源导入和User-only运输/原UI"
+      ],
+      "verification_evidence": "i04-native-claude-content-result.json"
+    },
+    {
+      "id": "DEV-NATIVE-CLAUDE-CONTENT",
+      "task": "I04-T01/T02/I12",
+      "owner": "研发",
+      "status": "full_original_parser_local_verified_core_producer_and_candidate_pending",
+      "problem": "固定Codeg完整Claude helper/RecordAccumulator/分组、图片/别名/补丁、后台/goal/compaction及去重用量移植；Core核验字节、子源/工程行回调与稳定时间替代原路径猜选。独立summary扫描和父窗口先于子花费的原顺序保留。",
+      "evidence": "i04-native-claude-content-result.json",
+      "qualification": "66原函数主体在声明的模块路径/格式化归一后相同；54原断言和真实文件→完整UTF8/稳定快照/取消在原source owner通过，12条警告留证。来源/Core生产者、公开目标及真实Runtime/App未获资格，正式84新增0。",
+      "remaining": [
+        "完整Qoder正文/usage/lifecycle；Claude/Qoder Core证据/producer与独立User-only目标运输",
+        "旧无记录来源显式导入和完整格式语料/原parser差分；来源不能猜用当前目录",
+        "实际Host持久绑定、Core/Native/Web/完整App、Runtime/平台集中候选；I04其余原包不删"
       ]
     }
   ]

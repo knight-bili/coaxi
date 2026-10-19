@@ -28,11 +28,11 @@
     "model_input_changed": false,
     "public_gate_changed": false
   },
-  "verification": "code_and_review_complete_not_rust_compiled_or_executed_this_batch",
+  "verification": "existing_source_filesystem_owner_passed_with_complete_claude_batch",
   "remaining": [
-    "Actual Rust source owner execution with full Claude/Qoder parser batch",
-    "Core evidence correlation and Qoder producer qualification",
-    "Full Qoder/Claude transcript/timeline/usage/lifecycle parser; API and original UI still pending",
-    "Actual Host/CLI/full App/platform candidate and explicit old unrecorded source import"
-  ]
+    "Qoder完整正文/usage/lifecycle parser和Core证据/producer资格",
+    "旧无记录来源显式导入；不得当前home回填",
+    "实际Host/CLI/完整App与平台集中候选、User-only目标运输与原UI"
+  ],
+  "verification_evidence": "integration/execution/i04-native-claude-content-result.json"
 }

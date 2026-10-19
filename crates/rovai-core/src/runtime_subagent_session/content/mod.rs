@@ -21,6 +21,8 @@ use super::{
 };
 use model::MessageTurn;
 mod codex;
+pub(super) mod claude;
+pub(super) mod claude_read;
 mod grok_stats;
 mod project;
 

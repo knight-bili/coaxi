@@ -24,11 +24,11 @@ use support::{title_from_user_text, truncate_str};
 mod attachments;
 mod code_mode;
 mod context;
-mod goal;
+pub(super) mod goal;
 mod js_text;
 mod routes;
 mod service_error;
-mod support;
+pub(super) mod support;
 
 pub(super) struct ConversationDetail {
     pub summary: NativeTranscriptSummary,

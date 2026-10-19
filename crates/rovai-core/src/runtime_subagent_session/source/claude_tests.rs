@@ -37,6 +37,7 @@ fn assert_legacy_claude_agent_documents(f: &SourceFixture) {
     let stop = AtomicBool::new(false);
     let read = || open_agent(&home, &link, &stop);
     let mut documents = read().unwrap();
+    crate::runtime_subagent_session::content::claude::assert_original_cases();
     assert_eq!(documents.documents.len(), 2);
     assert_eq!(documents.documents[0].kind, DocumentKind::ClaudeParent);
     assert_eq!(documents.documents[1].kind, DocumentKind::ClaudeAgent);
@@ -48,6 +49,48 @@ fn assert_legacy_claude_agent_documents(f: &SourceFixture) {
     assert_eq!(actual, child.as_bytes());
     let digest = transcript.snapshot_digest.clone();
     assert_eq!(read().unwrap().documents[1].snapshot_digest, digest);
+    let fallback = "2026-10-19T00:00:00Z".parse().unwrap();
+    let project = |documents: &mut NativeDocuments, stop: &AtomicBool| {
+        crate::runtime_subagent_session::content::claude_read::read_agent(
+            documents,
+            fallback,
+            stop,
+            &mut |_, _| None,
+            &std::collections::BTreeMap::new(),
+            &mut |_, _| None,
+        )
+    };
+    let content = project(&mut documents, &stop).unwrap();
+    let actual: String = content
+        .turns
+        .iter()
+        .flat_map(|turn| turn.blocks.iter())
+        .filter_map(|block| {
+            if let crate::runtime_subagent_session::content::model::ContentBlock::Text { text } =
+                block
+            {
+                Some(text.as_str())
+            } else {
+                None
+            }
+        })
+        .collect();
+    assert_eq!(
+        actual, full,
+        "original full Claude projection retains all verified UTF8"
+    );
+    assert_eq!(content.summary.as_ref().unwrap().started_at, fallback);
+    assert_eq!(
+        content.snapshot_digest,
+        project(&mut read().unwrap(), &stop)
+            .unwrap()
+            .snapshot_digest
+    );
+    assert!(
+        content.verified_children.is_empty(),
+        "agent ids are not Session grants"
+    );
+    assert!(project(&mut documents, &AtomicBool::new(true)).is_err());
     drop(documents);
     f.write(parent_path, parent("Task", "abc123"));
     assert!(read().is_ok());

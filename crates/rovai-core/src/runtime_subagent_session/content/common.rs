@@ -518,7 +518,7 @@ fn is_claude_native_one_million_model(model: &str) -> bool {
     }
 }
 
-fn parse_model_capacity_suffix(model: &str) -> Option<u64> {
+pub(super) fn parse_model_capacity_suffix(model: &str) -> Option<u64> {
     let captures = model_capacity_suffix_regex().captures(model.trim())?;
     let value = captures.get(1)?.as_str().parse::<f64>().ok()?;
     if !value.is_finite() || value <= 0.0 {
