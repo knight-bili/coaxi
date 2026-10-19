@@ -1,5 +1,7 @@
 # I04 执行队列
 
+2026-10-19当前检查点：原HTML卡片/完整文档/片段/脚本/资源控制已完成本地分项，见[i04-native-html-card-result.json](i04-native-html-card-result.json)。127定向、48 Chromium检查及4原组件图通过；与Markdown/媒体/引用菜单退出待编码清单。真实Core/Native/Web、完整App及规模恢复在阶段集齐后集中验证。下一编码按原队列推进旧agent/parser/home关联、Qoder明确来源/导入及Runtime并集，再Grok衔接、恢复/记忆/自动化；I07完整浏览器/I08增强技能资产继续。本批不等于I04收口，不增客户工程验收。
+
 2026-10-18 旧格式接续：固定源码确认agent-*.jsonl属于Claude类代理文件，Qoder只共享部分parser规则。单独私有来源层已过原文件owner，[分项证据](i04-legacy-agent-source-result.json)不授予完整parser/生产Runtime/公开读取资格。依赖顺序据此细化：先独立推进已接C/G的有界签名、后台快照取消与原UI；Claude完整parser/来源关联、Qoder根及旧源导入仍在同一I04格式/Runtime并集收口，不删范围，也不把旧代理强塞进Session身份。
 
 2026-10-18 最新接续：可信Host工程目录已持久化，Current User读取→核验文件→原Codex补丁行号已通过两个既有owner分项验证，[证据](i04-native-project-patch-result.json)区分来源兼容夹具和真实Core绑定。下方“工程回调待做”属于旧检查点；当前继续旧agent显式父链、有界签名/后台取消、公共运输和原UI，同场景、真实Host/Runtime/平台及其余I04包保持。没有新增正式场景通过，也不新增客户工程测试。

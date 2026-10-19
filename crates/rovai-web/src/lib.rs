@@ -299,8 +299,9 @@ async fn boundary(State(state): State<WebState>, req: Request, next: Next) -> Re
     if preview_shell && response.status().is_success() {
         // Only the trusted HTML preview shell gets these capabilities. Keep its CSP
         // sandbox aligned with the Web iframe; workspace/API policies stay strict.
+        // Opaque Codeg inner frames additionally pin their base to about:srcdoc.
         response.headers_mut().insert(header::CONTENT_SECURITY_POLICY, HeaderValue::from_static(
-            "sandbox allow-scripts allow-same-origin allow-forms allow-popups allow-modals; default-src 'none'; script-src http: https: data: 'unsafe-inline' 'unsafe-eval'; style-src http: https: 'unsafe-inline'; img-src http: https: data: blob:; font-src http: https: data:; connect-src http: https: ws: wss:; frame-src http: https: data:; frame-ancestors 'self'; object-src 'none'; base-uri http: https:; form-action http: https:"));
+            "sandbox allow-scripts allow-same-origin allow-forms allow-popups allow-modals; default-src 'none'; script-src http: https: data: 'unsafe-inline' 'unsafe-eval'; style-src http: https: 'unsafe-inline'; img-src http: https: data: blob:; font-src http: https: data:; connect-src http: https: ws: wss:; frame-src http: https: data:; frame-ancestors 'self'; object-src 'none'; base-uri about: http: https:; form-action http: https:"));
     }
     if preview_asset {
         response.headers_mut().insert(

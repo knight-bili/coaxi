@@ -7,6 +7,31 @@ import { createThreadAdapter } from './camp-adapter'
 // Owns the production Web adapter + execution window seam. A Host-only HTTP
 // test bypasses this adapter's allowlist; a populated page hides missing deltas.
 afterEach(() => vi.unstubAllGlobals())
+it('reads non-image HTML resources through exact authenticated download grants without starting a browser download', async () => {
+  const storage = { getItem: () => null, setItem: () => undefined, removeItem: () => undefined }
+  vi.stubGlobal('sessionStorage', storage); vi.stubGlobal('localStorage', storage)
+  vi.stubGlobal('navigator', { platform: 'Win32' }); vi.stubGlobal('window', { sessionStorage: storage, history: { state: null } })
+  vi.stubGlobal('location', { href: 'http://127.0.0.1:8766/workspace' }); vi.stubGlobal('matchMedia', () => ({ matches: false }))
+  const bytes = new Uint8Array([0, 255, ...new TextEncoder().encode('样式与脚本末尾😀')]), version = { size: bytes.length, mtimeMs: 1 }, requests: unknown[] = []
+  const transport = new ConsoleClient('http://127.0.0.1:8766', async (url, options) => {
+    if (String(url).endsWith('/login')) return Response.json({ protocolVersion: 4, token: 'a'.repeat(64), clientId: 'd'.repeat(64), editorProof: 'e'.repeat(64), ownerId: 'local_user' })
+    requests.push({ url: String(url), body: JSON.parse(String(options?.body)), headers: options?.headers })
+    return new Response(bytes, { headers: { 'Content-Type': 'application/octet-stream', 'x-rovai-content-generation': 'exact-version', 'x-rovai-content-version': JSON.stringify(version) } })
+  })
+  await transport.login('b'.repeat(64))
+  const files = createThreadAdapter(transport, async () => null).environment.files
+  expect(files.nativeHtmlFrameUrl).toBe('http://127.0.0.1:8766/preview.html')
+  expect(await files.readFileBytes!({ handleId: 'core-issued', expectedGeneration: 'exact-version' })).toEqual({ ok: true, value: { bytes, mime: 'application/octet-stream', contentGeneration: 'exact-version', contentVersion: version } })
+  expect(requests).toHaveLength(1)
+  expect(requests[0]).toMatchObject({ url: 'http://127.0.0.1:8766/api/v1/files/bytes', body: { action: 'download', request: { handleId: 'core-issued', expectedGeneration: 'exact-version' } } })
+  // Blob conversion is another asynchronous boundary after ConsoleClient returns.
+  let finish!: (bytes: ArrayBuffer) => void
+  const pendingBytes = new Promise<ArrayBuffer>(resolve => { finish = resolve })
+  vi.spyOn(transport, 'fileBytes').mockResolvedValue({ ok: true, value: { blob: { arrayBuffer: () => pendingBytes } as Blob, name: 'style.css', mime: 'text/css', contentVersion: version, contentGeneration: 'exact-version' } })
+  const pending = files.readFileBytes!({ handleId: 'core-issued', expectedGeneration: 'exact-version' })
+  const rejected = expect(pending).rejects.toThrow('Connection replaced')
+  transport.clear(); finish(new ArrayBuffer(1)); await rejected
+})
 it('sends exact native reference sources through authenticated resource transport and preserves server-only actions', async () => {
   const storage = { getItem: () => null, setItem: () => undefined, removeItem: () => undefined }
   vi.stubGlobal('sessionStorage', storage); vi.stubGlobal('localStorage', storage)

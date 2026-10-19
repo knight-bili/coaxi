@@ -1,0 +1,1052 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-19T04:45:29.011289+00:00",
+  "stage": "I04",
+  "task": "I04-T01",
+  "branch": "develop/V1.0.0",
+  "baseline_commit": "fc4ef069face934a18cde87c969af4cc8ee6b930",
+  "status": "original_html_cards_local_verified_other_i04_implementation_and_stage_candidate_pending",
+  "stage_complete": false,
+  "scope_preserved": {
+    "source_clusters": 81,
+    "work_packages": 48,
+    "formal_cases": 324,
+    "i04_packages": 4,
+    "i04_clusters": 21,
+    "i04_formal_cases": 84,
+    "new_formal_cases_passed": 0
+  },
+  "facts": [
+    "Original Codeg card and collapsed-row UI, original pure builders/inliner and unchanged original tests retained; explicit Core host seams only.",
+    "Exact native read identity, transient parent/child resources, canonical document directory checks, raw byte size/generation checks, bounded concurrency and window HTML quota.",
+    "Complete documents default scripts off; fragments use original local-only widget stub. Optional preserveAuthorCsp adds author restrictions to sandbox policy, no model send.",
+    "Web original srcDoc conflicts with App CSP: existing preview entry supplies an opaque bootstrap and original inner sandbox; App/API CSP unchanged.",
+    "Chromium caught retained sandbox flags when reusing a frame; document/sandbox/host changes now remount the frame and forward ref. Same path under another native reader loses old script permission.",
+    "Only the preview-shell header additionally allows about: for the original srcdoc base pin. Actual header strings tested in local HTTP browser fixture, Rust server compilation reserved for phase candidate.",
+    "127 TypeScript tests/11 files, 48 actual Chromium checks, four source/product theme/width screenshots, typecheck/documentation/source audit and CodeGraph passed.",
+    "Move implemented HTML controls out of coding queue; continue old native source/Runtime work, with actual Core/Native/Web/full App integration held for phase candidate."
+  ],
+  "verification": {
+    "targeted_tests_passed": 127,
+    "targeted_files": 11,
+    "renderer_checks": 48,
+    "screenshots_reviewed": 4,
+    "source_audit": {
+      "ok": true,
+      "baseline": "fc4ef069face934a18cde87c969af4cc8ee6b930",
+      "pureFunctionsUnchanged": [
+        "decodeBase64Utf8",
+        "escapeClosingScript",
+        "openaiStub",
+        "buildVisualizeDocument",
+        "fileName",
+        "titleFromPath"
+      ],
+      "originalCardJSXUnchangedExceptDeclaredHostSeams": true,
+      "portedModules": 5,
+      "originalInlineTestsUnchanged": true,
+      "priorTranslationsUnchanged": true,
+      "unchangedDependencies": true,
+      "unchangedExistingStyles": true,
+      "dirtyAgentsPreserved": true,
+      "modelInputChanged": false
+    },
+    "source_map": {
+      "sourceCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+      "files": [
+        {
+          "source": "src/lib/html-preview-inline.ts",
+          "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/html-preview-inline.ts",
+          "sourceSha256": "189a3c995307aeb258e16c32dcbed96a9adbc642d512cdd1d6e41907a604ee3f",
+          "portedSha256": "113dae96195e1b715443f54f801b47c2779f55af183b16cafb62e0747b492f01",
+          "sourceGitBlob": "6372954d78e446d92c38caafc14a31474adda9a0",
+          "bodyChanges": [
+            "source with optional preserveAuthorCsp; default unchanged, native cards intersect author restrictions"
+          ]
+        },
+        {
+          "source": "src/lib/html-preview-inline.test.ts",
+          "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/html-preview-inline.test.ts",
+          "sourceSha256": "b1636d50053497e7920cd86a29096fec3a2b3f00b97c2bfa5e41fc2d4f35aa1e",
+          "portedSha256": "43a7e203da353c623e0a4e48f1a605381aa8595507c795a9bd9636037c9b1d0d",
+          "sourceGitBlob": "b173d07f287aa7b7954846ae5dc09158a33e4f6b",
+          "bodyChanges": [
+            "original tests unchanged; provenance/LF and browser environment only"
+          ]
+        },
+        {
+          "source": "src/components/message/codex-visualize-card.tsx",
+          "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/codex-visualize-card.tsx",
+          "sourceSha256": "dead83ff7abb5f80190b0c611099a80a864822448d04e1bfab255e0dcba155fc",
+          "portedSha256": "c5e8b98966fb460b12559180e7a6f4d3f0233715297ff633f8eb515803896a49",
+          "sourceGitBlob": "a7fe683c17e98c57b6476669bd6c3ed66d6f2ebd",
+          "bodyChanges": [
+            "complete original pure document/fragment/CSP/size/theme/local-state builders and card JSX retained",
+            "Core scoped load and resource reader replace frontend home/root/Tauri IO; Core-owned reader identity and visibility in load key; current scope guards and original window HTML pool; resource concurrency 4 for shared host quotas; source theme values bind Rovai tokens without shadowing host variables",
+            "original runtime plugin asset discovery excluded from this slice; original FALLBACK_ASSETS branch retained, authorized enhanced asset integration remains I08; not a full DocGuest/browser port"
+          ]
+        },
+        {
+          "source": "src/components/message/codex-visualize-card.test.tsx",
+          "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/codex-visualize-build.test.ts",
+          "sourceSha256": "50e58a3be59915a53c7c666aa0651e62a40de99f96db91b83a82376e5b92bcc8",
+          "portedSha256": "c09f1645a734e4c6ec6c5805e6edc4309989e65449b93a0cfc6b16f6e5df2de5",
+          "sourceGitBlob": "0337d52afe11603ee040736f9ba469efa4b7bcd0",
+          "bodyChanges": [
+            "complete original buildVisualizeDocument describe block and all 4 original assertions/cases; only import/environment isolation, no expectation changes"
+          ]
+        },
+        {
+          "source": "src/components/message/html-file-previews.tsx",
+          "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/html-file-previews.tsx",
+          "sourceSha256": "4b25695300fd3d7fe0baa08e33f7f9363e67e9c3d9dfdde59dc1df710395f3d0",
+          "portedSha256": "ed0e58297cc0cfc2370e944d68e6dec0ae6dd776e76c36bc963d599b5413b4a6",
+          "sourceGitBlob": "35ca841d108d4da11513b3f1cca39833ce80ba07",
+          "bodyChanges": [
+            "original collapsed-row and open/collapse JSX retained; Core resolves relative sources so no frontend root join/drop; display-only split also handles Windows separators"
+          ]
+        }
+      ],
+      "modelInputChanged": false,
+      "runtimeAssetsI08Pending": true,
+      "docGuestI07Pending": true
+    },
+    "browser_transport_scope": "Actual Chromium renders production Codeg port and fixed original components. FilePreviewApi/Thread owner is simulated. Web headers are copied verbatim from production Rust CSP and sent by a local HTTP fixture; not actual Core/IPC/Rust HTTP/full App qualification.",
+    "actual_chromium": true,
+    "actual_core_native_web_e2e": false,
+    "actual_ipc": false,
+    "actual_rust_http": false,
+    "full_original_app": false,
+    "rust_compiled_this_slice": false,
+    "full_app_built_this_slice": false,
+    "typecheck_exit": 0,
+    "docs_tests_passed": 10,
+    "docs_diff_gate_base": "fc4ef069face934a18cde87c969af4cc8ee6b930",
+    "docs_version_gate": true,
+    "codegraph_synced": true,
+    "model_input_changed": false,
+    "database_changed": false,
+    "dependencies_changed": false,
+    "stage_formal_cases_added": 0
+  },
+  "remaining": [
+    "I04阶段编码集齐后集中核实真实Core/Native/Web、完整App/供体App同场景、授权/长历史/规模/内存与恢复；本批为生产卡片配声明运输替身的Chromium分项。",
+    "插件增强CSS/kit/calendar保留原构造接口与缺资产fallback；实际安装包Core授权发现归I08，无任意home/Tauri读取。",
+    "完整DocGuest、网页/邮件/电话与内置/系统浏览器目标归I07；普通文件工作区继续Rovai原HTML服务。",
+    "I04原剩余Claude旧agent/parser/home关联、Qoder独立来源/明确导入、Grok修改意见与三Context模式、Runtime并集、恢复、记忆及自动化不减；ANSI完整许可继续发布资格。"
+  ],
+  "approved_r1_artifacts": [
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    },
+    {
+      "path": "work/integration/integration/proposals/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.docx",
+      "bytes": 67619,
+      "sha256": "b3a318110460df2c95fc7132f4f3a985f0e59c6e506161fa1b8ceee3d70c0192"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/I04_队员怎样叫来独立帮手_客户确认版_r1.pdf",
+      "bytes": 809962,
+      "sha256": "79af957b4e2f3e2a77311b72093188289f193d1c36d49218d99e1d9cb2446340"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1-contract.json",
+      "bytes": 117977,
+      "sha256": "9ab33a832cde6ccf0a39504889ac2d39bd3d679c8e0ad768d16577e663132c86"
+    },
+    {
+      "path": "outputs/I04_独立帮手_r1/final/native-delegation-r1.md",
+      "bytes": 44061,
+      "sha256": "1f22de26a5c6df5df5b57628f84ce8f0594bf6c318c1abfcfb90543097dbbed1"
+    }
+  ],
+  "preserved_dirty_agents_sha256": "6d5c55bc4069cd453a36a38d9b0f48c112f1c256982388a27629c12f962c9f4b",
+  "source_files": [
+    {
+      "path": "apps/desktop/src/renderer/src/NativeSessionViewer.tsx",
+      "sha256": "a48c2eb607cc88985868593164c91f01d8098bfc56ce61c9d61ba20f919e9fda",
+      "git_blob_with_filters": "141ec1d46348d2ddbb657b68d4c2ca2bfdb2e788"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-markdown.tsx",
+      "sha256": "e2f00351a039aa4a832e13c77d9523cadfb1d6a136a8eca10d4c5f674833ca19",
+      "git_blob_with_filters": "ff97672b92fcc291a3eba99d6f4b0507a60af2e6"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/source-copy.json",
+      "sha256": "16ef158049c7bdf9701bfb9bdeec983c420bf5b911fdaec01fa76c52c199ff71",
+      "git_blob_with_filters": "0381e23a216f7e75de37b9ddc0d43c565423bdb8"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/desktop-file-preview-api.ts",
+      "sha256": "a48dd443b2dbc1c51f4ca84e89cc4f51559b883f287f0c3b57e8a40cea6f0a73",
+      "git_blob_with_filters": "e9a38a2407f0945cb0335bbab30f93971c47c3ae"
+    },
+    {
+      "path": "apps/web/public/preview.html",
+      "sha256": "0c1fddfbb1fd18edae39b99a8a635e121dad86d3095f774b5698b5289cdd7ef4",
+      "git_blob_with_filters": "3d498495e3ba69ed8cb72e7c2bbd6d961966b1b4"
+    },
+    {
+      "path": "apps/web/src/camp-adapter.test.ts",
+      "sha256": "5789f6be8b40b151277fef7841b6d4f71c2c9ef3f5604eddfb0959f872e7de4f",
+      "git_blob_with_filters": "c91b5cd7ab72ef9b60f24fc00b82b62c45e08950"
+    },
+    {
+      "path": "apps/web/src/camp-adapter.ts",
+      "sha256": "fa7a5f6506bbbb7b80d560202e50d9df740eb6a3f0b0d9ed319b9de7a7e90efe",
+      "git_blob_with_filters": "ea3c3b2b56ae0c5749a5940019a661fdd7bfebdf"
+    },
+    {
+      "path": "crates/rovai-web/src/lib.rs",
+      "sha256": "fada9dbda222b6b2a742461f938fc3794060884a404b987efd534ef6b47f55e7",
+      "git_blob_with_filters": "a549eb6f361918006157b5e1aa49834f665058c8"
+    },
+    {
+      "path": "integration/execution/development-todos.json",
+      "sha256": "6c4621f543d5d69334a1c94469988e3c6bc0a70650a85022613783132ef4235e",
+      "git_blob_with_filters": "e013406f006bdb49e96bb76393b2bdb905b32ce6"
+    },
+    {
+      "path": "integration/execution/goal-state.json",
+      "sha256": "dce238405556324853a55914719b174c3bf2a804482c59e4c41c5052f5b21653",
+      "git_blob_with_filters": "2a9f7352e459465e2a838b03528c6765e98ae0d5"
+    },
+    {
+      "path": "integration/execution/i04-execution-plan.md",
+      "sha256": "0bcc7ccaa7ebaedf37559cf6d3243187a7da1ac5e2e83ca56e54586296191adb",
+      "git_blob_with_filters": "c0f05984c864d442c8ae791c91a48739db126d73"
+    },
+    {
+      "path": "integration/inventory/native-content-ui-port.json",
+      "sha256": "cf662fbc9ef6e1a90715ae2fb5c8b191f021c6bdf31003447ff2e252574cd2bb",
+      "git_blob_with_filters": "759c5b4e2ba8e1a87299fb231eccd2d113f0feeb"
+    },
+    {
+      "path": "integration/inventory/native-session-viewer-ui-reference.md",
+      "sha256": "2c057427691b7c2fc4e5c3c6f858c6fc6214e28c0a02d769800e0b1bf7f8df5d",
+      "git_blob_with_filters": "2439364febdf9bf424fbba1e94c747576c6a1fd7"
+    },
+    {
+      "path": "packages/contracts/src/index.ts",
+      "sha256": "491abd7a8cc33cfe7fdb01062f24fdf90f71efd97b2fe562c5cf6e7f8147fdab",
+      "git_blob_with_filters": "c1d19d6d3a3267b763007f76ba018ba9c1831a7b"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/codex-visualize-build.test.ts",
+      "sha256": "c09f1645a734e4c6ec6c5805e6edc4309989e65449b93a0cfc6b16f6e5df2de5",
+      "git_blob_with_filters": "1a54eb30937468a7ad108a256ffc1d6b96bf3148"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/codex-visualize-card.tsx",
+      "sha256": "c5e8b98966fb460b12559180e7a6f4d3f0233715297ff633f8eb515803896a49",
+      "git_blob_with_filters": "cc01d131a6db0ebbbb18016ddb4a7b37b723d185"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/components/message/html-file-previews.tsx",
+      "sha256": "ed0e58297cc0cfc2370e944d68e6dec0ae6dd776e76c36bc963d599b5413b4a6",
+      "git_blob_with_filters": "7c91ed0f35858f4d780404654b5a14c240ecc82d"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/html-preview-inline.test.ts",
+      "sha256": "43a7e203da353c623e0a4e48f1a605381aa8595507c795a9bd9636037c9b1d0d",
+      "git_blob_with_filters": "c342f85acbe6407899b0489477cc026f03b6eb53"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/lib/html-preview-inline.ts",
+      "sha256": "113dae96195e1b715443f54f801b47c2779f55af183b16cafb62e0747b492f01",
+      "git_blob_with_filters": "8f4f2120cb3376019608e7d78c3fa92a1238bd43"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/source-html.css",
+      "sha256": "8b464518a700a69f51858631b3c1f209b98ca7d0f466e77af16c39a09f327a1e",
+      "git_blob_with_filters": "08ff30dfe76e7e54b22be1e2b39174d797af4051"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-html-frame.tsx",
+      "sha256": "9cc71044c2ed3aa46ad96fc3020261bec858d6a2b859e47e72f04b0348d9c861",
+      "git_blob_with_filters": "03704d4f95f5bdcb385dcd601dd541c549c4065a"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-html-host.tsx",
+      "sha256": "c6a293d918ebe535e8f2092ae2d59b1516e1a1256ed2727ec30e39d222a25abc",
+      "git_blob_with_filters": "126b5c11cdbe02276c7810e308b41681b73d623c"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-html-policy.test.ts",
+      "sha256": "4fd769a51b209537025e00c1c2d91f70f78adcc01a8b11dd0ecc94707d4e6e38",
+      "git_blob_with_filters": "0297830b32cd591d78030c05790fcfbb45e3e472"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-html-source.test.ts",
+      "sha256": "8a5ebef5e844476fcbcfdb89c5b89220abe298f9c724702abaa39de19ed66166",
+      "git_blob_with_filters": "5c7147df20a28e6afc774f098914b295bf8a8c32"
+    },
+    {
+      "path": "apps/desktop/src/renderer/src/codeg-native-content/ui/native-html-source.ts",
+      "sha256": "f7779be9239dd96bfc2910beb257e9157098d6bb25e6fd0fd06df05f5e50b191",
+      "git_blob_with_filters": "67e700c16a0952c5374f3651fc37c64100cb82a8"
+    },
+    {
+      "path": "apps/web/src/native-html-frame.test.ts",
+      "sha256": "ec9bd47f65e6f934630f388ff9b21c50238abfcf677668efa32d5175b6572eb8",
+      "git_blob_with_filters": "0865ca777c4ba517c3bdab37bc7c77d0f1742d21"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "file/I04原版HTML卡片/audit-source.mjs",
+      "sha256": "bd522ae518ccf73ae9ecec91f325565f7f6dbbca35162d1b2996bd3f08ffc0ae"
+    },
+    {
+      "path": "file/I04原版HTML卡片/build-style.mjs",
+      "sha256": "d6fc4ac16d52c91018977150845f5e369bd6ca2a3f6ed8d849500857c216987c"
+    },
+    {
+      "path": "file/I04原版HTML卡片/checkpoint.py",
+      "sha256": "9bda5d5de0efc48acad23b46fa5762d5fbb7c89d8a35720d1e2e081c7d698579"
+    },
+    {
+      "path": "file/I04原版HTML卡片/commit.py",
+      "sha256": "7a55fe3b732d35bba51993b721cd979aba7ef4a85f98010f8b9817e90297eff6"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/captures/product-day-390.png",
+      "sha256": "3c277f61b282824b07497ef696cb06fefa6e0c4c1000fac75c08848808ea1a0e"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/captures/product-night-1000.png",
+      "sha256": "d9b3464e895b0d2e9d6faaaa5a4f92765673caee6baca61675370d52bf851cdf"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/captures/source-day-390.png",
+      "sha256": "eafef6660f9e60d81006249c0fac0d0af09c5513ea36b26e40eb6e1b304c25e4"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/captures/source-night-1000.png",
+      "sha256": "4c2566a3d84533633ff8f33270e6fcb21b94794e18a16b9d22035977950074cd"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/apl-fqmucPXA.js",
+      "sha256": "5be3458b72027a2151b231faa2e30eaf16e1e29067222e232694f25418c2a140"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/asciiarmor-DucZyvP0.js",
+      "sha256": "01c94e79d596371ae8d7fb8f8e9d7f7c136b9c9cbd1f7f1124949ee0216d4816"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/asn1-BnOEsgAm.js",
+      "sha256": "bb17319ceb5860451c6822bfadacfcedd6f972cfafbe016b36dfe6ac23f73551"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/asterisk-QAlztEwS.js",
+      "sha256": "6df194920c95ba624a8fda9ecc6fb9bb3e8c608635a2d0b0f4b2610cce4e6fc3"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/brainfuck-DZVCuF_t.js",
+      "sha256": "71ae5a627c032ec5f0333e28a4fc02da543a8faf15f2705c0e1f69f7df69c812"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/clike-xqXYL6ge.js",
+      "sha256": "1acda985c43e1ca1c234bc64cd7b495850069c0c10cd1a433d89c2005dcb503a"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/clojure-BhXMqnxz.js",
+      "sha256": "e6c5a1b8eead561531a1fe6afc42ebd3541913ac87645794bee5b2e42222ff2e"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/cmake-BGaNd9E7.js",
+      "sha256": "319d4983f4e2c2934fdbf67a567ad183211c15a618df3d9e7ad270a188f63c1a"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/cobol-4yqQntpt.js",
+      "sha256": "f541e17f367fb16b84f1c4585dc6b96436fab9b9984351746b8d6b7e4be77533"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/coffeescript-D2dXvhEc.js",
+      "sha256": "fd8b8081e6c6d0b3a5a1d5159ea923fa92de6b16498672ac8ffb3a85d0f074ff"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/commonlisp-CF_VNHQR.js",
+      "sha256": "f0e48e905937a107e453a06c0eb54a8f1e536fc0fc63c5b58b9551c8f7fe49cb"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/crystal-DyuLTqLs.js",
+      "sha256": "c1628558768374a78a1fa71c26feaf44bfc6c5161bf81d964490416d1af1f38f"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/css-c-jst79C.js",
+      "sha256": "41425a19b41f83ae573be2f495236cd1161392d1ef66eb2d23d2784510746818"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/cypher-Dlu_3r4V.js",
+      "sha256": "80cff481ed4632ecfbe5952d4c60f15227c66f04dfea646c32852a2b090d19ca"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/d-UURgV0Ux.js",
+      "sha256": "df60654c2550e460276b5522896ee99ab6516252a0016a0fafa21875641b72b9"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/diff-B_Bi2Crb.js",
+      "sha256": "efa42a61215071dc4d677dab004a6f77c34b41825d87a7dc42303302c35b4b4a"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/dockerfile-Bvk733Ga.js",
+      "sha256": "31f1f2e8d8f9f2eeeb29f6d4b56e4632654d2f2a5b352a4febc9bf2f1984d29c"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/dtd-Dy74G54E.js",
+      "sha256": "cfaec369fbea7351fc6a8fb7c990f2fbc5a0d1730467e51935deb1965fccaa2a"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/dylan-TSb-Nfix.js",
+      "sha256": "b0c2026d9bb4917eccab491f63e56d95ceb4a8e01e42062a843c35ea29121607"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/ebnf-4fKAGW3a.js",
+      "sha256": "b21fa7b0323bdc0ab31713d74038dfef58b32305d3775c98547a3a23f143e16a"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/ecl-B59qGGVg.js",
+      "sha256": "4f1c8ae6eaddfd15d73523014b684fc2ae7160b0c10d0680812497b4f1254192"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/eiffel-Dze7nlu3.js",
+      "sha256": "a0fc308a8415ecaf7e5ffe28d9192c23f5b6e81d995eb7df35894a1b307a6606"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/elm-DG7jkhNZ.js",
+      "sha256": "c077dc7257d0e460440d911f88d5783e18ca8c58146fd9126e9e13a0897bcb5b"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/erlang-BO6gOnGA.js",
+      "sha256": "a7ff36cb6624f8cb2eedd1f201678c122f7d861f901c2b4465532dc9b10fb48e"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/factor-CMxFHDqz.js",
+      "sha256": "b249da83526bbefb5f5c5621c3cd3410f0f26edc9368cec95a585dbf5c6d0fd7"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/fcl-CDDUNjTj.js",
+      "sha256": "223f8c7838620a68cbcb74e4e40d10c5eb20fdd2fbe6d32e44bce2d1d2c28ed2"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/file-find.worker-CHoXCmE8.js",
+      "sha256": "80cfe35f96f8384c3f07480916e2786129ac31f1d7d839816bda104764da27c8"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/forth-B9D2JCeE.js",
+      "sha256": "2db6c4dd8f293410bd0de0a25f1dad21a1ee1990ddb816a4c783e86213e1e302"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/fortran-CAG2BFbe.js",
+      "sha256": "df8788d58683ac6188c9038802b9cc8483344dc447ff9854b818c5171c006401"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/gas-d3KEcW3x.js",
+      "sha256": "a699545574b2f6e9d0d502fe4536ef23b977a8f03ef284520247350ac240ab33"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/gherkin-DhZlEZiy.js",
+      "sha256": "86e76fdd8bbec4e37db05eebadde43a0761cddc0786f28f42befef6addaaefcb"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/groovy-CpwJiBl7.js",
+      "sha256": "6b1705ee26bb3827a73e657f0b58a16c84004135a5e237501d919b9cb868ca0e"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/haskell-ySd-OUo8.js",
+      "sha256": "ff8a9df8c8df8f199ad3b7000aff670c061d0c760ba213d94f52a6f92024e0f8"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/haxe-7MlzfeYV.js",
+      "sha256": "df08c4d4f5bf41a8e63335fa1650e2d5dd4de28c5760ebd6ab47ee0c3fbdb606"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/http-BqypyemW.js",
+      "sha256": "552d89ffbe4662e2a8a6ef42b9608509b6654b7de1f836e6c05c2b7ebc81e0f6"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/icon-192-C06667az.png",
+      "sha256": "2680338ed6d3557b6ab543b97460c4620ecffe0d3a801bd34c3c3c06a6eefe9a"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/icon-192-DrQKUdSk.png",
+      "sha256": "9fbd4eb0e7356b4c6ddf2d86a676178476b93747a4687a6e89d06684014ed142"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/icon-192-OagIfT5q.png",
+      "sha256": "9abc0b6b53cef994b32e8c14c02fa8cad3be5325168d1f6907c47b327a024438"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/icon-192-R53lTr_5.png",
+      "sha256": "2f40a6ee8f0a0d1cfc11d8010fc9d990d9dd2dfbb14ea27bbdf97e2c50619a4d"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/idl-4HIGJlDI.js",
+      "sha256": "0ec3441d716383be06d8b9abe052499551a470877e9fb3701ebc09ab590c70b1"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/index-9XrF7qVq.js",
+      "sha256": "5f7da4e720dd302b990e4c9de4398e6edcb70456d542863722f24d3d33c4cda5"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/index-B121cH2E.js",
+      "sha256": "3ea657edd7061d6cd08669e0b17bc60d45502262de6bdb9c2f30b6626724b80a"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/index-B8_qEIUi.js",
+      "sha256": "8e0fcc81d4d2e9b448304b655bcefca90793471a2ad4b71e6362fb460a4080d1"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/index-BJe2e8Wb.js",
+      "sha256": "2d2c409fb673e9b7c70a92b6066f1483269d5eba05d6d325602037fa58f267a5"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/index-BncMat_d.js",
+      "sha256": "c213d8d4f6907da6d011beda71dac5774e23aac412ae13112bf1f40b36022f95"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/index-Bt7wPF8V.js",
+      "sha256": "504599a0f198da3d7161ed2d1d1a00508f377e2f979ce440497f6d5cda1f10ab"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/index-C300ONxe.js",
+      "sha256": "16fd0d6be07a055e977976218596d84973dabd772dd480cafb4b38c6d84089dd"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/index-C60_jElY.css",
+      "sha256": "6b65ff9b64aff73e5483440001f6cfd934d03eb58fb5cff1e406017b9d0569b0"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/index-Cp6C0SwR.js",
+      "sha256": "9fb57f3b0a64633792d1eab2707b0eecc226f25acb87089d933e3619f8b8e5a2"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/index-CwTtgDMM.js",
+      "sha256": "3373471ef74b1e21b63d96608992af63d1f49bd06e78036a7ff94dc69a36692c"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/index-CwYyIKzJ.js",
+      "sha256": "780218812897c2b411cce6fd3127506643b5479ca5363684fb7c9f60e7d11d23"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/index-CzjsI1yZ.js",
+      "sha256": "3c0bed9fcf4f1fee318c7c390b72cc2d65018c0de46a93793ec5b309db85ad22"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/index-CzQq6xzE.js",
+      "sha256": "57824230b8c745ee1bb14e122cc0f1a40f59c04023129bf362176cebfad9784c"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/index-D7aqQfeG.js",
+      "sha256": "38d01582450da84bf868e68e364325e048c4ac38fa2320ae9d013fc2245eac45"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/index-DK0MRGl5.js",
+      "sha256": "2ed7446f002f23c2e37a633d8fffeab4e5c5a4c6676f929ceb616066dccf1161"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/index-DkK-kH3y.js",
+      "sha256": "c5b30c677a831592dc0de69cfd4ce43c1e55d12058bb7f505ee696d5c5f695af"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/index-DrdotvmA.js",
+      "sha256": "885b913ed0363b27a00f6a4a1f4359066736c9d3a1498c88d11fad35f4cf2f7a"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/index-Du4K5H95.js",
+      "sha256": "6f04135aef89e46e958e57435c0f40868cf4e41f7e73cae95e0a070b3f659a40"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/index-o25Zapct.js",
+      "sha256": "18aba1dc1a890e540c40b3291fe939ea8cb3dbde261405ebe630f58295cb4a67"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/index-Pun9cGqr.js",
+      "sha256": "b008ed7fc73d5882e2b706034b46474573c48e6671ed2c4c1d23dee721bbc09c"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/index-qWyWdizA.js",
+      "sha256": "33fdde38862b643acc30c6c01cc27cb95e80ea220b9d0aa8150c598d3ed836de"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/index-sBJQX0Bm.js",
+      "sha256": "0c3512ec0797c22837a2a8c719e38f36ce7c623403daee1437c440552571709b"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/index-TiFCWha1.js",
+      "sha256": "58b684d01377153c65fe6af6799f3df8621e567367986f9fea707ffb558ccc53"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/index-WXJZDdtG.js",
+      "sha256": "75d824b9d0638a463e9a6a36d45542883c0807d33d940bf0494c6fda319285ef"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/javascript-C_OHM9hj.js",
+      "sha256": "95b09f0b3fb5fdd9b2d10f6984118bbea38a78a51286f4d862b86a01094ddd8f"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/julia-Bs6JJhYG.js",
+      "sha256": "0d8127c7275ab1371ec839ec976879685017db1cf04c55095e651e48fe103196"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/livescript-BMWCDuIE.js",
+      "sha256": "b39453a81de0238efd37ac1306f2f004f305cbd745be57e1728a17625f013401"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/lua-Cvg8VrAA.js",
+      "sha256": "165c413653092708d81ff649b3d4a63df2eedc0b50c8f249b9667b4e75fe959d"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/mathematica-DNLOL9PQ.js",
+      "sha256": "acc57c8c8a74626a6b9423988f92155410b79196d13c9c6a78047d51ae130c68"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/mbox-Ga7d4MMN.js",
+      "sha256": "fc425b9a3a312399b3ff6adfec040828ff7c8789f0d31b96e73bde2dce902355"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/mirc-Dma3B8rS.js",
+      "sha256": "0ddcb9e79952a15f12935311af85affb24054773404adfdd1d437cc0080a21e2"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/mllike-DHn7xckP.js",
+      "sha256": "adc3b1b7f8aa916812cd4d8bdf8cc1bce352786e3df54c560c5b9067b4fe6d5b"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/modelica-0d55jYY0.js",
+      "sha256": "53c8da4f56d1dd592c1710d4b2735aa9904eb2306f365b56aa7074837c59526b"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/mscgen-DdqZYINH.js",
+      "sha256": "7e91513474f40739574f20f1b1f38659a476b68b39ee260c7e13132e20d66fc6"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/mumps-Btr8VblO.js",
+      "sha256": "aea5f291cf40bcc124e9ff104dedf8df38d630d3112f62d1051118f1ce16b80b"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/nginx-DTDtBDVN.js",
+      "sha256": "715cac7cfdb61a1efd09d43ec2c5e6d8e1bd491be679ac56df795a913e6eaf21"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/nsis-CyKBdPWp.js",
+      "sha256": "57f398b99c2ea986b5e4673709aa470f0fb4b42cb04188cf4044e52475c4ff61"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/ntriples-CvgOYMpL.js",
+      "sha256": "239581b9922c933f3427296d14f18a1febb1db49283e6e4aa3331f4e2b9bc3a9"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/octave-DYBj3-tl.js",
+      "sha256": "57d7b87692fe3ab14a413456a3ea0fb201a3052057b77a55604863fa5064c495"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/oz-R_e8WMIi.js",
+      "sha256": "a19a6ffdf1e6eb10fe9c4937cfb31303c9ec5bb723c73df1a71ef43c82cdd020"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/pascal-GD8iposT.js",
+      "sha256": "e5a1f91525017a8bf777f9c04f990c65a6a876b26e9b803ba4fddbcc6a68ccac"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/perl-DL9mHpoi.js",
+      "sha256": "8c4df1964a2fe9a690f2493217ed9f70d1f7e2f026ea515f3b226b3b39370b17"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/pig-C_4T4YIV.js",
+      "sha256": "82df721874d4623ebcfa10b27ea6eb9e3992ff4c28e2d838f8d166ab73abb91d"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/powershell-B0suO7Vd.js",
+      "sha256": "3de01d37e183594d3bb94dc474f6324219cb209d162b202f82b12c77d2370410"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/properties-BR-vP1aU.js",
+      "sha256": "b758d2ccb06eaaf23dbbc110988e64a57e55a5923a262c60432397feeef0c9c3"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/protobuf-BxgpyhoW.js",
+      "sha256": "ed0b3d7fbe3b079db99443170bd20dba78ba27f42043ad6efebd4b714ef4a364"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/pug-CTXt1f8z.js",
+      "sha256": "48c244b81b114de6a5e5adefc5c7715f6eba241d58edd162713fd21007afdb2c"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/puppet-Bdao66PW.js",
+      "sha256": "7985d1f812327008fe34d375ab1849a12e903d3e9507b7fa14253ba17dbdd596"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/python-CvWbmiX4.js",
+      "sha256": "219d8f4b9588956ac747cc56503e568fbf3aff3ab5e34e400a6cd21c86e2273f"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/q-CrbCVq4a.js",
+      "sha256": "ded6c3f92101aee3b6214667f489d691936350d01b61e69fdb2b8e2104afcacd"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/r-V7nswm59.js",
+      "sha256": "78772777dc6085a89ba3ed5f6fcd5fe46c7ff6cdb849c3c967ce0c1273b4f4a2"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/rpm-C-DLY-If.js",
+      "sha256": "e39a41ec2ab1ba47f2ef4ac46afda8ab6157df5f4388c70b332e2ebf154e1997"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/ruby-CQTpZw6f.js",
+      "sha256": "d66865a01096abcd291b833e0cd3d64881860acbd99b094fb5cf1cd134e2743c"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/sas-D2UG-yhZ.js",
+      "sha256": "015ef33927a3a7749cad183ad9e96b0dbf9df616080054b9e581486effc05bef"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/scheme-BKzrkGJD.js",
+      "sha256": "f0e7bc170c1987a1a0734b905eee725b83cca6aa8fa597457fec67670a555cc9"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/shell-BlsXDxCn.js",
+      "sha256": "476e685b723e32c63fec792d4266c65b3facfe8feb349b6a2dff9b6c749d9fde"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/sieve-CjwBwOY5.js",
+      "sha256": "084c9f5e19ccf7382ebe97bc97676ba143d9a36fad9b096cb4b3f99cf3c81df6"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/simple-mode-DMneyfDu.js",
+      "sha256": "bf2199ce2b8baa53cef87a5bc3a72c68817223b26167c168c645fe78be9280f4"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/smalltalk-BOIGQuhN.js",
+      "sha256": "7d696f35a8e402a8b6c2ac1db57c92af865ec665cd63d827689c46e58b9b295d"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/solr-CwD7U71z.js",
+      "sha256": "9e9b3bf9c4c0a208effcc6283428b25a30e935eeefa58fc34629947c040beb7e"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/source-BBnh_UZi.avif",
+      "sha256": "76da2efcd588b17589955391962024e47d2667e8e84e4744acef11f89d5f0626"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/source-BF5gqZd_.avif",
+      "sha256": "217b1a6e6333d55ddb5b884da74d77cb794416553a3225637e321ed8594b1cc5"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/source-eX5wQyix.avif",
+      "sha256": "73b5cabd1b68af9fef692c6c80a3e9773afd62dc7de2af853bbb3fb7dab9c369"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/source-pMlGT7XI.avif",
+      "sha256": "dda274619f2efe5882dbf24566837bea0b87067b1bfcc147bf3e0ed63c121649"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/sparql-DYskk2vE.js",
+      "sha256": "0573590f5173a33d2c988a89048fccb66706d9d2b1d1e01c42dd864c7b664422"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/spreadsheet-Bgtt3oLP.js",
+      "sha256": "453eff194470639d89a69e4cdf76b8e58773b5ab307554feed6d826b20a058c4"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/sql-BSrOzCRI.js",
+      "sha256": "dc7e3ba15d3123633b1a12391213fafb05a5abdcc9829498793b3d467a1d3fbd"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/stex-B6LNC55o.js",
+      "sha256": "350838050b62d1c5f9821e86a9bb0ee45f0c61628eadc676c126359a41a5f2a5"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/stylus-BkS-boTH.js",
+      "sha256": "2d50cfa755d2ad2fc7302164938caf2b4421003f3c3fb9eb02314a230a514cd9"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/swift-FRZi1uvB.js",
+      "sha256": "526e30f380c612526c4f06a3085c392bda84ede2673fff42b1d2dd7a205377d4"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/tcl-CUcaCdmq.js",
+      "sha256": "aa90d12c1490ebb77e68e6ce90fd35b0b312e5510f9753f1072c629c43e9c05c"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/textile-BnFpjsrl.js",
+      "sha256": "de9336373ae050e5a1ff954d462dd129d09f31c02951e27ede260fba1c054bad"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/tiddlywiki-CjprD-Qp.js",
+      "sha256": "5a80d8ec11cdad4503ab1462ed24e2bd7a1b09b787e815fbdfd4b7a454242fce"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/tiki-DK9DOeWn.js",
+      "sha256": "d307359b562484e7c25803b60349d4aa86e6351400f9612a3b78048f8451b847"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/toml-BOuWGMcf.js",
+      "sha256": "fddf8a802721005715a22746b28e0b87ac56a8f77caa41075f9142150e588fb3"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/troff-E1bJ0PPL.js",
+      "sha256": "ea32a0126878e2cd1198e94abcee48cbcd2131de1d80195e1267ad5b0cab82bf"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/ttcn-cfg-Dc39-fIP.js",
+      "sha256": "743ddd5c09b350d33149497d4177895083f584712019a20e88a3c9ded8b62fb9"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/ttcn-tKd4HLu4.js",
+      "sha256": "b9af59a0022981562d7482bf0125dc1b6bfdbb40ea1214807db4abbcb783059b"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/turtle-Dq7-1WAf.js",
+      "sha256": "7e505e9051b7e3c8ecebea47e4fd43b1e6b2b6ccd7334fd25fc267dc82ee0e4d"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/vb-Dp90gtsv.js",
+      "sha256": "049ed5cc9eb5958257497e1c018cd8aa6ff558760d7d9bca5d0d84db8573e19f"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/vbscript-CI6_mxxU.js",
+      "sha256": "61890fbc79e2fa6eed6ec2f556916d57712d58fa394f140b09af6c50fece5855"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/velocity-BwIZK1TH.js",
+      "sha256": "630eef603fbca377c8e48679bf30198dce1f27d1a72123bdd72f1eada28f4bbd"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/verilog-DDCYnHN8.js",
+      "sha256": "a38956f338156db5f9b6fd4644f88cd1f81d7dc726a78b882b1ee62f0e70f45a"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/vhdl-DCkMIyT9.js",
+      "sha256": "b0e803173743715af902fa2508c4da88a2e97f9b4782f33c6064a17db505bc05"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/webidl-BTLTThCm.js",
+      "sha256": "07aaaed4cf1b1adc2d5f705b656e0e3a4b0d4bddaf4ad998e488d3ca3450a290"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/xquery-BrBUuxMR.js",
+      "sha256": "96459fe2892ccdce0b57439307eeeaa9d82fd2663f2a0f4364a849dba3374e74"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/yacas-b5lAVEIl.js",
+      "sha256": "95c453f73dd9a218385c018b692c4af134b02d5131bea8dd957ca887a5cdd8bd"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/assets/z80-BZV19vqv.js",
+      "sha256": "51594b00905d1522d2f64113beae4943577338f0ff5af4503dd9ee49dc3957eb"
+    },
+    {
+      "path": "file/I04原版HTML卡片/drafts/renderer/out/index.html",
+      "sha256": "326e2ebbeac7fe0d1aabfe4bcd2094f2d010351cfb48abbeea5e179f3a98cd7a"
+    },
+    {
+      "path": "file/I04原版HTML卡片/index.html",
+      "sha256": "6dfc471a6dfe36997d5c665107021977104548f796183e64451457cb42649844"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/bootstrap-tests.txt",
+      "sha256": "8c66f35082369fd15e843af4b76160d65824055ad3b7d716acecf827f16dfffd"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/codegraph-sync-first.txt",
+      "sha256": "19fa3d903d2e219c793b889ffb7a0aa9e7716a63c3a4dd5c3b09f1840bc01401"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/codegraph.txt",
+      "sha256": "874b00d5b9d4132ebb229b37096ff60e1cfb2b417ae6e3a081c1d73564cb8d60"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/csp-fixture.json",
+      "sha256": "2b84586932557d8d8f2de3f3a41daf50ee946444ef403be918abd113c86ec054"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/docs-check.txt",
+      "sha256": "da5bfa835cba4d35d148ff8d79156e841c0fa3c9d9f36434f202da2238d1941a"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/docs-decisions.txt",
+      "sha256": "7b2e6605b046c14aba1576e5ec3598134caa2fd954bb0a4c4860152dd05187cf"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/docs-tests.txt",
+      "sha256": "9d3f1466d85525c30ddb67ca6edb058c68b172b1c1e474078df970c92ffd188d"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/docs-version.txt",
+      "sha256": "ef767267475d9fde95f908acafe24215239740f3a2af5ddc98f4ef0cd5cd2528"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/port-first.txt",
+      "sha256": "d606468500e23e7a9fe83bc4ac380c3568b501e7412b6f1b136f5a2b06e25b72"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/port-second.txt",
+      "sha256": "1d4ea6b44c54adfd6822c97f9154c6398b6988c6964da5805721f61d38526cfb"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/port-third.txt",
+      "sha256": "1d4ea6b44c54adfd6822c97f9154c6398b6988c6964da5805721f61d38526cfb"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/render-comparison-final.txt",
+      "sha256": "77f2238923aca64a5bde5adfc2237b1ac7360fad4cb00374ce9c6fa6c8d43073"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/render-diagnostic.txt",
+      "sha256": "9c438801aed78f0cf769f75d906f01c921a0a01ae2dee36dba8069693501fa6e"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/render-eighth.txt",
+      "sha256": "8df7273311182d26666de34fdb7bf77b128a5212c50bf512eb43e2d82fca0b11"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/render-eleventh.txt",
+      "sha256": "310c06a15006ee69b60b069b15c94791a4e7a6702b2444bb47bff8d2cc37ec87"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/render-fifth.txt",
+      "sha256": "cb9cbb4c6ba578d2623f0062eb4a456472df607a7488b8100b7be5e9f1946525"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/render-final.txt",
+      "sha256": "99c8fc66f91b26d19a8a36619de52923262aff88eb3bfafde8fad07d54f78bc4"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/render-first.txt",
+      "sha256": "65179fd12a0e7e0f792ec4c3b4eec1e732e93ce8d1c1de4a0239758e6ea55d11"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/render-fourth.txt",
+      "sha256": "6f2846ac0e249b4ba58cce7da1e37ebfeaad2c8fa378b0afb50d94cf58acf9a6"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/render-ninth.txt",
+      "sha256": "9aa9906309581140652f274173571ae70f9af1c8e62688dd0981431ce0a7eef4"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/render-second.txt",
+      "sha256": "5cc9e3340207f5079feecec92d9a17dc82027e463d8e67041c0ee98c9a8685eb"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/render-seventh.txt",
+      "sha256": "3ecdd8e54d1246891260da94f32b0cf30eb9adf4738336c9cc9c92bdf26a91f9"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/render-sixth.txt",
+      "sha256": "06470d3bc1980c2edb1ee602d9aba7e6c10a5038ea8250f2972f316e28ac09f2"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/render-tenth.txt",
+      "sha256": "aa12319301d1969bfc27903459acf45508335acc0161edd2d762a3ee92c65e47"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/render-third.txt",
+      "sha256": "9c13dbf0bc7f60bae7e027623cd34d3a4819d570f1a09cdd1c26c369616e095c"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/render-web-diagnostic.txt",
+      "sha256": "297e31e27f0de103e5865968acef2be4fae201b4bfe1dc9345692a431fc2f4a2"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/render-web-nested-dom.txt",
+      "sha256": "b7c2a70faf9c84bd76d38a86e4de7dc497f772e58ff78a71ea0b33901e8be00e"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/render-web-remount.txt",
+      "sha256": "e744ec097a18297a2050a21efc0a91564797fc7399712ab31910b808834804fc"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/renderer-result.json",
+      "sha256": "614b29ccccb1a14d71620aaf55a49d14311e654b0f92ef8ee8c9d6f0bfe925b9"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/site.json",
+      "sha256": "44458582d285d21fcba53d486d25e3652df289f61f49cb390370788047e20293"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/source-audit.json",
+      "sha256": "41f4a69b77c04593cbaf1a3a8f2078632d0c5f39f830621b29e863ea0ed61091"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/source-audit.txt",
+      "sha256": "3016ece5c03586948ce16d6a76c64eb6a2a7ab19bb7a49ed9db3a7d2d5d4b386"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/source-port.json",
+      "sha256": "b7e11c1df064f319121dbc1327a7e73628bc62863c87e6fb5c71ef0a1be8ff6a"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/style-generation.json",
+      "sha256": "59bce36e6132aee2df2cf66e3bbe3e4fea6ee642ce288379a67527566d158e6e"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/style.txt",
+      "sha256": "d7ff556178a24d4e88b725de4a5b25d5d306369797a95fd5db48cfd19984241c"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/tests-current.txt",
+      "sha256": "c287830b691fd3fc267ad46f851e64f5901d6826a08f088063751d48daa499f4"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/tests-final.txt",
+      "sha256": "5b5e9279c992e753c11b7efd30bd2df8f7ef2d1b9ac9e0aecefbf6d7cc3a6a0f"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/typecheck-current.txt",
+      "sha256": "4797e8aa4e456f1552af2052cbc70daf0457419eee617abfa5eafa5ac63283cb"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/typecheck-final.txt",
+      "sha256": "ed8d9e79dae53962c815fb5fea3d33bb5e369701dea01406ed8f83e071057ece"
+    },
+    {
+      "path": "file/I04原版HTML卡片/logs/typecheck-first.txt",
+      "sha256": "df05cacb14ac1e6e240fc801fd775443eac69a914dd6b014a0581536c406bc96"
+    },
+    {
+      "path": "file/I04原版HTML卡片/main.cjs",
+      "sha256": "94ad3cac329e7500dc7773d1eef9489a7a3b60f58bf7d4b72c4926996e845044"
+    },
+    {
+      "path": "file/I04原版HTML卡片/port.mjs",
+      "sha256": "557eb3fde7d4808ebfddcc66e16676c51c4ae4f02122f7b2ece5ac44c4d52f9c"
+    },
+    {
+      "path": "file/I04原版HTML卡片/reference-host.tsx",
+      "sha256": "4eb21c268172d773a03c09af44b5ebc36b499d8af506e31828458ee3282b3ba4"
+    },
+    {
+      "path": "file/I04原版HTML卡片/render-ui.mjs",
+      "sha256": "2771f900566ba440a61252ff7d2bb3ff4284f2d65470e0e7015a758fdc66b0d7"
+    },
+    {
+      "path": "file/I04原版HTML卡片/renderer.tsx",
+      "sha256": "6e86089efaea3610d9671f23f077a6e2a6ec7cea60c953e3dd8cc96267aee557"
+    },
+    {
+      "path": "file/I04原版HTML卡片/update-records.mjs",
+      "sha256": "325f1a73aba07a1e6cf0de9566ab00907bb598c8585f370ecf7fdb99da7ea9c1"
+    },
+    {
+      "path": "file/I04原版HTML卡片/verify-docs.mjs",
+      "sha256": "d465bce2080d23bdbbea5f3e40175c5a3714409119392679d2e0b40198422854"
+    }
+  ],
+  "artifact_scope": "Scripts/final and historical logs/compiled isolated renderer/four reviewed source comparisons; profiles and mutable workflow excluded.",
+  "push": false,
+  "actions_triggered": false,
+  "main_merged": false,
+  "paid_models": false,
+  "customer_action_required": false,
+  "goal_service": "active_verified_by_get_goal"
+}

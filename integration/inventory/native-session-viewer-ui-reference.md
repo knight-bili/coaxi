@@ -120,3 +120,15 @@ Main仅对Core已核实原生根内文件投影可选sourceRelativePath及已有
 8文件132项定向、类型与5项Rust资源测试通过；新增两个Rust owner分别拥有错来源回复和目录/二进制/name-only真实FS边界，原内容扫描与路径用例一并回归。19项真实隔离Renderer检查和4张日/夜原目录菜单图通过，实际Electron下载保存含0/255及Unicode末尾的完整字节；普通预览保持自己的合法句柄，菜单检查只核对新增临时资源归零。运输、Core权威和系统剪贴板明确为替身；Main与Rust元数据测试为真实FS。原组件参考不是完整供体App，[本批记录](../execution/i04-native-reference-targets-result.json)不授予实际Core/IPC/HTTP/外部模型或正式84场景资格。
 
 本批没有依赖、模型输入或数据库变更；本地Rust资源测试是新公开运输/授权边界的最小编译验证，没有全仓构建、push、Actions或main合入。完整81簇48包324/I04四包21簇84不减。下一步完整HTML控制与完整App，再真实两端集中候选，完整网页与浏览器目标归I07；其他I04有限清单不变。
+
+## 原版HTML卡片接续（2026-10-19）
+
+固定Codeg CodexVisualizeCard、HtmlFilePreviews与完整html-preview-inline已移植；保留原标题/脚本/重读/原文件/收起/展开、640/12000尺寸策略、完整文档/片段、主题及本地window.openai stub。排除声明frame/ref/配额接缝后整份卡片JSX与供体AST相同；六纯函数和原内联器测试原断言保持。无模型发送或输入语义变化。
+
+精确threadId/readId/rawReference读取来源；资源只用临时parent的child_of_handle，读取前复核Core规范位置仍属文档目录。正文4MiB完整读取、资源并发4/原base64聚合预算/窗口4实例。无路径披露则只渲染正文，不猜Camp路径；隐藏/换读者/晚结果释放句柄。
+
+完整文档默认禁脚本，用户显式开启；片段保留原本地交互。原内联器会删作者CSP，新增可选preserveAuthorCsp，默认供体行为不变，本卡片开启以叠加原限制。Web现有preview.html使用不透明外框和原沙箱内框，核对来源/父窗口/文档ID；文档/沙箱/宿主改变重建框和ref，消除旧权限残留。仅预览入口base-uri加about:支持原about:srcdoc钉住，其余App/API策略不变。
+
+127项11文件、类型、48项隔离Chromium检查及4份供体/产品日夜宽窄图通过，无横向溢出或无用滚动槽。Web夹具发送生产Rust原文CSP；文件和Thread运输为声明替身，不替代实际Core/IPC/Rust HTTP、完整原App/平台资格。普通文件工作区保留Rovai原HTML服务。本批未重编Rust/完整App，CSP字符串由浏览器HTTP夹具实测；阶段候选补实际服务构建和联调。
+
+原visualize增强CSS/kit/calendar构造接口和缺资产fallback保留，Core授权发现归I08；完整DocGuest/浏览器归I07，未删一期范围。下一编码转旧原生来源和Runtime兼容，已完成UI不重复排队。I04四包21簇84及一期81簇48包324保持。

@@ -162,8 +162,7 @@
       "problem": "原完整MessageResponse闭包及39份原模块/用例移植；修复实际原版冷公式memo和Chromium PNG导出，保留图表/spec本地状态、流式/静态字节及原图片HTML功能。",
       "evidence": "i04-native-markdown-engine-result.json",
       "remaining": [
-        "文件/目录/系统引用已本地验证；完整网页/浏览器目标随I07，完整HTML及真实两端候选仍待。",
-        "完整原HTML控制与完整供体App同场景运行对照；已有原生HTML入口和实际隔离HTML服务回归通过",
+        "完整原HTML控制已完成本地分项，见i04-native-html-card-result.json；真实Core/Native/Web与完整App/原App对照并入阶段候选，I07网页/浏览器、I08增强技能资产继续。",
         "真实Core/Native/Web集中候选、授权/生命周期/长历史/规模/内存恢复；七种原图表代码已保留，实际本批图表运行验证为BarChart",
         "I04其他parser/home关联、Runtime并集、恢复、记忆、自动化；此前ANSI完整许可文件缺口仍归发布资格"
       ],
@@ -177,12 +176,27 @@
       "problem": "原菜单和徽标已支持普通文件、目录及系统类型引用；Main明确User操作/危险确认后重验及Web认证元数据/临时二进制下载能力已接。Web原生来源白名单遗漏和普通外部文件放宽、readId串键及恢复错误已修复。",
       "evidence": "i04-native-reference-targets-result.json",
       "remaining": [
-        "完整原HTML控制、完整供体App同场景；随后实际Core/Native/Web授权/生命周期/长历史/规模/恢复集中候选。",
+        "完整原HTML控制已完成本地分项，见i04-native-html-card-result.json；真实Core/Native/Web与完整App/原App对照并入阶段候选，I07网页/浏览器、I08增强技能资产继续。",
         "I07接完整MarkdownLink网页/邮件/电话和内置/系统浏览器目标；当前文件/目录/系统引用分项不替代该能力。",
         "I04其他parser/home关联、Grok修改意见与三Context模式、Runtime并集、恢复、记忆与自动化；ANSI完整许可仍待发布资格。"
       ],
       "qualification": "132定向/5真实Rust资源测试/19隔离Renderer检查及4原菜单图；Main和Rust真实FS，Core权威/Renderer运输与剪贴板为声明替身。实际Core/IPC/HTTP/完整App尚未授予资格，I04正式84新增0。",
       "previous_evidence": "i04-native-reference-actions-result.json"
+    },
+    {
+      "id": "DEV-NATIVE-HTML-CARDS",
+      "task": "I04-T01/I07/I08/I12",
+      "owner": "研发",
+      "status": "original_card_controls_local_verified_stage_candidate_and_optional_runtime_assets_pending",
+      "problem": "复用原卡片、折叠行、完整文档/片段与资源内联；Core精确授权和可释放资源替换任意路径读取，Web原沙箱内嵌预览。",
+      "evidence": "i04-native-html-card-result.json",
+      "remaining": [
+        "I04阶段编码集齐后集中核实真实Core/Native/Web、完整App/供体App同场景、授权/长历史/规模/内存与恢复；本批为生产卡片配声明运输替身的Chromium分项。",
+        "插件增强CSS/kit/calendar保留原构造接口与缺资产fallback；实际安装包Core授权发现归I08，无任意home/Tauri读取。",
+        "完整DocGuest、网页/邮件/电话与内置/系统浏览器目标归I07；普通文件工作区继续Rovai原HTML服务。",
+        "I04原剩余Claude旧agent/parser/home关联、Qoder独立来源/明确导入、Grok修改意见与三Context模式、Runtime并集、恢复、记忆及自动化不减；ANSI完整许可继续发布资格。"
+      ],
+      "qualification": "127定向/48隔离Chromium检查及4原组件图；真实Core/Native/Web/完整App仍待，I04正式84新增0。"
     }
   ]
 }

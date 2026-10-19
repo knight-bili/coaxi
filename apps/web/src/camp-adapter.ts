@@ -139,7 +139,17 @@ export function createThreadAdapter(transport: ConsoleClient, selectWorkspaceDir
     return result
   }
   const files: FilePreviewApi = {
+    get nativeHtmlFrameUrl() { return new URL('/preview.html', location.href).href },
     nativeReference: request => transport.files('nativeReference', request),
+    readFileBytes: async request => {
+      const generation = transport.readGeneration
+      const result = await transport.fileBytes('download', request)
+      if (!result.ok) return result
+      const { blob, name: _name, ...metadata } = result.value
+      const bytes = new Uint8Array(await blob.arrayBuffer())
+      if (generation !== transport.readGeneration) throw new DOMException('Connection replaced', 'AbortError')
+      return { ok: true, value: { ...metadata, bytes } }
+    },
     bindThread: async () => { /* Thread tab state stays in the shared React provider; every resource carries an exact source. */ },
     open: request => opened('open', request), restore: request => opened('restore', request), reopen: request => opened('reopen', request),
     readText: request => transport.files('readText', request),

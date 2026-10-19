@@ -51,6 +51,7 @@ import './codeg-native-content/source-rich.css'
 import './codeg-native-content/source-media.css'
 import './codeg-native-content/source-markdown.css'
 import './codeg-native-content/source-reference.css'
+import './codeg-native-content/source-html.css'
 import 'katex/dist/katex.min.css'
 
 function readMessage(code: string): string {

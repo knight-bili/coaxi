@@ -14,7 +14,7 @@
   "current_branch": "develop/V1.0.0",
   "base_branch": "main",
   "current_task": "I04-T01",
-  "current_slice": "原目录/系统文件明确User菜单已接Desktop及Web：132定向/5Rust/19隔离Renderer检查通过，4原菜单图核对；真实Core/两端及完整HTML继续。",
+  "current_slice": "原版HTML卡片分项完成：127定向、48 Chromium检查及4原组件对照通过；完整文档/片段、脚本开关、重读/展开/收起、原文件、两端沙箱与资源归属已接。转旧原生来源与Runtime兼容编码，实际整合留待阶段集中验证。",
   "stages": {
     "I00": "engineering_complete",
     "I01": "engineering_evidence_ready_environment_validation_deferred",
@@ -33,14 +33,14 @@
   },
   "customer_dependencies": "customer-todos.json",
   "next_queue": [
-    "I04-T01：普通文件/目录/系统引用的原菜单分项已实现并本地验证，不重复排队；下一步完整HTML控制与完整App场景，再真实Core/Native/Web授权/长历史/规模/内存恢复集中候选。I07继续完整网页/浏览器目标；ANSI完整许可仍待。",
+    "I04-T01原Markdown/媒体/文件目录系统菜单与HTML控制已本地验证，不重复实现。阶段编码集齐后集中验真实Core/Native/Web和完整App、授权/长历史/规模/恢复；I07完整浏览器、I08增强技能资产保留。",
     "I04-T01/T02：Claude旧agent完整parser、实际home捕获和Core证据关联；Qoder独立根/producer，以及旧无来源的明确导入与完整格式语料核验",
     "I04-T01：Grok修改意见与r1三Context mode/接管衔接；真实Core/Host/Runtime生命周期、Schema升级和恢复矩阵集中候选",
     "I04-T02/T03/T04：Runtime并集、恢复、记忆与自动化原剩余项；完整四包21簇84场景保持，阶段集齐集中构建/少量push和Actions"
   ],
   "completion_rule": "完整一期研发实现、必需工程验证及I12工程完成后的真实用户软件使用验收都完成，才标目标完成；用户不执行技术测试，未验证不假通过。",
   "fusion_acceptance": "not_run",
-  "current_slice_status": "directory_system_reference_actions_local_verified_html_and_actual_host_candidate_pending",
+  "current_slice_status": "native_html_cards_local_verified_other_i04_implementation_and_stage_candidate_pending",
   "evidence": "i04-legacy-agent-source-result.json",
   "live_evidence": "i02-core148-live-result.json",
   "legacy_evidence": "i02-legacy-draft-result.json",
@@ -56,7 +56,7 @@
   "skill_catalog_evidence": "i02-skill-catalog-result.json",
   "skill_install_evidence": "i02-skill-install-result.json",
   "system_goal_status": "active",
-  "system_goal_verified_at": "2026-10-19T03:57:39.458Z",
+  "system_goal_verified_at": "2026-10-19T04:42:43.028Z",
   "skill_members_evidence": "i02-skill-members-result.json",
   "canvas_boards_evidence": "i03-canvas-boards-result.json",
   "skill_delivery_preparation_evidence": "i02-skill-delivery-preparation-result.json",
@@ -306,5 +306,6 @@
   "native_media_stats_evidence": "i04-native-media-stats-result.json",
   "native_markdown_engine_evidence": "i04-native-markdown-engine-result.json",
   "native_reference_actions_evidence": "i04-native-reference-actions-result.json",
-  "native_reference_targets_evidence": "i04-native-reference-targets-result.json"
+  "native_reference_targets_evidence": "i04-native-reference-targets-result.json",
+  "native_html_card_evidence": "integration/execution/i04-native-html-card-result.json"
 }

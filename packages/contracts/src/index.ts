@@ -2079,7 +2079,11 @@ export type NativeFileReferenceResult =
   | { kind: 'performed' }
 
 export interface FilePreviewApi {
+  /** Web-only, same-origin bootstrap for opaque native HTML cards under the App CSP. */
+  readonly nativeHtmlFrameUrl?: string
   nativeReference?(request: NativeFileReferenceRequest): Promise<FilePreviewOperationResult<NativeFileReferenceResult>>
+  /** Confined HTML resources use the same source/generation checks as a download, without starting one. */
+  readFileBytes?(request: { handleId: string; expectedGeneration: string }): Promise<FilePreviewOperationResult<FilePreviewBinaryContent>>
   /** Browser image bytes resolved under the current, generation-bound parent. */
   readChildImage?(request: { handleId: string; expectedGeneration: string; rawReference: string }): Promise<FilePreviewOperationResult<FilePreviewBinaryContent>>
 

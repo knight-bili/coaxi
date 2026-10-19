@@ -3,6 +3,7 @@ import type { FilePreviewApi } from '@contracts'
 /** Native file operations stay lazy; explicit browser adapters never enter this path. */
 export const desktopFilePreviewApi: FilePreviewApi = {
   nativeReference: input => window.rovai.filePreview.nativeReference!(input),
+  readFileBytes: input => window.rovai.filePreview.readBinary(input),
   updateRetention: input => window.rovai.filePreview.updateRetention?.(input) ?? Promise.resolve(),
   onResourcesReleased: listener => window.rovai.filePreview.onResourcesReleased?.(listener) ?? (() => undefined),
   bindThread: id => window.rovai.filePreview.bindThread(id),

@@ -1609,5 +1609,85 @@
       "I04其他parser/home关联、Grok修改意见与三Context模式、Runtime并集、恢复、记忆与自动化；ANSI完整许可仍待发布资格。"
     ],
     "remoteBinaryLeftClick": "Explicit download with a fresh source grant; no server system-open request."
+  },
+  "nativeHtmlCards": {
+    "baseline": "fc4ef069face934a18cde87c969af4cc8ee6b930",
+    "sourceCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+    "files": [
+      {
+        "source": "src/lib/html-preview-inline.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/html-preview-inline.ts",
+        "sourceSha256": "189a3c995307aeb258e16c32dcbed96a9adbc642d512cdd1d6e41907a604ee3f",
+        "portedSha256": "113dae96195e1b715443f54f801b47c2779f55af183b16cafb62e0747b492f01",
+        "sourceGitBlob": "6372954d78e446d92c38caafc14a31474adda9a0",
+        "bodyChanges": [
+          "source with optional preserveAuthorCsp; default unchanged, native cards intersect author restrictions"
+        ]
+      },
+      {
+        "source": "src/lib/html-preview-inline.test.ts",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/lib/html-preview-inline.test.ts",
+        "sourceSha256": "b1636d50053497e7920cd86a29096fec3a2b3f00b97c2bfa5e41fc2d4f35aa1e",
+        "portedSha256": "43a7e203da353c623e0a4e48f1a605381aa8595507c795a9bd9636037c9b1d0d",
+        "sourceGitBlob": "b173d07f287aa7b7954846ae5dc09158a33e4f6b",
+        "bodyChanges": [
+          "original tests unchanged; provenance/LF and browser environment only"
+        ]
+      },
+      {
+        "source": "src/components/message/codex-visualize-card.tsx",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/codex-visualize-card.tsx",
+        "sourceSha256": "dead83ff7abb5f80190b0c611099a80a864822448d04e1bfab255e0dcba155fc",
+        "portedSha256": "c5e8b98966fb460b12559180e7a6f4d3f0233715297ff633f8eb515803896a49",
+        "sourceGitBlob": "a7fe683c17e98c57b6476669bd6c3ed66d6f2ebd",
+        "bodyChanges": [
+          "complete original pure document/fragment/CSP/size/theme/local-state builders and card JSX retained",
+          "Core scoped load and resource reader replace frontend home/root/Tauri IO; Core-owned reader identity and visibility in load key; current scope guards and original window HTML pool; resource concurrency 4 for shared host quotas; source theme values bind Rovai tokens without shadowing host variables",
+          "original runtime plugin asset discovery excluded from this slice; original FALLBACK_ASSETS branch retained, authorized enhanced asset integration remains I08; not a full DocGuest/browser port"
+        ]
+      },
+      {
+        "source": "src/components/message/codex-visualize-card.test.tsx",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/codex-visualize-build.test.ts",
+        "sourceSha256": "50e58a3be59915a53c7c666aa0651e62a40de99f96db91b83a82376e5b92bcc8",
+        "portedSha256": "c09f1645a734e4c6ec6c5805e6edc4309989e65449b93a0cfc6b16f6e5df2de5",
+        "sourceGitBlob": "0337d52afe11603ee040736f9ba469efa4b7bcd0",
+        "bodyChanges": [
+          "complete original buildVisualizeDocument describe block and all 4 original assertions/cases; only import/environment isolation, no expectation changes"
+        ]
+      },
+      {
+        "source": "src/components/message/html-file-previews.tsx",
+        "destination": "apps/desktop/src/renderer/src/codeg-native-content/components/message/html-file-previews.tsx",
+        "sourceSha256": "4b25695300fd3d7fe0baa08e33f7f9363e67e9c3d9dfdde59dc1df710395f3d0",
+        "portedSha256": "ed0e58297cc0cfc2370e944d68e6dec0ae6dd776e76c36bc963d599b5413b4a6",
+        "sourceGitBlob": "35ca841d108d4da11513b3f1cca39833ce80ba07",
+        "bodyChanges": [
+          "original collapsed-row and open/collapse JSX retained; Core resolves relative sources so no frontend root join/drop; display-only split also handles Windows separators"
+        ]
+      }
+    ],
+    "sourceLayout": "Original card/collapsed-row JSX retained except Core frame/ref/quota seams; original pure builders and inline tests retained.",
+    "host": "Exact thread/read/raw reference; transient parent and Core child_of_handle resources; canonical document directory; concurrency 4 and window pool 4. No arbitrary home discovery.",
+    "policy": "Complete documents scripts off by default; fragments retain local stub. Optional preserveAuthorCsp intersects source restrictions; donor default and original tests unchanged.",
+    "web": "Existing preview.html opaque bootstrap plus original inner sandbox. Exact source/parent/origin/document ID init; fresh frames across document/sandbox/host changes. Only preview-shell base allows about:; App CSP unchanged.",
+    "api": "Optional readFileBytes wraps existing Native readBinary and authenticated Web download bytes, no download UI. NativeHtmlFrameUrl is Web presentation metadata, no new Core/IPC method or DB schema.",
+    "qualification": {
+      "typescriptTests": 127,
+      "testFiles": 11,
+      "rendererChecks": 48,
+      "reviewedScreenshots": 4,
+      "actualChromium": true,
+      "productionCoreTransport": false,
+      "rustHttpServer": false,
+      "fullApp": false,
+      "stageFormalCasesAdded": 0
+    },
+    "remaining": [
+      "I04阶段编码集齐后集中核实真实Core/Native/Web、完整App/供体App同场景、授权/长历史/规模/内存与恢复；本批为生产卡片配声明运输替身的Chromium分项。",
+      "插件增强CSS/kit/calendar保留原构造接口与缺资产fallback；实际安装包Core授权发现归I08，无任意home/Tauri读取。",
+      "完整DocGuest、网页/邮件/电话与内置/系统浏览器目标归I07；普通文件工作区继续Rovai原HTML服务。",
+      "I04原剩余Claude旧agent/parser/home关联、Qoder独立来源/明确导入、Grok修改意见与三Context模式、Runtime并集、恢复、记忆及自动化不减；ANSI完整许可继续发布资格。"
+    ]
   }
 }
