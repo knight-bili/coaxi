@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os'
 import { hostServerTargetKey, serverTarget } from './lib/sidecar-targets.mjs'
 import { archiveServerPackage } from './lib/server-archive.mjs'
 import { inspectLinuxServerAbi } from './lib/linux-server-abi.mjs'
+import { packageServerChannels } from './lib/package-server-channels.mjs'
 
 const repository = resolve(import.meta.dirname, '..')
 const arguments_ = process.argv.slice(2)
@@ -34,6 +35,7 @@ function run(command, args) {
 const webBuildDirectory = mkdtempSync(join(tmpdir(), 'rovai-server-web-'))
 try {
   run('pnpm', ['build:web', '--outDir', webBuildDirectory])
+  run('pnpm', ['build:server-channels'])
   run('cargo', ['build', '--locked', '-p', 'rovai-host', '-p', 'rovai-core', '--bin', 'rovai-host', '--bin', 'rovai-server', '--bin', 'rovai', ...(debug ? [] : ['--release'])])
   if (customOutput) {
     mkdirSync(dirname(destination), { recursive: true })
@@ -53,6 +55,7 @@ try {
   // beside the Server executables so a release works outside this checkout.
   cpSync(join(repository, 'skills'), join(destination, 'skills'), { recursive: true })
   copyFileSync(join(repository, 'LICENSE'), join(destination, 'LICENSE'))
+  const channelPackage = packageServerChannels(repository, destination, target)
   const version = JSON.parse(readFileSync(join(repository, 'package.json'), 'utf8')).version
   writeFileSync(join(destination, 'package-info'), `schema=1\nversion=${version}\ntarget=${target.key}\n`)
   copyFileSync(join(repository, 'scripts', target.platform === 'win32' ? 'install-server.ps1' : 'install-server.sh'), join(destination, target.platform === 'win32' ? 'install-server.ps1' : 'install-server.sh'))
@@ -79,7 +82,7 @@ try {
   hashTree(destination)
   writeFileSync(join(destination, 'manifest.json'), JSON.stringify({
     schemaVersion: 1, version, commit, dirty, target: target.key, rustTarget: target.rustTarget,
-    profile, qualification: 'development-preview', files
+    profile, qualification: 'development-preview', channelPackage, files
   }, null, 2) + '\n')
   execFileSync(join(destination, `rovai-host${target.executableSuffix}`), ['--version'], { stdio: 'inherit' })
   execFileSync(join(destination, `rovai-server${target.executableSuffix}`), ['--version'], { stdio: 'inherit' })
