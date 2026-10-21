@@ -132,14 +132,15 @@ private struct RovaiThreadDetail: View {
     @State private var engineering = false
     @State private var privateChat = false
     @State private var library = false
-    @State private var text = ""; @State private var recipients = Set<String>()
+    @State private var text = ""; @State private var recipients = Set<String>(); @State private var reply: JSONValue?
     @State private var bodyReady = false; @State private var inputRevision = 0; @State private var inputIssue: String?
     @State private var bodyGeneration: UInt64?
     private var owner: String { "public:" + id }
     private var inputLocked: Bool { !bodyReady || bodyGeneration != model.connectionGeneration || model.pending != nil || model.busy }
     var body: some View {
         VStack(spacing: 0) {
-            ScrollView { LazyVStack(alignment: .leading, spacing: 14) { RovaiPublicAttachments(model: model, threadId: id); RovaiThreadControls(model: model, threadId: id); ForEach((model.thread?["messages"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in GlassRow(isSelected: row.value.text("authorType") == "user") { VStack(alignment: .leading, spacing: 8) { Text(row.value.text("authorDisplayName").isEmpty ? row.value.text("authorType") == "user" ? "你" : row.value.text("authorId") : row.value.text("authorDisplayName")).font(.caption.weight(.semibold)).foregroundStyle(Theme.textSecondary); RovaiMessageBody(model: model, threadId: id, message: row.value); RovaiRuntimeImageGallery(model: model, threadId: id, groups: rovaiImageGroups(model.thread, message: row.value)) } } }; ForEach(rovaiOrphanImages(model.thread), id: \.self) { group in GlassRow { RovaiRuntimeImageGallery(model: model, threadId: id, groups: [group]) } }; ForEach((model.thread?["agentRuns"]?.rvArray ?? []).filter { ["running", "queued", "waiting_approval", "waiting_user"].contains($0.text("status")) }.map { RovaiRow(value: $0) }) { row in HStack { Text(row.value.text("agentId")).font(.caption); Spacer(); Button("停止") { Task { await model.command(.agentRunsCancel, value: .object(["threadId": .string(id), "agentRunId": .string(row.id), "expectedVersion": row.value["version"] ?? .number(0)])) } }.disabled(model.pending != nil) } }.padding(16) }
+            ScrollView { LazyVStack(alignment: .leading, spacing: 14) { RovaiPublicAttachments(model: model, threadId: id); RovaiThreadControls(model: model, threadId: id); ForEach((model.thread?["messages"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in GlassRow(isSelected: row.value.text("authorType") == "user") { VStack(alignment: .leading, spacing: 8) { Text(row.value.text("authorDisplayName").isEmpty ? row.value.text("authorType") == "user" ? "你" : row.value.text("authorId") : row.value.text("authorDisplayName")).font(.caption.weight(.semibold)).foregroundStyle(Theme.textSecondary); RovaiMessageBody(model: model, threadId: id, message: row.value); RovaiRuntimeImageGallery(model: model, threadId: id, groups: rovaiImageGroups(model.thread, message: row.value)); RovaiMessageActions(model: model, threadId: id, message: row.value, enabled: !inputLocked) {chosen in reply = chosen; let author = chosen.text("authorId"); if (model.thread?["members"]?.rvArray ?? []).contains(where: {$0.text("agentId") == author}) {recipients.insert(author)}; inputRevision += 1; persistPublicBody()} } } }; ForEach(rovaiOrphanImages(model.thread), id: \.self) { group in GlassRow { RovaiRuntimeImageGallery(model: model, threadId: id, groups: [group]) } }; ForEach((model.thread?["agentRuns"]?.rvArray ?? []).filter { ["running", "queued", "waiting_approval", "waiting_user"].contains($0.text("status")) }.map { RovaiRow(value: $0) }) { row in HStack { Text(row.value.text("agentId")).font(.caption); Spacer(); Button("停止") { Task { await model.command(.agentRunsCancel, value: .object(["threadId": .string(id), "agentRunId": .string(row.id), "expectedVersion": row.value["version"] ?? .number(0)])) } }.disabled(model.pending != nil) } }.padding(16) }
+            if let reply {RovaiReplyPreview(reply: reply, enabled: !inputLocked) {self.reply = nil; inputRevision += 1; persistPublicBody()}.padding(.horizontal, 16)}
             ScrollView(.horizontal, showsIndicators: false) { HStack {
                 ForEach((model.thread?["members"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in
                     Button { changeRecipient(row.id) } label: { Text(row.value.text("displayName")).font(.caption).padding(.horizontal, 12).padding(.vertical, 8).background(Capsule().fill(recipients.contains(row.id) ? Theme.accent.opacity(0.22) : Theme.accent.opacity(0.06))) }.disabled(inputLocked)
@@ -168,20 +169,20 @@ private struct RovaiThreadDetail: View {
         .onChange(of: model.lastResult) { _, result in
             guard bodyReady, bodyGeneration == model.connectionGeneration, model.lastOperation == .threadMessagesSend, model.lastInputOwner == owner,
                   ["applied", "accepted"].contains(result?["commandResult"]?.text("status") ?? result?.text("status") ?? ""),
-                  let document = try? model.publicBody(text, recipients: recipients, revision: inputRevision), document == model.lastInputBody else { return }
+                  let document = try? model.publicBody(text, recipients: recipients, revision: inputRevision, reply: reply), document == model.lastInputBody else { return }
             do { try restorePublicBody(model.readBody(owner)); inputIssue = nil } catch { inputIssue = error.localizedDescription }
         }
     }
     private func restorePublicBody(_ raw: String) throws {
-        if raw.isEmpty { text = ""; recipients = []; inputRevision += 1; return }
+        if raw.isEmpty { text = ""; recipients = []; reply = nil; inputRevision += 1; return }
         guard let document = JSONValue.parse(raw), document["version"]?.rvInt == 1 else { throw RovaiHostFailure(code: "草稿格式无法读取，原内容仍保留。") }
-        text = document.text("text"); recipients = Set((document["recipients"]?.rvArray ?? []).compactMap(\.stringValue)); inputRevision = document["revision"]?.rvInt ?? 0
+        text = document.text("text"); recipients = Set((document["recipients"]?.rvArray ?? []).compactMap(\.stringValue)); inputRevision = document["revision"]?.rvInt ?? 0; reply = document["reply"] == .null ? nil : document["reply"]
     }
     private func changeRecipient(_ id: String) { guard !inputLocked else { return }; if recipients.contains(id) { recipients.remove(id) } else { recipients.insert(id) }; inputRevision += 1; persistPublicBody() }
     private func persistPublicBody() {
         guard bodyReady, bodyGeneration == model.connectionGeneration else { return }
         do {
-            let document = try model.publicBody(text, recipients: recipients, revision: inputRevision)
+            let document = try model.publicBody(text, recipients: recipients, revision: inputRevision, reply: reply)
             let receipt = model.lastResult?["commandResult"] ?? model.lastResult
             if model.lastOperation == .threadMessagesSend, model.lastInputOwner == owner, model.lastInputBody == document, ["applied", "accepted"].contains(receipt?.text("status") ?? "") { return }
             try model.saveBody(owner, body: document); inputIssue = nil
@@ -190,7 +191,7 @@ private struct RovaiThreadDetail: View {
     private func sendPublicBody() {
         guard !inputLocked else { return }; let frozenText = text; let frozenRecipients = recipients; let lifetime = model.connectionGeneration
         do {
-            let document = try model.publicBody(frozenText, recipients: frozenRecipients, revision: inputRevision); try model.saveBody(owner, body: document); inputIssue = nil
+            let document = try model.publicBody(frozenText, recipients: frozenRecipients, revision: inputRevision, reply: reply); try model.saveBody(owner, body: document); inputIssue = nil
             Task { guard lifetime == model.connectionGeneration else { return }; await model.send(frozenText, recipients: frozenRecipients, document: document, expectedThreadId: id) }
         } catch { inputIssue = error.localizedDescription }
     }

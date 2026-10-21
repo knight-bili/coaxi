@@ -194,9 +194,9 @@ final class RovaiWorkspaceModel {
     }
 
     func command(_ operation: RovaiOperation, value: JSONValue) async { await execute(operation, params: .object(["commandId": .string(UUID().uuidString.lowercased()), "command": value])) }
-    func publicBody(_ text: String, recipients: Set<String>, revision: Int) throws -> String {
+    func publicBody(_ text: String, recipients: Set<String>, revision: Int, reply: JSONValue? = nil) throws -> String {
         let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys]
-        let value = JSONValue.object(["version": .number(1), "text": .string(text), "recipients": .array(recipients.sorted().map(JSONValue.string)), "revision": .number(Double(revision))])
+        let value = JSONValue.object(["version": .number(1), "text": .string(text), "recipients": .array(recipients.sorted().map(JSONValue.string)), "revision": .number(Double(revision)), "reply": reply ?? .null])
         return String(decoding: try encoder.encode(value), as: UTF8.self)
     }
     func send(_ text: String, recipients: Set<String>, document: String, expectedThreadId: String) async {
@@ -204,7 +204,7 @@ final class RovaiWorkspaceModel {
         guard let body = JSONValue.parse(document), body.text("text") == text, Set((body["recipients"]?.rvArray ?? []).compactMap(\.stringValue)) == recipients else { issue = "输入草稿发生变化"; return }
         var segments: [JSONValue] = recipients.sorted().map { .object(["kind": .string("atom"), "atom": .object(["type": .string("member"), "agentId": .string($0)])]) }
         segments.append(.object(["kind": .string("text"), "text": .string(text)]))
-        let params = JSONValue.object(["commandId": .string(UUID().uuidString.lowercased()), "threadId": .string(threadId), "content": .object(["version": .number(2), "segments": .array(segments)]), "sourceAttachments": .array(publicSources), "quotes": .array([]), "replyToThreadMessageId": .null, "execution": .object(["taskId": .null, "purpose": .string(text.trimmingCharacters(in: .whitespacesAndNewlines)), "completionRole": .string("required")])])
+        let params = JSONValue.object(["commandId": .string(UUID().uuidString.lowercased()), "threadId": .string(threadId), "content": .object(["version": .number(2), "segments": .array(segments)]), "sourceAttachments": .array(publicSources), "quotes": .array([]), "replyToThreadMessageId": body["reply"]?["id"] ?? .null, "execution": .object(["taskId": .null, "purpose": .string(text.trimmingCharacters(in: .whitespacesAndNewlines)), "completionRole": .string("required")])])
         await submit(.object(["operation": .string(RovaiOperation.threadMessagesSend.rawValue), "params": params, "nativeBody": .object(["owner": .string("public:" + threadId), "expectedBody": .string(document), "replace": .bool(false)])]))
     }
 
