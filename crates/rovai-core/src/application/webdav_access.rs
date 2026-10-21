@@ -7,7 +7,7 @@ use crate::backup::webdav::{Config,WebDav};
 struct Settings{revision:String,config:Config}
 #[derive(Deserialize)]
 #[serde(rename_all="camelCase",deny_unknown_fields)]
-struct Request{operation:String,#[serde(default)]expected_revision:Option<String>,#[serde(default)]endpoint:Option<String>,#[serde(default)]username:Option<String>,#[serde(default)]password:Option<String>,#[serde(default)]clear_password:bool,#[serde(default)]allow_insecure:bool,#[serde(default)]command_id:Option<String>,#[serde(default)]path:Option<PathBuf>,#[serde(default)]snapshot_id:Option<String>,#[serde(default)]expected_digest:Option<String>}
+struct Request{operation:String,#[serde(default)]expected_revision:Option<String>,#[serde(default)]endpoint:Option<String>,#[serde(default)]username:Option<String>,#[serde(default)]password:Option<String>,#[serde(default)]clear_password:bool,#[serde(default)]allow_insecure:bool,#[serde(default)]command_id:Option<String>,#[serde(default)]path:Option<PathBuf>,#[serde(default)]snapshot_id:Option<String>,#[serde(default)]expected_digest:Option<String>,#[serde(default)]expected_index_etag:Option<String>,#[serde(default)]confirmed:bool,#[serde(default)]kind:Option<String>}
 fn view(settings:&Settings)->Value{json!({"revision":settings.revision,"endpoint":settings.config.endpoint,"username":settings.config.username,"passwordSet":!settings.config.password.is_empty(),"allowInsecure":settings.config.allow_insecure})}
 impl Core{
     pub(super) async fn webdav_access(&self,local:bool,value:Value)->Result<Value>{
@@ -26,6 +26,9 @@ impl Core{
         if request.operation=="list"{return Ok(json!({"entries":client.list().await?}))}
         if request.operation=="probe"{return client.probe().await}
         if request.operation=="create_collection"{return client.create_collection().await}
+        if request.operation=="removal_status"{return client.removal_status(request.snapshot_id.as_deref().context("webdav.snapshot_required")?,request.expected_digest.as_deref().context("webdav.source_digest_required")?).await}
+        if request.operation=="removal_preview"{return client.removal_preview(request.snapshot_id.as_deref().context("webdav.snapshot_required")?,request.expected_digest.as_deref().context("webdav.source_digest_required")?).await}
+        if request.operation=="remove"{ensure!(request.confirmed,"webdav.confirmation_required");return client.remove(request.snapshot_id.as_deref().context("webdav.snapshot_required")?,request.expected_digest.as_deref().context("webdav.source_digest_required")?,request.expected_index_etag.as_deref().context("webdav.index_etag_required")?).await}
         if request.operation=="transfers"{return super::webdav_transfer::list(&self.data_dir)}
         let id=request.command_id.context("webdav.command_required")?;uuid::Uuid::parse_str(&id)?;
         if request.operation=="status"{return super::webdav_transfer::status(&self.data_dir,&id)}
@@ -39,6 +42,7 @@ impl Core{
         }
         ensure!(matches!(request.operation.as_str(),"push"|"pull"),"webdav.operation_not_admitted");let identity=crate::command::canonical_json_digest(&value)?;
         if receipt.exists(){let previous:Value=serde_json::from_slice(&std::fs::read(&receipt)?)?;ensure!(previous["identity"]==identity,"webdav.command_identity_changed");return super::webdav_transfer::status(&self.data_dir,&id)}
+        ensure!(request.kind.as_deref().is_none_or(|kind|["backup","configuration"].contains(&kind)),"webdav.invalid_snapshot_kind");
         let selected=request.path.context("webdav.path_required")?;ensure!(selected.is_absolute(),"webdav.absolute_path_required");let digest=request.expected_digest.context("webdav.source_digest_required")?;ensure!(digest.len()==64&&digest.bytes().all(|byte|byte.is_ascii_hexdigit()),"webdav.invalid_source_digest");
         if request.operation=="pull"{let parent=std::fs::canonicalize(selected.parent().context("webdav.destination_parent_required")?)?;ensure!(!parent.starts_with(std::fs::canonicalize(&self.data_dir)?)&&!selected.exists(),"webdav.destination_invalid");let snapshot=request.snapshot_id.context("webdav.snapshot_required")?;uuid::Uuid::parse_str(&snapshot)?;}
         super::webdav_transfer::start(&self.data_dir,settings.config,value,identity)
