@@ -25,7 +25,7 @@ impl Core{
         if request.operation=="get"{return Ok(match previous{Some(value)=>serde_json::to_value(value)?,None=>json!({"revision":null,"value":Appearance::default()})})}
         ensure!(request.operation=="set"&&previous.as_ref().map(|previous|previous.revision.as_str())==request.expected_revision.as_deref(),"appearance.settings_changed");
         let next=request.value.context("appearance.value_required")?;
-        ensure!(matches!(next.preset.as_str(),"rovai"|"neutral"|"zinc"|"slate"|"stone"|"gray"|"red"|"rose"|"orange"|"green"|"blue"|"yellow"|"violet")&&next.custom_css.len()<=256*1024,"appearance.invalid_preset_or_css");
+        ensure!(matches!(next.preset.as_str(),"rovai"|"neutral"|"zinc"|"slate"|"stone"|"gray"|"red"|"rose"|"orange"|"green"|"blue"|"yellow"|"violet")&&next.custom_css.len()<=64*1024,"appearance.invalid_preset_or_css");
         for side in [&next.custom_theme.light,&next.custom_theme.dark]{for (key,value) in side{ensure!(TOKENS.contains(&key.as_str())&&!value.is_empty()&&value.len()<=64&&value.chars().all(|character|character.is_ascii_alphanumeric()||"#%.,()/ +-\t\r\n".contains(character)),"appearance.invalid_theme_token");}}
         let stored=Stored{revision:uuid::Uuid::new_v4().to_string(),value:next};crate::platform::private_storage::atomic_write_private_json(&path,&stored)?;Ok(serde_json::to_value(stored)?)
     }

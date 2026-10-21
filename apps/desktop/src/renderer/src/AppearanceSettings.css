@@ -125,3 +125,5 @@
 .settings-panel-appearance .appearance-settings-page :is(.quiet-button, .save-state) > .icon { width: 13px; height: 13px; }
 
 .settings-panel-appearance .appearance-settings-page .appearance-options:disabled .appearance-option { cursor: default; opacity: .68; }
+
+.appearance-preset-swatches{display:flex;gap:8px;flex-wrap:wrap}.appearance-preset-swatches>button{display:flex;align-items:center;gap:7px;border:1px solid var(--line);padding:7px 10px;border-radius:9px;background:var(--surface-raised);color:var(--ink)}.appearance-preset-swatches>button>span{width:14px;height:14px;border-radius:50%}.appearance-preset-swatches>button.is-active{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}.appearance-extensions-section details{padding:.65rem 0}.appearance-extensions-section summary{cursor:pointer}.appearance-extensions-section textarea{width:100%;margin-top:.5rem;border:1px solid var(--line);background:var(--surface-raised);color:var(--ink);border-radius:8px;padding:.75rem;font-family:monospace}.appearance-custom-css-editor{height:240px;min-height:0;overflow:hidden;border:1px solid var(--line);border-radius:8px;margin-top:.5rem}

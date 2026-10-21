@@ -1,3 +1,4 @@
+import { AppearanceExtensionsSettings } from './AppearanceExtensionsSettings'
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react'
 import type { AppearancePreferences, AppearanceSnapshot } from '@contracts'
 import { APPEARANCE_ZOOM_OPTIONS, DEFAULT_APPEARANCE, MAX_READING_FONT_SIZE, MIN_READING_FONT_SIZE, appearancePreferencesEqual } from '../../shared/appearance'
@@ -145,6 +146,7 @@ export function AppearanceSettings({ appearance, disabled, platform = 'darwin', 
   const shortcut = platform === 'darwin' ? '⌘' : 'Ctrl'
 
   return <div className="appearance-settings-page" style={style}>
+    <AppearanceExtensionsSettings/>
     <SettingsPageHeader eyebrow="Settings / Appearance" title={uiAttribute("外观")} description={uiAttribute("调整 Rovai AI 的界面主题、文字大小与阅读体验。")} aside={<div className="heading-actions">
       <span className="save-state" role="status" aria-live="polite">{!saving && !saveError && !sourceDegraded && <Icon name="check" />}{saving ? uiAttribute("保存中…") : saveError || sourceDegraded ? uiAttribute("未保存") : uiAttribute("已保存")}</span>
       <button className="quiet-button" type="button" disabled={disabled || (!saveError && !sourceDegraded && appearancePreferencesEqual(draft, DEFAULT_APPEARANCE))} onClick={() => void change(DEFAULT_APPEARANCE)}><Icon name="reset"/><UiText zh={"恢复默认"} /></button>

@@ -1,3 +1,4 @@
+import { AppearanceExtensionHost } from './AppearanceExtensionHost'
 import { CanvasThreadWorkspace } from './CanvasThreadWorkspace'
 import { readCanvasObject, type CanvasObjectTarget } from './canvas-object'
 import { windowFilePreviewResources } from './file-preview-resources'
@@ -801,7 +802,7 @@ export function AppToast({
 }
 
 export function BusinessApp(props: React.ComponentProps<typeof BusinessAppContent>): React.JSX.Element {
-  return <ThreadClientProvider client={props.environment.client}><CanvasFolderProvider client={props.environment.client}><BusinessAppContent {...props} /></CanvasFolderProvider></ThreadClientProvider>
+  return <ThreadClientProvider client={props.environment.client}><CanvasFolderProvider client={props.environment.client}><AppearanceExtensionHost/><BusinessAppContent {...props} /></CanvasFolderProvider></ThreadClientProvider>
 }
 
 function BusinessAppContent({
