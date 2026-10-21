@@ -24,7 +24,7 @@ fun RovaiPrivateConversation(model:RovaiWorkspaceViewModel,threadId:String,child
     var conversations by remember(threadId){mutableStateOf<List<JsonObject>>(emptyList())};var selected by remember(threadId,childId,initialConversationId){mutableStateOf(childId?:initialConversationId)}
     var snapshot by remember(threadId,childId){mutableStateOf(buildJsonObject{})};var body by remember(selected){mutableStateOf("")};var bodyReady by remember(selected){mutableStateOf(false)}
     var retained by remember(selected){mutableStateOf<List<JsonObject>>(emptyList())};var cursor by remember(selected){mutableStateOf<String?>(null)}
-    var issue by remember{mutableStateOf<String?>(null)};var loading by remember{mutableStateOf(false)};var ending by remember{mutableStateOf(false)}
+    var issue by remember{mutableStateOf<String?>(null)};var loading by remember{mutableStateOf(false)};var ending by remember{mutableStateOf(false)};var openingCommand by remember{mutableStateOf<String?>(null)}
     val get=if(child)RovaiOperation.DELEGATIONS_CONVERSATION_GET else RovaiOperation.SINGLECHAT_GET
     val send=if(child)RovaiOperation.DELEGATIONS_MESSAGE_SEND else RovaiOperation.SINGLECHAT_SEND
     val edit=if(child)RovaiOperation.DELEGATIONS_PENDINGINPUTS_EDIT else RovaiOperation.SINGLECHAT_PENDINGINPUTS_EDIT
@@ -44,7 +44,7 @@ fun RovaiPrivateConversation(model:RovaiWorkspaceViewModel,threadId:String,child
     LaunchedEffect(state.thread){load()}
     LaunchedEffect(state.lastResult){
         val receipt=state.lastResult.coreObject()["commandResult"].coreObject().ifEmpty{state.lastResult.coreObject()}
-        if(!child&&state.lastCompletedOperation==RovaiOperation.SINGLECHAT_OPEN.wire&&receipt.coreText("status")=="applied"){
+        if(!child&&state.lastCompletedOperation==RovaiOperation.SINGLECHAT_OPEN.wire&&receipt.coreText("commandId")==openingCommand&&receipt.coreText("status")=="applied"){
             val id=receipt["payload"].coreObject().coreText("conversationId")
             if(id.isNotEmpty()){val opened=model.query(get,buildJsonObject{put("conversationId",id);put("composerScope",JsonNull)}).coreObject();if(opened["conversation"].coreObject().coreText("threadId")==threadId)selected=id}
         }else{load();if(selected!=null){retainedPage();if(state.lastCompletedOperation in listOf(send.wire,edit.wire,mutate.wire)&&state.pending==null){body=model.readBody(owner);bodyReady=true}}}
@@ -55,7 +55,7 @@ fun RovaiPrivateConversation(model:RovaiWorkspaceViewModel,threadId:String,child
         Row(Modifier.fillMaxWidth().padding(horizontal=12.dp)){TextButton(onClick={scope.launch{close()}}){Text("返回对话")};Text(if(child)"独立帮手" else "队员私聊",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(onClick={scope.launch{load();retainedPage()}},enabled=!loading){Text("刷新")}}
         issue?.let{Text(it,color=CodegTheme.colors.danger,modifier=Modifier.padding(horizontal=16.dp))};if(state.pending!=null)Row(Modifier.padding(horizontal=12.dp)){Text("原操作待核对",Modifier.weight(1f));TextButton(enabled=!state.busy,onClick=model::reconcile){Text("核对")};TextButton(enabled=!state.busy,onClick=model::retry){Text("重试原操作")}}
         if(selected==null){LazyColumn(contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
-            items(state.thread?.get("members").coreArray().filter{it.coreText("membershipStatus")=="active"&&it.coreText("profilePresence")=="present"},key={it.coreText("agentId")}){member->GlassRow(Modifier.fillMaxWidth()){Text(member.coreText("displayName"),style=MaterialTheme.typography.titleMedium);TextButton(enabled=state.pending==null&&!state.busy,onClick={model.command(RovaiOperation.SINGLECHAT_OPEN,buildJsonObject{put("threadId",threadId);put("agentId",member.coreText("agentId"))})}){Text("开始私聊")}}}
+            items(state.thread?.get("members").coreArray().filter{it.coreText("membershipStatus")=="active"&&it.coreText("profilePresence")=="present"},key={it.coreText("agentId")}){member->GlassRow(Modifier.fillMaxWidth()){Text(member.coreText("displayName"),style=MaterialTheme.typography.titleMedium);TextButton(enabled=state.pending==null&&!state.busy,onClick={run{val id=java.util.UUID.randomUUID().toString();openingCommand=id;model.execute(RovaiOperation.SINGLECHAT_OPEN,buildJsonObject{put("commandId",id);putJsonObject("command"){put("threadId",threadId);put("agentId",member.coreText("agentId"))}})}}){Text("开始私聊")}}}
             items(conversations,key={it.coreText("id")}){conversation->GlassRow(Modifier.fillMaxWidth().clickable{selected=conversation.coreText("id")}){Text(state.members.find{it.coreText("agentId")==conversation.coreText("agentId")}?.coreText("displayName")?:conversation.coreText("agentId"));Text(conversation.coreText("updatedAt"),style=MaterialTheme.typography.labelSmall)}}
         }}else{
             val active=snapshot["conversation"].coreObject().coreText("status")=="active"

@@ -4,6 +4,7 @@ struct RovaiPrivateConversationView: View {
     let model: RovaiWorkspaceModel
     let threadId: String
     var childId: String? = nil
+    var initialConversationId: String? = nil
     @Environment(\.dismiss) private var dismiss
     @State private var conversations: [JSONValue] = []
     @State private var selected: String?
@@ -15,6 +16,7 @@ struct RovaiPrivateConversationView: View {
     @State private var issue: String?
     @State private var busy = false
     @State private var ending = false
+    @State private var openingCommand: String?
     private var child: Bool { childId != nil }
     private var owner: String { "private:\(threadId):\(selected ?? ""):\(child ? "delegation_child" : "single_chat")" }
     private var disabled: Bool { busy || model.busy || model.pending != nil || !bodyReady }
@@ -31,21 +33,21 @@ struct RovaiPrivateConversationView: View {
             }.navigationTitle(child ? "独立帮手" : "队员私聊")
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("关闭") { close() } }; ToolbarItem(placement: .topBarTrailing) { Button("刷新") { Task { await load(); await readRetained() } }.disabled(busy) } }
         }.interactiveDismissDisabled(true)
-        .task { if let childId { selected = childId } else { await load() } }
+        .task { if let childId { selected = childId } else if let initialConversationId { selected = initialConversationId } else { await load() } }
         .task(id: selected) { bodyReady = false; snapshot = .object([:]); retained = []; if selected != nil { do { text = try model.readBody(owner); bodyReady = true; await load(); await readRetained() } catch { issue = error.localizedDescription } } }
         .onChange(of: text) { _, value in guard bodyReady else { return }; do { try model.saveBody(owner, body: value) } catch { issue = error.localizedDescription } }
         .onChange(of: model.thread) { _, _ in Task { await load() } }
         .onChange(of: model.lastUploadResult) { _, _ in Task { await load(); await readRetained() } }
         .onChange(of: model.lastResult) { _, value in
             let receipt = value?["commandResult"] ?? value
-            if !child, model.lastOperation == .singleChatOpen, receipt?.text("status") == "applied", let id = receipt?["payload"]?["conversationId"]?.stringValue { selected = id }
+            if !child, model.lastOperation == .singleChatOpen, receipt?.text("commandId") == openingCommand, receipt?.text("status") == "applied", let id = receipt?["payload"]?["conversationId"]?.stringValue { selected = id }
             else { Task { await load(); await readRetained(); if let operation = model.lastOperation, [send, edit, mutate].contains(operation), model.pending == nil, selected != nil { do { text = try model.readBody(owner) } catch { issue = error.localizedDescription } } } }
         }
         .confirmationDialog("结束当前私聊？", isPresented: $ending, titleVisibility: .visible) { Button("结束会话", role: .destructive) { Task { var value: [String: JSONValue] = ["conversationId": .string(selected ?? "")]; if !child { value["threadId"] = .string(threadId) }; await model.command(child ? .delegationsConversationEnd : .singleChatEnd, value: .object(value)) } } } message: { Text("保留消息和历史记录；正在执行的工作由Core处理结束。") }
     }
     private var chooser: some View {
         List {
-            Section("队员") { ForEach((model.thread?["members"]?.rvArray ?? []).filter { $0.text("membershipStatus") == "active" && $0.text("profilePresence") == "present" }.map { RovaiRow(value: $0) }) { row in Button(row.value.text("displayName")) { Task { await model.command(.singleChatOpen, value: .object(["threadId": .string(threadId), "agentId": .string(row.id)])) } }.disabled(model.pending != nil || model.busy) } }
+            Section("队员") { ForEach((model.thread?["members"]?.rvArray ?? []).filter { $0.text("membershipStatus") == "active" && $0.text("profilePresence") == "present" }.map { RovaiRow(value: $0) }) { row in Button(row.value.text("displayName")) { Task { let id = UUID().uuidString.lowercased(); openingCommand = id; await model.execute(.singleChatOpen, params: .object(["commandId": .string(id), "command": .object(["threadId": .string(threadId), "agentId": .string(row.id)])])) } }.disabled(model.pending != nil || model.busy) } }
             Section("已有私聊") { ForEach(conversations.map { RovaiRow(value: $0) }) { row in Button { selected = row.id } label: { VStack(alignment: .leading, spacing: 5) { Text(model.members.first { $0.text("agentId") == row.value.text("agentId") }?.text("displayName") ?? row.value.text("agentId")); Text(row.value.text("updatedAt")).font(.caption).foregroundStyle(Theme.textSecondary) } } } }
         }.scrollContentBackground(.hidden)
     }
