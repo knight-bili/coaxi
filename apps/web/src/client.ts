@@ -727,6 +727,17 @@ export class ConsoleClient {
     return [...this.#pending.entries()].flatMap(([commandId, entry]) => entry.missionFiles ? [{ commandId, intent: structuredClone(entry.missionFiles.intent), needsFiles: !entry.missionFiles.data }] : [])
   }
 
+  async retryMissionFiles(commandId: string): Promise<void> {
+    await this.reconcilePending()
+    const entry = this.#pending.get(commandId)
+    if (!entry?.missionFiles) return
+    if (!entry.missionFiles.data) {
+      if (entry.missionFiles.intent.files.length) throw new Error('请先选择原附件。')
+      const data = new FormData(); data.append('intent', JSON.stringify(entry.missionFiles.intent)); entry.missionFiles.data = data
+    }
+    await this.#dispatchCommand(commandId, entry, true)
+  }
+
   async resumeMissionFiles(commandId: string, files: File[]): Promise<void> {
     const entry = this.#pending.get(commandId)
     if (!entry?.missionFiles) throw new Error('原使命提交已核对完成。')

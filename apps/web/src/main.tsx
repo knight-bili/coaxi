@@ -4,6 +4,7 @@ import { takeLoginTicket } from './login-ticket'
 import { StrictMode, useEffect, useState } from 'react'
 import { RemoteConnectionStatus } from '../../desktop/src/renderer/src/RemoteConnectionStatus'
 import { HostWorkspacePicker } from './HostWorkspacePicker'
+import { MissionFilesRecovery } from './MissionFilesRecovery'
 import { WebLogin } from './WebLogin'
 import '../../desktop/src/renderer/src/remote-connection.css'
 import type { WorkspaceSelection } from '@contracts'
@@ -158,9 +159,10 @@ function WebEntry() {
   return <>
     {current && <div className="web-authenticated-shell" hidden={!authenticated} inert={!authenticated}><ThreadClientProvider client={current.environment.client}>
       <CurrentUserProfileProvider api={current.profile}>
-        <BusinessApp environment={current.environment} remoteConnection={<RemoteConnectionStatus origin={transport.origin} state={authenticated ? connection : 'expired'} onLogout={() => { setError(null); void transport.logout().catch(e => setError(e instanceof Error ? e.message : '退出未完成，请重试。')) }} />} sidebarFooter={authenticated && connection === 'offline' ? <div className="web-connection" role="status">
-          <span>连接中断，编辑保留</span>
-        </div> : undefined} />
+        <BusinessApp environment={current.environment} remoteConnection={<RemoteConnectionStatus origin={transport.origin} state={authenticated ? connection : 'expired'} onLogout={() => { setError(null); void transport.logout().catch(e => setError(e instanceof Error ? e.message : '退出未完成，请重试。')) }} />} sidebarFooter={authenticated ? <>
+          {connection === 'offline' && <div className="web-connection" role="status"><span>连接中断，编辑保留</span></div>}
+          <MissionFilesRecovery transport={transport} />
+        </> : undefined} />
       </CurrentUserProfileProvider>
     </ThreadClientProvider></div>}
     {authenticated && error && <div className="web-recovery-error" role="alert">{error}<button type="button" className="quiet-button compact" onClick={() => setError(null)}>关闭</button></div>}
