@@ -10,6 +10,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.codeg.android.core.designsystem.component.GlassRow
+import app.codeg.android.core.designsystem.diff.DiffView
+import app.codeg.android.core.designsystem.diff.UnifiedDiff
 import app.codeg.android.core.designsystem.markdown.MarkdownContent
 import app.codeg.android.core.designsystem.theme.CodegTheme
 import app.codeg.android.core.network.RovaiOperation
@@ -57,7 +59,7 @@ private fun JsonObject.forgeBody()=coreText("body").ifEmpty{coreText("descriptio
                 detail?.let{change->item{Text(change.coreText("head_ref")+" → "+change.coreText("base_ref"));Text(change.coreText("state")+" · "+change.coreText("head_sha").take(12),style=MaterialTheme.typography.bodySmall)};val checks=change["checks"].coreObject();item{Text("检查",style=MaterialTheme.typography.titleSmall);if(checks["available"]!=JsonPrimitive(true))Text("未能读取检查状态",color=CodegTheme.colors.textSecondary);if(checks["partial"]==JsonPrimitive(true))Text("仅取得部分检查状态",color=CodegTheme.colors.textSecondary)};items(checks["checks"].coreArray(),key={it.coreText("id")}){check->GlassRow{Text(check.coreText("name"));Text(check.coreText("state")+(if(check["allow_failure"]==JsonPrimitive(true))" · 允许失败" else ""),color=CodegTheme.colors.textSecondary);if(check.coreText("summary").isNotBlank())Text(check.coreText("summary"),style=MaterialTheme.typography.bodySmall)}}
                     item{TextButton(enabled=!busy&&fileNext!=null,onClick={val current=fileNext?:return@TextButton;work{val result=call("change_files",buildJsonObject{put("number",selectedRow.forgeNumber());put("page",current)});files=if(current==1)result["data"].coreObject()["files"].coreArray()else files+result["data"].coreObject()["files"].coreArray();fileNext=(result["nextPage"]as?JsonPrimitive)?.intOrNull}}){Text(if(files.isEmpty())"读取变更文件" else "更多变更文件")}}
                 }
-                items(files,key={it.coreText("path")}){file->GlassRow{var expanded by remember(file){mutableStateOf(false)};TextButton(onClick={expanded=!expanded}){Text(file.coreText("path"))};if(file["binary"]==JsonPrimitive(true))Text("二进制文件")else if(file.coreText("patch").isEmpty())Text("平台未提供文本差异")else if(expanded)androidx.compose.foundation.text.selection.SelectionContainer{Text(file.coreText("patch"),style=MaterialTheme.typography.bodySmall.copy(fontFamily=androidx.compose.ui.text.font.FontFamily.Monospace))}}}
+                items(files,key={it.coreText("path")}){file->GlassRow{var expanded by remember(file){mutableStateOf(false)};TextButton(onClick={expanded=!expanded}){Text(file.coreText("path"))};if(file["binary"]==JsonPrimitive(true))Text("二进制文件")else if(file.coreText("patch").isEmpty())Text("平台未提供文本差异")else if(expanded)DiffView(UnifiedDiff.parse("diff --git a/${file.coreText("previous_path").ifEmpty{file.coreText("path")}} b/${file.coreText("path")}\n--- a/${file.coreText("previous_path").ifEmpty{file.coreText("path")}}\n+++ b/${file.coreText("path")}\n${file.coreText("patch")}"))}}
                 items(comments){comment->GlassRow{Text(comment["user"].coreObject().coreText("login").ifEmpty{comment["author"].coreObject().coreText("username")},style=MaterialTheme.typography.labelSmall);MarkdownContent(comment.forgeBody())}}
                 commentNext?.let{current->item{TextButton(enabled=!busy,onClick={work{loadComments(selectedRow.forgeNumber(),current)}}){Text("更多评论")}}}
             }

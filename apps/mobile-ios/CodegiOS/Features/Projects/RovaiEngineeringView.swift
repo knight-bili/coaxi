@@ -32,9 +32,9 @@ struct RovaiEngineeringView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                Picker("工程", selection: $tab) { Text("文件").tag(0); Text("Git").tag(1) }.pickerStyle(.segmented).padding(12).disabled(dirty)
+                Picker("工程", selection: $tab) { Text("文件").tag(0); Text("Git").tag(1); Text("仓库面板").tag(2) }.pickerStyle(.segmented).padding(12).disabled(dirty)
                 if let issue { Text(issue).font(.caption).foregroundStyle(Theme.warning).frame(maxWidth: .infinity, alignment: .leading).padding(12) }
-                if tab == 0 { files } else { git }
+                if tab == 0 { files } else if tab == 1 { git } else {RovaiForgeWorkspace(model: model, threadId: threadId)}
             }
             .navigationTitle(file?.text("path").components(separatedBy: "/").last ?? (tab == 0 ? "工程文件" : "Git"))
             .navigationBarTitleDisplayMode(.inline)
