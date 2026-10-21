@@ -13,7 +13,7 @@ impl Core{
             "start"=>{
                 if let Some(locator)=request.attachment_locator{
                     ensure!(!request.editable&&locator.camp_id()==request.scope.thread_id,"office.attachment_readonly_owner_required");
-                    ensure!(matches!(locator,LocalAttachmentOwnerLocator::Message{..}|LocalAttachmentOwnerLocator::SingleChatMessage{..}|LocalAttachmentOwnerLocator::DelegationChildMessage{..}),"office.published_attachment_required");
+                    ensure!(matches!(locator,LocalAttachmentOwnerLocator::Message{..}|LocalAttachmentOwnerLocator::SingleChatMessage{..}|LocalAttachmentOwnerLocator::DelegationChildMessage{..}|LocalAttachmentOwnerLocator::Mission{..}),"office.published_attachment_required");
                     let target={let database=self.database.lock().await;let source=rovai_core::local_attachment_source::load_source_attachment_for_client(&database,&locator,client)?;
                         if let Some(source)=source{Some(desktop_target_for_source_attachment(&source)?)}else{
                             ensure!(legacy_attachment_belongs_to_owner(&database,&locator)?,"office.attachment_not_owned");
