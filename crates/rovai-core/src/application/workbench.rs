@@ -5,14 +5,14 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::{fs, io::Write, path::Component};
 
-static MUTATIONS: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
+pub(super) static MUTATIONS: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
 
 #[derive(Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
-struct Scope {
-    thread_id: String,
+pub(super) struct Scope {
+    pub(super) thread_id: String,
     #[serde(default)]
-    mission_id: Option<String>,
+    pub(super) mission_id: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -325,7 +325,7 @@ impl Core {
         Ok(result)
     }
 
-    async fn workbench_root(&self, scope: &Scope) -> Result<PathBuf> {
+    pub(super) async fn workbench_root(&self, scope: &Scope) -> Result<PathBuf> {
         let persisted: String = {
             let database = self.database.lock().await;
             let thread: String = database.connection().query_row(

@@ -12,6 +12,7 @@ mod mission;
 mod native_interactions;
 mod native_child_reads;
 mod workbench;
+mod forge;
 pub(crate) mod private_composer;
 mod private_sources;
 pub(crate) mod runtime_interactions;
@@ -10331,6 +10332,10 @@ impl Core {
             "workbench.organizer.get" | "workbench.organizer.set" => {
                 self.workbench_organizer(&request.method, request.params.clone()).await
             }
+            "forge.accounts.get" | "forge.accounts.set" => {
+                self.forge_accounts(&request.method, request.params.clone()).await
+            }
+            "forge.operation" => self.forge_operation(request.params.clone()).await,
             "workspaces.inspect" => {
                 let params: WorkspaceInspectParams =
                     serde_json::from_value(request.params.clone())?;
