@@ -25,6 +25,7 @@ mod office_skills;
 mod custom_skills;
 mod project_launcher;
 mod forge;
+mod forge_links;
 pub(crate) mod private_composer;
 mod private_sources;
 pub(crate) mod runtime_interactions;
@@ -10361,6 +10362,7 @@ impl Core {
                 self.forge_accounts(&request.method, request.params.clone()).await
             }
             "forge.operation" => self.forge_operation(request.params.clone()).await,
+            "forge.links" => self.forge_links(request.params.clone()).await,
             "workspaces.inspect" => {
                 let params: WorkspaceInspectParams =
                     serde_json::from_value(request.params.clone())?;

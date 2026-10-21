@@ -5028,6 +5028,7 @@ export type CoreMethod =
   | 'forge.accounts.get'
   | 'forge.accounts.set'
   | 'forge.operation'
+  | 'forge.links'
   | 'workbench.organizer.set'
   | 'workbench.files.read'
   | 'workbench.files.mutate'

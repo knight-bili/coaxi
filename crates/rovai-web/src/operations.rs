@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 /// and the legacy shared draft remain outside the network capability.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum Operation {
+    #[serde(rename="forge.links")]
+    ForgeLinks,
     #[serde(rename="workbench.projectLauncher")]
     ProjectLauncher,
     #[serde(rename="workbench.files.tools")]
@@ -505,6 +507,7 @@ pub enum Operation {
 impl Operation {
     pub fn timeout(self) -> std::time::Duration {
         std::time::Duration::from_secs(match self {
+            Self::ForgeLinks => 120,
             Self::ProjectLauncher => 30,
             Self::WorkbenchFileTools => 120,
             Self::OfficeCli => 30,
@@ -531,6 +534,7 @@ impl Operation {
         match self {
             Self::AppInfo => json!({"name":value["name"],"version":value["version"]}),
             Self::ForgeAccountsGet | Self::ForgeAccountsSet => select_fields(&value, &["accounts"]),
+            Self::ForgeLinks => select_fields(&value,&["revision","repository","links","applied","id"]),
             Self::ProjectLauncher => select_fields(&value,&["tools","planId","arguments","name","parent","kind","commandId","state","path","partialPath","startedAt","completedAt","log","error"]),
             Self::WorkbenchFileTools => select_fields(&value,&["path","digest","directory","files","bytes","entries","results","next","limited","scanned","applied","trashId","versions"]),
             Self::OfficeCli => select_fields(&value,&["installed","runnable","version","runtimeError","digest","manualUrl","commandId","operation","state","startedAt","completedAt","log","info","error"]),
@@ -616,6 +620,7 @@ impl Operation {
         match self {
             Self::ForgeAccountsGet => "forge.accounts.get",
             Self::ForgeAccountsSet => "forge.accounts.set",
+            Self::ForgeLinks => "forge.links",
             Self::ProjectLauncher => "workbench.projectLauncher",
             Self::WorkbenchFileTools => "workbench.files.tools",
             Self::OfficeCli => "office.cli",
