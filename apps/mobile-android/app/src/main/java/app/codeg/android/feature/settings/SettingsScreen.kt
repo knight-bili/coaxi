@@ -67,6 +67,7 @@ import app.codeg.android.core.designsystem.component.CodegSegmented
 import app.codeg.android.core.designsystem.component.SettingsIconBadge
 import app.codeg.android.core.designsystem.theme.AccentPalette
 import app.codeg.android.core.designsystem.theme.CodegTheme
+import app.codeg.android.core.datastore.AppSettings
 import app.codeg.android.core.datastore.ThemeMode
 import app.codeg.android.core.model.AgentType
 
@@ -183,8 +184,13 @@ private fun SettingsRoot(onSelect: (SettingsLeaf) -> Unit) {
 
 @Composable
 private fun AppearanceSettings(viewModel: SettingsViewModel) {
-    val colors = CodegTheme.colors
     val settings by viewModel.settings.collectAsStateWithLifecycle()
+    AppearanceSettingsContent(settings,viewModel::setThemeMode,viewModel::setAccent)
+}
+
+@Composable
+fun AppearanceSettingsContent(settings:AppSettings,onTheme:(ThemeMode)->Unit,onAccent:(String)->Unit) {
+    val colors = CodegTheme.colors
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(stringResource(R.string.settings_theme), style = MaterialTheme.typography.titleSmall, color = colors.textSecondary)
@@ -192,7 +198,7 @@ private fun AppearanceSettings(viewModel: SettingsViewModel) {
             CodegSegmented(
                 options = modes.map { it.name.lowercase().replaceFirstChar { c -> c.uppercase() } },
                 selectedIndex = modes.indexOf(settings.themeMode),
-                onSelect = { viewModel.setThemeMode(modes[it]) },
+                onSelect = { onTheme(modes[it]) },
             )
         }
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -203,7 +209,7 @@ private fun AppearanceSettings(viewModel: SettingsViewModel) {
                     Box(
                         Modifier.size(34.dp).clip(CircleShape).background(palette.resolve(colors.isDark))
                             .border(if (selected) 3.dp else 0.dp, colors.textPrimary, CircleShape)
-                            .clickable { viewModel.setAccent(palette.id) },
+                            .clickable { onAccent(palette.id) },
                     )
                 }
             }
