@@ -24,6 +24,8 @@ final class RovaiWorkspaceModel {
     var threadId: String?
     var pending: JSONValue?
     var lastResult: JSONValue?
+    var lastInputOwner: String?
+    var lastInputBody: String?
     var lastOperation: RovaiOperation?
     var lastUploadResult: JSONValue?
     var publicSources: [JSONValue] = []
@@ -40,7 +42,7 @@ final class RovaiWorkspaceModel {
     @ObservationIgnored private var writing = false
     func bind(_ profile: ServerProfile?, store: ServerStore) async {
         terminals.values.forEach { $0.retire() }; terminals.removeAll()
-        generation &+= 1; events?.cancel(); client = nil; self.profile = profile; connected = false; thread = nil; threadId = nil; navigation = .object([:]); members = []; missions = []; boards = []; issue = nil; pending = nil; lastResult = nil; lastOperation = nil; lastUploadResult = nil; publicSources = []; publicSourcesReady = false
+        generation &+= 1; events?.cancel(); client = nil; self.profile = profile; connected = false; thread = nil; threadId = nil; navigation = .object([:]); members = []; missions = []; boards = []; issue = nil; pending = nil; lastResult = nil; lastInputOwner = nil; lastInputBody = nil; lastOperation = nil; lastUploadResult = nil; publicSources = []; publicSourcesReady = false
         guard let profile, let token = store.token(for: profile), let baseURL = profile.baseURL else { return }
         account = "pending:" + RovaiSecureSession.account(baseURL: baseURL, administratorToken: token)
         if let data = RovaiSecureSession.load(profile: profile.id, account: account) { pending = try? JSONDecoder().decode(JSONValue.self, from: data) }
@@ -96,7 +98,7 @@ final class RovaiWorkspaceModel {
     }
     func saveBody(_ owner: String, body: String) throws {
         guard let profile, !account.isEmpty else { throw RovaiHostFailure(code: "尚未连接工作区") }
-        let data = Data(body.utf8); guard data.count <= 64 * 1024 else { throw RovaiHostFailure(code: "草稿超过64KB，请拆分后发送。") }
+        let data = Data(body.utf8); guard data.count <= 1024 * 1024 else { throw RovaiHostFailure(code: "草稿超过1MB，请拆分后发送。") }
         guard RovaiSecureSession.save(data.isEmpty ? nil : data, profile: profile.id, account: bodyAccount(owner)) else { throw RovaiHostFailure(code: "草稿未能保存，输入仍在当前页面。") }
     }
     func upload(_ url: URL, threadId: String, target: JSONValue, revision: Int, expectedGeneration: UInt64) async {
@@ -144,8 +146,9 @@ final class RovaiWorkspaceModel {
         }
         let key = "body:" + account + ":" + SHA256.hash(data: Data(local.text("owner").utf8)).map { String(format: "%02x", $0) }.joined()
         let saved = RovaiSecureSession.load(profile: profile.id, account: key).flatMap { String(data: $0, encoding: .utf8) } ?? ""
+        if !replace && saved != local.text("expectedBody") { return }
         guard saved == local.text("expectedBody") || saved == body else { throw RovaiHostFailure(code: "输入内容已变化，已保留当前草稿和原请求") }
-        let data = Data(body.utf8); guard data.count <= 64 * 1024, RovaiSecureSession.save(data.isEmpty ? nil : data, profile: profile.id, account: key) else { throw RovaiHostFailure(code: "私聊草稿尚未保存，原请求仍保留") }
+        let data = Data(body.utf8); guard data.count <= 1024 * 1024, RovaiSecureSession.save(data.isEmpty ? nil : data, profile: profile.id, account: key) else { throw RovaiHostFailure(code: "私聊草稿尚未保存，原请求仍保留") }
     }
     func execute(_ operation: RovaiOperation, params: JSONValue) async {
         guard pending == nil else { return }
@@ -166,7 +169,7 @@ final class RovaiWorkspaceModel {
             try settlePublicSend(request, result: result, profile: profile, account: account, lifetime: lifetime)
             RovaiSecureSession.save(nil, profile: profile.id, account: account)
             guard lifetime == generation else { return }
-            pending = nil; lastResult = result; lastOperation = operation
+            pending = nil; lastResult = result; lastOperation = operation; lastInputOwner = request["nativeBody"]?["owner"]?.stringValue; lastInputBody = request["nativeBody"]?["expectedBody"]?.stringValue
             let receipt = result["commandResult"] == .null ? result : result["commandResult"] ?? result
             if receipt.text("status") == "rejected" { issue = receipt.text("code") }
             await refresh()
@@ -180,17 +183,25 @@ final class RovaiWorkspaceModel {
             if request.text("operation") == "__host.upload" { let result = try await client.uploadStatus(intent: params["intent"] ?? .null); try await completeUpload(request, result: result, profile: profile, account: account, lifetime: lifetime); return }
             guard let operation = RovaiOperation(rawValue: request.text("operation")) else { return }
             let result = try await client.reconcile(operation, params: params); guard lifetime == generation else { return }
-            if result.text("state") == "recorded" { try await settlePrivate(request, result: result["result"] ?? .null, profile: profile, account: account, client: client); try settlePublicSend(request, result: result["result"] ?? .null, profile: profile, account: account, lifetime: lifetime); RovaiSecureSession.save(nil, profile: profile.id, account: account); pending = nil; lastResult = result["result"]; lastOperation = operation; await refresh() } else { issue = "原操作结果尚不明确，请稍后核对或重试原操作。" }
+            if result.text("state") == "recorded" { try await settlePrivate(request, result: result["result"] ?? .null, profile: profile, account: account, client: client); try settlePublicSend(request, result: result["result"] ?? .null, profile: profile, account: account, lifetime: lifetime); RovaiSecureSession.save(nil, profile: profile.id, account: account); pending = nil; lastResult = result["result"]; lastOperation = operation; lastInputOwner = request["nativeBody"]?["owner"]?.stringValue; lastInputBody = request["nativeBody"]?["expectedBody"]?.stringValue; await refresh() } else { issue = "原操作结果尚不明确，请稍后核对或重试原操作。" }
         } catch { if lifetime == generation { failure(error) } }
     }
 
     func command(_ operation: RovaiOperation, value: JSONValue) async { await execute(operation, params: .object(["commandId": .string(UUID().uuidString.lowercased()), "command": value])) }
-    func send(_ text: String, recipients: Set<String>) async {
-        guard let threadId, !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+    func publicBody(_ text: String, recipients: Set<String>, revision: Int) throws -> String {
+        let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys]
+        let value = JSONValue.object(["version": .number(1), "text": .string(text), "recipients": .array(recipients.sorted().map(JSONValue.string)), "revision": .number(Double(revision))])
+        return String(decoding: try encoder.encode(value), as: UTF8.self)
+    }
+    func send(_ text: String, recipients: Set<String>, document: String, expectedThreadId: String) async {
+        guard let threadId, threadId == expectedThreadId, !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, pending == nil, !busy else { return }
+        guard let body = JSONValue.parse(document), body.text("text") == text, Set((body["recipients"]?.rvArray ?? []).compactMap(\.stringValue)) == recipients else { issue = "输入草稿发生变化"; return }
         var segments: [JSONValue] = recipients.sorted().map { .object(["kind": .string("atom"), "atom": .object(["type": .string("member"), "agentId": .string($0)])]) }
         segments.append(.object(["kind": .string("text"), "text": .string(text)]))
-        await execute(.threadMessagesSend, params: .object(["commandId": .string(UUID().uuidString.lowercased()), "threadId": .string(threadId), "content": .object(["version": .number(2), "segments": .array(segments)]), "sourceAttachments": .array(publicSources), "quotes": .array([]), "replyToThreadMessageId": .null, "execution": .object(["taskId": .null, "purpose": .string(text.trimmingCharacters(in: .whitespacesAndNewlines)), "completionRole": .string("required")])]))
+        let params = JSONValue.object(["commandId": .string(UUID().uuidString.lowercased()), "threadId": .string(threadId), "content": .object(["version": .number(2), "segments": .array(segments)]), "sourceAttachments": .array(publicSources), "quotes": .array([]), "replyToThreadMessageId": .null, "execution": .object(["taskId": .null, "purpose": .string(text.trimmingCharacters(in: .whitespacesAndNewlines)), "completionRole": .string("required")])])
+        await submit(.object(["operation": .string(RovaiOperation.threadMessagesSend.rawValue), "params": params, "nativeBody": .object(["owner": .string("public:" + threadId), "expectedBody": .string(document), "replace": .bool(false)])]))
     }
+
     func terminal(boardId: String, nodeId: String) -> RovaiTerminalController? {
         let key = boardId + ":" + nodeId
         if let controller = terminals[key] { return controller }

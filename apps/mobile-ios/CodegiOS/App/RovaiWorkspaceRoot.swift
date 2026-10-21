@@ -102,18 +102,63 @@ private struct RovaiThreadDetail: View {
     let model: RovaiWorkspaceModel; let id: String
     @State private var engineering = false
     @State private var privateChat = false
-    @State private var text = ""; @State private var recipients = Set<String>(); @State private var submitted: String?
+    @State private var text = ""; @State private var recipients = Set<String>()
+    @State private var bodyReady = false; @State private var inputRevision = 0; @State private var inputIssue: String?
+    @State private var bodyGeneration: UInt64?
+    private var owner: String { "public:" + id }
+    private var inputLocked: Bool { !bodyReady || bodyGeneration != model.connectionGeneration || model.pending != nil || model.busy }
     var body: some View {
         VStack(spacing: 0) {
             ScrollView { LazyVStack(alignment: .leading, spacing: 14) { RovaiPublicAttachments(model: model, threadId: id); RovaiThreadControls(model: model, threadId: id); ForEach((model.thread?["messages"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in GlassRow(isSelected: row.value.text("authorType") == "user") { VStack(alignment: .leading, spacing: 8) { Text(row.value.text("authorDisplayName").isEmpty ? row.value.text("authorType") == "user" ? "你" : row.value.text("authorId") : row.value.text("authorDisplayName")).font(.caption.weight(.semibold)).foregroundStyle(Theme.textSecondary); MarkdownContent(raw: row.value.text("body")) } } }; ForEach((model.thread?["agentRuns"]?.rvArray ?? []).filter { ["running", "queued", "waiting_approval", "waiting_user"].contains($0.text("status")) }.map { RovaiRow(value: $0) }) { row in HStack { Text(row.value.text("agentId")).font(.caption); Spacer(); Button("停止") { Task { await model.command(.agentRunsCancel, value: .object(["threadId": .string(id), "agentRunId": .string(row.id), "expectedVersion": row.value["version"] ?? .number(0)])) } }.disabled(model.pending != nil) } }.padding(16) }
-            ScrollView(.horizontal, showsIndicators: false) { HStack { ForEach((model.thread?["members"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in Button { if recipients.contains(row.id) { recipients.remove(row.id) } else { recipients.insert(row.id) } } label: { Text(row.value.text("displayName")).font(.caption).padding(.horizontal, 12).padding(.vertical, 8).background(Capsule().fill(recipients.contains(row.id) ? Theme.accent.opacity(0.22) : Theme.accent.opacity(0.06))) } } }.padding(.horizontal, 16) }
-            HStack(alignment: .bottom, spacing: 10) { TextField("发送消息…", text: $text, axis: .vertical).lineLimit(1...6).padding(12).background(RoundedRectangle(cornerRadius: 18).fill(Theme.bgElevated)).disabled(model.pending != nil); Button { submitted = text; Task { await model.send(text, recipients: recipients) } } label: { Image(systemName: "paperplane").font(.title3).padding(12) }.disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || model.pending != nil || model.busy || !model.publicSourcesReady) }.padding(12)
+            ScrollView(.horizontal, showsIndicators: false) { HStack {
+                ForEach((model.thread?["members"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in
+                    Button { changeRecipient(row.id) } label: { Text(row.value.text("displayName")).font(.caption).padding(.horizontal, 12).padding(.vertical, 8).background(Capsule().fill(recipients.contains(row.id) ? Theme.accent.opacity(0.22) : Theme.accent.opacity(0.06))) }.disabled(inputLocked)
+                }
+                ForEach(recipients.subtracting(Set((model.thread?["members"]?.rvArray ?? []).map { $0.text("agentId") })).sorted(), id: \.self) { recipient in Button { changeRecipient(recipient) } label: { Label("已离开的收件人", systemImage: "xmark.circle").font(.caption) }.disabled(inputLocked).accessibilityHint(recipient) }
+            }.padding(.horizontal, 16) }
+            if let inputIssue { Text(inputIssue).font(.caption).foregroundStyle(Theme.warning).padding(.horizontal, 16) }
+            HStack(alignment: .bottom, spacing: 10) {
+                TextField("发送消息…", text: Binding(get: { text }, set: { value in guard !inputLocked, value != text else { return }; text = value; inputRevision += 1; persistPublicBody() }), axis: .vertical).lineLimit(1...6).padding(12).background(RoundedRectangle(cornerRadius: 18).fill(Theme.bgElevated)).disabled(inputLocked)
+                Button { sendPublicBody() } label: { Image(systemName: "paperplane").font(.title3).padding(12) }.disabled(inputLocked || inputIssue != nil || text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !model.publicSourcesReady)
+            }.padding(12)
         }.navigationTitle(model.thread?["thread"]?.text("title") ?? "对话")
         .toolbar { ToolbarItem(placement: .topBarTrailing) { Button { privateChat = true } label: { Image(systemName: "person.bubble") }; Button { engineering = true } label: { Image(systemName: "folder") } } }
         .sheet(isPresented: $privateChat) { RovaiPrivateConversationView(model: model, threadId: id) }
         .sheet(isPresented: $engineering) { RovaiEngineeringView(model: model, threadId: id) }
-        .task(id: id) { await model.open(id) }.onDisappear { if model.threadId == id { Task { await model.open(nil) } } }
-        .onChange(of: model.lastResult) { _, result in if model.lastOperation == .threadMessagesSend, result?["commandResult"]?.text("status") == "applied", text == submitted { text = ""; submitted = nil } }
+        .task(id: id) {
+            bodyReady = false; let lifetime = model.connectionGeneration; await model.open(id)
+            guard lifetime == model.connectionGeneration, !Task.isCancelled else { return }
+            do { try restorePublicBody(model.readBody(owner)); bodyGeneration = lifetime; bodyReady = true; inputIssue = nil } catch { inputIssue = error.localizedDescription }
+        }
+        .onDisappear { persistPublicBody(); if model.threadId == id { Task { await model.open(nil) } } }
+        .onChange(of: model.lastResult) { _, result in
+            guard bodyReady, bodyGeneration == model.connectionGeneration, model.lastOperation == .threadMessagesSend, model.lastInputOwner == owner,
+                  ["applied", "accepted"].contains(result?["commandResult"]?.text("status") ?? result?.text("status") ?? ""),
+                  let document = try? model.publicBody(text, recipients: recipients, revision: inputRevision), document == model.lastInputBody else { return }
+            do { try restorePublicBody(model.readBody(owner)); inputIssue = nil } catch { inputIssue = error.localizedDescription }
+        }
+    }
+    private func restorePublicBody(_ raw: String) throws {
+        if raw.isEmpty { text = ""; recipients = []; inputRevision += 1; return }
+        guard let document = JSONValue.parse(raw), document["version"]?.rvInt == 1 else { throw RovaiHostFailure(code: "草稿格式无法读取，原内容仍保留。") }
+        text = document.text("text"); recipients = Set((document["recipients"]?.rvArray ?? []).compactMap(\.stringValue)); inputRevision = document["revision"]?.rvInt ?? 0
+    }
+    private func changeRecipient(_ id: String) { guard !inputLocked else { return }; if recipients.contains(id) { recipients.remove(id) } else { recipients.insert(id) }; inputRevision += 1; persistPublicBody() }
+    private func persistPublicBody() {
+        guard bodyReady, bodyGeneration == model.connectionGeneration else { return }
+        do {
+            let document = try model.publicBody(text, recipients: recipients, revision: inputRevision)
+            let receipt = model.lastResult?["commandResult"] ?? model.lastResult
+            if model.lastOperation == .threadMessagesSend, model.lastInputOwner == owner, model.lastInputBody == document, ["applied", "accepted"].contains(receipt?.text("status") ?? "") { return }
+            try model.saveBody(owner, body: document); inputIssue = nil
+        } catch { inputIssue = error.localizedDescription }
+    }
+    private func sendPublicBody() {
+        guard !inputLocked else { return }; let frozenText = text; let frozenRecipients = recipients; let lifetime = model.connectionGeneration
+        do {
+            let document = try model.publicBody(frozenText, recipients: frozenRecipients, revision: inputRevision); try model.saveBody(owner, body: document); inputIssue = nil
+            Task { guard lifetime == model.connectionGeneration else { return }; await model.send(frozenText, recipients: frozenRecipients, document: document, expectedThreadId: id) }
+        } catch { inputIssue = error.localizedDescription }
     }
 }
 private struct RovaiNewConversation: View {
