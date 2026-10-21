@@ -3,7 +3,7 @@ import SwiftUI
 struct RovaiCanvasReferenceChoice: Identifiable {
     let reference: JSONValue
     let label: String
-    var id: String {JSONValue.array([reference["threadId"] ?? .null, reference["conversationId"] ?? .null]).encode() ?? ""}
+    var id: String {let value = JSONValue.array([reference["threadId"] ?? .null, reference["conversationId"] ?? .null]);return (try? JSONEncoder().encode(value)).map {String(decoding: $0, as: UTF8.self)} ?? ""}
 }
 func canvasReferenceChoices(_ rows: [JSONValue]) -> [RovaiCanvasReferenceChoice] {
     rows.flatMap {thread in
@@ -96,7 +96,7 @@ struct RovaiCanvasCreator: View {
         Section("原对象") {
             choice("所属对话", key: "objectThreadId", values: references.filter {kind == "task" || !$0.text("missionId").isEmpty}.map {($0.text("threadId"), $0.text("title"))})
             if kind == "task" {
-                Picker("任务", selection: Binding(get: {selectedObject.text("taskId")}, set: {field("objectReference", .object(["kind": .string("task"), "taskId": .string($0)]))})) {Text("请选择").tag("");ForEach(tasks.map(RovaiRow.init(value:))) {row in Text(row.value.text("title")).tag(row.value.text("taskId"))}}
+                Picker("任务", selection: Binding(get: {selectedObject.text("taskId")}, set: {field("objectReference", .object(["kind": .string("task"), "taskId": .string($0)]))})) {Text("请选择").tag("");ForEach(tasks, id: \.self) {task in Text(task.text("title")).tag(task.text("taskId"))}}
                 if taskCursor != nil {Button("载入更多任务") {Task {await moreTasks()}}}
             }
             if let mission {
@@ -131,7 +131,7 @@ struct RovaiCanvasCreator: View {
         let value = try await model.query(.tasksList, params: .object(["threadId": .string(text("objectThreadId")), "cursor": after.map(JSONValue.string) ?? .null, "limit": .number(50)]))
         guard generation == model.connectionGeneration else {throw CancellationError()}
         guard case .array(let rows) = value["tasks"], rows.count <= 50, rows.allSatisfy({!$0.text("taskId").isEmpty}) else {throw RovaiHostFailure(code: "任务列表无法读取")}
-        let next = value["nextCursor"]?.rvString
+        let next = value["nextCursor"]?.stringValue
         guard Set(rows.map {$0.text("taskId")}).count == rows.count, !rows.contains(where: {row in tasks.contains {$0.text("taskId") == row.text("taskId")}}), next == nil || next != after && next != "" && !rows.isEmpty, value["truncated"]?.rvBool != true || next != nil else {throw RovaiHostFailure(code: "任务分页未前进")}
         tasks += rows;taskCursor = next
     }
