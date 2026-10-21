@@ -34,7 +34,7 @@ struct RovaiAutomationSettings: View {
             if busy { ProgressView().frame(maxWidth: .infinity) }
         }.scrollContentBackground(.hidden).navigationTitle("定时任务")
         .toolbar { Button { editor = Editor(value: nil) } label: { Image(systemName: "plus") }.disabled(model.pending != nil) }
-        .task(id: filter) { await load() }.onChange(of: model.lastResult) { _, _ in Task { await load(); if let history { await readRuns(history) } } }
+        .task(id: "\(filter):\(model.resourceVersion)") { try? await Task.sleep(for: .milliseconds(250)); if !Task.isCancelled { await load(); if let history { await readRuns(history) } } }.onChange(of: model.lastResult) { _, _ in Task { await load(); if let history { await readRuns(history) } } }
         .sheet(item: $editor) { item in RovaiAutomationEditor(model: model, original: item.value) { editor = nil; Task { await load() } } }
         .confirmationDialog(action?.title ?? "确认操作", isPresented: Binding(get: { action != nil }, set: { if !$0 { action = nil } }), titleVisibility: .visible) { if let action { Button("确认", role: action.operation == .automationsDelete ? .destructive : nil) { Task { await model.command(action.operation, value: action.command); self.action = nil } }.disabled(model.pending != nil || model.busy) }; Button("取消", role: .cancel) { action = nil } } message: { Text("按所选任务执行。立即运行会在宿主创建实际执行；已有结果仍保留在原对话中。") }
     }

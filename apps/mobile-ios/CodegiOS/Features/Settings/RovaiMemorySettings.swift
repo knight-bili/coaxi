@@ -38,7 +38,7 @@ struct RovaiMemorySettings: View {
             }
             if busy { ProgressView().frame(maxWidth: .infinity) }
         }.scrollContentBackground(.hidden).navigationTitle("记忆").toolbar { Button { editor = Editor(mode: "create", value: nil) } label: { Image(systemName: "plus") }.disabled(blocked); Button { Task { await load() } } label: { Image(systemName: "arrow.clockwise") }.disabled(busy) }
-        .task { await load() }.onChange(of: model.lastResult) { _, _ in Task { await load() } }
+        .task(id: model.resourceVersion) { try? await Task.sleep(for: .milliseconds(250)); if !Task.isCancelled { await load() } }.onChange(of: model.lastResult) { _, _ in Task { await load() } }
         .sheet(item: $editor) { item in RovaiMemoryEditor(model: model, mode: item.mode, original: item.value) { editor = nil; Task { await load() } } }
         .confirmationDialog(action?.title ?? "确认操作", isPresented: Binding(get: { action != nil }, set: { if !$0 { action = nil } }), titleVisibility: .visible) { if let action { Button("确认", role: action.operation == .memoryForget || action.operation == .memoryHearthReviewItemsReject ? .destructive : nil) { Task { await model.command(action.operation, value: action.command); self.action = nil } }.disabled(blocked) }; Button("取消", role: .cancel) { action = nil } } message: { Text(action?.operation == .memoryForget ? "正文、历史版本和关联候选会按Core规则清除，无法通过重新沿用恢复。" : "按所选内容和当前版本执行。") }
         .fileExporter(isPresented: $exporting, document: exportDocument, contentType: .json, defaultFilename: "Rovai-memory") { result in if case .failure(let error) = result { issue = error.localizedDescription } }
@@ -70,6 +70,9 @@ private struct RovaiMemoryEditor: View {
     @State private var reviewDate = Date()
     @State private var issue: String?
     @State private var sent: String?
+    @State private var leaving = false
+    @State private var baseline = ""
+    private var fingerprint: String { JSONValue.object(["scope": .string(scope), "kind": .string(kind), "text": .string(text), "keys": .string(keys), "first": .string(first), "second": .string(second), "direction": .string(direction), "actor": .string(actor), "reviewEnabled": .bool(reviewEnabled), "reviewDate": .number(reviewDate.timeIntervalSince1970)]).prettyString }
     private var blocked: Bool { model.pending != nil || model.busy }
     var body: some View {
         NavigationStack { Form {
@@ -80,8 +83,11 @@ private struct RovaiMemoryEditor: View {
             if ["revise", "schedule"].contains(mode) { Section("最新版本") { Button("核对最新版本，保留当前编辑") { Task { do { authority = try await model.query(.memoryGet, params: .object(["memoryId": original?["id"] ?? .null])); issue = "已读取最新版本，请对照最新正文后再保存。" } catch { issue = error.localizedDescription } } }; if let authority { MarkdownContent(raw: authority.text("currentBody")) } } }
             if mode == "review" { Section { Text("接受后，最终内容会成为正式共同记忆。").font(.caption); if authority?["stale"]?.rvBool == true || authority?.text("status") != "pending" { Text("审核项已变化，请关闭后刷新。").foregroundStyle(Theme.warning) } } }
         }.disabled(blocked).navigationTitle(mode == "create" ? "新增记忆" : mode == "review" ? "审核共同记忆建议" : mode == "schedule" ? "复核提醒" : "修订记忆")
-        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("返回") { dismiss() } }; ToolbarItem(placement: .confirmationAction) { Button(mode == "review" ? "接受" : "保存") { Task { await save() } }.disabled(blocked || mode != "schedule" && text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || mode == "review" && (authority?["stale"]?.rvBool == true || authority?.text("status") != "pending")) } } }
-        .task { authority = original; text = original?.text(mode == "review" ? "candidateBody" : "currentBody") ?? ""; keys = strings(original, mode == "review" ? "candidateRetrievalKeys" : "currentRetrievalKeys").joined(separator: "\n"); if let original { scope = original.text("scope"); kind = original.text("kind"); first = original.text("companionAgentId"); if let date = ISO8601DateFormatter().date(from: original.text("reviewAfter")) { reviewDate = date; reviewEnabled = true } } }
+        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("返回") { if fingerprint != baseline { leaving = true } else { dismiss() } } }; ToolbarItem(placement: .confirmationAction) { Button(mode == "review" ? "接受" : "保存") { Task { await save() } }.disabled(blocked || mode != "schedule" && text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || mode == "review" && (authority?["stale"]?.rvBool == true || authority?.text("status") != "pending")) } } }
+        .task { authority = original; text = original?.text(mode == "review" ? "candidateBody" : "currentBody") ?? ""; keys = strings(original, mode == "review" ? "candidateRetrievalKeys" : "currentRetrievalKeys").joined(separator: "\n"); if let original { scope = original.text("scope"); kind = original.text("kind"); first = original.text("companionAgentId"); if let date = ISO8601DateFormatter().date(from: original.text("reviewAfter")) { reviewDate = date; reviewEnabled = true } }; baseline = fingerprint }
+        .interactiveDismissDisabled(true)
+        .confirmationDialog("放弃当前编辑？", isPresented: $leaving, titleVisibility: .visible) { Button("放弃编辑", role: .destructive) { dismiss() }; Button("继续编辑", role: .cancel) {} } message: { Text("尚未保存的内容会被丢弃，正式记忆不会改变。") }
+        .task(id: model.resourceVersion) { guard mode == "review", let original else { return }; try? await Task.sleep(for: .milliseconds(250)); guard !Task.isCancelled else { return }; do { let values = try await model.query(.memoryHearthReviewItemsList); let latest = values.rvArray.first { $0.text("reviewItemId") == original.text("reviewItemId") }; authority = latest; if latest == nil || latest?.text("status") != "pending" { text = ""; keys = ""; issue = "审核项已经结束，候选正文已清除。" } else if latest?["stale"]?.rvBool == true { issue = "目标已经变化，请关闭后刷新，只能拒绝此建议。" } } catch { issue = error.localizedDescription } }
         .onChange(of: model.lastResult) { _, value in let receipt = value?["commandResult"] ?? value; if sent != nil, receipt?.text("commandId") == sent, receipt?.text("status") == "applied" { onSaved() } }
     }
     private func memberPicker(_ title: String, value: Binding<String>) -> some View { Picker(title, selection: value) { Text("请选择").tag(""); ForEach(model.members, id: \.self) { Text($0.text("displayName")).tag($0.text("agentId")) } } }

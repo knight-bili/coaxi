@@ -1,5 +1,6 @@
 package app.codeg.android.feature.main
 
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.horizontalScroll
@@ -33,7 +34,7 @@ fun RovaiMemorySettings(model:RovaiWorkspaceViewModel){
     var editor by remember{mutableStateOf<Pair<String,JsonObject?>?>(null)};var confirmation by remember{mutableStateOf<Triple<RovaiOperation,JsonObject,String>?>(null)};var export by remember{mutableStateOf<String?>(null)}
     val exportPicker=rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")){uri->val bytes=export;export=null;if(uri!=null&&bytes!=null)coroutine.launch{try{withContext(Dispatchers.IO){context.contentResolver.openOutputStream(uri,"wt")?.use{it.write(bytes.toByteArray(Charsets.UTF_8))}?:error("文件无法写入")}}catch(error:Exception){issue=error.message}}}
     suspend fun load(){if(busy)return;busy=true;try{val value=model.query(RovaiOperation.MEMORY_LIST).coreObject();val candidates=model.query(RovaiOperation.MEMORY_HEARTHREVIEWITEMS_LIST).coreArray();library=value;reviews=candidates;selected=selected?.let{old->value["memories"].coreArray().firstOrNull{it.coreText("id")==old.coreText("id")}};issue=null}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message}finally{busy=false}}
-    LaunchedEffect(state.lastResult){load()}
+    LaunchedEffect(state.lastResult,state.resourceVersion){delay(250);load()}
     if(editor!=null){RovaiMemoryEditor(model,editor!!.first,editor!!.second,{editor=null},{editor=null});return}
     val blocked=state.pending!=null||state.busy
     val memories=library["memories"].coreArray()
@@ -64,9 +65,15 @@ private fun RovaiMemoryEditor(model:RovaiWorkspaceViewModel,mode:String,original
 ")?:"")}
     var first by remember{mutableStateOf(original?.coreText("companionAgentId")?:"")};var second by remember{mutableStateOf("")};var directed by remember{mutableStateOf(false)};var actor by remember{mutableStateOf("")};var reviewAt by remember{mutableStateOf(original?.coreText("reviewAfter")?:"")};var sent by remember{mutableStateOf<String?>(null)};var issue by remember{mutableStateOf<String?>(null)}
     val blocked=state.pending!=null||state.busy
+    var leaving by remember{mutableStateOf(false)}
+    val dirty=body!=(original?.coreText(if(mode=="review")"candidateBody"else"currentBody")?:"")||keys!=(original?.stringList(if(mode=="review")"candidateRetrievalKeys"else"currentRetrievalKeys")?.joinToString("\n")?:"")||reviewAt!=(original?.coreText("reviewAfter")?:"")||mode=="create"&&(first.isNotEmpty()||second.isNotEmpty()||scope!="hearth"||kind!="preference"||directed)
+    fun close(){if(dirty)leaving=true else onClose()}
+    BackHandler(onBack=::close)
+    if(leaving)AlertDialog(onDismissRequest={leaving=false},title={Text("放弃当前编辑？")},text={Text("尚未保存的内容会被丢弃，正式记忆不会改变。")},confirmButton={TextButton(onClick=onClose){Text("放弃编辑")}},dismissButton={TextButton(onClick={leaving=false}){Text("继续编辑")}})
+    LaunchedEffect(state.resourceVersion){if(mode=="review"&&original!=null){delay(250);try{val latest=model.query(RovaiOperation.MEMORY_HEARTHREVIEWITEMS_LIST).coreArray().firstOrNull{it.coreText("reviewItemId")==original.coreText("reviewItemId")};authority=latest;if(latest==null||latest.coreText("status")!="pending"){body="";keys="";issue="审核项已经结束，候选正文已清除。"}else if(latest["stale"]==JsonPrimitive(true))issue="目标已经变化，请关闭后刷新，只能拒绝此建议。"}catch(error:Exception){issue=error.message}}}
     LaunchedEffect(state.lastResult){val receipt=state.lastResult.coreObject()["commandResult"].coreObject().ifEmpty{state.lastResult.coreObject()};if(sent!=null&&receipt.coreText("commandId")==sent&&receipt.coreText("status")=="applied")onSaved()}
     LazyColumn(Modifier.fillMaxSize().padding(16.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
-        item{Row{Text(when(mode){"create"->"新增记忆";"review"->"审核共同记忆建议";"schedule"->"复核提醒";else->"修订记忆"},Modifier.weight(1f),style=MaterialTheme.typography.titleLarge);TextButton(onClick=onClose){Text("返回")}};issue?.let{Text(it,color=CodegTheme.colors.danger)}}
+        item{Row{Text(when(mode){"create"->"新增记忆";"review"->"审核共同记忆建议";"schedule"->"复核提醒";else->"修订记忆"},Modifier.weight(1f),style=MaterialTheme.typography.titleLarge);TextButton(onClick=::close){Text("返回")}};issue?.let{Text(it,color=CodegTheme.colors.danger)}}
         if(mode=="create")item{Row(Modifier.horizontalScroll(rememberScrollState())){memoryScopes.forEach{(id,label)->FilterChip(selected=scope==id,enabled=!blocked,onClick={scope=id},label={Text(label)})}};Row{memoryKinds.forEach{(id,label)->FilterChip(selected=kind==id,enabled=!blocked,onClick={kind=id},label={Text(label)})}};if(scope!="hearth"){Text("选择队员");state.members.forEach{member->Row{RadioButton(selected=first==member.coreText("agentId"),enabled=!blocked,onClick={first=member.coreText("agentId")});Text(member.coreText("displayName"))}}};if(scope=="relationship"){Text("另一位队员");state.members.filter{it.coreText("agentId")!=first}.forEach{member->Row{RadioButton(selected=second==member.coreText("agentId"),enabled=!blocked,onClick={second=member.coreText("agentId")});Text(member.coreText("displayName"))}};Row{Checkbox(checked=directed,enabled=!blocked,onCheckedChange={directed=it});Text("定向约定")};if(directed)listOf(first,second).filter{it.isNotEmpty()}.forEach{id->Row{RadioButton(selected=actor==id,enabled=!blocked,onClick={actor=id});Text(state.members.firstOrNull{it.coreText("agentId")==id}?.coreText("displayName")?:id)}}}}
         if(mode!="schedule")item{OutlinedTextField(body,{body=it},enabled=!blocked,label={Text("完整正文")},minLines=6,modifier=Modifier.fillMaxWidth());OutlinedTextField(keys,{keys=it},enabled=!blocked,label={Text("检索词，每行一项")},minLines=2,modifier=Modifier.fillMaxWidth())}
         if(mode!="review")item{OutlinedTextField(reviewAt,{reviewAt=it},enabled=!blocked,label={Text("复核时间，例如2026-12-01T09:00:00+08:00；留空清除")},modifier=Modifier.fillMaxWidth())}

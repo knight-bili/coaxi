@@ -13,6 +13,7 @@ struct RovaiRow: Identifiable { let value: JSONValue; var id: String { value.tex
 
 @MainActor @Observable
 final class RovaiWorkspaceModel {
+    var resourceVersion: UInt64 = 0
     var connected = false
     var busy = false
     var issue: String?
@@ -60,7 +61,7 @@ final class RovaiWorkspaceModel {
     }
     private func listen() {
         events?.cancel(); guard active, let client else { return }; let lifetime = generation
-        events = Task { do { let stream = try await client.invalidations(); var last = ContinuousClock.now; for try await _ in stream { try Task.checkCancellation(); guard lifetime == self.generation else { return }; let elapsed = last.duration(to: .now); if elapsed < .milliseconds(250) { try await Task.sleep(for: .milliseconds(250)) }; await self.refresh(); last = .now } } catch is CancellationError {} catch { if lifetime == self.generation { self.failure(error) } } }
+        events = Task { do { let stream = try await client.invalidations(); var last = ContinuousClock.now; for try await _ in stream { try Task.checkCancellation(); guard lifetime == self.generation else { return }; self.resourceVersion &+= 1; let elapsed = last.duration(to: .now); if elapsed < .milliseconds(250) { try await Task.sleep(for: .milliseconds(250)) }; await self.refresh(); last = .now } } catch is CancellationError {} catch { if lifetime == self.generation { self.failure(error) } } }
     }
     func refresh() async {
         guard let client, !refreshing else { return }; refreshing = true; let lifetime = generation; let selected = threadId
