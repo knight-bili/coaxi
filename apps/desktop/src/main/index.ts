@@ -1,3 +1,4 @@
+import { recoverLocalDataBeforeStores } from './configuration-recovery'
 import { PetWindowService } from './pet-window'
 import { WebdavWorkspace } from './webdav-workspace'
 import { BackupWorkspace } from './backup-workspace'
@@ -1079,6 +1080,7 @@ if (primaryInstance) void app.whenReady().then(async () => {
     void evaluationHost?.tick().catch((error) => { console.warn('[rovai] Evaluation Host preparation failed:', error.message) })
   }, 500)
   desktopBackgroundTimer.unref()
+  if(coreDataPath){try{await recoverLocalDataBeforeStores(coreDataPath)}catch(error){core.blockStartup({code:'local_data_recovery_required',message:error instanceof Error?error.message:String(error),retryable:false,details:{safetySnapshotPreserved:true}},'recovering_authority')}}
   const userDataPath = app.getPath('userData')
   appearanceFilePath = join(userDataPath, 'appearance.json')
   const generalPreferencesPath = join(userDataPath, 'general-preferences.json')

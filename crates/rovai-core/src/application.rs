@@ -19279,10 +19279,10 @@ async fn run_core(
         let _=crate::backup::owned_roots::unavailable(data_dir_lease.data_dir(),&format!("{error:#}"));tracing::warn!("backup owned storage registration unavailable: {error:#}");
     }
     if let Err(error)=crate::backup::light_config::recover_with_lease(&data_dir_lease){
-        write_startup_frame(&output_target,"blocked",Some("configuration_recovery"),json!({"kind":"configuration_recovery_pending"}),Some(structured_startup_error("config_sync_recovery_required",error.to_string(),false,json!({"safetySnapshotPreserved":true}))),None)?;return Ok(());
+        write_startup_frame(&output_target,"blocked",Some("recovering_authority"),json!({"kind":"configuration_recovery_pending"}),Some(structured_startup_error("config_sync_recovery_required",error.to_string(),false,json!({"safetySnapshotPreserved":true}))),None)?;return Ok(());
     }
     if let Err(error)=crate::backup::apply_pending_with_lease(&data_dir_lease){
-        write_startup_frame(&output_target,"blocked",Some("restore"),json!({"kind":"restore_pending"}),Some(structured_startup_error("backup_restore_requires_recovery",error.to_string(),false,json!({"safetySnapshotPreserved":true}))),None)?;
+        write_startup_frame(&output_target,"blocked",Some("recovering_authority"),json!({"kind":"restore_pending"}),Some(structured_startup_error("backup_restore_requires_recovery",error.to_string(),false,json!({"safetySnapshotPreserved":true}))),None)?;
         return Ok(());
     }
     let assessment_started = Instant::now();

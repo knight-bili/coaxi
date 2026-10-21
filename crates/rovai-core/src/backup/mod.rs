@@ -148,3 +148,7 @@ pub fn rollback(root:&Path)->Result<()> {
     operation.state="rolled_back".into();atomic_write_private_json(&marker,&operation)?;
     if marker.file_name().is_some_and(|name|name=="pending.json"){fs::rename(marker,administrative.join(format!("rollback-{}.json",uuid::Uuid::new_v4())))?;}Ok(())
 }
+
+/// Desktop calls this before loading cached preferences; Core repeats the same
+/// idempotent recovery before admitting its authority.
+pub fn recover_before_desktop(root:&Path)->Result<serde_json::Value>{let lease=CoreDataDirLease::acquire(root)?;let configuration=light_config::recover_with_lease(&lease)?;let workspace=apply_pending_with_lease(&lease)?.is_some();Ok(serde_json::json!({"configurationRecovered":configuration,"backupRestored":workspace}))}
