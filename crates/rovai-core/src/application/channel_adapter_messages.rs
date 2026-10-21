@@ -23,7 +23,14 @@ impl Core{
         let binding=config.bindings.iter().find(|binding|binding.chat_id==chat&&binding.thread_key==input.target.thread_key).context("channel_adapter.target_not_bound")?.clone();
         let principal=source_id(&json!({"provider":config.provider,"adapterId":config.id,"senderId":input.sender_id}))?;
         let digest=Sha256::digest(format!("{}\0{}\0{}",config.id,input.sender_id,input.external_id).as_bytes());let mut bytes:[u8;16]=digest[..16].try_into()?;bytes[6]=(bytes[6]&15)|0x50;bytes[8]=(bytes[8]&63)|0x80;let id=uuid::Uuid::from_bytes(bytes).to_string();
-        if let Some(result)=self.channel_adapter_command(&input,config,&binding,&id).await?{return Ok(result)}
+        let recorded={let database=self.database.lock().await;database.connection().query_row("SELECT command_type,camp_id FROM event_log WHERE event_type='command.result' AND command_id=?1",[&id],|row|Ok((row.get::<_,String>(0)?,row.get::<_,String>(1)?))).optional()?};
+        if let Some((kind,recorded_thread))=recorded{
+            ensure!(config.bindings.iter().any(|candidate|candidate.thread_id==recorded_thread&&candidate.chat_id==chat&&candidate.thread_key==input.target.thread_key),"channel_adapter.target_not_bound");
+            if kind=="channel.adapter.command"{return self.channel_adapter_command_replay(&input,&id,recorded_thread).await}
+            ensure!(kind=="channel.adapter.inbound","channel_adapter.command_conflict");let envelope=CommandEnvelope{command_id:id.clone(),actor:ActorRef::System{component_id:"channel-adapter".into()},camp_id:Some(recorded_thread),expected_versions:vec![],execution_epoch:None,payload:input.clone()};let database=self.database.lock().await;let replay=DomainCommandGateway.replay_if_recorded(&database,&envelope)?.context("channel_adapter.receipt_missing")?;return Ok(serde_json::to_value(replay.result)?)
+        }
+        let (binding,selection_expired)=self.channel_adapter_selected_binding(&input,config,&binding).await?;
+        if let Some(result)=self.channel_adapter_command(&input,config,&binding,&id,selection_expired).await?{return Ok(result)}
         let admitted_text=if let Some(command)=input.text.trim().strip_prefix('/') {let (verb,args)=command.split_once(char::is_whitespace).unwrap_or((command,""));if matches!(verb.split('@').next().unwrap_or(verb),"task"|"do"){args.trim().to_owned()}else{input.text.clone()}}else{input.text.clone()};
         let envelope=crate::command::CommandEnvelope{command_id:id.clone(),actor:ActorRef::System{component_id:"channel-adapter".into()},camp_id:Some(binding.thread_id.clone()),expected_versions:vec![],execution_epoch:None,payload:input.clone()};
         let mut database=self.database.lock().await;
