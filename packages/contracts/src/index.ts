@@ -5004,6 +5004,8 @@ export type CoreMethod =
   | 'runtime.interactions.resolve'
   | 'runtime.childReads.start'
   | 'workbench.files.list'
+  | 'workbench.organizer.get'
+  | 'workbench.organizer.set'
   | 'workbench.files.read'
   | 'workbench.files.mutate'
   | 'workbench.git.read'

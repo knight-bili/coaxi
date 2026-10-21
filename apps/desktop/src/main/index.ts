@@ -296,6 +296,8 @@ const allowedMethods = new Set<CoreMethod>([
   'workspaces.inspect',
   'workspaces.worktrees',
   'workbench.files.list',
+  'workbench.organizer.get',
+  'workbench.organizer.set',
   'workbench.files.read',
   'workbench.files.mutate',
   'workbench.git.read',

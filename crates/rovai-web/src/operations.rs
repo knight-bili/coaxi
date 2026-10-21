@@ -5,6 +5,10 @@ use serde::{Deserialize, Serialize};
 /// and the legacy shared draft remain outside the network capability.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum Operation {
+    #[serde(rename = "workbench.organizer.get")]
+    WorkbenchOrganizerGet,
+    #[serde(rename = "workbench.organizer.set")]
+    WorkbenchOrganizerSet,
     #[serde(rename = "workbench.files.list")]
     WorkbenchFilesList,
     #[serde(rename = "workbench.files.read")]
@@ -488,6 +492,7 @@ impl Operation {
         use serde_json::json;
         match self {
             Self::AppInfo => json!({"name":value["name"],"version":value["version"]}),
+            Self::WorkbenchOrganizerGet | Self::WorkbenchOrganizerSet => select_fields(&value, &["value", "digest"]),
             Self::WorkbenchFilesList => select_fields(&value, &["entries", "next"]),
             Self::WorkbenchFilesRead => select_fields(&value, &["path", "text", "digest"]),
             Self::WorkbenchFilesMutate => select_fields(&value, &["applied", "digest"]),
@@ -557,6 +562,8 @@ impl Operation {
 
     pub fn method(self) -> &'static str {
         match self {
+            Self::WorkbenchOrganizerGet => "workbench.organizer.get",
+            Self::WorkbenchOrganizerSet => "workbench.organizer.set",
             Self::WorkbenchFilesList => "workbench.files.list",
             Self::WorkbenchFilesRead => "workbench.files.read",
             Self::WorkbenchFilesMutate => "workbench.files.mutate",

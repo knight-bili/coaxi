@@ -100,6 +100,27 @@ struct GitRequest {
     #[serde(default)] confirmed: bool,
 }
 
+#[derive(Default, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct Organizer {
+    #[serde(default)] tags: Vec<String>,
+    #[serde(default)] directory_aliases: Vec<DirectoryAlias>,
+    #[serde(default)] quick_messages: Vec<QuickMessage>,
+}
+#[derive(Deserialize, Serialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct DirectoryAlias { path: String, name: String, group: String }
+#[derive(Deserialize, Serialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct QuickMessage { id: String, title: String, text: String }
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct OrganizerRequest {
+    scope: Scope,
+    #[serde(default)] expected_digest: Option<String>,
+    #[serde(default)] value: Option<Organizer>,
+}
+
 fn git_target(value: Option<&str>) -> Result<String> {
     let value = value.context("workbench.git_target_required")?;
     ensure!(!value.is_empty() && !value.starts_with('-') && !value.contains(['\0','\r','\n']), "workbench.invalid_git_target");
@@ -208,6 +229,43 @@ fn relative(root: &Path, value: &str, allow_missing: bool) -> Result<PathBuf> {
 }
 
 impl Core {
+    pub(super) async fn workbench_organizer(&self, method: &str, value: Value) -> Result<Value> {
+        let request: OrganizerRequest = serde_json::from_value(value)?;
+        let _write = MUTATIONS.lock().await;
+        let root = self.workbench_root(&request.scope).await?;
+        let directory = self.data_dir.join("workspace-metadata");
+        let identity = crate::command::canonical_json_digest(&json!({"scope":request.scope,"root":root}))?;
+        let path = directory.join(format!("{identity}.json"));
+        let current: Organizer = if path.exists() { serde_json::from_slice(&fs::read(&path)?)? } else { Organizer::default() };
+        let current_value = serde_json::to_value(&current)?;
+        let current_digest = crate::command::canonical_json_digest(&current_value)?;
+        if method == "workbench.organizer.get" { return Ok(json!({"value":current_value,"digest":current_digest})); }
+        ensure!(method == "workbench.organizer.set", "workbench.operation_not_admitted");
+        let mut next = request.value.context("workbench.metadata_required")?;
+        ensure!(next.tags.len() <= 512 && next.directory_aliases.len() <= 512 && next.quick_messages.len() <= 512, "workbench.metadata_limit");
+        let mut seen = std::collections::HashSet::new();
+        for tag in &next.tags { ensure!(!tag.trim().is_empty() && tag.len() <= 256 && seen.insert(tag), "workbench.invalid_tag"); }
+        let mut seen = std::collections::HashSet::new();
+        for alias in &mut next.directory_aliases {
+            let canonical = git::validate_workspace_directory(Path::new(&alias.path), &self.data_dir, false)?;
+            alias.path = canonical.to_string_lossy().into_owned();
+            ensure!(!alias.name.trim().is_empty() && alias.name.len() <= 256 && alias.group.len() <= 256 && seen.insert(alias.path.clone()), "workbench.invalid_alias");
+        }
+        let mut seen = std::collections::HashSet::new();
+        for message in &next.quick_messages {
+            uuid::Uuid::parse_str(&message.id).context("workbench.invalid_quick_message")?;
+            ensure!(seen.insert(&message.id) && !message.title.trim().is_empty() && message.title.len() <= 512 && message.text.len() <= 1024 * 1024, "workbench.invalid_quick_message");
+        }
+        let value = serde_json::to_value(next)?;
+        let next_digest = crate::command::canonical_json_digest(&value)?;
+        if next_digest != current_digest {
+            ensure!(request.expected_digest.as_deref() == Some(current_digest.as_str()), "workbench.metadata_changed");
+            crate::platform::private_storage::prepare_private_directory(&directory)?;
+            crate::platform::private_storage::atomic_write_private_json(&path, &value)?;
+        }
+        Ok(json!({"value":value,"digest":next_digest}))
+    }
+
     async fn workbench_git_revision(&self, git: &crate::mission_workspace::MissionGit, root: &Path) -> Result<String> {
         let mut bytes = Vec::new();
         for args in [vec!["rev-parse", "--verify", "HEAD"], vec!["status", "--porcelain=v2", "--branch", "-z"], vec!["show-ref", "--head"], vec!["diff", "--no-ext-diff", "--no-textconv", "--binary"]] {

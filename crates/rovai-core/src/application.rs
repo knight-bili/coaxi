@@ -10328,6 +10328,9 @@ impl Core {
             "workbench.git.read" | "workbench.git.preview" | "workbench.git.execute" => {
                 self.workbench_git(&request.method, request.params.clone()).await
             }
+            "workbench.organizer.get" | "workbench.organizer.set" => {
+                self.workbench_organizer(&request.method, request.params.clone()).await
+            }
             "workspaces.inspect" => {
                 let params: WorkspaceInspectParams =
                     serde_json::from_value(request.params.clone())?;
