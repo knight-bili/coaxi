@@ -35,6 +35,7 @@ struct RovaiPrivateConversationView: View {
         .task(id: selected) { bodyReady = false; snapshot = .object([:]); retained = []; if selected != nil { do { text = try model.readBody(owner); bodyReady = true; await load(); await readRetained() } catch { issue = error.localizedDescription } } }
         .onChange(of: text) { _, value in guard bodyReady else { return }; do { try model.saveBody(owner, body: value) } catch { issue = error.localizedDescription } }
         .onChange(of: model.thread) { _, _ in Task { await load() } }
+        .onChange(of: model.lastUploadResult) { _, _ in Task { await load(); await readRetained() } }
         .onChange(of: model.lastResult) { _, value in
             let receipt = value?["commandResult"] ?? value
             if !child, model.lastOperation == .singleChatOpen, receipt?.text("status") == "applied", let id = receipt?["payload"]?["conversationId"]?.stringValue { selected = id }
@@ -51,7 +52,7 @@ struct RovaiPrivateConversationView: View {
     private var transcript: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 12) {
-                HStack { if !child { Button("其他私聊") { do { try model.saveBody(owner, body: text); selected = nil } catch { issue = error.localizedDescription } } }; Spacer(); Button("结束会话", role: .destructive) { ending = true }.disabled(disabled) }
+                HStack { if !child { Button("其他私聊") { do { try model.saveBody(owner, body: text); selected = nil } catch { issue = error.localizedDescription } } }; RovaiAttachmentPicker(model: model, threadId: threadId, target: .object(["kind": .string(child ? "delegation_child" : "single_chat"), "conversationId": .string(selected ?? ""), "composerScope": .null]), revision: snapshot["draft"]?["revision"]?.rvInt ?? 0, disabled: disabled || snapshot["conversation"]?.text("status") != "active"); Spacer(); Button("结束会话", role: .destructive) { ending = true }.disabled(disabled) }
                 if let selected { RovaiInteractionCards(model: model, conversationId: selected); RovaiDelegationList(model: model, threadId: threadId, parentConversationId: selected) }
                 ForEach((snapshot["messages"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in
                     GlassRow(isSelected: row.value.text("authorType") == "user") { VStack(alignment: .leading, spacing: 8) { Text(row.value.text("authorType") == "user" ? "你" : row.value.text("authorType")).font(.caption).foregroundStyle(Theme.textSecondary); ForEach(row.value["quotes"]?.rvArray ?? [], id: \.self) { quote in Text("引用").font(.caption2); MarkdownContent(raw: quote.text("body")) }; MarkdownContent(raw: row.value.text("body")); ForEach(row.value["attachments"]?.rvArray ?? [], id: \.self) { attachment in Text("附件 · \(attachment.text("displayName"))").font(.caption) } } }

@@ -38,7 +38,7 @@ final class RovaiWorkspaceModel {
     @ObservationIgnored private var writing = false
     func bind(_ profile: ServerProfile?, store: ServerStore) async {
         terminals.values.forEach { $0.retire() }; terminals.removeAll()
-        generation &+= 1; events?.cancel(); client = nil; self.profile = profile; connected = false; thread = nil; threadId = nil; navigation = .object([:]); members = []; missions = []; boards = []; issue = nil; pending = nil
+        generation &+= 1; events?.cancel(); client = nil; self.profile = profile; connected = false; thread = nil; threadId = nil; navigation = .object([:]); members = []; missions = []; boards = []; issue = nil; pending = nil; lastResult = nil; lastOperation = nil; lastUploadResult = nil
         guard let profile, let token = store.token(for: profile), let baseURL = profile.baseURL else { return }
         account = "pending:" + RovaiSecureSession.account(baseURL: baseURL, administratorToken: token)
         if let data = RovaiSecureSession.load(profile: profile.id, account: account) { pending = try? JSONDecoder().decode(JSONValue.self, from: data) }
