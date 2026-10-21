@@ -28,11 +28,13 @@ final class RovaiWorkspaceModel {
     @ObservationIgnored private var profile: ServerProfile?
     @ObservationIgnored private var account = ""
     @ObservationIgnored private var generation: UInt64 = 0
+    @ObservationIgnored private var terminals: [String: RovaiTerminalController] = [:]
     @ObservationIgnored private var events: Task<Void, Never>?
     @ObservationIgnored private var active = true
     @ObservationIgnored private var refreshing = false
     @ObservationIgnored private var writing = false
     func bind(_ profile: ServerProfile?, store: ServerStore) async {
+        terminals.values.forEach { $0.retire() }; terminals.removeAll()
         generation &+= 1; events?.cancel(); client = nil; self.profile = profile; connected = false; thread = nil; threadId = nil; navigation = .object([:]); members = []; missions = []; boards = []; issue = nil; pending = nil
         guard let profile, let token = store.token(for: profile), let baseURL = profile.baseURL else { return }
         account = "pending:" + RovaiSecureSession.account(baseURL: baseURL, administratorToken: token)
@@ -103,7 +105,14 @@ final class RovaiWorkspaceModel {
         segments.append(.object(["kind": .string("text"), "text": .string(text)]))
         await execute(.threadMessagesSend, params: .object(["commandId": .string(UUID().uuidString.lowercased()), "threadId": .string(threadId), "content": .object(["version": .number(2), "segments": .array(segments)]), "sourceAttachments": .array([]), "quotes": .array([]), "replyToThreadMessageId": .null, "execution": .object(["taskId": .null, "purpose": .string(text.trimmingCharacters(in: .whitespacesAndNewlines)), "completionRole": .string("required")])]))
     }
-    func logout() async { events?.cancel(); do { try await client?.logout(); connected = false } catch { failure(error) } }
+    func terminal(boardId: String, nodeId: String) -> RovaiTerminalController? {
+        let key = boardId + ":" + nodeId
+        if let controller = terminals[key] { return controller }
+        guard let client, terminals.count < 64 else { issue = "请先关闭其他终端后重试。"; return nil }
+        let controller = RovaiTerminalController(client: client, boardId: boardId, nodeId: nodeId)
+        terminals[key] = controller; return controller
+    }
+    func logout() async { events?.cancel(); terminals.values.forEach { $0.retire() }; terminals.removeAll(); do { try await client?.logout(); connected = false } catch { failure(error) } }
     private func failure(_ error: Error) { issue = error.localizedDescription; if issue?.contains("unauthorized") == true || issue?.contains("login_required") == true { connected = false; events?.cancel() } }
 }
 private extension Optional where Wrapped == String {

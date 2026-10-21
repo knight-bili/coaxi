@@ -25,10 +25,8 @@ struct RootView: View {
                 OnboardingView(store: model.serverStore) { profile in
                     model.selectedServerID = profile.id
                 }
-            } else if horizontalSizeClass == .compact {
-                compactShell
             } else {
-                splitShell
+                RovaiWorkspaceRoot(store: model.serverStore, selectedServerID: $model.selectedServerID, onManageServers: { model.serversSheetPresented = true })
             }
         }
         .tint(Theme.accent)
@@ -59,10 +57,6 @@ struct RootView: View {
         // App-wide activity pulse: feeds the Activity tab, its sidebar badge,
         // and the bottom running bar. Restarts when the scene activates or the
         // server identity/endpoint changes; pauses in the background.
-        .task(id: activityPulseID) {
-            guard scenePhase == .active else { return }
-            await model.activity.autoRefresh(client: model.selectedClient())
-        }
         .sheet(isPresented: $model.serversSheetPresented) {
             ManageServersSheet(store: model.serverStore, selectedServerID: $model.selectedServerID)
         }
