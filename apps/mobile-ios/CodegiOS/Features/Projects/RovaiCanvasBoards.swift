@@ -52,9 +52,10 @@ struct RovaiCanvasBoardPreview: View {
             let scale = min(Double(size.width) / (width * 1.16), Double(size.height) / (height * 1.16)), dx = (Double(size.width) - width * 1.16 * scale) / 2, dy = (Double(size.height) - height * 1.16 * scale) / 2
             for rect in rects.prefix(200) {
                 let region = ["folder", "group", "agent", "custom"].contains(rect.text("kind"))
+                let tint = rovaiCanvasTint(rect.text("color")), terminal = rect.text("kind") == "terminal"
                 let box = CGRect(x: dx + (number(rect, "x") - left) * scale, y: dy + (number(rect, "y") - top) * scale, width: number(rect, "width") * scale, height: number(rect, "height") * scale)
                 let path = Path(roundedRect: box, cornerRadius: region ? 2 : 1)
-                context.fill(path, with: .color(region ? Theme.textSecondary.opacity(0.06) : Theme.bgElevated));context.stroke(path, with: .color(Theme.textSecondary.opacity(0.22)), lineWidth: 1)
+                context.fill(path, with: .color(terminal ? Theme.textSecondary.opacity(0.55) : region ? (tint ?? Theme.textSecondary).opacity(tint == nil ? 0.06 : 0.14) : tint?.opacity(0.35) ?? Theme.bgElevated));context.stroke(path, with: .color((region ? tint ?? Theme.textSecondary : Theme.textSecondary).opacity(0.22)), lineWidth: 1)
             }
         }.accessibilityHidden(true)
     }
@@ -85,7 +86,7 @@ struct RovaiCanvasBoardEditor: View {
             }} else {Section {
                 TextField("名称", text: changed($name))
                 TextField("说明（可选）", text: changed($detail), axis: .vertical).lineLimit(3...8)
-                Picker("颜色", selection: changed($color)) {ForEach(rovaiCanvasColors, id: \.0) {key, label in Text(label).tag(key)}}
+                Picker("颜色", selection: changed($color)) {ForEach(rovaiCanvasColors, id: \.0) {key, label in HStack {Circle().fill(rovaiCanvasTint(key) ?? Theme.textSecondary).frame(width: 12, height: 12).accessibilityHidden(true);Text(label)}.tag(key)}}
             }.disabled(blocked)}
             if stale {Section {Text("画布已有新修改，当前输入保留。请核对后继续。").foregroundStyle(Theme.warning);if !remove, let latest {Button("使用最新画布版本") {revision = latest["revision"]?.rvInt ?? 0;commandId = UUID().uuidString.lowercased();persist()}.disabled(blocked)}}}
             if model.pending != nil {Section {Text("原请求待核对；可关闭后从工作区核对或重试。").font(.caption)}}

@@ -29,7 +29,7 @@ struct RovaiCanvasNodeProperties: View {
             Section("属性") {
                 TextField("名称", text: changed($title))
                 if kind == "note" {TextField("便签内容（支持Markdown）", text: changed($content), axis: .vertical).lineLimit(8...24)}
-                Picker("颜色", selection: changed($color)) {ForEach(rovaiCanvasColors, id: \.0) {value, label in Text(label).tag(value)}}
+                Picker("颜色", selection: changed($color)) {ForEach(rovaiCanvasColors, id: \.0) {value, label in HStack {Circle().fill(rovaiCanvasTint(value) ?? Theme.textSecondary).frame(width: 12, height: 12).accessibilityHidden(true);Text(label)}.tag(value)}}
                 Toggle("折叠卡片", isOn: changed($collapsed))
             }.disabled(blocked)
             if region {Section("区域网格") {

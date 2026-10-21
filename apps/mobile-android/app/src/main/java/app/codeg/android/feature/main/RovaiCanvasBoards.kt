@@ -55,7 +55,7 @@ val rovaiCanvasColors=listOf("" to "默认","neutral" to "中性","zinc" to "锌
         val minX=rects.minOf{it.number("x")};val minY=rects.minOf{it.number("y")};val maxX=rects.maxOf{it.number("x")+it.number("width")};val maxY=rects.maxOf{it.number("y")+it.number("height")}
         val width=(maxX-minX).coerceAtLeast(1200.0);val height=(maxY-minY).coerceAtLeast(720.0);val left=(minX+maxX)/2-width*.58;val top=(minY+maxY)/2-height*.58
         val scale=minOf(size.width/(width*1.16),size.height/(height*1.16));val dx=(size.width-width*1.16*scale)/2;val dy=(size.height-height*1.16*scale)/2
-        rects.take(200).forEach{rect->val region=rect.coreText("kind")in listOf("folder","group","agent","custom");val position=Offset((dx+(rect.number("x")-left)*scale).toFloat(),(dy+(rect.number("y")-top)*scale).toFloat());val extent=Size((rect.number("width")*scale).toFloat(),(rect.number("height")*scale).toFloat());drawRect(if(region)ink.copy(alpha=.06f)else surface,position,extent);drawRect(ink.copy(alpha=.22f),position,extent,style=Stroke(1.dp.toPx()))}
+        rects.take(200).forEach{rect->val region=rect.coreText("kind")in listOf("folder","group","agent","custom");val tint=rovaiCanvasTint(rect.coreText("color"));val terminal=rect.coreText("kind")=="terminal";val position=Offset((dx+(rect.number("x")-left)*scale).toFloat(),(dy+(rect.number("y")-top)*scale).toFloat());val extent=Size((rect.number("width")*scale).toFloat(),(rect.number("height")*scale).toFloat());drawRect(when{terminal->ink.copy(alpha=.55f);region->(tint?:ink).copy(alpha=if(tint!=null).14f else .06f);tint!=null->tint.copy(alpha=.35f);else->surface},position,extent);drawRect((if(region)tint?:ink else ink).copy(alpha=.22f),position,extent,style=Stroke(1.dp.toPx()))}
     }
 }
 
@@ -73,8 +73,16 @@ val rovaiCanvasColors=listOf("" to "默认","neutral" to "中性","zinc" to "锌
     AlertDialog(onDismissRequest={close()},title={Text(if(remove)"删除画布？" else if(board==null)"新建画布" else "编辑画布")},text={Column(verticalArrangement=Arrangement.spacedBy(10.dp)){
         issue?.let{Text(it,color=CodegTheme.colors.danger)}
         if(remove){Text("删除画布会移除其中的卡片、区域和便签，保留原对话、使命、任务及工程文件。");Text(summary?.let{"包含${it.coreLong("nodeCount")}个节点，其中${it.coreLong("terminalCount")}张终端卡；仍运行的终端会关闭。"}?:"当前数量统计暂不可用，不能假定画布为空。")}
-        else{OutlinedTextField(name,{name=it;persist()},label={Text("名称")},enabled=!blocked);OutlinedTextField(description,{description=it;persist()},label={Text("说明（可选）")},enabled=!blocked,minLines=3);var picking by remember{mutableStateOf(false)};Box{TextButton(enabled=!blocked,onClick={picking=true}){Text("颜色 · "+(rovaiCanvasColors.firstOrNull{it.first==color}?.second?:color))};DropdownMenu(expanded=picking,onDismissRequest={picking=false}){rovaiCanvasColors.forEach{(key,label)->DropdownMenuItem(text={Text(label)},onClick={color=key;picking=false;persist()})}}}}
+        else{OutlinedTextField(name,{name=it;persist()},label={Text("名称")},enabled=!blocked);OutlinedTextField(description,{description=it;persist()},label={Text("说明（可选）")},enabled=!blocked,minLines=3);var picking by remember{mutableStateOf(false)};Box{TextButton(enabled=!blocked,onClick={picking=true}){Text("颜色 · "+(rovaiCanvasColors.firstOrNull{it.first==color}?.second?:color))};DropdownMenu(expanded=picking,onDismissRequest={picking=false}){rovaiCanvasColors.forEach{(key,label)->DropdownMenuItem(text={RovaiCanvasColorLabel(key,label)},onClick={color=key;picking=false;persist()})}}}}
         if(stale){Text("画布已有新修改，当前输入保留。请核对后继续。",color=CodegTheme.colors.danger);if(!remove&&latest!=null)TextButton(enabled=!blocked,onClick={revision=latest.coreLong("revision");commandId=UUID.randomUUID().toString();persist()}){Text("使用最新画布版本")}}
         if(state.pending!=null)Text("原请求待核对；可关闭后从工作区核对或重试。",color=CodegTheme.colors.textSecondary)
     }},confirmButton={TextButton(enabled=!blocked&&!stale&&name.codePointCount(0,name.length)<=200&&description.codePointCount(0,description.length)<=2000,onClick={val operation=if(remove)RovaiOperation.CANVAS_BOARDS_DELETE else if(board==null)RovaiOperation.CANVAS_BOARDS_CREATE else RovaiOperation.CANVAS_BOARDS_UPDATE;val command=buildJsonObject{if(id!=null){put("boardId",id);put("expectedRevision",revision)};if(!remove){put("name",name);put("description",description);put("color",color)}};val params=buildJsonObject{put("commandId",commandId);put("command",command)};val saved=record();busy=true;scope.launch{try{model.saveBody(owner,saved);model.rememberBody(owner,saved);require(generation==model.connectionGeneration);model.executeOwned(operation,params,owner,saved)}catch(error:Exception){issue=error.message}finally{busy=false}}}){Text(if(remove)"删除画布" else "保存")}},dismissButton={TextButton(enabled=!busy,onClick={close()}){Text("关闭并保留草稿")}})
+}
+
+@Composable fun RovaiCanvasColorLabel(value:String,label:String){
+    val tint=rovaiCanvasTint(value);val ink=CodegTheme.colors.textSecondary
+    Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){
+        Canvas(Modifier.size(12.dp)){if(tint==null)drawCircle(ink,style=Stroke(1.dp.toPx()))else drawCircle(tint)}
+        Text(label)
+    }
 }

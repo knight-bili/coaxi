@@ -33,6 +33,7 @@ import { canvasComposerContext } from './canvas-composer-drafts'
 import { CanvasObjectDialog } from './CanvasObjectDialog'
 import { canvasObjectId, canvasObjectNames, canvasObjectTarget, canvasPlainConversation, type CanvasObjectTarget } from './canvas-object'
 import './canvas.css'
+import './canvas-palette.css'
 
 export type { CanvasLeaveGuard } from './canvas-leave'
 import type { CanvasLeaveGuard } from './canvas-leave'
