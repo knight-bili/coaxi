@@ -23,11 +23,11 @@ struct RovaiThreadControls: View {
             ForEach(Array(Set((snapshot?["agentRuns"]?.rvArray ?? []).map { $0.text("conversationId") }.filter { !$0.isEmpty })).sorted(), id: \.self) { id in RovaiInteractionCards(model: model, conversationId: id); RovaiDelegationList(model: model, threadId: threadId, parentConversationId: id) }
             ForEach((snapshot?["agentRuns"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in RovaiExecutionHistory(model: model, threadId: threadId, run: row.value, observed: snapshot?["executionEvidence"]?.rvArray ?? []) }
             HStack { Text("任务").font(.headline); Spacer(); Button("新建任务") { creating = true }.disabled(model.pending != nil) }
-            ForEach(snapshot?["tasks"]?.rvArray ?? [], id: \.self) { task in GlassRow { VStack(alignment: .leading, spacing: 8) { HStack { Text(task.text("title")).font(.headline); Spacer(); Text(task.text("status")).font(.caption).foregroundStyle(Theme.textSecondary) }; Text(task.text("description")); if !task.text("blockedReason").isEmpty { Text(task.text("blockedReason")).foregroundStyle(Theme.warning) }; if !task.text("completionSummary").isEmpty { MarkdownContent(raw: task.text("completionSummary")) }; Button("编辑任务") { editing = TaskSelection(value: task) }.disabled(model.pending != nil) } } }
+            ForEach(snapshot?["tasks"]?.rvArray ?? [], id: \.self) { task in GlassRow { VStack(alignment: .leading, spacing: 8) { HStack { Text(task.text("title")).font(.headline); Spacer(); Text(taskStatusName(task.text("status"))).font(.caption).foregroundStyle(Theme.textSecondary) }; Text(task.text("description")); if !task.text("blockedReason").isEmpty { Text(task.text("blockedReason")).foregroundStyle(Theme.warning) }; if !task.text("completionSummary").isEmpty { MarkdownContent(raw: task.text("completionSummary")) }; Button("任务详情") { editing = TaskSelection(value: task) }.disabled(model.pending != nil) } } }
         }
         .sheet(isPresented: $managingMembers) {RovaiThreadMembers(model: model, threadId: threadId)}
-        .sheet(isPresented: $creating) { RovaiTaskEditor(model: model, threadId: threadId, task: nil) }
-        .sheet(item: $editing) { RovaiTaskEditor(model: model, threadId: threadId, task: $0.value) }
+        .sheet(isPresented: $creating) { RovaiTaskEditor(model: model, threadId: threadId, task: nil, projection: snapshot) }
+        .sheet(item: $editing) { RovaiTaskEditor(model: model, threadId: threadId, task: $0.value, projection: snapshot) }
     }
 }
 

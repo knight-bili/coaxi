@@ -30,11 +30,11 @@ fun RovaiThreadControls(model:RovaiWorkspaceViewModel,state:RovaiWorkspaceState)
         thread["agentRuns"].coreArray().map{it.coreText("conversationId")}.filter{it.isNotEmpty()}.distinct().forEach{conversation->key(threadId,conversation){RovaiInteractionCards(model,state,conversation);RovaiDelegationList(model,threadId,conversation)}}
         Row{Text("任务",Modifier.weight(1f),style=MaterialTheme.typography.titleSmall);TextButton(enabled=state.pending==null,onClick={creating=true}){Text("新建任务")}}
         thread["tasks"].coreArray().forEach{task->GlassRow(Modifier.fillMaxWidth()){
-            Row{Text(task.coreText("title"),Modifier.weight(1f),style=MaterialTheme.typography.titleSmall);Text(task.coreText("status"),style=MaterialTheme.typography.labelSmall,color=CodegTheme.colors.textSecondary)}
-            Text(task.coreText("description"));if(task.coreText("blockedReason").isNotEmpty())Text(task.coreText("blockedReason"),color=CodegTheme.colors.danger);if(task.coreText("completionSummary").isNotEmpty())MarkdownContent(task.coreText("completionSummary"));TextButton(enabled=state.pending==null,onClick={editing=task}){Text("编辑任务")}
+            Row{Text(task.coreText("title"),Modifier.weight(1f),style=MaterialTheme.typography.titleSmall);Text(taskStatusName(task.coreText("status")),style=MaterialTheme.typography.labelSmall,color=CodegTheme.colors.textSecondary)}
+            Text(task.coreText("description"));if(task.coreText("blockedReason").isNotEmpty())Text(task.coreText("blockedReason"),color=CodegTheme.colors.danger);if(task.coreText("completionSummary").isNotEmpty())MarkdownContent(task.coreText("completionSummary"));TextButton(enabled=state.pending==null,onClick={editing=task}){Text("任务详情")}
         }}
     }
-    if(creating||editing!=null)RovaiTaskEditor(model,threadId,editing){creating=false;editing=null}
+    if(creating||editing!=null)RovaiTaskEditor(model,threadId,editing,projection=thread){creating=false;editing=null}
 }
 
 @Composable fun RovaiInteractionCards(model:RovaiWorkspaceViewModel,state:RovaiWorkspaceState,conversationId:String){

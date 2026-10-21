@@ -18,16 +18,18 @@ val rovaiTaskStatuses=listOf("pending" to "待处理","in_progress" to "进行�
 fun taskStatusName(value:String)=rovaiTaskStatuses.firstOrNull{it.first==value}?.second?:value
 
 /** TaskPanel's sparse field patches and terminal rules; tasks have no object-version field. */
-@Composable fun RovaiTaskEditor(model:RovaiWorkspaceViewModel,threadId:String,task:JsonObject?,onClose:()->Unit){
+@Composable fun RovaiTaskEditor(model:RovaiWorkspaceViewModel,threadId:String,task:JsonObject?,projection:JsonObject?=null,onClose:()->Unit){
     val state=model.state.collectAsState().value;val scope=rememberCoroutineScope();val generation=remember(threadId){model.connectionGeneration}
     val key=task?.coreText("taskId")?:"new";val owner="task-edit:$threadId:$key"
     var baseline by remember(key){mutableStateOf(task)}
     var title by remember(key){mutableStateOf(task?.coreText("title").orEmpty())};var detail by remember(key){mutableStateOf(task?.coreText("description").orEmpty())};var assignee by remember(key){mutableStateOf(task?.coreText("assigneeAgentId").orEmpty())}
     var status by remember(key){mutableStateOf(task?.coreText("status")?:"pending")};var blockedReason by remember(key){mutableStateOf(task?.coreText("blockedReason").orEmpty())};var completion by remember(key){mutableStateOf(task?.coreText("completionSummary").orEmpty())};var cancelReason by remember(key){mutableStateOf("")}
     var commandId by remember(key){mutableStateOf(UUID.randomUUID().toString())};var ready by remember(key){mutableStateOf(false)};var busy by remember(key){mutableStateOf(false)};var cancelling by remember(key){mutableStateOf(false)};var issue by remember(key){mutableStateOf<String?>(null)}
-    val terminal=baseline?.coreText("status")in listOf("completed","cancelled")
+    val source=projection?:state.thread?.takeIf{it["thread"].coreObject().coreText("id")==threadId}
+    val currentTask=source?.get("tasks").coreArray().firstOrNull{it.coreText("taskId")==key}
+    val terminal=baseline?.coreText("status")in listOf("completed","cancelled")||currentTask?.coreText("status")in listOf("completed","cancelled")
     val locked=!ready||terminal||busy||state.busy||state.pending!=null||generation!=model.connectionGeneration
-    val members=state.thread?.takeIf{it["thread"].coreObject().coreText("id")==threadId}?.get("members").coreArray().filter{it.coreText("membershipStatus")=="active"}
+    val members=source?.get("members").coreArray().filter{it.coreText("membershipStatus")=="active"}
     fun record()=buildJsonObject{put("version",1);put("threadId",threadId);put("taskKey",key);put("baseline",baseline?:JsonNull);put("title",title);put("description",detail);put("assignee",assignee);put("status",status);put("blockedReason",blockedReason);put("completionSummary",completion);put("cancelReason",cancelReason);put("commandId",commandId)}.toString()
     fun persist(){if(ready&&generation==model.connectionGeneration)model.rememberBody(owner,record())}
     fun close(){if(busy)return;if(!ready||generation!=model.connectionGeneration){onClose();return};val saved=record();scope.launch{try{model.saveBody(owner,saved);model.rememberBody(owner,saved);onClose()}catch(error:Exception){issue=error.message}}}
@@ -60,6 +62,12 @@ fun taskStatusName(value:String)=rovaiTaskStatuses.firstOrNull{it.first==value}?
                 if(status=="blocked")item{OutlinedTextField(blockedReason,{blockedReason=it;persist()},Modifier.fillMaxWidth(),enabled=!locked,label={Text("阻塞原因")},minLines=3)}
                 if(status=="completed")item{OutlinedTextField(completion,{completion=it;persist()},Modifier.fillMaxWidth(),enabled=!locked,label={Text("完成摘要")},minLines=3)}
                 baseline?.let{base->item{Text("创建 · "+base.coreText("createdAt")+" · "+base.coreText("createdByType"),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary);Text("更新 · "+base.coreText("updatedAt"),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary);if(base.coreText("closedAt").isNotEmpty())Text("关闭 · "+base.coreText("closedAt"),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary);if(base.coreText("cancelReason").isNotEmpty())Text("取消原因 · "+base.coreText("cancelReason"))}}
+                if(task!=null){
+                    item{Text("责任与审计",style=MaterialTheme.typography.titleSmall);Text("任务 · "+key,style=MaterialTheme.typography.bodySmall);Text("创建者 · "+baseline?.coreText("createdByType").orEmpty()+" · "+baseline?.coreText("createdById").orEmpty(),style=MaterialTheme.typography.bodySmall);Text("来源执行 · "+baseline?.coreText("sourceAgentRunId").orEmpty().ifEmpty{"无"},style=MaterialTheme.typography.bodySmall);Text("结束者 · "+baseline?.coreText("closedByType").orEmpty()+" · "+baseline?.coreText("closedById").orEmpty(),style=MaterialTheme.typography.bodySmall)}
+                    val runs=source?.get("agentRuns").coreArray().filter{it.coreText("taskId")==key}
+                    item{Text("关联执行",style=MaterialTheme.typography.titleSmall);Text("${runs.size}个执行 · ${source?.get("messageDeliveries").coreArray().count{it.coreText("taskId")==key}}份消息投递",style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)}
+                    runs.forEach{run->item(key="task-run:"+run.coreText("id")){RovaiExecutionHistory(model,threadId,run,source?.get("executionEvidence").coreArray())}}
+                }
                 if(task!=null&&!terminal)item{TextButton(enabled=!locked,onClick={cancelling=true}){Text("取消任务",color=CodegTheme.colors.danger)}}
             }
             if(!terminal)Button(enabled=!locked&&valid,modifier=Modifier.fillMaxWidth().padding(12.dp),onClick={submit(false)}){Text(if(task==null)"创建任务" else "保存修改")}

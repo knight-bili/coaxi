@@ -8,6 +8,7 @@ struct RovaiTaskEditor: View {
     let model: RovaiWorkspaceModel
     let threadId: String
     let task: JSONValue?
+    var projection: JSONValue? = nil
     @Environment(\.dismiss) private var dismiss
     @State private var baseline: JSONValue?
     @State private var title = "", detail = "", assignee = "", status = "pending", blockedReason = "", completion = "", cancelReason = ""
@@ -16,9 +17,10 @@ struct RovaiTaskEditor: View {
     @State private var ready = false, busy = false, cancelling = false
     private var key: String {task?.text("taskId") ?? "new"}
     private var owner: String {"task-edit:\(threadId):\(key)"}
-    private var terminal: Bool {["completed", "cancelled"].contains(baseline?.text("status") ?? "")}
+    private var source: JSONValue? {projection ?? (model.thread?["thread"]?.text("id") == threadId ? model.thread : nil)}
+    private var terminal: Bool {["completed", "cancelled"].contains(baseline?.text("status") ?? "") || ["completed", "cancelled"].contains((source?["tasks"]?.rvArray ?? []).first {$0.text("taskId") == key}?.text("status") ?? "")}
     private var locked: Bool {!ready || terminal || busy || model.busy || model.pending != nil || generation != model.connectionGeneration}
-    private var members: [JSONValue] {guard model.thread?["thread"]?.text("id") == threadId else {return []};return (model.thread?["members"]?.rvArray ?? []).filter {$0.text("membershipStatus") == "active"}}
+    private var members: [JSONValue] {(source?["members"]?.rvArray ?? []).filter {$0.text("membershipStatus") == "active"}}
     private var valid: Bool {!title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && title.trimmingCharacters(in: .whitespacesAndNewlines).unicodeScalars.count <= 160 && detail.unicodeScalars.count <= 16000 && blockedReason.unicodeScalars.count <= 4000 && completion.unicodeScalars.count <= 4000 && (task != nil || !assignee.isEmpty) && (!["in_progress", "blocked"].contains(status) || !assignee.isEmpty) && (status != "blocked" || !blockedReason.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) && (status != "completed" || !completion.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)}
     var body: some View {
         NavigationStack {Form {
@@ -48,6 +50,20 @@ struct RovaiTaskEditor: View {
                 if let closed = baseline["closedAt"]?.stringValue {LabeledContent("关闭", value: closed)}
                 if !baseline.text("cancelReason").isEmpty {Text("取消原因 · \(baseline.text("cancelReason"))")}
             }}
+            if task != nil {
+                Section("责任与审计") {
+                    LabeledContent("任务", value: key)
+                    LabeledContent("创建者", value: (baseline?.text("createdByType") ?? "") + " · " + (baseline?.text("createdById") ?? ""))
+                    LabeledContent("来源执行", value: baseline?["sourceAgentRunId"]?.stringValue ?? "无")
+                    LabeledContent("结束者", value: (baseline?.text("closedByType") ?? "") + " · " + (baseline?.text("closedById") ?? ""))
+                }
+                Section("关联执行") {
+                    let runs = (source?["agentRuns"]?.rvArray ?? []).filter {$0.text("taskId") == key}
+                    let deliveries = (source?["messageDeliveries"]?.rvArray ?? []).filter {$0.text("taskId") == key}
+                    Text("\(runs.count)个执行 · \(deliveries.count)份消息投递").font(.caption).foregroundStyle(Theme.textSecondary)
+                    ForEach(runs, id: \.self) {run in RovaiExecutionHistory(model: model, threadId: threadId, run: run, observed: source?["executionEvidence"]?.rvArray ?? [])}
+                }
+            }
             if task != nil, !terminal {Section {Button("取消任务", role: .destructive) {cancelling = true}.disabled(locked)}}
         }.navigationTitle(task == nil ? "新建任务" : "任务详情").navigationBarTitleDisplayMode(.inline).toolbar {
             ToolbarItem(placement: .cancellationAction) {Button("保存草稿并关闭") {close()}.disabled(busy)}
