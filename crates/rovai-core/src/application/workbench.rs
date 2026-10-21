@@ -113,10 +113,12 @@ struct DirectoryAlias { path: String, name: String, group: String }
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 struct QuickMessage { id: String, title: String, text: String }
+fn organizer_thread_level()->String{"thread".into()}
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 struct OrganizerRequest {
-    scope: Scope,
+    #[serde(default)] scope: Option<Scope>,
+    #[serde(default="organizer_thread_level")] level:String,
     #[serde(default)] expected_digest: Option<String>,
     #[serde(default)] value: Option<Organizer>,
 }
@@ -244,10 +246,12 @@ impl Core {
     pub(super) async fn workbench_organizer(&self, method: &str, value: Value) -> Result<Value> {
         let request: OrganizerRequest = serde_json::from_value(value)?;
         let _write = MUTATIONS.lock().await;
-        let root = self.workbench_root(&request.scope).await?;
+        ensure!(["global","project","thread"].contains(&request.level.as_str()),"workbench.invalid_organizer_level");
         let directory = self.data_dir.join("workspace-metadata");
-        let identity = crate::command::canonical_json_digest(&json!({"scope":request.scope,"root":root}))?;
-        let path = directory.join(format!("{identity}.json"));
+        let path=if request.level=="global"{directory.join("global-v1.json")}else{
+            let scope=request.scope.as_ref().context("workbench.scope_required")?;let root=self.workbench_root(scope).await?;
+            let identity=crate::command::canonical_json_digest(&if request.level=="project"{json!({"root":root,"level":"project","version":1})}else{json!({"scope":scope,"root":root})})?;directory.join(format!("{identity}.json"))
+        };
         let current: Organizer = if path.exists() { serde_json::from_slice(&fs::read(&path)?)? } else { Organizer::default() };
         let current_value = serde_json::to_value(&current)?;
         let current_digest = crate::command::canonical_json_digest(&current_value)?;
