@@ -1,0 +1,12 @@
+{
+  "repository": "https://github.com/spacering-net/codeg",
+  "revision": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+  "license": "Apache-2.0",
+  "sourceRoot": "src-tauri/src/chat_channel",
+  "adaptations": [
+    "production transport/types only; donor tests excluded",
+    "No Tauri/database dependency",
+    "No HTTP redirects with credentials",
+    "Core binding and admission remain Host responsibilities"
+  ]
+}
