@@ -7,10 +7,12 @@ struct RovaiThreadControls: View {
     var projection: JSONValue? = nil
     private var snapshot: JSONValue? { projection ?? model.thread }
     @State private var creating = false
+    @State private var managingMembers = false
     @State private var editing: TaskSelection?
     private struct TaskSelection: Identifiable { let value: JSONValue; var id: String { value.text("taskId") } }
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
+            Button("会话队员与队长") {managingMembers = true}
             ForEach((snapshot?["approvals"]?.rvArray ?? []).filter { $0.text("status") == "pending" }, id: \.self) { approval in
                 GlassRow { VStack(alignment: .leading, spacing: 10) {
                     Text("需要你的许可").font(.headline)
@@ -23,6 +25,7 @@ struct RovaiThreadControls: View {
             HStack { Text("任务").font(.headline); Spacer(); Button("新建任务") { creating = true }.disabled(model.pending != nil) }
             ForEach(snapshot?["tasks"]?.rvArray ?? [], id: \.self) { task in GlassRow { VStack(alignment: .leading, spacing: 8) { HStack { Text(task.text("title")).font(.headline); Spacer(); Text(task.text("status")).font(.caption).foregroundStyle(Theme.textSecondary) }; Text(task.text("description")); if !task.text("blockedReason").isEmpty { Text(task.text("blockedReason")).foregroundStyle(Theme.warning) }; if !task.text("completionSummary").isEmpty { MarkdownContent(raw: task.text("completionSummary")) }; Button("编辑任务") { editing = TaskSelection(value: task) }.disabled(model.pending != nil) } } }
         }
+        .sheet(isPresented: $managingMembers) {RovaiThreadMembers(model: model, threadId: threadId)}
         .sheet(isPresented: $creating) { RovaiTaskEditor(model: model, threadId: threadId, task: nil) }
         .sheet(item: $editing) { RovaiTaskEditor(model: model, threadId: threadId, task: $0.value) }
     }
