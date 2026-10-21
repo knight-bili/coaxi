@@ -1,3 +1,4 @@
+import { PetWindowService } from './pet-window'
 import { WebdavWorkspace } from './webdav-workspace'
 import { BackupWorkspace } from './backup-workspace'
 import { OfficeWorkspace } from './office-workspace'
@@ -1258,6 +1259,12 @@ const webdavWorkspace = new WebdavWorkspace((method,params)=>core.request(method
 ipcMain.handle('rovai:webdav-workspace',(event,input)=>webdavWorkspace.invoke(event,input))
 const backupWorkspace = new BackupWorkspace(core,()=>coreDataPath,()=>mainWindow,()=>requestRendererQuitPreparation(mainWindow,()=>new MessageChannelMain()),()=>{browserWorkspace.revokeAll();officeWorkspace.closeAll()},()=>{app.relaunch();app.quit()})
 ipcMain.handle('rovai:backup-workspace',(event,operation,input)=>backupWorkspace.invoke(event,operation,input))
+const petWindow = new PetWindowService((method,params)=>core.request(method,params),()=>mainWindow)
+core.onEvent(event=>petWindow.onCoreEvent(event))
+ipcMain.handle('rovai:pets-synchronize',event=>petWindow.synchronize(event))
+ipcMain.handle('rovai:pet-request',(event,input)=>petWindow.read(event,input))
+ipcMain.handle('rovai:pet-control',(event,action)=>petWindow.control(event,action))
+app.on('before-quit',()=>petWindow.close())
 ipcMain.handle('rovai:pets-import',async event=>{
   if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('pets.local_owner_required')
   const selected=await dialog.showOpenDialog(mainWindow,{title:'选择包含pet.json和spritesheet.webp的宠物文件夹',properties:['openDirectory']})

@@ -5126,7 +5126,7 @@ export interface BrowserWorkspaceView { id:string; threadId:string;url:string;ti
 
 export interface RovaiApi {
   /** Native local owner surface; intentionally absent from remote Web. */
-  nativePets?: { importDirectory():Promise<unknown|null> }
+  nativePets?: { importDirectory():Promise<unknown|null>;synchronize():Promise<void>;onChanged(listener:()=>void):()=>void }
   webdavWorkspace?: {request<T>(input:{operation:'probe'|'create_collection'|'list'|'push'|'pull'|'status';expectedRevision:string;commandId?:string;snapshotId?:string;expectedDigest?:string}):Promise<T|null>}
   nativeBackups?: NativeBackupsApi
   nativeHistory?: {
