@@ -6,7 +6,8 @@ import type { CanvasBoard, CanvasBoardSummary, StoredCommandResult, NavigationPr
 import { CanvasSurface, type CanvasLeaveGuard, type CanvasSurfaceProps } from './CanvasSurface'
 import { CanvasBoardDialog } from './CanvasBoardDialog'
 import { CanvasBoardPreview, canvasPreviewTint } from './CanvasBoardPreview'
-import { CanvasBoardsController, initialCanvasBoardsState, type CanvasBoardIntent } from './canvas-boards-controller'
+import type { CanvasBoardIntent } from './canvas-boards-controller'
+import { useCanvasBoards } from './useCanvasBoards'
 import { browserCanvasStorage, readCanvasViewScope, loadCanvasBoardSelection, saveCanvasBoardSelection, type CanvasViewScope } from './canvas-view-state'
 import { useThreadClient } from './camp-client'
 import { useCanvasReferences } from './useCanvasReferences'
@@ -72,24 +73,6 @@ function BoardCard({ board, summary, name, now, blocked, onOpen, onEdit, onDelet
   </article>
 }
 
-function useCanvasBoards() {
-  const client = useThreadClient(), controller = useRef<CanvasBoardsController | null>(null)
-  const [owned, setOwned] = useState(() => ({ client, state: initialCanvasBoardsState() }))
-  useEffect(() => {
-    const current = new CanvasBoardsController(client)
-    controller.current = current
-    const unsubscribe = current.subscribe(() => setOwned({ client, state: current.getSnapshot() }))
-    setOwned({ client, state: current.getSnapshot() }); current.start()
-    const foreground = () => current.setVisible(document.visibilityState === 'visible')
-    const poll = setInterval(() => { if (document.visibilityState === 'visible') void current.refresh().catch(() => undefined) }, 20_000)
-    window.addEventListener('focus', foreground); document.addEventListener('visibilitychange', foreground)
-    return () => {
-      unsubscribe(); current.dispose(); if (controller.current === current) controller.current = null
-      clearInterval(poll); window.removeEventListener('focus', foreground); document.removeEventListener('visibilitychange', foreground)
-    }
-  }, [client])
-  return { controller, state: owned.client === client ? owned.state : initialCanvasBoardsState() }
-}
 
 export function CanvasWorkspace(props: CanvasWorkspaceProps): React.JSX.Element {
   const client = useThreadClient(), owner = useRef({ client, generation: 0 })
