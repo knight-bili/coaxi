@@ -22,6 +22,12 @@ pub enum ChannelKind {
 #[serde(tag = "operation", rename_all = "camelCase", deny_unknown_fields)]
 pub enum ChannelRequest {
     Get {},
+    Connect { kind: ChannelKind },
+    Disconnect { kind: ChannelKind },
+    #[serde(rename_all = "camelCase")]
+    CancelLogin { attempt_id: String },
+    #[serde(rename_all = "camelCase")]
+    RefreshLogin { attempt_id: String },
     #[serde(rename_all = "camelCase")]
     Publish {
         kind: ChannelKind,
@@ -46,7 +52,8 @@ impl ChannelRequest {
             !value.is_empty() && value.len() <= 256 && !value.chars().any(char::is_control)
         };
         match self {
-            Self::Get {} => true,
+            Self::Get {} | Self::Connect { .. } | Self::Disconnect { .. } => true,
+            Self::CancelLogin { attempt_id } | Self::RefreshLogin { attempt_id } => id(attempt_id),
             Self::Publish { agent_id, .. } | Self::Retry { agent_id, .. } => id(agent_id),
             Self::SelectApprover {
                 kind,

@@ -1,4 +1,5 @@
 mod desktop_channels;
+mod server_channels;
 mod backup;
 mod lifecycle;
 mod server;

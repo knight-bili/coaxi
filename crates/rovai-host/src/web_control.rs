@@ -20,6 +20,7 @@ pub struct WebControl {
     data_dir: PathBuf,
     channels: Option<Arc<crate::desktop_channels::DesktopChannels>>,
     updates: Option<Arc<dyn rovai_web::UpdateHost>>,
+    standalone_channels: Option<Arc<crate::server_channels::ServerChannels>>,
     state: Mutex<WebControlState>,
 }
 
@@ -33,6 +34,7 @@ impl WebControl {
         Arc::new(Self {
             channels: desktop
                 .then(|| Arc::new(crate::desktop_channels::DesktopChannels::new(core.clone()))),
+            standalone_channels: (!desktop).then(|| Arc::new(crate::server_channels::ServerChannels::new(core.clone()))),
             core,
             data_dir,
             updates,
@@ -44,6 +46,9 @@ impl WebControl {
     }
 
     pub async fn start(&self, config: WebConfig, token: &str) -> anyhow::Result<Value> {
+        if let Some(channels) = &self.standalone_channels {
+            if channels.start().await.is_err() { tracing::warn!("Standalone channel package unavailable; Core and Web remain available"); }
+        }
         self.state
             .lock()
             .await
@@ -54,7 +59,8 @@ impl WebControl {
                 Some(token),
                 self.channels
                     .clone()
-                    .map(|channels| channels as Arc<dyn rovai_web::ChannelHost>),
+                    .map(|channels| channels as Arc<dyn rovai_web::ChannelHost>)
+                    .or_else(|| self.standalone_channels.clone().map(|channels| channels as Arc<dyn rovai_web::ChannelHost>)),
                 self.updates.clone(),
             )
             .await
@@ -65,6 +71,8 @@ impl WebControl {
         if let Some(server) = state.server.take() {
             server.shutdown().await;
         }
+        drop(state);
+        if let Some(channels) = &self.standalone_channels { channels.shutdown().await; }
     }
 
     pub async fn stop(&self) -> anyhow::Result<()> {
