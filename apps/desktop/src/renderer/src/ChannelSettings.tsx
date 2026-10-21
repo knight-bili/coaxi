@@ -1,4 +1,5 @@
 import { useThreadClient, type ThreadClient } from './camp-client'
+import {TransportChannelSettings} from './TransportChannelSettings'
 import { feishuLoginFailureDetail } from '../../shared/feishu-login-progress'
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
@@ -101,10 +102,11 @@ function channelProvisioning(snapshot: ChannelSettingsSnapshot | null, kind: Cha
 
 export function ChannelSettings({ agents }: { agents: AgentProfile[] }): React.JSX.Element {
   const client = useThreadClient()
-  if (!client.channels) return <div className="channel-settings-page">
-    <SettingsPageHeader eyebrow="Settings / Channels" title={uiAttribute("渠道")} description={uiAttribute("独立 Server 当前不支持飞书／钉钉渠道。渠道功能请使用 Rovai Desktop。")} />
-  </div>
-  return <ManagedChannelSettings agents={agents} channels={client.channels} />
+  const [family,setFamily] = useState<'platform'|'transport'>('platform')
+  return <div className="transport-channel-settings"><div className="transport-channel-tabs" role="tablist">
+    <button type="button" className="quiet-button" role="tab" aria-selected={family==='platform'} onClick={()=>setFamily('platform')}>{uiAttribute('飞书 / Lark / 钉钉')}</button>
+    <button type="button" className="quiet-button" role="tab" aria-selected={family==='transport'} onClick={()=>setFamily('transport')}>{uiAttribute('Telegram / 微信')}</button>
+  </div>{family==='transport'?<TransportChannelSettings agents={agents}/>:client.channels?<ManagedChannelSettings agents={agents} channels={client.channels}/>:<div className="channel-settings-page"><SettingsPageHeader eyebrow="Settings / Channels" title={uiAttribute('渠道')} description={uiAttribute('当前宿主尚未提供飞书、Lark 和钉钉的渠道组件。')}/></div>}</div>
 }
 
 function ManagedChannelSettings({ agents, channels }: { agents: AgentProfile[]; channels: NonNullable<ThreadClient['channels']> }): React.JSX.Element {
