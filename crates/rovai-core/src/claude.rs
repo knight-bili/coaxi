@@ -13,6 +13,7 @@ use anyhow::{Context, Result};
 use rovai_core::{
     agent_profile::FrozenAgentRuntimeConfig,
     agent_runtime_adapter::CLAUDE_CODE_RUNTIME_DEFAULT_MODEL_ID,
+    command::canonical_json_digest,
     managed_process::{
         ManagedProcess, ManagedProcessLaunchSpec, ManagedProcessPurpose, ManagedStdinPolicy,
         ManagedWindowsArgvDialect,
@@ -1465,6 +1466,7 @@ struct ClaudeCodeStreamState {
     started_tools: HashSet<String>,
     terminal_tools: HashSet<String>,
     tool_inputs: HashMap<String, Value>,
+    tool_input_digests: HashMap<String, String>,
     tool_queries: HashMap<String, Value>,
     file_operation_candidates: HashMap<String, Value>,
     exact_edit_mutations: HashMap<String, Value>,
@@ -2160,6 +2162,11 @@ fn normalize_claude_runtime_events(
                 state
                     .tool_names
                     .insert(tool_use_id.clone(), tool_name.clone());
+                if let Some(input) = block.get("input") {
+                    state.tool_input_digests.insert(
+                        tool_use_id.clone(), canonical_json_digest(input)?,
+                    );
+                }
                 if let Some(input) = public_claude_tool_input(&tool_name, block.get("input")) {
                     state.tool_inputs.insert(tool_use_id.clone(), input);
                 }
@@ -2236,6 +2243,7 @@ fn normalize_claude_runtime_events(
                     }
                 });
                 let input = state.tool_inputs.get(&tool_use_id).cloned();
+                let raw_input_digest = state.tool_input_digests.get(&tool_use_id).cloned();
                 let query = state.tool_queries.get(&tool_use_id).cloned();
                 let kind = tool_name.as_deref().map(claude_tool_kind).unwrap_or("tool");
                 let title = tool_name.clone();
@@ -2248,6 +2256,7 @@ fn normalize_claude_runtime_events(
                     "kind": kind,
                     "title": title,
                     "input": input,
+                    "rawInputDigest": raw_input_digest,
                     "output": output,
                 });
                 let search_operation_candidate = tool_name.as_deref().and_then(|tool_name| {
@@ -2306,6 +2315,7 @@ fn claude_tool_started(
         .tool_names
         .insert(tool_use_id.clone(), tool_name.clone());
     let input = state.tool_inputs.get(&tool_use_id).cloned();
+    let raw_input_digest = state.tool_input_digests.get(&tool_use_id).cloned();
     let query = state.tool_queries.get(&tool_use_id).cloned();
     state.started_tools.insert(tool_use_id.clone()).then(|| {
         let mut payload = serde_json::json!({
@@ -2315,6 +2325,7 @@ fn claude_tool_started(
             "kind": kind,
             "title": title,
             "input": input,
+            "rawInputDigest": raw_input_digest,
         });
         let search_operation_candidate =
             payload
