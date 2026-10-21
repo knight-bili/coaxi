@@ -1,3 +1,4 @@
+import {withHostProjectGroups} from '../../desktop/src/shared/host-navigation-groups'
 import { withBrowserPreferenceWrite } from './auth-storage'
 import { withHostConversationPreferences } from '../../desktop/src/shared/host-general-preferences'
 import type { ConsoleClient } from './client'
@@ -97,7 +98,7 @@ export function browserPreferences(scope: string, transport: ConsoleClient): {
         setWorldMapEnabled: worldMapEnabled => commitGeneral({ worldMapEnabled }),
         invalidateNewConversationDefaults: () => commitGeneral({ newConversationDefaultsRequireConfirmation: general.newConversationDefaults !== null })
       }, (method, params) => transport.request(method, params)),
-      navigationPreferences: {
+      navigationPreferences: withHostProjectGroups({
         applyProjectLayout: (expectedRevision, mutation) => commitNavigation(current => applyNavigationProjectLayout(current, expectedRevision, mutation)),
         get: async () => { refreshNavigation(); return structuredClone(navigation) },
         onChanged: listener => {
@@ -140,7 +141,7 @@ export function browserPreferences(scope: string, transport: ConsoleClient): {
             ? current.projectOrder : [...new Set([...(current.projectOrder ?? []), key])],
           removedProjects: current.removedProjects.filter(p => p.targetKey !== key)
         }))
-      }
+      }, (method, params) => transport.request(method, params))
     }
   }
 }

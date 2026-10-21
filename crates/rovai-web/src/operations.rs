@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 /// and the legacy shared draft remain outside the network capability.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum Operation {
+    #[serde(rename="navigation.projectGroups")]
+    NavigationProjectGroups,
     #[serde(rename="extensions.catalog")]
     ExtensionCatalog,
     #[serde(rename="channels.adapters")]
@@ -546,6 +548,7 @@ impl Operation {
     pub fn project(self, mut value: serde_json::Value) -> serde_json::Value {
         use serde_json::json;
         match self {
+            Self::NavigationProjectGroups => select_fields(&value,&["schemaVersion","initialized","projectGroupsRevision","projectGroups","projectOrder"]),
             Self::AppInfo => json!({"name":value["name"],"version":value["version"]}),
             Self::ForgeAccountsGet | Self::ForgeAccountsSet => select_fields(&value, &["accounts"]),
             Self::ForgeLinks => select_fields(&value,&["revision","repository","links","applied","id"]),
@@ -645,6 +648,7 @@ impl Operation {
             Self::OfficeSkillPrepare => "skillPacks.office.prepare",
             Self::OfficeSkillInstall => "skillPacks.office.install",
             Self::PetsOperation => "pets.operation",
+            Self::NavigationProjectGroups => "navigation.projectGroups",
             Self::AppearanceExtensions => "appearance.extensions",
             Self::WebdavSettings => "backup.webdav.settings",
             Self::WebdavRemote => "backup.webdav.remote",

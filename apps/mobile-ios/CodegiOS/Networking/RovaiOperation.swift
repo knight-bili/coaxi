@@ -2,6 +2,7 @@ import Foundation
 
 /// Generated from the explicit public Host enum; private Core methods never cross this seam.
 enum RovaiOperation: String, Sendable {
+    case navigationProjectGroups = "navigation.projectGroups"
     case extensionsCatalog = "extensions.catalog"
     case channelsAdapters = "channels.adapters"
     case forgeLinks = "forge.links"

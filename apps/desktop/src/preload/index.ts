@@ -1,3 +1,4 @@
+import {withHostProjectGroups} from '../shared/host-navigation-groups'
 import { contextBridge, ipcRenderer, webUtils } from 'electron'
 import { createCloseTabShortcutHandler } from '../shared/close-tab-shortcut'
 import { createWindowCloseApi } from './window-close-api'
@@ -686,4 +687,5 @@ const api: RovaiApi = {
   platform: process.platform
 }
 
+api.navigationPreferences = withHostProjectGroups(api.navigationPreferences, (method, params) => api.request(method, params))
 contextBridge.exposeInMainWorld('rovai', api)

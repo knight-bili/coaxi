@@ -4,6 +4,7 @@ use rusqlite::OptionalExtension;
 mod canvas_terminal;
 mod config;
 mod conversation_preferences;
+mod navigation_groups;
 pub(crate) mod delegation_composer;
 pub(crate) mod delegation_control;
 pub(crate) mod delegation_input;
@@ -848,7 +849,8 @@ fn channel_request_host_component(method: &str) -> Result<&'static str> {
 fn request_runs_outside_main_queue(method: &str) -> bool {
     matches!(
         method,
-        "health.check"
+        "navigation.projectGroups"
+            | "health.check"
             | "backup.webdav.remote"
             | "diagnostics.check"
             | "diagnostics.export"
@@ -10371,6 +10373,7 @@ impl Core {
             "workbench.git.read" | "workbench.git.preview" | "workbench.git.execute" => {
                 self.workbench_git(&request.method, request.params.clone()).await
             }
+            "navigation.projectGroups" => self.navigation_project_groups(request.params.clone()).await,
             "workbench.organizer.get" | "workbench.organizer.set" => {
                 self.workbench_organizer(&request.method, request.params.clone()).await
             }

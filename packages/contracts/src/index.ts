@@ -5029,6 +5029,7 @@ export type CoreMethod =
   | 'workbench.projectLauncher'
   | 'workbench.files.tools'
   | 'workbench.files.list'
+  | 'navigation.projectGroups'
   | 'workbench.organizer.get'
   | 'forge.accounts.get'
   | 'forge.accounts.set'

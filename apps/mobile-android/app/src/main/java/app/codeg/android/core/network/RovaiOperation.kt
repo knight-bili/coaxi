@@ -2,6 +2,7 @@ package app.codeg.android.core.network
 
 /** Generated from the explicit public Host enum; private Core methods are not admitted. */
 enum class RovaiOperation(val wire:String) {
+    NAVIGATION_PROJECTGROUPS("navigation.projectGroups"),
     EXTENSIONS_CATALOG("extensions.catalog"),
     CHANNELS_ADAPTERS("channels.adapters"),
     FORGE_LINKS("forge.links"),
