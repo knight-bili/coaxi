@@ -19,9 +19,9 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.*
 
 @Composable
-fun RovaiPrivateConversation(model:RovaiWorkspaceViewModel,threadId:String,childId:String?=null,onClose:()->Unit){
+fun RovaiPrivateConversation(model:RovaiWorkspaceViewModel,threadId:String,childId:String?=null,initialConversationId:String?=null,onClose:()->Unit){
     val state by model.state.collectAsStateWithLifecycle();val scope=rememberCoroutineScope();val child=childId!=null
-    var conversations by remember(threadId){mutableStateOf<List<JsonObject>>(emptyList())};var selected by remember(threadId,childId){mutableStateOf(childId)}
+    var conversations by remember(threadId){mutableStateOf<List<JsonObject>>(emptyList())};var selected by remember(threadId,childId,initialConversationId){mutableStateOf(childId?:initialConversationId)}
     var snapshot by remember(threadId,childId){mutableStateOf(buildJsonObject{})};var body by remember(selected){mutableStateOf("")};var bodyReady by remember(selected){mutableStateOf(false)}
     var retained by remember(selected){mutableStateOf<List<JsonObject>>(emptyList())};var cursor by remember(selected){mutableStateOf<String?>(null)}
     var issue by remember{mutableStateOf<String?>(null)};var loading by remember{mutableStateOf(false)};var ending by remember{mutableStateOf(false)}
