@@ -4445,8 +4445,9 @@ function ThreadWorkspaceContent({
   useEffect(()=>{
     onBindWorkbenchQuickMessage?.(text=>{
       if(composerInteractionDisabled || composerDraft?.threadId!==snapshot.thread.id)return false
-      if(composerHandleRef.current?.isDirty() && !window.confirm(uiAttribute('替换当前尚未发送的正文？附件和引用保留。')))return false
-      chooseStarterPrompt(text,true);return true
+      const inserted = composerHandleRef.current?.appendText(text) ?? false
+      if (inserted) setStarterNotice(uiAttribute('快捷内容已追加，可编辑后发送。'))
+      return inserted
     })
     return()=>onBindWorkbenchQuickMessage?.(null)
   },[onBindWorkbenchQuickMessage,composerInteractionDisabled,composerDraft,snapshot.thread.id])

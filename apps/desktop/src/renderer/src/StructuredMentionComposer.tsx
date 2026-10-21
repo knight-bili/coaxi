@@ -97,6 +97,7 @@ export interface StructuredMentionComposerHandle {
   setDocument(document: ComposerDocument, boundary?: 'start' | 'end'): void
   focus(boundary?: 'start' | 'end'): void
   startMention(): void
+  appendText(text: string): boolean
   getLocalVersion(): number
   isDirty(): boolean
 }
@@ -551,6 +552,18 @@ function ComposerBridge({
         else $getRoot().selectEnd()
       }, { discrete: true })
       editor.focus(undefined, { defaultSelection: boundary === 'start' ? 'rootStart' : 'rootEnd' })
+    },
+    appendText(text) {
+      if (!editor.isEditable() || !text || text.length > 1_048_576) return false
+      const size = editor.getEditorState().read(() => $getRoot().getTextContentSize())
+      if (size + text.length + (size ? 1 : 0) > 1_048_576) return false
+      closeTypeaheads()
+      editor.update(() => {
+        const root = $getRoot()
+        root.selectEnd().insertText((root.getTextContentSize() ? '\n' : '') + text)
+      }, { discrete: true, tag: HISTORY_PUSH_TAG })
+      editor.focus(undefined, { defaultSelection: 'rootEnd' })
+      return true
     },
     startMention() {
       if (!editor.isEditable()) return
