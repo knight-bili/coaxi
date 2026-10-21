@@ -66,7 +66,7 @@ struct RovaiPrivateConversationView: View {
         }
     }
     private func run(_ value: JSONValue) -> some View {
-        GlassRow { VStack(alignment: .leading, spacing: 8) { Text(value.text("status")).font(.caption); if !value.text("lastErrorCode").isEmpty { Text(value.text("lastErrorCode")).foregroundStyle(Theme.warning) }; if ["running", "queued", "waiting"].contains(value.text("status")) { Button("停止") { Task { await model.command(.agentRunsCancel, value: .object(["threadId": .string(threadId), "agentRunId": value["id"] ?? .null, "expectedVersion": value["version"] ?? .number(0)])) } }.disabled(disabled) } } }
+        GlassRow { VStack(alignment: .leading, spacing: 8) { RovaiExecutionHistory(model: model, threadId: threadId, run: value, observed: snapshot["executionEvidence"]?.rvArray ?? []); Text(value.text("status")).font(.caption); if !value.text("lastErrorCode").isEmpty { Text(value.text("lastErrorCode")).foregroundStyle(Theme.warning) }; if ["running", "queued", "waiting"].contains(value.text("status")) { Button("停止") { Task { await model.command(.agentRunsCancel, value: .object(["threadId": .string(threadId), "agentRunId": value["id"] ?? .null, "expectedVersion": value["version"] ?? .number(0)])) } }.disabled(disabled) } } }
     }
     private func pending(_ value: JSONValue) -> some View {
         GlassRow { VStack(alignment: .leading, spacing: 8) { Text("排队输入").font(.headline); MarkdownContent(raw: value.text("body")); Text("\(value["attachments"]?.rvArray.count ?? 0) 个附件 · \(value["quotes"]?.rvArray.count ?? 0) 条引用").font(.caption)

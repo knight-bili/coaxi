@@ -17,6 +17,7 @@ struct RovaiThreadControls: View {
                 } }
             }
             ForEach(Array(Set((model.thread?["agentRuns"]?.rvArray ?? []).map { $0.text("conversationId") }.filter { !$0.isEmpty })).sorted(), id: \.self) { id in RovaiInteractionCards(model: model, conversationId: id); RovaiDelegationList(model: model, threadId: threadId, parentConversationId: id) }
+            ForEach((model.thread?["agentRuns"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in RovaiExecutionHistory(model: model, threadId: threadId, run: row.value, observed: model.thread?["executionEvidence"]?.rvArray ?? []) }
             HStack { Text("任务").font(.headline); Spacer(); Button("新建任务") { creating = true }.disabled(model.pending != nil) }
             ForEach(model.thread?["tasks"]?.rvArray ?? [], id: \.self) { task in GlassRow { VStack(alignment: .leading, spacing: 8) { HStack { Text(task.text("title")).font(.headline); Spacer(); Text(task.text("status")).font(.caption).foregroundStyle(Theme.textSecondary) }; Text(task.text("description")); if !task.text("blockedReason").isEmpty { Text(task.text("blockedReason")).foregroundStyle(Theme.warning) }; if !task.text("completionSummary").isEmpty { MarkdownContent(raw: task.text("completionSummary")) }; Button("编辑任务") { editing = TaskSelection(value: task) }.disabled(model.pending != nil) } } }
         }
