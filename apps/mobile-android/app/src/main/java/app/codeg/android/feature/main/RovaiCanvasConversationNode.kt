@@ -8,14 +8,16 @@ import kotlinx.serialization.json.*
 import java.util.UUID
 
 /** canvas-conversation.ts: resolve the saved public/single-chat identity, without opening a new private session. */
-@Composable fun RovaiCanvasConversationNode(model:RovaiWorkspaceViewModel,boardId:String,node:JsonObject,onClose:()->Unit){
-    val generation=remember{model.connectionGeneration};val data=node["data"].coreObject();val reference=data["conversation"].coreObject();val threadId=reference.coreText("threadId");val conversationId=(reference["conversationId"]as?JsonPrimitive)?.contentOrNull
+@Composable fun RovaiCanvasConversationNode(model:RovaiWorkspaceViewModel,boardId:String,node:JsonObject,memberReference:JsonObject?=null,onClose:()->Unit){
+    val generation=remember{model.connectionGeneration};val data=if(memberReference==null)node["data"].coreObject()else buildJsonObject{put("kind","conversation");put("conversation",memberReference)};val reference=data["conversation"].coreObject();val threadId=reference.coreText("threadId");val conversationId=(reference["conversationId"]as?JsonPrimitive)?.contentOrNull
     var ready by remember(node.coreText("id")){mutableStateOf(false)};var issue by remember{mutableStateOf<String?>(null)};var retry by remember{mutableIntStateOf(0)}
-    LaunchedEffect(node.coreText("id"),retry){try{
+    LaunchedEffect(node.coreText("id"),reference,retry){try{
         require(data.coreText("kind")=="conversation"&&data["objectReference"] !is JsonObject&&threadId.isNotEmpty()){"卡片不属于普通会话引用"}
+        if(memberReference!=null)requireCanvasRegionReference(model,boardId,node.coreText("id"),reference)else{
         val graph=model.query(RovaiOperation.CANVAS_NODES_SNAPSHOT,buildJsonObject{put("boardId",boardId)}).coreObject()
         val saved=graph["nodes"].coreArray().firstOrNull{it.coreText("id")==node.coreText("id")}?.get("data").coreObject()
         require(saved.coreText("kind")=="conversation"&&saved["objectReference"] !is JsonObject&&saved["conversation"]==reference){"原卡片已删除或绑定已变化；引用保留"}
+        }
         if(conversationId==null){
             val snapshot=model.query(RovaiOperation.THREADS_OPEN,buildJsonObject{put("threadId",threadId);put("traceId",UUID.randomUUID().toString())}).coreObject();require(snapshot["thread"].coreObject().coreText("id")==threadId){"原公开会话已不可用"};require(generation==model.connectionGeneration);model.openThread(threadId);onClose()
         }else{
