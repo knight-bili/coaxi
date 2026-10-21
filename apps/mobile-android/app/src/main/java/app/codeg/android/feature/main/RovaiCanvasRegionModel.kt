@@ -7,7 +7,7 @@ import kotlinx.coroutines.sync.withPermit
 import kotlinx.serialization.json.*
 import java.time.Instant
 
-data class RovaiCanvasFolderRelation(val paths:List<String>,val complete:Boolean,val parentPath:String?=null,val issue:String?=null)
+data class RovaiCanvasFolderRelation(val paths:List<String>,val complete:Boolean,val parentPath:String?=null,val issue:String?=null,val projectPath:String?=null,val worktrees:List<JsonObject> = emptyList())
 data class RovaiCanvasRegionMember(val reference:JsonObject,val label:String,val available:Boolean?,val updatedAt:String=""){val key:String get()=RovaiCanvasReferenceChoice(reference,label).key}
 data class RovaiCanvasRegionResolution(val members:List<RovaiCanvasRegionMember>,val complete:Boolean,val issue:String?=null)
 fun canvasRegionRoots(node:JsonObject,groups:List<JsonObject>):List<String>{val data=node["data"].coreObject();return when(data.coreText("kind")){"folder"->listOf(data.coreText("folderPath")).filter{it.isNotEmpty()};"group"->(groups.firstOrNull{it.coreText("id")==data.coreText("folderGroupId")}?.get("projectPaths")as?JsonArray)?.mapNotNull{(it as?JsonPrimitive)?.contentOrNull}.orEmpty();else->emptyList()}}
@@ -21,7 +21,7 @@ suspend fun readCanvasFolderRelations(model:RovaiWorkspaceViewModel,roots:List<S
         require(if(repository==null)rows.isEmpty()&&main==null else rows.any{it.coreText("projectPath")==repository&&it["available"]==JsonPrimitive(true)&&it["bare"]==JsonPrimitive(false)}&&main==rows.firstOrNull()?.takeUnless{it["bare"]==JsonPrimitive(true)}?.coreText("projectPath")){"工程工作树关系不一致"}
         require(generation==model.connectionGeneration)
         val paths=mutableSetOf(root,project);if(project==repository&&repository==main)rows.filter{it["bare"]==JsonPrimitive(false)}.forEach{paths.add(it.coreText("projectPath"))}
-        RovaiCanvasFolderRelation(paths.toList(),true,if(project==repository&&main!=null&&main!=repository)main else null)
+        RovaiCanvasFolderRelation(paths.toList(),true,if(project==repository&&main!=null&&main!=repository)main else null,projectPath=project,worktrees=rows)
     }catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){RovaiCanvasFolderRelation(listOf(root),false,issue="工作树关系读取失败，已保留已知对话。")}}}}.awaitAll().toMap()
 }
 fun resolveCanvasRegion(node:JsonObject,rows:List<JsonObject>,catalogComplete:Boolean,groups:List<JsonObject>,folders:Map<String,RovaiCanvasFolderRelation>):RovaiCanvasRegionResolution{

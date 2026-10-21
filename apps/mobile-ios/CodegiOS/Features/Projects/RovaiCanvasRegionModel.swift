@@ -1,6 +1,6 @@
 import Foundation
 
-struct RovaiCanvasFolderRelation {let paths: [String];let complete: Bool;var parentPath: String? = nil;var issue: String? = nil}
+struct RovaiCanvasFolderRelation {let paths: [String];let complete: Bool;var parentPath: String? = nil;var issue: String? = nil;var projectPath: String? = nil;var worktrees: [JSONValue] = []}
 struct RovaiCanvasRegionMember: Identifiable {
     let reference: JSONValue
     let label: String
@@ -34,7 +34,7 @@ func canvasRegionRoots(_ node: JSONValue, groups: [JSONValue]) -> [String] {
             guard generation == model.connectionGeneration else {throw CancellationError()}
             var paths = [root, project]
             if project == repository, repository == main {paths += rows.filter {$0["bare"] == .bool(false)}.map {$0.text("projectPath")}}
-            result[root] = RovaiCanvasFolderRelation(paths: Array(Set(paths)), complete: true, parentPath: project == repository && main != nil && main != repository ? main : nil)
+            result[root] = RovaiCanvasFolderRelation(paths: Array(Set(paths)), complete: true, parentPath: project == repository && main != nil && main != repository ? main : nil,projectPath: project,worktrees: rows)
         } catch is CancellationError {throw CancellationError()} catch {result[root] = RovaiCanvasFolderRelation(paths: [root], complete: false, issue: "工作树关系读取失败，已保留已知对话。")}
     }
     return result

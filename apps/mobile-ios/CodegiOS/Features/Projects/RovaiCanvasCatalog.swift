@@ -39,7 +39,7 @@ struct RovaiCanvasCatalogSnapshot {
             roots.formUnion(rows.filter {summaryThreads.contains($0.text("threadId")) && $0.text("projectBindingKind") == "directory"}.map {$0.text("projectPath")})
             let read = try await readCanvasFolderRelations(model,roots: roots.sorted());try Task.checkCancellation();guard current() else {return}
             var folders = read
-            for (root,value) in read where !value.complete {if var previous = snapshot.folders[root] {previous = RovaiCanvasFolderRelation(paths: previous.paths,complete: false,parentPath: previous.parentPath,issue: value.issue);folders[root] = previous}}
+            for (root,value) in read where !value.complete {if var previous = snapshot.folders[root] {previous = RovaiCanvasFolderRelation(paths: previous.paths,complete: false,parentPath: previous.parentPath,issue: value.issue,projectPath: previous.projectPath,worktrees: previous.worktrees);folders[root] = previous}}
             snapshot = RovaiCanvasCatalogSnapshot(rows: rows,groups: groups,folders: folders,complete: true)
         } catch is CancellationError {} catch {if current() {snapshot.complete = false;snapshot.issue = error.localizedDescription}}
     }
