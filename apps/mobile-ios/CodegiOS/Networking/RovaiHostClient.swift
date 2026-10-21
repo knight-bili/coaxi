@@ -79,6 +79,25 @@ actor RovaiHostClient {
         if let error = envelope["error"], error != .null { throw RovaiHostFailure(code: error.prettyString) }
         return envelope["result"] ?? .null
     }
+    func files(_ action: String, request: JSONValue) async throws -> JSONValue {
+        guard ["open", "restore", "reopen", "readText", "readPage", "readHtml", "resolveLine", "reload", "release"].contains(action) else { throw RovaiHostFailure(code: "预览操作无效") }
+        let current = try await connect(); let lifetime = generation
+        let value = try await post("files", body: .object(["action": .string(action), "request": request]), bearer: current.token)
+        guard lifetime == generation else { throw CancellationError() }
+        guard value["ok"] == .bool(true) else { throw RovaiHostFailure(code: value["error"]?.text("message") ?? "预览失败") }
+        return value["value"] ?? .null
+    }
+    func fileBytes(_ action: String, request value: JSONValue) async throws -> RovaiFileBytes {
+        guard ["readBinary", "readChildImage", "download"].contains(action) else { throw RovaiHostFailure(code: "文件操作无效") }
+        let current = try await connect(); let lifetime = generation
+        var request = URLRequest(url: endpoint("files/bytes")); request.httpMethod = "POST"; request.setValue("application/json", forHTTPHeaderField: "Content-Type"); request.setValue("Bearer " + current.token, forHTTPHeaderField: "Authorization"); request.httpBody = try JSONEncoder().encode(JSONValue.object(["action": .string(action), "request": value]))
+        let (stream, reply) = try await session.bytes(for: request)
+        guard let reply = reply as? HTTPURLResponse, (200...299).contains(reply.statusCode) else { if (reply as? HTTPURLResponse)?.statusCode == 401 { denied = true; deadline = 0 }; throw RovaiHostFailure(code: "文件读取被拒绝") }
+        let mime = reply.mimeType ?? "application/octet-stream"
+        guard mime != "application/json", let contentGeneration = reply.value(forHTTPHeaderField: "x-rovai-content-generation"), contentGeneration == value.text("expectedGeneration") else { throw RovaiHostFailure(code: "文件已变化或来源失效，请重新打开") }
+        var data = Data(); for try await byte in stream { if data.count % 65536 == 0 { try Task.checkCancellation(); guard lifetime == generation else { throw CancellationError() } }; guard data.count < 20 * 1024 * 1024 else { throw RovaiHostFailure(code: "文件超过手机预览的20MB限制") }; data.append(byte) }
+        guard lifetime == generation else { throw CancellationError() }; return RovaiFileBytes(data: data, mime: mime, contentGeneration: contentGeneration)
+    }
     func upload(intent: JSONValue, data: Data) async throws -> JSONValue {
         guard data.count <= 20 * 1024 * 1024, intent["byteSize"]?.rvInt == data.count else { throw RovaiHostFailure(code: "文件超过20MB或大小已变化") }
         let digest = SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
@@ -129,3 +148,5 @@ actor RovaiHostClient {
 private final class RovaiNoRedirect: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
     func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) { completionHandler(nil) }
 }
+
+struct RovaiFileBytes: Sendable { let data: Data; let mime: String; let contentGeneration: String }

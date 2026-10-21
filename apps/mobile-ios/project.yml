@@ -74,6 +74,7 @@ targets:
           - CFBundleURLName: app.codeg.ios
             CFBundleURLSchemes:
               - codeg
+              - rovai
         UILaunchScreen: {}
         UIUserInterfaceStyleSupportsDark: true
         UIApplicationSceneManifest:

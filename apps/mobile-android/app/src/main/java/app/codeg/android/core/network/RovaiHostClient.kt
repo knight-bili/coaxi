@@ -71,6 +71,28 @@ class RovaiHostClient(rawBaseUrl:String,private val administratorToken:String,
         envelope["error"]?.takeIf{it !is JsonNull}?.let{throw RovaiHostFailure(it.toString())}
         return envelope["result"]?:JsonNull
     }
+    suspend fun files(action:String,request:JsonObject):JsonObject {
+        require(action in listOf("open","restore","reopen","readText","readPage","readHtml","resolveLine","reload","release")){"预览操作无效"}
+        val current=connect();val generation=lifetime.get();val value=post("files",buildJsonObject{put("action",action);put("request",request)},current.token).jsonObject
+        if(generation!=lifetime.get())throw CancellationException("Host lifetime changed")
+        if(value["ok"]!=JsonPrimitive(true))throw RovaiHostFailure(value["error"]?.toString()?:"预览失败")
+        return value["value"]?.jsonObject?:throw RovaiHostFailure("预览响应格式无效")
+    }
+    suspend fun fileBytes(action:String,request:JsonObject):RovaiFileBytes {
+        require(action in listOf("readBinary","readChildImage","download")){"文件操作无效"}
+        val current=connect();val generation=lifetime.get()
+        return http.preparePost("$baseUrl/api/v1/files/bytes"){header(HttpHeaders.Authorization,"Bearer ${current.token}");contentType(ContentType.Application.Json);setBody(buildJsonObject{put("action",action);put("request",request)}.toString())}.execute {response->
+            if(response.status.value !in 200..299){if(response.status.value==401){denied=true;deadline=0};throw RovaiHostFailure("文件读取被拒绝")}
+            val channel=response.bodyAsChannel();val output=java.io.ByteArrayOutputStream();val chunk=ByteArray(65536)
+            while(true){val count=channel.readAvailable(chunk,0,chunk.size);if(count<0)break;if(count==0)continue;require(output.size()+count<=20*1024*1024){"文件超过手机预览的20MB限制"};output.write(chunk,0,count)}
+            if(generation!=lifetime.get())throw CancellationException("Host lifetime changed")
+            val mime=response.headers[HttpHeaders.ContentType]?.substringBefore(';')?:"application/octet-stream"
+            if(mime=="application/json")throw RovaiHostFailure("文件已变化或来源失效，请重新打开")
+            val contentGeneration=response.headers["x-rovai-content-generation"]?:throw RovaiHostFailure("文件版本缺失")
+            require(request["expectedGeneration"]?.jsonPrimitive?.content==contentGeneration){"文件已变化，请重新打开"}
+            RovaiFileBytes(output.toByteArray(),mime,contentGeneration)
+        }
+    }
     suspend fun upload(intent:JsonObject,bytes:ByteArray):JsonObject {
         require(bytes.size<=20*1024*1024){"文件超过20MB"}
         val digest=java.security.MessageDigest.getInstance("SHA-256").digest(bytes).joinToString(""){"%02x".format(it)}
@@ -107,3 +129,5 @@ class RovaiHostClient(rawBaseUrl:String,private val administratorToken:String,
     suspend fun logout(){lifetime.incrementAndGet();val current=session;session=null;denied=true;deadline=0;saveSession(null);if(current!=null)post("logout",buildJsonObject{},current.token)}
     fun close(){lifetime.incrementAndGet();session=null;http.close()}
 }
+
+data class RovaiFileBytes(val bytes:ByteArray,val mime:String,val contentGeneration:String)
