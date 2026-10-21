@@ -44,6 +44,7 @@ private fun JsonObject.forgeBody()=coreText("body").ifEmpty{coreText("descriptio
         Text(repository?.coreText("ownerRepo")?.ifEmpty{"仓库面板"}?:"仓库面板",Modifier.padding(12.dp),style=MaterialTheme.typography.titleMedium)
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal=12.dp)){FilterChip(selected=account.isEmpty(),enabled=!busy,onClick={account=""},label={Text("按远程仓库匹配")});accounts.forEach{row->FilterChip(selected=account==row.coreText("id"),enabled=!busy,onClick={account=row.coreText("id")},label={Text(row.coreText("provider")+" · "+row.coreText("baseUrl"))})}}
         issue?.let{Text(it,Modifier.padding(12.dp),color=CodegTheme.colors.danger)}
+        RovaiForgeAccounts(model){refreshRevision++}
         RovaiForgeWriteActions(model,threadId,account,kind,repository,selected){refreshRevision++}
         val selectedRow=selected
         if(selectedRow==null){

@@ -21,6 +21,7 @@ struct RovaiForgeWorkspace: View {
         List {
             if let issue {Text(issue).font(.caption).foregroundStyle(Theme.warning)}
             Section {Picker("仓库账号", selection: $account) {Text("按远程仓库匹配").tag("");ForEach(accounts.map {RovaiRow(value: $0)}) {row in Text("\(row.value.text("provider")) · \(row.value.text("baseUrl"))").tag(row.id)}}.disabled(busy)} header: {Text(repository?.text("ownerRepo") ?? "仓库面板")}
+            Section {RovaiForgeAccounts(model: model) {refreshRevision += 1}}
             Section {RovaiForgeWriteActions(model: model, threadId: threadId, accountId: account, kind: kind, repository: repository, selected: selected) {refreshRevision += 1}}
             if let selected {
                 Section {Button("返回列表") {self.selected = nil;detail = nil;files = [];fileNext = 1}.disabled(busy);Text("#\(selected.forgeNumber) \(selected.text("title"))").font(.headline);MarkdownContent(raw: selected.forgeBody)}
