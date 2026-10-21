@@ -8,7 +8,7 @@ import {useThreadClient} from './camp-client'
 import {useUiText} from './interface-language'
 
 const labels:Record<string,string>={appearance:'外观',general:'界面偏好',windowClose:'关闭窗口',messageLibrary:'全局消息库',preference:'主题',chatFontSize:'对话字号',documentFontSize:'文档字号',codeFontSize:'代码字号',readingDensity:'阅读密度',motionPreference:'动态效果',zoomPercentage:'页面缩放',interfaceLanguage:'界面语言',startupLocationMode:'启动位置',lastSettingsSection:'设置页位置',executionConsolePlacement:'执行过程位置',worldMapEnabled:'会话地图',behavior:'关闭方式'}
-function SnapshotValues({domain,value}:{domain:string;value:Record<string,unknown>|null}):React.JSX.Element{
+export function SnapshotValues({domain,value}:{domain:string;value:Record<string,unknown>|null}):React.JSX.Element{
   const t=useUiText();if(!value)return <span>{t('未配置')}</span>
   if(domain==='messageLibrary'){const tags=Array.isArray(value.tags)?value.tags as string[]:[],messages=Array.isArray(value.quickMessages)?value.quickMessages as Array<{id:string;title:string;textBytes?:number}>:[];return <div><p>{t('标签')}：{tags.join('、')||t('无')}</p><p>{t('快捷消息')}：{messages.length}</p>{messages.map(message=><p key={message.id}>{message.title} · {message.textBytes??0} B</p>)}</div>}
   const names:Record<string,string>={system:'跟随系统',light:'浅色',dark:'深色',standard:'标准',relaxed:'宽松',reduce:'减少动态效果','zh-CN':'简体中文',en:'English',last_location:'上次位置',quick_chat:'快速对话',right:'右侧',inspector:'详情栏',bottom:'底部',ask:'每次询问',tray:'保留在托盘',exit:'退出应用'}

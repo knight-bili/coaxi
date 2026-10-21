@@ -47,6 +47,26 @@ export class BackupWorkspace{
       const result=await this.execute<{applied:boolean;restartRequired:boolean}>('apply',root,selection.path,passphrase,event,'config-snapshot',[...extra,'--expected-local-digest',selection.localDigest]);restarting=true;setImmediate(this.restartApp);return result
     }finally{this.busy=false;if(offline&&!restarting)this.core.start()}
   }
+  /** Main-only handoff from an immutable, completed WebDAV pull receipt. */
+  async inspectDownloaded(event:IpcMainInvokeEvent,path:string,passphrase:string,kind:'backup'|'configuration',expectedDigest:string):Promise<unknown>{
+    const owner=this.owner(),root=this.dataRoot(),preferences=this.preferencesRoot()
+    if(!owner||owner.isDestroyed()||event.sender!==owner.webContents||event.senderFrame!==owner.webContents.mainFrame||!root||!preferences)throw new Error('backup.local_owner_required')
+    if(this.busy)throw new Error('backup.operation_in_progress')
+    if(typeof passphrase!=='string'||passphrase.length>16000||await backupFileDigest(path)!==expectedDigest)throw new Error('backup.archive_changed')
+    this.busy=true
+    try{
+      if(kind==='configuration'){
+        const preview=await this.execute<ConfigurationSnapshotPreview>('inspect',root,path,passphrase,event,'config-snapshot',['--preferences-root',preferences,'--summary-only'])
+        if(await backupFileDigest(path)!==expectedDigest)throw new Error('config_sync.archive_changed')
+        const id=randomUUID();this.configSelections.set(id,{path,digest:expectedDigest,localDigest:preview.localDigest,preferencesRoot:preferences,expires:Date.now()+15*60000})
+        return {kind,selectionId:id,...preview}
+      }
+      const result=await this.execute('inspect',root,path,passphrase,event)
+      if(await backupFileDigest(path)!==expectedDigest)throw new Error('backup.archive_changed')
+      const id=randomUUID();this.selections.set(id,{path,digest:expectedDigest,expires:Date.now()+15*60000})
+      return {kind,archiveId:id,...summary(result.manifest)}
+    }finally{this.busy=false}
+  }
   async invoke(event:IpcMainInvokeEvent,operation:unknown,input:unknown):Promise<unknown>{
     const owner=this.owner(),root=this.dataRoot()
     if(!owner||owner.isDestroyed()||event.sender!==owner.webContents||event.senderFrame!==owner.webContents.mainFrame||!root)throw new Error('backup.local_owner_required')
