@@ -6,6 +6,8 @@ struct RovaiQuoteSelector: View {
     let threadId: String
     let messageId: String
     let onChosen: (JSONValue) -> Bool
+    var conversationId: String? = nil
+    var onSelection: ((JSONValue) -> Bool)? = nil
     @Environment(\.dismiss) private var dismiss
     @State private var projection: JSONValue?
     @State private var selection = NSRange(location: 0, length: 0)
@@ -23,7 +25,9 @@ struct RovaiQuoteSelector: View {
             HStack {Text("已选 \(chosen.unicodeScalars.count) / \(limit) 字符").font(.caption).foregroundStyle(Theme.textSecondary);Spacer();Button("加入引用") {Task {await capture()}}.buttonStyle(.borderedProminent).disabled(busy || projection == nil || chosen.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || chosen.unicodeScalars.count > limit)}
         }.padding(16).navigationTitle("选择引用内容").navigationBarTitleDisplayMode(.inline).toolbar {ToolbarItem(placement: .cancellationAction) {Button("关闭") {dismiss()}}}}
         .task(id: messageId) {let generation = model.connectionGeneration;busy = true;defer {busy = false};do {
-            let value = try await model.query(.messageQuotesProjection, params: .object(["threadId": .string(threadId), "messageId": .string(messageId)]))
+            var params: [String: JSONValue] = ["threadId": .string(threadId), "messageId": .string(messageId)]
+            if let conversationId {params["conversationId"] = .string(conversationId)}
+            let value = try await model.query(conversationId == nil ? .messageQuotesProjection : .messageQuotesPrivateProjection, params: .object(params))
             guard generation == model.connectionGeneration, !Task.isCancelled else {return}
             projection = value
             if value.text("text").unicodeScalars.count <= (value["maxScalars"]?.rvInt ?? 12000) {selection = NSRange(location: 0, length: (value.text("text") as NSString).length)}
@@ -35,9 +39,16 @@ struct RovaiQuoteSelector: View {
         let prefix = (text as NSString).substring(to: range.location)
         let selected = chosen
         do {
-            let quote = try await model.query(.messageQuotesCapture, params: .object(["threadId": .string(threadId), "selection": .object(["messageId": .string(messageId), "bodyAtSelection": projection["bodyAtSelection"] ?? .null, "startScalar": .number(Double(prefix.unicodeScalars.count)), "endScalar": .number(Double(prefix.unicodeScalars.count + selected.unicodeScalars.count)), "text": .string(selected)])]))
-            guard generation == model.connectionGeneration, !Task.isCancelled else {return}
-            guard onChosen(quote) else {issue = "输入框当前无法接收引用，请稍后重试。";return};dismiss()
+            let input = JSONValue.object(["messageId": .string(messageId), "bodyAtSelection": projection["bodyAtSelection"] ?? .null, "startScalar": .number(Double(prefix.unicodeScalars.count)), "endScalar": .number(Double(prefix.unicodeScalars.count + selected.unicodeScalars.count)), "text": .string(selected)])
+            if conversationId != nil {
+                guard generation == model.connectionGeneration, !Task.isCancelled else {return}
+                guard onSelection?(input) == true else {issue = "输入框当前无法接收引用，请稍后重试。";return}
+            } else {
+                let quote = try await model.query(.messageQuotesCapture, params: .object(["threadId": .string(threadId), "selection": input]))
+                guard generation == model.connectionGeneration, !Task.isCancelled else {return}
+                guard onChosen(quote) else {issue = "输入框当前无法接收引用，请稍后重试。";return}
+            }
+            dismiss()
         } catch is CancellationError {} catch {issue = error.localizedDescription}
     }
 }

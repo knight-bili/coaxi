@@ -17,6 +17,9 @@ struct RovaiPrivateConversationView: View {
     @State private var busy = false
     @State private var ending = false
     @State private var openingCommand: String?
+    @State private var quoteSelection: QuoteSource?
+    @State private var removedQuoteId: String?
+    private struct QuoteSource: Identifiable {let id: String;let conversationId: String;let revision: Int}
     private var child: Bool { childId != nil }
     private var owner: String { "private:\(threadId):\(selected ?? ""):\(child ? "delegation_child" : "single_chat")" }
     private var disabled: Bool { busy || model.busy || model.pending != nil || !bodyReady }
@@ -34,7 +37,7 @@ struct RovaiPrivateConversationView: View {
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("关闭") { close() } }; ToolbarItem(placement: .topBarTrailing) { Button("刷新") { Task { await load(); await readRetained() } }.disabled(busy) } }
         }.interactiveDismissDisabled(true)
         .task { if let childId { selected = childId } else if let initialConversationId { selected = initialConversationId } else { await load() } }
-        .task(id: selected) { bodyReady = false; snapshot = .object([:]); retained = []; if selected != nil { do { text = try model.readBody(owner); bodyReady = true; await load(); await readRetained() } catch { issue = error.localizedDescription } } }
+        .task(id: selected) { bodyReady = false; snapshot = .object([:]); retained = []; removedQuoteId = nil; quoteSelection = nil; if selected != nil { do { text = try model.readBody(owner); bodyReady = true; await load(); await readRetained() } catch { issue = error.localizedDescription } } }
         .onChange(of: text) { _, value in guard bodyReady else { return }; do { try model.saveBody(owner, body: value) } catch { issue = error.localizedDescription } }
         .onChange(of: model.thread) { _, _ in Task { await load() } }
         .onChange(of: model.lastUploadResult) { _, _ in Task { await load(); await readRetained() } }
@@ -43,6 +46,12 @@ struct RovaiPrivateConversationView: View {
             if !child, model.lastOperation == .singleChatOpen, receipt?.text("commandId") == openingCommand, receipt?.text("status") == "applied", let id = receipt?["payload"]?["conversationId"]?.stringValue { selected = id }
             else { Task { await load(); await readRetained(); if let operation = model.lastOperation, [send, edit, mutate].contains(operation), model.pending == nil, selected != nil { do { text = try model.readBody(owner) } catch { issue = error.localizedDescription } } } }
         }
+        .sheet(item: $quoteSelection) {source in RovaiQuoteSelector(model: model, threadId: threadId, messageId: source.id, onChosen: {_ in false}, conversationId: source.conversationId, onSelection: {selection in
+            guard !disabled, selected == source.conversationId, snapshot["conversation"]?.text("status") == "active" else {return false}
+            do {try model.saveBody(owner, body: text)} catch {issue = error.localizedDescription;return false}
+            let value = JSONValue.object(["threadId": .string(threadId), "conversationId": .string(source.conversationId), "composerScope": .null, "expectedDraftRevision": .number(Double(source.revision)), "action": .object(["type": .string("quote"), "action": .object(["type": .string("add"), "selection": selection])])])
+            Task {await model.command(mutate, value: value)};return true
+        })}
         .confirmationDialog("结束当前私聊？", isPresented: $ending, titleVisibility: .visible) { Button("结束会话", role: .destructive) { Task { var value: [String: JSONValue] = ["conversationId": .string(selected ?? "")]; if !child { value["threadId"] = .string(threadId) }; await model.command(child ? .delegationsConversationEnd : .singleChatEnd, value: .object(value)) } } } message: { Text("保留消息和历史记录；正在执行的工作由Core处理结束。") }
     }
     private var chooser: some View {
@@ -57,12 +66,14 @@ struct RovaiPrivateConversationView: View {
                 HStack { if !child { Button("其他私聊") { do { try model.saveBody(owner, body: text); selected = nil } catch { issue = error.localizedDescription } } }; RovaiAttachmentPicker(model: model, threadId: threadId, target: .object(["kind": .string(child ? "delegation_child" : "single_chat"), "conversationId": .string(selected ?? ""), "composerScope": .null]), revision: snapshot["draft"]?["revision"]?.rvInt ?? 0, disabled: disabled || snapshot["conversation"]?.text("status") != "active"); Spacer(); Button("结束会话", role: .destructive) { ending = true }.disabled(disabled) }
                 if let selected { RovaiInteractionCards(model: model, conversationId: selected); RovaiDelegationList(model: model, threadId: threadId, parentConversationId: selected) }
                 ForEach((snapshot["messages"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in
-                    GlassRow(isSelected: row.value.text("authorType") == "user") { VStack(alignment: .leading, spacing: 8) { Text(row.value.text("authorType") == "user" ? "你" : row.value.text("authorType")).font(.caption).foregroundStyle(Theme.textSecondary); RovaiMessageBody(model: model, threadId: threadId, message: row.value, conversationId: selected, child: child) } }
+                    GlassRow(isSelected: row.value.text("authorType") == "user") { VStack(alignment: .leading, spacing: 8) { Text(row.value.text("authorType") == "user" ? "你" : row.value.text("authorType")).font(.caption).foregroundStyle(Theme.textSecondary); RovaiMessageBody(model: model, threadId: threadId, message: row.value, conversationId: selected, child: child); Button("引用一段") {if let selected {quoteSelection = QuoteSource(id: row.id, conversationId: selected, revision: snapshot["draft"]?["revision"]?.rvInt ?? 0)}}.font(.caption).disabled(disabled || snapshot["conversation"]?.text("status") != "active") } }
                 }
                 ForEach((snapshot["agentRuns"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in run(row.value) }
                 ForEach((snapshot["pendingInputs"]?["items"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in pending(row.value) }
                 ForEach(retained.map { RovaiRow(value: $0) }) { row in retainedInput(row.value) }
                 if let cursor { Button("更多保留输入") { Task { await readRetained(after: cursor) } } }
+                RovaiComposerQuotes(quotes: snapshot["draft"]?["quotes"]?.rvArray ?? [], enabled: !disabled && snapshot["conversation"]?.text("status") == "active") {id in removedQuoteId = id;Task {await model.command(mutate, value: mutation(.object(["type": .string("quote"), "action": .object(["type": .string("remove"), "quoteId": .string(id)])])))}}
+                if let removedQuoteId {Button("撤销移除引用") {Task {await model.command(mutate, value: mutation(.object(["type": .string("quote"), "action": .object(["type": .string("restore"), "quoteId": .string(removedQuoteId)])])))};self.removedQuoteId = nil}.font(.caption).disabled(disabled || snapshot["conversation"]?.text("status") != "active")}
                 ForEach(snapshot["draft"]?["attachments"]?.rvArray ?? [], id: \.self) { attachment in HStack { Text("附件 · \(attachment.text("displayName"))").font(.caption); Spacer(); Button("移除") { Task { await model.command(mutate, value: mutation(.object(["type": .string("remove_attachment"), "attachmentRefId": attachment["id"] ?? .null]))) } }.disabled(disabled) }
             }.padding(16)
         }
