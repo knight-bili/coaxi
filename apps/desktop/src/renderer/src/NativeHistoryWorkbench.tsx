@@ -5,9 +5,9 @@ import { NativeTranscriptBody } from './NativeSessionViewer'
 import { nativeTranscript, type NativeTranscript } from './native-child-reader'
 import { useThreadClient } from './camp-client'
 import { useUiText } from './interface-language'
-type Provider='codex'|'claude'|'qoder'|'grok'
+type Provider='codex'|'claude'|'qoder'|'grok'|'opencode'|'gemini'|'openclaw'|'cline'|'hermes'|'codebuddy'|'kimi_code'|'pi'|'cursor'|'deepseek'|'antigravity'
 type Preview={digest:string;turnCount:number;summary:{title:string|null};notes:{malformed_records:number;incomplete_tail:boolean}}
-type Candidate={id:string;name:string;bytes:number;modified:number;preview?:Preview;selected?:boolean;imported?:boolean}
+type Candidate={id:string;name:string;bytes:number;modified:number;snapshot?:boolean;preview?:Preview;selected?:boolean;imported?:boolean}
 type Plan={planId:string;provider:Provider;entries:Candidate[]}
 type Imported={id:string;provider:Provider;sourceName:string;summary:{title:string|null};importedAt:string;tags:string[]}
 // Source import selection + source-native transcript body, without granting
@@ -52,7 +52,7 @@ export function NativeHistoryWorkbench({threadId}:{threadId:string}):React.JSX.E
   }
   const choices=plan?.entries.filter(entry=>entry.selected&&!entry.imported)??[]
   return <div className="workbench-history">
-    <div className="workbench-toolbar"><select value={provider} disabled={busy} aria-label={t('原生会话来源')} onChange={event=>setProvider(event.target.value as Provider)}>{(['codex','claude','qoder','grok'] as const).map(value=><option key={value} value={value}>{value}</option>)}</select>
+    <div className="workbench-toolbar"><select value={provider} disabled={busy} aria-label={t('原生会话来源')} onChange={event=>setProvider(event.target.value as Provider)}>{(['codex','claude','qoder','grok','opencode','gemini','openclaw','cline','hermes','codebuddy','kimi_code','pi','cursor','deepseek','antigravity'] as const).map(value=><option key={value} value={value}>{value}</option>)}</select>
       {client.nativeHistory&&<button disabled={busy} onClick={()=>void run(async()=>{const result=await client.nativeHistory!.scan<Plan>(threadId,provider);if(result)setPlan(result)})}><FolderOpen size={14}/>{t('选择记录文件夹')}</button>}
       <Search size={14}/><input value={filter} onChange={event=>setFilter(event.target.value)} placeholder={t('搜索已导入会话或标签')}/>{progress&&<span role="status">{progress}</span>}
     </div>
