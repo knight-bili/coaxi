@@ -22,6 +22,7 @@ fun rovaiOfficeFile(path:String)=path.substringAfterLast('.').lowercase() in lis
 /** Codeg OfficePreview lifecycle with the shared Host's opaque sandbox proxy. */
 @Composable
 fun RovaiOfficePreview(model:RovaiWorkspaceViewModel,threadId:String,path:String,onClose:()->Unit,attachmentLocator:JsonObject?=null){
+    var showInstaller by remember{mutableStateOf(false)}
     var editable by remember{mutableStateOf(false)};var retry by remember{mutableIntStateOf(0)};var url by remember{mutableStateOf<String?>(null)};var issue by remember{mutableStateOf<String?>(null)}
     val owner=LocalLifecycleOwner.current;var active by remember{mutableStateOf(owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED))}
     DisposableEffect(owner){val listener=LifecycleEventObserver{_,event->if(event==Lifecycle.Event.ON_STOP)active=false else if(event==Lifecycle.Event.ON_START)active=true};owner.lifecycle.addObserver(listener);onDispose{owner.lifecycle.removeObserver(listener)}}
@@ -33,6 +34,8 @@ fun RovaiOfficePreview(model:RovaiWorkspaceViewModel,threadId:String,path:String
         Row{Text(path.substringAfterLast('/'),Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(onClick=onClose){Text("关闭")}}
         Row{if(attachmentLocator==null){Checkbox(checked=editable,onCheckedChange={editable=it});Text("允许编辑此文件")}else Text("消息附件只读预览");Spacer(Modifier.weight(1f));TextButton(onClick={retry++}){Text("重新连接")}}
         issue?.let{Text(it,color=CodegTheme.colors.danger)}
+        TextButton(onClick={showInstaller=!showInstaller}){Text(if(showInstaller)"收起Office程序管理" else "Office程序管理")}
+        if(showInstaller)RovaiOfficeCliSettings(model)
         val preview=url
         if(preview==null&&issue==null&&active)LinearProgressIndicator(Modifier.fillMaxWidth())
         if(preview!=null)key(preview){AndroidView(Modifier.fillMaxSize(),factory={context->WebView(context).apply{settings.javaScriptEnabled=true;settings.allowFileAccess=false;settings.allowContentAccess=false;settings.domStorageEnabled=false;settings.setSupportMultipleWindows(false);settings.mixedContentMode=WebSettings.MIXED_CONTENT_NEVER_ALLOW;CookieManager.getInstance().setAcceptThirdPartyCookies(this,false)

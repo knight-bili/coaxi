@@ -9,6 +9,7 @@ struct RovaiOfficePreview: View {
     var attachmentLocator: JSONValue? = nil
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
+    @State private var showInstaller = false
     @State private var editable = false
     @State private var retry = 0
     @State private var url: URL?
@@ -20,6 +21,7 @@ struct RovaiOfficePreview: View {
             VStack(spacing: 12) {
                 HStack { if attachmentLocator == nil {Toggle("允许编辑此文件", isOn: $editable)} else {Text("消息附件只读预览")}; Button("重新连接") { retry += 1 } }.padding(.horizontal, 16)
                 if let issue { Text(issue).font(.caption).foregroundStyle(Theme.warning).padding(.horizontal, 16) }
+                DisclosureGroup("Office程序管理", isExpanded: $showInstaller) {RovaiOfficeCliSettings(model: model)}.padding(.horizontal, 16)
                 if let url { RovaiOfficeWebView(url: url, issue: $issue).id(url).frame(maxWidth: .infinity, maxHeight: .infinity) }
                 else if issue == nil && scenePhase == .active { ProgressView("正在准备文档预览…").frame(maxWidth: .infinity, maxHeight: .infinity) }
             }.navigationTitle((path as NSString).lastPathComponent).navigationBarTitleDisplayMode(.inline)
