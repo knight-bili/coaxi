@@ -1,3 +1,4 @@
+import { OfficeCliSettings } from './OfficeCliSettings'
 import { CustomSkillEditor } from './CustomSkillEditor'
 import { OfficeSkillPanel } from './OfficeSkillPanel'
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
@@ -96,6 +97,7 @@ export function SkillPackSettings({ agents = [] }: { agents?: AgentProfile[] } =
   const removeEntry = catalog?.entries.find(entry => entry.id === removeId)
   return <div className="rebuilt-skills-page">
     <div className="rebuilt-runtime-bar"><label htmlFor={`${id}-family`}><UiText zh="技能包类型" /></label><select id={`${id}-family`} value={family} disabled={!!busy} onChange={event => { setFamily(event.target.value as typeof family); setDetailVisible(false) }}><option value="all">{uiAttribute('全部')}</option>{families.map(([key, label]) => <option key={key} value={key}>{uiAttribute(label)}</option>)}</select><button type="button" className="rebuilt-skill-action" disabled={loading || !!busy} onClick={() => { setError(null); void load().catch(() => {}) }}><UiText zh="刷新" /></button></div>
+    {(family==='office'||selected?.family==='office')&&<OfficeCliSettings/>}
     <CustomSkillEditor selected={selected} onSaved={load} disabled={!!busy||loading}/>
     <p className="skill-pack-stage-note"><UiText zh="选择哪些队员可以使用。新任务准备时确定技能版本，旧任务保留原内容。" /></p>
     {error && !removeId && <div className="rebuilt-skills-error" role="alert">{error}<button type="button" disabled={loading || !!busy} onClick={() => { setError(null); void load().catch(() => {}) }}><UiText zh="重试" /></button></div>}
