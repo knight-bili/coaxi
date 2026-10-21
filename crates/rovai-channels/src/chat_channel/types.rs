@@ -51,6 +51,8 @@ pub enum ChannelConnectionStatus {
 pub struct SentMessageId(pub String);
 
 pub struct IncomingCommand {
+    /// Host acknowledges only after the raw event is durably stored.
+    pub durable: Option<tokio::sync::oneshot::Sender<()>>,
     pub channel_id: i32,
     pub sender_id: String,
     pub command_text: String,

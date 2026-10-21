@@ -257,11 +257,12 @@ pub struct WeixinBackend {
     pending_messages: Arc<Mutex<Vec<String>>>,
     /// Stable X-WECHAT-UIN value for this backend instance.
     wechat_uin: String,
+    allowed_senders: Arc<std::collections::HashSet<String>>,
 }
 
 impl WeixinBackend {
     pub fn new(channel_id: i32, bot_token: String, base_url: String) -> Self {
-        let uin_raw = rand::thread_rng().gen::<u32>().to_string();
+        let uin_raw = rand::thread_rng().r#gen::<u32>().to_string();
         let wechat_uin = B64.encode(uin_raw.as_bytes());
 
         Self {
@@ -279,8 +280,11 @@ impl WeixinBackend {
             reply_context: Arc::new(Mutex::new(None)),
             pending_messages: Arc::new(Mutex::new(Vec::new())),
             wechat_uin,
+            allowed_senders: Arc::new(Default::default()),
         }
     }
+
+    pub fn with_allowed_senders(mut self, values: Vec<String>) -> Self { self.allowed_senders=Arc::new(values.into_iter().collect()); self }
 
     fn build_headers(bot_token: &str, wechat_uin: &str) -> HeaderMap {
         let mut headers = HeaderMap::new();
@@ -473,7 +477,6 @@ impl ChatChannelBackend for WeixinBackend {
             .map_err(|e| ChatChannelError::ConnectionFailed(e.to_string()))?;
 
         tracing::info!("[Weixin] verify response status={status_code}");
-        tracing::debug!("[Weixin] verify response body={resp_text}");
 
         let verify_result: serde_json::Value = serde_json::from_str(&resp_text)
             .map_err(|e| ChatChannelError::ConnectionFailed(format!("JSON parse failed: {e}")))?;
@@ -532,6 +535,7 @@ impl ChatChannelBackend for WeixinBackend {
         let status = self.status.clone();
         let reply_context = self.reply_context.clone();
         let pending_messages = self.pending_messages.clone();
+        let allowed_senders = self.allowed_senders.clone();
 
         tokio::spawn(async move {
             let mut cursor = initial_cursor;
@@ -638,6 +642,7 @@ impl ChatChannelBackend for WeixinBackend {
                                         .get("from_user_id")
                                         .and_then(|v| v.as_str())
                                         .unwrap_or_default();
+                                    if !allowed_senders.contains(from_user_id) { continue; }
                                     let context_token = msg
                                         .get("context_token")
                                         .and_then(|v| v.as_str())
@@ -695,9 +700,10 @@ impl ChatChannelBackend for WeixinBackend {
                                         }
                                     }
 
-                                    tracing::debug!("[Weixin] dispatching: {text}");
+                                    let (durable_tx, durable_rx) = tokio::sync::oneshot::channel();
                                     let send_result = command_tx
                                         .send(IncomingCommand {
+                                            durable: Some(durable_tx),
                                             channel_id,
                                             sender_id: from_user_id.to_string(),
                                             command_text: text.to_string(),
@@ -706,6 +712,7 @@ impl ChatChannelBackend for WeixinBackend {
                                             metadata: msg.clone(),
                                         })
                                         .await;
+                                    if send_result.is_ok() && durable_rx.await.is_err() { return; }
                                     if let Err(e) = send_result {
                                         tracing::error!("[Weixin] command_tx.send failed: {e}");
                                     }
@@ -779,7 +786,6 @@ impl ChatChannelBackend for WeixinBackend {
             .map_err(|e| ChatChannelError::ConnectionFailed(e.to_string()))?;
 
         tracing::info!("[Weixin] test_connection: status={status_code}");
-        tracing::debug!("[Weixin] test_connection body={resp_text}");
 
         let resp_json: serde_json::Value = serde_json::from_str(&resp_text)
             .map_err(|e| ChatChannelError::ConnectionFailed(format!("Not valid JSON: {e}")))?;

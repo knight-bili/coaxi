@@ -324,7 +324,6 @@ impl ChatChannelBackend for TelegramBackend {
                                                 &bot_username,
                                                 topic_mode,
                                             ) {
-                                                tracing::debug!("[Telegram] skipped group msg without @bot: {text}");
                                                 continue;
                                             }
 
@@ -341,9 +340,10 @@ impl ChatChannelBackend for TelegramBackend {
                                                 topic_mode,
                                                 message,
                                             );
-                                            tracing::debug!("[Telegram] dispatching: {clean_text}");
-                                            let send_result = command_tx
+                                            let (durable_tx, durable_rx) = tokio::sync::oneshot::channel();
+                                    let send_result = command_tx
                                                 .send(IncomingCommand {
+                                            durable: Some(durable_tx),
                                                     channel_id,
                                                     sender_id,
                                                     command_text: clean_text,
@@ -352,7 +352,8 @@ impl ChatChannelBackend for TelegramBackend {
                                                     metadata: update.clone(),
                                                 })
                                                 .await;
-                                            if let Err(e) = send_result {
+                                            if send_result.is_ok() && durable_rx.await.is_err() { return; }
+                                    if let Err(e) = send_result {
                                                 tracing::error!(
                                                     "[Telegram] command_tx.send failed: {e}"
                                                 );
@@ -402,9 +403,10 @@ impl ChatChannelBackend for TelegramBackend {
                                             topic_mode,
                                             message,
                                         );
-                                        tracing::debug!("[Telegram] dispatching callback: {data}");
-                                        let send_result = command_tx
+                                        let (durable_tx, durable_rx) = tokio::sync::oneshot::channel();
+                                    let send_result = command_tx
                                             .send(IncomingCommand {
+                                            durable: Some(durable_tx),
                                                 channel_id,
                                                 sender_id,
                                                 command_text: data.to_string(),
@@ -413,7 +415,8 @@ impl ChatChannelBackend for TelegramBackend {
                                                 metadata: update.clone(),
                                             })
                                             .await;
-                                        if let Err(e) = send_result {
+                                        if send_result.is_ok() && durable_rx.await.is_err() { return; }
+                                    if let Err(e) = send_result {
                                             tracing::error!(
                                                 "[Telegram] command_tx.send failed: {e}"
                                             );
