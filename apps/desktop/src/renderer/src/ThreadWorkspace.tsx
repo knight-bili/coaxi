@@ -1647,7 +1647,9 @@ export function ThreadWorkspace(props: Parameters<typeof ThreadWorkspaceContent>
     busy={props.busy} onResolveApproval={props.onResolveApproval} onNotify={props.onNotify}>
     <ThreadWorkspaceContent {...props} onThreadLeaveGuardChange={bindWorkspaceGuard}
       onBindWorkbenchQuickMessage={bindWorkbenchQuickMessage}
-      workbenchEntry={<WorkspaceWorkbench threadId={props.snapshot.thread.id} bindLeaveGuard={bindWorkbenchGuard} onQuickMessage={insertWorkbenchQuickMessage} />} />
+      workbenchEntry={<WorkspaceWorkbench threadId={props.snapshot.thread.id} projectPath={props.snapshot.thread.projectPath??''}
+        members={props.snapshot.members.map(member=>({id:member.agentId,name:props.agents.find(agent=>agent.agentId===member.agentId)?.displayName??member.agentId}))}
+        bindLeaveGuard={bindWorkbenchGuard} onQuickMessage={insertWorkbenchQuickMessage} />} />
   </DelegationViewerHost>
 }
 

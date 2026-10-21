@@ -500,7 +500,7 @@ impl Operation {
         match self {
             Self::AppInfo => json!({"name":value["name"],"version":value["version"]}),
             Self::ForgeAccountsGet | Self::ForgeAccountsSet => select_fields(&value, &["accounts"]),
-            Self::ForgeOperation => select_fields(&value, &["provider", "webUrl", "ownerRepo", "repository", "success", "status", "data", "missionDraft", "nextPage"]),
+            Self::ForgeOperation => select_fields(&value, &["provider", "webUrl", "ownerRepo", "repositoryKey", "repository", "success", "status", "data", "missionDraft", "nextPage"]),
             Self::WorkbenchOrganizerGet | Self::WorkbenchOrganizerSet => select_fields(&value, &["value", "digest"]),
             Self::WorkbenchFilesList => select_fields(&value, &["entries", "next"]),
             Self::WorkbenchFilesRead => select_fields(&value, &["path", "text", "digest"]),

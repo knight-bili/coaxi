@@ -4,6 +4,7 @@ use super::*;
 use super::workbench::{Scope, MUTATIONS};
 use anyhow::ensure;
 use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use std::{fs, time::Duration};
 #[path="forge_envelope.rs"]
 mod envelope;
@@ -31,6 +32,7 @@ struct ForgeRequest {
     #[serde(default)] draft:bool,
     #[serde(default)] command_id:Option<String>,
     #[serde(default)] confirmed:bool,
+    #[serde(default)] expected_repository_key:Option<String>,
 }
 fn origin()->String{"origin".into()}
 fn first_page()->u32{1}
@@ -41,7 +43,8 @@ fn public_accounts(accounts:&[Account])->Value {
 
 struct Repository { provider:String, web_base:String, api_base:String, owner_repo:String, token:String }
 impl Repository {
-    fn metadata(&self)->Value{json!({"provider":self.provider,"webUrl":format!("{}/{}",self.web_base,self.owner_repo),"ownerRepo":self.owner_repo})}
+    fn key(&self)->String{format!("{:x}",Sha256::digest(format!("{}\0{}\0{}",self.provider,self.web_base,self.owner_repo).as_bytes()))}
+    fn metadata(&self)->Value{json!({"provider":self.provider,"webUrl":format!("{}/{}",self.web_base,self.owner_repo),"ownerRepo":self.owner_repo,"repositoryKey":self.key()})}
     fn endpoint(&self, collection:&str, number:Option<u64>, comments:bool)->Result<reqwest::Url>{
         let mut url=reqwest::Url::parse(&self.api_base)?;
         {let mut parts=url.path_segments_mut().map_err(|_|anyhow::anyhow!("forge.invalid_api_base"))?;parts.pop_if_empty();
@@ -142,6 +145,7 @@ impl Core {
         let mut identity=String::new();
         if write{
             ensure!(request.confirmed&&!repository.token.is_empty(),"forge.confirmation_and_account_required");
+            ensure!(request.expected_repository_key.as_deref()==Some(repository.key().as_str()),"forge.repository_changed_refresh");
             let id=request.command_id.as_deref().context("forge.command_id_required")?;uuid::Uuid::parse_str(id)?;
             identity=crate::command::canonical_json_digest(&json!({"repository":repository.metadata(),"request":value}))?;
             let directory=self.data_dir.join("forge-operations");crate::platform::private_storage::prepare_private_directory(&directory)?;
