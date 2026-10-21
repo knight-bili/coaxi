@@ -29,7 +29,7 @@ struct RovaiCanvasView: View {
                 Canvas { context, size in let step = 32 * min(max(zoom * magnification, 0.1), 2); for x in stride(from: CGFloat(0), through: size.width, by: step) { for y in stride(from: CGFloat(0), through: size.height, by: step) { context.fill(Path(ellipseIn: CGRect(x: x, y: y, width: 1.3, height: 1.3)), with: .color(Theme.textTertiary.opacity(0.3))) } } }
                     .contentShape(Rectangle()).gesture(DragGesture().updating($pan) { value, state, _ in if viewReady {state = value.translation} }.onEnded { value in if viewReady {offset.width += value.translation.width; offset.height += value.translation.height} })
                     .simultaneousGesture(MagnifyGesture().updating($magnification) { value, state, _ in state = value.magnification }.onEnded { value in if viewReady {setZoom(min(max(zoom * value.magnification, 0.1), 2))} })
-                ForEach((snapshot?["nodes"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in RovaiCanvasCard(value: row.value, zoom: min(max(zoom * magnification, 0.1), 2), offset: CGSize(width: offset.width + pan.width, height: offset.height + pan.height), disabled: model.pending != nil || selecting, onOpen: {if selecting {if chosen.contains(row.id) {chosen.remove(row.id)} else {chosen.insert(row.id)}} else {selected = RovaiCanvasSelection(value: row.value)}}, onEdit: {properties = RovaiCanvasSelection(value: row.value)}, onMove: { x, y in mutate(.object(["type": .string("move"), "moves": .array([.object(["nodeId": .string(row.id), "x": .number(x), "y": .number(y)])])])) },isSelected: chosen.contains(row.id)) }
+                ForEach((snapshot?["nodes"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in RovaiCanvasCard(value: row.value, zoom: min(max(zoom * magnification, 0.1), 2), offset: CGSize(width: offset.width + pan.width, height: offset.height + pan.height), disabled: model.pending != nil || selecting, onOpen: {if selecting {if chosen.contains(row.id) {chosen.remove(row.id)} else {chosen.insert(row.id)}} else {selected = RovaiCanvasSelection(value: row.value)}}, onEdit: {properties = RovaiCanvasSelection(value: row.value)}, onMove: { x, y, captured in mutate(.object(["type": .string("move"), "moves": .array([.object(["nodeId": .string(row.id), "x": .number(x), "y": .number(y)])])]),revision: captured) },isSelected: chosen.contains(row.id),boardRevision: snapshot?["board"]?["revision"]?.rvInt ?? 0,onResize: {width,height,captured in mutate(.object(["type": .string("update"),"nodeId": .string(row.id),"patch": .object(["width": .number(width),"height": .number(height)])]),revision: captured)}) }
                 if minimap {VStack {Spacer();HStack {Spacer();RovaiCanvasMiniMap(nodes: snapshot?["nodes"]?.rvArray ?? [],viewport: viewState,stage: geometry.size) {x,y in offset = CGSize(width: geometry.size.width/2-CGFloat(x)*zoom,height: geometry.size.height/2-CGFloat(y)*zoom)}}}.padding(12).padding(.bottom,80)}
                 VStack {if let issue {Text(issue).font(.caption).foregroundStyle(Theme.warning).padding(10)};Spacer();HStack {
                     Button {if selecting {bulkGraph = snapshot;bulk = true} else {newNote = true}} label: {Label(selecting ? "操作 \(chosen.count) 张" : "添加",systemImage: selecting ? "square.stack" : "plus")}.disabled(snapshot == nil || model.pending != nil || selecting && chosen.isEmpty)
@@ -70,14 +70,59 @@ struct RovaiCanvasView: View {
     }
     private func saveView() {guard viewReady,let viewOwner,viewGeneration == model.connectionGeneration else {return};do {try model.saveBody(viewOwner,body: viewState.document(board: id))} catch {issue = error.localizedDescription}}
     private func load() async { do { snapshot = try await model.query(.canvasNodesSnapshot, params: .object(["boardId": .string(id)])); issue = nil } catch { issue = error.localizedDescription } }
-    private func mutate(_ value: JSONValue) { guard let snapshot else { return }; Task { await model.command(.canvasNodesApply, value: .object(["boardId": .string(id), "expectedRevision": snapshot["board"]?["revision"] ?? .number(0), "mutation": value])) } }
+    private func mutate(_ value: JSONValue,revision: Int? = nil) { guard let snapshot else { return }; Task { await model.command(.canvasNodesApply, value: .object(["boardId": .string(id), "expectedRevision": revision.map {JSONValue.number(Double($0))} ?? snapshot["board"]?["revision"] ?? .number(0), "mutation": value])) } }
 }
 private struct RovaiCanvasSelection: Identifiable { let value: JSONValue; var id: String { value.text("id") } }
 private struct RovaiCanvasCard: View {
-    let value: JSONValue; let zoom: CGFloat; let offset: CGSize; let disabled: Bool; let onOpen: () -> Void; let onEdit: () -> Void; let onMove: (Double, Double) -> Void
+    let value: JSONValue
+    let zoom: CGFloat
+    let offset: CGSize
+    let disabled: Bool
+    let onOpen: () -> Void
+    let onEdit: () -> Void
+    let onMove: (Double,Double,Int) -> Void
     var isSelected = false
-    @GestureState private var drag = CGSize.zero
-    private var data: JSONValue { value["data"] ?? .object([:]) }
-    private func number(_ key: String, fallback: Double) -> Double { if case .number(let number) = data[key] { return number }; return fallback }
-    var body: some View { VStack(alignment: .leading, spacing: 0) { HStack { Image(systemName: data.text("kind") == "terminal" ? "terminal" : data.text("kind") == "note" ? "note.text" : "square.stack"); Text(data.text("title").isEmpty ? data.text("kind") : data.text("title")).font(.headline); Spacer(); Button(action: onOpen) { Image(systemName: "arrow.up.right.square") } }.padding(12).contentShape(Rectangle()).gesture(DragGesture().updating($drag) { value, state, _ in if !disabled { state = value.translation } }.onEnded { gesture in if !disabled { onMove(number("x", fallback: 0) + gesture.translation.width / zoom, number("y", fallback: 0) + gesture.translation.height / zoom) } }); Divider(); if data["collapsed"]?.rvBool != true && !data.text("content").isEmpty { Text(data.text("content")).font(.subheadline).lineLimit(8).padding(12) }; if data["collapsed"]?.rvBool != true && !data.text("path").isEmpty { Text(data.text("path")).font(.caption).foregroundStyle(Theme.textSecondary).lineLimit(2).padding(12) }; Spacer(minLength: 0) }.frame(width: number("width", fallback: 320), height: data["collapsed"]?.rvBool == true ? 52 : number("height", fallback: 220)).background {RoundedRectangle(cornerRadius: 16).fill(Theme.bgElevated).overlay {if let tint = rovaiCanvasTint(data.text("color")) {RoundedRectangle(cornerRadius: 16).fill(tint.opacity(0.12))}}}.hairlineBorder(16).overlay {if isSelected {RoundedRectangle(cornerRadius: 16).stroke(Theme.accent,lineWidth: 2)}}.contextMenu {Button("编辑卡片属性", systemImage: "pencil", action: onEdit)}.scaleEffect(zoom, anchor: .topLeading).offset(x: offset.width + number("x", fallback: 0) * zoom + drag.width, y: offset.height + number("y", fallback: 0) * zoom + drag.height) }
+    var boardRevision = 0
+    var onResize: ((Double,Double,Int) -> Void)?
+    @GestureState private var drag = CGSize.zero, resizing = CGSize.zero
+    @State private var moveBase: CGPoint?, sizeBase: CGSize?, moveRevision: Int?, sizeRevision: Int?
+    private var data: JSONValue {value["data"] ?? .null}
+    private var kind: String {data.text("kind")}
+    private var minimum: CGSize {switch kind {case "file": return CGSize(width: 240,height: 160);case "terminal": return CGSize(width: 260,height: 140);case "note": return CGSize(width: 140,height: 96);case "folder","group","agent","custom": return CGSize(width: 260,height: 160);default: return CGSize(width: 48,height: 48)}}
+    private func number(_ key: String,fallback: Double) -> Double {if case .number(let value) = data[key] {return value};return fallback}
+    var body: some View {
+        VStack(alignment: .leading,spacing: 0) {
+            HStack {
+                Image(systemName: kind == "terminal" ? "terminal" : kind == "note" ? "note.text" : "square.stack")
+                Text(data.text("title").isEmpty ? rovaiCanvasKindNames[kind] ?? kind : data.text("title")).font(.headline).lineLimit(1)
+                Spacer()
+                Button(action: onOpen) {Image(systemName: "arrow.up.right.square")}
+            }.padding(12).contentShape(Rectangle()).gesture(DragGesture().onChanged {_ in
+                guard !disabled else {return};if moveBase == nil {moveBase = CGPoint(x: number("x",fallback: 0),y: number("y",fallback: 0));moveRevision = boardRevision}
+            }.updating($drag) {value,state,_ in if !disabled {state = value.translation}}.onEnded {gesture in
+                if !disabled,let moveBase,let moveRevision {onMove(Double(moveBase.x+gesture.translation.width/zoom),Double(moveBase.y+gesture.translation.height/zoom),moveRevision)}
+                moveBase = nil;moveRevision = nil
+            })
+            Divider()
+            if data["collapsed"] != .bool(true) {
+                if !data.text("content").isEmpty {Text(data.text("content")).font(.subheadline).lineLimit(8).padding(12)}
+                if !data.text("path").isEmpty {Text(data.text("path")).font(.caption).foregroundStyle(Theme.textSecondary).lineLimit(2).padding(12)}
+                Spacer(minLength: 0)
+                if isSelected,kind != "conversation",onResize != nil {
+                    HStack {Spacer();Image(systemName: "arrow.down.right").font(.caption).foregroundStyle(Theme.textSecondary).frame(width: 32,height: 32).contentShape(Rectangle()).accessibilityLabel("调整卡片尺寸").gesture(DragGesture().onChanged {_ in
+                        guard !disabled else {return};if sizeBase == nil {sizeBase = CGSize(width: number("width",fallback: 320),height: number("height",fallback: 220));sizeRevision = boardRevision}
+                    }.updating($resizing) {value,state,_ in if !disabled {state = value.translation}}.onEnded {gesture in
+                        if !disabled,let sizeBase,let sizeRevision {onResize?(Double(min(20000,max(minimum.width,sizeBase.width+gesture.translation.width/zoom))),Double(min(20000,max(minimum.height,sizeBase.height+gesture.translation.height/zoom))),sizeRevision)}
+                        sizeBase = nil;sizeRevision = nil
+                    })}
+                }
+            }
+        }.frame(width: min(20000,max(Double(minimum.width),number("width",fallback: 320)+Double(resizing.width/zoom))),height: data["collapsed"] == .bool(true) ? 52 : min(20000,max(Double(minimum.height),number("height",fallback: 220)+Double(resizing.height/zoom))))
+        .background {RoundedRectangle(cornerRadius: 16).fill(Theme.bgElevated).overlay {if let tint = rovaiCanvasTint(data.text("color")) {RoundedRectangle(cornerRadius: 16).fill(tint.opacity(0.12))}}}
+        .clipShape(RoundedRectangle(cornerRadius: 16)).hairlineBorder(16)
+        .overlay {if isSelected {RoundedRectangle(cornerRadius: 16).stroke(Theme.accent,lineWidth: 2)}}
+        .contextMenu {Button("编辑卡片属性",systemImage: "pencil",action: onEdit)}
+        .scaleEffect(zoom,anchor: .topLeading).offset(x: offset.width+number("x",fallback: 0)*zoom+drag.width,y: offset.height+number("y",fallback: 0)*zoom+drag.height)
+        .onChange(of: disabled) {_,value in if value {moveBase = nil;moveRevision = nil;sizeBase = nil;sizeRevision = nil}}
+    }
 }
