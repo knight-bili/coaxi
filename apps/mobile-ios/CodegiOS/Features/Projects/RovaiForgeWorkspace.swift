@@ -37,6 +37,7 @@ struct RovaiForgeWorkspace: View {
                         if let fileNext {Button(files.isEmpty ? "读取变更文件" : "更多变更文件") {Task {await work {let result = try await call("change_files", extra: ["number": .number(Double(selected.forgeNumber)), "page": .number(Double(fileNext))]);let values = result["data"]?["files"]?.rvArray ?? [];files = fileNext == 1 ? values : files + values;self.fileNext = result["nextPage"]?.rvInt}}}.disabled(busy)}
                     }
                 }
+                if let repository {Section {RovaiForgeMission(model: model, threadId: threadId, accountId: account, sourceKind: kind == "pulls" ? "pr" : "issue", number: selected.forgeNumber, repository: repository) {refreshRevision += 1}}}
                 if let repository {Section {RovaiForgeLinks(model: model, threadId: threadId, accountId: account, sourceKind: kind == "pulls" ? "pr" : "issue", number: selected.forgeNumber, repositoryKey: repository.text("repositoryKey"))}}
                 Section("评论") {ForEach(Array(comments.enumerated()), id: \.offset) {_, row in GlassRow {VStack(alignment: .leading, spacing: 8) {Text((row["user"]?.text("login") ?? "").isEmpty ? row["author"]?.text("username") ?? "" : row["user"]!.text("login")).font(.caption).foregroundStyle(Theme.textSecondary);MarkdownContent(raw: row.forgeBody)}}};if let commentNext {Button("更多评论") {Task {await work {try await loadComments(selected.forgeNumber, page: commentNext)}}}.disabled(busy)}}
             } else {
