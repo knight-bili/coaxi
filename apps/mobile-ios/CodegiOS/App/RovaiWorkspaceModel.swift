@@ -25,6 +25,8 @@ final class RovaiWorkspaceModel {
     var pending: JSONValue?
     var lastResult: JSONValue?
     var lastOperation: RovaiOperation?
+    var lastUploadResult: JSONValue?
+    var connectionGeneration: UInt64 { generation }
     @ObservationIgnored private var client: RovaiHostClient?
     @ObservationIgnored private var profile: ServerProfile?
     @ObservationIgnored private var account = ""
@@ -85,6 +87,29 @@ final class RovaiWorkspaceModel {
         let data = Data(body.utf8); guard data.count <= 64 * 1024 else { throw RovaiHostFailure(code: "草稿超过64KB，请拆分后发送。") }
         guard RovaiSecureSession.save(data.isEmpty ? nil : data, profile: profile.id, account: bodyAccount(owner)) else { throw RovaiHostFailure(code: "草稿未能保存，输入仍在当前页面。") }
     }
+    func upload(_ url: URL, threadId: String, target: JSONValue, revision: Int, expectedGeneration: UInt64) async {
+        guard expectedGeneration == generation, pending == nil, !busy else { issue = "工作区已切换或仍有待核对操作，请重新选择附件"; return }
+        busy = true; let lifetime = generation
+        do { let prepared = try await RovaiUploadSource.prepare(url: url, threadId: threadId, target: target, revision: revision); guard lifetime == generation else { RovaiUploadSource.remove(prepared); return }; busy = false; await submit(.object(["operation": .string("__host.upload"), "params": prepared])) } catch { if lifetime == generation { issue = error.localizedDescription; busy = false } }
+    }
+    private func completeUpload(_ request: JSONValue, result: JSONValue, profile: ServerProfile, account: String, lifetime: UInt64) async throws {
+        guard result["draft"] != nil && result["draft"] != .null || result["receipt"] != nil else { throw RovaiHostFailure(code: "上传结果尚未确定，请核对原上传") }
+        guard RovaiSecureSession.save(nil, profile: profile.id, account: account) else { throw RovaiHostFailure(code: "上传结果尚未保存，原请求仍保留") }
+        RovaiUploadSource.remove(request["params"] ?? .null); guard lifetime == generation else { return }
+        pending = nil; lastUploadResult = result; lastResult = result; lastOperation = nil; if result["receipt"]?.text("status") == "rejected" { issue = result["receipt"]?.text("code") }; await refresh()
+    }
+    private func dispatchUpload(_ request: JSONValue, client: RovaiHostClient, profile: ServerProfile, account: String, lifetime: UInt64) async throws {
+        let params = request["params"] ?? .null; let intent = params["intent"] ?? .null
+        if params["attempted"]?.rvBool == true {
+            let result = try await client.uploadStatus(intent: intent, action: intent["target"]?.text("kind") == "camp" ? "reconcile" : "retry")
+            if result["draft"] != nil || result.text("state") == "recorded" { try await completeUpload(request, result: result, profile: profile, account: account, lifetime: lifetime); return }
+            guard ["unknown", "needs_source"].contains(result.text("state")) else { throw RovaiHostFailure(code: "原上传仍待核对") }
+        }
+        var fields = params.rvObject; fields["attempted"] = .bool(true); var changed = request.rvObject; changed["params"] = .object(fields); let marked = JSONValue.object(changed)
+        guard RovaiSecureSession.save(try JSONEncoder().encode(marked), profile: profile.id, account: account) else { throw RovaiHostFailure(code: "无法保存原上传请求，尚未发送") }; if lifetime == generation { pending = marked }
+        let data = try await RovaiUploadSource.bytes(params); let result = try await client.upload(intent: intent, data: data)
+        try await completeUpload(marked, result: result, profile: profile, account: account, lifetime: lifetime)
+    }
     func executePrivate(_ operation: RovaiOperation, command: JSONValue, owner: String, body: String, replace: Bool = false) async {
         guard pending == nil else { return }
         await submit(.object(["operation": .string(operation.rawValue), "params": .object(["commandId": .string(UUID().uuidString.lowercased()), "command": command]), "nativeBody": .object(["owner": .string(owner), "expectedBody": .string(body), "replace": .bool(replace)])]))
@@ -113,14 +138,16 @@ final class RovaiWorkspaceModel {
         await submit(.object(["operation": .string(operation.rawValue), "params": params]))
     }
     private func submit(_ request: JSONValue) async {
-        guard !writing, let client, let profile, let operation = RovaiOperation(rawValue: request.text("operation")), let params = request["params"] else { return }
+        guard !writing, let client, let profile, let params = request["params"] else { return }
+        let operation = RovaiOperation(rawValue: request.text("operation")); guard operation != nil || request.text("operation") == "__host.upload" else { return }
         writing = true; busy = true; issue = nil; let lifetime = generation; let account = self.account
         defer { writing = false; if lifetime == generation { busy = false } }
         do {
             let bytes = try JSONEncoder().encode(request)
             guard RovaiSecureSession.save(bytes, profile: profile.id, account: account) else { throw RovaiHostFailure(code: "无法保存原请求，尚未向工作区发送。") }
             pending = request
-            let result = try await client.request(operation, params: params)
+            if request.text("operation") == "__host.upload" { try await dispatchUpload(request, client: client, profile: profile, account: account, lifetime: lifetime); return }
+            let result = try await client.request(operation!, params: params)
             try await settlePrivate(request, result: result, profile: profile, account: account, client: client)
             RovaiSecureSession.save(nil, profile: profile.id, account: account)
             guard lifetime == generation else { return }
@@ -132,10 +159,16 @@ final class RovaiWorkspaceModel {
     }
     func retry() async { if let pending { await submit(pending) } }
     func reconcile() async {
-        guard !writing, let request = pending, let profile, let client, let operation = RovaiOperation(rawValue: request.text("operation")), let params = request["params"] else { return }
-        let lifetime = generation
-        do { let result = try await client.reconcile(operation, params: params); guard lifetime == generation else { return }; if result.text("state") == "recorded" { try await settlePrivate(request, result: result["result"] ?? .null, profile: profile, account: account, client: client); RovaiSecureSession.save(nil, profile: profile.id, account: account); pending = nil; lastResult = result["result"]; lastOperation = operation; await refresh() } else { issue = "原操作结果尚不明确，请稍后核对或重试原操作。" } } catch { if lifetime == generation { failure(error) } }
+        guard !writing, let request = pending, let profile, let client, let params = request["params"] else { return }
+        let lifetime = generation; let account = self.account
+        do {
+            if request.text("operation") == "__host.upload" { let result = try await client.uploadStatus(intent: params["intent"] ?? .null); try await completeUpload(request, result: result, profile: profile, account: account, lifetime: lifetime); return }
+            guard let operation = RovaiOperation(rawValue: request.text("operation")) else { return }
+            let result = try await client.reconcile(operation, params: params); guard lifetime == generation else { return }
+            if result.text("state") == "recorded" { try await settlePrivate(request, result: result["result"] ?? .null, profile: profile, account: account, client: client); RovaiSecureSession.save(nil, profile: profile.id, account: account); pending = nil; lastResult = result["result"]; lastOperation = operation; await refresh() } else { issue = "原操作结果尚不明确，请稍后核对或重试原操作。" }
+        } catch { if lifetime == generation { failure(error) } }
     }
+
     func command(_ operation: RovaiOperation, value: JSONValue) async { await execute(operation, params: .object(["commandId": .string(UUID().uuidString.lowercased()), "command": value])) }
     func send(_ text: String, recipients: Set<String>) async {
         guard let threadId, !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
