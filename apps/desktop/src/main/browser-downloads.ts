@@ -4,7 +4,7 @@ import { promises as fs } from 'node:fs'
 import path from 'node:path'
 import type { BrowserDownloadView, BrowserWorkspaceApi } from '@contracts'
 
-type Entry = { view: BrowserDownloadView; item?: DownloadItem; hidden: boolean }
+type Entry = { view: BrowserDownloadView; item?: DownloadItem; session?: Session; hidden: boolean }
 const LIVE = new Set<BrowserDownloadView['state']>(['progressing', 'paused', 'interrupted'])
 const HISTORY_LIMIT = 32
 const ACTIVE_LIMIT = 16
@@ -17,6 +17,8 @@ export class BrowserDownloads {
   private readonly ready: Promise<void>
   private tail: Promise<void> = Promise.resolve()
   private disposed = false
+  private readonly bindings = new Map<Session, { owners: Map<WebContents, {threadId: string; tabId: string}>; listener: (event: Electron.Event, item: DownloadItem, source: WebContents) => void }>()
+  hasActive(value: Session): boolean { return [...this.entries.values()].some(entry => entry.item && entry.session === value) }
 
   constructor() { this.ready = this.load() }
 
@@ -51,10 +53,14 @@ export class BrowserDownloads {
   }
 
   bind(session: Session, contents: WebContents, threadId: string, tabId: string): () => void {
+    const existing = this.bindings.get(session)
+    if (existing) { existing.owners.set(contents, {threadId, tabId}); return () => { existing.owners.delete(contents); if (existing.owners.size === 0) { session.removeListener('will-download', existing.listener); this.bindings.delete(session) } } }
+    const owners = new Map<WebContents, {threadId: string; tabId: string}>([[contents, {threadId, tabId}]])
     const listener = (event: Electron.Event, item: DownloadItem, source: WebContents): void => {
-      if (this.disposed || source !== contents || contents.isDestroyed() || [...this.entries.values()].filter(entry => entry.item).length >= ACTIVE_LIMIT) { event.preventDefault(); return }
+      const owner = owners.get(source)
+      if (this.disposed || !owner || source.isDestroyed() || [...this.entries.values()].filter(entry => entry.item).length >= ACTIVE_LIMIT) { event.preventDefault(); return }
       try {
-        const sourceOrigin = new URL(contents.getURL()).origin
+        const sourceOrigin = new URL(source.getURL()).origin
         for (const value of item.getURLChain()) {
           const url = new URL(value)
           if (url.username || url.password || (!['http:', 'https:'].includes(url.protocol) && !(url.protocol === 'blob:' && url.origin === sourceOrigin && /^https?:/.test(sourceOrigin)))) throw new Error('browser.invalid_download')
@@ -64,7 +70,7 @@ export class BrowserDownloads {
       // dialog. Renderer and web page cannot choose an arbitrary output path.
       item.setSaveDialogOptions({ title: '保存下载文件', buttonLabel: '保存' })
       const startedAt = Date.now(), id = randomUUID()
-      const entry: Entry = { item, hidden: false, view: { id, threadId, tabId, fileName: item.getFilename().slice(0, 1024), path: '', startedAt, updatedAt: startedAt, state: 'progressing', receivedBytes: 0, totalBytes: Math.max(0, item.getTotalBytes()), canResume: false } }
+      const entry: Entry = { item, session, hidden: false, view: { id, threadId: owner.threadId, tabId: owner.tabId, fileName: item.getFilename().slice(0, 1024), path: '', startedAt, updatedAt: startedAt, state: 'progressing', receivedBytes: 0, totalBytes: Math.max(0, item.getTotalBytes()), canResume: false } }
       this.entries.set(id, entry)
       const update = (state: string): void => {
         entry.view = { ...entry.view, path: item.getSavePath(), receivedBytes: Math.max(0, item.getReceivedBytes()), totalBytes: Math.max(0, item.getTotalBytes()), state: state === 'interrupted' ? 'interrupted' : item.isPaused() ? 'paused' : 'progressing', canResume: item.canResume(), updatedAt: Date.now() }
@@ -75,12 +81,14 @@ export class BrowserDownloads {
         entry.view.state = state === 'completed' ? 'completed' : state === 'cancelled' ? 'cancelled' : 'failed'
         entry.view.canResume = false
         delete entry.item
+        delete entry.session
         if (entry.hidden) this.entries.delete(id)
         this.trim(); this.persist()
       })
     }
     session.on('will-download', listener)
-    return () => session.removeListener('will-download', listener)
+    this.bindings.set(session, {owners, listener})
+    return () => { owners.delete(contents); if (owners.size === 0) { session.removeListener('will-download', listener); this.bindings.delete(session) } }
   }
 
   async list(threadId: string): Promise<BrowserDownloadView[]> {

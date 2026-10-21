@@ -3,6 +3,7 @@ import { createHash, randomUUID } from 'node:crypto'
 import type { BrowserWorkspaceApi, BrowserWorkspaceView, CoreMethod } from '@contracts'
 import agentBundle from './codeg-browser-agent.js?raw'
 import { BrowserDownloads } from './browser-downloads'
+import { BrowserProfiles } from './browser-profiles'
 
 type Request = <T>(method: CoreMethod, params?: unknown) => Promise<T>
 type Surface = {
@@ -22,6 +23,7 @@ const address=(value:string):string=>{
 export class BrowserWorkspace {
   private readonly surfaces=new Map<string,Surface>()
   private readonly downloads=new BrowserDownloads()
+  private readonly profiles=new BrowserProfiles(value=>this.downloads.hasActive(value))
   constructor(private readonly request:Request,private readonly owner:()=>BrowserWindow|null){}
   private trusted(event:IpcMainInvokeEvent):void{
     const owner=this.owner()
@@ -43,6 +45,11 @@ export class BrowserWorkspace {
   }
   async invoke(event:IpcMainInvokeEvent,operation:unknown,input:unknown):Promise<unknown>{
     this.trusted(event)
+    if(operation==='profiles')return this.profiles.list()
+    if(operation==='profileControl'){
+      if(!input||typeof input!=='object'||Array.isArray(input))throw new Error('browser.invalid_request')
+      return this.profiles.control(input as Parameters<BrowserWorkspaceApi['profileControl']>[0])
+    }
     if(operation==='downloads'){
       if(typeof input!=='string'||input.length>200)throw new Error('browser.invalid_thread')
       await this.request('workbench.files.list',{scope:{threadId:input},path:''})
@@ -61,12 +68,15 @@ export class BrowserWorkspace {
     }
     if(!input||typeof input!=='object'||Array.isArray(input))throw new Error('browser.invalid_request')
     if(operation==='open'){
-      const {threadId,url}=input as {threadId:string;url:string}
+      const {threadId,url,profileId}=input as {threadId:string;url:string;profileId?:string}
       if(typeof threadId!=='string'||typeof url!=='string'||this.surfaces.size>=32)throw new Error('browser.invalid_request')
       await this.request('workbench.files.list',{scope:{threadId},path:''})
       const initial=address(url),id=randomUUID()
-      const window=new BrowserWindow({width:1100,height:780,show:false,title:'浏览器',autoHideMenuBar:true,webPreferences:{partition:`browser-${id}`,nodeIntegration:false,contextIsolation:true,sandbox:true,webSecurity:true,allowRunningInsecureContent:false,devTools:false}})
-      const surface:Surface={window,console:[],tail:Promise.resolve(),grantOrigin:null,view:{id,threadId,url:initial,title:'浏览器',level:'none',expiresAt:null,loading:true,error:null}}
+      if(profileId!==undefined&&typeof profileId!=='string')throw new Error('browser.invalid_profile')
+      const admission=await this.profiles.admit(profileId,id)
+      let window:BrowserWindow
+      try{window=new BrowserWindow({width:1100,height:780,show:false,title:'浏览器',autoHideMenuBar:true,webPreferences:{session:admission.session,nodeIntegration:false,contextIsolation:true,sandbox:true,webSecurity:true,allowRunningInsecureContent:false,devTools:false}})}catch(error){admission.release();throw error}
+      const surface:Surface={window,console:[],tail:Promise.resolve(),grantOrigin:null,view:{id,threadId,profileId:admission.profileId,url:initial,title:'浏览器',level:'none',expiresAt:null,loading:true,error:null}}
       this.surfaces.set(id,surface)
       window.webContents.session.setPermissionRequestHandler((_contents,_permission,callback)=>callback(false))
       window.webContents.session.setPermissionCheckHandler(()=>false)
@@ -87,7 +97,7 @@ export class BrowserWorkspace {
         surface.console.push({level:typeof details==='object'?String(details.level):String(details),message:String(message??'').slice(0,16000),at:Date.now()})
         if(surface.console.length>200)surface.console.shift()
       })
-      window.once('closed',()=>{unbindDownloads();this.revoke(surface);this.surfaces.delete(id)})
+      window.once('closed',()=>{admission.release();unbindDownloads();this.revoke(surface);this.surfaces.delete(id)})
       window.once('ready-to-show',()=>window.show())
       void window.loadURL(initial).catch(error=>{surface.view.error=String(error);surface.view.loading=false;window.show()})
       return this.snapshot(surface)

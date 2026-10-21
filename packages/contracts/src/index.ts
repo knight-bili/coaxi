@@ -5133,16 +5133,19 @@ export interface NativeBackupsApi {
   restore(archiveId:string,passphrase:string):Promise<BackupSummary&{restoreStaged:true}>
   onProgress(listener:(value:{phase:string;done:number;total:number})=>void):()=>void
 }
+export interface BrowserProfileView {id:string;name:string;createdAt:number}
 export interface BrowserDownloadView { id:string;threadId:string;tabId:string;fileName:string;path:string;state:'progressing'|'paused'|'interrupted'|'completed'|'cancelled'|'failed';receivedBytes:number;totalBytes:number;canResume:boolean;startedAt:number;updatedAt:number }
 export interface BrowserWorkspaceApi {
+  profiles():Promise<{revision:string;profiles:BrowserProfileView[]}>
+  profileControl(input:{action:'create'|'rename'|'clear'|'remove';expectedRevision:string;id?:string;name?:string;confirmed?:boolean}):Promise<{revision:string;profiles:BrowserProfileView[]}>
   downloads(threadId:string):Promise<BrowserDownloadView[]>
   downloadControl(input:{threadId:string;id:string;action:'pause'|'resume'|'cancel'|'dismiss'|'reveal'}):Promise<void>
   list(threadId: string): Promise<BrowserWorkspaceView[]>
-  open(threadId: string, url: string): Promise<BrowserWorkspaceView>
+  open(threadId: string, url: string, profileId?:string): Promise<BrowserWorkspaceView>
   control(input: {id:string; action:'navigate'|'back'|'forward'|'reload'|'focus'|'close'|'share'; url?:string; level?:'none'|'read'|'control'; minutes?:number}): Promise<BrowserWorkspaceView | null>
   perform(input:{id:string;commandId:string;action:'snapshot'|'screenshot'|'console'|'click'|'hover'|'type'|'press'|'select'|'scroll';generation?:string;ref?:string;text?:string;key?:string;values?:string[];x?:number;y?:number}):Promise<unknown>
 }
-export interface BrowserWorkspaceView { id:string; threadId:string;url:string;title:string;level:'none'|'read'|'control';expiresAt:number|null;loading:boolean;error:string|null }
+export interface BrowserWorkspaceView { id:string; threadId:string;profileId:string;url:string;title:string;level:'none'|'read'|'control';expiresAt:number|null;loading:boolean;error:string|null }
 
 export interface RovaiApi {
   nativeCustomSkills?: {importDirectory<T>(input:{skillId:string;expectedRevision?:string}):Promise<T|null>}
