@@ -30,7 +30,7 @@ struct RovaiWorkspaceRoot: View {
         .sheet(isPresented: Binding(get: { create != nil }, set: { if !$0 { create = nil } })) { RovaiNewConversation(model: model, mission: create == "mission") { create = nil } }
     }
     @ViewBuilder private var linkedSettings: some View {
-        switch linkSettings { case "appearance": AppearanceSettingsView(); case "language": LanguageSettingsView(); case "runtime": RovaiRuntimeSettingsView(model: model); case "skills": RovaiSkillSettingsView(model: model); case "mcp": RovaiMcpSettingsView(model: model); case "notifications": RovaiNotificationSettings(model: model); default: EmptyView() }
+        switch linkSettings { case "appearance": AppearanceSettingsView(); case "language": LanguageSettingsView(); case "runtime": RovaiRuntimeSettingsView(model: model); case "skills": RovaiSkillSettingsView(model: model); case "quickMessages": RovaiMessageLibrary(model: model); case "mcp": RovaiMcpSettingsView(model: model); case "notifications": RovaiNotificationSettings(model: model); default: EmptyView() }
     }
     private func openIncomingLink() async {
         guard let link = incomingLink, model.connected, !model.busy, model.pending == nil else { return }; let generation = model.connectionGeneration
@@ -41,7 +41,7 @@ struct RovaiWorkspaceRoot: View {
             case "mission": let mission = try await model.query(.missionsGet, params: .object(["missionId": .string(link.value)])); guard !mission.text("threadId").isEmpty else { throw RovaiHostFailure(code: "使命对话不存在") }; route = .thread(mission.text("threadId")); nextTab = 1
             case "canvas": let result = try await model.query(.canvasBoardsGet, params: .object(["boardId": .string(link.value)])); guard result["board"] != nil, result["board"] != .null else { throw RovaiHostFailure(code: "画布不存在") }; route = .canvas(link.value); nextTab = 3
             case "tab": switch link.value.lowercased() { case "chats", "threads": nextTab = 0; case "missions": nextTab = 1; case "members": nextTab = 2; case "canvas", "canvases": nextTab = 3; case "settings": nextTab = 4; default: throw RovaiHostFailure(code: "此旧版入口请从当前工作区导航打开") }
-            case "settings": nextTab = 4; switch link.value.lowercased() { case "appearance", "language", "mcp", "notifications": pane = link.value.lowercased(); case "agents", "runtime": pane = "runtime"; case "skills", "experts": pane = "skills"; default: throw RovaiHostFailure(code: "该设置入口尚未映射，请从设置页打开") }
+            case "settings": nextTab = 4; switch link.value.lowercased() { case "appearance", "language", "mcp", "notifications": pane = link.value.lowercased(); case "agents", "runtime": pane = "runtime"; case "skills", "experts": pane = "skills"; case "quickmessages": pane = "quickMessages"; default: throw RovaiHostFailure(code: "该设置入口尚未映射，请从设置页打开") }
             default: throw RovaiHostFailure(code: "这是原Codeg对象链接，请先导入原会话或从工程列表打开；不会将旧编号当作新对话。")
             }
             guard generation == model.connectionGeneration, incomingLink == link, !Task.isCancelled else { return }
@@ -118,7 +118,7 @@ struct RovaiWorkspaceRoot: View {
         } }.scrollContentBackground(.hidden)
     }
     private var canvasList: some View { List { ForEach(model.boards.map { RovaiRow(value: $0) }) { row in routeLink(.canvas(row.id)) { GlassRow { HStack(spacing: 12) { Image(systemName: "map").font(.title2).foregroundStyle(Theme.textSecondary); VStack(alignment: .leading, spacing: 6) { Text(row.value.text("name").isEmpty ? "未命名画布" : row.value.text("name")).font(.headline); Text(row.value.text("description")).font(.caption).foregroundStyle(Theme.textSecondary) } } } }.listRowBackground(Color.clear).listRowSeparator(.hidden) } }.scrollContentBackground(.hidden) }
-    private var settings: some View { List { NavigationLink { RovaiNotificationSettings(model: model) } label: { Label("提醒", systemImage: "bell") }; NavigationLink { RovaiRuntimeSettingsView(model: model) } label: { Label("智能体、模型和权限", systemImage: "cpu") }; NavigationLink { AppearanceSettingsView() } label: { Label("外观", systemImage: "paintpalette") }; NavigationLink { LanguageSettingsView() } label: { Label("界面语言", systemImage: "globe") }; NavigationLink { RovaiMcpSettingsView(model: model) } label: { Label("MCP连接", systemImage: "puzzlepiece.extension") }; NavigationLink { RovaiSkillSettingsView(model: model) } label: { Label("技能与专家库", systemImage: "graduationcap") }; Button("管理服务器", action: onManageServers); if let profile { LabeledContent("当前服务器", value: profile.displayHost) }; Button("退出当前连接", role: .destructive) { Task { await model.logout() } } }.scrollContentBackground(.hidden) }
+    private var settings: some View { List { NavigationLink { RovaiMessageLibrary(model: model) } label: { Label("快捷消息和标签", systemImage: "text.bubble") }; NavigationLink { RovaiNotificationSettings(model: model) } label: { Label("提醒", systemImage: "bell") }; NavigationLink { RovaiRuntimeSettingsView(model: model) } label: { Label("智能体、模型和权限", systemImage: "cpu") }; NavigationLink { AppearanceSettingsView() } label: { Label("外观", systemImage: "paintpalette") }; NavigationLink { LanguageSettingsView() } label: { Label("界面语言", systemImage: "globe") }; NavigationLink { RovaiMcpSettingsView(model: model) } label: { Label("MCP连接", systemImage: "puzzlepiece.extension") }; NavigationLink { RovaiSkillSettingsView(model: model) } label: { Label("技能与专家库", systemImage: "graduationcap") }; Button("管理服务器", action: onManageServers); if let profile { LabeledContent("当前服务器", value: profile.displayHost) }; Button("退出当前连接", role: .destructive) { Task { await model.logout() } } }.scrollContentBackground(.hidden) }
 }
 enum RovaiRoute: Hashable { case thread(String), canvas(String) }
 
@@ -132,6 +132,7 @@ private struct RovaiThreadDetail: View {
     let model: RovaiWorkspaceModel; let id: String
     @State private var engineering = false
     @State private var privateChat = false
+    @State private var library = false
     @State private var text = ""; @State private var recipients = Set<String>()
     @State private var bodyReady = false; @State private var inputRevision = 0; @State private var inputIssue: String?
     @State private var bodyGeneration: UInt64?
@@ -152,7 +153,10 @@ private struct RovaiThreadDetail: View {
                 Button { sendPublicBody() } label: { Image(systemName: "paperplane").font(.title3).padding(12) }.disabled(inputLocked || inputIssue != nil || text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !model.publicSourcesReady)
             }.padding(12)
         }.navigationTitle(model.thread?["thread"]?.text("title") ?? "对话")
-        .toolbar { ToolbarItem(placement: .topBarTrailing) { Button { privateChat = true } label: { Image(systemName: "person.bubble") }; Button { engineering = true } label: { Image(systemName: "folder") } } }
+        .toolbar { ToolbarItem(placement: .topBarTrailing) { Button { library = true } label: { Image(systemName: "text.bubble") }.disabled(inputLocked); Button { privateChat = true } label: { Image(systemName: "person.bubble") }; Button { engineering = true } label: { Image(systemName: "folder") } } }
+        .sheet(isPresented: $library) { NavigationStack { RovaiMessageLibrary(model: model, threadId: id) { content in
+            guard !inputLocked else { return false }; text = text.isEmpty ? content : text + "\n" + content; inputRevision += 1; persistPublicBody(); library = false; return true
+        }.toolbar { ToolbarItem(placement: .cancellationAction) { Button("返回输入") { library = false } } } } }
         .sheet(isPresented: $privateChat) { RovaiPrivateConversationView(model: model, threadId: id) }
         .sheet(isPresented: $engineering) { RovaiEngineeringView(model: model, threadId: id) }
         .task(id: id) {

@@ -63,7 +63,7 @@ private fun RovaiWorkspaceScreen(profile:ServerProfile?,onServers:()->Unit,model
                 "mission"->{val mission=model.query(RovaiOperation.MISSIONS_GET,buildJsonObject{put("missionId",link.value)}).coreObject();threadTarget=mission.coreText("threadId");require(!threadTarget.isNullOrBlank()){"使命对话不存在"};nextTab=1}
                 "canvas"->{canvasTarget=model.query(RovaiOperation.CANVAS_BOARDS_GET,buildJsonObject{put("boardId",link.value)}).coreObject()["board"] as? JsonObject;require(canvasTarget!=null){"画布不存在"};nextTab=3}
                 "tab"->{nextTab=when(link.value.lowercase()){ "chats","threads"->0;"missions"->1;"members"->2;"canvas","canvases"->3;"settings"->4;else->throw IllegalArgumentException("此旧版入口请从当前工作区导航打开")}}
-                "settings"->{nextTab=4;pane=when(link.value.lowercase()){ "appearance"->"appearance";"agents","runtime"->"runtime";"skills","experts"->"skills";"mcp"->"mcp";"notifications"->"notifications";else->throw IllegalArgumentException("该设置入口尚未映射，请从设置页打开")}}
+                "settings"->{nextTab=4;pane=when(link.value.lowercase()){ "appearance"->"appearance";"agents","runtime"->"runtime";"skills","experts"->"skills";"mcp"->"mcp";"notifications"->"notifications";"quickmessages"->"quickMessages";else->throw IllegalArgumentException("该设置入口尚未映射，请从设置页打开")}}
                 else->throw IllegalArgumentException("这是原Codeg对象链接，请先导入原会话或从工程列表打开；不会将旧编号当作新对话。")
             }
             if(model.connectionGeneration!=generation||app.codeg.android.core.common.RovaiDeepLinkBus.pending.value!=link)return@LaunchedEffect
