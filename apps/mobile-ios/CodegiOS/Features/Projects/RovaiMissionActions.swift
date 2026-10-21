@@ -38,28 +38,3 @@ struct RovaiMissionActions: View {
         } catch is CancellationError {} catch {issue = error.localizedDescription}
     }
 }
-
-private struct RovaiMissionEdit: View {
-    let model: RovaiWorkspaceModel
-    let mission: JSONValue
-    @Environment(\.dismiss) private var dismiss
-    @State private var title = "", description = "", tags = "", commandId = UUID().uuidString.lowercased()
-    @State private var baseline: JSONValue?, sent: JSONValue?, issue: String?
-    @State private var ready = false, busy = false
-    private var owner: String {"mission-edit:\(mission.text("missionId"))"}
-    private var record: JSONValue {.object(["title": .string(title), "description": .string(description), "tags": .string(tags), "baseline": baseline ?? mission, "commandId": .string(commandId), "sent": sent ?? .null])}
-    var body: some View {
-        NavigationStack {Form {if let issue {Text(issue).foregroundStyle(Theme.warning)};Section {TextField("使命名称", text: $title);TextField("使命描述", text: $description, axis: .vertical).lineLimit(4...12);TextField("标签，逗号分隔", text: $tags)}.disabled(!ready || busy || sent != nil);if sent != nil {Text("原保存请求已保留，请先核对原操作。").font(.caption).foregroundStyle(Theme.textSecondary)}}.navigationTitle("编辑使命").toolbar {ToolbarItem(placement: .cancellationAction) {Button("关闭，保留草稿") {dismiss()}.disabled(busy)};ToolbarItem(placement: .confirmationAction) {Button(sent == nil ? "保存" : "核对原保存") {Task {await submit()}}.disabled(!ready || busy || model.pending != nil || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)}}}
-        .interactiveDismissDisabled(busy)
-        .task {restore()}
-        .task(id: record) {guard ready, !busy else {return};do {try await Task.sleep(for: .milliseconds(350));try persist()} catch is CancellationError {} catch {issue = error.localizedDescription}}
-        .onDisappear {if ready {try? persist()}}
-        .onChange(of: model.lastResult) {_, result in let receipt = result?["commandResult"] ?? result;if sent != nil, receipt?.text("commandId") == commandId, ["applied", "accepted"].contains(receipt?.text("status") ?? "") {ready = false;try? model.saveBody(owner, body: "");dismiss()}}
-    }
-    private func restore() {guard !ready else {return};do {title = mission.text("title");description = mission.text("description");tags = (mission["tags"]?.rvArray ?? []).compactMap(\.stringValue).joined(separator: ", ");baseline = mission;let previous = try model.readBody(owner);if !previous.isEmpty {let value = try JSONDecoder().decode(JSONValue.self, from: Data(previous.utf8));title = value.text("title");description = value.text("description");tags = value.text("tags");baseline = value["baseline"];commandId = value.text("commandId");if let frozen = value["sent"], frozen != .null {sent = frozen}};ready = true} catch {issue = error.localizedDescription}}
-    private func persist() throws {let data = try JSONEncoder().encode(record);try model.saveBody(owner, body: String(decoding: data, as: UTF8.self))}
-    private func submit() async {
-        guard ready, !busy, model.pending == nil else {return};let generation = model.connectionGeneration;busy = true;defer {busy = false};issue = nil
-        do {if sent == nil {var command: [String: JSONValue] = ["missionId": mission["missionId"] ?? .null, "expectedDetailsVersion": baseline?["detailsVersion"] ?? .number(0), "tags": .array(Array(Set(tags.components(separatedBy: CharacterSet(charactersIn: ",，")).map {$0.trimmingCharacters(in: .whitespacesAndNewlines)}.filter {!$0.isEmpty})).sorted().map(JSONValue.string))];if title != baseline?.text("title") {command["title"] = .string(title)};if description != baseline?.text("description") {command["description"] = .string(description)};sent = .object(["commandId": .string(commandId), "command": .object(command)])};try persist();guard generation == model.connectionGeneration else {throw CancellationError()};await model.execute(.missionsUpdate, params: sent!)} catch is CancellationError {} catch {issue = error.localizedDescription}
-    }
-}
