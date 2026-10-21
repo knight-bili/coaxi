@@ -26,6 +26,7 @@ struct RovaiForgeWorkspace: View {
             if let selected {
                 Section {Button("返回列表") {self.selected = nil;detail = nil;files = [];fileNext = 1}.disabled(busy);Text("#\(selected.forgeNumber) \(selected.text("title"))").font(.headline);MarkdownContent(raw: selected.forgeBody)}
                 if let detail {
+                    if let repository {Section {RovaiForgeMerge(model: model, threadId: threadId, accountId: account, number: selected.forgeNumber, repository: repository, detail: detail) {refreshRevision += 1}}}
                     Section {Text("\(detail.text("head_ref")) → \(detail.text("base_ref"))").font(.system(.caption, design: .monospaced));Text("\(detail.text("state")) · \(detail.text("head_sha").prefix(12))").font(.caption).foregroundStyle(Theme.textSecondary)}
                     Section("检查") {let checks = detail["checks"]
                         if checks?["available"]?.rvBool != true {Text("未能读取检查状态").foregroundStyle(Theme.textSecondary)}
