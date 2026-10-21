@@ -13,6 +13,7 @@ struct RovaiThreadControls: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Button("会话队员与队长") {managingMembers = true}
+            if let snapshot {RovaiExecutionMetrics(model: model, threadId: threadId, projection: snapshot)}
             ForEach((snapshot?["approvals"]?.rvArray ?? []).filter { $0.text("status") == "pending" }, id: \.self) { approval in
                 GlassRow { VStack(alignment: .leading, spacing: 10) {
                     Text("需要你的许可").font(.headline)
