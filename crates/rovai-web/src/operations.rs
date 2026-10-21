@@ -547,7 +547,7 @@ impl Operation {
             Self::WebdavSettings => select_fields(&value,&["revision","endpoint","username","passwordSet","allowInsecure"]),
             Self::HistoryLibrary => select_fields(&value,&["entries","digest","totalBytes","offset","next","bytes","saved"]),
             Self::OfficeWatch => select_fields(&value,&["holdId","port","cap","editable","released","installed","formats"]),
-            Self::ForgeOperation => select_fields(&value, &["provider", "webUrl", "ownerRepo", "repositoryKey", "repository", "success", "status", "data", "missionDraft", "nextPage"]),
+            Self::ForgeOperation => select_fields(&value, &["provider", "webUrl", "ownerRepo", "repositoryKey", "repository", "success", "status", "data", "missionDraft", "nextPage","totalCount","reachableCount","incomplete","sortSupported","retryAfter"]),
             Self::WorkbenchOrganizerGet | Self::WorkbenchOrganizerSet => select_fields(&value, &["value", "digest"]),
             Self::WorkbenchFilesList => select_fields(&value, &["entries", "next"]),
             Self::WorkbenchFilesRead => select_fields(&value, &["path", "text", "digest"]),

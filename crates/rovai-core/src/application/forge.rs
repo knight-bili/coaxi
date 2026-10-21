@@ -8,6 +8,8 @@ use sha2::{Digest, Sha256};
 use std::{fs, time::Duration};
 #[path="forge_envelope.rs"]
 mod envelope;
+#[path="forge_filters.rs"]
+mod filters;
 
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all="camelCase",deny_unknown_fields)]
@@ -25,6 +27,10 @@ struct ForgeRequest {
     #[serde(default)] number:Option<u64>,
     #[serde(default="first_page")] page:u32,
     #[serde(default)] state:Option<String>,
+    #[serde(default)] search:Option<String>,
+    #[serde(default)] labels:Vec<String>,
+    #[serde(default)] assigned_me:bool,
+    #[serde(default)] sort:Option<String>,
     #[serde(default)] title:Option<String>,
     #[serde(default)] body:Option<String>,
     #[serde(default)] head:Option<String>,
@@ -80,7 +86,8 @@ impl Core {
             ensure!(["http","https"].contains(&base.scheme())&&base.host_str().is_some()&&base.username().is_empty()&&base.password().is_none(),"forge.invalid_base_url");
             base.set_query(None);base.set_fragment(None);
             let previous=accounts.iter().find(|a|a.id==input.id);
-            let token=input.token.or_else(||previous.map(|a|a.token.clone())).unwrap_or_default();
+            let same_origin=previous.is_some_and(|account|account.provider==input.provider&&account.base_url==base.as_str().trim_end_matches('/'));
+            let token=input.token.or_else(||previous.filter(|_|same_origin).map(|a|a.token.clone())).unwrap_or_default();
             ensure!(!token.contains(['\0','\r','\n']),"forge.invalid_credential");
             accounts.retain(|a|a.id!=input.id);
             accounts.push(Account{id:input.id,provider:input.provider,base_url:base.as_str().trim_end_matches('/').into(),token});
@@ -132,14 +139,17 @@ impl Core {
         let pull=request.action.ends_with("pr")||request.action=="pulls";
         let comments=request.action.starts_with("comment_")||request.action.starts_with("comments_");
         let mission_draft=request.action.starts_with("mission_draft_");
-        ensure!(write||["issues","pulls","issue","pr","comments_issue","comments_pr","mission_draft_issue","mission_draft_pr"].contains(&request.action.as_str()),"forge.operation_not_admitted");
+        ensure!(write||["issues","pulls","issue","pr","comments_issue","comments_pr","mission_draft_issue","mission_draft_pr","labels"].contains(&request.action.as_str()),"forge.operation_not_admitted");
         let single=matches!(request.action.as_str(),"issue"|"pr"|"update_issue"|"update_pr")||comments||mission_draft;
         if single{ensure!(request.number.is_some_and(|n|n>0),"forge.item_number_required");}
-        let collection=if pull && !(comments&&repository.provider!="gitlab"){"pulls"}else{"issues"};
+        let listing=matches!(request.action.as_str(),"issues"|"pulls");
+        let client=reqwest::Client::builder().timeout(Duration::from_secs(45)).redirect(reqwest::redirect::Policy::none()).user_agent("Codeg-Rovai-Workbench").build()?;
+        let collection=if request.action=="labels"{"labels"}else if pull && !(comments&&repository.provider!="gitlab"){"pulls"}else{"issues"};
         let mut url=repository.endpoint(collection,if single{request.number}else{None},comments)?;
         if !write{url.query_pairs_mut().append_pair("page",&request.page.to_string()).append_pair("per_page","50");if let Some(state)=&request.state{ensure!(["open","closed","all","opened","merged"].contains(&state.as_str()),"forge.invalid_state");url.query_pairs_mut().append_pair("state",if repository.provider=="gitlab"&&state=="open"{"opened"}else{state});}}
+        if listing{url=filters::list_url(&repository,&request,&client).await?;}else if request.action=="labels"&&matches!(repository.provider.as_str(),"gitea"|"forgejo"){url.query_pairs_mut().append_pair("limit","50");}
         let mut body=serde_json::Map::new();
-        if let Some(title)=&request.title{body.insert("title".into(),json!(title));}
+        if let Some(title)=&request.title{body.insert("title".into(),json!(if repository.provider=="gitlab"&&request.action=="create_pr"&&request.draft&&!title.to_ascii_lowercase().starts_with("draft:"){format!("Draft: {title}")}else{title.clone()}));}
         if let Some(text)=&request.body{body.insert(if repository.provider=="gitlab"&&!comments{"description"}else{"body"}.into(),json!(text));}
         if let Some(state)=&request.state{if repository.provider=="gitlab"{ensure!(["open","closed"].contains(&state.as_str()),"forge.invalid_state");body.insert("state_event".into(),json!(if state=="open"{"reopen"}else{"close"}));}else{body.insert("state".into(),json!(state));}}
         if request.action=="create_pr"{
@@ -161,16 +171,19 @@ impl Core {
             if file.exists(){let saved:Value=serde_json::from_slice(&fs::read(&file)?)?;ensure!(saved["identity"]==identity,"forge.command_conflict");ensure!(saved["state"]=="finished","forge.write_unknown_check_remote");return Ok(saved["result"].clone())}
             crate::platform::private_storage::atomic_write_private_json(&file,&json!({"identity":identity,"state":"started"}))?;receipt=Some(file);
         }
-        let client=reqwest::Client::builder().timeout(Duration::from_secs(45)).redirect(reqwest::redirect::Policy::none()).user_agent("Codeg-Rovai-Workbench").build()?;
+
         let method=if !write{reqwest::Method::GET}else if request.action.starts_with("update_"){if repository.provider=="gitlab"{reqwest::Method::PUT}else{reqwest::Method::PATCH}}else{reqwest::Method::POST};
         let mut call=client.request(method,url).header("Accept","application/json");
-        if !repository.token.is_empty(){call=if repository.provider=="gitlab"{call.header("PRIVATE-TOKEN",&repository.token)}else if matches!(repository.provider.as_str(),"gitea"|"forgejo"){call.header("Authorization",format!("token {}",repository.token))}else{call.bearer_auth(&repository.token)};}
+        call=filters::authorize(&repository,call);
         if write{call=call.json(&body);}
         let mut response=call.send().await.context("forge.network_unavailable")?;
         let status=response.status();
+        let header_total=response.headers().get("x-total").or_else(||response.headers().get("x-total-count")).and_then(|value|value.to_str().ok()).and_then(|value|value.parse::<u64>().ok());let retry_after=response.headers().get("retry-after").and_then(|value|value.to_str().ok()).and_then(|value|value.parse::<u64>().ok());
         let next=response.headers().get("x-next-page").and_then(|v|v.to_str().ok()).is_some_and(|v|!v.is_empty())||response.headers().get("link").and_then(|v|v.to_str().ok()).is_some_and(|v|v.contains("rel=\"next\""));
         let mut bytes=Vec::new();while let Some(chunk)=response.chunk().await?{ensure!(bytes.len()+chunk.len()<=16*1024*1024,"forge.response_too_large");bytes.extend_from_slice(&chunk);}
-        let data=if status.is_success()&&!bytes.is_empty(){serde_json::from_slice::<Value>(&bytes).context("forge.invalid_response")?}else{Value::Null};
+        let mut data=if status.is_success()&&!bytes.is_empty(){serde_json::from_slice::<Value>(&bytes).context("forge.invalid_response")?}else{Value::Null};
+        let mut next=next;let mut total=header_total;let mut incomplete=false;let mut reachable=None;
+        if listing&&repository.provider=="github"&&status.is_success(){total=data["total_count"].as_u64();incomplete=data["incomplete_results"].as_bool().unwrap_or(false);reachable=total.filter(|total|*total>1000).map(|_|1000u64);next=total.is_some_and(|total|(request.page as u64)*50<total.min(1000));data=data["items"].take();}
         let draft=if mission_draft&&status.is_success(){
             let number=request.number.context("forge.item_number_required")?;
             let route=if repository.provider=="gitlab"{if pull{"-/merge_requests"}else{"-/issues"}}else if pull{"pull"}else{"issues"};
@@ -179,7 +192,7 @@ impl Core {
             let snapshot=envelope::ForgeSnapshot{title:title.clone(),body:data["body"].as_str().or_else(||data["description"].as_str()).map(String::from),labels:Vec::new(),author:data.pointer("/user/login").or_else(||data.pointer("/author/username")).and_then(Value::as_str).map(String::from)};
             Some(json!({"title":format!("#{} {}",number,title),"description":format!("来源：{}\n{}",url,envelope::forge_untrusted_envelope(&repository.provider,&snapshot)),"sourceUrl":url,"sourceKey":format!("{}:{}:{}:{}:{}",repository.provider,repository.web_base,repository.owner_repo,if pull{"pr"}else{"issue"},number)}))
         }else{None};
-        let result=json!({"repository":repository.metadata(),"success":status.is_success(),"status":status.as_u16(),"data":data,"missionDraft":draft,"nextPage":if next{Some(request.page+1)}else{None}});
+        let result=json!({"repository":repository.metadata(),"success":status.is_success(),"status":status.as_u16(),"data":data,"missionDraft":draft,"totalCount":total,"reachableCount":reachable,"incomplete":incomplete,"sortSupported":matches!(repository.provider.as_str(),"github"|"gitlab"),"retryAfter":retry_after,"nextPage":if next{Some(request.page+1)}else{None}});
         if let Some(receipt)=receipt{crate::platform::private_storage::atomic_write_private_json(&receipt,&json!({"identity":identity,"state":"finished","result":result}))?;}
         Ok(result)
     }
