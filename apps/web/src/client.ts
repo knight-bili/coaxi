@@ -340,8 +340,8 @@ type SessionResponse = { protocolVersion?: unknown; token?: unknown; clientId?: 
 
 export class ConsoleClient {
   readonly origin: string
-  #channels: 'desktop' | 'unsupported' = 'unsupported'
-  get channels(): 'desktop' | 'unsupported' { return this.#channels }
+  #channels: 'desktop' | 'server' | 'unsupported' = 'unsupported'
+  get channels(): 'desktop' | 'server' | 'unsupported' { return this.#channels }
   #token: string | null = null
   #authStorage?: AuthStorage
   #now: () => number
@@ -542,7 +542,7 @@ export class ConsoleClient {
     this.#acceptTiming(session)
     this.#editor = { clientId: session.clientId, proof: session.editorProof }
     this.#ownerId = session.ownerId
-    this.#channels = session.channels === 'desktop' ? 'desktop' : 'unsupported'
+    this.#channels = session.channels === 'desktop' ? 'desktop' : session.channels === 'server' ? 'server' : 'unsupported'
     this.#privateUploadRecoveryVersion = session.privateUploadRecoveryVersion === 1 ? 1 : 0
     this.#privateUploadLifecycleVersion = session.privateUploadLifecycleVersion === 1 ? 1 : 0
     this.#token = session.token
@@ -907,7 +907,7 @@ export class ConsoleClient {
     return body.result
   }
 
-  async channel(request: { operation: 'get' | 'publish' | 'retry' | 'selectApprover'; kind?: ChannelKind; agentId?: string; userId?: string }): Promise<ChannelSettingsSnapshot> {
+  async channel(request: { operation: 'get' | 'publish' | 'retry' | 'selectApprover' | 'connect' | 'disconnect' | 'cancelLogin' | 'refreshLogin'; attemptId?: string; kind?: ChannelKind; agentId?: string; userId?: string }): Promise<ChannelSettingsSnapshot> {
     try {
       const reply = await this.#json<{ result: ChannelSettingsSnapshot }>('channels', { method: 'POST', body: JSON.stringify(request) })
       return reply.result
@@ -918,7 +918,7 @@ export class ConsoleClient {
         : error.code === 'channel_native_interaction'
           ? '此步骤需要原生页面，请在运行此服务的 Rovai Desktop 中完成后返回。'
           : error.code === 'channels_unsupported'
-            ? '独立 Server 当前不支持飞书／钉钉渠道。渠道功能请使用 Rovai Desktop。'
+            ? '此宿主未安装匹配的渠道组件，请补齐 Server 安装包后重试。'
             : error.code === 'channel_capacity'
               ? '渠道操作较多，请稍后重新读取状态。'
               : '渠道操作结果暂时无法确认。请重新读取发布状态，再继续原发布流程。'

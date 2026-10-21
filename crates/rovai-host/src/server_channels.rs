@@ -91,6 +91,7 @@ fn checked_asset(root:&Path,entry:&Value,limit:u64)->Result<PathBuf>{
     let digest=format!("{:x}",Sha256::digest(std::fs::read(&target)?));ensure!(entry["sha256"].as_str()==Some(digest.as_str()),"channel_asset_digest_mismatch");Ok(target)
 }
 impl ChannelHost for ServerChannels{
+    fn deployment(&self)->&'static str{"server"}
     fn call(&self,request:ChannelRequest)->ChannelFuture<'_>{Box::pin(async move{
         self.start().await.map_err(|_|"channel_host_unavailable")?;
         let response=self.exchange(json!({"request":request}),Duration::from_secs(60)).await.map_err(|_|"channel_result_unavailable")?;

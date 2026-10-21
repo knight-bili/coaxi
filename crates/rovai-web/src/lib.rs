@@ -448,7 +448,7 @@ async fn finish_login(
     match result {
         Ok((token, session)) => {
             let mut response = state.sessions.timing(&session);
-            response.as_object_mut().expect("session timing").extend(json!({"protocolVersion":HOST_WEB_PROTOCOL_VERSION,"token":token,"clientId":session.client_id,"editorProof":identity["proof"],"ownerId":identity["ownerId"],"epoch":state.epoch,"privateUploadRecoveryVersion":1,"privateUploadLifecycleVersion":1,"channels":if state.channels.is_some() { "desktop" } else { "unsupported" }}).as_object().expect("session response").clone());
+            response.as_object_mut().expect("session timing").extend(json!({"protocolVersion":HOST_WEB_PROTOCOL_VERSION,"token":token,"clientId":session.client_id,"editorProof":identity["proof"],"ownerId":identity["ownerId"],"epoch":state.epoch,"privateUploadRecoveryVersion":1,"privateUploadLifecycleVersion":1,"channels":state.channels.as_ref().map(|host|host.deployment()).unwrap_or("unsupported")}).as_object().expect("session response").clone());
             Json(response).into_response()
         }
         Err(failure) if ticket => ticket_failure(failure),
@@ -592,7 +592,7 @@ async fn renew_session(
 
 async fn capabilities(State(state): State<WebState>) -> Json<Value> {
     Json(
-        json!({"protocolVersion":HOST_WEB_PROTOCOL_VERSION,"epoch":state.epoch,"read":true,"composer":true,"uploads":true,"approval":true,"nativeFilePicker":false,"desktopWindow":false,"releaseQualified":false,"channels":if state.channels.is_some() { "desktop" } else { "unsupported" }}),
+        json!({"protocolVersion":HOST_WEB_PROTOCOL_VERSION,"epoch":state.epoch,"read":true,"composer":true,"uploads":true,"approval":true,"nativeFilePicker":false,"desktopWindow":false,"releaseQualified":false,"channels":state.channels.as_ref().map(|host|host.deployment()).unwrap_or("unsupported")}),
     )
 }
 

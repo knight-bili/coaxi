@@ -23,6 +23,7 @@ const pipe=new ChannelCorePipe(async frame=>{
   const request=frame.request as Record<string,unknown>|undefined
   if(!request)throw new Error('channel_request_invalid')
   const parsed=parseHostChannelRequest(request)
+  if(parsed?.operation==='get')return {result:present(await service.get()),error:null}
   if(parsed)return createHostChannelHandler(service)(parsed)
   const kind=request.kind as ChannelKind
   if(!['feishu','lark','dingtalk'].includes(kind)&&!['cancelLogin','refreshLogin'].includes(String(request.operation)))throw new Error('channel_request_invalid')

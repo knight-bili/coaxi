@@ -26,11 +26,22 @@ export function createThreadAdapter(transport: ConsoleClient, selectWorkspaceDir
   const preparations = transport.supportsPrivateUploadRecovery ? transport.privateUploadPreparations(editingRecovery) : null
   const unimplemented = async (): Promise<never> => { throw new Error('此操作的 Web 适配尚未接通。') }
   const channelAdapter: NonNullable<ThreadClient['channels']> = {
-    native: null,
+    native: transport.channels === 'server' ? {
+      connect: (kind = 'feishu') => transport.channel({ operation: 'connect', kind }),
+      disconnect: (kind = 'feishu') => transport.channel({ operation: 'disconnect', kind }),
+      cancelQrAttempt: attemptId => transport.channel({ operation: 'cancelLogin', attemptId }),
+      refreshLoginQr: async attemptId => { await transport.channel({ operation: 'refreshLogin', attemptId }) }
+    } : null,
     get: () => transport.channel({ operation: 'get' }),
     // Main-owned channel progress is read by the mounted shared page, including
     // steps that do not emit Core events. Polling never owns publication work.
-    onChanged: () => () => undefined,
+    onChanged: listener => {
+      if (transport.channels !== 'server') return () => undefined
+      let stopped = false, busy = false
+      const read = async (): Promise<void> => { if (stopped || busy || document.visibilityState === 'hidden') return; busy = true; try { const value = await transport.channel({ operation: 'get' }); if (!stopped) listener(value) } catch { /* The mounted page presents explicit read failures. */ } finally { busy = false } }
+      const timer = setInterval(() => void read(), 2000)
+      return () => { stopped = true; clearInterval(timer) }
+    },
     publishMemberBot: (agentId, kind = 'feishu') => transport.channel({ operation: 'publish', agentId, kind }),
     retryMemberBot: (agentId, kind = 'feishu') => transport.channel({ operation: 'retry', agentId, kind }),
     selectPublicationApprover: (agentId, userId, kind = 'feishu') => transport.channel({ operation: 'selectApprover', agentId, userId, kind })
@@ -59,7 +70,7 @@ export function createThreadAdapter(transport: ConsoleClient, selectWorkspaceDir
     selectSkillImportDirectory: async () => (await selectWorkspaceDirectory())?.projectPath ?? null,
     selectRuntimeExecutable: null,
     revealMcpConfig: null,
-    get channels() { return transport.channels === 'desktop' ? channelAdapter : null },
+    get channels() { return transport.channels !== 'unsupported' ? channelAdapter : null },
     request: <T,>(method: CoreMethod, params?: unknown): Promise<T> => {
       if (!(WEB_OPERATIONS as readonly string[]).includes(method)) return Promise.reject(new Error(`尚未开放此 Web 操作：${method}`))
       return transport.request<T>(method as WebOperation, params)

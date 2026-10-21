@@ -67,6 +67,7 @@ impl ChannelRequest {
 pub type ChannelReply = Result<Value, &'static str>;
 pub type ChannelFuture<'a> = Pin<Box<dyn Future<Output = ChannelReply> + Send + 'a>>;
 pub trait ChannelHost: Send + Sync {
+    fn deployment(&self) -> &'static str { "desktop" }
     fn call(&self, request: ChannelRequest) -> ChannelFuture<'_>;
 }
 
