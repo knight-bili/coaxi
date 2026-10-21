@@ -1,5 +1,6 @@
 mod desktop_channels;
 mod server_channels;
+mod transport_channels;
 mod backup;
 mod lifecycle;
 mod server;
@@ -220,6 +221,8 @@ fn run(
         .context("failed to create Host Tokio runtime")?;
     let result = runtime.block_on(async {
         if desktop {
+            let startup_core = core.clone(); let startup_control = control.clone();
+            tokio::spawn(async move { if startup_core.wait_ready().await.is_ok() { startup_control.start_transport_adapters().await; } });
             let result = runner.with_desktop_stdio(control.clone()).run().await;
             control.shutdown().await;
             return result;
@@ -238,6 +241,7 @@ fn run(
                 result
             },
             async {
+                control.start_transport_adapters().await;
                 if let Some((config, token)) = web {
                     let status = control.start(config, &token).await?;
                     tracing::info!(

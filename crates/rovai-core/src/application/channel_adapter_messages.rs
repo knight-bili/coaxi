@@ -35,7 +35,7 @@ impl Core{
                 Ok(accepted)=>Ok(crate::command::CommandHandlerResult::applied("channel.adapter.admitted",json!({"adapterId":config.id,"threadId":binding.thread_id,"messageId":accepted.camp_message_id,"senderId":input.sender_id,"externalId":input.external_id,"target":input.target}),Some(crate::command::EntityReference{entity_type:"camp_message".into(),entity_id:accepted.camp_message_id}))),
             }
         })?;
-        drop(database);emit(&self.output,"thread.changed",json!({"threadId":binding.thread_id,"reason":"channel_adapter_message"}));Ok(serde_json::to_value(result.result)?)
+        drop(database);self.execution_wake.execution_changed();emit(&self.output,"thread.changed",json!({"threadId":binding.thread_id,"reason":"channel_adapter_message"}));Ok(serde_json::to_value(result.result)?)
     }
 
     pub(super) async fn channel_adapter_outbox(&self,value:Value)->Result<Value>{
@@ -50,6 +50,7 @@ impl Core{
             for (sequence,payload)in &receipts{
                 let source:Value=serde_json::from_str(payload)?;let Some(config)=adapters.iter().find(|config|config.enabled&&source["adapterId"]==config.id)else{last=*sequence;continue};
                 if !config.allowed_senders.iter().any(|sender|source["senderId"]==sender.as_str()){last=*sequence;continue}
+                let target=&source["target"];let chat=target["chat_id"].as_str().unwrap_or(&config.chat_id);let thread_key=target["thread_key"].as_str();if !config.bindings.iter().any(|binding|source["threadId"]==binding.thread_id&&binding.chat_id==chat&&binding.thread_key.as_deref()==thread_key){last=*sequence;continue}
                 let message=source["messageId"].as_str().context("channel_adapter.invalid_source")?;
                 let mut query=database.connection().prepare("SELECT ar.id,ar.status,cm.id,cm.body FROM agent_run_input ari JOIN agent_run ar ON ar.id=ari.agent_run_id LEFT JOIN camp_message cm ON cm.id=ar.final_camp_message_id AND cm.tombstoned_at IS NULL WHERE ari.message_id=?1 ORDER BY ar.created_at,ar.id")?;
                 let runs=query.query_map([message],|row|Ok((row.get::<_,String>(0)?,row.get::<_,String>(1)?,row.get::<_,Option<String>>(2)?,row.get::<_,Option<String>>(3)?)))?.collect::<std::result::Result<Vec<_>,_>>()?;

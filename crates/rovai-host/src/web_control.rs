@@ -21,6 +21,7 @@ pub struct WebControl {
     channels: Option<Arc<crate::desktop_channels::DesktopChannels>>,
     updates: Option<Arc<dyn rovai_web::UpdateHost>>,
     standalone_channels: Option<Arc<crate::server_channels::ServerChannels>>,
+    transport_channels: Arc<crate::transport_channels::TransportChannels>,
     state: Mutex<WebControlState>,
 }
 
@@ -35,6 +36,7 @@ impl WebControl {
             channels: desktop
                 .then(|| Arc::new(crate::desktop_channels::DesktopChannels::new(core.clone()))),
             standalone_channels: (!desktop).then(|| Arc::new(crate::server_channels::ServerChannels::new(core.clone()))),
+            transport_channels: Arc::new(crate::transport_channels::TransportChannels::new(core.clone(), data_dir.clone())),
             core,
             data_dir,
             updates,
@@ -43,6 +45,10 @@ impl WebControl {
                 sessions: None,
             }),
         })
+    }
+
+    pub async fn start_transport_adapters(&self) {
+        if self.transport_channels.start().await.is_err() { tracing::warn!("Transport channel inbox is unavailable"); }
     }
 
     pub async fn start(&self, config: WebConfig, token: &str) -> anyhow::Result<Value> {
@@ -72,6 +78,7 @@ impl WebControl {
             server.shutdown().await;
         }
         drop(state);
+        self.transport_channels.shutdown().await;
         if let Some(channels) = &self.standalone_channels { channels.shutdown().await; }
     }
 
