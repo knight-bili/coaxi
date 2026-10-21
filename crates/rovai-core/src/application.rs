@@ -28,6 +28,7 @@ mod forge;
 mod forge_links;
 mod channel_adapters;
 mod channel_adapter_messages;
+mod channel_adapter_commands;
 mod channel_adapter_status;
 mod extension_catalog;
 pub(crate) mod private_composer;

@@ -1,7 +1,7 @@
 //! Original Telegram/Weixin transports; Core remains the message/run owner.
 use anyhow::{Context,Result,ensure};
 use rovai_core::{application::CoreService,platform::{atomic_write_private_bytes,open_private_read_file,prepare_private_directory}};
-use rovai_channels::{ChatChannelBackend,TelegramBackend,WeixinBackend,IncomingCommand,RichMessage,ChannelMessageTarget};
+use rovai_channels::{ChatChannelBackend,TelegramBackend,WeixinBackend,IncomingCommand,RichMessage,ChannelMessageTarget,InteractiveMessage,MessageButton,ButtonStyle};
 use serde::Deserialize;
 use serde_json::{Value,json};
 use sha2::{Digest,Sha256};
@@ -29,7 +29,7 @@ impl TransportChannels{
                     if !config.allowed_senders.contains(&message.sender_id){if let Some(durable)=durable{let _=durable.send(());}continue}
                     let external=message.metadata.get("update_id").or_else(||message.metadata.get("message_id")).or_else(||message.metadata.get("msg_id")).map(|value|value.to_string()).unwrap_or_else(||format!("metadata:{:x}",Sha256::digest(serde_json::to_vec(&message.metadata).unwrap_or_default())));
                     let key=format!("{:x}",Sha256::digest(format!("{}\0{}\0{}",config.id,message.sender_id,external).as_bytes()));
-                    let entry=json!({"params":{"adapterId":config.id,"expectedRevision":revision,"externalId":external,"senderId":message.sender_id,"text":message.command_text,"target":message.target},"callbackData":message.callback_data});
+                    let entry=json!({"params":{"adapterId":config.id,"expectedRevision":revision,"externalId":external,"senderId":message.sender_id,"text":message.command_text,"target":message.target,"callbackData":message.callback_data}});
                     let path=directory.join(format!("{key}.json"));let bytes=match serde_json::to_vec(&entry){Ok(bytes)if bytes.len()<=1024*1024=>bytes,_=>continue};
                     // A full/unwritable inbox withholds acknowledgment, so the
                     // receiver does not advance the provider's polling cursor.
@@ -46,9 +46,9 @@ impl TransportChannels{
                             }
                         }
                     }
-                    let mut files=std::fs::read_dir(&directory).into_iter().flatten().filter_map(|entry|entry.ok()).map(|entry|entry.path()).filter(|path|path.extension().is_some_and(|extension|extension=="json")).collect::<Vec<_>>();files.sort();
+                    let mut files=std::fs::read_dir(&directory).into_iter().flatten().filter_map(|entry|entry.ok()).map(|entry|entry.path()).filter(|path|path.extension().is_some_and(|extension|extension=="json"||extension=="callback-pending")).collect::<Vec<_>>();files.sort();
                     if !files.is_empty(){let count=files.len();for offset in 0..count.min(32){let path=&files[(inbox_after+offset)%count];let result=(||->Result<Value>{let mut file=open_private_read_file(path)?;let mut bytes=Vec::new();(&mut file).take(1024*1024+1).read_to_end(&mut bytes)?;ensure!(bytes.len()<=1024*1024,"channel_inbox_too_large");Ok(serde_json::from_slice(&bytes)?)})();
-                            if let Ok(entry)=result{if !entry["callbackData"].is_null(){let _=std::fs::rename(path,path.with_extension("callback-pending"));continue}
+                            if let Ok(mut entry)=result{if !entry["callbackData"].is_null(){entry["params"]["callbackData"]=entry["callbackData"].take();}
                                 if let Ok(receipt)=call(&core,"channels.adapters.inbound",entry["params"].clone()).await{match receipt["status"].as_str(){Some("applied"|"accepted")=>{let _=std::fs::remove_file(path);},Some("rejected")=>{let _=std::fs::rename(path,path.with_extension("rejected"));},_=>{}}}
                             }
                         }inbox_after=(inbox_after+32)%count;
@@ -65,7 +65,8 @@ impl TransportChannels{
                             let data=&output["data"];let Some((_,backend))=backends.values().find(|(id,_)|data["adapterId"]==id.as_str())else{continue};
                             let Ok(target)=serde_json::from_value::<ChannelMessageTarget>(data["target"].clone())else{continue};let Some(body)=data["body"].as_str()else{continue};
                             let id=&output["id"];let digest=&output["digest"];let Ok(claim)=call(&core,"channels.adapters.outbox",json!({"operation":"claim","id":id,"expectedDigest":digest})).await else{continue};if claim["claimed"]!=true{continue}
-                            let sent=tokio::time::timeout(Duration::from_secs(50),backend.send_rich_message_to(&RichMessage::info(body),&target)).await;
+                            let buttons=data["buttons"].as_array().map(|rows|rows.iter().filter_map(|row|Some(MessageButton{id:row["id"].as_str()?.into(),label:row["label"].as_str()?.into(),style:ButtonStyle::Default})).collect::<Vec<_>>()).unwrap_or_default();
+                            let message=RichMessage::info(body);let sent=tokio::time::timeout(Duration::from_secs(50),async{if buttons.is_empty(){backend.send_rich_message_to(&message,&target).await}else{backend.send_interactive_message_to(&InteractiveMessage{base:message,buttons,callback_context:json!({"adapterId":data["adapterId"]})},&target).await}}).await;
                             let (state,remote)=match sent{Ok(Ok(id))=>("sent",Some(id.0)),_=>("unknown",None)};
                             let _=call(&core,"channels.adapters.outbox",json!({"operation":"finish","id":id,"expectedDigest":digest,"result":state,"remoteId":remote})).await;
                         }}
