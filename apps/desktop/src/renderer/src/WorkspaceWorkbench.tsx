@@ -9,6 +9,7 @@ import { newCommandId } from '../../shared/command-id'
 import { FileTree, FileTreeFile, FileTreeFolder } from './codeg-workbench/file-tree'
 import {WorkspaceFileMenu,WorkspaceFileActionDialog,WorkspaceFileSearch,WorkspaceTrash,type FileAction} from './WorkspaceFileTools'
 import { WorkspaceCodeEditor } from './WorkspaceCodeEditor'
+import {WorkspaceGitViews} from './WorkspaceGitViews'
 import { WorkspaceMergeEditor } from './WorkspaceMergeEditor'
 import { WorkspaceOrganizer } from './WorkspaceOrganizer'
 import { ForgeWorkbench } from './ForgeWorkbench'
@@ -25,7 +26,7 @@ type Document = { path: string; text: string; saved: string; digest: string | nu
 type GitResult = { success: boolean; exitCode: number | null; output: string; error: string }
 const gitActions = {
   stage: '暂存文件', unstage: '取消暂存', commit: '提交暂存内容', stash_save: '保存到 Stash', stash_apply: '应用 Stash', stash_pop: '取出 Stash', stash_drop: '删除 Stash',
-  branch_create: '新建分支', checkout: '切换分支', reset: '重置历史', merge: '合并分支', rebase: '变基', merge_continue: '继续合并', merge_abort: '中止合并',
+  clone:'克隆到子目录',worktree_add:'创建独立工作目录',worktree_remove:'移除托管工作目录',branch_delete:'删除已合并分支',branch_rename:'重命名分支',tag_create:'创建标签',tag_delete:'删除标签',discard:'放弃指定工作区改动',branch_create: '新建分支', checkout: '切换分支', reset: '重置历史', merge: '合并分支', rebase: '变基', merge_continue: '继续合并', merge_abort: '中止合并',
   rebase_continue: '继续变基', rebase_abort: '中止变基', cherry_pick: '拣选提交', cherry_pick_continue: '继续拣选', cherry_pick_abort: '中止拣选', revert: '撤销提交',
   fetch: '获取远程更新', pull: '拉取远程更新', push: '推送', remote_add: '添加远程仓库', remote_remove: '移除远程仓库', clean: '清理指定未跟踪文件', init: '初始化 Git',
 } as const
@@ -44,12 +45,13 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
   const [documents, setDocuments] = useState<Document[]>([]), [selected, setSelected] = useState<string | null>(null)
   const [busy, setBusy] = useState(false), [error, setError] = useState<string | null>(null), epoch = useRef(0)
   const [creation, setCreation] = useState<'file' | 'directory' | 'rename' | null>(null), [name, setName] = useState('')
+  const [gitDirty,setGitDirty]=useState(false),[gitVersion,setGitVersion]=useState(0)
   const [gitView, setGitView] = useState('status'), [gitResult, setGitResult] = useState<GitResult | null>(null)
   const [action, setAction] = useState<keyof typeof gitActions>('stage'), [target, setTarget] = useState(''), [paths, setPaths] = useState('')
   const [remote, setRemote] = useState('origin'), [message, setMessage] = useState(''), [mode, setMode] = useState('mixed')
   const [preview, setPreview] = useState<{ request: Record<string, unknown>; revision: string; arguments: string[]; cleanPreview: string | null } | null>(null)
   const [merge, setMerge] = useState<{path:string;base:string;ours:string;theirs:string;merged:string}|null>(null)
-  const dirty = organizerDirty || forgeDirty || documents.some(document => document.text !== document.saved)
+  const dirty = organizerDirty || forgeDirty || gitDirty || documents.some(document => document.text !== document.saved)
   const current = documents.find(document => document.path === selected)
   const guard = useCallback(() => { if (busy) throw new Error(t('工程操作仍在进行，请稍后离开。')); if (dirty) throw new Error(t('工程文件尚未保存，请先保存或关闭对应标签。')) }, [busy, dirty, t])
   useEffect(() => { bindLeaveGuard(guard); return () => bindLeaveGuard(null) }, [bindLeaveGuard, guard])
@@ -125,6 +127,7 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
       setCreation(null); await loadDirectory('')
     })
   }
+  const prepareGitAction=(action:string,options:Record<string,unknown>):void=>{void operation(async()=>{const request={scope,action,paths:[],remote:'origin',...options};const value=await client.request<{revision:string;arguments:string[];cleanPreview:string|null}>('workbench.git.preview',request);setPreview({...value,request:{...request,commandId:newCommandId()}})})}
   const openMerge = async (): Promise<void> => {
     if(!current)return
     const document=current
@@ -174,16 +177,16 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
                 <div className="workbench-editors">{documents.map(document=><div key={document.path} className="workbench-document" hidden={document.path!==selected}><WorkspaceCodeEditor path={document.path} text={document.text} visible={document.path===selected} line={document.path===selected?cursorLine:undefined} onSave={()=>void save()} onChange={text=>setDocuments(previous=>previous.map(item=>item.path===document.path?{...item,text}:item))} /></div>)}</div>
               </> : <div className="workbench-empty">{t('从文件树打开文件')}</div>}
             </div> : <div className="workbench-git">
-              <div className="workbench-toolbar"><select aria-label={t('Git 视图')} value={gitView} onChange={event => {setGitView(event.target.value);void readGit(event.target.value)}}>{Object.entries({status:'变更',diff:'工作区 Diff',diff_staged:'暂存 Diff',log:'历史',branches:'分支',stash:'Stash',remotes:'远程',worktrees:'Worktree',conflicts:'冲突'}).map(([value,label]) => <option key={value} value={value}>{t(label)}</option>)}</select><button type="button" disabled={busy} onClick={() => void readGit()}>{t('刷新')}</button></div>
-              {gitResult && (gitView==='diff'||gitView==='diff_staged') && gitResult.success ? <div className="workbench-git-output"><UnifiedDiffPreview diffText={gitResult.output} clickableFilePath={false} /></div> : <pre className="workbench-git-output">{gitResult ? `${gitResult.output.replaceAll('\0','\n').replaceAll('\x1e','\n')}\n${gitResult.error}` : t('选择 Git 视图')}</pre>}
-              <div className="workbench-git-actions"><select aria-label={t('Git 操作')} value={action} onChange={event => setAction(event.target.value as keyof typeof gitActions)}>{Object.entries(gitActions).map(([value,label]) => <option key={value} value={value}>{t(label)}</option>)}</select>
+              <div className="workbench-toolbar"><select aria-label={t('Git 视图')} value={gitView} onChange={event => {setGitView(event.target.value);void readGit(event.target.value)}}>{Object.entries({status:'变更',diff:'工作区 Diff',diff_staged:'暂存 Diff',log:'历史',branches:'分支',stash:'Stash',remotes:'远程',worktrees:'Worktree',conflicts:'冲突',tags:'标签',reflog:'引用历史'}).map(([value,label]) => <option key={value} value={value}>{t(label)}</option>)}</select><button type="button" disabled={busy} onClick={() => void readGit()}>{t('刷新')}</button></div>
+              {gitResult && (gitView==='diff'||gitView==='diff_staged') && gitResult.success ? <div className="workbench-git-output"><UnifiedDiffPreview diffText={gitResult.output} clickableFilePath={false} /></div> : gitResult?<WorkspaceGitViews key={gitVersion} threadId={threadId} view={gitView} result={gitResult} disabled={busy} onAction={prepareGitAction} onDirtyChange={setGitDirty} onOpenFile={path=>{if(!gitDirty)void openFile(path)}}/>:<div className="workbench-empty">{t('选择 Git 视图')}</div>}
+              <details className="workbench-git-advanced"><summary>{t('更多 Git 操作')}</summary><div className="workbench-git-actions"><select aria-label={t('Git 操作')} value={action} onChange={event => setAction(event.target.value as keyof typeof gitActions)}>{Object.entries(gitActions).map(([value,label]) => <option key={value} value={value}>{t(label)}</option>)}</select>
                 <input aria-label={t('目标分支、提交或 Stash')} placeholder={t('目标分支、提交或 Stash')} value={target} onChange={event => setTarget(event.target.value)} />
                 <input aria-label={t('远程名称')} value={remote} onChange={event => setRemote(event.target.value)} />
                 {action === 'reset' && <select aria-label={t('重置方式')} value={mode} onChange={event => setMode(event.target.value)}><option value="soft">Soft</option><option value="mixed">Mixed</option><option value="hard">Hard</option></select>}
                 <textarea aria-label={t('文件路径，每行一个')} placeholder={t('文件路径，每行一个')} value={paths} onChange={event => setPaths(event.target.value)} />
-                {(action === 'commit' || action === 'stash_save') && <textarea aria-label={t('说明')} value={message} onChange={event => setMessage(event.target.value)} />}
+                {(action === 'commit' || action === 'stash_save' || action==='branch_rename') && <textarea aria-label={t('说明')} value={message} onChange={event => setMessage(event.target.value)} />}
                 <button type="button" disabled={busy} onClick={() => void operation(async () => { const request = {scope,action,paths:paths.split('\n').map(path=>path.trim()).filter(Boolean),...(target?{target}:{}),remote,message,mode}; const value=await client.request<{revision:string;arguments:string[];cleanPreview:string|null}>('workbench.git.preview',request);setPreview({...value,request:{...request,commandId:newCommandId()}}) })}>{t('预览操作')}</button>
-              </div>
+              </div></details>
             </div>}
           </Panel>
         </PanelGroup>
@@ -197,7 +200,7 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
     }}/>}
     <Dialog.Root open={preview !== null} onOpenChange={next => {if(!next && !busy)setPreview(null)}}><Dialog.Portal><Dialog.Overlay className="dialog-overlay" /><AppDialogContent tone="attention"><AppDialogHeader title={t('确认 Git 操作')} description={t('仅对当前预览的工程状态执行；工程变化时需重新预览。')} closeDisabled={busy} />
       <pre className="workbench-confirm">{preview?.arguments.join(' ')}{preview?.cleanPreview ? `\n${preview.cleanPreview}` : ''}</pre>
-      <button type="button" disabled={busy} onClick={() => void operation(async () => { if(!preview)return; const result=await client.request<GitResult>('workbench.git.execute',{...preview.request,expectedRevision:preview.revision,confirmed:true});setGitResult(result);setPreview(null); if(!result.success)setError(result.error) })}>{t('确认执行')}</button>
+      <button type="button" disabled={busy} onClick={() => void operation(async () => { if(!preview)return; const result=await client.request<GitResult>('workbench.git.execute',{...preview.request,expectedRevision:preview.revision,confirmed:true});setGitResult(result);setPreview(null);if(result.success){if(preview.request.action==='commit'){setGitVersion(value=>value+1);setGitDirty(false);setMessage('')}const fresh=await client.request<GitResult>('workbench.git.read',{scope,action:gitView});setGitResult(fresh)}else setError(result.error) })}>{t('确认执行')}</button>
     </AppDialogContent></Dialog.Portal></Dialog.Root>
   </>
 }
