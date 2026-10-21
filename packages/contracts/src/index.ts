@@ -3894,7 +3894,7 @@ export interface SkillPackEntry {
   needsEnv: boolean
   sourcePath: string
   sourceUrl: string
-  contentSource: 'embedded' | 'officecli'
+  contentSource: 'embedded' | 'officecli' | 'custom'
   requiredCapability: 'officecli' | 'generative_ui_renderer' | null
   loadId: string | null
 }
@@ -4826,6 +4826,8 @@ export type CoreMethod =
   | 'skills.list'
   | 'skills.get'
   | 'toolbox.list'
+  | 'skillPacks.custom.prepare'
+  | 'skillPacks.custom.install'
   | 'skillPacks.office.prepare'
   | 'skillPacks.office.install'
   | 'skillPacks.list'
@@ -5127,6 +5129,7 @@ export interface BrowserWorkspaceApi {
 export interface BrowserWorkspaceView { id:string; threadId:string;url:string;title:string;level:'none'|'read'|'control';expiresAt:number|null;loading:boolean;error:string|null }
 
 export interface RovaiApi {
+  nativeCustomSkills?: {importDirectory<T>(input:{skillId:string;expectedRevision?:string}):Promise<T|null>}
   /** Native local owner surface; intentionally absent from remote Web. */
   nativePets?: { importDirectory():Promise<unknown|null>;synchronize():Promise<void>;onChanged(listener:()=>void):()=>void }
   webdavWorkspace?: {request<T>(input:{operation:'probe'|'create_collection'|'list'|'push'|'pull'|'status';expectedRevision:string;commandId?:string;snapshotId?:string;expectedDigest?:string}):Promise<T|null>}

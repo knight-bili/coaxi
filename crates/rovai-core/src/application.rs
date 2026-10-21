@@ -20,6 +20,7 @@ mod webdav_access;
 mod appearance_extensions;
 mod pets_access;
 mod office_skills;
+mod custom_skills;
 mod forge;
 pub(crate) mod private_composer;
 mod private_sources;
@@ -9522,17 +9523,13 @@ impl Core {
                 let database = self.database.lock().await;
                 Ok(serde_json::to_value(self.skill_library.list(&database)?)?)
             }
+            "skillPacks.custom.prepare" => self.custom_skill_prepare(request.params.clone()).await,
+            "skillPacks.custom.install" => self.custom_skill_install(request.params.clone()).await,
+            "skillPacks.custom.local" => self.custom_skill_local(request.params.clone()).await,
             "skillPacks.office.prepare" => self.office_skill_prepare(request.params.clone()).await,
             "skillPacks.office.install" => self.office_skill_install(request.params.clone()).await,
-            "skillPacks.list" => Ok(serde_json::to_value(
-                rovai_core::codeg_skill_catalog::list()?,
-            )?),
-            "skillPacks.read" => {
-                let params = serde_json::from_value(request.params.clone())?;
-                Ok(serde_json::to_value(
-                    rovai_core::codeg_skill_catalog::read(&params)?,
-                )?)
-            }
+            "skillPacks.list" => self.skill_pack_catalog(),
+            "skillPacks.read" => self.skill_pack_read(request.params.clone()),
             "skillPacks.installations.list" => {
                 let store =
                     rovai_core::skill_pack_installation::SkillPackStore::new(&self.data_dir)?;

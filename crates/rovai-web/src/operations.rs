@@ -5,6 +5,10 @@ use serde::{Deserialize, Serialize};
 /// and the legacy shared draft remain outside the network capability.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum Operation {
+    #[serde(rename="skillPacks.custom.prepare")]
+    CustomSkillPrepare,
+    #[serde(rename="skillPacks.custom.install")]
+    CustomSkillInstall,
     #[serde(rename="skillPacks.office.prepare")]
     OfficeSkillPrepare,
     #[serde(rename="skillPacks.office.install")]
@@ -495,7 +499,7 @@ pub enum Operation {
 impl Operation {
     pub fn timeout(self) -> std::time::Duration {
         std::time::Duration::from_secs(match self {
-            Self::OfficeSkillPrepare | Self::OfficeSkillInstall => 60,
+            Self::CustomSkillPrepare | Self::CustomSkillInstall | Self::OfficeSkillPrepare | Self::OfficeSkillInstall => 60,
             Self::WebdavSettings => 30,
             Self::HistoryLibrary => 30,
             Self::OfficeWatch => 30,
@@ -518,6 +522,8 @@ impl Operation {
         match self {
             Self::AppInfo => json!({"name":value["name"],"version":value["version"]}),
             Self::ForgeAccountsGet | Self::ForgeAccountsSet => select_fields(&value, &["accounts"]),
+            Self::CustomSkillPrepare => select_fields(&value,&["skillId","sourceRevision"]),
+            Self::CustomSkillInstall => select_fields(&value,&["status","code","payload"]),
             Self::OfficeSkillPrepare => select_fields(&value,&["planId","skillId","sourceRevision","content","contentDigest","binaryDigest"]),
             Self::OfficeSkillInstall => select_fields(&value,&["status","code","payload"]),
             Self::PetsOperation => select_fields(&value,&["pets","pet","page","pageSize","total","totalPages","entries","settings","id","displayName","description","spritesheetPath","duplicate","removed","mime","digest","offset","totalBytes","next","bytes","enabled","activeId","scale"]),
@@ -598,6 +604,8 @@ impl Operation {
         match self {
             Self::ForgeAccountsGet => "forge.accounts.get",
             Self::ForgeAccountsSet => "forge.accounts.set",
+            Self::CustomSkillPrepare => "skillPacks.custom.prepare",
+            Self::CustomSkillInstall => "skillPacks.custom.install",
             Self::OfficeSkillPrepare => "skillPacks.office.prepare",
             Self::OfficeSkillInstall => "skillPacks.office.install",
             Self::PetsOperation => "pets.operation",

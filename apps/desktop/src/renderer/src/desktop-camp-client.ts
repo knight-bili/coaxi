@@ -7,6 +7,7 @@ export const desktopThreadClient: ThreadClient = {
   get nativePets() { return window.rovai.nativePets },
   get webdavWorkspace() { return window.rovai.webdavWorkspace },
   get nativeBackups() { return window.rovai.nativeBackups },
+  get nativeCustomSkills() { return window.rovai.nativeCustomSkills },
   get nativeHistory() { return window.rovai.nativeHistory },
   get officeWorkspace() { return window.rovai.officeWorkspace },
   get browserWorkspace() { return window.rovai.browserWorkspace },

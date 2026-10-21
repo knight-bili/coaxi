@@ -245,6 +245,8 @@ const allowedMethods = new Set<CoreMethod>([
   'runtime.installations.refresh',
   'skills.list',
   'skills.get',
+  'skillPacks.custom.prepare',
+  'skillPacks.custom.install',
   'skillPacks.office.prepare',
   'skillPacks.office.install',
   'skillPacks.list',
@@ -1272,6 +1274,13 @@ ipcMain.handle('rovai:pets-import',async event=>{
   const selected=await dialog.showOpenDialog(mainWindow,{title:'选择包含pet.json和spritesheet.webp的宠物文件夹',properties:['openDirectory']})
   if(selected.canceled||!selected.filePaths[0])return null
   return core.request('pets.local',{operation:'import_directory',source:selected.filePaths[0]})
+})
+ipcMain.handle('rovai:custom-skill-import',async(event,input:{skillId:string;expectedRevision?:string})=>{
+  if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('skill.local_owner_required')
+  if(!input||typeof input.skillId!=='string')throw new Error('skill.invalid_request')
+  const selected=await dialog.showOpenDialog(mainWindow,{title:'选择包含 SKILL.md 的技能文件夹',properties:['openDirectory']})
+  if(selected.canceled||!selected.filePaths[0])return null
+  return core.request('skillPacks.custom.local',{source:selected.filePaths[0],skillId:input.skillId,expectedRevision:input.expectedRevision??null})
 })
 ipcMain.handle('rovai:native-history',async(event,operation,value:unknown)=>{
   if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('history.local_owner_required')
