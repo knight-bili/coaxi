@@ -3,6 +3,7 @@ package app.codeg.android.feature.main
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,7 +45,7 @@ fun canvasRegionHeight(data:JsonObject,resolution:RovaiCanvasRegionResolution,ex
     }
 }
 
-@Composable fun RovaiCanvasCard(node:JsonObject,zoom:Float,offset:Offset,boardRevision:Long,disabled:Boolean,isSelected:Boolean,catalog:RovaiCanvasCatalogSnapshot,profiles:List<JsonObject>,expanded:Boolean,onExpand:()->Unit,onOpen:()->Unit,onEdit:()->Unit,onMember:(JsonObject)->Unit,onDetach:(JsonObject)->Unit,onMutation:(JsonObject,Long)->Unit){
+@Composable fun RovaiCanvasCard(node:JsonObject,zoom:Float,offset:Offset,boardRevision:Long,disabled:Boolean,isSelected:Boolean,catalog:RovaiCanvasCatalogSnapshot,profiles:List<JsonObject>,expanded:Boolean,onExpand:()->Unit,onOpen:()->Unit,onEdit:()->Unit,onMember:(JsonObject)->Unit,onDetach:(JsonObject)->Unit,onMutation:(JsonObject,Long)->Unit,onMemberMove:(JsonObject,Float,Float,Long)->Unit){
     val data=node["data"].coreObject();val id=node.coreText("id");val kind=data.coreText("kind");val density=LocalDensity.current.density;val colors=CodegTheme.colors;val region=kind in listOf("folder","group","agent","custom");val resolution=resolveCanvasRegion(node,catalog.rows,catalog.complete,catalog.groups,catalog.folders)
     val x=data.canvasFloat("x");val y=data.canvasFloat("y");val width=data.canvasFloat("width",320f);val height=if(region)canvasRegionHeight(data,resolution,expanded)else data.canvasFloat("height",220f);val collapsed=data["collapsed"]==JsonPrimitive(true)
     var drag by remember(id,x,y){mutableStateOf(Offset.Zero)};var resize by remember(id,width,height){mutableStateOf(Offset.Zero)};var dragRevision by remember(id){mutableStateOf<Long?>(null)};var resizeRevision by remember(id){mutableStateOf<Long?>(null)};val latestRevision by rememberUpdatedState(boardRevision)
@@ -62,7 +63,12 @@ fun canvasRegionHeight(data:JsonObject,resolution:RovaiCanvasRegionResolution,ex
                 if(region){
                     val visible=canvasRegionVisible(data,resolution,expanded);val columns=canvasRegionColumns(data)
                     Column(Modifier.fillMaxWidth().padding(12.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
-                        visible.chunked(columns).forEach{members->Row(horizontalArrangement=Arrangement.spacedBy(12.dp)){members.forEach{member->RovaiCanvasSummaryTile(canvasSummary(member.reference,catalog,profiles,member.label),tint,Modifier.size(224.dp,132.dp),onOpen={onMember(member.reference)},onExtra={onDetach(member.reference)},extraLabel="拆出",disabled=disabled||member.available!=true,catalogComplete=catalog.complete)}}}
+                        visible.chunked(columns).forEachIndexed{row,members->Row(horizontalArrangement=Arrangement.spacedBy(12.dp)){members.forEachIndexed{column,member->
+                            var translation by remember(id,member.key){mutableStateOf(Offset.Zero)};var captured by remember(id,member.key){mutableStateOf<Long?>(null)}
+                            val gesture=Modifier.pointerInput(id,member.key,disabled,zoom,x,y){detectDragGesturesAfterLongPress(onDragStart={captured=if(disabled||member.available!=true)null else latestRevision},onDragCancel={translation=Offset.Zero;captured=null},onDragEnd={val revision=captured;if(!disabled&&revision!=null)onMemberMove(member.reference,x+12+column*236+translation.x,y+52+row*144+translation.y,revision);translation=Offset.Zero;captured=null}){change,delta->if(captured!=null){change.consume();translation+=delta/(density*zoom)}}}
+                            RovaiCanvasSummaryTile(canvasSummary(member.reference,catalog,profiles,member.label),tint,Modifier.size(224.dp,132.dp).graphicsLayer{translationX=translation.x*density;translationY=translation.y*density}.then(gesture),onOpen={onMember(member.reference)},onExtra={onDetach(member.reference)},extraLabel="拆出",disabled=disabled||member.available!=true,catalogComplete=catalog.complete)
+                        }}}
+
                         if(resolution.complete&&visible.isEmpty())Text(if(kind=="custom")"拖入对话卡片进行分组"else"还没有关联对话",style=MaterialTheme.typography.bodySmall,color=colors.textSecondary)
                         val cap=if(data.coreLong("gridRows")>0)data.coreLong("gridRows").toInt()*columns else 24
                         if(resolution.members.size>cap)TextButton(onClick=onExpand){Text(if(expanded)"收起成员"else"显示全部 ${resolution.members.size} 个成员")}
