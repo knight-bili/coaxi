@@ -3,6 +3,8 @@
 use super::*;
 #[path="history_formats.rs"]
 mod formats;
+#[path="history_export.rs"]
+mod export;
 use anyhow::ensure;
 use serde::{Serialize,Deserialize};
 use sha2::{Digest,Sha256};
@@ -16,7 +18,7 @@ struct Entry{id:String,name:String,bytes:u64,modified:u64,#[serde(default)]nativ
 struct Plan{root:PathBuf,provider:String,created_at:String,entries:Vec<Entry>,#[serde(default)]source_root:Option<PathBuf>,#[serde(default)]helper:bool,#[serde(default)]snapshot_digest:Option<String>}
 #[derive(Deserialize)]
 #[serde(rename_all="camelCase",deny_unknown_fields)]
-struct Request{scope:workbench::Scope,operation:String,#[serde(default)]root:Option<PathBuf>,#[serde(default)]provider:Option<String>,#[serde(default)]plan_id:Option<String>,#[serde(default)]entry_id:Option<String>,#[serde(default)]expected_digest:Option<String>,#[serde(default)]import_id:Option<String>,#[serde(default)]offset:usize,#[serde(default)]tags:Option<Vec<String>>,#[serde(default)]include_archived:bool,#[serde(default)]expected_revision:Option<String>}
+struct Request{scope:workbench::Scope,operation:String,#[serde(default)]root:Option<PathBuf>,#[serde(default)]provider:Option<String>,#[serde(default)]plan_id:Option<String>,#[serde(default)]entry_id:Option<String>,#[serde(default)]expected_digest:Option<String>,#[serde(default)]import_id:Option<String>,#[serde(default)]offset:usize,#[serde(default)]tags:Option<Vec<String>>,#[serde(default)]include_archived:bool,#[serde(default)]expected_revision:Option<String>,#[serde(default)]destination:Option<PathBuf>}
 fn library_entry(mut value:Value)->Result<Value>{
     let revision=crate::command::canonical_json_digest(&value)?;
     if let Some(object)=value.as_object_mut(){object.remove("originalRoot");object.remove("nativeSessionId");let shared=object.remove("snapshotRoot").is_some_and(|value|!value.is_null());object.insert("sharedSourceSnapshot".into(),json!(shared));object.insert("revision".into(),json!(revision));object.entry("archived".to_string()).or_insert(json!(false));}
@@ -59,6 +61,10 @@ impl Core{
             crate::platform::private_storage::atomic_write_private_json(&path,&manifest)?;return Ok(json!({"saved":true,"entry":library_entry(manifest)?}));
         }
         ensure!(local,"history.local_owner_required");
+        if request.operation=="export"{
+            let id=request.import_id.context("history.import_required")?;let expected=request.expected_revision.context("history.revision_required")?;let destination=request.destination.context("history.destination_required")?;
+            let _lock=workbench::MUTATIONS.lock().await;return tokio::task::spawn_blocking(move||export::export(&directory,&id,&expected,&destination)).await?;
+        }
         if request.operation=="scan"{
             let root=request.root.context("history.root_required")?;let provider=request.provider.context("history.provider_required")?;
             let id=uuid::Uuid::new_v4().to_string();

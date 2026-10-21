@@ -1299,6 +1299,13 @@ ipcMain.handle('rovai:native-history',async(event,operation,value:unknown)=>{
     if(selected.canceled||!selected.filePaths[0])return null
     return core.request('history.local',{scope:{threadId},operation:'scan',root:selected.filePaths[0],provider})
   }
+  if(operation==='export'){
+    const {importId,expectedRevision}=value as {importId:unknown;expectedRevision:unknown}
+    if(typeof importId!=='string'||typeof expectedRevision!=='string')throw new Error('history.invalid_export')
+    const selected=await dialog.showSaveDialog(mainWindow,{title:'导出原生历史资料（请选择新文件）',defaultPath:`native-history-${importId.slice(0,12)}.zip`,filters:[{name:'原生历史资料',extensions:['zip']}]})
+    if(selected.canceled||!selected.filePath)return null
+    return core.request('history.local',{scope:{threadId},operation:'export',importId,expectedRevision,destination:selected.filePath})
+  }
   if(operation!=='request'||!input||!['preview','import'].includes(String(input.operation)))throw new Error('history.operation_not_admitted')
   return core.request('history.local',{scope:{threadId},operation:input.operation,planId:input.planId,entryId:input.entryId,expectedDigest:input.expectedDigest})
 })
