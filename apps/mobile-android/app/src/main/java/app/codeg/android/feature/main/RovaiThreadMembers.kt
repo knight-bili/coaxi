@@ -28,7 +28,7 @@ import java.util.UUID
     var submitted by remember(threadId){mutableStateOf<String?>(null)}
     val blocked=busy||state.busy||state.pending!=null||generation!=model.connectionGeneration
     val members=snapshot?.get("members").coreArray().filter{it.coreText("membershipStatus")=="active"}
-    val present=members.count{it.coreText("profilePresence")=="present"&&it["leaveRequestedAt"] !is JsonPrimitive}
+    val present=members.count{it.coreText("profilePresence")=="present"&&(it["leaveRequestedAt"]==null||it["leaveRequestedAt"]==JsonNull)}
     val active=members.map{it.coreText("agentId")}.toSet()
     val candidates=state.members.filter{it.coreText("presence")=="present"&&it.coreText("agentId") !in active&&(it.coreText("displayName")+" "+it.coreText("teamRole")).contains(search,true)}
     suspend fun load(){
@@ -57,6 +57,11 @@ import java.util.UUID
                     Text(member.coreText("teamRole"),color=CodegTheme.colors.textSecondary)
                     Text(if(member["leaveRequestedAt"]is JsonPrimitive&&member["leaveRequestedAt"]!=JsonNull)"正在暂离" else if(member.coreText("profilePresence")=="present")"在队" else "暂离",style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)
                     profile?.let{Text(it["runtime"].coreObject().coreText("adapterKind").ifEmpty{"未选择运行程序"},style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)}
+                    (member["fast"]as?JsonObject)?.let{fast->Row(Modifier.fillMaxWidth()){
+                        Column(Modifier.weight(1f)){Text("Fast");Text("用于之后的新执行；实际档位以运行程序反馈为准。",style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)}
+                        val checked=(fast["fastOverride"]as?JsonPrimitive)?.booleanOrNull?:(fast["runtimeDefaultFast"]as?JsonPrimitive)?.booleanOrNull?:false
+                        Switch(checked=checked,enabled=!blocked&&fast.coreText("runtimeBindingRevision").isNotEmpty(),onCheckedChange={selected->model.command(RovaiOperation.THREADS_MEMBERS_FAST_SET,buildJsonObject{put("threadId",threadId);put("agentId",agentId);put("expectedRuntimeBindingRevision",fast["runtimeBindingRevision"]!!);put("fastOverride",selected)})})
+                    }}
                     Row{
                         TextButton(enabled=!blocked&&!lead&&member.coreText("profilePresence")=="present"&&(member["leaveRequestedAt"]==null||member["leaveRequestedAt"]==JsonNull),onClick={confirmation=prepared("lead",buildJsonObject{put("threadId",threadId);put("successorAgentId",agentId);put("expectedVersion",snapshot?.get("thread").coreObject().coreLong("version"))},member)}){Text("设为队长")}
                         TextButton(enabled=!blocked&&members.size>1,onClick={busy=true;scope.launch{try{

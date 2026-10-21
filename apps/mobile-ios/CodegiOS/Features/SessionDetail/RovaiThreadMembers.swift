@@ -28,6 +28,11 @@ struct RovaiThreadMembers: View {
                     Text(member.text("teamRole")).font(.caption).foregroundStyle(Theme.textSecondary)
                     Text(member["leaveRequestedAt"] != nil && member["leaveRequestedAt"] != .null ? "正在暂离" : member.text("profilePresence") == "present" ? "在队" : "暂离").font(.caption).foregroundStyle(Theme.textSecondary)
                     if let profile = model.members.first(where: {$0.text("agentId") == id}) {Text(profile["runtime"]?.text("adapterKind") ?? "未选择运行程序").font(.caption).foregroundStyle(Theme.textSecondary)}
+                    if let fast = member["fast"], fast != .null {
+                        Toggle(isOn: Binding(get: {fast["fastOverride"]?.rvBool ?? fast["runtimeDefaultFast"]?.rvBool ?? false}, set: {selected in
+                            Task {await model.command(.threadsMembersFastSet, value: .object(["threadId": .string(threadId), "agentId": .string(id), "expectedRuntimeBindingRevision": fast["runtimeBindingRevision"] ?? .null, "fastOverride": .bool(selected)]));await load()}
+                        })) {VStack(alignment: .leading, spacing: 4) {Text("Fast");Text("用于之后的新执行；实际档位以运行程序反馈为准。").font(.caption).foregroundStyle(Theme.textSecondary)}}.disabled(blocked || fast["runtimeBindingRevision"] == nil)
+                    }
                     HStack {
                         Button("设为队长") {confirmation = prepared("lead", command: .object(["threadId": .string(threadId), "successorAgentId": .string(id), "expectedVersion": snapshot?["thread"]?["version"] ?? .null]), preview: member)}.disabled(blocked || lead || member.text("profilePresence") != "present" || member["leaveRequestedAt"] != nil && member["leaveRequestedAt"] != .null)
                         Spacer()
