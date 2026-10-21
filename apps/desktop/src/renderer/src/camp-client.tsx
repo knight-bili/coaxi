@@ -23,6 +23,7 @@ export type ThreadClient = Pick<RovaiApi,
       preview: import('@contracts').AttachmentPreview | { blob: Blob } | null
     }>
   }
+  browserWorkspace?: RovaiApi['browserWorkspace']
   editingRecovery?: EditingRecovery
   privateInputRecovery?: RovaiApi['privateInputRecovery']
   retryPendingCommand?: (method: 'runtime.interactions.resolve' | import('../../shared/private-conversation-operations').PrivateInputMethod | import('../../shared/private-conversation-operations').DelegationActionMethod, params: unknown) => Promise<void>

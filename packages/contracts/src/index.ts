@@ -5003,6 +5003,10 @@ export type CoreMethod =
   | 'runtime.interactions.get'
   | 'runtime.interactions.resolve'
   | 'runtime.childReads.start'
+  | 'browser.local.grant'
+  | 'browser.local.revoke'
+  | 'browser.local.begin'
+  | 'browser.local.finish'
   | 'workbench.files.list'
   | 'workbench.organizer.get'
   | 'forge.accounts.get'
@@ -5096,7 +5100,17 @@ export interface HostWebApi {
   rotate(): Promise<HostWebStatus & { administratorToken: string }>
 }
 
+export interface BrowserWorkspaceApi {
+  list(threadId: string): Promise<BrowserWorkspaceView[]>
+  open(threadId: string, url: string): Promise<BrowserWorkspaceView>
+  control(input: {id:string; action:'navigate'|'back'|'forward'|'reload'|'focus'|'close'|'share'; url?:string; level?:'none'|'read'|'control'; minutes?:number}): Promise<BrowserWorkspaceView | null>
+  perform(input:{id:string;commandId:string;action:'snapshot'|'screenshot'|'console'|'click'|'hover'|'type'|'press'|'select'|'scroll';generation?:string;ref?:string;text?:string;key?:string;values?:string[];x?:number;y?:number}):Promise<unknown>
+}
+export interface BrowserWorkspaceView { id:string; threadId:string;url:string;title:string;level:'none'|'read'|'control';expiresAt:number|null;loading:boolean;error:string|null }
+
 export interface RovaiApi {
+  /** Native local owner surface; intentionally absent from remote Web. */
+  browserWorkspace?: BrowserWorkspaceApi
   /** Desktop-local private editor durability; never a Core receipt or Web resource grant. */
   privateInputRecovery?: {
     get(identity: string): {found:false} | {found:true; value:unknown}

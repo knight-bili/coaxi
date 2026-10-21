@@ -1,3 +1,4 @@
+import { BrowserWorkspace } from './browser-workspace'
 import { creationPreferences, withHostConversationPreferences } from '../shared/host-general-preferences'
 import { createHostChannelHandler } from './host-channels'
 import { FilePreviewFrameNavigation } from './file-preview/file-preview-navigation'
@@ -1240,6 +1241,10 @@ app.on('second-instance', () => {
   if (mainWindow.isMinimized()) mainWindow.restore()
   mainWindow.focus()
 })
+
+const browserWorkspace = new BrowserWorkspace((method,params)=>core.request(method,params),()=>mainWindow)
+ipcMain.handle('rovai:browser-workspace',(event,operation,input)=>browserWorkspace.invoke(event,operation,input))
+app.on('before-quit',()=>browserWorkspace.closeAll())
 
 ipcMain.handle('rovai:request', async (_event, method: CoreMethod, params?: unknown) => {
   if (!allowedMethods.has(method)) {

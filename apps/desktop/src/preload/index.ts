@@ -62,6 +62,12 @@ async function invokeHostWeb<T>(operation: string, input?: unknown): Promise<T> 
 }
 
 const api: RovaiApi = {
+  browserWorkspace: {
+    list: threadId => ipcRenderer.invoke('rovai:browser-workspace','list',threadId),
+    open: (threadId,url) => ipcRenderer.invoke('rovai:browser-workspace','open',{threadId,url}),
+    control: input => ipcRenderer.invoke('rovai:browser-workspace','control',input),
+    perform: input => ipcRenderer.invoke('rovai:browser-workspace','perform',input)
+  },
   privateInputRecovery: {
     get(identity) {
       const reply = ipcRenderer.sendSync('rovai:private-input-recovery', 'get', identity)
