@@ -1,4 +1,5 @@
 import Foundation
+import CryptoKit
 import Observation
 
 extension JSONValue {
@@ -71,6 +72,19 @@ final class RovaiWorkspaceModel {
     }
     func open(_ threadId: String?) async { self.threadId = threadId; thread = nil; if threadId != nil { await refresh() } }
     func query(_ operation: RovaiOperation, params: JSONValue = .object([:])) async throws -> JSONValue { guard let client else { throw RovaiHostFailure(code: "尚未连接工作区") }; return try await client.request(operation, params: params) }
+    private func bodyAccount(_ owner: String) -> String {
+        "body:" + account + ":" + SHA256.hash(data: Data(owner.utf8)).map { String(format: "%02x", $0) }.joined()
+    }
+    func readBody(_ owner: String) throws -> String {
+        guard let profile, !account.isEmpty else { throw RovaiHostFailure(code: "尚未连接工作区") }
+        guard let data = RovaiSecureSession.load(profile: profile.id, account: bodyAccount(owner)) else { return "" }
+        guard let body = String(data: data, encoding: .utf8) else { throw RovaiHostFailure(code: "草稿无法读取") }; return body
+    }
+    func saveBody(_ owner: String, body: String) throws {
+        guard let profile, !account.isEmpty else { throw RovaiHostFailure(code: "尚未连接工作区") }
+        let data = Data(body.utf8); guard data.count <= 64 * 1024 else { throw RovaiHostFailure(code: "草稿超过64KB，请拆分后发送。") }
+        guard RovaiSecureSession.save(data.isEmpty ? nil : data, profile: profile.id, account: bodyAccount(owner)) else { throw RovaiHostFailure(code: "草稿未能保存，输入仍在当前页面。") }
+    }
     func execute(_ operation: RovaiOperation, params: JSONValue) async {
         guard pending == nil else { return }
         await submit(.object(["operation": .string(operation.rawValue), "params": params]))

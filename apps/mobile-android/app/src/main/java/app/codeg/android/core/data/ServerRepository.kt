@@ -95,6 +95,14 @@ class ServerRepository @Inject constructor(
         }
     }
 
+    private suspend fun rovaiBodyKey(profile:ServerProfile,owner:String):String {
+        val credential=token(profile.id)?:throw IllegalStateException("缺少服务器凭据")
+        val digest=MessageDigest.getInstance("SHA-256").digest((profile.baseUrl+"\u0000"+credential+"\u0000"+owner).toByteArray(Charsets.UTF_8)).joinToString(""){"%02x".format(it)}
+        return "rovai.body.${profile.id}.$digest"
+    }
+    suspend fun readRovaiBody(profile:ServerProfile,owner:String):String=withContext(dispatchers.io){secretStore.get(rovaiBodyKey(profile,owner))?:""}
+    suspend fun saveRovaiBody(profile:ServerProfile,owner:String,body:String)=withContext(dispatchers.io){require(body.toByteArray(Charsets.UTF_8).size<=64*1024){"草稿超过64KB，请拆分后发送。"};val key=rovaiBodyKey(profile,owner);if(body.isEmpty())secretStore.remove(key)else secretStore.put(key,body);Unit}
+
     suspend fun loadRovaiPending(profile:ServerProfile):JsonObject?=withContext(dispatchers.io){secretStore.get("rovai.pending.${profile.id}")?.let{raw->runCatching{val value=Json.parseToJsonElement(raw).jsonObject;if(value["endpoint"]?.jsonPrimitive?.content==profile.baseUrl)value["request"] as? JsonObject else null}.getOrNull()}}
     suspend fun saveRovaiPending(profile:ServerProfile,request:JsonObject?)=withContext(dispatchers.io){val key="rovai.pending.${profile.id}";if(request==null)secretStore.remove(key)else secretStore.put(key,buildJsonObject{put("endpoint",profile.baseUrl);put("request",request)}.toString());Unit}
 
