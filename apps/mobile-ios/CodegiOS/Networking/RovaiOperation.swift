@@ -40,6 +40,7 @@ enum RovaiOperation: String, Sendable {
     case missionsDiffSessionRelease = "missions.diffSession.release"
     case missionsCreate = "missions.create"
     case missionsUpdate = "missions.update"
+    case missionsAttachmentsRemove = "missions.attachments.remove"
     case missionsStatus = "missions.status"
     case missionsStart = "missions.start"
     case missionsLinkPr = "missions.linkPr"

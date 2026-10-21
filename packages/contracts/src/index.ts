@@ -4796,6 +4796,7 @@ export type CoreMethod =
   | 'missions.diffSession.release'
   | 'missions.create'
   | 'missions.update'
+  | 'missions.attachments.remove'
   | 'missions.status'
   | 'missions.start'
   | 'missions.linkPr'

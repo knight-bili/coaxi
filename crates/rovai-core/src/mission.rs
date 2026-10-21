@@ -283,6 +283,18 @@ impl DomainCommand for UpdateMissionCommand {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct RemoveMissionAttachmentCommand {
+    pub mission_id: String,
+    pub attachment_ref_id: String,
+    pub expected_details_version: i64,
+}
+impl sealed::Sealed for RemoveMissionAttachmentCommand {}
+impl DomainCommand for RemoveMissionAttachmentCommand {
+    const TYPE: &'static str = "mission.attachment.remove";
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct MissionAttachmentUpdate {
     pub keep_attachment_ids: Vec<String>,
     pub new_source_attachments: Vec<LocalAttachmentSourceRef>,
@@ -573,6 +585,39 @@ impl MissionService {
                 params![current.camp_id,title.chars().take(80).collect::<String>(),chrono::Utc::now().to_rfc3339()])?;
             }
             record_activity(tx, &input.mission_id, "updated", &envelope.actor, envelope.execution_epoch, Value::Object(changes))?;
+            Ok(mutation(&input.mission_id, true))
+        })
+    }
+
+    pub fn remove_attachment(
+        &self,
+        database: &mut Database,
+        envelope: &CommandEnvelope<RemoveMissionAttachmentCommand>,
+    ) -> Result<CommandExecution> {
+        self.gateway.execute(database, envelope, |tx| {
+            if !matches!(envelope.actor, ActorRef::User { .. }) {
+                return Ok(reject("mission.forbidden"));
+            }
+            let input = &envelope.payload;
+            let Some(current) = load_record(tx, &input.mission_id)? else {
+                return Ok(reject("mission.not_found"));
+            };
+            if current.details_version != input.expected_details_version {
+                return Ok(reject("mission.details_version_conflict"));
+            }
+            let kept = current.source_attachments.iter()
+                .filter(|source| source.id != input.attachment_ref_id)
+                .cloned().collect::<Vec<_>>();
+            if kept.len() == current.source_attachments.len() {
+                return Ok(reject("mission.attachment_not_found"));
+            }
+            // Remove only the Mission reference. Source bytes and published history are retained.
+            tx.execute(
+                "UPDATE mission SET source_attachments_json=?2,details_version=details_version+1,updated_at=?3 WHERE id=?1",
+                params![input.mission_id, serialize_source_attachments(&kept)?, chrono::Utc::now().to_rfc3339()],
+            )?;
+            record_activity(tx, &input.mission_id, "updated", &envelope.actor,
+                envelope.execution_epoch, json!({"attachmentsChanged":true}))?;
             Ok(mutation(&input.mission_id, true))
         })
     }

@@ -1316,6 +1316,7 @@ impl Core {
             }
             "missions.update"
             | "missions.updateWithAttachments"
+            | "missions.attachments.remove"
             | "missions.status"
             | "missions.start"
             | "missions.linkPr" => {
@@ -1346,6 +1347,14 @@ impl Core {
                             None => serde_json::from_value(request.params.clone())?,
                         };
                         MissionService::default().update(
+                            &mut database,
+                            &user_command_envelope(params.command_id, params.command),
+                        )?
+                    }
+                    "missions.attachments.remove" => {
+                        let params: UserCommandParams<crate::mission::RemoveMissionAttachmentCommand> =
+                            serde_json::from_value(request.params.clone())?;
+                        MissionService::default().remove_attachment(
                             &mut database,
                             &user_command_envelope(params.command_id, params.command),
                         )?

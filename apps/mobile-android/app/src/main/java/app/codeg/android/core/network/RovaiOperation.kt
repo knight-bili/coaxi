@@ -40,6 +40,7 @@ enum class RovaiOperation(val wire:String) {
     MISSIONS_DIFFSESSION_RELEASE("missions.diffSession.release"),
     MISSIONS_CREATE("missions.create"),
     MISSIONS_UPDATE("missions.update"),
+    MISSIONS_ATTACHMENTS_REMOVE("missions.attachments.remove"),
     MISSIONS_STATUS("missions.status"),
     MISSIONS_START("missions.start"),
     MISSIONS_LINKPR("missions.linkPr"),

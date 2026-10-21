@@ -10517,6 +10517,7 @@ impl Core {
             | "missions.createWithAttachments"
             | "missions.update"
             | "missions.updateWithAttachments"
+            | "missions.attachments.remove"
             | "missions.status"
             | "missions.start"
             | "missions.linkPr" => self.handle_mission(request).await,

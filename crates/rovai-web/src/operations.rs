@@ -81,6 +81,8 @@ pub enum Operation {
     MissionCreate,
     #[serde(rename = "missions.update")]
     MissionUpdate,
+    #[serde(rename = "missions.attachments.remove")]
+    MissionAttachmentRemove,
     #[serde(rename = "missions.status")]
     MissionStatus,
     #[serde(rename = "missions.start")]
@@ -666,6 +668,7 @@ impl Operation {
             Self::MissionDiffSessionRelease => "missions.diffSession.release",
             Self::MissionCreate => "missions.create",
             Self::MissionUpdate => "missions.update",
+            Self::MissionAttachmentRemove => "missions.attachments.remove",
             Self::MissionStatus => "missions.status",
             Self::MissionStart => "missions.start",
             Self::MissionLinkPr => "missions.linkPr",
