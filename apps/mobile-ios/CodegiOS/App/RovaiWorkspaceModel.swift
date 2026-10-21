@@ -109,6 +109,10 @@ final class RovaiWorkspaceModel {
         let data = Data(body.utf8); guard data.count <= 1024 * 1024 else { throw RovaiHostFailure(code: "草稿超过1MB，请拆分后发送。") }
         guard RovaiSecureSession.save(data.isEmpty ? nil : data, profile: profile.id, account: bodyAccount(owner)) else { throw RovaiHostFailure(code: "草稿未能保存，输入仍在当前页面。") }
     }
+    func clearBodyIfMatches(_ owner: String,expectedBody: String,expectedGeneration: UInt64) throws -> Bool {
+        guard expectedGeneration == generation else {throw RovaiHostFailure(code: "工作区已切换，保留原记录")}
+        guard try readBody(owner) == expectedBody else {return false};try saveBody(owner,body: "");return true
+    }
     func upload(_ url: URL, threadId: String, target: JSONValue, revision: Int, expectedGeneration: UInt64) async {
         guard expectedGeneration == generation, pending == nil, !busy else { issue = "工作区已切换或仍有待核对操作，请重新选择附件"; return }
         busy = true; let lifetime = generation

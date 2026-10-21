@@ -53,6 +53,10 @@ class RovaiWorkspaceViewModel @Inject constructor(private val servers:ServerRepo
     suspend fun fileBytes(action:String,params:JsonObject):RovaiFileBytes{val generation=lifetime;val result=(client?:throw RovaiHostFailure("尚未连接")).fileBytes(action,params);if(generation!=lifetime)throw CancellationException("工作区已切换");return result}
     suspend fun readBody(owner:String):String {bodyCache[owner]?.let{return it};val selected=profile?:throw RovaiHostFailure("尚未连接");val generation=lifetime;val body=servers.readRovaiBody(selected,owner);if(generation!=lifetime)throw CancellationException("工作区已切换");return body}
     suspend fun saveBody(owner:String,body:String)=bodyGate.withLock{val selected=profile?:throw RovaiHostFailure("尚未连接");val generation=lifetime;servers.saveRovaiBody(selected,owner,body);if(generation==lifetime&&bodyCache[owner]==null)bodyCache[owner]=body;if(generation!=lifetime)throw CancellationException("工作区已切换")}
+    suspend fun clearBodyIfMatches(owner:String,expectedBody:String,expectedGeneration:Long):Boolean=bodyGate.withLock{
+        require(expectedGeneration==lifetime){"工作区已切换，保留原记录"};val selected=profile?:throw RovaiHostFailure("尚未连接");val body=servers.readRovaiBody(selected,owner);require(expectedGeneration==lifetime){"工作区已切换，保留原记录"};if(body!=expectedBody)return@withLock false
+        servers.saveRovaiBody(selected,owner,"");if(expectedGeneration==lifetime)bodyCache[owner]="";true
+    }
     fun rememberBody(owner:String,body:String){val selected=profile?:return;val generation=lifetime;bodyCache[owner]=body;viewModelScope.launch{try{bodyGate.withLock{servers.saveRovaiBody(selected,owner,body)}}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){if(generation==lifetime)mutable.update{it.copy(error=error.message)}}}}
     val connectionGeneration:Long get()=lifetime
     fun upload(uri:Uri,threadId:String,target:JsonObject,revision:Long,expectedHostGeneration:Long=lifetime){
