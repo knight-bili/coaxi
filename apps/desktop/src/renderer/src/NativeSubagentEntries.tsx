@@ -5,6 +5,7 @@ import { Eye } from 'lucide-react'
 import type { AgentRunExecutionEvidenceView } from '@contracts'
 import { NativeSessionViewerContext } from './native-session-viewer-context'
 import { nativeSubagentEntries } from './native-subagent-entries'
+import { LegacyAgentEntries } from './LegacyAgentEntries'
 import { CodegRuntimeMark } from './CodegRuntimeMark'
 import { useUiText } from './interface-language'
 import { useThreadClient } from './camp-client'
@@ -42,9 +43,9 @@ export function NativeSubagentEntries({ threadId, runId, parentConversationId, e
     } catch { if (request === sequence.current) setError(true) }
     finally { if (request === sequence.current) setLoading(false) }
   }
-  if (!host || !entries.length) return null
+  if (!host) return null
   const labels: Record<string, string> = { running: '正在执行', waiting: '等待继续', completed: '已完成', failed: '执行失败', cancelled: '已取消', interrupted: '已中断', shutdown: '已关闭', not_found: '未找到', unknown: '状态待核对' }
-  return <section className="delegation-children native-subagent-entries" aria-label={t('原生帮手')}>
+  return <><LegacyAgentEntries threadId={threadId} runId={runId} parentConversationId={parentConversationId} evidence={evidence} />{entries.length > 0 && <section className="delegation-children native-subagent-entries" aria-label={t('原生帮手')}>
     {(expanded ? entries : entries.slice(0, 3)).map(entry => <div className="delegation-card" key={entry.identity}>
       <span className="delegation-avatar"><CodegRuntimeMark target={entry.runtime} /></span>
       <div className="delegation-card-description"><div><strong>{entry.runtime === 'codex' ? 'Codex' : 'Grok'}</strong><code>{entry.label}</code><span className={`delegation-status is-${entry.status}`}>{!parentLive && ['running', 'waiting'].includes(entry.status) ? t('上次记录：{0}', t(labels[entry.status]!)) : t(labels[entry.status] ?? '状态待核对')}</span></div>
@@ -58,5 +59,5 @@ export function NativeSubagentEntries({ threadId, runId, parentConversationId, e
     {entries.length > 3 && <div className="delegation-list-controls"><button type="button" onClick={() => setExpanded(value => !value)}>{t(expanded ? '收起帮手列表' : '展开帮手列表')} ({entries.length})</button></div>}
     {missing.length > 0 && <div className="delegation-list-controls"><button type="button" disabled={loading} onClick={() => void loadComplete()}>{t(loading ? '正在读取完整列表…' : '读取完整帮手列表')}</button></div>}
     {error && <p className="delegation-read-error" role="alert">{t('帮手列表暂时无法读取，请重试。')}</p>}
-  </section>
+  </section>}</>
 }

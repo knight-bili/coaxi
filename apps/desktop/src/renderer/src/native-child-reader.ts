@@ -1,7 +1,7 @@
 // Read-only transport for Codeg's subagent-session-dialog. Core alone resolves
 // native addresses. A browser never sends a Session ID or a source path.
 import { sha256 } from '@noble/hashes/sha2.js'
-import type { NativeChildReadPage, NativeChildReadReference, NativeChildReadStart, NativeChildReadView } from '@contracts'
+import type { NativeAgentReadReference, NativeChildReadPage, NativeChildReadReference, NativeChildReadView } from '@contracts'
 import type { ThreadClient } from './camp-client'
 import { newCommandId } from '../../shared/command-id'
 
@@ -27,9 +27,11 @@ export interface NativeTranscript {
   summary: { title: string | null; model: string | null; git_branch: string | null; started_at: string; ended_at: string | null; message_count: number } | null
   notes: { malformed_records: number; incomplete_tail: boolean; unavailable_children: number; unavailable_advisories: number }
   child_references: Array<{ source_id: string; reference: string }>
+  agent_stats?: Record<string, unknown> | null
 }
 export interface NativeReaderTarget {
-  reference: NativeChildReadReference
+  reference: NativeChildReadReference | NativeAgentReadReference
+  kind?: 'session' | 'agent'
   descendant?: { parent: NativeChildReader; sourceId: string }
 }
 export interface NativeReaderState {
@@ -118,8 +120,9 @@ export class NativeChildReader {
   private off: (() => void) | undefined
   readonly target: NativeReaderTarget
   constructor(private client: Client, target: NativeReaderTarget) {
-    this.target = { reference: Object.freeze({ ...target.reference }), ...(target.descendant ? { descendant: { ...target.descendant } } : {}) }
+    this.target = { reference: Object.freeze({ ...target.reference }), kind: target.kind, ...(target.descendant ? { descendant: { ...target.descendant } } : {}) }
   }
+  private method(action: 'start' | 'poll' | 'page' | 'close'): string { return `runtime.${this.target.kind === 'agent' ? 'agentReads' : 'childReads'}.${action}` }
   getSnapshot = (): NativeReaderState => this.state
   fileSource(): { threadId: string; readId: string } | null {
     return this.current && !this.current.retired && !this.current.closed && this.state.data
@@ -131,7 +134,7 @@ export class NativeChildReader {
   private close(resource: Resource): void {
     if (!resource.retired || resource.refs > 0 || resource.closed) return
     resource.closed = true
-    try { void this.client.request('runtime.childReads.close', { readId: resource.id }).catch(() => undefined) } catch { /* Core/transport may already be gone. */ }
+    try { void this.client.request(this.method('close'), { readId: resource.id }).catch(() => undefined) } catch { /* Core/transport may already be gone. */ }
   }
   private retire(resource: Resource | null): void {
     if (!resource || resource.retired) return
@@ -194,13 +197,13 @@ export class NativeChildReader {
   private async load(flight: Flight): Promise<void> {
     const signal = flight.signal.signal
     let lease: Awaited<ReturnType<NativeChildReader['childLease']>> | undefined
-    const request: NativeChildReadStart = { readId: flight.resource.id, reference: { ...this.target.reference } }
+    const request: { readId: string; reference: NativeReaderTarget['reference']; descendant?: { parentReadId: string; descendantReference: string } } = { readId: flight.resource.id, reference: { ...this.target.reference } }
     try {
       if (this.target.descendant) {
         lease = await this.target.descendant.parent.childLease(this.target.descendant.sourceId, signal)
         request.descendant = { parentReadId: lease.parentReadId, descendantReference: lease.descendantReference }
       }
-      let view = await cancellable(() => this.client.request<NativeChildReadView>('runtime.childReads.start', request), signal)
+      let view = await cancellable(() => this.client.request<NativeChildReadView>(this.method('start'), request), signal)
       lease?.release(); lease = undefined
       const generation = view.coreGeneration
       for (;;) {
@@ -209,7 +212,7 @@ export class NativeChildReader {
         if (view.state === 'failed') failed(typeof view.code === 'string' ? view.code : 'native_child.read_failed')
         if (view.state === 'ready') break
         await delay(signal)
-        view = await cancellable(() => this.client.request<NativeChildReadView>('runtime.childReads.poll', { readId: request.readId }), signal)
+        view = await cancellable(() => this.client.request<NativeChildReadView>(this.method('poll'), { readId: request.readId }), signal)
       }
       if (typeof view.snapshotReference !== 'string' || !view.snapshotReference) failed('native_child.read_response_invalid')
       const hash = sha256.create(), fragments: string[] = [], cursors = new Set<string>(), encoder = new TextEncoder()
@@ -217,7 +220,7 @@ export class NativeChildReader {
       let live = false, reportedStatus = 'unknown'
       try {
         for (;;) {
-          const page: NativeChildReadPage = await cancellable(() => this.client.request<NativeChildReadPage>('runtime.childReads.page', {
+          const page: NativeChildReadPage = await cancellable(() => this.client.request<NativeChildReadPage>(this.method('page'), {
             readId: request.readId, snapshotReference: view.snapshotReference, cursor, maxBytes: 32768
           }), signal)
           if (!page || typeof page.fragment !== 'string') failed('native_child.page_invalid')

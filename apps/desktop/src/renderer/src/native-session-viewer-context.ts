@@ -6,7 +6,7 @@ export interface NativeSessionTarget {
   identity: string
   threadId: string
   parentConversationId: string
-  runtime: 'codex' | 'grok'
+  runtime: 'codex' | 'grok' | 'claude' | 'qoder'
   subtitle: string | null
   source: NativeReaderTarget
 }
