@@ -111,6 +111,10 @@ pub struct UploadIntent {
 pub enum UploadTarget {
     #[default]
     Camp,
+    Mission {
+        #[serde(rename = "missionId")]
+        mission_id: String,
+    },
     DelegationChildPending {
         #[serde(rename = "conversationId")]
         conversation_id: String,
@@ -179,6 +183,11 @@ pub fn snapshot(
     intent: &UploadIntent,
 ) -> Result<serde_json::Value> {
     match &intent.target {
+        UploadTarget::Mission {mission_id} => {
+            let mission=crate::mission::MissionService::default().get(database,mission_id)?.ok_or_else(||anyhow::anyhow!("mission.not_found"))?;
+            ensure!(mission.camp_id==intent.camp_id,"mission.thread_mismatch");
+            Ok(serde_json::to_value(mission)?)
+        }
         UploadTarget::DelegationChildPending {
             conversation_id,
             composer_scope,
@@ -421,6 +430,9 @@ pub(crate) fn bind_with_prepared(
             return Ok(rejected);
         }
         match &intent.target {
+            UploadTarget::Mission {mission_id} => {
+                if let Some(rejected)=crate::mission::bind_uploaded_attachment(transaction,&intent.camp_id,mission_id,intent.expected_revision,source.clone(),&envelope.actor)?{return Ok(rejected)}
+            }
             UploadTarget::Camp => {
                 ensure!(
                     transaction.query_row(
@@ -446,7 +458,9 @@ pub(crate) fn bind_with_prepared(
             | UploadTarget::DelegationChild { conversation_id, .. } | UploadTarget::DelegationChildPending { conversation_id, .. } = &intent.target {
             crate::private_source_observation::capture_upload(transaction,conversation_id,&source,&intent.sha256,intent.byte_size, prepared)?;
         }
-        let payload = if matches!(intent.target, UploadTarget::Camp) {
+        let payload = if let UploadTarget::Mission {mission_id}=&intent.target {
+            json!({"attachmentRefId":intent.command_id,"missionId":mission_id,"detailsVersion":intent.expected_revision+1})
+        } else if matches!(intent.target, UploadTarget::Camp) {
             json!({"attachmentRefId":intent.command_id, "source":source})
         } else {
             json!({"attachmentRefId":intent.command_id, "draftId":client.draft_id(&intent.camp_id), "revision":intent.expected_revision+1})
@@ -507,7 +521,7 @@ fn private_target_rejection(
 ) -> Result<Option<CommandHandlerResult>> {
     use crate::single_chat_composer::ComposerOwner;
     let (conversation, scope, pending, owner) = match target {
-        UploadTarget::Camp => return Ok(None),
+        UploadTarget::Camp | UploadTarget::Mission { .. } => return Ok(None),
         UploadTarget::DelegationChildPending {
             conversation_id,
             composer_scope,

@@ -379,6 +379,7 @@ fn project_upload(intent: &UploadIntent, value: serde_json::Value) -> serde_json
     let operation = match intent.target {
         UploadTarget::DelegationChild { .. } => operations::Operation::DelegationComposerGet,
         UploadTarget::Camp => return value,
+        UploadTarget::Mission { .. } => operations::Operation::MissionGet,
         UploadTarget::SingleChat { .. }
         | UploadTarget::SingleChatPending { .. }
         | UploadTarget::DelegationChildPending { .. } => operations::Operation::SingleChatGet,

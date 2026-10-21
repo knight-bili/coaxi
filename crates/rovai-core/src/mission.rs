@@ -1072,6 +1072,19 @@ fn normalize_tags(tags: &[String]) -> Result<Vec<String>> {
     Ok(values)
 }
 
+/// Bind a Host-frozen upload through the caller's existing command transaction.
+/// Uses the same detail version, attachment validation and activity as Mission update.
+pub(crate) fn bind_uploaded_attachment(tx:&rusqlite::Connection,camp_id:&str,mission_id:&str,expected_version:i64,source:LocalAttachmentSourceRef,actor:&ActorRef)->Result<Option<CommandHandlerResult>>{
+    if !matches!(actor,ActorRef::User{..}){return Ok(Some(reject("mission.forbidden")))}
+    let Some(current)=load_record(tx,mission_id)?else{return Ok(Some(reject("mission.not_found")))};
+    if current.camp_id!=camp_id{return Ok(Some(reject("mission.thread_mismatch")))}
+    if current.details_version!=expected_version{return Ok(Some(reject("mission.details_version_conflict")))}
+    let next=apply_attachment_update(&current.source_attachments,&MissionAttachmentUpdate{keep_attachment_ids:current.source_attachments.iter().map(|item|item.id.clone()).collect(),new_source_attachments:vec![source]})?;
+    tx.execute("UPDATE mission SET source_attachments_json=?2,details_version=details_version+1,updated_at=?3 WHERE id=?1 AND details_version=?4",params![mission_id,serialize_source_attachments(&next)?,chrono::Utc::now().to_rfc3339(),expected_version])?;
+    record_activity(tx,mission_id,"updated",actor,None,json!({"attachmentsChanged":true}))?;
+    Ok(None)
+}
+
 fn validate_mission_source_attachments(refs: &[LocalAttachmentSourceRef]) -> Result<()> {
     ensure!(
         refs.len() <= crate::camp_attachment::MAX_PREPARED_ATTACHMENTS,
