@@ -18,6 +18,7 @@ mod office_access;
 mod history_import;
 mod webdav_access;
 mod appearance_extensions;
+mod pets_access;
 mod forge;
 pub(crate) mod private_composer;
 mod private_sources;
@@ -10327,6 +10328,8 @@ impl Core {
                     "blockers": blockers,
                 }))
             }
+            "pets.operation" => self.pets_access(false,request.params.clone()).await,
+            "pets.local" => self.pets_access(true,request.params.clone()).await,
             "appearance.extensions" => self.appearance_extensions(request.params.clone()).await,
             "backup.webdav.settings" => self.webdav_access(false,request.params.clone()).await,
             "backup.webdav.local" => self.webdav_access(true,request.params.clone()).await,

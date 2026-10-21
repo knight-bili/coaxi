@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 /// and the legacy shared draft remain outside the network capability.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum Operation {
+    #[serde(rename="pets.operation")]
+    PetsOperation,
     #[serde(rename="appearance.extensions")]
     AppearanceExtensions,
     #[serde(rename="backup.webdav.settings")]
@@ -511,6 +513,7 @@ impl Operation {
         match self {
             Self::AppInfo => json!({"name":value["name"],"version":value["version"]}),
             Self::ForgeAccountsGet | Self::ForgeAccountsSet => select_fields(&value, &["accounts"]),
+            Self::PetsOperation => select_fields(&value,&["entries","settings","id","displayName","description","spritesheetPath","duplicate","removed","mime","digest","offset","totalBytes","next","bytes","enabled","activeId","scale"]),
             Self::AppearanceExtensions => select_fields(&value,&["revision","value"]),
             Self::WebdavSettings => select_fields(&value,&["revision","endpoint","username","passwordSet","allowInsecure"]),
             Self::HistoryLibrary => select_fields(&value,&["entries","digest","totalBytes","offset","next","bytes","saved"]),
@@ -588,6 +591,7 @@ impl Operation {
         match self {
             Self::ForgeAccountsGet => "forge.accounts.get",
             Self::ForgeAccountsSet => "forge.accounts.set",
+            Self::PetsOperation => "pets.operation",
             Self::AppearanceExtensions => "appearance.extensions",
             Self::WebdavSettings => "backup.webdav.settings",
             Self::HistoryLibrary => "history.library",

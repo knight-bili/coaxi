@@ -5003,6 +5003,8 @@ export type CoreMethod =
   | 'runtime.interactions.get'
   | 'runtime.interactions.resolve'
   | 'runtime.childReads.start'
+  | 'pets.operation'
+  | 'pets.local'
   | 'appearance.extensions'
   | 'backup.webdav.settings'
   | 'backup.webdav.local'
@@ -5124,6 +5126,7 @@ export interface BrowserWorkspaceView { id:string; threadId:string;url:string;ti
 
 export interface RovaiApi {
   /** Native local owner surface; intentionally absent from remote Web. */
+  nativePets?: { importDirectory():Promise<unknown|null> }
   webdavWorkspace?: {request<T>(input:{operation:'probe'|'create_collection'|'list'|'push'|'pull'|'status';expectedRevision:string;commandId?:string;snapshotId?:string;expectedDigest?:string}):Promise<T|null>}
   nativeBackups?: NativeBackupsApi
   nativeHistory?: {

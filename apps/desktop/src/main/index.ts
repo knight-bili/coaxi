@@ -301,6 +301,7 @@ const allowedMethods = new Set<CoreMethod>([
   'workspaces.worktrees',
   'workbench.files.list',
   'workbench.organizer.get',
+  'pets.operation',
   'appearance.extensions',
   'backup.webdav.settings',
   'history.library',
@@ -1257,6 +1258,12 @@ const webdavWorkspace = new WebdavWorkspace((method,params)=>core.request(method
 ipcMain.handle('rovai:webdav-workspace',(event,input)=>webdavWorkspace.invoke(event,input))
 const backupWorkspace = new BackupWorkspace(core,()=>coreDataPath,()=>mainWindow,()=>requestRendererQuitPreparation(mainWindow,()=>new MessageChannelMain()),()=>{browserWorkspace.revokeAll();officeWorkspace.closeAll()},()=>{app.relaunch();app.quit()})
 ipcMain.handle('rovai:backup-workspace',(event,operation,input)=>backupWorkspace.invoke(event,operation,input))
+ipcMain.handle('rovai:pets-import',async event=>{
+  if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('pets.local_owner_required')
+  const selected=await dialog.showOpenDialog(mainWindow,{title:'选择包含pet.json和spritesheet.webp的宠物文件夹',properties:['openDirectory']})
+  if(selected.canceled||!selected.filePaths[0])return null
+  return core.request('pets.local',{operation:'import_directory',source:selected.filePaths[0]})
+})
 ipcMain.handle('rovai:native-history',async(event,operation,value:unknown)=>{
   if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('history.local_owner_required')
   if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('history.invalid_request')
