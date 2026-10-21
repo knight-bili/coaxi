@@ -5,6 +5,8 @@ use super::workbench::{Scope, MUTATIONS};
 use anyhow::ensure;
 use serde::{Deserialize, Serialize};
 use std::{fs, time::Duration};
+#[path="forge_envelope.rs"]
+mod envelope;
 
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all="camelCase",deny_unknown_fields)]
@@ -118,8 +120,9 @@ impl Core {
         let write=matches!(request.action.as_str(),"create_issue"|"update_issue"|"create_pr"|"update_pr"|"comment_issue"|"comment_pr");
         let pull=request.action.ends_with("pr")||request.action=="pulls";
         let comments=request.action.starts_with("comment_")||request.action.starts_with("comments_");
-        ensure!(write||["issues","pulls","issue","pr","comments_issue","comments_pr"].contains(&request.action.as_str()),"forge.operation_not_admitted");
-        let single=matches!(request.action.as_str(),"issue"|"pr"|"update_issue"|"update_pr")||comments;
+        let mission_draft=request.action.starts_with("mission_draft_");
+        ensure!(write||["issues","pulls","issue","pr","comments_issue","comments_pr","mission_draft_issue","mission_draft_pr"].contains(&request.action.as_str()),"forge.operation_not_admitted");
+        let single=matches!(request.action.as_str(),"issue"|"pr"|"update_issue"|"update_pr")||comments||mission_draft;
         if single{ensure!(request.number.is_some_and(|n|n>0),"forge.item_number_required");}
         let collection=if pull && !(comments&&repository.provider!="gitlab"){"pulls"}else{"issues"};
         let mut url=repository.endpoint(collection,if single{request.number}else{None},comments)?;
@@ -156,7 +159,15 @@ impl Core {
         let next=response.headers().get("x-next-page").and_then(|v|v.to_str().ok()).is_some_and(|v|!v.is_empty())||response.headers().get("link").and_then(|v|v.to_str().ok()).is_some_and(|v|v.contains("rel=\"next\""));
         let mut bytes=Vec::new();while let Some(chunk)=response.chunk().await?{ensure!(bytes.len()+chunk.len()<=16*1024*1024,"forge.response_too_large");bytes.extend_from_slice(&chunk);}
         let data=if status.is_success()&&!bytes.is_empty(){serde_json::from_slice::<Value>(&bytes).context("forge.invalid_response")?}else{Value::Null};
-        let result=json!({"repository":repository.metadata(),"success":status.is_success(),"status":status.as_u16(),"data":data,"nextPage":if next{Some(request.page+1)}else{None}});
+        let draft=if mission_draft&&status.is_success(){
+            let number=request.number.context("forge.item_number_required")?;
+            let route=if repository.provider=="gitlab"{if pull{"-/merge_requests"}else{"-/issues"}}else if pull{"pull"}else{"issues"};
+            let url=format!("{}/{}/{route}/{number}",repository.web_base,repository.owner_repo);
+            let title=data["title"].as_str().unwrap_or_default().to_owned();
+            let snapshot=envelope::ForgeSnapshot{title:title.clone(),body:data["body"].as_str().or_else(||data["description"].as_str()).map(String::from),labels:Vec::new(),author:data.pointer("/user/login").or_else(||data.pointer("/author/username")).and_then(Value::as_str).map(String::from)};
+            Some(json!({"title":format!("#{} {}",number,title),"description":format!("来源：{}\n{}",url,envelope::forge_untrusted_envelope(&repository.provider,&snapshot)),"sourceUrl":url,"sourceKey":format!("{}:{}:{}:{}:{}",repository.provider,repository.web_base,repository.owner_repo,if pull{"pr"}else{"issue"},number)}))
+        }else{None};
+        let result=json!({"repository":repository.metadata(),"success":status.is_success(),"status":status.as_u16(),"data":data,"missionDraft":draft,"nextPage":if next{Some(request.page+1)}else{None}});
         if let Some(receipt)=receipt{crate::platform::private_storage::atomic_write_private_json(&receipt,&json!({"identity":identity,"state":"finished","result":result}))?;}
         Ok(result)
     }

@@ -5,6 +5,12 @@ use serde::{Deserialize, Serialize};
 /// and the legacy shared draft remain outside the network capability.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum Operation {
+    #[serde(rename = "forge.accounts.get")]
+    ForgeAccountsGet,
+    #[serde(rename = "forge.accounts.set")]
+    ForgeAccountsSet,
+    #[serde(rename = "forge.operation")]
+    ForgeOperation,
     #[serde(rename = "workbench.organizer.get")]
     WorkbenchOrganizerGet,
     #[serde(rename = "workbench.organizer.set")]
@@ -475,6 +481,7 @@ pub enum Operation {
 impl Operation {
     pub fn timeout(self) -> std::time::Duration {
         std::time::Duration::from_secs(match self {
+            Self::ForgeOperation => 60,
             Self::WorkbenchGitRead | Self::WorkbenchGitPreview | Self::WorkbenchGitExecute => 120,
             Self::MissionCleanupRetry
             | Self::MissionChanges
@@ -492,6 +499,8 @@ impl Operation {
         use serde_json::json;
         match self {
             Self::AppInfo => json!({"name":value["name"],"version":value["version"]}),
+            Self::ForgeAccountsGet | Self::ForgeAccountsSet => select_fields(&value, &["accounts"]),
+            Self::ForgeOperation => select_fields(&value, &["provider", "webUrl", "ownerRepo", "repository", "success", "status", "data", "missionDraft", "nextPage"]),
             Self::WorkbenchOrganizerGet | Self::WorkbenchOrganizerSet => select_fields(&value, &["value", "digest"]),
             Self::WorkbenchFilesList => select_fields(&value, &["entries", "next"]),
             Self::WorkbenchFilesRead => select_fields(&value, &["path", "text", "digest"]),
@@ -562,6 +571,9 @@ impl Operation {
 
     pub fn method(self) -> &'static str {
         match self {
+            Self::ForgeAccountsGet => "forge.accounts.get",
+            Self::ForgeAccountsSet => "forge.accounts.set",
+            Self::ForgeOperation => "forge.operation",
             Self::WorkbenchOrganizerGet => "workbench.organizer.get",
             Self::WorkbenchOrganizerSet => "workbench.organizer.set",
             Self::WorkbenchFilesList => "workbench.files.list",
