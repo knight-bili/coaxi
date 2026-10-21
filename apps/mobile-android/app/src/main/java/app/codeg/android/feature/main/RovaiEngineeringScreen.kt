@@ -44,11 +44,11 @@ fun RovaiEngineeringScreen(model:RovaiWorkspaceViewModel,threadId:String,blocked
     Column(Modifier.fillMaxSize()){
         Row(Modifier.fillMaxWidth().padding(8.dp),horizontalArrangement=Arrangement.spacedBy(8.dp)){
             TextButton(onClick=::close){Text("返回对话")}
-            FilterChip(selected=section==0,onClick={section=0},label={Text("文件")});FilterChip(selected=section==1,onClick={if(!dirty){section=1;work{readGit()}}},label={Text("Git")})
+            FilterChip(selected=section==0,onClick={section=0},label={Text("文件")});FilterChip(selected=section==1,onClick={if(!dirty){section=1;work{readGit()}}},label={Text("Git")});FilterChip(selected=section==2,enabled=!dirty,onClick={section=2},label={Text("仓库面板")})
             Spacer(Modifier.weight(1f));IconButton(enabled=!busy&&!dirty,onClick={work{if(section==0)readDirectory()else readGit()}}){Icon(Icons.Outlined.Refresh,"刷新")}
         }
         issue?.let{Text(it,Modifier.padding(12.dp),color=CodegTheme.colors.danger)}
-        if(section==0){
+        if(section==2){RovaiForgeWorkspace(model,threadId)}else if(section==0){
             if(file==null){
                 Row(Modifier.fillMaxWidth().padding(horizontal=12.dp)){Text(directory.ifEmpty{"工程根目录"},Modifier.weight(1f),fontFamily=FontFamily.Monospace);if(directory.isNotEmpty())TextButton(enabled=!busy,onClick={directory=directory.substringBeforeLast('/',"")}){Text("上一级")}}
                 LazyColumn(Modifier.weight(1f),contentPadding=PaddingValues(horizontal=12.dp)){
