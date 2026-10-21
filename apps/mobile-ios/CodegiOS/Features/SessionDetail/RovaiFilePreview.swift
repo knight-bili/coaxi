@@ -12,7 +12,7 @@ struct RovaiMessageArtifacts: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             ForEach(message["quotes"]?.rvArray ?? [], id: \.self) { quote in GlassRow { VStack(alignment: .leading, spacing: 4) { Text("引用 · " + (quote["authorAtCapture"]?.text("displayName") ?? "")).font(.caption).foregroundStyle(Theme.textSecondary); MarkdownContent(raw: quote.text("text")) } } }
-            ForEach((message["attachments"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in
+            ForEach((message["attachments"]?.rvArray ?? []).filter { $0.text("previewKind") != "image" }.map { RovaiRow(value: $0) }) { row in
                 Button { source = request(row.id) } label: { Label(row.value.text("displayName"), systemImage: row.value.text("previewKind") == "image" ? "photo" : "doc").font(.subheadline) }.disabled(["missing", "unreadable", "kind_changed"].contains(row.value.text("availability")))
             }
         }.sheet(isPresented: Binding(get: { source != nil }, set: { if !$0 { source = nil } })) { if let source { RovaiFilePreview(model: model, source: source) } }
