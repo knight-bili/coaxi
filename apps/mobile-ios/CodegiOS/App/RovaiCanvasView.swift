@@ -2,6 +2,7 @@ import SwiftUI
 
 struct RovaiCanvasView: View {
     let model: RovaiWorkspaceModel; let id: String
+    let onOpenThread: (String) -> Void
     @State private var snapshot: JSONValue?
     @State private var issue: String?
     @State private var offset = CGSize.zero
@@ -27,7 +28,7 @@ struct RovaiCanvasView: View {
         .task(id: "\(id):\(revision)") { await load() }
         .onChange(of: model.lastResult) { _, _ in Task { await load() } }
         .sheet(item: $properties) {target in if let snapshot {RovaiCanvasNodeProperties(model: model, boardId: id, node: target.value, graph: snapshot)}}
-        .sheet(item: $selected) { selected in if selected.value["data"]?.text("kind") == "file" {RovaiCanvasFileNode(model: model, node: selected.value)} else if selected.value["data"]?.text("kind") == "terminal", let controller = model.terminal(boardId: id, nodeId: selected.id) { RovaiTerminalView(controller: controller) } else { NavigationStack { ScrollView { MarkdownContent(raw: selected.value["data"]?.text("content") ?? "").padding(20) }.navigationTitle(selected.value["data"]?.text("title") ?? "卡片").toolbar { ToolbarItem(placement: .confirmationAction) { Button("关闭") { self.selected = nil } } } } } }
+        .sheet(item: $selected) { selected in if selected.value["data"]?.text("kind") == "file" {RovaiCanvasFileNode(model: model, node: selected.value)} else if selected.value["data"]?.text("kind") == "conversation", selected.value["data"]?["objectReference"] == nil || selected.value["data"]?["objectReference"] == .null {RovaiCanvasConversationNode(model: model, boardId: id, node: selected.value, onOpenThread: onOpenThread)} else if selected.value["data"]?.text("kind") == "terminal", let controller = model.terminal(boardId: id, nodeId: selected.id) { RovaiTerminalView(controller: controller) } else { NavigationStack { ScrollView { MarkdownContent(raw: selected.value["data"]?.text("content") ?? "").padding(20) }.navigationTitle(selected.value["data"]?.text("title") ?? "卡片").toolbar { ToolbarItem(placement: .confirmationAction) { Button("关闭") { self.selected = nil } } } } } }
         .alert("添加便签", isPresented: $newNote) { TextField("内容", text: $note); Button("取消", role: .cancel) {}; Button("添加") { mutate(.object(["type": .string("create"), "node": .object(["kind": .string("note"), "title": .string("便签"), "content": .string(note), "x": .number(100), "y": .number(100), "width": .number(320), "height": .number(220)])])); note = "" } }
     }
     private func load() async { do { snapshot = try await model.query(.canvasNodesSnapshot, params: .object(["boardId": .string(id)])); issue = nil } catch { issue = error.localizedDescription } }

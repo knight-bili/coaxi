@@ -81,7 +81,7 @@ struct RovaiWorkspaceRoot: View {
             }.navigationSplitViewColumnWidth(min: 340, ideal: 400, max: 520)
         } detail: {
             NavigationStack {
-                if model.connected, let detailRoute { switch detailRoute { case .thread(let id): RovaiThreadDetail(model: model, id: id).id(id); case .canvas(let id): RovaiCanvasView(model: model, id: id).id(id) } }
+                if model.connected, let detailRoute { switch detailRoute { case .thread(let id): RovaiThreadDetail(model: model, id: id).id(id); case .canvas(let id): RovaiCanvasView(model: model, id: id, onOpenThread: {detailRoute = .thread($0)}).id(id) } }
                 else { ContentUnavailableView("选择对话或画布", systemImage: "sidebar.left", description: Text("从列表打开内容，在此查看并继续工作。")) }
             }
         }.navigationSplitViewStyle(.balanced)
@@ -99,7 +99,7 @@ struct RovaiWorkspaceRoot: View {
             }
             .navigationTitle(title)
             .toolbar { ToolbarItem(placement: .topBarLeading) { Menu { ForEach(store.servers) { profile in Button(profile.name) { selectedServerID = profile.id } }; Divider(); Button("管理服务器", action: onManageServers) } label: { Label(profile?.name ?? "工作区", systemImage: "server.rack") } }; ToolbarItemGroup(placement: .topBarTrailing) { Button { notifications = true } label: { Image(systemName: "bell") }.disabled(!model.connected); if value == 2 { Button { memberEditor = MemberEditorSelection(value: nil) } label: { Image(systemName: "person.badge.plus") }.disabled(!model.connected || model.pending != nil) }; if value == 0 || value == 1 { Button { create = value == 1 ? "mission" : "thread" } label: { Image(systemName: "plus") }.disabled(!model.connected || model.pending != nil) }; Button { Task { await model.refresh() } } label: { Image(systemName: "arrow.clockwise") }.disabled(!model.connected) } }
-            .navigationDestination(for: RovaiRoute.self) { route in switch route { case .thread(let id): RovaiThreadDetail(model: model, id: id); case .canvas(let id): RovaiCanvasView(model: model, id: id) } }
+            .navigationDestination(for: RovaiRoute.self) { route in switch route { case .thread(let id): RovaiThreadDetail(model: model, id: id); case .canvas(let id): RovaiCanvasView(model: model, id: id, onOpenThread: {compactPaths[3, default: []].append(.thread($0))}) } }
         }.tabItem { Label(title, systemImage: icon).environment(\.symbolVariants, .none) }.tag(value)
     }
     private var threadList: some View {
