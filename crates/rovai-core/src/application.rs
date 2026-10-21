@@ -11,6 +11,7 @@ pub(crate) mod delegation_queries;
 mod mission;
 mod native_interactions;
 mod native_child_reads;
+mod workbench;
 pub(crate) mod private_composer;
 mod private_sources;
 pub(crate) mod runtime_interactions;
@@ -10319,6 +10320,20 @@ impl Core {
                 }))
             }
             "workspaces.inspect" => {
+                let params: WorkspaceInspectParams =
+                    serde_json::from_value(request.params.clone())?;
+                let inspection = git::inspect_workspace(
+                    PathBuf::from(params.path).as_path(),
+                    &self.data_dir,
+                    false,
+                )
+                .await?;
+                Ok(serde_json::to_value(inspection)?)
+            }
+            "workbench.files.list" | "workbench.files.read" => {
+                self.workbench_files(&request.method, request.params.clone()).await
+            }
+            "workspaces.inspect.compat" => {
                 let params: WorkspaceInspectParams =
                     serde_json::from_value(request.params.clone())?;
                 let inspection = git::inspect_workspace(
