@@ -5,6 +5,18 @@ use serde::{Deserialize, Serialize};
 /// and the legacy shared draft remain outside the network capability.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum Operation {
+    #[serde(rename = "workbench.files.list")]
+    WorkbenchFilesList,
+    #[serde(rename = "workbench.files.read")]
+    WorkbenchFilesRead,
+    #[serde(rename = "workbench.files.mutate")]
+    WorkbenchFilesMutate,
+    #[serde(rename = "workbench.git.read")]
+    WorkbenchGitRead,
+    #[serde(rename = "workbench.git.preview")]
+    WorkbenchGitPreview,
+    #[serde(rename = "workbench.git.execute")]
+    WorkbenchGitExecute,
     #[serde(rename = "missions.workspace.cleanup")]
     MissionWorkspaceCleanup,
     #[serde(rename = "missions.cleanup.list")]
@@ -459,6 +471,7 @@ pub enum Operation {
 impl Operation {
     pub fn timeout(self) -> std::time::Duration {
         std::time::Duration::from_secs(match self {
+            Self::WorkbenchGitRead | Self::WorkbenchGitPreview | Self::WorkbenchGitExecute => 120,
             Self::MissionCleanupRetry
             | Self::MissionChanges
             | Self::MissionFileDiff
@@ -475,6 +488,11 @@ impl Operation {
         use serde_json::json;
         match self {
             Self::AppInfo => json!({"name":value["name"],"version":value["version"]}),
+            Self::WorkbenchFilesList => select_fields(&value, &["entries", "next"]),
+            Self::WorkbenchFilesRead => select_fields(&value, &["path", "text", "digest"]),
+            Self::WorkbenchFilesMutate => select_fields(&value, &["applied", "digest"]),
+            Self::WorkbenchGitRead | Self::WorkbenchGitExecute => select_fields(&value, &["success", "exitCode", "output", "error"]),
+            Self::WorkbenchGitPreview => select_fields(&value, &["revision", "action", "arguments", "cleanPreview"]),
             Self::DelegationSource => select_fields(&value,
                 &["state", "source", "operation", "attemptNo", "detail", "task", "reason", "code"]),
             Self::NativeAgentReadStart | Self::NativeAgentReadPoll | Self::NativeChildReadStart | Self::NativeChildReadPoll => select_fields(&value,
@@ -539,6 +557,12 @@ impl Operation {
 
     pub fn method(self) -> &'static str {
         match self {
+            Self::WorkbenchFilesList => "workbench.files.list",
+            Self::WorkbenchFilesRead => "workbench.files.read",
+            Self::WorkbenchFilesMutate => "workbench.files.mutate",
+            Self::WorkbenchGitRead => "workbench.git.read",
+            Self::WorkbenchGitPreview => "workbench.git.preview",
+            Self::WorkbenchGitExecute => "workbench.git.execute",
             Self::NewConversationGet => "preferences.newConversation.get",
             Self::NewConversationSetDefaults => "preferences.newConversation.setDefaults",
             Self::NewConversationSetOneClick => "preferences.newConversation.setOneClick",
