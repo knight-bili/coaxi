@@ -52,7 +52,7 @@ struct RovaiPrivateConversationView: View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 12) {
                 HStack { if !child { Button("其他私聊") { do { try model.saveBody(owner, body: text); selected = nil } catch { issue = error.localizedDescription } } }; Spacer(); Button("结束会话", role: .destructive) { ending = true }.disabled(disabled) }
-                if let selected { RovaiInteractionCards(model: model, conversationId: selected) }
+                if let selected { RovaiInteractionCards(model: model, conversationId: selected); RovaiDelegationList(model: model, threadId: threadId, parentConversationId: selected) }
                 ForEach((snapshot["messages"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in
                     GlassRow(isSelected: row.value.text("authorType") == "user") { VStack(alignment: .leading, spacing: 8) { Text(row.value.text("authorType") == "user" ? "你" : row.value.text("authorType")).font(.caption).foregroundStyle(Theme.textSecondary); ForEach(row.value["quotes"]?.rvArray ?? [], id: \.self) { quote in Text("引用").font(.caption2); MarkdownContent(raw: quote.text("body")) }; MarkdownContent(raw: row.value.text("body")); ForEach(row.value["attachments"]?.rvArray ?? [], id: \.self) { attachment in Text("附件 · \(attachment.text("displayName"))").font(.caption) } } }
                 }
