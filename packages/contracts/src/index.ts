@@ -5141,7 +5141,7 @@ export interface RovaiApi {
   webdavWorkspace?: {request<T>(input:{operation:'probe'|'create_collection'|'list'|'push'|'pull'|'status';expectedRevision:string;commandId?:string;snapshotId?:string;expectedDigest?:string}):Promise<T|null>}
   nativeBackups?: NativeBackupsApi
   nativeHistory?: {
-    scan<T>(threadId:string,provider:'codex'|'claude'|'qoder'|'grok'):Promise<T|null>
+    scan<T>(threadId:string,provider:'codex'|'claude'|'qoder'|'grok'|'opencode'|'gemini'|'openclaw'|'cline'|'hermes'|'codebuddy'|'kimi_code'|'pi'|'cursor'|'deepseek'|'antigravity'):Promise<T|null>
     request<T>(threadId:string,input:{operation:'preview'|'import';planId:string;entryId:string;expectedDigest?:string}):Promise<T>
   }
   officeWorkspace?: {open(threadId:string,path:string,editable:boolean):Promise<{opened:true}>}

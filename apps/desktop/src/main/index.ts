@@ -1294,7 +1294,7 @@ ipcMain.handle('rovai:native-history',async(event,operation,value:unknown)=>{
   const {threadId,provider,input}=value as {threadId:string;provider:string;input:Record<string,unknown>}
   if(typeof threadId!=='string')throw new Error('history.invalid_thread')
   if(operation==='scan'){
-    if(!['codex','claude','qoder','grok'].includes(provider))throw new Error('history.invalid_provider')
+    if(!['codex','claude','qoder','grok','opencode','gemini','openclaw','cline','hermes','codebuddy','kimi_code','pi','cursor','deepseek','antigravity'].includes(provider))throw new Error('history.invalid_provider')
     const selected=await dialog.showOpenDialog(mainWindow,{title:'选择原生会话记录文件夹',properties:['openDirectory']})
     if(selected.canceled||!selected.filePaths[0])return null
     return core.request('history.local',{scope:{threadId},operation:'scan',root:selected.filePaths[0],provider})
