@@ -9,6 +9,7 @@ import Observation
 final class ServerStore {
     private(set) var servers: [ServerProfile]
 
+    @ObservationIgnored private var rovaiClients: [UUID: (String, RovaiHostClient)] = [:]
     private let defaults: UserDefaults
     private let storageKey = "codeg.servers.v1"
 
@@ -51,6 +52,8 @@ final class ServerStore {
     }
 
     func delete(_ profile: ServerProfile) {
+        RovaiSecureSession.remove(profile: profile.id)
+        if let entry = rovaiClients.removeValue(forKey: profile.id) { Task { await entry.1.close() } }
         servers.removeAll { $0.id == profile.id }
         Keychain.deleteToken(for: profile.id)
         persist()
@@ -58,6 +61,8 @@ final class ServerStore {
 
     func delete(at offsets: IndexSet) {
         for index in offsets {
+            RovaiSecureSession.remove(profile: servers[index].id)
+            if let entry = rovaiClients.removeValue(forKey: servers[index].id) { Task { await entry.1.close() } }
             Keychain.deleteToken(for: servers[index].id)
         }
         servers.remove(atOffsets: offsets)
@@ -79,6 +84,16 @@ final class ServerStore {
     func client(for profile: ServerProfile) -> CodegClient? {
         guard let baseURL = profile.baseURL, let token = token(for: profile) else { return nil }
         return CodegClient(baseURL: baseURL, token: token)
+    }
+
+    func rovaiClient(for profile: ServerProfile) throws -> RovaiHostClient? {
+        guard let baseURL = profile.baseURL, let token = token(for: profile) else { return nil }
+        let account = RovaiSecureSession.account(baseURL: baseURL, administratorToken: token)
+        if let current = rovaiClients[profile.id], current.0 == account { return current.1 }
+        if let previous = rovaiClients.removeValue(forKey: profile.id) { Task { await previous.1.close() } }
+        let id = profile.id
+        let client = try RovaiHostClient(baseURL: baseURL, administratorToken: token, load: { RovaiSecureSession.load(profile: id, account: account) }, save: { RovaiSecureSession.save($0, profile: id, account: account) })
+        rovaiClients[id] = (account, client); return client
     }
 
     // MARK: - Persistence

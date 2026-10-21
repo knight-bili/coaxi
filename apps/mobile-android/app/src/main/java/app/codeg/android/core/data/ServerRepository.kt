@@ -4,6 +4,11 @@ import app.codeg.android.core.common.DispatcherProvider
 import app.codeg.android.core.datastore.ServerProfile
 import app.codeg.android.core.datastore.ServerStore
 import app.codeg.android.core.network.CodegClient
+import app.codeg.android.core.network.RovaiHostClient
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.serialization.json.*
+import java.security.MessageDigest
 import app.codeg.android.core.network.CodegClientFactory
 import app.codeg.android.core.network.EventStream
 import app.codeg.android.core.security.SecretStore
@@ -29,6 +34,8 @@ class ServerRepository @Inject constructor(
     private val factory: CodegClientFactory,
     private val dispatchers: DispatcherProvider,
 ) {
+    private val rovaiMutex=Mutex()
+    private val rovaiClients=mutableMapOf<String,Pair<String,RovaiHostClient>>()
     val profiles: Flow<List<ServerProfile>> = serverStore.profiles
     val selectedId: Flow<String?> = serverStore.selectedId
 
@@ -61,6 +68,8 @@ class ServerRepository @Inject constructor(
     }
 
     suspend fun delete(id: String) {
+        rovaiMutex.withLock {rovaiClients.remove(id)?.second?.close()}
+        withContext(dispatchers.io){secretStore.remove("rovai.host-session.$id")}
         serverStore.delete(id)
         withContext(dispatchers.io) { secretStore.remove(id) }
     }
@@ -71,6 +80,19 @@ class ServerRepository @Inject constructor(
     suspend fun client(profile: ServerProfile): CodegClient? {
         val token = token(profile.id) ?: return null
         return factory.client(profile.baseUrl, token)
+    }
+
+    suspend fun rovaiClient(profile:ServerProfile):RovaiHostClient? {
+        val token=token(profile.id)?:return null
+        val signature=MessageDigest.getInstance("SHA-256").digest((profile.baseUrl+"\u0000"+token).toByteArray()).joinToString(""){"%02x".format(it)}
+        return rovaiMutex.withLock {
+            rovaiClients[profile.id]?.let{if(it.first==signature)return@withLock it.second;it.second.close()}
+            val key="rovai.host-session.${profile.id}"
+            val client=RovaiHostClient(profile.baseUrl,token,loadSession={
+                withContext(dispatchers.io){secretStore.get(key)?.let{raw->runCatching{val value=Json.parseToJsonElement(raw).jsonObject;if(value["signature"]?.jsonPrimitive?.content==signature)value["credential"]?.jsonPrimitive?.content else null}.getOrNull()}}
+            },saveSession={credential->withContext(dispatchers.io){if(credential==null)secretStore.remove(key)else secretStore.put(key,buildJsonObject{put("signature",signature);put("credential",credential)}.toString())}})
+            rovaiClients[profile.id]=signature to client;client
+        }
     }
 
     /** An event stream for a saved profile, or null if its token is missing. */
