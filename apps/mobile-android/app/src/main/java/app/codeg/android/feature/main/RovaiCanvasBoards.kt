@@ -22,10 +22,10 @@ val rovaiCanvasColors=listOf("" to "默认","neutral" to "中性","zinc" to "锌
 
 /** Codeg BoardCard's footprint, copy and separate action menu; summaries must match the board revision. */
 @Composable fun RovaiCanvasBoards(model:RovaiWorkspaceViewModel,onOpen:(JsonObject)->Unit){
-    val state=model.state.collectAsState().value;var search by remember{mutableStateOf("")};var creating by remember{mutableStateOf(false)};var editing by remember{mutableStateOf<JsonObject?>(null)};var deleting by remember{mutableStateOf<JsonObject?>(null)}
+    val state=model.state.collectAsState().value;var search by remember{mutableStateOf("")};var creating by remember{mutableStateOf(false)};var editing by remember{mutableStateOf<JsonObject?>(null)};var deleting by remember{mutableStateOf<JsonObject?>(null)};var managingGroups by remember{mutableStateOf(false)}
     val blocked=state.busy||state.pending!=null||!state.connected
     LazyVerticalGrid(columns=GridCells.Adaptive(180.dp),modifier=Modifier.fillMaxSize(),contentPadding=PaddingValues(16.dp),horizontalArrangement=Arrangement.spacedBy(12.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
-        item(span={GridItemSpan(maxLineSpan)}){Column(verticalArrangement=Arrangement.spacedBy(10.dp)){Row{Text("画布",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(enabled=!blocked,onClick={creating=true}){Text("新建画布")}};Text("每个画布都有自己的区域、会话卡片、便签、文件和终端。",style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary);OutlinedTextField(search,{search=it},Modifier.fillMaxWidth(),label={Text("搜索画布")},singleLine=true)}}
+        item(span={GridItemSpan(maxLineSpan)}){Column(verticalArrangement=Arrangement.spacedBy(10.dp)){Row{Text("画布",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(enabled=!blocked,onClick={managingGroups=true}){Text("项目分组")};TextButton(enabled=!blocked,onClick={creating=true}){Text("新建画布")}};Text("每个画布都有自己的区域、会话卡片、便签、文件和终端。",style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary);OutlinedTextField(search,{search=it},Modifier.fillMaxWidth(),label={Text("搜索画布")},singleLine=true)}}
         val rows=state.boards.filter{(it.coreText("name")+" "+it.coreText("description")).contains(search,true)}
         items(rows,key={it.coreText("id")}){board->
             var menu by remember(board.coreText("id")){mutableStateOf(false)}
@@ -44,6 +44,7 @@ val rovaiCanvasColors=listOf("" to "默认","neutral" to "中性","zinc" to "锌
         }
         if(rows.isEmpty())item(span={GridItemSpan(maxLineSpan)}){Text(if(state.boards.isEmpty())"还没有画布，创建一个画布开始整理工作。" else "没有符合条件的画布",modifier=Modifier.padding(vertical=32.dp),color=CodegTheme.colors.textSecondary)}
     }
+    if(managingGroups)RovaiProjectGroups(model){managingGroups=false}
     if(creating||editing!=null||deleting!=null)RovaiCanvasBoardEditor(model,editing?:deleting,deleting!=null){creating=false;editing=null;deleting=null}
 }
 

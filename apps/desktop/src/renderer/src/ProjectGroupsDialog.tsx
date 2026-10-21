@@ -64,7 +64,7 @@ export function ProjectGroupsDialog({ snapshot, onSave, onRefresh, onClose, init
     <Dialog.Overlay className="dialog-overlay app-dialog-overlay" />
     <AppDialogContent width="wide" onEscapeKeyDown={event => { if (saving.current) event.preventDefault() }}
       onPointerDownOutside={event => { if (saving.current || editor || removal) event.preventDefault() }}>
-      <AppDialogHeader title={uiAttribute('管理项目分组')} description={uiAttribute('分组保存在此设备或浏览器，不改动文件和对话。')} closeDisabled={busy} />
+      <AppDialogHeader title={uiAttribute('管理项目分组')} description={uiAttribute('分组由当前工作区共享，文件和对话保持原处。')} closeDisabled={busy} />
       <form className="app-dialog-form" onSubmit={save}>
         <AppDialogBody>
           {(error || snapshot.readError) && <p role="alert" className="rename-project-error">{error || uiAttribute('分组暂时无法保存，原有记录已保留。请重新读取。')}</p>}
