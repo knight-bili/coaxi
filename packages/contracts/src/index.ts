@@ -5138,7 +5138,7 @@ export interface RovaiApi {
   nativeCustomSkills?: {importDirectory<T>(input:{skillId:string;expectedRevision?:string}):Promise<T|null>}
   /** Native local owner surface; intentionally absent from remote Web. */
   nativePets?: { importDirectory():Promise<unknown|null>;synchronize():Promise<void>;onChanged(listener:()=>void):()=>void }
-  webdavWorkspace?: {request<T>(input:{operation:'probe'|'create_collection'|'list'|'push'|'pull'|'status';expectedRevision:string;commandId?:string;snapshotId?:string;expectedDigest?:string}):Promise<T|null>}
+  webdavWorkspace?: {request<T>(input:{operation:'probe'|'create_collection'|'list'|'push'|'pull'|'status'|'transfers'|'cancel'|'resume';expectedRevision:string;commandId?:string;snapshotId?:string;expectedDigest?:string}):Promise<T|null>}
   nativeBackups?: NativeBackupsApi
   nativeHistory?: {
     export<T>(threadId:string,importId:string,expectedRevision:string):Promise<T|null>

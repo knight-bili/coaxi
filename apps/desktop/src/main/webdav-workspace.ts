@@ -10,9 +10,9 @@ export class WebdavWorkspace{
     if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('webdav.invalid_request')
     const input=value as {operation:string;expectedRevision:string;commandId?:string;snapshotId?:string;expectedDigest?:string}
     if(typeof input.expectedRevision!=='string')throw new Error('webdav.settings_revision_required')
-    if(['list','probe','create_collection'].includes(input.operation))return this.request('backup.webdav.local',{operation:input.operation,expectedRevision:input.expectedRevision})
+    if(['list','probe','create_collection','transfers'].includes(input.operation))return this.request('backup.webdav.local',{operation:input.operation,expectedRevision:input.expectedRevision})
     if(typeof input.commandId!=='string')throw new Error('webdav.command_required')
-    if(input.operation==='status')return this.request('backup.webdav.local',{operation:'status',commandId:input.commandId,expectedRevision:input.expectedRevision})
+    if(['status','cancel','resume'].includes(input.operation))return this.request('backup.webdav.local',{operation:input.operation,commandId:input.commandId,expectedRevision:input.expectedRevision})
     if(input.operation==='push'){
       const selected=await dialog.showOpenDialog(owner,{title:'选择要上传的加密备份',properties:['openFile'],filters:[{name:'加密备份',extensions:['rovai-backup','codegbak']}]})
       if(selected.canceled||!selected.filePaths[0])return null

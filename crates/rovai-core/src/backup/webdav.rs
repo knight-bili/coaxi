@@ -62,6 +62,21 @@ impl WebDav{
         }
         anyhow::bail!("webdav.concurrent_index_update; encrypted blob retained")
     }
+    pub async fn pull_resumable(&self,id:&str,destination:&Path,expected_digest:Option<&str>,operation_id:&str,cancel:&tokio_util::sync::CancellationToken)->Result<Snapshot>{
+        use tokio::io::{AsyncReadExt,AsyncSeekExt};
+        uuid::Uuid::parse_str(id)?;uuid::Uuid::parse_str(operation_id)?;let(index,_)=self.index().await?;let snapshot=index.entries.into_iter().find(|entry|entry.id==id).context("webdav.snapshot_missing")?;ensure!(expected_digest.is_none_or(|digest|digest==snapshot.sha256),"webdav.remote_selection_changed");
+        let parent=std::fs::canonicalize(destination.parent().context("webdav.destination_parent_required")?)?;let temporary=parent.join(format!(".rovai-download-{operation_id}.part"));
+        if destination.exists(){super::no_link(destination)?;let found=super::hash_file(destination)?;ensure!(found==(snapshot.bytes,snapshot.sha256.clone()),"webdav.destination_changed");return Ok(snapshot)}
+        let mut file=if temporary.exists(){super::no_link(&temporary)?;tokio::fs::OpenOptions::new().read(true).write(true).open(&temporary).await?}else{tokio::fs::OpenOptions::new().read(true).write(true).create_new(true).open(&temporary).await?};let mut length=file.metadata().await?.len();ensure!(length<=snapshot.bytes,"webdav.partial_size_invalid");let mut hash=Sha256::new();let mut buffer=[0u8;65536];loop{ensure!(!cancel.is_cancelled(),"webdav.cancelled_outcome_unknown");let count=file.read(&mut buffer).await?;if count==0{break}hash.update(&buffer[..count]);}
+        if length<snapshot.bytes{
+            let mut request=self.request(Method::GET,self.url(&Self::blob_name(&snapshot))?).timeout(Duration::from_secs(43200));if length>0{request=request.header("range",format!("bytes={length}-"));}
+            let mut response=tokio::select!{_ = cancel.cancelled()=>anyhow::bail!("webdav.cancelled_outcome_unknown"),result=request.send()=>result?};
+            if length>0&&response.status()==StatusCode::PARTIAL_CONTENT{let expected=format!("bytes {length}-");let range=response.headers().get("content-range").and_then(|value|value.to_str().ok()).context("webdav.range_missing")?;ensure!(range.starts_with(&expected)&&range.ends_with(&format!("/{}",snapshot.bytes)),"webdav.range_changed");}
+            else{ensure!(response.status()==StatusCode::OK,"webdav.download_rejected: {}",response.status());file.set_len(0).await?;file.seek(std::io::SeekFrom::Start(0)).await?;length=0;hash=Sha256::new();}
+            loop{let chunk=tokio::select!{_ = cancel.cancelled()=>{file.sync_all().await?;anyhow::bail!("webdav.cancelled_outcome_unknown")},result=response.chunk()=>result?};let Some(chunk)=chunk else{break};length=length.checked_add(chunk.len()as u64).context("webdav.length_overflow")?;ensure!(length<=snapshot.bytes,"webdav.download_limit");hash.update(&chunk);file.write_all(&chunk).await?;progress(length,snapshot.bytes,"download");}
+        }
+        file.sync_all().await?;drop(file);ensure!(length==snapshot.bytes&&format!("{:x}",hash.finalize())==snapshot.sha256,"webdav.download_checksum_mismatch");ensure!(super::crypto::is_encrypted(&temporary)?,"webdav.encrypted_snapshot_required");ensure!(!cancel.is_cancelled(),"webdav.cancelled_outcome_unknown");std::fs::hard_link(&temporary,destination)?;let _=tokio::fs::remove_file(&temporary).await;Ok(snapshot)
+    }
     pub async fn pull(&self,id:&str,destination:&Path,expected_digest:Option<&str>)->Result<Snapshot>{
         uuid::Uuid::parse_str(id)?;let (index,_)=self.index().await?;let snapshot=index.entries.into_iter().find(|entry|entry.id==id).context("webdav.snapshot_missing")?;
         ensure!(expected_digest.is_none_or(|digest|digest==snapshot.sha256),"webdav.remote_selection_changed");

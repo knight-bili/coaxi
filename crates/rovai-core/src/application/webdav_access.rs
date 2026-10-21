@@ -22,22 +22,25 @@ impl Core{
             WebDav::new(settings.config.clone())?;crate::platform::private_storage::atomic_write_private_json(&path,&settings)?;return Ok(view(&settings));
         }
         ensure!(local,"webdav.local_owner_required");
-        let settings:Settings=serde_json::from_slice(&std::fs::read(path)?)?;ensure!(request.expected_revision.as_deref()==Some(settings.revision.as_str()),"webdav.settings_changed");let client=WebDav::new(settings.config)?;
+        let settings:Settings=serde_json::from_slice(&std::fs::read(path)?)?;ensure!(request.expected_revision.as_deref()==Some(settings.revision.as_str()),"webdav.settings_changed");let client=WebDav::new(settings.config.clone())?;
         if request.operation=="list"{return Ok(json!({"entries":client.list().await?}))}
         if request.operation=="probe"{return client.probe().await}
         if request.operation=="create_collection"{return client.create_collection().await}
+        if request.operation=="transfers"{return super::webdav_transfer::list(&self.data_dir)}
         let id=request.command_id.context("webdav.command_required")?;uuid::Uuid::parse_str(&id)?;
-        let directory=self.data_dir.join("webdav-operations");crate::platform::private_storage::prepare_private_directory(&directory)?;let receipt=directory.join(format!("{id}.json"));let identity=crate::command::canonical_json_digest(&value)?;
-        if request.operation=="status"{let previous:Value=serde_json::from_slice(&std::fs::read(receipt)?)?;return Ok(json!({"state":previous["state"],"result":previous["result"],"message":previous["message"]}));}
-        ensure!(matches!(request.operation.as_str(),"push"|"pull"),"webdav.operation_not_admitted");let selected=request.path.context("webdav.path_required")?;ensure!(selected.is_absolute(),"webdav.absolute_path_required");
-        if request.operation=="push"{let expected=request.expected_digest.as_deref().context("webdav.source_digest_required")?;let actual=tokio::task::spawn_blocking({let selected=selected.clone();move||crate::backup::file_digest(&selected)}).await??;ensure!(actual.1==expected,"webdav.source_changed");}
-        else{let parent=std::fs::canonicalize(selected.parent().context("webdav.destination_parent_required")?)?;ensure!(!parent.starts_with(std::fs::canonicalize(&self.data_dir)?)&&!selected.exists(),"webdav.destination_invalid");}
-        {
-            let _lock=workbench::MUTATIONS.lock().await;if receipt.exists(){let previous:Value=serde_json::from_slice(&std::fs::read(&receipt)?)?;ensure!(previous["identity"].as_str()==Some(identity.as_str()),"webdav.command_identity_changed");if previous["state"]=="completed"{return Ok(previous["result"].clone())}anyhow::bail!("webdav.original_operation_outcome_unknown");}
-            crate::platform::private_storage::atomic_write_private_json(&receipt,&json!({"identity":identity,"state":"started","at":Utc::now().to_rfc3339()}))?;
+        if request.operation=="status"{return super::webdav_transfer::status(&self.data_dir,&id)}
+        if request.operation=="cancel"{return super::webdav_transfer::cancel(&self.data_dir,&id)}
+        let directory=self.data_dir.join("webdav-operations");crate::platform::private_storage::prepare_private_directory(&directory)?;let receipt=directory.join(format!("{id}.json"));
+        let _lock=workbench::MUTATIONS.lock().await;
+        if request.operation=="resume"{
+            let previous:Value=serde_json::from_slice(&std::fs::read(&receipt)?)?;
+            if previous["state"]=="completed"||super::webdav_transfer::active(&self.data_dir,&id){return super::webdav_transfer::status(&self.data_dir,&id)}
+            let original=previous["request"].clone();ensure!(original.is_object(),"webdav.legacy_receipt_requires_manual_reconciliation");ensure!(original["expectedRevision"]==settings.revision,"webdav.settings_changed");let identity=crate::command::canonical_json_digest(&original)?;ensure!(previous["identity"]==identity,"webdav.command_identity_changed");return super::webdav_transfer::start(&self.data_dir,settings.config,original,identity)
         }
-        let result=if request.operation=="push"{client.push(&selected,&id,request.expected_digest.as_deref()).await}else{client.pull(request.snapshot_id.as_deref().context("webdav.snapshot_required")?,&selected,request.expected_digest.as_deref()).await};
-        let receipt_value=match &result{Ok(snapshot)=>json!({"identity":identity,"state":"completed","result":{"snapshot":snapshot,"path":selected},"at":Utc::now().to_rfc3339()}),Err(error)=>json!({"identity":identity,"state":"unknown","message":error.to_string(),"at":Utc::now().to_rfc3339()})};
-        crate::platform::private_storage::atomic_write_private_json(&receipt,&receipt_value)?;result?;Ok(receipt_value["result"].clone())
+        ensure!(matches!(request.operation.as_str(),"push"|"pull"),"webdav.operation_not_admitted");let identity=crate::command::canonical_json_digest(&value)?;
+        if receipt.exists(){let previous:Value=serde_json::from_slice(&std::fs::read(&receipt)?)?;ensure!(previous["identity"]==identity,"webdav.command_identity_changed");return super::webdav_transfer::status(&self.data_dir,&id)}
+        let selected=request.path.context("webdav.path_required")?;ensure!(selected.is_absolute(),"webdav.absolute_path_required");let digest=request.expected_digest.context("webdav.source_digest_required")?;ensure!(digest.len()==64&&digest.bytes().all(|byte|byte.is_ascii_hexdigit()),"webdav.invalid_source_digest");
+        if request.operation=="pull"{let parent=std::fs::canonicalize(selected.parent().context("webdav.destination_parent_required")?)?;ensure!(!parent.starts_with(std::fs::canonicalize(&self.data_dir)?)&&!selected.exists(),"webdav.destination_invalid");let snapshot=request.snapshot_id.context("webdav.snapshot_required")?;uuid::Uuid::parse_str(&snapshot)?;}
+        super::webdav_transfer::start(&self.data_dir,settings.config,value,identity)
     }
 }
