@@ -1,0 +1,8 @@
+//! Desktop-managed state units only; Chromium profiles and caches are excluded.
+use super::*;
+#[derive(Clone,Serialize,Deserialize,PartialEq,Eq)]#[serde(rename_all="camelCase",deny_unknown_fields)]
+pub struct Unit{pub name:String,pub kind:String,pub present:bool}
+pub const UNITS:&[(&str,&str)]=&[("appearance.json","file"),("general-preferences.json","file"),("window-close.json","file"),("current-user-profile.json","file"),("onboarding.json","file"),("restorable-location.json","file"),("navigation.json","file"),("window-state.json","file"),("local-composer-attachments-v1.json","file"),("private-input-recovery-v1","directory"),("execution-web.json","file")];
+pub fn units(root:&Path)->Result<Vec<Unit>>{UNITS.iter().map(|(name,kind)|{let path=root.join(name);let present=path.exists();if present{no_link(&path)?;ensure!(if *kind=="file"{path.is_file()}else{path.is_dir()},"backup.desktop_unit_kind_changed");}Ok(Unit{name:name.to_string(),kind:kind.to_string(),present})}).collect()}
+pub fn files_for(root:&Path)->Result<Vec<(String,PathBuf)>>{let mut result=Vec::new();for unit in units(root)?{if !unit.present{continue}let path=root.join(&unit.name);if unit.kind=="file"{result.push((unit.name,path))}else{result.extend(files(&path)?.into_iter().map(|(name,path)|(format!("{}/{name}",unit.name),path)));}}result.sort_by(|a,b|a.0.cmp(&b.0));Ok(result)}
+pub fn validate_units(units:&[Unit])->Result<()>{ensure!(units.len()==UNITS.len(),"backup.invalid_desktop_units");let mut seen=HashSet::new();for unit in units{ensure!(UNITS.iter().any(|(name,kind)|*name==unit.name&&*kind==unit.kind)&&seen.insert(&unit.name),"backup.invalid_desktop_unit");}Ok(())}

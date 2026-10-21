@@ -12,17 +12,17 @@ export async function backupFileDigest(path:string):Promise<string>{const hash=c
 export class BackupWorkspace{
   private busy=false
   private readonly selections=new Map<string,{path:string;digest:string;expires:number}>()
-  constructor(private readonly core:Pick<CoreClient,'shutdown'|'start'>,private readonly dataRoot:()=>string|null,private readonly owner:()=>BrowserWindow|null,private readonly prepare:()=>Promise<void>,private readonly beforeOffline:()=>void,private readonly restartApp:()=>void){}
-  private execute(operation:string,root:string,file:string|undefined,passphrase:string,event:IpcMainInvokeEvent):Promise<{manifest:Manifest}>{
+  constructor(private readonly core:Pick<CoreClient,'shutdown'|'start'>,private readonly dataRoot:()=>string|null,private readonly owner:()=>BrowserWindow|null,private readonly prepare:()=>Promise<void>,private readonly beforeOffline:()=>void,private readonly restartApp:()=>void,private readonly preferencesRoot:()=>string|null=dataRoot){}
+  private execute<T={manifest:Manifest}>(operation:string,root:string,file:string|undefined,passphrase:string,event:IpcMainInvokeEvent,command='backup',extra:string[]=[]):Promise<T>{
     return new Promise((resolve,reject)=>{
       const env:NodeJS.ProcessEnv={LANG:'C.UTF-8',LC_ALL:'C.UTF-8'};for(const key of ['PATH','SystemRoot','WINDIR','HOME','USERPROFILE','TEMP','TMP','LOCALAPPDATA'])if(process.env[key])env[key]=process.env[key]
-      const child=spawn(resolveCoreBinary(),['backup',operation,'--data-dir',root,...(file?['--file',file]:[])],{stdio:['pipe','pipe','pipe'],windowsHide:true,env})
+      const child=spawn(resolveCoreBinary(),[command,...(operation?[operation]:[]),'--data-dir',root,...(file?['--file',file]:[]),...extra],{stdio:['pipe','pipe','pipe'],windowsHide:true,env})
       let output='',errors='',pending=''
       child.stdout.setEncoding('utf8');child.stderr.setEncoding('utf8')
       child.stdout.on('data',(chunk:string)=>{output+=chunk;if(output.length>40*1024*1024)child.kill()})
       child.stderr.on('data',(chunk:string)=>{errors=(errors+chunk).slice(-16000);pending+=chunk;const lines=pending.split('\n');pending=lines.pop()??'';for(const line of lines){try{const value=JSON.parse(line) as {phase?:unknown;done?:unknown;total?:unknown};if(typeof value.phase==='string'&&typeof value.done==='number'&&typeof value.total==='number'&&!event.sender.isDestroyed())event.sender.send('rovai:backup-progress',value)}catch{/* diagnostic text stays outside the progress stream */}}})
       child.once('error',reject)
-      child.once('close',code=>{if(code!==0){reject(new Error(errors||'backup.helper_failed'));return}try{resolve(JSON.parse(output.trim()) as {manifest:Manifest})}catch{reject(new Error('backup.invalid_helper_response'))}})
+      child.once('close',code=>{if(code!==0){reject(new Error(errors||'backup.helper_failed'));return}try{resolve(JSON.parse(output.trim()) as T)}catch{reject(new Error('backup.invalid_helper_response'))}})
       child.stdin.on('error',()=>undefined);child.stdin.end(JSON.stringify({passphrase}))
     })
   }
@@ -53,6 +53,7 @@ export class BackupWorkspace{
         if(!selection||selection.expires<Date.now()||await backupFileDigest(selection.path)!==selection.digest)throw new Error('backup.selection_expired_or_changed')
         file=selection.path
       }else throw new Error('backup.operation_not_admitted')
+      await this.execute<{registered:boolean}>('',root,undefined,'',event,'backup-preferences',['--preferences-root',this.preferencesRoot()??root])
       await this.prepare();this.beforeOffline()
       const stopped=await this.core.shutdown();offline=true
       if(stopped.forcedSignal!==null)throw new Error('backup.core_shutdown_incomplete')

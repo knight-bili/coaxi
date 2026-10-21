@@ -38,6 +38,8 @@ struct Cli {
 enum Command {
     /// Publish the local owner CLI discovery record using native private storage.
     AutomationStorage { #[arg(long)] directory:PathBuf },
+    /// Register only Desktop-owned state units for the current local data root.
+    BackupPreferences { #[arg(long)] data_dir:PathBuf, #[arg(long)] preferences_root:PathBuf },
     /// Offline encrypted backup/restore; passphrase is read from stdin only.
     Backup(backup::Arguments),
     /// Portable encrypted preference export and explicit offline import.
@@ -109,6 +111,7 @@ pub fn run_host() -> Result<()> {
             Command::AutomationStorage{directory}=>{
                 anyhow::ensure!(directory.is_absolute()&&!directory.components().any(|part|matches!(part,std::path::Component::CurDir|std::path::Component::ParentDir)),"automation_context_absolute_directory_required");let mut bytes=Vec::new();std::io::stdin().take(1024*1024+1).read_to_end(&mut bytes)?;rovai_core::platform::write_user_automation_context(&directory,&bytes)?;println!("{}",serde_json::json!({"saved":true}));return Ok(())
             }
+            Command::BackupPreferences{data_dir,preferences_root}=>{anyhow::ensure!(data_dir.is_absolute()&&preferences_root.is_absolute(),"backup.absolute_paths_required");rovai_core::backup::owned_roots::register_desktop(&data_dir,&preferences_root)?;println!("{}",serde_json::json!({"registered":true}));return Ok(())}
             Command::ConfigSnapshot(args)=>{return config_snapshot::run(args)},
             Command::Backup(args)=>{return backup::run(args)},
             Command::Token => {

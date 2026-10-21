@@ -20,7 +20,7 @@ export function BackupSettings():React.JSX.Element{
     catch(failure){setError(String(failure))}finally{setBusy(false);setPassphrase('');setRepeat('')}
   }
   const description=(value:BackupSummary):string=>`${new Date(value.createdAt).toLocaleString()} · ${value.fileCount} ${t('个文件')} · ${(value.totalBytes/1024/1024).toFixed(1)} MB`
-  const roots=(value:BackupSummary):React.JSX.Element=><div>{(value.roots??[]).map(root=><p key={root.id}>{t(root.id==='skill_library'?'技能库':root.id==='runtime_files'?'运行文件':'MCP配置')} · {t(root.present?'已包含':'备份时不存在')}{root.shared?` · ${t('共享位置，恢复将替换这台主机的共用配置')}`:''}</p>)}{value.formatVersion===1&&<p>{t('这是旧格式备份，覆盖原数据目录。')}</p>}</div>
+  const roots=(value:BackupSummary):React.JSX.Element=><div>{(value.roots??[]).map(root=><p key={root.id}>{t(root.id==='skill_library'?'技能库':root.id==='runtime_files'?'运行文件':root.id==='desktop_preferences'?'界面偏好和草稿':'MCP配置')} · {t(root.present?'已包含':'备份时不存在')}{root.shared?` · ${t('共享位置，恢复将替换这台主机的共用配置')}`:''}</p>)}{value.formatVersion===1&&<p>{t('这是旧格式备份，覆盖原数据目录。')}</p>}</div>
   return <section className="section-block general-settings-section" aria-labelledby="backup-settings-heading">
     <div className="section-heading"><div><h2 id="backup-settings-heading"><Archive size={17}/> {t('备份与恢复')}</h2><p>{t('保存会话、画布、队员、使命及设置。备份加密后保存在你选择的位置。')}</p></div></div>
     {api?<><div className="workbench-toolbar"><button disabled={busy} onClick={()=>{reset();setMode('create')}}><Download size={14}/>{t('创建加密备份')}</button><button disabled={busy} onClick={()=>{reset();setMode('inspect')}}><RotateCcw size={14}/>{t('选择备份并预览')}</button></div>
