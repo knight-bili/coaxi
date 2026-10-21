@@ -133,8 +133,13 @@ fn git_arguments(request: &GitRequest, write: bool) -> Result<Vec<String>> {
     let message = || request.message.as_deref().filter(|s| !s.trim().is_empty()).map(String::from).context("workbench.message_required");
     let args: Vec<String> = if !write {
         match request.action.as_str() {
-            "status" => vec!["status", "--porcelain=v2", "--branch", "-z"].into_iter().map(String::from).collect(),
+            "status" => vec!["status", "--porcelain=v2", "--branch", "--untracked-files=all", "-z"].into_iter().map(String::from).collect(),
             "log" => vec!["log", "--all", "--date-order", "-n", "200", "--format=%H%x00%P%x00%an%x00%aI%x00%B%x00%x1e"].into_iter().map(String::from).collect(),
+            "reflog" => vec!["reflog","-n","200","--format=%H%x00%gd%x00%gs%x1e"].into_iter().map(String::from).collect(),
+            "tags" => vec!["tag","--list","--format=%(refname:short)%00%(objectname)%00%(subject)%1e"].into_iter().map(String::from).collect(),
+            "stash_diff" => vec!["stash".into(),"show".into(),"--no-ext-diff".into(),"--no-textconv".into(),"-p".into(),"--include-untracked".into(),target()?],
+            "file_at" => {ensure!(request.paths.len()==1,"workbench.paths_required");vec!["show".into(),format!("{}:{}",target()?,request.paths[0])]},
+            "diff_compare" => {let mut args=vec!["diff".into(),"--no-ext-diff".into(),"--no-textconv".into(),"--binary".into(),target()?,"--".into()];args.extend(request.paths.iter().map(|path|format!(":(literal){path}")));args},
             "branches" => vec!["for-each-ref", "--format=%(refname)%00%(objectname)%00%(upstream:short)%00%(HEAD)%1e", "refs/heads", "refs/remotes"].into_iter().map(String::from).collect(),
             "stash" => vec!["stash", "list", "--format=%gd%x00%H%x00%gs%x1e"].into_iter().map(String::from).collect(),
             "remotes" => vec!["remote", "-v"].into_iter().map(String::from).collect(),
@@ -165,6 +170,13 @@ fn git_arguments(request: &GitRequest, write: bool) -> Result<Vec<String>> {
                 ensure!(value.starts_with("stash@{") && value.ends_with('}') && value[7..value.len()-1].bytes().all(|b| b.is_ascii_digit()), "workbench.invalid_stash");
                 vec!["stash".into(), request.action.trim_start_matches("stash_").into(), value]
             }
+            "branch_delete" => vec!["branch".into(),"-d".into(),target()?],
+            "branch_rename" => vec!["branch".into(),"-m".into(),target()?,git_target(request.message.as_deref())?],
+            "tag_create" => vec!["tag".into(),target()?],
+            "tag_delete" => vec!["tag".into(),"-d".into(),target()?],
+            "discard" => {ensure!(!request.paths.is_empty(),"workbench.paths_required");vec!["restore".into(),"--worktree".into(),"--".into()]},
+            "clone" => {ensure!(request.paths.len()==1,"workbench.paths_required");let source=target()?;ensure!((source.starts_with("https://")||source.starts_with("ssh://")||(source.contains('@')&&source.contains(':')))&&!source.contains(['\0','\r','\n']),"workbench.invalid_remote_url");vec!["clone".into(),"--no-local".into(),"--".into(),source,request.paths[0].clone()]},
+            "worktree_add" => vec!["worktree".into(),"add".into()],
             "branch_create" => vec!["branch".into(), target()?],
             "checkout" => vec!["switch".into(), target()?],
             "reset" => {
@@ -187,13 +199,13 @@ fn git_arguments(request: &GitRequest, write: bool) -> Result<Vec<String>> {
             "push" => { let mut v=vec!["push".into(), remote()?]; if request.target.is_some() {v.push(target()?)}; v }
             "remote_add" => vec!["remote".into(), "add".into(), remote()?, target()?],
             "remote_remove" => vec!["remote".into(), "remove".into(), remote()?],
-            "worktree_remove" => { ensure!(request.paths.len()==1,"workbench.paths_required"); vec!["worktree".into(),"remove".into(),"--".into()] }
+            "worktree_remove" => vec!["worktree".into(),"remove".into()],
             "clean" => { ensure!(!request.paths.is_empty(),"workbench.paths_required"); vec!["clean".into(),"-f".into(),"-d".into(),"--".into()] }
             _ => anyhow::bail!("workbench.operation_not_admitted"),
         }
     };
     let mut args = args;
-    if matches!(request.action.as_str(), "stage"|"unstage"|"diff"|"diff_staged"|"show"|"clean"|"worktree_remove") { args.extend(request.paths.clone()); }
+    if matches!(request.action.as_str(), "stage"|"unstage"|"diff"|"diff_staged"|"show"|"clean"|"discard") { args.extend(request.paths.iter().map(|path|format!(":(literal){path}"))); }
     Ok(args)
 }
 
@@ -281,6 +293,11 @@ impl Core {
             let index = if index.is_absolute() { index.to_path_buf() } else { root.join(index) };
             if index.exists() { bytes.extend_from_slice(&fs::read(index)?); }
         }
+        let untracked=git.workbench_output(root,&["ls-files".into(),"--others".into(),"--exclude-standard".into(),"-z".into()]).await?;
+        ensure!(untracked.status.success(),"workbench.git_untracked_unavailable");let mut total=0u64;
+        for name in untracked.stdout.bytes.split(|byte|*byte==0).filter(|name|!name.is_empty()){
+            let name=std::str::from_utf8(name)?;let path=relative(root,name,false)?;let metadata=fs::metadata(&path)?;if !metadata.is_file(){continue}total+=metadata.len();ensure!(total<=512*1024*1024,"workbench.git_untracked_size_limit");let (size,hash)=crate::backup::file_digest(&path)?;bytes.extend_from_slice(&(name.len() as u64).to_le_bytes());bytes.extend_from_slice(name.as_bytes());bytes.extend_from_slice(&size.to_le_bytes());bytes.extend_from_slice(hash.as_bytes());
+        }
         Ok(digest(&bytes))
     }
 
@@ -294,9 +311,16 @@ impl Core {
             let output = git.workbench_output(&root, &arguments).await?;
             return Ok(json!({"success":output.status.success(),"exitCode":output.status.code(),"output":String::from_utf8(output.stdout.bytes).context("workbench.git_non_utf8")?,"error":output.stderr.lossy_text()}));
         }
-        let arguments = git_arguments(&request, true)?;
+        let mut arguments = git_arguments(&request, true)?;
+        let mut managed_tree=None;
+        if matches!(request.action.as_str(),"worktree_add"|"worktree_remove"){
+            let branch=git_target(request.target.as_deref())?;let key=crate::command::canonical_json_digest(&json!({"root":root,"branch":branch}))?;let directory=self.data_dir.join("workspace-trees");crate::platform::private_storage::prepare_private_directory(&directory)?;let tree=directory.join(&key);let owner=directory.join(format!("{key}.json"));
+            if request.action=="worktree_add"{ensure!(!tree.exists(),"workbench.worktree_exists");arguments.extend([tree.to_string_lossy().into_owned(),branch.clone()]);}else{let record:Value=serde_json::from_slice(&fs::read(&owner)?)?;ensure!(record["root"]==json!(root)&&record["branch"]==branch,"workbench.worktree_owner_mismatch");arguments.extend(["--".into(),tree.to_string_lossy().into_owned()]);}
+            managed_tree=Some((tree,owner,branch));
+        }
+        if request.action=="clone"{let destination=relative(&root,&request.paths[0],true)?;ensure!(!destination.exists(),"workbench.destination_exists");}
         let _write = MUTATIONS.lock().await;
-        let revision = self.workbench_git_revision(&git, &root).await?;
+        let revision = if matches!(request.action.as_str(),"init"|"clone"){crate::command::canonical_json_digest(&json!({"root":root,"destination":request.paths,"exists":request.paths.iter().map(|path|root.join(path).exists()).collect::<Vec<_>>()}))?}else{self.workbench_git_revision(&git,&root).await?};
         if method == "workbench.git.preview" {
             let clean = if request.action == "clean" {
                 let mut preview = arguments.clone(); preview[1]="-n".into();
@@ -320,7 +344,8 @@ impl Core {
         ensure!(request.expected_revision.as_deref() == Some(revision.as_str()), "workbench.git_changed_refresh_preview");
         crate::platform::private_storage::atomic_write_private_json(&receipt, &json!({"identity":identity,"state":"started"}))?;
         let output = git.workbench_output(&root, &arguments).await?;
-        let result = json!({"success":output.status.success(),"exitCode":output.status.code(),"output":output.stdout.lossy_text(),"error":output.stderr.lossy_text()});
+        if output.status.success(){if let Some((tree,owner,branch))=&managed_tree {if request.action=="worktree_add"{crate::platform::private_storage::atomic_write_private_json(owner,&json!({"root":root,"branch":branch,"path":tree,"createdAt":Utc::now().to_rfc3339()}))?;}else{let _=fs::remove_file(owner);}}}
+        let result = json!({"success":output.status.success(),"exitCode":output.status.code(),"output":output.stdout.lossy_text(),"error":output.stderr.lossy_text(),"workingDirectory":managed_tree.as_ref().map(|(tree,_,_)|tree)});
         crate::platform::private_storage::atomic_write_private_json(&receipt, &json!({"identity":identity,"state":"finished","result":result}))?;
         Ok(result)
     }
