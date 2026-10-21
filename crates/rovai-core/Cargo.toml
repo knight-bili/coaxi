@@ -14,7 +14,7 @@ legacy-migration-tests = ["slow-tests"]
 aes-gcm = { version = "0.10", features = ["stream"] }
 argon2 = "0.5"
 rand = "0.8"
-tokio-util = { version = "0.7", features = ["rt"] }
+tokio-util = { version = "0.7", features = ["rt","io"] }
 zip = { version = "2", default-features = false, features = ["deflate"] }
 rovai-computer = { path = "../rovai-computer" }
 anyhow = "1"
@@ -30,7 +30,7 @@ percent-encoding = "=2.3.2"
 regex = "=1.12.3"
 portable-pty = "=0.8.1"
 rusqlite = { version = "0.40.2", features = ["backup", "bundled", "functions"] }
-reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls","stream"] }
 ring = "0.17"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["raw_value"] }

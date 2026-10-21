@@ -1,6 +1,7 @@
 //! Offline, encrypted snapshots of the unified Core data root (canvas included).
 //! A Core instance lease is held for every snapshot/swap. No live DB is copied.
 pub mod crypto;
+pub mod webdav;
 use anyhow::{Result,Context,ensure};
 use serde::{Serialize,Deserialize};
 use sha2::{Sha256,Digest};
