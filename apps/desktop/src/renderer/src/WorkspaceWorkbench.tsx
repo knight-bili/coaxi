@@ -13,6 +13,7 @@ import { WorkspaceOrganizer } from './WorkspaceOrganizer'
 import { ForgeWorkbench } from './ForgeWorkbench'
 import { BrowserWorkbench } from './BrowserWorkbench'
 import { ComputerWorkbench } from './ComputerWorkbench'
+import { OfficePreviewWorkbench } from './OfficePreviewWorkbench'
 import { UnifiedDiffPreview } from './codeg-native-content/components/diff/unified-diff-preview'
 import './workspace-workbench.css'
 
@@ -32,9 +33,10 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
   threadId: string; projectPath:string; members:Array<{id:string;name:string}>; bindLeaveGuard(guard: (() => void) | null): void; onQuickMessage?(text:string):boolean
 }): React.JSX.Element {
   const client = useThreadClient(), t = useUiText(), scope = useMemo(() => ({ threadId }), [threadId])
-  const [open, setOpen] = useState(false), [tab, setTab] = useState<'files' | 'git' | 'organizer' | 'forge' | 'browser' | 'computer'>('files')
+  const [open, setOpen] = useState(false), [tab, setTab] = useState<'files' | 'git' | 'organizer' | 'forge' | 'browser' | 'computer' | 'office'>('files')
   const [organizerDirty,setOrganizerDirty]=useState(false)
   const [forgeDirty,setForgeDirty]=useState(false)
+  const [officePath,setOfficePath]=useState<string|null>(null)
   const [directories, setDirectories] = useState(new Map<string, Directory>()), [expanded, setExpanded] = useState(new Set<string>())
   const [documents, setDocuments] = useState<Document[]>([]), [selected, setSelected] = useState<string | null>(null)
   const [busy, setBusy] = useState(false), [error, setError] = useState<string | null>(null), epoch = useRef(0)
@@ -67,6 +69,7 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
   }
   useEffect(() => { if (open && !directories.has('')) void operation(() => loadDirectory('')) }, [open])
   const openFile = async (path: string): Promise<void> => {
+    if(/\.(docx|xlsx|pptx)$/i.test(path)){setOfficePath(path);setTab('office');return}
     setSelected(path)
     if (documents.some(document => document.path === path)) return
     await operation(async () => {
@@ -151,7 +154,7 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
           }}>{renderTree('')}</FileTree></div></Panel>
           <PanelResizeHandle className="workbench-resize" />
           <Panel minSize={25}>
-            {merge ? <WorkspaceMergeEditor {...merge} onClose={()=>setMerge(null)} onApply={text=>{setDocuments(previous=>previous.map(document=>document.path===merge.path?{...document,text}:document));setMerge(null)}} /> : tab==='computer'?<ComputerWorkbench threadId={threadId}/> : tab==='browser'?<BrowserWorkbench threadId={threadId}/> : tab==='forge'?<ForgeWorkbench threadId={threadId} projectPath={projectPath} members={members} onDirtyChange={setForgeDirty}/> : tab==='organizer'?<WorkspaceOrganizer threadId={threadId} onDirtyChange={setOrganizerDirty} onUseMessage={onQuickMessage?text=>{if(dirty||!onQuickMessage(text))return false;setOpen(false);return true}:undefined}/> : tab === 'files' ? <div className="workbench-editor">
+            {merge ? <WorkspaceMergeEditor {...merge} onClose={()=>setMerge(null)} onApply={text=>{setDocuments(previous=>previous.map(document=>document.path===merge.path?{...document,text}:document));setMerge(null)}} /> : tab==='office'&&officePath?<OfficePreviewWorkbench key={officePath} threadId={threadId} path={officePath}/> : tab==='computer'?<ComputerWorkbench threadId={threadId}/> : tab==='browser'?<BrowserWorkbench threadId={threadId}/> : tab==='forge'?<ForgeWorkbench threadId={threadId} projectPath={projectPath} members={members} onDirtyChange={setForgeDirty}/> : tab==='organizer'?<WorkspaceOrganizer threadId={threadId} onDirtyChange={setOrganizerDirty} onUseMessage={onQuickMessage?text=>{if(dirty||!onQuickMessage(text))return false;setOpen(false);return true}:undefined}/> : tab === 'files' ? <div className="workbench-editor">
               <div className="workbench-tabs" role="tablist">{documents.map(document => <div className={selected === document.path ? 'workbench-tab is-active' : 'workbench-tab'} key={document.path}><button type="button" role="tab" aria-selected={selected === document.path} onClick={() => setSelected(document.path)}>{document.path}{document.text !== document.saved ? ' •' : ''}</button><button type="button" disabled={busy} onClick={() => closeDocument(document.path)} aria-label={t('关闭文件')}><X size={12} /></button></div>)}</div>
               {current ? <><div className="workbench-toolbar"><span title={current.path}>{current.path}</span><button type="button" className="quiet-button" disabled={busy || current.text === current.saved} onClick={() => void save()}><Save size={14} />{t('保存')}</button><button type="button" className="quiet-button" disabled={busy || dirty} onClick={() => {setCreation('rename');setName(current.path)}}>{t('重命名')}</button><button type="button" className="quiet-button" disabled={busy} onClick={()=>void openMerge()}>{t('解决冲突')}</button></div>
                 {current.conflict && <div className="workbench-error" role="alert">{t('文件在外部发生变化，本地修改已保留。请复制修改或重新打开外部版本后合并。')}</div>}

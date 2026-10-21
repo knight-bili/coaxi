@@ -1,3 +1,4 @@
+import { OfficeWorkspace } from './office-workspace'
 import { BrowserWorkspace } from './browser-workspace'
 import { creationPreferences, withHostConversationPreferences } from '../shared/host-general-preferences'
 import { createHostChannelHandler } from './host-channels'
@@ -1243,6 +1244,9 @@ app.on('second-instance', () => {
   mainWindow.focus()
 })
 
+const officeWorkspace = new OfficeWorkspace((method,params)=>core.request(method,params),()=>mainWindow)
+ipcMain.handle('rovai:office-workspace',(event,input)=>officeWorkspace.open(event,input))
+app.on('before-quit',()=>officeWorkspace.closeAll())
 const browserWorkspace = new BrowserWorkspace((method,params)=>core.request(method,params),()=>mainWindow)
 ipcMain.handle('rovai:computer-workspace',async(event,value:unknown)=>{
   if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('computer.local_owner_required')

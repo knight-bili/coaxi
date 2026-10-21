@@ -5112,6 +5112,7 @@ export interface BrowserWorkspaceView { id:string; threadId:string;url:string;ti
 
 export interface RovaiApi {
   /** Native local owner surface; intentionally absent from remote Web. */
+  officeWorkspace?: {open(threadId:string,path:string,editable:boolean):Promise<{opened:true}>}
   browserWorkspace?: BrowserWorkspaceApi
   computerWorkspace?: { request<T>(threadId:string,input:{operation:string;targetId?:string;level?:'none'|'read'|'control';permission?:'accessibility'|'screenRecording';action?:unknown;enabled?:boolean}):Promise<T> }
   /** Desktop-local private editor durability; never a Core receipt or Web resource grant. */
