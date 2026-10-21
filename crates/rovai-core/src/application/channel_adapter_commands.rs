@@ -15,7 +15,7 @@ impl crate::command::DomainCommand for ChannelCommand { const TYPE: &'static str
 pub(super) fn effective_callback(input:&Inbound,config:&Adapter)->Option<String>{
     if let Some(value)=&input.callback_data{return Some(value.clone())}
     let text=input.text.trim();let (command,token)=text.split_once(char::is_whitespace)?;
-    let command=command.strip_prefix(&config.command_prefix)?;
+    let command=command.strip_prefix(config.command_prefix.as_str())?;
     match command.split('@').next().unwrap_or(command){"confirm"=>Some(format!("rv:control:{}",token.trim())),"select"=>Some(format!("rv:choose:{}",token.trim())),_=>None}
 }
 pub(super) fn sender_scope(input:&Inbound,config:&Adapter)->Result<String>{source_id(&json!({"adapterId":config.id,"senderId":input.sender_id,"chatId":input.target.chat_id.as_deref().unwrap_or(&config.chat_id),"threadKey":input.target.thread_key}))}
@@ -43,7 +43,7 @@ impl Core {
         let callback=effective_callback(input,config);
         let command=if let Some(callback)=callback.as_deref(){
             match callback { "rv:today"=>"today", "rv:status"=>"status", "rv:sessions"=>"sessions", "rv:help"=>"help", value if value.starts_with("rv:choose:")=>"choose", _=>"expired_callback" }
-        }else if let Some(value)=text.strip_prefix(&config.command_prefix) { value.split_whitespace().next().unwrap_or("help").split('@').next().unwrap_or("help") } else if selection_expired { "selection_expired" } else { return Ok(None) };
+        }else if let Some(value)=text.strip_prefix(config.command_prefix.as_str()) { value.split_whitespace().next().unwrap_or("help").split('@').next().unwrap_or("help") } else if selection_expired { "selection_expired" } else { return Ok(None) };
         let args=text.split_once(char::is_whitespace).map(|(_,value)|value.trim()).unwrap_or("");
         if matches!(command,"task"|"do") && !args.is_empty() && !selection_expired { return Ok(None) }
         let envelope=CommandEnvelope{command_id:command_id.into(),actor:ActorRef::System{component_id:"channel-adapter".into()},camp_id:Some(binding.thread_id.clone()),expected_versions:vec![],execution_epoch:None,payload:ChannelCommand(input.clone())};
