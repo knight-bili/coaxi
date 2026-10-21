@@ -34,7 +34,7 @@ fun RovaiThreadControls(model:RovaiWorkspaceViewModel,state:RovaiWorkspaceState)
     if(creating||editing!=null)RovaiTaskEditor(threadId,editing,thread["members"].coreArray(),onDismiss={creating=false;editing=null}){params->model.execute(if(editing==null)RovaiOperation.TASKS_CREATE else RovaiOperation.TASKS_UPDATE,params);creating=false;editing=null}
 }
 
-@Composable private fun RovaiInteractionCards(model:RovaiWorkspaceViewModel,state:RovaiWorkspaceState,conversationId:String){
+@Composable fun RovaiInteractionCards(model:RovaiWorkspaceViewModel,state:RovaiWorkspaceState,conversationId:String){
     var values by remember(conversationId){mutableStateOf<List<JsonObject>>(emptyList())};var issue by remember{mutableStateOf<String?>(null)};val coroutine=rememberCoroutineScope();var cursor by remember{mutableStateOf<String?>(null)}
     suspend fun load(after:String?=null){try{val page=model.query(RovaiOperation.RUNTIME_INTERACTIONS_LIST,buildJsonObject{put("conversationId",conversationId);put("limit",50);if(after!=null)put("cursor",after)}).coreObject();val details=page["items"].coreArray().filter{it.coreText("status")=="pending"}.mapNotNull{summary->val value=model.query(RovaiOperation.RUNTIME_INTERACTIONS_GET,buildJsonObject{put("interactionId",summary.coreText("id"))}).coreObject();value.takeIf{it.coreText("conversationId")==conversationId&&it.coreText("status")=="pending"}};values=if(after==null)details else values+details;cursor=(page["nextCursor"] as? JsonPrimitive)?.contentOrNull;issue=null}catch(error:Exception){issue=error.message}}
     LaunchedEffect(conversationId,state.thread,state.lastResult){load()}
