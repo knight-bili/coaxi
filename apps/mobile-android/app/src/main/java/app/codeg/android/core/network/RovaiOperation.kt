@@ -1,6 +1,9 @@
-// Explicit Host v4 operation names; kept aligned with rovai-web operations.rs.
 package app.codeg.android.core.network
+
+/** Explicit public Host operations; private Core methods are not admitted. */
 enum class RovaiOperation(val wire:String) {
+    CHANNELS_ADAPTERS("channels.adapters"),
+    FORGE_LINKS("forge.links"),
     WORKBENCH_PROJECTLAUNCHER("workbench.projectLauncher"),
     WORKBENCH_FILES_TOOLS("workbench.files.tools"),
     OFFICE_CLI("office.cli"),
@@ -238,5 +241,5 @@ enum class RovaiOperation(val wire:String) {
     RUNTIME_PRODUCT_ENSURE("runtime.product.ensure"),
     RUNTIME_PRODUCT_CHECK("runtime.product.check"),
     RUNTIME_MODELCATALOG_OPEN("runtime.modelCatalog.open"),
-    RUNTIME_DISCOVERY_RESCAN("runtime.discovery.rescan"),
+    RUNTIME_DISCOVERY_RESCAN("runtime.discovery.rescan")
 }

@@ -28,7 +28,7 @@ impl Core{
         let _guard=MUTATIONS.lock().await;
         let mut adapters=self.read_channel_adapters()?;let revision=crate::command::canonical_json_digest(&serde_json::to_value(&adapters)?)?;
         if request.operation=="outbox_inspect"{drop(_guard);return self.channel_adapter_outbox(json!({"operation":"list","after":request.after})).await;}
-        if request.operation=="list"{return Ok(json!({"revision":revision,"adapters":if private{serde_json::to_value(adapters)?}else{projected(&adapters)}}))}
+        if request.operation=="list"{return Ok(json!({"revision":revision,"adapters":if private{serde_json::to_value(adapters)?}else{projected(&adapters)},"hostState":self.channel_adapter_public_status()}))}
         ensure!(!private&&["save","remove","weixin_qr_begin","weixin_qr_check","outbox_retry","outbox_confirm"].contains(&request.operation.as_str()),"channel_adapter.operation_not_admitted");
         let command_id=request.command_id.as_deref().context("channel_adapter.command_required")?;uuid::Uuid::parse_str(command_id)?;
         let digest=crate::command::canonical_json_digest(&value)?;let directory=self.data_dir.join("channel-adapter-operations");crate::platform::private_storage::prepare_private_directory(&directory)?;let receipt=directory.join(format!("{command_id}.json"));

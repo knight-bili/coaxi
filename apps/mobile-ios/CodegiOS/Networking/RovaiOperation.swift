@@ -1,6 +1,9 @@
-// Explicit Host v4 operation names; kept aligned with rovai-web operations.rs.
 import Foundation
+
+/// Explicit public Host operations. Private Core methods never cross this seam.
 enum RovaiOperation: String, Sendable {
+    case channelsAdapters = "channels.adapters"
+    case forgeLinks = "forge.links"
     case workbenchProjectLauncher = "workbench.projectLauncher"
     case workbenchFilesTools = "workbench.files.tools"
     case officeCli = "office.cli"

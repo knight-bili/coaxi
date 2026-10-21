@@ -53,6 +53,10 @@ impl TransportChannels{
                             }
                         }inbox_after=(inbox_after+32)%count;
                     }
+                    let mut states=Vec::new();for (_, (id,backend))in &backends{states.push(json!({"adapterId":id,"state":backend.status().await}));}
+                    let entries=std::fs::read_dir(&directory).into_iter().flatten().filter_map(|entry|entry.ok()).map(|entry|entry.path()).collect::<Vec<_>>();
+                    let pending_inbox=entries.iter().filter(|path|path.extension().is_some_and(|value|value=="json")).count();let pending_callbacks=entries.iter().filter(|path|path.extension().is_some_and(|value|value=="callback-pending")).count();let rejected=entries.iter().filter(|path|path.extension().is_some_and(|value|value=="rejected")).count();
+                    let _=call(&core,"channels.adapters.hostStatus",json!({"states":states,"pendingInbox":pending_inbox,"pendingCallbacks":pending_callbacks,"rejectedInbox":rejected})).await;
                     // Scan bounded pages. Sending/unknown receipts never enter
                     // the automatic send path again after a process restart.
                     let mut after=0i64;for _ in 0..8{
