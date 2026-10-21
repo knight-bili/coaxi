@@ -536,7 +536,7 @@ export class CoreClient {
       ))
     }
 
-    return this.#sendRequest<T>(active, method, params, method === 'runtime.startup.check' ? 95_000 : 60_000)
+    return this.#sendRequest<T>(active, method, params, method === 'backup.webdav.local' ? 43_200_000 : method === 'runtime.startup.check' ? 95_000 : 60_000)
   }
 
   async notifyAutomationSystemSuspending(): Promise<void> {

@@ -25,6 +25,7 @@ impl Core{
         let settings:Settings=serde_json::from_slice(&std::fs::read(path)?)?;ensure!(request.expected_revision.as_deref()==Some(settings.revision.as_str()),"webdav.settings_changed");let client=WebDav::new(settings.config)?;
         if request.operation=="list"{return Ok(json!({"entries":client.list().await?}))}
         if request.operation=="probe"{return client.probe().await}
+        if request.operation=="create_collection"{return client.create_collection().await}
         let id=request.command_id.context("webdav.command_required")?;uuid::Uuid::parse_str(&id)?;
         let directory=self.data_dir.join("webdav-operations");crate::platform::private_storage::prepare_private_directory(&directory)?;let receipt=directory.join(format!("{id}.json"));let identity=crate::command::canonical_json_digest(&value)?;
         if request.operation=="status"{let previous:Value=serde_json::from_slice(&std::fs::read(receipt)?)?;return Ok(json!({"state":previous["state"],"result":previous["result"],"message":previous["message"]}));}
@@ -35,7 +36,7 @@ impl Core{
             let _lock=workbench::MUTATIONS.lock().await;if receipt.exists(){let previous:Value=serde_json::from_slice(&std::fs::read(&receipt)?)?;ensure!(previous["identity"].as_str()==Some(identity.as_str()),"webdav.command_identity_changed");if previous["state"]=="completed"{return Ok(previous["result"].clone())}anyhow::bail!("webdav.original_operation_outcome_unknown");}
             crate::platform::private_storage::atomic_write_private_json(&receipt,&json!({"identity":identity,"state":"started","at":Utc::now().to_rfc3339()}))?;
         }
-        let result=if request.operation=="push"{client.push(&selected,&id).await}else{client.pull(request.snapshot_id.as_deref().context("webdav.snapshot_required")?,&selected,request.expected_digest.as_deref()).await};
+        let result=if request.operation=="push"{client.push(&selected,&id,request.expected_digest.as_deref()).await}else{client.pull(request.snapshot_id.as_deref().context("webdav.snapshot_required")?,&selected,request.expected_digest.as_deref()).await};
         let receipt_value=match &result{Ok(snapshot)=>json!({"identity":identity,"state":"completed","result":{"snapshot":snapshot,"path":selected},"at":Utc::now().to_rfc3339()}),Err(error)=>json!({"identity":identity,"state":"unknown","message":error.to_string(),"at":Utc::now().to_rfc3339()})};
         crate::platform::private_storage::atomic_write_private_json(&receipt,&receipt_value)?;result?;Ok(receipt_value["result"].clone())
     }

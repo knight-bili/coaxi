@@ -5,7 +5,7 @@ import { createHash, randomUUID } from 'node:crypto'
 import { resolveCoreBinary, type CoreClient } from './core-client'
 type Manifest={formatVersion:number;product:string;appVersion:string;createdAt:string;entries:Array<{path:string;size:number;sha256:string}>}
 const summary=(manifest:Manifest):{createdAt:string;appVersion:string;fileCount:number;totalBytes:number}=>({createdAt:manifest.createdAt,appVersion:manifest.appVersion,fileCount:manifest.entries.length,totalBytes:manifest.entries.reduce((sum,entry)=>sum+entry.size,0)})
-async function digest(path:string):Promise<string>{const hash=createHash('sha256');for await(const chunk of createReadStream(path))hash.update(chunk);return hash.digest('hex')}
+export async function backupFileDigest(path:string):Promise<string>{const hash=createHash('sha256');for await(const chunk of createReadStream(path))hash.update(chunk);return hash.digest('hex')}
 /** Offline helper is the sole reader/writer of backup archives. Renderer
  * receives an expiring selection id and a summary, never a passphrase receipt. */
 export class BackupWorkspace{
@@ -37,8 +37,8 @@ export class BackupWorkspace{
       if(operation==='inspect'){
         const chosen=await dialog.showOpenDialog(owner,{title:'选择加密备份',properties:['openFile'],filters:[{name:'加密备份',extensions:['rovai-backup','codegbak']}]})
         if(chosen.canceled||!chosen.filePaths[0])return null
-        const path=chosen.filePaths[0],before=await digest(path),result=await this.execute('inspect',root,path,passphrase,event)
-        if(await digest(path)!==before)throw new Error('backup.archive_changed')
+        const path=chosen.filePaths[0],before=await backupFileDigest(path),result=await this.execute('inspect',root,path,passphrase,event)
+        if(await backupFileDigest(path)!==before)throw new Error('backup.archive_changed')
         const id=randomUUID();this.selections.set(id,{path,digest:before,expires:Date.now()+15*60000});return {archiveId:id,...summary(result.manifest)}
       }
       let file:string
@@ -49,7 +49,7 @@ export class BackupWorkspace{
         file=destination.filePath
       }else if(operation==='restore'){
         const selection=archiveId?this.selections.get(archiveId):undefined
-        if(!selection||selection.expires<Date.now()||await digest(selection.path)!==selection.digest)throw new Error('backup.selection_expired_or_changed')
+        if(!selection||selection.expires<Date.now()||await backupFileDigest(selection.path)!==selection.digest)throw new Error('backup.selection_expired_or_changed')
         file=selection.path
       }else throw new Error('backup.operation_not_admitted')
       await this.prepare();this.beforeOffline()

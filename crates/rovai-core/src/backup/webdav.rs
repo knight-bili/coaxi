@@ -28,6 +28,7 @@ impl WebDav{
     fn url(&self,name:&str)->Result<Url>{ensure!(!name.contains(['/',':','\\','?','#','\r','\n'])&&!name.is_empty(),"webdav.invalid_name");let url=self.base.join(name)?;ensure!(url.origin()==self.base.origin()&&url.path().starts_with(self.base.path()),"webdav.path_escaped");Ok(url)}
     fn request(&self,method:Method,url:Url)->reqwest::RequestBuilder{self.client.request(method,url).basic_auth(&self.config.username,Some(&self.config.password))}
     pub async fn probe(&self)->Result<serde_json::Value>{let response=self.request(Method::from_bytes(b"PROPFIND")?,self.base.clone()).header("depth","0").timeout(Duration::from_secs(15)).send().await?;ensure!(response.status().is_success(),"webdav.request_rejected: {}",response.status());Ok(serde_json::json!({"connected":true}))}
+    pub async fn create_collection(&self)->Result<serde_json::Value>{let response=self.request(Method::from_bytes(b"MKCOL")?,self.base.clone()).timeout(Duration::from_secs(30)).send().await?;ensure!(response.status().is_success()||response.status()==StatusCode::METHOD_NOT_ALLOWED,"webdav.collection_rejected: {}",response.status());self.probe().await}
     async fn index(&self)->Result<(Index,Option<String>)>{
         let mut response=self.request(Method::GET,self.url("rovai-index-v1.json")?).timeout(Duration::from_secs(30)).send().await?;
         if response.status()==StatusCode::NOT_FOUND{return Ok((Index{format_version:1,entries:Vec::new()},None))}
@@ -44,9 +45,10 @@ impl WebDav{
         while let Some(chunk)=response.chunk().await?{length=length.checked_add(chunk.len() as u64).context("webdav.length_overflow")?;ensure!(length<=snapshot.bytes,"webdav.remote_size_changed");hash.update(&chunk)}
         ensure!(length==snapshot.bytes&&format!("{:x}",hash.finalize())==snapshot.sha256,"webdav.remote_checksum_mismatch");Ok(())
     }
-    pub async fn push(&self,path:&Path,id:&str)->Result<Snapshot>{
+    pub async fn push(&self,path:&Path,id:&str,expected_digest:Option<&str>)->Result<Snapshot>{
         uuid::Uuid::parse_str(id)?;ensure!(super::crypto::is_encrypted(path)?,"webdav.encrypted_snapshot_required");
         let (bytes,sha256)=tokio::task::spawn_blocking({let path=path.to_path_buf();move||super::hash_file(&path)}).await??;ensure!(bytes<=64*1024*1024*1024,"webdav.snapshot_limit");
+        ensure!(expected_digest.is_none_or(|expected|expected==sha256),"webdav.local_selection_changed");
         let snapshot=Snapshot{id:id.into(),created_at:chrono::Utc::now().to_rfc3339(),sha256,bytes};let (index,_)=self.index().await?;
         if let Some(existing)=index.entries.iter().find(|entry|entry.id==id){ensure!(existing.sha256==snapshot.sha256&&existing.bytes==snapshot.bytes,"webdav.operation_identity_changed");return Ok(existing.clone())}
         let stream=tokio_util::io::ReaderStream::new(tokio::fs::File::open(path).await?);

@@ -62,6 +62,7 @@ async function invokeHostWeb<T>(operation: string, input?: unknown): Promise<T> 
 }
 
 const api: RovaiApi = {
+  webdavWorkspace:{request:input=>ipcRenderer.invoke('rovai:webdav-workspace',input)},
   nativeBackups: {
     create:passphrase=>ipcRenderer.invoke('rovai:backup-workspace','create',{passphrase}),
     inspect:passphrase=>ipcRenderer.invoke('rovai:backup-workspace','inspect',{passphrase}),
