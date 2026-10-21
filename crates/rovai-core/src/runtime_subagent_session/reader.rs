@@ -583,6 +583,27 @@ impl Registry {
         Ok(target)
     }
 
+    pub(crate) fn agent_file_directory(
+        &self,
+        actor: &ActorRef,
+        id: &str,
+        plan: &NativeAgentReadPlan,
+    ) -> Result<std::path::PathBuf> {
+        user(actor)?;
+        read_id(id)?;
+        let mut entries = self.entries()?;
+        self.reap(&mut entries)?;
+        let entry = entries.get(id).context("native_child.read_missing")?;
+        entry.agent(actor, plan)?;
+        let mut data = entry.data()?;
+        let State::Ready(snapshot) = &data.state else {
+            anyhow::bail!("native_child.read_not_ready")
+        };
+        let directory = snapshot.agent_working_directory(actor, plan)?;
+        data.last_used = Instant::now();
+        Ok(directory)
+    }
+
     /// Cleanup is Current User-only and idempotent even after source deletion.
     /// It grants no content and never sends cancellation to the agent Runtime.
     pub(crate) fn close(&self, actor: &ActorRef, id: &str) -> Result<()> {

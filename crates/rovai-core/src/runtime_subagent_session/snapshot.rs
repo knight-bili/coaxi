@@ -366,6 +366,23 @@ impl NativeSnapshot {
         Ok(())
     }
 
+    pub(crate) fn agent_working_directory(
+        &self,
+        actor: &ActorRef,
+        plan: &NativeAgentReadPlan,
+    ) -> Result<std::path::PathBuf> {
+        self.authorize_agent(actor, plan)?;
+        let SnapshotTarget::Agent(target) = &self.target else {
+            anyhow::bail!("native_child.scope_changed")
+        };
+        let directory = std::path::PathBuf::from(
+            target.origin.working_directory.as_deref()
+                .context("native_child.source_unavailable")?,
+        );
+        ensure!(directory.is_absolute(), "native_child.source_unavailable");
+        Ok(directory)
+    }
+
     pub(crate) fn agent_window(
         &self,
         actor: &ActorRef,
