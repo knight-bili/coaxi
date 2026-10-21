@@ -35,6 +35,10 @@ export function usePetAnimator(state: PetState): AnimatorTick {
   // Generation counter so an in-flight setTimeout from a previous state
   // never wins a race against a new state's first frame.
   const genRef = useRef(0)
+  const [reducedMotion,setReducedMotion]=useState(()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+  const [visible,setVisible]=useState(()=>document.visibilityState!=='hidden')
+  useEffect(()=>{const media=window.matchMedia('(prefers-reduced-motion: reduce)'),motion=():void=>setReducedMotion(media.matches),visibility=():void=>setVisible(document.visibilityState!=='hidden');media.addEventListener('change',motion);document.addEventListener('visibilitychange',visibility);return()=>{media.removeEventListener('change',motion);document.removeEventListener('visibilitychange',visibility)}},[])
+
 
   useEffect(() => {
     const gen = ++genRef.current
@@ -88,6 +92,7 @@ export function usePetAnimator(state: PetState): AnimatorTick {
       }, delay)
     }
 
+    if(reducedMotion||!visible){setRow(state,0);return}
     activeState = state
     playFrame(state, 0)
     if (state === "idle") {
@@ -98,7 +103,7 @@ export function usePetAnimator(state: PetState): AnimatorTick {
       if (timer) clearTimeout(timer)
       if (flourishTimer) clearTimeout(flourishTimer)
     }
-  }, [state])
+  }, [state,reducedMotion,visible])
 
   return tick
 }

@@ -1276,7 +1276,7 @@ core.onEvent(event=>petWindow.onCoreEvent(event))
 ipcMain.handle('rovai:pets-synchronize',event=>petWindow.synchronize(event))
 ipcMain.handle('rovai:pet-request',(event,input)=>petWindow.read(event,input))
 ipcMain.handle('rovai:pet-control',(event,action)=>petWindow.control(event,action))
-app.on('before-quit',()=>petWindow.close())
+app.on('before-quit',()=>petWindow.dispose())
 ipcMain.handle('rovai:pets-import',async event=>{
   if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('pets.local_owner_required')
   const selected=await dialog.showOpenDialog(mainWindow,{title:'选择包含pet.json和spritesheet.webp的宠物文件夹',properties:['openDirectory']})
