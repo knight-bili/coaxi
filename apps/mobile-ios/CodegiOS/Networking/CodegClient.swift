@@ -66,7 +66,12 @@ struct CodegClient: Sendable {
     /// the 30s default — this endpoint normally answers in well under a second,
     /// and it backs the per-server status dots and the editor's Test Connection.
     func health() async throws -> HealthResponse {
-        try await postJSON("health", EmptyBody(), session: Self.readSession)
+        var request = URLRequest(url: baseURL.appendingPathComponent("api/v1/probe"))
+        request.httpMethod = "POST"; request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONSerialization.data(withJSONObject: ["protocolVersion": 4, "administratorToken": token])
+        let (data, response) = try await Self.readSession.data(for: request)
+        guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else { throw RovaiHostFailure(code: "host.probe_denied") }
+        return try JSONDecoder().decode(HealthResponse.self, from: data)
     }
 
     /// All projects/folders known to the server.

@@ -239,6 +239,7 @@ fn routes(state: WebState) -> Router {
         .route("/api/office-watch-proxy/{port}/{*rest}",axum::routing::any(office_proxy::proxy))
         .nest("/api/v1", api)
         .route("/api/v1/login", post(login))
+        .route("/api/v1/probe", post(native_probe))
         .route("/api/v1/login-ticket", post(redeem_login_ticket))
         .route("/", get(index))
         .route("/preview.html", get(preview_shell))
@@ -353,6 +354,17 @@ struct Login {
     administrator_token: String,
     #[serde(default)]
     editor: Option<EditorResume>,
+}
+
+// Native connection checks authenticate without creating an editing identity.
+async fn native_probe(State(state): State<WebState>, body: std::result::Result<Json<Login>, axum::extract::rejection::JsonRejection>) -> Response {
+    let Ok(Json(body)) = body else { return error(StatusCode::BAD_REQUEST,"invalid_login") };
+    if body.protocol_version != HOST_WEB_PROTOCOL_VERSION { return error(StatusCode::CONFLICT,"protocol_incompatible") }
+    if let Err(failure) = state.sessions.authorize_login(&body.administrator_token) { return login_failure(failure) }
+    match state.core.request("app.info",json!({})).await {
+        Ok(reply) if reply.error.is_none() => Json(json!({"status":"ok","version":reply.result.as_ref().and_then(|value|value.get("version")).cloned().unwrap_or(Value::Null),"protocolVersion":HOST_WEB_PROTOCOL_VERSION})).into_response(),
+        _=>error(StatusCode::SERVICE_UNAVAILABLE,"core_unavailable")
+    }
 }
 
 #[derive(Deserialize, serde::Serialize)]

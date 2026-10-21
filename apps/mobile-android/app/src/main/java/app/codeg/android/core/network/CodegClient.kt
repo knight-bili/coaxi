@@ -931,12 +931,12 @@ class CodegClient(
      * text, or throws an [ApiError] for any non-2xx / transport failure.
      */
     private suspend fun send(path: String, bodyJson: String): String {
-        val url = "$baseUrl/api/$path"
+        val url = if(path=="health")"$baseUrl/api/v1/probe" else "$baseUrl/api/$path"
         val response = try {
             http.post(url) {
                 header(HttpHeaders.Authorization, "Bearer $token")
                 contentType(ContentType.Application.Json)
-                setBody(bodyJson)
+                setBody(if(path=="health")buildJsonObject{put("protocolVersion",4);put("administratorToken",token)}.toString()else bodyJson)
             }
         } catch (e: kotlinx.coroutines.CancellationException) {
             // Cancellation must stay cancellation — never masquerade as a transport error,
