@@ -1,6 +1,7 @@
 [workspace]
 members = ["crates/rovai-core", "crates/rovai-host", "crates/rovai-web", "crates/rovai-computer", "crates/rovai-channels"]
 resolver = "3"
+exclude = ["helpers/native-history"]
 
 [workspace.package]
 version = "0.4.8"

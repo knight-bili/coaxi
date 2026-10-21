@@ -1,0 +1,26 @@
+[package]
+name = "rovai-native-history"
+version = "1.0.0"
+edition = "2021"
+license = "Apache-2.0"
+
+[workspace]
+
+[dependencies]
+anyhow = "1"
+base64 = "0.22"
+chrono = { version = "0.4", features = ["serde"] }
+dirs = "6"
+percent-encoding = "2.3.2"
+prost = "0.13"
+regex = "1.12.3"
+rusqlite = { version = "0.32", features = ["backup", "bundled"] }
+sea-orm = { version = "1.1", features = ["sqlx-sqlite", "runtime-tokio-rustls", "macros"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+thiserror = "2"
+tokio = { version = "1", features = ["rt-multi-thread", "time"] }
+toml = "0.8"
+tracing = "0.1"
+walkdir = "2"

@@ -1,0 +1,34 @@
+{
+  "repository": "https://github.com/spacering-net/codeg",
+  "revision": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+  "license": "Apache-2.0",
+  "sourceFiles": [
+    "parsers/gemini.rs",
+    "parsers/openclaw.rs",
+    "parsers/hermes.rs",
+    "parsers/codebuddy.rs",
+    "parsers/kimi_code.rs",
+    "parsers/pi.rs",
+    "parsers/deepseek.rs",
+    "parsers/cursor.rs",
+    "parsers/opencode.rs",
+    "parsers/cline.rs",
+    "parsers/antigravity.rs",
+    "parsers/claude.rs",
+    "parsers/opencode_context_window.rs",
+    "parsers/summary_cache.rs",
+    "models/agent.rs",
+    "models/message.rs",
+    "models/conversation.rs",
+    "acp/agent_mentions.rs",
+    "acp/codex_goal.rs"
+  ],
+  "purpose": "Read-only parser helper for the eleven remaining native history formats; original four remain in Core",
+  "adaptations": [
+    "Explicit with_base_dir only; global native-home discovery excluded",
+    "No donor business database or execution registry",
+    "Source production parsers only; tests excluded",
+    "Filesystem reads will be fenced to an explicit snapshot root",
+    "Separate binary isolates donor SeaORM/SQLite reader dependencies from Core SQLite"
+  ]
+}
