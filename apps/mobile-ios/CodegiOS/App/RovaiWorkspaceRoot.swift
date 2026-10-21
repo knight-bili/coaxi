@@ -27,7 +27,7 @@ struct RovaiWorkspaceRoot: View {
         .sheet(isPresented: Binding(get: { linkSettings != nil }, set: { if !$0 { linkSettings = nil } })) { NavigationStack { linkedSettings.navigationTitle("设置").toolbar { ToolbarItem(placement: .confirmationAction) { Button("关闭") { linkSettings = nil } } } } }
         .sheet(isPresented: $notifications) { RovaiNotificationInbox(model: model) }
         .sheet(item: $memberEditor) { item in RovaiMemberEditor(model: model, member: item.value) }
-        .sheet(isPresented: Binding(get: { create != nil }, set: { if !$0 { create = nil } })) { RovaiNewConversation(model: model, mission: create == "mission") { create = nil } }
+        .sheet(isPresented: Binding(get: { create != nil }, set: { if !$0 { create = nil } })) { if create == "mission" {RovaiMissionCreator(model: model) {create = nil}} else {RovaiNewConversation(model: model, mission: false) {create = nil}} }
     }
     @ViewBuilder private var linkedSettings: some View {
         switch linkSettings { case "appearance": AppearanceSettingsView(); case "language": LanguageSettingsView(); case "runtime": RovaiRuntimeSettingsView(model: model); case "skills": RovaiSkillSettingsView(model: model); case "quickMessages": RovaiMessageLibrary(model: model); case "mcp": RovaiMcpSettingsView(model: model); case "notifications": RovaiNotificationSettings(model: model); default: EmptyView() }
