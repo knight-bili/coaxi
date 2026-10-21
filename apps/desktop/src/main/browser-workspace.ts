@@ -2,6 +2,7 @@ import { BrowserWindow, type IpcMainInvokeEvent } from 'electron'
 import { createHash, randomUUID } from 'node:crypto'
 import type { BrowserWorkspaceApi, BrowserWorkspaceView, CoreMethod } from '@contracts'
 import agentBundle from './codeg-browser-agent.js?raw'
+import { BrowserDownloads } from './browser-downloads'
 
 type Request = <T>(method: CoreMethod, params?: unknown) => Promise<T>
 type Surface = {
@@ -20,6 +21,7 @@ const address=(value:string):string=>{
  * Electron. Only a trusted local owner can create/share/control a surface. */
 export class BrowserWorkspace {
   private readonly surfaces=new Map<string,Surface>()
+  private readonly downloads=new BrowserDownloads()
   constructor(private readonly request:Request,private readonly owner:()=>BrowserWindow|null){}
   private trusted(event:IpcMainInvokeEvent):void{
     const owner=this.owner()
@@ -41,6 +43,18 @@ export class BrowserWorkspace {
   }
   async invoke(event:IpcMainInvokeEvent,operation:unknown,input:unknown):Promise<unknown>{
     this.trusted(event)
+    if(operation==='downloads'){
+      if(typeof input!=='string'||input.length>200)throw new Error('browser.invalid_thread')
+      await this.request('workbench.files.list',{scope:{threadId:input},path:''})
+      return this.downloads.list(input)
+    }
+    if(operation==='downloadControl'){
+      if(!input||typeof input!=='object'||Array.isArray(input))throw new Error('browser.invalid_request')
+      const value=input as Parameters<BrowserWorkspaceApi['downloadControl']>[0]
+      if(typeof value.id!=='string'||typeof value.threadId!=='string')throw new Error('browser.invalid_request')
+      await this.request('workbench.files.list',{scope:{threadId:value.threadId},path:''})
+      return this.downloads.control(value)
+    }
     if(operation==='list'){
       if(typeof input!=='string')throw new Error('browser.invalid_thread')
       return [...this.surfaces.values()].filter(s=>s.view.threadId===input).map(s=>this.snapshot(this.find(s.view.id)))
@@ -56,7 +70,7 @@ export class BrowserWorkspace {
       this.surfaces.set(id,surface)
       window.webContents.session.setPermissionRequestHandler((_contents,_permission,callback)=>callback(false))
       window.webContents.session.setPermissionCheckHandler(()=>false)
-      window.webContents.session.on('will-download',(event)=>event.preventDefault())
+      const unbindDownloads=this.downloads.bind(window.webContents.session,window.webContents,threadId,id)
       window.webContents.setWindowOpenHandler(()=>({action:'deny'}))
       const navigation=(event:Electron.Event,url:string):void=>{try{address(url)}catch{event.preventDefault();return};if(surface.grantOrigin&&new URL(url).origin!==surface.grantOrigin)this.revoke(surface)}
       window.webContents.on('will-navigate',navigation)
@@ -73,7 +87,7 @@ export class BrowserWorkspace {
         surface.console.push({level:typeof details==='object'?String(details.level):String(details),message:String(message??'').slice(0,16000),at:Date.now()})
         if(surface.console.length>200)surface.console.shift()
       })
-      window.once('closed',()=>{this.revoke(surface);this.surfaces.delete(id)})
+      window.once('closed',()=>{unbindDownloads();this.revoke(surface);this.surfaces.delete(id)})
       window.once('ready-to-show',()=>window.show())
       void window.loadURL(initial).catch(error=>{surface.view.error=String(error);surface.view.loading=false;window.show()})
       return this.snapshot(surface)
@@ -140,5 +154,5 @@ export class BrowserWorkspace {
     })
   }
   revokeAll():void{for(const surface of this.surfaces.values())this.revoke(surface)}
-  closeAll():void{for(const surface of this.surfaces.values()){this.revoke(surface);if(!surface.window.isDestroyed())surface.window.destroy()}}
+  closeAll():void{this.downloads.close();for(const surface of this.surfaces.values()){this.revoke(surface);if(!surface.window.isDestroyed())surface.window.destroy()}}
 }

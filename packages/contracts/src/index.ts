@@ -5133,7 +5133,10 @@ export interface NativeBackupsApi {
   restore(archiveId:string,passphrase:string):Promise<BackupSummary&{restoreStaged:true}>
   onProgress(listener:(value:{phase:string;done:number;total:number})=>void):()=>void
 }
+export interface BrowserDownloadView { id:string;threadId:string;tabId:string;fileName:string;path:string;state:'progressing'|'paused'|'interrupted'|'completed'|'cancelled'|'failed';receivedBytes:number;totalBytes:number;canResume:boolean;startedAt:number;updatedAt:number }
 export interface BrowserWorkspaceApi {
+  downloads(threadId:string):Promise<BrowserDownloadView[]>
+  downloadControl(input:{threadId:string;id:string;action:'pause'|'resume'|'cancel'|'dismiss'|'reveal'}):Promise<void>
   list(threadId: string): Promise<BrowserWorkspaceView[]>
   open(threadId: string, url: string): Promise<BrowserWorkspaceView>
   control(input: {id:string; action:'navigate'|'back'|'forward'|'reload'|'focus'|'close'|'share'; url?:string; level?:'none'|'read'|'control'; minutes?:number}): Promise<BrowserWorkspaceView | null>

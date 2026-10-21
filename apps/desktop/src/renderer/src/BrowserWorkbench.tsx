@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ArrowLeft, ArrowRight, ExternalLink, Globe, Plus, RefreshCw, ShieldOff, X } from 'lucide-react'
 import type { BrowserWorkspaceView } from '@contracts'
+import { BrowserDownloadBar } from './BrowserDownloadBar'
 import { newCommandId } from '../../shared/command-id'
 import { useThreadClient } from './camp-client'
 import { useUiText } from './interface-language'
@@ -33,6 +34,7 @@ export function BrowserWorkbench({threadId}:{threadId:string}):React.JSX.Element
       <button type="submit" disabled={busy}><Plus size={14}/>{t('新页面')}</button>
     </form>
     {error&&<p className="workbench-error" role="alert">{error}</p>}
+    <BrowserDownloadBar key={threadId} api={api} threadId={threadId} tabId={current?.id??null}/>
     <div className="workbench-tabs" role="tablist">{tabs.map(tab=><button type="button" role="tab" aria-selected={tab.id===selected} className={tab.id===selected?'workbench-tab is-active':'workbench-tab'} key={tab.id} title={tab.url} onClick={()=>{setSelected(tab.id);setUrl(tab.url);setPreview(null)}}>{tab.title||tab.url}{tab.level!=='none'?' · '+t(tab.level==='read'?'允许查看':'允许操作'):''}</button>)}</div>
     {current?<>
       <div className="workbench-toolbar">
