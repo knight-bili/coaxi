@@ -23,6 +23,7 @@ fun RovaiThreadControls(model:RovaiWorkspaceViewModel,state:RovaiWorkspaceState)
     if(managingMembers)RovaiThreadMembers(model,threadId){managingMembers=false}
     Column(verticalArrangement=Arrangement.spacedBy(10.dp)){
         TextButton(onClick={managingMembers=true}){Text("会话队员与队长")}
+        RovaiExecutionMetrics(model,threadId,thread)
         thread["approvals"].coreArray().filter{it.coreText("status")=="pending"}.forEach{approval->GlassRow(Modifier.fillMaxWidth()){
             Text("需要你的许可",style=MaterialTheme.typography.titleSmall);Text(approval.coreText("actionSummary"));if(approval.coreText("reason").isNotEmpty())Text(approval.coreText("reason"),color=CodegTheme.colors.textSecondary)
             approval["options"].coreArray().forEach{option->TextButton(enabled=state.pending==null&&!state.busy,onClick={model.execute(RovaiOperation.ACTION_APPROVALS_RESOLVE,buildJsonObject{put("commandId",UUID.randomUUID().toString());put("threadId",threadId);put("approvalId",approval.coreText("id"));put("expectedVersion",approval.coreLong("version"));put("optionId",option.coreText("optionId"));put("reason","用户选择智能体原生选项：${option.coreText("optionId")}。")})}){Column{Text(option.coreText("label"));Text(option.coreText("consequence"),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)}}}
