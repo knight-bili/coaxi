@@ -15,6 +15,7 @@ mod workbench;
 mod browser_access;
 mod computer_access;
 mod office_access;
+mod history_import;
 mod forge;
 pub(crate) mod private_composer;
 mod private_sources;
@@ -10324,6 +10325,8 @@ impl Core {
                     "blockers": blockers,
                 }))
             }
+            "history.local" => self.history_import(true,request.params.clone()).await,
+            "history.library" => self.history_import(false,request.params.clone()).await,
             "office.watch" => self.office_access(request.params.clone()).await,
             "computer.local" => self.computer_access(request.params.clone()).await,
             "browser.local.grant" | "browser.local.revoke" | "browser.local.begin" | "browser.local.finish" => self.browser_access(&request.method, request.params.clone()).await,

@@ -62,6 +62,7 @@ async function invokeHostWeb<T>(operation: string, input?: unknown): Promise<T> 
 }
 
 const api: RovaiApi = {
+  nativeHistory: {scan:(threadId,provider)=>ipcRenderer.invoke('rovai:native-history','scan',{threadId,provider}),request:(threadId,input)=>ipcRenderer.invoke('rovai:native-history','request',{threadId,input})},
   officeWorkspace: {open:(threadId,path,editable)=>ipcRenderer.invoke('rovai:office-workspace',{threadId,path,editable})},
   computerWorkspace: { request: (threadId,input)=>ipcRenderer.invoke('rovai:computer-workspace',{threadId,input,commandId:globalThis.crypto.randomUUID()}) },
   browserWorkspace: {

@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 /// and the legacy shared draft remain outside the network capability.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum Operation {
+    #[serde(rename="history.library")]
+    HistoryLibrary,
     #[serde(rename="office.watch")]
     OfficeWatch,
     #[serde(rename = "forge.accounts.get")]
@@ -483,6 +485,7 @@ pub enum Operation {
 impl Operation {
     pub fn timeout(self) -> std::time::Duration {
         std::time::Duration::from_secs(match self {
+            Self::HistoryLibrary => 30,
             Self::OfficeWatch => 30,
             Self::ForgeOperation => 60,
             Self::WorkbenchGitRead | Self::WorkbenchGitPreview | Self::WorkbenchGitExecute => 120,
@@ -503,6 +506,7 @@ impl Operation {
         match self {
             Self::AppInfo => json!({"name":value["name"],"version":value["version"]}),
             Self::ForgeAccountsGet | Self::ForgeAccountsSet => select_fields(&value, &["accounts"]),
+            Self::HistoryLibrary => select_fields(&value,&["entries","digest","totalBytes","offset","next","bytes","saved"]),
             Self::OfficeWatch => select_fields(&value,&["holdId","port","cap","editable","released","installed","formats"]),
             Self::ForgeOperation => select_fields(&value, &["provider", "webUrl", "ownerRepo", "repositoryKey", "repository", "success", "status", "data", "missionDraft", "nextPage"]),
             Self::WorkbenchOrganizerGet | Self::WorkbenchOrganizerSet => select_fields(&value, &["value", "digest"]),
@@ -577,6 +581,7 @@ impl Operation {
         match self {
             Self::ForgeAccountsGet => "forge.accounts.get",
             Self::ForgeAccountsSet => "forge.accounts.set",
+            Self::HistoryLibrary => "history.library",
             Self::OfficeWatch => "office.watch",
             Self::ForgeOperation => "forge.operation",
             Self::WorkbenchOrganizerGet => "workbench.organizer.get",

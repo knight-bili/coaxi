@@ -5003,6 +5003,8 @@ export type CoreMethod =
   | 'runtime.interactions.get'
   | 'runtime.interactions.resolve'
   | 'runtime.childReads.start'
+  | 'history.local'
+  | 'history.library'
   | 'office.watch'
   | 'computer.local'
   | 'browser.local.grant'
@@ -5112,6 +5114,10 @@ export interface BrowserWorkspaceView { id:string; threadId:string;url:string;ti
 
 export interface RovaiApi {
   /** Native local owner surface; intentionally absent from remote Web. */
+  nativeHistory?: {
+    scan<T>(threadId:string,provider:'codex'|'claude'|'qoder'|'grok'):Promise<T|null>
+    request<T>(threadId:string,input:{operation:'preview'|'import';planId:string;entryId:string;expectedDigest?:string}):Promise<T>
+  }
   officeWorkspace?: {open(threadId:string,path:string,editable:boolean):Promise<{opened:true}>}
   browserWorkspace?: BrowserWorkspaceApi
   computerWorkspace?: { request<T>(threadId:string,input:{operation:string;targetId?:string;level?:'none'|'read'|'control';permission?:'accessibility'|'screenRecording';action?:unknown;enabled?:boolean}):Promise<T> }

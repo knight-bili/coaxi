@@ -4,6 +4,7 @@ import type { ThreadClient } from './camp-client'
 export const desktopThreadClient: ThreadClient = {
   presentationScope: 'desktop',
   get computerWorkspace() { return window.rovai.computerWorkspace },
+  get nativeHistory() { return window.rovai.nativeHistory },
   get officeWorkspace() { return window.rovai.officeWorkspace },
   get browserWorkspace() { return window.rovai.browserWorkspace },
   get privateInputRecovery() { return window.rovai.privateInputRecovery },

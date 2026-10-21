@@ -107,7 +107,7 @@ export function NativeSessionViewer({ target, open, visible, onOpenChange, retur
 
 type ToolUse = Extract<NativeTranscriptBlock, { type: 'tool_use' }>
 type ToolResult = Extract<NativeTranscriptBlock, { type: 'tool_result' }>
-function NativeTranscriptBody({ data, reader, target, live, visible }: { data: NativeTranscript; reader: NativeChildReader; target: NativeSessionTarget; live: boolean; visible: boolean }): React.JSX.Element {
+export function NativeTranscriptBody({ data, reader, target, live, visible }: { data: NativeTranscript; reader: NativeChildReader | null; target: NativeSessionTarget | null; live: boolean; visible: boolean }): React.JSX.Element {
   const turns = data.turns
   const language = useInterfaceLanguage(), t = useUiText(), planText = useTranslations('Folder.chat.proposedPlan')
   const filePreview = useOptionalFilePreview()
@@ -121,16 +121,16 @@ function NativeTranscriptBody({ data, reader, target, live, visible }: { data: N
     return () => window.removeEventListener('native-content-notice', update)
   }, [visible])
   const openFile = useCallback(async (rawReference: string, line?: number | null): Promise<void> => {
-    const source = reader.fileSource()
+    const source = reader?.fileSource()
     if (!source || !previewOpen) throw new Error('native_child.source_unavailable')
     const outcome = await previewOpen({ kind: 'native_child_file', ...source, rawReference },
       line != null && Number.isSafeInteger(line) && line > 0 ? { line } : undefined,
       undefined, { commitOnSuccess: true, revalidateSource: true })
     if (outcome.kind === 'error') throw new Error('native_child.file_unavailable')
   }, [reader, previewOpen])
-  const source = reader.fileSource()
+  const source = reader?.fileSource()
   const client = useThreadClient(), local = client.attachments?.kind !== 'download'
-  const scope = useMemo(() => ({ source, api: fileApi, theme: filePreview?.resolvedTheme ?? 'day' as const, visible, local, open: filePreview ? openFile : null }),
+  const scope = useMemo(() => ({ source, api: fileApi, theme: filePreview?.resolvedTheme ?? 'day' as const, visible, local, open: filePreview && source ? openFile : null }),
     [source?.threadId, source?.readId, fileApi, filePreview?.resolvedTheme, visible, local, Boolean(previewOpen), openFile])
   const imageScope = useMemo(() => ({ visible, notice: setNotice }), [visible, source?.threadId, source?.readId])
   const renderMarkdown = useCallback((text: string, streaming: boolean) => <NativeMarkdown streaming={streaming}>{text}</NativeMarkdown>, [])
@@ -157,6 +157,7 @@ function NativeTranscriptBody({ data, reader, target, live, visible }: { data: N
     const original = raw?.type === 'tool_use' ? results.get(raw) : undefined
     const result: ToolResult | undefined = original ? { ...original, images: undefined } : part.output !== undefined || part.errorText !== undefined
       ? { type: 'tool_result', tool_use_id: part.toolCallId, output_preview: part.errorText ?? part.output ?? null, is_error: part.state === 'output-error', agent_stats: part.agentStats ? { ...part.agentStats } : null } : undefined
+    if (!reader || !target) return <NativeSourceTool key={key} part={part}><OrdinaryToolCallPart part={part} /></NativeSourceTool>
     if (name.toLowerCase() === 'agent' || name.toLowerCase() === COLLAB_AGENT_TOOL_NAME) return <NativeAgentSourceTool key={key} part={part} reader={reader} target={target} childIds={nativeToolChildren(use, result)}>
       {name.toLowerCase() === 'agent'
         ? <AgentToolCallPart part={part} renderToolCall={(child, childKey) => tool({ ...child, agentStats: undefined, agentTranscript: undefined }, childKey)} />

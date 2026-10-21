@@ -43,6 +43,34 @@ pub(crate) struct NativeContent {
     pub(crate) verified_children: Vec<String>,
 }
 
+/// Explicit User import is a distinct authority from a running native child.
+/// Bytes are supplied by Core's selected-file importer; cwd, child ids and
+/// file paths inside a transcript never authorize another filesystem read.
+pub(crate) fn import_records(adapter:&str,bytes:&[u8],fallback:DateTime<Utc>,stop:&AtomicBool)->Result<Value>{
+    let mut rows=Vec::new();let mut malformed=0_u64;let mut incomplete=false;
+    let text=std::str::from_utf8(bytes)?;
+    if text.trim_start().starts_with('['){
+        let value:Value=serde_json::from_str(text)?;rows=value.as_array().cloned().ok_or_else(||anyhow::anyhow!("history.invalid_array"))?;
+    }else{
+        let lines=text.split_inclusive('\n').collect::<Vec<_>>();
+        for (index,line) in lines.iter().enumerate(){
+            ensure!(!stop.load(Ordering::Acquire),"history.cancelled");if line.trim().is_empty(){continue}
+            match serde_json::from_str::<Value>(line){Ok(value)=>rows.push(value),Err(_)=>{malformed+=1;if index+1==lines.len()&&!line.ends_with('\n'){incomplete=true}}}
+        }
+    }
+    ensure!(!rows.is_empty(),"history.no_records");
+    let unavailable=std::collections::BTreeMap::new();
+    let (turns,stats,summary)=match adapter{
+        "codex"=>{let detail=codex::project(rows.into_iter().map(Ok),fallback,stop,&mut |_|None,&mut |_,_|None)?;(detail.turns,detail.session_stats,detail.summary)}
+        "claude"=>{let detail=claude_read::parse(rows.into_iter().map(Ok),fallback,stop,&mut |_,_|None,&unavailable,&mut |_,_|None)?;(detail.turns,detail.session_stats,detail.summary)}
+        "qoder"=>{let detail=qoder::parse(rows,fallback,stop,&Default::default(),&mut |_,_|None)?;(detail.turns,detail.session_stats,detail.summary)}
+        "grok"=>{let detail=grok::project(rows.into_iter().map(Ok),std::iter::empty(),fallback,&grok_stats::SummaryMeta::default(),None,None,&Default::default(),|_|Vec::new())?;(detail.turns,detail.session_stats,detail.summary)}
+        _=>anyhow::bail!("history.unsupported_adapter"),
+    };
+    ensure!(!stop.load(Ordering::Acquire),"history.cancelled");
+    Ok(serde_json::json!({"schema_version":1,"turns":turns,"context_tokens":null,"session_stats":stats,"summary":summary,"notes":{"malformed_records":malformed,"incomplete_tail":incomplete,"unavailable_children":0,"unavailable_advisories":0},"child_references":[]}))
+}
+
 pub(super) fn read(
     target: &ObservedNativeSessionTarget,
     fallback: DateTime<Utc>,

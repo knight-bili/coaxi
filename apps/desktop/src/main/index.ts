@@ -299,6 +299,7 @@ const allowedMethods = new Set<CoreMethod>([
   'workspaces.worktrees',
   'workbench.files.list',
   'workbench.organizer.get',
+  'history.library',
   'office.watch',
   'forge.accounts.get',
   'forge.accounts.set',
@@ -1248,6 +1249,20 @@ const officeWorkspace = new OfficeWorkspace((method,params)=>core.request(method
 ipcMain.handle('rovai:office-workspace',(event,input)=>officeWorkspace.open(event,input))
 app.on('before-quit',()=>officeWorkspace.closeAll())
 const browserWorkspace = new BrowserWorkspace((method,params)=>core.request(method,params),()=>mainWindow)
+ipcMain.handle('rovai:native-history',async(event,operation,value:unknown)=>{
+  if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('history.local_owner_required')
+  if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('history.invalid_request')
+  const {threadId,provider,input}=value as {threadId:string;provider:string;input:Record<string,unknown>}
+  if(typeof threadId!=='string')throw new Error('history.invalid_thread')
+  if(operation==='scan'){
+    if(!['codex','claude','qoder','grok'].includes(provider))throw new Error('history.invalid_provider')
+    const selected=await dialog.showOpenDialog(mainWindow,{title:'选择原生会话记录文件夹',properties:['openDirectory']})
+    if(selected.canceled||!selected.filePaths[0])return null
+    return core.request('history.local',{scope:{threadId},operation:'scan',root:selected.filePaths[0],provider})
+  }
+  if(operation!=='request'||!input||!['preview','import'].includes(String(input.operation)))throw new Error('history.operation_not_admitted')
+  return core.request('history.local',{scope:{threadId},operation:input.operation,planId:input.planId,entryId:input.entryId,expectedDigest:input.expectedDigest})
+})
 ipcMain.handle('rovai:computer-workspace',async(event,value:unknown)=>{
   if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('computer.local_owner_required')
   if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('computer.invalid_request')
