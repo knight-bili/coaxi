@@ -1,4 +1,7 @@
 import { randomBytes, randomUUID } from 'node:crypto'
+import { spawn } from 'node:child_process'
+import { dirname } from 'node:path'
+import { resolveCoreBinary } from './core-client'
 import { createServer, type Server, type Socket } from 'node:net'
 import { chmod, lstat, mkdir, readFile, rename, unlink, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -93,9 +96,9 @@ export class UserAutomationError extends Error {
 
 export function userAutomationAvailableOnPlatform(
   platform: NodeJS.Platform,
-  windowsQualification: string | undefined
+  _windowsQualification: string | undefined
 ): boolean {
-  return platform !== 'win32' || windowsQualification === '1'
+  return ['win32', 'darwin', 'linux'].includes(platform)
 }
 
 function record(value: unknown, label: string): RecordValue {
@@ -491,6 +494,19 @@ async function removeStaleSocket(path: string): Promise<void> {
 }
 
 async function atomicWritePrivateJson(path: string, value: unknown): Promise<void> {
+  if (process.platform === 'win32') {
+    await new Promise<void>((resolve, reject) => {
+      const child = spawn(resolveCoreBinary(), ['automation-storage', '--directory', dirname(path)], { windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'] })
+      let output = '', errorOutput = ''; const timer = setTimeout(() => child.kill(), 15_000)
+      child.stdout.setEncoding('utf8'); child.stderr.setEncoding('utf8')
+      child.stdout.on('data', (chunk: string) => { output += chunk; if (output.length > 65536) child.kill() })
+      child.stderr.on('data', (chunk: string) => { errorOutput = (errorOutput + chunk).slice(-4096) })
+      child.once('error', failure => { clearTimeout(timer); reject(failure) })
+      child.once('close', code => { clearTimeout(timer); if (code !== 0) { reject(new UserAutomationError('automation_private_storage_unavailable', errorOutput || '本机CLI私有凭据未能保存。')); return }; try { if (JSON.parse(output).saved !== true) throw Error('invalid'); resolve() } catch { reject(new UserAutomationError('automation_private_storage_unavailable', '本机CLI凭据保存结果不明确。')) } })
+      child.stdin.on('error', () => undefined); child.stdin.end(JSON.stringify(value))
+    })
+    return
+  }
   const temporary = `${path}.${randomUUID()}.tmp`
   await writeFile(temporary, `${JSON.stringify(value)}\n`, { encoding: 'utf8', mode: 0o600 })
   await chmod(temporary, 0o600)
@@ -528,7 +544,7 @@ export class UserAutomationServer {
     )) {
       throw new UserAutomationError(
         'automation_platform_unsupported',
-        'Windows User Automation is available only in an explicit local qualification run.'
+        'User Automation is unavailable on this platform.'
       )
     }
     await mkdir(this.rootPath, { recursive: true, mode: 0o700 })

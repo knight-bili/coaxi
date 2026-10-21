@@ -89,3 +89,13 @@ mod tests {
         );
     }
 }
+
+/// Local Desktop CLI discovery record. The parent and record receive the native
+/// private storage policy before a credential is published.
+pub fn write_user_automation_context(directory:&std::path::Path,bytes:&[u8])->anyhow::Result<()> {
+    anyhow::ensure!(bytes.len()<=1024*1024,"automation_context_too_large");let value:serde_json::Value=serde_json::from_slice(bytes)?;
+    anyhow::ensure!(value["contractVersion"]==1&&value["credential"].as_str().is_some_and(|secret|secret.len()>=32)&&value["instanceId"].as_str().is_some_and(|id|uuid::Uuid::parse_str(id).is_ok()),"automation_context_invalid");
+    let directory=private_storage::prepare_private_directory(directory)?;let path=directory.join("connection-v1.json");
+    if path.exists(){let metadata=std::fs::symlink_metadata(&path)?;anyhow::ensure!(metadata.is_file()&&!metadata.file_type().is_symlink(),"automation_context_unsafe");#[cfg(windows)]private_storage::repair_private_file(&path)?;}
+    private_storage::atomic_write_private_bytes(&path,bytes)
+}
