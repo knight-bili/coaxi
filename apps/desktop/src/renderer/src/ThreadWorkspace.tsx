@@ -171,6 +171,7 @@ import { SafeMarkdown } from './SafeMarkdown'
 import { RuntimeInteractionDock } from './RuntimeInteractionDock'
 import { DelegationViewerHost, DelegationChildren } from './DelegationViewer'
 import { NativeSubagentEntries } from './NativeSubagentEntries'
+import { WorkspaceWorkbench } from './WorkspaceWorkbench'
 import { FilePreviewPane } from './FilePreviewPane'
 import { FilePreviewResizeHandle, FilePreviewWorkspace, useInitializeFilePreviewMinimumWidth, useOptionalFilePreviewLayout } from './FilePreviewLayout'
 import { useExecutionPreviewHost, useOptionalFilePreview } from './FilePreviewContext'
@@ -1623,10 +1624,13 @@ function RevealNotificationConversation({ active, onHidePreview }: { active: boo
 
 export function ThreadWorkspace(props: Parameters<typeof ThreadWorkspaceContent>[0]): JSX.Element {
   const client = useThreadClient(), owner = useRef({ client, generation: 0 })
+  const workbenchGuard = useRef<(() => void) | null>(null)
+  const bindWorkbenchGuard = useCallback((guard: (() => void) | null) => { workbenchGuard.current = guard }, [])
   const viewerGuard = useRef<(() => ThreadLeavePreparation) | null>(null)
   const bindViewerGuard = useCallback((guard: (() => ThreadLeavePreparation) | null) => { viewerGuard.current = guard }, [])
   const bindWorkspaceGuard = useCallback((threadId: string, guard: ThreadLeaveGuard | null) => {
     props.onThreadLeaveGuardChange?.(threadId, guard ? async () => {
+      workbenchGuard.current?.()
       const viewer = viewerGuard.current?.()
       let workspace: ThreadLeavePreparation
       try { workspace = await guard() } catch (error) { viewer?.complete(false); throw error }
@@ -1638,12 +1642,14 @@ export function ThreadWorkspace(props: Parameters<typeof ThreadWorkspaceContent>
   const key = JSON.stringify([owner.current.generation, props.snapshot.thread.id, props.composerContext ? canvasComposerContextKey(props.composerContext) : null])
   return <DelegationViewerHost key={key} visible={props.surfaceVisible} onLeaveGuardChange={bindViewerGuard} threadId={props.snapshot.thread.id} members={props.snapshot.members} profileById={new Map(props.agents.map(agent => [agent.agentId, agent]))}
     busy={props.busy} onResolveApproval={props.onResolveApproval} onNotify={props.onNotify}>
-    <ThreadWorkspaceContent {...props} onThreadLeaveGuardChange={bindWorkspaceGuard} />
+    <ThreadWorkspaceContent {...props} onThreadLeaveGuardChange={bindWorkspaceGuard}
+      workbenchEntry={<WorkspaceWorkbench threadId={props.snapshot.thread.id} bindLeaveGuard={bindWorkbenchGuard} />} />
   </DelegationViewerHost>
 }
 
 function ThreadWorkspaceContent({
   snapshot,
+  workbenchEntry,
   composerContext,
   userAnchorNavigation,
   missionBoard = null,
@@ -1707,6 +1713,7 @@ function ThreadWorkspaceContent({
   onNotifyError
 }: {
   snapshot: ThreadSnapshot
+  workbenchEntry?: React.ReactNode
   surfaceVisible?: boolean
   composerContext?: CanvasComposerContext
   userAnchorNavigation?: ThreadUserAnchorNavigation
@@ -4892,6 +4899,7 @@ function ThreadWorkspaceContent({
         >
           <div className={`camp-conversation-stage ${conversationFind.open ? 'conversation-find-open' : ''}`.trim()}>
             <div className={`conversation-floating-tools ${conversationFind.open ? 'find-open' : ''}`.trim()}>
+              {snapshot.thread.projectPath && workbenchEntry}
               {conversationFind.open && (
                 <div className="conversation-find-surface" ref={conversationFindSurfaceRef}>
                   <form
