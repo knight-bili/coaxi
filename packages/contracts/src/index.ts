@@ -5119,7 +5119,7 @@ export interface HostWebApi {
   rotate(): Promise<HostWebStatus & { administratorToken: string }>
 }
 
-export interface BackupSummary {createdAt:string;appVersion:string;fileCount:number;totalBytes:number}
+export interface BackupSummary {createdAt:string;appVersion:string;fileCount:number;totalBytes:number;formatVersion?:number;roots?:Array<{id:string;kind:string;shared:boolean;present:boolean}>}
 export interface NativeBackupsApi {
   create(passphrase:string):Promise<(BackupSummary&{path:string})|null>
   inspect(passphrase:string):Promise<(BackupSummary&{archiveId:string})|null>
