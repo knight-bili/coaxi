@@ -11,7 +11,9 @@ static SOURCES: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
 struct SourceFile { path: String, bytes: Vec<u8>, #[serde(default)] executable: bool }
 #[derive(Deserialize)]
 #[serde(rename_all="camelCase", deny_unknown_fields)]
-struct Prepare { skill_id: String, expected_revision: Option<String>, files: Vec<SourceFile> }
+struct Prepare { skill_id: String, expected_revision: Option<String>, files: Vec<SourceFile>, #[serde(default)] preserve_support_files: bool, copy_from: Option<CopySource> }
+#[derive(Deserialize)] #[serde(rename_all="camelCase",deny_unknown_fields)]
+struct CopySource {skill_id:String,source_revision:String}
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all="camelCase", deny_unknown_fields)]
 struct Source { skill_id: String, source_revision: String, snapshot_id: String, description: String, files: Vec<SourceFile> }
@@ -40,6 +42,11 @@ fn snapshot_source(root:&Path,request:Prepare,expected_digest:Option<&str>)->Res
     let previous=if current.exists(){Some(load_source(root,&request.skill_id)?.source_revision)}else{None};
     ensure!(previous==request.expected_revision,"skill.custom_source_conflict");
     let mut files=request.files;
+    let inherited=if let Some(copy)=request.copy_from {
+        let source=load_source(root,&copy.skill_id)?;ensure!(source.source_revision==copy.source_revision,"skill.custom_source_conflict");Some(source.files)
+    }else if request.preserve_support_files {Some(load_source(root,&request.skill_id)?.files)}else{None};
+    if let Some(inherited)=inherited {for file in inherited {if !files.iter().any(|changed|changed.path.eq_ignore_ascii_case(&file.path)){files.push(file)}}}
+    ensure!(files.len()<=512&&files.iter().map(|file|file.bytes.len()).sum::<usize>()<=16*1024*1024,"skill.custom_size_limit");
     files.sort_by(|a,b|a.path.cmp(&b.path));
     ensure!(!files.windows(2).any(|pair|pair[0].path.eq_ignore_ascii_case(&pair[1].path)),"skill.custom_duplicate_path");
     let directory=source_root(root).join(&request.skill_id);
@@ -111,7 +118,7 @@ impl Core {
             }
         }
         ensure!(crate::skill::inspect_installed_pack_tree(&request.source,&request.skill_id)?==before,"skill.custom_import_changed");
-        let _guard=SOURCES.lock().await;snapshot_source(&self.data_dir,Prepare{skill_id:request.skill_id,expected_revision:request.expected_revision,files},Some(&before))
+        let _guard=SOURCES.lock().await;snapshot_source(&self.data_dir,Prepare{skill_id:request.skill_id,expected_revision:request.expected_revision,files,preserve_support_files:false,copy_from:None},Some(&before))
     }
     pub(super) async fn custom_skill_install(&self,value:Value)->Result<Value>{
         let request:Install=serde_json::from_value(value)?;let envelope=user_command_envelope(request.command_id,request.command);let store=SkillPackStore::new(&self.data_dir)?;
