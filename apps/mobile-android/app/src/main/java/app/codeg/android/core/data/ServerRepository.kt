@@ -69,7 +69,7 @@ class ServerRepository @Inject constructor(
 
     suspend fun delete(id: String) {
         rovaiMutex.withLock {rovaiClients.remove(id)?.second?.close()}
-        withContext(dispatchers.io){secretStore.remove("rovai.host-session.$id")}
+        withContext(dispatchers.io){secretStore.remove("rovai.host-session.$id");secretStore.remove("rovai.pending.$id")}
         serverStore.delete(id)
         withContext(dispatchers.io) { secretStore.remove(id) }
     }
@@ -94,6 +94,9 @@ class ServerRepository @Inject constructor(
             rovaiClients[profile.id]=signature to client;client
         }
     }
+
+    suspend fun loadRovaiPending(profile:ServerProfile):JsonObject?=withContext(dispatchers.io){secretStore.get("rovai.pending.${profile.id}")?.let{raw->runCatching{val value=Json.parseToJsonElement(raw).jsonObject;if(value["endpoint"]?.jsonPrimitive?.content==profile.baseUrl)value["request"] as? JsonObject else null}.getOrNull()}}
+    suspend fun saveRovaiPending(profile:ServerProfile,request:JsonObject?)=withContext(dispatchers.io){val key="rovai.pending.${profile.id}";if(request==null)secretStore.remove(key)else secretStore.put(key,buildJsonObject{put("endpoint",profile.baseUrl);put("request",request)}.toString());Unit}
 
     /** An event stream for a saved profile, or null if its token is missing. */
     suspend fun eventStream(profile: ServerProfile): EventStream? {

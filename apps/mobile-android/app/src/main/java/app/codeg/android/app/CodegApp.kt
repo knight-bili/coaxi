@@ -14,7 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import app.codeg.android.core.designsystem.CodegBackground
 import app.codeg.android.core.designsystem.theme.CodegTheme
-import app.codeg.android.feature.main.MainShell
+import app.codeg.android.feature.main.RovaiMainShell
 import app.codeg.android.feature.onboarding.OnboardingScreen
 import app.codeg.android.feature.server.ServerEditorScreen
 
@@ -35,7 +35,7 @@ fun CodegApp(appViewModel: AppViewModel = hiltViewModel()) {
             val servers by appViewModel.servers.collectAsStateWithLifecycle()
             when (val list = servers) {
                 null -> Splash()
-                else -> if (list.isEmpty()) OnboardingRoot() else MainShell(appViewModel, list)
+                else -> if (list.isEmpty()) OnboardingRoot() else RovaiMainShell(appViewModel, list)
             }
         }
     }
