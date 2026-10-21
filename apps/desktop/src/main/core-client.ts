@@ -1064,10 +1064,11 @@ function campOpenTraceId(params: unknown): string | null {
 export function sidecarTargetKey(
   platform: NodeJS.Platform = process.platform,
   arch: string = process.arch
-): 'macos-arm64' | 'macos-x64' | 'windows-x64' {
+): 'macos-arm64' | 'macos-x64' | 'windows-x64' | 'linux-x64' {
   if (platform === 'darwin' && arch === 'arm64') return 'macos-arm64'
   if (platform === 'darwin' && arch === 'x64') return 'macos-x64'
   if (platform === 'win32' && arch === 'x64') return 'windows-x64'
+  if (platform === 'linux' && arch === 'x64') return 'linux-x64'
   throw new Error(`Unsupported Rovai sidecar host: ${platform}-${arch}`)
 }
 

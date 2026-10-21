@@ -37,6 +37,11 @@ module.exports = async function afterPack(context) {
     recordWorkbenchPackage(context)
     return
   }
+  if (context.electronPlatformName === 'linux') {
+    for (const name of ['rovai-core', 'rovai-host', 'rovai', 'rovai-native-history']) chmodSync(join(context.appOutDir, 'resources', 'bin', name), 0o755)
+    recordWorkbenchPackage(context)
+    return
+  }
   if (context.electronPlatformName !== 'darwin') return
 
   const appName = `${context.packager.appInfo.productFilename}.app`

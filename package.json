@@ -1,5 +1,5 @@
 {
-  "name": "rovai-ai",
+  "name": "codeg-rovai-workbench",
   "productName": "Codeg Rovai Workbench",
   "version": "0.4.8",
   "private": true,
@@ -179,7 +179,12 @@
     "test:member-runtime-apply": "node --test scripts/lib/member-runtime-apply.test.mjs",
     "test:run-presence-ui": "node --test scripts/lib/run-presence.test.mjs",
     "build:server-channels": "node scripts/build-server-channels.mjs",
-    "generate:native-operations": "node scripts/generate-native-operations.mjs"
+    "generate:native-operations": "node scripts/generate-native-operations.mjs",
+    "core:build:linux:x64": "node scripts/build-core.mjs --release --target-key linux-x64",
+    "build:linux:x64": "pnpm core:build:linux:x64 && pnpm build:desktop",
+    "package:linux:x64": "pnpm build:linux:x64 && node scripts/package-linux.mjs dir",
+    "dist:linux:x64": "pnpm build:linux:x64 && node scripts/package-linux.mjs portable",
+    "dist:linux:deb:x64": "pnpm build:linux:x64 && node scripts/package-linux.mjs deb"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",
@@ -480,6 +485,70 @@
           "path": "/Applications"
         }
       ]
+    },
+    "linux": {
+      "icon": "build/icon.png",
+      "executableName": "codeg-rovai-workbench",
+      "category": "Development",
+      "target": [
+        "AppImage",
+        "tar.gz"
+      ],
+      "extraResources": [
+        {
+          "from": "resources/bin/linux-x64/rovai-core",
+          "to": "bin/rovai-core"
+        },
+        {
+          "from": "resources/bin/linux-x64/rovai-host",
+          "to": "bin/rovai-host"
+        },
+        {
+          "from": "resources/bin/linux-x64/rovai",
+          "to": "bin/rovai"
+        },
+        {
+          "from": "out/web",
+          "to": "web-ui"
+        },
+        {
+          "from": "skills",
+          "to": "skills"
+        },
+        {
+          "from": "resources/bin/linux-x64/rovai-native-history",
+          "to": "bin/rovai-native-history"
+        },
+        {
+          "from": "helpers/native-history/LICENSE",
+          "to": "licenses/native-history-LICENSE"
+        },
+        {
+          "from": "LICENSE",
+          "to": "licenses/rovai-LICENSE"
+        },
+        {
+          "from": "THIRD_PARTY_NOTICES.md",
+          "to": "licenses/THIRD_PARTY_NOTICES.md"
+        },
+        {
+          "from": "integration/licenses",
+          "to": "licenses/integration"
+        },
+        {
+          "from": "legal/licenses",
+          "to": "licenses/dependencies"
+        },
+        {
+          "from": "integration/sources.lock.json",
+          "to": "workbench/sources.lock.json"
+        },
+        {
+          "from": "integration/product-release.json",
+          "to": "workbench/product-release.json"
+        }
+      ],
+      "artifactName": "Codeg-Rovai-Workbench-${version}-linux-${arch}.${ext}"
     }
   }
 }

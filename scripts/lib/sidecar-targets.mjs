@@ -27,8 +27,7 @@ const TARGETS = Object.freeze({
     platform: 'linux',
     arch: 'x64',
     rustTarget: 'x86_64-unknown-linux-gnu',
-    executableSuffix: '',
-    serverOnly: true
+    executableSuffix: ''
   })
 })
 
@@ -50,7 +49,7 @@ export function hostSidecarTargetKey(platform = process.platform, arch = process
   return target.key
 }
 
-/** Server builds share platform entries without admitting a Linux Desktop. */
+/** Server and Desktop builds share the explicit shipped target directory table. */
 export function serverTarget(targetKey) {
   const target = TARGETS[targetKey]
   if (!target) throw new Error(`Unsupported Rovai Server target: ${targetKey}`)

@@ -19,6 +19,17 @@
     "bootstrapDirectory": "Codeg Rovai Workbench Bootstrap",
     "legacyDataPolicy": "never_auto_adopt",
     "explicitDataRootPreserved": true,
-    "uninstallPreservesDataByDefault": true
+    "uninstallPreservesDataByDefault": true,
+    "linux": {
+      "packageName": "codeg-rovai-workbench",
+      "architecture": "x64",
+      "artifacts": [
+        "AppImage",
+        "tar.gz",
+        "deb_explicit_maintainer"
+      ],
+      "qualification": "not_run",
+      "automaticPublishing": false
+    }
   }
 }

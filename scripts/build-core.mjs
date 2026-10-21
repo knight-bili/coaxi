@@ -47,7 +47,7 @@ for (const binary of ['rovai-core', 'rovai-host', 'rovai']) {
     throw new Error(`Rust binary not found at ${source}`)
   }
   copyFileSync(source, destination)
-  if (target.platform === 'darwin') chmodSync(destination, 0o755)
+  if (target.platform !== 'win32') chmodSync(destination, 0o755)
   console.log(`Staged ${targetKey} ${profile} Rust binary at ${destination}`)
 }
 
