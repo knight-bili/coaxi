@@ -6,7 +6,7 @@ import { dirname, resolve } from 'node:path'
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const source = await readFile(resolve(root, 'crates/rovai-web/src/operations.rs'), 'utf8')
 const declaration = source.slice(source.indexOf('pub enum Operation {'), source.indexOf('impl Operation {'))
-const names = [...declaration.matchAll(/#\[serde\(rename\s*=\s*"([^"]+)"/g)].map(match => match[1])
+const names = [...declaration.matchAll(/#\[serde\(\s*rename\s*=\s*"([^"]+)"/g)].map(match => match[1])
 const kotlin = names.map(name => name.replace(/[^a-zA-Z0-9]/g, '_').toUpperCase())
 const swift = names.map(name => name.split('.').map((part, index) => index ? part[0].toUpperCase() + part.slice(1) : part).join(''))
 if (!names.length || [names, kotlin, swift].some(values => new Set(values).size !== values.length)) throw new Error('Public operation names must be nonempty and unique in each target language')
