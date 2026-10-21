@@ -10,9 +10,10 @@ pub struct Arguments{
     #[arg(long)]snapshot_id:Option<String>,
 }
 #[derive(Clone,ValueEnum)]
-enum Operation{Create,Inspect,Stage,Apply,Rollback,WebdavList,WebdavProbe,WebdavPush,WebdavPull}
+enum Operation{Coverage,Create,Inspect,Stage,Apply,Rollback,WebdavList,WebdavProbe,WebdavPush,WebdavPull}
 pub fn run(args:Arguments)->Result<()>{
     ensure!(args.data_dir.is_absolute(),"backup.absolute_data_directory_required");
+    if matches!(args.operation,Operation::Coverage){println!("{}",rovai_core::backup::owned_roots::coverage(&args.data_dir)?);return Ok(())}
     if matches!(args.operation,Operation::Apply){let result=rovai_core::backup::apply_pending(&args.data_dir)?;println!("{}",serde_json::json!({"applied":result.is_some(),"manifest":result}));return Ok(())}
     if matches!(args.operation,Operation::Rollback){rovai_core::backup::rollback(&args.data_dir)?;println!("{}",serde_json::json!({"rolledBack":true}));return Ok(())}
     if matches!(args.operation,Operation::WebdavList|Operation::WebdavProbe|Operation::WebdavPush|Operation::WebdavPull){
