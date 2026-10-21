@@ -1,3 +1,4 @@
+export { WEB_OPERATIONS, type WebOperation } from './web-operations'
 import type { CurrentUserProfileApi } from './current-user-profile'
 
 import type { BuiltinMemberAvatarRole } from './member-avatar'
