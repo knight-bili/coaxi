@@ -21,6 +21,7 @@ mod history_import;
 mod webdav_access;
 mod webdav_transfer;
 mod config_sync;
+mod config_sync_cleanup;
 mod appearance_extensions;
 mod pets_access;
 mod office_skills;

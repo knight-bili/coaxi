@@ -11,7 +11,7 @@ export class WebdavWorkspace{
     const input=value as {operation:string;expectedRevision:string|null;commandId?:string;snapshotId?:string;expectedDigest?:string;expectedIndexEtag?:string;confirmed?:boolean;kind?:'backup'|'configuration';enabled?:boolean;autoSync?:boolean;intervalMinutes?:number;passphrase?:string;clearPassphrase?:boolean;keepBackups?:number;keepConfigurations?:number}
     if(typeof input.operation!=='string')throw new Error('webdav.invalid_request')
     if(input.operation.startsWith('config_')){
-      const operation=input.operation.slice(7);if(!['get','set','upload','cancel','resume','archive'].includes(operation))throw new Error('config_sync.operation_not_admitted')
+      const operation=input.operation.slice(7);if(!['get','set','upload','cancel','resume','archive','cache_preview','cache_remove','cache_status'].includes(operation))throw new Error('config_sync.operation_not_admitted')
       if(['set','upload'].includes(operation)&&this.preferencesRoot)await this.request('backup.storage.desktop.register',{preferencesRoot:this.preferencesRoot()})
       return this.request('backup.config.local',{operation,expectedRevision:input.expectedRevision,commandId:input.commandId,enabled:input.enabled,autoSync:input.autoSync,intervalMinutes:input.intervalMinutes,passphrase:input.passphrase,clearPassphrase:input.clearPassphrase,confirmed:input.confirmed})
     }
