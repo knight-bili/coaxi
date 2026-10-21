@@ -1,5 +1,6 @@
 //! Per-open authority for Codeg's ref-counted OfficeCLI watch processes.
 mod watch;
+pub mod installer;
 pub use watch::{acquire_sse_lease,release_sse_lease,note_proxy_request};
 use anyhow::{Result,Context,ensure};
 use serde_json::{Value,json};

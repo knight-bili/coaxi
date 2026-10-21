@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 /// and the legacy shared draft remain outside the network capability.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum Operation {
+    #[serde(rename="office.cli")]
+    OfficeCli,
     #[serde(rename="skillPacks.custom.prepare")]
     CustomSkillPrepare,
     #[serde(rename="skillPacks.custom.install")]
@@ -499,6 +501,7 @@ pub enum Operation {
 impl Operation {
     pub fn timeout(self) -> std::time::Duration {
         std::time::Duration::from_secs(match self {
+            Self::OfficeCli => 30,
             Self::CustomSkillPrepare | Self::CustomSkillInstall | Self::OfficeSkillPrepare | Self::OfficeSkillInstall => 60,
             Self::WebdavSettings => 30,
             Self::HistoryLibrary => 30,
@@ -522,6 +525,7 @@ impl Operation {
         match self {
             Self::AppInfo => json!({"name":value["name"],"version":value["version"]}),
             Self::ForgeAccountsGet | Self::ForgeAccountsSet => select_fields(&value, &["accounts"]),
+            Self::OfficeCli => select_fields(&value,&["installed","runnable","version","runtimeError","digest","manualUrl","commandId","operation","state","startedAt","completedAt","log","info","error"]),
             Self::CustomSkillPrepare => select_fields(&value,&["skillId","sourceRevision"]),
             Self::CustomSkillInstall => select_fields(&value,&["status","code","payload"]),
             Self::OfficeSkillPrepare => select_fields(&value,&["planId","skillId","sourceRevision","content","contentDigest","binaryDigest"]),
@@ -604,6 +608,7 @@ impl Operation {
         match self {
             Self::ForgeAccountsGet => "forge.accounts.get",
             Self::ForgeAccountsSet => "forge.accounts.set",
+            Self::OfficeCli => "office.cli",
             Self::CustomSkillPrepare => "skillPacks.custom.prepare",
             Self::CustomSkillInstall => "skillPacks.custom.install",
             Self::OfficeSkillPrepare => "skillPacks.office.prepare",

@@ -9523,6 +9523,7 @@ impl Core {
                 let database = self.database.lock().await;
                 Ok(serde_json::to_value(self.skill_library.list(&database)?)?)
             }
+            "office.cli" => crate::office_preview::installer::operation(&self.data_dir,request.params.clone()).await,
             "skillPacks.custom.prepare" => self.custom_skill_prepare(request.params.clone()).await,
             "skillPacks.custom.install" => self.custom_skill_install(request.params.clone()).await,
             "skillPacks.custom.local" => self.custom_skill_local(request.params.clone()).await,
