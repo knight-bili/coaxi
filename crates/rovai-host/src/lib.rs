@@ -2,6 +2,7 @@ mod desktop_channels;
 mod server_channels;
 mod transport_channels;
 mod backup;
+mod config_snapshot;
 mod lifecycle;
 mod server;
 mod server_logs;
@@ -39,6 +40,8 @@ enum Command {
     AutomationStorage { #[arg(long)] directory:PathBuf },
     /// Offline encrypted backup/restore; passphrase is read from stdin only.
     Backup(backup::Arguments),
+    /// Portable encrypted preference export and explicit offline import.
+    ConfigSnapshot(config_snapshot::Arguments),
     /// Start one Core owner, optionally with the shared Web module.
     Run(RunArgs),
     /// Generate a management token for an operator. Treat stdout as a secret.
@@ -106,6 +109,7 @@ pub fn run_host() -> Result<()> {
             Command::AutomationStorage{directory}=>{
                 anyhow::ensure!(directory.is_absolute()&&!directory.components().any(|part|matches!(part,std::path::Component::CurDir|std::path::Component::ParentDir)),"automation_context_absolute_directory_required");let mut bytes=Vec::new();std::io::stdin().take(1024*1024+1).read_to_end(&mut bytes)?;rovai_core::platform::write_user_automation_context(&directory,&bytes)?;println!("{}",serde_json::json!({"saved":true}));return Ok(())
             }
+            Command::ConfigSnapshot(args)=>{return config_snapshot::run(args)},
             Command::Backup(args)=>{return backup::run(args)},
             Command::Token => {
                 println!("{}", rovai_web::new_token()?);

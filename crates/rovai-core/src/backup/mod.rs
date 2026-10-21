@@ -3,6 +3,7 @@
 pub mod crypto;
 pub mod webdav;
 pub mod owned_roots;
+pub mod light_config;
 use anyhow::{Result,Context,ensure};
 use serde::{Serialize,Deserialize};
 use sha2::{Sha256,Digest};
