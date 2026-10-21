@@ -88,24 +88,3 @@ private struct RovaiInteractionCard: View {
     }
     private func resolve(_ answer: JSONValue) { Task { await model.command(.runtimeInteractionsResolve, value: .object(["interactionId": .string(value.text("id")), "expectedVersion": value["version"] ?? .number(0), "answer": answer])) } }
 }
-
-private struct RovaiTaskEditor: View {
-    let model: RovaiWorkspaceModel
-    let threadId: String
-    let task: JSONValue?
-    @Environment(\.dismiss) private var dismiss
-    @State private var title = ""
-    @State private var detail = ""
-    @State private var assignee = ""
-    @State private var status = "pending"
-    @State private var reason = ""
-    var body: some View {
-        NavigationStack { Form {
-            TextField("任务名称", text: $title); TextField("说明", text: $detail, axis: .vertical).lineLimit(3...8)
-            Picker("负责人", selection: $assignee) { ForEach(model.thread?["members"]?.rvArray ?? [], id: \.self) { Text($0.text("displayName")).tag($0.text("agentId")) } }
-            if task != nil { Picker("状态", selection: $status) { ForEach(["pending", "in_progress", "blocked", "completed", "cancelled"], id: \.self) { Text($0).tag($0) } }; TextField("完成说明 / 阻塞或取消原因", text: $reason, axis: .vertical).lineLimit(3...6) }
-            if let issue = model.issue { Text(issue).foregroundStyle(Theme.warning) }
-            Button("保存") { Task { var args: [String: JSONValue] = ["commandId": .string(UUID().uuidString.lowercased()), "threadId": .string(threadId), "title": .string(title), "description": .string(detail)]; if let task { args["taskId"] = .string(task.text("taskId")); args["status"] = .string(status); args["assignee"] = .object(["operation": .string("assign"), "agentId": .string(assignee)]); if status == "blocked" { args["blockedReason"] = .string(reason) }; if status == "completed" { args["completionSummary"] = .string(reason) }; if status == "cancelled" { args["cancelReason"] = .string(reason) } } else { args["assigneeAgentId"] = .string(assignee) }; await model.execute(task == nil ? .tasksCreate : .tasksUpdate, params: .object(args)); if model.pending == nil && model.issue == nil { dismiss() } } }.disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || assignee.isEmpty || model.pending != nil || model.busy)
-        }.navigationTitle(task == nil ? "新建任务" : "编辑任务").toolbar { Button("取消") { dismiss() } }.task { title = task?.text("title") ?? ""; detail = task?.text("description") ?? ""; assignee = task?.text("assigneeAgentId") ?? model.thread?["members"]?.rvArray.first?.text("agentId") ?? ""; status = task?.text("status") ?? "pending" } }.interactiveDismissDisabled(model.pending != nil || model.busy)
-    }
-}
