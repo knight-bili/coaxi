@@ -151,7 +151,7 @@ impl Core {
         let mut body=serde_json::Map::new();
         if let Some(title)=&request.title{body.insert("title".into(),json!(if repository.provider=="gitlab"&&request.action=="create_pr"&&request.draft&&!title.to_ascii_lowercase().starts_with("draft:"){format!("Draft: {title}")}else{title.clone()}));}
         if let Some(text)=&request.body{body.insert(if repository.provider=="gitlab"&&!comments{"description"}else{"body"}.into(),json!(text));}
-        if let Some(state)=&request.state{if repository.provider=="gitlab"{ensure!(["open","closed"].contains(&state.as_str()),"forge.invalid_state");body.insert("state_event".into(),json!(if state=="open"{"reopen"}else{"close"}));}else{body.insert("state".into(),json!(state));}}
+        if write{if let Some(state)=&request.state{if repository.provider=="gitlab"{ensure!(["open","closed"].contains(&state.as_str()),"forge.invalid_state");body.insert("state_event".into(),json!(if state=="open"{"reopen"}else{"close"}));}else{body.insert("state".into(),json!(state));}}}
         if request.action=="create_pr"{
             let head=request.head.as_deref().filter(|s|!s.trim().is_empty()).context("forge.head_required")?;
             let base=request.base.as_deref().filter(|s|!s.trim().is_empty()).context("forge.base_required")?;
