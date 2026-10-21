@@ -9,9 +9,14 @@ use serde::{Deserialize,Serialize};
 
 #[derive(Clone,Deserialize,Serialize)]
 #[serde(transparent)]
-struct ChannelCommand(Inbound);
+pub(super) struct ChannelCommand(pub Inbound);
 impl crate::command::sealed::Sealed for ChannelCommand {}
 impl crate::command::DomainCommand for ChannelCommand { const TYPE: &'static str = "channel.adapter.command"; const EXACT_REPLAY:bool=true; }
+pub(super) fn effective_callback(input:&Inbound)->Option<String>{
+    if let Some(value)=&input.callback_data{return Some(value.clone())}
+    let text=input.text.trim();let (command,token)=text.split_once(char::is_whitespace)?;
+    match command.split('@').next().unwrap_or(command){"/confirm"=>Some(format!("rv:control:{}",token.trim())),"/select"=>Some(format!("rv:choose:{}",token.trim())),_=>None}
+}
 pub(super) fn sender_scope(input:&Inbound,config:&Adapter)->Result<String>{source_id(&json!({"adapterId":config.id,"senderId":input.sender_id,"chatId":input.target.chat_id.as_deref().unwrap_or(&config.chat_id),"threadKey":input.target.thread_key}))}
 fn target_matches(input:&Inbound,config:&Adapter,binding:&Binding)->bool{binding.chat_id==input.target.chat_id.as_deref().unwrap_or(&config.chat_id)&&binding.thread_key==input.target.thread_key}
 impl Core{
@@ -34,7 +39,8 @@ fn help()->String { "/search 关键词：搜索已绑定对话\n/today：今日�
 impl Core {
     pub(super) async fn channel_adapter_command(&self,input:&Inbound,config:&Adapter,binding:&Binding,command_id:&str,selection_expired:bool)->Result<Option<Value>> {
         let text=input.text.trim();
-        let command=if let Some(callback)=input.callback_data.as_deref(){
+        let callback=effective_callback(input);
+        let command=if let Some(callback)=callback.as_deref(){
             match callback { "rv:today"=>"today", "rv:status"=>"status", "rv:sessions"=>"sessions", "rv:help"=>"help", value if value.starts_with("rv:choose:")=>"choose", _=>"expired_callback" }
         }else if let Some(value)=text.strip_prefix('/') { value.split_whitespace().next().unwrap_or("help").split('@').next().unwrap_or("help") } else if selection_expired { "selection_expired" } else { return Ok(None) };
         let args=text.split_once(char::is_whitespace).map(|(_,value)|value.trim()).unwrap_or("");
@@ -43,14 +49,15 @@ impl Core {
         let sender_scope=sender_scope(input,config)?;
         let mut database=self.database.lock().await;
         let execution=DomainCommandGateway.execute(&mut database,&envelope,|transaction|{
-            let mut lines=Vec::<String>::new();let mut selection=Value::Null;let mut choices=Vec::<Value>::new();
+            let mut lines=Vec::<String>::new();let mut selection=Value::Null;let mut choices=Vec::<Value>::new();let mut control_choices=Vec::<Value>::new();
             let candidates=config.bindings.iter().filter(|candidate|target_matches(input,config,candidate)).collect::<Vec<_>>();
             match command {
                 "help"|"start"=>lines.push(help()),
                 "task"|"do"|"selection_expired"=>lines.push("对话选择已随渠道配置变化失效，请先用 /sessions 或 /resume 对话编号重新选择。用法：/task 任务内容。".into()),
                 "expired_callback"=>lines.push("按钮已失效或不属于当前协议，请重新输入 /help；没有执行操作。".into()),
+                "cancel"|"approve"|"deny"=>{if selection_expired{lines.push("对话选择已失效，请先用 /sessions 重新选择。".into())}else{let (details,options)=super::channel_adapter_control::menu(transaction,input,config,binding,command,args)?;lines.extend(details);control_choices=options;}},
                 "choose"=>{
-                    let parts=input.callback_data.as_deref().unwrap_or_default().split(':').collect::<Vec<_>>();
+                    let parts=callback.as_deref().unwrap_or_default().split(':').collect::<Vec<_>>();
                     let chosen=(||->Result<Value>{ensure!(parts.len()==4,"channel_adapter.invalid_callback");uuid::Uuid::parse_str(parts[2])?;let index:usize=parts[3].parse()?;
                         let raw:String=transaction.query_row("SELECT result_payload_json FROM event_log WHERE command_id=?1 AND command_type='channel.adapter.command' AND result_status='applied'",[parts[2]],|row|row.get(0))?;let previous:Value=serde_json::from_str(&raw)?;
                         ensure!(previous["senderScope"]==sender_scope&&previous["revision"]==input.expected_revision,"channel_adapter.callback_scope_changed");let choice=previous["choices"].as_array().and_then(|items|items.get(index)).context("channel_adapter.callback_expired")?.clone();
@@ -77,10 +84,13 @@ impl Core {
                 "status"=>{let mut statement=transaction.prepare("SELECT id,status FROM agent_run WHERE camp_id=?1 ORDER BY created_at DESC,id DESC LIMIT 20")?;let rows=statement.query_map([&binding.thread_id],|row|Ok((row.get::<_,String>(0)?,row.get::<_,String>(1)?)))?.collect::<std::result::Result<Vec<_>,_>>()?;lines.push(format!("当前对话：{}",binding.thread_id));for(id,status)in rows{lines.push(format!("{id} · {status}"));}},
                 _=>lines.push(format!("该命令尚未执行。\n{}",help())),
             }
+            for(index,choice)in choices.iter().enumerate(){lines.push(format!("选择 {}：/select {command_id}:{index}",choice["threadId"].as_str().unwrap_or_default()))}
+            for(index,choice)in control_choices.iter().enumerate(){lines.push(format!("确认 {}：/confirm {command_id}:{index}",choice["label"].as_str().unwrap_or("此操作")))}
             let body=lines.join("\n");ensure!(body.len()<=256*1024,"channel_adapter.response_too_large");
             let mut buttons=choices.iter().enumerate().take(20).map(|(index,choice)|json!({"id":format!("rv:choose:{command_id}:{index}"),"label":format!("选择 {}",choice["threadId"].as_str().unwrap_or_default()).chars().take(32).collect::<String>()})).collect::<Vec<_>>();if buttons.is_empty(){buttons=vec![json!({"id":"rv:sessions","label":"对话"}),json!({"id":"rv:today","label":"今日"}),json!({"id":"rv:status","label":"状态"}),json!({"id":"rv:help","label":"帮助"})]}
+            if !control_choices.is_empty(){buttons=control_choices.iter().enumerate().map(|(index,choice)|json!({"id":format!("rv:control:{command_id}:{index}"),"label":choice["label"].as_str().unwrap_or("确认").chars().take(32).collect::<String>()})).collect();}
             let response=json!({"body":body,"buttons":buttons});
-            Ok(crate::command::CommandHandlerResult::applied("channel.adapter.command.completed",json!({"adapterId":config.id,"threadId":binding.thread_id,"senderId":input.sender_id,"externalId":input.external_id,"target":input.target,"response":response,"senderScope":sender_scope,"revision":input.expected_revision,"selection":selection,"choices":choices}),None))
+            Ok(crate::command::CommandHandlerResult::applied("channel.adapter.command.completed",json!({"adapterId":config.id,"threadId":binding.thread_id,"senderId":input.sender_id,"externalId":input.external_id,"target":input.target,"response":response,"senderScope":sender_scope,"revision":input.expected_revision,"selection":selection,"choices":choices,"controlChoices":control_choices}),None))
         })?;
         Ok(Some(serde_json::to_value(execution.result)?))
     }
