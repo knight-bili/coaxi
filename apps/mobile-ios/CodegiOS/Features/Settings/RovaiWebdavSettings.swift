@@ -17,6 +17,7 @@ struct RovaiWebdavSettings: View {
             if let message {Section {Text(message).font(.caption).foregroundStyle(Theme.textSecondary)}}
             account
             Section {HStack {Button("测试连接") {Task {await work {_ = try await remote("probe");message = "连接成功"}}};Spacer();Button("刷新副本和传输") {Task {await work {try await list()}}}}.disabled(busy || dirty || !connected)}
+            if connected {RovaiWebdavRetention(model: model, revision: saved.text("revision"), disabled: busy || dirty) {Task {await work {try await list()}}}}
             if !removals.isEmpty {Section("移除结果待核对") {ForEach(removals, id: \.self) {frozen in VStack(alignment: .leading, spacing: 8) {
                 Text(frozen.text("snapshotId")).font(.caption).foregroundStyle(Theme.textSecondary)
                 HStack {Button("核对原结果") {Task {await work {
