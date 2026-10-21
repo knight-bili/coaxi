@@ -132,6 +132,31 @@ final class RovaiWorkspaceModel {
         let data = try await RovaiUploadSource.bytes(params); let result = try await client.upload(intent: intent, data: data)
         try await completeUpload(marked, result: result, profile: profile, account: account, lifetime: lifetime)
     }
+    func prepareMissionFile(_ url: URL) async throws -> JSONValue {let lifetime = generation;let value = try await RovaiMissionBatch.prepare(url);guard lifetime == generation else {RovaiUploadSource.remove(value);throw CancellationError()};return value}
+    func removeMissionFile(_ source: JSONValue) {RovaiUploadSource.remove(source)}
+    func executeMissionBatch(_ operation: RovaiOperation, commandId: String, command: JSONValue, kept: [String], sources: [JSONValue], owner: String, body: String) async {
+        guard pending == nil, !busy else {return}
+        do {let intent = try RovaiMissionBatch.intent(operation: operation, commandId: commandId, command: command, kept: kept, sources: sources);await submit(.object(["operation": .string("__host.mission"), "params": .object(["intent": intent, "sources": .array(sources), "attempted": .bool(false)]), "nativeBody": .object(["owner": .string(owner), "expectedBody": .string(body), "replace": .bool(false)])]))} catch {issue = error.localizedDescription}
+    }
+    private func completeMissionBatch(_ request: JSONValue, receipt: JSONValue, profile: ServerProfile, account: String, client: RovaiHostClient, lifetime: UInt64) async throws {
+        guard ["applied", "accepted", "rejected"].contains(receipt.text("status")) else {throw RovaiHostFailure(code: "原使命结果尚未确定", unknownResult: true)}
+        try await settlePrivate(request, result: receipt, profile: profile, account: account, client: client)
+        if receipt.text("status") != "rejected" {for source in request["params"]?["sources"]?.rvArray ?? [] {RovaiUploadSource.remove(source)}}
+        guard RovaiSecureSession.save(nil, profile: profile.id, account: account) else {throw RovaiHostFailure(code: "原使命回执已返回，本机待核对记录尚未清除")}
+        guard lifetime == generation else {return}
+        pending = nil;lastResult = receipt;lastOperation = RovaiOperation(rawValue: request["params"]?["intent"]?.text("operation") ?? "");lastInputOwner = request["nativeBody"]?.text("owner");lastInputBody = request["nativeBody"]?.text("expectedBody")
+        if receipt.text("status") == "rejected" {issue = receipt.text("code")};await refresh()
+    }
+    private func dispatchMissionBatch(_ request: JSONValue, client: RovaiHostClient, profile: ServerProfile, account: String, lifetime: UInt64) async throws {
+        guard let params = request["params"], let intent = params["intent"], let operation = RovaiOperation(rawValue: intent.text("operation")) else {throw RovaiHostFailure(code: "原使命请求不完整")}
+        let input = JSONValue.object(["commandId": intent["commandId"] ?? .null, "command": intent["command"] ?? .null])
+        if params["attempted"]?.rvBool == true {let status = try await client.reconcile(operation, params: input);if status.text("state") == "recorded" {try await completeMissionBatch(request, receipt: status["result"] ?? .null, profile: profile, account: account, client: client, lifetime: lifetime);return}}
+        var fields = request.rvObject;var savedParams = params.rvObject;savedParams["attempted"] = .bool(true);fields["params"] = .object(savedParams);let attempted = JSONValue.object(fields)
+        guard RovaiSecureSession.save(try JSONEncoder().encode(attempted), profile: profile.id, account: account), lifetime == generation else {throw RovaiHostFailure(code: "无法保存原使命提交，尚未发送")};pending = attempted
+        let reply = try await client.uploadMissionBatch(intent: intent, sources: params["sources"]?.rvArray ?? [])
+        if let error = reply["error"], error != .null {throw RovaiHostFailure(code: error.text("message"), unknownResult: true)}
+        try await completeMissionBatch(attempted, receipt: reply["result"] ?? .null, profile: profile, account: account, client: client, lifetime: lifetime)
+    }
     func executePrivate(_ operation: RovaiOperation, command: JSONValue, owner: String, body: String, replace: Bool = false) async {
         guard pending == nil else { return }
         await submit(.object(["operation": .string(operation.rawValue), "params": .object(["commandId": .string(UUID().uuidString.lowercased()), "command": command]), "nativeBody": .object(["owner": .string(owner), "expectedBody": .string(body), "replace": .bool(replace)])]))
@@ -162,13 +187,14 @@ final class RovaiWorkspaceModel {
     }
     private func submit(_ request: JSONValue) async {
         guard !writing, let client, let profile, let params = request["params"] else { return }
-        let operation = RovaiOperation(rawValue: request.text("operation")); guard operation != nil || request.text("operation") == "__host.upload" else { return }
+        let operation = RovaiOperation(rawValue: request.text("operation")); guard operation != nil || ["__host.upload", "__host.mission"].contains(request.text("operation")) else { return }
         writing = true; busy = true; issue = nil; let lifetime = generation; let account = self.account
         defer { writing = false; if lifetime == generation { busy = false } }
         do {
             let bytes = try JSONEncoder().encode(request)
             guard RovaiSecureSession.save(bytes, profile: profile.id, account: account) else { throw RovaiHostFailure(code: "无法保存原请求，尚未向工作区发送。") }
             pending = request
+            if request.text("operation") == "__host.mission" {try await dispatchMissionBatch(request, client: client, profile: profile, account: account, lifetime: lifetime);return}
             if request.text("operation") == "__host.upload" { try await dispatchUpload(request, client: client, profile: profile, account: account, lifetime: lifetime); return }
             let result = try await client.request(operation!, params: params)
             try await settlePrivate(request, result: result, profile: profile, account: account, client: client)
@@ -186,6 +212,10 @@ final class RovaiWorkspaceModel {
         guard !writing, let request = pending, let profile, let client, let params = request["params"] else { return }
         let lifetime = generation; let account = self.account
         do {
+            if request.text("operation") == "__host.mission", let intent = params["intent"], let operation = RovaiOperation(rawValue: intent.text("operation")) {
+                let status = try await client.reconcile(operation, params: .object(["commandId": intent["commandId"] ?? .null, "command": intent["command"] ?? .null]))
+                if status.text("state") == "recorded" {try await completeMissionBatch(request, receipt: status["result"] ?? .null, profile: profile, account: account, client: client, lifetime: lifetime)} else {issue = "原使命结果仍未知，完整请求与原附件继续保留。"};return
+            }
             if request.text("operation") == "__host.upload" { let result = try await client.uploadStatus(intent: params["intent"] ?? .null); try await completeUpload(request, result: result, profile: profile, account: account, lifetime: lifetime); return }
             guard let operation = RovaiOperation(rawValue: request.text("operation")) else { return }
             let result = try await client.reconcile(operation, params: params); guard lifetime == generation else { return }

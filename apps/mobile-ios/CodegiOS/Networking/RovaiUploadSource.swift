@@ -29,6 +29,7 @@ enum RovaiUploadSource {
             } catch { try? FileManager.default.removeItem(at: file); throw error }
         }.value
     }
+    static func frozenFile(_ request: JSONValue) throws -> URL {try file(request)}
     private static func file(_ request: JSONValue) throws -> URL {
         let id = request["intent"]?.text("commandId") ?? ""
         guard UUID(uuidString: id)?.uuidString.lowercased() == id else { throw RovaiHostFailure(code: "上传来源记录无效") }

@@ -111,6 +111,17 @@ actor RovaiHostClient {
         guard let response = response as? HTTPURLResponse, (200...299).contains(response.statusCode) else { if (response as? HTTPURLResponse)?.statusCode == 401 { denied = true; deadline = 0 }; throw RovaiHostFailure(code: "host.upload_result_unknown", unknownResult: true) }
         guard reply.count <= 32 * 1024 * 1024 else { throw RovaiHostFailure(code: "host.upload_response_limit", unknownResult: true) }; return try JSONDecoder().decode(JSONValue.self, from: reply)
     }
+    func uploadMissionBatch(intent: JSONValue, sources: [JSONValue]) async throws -> JSONValue {
+        let current = try await connect();let lifetime = generation
+        let (file, boundary) = try await RovaiMissionBatch.spool(intent: intent, sources: sources)
+        defer {try? FileManager.default.removeItem(at: file)}
+        guard lifetime == generation else {throw CancellationError()}
+        var request = URLRequest(url: endpoint("mission-files"));request.httpMethod = "POST";request.setValue("Bearer " + current.token, forHTTPHeaderField: "Authorization");request.setValue("multipart/form-data; boundary=" + boundary, forHTTPHeaderField: "Content-Type")
+        let (bytes, response) = try await session.upload(for: request, fromFile: file)
+        guard lifetime == generation, let response = response as? HTTPURLResponse, (200...299).contains(response.statusCode) else {if (response as? HTTPURLResponse)?.statusCode == 401 {denied = true;deadline = 0};throw RovaiHostFailure(code: "host.mission_upload_result_unknown", unknownResult: true)}
+        guard bytes.count <= 1024 * 1024 else {throw RovaiHostFailure(code: "host.mission_response_limit", unknownResult: true)}
+        return try JSONDecoder().decode(JSONValue.self, from: bytes)
+    }
     func uploadStatus(intent: JSONValue, action: String = "reconcile") async throws -> JSONValue {
         guard ["reconcile", "receipt", "retry", "finish"].contains(action) else { throw RovaiHostFailure(code: "上传操作无效") }; let current = try await connect(); return try await post("uploads/" + action, body: intent, bearer: current.token)
     }
