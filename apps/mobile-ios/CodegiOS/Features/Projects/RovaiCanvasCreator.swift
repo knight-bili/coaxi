@@ -23,6 +23,7 @@ struct RovaiCanvasCreator: View {
     let boardId: String
     let graph: JSONValue
     let x: Double, y: Double
+    var bindingNode: JSONValue? = nil
     @Environment(\.dismiss) private var dismiss
     @State private var form: [String: JSONValue] = ["kind": .string("note"), "title": .string(""), "content": .string(""), "color": .string(""), "columns": .number(0), "rows": .number(0)]
     @State private var revision = 0, commandId = UUID().uuidString.lowercased()
@@ -30,7 +31,7 @@ struct RovaiCanvasCreator: View {
     @State private var generation: UInt64?, issue: String?
     @State private var references: [JSONValue] = [], groups: [JSONValue] = [], tasks: [JSONValue] = []
     @State private var cursor: RovaiCanvasReferenceCursor?, taskCursor: String?, mission: JSONValue?, diffFiles: [JSONValue]?
-    private var owner: String {"canvas-create:\(boardId)"}
+    private var owner: String {if let bindingNode {return "canvas-file-binding:\(boardId):\(bindingNode.text("id"))"};return "canvas-create:\(boardId)"}
     private var kind: String {text("kind")}
     private var objectKind: Bool {["task", "mission", "mission_diff"].contains(kind)}
     private var region: Bool {["folder", "group", "agent", "custom"].contains(kind)}
@@ -41,6 +42,7 @@ struct RovaiCanvasCreator: View {
     private var selectedObject: JSONValue {form["objectReference"] ?? .null}
     private var sourceThread: JSONValue? {references.first {$0.text("threadId") == text("objectThreadId")}}
     private var valid: Bool {
+        if bindingNode != nil && (kind != "file" || graph["fileReferenceVersion"] != .number(1)) {return false}
         switch kind {
         case "note": return true
         case "custom": return members.count <= 200 && members.allSatisfy {key in choices.contains {$0.id == key}}
@@ -62,11 +64,11 @@ struct RovaiCanvasCreator: View {
                 if model.pending != nil {Text("原请求待核对，可关闭后从工作区核对或重试。").font(.caption)}
             }
             Section("属性") {
-                choice("类型", key: "kind", values: ["folder", "group", "agent", "conversation", "custom", "note", "file", "terminal", "mission", "task", "mission_diff"].map {($0, rovaiCanvasKindNames[$0] ?? ["mission": "使命", "task": "任务", "mission_diff": "累计文件变更"][$0] ?? $0)})
+                if bindingNode == nil {choice("类型", key: "kind", values: ["folder", "group", "agent", "conversation", "custom", "note", "file", "terminal", "mission", "task", "mission_diff"].map {($0, rovaiCanvasKindNames[$0] ?? ["mission": "使命", "task": "任务", "mission_diff": "累计文件变更"][$0] ?? $0)})
                 TextField("标题", text: binding("title"))
-                Picker("标记颜色", selection: binding("color")) {ForEach(rovaiCanvasColors, id: \.0) {key, label in HStack {Circle().fill(rovaiCanvasTint(key) ?? Theme.textSecondary).frame(width: 12, height: 12).accessibilityHidden(true);Text(label)}.tag(key)}}
+                Picker("标记颜色", selection: binding("color")) {ForEach(rovaiCanvasColors, id: \.0) {key, label in HStack {Circle().fill(rovaiCanvasTint(key) ?? Theme.textSecondary).frame(width: 12, height: 12).accessibilityHidden(true);Text(label)}.tag(key)}}}
                 if kind == "note" {TextField("便签内容（支持Markdown）", text: binding("content"), axis: .vertical).lineLimit(8...24)}
-                if ["folder", "file", "terminal"].contains(kind) {TextField(kind == "file" ? "文件绝对路径" : "工作目录绝对路径", text: binding("path")).textInputAutocapitalization(.never).autocorrectionDisabled()}
+                if ["folder", "file", "terminal"].contains(kind) {if bindingNode != nil {Text(text("path")).font(.caption)} else {TextField(kind == "file" ? "文件绝对路径" : "工作目录绝对路径", text: binding("path")).textInputAutocapitalization(.never).autocorrectionDisabled()}}
                 if kind == "agent" {choice("队员", key: "agentId", values: model.members.filter {$0["removedAt"] == nil || $0["removedAt"] == .null}.map {($0.text("agentId"), $0.text("displayName"))})}
                 if kind == "group" {choice("项目分组", key: "groupId", values: groups.map {($0.text("id"), $0.text("name"))});Button("重新读取原项目分组") {Task {await loadGroups()}}}
             }.disabled(blocked)
@@ -80,9 +82,9 @@ struct RovaiCanvasCreator: View {
                 if !catalogLoaded || cursor != nil {Text("对话清单尚未完整载入，当前结果仍在核对。").font(.caption).foregroundStyle(Theme.textSecondary)}
                 Button("重新载入对话") {Task {await page(reset: true)}}.disabled(blocked || reading)
                 if cursor != nil {Button("载入更多对话") {Task {await page(reset: false)}}.disabled(blocked || reading)}
-                Button("保存到画布") {Task {await submit()}}.disabled(blocked || stale || !valid || objectBusy)
+                Button(bindingNode == nil ? "保存到画布" : "绑定来源") {Task {await submit()}}.disabled(blocked || stale || !valid || objectBusy)
             }
-        }.navigationTitle("添加到画布").toolbar {Button("保留草稿并关闭") {close()}.disabled(busy)}}.interactiveDismissDisabled(true)
+        }.navigationTitle(bindingNode == nil ? "添加到画布" : "绑定文件来源").toolbar {Button("保留草稿并关闭") {close()}.disabled(busy)}}.interactiveDismissDisabled(true)
         .task {await restore()}
         .task(id: "\(kind):\(text("objectThreadId")):\(sourceThread?.text("missionId") ?? "")") {await loadObject()}
         .onChange(of: model.lastResult) {_, result in
@@ -115,12 +117,12 @@ struct RovaiCanvasCreator: View {
     private func binding(_ key: String) -> Binding<String> {Binding(get: {text(key)}, set: {field(key, .string($0))})}
     private func integerBinding(_ key: String) -> Binding<Int> {Binding(get: {number(key)}, set: {field(key, .number(Double($0)))})}
     private func choice(_ label: String, key: String, values: [(String,String)]) -> some View {Picker(label, selection: binding(key)) {Text("请选择").tag("");ForEach(values, id: \.0) {key, title in Text(title).tag(key)}}}
-    private func document() throws -> String {let value: JSONValue = .object(["version": .number(1), "boardId": .string(boardId), "form": .object(form), "revision": .number(Double(revision)), "commandId": .string(commandId)]);return String(decoding: try JSONEncoder().encode(value), as: UTF8.self)}
+    private func document() throws -> String {let value: JSONValue = .object(["version": .number(1), "boardId": .string(boardId), "bindingNodeId": bindingNode?["id"] ?? .null, "form": .object(form), "revision": .number(Double(revision)), "commandId": .string(commandId)]);return String(decoding: try JSONEncoder().encode(value), as: UTF8.self)}
     private func persist() {guard ready, generation == model.connectionGeneration else {return};do {try model.saveBody(owner, body: document())} catch {issue = error.localizedDescription}}
     private func close() {guard !busy else {return};guard ready, generation == model.connectionGeneration else {dismiss();return};do {try model.saveBody(owner, body: document());dismiss()} catch {issue = error.localizedDescription}}
     private func restore() async {
-        guard !ready else {return};generation = model.connectionGeneration;revision = graph["board"]?["revision"]?.rvInt ?? 0;form["x"] = .number(x);form["y"] = .number(y)
-        do {let raw = try model.readBody(owner);if !raw.isEmpty {guard let value = JSONValue.parse(raw), value["version"]?.rvInt == 1, value.text("boardId") == boardId, case .object(let saved) = value["form"] else {throw RovaiHostFailure(code: "原创建草稿无法读取，原记录保留")};form = saved;revision = value["revision"]?.rvInt ?? 0;if !value.text("commandId").isEmpty {commandId = value.text("commandId")}};ready = true;await loadGroups();await page(reset: true)} catch {issue = error.localizedDescription}
+        guard !ready else {return};generation = model.connectionGeneration;revision = graph["board"]?["revision"]?.rvInt ?? 0;form["x"] = .number(x);form["y"] = .number(y);if let bindingNode {form["kind"] = .string("file");form["path"] = bindingNode["data"]?["path"] ?? .null}
+        do {let raw = try model.readBody(owner);if !raw.isEmpty {guard let value = JSONValue.parse(raw), value["version"]?.rvInt == 1, value.text("boardId") == boardId, case .object(let saved) = value["form"] else {throw RovaiHostFailure(code: "原创建草稿无法读取，原记录保留")};if let bindingNode {guard value["bindingNodeId"] == bindingNode["id"], saved["path"] == bindingNode["data"]?["path"] else {throw RovaiHostFailure(code: "原文件绑定草稿不属于这张卡片")}};form = saved;revision = value["revision"]?.rvInt ?? 0;if !value.text("commandId").isEmpty {commandId = value.text("commandId")}};ready = true;await loadGroups();await page(reset: true)} catch {issue = error.localizedDescription}
     }
     private func loadGroups() async {do {let value = try await model.query(.navigationProjectGroups, params: .object(["action": .string("get")]));guard generation == model.connectionGeneration else {throw CancellationError()};groups = value["projectGroups"]?.rvArray ?? []} catch is CancellationError {} catch {issue = error.localizedDescription}}
     private func page(reset: Bool) async {
@@ -167,6 +169,6 @@ struct RovaiCanvasCreator: View {
         case "custom": node["conversations"] = .array(choices.filter {members.contains($0.id)}.map(\.reference))
         default: if objectKind {node["conversation"] = .object(["threadId": form["objectThreadId"] ?? .null,"conversationId": .null]);node["objectReference"] = selectedObject}
         }
-        do {let body = try document();try model.saveBody(owner, body: body);guard generation == model.connectionGeneration else {throw CancellationError()};await model.executeOwned(.canvasNodesApply, params: .object(["commandId": .string(commandId), "command": .object(["boardId": .string(boardId), "expectedRevision": .number(Double(revision)), "mutation": .object(["type": .string("create"), "node": .object(node)])])]), owner: owner, body: body)} catch {issue = error.localizedDescription}
+        do {let body = try document();try model.saveBody(owner, body: body);guard generation == model.connectionGeneration else {throw CancellationError()};await model.executeOwned(.canvasNodesApply, params: .object(["commandId": .string(commandId), "command": .object(["boardId": .string(boardId), "expectedRevision": .number(Double(revision)), "mutation": bindingNode.map {JSONValue.object(["type": .string("bind_file"),"nodeId": $0["id"] ?? .null,"threadId": form["fileThreadId"] ?? .null])} ?? .object(["type": .string("create"), "node": .object(node)])])]), owner: owner, body: body)} catch {issue = error.localizedDescription}
     }
 }
