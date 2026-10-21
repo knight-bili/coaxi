@@ -1,5 +1,7 @@
 # GitHub 免费优先验证安排
 
+2026-10-21 执行频率已由客户更新为[第一期改造七步路径](execution/phase-one-execution.md)：步骤1集中完成所有剩余代码后才统一Review和修复，期间不编译、不测试、不运行静态检查、不启动Runtime、不触发Actions；每小功能commit，每七步阶段完成push。下文逐切片自审/检查、原I01–I12十二批频率仅保留历史，不再驱动当前编码。
+
 客户于 2026-10-14 授权：审查敏感内容和许可证后，将
 `knight-bili/codeg-rovai-workbench` 从私有改为公开，以使用标准 GitHub 托管 runner。
 公开操作的实际结果与验证记录见[执行证据](execution/ci-free-result.json)。不调整付款方式、订阅或账号支出上限。
