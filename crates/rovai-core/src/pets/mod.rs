@@ -1,5 +1,7 @@
 //! Source-compatible sprite packages. Pet assets own no execution or model state.
 pub mod model;
+pub mod marketplace;
+pub use validation::{validate_pet_id,validate_spritesheet};
 pub mod validation;
 use anyhow::{Result,ensure,Context};
 use serde_json::{Value,json};
@@ -28,3 +30,18 @@ pub fn package(root:&Path,bytes:&[u8])->Result<Value>{
     for index in 0..archive.len(){let mut entry=archive.by_index(index)?;let name=entry.enclosed_name().context("pets.invalid_package_path")?.to_string_lossy().replace('\\',"/");ensure!(entry.unix_mode().is_none_or(|mode|mode&0o170000!=0o120000),"pets.linked_package_entry");match name.as_str(){"pet.json"=>{ensure!(manifest.is_none()&&entry.size()<=64*1024,"pets.invalid_manifest_entry");let mut bytes=Vec::new();(&mut entry).take(64*1024+1).read_to_end(&mut bytes)?;manifest=Some(serde_json::from_slice::<model::PetManifest>(&bytes)?);},"spritesheet.webp"|"spritesheet.png"=>{ensure!(sprite.is_none()&&entry.size()<=16*1024*1024,"pets.invalid_sprite_entry");let mut bytes=Vec::new();(&mut entry).take(16*1024*1024+1).read_to_end(&mut bytes)?;sprite=Some(bytes)},_=>{}}}
     install(root,manifest.context("pets.manifest_missing")?,&sprite.context("pets.sprite_missing")?)
 }
+
+#[derive(Debug)]
+pub struct MarketError{message:String}
+impl std::fmt::Display for MarketError{fn fmt(&self,f:&mut std::fmt::Formatter<'_>)->std::fmt::Result{write!(f,"{}",self.message)}}
+impl std::error::Error for MarketError{}
+impl From<anyhow::Error> for MarketError{fn from(error:anyhow::Error)->Self{Self{message:error.to_string()}}}
+impl MarketError{
+    fn io(error:impl std::fmt::Display)->Self{Self{message:format!("pets.io: {error}")}}
+    fn network(message:impl AsRef<str>)->Self{Self{message:format!("pets.marketplace_network: {}",message.as_ref())}}
+    fn invalid_input(message:impl AsRef<str>)->Self{Self{message:format!("pets.invalid_package: {}",message.as_ref())}}
+    fn already_exists(message:impl AsRef<str>)->Self{Self{message:format!("pets.already_installed: {}",message.as_ref())}}
+    fn task_execution_failed(message:impl AsRef<str>)->Self{Self{message:format!("pets.install_failed: {}",message.as_ref())}}
+}
+pub fn ensure_pets_root_or_create(root:&Path)->Result<std::path::PathBuf>{prepare_private_directory(root)}
+pub fn list_existing_ids(root:&Path)->Result<std::collections::HashSet<String>>{Ok(list(root)?.into_iter().filter_map(|entry|entry["id"].as_str().map(str::to_owned)).collect())}

@@ -6,7 +6,7 @@ export async function readPetSprite(request:Request,id:string,signal:AbortSignal
     if(signal.aborted)throw new DOMException('closed','AbortError')
     const page=await request<{mime:string;digest:string;offset:number;totalBytes:number;next:number|null;bytes:string}>({operation:'asset',id,offset})
     if(signal.aborted)throw new DOMException('closed','AbortError')
-    if(!Number.isSafeInteger(page.totalBytes)||page.totalBytes>16*1024*1024||page.totalBytes<1||page.offset!==offset||total!==null&&total!==page.totalBytes||digest!==null&&digest!==page.digest||mime!==null&&mime!==page.mime||!['image/png','image/webp'].includes(page.mime))throw new Error('pets.asset_changed')
+    if(!Number.isSafeInteger(page.totalBytes)||page.totalBytes>16*1024*1024||page.totalBytes<1||page.offset!==offset||total!==null&&total!==page.totalBytes||digest!==null&&digest!==page.digest||mime!==null&&mime!==page.mime||!['image/png','image/webp','image/jpeg'].includes(page.mime))throw new Error('pets.asset_changed')
     total=page.totalBytes;digest=page.digest;mime=page.mime
     const bytes=Uint8Array.from(atob(page.bytes),character=>character.charCodeAt(0));chunks.push(bytes);hash.update(bytes);offset+=bytes.length
     if(page.next===null){if(offset!==total)throw new Error('pets.incomplete_asset');break}
