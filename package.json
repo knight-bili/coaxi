@@ -291,9 +291,9 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "murray17",
-        "repo": "rovai-ai",
-        "releaseType": "release"
+        "owner": "knight-bili",
+        "repo": "codeg-rovai-workbench",
+        "releaseType": "draft"
       }
     ],
     "releaseInfo": {

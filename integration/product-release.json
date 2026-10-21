@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "productId": "codeg-rovai-workbench",
+  "targetVersion": "1.0.0",
+  "developmentBranch": "develop/V1.0.0",
+  "repository": "https://github.com/knight-bili/codeg-rovai-workbench",
+  "releaseAuthority": "customer_explicit_instruction_after_acceptance",
+  "desktopReleaseType": "draft",
+  "serverChannelState": "unpublished",
+  "sourceVersions": {
+    "rovai": "cc465dda562536b94f23787759e3206324baa29e",
+    "codeg": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f"
+  },
+  "sourceProductVersionPreservedUntilRelease": true
+}
