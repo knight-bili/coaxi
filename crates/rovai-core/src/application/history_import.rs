@@ -16,7 +16,12 @@ struct Entry{id:String,name:String,bytes:u64,modified:u64,#[serde(default)]nativ
 struct Plan{root:PathBuf,provider:String,created_at:String,entries:Vec<Entry>,#[serde(default)]source_root:Option<PathBuf>,#[serde(default)]helper:bool,#[serde(default)]snapshot_digest:Option<String>}
 #[derive(Deserialize)]
 #[serde(rename_all="camelCase",deny_unknown_fields)]
-struct Request{scope:workbench::Scope,operation:String,#[serde(default)]root:Option<PathBuf>,#[serde(default)]provider:Option<String>,#[serde(default)]plan_id:Option<String>,#[serde(default)]entry_id:Option<String>,#[serde(default)]expected_digest:Option<String>,#[serde(default)]import_id:Option<String>,#[serde(default)]offset:usize,#[serde(default)]tags:Option<Vec<String>>}
+struct Request{scope:workbench::Scope,operation:String,#[serde(default)]root:Option<PathBuf>,#[serde(default)]provider:Option<String>,#[serde(default)]plan_id:Option<String>,#[serde(default)]entry_id:Option<String>,#[serde(default)]expected_digest:Option<String>,#[serde(default)]import_id:Option<String>,#[serde(default)]offset:usize,#[serde(default)]tags:Option<Vec<String>>,#[serde(default)]include_archived:bool,#[serde(default)]expected_revision:Option<String>}
+fn library_entry(mut value:Value)->Result<Value>{
+    let revision=crate::command::canonical_json_digest(&value)?;
+    if let Some(object)=value.as_object_mut(){object.remove("originalRoot");object.remove("nativeSessionId");let shared=object.remove("snapshotRoot").is_some_and(|value|!value.is_null());object.insert("sharedSourceSnapshot".into(),json!(shared));object.insert("revision".into(),json!(revision));object.entry("archived".to_string()).or_insert(json!(false));}
+    Ok(value)
+}
 fn hash(bytes:&[u8])->String{format!("{:x}",Sha256::digest(bytes))}
 fn identifier(value:&str)->Result<()>{ensure!(value.len()==64&&value.bytes().all(|byte|byte.is_ascii_hexdigit()),"history.invalid_identifier");Ok(())}
 fn reject_link(path:&Path)->Result<()>{let metadata=fs::symlink_metadata(path)?;ensure!(!metadata.file_type().is_symlink(),"history.linked_path");#[cfg(windows)]{use std::os::windows::fs::MetadataExt;ensure!(metadata.file_attributes()&0x400==0,"history.linked_path");}Ok(())}
@@ -40,15 +45,18 @@ impl Core{
         let directory=self.data_dir.join("imported-history");
         crate::platform::private_storage::prepare_private_directory(&directory)?;
         if request.operation=="list"{
-            let mut entries=Vec::new();for entry in fs::read_dir(&directory)?{let entry=entry?;if entry.file_name().to_string_lossy().ends_with(".manifest.json"){let mut value:Value=serde_json::from_slice(&fs::read(entry.path())?)?;if let Some(object)=value.as_object_mut(){object.remove("originalRoot");object.remove("nativeSessionId");object.remove("snapshotRoot");}entries.push(value)}}
+            let mut entries=Vec::new();for entry in fs::read_dir(&directory)?{let entry=entry?;if entry.file_name().to_string_lossy().ends_with(".manifest.json"){let value:Value=serde_json::from_slice(&fs::read(entry.path())?)?;if request.include_archived||value["archived"]!=true{entries.push(library_entry(value)?)}}}
             entries.sort_by(|a,b|b["importedAt"].as_str().cmp(&a["importedAt"].as_str()));return Ok(json!({"entries":entries}));
         }
         if request.operation=="read"{
             let id=request.import_id.context("history.import_required")?;identifier(&id)?;let bytes=fs::read(directory.join(format!("{id}.transcript.json")))?;ensure!(request.offset<=bytes.len(),"history.invalid_offset");let end=(request.offset+512*1024).min(bytes.len());
             use base64::Engine;return Ok(json!({"digest":hash(&bytes),"totalBytes":bytes.len(),"offset":request.offset,"next":(end<bytes.len()).then_some(end),"bytes":base64::engine::general_purpose::STANDARD.encode(&bytes[request.offset..end])}));
         }
-        if request.operation=="tags"{
-            let id=request.import_id.context("history.import_required")?;identifier(&id)?;let tags=request.tags.context("history.tags_required")?;ensure!(tags.len()<=128&&tags.iter().all(|tag|!tag.trim().is_empty()&&tag.len()<=256),"history.invalid_tags");let _lock=workbench::MUTATIONS.lock().await;let path=directory.join(format!("{id}.manifest.json"));let mut manifest:Value=serde_json::from_slice(&fs::read(&path)?)?;manifest["tags"]=json!(tags);crate::platform::private_storage::atomic_write_private_json(&path,&manifest)?;return Ok(json!({"saved":true}));
+        if matches!(request.operation.as_str(),"tags"|"archive"|"restore"){
+            let id=request.import_id.context("history.import_required")?;identifier(&id)?;let _lock=workbench::MUTATIONS.lock().await;let path=directory.join(format!("{id}.manifest.json"));let mut manifest:Value=serde_json::from_slice(&fs::read(&path)?)?;
+            let revision=crate::command::canonical_json_digest(&manifest)?;ensure!(request.expected_revision.as_deref()==Some(revision.as_str()),"history.library_changed");
+            if request.operation=="tags"{let tags=request.tags.context("history.tags_required")?;ensure!(tags.len()<=128&&tags.iter().all(|tag|!tag.trim().is_empty()&&tag.len()<=256),"history.invalid_tags");manifest["tags"]=json!(tags);}else{manifest["archived"]=json!(request.operation=="archive");manifest["archivedAt"]=if request.operation=="archive"{json!(Utc::now().to_rfc3339())}else{Value::Null};}
+            crate::platform::private_storage::atomic_write_private_json(&path,&manifest)?;return Ok(json!({"saved":true,"entry":library_entry(manifest)?}));
         }
         ensure!(local,"history.local_owner_required");
         if request.operation=="scan"{
@@ -69,11 +77,11 @@ impl Core{
         ensure!(request.operation=="import"&&request.expected_digest.as_deref()==Some(digest.as_str()),"history.source_changed");
         let id=hash(format!("{provider}:{digest}").as_bytes());let manifest_path=directory.join(format!("{id}.manifest.json"));
         let _lock=workbench::MUTATIONS.lock().await;
-        if manifest_path.exists(){return Ok(json!({"importId":id,"duplicate":true}));}
+        if manifest_path.exists(){let existing:Value=serde_json::from_slice(&fs::read(&manifest_path)?)?;return Ok(json!({"importId":id,"duplicate":true,"archived":existing["archived"]==true}));}
         let source_path=directory.join(format!("{id}.native.json"));
         crate::platform::private_storage::atomic_write_private_bytes(&source_path,&bytes)?;
         crate::platform::private_storage::atomic_write_private_json(&directory.join(format!("{id}.transcript.json")),&transcript)?;
-        crate::platform::private_storage::atomic_write_private_json(&manifest_path,&json!({"id":id,"provider":provider,"sourceName":name,"originalRoot":origin,"sourceDigest":digest,"summary":transcript["summary"],"notes":transcript["notes"],"importedAt":Utc::now().to_rfc3339(),"linkedThreadId":request.scope.thread_id,"snapshotRoot":snapshot_root,"snapshotDigest":snapshot_digest,"tags":[]}))?;
+        crate::platform::private_storage::atomic_write_private_json(&manifest_path,&json!({"id":id,"provider":provider,"sourceName":name,"originalRoot":origin,"sourceDigest":digest,"summary":transcript["summary"],"notes":transcript["notes"],"importedAt":Utc::now().to_rfc3339(),"linkedThreadId":request.scope.thread_id,"snapshotRoot":snapshot_root,"snapshotDigest":snapshot_digest,"tags":[],"archived":false}))?;
         Ok(json!({"importId":id,"duplicate":false}))
     }
 }
