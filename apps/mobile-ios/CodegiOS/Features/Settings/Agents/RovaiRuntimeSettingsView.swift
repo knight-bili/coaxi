@@ -42,7 +42,7 @@ private struct NativeRuntimeEditor: View {
             if changed { Section { Text("队员信息已变化，当前更改保留；请返回后重新打开。").foregroundStyle(Theme.warning) } }
             Section("智能体") {
                 Picker("智能体", selection: Binding(get: { kind }, set: { choose($0) })) { Text("请选择").tag(""); ForEach(eligible, id: \.self) { item in Text(item.text("adapterKind")).tag(item.text("adapterKind")) } }.disabled(disabled)
-                if installation != nil { LabeledContent("环境状态", value: snapshot.text("probeStatus").isEmpty ? "尚未检查" : snapshot.text("probeStatus")); LabeledContent("认证状态", value: snapshot.text("authenticationStatus")); Button("检查运行环境") { Task { await model.execute(.runtimeProductCheck, params: .object(["runtimeKind": .string(kind)])) } }.disabled(disabled) }
+                if installation != nil { LabeledContent("环境状态", value: snapshot.text("probeStatus").isEmpty ? "尚未检查" : snapshot.text("probeStatus")); LabeledContent("认证状态", value: snapshot.text("authenticationStatus")); NavigationLink("启动程序与环境变量") { RovaiRuntimeStartupView(model: model, runtimeKind: kind) }; Button("检查运行环境") { Task { await model.execute(.runtimeProductCheck, params: .object(["runtimeKind": .string(kind)])) } }.disabled(disabled) }
             }
             if installation?["memberRuntimeDefaults"] != nil && installation?["memberRuntimeDefaults"] != .null {
                 Section("模型") {
