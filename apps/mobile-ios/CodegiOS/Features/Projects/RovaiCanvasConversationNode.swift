@@ -6,10 +6,11 @@ struct RovaiCanvasConversationNode: View {
     let boardId: String
     let node: JSONValue
     let onOpenThread: (String) -> Void
+    var memberReference: JSONValue? = nil
     @Environment(\.dismiss) private var dismiss
     @State private var ready = false, retry = 0
     @State private var issue: String?
-    private var data: JSONValue {node["data"] ?? .null}
+    private var data: JSONValue {memberReference.map {JSONValue.object(["kind": .string("conversation"), "conversation": $0])} ?? node["data"] ?? .null}
     private var reference: JSONValue {data["conversation"] ?? .null}
     private var threadId: String {reference.text("threadId")}
     private var conversationId: String? {reference["conversationId"]?.stringValue}
@@ -23,9 +24,11 @@ struct RovaiCanvasConversationNode: View {
         ready = false;issue = nil;let generation = model.connectionGeneration
         do {
             guard data.text("kind") == "conversation", data["objectReference"] == nil || data["objectReference"] == .null, !threadId.isEmpty else {throw RovaiHostFailure(code: "卡片不属于普通会话引用")}
+            if memberReference != nil {try await requireCanvasRegionReference(model, boardId: boardId, nodeId: node.text("id"), reference: reference)} else {
             let graph = try await model.query(.canvasNodesSnapshot, params: .object(["boardId": .string(boardId)]))
             let saved = (graph["nodes"]?.rvArray ?? []).first {$0.text("id") == node.text("id") }?["data"]
             guard saved?.text("kind") == "conversation", saved?["conversation"] == reference, saved?["objectReference"] == nil || saved?["objectReference"] == .null else {throw RovaiHostFailure(code: "原卡片已删除或绑定已变化；引用保留")}
+            }
             if let conversationId {
                 let value = try await model.query(.singleChatGet, params: .object(["conversationId": .string(conversationId), "composerScope": .null])), conversation = value["conversation"]
                 guard conversation?.text("id") == conversationId, conversation?.text("threadId") == threadId, conversation?.text("status") == "active" else {throw RovaiHostFailure(code: "原私聊已结束、删除或归属已变化；卡片引用保留")}
