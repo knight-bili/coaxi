@@ -1276,6 +1276,7 @@ core.onEvent(event=>petWindow.onCoreEvent(event))
 ipcMain.handle('rovai:pets-synchronize',event=>petWindow.synchronize(event))
 ipcMain.handle('rovai:pet-request',(event,input)=>petWindow.read(event,input))
 ipcMain.handle('rovai:pet-control',(event,action)=>petWindow.control(event,action))
+ipcMain.handle('rovai:pet-hit-test',(event,input)=>petWindow.hitTest(event,input))
 app.on('before-quit',()=>petWindow.dispose())
 ipcMain.handle('rovai:pets-import',async event=>{
   if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('pets.local_owner_required')

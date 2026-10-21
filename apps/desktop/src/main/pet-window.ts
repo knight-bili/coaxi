@@ -12,6 +12,7 @@ export class PetWindowService{
   private readonly running=new Set<string>()
   private readonly waiting=new Set<string>()
   private state='idle'
+  private hitRegions:Array<{x:number;y:number;width:number;height:number;mask?:string}>=[]
   private disposed=false
   private serial:Promise<void>=Promise.resolve()
   private pointerTimer:ReturnType<typeof setInterval>|null=null
@@ -43,7 +44,7 @@ export class PetWindowService{
     this.displayChanged=()=>{if(!window.isDestroyed()){const current=window.getBounds();this.place(window,current.width,current.height);this.persist(window)}}
     screen.on('display-removed',this.displayChanged);screen.on('display-metrics-changed',this.displayChanged)
     let ignored=false
-    this.pointerTimer=setInterval(()=>{if(window.isDestroyed())return;const cursor=screen.getCursorScreenPoint(),bounds=window.getBounds();const inside=cursor.x>=bounds.x+6&&cursor.x<bounds.x+bounds.width-6&&cursor.y>=bounds.y+6&&cursor.y<bounds.y+bounds.height-6;if(ignored===inside){ignored=!inside;window.setIgnoreMouseEvents(ignored,{forward:true})}},200)
+    this.pointerTimer=setInterval(()=>{if(window.isDestroyed())return;const cursor=screen.getCursorScreenPoint(),bounds=window.getBounds();const x=cursor.x-bounds.x,y=cursor.y-bounds.y;const inside=this.hitRegions.some(region=>{if(x<region.x||y<region.y||x>=region.x+region.width||y>=region.y+region.height)return false;if(!region.mask)return true;const col=Math.min(31,Math.floor((x-region.x)/region.width*32)),row=Math.min(35,Math.floor((y-region.y)/region.height*36));return region.mask[row*32+col]==='1'});if(ignored===inside){ignored=!inside;window.setIgnoreMouseEvents(ignored,{forward:true})}},200)
     this.pointerTimer.unref()
 
     window.webContents.setWindowOpenHandler(()=>({action:'deny'}))
@@ -53,6 +54,12 @@ export class PetWindowService{
     window.once('closed',()=>{if(this.window===window){this.window=null;this.releaseResources()}})
     window.once('ready-to-show',()=>window.showInactive())
     if(process.env.ELECTRON_RENDERER_URL){const url=new URL('pet.html',process.env.ELECTRON_RENDERER_URL);await window.loadURL(url.href)}else await window.loadFile(join(import.meta.dirname,'../renderer/pet.html'))
+  }
+  hitTest(event:IpcMainInvokeEvent,input:unknown):void{
+    this.trusted(event,true)
+    if(!Array.isArray(input)||input.length>3)throw new Error('pets.invalid_hit_regions')
+    const bounds=this.window!.getBounds()
+    this.hitRegions=input.map(value=>{if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('pets.invalid_hit_region');const region=value as {x:number;y:number;width:number;height:number;mask?:string};if(![region.x,region.y,region.width,region.height].every(Number.isFinite)||region.x<0||region.y<0||region.width<=0||region.height<=0||region.x+region.width>bounds.width+1||region.y+region.height>bounds.height+1||(region.mask!==undefined&&(typeof region.mask!=='string'||!/^[01]{1152}$/.test(region.mask))))throw new Error('pets.invalid_hit_region');return {x:region.x,y:region.y,width:region.width,height:region.height,...(region.mask===undefined?{}:{mask:region.mask})}})
   }
   async read(event:IpcMainInvokeEvent,input:unknown):Promise<unknown>{
     this.trusted(event,true)
@@ -81,7 +88,7 @@ export class PetWindowService{
     const state=this.waiting.size?'waiting':this.running.size?'running':'idle'
     if(state!==this.state){this.state=state;this.window?.webContents.send('rovai:pet-state',{state})}
   }
-  private releaseResources():void{if(this.pointerTimer)clearInterval(this.pointerTimer);this.pointerTimer=null;if(this.persistTimer)clearTimeout(this.persistTimer);this.persistTimer=null;if(this.displayChanged){screen.removeListener('display-removed',this.displayChanged);screen.removeListener('display-metrics-changed',this.displayChanged);this.displayChanged=null}}
+  private releaseResources():void{this.hitRegions=[];if(this.pointerTimer)clearInterval(this.pointerTimer);this.pointerTimer=null;if(this.persistTimer)clearTimeout(this.persistTimer);this.persistTimer=null;if(this.displayChanged){screen.removeListener('display-removed',this.displayChanged);screen.removeListener('display-metrics-changed',this.displayChanged);this.displayChanged=null}}
   close():void{const window=this.window;if(window&&!window.isDestroyed())this.persist(window);this.window=null;this.releaseResources();if(window&&!window.isDestroyed())window.destroy()}
   dispose():void{this.disposed=true;this.close();this.running.clear();this.waiting.clear()}
 

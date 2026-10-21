@@ -1,7 +1,7 @@
 // Apache-2.0; spacering-net/codeg aff1e6c278453ed8d0b96a5f664edcdca621aa3f.
 "use client"
 
-import { useMemo } from "react"
+import { useEffect,useMemo } from "react"
 import {
   backgroundPositionFor,
   spriteBackgroundSize,
@@ -16,6 +16,7 @@ export interface PetSpriteProps {
   state: PetState
   scale: number
   /** Aria-label for screen readers. */
+  onFrame?: (row:number,col:number)=>void
   label: string
 }
 
@@ -27,8 +28,10 @@ export function PetSprite({
   state,
   scale,
   label,
+  onFrame,
 }: PetSpriteProps) {
   const { row, col } = usePetAnimator(state)
+  useEffect(()=>{onFrame?.(row,col)},[row,col,onFrame])
   const backgroundImage = useMemo(
     () => `url("${spritesheetUrl}")`,
     [spritesheetUrl]
