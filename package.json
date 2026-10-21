@@ -329,12 +329,37 @@
         {
           "from": "helpers/native-history/LICENSE",
           "to": "licenses/native-history-LICENSE"
+        },
+        {
+          "from": "LICENSE",
+          "to": "licenses/rovai-LICENSE"
+        },
+        {
+          "from": "THIRD_PARTY_NOTICES.md",
+          "to": "licenses/THIRD_PARTY_NOTICES.md"
+        },
+        {
+          "from": "integration/licenses",
+          "to": "licenses/integration"
+        },
+        {
+          "from": "legal/licenses",
+          "to": "licenses/dependencies"
+        },
+        {
+          "from": "integration/sources.lock.json",
+          "to": "workbench/sources.lock.json"
+        },
+        {
+          "from": "integration/product-release.json",
+          "to": "workbench/product-release.json"
         }
       ],
       "binaries": [
         "Contents/Resources/bin/rovai-core",
         "Contents/Resources/bin/rovai-host",
-        "Contents/Resources/bin/rovai"
+        "Contents/Resources/bin/rovai",
+        "Contents/Resources/bin/rovai-native-history"
       ],
       "hardenedRuntime": true,
       "entitlements": "build/entitlements.mac.plist",
@@ -398,6 +423,30 @@
         {
           "from": "helpers/native-history/LICENSE",
           "to": "licenses/native-history-LICENSE"
+        },
+        {
+          "from": "LICENSE",
+          "to": "licenses/rovai-LICENSE"
+        },
+        {
+          "from": "THIRD_PARTY_NOTICES.md",
+          "to": "licenses/THIRD_PARTY_NOTICES.md"
+        },
+        {
+          "from": "integration/licenses",
+          "to": "licenses/integration"
+        },
+        {
+          "from": "legal/licenses",
+          "to": "licenses/dependencies"
+        },
+        {
+          "from": "integration/sources.lock.json",
+          "to": "workbench/sources.lock.json"
+        },
+        {
+          "from": "integration/product-release.json",
+          "to": "workbench/product-release.json"
         }
       ],
       "artifactName": "Rovai-AI-${version}-${arch}.${ext}"
