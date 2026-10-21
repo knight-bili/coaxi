@@ -4826,6 +4826,8 @@ export type CoreMethod =
   | 'skills.list'
   | 'skills.get'
   | 'toolbox.list'
+  | 'skillPacks.office.prepare'
+  | 'skillPacks.office.install'
   | 'skillPacks.list'
   | 'skillPacks.read'
   | 'skillPacks.installations.list'

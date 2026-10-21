@@ -5,6 +5,10 @@ use serde::{Deserialize, Serialize};
 /// and the legacy shared draft remain outside the network capability.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum Operation {
+    #[serde(rename="skillPacks.office.prepare")]
+    OfficeSkillPrepare,
+    #[serde(rename="skillPacks.office.install")]
+    OfficeSkillInstall,
     #[serde(rename="pets.operation")]
     PetsOperation,
     #[serde(rename="appearance.extensions")]
@@ -491,6 +495,7 @@ pub enum Operation {
 impl Operation {
     pub fn timeout(self) -> std::time::Duration {
         std::time::Duration::from_secs(match self {
+            Self::OfficeSkillPrepare | Self::OfficeSkillInstall => 60,
             Self::WebdavSettings => 30,
             Self::HistoryLibrary => 30,
             Self::OfficeWatch => 30,
@@ -513,6 +518,8 @@ impl Operation {
         match self {
             Self::AppInfo => json!({"name":value["name"],"version":value["version"]}),
             Self::ForgeAccountsGet | Self::ForgeAccountsSet => select_fields(&value, &["accounts"]),
+            Self::OfficeSkillPrepare => select_fields(&value,&["planId","skillId","sourceRevision","content","contentDigest","binaryDigest"]),
+            Self::OfficeSkillInstall => select_fields(&value,&["status","code","payload"]),
             Self::PetsOperation => select_fields(&value,&["pets","pet","page","pageSize","total","totalPages","entries","settings","id","displayName","description","spritesheetPath","duplicate","removed","mime","digest","offset","totalBytes","next","bytes","enabled","activeId","scale"]),
             Self::AppearanceExtensions => select_fields(&value,&["revision","value"]),
             Self::WebdavSettings => select_fields(&value,&["revision","endpoint","username","passwordSet","allowInsecure"]),
@@ -591,6 +598,8 @@ impl Operation {
         match self {
             Self::ForgeAccountsGet => "forge.accounts.get",
             Self::ForgeAccountsSet => "forge.accounts.set",
+            Self::OfficeSkillPrepare => "skillPacks.office.prepare",
+            Self::OfficeSkillInstall => "skillPacks.office.install",
             Self::PetsOperation => "pets.operation",
             Self::AppearanceExtensions => "appearance.extensions",
             Self::WebdavSettings => "backup.webdav.settings",

@@ -334,13 +334,16 @@ impl SkillPackStore {
         database: &mut Database,
         envelope: &CommandEnvelope<InstallSkillPackCommand>,
     ) -> Result<InstallBeginning> {
+        self.begin_install_with_source(database,envelope,installation_source(&envelope.payload.skill_id))
+    }
+
+    pub(crate) fn begin_install_with_source(&self,database:&mut Database,envelope:&CommandEnvelope<InstallSkillPackCommand>,source:Result<InstallationSource>)->Result<InstallBeginning>{
         if let Some(execution) = DomainCommandGateway.replay_if_recorded(database, envelope)? {
             return Ok(InstallBeginning::Complete(execution));
         }
         let command = &envelope.payload;
         let previous = load(database.connection(), &command.skill_id)?;
         let actual = version(previous.as_ref())?;
-        let source = installation_source(&command.skill_id);
         let rejection = if !is_user(envelope) {
             Some(("skill_pack.invalid_request", json!({})))
         } else if actual != command.expected_version {
@@ -433,7 +436,7 @@ impl SkillPackStore {
             }
             let destination = content.join(relative);
             let mut output = create_private_new_file(&destination)?;
-            output.write_all(file.bytes)?;
+            output.write_all(file.bytes.as_ref())?;
             #[cfg(unix)]
             {
                 use std::os::unix::fs::PermissionsExt;
@@ -452,7 +455,7 @@ impl SkillPackStore {
             schema_version: 1,
             skill_id: plan.skill_id.clone(),
             active_version: active_version.clone(),
-            source_revision: plan.source.revision.into(),
+            source_revision: plan.source.revision.to_string(),
             source_digest: plan.source_digest.clone(),
             content_digest: content_digest.clone(),
         };
@@ -468,7 +471,7 @@ impl SkillPackStore {
         Ok(PreparedInstall {
             installation: Installation {
                 skill_id: plan.skill_id,
-                source_revision: plan.source.revision.into(),
+                source_revision: plan.source.revision.to_string(),
                 source_digest: plan.source_digest,
                 active_version,
                 content_digest,
@@ -606,7 +609,7 @@ fn is_user<C>(envelope: &CommandEnvelope<C>) -> bool {
         && envelope.execution_epoch.is_none()
 }
 fn source_digest(source: &InstallationSource) -> Result<String> {
-    canonical_json_digest(&json!(source.files.iter().map(|file|json!({"path":file.path,"sha256":format!("{:x}",Sha256::digest(file.bytes)),"executable":file.executable})).collect::<Vec<_>>()))
+    canonical_json_digest(&json!(source.files.iter().map(|file|json!({"path":file.path,"sha256":format!("{:x}",Sha256::digest(file.bytes.as_ref())),"executable":file.executable})).collect::<Vec<_>>()))
 }
 
 fn admit_directory(path: &Path) -> Result<()> {

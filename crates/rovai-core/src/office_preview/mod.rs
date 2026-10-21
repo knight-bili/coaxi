@@ -37,14 +37,14 @@ fn resolve_tree_path(root:&Path,path:&str)->Result<PathBuf>{
     for part in Path::new(path).components(){match part{Component::Normal(name)=>{target.push(name);let metadata=std::fs::symlink_metadata(&target)?;ensure!(!metadata.file_type().is_symlink(),"office.linked_path");#[cfg(windows)]{use std::os::windows::fs::MetadataExt;ensure!(metadata.file_attributes()&0x400==0,"office.linked_path");}},_=>anyhow::bail!("office.invalid_path")}}
     let target=std::fs::canonicalize(target)?;ensure!(target.starts_with(canonical)&&target.is_file(),"office.outside_root");Ok(target)
 }
-fn resolve_officecli()->Option<PathBuf>{
+pub(crate) fn resolve_officecli()->Option<PathBuf>{
     let executable=if cfg!(windows){"officecli.exe"}else{"officecli"};
     if let Some(paths)=std::env::var_os("PATH"){for path in std::env::split_paths(&paths){if path.is_absolute(){let candidate=path.join(executable);if candidate.is_file(){return Some(candidate)}}}}
     #[cfg(windows)]{if let Some(root)=std::env::var_os("LOCALAPPDATA"){let path=PathBuf::from(root).join("OfficeCLI").join(executable);if path.is_file(){return Some(path)}}}
     #[cfg(not(windows))]{if let Some(root)=dirs::home_dir(){let path=root.join(".local/bin").join(executable);if path.is_file(){return Some(path)}}}
     None
 }
-fn tokio_command(program:impl AsRef<std::ffi::OsStr>)->tokio::process::Command{
+pub(crate) fn tokio_command(program:impl AsRef<std::ffi::OsStr>)->tokio::process::Command{
     let mut command=tokio::process::Command::new(program);command.env_clear();
     for key in ["PATH","SystemRoot","WINDIR","HOME","USERPROFILE","TEMP","TMP","LOCALAPPDATA","DOTNET_ROOT"]{if let Some(value)=std::env::var_os(key){command.env(key,value);}}
     command.env("LANG","C.UTF-8").env("LC_ALL","C.UTF-8");

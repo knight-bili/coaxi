@@ -137,12 +137,12 @@ fn source_url(path: &str) -> String {
 
 pub(crate) struct InstallationFile {
     pub path: String,
-    pub bytes: &'static [u8],
+    pub bytes: std::borrow::Cow<'static,[u8]>,
     pub executable: bool,
 }
 
 pub(crate) struct InstallationSource {
-    pub revision: &'static str,
+    pub revision: std::borrow::Cow<'static,str>,
     pub files: Vec<InstallationFile>,
 }
 
@@ -182,7 +182,7 @@ pub(crate) fn installation_source(id: &str) -> Result<InstallationSource> {
             );
             files.push(InstallationFile {
                 path: relative.into(),
-                bytes,
+                bytes: std::borrow::Cow::Borrowed(bytes),
                 executable: record["mode"] == "100755",
             });
         }
@@ -193,7 +193,7 @@ pub(crate) fn installation_source(id: &str) -> Result<InstallationSource> {
         "Skill pack manifest has no guide"
     );
     Ok(InstallationSource {
-        revision: SOURCE_COMMIT,
+        revision: std::borrow::Cow::Borrowed(SOURCE_COMMIT),
         files,
     })
 }

@@ -19,6 +19,7 @@ mod history_import;
 mod webdav_access;
 mod appearance_extensions;
 mod pets_access;
+mod office_skills;
 mod forge;
 pub(crate) mod private_composer;
 mod private_sources;
@@ -9521,6 +9522,8 @@ impl Core {
                 let database = self.database.lock().await;
                 Ok(serde_json::to_value(self.skill_library.list(&database)?)?)
             }
+            "skillPacks.office.prepare" => self.office_skill_prepare(request.params.clone()).await,
+            "skillPacks.office.install" => self.office_skill_install(request.params.clone()).await,
             "skillPacks.list" => Ok(serde_json::to_value(
                 rovai_core::codeg_skill_catalog::list()?,
             )?),

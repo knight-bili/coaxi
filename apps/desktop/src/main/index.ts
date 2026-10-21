@@ -245,6 +245,8 @@ const allowedMethods = new Set<CoreMethod>([
   'runtime.installations.refresh',
   'skills.list',
   'skills.get',
+  'skillPacks.office.prepare',
+  'skillPacks.office.install',
   'skillPacks.list',
   'skillPacks.read',
   'skillPacks.installations.list',
