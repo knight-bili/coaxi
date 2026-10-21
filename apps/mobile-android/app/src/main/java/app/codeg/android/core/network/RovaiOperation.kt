@@ -218,6 +218,7 @@ enum class RovaiOperation(val wire:String) {
     MCP_CONFIG_GET("mcp.config.get"),
     MESSAGEQUOTES_MUTATEDRAFT("messageQuotes.mutateDraft"),
     MESSAGEQUOTES_CAPTURE("messageQuotes.capture"),
+    MESSAGEQUOTES_PROJECTION("messageQuotes.projection"),
     THREAD_MESSAGES_SEND("thread.messages.send"),
     THREAD_MESSAGES_WITHDRAW("thread.messages.withdraw"),
     ACTION_APPROVALS_RESOLVE("action.approvals.resolve"),

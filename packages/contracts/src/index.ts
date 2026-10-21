@@ -5083,6 +5083,7 @@ export type CoreMethod =
   | 'tasks.get'
   | 'messageQuotes.mutateDraft'
   | 'messageQuotes.capture'
+  | 'messageQuotes.projection'
   | 'thread.messages.send'
   | 'thread.messages.withdraw'
   | 'userAutomation.thread.send'

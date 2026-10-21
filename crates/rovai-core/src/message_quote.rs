@@ -408,6 +408,20 @@ pub struct QuoteSelection {
     pub current_user_display_name: Option<String>,
 }
 
+/// A read-only UI selection surface using the same projection as capture_quote.
+/// Its body is an optimistic fence; callers never manufacture a trusted quote.
+pub fn public_quote_projection(connection:&Connection,camp_id:&str,message_id:&str)->Result<Value> {
+    let sql=format!("WITH {} SELECT m.author_type,m.structured_content_json FROM camp_message m JOIN public_camp_message_publication p ON p.message_id=m.id WHERE m.id=?1 AND m.camp_id=?2 AND m.tombstoned_at IS NULL",public_camp_message_publication_cte());
+    let (author,encoded):(String,String)=connection.query_row(&sql,params![message_id,camp_id],|row|Ok((row.get(0)?,row.get(1)?))).optional()?.context("quote.source_unavailable")?;
+    ensure!(matches!(author.as_str(),"user"|"agent")&&encoded.len()<=2*1024*1024,"quote.source_not_supported");
+    let content:StructuredThreadMessageContent=serde_json::from_str(&encoded)?;
+    let body=render_current_plain_text(connection,&content)?;
+    let text=if author=="user" {body.replace("\r\n","\n")} else {
+        project_structured_quote_text(&content,|id|connection.query_row("SELECT display_name FROM agent_profile WHERE id=?1",[id],|row|row.get(0)).optional().ok().flatten(),"你")?
+    };
+    Ok(json!({"messageId":message_id,"bodyAtSelection":body,"text":text,"projectionVersion":QUOTE_PROJECTION_VERSION,"maxScalars":MAX_QUOTE_SCALARS}))
+}
+
 pub fn capture_quote(
     transaction: &Transaction<'_>,
     camp_id: &str,

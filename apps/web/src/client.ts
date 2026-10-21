@@ -201,6 +201,7 @@ export const WEB_OPERATIONS = [
   'agentRunEvidence.getContent',
   'messageQuotes.mutateDraft',
   'messageQuotes.capture',
+  'messageQuotes.projection',
   'thread.messages.send',
   'thread.messages.withdraw',
   'action.approvals.resolve',

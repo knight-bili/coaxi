@@ -447,6 +447,8 @@ pub enum Operation {
     DraftQuote,
     #[serde(rename = "messageQuotes.capture")]
     CaptureQuote,
+    #[serde(rename = "messageQuotes.projection")]
+    QuoteProjection,
     #[serde(rename = "thread.messages.send", alias = "camp.messages.send")]
     Send,
     #[serde(rename = "thread.messages.withdraw", alias = "camp.messages.withdraw")]
@@ -790,6 +792,7 @@ impl Operation {
             Self::RuntimeDiscover => "runtime.discovery.rescan",
             Self::DraftQuote => "messageQuotes.mutateDraft",
             Self::CaptureQuote => "messageQuotes.capture",
+            Self::QuoteProjection => "messageQuotes.projection",
             Self::Send => "camp.messages.send",
             Self::WithdrawMessage => "camp.messages.withdraw",
             Self::Approval => "action.approvals.resolve",

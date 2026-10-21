@@ -218,6 +218,7 @@ enum RovaiOperation: String, Sendable {
     case mcpConfigGet = "mcp.config.get"
     case messageQuotesMutateDraft = "messageQuotes.mutateDraft"
     case messageQuotesCapture = "messageQuotes.capture"
+    case messageQuotesProjection = "messageQuotes.projection"
     case threadMessagesSend = "thread.messages.send"
     case threadMessagesWithdraw = "thread.messages.withdraw"
     case actionApprovalsResolve = "action.approvals.resolve"
