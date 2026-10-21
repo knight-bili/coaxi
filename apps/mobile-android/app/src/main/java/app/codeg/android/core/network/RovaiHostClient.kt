@@ -5,6 +5,7 @@ import android.os.SystemClock
 import io.ktor.utils.io.readUTF8Line
 import io.ktor.client.HttpClient
 import io.ktor.client.request.*
+import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.CancellationException
@@ -69,6 +70,22 @@ class RovaiHostClient(rawBaseUrl:String,private val administratorToken:String,
         val envelope=response.jsonObject
         envelope["error"]?.takeIf{it !is JsonNull}?.let{throw RovaiHostFailure(it.toString())}
         return envelope["result"]?:JsonNull
+    }
+    suspend fun upload(intent:JsonObject,bytes:ByteArray):JsonObject {
+        require(bytes.size<=20*1024*1024){"文件超过20MB"}
+        val digest=java.security.MessageDigest.getInstance("SHA-256").digest(bytes).joinToString(""){"%02x".format(it)}
+        require(intent["sha256"]?.jsonPrimitive?.content==digest&&intent["byteSize"]?.jsonPrimitive?.long==bytes.size.toLong()){ "上传文件已变化" }
+        val current=connect()
+        val response=http.post("$baseUrl/api/v1/uploads"){
+            header(HttpHeaders.Authorization,"Bearer ${current.token}")
+            setBody(MultiPartFormDataContent(formData{append("intent",intent.toString());append("file",bytes,Headers.build{append(HttpHeaders.ContentType,"application/octet-stream");append(HttpHeaders.ContentDisposition,"filename=\"source\"")})}))
+        }
+        if(response.status.value !in 200..299){if(response.status.value==401){denied=true;deadline=0};throw RovaiHostFailure("host.upload_http_${response.status.value}",unknownResult=true)}
+        val text=response.bodyAsText();require(text.length<=32*1024*1024){"上传响应超过限制"};return json.parseToJsonElement(text).jsonObject
+    }
+    suspend fun uploadStatus(intent:JsonObject,action:String="reconcile"):JsonObject {
+        require(action in listOf("reconcile","receipt","retry","finish")){"上传操作无效"}
+        val current=connect();return post("uploads/$action",intent,current.token).jsonObject
     }
     suspend fun command(operation:RovaiOperation,command:JsonObject,commandId:String=UUID.randomUUID().toString()):JsonElement=
         request(operation,buildJsonObject{put("commandId",commandId);put("command",command)})

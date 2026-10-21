@@ -1,4 +1,5 @@
 import Foundation
+import CryptoKit
 
 struct RovaiHostSession: Codable, Sendable {
     let token: String
@@ -77,6 +78,21 @@ actor RovaiHostClient {
         catch { if (error as? RovaiHostFailure)?.code == "host.unauthorized" { denied = true; deadline = 0 }; throw RovaiHostFailure(code: error.localizedDescription, unknownResult: true) }
         if let error = envelope["error"], error != .null { throw RovaiHostFailure(code: error.prettyString) }
         return envelope["result"] ?? .null
+    }
+    func upload(intent: JSONValue, data: Data) async throws -> JSONValue {
+        guard data.count <= 20 * 1024 * 1024, intent["byteSize"]?.rvInt == data.count else { throw RovaiHostFailure(code: "文件超过20MB或大小已变化") }
+        let digest = SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+        guard intent.text("sha256") == digest else { throw RovaiHostFailure(code: "上传文件已变化") }
+        let current = try await connect(); let boundary = "Rovai-" + UUID().uuidString
+        var bytes = Data(); bytes.append(Data("--\(boundary)\r\nContent-Disposition: form-data; name=\"intent\"\r\nContent-Type: application/json\r\n\r\n".utf8)); bytes.append(try JSONEncoder().encode(intent))
+        bytes.append(Data("\r\n--\(boundary)\r\nContent-Disposition: form-data; name=\"file\"; filename=\"source\"\r\nContent-Type: application/octet-stream\r\n\r\n".utf8)); bytes.append(data); bytes.append(Data("\r\n--\(boundary)--\r\n".utf8))
+        var request = URLRequest(url: endpoint("uploads")); request.httpMethod = "POST"; request.setValue("Bearer " + current.token, forHTTPHeaderField: "Authorization"); request.setValue("multipart/form-data; boundary=" + boundary, forHTTPHeaderField: "Content-Type"); request.httpBody = bytes
+        let (reply, response) = try await session.data(for: request)
+        guard let response = response as? HTTPURLResponse, (200...299).contains(response.statusCode) else { if (response as? HTTPURLResponse)?.statusCode == 401 { denied = true; deadline = 0 }; throw RovaiHostFailure(code: "host.upload_result_unknown", unknownResult: true) }
+        guard reply.count <= 32 * 1024 * 1024 else { throw RovaiHostFailure(code: "host.upload_response_limit", unknownResult: true) }; return try JSONDecoder().decode(JSONValue.self, from: reply)
+    }
+    func uploadStatus(intent: JSONValue, action: String = "reconcile") async throws -> JSONValue {
+        guard ["reconcile", "receipt", "retry", "finish"].contains(action) else { throw RovaiHostFailure(code: "上传操作无效") }; let current = try await connect(); return try await post("uploads/" + action, body: intent, bearer: current.token)
     }
     func command(_ operation: RovaiOperation, command: JSONValue, id: UUID) async throws -> JSONValue {
         try await request(operation, params: .object(["commandId": .string(id.uuidString.lowercased()), "command": command]))
