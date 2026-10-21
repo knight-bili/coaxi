@@ -90,6 +90,7 @@ pub(super) fn reconcile(
             )
         }
         "missions.update" => user!(crate::mission::UpdateMissionCommand),
+        "missions.attachments.remove" => user!(crate::mission::RemoveMissionAttachmentCommand),
         "missions.status" => user!(crate::mission::StatusMissionCommand),
         "missions.start" => user!(crate::mission::StartMissionCommand),
         "missions.linkPr" => user!(crate::mission::LinkMissionPrCommand),

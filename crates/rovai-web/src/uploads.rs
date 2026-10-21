@@ -11,9 +11,9 @@ pub const MAX_BYTES: usize = 20 * 1024 * 1024;
 
 // Before binding this guard owns cleanup, including a disconnected multipart
 // request. Once submitted, only a definitive Core receipt permits deletion.
-struct TemporaryUpload {
+pub(super) struct TemporaryUpload {
     directory: PathBuf,
-    retain: bool,
+    pub(super) retain: bool,
 }
 impl TemporaryUpload {
     fn create() -> Result<Self> {
@@ -30,7 +30,7 @@ impl TemporaryUpload {
             retain: false,
         })
     }
-    fn path(&self) -> PathBuf {
+    pub(super) fn path(&self) -> PathBuf {
         self.directory.join("source")
     }
 }
@@ -42,13 +42,13 @@ impl Drop for TemporaryUpload {
     }
 }
 
-struct ReceivedUpload {
-    temporary: TemporaryUpload,
-    hash: String,
-    size: u64,
+pub(super) struct ReceivedUpload {
+    pub(super) temporary: TemporaryUpload,
+    pub(super) hash: String,
+    pub(super) size: u64,
     prefix: Vec<u8>,
 }
-async fn receive(mut field: axum::extract::multipart::Field<'_>) -> Result<ReceivedUpload> {
+pub(super) async fn receive(mut field: axum::extract::multipart::Field<'_>) -> Result<ReceivedUpload> {
     let temporary = TemporaryUpload::create()?;
     let file = tokio::fs::File::create(temporary.path()).await?;
     let mut file = tokio::io::BufWriter::with_capacity(64 * 1024, file);

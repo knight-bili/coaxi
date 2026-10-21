@@ -1263,10 +1263,10 @@ impl Core {
                     Ok(value)
                 }
             }
-            "missions.create" | "missions.createWithAttachments" => {
+            "missions.create" | "missions.createWithAttachments" | "host.missions.createWithAttachments" => {
                 let mut params: UserCommandParams<CreateMissionCommand> =
-                    if request.method == "missions.createWithAttachments" {
-                        anyhow::ensure!(request.client.is_desktop(), "mission.desktop_required");
+                    if request.method.ends_with("createWithAttachments") {
+                        anyhow::ensure!(request.client.is_desktop() || request.method == "host.missions.createWithAttachments", "mission.desktop_required");
                         let private: CreateMissionWithAttachmentsParams =
                             serde_json::from_value(request.params.clone())?;
                         let mut command = private.command;
@@ -1312,16 +1312,21 @@ impl Core {
                     "missions.create",
                     execution.result.payload["threadId"].as_str(),
                 );
-                Ok(serde_json::to_value(execution.result)?)
+                if request.method.starts_with("host.") {
+                    Ok(json!({"receipt":execution.result,"replayed":execution.replayed}))
+                } else {
+                    Ok(serde_json::to_value(execution.result)?)
+                }
             }
             "missions.update"
             | "missions.updateWithAttachments"
+            | "host.missions.updateWithAttachments"
             | "missions.attachments.remove"
             | "missions.status"
             | "missions.start"
             | "missions.linkPr" => {
-                let private_update = if request.method == "missions.updateWithAttachments" {
-                    anyhow::ensure!(request.client.is_desktop(), "mission.desktop_required");
+                let private_update = if request.method.ends_with("updateWithAttachments") {
+                    anyhow::ensure!(request.client.is_desktop() || request.method == "host.missions.updateWithAttachments", "mission.desktop_required");
                     let private: UpdateMissionWithAttachmentsParams =
                         serde_json::from_value(request.params.clone())?;
                     let mut command = private.command;
@@ -1341,7 +1346,7 @@ impl Core {
                 };
                 let mut database = self.database.lock().await;
                 let execution = match request.method.as_str() {
-                    "missions.update" | "missions.updateWithAttachments" => {
+                    "missions.update" | "missions.updateWithAttachments" | "host.missions.updateWithAttachments" => {
                         let params: UserCommandParams<UpdateMissionCommand> = match private_update {
                             Some(params) => params,
                             None => serde_json::from_value(request.params.clone())?,
@@ -1388,7 +1393,11 @@ impl Core {
                     self.delivery_batch_scheduler_notify.notify_one();
                 }
                 emit_missions_invalidated(&self.output, &request.method, None);
-                Ok(serde_json::to_value(execution.result)?)
+                if request.method.starts_with("host.") {
+                    Ok(json!({"receipt":execution.result,"replayed":execution.replayed}))
+                } else {
+                    Ok(serde_json::to_value(execution.result)?)
+                }
             }
             _ => anyhow::bail!("Unsupported Mission operation"),
         }

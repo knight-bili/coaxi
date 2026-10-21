@@ -59,7 +59,10 @@ export function createThreadAdapter(transport: ConsoleClient, selectWorkspaceDir
     },
     canvasCoreIdentity: () => transport.canvasCoreIdentity(),
     platform: browserPlatform(),
-    missionAttachments: null,
+    missionAttachments: {
+      create: (id, command, attachments) => transport.missionAttachments('missions.create', id, command, [], attachments),
+      update: (id, command, keep, attachments) => transport.missionAttachments('missions.update', id, command, keep, attachments)
+    },
     editingRecovery,
     retryPendingCommand: (method, params) => transport.retryPendingCommand(method, params),
     exportDiagnostics: async () => downloadJson(await transport.request('diagnostics.export'), 'rovai-diagnostics.json'),

@@ -8,6 +8,7 @@ mod resources;
 mod office_proxy;
 mod updates;
 mod uploads;
+mod mission_uploads;
 mod workspaces;
 pub use updates::{UpdateFuture, UpdateHost, UpdateRequest};
 
@@ -222,6 +223,7 @@ fn routes(state: WebState) -> Router {
             "/uploads",
             post(uploads::upload).layer(DefaultBodyLimit::max(uploads::MAX_BYTES + 16384)),
         )
+        .route("/mission-files", post(mission_uploads::submit).layer(DefaultBodyLimit::max(10 * uploads::MAX_BYTES + 65536)))
         .route("/uploads/reconcile", post(uploads::reconcile))
         .route("/uploads/receipt", post(uploads::receipt))
         .route("/uploads/retry", post(uploads::retry))

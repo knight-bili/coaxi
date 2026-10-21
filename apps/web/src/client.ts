@@ -142,6 +142,7 @@ export const WEB_OPERATIONS = [
   'missions.diffSession.release',
   'missions.create',
   'missions.update',
+  'missions.attachments.remove',
   'missions.status',
   'missions.start',
   'missions.linkPr',
@@ -273,6 +274,7 @@ const RECONCILABLE_COMMANDS = new Set<WebOperation>([
   'memory.hearthReviewItems.reject',
   'missions.create',
   'missions.update',
+  'missions.attachments.remove',
   'missions.status',
   'missions.start',
   'missions.linkPr',
@@ -304,7 +306,8 @@ function commandGroup(operation: WebOperation, params: unknown): string {
 }
 
 export type ConnectionState = 'connecting' | 'live' | 'offline' | 'expired'
-type PendingCommand = { operation: WebOperation; params: unknown; resolve(value: unknown): void; reject(error: unknown): void }
+export type MissionFilesIntent = { operation: 'missions.create' | 'missions.update'; commandId: string; command: import('@contracts').MissionCreate | import('@contracts').MissionUpdate; keepAttachmentIds: string[]; files: Array<{ id: string; displayName: string; byteSize: number; sha256: string }> }
+type PendingCommand = { operation: WebOperation; params: unknown; missionFiles?: { intent: MissionFilesIntent; data?: FormData }; resolve(value: unknown): void; reject(error: unknown): void }
 type PendingUpload = { intent: unknown; data: FormData | null; resolve(draft: unknown): void; reject(error: unknown): void }
 type CommandReceipt = { state: 'unknown' | 'recorded'; result?: unknown; error?: { code: string; message?: string } }
 
@@ -420,7 +423,7 @@ export class ConsoleClient {
     if (this.#restored) return this.authenticated
     this.#restored = true
     const raw = this.#storage?.getItem(RECOVERY_KEY)
-    type Recovery = { version: number; origin: string; token?: string | null; editor: { clientId: string; proof: string }; ownerId: string; pending?: Array<{ operation: WebOperation; params: unknown }>; uploads?: unknown[] }
+    type Recovery = { version: number; origin: string; token?: string | null; editor: { clientId: string; proof: string }; ownerId: string; pending?: Array<{ operation: WebOperation; params: unknown; missionFiles?: { intent: MissionFilesIntent } }>; uploads?: unknown[] }
     let saved: Recovery | null = null
     const identity = (value: unknown) => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value)
     if (raw) {
@@ -496,7 +499,7 @@ export class ConsoleClient {
   #persistRecovery(): void {
     if (!this.#storage || !this.#editor || !this.#ownerId) return
     this.#storage.setItem(RECOVERY_KEY, JSON.stringify({ version: 2, origin: this.origin, editor: this.#editor, ownerId: this.#ownerId,
-      pending: [...this.#pending.values()].map(({ operation, params }) => ({ operation, params })), uploads: [...this.#pendingUploads.values()].map(({ intent }) => intent) }))
+      pending: [...this.#pending.values()].map(({ operation, params, missionFiles }) => ({ operation, params, ...(missionFiles ? { missionFiles: { intent: missionFiles.intent } } : {}) })), uploads: [...this.#pendingUploads.values()].map(({ intent }) => intent) }))
   }
 
   clearEditingRecovery(): void { this.#storage?.removeItem('rovai.web.edits.v1') }
@@ -681,12 +684,19 @@ export class ConsoleClient {
   }
 
   async #dispatchCommand(commandId: string, entry: PendingCommand, preserveUnknown = false): Promise<void> {
-    await this.#rpc(entry.operation, entry.params).then(value => {
+    const send = async (): Promise<unknown> => {
+      if (!entry.missionFiles) return this.#rpc(entry.operation, entry.params)
+      if (!entry.missionFiles.data) throw new Error('请重新选择原使命附件后重试；本次只会使用已保存的原提交。')
+      const result = await this.#json<{ result?: unknown; error?: { code: string; message?: string } }>('mission-files', { method: 'POST', body: entry.missionFiles.data })
+      if (result.error) throw new CoreRequestError(result.error.code, result.error.message)
+      return result.result
+    }
+    await send().then(value => {
         if (this.#pending.get(commandId) !== entry) return
         this.#pending.delete(commandId); this.#notifyPending(); entry.resolve(value)
       }).catch(error => {
         if (preserveUnknown) { void this.reconcilePending(); return }
-        if (error instanceof HttpRequestError && ['operation_not_admitted', 'workspace_not_authorized', 'request_capacity'].includes(error.code)) {
+        if (error instanceof HttpRequestError && ['operation_not_admitted', 'workspace_not_authorized', 'request_capacity', 'invalid_mission_upload', 'upload_changed_or_session_expired', 'upload_capacity'].includes(error.code)) {
           if (this.#pending.get(commandId) === entry) { this.#pending.delete(commandId); this.#notifyPending(); entry.reject(error) }
           return
         }
@@ -711,6 +721,63 @@ export class ConsoleClient {
       else if (receipt.state === 'recorded') entry.resolve(receipt.result)
       else entry.reject(error) // Explicit Core completion plus a successful absent-receipt lookup.
     } catch { /* Still unknown if reconciliation itself could not complete. */ }
+  }
+
+  pendingMissionFiles(): Array<{ commandId: string; intent: MissionFilesIntent; needsFiles: boolean }> {
+    return [...this.#pending.entries()].flatMap(([commandId, entry]) => entry.missionFiles ? [{ commandId, intent: structuredClone(entry.missionFiles.intent), needsFiles: !entry.missionFiles.data }] : [])
+  }
+
+  async resumeMissionFiles(commandId: string, files: File[]): Promise<void> {
+    const entry = this.#pending.get(commandId)
+    if (!entry?.missionFiles) throw new Error('原使命提交已核对完成。')
+    await this.reconcilePending()
+    if (this.#pending.get(commandId) !== entry) return
+    const scope = this.editingScope, generation = this.#generation
+    const expected = entry.missionFiles.intent.files
+    if (files.length !== expected.length) throw new Error('请一次选择原提交中的全部附件。')
+    const candidates = await Promise.all(files.map(async file => ({ file, sha256: await fileDigest(file, this.#lifetime.signal) })))
+    const selected = new Set<number>()
+    const data = new FormData(); data.append('intent', JSON.stringify(entry.missionFiles.intent))
+    for (const item of expected) {
+      const index = candidates.findIndex((candidate, i) => !selected.has(i) && candidate.file.name === item.displayName && candidate.file.size === item.byteSize && candidate.sha256 === item.sha256)
+      if (index < 0) throw new Error('所选文件与原附件名称、大小或内容不一致；原提交保留。')
+      selected.add(index); data.append(`file:${item.id}`, candidates[index].file)
+    }
+    if (!this.authenticated || scope !== this.editingScope || generation !== this.#generation || this.#pending.get(commandId) !== entry) throw new DOMException('Connection replaced', 'AbortError')
+    entry.missionFiles.data = data
+    await this.#dispatchCommand(commandId, entry, true)
+  }
+
+  async missionAttachments(operation: 'missions.create' | 'missions.update', commandId: string,
+    command: import('@contracts').MissionCreate | import('@contracts').MissionUpdate,
+    keepAttachmentIds: string[], attachments: import('@contracts').MissionAttachmentDraft[]): Promise<import('@contracts').StoredCommandResult> {
+    if (!this.authenticated) throw new SessionRequired()
+    if (attachments.length + keepAttachmentIds.length > 10) throw new Error('使命最多保留 10 份附件。')
+    const scope = this.editingScope, generation = this.#generation
+    const intent: MissionFilesIntent = { operation, commandId, command: structuredClone(command), keepAttachmentIds: [...keepAttachmentIds], files: [] }
+    const data = new FormData()
+    for (const attachment of attachments) {
+      if (attachment.kindHint !== 'file') throw new Error('远程端请选择文件；整个目录请从主机端添加。')
+      if (attachment.file.size > 20 * 1024 * 1024) throw new Error('单个上传文件不能超过 20 MB。')
+      intent.files.push({ id: attachment.id, displayName: attachment.file.name, byteSize: attachment.file.size, sha256: await fileDigest(attachment.file, this.#lifetime.signal) })
+    }
+    if (!this.authenticated || scope !== this.editingScope || generation !== this.#generation) throw new DOMException('Connection replaced', 'AbortError')
+    data.append('intent', JSON.stringify(intent))
+    for (const attachment of attachments) data.append(`file:${attachment.id}`, attachment.file)
+    const params = { commandId, command: intent.command }
+    const previous = this.#pending.get(commandId)
+    if (previous) {
+      if (!previous.missionFiles || JSON.stringify(previous.missionFiles.intent) !== JSON.stringify(intent)) throw new Error('原使命提交仍待核对，不能替换其中的定义或附件。')
+      previous.missionFiles.data = data
+      await this.#dispatchCommand(commandId, previous, true)
+      throw new Error('已核对原提交，请等待使命板刷新。')
+    }
+    if ([...this.#pending.values()].some(entry => entry.operation.startsWith('missions.') && commandGroup(entry.operation, entry.params) === commandGroup(operation, params))) throw new Error('原使命提交仍待核对，请先处理原提交。')
+    return new Promise((resolve, reject) => {
+      const entry: PendingCommand = { operation, params, missionFiles: { intent, data }, resolve: value => resolve(value as import('@contracts').StoredCommandResult), reject }
+      this.#pending.set(commandId, entry); this.#notifyPending()
+      void this.#dispatchCommand(commandId, entry)
+    })
   }
 
   async uploadFile(threadId: string, expectedRevision: number, file: File): Promise<LocalAttachmentSourceView> {
@@ -932,14 +999,14 @@ export class ConsoleClient {
     return this.#json('workspaces', { method: 'POST', body: JSON.stringify({ path, offset }) })
   }
 
-  async #json<T>(path: 'session' | 'session/renew' | 'channels' | 'updates' | 'workspaces' | 'uploads' | 'uploads/reconcile' | 'uploads/receipt' | 'uploads/retry' | 'uploads/finish' | 'files' | 'avatars', options: RequestInit = {}): Promise<T> {
+  async #json<T>(path: 'session' | 'session/renew' | 'channels' | 'updates' | 'workspaces' | 'mission-files' | 'uploads' | 'uploads/reconcile' | 'uploads/receipt' | 'uploads/retry' | 'uploads/finish' | 'files' | 'avatars', options: RequestInit = {}): Promise<T> {
     const generation = this.#generation
     const result = await (await this.#authorized(path, options)).json() as T
     if (generation !== this.#generation) throw new DOMException('Connection replaced', 'AbortError')
     return result
   }
 
-  async #authorized(path: 'session' | 'session/renew' | 'channels' | 'updates' | 'workspaces' | 'uploads' | 'uploads/reconcile' | 'uploads/receipt' | 'uploads/retry' | 'uploads/finish' | 'request' | 'events' | 'logout' | 'files' | 'files/bytes' | 'attachments' | 'avatars', options: RequestInit = {}): Promise<Response> {
+  async #authorized(path: 'session' | 'session/renew' | 'channels' | 'updates' | 'workspaces' | 'mission-files' | 'uploads' | 'uploads/reconcile' | 'uploads/receipt' | 'uploads/retry' | 'uploads/finish' | 'request' | 'events' | 'logout' | 'files' | 'files/bytes' | 'attachments' | 'avatars', options: RequestInit = {}): Promise<Response> {
     if (!this.#token) throw new SessionRequired()
     const generation = this.#generation
     if (this.#localExpiry !== null && this.#localExpiry - this.#now() <= this.#renewalWindow && !['session', 'session/renew', 'logout'].includes(path)) await this.renewIfNeeded()
