@@ -11,6 +11,11 @@ slow-tests = ["extended-tests"]
 legacy-migration-tests = ["slow-tests"]
 
 [dependencies]
+aes-gcm = { version = "0.10", features = ["stream"] }
+argon2 = "0.5"
+rand = "0.8"
+tokio-util = { version = "0.7", features = ["rt"] }
+zip = { version = "2", default-features = false, features = ["deflate"] }
 rovai-computer = { path = "../rovai-computer" }
 anyhow = "1"
 base64 = "0.22"

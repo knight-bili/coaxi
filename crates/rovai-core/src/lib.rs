@@ -170,3 +170,5 @@ pub mod draft_client;
 pub mod web_upload;
 
 pub mod office_preview;
+
+pub mod backup;
