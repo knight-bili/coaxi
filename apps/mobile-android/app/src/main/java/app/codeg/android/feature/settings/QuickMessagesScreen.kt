@@ -105,20 +105,21 @@ private fun MessageRow(msg: QuickMessage, onEdit: () -> Unit, onDelete: () -> Un
 }
 
 @Composable
-private fun QuickMessageEditor(existing: QuickMessage?, onDismiss: () -> Unit, onSave: (String, String) -> Unit) {
+internal fun QuickMessageEditor(existing: QuickMessage?, onDismiss: () -> Unit, onSave: (String, String) -> Unit, busy:Boolean=false, error:String?=null) {
     var title by remember { mutableStateOf(existing?.title ?: "") }
     var content by remember { mutableStateOf(existing?.content ?: "") }
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {if(!busy)onDismiss()},
         title = { Text(if (existing == null) stringResource(R.string.quickmsg_new_title) else stringResource(R.string.quickmsg_edit_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                CodegTextField(title, { title = it }, label = stringResource(R.string.quickmsg_title_label))
-                CodegTextField(content, { content = it }, label = stringResource(R.string.quickmsg_content_label), singleLine = false)
+                CodegTextField(title, { if(!busy)title = it }, label = stringResource(R.string.quickmsg_title_label))
+                CodegTextField(content, { if(!busy)content = it }, label = stringResource(R.string.quickmsg_content_label), singleLine = false)
+                error?.let{Text(it,color=CodegTheme.colors.danger)}
             }
         },
         confirmButton = {
-            TextButton(onClick = { onSave(title, content) }, enabled = title.isNotBlank() && content.isNotBlank()) { Text(stringResource(R.string.common_save)) }
+            TextButton(onClick = { onSave(title, content) }, enabled = !busy && title.isNotBlank() && content.isNotBlank()) { Text(stringResource(R.string.common_save)) }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_cancel)) } },
         containerColor = CodegTheme.colors.bgElevated,
