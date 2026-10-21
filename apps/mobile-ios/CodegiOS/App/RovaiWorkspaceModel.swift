@@ -85,6 +85,29 @@ final class RovaiWorkspaceModel {
         let data = Data(body.utf8); guard data.count <= 64 * 1024 else { throw RovaiHostFailure(code: "草稿超过64KB，请拆分后发送。") }
         guard RovaiSecureSession.save(data.isEmpty ? nil : data, profile: profile.id, account: bodyAccount(owner)) else { throw RovaiHostFailure(code: "草稿未能保存，输入仍在当前页面。") }
     }
+    func executePrivate(_ operation: RovaiOperation, command: JSONValue, owner: String, body: String, replace: Bool = false) async {
+        guard pending == nil else { return }
+        await submit(.object(["operation": .string(operation.rawValue), "params": .object(["commandId": .string(UUID().uuidString.lowercased()), "command": command]), "nativeBody": .object(["owner": .string(owner), "expectedBody": .string(body), "replace": .bool(replace)])]))
+    }
+    private func settlePrivate(_ request: JSONValue, result: JSONValue, profile: ServerProfile, account: String, client: RovaiHostClient) async throws {
+        guard let local = request["nativeBody"], local != .null else { return }
+        let receipt = result["commandResult"] == nil || result["commandResult"] == .null ? result : result["commandResult"]!
+        if receipt.text("status") == "rejected" { return }
+        guard ["applied", "accepted"].contains(receipt.text("status")) else { throw RovaiHostFailure(code: "私聊操作结果尚未确定") }
+        let payload = receipt["payload"] ?? .object([:]); let replace = local["replace"]?.rvBool == true
+        if replace && payload.text("placement") == "retained" { return }
+        var body = ""
+        if replace {
+            guard let draft = payload["draft"], draft["scopeVersion"]?.rvInt == 1, draft.text("scopeKey").isEmpty, draft["composerScope"] == .null, let replacement = payload["body"]?.stringValue else { throw RovaiHostFailure(code: "私聊材料归属发生变化") }; body = replacement
+            let command = request["params"]?["command"] ?? .null
+            let snapshot = try await client.request(request.text("operation").hasPrefix("delegations.") ? .delegationsConversationGet : .singleChatGet, params: .object(["conversationId": command["conversationId"] ?? .null, "composerScope": .null]))
+            guard snapshot["draft"]?["revision"] == draft["revision"] else { throw RovaiHostFailure(code: "材料版本已变化，请先核对原操作") }
+        }
+        let key = "body:" + account + ":" + SHA256.hash(data: Data(local.text("owner").utf8)).map { String(format: "%02x", $0) }.joined()
+        let saved = RovaiSecureSession.load(profile: profile.id, account: key).flatMap { String(data: $0, encoding: .utf8) } ?? ""
+        guard saved == local.text("expectedBody") || saved == body else { throw RovaiHostFailure(code: "输入内容已变化，已保留当前草稿和原请求") }
+        let data = Data(body.utf8); guard data.count <= 64 * 1024, RovaiSecureSession.save(data.isEmpty ? nil : data, profile: profile.id, account: key) else { throw RovaiHostFailure(code: "私聊草稿尚未保存，原请求仍保留") }
+    }
     func execute(_ operation: RovaiOperation, params: JSONValue) async {
         guard pending == nil else { return }
         await submit(.object(["operation": .string(operation.rawValue), "params": params]))
@@ -98,6 +121,7 @@ final class RovaiWorkspaceModel {
             guard RovaiSecureSession.save(bytes, profile: profile.id, account: account) else { throw RovaiHostFailure(code: "无法保存原请求，尚未向工作区发送。") }
             pending = request
             let result = try await client.request(operation, params: params)
+            try await settlePrivate(request, result: result, profile: profile, account: account, client: client)
             RovaiSecureSession.save(nil, profile: profile.id, account: account)
             guard lifetime == generation else { return }
             pending = nil; lastResult = result; lastOperation = operation
@@ -110,7 +134,7 @@ final class RovaiWorkspaceModel {
     func reconcile() async {
         guard !writing, let request = pending, let profile, let client, let operation = RovaiOperation(rawValue: request.text("operation")), let params = request["params"] else { return }
         let lifetime = generation
-        do { let result = try await client.reconcile(operation, params: params); guard lifetime == generation else { return }; if result.text("state") == "recorded" { RovaiSecureSession.save(nil, profile: profile.id, account: account); pending = nil; lastResult = result["result"]; lastOperation = operation; await refresh() } else { issue = "原操作结果尚不明确，请稍后核对或重试原操作。" } } catch { if lifetime == generation { failure(error) } }
+        do { let result = try await client.reconcile(operation, params: params); guard lifetime == generation else { return }; if result.text("state") == "recorded" { try await settlePrivate(request, result: result["result"] ?? .null, profile: profile, account: account, client: client); RovaiSecureSession.save(nil, profile: profile.id, account: account); pending = nil; lastResult = result["result"]; lastOperation = operation; await refresh() } else { issue = "原操作结果尚不明确，请稍后核对或重试原操作。" } } catch { if lifetime == generation { failure(error) } }
     }
     func command(_ operation: RovaiOperation, value: JSONValue) async { await execute(operation, params: .object(["commandId": .string(UUID().uuidString.lowercased()), "command": value])) }
     func send(_ text: String, recipients: Set<String>) async {
