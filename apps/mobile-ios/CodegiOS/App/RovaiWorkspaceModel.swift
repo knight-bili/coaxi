@@ -157,6 +157,11 @@ final class RovaiWorkspaceModel {
         if let error = reply["error"], error != .null {throw RovaiHostFailure(code: error.text("message"), unknownResult: true)}
         try await completeMissionBatch(attempted, receipt: reply["result"] ?? .null, profile: profile, account: account, client: client, lifetime: lifetime)
     }
+    /// Attach local draft ownership without changing a flat Host command's original shape.
+    func executeOwned(_ operation: RovaiOperation, params: JSONValue, owner: String, body: String) async {
+        guard pending == nil else {return}
+        await submit(.object(["operation": .string(operation.rawValue), "params": params, "nativeBody": .object(["owner": .string(owner), "expectedBody": .string(body), "replace": .bool(false)])]))
+    }
     func executePrivate(_ operation: RovaiOperation, command: JSONValue, owner: String, body: String, replace: Bool = false) async {
         guard pending == nil else { return }
         await submit(.object(["operation": .string(operation.rawValue), "params": .object(["commandId": .string(UUID().uuidString.lowercased()), "command": command]), "nativeBody": .object(["owner": .string(owner), "expectedBody": .string(body), "replace": .bool(replace)])]))

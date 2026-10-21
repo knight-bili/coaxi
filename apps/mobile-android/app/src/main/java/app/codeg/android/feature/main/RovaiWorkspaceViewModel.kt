@@ -102,6 +102,11 @@ class RovaiWorkspaceViewModel @Inject constructor(private val servers:ServerRepo
         servers.saveRovaiPending(selected,marked);if(generation==lifetime)mutable.update{it.copy(pending=marked)}
         val bytes=RovaiUploadSource.bytes(appContext,params);completeUpload(marked,current.upload(intent,bytes),selected,generation)
     }
+    /** Retain the original closed Host request shape, including flat commands such as tasks.update. */
+    fun executeOwned(operation:RovaiOperation,params:JsonObject,owner:String,body:String){
+        if(state.value.pending!=null)return
+        submit(buildJsonObject{put("operation",operation.wire);put("params",params);putJsonObject("nativeBody"){put("owner",owner);put("expectedBody",body);put("replace",false)}})
+    }
     fun executePrivate(operation:RovaiOperation,command:JsonObject,owner:String,body:String,replace:Boolean=false){
         if(state.value.pending!=null)return
         submit(buildJsonObject{put("operation",operation.wire);putJsonObject("params"){put("commandId",UUID.randomUUID().toString());put("command",command)};putJsonObject("nativeBody"){put("owner",owner);put("expectedBody",body);put("replace",replace)}})
