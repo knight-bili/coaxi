@@ -60,8 +60,9 @@ impl WebDav{
         }
         anyhow::bail!("webdav.concurrent_index_update; encrypted blob retained")
     }
-    pub async fn pull(&self,id:&str,destination:&Path)->Result<Snapshot>{
+    pub async fn pull(&self,id:&str,destination:&Path,expected_digest:Option<&str>)->Result<Snapshot>{
         uuid::Uuid::parse_str(id)?;let (index,_)=self.index().await?;let snapshot=index.entries.into_iter().find(|entry|entry.id==id).context("webdav.snapshot_missing")?;
+        ensure!(expected_digest.is_none_or(|digest|digest==snapshot.sha256),"webdav.remote_selection_changed");
         ensure!(!destination.exists(),"webdav.destination_exists");let parent=std::fs::canonicalize(destination.parent().context("webdav.destination_parent_required")?)?;let temporary:PathBuf=parent.join(format!(".rovai-download-{}.tmp",uuid::Uuid::new_v4()));
         let result=async{let mut response=self.request(Method::GET,self.url(&Self::blob_name(&snapshot))?).timeout(Duration::from_secs(43200)).send().await?.error_for_status()?;let mut file=tokio::fs::OpenOptions::new().write(true).create_new(true).open(&temporary).await?;let mut hash=Sha256::new();let mut length=0_u64;
             while let Some(chunk)=response.chunk().await?{length=length.checked_add(chunk.len() as u64).context("webdav.length_overflow")?;ensure!(length<=snapshot.bytes,"webdav.download_limit");hash.update(&chunk);file.write_all(&chunk).await?;progress(length,snapshot.bytes,"download");}

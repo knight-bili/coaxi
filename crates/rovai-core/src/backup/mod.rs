@@ -32,6 +32,7 @@ pub struct Manifest{pub format_version:u32,pub product:String,pub app_version:St
 #[derive(Serialize,Deserialize)]
 #[serde(rename_all="camelCase",deny_unknown_fields)]
 struct Pending{root:PathBuf,staging:PathBuf,safety:PathBuf,manifest:Manifest,state:String,units:Vec<String>}
+pub fn file_digest(path:&Path)->Result<(u64,String)>{hash_file(path)}
 fn hash_file(path:&Path)->Result<(u64,String)>{let mut file=fs::File::open(path)?;let mut hash=Sha256::new();let mut bytes=0_u64;let mut buffer=[0_u8;64*1024];loop{let count=file.read(&mut buffer)?;if count==0{break}bytes+=count as u64;hash.update(&buffer[..count]);}Ok((bytes,format!("{:x}",hash.finalize())))}
 fn no_link(path:&Path)->Result<()>{let metadata=fs::symlink_metadata(path)?;ensure!(!metadata.file_type().is_symlink(),"backup.linked_path: {}",path.display());#[cfg(windows)]{use std::os::windows::fs::MetadataExt;ensure!(metadata.file_attributes()&0x400==0,"backup.linked_path");}Ok(())}
 fn name(value:&str)->Result<()>{ensure!(!value.is_empty()&&!value.contains(['\0',':','\\'])&&Path::new(value).components().all(|part|matches!(part,Component::Normal(_))),"backup.invalid_entry");Ok(())}

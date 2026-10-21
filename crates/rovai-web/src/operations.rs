@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 /// and the legacy shared draft remain outside the network capability.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum Operation {
+    #[serde(rename="backup.webdav.settings")]
+    WebdavSettings,
     #[serde(rename="history.library")]
     HistoryLibrary,
     #[serde(rename="office.watch")]
@@ -485,6 +487,7 @@ pub enum Operation {
 impl Operation {
     pub fn timeout(self) -> std::time::Duration {
         std::time::Duration::from_secs(match self {
+            Self::WebdavSettings => 30,
             Self::HistoryLibrary => 30,
             Self::OfficeWatch => 30,
             Self::ForgeOperation => 60,
@@ -506,6 +509,7 @@ impl Operation {
         match self {
             Self::AppInfo => json!({"name":value["name"],"version":value["version"]}),
             Self::ForgeAccountsGet | Self::ForgeAccountsSet => select_fields(&value, &["accounts"]),
+            Self::WebdavSettings => select_fields(&value,&["revision","endpoint","username","passwordSet","allowInsecure"]),
             Self::HistoryLibrary => select_fields(&value,&["entries","digest","totalBytes","offset","next","bytes","saved"]),
             Self::OfficeWatch => select_fields(&value,&["holdId","port","cap","editable","released","installed","formats"]),
             Self::ForgeOperation => select_fields(&value, &["provider", "webUrl", "ownerRepo", "repositoryKey", "repository", "success", "status", "data", "missionDraft", "nextPage"]),
@@ -581,6 +585,7 @@ impl Operation {
         match self {
             Self::ForgeAccountsGet => "forge.accounts.get",
             Self::ForgeAccountsSet => "forge.accounts.set",
+            Self::WebdavSettings => "backup.webdav.settings",
             Self::HistoryLibrary => "history.library",
             Self::OfficeWatch => "office.watch",
             Self::ForgeOperation => "forge.operation",

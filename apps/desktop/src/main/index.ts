@@ -300,6 +300,7 @@ const allowedMethods = new Set<CoreMethod>([
   'workspaces.worktrees',
   'workbench.files.list',
   'workbench.organizer.get',
+  'backup.webdav.settings',
   'history.library',
   'office.watch',
   'forge.accounts.get',
