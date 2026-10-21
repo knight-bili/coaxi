@@ -11,5 +11,14 @@
     "rovai": "cc465dda562536b94f23787759e3206324baa29e",
     "codeg": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f"
   },
-  "sourceProductVersionPreservedUntilRelease": true
+  "sourceProductVersionPreservedUntilRelease": true,
+  "desktopIdentity": {
+    "productName": "Codeg Rovai Workbench",
+    "applicationId": "app.codegrovai.workbench.desktop",
+    "defaultDataDirectory": "Codeg Rovai Workbench",
+    "bootstrapDirectory": "Codeg Rovai Workbench Bootstrap",
+    "legacyDataPolicy": "never_auto_adopt",
+    "explicitDataRootPreserved": true,
+    "uninstallPreservesDataByDefault": true
+  }
 }

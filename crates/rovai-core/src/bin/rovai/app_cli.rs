@@ -1529,11 +1529,7 @@ fn load_automation_context() -> Result<AutomationContext> {
     let path = env::var_os(CONTEXT_ENV)
         .map(PathBuf::from)
         .or_else(|| {
-            dirs::data_dir().map(|root| {
-                root.join("Rovai AI")
-                    .join("automation-v1")
-                    .join("connection-v1.json")
-            })
+            rovai_core::product_identity::desktop_automation_root().map(|root|root.join("connection-v1.json"))
         })
         .ok_or_else(|| CliError::new("app_not_running", "Rovai Desktop is not running."))?;
     let raw = fs::read(&path)
@@ -1883,10 +1879,8 @@ fn write_trial_bundle(
 }
 
 fn trial_journal_path(trial_id: &str) -> Result<PathBuf> {
-    let root = dirs::data_dir()
+    let root = rovai_core::product_identity::desktop_automation_root()
         .context("User data directory is unavailable")?
-        .join("Rovai AI")
-        .join("automation-v1")
         .join("trials");
     fs::create_dir_all(&root)?;
     restrict_private_directory(&root)?;

@@ -1,6 +1,6 @@
 {
   "name": "rovai-ai",
-  "productName": "Rovai AI",
+  "productName": "Codeg Rovai Workbench",
   "version": "0.4.8",
   "private": true,
   "type": "module",
@@ -276,8 +276,8 @@
     "esbuild": "0.28.1"
   },
   "build": {
-    "appId": "ai.rovai.desktop",
-    "productName": "Rovai AI",
+    "appId": "app.codegrovai.workbench.desktop",
+    "productName": "Codeg Rovai Workbench",
     "asar": true,
     "directories": {
       "output": "dist",
@@ -365,7 +365,7 @@
       "entitlements": "build/entitlements.mac.plist",
       "entitlementsInherit": "build/entitlements.mac.plist",
       "extendInfo": {
-        "CFBundleDisplayName": "Rovai AI",
+        "CFBundleDisplayName": "Codeg Rovai Workbench",
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": false,
           "NSAllowsLocalNetworking": true
@@ -378,11 +378,11 @@
         "dmg",
         "zip"
       ],
-      "artifactName": "Rovai-AI-${version}-${arch}.${ext}"
+      "artifactName": "Codeg-Rovai-Workbench-${version}-${arch}.${ext}"
     },
     "win": {
       "icon": "build/icon.png",
-      "executableName": "Rovai-ai",
+      "executableName": "Codeg Rovai Workbench",
       "target": [
         {
           "target": "nsis",
@@ -449,7 +449,7 @@
           "to": "workbench/product-release.json"
         }
       ],
-      "artifactName": "Rovai-AI-${version}-${arch}.${ext}"
+      "artifactName": "Codeg-Rovai-Workbench-${version}-${arch}.${ext}"
     },
     "nsis": {
       "oneClick": false,
@@ -463,7 +463,7 @@
       "warningsAsErrors": true
     },
     "dmg": {
-      "title": "Rovai AI ${version}",
+      "title": "Codeg Rovai Workbench ${version}",
       "window": {
         "width": 540,
         "height": 380

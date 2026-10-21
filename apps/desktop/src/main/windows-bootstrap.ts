@@ -1,3 +1,4 @@
+import { PRODUCT_ID } from '../shared/product-identity'
 import { createHash } from 'node:crypto'
 import { win32 } from 'node:path'
 import type { StructuredError } from '@contracts'
@@ -17,7 +18,7 @@ export type WindowsBootstrapAssessment =
 /** Stable before either successful or failed full-root preparation. Not an ACL/identity claim. */
 export function windowsBootstrapInstanceKey(explicitRoot: string | null): string {
   const identity = explicitRoot === null ? 'daily' : `explicit:${win32.normalize(explicitRoot).toLowerCase()}`
-  return createHash('sha256').update(identity).digest('hex').slice(0, 32)
+  return createHash('sha256').update(`${PRODUCT_ID}:${identity}`).digest('hex').slice(0, 32)
 }
 
 /** Synchronous pre-ready composition. Authority preparation never escapes into Main module loading. */

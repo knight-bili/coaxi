@@ -1,3 +1,4 @@
+import { PRODUCT_NAME, PRODUCT_APPLICATION_ID, PRODUCT_DATA_DIRECTORY } from '../shared/product-identity'
 import { recoverLocalDataBeforeStores } from './configuration-recovery'
 import { PetWindowService } from './pet-window'
 import { WebdavWorkspace } from './webdav-workspace'
@@ -77,7 +78,6 @@ import {
   inspectMemberAvatarSourceFile,
   MemberAvatarAssetService
 } from './member-avatar-assets'
-import { legacyUserDataPath } from './user-data-path'
 import { deleteRetiredManagedDirectory } from './quick-chat-cutover'
 import { CurrentUserProfileStore } from './current-user-profile'
 import { NavigationPreferencesStore } from './navigation-preferences'
@@ -438,8 +438,9 @@ const allowedMethods = new Set<CoreMethod>([
   'events.subscribe',
   'diagnostics.export'
 ])
-const APP_NAME = 'Rovai AI'
+const APP_NAME = PRODUCT_NAME
 app.setName(APP_NAME)
+if (process.platform === 'win32') app.setAppUserModelId(PRODUCT_APPLICATION_ID)
 protocol.registerSchemesAsPrivileged([{
   scheme: 'rovai-preview',
   privileges: {
@@ -483,12 +484,7 @@ if (process.platform === 'win32') {
       `Core 未启动，也没有创建替代工作区。\n\n${windowsBootstrap.error.message}`)
   }
 } else {
-  const legacyDataPath = legacyUserDataPath(
-    app.getPath('appData'),
-    APP_NAME,
-    hasExplicitUserDataDirectory
-  )
-  if (legacyDataPath) app.setPath('userData', legacyDataPath)
+  if (!hasExplicitUserDataDirectory) app.setPath('userData', join(app.getPath('appData'), PRODUCT_DATA_DIRECTORY))
   coreDataPath = app.getPath('userData')
   primaryInstance = isolatedAcceptanceInstance || app.requestSingleInstanceLock()
 }

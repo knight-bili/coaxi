@@ -104,24 +104,24 @@ Var rovaiShutdownFailure
 !macro ROVAI_SET_SHUTDOWN_MESSAGES
   ${if} $IsPowerShellAvailable != 0
     ${if} $LANGUAGE == 2052
-      StrCpy $rovaiShutdownPrompt "安装器无法验证 Rovai 进程的安装路径，因此不会自动结束任何进程。请在任务管理器中关闭 Rovai AI、rovai-host、rovai-core 和 rovai，然后点击“重试”再等待 20 秒；点击“取消”停止安装。"
+      StrCpy $rovaiShutdownPrompt "安装器无法验证 Rovai 进程的安装路径，因此不会自动结束任何进程。请在任务管理器中关闭 Codeg Rovai Workbench、rovai-host、rovai-core 和 rovai，然后点击“重试”再等待 20 秒；点击“取消”停止安装。"
       StrCpy $rovaiShutdownFailure "仍检测到 Rovai 进程，或无法验证其安装路径，安装已安全停止。请关闭对应进程，并确认 Windows PowerShell 未被策略禁用，然后重新运行安装程序。"
     ${elseif} $LANGUAGE == 1028
-      StrCpy $rovaiShutdownPrompt "安裝程式無法驗證 Rovai 程序的安裝路徑，因此不會自動結束任何程序。請在工作管理員中關閉 Rovai AI、rovai-host、rovai-core 和 rovai，然後點擊「重試」再等待 20 秒；點擊「取消」停止安裝。"
+      StrCpy $rovaiShutdownPrompt "安裝程式無法驗證 Rovai 程序的安裝路徑，因此不會自動結束任何程序。請在工作管理員中關閉 Codeg Rovai Workbench、rovai-host、rovai-core 和 rovai，然後點擊「重試」再等待 20 秒；點擊「取消」停止安裝。"
       StrCpy $rovaiShutdownFailure "仍偵測到 Rovai 程序，或無法驗證其安裝路徑，安裝已安全停止。請關閉對應程序，並確認 Windows PowerShell 未被原則停用，然後重新執行安裝程式。"
     ${else}
-      StrCpy $rovaiShutdownPrompt "Setup could not verify the installation path of the Rovai processes, so it will not end any process automatically. Close Rovai AI, rovai-host, rovai-core, and rovai in Task Manager, then click Retry to wait another 20 seconds, or Cancel to stop setup."
+      StrCpy $rovaiShutdownPrompt "Setup could not verify the installation path of the Rovai processes, so it will not end any process automatically. Close Codeg Rovai Workbench, rovai-host, rovai-core, and rovai in Task Manager, then click Retry to wait another 20 seconds, or Cancel to stop setup."
       StrCpy $rovaiShutdownFailure "Rovai processes are still detected, or their installation paths could not be verified, so setup stopped safely. Close them and confirm that Windows PowerShell is not disabled by policy, then run setup again."
     ${endif}
   ${elseif} $LANGUAGE == 2052
-    StrCpy $rovaiShutdownPrompt "Rovai AI 在 20 秒内尚未完成受控退出。$\r$\n$\r$\n点击“是”仅强制关闭安装目录内仍在运行的 Rovai 进程；点击“否”可再等待 20 秒，以便你手动关闭；点击“取消”停止安装。"
-    StrCpy $rovaiShutdownFailure "Rovai AI 仍无法退出，安装已安全停止。它可能以管理员身份或在其他 Windows 会话中运行。请在任务管理器中结束对应进程，然后重新运行安装程序。"
+    StrCpy $rovaiShutdownPrompt "Codeg Rovai Workbench 在 20 秒内尚未完成受控退出。$\r$\n$\r$\n点击“是”仅强制关闭安装目录内仍在运行的 Rovai 进程；点击“否”可再等待 20 秒，以便你手动关闭；点击“取消”停止安装。"
+    StrCpy $rovaiShutdownFailure "Codeg Rovai Workbench 仍无法退出，安装已安全停止。它可能以管理员身份或在其他 Windows 会话中运行。请在任务管理器中结束对应进程，然后重新运行安装程序。"
   ${elseif} $LANGUAGE == 1028
-    StrCpy $rovaiShutdownPrompt "Rovai AI 在 20 秒內尚未完成受控退出。$\r$\n$\r$\n點擊「是」僅強制關閉安裝目錄內仍在執行的 Rovai 程序；點擊「否」可再等待 20 秒，以便你手動關閉；點擊「取消」停止安裝。"
-    StrCpy $rovaiShutdownFailure "Rovai AI 仍無法退出，安裝已安全停止。它可能以系統管理員身分或在其他 Windows 工作階段中執行。請在工作管理員中結束對應程序，然後重新執行安裝程式。"
+    StrCpy $rovaiShutdownPrompt "Codeg Rovai Workbench 在 20 秒內尚未完成受控退出。$\r$\n$\r$\n點擊「是」僅強制關閉安裝目錄內仍在執行的 Rovai 程序；點擊「否」可再等待 20 秒，以便你手動關閉；點擊「取消」停止安裝。"
+    StrCpy $rovaiShutdownFailure "Codeg Rovai Workbench 仍無法退出，安裝已安全停止。它可能以系統管理員身分或在其他 Windows 工作階段中執行。請在工作管理員中結束對應程序，然後重新執行安裝程式。"
   ${else}
-    StrCpy $rovaiShutdownPrompt "Rovai AI did not finish its controlled shutdown within 20 seconds.$\r$\n$\r$\nClick Yes to force-close only Rovai processes inside the installation directory, No to wait another 20 seconds while you close it manually, or Cancel to stop setup."
-    StrCpy $rovaiShutdownFailure "Rovai AI still could not exit, so setup stopped without replacing files. It may be running as administrator or in another Windows session. End the corresponding processes in Task Manager, then run setup again."
+    StrCpy $rovaiShutdownPrompt "Codeg Rovai Workbench did not finish its controlled shutdown within 20 seconds.$\r$\n$\r$\nClick Yes to force-close only Rovai processes inside the installation directory, No to wait another 20 seconds while you close it manually, or Cancel to stop setup."
+    StrCpy $rovaiShutdownFailure "Codeg Rovai Workbench still could not exit, so setup stopped without replacing files. It may be running as administrator or in another Windows session. End the corresponding processes in Task Manager, then run setup again."
   ${endif}
 !macroend
 
@@ -172,7 +172,7 @@ Var rovaiShutdownFailure
   ${EndIf}
 
   rovai_begin_shutdown:
-    DetailPrint "Requesting Rovai AI controlled shutdown and waiting up to 20 seconds."
+    DetailPrint "Requesting Codeg Rovai Workbench controlled shutdown and waiting up to 20 seconds."
     !insertmacro ROVAI_REQUEST_GRACEFUL_CLOSE
     !insertmacro ROVAI_WAIT_FOR_QUIESCENCE ${ROVAI_GRACEFUL_SHUTDOWN_MS} ${ROVAI_GRACEFUL_SHUTDOWN_TICKS} graceful rovai_graceful_timeout
 
@@ -189,7 +189,7 @@ Var rovaiShutdownFailure
     Goto rovai_cancel_setup
 
   rovai_manual_wait:
-    DetailPrint "Waiting another 20 seconds for Rovai AI to be closed manually."
+    DetailPrint "Waiting another 20 seconds for Codeg Rovai Workbench to be closed manually."
     !insertmacro ROVAI_WAIT_FOR_QUIESCENCE ${ROVAI_MANUAL_SHUTDOWN_MS} ${ROVAI_MANUAL_SHUTDOWN_TICKS} manual rovai_shutdown_failed
 
   rovai_force_shutdown:
@@ -215,13 +215,13 @@ Var rovaiShutdownFailure
 !macro customUnInstallCheck
   IfErrors rovai_uninstaller_launch_failed 0
   ${if} $R0 != 0
-    DetailPrint "Previous Rovai AI uninstaller failed with exit code $R0."
+    DetailPrint "Previous Codeg Rovai Workbench uninstaller failed with exit code $R0."
     ${if} $LANGUAGE == 2052
-      StrCpy $rovaiUninstallFailure "旧版 Rovai AI 卸载程序执行失败，错误码：$R0。安装已停止；这不是应用仍在后台的证明。请保存安装日志后重新运行安装程序。"
+      StrCpy $rovaiUninstallFailure "旧版 Codeg Rovai Workbench 卸载程序执行失败，错误码：$R0。安装已停止；这不是应用仍在后台的证明。请保存安装日志后重新运行安装程序。"
     ${elseif} $LANGUAGE == 1028
-      StrCpy $rovaiUninstallFailure "舊版 Rovai AI 解除安裝程式執行失敗，錯誤碼：$R0。安裝已停止；這不代表應用程式仍在背景執行。請儲存安裝記錄後重新執行安裝程式。"
+      StrCpy $rovaiUninstallFailure "舊版 Codeg Rovai Workbench 解除安裝程式執行失敗，錯誤碼：$R0。安裝已停止；這不代表應用程式仍在背景執行。請儲存安裝記錄後重新執行安裝程式。"
     ${else}
-      StrCpy $rovaiUninstallFailure "The previous Rovai AI uninstaller failed with exit code $R0. Setup stopped; this does not prove that the App is still running. Save the installer log, then run setup again."
+      StrCpy $rovaiUninstallFailure "The previous Codeg Rovai Workbench uninstaller failed with exit code $R0. Setup stopped; this does not prove that the App is still running. Save the installer log, then run setup again."
     ${endif}
     ${IfNot} ${Silent}
       MessageBox MB_OK|MB_ICONSTOP "$rovaiUninstallFailure"
@@ -232,13 +232,13 @@ Var rovaiShutdownFailure
   Goto rovai_uninstaller_check_complete
 
   rovai_uninstaller_launch_failed:
-    DetailPrint "Previous Rovai AI uninstaller could not be launched."
+    DetailPrint "Previous Codeg Rovai Workbench uninstaller could not be launched."
     ${if} $LANGUAGE == 2052
-      StrCpy $rovaiUninstallFailure "无法启动旧版 Rovai AI 卸载程序。安装已停止；这不是应用仍在后台的证明。请保存安装日志后重新运行安装程序。"
+      StrCpy $rovaiUninstallFailure "无法启动旧版 Codeg Rovai Workbench 卸载程序。安装已停止；这不是应用仍在后台的证明。请保存安装日志后重新运行安装程序。"
     ${elseif} $LANGUAGE == 1028
-      StrCpy $rovaiUninstallFailure "無法啟動舊版 Rovai AI 解除安裝程式。安裝已停止；這不代表應用程式仍在背景執行。請儲存安裝記錄後重新執行安裝程式。"
+      StrCpy $rovaiUninstallFailure "無法啟動舊版 Codeg Rovai Workbench 解除安裝程式。安裝已停止；這不代表應用程式仍在背景執行。請儲存安裝記錄後重新執行安裝程式。"
     ${else}
-      StrCpy $rovaiUninstallFailure "The previous Rovai AI uninstaller could not be launched. Setup stopped; this does not prove that the App is still running. Save the installer log, then run setup again."
+      StrCpy $rovaiUninstallFailure "The previous Codeg Rovai Workbench uninstaller could not be launched. Setup stopped; this does not prove that the App is still running. Save the installer log, then run setup again."
     ${endif}
     ${IfNot} ${Silent}
       MessageBox MB_OK|MB_ICONSTOP "$rovaiUninstallFailure"
@@ -250,16 +250,16 @@ Var rovaiShutdownFailure
 !macroend
 
 !macro customInstallMode
-  ; Rovai AI ships only as a non-admin, current-user installation.
+  ; Codeg Rovai Workbench ships only as a non-admin, current-user installation.
   StrCpy $isForceCurrentInstall "1"
 !macroend
 
 !macro customUnInstallSection
-  Section /o "删除 Rovai AI 用户数据" un.RemoveRovaiUserData
+  Section /o "删除 Codeg Rovai Workbench 用户数据" un.RemoveRovaiUserData
     MessageBox MB_ICONEXCLAMATION|MB_YESNO|MB_DEFBUTTON2 \
-      "这将永久删除 $LOCALAPPDATA\Rovai AI 及其中的会话、消息、运行记录和设置。是否继续？" \
+      "这将永久删除 $LOCALAPPDATA\Codeg Rovai Workbench 及其中的会话、消息、运行记录和设置。是否继续？" \
       IDNO keepRovaiUserData
-    RMDir /r "$LOCALAPPDATA\Rovai AI"
+    RMDir /r "$LOCALAPPDATA\Codeg Rovai Workbench"
     keepRovaiUserData:
   SectionEnd
 !macroend

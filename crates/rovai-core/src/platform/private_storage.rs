@@ -97,7 +97,7 @@ pub fn prepare_windows_bootstrap_root(instance_key: &str) -> Result<WindowsBoots
     {
         let base = dirs::data_local_dir()
             .context("windows_storage.host_unsupported: LocalAppData Known Folder unavailable")?;
-        prepare_windows_bootstrap_layout(&base.join("Rovai AI Bootstrap").join(instance_key))
+        prepare_windows_bootstrap_layout(&base.join(format!("{} Bootstrap",crate::product_identity::APPLICATION_DATA_NAME)).join(instance_key))
     }
     #[cfg(not(windows))]
     anyhow::bail!("windows_storage.host_unsupported: bootstrap storage requires Windows")

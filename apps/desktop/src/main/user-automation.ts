@@ -1,3 +1,4 @@
+import { PRODUCT_DATA_DIRECTORY } from '../shared/product-identity'
 import { randomBytes, randomUUID } from 'node:crypto'
 import { spawn } from 'node:child_process'
 import { dirname } from 'node:path'
@@ -684,5 +685,5 @@ export function userAutomationRoot(
 ): string {
   return hasExplicitUserDataDirectory
     ? join(userDataPath, 'automation-v1')
-    : join(appDataPath, 'Rovai AI', 'automation-v1')
+    : join(appDataPath, PRODUCT_DATA_DIRECTORY, 'automation-v1')
 }

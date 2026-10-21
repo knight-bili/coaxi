@@ -175,3 +175,5 @@ pub mod office_preview;
 pub mod backup;
 
 pub mod pets;
+
+pub mod product_identity;

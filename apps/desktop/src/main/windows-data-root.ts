@@ -1,3 +1,4 @@
+import { PRODUCT_DATA_DIRECTORY } from '../shared/product-identity'
 import { spawnSync } from 'node:child_process'
 import { win32 } from 'node:path'
 
@@ -41,7 +42,7 @@ export function resolveWindowsDataRoot(
   const candidate = explicitRoot !== null
     ? explicitRoot
     : localAppData
-      ? win32.join(localAppData, 'Rovai AI')
+      ? win32.join(localAppData, PRODUCT_DATA_DIRECTORY)
       : ''
   if (!candidate) {
     throw new Error(

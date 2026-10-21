@@ -12,25 +12,25 @@ module.exports = async function afterPack(context) {
     const version = context.packager.appInfo.version
     await stampWindowsExecutable(join(context.appOutDir, appFilename), {
       version,
-      description: 'Rovai AI Desktop',
+      description: 'Codeg Rovai Workbench Desktop',
       originalFilename: appFilename,
       iconPath
     })
     await stampWindowsExecutable(join(bundledBin, 'rovai-core.exe'), {
       version,
-      description: 'Rovai AI Core',
+      description: 'Codeg Rovai Workbench Core',
       originalFilename: 'rovai-core.exe',
       iconPath
     })
     await stampWindowsExecutable(join(bundledBin, 'rovai-host.exe'), {
       version,
-      description: 'Rovai AI Host',
+      description: 'Codeg Rovai Workbench Host',
       originalFilename: 'rovai-host.exe',
       iconPath
     })
     await stampWindowsExecutable(join(bundledBin, 'rovai.exe'), {
       version,
-      description: 'Rovai AI CLI',
+      description: 'Codeg Rovai Workbench CLI',
       originalFilename: 'rovai.exe',
       iconPath
     })

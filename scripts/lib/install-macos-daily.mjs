@@ -8,7 +8,7 @@ import { basename, dirname, isAbsolute, join, resolve } from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { verifyAdhocMacosApp } from './macos-app-verification.mjs'
 
-const DAILY_APP_NAME = 'Rovai AI.app'
+const DAILY_APP_NAME = 'Codeg Rovai Workbench.app'
 const DEFAULT_FILE_SYSTEM = Object.freeze({
   pathEntry: noFollowPathEntry,
   rename: renameSync,
