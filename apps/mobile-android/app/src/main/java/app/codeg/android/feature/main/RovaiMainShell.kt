@@ -50,12 +50,33 @@ fun RovaiMainShell(appViewModel:AppViewModel,servers:List<ServerProfile>){
 private fun RovaiWorkspaceScreen(profile:ServerProfile?,onServers:()->Unit,model:RovaiWorkspaceViewModel=hiltViewModel()){
     val state by model.state.collectAsStateWithLifecycle();var tab by rememberSaveable{mutableIntStateOf(0)};val lifecycle=LocalLifecycleOwner.current
     var board by remember{mutableStateOf<JsonObject?>(null)};var newConversation by remember{mutableStateOf(false)};var engineering by remember(profile){mutableStateOf(false)};var settingsPage by remember(profile){mutableStateOf<String?>(null)};var editingMember by remember(profile){mutableStateOf<JsonObject?>(null)};var creatingMember by remember(profile){mutableStateOf(false)};var notifications by remember(profile){mutableStateOf(false)}
+    val incomingLink by app.codeg.android.core.common.RovaiDeepLinkBus.pending.collectAsStateWithLifecycle()
+    var linkIssue by remember(profile){mutableStateOf<String?>(null)}
     LaunchedEffect(profile){model.bind(profile)}
+    LaunchedEffect(incomingLink,state.connected,state.busy,state.pending){
+        val link=incomingLink?:return@LaunchedEffect;if(!state.connected||state.busy||state.pending!=null)return@LaunchedEffect
+        val generation=model.connectionGeneration
+        try {
+            var threadTarget:String?=null;var canvasTarget:JsonObject?=null;var nextTab:Int?=null;var pane:String?=null
+            when(link.kind){
+                "thread"->{threadTarget=link.value;nextTab=0}
+                "mission"->{val mission=model.query(RovaiOperation.MISSIONS_GET,buildJsonObject{put("missionId",link.value)}).coreObject();threadTarget=mission.coreText("threadId");require(!threadTarget.isNullOrBlank()){"使命对话不存在"};nextTab=1}
+                "canvas"->{canvasTarget=model.query(RovaiOperation.CANVAS_BOARDS_GET,buildJsonObject{put("boardId",link.value)}).coreObject()["board"] as? JsonObject;require(canvasTarget!=null){"画布不存在"};nextTab=3}
+                "tab"->{nextTab=when(link.value.lowercase()){ "chats","threads"->0;"missions"->1;"members"->2;"canvas","canvases"->3;"settings"->4;else->throw IllegalArgumentException("此旧版入口请从当前工作区导航打开")}}
+                "settings"->{nextTab=4;pane=when(link.value.lowercase()){ "appearance"->"appearance";"agents","runtime"->"runtime";"skills","experts"->"skills";"mcp"->"mcp";"notifications"->"notifications";else->throw IllegalArgumentException("该设置入口尚未映射，请从设置页打开")}}
+                else->throw IllegalArgumentException("这是原Codeg对象链接，请先导入原会话或从工程列表打开；不会将旧编号当作新对话。")
+            }
+            if(model.connectionGeneration!=generation||app.codeg.android.core.common.RovaiDeepLinkBus.pending.value!=link)return@LaunchedEffect
+            notifications=false;engineering=false;settingsPage=pane;board=canvasTarget;nextTab?.let{tab=it};model.openThread(threadTarget);linkIssue=null
+        }catch(cancelled:kotlinx.coroutines.CancellationException){throw cancelled}catch(error:Exception){if(model.connectionGeneration==generation)linkIssue=error.message}
+        app.codeg.android.core.common.RovaiDeepLinkBus.consume(link)
+    }
     DisposableEffect(lifecycle,model){val observer=LifecycleEventObserver{_,event->if(event==Lifecycle.Event.ON_START)model.foreground(true)else if(event==Lifecycle.Event.ON_STOP)model.foreground(false)};lifecycle.lifecycle.addObserver(observer);onDispose{lifecycle.lifecycle.removeObserver(observer);model.foreground(false)}}
     BackHandler(enabled=settingsPage!=null){settingsPage=null}
     BackHandler(enabled=!engineering&&settingsPage==null&&(state.selectedThread!=null||board!=null)){if(board!=null)board=null else model.openThread(null)}
     val titles=listOf("对话","使命","队员","画布","设置");val icons=listOf(Icons.Outlined.Forum,Icons.Outlined.Flag,Icons.Outlined.Groups,Icons.Outlined.Map,Icons.Outlined.Settings)
     Scaffold(containerColor=Color.Transparent,topBar={TopAppBar(title={Text(state.thread?.get("thread").coreObject().coreText("title").ifEmpty{board?.coreText("name")?:profile?.name?:"Rovai Workbench"})},navigationIcon={if(state.selectedThread!=null||board!=null)IconButton(onClick={if(board!=null)board=null else model.openThread(null)}){Icon(Icons.AutoMirrored.Outlined.ArrowBack,null)}},actions={IconButton(enabled=state.connected,onClick={notifications=true}){Icon(Icons.Outlined.Notifications,"提醒")};if(tab==2&&state.selectedThread==null)IconButton(enabled=state.pending==null&&state.connected,onClick={creatingMember=true}){Icon(Icons.Outlined.PersonAdd,"新建队员")};if(state.selectedThread!=null)IconButton(onClick={engineering=true}){Icon(Icons.Outlined.Folder,"工程")};IconButton(onClick=onServers){Icon(Icons.Outlined.Dns,"服务器")};IconButton(onClick=model::refreshNow,enabled=state.connected){Icon(Icons.Outlined.Refresh,"刷新")};if(tab==0&&state.selectedThread==null)IconButton(onClick={newConversation=true},enabled=state.connected&&state.pending==null){Icon(Icons.Outlined.Add,"新对话")}},colors=TopAppBarDefaults.topAppBarColors(containerColor=Color.Transparent))},bottomBar={if(state.selectedThread==null&&board==null)NavigationBar(containerColor=CodegTheme.colors.bgElevated){titles.forEachIndexed{index,title->NavigationBarItem(selected=tab==index,onClick={tab=index},icon={Icon(icons[index],title)},label={Text(title)})}}}){padding->Column(Modifier.fillMaxSize().padding(padding)){
+        linkIssue?.let{Text(it,color=CodegTheme.colors.danger,modifier=Modifier.padding(12.dp))}
         if(state.error!=null)Text(state.error!!,color=CodegTheme.colors.danger,modifier=Modifier.padding(12.dp))
         if(state.pending!=null)Row(Modifier.fillMaxWidth().padding(8.dp),horizontalArrangement=Arrangement.spacedBy(8.dp)){Text("原操作待核对",Modifier.weight(1f));TextButton(onClick=model::reconcile,enabled=!state.busy){Text("核对")};TextButton(onClick=model::retry,enabled=!state.busy){Text("重试原操作")}}
         if(!state.connected){Column(Modifier.padding(24.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){Text("连接 ${profile?.name?:"工作区"}",style=MaterialTheme.typography.titleLarge);Text("连接后使用服务器中的对话、使命、队员和工程。",color=CodegTheme.colors.textSecondary);Button(onClick=model::authenticate,enabled=!state.busy){Text(if(state.busy)"正在连接…" else "连接工作区")};TextButton(onClick=onServers){Text("管理服务器")}}}

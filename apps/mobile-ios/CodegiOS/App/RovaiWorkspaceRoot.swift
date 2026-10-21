@@ -3,6 +3,7 @@ import SwiftUI
 struct RovaiWorkspaceRoot: View {
     let store: ServerStore
     @Binding var selectedServerID: UUID?
+    @Binding var incomingLink: RovaiDeepLink?
     let onManageServers: () -> Void
     @State private var model = RovaiWorkspaceModel()
     @State private var tab = 0
@@ -12,6 +13,9 @@ struct RovaiWorkspaceRoot: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var columns: NavigationSplitViewVisibility = .all
     @State private var detailRoute: RovaiRoute?
+    @State private var compactPaths: [Int: [RovaiRoute]] = [:]
+    @State private var linkIssue: String?
+    @State private var linkSettings: String?
     @State private var memberEditor: MemberEditorSelection?
     private struct MemberEditorSelection: Identifiable { let value: JSONValue?; let id = UUID() }
     private var profile: ServerProfile? { store.servers.first { $0.id == selectedServerID } ?? store.servers.first }
@@ -19,9 +23,33 @@ struct RovaiWorkspaceRoot: View {
         Group { if horizontalSizeClass == .regular { splitShell } else { compactShell } }
         .task(id: "\(profile?.id.uuidString ?? ""):\(profile?.urlString ?? "")") { notifications = false; memberEditor = nil; detailRoute = nil; await model.bind(profile, store: store) }
         .onChange(of: scenePhase, initial: true) { _, phase in model.foreground(phase == .active) }
+        .task(id: "\(incomingLink?.id.uuidString ?? ""):\(model.connected):\(model.busy):\(model.pending != nil)") { await openIncomingLink() }
+        .sheet(isPresented: Binding(get: { linkSettings != nil }, set: { if !$0 { linkSettings = nil } })) { NavigationStack { linkedSettings.navigationTitle("设置").toolbar { ToolbarItem(placement: .confirmationAction) { Button("关闭") { linkSettings = nil } } } } }
         .sheet(isPresented: $notifications) { RovaiNotificationInbox(model: model) }
         .sheet(item: $memberEditor) { item in RovaiMemberEditor(model: model, member: item.value) }
         .sheet(isPresented: Binding(get: { create != nil }, set: { if !$0 { create = nil } })) { RovaiNewConversation(model: model, mission: create == "mission") { create = nil } }
+    }
+    @ViewBuilder private var linkedSettings: some View {
+        switch linkSettings { case "appearance": AppearanceSettingsView(); case "language": LanguageSettingsView(); case "runtime": RovaiRuntimeSettingsView(model: model); case "skills": RovaiSkillSettingsView(model: model); case "mcp": RovaiMcpSettingsView(model: model); case "notifications": RovaiNotificationSettings(model: model); default: EmptyView() }
+    }
+    private func openIncomingLink() async {
+        guard let link = incomingLink, model.connected, !model.busy, model.pending == nil else { return }; let generation = model.connectionGeneration
+        do {
+            var route: RovaiRoute?; var nextTab: Int?; var pane: String?
+            switch link.kind {
+            case "thread": route = .thread(link.value); nextTab = 0
+            case "mission": let mission = try await model.query(.missionsGet, params: .object(["missionId": .string(link.value)])); guard !mission.text("threadId").isEmpty else { throw RovaiHostFailure(code: "使命对话不存在") }; route = .thread(mission.text("threadId")); nextTab = 1
+            case "canvas": let result = try await model.query(.canvasBoardsGet, params: .object(["boardId": .string(link.value)])); guard result["board"] != nil, result["board"] != .null else { throw RovaiHostFailure(code: "画布不存在") }; route = .canvas(link.value); nextTab = 3
+            case "tab": switch link.value.lowercased() { case "chats", "threads": nextTab = 0; case "missions": nextTab = 1; case "members": nextTab = 2; case "canvas", "canvases": nextTab = 3; case "settings": nextTab = 4; default: throw RovaiHostFailure(code: "此旧版入口请从当前工作区导航打开") }
+            case "settings": nextTab = 4; switch link.value.lowercased() { case "appearance", "language", "mcp", "notifications": pane = link.value.lowercased(); case "agents", "runtime": pane = "runtime"; case "skills", "experts": pane = "skills"; default: throw RovaiHostFailure(code: "该设置入口尚未映射，请从设置页打开") }
+            default: throw RovaiHostFailure(code: "这是原Codeg对象链接，请先导入原会话或从工程列表打开；不会将旧编号当作新对话。")
+            }
+            guard generation == model.connectionGeneration, incomingLink == link, !Task.isCancelled else { return }
+            notifications = false; memberEditor = nil; linkSettings = pane; linkIssue = nil
+            if let nextTab { tab = nextTab; compactPaths[nextTab] = route.map { [$0] } ?? [] }; detailRoute = route
+            if route == nil { await model.open(nil) }
+        } catch is CancellationError { return } catch { if generation == model.connectionGeneration { linkIssue = error.localizedDescription } }
+        if incomingLink == link { incomingLink = nil }
     }
     private var compactShell: some View {
         TabView(selection: $tab) {
@@ -42,7 +70,9 @@ struct RovaiWorkspaceRoot: View {
         } content: {
             NavigationStack {
                 VStack(spacing: 0) {
-                    if let issue = model.issue { Text(issue).font(.caption).foregroundStyle(Theme.warning).padding(12) }
+                    if let linkIssue { Text(linkIssue).font(.caption).foregroundStyle(Theme.warning).padding(12) }
+                    if let linkIssue { Text(linkIssue).font(.caption).foregroundStyle(Theme.warning).padding(12) }
+                if let issue = model.issue { Text(issue).font(.caption).foregroundStyle(Theme.warning).padding(12) }
                     if model.pending != nil { HStack { Text("原操作待核对").font(.caption); Spacer(); Button("核对") { Task { await model.reconcile() } }; Button("重试原操作") { Task { await model.retry() } } }.padding(12).disabled(model.busy) }
                     if model.connected { switch tab { case 0: threadList; case 1: missionList; case 2: memberList; case 3: canvasList; default: settings } }
                     else { ContentUnavailableView { Label("连接工作区", systemImage: "network") } description: { Text(profile?.name ?? "Rovai Workbench") } actions: { Button("连接") { Task { await model.authenticate() } }.disabled(model.busy); Button("管理服务器", action: onManageServers) } }
@@ -61,7 +91,7 @@ struct RovaiWorkspaceRoot: View {
         else { NavigationLink(value: route) { label() } }
     }
     private func tabPage<Content: View>(_ title: String, icon: String, value: Int, @ViewBuilder content: () -> Content) -> some View {
-        NavigationStack {
+        NavigationStack(path: Binding(get: { compactPaths[value, default: []] }, set: { compactPaths[value] = $0 })) {
             VStack(spacing: 0) {
                 if let issue = model.issue { Text(issue).font(.caption).foregroundStyle(Theme.warning).frame(maxWidth: .infinity, alignment: .leading).padding(12) }
                 if model.pending != nil { HStack { Text("原操作待核对").font(.caption); Spacer(); Button("核对") { Task { await model.reconcile() } }; Button("重试原操作") { Task { await model.retry() } } }.padding(12).disabled(model.busy) }

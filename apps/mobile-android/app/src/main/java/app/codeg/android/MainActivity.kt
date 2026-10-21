@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import app.codeg.android.app.CodegApp
 import app.codeg.android.core.common.DeepLinkBus
+import app.codeg.android.core.common.RovaiDeepLinkBus
 import app.codeg.android.core.common.LocaleManager
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -28,11 +29,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent { CodegApp() }
         DeepLinkBus.dispatch(intent?.data)
+        RovaiDeepLinkBus.dispatch(intent?.data)
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
         DeepLinkBus.dispatch(intent.data)
+        RovaiDeepLinkBus.dispatch(intent.data)
     }
 }

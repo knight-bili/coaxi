@@ -13,6 +13,7 @@ import SwiftUI
 /// First launch with no saved servers shows the onboarding screen instead.
 struct RootView: View {
     @State private var model = AppModel()
+    @State private var workspaceLink: RovaiDeepLink?
     @State private var appearance = AppearanceStore()
     @State private var language = LanguageStore()
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
@@ -26,7 +27,7 @@ struct RootView: View {
                     model.selectedServerID = profile.id
                 }
             } else {
-                RovaiWorkspaceRoot(store: model.serverStore, selectedServerID: $model.selectedServerID, onManageServers: { model.serversSheetPresented = true })
+                RovaiWorkspaceRoot(store: model.serverStore, selectedServerID: $model.selectedServerID, incomingLink: $workspaceLink, onManageServers: { model.serversSheetPresented = true })
             }
         }
         .tint(Theme.accent)
@@ -44,7 +45,7 @@ struct RootView: View {
         .environment(language)
         .environment(\.locale, language.locale)
         .preferredColorScheme(appearance.mode.colorScheme)
-        .onOpenURL { model.handle(url: $0) }
+        .onOpenURL { if let link = RovaiDeepLink(url: $0) { workspaceLink = link } }
         .onChange(of: horizontalSizeClass, initial: true) { _, size in
             model.isCompact = size == .compact
         }
