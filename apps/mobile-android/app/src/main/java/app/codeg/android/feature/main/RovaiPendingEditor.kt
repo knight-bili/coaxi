@@ -2,6 +2,8 @@ package app.codeg.android.feature.main
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -44,6 +46,6 @@ import kotlinx.serialization.json.*
         }
     }
     if(discard||takeover)AlertDialog(onDismissRequest={discard=false;takeover=false},title={Text(if(takeover)"从已保存版本接管？" else "放弃本次编辑？")},text={Text(if(takeover)"恢复原排队消息的已保存正文、附件和引用；本次尚未保存的输入仍保留在本机草稿。" else "保留原排队消息，放弃编辑中的附件和引用修改；本机正文草稿仅在原请求确认成功后清除。")},confirmButton={TextButton(enabled=ready&&!state.busy&&state.pending==null,onClick={val action=if(takeover)"takeover" else "cancel";perform(buildJsonObject{put("type",action)},settle=action=="cancel");discard=false;takeover=false}){Text("确认")}},dismissButton={TextButton(onClick={discard=false;takeover=false}){Text("继续编辑")}})
-    if(choosing)AlertDialog(onDismissRequest={choosing=false},title={Text("选择引用来源")},text={Column{messages.takeLast(30).forEach{message->TextButton(enabled=!disabled,onClick={quoteMessage=message.coreText("id");choosing=false}){Text(message.coreText("body").take(90),maxLines=2)}}}},confirmButton={TextButton(onClick={choosing=false}){Text("关闭")}})
+    if(choosing)AlertDialog(onDismissRequest={choosing=false},title={Text("选择引用来源")},text={LazyColumn(Modifier.heightIn(max=360.dp)){items(messages,key={it.coreText("id")}){message->TextButton(enabled=!disabled,onClick={quoteMessage=message.coreText("id");choosing=false}){Text(message.coreText("body").take(90),maxLines=2)}}}},confirmButton={TextButton(onClick={choosing=false}){Text("关闭")}})
     quoteMessage?.let{id->RovaiQuoteSelector(model,threadId,id,onChosen={false},conversationId=conversationId,onSelection={selection->if(disabled)false else{perform(buildJsonObject{put("type","quote");putJsonObject("action"){put("type","add");put("selection",selection)}});true}}){quoteMessage=null}}
 }

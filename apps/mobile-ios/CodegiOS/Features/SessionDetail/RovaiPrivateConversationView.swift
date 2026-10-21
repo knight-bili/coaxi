@@ -70,6 +70,7 @@ struct RovaiPrivateConversationView: View {
                 }
                 ForEach((snapshot["agentRuns"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in run(row.value) }
                 ForEach((snapshot["pendingInputs"]?["items"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in pending(row.value) }
+                if let session = snapshot["pendingInputs"]?["editSession"], !session.text("editToken").isEmpty, let selected, let item = (snapshot["pendingInputs"]?["items"]?.rvArray ?? []).first(where: {$0.text("id") == session.text("pendingInputId")}) {RovaiPendingEditor(model: model, threadId: threadId, conversationId: selected, child: child, item: item, session: session, messages: snapshot["messages"]?.rvArray ?? [])}
                 ForEach(retained.map { RovaiRow(value: $0) }) { row in retainedInput(row.value) }
                 if let cursor { Button("更多保留输入") { Task { await readRetained(after: cursor) } } }
                 RovaiComposerQuotes(quotes: snapshot["draft"]?["quotes"]?.rvArray ?? [], enabled: !disabled && snapshot["conversation"]?.text("status") == "active") {id in removedQuoteId = id;Task {await model.command(mutate, value: mutation(.object(["type": .string("quote"), "action": .object(["type": .string("remove"), "quoteId": .string(id)])])))}}
@@ -82,7 +83,7 @@ struct RovaiPrivateConversationView: View {
         GlassRow { VStack(alignment: .leading, spacing: 8) { RovaiExecutionHistory(model: model, threadId: threadId, run: value, observed: snapshot["executionEvidence"]?.rvArray ?? []); Text(value.text("status")).font(.caption); if !value.text("lastErrorCode").isEmpty { Text(value.text("lastErrorCode")).foregroundStyle(Theme.warning) }; if ["running", "queued", "waiting"].contains(value.text("status")) { Button("停止") { Task { await model.command(.agentRunsCancel, value: .object(["threadId": .string(threadId), "agentRunId": value["id"] ?? .null, "expectedVersion": value["version"] ?? .number(0)])) } }.disabled(disabled) } } }
     }
     private func pending(_ value: JSONValue) -> some View {
-        GlassRow { VStack(alignment: .leading, spacing: 8) { Text("排队输入").font(.headline); MarkdownContent(raw: value.text("body")); Text("\(value["attachments"]?.rvArray.count ?? 0) 个附件 · \(value["quotes"]?.rvArray.count ?? 0) 条引用").font(.caption)
+        GlassRow { VStack(alignment: .leading, spacing: 8) { Text("排队输入").font(.headline); MarkdownContent(raw: value.text("body")); Text("\(value["attachments"]?.rvArray.count ?? 0) 个附件 · \(value["quotes"]?.rvArray.count ?? 0) 条引用").font(.caption); Button("编辑") {Task {await model.command(edit, value: pendingCommand(value, action: .object(["type": .string("begin")])))} }.disabled(disabled)
             Button("移回输入框（保留当前输入）") { Task { do { try model.saveBody(owner, body: text); await model.executePrivate(edit, command: pendingCommand(value, action: .object(["type": .string("return_to_composer"), "expectedDraftRevision": snapshot["draft"]?["revision"] ?? .number(0), "targetBody": .string(text)])), owner: owner, body: text, replace: true) } catch { issue = error.localizedDescription } } }.disabled(disabled)
             Button("删除排队消息", role: .destructive) { Task { await model.command(edit, value: pendingCommand(value, action: .object(["type": .string("delete")]))) } }.disabled(disabled)
         } }
