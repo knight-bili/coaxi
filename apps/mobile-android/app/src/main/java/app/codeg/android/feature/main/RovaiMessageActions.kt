@@ -11,14 +11,16 @@ import app.codeg.android.core.designsystem.theme.CodegTheme
 import app.codeg.android.core.network.RovaiOperation
 import kotlinx.serialization.json.*
 
-@Composable fun RovaiMessageActions(model:RovaiWorkspaceViewModel,threadId:String,message:JsonObject,enabled:Boolean,onReply:(JsonObject)->Unit){
-    var menu by remember{mutableStateOf(false)};var withdrawal by remember{mutableStateOf<JsonObject?>(null)}
+@Composable fun RovaiMessageActions(model:RovaiWorkspaceViewModel,threadId:String,message:JsonObject,enabled:Boolean,onQuote:(JsonObject)->Boolean,onReply:(JsonObject)->Unit){
+    var menu by remember{mutableStateOf(false)};var quote by remember{mutableStateOf(false)};var withdrawal by remember{mutableStateOf<JsonObject?>(null)}
     val clipboard=LocalClipboardManager.current;val state=model.state.collectAsState().value
     Box{TextButton(onClick={menu=true}){Text("更多")};DropdownMenu(expanded=menu,onDismissRequest={menu=false}){
         DropdownMenuItem(text={Text("回复")},enabled=enabled,onClick={menu=false;onReply(buildJsonObject{put("id",message.coreText("id"));put("authorId",message.coreText("authorId"));put("authorDisplayName",message.coreText("authorDisplayName"));put("excerpt",message.coreText("body").take(320))})})
+        DropdownMenuItem(text={Text("引用一段")},enabled=enabled,onClick={menu=false;quote=true})
         DropdownMenuItem(text={Text("复制消息")},onClick={menu=false;clipboard.setText(AnnotatedString(message.coreText("body")))})
         if(message["canWithdraw"]==JsonPrimitive(true))DropdownMenuItem(text={Text("撤回")},enabled=enabled,onClick={menu=false;withdrawal=buildJsonObject{put("threadId",threadId);put("messageId",message.coreText("id"));put("expectedVersion",message.coreLong("version"))}})
     }}
+    if(quote)RovaiQuoteSelector(model,threadId,message.coreText("id"),onQuote){quote=false}
     withdrawal?.let{frozen->AlertDialog(onDismissRequest={withdrawal=null},title={Text("撤回这条消息？")},text={Text("仅在消息版本仍一致、且允许撤回时执行。已开始执行的工作请另外停止。")},confirmButton={TextButton(enabled=state.pending==null&&!state.busy,onClick={model.command(RovaiOperation.THREAD_MESSAGES_WITHDRAW,frozen);withdrawal=null}){Text("撤回")}},dismissButton={TextButton(onClick={withdrawal=null}){Text("取消")}})}
 }
 @Composable fun RovaiReplyPreview(reply:JsonObject,enabled:Boolean,onRemove:()->Unit){
