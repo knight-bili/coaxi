@@ -25,6 +25,7 @@ struct RovaiCanvasCreator: View {
     let x: Double, y: Double
     var bindingNode: JSONValue? = nil
     @Environment(\.dismiss) private var dismiss
+    @State private var managingGroups = false
     @State private var form: [String: JSONValue] = ["kind": .string("note"), "title": .string(""), "content": .string(""), "color": .string(""), "columns": .number(0), "rows": .number(0)]
     @State private var revision = 0, commandId = UUID().uuidString.lowercased()
     @State private var ready = false, busy = false, reading = false, catalogLoaded = false, objectBusy = false, objectReady = false
@@ -70,7 +71,7 @@ struct RovaiCanvasCreator: View {
                 if kind == "note" {TextField("便签内容（支持Markdown）", text: binding("content"), axis: .vertical).lineLimit(8...24)}
                 if ["folder", "file", "terminal"].contains(kind) {if bindingNode != nil {Text(text("path")).font(.caption)} else {TextField(kind == "file" ? "文件绝对路径" : "工作目录绝对路径", text: binding("path")).textInputAutocapitalization(.never).autocorrectionDisabled()}}
                 if kind == "agent" {choice("队员", key: "agentId", values: model.members.filter {$0["removedAt"] == nil || $0["removedAt"] == .null}.map {($0.text("agentId"), $0.text("displayName"))})}
-                if kind == "group" {choice("项目分组", key: "groupId", values: groups.map {($0.text("id"), $0.text("name"))});Button("重新读取原项目分组") {Task {await loadGroups()}}}
+                if kind == "group" {choice("项目分组", key: "groupId", values: groups.map {($0.text("id"), $0.text("name"))});Button("管理项目分组") {managingGroups = true};Button("重新读取原项目分组") {Task {await loadGroups()}}}
             }.disabled(blocked)
             if kind == "conversation" {Section("对话") {choice("对话", key: "referenceKey", values: choices.map {($0.id, $0.label)})}.disabled(blocked)}
             if kind == "custom" {Section("分组内的对话") {ForEach(choices) {choice in Toggle(choice.label, isOn: Binding(get: {members.contains(choice.id)}, set: {selected in field("members", .array((selected ? members + [choice.id] : members.filter {$0 != choice.id}).map(JSONValue.string)))})).disabled(blocked || !members.contains(choice.id) && members.count >= 200)}}}
@@ -85,6 +86,7 @@ struct RovaiCanvasCreator: View {
                 Button(bindingNode == nil ? "保存到画布" : "绑定来源") {Task {await submit()}}.disabled(blocked || stale || !valid || objectBusy)
             }
         }.navigationTitle(bindingNode == nil ? "添加到画布" : "绑定文件来源").toolbar {Button("保留草稿并关闭") {close()}.disabled(busy)}}.interactiveDismissDisabled(true)
+        .sheet(isPresented: $managingGroups,onDismiss: {Task {await loadGroups()}}) {RovaiProjectGroups(model: model)}
         .task {await restore()}
         .task(id: "\(kind):\(text("objectThreadId")):\(sourceThread?.text("missionId") ?? "")") {await loadObject()}
         .onChange(of: model.lastResult) {_, result in

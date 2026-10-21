@@ -7,13 +7,14 @@ struct RovaiCanvasBoards: View {
     let model: RovaiWorkspaceModel
     let onOpen: (String) -> Void
     @State private var search = ""
+    @State private var managingGroups = false
     @State private var editor: Selection?
     private struct Selection: Identifiable {let id = UUID();let board: JSONValue?;let remove: Bool}
     private var blocked: Bool {model.busy || model.pending != nil || !model.connected}
     private var rows: [JSONValue] {model.boards.filter {search.isEmpty || ($0.text("name") + " " + $0.text("description")).localizedCaseInsensitiveContains(search)}}
     var body: some View {
         ScrollView {VStack(alignment: .leading, spacing: 16) {
-            HStack {VStack(alignment: .leading, spacing: 6) {Text("画布").font(.title2.weight(.semibold));Text("每个画布都有自己的区域、会话卡片、便签、文件和终端。").font(.caption).foregroundStyle(Theme.textSecondary)};Spacer();Button {editor = Selection(board: nil, remove: false)} label: {Label("新建画布", systemImage: "plus")}.disabled(blocked)}
+            HStack {VStack(alignment: .leading, spacing: 6) {Text("画布").font(.title2.weight(.semibold));Text("每个画布都有自己的区域、会话卡片、便签、文件和终端。").font(.caption).foregroundStyle(Theme.textSecondary)};Spacer();Button("项目分组") {managingGroups = true}.disabled(blocked);Button {editor = Selection(board: nil, remove: false)} label: {Label("新建画布", systemImage: "plus")}.disabled(blocked)}
             TextField("搜索画布", text: $search).textFieldStyle(.roundedBorder)
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 180), spacing: 12)], spacing: 12) {
                 ForEach(rows, id: \.self) {board in
@@ -31,6 +32,7 @@ struct RovaiCanvasBoards: View {
             }
             if rows.isEmpty {ContentUnavailableView(model.boards.isEmpty ? "还没有画布" : "没有符合条件的画布", systemImage: "map", description: Text(model.boards.isEmpty ? "创建一个画布开始整理工作。" : "调整搜索内容后重试。"))}
         }.padding(16)}
+        .sheet(isPresented: $managingGroups) {RovaiProjectGroups(model: model)}
         .sheet(item: $editor) {target in RovaiCanvasBoardEditor(model: model, board: target.board, remove: target.remove)}
     }
     @ViewBuilder private func actions(_ board: JSONValue) -> some View {
