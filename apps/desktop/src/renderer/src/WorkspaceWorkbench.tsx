@@ -7,6 +7,9 @@ import { useThreadClient } from './camp-client'
 import { useUiText } from './interface-language'
 import { newCommandId } from '../../shared/command-id'
 import { FileTree, FileTreeFile, FileTreeFolder } from './codeg-workbench/file-tree'
+import { WorkspaceCodeEditor } from './WorkspaceCodeEditor'
+import { WorkspaceMergeEditor } from './WorkspaceMergeEditor'
+import { UnifiedDiffPreview } from './codeg-native-content/components/diff/unified-diff-preview'
 import './workspace-workbench.css'
 
 type Entry = { name: string; path: string; directory: boolean; link: boolean; bytes: number }
@@ -34,6 +37,7 @@ export function WorkspaceWorkbench({ threadId, bindLeaveGuard }: {
   const [action, setAction] = useState<keyof typeof gitActions>('stage'), [target, setTarget] = useState(''), [paths, setPaths] = useState('')
   const [remote, setRemote] = useState('origin'), [message, setMessage] = useState(''), [mode, setMode] = useState('mixed')
   const [preview, setPreview] = useState<{ request: Record<string, unknown>; revision: string; arguments: string[]; cleanPreview: string | null } | null>(null)
+  const [merge, setMerge] = useState<{path:string;base:string;ours:string;theirs:string;merged:string}|null>(null)
   const dirty = documents.some(document => document.text !== document.saved)
   const current = documents.find(document => document.path === selected)
   const guard = useCallback(() => { if (busy) throw new Error(t('工程操作仍在进行，请稍后离开。')); if (dirty) throw new Error(t('工程文件尚未保存，请先保存或关闭对应标签。')) }, [busy, dirty, t])
@@ -101,6 +105,22 @@ export function WorkspaceWorkbench({ threadId, bindLeaveGuard }: {
       setCreation(null); await loadDirectory('')
     })
   }
+  const openMerge = async (): Promise<void> => {
+    if(!current)return
+    const document=current
+    await operation(async()=>{
+      const conflicts=await client.request<GitResult>('workbench.git.read',{scope,action:'conflicts'})
+      if(!conflicts.success)throw new Error(conflicts.error)
+      const stages=new Set(conflicts.output.split('\0').filter(Boolean).filter(row=>row.slice(row.indexOf('\t')+1)===document.path).map(row=>row.slice(0,row.indexOf('\t')).split(' ').at(-1)))
+      if(!stages.size)throw new Error(t('这个文件没有未合并的 Git 记录。'))
+      const parts=await Promise.all(['1','2','3'].map(async stage=>{
+        if(!stages.has(stage))return ''
+        const result=await client.request<GitResult>('workbench.git.read',{scope,action:'conflict',mode:stage,paths:[document.path]})
+        if(!result.success)throw new Error(result.error);return result.output
+      }))
+      setMerge({path:document.path,base:parts[0]!,ours:parts[1]!,theirs:parts[2]!,merged:document.text})
+    })
+  }
   return <>
     <button type="button" className="quiet-button conversation-tool-button" title={t('文件与 Git 工程工作区')} onClick={() => setOpen(true)}><Files size={15} /><span>{t('工程')}</span></button>
     <Dialog.Root open={open} onOpenChange={next => { if (!next) { try { guard() } catch (failure) { setError(String(failure)); return } }; setOpen(next) }}>
@@ -121,15 +141,15 @@ export function WorkspaceWorkbench({ threadId, bindLeaveGuard }: {
           }}>{renderTree('')}</FileTree></div></Panel>
           <PanelResizeHandle className="workbench-resize" />
           <Panel minSize={25}>
-            {tab === 'files' ? <div className="workbench-editor">
+            {merge ? <WorkspaceMergeEditor {...merge} onClose={()=>setMerge(null)} onApply={text=>{setDocuments(previous=>previous.map(document=>document.path===merge.path?{...document,text}:document));setMerge(null)}} /> : tab === 'files' ? <div className="workbench-editor">
               <div className="workbench-tabs" role="tablist">{documents.map(document => <div className={selected === document.path ? 'workbench-tab is-active' : 'workbench-tab'} key={document.path}><button type="button" role="tab" aria-selected={selected === document.path} onClick={() => setSelected(document.path)}>{document.path}{document.text !== document.saved ? ' •' : ''}</button><button type="button" disabled={busy} onClick={() => closeDocument(document.path)} aria-label={t('关闭文件')}><X size={12} /></button></div>)}</div>
-              {current ? <><div className="workbench-toolbar"><span title={current.path}>{current.path}</span><button type="button" className="quiet-button" disabled={busy || current.text === current.saved} onClick={() => void save()}><Save size={14} />{t('保存')}</button><button type="button" className="quiet-button" disabled={busy || dirty} onClick={() => {setCreation('rename');setName(current.path)}}>{t('重命名')}</button></div>
+              {current ? <><div className="workbench-toolbar"><span title={current.path}>{current.path}</span><button type="button" className="quiet-button" disabled={busy || current.text === current.saved} onClick={() => void save()}><Save size={14} />{t('保存')}</button><button type="button" className="quiet-button" disabled={busy || dirty} onClick={() => {setCreation('rename');setName(current.path)}}>{t('重命名')}</button><button type="button" className="quiet-button" disabled={busy} onClick={()=>void openMerge()}>{t('解决冲突')}</button></div>
                 {current.conflict && <div className="workbench-error" role="alert">{t('文件在外部发生变化，本地修改已保留。请复制修改或重新打开外部版本后合并。')}</div>}
-                <textarea className="workbench-source" aria-label={t('文件内容')} value={current.text} spellCheck={false} onKeyDown={event => { if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {event.preventDefault();void save()} }} onChange={event => {const text=event.target.value;setDocuments(previous => previous.map(document => document.path === current.path ? {...document,text} : document))}} />
+                <div className="workbench-editors">{documents.map(document=><div key={document.path} className="workbench-document" hidden={document.path!==selected}><WorkspaceCodeEditor path={document.path} text={document.text} visible={document.path===selected} onSave={()=>void save()} onChange={text=>setDocuments(previous=>previous.map(item=>item.path===document.path?{...item,text}:item))} /></div>)}</div>
               </> : <div className="workbench-empty">{t('从文件树打开文件')}</div>}
             </div> : <div className="workbench-git">
               <div className="workbench-toolbar"><select aria-label={t('Git 视图')} value={gitView} onChange={event => {setGitView(event.target.value);void readGit(event.target.value)}}>{Object.entries({status:'变更',diff:'工作区 Diff',diff_staged:'暂存 Diff',log:'历史',branches:'分支',stash:'Stash',remotes:'远程',worktrees:'Worktree',conflicts:'冲突'}).map(([value,label]) => <option key={value} value={value}>{t(label)}</option>)}</select><button type="button" disabled={busy} onClick={() => void readGit()}>{t('刷新')}</button></div>
-              <pre className="workbench-git-output">{gitResult ? `${gitResult.output.replaceAll('\0','\n').replaceAll('\x1e','\n')}\n${gitResult.error}` : t('选择 Git 视图')}</pre>
+              {gitResult && (gitView==='diff'||gitView==='diff_staged') && gitResult.success ? <div className="workbench-git-output"><UnifiedDiffPreview diffText={gitResult.output} clickableFilePath={false} /></div> : <pre className="workbench-git-output">{gitResult ? `${gitResult.output.replaceAll('\0','\n').replaceAll('\x1e','\n')}\n${gitResult.error}` : t('选择 Git 视图')}</pre>}
               <div className="workbench-git-actions"><select aria-label={t('Git 操作')} value={action} onChange={event => setAction(event.target.value as keyof typeof gitActions)}>{Object.entries(gitActions).map(([value,label]) => <option key={value} value={value}>{t(label)}</option>)}</select>
                 <input aria-label={t('目标分支、提交或 Stash')} placeholder={t('目标分支、提交或 Stash')} value={target} onChange={event => setTarget(event.target.value)} />
                 <input aria-label={t('远程名称')} value={remote} onChange={event => setRemote(event.target.value)} />
