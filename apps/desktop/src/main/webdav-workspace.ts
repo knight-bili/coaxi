@@ -8,7 +8,7 @@ export class WebdavWorkspace{
     const owner=this.owner()
     if(!owner||owner.isDestroyed()||event.sender!==owner.webContents||event.senderFrame!==owner.webContents.mainFrame)throw new Error('webdav.local_owner_required')
     if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('webdav.invalid_request')
-    const input=value as {operation:string;expectedRevision:string|null;commandId?:string;snapshotId?:string;expectedDigest?:string;expectedIndexEtag?:string;confirmed?:boolean;kind?:'backup'|'configuration';enabled?:boolean;autoSync?:boolean;intervalMinutes?:number;passphrase?:string;clearPassphrase?:boolean}
+    const input=value as {operation:string;expectedRevision:string|null;commandId?:string;snapshotId?:string;expectedDigest?:string;expectedIndexEtag?:string;confirmed?:boolean;kind?:'backup'|'configuration';enabled?:boolean;autoSync?:boolean;intervalMinutes?:number;passphrase?:string;clearPassphrase?:boolean;keepBackups?:number;keepConfigurations?:number}
     if(typeof input.operation!=='string')throw new Error('webdav.invalid_request')
     if(input.operation.startsWith('config_')){
       const operation=input.operation.slice(7);if(!['get','set','upload','cancel','resume','archive'].includes(operation))throw new Error('config_sync.operation_not_admitted')
@@ -21,6 +21,11 @@ export class WebdavWorkspace{
       if(typeof input.snapshotId!=='string'||typeof input.expectedDigest!=='string')throw new Error('webdav.snapshot_required')
       if(input.operation==='remove'&&(input.confirmed!==true||typeof input.expectedIndexEtag!=='string'))throw new Error('webdav.confirmation_required')
       return this.request('backup.webdav.local',{operation:input.operation,expectedRevision:input.expectedRevision,snapshotId:input.snapshotId,expectedDigest:input.expectedDigest,...(input.operation==='remove'?{confirmed:true,expectedIndexEtag:input.expectedIndexEtag}:{})})
+    }
+    if(['retention_preview','retention_apply','retention_status','cleanup_preview','cleanup_removed'].includes(input.operation)){
+      if(input.operation==='retention_preview'&&(!Number.isInteger(input.keepBackups)||!Number.isInteger(input.keepConfigurations)))throw new Error('webdav.retention_required')
+      if(['retention_apply','cleanup_removed'].includes(input.operation)&&input.confirmed!==true)throw new Error('webdav.confirmation_required')
+      return this.request('backup.webdav.local',{operation:input.operation,expectedRevision:input.expectedRevision,commandId:input.commandId,keepBackups:input.keepBackups,keepConfigurations:input.keepConfigurations,snapshotId:input.snapshotId,expectedDigest:input.expectedDigest,confirmed:input.confirmed})
     }
     if(typeof input.commandId!=='string')throw new Error('webdav.command_required')
     if(['status','cancel','resume'].includes(input.operation))return this.request('backup.webdav.local',{operation:input.operation,commandId:input.commandId,expectedRevision:input.expectedRevision})

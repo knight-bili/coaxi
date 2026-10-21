@@ -1,3 +1,4 @@
+import {WebdavRetentionSettings} from './WebdavRetentionSettings'
 import {ConfigurationSyncSettings} from './ConfigurationSyncSettings'
 import * as Dialog from '@radix-ui/react-dialog'
 import {AppDialogContent,AppDialogHeader} from './AppDialog'
@@ -47,6 +48,7 @@ export function WebdavSettings():React.JSX.Element{
       <div className="workbench-toolbar"><button disabled={busy||!dirty||!draft.endpoint.trim()} type="submit">{t('保存')}</button><button disabled={busy||!dirty} type="button" onClick={()=>accept(saved)}>{t('放弃修改')}</button></div>
     </form>
     <ConfigurationSyncSettings remoteReady={!!saved.revision&&!dirty}/>
+    {native&&saved.revision&&<WebdavRetentionSettings accountRevision={saved.revision} disabled={busy||dirty} onChanged={list}/>}
     {error&&<p className="workbench-error" role="alert">{error}</p>}{message&&<p role="status">{message}</p>}
     {native?<div className="workbench-toolbar"><button disabled={busy||dirty||!saved.revision} onClick={()=>void run(async()=>{await native.request({operation:'probe',expectedRevision:saved.revision!});setMessage(t('已连接远程文件夹。'))})}>{t('检查连接')}</button><button disabled={busy||dirty||!saved.revision} onClick={()=>void run(async()=>{await native.request({operation:'create_collection',expectedRevision:saved.revision!});setMessage(t('远程文件夹已准备好。'))})}>{t('创建远程文件夹')}</button><button disabled={busy||dirty||!saved.revision} onClick={()=>void run(list)}><RefreshCw size={14}/>{t('读取远程备份')}</button><button disabled={busy||dirty||!saved.revision||pending!==null} onClick={()=>void run(()=>transfer('push'))}><Upload size={14}/>{t('上传加密备份')}</button></div>:<p>{t('文件传输在桌面主机完成；独立服务器提供对应的 WebDAV 命令。')}</p>}
     {pending&&<div role="status"><p>{t(busy?'正在传输加密备份…':'原传输的结果需要核对。')} {pending.commandId}</p><button disabled={busy||!saved.revision} onClick={()=>void run(async()=>{const result=await native?.request<{state:string;message?:string;result?:{path:string}}>({operation:'status',expectedRevision:saved.revision!,commandId:pending.commandId});if(result?.state==='completed'){setPending(null);setMessage(t('原传输已经完成。'));await list()}else setMessage(t(result?.state==='started'?'原传输仍在进行，请稍后再核对。':'原传输的结果尚不能确定，已保留记录，没有重复发送。'))})}>{t('核对原传输')}</button></div>}

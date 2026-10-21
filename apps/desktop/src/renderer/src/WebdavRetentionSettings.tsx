@@ -1,0 +1,29 @@
+import {useEffect,useState} from 'react'
+import * as Dialog from '@radix-ui/react-dialog'
+import {AppDialogContent,AppDialogHeader} from './AppDialog'
+import {useThreadClient} from './camp-client'
+import {useUiText} from './interface-language'
+import {newCommandId} from '../../shared/command-id'
+type Snapshot={id:string;createdAt:string;sha256:string;bytes:number;kind:string}
+type Plan={commandId:string;plan:{delete:Snapshot[];remaining:number};unknown?:boolean}
+type Cleanup={snapshot:Snapshot;removedAt:string}
+// Source Codeg BackupSettings preview/confirmation; existing Rovai forms/dialog.
+export function WebdavRetentionSettings({accountRevision,disabled,onChanged}:{accountRevision:string;disabled:boolean;onChanged:()=>Promise<void>}):React.JSX.Element{
+  const native=useThreadClient().webdavWorkspace,t=useUiText()
+  const [keepBackups,setKeepBackups]=useState(10),[keepConfigurations,setKeepConfigurations]=useState(20),[busy,setBusy]=useState(false),[error,setError]=useState<string|null>(null),[message,setMessage]=useState<string|null>(null)
+  const [plan,setPlan]=useState<Plan|null>(null),[cleanup,setCleanup]=useState<Cleanup[]>([]),[cursor,setCursor]=useState<string|null>(null),[target,setTarget]=useState<Cleanup|null>(null)
+  useEffect(()=>{setPlan(null);setCleanup([]);setCursor(null);setTarget(null);setError(null)},[accountRevision])
+  const run=async(action:()=>Promise<void>):Promise<void>=>{if(busy||disabled||!native)return;setBusy(true);setError(null);setMessage(null);try{await action()}catch(failure){setError(String(failure))}finally{setBusy(false)}}
+  const scan=async(after?:string):Promise<void>=>{const result=await native?.request<{items:Cleanup[];nextCursor:string|null}>({operation:'cleanup_preview',expectedRevision:accountRevision,snapshotId:after});if(result){setCleanup(previous=>after?[...previous,...result.items.filter(item=>!previous.some(old=>old.snapshot.id===item.snapshot.id))]:result.items);setCursor(result.nextCursor)}}
+  return <section className="section-block general-settings-section"><div className="section-heading"><div><h3>{t('远端副本保留')}</h3><p>{t('分别保留最近的完整备份和配置快照，先预览，每批最多移除20份。')}</p></div></div>
+    <div className="forge-form"><label>{t('保留完整备份数量')}<input type="number" min={1} max={1000} disabled={busy||disabled} value={keepBackups} onChange={event=>setKeepBackups(Number(event.target.value))}/></label><label>{t('保留配置快照数量')}<input type="number" min={1} max={1000} disabled={busy||disabled} value={keepConfigurations} onChange={event=>setKeepConfigurations(Number(event.target.value))}/></label></div>
+    <div className="workbench-toolbar"><button disabled={busy||disabled} onClick={()=>void run(async()=>{const result=await native?.request<Plan>({operation:'retention_preview',expectedRevision:accountRevision,commandId:newCommandId(),keepBackups,keepConfigurations});if(result)setPlan(result)})}>{t('预览保留计划')}</button><button disabled={busy||disabled} onClick={()=>void run(()=>scan())}>{t('查找待清理文件')}</button></div>
+    {error&&<p className="workbench-error" role="alert">{error}</p>}{message&&<p role="status">{message}</p>}
+    {cleanup.map(item=><div className="workbench-import-row" key={item.snapshot.id}><div><strong>{t(item.snapshot.kind==='configuration'?'配置快照':'完整备份')} · {new Date(item.snapshot.createdAt).toLocaleString()}</strong><small>{t('已经从远端清单移除')} · {(item.snapshot.bytes/1024/1024).toFixed(1)} MB</small></div><button disabled={busy||disabled} onClick={()=>setTarget(item)}>{t('清理文件…')}</button></div>)}
+    {cursor&&<button disabled={busy||disabled} onClick={()=>void run(()=>scan(cursor))}>{t('继续查找更早的记录')}</button>}
+    <Dialog.Root open={plan!==null||target!==null} onOpenChange={open=>{if(!open&&!busy){setPlan(null);setTarget(null)}}}><Dialog.Portal><Dialog.Overlay className="dialog-overlay"/><AppDialogContent width="compact" tone="danger"><AppDialogHeader title={t(target?'清理已移除的远端文件':'确认远端保留计划')} description={t('本机保存的备份会保留；其他设备不能再从远端下载这些副本。')} closeDisabled={busy}/>
+      <div>{plan&&<><p>{t('本批移除')} {plan.plan.delete.length} {t('份，之后仍有')} {plan.plan.remaining} {t('份可重新预览。')}</p><ul>{plan.plan.delete.map(item=><li key={item.id}>{t(item.kind==='configuration'?'配置快照':'完整备份')} · {new Date(item.createdAt).toLocaleString()} · {(item.bytes/1024/1024).toFixed(1)} MB</li>)}</ul></>}{target&&<p>{new Date(target.snapshot.createdAt).toLocaleString()} · {target.snapshot.sha256.slice(0,12)}</p>}{error&&<p role="alert" className="workbench-error">{error}</p>}
+      <div className="dialog-actions"><button disabled={busy} onClick={()=>{setPlan(null);setTarget(null)}}>{t('关闭')}</button>{plan?.unknown?<button disabled={busy||disabled} onClick={()=>void run(async()=>{const result=await native?.request<{removed:boolean}>({operation:'retention_status',expectedRevision:accountRevision,commandId:plan.commandId});if(result?.removed){setPlan(null);setMessage(t('已核对本批移除记录，可继续查找待清理文件。'));await onChanged()}else setError(t('移除结果尚未核对，请重新读取远端清单后再预览。'))})}>{t('核对原批次')}</button>:<button disabled={busy||disabled||(!target&&!plan?.plan.delete.length)} onClick={()=>void run(async()=>{if(target){await native?.request({operation:'cleanup_removed',expectedRevision:accountRevision,snapshotId:target.snapshot.id,expectedDigest:target.snapshot.sha256,confirmed:true});setCleanup(previous=>previous.filter(item=>item.snapshot.id!==target.snapshot.id));setTarget(null);setMessage(t('已清理远端文件。'))}else if(plan){const chosen=plan;try{const result=await native?.request<{removed:boolean}>({operation:'retention_apply',expectedRevision:accountRevision,commandId:chosen.commandId,confirmed:true});if(result?.removed){setPlan(null);setMessage(t('已移除本批副本；清理状态可通过查找待清理文件查看。'));await onChanged()}}catch(failure){setPlan({...chosen,unknown:true});throw failure}}})}>{t(target?'确认清理文件':'确认执行本批')}</button>}</div></div>
+    </AppDialogContent></Dialog.Portal></Dialog.Root>
+  </section>
+}

@@ -38,7 +38,7 @@ impl Core{
             if request.operation=="retention_status"{return client.retention_status(receipt["plan"].clone()).await}
             ensure!(request.confirmed,"webdav.confirmation_required");let created=chrono::DateTime::parse_from_rfc3339(receipt["createdAt"].as_str().context("webdav.invalid_receipt")?)?;ensure!((chrono::Utc::now()-created.with_timezone(&chrono::Utc)).num_minutes()<15,"webdav.retention_preview_expired");return client.retention_apply(receipt["plan"].clone()).await
         }
-        if request.operation=="cleanup_preview"{return client.cleanup_preview().await}
+        if request.operation=="cleanup_preview"{return client.cleanup_preview(request.snapshot_id.as_deref()).await}
         if request.operation=="cleanup_removed"{ensure!(request.confirmed,"webdav.confirmation_required");return client.cleanup_removed(request.snapshot_id.as_deref().context("webdav.snapshot_required")?,request.expected_digest.as_deref().context("webdav.source_digest_required")?).await}
         if request.operation=="list"{return Ok(json!({"entries":client.list().await?}))}
         if request.operation=="probe"{return client.probe().await}
