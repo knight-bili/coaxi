@@ -28,7 +28,9 @@ struct RovaiCanvasConversationNode: View {
             guard saved?.text("kind") == "conversation", saved?["conversation"] == reference, saved?["objectReference"] == nil || saved?["objectReference"] == .null else {throw RovaiHostFailure(code: "原卡片已删除或绑定已变化；引用保留")}
             if let conversationId {
                 let value = try await model.query(.singleChatGet, params: .object(["conversationId": .string(conversationId), "composerScope": .null])), conversation = value["conversation"]
-                guard conversation?.text("id") == conversationId, conversation?.text("threadId") == threadId, conversation?.text("kind") == "single_chat", conversation?.text("status") == "active" else {throw RovaiHostFailure(code: "原私聊已结束、删除或归属已变化；卡片引用保留")}
+                guard conversation?.text("id") == conversationId, conversation?.text("threadId") == threadId, conversation?.text("status") == "active" else {throw RovaiHostFailure(code: "原私聊已结束、删除或归属已变化；卡片引用保留")}
+                let anchor = try await model.query(.threadsOpen, params: .object(["threadId": .string(threadId), "traceId": .string(UUID().uuidString.lowercased())]))
+                guard anchor["thread"]?.text("id") == threadId else {throw RovaiHostFailure(code: "原私聊的公开会话锚点已不可用")}
                 guard generation == model.connectionGeneration else {throw CancellationError()};ready = true
             } else {
                 let value = try await model.query(.threadsOpen, params: .object(["threadId": .string(threadId), "traceId": .string(UUID().uuidString.lowercased())]))
