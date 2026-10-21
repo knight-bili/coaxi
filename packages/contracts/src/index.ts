@@ -5120,7 +5120,12 @@ export interface HostWebApi {
 }
 
 export interface BackupSummary {createdAt:string;appVersion:string;fileCount:number;totalBytes:number;formatVersion?:number;roots?:Array<{id:string;kind:string;shared:boolean;present:boolean}>}
+export interface ConfigurationSnapshotPreview {formatVersion:number;appVersion:string;createdAt:string;localDigest:string;changes:Array<{domain:string;before:Record<string,unknown>|null;after:Record<string,unknown>|null}>}
 export interface NativeBackupsApi {
+  exportConfiguration(passphrase:string):Promise<{created:boolean;path:string;domains:string[]}|null>
+  inspectConfiguration(passphrase:string):Promise<(ConfigurationSnapshotPreview&{selectionId:string})|null>
+  applyConfiguration(selectionId:string,passphrase:string):Promise<{applied:boolean;restartRequired:boolean}>
+
   create(passphrase:string):Promise<(BackupSummary&{path:string})|null>
   inspect(passphrase:string):Promise<(BackupSummary&{archiveId:string})|null>
   restore(archiveId:string,passphrase:string):Promise<BackupSummary&{restoreStaged:true}>

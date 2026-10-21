@@ -1,3 +1,4 @@
+import {ConfigurationSnapshotSettings} from './ConfigurationSnapshotSettings'
 import { useEffect, useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Archive, Download, Lock, RotateCcw } from 'lucide-react'
@@ -38,5 +39,6 @@ export function BackupSettings():React.JSX.Element{
         </form>
       </AppDialogContent></Dialog.Portal>
     </Dialog.Root>
+    <ConfigurationSnapshotSettings/>
   </section>
 }

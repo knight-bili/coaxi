@@ -1,0 +1,31 @@
+import './ConfigurationSnapshotSettings.css'
+import {useState} from 'react'
+import * as Dialog from '@radix-ui/react-dialog'
+import {Download,Upload,Settings2} from 'lucide-react'
+import type {ConfigurationSnapshotPreview} from '@contracts'
+import {AppDialogContent,AppDialogHeader} from './AppDialog'
+import {useThreadClient} from './camp-client'
+import {useUiText} from './interface-language'
+
+const labels:Record<string,string>={appearance:'外观',general:'界面偏好',windowClose:'关闭窗口',messageLibrary:'全局消息库',preference:'主题',chatFontSize:'对话字号',documentFontSize:'文档字号',codeFontSize:'代码字号',readingDensity:'阅读密度',motionPreference:'动态效果',zoomPercentage:'页面缩放',interfaceLanguage:'界面语言',startupLocationMode:'启动位置',lastSettingsSection:'设置页位置',executionConsolePlacement:'执行过程位置',worldMapEnabled:'会话地图',behavior:'关闭方式'}
+function SnapshotValues({domain,value}:{domain:string;value:Record<string,unknown>|null}):React.JSX.Element{
+  const t=useUiText();if(!value)return <span>{t('未配置')}</span>
+  if(domain==='messageLibrary'){const tags=Array.isArray(value.tags)?value.tags as string[]:[],messages=Array.isArray(value.quickMessages)?value.quickMessages as Array<{id:string;title:string;textBytes?:number}>:[];return <div><p>{t('标签')}：{tags.join('、')||t('无')}</p><p>{t('快捷消息')}：{messages.length}</p>{messages.map(message=><p key={message.id}>{message.title} · {message.textBytes??0} B</p>)}</div>}
+  const names:Record<string,string>={system:'跟随系统',light:'浅色',dark:'深色',standard:'标准',relaxed:'宽松',reduce:'减少动态效果','zh-CN':'简体中文',en:'English',last_location:'上次位置',quick_chat:'快速对话',right:'右侧',inspector:'详情栏',bottom:'底部',ask:'每次询问',tray:'保留在托盘',exit:'退出应用'}
+  return <dl>{Object.entries(value).map(([key,item])=><div key={key}><dt>{t(labels[key]??key)}</dt><dd>{typeof item==='boolean'?t(item?'开启':'关闭'):t(names[String(item)]??String(item))}</dd></div>)}</dl>
+}
+export function ConfigurationSnapshotSettings():React.JSX.Element{
+  const api=useThreadClient().nativeBackups,t=useUiText();const [mode,setMode]=useState<'export'|'inspect'|'apply'|null>(null),[passphrase,setPassphrase]=useState(''),[repeat,setRepeat]=useState(''),[confirmation,setConfirmation]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState<string|null>(null),[message,setMessage]=useState<string|null>(null),[preview,setPreview]=useState<(ConfigurationSnapshotPreview&{selectionId:string})|null>(null)
+  const open=(next:typeof mode):void=>{setPassphrase('');setRepeat('');setConfirmation('');setError(null);setMode(next)}
+  const submit=async():Promise<void>=>{if(!api||busy)return;setBusy(true);setError(null);try{
+    if(mode==='export'){if(passphrase!==repeat)throw Error(t('两次输入的口令不一致。'));const result=await api.exportConfiguration(passphrase);if(result){setMessage(t('加密配置已导出。')+' '+result.path);setMode(null)}}
+    else if(mode==='inspect'){const result=await api.inspectConfiguration(passphrase);if(result){setPreview(result);setMode(null)}}
+    else if(mode==='apply'&&preview){await api.applyConfiguration(preview.selectionId,passphrase);setMode(null)}
+  }catch(failure){setError(String(failure))}finally{setBusy(false);setPassphrase('');setRepeat('')}}
+  return <section className="section-block general-settings-section"><div className="section-heading"><div><h3><Settings2 size={17}/> {t('可移植配置')}</h3><p>{t('单独迁移外观、界面偏好、关闭方式和全局消息库。导入前预览，应用后重启。')}</p></div></div>
+    {api?<div className="workbench-toolbar"><button disabled={busy} onClick={()=>open('export')}><Upload size={14}/>{t('导出加密配置')}</button><button disabled={busy} onClick={()=>open('inspect')}><Download size={14}/>{t('选择配置并预览')}</button></div>:<p>{t('请在桌面主机或独立服务器命令行导出和导入配置。')}</p>}
+    {message&&<p role="status">{message}</p>}{error&&!mode&&<p className="workbench-error" role="alert">{error}</p>}
+    {preview&&<div className="backup-preview-summary"><p>{t('配置来源')} · {preview.appVersion} · {new Date(preview.createdAt).toLocaleString()}</p>{preview.changes.map(change=><details key={change.domain}><summary>{t(labels[change.domain]??change.domain)}</summary><div className="configuration-compare"><div><h4>{t('当前配置')}</h4><SnapshotValues domain={change.domain} value={change.before}/></div><div><h4>{t('导入后的配置')}</h4><SnapshotValues domain={change.domain} value={change.after}/></div></div></details>)}<button disabled={busy||preview.changes.length===0} onClick={()=>open('apply')}>{t('应用这份配置并重启…')}</button></div>}
+    <Dialog.Root open={mode!==null} onOpenChange={next=>{if(!next&&!busy)open(null)}}><Dialog.Portal><Dialog.Overlay className="dialog-overlay"/><AppDialogContent width="compact" tone={mode==='apply'?'danger':'neutral'}><AppDialogHeader title={t(mode==='export'?'导出加密配置':mode==='apply'?'应用配置并重启':'预览加密配置')} description={t(mode==='apply'?'将应用预览中的配置。若本机设置已经变化，会保留当前设置并要求重新预览。':'配置文件需要口令才能读取。请自行保管口令。')} closeDisabled={busy}/><form className="forge-form" onSubmit={event=>{event.preventDefault();void submit()}}><label>{t('加密口令')}<input type="password" autoComplete="off" disabled={busy} value={passphrase} onChange={event=>setPassphrase(event.target.value)} data-dialog-autofocus/></label>{mode==='export'&&<label>{t('再次输入口令')}<input type="password" autoComplete="off" disabled={busy} value={repeat} onChange={event=>setRepeat(event.target.value)}/><small>{t('至少8个字符。')}</small></label>}{mode==='apply'&&<label>{t('输入“应用配置”确认')}<input disabled={busy} value={confirmation} onChange={event=>setConfirmation(event.target.value)}/></label>}{error&&<p className="workbench-error" role="alert">{error}</p>}<div className="dialog-actions"><button type="button" disabled={busy} onClick={()=>open(null)}>{t('取消')}</button><button disabled={busy||!passphrase||mode==='export'&&([...passphrase].length<8||repeat!==passphrase)||mode==='apply'&&confirmation!=='应用配置'}>{t(busy?'处理中…':mode==='apply'?'应用并重启':mode==='export'?'选择保存位置':'选择配置文件')}</button></div></form></AppDialogContent></Dialog.Portal></Dialog.Root>
+  </section>
+}

@@ -1,5 +1,5 @@
 import { BrowserWindow, dialog, type IpcMainInvokeEvent } from 'electron'
-import type { BackupSummary } from '@contracts'
+import type { BackupSummary, ConfigurationSnapshotPreview } from '@contracts'
 import { spawn } from 'node:child_process'
 import { createReadStream } from 'node:fs'
 import { createHash, randomUUID } from 'node:crypto'
@@ -11,6 +11,7 @@ export async function backupFileDigest(path:string):Promise<string>{const hash=c
  * receives an expiring selection id and a summary, never a passphrase receipt. */
 export class BackupWorkspace{
   private busy=false
+  private readonly configSelections=new Map<string,{path:string;digest:string;localDigest:string;preferencesRoot:string;expires:number}>()
   private readonly selections=new Map<string,{path:string;digest:string;expires:number}>()
   constructor(private readonly core:Pick<CoreClient,'shutdown'|'start'>,private readonly dataRoot:()=>string|null,private readonly owner:()=>BrowserWindow|null,private readonly prepare:()=>Promise<void>,private readonly beforeOffline:()=>void,private readonly restartApp:()=>void,private readonly preferencesRoot:()=>string|null=dataRoot){}
   private execute<T={manifest:Manifest}>(operation:string,root:string,file:string|undefined,passphrase:string,event:IpcMainInvokeEvent,command='backup',extra:string[]=[]):Promise<T>{
@@ -26,6 +27,26 @@ export class BackupWorkspace{
       child.stdin.on('error',()=>undefined);child.stdin.end(JSON.stringify({passphrase}))
     })
   }
+  private async invokeConfiguration(event:IpcMainInvokeEvent,operation:string,input:{selectionId?:string},owner:BrowserWindow,root:string,passphrase:string):Promise<unknown>{
+    if(!['config_export','config_inspect','config_apply'].includes(operation))throw new Error('config_sync.operation_not_admitted')
+    const preferences=this.preferencesRoot()??root;const extra=['--preferences-root',preferences];this.busy=true;let offline=false,restarting=false
+    try{
+      if(operation==='config_export'){
+        if([...passphrase].length<8)throw new Error('config_sync.passphrase_too_short')
+        const selected=await dialog.showSaveDialog(owner,{title:'导出加密配置',defaultPath:`Rovai-settings-${new Date().toISOString().slice(0,10)}.rovai-config`,filters:[{name:'加密配置',extensions:['rovai-config']}]});if(selected.canceled||!selected.filePath)return null
+        return this.execute('export',root,selected.filePath,passphrase,event,'config-snapshot',extra)
+      }
+      if(operation==='config_inspect'){
+        const selected=await dialog.showOpenDialog(owner,{title:'预览加密配置',properties:['openFile'],filters:[{name:'加密配置',extensions:['rovai-config']}]});if(selected.canceled||!selected.filePaths[0])return null
+        const path=selected.filePaths[0],digest=await backupFileDigest(path),preview=await this.execute<ConfigurationSnapshotPreview>('inspect',root,path,passphrase,event,'config-snapshot',[...extra,'--summary-only']);if(await backupFileDigest(path)!==digest)throw new Error('config_sync.archive_changed')
+        const id=randomUUID();this.configSelections.set(id,{path,digest,localDigest:preview.localDigest,preferencesRoot:preferences,expires:Date.now()+15*60000});return {...preview,selectionId:id}
+      }
+      const selection=input.selectionId?this.configSelections.get(input.selectionId):undefined
+      if(!selection||selection.expires<Date.now()||selection.preferencesRoot!==preferences||await backupFileDigest(selection.path)!==selection.digest)throw new Error('config_sync.selection_expired_or_changed')
+      await this.prepare();this.beforeOffline();const stopped=await this.core.shutdown();offline=true;if(stopped.forcedSignal!==null)throw new Error('config_sync.core_shutdown_incomplete')
+      const result=await this.execute<{applied:boolean;restartRequired:boolean}>('apply',root,selection.path,passphrase,event,'config-snapshot',[...extra,'--expected-local-digest',selection.localDigest]);restarting=true;setImmediate(this.restartApp);return result
+    }finally{this.busy=false;if(offline&&!restarting)this.core.start()}
+  }
   async invoke(event:IpcMainInvokeEvent,operation:unknown,input:unknown):Promise<unknown>{
     const owner=this.owner(),root=this.dataRoot()
     if(!owner||owner.isDestroyed()||event.sender!==owner.webContents||event.senderFrame!==owner.webContents.mainFrame||!root)throw new Error('backup.local_owner_required')
@@ -33,6 +54,7 @@ export class BackupWorkspace{
     if(!input||typeof input!=='object'||Array.isArray(input))throw new Error('backup.invalid_request')
     const {passphrase,archiveId}=input as {passphrase:string;archiveId?:string}
     if(typeof passphrase!=='string'||passphrase.length>16000)throw new Error('backup.invalid_passphrase')
+    if(typeof operation==='string'&&operation.startsWith('config_'))return this.invokeConfiguration(event,operation,input as {selectionId?:string},owner,root,passphrase)
     this.busy=true;let offline=false,restarting=false
     try{
       if(operation==='inspect'){

@@ -1,0 +1,6 @@
+.configuration-compare { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; padding: 12px 0; }
+.configuration-compare > div { min-width: 0; overflow-wrap: anywhere; }
+.configuration-compare dl { display: grid; gap: 8px; margin: 0; }
+.configuration-compare dl > div { display: flex; justify-content: space-between; gap: 12px; }
+.configuration-compare dd { margin: 0; text-align: end; }
+@media (max-width: 640px) { .configuration-compare { grid-template-columns: minmax(0, 1fr); gap: 12px; } }
