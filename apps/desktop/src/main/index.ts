@@ -305,6 +305,7 @@ const allowedMethods = new Set<CoreMethod>([
   'threads.creationPreflight',
   'workspaces.inspect',
   'workspaces.worktrees',
+  'workbench.projectLauncher',
   'workbench.files.tools',
   'workbench.files.list',
   'workbench.organizer.get',

@@ -22,6 +22,7 @@ mod appearance_extensions;
 mod pets_access;
 mod office_skills;
 mod custom_skills;
+mod project_launcher;
 mod forge;
 pub(crate) mod private_composer;
 mod private_sources;
@@ -9524,6 +9525,7 @@ impl Core {
                 let database = self.database.lock().await;
                 Ok(serde_json::to_value(self.skill_library.list(&database)?)?)
             }
+            "workbench.projectLauncher" => self.project_launcher(request.params.clone()).await,
             "office.cli" => crate::office_preview::installer::operation(&self.data_dir,request.params.clone()).await,
             "skillPacks.custom.prepare" => self.custom_skill_prepare(request.params.clone()).await,
             "skillPacks.custom.install" => self.custom_skill_install(request.params.clone()).await,

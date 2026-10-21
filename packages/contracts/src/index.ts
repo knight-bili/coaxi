@@ -5021,6 +5021,7 @@ export type CoreMethod =
   | 'browser.local.revoke'
   | 'browser.local.begin'
   | 'browser.local.finish'
+  | 'workbench.projectLauncher'
   | 'workbench.files.tools'
   | 'workbench.files.list'
   | 'workbench.organizer.get'

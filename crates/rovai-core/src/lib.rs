@@ -94,6 +94,7 @@ pub mod local_attachment_source;
 pub mod managed_attachment;
 pub mod managed_blob;
 pub mod managed_process;
+pub(crate) mod managed_operation;
 pub mod managed_skills;
 pub mod mcp;
 pub mod mcp_import;

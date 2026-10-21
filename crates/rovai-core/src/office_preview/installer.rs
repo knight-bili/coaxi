@@ -1,7 +1,6 @@
 use super::*;
-use crate::managed_process::{ManagedProcess, ManagedProcessLaunchSpec, ManagedProcessPurpose, ManagedStdinPolicy, ManagedWindowsArgvDialect};
+use crate::managed_operation::run_bounded_command as execute;
 use std::{sync::Arc, fs};
-use tokio::io::AsyncReadExt;
 use tokio_util::sync::CancellationToken;
 include!("installer_command.rs");
 
@@ -9,21 +8,6 @@ struct Active { root:PathBuf, cancel:CancellationToken, log:Arc<tokio::sync::Mut
 static ACTIVE:LazyLock<tokio::sync::Mutex<HashMap<String,Active>>>=LazyLock::new(Default::default);
 static MUTATION:LazyLock<Arc<tokio::sync::Mutex<()>>>=LazyLock::new(||Arc::new(tokio::sync::Mutex::new(())));
 fn receipt(root:&Path,id:&str)->PathBuf{root.join("office-cli-operations").join(format!("{id}.json"))}
-async fn drain(mut reader:impl tokio::io::AsyncRead+Unpin,log:Arc<tokio::sync::Mutex<Vec<u8>>>)->std::io::Result<()> {
-    let mut buffer=[0u8;4096];loop{let count=reader.read(&mut buffer).await?;if count==0{return Ok(())}let mut log=log.lock().await;log.extend_from_slice(&buffer[..count]);if log.len()>64*1024{let remove=log.len()-64*1024;log.drain(..remove);}}
-}
-async fn execute(mut command:tokio::process::Command,owner:&str,timeout:Duration,cancel:CancellationToken,log:Arc<tokio::sync::Mutex<Vec<u8>>>)->Result<()> {
-    command.stdin(std::process::Stdio::null());
-    let spec=ManagedProcessLaunchSpec::capture(&command,ManagedProcessPurpose::RuntimeOneShot,ManagedStdinPolicy::Null,ManagedWindowsArgvDialect::MicrosoftCrt,owner.to_owned())?;
-    let mut child=ManagedProcess::spawn(spec)?;
-    let out=tokio::spawn(drain(child.take_stdout().context("office.stdout_missing")?,log.clone()));
-    let err=tokio::spawn(drain(child.take_stderr().context("office.stderr_missing")?,log));
-    let waited=tokio::select!{status=child.wait()=>status.map_err(anyhow::Error::from),_=tokio::time::sleep(timeout)=>Err(anyhow::anyhow!("office.process_timeout")),_=cancel.cancelled()=>Err(anyhow::anyhow!("office.operation_cancelled"))};
-    match waited {
-        Ok(status)=>{tokio::time::timeout(Duration::from_secs(3),async{out.await??;err.await??;Ok::<(),anyhow::Error>(())}).await??;ensure!(status.success(),"office.process_failed: {status}");Ok(())},
-        Err(error)=>{let _=child.force_terminate_tree();let _=tokio::time::timeout(Duration::from_secs(3),child.wait()).await;out.abort();err.abort();Err(error)}
-    }
-}
 pub async fn probe(root:&Path)->Result<Value>{
     let Some(binary)=resolve_officecli() else{return Ok(json!({"installed":false,"runnable":false,"manualUrl":OFFICECLI_MANUAL_URL}))};
     let digest=crate::backup::file_digest(&binary)?.1;
