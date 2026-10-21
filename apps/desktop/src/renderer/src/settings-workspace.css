@@ -1499,3 +1499,5 @@
 .runtime-conflict-value { color: var(--muted); overflow-wrap: anywhere; }
 .runtime-conflict-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .runtime-conflict-actions .quiet-button { min-height: 32px; }
+
+.extension-catalog-settings>summary{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px}.extension-catalog-settings>p{font-size:12px;color:var(--muted)}.extension-catalog-rows>details{padding:10px 0;border-top:1px solid var(--line)}.extension-catalog-rows summary{display:flex;align-items:center;gap:10px;cursor:pointer}.extension-catalog-rows summary>strong{font-size:12px;flex:1}.extension-catalog-rows summary>small{font:11px monospace;color:var(--muted)}.extension-catalog-rows dl{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:11px}.extension-catalog-rows dd{margin:0;overflow-wrap:anywhere}.extension-catalog-rows dt{color:var(--muted)}.extension-catalog-rows a{display:inline-flex;align-items:center;gap:6px;font-size:12px}

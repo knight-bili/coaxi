@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeg-rovai.local/contracts/extension-descriptor/v1",
+  "title": "Core extension descriptor v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "kind", "contractVersion", "version", "displayName", "dataOwner", "hosts", "permissions", "capabilities", "configurationMethod", "source"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-z][a-z0-9._-]{1,159}$"},
+    "kind": {"enum": ["runtime", "channel", "viewer", "skill", "theme"]},
+    "contractVersion": {"const": 1},
+    "version": {"type": "string", "minLength": 1, "maxLength": 128},
+    "displayName": {"type": "string", "minLength": 1, "maxLength": 256},
+    "dataOwner": {"const": "rovai-core"},
+    "hosts": {"type": "array", "uniqueItems": true, "items": {"enum": ["desktop", "server", "web", "android", "ios"]}},
+    "permissions": {"type": "array", "uniqueItems": true, "items": {"type": "string", "maxLength": 128}},
+    "capabilities": {"type": "array", "uniqueItems": true, "items": {"type": "string", "maxLength": 128}},
+    "configurationMethod": {"type": "string", "minLength": 1, "maxLength": 128},
+    "source": {"type": "object", "additionalProperties": false, "required": ["repository", "revision", "license", "path"], "properties": {"repository": {"type": "string", "format": "uri"}, "revision": {"type": "string", "pattern": "^[a-f0-9]{40}$"}, "license": {"type": "string", "minLength": 1}, "path": {"type": "string", "minLength": 1}}}
+  }
+}

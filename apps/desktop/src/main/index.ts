@@ -319,6 +319,7 @@ const allowedMethods = new Set<CoreMethod>([
   'forge.operation',
   'forge.links',
   'channels.adapters',
+  'extensions.catalog',
   'workbench.organizer.set',
   'workbench.files.read',
   'workbench.files.mutate',

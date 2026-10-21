@@ -29,6 +29,7 @@ mod forge_links;
 mod channel_adapters;
 mod channel_adapter_messages;
 mod channel_adapter_status;
+mod extension_catalog;
 pub(crate) mod private_composer;
 mod private_sources;
 pub(crate) mod runtime_interactions;
@@ -10365,6 +10366,7 @@ impl Core {
                 self.forge_accounts(&request.method, request.params.clone()).await
             }
             "forge.operation" => self.forge_operation(request.params.clone()).await,
+            "extensions.catalog" => self.extension_catalog(request.params.clone()).await,
             "forge.links" => self.forge_links(request.params.clone()).await,
             "channels.adapters" => self.channel_adapter_operation(request.params.clone(), false).await,
             "channels.adapters.private" => self.channel_adapter_operation(request.params.clone(), true).await,

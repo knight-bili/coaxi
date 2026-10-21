@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 /// and the legacy shared draft remain outside the network capability.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum Operation {
+    #[serde(rename="extensions.catalog")]
+    ExtensionCatalog,
     #[serde(rename="channels.adapters")]
     ChannelAdapters,
     #[serde(rename="forge.links")]
@@ -622,6 +624,7 @@ impl Operation {
         match self {
             Self::ForgeAccountsGet => "forge.accounts.get",
             Self::ForgeAccountsSet => "forge.accounts.set",
+            Self::ExtensionCatalog => "extensions.catalog",
             Self::ChannelAdapters => "channels.adapters",
             Self::ForgeLinks => "forge.links",
             Self::ProjectLauncher => "workbench.projectLauncher",

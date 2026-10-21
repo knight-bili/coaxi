@@ -1,4 +1,5 @@
 import { WebdavSettings } from './WebdavSettings'
+import { ExtensionCatalogSettings } from './ExtensionCatalogSettings'
 import { BackupSettings } from './BackupSettings'
 import { WindowCloseSettings } from './WindowCloseSettings'
 import { GeneralLeadSelect } from './GeneralLeadSelect'
@@ -372,6 +373,7 @@ export function GeneralSettings({
         {browserAccess}
         <BackupSettings/>
         <WebdavSettings/>
+        <ExtensionCatalogSettings/>
         <section className="section-block general-settings-section general-language-section" aria-labelledby="general-language-heading">
           <div className="section-heading"><div><h2 id="general-language-heading">{t('界面语言')}</h2></div></div>
           <div className="general-section-body">
