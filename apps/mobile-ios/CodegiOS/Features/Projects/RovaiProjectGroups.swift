@@ -8,6 +8,10 @@ struct RovaiProjectGroups: View {
     @State private var folders: [String:RovaiCanvasFolderRelation] = [:]
     @State private var generation: UInt64?,issue: String?
     @State private var busy = false,ready = false,useCurrent = false
+    @State private var arranging = false,replaceLayout = false
+    @State private var layout: RovaiProjectLayout?,initialLayout: RovaiProjectLayout?
+    @State private var layoutRevision = 0
+    private let layoutOwner = "project-groups:layout"
     private let draftOwner = "project-groups:editor",pendingOwner = "project-groups:pending"
     private var active: [String] {var seen = Set<String>();return (model.navigation["projects"]?.rvArray ?? []).map {$0.text("projectPath")}.filter {rovaiProjectPath($0) && seen.insert($0).inserted}}
     private var groups: [JSONValue] {source?["projectGroups"]?.rvArray ?? []}
@@ -16,7 +20,7 @@ struct RovaiProjectGroups: View {
     private var selected: [String] {(group["projectPaths"]?.rvArray ?? []).compactMap(\.stringValue)}
     private var previous: JSONValue? {groups.first {$0.text("id") == group.text("id")}}
     private var previousPaths: [String] {(previous?["projectPaths"]?.rvArray ?? []).compactMap(\.stringValue)}
-    private var stale: Bool {editor != nil && editor?["revision"]?.rvInt != revision}
+    private var stale: Bool {arranging ? layoutRevision != revision : editor != nil && editor?["revision"]?.rvInt != revision}
     private var missing: Bool {editor?.text("mode") == "update" && previous == nil}
     private var membershipIssue: Bool {selected.contains {!previousPaths.contains($0) && (folders[$0]?.complete != true || folders[$0]?.parentPath != nil)}}
     private var blocked: Bool {busy || !ready || source == nil || pending != nil || model.busy || model.pending != nil || generation != model.connectionGeneration}
@@ -34,8 +38,9 @@ struct RovaiProjectGroups: View {
                 Button("原样重试原修改") {Task {await retry(pending)}}.disabled(busy)
                 if source != nil,revision>(pending["params"]?["expectedRevision"]?.rvInt ?? Int.max) {Button("使用当前版本并放弃旧本机计划") {useCurrent = true}.disabled(busy)}
             }}
-            if editor == nil {
-                Section {Button("新建项目分组") {edit(nil)}.disabled(blocked);if groups.isEmpty {Text("还没有项目分组。").foregroundStyle(Theme.textSecondary)}}
+            if arranging {layoutSections}
+            else if editor == nil {
+                Section {Button("排列项目与分组") {beginLayout()}.disabled(blocked || active.contains {folders[$0]?.complete != true});Button("新建项目分组") {edit(nil)}.disabled(blocked);if groups.isEmpty {Text("还没有项目分组。").foregroundStyle(Theme.textSecondary)}}
                 ForEach(groups.map(RovaiRow.init(value:))) {row in Section {
                     HStack {Circle().fill(rovaiCanvasTint(row.value.text("color")) ?? Theme.textSecondary).frame(width: 10,height: 10);Text(row.value.text("name")).font(.headline);Spacer();Text("\(row.value["projectPaths"]?.rvArray.count ?? 0) 个工程").font(.caption).foregroundStyle(Theme.textSecondary)}
                     Button("编辑") {edit(row.value)}.disabled(blocked)
@@ -44,6 +49,10 @@ struct RovaiProjectGroups: View {
             } else {editorSections}
         }.navigationTitle("管理项目分组").toolbar {Button("保留草稿并关闭") {close()}.disabled(busy)}}.interactiveDismissDisabled(true)
         .task {await restore()}
+        .confirmationDialog("放弃本机排版，载入最新布局？",isPresented: $replaceLayout,titleVisibility: .visible) {
+            Button("载入最新布局",role: .destructive) {if let source {let next = createProjectLayout(source,active: active,folders: folders);initialLayout = next;layout = next;layoutRevision = revision;persistLayout()}}.disabled(blocked)
+            Button("保留当前排版",role: .cancel) {}
+        } message: {Text("当前未保存的位置和分组调整将被替换；不会向工作区提交更改。")}
         .confirmationDialog("删除项目分组？",isPresented: Binding(get: {removal != nil},set: {if !$0 {removal = nil}}),titleVisibility: .visible) {
             Button("确认删除分组",role: .destructive) {if let removal {let mutation: JSONValue = .object(["type": .string("delete"),"groupId": removal["group"]?["id"] ?? .null]);Task {await apply(mutation)}};removal = nil}.disabled(blocked || removal?["revision"]?.rvInt != revision)
             Button("取消",role: .cancel) {removal = nil}
@@ -53,6 +62,25 @@ struct RovaiProjectGroups: View {
             Button("保留原计划",role: .cancel) {}
         } message: {Text("当前版本已超过原修改的版本，原旧请求不能再写入。只放弃这次本机未决计划；未保存的分组草稿仍保留。")}
     }
+    @ViewBuilder private var layoutSections: some View {
+        Section("排列项目与分组") {
+            if stale {Text("项目排列已有新修改，当前排版草稿保留。").foregroundStyle(Theme.warning)}
+            if let initialLayout,let layout,projectLayoutRelationIssue(initialLayout,next: layout,folders: folders) {Text("工程关系已有变化或尚未核对，请重新读取后使用最新布局。").foregroundStyle(Theme.warning)}
+            Button("放弃本机排版并载入最新布局") {replaceLayout = true}.disabled(blocked)
+        }
+        if let layout {ForEach(layout.top,id: \.key) {entry in Section {
+            RovaiProjectLayoutRow(entry: entry,layout: layout,groups: groups,folders: folders,blocked: blocked || stale,onMove: moveLayout)
+            if entry.kind == "group" {ForEach(layout.members[entry.target] ?? [],id: \.self) {path in RovaiProjectLayoutRow(entry: .init(kind: "project",target: path),layout: layout,groups: groups,folders: folders,blocked: blocked || stale,onMove: moveLayout)}}
+        }}}
+        Section {
+            Button("保存排列") {if let layout {Task {await apply(.object(["type": .string("layout"),"entries": .array(layout.entries())]))}}}.disabled(blocked || stale || layout == nil || initialLayout == nil || layout == initialLayout || projectLayoutRelationIssue(initialLayout ?? .init(top: [],members: [:]),next: layout ?? .init(top: [],members: [:]),folders: folders))
+            Button("保留排版，返回清单") {persistLayout();arranging = false}.disabled(busy)
+        }
+    }
+    private func layoutBody() throws -> String {guard let layout,let initialLayout else {throw RovaiHostFailure(code: "项目排版草稿不完整")};return try encode(.object(["version": .number(1),"revision": .number(Double(layoutRevision)),"base": initialLayout.value(),"layout": layout.value()]))}
+    private func persistLayout() {guard ready,generation == model.connectionGeneration,layout != nil else {return};do {try model.saveBody(layoutOwner,body: layoutBody())} catch {issue = error.localizedDescription}}
+    private func beginLayout() {guard let source else {return};if layout == nil {let next = createProjectLayout(source,active: active,folders: folders);initialLayout = next;layout = next;layoutRevision = revision;persistLayout()};arranging = true}
+    private func moveLayout(_ entry: RovaiProjectLayoutItem,_ target: RovaiProjectLayoutLocation) {guard let initialLayout,let layout else {return};let next = layout.move(entry,to: target);guard !projectLayoutRelationIssue(initialLayout,next: next,folders: folders) else {issue = "工程关系已有变化或尚未核对，请重新读取后使用最新布局。";return};self.layout = next;persistLayout()}
     @ViewBuilder private var editorSections: some View {
         Section("分组") {
             if stale {Text("分组已有新修改，输入已保留。请核对最新清单后继续。").foregroundStyle(Theme.warning);ForEach(groups.map(RovaiRow.init(value:))) {row in Text(row.value.text("name")+" · \(row.value["projectPaths"]?.rvArray.count ?? 0) 个工程").font(.caption)};Button("已核对最新分组") {editorChange(["revision": .number(Double(revision))])}.disabled(blocked || missing)}
@@ -81,7 +109,7 @@ struct RovaiProjectGroups: View {
     private func editorChange(_ patch: [String:JSONValue]) {guard let editor else {return};self.editor = .object(editor.rvObject.merging(patch) {_,next in next});persist()}
     private func groupChange(_ patch: [String:JSONValue]) {editorChange(["group": .object(group.rvObject.merging(patch) {_,next in next})])}
     private func persist() {guard ready,let editor,generation == model.connectionGeneration else {return};do {try model.saveBody(draftOwner,body: editorBody(editor))} catch {issue = error.localizedDescription}}
-    private func close() {guard !busy else {return};guard ready,let editor,generation == model.connectionGeneration else {dismiss();return};do {try model.saveBody(draftOwner,body: editorBody(editor));dismiss()} catch {issue = error.localizedDescription}}
+    private func close() {guard !busy else {return};if arranging,ready,generation == model.connectionGeneration {do {try model.saveBody(layoutOwner,body: layoutBody());dismiss()} catch {issue = error.localizedDescription};return};guard ready,let editor,generation == model.connectionGeneration else {dismiss();return};do {try model.saveBody(draftOwner,body: editorBody(editor));dismiss()} catch {issue = error.localizedDescription}}
     private func edit(_ row: JSONValue?) {
         guard !blocked else {return}
         let group = row ?? .object(["id": .string(UUID().uuidString.lowercased()),"name": .string(""),"color": .null,"projectPaths": .array([])])
@@ -99,12 +127,15 @@ struct RovaiProjectGroups: View {
             if !rawPending.isEmpty {guard let value = JSONValue.parse(rawPending),value["version"] == .number(1),value["params"]?.text("action") == "replace",value["params"]?["value"]?.isObject == true,case .number(let revision) = value["params"]?["expectedRevision"],revision.isFinite,revision>=0,revision<=9007199254740991,revision.rounded() == revision else {throw RovaiHostFailure(code: "原分组未决记录无法读取，已保留")};pending = value}
             let raw = try model.readBody(draftOwner)
             if !raw.isEmpty {guard let value = JSONValue.parse(raw),value["version"] == .number(1),value["editor"]?.isObject == true else {throw RovaiHostFailure(code: "原分组草稿无法读取，已保留")};editor = value["editor"]}
+            let rawLayout = try model.readBody(layoutOwner)
+            if !rawLayout.isEmpty {guard let value = JSONValue.parse(rawLayout),value["version"] == .number(1),let base = value["base"],let current = value["layout"] else {throw RovaiHostFailure(code: "原排版草稿无法读取，已保留")};initialLayout = try parseProjectLayout(base);layout = try parseProjectLayout(current);layoutRevision = value["revision"]?.rvInt ?? 0;arranging = editor == nil}
             try await load();ready = true
         } catch is CancellationError {} catch {issue = error.localizedDescription}
     }
     private func finish(_ value: JSONValue,record: JSONValue) throws {
         guard let generation,projectGroupPendingMatches(value,pending: record["params"] ?? .null) else {throw RovaiHostFailure(code: "当前分组与原修改尚未一致；保留原请求核对")}
         guard try model.clearBodyIfMatches(pendingOwner,expectedBody: encode(record),expectedGeneration: generation) else {throw RovaiHostFailure(code: "本机未决记录已有新修改，已保留")}
+        if let body = record["layoutBody"]?.stringValue {_ = try model.clearBodyIfMatches(layoutOwner,expectedBody: body,expectedGeneration: generation);layout = nil;initialLayout = nil;arranging = false}
         if let body = record["editorBody"]?.stringValue {_ = try model.clearBodyIfMatches(draftOwner,expectedBody: body,expectedGeneration: generation)}
         source = value;pending = nil;editor = nil;issue = nil
     }
@@ -115,9 +146,9 @@ struct RovaiProjectGroups: View {
     private func apply(_ mutation: JSONValue) async {
         guard !blocked,!stale,let source else {return};busy = true;defer {busy = false}
         do {
-            let revision = editor?["revision"]?.rvInt ?? revision,value = try projectGroupPlan(source,expectedRevision: revision,input: mutation,activePaths: active)
-            let params: JSONValue = .object(["action": .string("replace"),"expectedRevision": .number(Double(revision)),"value": value])
-            let record: JSONValue = .object(["version": .number(1),"params": params,"editorBody": try editor.map {JSONValue.string(try editorBody($0))} ?? .null])
+            let expected = arranging ? layoutRevision : editor?["revision"]?.rvInt ?? self.revision,value = try projectGroupPlan(source,expectedRevision: expected,input: mutation,activePaths: active)
+            let params: JSONValue = .object(["action": .string("replace"),"expectedRevision": .number(Double(expected)),"value": value])
+            let record: JSONValue = .object(["version": .number(1),"params": params,"editorBody": try editor.map {JSONValue.string(try editorBody($0))} ?? .null,"layoutBody": arranging ? .string(try layoutBody()) : .null])
             try model.saveBody(pendingOwner,body: encode(record));guard generation == model.connectionGeneration else {throw CancellationError()};pending = record;try await send(record)
         } catch is CancellationError {} catch {issue = error.localizedDescription}
     }
