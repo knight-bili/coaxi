@@ -3,6 +3,7 @@ mod server_channels;
 mod transport_channels;
 mod backup;
 mod config_snapshot;
+mod program_recovery;
 mod lifecycle;
 mod server;
 mod server_logs;
@@ -38,6 +39,8 @@ struct Cli {
 enum Command {
     /// Publish the local owner CLI discovery record using native private storage.
     AutomationStorage { #[arg(long)] directory:PathBuf },
+    /// Inspect or explicitly switch an installer-owned program revision; never rewrite business data.
+    ProgramRecovery(program_recovery::Arguments),
     /// Register only Desktop-owned state units for the current local data root.
     BackupPreferences { #[arg(long)] data_dir:PathBuf, #[arg(long)] preferences_root:PathBuf },
     /// Offline encrypted backup/restore; passphrase is read from stdin only.
@@ -118,6 +121,7 @@ pub fn run_host() -> Result<()> {
             Command::BackupPreferences{data_dir,preferences_root}=>{anyhow::ensure!(data_dir.is_absolute()&&preferences_root.is_absolute(),"backup.absolute_paths_required");rovai_core::backup::owned_roots::register_desktop(&data_dir,&preferences_root)?;println!("{}",serde_json::json!({"registered":true}));return Ok(())}
             Command::RecoverLocalData{data_dir}=>{anyhow::ensure!(data_dir.is_absolute(),"backup.absolute_paths_required");println!("{}",rovai_core::backup::recover_before_desktop(&data_dir)?);return Ok(())}
             Command::ConfigRecover{data_dir}=>{anyhow::ensure!(data_dir.is_absolute(),"config_sync.absolute_paths_required");let recovered=rovai_core::backup::light_config::recover(&data_dir)?;println!("{}",serde_json::json!({"recovered":recovered}));return Ok(())}
+            Command::ProgramRecovery(args)=>{return program_recovery::run(args)},
             Command::ConfigSnapshot(args)=>{return config_snapshot::run(args)},
             Command::Backup(args)=>{return backup::run(args)},
             Command::Token => {

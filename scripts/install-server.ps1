@@ -93,7 +93,7 @@ try {
     if ($hadPrevious) { [IO.Directory]::Move($current, $previous) }
     try { [IO.Directory]::Move($incoming, $current); $incoming = $null }
     catch { if ($hadPrevious) { [IO.Directory]::Move($previous, $current) }; throw }
-    if ($hadPrevious) { Remove-Item -LiteralPath $previous -Recurse -Force }
+    if ($hadPrevious) { Write-Output "Previous program preserved at $previous. Business data was not changed." }
     if (-not $NoModifyPath) {
         $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
         if (@($userPath -split ';') -notcontains $current) { [Environment]::SetEnvironmentVariable('Path', ($current + ';' + $userPath), 'User') }
