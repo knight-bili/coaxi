@@ -100,6 +100,7 @@ pub(super) fn reconcile(
         "camps.members.fast.set" => camp!(rovai_core::camp_fast::SetThreadMemberFastCommand),
         "members.remove" => user!(RemoveMemberCommand),
         "members.reorder" => user!(ReorderAgentProfilesCommand),
+        "members.presence.set" => user!(SetMemberPresenceCommand),
         "notifications.preference.update" => user!(UpdateNotificationPreferenceCommand),
         "notifications.acknowledge" => user!(AcknowledgeNotificationEpisodeCommand),
         "notifications.acknowledgeVisibleSources" => {

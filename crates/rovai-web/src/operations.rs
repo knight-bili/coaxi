@@ -122,6 +122,8 @@ pub enum Operation {
     MemberRemove,
     #[serde(rename = "members.reorder")]
     MemberReorder,
+    #[serde(rename = "members.presence.set")]
+    MemberPresence,
     #[serde(rename = "runtime.subsystems.retry")]
     SubsystemRetry,
     #[serde(rename = "notifications.inbox")]
@@ -678,6 +680,7 @@ impl Operation {
             Self::MemberRemovalPreview => "members.removalPreview",
             Self::MemberRemove => "members.remove",
             Self::MemberReorder => "members.reorder",
+            Self::MemberPresence => "members.presence.set",
             Self::SubsystemRetry => "runtime.subsystems.retry",
             Self::NotificationInbox => "notifications.inbox",
             Self::NotificationChanges => "notifications.changesSince",

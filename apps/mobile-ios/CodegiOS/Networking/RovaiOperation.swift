@@ -58,6 +58,7 @@ enum RovaiOperation: String, Sendable {
     case membersRemovalPreview = "members.removalPreview"
     case membersRemove = "members.remove"
     case membersReorder = "members.reorder"
+    case membersPresenceSet = "members.presence.set"
     case runtimeSubsystemsRetry = "runtime.subsystems.retry"
     case notificationsInbox = "notifications.inbox"
     case notificationsChangesSince = "notifications.changesSince"

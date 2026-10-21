@@ -58,6 +58,7 @@ enum class RovaiOperation(val wire:String) {
     MEMBERS_REMOVALPREVIEW("members.removalPreview"),
     MEMBERS_REMOVE("members.remove"),
     MEMBERS_REORDER("members.reorder"),
+    MEMBERS_PRESENCE_SET("members.presence.set"),
     RUNTIME_SUBSYSTEMS_RETRY("runtime.subsystems.retry"),
     NOTIFICATIONS_INBOX("notifications.inbox"),
     NOTIFICATIONS_CHANGESSINCE("notifications.changesSince"),
