@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 /// and the legacy shared draft remain outside the network capability.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum Operation {
+    #[serde(rename="office.watch")]
+    OfficeWatch,
     #[serde(rename = "forge.accounts.get")]
     ForgeAccountsGet,
     #[serde(rename = "forge.accounts.set")]
@@ -481,6 +483,7 @@ pub enum Operation {
 impl Operation {
     pub fn timeout(self) -> std::time::Duration {
         std::time::Duration::from_secs(match self {
+            Self::OfficeWatch => 30,
             Self::ForgeOperation => 60,
             Self::WorkbenchGitRead | Self::WorkbenchGitPreview | Self::WorkbenchGitExecute => 120,
             Self::MissionCleanupRetry
@@ -500,6 +503,7 @@ impl Operation {
         match self {
             Self::AppInfo => json!({"name":value["name"],"version":value["version"]}),
             Self::ForgeAccountsGet | Self::ForgeAccountsSet => select_fields(&value, &["accounts"]),
+            Self::OfficeWatch => select_fields(&value,&["holdId","port","cap","editable","released","installed","formats"]),
             Self::ForgeOperation => select_fields(&value, &["provider", "webUrl", "ownerRepo", "repositoryKey", "repository", "success", "status", "data", "missionDraft", "nextPage"]),
             Self::WorkbenchOrganizerGet | Self::WorkbenchOrganizerSet => select_fields(&value, &["value", "digest"]),
             Self::WorkbenchFilesList => select_fields(&value, &["entries", "next"]),
@@ -573,6 +577,7 @@ impl Operation {
         match self {
             Self::ForgeAccountsGet => "forge.accounts.get",
             Self::ForgeAccountsSet => "forge.accounts.set",
+            Self::OfficeWatch => "office.watch",
             Self::ForgeOperation => "forge.operation",
             Self::WorkbenchOrganizerGet => "workbench.organizer.get",
             Self::WorkbenchOrganizerSet => "workbench.organizer.set",

@@ -298,6 +298,7 @@ const allowedMethods = new Set<CoreMethod>([
   'workspaces.worktrees',
   'workbench.files.list',
   'workbench.organizer.get',
+  'office.watch',
   'forge.accounts.get',
   'forge.accounts.set',
   'forge.operation',

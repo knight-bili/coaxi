@@ -14,6 +14,7 @@ mod native_child_reads;
 mod workbench;
 mod browser_access;
 mod computer_access;
+mod office_access;
 mod forge;
 pub(crate) mod private_composer;
 mod private_sources;
@@ -5886,6 +5887,7 @@ impl Core {
     }
 
     async fn shutdown_all_runtimes(&self) {
+        crate::office_preview::stop_all();
         tokio::join!(
             self.codex_cli.shutdown_all(),
             self.pi.shutdown_all(),
@@ -10322,6 +10324,7 @@ impl Core {
                     "blockers": blockers,
                 }))
             }
+            "office.watch" => self.office_access(request.params.clone()).await,
             "computer.local" => self.computer_access(request.params.clone()).await,
             "browser.local.grant" | "browser.local.revoke" | "browser.local.begin" | "browser.local.finish" => self.browser_access(&request.method, request.params.clone()).await,
             "workbench.files.list" | "workbench.files.read" => {

@@ -197,7 +197,7 @@ fn git_arguments(request: &GitRequest, write: bool) -> Result<Vec<String>> {
     Ok(args)
 }
 
-fn relative(root: &Path, value: &str, allow_missing: bool) -> Result<PathBuf> {
+pub(super) fn relative(root: &Path, value: &str, allow_missing: bool) -> Result<PathBuf> {
     ensure!(!value.contains(['\0', '\r', '\n', ':', '\\']), "workbench.invalid_path");
     let path = Path::new(value);
     ensure!(!path.is_absolute(), "workbench.invalid_path");

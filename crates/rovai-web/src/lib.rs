@@ -5,6 +5,7 @@ mod avatars;
 mod network;
 mod operations;
 mod resources;
+mod office_proxy;
 mod updates;
 mod uploads;
 mod workspaces;
@@ -234,6 +235,8 @@ fn routes(state: WebState) -> Router {
         .route("/attachments", post(resources::attachment))
         .route_layer(middleware::from_fn_with_state(state.clone(), authenticate));
     Router::new()
+        .route("/api/office-watch-proxy/{port}/",axum::routing::any(office_proxy::proxy_root))
+        .route("/api/office-watch-proxy/{port}/{*rest}",axum::routing::any(office_proxy::proxy))
         .nest("/api/v1", api)
         .route("/api/v1/login", post(login))
         .route("/api/v1/login-ticket", post(redeem_login_ticket))
@@ -259,13 +262,14 @@ async fn boundary(State(state): State<WebState>, req: Request, next: Next) -> Re
         .get(header::HOST)
         .and_then(|value| value.to_str().ok());
     let origin = req.headers().get(header::ORIGIN);
+    let office_preview = req.uri().path().starts_with("/api/office-watch-proxy/");
     let preview_shell = req.uri().path() == "/preview.html";
     let preview_asset = req.uri().path().starts_with("/preview-assets/")
         && matches!(
             *req.method(),
             axum::http::Method::GET | axum::http::Method::HEAD
         );
-    let checked_origin = if preview_asset && origin.is_some_and(|v| v == "null") {
+    let checked_origin = if (preview_asset || office_preview) && origin.is_some_and(|v| v == "null") {
         None
     } else {
         origin.and_then(|v| v.to_str().ok())
@@ -274,7 +278,7 @@ async fn boundary(State(state): State<WebState>, req: Request, next: Next) -> Re
         || origin.is_some_and(|value| value.to_str().is_err())
     {
         error(StatusCode::FORBIDDEN, "origin_not_allowed")
-    } else if req.uri().query().is_some() && !preview_asset {
+    } else if req.uri().query().is_some() && !preview_asset && !office_preview {
         // Credentials and API parameters have no URL representation.
         error(StatusCode::BAD_REQUEST, "query_not_allowed")
     } else {
@@ -291,6 +295,10 @@ async fn boundary(State(state): State<WebState>, req: Request, next: Next) -> Re
         }),
     );
     headers.insert(header::CONTENT_SECURITY_POLICY, HeaderValue::from_static("default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self'; frame-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"));
+    if office_preview && response.status().is_success() {
+        response.headers_mut().insert(header::CONTENT_SECURITY_POLICY,HeaderValue::from_static("sandbox allow-scripts; default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'self'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'"));
+        response.headers_mut().insert(header::REFERRER_POLICY,HeaderValue::from_static("no-referrer"));
+    }
     if preview_asset && response.status().is_success() {
         // Preserve the existing resource response policy, including direct navigation.
         response.headers_mut().insert(header::CONTENT_SECURITY_POLICY, HeaderValue::from_static(
