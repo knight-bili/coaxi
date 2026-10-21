@@ -1,7 +1,8 @@
 import Foundation
 
-/// Explicit public Host operations. Private Core methods never cross this seam.
+/// Generated from the explicit public Host enum; private Core methods never cross this seam.
 enum RovaiOperation: String, Sendable {
+    case extensionsCatalog = "extensions.catalog"
     case channelsAdapters = "channels.adapters"
     case forgeLinks = "forge.links"
     case workbenchProjectLauncher = "workbench.projectLauncher"
@@ -52,7 +53,6 @@ enum RovaiOperation: String, Sendable {
     case threadsRetryDeletion = "threads.retryDeletion"
     case threadsDiscardPending = "threads.discardPending"
     case threadsPendingDraftSetPresence = "threads.pendingDraft.setPresence"
-    case threadsMembersFastCheck = "threads.members.fast.check"
     case threadsMembersFastSet = "threads.members.fast.set"
     case membersRemovalPreview = "members.removalPreview"
     case membersRemove = "members.remove"
@@ -222,11 +222,8 @@ enum RovaiOperation: String, Sendable {
     case agentRunsContinue = "agentRuns.continue"
     case commandsReconcile = "commands.reconcile"
     case threadsCreate = "threads.create"
-    case threadsCreationPreflight = "threads.creationPreflight"
     case threadsMembersAdd = "threads.members.add"
     case threadsMembersRemove = "threads.members.remove"
-    case threadsMembersRemovalPreview = "threads.members.removalPreview"
-    case threadsChangeDefaultLead = "threads.changeDefaultLead"
     case membersCreate = "members.create"
     case membersUpdate = "members.update"
     case membersAvatarSet = "members.avatar.set"

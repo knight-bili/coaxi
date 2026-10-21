@@ -1,7 +1,8 @@
 package app.codeg.android.core.network
 
-/** Explicit public Host operations; private Core methods are not admitted. */
+/** Generated from the explicit public Host enum; private Core methods are not admitted. */
 enum class RovaiOperation(val wire:String) {
+    EXTENSIONS_CATALOG("extensions.catalog"),
     CHANNELS_ADAPTERS("channels.adapters"),
     FORGE_LINKS("forge.links"),
     WORKBENCH_PROJECTLAUNCHER("workbench.projectLauncher"),
@@ -52,7 +53,6 @@ enum class RovaiOperation(val wire:String) {
     THREADS_RETRYDELETION("threads.retryDeletion"),
     THREADS_DISCARDPENDING("threads.discardPending"),
     THREADS_PENDINGDRAFT_SETPRESENCE("threads.pendingDraft.setPresence"),
-    THREADS_MEMBERS_FAST_CHECK("threads.members.fast.check"),
     THREADS_MEMBERS_FAST_SET("threads.members.fast.set"),
     MEMBERS_REMOVALPREVIEW("members.removalPreview"),
     MEMBERS_REMOVE("members.remove"),
@@ -222,11 +222,8 @@ enum class RovaiOperation(val wire:String) {
     AGENTRUNS_CONTINUE("agentRuns.continue"),
     COMMANDS_RECONCILE("commands.reconcile"),
     THREADS_CREATE("threads.create"),
-    THREADS_CREATIONPREFLIGHT("threads.creationPreflight"),
     THREADS_MEMBERS_ADD("threads.members.add"),
     THREADS_MEMBERS_REMOVE("threads.members.remove"),
-    THREADS_MEMBERS_REMOVALPREVIEW("threads.members.removalPreview"),
-    THREADS_CHANGEDEFAULTLEAD("threads.changeDefaultLead"),
     MEMBERS_CREATE("members.create"),
     MEMBERS_UPDATE("members.update"),
     MEMBERS_AVATAR_SET("members.avatar.set"),

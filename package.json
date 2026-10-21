@@ -178,7 +178,8 @@
     "test:mission-board": "node --test scripts/lib/mission-board.test.mjs",
     "test:member-runtime-apply": "node --test scripts/lib/member-runtime-apply.test.mjs",
     "test:run-presence-ui": "node --test scripts/lib/run-presence.test.mjs",
-    "build:server-channels": "node scripts/build-server-channels.mjs"
+    "build:server-channels": "node scripts/build-server-channels.mjs",
+    "generate:native-operations": "node scripts/generate-native-operations.mjs"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",
