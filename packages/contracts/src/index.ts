@@ -5104,6 +5104,13 @@ export interface HostWebApi {
   rotate(): Promise<HostWebStatus & { administratorToken: string }>
 }
 
+export interface BackupSummary {createdAt:string;appVersion:string;fileCount:number;totalBytes:number}
+export interface NativeBackupsApi {
+  create(passphrase:string):Promise<(BackupSummary&{path:string})|null>
+  inspect(passphrase:string):Promise<(BackupSummary&{archiveId:string})|null>
+  restore(archiveId:string,passphrase:string):Promise<BackupSummary&{restoreStaged:true}>
+  onProgress(listener:(value:{phase:string;done:number;total:number})=>void):()=>void
+}
 export interface BrowserWorkspaceApi {
   list(threadId: string): Promise<BrowserWorkspaceView[]>
   open(threadId: string, url: string): Promise<BrowserWorkspaceView>
@@ -5114,6 +5121,7 @@ export interface BrowserWorkspaceView { id:string; threadId:string;url:string;ti
 
 export interface RovaiApi {
   /** Native local owner surface; intentionally absent from remote Web. */
+  nativeBackups?: NativeBackupsApi
   nativeHistory?: {
     scan<T>(threadId:string,provider:'codex'|'claude'|'qoder'|'grok'):Promise<T|null>
     request<T>(threadId:string,input:{operation:'preview'|'import';planId:string;entryId:string;expectedDigest?:string}):Promise<T>

@@ -1,3 +1,4 @@
+import { BackupWorkspace } from './backup-workspace'
 import { OfficeWorkspace } from './office-workspace'
 import { BrowserWorkspace } from './browser-workspace'
 import { creationPreferences, withHostConversationPreferences } from '../shared/host-general-preferences'
@@ -1249,6 +1250,8 @@ const officeWorkspace = new OfficeWorkspace((method,params)=>core.request(method
 ipcMain.handle('rovai:office-workspace',(event,input)=>officeWorkspace.open(event,input))
 app.on('before-quit',()=>officeWorkspace.closeAll())
 const browserWorkspace = new BrowserWorkspace((method,params)=>core.request(method,params),()=>mainWindow)
+const backupWorkspace = new BackupWorkspace(core,()=>coreDataPath,()=>mainWindow,()=>requestRendererQuitPreparation(mainWindow,()=>new MessageChannelMain()),()=>{browserWorkspace.revokeAll();officeWorkspace.closeAll()},()=>{app.relaunch();app.quit()})
+ipcMain.handle('rovai:backup-workspace',(event,operation,input)=>backupWorkspace.invoke(event,operation,input))
 ipcMain.handle('rovai:native-history',async(event,operation,value:unknown)=>{
   if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('history.local_owner_required')
   if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('history.invalid_request')

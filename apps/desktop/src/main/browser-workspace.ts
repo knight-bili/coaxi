@@ -139,5 +139,6 @@ export class BrowserWorkspace {
       return result
     })
   }
+  revokeAll():void{for(const surface of this.surfaces.values())this.revoke(surface)}
   closeAll():void{for(const surface of this.surfaces.values()){this.revoke(surface);if(!surface.window.isDestroyed())surface.window.destroy()}}
 }

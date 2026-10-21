@@ -62,6 +62,12 @@ async function invokeHostWeb<T>(operation: string, input?: unknown): Promise<T> 
 }
 
 const api: RovaiApi = {
+  nativeBackups: {
+    create:passphrase=>ipcRenderer.invoke('rovai:backup-workspace','create',{passphrase}),
+    inspect:passphrase=>ipcRenderer.invoke('rovai:backup-workspace','inspect',{passphrase}),
+    restore:(archiveId,passphrase)=>ipcRenderer.invoke('rovai:backup-workspace','restore',{archiveId,passphrase}),
+    onProgress:listener=>{const receive=(_event:Electron.IpcRendererEvent,value:{phase:string;done:number;total:number}):void=>listener(value);ipcRenderer.on('rovai:backup-progress',receive);return()=>ipcRenderer.removeListener('rovai:backup-progress',receive)}
+  },
   nativeHistory: {scan:(threadId,provider)=>ipcRenderer.invoke('rovai:native-history','scan',{threadId,provider}),request:(threadId,input)=>ipcRenderer.invoke('rovai:native-history','request',{threadId,input})},
   officeWorkspace: {open:(threadId,path,editable)=>ipcRenderer.invoke('rovai:office-workspace',{threadId,path,editable})},
   computerWorkspace: { request: (threadId,input)=>ipcRenderer.invoke('rovai:computer-workspace',{threadId,input,commandId:globalThis.crypto.randomUUID()}) },

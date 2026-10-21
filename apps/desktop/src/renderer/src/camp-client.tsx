@@ -23,6 +23,7 @@ export type ThreadClient = Pick<RovaiApi,
       preview: import('@contracts').AttachmentPreview | { blob: Blob } | null
     }>
   }
+  nativeBackups?: RovaiApi['nativeBackups']
   nativeHistory?: RovaiApi['nativeHistory']
   officeWorkspace?: RovaiApi['officeWorkspace']
   browserWorkspace?: RovaiApi['browserWorkspace']
