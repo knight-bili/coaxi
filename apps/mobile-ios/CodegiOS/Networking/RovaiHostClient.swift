@@ -1,0 +1,115 @@
+import Foundation
+
+struct RovaiHostSession: Codable, Sendable {
+    let token: String
+    let clientId: String
+    let editorProof: String
+    let ownerId: String
+    let epoch: String
+    var expiresAt: Double
+}
+struct RovaiHostFailure: LocalizedError, Sendable {
+    let code: String
+    var unknownResult = false
+    var errorDescription: String? { code }
+}
+/// Actor isolation protects a single Host/editor lifetime, never a second execution engine.
+actor RovaiHostClient {
+    let baseURL: URL
+    private let administratorToken: String
+    private let session: URLSession
+    private let load: @Sendable () async -> Data?
+    private let save: @Sendable (Data?) async -> Void
+    private var credential: RovaiHostSession?
+    private var loaded = false
+    private var denied = false
+    private var deadline: TimeInterval = 0
+    private var generation: UInt64 = 0
+    private var login: Task<RovaiHostSession, Error>?
+    init(baseURL: URL, administratorToken: String, load: @escaping @Sendable () async -> Data? = { nil }, save: @escaping @Sendable (Data?) async -> Void = { _ in }) throws {
+        guard let parts = URLComponents(url: baseURL, resolvingAgainstBaseURL: false), ["http", "https"].contains(parts.scheme ?? ""), parts.host != nil, parts.user == nil, parts.password == nil, parts.query == nil, parts.fragment == nil else { throw RovaiHostFailure(code: "host.invalid_url") }
+        self.baseURL = baseURL; self.administratorToken = administratorToken; self.load = load; self.save = save
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.timeoutIntervalForRequest = 120; configuration.timeoutIntervalForResource = 180
+        configuration.waitsForConnectivity = true
+        self.session = URLSession(configuration: configuration, delegate: RovaiNoRedirect(), delegateQueue: nil)
+    }
+    private func endpoint(_ path: String) -> URL { baseURL.appendingPathComponent("api/v1/" + path) }
+    private func post(_ path: String, body: JSONValue, bearer: String? = nil) async throws -> JSONValue {
+        var request = URLRequest(url: endpoint(path)); request.httpMethod = "POST"; request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        if let bearer { request.setValue("Bearer " + bearer, forHTTPHeaderField: "Authorization") }
+        request.httpBody = try JSONEncoder().encode(body)
+        let (data, response) = try await session.data(for: request)
+        guard let response = response as? HTTPURLResponse else { throw RovaiHostFailure(code: "host.invalid_response") }
+        guard (200...299).contains(response.statusCode) else { throw RovaiHostFailure(code: response.statusCode == 401 ? "host.unauthorized" : "host.http_\(response.statusCode)") }
+        guard data.count <= 32 * 1024 * 1024 else { throw RovaiHostFailure(code: "host.response_limit") }
+        return try JSONDecoder().decode(JSONValue.self, from: data)
+    }
+    func connect(authenticate: Bool = false) async throws -> RovaiHostSession {
+        if !authenticate, !denied, let credential, deadline > ProcessInfo.processInfo.systemUptime + 60 { return credential }
+        if let login { return try await login.value }
+        let lifetime = generation
+        let task = Task<RovaiHostSession, Error> {
+            if !self.loaded { self.loaded = true; if let data = await self.load() { self.credential = try? JSONDecoder().decode(RovaiHostSession.self, from: data) } }
+            if !authenticate {
+                guard !self.denied, let previous = self.credential else { throw RovaiHostFailure(code: "host.login_required") }
+                let resumed = try await self.post("session", body: .object(["editor": .object(["clientId": .string(previous.clientId), "proof": .string(previous.editorProof)])]), bearer: previous.token)
+                self.deadline = try self.monotonicDeadline(resumed)
+                if self.deadline <= ProcessInfo.processInfo.systemUptime + 60 { try await self.renew() }
+                return previous
+            }
+            var fields: [String: JSONValue] = ["protocolVersion": .number(4), "administratorToken": .string(self.administratorToken)]
+            if let previous = self.credential { fields["editor"] = .object(["clientId": .string(previous.clientId), "proof": .string(previous.editorProof)]) }
+            let value = try await self.post("login", body: .object(fields))
+            guard value["protocolVersion"] == .number(4) else { throw RovaiHostFailure(code: "host.protocol_incompatible") }
+            let next = try JSONDecoder().decode(RovaiHostSession.self, from: JSONEncoder().encode(value))
+            guard lifetime == self.generation else { _ = try? await self.post("logout", body: .object([:]), bearer: next.token); throw CancellationError() }
+            self.credential = next; self.deadline = try self.monotonicDeadline(value); self.denied = false; await self.save(try JSONEncoder().encode(next)); return next
+        }
+        login = task
+        do { let result = try await task.value; login = nil; return result } catch { login = nil; throw error }
+    }
+    func request(_ operation: RovaiOperation, params: JSONValue = .object([:])) async throws -> JSONValue {
+        let current = try await connect()
+        let envelope: JSONValue
+        do { envelope = try await post("request", body: .object(["operation": .string(operation.rawValue), "params": params]), bearer: current.token) }
+        catch is CancellationError { throw CancellationError() }
+        catch { if (error as? RovaiHostFailure)?.code == "host.unauthorized" { denied = true; deadline = 0 }; throw RovaiHostFailure(code: error.localizedDescription, unknownResult: true) }
+        if let error = envelope["error"], error != .null { throw RovaiHostFailure(code: error.prettyString) }
+        return envelope["result"] ?? .null
+    }
+    func command(_ operation: RovaiOperation, command: JSONValue, id: UUID) async throws -> JSONValue {
+        try await request(operation, params: .object(["commandId": .string(id.uuidString.lowercased()), "command": command]))
+    }
+    func reconcile(_ operation: RovaiOperation, params: JSONValue) async throws -> JSONValue {
+        try await request(.commandsReconcile, params: .object(["operation": .string(operation.rawValue), "params": params]))
+    }
+    func invalidations() async throws -> AsyncThrowingStream<JSONValue, Error> {
+        let current = try await connect(); var request = URLRequest(url: endpoint("events")); request.setValue("Bearer " + current.token, forHTTPHeaderField: "Authorization"); request.timeoutInterval = 3600
+        let streamSession = self.session
+        return AsyncThrowingStream { continuation in
+            let reader = Task {
+                do {
+                    let (bytes, response) = try await streamSession.bytes(for: request)
+                    guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw RovaiHostFailure(code: "host.events_denied") }
+                    var event = "", data = ""
+                    for try await line in bytes.lines {
+                        try Task.checkCancellation()
+                        if line.isEmpty { if ["resync", "invalidate"].contains(event), let value = JSONValue.parse(data) { continuation.yield(.object(["event": .string(event), "data": value])) }; event = ""; data = "" }
+                        else if line.hasPrefix("event:") { event = String(line.dropFirst(6)).trimmingCharacters(in: .whitespaces) }
+                        else if line.hasPrefix("data:") { if !data.isEmpty { data += "\n" }; data += String(line.dropFirst(5)).trimmingCharacters(in: .whitespaces); guard data.utf8.count <= 1024 * 1024 else { throw RovaiHostFailure(code: "host.event_limit") } }
+                    }
+                    continuation.finish()
+                } catch { continuation.finish(throwing: error) }
+            }
+            continuation.onTermination = { _ in reader.cancel() }
+        }
+    }
+    private func monotonicDeadline(_ value: JSONValue) throws -> TimeInterval { guard case .number(let ttl) = value["expiresInSeconds"] else { throw RovaiHostFailure(code: "host.invalid_timing") }; return ProcessInfo.processInfo.systemUptime + min(max(ttl, 0), 86_400) }
+    func renew() async throws { guard var current = credential else { return }; let value = try await post("session/renew", body: .object([:]), bearer: current.token); guard case .number(let expiry) = value["expiresAt"] else { throw RovaiHostFailure(code: "host.invalid_renewal") }; current.expiresAt = expiry; deadline = try monotonicDeadline(value); credential = current; await save(try JSONEncoder().encode(current)) }
+    func logout() async throws { generation &+= 1; login?.cancel(); login = nil; let previous = credential; credential = nil; denied = true; deadline = 0; await save(nil); if let previous { _ = try await post("logout", body: .object([:]), bearer: previous.token) } }
+    func close() { generation &+= 1; login?.cancel(); login = nil; credential = nil; session.invalidateAndCancel() }
+}
+private final class RovaiNoRedirect: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
+    func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) { completionHandler(nil) }
+}
