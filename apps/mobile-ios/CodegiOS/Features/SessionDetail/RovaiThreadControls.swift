@@ -25,7 +25,7 @@ struct RovaiThreadControls: View {
     }
 }
 
-private struct RovaiInteractionCards: View {
+struct RovaiInteractionCards: View {
     let model: RovaiWorkspaceModel
     let conversationId: String
     @State private var values: [JSONValue] = []

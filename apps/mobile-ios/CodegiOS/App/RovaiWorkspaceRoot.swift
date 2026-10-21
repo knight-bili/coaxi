@@ -57,6 +57,7 @@ private struct RovaiMoreThreads: View {
 private struct RovaiThreadDetail: View {
     let model: RovaiWorkspaceModel; let id: String
     @State private var engineering = false
+    @State private var privateChat = false
     @State private var text = ""; @State private var recipients = Set<String>(); @State private var submitted: String?
     var body: some View {
         VStack(spacing: 0) {
@@ -64,7 +65,8 @@ private struct RovaiThreadDetail: View {
             ScrollView(.horizontal, showsIndicators: false) { HStack { ForEach((model.thread?["members"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in Button { if recipients.contains(row.id) { recipients.remove(row.id) } else { recipients.insert(row.id) } } label: { Text(row.value.text("displayName")).font(.caption).padding(.horizontal, 12).padding(.vertical, 8).background(Capsule().fill(recipients.contains(row.id) ? Theme.accent.opacity(0.22) : Theme.accent.opacity(0.06))) } } }.padding(.horizontal, 16) }
             HStack(alignment: .bottom, spacing: 10) { TextField("发送消息…", text: $text, axis: .vertical).lineLimit(1...6).padding(12).background(RoundedRectangle(cornerRadius: 18).fill(Theme.bgElevated)).disabled(model.pending != nil); Button { submitted = text; Task { await model.send(text, recipients: recipients) } } label: { Image(systemName: "paperplane").font(.title3).padding(12) }.disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || model.pending != nil || model.busy) }.padding(12)
         }.navigationTitle(model.thread?["thread"]?.text("title") ?? "对话")
-        .toolbar { ToolbarItem(placement: .topBarTrailing) { Button { engineering = true } label: { Image(systemName: "folder") } } }
+        .toolbar { ToolbarItem(placement: .topBarTrailing) { Button { privateChat = true } label: { Image(systemName: "person.bubble") }; Button { engineering = true } label: { Image(systemName: "folder") } } }
+        .sheet(isPresented: $privateChat) { RovaiPrivateConversationView(model: model, threadId: id) }
         .sheet(isPresented: $engineering) { RovaiEngineeringView(model: model, threadId: id) }
         .task(id: id) { await model.open(id) }.onDisappear { if model.threadId == id { Task { await model.open(nil) } } }
         .onChange(of: model.lastResult) { _, result in if model.lastOperation == .threadMessagesSend, result?["commandResult"]?.text("status") == "applied", text == submitted { text = ""; submitted = nil } }
