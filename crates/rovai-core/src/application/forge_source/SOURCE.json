@@ -1,0 +1,19 @@
+{
+  "repository": "https://github.com/spacering-net/codeg",
+  "revision": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+  "license": "Apache-2.0",
+  "files": [
+    "mod.rs",
+    "github.rs",
+    "gitlab.rs",
+    "gitea.rs",
+    "auth.rs",
+    "deliver.rs"
+  ],
+  "adaptations": [
+    "Core resolves scope/account; no donor database or Tauri commands",
+    "Production types and REST functions only; donor tests excluded",
+    "No redirect or provider identity auto-switch",
+    "Core command receipt and explicit head-SHA merge guard"
+  ]
+}

@@ -10,6 +10,10 @@ use std::{fs, time::Duration};
 mod envelope;
 #[path="forge_filters.rs"]
 mod filters;
+#[path="forge_source/mod.rs"]
+mod source;
+#[path="forge_changes.rs"]
+mod changes;
 
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all="camelCase",deny_unknown_fields)]
@@ -34,6 +38,8 @@ struct ForgeRequest {
     #[serde(default)] title:Option<String>,
     #[serde(default)] body:Option<String>,
     #[serde(default)] head:Option<String>,
+    #[serde(default)] head_sha:Option<String>,
+    #[serde(default)] merge_method:Option<source::ForgeMergeMethod>,
     #[serde(default)] base:Option<String>,
     #[serde(default)] draft:bool,
     #[serde(default)] command_id:Option<String>,
@@ -135,6 +141,7 @@ impl Core {
         ensure!(request.page>0&&request.page<=100_000,"forge.invalid_page");
         let repository=self.forge_repository(&request).await?;
         if request.action=="repository"{return Ok(repository.metadata())}
+        if matches!(request.action.as_str(),"change_detail"|"change_files"|"merge_options"|"merge_pr"){return self.forge_change_operation(request,value,repository).await;}
         let write=matches!(request.action.as_str(),"create_issue"|"update_issue"|"create_pr"|"update_pr"|"comment_issue"|"comment_pr");
         let pull=request.action.ends_with("pr")||request.action=="pulls";
         let comments=request.action.starts_with("comment_")||request.action.starts_with("comments_");

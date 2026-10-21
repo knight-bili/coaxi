@@ -18,6 +18,7 @@ tokio-util = { version = "0.7", features = ["rt","io"] }
 zip = { version = "2", default-features = false, features = ["deflate"] }
 rovai-computer = { path = "../rovai-computer" }
 anyhow = "1"
+thiserror = "2"
 base64 = "0.22"
 chrono = { version = "0.4", features = ["serde"] }
 croner = "4.0.0"
