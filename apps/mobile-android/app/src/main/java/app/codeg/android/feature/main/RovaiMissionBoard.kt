@@ -24,9 +24,12 @@ import kotlinx.serialization.json.*
 val rovaiMissionStatuses=listOf("needs_you" to "需要你","not_started" to "未开始","in_progress" to "进行中","completed" to "已完成")
 fun missionStatusName(value:String)=rovaiMissionStatuses.firstOrNull{it.first==value}?.second?:value
 @Composable fun RovaiMissionBoard(model:RovaiWorkspaceViewModel,state:RovaiWorkspaceState){
+    var creating by remember{mutableStateOf(false)}
+    if(creating)RovaiMissionCreator(model){creating=false}
     var status by remember{mutableStateOf("")};var search by remember{mutableStateOf("")};var selected by remember{mutableStateOf<JsonObject?>(null)}
     val rows=state.missions.filter{(status.isEmpty()||it.coreText("status")==status)&&(it.coreText("title")+" "+it.coreText("description")+" "+it["tags"].toString()+" "+it.coreText("projectPath")).contains(search,ignoreCase=true)}
     Column(Modifier.fillMaxSize()){
+        Row(Modifier.fillMaxWidth().padding(horizontal=12.dp)){Text("使命",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(enabled=state.connected&&!state.busy,onClick={creating=true}){Text("新建使命")}}
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal=12.dp),horizontalArrangement=Arrangement.spacedBy(6.dp)){(listOf("" to "全部")+rovaiMissionStatuses).forEach{(id,title)->FilterChip(selected=status==id,onClick={status=id},label={Text("$title ${state.missions.count{ id.isEmpty()||it.coreText("status")==id }}")})}}
         OutlinedTextField(search,{search=it},label={Text("搜索使命、标签或工程")},modifier=Modifier.fillMaxWidth().padding(12.dp))
         LazyColumn(Modifier.weight(1f),contentPadding=PaddingValues(12.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){items(rows,key={it.coreText("missionId")}){mission->GlassRow(Modifier.fillMaxWidth().combinedClickable(onClick={model.openThread(mission.coreText("threadId"))},onLongClick={selected=mission})){
