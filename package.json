@@ -320,6 +320,14 @@
         {
           "from": "skills",
           "to": "skills"
+        },
+        {
+          "from": "resources/bin/macos-${arch}/rovai-native-history",
+          "to": "bin/rovai-native-history"
+        },
+        {
+          "from": "helpers/native-history/LICENSE",
+          "to": "licenses/native-history-LICENSE"
         }
       ],
       "binaries": [
@@ -381,6 +389,14 @@
         {
           "from": "skills",
           "to": "skills"
+        },
+        {
+          "from": "resources/bin/windows-x64/rovai-native-history.exe",
+          "to": "bin/rovai-native-history.exe"
+        },
+        {
+          "from": "helpers/native-history/LICENSE",
+          "to": "licenses/native-history-LICENSE"
         }
       ],
       "artifactName": "Rovai-AI-${version}-${arch}.${ext}"

@@ -1,6 +1,7 @@
 import { chmodSync, copyFileSync, existsSync, mkdirSync, rmSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
+import { buildNativeHistoryHelper } from './lib/native-history-helper.mjs'
 import {
   hostSidecarTargetKey,
   sidecarExecutableName,
@@ -49,3 +50,5 @@ for (const binary of ['rovai-core', 'rovai-host', 'rovai']) {
   if (target.platform === 'darwin') chmodSync(destination, 0o755)
   console.log(`Staged ${targetKey} ${profile} Rust binary at ${destination}`)
 }
+
+buildNativeHistoryHelper(root, targetKey, { release, destination: destinationDir })
