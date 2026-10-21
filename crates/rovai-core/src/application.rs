@@ -10319,21 +10319,13 @@ impl Core {
                     "blockers": blockers,
                 }))
             }
-            "workspaces.inspect" => {
-                let params: WorkspaceInspectParams =
-                    serde_json::from_value(request.params.clone())?;
-                let inspection = git::inspect_workspace(
-                    PathBuf::from(params.path).as_path(),
-                    &self.data_dir,
-                    false,
-                )
-                .await?;
-                Ok(serde_json::to_value(inspection)?)
-            }
             "workbench.files.list" | "workbench.files.read" => {
                 self.workbench_files(&request.method, request.params.clone()).await
             }
-            "workspaces.inspect.compat" => {
+            "workbench.files.mutate" => {
+                self.workbench_file_mutate(request.params.clone()).await
+            }
+            "workspaces.inspect" => {
                 let params: WorkspaceInspectParams =
                     serde_json::from_value(request.params.clone())?;
                 let inspection = git::inspect_workspace(

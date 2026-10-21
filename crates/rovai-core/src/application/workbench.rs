@@ -25,6 +25,64 @@ struct FileRequest {
     after: Option<String>,
 }
 
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct FileMutation {
+    command_id: String,
+    scope: Scope,
+    action: String,
+    path: String,
+    #[serde(default)]
+    destination: Option<String>,
+    #[serde(default)]
+    text: Option<String>,
+    #[serde(default)]
+    expected_digest: Option<String>,
+}
+
+fn write_text(path: &Path, text: &str, expected: Option<&str>) -> Result<Value> {
+    ensure!(text.len() <= 16 * 1024 * 1024 && !text.contains('\0'), "workbench.text_too_large");
+    let parent = path.parent().context("workbench.invalid_path")?;
+    ensure!(parent.is_dir(), "workbench.parent_missing");
+    let before = match fs::read(path) {
+        Ok(bytes) => Some(digest(&bytes)),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => None,
+        Err(error) => return Err(error.into()),
+    };
+    ensure!(before.as_deref() == expected, "workbench.file_changed");
+    let temporary = parent.join(format!(".rovai-edit-{}.tmp", uuid::Uuid::new_v4()));
+    let result = (|| -> Result<Value> {
+        let mut file = fs::OpenOptions::new().write(true).create_new(true).open(&temporary)?;
+        if let Ok(metadata) = fs::metadata(path) { file.set_permissions(metadata.permissions())?; }
+        file.write_all(text.as_bytes())?;
+        file.sync_all()?;
+        drop(file);
+        let current = if path.exists() { Some(digest(&fs::read(path)?)) } else { None };
+        ensure!(current == before, "workbench.file_changed");
+        if before.is_none() {
+            fs::hard_link(&temporary, path).context("workbench.destination_exists")?;
+            fs::remove_file(&temporary)?;
+        } else {
+            #[cfg(windows)]
+            {
+                use std::os::windows::ffi::OsStrExt;
+                use windows_sys::Win32::Storage::FileSystem::ReplaceFileW;
+                let destination: Vec<u16> = path.as_os_str().encode_wide().chain(Some(0)).collect();
+                let source: Vec<u16> = temporary.as_os_str().encode_wide().chain(Some(0)).collect();
+                let replaced = unsafe { ReplaceFileW(destination.as_ptr(), source.as_ptr(), std::ptr::null(), 0, std::ptr::null(), std::ptr::null()) };
+                ensure!(replaced != 0, "workbench.replace_failed: {}", std::io::Error::last_os_error());
+            }
+            #[cfg(not(windows))]
+            fs::rename(&temporary, path)?;
+        }
+        #[cfg(not(windows))]
+        fs::File::open(parent)?.sync_all()?;
+        Ok(json!({"applied":true,"digest":digest(text.as_bytes())}))
+    })();
+    if result.is_err() { let _ = fs::remove_file(&temporary); }
+    result
+}
+
 fn digest(bytes: &[u8]) -> String { format!("{:x}", Sha256::digest(bytes)) }
 
 fn relative(root: &Path, value: &str, allow_missing: bool) -> Result<PathBuf> {
@@ -117,5 +175,50 @@ impl Core {
             }
             _ => anyhow::bail!("workbench.operation_not_admitted"),
         }
+    }
+
+    pub(super) async fn workbench_file_mutate(&self, value: Value) -> Result<Value> {
+        let request: FileMutation = serde_json::from_value(value.clone())?;
+        uuid::Uuid::parse_str(&request.command_id).context("workbench.invalid_command_id")?;
+        let _write = MUTATIONS.lock().await;
+        let root = self.workbench_root(&request.scope).await?;
+        ensure!(!request.path.is_empty(), "workbench.root_immutable");
+        let path = relative(&root, &request.path, true)?;
+        ensure!(path != root, "workbench.root_immutable");
+        let identity = crate::command::canonical_json_digest(&json!({"root":root,"request":value}))?;
+        let receipts = self.data_dir.join("workspace-operations");
+        crate::platform::private_storage::prepare_private_directory(&receipts)?;
+        let receipt = receipts.join(format!("{}.json", request.command_id));
+        if receipt.exists() {
+            let saved: Value = serde_json::from_slice(&fs::read(&receipt)?)?;
+            ensure!(saved["identity"] == identity, "workbench.command_conflict");
+            return match saved["state"].as_str() {
+                Some("applied") => Ok(saved["result"].clone()),
+                Some("failed") => anyhow::bail!("workbench.operation_failed: {}", saved["error"]),
+                _ => anyhow::bail!("workbench.operation_unknown_check_state"),
+            };
+        }
+        crate::platform::private_storage::atomic_write_private_json(&receipt, &json!({"identity":identity,"state":"started"}))?;
+        let result = (|| -> Result<Value> {
+            match request.action.as_str() {
+                "save" => write_text(&path, request.text.as_deref().context("workbench.text_required")?, request.expected_digest.as_deref()),
+                "create_directory" => { fs::create_dir(&path)?; Ok(json!({"applied":true})) }
+                "rename" => {
+                    let destination = relative(&root, request.destination.as_deref().context("workbench.destination_required")?, true)?;
+                    ensure!(destination != root && !destination.exists(), "workbench.destination_exists");
+                    ensure!(!destination.starts_with(&path), "workbench.invalid_destination");
+                    if path.is_file() { ensure!(request.expected_digest.as_deref() == Some(digest(&fs::read(&path)?).as_str()), "workbench.file_changed"); }
+                    fs::rename(&path, destination)?;
+                    Ok(json!({"applied":true}))
+                }
+                _ => anyhow::bail!("workbench.operation_not_admitted"),
+            }
+        })();
+        let saved = match &result {
+            Ok(output) => json!({"identity":identity,"state":"applied","result":output}),
+            Err(error) => json!({"identity":identity,"state":"failed","error":error.to_string()}),
+        };
+        crate::platform::private_storage::atomic_write_private_json(&receipt, &saved)?;
+        result
     }
 }
