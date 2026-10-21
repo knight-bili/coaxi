@@ -12,10 +12,11 @@ use serde::{Deserialize,Serialize};
 pub(super) struct ChannelCommand(pub Inbound);
 impl crate::command::sealed::Sealed for ChannelCommand {}
 impl crate::command::DomainCommand for ChannelCommand { const TYPE: &'static str = "channel.adapter.command"; const EXACT_REPLAY:bool=true; }
-pub(super) fn effective_callback(input:&Inbound)->Option<String>{
+pub(super) fn effective_callback(input:&Inbound,config:&Adapter)->Option<String>{
     if let Some(value)=&input.callback_data{return Some(value.clone())}
     let text=input.text.trim();let (command,token)=text.split_once(char::is_whitespace)?;
-    match command.split('@').next().unwrap_or(command){"/confirm"=>Some(format!("rv:control:{}",token.trim())),"/select"=>Some(format!("rv:choose:{}",token.trim())),_=>None}
+    let command=command.strip_prefix(&config.command_prefix)?;
+    match command.split('@').next().unwrap_or(command){"confirm"=>Some(format!("rv:control:{}",token.trim())),"select"=>Some(format!("rv:choose:{}",token.trim())),_=>None}
 }
 pub(super) fn sender_scope(input:&Inbound,config:&Adapter)->Result<String>{source_id(&json!({"adapterId":config.id,"senderId":input.sender_id,"chatId":input.target.chat_id.as_deref().unwrap_or(&config.chat_id),"threadKey":input.target.thread_key}))}
 fn target_matches(input:&Inbound,config:&Adapter,binding:&Binding)->bool{binding.chat_id==input.target.chat_id.as_deref().unwrap_or(&config.chat_id)&&binding.thread_key==input.target.thread_key}
@@ -35,14 +36,14 @@ impl Core{
         Ok((Binding{agent_ids:ids,..binding.clone()},false))
     }
 }
-fn help()->String { "/search 关键词：搜索已绑定对话\n/today：今日活动\n/status：当前对话运行状态\n/folder：可用工程\n/agent：可用队员\n/sessions：可用对话\n/task 内容 或 /do 内容：向当前对话发起任务\n/resume、/cancel、/approve、/deny：会话控制\n/help：命令帮助".into() }
+fn help(config:&Adapter)->String { "/search 关键词：搜索已绑定对话\n/today：今日活动\n/status：当前对话运行状态\n/folder：可用工程\n/agent：可用队员\n/sessions：可用对话\n/task 内容 或 /do 内容：向当前对话发起任务\n/resume、/cancel、/approve、/deny：会话控制\n/help：命令帮助".replace("/",&config.command_prefix) }
 impl Core {
     pub(super) async fn channel_adapter_command(&self,input:&Inbound,config:&Adapter,binding:&Binding,command_id:&str,selection_expired:bool)->Result<Option<Value>> {
         let text=input.text.trim();
-        let callback=effective_callback(input);
+        let callback=effective_callback(input,config);
         let command=if let Some(callback)=callback.as_deref(){
             match callback { "rv:today"=>"today", "rv:status"=>"status", "rv:sessions"=>"sessions", "rv:help"=>"help", value if value.starts_with("rv:choose:")=>"choose", _=>"expired_callback" }
-        }else if let Some(value)=text.strip_prefix('/') { value.split_whitespace().next().unwrap_or("help").split('@').next().unwrap_or("help") } else if selection_expired { "selection_expired" } else { return Ok(None) };
+        }else if let Some(value)=text.strip_prefix(&config.command_prefix) { value.split_whitespace().next().unwrap_or("help").split('@').next().unwrap_or("help") } else if selection_expired { "selection_expired" } else { return Ok(None) };
         let args=text.split_once(char::is_whitespace).map(|(_,value)|value.trim()).unwrap_or("");
         if matches!(command,"task"|"do") && !args.is_empty() && !selection_expired { return Ok(None) }
         let envelope=CommandEnvelope{command_id:command_id.into(),actor:ActorRef::System{component_id:"channel-adapter".into()},camp_id:Some(binding.thread_id.clone()),expected_versions:vec![],execution_epoch:None,payload:ChannelCommand(input.clone())};
@@ -52,7 +53,7 @@ impl Core {
             let mut lines=Vec::<String>::new();let mut selection=Value::Null;let mut choices=Vec::<Value>::new();let mut control_choices=Vec::<Value>::new();
             let candidates=config.bindings.iter().filter(|candidate|target_matches(input,config,candidate)).collect::<Vec<_>>();
             match command {
-                "help"|"start"=>lines.push(help()),
+                "help"|"start"=>lines.push(help(config)),
                 "task"|"do"|"selection_expired"=>lines.push("对话选择已随渠道配置变化失效，请先用 /sessions 或 /resume 对话编号重新选择。用法：/task 任务内容。".into()),
                 "expired_callback"=>lines.push("按钮已失效或不属于当前协议，请重新输入 /help；没有执行操作。".into()),
                 "cancel"|"approve"|"deny"=>{if selection_expired{lines.push("对话选择已失效，请先用 /sessions 重新选择。".into())}else{let (details,options)=super::channel_adapter_control::menu(transaction,input,config,binding,command,args)?;lines.extend(details);control_choices=options;}},
@@ -82,10 +83,10 @@ impl Core {
                     lines.push(format!("今日活动（UTC）\n已授权对话 {} 个，消息 {messages} 条，队员执行 {runs} 次。",seen.len()));
                 },
                 "status"=>{let mut statement=transaction.prepare("SELECT id,status FROM agent_run WHERE camp_id=?1 ORDER BY created_at DESC,id DESC LIMIT 20")?;let rows=statement.query_map([&binding.thread_id],|row|Ok((row.get::<_,String>(0)?,row.get::<_,String>(1)?)))?.collect::<std::result::Result<Vec<_>,_>>()?;lines.push(format!("当前对话：{}",binding.thread_id));for(id,status)in rows{lines.push(format!("{id} · {status}"));}},
-                _=>lines.push(format!("该命令尚未执行。\n{}",help())),
+                _=>lines.push(format!("该命令尚未执行。\n{}",help(config))),
             }
-            for(index,choice)in choices.iter().enumerate(){lines.push(format!("选择 {}：/select {command_id}:{index}",choice["threadId"].as_str().unwrap_or_default()))}
-            for(index,choice)in control_choices.iter().enumerate(){lines.push(format!("确认 {}：/confirm {command_id}:{index}",choice["label"].as_str().unwrap_or("此操作")))}
+            for(index,choice)in choices.iter().enumerate(){lines.push(format!("选择 {}：{}select {command_id}:{index}",choice["threadId"].as_str().unwrap_or_default(),config.command_prefix))}
+            for(index,choice)in control_choices.iter().enumerate(){lines.push(format!("确认 {}：{}confirm {command_id}:{index}",choice["label"].as_str().unwrap_or("此操作"),config.command_prefix))}
             let body=lines.join("\n");ensure!(body.len()<=256*1024,"channel_adapter.response_too_large");
             let mut buttons=choices.iter().enumerate().take(20).map(|(index,choice)|json!({"id":format!("rv:choose:{command_id}:{index}"),"label":format!("选择 {}",choice["threadId"].as_str().unwrap_or_default()).chars().take(32).collect::<String>()})).collect::<Vec<_>>();if buttons.is_empty(){buttons=vec![json!({"id":"rv:sessions","label":"对话"}),json!({"id":"rv:today","label":"今日"}),json!({"id":"rv:status","label":"状态"}),json!({"id":"rv:help","label":"帮助"})]}
             if !control_choices.is_empty(){buttons=control_choices.iter().enumerate().map(|(index,choice)|json!({"id":format!("rv:control:{command_id}:{index}"),"label":choice["label"].as_str().unwrap_or("确认").chars().take(32).collect::<String>()})).collect();}

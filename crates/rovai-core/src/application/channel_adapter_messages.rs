@@ -32,7 +32,7 @@ impl Core{
         let (binding,selection_expired)=self.channel_adapter_selected_binding(&input,config,&binding).await?;
         if let Some(result)=self.channel_adapter_control(&input,config,&binding,&id).await?{return Ok(result)}
         if let Some(result)=self.channel_adapter_command(&input,config,&binding,&id,selection_expired).await?{return Ok(result)}
-        let admitted_text=if let Some(command)=input.text.trim().strip_prefix('/') {let (verb,args)=command.split_once(char::is_whitespace).unwrap_or((command,""));if matches!(verb.split('@').next().unwrap_or(verb),"task"|"do"){args.trim().to_owned()}else{input.text.clone()}}else{input.text.clone()};
+        let admitted_text=if let Some(command)=input.text.trim().strip_prefix(&config.command_prefix) {let (verb,args)=command.split_once(char::is_whitespace).unwrap_or((command,""));if matches!(verb.split('@').next().unwrap_or(verb),"task"|"do"){args.trim().to_owned()}else{input.text.clone()}}else{input.text.clone()};
         let envelope=crate::command::CommandEnvelope{command_id:id.clone(),actor:ActorRef::System{component_id:"channel-adapter".into()},camp_id:Some(binding.thread_id.clone()),expected_versions:vec![],execution_epoch:None,payload:input.clone()};
         let mut database=self.database.lock().await;
         let result=crate::command::DomainCommandGateway.execute(&mut database,&envelope,|transaction|{

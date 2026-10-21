@@ -29,7 +29,7 @@ pub(super) fn menu(transaction:&rusqlite::Transaction<'_>,input:&Inbound,config:
 }
 impl Core{
     pub(super) async fn channel_adapter_control(&self,input:&Inbound,config:&Adapter,binding:&Binding,command_id:&str)->Result<Option<Value>>{
-        let callback=effective_callback(input);let Some(callback)=callback.as_deref().filter(|value|value.starts_with("rv:control:"))else{return Ok(None)};
+        let callback=effective_callback(input,config);let Some(callback)=callback.as_deref().filter(|value|value.starts_with("rv:control:"))else{return Ok(None)};
         let parts=callback.split(':').collect::<Vec<_>>();let scope=sender_scope(input,config)?;
         let prepared=(||->Result<(&str,usize)>{ensure!(parts.len()==4,"channel_adapter.invalid_callback");uuid::Uuid::parse_str(parts[2])?;Ok((parts[2],parts[3].parse()?))})();
         let outcome=match prepared{
