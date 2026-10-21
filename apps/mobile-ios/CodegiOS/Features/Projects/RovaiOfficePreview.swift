@@ -6,6 +6,7 @@ struct RovaiOfficePreview: View {
     let model: RovaiWorkspaceModel
     let threadId: String
     let path: String
+    var attachmentLocator: JSONValue? = nil
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     @State private var editable = false
@@ -17,7 +18,7 @@ struct RovaiOfficePreview: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 12) {
-                HStack { Toggle("允许编辑此文件", isOn: $editable); Button("重新连接") { retry += 1 } }.padding(.horizontal, 16)
+                HStack { if attachmentLocator == nil {Toggle("允许编辑此文件", isOn: $editable)} else {Text("消息附件只读预览")}; Button("重新连接") { retry += 1 } }.padding(.horizontal, 16)
                 if let issue { Text(issue).font(.caption).foregroundStyle(Theme.warning).padding(.horizontal, 16) }
                 if let url { RovaiOfficeWebView(url: url, issue: $issue).id(url).frame(maxWidth: .infinity, maxHeight: .infinity) }
                 else if issue == nil && scenePhase == .active { ProgressView("正在准备文档预览…").frame(maxWidth: .infinity, maxHeight: .infinity) }
@@ -29,10 +30,11 @@ struct RovaiOfficePreview: View {
     private func watch() async {
         url = nil; guard scenePhase == .active else { return }; let lifetime = model.connectionGeneration; generation = lifetime
         let hold = UUID().uuidString.lowercased(); let scope = JSONValue.object(["threadId": .string(threadId)])
-        do { let lease = try await model.query(.officeWatch, params: .object(["scope": scope, "operation": .string("start"), "holdId": .string(hold), "path": .string(path), "editable": .bool(editable)])); guard lifetime == model.connectionGeneration, lease.text("holdId") == hold else { throw CancellationError() }; let selected = try await model.officePreviewURL(port: lease["port"]?.rvInt ?? 0, cap: lease.text("cap")); try Task.checkCancellation(); url = selected; showingHold = hold; issue = nil
-            while !Task.isCancelled { try await Task.sleep(for: .seconds(30)); _ = try await model.query(.officeWatch, params: .object(["scope": scope, "operation": .string("heartbeat"), "holdId": .string(hold)])) }
+        func params(_ operation: String) -> JSONValue {var result: [String: JSONValue] = ["scope": scope, "operation": .string(operation), "holdId": .string(hold), "path": .string(path), "editable": .bool(editable && attachmentLocator == nil)];if let attachmentLocator {result["attachmentLocator"] = attachmentLocator};return .object(result)}
+        do { let lease = try await model.query(.officeWatch, params: params("start")); guard lifetime == model.connectionGeneration, lease.text("holdId") == hold else { throw CancellationError() }; let selected = try await model.officePreviewURL(port: lease["port"]?.rvInt ?? 0, cap: lease.text("cap")); try Task.checkCancellation(); url = selected; showingHold = hold; issue = nil
+            while !Task.isCancelled { try await Task.sleep(for: .seconds(30)); _ = try await model.query(.officeWatch, params: params("heartbeat")) }
         } catch is CancellationError {} catch { if lifetime == model.connectionGeneration { issue = error.localizedDescription } }
-        if lifetime == model.connectionGeneration { _ = try? await model.query(.officeWatch, params: .object(["scope": scope, "operation": .string("stop"), "holdId": .string(hold)])) }
+        if lifetime == model.connectionGeneration { _ = try? await model.query(.officeWatch, params: params("stop")) }
         if showingHold == hold { url = nil; showingHold = nil }
     }
 }

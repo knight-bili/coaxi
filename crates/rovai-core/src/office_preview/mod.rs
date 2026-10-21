@@ -5,7 +5,7 @@ pub use watch::{acquire_sse_lease,release_sse_lease,note_proxy_request};
 use anyhow::{Result,Context,ensure};
 use serde_json::{Value,json};
 use std::{collections::HashMap,path::{Path,PathBuf,Component},sync::{LazyLock,Mutex},time::{Instant,Duration}};
-struct Lease {scope:String,root:String,path:String,port:u16,underlying:String,cap:String,editable:bool,last:Instant}
+struct Lease {scope:String,root:String,path:String,port:u16,underlying:String,cap:String,editable:bool,last:Instant,owned_root:Option<PathBuf>}
 static LEASES:LazyLock<Mutex<HashMap<String,Lease>>>=LazyLock::new(Default::default);
 static START:tokio::sync::Mutex<()>=tokio::sync::Mutex::const_new(());
 static SWEEP:std::sync::atomic::AtomicBool=std::sync::atomic::AtomicBool::new(false);
@@ -24,14 +24,14 @@ pub async fn start(scope:&str,id:&str,root:&Path,path:&str,editable:bool)->Resul
     }
     let _=resolve_tree_path(root,path)?;
     let started=watch::start_office_watch_core(root.to_string_lossy().into_owned(),path.into()).await.map_err(|error|anyhow::anyhow!("office.{}: {error}",error.code()))?;
-    let lease=Lease{scope:scope.into(),root:root.to_string_lossy().into_owned(),path:path.into(),port:started.port,underlying:started.cap,cap:uuid::Uuid::new_v4().simple().to_string(),editable,last:Instant::now()};
+    let lease=Lease{scope:scope.into(),root:root.to_string_lossy().into_owned(),path:path.into(),port:started.port,underlying:started.cap,cap:uuid::Uuid::new_v4().simple().to_string(),editable,last:Instant::now(),owned_root:None};
     let result=view(id,&lease);leases().insert(id.into(),lease);
-    if !SWEEP.swap(true,std::sync::atomic::Ordering::AcqRel){tokio::spawn(async{loop{tokio::time::sleep(Duration::from_secs(30)).await;let expired={let mut leases=leases();let ids=leases.iter().filter(|(_,lease)|lease.last.elapsed()>=Duration::from_secs(180)).map(|(id,_)|id.clone()).collect::<Vec<_>>();ids.into_iter().filter_map(|id|leases.remove(&id)).collect::<Vec<_>>()};for lease in expired{let _=watch::stop_office_watch_core(lease.root,lease.path).await;}watch::sweep_office_watches(Duration::from_secs(300));}});}
+    if !SWEEP.swap(true,std::sync::atomic::Ordering::AcqRel){tokio::spawn(async{loop{tokio::time::sleep(Duration::from_secs(30)).await;let expired={let mut leases=leases();let ids=leases.iter().filter(|(_,lease)|lease.last.elapsed()>=Duration::from_secs(180)).map(|(id,_)|id.clone()).collect::<Vec<_>>();ids.into_iter().filter_map(|id|leases.remove(&id)).collect::<Vec<_>>()};for lease in expired{let _=watch::stop_office_watch_core(lease.root,lease.path).await;if let Some(root)=lease.owned_root{let _=tokio::fs::remove_dir_all(root).await;}}watch::sweep_office_watches(Duration::from_secs(300));}});}
     Ok(result)
 }
 pub fn heartbeat(scope:&str,id:&str)->Result<Value>{let mut leases=leases();let lease=leases.get_mut(id).context("office.lease_expired")?;ensure!(lease.scope==scope&&watch::validate_watch_cap(lease.port,&lease.underlying),"office.lease_expired");lease.last=Instant::now();Ok(view(id,lease))}
-pub async fn release(scope:&str,id:&str)->Result<Value>{let lease={let mut leases=leases();if let Some(lease)=leases.get(id){ensure!(lease.scope==scope,"office.hold_identity_changed")};leases.remove(id)};if let Some(lease)=lease{watch::stop_office_watch_core(lease.root,lease.path).await?;}Ok(json!({"released":true}))}
-pub fn stop_all(){leases().clear();watch::stop_all_office_watches();}
+pub async fn release(scope:&str,id:&str)->Result<Value>{let lease={let mut leases=leases();if let Some(lease)=leases.get(id){ensure!(lease.scope==scope,"office.hold_identity_changed")};leases.remove(id)};if let Some(lease)=lease{watch::stop_office_watch_core(lease.root,lease.path).await?;if let Some(root)=lease.owned_root{tokio::fs::remove_dir_all(root).await?;}}Ok(json!({"released":true}))}
+pub fn stop_all(){let roots=leases().values().filter_map(|lease|lease.owned_root.clone()).collect::<Vec<_>>();leases().clear();watch::stop_all_office_watches();for root in roots{let _=std::fs::remove_dir_all(root);}}
 fn is_office_path(path:&Path)->bool{path.extension().and_then(|part|part.to_str()).is_some_and(|part|matches!(part.to_ascii_lowercase().as_str(),"docx"|"xlsx"|"pptx"))}
 fn resolve_tree_path(root:&Path,path:&str)->Result<PathBuf>{
     ensure!(!path.is_empty()&&!path.contains(['\0',':','\\']),"office.invalid_path");let canonical=std::fs::canonicalize(root)?;let mut target=canonical.clone();
@@ -51,4 +51,21 @@ pub(crate) fn tokio_command(program:impl AsRef<std::ffi::OsStr>)->tokio::process
     command.env("LANG","C.UTF-8").env("LC_ALL","C.UTF-8");
     #[cfg(windows)]command.creation_flags(0x0800_0000);
     command
+}
+
+/// OfficeCLI sees one private read-only copy, never the attachment's siblings.
+/// Core resolves the published owner before entering this function.
+pub async fn start_attachment(scope:&str,id:&str,data_dir:&Path,source:&Path)->Result<Value>{
+    uuid::Uuid::parse_str(id)?;
+    if let Some(lease)=leases().get(id){ensure!(lease.scope==scope&&lease.owned_root.is_some(),"office.hold_identity_changed");return Ok(view(id,lease));}
+    ensure!(is_office_path(source),"office.unsupported_attachment");
+    let metadata=std::fs::symlink_metadata(source)?;ensure!(metadata.is_file()&&!metadata.file_type().is_symlink()&&metadata.len()<=256*1024*1024,"office.attachment_unavailable_or_too_large");
+    #[cfg(windows)]{use std::os::windows::fs::MetadataExt;ensure!(metadata.file_attributes()&0x400==0,"office.linked_attachment");}
+    let base=data_dir.join("office-attachment-previews");crate::platform::private_storage::prepare_private_directory(&base)?;
+    let owned=base.join(uuid::Uuid::new_v4().simple().to_string());crate::platform::private_storage::prepare_private_directory(&owned)?;
+    let name=format!("document.{}",source.extension().and_then(|part|part.to_str()).context("office.unsupported_attachment")?.to_ascii_lowercase());
+    let destination=owned.join(&name);
+    let copied=async{use tokio::io::{AsyncReadExt,AsyncWriteExt};let mut input=tokio::fs::File::open(source).await?;let observed=input.metadata().await?;ensure!(observed.is_file()&&observed.len()==metadata.len(),"office.attachment_changed");let mut output=tokio::fs::File::from_std(crate::platform::private_storage::create_private_new_file(&destination)?);let count=tokio::io::copy(&mut (&mut input).take(256*1024*1024+1),&mut output).await?;ensure!(count==observed.len()&&count<=256*1024*1024,"office.attachment_changed");output.flush().await?;output.sync_all().await?;Ok::<(),anyhow::Error>(())}.await;
+    if let Err(error)=copied{let _=tokio::fs::remove_dir_all(&owned).await;return Err(error)}
+    match start(scope,id,&owned,&name,false).await{Ok(value)=>{if let Some(lease)=leases().get_mut(id){lease.owned_root=Some(owned);}Ok(value)},Err(error)=>{let _=tokio::fs::remove_dir_all(&owned).await;Err(error)}}
 }

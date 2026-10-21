@@ -36,12 +36,13 @@ fun RovaiMessageArtifacts(model:RovaiWorkspaceViewModel,threadId:String,message:
 @Composable
 fun RovaiFilePreview(model:RovaiWorkspaceViewModel,source:JsonObject,onClose:()->Unit){
     val scope=rememberCoroutineScope();val generation=remember(source){model.connectionGeneration}
+    var office by remember(source){mutableStateOf(false)}
     var file by remember(source){mutableStateOf<JsonObject?>(null)};var page by remember(source){mutableStateOf<JsonObject?>(null)};var image by remember(source){mutableStateOf<ImageBitmap?>(null)}
     var issue by remember{mutableStateOf<String?>(null)};var busy by remember{mutableStateOf(false)};var html by remember{mutableStateOf<String?>(null)};var renderHtml by remember{mutableStateOf(false)};var previous by remember{mutableStateOf<List<Long>>(emptyList())}
     suspend fun read(offset:Long=0){val selected=file?:return;busy=true;try{require(generation==model.connectionGeneration){"工作区已切换"};val value=model.files("readPage",buildJsonObject{put("handleId",selected.coreText("handleId"));put("expectedGeneration",selected.coreText("contentGeneration"));put("offset",offset);put("maxBytes",128*1024)});page=value;issue=null}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message}finally{busy=false}}
     LaunchedEffect(source){busy=true;var handle:String?=null;try{val opened=model.files("open",source);require(opened.coreText("kind")=="file_preview"){"此来源暂不能预览"};val selected=opened["file"].coreObject();handle=selected.coreText("handleId");require(generation==model.connectionGeneration){"工作区已切换"};file=selected
         if(selected.coreText("kind")=="image"){require(selected.coreLong("size")<=20*1024*1024){"图片超过20MB，请在工程中查看"};val data=model.fileBytes("readBinary",buildJsonObject{put("handleId",handle);put("expectedGeneration",selected.coreText("contentGeneration"))});image=withContext(Dispatchers.Default){val bounds=BitmapFactory.Options().apply{inJustDecodeBounds=true};BitmapFactory.decodeByteArray(data.bytes,0,data.bytes.size,bounds);require(bounds.outWidth in 1..100000&&bounds.outHeight in 1..100000){"图片尺寸无法读取"};val options=BitmapFactory.Options();while(bounds.outWidth/options.inSampleSize.coerceAtLeast(1)>2048||bounds.outHeight/options.inSampleSize.coerceAtLeast(1)>2048)options.inSampleSize=options.inSampleSize.coerceAtLeast(1)*2;BitmapFactory.decodeByteArray(data.bytes,0,data.bytes.size,options)?.asImageBitmap()?:error("图片无法解码")}}
-        else read()
+        else if(!rovaiOfficeFile(selected.coreText("fileName")))read()
         issue=null
         busy=false
         awaitCancellation()
@@ -49,6 +50,7 @@ fun RovaiFilePreview(model:RovaiWorkspaceViewModel,source:JsonObject,onClose:()-
     LaunchedEffect(model.connectionGeneration){if(generation!=model.connectionGeneration)onClose()}
     Dialog(onDismissRequest=onClose,properties=DialogProperties(usePlatformDefaultWidth=false)){Surface(Modifier.fillMaxSize(),color=CodegTheme.colors.bgElevated){Column(Modifier.fillMaxSize().padding(16.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
         Row{Text(file?.coreText("fileName")?:"文件预览",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(onClick=onClose){Text("关闭")}}
+        if(source.coreText("kind")=="attachment"&&file?.coreText("fileName")?.let(::rovaiOfficeFile)==true)TextButton(onClick={office=true}){Text("打开Office文档预览")}
         if(busy)LinearProgressIndicator(Modifier.fillMaxWidth());issue?.let{Text(it,color=CodegTheme.colors.danger);TextButton(enabled=!busy&&file!=null,onClick={scope.launch{read(page?.coreLong("startOffset")?:0)}}){Text("重试读取")}}
         image?.let{Image(it,contentDescription=file?.coreText("fileName"),modifier=Modifier.fillMaxWidth().weight(1f),contentScale=ContentScale.Fit)}
         if(file?.coreText("kind")=="html"){TextButton(enabled=!busy,onClick={if(renderHtml)renderHtml=false else scope.launch{busy=true;try{val selected=file?:return@launch;val value=model.files("readHtml",buildJsonObject{put("handleId",selected.coreText("handleId"));put("expectedGeneration",selected.coreText("contentGeneration"))});html=value.coreText("text");renderHtml=true}catch(error:Exception){issue=error.message}finally{busy=false}}}){Text(if(renderHtml)"查看源码" else "查看HTML页面")}}
@@ -56,4 +58,5 @@ fun RovaiFilePreview(model:RovaiWorkspaceViewModel,source:JsonObject,onClose:()-
         else page?.let{value->SelectionContainer(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())){if(file?.coreText("kind")=="markdown")MarkdownContent(value.coreText("text"))else Text(value.coreText("text"),fontFamily=FontFamily.Monospace,modifier=Modifier.horizontalScroll(rememberScrollState()))}}
         if(page!=null&&!renderHtml)Row{TextButton(enabled=!busy&&previous.isNotEmpty(),onClick={val offset=previous.lastOrNull()?:return@TextButton;previous=previous.dropLast(1);scope.launch{read(offset)}}){Text("上一页")};Spacer(Modifier.weight(1f));TextButton(enabled=!busy&&page?.get("hasNext")==JsonPrimitive(true),onClick={val current=page?:return@TextButton;previous=previous+current.coreLong("startOffset");scope.launch{read(current.coreLong("endOffset"))}}){Text("下一页")}}
     }}}
+    if(office)RovaiOfficePreview(model,source.coreText("threadId"),file?.coreText("fileName").orEmpty(),onClose={office=false},attachmentLocator=source["locator"].coreObject())
 }

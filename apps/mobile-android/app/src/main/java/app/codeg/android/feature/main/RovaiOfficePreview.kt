@@ -21,17 +21,17 @@ import java.net.URI
 fun rovaiOfficeFile(path:String)=path.substringAfterLast('.').lowercase() in listOf("docx","xlsx","pptx")
 /** Codeg OfficePreview lifecycle with the shared Host's opaque sandbox proxy. */
 @Composable
-fun RovaiOfficePreview(model:RovaiWorkspaceViewModel,threadId:String,path:String,onClose:()->Unit){
+fun RovaiOfficePreview(model:RovaiWorkspaceViewModel,threadId:String,path:String,onClose:()->Unit,attachmentLocator:JsonObject?=null){
     var editable by remember{mutableStateOf(false)};var retry by remember{mutableIntStateOf(0)};var url by remember{mutableStateOf<String?>(null)};var issue by remember{mutableStateOf<String?>(null)}
     val owner=LocalLifecycleOwner.current;var active by remember{mutableStateOf(owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED))}
     DisposableEffect(owner){val listener=LifecycleEventObserver{_,event->if(event==Lifecycle.Event.ON_STOP)active=false else if(event==Lifecycle.Event.ON_START)active=true};owner.lifecycle.addObserver(listener);onDispose{owner.lifecycle.removeObserver(listener)}}
-    LaunchedEffect(threadId,path,editable,retry,active){url=null;if(!active)return@LaunchedEffect;val generation=model.connectionGeneration;val id=UUID.randomUUID().toString();val scope=buildJsonObject{put("threadId",threadId)}
-        try{val lease=model.query(RovaiOperation.OFFICE_WATCH,buildJsonObject{put("scope",scope);put("operation","start");put("holdId",id);put("path",path);put("editable",editable)}).coreObject();require(generation==model.connectionGeneration&&lease.coreText("holdId")==id){"工作区或预览归属已变化"};url=model.officePreviewUrl(lease.coreLong("port").toInt(),lease.coreText("cap"));issue=null
-            while(isActive){delay(30000);model.query(RovaiOperation.OFFICE_WATCH,buildJsonObject{put("scope",scope);put("operation","heartbeat");put("holdId",id)})}
-        }catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message;url=null}finally{url=null;if(generation==model.connectionGeneration)withContext(NonCancellable){runCatching{model.query(RovaiOperation.OFFICE_WATCH,buildJsonObject{put("scope",scope);put("operation","stop");put("holdId",id)})}}}}
+    LaunchedEffect(threadId,path,editable,retry,active,attachmentLocator){url=null;if(!active)return@LaunchedEffect;val generation=model.connectionGeneration;val id=UUID.randomUUID().toString();val scope=buildJsonObject{put("threadId",threadId)}
+        try{val lease=model.query(RovaiOperation.OFFICE_WATCH,buildJsonObject{put("scope",scope);if(attachmentLocator!=null)put("attachmentLocator",attachmentLocator);put("operation","start");put("holdId",id);put("path",path);put("editable",editable&&attachmentLocator==null)}).coreObject();require(generation==model.connectionGeneration&&lease.coreText("holdId")==id){"工作区或预览归属已变化"};url=model.officePreviewUrl(lease.coreLong("port").toInt(),lease.coreText("cap"));issue=null
+            while(isActive){delay(30000);model.query(RovaiOperation.OFFICE_WATCH,buildJsonObject{put("scope",scope);if(attachmentLocator!=null)put("attachmentLocator",attachmentLocator);put("operation","heartbeat");put("holdId",id)})}
+        }catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message;url=null}finally{url=null;if(generation==model.connectionGeneration)withContext(NonCancellable){runCatching{model.query(RovaiOperation.OFFICE_WATCH,buildJsonObject{put("scope",scope);if(attachmentLocator!=null)put("attachmentLocator",attachmentLocator);put("operation","stop");put("holdId",id)})}}}}
     Dialog(onDismissRequest=onClose,properties=DialogProperties(usePlatformDefaultWidth=false)){Surface(Modifier.fillMaxSize(),color=CodegTheme.colors.bgElevated){Column(Modifier.fillMaxSize().padding(12.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){
         Row{Text(path.substringAfterLast('/'),Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(onClick=onClose){Text("关闭")}}
-        Row{Checkbox(checked=editable,onCheckedChange={editable=it});Text("允许编辑此文件");Spacer(Modifier.weight(1f));TextButton(onClick={retry++}){Text("重新连接")}}
+        Row{if(attachmentLocator==null){Checkbox(checked=editable,onCheckedChange={editable=it});Text("允许编辑此文件")}else Text("消息附件只读预览");Spacer(Modifier.weight(1f));TextButton(onClick={retry++}){Text("重新连接")}}
         issue?.let{Text(it,color=CodegTheme.colors.danger)}
         val preview=url
         if(preview==null&&issue==null&&active)LinearProgressIndicator(Modifier.fillMaxWidth())

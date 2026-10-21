@@ -33,6 +33,7 @@ struct RovaiFilePreview: View {
     @State private var image: UIImage?
     @State private var html: String?
     @State private var rendered = false
+    @State private var office = false
     @State private var issue: String?
     @State private var busy = false
     @State private var previous: [Int] = []
@@ -40,6 +41,7 @@ struct RovaiFilePreview: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 12) {
+                if source.text("kind") == "attachment", let name = file?.text("fileName"), rovaiOfficeFile(name) {Button("打开Office文档预览") {office = true}}
                 if busy { ProgressView().frame(maxWidth: .infinity) }
                 if let issue { Text(issue).font(.caption).foregroundStyle(Theme.warning); Button("重试读取") { Task { await read(page?["startOffset"]?.rvInt ?? 0) } }.disabled(busy || file == nil) }
                 if let image { ScrollView([.horizontal, .vertical]) { Image(uiImage: image).resizable().scaledToFit().frame(maxWidth: .infinity).clipShape(RoundedRectangle(cornerRadius: 10)) } }
@@ -49,7 +51,8 @@ struct RovaiFilePreview: View {
                 Spacer(minLength: 0)
             }.padding(16).navigationTitle(file?.text("fileName") ?? "文件预览").navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("关闭") { dismiss() } }; if file?.text("kind") == "html" { ToolbarItem(placement: .topBarTrailing) { Button(rendered ? "源码" : "查看页面") { if rendered { rendered = false } else { Task { await readHtml() } } }.disabled(busy) } } }
-        }.task(id: source) { generation = model.connectionGeneration; await open() }
+        }.sheet(isPresented: $office) {RovaiOfficePreview(model: model, threadId: source.text("threadId"), path: file?.text("fileName") ?? "文档", attachmentLocator: source["locator"])}
+        .task(id: source) { generation = model.connectionGeneration; await open() }
         .onChange(of: model.connectionGeneration) { _, value in if generation != value { dismiss() } }
         .onDisappear { guard let file, generation == model.connectionGeneration else { return }; Task { _ = try? await model.files("release", params: .object(["handleId": file["handleId"] ?? .null])) } }
     }
@@ -58,7 +61,7 @@ struct RovaiFilePreview: View {
         busy = true; defer { busy = false }
         do { let value = try await model.files("open", params: source); guard value.text("kind") == "file_preview", let selected = value["file"], generation == model.connectionGeneration else { throw RovaiHostFailure(code: "此来源暂不能预览") }; file = selected
             if selected.text("kind") == "image" { guard (selected["size"]?.rvInt ?? 0) <= 20 * 1024 * 1024 else { throw RovaiHostFailure(code: "图片超过20MB，请在工程中查看") }; let result = try await model.fileBytes("readBinary", params: input()); let data = result.data; let decoded = await Task.detached(priority: .userInitiated) { () -> UIImage? in guard let source = CGImageSourceCreateWithData(data as CFData, nil), let thumbnail = CGImageSourceCreateThumbnailAtIndex(source, 0, [kCGImageSourceCreateThumbnailFromImageAlways: true, kCGImageSourceThumbnailMaxPixelSize: 2048, kCGImageSourceCreateThumbnailWithTransform: true] as CFDictionary) else { return nil }; return UIImage(cgImage: thumbnail) }.value; guard generation == model.connectionGeneration, !Task.isCancelled else { return }; guard let decoded else { throw RovaiHostFailure(code: "图片无法解码") }; image = decoded }
-            else { busy = false; await read(0) }
+            else if !rovaiOfficeFile(selected.text("fileName")) { busy = false; await read(0) }
         } catch is CancellationError {} catch { issue = error.localizedDescription }
     }
     private func read(_ offset: Int) async {
