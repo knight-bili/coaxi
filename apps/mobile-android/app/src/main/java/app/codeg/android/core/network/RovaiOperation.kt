@@ -15,6 +15,7 @@ enum class RovaiOperation(val wire:String) {
     PETS_OPERATION("pets.operation"),
     APPEARANCE_EXTENSIONS("appearance.extensions"),
     BACKUP_WEBDAV_SETTINGS("backup.webdav.settings"),
+    BACKUP_WEBDAV_REMOTE("backup.webdav.remote"),
     HISTORY_LIBRARY("history.library"),
     OFFICE_WATCH("office.watch"),
     FORGE_ACCOUNTS_GET("forge.accounts.get"),

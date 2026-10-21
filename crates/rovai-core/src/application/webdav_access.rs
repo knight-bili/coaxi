@@ -10,6 +10,15 @@ struct Settings{revision:String,config:Config}
 struct Request{operation:String,#[serde(default)]expected_revision:Option<String>,#[serde(default)]endpoint:Option<String>,#[serde(default)]username:Option<String>,#[serde(default)]password:Option<String>,#[serde(default)]clear_password:bool,#[serde(default)]allow_insecure:bool,#[serde(default)]command_id:Option<String>,#[serde(default)]path:Option<PathBuf>,#[serde(default)]snapshot_id:Option<String>,#[serde(default)]expected_digest:Option<String>,#[serde(default)]expected_index_etag:Option<String>,#[serde(default)]confirmed:bool,#[serde(default)]kind:Option<String>,#[serde(default)]keep_backups:Option<usize>,#[serde(default)]keep_configurations:Option<usize>}
 fn view(settings:&Settings)->Value{json!({"revision":settings.revision,"endpoint":settings.config.endpoint,"username":settings.config.username,"passwordSet":!settings.config.password.is_empty(),"allowInsecure":settings.config.allow_insecure})}
 impl Core{
+    pub(super) async fn webdav_remote_access(&self,value:Value)->Result<Value>{
+        let request:Request=serde_json::from_value(value.clone())?;
+        ensure!(request.path.is_none()&&request.endpoint.is_none()&&request.username.is_none()&&request.password.is_none()&&!request.clear_password&&!request.allow_insecure,"webdav.remote_paths_or_credentials_not_admitted");
+        ensure!(["list","probe","create_collection","transfers","status","cancel","removal_preview","removal_status","remove","retention_preview","retention_status","retention_apply","cleanup_preview","cleanup_removed"].contains(&request.operation.as_str()),"webdav.remote_operation_not_admitted");
+        if request.operation=="create_collection"{ensure!(request.confirmed,"webdav.confirmation_required")}
+        let mut result=self.webdav_access(true,value).await?;
+        fn hide_host_path(value:&mut Value){if let Some(object)=value.as_object_mut(){object.remove("path");object.remove("request");if let Some(result)=object.get_mut("result"){hide_host_path(result)};if let Some(items)=object.get_mut("items").and_then(Value::as_array_mut){for item in items{hide_host_path(item)}}}}
+        hide_host_path(&mut result);Ok(result)
+    }
     pub(super) async fn webdav_access(&self,local:bool,value:Value)->Result<Value>{
         let request:Request=serde_json::from_value(value.clone())?;let path=self.data_dir.join("webdav-settings-v1.json");
         if request.operation=="get"{return if path.exists(){Ok(view(&serde_json::from_slice(&std::fs::read(path)?)?))}else{Ok(json!({"revision":null,"endpoint":"","username":"","passwordSet":false,"allowInsecure":false}))}}

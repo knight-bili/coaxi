@@ -849,6 +849,7 @@ fn request_runs_outside_main_queue(method: &str) -> bool {
     matches!(
         method,
         "health.check"
+            | "backup.webdav.remote"
             | "diagnostics.check"
             | "diagnostics.export"
             | "monitoring.snapshot"
@@ -10353,6 +10354,7 @@ impl Core {
             "backup.config.local" => self.config_sync_access(request.params.clone()).await,
             "backup.storage.desktop.register" => {#[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Input{preferences_root:PathBuf}let input:Input=serde_json::from_value(request.params.clone())?;crate::backup::owned_roots::register_desktop(&self.data_dir,&input.preferences_root)?;Ok(json!({"registered":true}))},
             "backup.webdav.settings" => self.webdav_access(false,request.params.clone()).await,
+            "backup.webdav.remote" => self.webdav_remote_access(request.params.clone()).await,
             "backup.webdav.local" => self.webdav_access(true,request.params.clone()).await,
             "history.local" => self.history_import(true,request.params.clone()).await,
             "history.library" => self.history_import(false,request.params.clone()).await,

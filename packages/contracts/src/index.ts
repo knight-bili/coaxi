@@ -5013,6 +5013,7 @@ export type CoreMethod =
   | 'pets.local'
   | 'appearance.extensions'
   | 'backup.webdav.settings'
+  | 'backup.webdav.remote'
   | 'backup.webdav.local'
   | 'backup.config.local'
   | 'backup.storage.desktop.register'

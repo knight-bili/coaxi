@@ -15,6 +15,7 @@ enum RovaiOperation: String, Sendable {
     case petsOperation = "pets.operation"
     case appearanceExtensions = "appearance.extensions"
     case backupWebdavSettings = "backup.webdav.settings"
+    case backupWebdavRemote = "backup.webdav.remote"
     case historyLibrary = "history.library"
     case officeWatch = "office.watch"
     case forgeAccountsGet = "forge.accounts.get"

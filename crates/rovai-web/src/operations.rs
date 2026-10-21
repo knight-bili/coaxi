@@ -31,6 +31,8 @@ pub enum Operation {
     AppearanceExtensions,
     #[serde(rename="backup.webdav.settings")]
     WebdavSettings,
+    #[serde(rename="backup.webdav.remote")]
+    WebdavRemote,
     #[serde(rename="history.library")]
     HistoryLibrary,
     #[serde(rename="office.watch")]
@@ -645,6 +647,7 @@ impl Operation {
             Self::PetsOperation => "pets.operation",
             Self::AppearanceExtensions => "appearance.extensions",
             Self::WebdavSettings => "backup.webdav.settings",
+            Self::WebdavRemote => "backup.webdav.remote",
             Self::HistoryLibrary => "history.library",
             Self::OfficeWatch => "office.watch",
             Self::ForgeOperation => "forge.operation",

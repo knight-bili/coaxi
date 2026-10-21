@@ -29,6 +29,7 @@ export class SessionRequired extends Error {
 export type WorkspaceListing = { name: string; projectPath: string; parentPath: string | null; roots: string[]; directories: { name: string; projectPath: string }[]; nextOffset: number | null }
 
 export const WEB_OPERATIONS = [
+  'backup.webdav.settings', 'backup.webdav.remote',
   'threads.rename',
   'threads.delete',
   'threads.deletionIssues',
