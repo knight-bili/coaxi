@@ -12,14 +12,16 @@ enum RovaiSecureSession {
     }
     static func load(profile: UUID, account: String) -> Data? {
         var value = query(profile: profile, account: account); value[kSecReturnData as String] = true; value[kSecMatchLimit as String] = kSecMatchLimitOne
-        var result: CFTypeRef?; guard SecItemCopyMatching(value as CFDictionary, &result) == errSecSuccess, let data = result as? Data, data.count <= 64 * 1024 else { return nil }; return data
+        var result: CFTypeRef?; guard SecItemCopyMatching(value as CFDictionary, &result) == errSecSuccess, let data = result as? Data, data.count <= (account.hasPrefix("pending:") ? 8 * 1024 * 1024 : 64 * 1024) else { return nil }; return data
     }
-    static func save(_ data: Data?, profile: UUID, account: String) {
+    @discardableResult static func save(_ data: Data?, profile: UUID, account: String) -> Bool {
         let value = query(profile: profile, account: account)
-        guard let data else { SecItemDelete(value as CFDictionary); return }
-        guard data.count <= 64 * 1024 else { return }
+        guard let data else { let status = SecItemDelete(value as CFDictionary); return status == errSecSuccess || status == errSecItemNotFound }
+        guard data.count <= (account.hasPrefix("pending:") ? 8 * 1024 * 1024 : 64 * 1024) else { return false }
         let attributes: [String: Any] = [kSecValueData as String: data, kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly]
-        if SecItemUpdate(value as CFDictionary, attributes as CFDictionary) == errSecItemNotFound { var insert = value; insert.merge(attributes) { _, next in next }; SecItemAdd(insert as CFDictionary, nil) }
+        let status = SecItemUpdate(value as CFDictionary, attributes as CFDictionary)
+        if status == errSecItemNotFound { var insert = value; insert.merge(attributes) { _, next in next }; return SecItemAdd(insert as CFDictionary, nil) == errSecSuccess }
+        return status == errSecSuccess
     }
     static func remove(profile: UUID) { SecItemDelete(query(profile: profile) as CFDictionary) }
 }
