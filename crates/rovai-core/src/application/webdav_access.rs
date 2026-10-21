@@ -7,7 +7,7 @@ use crate::backup::webdav::{Config,WebDav};
 struct Settings{revision:String,config:Config}
 #[derive(Deserialize)]
 #[serde(rename_all="camelCase",deny_unknown_fields)]
-struct Request{operation:String,#[serde(default)]expected_revision:Option<String>,#[serde(default)]endpoint:Option<String>,#[serde(default)]username:Option<String>,#[serde(default)]password:Option<String>,#[serde(default)]clear_password:bool,#[serde(default)]allow_insecure:bool,#[serde(default)]command_id:Option<String>,#[serde(default)]path:Option<PathBuf>,#[serde(default)]snapshot_id:Option<String>,#[serde(default)]expected_digest:Option<String>,#[serde(default)]expected_index_etag:Option<String>,#[serde(default)]confirmed:bool,#[serde(default)]kind:Option<String>}
+struct Request{operation:String,#[serde(default)]expected_revision:Option<String>,#[serde(default)]endpoint:Option<String>,#[serde(default)]username:Option<String>,#[serde(default)]password:Option<String>,#[serde(default)]clear_password:bool,#[serde(default)]allow_insecure:bool,#[serde(default)]command_id:Option<String>,#[serde(default)]path:Option<PathBuf>,#[serde(default)]snapshot_id:Option<String>,#[serde(default)]expected_digest:Option<String>,#[serde(default)]expected_index_etag:Option<String>,#[serde(default)]confirmed:bool,#[serde(default)]kind:Option<String>,#[serde(default)]keep_backups:Option<usize>,#[serde(default)]keep_configurations:Option<usize>}
 fn view(settings:&Settings)->Value{json!({"revision":settings.revision,"endpoint":settings.config.endpoint,"username":settings.config.username,"passwordSet":!settings.config.password.is_empty(),"allowInsecure":settings.config.allow_insecure})}
 impl Core{
     pub(super) async fn webdav_access(&self,local:bool,value:Value)->Result<Value>{
@@ -23,6 +23,23 @@ impl Core{
         }
         ensure!(local,"webdav.local_owner_required");
         let settings:Settings=serde_json::from_slice(&std::fs::read(path)?)?;ensure!(request.expected_revision.as_deref()==Some(settings.revision.as_str()),"webdav.settings_changed");let client=WebDav::new(settings.config.clone())?;
+        if request.operation=="retention_preview"{
+            let id=request.command_id.as_deref().context("webdav.command_required")?;uuid::Uuid::parse_str(id)?;
+            let directory=self.data_dir.join("webdav-maintenance");crate::platform::private_storage::prepare_private_directory(&directory)?;let path=directory.join(format!("{id}.json"));
+            let _lock=workbench::MUTATIONS.lock().await;
+            if path.exists(){let previous:Value=serde_json::from_slice(&std::fs::read(path)?)?;ensure!(previous["accountRevision"]==settings.revision&&previous["plan"]["keepBackups"].as_u64()==request.keep_backups.map(|n|n as u64)&&previous["plan"]["keepConfigurations"].as_u64()==request.keep_configurations.map(|n|n as u64),"webdav.command_identity_changed");return Ok(previous)}
+            ensure!(std::fs::read_dir(&directory)?.take(1001).count()<1000,"webdav.maintenance_receipt_limit");
+            let plan=client.retention_preview(request.keep_backups.context("webdav.retention_required")?,request.keep_configurations.context("webdav.retention_required")?).await?;
+            let receipt=json!({"commandId":id,"accountRevision":settings.revision,"createdAt":chrono::Utc::now().to_rfc3339(),"plan":plan});crate::platform::private_storage::atomic_write_private_json(&path,&receipt)?;return Ok(receipt)
+        }
+        if matches!(request.operation.as_str(),"retention_apply"|"retention_status"){
+            let id=request.command_id.as_deref().context("webdav.command_required")?;uuid::Uuid::parse_str(id)?;let path=self.data_dir.join("webdav-maintenance").join(format!("{id}.json"));
+            let receipt:Value=serde_json::from_slice(&std::fs::read(path)?)?;ensure!(receipt["accountRevision"]==settings.revision,"webdav.settings_changed");
+            if request.operation=="retention_status"{return client.retention_status(receipt["plan"].clone()).await}
+            ensure!(request.confirmed,"webdav.confirmation_required");let created=chrono::DateTime::parse_from_rfc3339(receipt["createdAt"].as_str().context("webdav.invalid_receipt")?)?;ensure!((chrono::Utc::now()-created.with_timezone(&chrono::Utc)).num_minutes()<15,"webdav.retention_preview_expired");return client.retention_apply(receipt["plan"].clone()).await
+        }
+        if request.operation=="cleanup_preview"{return client.cleanup_preview().await}
+        if request.operation=="cleanup_removed"{ensure!(request.confirmed,"webdav.confirmation_required");return client.cleanup_removed(request.snapshot_id.as_deref().context("webdav.snapshot_required")?,request.expected_digest.as_deref().context("webdav.source_digest_required")?).await}
         if request.operation=="list"{return Ok(json!({"entries":client.list().await?}))}
         if request.operation=="probe"{return client.probe().await}
         if request.operation=="create_collection"{return client.create_collection().await}

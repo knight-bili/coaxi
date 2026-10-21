@@ -104,3 +104,6 @@ impl WebDav{
     }
 }
 fn progress(done:u64,total:u64,phase:&str){eprintln!("{}",serde_json::json!({"phase":phase,"done":done,"total":total}));}
+
+#[path="webdav_retention.rs"]
+mod retention;
