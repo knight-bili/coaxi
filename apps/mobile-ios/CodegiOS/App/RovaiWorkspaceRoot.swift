@@ -8,8 +8,17 @@ struct RovaiWorkspaceRoot: View {
     @State private var tab = 0
     @State private var create: String?
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @State private var columns: NavigationSplitViewVisibility = .all
+    @State private var detailRoute: RovaiRoute?
     private var profile: ServerProfile? { store.servers.first { $0.id == selectedServerID } ?? store.servers.first }
     var body: some View {
+        Group { if horizontalSizeClass == .regular { splitShell } else { compactShell } }
+        .task(id: "\(profile?.id.uuidString ?? ""):\(profile?.urlString ?? "")") { detailRoute = nil; await model.bind(profile, store: store) }
+        .onChange(of: scenePhase, initial: true) { _, phase in model.foreground(phase == .active) }
+        .sheet(isPresented: Binding(get: { create != nil }, set: { if !$0 { create = nil } })) { RovaiNewConversation(model: model, mission: create == "mission") { create = nil } }
+    }
+    private var compactShell: some View {
         TabView(selection: $tab) {
             tabPage("对话", icon: "message", value: 0) { threadList }
             tabPage("使命", icon: "flag", value: 1) { missionList }
@@ -17,9 +26,34 @@ struct RovaiWorkspaceRoot: View {
             tabPage("画布", icon: "map", value: 3) { canvasList }
             tabPage("设置", icon: "gearshape", value: 4) { settings }
         }
-        .task(id: "\(profile?.id.uuidString ?? ""):\(profile?.urlString ?? "")") { await model.bind(profile, store: store) }
-        .onChange(of: scenePhase, initial: true) { _, phase in model.foreground(phase == .active) }
-        .sheet(isPresented: Binding(get: { create != nil }, set: { if !$0 { create = nil } })) { RovaiNewConversation(model: model, mission: create == "mission") { create = nil } }
+    }
+    // Same balanced three-column shell and widths as Codeg's original iPad root.
+    private var splitShell: some View {
+        NavigationSplitView(columnVisibility: $columns) {
+            List(selection: $tab) { Label("对话", systemImage: "message").tag(0); Label("使命", systemImage: "flag").tag(1); Label("队员", systemImage: "person.2").tag(2); Label("画布", systemImage: "map").tag(3); Label("设置", systemImage: "gearshape").tag(4) }
+                .navigationTitle(profile?.name ?? "Rovai Workbench")
+                .navigationSplitViewColumnWidth(min: 220, ideal: 260, max: 320)
+                .toolbarTitleMenu { Picker("服务器", selection: $selectedServerID) { ForEach(store.servers) { server in Text(server.name).tag(Optional(server.id)) } }; Divider(); Button("管理服务器", action: onManageServers) }
+        } content: {
+            NavigationStack {
+                VStack(spacing: 0) {
+                    if let issue = model.issue { Text(issue).font(.caption).foregroundStyle(Theme.warning).padding(12) }
+                    if model.pending != nil { HStack { Text("原操作待核对").font(.caption); Spacer(); Button("核对") { Task { await model.reconcile() } }; Button("重试原操作") { Task { await model.retry() } } }.padding(12).disabled(model.busy) }
+                    if model.connected { switch tab { case 0: threadList; case 1: missionList; case 2: memberList; case 3: canvasList; default: settings } }
+                    else { ContentUnavailableView { Label("连接工作区", systemImage: "network") } description: { Text(profile?.name ?? "Rovai Workbench") } actions: { Button("连接") { Task { await model.authenticate() } }.disabled(model.busy); Button("管理服务器", action: onManageServers) } }
+                }.navigationTitle(["对话", "使命", "队员", "画布", "设置"][tab])
+                    .toolbar { ToolbarItemGroup(placement: .topBarTrailing) { if tab == 0 || tab == 1 { Button { create = tab == 1 ? "mission" : "thread" } label: { Image(systemName: "plus") }.disabled(!model.connected || model.pending != nil) }; Button { Task { await model.refresh() } } label: { Image(systemName: "arrow.clockwise") }.disabled(!model.connected) } }
+            }.navigationSplitViewColumnWidth(min: 340, ideal: 400, max: 520)
+        } detail: {
+            NavigationStack {
+                if model.connected, let detailRoute { switch detailRoute { case .thread(let id): RovaiThreadDetail(model: model, id: id).id(id); case .canvas(let id): RovaiCanvasView(model: model, id: id).id(id) } }
+                else { ContentUnavailableView("选择对话或画布", systemImage: "sidebar.left", description: Text("从列表打开内容，在此查看并继续工作。")) }
+            }
+        }.navigationSplitViewStyle(.balanced)
+    }
+    @ViewBuilder private func routeLink<Content: View>(_ route: RovaiRoute, @ViewBuilder label: () -> Content) -> some View {
+        if horizontalSizeClass == .regular { Button { detailRoute = route } label: { label() }.buttonStyle(.plain) }
+        else { NavigationLink(value: route) { label() } }
     }
     private func tabPage<Content: View>(_ title: String, icon: String, value: Int, @ViewBuilder content: () -> Content) -> some View {
         NavigationStack {
@@ -36,23 +70,24 @@ struct RovaiWorkspaceRoot: View {
     private var threadList: some View {
         List {
             Section("快速对话") { ForEach((model.navigation["quickChat"]?["recentThreads"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in threadLink(row.value) } }
-            ForEach((model.navigation["projects"]?.rvArray ?? []).map { RovaiRow(value: $0) }, id: \.value) { project in Section(project.value.text("name")) { ForEach((project.value["recentThreads"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in threadLink(row.value) }; RovaiMoreThreads(model: model, path: project.value.text("projectPath"), total: project.value["totalCount"]?.rvInt ?? 0, displayed: Set((project.value["recentThreads"]?.rvArray ?? []).map { $0.text("id") })) } }
+            ForEach((model.navigation["projects"]?.rvArray ?? []).map { RovaiRow(value: $0) }, id: \.value) { project in Section(project.value.text("name")) { ForEach((project.value["recentThreads"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in threadLink(row.value) }; RovaiMoreThreads(model: model, path: project.value.text("projectPath"), total: project.value["totalCount"]?.rvInt ?? 0, displayed: Set((project.value["recentThreads"]?.rvArray ?? []).map { $0.text("id") }), onSelect: horizontalSizeClass == .regular ? { detailRoute = .thread($0) } : nil) } }
         }.scrollContentBackground(.hidden).refreshable { await model.refresh() }
     }
-    private func threadLink(_ value: JSONValue) -> some View { NavigationLink(value: RovaiRoute.thread(value.text("id"))) { VStack(alignment: .leading, spacing: 6) { Text(value.text("title")).font(.headline); if let lead = value["defaultLead"] { Text(lead.text("displayName")).font(.caption).foregroundStyle(Theme.textSecondary) } } }.listRowBackground(Color.clear) }
+    private func threadLink(_ value: JSONValue) -> some View { routeLink(.thread(value.text("id"))) { VStack(alignment: .leading, spacing: 6) { Text(value.text("title")).font(.headline); if let lead = value["defaultLead"] { Text(lead.text("displayName")).font(.caption).foregroundStyle(Theme.textSecondary) } } }.listRowBackground(Color.clear) }
     private var missionList: some View {
-        List { ForEach(model.missions.map { RovaiRow(value: $0) }) { row in GlassRow { VStack(alignment: .leading, spacing: 8) { HStack { Text(row.value.text("title")).font(.headline); Spacer(); Text(row.value.text("status")).font(.caption).foregroundStyle(Theme.textSecondary) }; Text(row.value.text("description")).lineLimit(3).foregroundStyle(Theme.textSecondary); HStack { NavigationLink("打开对话", value: RovaiRoute.thread(row.value.text("threadId"))); if row.value["startAvailable"]?.rvBool == true { Button("开始使命") { Task { await model.command(.missionsStart, value: .object(["missionId": .string(row.id)])) } }.disabled(model.pending != nil) } } }.listRowBackground(Color.clear).listRowSeparator(.hidden) } }.scrollContentBackground(.hidden).refreshable { await model.refresh() }
+        List { ForEach(model.missions.map { RovaiRow(value: $0) }) { row in GlassRow { VStack(alignment: .leading, spacing: 8) { HStack { Text(row.value.text("title")).font(.headline); Spacer(); Text(row.value.text("status")).font(.caption).foregroundStyle(Theme.textSecondary) }; Text(row.value.text("description")).lineLimit(3).foregroundStyle(Theme.textSecondary); HStack { routeLink(.thread(row.value.text("threadId"))) { Text("打开对话") }; if row.value["startAvailable"]?.rvBool == true { Button("开始使命") { Task { await model.command(.missionsStart, value: .object(["missionId": .string(row.id)])) } }.disabled(model.pending != nil) } } }.listRowBackground(Color.clear).listRowSeparator(.hidden) } }.scrollContentBackground(.hidden).refreshable { await model.refresh() }
     }
     private var memberList: some View { List { ForEach(model.members.map { RovaiRow(value: $0) }) { row in GlassRow { VStack(alignment: .leading, spacing: 8) { Text(row.value.text("displayName")).font(.headline); Text(row.value.text("teamRole")).font(.subheadline).foregroundStyle(Theme.textSecondary); Text(row.value.text("professionalResponsibilities")); Text(row.value["runtimeReadiness"]?.text("status") ?? "").font(.caption).foregroundStyle(Theme.accent) } }.listRowBackground(Color.clear).listRowSeparator(.hidden) } }.scrollContentBackground(.hidden) }
-    private var canvasList: some View { List { ForEach(model.boards.map { RovaiRow(value: $0) }) { row in NavigationLink(value: RovaiRoute.canvas(row.id)) { GlassRow { HStack(spacing: 12) { Image(systemName: "map").font(.title2).foregroundStyle(Theme.textSecondary); VStack(alignment: .leading, spacing: 6) { Text(row.value.text("name").isEmpty ? "未命名画布" : row.value.text("name")).font(.headline); Text(row.value.text("description")).font(.caption).foregroundStyle(Theme.textSecondary) } } } }.listRowBackground(Color.clear).listRowSeparator(.hidden) } }.scrollContentBackground(.hidden) }
+    private var canvasList: some View { List { ForEach(model.boards.map { RovaiRow(value: $0) }) { row in routeLink(.canvas(row.id)) { GlassRow { HStack(spacing: 12) { Image(systemName: "map").font(.title2).foregroundStyle(Theme.textSecondary); VStack(alignment: .leading, spacing: 6) { Text(row.value.text("name").isEmpty ? "未命名画布" : row.value.text("name")).font(.headline); Text(row.value.text("description")).font(.caption).foregroundStyle(Theme.textSecondary) } } } }.listRowBackground(Color.clear).listRowSeparator(.hidden) } }.scrollContentBackground(.hidden) }
     private var settings: some View { List { NavigationLink { RovaiMcpSettingsView(model: model) } label: { Label("MCP连接", systemImage: "puzzlepiece.extension") }; NavigationLink { RovaiSkillSettingsView(model: model) } label: { Label("技能与专家库", systemImage: "graduationcap") }; Button("管理服务器", action: onManageServers); if let profile { LabeledContent("当前服务器", value: profile.displayHost) }; Button("退出当前连接", role: .destructive) { Task { await model.logout() } } }.scrollContentBackground(.hidden) }
 }
 enum RovaiRoute: Hashable { case thread(String), canvas(String) }
 
 private struct RovaiMoreThreads: View {
     let model: RovaiWorkspaceModel; let path: String; let total: Int; let displayed: Set<String>
+    var onSelect: ((String) -> Void)? = nil
     @State private var rows: [JSONValue] = []; @State private var offset: Int? = 0; @State private var busy = false; @State private var issue: String?
-    var body: some View { ForEach(rows.filter { !displayed.contains($0.text("id")) }.map { RovaiRow(value: $0) }) { row in NavigationLink(row.value.text("title"), value: RovaiRoute.thread(row.id)) }; if offset != nil && total > displayed.count { Button(busy ? "正在读取…" : "更多对话") { Task { busy = true; defer { busy = false }; do { let result = try await model.query(.navigationGroupThreads, params: .object(["projectPath": .string(path), "offset": .number(Double(offset ?? 0)), "limit": .number(50)])); rows += result["threads"]?.rvArray ?? []; if result["nextOffset"] == .null { offset = nil } else { offset = result["nextOffset"]?.rvInt } } catch { issue = error.localizedDescription } } }.disabled(busy) }; if let issue { Text(issue).font(.caption).foregroundStyle(Theme.warning) } }
+    var body: some View { ForEach(rows.filter { !displayed.contains($0.text("id")) }.map { RovaiRow(value: $0) }) { row in if let onSelect { Button(row.value.text("title")) { onSelect(row.id) } } else { NavigationLink(row.value.text("title"), value: RovaiRoute.thread(row.id)) } }; if offset != nil && total > displayed.count { Button(busy ? "正在读取…" : "更多对话") { Task { busy = true; defer { busy = false }; do { let result = try await model.query(.navigationGroupThreads, params: .object(["projectPath": .string(path), "offset": .number(Double(offset ?? 0)), "limit": .number(50)])); rows += result["threads"]?.rvArray ?? []; if result["nextOffset"] == .null { offset = nil } else { offset = result["nextOffset"]?.rvInt } } catch { issue = error.localizedDescription } } }.disabled(busy) }; if let issue { Text(issue).font(.caption).foregroundStyle(Theme.warning) } }
 }
 private struct RovaiThreadDetail: View {
     let model: RovaiWorkspaceModel; let id: String
