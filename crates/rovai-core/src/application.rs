@@ -2405,6 +2405,7 @@ struct ClaudeInputAcceptanceTarget<'a> {
     expected_native_session_id: &'a str,
     expected_native_turn_id: &'a str,
     is_new_session: bool,
+    native_source: Option<&'a rovai_core::runtime_subagent_session::CapturedNativeSource>,
 }
 
 struct Core {
@@ -15239,14 +15240,26 @@ impl Core {
         let native_source = match execution.runtime.adapter_kind {
             AdapterKind::CodexCli => self.codex_cli.get_agent_run(&execution.agent_run_id, execution.execution_epoch)
                 .await.and_then(|runtime| runtime.native_source()),
-            AdapterKind::GrokBuild => {
-                if let Some(adapter) = self.acp_adapter(AdapterKind::GrokBuild) {
+            AdapterKind::GrokBuild | AdapterKind::QoderCli => {
+                if let Some(adapter) = self.acp_adapter(execution.runtime.adapter_kind) {
                     adapter.get_agent_run(&execution.agent_run_id, execution.execution_epoch)
                         .await.and_then(|runtime| runtime.native_source())
                 } else { None }
             }
             _ => None,
         };
+        self.bind_prepared_native_session_source(
+            execution, credential, native_session_id, native_source.as_ref(),
+        ).await
+    }
+
+    async fn bind_prepared_native_session_source(
+        &self,
+        execution: &AgentRunExecution,
+        credential: &BuiltinToolBindingCredential,
+        native_session_id: &str,
+        native_source: Option<&rovai_core::runtime_subagent_session::CapturedNativeSource>,
+    ) -> Result<()> {
         let binding = {
             let mut database = self.database.lock().await;
             ExecutionRuntimeService::default().bind_native_session_with_source(
@@ -15282,7 +15295,7 @@ impl Core {
                             .clone(),
                     },
                 },
-                native_source.as_ref(),
+                native_source,
             )
         }?;
         if binding.result.status == CommandResultStatus::Rejected {
@@ -15381,7 +15394,9 @@ impl Core {
         .await?;
         if !target.is_new_session
             && let Err(error) = self
-                .bind_prepared_native_session(execution, credential, &accepted.native_session_id)
+                .bind_prepared_native_session_source(
+                    execution, credential, &accepted.native_session_id, target.native_source,
+                )
                 .await
         {
             let mut database = self.database.lock().await;
@@ -16816,6 +16831,7 @@ impl Core {
                 .context("single replacement Claude Code Session failed");
             }
         };
+        let native_source = release.native_source.clone();
         let materialized = self
             .materialize_agent_run_context(
                 execution,
@@ -16853,7 +16869,9 @@ impl Core {
             }
         };
         if is_new_session {
-            self.bind_prepared_native_session(execution, &binding_credential, &native_session_id)
+            self.bind_prepared_native_session_source(
+                execution, &binding_credential, &native_session_id, native_source.as_ref(),
+            )
                 .await?;
         }
         let delivery = {
@@ -16878,6 +16896,7 @@ impl Core {
             expected_native_session_id: &native_session_id,
             expected_native_turn_id: &native_turn_id,
             is_new_session,
+            native_source: native_source.as_ref(),
         };
         self.begin_agent_run_input_dispatch(execution, &delivery.id, launch_permit)
             .await?;

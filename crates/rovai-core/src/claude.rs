@@ -170,7 +170,18 @@ pub struct ClaudeCodeRunRequest {
     pub launch_handoff: Option<oneshot::Sender<()>>,
     /// Native initialization completed, but no business input has been sent.
     /// Core records dispatch only after releasing this gate.
-    pub input_ready: Option<mpsc::UnboundedSender<oneshot::Sender<String>>>,
+    pub input_ready: Option<mpsc::UnboundedSender<ClaudeCodeInputReady>>,
+}
+
+pub struct ClaudeCodeInputReady {
+    release: oneshot::Sender<String>,
+    pub native_source: Option<rovai_core::runtime_subagent_session::CapturedNativeSource>,
+}
+
+impl ClaudeCodeInputReady {
+    pub fn send(self, prompt: String) -> std::result::Result<(), String> {
+        self.release.send(prompt)
+    }
 }
 
 #[derive(Debug)]
@@ -757,7 +768,7 @@ impl ClaudeCodeCliRuntimeAdapter {
         }
         // Frozen context can contain user messages and local paths. The managed
         // process uses piped stdin so it never appears in argv or diagnostics.
-        let launch_result: Result<ManagedProcess> = (|| {
+        let launch_result: Result<_> = (|| {
             let spec = ManagedProcessLaunchSpec::capture(
                 &command,
                 ManagedProcessPurpose::RuntimeOneShot,
@@ -765,9 +776,16 @@ impl ClaudeCodeCliRuntimeAdapter {
                 ManagedWindowsArgvDialect::MicrosoftCrt,
                 format!("agent-run:{}:claude-code-cli", request.agent_run_id),
             )?;
-            ManagedProcess::spawn(spec)
+            let native_source =
+                rovai_core::runtime_subagent_session::CapturedNativeSource::capture(
+                    rovai_core::agent_profile::AdapterKind::ClaudeCodeCli,
+                    spec.environment(),
+                    spec.working_directory(),
+                    &uuid::Uuid::new_v4().to_string(),
+                );
+            ManagedProcess::spawn(spec).map(|child| (child, native_source))
         })();
-        let child = launch_result.map_err(|error| {
+        let (child, native_source) = launch_result.map_err(|error| {
             let raw_detail = error.to_string();
             let failure = claude_public_failure(
                 request,
@@ -805,6 +823,7 @@ impl ClaudeCodeCliRuntimeAdapter {
             control,
             permission_mode,
             resources,
+            native_source,
             interrupted,
             launch_handoff,
             native_session_id,
@@ -849,6 +868,7 @@ impl ClaudeCodeCliRuntimeAdapter {
         process_control: &ClaudeCodeProcessControl,
         permission_mode: &str,
         resources: &mut ClaudeCodeRunResources,
+        native_source: Option<rovai_core::runtime_subagent_session::CapturedNativeSource>,
         mut interrupted: oneshot::Receiver<()>,
         launch_handoff: Option<oneshot::Sender<()>>,
         native_session_id: String,
@@ -982,7 +1002,7 @@ impl ClaudeCodeCliRuntimeAdapter {
         let prompt = if let Some(ready) = &request.input_ready {
             let (release, released) = oneshot::channel();
             ready
-                .send(release)
+                .send(ClaudeCodeInputReady { release, native_source })
                 .map_err(|_| anyhow::anyhow!("Claude Code dispatch owner is unavailable"))?;
             tokio::select! {
                 biased;
