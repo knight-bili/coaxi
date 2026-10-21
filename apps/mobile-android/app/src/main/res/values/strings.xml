@@ -1,0 +1,852 @@
+<resources>
+    <string name="app_name">Rovai Workbench</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_title">Codeg</string>
+    <string name="onboarding_tagline">Watch your codeg agents work, and steer them from anywhere.</string>
+    <string name="onboarding_feature_watch">Watch tasks live</string>
+    <string name="onboarding_feature_steer">Steer from anywhere</string>
+    <string name="onboarding_feature_start">Start new work</string>
+    <string name="onboarding_add_server">Add Your Server</string>
+    <string name="onboarding_footnote">Codeg connects to a codeg server you run.</string>
+
+    <!-- Servers -->
+    <string name="servers_title">Servers</string>
+    <string name="server_add">Add Server</string>
+    <string name="server_edit">Edit Server</string>
+    <string name="server_name">Name</string>
+    <string name="server_url">Server URL</string>
+    <string name="server_url_placeholder">http://192.168.1.10:3080</string>
+    <string name="server_token">Token</string>
+    <string name="server_test_connection">Test Connection</string>
+    <string name="server_save">Save</string>
+    <string name="server_delete">Delete</string>
+    <string name="server_connection_ok">Connected · codeg %1$s</string>
+    <string name="server_connection_failed">Connection failed: %1$s</string>
+    <string name="server_section_connection">Connection</string>
+    <string name="server_section_auth">Authentication</string>
+    <string name="server_none_selected">No server selected</string>
+
+    <!-- Home (smoke screen) -->
+    <string name="home_title">Codeg</string>
+    <string name="home_status_checking">Checking connection…</string>
+    <string name="home_status_online">Online · codeg %1$s</string>
+    <string name="home_status_offline">Offline</string>
+    <string name="home_folders_count">%1$d folders</string>
+    <string name="home_conversations_count">%1$d conversations</string>
+    <string name="home_stream_waiting">Event stream: connecting…</string>
+    <string name="home_stream_ready">Event stream: ready</string>
+    <string name="home_stream_closed">Event stream: closed</string>
+    <string name="home_manage_servers">Manage Servers</string>
+    <string name="home_scaffold_note">Scaffold build — networking, models, and design system are wired. Feature screens land next.</string>
+
+    <!-- Bottom navigation tabs -->
+    <string name="tab_chats">Chats</string>
+    <string name="tab_folders">Folders</string>
+    <string name="tab_activity">Activity</string>
+    <string name="tab_search">Search</string>
+    <string name="tab_settings">Settings</string>
+
+    <!-- Sessions (Chats) -->
+    <string name="session_untitled">Untitled session</string>
+    <string name="session_title_fallback">Session</string>
+    <string name="session_new_task">New Task</string>
+    <string name="session_pin">Pin</string>
+    <string name="session_unpin">Unpin</string>
+    <string name="sessions_pinned">Pinned</string>
+    <string name="sessions_other">Other</string>
+    <string name="sessions_load_failed">Couldn\'t load sessions</string>
+    <string name="sessions_empty_title">No sessions yet</string>
+    <string name="sessions_empty_message">Start a new task and it\'ll show up here.</string>
+    <string name="session_load_failed">Couldn\'t load this session</string>
+    <string name="session_empty_title">No messages yet</string>
+    <string name="session_empty_message">Messages in this session will appear here.</string>
+    <string name="session_jump_to_latest">Jump to latest</string>
+    <string name="session_agent_options">Agent options</string>
+    <string name="sessions_collapse">Collapse</string>
+    <string name="sessions_expand">Expand</string>
+
+    <!-- Projects / Folders -->
+    <string name="projects_add">Add</string>
+    <string name="projects_open_folder">Open Folder</string>
+    <string name="projects_open_this_folder">Open This Folder</string>
+    <string name="projects_clone_repo">Clone Repository</string>
+    <string name="projects_empty_title">No folders</string>
+    <string name="projects_empty_message">Open a folder or clone a repo to get started.</string>
+    <string name="projects_load_failed">Couldn\'t load folders</string>
+    <string name="projects_tab_files">Files</string>
+    <string name="projects_tab_changes">Changes</string>
+    <string name="projects_tab_commits">Commits</string>
+
+    <!-- Activity -->
+    <string name="activity_running">Running</string>
+    <string name="activity_recent">Last 24 Hours</string>
+    <string name="activity_empty_title">No activity</string>
+    <string name="activity_empty_message">Running and recent sessions show up here.</string>
+    <string name="activity_updated">Updated %1$s</string>
+
+    <!-- Search -->
+    <string name="search_placeholder">Search sessions</string>
+    <string name="search_title">Search</string>
+    <string name="search_hint">Search your sessions by title or model.</string>
+    <string name="search_recent">Recent</string>
+    <string name="search_clear">Clear</string>
+    <string name="search_no_results">No results</string>
+    <string name="search_no_results_for">Nothing matched \"%1$s\".</string>
+    <string name="search_failed">Search failed</string>
+
+    <!-- Common -->
+    <string name="common_retry">Retry</string>
+    <string name="common_dismiss">Dismiss</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_save">Save</string>
+    <string name="common_delete">Delete</string>
+    <string name="common_edit">Edit</string>
+    <string name="common_remove">Remove</string>
+    <string name="common_add">Add</string>
+    <string name="common_ok">OK</string>
+    <string name="common_done">Done</string>
+    <string name="common_back">Back</string>
+    <string name="common_loading">Loading…</string>
+    <string name="common_error_generic">Something went wrong.</string>
+
+    <!-- ===== Settings · Chat Channels ===== -->
+    <string name="cc_loading_channels">Loading channels…</string>
+    <string name="cc_couldnt_load">Couldn\'t load</string>
+    <string name="cc_unknown_error">Unknown error</string>
+    <string name="cc_no_chat_channels">No Chat Channels</string>
+    <string name="cc_empty_subtitle">Connect Telegram, Lark, or WeChat to get notified and chat with your agents.</string>
+    <string name="cc_add_channel">Add Channel</string>
+    <string name="cc_section_general">GENERAL</string>
+    <string name="cc_message_settings">Message Settings</string>
+    <string name="cc_message_settings_subtitle">Command prefix, language, events, webhooks</string>
+    <string name="cc_delete_channel">Delete Channel</string>
+    <string name="cc_delete_channel_message">Remove \"%1$s\" and its stored token.</string>
+    <string name="cc_daily_report_at">Daily report · %1$s</string>
+    <string name="cc_close">Close</string>
+    <string name="cc_section_status">STATUS</string>
+    <string name="cc_enabled">Enabled</string>
+    <string name="cc_daily_report">Daily report</string>
+    <string name="cc_section_connection">CONNECTION</string>
+    <string name="cc_scan_qr_to_connect">Scan QR to Connect</string>
+    <string name="cc_disconnect">Disconnect</string>
+    <string name="cc_connect">Connect</string>
+    <string name="cc_send_test_message">Send Test Message</string>
+    <string name="cc_working">Working…</string>
+    <string name="cc_section_configuration">CONFIGURATION</string>
+    <string name="cc_config">Config</string>
+    <string name="cc_section_token">TOKEN</string>
+    <string name="cc_secret_is_set">%1$s is set</string>
+    <string name="cc_no_token_set">No token set</string>
+    <string name="cc_section_recent_messages">RECENT MESSAGES</string>
+    <string name="cc_no_messages_yet">No messages yet.</string>
+    <string name="cc_remove_token">Remove Token</string>
+    <string name="cc_remove_token_message">The channel won\'t be able to connect until a new token is set.</string>
+    <string name="cc_something_went_wrong">Something Went Wrong</string>
+    <string name="cc_loading_qr_code">Loading QR code…</string>
+    <string name="cc_couldnt_load_qr">Couldn\'t load the QR code.</string>
+    <string name="cc_scan_with_wechat">Scan with WeChat</string>
+    <string name="cc_connected">Connected!</string>
+    <string name="cc_qr_expired">QR code expired.</string>
+    <string name="cc_scanned_confirm">Scanned — confirm in WeChat.</string>
+    <string name="cc_connect_wechat">Connect WeChat</string>
+    <string name="cc_qr_code">QR code</string>
+    <string name="cc_refresh_qr_code">Refresh QR Code</string>
+    <string name="cc_wechat_scan_instruction">Open WeChat, tap the \"+\" and choose Scan, then point your camera at the code.</string>
+    <string name="cc_couldnt_save_channel">Couldn\'t save channel</string>
+    <string name="cc_edit_channel">Edit Channel</string>
+    <string name="cc_name_placeholder">My channel</string>
+    <string name="cc_type">Type</string>
+    <string name="cc_configuration">Configuration</string>
+    <string name="cc_spec_json">Spec (JSON)</string>
+    <string name="cc_must_be_json_object">Must be a JSON object.</string>
+    <string name="cc_chat_id">Chat ID</string>
+    <string name="cc_app_id">App ID</string>
+    <string name="cc_base_url">Base URL</string>
+    <string name="cc_edit_raw_json">Edit raw JSON</string>
+    <string name="cc_keep_current">Keep current</string>
+    <string name="cc_leave_blank_secret">Leave blank to keep the stored %1$s.</string>
+    <string name="cc_wechat_connects_after_saving">WeChat connects by scanning a QR code after saving.</string>
+    <string name="cc_daily_report_title">Daily Report</string>
+    <string name="cc_time_hhmm">Time (HH:mm)</string>
+
+    <!-- ===== Settings · Skills ===== -->
+    <string name="skills_couldnt_load">Couldn\'t load</string>
+    <string name="skills_unknown_error">Unknown error</string>
+    <string name="skills_no_agents">No agents</string>
+    <string name="skills_enable_agent_hint">Enable an agent to manage its skills.</string>
+    <string name="skills_new_skill">New Skill</string>
+    <string name="skills_delete_title">Delete Skill</string>
+    <string name="skills_delete_confirm">Remove the skill file \"%1$s\". This can\'t be undone.</string>
+    <string name="skills_loading_skills">Loading skills…</string>
+    <string name="skills_not_supported">Not Supported</string>
+    <string name="skills_not_supported_message">This agent doesn\'t support skills.</string>
+    <string name="skills_no_skills">No Skills</string>
+    <string name="skills_create_hint">Create a skill to guide this agent.</string>
+    <string name="skills_read_only">READ-ONLY</string>
+    <string name="skills_view_skill">View Skill</string>
+    <string name="skills_edit_skill">Edit Skill</string>
+    <string name="skills_close">Close</string>
+    <string name="skills_scope_global">Global</string>
+    <string name="skills_scope_project">Project</string>
+    <string name="skills_scope_for_agent">%1$s skill for %2$s.</string>
+    <string name="skills_new_global_for_agent">New global skill for %1$s.</string>
+    <string name="skills_skill_id">Skill ID</string>
+    <string name="skills_skill_id_placeholder">my-skill</string>
+    <string name="skills_content">Content</string>
+    <string name="skills_no_content">This skill has no content.</string>
+    <string name="skills_content_markdown">Content (Markdown)</string>
+
+    <!-- ===== Settings · Experts ===== -->
+    <string name="experts_loading_experts">Loading experts…</string>
+    <string name="experts_couldnt_load">Couldn\'t load</string>
+    <string name="experts_unknown_error">Unknown error</string>
+    <string name="experts_no_experts">No Experts</string>
+    <string name="experts_no_experts_message">This server has no built-in expert skill packs.</string>
+    <string name="experts_close">Close</string>
+    <string name="experts_enable_for">ENABLE FOR</string>
+    <string name="experts_no_agents_available">No agents available on this server.</string>
+    <string name="experts_loading_status">Loading status…</string>
+    <string name="experts_link_hint">Links this expert into the selected agents\' skills.</string>
+    <string name="experts_preview">PREVIEW</string>
+    <string name="experts_link_copied">Copied (no symlink)</string>
+    <string name="experts_link_linked">Linked</string>
+    <string name="experts_link_elsewhere">Linked elsewhere</string>
+    <string name="experts_link_blocked">Blocked by an existing directory</string>
+    <string name="experts_link_broken">Broken link</string>
+
+    <!-- ===== Settings · About / Appearance ===== -->
+    <string name="settings_theme">Theme</string>
+    <string name="settings_accent">Accent</string>
+    <string name="settings_preview">Preview</string>
+    <string name="settings_accent_preview_caption">The accent tints buttons, links, and live indicators.</string>
+    <string name="settings_accent_button">Accent button</string>
+    <string name="settings_version">Version %1$s</string>
+    <string name="settings_server">Server: %1$s</string>
+    <string name="settings_codeg_version">codeg %1$s</string>
+    <string name="settings_about_description">A native Android client for the codeg multi-agent coding server.</string>
+    <string name="settings_coming_soon">Coming in milestone M9.</string>
+    <string name="settings_licenses_unavailable">Unable to load open-source notices.</string>
+
+    <!-- ===== Settings · Language ===== -->
+    <string name="language_interface_description">Choose the language the app interface is shown in. This is separate from the chat reply language.</string>
+
+    <!-- ===== Settings · System ===== -->
+    <string name="system_http_proxy">HTTP Proxy</string>
+    <string name="system_enable_proxy">Enable proxy</string>
+    <string name="system_proxy_url">Proxy URL</string>
+    <string name="system_server_update">Server Update</string>
+    <string name="system_check_for_updates">Check for updates</string>
+    <string name="system_current_version">Current: codeg %1$s</string>
+    <string name="system_update_available">Update available: %1$s</string>
+    <string name="system_up_to_date">You\'re up to date.</string>
+
+    <!-- ===== Settings · Model Providers ===== -->
+    <string name="providers_empty_title">No providers</string>
+    <string name="providers_empty_subtitle">Add a custom OpenAI-compatible endpoint.</string>
+    <string name="providers_new_cd">New model provider</string>
+    <string name="providers_new_title">New provider</string>
+    <string name="providers_edit_title">Edit provider</string>
+    <string name="providers_api_url">API URL</string>
+    <string name="providers_api_key">API Key</string>
+    <string name="providers_api_key_keep">API Key (leave blank to keep)</string>
+    <string name="providers_agent">Agent</string>
+    <string name="providers_model_optional">Model (optional)</string>
+
+    <!-- ===== Settings · MCP ===== -->
+    <string name="mcp_empty_title">No MCP servers</string>
+    <string name="mcp_empty_subtitle">Add a local MCP server spec.</string>
+    <string name="mcp_new_cd">New MCP server</string>
+    <string name="mcp_new_title">New MCP server</string>
+    <string name="mcp_edit_title">Edit MCP server</string>
+    <string name="mcp_close_cd">Close</string>
+    <string name="mcp_server_id">Server ID</string>
+    <string name="mcp_spec_json">Spec (JSON)</string>
+    <string name="mcp_enabled_for">Enabled for</string>
+
+    <!-- ===== Settings · Version Control ===== -->
+    <string name="vcs_git_installed">Git installed</string>
+    <string name="vcs_git_not_found">Git not found</string>
+    <string name="vcs_custom_git_path">Custom git path (optional)</string>
+    <string name="vcs_test">Test</string>
+    <string name="vcs_path_fallback">path</string>
+    <string name="vcs_valid_git_at">✓ Valid git at %1$s</string>
+    <string name="vcs_no_git_at_path">✗ No git at that path</string>
+    <string name="vcs_github_accounts">GitHub Accounts</string>
+    <string name="vcs_no_linked_accounts">No linked accounts.</string>
+    <string name="vcs_default_badge">Default</string>
+
+    <!-- ===== Settings · Quick Messages ===== -->
+    <string name="quickmsg_empty_title">No quick messages</string>
+    <string name="quickmsg_empty_subtitle">Add reusable message templates.</string>
+    <string name="quickmsg_new_cd">New quick message</string>
+    <string name="quickmsg_new_title">New quick message</string>
+    <string name="quickmsg_edit_title">Edit quick message</string>
+    <string name="quickmsg_title_label">Title</string>
+    <string name="quickmsg_content_label">Content</string>
+
+    <!-- ===== Settings · Chat Global Settings ===== -->
+    <string name="chatglobal_title">Message Settings</string>
+    <string name="chatglobal_close_cd">Close</string>
+    <string name="chatglobal_command_prefix_title">COMMAND PREFIX</string>
+    <string name="chatglobal_command_prefix_subtitle">The character that marks a chat message as a slash command.</string>
+    <string name="chatglobal_prefix_label">Prefix</string>
+    <string name="chatglobal_save_prefix">Save prefix</string>
+    <string name="chatglobal_reply_language_title">REPLY LANGUAGE</string>
+    <string name="chatglobal_reply_language_subtitle">The language the bot replies in.</string>
+    <string name="chatglobal_forwarded_events_title">FORWARDED EVENTS</string>
+    <string name="chatglobal_forwarded_events_subtitle">Which agent events are pushed to channels and webhooks.</string>
+    <string name="chatglobal_webhooks_title">WEBHOOKS</string>
+    <string name="chatglobal_webhooks_subtitle">Forward events to external HTTP endpoints.</string>
+    <string name="chatglobal_add_webhook_cd">Add webhook</string>
+
+    <!-- ===== Settings · General ===== -->
+    <string name="general_conversation_tools">Conversation Tools</string>
+    <string name="general_live_feedback_title">Live feedback</string>
+    <string name="general_live_feedback_subtitle">Let the agent ask for inline feedback while it works.</string>
+    <string name="general_ask_questions_title">Ask user questions</string>
+    <string name="general_ask_questions_subtitle">Let the agent ask you multiple-choice questions.</string>
+    <string name="general_multi_agent_delegation">Multi-Agent Delegation</string>
+    <string name="general_enable_delegation_title">Enable delegation</string>
+    <string name="general_enable_delegation_subtitle">Allow agents to delegate work to sub-agents.</string>
+    <string name="general_max_depth_title">Max depth</string>
+    <string name="general_max_depth_subtitle">How many levels deep agents may delegate.</string>
+
+    <!-- ===== Settings · Agents ===== -->
+    <string name="agents_empty_title">No agents</string>
+    <string name="agents_empty_subtitle">No agents registered.</string>
+    <!-- Agents · per-agent detail / config editor -->
+    <string name="agents_detail_unavailable">Not available — install it on the server to enable.</string>
+    <string name="agents_detail_not_installed">Not installed</string>
+    <string name="agents_detail_version_latest">v%1$s · latest v%2$s</string>
+    <!-- Detail · sections -->
+    <string name="agents_section_configuration">Configuration</string>
+    <string name="agents_section_auth_config">Auth Config</string>
+    <string name="agents_section_gateway_config">Gateway Config</string>
+    <string name="agents_section_cline">Cline</string>
+    <string name="agents_section_models">Models</string>
+    <!-- Detail · shared field labels -->
+    <string name="agents_field_auth_mode">Auth Mode</string>
+    <string name="agents_field_api_url">API URL</string>
+    <string name="agents_field_api_key">API Key</string>
+    <string name="agents_field_model">Model</string>
+    <string name="agents_field_main_model">Main Model</string>
+    <string name="agents_field_reasoning_model">Reasoning Model</string>
+    <string name="agents_field_reasoning_effort">Reasoning Effort</string>
+    <string name="agents_field_provider">Provider</string>
+    <string name="agents_field_model_provider">Model Provider</string>
+    <!-- Detail · auth options -->
+    <string name="agents_auth_custom_endpoint">Custom Endpoint</string>
+    <string name="agents_claude_auth_official">Official Subscription</string>
+    <!-- Detail · reasoning effort levels -->
+    <string name="agents_effort_default">Default Level</string>
+    <string name="agents_effort_low">Low</string>
+    <string name="agents_effort_medium">Medium</string>
+    <string name="agents_effort_high">High</string>
+    <string name="agents_effort_xhigh">Extra High</string>
+    <!-- Detail · Claude -->
+    <string name="agents_claude_default_models">Default models by tier</string>
+    <string name="agents_claude_haiku_model">Haiku Model</string>
+    <string name="agents_claude_sonnet_model">Sonnet Model</string>
+    <string name="agents_claude_opus_model">Opus Model</string>
+    <string name="agents_claude_footer_official">Uses your Claude subscription login on the server. Model overrides below are optional.</string>
+    <string name="agents_claude_footer_custom">Point Claude Code at a custom Anthropic-compatible endpoint.</string>
+    <string name="agents_footer_model_provider">Resolve the endpoint and key from a saved model provider.</string>
+    <!-- Detail · Codex -->
+    <string name="agents_codex_chatgpt_signed_in">Signed in with a ChatGPT subscription on the server.</string>
+    <string name="agents_codex_switch_to_api_key">Switch to API Key</string>
+    <string name="agents_codex_enable_websocket">Enable WebSocket</string>
+    <string name="agents_codex_enable_skills">Enable Skills</string>
+    <string name="agents_codex_enable_fast">Enable Fast</string>
+    <!-- Detail · Gemini -->
+    <string name="agents_gemini_auth_oauth">Google Login (OAuth)</string>
+    <string name="agents_gemini_api_key">Gemini API Key</string>
+    <string name="agents_gemini_auth_vertex_adc">Vertex AI (ADC)</string>
+    <string name="agents_gemini_auth_vertex_sa">Vertex AI (Service Account)</string>
+    <string name="agents_gemini_auth_vertex_api_key">Vertex AI API Key</string>
+    <string name="agents_gemini_google_api_key">Google API Key</string>
+    <string name="agents_gemini_cloud_project">Cloud Project</string>
+    <string name="agents_gemini_cloud_location">Cloud Location</string>
+    <string name="agents_gemini_credentials_path">Credentials Path</string>
+    <string name="agents_gemini_oauth_hint">Run `gemini` once on the server to sign in with Google.</string>
+    <!-- Detail · OpenClaw -->
+    <string name="agents_openclaw_gateway_url">Gateway URL</string>
+    <string name="agents_openclaw_gateway_token">Gateway Token</string>
+    <string name="agents_openclaw_session_key">Session Key</string>
+    <!-- Detail · OpenCode -->
+    <string name="agents_opencode_small_model">Small Model</string>
+    <string name="agents_opencode_footer">Provider and model-catalog editing lives in the Advanced editor below.</string>
+    <!-- Detail · Hermes -->
+    <string name="agents_hermes_api_key_keep">API Key (leave blank to keep)</string>
+    <string name="agents_hermes_footer_oauth">This provider uses OAuth — run hermes setup on the desktop to sign in.</string>
+    <string name="agents_hermes_footer_aws">Uses the AWS credential chain on the server.</string>
+    <string name="agents_hermes_footer_api_key">API key is saved to ~/.hermes/.env. Leave blank to keep the stored key.</string>
+    <string name="agents_hermes_kind_api_key">API KEY</string>
+    <string name="agents_hermes_kind_oauth">OAUTH</string>
+    <string name="agents_hermes_kind_aws">AWS</string>
+    <!-- Detail · CodeBuddy -->
+    <string name="agents_codebuddy_section">CodeBuddy Configuration</string>
+    <string name="agents_codebuddy_footer">CodeBuddy authenticates with an API key. Mainland China builds also require the environment set to “China (internal)”; iOA builds use “iOA”. The overseas build leaves it unset. No API key? Run “codebuddy” in a terminal to sign in with your Tencent account.</string>
+    <string name="agents_codebuddy_footer_self_hosted">Saved as CODEBUDDY_BASE_URL and points CodeBuddy at your private endpoint. The region setting is left unset for self-hosted deployments.</string>
+    <string name="agents_codebuddy_environment">Environment</string>
+    <string name="agents_codebuddy_env_overseas">Overseas (default)</string>
+    <string name="agents_codebuddy_env_internal">China (internal)</string>
+    <string name="agents_codebuddy_env_ioa">iOA</string>
+    <string name="agents_codebuddy_env_self_hosted">Self-hosted (private deployment)</string>
+    <string name="agents_codebuddy_deployment_url">Deployment URL</string>
+    <string name="agents_codebuddy_url_invalid">Enter a valid http(s) URL.</string>
+    <!-- Detail · Kimi Code (self-contained panel) -->
+    <string name="agents_kimi_section">Kimi Code Configuration</string>
+    <string name="agents_kimi_footer">`kimi acp` only authenticates with a stored login token and rejects API keys on their own. To use an API key, codeg writes a managed ~/.kimi-code/config.toml provider AND seeds a local gate token so the session opens — inference still runs on your key.</string>
+    <string name="agents_kimi_auth_method">Authentication method</string>
+    <string name="agents_kimi_auth_apikey">API key</string>
+    <string name="agents_kimi_auth_login">Kimi account login (subscription)</string>
+    <string name="agents_kimi_auth_caption">“API key” writes a codeg-managed config.toml provider and seeds a gate token. “Login” clears that and uses a real `kimi login` session (requires a Kimi subscription).</string>
+    <string name="agents_kimi_login_caption">Run `kimi login` in a terminal to sign in with a Kimi subscription account (device-code OAuth). codeg stores nothing and reuses Kimi’s own login. Saving here removes codeg’s API-key gate token.</string>
+    <string name="agents_kimi_provider_type">Provider type</string>
+    <string name="agents_kimi_provider_caption">The provider protocol Kimi speaks (config.toml `type`). Use Kimi / Moonshot for a Moonshot / platform.kimi.com key.</string>
+    <string name="agents_kimi_endpoint">Endpoint</string>
+    <string name="agents_kimi_endpoint_international">International (api.moonshot.ai)</string>
+    <string name="agents_kimi_endpoint_china">China (api.moonshot.cn)</string>
+    <string name="agents_kimi_endpoint_custom">Custom (OpenAI-compatible)</string>
+    <string name="agents_kimi_endpoint_caption">International = api.moonshot.ai; China (platform.kimi.com keys) = api.moonshot.cn. Custom points at any OpenAI-compatible endpoint.</string>
+    <string name="agents_kimi_base_url">Base URL</string>
+    <string name="agents_kimi_base_url_caption">Leave blank to use the provider SDK default.</string>
+    <string name="agents_kimi_api_key_caption">Written to ~/.kimi-code/config.toml and used for inference. From platform.kimi.com or platform.kimi.ai.</string>
+    <string name="agents_kimi_placement_disclosure">Advanced: credential placement</string>
+    <string name="agents_kimi_placement_inline">Inline api_key</string>
+    <string name="agents_kimi_placement_env">Provider env sub-table</string>
+    <string name="agents_kimi_placement_caption">Where the API key is written inside config.toml.</string>
+    <string name="agents_kimi_vertex_project">GCP project (GOOGLE_CLOUD_PROJECT)</string>
+    <string name="agents_kimi_vertex_location">GCP location (GOOGLE_CLOUD_LOCATION)</string>
+    <string name="agents_kimi_vertex_caption">Vertex AI uses Google Application Default Credentials — run `gcloud auth application-default login` (no API key).</string>
+    <string name="agents_kimi_model">Model</string>
+    <string name="agents_kimi_fetch">Fetch</string>
+    <string name="agents_kimi_models_count">%1$d models</string>
+    <string name="agents_kimi_model_caption">The model id to use. Tap Fetch to list the models your key can access (e.g. kimi-k2.7-code) — avoids “model not found” errors.</string>
+    <string name="agents_kimi_max_context">Max context size (optional)</string>
+    <string name="agents_kimi_max_context_caption">Tokens, e.g. 262144. Leave blank to use the model default.</string>
+    <string name="agents_kimi_save">Save Kimi Code Config</string>
+    <string name="agents_kimi_raw_disclosure">Advanced: edit config.toml directly</string>
+    <string name="agents_kimi_raw_caption">Written verbatim (comments preserved) and validated as TOML. codeg also seeds the gate token so the session opens.</string>
+    <string name="agents_kimi_save_raw">Save config.toml</string>
+    <string name="agents_kimi_gate_login">Authenticated via a Kimi account login.</string>
+    <string name="agents_kimi_gate_apikey">Authenticated via API key (codeg seeded the local gate token).</string>
+    <string name="agents_kimi_gate_none">Not authenticated yet — save an API key below (or sign in) to open Kimi sessions.</string>
+    <string name="agents_kimi_saved">Kimi Code config saved</string>
+    <string name="agents_kimi_model_required">Enter a model id (Kimi requires one for API-key mode).</string>
+    <string name="agents_kimi_enter_key_endpoint">Enter an API key and endpoint first</string>
+    <string name="agents_kimi_models_none">Key works, but no models were returned</string>
+    <string name="agents_kimi_models_found">Found %1$d models</string>
+    <string name="agents_kimi_models_error">Couldn’t list models — check the key and endpoint</string>
+    <!-- Detail · Pi (self-contained panel) -->
+    <string name="agents_pi_runtime_section">Runtime</string>
+    <string name="agents_pi_runtime_footer">Choose which pi binary runs. Use the default, or point at your own pi build.</string>
+    <string name="agents_pi_mode_default">Default pi</string>
+    <string name="agents_pi_mode_custom">Custom pi</string>
+    <string name="agents_pi_mode_default_caption">Use the bundled pi-acp adapter with the pi on your PATH. Install pi with: npm install -g @earendil-works/pi-coding-agent</string>
+    <string name="agents_pi_mode_custom_caption">Run your own pi build, install, or wrapper.</string>
+    <string name="agents_pi_checking">Checking…</string>
+    <string name="agents_pi_installed">Installed</string>
+    <string name="agents_pi_installed_version">Installed · %1$s</string>
+    <string name="agents_pi_not_installed">Not installed</string>
+    <string name="agents_pi_recheck">Recheck</string>
+    <string name="agents_pi_install">Install pi</string>
+    <string name="agents_pi_uninstall">Uninstall</string>
+    <string name="agents_pi_installed_msg">pi installed</string>
+    <string name="agents_pi_uninstalled_msg">pi uninstalled</string>
+    <string name="agents_pi_install_failed">Failed to install pi</string>
+    <string name="agents_pi_uninstall_failed">Failed to uninstall pi</string>
+    <string name="agents_pi_command_label">pi command or path</string>
+    <string name="agents_pi_validate">Validate</string>
+    <string name="agents_pi_command_not_found">Command not found</string>
+    <string name="agents_pi_command_caption">An absolute path, a command name on PATH, or a wrapper script (e.g. a monorepo ./pi-test.sh).</string>
+    <string name="agents_pi_advanced">Advanced</string>
+    <string name="agents_pi_config_dir">Config directory (PI_CODING_AGENT_DIR)</string>
+    <string name="agents_pi_config_dir_warning">With a custom config directory, the Skills, Experts, and Office tools managed in Settings won’t apply to this pi — manage its skills in that folder directly.</string>
+    <string name="agents_pi_session_dir">Sessions directory (PI_CODING_AGENT_SESSION_DIR)</string>
+    <string name="agents_pi_dirs_caption">Custom pi flags (--approve, -e, …) aren’t forwarded by pi-acp — wrap pi in a script and point the command at it.</string>
+    <string name="agents_pi_save_runtime">Save Runtime</string>
+    <string name="agents_pi_runtime_incomplete">Enter a pi command to save</string>
+    <string name="agents_pi_runtime_saved">Pi runtime saved</string>
+    <string name="agents_pi_config_section">Pi Configuration</string>
+    <string name="agents_pi_config_footer">Pi authenticates with your model provider’s API key. The key is written to ~/.pi/agent/auth.json and the model selection to settings.json.</string>
+    <string name="agents_pi_provider">Provider</string>
+    <string name="agents_pi_provider_custom">Custom provider…</string>
+    <string name="agents_pi_provider_id">Provider ID</string>
+    <string name="agents_pi_api_protocol">API protocol</string>
+    <string name="agents_pi_api_endpoint">API endpoint (Base URL)</string>
+    <string name="agents_pi_custom_caption">Defines a provider in ~/.pi/agent/models.json at your endpoint. Most self-hosted or proxy servers use openai-completions.</string>
+    <string name="agents_pi_model">Model</string>
+    <string name="agents_pi_thinking">Thinking</string>
+    <string name="agents_pi_thinking_off">Off</string>
+    <string name="agents_pi_thinking_minimal">Minimal</string>
+    <string name="agents_pi_thinking_low">Low</string>
+    <string name="agents_pi_thinking_medium">Medium</string>
+    <string name="agents_pi_thinking_high">High</string>
+    <string name="agents_pi_thinking_xhigh">Extra high</string>
+    <string name="agents_pi_api_key_caption">Stored in ~/.pi/agent/auth.json for the selected provider.</string>
+    <string name="agents_pi_api_key_saved_caption">Saved for this provider — leave blank to keep the stored key.</string>
+    <string name="agents_pi_save_config">Save Pi Config</string>
+    <string name="agents_pi_provider_model_required">Provider and model are required</string>
+    <string name="agents_pi_base_url_required">API endpoint (Base URL) is required</string>
+    <string name="agents_pi_config_saved">Pi config saved</string>
+    <string name="agents_pi_trust_section">Auto-trust opened workspaces</string>
+    <string name="agents_pi_trust_title">Auto-trust opened workspaces</string>
+    <string name="agents_pi_trust_desc">When codeg connects pi to a folder, mark that folder trusted so pi loads the project’s local config and skills without a separate prompt.</string>
+    <string name="agents_pi_trust_caption">Only folders you open here are trusted, never your whole machine — and this affects config loading only, not what pi is allowed to run.</string>
+    <string name="agents_pi_trust_failed">Failed to save workspace trust</string>
+    <!-- Detail · Grok -->
+    <string name="agents_grok_section">Grok Configuration</string>
+    <string name="agents_grok_footer">The controls below merge into ~/.grok/config.toml, preserving your other keys and comments. Other keys stay editable under Advanced.</string>
+    <string name="agents_grok_permission_mode">Permission Mode</string>
+    <string name="agents_grok_use_default">Use default</string>
+    <string name="agents_grok_permission_ask">Ask every time</string>
+    <string name="agents_grok_permission_always">Always approve</string>
+    <string name="agents_grok_effort_low">Low (faster)</string>
+    <string name="agents_grok_effort_medium">Medium (balanced)</string>
+    <string name="agents_grok_effort_high">High</string>
+    <string name="agents_grok_effort_max">Max</string>
+    <string name="agents_grok_api_key_configured">XAI_API_KEY is configured.</string>
+    <string name="agents_grok_api_key_none">No XAI_API_KEY set.</string>
+    <string name="agents_grok_api_key_caption">Saved as XAI_API_KEY for this agent, or run “grok login” in a terminal for subscription sign-in (SuperGrok / X Premium+).</string>
+    <!-- Session detail · plan approval (Grok exit_plan_mode) -->
+    <string name="plan_approval_title">Plan ready for review</string>
+    <string name="plan_approval_subtitle">Approve to start building, or send notes to have the plan revised.</string>
+    <string name="plan_approval_empty">The agent didn\'t include a plan.</string>
+    <string name="plan_approval_request_changes">Request Changes</string>
+    <string name="plan_approval_send_notes">Send Notes</string>
+    <string name="plan_approval_notes_placeholder">What should change?</string>
+    <string name="plan_approval_approve">Approve &amp; Build</string>
+    <string name="plan_approval_abandon">Abandon Plan</string>
+    <string name="plan_approval_notes_dropped">The turn ended before your notes could be sent.</string>
+    <!-- Session detail · context compaction -->
+    <string name="compaction_running">Compacting context…</string>
+    <string name="compaction_done">Context compacted</string>
+    <string name="compaction_done_tokens">Context compacted · %1$s → %2$s tokens</string>
+    <!-- Detail · Cursor -->
+    <string name="agents_cursor_section">Cursor Configuration</string>
+    <string name="agents_cursor_footer">Both methods sign in to Cursor\'s own backend — cursor-agent has no custom-endpoint support, so there is no API URL to set.</string>
+    <string name="agents_cursor_auth_mode">Authentication Method</string>
+    <string name="agents_cursor_mode_subscription">Official Subscription</string>
+    <string name="agents_cursor_mode_api_key">Cursor API Key</string>
+    <string name="agents_cursor_mode_subscription_hint">Sign in with your Cursor account in a terminal. No credential is stored here.</string>
+    <string name="agents_cursor_mode_api_key_hint">A Cursor Dashboard account key for headless or server machines — an alternative to signing in. Not a third-party or OpenAI key.</string>
+    <string name="agents_cursor_account">Account</string>
+    <string name="agents_cursor_status_checking">Checking…</string>
+    <string name="agents_cursor_status_missing">cursor-agent isn\'t installed</string>
+    <string name="agents_cursor_status_signed_out">Not signed in</string>
+    <string name="agents_cursor_status_signed_in">Signed in</string>
+    <string name="agents_cursor_refresh">Refresh</string>
+    <string name="agents_cursor_login_hint">Run this on the machine hosting codeg, then refresh:</string>
+    <string name="agents_cursor_api_key">Cursor API Key</string>
+    <string name="agents_cursor_api_key_hint">Create one in the Cursor Dashboard under Integrations.</string>
+    <string name="agents_cursor_model">Default Model</string>
+    <string name="agents_cursor_model_default">Account default</string>
+    <string name="agents_cursor_model_footer">Passed to cursor-agent as its --model flag. Leave unset to use the account default.</string>
+    <string name="agents_cursor_models_loading">Loading models…</string>
+    <string name="agents_cursor_permissions">Permissions</string>
+    <string name="agents_cursor_permissions_footer">Rules and sandbox merge into ~/.cursor/cli-config.json, preserving keys the Cursor CLI wrote. Running sessions pick them up after a restart.</string>
+    <string name="agents_cursor_run_everything">Run Everything</string>
+    <string name="agents_cursor_run_everything_on">Cursor runs commands without asking. Deny rules below still apply.</string>
+    <string name="agents_cursor_run_everything_off">Cursor asks before running commands.</string>
+    <string name="agents_cursor_sandbox">Sandbox</string>
+    <string name="agents_cursor_option_default">Use default</string>
+    <string name="agents_cursor_sandbox_enabled">Enabled</string>
+    <string name="agents_cursor_sandbox_disabled">Disabled</string>
+    <string name="agents_cursor_allow_rules">Allow Rules</string>
+    <string name="agents_cursor_deny_rules">Deny Rules</string>
+    <string name="agents_cursor_add_rule">Add rule</string>
+    <string name="agents_cursor_rules_syntax">Rule syntax: Shell(cmd), Read(path/glob), Write(path/glob), WebFetch(domain), Mcp(server:tool) — deny always wins.</string>
+    <string name="agents_cursor_api_key_required">Enter your Cursor API key, or switch to Official Subscription.</string>
+    <!-- Detail · model-provider picker -->
+    <string name="agents_provider_none">No model providers configured for this agent. Add one in Settings → Model Providers.</string>
+    <string name="agents_provider_endpoint">Endpoint</string>
+    <!-- Detail · advanced raw editor -->
+    <string name="agents_advanced">Advanced</string>
+    <string name="agents_advanced_override_hint">Edits here override the fields above on save.</string>
+
+    <!-- ===== Session Detail · Actions &amp; Details ===== -->
+    <string name="sessionactions_session_actions">Session actions</string>
+    <string name="sessionactions_rename">Rename</string>
+    <string name="sessionactions_unpin">Unpin</string>
+    <string name="sessionactions_pin">Pin</string>
+    <string name="sessionactions_session_details">Session Details</string>
+    <string name="sessionactions_change_status">Change Status</string>
+    <string name="sessionactions_rename_session">Rename Session</string>
+    <string name="sessionactions_delete_session_confirm">Delete Session?</string>
+    <string name="sessionactions_delete_session_message">This permanently removes the conversation and its history.</string>
+    <string name="sessionactions_untitled">Untitled</string>
+    <string name="sessionactions_detail_status">Status</string>
+    <string name="sessionactions_detail_folder">Folder</string>
+    <string name="sessionactions_detail_messages">Messages</string>
+    <string name="sessionactions_detail_model">Model</string>
+    <string name="sessionactions_detail_branch">Branch</string>
+    <string name="sessionactions_detail_created">Created</string>
+    <string name="sessionactions_detail_updated">Updated</string>
+    <string name="sessiondetail_attachment">Attachment</string>
+
+    <!-- ===== Session Detail · Agent Options ===== -->
+    <string name="agentopts_title">Agent Options</string>
+    <string name="agentopts_mode">MODE</string>
+    <string name="agentopts_apply_failed">Couldn\'t apply that change. Check your connection and try again.</string>
+    <string name="agentopts_no_options">This agent has no adjustable options.</string>
+    <string name="agentopts_new_session_title">New Session</string>
+    <string name="agentopts_agent_section">AGENT</string>
+    <string name="agentopts_workspace">WORKSPACE</string>
+    <string name="agentopts_busy">Options can\'t be changed while the agent is responding.</string>
+    <string name="agentopts_choose_folder">Choose a folder</string>
+    <string name="agentopts_folder_readonly">Folder is fixed for this session</string>
+    <string name="agentopts_branch">Branch</string>
+    <string name="agentopts_select_branch">Select a branch</string>
+
+    <!-- ===== Session Detail · Composer ===== -->
+    <string name="compose_insert">Insert</string>
+    <string name="compose_attach_image">Attach image</string>
+    <string name="compose_message_placeholder">Message</string>
+    <string name="compose_stop">Stop</string>
+    <string name="compose_send">Send</string>
+
+    <!-- ===== Session Detail · Ask / Permission / Tool / Plan / Timeline ===== -->
+    <string name="ask_needs_input_title">The agent needs your input</string>
+    <string name="ask_needs_input_subtitle">Answer below, then submit. You can skip anytime.</string>
+    <string name="ask_skip">Skip</string>
+    <string name="ask_submit">Submit</string>
+    <string name="ask_badge_multiple">Multiple</string>
+    <string name="ask_badge_single">Single</string>
+    <string name="ask_other">Other</string>
+    <string name="ask_other_placeholder">Type your answer…</string>
+    <string name="perm_plan_subtitle">The agent wants to proceed with this plan.</string>
+    <string name="perm_permission_subtitle">The agent needs permission to continue.</string>
+    <string name="toolcall_failed_count">%1$d failed</string>
+    <string name="tool_error_output">Error output</string>
+    <string name="liveplan_title">Plan</string>
+    <string name="liveplan_priority_high">High</string>
+    <string name="timeline_unsupported_block">Unsupported block: %1$s</string>
+    <string name="timeline_copied">Copied</string>
+    <string name="timeline_copy">Copy</string>
+    <string name="timeline_scroll_to_question">Scroll to question</string>
+    <string name="timeline_question">Question</string>
+
+    <!-- ===== Projects · Clone / Browse / Branch ===== -->
+    <string name="clone_close">Close</string>
+    <string name="clone_repository_url">Repository URL</string>
+    <string name="clone_url_placeholder">https://github.com/owner/repo.git</string>
+    <string name="clone_parent_directory">Parent Directory</string>
+    <string name="clone_browse">Browse</string>
+    <string name="clone_username_optional">Username (optional)</string>
+    <string name="clone_password_token_optional">Password / Token (optional)</string>
+    <string name="clone_clones_into">Clones into %1$s</string>
+    <string name="clone_clone">Clone</string>
+    <string name="clone_choose_directory">Choose Directory</string>
+    <string name="clone_select_this_folder">Select This Folder</string>
+    <string name="dirbrowser_close">Close</string>
+    <string name="dirbrowser_home">Home</string>
+    <string name="branch_switch_branch">Switch Branch</string>
+    <string name="branch_new_branch">New branch</string>
+    <string name="branch_create_branch">Create branch</string>
+    <string name="branch_local">LOCAL</string>
+    <string name="branch_remote">REMOTE</string>
+    <string name="branch_filter">Filter branches</string>
+    <string name="branch_loading">Loading branches…</string>
+    <string name="branch_none">No branches found.</string>
+    <string name="branch_from">From %1$s</string>
+    <string name="branch_occupied">Checked out in another worktree</string>
+    <string name="branch_open_worktree_failed">Couldn\'t open the worktree folder.</string>
+
+    <!-- ===== Projects · Files / Commits ===== -->
+    <string name="files_load_failed">Couldn\'t list files</string>
+    <string name="files_error">Error</string>
+    <string name="files_empty_folder">Empty folder</string>
+    <string name="files_empty_folder_message">Nothing in this directory.</string>
+    <string name="files_read_failed">Couldn\'t read file</string>
+    <string name="files_empty_file">Empty file</string>
+    <string name="files_empty_file_message">This file has no content.</string>
+    <string name="commits_not_a_git_repo">Not a Git repository</string>
+    <string name="commits_not_a_git_repo_message">This folder isn\'t a git repo.</string>
+    <string name="commits_load_failed">Couldn\'t load commits</string>
+    <string name="commits_error">Error</string>
+    <string name="commits_empty_title">No commits</string>
+    <string name="commits_empty_message">No commit history yet.</string>
+    <string name="commits_showing_latest_50">Showing the latest 50 commits</string>
+    <string name="commits_files_changed_summary">"%1$d files changed   +%2$d −%3$d"</string>
+    <string name="commits_loading_diff">Loading diff…</string>
+
+    <!-- ===== Core · Diff / Code Block ===== -->
+    <string name="diff_show_less">Show less</string>
+    <string name="diff_show_more_lines">Show %1$d more lines</string>
+    <string name="diff_mode_added">ADDED</string>
+    <string name="diff_mode_modified">MODIFIED</string>
+    <string name="diff_mode_deleted">DELETED</string>
+    <string name="diff_mode_renamed">RENAMED</string>
+    <string name="code_default_language">code</string>
+    <string name="code_show_less">Show less</string>
+    <string name="code_show_more_lines">Show %1$d more lines</string>
+    <string name="code_copy">Copy</string>
+
+    <!-- ===== Settings menu (navigation list) ===== -->
+    <string name="settings_leaf_appearance">Appearance</string>
+    <string name="settings_leaf_language">Language</string>
+    <string name="settings_leaf_general">General</string>
+    <string name="settings_leaf_quick_messages">Quick Messages</string>
+    <string name="settings_leaf_agents">Agents</string>
+    <string name="settings_leaf_model_providers">Model Providers</string>
+    <string name="settings_leaf_experts">Experts</string>
+    <string name="settings_leaf_skills">Skills</string>
+    <string name="settings_leaf_mcp">MCP</string>
+    <string name="settings_leaf_version_control">Version Control</string>
+    <string name="settings_leaf_chat_channels">Chat Channels</string>
+    <string name="settings_leaf_system">System</string>
+    <string name="settings_leaf_open_source_licenses">Open-source licenses</string>
+    <string name="settings_leaf_about">About</string>
+    <string name="settings_group_personalization">Personalization</string>
+    <string name="settings_group_ai_agents">AI &amp; Agents</string>
+    <string name="settings_group_integrations">Integrations</string>
+    <string name="settings_group_system">System</string>
+
+    <!-- ===== ViewModel-surfaced messages ===== -->
+    <string name="cc_toast_deleted">Deleted \"%1$s\".</string>
+    <string name="cc_toast_delete_failed">Couldn\'t delete: %1$s</string>
+    <string name="sessions_missing_token">Missing token for this server</string>
+    <string name="live_cancelled">Cancelled.</string>
+    <string name="live_agent_connection_errored">The agent connection errored.</string>
+    <string name="files_truncated_note">… file truncated at %1$d lines</string>
+
+    <!-- ===== Tool group summary (timeline, pluralized) ===== -->
+    <string name="tool_summary_todos">Updated todos</string>
+    <plurals name="tool_summary_read">
+        <item quantity="one">Read %d file</item>
+        <item quantity="other">Read %d files</item>
+    </plurals>
+    <plurals name="tool_summary_edit">
+        <item quantity="one">Edited %d file</item>
+        <item quantity="other">Edited %d files</item>
+    </plurals>
+    <plurals name="tool_summary_search">
+        <item quantity="one">%d search</item>
+        <item quantity="other">%d searches</item>
+    </plurals>
+    <plurals name="tool_summary_execute">
+        <item quantity="one">Ran %d command</item>
+        <item quantity="other">Ran %d commands</item>
+    </plurals>
+    <plurals name="tool_summary_web">
+        <item quantity="one">%d web request</item>
+        <item quantity="other">%d web requests</item>
+    </plurals>
+    <plurals name="tool_summary_task">
+        <item quantity="one">%d task</item>
+        <item quantity="other">%d tasks</item>
+    </plurals>
+    <plurals name="tool_summary_tools">
+        <item quantity="one">%d tool</item>
+        <item quantity="other">%d tools</item>
+    </plurals>
+
+    <!-- ===== Projects · Changes (working tree) ===== -->
+    <string name="changes_load_failed">Couldn\'t load changes</string>
+    <string name="changes_clean_title">Working tree clean</string>
+    <string name="changes_clean_message">No uncommitted changes.</string>
+    <string name="changes_diff_load_failed">Couldn\'t load diff</string>
+    <string name="changes_no_diff_title">No textual diff</string>
+    <string name="changes_no_diff_message">Binary or mode-only change.</string>
+    <string name="changes_renamed_from">from %1$s</string>
+
+    <!-- ===== Projects · Git operations (commit / push / pull / fetch) ===== -->
+    <string name="git_busy_pushing">Pushing…</string>
+    <string name="git_busy_pulling">Pulling…</string>
+    <string name="git_busy_fetching">Fetching…</string>
+    <string name="git_busy_discarding">Discarding…</string>
+    <string name="git_busy_staging">Staging…</string>
+    <string name="git_busy_deleting">Deleting…</string>
+    <string name="git_fetched">Fetched from remote</string>
+    <string name="git_discarded">Discarded changes in %1$s</string>
+    <string name="git_staged">Staged %1$s</string>
+    <string name="git_deleted">Deleted %1$s</string>
+    <string name="git_push_up_to_date">Everything is up to date</string>
+    <string name="git_pull_up_to_date">Already up to date</string>
+    <plurals name="git_committed">
+        <item quantity="one">Committed %d file</item>
+        <item quantity="other">Committed %d files</item>
+    </plurals>
+    <plurals name="git_pushed">
+        <item quantity="one">Pushed %d commit</item>
+        <item quantity="other">Pushed %d commits</item>
+    </plurals>
+    <plurals name="git_pushed_upstream">
+        <item quantity="one">Pushed %d commit · set upstream</item>
+        <item quantity="other">Pushed %d commits · set upstream</item>
+    </plurals>
+    <plurals name="git_pulled">
+        <item quantity="one">Pulled — updated %d file</item>
+        <item quantity="other">Pulled — updated %d files</item>
+    </plurals>
+    <plurals name="git_pull_conflicts">
+        <item quantity="one">Pull produced conflicts in %d file — resolve it on desktop or via an agent</item>
+        <item quantity="other">Pull produced conflicts in %d files — resolve them on desktop or via an agent</item>
+    </plurals>
+    <!-- Commit sheet -->
+    <string name="commit_title">Commit</string>
+    <string name="commit_load_failed">Couldn\'t load changes</string>
+    <string name="commit_nothing_title">Nothing to commit</string>
+    <string name="commit_nothing_message">The working tree is clean.</string>
+    <string name="commit_message_label">Message</string>
+    <string name="commit_message_placeholder">Describe your changes</string>
+    <string name="commit_section_changes">Changes</string>
+    <string name="commit_section_untracked">Untracked</string>
+    <string name="commit_selected">%1$d of %2$d selected</string>
+    <string name="commit_select_all">Select all</string>
+    <string name="commit_deselect_all">Deselect all</string>
+    <string name="commit_and_push">Commit &amp; Push</string>
+    <plurals name="commit_button">
+        <item quantity="one">Commit %d file</item>
+        <item quantity="other">Commit %d files</item>
+    </plurals>
+    <!-- Changes tab actions -->
+    <string name="changes_commit_button">Commit changes</string>
+    <string name="changes_action_view_diff">View diff</string>
+    <string name="changes_action_stage">Stage</string>
+    <string name="changes_action_discard">Discard changes</string>
+    <string name="changes_action_delete">Delete file</string>
+    <string name="changes_discard_title">Discard changes?</string>
+    <string name="changes_discard_message">Discard your changes to %1$s? This can\'t be undone.</string>
+    <string name="changes_delete_title">Delete file?</string>
+    <string name="changes_delete_message">Delete %1$s from disk? This can\'t be undone.</string>
+    <!-- Commits tab sync header -->
+    <string name="sync_pull">Pull</string>
+    <string name="sync_push">Push</string>
+    <string name="sync_fetch">Fetch</string>
+    <string name="sync_no_remote">No remote configured</string>
+    <!-- Git status strip -->
+    <string name="git_working">Working…</string>
+    <string name="git_dismiss">Dismiss</string>
+    <!-- Credential sheet -->
+    <string name="cred_title_github">GitHub sign-in</string>
+    <string name="cred_title_generic">Authenticate</string>
+    <string name="cred_retry_hint">Authentication failed. Check your credentials and try again.</string>
+    <string name="cred_github_footer">Pushing to %1$s needs a token with repo access. It\'s saved as a GitHub account for next time.</string>
+    <string name="cred_token_label">Token</string>
+    <string name="cred_generate">Generate</string>
+    <string name="cred_generic_footer">Pushing to %1$s requires authentication. Use a personal access token as the password.</string>
+    <string name="cred_username">Username</string>
+    <string name="cred_password_label">Password / token</string>
+    <string name="cred_save">Save for future operations</string>
+    <string name="cred_authenticate">Authenticate</string>
+    <string name="cred_invalid_token">Invalid token.</string>
+
+    <!-- ===== Session Detail · Insert sheet ===== -->
+    <string name="insert_quick_messages">Quick Messages</string>
+    <string name="insert_experts">Experts</string>
+    <string name="insert_commands">Commands</string>
+    <string name="insert_empty_quick">No quick messages.</string>
+    <string name="insert_empty_experts">No experts linked to this agent.</string>
+    <string name="insert_empty_commands">No slash commands available.</string>
+
+    <!-- ===== Session Detail · Permission fallback ===== -->
+    <string name="perm_request_title">Permission Request</string>
+
+    <!-- ===== ViewModel toasts (interactive flows) ===== -->
+    <string name="cc_test_message_sent">Test message sent.</string>
+    <string name="cc_token_removed">Token removed.</string>
+    <string name="mcp_spec_invalid_json">Spec is not valid JSON</string>
+</resources>

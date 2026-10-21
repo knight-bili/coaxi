@@ -1,0 +1,1029 @@
+{
+  "repository": "codeg-android",
+  "commit": "33dba91b1522330fe519c27c4833066e35c9495e",
+  "license": "Apache-2.0",
+  "files": [
+    {
+      "path": ".gitignore",
+      "sha256": "12c7ff4ab3faada94e92be350b7da91c3ae3c7fa3d9e536a5f5b675afa98b65c",
+      "bytes": 394
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "1eb85fc97224598dad1852b5d6483bbcf0aa8608790dcc657a5a2a761ae9c8c6",
+      "bytes": 11558
+    },
+    {
+      "path": "NOTICE",
+      "sha256": "413ff8aee434f8878d61074fbc9e86dee0efb6835f6aa0e414db15704298a030",
+      "bytes": 199
+    },
+    {
+      "path": "SECURITY.md",
+      "sha256": "0beb0d10d5833940db9e766aabcea26ac1ed1c473252e06e4c7ff7eff012353a",
+      "bytes": 947
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "sha256": "5e7b1b0ca779c206956996f280584494dced04b02fe3dc7a6bd2e64a621279a4",
+      "bytes": 2825
+    },
+    {
+      "path": "app/build.gradle.kts",
+      "sha256": "bbae9fe1c7b60abe8dc133e0217bacb91ce23c76015fdb78d58f4ae8a744a013",
+      "bytes": 11496
+    },
+    {
+      "path": "app/proguard-rules.pro",
+      "sha256": "b242cc009f2b3b7aa33996884455e066a7fa3b19911b94bc7af6d927df00bb80",
+      "bytes": 760
+    },
+    {
+      "path": "app/src/main/AndroidManifest.xml",
+      "sha256": "7b0e7093eb706e4d719440c3e73b8d63ac00b0a3fda5dcce747a399563627064",
+      "bytes": 1898
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/CodegApplication.kt",
+      "sha256": "b7168ddcd34d8dbfa54287eb835ed036030f2e4022717aaed6f952b9f4573f60",
+      "bytes": 328
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/MainActivity.kt",
+      "sha256": "0cce144f56ff97a46cd9875033c305dfb03e647ab106b5ca094a1faa7f4aad77",
+      "bytes": 1326
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/app/AppViewModel.kt",
+      "sha256": "b821eb67e681e173582cd5bcc612d0bcd564621bc8190055959c87f8ede43f0b",
+      "bytes": 1645
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/app/CodegApp.kt",
+      "sha256": "5deda48539374dceb304fce716884703054a6dd9eda3b5f1629ecd3373d5ac50",
+      "bytes": 2491
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/common/AppLocale.kt",
+      "sha256": "9567027ee8245256d61d1c1ad89b5f807f987b7df7af58aa09d17e7f7c1c69f8",
+      "bytes": 2023
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/common/Base64Url.kt",
+      "sha256": "c2fa803ba131745ec55f36697442d9027cf6d018354fc5feda4c93004bfd402e",
+      "bytes": 690
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/common/DeepLink.kt",
+      "sha256": "52baef06223000ce693b72336319f3291bed9cca3c52a8b809e90de357a15723",
+      "bytes": 2232
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/common/DispatcherProvider.kt",
+      "sha256": "31b672a52149320a6d4969080a5e9861d0c37c0e78b596d2762a1a5359deb3ae",
+      "bytes": 784
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/common/RelativeTime.kt",
+      "sha256": "9d707a3f162ca353e753b014ccecb71ad38931432c4277b6fa449aee768e7b1a",
+      "bytes": 1137
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/data/ServerRepository.kt",
+      "sha256": "096fd2faf39d3cc7580d8153e7a2797cc8c80d46000f76a705cb6ff418096065",
+      "bytes": 3832
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/datastore/AppSettingsStore.kt",
+      "sha256": "c0c4ed36a200fe09db6ae3cabc35f87f91e7decb635b371bd3ba838a8783b3bf",
+      "bytes": 1841
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/datastore/RecentSearchesStore.kt",
+      "sha256": "4d87f2257c8a0c6d3f3d796fe5a9cc248c378c1c0864b0f470e3718170f4a977",
+      "bytes": 1704
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/datastore/SelectorPrefsStore.kt",
+      "sha256": "2b0b28eb14d520151593eede78ee8bbc8f599367d08ff143811e9426edfd98a0",
+      "bytes": 3204
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/datastore/ServerProfile.kt",
+      "sha256": "d4a4780092ba80d530b9f28d751fa792066b5ce0688f1dd892b69ba5911e99a4",
+      "bytes": 432
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/datastore/ServerStore.kt",
+      "sha256": "d35b0b782d8441a4d1488c444b88d46fed0d7e7f3a443d8ea2c0694b6b892dc6",
+      "bytes": 2665
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/designsystem/CodegBackground.kt",
+      "sha256": "d0fab07ea5d6919d52b89365c0abc01a7f04f8043011d2f1f9715c7170bbbc49",
+      "bytes": 2886
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/designsystem/component/AgentIcon.kt",
+      "sha256": "8ce4b76f981e22943e78d3b609675b5a6384e1c50698484841a0b85c64e9b7a7",
+      "bytes": 4730
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/designsystem/component/Badges.kt",
+      "sha256": "2d0054b307d9df9b9b1fc0e836b674b92b28022077b345690e7fe2ce6a82df52",
+      "bytes": 8163
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/designsystem/component/Buttons.kt",
+      "sha256": "b7d3e4391467eb20c4790444c093b83639b59f1169e6752b592043d87ede97b5",
+      "bytes": 5480
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/designsystem/component/CodeBlock.kt",
+      "sha256": "c6b1856ad11937836c0de5cc4a8d2e6765575f5ff4919b4c1ada97fcf1e31fe8",
+      "bytes": 5497
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/designsystem/component/Glass.kt",
+      "sha256": "a8bc40aef60de9603458157bde46fd6ae1a224b5c85853c4698e3eaeb71ea14a",
+      "bytes": 2740
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/designsystem/component/StateViews.kt",
+      "sha256": "aa16445e97abba0a97e0c372069bd8effb3ce0cc535c8ac7469286c7ff317130",
+      "bytes": 4116
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/designsystem/component/TextFields.kt",
+      "sha256": "93686d209e4ba56e217c2aef7f6b96797c63367db04c916e6d5174a224f3f547",
+      "bytes": 3704
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/designsystem/diff/DiffView.kt",
+      "sha256": "04cfe0e5aefe2c64d8e1a5eda89159cda15c49b726f4b68c548e50c219ebe24a",
+      "bytes": 6716
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/designsystem/diff/UnifiedDiff.kt",
+      "sha256": "9f13994096c5c650b8461fbe25b419757abd0485144fd424402d69e1c2722599",
+      "bytes": 9962
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/designsystem/markdown/InlineMarkdown.kt",
+      "sha256": "cc1faf00c301663b6ffedb8b4300ec9cdb290ff96941d83109dde9554b87e5fb",
+      "bytes": 5761
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/designsystem/markdown/LiveBlockParser.kt",
+      "sha256": "fb0a65f1c2c66943c488a5944f11cb1086c22724b85d68c5868de625c1ab556d",
+      "bytes": 5793
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/designsystem/markdown/MarkdownBlock.kt",
+      "sha256": "05760aac366dcc33111e51a9d6be9009ea66e0ee4b85e2aa87a29b9468edb178",
+      "bytes": 6659
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/designsystem/markdown/MarkdownCache.kt",
+      "sha256": "9af59173d35f221e5645f472f27be96117d1241ef412fba16ca5a79d2f0a5d7a",
+      "bytes": 1437
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/designsystem/markdown/MarkdownContent.kt",
+      "sha256": "fc33b8173953e5759ba45360d8879a0abc847dab7f5bd269d98e0706e36a9c71",
+      "bytes": 6804
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/designsystem/theme/CodegTheme.kt",
+      "sha256": "4c555c3d18b54fc7408f8b29f526d88557ad6e6b762ac696e196db3465128f33",
+      "bytes": 4286
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/designsystem/theme/Color.kt",
+      "sha256": "db0e4e11fbc6acda0bfa6ff6d52fe90053a03e1314bac1bcce74b2cd9672b429",
+      "bytes": 3791
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/designsystem/theme/ColorHex.kt",
+      "sha256": "e7526e670aa2837a98e21c7351ae7ac0ca85a436d2f24f86d6d8f8169daf0059",
+      "bytes": 1057
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/designsystem/theme/Dimens.kt",
+      "sha256": "36e91a9e713d7d48199eeebd5011fbeb16c3f68c1c93d75fc2fb2747f370ace2",
+      "bytes": 533
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/designsystem/theme/Shape.kt",
+      "sha256": "6a657877b0c1b91935b17e30481e09e2f8c99cc8cc9b20649483054773e8596b",
+      "bytes": 637
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/designsystem/theme/Type.kt",
+      "sha256": "59633edaea87b45c594b68e3aad7205fbe9e1bff6a372cfa7c78e25338ca359a",
+      "bytes": 2005
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/model/AcpEvent.kt",
+      "sha256": "b3fdb7c641815e49c6dd4c443c1dd2174756ab8561d329cf723da996b9796f20",
+      "bytes": 20926
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/model/AgentConfig.kt",
+      "sha256": "5d0ec08e60507c7c4d172f690adf1cf27229041a9563247137bfe2571419f27c",
+      "bytes": 57052
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/model/AgentConfigCursor.kt",
+      "sha256": "e6c08347bab7a58122e8e03b7833b028fdc00a5574fa432110d4b5325b8bfe3e",
+      "bytes": 5476
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/model/AgentConfigKimi.kt",
+      "sha256": "5c0202129bef7d6c285bb3e60ce276bcf36041e6b36513f0030797fd1cbc8815",
+      "bytes": 7106
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/model/AgentConfigPi.kt",
+      "sha256": "2f3aca89d2ceab2cffbb4d055e5ac58361b8d41495441a2eb8316b55b5ab899a",
+      "bytes": 5021
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/model/AgentConfigToml.kt",
+      "sha256": "2142a1f4752455f05814c0cc65862c067991d46382fbed840eeb334379f3c6df",
+      "bytes": 28318
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/model/AgentType.kt",
+      "sha256": "3a164e85af099db159d405aec8904e4d5163df428959317318fc4a3f80eeea87",
+      "bytes": 3298
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/model/ChatChannel.kt",
+      "sha256": "6816a866b0b340441fafb45ab08746a609738956679c779f46308fdfc94673df",
+      "bytes": 7946
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/model/Conversation.kt",
+      "sha256": "e9e846bfe40b9cccc7ad3b68e9574f1fbf083cdb89db5f3688cbc03cccf01d16",
+      "bytes": 2675
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/model/ConversationStatus.kt",
+      "sha256": "6f4eb99c18e796d8cb1c2b28a9f48526caf1625491a9dd497199c3bc0ea66dfa",
+      "bytes": 1884
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/model/Folder.kt",
+      "sha256": "5abe20b5bac9f0af1c690fd989b13949a9bada92a4b59802ee380e1a68be226e",
+      "bytes": 949
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/model/FolderVisibility.kt",
+      "sha256": "db77143c6c0c05abbb468f8f88c321f95f321233cbee9800119421c16c3ba517",
+      "bytes": 3502
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/model/Git.kt",
+      "sha256": "f84afbaa1ebe6d55eccab36db077a9590c43d7cdbc028ab9a3e8241573076691",
+      "bytes": 6169
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/model/Interactive.kt",
+      "sha256": "58fc620568a8f7af98e6b5636b13fb05f2af0d53acf2814b18d3515817c54904",
+      "bytes": 4126
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/model/Message.kt",
+      "sha256": "83920a5571f705b1c42131fb97e48ed1b2a1d2f17c4f67e3c96440f4ce8d7969",
+      "bytes": 6516
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/model/SessionSnapshot.kt",
+      "sha256": "35c873506f9f361380a7caf399da38325aa0c13f7c0e7390f20d4124ec6c3221",
+      "bytes": 2492
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/model/Settings.kt",
+      "sha256": "bd0321bbc3aa69775ca8c9ba803f23ce2a997a7c1f1d56d21e8ed89d6dc826f9",
+      "bytes": 11176
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/model/WireRequests.kt",
+      "sha256": "86a18a842ecdc511ed414c9e227cbd1b95e6032378a2aedefc3d17a25ef756fc",
+      "bytes": 13440
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/model/wire/InstantSerializer.kt",
+      "sha256": "55617c94af58ff1aa6bc900460b6f641b92d0e58650a2288d03bf839d7336d39",
+      "bytes": 2216
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/model/wire/JsonExt.kt",
+      "sha256": "4e69d21f4cf7427ba8959ca82e92c3921c627b314407204476fd2852e25c594a",
+      "bytes": 1857
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/network/ApiError.kt",
+      "sha256": "714e5661c0d5e6289d962e56160571882531e20d8f8512bc59180d8f2b222ee6",
+      "bytes": 2596
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/network/CodegClient.kt",
+      "sha256": "8ebdbf79d51f8512469c497f64e3c4ed5c0315eddf159847c7eb87caa3981f95",
+      "bytes": 50945
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/network/CodegClientFactory.kt",
+      "sha256": "6884b1d6d07a87b6113c9d4221418c52c416577a7653015d03458439cdc3a878",
+      "bytes": 1370
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/network/CodegJson.kt",
+      "sha256": "1a32fca207930ee7c36144f14bbcf7908bc6092a88e9b67830c14f7716789f67",
+      "bytes": 1690
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/network/ErrorMessages.kt",
+      "sha256": "71e371cbc43af8a936d46976e4b86e0def5ba6bf56d3d4e6d13e4bea89b0fd5b",
+      "bytes": 506
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/network/EventStream.kt",
+      "sha256": "ca80ef44e31e02349d86cbf90378c47c0996a0e8295376489b8b3df6f8c6a383",
+      "bytes": 6104
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/network/WsFrames.kt",
+      "sha256": "fca5eea02f918e989642166139997b02ca9427a0e8c2e2bd2ac1e0d63b14119a",
+      "bytes": 1923
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/security/KeystoreSecretStore.kt",
+      "sha256": "7bda0790be29d6faeab0a333d0081d5e2279a682eb15283c5188aeed3ba9280d",
+      "bytes": 3278
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/core/security/SecretStore.kt",
+      "sha256": "2cb835d0b903bffc08cc21ef8bfa1db5bad533715f2c19cf8973e19779086379",
+      "bytes": 351
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/di/NetworkModule.kt",
+      "sha256": "10f17c84e68a991a6ba962f39a2bd928abab0b56e183ab46b5d34576eb51797c",
+      "bytes": 1718
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/di/SecurityModule.kt",
+      "sha256": "7a9c21f9d01eed472d247d42f64b15561c75f30c233ee6ae6e0922931634e202",
+      "bytes": 488
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/di/StorageModule.kt",
+      "sha256": "dc100e307c6e5ed111f3e5c49e2addabbc756e5205207f4458d60baa2b5d1e57",
+      "bytes": 1149
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/activity/ActivityScreen.kt",
+      "sha256": "ab2035cfa8ee449b84a28698416d2941bb1958b0fc74b48c66dd54d38f7a0315",
+      "bytes": 7454
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/activity/ActivityViewModel.kt",
+      "sha256": "dea2462ed31b08d5f732a9513896330478d906e0ae5fa46ef19213f0557ea653",
+      "bytes": 6734
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/main/MainShell.kt",
+      "sha256": "f230695d2fc01010dfad5af79731e3ad9628e102f9529b44f725f90226a16394",
+      "bytes": 20796
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/onboarding/OnboardingScreen.kt",
+      "sha256": "7b943cacdac1e22313b8b86f0a238067695d1e60c6750494cb89314e124228e3",
+      "bytes": 3998
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/projects/BranchPickerSheet.kt",
+      "sha256": "b9c5922cfc6189841a5331e2f7e2f5cfb10301972ec3c1f060f138021141c3db",
+      "bytes": 6900
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/projects/CloneRepoSheet.kt",
+      "sha256": "82121e9c91961b9fc90f88d67cc798743c08a78a4aad945624e8ed6a4e82f7a4",
+      "bytes": 7227
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/projects/CommitSheet.kt",
+      "sha256": "b4e76ff476272fd5633105429c4189abce7f18427991445318011c8f07240b98",
+      "bytes": 13339
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/projects/DirectoryBrowserSheet.kt",
+      "sha256": "ffad9227cb3916aaf085cfac59989b2cb2715f6a07c3e102b5813fc789841baa",
+      "bytes": 6912
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/projects/FolderChangesView.kt",
+      "sha256": "d8ab154e7dc4f2ea53022f0050534e670b832b45f50c12f12d4c4869566f9e8c",
+      "bytes": 12517
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/projects/FolderCommitsView.kt",
+      "sha256": "11e07576ee97718a8c5327ac3e1b45be89ea7346577ec7a2960d4f4799bb60a5",
+      "bytes": 14975
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/projects/FolderFilesView.kt",
+      "sha256": "e76c85e57a9ad857354ea81632230d3b6ef9ea9190504de95b5a56692086ee16",
+      "bytes": 9764
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/projects/GitChangeVisuals.kt",
+      "sha256": "05c8403e8ec9aceb4398cad780aab16f85d87860dc904332bab1b3057dd84608",
+      "bytes": 1756
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/projects/GitCredentialSheet.kt",
+      "sha256": "3710efce91b89f17699ea1e84c63fcfc3bf09453ad024d8de147ddd043ac37a4",
+      "bytes": 9545
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/projects/GitStatusStrip.kt",
+      "sha256": "08f17512d13aa7dd093848fe9a7a3e9c46503a6350ee34e90991d735a0f35685",
+      "bytes": 4026
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/projects/ProjectDetailScreen.kt",
+      "sha256": "983a7ab45737b2284b877692d859340b7e14bbcb8858c1052440c6df5da0d246",
+      "bytes": 8907
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/projects/ProjectDetailViewModel.kt",
+      "sha256": "5c3f463dc9c2475ec37bf434811694cc7e75048d7fcabe87dfaf184e5be844e0",
+      "bytes": 17785
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/projects/ProjectListScreen.kt",
+      "sha256": "118eb1943de2ac6af24b25297b638f6334633ffb17aef43e164962549dcff84f",
+      "bytes": 11696
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/projects/ProjectsViewModel.kt",
+      "sha256": "3befee4f2f88e3ecc9aa582fff604b4d99a4d443b632b6572136bd3f7e5dda96",
+      "bytes": 5183
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/search/SearchScreen.kt",
+      "sha256": "73e72ac41e9b5917d12e3d5689a35207ad6b6bd2d9de5d9cd3cd95e57acc4f8f",
+      "bytes": 8915
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/search/SearchViewModel.kt",
+      "sha256": "22af04f14a5f37a29a8ec05dd54a0150d4902ddc6d7e0e36cb985eb8c9d10a7f",
+      "bytes": 3772
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/server/ServerEditorScreen.kt",
+      "sha256": "1e05a3b7c6e02f7e3308e161833ff2c4a9ee4c5520f88d7294f30e1b91e88fa4",
+      "bytes": 5249
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/server/ServerEditorViewModel.kt",
+      "sha256": "28ec06acc8eccbe2f00cba962235532251a09258228ea1e10b130c7d3c1a4a28",
+      "bytes": 3063
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/server/ServerListScreen.kt",
+      "sha256": "8236803dc04f8e2d3f77bfefc79ad4fd63d04668ab9c57f16d557d6b8a1624c1",
+      "bytes": 7920
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessiondetail/AgentOptionsSheet.kt",
+      "sha256": "3d7c4f8d7470a0e2b9036de608330f8834ed5bea34ab9ec078565461da241b08",
+      "bytes": 32022
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessiondetail/Attachment.kt",
+      "sha256": "7b1fc5eec5470996a3e893a8b6c3f8e847a3f106d1360c0bca4cc8b737c3edba",
+      "bytes": 3430
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessiondetail/ComposeBar.kt",
+      "sha256": "00e5281380359bedb30d880bb27d1a4953307516f6c5becdea8b781ce5390bd4",
+      "bytes": 7457
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessiondetail/ComposeInsertSheet.kt",
+      "sha256": "191b27a01bef45057f5a3583d10235188316a89c087f74c643474b31c2f11413",
+      "bytes": 7953
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessiondetail/LiveTurn.kt",
+      "sha256": "d38f0f9ef028d3b44b3723dde73c561744d3711ece17012218ff6fa67bd0b2de",
+      "bytes": 10694
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessiondetail/SessionActions.kt",
+      "sha256": "ad3f45e8de401cd6f36f0a1b9d0fd7ab225c1c228ca0d6fe22cf5a5e0d12f569",
+      "bytes": 9934
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessiondetail/SessionDetailScreen.kt",
+      "sha256": "1e7ed9cd844ff3a9486f87f6d2684f33be6db146c37e56e7476b151bb78857bf",
+      "bytes": 20863
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessiondetail/SessionDetailViewModel.kt",
+      "sha256": "93081c783e1f1954cf8b6be69e378fc4df87d01917989703c91e8e866cff2a65",
+      "bytes": 84145
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessiondetail/interactive/AskQuestionCard.kt",
+      "sha256": "9e51bf037cb5a6f58247f741d03f4fbff8cd99178562200d6dc12ff4057ebeea",
+      "bytes": 11331
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessiondetail/interactive/ParsedPermission.kt",
+      "sha256": "8fdbf7f56e6a03e7cf4afcabd11d93968ed02d02ed67fbce826b6d374eded310",
+      "bytes": 11871
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessiondetail/interactive/PermissionRequestCard.kt",
+      "sha256": "5a351144c78dd487bf0bf23776832ca35eb6d56ab46d0f8b1569d8b5d5d49c83",
+      "bytes": 9813
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessiondetail/interactive/PlanApprovalCard.kt",
+      "sha256": "73379cc8a7838a5a580178c5e63469acd265e246c405d243fdd70a84e97a669b",
+      "bytes": 8022
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessiondetail/rendering/ContextCompaction.kt",
+      "sha256": "8b1014bf8c366a686e53eb7b23564b524fe5ccb8affe2fb5fcf6db904bd23fc1",
+      "bytes": 1851
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessiondetail/rendering/InlineImage.kt",
+      "sha256": "801b105880fa0ffaf29d0d1e4b6061598f4175392d137481e028e351e7ca2387",
+      "bytes": 2594
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessiondetail/rendering/LivePlanView.kt",
+      "sha256": "734dccd8ab21a2df891543bcf7f967d8851602056cfb2f8c9444e777f3cfd4c4",
+      "bytes": 4321
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessiondetail/rendering/McpResultEnvelope.kt",
+      "sha256": "44de185608fad07d168ba062ba17b92edcbfb2617f789dd8a11dd3ba03ef4c59",
+      "bytes": 4168
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessiondetail/rendering/ReasoningBlock.kt",
+      "sha256": "302659dc48b48b81f7a0342f8b8b0f04a8fbd2686f6dcf30587692e92b86feed",
+      "bytes": 3646
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessiondetail/rendering/ToolCallCard.kt",
+      "sha256": "e8d3f00d2e477d612dcff24e1de63acfc45ac1d06bd1c16790bb9b2e6ce393d1",
+      "bytes": 16710
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessiondetail/rendering/ToolCallVM.kt",
+      "sha256": "0afdcd6fae7185293e7f27ecc5857923506ec5a79953f00db2bfb8a642698455",
+      "bytes": 9693
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessiondetail/rendering/ToolDerive.kt",
+      "sha256": "63b20d3459fd256eb6bf7868f57630984cb3289b7e3370d6aa8e927cdb5a18e7",
+      "bytes": 13653
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessiondetail/rendering/ToolValueFormat.kt",
+      "sha256": "6ff6f81d3784abe6859da53b96f3a4a0922ddd3baa372efcaf9655d221078975",
+      "bytes": 22473
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessiondetail/timeline/TimelineNode.kt",
+      "sha256": "80cc0ee2c18ad80976f2665b06c78b9123327a83d3d71305c95b63b222a70907",
+      "bytes": 17653
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessiondetail/timeline/TimelineNodeBody.kt",
+      "sha256": "eac16f84e54a1d04035c491569cb2ad7e9c73f9f50bf6afe69c5c1523608cf58",
+      "bytes": 14934
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessiondetail/timeline/TimelineRail.kt",
+      "sha256": "01221751638b008a1838c6b884338af523e8e8c4900767dd56949b9019c522a9",
+      "bytes": 11487
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessions/SectionHeader.kt",
+      "sha256": "7ef64a9de87174233b31d682e797955895d9480a4e97fea1774cad8ee9256fdf",
+      "bytes": 3963
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessions/SessionListScreen.kt",
+      "sha256": "b4d000202dc2cb9d9d491bdad5672da0d6936c07e153c60a8de16ea4a012c9a2",
+      "bytes": 17089
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessions/SessionListViewModel.kt",
+      "sha256": "e53234fac77740a289a4d6985f6f3ba99d0a95ed49000d5793cac2cce86a2c06",
+      "bytes": 11145
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessions/SessionRow.kt",
+      "sha256": "6ae64262fb110239f8a3f107e9a73fb5107df2a5cb5db99dfc9d33645cd7ca0c",
+      "bytes": 6575
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/sessions/SessionSections.kt",
+      "sha256": "4823d7e34ad5de25bbdc4db7c8aa7940fb96637df7af7754e5bc58ed19008d70",
+      "bytes": 3477
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/AgentConfigKimiView.kt",
+      "sha256": "c22cfbdeb7686fdaf78ebf7dab6e9a75cb09b242c4300b04e279708288e8514f",
+      "bytes": 18375
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/AgentConfigPiView.kt",
+      "sha256": "55479e1d38e34070c2b50488405fa4f7feb9c7a89d777163906eb7ba7df54b0d",
+      "bytes": 23207
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/AgentDetailScreen.kt",
+      "sha256": "a047217e82e442a110dca80965cc66f97c3ca81083dd83cd6d44854f18d14e88",
+      "bytes": 54167
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/AgentsScreen.kt",
+      "sha256": "c92654b814697636f459a55164835e8d37adaf7fa160c4da100d7f26fba8f06f",
+      "bytes": 4515
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/AgentsViewModel.kt",
+      "sha256": "77efd75772c1fdc238f38e9df3283dd60fc1eea332bd2af3d615204fdfb0ce6a",
+      "bytes": 29273
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/ChatChannelsScreen.kt",
+      "sha256": "8b7afc90b05abfbe3844f5f1ba08a37a7526eeacf25359938539ff4551bb9a92",
+      "bytes": 43540
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/ChatChannelsViewModel.kt",
+      "sha256": "85edba66416d86774ffaebd50ca9eb8f2cd7f40495611c41d40c39fb36924cd1",
+      "bytes": 11888
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/ChatGlobalSettingsScreen.kt",
+      "sha256": "844215b4338b38042aafe1a32defd0ea13e846dc0e3c6281b14b0babbeced0b0",
+      "bytes": 11110
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/ChatGlobalSettingsViewModel.kt",
+      "sha256": "9bec904b3405e6e4e7a18a29953917820bd0dda39a97db65c1e633b75cc28aec",
+      "bytes": 4946
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/ExpertsScreen.kt",
+      "sha256": "db3878653ca44dd587703d7614753ed513d3b95cad6940cfc0945b8d793ad4c4",
+      "bytes": 16466
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/ExpertsViewModel.kt",
+      "sha256": "c5fc08ba8dbd4c961e66b9048b942baea7ef44846bb49f2c7e3f9af1c2478802",
+      "bytes": 7749
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/GeneralScreen.kt",
+      "sha256": "2f73025e076fae252e0aa1993b2aa4ffbbd22831adc4e6892d2fda5ee22e4e3b",
+      "bytes": 6099
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/GeneralViewModel.kt",
+      "sha256": "6fb7c58ee33c05f0b3013523f3d4ea3b6d3dafbf508f21d959fa73e578ca369f",
+      "bytes": 4464
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/LanguageScreen.kt",
+      "sha256": "4f1297dc539ba2961f678ab4ec0bf903e90991c20d84ec9ded6b38e6385f4a9f",
+      "bytes": 4830
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/McpScreen.kt",
+      "sha256": "ee632492c1b41d68127f9789c5673976a3a05d2616119409bdcddbcb415c6c2e",
+      "bytes": 9687
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/McpViewModel.kt",
+      "sha256": "b86b007fa1381f0ecce5d51a6e0e1bbef920633f66f390f8341893b79e61450f",
+      "bytes": 3456
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/ModelProvidersScreen.kt",
+      "sha256": "456e568478ca2d9dd013a48edfa354cbc9af2d18aa9074e7fae0b9f8f1b3977b",
+      "bytes": 10134
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/ModelProvidersViewModel.kt",
+      "sha256": "f572b54832f67fa41ae420e576eb3bc1cc7f672fa8941a38c2388d80a59c047d",
+      "bytes": 3527
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/OpenSourceLicensesScreen.kt",
+      "sha256": "f477346da9e034cbef72bd67f3f92d20c276b9caa2ef97090cd3f6303e9b72b9",
+      "bytes": 2760
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/QuickMessagesScreen.kt",
+      "sha256": "755eac3843f1c63a10b8503eaea6bd29305a0073cbf331cde30a8ce2bfa22a4d",
+      "bytes": 6523
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/QuickMessagesViewModel.kt",
+      "sha256": "771f899bc648ac2b6db0f5d80f78d901d19bc8d563499a6e5e66a738ef767c17",
+      "bytes": 3014
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/SettingsScreen.kt",
+      "sha256": "a9523d6837ce167adc162c6859258a8d6e132e4b41807d80bc0012dfc85489ff",
+      "bytes": 14750
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/SettingsViewModel.kt",
+      "sha256": "6d93cef9a1e5f95a3463cbe501593a5ea6f367bfe2e3cbbeb1da229eccf3828e",
+      "bytes": 2065
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/SkillsScreen.kt",
+      "sha256": "ab4297edb1647543e9c65eb668355ab2586bc6e1b1a1ef03d854d25b1dd44bb9",
+      "bytes": 20261
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/SkillsViewModel.kt",
+      "sha256": "ec14feafebc0ce96a6d5f3a8bb193802e3274e7b4d9f39e3d40b5abd8b075e4b",
+      "bytes": 5863
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/SystemScreen.kt",
+      "sha256": "86bc785dcd52027a6ad23545b595c46558fec4aedfad22d3ee0c1d252fc44e4d",
+      "bytes": 4849
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/SystemViewModel.kt",
+      "sha256": "f36d45d512df243d90c324d07d69f2c7991057b49860c238d17d11533a3ffb0b",
+      "bytes": 3179
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/VersionControlScreen.kt",
+      "sha256": "bdf3fa8c070d9c65f7033ae5694a7ead2fbff3cdd8b815c4782c644907a57bba",
+      "bytes": 6453
+    },
+    {
+      "path": "app/src/main/java/app/codeg/android/feature/settings/VersionControlViewModel.kt",
+      "sha256": "b59df18b19accdacc80b59b0505119e2e64207d0917bbbe365c3e2f4d2324aaf",
+      "bytes": 3741
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_agent_claude_code.xml",
+      "sha256": "de6063e3871d4b4cad65153fa29085e7e63986dc72c75fc31914136b36833e8b",
+      "bytes": 599
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_agent_cline.xml",
+      "sha256": "10a1a69867e6844d21a93ee0a0dd40297aff27b8175c3f118a84411677db10bc",
+      "bytes": 1037
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_agent_code_buddy.xml",
+      "sha256": "24732493228efd830ea4069cb355d7dab7796178de34f70eaec7e34fbff8f560",
+      "bytes": 2128
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_agent_codex.xml",
+      "sha256": "d01f547015426e98756d5bd213c7cd000d0bbdd9bf0c5baa89e9d39a59da3fc4",
+      "bytes": 2172
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_agent_cursor.xml",
+      "sha256": "4a6945f2ee72c7e80bb7e25fc0aa55647421a75b53a33fee7952db0410fbda60",
+      "bytes": 822
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_agent_gemini.xml",
+      "sha256": "670bb31d9b6e286c80321522a8113afe02af7735b722d79467c925c01385b300",
+      "bytes": 1396
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_agent_grok.xml",
+      "sha256": "b3fa955ac59e485fa4ef81fd4385323b61eb7adebbe140bd2dc8affaff183ee7",
+      "bytes": 1340
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_agent_hermes.xml",
+      "sha256": "3f1d40c30b5ab491c1d9a9aed3e0cc79daceba696e48c95f172c3a8afa575b5e",
+      "bytes": 24819
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_agent_kimi_code.xml",
+      "sha256": "5c88a048bf7a74747b1d124cc9037db0418a4dbd841761f8eb01f9f31aa6cae1",
+      "bytes": 830
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_agent_open_claw.xml",
+      "sha256": "919940583d5bc8b5f52a40b17806a8c7c9ca12e65a8c74bf268a79a72b6b4616",
+      "bytes": 3200
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_agent_open_code.xml",
+      "sha256": "c0226d19da6ad9a20a2e5d0c9de68bd1866c910a2bdf6630bcfa956baa6f1617",
+      "bytes": 398
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_agent_pi.xml",
+      "sha256": "36e519b1117745bfb6f651ee32c7bc77838a286eb094002b7157070096f60e78",
+      "bytes": 822
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_launcher_background.xml",
+      "sha256": "ec266ae67ae9c061826c24481404b77ca75d6ac6505285c4b7e2cec8d0a6bccb",
+      "bytes": 340
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_launcher_foreground.xml",
+      "sha256": "ad0455c7777175e7f71f0a137b63dadde5e2d1e1c0fb3cfd62797556f81d7dd9",
+      "bytes": 1226
+    },
+    {
+      "path": "app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
+      "sha256": "c83c425cc19d7f44ac6c986abda72e0e819bf40a2d2aa73d95416f81738a054f",
+      "bytes": 350
+    },
+    {
+      "path": "app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml",
+      "sha256": "c83c425cc19d7f44ac6c986abda72e0e819bf40a2d2aa73d95416f81738a054f",
+      "bytes": 350
+    },
+    {
+      "path": "app/src/main/res/values-night/bools.xml",
+      "sha256": "17df02cf37f7ed4542142f14fc514d3687858a1dcebc246653ed7472ffd2f87d",
+      "bytes": 123
+    },
+    {
+      "path": "app/src/main/res/values-night/colors.xml",
+      "sha256": "fa18dc92bea159735d6c03e0eda81923376dfa1ae955d00a143278a8bb42fcfd",
+      "bytes": 194
+    },
+    {
+      "path": "app/src/main/res/values-zh-rCN/strings.xml",
+      "sha256": "2300ca59f83d22df505495aaeee7bbe5ed386e58a717cc3f3043abc9c69b1e07",
+      "bytes": 57036
+    },
+    {
+      "path": "app/src/main/res/values/bools.xml",
+      "sha256": "14a4932f26d6adbec0c815f836af9c8c0cd59ef29c39e6daeb3fbd5a40f3b33b",
+      "bytes": 449
+    },
+    {
+      "path": "app/src/main/res/values/colors.xml",
+      "sha256": "502300fec73f9569e667c391443d7569786891664617f28849941c0e241e9c08",
+      "bytes": 464
+    },
+    {
+      "path": "app/src/main/res/values/strings.xml",
+      "sha256": "6743b7c149f4fd926bc02e5b6a7ef961f339015bb8ed7d8b6b3b0195a8c4daf1",
+      "bytes": 57356
+    },
+    {
+      "path": "app/src/main/res/values/themes.xml",
+      "sha256": "a501589a82bce04b8a6b2fe28a43f2357172702db4dfe6e47780dfcad1672382",
+      "bytes": 1184
+    },
+    {
+      "path": "build.gradle.kts",
+      "sha256": "f3824a9d099edc0d6e32b49288a2363dbe85b50bfd3ec58fa1b41dee336e4055",
+      "bytes": 464
+    },
+    {
+      "path": "config/licenses/EMBEDDED_COMPONENTS.md",
+      "sha256": "84e90a7c26f447519487eb28cf43574de4f7e7bb9115e97e3d864f85d96af3a3",
+      "bytes": 785
+    },
+    {
+      "path": "config/licenses/LICENSE_REVIEW.md",
+      "sha256": "2a2ac97af403432ac1b355a75008e286177de304d9c5fdf8e53f4dcbcc5cc190",
+      "bytes": 1302
+    },
+    {
+      "path": "config/licenses/MPL-2.0.txt",
+      "sha256": "9221c2f936159b8446d329249fb4c0f25be510f447383a0f13336ac7985668a3",
+      "bytes": 17099
+    },
+    {
+      "path": "gradle.properties",
+      "sha256": "6e764c3d17579ea25b38be32f4d4c64282dacd04f8dedfbdf0300fa80b28d98e",
+      "bytes": 491
+    },
+    {
+      "path": "gradle/libs.versions.toml",
+      "sha256": "d8e5e3326ff5a2d19ceb03d955d2b8974e1cae0601ce9018a666d6e13d874603",
+      "bytes": 4634
+    },
+    {
+      "path": "gradle/wrapper/gradle-wrapper.jar",
+      "sha256": "7d3a4ac4de1c32b59bc6a4eb8ecb8e612ccd0cf1ae1e99f66902da64df296172",
+      "bytes": 43764
+    },
+    {
+      "path": "gradle/wrapper/gradle-wrapper.properties",
+      "sha256": "e46975fd9c8496527e8b34e43e8a4fbb248a881ff0cb11a95b4ce829b879376b",
+      "bytes": 348
+    },
+    {
+      "path": "gradlew",
+      "sha256": "28d2c82e7f9cca986ee8da10ba939cf9260d682f73936b2b6d2545e35360ce7b",
+      "bytes": 8984
+    },
+    {
+      "path": "gradlew.bat",
+      "sha256": "1d297e00bd21de3ace22b4d7f2de1f9dfa858883d66bbf7c1ccbecccec8f4f3b",
+      "bytes": 2937
+    },
+    {
+      "path": "settings.gradle.kts",
+      "sha256": "8b585cea6aab84a612e0842b04e25c20efb135f064235af1ab0b413162c07573",
+      "bytes": 561
+    },
+    {
+      "path": "third-party-licenses/DEPENDENCIES.md",
+      "sha256": "5dbced60bba1f27b6a4d029296c0cff802fef040018313ec463ed5543658c220",
+      "bytes": 65675
+    },
+    {
+      "path": "third-party-licenses/NOTICE_BUNDLE.txt",
+      "sha256": "a923c7bc304a3f78dbe789b74ec51f2fa40f815d6bcaffb23cbeb72d7651137e",
+      "bytes": 115830
+    },
+    {
+      "path": "third-party-licenses/dependencies.json",
+      "sha256": "4aeb7c538e81f3c525e8962f934d5d7a61fe98b3730c162663af9b286ef58c92",
+      "bytes": 83009
+    },
+    {
+      "path": "third-party-licenses/jakarta.inject-api-2.0.1.jar/META-INF/LICENSE.txt",
+      "sha256": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5",
+      "bytes": 11560
+    },
+    {
+      "path": "third-party-licenses/jakarta.inject-api-2.0.1.jar/META-INF/NOTICE.md",
+      "sha256": "334ecbde52bd5b124371b66ed17e7e8cee07f9d633a8abdb0096966304ba45bf",
+      "bytes": 1116
+    },
+    {
+      "path": "third-party-licenses/okhttp-4.12.0.jar/okhttp3/internal/publicsuffix/NOTICE",
+      "sha256": "8dbbde6f05f9dd8bc702d0463325e48632477fe707d30d00539e51a3ad5e3d4f",
+      "bytes": 223
+    },
+    {
+      "path": "third-party-licenses/project/LICENSE",
+      "sha256": "1eb85fc97224598dad1852b5d6483bbcf0aa8608790dcc657a5a2a761ae9c8c6",
+      "bytes": 11558
+    },
+    {
+      "path": "third-party-licenses/project/NOTICE",
+      "sha256": "413ff8aee434f8878d61074fbc9e86dee0efb6835f6aa0e414db15704298a030",
+      "bytes": 199
+    },
+    {
+      "path": "third-party-licenses/project/THIRD_PARTY_NOTICES.md",
+      "sha256": "5e7b1b0ca779c206956996f280584494dced04b02fe3dc7a6bd2e64a621279a4",
+      "bytes": 2825
+    },
+    {
+      "path": "third-party-licenses/slf4j-api-2.0.16.jar/META-INF/LICENSE.txt",
+      "sha256": "ee2a8f3ee05e737542a33e85b782abb1f57d1c0e57f3fd9e2bb803826333a27a",
+      "bytes": 1172
+    },
+    {
+      "path": "third-party-licenses/supplemental/EMBEDDED_COMPONENTS.md",
+      "sha256": "84e90a7c26f447519487eb28cf43574de4f7e7bb9115e97e3d864f85d96af3a3",
+      "bytes": 785
+    },
+    {
+      "path": "third-party-licenses/supplemental/LICENSE_REVIEW.md",
+      "sha256": "2a2ac97af403432ac1b355a75008e286177de304d9c5fdf8e53f4dcbcc5cc190",
+      "bytes": 1302
+    },
+    {
+      "path": "third-party-licenses/supplemental/MPL-2.0.txt",
+      "sha256": "9221c2f936159b8446d329249fb4c0f25be510f447383a0f13336ac7985668a3",
+      "bytes": 17099
+    }
+  ],
+  "sourceOnly": true,
+  "validation": "deferred_step_3"
+}

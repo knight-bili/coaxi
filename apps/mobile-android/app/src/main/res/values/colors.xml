@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Launch-window background. Day is the Theme.bg light tone (#F2F4F6); the
+         values-night variant is the dark #0A0B0D. Following the system day/night
+         setting here keeps the launch frame from flashing dark before Compose paints
+         a light UI (and vice versa). -->
+    <color name="codeg_bg">#F2F4F6</color>
+    <color name="ic_launcher_background">#0F0F1E</color>
+</resources>

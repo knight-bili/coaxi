@@ -1,0 +1,27 @@
+# Xcode / build
+build/
+DerivedData/
+*.xcarchive/
+*.ipa
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+.DS_Store
+
+# XcodeGen generates the project from project.yml
+CodegiOS.xcodeproj/
+
+# Local signing configuration
+Config/Signing.local.xcconfig
+*.mobileprovision
+*.cer
+*.p8
+*.p12
+*.pem
+*.key
+
+# Local environment / service configuration
+.env
+.env.*
+!.env.example
+Secrets.xcconfig
+GoogleService-Info.plist

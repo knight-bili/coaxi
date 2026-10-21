@@ -1,0 +1,54 @@
+{
+  "fill-specializations" : [
+    {
+      "value" : {
+        "automatic-gradient" : "srgb:0.10196,0.10196,0.18039,1.00000"
+      }
+    },
+    {
+      "appearance" : "dark",
+      "value" : {
+        "automatic-gradient" : "srgb:0.05882,0.05882,0.11765,1.00000"
+      }
+    }
+  ],
+  "groups" : [
+    {
+      "name" : "Brackets",
+      "position" : { "scale" : 2.0, "translation-in-points" : [ 0, 0 ] },
+      "specular" : true,
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.4
+      },
+      "blur-material" : null,
+      "layers" : [
+        {
+          "image-name" : "brackets.svg",
+          "name" : "Brackets",
+          "glass" : true
+        }
+      ]
+    },
+    {
+      "name" : "Dots",
+      "position" : { "scale" : 2.0, "translation-in-points" : [ 0, 0 ] },
+      "specular" : true,
+      "shadow" : {
+        "kind" : "layer-color",
+        "opacity" : 0.5
+      },
+      "blur-material" : null,
+      "layers" : [
+        {
+          "image-name" : "dots.svg",
+          "name" : "Dots",
+          "glass" : true
+        }
+      ]
+    }
+  ],
+  "supported-platforms" : {
+    "squares" : "shared"
+  }
+}

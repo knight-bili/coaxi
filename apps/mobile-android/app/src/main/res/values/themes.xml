@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Activity/launch theme. The real UI theming is done in Compose (CodegTheme);
+      this platform theme only needs to be a no-action-bar surface with transparent
+      system bars so edge-to-edge (enableEdgeToEdge) can draw under them. The window
+      background and system-bar icon contrast follow the system day/night setting (via
+      @color/codeg_bg and @bool/window_light_system_bars), so the launch frame matches
+      the resolved UI instead of always flashing dark. Parent is a platform Material
+      theme to avoid pulling in the Material Components view library.
+    -->
+    <style name="Theme.Codeg" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/codeg_bg</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">@bool/window_light_system_bars</item>
+        <item name="android:windowLightNavigationBar">@bool/window_light_system_bars</item>
+    </style>
+</resources>

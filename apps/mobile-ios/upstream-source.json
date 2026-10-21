@@ -1,0 +1,1004 @@
+{
+  "repository": "codeg-ios",
+  "commit": "e2d75f918a64bc8a450216155cbc3ae4a820b0f1",
+  "license": "Apache-2.0",
+  "files": [
+    {
+      "path": ".gitignore",
+      "sha256": "644432eff81d6bd3949dac050d74fa1fcc8aea686967238d4a1fc5176b4ed9cb",
+      "bytes": 452
+    },
+    {
+      "path": "CodegiOS/App/AppModel.swift",
+      "sha256": "016da447bb56c48a23c08e99ba6e0ddf1b6906d9cfbdd836c8a928fe83fa037d",
+      "bytes": 7276
+    },
+    {
+      "path": "CodegiOS/App/CodegiOSApp.swift",
+      "sha256": "4295f81f8fce44b7fb09d2d201943d1ff69898a364f5c4b50a66cb7906ba50a7",
+      "bytes": 148
+    },
+    {
+      "path": "CodegiOS/App/RootView.swift",
+      "sha256": "b0191742c4d819a904f28cb96924ee72e403bcfc215ab4506b6d50d2a60755b2",
+      "bytes": 21841
+    },
+    {
+      "path": "CodegiOS/App/Route.swift",
+      "sha256": "069083615a9627f0596b96129052b88f468e60863b84f475adfe2b33b3f1a56a",
+      "bytes": 2590
+    },
+    {
+      "path": "CodegiOS/DesignSystem/AgentIcon.swift",
+      "sha256": "e0e1ccc88078f728f39f1e275cbabe0df661658bd1a5a2ab80e68b4dacd0bac1",
+      "bytes": 1644
+    },
+    {
+      "path": "CodegiOS/DesignSystem/AppLanguage.swift",
+      "sha256": "1f17bca926f3fd501aa9d144652d413bc0e202aff9aefa6ed206170d3ffd5273",
+      "bytes": 2683
+    },
+    {
+      "path": "CodegiOS/DesignSystem/Appearance.swift",
+      "sha256": "ee1f95b50e44eb6360fa9abdce2ffacc334a18c9ed493458c019353b6377b3aa",
+      "bytes": 2389
+    },
+    {
+      "path": "CodegiOS/DesignSystem/Badges.swift",
+      "sha256": "1095c579e48c00a04c940b15bc920239f0ed4bf0975b8d3c613f3786a28fdd78",
+      "bytes": 5906
+    },
+    {
+      "path": "CodegiOS/DesignSystem/CodegBackground.swift",
+      "sha256": "3a1dba56fa082d87004e99bfcc58b745d8d6dfc78c1fb32d70f92cc5acf7c422",
+      "bytes": 1430
+    },
+    {
+      "path": "CodegiOS/DesignSystem/FormComponents.swift",
+      "sha256": "acb195d347830da06d8ea4e8a1495e9481f9030028ff528f7eaa346d1b7670b5",
+      "bytes": 6296
+    },
+    {
+      "path": "CodegiOS/DesignSystem/GlassComponents.swift",
+      "sha256": "63cb83478d5081de0c374238da17fe6a5ffcfa5a4edc86dd6b838771f5f22e5b",
+      "bytes": 10308
+    },
+    {
+      "path": "CodegiOS/DesignSystem/SecretField.swift",
+      "sha256": "7bcce778edc438654432f79cf42b582f7d08af9830f509f1f822f5375dab9e1b",
+      "bytes": 1538
+    },
+    {
+      "path": "CodegiOS/DesignSystem/SettingsRow.swift",
+      "sha256": "22c99ecdf4e395b3429523375f8db70f5835961816c3e8122f6e25d49ebc3a30",
+      "bytes": 7378
+    },
+    {
+      "path": "CodegiOS/DesignSystem/StateViews.swift",
+      "sha256": "13f4500d2d06af2edd9de57d55dd636dc64dc10b8aa8629e1519d3ce3874a8fe",
+      "bytes": 4164
+    },
+    {
+      "path": "CodegiOS/DesignSystem/Theme.swift",
+      "sha256": "979408e170bff7dbf66859cc744c27608040eaee6fc96e96f5dc4ff4dfa05bd1",
+      "bytes": 18977
+    },
+    {
+      "path": "CodegiOS/Features/Activity/ActivityModel.swift",
+      "sha256": "4bd71624591ef4584d52a0d73597a6f1023d8cc20420827a96dd8d855b2e8529",
+      "bytes": 7964
+    },
+    {
+      "path": "CodegiOS/Features/Activity/ActivityView.swift",
+      "sha256": "12060ee0021258ac534506d402d84c6fc869c1083b9c93eddb148d153770cc0d",
+      "bytes": 7259
+    },
+    {
+      "path": "CodegiOS/Features/Onboarding/OnboardingView.swift",
+      "sha256": "98ac4ccdeba5e3a7928443d068c4bd225d98370c22fb10ca6da99e3a685dc60a",
+      "bytes": 3849
+    },
+    {
+      "path": "CodegiOS/Features/Projects/CloneRepoView.swift",
+      "sha256": "a1cdbdf2c110f7ea352b006a76b12467f9399a287ca44ebe114ce9fa94b9c62b",
+      "bytes": 8718
+    },
+    {
+      "path": "CodegiOS/Features/Projects/CommitSheet.swift",
+      "sha256": "458676cbc5859f40153b989a2b166dc866bcca617a894fc0543d93ef9869b97f",
+      "bytes": 11505
+    },
+    {
+      "path": "CodegiOS/Features/Projects/DirectoryBrowserView.swift",
+      "sha256": "0b11b173a7b27ffd782e648d9064061024694b680f5a170566a94729042b22f5",
+      "bytes": 6707
+    },
+    {
+      "path": "CodegiOS/Features/Projects/FolderChangesView.swift",
+      "sha256": "e43be5ba1bb162463f1bdcf7c1061c75b92b7c90499f043dc6ee14c129a0f948",
+      "bytes": 17201
+    },
+    {
+      "path": "CodegiOS/Features/Projects/FolderCommitsView.swift",
+      "sha256": "d96391557c51e455d23c243688db1e03cfde2174b02e6b8f2926323b3a16a555",
+      "bytes": 20910
+    },
+    {
+      "path": "CodegiOS/Features/Projects/FolderFilesView.swift",
+      "sha256": "94e1d65603fb330ebad938f5434273753ff83774389798aebdac6d71189bd787",
+      "bytes": 15234
+    },
+    {
+      "path": "CodegiOS/Features/Projects/FolderGitModel.swift",
+      "sha256": "4cb5ee1ebdca5c6972c8215d4aca3b2f16bd3485e8cac4f2abe4197511a85c7b",
+      "bytes": 18687
+    },
+    {
+      "path": "CodegiOS/Features/Projects/GitCredentialSheet.swift",
+      "sha256": "5ff4ee422fa7d301edfe202d434e79a6a364b275622e16b2b18bc3b241ac8017",
+      "bytes": 11543
+    },
+    {
+      "path": "CodegiOS/Features/Projects/ProjectDetailView.swift",
+      "sha256": "22de84248b22e3ae7ab51df235a6d1e17597731e2f03045baf0342100ab5b2fc",
+      "bytes": 10431
+    },
+    {
+      "path": "CodegiOS/Features/Projects/ProjectListView.swift",
+      "sha256": "68e28311b203e322cadc29f1701e94ee913243df7f80efac96f4a3b57ba81806",
+      "bytes": 10445
+    },
+    {
+      "path": "CodegiOS/Features/Projects/Terminal/FolderTerminalView.swift",
+      "sha256": "5f0fcc8a74f44468174a1b494327228f0226e8d7156f5e83c99f52db7d5ac5d0",
+      "bytes": 6621
+    },
+    {
+      "path": "CodegiOS/Features/Projects/Terminal/TerminalKeyBar.swift",
+      "sha256": "401592e34493d3b2834caa4336ae9f1fe3f30763c063ba5a9e56f1f6186e0167",
+      "bytes": 9978
+    },
+    {
+      "path": "CodegiOS/Features/Projects/Terminal/TerminalSession.swift",
+      "sha256": "35af559b2ac66c0cfc48ba6c87ed8592ecdb5caceaacfda5e09288901414f08b",
+      "bytes": 21479
+    },
+    {
+      "path": "CodegiOS/Features/Search/SearchView.swift",
+      "sha256": "b022afd82d55cac6a1c2533a80567db4536b92a992a8c1b20344b562e8af380b",
+      "bytes": 7584
+    },
+    {
+      "path": "CodegiOS/Features/Servers/QRScannerView.swift",
+      "sha256": "deeb9a2dae8eb42f6a3d2a54395508e25b64e10e1cafe9df67920f13a7c85def",
+      "bytes": 11010
+    },
+    {
+      "path": "CodegiOS/Features/Servers/ServerEditorModel.swift",
+      "sha256": "58cb70948a1c4570b49e2537f263df11b15918e35a2594fc7801d17d044e4025",
+      "bytes": 13593
+    },
+    {
+      "path": "CodegiOS/Features/Servers/ServerEditorSheet.swift",
+      "sha256": "642b363781a51dc7885220cfb5c002fc2b76d400ba29178ada618ac4f42b47cd",
+      "bytes": 10510
+    },
+    {
+      "path": "CodegiOS/Features/Servers/ServerListView.swift",
+      "sha256": "030d6bba097c2587da28956fa219bea28ff6ce280cbef7e265e95033606fd5b4",
+      "bytes": 11452
+    },
+    {
+      "path": "CodegiOS/Features/Servers/ServerStatusModel.swift",
+      "sha256": "19d2cc773c929d52e34f4553e924b2789b72d57a90bc21baa6d8e8649ce2eb53",
+      "bytes": 4937
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/AgentOptionsButton.swift",
+      "sha256": "21c730d26f89381ff836e1286bee15387655d92a859320ab09ff800a12b95550",
+      "bytes": 24789
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/AgentOptionsModel.swift",
+      "sha256": "304e191f88560158e171f2bdd622907aad8e5ae819160f0088b8633c74a9f3ef",
+      "bytes": 16136
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Attachment.swift",
+      "sha256": "0f485c744c702f7a949b55c4dcc2f210e91d98aa539ae0b0ebcb8c0bf90a15ef",
+      "bytes": 6371
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/AttachmentChipsView.swift",
+      "sha256": "537fafc960dc47bd059399c71e59424991886ab1f18078424ab6593452434b84",
+      "bytes": 2155
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/AttachmentPickers.swift",
+      "sha256": "55fc8c4512bcc93544134671a30863bf816349d97a5dee92943275a63fa3bb47",
+      "bytes": 1711
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/BranchPickerView.swift",
+      "sha256": "f4c1a947f63349eba9c02c5476f5c0d7f6ecacb17167ed7bfac3311daf0d86f2",
+      "bytes": 11465
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/ComposeBar.swift",
+      "sha256": "40a899b17c6a5b59c6576bec2fe6d4e0ff0dbfdb243b102ea2acfa9049773fad",
+      "bytes": 12324
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/ComposeInsertModel.swift",
+      "sha256": "96b2b8adca961c6aa23d269a3ed8c56308879f7e53255b35f5fee0a748119e01",
+      "bytes": 10307
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/ComposeInsertSheet.swift",
+      "sha256": "068f4172f2d7d10562d4b176d2fe4cc823ec586d3f13ab06c94bf5e2539ac396",
+      "bytes": 8820
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/ContentBlockView.swift",
+      "sha256": "6b4eed43322a3c71042d66abeaef7c3784f4e89f4ffd92c2964ed970330f1e2a",
+      "bytes": 8084
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Formatters.swift",
+      "sha256": "fc16ef6d41370ad2eca596da4c868f7330d91aa5d9fbd69556d8c3af6c5ca23a",
+      "bytes": 1105
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Interactive/AskQuestionCard.swift",
+      "sha256": "e8c45148b334d85b4cfd9e0ad6352a53d4a9e3394b4ec6c944157c3360be2acd",
+      "bytes": 14844
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Interactive/LivePlanView.swift",
+      "sha256": "f029d8c71c8ddfba6db63d9bc839e2a9b9d730fc7bedcfc5ab00e95a980cdc06",
+      "bytes": 3473
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Interactive/PermissionRequestCard.swift",
+      "sha256": "e05bb7a37addf17d5867beaad1207df369fab5cc9f8ebe65384e9c8a567b1ef4",
+      "bytes": 10358
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Interactive/PlanApprovalCard.swift",
+      "sha256": "de6c23bc01d7a891e0df4434b443d1b762858f2802898c8741e6ff5e8cdcf4fc",
+      "bytes": 7077
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Interactive/PlanChecklist.swift",
+      "sha256": "2b33b6568c6885b517d2ee5baa0a631e60bbfbc9f1daa68cb1ced705b8cb94ac",
+      "bytes": 4472
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/LiveTurn.swift",
+      "sha256": "99bd36122c8ba5dd4c6521ba4f82b5d441a27017f56672a6d3eecd499db5d375",
+      "bytes": 13614
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/MarkdownText.swift",
+      "sha256": "8240c56a417abb24a7b091db4976cd018997215d8c57d6c15b596fdc3b335e13",
+      "bytes": 3223
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Rendering/CodeBlockView.swift",
+      "sha256": "e719da9983248f215fb69fea971c1ad4c62c3d210775d418f2def4859cd76b38",
+      "bytes": 5041
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Rendering/Companion/AskQuestionResult.swift",
+      "sha256": "e6695778145ba911e3a3bc405827e67d39f03327ec849fd3a6674c40474da580",
+      "bytes": 8311
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Rendering/Companion/AskQuestionResultCard.swift",
+      "sha256": "3151c5f13c8c05a90f52d617adb601c06b8704b423535548899cf7412f4aa6c7",
+      "bytes": 8796
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Rendering/Companion/CompanionTools.swift",
+      "sha256": "a9dfea4fae0a064c3f3c3c3d642eae1eea5475b80037c2e25ffbc270cb0bbc12",
+      "bytes": 13014
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Rendering/Companion/DelegationCardViews.swift",
+      "sha256": "277e99baad89ee4ae065eab3044ed5eac5ff0e09f0b14113084e8cc78aa0fe7b",
+      "bytes": 13875
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Rendering/Companion/DelegationModel.swift",
+      "sha256": "9062e2b517388ee557cb55412d6a33b127a7ca348ede2922cd1768576bb67022",
+      "bytes": 29200
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Rendering/ContextCompaction.swift",
+      "sha256": "d75855e3401ae5d206948b5f250ec788eb0493c1c4f386df8728e6bdfeb00b5b",
+      "bytes": 1524
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Rendering/DiffView.swift",
+      "sha256": "63d968593294f7e61aca6fc5ef81340f2b565223dfb188442cf88e9ead3ae4f9",
+      "bytes": 8931
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Rendering/MarkdownContent.swift",
+      "sha256": "ecc0863c569af83108ece2152e9dd33d92b505f3545ffb62105cba8712f3a8cd",
+      "bytes": 18018
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Rendering/TaskListCard.swift",
+      "sha256": "52d3b7ff48bee346e283a4c1bc165c26535fedc80aabce1353a63b1d86118668",
+      "bytes": 8347
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Rendering/TaskOp.swift",
+      "sha256": "b288c24c86a083319e0e797b9514f2cff156f12011445096d11de120bb265dd2",
+      "bytes": 13608
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Rendering/ToolCallVM.swift",
+      "sha256": "127c0187fd1f9481f06a16ad839013dd95a7ba34caddf85cb71efffe1b379ae0",
+      "bytes": 38250
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Rendering/ToolCallView.swift",
+      "sha256": "5821ab0d379d1f4e4fa3158b206a11c30b9b0508315b0ca791537e3ebc0a6a64",
+      "bytes": 20765
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Rendering/ToolValueFormat.swift",
+      "sha256": "fb88e4088f25a4a3de113b3ed8af84582f893181970232a0792890ee2c6f85f1",
+      "bytes": 25109
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Rendering/UnifiedDiff.swift",
+      "sha256": "70655a4dcb283f206db3df146f7510866398e004ff951b6ef62c628fb3ded758",
+      "bytes": 11089
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/SessionDetailView.swift",
+      "sha256": "7ad7af66cb23d6c5ec049ec0d9e332260983ae2c1db607c3dd5ae6c3e930cbe4",
+      "bytes": 21700
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/SessionDetailViewModel.swift",
+      "sha256": "668d9b1b0ff2ce414c416ccdfbc9b65d0c26a9151df2ff5b076d9aea74c6f39b",
+      "bytes": 93931
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/SessionHeaderView.swift",
+      "sha256": "4f7e09db3f3b2ba53ac33bfd1c79799434c09f14fc24bae72b996a1272b8cd05",
+      "bytes": 5790
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Timeline/TimelineNode.swift",
+      "sha256": "56f6bf595cc957e9f2b06880bd017dea75dc4086e42197a42c7cd43e956b9756",
+      "bytes": 14572
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Timeline/TimelineNodeBody.swift",
+      "sha256": "56e0feec808d2a85482c7f7028ba40b4b4ab623242c89eb436d98b8ef32122c8",
+      "bytes": 12436
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/Timeline/TimelineRail.swift",
+      "sha256": "e98fc9825168b35eb60609a8fa5b2f8cab31f64b5544c14c92f550bee07c5c78",
+      "bytes": 17620
+    },
+    {
+      "path": "CodegiOS/Features/SessionDetail/TranscriptView.swift",
+      "sha256": "ae72c408a8ed4548b333839b8c9b57b4d4877c8774ba31e2a5d439e266f7d90d",
+      "bytes": 18910
+    },
+    {
+      "path": "CodegiOS/Features/Sessions/SessionListView.swift",
+      "sha256": "1046b4e622a4ca3a3abefd502752f42ab66e568a7ef8bd39bd1711b20d979ebf",
+      "bytes": 18097
+    },
+    {
+      "path": "CodegiOS/Features/Sessions/SessionListViewModel.swift",
+      "sha256": "ded708210888d0aeb181f1fdc8ec5b1333b024b096da8b8af5bc889a7e9c3a66",
+      "bytes": 13291
+    },
+    {
+      "path": "CodegiOS/Features/Sessions/SessionRow.swift",
+      "sha256": "a89bebe248e9e6f6cf5574f4b832e34e849c25ada3b64fd06f84070c61b8408c",
+      "bytes": 5928
+    },
+    {
+      "path": "CodegiOS/Features/Sessions/SessionSectionCard.swift",
+      "sha256": "3496ea2fe851e7928d7b9130a5ba88fde03e97bf8a7ff3b23ca57d82f1165c57",
+      "bytes": 9113
+    },
+    {
+      "path": "CodegiOS/Features/Settings/AboutView.swift",
+      "sha256": "2dc684c37c9947ba6bd2bbb1df7ba6150b7106a927679c127ae0d4d89dcce73a",
+      "bytes": 5909
+    },
+    {
+      "path": "CodegiOS/Features/Settings/Agents/AgentConfigCursorView.swift",
+      "sha256": "951fb73214ff06a4949961c1c6d9c3301b3366a7eda90420658ed878c22d2d87",
+      "bytes": 15628
+    },
+    {
+      "path": "CodegiOS/Features/Settings/Agents/AgentConfigHermes.swift",
+      "sha256": "60cc14a52eee32cb7071fb4c7763849de5d6e9055b82c9f3f3ddbbfb553d6f8e",
+      "bytes": 8872
+    },
+    {
+      "path": "CodegiOS/Features/Settings/Agents/AgentConfigKimiView.swift",
+      "sha256": "c67a505b8d999b4867892dd08214edefe2fcd16232624dc18f98910664b258ea",
+      "bytes": 16950
+    },
+    {
+      "path": "CodegiOS/Features/Settings/Agents/AgentConfigOpenCode.swift",
+      "sha256": "c0ebb8b7101c75455c3e18476663b1adf687682e3e3949d6ed944b65c66cc939",
+      "bytes": 11769
+    },
+    {
+      "path": "CodegiOS/Features/Settings/Agents/AgentConfigPiView.swift",
+      "sha256": "6bbbbd003141d8e044f896e055fac4ca33e7bdc9cb8334e866d83175ca89a55a",
+      "bytes": 23744
+    },
+    {
+      "path": "CodegiOS/Features/Settings/Agents/AgentConfigSections.swift",
+      "sha256": "2d8286091a47eb3667a1e653450458dca90c94c724e07002c7a111abbe76ada5",
+      "bytes": 30374
+    },
+    {
+      "path": "CodegiOS/Features/Settings/Agents/AgentDetailView.swift",
+      "sha256": "ca26d03a857ee8dca09436d8042a53777cd1a784e78fe2896b2298f3f642e194",
+      "bytes": 30175
+    },
+    {
+      "path": "CodegiOS/Features/Settings/Agents/AgentsSettingsModel.swift",
+      "sha256": "a66c4f586374faa08a72cd475c870660f5541be82781dc6b430a2bd7628c1b3d",
+      "bytes": 23390
+    },
+    {
+      "path": "CodegiOS/Features/Settings/Agents/AgentsSettingsView.swift",
+      "sha256": "023140daab89e6f6ea3e0be6e957308f41a27bdb409f3c1363bed8a4790dac9a",
+      "bytes": 8175
+    },
+    {
+      "path": "CodegiOS/Features/Settings/Appearance/AppearanceSettingsView.swift",
+      "sha256": "74de3069d484e5420bdb7d0c8530f6f948a5ba6785d3026964813cfe9e2d1ab5",
+      "bytes": 6381
+    },
+    {
+      "path": "CodegiOS/Features/Settings/Appearance/LanguageSettingsView.swift",
+      "sha256": "e5bfdeeb128ff91902ae2a3e33dcea1bbdd36ac38f27ded349d8e943f69a68ff",
+      "bytes": 1844
+    },
+    {
+      "path": "CodegiOS/Features/Settings/ChatChannels/ChatChannelDetailView.swift",
+      "sha256": "41bfdadcf13cb1fe0eb9bbbe4a37eed4bac6d7b6c8694c08061f87e7a0f07d00",
+      "bytes": 16128
+    },
+    {
+      "path": "CodegiOS/Features/Settings/ChatChannels/ChatChannelEditorSheet.swift",
+      "sha256": "79082b21d324658a6cb5c752c1b18130a967a03e10862f14aae76a76e916357e",
+      "bytes": 14844
+    },
+    {
+      "path": "CodegiOS/Features/Settings/ChatChannels/ChatChannelsSettingsModel.swift",
+      "sha256": "f1993effd04bb0471379e9d8013f0ff4881b3e091f7a80b24285be1fb890a3b8",
+      "bytes": 7471
+    },
+    {
+      "path": "CodegiOS/Features/Settings/ChatChannels/ChatChannelsSettingsView.swift",
+      "sha256": "cda159bd0ddd52797b86735104d88fc8b3182db0ad96fb7a051e93056fc1c902",
+      "bytes": 13041
+    },
+    {
+      "path": "CodegiOS/Features/Settings/ChatChannels/ChatGlobalSettingsView.swift",
+      "sha256": "5b16bce24698f2a614b7d1e3f2fb96127b9fd80f43385db3aeb172b5e35ee56a",
+      "bytes": 13983
+    },
+    {
+      "path": "CodegiOS/Features/Settings/ChatChannels/WeixinQRView.swift",
+      "sha256": "6d2d54606fd8a0ebeb26dde24a1712cd9741875ab00dc6551ebbea8d704a4aa5",
+      "bytes": 5966
+    },
+    {
+      "path": "CodegiOS/Features/Settings/Experts/ExpertDetailView.swift",
+      "sha256": "d4034bb6b763894582b2e667e121077a8a32e4dd68d8a4cd16eb11136713f602",
+      "bytes": 12415
+    },
+    {
+      "path": "CodegiOS/Features/Settings/Experts/ExpertsSettingsModel.swift",
+      "sha256": "288edd369e9b5d57f0ccaf4ae0eefbe0b0b0fa0dbbad21012d44d0cbccfe4196",
+      "bytes": 3897
+    },
+    {
+      "path": "CodegiOS/Features/Settings/Experts/ExpertsSettingsView.swift",
+      "sha256": "df0d35f150cb88d0ae884fec690f1902a1cc5c87552410aee1d3ab91a59c0dbb",
+      "bytes": 6861
+    },
+    {
+      "path": "CodegiOS/Features/Settings/General/GeneralSettingsModel.swift",
+      "sha256": "e65bbf2530879e034496a3d10674770e3e6a0638b1f2c407b01199a4daeeaa91",
+      "bytes": 5027
+    },
+    {
+      "path": "CodegiOS/Features/Settings/General/GeneralSettingsView.swift",
+      "sha256": "08206591a29a6d1dfbff97c3d9fdfa9e0eb1f6175828ab3dee7062ff5567bb1b",
+      "bytes": 8491
+    },
+    {
+      "path": "CodegiOS/Features/Settings/Mcp/McpServerEditorSheet.swift",
+      "sha256": "552d1cc0e21e0391bdd16a83f3446915ce7f18347fa527d64d2a974daef17a71",
+      "bytes": 7081
+    },
+    {
+      "path": "CodegiOS/Features/Settings/Mcp/McpSettingsModel.swift",
+      "sha256": "c455cf6fe7b8d269ed00d0b48f37ae9e60ae33cb0a7c692b005b56ccd139a183",
+      "bytes": 1816
+    },
+    {
+      "path": "CodegiOS/Features/Settings/Mcp/McpSettingsView.swift",
+      "sha256": "fa9444b0f5a032197d209b26e6d255806110fd01aeadfb961f2a83e802e29821",
+      "bytes": 7816
+    },
+    {
+      "path": "CodegiOS/Features/Settings/ModelProviders/ModelProviderEditorSheet.swift",
+      "sha256": "3c7730e89ec8634343503631076e74e6b7224f29e04b747e164a0ee5efc41276",
+      "bytes": 10398
+    },
+    {
+      "path": "CodegiOS/Features/Settings/ModelProviders/ModelProvidersSettingsModel.swift",
+      "sha256": "13e6e35962d6f10bfa43865b9af7c9ad5f437bbeac4035d2dbd02809ec38b928",
+      "bytes": 4899
+    },
+    {
+      "path": "CodegiOS/Features/Settings/ModelProviders/ModelProvidersSettingsView.swift",
+      "sha256": "33fbfd5d82bce6c96e8b5da16f7b3c7e10bb9467d038569a81f39101c62740fa",
+      "bytes": 10176
+    },
+    {
+      "path": "CodegiOS/Features/Settings/QuickMessages/QuickMessageEditorSheet.swift",
+      "sha256": "c2a217f949fa155e3f9a3187c5c95ae2ca887f31cd6cf4c71ce7adfc69c0de1c",
+      "bytes": 4098
+    },
+    {
+      "path": "CodegiOS/Features/Settings/QuickMessages/QuickMessagesSettingsModel.swift",
+      "sha256": "2e146c35ec2b6a44178e82c2b949faaac60d33425c2ae100e8e9cbd5064a6fc2",
+      "bytes": 3300
+    },
+    {
+      "path": "CodegiOS/Features/Settings/QuickMessages/QuickMessagesSettingsView.swift",
+      "sha256": "ec06b19afe1f14efec1c35f34281dfae8e37f9be7bf1e1d840c588949b4de20b",
+      "bytes": 4929
+    },
+    {
+      "path": "CodegiOS/Features/Settings/SettingsLeaf.swift",
+      "sha256": "9076603f9d0e9d1f96906a34f531430a77b0277cb6d20badbfc5401998f88d90",
+      "bytes": 3326
+    },
+    {
+      "path": "CodegiOS/Features/Settings/SettingsView.swift",
+      "sha256": "67963780099558c48fbbf7a1be1d4a525998abca9efa4a447d7e873ee3c3f9a2",
+      "bytes": 5895
+    },
+    {
+      "path": "CodegiOS/Features/Settings/Skills/SkillEditorSheet.swift",
+      "sha256": "12ec9a0128498ad738ff606b3c60e1051a9831af8e8c7bd44707960e4d3b92f8",
+      "bytes": 8943
+    },
+    {
+      "path": "CodegiOS/Features/Settings/Skills/SkillsSettingsModel.swift",
+      "sha256": "82bab4219eed578eab4a9cf7a7f1e51d5bfb0c07696fe25470444784bce6e8d8",
+      "bytes": 4781
+    },
+    {
+      "path": "CodegiOS/Features/Settings/Skills/SkillsSettingsView.swift",
+      "sha256": "fb3199c87b9c7f17f0bb1ba43618fd78f47c96a3057227b1240de648fc20c02b",
+      "bytes": 14247
+    },
+    {
+      "path": "CodegiOS/Features/Settings/System/SystemSettingsModel.swift",
+      "sha256": "d8bfe26bb5246213ee3f8cabab92960b1dc0967925625f1166dcdc8ab85c72c6",
+      "bytes": 8090
+    },
+    {
+      "path": "CodegiOS/Features/Settings/System/SystemSettingsView.swift",
+      "sha256": "ab8dfd3a2dd254cd9e899aa7c64d32bc1cbac7f957304405338238dc52400127",
+      "bytes": 10536
+    },
+    {
+      "path": "CodegiOS/Features/Settings/VersionControl/GitHubAccountEditorSheet.swift",
+      "sha256": "928b8c6cd2acbe0acb920a37245b5178691d4b3fbafdcb8fb9a906a14d0137e7",
+      "bytes": 10318
+    },
+    {
+      "path": "CodegiOS/Features/Settings/VersionControl/VersionControlSettingsModel.swift",
+      "sha256": "93739a320ac3cb37c2cae96f924f53a064949c307d5ea2778040d8cd8a389765",
+      "bytes": 4336
+    },
+    {
+      "path": "CodegiOS/Features/Settings/VersionControl/VersionControlSettingsView.swift",
+      "sha256": "2b2df2de94dba1f0c13f16deec30af72dc5b70dfbd4e7b0f9c79f8ed883280e3",
+      "bytes": 9970
+    },
+    {
+      "path": "CodegiOS/Info.plist",
+      "sha256": "42e2ae263dfc562bc5e2af2fd06bf8f8ad1a42fcb9d2faba92d68c5d0f7641ac",
+      "bytes": 2405
+    },
+    {
+      "path": "CodegiOS/Models/AcpEvent.swift",
+      "sha256": "7ab57e66dcddfb7cf0ba7e425994d57317966d23d6f52df481b76292921a4f96",
+      "bytes": 24617
+    },
+    {
+      "path": "CodegiOS/Models/AgentConfig.swift",
+      "sha256": "d6f4e64a6ebceb01c95b7fdb5bf82d1fcc803bdb1f304d4a4841a70387c6a16b",
+      "bytes": 44627
+    },
+    {
+      "path": "CodegiOS/Models/AgentConfigCursor.swift",
+      "sha256": "f800822f1ca261474fbd12ccb13cfb74044c4941be2d1ea47ccf8d5ead3954e4",
+      "bytes": 8029
+    },
+    {
+      "path": "CodegiOS/Models/AgentConfigKimi.swift",
+      "sha256": "a5cc5d41d9813ebeaefa59986494e30cdc40fd488934147249c83d414b4969fc",
+      "bytes": 6545
+    },
+    {
+      "path": "CodegiOS/Models/AgentConfigPi.swift",
+      "sha256": "c928cd43e06c44edf328b8c82198897dfa84c83c781d889b0c297d5fa00d8653",
+      "bytes": 4877
+    },
+    {
+      "path": "CodegiOS/Models/AgentConfigTOML.swift",
+      "sha256": "13a7e6b9e94265e134ca5d32458c705d184bffef0ab0e765315066a57f1e680b",
+      "bytes": 26252
+    },
+    {
+      "path": "CodegiOS/Models/AgentManagement.swift",
+      "sha256": "0c0ba1b5c4e80fe1a6e625beae5081ebbdbd058d364c3879a4d61c79f4137c1d",
+      "bytes": 3501
+    },
+    {
+      "path": "CodegiOS/Models/AgentOptions.swift",
+      "sha256": "ac17c78b15bb3ab5256b4c342ddecc6f323cc664df0090f182726328cb5b6fb9",
+      "bytes": 7843
+    },
+    {
+      "path": "CodegiOS/Models/AgentSkill.swift",
+      "sha256": "14a20622a397a0c47f41de3911d75c8c6b6cda6a772d7fcdb909acd3a4fa36b6",
+      "bytes": 1210
+    },
+    {
+      "path": "CodegiOS/Models/AgentType.swift",
+      "sha256": "6dc03e2fea9441c64a7d43a3ced9096ebb80b180f711fe971a6fb011b8200f69",
+      "bytes": 5791
+    },
+    {
+      "path": "CodegiOS/Models/AgentVersionCheck.swift",
+      "sha256": "daa6eefd88581ef48b13896ec61de0eda35d6ced1e74081dafd1307178dfa09d",
+      "bytes": 9028
+    },
+    {
+      "path": "CodegiOS/Models/AnyJSON.swift",
+      "sha256": "03ff69b9605256016459e2b7776e307fd4a7e1908450be86507890144b1c8df5",
+      "bytes": 4627
+    },
+    {
+      "path": "CodegiOS/Models/ChatChannel.swift",
+      "sha256": "f2266d30c3483464ba904dfff85b8ae0e6af19947756867075605ff09d0c35c5",
+      "bytes": 9004
+    },
+    {
+      "path": "CodegiOS/Models/ComposeInserts.swift",
+      "sha256": "2626da24d0cc0a946e26fd2b5d49e2568d538e4721e451c27c7808a3e6bf20d8",
+      "bytes": 6236
+    },
+    {
+      "path": "CodegiOS/Models/Conversation.swift",
+      "sha256": "43eb754949f3c0c5329317752fa71de9f1443c6385c54c4af420985330291725",
+      "bytes": 8723
+    },
+    {
+      "path": "CodegiOS/Models/DirectoryEntry.swift",
+      "sha256": "bf11d6f99d136124174c2cce9c2469b07e3d140e2d5f58ddf633708213b1efeb",
+      "bytes": 1347
+    },
+    {
+      "path": "CodegiOS/Models/ExpertStatus.swift",
+      "sha256": "120e5f815089b5bd28ff679bd7a6dc998a5c24b0812429dcdec7a2335f289e57",
+      "bytes": 1304
+    },
+    {
+      "path": "CodegiOS/Models/FolderVisibility.swift",
+      "sha256": "d8fe54185735a8785d9dedef0373301a629fc430e59a35afb96022981c374b6e",
+      "bytes": 4911
+    },
+    {
+      "path": "CodegiOS/Models/GitHistory.swift",
+      "sha256": "a10d226d735773534ff42a3ab5fdb0d17d6d05f7feb5cca4c8e6f40c262ad193",
+      "bytes": 8939
+    },
+    {
+      "path": "CodegiOS/Models/GitSettings.swift",
+      "sha256": "a0f963367649659b1fa1af8a578b2162ebb42dd967ee3578005d84eb2ffe26be",
+      "bytes": 2464
+    },
+    {
+      "path": "CodegiOS/Models/InteractiveRequests.swift",
+      "sha256": "4ebe5050ab1279dc5bc2849ebd5655fde11184315215f9d2b74f287bdfcefb3d",
+      "bytes": 18544
+    },
+    {
+      "path": "CodegiOS/Models/McpModels.swift",
+      "sha256": "9b8a5e8b1b3b70b73d8474f0b443ac13c9f9f819bcd0b3084383d1dfc5d9ffe4",
+      "bytes": 6367
+    },
+    {
+      "path": "CodegiOS/Models/Message.swift",
+      "sha256": "09d1e190d1beff646b650b3378740dacb57653fbb4462bf3fae9f8ef02244edb",
+      "bytes": 4802
+    },
+    {
+      "path": "CodegiOS/Models/ModelProvider.swift",
+      "sha256": "e783fbc1ae3d65af13f7d2ff025c4617487e670c7aebed8dd98ef49f525a761b",
+      "bytes": 3547
+    },
+    {
+      "path": "CodegiOS/Models/SystemSettings.swift",
+      "sha256": "731bf4de24975d49df0b9a1852fb30c48b5a2147a1375ded2a7aab47d6774c3e",
+      "bytes": 2251
+    },
+    {
+      "path": "CodegiOS/Networking/APIError.swift",
+      "sha256": "345c998923b48f331fbced6052d667e55d358738be606319c47f3e2d525c549d",
+      "bytes": 4814
+    },
+    {
+      "path": "CodegiOS/Networking/CodegClient+Folders.swift",
+      "sha256": "779b43de1a3743371a26f52265a9979f8d924dc22c4992b758e78920f2a21d21",
+      "bytes": 13651
+    },
+    {
+      "path": "CodegiOS/Networking/CodegClient+Settings.swift",
+      "sha256": "184038e9f8278a5509cf06f2d643bf125f9511ee7c8d0785fbbf6da4406bfb90",
+      "bytes": 22993
+    },
+    {
+      "path": "CodegiOS/Networking/CodegClient+Terminal.swift",
+      "sha256": "43c083c11be878f269ed7e504d902b6ca5b6b1bfa678671462e1376173932b22",
+      "bytes": 3044
+    },
+    {
+      "path": "CodegiOS/Networking/CodegClient.swift",
+      "sha256": "e1b9c3aa3d650823353da08ab245a6e58b010fc7a93007c5c1535918b6071bb3",
+      "bytes": 24815
+    },
+    {
+      "path": "CodegiOS/Networking/EventStream.swift",
+      "sha256": "b4114f1c9c737f446a834478959e62e8c6165bf9dba929f93594960511fd8ce2",
+      "bytes": 10640
+    },
+    {
+      "path": "CodegiOS/Networking/JSONCoding.swift",
+      "sha256": "56ef24a99d9a2c9c0efc016d8941f089823f27acd7f7c99b18c577914c9ccfaf",
+      "bytes": 2579
+    },
+    {
+      "path": "CodegiOS/Networking/TerminalSocket.swift",
+      "sha256": "c58c2ec6c09019edbb49e006d7248624164b01ced8b4fc721a7963aad53a74ae",
+      "bytes": 5450
+    },
+    {
+      "path": "CodegiOS/Networking/WireRequests+Settings.swift",
+      "sha256": "b1fbc4562fadd288987c9516b0cf1116af82d511d7bf93d1372090f3a7d3d763",
+      "bytes": 16759
+    },
+    {
+      "path": "CodegiOS/Networking/WireRequests.swift",
+      "sha256": "72cde2c275c7e89646a4ed065888212a22094cf501f4b20f1ccdd800b834e9d9",
+      "bytes": 6921
+    },
+    {
+      "path": "CodegiOS/Persistence/Keychain.swift",
+      "sha256": "072abb21f2102ce660527935586650817011ad35ae1e02c502607c1b4788a9fc",
+      "bytes": 4801
+    },
+    {
+      "path": "CodegiOS/Persistence/SelectorPrefsStore.swift",
+      "sha256": "aab7eeb53277bd83aab0f7000f5b67837002a79be1fb92a5c9e1fcca8e5e1728",
+      "bytes": 2524
+    },
+    {
+      "path": "CodegiOS/Persistence/ServerProfile.swift",
+      "sha256": "e27ccc1564a36f3e7ea1e2e5a01f21d8d3ef9a9ebe049bb65acf469885bcd36f",
+      "bytes": 2081
+    },
+    {
+      "path": "CodegiOS/Persistence/ServerStore.swift",
+      "sha256": "c22d02c94c21e48667139c4cccbfa66d4c7b683c0028e38fe0d6210564d1423e",
+      "bytes": 3688
+    },
+    {
+      "path": "CodegiOS/Resources/AppIcon.icon/Assets/brackets.svg",
+      "sha256": "08bed1ada111d1b0ece9d10556c3d8013f36277e543206befa52a57557040873",
+      "bytes": 582
+    },
+    {
+      "path": "CodegiOS/Resources/AppIcon.icon/Assets/dots.svg",
+      "sha256": "0ef76e3cb2b215c8eb46d6524c41590fcf1fe07cdbd4703e470c27ce2b739da3",
+      "bytes": 846
+    },
+    {
+      "path": "CodegiOS/Resources/AppIcon.icon/icon.json",
+      "sha256": "c793457a2fa693c11ecd2bfcc67b289ec6005755ef2291ee3213c97c4a37f846",
+      "bytes": 1192
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/AgentClaudeCode.imageset/Contents.json",
+      "sha256": "37dab1580e8dc5d91bc52a56d8b78385eef86c605f382a89c715ec78ee4afe6f",
+      "bytes": 245
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/AgentClaudeCode.imageset/claude_code.svg",
+      "sha256": "369a831e23df2395d55b04f2790b7ef597c0e551989b98a0013ebda19ed433a3",
+      "bytes": 366
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/AgentCline.imageset/Contents.json",
+      "sha256": "3444d2b1e6897cde3a9c70e78d356f67ceff4fa7d03d6b0785b55af58e8e99f7",
+      "bytes": 286
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/AgentCline.imageset/cline.svg",
+      "sha256": "55765d37d8c3b36ebcf345221f653ddb7c4c5a4343bb579afae7d3986c00e1e9",
+      "bytes": 700
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/AgentCodeBuddy.imageset/Contents.json",
+      "sha256": "779179276c99d16957d8c00c5db320736d014416e8f6d04e0fc444893918a8f9",
+      "bytes": 290
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/AgentCodeBuddy.imageset/codebuddy.svg",
+      "sha256": "0da3ae3070a5afe3676ed88a75ca1baa9367e1111a6ba74eb9e494ca18324453",
+      "bytes": 1458
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/AgentCodex.imageset/Contents.json",
+      "sha256": "59d5cb26b7a31b157ad0753a6672f57006240db53bf468ef855ec3a73e4c60fa",
+      "bytes": 239
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/AgentCodex.imageset/codex.svg",
+      "sha256": "f53fa22ed906b2b4103f248611c6737f048b8398d694e3d6c4f44819eb7767fe",
+      "bytes": 1364
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/AgentCursor.imageset/Contents.json",
+      "sha256": "aaede2e12c2e70fb5779943f049ada676a59172440ae9364a43f5e0015b6a27b",
+      "bytes": 287
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/AgentCursor.imageset/cursor.svg",
+      "sha256": "50b211349ce6d3fcca4d20a0ce658691d11d2d8c9c8809bc2463d7fe641ddf00",
+      "bytes": 553
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/AgentGemini.imageset/Contents.json",
+      "sha256": "4cb7c016c35beb1ef8fe369cf94cf999e049776994f3c1b0addf9b28bbc96eaf",
+      "bytes": 240
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/AgentGemini.imageset/gemini.svg",
+      "sha256": "8992930e617f492b82485a42a99366251d721fa4dc9d77cd7978fcea1b2a7743",
+      "bytes": 854
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/AgentGrok.imageset/Contents.json",
+      "sha256": "310316dbc8addf86d9fd7e2377bb3177cfd7c47a876330f28d48a9a9e4ad8869",
+      "bytes": 285
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/AgentGrok.imageset/grok.svg",
+      "sha256": "03a6e4a704eb5d4e67084d7b08716334996421c860eef221c7c1e3214e4da624",
+      "bytes": 921
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/AgentHermes.imageset/Contents.json",
+      "sha256": "93c86edd3145428ba8547012b5c55f6a975e3822970f4c45b9dd6b92662af0e8",
+      "bytes": 287
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/AgentHermes.imageset/hermes.svg",
+      "sha256": "5d6239fe943f51c1616bc46e818eddf967dd8f537f8236a3cfc9d5bca478b891",
+      "bytes": 19819
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/AgentKimiCode.imageset/Contents.json",
+      "sha256": "783859cb5284c836e6e9a04e0d6db2df5f5fc09abb86380d8d262f9cb3f3e961",
+      "bytes": 242
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/AgentKimiCode.imageset/kimicode.svg",
+      "sha256": "27277334faba73a44f9076134ea6dc9d35855ec9a06472814afc4efef7354142",
+      "bytes": 336
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/AgentOpenClaw.imageset/Contents.json",
+      "sha256": "0443c84f4e9a0fe343b6d1eedf550cbd269e181f299d16230408bba5abbd9fd5",
+      "bytes": 243
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/AgentOpenClaw.imageset/open_claw.svg",
+      "sha256": "57756a019d6816fa11386b4ea9688d15757ae76df9a054fac01565dc474b95f3",
+      "bytes": 1883
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/AgentOpenCode.imageset/Contents.json",
+      "sha256": "3be8a592c8c926bf894eb8b302dc1f627f9e18fc5c6f97c4a9d32b0f280c7a38",
+      "bytes": 290
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/AgentOpenCode.imageset/open_code.svg",
+      "sha256": "85ec6c2297f394fb6383575a0a6e26d3150910a460e87f04fc3992a53e40dfa6",
+      "bytes": 172
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/AgentPi.imageset/Contents.json",
+      "sha256": "aa5e6d0b5981d47fe568e2dcff239e7f3bf95c09a6af68fb06771e0cd7f276f3",
+      "bytes": 236
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/AgentPi.imageset/pi.svg",
+      "sha256": "0a6138a66b96de24516df1b5a86430d0bdaf29e6e22034f28ed32083c6520a3b",
+      "bytes": 341
+    },
+    {
+      "path": "CodegiOS/Resources/Assets.xcassets/Contents.json",
+      "sha256": "73d83da8f89d57a704aa6df8b476cd9c2a22221daf3b9e949cecdd61e77f7cdc",
+      "bytes": 69
+    },
+    {
+      "path": "CodegiOS/Resources/Localizable.xcstrings",
+      "sha256": "3c7baba8c921889e83e7e6e4de73331b236115553650aff94f88157927affcc0",
+      "bytes": 240056
+    },
+    {
+      "path": "Config/Signing.local.xcconfig.example",
+      "sha256": "7677d281639784fa0b884b5f3d23523efa10bc0ccc53ae2cfddf8a854d5f4e7f",
+      "bytes": 113
+    },
+    {
+      "path": "Config/Signing.xcconfig",
+      "sha256": "4ce0cbd39204e8b52b8e1a0716549994628d504e9aaf241fcacc2621b2f9dc5c",
+      "bytes": 251
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "1eb85fc97224598dad1852b5d6483bbcf0aa8608790dcc657a5a2a761ae9c8c6",
+      "bytes": 11558
+    },
+    {
+      "path": "NOTICE",
+      "sha256": "630e56890f0f7b81c0cfa3edc74b8bb630065ca5ee125ea52f78e9b94b49fe5a",
+      "bytes": 356
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "sha256": "90ea3239cf147750cf880f3e90768a467ef0ed76a40074e51ed3e3ff392e5610",
+      "bytes": 1924
+    },
+    {
+      "path": "project.yml",
+      "sha256": "78efcfd10ef8be1f67e1aa74a55ba9bdb36a28148a9496e4260c97ba9b677c8d",
+      "bytes": 4020
+    }
+  ],
+  "sourceOnly": true,
+  "validation": "deferred_step_3"
+}
