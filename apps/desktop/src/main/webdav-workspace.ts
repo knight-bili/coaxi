@@ -3,12 +3,18 @@ import type { CoreMethod } from '@contracts'
 import { backupFileDigest } from './backup-workspace'
 type Request=<T>(method:CoreMethod,params?:unknown)=>Promise<T>
 export class WebdavWorkspace{
-  constructor(private readonly request:Request,private readonly owner:()=>BrowserWindow|null){}
+  constructor(private readonly request:Request,private readonly owner:()=>BrowserWindow|null,private readonly preferencesRoot?:()=>string){}
   async invoke(event:IpcMainInvokeEvent,value:unknown):Promise<unknown>{
     const owner=this.owner()
     if(!owner||owner.isDestroyed()||event.sender!==owner.webContents||event.senderFrame!==owner.webContents.mainFrame)throw new Error('webdav.local_owner_required')
     if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('webdav.invalid_request')
-    const input=value as {operation:string;expectedRevision:string;commandId?:string;snapshotId?:string;expectedDigest?:string;expectedIndexEtag?:string;confirmed?:boolean;kind?:'backup'|'configuration'}
+    const input=value as {operation:string;expectedRevision:string|null;commandId?:string;snapshotId?:string;expectedDigest?:string;expectedIndexEtag?:string;confirmed?:boolean;kind?:'backup'|'configuration';enabled?:boolean;autoSync?:boolean;intervalMinutes?:number;passphrase?:string;clearPassphrase?:boolean}
+    if(typeof input.operation!=='string')throw new Error('webdav.invalid_request')
+    if(input.operation.startsWith('config_')){
+      const operation=input.operation.slice(7);if(!['get','set','upload','cancel','resume','archive'].includes(operation))throw new Error('config_sync.operation_not_admitted')
+      if(['set','upload'].includes(operation)&&this.preferencesRoot)await this.request('backup.storage.desktop.register',{preferencesRoot:this.preferencesRoot()})
+      return this.request('backup.config.local',{operation,expectedRevision:input.expectedRevision,commandId:input.commandId,enabled:input.enabled,autoSync:input.autoSync,intervalMinutes:input.intervalMinutes,passphrase:input.passphrase,clearPassphrase:input.clearPassphrase,confirmed:input.confirmed})
+    }
     if(typeof input.expectedRevision!=='string')throw new Error('webdav.settings_revision_required')
     if(['list','probe','create_collection','transfers'].includes(input.operation))return this.request('backup.webdav.local',{operation:input.operation,expectedRevision:input.expectedRevision})
     if(['removal_preview','removal_status','remove'].includes(input.operation)){

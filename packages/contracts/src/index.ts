@@ -5145,7 +5145,7 @@ export interface RovaiApi {
   nativeCustomSkills?: {importDirectory<T>(input:{skillId:string;expectedRevision?:string}):Promise<T|null>}
   /** Native local owner surface; intentionally absent from remote Web. */
   nativePets?: { importDirectory():Promise<unknown|null>;synchronize():Promise<void>;onChanged(listener:()=>void):()=>void }
-  webdavWorkspace?: {request<T>(input:{operation:'probe'|'create_collection'|'list'|'push'|'pull'|'status'|'transfers'|'cancel'|'resume'|'removal_preview'|'removal_status'|'remove';expectedRevision:string;commandId?:string;snapshotId?:string;expectedDigest?:string;expectedIndexEtag?:string;confirmed?:boolean;kind?:'backup'|'configuration'}):Promise<T|null>}
+  webdavWorkspace?: {request<T>(input:{operation:'probe'|'create_collection'|'list'|'push'|'pull'|'status'|'transfers'|'cancel'|'resume'|'removal_preview'|'removal_status'|'remove'|'config_get'|'config_set'|'config_upload'|'config_cancel'|'config_resume'|'config_archive';expectedRevision:string|null;commandId?:string;snapshotId?:string;expectedDigest?:string;expectedIndexEtag?:string;confirmed?:boolean;kind?:'backup'|'configuration';enabled?:boolean;autoSync?:boolean;intervalMinutes?:number;passphrase?:string;clearPassphrase?:boolean}):Promise<T|null>}
   nativeBackups?: NativeBackupsApi
   nativeHistory?: {
     export<T>(threadId:string,importId:string,expectedRevision:string):Promise<T|null>

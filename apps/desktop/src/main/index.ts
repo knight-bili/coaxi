@@ -1267,7 +1267,7 @@ const officeWorkspace = new OfficeWorkspace((method,params)=>core.request(method
 ipcMain.handle('rovai:office-workspace',(event,input)=>officeWorkspace.open(event,input))
 app.on('before-quit',()=>officeWorkspace.closeAll())
 const browserWorkspace = new BrowserWorkspace((method,params)=>core.request(method,params),()=>mainWindow)
-const webdavWorkspace = new WebdavWorkspace((method,params)=>core.request(method,params),()=>mainWindow)
+const webdavWorkspace = new WebdavWorkspace((method,params)=>core.request(method,params),()=>mainWindow,()=>app.getPath('userData'))
 ipcMain.handle('rovai:webdav-workspace',(event,input)=>webdavWorkspace.invoke(event,input))
 const backupWorkspace = new BackupWorkspace(core,()=>coreDataPath,()=>mainWindow,()=>requestRendererQuitPreparation(mainWindow,()=>new MessageChannelMain()),()=>{browserWorkspace.revokeAll();officeWorkspace.closeAll()},()=>{app.relaunch();app.quit()},()=>app.getPath('userData'))
 ipcMain.handle('rovai:backup-workspace',(event,operation,input)=>backupWorkspace.invoke(event,operation,input))
