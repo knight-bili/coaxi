@@ -26,6 +26,7 @@ object RovaiUploadSource {
             buildJsonObject{put("sourceFile",file.absolutePath);put("attempted",false);putJsonObject("intent"){put("commandId",id);put("threadId",threadId);put("expectedRevision",revision);put("target",target);put("displayName",name);put("byteSize",size);put("sha256",hash.digest().joinToString(""){"%02x".format(it)})}}
         }catch(error:Exception){file.delete();throw error}
     }
+    internal fun frozenFile(context:Context,request:JsonObject):File=file(context,request)
     private fun file(context:Context,request:JsonObject):File{val id=request["intent"]!!.jsonObject["commandId"]!!.jsonPrimitive.content;require(UUID.fromString(id).toString()==id);val expected=File(directory(context),"$id.bin");require(expected.absolutePath==request["sourceFile"]?.jsonPrimitive?.content&&!Files.isSymbolicLink(expected.toPath())&&expected.canonicalFile.parentFile==directory(context).canonicalFile){"上传来源记录无效"};return expected}
     suspend fun bytes(context:Context,request:JsonObject):ByteArray=withContext(Dispatchers.IO){val source=file(context,request);require(source.length()<=20L*1024*1024){"上传文件超过限制"};source.inputStream().use{input->input.readNBytes(20*1024*1024+1).also{require(it.size<=20*1024*1024)}}}
     suspend fun remove(context:Context,request:JsonObject)=withContext(Dispatchers.IO){file(context,request).delete();Unit}

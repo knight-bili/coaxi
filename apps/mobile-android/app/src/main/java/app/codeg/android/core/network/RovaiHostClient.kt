@@ -8,6 +8,12 @@ import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.http.content.OutgoingContent
+import io.ktor.utils.io.ByteWriteChannel
+import io.ktor.utils.io.writeFully
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.File
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -105,6 +111,24 @@ class RovaiHostClient(rawBaseUrl:String,private val administratorToken:String,
         }
         if(response.status.value !in 200..299){if(response.status.value==401){denied=true;deadline=0};throw RovaiHostFailure("host.upload_http_${response.status.value}",unknownResult=true)}
         val text=response.bodyAsText();require(text.length<=32*1024*1024){"上传响应超过限制"};return json.parseToJsonElement(text).jsonObject
+    }
+    suspend fun uploadMissionBatch(intent:JsonObject,files:List<Pair<String,File>>):JsonObject {
+        require(files.size<=10&&files.map{it.first}.toSet().size==files.size)
+        val expected=intent["files"]!!.jsonArray;require(files.size==expected.size&&expected.all{entry->files.any{it.first==entry.jsonObject["id"]!!.jsonPrimitive.content}})
+        val current=connect();val version=lifetime.get();val boundary="RovaiMission-"+UUID.randomUUID().toString()
+        val initial=("--$boundary\r\nContent-Disposition: form-data; name=\"intent\"\r\nContent-Type: application/json\r\n\r\n"+intent.toString()+"\r\n").toByteArray(Charsets.UTF_8)
+        val headers=files.map{(id,_)->("--$boundary\r\nContent-Disposition: form-data; name=\"file:$id\"; filename=\"source\"\r\nContent-Type: application/octet-stream\r\n\r\n").toByteArray(Charsets.UTF_8)}
+        val closing="--$boundary--\r\n".toByteArray(Charsets.UTF_8)
+        val response=http.post("$baseUrl/api/v1/mission-files"){
+            header(HttpHeaders.Authorization,"Bearer ${current.token}")
+            setBody(object:OutgoingContent.WriteChannelContent(){
+                override val contentType=ContentType.MultiPart.FormData.withParameter("boundary",boundary)
+                override val contentLength=initial.size.toLong()+closing.size+files.mapIndexed{index,pair->headers[index].size+pair.second.length()+2}.sum()
+                override suspend fun writeTo(channel:ByteWriteChannel){withContext(Dispatchers.IO){channel.writeFully(initial);files.forEachIndexed{index,(_,file)->channel.writeFully(headers[index]);file.inputStream().use{input->val buffer=ByteArray(65536);while(true){val count=input.read(buffer);if(count<0)break;channel.writeFully(buffer,0,count)}};channel.writeFully(byteArrayOf(13,10))};channel.writeFully(closing)}}
+            })
+        }
+        if(response.status.value !in 200..299){if(response.status.value==401){denied=true;deadline=0};throw RovaiHostFailure("host.mission_upload_http_${response.status.value}",unknownResult=true)}
+        val text=response.bodyAsText();require(version==lifetime.get()&&text.length<=1024*1024){"使命上传连接或结果已变化"};return json.parseToJsonElement(text).jsonObject
     }
     suspend fun uploadStatus(intent:JsonObject,action:String="reconcile"):JsonObject {
         require(action in listOf("reconcile","receipt","retry","finish")){"上传操作无效"}
