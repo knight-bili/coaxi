@@ -10325,6 +10325,9 @@ impl Core {
             "workbench.files.mutate" => {
                 self.workbench_file_mutate(request.params.clone()).await
             }
+            "workbench.git.read" | "workbench.git.preview" | "workbench.git.execute" => {
+                self.workbench_git(&request.method, request.params.clone()).await
+            }
             "workspaces.inspect" => {
                 let params: WorkspaceInspectParams =
                     serde_json::from_value(request.params.clone())?;

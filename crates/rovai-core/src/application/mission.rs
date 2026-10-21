@@ -170,7 +170,7 @@ fn cleanup_diagnostic_is_recoverable(workspace: &MissionWorkspace) -> bool {
 }
 
 impl Core {
-    async fn mission_git(&self) -> Result<MissionGit> {
+    pub(super) async fn mission_git(&self) -> Result<MissionGit> {
         MissionGit::new(
             self.runtime_search_environment
                 .read()

@@ -193,6 +193,10 @@ fn git_compatible_path(path: &Path) -> &Path {
 }
 
 impl MissionGit {
+    pub(crate) async fn workbench_output(&self, cwd: &Path, arguments: &[String]) -> Result<BoundedCommandOutput> {
+        self.output(cwd, &arguments.iter().map(OsString::from).collect::<Vec<_>>(), None, None).await
+    }
+
     pub fn new(executable: PathBuf) -> Result<Self> {
         ensure!(
             executable.is_absolute() && executable.is_file(),
