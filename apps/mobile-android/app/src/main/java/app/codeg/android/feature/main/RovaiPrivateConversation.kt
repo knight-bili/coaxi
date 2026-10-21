@@ -41,7 +41,15 @@ fun RovaiPrivateConversation(model:RovaiWorkspaceViewModel,threadId:String,child
     fun base(action:JsonObject)=buildJsonObject{put("threadId",threadId);put("conversationId",selected);put("composerScope",JsonNull);put("expectedDraftRevision",snapshot["draft"].coreObject().coreLong("revision"));put("action",action)}
     fun pendingAction(item:JsonObject,action:JsonObject,replace:Boolean=false){val command=buildJsonObject{if(!child)put("threadId",threadId);put("conversationId",selected);put("composerScope",JsonNull);put("pendingInputId",item.coreText("id"));put("expectedRevision",item.coreLong("revision"));put("editToken",snapshot["pendingInputs"].coreObject()["editSession"].coreObject().takeIf{it.coreText("pendingInputId")==item.coreText("id")}?.get("editToken")?:JsonNull);put("action",action)};if(replace)model.executePrivate(edit,command,owner,body,true)else model.command(edit,command)}
     LaunchedEffect(threadId,selected){snapshot=buildJsonObject{};bodyReady=false;try{if(selected!=null){body=model.readBody(owner);bodyReady=true};load();if(selected!=null)retainedPage()}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message}}
-    LaunchedEffect(state.thread,state.lastResult){val receipt=state.lastResult.coreObject()["commandResult"].coreObject().ifEmpty{state.lastResult.coreObject()};if(state.lastCompletedOperation==RovaiOperation.SINGLECHAT_OPEN.wire&&receipt.coreText("status")=="applied"&&receipt["payload"].coreObject().coreText("conversationId").isNotEmpty())selected=receipt["payload"].coreObject().coreText("conversationId");else{load();if(selected!=null){retainedPage();if(state.lastCompletedOperation in listOf(send.wire,edit.wire,mutate.wire)&&state.pending==null){body=model.readBody(owner);bodyReady=true}}}}
+    LaunchedEffect(state.thread){load()}
+    LaunchedEffect(state.lastResult){
+        val receipt=state.lastResult.coreObject()["commandResult"].coreObject().ifEmpty{state.lastResult.coreObject()}
+        if(!child&&state.lastCompletedOperation==RovaiOperation.SINGLECHAT_OPEN.wire&&receipt.coreText("status")=="applied"){
+            val id=receipt["payload"].coreObject().coreText("conversationId")
+            if(id.isNotEmpty()){val opened=model.query(get,buildJsonObject{put("conversationId",id);put("composerScope",JsonNull)}).coreObject();if(opened["conversation"].coreObject().coreText("threadId")==threadId)selected=id}
+        }else{load();if(selected!=null){retainedPage();if(state.lastCompletedOperation in listOf(send.wire,edit.wire,mutate.wire)&&state.pending==null){body=model.readBody(owner);bodyReady=true}}}
+    }
+
     BackHandler{scope.launch{close()}}
     Column(Modifier.fillMaxSize()){
         Row(Modifier.fillMaxWidth().padding(horizontal=12.dp)){TextButton(onClick={scope.launch{close()}}){Text("返回对话")};Text(if(child)"独立帮手" else "队员私聊",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(onClick={scope.launch{load();retainedPage()}},enabled=!loading){Text("刷新")}}

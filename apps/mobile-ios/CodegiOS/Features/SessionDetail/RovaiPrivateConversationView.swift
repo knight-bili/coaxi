@@ -38,7 +38,7 @@ struct RovaiPrivateConversationView: View {
         .onChange(of: model.lastResult) { _, value in
             let receipt = value?["commandResult"] ?? value
             if !child, model.lastOperation == .singleChatOpen, receipt?.text("status") == "applied", let id = receipt?["payload"]?["conversationId"]?.stringValue { selected = id }
-            else { Task { await load(); await readRetained(); if [send, edit, mutate].contains(model.lastOperation), model.pending == nil, selected != nil { do { text = try model.readBody(owner) } catch { issue = error.localizedDescription } } } }
+            else { Task { await load(); await readRetained(); if let operation = model.lastOperation, [send, edit, mutate].contains(operation), model.pending == nil, selected != nil { do { text = try model.readBody(owner) } catch { issue = error.localizedDescription } } } }
         }
         .confirmationDialog("结束当前私聊？", isPresented: $ending, titleVisibility: .visible) { Button("结束会话", role: .destructive) { Task { var value: [String: JSONValue] = ["conversationId": .string(selected ?? "")]; if !child { value["threadId"] = .string(threadId) }; await model.command(child ? .delegationsConversationEnd : .singleChatEnd, value: .object(value)) } } } message: { Text("保留消息和历史记录；正在执行的工作由Core处理结束。") }
     }

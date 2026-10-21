@@ -70,7 +70,7 @@ private struct RovaiMcpEditor: View {
         .task { baseDigest = config.text("configDigest"); if id == nil { draft = "{\n  \"mcpServers\": {\n    \"my-server\": {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"@example/mcp-server\"]\n    }\n  }\n}"; baseline = draft } }
         .onChange(of: model.lastResult) { _, value in
             guard model.lastOperation?.rawValue.hasPrefix("mcp.") == true, let value else { return }
-            if value.text("status") == "ok" { config = value["config"] ?? config; baseDigest = config.text("configDigest"); if [.mcpServersCreate, .mcpServersUpdate].contains(model.lastOperation) { baseline = draft }; if model.lastOperation == .mcpServersDelete || model.lastOperation == .mcpServersCreate { dismiss() } }
+            if value.text("status") == "ok" { config = value["config"] ?? config; baseDigest = config.text("configDigest"); if let operation = model.lastOperation, [RovaiOperation.mcpServersCreate, .mcpServersUpdate].contains(operation) { baseline = draft }; if model.lastOperation == .mcpServersDelete || model.lastOperation == .mcpServersCreate { dismiss() } }
             else { issue = value.text("status") == "conflict" ? "配置已在其他位置修改。草稿已保留，请重新读取后编辑。" : (value["issues"]?.rvArray.first?.text("message") ?? "配置尚未保存，请刷新后核对。") }
         }
         .confirmationDialog(action?.title ?? "确认操作", isPresented: Binding(get: { action != nil }, set: { if !$0 { action = nil } }), titleVisibility: .visible) {
