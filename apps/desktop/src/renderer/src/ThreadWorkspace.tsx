@@ -1625,6 +1625,9 @@ function RevealNotificationConversation({ active, onHidePreview }: { active: boo
 export function ThreadWorkspace(props: Parameters<typeof ThreadWorkspaceContent>[0]): JSX.Element {
   const client = useThreadClient(), owner = useRef({ client, generation: 0 })
   const workbenchGuard = useRef<(() => void) | null>(null)
+  const workbenchQuickMessage = useRef<((text:string)=>boolean)|null>(null)
+  const bindWorkbenchQuickMessage = useCallback((insert:((text:string)=>boolean)|null)=>{workbenchQuickMessage.current=insert},[])
+  const insertWorkbenchQuickMessage = useCallback((text:string)=>workbenchQuickMessage.current?.(text)??false,[])
   const bindWorkbenchGuard = useCallback((guard: (() => void) | null) => { workbenchGuard.current = guard }, [])
   const viewerGuard = useRef<(() => ThreadLeavePreparation) | null>(null)
   const bindViewerGuard = useCallback((guard: (() => ThreadLeavePreparation) | null) => { viewerGuard.current = guard }, [])
@@ -1643,13 +1646,15 @@ export function ThreadWorkspace(props: Parameters<typeof ThreadWorkspaceContent>
   return <DelegationViewerHost key={key} visible={props.surfaceVisible} onLeaveGuardChange={bindViewerGuard} threadId={props.snapshot.thread.id} members={props.snapshot.members} profileById={new Map(props.agents.map(agent => [agent.agentId, agent]))}
     busy={props.busy} onResolveApproval={props.onResolveApproval} onNotify={props.onNotify}>
     <ThreadWorkspaceContent {...props} onThreadLeaveGuardChange={bindWorkspaceGuard}
-      workbenchEntry={<WorkspaceWorkbench threadId={props.snapshot.thread.id} bindLeaveGuard={bindWorkbenchGuard} />} />
+      onBindWorkbenchQuickMessage={bindWorkbenchQuickMessage}
+      workbenchEntry={<WorkspaceWorkbench threadId={props.snapshot.thread.id} bindLeaveGuard={bindWorkbenchGuard} onQuickMessage={insertWorkbenchQuickMessage} />} />
   </DelegationViewerHost>
 }
 
 function ThreadWorkspaceContent({
   snapshot,
   workbenchEntry,
+  onBindWorkbenchQuickMessage,
   composerContext,
   userAnchorNavigation,
   missionBoard = null,
@@ -1714,6 +1719,7 @@ function ThreadWorkspaceContent({
 }: {
   snapshot: ThreadSnapshot
   workbenchEntry?: React.ReactNode
+  onBindWorkbenchQuickMessage?(insert:((text:string)=>boolean)|null):void
   surfaceVisible?: boolean
   composerContext?: CanvasComposerContext
   userAnchorNavigation?: ThreadUserAnchorNavigation
@@ -4433,6 +4439,15 @@ function ThreadWorkspaceContent({
     composerHandleRef.current?.setDocument(composerDocumentFromText(prompt), 'end')
     if (announceDraft) setStarterNotice(uiAttribute('内容已填入，可编辑后发送。'))
   }
+
+  useEffect(()=>{
+    onBindWorkbenchQuickMessage?.(text=>{
+      if(composerInteractionDisabled || composerDraft?.threadId!==snapshot.thread.id)return false
+      if(composerHandleRef.current?.isDirty() && !window.confirm(uiAttribute('替换当前尚未发送的正文？附件和引用保留。')))return false
+      chooseStarterPrompt(text,true);return true
+    })
+    return()=>onBindWorkbenchQuickMessage?.(null)
+  },[onBindWorkbenchQuickMessage,composerInteractionDisabled,composerDraft,snapshot.thread.id])
 
   const selectInspectorTab = (tab: ThreadInspectorTab): void => {
     if (controlledInspectorTab === undefined) setLocalInspectorTab(tab)
