@@ -19243,6 +19243,10 @@ async fn run_core(
         None,
         None,
     )?;
+    if let Err(error)=crate::backup::apply_pending_with_lease(&data_dir_lease){
+        write_startup_frame(&output_target,"blocked",Some("restore"),json!({"kind":"restore_pending"}),Some(structured_startup_error("backup_restore_requires_recovery",error.to_string(),false,json!({"safetySnapshotPreserved":true}))),None)?;
+        return Ok(());
+    }
     let assessment_started = Instant::now();
     let assessment = DatabaseAdmission::assess(&data_dir_lease);
     let source_contract = assessment

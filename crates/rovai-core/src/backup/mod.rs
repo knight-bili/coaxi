@@ -16,6 +16,7 @@ impl std::error::Error for BackupError{}
 impl BackupError{
     fn io(error:impl std::fmt::Display)->Self{Self{code:"backup.io".into(),message:error.to_string()}}
     fn task_execution_failed(message:impl Into<String>)->Self{Self{code:"backup.failed".into(),message:message.into()}}
+    fn authentication_failed(message:impl Into<String>)->Self{Self{code:"backup.authentication_failed".into(),message:message.into()}}
     fn invalid_input(message:impl Into<String>)->Self{Self{code:"backup.invalid_input".into(),message:message.into()}}
     fn with_detail(mut self,detail:impl AsRef<str>)->Self{self.message.push_str(": ");self.message.push_str(detail.as_ref());self}
     fn with_i18n(mut self,key:&str,_parameters:std::collections::BTreeMap<String,String>)->Self{self.code=key.into();self}
@@ -83,8 +84,10 @@ pub fn stage(root:&Path,archive:&Path,passphrase:&str,cancel:&CancellationToken)
 }
 /// Called before opening Core. Each path remains under the admitted root or its
 /// private operation directory; the safety copy remains available after success.
-pub fn apply_pending(root:&Path)->Result<Option<Manifest>>{
-    let lease=CoreDataDirLease::acquire(root)?;let root=lease.data_dir();let administrative=administrative(root)?;let marker=administrative.join("pending.json");if !marker.exists(){return Ok(None)}
+pub fn apply_pending(root:&Path)->Result<Option<Manifest>>{let lease=CoreDataDirLease::acquire(root)?;apply_pending_with_lease(&lease)}
+pub fn apply_pending_with_lease(lease:&CoreDataDirLease)->Result<Option<Manifest>>{
+    let root=lease.data_dir();let key=format!("{:x}",Sha256::digest(root.to_string_lossy().as_bytes()));let administrative=root.parent().context("backup.root_parent_required")?.join(format!(".rovai-backup-{}",&key[..16]));let marker=administrative.join("pending.json");if !marker.exists(){return Ok(None)}
+    prepare_private_directory(&administrative)?;
     let mut pending:Pending=serde_json::from_slice(&fs::read(&marker)?)?;ensure!(pending.root==root&&pending.staging.starts_with(&administrative)&&pending.safety.starts_with(&administrative),"backup.invalid_pending_paths");no_link(&pending.staging)?;no_link(&pending.safety)?;
     ensure!(matches!(pending.state.as_str(),"staged"|"applying"),"backup.restore_requires_recovery");pending.state="applying".into();atomic_write_private_json(&marker,&pending)?;
     for unit in &pending.units{
@@ -97,5 +100,25 @@ pub fn apply_pending(root:&Path)->Result<Option<Manifest>>{
         if state["hasReplacement"]==true&&staged.exists(){ensure!(!live.exists(),"backup.restore_destination_changed");no_link(&staged)?;fs::rename(&staged,&live)?;}
         ensure!(state["hasReplacement"]!=true||live.exists(),"backup.replacement_missing");state["done"]=serde_json::json!(true);atomic_write_private_json(&receipt,&state)?;
     }
+    for entry in &pending.manifest.entries{ensure!(hash_file(&root.join(&entry.path))?==(entry.size,entry.sha256.clone()),"backup.applied_checksum_mismatch");}
     pending.state="applied".into();atomic_write_private_json(&marker,&pending)?;fs::rename(&marker,administrative.join(format!("restore-{}.json",uuid::Uuid::new_v4())))?;Ok(Some(pending.manifest))
+}
+
+/// Restore the safety snapshot of the latest applied/partly-applied operation.
+pub fn rollback(root:&Path)->Result<()> {
+    let lease=CoreDataDirLease::acquire(root)?;let root=lease.data_dir();let administrative=administrative(root)?;
+    let pending=administrative.join("pending.json");
+    let marker=if pending.exists(){pending}else{let mut candidates=fs::read_dir(&administrative)?.filter_map(|entry|entry.ok()).filter(|entry|entry.file_name().to_string_lossy().starts_with("restore-")&&entry.path().extension().is_some_and(|extension|extension=="json")).collect::<Vec<_>>();candidates.sort_by_key(|entry|entry.metadata().and_then(|metadata|metadata.modified()).ok());candidates.pop().context("backup.no_restore_to_rollback")?.path()};
+    let mut operation:Pending=serde_json::from_slice(&fs::read(&marker)?)?;ensure!(operation.root==root&&operation.safety.starts_with(&administrative)&&operation.staging.starts_with(&administrative)&&matches!(operation.state.as_str(),"applying"|"applied"|"rolling_back"),"backup.invalid_rollback");no_link(&operation.safety)?;let after=operation.safety.parent().context("backup.invalid_operation")?.join("after");prepare_private_directory(&after)?;
+    operation.state="rolling_back".into();atomic_write_private_json(&marker,&operation)?;
+    for unit in operation.units.iter().rev(){
+        name(unit)?;ensure!(!unit.contains('/')&&!excluded(unit),"backup.invalid_unit");let receipt=operation.safety.join(format!(".{:x}.swap.json",Sha256::digest(unit.as_bytes())));if !receipt.exists(){continue}
+        let mut state:serde_json::Value=serde_json::from_slice(&fs::read(&receipt)?)?;if state["rolledBack"]==true{continue}
+        let live=root.join(unit);let before=operation.safety.join(unit);let saved=after.join(unit);
+        if before.exists(){if live.exists(){ensure!(!saved.exists(),"backup.rollback_destination_changed");no_link(&live)?;fs::rename(&live,&saved)?;}no_link(&before)?;fs::rename(&before,&live)?;}
+        else if state["hadOriginal"]==false&&live.exists(){ensure!(!saved.exists(),"backup.rollback_destination_changed");no_link(&live)?;fs::rename(&live,&saved)?;}
+        state["rolledBack"]=serde_json::json!(true);atomic_write_private_json(&receipt,&state)?;
+    }
+    operation.state="rolled_back".into();atomic_write_private_json(&marker,&operation)?;
+    if marker.file_name().is_some_and(|name|name=="pending.json"){fs::rename(marker,administrative.join(format!("rollback-{}.json",uuid::Uuid::new_v4())))?;}Ok(())
 }

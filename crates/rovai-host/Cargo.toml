@@ -5,6 +5,7 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
+tokio-util = { version = "0.7", features = ["rt"] }
 os_pipe = "1.2"
 dirs = "6"
 anyhow = "1"

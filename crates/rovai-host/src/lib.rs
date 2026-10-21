@@ -1,4 +1,5 @@
 mod desktop_channels;
+mod backup;
 mod lifecycle;
 mod server;
 mod server_logs;
@@ -32,6 +33,8 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
+    /// Offline encrypted backup/restore; passphrase is read from stdin only.
+    Backup(backup::Arguments),
     /// Start one Core owner, optionally with the shared Web module.
     Run(RunArgs),
     /// Generate a management token for an operator. Treat stdout as a secret.
@@ -96,6 +99,7 @@ pub fn run_host() -> Result<()> {
         CoreConfig::from_legacy_args(arguments)?
     } else {
         match Cli::parse().command {
+            Command::Backup(args)=>{return backup::run(args)},
             Command::Token => {
                 println!("{}", rovai_web::new_token()?);
                 return Ok(());

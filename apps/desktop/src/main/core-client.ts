@@ -411,6 +411,7 @@ export class CoreClient {
     if (options?.mcpConfigPath) this.#mcpConfigPath = options.mcpConfigPath
     if (this.#child) return
     this.#stopping = false
+    this.#shutdownPromise = null
     this.#queuedRetryGeneration = null
     if (this.#restartTimer) {
       clearTimeout(this.#restartTimer)
