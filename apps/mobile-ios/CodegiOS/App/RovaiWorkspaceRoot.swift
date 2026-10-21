@@ -7,6 +7,7 @@ struct RovaiWorkspaceRoot: View {
     @State private var model = RovaiWorkspaceModel()
     @State private var tab = 0
     @State private var create: String?
+    @State private var notifications = false
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var columns: NavigationSplitViewVisibility = .all
@@ -16,8 +17,9 @@ struct RovaiWorkspaceRoot: View {
     private var profile: ServerProfile? { store.servers.first { $0.id == selectedServerID } ?? store.servers.first }
     var body: some View {
         Group { if horizontalSizeClass == .regular { splitShell } else { compactShell } }
-        .task(id: "\(profile?.id.uuidString ?? ""):\(profile?.urlString ?? "")") { detailRoute = nil; await model.bind(profile, store: store) }
+        .task(id: "\(profile?.id.uuidString ?? ""):\(profile?.urlString ?? "")") { notifications = false; memberEditor = nil; detailRoute = nil; await model.bind(profile, store: store) }
         .onChange(of: scenePhase, initial: true) { _, phase in model.foreground(phase == .active) }
+        .sheet(isPresented: $notifications) { RovaiNotificationInbox(model: model) }
         .sheet(item: $memberEditor) { item in RovaiMemberEditor(model: model, member: item.value) }
         .sheet(isPresented: Binding(get: { create != nil }, set: { if !$0 { create = nil } })) { RovaiNewConversation(model: model, mission: create == "mission") { create = nil } }
     }
@@ -45,7 +47,7 @@ struct RovaiWorkspaceRoot: View {
                     if model.connected { switch tab { case 0: threadList; case 1: missionList; case 2: memberList; case 3: canvasList; default: settings } }
                     else { ContentUnavailableView { Label("连接工作区", systemImage: "network") } description: { Text(profile?.name ?? "Rovai Workbench") } actions: { Button("连接") { Task { await model.authenticate() } }.disabled(model.busy); Button("管理服务器", action: onManageServers) } }
                 }.navigationTitle(["对话", "使命", "队员", "画布", "设置"][tab])
-                    .toolbar { ToolbarItemGroup(placement: .topBarTrailing) { if tab == 2 { Button { memberEditor = MemberEditorSelection(value: nil) } label: { Image(systemName: "person.badge.plus") }.disabled(!model.connected || model.pending != nil) }; if tab == 0 || tab == 1 { Button { create = tab == 1 ? "mission" : "thread" } label: { Image(systemName: "plus") }.disabled(!model.connected || model.pending != nil) }; Button { Task { await model.refresh() } } label: { Image(systemName: "arrow.clockwise") }.disabled(!model.connected) } }
+                    .toolbar { ToolbarItemGroup(placement: .topBarTrailing) { Button { notifications = true } label: { Image(systemName: "bell") }.disabled(!model.connected); if tab == 2 { Button { memberEditor = MemberEditorSelection(value: nil) } label: { Image(systemName: "person.badge.plus") }.disabled(!model.connected || model.pending != nil) }; if tab == 0 || tab == 1 { Button { create = tab == 1 ? "mission" : "thread" } label: { Image(systemName: "plus") }.disabled(!model.connected || model.pending != nil) }; Button { Task { await model.refresh() } } label: { Image(systemName: "arrow.clockwise") }.disabled(!model.connected) } }
             }.navigationSplitViewColumnWidth(min: 340, ideal: 400, max: 520)
         } detail: {
             NavigationStack {
@@ -66,7 +68,7 @@ struct RovaiWorkspaceRoot: View {
                 if model.connected { content() } else { ContentUnavailableView { Label("连接工作区", systemImage: "network") } description: { Text(profile?.name ?? "Rovai Workbench") } actions: { Button("连接") { Task { await model.authenticate() } }.buttonStyle(.borderedProminent).disabled(model.busy); Button("管理服务器", action: onManageServers) } }
             }
             .navigationTitle(title)
-            .toolbar { ToolbarItem(placement: .topBarLeading) { Menu { ForEach(store.servers) { profile in Button(profile.name) { selectedServerID = profile.id } }; Divider(); Button("管理服务器", action: onManageServers) } label: { Label(profile?.name ?? "工作区", systemImage: "server.rack") } }; ToolbarItemGroup(placement: .topBarTrailing) { if value == 2 { Button { memberEditor = MemberEditorSelection(value: nil) } label: { Image(systemName: "person.badge.plus") }.disabled(!model.connected || model.pending != nil) }; if value == 0 || value == 1 { Button { create = value == 1 ? "mission" : "thread" } label: { Image(systemName: "plus") }.disabled(!model.connected || model.pending != nil) }; Button { Task { await model.refresh() } } label: { Image(systemName: "arrow.clockwise") }.disabled(!model.connected) } }
+            .toolbar { ToolbarItem(placement: .topBarLeading) { Menu { ForEach(store.servers) { profile in Button(profile.name) { selectedServerID = profile.id } }; Divider(); Button("管理服务器", action: onManageServers) } label: { Label(profile?.name ?? "工作区", systemImage: "server.rack") } }; ToolbarItemGroup(placement: .topBarTrailing) { Button { notifications = true } label: { Image(systemName: "bell") }.disabled(!model.connected); if value == 2 { Button { memberEditor = MemberEditorSelection(value: nil) } label: { Image(systemName: "person.badge.plus") }.disabled(!model.connected || model.pending != nil) }; if value == 0 || value == 1 { Button { create = value == 1 ? "mission" : "thread" } label: { Image(systemName: "plus") }.disabled(!model.connected || model.pending != nil) }; Button { Task { await model.refresh() } } label: { Image(systemName: "arrow.clockwise") }.disabled(!model.connected) } }
             .navigationDestination(for: RovaiRoute.self) { route in switch route { case .thread(let id): RovaiThreadDetail(model: model, id: id); case .canvas(let id): RovaiCanvasView(model: model, id: id) } }
         }.tabItem { Label(title, systemImage: icon).environment(\.symbolVariants, .none) }.tag(value)
     }

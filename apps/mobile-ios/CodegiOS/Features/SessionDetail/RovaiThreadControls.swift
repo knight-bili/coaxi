@@ -4,22 +4,24 @@ import SwiftUI
 struct RovaiThreadControls: View {
     let model: RovaiWorkspaceModel
     let threadId: String
+    var projection: JSONValue? = nil
+    private var snapshot: JSONValue? { projection ?? model.thread }
     @State private var creating = false
     @State private var editing: TaskSelection?
     private struct TaskSelection: Identifiable { let value: JSONValue; var id: String { value.text("taskId") } }
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            ForEach((model.thread?["approvals"]?.rvArray ?? []).filter { $0.text("status") == "pending" }, id: \.self) { approval in
+            ForEach((snapshot?["approvals"]?.rvArray ?? []).filter { $0.text("status") == "pending" }, id: \.self) { approval in
                 GlassRow { VStack(alignment: .leading, spacing: 10) {
                     Text("需要你的许可").font(.headline)
                     Text(approval.text("actionSummary")); if !approval.text("reason").isEmpty { Text(approval.text("reason")).font(.caption).foregroundStyle(Theme.textSecondary) }
                     ForEach(approval["options"]?.rvArray ?? [], id: \.self) { option in Button { Task { await model.execute(.actionApprovalsResolve, params: .object(["commandId": .string(UUID().uuidString.lowercased()), "threadId": .string(threadId), "approvalId": .string(approval.text("id")), "expectedVersion": approval["version"] ?? .number(0), "optionId": .string(option.text("optionId")), "reason": .string("用户选择智能体原生选项：\(option.text("optionId"))。")])) } } label: { VStack(alignment: .leading, spacing: 4) { Text(option.text("label")); Text(option.text("consequence")).font(.caption).foregroundStyle(Theme.textSecondary) }.frame(maxWidth: .infinity, alignment: .leading) }.disabled(model.pending != nil || model.busy) }
                 } }
             }
-            ForEach(Array(Set((model.thread?["agentRuns"]?.rvArray ?? []).map { $0.text("conversationId") }.filter { !$0.isEmpty })).sorted(), id: \.self) { id in RovaiInteractionCards(model: model, conversationId: id); RovaiDelegationList(model: model, threadId: threadId, parentConversationId: id) }
-            ForEach((model.thread?["agentRuns"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in RovaiExecutionHistory(model: model, threadId: threadId, run: row.value, observed: model.thread?["executionEvidence"]?.rvArray ?? []) }
+            ForEach(Array(Set((snapshot?["agentRuns"]?.rvArray ?? []).map { $0.text("conversationId") }.filter { !$0.isEmpty })).sorted(), id: \.self) { id in RovaiInteractionCards(model: model, conversationId: id); RovaiDelegationList(model: model, threadId: threadId, parentConversationId: id) }
+            ForEach((snapshot?["agentRuns"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in RovaiExecutionHistory(model: model, threadId: threadId, run: row.value, observed: snapshot?["executionEvidence"]?.rvArray ?? []) }
             HStack { Text("任务").font(.headline); Spacer(); Button("新建任务") { creating = true }.disabled(model.pending != nil) }
-            ForEach(model.thread?["tasks"]?.rvArray ?? [], id: \.self) { task in GlassRow { VStack(alignment: .leading, spacing: 8) { HStack { Text(task.text("title")).font(.headline); Spacer(); Text(task.text("status")).font(.caption).foregroundStyle(Theme.textSecondary) }; Text(task.text("description")); if !task.text("blockedReason").isEmpty { Text(task.text("blockedReason")).foregroundStyle(Theme.warning) }; if !task.text("completionSummary").isEmpty { MarkdownContent(raw: task.text("completionSummary")) }; Button("编辑任务") { editing = TaskSelection(value: task) }.disabled(model.pending != nil) } } }
+            ForEach(snapshot?["tasks"]?.rvArray ?? [], id: \.self) { task in GlassRow { VStack(alignment: .leading, spacing: 8) { HStack { Text(task.text("title")).font(.headline); Spacer(); Text(task.text("status")).font(.caption).foregroundStyle(Theme.textSecondary) }; Text(task.text("description")); if !task.text("blockedReason").isEmpty { Text(task.text("blockedReason")).foregroundStyle(Theme.warning) }; if !task.text("completionSummary").isEmpty { MarkdownContent(raw: task.text("completionSummary")) }; Button("编辑任务") { editing = TaskSelection(value: task) }.disabled(model.pending != nil) } } }
         }
         .sheet(isPresented: $creating) { RovaiTaskEditor(model: model, threadId: threadId, task: nil) }
         .sheet(item: $editing) { RovaiTaskEditor(model: model, threadId: threadId, task: $0.value) }
