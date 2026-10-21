@@ -44,7 +44,7 @@ pub fn file_digest(path:&Path)->Result<(u64,String)>{hash_file(path)}
 fn hash_file(path:&Path)->Result<(u64,String)>{let mut file=fs::File::open(path)?;let mut hash=Sha256::new();let mut bytes=0_u64;let mut buffer=[0_u8;64*1024];loop{let count=file.read(&mut buffer)?;if count==0{break}bytes+=count as u64;hash.update(&buffer[..count]);}Ok((bytes,format!("{:x}",hash.finalize())))}
 fn no_link(path:&Path)->Result<()>{let metadata=fs::symlink_metadata(path)?;ensure!(!metadata.file_type().is_symlink(),"backup.linked_path: {}",path.display());#[cfg(windows)]{use std::os::windows::fs::MetadataExt;ensure!(metadata.file_attributes()&0x400==0,"backup.linked_path");}Ok(())}
 fn name(value:&str)->Result<()>{ensure!(!value.is_empty()&&!value.contains(['\0',':','\\'])&&Path::new(value).components().all(|part|matches!(part,Component::Normal(_))),"backup.invalid_entry");Ok(())}
-fn excluded(value:&str)->bool{value==CORE_DATA_DIR_LOCK_FILE||value==owned_roots::REGISTRY_FILE||value=="backup-owned-roots-issue.json"||value=="backup-desktop-preferences-v1.json"||value.split('/').next().is_some_and(|name|[".rovai-restore-",".rovai-before-",".rovai-after-"].iter().any(|prefix|name.starts_with(prefix)))||matches!(value.split('/').next(),Some("pets-market-cache"|"logs"|"run-tmp"|"tmp"|"crash-dumps"|"Crashpad"|"Cache"|"Code Cache"|"GPUCache"|".codegraph"))}
+fn excluded(value:&str)->bool{value==CORE_DATA_DIR_LOCK_FILE||value==owned_roots::REGISTRY_FILE||value=="backup-owned-roots-issue.json"||value=="backup-desktop-preferences-v1.json"||value=="config-sync-pending-v1.json"||value.split('/').next().is_some_and(|name|[".rovai-restore-",".rovai-before-",".rovai-after-"].iter().any(|prefix|name.starts_with(prefix)))||matches!(value.split('/').next(),Some("pets-market-cache"|"logs"|"run-tmp"|"tmp"|"crash-dumps"|"Crashpad"|"Cache"|"Code Cache"|"GPUCache"|".codegraph"))}
 fn files(root:&Path)->Result<Vec<(String,PathBuf)>>{files_ignoring(root,&[])}
 fn files_ignoring(root:&Path,ignored:&[PathBuf])->Result<Vec<(String,PathBuf)>>{
     let mut queue=vec![root.to_path_buf()];let mut result=Vec::new();
@@ -54,7 +54,7 @@ fn files_ignoring(root:&Path,ignored:&[PathBuf])->Result<Vec<(String,PathBuf)>>{
 fn administrative(root:&Path)->Result<PathBuf>{let parent=root.parent().context("backup.root_parent_required")?;let key=format!("{:x}",Sha256::digest(root.to_string_lossy().as_bytes()));let directory=parent.join(format!(".rovai-backup-{}",&key[..16]));prepare_private_directory(&directory)?;Ok(directory)}
 fn progress(done:u64,total:u64,phase:&str){eprintln!("{}",serde_json::json!({"phase":phase,"done":done,"total":total}));}
 pub fn create(root:&Path,destination:&Path,passphrase:&str,cancel:&CancellationToken)->Result<Manifest>{
-    ensure!(passphrase.chars().count()>=8,"backup.passphrase_too_short");let lease=CoreDataDirLease::acquire(root)?;let root=lease.data_dir();
+    ensure!(passphrase.chars().count()>=8,"backup.passphrase_too_short");let lease=CoreDataDirLease::acquire(root)?;let root=lease.data_dir();ensure!(!root.join("config-sync-pending-v1.json").exists(),"backup.configuration_recovery_required");
     let parent=fs::canonicalize(destination.parent().context("backup.destination_parent_required")?)?;
     ensure!(!parent.starts_with(root)&&!destination.exists(),"backup.destination_inside_data_or_exists");
     let administrative=administrative(root)?;let operation=administrative.join(uuid::Uuid::new_v4().to_string());prepare_private_directory(&operation)?;
@@ -90,7 +90,7 @@ pub fn inspect(root:&Path,archive:&Path,passphrase:&str,cancel:&CancellationToke
     let result=(||{let zip=decrypt(archive,&temporary,passphrase,cancel)?;let mut archive=zip::ZipArchive::new(fs::File::open(zip)?)?;read_manifest(&mut archive)})();let _=fs::remove_dir_all(&temporary);result
 }
 pub fn stage(root:&Path,archive:&Path,passphrase:&str,cancel:&CancellationToken)->Result<Manifest>{
-    let lease=CoreDataDirLease::acquire(root)?;let root=lease.data_dir();let administrative=administrative(root)?;ensure!(!administrative.join("pending.json").exists(),"backup.restore_already_pending");
+    let lease=CoreDataDirLease::acquire(root)?;let root=lease.data_dir();ensure!(!root.join("config-sync-pending-v1.json").exists(),"backup.configuration_recovery_required");let administrative=administrative(root)?;ensure!(!administrative.join("pending.json").exists(),"backup.restore_already_pending");
     let operation=administrative.join(uuid::Uuid::new_v4().to_string());prepare_private_directory(&operation)?;let staging=operation.join("staging");prepare_private_directory(&staging)?;
     let result=(||->Result<Manifest>{
         let zip=decrypt(archive,&operation,passphrase,cancel)?;let mut archive=zip::ZipArchive::new(fs::File::open(&zip)?)?;let manifest=read_manifest(&mut archive)?;
