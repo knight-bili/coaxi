@@ -33,7 +33,7 @@ class KeystoreSecretStore @Inject constructor(
         val iv = cipher.iv
         val ciphertext = cipher.doFinal(value.toByteArray(Charsets.UTF_8))
         val blob = iv + ciphertext
-        prefs.edit().putString(key, Base64.encodeToString(blob, Base64.NO_WRAP)).apply()
+        check(prefs.edit().putString(key, Base64.encodeToString(blob, Base64.NO_WRAP)).commit()) { "安全数据未能保存" }
     }
 
     override fun get(key: String): String? {
@@ -49,7 +49,7 @@ class KeystoreSecretStore @Inject constructor(
     }
 
     override fun remove(key: String) {
-        prefs.edit().remove(key).apply()
+        check(prefs.edit().remove(key).commit()) { "安全数据未能移除" }
     }
 
     private fun secretKey(): SecretKey {
