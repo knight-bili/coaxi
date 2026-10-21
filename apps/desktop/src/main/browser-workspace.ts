@@ -1,9 +1,10 @@
-import { BrowserWindow, type IpcMainInvokeEvent } from 'electron'
+import { BrowserWindow, shell, type IpcMainInvokeEvent } from 'electron'
 import { createHash, randomUUID } from 'node:crypto'
-import type { BrowserWorkspaceApi, BrowserWorkspaceView, CoreMethod } from '@contracts'
+import type { BrowserWorkspaceApi, BrowserWorkspaceView, BrowserPreferences, CoreMethod } from '@contracts'
 import agentBundle from './codeg-browser-agent.js?raw'
 import { BrowserDownloads } from './browser-downloads'
 import { BrowserProfiles } from './browser-profiles'
+import { BrowserPreferenceStore } from './browser-preferences'
 
 type Request = <T>(method: CoreMethod, params?: unknown) => Promise<T>
 type Surface = {
@@ -24,6 +25,7 @@ export class BrowserWorkspace {
   private readonly surfaces=new Map<string,Surface>()
   private readonly downloads=new BrowserDownloads()
   private readonly profiles=new BrowserProfiles(value=>this.downloads.hasActive(value))
+  private readonly preferences=new BrowserPreferenceStore(()=>{for(const surface of this.surfaces.values()){this.revoke(surface);if(!surface.window.isDestroyed()){surface.window.webContents.stop();if(this.preferences.action(surface.view.url)!=='builtin')surface.view.error='此地址的浏览规则已变更，请在允许的地址继续浏览'}}})
   constructor(private readonly request:Request,private readonly owner:()=>BrowserWindow|null){}
   private trusted(event:IpcMainInvokeEvent):void{
     const owner=this.owner()
@@ -45,6 +47,11 @@ export class BrowserWorkspace {
   }
   async invoke(event:IpcMainInvokeEvent,operation:unknown,input:unknown):Promise<unknown>{
     this.trusted(event)
+    if(operation==='preferences')return this.preferences.get()
+    if(operation==='updatePreferences'){
+      if(!input||typeof input!=='object'||Array.isArray(input))throw new Error('browser.invalid_request')
+      return this.preferences.update(input as BrowserPreferences)
+    }
     if(operation==='profiles')return this.profiles.list()
     if(operation==='profileControl'){
       if(!input||typeof input!=='object'||Array.isArray(input))throw new Error('browser.invalid_request')
@@ -73,16 +80,20 @@ export class BrowserWorkspace {
       await this.request('workbench.files.list',{scope:{threadId},path:''})
       const initial=address(url),id=randomUUID()
       if(profileId!==undefined&&typeof profileId!=='string')throw new Error('browser.invalid_profile')
+      await this.preferences.get()
+      if(this.preferences.action(initial)!=='builtin')throw new Error('browser.address_rule_requires_other_destination')
       const admission=await this.profiles.admit(profileId,id)
+      let policy:Awaited<ReturnType<BrowserPreferenceStore['attach']>>
+      try{policy=await this.preferences.attach(admission.session)}catch(error){admission.release();throw error}
       let window:BrowserWindow
-      try{window=new BrowserWindow({width:1100,height:780,show:false,title:'浏览器',autoHideMenuBar:true,webPreferences:{session:admission.session,nodeIntegration:false,contextIsolation:true,sandbox:true,webSecurity:true,allowRunningInsecureContent:false,devTools:false}})}catch(error){admission.release();throw error}
+      try{window=new BrowserWindow({width:1100,height:780,show:false,title:'浏览器',autoHideMenuBar:true,webPreferences:{session:admission.session,nodeIntegration:false,contextIsolation:true,sandbox:true,webSecurity:true,allowRunningInsecureContent:false,devTools:policy.devtools}})}catch(error){policy.release();admission.release();throw error}
       const surface:Surface={window,console:[],tail:Promise.resolve(),grantOrigin:null,view:{id,threadId,profileId:admission.profileId,url:initial,title:'浏览器',level:'none',expiresAt:null,loading:true,error:null}}
       this.surfaces.set(id,surface)
       window.webContents.session.setPermissionRequestHandler((_contents,_permission,callback)=>callback(false))
       window.webContents.session.setPermissionCheckHandler(()=>false)
       const unbindDownloads=this.downloads.bind(window.webContents.session,window.webContents,threadId,id)
       window.webContents.setWindowOpenHandler(()=>({action:'deny'}))
-      const navigation=(event:Electron.Event,url:string):void=>{try{address(url)}catch{event.preventDefault();return};if(surface.grantOrigin&&new URL(url).origin!==surface.grantOrigin)this.revoke(surface)}
+      const navigation=(event:Electron.Event,url:string):void=>{try{address(url);if(this.preferences.action(url)!=='builtin')throw new Error('browser.site_blocked')}catch{event.preventDefault();this.revoke(surface);surface.view.error='此地址受到浏览规则限制';return};if(surface.grantOrigin&&new URL(url).origin!==surface.grantOrigin)this.revoke(surface)}
       window.webContents.on('will-navigate',navigation)
       window.webContents.on('will-redirect',navigation)
       window.webContents.on('did-navigate',(_event,url)=>{surface.view.url=url;if(surface.grantOrigin&&new URL(url).origin!==surface.grantOrigin)this.revoke(surface)})
@@ -97,7 +108,7 @@ export class BrowserWorkspace {
         surface.console.push({level:typeof details==='object'?String(details.level):String(details),message:String(message??'').slice(0,16000),at:Date.now()})
         if(surface.console.length>200)surface.console.shift()
       })
-      window.once('closed',()=>{admission.release();unbindDownloads();this.revoke(surface);this.surfaces.delete(id)})
+      window.once('closed',()=>{policy.release();admission.release();unbindDownloads();this.revoke(surface);this.surfaces.delete(id)})
       window.once('ready-to-show',()=>window.show())
       void window.loadURL(initial).catch(error=>{surface.view.error=String(error);surface.view.loading=false;window.show()})
       return this.snapshot(surface)
@@ -110,9 +121,11 @@ export class BrowserWorkspace {
       if(operation==='control'){
         const value=input as Parameters<BrowserWorkspaceApi['control']>[0]
         switch(value.action){
+          case 'devtools':if(!(await this.preferences.get()).devtools)throw new Error('browser.devtools_disabled');surface.window.webContents.openDevTools({mode:'detach'});break
+          case 'system':{const target=address(value.url??surface.view.url);if(this.preferences.action(target)==='block')throw new Error('browser.address_blocked');await shell.openExternal(target);break}
           case 'focus':surface.window.show();surface.window.focus();break
           case 'close':surface.window.close();return null
-          case 'navigate':this.revoke(surface);await surface.window.loadURL(address(value.url??''));break
+          case 'navigate':{const target=address(value.url??'');if(this.preferences.action(target)!=='builtin')throw new Error('browser.address_rule_requires_other_destination');this.revoke(surface);await surface.window.loadURL(target);break}
           case 'back':if(surface.window.webContents.navigationHistory.canGoBack())surface.window.webContents.navigationHistory.goBack();break
           case 'forward':if(surface.window.webContents.navigationHistory.canGoForward())surface.window.webContents.navigationHistory.goForward();break
           case 'reload':surface.window.webContents.reload();break

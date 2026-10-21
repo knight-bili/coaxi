@@ -78,6 +78,8 @@ const api: RovaiApi = {
   officeWorkspace: {open:(threadId,path,editable)=>ipcRenderer.invoke('rovai:office-workspace',{threadId,path,editable})},
   computerWorkspace: { request: (threadId,input)=>ipcRenderer.invoke('rovai:computer-workspace',{threadId,input,commandId:globalThis.crypto.randomUUID()}) },
   browserWorkspace: {
+    preferences: () => ipcRenderer.invoke('rovai:browser-workspace','preferences'),
+    updatePreferences: input => ipcRenderer.invoke('rovai:browser-workspace','updatePreferences',input),
     profiles: () => ipcRenderer.invoke('rovai:browser-workspace','profiles'),
     profileControl: input => ipcRenderer.invoke('rovai:browser-workspace','profileControl',input),
     downloads: threadId => ipcRenderer.invoke('rovai:browser-workspace','downloads',threadId),

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ArrowLeft, ArrowRight, ExternalLink, Globe, Plus, RefreshCw, ShieldOff, X } from 'lucide-react'
 import type { BrowserWorkspaceView } from '@contracts'
+import { BrowserSettingsDialog } from './BrowserSettingsDialog'
 import { BrowserProfiles } from './BrowserProfiles'
 import { BrowserDownloadBar } from './BrowserDownloadBar'
 import { newCommandId } from '../../shared/command-id'
@@ -13,7 +14,8 @@ export function BrowserWorkbench({threadId}:{threadId:string}):React.JSX.Element
   const api=useThreadClient().browserWorkspace,t=useUiText()
   const [tabs,setTabs]=useState<BrowserWorkspaceView[]>([]),[selected,setSelected]=useState<string|null>(null),[url,setUrl]=useState('http://localhost:3000')
   const [busy,setBusy]=useState(false),[error,setError]=useState<string|null>(null),[preview,setPreview]=useState<{tree?:string;image?:string;console?:Array<{level:string;message:string;at:number}>}|null>(null)
-  const [profileId,setProfileId]=useState('temporary')
+  const [profileId,setProfileId]=useState('temporary'),[devtools,setDevtools]=useState(false)
+  useEffect(()=>{let cancelled=false;void api?.preferences().then(value=>{if(!cancelled)setDevtools(value.devtools)}).catch(()=>undefined);return()=>{cancelled=true}},[api])
   const current=tabs.find(tab=>tab.id===selected)
   useEffect(()=>{let cancelled=false;const refresh=():void=>{void api?.list(threadId).then(value=>{if(!cancelled)setTabs(value)}).catch(failure=>{if(!cancelled)setError(String(failure))})};refresh();const timer=window.setInterval(refresh,2000);return()=>{cancelled=true;window.clearInterval(timer)}},[api,threadId])
   const run=async(action:()=>Promise<void>):Promise<void>=>{if(busy)return;setBusy(true);setError(null);try{await action()}catch(failure){setError(String(failure))}finally{setBusy(false)}}
@@ -32,7 +34,7 @@ export function BrowserWorkbench({threadId}:{threadId:string}):React.JSX.Element
   if(!api)return <div className="workbench-empty"><Globe size={28}/><p>{t('浏览器页面由桌面主机管理。请在桌面端打开并选择要共享的页面。')}</p></div>
   return <div className="workbench-browser">
     <form className="workbench-toolbar" onSubmit={event=>{event.preventDefault();void run(async()=>{const tab=await api.open(threadId,url,profileId);setTabs(previous=>[...previous,tab]);setSelected(tab.id);setPreview(null)})}}>
-      <BrowserProfiles api={api} value={profileId} onChange={setProfileId}/><Globe size={16}/><input aria-label={t('网页地址')} value={url} onChange={event=>setUrl(event.target.value)} placeholder="https://"/>
+      <BrowserSettingsDialog api={api} onChanged={value=>setDevtools(value.devtools)}/><BrowserProfiles api={api} value={profileId} onChange={setProfileId}/><Globe size={16}/><input aria-label={t('网页地址')} value={url} onChange={event=>setUrl(event.target.value)} placeholder="https://"/>
       <button type="submit" disabled={busy}><Plus size={14}/>{t('新页面')}</button>
     </form>
     {error&&<p className="workbench-error" role="alert">{error}</p>}
@@ -44,6 +46,8 @@ export function BrowserWorkbench({threadId}:{threadId:string}):React.JSX.Element
         <button type="button" disabled={busy} aria-label={t('前进')} onClick={()=>void run(()=>control('forward'))}><ArrowRight size={14}/></button>
         <button type="button" disabled={busy} aria-label={t('重新加载')} onClick={()=>void run(()=>control('reload'))}><RefreshCw size={14}/></button>
         <button type="button" disabled={busy} onClick={()=>void run(()=>control('focus'))}><ExternalLink size={14}/>{t('显示页面')}</button>
+        <button type="button" disabled={busy} onClick={()=>void run(()=>control('system'))}>{t('系统浏览器打开')}</button>
+        {devtools&&<button type="button" disabled={busy} onClick={()=>void run(()=>control('devtools'))}>{t('开发工具')}</button>}
         <button type="button" disabled={busy} onClick={()=>void run(()=>control('navigate',{url}))}>{t('前往地址')}</button>
         <select value={current.level} disabled={busy||current.loading} aria-label={t('本会话的页面共享权限')} onChange={event=>void run(()=>control('share',{level:event.target.value,minutes:30}))}>
           <option value="none">{t('未共享')}</option><option value="read">{t('允许本会话查看 · 30分钟')}</option><option value="control">{t('允许本会话操作 · 30分钟')}</option>
