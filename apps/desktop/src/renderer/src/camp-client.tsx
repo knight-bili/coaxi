@@ -24,6 +24,7 @@ export type ThreadClient = Pick<RovaiApi,
     }>
   }
   browserWorkspace?: RovaiApi['browserWorkspace']
+  computerWorkspace?: RovaiApi['computerWorkspace']
   editingRecovery?: EditingRecovery
   privateInputRecovery?: RovaiApi['privateInputRecovery']
   retryPendingCommand?: (method: 'runtime.interactions.resolve' | import('../../shared/private-conversation-operations').PrivateInputMethod | import('../../shared/private-conversation-operations').DelegationActionMethod, params: unknown) => Promise<void>

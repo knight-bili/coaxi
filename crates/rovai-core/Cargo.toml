@@ -11,6 +11,7 @@ slow-tests = ["extended-tests"]
 legacy-migration-tests = ["slow-tests"]
 
 [dependencies]
+rovai-computer = { path = "../rovai-computer" }
 anyhow = "1"
 base64 = "0.22"
 chrono = { version = "0.4", features = ["serde"] }

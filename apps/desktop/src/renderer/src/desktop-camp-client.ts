@@ -3,6 +3,7 @@ import type { ThreadClient } from './camp-client'
 /** Lazy Desktop-only compatibility adapter; importing it never accesses Electron. */
 export const desktopThreadClient: ThreadClient = {
   presentationScope: 'desktop',
+  get computerWorkspace() { return window.rovai.computerWorkspace },
   get browserWorkspace() { return window.rovai.browserWorkspace },
   get privateInputRecovery() { return window.rovai.privateInputRecovery },
   exportMonitoring: async filter => { const path = await window.rovai.exportMonitoring(filter); return { exported: Boolean(path), ...(path ? { path } : {}) } },

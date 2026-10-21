@@ -1243,6 +1243,13 @@ app.on('second-instance', () => {
 })
 
 const browserWorkspace = new BrowserWorkspace((method,params)=>core.request(method,params),()=>mainWindow)
+ipcMain.handle('rovai:computer-workspace',async(event,value:unknown)=>{
+  if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('computer.local_owner_required')
+  if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('computer.invalid_request')
+  const {threadId,input,commandId}=value as {threadId:string;input:unknown;commandId:string}
+  if(typeof threadId!=='string'||typeof commandId!=='string')throw new Error('computer.invalid_request')
+  return core.request('computer.local',{scope:{threadId},request:input,commandId})
+})
 ipcMain.handle('rovai:browser-workspace',(event,operation,input)=>browserWorkspace.invoke(event,operation,input))
 app.on('before-quit',()=>browserWorkspace.closeAll())
 

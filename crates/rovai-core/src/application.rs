@@ -13,6 +13,7 @@ mod native_interactions;
 mod native_child_reads;
 mod workbench;
 mod browser_access;
+mod computer_access;
 mod forge;
 pub(crate) mod private_composer;
 mod private_sources;
@@ -10321,6 +10322,7 @@ impl Core {
                     "blockers": blockers,
                 }))
             }
+            "computer.local" => self.computer_access(request.params.clone()).await,
             "browser.local.grant" | "browser.local.revoke" | "browser.local.begin" | "browser.local.finish" => self.browser_access(&request.method, request.params.clone()).await,
             "workbench.files.list" | "workbench.files.read" => {
                 self.workbench_files(&request.method, request.params.clone()).await

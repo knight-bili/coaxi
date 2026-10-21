@@ -62,6 +62,7 @@ async function invokeHostWeb<T>(operation: string, input?: unknown): Promise<T> 
 }
 
 const api: RovaiApi = {
+  computerWorkspace: { request: (threadId,input)=>ipcRenderer.invoke('rovai:computer-workspace',{threadId,input,commandId:globalThis.crypto.randomUUID()}) },
   browserWorkspace: {
     list: threadId => ipcRenderer.invoke('rovai:browser-workspace','list',threadId),
     open: (threadId,url) => ipcRenderer.invoke('rovai:browser-workspace','open',{threadId,url}),

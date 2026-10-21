@@ -1,5 +1,6 @@
 //! Codeg computer helper and policy primitives; Core owns Thread/Run grants.
 pub mod computer;
+pub mod service;
 pub mod transport;
 mod driver_cache;
 #[derive(Debug,Clone,Copy,Default,PartialEq,Eq,serde::Serialize,serde::Deserialize)]

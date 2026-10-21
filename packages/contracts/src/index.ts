@@ -5003,6 +5003,7 @@ export type CoreMethod =
   | 'runtime.interactions.get'
   | 'runtime.interactions.resolve'
   | 'runtime.childReads.start'
+  | 'computer.local'
   | 'browser.local.grant'
   | 'browser.local.revoke'
   | 'browser.local.begin'
@@ -5111,6 +5112,7 @@ export interface BrowserWorkspaceView { id:string; threadId:string;url:string;ti
 export interface RovaiApi {
   /** Native local owner surface; intentionally absent from remote Web. */
   browserWorkspace?: BrowserWorkspaceApi
+  computerWorkspace?: { request<T>(threadId:string,input:{operation:string;targetId?:string;level?:'none'|'read'|'control';permission?:'accessibility'|'screenRecording';action?:unknown;enabled?:boolean}):Promise<T> }
   /** Desktop-local private editor durability; never a Core receipt or Web resource grant. */
   privateInputRecovery?: {
     get(identity: string): {found:false} | {found:true; value:unknown}
