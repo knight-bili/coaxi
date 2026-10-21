@@ -11,7 +11,8 @@ struct RovaiMessageArtifacts: View {
     @State private var source: JSONValue?
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            ForEach(message["quotes"]?.rvArray ?? [], id: \.self) { quote in GlassRow { VStack(alignment: .leading, spacing: 4) { Text("引用 · " + (quote["authorAtCapture"]?.text("displayName") ?? "")).font(.caption).foregroundStyle(Theme.textSecondary); MarkdownContent(raw: quote.text("text")) } } }
+            ForEach(message["quotes"]?.rvArray ?? [], id: \.self) { quote in GlassRow { VStack(alignment: .leading, spacing: 4) { Text("引用 · " + (quote["authorAtCapture"]?.text("displayName") ?? "")).font(.caption).foregroundStyle(Theme.textSecondary); MarkdownContent(raw: quote.text("text")); if let origin = quote["source"], origin.text("scope") == "camp", origin.text("threadId") == threadId, !origin.text("messageId").isEmpty {RovaiPublicMessageOrigin(model: model, threadId: threadId, messageId: origin.text("messageId"), label: "查看引用原消息")} } } }
+            if conversationId == nil, !message.text("replyToThreadMessageId").isEmpty {RovaiPublicMessageOrigin(model: model, threadId: threadId, messageId: message.text("replyToThreadMessageId"), label: "查看回复原消息")}
             ForEach((message["attachments"]?.rvArray ?? []).filter { $0.text("previewKind") != "image" }.map { RovaiRow(value: $0) }) { row in
                 Button { source = request(row.id) } label: { Label(row.value.text("displayName"), systemImage: row.value.text("previewKind") == "image" ? "photo" : "doc").font(.subheadline) }.disabled(["missing", "unreadable", "kind_changed"].contains(row.value.text("availability")))
             }

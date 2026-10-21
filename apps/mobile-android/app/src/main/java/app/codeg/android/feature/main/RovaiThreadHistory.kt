@@ -3,6 +3,7 @@ package app.codeg.android.feature.main
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -16,7 +17,7 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.json.*
 
 @Composable fun RovaiThreadHistory(model:RovaiWorkspaceViewModel,threadId:String,anchor:String?=null,onClose:()->Unit){
-    val generation=model.connectionGeneration;val scope=rememberCoroutineScope()
+    val generation=model.connectionGeneration;val scope=rememberCoroutineScope();val listState=rememberLazyListState()
     var rows by remember{mutableStateOf<List<JsonObject>>(emptyList())};var before by remember{mutableStateOf<Long?>(null)}
     var watermark by remember{mutableLongStateOf(0)};var query by remember{mutableStateOf("")};var frozenQuery by remember{mutableStateOf("")}
     var matchIndex by remember{mutableIntStateOf(0)};var total by remember{mutableIntStateOf(0)};var focused by remember{mutableStateOf(anchor)}
@@ -26,12 +27,13 @@ import kotlinx.serialization.json.*
     suspend fun find(text:String,index:Int){val value=model.query(RovaiOperation.THREAD_MESSAGES_FIND,buildJsonObject{put("threadId",threadId);put("query",text);put("selectedMatchIndex",index)}).coreObject();require(generation==model.connectionGeneration);frozenQuery=text;total=value.coreLong("totalMatchCount").toInt();matchIndex=value.coreLong("selectedMatchIndex").toInt();val match=value["match"].coreObject();if(match.coreText("messageId").isNotEmpty())around(match.coreText("messageId"))else{rows=emptyList();before=null;focused=null}}
     fun work(block:suspend ()->Unit){if(busy)return;busy=true;issue=null;scope.launch{try{block()}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message}finally{busy=false}}}
     LaunchedEffect(threadId,anchor){busy=true;try{if(anchor!=null)around(anchor)else page(9007199254740991)}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message}finally{busy=false}}
+    LaunchedEffect(focused,rows){val index=rows.indexOfFirst{it.coreText("id")==focused};if(index>=0)listState.scrollToItem(index+if(before!=null&&before!!>0)1 else 0)}
     Dialog(onDismissRequest=onClose,properties=DialogProperties(usePlatformDefaultWidth=false)){Surface(Modifier.fillMaxSize(),color=CodegTheme.colors.bgElevated){Column(Modifier.fillMaxSize().padding(12.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){
-        Row{Text("消息记录",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(onClick=onClose){Text("关闭")}}
+        Row{Text("消息记录",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(enabled=!busy,onClick={work{rows=emptyList();before=null;focused=null;frozenQuery="";watermark=0;page(9007199254740991)}}){Text("最新")};TextButton(onClick=onClose){Text("关闭")}}
         Row{OutlinedTextField(query,{query=it},Modifier.weight(1f),label={Text("搜索消息")},singleLine=true);TextButton(enabled=!busy&&query.isNotBlank(),onClick={work{find(query,0)}}){Text("搜索")}}
         if(frozenQuery.isNotEmpty())Row{Text("${if(total==0)0 else matchIndex+1} / $total",Modifier.weight(1f));TextButton(enabled=!busy&&matchIndex>0,onClick={work{find(frozenQuery,matchIndex-1)}}){Text("上一处")};TextButton(enabled=!busy&&matchIndex+1<total,onClick={work{find(frozenQuery,matchIndex+1)}}){Text("下一处")}}
         issue?.let{Text(it,color=CodegTheme.colors.danger)}
-        LazyColumn(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(10.dp)){
+        LazyColumn(Modifier.weight(1f),state=listState,verticalArrangement=Arrangement.spacedBy(10.dp)){
             before?.takeIf{it>0}?.let{cursor->item{TextButton(enabled=!busy,onClick={work{page(cursor)}}){Text("更早的消息")}}}
             items(rows,key={it.coreText("id")}){message->GlassRow(Modifier.fillMaxWidth(),selected=message.coreText("id")==focused){Text(message.coreText("authorDisplayName").ifEmpty{message.coreText("authorType")},style=MaterialTheme.typography.labelMedium);Text(message.coreText("createdAt"),style=MaterialTheme.typography.labelSmall,color=CodegTheme.colors.textSecondary);RovaiMessageBody(model,threadId,message)}}
             if(!busy&&rows.isEmpty())item{Text("没有消息记录",color=CodegTheme.colors.textSecondary)}

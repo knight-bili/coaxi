@@ -129,6 +129,7 @@ private struct RovaiMoreThreads: View {
 private struct RovaiThreadDetail: View {
     let model: RovaiWorkspaceModel; let id: String
     @State private var importedHistory = false
+    @State private var messageHistory = false
     @State private var engineering = false
     @State private var privateChat = false
     @State private var library = false
@@ -155,11 +156,12 @@ private struct RovaiThreadDetail: View {
                 Button { sendPublicBody() } label: { Image(systemName: "paperplane").font(.title3).padding(12) }.disabled(inputLocked || inputIssue != nil || text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !model.publicSourcesReady)
             }.padding(12)
         }.navigationTitle(model.thread?["thread"]?.text("title") ?? "对话")
-        .toolbar { ToolbarItem(placement: .topBarTrailing) { Button { library = true } label: { Image(systemName: "text.bubble") }.disabled(inputLocked); Button { privateChat = true } label: { Image(systemName: "person.bubble") }; Button { importedHistory = true } label: { Image(systemName: "clock.arrow.circlepath") }.accessibilityLabel("已导入会话"); Button { engineering = true } label: { Image(systemName: "folder") } } }
+        .toolbar { ToolbarItem(placement: .topBarTrailing) { Button { library = true } label: { Image(systemName: "text.bubble") }.disabled(inputLocked); Button { privateChat = true } label: { Image(systemName: "person.bubble") }; Button {messageHistory = true} label: {Image(systemName: "magnifyingglass")}.accessibilityLabel("消息记录和搜索"); Button { importedHistory = true } label: { Image(systemName: "clock.arrow.circlepath") }.accessibilityLabel("已导入会话"); Button { engineering = true } label: { Image(systemName: "folder") } } }
         .sheet(isPresented: $library) { NavigationStack { RovaiMessageLibrary(model: model, threadId: id) { content in
             guard !inputLocked else { return false }; text = text.isEmpty ? content : text + "\n" + content; inputRevision += 1; persistPublicBody(); library = false; return true
         }.toolbar { ToolbarItem(placement: .cancellationAction) { Button("返回输入") { library = false } } } } }
         .sheet(isPresented: $privateChat) { RovaiPrivateConversationView(model: model, threadId: id) }
+        .sheet(isPresented: $messageHistory) {RovaiThreadHistory(model: model, threadId: id)}
         .sheet(isPresented: $importedHistory) {NavigationStack {RovaiHistoryLibrary(model: model, threadId: id).toolbar {ToolbarItem(placement: .cancellationAction) {Button("返回对话") {importedHistory = false}}}}}
         .sheet(isPresented: $engineering) { RovaiEngineeringView(model: model, threadId: id) }
         .task(id: id) {
