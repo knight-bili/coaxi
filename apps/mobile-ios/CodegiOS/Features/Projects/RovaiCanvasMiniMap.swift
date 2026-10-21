@@ -18,7 +18,7 @@ struct RovaiCanvasMiniMap: View {
                 for node in nodes {
                     let data = node["data"] ?? .null
                     let region = ["folder","group","agent","custom"].contains(data.text("kind"))
-                    let rect = CGRect(x: px+(number(data,"x",0)-bounds.left)*scale,y: py+(number(data,"y",0)-bounds.top)*scale,width: max(2,number(data,"width",320)*scale),height: max(2,(data["collapsed"] == .bool(true) ? 52 : number(data,"height",220))*scale))
+                    let rect = CGRect(x: px+(number(data,"x",0)-bounds.left)*scale,y: py+(number(data,"y",0)-bounds.top)*scale,width: max(2,number(data,"width",320)*scale),height: max(2,(data["collapsed"] == .bool(true) ? 40 : number(data,"height",220))*scale))
                     context.fill(Path(rect),with: .color((rovaiCanvasTint(data.text("color")) ?? Theme.textTertiary).opacity(region ? 0.14 : 0.35)))
                 }
                 let visible = CGRect(x: px+(-viewport.x/viewport.zoom-bounds.left)*scale,y: py+(-viewport.y/viewport.zoom-bounds.top)*scale,width: Double(stage.width)/viewport.zoom*scale,height: Double(stage.height)/viewport.zoom*scale)
