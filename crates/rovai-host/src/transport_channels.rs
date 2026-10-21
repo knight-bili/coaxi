@@ -37,6 +37,7 @@ impl TransportChannels{
                     if count<=4096&&atomic_write_private_bytes(&path,&bytes).is_ok(){if let Some(durable)=durable{let _=durable.send(());}}
                 },
                 _=timer.tick()=>{
+                    let _=call(&core,"backup.config.local",json!({"operation":"tick"})).await;
                     if let Ok(snapshot)=call(&core,"channels.adapters.private",json!({"operation":"list"})).await{
                         let next=snapshot["revision"].as_str().unwrap_or_default();
                         if next!=revision{for (_,(_,backend))in backends.drain(){let _=backend.stop().await;}configs=serde_json::from_value(snapshot["adapters"].clone()).unwrap_or_default();revision=next.into();

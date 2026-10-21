@@ -48,3 +48,5 @@ impl Core{
         super::webdav_transfer::start(&self.data_dir,settings.config,value,identity)
     }
 }
+
+pub(super) fn saved_connection(root:&Path)->Result<(Config,String)>{let path=root.join("webdav-settings-v1.json");ensure!(std::fs::metadata(&path)?.len()<=65536,"webdav.settings_limit");let settings:Settings=serde_json::from_slice(&std::fs::read(path)?)?;WebDav::new(settings.config.clone())?;Ok((settings.config,settings.revision))}

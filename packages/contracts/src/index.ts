@@ -5013,6 +5013,8 @@ export type CoreMethod =
   | 'appearance.extensions'
   | 'backup.webdav.settings'
   | 'backup.webdav.local'
+  | 'backup.config.local'
+  | 'backup.storage.desktop.register'
   | 'history.local'
   | 'history.library'
   | 'office.watch'

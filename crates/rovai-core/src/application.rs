@@ -20,6 +20,7 @@ mod office_access;
 mod history_import;
 mod webdav_access;
 mod webdav_transfer;
+mod config_sync;
 mod appearance_extensions;
 mod pets_access;
 mod office_skills;
@@ -10346,6 +10347,8 @@ impl Core {
             "pets.operation" => self.pets_access(false,request.params.clone()).await,
             "pets.local" => self.pets_access(true,request.params.clone()).await,
             "appearance.extensions" => self.appearance_extensions(request.params.clone()).await,
+            "backup.config.local" => self.config_sync_access(request.params.clone()).await,
+            "backup.storage.desktop.register" => {#[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Input{preferences_root:PathBuf}let input:Input=serde_json::from_value(request.params.clone())?;crate::backup::owned_roots::register_desktop(&self.data_dir,&input.preferences_root)?;Ok(json!({"registered":true}))},
             "backup.webdav.settings" => self.webdav_access(false,request.params.clone()).await,
             "backup.webdav.local" => self.webdav_access(true,request.params.clone()).await,
             "history.local" => self.history_import(true,request.params.clone()).await,
