@@ -7,6 +7,7 @@ struct RovaiEngineeringView: View {
     let threadId: String
     @Environment(\.dismiss) private var dismiss
     @State private var tab = 0
+    @State private var office: String?
     @State private var directory = ""
     @State private var entries: [JSONValue] = []
     @State private var after: String?
@@ -43,6 +44,7 @@ struct RovaiEngineeringView: View {
             .confirmationDialog("放弃尚未保存的修改？", isPresented: $discard, titleVisibility: .visible) { Button("放弃修改", role: .destructive) { file = nil; if leaving { dismiss() } }; Button("继续编辑", role: .cancel) {} }
             .sheet(item: $plan) { selected in NavigationStack { Form { Section("即将执行") { Text(selected.preview["arguments"]?.rvArray.compactMap { $0.stringValue }.joined(separator: " ") ?? "").font(.system(.caption, design: .monospaced)); if !selected.preview.text("cleanPreview").isEmpty { Text(selected.preview.text("cleanPreview")) } }; Button("确认执行") { Task { var args = selected.arguments.rvObject; args["commandId"] = .string(selected.commandId); args["expectedRevision"] = selected.preview["revision"]; args["confirmed"] = .bool(true); await model.execute(.workbenchGitExecute, params: .object(args)); plan = nil; if model.pending == nil { await work { await readGit() } } } }.disabled(model.pending != nil || model.busy) }.navigationTitle("确认 Git 操作").toolbar { Button("取消") { plan = nil } } } }
         }.interactiveDismissDisabled(dirty || busy || model.pending != nil)
+        .sheet(isPresented: Binding(get: { office != nil }, set: { if !$0 { office = nil } })) { if let office { RovaiOfficePreview(model: model, threadId: threadId, path: office) } }
     }
     @ViewBuilder private var files: some View {
         if let selected = file {
@@ -60,7 +62,7 @@ struct RovaiEngineeringView: View {
             List {
                 Section(directory.isEmpty ? "工程根目录" : directory) {
                     if !directory.isEmpty { Button { directory = (directory as NSString).deletingLastPathComponent } label: { Label("上一级", systemImage: "arrow.up") } }
-                    ForEach(entries, id: \.self) { entry in Button { if entry["directory"] == .bool(true) { directory = entry.text("path") } else { Task { await work { do { var value = try await model.query(.workbenchFilesRead, params: .object(["scope": scope, "path": .string(entry.text("path"))])).rvObject; value["path"] = entry["path"]; file = .object(value); draft = file?.text("text") ?? ""; baseline = draft } catch { issue = error.localizedDescription } } } } } label: { HStack(spacing: 12) { Image(systemName: entry["directory"] == .bool(true) ? "folder" : "doc.text").foregroundStyle(Theme.textSecondary); Text(entry.text("name")).foregroundStyle(Theme.textPrimary); Spacer(); if entry["directory"] == .bool(true) { Image(systemName: "chevron.right").font(.caption).foregroundStyle(Theme.textSecondary) } } }.disabled(busy || entry["link"] == .bool(true)).listRowBackground(Color.clear) }
+                    ForEach(entries, id: \.self) { entry in Button { if entry["directory"] == .bool(true) { directory = entry.text("path") } else if rovaiOfficeFile(entry.text("path")) { office = entry.text("path") } else { Task { await work { do { var value = try await model.query(.workbenchFilesRead, params: .object(["scope": scope, "path": .string(entry.text("path"))])).rvObject; value["path"] = entry["path"]; file = .object(value); draft = file?.text("text") ?? ""; baseline = draft } catch { issue = error.localizedDescription } } } } } label: { HStack(spacing: 12) { Image(systemName: entry["directory"] == .bool(true) ? "folder" : "doc.text").foregroundStyle(Theme.textSecondary); Text(entry.text("name")).foregroundStyle(Theme.textPrimary); Spacer(); if entry["directory"] == .bool(true) { Image(systemName: "chevron.right").font(.caption).foregroundStyle(Theme.textSecondary) } } }.disabled(busy || entry["link"] == .bool(true)).listRowBackground(Color.clear) }
                     if let after { Button("加载更多") { Task { await work { await readDirectory(after: after) } } }.disabled(busy) }
                 }
             }.scrollContentBackground(.hidden)

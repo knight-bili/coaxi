@@ -89,6 +89,7 @@ final class RovaiWorkspaceModel {
     }
     func query(_ operation: RovaiOperation, params: JSONValue = .object([:])) async throws -> JSONValue { guard let client else { throw RovaiHostFailure(code: "尚未连接工作区") }; return try await client.request(operation, params: params) }
     func files(_ action: String, params: JSONValue) async throws -> JSONValue { guard let client else { throw RovaiHostFailure(code: "尚未连接") }; let lifetime = generation; let result = try await client.files(action, request: params); guard lifetime == generation else { throw CancellationError() }; return result }
+    func officePreviewURL(port: Int, cap: String) async throws -> URL { guard let client else { throw RovaiHostFailure(code: "尚未连接") }; let lifetime = generation; let result = try await client.officePreviewURL(port: port, cap: cap); guard lifetime == generation else { throw CancellationError() }; return result }
     func fileBytes(_ action: String, params: JSONValue) async throws -> RovaiFileBytes { guard let client else { throw RovaiHostFailure(code: "尚未连接") }; let lifetime = generation; let result = try await client.fileBytes(action, request: params); guard lifetime == generation else { throw CancellationError() }; return result }
     private func bodyAccount(_ owner: String) -> String {
         "body:" + account + ":" + SHA256.hash(data: Data(owner.utf8)).map { String(format: "%02x", $0) }.joined()

@@ -87,6 +87,7 @@ actor RovaiHostClient {
         guard value["ok"] == .bool(true) else { throw RovaiHostFailure(code: value["error"]?.text("message") ?? "预览失败") }
         return value["value"] ?? .null
     }
+    func officePreviewURL(port: Int, cap: String) throws -> URL { guard (1...65535).contains(port), (32...256).contains(cap.utf8.count), cap.utf8.allSatisfy({ ($0 >= 48 && $0 <= 57) || ($0 >= 65 && $0 <= 90) || ($0 >= 97 && $0 <= 122) || $0 == 95 || $0 == 45 }), var parts = URLComponents(url: baseURL.appendingPathComponent("api/office-watch-proxy/\(port)/"), resolvingAgainstBaseURL: false) else { throw RovaiHostFailure(code: "预览授权无效") }; parts.queryItems = [URLQueryItem(name: "cap", value: cap)]; guard let url = parts.url else { throw RovaiHostFailure(code: "预览地址无效") }; return url }
     func fileBytes(_ action: String, request value: JSONValue) async throws -> RovaiFileBytes {
         guard ["readBinary", "readChildImage", "download"].contains(action) else { throw RovaiHostFailure(code: "文件操作无效") }
         let current = try await connect(); let lifetime = generation

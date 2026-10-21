@@ -78,6 +78,7 @@ class RovaiHostClient(rawBaseUrl:String,private val administratorToken:String,
         if(value["ok"]!=JsonPrimitive(true))throw RovaiHostFailure(value["error"]?.toString()?:"预览失败")
         return value["value"]?.jsonObject?:throw RovaiHostFailure("预览响应格式无效")
     }
+    fun officePreviewUrl(port:Int,cap:String):String{require(port in 1..65535&&cap.length in 32..256&&cap.all{it.isLetterOrDigit()&&it.code<128||it=='_'||it=='-'}){"预览授权无效"};return "$baseUrl/api/office-watch-proxy/$port/?cap=$cap"}
     suspend fun fileBytes(action:String,request:JsonObject):RovaiFileBytes {
         require(action in listOf("readBinary","readChildImage","download")){"文件操作无效"}
         val current=connect();val generation=lifetime.get()
