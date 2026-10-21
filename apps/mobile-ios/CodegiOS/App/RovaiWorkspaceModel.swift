@@ -21,6 +21,7 @@ final class RovaiWorkspaceModel {
     var members: [JSONValue] = []
     var missions: [JSONValue] = []
     var boards: [JSONValue] = []
+    var boardSummaries: [JSONValue] = []
     var thread: JSONValue?
     var threadId: String?
     var pending: JSONValue?
@@ -43,7 +44,7 @@ final class RovaiWorkspaceModel {
     @ObservationIgnored private var writing = false
     func bind(_ profile: ServerProfile?, store: ServerStore) async {
         terminals.values.forEach { $0.retire() }; terminals.removeAll()
-        generation &+= 1; events?.cancel(); client = nil; self.profile = profile; connected = false; thread = nil; threadId = nil; navigation = .object([:]); members = []; missions = []; boards = []; issue = nil; pending = nil; lastResult = nil; lastInputOwner = nil; lastInputBody = nil; lastOperation = nil; lastUploadResult = nil; publicSources = []; publicSourcesReady = false
+        generation &+= 1; events?.cancel(); client = nil; self.profile = profile; connected = false; thread = nil; threadId = nil; navigation = .object([:]); members = []; missions = []; boards = []; boardSummaries = []; issue = nil; pending = nil; lastResult = nil; lastInputOwner = nil; lastInputBody = nil; lastOperation = nil; lastUploadResult = nil; publicSources = []; publicSourcesReady = false
         guard let profile, let token = store.token(for: profile), let baseURL = profile.baseURL else { return }
         account = "pending:" + RovaiSecureSession.account(baseURL: baseURL, administratorToken: token)
         if let data = RovaiSecureSession.load(profile: profile.id, account: account) { pending = try? JSONDecoder().decode(JSONValue.self, from: data) }
@@ -74,7 +75,7 @@ final class RovaiWorkspaceModel {
             let (navValue, profileValue, missionValue, canvasValue) = try await (nav, profiles, missionList, canvasList)
             let opened = try await selected.asyncMap { try await client.request(.threadsOpen, params: .object(["threadId": .string($0), "traceId": .string(UUID().uuidString.lowercased())])) }
             guard lifetime == generation else { return }
-            navigation = navValue; members = profileValue.rvArray; missions = missionValue.rvArray; boards = canvasValue["boards"]?.rvArray ?? []; if selected == threadId { thread = opened }; issue = nil
+            navigation = navValue; members = profileValue.rvArray; missions = missionValue.rvArray; boards = canvasValue["boards"]?.rvArray ?? []; boardSummaries = canvasValue["summaries"]?.rvArray ?? []; if selected == threadId { thread = opened }; issue = nil
         } catch is CancellationError {} catch { if lifetime == generation { failure(error) } }
     }
     func open(_ threadId: String?) async { self.threadId = threadId; thread = nil; publicSources = []; publicSourcesReady = false; if let threadId { do { guard let profile else { return }; publicSources = try readPublicSources(threadId, profile: profile, account: account); publicSourcesReady = true; await refresh() } catch { issue = error.localizedDescription } } }
