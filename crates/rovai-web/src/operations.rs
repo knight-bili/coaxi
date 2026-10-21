@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 /// and the legacy shared draft remain outside the network capability.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum Operation {
+    #[serde(rename="appearance.extensions")]
+    AppearanceExtensions,
     #[serde(rename="backup.webdav.settings")]
     WebdavSettings,
     #[serde(rename="history.library")]
@@ -509,6 +511,7 @@ impl Operation {
         match self {
             Self::AppInfo => json!({"name":value["name"],"version":value["version"]}),
             Self::ForgeAccountsGet | Self::ForgeAccountsSet => select_fields(&value, &["accounts"]),
+            Self::AppearanceExtensions => select_fields(&value,&["revision","value"]),
             Self::WebdavSettings => select_fields(&value,&["revision","endpoint","username","passwordSet","allowInsecure"]),
             Self::HistoryLibrary => select_fields(&value,&["entries","digest","totalBytes","offset","next","bytes","saved"]),
             Self::OfficeWatch => select_fields(&value,&["holdId","port","cap","editable","released","installed","formats"]),
@@ -585,6 +588,7 @@ impl Operation {
         match self {
             Self::ForgeAccountsGet => "forge.accounts.get",
             Self::ForgeAccountsSet => "forge.accounts.set",
+            Self::AppearanceExtensions => "appearance.extensions",
             Self::WebdavSettings => "backup.webdav.settings",
             Self::HistoryLibrary => "history.library",
             Self::OfficeWatch => "office.watch",

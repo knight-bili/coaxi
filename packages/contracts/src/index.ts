@@ -5003,6 +5003,7 @@ export type CoreMethod =
   | 'runtime.interactions.get'
   | 'runtime.interactions.resolve'
   | 'runtime.childReads.start'
+  | 'appearance.extensions'
   | 'backup.webdav.settings'
   | 'backup.webdav.local'
   | 'history.local'

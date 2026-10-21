@@ -17,6 +17,7 @@ mod computer_access;
 mod office_access;
 mod history_import;
 mod webdav_access;
+mod appearance_extensions;
 mod forge;
 pub(crate) mod private_composer;
 mod private_sources;
@@ -10326,6 +10327,7 @@ impl Core {
                     "blockers": blockers,
                 }))
             }
+            "appearance.extensions" => self.appearance_extensions(request.params.clone()).await,
             "backup.webdav.settings" => self.webdav_access(false,request.params.clone()).await,
             "backup.webdav.local" => self.webdav_access(true,request.params.clone()).await,
             "history.local" => self.history_import(true,request.params.clone()).await,
