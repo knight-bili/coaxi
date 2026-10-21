@@ -17,6 +17,7 @@ rand = "0.8"
 tokio-util = { version = "0.7", features = ["rt","io"] }
 zip = { version = "2", default-features = false, features = ["deflate"] }
 rovai-computer = { path = "../rovai-computer" }
+rovai-channels = { path = "../rovai-channels" }
 anyhow = "1"
 thiserror = "2"
 base64 = "0.22"

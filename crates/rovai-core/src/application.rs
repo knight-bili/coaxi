@@ -26,6 +26,7 @@ mod custom_skills;
 mod project_launcher;
 mod forge;
 mod forge_links;
+mod channel_adapters;
 pub(crate) mod private_composer;
 mod private_sources;
 pub(crate) mod runtime_interactions;
@@ -10363,6 +10364,8 @@ impl Core {
             }
             "forge.operation" => self.forge_operation(request.params.clone()).await,
             "forge.links" => self.forge_links(request.params.clone()).await,
+            "channels.adapters" => self.channel_adapter_operation(request.params.clone(), false).await,
+            "channels.adapters.private" => self.channel_adapter_operation(request.params.clone(), true).await,
             "workspaces.inspect" => {
                 let params: WorkspaceInspectParams =
                     serde_json::from_value(request.params.clone())?;

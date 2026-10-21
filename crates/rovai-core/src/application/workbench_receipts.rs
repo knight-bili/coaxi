@@ -5,6 +5,7 @@ use std::fs;
 impl Core {
     pub(super) async fn reconcile_workspace_operation(&self,value:&Value)->Result<Option<Value>>{
         let operation=value["operation"].as_str().context("workbench.operation_required")?;
+        if operation=="channels.adapters"{let params=value["params"].clone();let id=params["commandId"].as_str().context("channel_adapter.command_required")?;uuid::Uuid::parse_str(id)?;let file=self.data_dir.join("channel-adapter-operations").join(format!("{id}.json"));if !file.exists(){return Ok(Some(json!({"state":"unknown"})))}let receipt:Value=serde_json::from_slice(&fs::read(file)?)?;ensure!(receipt["digest"]==crate::command::canonical_json_digest(&params)?,"channel_adapter.command_conflict");return Ok(Some(if receipt["state"]=="finished"{json!({"state":"recorded","result":receipt["result"]})}else{json!({"state":"unknown"})}))}
         if operation=="forge.operation"{return self.reconcile_forge_operation(value["params"].clone()).await.map(Some)}
         if !matches!(operation,"workbench.files.mutate"|"workbench.files.tools"|"workbench.git.execute"){return Ok(None)}
         let request=&value["params"];
