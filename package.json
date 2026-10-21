@@ -177,7 +177,8 @@
     "test:member-creation": "node --test scripts/lib/member-creation.test.mjs",
     "test:mission-board": "node --test scripts/lib/mission-board.test.mjs",
     "test:member-runtime-apply": "node --test scripts/lib/member-runtime-apply.test.mjs",
-    "test:run-presence-ui": "node --test scripts/lib/run-presence.test.mjs"
+    "test:run-presence-ui": "node --test scripts/lib/run-presence.test.mjs",
+    "build:server-channels": "node scripts/build-server-channels.mjs"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",
@@ -270,7 +271,8 @@
     "@testing-library/react": "16.3.2",
     "jsdom": "25.0.1",
     "remark-math": "6.0.0",
-    "@testing-library/jest-dom": "6.10.0"
+    "@testing-library/jest-dom": "6.10.0",
+    "esbuild": "0.28.1"
   },
   "build": {
     "appId": "ai.rovai.desktop",
