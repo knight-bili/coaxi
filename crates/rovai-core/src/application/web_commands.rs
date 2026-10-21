@@ -5,6 +5,7 @@ use super::*;
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct Reconcile {
+    #[serde(deserialize_with="crate::thread_compat::deserialize_host_method")]
     operation: String,
     params: Value,
 }
@@ -63,6 +64,14 @@ pub(super) fn reconcile(
         }
         "singleChat.composerDraft.mutate" => {
             private_composer::reconcile(database, client, query.params)
+        }
+        "skillPacks.install" | "skillPacks.custom.install" => user!(crate::skill_pack_installation::InstallSkillPackCommand),
+        "skillPacks.uninstall" => user!(crate::skill_pack_installation::UninstallSkillPackCommand),
+        "skillPacks.office.install" => {
+            #[derive(Deserialize)] #[serde(rename_all="camelCase",deny_unknown_fields)]
+            struct OfficeInstall{command_id:String,command:crate::skill_pack_installation::InstallSkillPackCommand,plan_id:String}
+            let params:OfficeInstall=serde_json::from_value(query.params)?;uuid::Uuid::parse_str(&params.plan_id)?;
+            receipt(database,user_command_envelope(params.command_id,params.command))
         }
         "canvas.boards.create" => user!(rovai_core::canvas_board::CreateCanvasBoardCommand),
         "canvas.boards.update" => user!(rovai_core::canvas_board::UpdateCanvasBoardCommand),

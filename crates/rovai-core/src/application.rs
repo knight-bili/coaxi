@@ -13,6 +13,7 @@ mod native_interactions;
 mod native_child_reads;
 mod workbench;
 mod workbench_file_tools;
+mod workbench_receipts;
 mod browser_access;
 mod computer_access;
 mod office_access;
@@ -7591,6 +7592,7 @@ impl Core {
                 Ok(json!({ "released": true }))
             }
             "commands.reconcile" => {
+                if let Some(result)=self.reconcile_workspace_operation(&request.params).await?{return Ok(result)}
                 let database = self.database.lock().await;
                 web_commands::reconcile(
                     &database,

@@ -58,6 +58,14 @@ impl Repository {
 }
 
 impl Core {
+    pub(super) async fn reconcile_forge_operation(&self,value:Value)->Result<Value>{
+        let request:ForgeRequest=serde_json::from_value(value.clone())?;let id=request.command_id.as_deref().context("forge.command_id_required")?;uuid::Uuid::parse_str(id)?;
+        let repository=self.forge_repository(&request).await?;let identity=crate::command::canonical_json_digest(&json!({"repository":repository.metadata(),"request":value}))?;
+        let path=self.data_dir.join("forge-operations").join(format!("{id}.json"));if !path.exists(){return Ok(json!({"state":"unknown"}))}
+        let receipt:Value=serde_json::from_slice(&fs::read(path)?)?;ensure!(receipt["identity"]==identity,"forge.command_conflict");
+        Ok(if receipt["state"]=="finished"{json!({"state":"recorded","result":receipt["result"]})}else{json!({"state":"unknown"})})
+    }
+
     pub(super) async fn forge_accounts(&self, method:&str, value:Value)->Result<Value>{
         let _write=MUTATIONS.lock().await;
         let path=self.data_dir.join("forge-accounts.json");
