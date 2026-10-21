@@ -1,6 +1,7 @@
 package app.codeg.android.feature.main
 
 import androidx.compose.foundation.layout.*
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
@@ -31,6 +32,7 @@ import kotlinx.serialization.json.*
     suspend fun keepRemovals(next:List<JsonObject>){model.saveBody(owner,JsonArray(next).toString());require(generation==model.connectionGeneration);removals=next}
     suspend fun remove(frozen:JsonObject){keepRemovals((removals.filter{it.coreText("snapshotId")!=frozen.coreText("snapshotId")}+frozen));request(RovaiOperation.BACKUP_WEBDAV_REMOTE,frozen);keepRemovals(removals.filter{it.coreText("snapshotId")!=frozen.coreText("snapshotId")});list();message="已移除远端索引中的副本；本地备份保持原样。"}
     LaunchedEffect(generation){busy=true;try{accept(request(RovaiOperation.BACKUP_WEBDAV_SETTINGS,buildJsonObject{put("operation","get")}));val raw=model.readBody(owner);removals=if(raw.isBlank())emptyList()else Json.parseToJsonElement(raw).coreArray()}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message}finally{busy=false}}
+    BackHandler(enabled=dirty||busy){if(!busy)leaving=true}
     Column(Modifier.fillMaxSize()){
         Row(Modifier.fillMaxWidth().padding(12.dp)){Text("主机WebDAV",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(enabled=!busy,onClick={if(dirty)leaving=true else onClose()}){Text("返回")}}
         LazyColumn(Modifier.weight(1f),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
