@@ -14,12 +14,14 @@ struct RovaiForgeWorkspace: View {
     @State private var assigned = false, busy = false, incomplete = false
     @State private var repository: JSONValue?, selected: JSONValue?, detail: JSONValue?, filters: JSONValue?
     @State private var page = 1, next: Int?, commentNext: Int?, fileNext: Int? = 1, total: Int?, reachable: Int?
+    @State private var refreshRevision = 0
     @State private var issue: String?
-    private var identity: String {"\(threadId):\(model.connectionGeneration):\(account):\(kind)"}
+    private var identity: String {"\(threadId):\(model.connectionGeneration):\(account):\(kind):\(refreshRevision)"}
     var body: some View {
         List {
             if let issue {Text(issue).font(.caption).foregroundStyle(Theme.warning)}
             Section {Picker("仓库账号", selection: $account) {Text("按远程仓库匹配").tag("");ForEach(accounts.map {RovaiRow(value: $0)}) {row in Text("\(row.value.text("provider")) · \(row.value.text("baseUrl"))").tag(row.id)}}.disabled(busy)} header: {Text(repository?.text("ownerRepo") ?? "仓库面板")}
+            Section {RovaiForgeWriteActions(model: model, threadId: threadId, accountId: account, kind: kind, repository: repository, selected: selected) {refreshRevision += 1}}
             if let selected {
                 Section {Button("返回列表") {self.selected = nil;detail = nil;files = [];fileNext = 1}.disabled(busy);Text("#\(selected.forgeNumber) \(selected.text("title"))").font(.headline);MarkdownContent(raw: selected.forgeBody)}
                 if let detail {
@@ -29,7 +31,7 @@ struct RovaiForgeWorkspace: View {
                         if checks?["partial"]?.rvBool == true {Text("仅取得部分检查状态").foregroundStyle(Theme.textSecondary)}
                         ForEach((checks?["checks"]?.rvArray ?? []).map {RovaiRow(value: $0)}) {row in GlassRow {VStack(alignment: .leading, spacing: 6) {Text(row.value.text("name")).font(.subheadline);Text("\(row.value.text("state"))\(row.value["allow_failure"]?.rvBool == true ? " · 允许失败" : "")").font(.caption).foregroundStyle(Theme.textSecondary);if !row.value.text("summary").isEmpty {Text(row.value.text("summary")).font(.caption)}}}}
                     }
-                    Section("变更文件") {ForEach(files, id: \.self) {file in DisclosureGroup {if file["binary"]?.rvBool == true {Text("二进制文件")} else if file.text("patch").isEmpty {Text("平台未提供文本差异")} else {DiffView(files: UnifiedDiff.parse("diff --git a/\(file.text("previous_path").isEmpty ? file.text("path") : file.text("previous_path")) b/\(file.text("path"))\n--- a/\(file.text("previous_path").isEmpty ? file.text("path") : file.text("previous_path"))\n+++ b/\(file.text("path"))\n\(file.text("patch"))"))}} label: {Text(file.text("path")).font(.system(.caption, design: .monospaced))}}
+                    Section("变更文件") {ForEach(files, id: \.self) {file in DisclosureGroup {if file["binary"]?.rvBool == true {Text("二进制文件")} else if file.text("patch").isEmpty {Text("平台未提供文本差异")} else {DiffView(files: UnifiedDiff.parse("diff --git a/\(file.text("previous_path").isEmpty ? file.text("path") : file.text("previous_path")) b/\(file.text("path"))\n--- a/\(file.text("previous_path").isEmpty ? file.text("path") : file.text("previous_path"))\n+++ b/\(file.text("path"))\n\(file.text("patch"))") ?? [])}} label: {Text(file.text("path")).font(.system(.caption, design: .monospaced))}}
                         if let fileNext {Button(files.isEmpty ? "读取变更文件" : "更多变更文件") {Task {await work {let result = try await call("change_files", extra: ["number": .number(Double(selected.forgeNumber)), "page": .number(Double(fileNext))]);let values = result["data"]?["files"]?.rvArray ?? [];files = fileNext == 1 ? values : files + values;self.fileNext = result["nextPage"]?.rvInt}}}.disabled(busy)}
                     }
                 }
