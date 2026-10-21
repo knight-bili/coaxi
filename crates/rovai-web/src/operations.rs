@@ -528,7 +528,7 @@ impl Operation {
         match self {
             Self::AppInfo => json!({"name":value["name"],"version":value["version"]}),
             Self::ForgeAccountsGet | Self::ForgeAccountsSet => select_fields(&value, &["accounts"]),
-            Self::WorkbenchFileTools => select_fields(&value,&["path","digest","directory","files","bytes","entries","results","next","limited","scanned","applied","trashId"]),
+            Self::WorkbenchFileTools => select_fields(&value,&["path","digest","directory","files","bytes","entries","results","next","limited","scanned","applied","trashId","versions"]),
             Self::OfficeCli => select_fields(&value,&["installed","runnable","version","runtimeError","digest","manualUrl","commandId","operation","state","startedAt","completedAt","log","info","error"]),
             Self::CustomSkillPrepare => select_fields(&value,&["skillId","sourceRevision"]),
             Self::CustomSkillInstall => select_fields(&value,&["status","code","payload"]),

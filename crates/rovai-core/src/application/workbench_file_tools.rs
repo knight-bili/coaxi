@@ -6,7 +6,7 @@ use serde::{Deserialize,Serialize};
 use std::{fs,io::{Read,Write}};
 use sha2::{Digest,Sha256};
 #[derive(Deserialize)] #[serde(rename_all="camelCase",deny_unknown_fields)]
-struct Request{scope:Scope,operation:String,#[serde(default)]path:String,destination:Option<String>,command_id:Option<String>,expected_digest:Option<String>,trash_id:Option<String>,query:Option<String>,after:Option<String>,#[serde(default)]content:bool,#[serde(default)]case_sensitive:bool,#[serde(default)]regex:bool,#[serde(default)]include_ignored:bool}
+struct Request{scope:Scope,operation:String,#[serde(default)]path:String,destination:Option<String>,command_id:Option<String>,expected_digest:Option<String>,trash_id:Option<String>,query:Option<String>,after:Option<String>,#[serde(default)]content:bool,#[serde(default)]case_sensitive:bool,#[serde(default)]regex:bool,#[serde(default)]include_ignored:bool,paths:Option<Vec<String>>}
 #[derive(Serialize,Deserialize)] #[serde(rename_all="camelCase")]
 struct Entry{path:String,directory:bool,bytes:u64,digest:String,#[serde(default)]executable:bool}
 fn snapshot(root:&Path)->Result<(String,Vec<Entry>)>{
@@ -71,6 +71,7 @@ impl Core{
         if request.operation=="search"{return tokio::task::spawn_blocking(move||search(&root,&request)).await?}
         let _guard=MUTATIONS.lock().await;
         tokio::task::spawn_blocking(move||{
+            if request.operation=="versions"{let paths=request.paths.as_ref().context("workbench.paths_required")?;ensure!(paths.len()<=64,"workbench.path_limit");let mut versions=Vec::new();for path in paths{let target=relative(&root,path,true)?;let value=if target.is_file(){let metadata=fs::metadata(&target)?;if metadata.len()>16*1024*1024{json!({"path":path,"state":"too_large"})}else{json!({"path":path,"state":"present","digest":crate::backup::file_digest(&target)?.1})}}else{json!({"path":path,"state":"missing"})};versions.push(value)}return Ok(json!({"versions":versions}))}
             if request.operation=="inspect"{let path=relative(&root,&request.path,false)?;let (digest,entries)=snapshot(&path)?;return Ok(json!({"path":request.path,"digest":digest,"directory":path.is_dir(),"files":entries.len(),"bytes":entries.iter().map(|entry|entry.bytes).sum::<u64>()}))}
             let trash=trash_root(&root)?;
             if request.operation=="trash_list"{let mut entries=Vec::new();if trash.exists(){crate::platform::private_storage::prepare_private_directory(&trash)?;for entry in fs::read_dir(&trash)?.take(10001){let entry=entry?;if !entry.file_type()?.is_dir(){continue}let metadata=entry.path().join("entry.json");if metadata.is_file(){let value:Value=serde_json::from_slice(&fs::read(metadata)?)?;if value["root"]==json!(root)&&entry.path().join("content").exists(){entries.push(value)}}}}return Ok(json!({"entries":entries}))}

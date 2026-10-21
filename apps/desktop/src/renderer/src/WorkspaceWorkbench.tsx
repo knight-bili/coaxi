@@ -7,6 +7,7 @@ import { useThreadClient } from './camp-client'
 import { useUiText } from './interface-language'
 import { newCommandId } from '../../shared/command-id'
 import { FileTree, FileTreeFile, FileTreeFolder } from './codeg-workbench/file-tree'
+import {WorkspaceFileMenu,WorkspaceFileActionDialog,WorkspaceFileSearch,WorkspaceTrash,type FileAction} from './WorkspaceFileTools'
 import { WorkspaceCodeEditor } from './WorkspaceCodeEditor'
 import { WorkspaceMergeEditor } from './WorkspaceMergeEditor'
 import { WorkspaceOrganizer } from './WorkspaceOrganizer'
@@ -34,7 +35,8 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
   threadId: string; projectPath:string; members:Array<{id:string;name:string}>; bindLeaveGuard(guard: (() => void) | null): void; onQuickMessage?(text:string):boolean
 }): React.JSX.Element {
   const client = useThreadClient(), t = useUiText(), scope = useMemo(() => ({ threadId }), [threadId])
-  const [open, setOpen] = useState(false), [tab, setTab] = useState<'files' | 'git' | 'organizer' | 'forge' | 'browser' | 'computer' | 'office' | 'history'>('files')
+  const [open, setOpen] = useState(false), [tab, setTab] = useState<'files' | 'git' | 'organizer' | 'forge' | 'browser' | 'computer' | 'office' | 'history' | 'trash'>('files')
+  const [fileAction,setFileAction]=useState<FileAction|null>(null),[searchVisible,setSearchVisible]=useState(false),[cursorLine,setCursorLine]=useState<number|undefined>(undefined)
   const [organizerDirty,setOrganizerDirty]=useState(false)
   const [forgeDirty,setForgeDirty]=useState(false)
   const [officePath,setOfficePath]=useState<string|null>(null)
@@ -69,7 +71,8 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
     if (generation === epoch.current) setDirectories(previous => new Map(previous).set(path, { entries: after ? [...(previous.get(path)?.entries ?? []), ...result.entries] : result.entries, next: result.next }))
   }
   useEffect(() => { if (open && !directories.has('')) void operation(() => loadDirectory('')) }, [open])
-  const openFile = async (path: string): Promise<void> => {
+  const openFile = async (path: string,line?:number): Promise<void> => {
+    setCursorLine(line);setTab('files')
     if(/\.(docx|xlsx|pptx)$/i.test(path)){setOfficePath(path);setTab('office');return}
     setSelected(path)
     if (documents.some(document => document.path === path)) return
@@ -91,6 +94,13 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
       }
     })
   }
+  useEffect(()=>{
+    if(!open||tab!=='files'||!current||busy)return
+    let active=true,running=false;const document=current
+    const check=async():Promise<void>=>{if(running||globalThis.document.visibilityState==='hidden')return;running=true;try{const value=await client.request<{versions:Array<{path:string;state:string;digest?:string}>}>('workbench.files.tools',{scope,operation:'versions',paths:[document.path]});if(!active)return;const version=value.versions[0];if(version?.state!=='present'){setDocuments(previous=>previous.map(item=>item.path===document.path?{...item,conflict:true}:item));return}if(version.digest===document.digest)return;if(document.text!==document.saved){setDocuments(previous=>previous.map(item=>item.path===document.path?{...item,conflict:true}:item));return}const external=await client.request<{text:string;digest:string}>('workbench.files.read',{scope,path:document.path});if(active)setDocuments(previous=>previous.map(item=>item.path===document.path&&item.text===document.saved?{...item,...external,saved:external.text,conflict:false}:item))}catch{if(active)setDocuments(previous=>previous.map(item=>item.path===document.path?{...item,conflict:true}:item))}finally{running=false}}
+    const timer=setInterval(()=>void check(),4000);window.addEventListener('focus',check);return()=>{active=false;clearInterval(timer);window.removeEventListener('focus',check)}
+  },[client,scope,open,tab,current?.path,current?.digest,current?.text,current?.saved,busy])
+  const mergeExternal=async():Promise<void>=>{if(!current)return;const document=current;await operation(async()=>{const external=await client.request<{text:string;digest:string}>('workbench.files.read',{scope,path:document.path});setDocuments(previous=>previous.map(item=>item.path===document.path?{...item,saved:external.text,digest:external.digest,conflict:false}:item));setMerge({path:document.path,base:document.saved,ours:document.text,theirs:external.text,merged:document.text})})}
   const closeDocument = (path: string): void => {
     const document = documents.find(item => item.path === path)
     if (busy || document && document.text !== document.saved && !window.confirm(t('放弃这个文件尚未保存的修改？'))) return
@@ -99,8 +109,8 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
   }
   const renderTree = (path: string, depth = 0): React.ReactNode => <>
     {(directories.get(path)?.entries ?? []).map(entry => entry.directory && !entry.link
-      ? <FileTreeFolder key={entry.path} path={entry.path} name={entry.name} depth={depth}>{renderTree(entry.path, depth + 1)}</FileTreeFolder>
-      : <FileTreeFile key={entry.path} path={entry.path} name={entry.name} depth={depth} aria-disabled={entry.link} onDoubleClick={() => { if (!entry.link) void openFile(entry.path) }} />)}
+      ? <FileTreeFolder key={entry.path} path={entry.path} name={entry.name} depth={depth} actions={<WorkspaceFileMenu path={entry.path} disabled={busy||dirty||entry.link} onAction={setFileAction}/>}>{renderTree(entry.path, depth + 1)}</FileTreeFolder>
+      : <FileTreeFile key={entry.path} path={entry.path} name={entry.name} depth={depth} actions={<WorkspaceFileMenu path={entry.path} disabled={busy||dirty||entry.link} onAction={setFileAction}/>} aria-disabled={entry.link} onDoubleClick={() => { if (!entry.link) void openFile(entry.path) }} />)}
     {directories.get(path)?.next && <button type="button" className="quiet-button" disabled={busy} onClick={() => void operation(() => loadDirectory(path, directories.get(path)!.next!))}>{t('加载更多')}</button>}
   </>
   const readGit = async (view = gitView): Promise<void> => {
@@ -150,17 +160,18 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
         </nav>
         {error && <p className="workbench-error" role="alert">{error}</p>}
         {creation && <form className="workbench-toolbar" onSubmit={event => {event.preventDefault();void create()}}><input aria-label={t('相对路径')} value={name} onChange={event => setName(event.target.value)} placeholder={t('相对工程的路径')} /><button type="submit" disabled={busy || !name.trim()}>{t('确认')}</button><button type="button" onClick={() => setCreation(null)}>{t('取消')}</button></form>}
+        <div className="workbench-toolbar"><button className={searchVisible?'quiet-button is-active':'quiet-button'} onClick={()=>setSearchVisible(value=>!value)}>{t(searchVisible?'文件树':'搜索文件')}</button><button className="quiet-button" onClick={()=>setTab('trash')}>{t('回收站')}</button></div>
         <PanelGroup direction="horizontal" className="workbench-panels">
-          <Panel defaultSize={23} minSize={15}><div className="workbench-tree"><FileTree expanded={expanded} selectedPath={selected ?? undefined} onSelect={path => { if (![...directories.values()].some(directory => directory.entries.some(entry => entry.path === path && (entry.directory || entry.link)))) void openFile(path) }} onExpandedChange={next => {
+          <Panel defaultSize={23} minSize={15}><div className="workbench-tree">{searchVisible?<WorkspaceFileSearch threadId={threadId} onOpen={(path,line)=>void openFile(path,line)}/>:<FileTree expanded={expanded} selectedPath={selected ?? undefined} onSelect={path => { if (![...directories.values()].some(directory => directory.entries.some(entry => entry.path === path && (entry.directory || entry.link)))) void openFile(path) }} onExpandedChange={next => {
             setExpanded(next); void operation(async () => { for (const path of next) if (!directories.has(path)) await loadDirectory(path) })
-          }}>{renderTree('')}</FileTree></div></Panel>
+          }}>{renderTree('')}</FileTree>}</div></Panel>
           <PanelResizeHandle className="workbench-resize" />
           <Panel minSize={25}>
-            {merge ? <WorkspaceMergeEditor {...merge} onClose={()=>setMerge(null)} onApply={text=>{setDocuments(previous=>previous.map(document=>document.path===merge.path?{...document,text}:document));setMerge(null)}} /> : tab==='history'?<NativeHistoryWorkbench threadId={threadId}/> : tab==='office'&&officePath?<OfficePreviewWorkbench key={officePath} threadId={threadId} path={officePath}/> : tab==='computer'?<ComputerWorkbench threadId={threadId}/> : tab==='browser'?<BrowserWorkbench threadId={threadId}/> : tab==='forge'?<ForgeWorkbench threadId={threadId} projectPath={projectPath} members={members} onDirtyChange={setForgeDirty}/> : tab==='organizer'?<WorkspaceOrganizer threadId={threadId} onDirtyChange={setOrganizerDirty} onUseMessage={onQuickMessage?text=>{if(dirty||!onQuickMessage(text))return false;setOpen(false);return true}:undefined}/> : tab === 'files' ? <div className="workbench-editor">
+            {merge ? <WorkspaceMergeEditor {...merge} onClose={()=>setMerge(null)} onApply={text=>{setDocuments(previous=>previous.map(document=>document.path===merge.path?{...document,text}:document));setMerge(null)}} /> : tab==='trash'?<WorkspaceTrash threadId={threadId} onRestored={async()=>{for(const path of ['',...expanded])await loadDirectory(path).catch(()=>{})}}/> : tab==='history'?<NativeHistoryWorkbench threadId={threadId}/> : tab==='office'&&officePath?<OfficePreviewWorkbench key={officePath} threadId={threadId} path={officePath}/> : tab==='computer'?<ComputerWorkbench threadId={threadId}/> : tab==='browser'?<BrowserWorkbench threadId={threadId}/> : tab==='forge'?<ForgeWorkbench threadId={threadId} projectPath={projectPath} members={members} onDirtyChange={setForgeDirty}/> : tab==='organizer'?<WorkspaceOrganizer threadId={threadId} onDirtyChange={setOrganizerDirty} onUseMessage={onQuickMessage?text=>{if(dirty||!onQuickMessage(text))return false;setOpen(false);return true}:undefined}/> : tab === 'files' ? <div className="workbench-editor">
               <div className="workbench-tabs" role="tablist">{documents.map(document => <div className={selected === document.path ? 'workbench-tab is-active' : 'workbench-tab'} key={document.path}><button type="button" role="tab" aria-selected={selected === document.path} onClick={() => setSelected(document.path)}>{document.path}{document.text !== document.saved ? ' •' : ''}</button><button type="button" disabled={busy} onClick={() => closeDocument(document.path)} aria-label={t('关闭文件')}><X size={12} /></button></div>)}</div>
               {current ? <><div className="workbench-toolbar"><span title={current.path}>{current.path}</span><button type="button" className="quiet-button" disabled={busy || current.text === current.saved} onClick={() => void save()}><Save size={14} />{t('保存')}</button><button type="button" className="quiet-button" disabled={busy || dirty} onClick={() => {setCreation('rename');setName(current.path)}}>{t('重命名')}</button><button type="button" className="quiet-button" disabled={busy} onClick={()=>void openMerge()}>{t('解决冲突')}</button></div>
-                {current.conflict && <div className="workbench-error" role="alert">{t('文件在外部发生变化，本地修改已保留。请复制修改或重新打开外部版本后合并。')}</div>}
-                <div className="workbench-editors">{documents.map(document=><div key={document.path} className="workbench-document" hidden={document.path!==selected}><WorkspaceCodeEditor path={document.path} text={document.text} visible={document.path===selected} onSave={()=>void save()} onChange={text=>setDocuments(previous=>previous.map(item=>item.path===document.path?{...item,text}:item))} /></div>)}</div>
+                {current.conflict && <div className="workbench-error" role="alert">{t('文件在外部发生变化，本地修改已保留。')}<button disabled={busy} onClick={()=>void mergeExternal()}>{t('比较并合并外部版本')}</button></div>}
+                <div className="workbench-editors">{documents.map(document=><div key={document.path} className="workbench-document" hidden={document.path!==selected}><WorkspaceCodeEditor path={document.path} text={document.text} visible={document.path===selected} line={document.path===selected?cursorLine:undefined} onSave={()=>void save()} onChange={text=>setDocuments(previous=>previous.map(item=>item.path===document.path?{...item,text}:item))} /></div>)}</div>
               </> : <div className="workbench-empty">{t('从文件树打开文件')}</div>}
             </div> : <div className="workbench-git">
               <div className="workbench-toolbar"><select aria-label={t('Git 视图')} value={gitView} onChange={event => {setGitView(event.target.value);void readGit(event.target.value)}}>{Object.entries({status:'变更',diff:'工作区 Diff',diff_staged:'暂存 Diff',log:'历史',branches:'分支',stash:'Stash',remotes:'远程',worktrees:'Worktree',conflicts:'冲突'}).map(([value,label]) => <option key={value} value={value}>{t(label)}</option>)}</select><button type="button" disabled={busy} onClick={() => void readGit()}>{t('刷新')}</button></div>
@@ -178,6 +189,12 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
         </PanelGroup>
       </AppDialogContent></Dialog.Portal>
     </Dialog.Root>
+    {fileAction&&<WorkspaceFileActionDialog key={`${fileAction.operation}:${fileAction.path}`} threadId={threadId} action={fileAction} onClose={()=>setFileAction(null)} onApplied={async(action,destination)=>{
+      const moved=(path:string):string=>destination?destination+path.slice(action.path.length):path
+      if(action.operation==='move'){setDocuments(previous=>previous.map(document=>document.path===action.path||document.path.startsWith(`${action.path}/`)?{...document,path:moved(document.path)}:document));setSelected(previous=>previous&&(previous===action.path||previous.startsWith(`${action.path}/`))?moved(previous):previous)}
+      if(action.operation==='trash'){setDocuments(previous=>previous.filter(document=>document.path!==action.path&&!document.path.startsWith(`${action.path}/`)));setSelected(previous=>previous&&(previous===action.path||previous.startsWith(`${action.path}/`))?null:previous)}
+      setDirectories(new Map());await loadDirectory('');for(const path of expanded)await loadDirectory(path).catch(()=>{})
+    }}/>}
     <Dialog.Root open={preview !== null} onOpenChange={next => {if(!next && !busy)setPreview(null)}}><Dialog.Portal><Dialog.Overlay className="dialog-overlay" /><AppDialogContent tone="attention"><AppDialogHeader title={t('确认 Git 操作')} description={t('仅对当前预览的工程状态执行；工程变化时需重新预览。')} closeDisabled={busy} />
       <pre className="workbench-confirm">{preview?.arguments.join(' ')}{preview?.cleanPreview ? `\n${preview.cleanPreview}` : ''}</pre>
       <button type="button" disabled={busy} onClick={() => void operation(async () => { if(!preview)return; const result=await client.request<GitResult>('workbench.git.execute',{...preview.request,expectedRevision:preview.revision,confirmed:true});setGitResult(result);setPreview(null); if(!result.success)setError(result.error) })}>{t('确认执行')}</button>
