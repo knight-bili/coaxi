@@ -11,6 +11,7 @@ struct RovaiOfficePreview: View {
     @State private var editable = false
     @State private var retry = 0
     @State private var url: URL?
+    @State private var showingHold: String?
     @State private var issue: String?
     @State private var generation: UInt64?
     var body: some View {
@@ -28,11 +29,11 @@ struct RovaiOfficePreview: View {
     private func watch() async {
         url = nil; guard scenePhase == .active else { return }; let lifetime = model.connectionGeneration; generation = lifetime
         let hold = UUID().uuidString.lowercased(); let scope = JSONValue.object(["threadId": .string(threadId)])
-        do { let lease = try await model.query(.officeWatch, params: .object(["scope": scope, "operation": .string("start"), "holdId": .string(hold), "path": .string(path), "editable": .bool(editable)])); guard lifetime == model.connectionGeneration, lease.text("holdId") == hold else { throw CancellationError() }; let selected = try await model.officePreviewURL(port: lease["port"]?.rvInt ?? 0, cap: lease.text("cap")); try Task.checkCancellation(); url = selected; issue = nil
+        do { let lease = try await model.query(.officeWatch, params: .object(["scope": scope, "operation": .string("start"), "holdId": .string(hold), "path": .string(path), "editable": .bool(editable)])); guard lifetime == model.connectionGeneration, lease.text("holdId") == hold else { throw CancellationError() }; let selected = try await model.officePreviewURL(port: lease["port"]?.rvInt ?? 0, cap: lease.text("cap")); try Task.checkCancellation(); url = selected; showingHold = hold; issue = nil
             while !Task.isCancelled { try await Task.sleep(for: .seconds(30)); _ = try await model.query(.officeWatch, params: .object(["scope": scope, "operation": .string("heartbeat"), "holdId": .string(hold)])) }
         } catch is CancellationError {} catch { if lifetime == model.connectionGeneration { issue = error.localizedDescription } }
         if lifetime == model.connectionGeneration { _ = try? await model.query(.officeWatch, params: .object(["scope": scope, "operation": .string("stop"), "holdId": .string(hold)])) }
-        if url?.query?.contains(hold) == true { url = nil }
+        if showingHold == hold { url = nil; showingHold = nil }
     }
 }
 private struct RovaiOfficeWebView: UIViewRepresentable {
@@ -44,7 +45,7 @@ private struct RovaiOfficeWebView: UIViewRepresentable {
         let view = WKWebView(frame: .zero, configuration: configuration); view.navigationDelegate = context.coordinator
         let absolute = url.absoluteString; let components = URLComponents(url: url, resolvingAgainstBaseURL: false); let cap = components?.queryItems?.first { $0.name == "cap" }?.value ?? ""; let prefix = absolute.components(separatedBy: "?")[0]
         let pattern = "^" + NSRegularExpression.escapedPattern(for: prefix) + "[^?#]*[?]([^#]*&)?cap=" + NSRegularExpression.escapedPattern(for: cap) + "(&[^#]*)?$"
-        let rules: [[String: Any]] = [["trigger": ["url-filter": ".*"], "action": ["type": "block"]], ["trigger": ["url-filter": pattern], "action": ["type": "ignore-previous-rules"]], ["trigger": ["url-filter": "^about:blank$"], "action": ["type": "ignore-previous-rules"]]]
+        let rules: [[String: Any]] = [["trigger": ["url-filter": ".*"], "action": ["type": "block"]], ["trigger": ["url-filter": pattern], "action": ["type": "ignore-previous-rules"]], ["trigger": ["url-filter": "^about:blank$"], "action": ["type": "ignore-previous-rules"]], ["trigger": ["url-filter": "^data:(image/|font/)"], "action": ["type": "ignore-previous-rules"]]]
         guard let data = try? JSONSerialization.data(withJSONObject: rules), let encoded = String(data: data, encoding: .utf8) else { issue = "文档预览隔离规则无法创建"; return view }
         let coordinator = context.coordinator
         WKContentRuleListStore.default().compileContentRuleList(forIdentifier: "rovai-office-" + UUID().uuidString, encodedContentRuleList: encoded) { [weak view, weak coordinator] list, error in
