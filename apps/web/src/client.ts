@@ -202,6 +202,7 @@ export const WEB_OPERATIONS = [
   'messageQuotes.mutateDraft',
   'messageQuotes.capture',
   'messageQuotes.projection',
+  'messageQuotes.privateProjection',
   'thread.messages.send',
   'thread.messages.withdraw',
   'action.approvals.resolve',

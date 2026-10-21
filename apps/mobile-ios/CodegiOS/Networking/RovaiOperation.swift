@@ -219,6 +219,7 @@ enum RovaiOperation: String, Sendable {
     case messageQuotesMutateDraft = "messageQuotes.mutateDraft"
     case messageQuotesCapture = "messageQuotes.capture"
     case messageQuotesProjection = "messageQuotes.projection"
+    case messageQuotesPrivateProjection = "messageQuotes.privateProjection"
     case threadMessagesSend = "thread.messages.send"
     case threadMessagesWithdraw = "thread.messages.withdraw"
     case actionApprovalsResolve = "action.approvals.resolve"

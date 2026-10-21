@@ -5084,6 +5084,7 @@ export type CoreMethod =
   | 'messageQuotes.mutateDraft'
   | 'messageQuotes.capture'
   | 'messageQuotes.projection'
+  | 'messageQuotes.privateProjection'
   | 'thread.messages.send'
   | 'thread.messages.withdraw'
   | 'userAutomation.thread.send'

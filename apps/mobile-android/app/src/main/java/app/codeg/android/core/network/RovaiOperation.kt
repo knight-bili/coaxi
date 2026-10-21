@@ -219,6 +219,7 @@ enum class RovaiOperation(val wire:String) {
     MESSAGEQUOTES_MUTATEDRAFT("messageQuotes.mutateDraft"),
     MESSAGEQUOTES_CAPTURE("messageQuotes.capture"),
     MESSAGEQUOTES_PROJECTION("messageQuotes.projection"),
+    MESSAGEQUOTES_PRIVATEPROJECTION("messageQuotes.privateProjection"),
     THREAD_MESSAGES_SEND("thread.messages.send"),
     THREAD_MESSAGES_WITHDRAW("thread.messages.withdraw"),
     ACTION_APPROVALS_RESOLVE("action.approvals.resolve"),

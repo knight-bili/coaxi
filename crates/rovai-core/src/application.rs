@@ -11804,6 +11804,13 @@ impl Core {
                     )?)
                 }
             }
+            "messageQuotes.privateProjection" => {
+                #[derive(Deserialize)] #[serde(rename_all="camelCase",deny_unknown_fields)]
+                struct Projection {thread_id:ThreadId,conversation_id:String,message_id:String}
+                let params:Projection=serde_json::from_value(request.params.clone())?;
+                let database=self.database.lock().await;
+                rovai_core::message_quote::private_quote_projection(database.connection(),params.thread_id.as_str(),&params.conversation_id,&params.message_id)
+            }
             "messageQuotes.projection" => {
                 #[derive(Deserialize)] #[serde(rename_all="camelCase",deny_unknown_fields)]
                 struct Projection {thread_id:ThreadId,message_id:String}

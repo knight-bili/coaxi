@@ -422,6 +422,18 @@ pub fn public_quote_projection(connection:&Connection,camp_id:&str,message_id:&s
     Ok(json!({"messageId":message_id,"bodyAtSelection":body,"text":text,"projectionVersion":QUOTE_PROJECTION_VERSION,"maxScalars":MAX_QUOTE_SCALARS}))
 }
 
+/// Private published messages remain inside the original conversation. The
+/// composer mutation captures the selected range under its own owner/version gate.
+pub fn private_quote_projection(connection:&Connection,camp_id:&str,conversation_id:&str,message_id:&str)->Result<Value> {
+    let (author,body):(String,String)=connection.query_row(
+        "SELECT m.author_type,m.body FROM conversation_message m JOIN conversation c ON c.id=m.conversation_id WHERE m.id=?1 AND c.id=?2 AND c.camp_id=?3 AND c.kind IN ('single_chat','delegation_child') AND c.ended_at IS NULL",
+        params![message_id,conversation_id,camp_id],|row|Ok((row.get(0)?,row.get(1)?)),
+    ).optional()?.context("quote.source_unavailable")?;
+    ensure!(matches!(author.as_str(),"user"|"agent")&&body.len()<=2*1024*1024,"quote.source_not_supported");
+    let text=if author=="user" {body.replace("\r\n","\n")} else {project_quote_text(&body)};
+    Ok(json!({"messageId":message_id,"bodyAtSelection":body,"text":text,"projectionVersion":QUOTE_PROJECTION_VERSION,"maxScalars":MAX_QUOTE_SCALARS}))
+}
+
 pub fn capture_quote(
     transaction: &Transaction<'_>,
     camp_id: &str,
