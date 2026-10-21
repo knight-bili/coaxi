@@ -8,6 +8,7 @@ import {useUiText} from './interface-language'
 import {newCommandId} from '../../shared/command-id'
 import type {AgentProfile} from '@contracts'
 import './transport-channel-settings.css'
+import {TransportChannelOutbox} from './TransportChannelOutbox'
 
 type Binding={chatId:string;threadKey:string|null;threadId:string;agentIds:string[]}
 type Adapter={id:string;provider:'telegram'|'weixin';name:string;enabled:boolean;hasToken:boolean;baseUrl:string;chatId:string;topicMode:boolean;allowedSenders:string[];bindings:Binding[]}
@@ -37,6 +38,7 @@ export function TransportChannelSettings({agents}:{agents:AgentProfile[]}):React
     <div className="settings-actions"><button type="button" disabled={busy} onClick={()=>void run(read)}><RefreshCw size={14}/>{t('刷新')}</button><button type="button" disabled={busy||!snapshot} onClick={()=>open()}><Plus size={14}/>{t('添加渠道')}</button></div>
     {error&&<p role="alert" className="settings-error">{error}</p>}
     <div className="transport-channel-list">{snapshot?.adapters.map(adapter=><section key={adapter.id} className="settings-card"><div className="settings-card-heading">{adapter.provider==='telegram'?<Send size={18}/>:<MessageCircle size={18}/>}<div><h3>{adapter.name}</h3><p>{adapter.provider==='telegram'?'Telegram':t('微信')} · {adapter.enabled?t('已启用'):t('已停用')}{snapshot.hostState?.states?.find(value=>value.adapterId===adapter.id)?.state?` · ${snapshot.hostState.states.find(value=>value.adapterId===adapter.id)!.state}`:''}</p></div><button type="button" className="quiet-button" onClick={()=>open(adapter)}><Settings size={14}/>{t('配置')}</button><button type="button" className="quiet-button" disabled={busy} aria-label={t('移除渠道')} onClick={()=>{if(snapshot&&window.confirm(t('移除此渠道配置并停止接收？已有对话和消息会保留。')))void run(async()=>{await client.request('channels.adapters',{operation:'remove',id:adapter.id,expectedRevision:snapshot.revision,commandId:newCommandId()});await read()})}}><Trash2 size={14}/></button></div><p>{t('允许 {0} 位发送者，绑定 {1} 个对话',String(adapter.allowedSenders.length),String(adapter.bindings.length))}</p></section>)}</div>
+    {snapshot&&<TransportChannelOutbox revision={snapshot.revision}/>}
     <Dialog.Root open={draft!==null} onOpenChange={open=>{if(!open&&!busy&&(!draft?.sent||window.confirm(t('原操作可能已经执行，保留配置记录后关闭？')))){setDraft(null);setQr(null)}}}><Dialog.Portal><Dialog.Overlay className="dialog-overlay"/><AppDialogContent width="wide"><AppDialogHeader title={t('渠道配置')} description={t('外部发来的内容以外部发送者身份进入所选对话，队员结果会回复到对应渠道。')} closeDisabled={busy}/>{draft&&<form className="transport-channel-form" onSubmit={event=>{event.preventDefault();void save()}}><fieldset disabled={busy||!!draft.sent}>
       <label>{t('名称')}<input required value={draft.name} onChange={event=>setDraft({...draft,name:event.target.value})}/></label>
       <label>{t('平台')}<select value={draft.provider} onChange={event=>{setDraft({...draft,provider:event.target.value as Draft['provider'],token:'',hasToken:false});setQr(null)}}><option value="telegram">Telegram</option><option value="weixin">{t('微信')}</option></select></label>

@@ -73,6 +73,7 @@ impl Core{
         ensure!(saved["digest"]==request.expected_digest.as_deref().context("channel_adapter.output_digest_required")?,"channel_adapter.output_changed");
         if request.operation=="claim"{if saved["state"]!="ready"{return Ok(json!({"claimed":false,"state":saved["state"]}))}saved["state"]=json!("sending");}
         else{ensure!(saved["state"]=="sending","channel_adapter.output_not_owned");let state=request.result.as_deref().context("channel_adapter.output_result_required")?;ensure!(["sent","unknown"].contains(&state),"channel_adapter.invalid_output_result");saved["state"]=json!(state);saved["remoteId"]=json!(request.remote_id);}
+        saved["updatedAt"]=json!(chrono::Utc::now().timestamp());
         crate::platform::private_storage::atomic_write_private_json(&file,&saved)?;Ok(json!({"claimed":request.operation=="claim","state":saved["state"]}))
     }
 }

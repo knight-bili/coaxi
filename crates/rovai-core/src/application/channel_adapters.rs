@@ -14,7 +14,7 @@ pub(super) struct Binding{pub chat_id:String,pub thread_key:Option<String>,pub t
 pub(super) struct Adapter{pub id:String,pub local_id:i32,pub provider:String,pub name:String,pub enabled:bool,pub token:String,pub base_url:String,pub chat_id:String,pub topic_mode:bool,pub allowed_senders:Vec<String>,pub bindings:Vec<Binding>}
 #[derive(Deserialize)]
 #[serde(rename_all="camelCase",deny_unknown_fields)]
-struct Request{operation:String,id:Option<String>,command_id:Option<String>,expected_revision:Option<String>,adapter:Option<AdapterInput>,attempt_id:Option<String>}
+struct Request{operation:String,id:Option<String>,command_id:Option<String>,expected_revision:Option<String>,adapter:Option<AdapterInput>,attempt_id:Option<String>,#[serde(default)]confirmed:bool,outbox_id:Option<String>,expected_output_digest:Option<String>,after:Option<i64>}
 #[derive(Deserialize)]
 #[serde(rename_all="camelCase",deny_unknown_fields)]
 struct AdapterInput{id:String,provider:String,name:String,enabled:bool,token:Option<String>,#[serde(default)]base_url:String,#[serde(default)]chat_id:String,#[serde(default)]topic_mode:bool,#[serde(default)]allowed_senders:Vec<String>,#[serde(default)]bindings:Vec<Binding>}
@@ -27,12 +27,20 @@ impl Core{
         let request:Request=serde_json::from_value(value.clone())?;
         let _guard=MUTATIONS.lock().await;
         let mut adapters=self.read_channel_adapters()?;let revision=crate::command::canonical_json_digest(&serde_json::to_value(&adapters)?)?;
+        if request.operation=="outbox_inspect"{drop(_guard);return self.channel_adapter_outbox(json!({"operation":"list","after":request.after})).await;}
         if request.operation=="list"{return Ok(json!({"revision":revision,"adapters":if private{serde_json::to_value(adapters)?}else{projected(&adapters)}}))}
-        ensure!(!private&&["save","remove","weixin_qr_begin","weixin_qr_check"].contains(&request.operation.as_str()),"channel_adapter.operation_not_admitted");
+        ensure!(!private&&["save","remove","weixin_qr_begin","weixin_qr_check","outbox_retry","outbox_confirm"].contains(&request.operation.as_str()),"channel_adapter.operation_not_admitted");
         let command_id=request.command_id.as_deref().context("channel_adapter.command_required")?;uuid::Uuid::parse_str(command_id)?;
         let digest=crate::command::canonical_json_digest(&value)?;let directory=self.data_dir.join("channel-adapter-operations");crate::platform::private_storage::prepare_private_directory(&directory)?;let receipt=directory.join(format!("{command_id}.json"));
         if receipt.exists(){let previous:Value=serde_json::from_slice(&fs::read(&receipt)?)?;ensure!(previous["digest"]==digest,"channel_adapter.command_conflict");ensure!(previous["state"]=="finished","channel_adapter.result_unknown");return Ok(previous["result"].clone())}
         ensure!(request.expected_revision.as_deref()==Some(revision.as_str()),"channel_adapter.settings_changed");
+        if matches!(request.operation.as_str(),"outbox_retry"|"outbox_confirm"){
+            ensure!(request.confirmed,"channel_adapter.confirmation_required");let id=request.outbox_id.as_deref().context("channel_adapter.output_id_required")?;ensure!(id.starts_with("adapter_")&&id[8..].len()==64&&id[8..].bytes().all(|byte|byte.is_ascii_hexdigit()),"channel_adapter.invalid_output_id");
+            let file=self.data_dir.join("channel-adapter-outbox").join(format!("{id}.json"));let mut saved:Value=serde_json::from_slice(&fs::read(&file)?)?;ensure!(saved["digest"]==request.expected_output_digest.as_deref().context("channel_adapter.output_digest_required")?,"channel_adapter.output_changed");ensure!(["sending","unknown"].iter().any(|state|saved["state"]==*state),"channel_adapter.output_not_unknown");
+            ensure!(saved["state"]!="sending"||chrono::Utc::now().timestamp()-saved["updatedAt"].as_i64().unwrap_or(i64::MAX)>120,"channel_adapter.output_still_sending");
+            saved["state"]=json!(if request.operation=="outbox_retry"{"ready"}else{"sent"});saved["updatedAt"]=json!(chrono::Utc::now().timestamp());saved["resolution"]=json!({"commandId":command_id,"operation":request.operation,"actor":"user"});
+            crate::platform::private_storage::atomic_write_private_json(&receipt,&json!({"digest":digest,"state":"started"}))?;crate::platform::private_storage::atomic_write_private_json(&file,&saved)?;let result=json!({"applied":true,"state":saved["state"]});crate::platform::private_storage::atomic_write_private_json(&receipt,&json!({"digest":digest,"state":"finished","result":result}))?;return Ok(result)
+        }
         if request.operation=="weixin_qr_begin"{
             crate::platform::private_storage::atomic_write_private_json(&receipt,&json!({"digest":digest,"state":"started"}))?;
             let qr=rovai_channels::weixin_get_qrcode().await?;let id=uuid::Uuid::new_v4().to_string();let pending=self.data_dir.join("channel-adapter-qr");crate::platform::private_storage::prepare_private_directory(&pending)?;
