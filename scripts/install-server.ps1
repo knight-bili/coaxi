@@ -3,7 +3,7 @@
 param(
     [string]$Version = 'latest',
     [string]$FromDirectory,
-    [string]$InstallDirectory = (Join-Path $env:LOCALAPPDATA 'Programs\RovaiServer'),
+    [string]$InstallDirectory = (Join-Path $env:LOCALAPPDATA 'Programs\CodegRovaiServer'),
     [switch]$NoModifyPath
 )
 $ErrorActionPreference = 'Stop'
@@ -66,16 +66,16 @@ try {
     [IO.Compression.ZipFile]::ExtractToDirectory($archive, $staging)
     $payload = Join-Path $staging 'rovai-server'
     $info = @(Get-Content (Join-Path $payload 'package-info'))
-    if ($info -cnotcontains "version=$Version" -or $info -cnotcontains 'target=windows-x64' -or -not (Test-Path -LiteralPath (Join-Path $payload 'web-ui\index.html') -PathType Leaf) -or -not (Test-Path -LiteralPath (Join-Path $payload 'skills\cli-operations\SKILL.md') -PathType Leaf)) { throw 'Package version, target, WebUI, or bundled Skills mismatch.' }
+    if ($info -cnotcontains 'product=codeg-rovai-workbench' -or $info -cnotcontains "version=$Version" -or $info -cnotcontains 'target=windows-x64' -or -not (Test-Path -LiteralPath (Join-Path $payload 'web-ui\index.html') -PathType Leaf) -or -not (Test-Path -LiteralPath (Join-Path $payload 'skills\cli-operations\SKILL.md') -PathType Leaf)) { throw 'Package version, target, WebUI, or bundled Skills mismatch.' }
     $reportedVersion = & (Join-Path $payload 'rovai-server.exe') --version
     if ($LASTEXITCODE -ne 0 -or $reportedVersion -cne "rovai-server $Version") { throw 'Host/package mismatch or missing native dependency.' }
     $marker = Join-Path $InstallDirectory 'INSTALLER-V1'
     if (Test-Path -LiteralPath $InstallDirectory) {
         if ((Get-Item -LiteralPath $InstallDirectory).Attributes -band [IO.FileAttributes]::ReparsePoint) { throw 'Installation directory cannot be a reparse point.' }
-        if (-not (Test-Path -LiteralPath $marker -PathType Leaf) -or (Get-Content -Raw $marker).Trim() -cne 'rovai-server') { throw 'Program directory is not an installer-owned installation.' }
+        if (-not (Test-Path -LiteralPath $marker -PathType Leaf) -or (Get-Content -Raw $marker).Trim() -cne 'codeg-rovai-workbench-server') { throw 'Program directory is not an installer-owned installation.' }
     } else {
         [void][IO.Directory]::CreateDirectory($InstallDirectory)
-        [IO.File]::WriteAllText($marker, "rovai-server`n")
+        [IO.File]::WriteAllText($marker, "codeg-rovai-workbench-server`n")
     }
     try { $lease = [IO.File]::Open((Join-Path $InstallDirectory '.install-lock'), [IO.FileMode]::OpenOrCreate, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None) }
     catch { throw 'Another installation is in progress.' }

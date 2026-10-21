@@ -55,6 +55,7 @@ pub(super) fn prepare(
 ) -> Result<Prepared> {
     let expected_info = fs::read_to_string(root.join("package-info"))
         .context("Updates require a complete installed Server package")?;
+    ensure!(expected_info.lines().any(|line|line=="product=codeg-rovai-workbench"),"installed package belongs to another product");
     ensure!(
         expected_info
             .lines()
@@ -147,7 +148,7 @@ pub(super) fn prepare(
             .and_then(Path::parent)
             .context("managed installation root")?;
         ensure!(
-            fs::read_to_string(parent.join("INSTALLER-V1"))?.trim() == "rovai-server",
+            fs::read_to_string(parent.join("INSTALLER-V1"))?.trim() == "codeg-rovai-workbench-server",
             "unknown installation owner"
         );
         Some(parent.to_owned())
@@ -271,7 +272,7 @@ impl Prepared {
                 && parent.join("INSTALLER-V1").is_file()
             {
                 ensure!(
-                    fs::read_to_string(parent.join("INSTALLER-V1"))?.trim() == "rovai-server",
+                    fs::read_to_string(parent.join("INSTALLER-V1"))?.trim() == "codeg-rovai-workbench-server",
                     "unknown installation owner"
                 );
                 Some(

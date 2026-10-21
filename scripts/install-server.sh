@@ -6,7 +6,7 @@ fail() { printf 'Rovai Server: %s\n' "$*" >&2; exit 1; }
 version=latest
 release_tag=
 from_dir=
-prefix="${HOME:?Current account HOME is required}/.local/share/rovai-server"
+prefix="${HOME:?Current account HOME is required}/.local/share/codeg-rovai-workbench-server"
 bin_dir="$HOME/.local/bin"
 modify_path=yes
 while [ "$#" -gt 0 ]; do
@@ -79,18 +79,18 @@ tar -tvzf "$staging/$asset" > "$staging/types"
 LC_ALL=C awk 'substr($0,1,1)!="-" && substr($0,1,1)!="d" { bad=1 } END { exit bad }' "$staging/types" || fail 'Archive links or special files are not allowed'
 tar -xzf "$staging/$asset" -C "$staging"
 payload="$staging/rovai-server"
-grep -qx "version=$version" "$payload/package-info" && grep -qx "target=$target" "$payload/package-info" || fail 'Package version or target mismatch'
+grep -qx "product=codeg-rovai-workbench" "$payload/package-info" && grep -qx "version=$version" "$payload/package-info" && grep -qx "target=$target" "$payload/package-info" || fail 'Package version or target mismatch'
 [ -f "$payload/web-ui/index.html" ] && [ -f "$payload/skills/cli-operations/SKILL.md" ] && [ -x "$payload/rovai-server" ] || fail 'Incomplete package'
 [ "$("$payload/rovai-server" --version)" = "rovai-server $version" ] || fail 'Host/package version mismatch'
 # Claim only a new directory or an installation already owned by this installer.
 if [ -e "$prefix" ] || [ -L "$prefix" ]; then
   [ -d "$prefix" ] && [ ! -L "$prefix" ] && [ -f "$prefix/INSTALLER-V1" ] && [ ! -L "$prefix/INSTALLER-V1" ] || fail 'Program directory is not an installer-owned installation'
-  [ "$(cat "$prefix/INSTALLER-V1")" = rovai-server ] || fail 'Unknown installation owner'
-else mkdir -p "$prefix"; printf '%s\n' rovai-server > "$prefix/INSTALLER-V1"; fi
+  [ "$(cat "$prefix/INSTALLER-V1")" = codeg-rovai-workbench-server ] || fail 'Unknown installation owner'
+else mkdir -p "$prefix"; printf '%s\n' codeg-rovai-workbench-server > "$prefix/INSTALLER-V1"; fi
 mkdir "$prefix/.install-lock" 2>/dev/null || fail 'Another installation is in progress'
 locked=yes
 mkdir -p "$bin_dir"
-command_path="$bin_dir/rovai-server"
+command_path="$bin_dir/codeg-rovai-server"
 if [ -e "$command_path" ] || [ -L "$command_path" ]; then
   [ -L "$command_path" ] && [ "$(readlink "$command_path")" = "$prefix/current/rovai-server" ] || fail 'Existing rovai-server command belongs to another installation'
 fi
@@ -120,4 +120,4 @@ if [ "$modify_path" = yes ]; then
   done
   printf 'Open a new terminal, or run: export PATH=%s:$PATH\n' "'$bin_dir'"
 fi
-printf 'Installed Rovai Server %s (%s). Run rovai-server. Data is selected at launch with --data-dir; installation does not open it.\n' "$version" "$target"
+printf 'Installed Rovai Server %s (%s). Run codeg-rovai-server. Data is selected at launch with --data-dir; installation does not open it.\n' "$version" "$target"

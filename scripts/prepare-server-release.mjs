@@ -26,7 +26,7 @@ for (const target of ['macos-arm64', 'macos-x64', 'windows-x64', 'linux-x64']) {
   const manifest = JSON.parse(target === 'windows-x64'
     ? execFileSync('unzip', ['-p', archive, 'rovai-server/manifest.json'], { encoding: 'utf8' })
     : execFileSync('tar', ['-xzOf', archive, 'rovai-server/manifest.json'], { encoding: 'utf8' }))
-  if (manifest.schemaVersion !== 1 || manifest.version !== version || manifest.commit !== process.env.GITHUB_SHA || manifest.dirty || manifest.profile !== 'release' || manifest.target !== target) throw new Error(`Package provenance mismatch: ${target}`)
+  if (manifest.schemaVersion !== 1 || manifest.productId !== 'codeg-rovai-workbench' || manifest.version !== version || manifest.commit !== process.env.GITHUB_SHA || manifest.dirty || manifest.profile !== 'release' || manifest.target !== target) throw new Error(`Package provenance mismatch: ${target}`)
   for (const name of requiredSkills) {
     const path = `skills/${name}/SKILL.md`
     const sourceDigest = createHash('sha256').update(readFileSync(join(skillsRoot, name, 'SKILL.md'))).digest('hex')

@@ -56,11 +56,15 @@ try {
   // beside the Server executables so a release works outside this checkout.
   cpSync(join(repository, 'skills'), join(destination, 'skills'), { recursive: true })
   copyFileSync(join(repository, 'LICENSE'), join(destination, 'LICENSE'))
+  copyFileSync(join(repository, 'THIRD_PARTY_NOTICES.md'), join(destination, 'THIRD_PARTY_NOTICES.md'))
+  mkdirSync(join(destination,'workbench'),{recursive:true})
+  copyFileSync(join(repository,'integration/sources.lock.json'),join(destination,'workbench/sources.lock.json'))
+  copyFileSync(join(repository,'integration/product-release.json'),join(destination,'workbench/product-release.json'))
   buildNativeHistoryHelper(repository, target.key, { release: !debug, destination })
   const channelPackage = packageServerChannels(repository, destination, target)
   cpSync(join(repository, 'helpers/native-history/LICENSE'), join(destination, 'licenses/native-history-LICENSE'))
   const version = JSON.parse(readFileSync(join(repository, 'package.json'), 'utf8')).version
-  writeFileSync(join(destination, 'package-info'), `schema=1\nversion=${version}\ntarget=${target.key}\n`)
+  writeFileSync(join(destination, 'package-info'), `schema=1\nproduct=codeg-rovai-workbench\nversion=${version}\ntarget=${target.key}\n`)
   copyFileSync(join(repository, 'scripts', target.platform === 'win32' ? 'install-server.ps1' : 'install-server.sh'), join(destination, target.platform === 'win32' ? 'install-server.ps1' : 'install-server.sh'))
   const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repository, encoding: 'utf8' }).trim()
   const dirty = execFileSync('git', ['status', '--porcelain'], { cwd: repository, encoding: 'utf8' }).trim().length > 0
@@ -84,7 +88,7 @@ try {
   }
   hashTree(destination)
   writeFileSync(join(destination, 'manifest.json'), JSON.stringify({
-    schemaVersion: 1, version, commit, dirty, target: target.key, rustTarget: target.rustTarget,
+    schemaVersion: 1, productId: 'codeg-rovai-workbench', version, commit, dirty, target: target.key, rustTarget: target.rustTarget,
     profile, qualification: 'development-preview', channelPackage, files
   }, null, 2) + '\n')
   execFileSync(join(destination, `rovai-host${target.executableSuffix}`), ['--version'], { stdio: 'inherit' })
