@@ -60,7 +60,7 @@ struct RovaiPrivateConversationView: View {
                 ForEach((snapshot["pendingInputs"]?["items"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in pending(row.value) }
                 ForEach(retained.map { RovaiRow(value: $0) }) { row in retainedInput(row.value) }
                 if let cursor { Button("更多保留输入") { Task { await readRetained(after: cursor) } } }
-                ForEach(snapshot["draft"]?["attachments"]?.rvArray ?? [], id: \.self) { attachment in HStack { Text("附件 · \(attachment.text("displayName"))").font(.caption); Spacer(); Button("移除") { Task { await model.command(mutate, value: mutation(.object(["type": .string("remove_attachment"), "attachmentRefId": attachment["attachmentRefId"] ?? .null]))) } }.disabled(disabled) }
+                ForEach(snapshot["draft"]?["attachments"]?.rvArray ?? [], id: \.self) { attachment in HStack { Text("附件 · \(attachment.text("displayName"))").font(.caption); Spacer(); Button("移除") { Task { await model.command(mutate, value: mutation(.object(["type": .string("remove_attachment"), "attachmentRefId": attachment["id"] ?? .null]))) } }.disabled(disabled) }
             }.padding(16)
         }
     }

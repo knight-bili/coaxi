@@ -43,7 +43,9 @@ class RovaiWorkspaceViewModel @Inject constructor(private val servers:ServerRepo
     suspend fun query(operation:RovaiOperation,params:JsonElement=buildJsonObject{}):JsonElement=(client?:throw RovaiHostFailure("尚未连接")).request(operation,params)
     suspend fun readBody(owner:String):String {val selected=profile?:throw RovaiHostFailure("尚未连接");val generation=lifetime;val body=servers.readRovaiBody(selected,owner);if(generation!=lifetime)throw CancellationException("工作区已切换");return body}
     suspend fun saveBody(owner:String,body:String)=bodyGate.withLock{val selected=profile?:throw RovaiHostFailure("尚未连接");val generation=lifetime;servers.saveRovaiBody(selected,owner,body);if(generation!=lifetime)throw CancellationException("工作区已切换")}
-    fun upload(uri:Uri,threadId:String,target:JsonObject,revision:Long){
+    val connectionGeneration:Long get()=lifetime
+    fun upload(uri:Uri,threadId:String,target:JsonObject,revision:Long,expectedHostGeneration:Long=lifetime){
+        if(expectedHostGeneration!=lifetime){mutable.update{it.copy(error="工作区已切换，请重新选择附件")};return}
         if(state.value.pending!=null||state.value.busy)return
         viewModelScope.launch{val generation=lifetime;mutable.update{it.copy(busy=true,error=null)};try{val prepared=RovaiUploadSource.prepare(appContext,uri,threadId,target,revision);if(generation!=lifetime){RovaiUploadSource.remove(appContext,prepared);return@launch};submit(buildJsonObject{put("operation","__host.upload");put("params",prepared)})}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){if(generation==lifetime)mutable.update{it.copy(error=error.message)}}finally{if(generation==lifetime)mutable.update{it.copy(busy=false)}}}
     }
