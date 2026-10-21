@@ -103,10 +103,7 @@ struct RovaiWorkspaceRoot: View {
         }.tabItem { Label(title, systemImage: icon).environment(\.symbolVariants, .none) }.tag(value)
     }
     private var threadList: some View {
-        List {
-            Section("快速对话") { ForEach((model.navigation["quickChat"]?["recentThreads"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in threadLink(row.value) } }
-            ForEach((model.navigation["projects"]?.rvArray ?? []).map { RovaiRow(value: $0) }, id: \.value) { project in Section(project.value.text("name")) { ForEach((project.value["recentThreads"]?.rvArray ?? []).map { RovaiRow(value: $0) }) { row in threadLink(row.value) }; RovaiMoreThreads(model: model, path: project.value.text("projectPath"), total: project.value["totalCount"]?.rvInt ?? 0, displayed: Set((project.value["recentThreads"]?.rvArray ?? []).map { $0.text("id") }), onSelect: horizontalSizeClass == .regular ? { detailRoute = .thread($0) } : nil) } }
-        }.scrollContentBackground(.hidden).refreshable { await model.refresh() }
+        RovaiProjectNavigation(model: model,threadLink: threadLink,onSelect: horizontalSizeClass == .regular ? {detailRoute = .thread($0)} : nil).id(model.connectionGeneration)
     }
     private func threadLink(_ value: JSONValue) -> some View { routeLink(.thread(value.text("id"))) { VStack(alignment: .leading, spacing: 6) { Text(value.text("title")).font(.headline); if let lead = value["defaultLead"] { Text(lead.text("displayName")).font(.caption).foregroundStyle(Theme.textSecondary) } } }.listRowBackground(Color.clear) }
     private var missionList: some View {RovaiMissionBoard(model: model) {id in if horizontalSizeClass == .regular {detailRoute = .thread(id)} else {compactPaths.append(.thread(id))}}}
@@ -122,7 +119,7 @@ struct RovaiWorkspaceRoot: View {
 }
 enum RovaiRoute: Hashable { case thread(String), canvas(String) }
 
-private struct RovaiMoreThreads: View {
+struct RovaiMoreThreads: View {
     let model: RovaiWorkspaceModel; let path: String; let total: Int; let displayed: Set<String>
     var onSelect: ((String) -> Void)? = nil
     @State private var rows: [JSONValue] = []; @State private var offset: Int? = 0; @State private var busy = false; @State private var issue: String?
