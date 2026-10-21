@@ -34,7 +34,7 @@ fun RovaiThreadControls(model:RovaiWorkspaceViewModel,state:RovaiWorkspaceState)
             Text(task.coreText("description"));if(task.coreText("blockedReason").isNotEmpty())Text(task.coreText("blockedReason"),color=CodegTheme.colors.danger);if(task.coreText("completionSummary").isNotEmpty())MarkdownContent(task.coreText("completionSummary"));TextButton(enabled=state.pending==null,onClick={editing=task}){Text("编辑任务")}
         }}
     }
-    if(creating||editing!=null)RovaiTaskEditor(threadId,editing,thread["members"].coreArray(),onDismiss={creating=false;editing=null}){params->model.execute(if(editing==null)RovaiOperation.TASKS_CREATE else RovaiOperation.TASKS_UPDATE,params);creating=false;editing=null}
+    if(creating||editing!=null)RovaiTaskEditor(model,threadId,editing){creating=false;editing=null}
 }
 
 @Composable fun RovaiInteractionCards(model:RovaiWorkspaceViewModel,state:RovaiWorkspaceState,conversationId:String){
@@ -59,9 +59,4 @@ fun RovaiThreadControls(model:RovaiWorkspaceViewModel,state:RovaiWorkspaceState)
             Row{TextButton(enabled=!blocked,onClick={onAnswer(answer(false))}){Text("提交回答")};TextButton(enabled=!blocked,onClick={onAnswer(answer(true))}){Text("暂不回答")}}
         }
     }
-}
-
-@Composable private fun RovaiTaskEditor(threadId:String,task:JsonObject?,members:List<JsonObject>,onDismiss:()->Unit,onSave:(JsonObject)->Unit){
-    var title by remember{mutableStateOf(task?.coreText("title")?:"")};var description by remember{mutableStateOf(task?.coreText("description")?:"")};var assignee by remember{mutableStateOf(task?.coreText("assigneeAgentId")?:members.firstOrNull()?.coreText("agentId").orEmpty())};var status by remember{mutableStateOf(task?.coreText("status")?:"pending")};var reason by remember{mutableStateOf("")}
-    AlertDialog(onDismissRequest=onDismiss,title={Text(if(task==null)"新建任务" else "编辑任务")},text={LazyColumn(verticalArrangement=Arrangement.spacedBy(8.dp)){item{OutlinedTextField(title,{title=it},label={Text("任务名称")})};item{OutlinedTextField(description,{description=it},label={Text("说明")},maxLines=5)};item{members.forEach{member->FilterChip(selected=assignee==member.coreText("agentId"),onClick={assignee=member.coreText("agentId")},label={Text(member.coreText("displayName"))})}};if(task!=null){item{listOf("pending","in_progress","blocked","completed","cancelled").forEach{value->FilterChip(selected=status==value,onClick={status=value},label={Text(value)})}};item{OutlinedTextField(reason,{reason=it},label={Text("完成说明 / 阻塞或取消原因")},maxLines=4)}}}},confirmButton={TextButton(enabled=title.isNotBlank()&&assignee.isNotBlank(),onClick={onSave(buildJsonObject{put("commandId",UUID.randomUUID().toString());put("threadId",threadId);put("title",title);put("description",description);if(task==null)put("assigneeAgentId",assignee)else{put("taskId",task.coreText("taskId"));put("status",status);putJsonObject("assignee"){put("operation","assign");put("agentId",assignee)};if(status=="blocked")put("blockedReason",reason);if(status=="completed")put("completionSummary",reason);if(status=="cancelled")put("cancelReason",reason)}})}){Text("保存")}},dismissButton={TextButton(onClick=onDismiss){Text("取消")}})
 }
