@@ -64,7 +64,8 @@
     "owners": [
       "AppearancePreferencesStore",
       "GeneralPreferencesStore",
-      "WindowsWindowClose_and_WindowClosePreferences"
+      "WindowsWindowClose_and_WindowClosePreferences",
+      "LocalLoggingPreferences"
     ],
     "receipt": "database_applied_and_each_file_state_independent",
     "recovery": "compare_original_before_or_exact_after_inside_owner_write_queue_then_acknowledge_original_plan_digest"
@@ -80,14 +81,67 @@
     "defaultIncludeSecrets": false,
     "recovery": "original_operation_id_with_private_input_HMAC_and_encrypted_frozen_snapshot",
     "privatePath": "trusted_host_only_never_web_response",
-    "clientDownload": "bounded_encrypted_bytes_and_original_digest"
+    "clientDownload": "bounded_encrypted_bytes_and_original_digest",
+    "originalArchiveExport": {
+      "selector": [
+        "archiveId",
+        "sourceDigest"
+      ],
+      "owner": "same_authenticated_client",
+      "preserves": "entire_original_json_including_unknown_fields",
+      "requiresExplicitIncludeSecrets": true,
+      "encrypted": true,
+      "activatesSourceSettings": false
+    }
   },
   "sync": {
     "defaultFullConfiguration": false,
     "defaultIncludeSecrets": false,
     "autoApplyDownloadedConfiguration": false,
     "downloadedDesktopCandidate": "same_archive_registration_and_explicit_migration_selection",
-    "dedupeDigest": "stable_owner_revisions_and_content_not_random_archive_aliases"
+    "dedupeDigest": "stable_owner_revisions_files_and_member_connection_mappings_not_random_archive_aliases",
+    "nativeClients": "same_host_scheduler_private_sync_and_original_receipt_no_phone_scheduler"
   },
-  "sourceStatus": "authored_unreviewed_untested_step_1"
+  "sourceStatus": "authored_unreviewed_untested_step_1",
+  "logging": {
+    "method": "configuration.logging",
+    "authority": "private_authenticated_user_not_model",
+    "desktopOwner": "original_Main_console_queue",
+    "standaloneOwner": "Core_owned_logging_json_and_Host_structured_tracing_filter",
+    "networkDesktop": "readable_owner_status_writable_false",
+    "rawFailureEvidencePreserved": true
+  },
+  "taskTemplates": {
+    "method": "configuration.taskTemplates",
+    "authority": "private_authenticated_user_not_model",
+    "operations": [
+      "list",
+      "get",
+      "put",
+      "remove",
+      "receipt",
+      "finish"
+    ],
+    "mutationReceipt": "exact_command_uuid_client_and_input_in_existing_domain_gateway",
+    "fileOwner": "same_taskTemplates_library_outbox",
+    "taskStartedBySave": false,
+    "draftUse": "explicit_current_runtime_settings_and_original_material_mapping_before_filling_normal_mission_draft",
+    "clients": [
+      "Desktop",
+      "Web",
+      "Android",
+      "iOS"
+    ]
+  },
+  "fileFinish": {
+    "method": "configuration.files.finish",
+    "input": [
+      "commandId"
+    ],
+    "authority": "same_authenticated_owner_of_already_applied_migration_receipt",
+    "effect": "continue_only_original_pending_outbox_plans",
+    "reimport": false,
+    "failedOrConflictRetry": false,
+    "desktopOwnerPreserved": true
+  }
 }
