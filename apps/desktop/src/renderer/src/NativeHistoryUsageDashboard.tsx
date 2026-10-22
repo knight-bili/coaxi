@@ -7,6 +7,7 @@ import { ActivityHeatmap,RankedBars,RingMeter,TrendChart } from './codeg-native-
 import { buildHeatMatrix,cacheHitRate,computeDelta,foldBreakdown,formatTokensPrecise,resolveRange,suggestBucket,type TokenUsageRangePreset } from './codeg-native-content/lib/token-usage'
 import { useTranslations } from './codeg-native-content/ui/source-primitives'
 import { UsageShareDialog } from './UsageShareDialog'
+import { NativeUsagePriceEstimate } from './NativeUsagePriceEstimate'
 
 /** 冻结导入材料的原 Codeg 用量口径，和本应用运行数据分开。 */
 export function NativeHistoryUsageDashboard():React.JSX.Element {
@@ -47,6 +48,7 @@ export function NativeHistoryUsageDashboard():React.JSX.Element {
         <div className="usage-dashboard-two-panels"><section className="flex min-w-0 flex-col rounded-xl border border-border bg-card p-4"><h2 className="mb-3 text-sm font-semibold">{t('活动热力图')}</h2><ActivityHeatmap matrix={heat.cells} max={heat.max} weekdayLabels={weekdays} formatAria={(day,hour,value)=>t('{0} {1} 时，已报告 {2} Token',weekdays[day],hour,formatTokensPrecise(value))} legendLess={t('少')} legendMore={t('多')}/></section>
           <section className="rounded-xl border border-border bg-card p-4"><h2 className="mb-3 text-sm font-semibold">{t('模型排行')}</h2><RankedBars data={foldBreakdown(report.by_model,7).shown.map(row=>({key:row.key,label:row.key==='__unknown__'?t('未知模型'):row.label,value:row.total_tokens,share:totals.total_tokens>0?row.total_tokens/totals.total_tokens:null}))} emptyLabel={t('此范围没有已报告的用量。')} showRank/></section></div>
         <section className="rounded-xl border border-border bg-card p-4"><h2 className="mb-3 text-sm font-semibold">{t('工程排行')}</h2><RankedBars data={foldBreakdown(report.by_folder,7).shown.map(row=>({key:row.key,label:row.label,value:row.total_tokens,share:totals.total_tokens>0?row.total_tokens/totals.total_tokens:null}))} emptyLabel={t('此范围没有已报告的用量。')} showRank onSelect={key=>{const row=data.folderKeys.find(row=>String(row.id)===key);if(row?.path)setProject(row.path)}}/></section>
+        <NativeUsagePriceEstimate report={report}/>
         <p className="usage-dashboard-source-note">{t('{0} 份会话未报告用量；{1} 份使用原版整会话总量回退；已排除同源旧快照 {2} 份。',data.sessionsWithoutUsage,data.sessionTotalFallbacks,data.supersededSnapshots)}</p>
         <p className="usage-dashboard-source-note">{t('整会话回退会集中记在会话末尾，不代表每个小时的真实花费。此页不与融合运行数据相加。')}</p>
       </>}
