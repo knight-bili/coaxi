@@ -61,7 +61,7 @@ pub fn stage(target:&Path,source:&Path,expected:&str,cancel:&CancellationToken)-
             progress(index as u64+1,entries.len()as u64,"migration_copy");
         }
         ensure!(snapshot(source,cancel)?.0.digest==expected,"migration.source_changed");
-        let manifest=Manifest{format_version:2,product:"codeg-rovai-core".into(),app_version:"legacy-rovai".into(),created_at:chrono::Utc::now().to_rfc3339(),entries,roots:Vec::new()};
+        let manifest=Manifest{runtime_links:Vec::new(),file_modes:Default::default(),format_version:2,product:"codeg-rovai-core".into(),app_version:"legacy-rovai".into(),created_at:chrono::Utc::now().to_rfc3339(),entries,roots:Vec::new()};
         let mut units=fs::read_dir(target)?.map(|entry|entry.map(|entry|entry.file_name().to_string_lossy().into_owned())).collect::<std::io::Result<HashSet<_>>>()?;
         units.extend(manifest.entries.iter().filter_map(|entry|entry.path.split('/').next().map(str::to_owned)));units.retain(|unit|!excluded(unit));let mut units=units.into_iter().collect::<Vec<_>>();units.sort();
         let safety=operation.join("before");prepare_private_directory(&safety)?;
