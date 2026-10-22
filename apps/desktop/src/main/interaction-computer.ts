@@ -12,7 +12,8 @@ interface Preferences{revision:string;enabled:boolean;launch:boolean;clipboard:b
 interface Peer{desktopPeerId:string;coreInstanceId:string;ownerWindowId:string;connectionGeneration:number}
 interface NativeWindow{targetId:string;appId:string|null;appName:string;appKey:string|null;title:string;shareable:boolean;identity:unknown;bounds:unknown}
 interface Pending{resolve(value:unknown):void;reject(error:Error):void;timer:ReturnType<typeof setTimeout>}
-interface Activity {scopeKey:string;targetId:string;action:string;outcome:'done'|'refused'|'failed';at:number;app:string|null;count:number}
+export interface ComputerActivity {scopeKey:string;targetId:string;action:string;outcome:'done'|'refused'|'failed';at:number;app:string|null;count:number}
+export interface InteractionComputerMonitor {enabled:boolean;connected:boolean;lastError:string|null;stopShortcut:string|null;grants:InteractionGrant[];activity:Array<ComputerActivity&{scope?:InteractionScope;agentId?:string}>}
 const digest=(value:unknown):string=>createHash('sha256').update(JSON.stringify(value)).digest('hex')
 
 /** 仅本机窗口拥有此管道。模型和远程 Web 均拿不到子进程的认证材料。 */
@@ -35,7 +36,7 @@ export class InteractionComputer implements DesktopComputerExecutor{
   private readonly unsubscribe:()=>void
   private writing:Promise<unknown>=Promise.resolve()
   private readonly scopes=new Map<string,{scope:InteractionScope;agentId:string}>()
-  private readonly activity:Activity[]=[]
+  private readonly activity:ComputerActivity[]=[]
   private readonly nativeStates=new Map<string,unknown>()
   constructor(private readonly core:CoreClient,private readonly owner:()=>BrowserWindow|null){this.ready=this.load();this.unsubscribe=core.onEvent(event=>{if(event.method!=='interaction.run.revoked')return;const input=event.params as {agentRunId?:string;bridgeInstanceId?:string},running=input.agentRunId?this.running.get(input.agentRunId):null;if(running&&running.bridgeInstanceId===input.bridgeInstanceId)void this.request('stop_scope',running).catch(()=>undefined)});void app.whenReady().then(()=>this.ready).then(()=>this.updateShortcut()).catch(()=>undefined)}
   available():boolean{try{return this.preferences.enabled&&!this.failed&&existsSync(resolveCoreBinary())}catch{return false}}
@@ -75,7 +76,7 @@ export class InteractionComputer implements DesktopComputerExecutor{
     if(event.event==='computer://state'){this.nativeStates.set(envelope.scopeKey,envelope.payload);return}
     if(event.event==='computer://backend-status'){const state=envelope.payload as {state?:string;detail?:string};if(state.state==='unavailable'||state.state==='failed')this.lastError=state.detail??'computer.backend_unavailable';return}
     if(event.event!=='computer://agent-activity')return
-    const payload=envelope.payload as Omit<Activity,'scopeKey'|'count'>
+    const payload=envelope.payload as Omit<ComputerActivity,'scopeKey'|'count'>
     const actions=['capture','snapshot','verify','click','drag','scroll','type','key','hold-key','set-value','restore','menu','set-frame','launch','clipboard-read','clipboard-write']
     if(!payload||typeof payload.targetId!=='string'||!actions.includes(payload.action)||!['done','refused','failed'].includes(payload.outcome)||!Number.isSafeInteger(payload.at))return
     const head=this.activity[0]
@@ -83,7 +84,7 @@ export class InteractionComputer implements DesktopComputerExecutor{
     else this.activity.unshift({scopeKey:envelope.scopeKey,targetId:payload.targetId,action:payload.action,outcome:payload.outcome,at:payload.at,app:typeof payload.app==='string'?payload.app:null,count:1})
     this.activity.splice(50)
   }
-  async monitor():Promise<unknown>{
+  async monitor():Promise<InteractionComputerMonitor>{
     await this.ready
     const peer=this.peer
     const all=peer?await this.core.request<{grants:InteractionGrant[]}>('interaction.local',{action:'grant.list',payload:{desktopPeerId:peer.desktopPeerId}}):{grants:[]}
@@ -95,8 +96,6 @@ export class InteractionComputer implements DesktopComputerExecutor{
   async clearActivity(before:number):Promise<void>{if(!Number.isSafeInteger(before))throw new Error('invalid_arguments');for(let index=this.activity.length-1;index>=0;index--)if(this.activity[index].at<=before)this.activity.splice(index,1)}
   private async open():Promise<void>{
     await this.ready
-    if(method==='monitor')return this.monitor()
-    if(method==='activity.clear'){await this.clearActivity((input as {before:number})?.before);return {cleared:true}}
     if(this.child)return
     if(this.opening)return this.opening
     if(!this.available()||!this.peer)throw new Error('runtime_unavailable')
@@ -155,6 +154,8 @@ export class InteractionComputer implements DesktopComputerExecutor{
   async invoke(event:IpcMainInvokeEvent,method:unknown,input:unknown):Promise<unknown>{
     const owner=this.owner();if(!owner||owner.isDestroyed()||event.sender!==owner.webContents||event.senderFrame!==owner.webContents.mainFrame)throw new Error('computer.local_owner_required')
     await this.ready
+    if(method==='monitor')return this.monitor()
+    if(method==='activity.clear'){await this.clearActivity((input as {before:number})?.before);return {cleared:true}}
     if(method==='preferences.get')return {...this.preferences,lastError:this.lastError}
     if(method==='preferences.set'){
       const value=input as Preferences;this.validate(value);if(value.revision!==this.preferences.revision)throw new Error('computer.preferences_changed')

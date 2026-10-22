@@ -8,6 +8,7 @@ import { BrowserWorkspace } from './browser-workspace'
 import { InteractionWorkspace } from './interaction-workspace'
 import { InteractionComputer } from './interaction-computer'
 import { InteractionResultJournal } from './interaction-result-journal'
+import { InteractionComputerIndicator } from './interaction-computer-indicator'
 import { creationPreferences, withHostConversationPreferences } from '../shared/host-general-preferences'
 import { createHostChannelHandler } from './host-channels'
 import { FilePreviewFrameNavigation } from './file-preview/file-preview-navigation'
@@ -1267,6 +1268,8 @@ ipcMain.handle('rovai:office-workspace',(event,input)=>officeWorkspace.open(even
 app.on('before-quit',()=>officeWorkspace.closeAll())
 const browserWorkspace = new BrowserWorkspace((method,params)=>core.request(method,params),()=>mainWindow)
 const interactionComputer = new InteractionComputer(core,()=>mainWindow)
+const interactionComputerIndicator = new InteractionComputerIndicator(interactionComputer,()=>mainWindow,async()=>{try{await core.request('interaction.local',{action:'computer.stop',payload:{}})}finally{await interactionComputer.stop()}})
+app.once('will-quit',()=>interactionComputerIndicator.dispose())
 const interactionWorkspace = new InteractionWorkspace(core,browserWorkspace,()=>mainWindow,interactionComputer,new InteractionResultJournal(app.getPath('userData'),()=>coreDataPath))
 ipcMain.handle('rovai:interaction-computer',(event,method,input)=>interactionComputer.invoke(event,method,input))
 app.on('before-quit',()=>{void interactionComputer.dispose()})
