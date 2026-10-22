@@ -1,0 +1,14 @@
+{
+  "revision": 1,
+  "confirmedRevision": 1,
+  "confirmationStatus": "confirmed",
+  "confirmedBy": "user",
+  "confirmedAt": "2026-10-22T09:53:51.621558+00:00",
+  "statement": "确认，按原生继续分叉插话 r1 实施",
+  "questionRevisionLabel": "原生继续分叉插话 r1",
+  "questionItemId": "call_aa3d621dbf6e415ca5daf60e1cd6cf8a:0",
+  "frozenContractSha256": "aff687c41bf2a9485d53fb6712b405eb6d9366a36da8076b9ffcdae4c20ce030",
+  "paidModelAuthorization": false,
+  "mainMergeAuthorization": false,
+  "releaseAuthorization": false
+}
