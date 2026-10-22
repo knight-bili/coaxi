@@ -111,7 +111,7 @@ impl Core {
                 if core.interaction_tools.authenticated_binding(&bridge_id,&secret).is_err() { break; }
                 {
                     let database = core.database.lock().await;
-                    if require_binding(&database,&core.interaction_tools,&binding).is_err() { let _=core.interaction_tools.disconnect(&bridge_id); break; }
+                    if require_binding(&database,&core.interaction_tools,&binding).is_err() { let _=core.interaction_tools.disconnect(&bridge_id);emit(&core.output,"interaction.run.revoked",json!({"agentRunId":binding["agentRunId"],"bridgeInstanceId":bridge_id})); break; }
                 }
                 let accepted = tokio::time::timeout(std::time::Duration::from_secs(1),listener.accept()).await;
                 let stream = match accepted { Ok(Ok(stream))=>stream, Err(_)=>continue, Ok(Err(_))=>break };

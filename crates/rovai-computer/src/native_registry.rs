@@ -76,9 +76,9 @@ impl NativeRegistry {
         ensure!(stop==self.stop_generation(),"cancelled");
         Ok(result)
     }
-    pub async fn stop_scope(&self,scope:&str)->Result<Value>{
+    pub async fn stop_scope(&self,scope:&str,expected_bridge:Option<&str>)->Result<Value>{
         let slot={self.slots.lock().await.get(scope).cloned()};
-        if let Some(slot)=slot {slot.binding.lock().map_err(|_|anyhow::anyhow!("computer.binding_lock"))?.clear();slot.service.stop().await;let mut config=slot.configuration.snapshot().await;config.enabled=false;slot.configuration.set(config).await;*slot.gate.lock().await=None;}
+        if let Some(slot)=slot { {let mut binding=slot.binding.lock().map_err(|_|anyhow::anyhow!("computer.binding_lock"))?;if expected_bridge.is_some_and(|expected|binding.as_str()!=expected){return Ok(json!({"stopped":false,"bindingChanged":true}))}binding.clear();}slot.service.stop().await;let mut config=slot.configuration.snapshot().await;config.enabled=false;slot.configuration.set(config).await;*slot.gate.lock().await=None;}
         Ok(json!({"stopped":true,"stopGeneration":self.stop_generation()}))
     }
     pub async fn stop_all(&self)->Value {
@@ -97,7 +97,7 @@ impl NativeRegistry {
             "configure"=>self.configure(serde_json::from_value(params)?).await,
             "picker"=>self.picker(text("scopeKey")?).await,
             "status"=>self.status(text("scopeKey")?).await,
-            "stop_scope"=>self.stop_scope(text("scopeKey")?).await,
+            "stop_scope"=>self.stop_scope(text("scopeKey")?,params["bridgeInstanceId"].as_str()).await,
             "stop_all"=>Ok(self.stop_all().await),
             "call"=>self.call(text("scopeKey")?,text("bridgeInstanceId")?,params["expectedStopGeneration"].as_u64().context("invalid_arguments")?,text("toolName")?,&params["arguments"]).await,
             _=>anyhow::bail!("computer.operation_not_admitted"),
