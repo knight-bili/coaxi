@@ -27,6 +27,7 @@ export type ThreadClient = Pick<RovaiApi,
   webdavWorkspace?: RovaiApi['webdavWorkspace']
   nativeBackups?: RovaiApi['nativeBackups']
   keyboardShortcuts?:RovaiApi['keyboardShortcuts']
+  workbenchEditorRecovery?:RovaiApi['workbenchEditorRecovery']
   nativeCustomSkills?: RovaiApi['nativeCustomSkills']
   nativeHistory?: RovaiApi['nativeHistory']
   officeWorkspace?: RovaiApi['officeWorkspace']

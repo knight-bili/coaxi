@@ -23,12 +23,12 @@ export class WorkbenchEditorDrafts {
   private publish(change:Partial<EditorDraftStatus>):void{if(this.disposed)return;this.current={...this.current,...change};for(const listener of this.listeners)listener()}
   private cache():Promise<void>{
     if(!this.record)return Promise.reject(new Error('工程草稿尚未准备好。'))
-    const value=structuredClone(this.record),write=this.cacheTail.catch(()=>undefined).then(()=>saveEditorRecovery(value));this.cacheTail=write;return write
+    const value=structuredClone(this.record),write=this.cacheTail.catch(()=>undefined).then(()=>saveEditorRecovery(value,this.client.workbenchEditorRecovery));this.cacheTail=write;return write
   }
   async start():Promise<WorkbenchEditorState|null>{
     const generation=++this.generation;this.disposed=false;this.publish({ready:false,issue:null});await this.cacheTail.catch(()=>undefined)
     const identity=await readCanvasViewScope(this.client);if(!identity)throw new Error('无法确定工程草稿所属主机。')
-    const key=JSON.stringify([identity.host,identity.core,this.threadId,this.projectPath]),record=await loadEditorRecovery(key)
+    const key=JSON.stringify([identity.host,identity.core,this.threadId,this.projectPath]),record=await loadEditorRecovery(key,this.client.workbenchEditorRecovery)
     const result=await this.client.request<WorkbenchEditorSnapshot>('workbench.editor',{operation:'get',scope:{threadId:this.threadId},editorId:record.editorId})
     if(this.disposed||generation!==this.generation)return null
     if(record.workspaceRoot&&record.workspaceRoot!==result.workspaceRoot)throw new Error('原工程目录已改变，本机原草稿保留，请先恢复原工程。')
@@ -53,16 +53,16 @@ export class WorkbenchEditorDrafts {
   async useHostVersion():Promise<WorkbenchEditorState|null>{
     if(this.flight)throw new Error('工程草稿仍在补存。')
     const host=await this.readHost(),record=this.record!
-    if(record.latest)await saveEditorRecovery({...structuredClone(record),key:`${record.key}:copy:${crypto.randomUUID()}`})
+    if(record.latest)await saveEditorRecovery({...structuredClone(record),key:`${record.key}:copy:${crypto.randomUUID()}`},this.client.workbenchEditorRecovery)
     record.pending=null;record.latest=host.value?structuredClone(host.value):null;record.revision=host.revision;record.workspaceRoot=host.workspaceRoot;this.acknowledged=host.value;await this.cache()
     this.publish({ready:true,pending:false,saving:false,issue:null,revision:record.revision});return record.latest?structuredClone(record.latest):null
   }
-  async copies(after:string|null=null):ReturnType<typeof listEditorCopies>{if(!this.record)throw new Error('工程草稿尚未读取。');if(after&&!after.startsWith(`${this.record.key}:copy:`))throw new Error('原副本不属于这个工程。');return listEditorCopies(this.record.key,after)}
+  async copies(after:string|null=null):ReturnType<typeof listEditorCopies>{if(!this.record)throw new Error('工程草稿尚未读取。');if(after&&!after.startsWith(`${this.record.key}:copy:`))throw new Error('原副本不属于这个工程。');return listEditorCopies(this.record.key,after,this.client.workbenchEditorRecovery)}
   async restoreCopy(key:string):Promise<WorkbenchEditorState>{
     const record=this.record;if(!record||!key.startsWith(`${record.key}:copy:`)||this.flight)throw new Error('工程副本尚未准备好。')
-    const copy=await readEditorCopy(key),host=await this.readHost()
+    const copy=await readEditorCopy(key,this.client.workbenchEditorRecovery),host=await this.readHost()
     if(copy.editorId!==record.editorId||copy.workspaceRoot!==host.workspaceRoot||!copy.latest)throw new Error('原副本的工程归属已改变。')
-    if(record.latest)await saveEditorRecovery({...structuredClone(record),key:`${record.key}:copy:${crypto.randomUUID()}`})
+    if(record.latest)await saveEditorRecovery({...structuredClone(record),key:`${record.key}:copy:${crypto.randomUUID()}`},this.client.workbenchEditorRecovery)
     record.latest=structuredClone(copy.latest);record.pending=null;record.revision=host.revision;record.workspaceRoot=host.workspaceRoot;this.acknowledged=host.value;await this.cache();this.publish({ready:true,pending:!same(record.latest,this.acknowledged),issue:null,revision:record.revision});return structuredClone(record.latest)
   }
   flush():Promise<void>{
