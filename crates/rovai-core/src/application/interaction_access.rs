@@ -175,10 +175,12 @@ impl Core {
                 Ok(json!({"grants":broker.grants(payload)?}))
             }
             "desktop.poll" => { let database = self.database.lock().await; broker.poll(payload, |binding| require_binding(&database, broker, binding)) }
+            "desktop.targets" => broker.register_targets(payload.clone()),
             "desktop.check" => { let database = self.database.lock().await; broker.check_desktop_call(payload, |binding| require_binding(&database, broker, binding)) }
             "desktop.finish" => { let database = self.database.lock().await; broker.finish(payload, |binding| require_binding(&database, broker, binding)) }
             "pending" => Ok(json!({"items":broker.pending()?})),
-            "eval.approve" => { broker.approve(string(payload,"bridgeCallId")?,string(payload,"argumentsDigest")?)?; Ok(json!({"approved":true})) }
+            "eval.approve"|"operation.approve" => { broker.approve(string(payload,"bridgeCallId")?,string(payload,"argumentsDigest")?)?; Ok(json!({"approved":true})) }
+            "computer.stop"=>broker.stop_computer(),
             "unknown.reconcile" => broker.reconcile_unknown(string(payload,"bridgeCallId")?,string(payload,"argumentsDigest")?),
             "run.revoke" => { broker.revoke_run(string(payload,"agentRunId")?)?; Ok(json!({"revoked":true})) }
             _ => anyhow::bail!("interaction.operation_not_admitted"),

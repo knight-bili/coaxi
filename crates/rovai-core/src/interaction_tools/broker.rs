@@ -17,6 +17,7 @@ struct State {
     grants: BTreeMap<String, Value>,
     ledger: BTreeMap<String, Ledger>,
     approvals: HashMap<String, String>,
+    targets:HashMap<String,(u64,Value)>,
 }
 pub struct Broker { pub policies: PolicyStore, root: PathBuf, core_instance: String, state: Mutex<State> }
 fn text<'a>(value: &'a Value, key: &str) -> Result<&'a str> { value[key].as_str().context("interaction.invalid_identity") }
@@ -105,6 +106,18 @@ impl Broker {
         Ok(peer)
     }
     pub fn peers(&self) -> Result<Vec<Value>> { Ok(self.locked()?.peers.values().filter(|peer| unexpired(peer)).cloned().collect()) }
+    pub fn register_targets(&self,value:Value)->Result<Value>{
+        #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Catalog{desktop_peer_id:String,connection_generation:u64,sequence:u64,targets:Vec<Target>}
+        #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Target{target_id:String,target_kind:String,app_id:Option<String>,shareable:bool}
+        let input:Catalog=serde_json::from_value(value.clone())?;
+        ensure!(input.sequence>0&&input.sequence<=MAX_SAFE_INTEGER&&input.targets.len()<=4096,"invalid_arguments");
+        let mut ids=BTreeSet::new();
+        for target in &input.targets{ensure!(ids.insert(&target.target_id)&&target.target_id.len()<=256&&matches!(target.target_kind.as_str(),"computer_window"|"computer_app"|"computer_desktop"),"invalid_arguments");if target.target_kind=="computer_window"{ensure!(target.app_id.as_ref().is_none_or(|id|id.len()<=256),"invalid_arguments")}}
+        let mut state=self.locked()?;self.peer(&state,&input.desktop_peer_id,&json!(input.connection_generation))?;
+        if let Some((sequence,previous))=state.targets.get(&input.desktop_peer_id){if *sequence==input.sequence&&previous==&value{return Ok(json!({"registered":true}))}ensure!(input.sequence>*sequence,"generation_changed")}
+        state.grants.retain(|_,grant|grant["desktopPeerId"]!=input.desktop_peer_id||grant["targetKind"]=="browser_tab"||input.targets.iter().any(|target|grant["targetId"]==target.target_id&&grant["targetKind"]==target.target_kind&&target.shareable));
+        state.targets.insert(input.desktop_peer_id,(input.sequence,value));Ok(json!({"registered":true}))
+    }
     fn peer<'a>(&self, state: &'a State, id: &str, generation: &Value) -> Result<&'a Value> {
         let peer = state.peers.get(id).context("desktop_unavailable")?;
         ensure!(unexpired(peer) && &peer["connectionGeneration"] == generation, "desktop_unavailable");
@@ -122,6 +135,7 @@ impl Broker {
         let mut state = self.locked()?;
         let peer_id = text(&grant, "desktopPeerId")?;
         ensure!(state.peers.get(peer_id).is_some_and(unexpired), "desktop_unavailable");
+        if grant["targetKind"]!="browser_tab"{ensure!(state.targets.get(peer_id).and_then(|(_,catalog)|catalog["targets"].as_array()).is_some_and(|targets|targets.iter().any(|target|target["targetId"]==grant["targetId"]&&target["targetKind"]==grant["targetKind"]&&target["shareable"]==true)),"target_changed")}
         let id = text(&grant, "grantId")?.to_owned();
         if let Some(previous) = state.grants.get(&id) { if previous == &grant {return Ok(previous.clone());} ensure!(grant["grantGeneration"].as_u64() > previous["grantGeneration"].as_u64() && same_scope(previous, &grant) && previous["desktopPeerId"] == grant["desktopPeerId"] && previous["targetId"] == grant["targetId"], "generation_changed"); }
         state.grants.insert(id, grant.clone());
@@ -141,11 +155,13 @@ impl Broker {
     pub fn disconnect(&self, bridge_id: &str) -> Result<()> { self.revoke_locked(&mut self.locked()?, bridge_id) }
     pub fn grants(&self, binding: &Value) -> Result<Vec<Value>> { Ok(self.locked()?.grants.values().filter(|grant| unexpired(grant) && same_scope(grant, binding) && grant["desktopPeerId"] == binding["desktopPeerId"]).cloned().collect()) }
     fn selected_grants(&self, state: &State, binding: &Value, name: &str, arguments: &Value) -> Result<Vec<Value>> {
+        if matches!(name,"computer_launch_app"|"computer_clipboard_read"|"computer_clipboard_write"){return Ok(Vec::new())}
         if name == "browser_open_tab" { return Ok(Vec::new()); }
         if matches!(name, "browser_list_tabs" | "computer_list_apps" | "computer_list_windows") {
             return Ok(state.grants.values().filter(|grant| unexpired(grant) && same_scope(grant,binding) && grant["desktopPeerId"] == binding["desktopPeerId"]).cloned().collect());
         }
         let target = arguments["tabId"].as_str().or(arguments["targetId"].as_str());
+        let app_id=state.targets.get(binding["desktopPeerId"].as_str().unwrap_or("")).and_then(|(_,catalog)|catalog["targets"].as_array()).and_then(|targets|targets.iter().find(|row|row["targetId"].as_str()==target)).and_then(|row|row["appId"].as_str());
         let needed = if mutates(name) { "control" } else { "read" };
         let selected: Vec<Value> = state.grants.values().filter(|grant| {
             if !unexpired(grant) || !same_scope(grant, binding) || grant["desktopPeerId"] != binding["desktopPeerId"] { return false; }
@@ -153,8 +169,9 @@ impl Broker {
             match name {
                 "computer_launch_app" => grant["targetKind"] == "computer_app" && (arguments["key"] == grant["targetId"] || arguments["name"] == grant["targetId"]),
                 "computer_clipboard_read" | "computer_clipboard_write" => grant["targetKind"] == "computer_desktop",
-                "computer_invoke_menu" => grant["targetKind"] == "computer_app" && target == grant["targetId"].as_str(),
-                _ => target == grant["targetId"].as_str() && if name.starts_with("browser_") { grant["targetKind"] == "browser_tab" } else { matches!(grant["targetKind"].as_str(), Some("computer_window" | "computer_desktop" | "computer_app")) },
+                "computer_invoke_menu" => grant["targetKind"] == "computer_app" && app_id.is_some() && app_id == grant["targetId"].as_str(),
+                _ if name.starts_with("browser_") => target == grant["targetId"].as_str() && grant["targetKind"] == "browser_tab",
+                _ => (grant["targetKind"]=="computer_window"&&target==grant["targetId"].as_str())||(grant["targetKind"]=="computer_app"&&app_id.is_some()&&app_id==grant["targetId"].as_str())||(grant["targetKind"]=="computer_desktop"&&grant["targetId"]==rovai_computer::computer::targets::SCREEN_TARGET_ID),
             }
         }).cloned().collect();
         ensure!(!selected.is_empty(), "grant_required");
@@ -189,7 +206,7 @@ impl Broker {
     pub fn approve(&self, id: &str, arguments_digest: &str) -> Result<()> {
         let mut state = self.locked()?;
         let ledger = state.ledger.get(id).context("original_request_pending")?;
-        ensure!(ledger.call["toolName"] == "browser_eval" && ledger.receipt["state"] == "prepared" && ledger.call["argumentsDigest"] == arguments_digest, "approval_rejected");
+        ensure!(needs_local_approval(text(&ledger.call,"toolName")?) && ledger.receipt["state"] == "prepared" && ledger.call["argumentsDigest"] == arguments_digest, "approval_rejected");
         self.current_bridge(&state, text(&ledger.binding, "bridgeInstanceId")?)?;
         self.grants_current(&state, ledger)?;
         state.approvals.insert(id.to_owned(), arguments_digest.to_owned());
@@ -216,7 +233,7 @@ impl Broker {
             let mut ledger = state.ledger[&id].clone();
             let valid = authority(&ledger.binding).and_then(|_| self.current_bridge(&state, text(&ledger.binding, "bridgeInstanceId")?).map(|_| ())).and_then(|_| self.grants_current(&state, &ledger));
             if valid.is_err() { ledger.receipt["state"] = json!("cancelled"); ledger.receipt["finishedAt"] = json!(Utc::now().to_rfc3339()); self.persist(&ledger)?; state.ledger.insert(id, ledger); continue; }
-            if ledger.call["toolName"] == "browser_eval" && state.approvals.get(&id).map(String::as_str) != ledger.call["argumentsDigest"].as_str() { continue; }
+            if needs_local_approval(text(&ledger.call,"toolName")?) && state.approvals.get(&id).map(String::as_str) != ledger.call["argumentsDigest"].as_str() { continue; }
             // 这一持久化先于把动作交给桌面；中途丢失只能记 unknown。
             ledger.receipt["state"] = json!("started");
             self.persist(&ledger)?;
@@ -284,6 +301,7 @@ impl Broker {
     }
     pub fn revoke_run(&self, run: &str) -> Result<()> { let mut state = self.locked()?; let ids: Vec<String> = state.bridges.iter().filter(|(_, bridge)| bridge.binding["agentRunId"] == run).map(|(id, _)| id.clone()).collect(); for id in ids { self.revoke_locked(&mut state, &id)?; } Ok(()) }
     pub fn revoke_peer(&self, peer: &str) -> Result<()> { let mut state = self.locked()?; state.peers.remove(peer); state.grants.retain(|_, grant| grant["desktopPeerId"] != peer); let ids: Vec<String> = state.bridges.iter().filter(|(_, bridge)| bridge.binding["desktopPeerId"] == peer).map(|(id, _)| id.clone()).collect(); for id in ids { self.revoke_locked(&mut state, &id)?; } Ok(()) }
+    pub fn stop_computer(&self)->Result<Value>{let mut state=self.locked()?;state.grants.retain(|_,grant|grant["targetKind"]=="browser_tab");let ids:Vec<String>=state.ledger.iter().filter(|(_,ledger)|ledger.call["toolName"].as_str().is_some_and(|name|name.starts_with("computer_"))&&matches!(ledger.receipt["state"].as_str(),Some("prepared"|"started"))).map(|(id,_)|id.clone()).collect();for id in ids{state.approvals.remove(&id);let ledger=state.ledger.get_mut(&id).context("original_request_pending")?;ledger.receipt["state"]=json!(if ledger.receipt["state"]=="started"{"unknown"}else{"cancelled"});ledger.receipt["finishedAt"]=json!(Utc::now().to_rfc3339());self.persist(ledger)?;}Ok(json!({"revoked":true}))}
     pub fn pending(&self) -> Result<Vec<Value>> { Ok(self.locked()?.ledger.values().filter(|ledger| matches!(ledger.receipt["state"].as_str(), Some("prepared" | "started" | "unknown")) && !ledger.owner_reconciled).map(|ledger| json!({"binding":ledger.binding,"call":ledger.call,"receipt":ledger.receipt})).collect()) }
     pub fn reconcile_unknown(&self, id: &str, expected_digest: &str) -> Result<Value> { let mut state = self.locked()?; let ledger = state.ledger.get_mut(id).context("original_request_pending")?; ensure!(ledger.receipt["state"] == "unknown" && ledger.call["argumentsDigest"] == expected_digest, "original_request_pending"); ledger.owner_reconciled = true; self.persist(ledger)?; Ok(ledger.receipt.clone()) }
 }

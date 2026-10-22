@@ -157,3 +157,4 @@ pub fn failure(status: &str, code: &str) -> Value {
 pub fn mutates(name: &str) -> bool {
     !matches!(name, "browser_list_tabs" | "browser_snapshot" | "browser_console_messages" | "browser_screenshot" | "computer_list_apps" | "computer_list_windows" | "computer_screenshot" | "computer_snapshot" | "computer_verify" | "computer_clipboard_read")
 }
+pub fn needs_local_approval(name:&str)->bool{matches!(name,"browser_eval"|"computer_launch_app"|"computer_clipboard_read"|"computer_clipboard_write")}
