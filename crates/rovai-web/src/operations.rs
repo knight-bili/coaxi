@@ -5,6 +5,12 @@ use serde::{Deserialize, Serialize};
 /// and the legacy shared draft remain outside the network capability.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum Operation {
+    #[serde(rename="history.execution.preview")]
+    NativeContinuationPreview,
+    #[serde(rename="history.execution.confirm")]
+    NativeContinuationConfirm,
+    #[serde(rename="history.execution.receipt")]
+    NativeContinuationReceipt,
     #[serde(rename="runtime.steer.policy.get")]
     NativeSteerPolicyGet,
     #[serde(rename="runtime.steer.policy.set")]
@@ -561,6 +567,7 @@ pub enum Operation {
 impl Operation {
     pub fn timeout(self) -> std::time::Duration {
         std::time::Duration::from_secs(match self {
+            Self::NativeContinuationPreview => 120,
             Self::ForgeLinks => 120,
             Self::ProjectLauncher => 30,
             Self::WorkbenchFileTools => 120,
@@ -586,6 +593,8 @@ impl Operation {
     pub fn project(self, mut value: serde_json::Value) -> serde_json::Value {
         use serde_json::json;
         match self {
+            Self::NativeContinuationPreview => select_fields(&value,&["schemaVersion","previewId","previewDigest","expiresAt","source","mode","point","sourceThreadId","newThreadId","newConversationId","agentId","expectedAgentVersion","runtimeConfigDigest","workspaceDigest","title","historyMessageCount","capabilityStatus","reason"]),
+            Self::NativeContinuationConfirm | Self::NativeContinuationReceipt => select_fields(&value,&["schemaVersion","commandId","state","originId","threadId","conversationId","reportedSessionId","error"]),
             Self::NativeSteerPolicyGet => select_fields(&value,&["schemaVersion","revision","members"]),
             Self::NativeSteerPolicySet => select_fields(&value,&["commandId","commandType","status","code","payload","resultEntity","recordedAt"]),
             Self::NativeSteerTargets => select_fields(&value,&["schemaVersion","targets"]),
@@ -687,6 +696,9 @@ impl Operation {
     pub fn method(self) -> &'static str {
         match self {
             Self::NativeSteerPolicyGet => "runtime.steer.policy.get",
+            Self::NativeContinuationPreview => "history.execution.preview",
+            Self::NativeContinuationConfirm => "history.execution.confirm",
+            Self::NativeContinuationReceipt => "history.execution.receipt",
             Self::NativeSteerPolicySet => "runtime.steer.policy.set",
             Self::NativeSteerTargets => "runtime.steer.targets",
             Self::NativeSteerMaterialsPrepare => "runtime.steer.materials.prepare",

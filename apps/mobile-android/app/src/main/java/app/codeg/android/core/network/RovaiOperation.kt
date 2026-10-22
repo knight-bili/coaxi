@@ -2,6 +2,9 @@ package app.codeg.android.core.network
 
 /** Generated from the explicit public Host enum; private Core methods are not admitted. */
 enum class RovaiOperation(val wire:String) {
+    HISTORY_EXECUTION_PREVIEW("history.execution.preview"),
+    HISTORY_EXECUTION_CONFIRM("history.execution.confirm"),
+    HISTORY_EXECUTION_RECEIPT("history.execution.receipt"),
     RUNTIME_STEER_POLICY_GET("runtime.steer.policy.get"),
     RUNTIME_STEER_POLICY_SET("runtime.steer.policy.set"),
     RUNTIME_STEER_TARGETS("runtime.steer.targets"),
