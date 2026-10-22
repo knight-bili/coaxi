@@ -20,7 +20,7 @@ function keydown(event:KeyboardEvent):void{
   }
 }
 export function registerShortcutActions(value:ShortcutRegistration):()=>void{
-  if(!registrations.size)window.addEventListener('keydown',keydown)
+  if(!registrations.size)window.addEventListener('keydown',keydown,true)
   registrations.add(value)
-  return()=>{registrations.delete(value);if(!registrations.size)window.removeEventListener('keydown',keydown)}
+  return()=>{registrations.delete(value);if(!registrations.size)window.removeEventListener('keydown',keydown,true)}
 }

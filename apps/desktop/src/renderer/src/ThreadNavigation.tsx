@@ -39,10 +39,7 @@ import {
 } from './AppDialog'
 import { NavigationIcon, type NavigationIconName } from './NavigationIcon'
 import { MissionIcon } from './MissionIcon'
-import {
-  primaryShortcutLabel,
-  shouldHandlePrimaryShortcut
-} from './renderer-platform'
+import { primaryShortcutLabel } from './renderer-platform'
 import { allNavigationThreads } from './ui-model'
 import { navigationThreadSearch, startNavigationThreadLookup, type NavigationThreadLookup } from './camp-navigation-search'
 import { formatThreadTitle } from './camp-title'
