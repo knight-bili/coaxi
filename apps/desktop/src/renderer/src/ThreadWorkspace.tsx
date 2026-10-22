@@ -168,6 +168,7 @@ import { runtimeReadinessLabel } from './runtime-status'
 import { runtimeEditorInstallation } from './MemberRuntimeParameters'
 import { mentionCandidateRuntime } from './mention-runtime'
 import { SafeMarkdown } from './SafeMarkdown'
+import { UserFeedbackDock } from './UserFeedbackDock'
 import { RuntimeInteractionDock } from './RuntimeInteractionDock'
 import { DelegationViewerHost, DelegationChildren } from './DelegationViewer'
 import { NativeSubagentEntries } from './NativeSubagentEntries'
@@ -5877,6 +5878,7 @@ function ThreadWorkspaceContent({
             />
           )}
 
+          <UserFeedbackDock key={`feedback:${snapshot.thread.id}`} scope={{threadId:snapshot.thread.id,conversationId:null,scopeKind:'public'}} members={snapshot.members}/>
           <form
         className={[
           'composer',

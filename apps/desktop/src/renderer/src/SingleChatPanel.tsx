@@ -69,6 +69,7 @@ import {
 import { executionPhaseFeedback, executionRunSummary } from './execution-run-summary'
 import { ComposerPrimaryAction } from './ComposerPrimaryAction'
 import { SafeMarkdown } from './SafeMarkdown'
+import { UserFeedbackDock } from './UserFeedbackDock'
 import { shouldSubmitStructuredComposerOnEnter } from './StructuredMentionComposer'
 import { readErrorMessage } from './error-message'
 import {
@@ -1803,6 +1804,7 @@ export function SingleChatPanel({
         ownerKey={`${conversationKind}:${currentSnapshot.conversation.id}`} messages={currentSnapshot.messages}
         disabled={!visible || sending || quoteBusy || returningPending || preparingAttachments.some((item) => !item.error)}
         onAdd={(selection) => mutateDraftQuote({ type: 'add', selection })} />}
+      {currentSnapshot&&<UserFeedbackDock key={`feedback:${currentSnapshot.conversation.id}`} scope={{threadId,conversationId:currentSnapshot.conversation.id,scopeKind:conversationKind}} agentId={currentSnapshot.conversation.agentId} members={members}/>}
       <form className="composer single-chat-composer" onSubmit={(event) => void send(event)}>
         <div className={`composer-box single-chat-composer-box${activeRun ? ' is-running' : ''}`}>
           <div className="composer-input">
