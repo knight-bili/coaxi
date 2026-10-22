@@ -50,6 +50,7 @@ internal fun nativeSteerState(receipt:JsonObject)=when(receipt.coreText("status"
     var targets by remember(scope){mutableStateOf<List<JsonObject>>(emptyList())};var run by remember(scope){mutableStateOf("")};var checked by remember(scope){mutableStateOf<Set<String>>(emptySet())};var packet by remember(scope){mutableStateOf<JsonObject?>(null)};var receipt by remember(scope){mutableStateOf<JsonObject?>(null)}
     var history by remember(scope){mutableStateOf<List<JsonObject>>(emptyList())};var after by remember(scope){mutableStateOf<String?>(null)};var busy by remember(scope){mutableStateOf(false)};var ready by remember(scope){mutableStateOf(false)};var issue by remember(scope){mutableStateOf<String?>(null)}
     val disabled=busy||!ready||state.busy||state.pending!=null||generation!=model.connectionGeneration
+    var normalOpen by remember(scope){mutableStateOf(false)}
     suspend fun keep(value:JsonObject){model.saveBody(owner,value.toString());packet=value}
     suspend fun records(more:Boolean=false){val page=nativeUserCall(model,RovaiOperation.RUNTIME_STEER_PREVIEWS,buildJsonObject{put("schemaVersion",1);put("scope",scope);put("limit",50);put("after",if(more)after?.let(::JsonPrimitive)?:JsonNull else JsonNull)});val rows=page["items"].coreArray();history=if(more)(history+rows).distinctBy{it["preview"].coreObject().coreText("previewId")}else rows;after=(page["next"]as?JsonPrimitive)?.contentOrNull}
     fun work(action:suspend()->Unit){if(busy)return;busy=true;issue=null;coroutine.launch{try{action()}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message}finally{busy=false}}}
@@ -58,6 +59,7 @@ internal fun nativeSteerState(receipt:JsonObject)=when(receipt.coreText("status"
         val raw=model.readBody(owner);if(raw.isNotEmpty()){packet=Json.parseToJsonElement(raw).coreObject();packet?.get("original")?.coreObject()?.takeIf{it.isNotEmpty()}?.let{reconcile(it)}}
         val value=nativeUserCall(model,RovaiOperation.RUNTIME_STEER_TARGETS,buildJsonObject{put("schemaVersion",1);put("scope",scope)});targets=value["targets"].coreArray().filter{agentId==null||it.coreText("agentId")==agentId};if(targets.size==1)run=targets.first().coreText("agentRunId");records();ready=true
     }catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message}finally{busy=false}}
+    if(normalOpen&&receipt!=null){RovaiNativeNormalContinue(model,receipt!!.coreText("commandId"),composerScope){normalOpen=false};return}
     Dialog(onDismissRequest={if(!busy)onClose()},properties=DialogProperties(usePlatformDefaultWidth=false)){Surface(Modifier.fillMaxWidth().fillMaxHeight(.94f),shape=MaterialTheme.shapes.large){Column(Modifier.padding(16.dp)){
         Row{Text("完整原生插话",Modifier.weight(1f),style=MaterialTheme.typography.titleLarge);TextButton(enabled=!busy,onClick=onClose){Text("关闭并保留")}}
         issue?.let{Text(it,color=CodegTheme.colors.danger)}
@@ -74,6 +76,7 @@ internal fun nativeSteerState(receipt:JsonObject)=when(receipt.coreText("status"
             }else{
                 item{GlassRow(Modifier.fillMaxWidth()){Text("将发送的完整内容",style=MaterialTheme.typography.titleMedium);Text(preview["input"].coreObject().coreText("text"));preview["input"].coreObject()["materials"].coreArray().forEach{material->Text(material.coreText("displayName")+" · "+material.coreLong("byteSize")+" B")};Text("普通输入和其他材料保留。",color=CodegTheme.colors.textSecondary)}}
                 receipt?.let{value->item{Text(nativeSteerState(value));Text(value.coreText("commandId"),style=MaterialTheme.typography.bodySmall);if(value.coreText("nativeOutcome")=="startedNewTurn")Text("输入已被原程序消耗，不要再次排队；该连接的直接插话已停用。");if(value.coreText("status")=="not_consumed")Text("整份输入仍保存在原预览，作为普通下一轮发送须另外确认。")}}
+                if(receipt?.coreText("status")=="not_consumed")item{TextButton(enabled=!disabled,onClick={normalOpen=true}){Text("预览整份普通下一轮")}}
                 item{Button(enabled=!disabled&&(receipt==null||original.isNotEmpty()),onClick={work{
                     if(original.isNotEmpty())reconcile(original)else{
                         val request=buildJsonObject{put("schemaVersion",1);put("commandId",UUID.randomUUID().toString());put("previewId",preview.coreText("previewId"));put("previewDigest",preview.coreText("previewDigest"))};keep(buildJsonObject{put("preview",preview);put("original",request)})
