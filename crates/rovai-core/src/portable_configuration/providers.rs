@@ -48,7 +48,9 @@ pub(crate) fn upsert_on(tx:&Transaction<'_>,client:&str,expected:i64,definition:
         if original.as_ref().is_none_or(|old|old["credential"]!=*secret){secrets::attach(tx,&reference,client,"provider_key")?;}
         else{let _=secrets::retained(tx,&reference,"provider_key")?;}
     }
-    let revision=expected.checked_add(1).context("configuration.revision_exhausted")?;
+    // 撤销可以把头指回旧版本；新写入仍须越过全部已保存版本。
+    let maximum:i64=tx.query_row("SELECT COALESCE(MAX(revision),0) FROM portable_provider_revision WHERE id=?1",[id],|row|row.get(0))?;
+    let revision=maximum.checked_add(1).context("configuration.revision_exhausted")?;
     let now=Utc::now().to_rfc3339();let mut value=definition.clone();value["revision"]=json!(revision);value["digest"]=json!("");
     value["createdAt"]=original.as_ref().map(|old|old["createdAt"].clone()).unwrap_or_else(||json!(now));value["updatedAt"]=json!(now);value["digest"]=json!(digest(&value)?);checked(&value)?;
     let view=public_view(&value)?;let cipher=crate::member_environment::encrypt(tx,&context(id,revision),&value)?;
