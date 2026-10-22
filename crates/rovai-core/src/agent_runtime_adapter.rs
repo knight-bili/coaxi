@@ -745,9 +745,10 @@ impl AgentRuntimeAdapterRegistry {
         kind: AdapterKind,
         platform: HostPlatformKey,
     ) -> RuntimePlatformAdmission {
+        if kind==AdapterKind::CustomAcp{return RuntimePlatformAdmission::preview(kind,platform,RuntimePlatformAdmissionReasonCode::QualificationEvidenceMissing);}
         if matches!(
             kind,
-            AdapterKind::GeminiCli | AdapterKind::HermesCli | AdapterKind::OpenClawCli | AdapterKind::CustomAcp
+            AdapterKind::GeminiCli | AdapterKind::HermesCli | AdapterKind::OpenClawCli
         ) {
             return RuntimePlatformAdmission::not_qualified(
                 kind,

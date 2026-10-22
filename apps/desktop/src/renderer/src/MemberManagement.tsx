@@ -48,6 +48,7 @@ import { localizeExecutionEngineTerms } from './product-copy'
 import { SettingsPageHeader } from './SettingsPageHeader'
 import { RuntimeStartupSettings } from './RuntimeStartupSettings'
 import { CustomRuntimeSettings } from './CustomRuntimeSettings'
+import { MemberCustomRuntime } from './MemberCustomRuntime'
 import { RuntimeInstallationGuide } from './RuntimeInstallationGuide'
 import { runtimeInstallGuide } from './runtime-install-guide'
 import { invalidateManagedAvatarObjectUrl } from './managed-avatar-cache'
@@ -843,6 +844,7 @@ const MemberEditor = forwardRef<
           </section>
           {selectedAgent && <MemberInteractionSettings key={selectedAgent.agentId} agentId={selectedAgent.agentId} adapterKind={selectedAgent.runtimeConfiguration?.adapterKind} disabled={busy !== null}/>}
           {selectedAgent && <MemberFeedbackSettings key={`feedback:${selectedAgent.agentId}`} agentId={selectedAgent.agentId} disabled={busy !== null}/>}
+          {selectedAgent && <MemberCustomRuntime key={`custom:${selectedAgent.agentId}`} agent={selectedAgent} disabled={busy!==null} onSaved={onReload}/>}
         </div>
       </div>
       <Dialog.Root
