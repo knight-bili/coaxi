@@ -9,6 +9,7 @@ import { InteractionWorkspace } from './interaction-workspace'
 import { InteractionComputer } from './interaction-computer'
 import { InteractionResultJournal } from './interaction-result-journal'
 import { InteractionComputerIndicator } from './interaction-computer-indicator'
+import { KeyboardShortcutsStore } from './keyboard-shortcuts'
 import { creationPreferences, withHostConversationPreferences } from '../shared/host-general-preferences'
 import { createHostChannelHandler } from './host-channels'
 import { FilePreviewFrameNavigation } from './file-preview/file-preview-navigation'
@@ -1268,6 +1269,8 @@ ipcMain.handle('rovai:office-workspace',(event,input)=>officeWorkspace.open(even
 app.on('before-quit',()=>officeWorkspace.closeAll())
 const browserWorkspace = new BrowserWorkspace((method,params)=>core.request(method,params),()=>mainWindow)
 const interactionComputer = new InteractionComputer(core,()=>mainWindow)
+const keyboardShortcuts = new KeyboardShortcutsStore(()=>app.getPath('userData'))
+ipcMain.handle('rovai:keyboard-shortcuts',(event,action,input)=>{if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('shortcuts.local_owner_required');if(action==='get')return keyboardShortcuts.get();if(action==='save')return keyboardShortcuts.save(input);throw new Error('shortcuts.operation_not_admitted')})
 const interactionComputerIndicator = new InteractionComputerIndicator(interactionComputer,()=>mainWindow,async()=>{try{await core.request('interaction.local',{action:'computer.stop',payload:{}})}finally{await interactionComputer.stop()}})
 app.once('will-quit',()=>interactionComputerIndicator.dispose())
 const interactionWorkspace = new InteractionWorkspace(core,browserWorkspace,()=>mainWindow,interactionComputer,new InteractionResultJournal(app.getPath('userData'),()=>coreDataPath))
