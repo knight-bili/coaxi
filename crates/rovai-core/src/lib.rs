@@ -10,6 +10,7 @@ mod claude_control;
 pub(crate) mod cline;
 mod codex;
 pub mod command_code_acp;
+pub mod diagnostic_preferences;
 mod health;
 mod openclaw_gateway;
 mod opencode_compat;

@@ -220,6 +220,7 @@ fn routes(state: WebState) -> Router {
         .route("/configuration/provider",post(portable_configuration::provider))
         .route("/configuration/export",post(portable_configuration::export).layer(DefaultBodyLimit::max(128*1024)))
         .route("/configuration/sync",post(portable_configuration::sync).layer(DefaultBodyLimit::max(128*1024)))
+        .route("/configuration/logging",post(portable_configuration::logging).layer(DefaultBodyLimit::max(128*1024)))
         .route("/configuration/export-receipt",post(portable_configuration::export_receipt))
         .route("/configuration/export-download",post(portable_configuration::export_download))
         .route("/configuration/archive",post(portable_configuration::archive).layer(DefaultBodyLimit::max(portable_configuration::MAX_ARCHIVE+256*1024)))

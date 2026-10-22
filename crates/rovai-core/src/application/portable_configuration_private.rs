@@ -15,6 +15,10 @@ impl Core{
     }
     async fn portable_configuration_private_inner(&self,method:&str,value:Value,client:&crate::draft_client::DraftClient)->Result<Value>{
         ensure!(serde_json::to_vec(&value)?.len()<=configuration::MAX_REQUEST,"configuration.request_too_large");
+        if method=="configuration.logging"{
+            let _lock=crate::workbench::MUTATIONS.lock().await;
+            return crate::diagnostic_preferences::access(&self.data_dir,value)
+        }
         if method=="configuration.sync"{
             if value["operation"]=="receipt"{
                 #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Input{operation:String,command_id:String}

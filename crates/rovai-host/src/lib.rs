@@ -7,6 +7,7 @@ mod program_recovery;
 mod lifecycle;
 mod server;
 mod server_logs;
+mod diagnostic_preferences;
 mod server_updates;
 mod signals;
 mod web_control;
@@ -217,11 +218,12 @@ fn run(
     console: Option<&server::Console>,
     updates: Option<server_updates::ServerUpdates>,
 ) -> Result<()> {
-    tracing_subscriber::fmt()
-        .with_ansi(false)
-        .with_target(false)
-        .with_writer(std::io::stderr)
-        .init();
+    use tracing_subscriber::{Layer,prelude::*};
+    let preferences=diagnostic_preferences::Filter::new(config.data_dir.clone());
+    tracing_subscriber::registry().with(
+        tracing_subscriber::fmt::layer().with_ansi(false).with_target(true).with_writer(std::io::stderr)
+            .with_filter(tracing_subscriber::filter::filter_fn(move|metadata|if desktop{*metadata.level()<=tracing::Level::INFO}else{preferences.enabled(metadata)}))
+    ).init();
 
     // Preserve the Desktop adapter's ordering: discovery captures its search
     // environment before Tokio starts and passes it to child launches explicitly.

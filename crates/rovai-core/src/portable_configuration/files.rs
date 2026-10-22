@@ -65,7 +65,8 @@ pub(crate) fn drain(connection:&Connection,root:&Path,command:&str)->Result<Vec<
     ensure!(rows.len()<=128,"configuration.file_target_limit");
     for(domain,target,expected,raw)in rows{
         // Desktop 偏好由原 Store 拥有，等待 Host 所有者接收；不从 Core 绕过其写队列。
-        if matches!(target.as_str(),"appearance"|"general"|"windowClose"|"logging"){
+        let desktop_logging=target=="logging"&&crate::backup::owned_roots::configured(root)?.iter().any(|owner|owner.id=="desktop_preferences");
+        if matches!(target.as_str(),"appearance"|"general"|"windowClose")||desktop_logging{
             connection.execute("UPDATE configuration_file_outbox SET error_code='configuration.desktop_owner_required',updated_at=?4 WHERE command_id=?1 AND domain=?2 AND target_id=?3 AND state='pending'",params![command,domain,target,chrono::Utc::now().to_rfc3339()])?;continue
         }
         let value:Value=serde_json::from_str(&raw)?;
