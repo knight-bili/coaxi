@@ -17,7 +17,7 @@ export function InteractionShareControl({threadId,targetId,targetKind,origin=nul
   const target=targets.find(target=>target.id===selected)
   const current=grants.find(grant=>grant.targetId===targetId&&grant.targetKind===targetKind&&Date.parse(grant.expiresAt)>Date.now())
   useEffect(()=>{const generation=++sequence.current;setSelected('');setGrants([]);setPending(null);setTargets([]);setNext(null);setError('');if(open)void api?.request<{targets:Target[];next:string|null}>('sharing.targets',{threadId,after:null}).then(value=>{if(sequence.current===generation){setTargets(value.targets);setNext(value.next)}}).catch(error=>{if(sequence.current===generation)setError(String(error))});return()=>{sequence.current++}},[api,open,threadId,targetId,targetKind])
-  useEffect(()=>{const generation=++sequence.current;setGrants([]);if(!open||!target||!api)return;void api.request<{grants:Grant[]}>('grant.list',{scope:target.scope,agentId:target.agentId}).then(value=>{if(sequence.current===generation)setGrants(value.grants)}).catch(error=>{if(sequence.current===generation)setError(String(error))})},[api,open,target])
+  useEffect(()=>{let active=true;setGrants([]);if(open&&target&&api)void api.request<{grants:Grant[]}>('grant.list',{scope:target.scope,agentId:target.agentId}).then(value=>{if(active)setGrants(value.grants)}).catch(error=>{if(active)setError(String(error))});return()=>{active=false}},[api,open,target])
   if(!api)return null
   const commit=async(request:NonNullable<typeof pending>):Promise<void>=>{
     if(busy)return
