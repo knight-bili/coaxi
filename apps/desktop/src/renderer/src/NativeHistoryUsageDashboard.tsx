@@ -54,6 +54,7 @@ export function NativeHistoryUsageDashboard():React.JSX.Element {
         <NativeUsagePriceEstimate report={report}/>
         <p className="usage-dashboard-source-note">{t('{0} 份会话未报告用量；{1} 份使用原版整会话总量回退；已排除同源旧快照 {2} 份。',data.sessionsWithoutUsage,data.sessionTotalFallbacks,data.supersededSnapshots)}</p>
         <p className="usage-dashboard-source-note">{t('整会话回退会集中记在会话末尾，不代表每个小时的真实花费。此页不与融合运行数据相加。')}</p>
+        <details className="usage-dashboard-source-note block"><summary>{t('查看本次统计来源')}</summary><p>{t('读取于 {0}，采用 {1} 份冻结快照；完整来源摘要随 JSON 一起导出。',new Date(data.generatedAt).toLocaleString(language),data.provenance.length)}</p>{!data.projection.globallyNewestFactsGuaranteed&&<p>{t('已达到读取上限，先读取最近导入的快照；这不保证覆盖所有历史中最新发生的记录。')}</p>}<ul className="mt-2 space-y-1">{data.provenance.map(row=><li key={row.importId} className="break-all">{row.provider} · {row.importId} · {t('索引于 {0}',new Date(row.indexedAt).toLocaleString(language))}<br/>{row.transcriptDigest}</li>)}</ul></details>
       </>}
     </main>
     {share&&<UsageShareDialog report={share} onClose={()=>setShare(null)}/>}

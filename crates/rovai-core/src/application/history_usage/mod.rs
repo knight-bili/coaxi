@@ -78,13 +78,14 @@ fn report(directory:&Path,request:Request,projects:&HashMap<String,String>)->Res
     let mut folder_ids=BTreeMap::<String,i32>::new();for(_,manifest,_)in &archives{let root=manifest["linkedThreadId"].as_str().and_then(|id|projects.get(id)).cloned().unwrap_or_default();folder_ids.entry(root).or_insert(0);}
     for(index,(_,id))in folder_ids.iter_mut().enumerate(){*id=i32::try_from(index+1)?;}
     let folder_labels=folder_ids.iter().map(|(path,id)|(*id,if path.is_empty(){"未记录工程".into()}else{path.clone()})).collect::<HashMap<_,_>>();
-    let mut rows=Vec::new();let mut titles=HashMap::<i32,String>::new();let mut import_ids=BTreeMap::<i32,String>::new();let mut no_usage=0;let mut fallback_sessions=0;let mut truncated=scan_truncated;
+    let mut rows=Vec::new();let mut titles=HashMap::<i32,String>::new();let mut import_ids=BTreeMap::<i32,String>::new();let mut no_usage=0;let mut fallback_sessions=0;let mut truncated=scan_truncated;let mut provenance=Vec::new();
     for(index,(id,manifest,cache))in archives.iter().enumerate(){
         let project=manifest["linkedThreadId"].as_str().and_then(|id|projects.get(id)).cloned().unwrap_or_default();
         if request.project_roots.as_ref().is_some_and(|selected|!selected.contains(&project))||filter.agent_types.as_ref().is_some_and(|selected|!selected.contains(&cache.provider)){continue}
         let conversation=i32::try_from(index+1)?;let folder=*folder_ids.get(&project).context("history.usage_folder_missing")?;
         if cache.facts.is_empty(){no_usage+=1}if cache.session_total_fallback{fallback_sessions+=1}
         titles.insert(conversation,manifest["summary"]["title"].as_str().or_else(||manifest["sourceName"].as_str()).unwrap_or("导入历史").to_string());import_ids.insert(conversation,id.clone());
+        provenance.push(json!({"conversationId":conversation,"importId":id,"sourceDigest":cache.source_digest,"transcriptDigest":cache.transcript_digest,"sourceIdentity":cache.source_identity,"provider":cache.provider,"indexedAt":cache.indexed_at,"importedAt":manifest["importedAt"],"indexedFactRowsIncludedInScan":cache.facts.len(),"sessionTotalFallback":cache.session_total_fallback,"archived":manifest["archived"].as_bool().unwrap_or(false)}));
         for fact in &cache.facts{if filter.models.as_ref().is_some_and(|selected|!fact.model.as_ref().is_some_and(|model|selected.contains(model))){continue}if rows.len()>=MAX_FACTS{truncated=true;break}
             ensure!([fact.input_tokens,fact.output_tokens,fact.cache_creation_tokens,fact.cache_read_tokens,fact.duration_ms].iter().all(|value|*value>=0),"history.usage_invalid_cached_counter");
             rows.push(UsageFactRow{conversation_id:conversation,folder_id:folder,agent_type:cache.provider.clone(),model:fact.model.clone(),occurred_at:fact.occurred_at,input_tokens:fact.input_tokens,output_tokens:fact.output_tokens,cache_creation_tokens:fact.cache_creation_tokens,cache_read_tokens:fact.cache_read_tokens,total_tokens:fact.total_tokens(),duration_ms:fact.duration_ms});
@@ -98,7 +99,7 @@ fn report(directory:&Path,request:Request,projects:&HashMap<String,String>)->Res
     let options=aggregate::AggregateOptions{bucket:filter.bucket,tz_offset_minutes:filter.tz_offset_minutes,range_start:filter.start,range_end:filter.end,folder_labels:&folder_labels,truncated,compare_previous:filter.compare_previous&&filter.start.is_some()&&filter.end.is_some()};
     let mut report=aggregate::aggregate_report(&selected,&previous,&options);
     for item in &mut report.top_conversations{item.title=titles.get(&item.conversation_id).cloned();}
-    Ok(json!({"schemaVersion":1,"source":"imported_native_history","report":report,"folderKeys":folder_ids.iter().map(|(path,id)|json!({"id":id,"path":path})).collect::<Vec<_>>(),"importIds":import_ids,"missingIndex":missing,"supersededSnapshots":superseded,"sessionsWithoutUsage":no_usage,"sessionTotalFallbacks":fallback_sessions,"nativeCountersAreSourceReported":true,"mergedWithCoreUsage":false}))
+    Ok(json!({"schemaVersion":1,"source":"imported_native_history","report":report,"folderKeys":folder_ids.iter().map(|(path,id)|json!({"id":id,"path":path})).collect::<Vec<_>>(),"importIds":import_ids,"missingIndex":missing,"supersededSnapshots":superseded,"sessionsWithoutUsage":no_usage,"sessionTotalFallbacks":fallback_sessions,"nativeCountersAreSourceReported":true,"mergedWithCoreUsage":false,"generatedAt":Utc::now().to_rfc3339(),"projection":{"version":CACHE_VERSION,"sourceRevision":"aff1e6c278453ed8d0b96a5f664edcdca621aa3f","archiveLimit":MAX_ARCHIVES,"factRowLimit":MAX_FACTS,"scanOrder":"latest_imported_archive_first_then_latest_fact_within_archive","globallyNewestFactsGuaranteed":!scan_truncated,"sameSourcePolicy":"latest_imported_snapshot_only","includesArchived":request.include_archived},"provenance":provenance}))
 }
 
 impl Core {

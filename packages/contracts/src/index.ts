@@ -12,6 +12,9 @@ export interface NativeHistoryUsageReport {
   folderKeys:Array<{id:number;path:string}>;importIds:Record<string,string>;missingIndex:string[]
   supersededSnapshots:number;sessionsWithoutUsage:number;sessionTotalFallbacks:number
   nativeCountersAreSourceReported:true;mergedWithCoreUsage:false
+  generatedAt:string
+  projection:{version:1;sourceRevision:string;archiveLimit:number;factRowLimit:number;scanOrder:'latest_imported_archive_first_then_latest_fact_within_archive';globallyNewestFactsGuaranteed:boolean;sameSourcePolicy:'latest_imported_snapshot_only';includesArchived:boolean}
+  provenance:Array<{conversationId:number;importId:string;sourceDigest:string;transcriptDigest:string;sourceIdentity:string;provider:string;indexedAt:string;importedAt:string;indexedFactRowsIncludedInScan:number;sessionTotalFallback:boolean;archived:boolean}>
 }
 export interface NativeHistoryUsageSync {
   results:Array<{id:string;indexed:boolean;unchanged?:boolean;facts?:number;error?:string;existingFactsPreserved?:boolean}>
