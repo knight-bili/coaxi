@@ -33,6 +33,12 @@ fn scope_id(member:&str,reference:&PortableConnectionRefV1,platform:&str)->Resul
     let mut id=[0u8;16];id.copy_from_slice(&bytes[..16]);id[6]=(id[6]&0x0f)|0x80;id[8]=(id[8]&0x3f)|0x80;Ok(uuid::Uuid::from_bytes(id).to_string())
 }
 
+pub(crate) fn selected(connection:&Connection,member:&str)->Result<bool>{
+    if storage::absent(connection)?{return Ok(false)}
+    let stored:Option<String>=connection.query_row("SELECT reference_json FROM portable_member_connection WHERE agent_id=?1",[member],|row|row.get(0)).optional()?;
+    Ok(stored.map(|value|serde_json::from_str::<Option<PortableConnectionRefV1>>(&value)).transpose()?.flatten().is_some())
+}
+
 /// 仅新 Run 冻结调用；已保存的 Run 必须读取自己的 FrozenPortableConnectionV1。
 pub(crate) fn freeze_for_member(connection:&Connection,member:&str,runtime:&crate::agent_profile::FrozenAgentRuntimeConfig)->Result<Option<FrozenPortableConnectionV1>>{
     if storage::absent(connection)?{return Ok(None)}

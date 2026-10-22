@@ -63,6 +63,7 @@ pub fn validate_operation(name:&str,value:&Value)->Result<()>{validate_at("opera
 pub(crate) fn freeze(runtime:&mut crate::agent_profile::FrozenAgentRuntimeConfig,connection:Option<FrozenPortableConnectionV1>)->Result<()>{
     ensure!(runtime.portable_connection.is_none()&&runtime.native_origin.is_none()&&runtime.native_steer.is_none(),"configuration.intent_already_frozen");
     let Some(connection)=connection else{return Ok(())};connection.validate()?;
+    ensure!(runtime.custom_api.is_none(),"configuration.native_api_overlap");
     ensure!(connection.installation_id==runtime.installation_id&&connection.installation_generation==runtime.installation_generation,"configuration.installation_changed");
     ensure!(connection.adapter_kind()?==runtime.adapter_kind,"configuration.runtime_kind_mismatch");
     runtime.host_config_digest=crate::command::canonical_json_digest(&json!({"native":runtime.host_config_digest,"portableConnection":connection}))?;

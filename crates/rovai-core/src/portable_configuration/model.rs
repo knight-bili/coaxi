@@ -31,7 +31,9 @@ impl FrozenPortableConnectionV1{
         validate_url(&self.api_url)?;validate_model(&self.agent_type,&self.model)?;
         let mut names=std::collections::HashSet::new();for item in &self.environment{item.secret.validate()?;ensure!(names.insert(if cfg!(windows){item.name.to_ascii_uppercase()}else{item.name.clone()}),"configuration.duplicate_environment_name");}
         ensure!(digest(&serde_json::to_value(&self.environment)?)?==self.environment_digest,"configuration.environment_digest_mismatch");
-        ensure!(digest(&self.model)?==self.catalog_digest,"configuration.catalog_digest_mismatch");Ok(())
+        ensure!(digest(&self.model)?==self.catalog_digest,"configuration.catalog_digest_mismatch");
+        let mut unsigned=serde_json::to_value(self)?;unsigned["projectionDigest"]=json!("");
+        ensure!(digest(&unsigned)?==self.projection_digest,"configuration.projection_digest_mismatch");Ok(())
     }
     pub fn adapter_kind(&self)->Result<crate::agent_profile::AdapterKind>{
         use crate::agent_profile::AdapterKind;

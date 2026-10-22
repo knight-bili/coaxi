@@ -4456,6 +4456,8 @@ fn resolve_rebound_runtime_with_native_intent(
     // Re-probing may change executable evidence, never the admitted Run's Camp intent.
     rebound.environment = frozen.environment.clone();
     rebound.camp_fast = frozen.camp_fast.clone();
+    // 恢复只保留原 Run 的精确连接，不读取队员今天选择的服务商或密钥。
+    crate::portable_configuration::freeze(&mut rebound,frozen.portable_connection.clone())?;
     crate::native_lifecycle::freeze_intent(&mut rebound,frozen.native_origin.clone(),native_steer)?;
     if frozen.adapter_kind == AdapterKind::CodexCli
         && frozen.camp_fast.is_some()
@@ -4595,13 +4597,16 @@ pub fn resolve_frozen_runtime(
             }),
         )));
     }
+    let portable_selected=crate::portable_configuration::members::selected(transaction,agent_id)?;
     let mut result = resolve_frozen_runtime_binding_with_snapshot(
         transaction,
         &binding,
-        None,
+        if portable_selected{Some(None)}else{None},
         native_binding_compatibility_digest.as_deref(),
     )?;
     if let Ok(runtime) = &mut result {
+        let connection=crate::portable_configuration::members::freeze_for_member(transaction,agent_id,runtime)?;
+        crate::portable_configuration::freeze(runtime,connection)?;
         crate::camp_fast::freeze(transaction, conversation_id, agent_id, runtime)?;
         if let Some(prepared)=crate::native_lifecycle::continuation::runtime_for_conversation(transaction,conversation_id,agent_id,runtime)?{
             *runtime=prepared;
