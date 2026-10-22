@@ -5,6 +5,9 @@ fn main() -> anyhow::Result<()> {
     if rovai_core::interaction_tools::stdio::run_if_requested()? {
         return Ok(());
     }
+    if rovai_core::ui_feedback::stdio::run_if_requested()? {
+        return Ok(());
+    }
     if rovai_core::canvas_terminal::run_helper_if_requested()? {
         return Ok(());
     }

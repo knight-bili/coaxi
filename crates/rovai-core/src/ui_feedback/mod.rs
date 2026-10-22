@@ -6,6 +6,8 @@ use std::{collections::BTreeSet,sync::LazyLock};
 pub mod storage;
 pub mod cards;
 pub mod delivery;
+pub mod broker;
+pub mod stdio;
 
 pub const SERVER_NAME:&str="rovai-ui-feedback";
 pub const MAX_FRAME_BYTES:usize=65_536;
