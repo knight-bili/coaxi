@@ -10,6 +10,8 @@ pub(crate) mod providers;
 pub(crate) mod members;
 pub(crate) mod archive;
 mod codeg_crypto;
+pub(crate) mod codex_catalog;
+pub(crate) mod normalize;
 mod model;
 pub use model::*;
 
