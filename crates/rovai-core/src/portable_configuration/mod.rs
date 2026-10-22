@@ -7,6 +7,7 @@ use std::sync::LazyLock;
 pub mod storage;
 pub(crate) mod secrets;
 pub(crate) mod providers;
+pub(crate) mod members;
 mod model;
 pub use model::*;
 
