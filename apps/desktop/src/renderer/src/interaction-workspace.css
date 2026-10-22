@@ -23,3 +23,6 @@
 .interaction-activity li>span:first-child{color:var(--ink);min-width:96px}
 .interaction-activity li>span,.interaction-activity time{color:var(--muted)}
 .interaction-activity time{margin-inline-start:auto}
+.legacy-data-summary{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 16px;font-size:13px}
+.legacy-data-summary dt{color:var(--muted)}
+.legacy-data-summary dd{margin:0;overflow-wrap:anywhere;color:var(--ink)}
