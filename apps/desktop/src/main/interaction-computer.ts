@@ -31,6 +31,7 @@ export class InteractionComputer implements DesktopComputerExecutor{
   private readonly pending=new Map<string,Pending>()
   private lastError:string|null=null
   private failed=false
+  private disposed=false
   private registeredShortcut:string|null=null
   private readonly running=new Map<string,{scopeKey:string;bridgeInstanceId:string}>()
   private readonly unsubscribe:()=>void
@@ -38,9 +39,9 @@ export class InteractionComputer implements DesktopComputerExecutor{
   private readonly scopes=new Map<string,{scope:InteractionScope;agentId:string}>()
   private readonly activity:ComputerActivity[]=[]
   private readonly nativeStates=new Map<string,unknown>()
-  constructor(private readonly core:CoreClient,private readonly owner:()=>BrowserWindow|null){this.ready=this.load();this.unsubscribe=core.onEvent(event=>{if(event.method!=='interaction.run.revoked')return;const input=event.params as {agentRunId?:string;bridgeInstanceId?:string},running=input.agentRunId?this.running.get(input.agentRunId):null;if(running&&running.bridgeInstanceId===input.bridgeInstanceId)void this.request('stop_scope',running).catch(()=>undefined)});void app.whenReady().then(()=>this.ready).then(()=>this.updateShortcut()).catch(()=>undefined)}
-  available():boolean{try{return this.preferences.enabled&&!this.failed&&existsSync(resolveCoreBinary())}catch{return false}}
-  attachPeer(peer:Peer):void{if(this.peer&&(this.peer.desktopPeerId!==peer.desktopPeerId||this.peer.coreInstanceId!==peer.coreInstanceId)){void this.stop();this.end();this.scopes.clear();this.activity.length=0;this.nativeStates.clear()}this.peer={...peer}}
+  constructor(private readonly core:CoreClient,private readonly owner:()=>BrowserWindow|null){this.ready=this.load();this.unsubscribe=core.onEvent(event=>{if(event.method!=='interaction.run.revoked')return;const input=event.params as {agentRunId?:string;bridgeInstanceId?:string},running=input.agentRunId?this.running.get(input.agentRunId):null;if(running&&running.bridgeInstanceId===input.bridgeInstanceId){this.running.delete(input.agentRunId!);if(this.child)void this.request('release_scope',running).catch(()=>undefined)}});void app.whenReady().then(()=>this.ready).then(()=>this.updateShortcut()).catch(()=>undefined)}
+  available():boolean{try{return !this.disposed&&this.preferences.enabled&&!this.failed&&existsSync(resolveCoreBinary())}catch{return false}}
+  attachPeer(peer:Peer):void{if(this.peer&&(this.peer.desktopPeerId!==peer.desktopPeerId||this.peer.coreInstanceId!==peer.coreInstanceId)){this.end();this.scopes.clear();this.activity.length=0;this.nativeStates.clear()}this.peer={...peer}}
   private async load():Promise<void>{
     try{const stat=await fs.lstat(this.file);if(!stat.isFile()||stat.isSymbolicLink()||stat.size>16384)throw new Error('computer.invalid_preferences');const value=JSON.parse(await fs.readFile(this.file,'utf8')) as Preferences;if(value.stopShortcut===undefined)value.stopShortcut=defaultInteractionStopShortcut(process.platform);this.validate(value);this.preferences=value}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT'){this.lastError=String(error);this.failed=true}}
   }
@@ -96,23 +97,24 @@ export class InteractionComputer implements DesktopComputerExecutor{
   async clearActivity(before:number,threadId:string):Promise<void>{if(!Number.isSafeInteger(before)||typeof threadId!=='string')throw new Error('invalid_arguments');for(let index=this.activity.length-1;index>=0;index--)if(this.activity[index].at<=before&&this.scopes.get(this.activity[index].scopeKey)?.scope.threadId===threadId)this.activity.splice(index,1)}
   private async open():Promise<void>{
     await this.ready
-    if(this.child)return
     if(this.opening)return this.opening
+    if(this.child)return
     if(!this.available()||!this.peer)throw new Error('runtime_unavailable')
     const peer=this.peer
-    this.opening=(async()=>{
-      const child=spawn(resolveCoreBinary(),['--interaction-desktop'],{stdio:['pipe','pipe','pipe'],windowsHide:true,env:{...process.env}})
-      this.child=child;this.buffer=Buffer.alloc(0);this.token=randomBytes(32).toString('hex')
+    let child:ChildProcessWithoutNullStreams|null=null
+    const opening=(async()=>{
+      const processChild=spawn(resolveCoreBinary(),['--interaction-desktop'],{stdio:['pipe','pipe','pipe'],windowsHide:true,env:{...process.env}})
+      child=processChild;this.child=processChild;this.buffer=Buffer.alloc(0);this.token=randomBytes(32).toString('hex')
       await new Promise<void>((resolve,reject)=>{
-        const timer=setTimeout(()=>reject(new Error('computer.handshake_timeout')),15000)
-        const fail=(error:Error):void=>{clearTimeout(timer);this.fail(error);reject(error)}
-        child.once('error',fail);child.once('exit',()=>{if(this.child===child)this.child=null;fail(new Error('computer.host_exited'))})
-        child.stderr.on('data',()=>{/* 原生错误经逐请求回执返回，stderr 不混入私有协议。 */})
-        child.stdout.on('data',(chunk:Buffer)=>{try{this.consume(chunk,value=>{const answer=value as {protocolVersion:number;desktopPeerId:string;stopGeneration:number};if(answer.protocolVersion!==1||answer.desktopPeerId!==peer.desktopPeerId)throw new Error('computer.handshake_changed');clearTimeout(timer);this.stopGeneration=answer.stopGeneration;resolve()})}catch(error){fail(error as Error);child.stdin.end()}})
+        const fail=(error:Error):void=>{clearTimeout(timer);if(this.child===processChild){this.fail(error);this.end()}reject(error)}
+        const timer=setTimeout(()=>fail(new Error('computer.handshake_timeout')),15000)
+        processChild.once('error',fail);processChild.once('exit',()=>fail(new Error('computer.host_exited')))
+        processChild.stderr.on('data',()=>{/* 原生错误经逐请求回执返回，stderr 不混入私有协议。 */})
+        processChild.stdout.on('data',(chunk:Buffer)=>{if(this.child!==processChild)return;try{this.consume(chunk,value=>{const answer=value as {protocolVersion:number;desktopPeerId:string;stopGeneration:number};if(answer.protocolVersion!==1||answer.desktopPeerId!==peer.desktopPeerId||this.peer?.desktopPeerId!==peer.desktopPeerId)throw new Error('computer.handshake_changed');clearTimeout(timer);this.stopGeneration=answer.stopGeneration;resolve()})}catch(error){fail(error as Error)}})
         void this.send({protocolVersion:1,desktopPeerId:peer.desktopPeerId,ownerWindowId:peer.ownerWindowId,token:this.token}).catch(fail)
       })
-    })().catch(error=>{this.end();throw error}).finally(()=>{this.opening=null})
-    return this.opening
+    })().catch(error=>{if(this.child===child)this.end();throw error}).finally(()=>{if(this.opening===opening)this.opening=null})
+    this.opening=opening;return opening
   }
   private async request<T>(method:string,params:unknown):Promise<T>{
     await this.open();const id=randomUUID()
@@ -143,14 +145,15 @@ export class InteractionComputer implements DesktopComputerExecutor{
     await this.registerTargets(catalog.windows,catalog.screenId)
     await assertCurrent()
     const running={scopeKey,bridgeInstanceId:work.binding.bridgeInstanceId}
+    for(const [id,previous]of this.running)if(previous.scopeKey===scopeKey&&id!==work.binding.agentRunId)this.running.delete(id)
     this.running.set(work.binding.agentRunId,running)
     let checking=false
     const watcher=setInterval(()=>{if(checking)return;checking=true;void assertCurrent().catch(()=>this.request('stop_scope',running)).catch(()=>undefined).finally(()=>{checking=false})},500);watcher.unref()
     try{const result=await this.request('call',{...running,expectedStopGeneration:this.stopGeneration,toolName:work.call.toolName,arguments:work.call.arguments});await assertCurrent();return result}
-    finally{clearInterval(watcher);if(this.running.get(work.binding.agentRunId)===running)this.running.delete(work.binding.agentRunId)}
+    finally{clearInterval(watcher)}
   }
-  async stop():Promise<void>{if(!this.child)return;try{const result=await this.request<{stopGeneration:number}>('stop_all',{});this.stopGeneration=result.stopGeneration}catch(error){this.lastError=String(error);this.end()}}
-  private end():void{const child=this.child;this.child=null;if(child){child.stdin.end();const timer=setTimeout(()=>{if(child.exitCode===null)child.kill()},3000);timer.unref();child.once('exit',()=>clearTimeout(timer))}}
+  async stop():Promise<void>{const child=this.child;if(!child)return;try{const result=await this.request<{stopGeneration:number}>('stop_all',{});if(this.child===child)this.stopGeneration=result.stopGeneration}catch(error){this.lastError=String(error);if(this.child===child)this.end()}}
+  private end():void{const child=this.child;this.child=null;this.opening=null;this.running.clear();this.nativeStates.clear();for(const pending of this.pending.values()){clearTimeout(pending.timer);pending.reject(new Error('computer.original_request_unknown'))}this.pending.clear();if(child){child.stdin.end();const timer=setTimeout(()=>{if(child.exitCode===null)child.kill()},3000);timer.unref();child.once('exit',()=>clearTimeout(timer))}}
   async invoke(event:IpcMainInvokeEvent,method:unknown,input:unknown):Promise<unknown>{
     const owner=this.owner();if(!owner||owner.isDestroyed()||event.sender!==owner.webContents||event.senderFrame!==owner.webContents.mainFrame)throw new Error('computer.local_owner_required')
     await this.ready
@@ -172,11 +175,10 @@ export class InteractionComputer implements DesktopComputerExecutor{
       const scopeKey=this.scopeKey(value.scope,value.agentId);this.scopes.set(scopeKey,value)
       const pickerKey=digest({peer:this.peer?.desktopPeerId,scope:value.scope,agentId:value.agentId,kind:'local_picker'})
       if(method==='picker')await this.request('configure',{scopeKey:pickerKey,bridgeInstanceId:randomUUID(),expectedStopGeneration:this.stopGeneration,enabled:this.preferences.enabled,launchEnabled:false,clipboardEnabled:false,allowForeground:false,screenEnabled:false,grants:[]})
-      const result=await this.request<{windows:NativeWindow[];screenId:string}>(method,{scopeKey:pickerKey})
-      if(method==='picker')await this.registerTargets(result.windows,result.screenId)
-      return result
+      try{const result=await this.request<{windows:NativeWindow[];screenId:string}>(method,{scopeKey:pickerKey});if(method==='picker')await this.registerTargets(result.windows,result.screenId);return result}
+      finally{if(this.child)await this.request('release_scope',{scopeKey:pickerKey}).catch(()=>undefined)}
     }
     throw new Error('computer.operation_not_admitted')
   }
-  async dispose():Promise<void>{this.unsubscribe();if(this.registeredShortcut)globalShortcut.unregister(this.registeredShortcut);this.registeredShortcut=null;await this.stop();this.end();this.peer=null;this.scopes.clear()}
+  async dispose():Promise<void>{this.disposed=true;this.unsubscribe();if(this.registeredShortcut)globalShortcut.unregister(this.registeredShortcut);this.registeredShortcut=null;await this.stop();this.end();this.peer=null;this.scopes.clear()}
 }
