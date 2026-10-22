@@ -30,6 +30,16 @@ CREATE TABLE native_lifecycle_source_lease (
  PRIMARY KEY(source_handle_id,provider,native_session_id)
 );
 CREATE UNIQUE INDEX native_lifecycle_intent_preview ON native_lifecycle_intent(preview_id);
+CREATE UNIQUE INDEX native_lifecycle_exclusive_source ON native_lifecycle_source_lease(provider,native_session_id) WHERE state<>'released';
+CREATE TABLE native_lifecycle_continuation (
+ origin_id TEXT PRIMARY KEY NOT NULL,
+ command_id TEXT NOT NULL UNIQUE REFERENCES native_lifecycle_intent(command_id),
+ source_thread_id TEXT NOT NULL,thread_id TEXT NOT NULL UNIQUE,conversation_id TEXT NOT NULL UNIQUE,
+ source_snapshot_digest TEXT NOT NULL,workspace_path TEXT NOT NULL,workspace_digest TEXT NOT NULL,
+ base_runtime_digest TEXT NOT NULL,runtime_json TEXT NOT NULL CHECK(json_valid(runtime_json) AND length(runtime_json)<=2097152),
+ reported_session_id TEXT,preparation_evidence_json TEXT CHECK(preparation_evidence_json IS NULL OR json_valid(preparation_evidence_json)),
+ created_at TEXT NOT NULL,updated_at TEXT NOT NULL
+);
 CREATE TABLE native_lifecycle_steer_policy (
  singleton INTEGER PRIMARY KEY NOT NULL CHECK(singleton=1), revision INTEGER NOT NULL CHECK(revision>=0),
  value_json TEXT NOT NULL CHECK(json_valid(value_json) AND length(value_json)<=2097152)

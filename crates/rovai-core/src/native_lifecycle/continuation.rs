@@ -1,7 +1,7 @@
 //! 原生工作副本沿用 Core 的 Thread 和私聊权威；导入快照只读。
 use super::*;
 use crate::{agent_profile::{FrozenAgentRuntimeConfig,ResolvedRuntimeBinding},camp_id::ThreadId};
-use rusqlite::{Connection,Transaction,params};
+use rusqlite::{Connection,OptionalExtension,Transaction,params};
 use std::{fs,io::Read,path::{Path,PathBuf},str::FromStr};
 
 pub(crate) struct ImportedSource {
@@ -90,4 +90,25 @@ pub(crate) fn receipt(connection:&Connection,command:&str,client:&str,core_insta
         value["state"]=json!("unknown");value["error"]=json!("原生创建结果待核对，禁止自动重复创建");
     }
     validate_shape("NativeContinuationReceiptV1",&value)?;Ok(value)
+}
+
+pub(crate) fn reserve(tx:&Transaction<'_>,command:&str,source:&NativeSourceReferenceV1)->Result<()>{
+    let occupied:bool=tx.query_row("SELECT EXISTS(SELECT 1 FROM native_lifecycle_source_lease WHERE provider=?1 AND native_session_id=?2 AND state<>'released')",params![source.provider,source.native_session_id],|row|row.get(0))?;
+    ensure!(!occupied,"native_lifecycle.source_already_in_use");
+    tx.execute("INSERT INTO native_lifecycle_source_lease(source_handle_id,provider,native_session_id,command_id,state) VALUES(?1,?2,?3,?4,'reserved')",params![source.source_handle_id,source.provider,source.native_session_id,command])?;Ok(())
+}
+pub(crate) fn runtime_for_conversation(connection:&Connection,conversation:&str,agent:&str,base:&FrozenAgentRuntimeConfig)->Result<Option<FrozenAgentRuntimeConfig>>{
+    if storage::absent(connection)?{return Ok(None)}
+    let stored:Option<(String,String,String,String)>=connection.query_row("SELECT n.base_runtime_digest,n.runtime_json,i.state,c.agent_id FROM native_lifecycle_continuation n JOIN native_lifecycle_intent i ON i.command_id=n.command_id JOIN conversation c ON c.id=n.conversation_id WHERE n.conversation_id=?1",[conversation],|row|Ok((row.get(0)?,row.get(1)?,row.get(2)?,row.get(3)?))).optional()?;
+    let Some((expected,raw,state,owner))=stored else{return Ok(None)};
+    ensure!(state=="binding_recorded","native_lifecycle.preparation_not_confirmed");
+    ensure!(owner==agent&&base.config_digest==expected,"native_lifecycle.prepared_runtime_changed");
+    let frozen:FrozenAgentRuntimeConfig=serde_json::from_str(&raw)?;
+    frozen.native_origin.as_ref().context("native_lifecycle.origin_missing")?.validate()?;Ok(Some(frozen))
+}
+
+/// 释放仅发生于 Core 已结束该工作副本且不存在活动执行时；unknown 不按重试释放。
+pub(crate) fn release_closed(connection:&Connection)->Result<()> {
+    if storage::absent(connection)?{return Ok(())}
+    connection.execute("UPDATE native_lifecycle_source_lease SET state='released' WHERE state='bound' AND command_id IN (SELECT n.command_id FROM native_lifecycle_continuation n LEFT JOIN conversation c ON c.id=n.conversation_id LEFT JOIN camp t ON t.id=n.thread_id WHERE (c.id IS NULL OR c.ended_at IS NOT NULL OR t.id IS NULL) AND NOT EXISTS(SELECT 1 FROM agent_run r WHERE r.conversation_id=n.conversation_id AND r.status IN ('running','waiting')))",[])?;Ok(())
 }
