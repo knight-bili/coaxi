@@ -7,6 +7,7 @@ use rusqlite::params;
 use rusqlite::OptionalExtension;
 static MUTATION:LazyLock<Arc<tokio::sync::Mutex<()>>>=LazyLock::new(||Arc::new(tokio::sync::Mutex::new(())));
 static ACTIVE:LazyLock<std::sync::Mutex<BTreeSet<PathBuf>>>=LazyLock::new(Default::default);
+static RECEIPT_GATE:LazyLock<tokio::sync::Mutex<()>>=LazyLock::new(||tokio::sync::Mutex::new(()));
 struct ReceiptActivity(PathBuf);
 impl ReceiptActivity{fn begin(path:&Path)->Result<Self>{ACTIVE.lock().map_err(|_|anyhow::anyhow!("custom_runtime.install_lock"))?.insert(path.to_path_buf());Ok(Self(path.to_path_buf()))}}
 impl Drop for ReceiptActivity{fn drop(&mut self){if let Ok(mut active)=ACTIVE.lock(){active.remove(&self.0);}}}
@@ -57,6 +58,8 @@ fn register(database:&mut Database,reference:CustomRuntimeRefV1,lock:Value,id:&s
     })?;Ok(serde_json::to_value(result.result)?)
 }
 pub async fn start(root:&Path,definition:Value,reference:CustomRuntimeRefV1,requested_platform:String,id:String,selectable:bool,database:Arc<tokio::sync::Mutex<Database>>)->Result<Value>{
+    // 原编号首次登记串行完成；锁在文件登记后立即释放，不覆盖另一请求的首次回执。
+    let receipt_gate=RECEIPT_GATE.lock().await;
     let path=receipt_path(root,&id)?;let input_digest=digest(&json!({"reference":reference,"platform":requested_platform,"commandId":id}))?;
     if path.exists(){let result=receipt(root,&id)?;ensure!(result["inputDigest"].as_str()==Some(input_digest.as_str()),"custom_runtime.command_identity_changed");return Ok(result)}
     let failure=if requested_platform!=platform()?{Some("custom_runtime.install_requires_current_platform")}else if !selectable{Some("custom_runtime.definition_changed")}else{None};
@@ -66,6 +69,7 @@ pub async fn start(root:&Path,definition:Value,reference:CustomRuntimeRefV1,requ
     crate::platform::private_storage::prepare_private_directory(path.parent().context("custom_runtime.receipt_parent_missing")?)?;
     let record=json!({"commandId":id,"inputDigest":input_digest,"reference":reference,"platform":requested_platform,"state":"running","startedAt":chrono::Utc::now().to_rfc3339()});crate::platform::private_storage::atomic_write_private_json(&path,&record)?;
     let activity=ReceiptActivity::begin(&path)?;
+    drop(receipt_gate);
     let installed:Option<(String,String)>={let database=database.lock().await;database.connection().query_row("SELECT operation_id,lock_json FROM custom_runtime_installation WHERE definition_id=?1 AND definition_revision=?2 AND platform=?3 AND lock_json IS NOT NULL",params![reference.id,reference.definition_revision,requested_platform],|row|Ok((row.get(0)?,row.get(1)?))).optional()?};
     if let Some((operation,raw))=installed{
         uuid::Uuid::parse_str(&operation)?;let lock:Value=serde_json::from_str(&raw)?;validate("launchLock",&lock)?;
