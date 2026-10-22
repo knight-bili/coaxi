@@ -5882,7 +5882,7 @@ function ThreadWorkspaceContent({
             />
           )}
 
-          <UserFeedbackDock key={`feedback:${snapshot.thread.id}`} scope={{threadId:snapshot.thread.id,conversationId:null,scopeKind:'public'}} members={snapshot.members}/>
+          <UserFeedbackDock key={`feedback:${snapshot.thread.id}`} scope={{threadId:snapshot.thread.id,conversationId:null,scopeKind:'public'}} members={snapshot.members} materials={composerDraft?.attachments??[]}/>
           <form
         className={[
           'composer',
