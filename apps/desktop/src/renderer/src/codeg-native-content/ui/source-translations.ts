@@ -1,11 +1,12 @@
 import { IntlMessageFormat } from 'intl-messageformat'
 import copy from './source-copy.json'
+import { supportedInterfaceLanguage } from '../../../../shared/interface-languages'
 
 // Keys and messages come only from the fixed source catalog. No transcript text
 // can create cache entries or become a message template.
 const compiled = new Map<string, IntlMessageFormat>()
 export function formatSourceCopy(language: string, scope: string, key: string, values?: Record<string, unknown>): string {
-  const locale = language === 'en' ? 'en' : 'zh-CN'
+  const locale = supportedInterfaceLanguage(language) ? language : 'en'
   const catalog: Record<string, unknown> = copy[locale]
   const base = scope.endsWith('.goal') ? scope.slice(0, -5) : scope
   const name = scope.endsWith('.goal') ? 'goal.' + key : key

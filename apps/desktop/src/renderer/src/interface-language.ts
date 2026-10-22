@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react'
 import type { GeneralPreferencesApi, GeneralPreferencesSnapshot, InterfaceLanguage } from '@contracts'
 import englishCopy from './locales/en.json'
+import codegCommon from './locales/codeg-common.json'
 
 const english: Readonly<Record<string, string>> = englishCopy
 const listeners = new Set<() => void>()
@@ -13,9 +14,12 @@ let pendingRequests = 0
 let latestRequestFailed = false
 
 function publish(language: InterfaceLanguage): void {
+  if (typeof document !== 'undefined') {
+    document.documentElement.lang = language
+    document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr'
+  }
   if (currentLanguage === language) return
   currentLanguage = language
-  if (typeof document !== 'undefined') document.documentElement.lang = language
   listeners.forEach((listener) => listener())
 }
 
@@ -79,7 +83,8 @@ export function translateUi(language: InterfaceLanguage, chinese: string, ...val
   const key = chinese.trim()
   const prefix = chinese.slice(0, chinese.indexOf(key))
   const suffix = chinese.slice(chinese.indexOf(key) + key.length)
-  const template = language === 'en' ? english[key] ?? key : key
+  const source: Readonly<Record<string, string>> = codegCommon[language]
+  const template = language === 'zh-CN' ? key : source[key] ?? english[key] ?? key
   const formatted = template.replace(/\{(\d+)\}/g, (match, index: string) => {
     const value = values[Number(index)]
     return value === undefined ? match : String(value)
