@@ -24,11 +24,15 @@ pub(crate) fn targets(connection:&Connection,root:&Path,domain:&str,after:Option
     }
     ensure!(domain=="preferences","configuration.catalog_domain_unknown");
     let entries=[("system_language_settings","语言"),("appearance_mode","主题"),("appearance_zoom_level","缩放"),("system_close_behavior_settings","关闭窗口方式")];let mut items=Vec::new();
+    let policy=policies::basis(connection,"delegationPolicy")?;
+    for(key,name)in[("delegation.enabled","启用帮手"),("delegation.depth_limit","帮手层数"),("delegation.agent_defaults","帮手程序默认选项"),("delegation.completed_cache_max_mb","帮手缓存上限")]{
+        if after.is_none_or(|after|key>after){items.push(json!({"id":key,"name":name,"revision":policy["version"]}));}
+    }
     for(key,name)in entries{
         if after.is_some_and(|after|key<=after){continue}
         let raw=match key{"system_language_settings"=>"{}","appearance_mode"=>"system","appearance_zoom_level"=>"100",_=>"{}"};
         let(target,patch)=preferences::file_patch(&json!({"key":key,"value":raw}))?;let current=files::read(root,target)?;
         let fields=preferences::before_fields(&current,&patch);if fields.as_object().is_some_and(|map|map.values().any(|value|!value.is_null())){items.push(json!({"id":key,"name":name,"revision":1}));}
     }
-    items.sort_by(|left,right|left["id"].as_str().cmp(&right["id"].as_str()));Ok(json!({"items":items,"next":null}))
+    items.sort_by(|left,right|left["id"].as_str().cmp(&right["id"].as_str()));let more=items.len()>limit as usize;items.truncate(limit as usize);let next=if more{items.last().map(|value|value["id"].clone()).unwrap_or(Value::Null)}else{Value::Null};Ok(json!({"items":items,"next":next}))
 }

@@ -29,12 +29,12 @@ fn source_name(entry:&archive::Entry)->String{
     entry.value.get("name").or_else(||entry.value.get("title")).or_else(||entry.value.get("key")).and_then(Value::as_str).unwrap_or(&entry.domain).chars().take(512).collect()
 }
 fn basis(connection:&Connection,root:&Path,targets:&Value,domains:&Value,members:&[Value])->Result<Value>{
-    let mut providers=serde_json::Map::new();let mut customs=serde_json::Map::new();let mut file_targets=BTreeSet::new();
+    let mut providers=serde_json::Map::new();let mut customs=serde_json::Map::new();let mut policy_values=serde_json::Map::new();let mut file_targets=BTreeSet::new();
     for(entry,id)in targets.as_object().context("configuration.targets_invalid")?{let id=id.as_str().context("configuration.target_invalid")?;
-        match domains[entry].as_str(){Some("modelProviders")=>{providers.insert(id.into(),provider_basis(connection,id)?);},Some("customAgents")=>{customs.insert(id.into(),custom_basis(connection,id)?);},Some("preferences")=>{file_targets.insert(id.to_owned());},Some(domain)=>if let Some(target)=library::file_target(domain){file_targets.insert(target.to_owned());},None=>anyhow::bail!("configuration.domain_required")}
+        match domains[entry].as_str(){Some("modelProviders")=>{providers.insert(id.into(),provider_basis(connection,id)?);},Some("customAgents")=>{customs.insert(id.into(),custom_basis(connection,id)?);},Some("preferences")=>{if policies::owns(id){policy_values.insert(id.into(),policies::basis(connection,id)?);}else{file_targets.insert(id.to_owned());}},Some(domain)=>if let Some(target)=library::file_target(domain){file_targets.insert(target.to_owned());},None=>anyhow::bail!("configuration.domain_required")}
     }
     let mut member_values=serde_json::Map::new();for member in members{let id=text(member,"agentId")?;member_values.insert(id.into(),member_basis(connection,id)?);}
-    Ok(json!({"providers":providers,"customAgents":customs,"members":member_values,"files":files::basis(root,&file_targets.into_iter().collect::<Vec<_>>())?}))
+    Ok(json!({"providers":providers,"customAgents":customs,"members":member_values,"policies":policy_values,"files":files::basis(root,&file_targets.into_iter().collect::<Vec<_>>())?}))
 }
 pub(crate) fn preview(connection:&Connection,root:&Path,client:&str,input:&Value)->Result<Value>{
     validate_operation("configuration.migration.preview",input)?;
@@ -83,12 +83,13 @@ pub(crate) fn preview(connection:&Connection,root:&Path,client:&str,input:&Value
                 match converted{Ok(value)=>row["after"]=value,Err(_)=>{row["status"]=json!("unsupported");row["reason"]=json!("此条原配置无法完整转换；原文保留，请补齐字段后重新预览。");}}
                 targets.insert(entry.id.clone(),json!(target));domains.insert(entry.id.clone(),json!(entry.domain));
             }else if entry.domain=="preferences"{
-                match preferences::file_patch(&entry.value){
+                match policies::patch(&entry.value).and_then(|value|value.map(Ok).unwrap_or_else(||preferences::file_patch(&entry.value))){
                     Ok((target,patch))=>{
-                        let before=files::read(root,target)?;row["before"]=preferences::before_fields(&before,&patch);row["after"]=patch;
+                        let policy=policies::owns(target);let original=if policy{policies::basis(connection,target)?}else{json!({"version":1,"value":files::read(root,target)?})};
+                        let before=&original["value"];row["before"]=preferences::before_fields(before,&patch);row["after"]=patch;
                         let key=text(&entry.value,"key")?;let existing=row["before"].as_object().is_some_and(|map|map.values().any(|value|!value.is_null()));
                         let decision=decision.context("configuration.decision_required")?;
-                        if(action=="create"&&(existing||!decision["targetId"].is_null()||!decision["expectedRevision"].is_null()))||(action=="replace"&&(!existing||decision["targetId"]!=key||decision["expectedRevision"]!=1)){
+                        if(action=="create"&&(existing||!decision["targetId"].is_null()||!decision["expectedRevision"].is_null()))||(action=="replace"&&(!existing||decision["targetId"]!=key||decision["expectedRevision"]!=original["version"])){
                             row["status"]=json!("conflict");row["reason"]=json!("请明确选择替换对应偏好，已有值不会按名称自动覆盖。");
                         }
                         targets.insert(entry.id.clone(),json!(target));domains.insert(entry.id.clone(),json!(entry.domain));
@@ -143,6 +144,7 @@ pub(crate) fn receipt(connection:&Connection,client:&str,id:&str)->Result<Value>
 }
 
 fn target_basis(connection:&Connection,root:&Path,domain:&str,id:&str)->Result<Value>{
+    if domain=="preferences"&&policies::owns(id){return policies::basis(connection,id)}
     match domain{
         "modelProviders"=>provider_basis(connection,id),"customAgents"=>custom_basis(connection,id),"memberConnection"=>member_basis(connection,id),
         "quickMessages"|"taskTemplates"|"agentSettings"|"preferences"=>Ok(files::basis(root,&[id.to_owned()])?[id].clone()),
@@ -189,7 +191,8 @@ fn undo_on(tx:&Transaction<'_>,root:&Path,command:&str,private:&Value)->Result<V
                 tx.execute("UPDATE agent_profile SET version=version+1,default_model_selection_json=?2,updated_at=?3 WHERE id=?1",params![id,before["modelJson"].as_str(),chrono::Utc::now().to_rfc3339()])?;changed.push(id.to_owned());
             },
             "quickMessages"|"taskTemplates"|"agentSettings"|"preferences"=>{
-                let current=files::read(root,id)?;files::enqueue(tx,root,command,domain,id,&current,&before["value"])?;
+                if domain=="preferences"&&policies::owns(id){let current=policies::basis(tx,id)?;policies::apply(tx,id,&current,&before["value"])?;}
+                else{let current=files::read(root,id)?;files::enqueue(tx,root,command,domain,id,&current,&before["value"])?;}
             },
             _=>anyhow::bail!("configuration.undo_domain_unknown"),
         }
@@ -227,13 +230,18 @@ fn apply_on(tx:&Transaction<'_>,root:&Path,client:&str,command:&str,preview:&Val
     let members=preview["members"].as_array().context("configuration.members_invalid")?;
     ensure!(basis(tx,root,&private["targets"],&private["domains"],members)?==private["basis"],"configuration.local_configuration_changed");
     let archive=archive_store::retained(tx,root,client,text(preview,"archiveId")?,text(preview,"sourceDigest")?)?;
-    let entries=archive.entries()?;let mut references=BTreeMap::new();let mut counts=BTreeMap::<String,u64>::new();let mut file_updates=BTreeMap::<String,(String,Value)>::new();
+    let entries=archive.entries()?;let mut references=BTreeMap::new();let mut counts=BTreeMap::<String,u64>::new();let mut file_updates=BTreeMap::<String,(String,Value)>::new();let mut policy_updates=BTreeMap::<String,Value>::new();
     for selected in preview["selections"].as_array().context("configuration.selections_invalid")?{
         if selected["decision"]["action"]=="skip"{continue}
         let source=text(selected,"entryId")?;let entry=entries.iter().find(|entry|entry.id==source&&entry.domain==selected["domain"]).context("configuration.source_entry_changed")?;
         let id=private["targets"][source].as_str().context("configuration.target_required")?;
         *counts.entry(entry.domain.clone()).or_default()+=1;
         if entry.domain=="preferences"{
+            if let Some((target,patch))=policies::patch(&entry.value)?{
+                ensure!(id==target,"configuration.preference_target_changed");
+                let original=policy_updates.get(target).cloned().unwrap_or_else(||private["basis"]["policies"][target]["value"].clone());
+                policy_updates.insert(target.into(),policies::merge(&original,&patch)?);continue
+            }
             let(target,patch)=preferences::file_patch(&entry.value)?;ensure!(id==target,"configuration.preference_target_changed");
             let original=file_updates.get(target).map(|(_,value)|value.clone()).unwrap_or_else(||private["basis"]["files"][target]["value"].clone());
             let next=preferences::merge(target,&original,&patch)?;file_updates.insert(target.into(),("preferences".into(),next));continue
@@ -271,6 +279,10 @@ fn apply_on(tx:&Transaction<'_>,root:&Path,client:&str,command:&str,preview:&Val
     for(target,(domain,after))in file_updates{
         let before=&private["basis"]["files"][&target];let mut after_basis=before.clone();after_basis["value"]=after.clone();
         files::enqueue(tx,root,command,&domain,&target,&before["value"],&after)?;remember(tx,command,&domain,&target,before,&after_basis)?;
+    }
+    for(target,after)in policy_updates{
+        let before=&private["basis"]["policies"][&target];let saved=policies::apply(tx,&target,before,&after)?;
+        remember(tx,command,"preferences",&target,before,&saved)?;
     }
     Ok(json!({"counts":counts,"changedMembers":changed,"files":files::statuses(tx,command)?}))
 }
