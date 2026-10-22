@@ -38,6 +38,7 @@ private struct NativeRuntimeEditor: View {
     private var changed: Bool { model.members.first { $0.text("agentId") == member.text("agentId") }?["version"] != member["version"] }
     var body: some View {
         Form {
+            Section("工作中补充") {RovaiMemberFeedbackSwitch(model: model, agentId: member.text("agentId"))}
             if let issue { Section { Text(issue).font(.caption).foregroundStyle(Theme.warning) } }
             if changed { Section { Text("队员信息已变化，当前更改保留；请返回后重新打开。").foregroundStyle(Theme.warning) } }
             Section("智能体") {

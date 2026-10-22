@@ -16,6 +16,7 @@ struct RovaiPrivateConversationView: View {
     @State private var issue: String?
     @State private var busy = false
     @State private var ending = false
+    @State private var feedback = false
     @State private var openingCommand: String?
     @State private var quoteSelection: QuoteSource?
     @State private var removedQuoteId: String?
@@ -34,7 +35,7 @@ struct RovaiPrivateConversationView: View {
                 if model.pending != nil { HStack { Text("原操作待核对").font(.caption); Spacer(); Button("核对") { Task { await model.reconcile() } }; Button("重试原操作") { Task { await model.retry() } } }.padding(12).disabled(model.busy) }
                 if selected == nil { chooser } else { transcript; composer }
             }.navigationTitle(child ? "独立帮手" : "队员私聊")
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("关闭") { close() } }; ToolbarItem(placement: .topBarTrailing) { Button("刷新") { Task { await load(); await readRetained() } }.disabled(busy) } }
+            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("关闭") { close() } }; ToolbarItem(placement: .topBarTrailing) {if selected != nil {Button("工作中补充") {feedback = true}}; Button("刷新") { Task { await load(); await readRetained() } }.disabled(busy) } }
         }.interactiveDismissDisabled(true)
         .task { if let childId { selected = childId } else if let initialConversationId { selected = initialConversationId } else { await load() } }
         .task(id: selected) { bodyReady = false; snapshot = .object([:]); retained = []; removedQuoteId = nil; quoteSelection = nil; if selected != nil { do { text = try model.readBody(owner); bodyReady = true; await load(); await readRetained() } catch { issue = error.localizedDescription } } }
@@ -45,6 +46,14 @@ struct RovaiPrivateConversationView: View {
             let receipt = value?["commandResult"] ?? value
             if !child, model.lastOperation == .singleChatOpen, receipt?.text("commandId") == openingCommand, receipt?.text("status") == "applied", let id = receipt?["payload"]?["conversationId"]?.stringValue { selected = id }
             else { Task { await load(); await readRetained(); if let operation = model.lastOperation, [send, edit, mutate].contains(operation), model.pending == nil, selected != nil { do { text = try model.readBody(owner) } catch { issue = error.localizedDescription } } } }
+        }
+        .sheet(isPresented: $feedback, onDismiss: {Task {await load()}}) {
+            RovaiUserFeedback(model: model, threadId: threadId, conversationId: selected, child: child, agentId: snapshot["conversation"]?.text("agentId"), normalInput: {
+                guard !disabled, text.isEmpty, let selected else {throw RovaiHostFailure(code: "请先处理普通输入中的草稿和材料")}
+                let value = try await model.query(get, params: .object(["conversationId": .string(selected), "composerScope": .null]))
+                guard value["conversation"]?.text("id") == selected, (value["draft"]?["attachments"]?.rvArray ?? []).isEmpty, (value["draft"]?["quotes"]?.rvArray ?? []).isEmpty else {throw RovaiHostFailure(code: "请先处理普通输入中的草稿和材料")}
+                return .object(["draftRevision": value["draft"]?["revision"] ?? .number(0)])
+            })
         }
         .sheet(item: $quoteSelection) {source in RovaiQuoteSelector(model: model, threadId: threadId, messageId: source.id, onChosen: {_ in false}, conversationId: source.conversationId, onSelection: {selection in
             guard !disabled, selected == source.conversationId, snapshot["conversation"]?.text("status") == "active" else {return false}
