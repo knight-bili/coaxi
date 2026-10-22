@@ -18,6 +18,7 @@ pub(crate) mod files;
 pub(crate) mod library;
 pub(crate) mod preferences;
 pub(crate) mod launch;
+pub(crate) mod catalog;
 mod model;
 pub use model::*;
 

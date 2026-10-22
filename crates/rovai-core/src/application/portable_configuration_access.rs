@@ -3,6 +3,12 @@ use crate::portable_configuration::{self as configuration,providers,members,migr
 
 impl Core{
     pub(super) async fn portable_configuration_access(self:&Arc<Self>,method:&str,mut value:Value,client:&crate::draft_client::DraftClient)->Result<Value>{
+        if matches!(method,"configuration.migration.archives"|"configuration.migration.targets"){
+            #[derive(Deserialize)]#[serde(deny_unknown_fields)]struct Input{after:Option<String>,limit:u32,domain:Option<String>}
+            anyhow::ensure!(serde_json::to_vec(&value)?.len()<=4096,"configuration.catalog_request_limit");
+            let input:Input=serde_json::from_value(value)?;let database=self.database.lock().await;
+            return if method=="configuration.migration.archives"{anyhow::ensure!(input.domain.is_none(),"configuration.catalog_domain_invalid");configuration::catalog::archives(database.connection(),client.id(),input.after.as_deref(),input.limit)}else{configuration::catalog::targets(database.connection(),&self.data_dir,input.domain.as_deref().context("configuration.domain_required")?,input.after.as_deref(),input.limit)}
+        }
         configuration::validate_operation(method,&value)?;
         if matches!(method,"configuration.migration.preview"|"configuration.migration.undoPreview"|"configuration.migration.receipt"){
             let _lock=workbench::MUTATIONS.lock().await;let database=self.database.lock().await;

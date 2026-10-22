@@ -5,6 +5,10 @@ use serde::{Deserialize, Serialize};
 /// and the legacy shared draft remain outside the network capability.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum Operation {
+    #[serde(rename="configuration.migration.archives")]
+    PortableMigrationArchives,
+    #[serde(rename="configuration.migration.targets")]
+    PortableMigrationTargets,
     #[serde(rename="configuration.migration.preview")]
     PortableMigrationPreview,
     #[serde(rename="configuration.migration.confirm")]
@@ -626,7 +630,7 @@ impl Operation {
             Self::NativeCreationRecords => select_fields(&value,&["schemaVersion","items","next"]),
             Self::PortableMigrationPreview|Self::PortableMigrationUndoPreview=>select_fields(&value,&["schemaVersion","previewId","previewDigest","expiresAt","archiveId","sourceDigest","localDigest","selections","members","rows","canApply"]),
             Self::PortableMigrationConfirm|Self::PortableMigrationUndoConfirm|Self::PortableMigrationReceipt=>select_fields(&value,&["schemaVersion","commandId","previewId","previewDigest","state","counts","changedMembers","errorCode","historyPreserved","files"]),
-            Self::PortableProvidersList=>select_fields(&value,&["items","next"]),
+            Self::PortableMigrationArchives|Self::PortableMigrationTargets|Self::PortableProvidersList=>select_fields(&value,&["items","next"]),
             Self::PortableProvidersUpsert|Self::PortableProvidersRemove|Self::PortableMemberConnectionSet=>select_fields(&value,&["commandId","commandType","status","code","payload","resultEntity","recordedAt"]),
             Self::PortableMemberConnectionGet=>select_fields(&value,&["agentId","agentVersion","binding"]),
             Self::NativeSteerEvidence => select_fields(&value,&["schemaVersion","preview","receipt","delivery","normalContinuation"]),
@@ -738,6 +742,8 @@ impl Operation {
             Self::NativeContinuationPreview => "history.execution.preview",
             Self::NativeCreationRecords => "history.execution.records",
             Self::PortableMigrationPreview=>"configuration.migration.preview",
+            Self::PortableMigrationArchives=>"configuration.migration.archives",
+            Self::PortableMigrationTargets=>"configuration.migration.targets",
             Self::PortableMigrationConfirm=>"configuration.migration.confirm",
             Self::PortableMigrationReceipt=>"configuration.migration.receipt",
             Self::PortableMigrationUndoPreview=>"configuration.migration.undoPreview",

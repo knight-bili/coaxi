@@ -2,6 +2,8 @@ package app.codeg.android.core.network
 
 /** Generated from the explicit public Host enum; private Core methods are not admitted. */
 enum class RovaiOperation(val wire:String) {
+    CONFIGURATION_MIGRATION_ARCHIVES("configuration.migration.archives"),
+    CONFIGURATION_MIGRATION_TARGETS("configuration.migration.targets"),
     CONFIGURATION_MIGRATION_PREVIEW("configuration.migration.preview"),
     CONFIGURATION_MIGRATION_CONFIRM("configuration.migration.confirm"),
     CONFIGURATION_MIGRATION_RECEIPT("configuration.migration.receipt"),

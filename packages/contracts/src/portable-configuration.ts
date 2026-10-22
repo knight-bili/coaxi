@@ -23,3 +23,10 @@ export interface PortableConfigurationPrivateApi {
   importSelected?(input:{selectionId:string;operationId:string;passphrase:string;manifest?:Record<string,unknown>|null}):Promise<PortableArchiveReference>
   uploadArchive?(operationId:string,file:File,passphrase:string,manifest?:Record<string,unknown>|null):Promise<PortableArchiveReference>
 }
+export type PortableMigrationDomain='modelProviders'|'agentSettings'|'customAgents'|'quickMessages'|'taskTemplates'|'preferences'
+export interface PortableMigrationSelection {entryId:string;domain:PortableMigrationDomain;decision:{entryId:string;action:'skip'|'create'|'replace';targetId:string|null;expectedRevision:number|null}}
+export interface PortableMigrationMember {agentId:string;expectedVersion:number;providerEntryId:string;environmentEntryId:string|null;modelSelection:import('./index').ModelSelection;installationId:string;expectedInstallationGeneration:number}
+export interface PortableMigrationRow {entryId:string;domain:string;name:string;action:'skip'|'create'|'replace';status:'ready'|'conflict'|'needs_environment'|'unsupported';before:Record<string,unknown>;after:Record<string,unknown>;reason:string|null}
+export interface PortableMigrationPreview {schemaVersion:1;previewId:string;previewDigest:string;expiresAt:string;archiveId:string;sourceDigest:string;localDigest:string;selections:PortableMigrationSelection[];members:PortableMigrationMember[];rows:PortableMigrationRow[];canApply:boolean}
+export interface PortableMigrationReceipt {schemaVersion:1;commandId:string;previewId:string;previewDigest:string;state:'prepared'|'applied'|'rejected'|'unknown';counts:Record<string,number>;changedMembers:string[];errorCode:string|null;historyPreserved:true;files:Array<{domain:string;targetId:string;state:'pending'|'applied'|'conflict'|'failed';errorCode:string|null}>}
+export interface PortableMigrationTarget {id:string;name:string;revision:number}

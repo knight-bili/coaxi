@@ -1,6 +1,7 @@
 import type { CoreMethod } from '@contracts'
 
 export const RUNTIME_RENDERER_CORE_METHODS = [
+  'configuration.migration.archives','configuration.migration.targets',
   'configuration.migration.preview','configuration.migration.confirm','configuration.migration.receipt','configuration.migration.undoPreview','configuration.migration.undoConfirm',
   'configuration.providers.list', 'configuration.providers.upsert', 'configuration.providers.remove',
   'configuration.memberConnection.get', 'configuration.memberConnection.set',
