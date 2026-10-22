@@ -78,19 +78,35 @@ impl Core{
         let plan:Plan=serde_json::from_slice(&fs::read(directory.join("plans").join(format!("{plan_id}.json")))?)?;
         let entry=plan.entries.iter().find(|entry|Some(entry.id.as_str())==request.entry_id.as_deref()).context("history.entry_unavailable")?.clone();
         let name=entry.name.clone();let provider=plan.provider.clone();let origin=plan.source_root.clone().unwrap_or_else(||plan.root.clone());
+        let execution_location=crate::native_lifecycle::source::Location{root:origin.clone(),relative:if plan.helper{None}else{Some(name.clone())}};
+        let selected_native_id=entry.native_id.clone();
         let snapshot_root=plan.helper.then(||plan.root.clone());let snapshot_digest=plan.snapshot_digest.clone();
         let (bytes,transcript)=if plan.helper{formats::read(&plan,&entry).await?}else{tokio::task::spawn_blocking(move||->Result<_>{let bytes=source(&plan,&entry)?;let transcript=crate::runtime_subagent_session::content::import_records(&plan.provider,&bytes,Utc::now(),&AtomicBool::new(false))?;Ok((bytes,transcript))}).await??};
         let digest=hash(&bytes);
         if request.operation=="preview"{return Ok(json!({"digest":digest,"summary":transcript["summary"],"notes":transcript["notes"],"turnCount":transcript["turns"].as_array().map(Vec::len)}));}
         ensure!(request.operation=="import"&&request.expected_digest.as_deref()==Some(digest.as_str()),"history.source_changed");
         let id=hash(format!("{provider}:{digest}").as_bytes());let manifest_path=directory.join(format!("{id}.manifest.json"));
+        let native_id=match selected_native_id{Some(id)=>Ok(id),None=>crate::native_lifecycle::source::native_id(&provider,&bytes)};
         let _lock=workbench::MUTATIONS.lock().await;
-        if manifest_path.exists(){let existing:Value=serde_json::from_slice(&fs::read(&manifest_path)?)?;return Ok(json!({"importId":id,"duplicate":true,"archived":existing["archived"]==true}));}
+        if manifest_path.exists(){let existing:Value=serde_json::from_slice(&fs::read(&manifest_path)?)?;let execution_source=self.register_history_execution_source(&request.scope.thread_id,&id,&existing,&execution_location,native_id).await;return Ok(json!({"importId":id,"duplicate":true,"archived":existing["archived"]==true,"executionSource":execution_source}));}
         let source_path=directory.join(format!("{id}.native.json"));
         crate::platform::private_storage::atomic_write_private_bytes(&source_path,&bytes)?;
         crate::platform::private_storage::atomic_write_private_json(&directory.join(format!("{id}.transcript.json")),&transcript)?;
-        crate::platform::private_storage::atomic_write_private_json(&manifest_path,&json!({"id":id,"provider":provider,"sourceName":name,"originalRoot":origin,"sourceDigest":digest,"summary":transcript["summary"],"notes":transcript["notes"],"importedAt":Utc::now().to_rfc3339(),"linkedThreadId":request.scope.thread_id,"snapshotRoot":snapshot_root,"snapshotDigest":snapshot_digest,"tags":[],"archived":false}))?;
+        let manifest=json!({"id":id,"provider":provider,"sourceName":name,"originalRoot":origin,"sourceDigest":digest,"summary":transcript["summary"],"notes":transcript["notes"],"importedAt":Utc::now().to_rfc3339(),"linkedThreadId":request.scope.thread_id,"snapshotRoot":snapshot_root,"snapshotDigest":snapshot_digest,"tags":[],"archived":false});
+        crate::platform::private_storage::atomic_write_private_json(&manifest_path,&manifest)?;
+        let execution_source=self.register_history_execution_source(&request.scope.thread_id,&id,&manifest,&execution_location,native_id).await;
         let usage_index=usage::index(&directory,&id,false).map(|result|json!({"available":true,"result":result})).unwrap_or_else(|error|json!({"available":false,"error":error.to_string(),"historyPreserved":true}));
-        Ok(json!({"importId":id,"duplicate":false,"usageIndex":usage_index}))
+        Ok(json!({"importId":id,"duplicate":false,"usageIndex":usage_index,"executionSource":execution_source}))
+    }
+    async fn register_history_execution_source(&self,owner:&str,id:&str,manifest:&Value,location:&crate::native_lifecycle::source::Location,native_id:Result<String>)->Value{
+        let result=async{
+            ensure!(manifest["linkedThreadId"]==owner,"native_lifecycle.import_scope_mismatch");
+            let native_id=native_id?;let import_revision=crate::command::canonical_json_digest(manifest)?;
+            let selected=location.clone();let source_revision=tokio::task::spawn_blocking(move||crate::native_lifecycle::source::revision(&selected)).await??;
+            if location.relative.is_some(){ensure!(source_revision==format!("sha256:{}",manifest["sourceDigest"].as_str().context("native_lifecycle.import_digest_missing")?),"native_lifecycle.source_changed");}
+            let database=self.database.lock().await;let reference=crate::native_lifecycle::source::register(database.connection(),owner,id,&import_revision,manifest["provider"].as_str().context("native_lifecycle.provider_missing")?,&native_id,location,&source_revision)?;
+            Ok::<_,anyhow::Error>(json!({"registered":true,"sourceHandleId":reference.source_handle_id,"executionStarted":false}))
+        }.await;
+        match result{Ok(value)=>value,Err(error)=>json!({"registered":false,"reason":error.to_string(),"importPreserved":true,"executionStarted":false})}
     }
 }
