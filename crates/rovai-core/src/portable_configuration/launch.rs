@@ -103,6 +103,10 @@ fn managed_files(directory:&Path,agent:&str)->Result<Value>{
     Ok(Value::Object(result))
 }
 pub(crate) async fn prepare(runtime:&FrozenAgentRuntimeConfig,source:Option<&LaunchEnvironmentSource>)->Result<Option<Plan>>{
+    if runtime.portable_connection.is_none(){return Ok(None)}
+    prepare_selected(runtime,source).await.map_err(|error|super::launch_failure::public(runtime,error))
+}
+async fn prepare_selected(runtime:&FrozenAgentRuntimeConfig,source:Option<&LaunchEnvironmentSource>)->Result<Option<Plan>>{
     let Some(connection)=runtime.portable_connection.as_ref()else{return Ok(None)};connection.validate()?;
     ensure!(runtime.custom_api.is_none()&&runtime.custom_runtime.is_none()&&runtime.adapter_kind==connection.adapter_kind()?&&runtime.installation_id==connection.installation_id&&runtime.installation_generation==connection.installation_generation,"configuration.frozen_connection_changed");
     ensure!(crate::custom_runtime::installer::platform()?==connection.host_platform,"configuration.connection_requires_original_platform");

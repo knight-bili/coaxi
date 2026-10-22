@@ -25,6 +25,7 @@ pub(crate) mod preferences;
 mod channel_preferences;
 pub(crate) mod policies;
 pub(crate) mod launch;
+mod launch_failure;
 pub(crate) mod catalog;
 mod model;
 pub use model::*;
