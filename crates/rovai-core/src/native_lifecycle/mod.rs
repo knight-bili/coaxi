@@ -5,6 +5,7 @@ use serde_json::{Value,json};
 use std::sync::LazyLock;
 
 pub mod model;
+pub mod storage;
 pub use model::*;
 const MAX_REQUEST_BYTES:usize=2*1024*1024;
 static CONTRACT:LazyLock<Value>=LazyLock::new(||serde_json::from_str(include_str!("contract.json")).expect("confirmed native continuation fork steer r1 contract"));
