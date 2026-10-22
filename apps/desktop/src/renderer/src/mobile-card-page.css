@@ -1,0 +1,1 @@
+html,body,#root{height:auto;min-height:100%;margin:0;overflow:visible}body{background:var(--canvas);color:var(--ink)}.mobile-card-page{box-sizing:border-box;width:100%;min-width:0;padding:16px}.mobile-card-page pre{white-space:pre-wrap;overflow-wrap:anywhere}.feedback-dialog{max-height:calc(100dvh - 24px);width:min(680px,calc(100vw - 24px))}

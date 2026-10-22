@@ -3,6 +3,8 @@ node_modules/
 
 # Build and test outputs
 out/
+apps/mobile-android/app/src/main/assets/card-preview/
+apps/mobile-ios/CodegiOS/Resources/CardPreview.bundle/
 dist/
 target/
 resources/bin/
