@@ -8,6 +8,7 @@ export * from './current-user-profile'
 export type * from './native-history-usage'
 export type * from './user-feedback'
 export type * from './native-lifecycle'
+export type * from './portable-configuration'
 
 export interface NativeHistoryUsageReport {
   schemaVersion:1;source:'imported_native_history';report:import('./native-history-usage').TokenUsageReport
@@ -5243,6 +5244,7 @@ export interface RovaiApi {
   nativePets?: { importDirectory():Promise<unknown|null>;synchronize():Promise<void>;onChanged(listener:()=>void):()=>void }
   webdavWorkspace?: {request<T>(input:{operation:'restore_inspect'|'probe'|'create_collection'|'list'|'push'|'pull'|'status'|'transfers'|'cancel'|'resume'|'removal_preview'|'removal_status'|'remove'|'config_get'|'config_set'|'config_upload'|'config_cancel'|'config_resume'|'config_archive'|'config_cache_preview'|'config_cache_remove'|'config_cache_status'|'retention_preview'|'retention_apply'|'retention_status'|'cleanup_preview'|'cleanup_removed';expectedRevision:string|null;commandId?:string;snapshotId?:string;expectedDigest?:string;expectedIndexEtag?:string;confirmed?:boolean;kind?:'backup'|'configuration';enabled?:boolean;autoSync?:boolean;intervalMinutes?:number;passphrase?:string;clearPassphrase?:boolean;keepBackups?:number;keepConfigurations?:number}):Promise<T|null>}
   nativeBackups?: NativeBackupsApi
+  portableConfiguration?: import('./portable-configuration').PortableConfigurationPrivateApi
   nativeHistory?: {
     export<T>(threadId:string,importId:string,expectedRevision:string):Promise<T|null>
     scan<T>(threadId:string,provider:'codex'|'claude'|'qoder'|'grok'|'opencode'|'gemini'|'openclaw'|'cline'|'hermes'|'codebuddy'|'kimi_code'|'pi'|'cursor'|'deepseek'|'antigravity'):Promise<T|null>

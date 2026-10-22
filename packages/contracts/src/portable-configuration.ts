@@ -13,3 +13,12 @@ export interface PortableMemberConnectionView {agentId:string;agentVersion:numbe
 export interface PortableProviderPage {items:PortableProviderViewV1[];next:string|null}
 /** 原文由加密存储和显式导出拥有；普通视图的原文字段为占位提示。 */
 export type PortableProviderDefinitionV1 = Omit<PortableProviderViewV1,'revision'|'digest'|'createdAt'|'updatedAt'>
+export interface PortableArchiveReference {archiveId:string;sourceDigest:string;sourceKind:'codeg_v1'|'fusion_v1'|'fusion_v2';counts:Record<string,number>}
+export interface PortableArchiveSelection {selectionId:string;displayName:string;sourceDigest:string;byteSize:number}
+export interface PortableConfigurationPrivateApi {
+  prepareSecret(input:{schemaVersion:1;operationId:string;purpose:'provider_key'|'member_environment';value:string}):Promise<{reference:PortableSecretRefV1;expiresAt:string}>
+  archiveReceipt(operationId:string):Promise<{archive:PortableArchiveReference|null}>
+  selectArchive?():Promise<PortableArchiveSelection|null>
+  importSelected?(input:{selectionId:string;operationId:string;passphrase:string;manifest?:Record<string,unknown>|null}):Promise<PortableArchiveReference>
+  uploadArchive?(operationId:string,file:File,passphrase:string,manifest?:Record<string,unknown>|null):Promise<PortableArchiveReference>
+}

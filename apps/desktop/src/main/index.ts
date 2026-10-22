@@ -98,6 +98,7 @@ import {
   restoreProjectAccessFailClosed
 } from './project-access-restore'
 import { RUNTIME_RENDERER_CORE_METHODS } from './runtime-core-methods'
+import { PortableConfigurationPrivate } from './portable-configuration-private'
 import {
   GeneralPreferencesStore,
   isExecutionConsolePlacement,
@@ -1297,6 +1298,8 @@ app.on('before-quit',()=>{void interactionWorkspace.dispose()})
 const webdavWorkspace = new WebdavWorkspace((method,params)=>core.request(method,params),()=>mainWindow,()=>app.getPath('userData'),(event,path,passphrase,kind,digest)=>backupWorkspace.inspectDownloaded(event,path,passphrase,kind,digest))
 ipcMain.handle('rovai:webdav-workspace',(event,input)=>webdavWorkspace.invoke(event,input))
 const backupWorkspace = new BackupWorkspace(core,()=>coreDataPath,()=>mainWindow,()=>requestRendererQuitPreparation(mainWindow,()=>new MessageChannelMain()),()=>{browserWorkspace.revokeAll();officeWorkspace.closeAll()},()=>{app.relaunch();app.quit()},()=>app.getPath('userData'))
+const portableConfigurationPrivate=new PortableConfigurationPrivate(core,()=>mainWindow)
+ipcMain.handle('rovai:portable-configuration-private',(event,operation,input)=>portableConfigurationPrivate.invoke(event,operation,input))
 ipcMain.handle('rovai:backup-workspace',(event,operation,input)=>backupWorkspace.invoke(event,operation,input))
 const petWindow = new PetWindowService((method,params)=>core.request(method,params),()=>mainWindow)
 core.onEvent(event=>petWindow.onCoreEvent(event))

@@ -23,7 +23,9 @@ impl Core{
             let input:Input=serde_json::from_value(value)?;let database=self.database.lock().await;
             return Ok(json!({"archive":archive_store::receipt(database.connection(),client.id(),&input.operation_id)?}))
         }
-        ensure!(method=="configuration.archive.registerLocal","configuration.operation_unknown");
+        ensure!(matches!(method,"configuration.archive.registerLocal"|"configuration.archive.registerSelected"),"configuration.operation_unknown");
+        let selected=method=="configuration.archive.registerSelected";
+        ensure!(!selected||client.is_desktop(),"configuration.desktop_selection_required");
         let input:ArchiveInput=serde_json::from_value(value)?;
         uuid::Uuid::parse_str(&input.operation_id)?;
         ensure!(input.byte_size<=configuration::MAX_ARCHIVE as u64&&input.passphrase.len()<=16000,"configuration.archive_too_large");
@@ -34,7 +36,13 @@ impl Core{
             }
         }
         let parsed=tokio::task::spawn_blocking(move||->Result<_>{
-            let mut file=crate::platform::private_storage::open_private_read_file(&input.path)?;
+            let mut file=if selected{
+                ensure!(input.path.is_absolute(),"configuration.absolute_source_required");
+                let metadata=std::fs::symlink_metadata(&input.path)?;
+                ensure!(metadata.is_file()&&!metadata.file_type().is_symlink(),"configuration.source_kind_invalid");
+                // Main 持有文件选择，Core 另核对整份内容 SHA；不接受 Renderer 任意路径。
+                std::fs::File::open(&input.path)?
+            }else{crate::platform::private_storage::open_private_read_file(&input.path)?};
             ensure!(file.metadata()?.len()==input.byte_size,"configuration.archive_changed");
             let mut bytes=Vec::new();file.by_ref().take(configuration::MAX_ARCHIVE as u64+1).read_to_end(&mut bytes)?;
             ensure!(bytes.len()as u64==input.byte_size,"configuration.archive_changed");
