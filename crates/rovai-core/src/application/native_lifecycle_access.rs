@@ -45,7 +45,7 @@ impl Core{
     }
     async fn native_steer_materials(&self,value:Value,client:&crate::draft_client::DraftClient)->Result<Value>{
         #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Request{schema_version:u32,target:native::NativeSteerTargetV1,source_ids:Vec<String>,composer_scope:Option<crate::single_chat_composer_scope::SingleChatComposerScope>}
-        anyhow::ensure!(serde_json::to_vec(&value)?.len()<=2*1024*1024,"native_lifecycle.request_too_large");let input:Request=serde_json::from_value(value)?;anyhow::ensure!(input.schema_version==1,"native_lifecycle.version_invalid");
+        anyhow::ensure!(serde_json::to_vec(&value)?.len()<=2*1024*1024&&value.get("composerScope").is_some(),"native_lifecycle.material_prepare_invalid");let input:Request=serde_json::from_value(value)?;anyhow::ensure!(input.schema_version==1,"native_lifecycle.version_invalid");
         let candidates={let database=self.database.lock().await;native::material::selected_sources(database.connection(),&input.target,client,input.composer_scope.as_ref(),&input.source_ids)?};
         let root=self.data_dir.clone();let frozen=tokio::task::spawn_blocking(move||candidates.iter().map(|candidate|native::material::freeze(&root,candidate)).collect::<Result<Vec<_>>>()).await??;
         let mut database=self.database.lock().await;let tx=database.connection_mut().transaction()?;for material in &frozen{native::material::register(&tx,&input.target,client,material)?}tx.commit()?;

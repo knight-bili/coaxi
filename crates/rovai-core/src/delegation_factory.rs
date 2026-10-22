@@ -129,7 +129,7 @@ pub(crate) fn create_child(
         serde_json::from_value(preset.clone()).context("Invalid delegation Runtime defaults")?;
     let selected =
         crate::delegation_runtime_defaults::configuration(plan.configuration, &defaults)?;
-    let base = crate::agent_profile::resolve_frozen_runtime_binding(
+    let mut base = crate::agent_profile::resolve_frozen_runtime_binding(
         tx,
         &ResolvedRuntimeBinding {
             custom_runtime_ref: selected.custom_runtime_ref.clone(),
@@ -140,6 +140,8 @@ pub(crate) fn create_child(
         },
     )?
     .map_err(|blocker| anyhow::anyhow!("{}", blocker.code))?;
+    let native_steer=crate::native_lifecycle::storage::freeze_policy(tx,&identity.owner_agent_id)?;
+    crate::native_lifecycle::freeze_intent(&mut base,None,native_steer)?;
     // Resolve afresh through the actual Registry. A previously child-tagged parent
     // binding, Session, evidence, lease or recovery state never enters this Run.
     let runtime = plan.policy.freeze_resolved_runtime(&base)?;
