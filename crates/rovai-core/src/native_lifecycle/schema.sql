@@ -41,3 +41,8 @@ CREATE TABLE native_lifecycle_image_reservation (
  state TEXT NOT NULL CHECK(state IN ('reserved','written','acknowledged','not_consumed','unknown'))
 );
 CREATE INDEX native_lifecycle_image_turn ON native_lifecycle_image_reservation(turn_digest,state);
+CREATE TABLE native_lifecycle_material (
+ source_id TEXT PRIMARY KEY NOT NULL,owner_thread_id TEXT NOT NULL,conversation_id TEXT,scope_kind TEXT NOT NULL,
+ client_id TEXT NOT NULL,original_id TEXT NOT NULL,value_json TEXT NOT NULL CHECK(json_valid(value_json) AND length(value_json)<=8192),
+ relative_path TEXT NOT NULL UNIQUE,media_type TEXT NOT NULL,created_at TEXT NOT NULL
+);
