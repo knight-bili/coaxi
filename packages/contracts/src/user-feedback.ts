@@ -12,3 +12,5 @@ export type FeedbackStatus = 'pending'|'response_prepared'|'connection_written'|
 export interface FeedbackReceipt {schemaVersion:1;feedbackId:string;scope:FeedbackScope;agentId:string;sourceAgentRunId:string;sourceExecutionEpoch:number;sourceKind:'live_note'|'generated_card';textDigest:string;status:FeedbackStatus;deliveryChannel:'none'|'mcp'|'normal_message';bridgeInstanceId:string|null;transportRpcId:string|number|null;nativeToolCallId:string|null;resultDigest:string|null;writtenAt:string|null;continuedMessageId:string|null}
 export interface FeedbackList {items:Array<{receipt:FeedbackReceipt;text:string;createdAt:string}>;next:string|null}
 export interface FeedbackPreviewRecoveryList {items:Array<{preview:FeedbackPreview;receipt:FeedbackReceipt|null}>;next:string|null}
+export interface FeedbackContinuationReference {schemaVersion:1;feedbackId:string;previewId:string;previewDigest:string}
+export interface FeedbackNormalPreview {preview:FeedbackPreview;reference:FeedbackContinuationReference}

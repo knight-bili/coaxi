@@ -52,6 +52,22 @@ CREATE TABLE ui_feedback_attempt (
     UNIQUE(bridge_instance_id,rpc_id_json)
 );
 CREATE INDEX ui_feedback_attempt_run ON ui_feedback_attempt(bridge_instance_id,write_status);
+CREATE TABLE ui_feedback_continuation (
+    feedback_id TEXT PRIMARY KEY REFERENCES ui_feedback_entry(id),
+    command_id TEXT NOT NULL UNIQUE,
+    preview_id TEXT NOT NULL,
+    pending_input_id TEXT,
+    message_id TEXT,
+    result_json TEXT NOT NULL CHECK(json_valid(result_json)),
+    created_at TEXT NOT NULL
+);
+CREATE TRIGGER ui_feedback_pending_published AFTER UPDATE OF published_conversation_message_id ON single_chat_pending_input
+WHEN NEW.published_conversation_message_id IS NOT NULL
+BEGIN
+    UPDATE ui_feedback_entry SET receipt_json=json_set(receipt_json,'$.continuedMessageId',NEW.published_conversation_message_id)
+    WHERE id IN (SELECT feedback_id FROM ui_feedback_continuation WHERE pending_input_id=NEW.id) AND status='continued_as_message';
+    UPDATE ui_feedback_continuation SET message_id=NEW.published_conversation_message_id WHERE pending_input_id=NEW.id;
+END;
 CREATE TRIGGER ui_feedback_run_closed AFTER UPDATE OF status,execution_epoch,cancel_requested_at ON agent_run
 WHEN NEW.status!='running' OR NEW.cancel_requested_at IS NOT NULL OR NEW.execution_epoch!=OLD.execution_epoch
 BEGIN
