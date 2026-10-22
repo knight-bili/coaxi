@@ -810,13 +810,29 @@ export class ConsoleClient {
   }
 
   portableConfiguration():import('@contracts').PortableConfigurationPrivateApi {
-    const privateCall=async<T,>(path:'configuration/provider'|'configuration/secrets'|'configuration/receipt'|'configuration/archive',body:BodyInit):Promise<T>=>{
+    const privateCall=async<T,>(path:'configuration/provider'|'configuration/secrets'|'configuration/receipt'|'configuration/archive'|'configuration/export'|'configuration/export-receipt'|'configuration/export-download',body:BodyInit):Promise<T>=>{
       const reply=await this.#json<{result?:T;error?:{code?:string;message?:string}}>(path,{method:'POST',body})
       if(reply.error)throw new CoreRequestError(reply.error.code??'configuration_input_rejected')
       if(reply.result===undefined)throw new CoreRequestError('configuration_result_unavailable')
       return reply.result
     }
     return {
+      prepareExport:input=>privateCall('configuration/export',JSON.stringify(input)),
+      exportReceipt:operationId=>privateCall('configuration/export-receipt',JSON.stringify({operationId})),
+      downloadExport:async receipt=>{
+        if(receipt.state!=='ready'||!receipt.encryptedDigest||!Number.isSafeInteger(receipt.byteSize)||receipt.byteSize!<0||receipt.byteSize!>64*1024*1024)throw new Error('配置导出尚未准备好。')
+        const generation=this.#generation,scope=this.editingScope
+        const response=await this.#authorized('configuration/export-download',{method:'POST',body:JSON.stringify({operationId:receipt.operationId})})
+        const reader=response.body?.getReader();if(!reader)throw new Error('配置下载不可用。')
+        const parts:Uint8Array[]=[],expected=receipt.byteSize!;let size=0
+        try{for(;;){const value=await reader.read();if(value.done)break;size+=value.value.byteLength;if(size>expected)throw new Error('配置副本已变化。');parts.push(value.value)}}catch(error){await reader.cancel().catch(()=>undefined);throw error}finally{reader.releaseLock()}
+        if(size!==expected)throw new Error('配置副本已变化。')
+        const file=new File(parts,'configuration.rovai-config',{type:'application/octet-stream'})
+        const digest=await fileDigest(file,this.#lifetime.signal)
+        if(generation!==this.#generation||scope!==this.editingScope)throw new DOMException('Connection replaced','AbortError')
+        if(`sha256:${digest}`!==receipt.encryptedDigest&&digest!==receipt.encryptedDigest)throw new Error('配置副本摘要不同。')
+        return file
+      },
       providerForEdit:reference=>privateCall('configuration/provider',JSON.stringify(reference)),
       prepareSecret:input=>privateCall('configuration/secrets',JSON.stringify(input)),
       archiveReceipt:operationId=>privateCall('configuration/receipt',JSON.stringify({operationId})),
@@ -831,14 +847,14 @@ export class ConsoleClient {
     }
   }
 
-  async #json<T>(path: 'configuration/provider'|'configuration/secrets'|'configuration/receipt'|'configuration/archive'| 'session' | 'session/renew' | 'channels' | 'updates' | 'workspaces' | 'mission-files' | 'uploads' | 'uploads/reconcile' | 'uploads/receipt' | 'uploads/retry' | 'uploads/finish' | 'files' | 'avatars', options: RequestInit = {}): Promise<T> {
+  async #json<T>(path: 'configuration/provider'|'configuration/secrets'|'configuration/receipt'|'configuration/archive'|'configuration/export'|'configuration/export-receipt'|'configuration/export-download'| 'session' | 'session/renew' | 'channels' | 'updates' | 'workspaces' | 'mission-files' | 'uploads' | 'uploads/reconcile' | 'uploads/receipt' | 'uploads/retry' | 'uploads/finish' | 'files' | 'avatars', options: RequestInit = {}): Promise<T> {
     const generation = this.#generation
     const result = await (await this.#authorized(path, options)).json() as T
     if (generation !== this.#generation) throw new DOMException('Connection replaced', 'AbortError')
     return result
   }
 
-  async #authorized(path: 'configuration/provider'|'configuration/secrets'|'configuration/receipt'|'configuration/archive'| 'session' | 'session/renew' | 'channels' | 'updates' | 'workspaces' | 'mission-files' | 'uploads' | 'uploads/reconcile' | 'uploads/receipt' | 'uploads/retry' | 'uploads/finish' | 'request' | 'events' | 'logout' | 'files' | 'files/bytes' | 'attachments' | 'avatars', options: RequestInit = {}): Promise<Response> {
+  async #authorized(path: 'configuration/provider'|'configuration/secrets'|'configuration/receipt'|'configuration/archive'|'configuration/export'|'configuration/export-receipt'|'configuration/export-download'| 'session' | 'session/renew' | 'channels' | 'updates' | 'workspaces' | 'mission-files' | 'uploads' | 'uploads/reconcile' | 'uploads/receipt' | 'uploads/retry' | 'uploads/finish' | 'request' | 'events' | 'logout' | 'files' | 'files/bytes' | 'attachments' | 'avatars', options: RequestInit = {}): Promise<Response> {
     if (!this.#token) throw new SessionRequired()
     const generation = this.#generation
     if (this.#localExpiry !== null && this.#localExpiry - this.#now() <= this.#renewalWindow && !['session', 'session/renew', 'logout'].includes(path)) await this.renewIfNeeded()

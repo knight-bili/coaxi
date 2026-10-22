@@ -15,7 +15,12 @@ export interface PortableProviderPage {items:PortableProviderViewV1[];next:strin
 export type PortableProviderDefinitionV1 = Omit<PortableProviderViewV1,'revision'|'digest'|'createdAt'|'updatedAt'>
 export interface PortableArchiveReference {archiveId:string;sourceDigest:string;sourceKind:'codeg_v1'|'fusion_v1'|'fusion_v2';counts:Record<string,number>}
 export interface PortableArchiveSelection {selectionId:string;displayName:string;sourceDigest:string;byteSize:number}
+export interface PortableExportReceipt {operationId:string;state:'unknown'|'prepared'|'ready';archiveId?:string;createdAt?:string;includeSecrets?:boolean;encryptedDigest?:string|null;byteSize?:number|null}
 export interface PortableConfigurationPrivateApi {
+  prepareExport(input:{operationId:string;includeSecrets:boolean;passphrase:string}):Promise<PortableExportReceipt>
+  exportReceipt(operationId:string):Promise<PortableExportReceipt>
+  saveExport?(operationId:string):Promise<{saved:boolean}>
+  downloadExport?(receipt:PortableExportReceipt):Promise<Blob>
   providerForEdit(reference:PortableConnectionRefV1):Promise<PortableProviderViewV1>
   prepareSecret(input:{schemaVersion:1;operationId:string;purpose:'provider_key'|'member_environment';value:string}):Promise<{reference:PortableSecretRefV1;expiresAt:string}>
   archiveReceipt(operationId:string):Promise<{archive:PortableArchiveReference|null}>

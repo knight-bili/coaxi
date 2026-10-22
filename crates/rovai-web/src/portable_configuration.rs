@@ -66,3 +66,41 @@ pub async fn archive(State(state):State<WebState>,Extension(session):Extension<A
         _=>error(StatusCode::SERVICE_UNAVAILABLE,"configuration_result_unavailable"),
     }
 }
+
+pub async fn export(State(state):State<WebState>,Extension(session):Extension<Arc<Session>>,body:std::result::Result<Json<Value>,axum::extract::rejection::JsonRejection>)->Response{
+    let Ok(Json(input))=body else{return error(StatusCode::BAD_REQUEST,"configuration_input_invalid")};
+    let Ok(permit)=state.requests.clone().try_acquire_owned()else{return error(StatusCode::TOO_MANY_REQUESTS,"request_capacity")};
+    if !state.sessions.is_live(&session){return error(StatusCode::UNAUTHORIZED,"session_required")}
+    let client=DraftClient::verified_web(&session.client_id).expect("Host editor identity");
+    let pending=tokio::spawn(async move{let _permit=permit;call(state,client,"configuration.export.prepare",input).await});
+    match pending.await{Ok(response)=>response,Err(_)=>error(StatusCode::SERVICE_UNAVAILABLE,"configuration_result_unavailable")}
+}
+pub async fn export_receipt(State(state):State<WebState>,Extension(session):Extension<Arc<Session>>,body:std::result::Result<Json<Value>,axum::extract::rejection::JsonRejection>)->Response{
+    let Ok(Json(input))=body else{return error(StatusCode::BAD_REQUEST,"configuration_input_invalid")};
+    let Ok(_permit)=state.requests.clone().try_acquire_owned()else{return error(StatusCode::TOO_MANY_REQUESTS,"request_capacity")};
+    if !state.sessions.is_live(&session){return error(StatusCode::UNAUTHORIZED,"session_required")}
+    let client=DraftClient::verified_web(&session.client_id).expect("Host editor identity");call(state,client,"configuration.export.receipt",input).await
+}
+pub async fn export_download(State(state):State<WebState>,Extension(session):Extension<Arc<Session>>,body:std::result::Result<Json<Value>,axum::extract::rejection::JsonRejection>)->Response{
+    use tokio::io::AsyncReadExt;
+    let Ok(Json(input))=body else{return error(StatusCode::BAD_REQUEST,"configuration_input_invalid")};
+    let Ok(permit)=state.requests.clone().try_acquire_owned()else{return error(StatusCode::TOO_MANY_REQUESTS,"request_capacity")};
+    if !state.sessions.is_live(&session){return error(StatusCode::UNAUTHORIZED,"session_required")}
+    let client=DraftClient::verified_web(&session.client_id).expect("Host editor identity");
+    let Ok(reply)=state.core.request_for_editor("configuration.export.read",input,client).await else{return error(StatusCode::SERVICE_UNAVAILABLE,"configuration_result_unavailable")};
+    if reply.error.is_some(){return error(StatusCode::CONFLICT,"configuration_export_not_ready")}
+    let Some(result)=reply.result else{return error(StatusCode::CONFLICT,"configuration_export_not_ready")};
+    let(Some(path),Some(size))=(result["artifactPath"].as_str(),result["byteSize"].as_u64())else{return error(StatusCode::CONFLICT,"configuration_export_not_ready")};
+    if size>MAX_ARCHIVE as u64||!state.sessions.is_live(&session){return error(StatusCode::CONFLICT,"configuration_export_changed")}
+    let path=std::path::PathBuf::from(path);
+    let Ok(metadata)=tokio::fs::symlink_metadata(&path).await else{return error(StatusCode::CONFLICT,"configuration_export_changed")};
+    if !metadata.is_file()||metadata.file_type().is_symlink()||metadata.len()!=size{return error(StatusCode::CONFLICT,"configuration_export_changed")}
+    let Ok(file)=tokio::fs::File::open(path).await else{return error(StatusCode::CONFLICT,"configuration_export_changed")};
+    let stream=futures_util::stream::try_unfold((file,0u64,permit),move|(mut file,observed,permit)|async move{
+        let mut bytes=vec![0u8;64*1024];let count=file.read(&mut bytes).await?;
+        if count==0{if observed!=size{return Err(std::io::Error::other("configuration_export_changed"))}return Ok(None)}
+        if observed+count as u64>size{return Err(std::io::Error::other("configuration_export_changed"))}
+        bytes.truncate(count);Ok::<_,std::io::Error>(Some((bytes,(file,observed+count as u64,permit))))
+    });
+    ([(header::CONTENT_TYPE,"application/octet-stream".to_owned()),(header::CONTENT_DISPOSITION,"attachment; filename=\"configuration.rovai-config\"".to_owned()),(header::CACHE_CONTROL,"no-store".to_owned()),(header::CONTENT_LENGTH,size.to_string())],axum::body::Body::from_stream(stream)).into_response()
+}
