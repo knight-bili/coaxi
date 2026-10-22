@@ -5309,6 +5309,7 @@ export interface RovaiApi {
   exportMonitoring(filter: MonitoringFilter): Promise<string | null>
   exportUsageActivityReport?(query: UsageActivityQuery): Promise<string | null>
   usageCard?:{save(dataUrl:string):Promise<string|null>;copy(dataUrl:string):Promise<void>}
+  exportNativeHistoryUsage?(query:unknown):Promise<string|null>
   revealMonitoringExport(path: string): Promise<void>
   platform: NodeJS.Platform
 }

@@ -20,6 +20,8 @@ export const desktopThreadClient: ThreadClient = {
   exportMonitoring: async filter => { const path = await window.rovai.exportMonitoring(filter); return { exported: Boolean(path), ...(path ? { path } : {}) } },
   exportUsageActivityReport: async query => { const path = await window.rovai.exportUsageActivityReport?.(query); return {exported:Boolean(path),...(path?{path}:{})} },
   get usageCard() { return window.rovai.usageCard },
+  syncNativeHistoryUsage: input => window.rovai.request('history.usage.local',input),
+  exportNativeHistoryUsage: async query => {const path=await window.rovai.exportNativeHistoryUsage?.(query);return {exported:Boolean(path),...(path?{path}:{})}},
   revealMonitoringExport: path => window.rovai.revealMonitoringExport(path),
   exportDiagnostics: async () => { const path = await window.rovai.exportDiagnostics(); return { exported: Boolean(path), ...(path ? { path } : {}) } },
   revealDiagnosticsExport: path => window.rovai.revealDiagnosticsExport(path),

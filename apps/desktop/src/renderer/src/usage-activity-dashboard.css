@@ -22,5 +22,8 @@
 .usage-dashboard-two-panels{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
 .usage-dashboard-source-note{display:flex;align-items:start;gap:6px;font-size:11px;line-height:1.6;color:var(--muted-foreground)}
 .usage-dashboard-state{display:flex;align-items:center;gap:12px;min-height:160px;justify-content:center}
+.usage-native-sync{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}.usage-native-sync strong{font-size:13px}.usage-native-sync p{margin:4px 0 0;font-size:11px;color:var(--muted-foreground)}
+.usage-share-dialog{display:flex;flex-direction:column;gap:14px;width:min(420px,calc(100vw - 24px));max-height:calc(100dvh - 32px);padding:20px;overflow:hidden}
+.usage-share-dialog header h2{margin:0;font-size:17px;font-weight:600}.usage-share-preview{display:flex;justify-content:center;min-height:0;overflow:auto;scrollbar-width:thin;border-radius:12px}.usage-share-names{display:flex;align-items:center;gap:8px;font-size:12px}.usage-share-dialog p{font-size:12px;margin:0}.usage-share-dialog footer{flex:none}
 @media(max-width:1000px){.usage-dashboard-two-panels{grid-template-columns:minmax(0,1fr)}.usage-connected-stats{grid-template-columns:repeat(3,minmax(0,1fr))}.usage-connected-stats>div{border-bottom:1px solid var(--border)}}
 @media(max-width:650px){.usage-dashboard-heading{padding:16px;flex-wrap:wrap}.usage-dashboard-toolbar{padding:0 16px 12px}.usage-dashboard-content{padding:16px}.usage-dashboard-filters input{max-width:160px}.usage-connected-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}

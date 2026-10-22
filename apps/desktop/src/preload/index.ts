@@ -697,6 +697,7 @@ const api: RovaiApi = {
     save: dataUrl => ipcRenderer.invoke('rovai:usage-card-save',dataUrl),
     copy: dataUrl => ipcRenderer.invoke('rovai:usage-card-copy',dataUrl)
   },
+  exportNativeHistoryUsage: query => ipcRenderer.invoke('rovai:export-native-history-usage',query),
   revealMonitoringExport(path: string) {
     return ipcRenderer.invoke('rovai:reveal-monitoring-export', path)
   },

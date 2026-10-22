@@ -48,6 +48,8 @@ export type ThreadClient = Pick<RovaiApi,
   exportMonitoring: (filter: import('@contracts').MonitoringFilter) => Promise<{ exported: boolean; path?: string }>
   exportUsageActivityReport?: (query: import('@contracts').UsageActivityQuery) => Promise<{exported:boolean;path?:string}>
   usageCard?:import('@contracts').RovaiApi['usageCard']
+  syncNativeHistoryUsage?:(input:{operation:'sync';force:boolean;after?:string})=>Promise<import('@contracts').NativeHistoryUsageSync>
+  exportNativeHistoryUsage?:(query:unknown)=>Promise<{exported:boolean;path?:string}>
   revealMonitoringExport: RovaiApi['revealMonitoringExport'] | null
   exportDiagnostics: () => Promise<{ exported: boolean; path?: string }>
   revealDiagnosticsExport: RovaiApi['revealDiagnosticsExport'] | null

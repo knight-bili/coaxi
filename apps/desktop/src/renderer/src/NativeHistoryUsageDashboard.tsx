@@ -1,0 +1,56 @@
+import { useEffect,useMemo,useRef,useState } from 'react'
+import type { NativeHistoryUsageReport,TokenUsageBucket,TokenUsageReport } from '@contracts'
+import { useThreadClient } from './camp-client'
+import { useInterfaceLanguage,useUiText } from './interface-language'
+import { readErrorMessage } from './error-message'
+import { ActivityHeatmap,RankedBars,RingMeter,TrendChart } from './codeg-native-content/components/token-usage/charts'
+import { buildHeatMatrix,cacheHitRate,computeDelta,foldBreakdown,formatTokensPrecise,resolveRange,suggestBucket,type TokenUsageRangePreset } from './codeg-native-content/lib/token-usage'
+import { useTranslations } from './codeg-native-content/ui/source-primitives'
+import { UsageShareDialog } from './UsageShareDialog'
+
+/** 冻结导入材料的原 Codeg 用量口径，和本应用运行数据分开。 */
+export function NativeHistoryUsageDashboard():React.JSX.Element {
+  const client=useThreadClient(),language=useInterfaceLanguage(),t=useUiText(),original=useTranslations('TokenUsage')
+  const [now]=useState(()=>new Date()),[preset,setPreset]=useState<TokenUsageRangePreset>('30d'),[dates,setDates]=useState({from:'',to:''}),[bucket,setBucket]=useState<TokenUsageBucket>('day')
+  const [project,setProject]=useState(''),[provider,setProvider]=useState(''),[model,setModel]=useState(''),[data,setData]=useState<NativeHistoryUsageReport|null>(null),[error,setError]=useState<string|null>(null),[loading,setLoading]=useState(true),[refresh,setRefresh]=useState(0)
+  const [indexing,setIndexing]=useState(false),[progress,setProgress]=useState<{done:number;total:number;errors:number}|null>(null),[share,setShare]=useState<TokenUsageReport|null>(null)
+  const alive=useRef(true),sequence=useRef(0),syncGeneration=useRef(0)
+  useEffect(()=>{alive.current=true;return()=>{alive.current=false;syncGeneration.current++}},[])
+  const range=useMemo(()=>resolveRange(preset,now,{from:dates.from?new Date(dates.from+'T00:00:00'):null,to:dates.to?new Date(dates.to+'T00:00:00'):null}),[preset,now,dates])
+  const query=useMemo(()=>({operation:'report',filter:{start:range.start,end:range.end,folderIds:null,agentTypes:provider?[provider]:null,models:model?[model]:null,bucket,tzOffsetMinutes:-now.getTimezoneOffset(),comparePrevious:true},projectRoots:project?[project]:null}),[range,provider,model,bucket,now,project])
+  useEffect(()=>{let current=true;const observed=++sequence.current;setLoading(true);setError(null);setData(null);const timer=setTimeout(()=>{void client.request<NativeHistoryUsageReport>('history.usage',query).then(value=>{if(current&&observed===sequence.current)setData(value)}).catch(reason=>{if(current&&observed===sequence.current)setError(readErrorMessage(reason))}).finally(()=>{if(current&&observed===sequence.current)setLoading(false)})},200);return()=>{current=false;clearTimeout(timer)}},[client,query,refresh])
+  const rebuild=async(force:boolean):Promise<void>=>{
+    if(!client.syncNativeHistoryUsage||indexing)return
+    const observed=++syncGeneration.current;setIndexing(true);setError(null);setProgress({done:0,total:0,errors:0});let after:string|undefined;let done=0,errors=0
+    try{do{const page=await client.syncNativeHistoryUsage({operation:'sync',force,after});if(!alive.current||observed!==syncGeneration.current)return;done+=page.results.length;errors+=page.results.filter(row=>!row.indexed).length;setProgress({done,total:page.totalArchives,errors});after=page.next??undefined;}while(after);setRefresh(value=>value+1)}catch(reason){if(alive.current&&observed===syncGeneration.current)setError(readErrorMessage(reason))}finally{if(alive.current&&observed===syncGeneration.current)setIndexing(false)}
+  }
+  const report=data?.report,totals=report?.totals,heat=useMemo(()=>buildHeatMatrix(report?.heatmap??[]),[report?.heatmap])
+  const weekdays=useMemo(()=>Array.from({length:7},(_,index)=>new Intl.DateTimeFormat(language,{weekday:'short',timeZone:'UTC'}).format(new Date(Date.UTC(2024,0,1+index)))),[language])
+  const cache=totals?cacheHitRate(totals):null,delta=totals&&report?.previous_totals?computeDelta(totals.total_tokens,report.previous_totals.total_tokens):null
+  const trend=report?.series.map(point=>({key:point.bucket_key,label:point.bucket_key,cache:point.cache_read_tokens,fresh:Math.max(0,point.total_tokens-point.cache_read_tokens),detail:[{label:t('输入'),value:formatTokensPrecise(point.input_tokens)},{label:t('输出'),value:formatTokensPrecise(point.output_tokens)}]}))??[]
+  const downloadJson=async():Promise<void>=>{if(!data)return;try{if(client.exportNativeHistoryUsage){await client.exportNativeHistoryUsage(query);return}const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const link=document.createElement('a');link.href=url;link.download='codeg-rovai-native-history-usage.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),30000)}catch(reason){setError(readErrorMessage(reason))}}
+  return <div className="usage-activity-dashboard codeg-native-rich tu-viz">
+    <header className="usage-dashboard-heading"><div><h1>{t('原生历史用量')}</h1><p>{t('来自已导入的冻结快照，沿用 Codeg 原统计规则。')}</p></div><div className="flex flex-wrap gap-2"><button type="button" className="quiet-button" disabled={loading} onClick={()=>setRefresh(value=>value+1)}>{t('刷新')}</button><button type="button" className="quiet-button" disabled={!report} onClick={()=>void downloadJson()}>{t('导出 JSON')}</button><button type="button" className="primary-button" disabled={!report} onClick={()=>report&&setShare({...structuredClone(report),truncated:report.truncated||Boolean(data?.missingIndex.length)})}>{t('分享')}</button></div></header>
+    <div className="usage-dashboard-toolbar"><div className="usage-dashboard-ranges" role="group" aria-label={t('统计范围')}>{(['7d','30d','90d','thisMonth','thisYear','all','custom'] as const).map((value,index)=><button key={value} type="button" aria-pressed={preset===value} onClick={()=>{setPreset(value);setBucket(suggestBucket(value,resolveRange(value,now)))}}>{t(['近 7 天','近 30 天','近 90 天','本月','今年','全部记录','自选日期'][index])}</button>)}</div>
+      <div className="usage-dashboard-filters"><label>{t('工程')}<select value={project} onChange={event=>setProject(event.target.value)}><option value="">{t('全部')}</option>{data?.folderKeys.filter(row=>row.path).map(row=><option value={row.path} key={row.path}>{row.path}</option>)}</select></label><label>{t('智能体')}<input value={provider} placeholder={t('全部')} onChange={event=>setProvider(event.target.value)}/></label><label>{t('模型')}<input value={model} placeholder={t('全部')} onChange={event=>setModel(event.target.value)}/></label><label>{t('粒度')}<select value={bucket} onChange={event=>setBucket(event.target.value as TokenUsageBucket)}><option value="day">{t('按天')}</option><option value="week">{t('按周')}</option><option value="month">{t('按月')}</option></select></label></div>
+      {preset==='custom'&&<div className="usage-custom-dates"><label>{t('开始日期')}<input type="date" value={dates.from} onChange={event=>setDates(current=>({...current,from:event.target.value}))}/></label><label>{t('结束日期')}<input type="date" min={dates.from||undefined} value={dates.to} onChange={event=>setDates(current=>({...current,to:event.target.value}))}/></label></div>}
+    </div>
+    <main className="usage-dashboard-content space-y-4" aria-busy={loading||indexing}>
+      <div className="usage-native-sync"><div><strong>{t('用量索引')}</strong><p>{t('同步只读取已导入快照；不会扫描你的原生工具目录，也不会改写聊天记录。')}</p></div><div className="flex gap-2"><button className="quiet-button" type="button" disabled={!client.syncNativeHistoryUsage||indexing} onClick={()=>void rebuild(false)}>{t('同步新导入')}</button><button className="quiet-button" type="button" disabled={!client.syncNativeHistoryUsage||indexing} onClick={()=>void rebuild(true)}>{t('重建全部')}</button>{indexing&&<button className="quiet-button" type="button" onClick={()=>{syncGeneration.current++;setIndexing(false)}}>{t('当前批次后停止')}</button>}</div></div>
+      {progress&&<p role="status">{t('已处理 {0}/{1} 份快照，失败 {2} 份。',progress.done,progress.total,progress.errors)}</p>}
+      {error&&<p role="alert">{error}</p>}
+      {loading&&<p role="status">{t('正在读取用量…')}</p>}
+      {data&&report&&totals&&<>
+        {(data.missingIndex.length>0||report.truncated)&&<p role="status">{report.truncated?t('统计超过本次读取上限，仅显示部分记录。'):t('还有 {0} 份快照未建立用量索引，请在桌面端同步。',data.missingIndex.length)}</p>}
+        <section className="rounded-xl border border-border bg-card px-5 py-6"><div className="flex flex-wrap items-center justify-between gap-5"><div><p className="text-xs text-muted-foreground">{original('totalTokens')}</p><strong className="mt-2 block text-4xl font-semibold tracking-tight">{formatTokensPrecise(totals.total_tokens)}</strong>{delta&&delta.direction!=='flat'&&<p className="mt-2 text-xs text-muted-foreground">{delta.ratio===null?t('上一时段没有记录'):new Intl.NumberFormat(language,{style:'percent',signDisplay:'always',maximumFractionDigits:0}).format(delta.ratio)}</p>}</div><RingMeter ratio={cache??0} valueText={cache===null?'—':new Intl.NumberFormat(language,{style:'percent',maximumFractionDigits:1}).format(cache)} caption={t('缓存读取占比')}/></div><p className="mt-4 text-xs text-muted-foreground">{t('{0} 次用量记录 · {1} 份会话 · {2} 个活跃日',totals.turn_count,totals.conversation_count,totals.active_days)}</p></section>
+        <section className="rounded-xl border border-border bg-card p-4"><h2 className="mb-3 text-sm font-semibold">{t('用量趋势')}</h2><TrendChart data={trend} label={t('原生历史 Token 趋势')} cacheLabel={t('缓存读取')} freshLabel={t('新计算 Token')} emptyLabel={t('此范围没有已报告的用量。')}/></section>
+        <div className="usage-dashboard-two-panels"><section className="flex min-w-0 flex-col rounded-xl border border-border bg-card p-4"><h2 className="mb-3 text-sm font-semibold">{t('活动热力图')}</h2><ActivityHeatmap matrix={heat.cells} max={heat.max} weekdayLabels={weekdays} formatAria={(day,hour,value)=>t('{0} {1} 时，已报告 {2} Token',weekdays[day],hour,formatTokensPrecise(value))} legendLess={t('少')} legendMore={t('多')}/></section>
+          <section className="rounded-xl border border-border bg-card p-4"><h2 className="mb-3 text-sm font-semibold">{t('模型排行')}</h2><RankedBars data={foldBreakdown(report.by_model,7).shown.map(row=>({key:row.key,label:row.key==='__unknown__'?t('未知模型'):row.label,value:row.total_tokens,share:totals.total_tokens>0?row.total_tokens/totals.total_tokens:null}))} emptyLabel={t('此范围没有已报告的用量。')} showRank/></section></div>
+        <section className="rounded-xl border border-border bg-card p-4"><h2 className="mb-3 text-sm font-semibold">{t('工程排行')}</h2><RankedBars data={foldBreakdown(report.by_folder,7).shown.map(row=>({key:row.key,label:row.label,value:row.total_tokens,share:totals.total_tokens>0?row.total_tokens/totals.total_tokens:null}))} emptyLabel={t('此范围没有已报告的用量。')} showRank onSelect={key=>{const row=data.folderKeys.find(row=>String(row.id)===key);if(row?.path)setProject(row.path)}}/></section>
+        <p className="usage-dashboard-source-note">{t('{0} 份会话未报告用量；{1} 份使用原版整会话总量回退；已排除同源旧快照 {2} 份。',data.sessionsWithoutUsage,data.sessionTotalFallbacks,data.supersededSnapshots)}</p>
+        <p className="usage-dashboard-source-note">{t('整会话回退会集中记在会话末尾，不代表每个小时的真实花费。此页不与融合运行数据相加。')}</p>
+      </>}
+    </main>
+    {share&&<UsageShareDialog report={share} onClose={()=>setShare(null)}/>}
+  </div>
+}
