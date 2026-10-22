@@ -1,6 +1,6 @@
 import type {ThreadClient} from './camp-client'
-export interface PortableConfigurationPending {operation:'configuration.providers.upsert'|'configuration.providers.remove'|'configuration.memberConnection.set'|'configuration.migration.confirm'|'configuration.migration.undoConfirm'|'configuration.archive.register';commandId:string;targetId?:string;previewId?:string;previewDigest?:string}
-const operations=new Set(['configuration.providers.upsert','configuration.providers.remove','configuration.memberConnection.set','configuration.migration.confirm','configuration.migration.undoConfirm','configuration.archive.register'])
+export interface PortableConfigurationPending {operation:'configuration.providers.upsert'|'configuration.providers.remove'|'configuration.memberConnection.set'|'configuration.migration.confirm'|'configuration.migration.undoConfirm'|'configuration.archive.register'|'configuration.export.prepare';commandId:string;targetId?:string;previewId?:string;previewDigest?:string}
+const operations=new Set(['configuration.providers.upsert','configuration.providers.remove','configuration.memberConnection.set','configuration.migration.confirm','configuration.migration.undoConfirm','configuration.archive.register','configuration.export.prepare'])
 function decode(value:unknown):PortableConfigurationPending|null{
   if(!value||typeof value!=='object'||Array.isArray(value))return null
   const row=value as Record<string,unknown>

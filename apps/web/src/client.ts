@@ -824,8 +824,8 @@ export class ConsoleClient {
         const generation=this.#generation,scope=this.editingScope
         const response=await this.#authorized('configuration/export-download',{method:'POST',body:JSON.stringify({operationId:receipt.operationId})})
         const reader=response.body?.getReader();if(!reader)throw new Error('配置下载不可用。')
-        const parts:Uint8Array[]=[],expected=receipt.byteSize!;let size=0
-        try{for(;;){const value=await reader.read();if(value.done)break;size+=value.value.byteLength;if(size>expected)throw new Error('配置副本已变化。');parts.push(value.value)}}catch(error){await reader.cancel().catch(()=>undefined);throw error}finally{reader.releaseLock()}
+        const parts:ArrayBuffer[]=[],expected=receipt.byteSize!;let size=0
+        try{for(;;){const value=await reader.read();if(value.done)break;size+=value.value.byteLength;if(size>expected)throw new Error('配置副本已变化。');parts.push(value.value.slice().buffer as ArrayBuffer)}}catch(error){await reader.cancel().catch(()=>undefined);throw error}finally{reader.releaseLock()}
         if(size!==expected)throw new Error('配置副本已变化。')
         const file=new File(parts,'configuration.rovai-config',{type:'application/octet-stream'})
         const digest=await fileDigest(file,this.#lifetime.signal)
