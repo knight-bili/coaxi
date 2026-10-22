@@ -4,6 +4,7 @@ use anyhow::{ensure, Context, Result};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::{collections::BTreeSet, path::{Path, PathBuf}, sync::LazyLock};
+pub mod broker;
 
 pub const SERVER_NAME: &str = "rovai-interaction";
 pub const MAX_REQUEST_BYTES: usize = 1024 * 1024;
@@ -104,7 +105,7 @@ pub fn validate_shape(name: &str, value: &Value) -> Result<()> {
 }
 
 // 仅执行本 r1 冻结合同实际使用的约束；不接受外部 Schema 或动态引用。
-fn validate_value(schema: &Value, value: &Value, depth: usize) -> Result<()> {
+pub(super) fn validate_value(schema: &Value, value: &Value, depth: usize) -> Result<()> {
     ensure!(depth <= 48, "interaction.shape_depth");
     if let Some(values) = schema["anyOf"].as_array() { ensure!(values.iter().any(|item| validate_value(item, value, depth + 1).is_ok()), "interaction.shape_any"); }
     if let Some(values) = schema["oneOf"].as_array() { ensure!(values.iter().filter(|item| validate_value(item, value, depth + 1).is_ok()).count() == 1, "interaction.shape_one"); }
