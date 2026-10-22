@@ -1,3 +1,4 @@
+import { InteractionActivity } from './InteractionActivity'
 import { useCallback, useEffect, useState } from 'react'
 import { Monitor, RefreshCw, ShieldOff, Square } from 'lucide-react'
 import { useThreadClient } from './camp-client'
@@ -23,7 +24,7 @@ export function ComputerWorkbench({threadId}:{threadId:string}):React.JSX.Elemen
   if(!api)return <div className="workbench-empty"><Monitor size={30}/><p>{t('电脑窗口的共享和操作在桌面端管理。')}</p></div>
   const groups=Map.groupBy(windows,window=>window.app)
   return <div className="workbench-computer">
-    <div className="workbench-toolbar"><Monitor size={17}/><strong>{t('电脑操作')}</strong>
+    <div className="workbench-toolbar"><Monitor size={17}/><strong>{t('电脑操作')}</strong><InteractionActivity threadId={threadId}/>
       <label><input type="checkbox" checked={status?.enabled??false} disabled={busy||!status} onChange={event=>{const enabled=event.target.checked;void run(async()=>{await api.request(threadId,{operation:'enable',enabled});setWindows([]);setPreview(null);setPermissions(null)})}}/>{t('允许在此会话共享窗口')}</label>
       <button disabled={busy||!status?.enabled} onClick={()=>void run(load)}><RefreshCw size={14}/>{t('选择窗口')}</button>
       <button disabled={busy||!status?.enabled} onClick={()=>void run(async()=>setPermissions(await api.request(threadId,{operation:'permissions'})))}>{t('系统权限')}</button>

@@ -1,3 +1,4 @@
+import { InteractionActivity } from './InteractionActivity'
 import { InteractionShareControl } from './InteractionShareControl'
 import { useEffect, useState } from 'react'
 import { ArrowLeft, ArrowRight, ExternalLink, Globe, Plus, RefreshCw, ShieldOff, X } from 'lucide-react'
@@ -35,7 +36,7 @@ export function BrowserWorkbench({threadId}:{threadId:string}):React.JSX.Element
   if(!api)return <div className="workbench-empty"><Globe size={28}/><p>{t('浏览器页面由桌面主机管理。请在桌面端打开并选择要共享的页面。')}</p></div>
   return <div className="workbench-browser">
     <form className="workbench-toolbar" onSubmit={event=>{event.preventDefault();void run(async()=>{const tab=await api.open(threadId,url,profileId);setTabs(previous=>[...previous,tab]);setSelected(tab.id);setPreview(null)})}}>
-      <BrowserSettingsDialog api={api} onChanged={value=>setDevtools(value.devtools)}/><BrowserProfiles api={api} value={profileId} onChange={setProfileId}/><Globe size={16}/><input aria-label={t('网页地址')} value={url} onChange={event=>setUrl(event.target.value)} placeholder="https://"/>
+      <InteractionActivity threadId={threadId}/><BrowserSettingsDialog api={api} onChanged={value=>setDevtools(value.devtools)}/><BrowserProfiles api={api} value={profileId} onChange={setProfileId}/><Globe size={16}/><input aria-label={t('网页地址')} value={url} onChange={event=>setUrl(event.target.value)} placeholder="https://"/>
       <button type="submit" disabled={busy}><Plus size={14}/>{t('新页面')}</button>
     </form>
     {error&&<p className="workbench-error" role="alert">{error}</p>}
