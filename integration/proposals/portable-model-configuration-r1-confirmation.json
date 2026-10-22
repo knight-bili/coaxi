@@ -1,0 +1,16 @@
+{
+  "revision": 1,
+  "confirmedRevision": 1,
+  "confirmationStatus": "confirmed",
+  "confirmedBy": "user",
+  "confirmedAt": "2026-10-22T12:52:07.839881+00:00",
+  "statement": "确认，按完整模型配置迁移 r1 实施",
+  "questionRevisionLabel": "完整模型配置迁移 r1",
+  "questionItemId": "call_4df1f41e65534c4eb4795758e0720d85:0",
+  "frozenContractSha256": "7f3c3ad22eb4fc701b7ec22795f255dc055a1f72097add00244d0bac2cd01a53",
+  "frozenWordSha256": "f06d7faf366b5f26e70c96d9a1ef01e4dc8478a7fdba8b8204de6c0106a7005e",
+  "frozenPdfSha256": "40f7a101989128acb8be73b1fb55c0562327b73efee11c4c7322df4948f50be0",
+  "paidModelAuthorization": false,
+  "mainMergeAuthorization": false,
+  "releaseAuthorization": false
+}
