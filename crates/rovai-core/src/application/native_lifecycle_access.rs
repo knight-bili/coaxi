@@ -55,6 +55,7 @@ impl Core{
         anyhow::ensure!(serde_json::to_vec(&value)?.len()<=2*1024*1024,"native_lifecycle.request_too_large");
         let database=self.database.lock().await;let connection=database.connection();
         if method=="history.execution.records"{
+            anyhow::ensure!(value.get("importId").is_some()&&value.get("after").is_some(),"native_lifecycle.records_request_invalid");
             #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Request{schema_version:u32,source_thread_id:String,import_id:Option<String>,after:Option<String>,limit:u32}
             let input:Request=serde_json::from_value(value)?;anyhow::ensure!(input.schema_version==1&&(1..=50).contains(&input.limit),"native_lifecycle.records_request_invalid");ThreadId::parse(&input.source_thread_id)?;
             if let Some(id)=&input.import_id{anyhow::ensure!(id.len()==64&&id.bytes().all(|byte|byte.is_ascii_hexdigit()),"native_lifecycle.import_id_invalid");}if let Some(after)=&input.after{uuid::Uuid::parse_str(after)?;}
