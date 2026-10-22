@@ -3,7 +3,7 @@
 // Core authority + shared Rovai Markdown are the integration seams.
 import { useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { Drawer } from '@base-ui/react/drawer'
-import { Brain, ChevronDown, Eye, Loader2, RefreshCw, X } from 'lucide-react'
+import { Brain, ChevronDown, Eye, GitFork, Loader2, RefreshCw, X } from 'lucide-react'
 import { NativeChildReader, type NativeTranscript, type NativeTranscriptBlock } from './native-child-reader'
 import type { NativeSessionTarget } from './native-session-viewer-context'
 import { NativeSessionViewerContext } from './native-session-viewer-context'
@@ -107,7 +107,7 @@ export function NativeSessionViewer({ target, open, visible, onOpenChange, retur
 
 type ToolUse = Extract<NativeTranscriptBlock, { type: 'tool_use' }>
 type ToolResult = Extract<NativeTranscriptBlock, { type: 'tool_result' }>
-export function NativeTranscriptBody({ data, reader, target, live, visible }: { data: NativeTranscript; reader: NativeChildReader | null; target: NativeSessionTarget | null; live: boolean; visible: boolean }): React.JSX.Element {
+export function NativeTranscriptBody({ data, reader, target, live, visible, onForkFromTurn }: { data: NativeTranscript; reader: NativeChildReader | null; target: NativeSessionTarget | null; live: boolean; visible: boolean; onForkFromTurn?(turnId:string):void }): React.JSX.Element {
   const turns = data.turns
   const language = useInterfaceLanguage(), t = useUiText(), planText = useTranslations('Folder.chat.proposedPlan')
   const filePreview = useOptionalFilePreview()
@@ -197,6 +197,7 @@ export function NativeTranscriptBody({ data, reader, target, live, visible }: { 
     {message.userImages && <UserImageAttachments images={message.userImages} />}
     {message.role === 'assistant' && <TurnStats {...nativeTurnStats(turns[turnIndex])} copyText={turns[turnIndex].blocks.flatMap(block => block.type === 'text' ? [block.text] : []).join('\n\n')}
       isResponseComplete={!live || turnIndex < turns.length - 1} previousUserIndex={previousUserIndex < 0 ? undefined : previousUserIndex} />}
+    {!live&&message.role==='assistant'&&onForkFromTurn&&<button type="button" className="quiet-button" onClick={()=>onForkFromTurn(turns[turnIndex].id)}><GitFork size={14}/>{t('从这条回答分叉')}</button>}
   </section>})}<details className="native-session-reasoning"><summary>{t('会话统计与原始信息')}</summary><JsonTreeView value={{ context_tokens: data.context_tokens, session_stats: data.session_stats, summary: data.summary,
     turns: turns.map(({ blocks: _blocks, ...metadata }) => metadata) }} /></details></div>
   </NativeMessageScroll.Provider></NativeImageScope.Provider></SourceMarkdownRenderer.Provider></NativeMarkdownProvider></NativeFileActionsProvider>
