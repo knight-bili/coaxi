@@ -1602,6 +1602,7 @@ impl AcpHost {
                 external_mcp_servers,
                 private_runtime_dir,
                 attachment_access_root,
+                None,
             ),
         )
         .await
@@ -1620,6 +1621,7 @@ impl AcpHost {
         external_mcp_servers: &BTreeMap<String, McpServerDefinition>,
         private_runtime_dir: &Path,
         attachment_access_root: Option<&Path>,
+        preparation_kind: Option<AdapterKind>,
     ) -> Result<Arc<Self>> {
         if !runtime_launch_allowed(
             frozen_runtime.adapter_kind,
@@ -1746,7 +1748,7 @@ impl AcpHost {
         };
         // From this point a process may exist; its owner handles cleanup.
         let captured_kind=if frozen_runtime.adapter_kind==AdapterKind::CustomAcp{
-            frozen_runtime.native_origin.as_ref().and_then(|origin|match origin.source.provider.as_str(){"codex"=>Some(AdapterKind::CodexCli),"claude"=>Some(AdapterKind::ClaudeCodeCli),"qoder"=>Some(AdapterKind::QoderCli),"grok"=>Some(AdapterKind::GrokBuild),_=>None}).unwrap_or(frozen_runtime.adapter_kind)
+            preparation_kind.or_else(||frozen_runtime.native_origin.as_ref().and_then(|origin|match origin.source.provider.as_str(){"codex"=>Some(AdapterKind::CodexCli),"claude"=>Some(AdapterKind::ClaudeCodeCli),"qoder"=>Some(AdapterKind::QoderCli),"grok"=>Some(AdapterKind::GrokBuild),_=>None})).unwrap_or(frozen_runtime.adapter_kind)
         }else{frozen_runtime.adapter_kind};
         let native_source = rovai_core::runtime_subagent_session::CapturedNativeSource::capture(
             frozen_runtime.adapter_kind, spec.environment(), spec.working_directory(), &host_instance_id,

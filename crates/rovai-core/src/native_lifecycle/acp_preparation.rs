@@ -10,11 +10,19 @@ pub(crate) struct NativePreparationProof{
 }
 pub(crate) struct NativePreparationFailure{pub outcome_unknown:bool,pub code:&'static str}
 
-async fn host(cwd:&Path,runtime:&FrozenAgentRuntimeConfig,private:&Path)->Result<Arc<AcpHost>>{
+async fn host(cwd:&Path,runtime:&FrozenAgentRuntimeConfig,origin:&native::NativeSessionOriginV1,private:&Path)->Result<Arc<AcpHost>>{
     anyhow::ensure!(runtime.adapter_kind==AdapterKind::CustomAcp,"native_lifecycle.explicit_acp_program_required");
+    let source=rovai_core::member_environment::launch_source();
+    let plan=crate::custom_runtime::launch::prepare(runtime,source.as_ref()).await?;
+    let mut runtime=runtime.clone();
+    runtime.environment=rovai_core::member_environment::resolve_for_launch(source,runtime.environment.clone()).await?;
+    crate::custom_runtime::launch::merge_environment(plan.as_ref(),&mut runtime.environment)?;
+    if runtime.environment.as_ref().is_some_and(|value|value.has_overlay()){runtime.custom_api=None;}
+    // 来源种类只决定如何核对最终子进程目录，随后仍必须核对真实 initialize 的程序身份。
+    let preparation_kind=match origin.source.provider.as_str(){"claude"=>Some(AdapterKind::ClaudeCodeCli),"codex"=>Some(AdapterKind::CodexCli),_=>None};
     let workspace=AgentRunWorkspace::runtime_managed_path(cwd.to_string_lossy().into_owned());
     let(incoming,mut receiver)=mpsc::unbounded_channel();
-    let host=AcpHost::spawn(cwd,&workspace,PermissionSemantics::RuntimeManagedV2,runtime,incoming,None,CompactionDetectorPolicy::Disabled,false,&BTreeMap::new(),private,None).await?;
+    let host=crate::custom_runtime::launch::with_plan(plan,rovai_core::runtime_discovery::with_launch_environment(runtime.environment.clone(),AcpHost::spawn_in_environment(cwd,&workspace,PermissionSemantics::RuntimeManagedV2,&runtime,incoming,None,CompactionDetectorPolicy::Disabled,false,&BTreeMap::new(),private,None,preparation_kind))).await?;
     // 未绑定 Session 的请求由已有 Host 路由拒绝；这里只排空诊断，不将历史重放成新模型输出。
     tokio::spawn(async move{while receiver.recv().await.is_some(){}});
     Ok(host)
@@ -36,13 +44,13 @@ async fn qualify(host:&AcpHost,origin:&native::NativeSessionOriginV1,location:&n
 
 /// 用户预览时只握手核对实际广告，不发送 load、fork 或模型输入。
 pub(crate) async fn inspect_native_preparation(cwd:&Path,runtime:&FrozenAgentRuntimeConfig,origin:&native::NativeSessionOriginV1,location:&native::source::Location,private:&Path)->Result<String>{
-    let host=host(cwd,runtime,private).await?;
+    let host=host(cwd,runtime,origin,private).await?;
     let result=qualify(&host,origin,location).await.map(|(_,digest)|digest);
     host.shutdown_and_reap().await;result
 }
 
 pub(crate) async fn prepare_native_session(cwd:&Path,runtime:&FrozenAgentRuntimeConfig,origin:&native::NativeSessionOriginV1,location:&native::source::Location,expected_initialize:&str,private:&Path)->std::result::Result<NativePreparationProof,NativePreparationFailure>{
-    let host=host(cwd,runtime,private).await.map_err(|_|NativePreparationFailure{outcome_unknown:false,code:"native_lifecycle.program_start_failed"})?;
+    let host=host(cwd,runtime,origin,private).await.map_err(|_|NativePreparationFailure{outcome_unknown:false,code:"native_lifecycle.program_start_failed"})?;
     let mut external_requested=false;
     let result=async{
         let(_,initialize_digest)=qualify(&host,origin,location).await?;
