@@ -113,10 +113,10 @@ pub struct PreparedMcpProjection {
 
 impl PreparedMcpProjection {
     pub fn require_interaction_name_available(&self, native: &BTreeSet<String>) -> Result<()> {
-        if self.servers.contains_key(crate::interaction_tools::SERVER_NAME)
-            && native.iter().any(|name| name.eq_ignore_ascii_case(crate::interaction_tools::SERVER_NAME))
-        {
-            anyhow::bail!("interaction.reserved_mcp_name_conflict");
+        for reserved in [crate::interaction_tools::SERVER_NAME,crate::ui_feedback::SERVER_NAME] {
+            if self.servers.contains_key(reserved)&&native.iter().any(|name|name.eq_ignore_ascii_case(reserved)) {
+                anyhow::bail!("interaction.reserved_mcp_name_conflict");
+            }
         }
         Ok(())
     }
@@ -202,34 +202,46 @@ impl McpProjectionService {
         definition: McpServerDefinition,
         catalog_policy_digest: &str,
     ) -> Result<PreparedMcpProjection> {
-        use crate::interaction_tools::SERVER_NAME;
+        self.prepare_owned_tools(database,config_store,request,vec![(crate::interaction_tools::SERVER_NAME,definition,catalog_policy_digest.to_string())])
+    }
+
+    /// 每次一起冻结应用自有服务，避免先发布一个后再覆盖另一项。原服务相对顺序保留。
+    pub fn prepare_owned_tools(
+        &self,database:&Database,config_store:&McpConfigStore,request:&McpProjectionRequest<'_>,
+        definitions:Vec<(&str,McpServerDefinition,String)>,
+    )->Result<PreparedMcpProjection>{
+        anyhow::ensure!(!definitions.is_empty()&&definitions.len()<=2,"runtime_unavailable");
+        let mut names=BTreeSet::new();
+        for(name,_,_)in &definitions{anyhow::ensure!(matches!(*name,crate::interaction_tools::SERVER_NAME|crate::ui_feedback::SERVER_NAME)&&names.insert(*name),"interaction.reserved_mcp_name_conflict")}
         validate_request(request)?;
         validate_child_run_request(database, request)?;
         let capability = AgentRuntimeAdapterRegistry::default().mcp_projection(request.adapter_kind);
         anyhow::ensure!(capability.supports_stdio && capability.external_mcp_projection != ExternalMcpProjection::Unsupported && runtime_version_supports_mcp(request.adapter_kind, request.reported_runtime_version), "runtime_unavailable");
         let frozen = load_frozen_projection(database, request.agent_run_id)?;
         if let Some(frozen) = &frozen {
-            anyhow::ensure!(frozen.servers.iter().any(|entry| entry.server_id == SERVER_NAME && entry.config_digest == catalog_policy_digest && entry.status == McpExposureStatus::Ready), "interaction.frozen_run_cannot_gain_tools");
+            for(name,_,digest)in &definitions{anyhow::ensure!(frozen.servers.iter().any(|entry|entry.server_id==*name&&entry.config_digest==*digest&&entry.status==McpExposureStatus::Ready),"interaction.frozen_run_cannot_gain_tools")}
         }
         let target = self.target_path(request.agent_run_id, request.execution_epoch);
         if target.exists() {
             let prepared = self.load_and_validate(&target, request, frozen.as_ref())?;
-            anyhow::ensure!(prepared.servers.get(SERVER_NAME) == Some(&definition), "interaction.frozen_connection_changed");
+            for(name,definition,_)in &definitions{anyhow::ensure!(prepared.servers.get(*name)==Some(definition),"interaction.frozen_connection_changed")}
             return Ok(prepared);
         }
         let mut projection = if let Some(previous) = self.find_previous(request, frozen.as_ref())? {
             let projection = parse_projection(&previous.0, request)?;
-            anyhow::ensure!(projection.exposure.servers.iter().any(|entry| entry.server_id == SERVER_NAME && entry.config_digest == catalog_policy_digest), "interaction.frozen_run_cannot_gain_tools");
+            for(name,_,digest)in &definitions{anyhow::ensure!(projection.exposure.servers.iter().any(|entry|entry.server_id==*name&&entry.config_digest==*digest),"interaction.frozen_run_cannot_gain_tools")}
             projection
         } else {
             anyhow::ensure!(frozen.is_none(), "interaction.frozen_projection_unavailable");
             let mut projection = materialize_projection(config_store, request)?;
             anyhow::ensure!(projection.exposure.config_status == "ready", "interaction.mcp_configuration_unavailable");
-            anyhow::ensure!(!projection.exposure.servers.iter().any(|entry| entry.name.eq_ignore_ascii_case(SERVER_NAME) || entry.runtime_name.eq_ignore_ascii_case(SERVER_NAME)), "interaction.reserved_mcp_name_conflict");
-            projection.exposure.servers.push(McpExposureEntry { server_id:SERVER_NAME.into(), name:SERVER_NAME.into(), runtime_name:SERVER_NAME.into(), transport:"stdio".into(), config_digest:catalog_policy_digest.into(), status:McpExposureStatus::Ready, reason:None });
+            for(name,_,digest)in &definitions{
+                anyhow::ensure!(!projection.exposure.servers.iter().any(|entry|entry.name.eq_ignore_ascii_case(name)||entry.runtime_name.eq_ignore_ascii_case(name)),"interaction.reserved_mcp_name_conflict");
+                projection.exposure.servers.push(McpExposureEntry{server_id:(*name).into(),name:(*name).into(),runtime_name:(*name).into(),transport:"stdio".into(),config_digest:digest.clone(),status:McpExposureStatus::Ready,reason:None});
+            }
             projection
         };
-        projection.servers.insert(SERVER_NAME.into(), definition);
+        for(name,definition,_)in definitions{projection.servers.insert(name.into(),definition);}
         validate_projection(&projection, frozen.as_ref())?;
         self.publish_projection(request, &projection)?;
         self.load_and_validate(&target, request, frozen.as_ref())

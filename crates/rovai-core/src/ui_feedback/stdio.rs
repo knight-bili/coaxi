@@ -34,7 +34,7 @@ pub fn run_if_requested()->Result<bool>{
     let args:Vec<_>=std::env::args_os().skip(1).collect();if args.first().is_none_or(|arg|arg!="--ui-feedback-mcp"){return Ok(false)}ensure!(args.len()==3&&args[1]=="--config","feedback.invalid_cli");
     let config=load(Path::new(&args[2]))?;tokio::runtime::Builder::new_current_thread().enable_all().build()?.block_on(serve(config))?;Ok(true)
 }
-fn error_code(error:&anyhow::Error)->&str{let code=error.downcast_ref::<String>();let _=code;"transport_failed"}
+fn error_code(error:&anyhow::Error)->&'static str{match error.to_string().as_str(){"feature_disabled"=>"feature_disabled","runtime_unavailable"=>"runtime_unavailable","scope_changed"=>"scope_changed","run_not_active"=>"run_not_active","epoch_changed"=>"epoch_changed","binding_changed"=>"binding_changed","member_changed"=>"member_changed","policy_changed"=>"policy_changed","result_too_large"=>"result_too_large","original_request_pending"=>"original_request_pending","feedback_unknown"=>"feedback_unknown",_=>"transport_failed"}}
 async fn serve(config:ProcessConfig)->Result<()>{
     let mut input=BufReader::new(tokio::io::stdin());let mut output=tokio::io::stdout();let mut initialized=false;
     loop{
@@ -54,7 +54,7 @@ async fn serve(config:ProcessConfig)->Result<()>{
         let prepared=match first{Ok(value)=>value,Err(error)=>{let code=error_code(&error);answer(&mut output,&json!({"jsonrpc":"2.0","id":id,"result":failure("unavailable",code)})).await?;continue}};
         // 写出前复核同一冻结请求，关闭或撤权时不发送已准备的旧正文。
         let checked=config.request("prepare",params).await;
-        if checked.as_ref().is_err_or(|value|value!=&prepared){answer(&mut output,&json!({"jsonrpc":"2.0","id":id,"result":failure("unavailable","binding_changed")})).await?;continue}
+        if !matches!(checked,Ok(ref value) if value==&prepared){answer(&mut output,&json!({"jsonrpc":"2.0","id":id,"result":failure("unavailable","binding_changed")})).await?;continue}
         let result=&prepared["result"];ensure!(digest(result)?==prepared["resultDigest"].as_str().context("transport_failed")?,"transport_failed");
         let written=answer(&mut output,&json!({"jsonrpc":"2.0","id":id,"result":result})).await;
         let receipt=json!({"schemaVersion":1,"attemptId":prepared["attemptId"],"bindingDigest":config.binding_digest,"resultDigest":prepared["resultDigest"],"writeStatus":if written.is_ok(){"written"}else{"unknown"}});
