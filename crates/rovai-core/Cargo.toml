@@ -16,6 +16,9 @@ argon2 = "0.5"
 rand = "0.8"
 tokio-util = { version = "0.7", features = ["rt","io"] }
 zip = { version = "2", default-features = false, features = ["deflate"] }
+flate2 = "1"
+tar = "0.4"
+semver = "1"
 rovai-computer = { path = "../rovai-computer" }
 rovai-channels = { path = "../rovai-channels" }
 anyhow = "1"
