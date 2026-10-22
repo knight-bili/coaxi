@@ -1,4 +1,5 @@
-import { app, type BrowserWindow, type IpcMainInvokeEvent } from 'electron'
+import {defaultInteractionStopShortcut,interactionStopAccelerator} from '../shared/interaction-stop-shortcut'
+import { app, globalShortcut, type BrowserWindow, type IpcMainInvokeEvent } from 'electron'
 import { spawn, type ChildProcessWithoutNullStreams } from 'node:child_process'
 import { createHash,randomBytes,randomUUID } from 'node:crypto'
 import { promises as fs,existsSync } from 'node:fs'
@@ -7,7 +8,7 @@ import { resolveCoreBinary,type CoreClient } from './core-client'
 import type { DesktopComputerExecutor } from './interaction-workspace'
 import type { InteractionGrant,InteractionWork,InteractionScope } from './interaction-types'
 
-interface Preferences{revision:string;enabled:boolean;launch:boolean;clipboard:boolean;foreground:boolean;screen:boolean}
+interface Preferences{revision:string;enabled:boolean;launch:boolean;clipboard:boolean;foreground:boolean;screen:boolean;stopShortcut:string}
 interface Peer{desktopPeerId:string;coreInstanceId:string;ownerWindowId:string;connectionGeneration:number}
 interface NativeWindow{targetId:string;appId:string|null;appName:string;appKey:string|null;title:string;shareable:boolean;identity:unknown;bounds:unknown}
 interface Pending{resolve(value:unknown):void;reject(error:Error):void;timer:ReturnType<typeof setTimeout>}
@@ -16,7 +17,7 @@ const digest=(value:unknown):string=>createHash('sha256').update(JSON.stringify(
 /** 仅本机窗口拥有此管道。模型和远程 Web 均拿不到子进程的认证材料。 */
 export class InteractionComputer implements DesktopComputerExecutor{
   private readonly file=path.join(app.getPath('userData'),'interaction-computer-preferences.json')
-  private preferences:Preferences={revision:randomUUID(),enabled:false,launch:false,clipboard:false,foreground:false,screen:false}
+  private preferences:Preferences={revision:randomUUID(),enabled:false,launch:false,clipboard:false,foreground:false,screen:false,stopShortcut:defaultInteractionStopShortcut(process.platform)}
   private readonly ready:Promise<void>
   private peer:Peer|null=null
   private child:ChildProcessWithoutNullStreams|null=null
@@ -28,15 +29,24 @@ export class InteractionComputer implements DesktopComputerExecutor{
   private readonly pending=new Map<string,Pending>()
   private lastError:string|null=null
   private failed=false
+  private registeredShortcut:string|null=null
   private writing:Promise<unknown>=Promise.resolve()
   private readonly scopes=new Map<string,{scope:InteractionScope;agentId:string}>()
-  constructor(private readonly core:CoreClient,private readonly owner:()=>BrowserWindow|null){this.ready=this.load()}
+  constructor(private readonly core:CoreClient,private readonly owner:()=>BrowserWindow|null){this.ready=this.load();void app.whenReady().then(()=>this.ready).then(()=>this.updateShortcut()).catch(()=>undefined)}
   available():boolean{try{return this.preferences.enabled&&!this.failed&&existsSync(resolveCoreBinary())}catch{return false}}
   attachPeer(peer:Peer):void{if(this.peer&&(this.peer.desktopPeerId!==peer.desktopPeerId||this.peer.coreInstanceId!==peer.coreInstanceId)){void this.stop();this.end();this.scopes.clear()}this.peer={...peer}}
   private async load():Promise<void>{
-    try{const stat=await fs.lstat(this.file);if(!stat.isFile()||stat.isSymbolicLink()||stat.size>16384)throw new Error('computer.invalid_preferences');const value=JSON.parse(await fs.readFile(this.file,'utf8')) as Preferences;this.validate(value);this.preferences=value}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT'){this.lastError=String(error);this.failed=true}}
+    try{const stat=await fs.lstat(this.file);if(!stat.isFile()||stat.isSymbolicLink()||stat.size>16384)throw new Error('computer.invalid_preferences');const value=JSON.parse(await fs.readFile(this.file,'utf8')) as Preferences;if(value.stopShortcut===undefined)value.stopShortcut=defaultInteractionStopShortcut(process.platform);this.validate(value);this.preferences=value}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT'){this.lastError=String(error);this.failed=true}}
   }
-  private validate(value:Preferences):void{if(!value||typeof value.revision!=='string'||Object.keys(value).sort().join(',')!=='clipboard,enabled,foreground,launch,revision,screen'||['enabled','launch','clipboard','foreground','screen'].some(key=>typeof value[key as keyof Preferences]!=='boolean'))throw new Error('computer.invalid_preferences')}
+  private validate(value:Preferences):void{if(!value||typeof value.revision!=='string'||Object.keys(value).sort().join(',')!=='clipboard,enabled,foreground,launch,revision,screen,stopShortcut'||['enabled','launch','clipboard','foreground','screen'].some(key=>typeof value[key as keyof Preferences]!=='boolean'))throw new Error('computer.invalid_preferences');if(typeof value.stopShortcut!=='string'||value.stopShortcut.length>128)throw new Error('computer.invalid_stop_shortcut');interactionStopAccelerator(value.stopShortcut,process.platform)}
+  private updateShortcut():void{
+    if(!app.isReady())return
+    const shortcut=this.preferences.enabled?interactionStopAccelerator(this.preferences.stopShortcut,process.platform):null
+    if(shortcut===this.registeredShortcut)return
+    if(this.registeredShortcut)globalShortcut.unregister(this.registeredShortcut)
+    this.registeredShortcut=null
+    if(shortcut){if(globalShortcut.register(shortcut,()=>{void this.core.request('interaction.local',{action:'computer.stop',payload:{}}).finally(()=>this.stop()).catch(error=>{this.lastError=String(error)})}))this.registeredShortcut=shortcut;else this.lastError='停止快捷键未注册成功，请在设置中更换组合或使用立即停止。'}
+  }
   private fail(error:Error):void{this.failed=true;this.lastError=error.message;for(const request of this.pending.values()){clearTimeout(request.timer);request.reject(error)}this.pending.clear()}
   private frame(value:unknown):Buffer{const body=Buffer.from(JSON.stringify(value));if(body.length>1024*1024)throw new Error('computer.request_too_large');const header=Buffer.alloc(4);header.writeUInt32LE(body.length);return Buffer.concat([header,body])}
   private send(value:unknown):Promise<void>{
@@ -115,7 +125,7 @@ export class InteractionComputer implements DesktopComputerExecutor{
       const value=input as Preferences;this.validate(value);if(value.revision!==this.preferences.revision)throw new Error('computer.preferences_changed')
       await this.stop();const next={...value,revision:randomUUID()},temporary=`${this.file}.${randomUUID()}.tmp`
       try{await fs.writeFile(temporary,JSON.stringify(next),{encoding:'utf8',mode:0o600,flag:'wx'});await fs.rename(temporary,this.file)}finally{await fs.unlink(temporary).catch(()=>undefined)}
-      this.preferences=next;this.failed=false;this.lastError=null;return {...next,lastError:null}
+      this.preferences=next;this.failed=false;this.lastError=null;this.updateShortcut();return {...next,lastError:null}
     }
     if(method==='stop'){await this.core.request('interaction.local',{action:'computer.stop',payload:{}});await this.stop();return {stopped:true}}
     if(method==='picker'||method==='status'){
@@ -132,5 +142,5 @@ export class InteractionComputer implements DesktopComputerExecutor{
     }
     throw new Error('computer.operation_not_admitted')
   }
-  async dispose():Promise<void>{await this.stop();this.end();this.peer=null;this.scopes.clear()}
+  async dispose():Promise<void>{if(this.registeredShortcut)globalShortcut.unregister(this.registeredShortcut);this.registeredShortcut=null;await this.stop();this.end();this.peer=null;this.scopes.clear()}
 }
