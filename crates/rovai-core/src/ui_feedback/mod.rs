@@ -3,6 +3,7 @@ use anyhow::{ensure,Context,Result};
 use serde::{Deserialize,Serialize};
 use serde_json::{json,Value};
 use std::{collections::BTreeSet,sync::LazyLock};
+pub mod storage;
 
 pub const SERVER_NAME:&str="rovai-ui-feedback";
 pub const MAX_FRAME_BYTES:usize=65_536;
