@@ -84,6 +84,47 @@ class RovaiHostClient(rawBaseUrl:String,private val administratorToken:String,
         if(value["ok"]!=JsonPrimitive(true))throw RovaiHostFailure(value["error"]?.toString()?:"预览失败")
         return value["value"]?.jsonObject?:throw RovaiHostFailure("预览响应格式无效")
     }
+
+    /** 密钥只经专用入口发送；不进入普通命令持久队列或错误正文。 */
+    suspend fun privateConfiguration(action:String,input:JsonObject):JsonObject {
+        require(action in listOf("provider","secrets","receipt")){"配置私有操作无效"}
+        require(input.toString().toByteArray(Charsets.UTF_8).size<=2*1024*1024){"配置输入过大"}
+        val current=connect();val generation=lifetime.get()
+        val envelope=try{post("configuration/$action",input,current.token).jsonObject}
+        catch(cancelled:CancellationException){throw cancelled}
+        catch(error:Exception){if(error is RovaiHostFailure&&error.code=="host.unauthorized"){denied=true;deadline=0};throw RovaiHostFailure("configuration.private_result_unknown",unknownResult=true)}
+        if(generation!=lifetime.get())throw CancellationException("Host lifetime changed")
+        if(envelope["error"]?.let{it !is JsonNull}==true)throw RovaiHostFailure("configuration.private_input_rejected")
+        return envelope["result"]?.jsonObject?:throw RovaiHostFailure("configuration.private_response_invalid")
+    }
+
+    suspend fun configurationArchive(metadata:JsonObject,source:File):JsonObject=withContext(Dispatchers.IO){
+        require(source.isFile&&source.length()<=64L*1024*1024){"配置文件超过64MB或不可读取"}
+        val size=source.length();val modified=source.lastModified();val hash=java.security.MessageDigest.getInstance("SHA-256")
+        source.inputStream().use{input->val buffer=ByteArray(64*1024);var observed=0L;while(true){val count=input.read(buffer);if(count<0)break;observed+=count;require(observed<=64L*1024*1024){"配置文件过大"};hash.update(buffer,0,count)};require(observed==size){"配置文件已变化"}}
+        val digest="sha256:"+hash.digest().joinToString(""){"%02x".format(it.toInt() and 255)}
+        require(metadata["byteSize"]?.jsonPrimitive?.longOrNull==size&&metadata["sourceDigest"]?.jsonPrimitive?.contentOrNull==digest&&source.length()==size&&source.lastModified()==modified){"配置文件已变化"}
+        val raw=metadata.toString().toByteArray(Charsets.UTF_8);require(raw.size<=128*1024){"配置说明过大"}
+        val current=connect();val generation=lifetime.get();val boundary="RovaiConfig-"+UUID.randomUUID()
+        val prefix=("--$boundary\r\nContent-Disposition: form-data; name=\"metadata\"\r\nContent-Type: application/json\r\n\r\n").toByteArray()+raw+("\r\n--$boundary\r\nContent-Disposition: form-data; name=\"file\"; filename=\"configuration\"\r\nContent-Type: application/octet-stream\r\n\r\n").toByteArray()
+        val suffix="\r\n--$boundary--\r\n".toByteArray()
+        val response=try{http.post("$baseUrl/api/v1/configuration/archive"){
+            header(HttpHeaders.Authorization,"Bearer ${current.token}");header(HttpHeaders.CacheControl,"no-store")
+            setBody(object:OutgoingContent.WriteChannelContent(){
+                override val contentType=ContentType.MultiPart.FormData.withParameter("boundary",boundary)
+                override val contentLength:Long=prefix.size.toLong()+size+suffix.size
+                override suspend fun writeTo(channel:ByteWriteChannel){
+                    channel.writeFully(prefix);source.inputStream().use{input->val buffer=ByteArray(64*1024);var count=0L;while(true){val read=input.read(buffer);if(read<0)break;count+=read;if(count>size)throw RovaiHostFailure("configuration.source_changed");channel.writeFully(buffer,0,read)};if(count!=size)throw RovaiHostFailure("configuration.source_changed")};channel.writeFully(suffix)
+                }
+            })
+        }}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){throw RovaiHostFailure("configuration.archive_result_unknown",unknownResult=true)}
+        if(response.status.value !in 200..299){if(response.status.value==401){denied=true;deadline=0};throw RovaiHostFailure("configuration.archive_result_unknown",unknownResult=true)}
+        val text=response.bodyAsText();if(text.length>2*1024*1024)throw RovaiHostFailure("configuration.archive_response_limit",unknownResult=true)
+        if(generation!=lifetime.get())throw CancellationException("Host lifetime changed")
+        val envelope=json.parseToJsonElement(text).jsonObject
+        if(envelope["error"]?.let{it !is JsonNull}==true)throw RovaiHostFailure("configuration.archive_rejected")
+        envelope["result"]?.jsonObject?:throw RovaiHostFailure("configuration.archive_response_invalid")
+    }
     fun officePreviewUrl(port:Int,cap:String):String{require(port in 1..65535&&cap.length in 32..256&&cap.all{it.isLetterOrDigit()&&it.code<128||it=='_'||it=='-'}){"预览授权无效"};return "$baseUrl/api/office-watch-proxy/$port/?cap=$cap"}
     suspend fun fileBytes(action:String,request:JsonObject):RovaiFileBytes {
         require(action in listOf("readBinary","readChildImage","download")){"文件操作无效"}
