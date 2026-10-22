@@ -23,7 +23,10 @@ export class PortablePreferenceOwner {
     this.dirty = true
     if (this.running || this.core.getSnapshot().fullCoreState !== 'ready') return
     this.running = true
-    void this.drain().catch(() => undefined).finally(() => {
+    void this.drain().catch(() => {
+      // 连接中断时只再领取/核对原 outbox，不重新生成导入业务命令。
+      if (!this.stopped) this.dirty = true
+    }).finally(() => {
       this.running = false
       if (this.dirty && !this.stopped && !this.timer) {
         this.timer = setTimeout(() => { this.timer = null; this.wake() }, 2000)
@@ -51,6 +54,10 @@ export class PortablePreferenceOwner {
         let state: PreferenceApplyState | 'pending' | 'failed'
         try { state = await this.apply(plan) } catch { state = 'failed' }
         if (state === 'pending') { this.dirty = true; continue }
+        if (this.stopped || this.core.getSnapshot().fullCoreState !== 'ready' || this.core.getSnapshot().generation !== generation) {
+          this.dirty = !this.stopped
+          return
+        }
         await this.core.request('configuration.desktopOwner.acknowledge', {
           commandId: plan.commandId, domain: plan.domain, targetId: plan.targetId,
           planDigest: plan.planDigest, state
