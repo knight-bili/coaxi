@@ -3,7 +3,7 @@ import type { CoreMethod } from '@contracts'
 import { backupFileDigest } from './backup-workspace'
 type Request=<T>(method:CoreMethod,params?:unknown)=>Promise<T>
 export class WebdavWorkspace{
-  constructor(private readonly request:Request,private readonly owner:()=>BrowserWindow|null,private readonly preferencesRoot?:()=>string,private readonly inspectDownloaded?:(event:IpcMainInvokeEvent,path:string,passphrase:string,kind:'backup'|'configuration',expectedDigest:string)=>Promise<unknown>){}
+  constructor(private readonly request:Request,private readonly owner:()=>BrowserWindow|null,private readonly preferencesRoot?:()=>string,private readonly inspectDownloaded?:(event:IpcMainInvokeEvent,path:string,passphrase:string,kind:'backup'|'configuration',expectedDigest:string)=>Promise<unknown>,private readonly importConfiguration?:(event:IpcMainInvokeEvent,path:string,passphrase:string,digest:string,operationId:string)=>Promise<unknown>){}
   async invoke(event:IpcMainInvokeEvent,value:unknown):Promise<unknown>{
     const owner=this.owner()
     if(!owner||owner.isDestroyed()||event.sender!==owner.webContents||event.senderFrame!==owner.webContents.mainFrame)throw new Error('webdav.local_owner_required')
@@ -34,6 +34,7 @@ export class WebdavWorkspace{
       const selected=receipt.result
       if(receipt.state!=='completed'||receipt.operation!=='pull'||!selected||typeof selected.path!=='string'||selected.snapshot.id!==input.snapshotId||selected.snapshot.sha256!==input.expectedDigest)throw new Error('webdav.original_download_not_completed_or_changed')
       const kind=selected.snapshot.kind==='configuration'?'configuration':'backup'
+      if(kind==='configuration'&&this.importConfiguration)return this.importConfiguration(event,selected.path,input.passphrase,input.expectedDigest,input.commandId)
       return this.inspectDownloaded(event,selected.path,input.passphrase,kind,input.expectedDigest)
     }
     if(['status','cancel','resume'].includes(input.operation))return this.request('backup.webdav.local',{operation:input.operation,commandId:input.commandId,expectedRevision:input.expectedRevision})

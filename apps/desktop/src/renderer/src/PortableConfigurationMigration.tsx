@@ -11,7 +11,7 @@ import {PortableConfigurationExport} from './PortableConfigurationExport'
 const domains:Record<PortableMigrationDomain,string>={modelProviders:'模型服务商',agentSettings:'智能体设置',customAgents:'自定义程序',quickMessages:'快捷语',taskTemplates:'任务模板',preferences:'可迁移偏好'}
 type Archive=PortableArchiveReference&{createdAt?:string}
 /** 原 Codeg ConfigSyncSettings 的选范围、预览、确认和撤销流程；沿用当前设置容器。 */
-export function PortableConfigurationMigration():React.JSX.Element{
+export function PortableConfigurationMigration({initialArchive,embedded=false}:{initialArchive?:PortableArchiveReference;embedded?:boolean}={}):React.JSX.Element{
   const client=useThreadClient(),t=useUiText(),generation=useRef(0),fileInput=useRef<HTMLInputElement>(null)
   const [archives,setArchives]=useState<{items:Archive[];next:string|null}>({items:[],next:null}),[archive,setArchive]=useState<Archive|null>(null),[selection,setSelection]=useState<PortableArchiveSelection|null>(null),[file,setFile]=useState<File|null>(null),[passphrase,setPassphrase]=useState('')
   const [rows,setRows]=useState<PortableMigrationRow[]>([]),[choices,setChoices]=useState<PortableMigrationSelection[]>([]),[members,setMembers]=useState<AgentProfile[]>([]),[mapped,setMapped]=useState<PortableMigrationMember[]>([]),[targets,setTargets]=useState<Record<string,{items:PortableMigrationTarget[];next:string|null}>>({})
@@ -23,6 +23,7 @@ export function PortableConfigurationMigration():React.JSX.Element{
   const blocked=busy||!ready||Boolean(pending)
   const run=async(work:()=>Promise<void>):Promise<void>=>{if(busy)return;const observed=generation.current;setBusy(true);setError('');try{await work()}catch(reason){if(observed===generation.current)setError(readErrorMessage(reason))}finally{if(observed===generation.current)setBusy(false)}}
   const open=async(source:Archive):Promise<void>=>{const observed=generation.current;const value=await client.request<PortableMigrationPreview>('configuration.migration.preview',{schemaVersion:1,archiveId:source.archiveId,sourceDigest:source.sourceDigest,selections:[],members:[]});if(observed!==generation.current)return;setArchive(source);setRows(value.rows);setChoices([]);setMapped([]);setTargets({});setPreview(null);setMode('apply');setVisible(100)}
+  useEffect(()=>{if(ready&&!pending&&initialArchive&&archive?.archiveId!==initialArchive.archiveId)void run(()=>open(initialArchive))},[ready,pending,initialArchive?.archiveId,key])
   const chooseFile=async():Promise<void>=>{if(client.portableConfiguration?.selectArchive){const value=await client.portableConfiguration.selectArchive();if(value){setSelection(value);setFile(null)}}else fileInput.current?.click()}
   const importFile=async():Promise<void>=>{
     const api=client.portableConfiguration;if(!api)throw new Error(t('私有配置入口尚不可用。'));const operationId=newCommandId(),observed=generation.current
@@ -70,6 +71,6 @@ export function PortableConfigurationMigration():React.JSX.Element{
     <div className="portable-provider-actions"><button className="quiet-button" disabled={blocked||invalidChoice||mode==='undo'} onClick={()=>void run(prepare)}>{t('生成完整预览')}</button><button className="quiet-button primary" disabled={blocked||!preview?.canApply} onClick={()=>void run(confirm)}>{t(mode==='undo'?'确认撤销这批配置':'应用预览中的选中配置')}</button></div>{preview&&!preview.canApply&&<p role="status">{t('这份预览还有冲突或尚不支持的选中项。请处理这些项目，或先取消选择，再重新预览。')}</p>}</>}
     {receipt&&<div className="portable-configuration-pending" role="status"><strong>{t(receipt.state==='applied'?'这批配置已提交':receipt.state==='rejected'?'这批配置没有应用':'原结果仍待核对')}</strong><p>{t('历史任务和消息保留。')} {receipt.changedMembers.length} {t('位队员的新任务设置发生变化。')}</p>{receipt.files.map(file=><div key={`${file.domain}:${file.targetId}`}>{t(domains[file.domain as PortableMigrationDomain]??'配置文件')} · {t(file.state==='applied'?'文件已保存':file.state==='pending'?'文件等待保存':file.state==='conflict'?'后续修改冲突，未覆盖':'文件未保存')}</div>)}<div className="portable-provider-actions"><button className="quiet-button" disabled={busy} onClick={()=>void run(async()=>{const value=await client.request<PortableMigrationReceipt>('configuration.migration.receipt',{schemaVersion:1,commandId:receipt.commandId});setReceipt(value)})}>{t('刷新这次结果')}</button><button className="quiet-button" disabled={blocked||receipt.state!=='applied'} onClick={()=>void run(undo)}>{t('预览撤销')}</button></div></div>}
     {error&&<p role="alert" className="inline-error">{error}</p>}
-    <PortableConfigurationExport/>
+    {!embedded&&<PortableConfigurationExport/>}
   </section>
 }

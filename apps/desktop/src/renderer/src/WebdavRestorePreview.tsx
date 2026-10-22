@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { RotateCcw } from 'lucide-react'
-import type { BackupSummary, ConfigurationSnapshotPreview } from '@contracts'
+import type { BackupSummary, ConfigurationSnapshotPreview, PortableArchiveReference } from '@contracts'
+import {PortableConfigurationMigration} from './PortableConfigurationMigration'
 import { AppDialogContent, AppDialogHeader } from './AppDialog'
 import { SnapshotValues } from './ConfigurationSnapshotSettings'
 import { useThreadClient } from './camp-client'
 import { useUiText } from './interface-language'
 
-type Preview = ConfigurationSnapshotPreview & {kind: 'configuration'; selectionId: string} | BackupSummary & {kind: 'backup'; archiveId: string}
+type Preview = ConfigurationSnapshotPreview & {kind: 'configuration'; selectionId: string} | BackupSummary & {kind: 'backup'; archiveId: string} | {kind:'configuration-migration';archive:PortableArchiveReference}
 type Transfer = {commandId: string; result: {snapshot: {id: string; sha256: string; kind?: 'backup' | 'configuration'}}}
 const names: Record<string, string> = {appearance: '外观', general: '界面偏好', windowClose: '关闭窗口', messageLibrary: '全局消息库'}
 
@@ -26,6 +27,8 @@ export function WebdavRestorePreview({transfer, accountRevision, disabled}: {tra
       if (!preview) {
         const result = await native.request<Preview>({operation: 'restore_inspect', expectedRevision: accountRevision, commandId: transfer.commandId, snapshotId: transfer.result.snapshot.id, expectedDigest: transfer.result.snapshot.sha256, passphrase: secret})
         if (current === epoch.current && result) setPreview(result)
+      } else if (preview.kind === 'configuration-migration') {
+        return
       } else if (preview.kind === 'configuration') {
         if (confirmation !== '应用配置') throw new Error(t('请先输入“应用配置”确认。'))
         await backups.applyConfiguration(preview.selectionId, secret)
@@ -37,6 +40,10 @@ export function WebdavRestorePreview({transfer, accountRevision, disabled}: {tra
     finally {if (current === epoch.current) {setBusy(false); setPassphrase('')}}
   }
   if (!native || !backups) return null
+  if(preview?.kind==='configuration-migration')return <>
+    <button disabled={disabled||busy} onClick={()=>setOpen(true)}><RotateCcw size={14}/>{t('选择要搬入的配置…')}</button>
+    <Dialog.Root open={open} onOpenChange={next=>{if(!next)close()}}><Dialog.Portal><Dialog.Overlay className="dialog-overlay"/><AppDialogContent width="wide"><AppDialogHeader title={t('选择要搬入的配置和本机队员')} description={t('副本已核对并登记为候选。每项由你选择，历史任务保留，不会自动运行。')} closeDisabled={busy}/><PortableConfigurationMigration initialArchive={preview.archive} embedded/><div className="dialog-actions"><button disabled={busy} onClick={close}>{t('关闭')}</button></div></AppDialogContent></Dialog.Portal></Dialog.Root>
+  </>
   return <>
     <button disabled={disabled || busy} onClick={() => {setOpen(true); setPreview(null); setPassphrase(''); setError(null); setConfirmation('')}}><RotateCcw size={14}/>{t('预览并恢复…')}</button>
     <Dialog.Root open={open} onOpenChange={next => {if (!next) close()}}><Dialog.Portal><Dialog.Overlay className="dialog-overlay"/><AppDialogContent width={preview?.kind === 'configuration' ? 'wide' : 'compact'} tone={preview ? 'danger' : 'neutral'}>

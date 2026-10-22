@@ -1296,7 +1296,7 @@ ipcMain.handle('rovai:interaction-computer',(event,method,input)=>interactionCom
 app.on('before-quit',()=>{void interactionComputer.dispose()})
 ipcMain.handle('rovai:interaction-workspace',(event,action,payload)=>interactionWorkspace.invoke(event,action,payload))
 app.on('before-quit',()=>{void interactionWorkspace.dispose()})
-const webdavWorkspace = new WebdavWorkspace((method,params)=>core.request(method,params),()=>mainWindow,()=>app.getPath('userData'),(event,path,passphrase,kind,digest)=>backupWorkspace.inspectDownloaded(event,path,passphrase,kind,digest))
+const webdavWorkspace = new WebdavWorkspace((method,params)=>core.request(method,params),()=>mainWindow,()=>app.getPath('userData'),(event,path,passphrase,kind,digest)=>backupWorkspace.inspectDownloaded(event,path,passphrase,kind,digest),(event,path,passphrase,digest,operationId)=>portableConfigurationPrivate.registerDownloaded(event,path,passphrase,digest,operationId))
 ipcMain.handle('rovai:webdav-workspace',(event,input)=>webdavWorkspace.invoke(event,input))
 const backupWorkspace = new BackupWorkspace(core,()=>coreDataPath,()=>mainWindow,()=>requestRendererQuitPreparation(mainWindow,()=>new MessageChannelMain()),()=>{browserWorkspace.revokeAll();officeWorkspace.closeAll()},()=>{app.relaunch();app.quit()},()=>app.getPath('userData'))
 const portableConfigurationPrivate=new PortableConfigurationPrivate(core,()=>mainWindow)

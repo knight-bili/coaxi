@@ -9,6 +9,15 @@ type Selection={path:string;sourceDigest:string;byteSize:number;expires:number}
 export class PortableConfigurationPrivate{
   private readonly selections=new Map<string,Selection>()
   constructor(private readonly core:Pick<CoreClient,'request'>,private readonly owner:()=>BrowserWindow|null){}
+  async registerDownloaded(event:IpcMainInvokeEvent,path:string,passphrase:string,expectedDigest:string,operationId:string):Promise<unknown>{
+    const owner=this.owner()
+    if(!owner||owner.isDestroyed()||event.sender!==owner.webContents||event.senderFrame!==owner.webContents.mainFrame)throw new Error('configuration.local_owner_required')
+    if(!/^[a-f0-9]{64}$/i.test(expectedDigest)||passphrase.length>16000)throw new Error('configuration.download_invalid')
+    const file=await lstat(path)
+    if(!file.isFile()||file.isSymbolicLink()||file.size>64*1024*1024)throw new Error('configuration.download_invalid')
+    const archive=await this.core.request('configuration.archive.registerSelected',{operationId,path,sourceDigest:`sha256:${expectedDigest.toLowerCase()}`,byteSize:file.size,passphrase,manifest:null})
+    return {kind:'configuration-migration',archive}
+  }
   async invoke(event:IpcMainInvokeEvent,operation:unknown,input:unknown):Promise<unknown>{
     const owner=this.owner()
     if(!owner||owner.isDestroyed()||event.sender!==owner.webContents||event.senderFrame!==owner.webContents.mainFrame)throw new Error('configuration.local_owner_required')
