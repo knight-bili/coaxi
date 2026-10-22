@@ -55,6 +55,12 @@ CREATE TABLE native_lifecycle_normal_continuation (
  command_id TEXT NOT NULL UNIQUE,preview_id TEXT NOT NULL REFERENCES native_lifecycle_normal_preview(id),
  client_id TEXT NOT NULL,result_json TEXT NOT NULL CHECK(json_valid(result_json)),created_at TEXT NOT NULL
 );
+CREATE TABLE native_lifecycle_normal_request (
+ command_id TEXT PRIMARY KEY NOT NULL,client_id TEXT NOT NULL,core_instance_id TEXT NOT NULL,
+ request_digest TEXT NOT NULL,request_json TEXT NOT NULL CHECK(json_valid(request_json)),
+ state TEXT NOT NULL CHECK(state IN ('prepared','recorded','failed')),error TEXT,
+ created_at TEXT NOT NULL,updated_at TEXT NOT NULL
+);
 CREATE TABLE native_lifecycle_steer_policy (
  singleton INTEGER PRIMARY KEY NOT NULL CHECK(singleton=1), revision INTEGER NOT NULL CHECK(revision>=0),
  value_json TEXT NOT NULL CHECK(json_valid(value_json) AND length(value_json)<=2097152)

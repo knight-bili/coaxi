@@ -2,7 +2,8 @@ use super::*;
 use crate::native_lifecycle::{self as native,storage};
 
 impl Core{
-    pub(super) async fn native_lifecycle_access(&self,method:&str,value:Value,client:crate::draft_client::DraftClient)->Result<Value>{
+    pub(super) async fn native_lifecycle_access(self:&Arc<Self>,method:&str,value:Value,client:crate::draft_client::DraftClient)->Result<Value>{
+        if matches!(method,"runtime.steer.normal.preview"|"runtime.steer.normal.confirm"|"runtime.steer.normal.receipt"){return self.native_normal_access(method,value,client).await}
         if method=="runtime.steer.materials.prepare"{return self.native_steer_materials(value,&client).await}
         native::validate_operation(method,&value)?;
         match method{

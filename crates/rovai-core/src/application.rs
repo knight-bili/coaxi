@@ -22,6 +22,7 @@ mod feedback_access;
 mod custom_runtime_access;
 mod native_lifecycle_access;
 mod native_continuation;
+mod native_normal;
 mod computer_access;
 mod office_access;
 mod history_import;
@@ -10394,7 +10395,7 @@ impl Core {
             "interaction.local" => self.interaction_access(request.params.clone()).await,
             "feedback.operation" => self.feedback_operation(request.params.clone(),request.client.clone()).await,
             "runtime.custom.list" | "runtime.custom.upsert" | "runtime.custom.remove" | "runtime.custom.install" | "runtime.custom.inspect" | "runtime.custom.registry" => self.custom_runtime_access(&request.method,request.params.clone()).await,
-            "history.execution.preview" | "history.execution.confirm" | "history.execution.receipt" | "runtime.steer.policy.get" | "runtime.steer.policy.set" | "runtime.steer.targets" | "runtime.steer.preview" | "runtime.steer.confirm" | "runtime.steer.receipt" | "runtime.steer.previews" | "runtime.steer.materials.prepare" => self.native_lifecycle_access(&request.method,request.params.clone(),request.client.clone()).await,
+            "runtime.steer.normal.preview" | "runtime.steer.normal.confirm" | "runtime.steer.normal.receipt" | "history.execution.preview" | "history.execution.confirm" | "history.execution.receipt" | "runtime.steer.policy.get" | "runtime.steer.policy.set" | "runtime.steer.targets" | "runtime.steer.preview" | "runtime.steer.confirm" | "runtime.steer.receipt" | "runtime.steer.previews" | "runtime.steer.materials.prepare" => self.native_lifecycle_access(&request.method,request.params.clone(),request.client.clone()).await,
             "computer.local" => self.computer_access(request.params.clone()).await,
             "browser.local.grant" | "browser.local.revoke" | "browser.local.begin" | "browser.local.finish" => self.browser_access(&request.method, request.params.clone()).await,
             "workbench.files.tools" => self.workbench_file_tools(request.params.clone()).await,

@@ -84,3 +84,13 @@ pub(crate) fn complete(tx:&Transaction<'_>,input:&Input,command:&str,result:&Com
 pub(crate) fn result(connection:&Connection,command:&str,client:&str)->Result<Option<Value>>{
     let raw:Option<String>=connection.query_row("SELECT result_json FROM native_lifecycle_normal_continuation WHERE command_id=?1 AND client_id=?2",params![command,client],|row|row.get(0)).optional()?;raw.map(|raw|serde_json::from_str(&raw).map_err(Into::into)).transpose()
 }
+pub(crate) fn receipt(connection:&Connection,command:&str,client:&str,instance:&str)->Result<Value>{
+    uuid::Uuid::parse_str(command)?;
+    let row:Option<(String,String,String,Option<String>)>=connection.query_row("SELECT state,client_id,core_instance_id,error FROM native_lifecycle_normal_request WHERE command_id=?1",[command],|row|Ok((row.get(0)?,row.get(1)?,row.get(2)?,row.get(3)?))).optional()?;
+    let Some((state,owner,core,error))=row else{return Ok(json!({"schemaVersion":1,"commandId":command,"state":"unknown","commandResult":null,"error":null}))};
+    ensure!(owner==client,"native_lifecycle.normal_command_scope_changed");
+    let owned:bool=connection.query_row("SELECT EXISTS(SELECT 1 FROM event_log WHERE event_type='command.result' AND command_id=?1 AND command_client_id=?2 AND actor_type='user' AND actor_id='local_user' AND command_type IN ('camp.native_input.continue','single_chat.native_input.continue','delegations.native_input.continue'))",params![command,client],|row|row.get(0))?;
+    if owned{return Ok(json!({"schemaVersion":1,"commandId":command,"state":"recorded","commandResult":crate::command::load_stored_result(connection,command)?,"error":null}))}
+    let state=if state=="prepared"&&(core!=instance||!steer_delivery::active(command)){"unknown"}else{state.as_str()};
+    Ok(json!({"schemaVersion":1,"commandId":command,"state":state,"commandResult":null,"error":error}))
+}
