@@ -164,7 +164,7 @@ const INNER_WIDTH = CARD_WIDTH - 88
 
 /** The dashboard's two-tone trend, at poster scale: cache-served context in
  *  accent at the baseline, freshly computed tokens capping it in ink. */
-function TrendBars({
+export function TrendBars({
   series,
   theme,
 }: {
@@ -256,7 +256,7 @@ function LegendChip({
   )
 }
 
-function StripCell({
+export function StripCell({
   label,
   value,
   sub,
@@ -319,7 +319,7 @@ function StripCell({
   )
 }
 
-function RankRow({
+export function RankRow({
   rank,
   label,
   value,

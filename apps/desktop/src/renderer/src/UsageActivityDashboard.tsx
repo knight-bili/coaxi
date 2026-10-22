@@ -9,6 +9,7 @@ import { formatTokenCount } from './codeg-native-content/lib/token-format'
 import './codeg-native-content/source-html.css'
 import './codeg-native-content/source-usage-colors.css'
 import './usage-activity-dashboard.css'
+import { UsageShareDialog } from './UsageShareDialog'
 
 const RANGES:Array<{id:UsageActivityQuery['range'];label:string}>=[{id:'7d',label:'近 7 天'},{id:'30d',label:'近 30 天'},{id:'90d',label:'近 90 天'},{id:'thisMonth',label:'本月'},{id:'thisYear',label:'今年'},{id:'all',label:'全部记录'},{id:'custom',label:'自选日期'}]
 
@@ -19,6 +20,7 @@ export function UsageActivityDashboard():React.JSX.Element {
   const [custom,setCustom]=useState({start:'',end:''}),[customOpen,setCustomOpen]=useState(false)
   const [report,setReport]=useState<UsageActivityReport|null>(null),[error,setError]=useState<string|null>(null),[loading,setLoading]=useState(true),[refresh,setRefresh]=useState(0)
   const [dimension,setDimension]=useState<'project'|'runtime'|'model'>('project'),[exporting,setExporting]=useState(false),[notice,setNotice]=useState<string|null>(null)
+  const [share,setShare]=useState<UsageActivityReport|null>(null)
   const sequence=useRef(0),queryKey=JSON.stringify(query)
   useEffect(()=>{
     let alive=true;const observed=++sequence.current;setLoading(true);setError(null);setReport(null)
@@ -44,7 +46,7 @@ export function UsageActivityDashboard():React.JSX.Element {
   }
   const changeFacet=(key:'projectRoot'|'runtimeKind'|'modelKey',value:string):void=>setQuery(current=>({...current,[key]:value||undefined}))
   return <div className="usage-activity-dashboard codeg-native-rich tu-viz">
-    <header className="usage-dashboard-heading"><div><h1>{t('用量看板')}</h1><p>{t('查看已报告的 Token、缓存与活动分布。')}</p></div><div className="flex gap-2"><button type="button" className="quiet-button" disabled={loading} onClick={()=>setRefresh(value=>value+1)}><RefreshCw size={14}/>{t('刷新')}</button><button type="button" className="primary-button" disabled={!report||loading||exporting||!client.exportUsageActivityReport} onClick={()=>void exportData()}>{t(exporting?'正在导出…':'导出 JSON')}</button></div></header>
+    <header className="usage-dashboard-heading"><div><h1>{t('用量看板')}</h1><p>{t('查看已报告的 Token、缓存与活动分布。')}</p></div><div className="flex gap-2"><button type="button" className="quiet-button" disabled={loading} onClick={()=>setRefresh(value=>value+1)}><RefreshCw size={14}/>{t('刷新')}</button><button type="button" className="quiet-button" disabled={!report||loading||exporting||!client.exportUsageActivityReport} onClick={()=>void exportData()}>{t(exporting?'正在导出…':'导出 JSON')}</button><button type="button" className="primary-button" disabled={!report||loading} onClick={()=>report&&setShare(structuredClone(report))}>{t('分享')}</button></div></header>
     <div className="usage-dashboard-toolbar">
       <div className="usage-dashboard-ranges" role="group" aria-label={t('统计范围')}>{RANGES.map(range=><button type="button" key={range.id} aria-pressed={customOpen?range.id==='custom':query.range===range.id} onClick={()=>selectRange(range.id)}>{t(range.label)}</button>)}</div>
       <div className="usage-dashboard-filters">
@@ -62,6 +64,7 @@ export function UsageActivityDashboard():React.JSX.Element {
       {error&&<div role="alert" className="usage-dashboard-state"><p>{error}</p><button type="button" className="quiet-button" onClick={()=>setRefresh(value=>value+1)}>{t('重试')}</button></div>}
       {report&&!loading&&<UsageActivityView report={report} dimension={dimension} onDimension={setDimension} onFilter={changeFacet}/>}
     </main>
+    {share&&<UsageShareDialog report={share} onClose={()=>setShare(null)}/>}
   </div>
 }
 
