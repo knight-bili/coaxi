@@ -1,0 +1,53 @@
+{
+  "state": "proposal_frozen_pending_confirmation",
+  "revision": 1,
+  "reviewScope": "proposal_document_only",
+  "softwareReview": false,
+  "softwareTests": false,
+  "pages": 18,
+  "pagesSeen": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+  ],
+  "documentQa": "all_pages_inspected_no_clipping_or_overlap",
+  "casesPlannedNotExecuted": 30,
+  "files": [
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\第一期改造\\自定义智能体接入_r1\\final\\怎样添加你自己的智能体程序_客户确认版_r1.docx",
+      "bytes": 22110,
+      "sha256": "2a3b76cd02f202c751f28c27f4d4d416e692fff3510ba864337aea87b4798a24"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\第一期改造\\自定义智能体接入_r1\\final\\怎样添加你自己的智能体程序_客户确认版_r1.pdf",
+      "bytes": 576624,
+      "sha256": "51a3db3c4709a71b3f87f4c6f4a6b0c1b6d6e59723ee9fc0a0a295d3552bc4a8"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\versions\\v1.73\\model-context-change-custom-acp-runtime.md",
+      "bytes": 34244,
+      "sha256": "bd5b1025760fe315b89350cd52d4a8a2663d42b158439287864d016f6b6a4cff"
+    },
+    {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\custom-acp-runtime-r1-contract.json",
+      "bytes": 82428,
+      "sha256": "237c3ebb71dfb7c3249259f7f319bcc1b060a8d7aac0dfd8e0f57ae914f834f8"
+    }
+  ],
+  "recordedAt": "2026-10-22T07:15:22.454242+00:00"
+}
