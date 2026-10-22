@@ -36,13 +36,14 @@ impl Core{
         let search=self.runtime_search_environment.read().await.clone();
         let private=self.data_dir.join("native-lifecycle").join("preparation").join(&origin.origin_id);
         let environment=crate::member_environment::LaunchEnvironmentSource{database:self.database.clone(),member_id:agent.clone(),kind:runtime.adapter_kind};
-        let inspected=if runtime.adapter_kind==AdapterKind::CustomAcp{
+        let matching_program=runtime.adapter_kind==AdapterKind::CustomAcp||(runtime.adapter_kind==AdapterKind::CodexCli&&origin.source.provider=="codex"&&origin.mode==native::NativeContinuationMode::Continue);
+        let inspected=if matching_program{
             crate::member_environment::with_launch_source(environment,with_runtime_configuration(runtime.adapter_kind,&search,async{
                 inspection_runtime.environment=crate::member_environment::load_for_launch().await?;
-                acp::inspect_native_preparation(&workspace,&inspection_runtime,&origin,&source.location,&private).await
+                if runtime.adapter_kind==AdapterKind::CodexCli{codex::inspect_native_preparation(&workspace,&inspection_runtime,&origin,&source.location).await}else{acp::inspect_native_preparation(&workspace,&inspection_runtime,&origin,&source.location,&private).await}
             })).await
         }else{Err(anyhow::anyhow!("native_lifecycle.explicit_matching_program_required"))};
-        let(status,reason,initialize)=match inspected{Ok(digest)=>("available",None,Some(digest)),Err(_)=>(if runtime.adapter_kind==AdapterKind::CustomAcp{"unavailable"}else{"requires_acp_program"},Some(if runtime.adapter_kind==AdapterKind::CustomAcp{"所选程序未能确认同一来源或所需恢复能力；保留导入记录，请核对程序和环境"}else{"请选择你已添加、与来源相同且支持恢复的 ACP 程序；不会自动换程序或安装"}),None)};
+        let(status,reason,initialize)=match inspected{Ok(digest)=>("available",None,Some(digest)),Err(_)=>(if matching_program{"unavailable"}else{"requires_acp_program"},Some(if matching_program{"所选程序未能确认同一来源或所需恢复能力；保留导入记录，请核对程序和环境"}else{"请选择你已添加、与来源相同且支持恢复的 ACP 程序；不会自动换程序或安装"}),None)};
         let mut database=self.database.lock().await;let tx=database.connection_mut().transaction()?;
         let current=continuation::member(&tx,&agent,version)?;anyhow::ensure!(current.config_digest==runtime.config_digest,"native_lifecycle.member_runtime_changed");
         let(_,current_workspace)=continuation::workspace(&tx,&owner)?;anyhow::ensure!(current_workspace==workspace_digest,"native_lifecycle.project_changed");
@@ -104,7 +105,7 @@ impl Core{
             let observed=crate::member_environment::with_launch_source(environment,with_runtime_configuration(kind,&search,async{
                 runtime.environment=crate::member_environment::load_for_launch().await.map_err(|_|acp::NativePreparationFailure{outcome_unknown:false,code:"native_lifecycle.environment_unavailable"})?;
                 let private=root.join("native-lifecycle").join("preparation").join(&origin.origin_id);
-                acp::prepare_native_session(&workspace,&runtime,&origin,&source.location,&initialize,&private).await
+                if kind==AdapterKind::CodexCli{codex::prepare_native_session(&workspace,&runtime,&origin,&source.location,&initialize).await}else{acp::prepare_native_session(&workspace,&runtime,&origin,&source.location,&initialize,&private).await}
             })).await;
             let mut database=database.lock().await;
             if let Err(error)=settle_continuation(database.connection_mut(),&command,&instance,&record,&runtime,observed){eprintln!("Native creation receipt retained unknown: {error:#}");}

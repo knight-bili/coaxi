@@ -35,6 +35,9 @@ use rovai_core::{
     storage_layout::ThreadOutputDirectory,
 };
 use serde_json::{Value, json};
+#[path = "native_lifecycle/codex_preparation.rs"]
+mod native_lifecycle_preparation;
+pub(crate) use native_lifecycle_preparation::{inspect_native_preparation,prepare_native_session};
 use tokio::{
     io::{AsyncBufReadExt, AsyncWriteExt, BufReader},
     process::Command,
@@ -135,7 +138,7 @@ impl CodexRuntimeOwner {
 
 pub(crate) struct CodexHost {
     native_source: Option<rovai_core::runtime_subagent_session::CapturedNativeSource>,
-    initialized: tokio::sync::OnceCell<()>,
+    initialized: tokio::sync::OnceCell<Value>,
     credential_redactor: Option<rovai_core::runtime_custom_api::CredentialRedactor>,
     host_instance_id: String,
     child: Mutex<ManagedProcess>,
@@ -479,13 +482,13 @@ impl CodexHost {
 
     async fn initialize(&self) -> Result<()> {
         self.initialized.get_or_try_init(|| async {
-            self.rpc("initialize", json!({
+            let result=self.rpc("initialize", json!({
                 "clientInfo": {"name": "rovai", "title": "Rovai-ai", "version": env!("CARGO_PKG_VERSION")},
                 "capabilities": {"experimentalApi": true}
             })).await.context("Codex app-server initialize failed")?;
             self.notify("initialized", json!({})).await
                 .context("Codex app-server initialized notification failed")?;
-            Ok::<_, anyhow::Error>(())
+            Ok::<_, anyhow::Error>(result)
         }).await?;
         Ok(())
     }
