@@ -20,6 +20,8 @@ import java.util.UUID
 @Composable
 fun RovaiRuntimeSettings(model:RovaiWorkspaceViewModel){
     val state by model.state.collectAsStateWithLifecycle();val coroutine=rememberCoroutineScope()
+    var portable by remember{mutableStateOf(false)}
+    if(portable){RovaiPortableProviderSettings(model){portable=false};return}
     var installations by remember{mutableStateOf<List<JsonObject>>(emptyList())};var agent by remember{mutableStateOf<JsonObject?>(null)}
     var kind by remember{mutableStateOf("")};var selection by remember{mutableStateOf(buildJsonObject{put("mode","runtime_default")})}
     var permissions by remember{mutableStateOf(buildJsonObject{})};var catalog by remember{mutableStateOf(buildJsonObject{})}
@@ -40,6 +42,7 @@ fun RovaiRuntimeSettings(model:RovaiWorkspaceViewModel){
     if(custom)RovaiCustomRuntimeSettings(model,onClose={custom=false})
     val models=catalog["models"].coreArray().ifEmpty{snapshot["models"].coreArray()};val currentModel=models.find{it.coreText("id")==selection.coreText("modelId")}
     LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
+        item{TextButton(enabled=!disabled&&!dirty,onClick={portable=true}){Text("模型服务商")}}
         item{Row{if(agent!=null)TextButton(onClick={if(dirty)discard=true else agent=null}){Text("返回队员列表")};TextButton(enabled=!disabled,onClick={coroutine.launch{load()}}){Text("刷新")};TextButton(enabled=!disabled,onClick={custom=true}){Text("自定义智能体")}}}
         issue?.let{item{Text(it,color=CodegTheme.colors.danger)}}
         if(agent==null){items(state.members.filter{it.coreText("presence")!="removed"},key={it.coreText("agentId")}){member->GlassRow(Modifier.fillMaxWidth()){Text(member.coreText("displayName"),style=MaterialTheme.typography.titleMedium);Text(member["runtimeReadiness"].coreObject().coreText("status"),color=CodegTheme.colors.textSecondary);RovaiMemberFeedbackSwitch(model,member.coreText("agentId"));RovaiMemberNativeSteerSwitch(model,member.coreText("agentId"));RovaiMemberCustomRuntime(model,member);TextButton(enabled=!disabled,onClick={chooseMember(member)}){Text("模型和权限")}}}}
