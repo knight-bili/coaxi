@@ -1115,6 +1115,10 @@ impl AgentRuntimeAdapterRegistry {
         }
     }
 
+    pub fn mcp_projection_for_runtime(&self,runtime:&crate::agent_profile::FrozenAgentRuntimeConfig)->McpProjectionCapability{
+        if runtime.adapter_kind==AdapterKind::CustomAcp&&!runtime.custom_runtime.as_ref().is_some_and(|custom|custom.declared_mcp){unsupported_external_mcp_projection()}else{self.mcp_projection(runtime.adapter_kind)}
+    }
+
     pub fn codex_capability_snapshot(
         &self,
         observation: CodexProbeObservation,

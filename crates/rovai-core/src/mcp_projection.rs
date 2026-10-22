@@ -187,7 +187,7 @@ impl McpProjectionService {
             );
         }
 
-        let projection = materialize_projection(config_store, request)?;
+        let projection = materialize_projection(config_store, request,request_capability(database,request)?)?;
         self.publish_projection(request, &projection)?;
         self.load_and_validate(&target, request, None)
     }
@@ -215,7 +215,7 @@ impl McpProjectionService {
         for(name,_,_)in &definitions{anyhow::ensure!(matches!(*name,crate::interaction_tools::SERVER_NAME|crate::ui_feedback::SERVER_NAME)&&names.insert(*name),"interaction.reserved_mcp_name_conflict")}
         validate_request(request)?;
         validate_child_run_request(database, request)?;
-        let capability = AgentRuntimeAdapterRegistry::default().mcp_projection(request.adapter_kind);
+        let capability = request_capability(database,request)?;
         anyhow::ensure!(capability.supports_stdio && capability.external_mcp_projection != ExternalMcpProjection::Unsupported && runtime_version_supports_mcp(request.adapter_kind, request.reported_runtime_version), "runtime_unavailable");
         let frozen = load_frozen_projection(database, request.agent_run_id)?;
         if let Some(frozen) = &frozen {
@@ -233,7 +233,7 @@ impl McpProjectionService {
             projection
         } else {
             anyhow::ensure!(frozen.is_none(), "interaction.frozen_projection_unavailable");
-            let mut projection = materialize_projection(config_store, request)?;
+            let mut projection = materialize_projection(config_store, request,capability)?;
             anyhow::ensure!(projection.exposure.config_status == "ready", "interaction.mcp_configuration_unavailable");
             for(name,_,digest)in &definitions{
                 anyhow::ensure!(!projection.exposure.servers.iter().any(|entry|entry.name.eq_ignore_ascii_case(name)||entry.runtime_name.eq_ignore_ascii_case(name)),"interaction.reserved_mcp_name_conflict");
@@ -461,10 +461,10 @@ impl McpProjectionService {
 fn materialize_projection(
     config_store: &McpConfigStore,
     request: &McpProjectionRequest<'_>,
+    capability:crate::agent_runtime_adapter::McpProjectionCapability,
 ) -> Result<ProjectionFile> {
     let known = [request.agent_id.to_string()].into_iter().collect();
     let (view, config) = config_store.get_with_raw(&known)?;
-    let capability = AgentRuntimeAdapterRegistry::default().mcp_projection(request.adapter_kind);
     let mut exposure = McpExposureSnapshot {
         schema_version: MCP_PROJECTION_SCHEMA_VERSION,
         config_digest: view.config_digest.clone(),
@@ -571,6 +571,15 @@ fn materialize_projection(
         exposure,
         servers,
     })
+}
+
+fn request_capability(database:&Database,request:&McpProjectionRequest<'_>)->Result<crate::agent_runtime_adapter::McpProjectionCapability>{
+    let registry=AgentRuntimeAdapterRegistry::default();
+    if request.adapter_kind!=AdapterKind::CustomAcp{return Ok(registry.mcp_projection(request.adapter_kind))}
+    let(raw,epoch,adapter):(String,i64,String)=database.connection().query_row("SELECT effective_config_json,execution_epoch,runtime_adapter_kind FROM agent_run WHERE id=?1",[request.agent_run_id],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?)))?;
+    let config:serde_json::Value=serde_json::from_str(&raw)?;let runtime:crate::agent_profile::FrozenAgentRuntimeConfig=serde_json::from_value(config["runtime"].clone())?;
+    anyhow::ensure!(epoch==request.execution_epoch&&adapter=="custom-acp"&&runtime.adapter_kind==AdapterKind::CustomAcp&&runtime.custom_runtime.is_some(),"custom_runtime.mcp_scope_changed");
+    Ok(registry.mcp_projection_for_runtime(&runtime))
 }
 
 fn empty_legacy_projection(request: &McpProjectionRequest<'_>) -> ProjectionFile {

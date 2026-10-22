@@ -49,7 +49,7 @@ impl Core {
     pub(super) async fn interaction_policy_for_run(&self, execution: &AgentRunExecution) -> Result<Option<tools::Policy>> {
         let policy = self.interaction_tools.policies.read()?;
         if !policy.features(&execution.agent_id).any() { return Ok(None); }
-        let capability = AgentRuntimeAdapterRegistry::default().mcp_projection(execution.runtime.adapter_kind);
+        let capability = AgentRuntimeAdapterRegistry::default().mcp_projection_for_runtime(&execution.runtime);
         if capability.external_mcp_projection == crate::agent_runtime_adapter::ExternalMcpProjection::Unsupported || !capability.supports_stdio { return Ok(None); }
         let database = self.database.lock().await;
         // 已冻结且原来没配备工具的 Run 不在途中获得新目录。
