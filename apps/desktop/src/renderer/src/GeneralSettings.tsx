@@ -1,5 +1,6 @@
 import { WebdavSettings } from './WebdavSettings'
 import { KeyboardShortcutSettings } from './KeyboardShortcutSettings'
+import { INTERFACE_LANGUAGE_OPTIONS } from '../../shared/interface-languages'
 import { ExtensionCatalogSettings } from './ExtensionCatalogSettings'
 import { BackupSettings } from './BackupSettings'
 import { WindowCloseSettings } from './WindowCloseSettings'
@@ -380,12 +381,12 @@ export function GeneralSettings({
           <div className="section-heading"><div><h2 id="general-language-heading">{t('界面语言')}</h2></div></div>
           <div className="general-section-body">
             <div className="general-language-options" role="radiogroup" aria-labelledby="general-language-heading">
-              {(['zh-CN', 'en'] as const).map((language) => (
+              {INTERFACE_LANGUAGE_OPTIONS.map(({id:language,name}) => (
                 <label key={language} className={interfaceLanguage === language ? 'selected' : ''}>
                   <input type="radio" name="interface-language" value={language}
                     checked={interfaceLanguage === language} disabled={!preferences}
                     onChange={() => void setInterfaceLanguage(language)} />
-                  <span>{language === 'zh-CN' ? uiAttribute("简体中文") : 'English'}</span>
+                  <span lang={language}>{name}</span>
                 </label>
               ))}
             </div>

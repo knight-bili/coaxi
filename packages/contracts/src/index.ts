@@ -3580,7 +3580,7 @@ export interface NewConversationDefaults {
   defaultLeadAgentId: string
 }
 
-export type InterfaceLanguage = 'zh-CN' | 'en'
+export type InterfaceLanguage = 'zh-CN' | 'zh-TW' | 'en' | 'ja' | 'ko' | 'es' | 'de' | 'fr' | 'pt' | 'ar'
 
 export interface GeneralPreferencesSnapshot {
   schemaVersion: 5

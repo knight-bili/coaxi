@@ -24,7 +24,7 @@ fn validate(id:&str,value:&Value)->Result<()> {
         ("appearance","motionPreference")=>ensure!(["system","reduce"].contains(&value.as_str().unwrap_or_default()),"config_sync.invalid_motion"),
         ("appearance","zoomPercentage")=>ensure!(value.as_u64().is_some_and(|number|(10..=500).contains(&number)),"config_sync.invalid_zoom"),
         ("appearance",_)=>ensure!(value.as_u64().is_some_and(|number|(12..=24).contains(&number)),"config_sync.invalid_font"),
-        ("general","interfaceLanguage")=>ensure!(["zh-CN","en"].contains(&value.as_str().unwrap_or_default()),"config_sync.invalid_language"),
+        ("general","interfaceLanguage")=>ensure!(["zh-CN","zh-TW","en","ja","ko","es","de","fr","pt","ar"].contains(&value.as_str().unwrap_or_default()),"config_sync.invalid_language"),
         ("general","startupLocationMode")=>ensure!(["last_location","quick_chat"].contains(&value.as_str().unwrap_or_default()),"config_sync.invalid_startup"),
         ("general","executionConsolePlacement")=>ensure!(["right","inspector","bottom"].contains(&value.as_str().unwrap_or_default()),"config_sync.invalid_placement"),
         ("general","worldMapEnabled")=>ensure!(value.is_boolean(),"config_sync.invalid_boolean"),

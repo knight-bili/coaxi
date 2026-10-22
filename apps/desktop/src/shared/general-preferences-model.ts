@@ -1,4 +1,5 @@
 import type { ExecutionConsolePlacement, GeneralPreferencesSnapshot, InterfaceLanguage, NewConversationDefaults, SettingsSection, StartupLocationMode } from '@contracts'
+import { INTERFACE_LANGUAGE_OPTIONS } from './interface-languages'
 
 const STARTUP_LOCATION_MODES = new Set<StartupLocationMode>(['last_location', 'quick_chat'])
 const EXECUTION_CONSOLE_PLACEMENTS = new Set<ExecutionConsolePlacement>(['right', 'inspector', 'bottom'])
@@ -16,7 +17,7 @@ const SETTINGS_SECTIONS = new Set<SettingsSection>([
   'diagnostics',
   'about'
 ])
-const INTERFACE_LANGUAGES = new Set<InterfaceLanguage>(['zh-CN', 'en'])
+const INTERFACE_LANGUAGES = new Set<InterfaceLanguage>(INTERFACE_LANGUAGE_OPTIONS.map(option=>option.id))
 
 export const DEFAULT_GENERAL_PREFERENCES: GeneralPreferencesSnapshot = {
   schemaVersion: 5,

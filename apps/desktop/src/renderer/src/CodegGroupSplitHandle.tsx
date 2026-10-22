@@ -3,7 +3,7 @@
 
 import { useCallback, useRef, useState } from "react"
 import type { PointerEvent as ReactPointerEvent, RefObject } from "react"
-import { cn } from "./codeg-native-content/lib/utils"
+import { cn } from "./codeg-native-content/ui/source-primitives"
 import type { HandleRect } from "../../shared/codeg-tab-group-layout"
 
 interface GroupSplitHandleProps {
