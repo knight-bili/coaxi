@@ -60,7 +60,7 @@ impl Query {
             _=>anyhow::bail!("usage.invalid_range"),
         };
         ensure!(start<end&&end-start<=Duration::days(367)&&end<=tomorrow,"usage.invalid_range");
-        Ok(Bounds{from:start.max(recording).min(end),to:end,offset})
+        Ok(Bounds{from:start.max(hour_bucket(recording)).min(end),to:end,offset})
     }
     fn where_sql(&self,epoch:&str,bounds:&Bounds)->(String,Vec<SqlValue>){
         let mut sql=String::from("collection_epoch=? AND bucket_start_at>=? AND bucket_start_at<?");

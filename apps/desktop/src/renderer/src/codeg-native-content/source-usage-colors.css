@@ -1,0 +1,44 @@
+.tu-viz {
+  --tu-accent: color-mix(in oklab, var(--primary) 86%, var(--foreground));
+  --tu-ink: var(--foreground);
+  /* 墨色淡阶：构成条里「新算」侧的次级行（缓存写入/输出） */
+  --tu-ink-2: color-mix(in oklab, var(--foreground) 55%, var(--card));
+  --tu-ink-3: color-mix(in oklab, var(--foreground) 32%, var(--card));
+  /* 强调色的表面淡染：缓存环的未充满轨道、洞察横幅底色、悬停列高亮 */
+  --tu-accent-soft: color-mix(in oklab, var(--tu-accent) 14%, var(--card));
+  --tu-seq-1: color-mix(in oklab, var(--tu-accent) 13%, var(--card));
+  --tu-seq-2: color-mix(in oklab, var(--tu-accent) 26%, var(--card));
+  --tu-seq-3: color-mix(in oklab, var(--tu-accent) 42%, var(--card));
+  --tu-seq-4: color-mix(in oklab, var(--tu-accent) 60%, var(--card));
+  --tu-seq-5: color-mix(in oklab, var(--tu-accent) 80%, var(--card));
+  --tu-seq-6: var(--tu-accent);
+  --tu-seq-7: color-mix(in oklab, var(--tu-accent) 72%, var(--foreground));
+}
+.dark .tu-viz {
+  /* 暗色下主色本就落在中亮度带，不需要再压深 */
+  --tu-accent: var(--primary);
+}
+/* 中性预设（neutral/zinc/slate/stone/gray）：--primary 是近黑/近白，看板随
+   之走全灰阶——不引入任何外来色相，和这些主题「主按钮就是黑白」的语言一致。
+   accent（=缓存）沿用上面的 primary 派生（近黑/近白）；「新算」墨阶整体下压
+   一档与 accent 拉开；seq ramp 顶部两档在灰阶下会贴在一起，重排为到 accent
+   为止的等距灰梯。公式全部混向 card/foreground，亮暗模式自动反向。
+   （:root:not([data-theme]) 是 inline 脚本失败时的兜底路径，同样中性。） */
+:root:not([data-theme]) .tu-viz,
+[data-theme="neutral"] .tu-viz,
+[data-theme="zinc"] .tu-viz,
+[data-theme="slate"] .tu-viz,
+[data-theme="stone"] .tu-viz,
+[data-theme="gray"] .tu-viz {
+  --tu-ink: color-mix(in oklab, var(--foreground) 52%, var(--card));
+  --tu-ink-2: color-mix(in oklab, var(--foreground) 33%, var(--card));
+  --tu-ink-3: color-mix(in oklab, var(--foreground) 18%, var(--card));
+  --tu-seq-1: color-mix(in oklab, var(--tu-accent) 10%, var(--card));
+  --tu-seq-2: color-mix(in oklab, var(--tu-accent) 22%, var(--card));
+  --tu-seq-3: color-mix(in oklab, var(--tu-accent) 35%, var(--card));
+  --tu-seq-4: color-mix(in oklab, var(--tu-accent) 49%, var(--card));
+  --tu-seq-5: color-mix(in oklab, var(--tu-accent) 64%, var(--card));
+  --tu-seq-6: color-mix(in oklab, var(--tu-accent) 81%, var(--card));
+  --tu-seq-7: var(--tu-accent);
+}
+
