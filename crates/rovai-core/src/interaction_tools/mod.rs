@@ -7,6 +7,7 @@ use std::{collections::BTreeSet, path::{Path, PathBuf}, sync::LazyLock};
 pub mod broker;
 pub mod renderers;
 pub mod output;
+pub mod runtime_support;
 pub mod stdio;
 
 pub const SERVER_NAME: &str = "rovai-interaction";

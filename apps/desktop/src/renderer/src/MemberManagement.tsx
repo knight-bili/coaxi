@@ -839,7 +839,7 @@ const MemberEditor = forwardRef<
               <p className="member-editor-new-runtime"><UiText zh={"创建队员后，可在这里选择智能体、模型与权限。"} /></p>
             )}
           </section>
-          {selectedAgent && <MemberInteractionSettings key={selectedAgent.agentId} agentId={selectedAgent.agentId} disabled={busy !== null}/>}
+          {selectedAgent && <MemberInteractionSettings key={selectedAgent.agentId} agentId={selectedAgent.agentId} adapterKind={selectedAgent.runtimeConfiguration?.adapterKind} disabled={busy !== null}/>}
         </div>
       </div>
       <Dialog.Root

@@ -15,10 +15,12 @@ const rows:Array<{key:keyof InteractionFeatures;title:string;description:string;
 ]
 
 /** 以 Codeg AgentToolsSettings/SettingRow 的五组开关和 Rovai 队员详情节布局呈现。 */
-export function MemberInteractionSettings({agentId,disabled=false}:{agentId:string;disabled?:boolean}):React.JSX.Element|null{
+export function MemberInteractionSettings({agentId,adapterKind,disabled=false}:{agentId:string;adapterKind?:string|null;disabled?:boolean}):React.JSX.Element|null{
   const api=useThreadClient().interactionWorkspace,t=useUiText()
   const [base,setBase]=useState<Policy|null>(null),[features,setFeatures]=useState(empty),[busy,setBusy]=useState(false),[error,setError]=useState(''),[pending,setPending]=useState<{expectedRevision:number;value:Policy}|null>(null)
   const lifetime=useRef(0)
+  const [support,setSupport]=useState<{adapterKind:string;state:string;message:string;qualified:boolean}|null>(null)
+  useEffect(()=>{let active=true;setSupport(null);void api?.request<{runtimes:Array<NonNullable<typeof support>>}>('support.get',{}).then(value=>{if(active)setSupport(value.runtimes.find(row=>row.adapterKind===adapterKind)??null)}).catch(error=>{if(active)setError(String(error))});return()=>{active=false}},[api,adapterKind])
   useEffect(()=>{let active=true;lifetime.current++;setBase(null);setFeatures(empty());setError('');setPending(null);void api?.request<Policy>('policy.get',{}).then(value=>{if(active){setBase(value);setFeatures(value.members.find(member=>member.agentId===agentId)?.features??empty())}}).catch(error=>{if(active)setError(String(error))});return()=>{active=false;lifetime.current++}},[api,agentId])
   if(!api)return null
   const save=async(original?:NonNullable<typeof pending>):Promise<void>=>{
@@ -41,6 +43,7 @@ export function MemberInteractionSettings({agentId,disabled=false}:{agentId:stri
   return <section className="member-editor-section interaction-member-settings" aria-label={t('浏览器与电脑工具')}>
     <div className="member-editor-section-heading"><h2>{t('浏览器与电脑工具')}</h2><span>{t('用于之后开始的新执行')}</span></div>
     <p className="interaction-help">{t('配备工具后，在页面或窗口中选择具体会话和队员。原有历史会保留；必要时会重新准备会话。')}</p>
+    <p className="interaction-help" role="status">{!adapterKind?t('请先为队员选择运行器，再核对工具支持情况。'):support?t(support.message):t('正在读取此运行器的工具支持情况。')}</p>
     <div className="interaction-setting-rows">{rows.map(row=><label className="interaction-setting-row" key={row.key}><span><strong>{t(row.title)}</strong><small>{t(row.description)}</small></span><input type="checkbox" role="switch" checked={features[row.key]} disabled={disabled||busy||!base||Boolean(pending)||Boolean(row.parent&&!features[row.parent])} onChange={event=>{const checked=event.target.checked;setFeatures(value=>({...value,[row.key]:checked,...(row.key==='browser'&&!checked?{browserEval:false}:{}),...(row.key==='computer'&&!checked?{computerLaunch:false,computerClipboard:false}:{})}))}}/></label>)}</div>
     {error&&<p role="alert" className="environment-error">{error}</p>}
     <div className="interaction-actions"><button type="button" className="quiet-button" disabled={busy} onClick={()=>void reread()}>{t('重新读取')}</button>{pending?<><button type="button" disabled={busy} onClick={()=>void save(pending)}>{t('原样重试')}</button><button type="button" disabled={busy} onClick={()=>{setPending(null);setError(t('原计划已留在当前显示中。请重新读取后再编辑。'));setBase(null)}}>{t('放弃本机原计划')}</button></>:<button type="button" disabled={disabled||busy||!base||JSON.stringify(features)===JSON.stringify(base.members.find(member=>member.agentId===agentId)?.features??empty())} onClick={()=>void save()}>{t(busy?'正在保存…':'保存工具配置')}</button>}</div>

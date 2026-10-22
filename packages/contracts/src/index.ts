@@ -5160,7 +5160,7 @@ export interface BrowserWorkspaceApi {
 }
 export interface BrowserWorkspaceView { id:string; threadId:string;profileId:string;url:string;title:string;level:'none'|'read'|'control';expiresAt:number|null;loading:boolean;error:string|null }
 
-export interface InteractionWorkspaceApi {request<T>(action:'status'|'stop'|'policy.get'|'policy.replace'|'grant.share'|'grant.revoke'|'grant.list'|'sharing.targets'|'pending'|'eval.approve'|'operation.approve'|'unknown.reconcile',payload:Record<string,unknown>):Promise<T>}
+export interface InteractionWorkspaceApi {request<T>(action:'status'|'stop'|'support.get'|'policy.get'|'policy.replace'|'grant.share'|'grant.revoke'|'grant.list'|'sharing.targets'|'pending'|'eval.approve'|'operation.approve'|'unknown.reconcile',payload:Record<string,unknown>):Promise<T>}
 export interface KeyboardShortcutsSnapshot {revision:string;bindings:Record<string,string>}
 export interface NativeShortcutInput {key:string;code?:string;metaKey:boolean;ctrlKey:boolean;altKey:boolean;shiftKey:boolean;isComposing?:boolean}
 export interface KeyboardShortcutsApi {get():Promise<KeyboardShortcutsSnapshot>;save(input:KeyboardShortcutsSnapshot):Promise<KeyboardShortcutsSnapshot>;recording?(value:boolean):Promise<void>;onNativeInput?(listener:(input:NativeShortcutInput)=>void):()=>void}

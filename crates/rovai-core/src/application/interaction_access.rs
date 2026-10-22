@@ -141,6 +141,8 @@ impl Core {
                 let targets=rows.into_iter().map(|(conversation,kind,agent,name,created)|{let public=kind=="camp_member";json!({"id":conversation,"agentId":agent,"displayName":name,"createdAt":created,"scope":{"threadId":input.thread_id,"conversationId":if public{None}else{Some(conversation.as_str())},"scopeKind":if public{"public"}else{kind.as_str()}})}).collect::<Vec<_>>();
                 Ok(json!({"targets":targets,"next":after}))
             }
+            "support.get"=>Ok(tools::runtime_support::snapshot()),
+            "support.cursorCandidate"=>{#[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Candidate{cwd:String,definition:crate::mcp::McpServerDefinition,native_session_id:Option<String>}let candidate:Candidate=serde_json::from_value(payload.clone())?;tools::runtime_support::cursor_session_candidate(&candidate.cwd,&candidate.definition,candidate.native_session_id.as_deref())},
             "policy.get" => Ok(serde_json::to_value(broker.policies.read()?)?),
             "policy.replace" => {
                 #[derive(Deserialize)] #[serde(rename_all="camelCase",deny_unknown_fields)] struct Replace { expected_revision:u64, value:tools::Policy }
