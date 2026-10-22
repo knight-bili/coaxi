@@ -16,7 +16,7 @@ export type PortableProviderDefinitionV1 = Omit<PortableProviderViewV1,'revision
 export interface PortableArchiveReference {archiveId:string;sourceDigest:string;sourceKind:'codeg_v1'|'fusion_v1'|'fusion_v2';counts:Record<string,number>}
 export interface PortableArchiveSelection {selectionId:string;displayName:string;sourceDigest:string;byteSize:number}
 export interface PortableExportReceipt {operationId:string;state:'unknown'|'prepared'|'ready';archiveId?:string;createdAt?:string;includeSecrets?:boolean;encryptedDigest?:string|null;byteSize?:number|null}
-export interface PortableSyncRequest {operation:'get'|'set'|'upload'|'cancel'|'resume'|'archive'|'cache_preview'|'cache_remove'|'cache_status';expectedRevision?:string|null;commandId?:string;enabled?:boolean;autoSync?:boolean;fullConfiguration?:boolean;includeSecrets?:boolean;intervalMinutes?:number;passphrase?:string;clearPassphrase?:boolean;confirmed?:boolean}
+export interface PortableSyncRequest {operation:'get'|'set'|'upload'|'cancel'|'resume'|'archive'|'cache_preview'|'cache_remove'|'cache_status'|'receipt';expectedRevision?:string|null;commandId?:string;enabled?:boolean;autoSync?:boolean;fullConfiguration?:boolean;includeSecrets?:boolean;intervalMinutes?:number;passphrase?:string;clearPassphrase?:boolean;confirmed?:boolean}
 export interface PortableConfigurationPrivateApi {
   sync<T>(input:PortableSyncRequest):Promise<T>
   prepareExport(input:{operationId:string;includeSecrets:boolean;passphrase:string}):Promise<PortableExportReceipt>

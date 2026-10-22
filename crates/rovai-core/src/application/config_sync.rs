@@ -24,6 +24,14 @@ fn reconcile(root:&Path,value:&mut State)->Result<()> {
     if !receipt.exists(){if !super::webdav_transfer::active(root,&id){value.phase="stopped".into();value.last_error=Some("配置准备已中断，尚未开始远端传输；请重新上传。".into());value.active_command_id=None;value.next_at=i64::MAX;save_state(root,value)?;}return Ok(())}
     let result=super::webdav_transfer::status(root,&id)?;if result["state"]=="completed"{value.last_digest=value.pending_digest.take();value.active_command_id=None;value.last_sync_at=Some(Utc::now().to_rfc3339());value.last_error=None;value.failures=0;value.phase="idle".into();save_state(root,value)?;}else if result["state"]=="unknown"{value.phase="unknown".into();value.last_error=result["message"].as_str().map(str::to_owned);save_state(root,value)?;}Ok(())
 }
+pub(super) fn original_receipt(root:&Path,id:&str)->Result<Value>{
+    uuid::Uuid::parse_str(id)?;
+    if root.join("webdav-operations").join(format!("{id}.json")).exists(){
+        let result=super::webdav_transfer::status(root,id)?;
+        return Ok(json!({"commandId":id,"state":result["state"],"operation":result["operation"],"snapshot":result["result"]["snapshot"]}))
+    }
+    let value=state(root)?;Ok(json!({"commandId":id,"state":if value.active_command_id.as_deref()==Some(id)&&value.phase=="preparing"{"preparing"}else{"unknown"}}))
+}
 fn begin(root:&Path,current:Settings,connection:crate::backup::webdav::Config,account_revision:String,id:String,force:bool,full:Option<(Value,String)>)->Result<Value>{
     uuid::Uuid::parse_str(&id)?;ensure!(!root.join("webdav-operations").join(format!("{id}.json")).exists(),"config_sync.command_identity_already_used");let mut previous=state(root)?;ensure!(previous.active_command_id.is_none(),"config_sync.original_upload_needs_reconciliation");let configured=crate::backup::owned_roots::configured(root)?;let preferences=configured.iter().find(|value|value.id=="desktop_preferences"&&value.kind=="preferences").map(|value|value.path.clone()).unwrap_or_else(||root.into());
     let token=CancellationToken::new();previous.active_command_id=Some(id.clone());previous.pending_digest=None;previous.phase="preparing".into();previous.last_error=None;previous.next_at=Utc::now().timestamp()+i64::from(current.interval_minutes)*60;save_state(root,&previous)?;PREPARING.lock().map_err(|_|anyhow::anyhow!("config_sync.preparation_unavailable"))?.insert(key(root,&id),token.clone());

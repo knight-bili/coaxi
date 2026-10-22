@@ -16,6 +16,12 @@ impl Core{
     async fn portable_configuration_private_inner(&self,method:&str,value:Value,client:&crate::draft_client::DraftClient)->Result<Value>{
         ensure!(serde_json::to_vec(&value)?.len()<=configuration::MAX_REQUEST,"configuration.request_too_large");
         if method=="configuration.sync"{
+            if value["operation"]=="receipt"{
+                #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Input{operation:String,command_id:String}
+                let input:Input=serde_json::from_value(value)?;ensure!(input.operation=="receipt","configuration.sync_operation_invalid");
+                let _lock=crate::workbench::MUTATIONS.lock().await;
+                return super::config_sync::original_receipt(&self.data_dir,&input.command_id)
+            }
             ensure!(value["operation"].as_str().is_some_and(|operation|["get","set","upload","cancel","resume","archive","cache_preview","cache_remove","cache_status"].contains(&operation)),"configuration.sync_operation_invalid");
             return self.config_sync_access(value).await
         }
