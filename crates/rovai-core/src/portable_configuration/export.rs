@@ -32,7 +32,7 @@ pub(crate) fn configuration_digest(connection:&Connection,root:&Path,include_sec
     }
     let mut customs=Vec::new();for id in ids(connection,"SELECT id FROM custom_runtime_head WHERE removed=0 ORDER BY id")?{customs.push(crate::custom_runtime::storage::latest(connection,&id)?.context("configuration.custom_definition_missing")?);}
     let mut values=serde_json::Map::new();for target in ["appearance","general","windowClose","messageLibrary","taskTemplates","agentSettings"]{if target=="windowClose"&&!cfg!(windows){continue}values.insert(target.into(),files::read(root,target)?);}
-    digest(&json!({"providers":revisions,"customAgents":customs,"files":values,"delegations":crate::delegation_settings::read(connection)?,"includeSecrets":include_secrets}))
+    digest(&json!({"providers":revisions,"customAgents":customs,"files":values,"channelPreferences":channel_preferences::portable(root)?,"delegations":crate::delegation_settings::read(connection)?,"includeSecrets":include_secrets}))
 }
 pub(crate) fn cache_for_sync(root:&Path,snapshot:&Value,id:&str,passphrase:&str,cancel:&tokio_util::sync::CancellationToken)->Result<std::path::PathBuf>{
     uuid::Uuid::parse_str(id)?;ensure!(!cancel.is_cancelled()&&passphrase.chars().count()>=8,"configuration.export_cancelled_or_passphrase_invalid");
@@ -102,6 +102,7 @@ pub(crate) fn collect(connection:&Connection,root:&Path,include_secrets:bool)->R
     let mut members=Vec::new();let mut query=connection.prepare("SELECT p.id,p.display_name,c.reference_json FROM portable_member_connection c JOIN agent_profile p ON p.id=c.agent_id WHERE p.profile_status='present' ORDER BY p.id")?;
     for row in query.query_map([],|row|Ok((row.get::<_,String>(0)?,row.get::<_,String>(1)?,row.get::<_,String>(2)?)))?{let(id,name,reference)=row?;members.push(json!({"sourceMemberId":id,"displayName":name,"connection":serde_json::from_str::<Value>(&reference)?}));}
     domains.insert("sourceMemberMappings".into(),json!(members));
+    domains.insert("channelPreferences".into(),json!(channel_preferences::portable(root)?));
     let snapshot=json!({"formatVersion":2,"product":"codeg-rovai-config","archiveId":uuid::Uuid::new_v4().to_string(),"appVersion":env!("CARGO_PKG_VERSION"),"createdAt":chrono::Utc::now().to_rfc3339(),"sourcePlatform":std::env::consts::OS,"domains":domains,"secretsIncluded":include_secrets,"secrets":secrets.rows});
     validate("ConfigurationArchiveV2",&snapshot)?;ensure!(serde_json::to_vec(&snapshot)?.len()<=MAX_ARCHIVE-1024*1024,"configuration.export_too_large");Ok(snapshot)
 }

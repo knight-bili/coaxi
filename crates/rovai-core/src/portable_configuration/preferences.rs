@@ -1,5 +1,13 @@
 //! 只映射源应用可迁移的明确枚举；账号、代理、终端和本机目录没有普通偏好入口。
 use super::*;
+pub(crate) fn selected_patch(entry:&Value,decision:&Value)->Result<(String,Value)>{
+    if let Some(value)=super::channel_preferences::selected(entry,decision)?{return Ok(value)}
+    let(target,value)=if let Some(value)=policies::patch(entry)?{value}else{file_patch(entry)?};
+    Ok((target.into(),value))
+}
+pub(crate) fn merge_at(root:&std::path::Path,target:&str,original:&Value,patch:&Value)->Result<Value>{
+    if super::channel_preferences::owns(target){super::channel_preferences::merge(root,target,original,patch)}else{merge(target,original,patch)}
+}
 
 pub(crate) fn file_patch(entry:&Value)->Result<(&'static str,Value)>{
     let key=entry["key"].as_str().context("configuration.preference_key_required")?;

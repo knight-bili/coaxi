@@ -83,18 +83,19 @@ pub(crate) fn preview(connection:&Connection,root:&Path,client:&str,input:&Value
                 match converted{Ok(value)=>row["after"]=value,Err(_)=>{row["status"]=json!("unsupported");row["reason"]=json!("此条原配置无法完整转换；原文保留，请补齐字段后重新预览。");}}
                 targets.insert(entry.id.clone(),json!(target));domains.insert(entry.id.clone(),json!(entry.domain));
             }else if entry.domain=="preferences"{
-                match policies::patch(&entry.value).and_then(|value|value.map(Ok).unwrap_or_else(||preferences::file_patch(&entry.value))){
+                match preferences::selected_patch(&entry.value,decision.context("configuration.decision_required")?){
                     Ok((target,patch))=>{
-                        let policy=policies::owns(target);let original=if policy{policies::basis(connection,target)?}else{json!({"version":1,"value":files::read(root,target)?})};
+                        let policy=policies::owns(&target);let original=if policy{policies::basis(connection,&target)?}else{json!({"version":1,"value":files::read(root,&target)?})};
                         for field in patch.as_object().context("configuration.preference_patch_invalid")?.keys(){
                             if !preference_fields.insert(format!("{target}.{field}")){row["status"]=json!("conflict");row["reason"]=json!("多个来源条目指向同一个设置字段，请只保留一个选择。");}
                         }
                         let before=&original["value"];row["before"]=preferences::before_fields(before,&patch);row["after"]=patch;
                         let key=text(&entry.value,"key")?;let existing=row["before"].as_object().is_some_and(|map|map.values().any(|value|!value.is_null()));
                         let decision=decision.context("configuration.decision_required")?;
-                        if(action=="create"&&(existing||!decision["targetId"].is_null()||!decision["expectedRevision"].is_null()))||(action=="replace"&&(!existing||decision["targetId"]!=key||decision["expectedRevision"]!=original["version"])){
+                        if !channel_preferences::owns(&target)&&((action=="create"&&(existing||!decision["targetId"].is_null()||!decision["expectedRevision"].is_null()))||(action=="replace"&&(!existing||decision["targetId"]!=key||decision["expectedRevision"]!=original["version"]))){
                             row["status"]=json!("conflict");row["reason"]=json!("请明确选择替换对应偏好，已有值不会按名称自动覆盖。");
                         }
+                        if channel_preferences::owns(&target)&&before.is_null(){row["status"]=json!("conflict");row["reason"]=json!("所选本机渠道已不存在，请重新选择准确目标。");}
                         targets.insert(entry.id.clone(),json!(target));domains.insert(entry.id.clone(),json!(entry.domain));
                     },
                     Err(_)=>{row["status"]=json!("unsupported");row["reason"]=json!("原值已保留；此设置需要对应策略或当前主机支持，尚未应用。");},
@@ -247,9 +248,9 @@ fn apply_on(tx:&Transaction<'_>,root:&Path,client:&str,command:&str,preview:&Val
                 let original=policy_updates.get(target).cloned().unwrap_or_else(||private["basis"]["policies"][target]["value"].clone());
                 policy_updates.insert(target.into(),policies::merge(&original,&patch)?);continue
             }
-            let(target,patch)=preferences::file_patch(&entry.value)?;ensure!(id==target,"configuration.preference_target_changed");
-            let original=file_updates.get(target).map(|(_,value)|value.clone()).unwrap_or_else(||private["basis"]["files"][target]["value"].clone());
-            let next=preferences::merge(target,&original,&patch)?;file_updates.insert(target.into(),("preferences".into(),next));continue
+            let(target,patch)=preferences::selected_patch(&entry.value,&selected["decision"])?;ensure!(id==target.as_str(),"configuration.preference_target_changed");
+            let original=file_updates.get(&target).map(|(_,value)|value.clone()).unwrap_or_else(||private["basis"]["files"][target.as_str()]["value"].clone());
+            let next=preferences::merge_at(root,&target,&original,&patch)?;file_updates.insert(target,("preferences".into(),next));continue
         }
         if entry.domain=="customAgents"{
             let before=custom_basis(tx,id)?;let definition=normalize::custom_agent(id,&entry.value)?;

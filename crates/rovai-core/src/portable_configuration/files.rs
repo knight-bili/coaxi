@@ -9,6 +9,7 @@ fn preferences(root:&Path)->Result<PathBuf>{
     Ok(configured.into_iter().find(|value|value.id=="desktop_preferences"&&value.kind=="preferences").map(|value|value.path).unwrap_or_else(||root.into()))
 }
 pub(super) fn path(root:&Path,target:&str)->Result<PathBuf>{
+    if super::channel_preferences::owns(target){let _=super::channel_preferences::read(root,target)?;return Ok(root.join("channel-adapters.json"))}
     Ok(match target{
         "messageLibrary"=>root.join("workspace-metadata/global-v1.json"),
         "taskTemplates"=>root.join("portable-configuration/task-templates-v1.json"),
@@ -20,6 +21,7 @@ pub(super) fn path(root:&Path,target:&str)->Result<PathBuf>{
     })
 }
 pub(crate) fn read(root:&Path,target:&str)->Result<Value>{
+    if super::channel_preferences::owns(target){return super::channel_preferences::read(root,target)}
     let path=path(root,target)?;
     match std::fs::symlink_metadata(&path){
         Err(error)if error.kind()==std::io::ErrorKind::NotFound=>return Ok(Value::Null),
@@ -41,6 +43,8 @@ pub(crate) fn statuses(connection:&Connection,command:&str)->Result<Vec<Value>>{
     Ok(statement.query_map([command],|row|Ok(json!({"domain":row.get::<_,String>(0)?,"targetId":row.get::<_,String>(1)?,"state":row.get::<_,String>(2)?,"errorCode":row.get::<_,Option<String>>(3)?})))?.collect::<rusqlite::Result<Vec<_>>>()?)
 }
 fn apply_one(root:&Path,target:&str,expected:&str,value:&Value)->Result<&'static str>{
+    if value["ownerPath"]!=serde_json::to_value(path(root,target)?)?{return Ok("conflict")}
+    if super::channel_preferences::owns(target){return super::channel_preferences::apply(root,target,&value["before"],&value["after"])}
     let destination=path(root,target)?;let current=read(root,target)?;
     if current==value["after"]{return Ok("applied")}
     if digest(&current)?!=expected{return Ok("conflict")}

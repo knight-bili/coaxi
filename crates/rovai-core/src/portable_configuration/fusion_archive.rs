@@ -21,6 +21,13 @@ pub(crate) fn entries(source:&archive::ParsedArchive)->Result<Vec<archive::Entry
                     push(&mut result,source,domain,index,Some(key),"preferences",json!({"key":format!("rovai.messageLibrary.{key}"),"value":serde_json::to_string(value)?}))?;
                 }
             }
+        }else if domain=="channelPreferences"{
+            for(index,row)in value.as_array().context("configuration.channel_preferences_invalid")?.iter().enumerate(){
+                for(key,field,label)in[("chat_command_prefix","commandPrefix","命令前缀"),("chat_message_language","messageLanguage","消息语言"),("chat_event_filter","notificationKinds","事件通知")]{
+                    let raw=if field=="notificationKinds"{serde_json::to_string(&row[field])?}else{row[field].as_str().context("configuration.channel_preference_invalid")?.to_owned()};
+                    push(&mut result,source,domain,index,Some(field),"preferences",json!({"name":format!("{} · {label}",row["name"].as_str().unwrap_or("源渠道")),"key":key,"value":raw}))?;
+                }
+            }
         }else{
             append_rows(&mut result,source,domain,value)?;
         }

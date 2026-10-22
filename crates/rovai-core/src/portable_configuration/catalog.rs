@@ -24,6 +24,13 @@ pub(crate) fn targets(connection:&Connection,root:&Path,domain:&str,after:Option
     }
     ensure!(domain=="preferences","configuration.catalog_domain_unknown");
     let entries=[("system_language_settings","语言"),("appearance_mode","主题"),("appearance_zoom_level","缩放"),("system_close_behavior_settings","关闭窗口方式")];let mut items=Vec::new();
+    for channel in channel_preferences::portable(root)?{
+        let channel_id=channel["sourceAdapterId"].as_str().context("configuration.channel_target_invalid")?;uuid::Uuid::parse_str(channel_id)?;
+        for(key,label)in[("chat_command_prefix","命令前缀"),("chat_message_language","消息语言"),("chat_event_filter","事件通知")]{
+            let id=format!("channel:{channel_id}:{key}");if after.is_some_and(|after|id.as_str()<=after){continue}
+            items.push(json!({"id":id,"name":format!("{} · {label}",channel["name"].as_str().unwrap_or("本机渠道")),"revision":1}));
+        }
+    }
     for(key,field)in preferences::NATIVE_FIELDS{
         if after.is_some_and(|after|*key<=after){continue}
         let target=key.split('.').nth(1).context("configuration.catalog_key_invalid")?;
