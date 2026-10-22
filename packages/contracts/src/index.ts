@@ -670,6 +670,28 @@ export interface RuntimeUsageSnapshot {
   }
 }
 
+export interface UsageActivityQuery {
+  range:'24h'|'7d'|'30d'|'90d'|'thisMonth'|'thisYear'|'all'|'custom'
+  start?:string;end?:string;bucket:'day'|'week'|'month';tzOffsetMinutes:number
+  runtimeKind?:AdapterKind;providerKey?:string;modelKey?:string;projectRoot?:string
+}
+export interface UsageActivityCounters {
+  inputTokens:number|null;uncachedInputTokens:number|null;cacheReadTokens:number|null;cacheWriteTokens:number|null;outputTokens:number|null
+  knownTotalTokens:number;partialObservations:number;observedBuckets:number
+}
+export interface UsageActivityReport {
+  schemaVersion:1;source:'core_usage_activity';generatedAt:string;recordingStartedAt:string;retentionDays:number;resolutionSeconds:number
+  range:{from:string;to:string};bucket:UsageActivityQuery['bucket'];tzOffsetMinutes:number
+  totals:UsageActivityCounters&{runs:number};previous:UsageActivityCounters&{runs:number}
+  series:Array<UsageActivityCounters&{key:string}>
+  heatmap:Array<UsageActivityCounters&{weekday:number;hour:number}>
+  byProject:Array<UsageActivityCounters&{key:string;runs:number}>
+  byRuntime:Array<UsageActivityCounters&{key:string;runs:number}>
+  byModel:Array<UsageActivityCounters&{key:string;runs:number}>
+  facets:{projects:string[];runtimes:string[];providers:string[];models:string[];limit:number}
+  runCost:RuntimeUsageMoneyValue[];costScope:'whole_runs_overlapping_range';includesImportedNativeHistory:false
+}
+
 export interface RuntimeExecutionMetricsSnapshot {
   schemaVersion: 1
   runs: Array<{
@@ -4753,6 +4775,7 @@ export type CoreMethod =
   | 'health.check'
   | 'diagnostics.check'
   | 'monitoring.snapshot'
+  | 'monitoring.report'
   | 'monitoring.execution'
   | 'runtime.discovery.rescan'
   | 'runtime.networkRecovery.wake'

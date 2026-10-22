@@ -857,6 +857,7 @@ fn request_runs_outside_main_queue(method: &str) -> bool {
             | "diagnostics.check"
             | "diagnostics.export"
             | "monitoring.snapshot"
+            | "monitoring.report"
             | "monitoring.execution"
             | "runtime.installations.refresh"
             | "runtime.discovery.rescan"
@@ -12150,6 +12151,10 @@ impl Core {
                 )?)
             }
             "diagnostics.check" => Ok(serde_json::to_value(self.diagnostics_report().await)?),
+            "monitoring.report" => {
+                let mut database = self.database.lock().await;
+                MonitoringService::report(&mut database, request.params.clone())
+            }
             "monitoring.snapshot" => {
                 let filter: MonitoringFilter = serde_json::from_value(request.params.clone())?;
                 let lock_wait_started = Instant::now();

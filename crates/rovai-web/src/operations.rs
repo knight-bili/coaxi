@@ -389,6 +389,8 @@ pub enum Operation {
     Subsystems,
     #[serde(rename = "monitoring.snapshot")]
     Monitoring,
+    #[serde(rename = "monitoring.report")]
+    MonitoringReport,
     #[serde(rename = "monitoring.execution")]
     ExecutionMetrics,
     #[serde(rename = "skills.list")]
@@ -861,6 +863,7 @@ impl Operation {
             Self::Installations => "runtime.installations.list",
             Self::Subsystems => "runtime.subsystems.get",
             Self::Monitoring => "monitoring.snapshot",
+            Self::MonitoringReport => "monitoring.report",
             Self::ExecutionMetrics => "monitoring.execution",
             Self::Skills => "skills.list",
             Self::Skill => "skills.get",
