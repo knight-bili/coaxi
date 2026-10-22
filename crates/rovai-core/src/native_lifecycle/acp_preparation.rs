@@ -22,7 +22,7 @@ async fn host(cwd:&Path,runtime:&FrozenAgentRuntimeConfig,private:&Path)->Result
 async fn qualify(host:&AcpHost,origin:&native::NativeSessionOriginV1,location:&native::source::Location)->Result<(Value,String)>{
     let initialize=host.initialize_result.read().await.clone().context("native_lifecycle.initialize_missing")?;
     anyhow::ensure!(acp_policy::provider_matches(&origin.source.provider,&initialize),"native_lifecycle.provider_program_mismatch");
-    let captured=host.native_source.as_ref().context("native_lifecycle.program_source_unproven")?;
+    let captured=host.native_preparation_source.as_ref().or(host.native_source.as_ref()).context("native_lifecycle.program_source_unproven")?;
     anyhow::ensure!(captured.contains_selected_root(&location.root)?,"native_lifecycle.program_source_mismatch");
     match origin.mode{
         native::NativeContinuationMode::Continue=>anyhow::ensure!(initialize.pointer("/agentCapabilities/loadSession").and_then(Value::as_bool)==Some(true),"native_lifecycle.strict_load_unavailable"),
