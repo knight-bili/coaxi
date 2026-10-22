@@ -33,6 +33,9 @@ pub trait DomainCommand: sealed::Sealed + Serialize {
     fn feedback_continuation(&self) -> Option<crate::ui_feedback::continuation::Input> {
         None
     }
+    fn native_input_continuation(&self) -> Option<crate::native_lifecycle::normal::Input> {
+        None
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -294,10 +297,17 @@ impl DomainCommandGateway {
                 anyhow::ensure!(matches!(&envelope.actor, ActorRef::User { .. }), "feedback.user_required");
                 crate::ui_feedback::continuation::validate(&transaction, &input)?;
             }
+            if let Some(input) = envelope.payload.native_input_continuation() {
+                anyhow::ensure!(matches!(&envelope.actor, ActorRef::User { .. }),"native_lifecycle.user_required");
+                crate::native_lifecycle::normal::validate(&transaction,&input)?;
+            }
             handler(&transaction)?
         };
         if let Some(input) = envelope.payload.feedback_continuation() {
             crate::ui_feedback::continuation::complete(&transaction, &input, &envelope.command_id, &handler_result)?;
+        }
+        if let Some(input) = envelope.payload.native_input_continuation() {
+            crate::native_lifecycle::normal::complete(&transaction,&input,&envelope.command_id,&handler_result)?;
         }
         let recorded_at = chrono::Utc::now().to_rfc3339();
         let mut stored_result = StoredCommandResult {

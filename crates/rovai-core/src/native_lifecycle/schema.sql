@@ -45,6 +45,16 @@ CREATE TABLE native_lifecycle_continuation_preview (
  source_snapshot_digest TEXT NOT NULL,initialize_digest TEXT,
  runtime_json TEXT NOT NULL CHECK(json_valid(runtime_json) AND length(runtime_json)<=2097152)
 );
+CREATE TABLE native_lifecycle_normal_preview (
+ id TEXT PRIMARY KEY NOT NULL,source_command_id TEXT NOT NULL REFERENCES native_lifecycle_intent(command_id),
+ client_id TEXT NOT NULL,digest TEXT NOT NULL,value_json TEXT NOT NULL CHECK(json_valid(value_json) AND length(value_json)<=2097152),
+ expires_at_ms INTEGER NOT NULL,created_at TEXT NOT NULL
+);
+CREATE TABLE native_lifecycle_normal_continuation (
+ source_command_id TEXT PRIMARY KEY NOT NULL REFERENCES native_lifecycle_intent(command_id),
+ command_id TEXT NOT NULL UNIQUE,preview_id TEXT NOT NULL REFERENCES native_lifecycle_normal_preview(id),
+ client_id TEXT NOT NULL,result_json TEXT NOT NULL CHECK(json_valid(result_json)),created_at TEXT NOT NULL
+);
 CREATE TABLE native_lifecycle_steer_policy (
  singleton INTEGER PRIMARY KEY NOT NULL CHECK(singleton=1), revision INTEGER NOT NULL CHECK(revision>=0),
  value_json TEXT NOT NULL CHECK(json_valid(value_json) AND length(value_json)<=2097152)

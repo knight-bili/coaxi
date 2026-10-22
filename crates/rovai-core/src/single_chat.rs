@@ -450,7 +450,9 @@ impl SingleChatService {
         {
             return Ok(vec![]);
         }
-        let sources = materials.sources()?;
+        let sources = if let Some(input)=envelope.payload.native_input_continuation(){
+            crate::native_lifecycle::normal::validate(connection,&input)?;input.sources
+        }else{materials.sources()?};
         if sources.len() > MAX_PREPARED_ATTACHMENTS {
             return Ok(vec![]);
         }
@@ -920,7 +922,8 @@ impl SingleChatService {
                 &key,
             )?;
             let draft_revision = materials.revision;
-            let source_attachments = materials.sources()?;
+            let native_input=envelope.payload.native_input_continuation();
+            let source_attachments = match &native_input{Some(input)=>input.sources.clone(),None=>materials.sources()?};
             if draft_revision != command.draft_revision {
                 return Ok(CommandHandlerResult::rejected(
                     "single_chat.draft_changed",
@@ -928,8 +931,8 @@ impl SingleChatService {
                 ));
             }
             let feedback_continuation = envelope.payload.feedback_continuation().is_some();
-            let body = if feedback_continuation { command.body.as_str() } else { command.body.trim() };
-            let quotes = materials.quotes()?;
+            let body = if feedback_continuation||native_input.is_some() { command.body.as_str() } else { command.body.trim() };
+            let quotes = if native_input.is_some(){Vec::new()}else{materials.quotes()?};
             if feedback_continuation && (!source_attachments.is_empty() || !quotes.is_empty()) {
                 return Ok(rejected("feedback.composer_materials_present", "请先处理普通输入中的材料，再确认反馈续办"));
             }
@@ -980,13 +983,13 @@ impl SingleChatService {
                     &pending_input_id,
                     &quotes,
                 )?;
-                consume_single_chat_draft(
+                if native_input.is_none(){consume_single_chat_draft(
                     transaction,
                     &target.conversation_id,
                     draft_revision,
                     client,
                     &key,
-                )?;
+                )?;}
                 append_domain_event(
                     transaction,
                     "single_chat.pending_input_queued",
@@ -1004,7 +1007,7 @@ impl SingleChatService {
                     json!({
                         "conversationId": target.conversation_id,
                         "conversationVersion": target.version,
-                        "draftRevision": draft_revision + 1,
+                        "draftRevision": draft_revision + if native_input.is_some(){0}else{1},
                         "pendingInputId": pending_input_id,
                     }),
                     Some(entity_ref("single_chat_pending_input", &pending_input_id)),
@@ -1038,7 +1041,7 @@ impl SingleChatService {
                 &quotes,
                 &runtime,
                 &envelope.command_id,
-                Some((draft_revision, client, &key)),
+                native_input.is_none().then_some((draft_revision, client, &key)),
                 &envelope.actor,
             )?;
             Ok(CommandHandlerResult::accepted(
@@ -1046,7 +1049,7 @@ impl SingleChatService {
                 json!({
                     "conversationId": target.conversation_id,
                     "conversationVersion": admitted.conversation_version,
-                    "draftRevision": draft_revision + 1,
+                    "draftRevision": draft_revision + if native_input.is_some(){0}else{1},
                     "conversationMessageId": admitted.conversation_message_id,
                     "threadTurnId": admitted.camp_turn_id,
                     "agentRunId": admitted.agent_run_id,

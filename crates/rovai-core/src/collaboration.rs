@@ -2640,6 +2640,9 @@ impl CollaborationService {
     ) -> Result<CommandExecution> {
         self.send_user_automation_inner(database, envelope, &envelope.payload.message)
     }
+    pub(crate) fn send_native_input_camp_message(&self,database:&mut Database,envelope:&CommandEnvelope<crate::native_lifecycle::normal::PublicCommand>)->Result<CommandExecution>{
+        self.send_user_automation_inner(database,envelope,&envelope.payload.message)
+    }
 
     fn send_user_automation_inner<C: DomainCommand>(
         &self,
@@ -2650,22 +2653,23 @@ impl CollaborationService {
         if input.agent_id.trim().is_empty() {
             anyhow::bail!("agentId must not be empty");
         }
-        if input.body.trim().is_empty() {
+        if input.body.trim().is_empty() && !envelope.payload.native_input_continuation().is_some_and(|input|!input.sources.is_empty()) {
             anyhow::bail!("body must not be empty");
         }
         let camp_id = input.camp_id.clone();
         let body = input.body.clone();
-        let content = normalize_content(vec![
+        let segments = vec![
             StructuredThreadMessageSegment::MemberMention {
                 agent_id: input.agent_id.clone(),
             },
             StructuredThreadMessageSegment::Text {
                 text: format!(" {body}"),
             },
-        ]);
+        ];
+        let content=if envelope.payload.native_input_continuation().is_some(){segments}else{normalize_content(segments)};
         validate_user_authored_content(&content)?;
         let command = SendUserThreadDraftCommand {
-            draft_client: DraftClient::default(),
+            draft_client: envelope.payload.draft_client().cloned().unwrap_or_default(),
             camp_id: camp_id.clone(),
             // Automation does not consume Composer authority or attachments.
             // The revision is therefore only a validated inert placeholder.
@@ -2721,7 +2725,7 @@ impl CollaborationService {
                 Ok(Ok(ThreadMessageSubmission {
                     body: rendered_body,
                     structured_content: content,
-                    source_attachments: Vec::new(),
+                    source_attachments: envelope.payload.native_input_continuation().map_or_else(Vec::new,|input|input.sources),
                     prepared_attachment_ids: Vec::new(),
                     address: ThreadMessageAddress::Explicit {
                         agent_ids: vec![input.agent_id.clone()],
@@ -3033,7 +3037,7 @@ impl CollaborationService {
             std::result::Result<ThreadMessageSubmission, CommandHandlerResult>,
         >,
     {
-        Self::validate_send_message_input(command)?;
+        validate_camp_message_input_with_materials(command,envelope.payload.native_input_continuation().is_some_and(|input|!input.sources.is_empty()))?;
         let camp_message_id = Uuid::new_v4().to_string();
         self.gateway.execute(database, envelope, |transaction| {
             // A rejected command receipt is committed by the gateway. Roll back
@@ -4973,11 +4977,14 @@ fn actor_has_capability(
 }
 
 fn validate_camp_message_input(command: &SendUserThreadDraftCommand) -> Result<()> {
+    validate_camp_message_input_with_materials(command,false)
+}
+fn validate_camp_message_input_with_materials(command: &SendUserThreadDraftCommand,has_independent_materials:bool) -> Result<()> {
     if command.draft_revision < 1 {
         anyhow::bail!("draftRevision must be a positive Core Revision");
     }
     if let Some(execution) = &command.execution {
-        if execution.purpose.trim().is_empty() {
+        if execution.purpose.trim().is_empty() && !has_independent_materials {
             anyhow::bail!("Execution request requires purpose");
         }
         if !matches!(execution.completion_role.as_str(), "required" | "optional") {
