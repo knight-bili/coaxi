@@ -1,4 +1,5 @@
 import { WebdavSettings } from './WebdavSettings'
+import { KeyboardShortcutSettings } from './KeyboardShortcutSettings'
 import { ExtensionCatalogSettings } from './ExtensionCatalogSettings'
 import { BackupSettings } from './BackupSettings'
 import { WindowCloseSettings } from './WindowCloseSettings'
@@ -372,6 +373,7 @@ export function GeneralSettings({
       <div className="general-settings-body">
         {browserAccess}
         <BackupSettings/>
+        <KeyboardShortcutSettings/>
         <WebdavSettings/>
         <ExtensionCatalogSettings/>
         <section className="section-block general-settings-section general-language-section" aria-labelledby="general-language-heading">
