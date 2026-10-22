@@ -74,6 +74,7 @@ pub fn upsert(database:&mut Database,envelope:&CommandEnvelope<Upsert>)->Result<
     DomainCommandGateway.execute(database,envelope,|tx|{
         if !matches!(&envelope.actor,ActorRef::User{..}){return Ok(reject("custom_runtime.user_required"))}
         let input=&envelope.payload;let mut value=input.definition.clone();
+        if normalize_skill_directory(&mut value).is_err(){return Ok(reject("custom_runtime.skill_directory_invalid"))}
         if validate_definition(&value,true).is_err()||!(0..9_007_199_254_740_991).contains(&input.expected_revision){return Ok(reject("custom_runtime.definition_invalid"))}
         let id=text(&value,"id")?.to_owned();let previous=latest(tx,&id)?;
         let current:i64=tx.query_row("SELECT COALESCE(MAX(revision),0) FROM custom_runtime_definition WHERE id=?1",[&id],|r|r.get(0))?;

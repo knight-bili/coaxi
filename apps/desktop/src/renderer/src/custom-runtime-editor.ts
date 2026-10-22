@@ -19,9 +19,9 @@ export function parseCustomDistribution(text:string,kind:CustomRuntimeDefinition
   if(channels.binary&&Object.keys(object(channels.binary)).length)kinds.push('binary');if(channels.npx)kinds.push('npx');if(channels.uvx)kinds.push('uvx')
   if(!kinds.includes(kind))throw new Error('所选分发方式不在这份配置中。')
   const spec:CustomRuntimeDefinitionInput['spec']={npx:null,uvx:null,binary:{}}
-  if(kind==='npx')spec.npx=packageSpec(channels.npx,'npx') as NonNullable<typeof spec.npx>
-  else if(kind==='uvx')spec.uvx=packageSpec(channels.uvx,'uvx') as NonNullable<typeof spec.uvx>
-  else for(const [platform,entry]of Object.entries(object(channels.binary))){const item=object(entry);known(item,['archive','url','cmd','args','env','sha256']);if('archive'in item&&'url'in item)throw new Error('同一下载地址不能同时填写 archive 和 url。');(spec.binary as ObjectValue)[platform]={archive:item.archive??item.url,cmd:item.cmd??'',args:item.args??[],env:item.env??{},sha256:item.sha256??null}}
+  if(channels.npx)spec.npx=packageSpec(channels.npx,'npx') as NonNullable<typeof spec.npx>
+  if(channels.uvx)spec.uvx=packageSpec(channels.uvx,'uvx') as NonNullable<typeof spec.uvx>
+  if(channels.binary)for(const [platform,entry]of Object.entries(object(channels.binary))){const item=object(entry);known(item,['archive','url','cmd','args','env','sha256']);if('archive'in item&&'url'in item)throw new Error('同一下载地址不能同时填写 archive 和 url。');(spec.binary as ObjectValue)[platform]={archive:item.archive??item.url,cmd:item.cmd??'',args:item.args??[],env:item.env??{},sha256:item.sha256??null}}
   return {spec,metadata,kinds}
 }
 export function newCustomDefinition():CustomRuntimeDefinitionInput{return {schemaVersion:1,id:newCommandId(),registryId:'',name:'',description:'',version:'1.0.0',distributionKind:'npx',spec:{npx:{package:'',args:['--acp'],env:{},cmd:null,nodeRequired:null},uvx:null,binary:{}},iconUrl:null,skillsSharedStore:false,skillsDir:null,source:'manual',sourceRef:null,versionProbe:null,supportsMcp:true,enabled:true}}

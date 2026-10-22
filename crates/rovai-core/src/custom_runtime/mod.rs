@@ -37,10 +37,16 @@ pub fn validate_operation(operation:&str,value:&Value)->Result<()>{ensure!(serde
 pub fn validate_definition(value:&Value,input:bool)->Result<()>{
     validate(if input{"definitionInput"}else{"definitionView"},value)?;
     let kind=text(value,"distributionKind")?;let spec=&value["spec"];
-    ensure!(match kind{"npx"=>spec["npx"].is_object()&&spec["uvx"].is_null()&&spec["binary"].as_object().is_some_and(|v|v.is_empty()),"uvx"=>spec["uvx"].is_object()&&spec["npx"].is_null()&&spec["binary"].as_object().is_some_and(|v|v.is_empty()),"binary"=>spec["npx"].is_null()&&spec["uvx"].is_null()&&spec["binary"].as_object().is_some_and(|v|!v.is_empty()),_=>false},"custom_runtime.distribution_invalid");
+    ensure!(match kind{"npx"=>spec["npx"].is_object(),"uvx"=>spec["uvx"].is_object(),"binary"=>spec["binary"].as_object().is_some_and(|v|!v.is_empty()),_=>false},"custom_runtime.distribution_invalid");
     if let Some(directory)=value["skillsDir"].as_str(){ensure!(std::path::Path::new(directory).is_absolute(),"custom_runtime.skill_directory_not_absolute")}
     if let Some(platforms)=spec["binary"].as_object(){for platform in platforms.values(){let url=reqwest::Url::parse(text(platform,"archive")?).context("custom_runtime.archive_url_invalid")?;ensure!(url.scheme()=="https"&&url.host_str().is_some()&&url.username().is_empty()&&url.password().is_none(),"custom_runtime.archive_https_required")}}
     Ok(())
+}
+/// 仅展开执行 Host 的家目录；不读取任意变量，也不替换其他平台的路径。
+pub(crate) fn normalize_skill_directory(value:&mut Value)->Result<()>{
+    let Some(directory)=value["skillsDir"].as_str()else{return Ok(())};
+    let suffix=if directory=="~"{Some("")}else{directory.strip_prefix("~/").or_else(||directory.strip_prefix("~\\"))};
+    if let Some(suffix)=suffix{let home=dirs::home_dir().context("custom_runtime.home_missing")?;ensure!(home.is_absolute(),"custom_runtime.home_not_absolute");value["skillsDir"]=json!(home.join(suffix).to_string_lossy());}Ok(())
 }
 /// 指针由 Core 固定生成，秘密的归属包括定义、分发通道及环境变量名。
 pub(crate) fn environments(value:&Value)->Vec<String>{
