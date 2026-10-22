@@ -22,6 +22,8 @@ import kotlinx.serialization.json.*
 @Composable
 fun RovaiSkillSettings(model:RovaiWorkspaceViewModel){
     val state by model.state.collectAsStateWithLifecycle();val scope=rememberCoroutineScope()
+    var native by remember{mutableStateOf(false)}
+    if(native)RovaiNativeSkills(model,onClose={native=false})
     var catalog by remember{mutableStateOf(buildJsonObject{})};var installations by remember{mutableStateOf<List<JsonObject>>(emptyList())}
     var assignments by remember{mutableStateOf<List<JsonObject>>(emptyList())};var selected by remember{mutableStateOf<String?>(null)}
     var query by remember{mutableStateOf("")};var family by remember{mutableStateOf("all")};var content by remember{mutableStateOf(buildJsonObject{})}
@@ -35,6 +37,7 @@ fun RovaiSkillSettings(model:RovaiWorkspaceViewModel){
     val disabled=state.pending!=null||state.busy||loading
     fun localized(value:JsonElement?):String{val objectValue=value.coreObject();return objectValue.coreText("zh-CN").ifEmpty{objectValue.coreText("zh").ifEmpty{objectValue.coreText("en")}}}
     LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
+        item{TextButton(onClick={native=true}){Text("查看原生 Skills")}}
         item{Row(Modifier.fillMaxWidth()){if(selected!=null)TextButton(onClick={selected=null}){Text("返回技能库")};TextButton(onClick={scope.launch{load()}},enabled=!disabled){Text("刷新")}}}
         issue?.let{item{Text(it,color=CodegTheme.colors.danger)}}
         if(entry==null){
