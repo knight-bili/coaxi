@@ -3,6 +3,7 @@ use crate::native_lifecycle::{self as native,storage};
 
 impl Core{
     pub(super) async fn native_lifecycle_access(self:&Arc<Self>,method:&str,value:Value,client:crate::draft_client::DraftClient)->Result<Value>{
+        if matches!(method,"history.execution.records"|"runtime.steer.evidence"){return self.native_lifecycle_records(method,value,&client).await}
         if matches!(method,"runtime.steer.normal.preview"|"runtime.steer.normal.confirm"|"runtime.steer.normal.receipt"){return self.native_normal_access(method,value,client).await}
         if method=="runtime.steer.materials.prepare"{return self.native_steer_materials(value,&client).await}
         native::validate_operation(method,&value)?;
@@ -49,6 +50,33 @@ impl Core{
             },
             _=>anyhow::bail!("native_lifecycle.operation_unknown"),
         }
+    }
+    async fn native_lifecycle_records(&self,method:&str,value:Value,client:&crate::draft_client::DraftClient)->Result<Value>{
+        anyhow::ensure!(serde_json::to_vec(&value)?.len()<=2*1024*1024,"native_lifecycle.request_too_large");
+        let database=self.database.lock().await;let connection=database.connection();
+        if method=="history.execution.records"{
+            #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Request{schema_version:u32,source_thread_id:String,import_id:Option<String>,after:Option<String>,limit:u32}
+            let input:Request=serde_json::from_value(value)?;anyhow::ensure!(input.schema_version==1&&(1..=50).contains(&input.limit),"native_lifecycle.records_request_invalid");ThreadId::parse(&input.source_thread_id)?;
+            if let Some(id)=&input.import_id{anyhow::ensure!(id.len()==64&&id.bytes().all(|byte|byte.is_ascii_hexdigit()),"native_lifecycle.import_id_invalid");}if let Some(after)=&input.after{uuid::Uuid::parse_str(after)?;}
+            let mut statement=connection.prepare("SELECT p.id,p.value_json,i.command_id,n.preparation_evidence_json FROM native_lifecycle_preview p LEFT JOIN native_lifecycle_intent i ON i.preview_id=p.id LEFT JOIN native_lifecycle_continuation n ON n.command_id=i.command_id WHERE p.kind='continuation' AND p.owner_thread_id=?1 AND p.client_id=?2 AND (?3 IS NULL OR json_extract(p.value_json,'$.source.importId')=?3) AND (?4 IS NULL OR p.id>?4) ORDER BY p.id LIMIT ?5")?;
+            let mut rows=statement.query_map(rusqlite::params![input.source_thread_id,client.id(),input.import_id,input.after,input.limit+1],|row|Ok((row.get::<_,String>(0)?,row.get::<_,String>(1)?,row.get::<_,Option<String>>(2)?,row.get::<_,Option<String>>(3)?)))?.collect::<rusqlite::Result<Vec<_>>>()?;
+            let more=rows.len()>input.limit as usize;rows.truncate(input.limit as usize);let next=more.then(||rows.last().map(|row|row.0.clone())).flatten();
+            let items=rows.into_iter().map(|(_,raw,command,proof)|->Result<Value>{
+                let preview:Value=serde_json::from_str(&raw)?;native::validate_shape("NativeContinuationPreviewV1",&preview)?;
+                let receipt=command.map(|command|native::continuation::receipt(connection,&command,client.id(),self.interaction_tools.core_instance())).transpose()?;
+                let preparation=proof.map(|raw|serde_json::from_str::<acp::NativePreparationProof>(&raw)).transpose()?;
+                Ok(json!({"preview":preview,"receipt":receipt,"preparation":preparation}))
+            }).collect::<Result<Vec<_>>>()?;
+            return Ok(json!({"schemaVersion":1,"items":items,"next":next}))
+        }
+        #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Request{schema_version:u32,command_id:String}
+        let input:Request=serde_json::from_value(value)?;anyhow::ensure!(input.schema_version==1,"native_lifecycle.version_invalid");uuid::Uuid::parse_str(&input.command_id)?;
+        let(preview,delivery):(String,String)=connection.query_row("SELECT p.value_json,d.value_json FROM native_lifecycle_intent i JOIN native_lifecycle_preview p ON p.id=i.preview_id JOIN native_lifecycle_input_delivery d ON d.command_id=i.command_id WHERE i.command_id=?1 AND i.kind='steer' AND i.client_id=?2",rusqlite::params![input.command_id,client.id()],|row|Ok((row.get(0)?,row.get(1)?)))?;
+        let preview:Value=serde_json::from_str(&preview)?;let delivery:Value=serde_json::from_str(&delivery)?;native::validate_shape("NativeSteerPreviewV1",&preview)?;native::validate_shape("NativeInputDeliveryV1",&delivery)?;
+        let receipt=native::steer_delivery::receipt(connection,&input.command_id,client.id(),self.interaction_tools.core_instance())?;
+        let normal:Option<String>=connection.query_row("SELECT result_json FROM native_lifecycle_normal_continuation WHERE source_command_id=?1 AND client_id=?2",rusqlite::params![input.command_id,client.id()],|row|row.get(0)).optional()?;
+        let normal=normal.map(|raw|serde_json::from_str::<crate::command::CommandHandlerResult>(&raw)).transpose()?;
+        Ok(json!({"schemaVersion":1,"preview":preview,"receipt":receipt,"delivery":delivery,"normalContinuation":normal}))
     }
     async fn native_steer_materials(&self,value:Value,client:&crate::draft_client::DraftClient)->Result<Value>{
         #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Request{schema_version:u32,target:native::NativeSteerTargetV1,source_ids:Vec<String>,composer_scope:Option<crate::single_chat_composer_scope::SingleChatComposerScope>}
