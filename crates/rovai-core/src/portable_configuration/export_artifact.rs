@@ -5,7 +5,9 @@ use std::{io::Read,path::{Path,PathBuf}};
 use crate::platform::private_storage;
 
 #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]
-pub(crate) struct Prepare{pub operation_id:String,pub include_secrets:bool,pub passphrase:String}
+pub(crate) struct Prepare{pub operation_id:String,pub include_secrets:bool,pub passphrase:String,pub source_archive:Option<SourceArchive>}
+#[derive(Deserialize,Serialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]
+pub(crate) struct SourceArchive{pub archive_id:String,pub source_digest:String}
 #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]
 pub(crate) struct ReadExport{pub operation_id:String}
 pub(crate) struct Frozen{pub directory:PathBuf,pub snapshot:Value,pub metadata:Value,pub passphrase:String}
@@ -21,13 +23,15 @@ fn read_bytes(path:&Path,limit:usize)->Result<Vec<u8>>{
     let mut file=private_storage::open_private_read_file(path)?;let mut bytes=Vec::new();file.by_ref().take(limit as u64+1).read_to_end(&mut bytes)?;ensure!(bytes.len()<=limit,"configuration.export_file_too_large");Ok(bytes)
 }
 fn hash(bytes:&[u8])->String{use sha2::{Digest,Sha256};format!("sha256:{:x}",Sha256::digest(bytes))}
-fn public(metadata:&Value)->Value{json!({"operationId":metadata["operationId"],"archiveId":metadata["archiveId"],"createdAt":metadata["createdAt"],"includeSecrets":metadata["includeSecrets"],"state":metadata["state"],"encryptedDigest":metadata["encryptedDigest"],"byteSize":metadata["byteSize"]})}
+fn public(metadata:&Value)->Value{let mut value=json!({"operationId":metadata["operationId"],"archiveId":metadata["archiveId"],"createdAt":metadata["createdAt"],"includeSecrets":metadata["includeSecrets"],"state":metadata["state"],"encryptedDigest":metadata["encryptedDigest"],"byteSize":metadata["byteSize"]});if let Some(source)=metadata.get("sourceArchive"){value["sourceArchive"]=source.clone();}value}
 
 /// 调用方持有配置互斥与数据库锁；在释放锁前冻结原快照和请求证据。
 pub(crate) fn freeze(connection:&Connection,root:&Path,client:&str,input:Prepare)->Result<Frozen>{
     ensure!(input.passphrase.chars().count()>=8&&input.passphrase.len()<=16000,"configuration.export_passphrase_invalid");
     let path=directory(root,client,&input.operation_id)?;
-    let request=serde_json::to_vec(&json!({"includeSecrets":input.include_secrets,"passphrase":input.passphrase}))?;
+    let mut request=json!({"includeSecrets":input.include_secrets,"passphrase":input.passphrase});
+    if let Some(source)=&input.source_archive{ensure!(input.include_secrets,"configuration.original_archive_requires_explicit_secret_confirmation");request["sourceArchive"]=serde_json::to_value(source)?;}
+    let request=serde_json::to_vec(&request)?;
     let context=format!("configuration-export:{client}:{}",input.operation_id);
     let hmac=crate::member_environment::private_input_hmac(connection,&context,&request)?;
     let receipt=path.join("receipt.json");let frozen=path.join("snapshot.bin");
@@ -40,11 +44,14 @@ pub(crate) fn freeze(connection:&Connection,root:&Path,client:&str,input:Prepare
         ensure!(metadata["snapshotDigest"].as_str()==Some(digest(&snapshot)?.as_str()),"configuration.export_snapshot_changed");(snapshot,metadata)
     }else{
         ensure!(!frozen.exists()&&!path.join("configuration.rovai-config").exists(),"configuration.export_preparation_incomplete");
-        let snapshot=super::export::collect(connection,root,input.include_secrets)?;
+        // 原归档再导出保持完整原文，包括未来未知字段；必须明确确认其可能携带原秘密。
+        let snapshot=if let Some(source)=&input.source_archive{archive_store::retained(connection,root,client,&source.archive_id,&source.source_digest)?.original}else{super::export::collect(connection,root,input.include_secrets)?};
+        ensure!(serde_json::to_vec(&snapshot)?.len()<=MAX_ARCHIVE-1024*1024,"configuration.export_too_large");
         let cipher=crate::member_environment::encrypt(connection,&context,&snapshot)?;
         private_storage::prepare_private_directory(&path)?;
         private_storage::atomic_write_private_bytes(&frozen,&cipher)?;
-        let metadata=json!({"schemaVersion":1,"operationId":input.operation_id,"archiveId":snapshot["archiveId"],"createdAt":snapshot["createdAt"],"includeSecrets":input.include_secrets,"requestHmac":hmac,"snapshotDigest":digest(&snapshot)?,"snapshotCipherDigest":hash(&cipher),"state":"prepared","encryptedDigest":null,"byteSize":null});
+        let mut metadata=json!({"schemaVersion":1,"operationId":input.operation_id,"archiveId":snapshot["archiveId"],"createdAt":snapshot["createdAt"],"includeSecrets":input.include_secrets,"requestHmac":hmac,"snapshotDigest":digest(&snapshot)?,"snapshotCipherDigest":hash(&cipher),"state":"prepared","encryptedDigest":null,"byteSize":null});
+        if let Some(source)=&input.source_archive{metadata["sourceArchive"]=serde_json::to_value(source)?;metadata["archiveId"]=json!(source.archive_id);metadata["createdAt"]=json!(chrono::Utc::now().to_rfc3339());}
         private_storage::atomic_write_private_json(&receipt,&metadata)?;(snapshot,metadata)
     };
     Ok(Frozen{directory:path,snapshot,metadata,passphrase:input.passphrase})
