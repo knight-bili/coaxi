@@ -21,6 +21,8 @@ use crate::{
     runtime_pricing::{CodexTokenBuckets, estimate_codex_api_price, supports_codex_price_estimate},
 };
 
+mod report;
+
 const USAGE_SCHEMA_VERSION: i64 = 2;
 
 pub(crate) const ASYNC_SETTLEMENT_TRIGGER: &str = "CREATE TRIGGER runtime_usage_agent_run_terminal
@@ -1026,6 +1028,7 @@ impl MonitoringService {
             "#,
             [&cutoff],
         )?;
+        deleted += report::retain_activity(&transaction, Utc::now())?;
         transaction.commit()?;
         Ok(deleted)
     }
@@ -1784,6 +1787,7 @@ fn update_hourly(
         return Ok(());
     }
     let bucket = hour_bucket(parse_time(occurred_at)?).to_rfc3339();
+    report::record_activity(transaction, collection_epoch, run, delta, &bucket)?;
     let changed = transaction.execute(
         r#"
         UPDATE runtime_usage_hourly
