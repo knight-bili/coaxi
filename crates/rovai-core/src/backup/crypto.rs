@@ -129,11 +129,10 @@ pub fn encrypt_file(
     cancel: &CancellationToken,
 ) -> Result<(), AppCommandError> {
     let reader = BufReader::new(File::open(src).map_err(AppCommandError::io)?);
-    let writer = BufWriter::new(File::create(dest).map_err(AppCommandError::io)?);
-    encrypt_stream(reader, writer, passphrase, cancel)
+    encrypt_stream(reader, || File::create(dest).map(BufWriter::new).map_err(AppCommandError::io), passphrase, cancel)
 }
 
-fn encrypt_stream<R: Read, W: Write>(mut reader: R, mut out: W, passphrase: &str, cancel: &CancellationToken) -> Result<(), AppCommandError> {
+fn encrypt_stream<R: Read, W: Write>(mut reader: R, writer: impl FnOnce() -> Result<W, AppCommandError>, passphrase: &str, cancel: &CancellationToken) -> Result<(), AppCommandError> {
     let mut salt = [0u8; SALT_LEN];
     let mut nonce_prefix = [0u8; NONCE_PREFIX_LEN];
     rand::rngs::OsRng.fill_bytes(&mut salt);
@@ -151,6 +150,7 @@ fn encrypt_stream<R: Read, W: Write>(mut reader: R, mut out: W, passphrase: &str
         chunk_size: DEFAULT_CHUNK_SIZE,
     };
 
+    let mut out = writer()?;
     // Write the cleartext header.
     out.write_all(ENVELOPE_MAGIC).map_err(AppCommandError::io)?;
     out.write_all(&[ENVELOPE_HEADER_VERSION]).map_err(AppCommandError::io)?;
@@ -197,11 +197,10 @@ pub fn decrypt_file(
     cancel: &CancellationToken,
 ) -> Result<(), AppCommandError> {
     let reader = BufReader::new(File::open(src).map_err(AppCommandError::io)?);
-    let writer = BufWriter::new(File::create(dest).map_err(AppCommandError::io)?);
-    decrypt_stream(reader, writer, passphrase, cancel)
+    decrypt_stream(reader, || File::create(dest).map(BufWriter::new).map_err(AppCommandError::io), passphrase, cancel)
 }
 
-fn decrypt_stream<R: Read, W: Write>(mut reader: R, mut out: W, passphrase: &str, cancel: &CancellationToken) -> Result<(), AppCommandError> {
+fn decrypt_stream<R: Read, W: Write>(mut reader: R, writer: impl FnOnce() -> Result<W, AppCommandError>, passphrase: &str, cancel: &CancellationToken) -> Result<(), AppCommandError> {
     let header = read_header(&mut reader)?;
     // The envelope header is attacker-controlled; validate every field that
     // drives an allocation (chunk_size) or CPU/memory work (Argon2 params)
@@ -227,6 +226,7 @@ fn decrypt_stream<R: Read, W: Write>(mut reader: R, mut out: W, passphrase: &str
     let nonce = GenericArray::from_slice(&nonce_prefix);
     let mut dec = DecryptorBE32::from_aead(cipher, nonce);
 
+    let mut out = writer()?;
     let block = header.chunk_size + GCM_TAG_LEN;
     let mut cur = read_block(&mut reader, block).map_err(AppCommandError::io)?;
     loop {
@@ -331,14 +331,14 @@ fn corrupt_header_error() -> AppCommandError {
 pub(crate) fn encrypt_bytes(bytes: &[u8], passphrase: &str, limit: usize) -> Result<Vec<u8>, AppCommandError> {
     if bytes.len() > limit { return Err(AppCommandError::invalid_input("Configuration exceeds memory limit")); }
     let mut writer = BoundedConfigurationBytes { bytes: Vec::new(), limit };
-    encrypt_stream(bytes, &mut writer, passphrase, &CancellationToken::new())?;
+    encrypt_stream(bytes, || Ok(&mut writer), passphrase, &CancellationToken::new())?;
     Ok(writer.bytes)
 }
 
 pub(crate) fn decrypt_bytes(bytes: &[u8], passphrase: &str, limit: usize) -> Result<Vec<u8>, AppCommandError> {
     if bytes.len() > limit { return Err(AppCommandError::invalid_input("Configuration exceeds memory limit")); }
     let mut writer = BoundedConfigurationBytes { bytes: Vec::new(), limit };
-    decrypt_stream(bytes, &mut writer, passphrase, &CancellationToken::new())?;
+    decrypt_stream(bytes, || Ok(&mut writer), passphrase, &CancellationToken::new())?;
     Ok(writer.bytes)
 }
 
