@@ -9,6 +9,7 @@ pub(crate) mod secrets;
 pub(crate) mod providers;
 pub(crate) mod members;
 pub(crate) mod archive;
+mod fusion_archive;
 mod codeg_crypto;
 pub(crate) mod codex_catalog;
 pub(crate) mod normalize;

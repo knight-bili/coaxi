@@ -81,9 +81,14 @@ pub(crate) fn parse(bytes:&[u8],passphrase:&str,manifest:Option<&Value>)->Result
 }
 impl ParsedArchive{
     pub(crate) fn entries(&self)->Result<Vec<Entry>>{
+        if self.source_kind!="codeg_v1"{return super::fusion_archive::entries(self)}
         let mut entries=Vec::new();
         for(domain,value)in &self.domains{
-            if let Some(rows)=value.as_array(){for(index,value)in rows.iter().enumerate(){entries.push(Entry{id:digest(&json!({"source":self.source_digest,"domain":domain,"index":index}))?,domain:domain.clone(),index,value:value.clone()});}}
+            if let Some(rows)=value.as_array(){
+                let mut indexed=rows.iter().enumerate().collect::<Vec<_>>();
+                if matches!(domain.as_str(),"quickMessages"|"agentSettings"){indexed.sort_by_key(|(index,value)|(value["sortOrder"].as_i64().unwrap_or(0),*index));}
+                for(index,value)in indexed{entries.push(Entry{id:digest(&json!({"source":self.source_digest,"domain":domain,"index":index}))?,domain:domain.clone(),index,value:value.clone()});}
+            }
             else if let Some(map)=value.as_object(){for(index,(key,value))in map.iter().enumerate(){entries.push(Entry{id:digest(&json!({"source":self.source_digest,"domain":domain,"index":index,"key":key}))?,domain:domain.clone(),index,value:json!({"key":key,"value":value})});}}
         }
         ensure!(entries.len()<=8192,"configuration.too_many_entries");Ok(entries)

@@ -44,7 +44,7 @@ pub(crate) fn preview(connection:&Connection,root:&Path,client:&str,input:&Value
         let id=text(selected,"entryId")?;ensure!(selected["decision"]["entryId"]==id&&selections.insert(id.to_owned(),selected.clone()).is_none(),"configuration.duplicate_selection");
         ensure!(entries.iter().any(|entry|entry.id==id&&entry.domain==selected["domain"]),"configuration.source_entry_changed");
     }
-    let mut targets=serde_json::Map::new();let mut domains=serde_json::Map::new();let mut seen_targets=BTreeSet::new();let mut rows=Vec::new();
+    let mut targets=serde_json::Map::new();let mut domains=serde_json::Map::new();let mut seen_targets=BTreeSet::new();let mut preference_fields=BTreeSet::new();let mut rows=Vec::new();
     for entry in &entries{
         let selected=selections.get(&entry.id);let decision=selected.map(|item|&item["decision"]);let action=decision.and_then(|item|item["action"].as_str()).unwrap_or("skip");
         let mut row=json!({"entryId":entry.id,"domain":entry.domain,"name":source_name(entry),"action":action,"status":"ready","before":{},"after":{},"reason":null});
@@ -86,6 +86,9 @@ pub(crate) fn preview(connection:&Connection,root:&Path,client:&str,input:&Value
                 match policies::patch(&entry.value).and_then(|value|value.map(Ok).unwrap_or_else(||preferences::file_patch(&entry.value))){
                     Ok((target,patch))=>{
                         let policy=policies::owns(target);let original=if policy{policies::basis(connection,target)?}else{json!({"version":1,"value":files::read(root,target)?})};
+                        for field in patch.as_object().context("configuration.preference_patch_invalid")?.keys(){
+                            if !preference_fields.insert(format!("{target}.{field}")){row["status"]=json!("conflict");row["reason"]=json!("多个来源条目指向同一个设置字段，请只保留一个选择。");}
+                        }
                         let before=&original["value"];row["before"]=preferences::before_fields(before,&patch);row["after"]=patch;
                         let key=text(&entry.value,"key")?;let existing=row["before"].as_object().is_some_and(|map|map.values().any(|value|!value.is_null()));
                         let decision=decision.context("configuration.decision_required")?;
@@ -231,9 +234,11 @@ fn apply_on(tx:&Transaction<'_>,root:&Path,client:&str,command:&str,preview:&Val
     ensure!(basis(tx,root,&private["targets"],&private["domains"],members)?==private["basis"],"configuration.local_configuration_changed");
     let archive=archive_store::retained(tx,root,client,text(preview,"archiveId")?,text(preview,"sourceDigest")?)?;
     let entries=archive.entries()?;let mut references=BTreeMap::new();let mut counts=BTreeMap::<String,u64>::new();let mut file_updates=BTreeMap::<String,(String,Value)>::new();let mut policy_updates=BTreeMap::<String,Value>::new();
-    for selected in preview["selections"].as_array().context("configuration.selections_invalid")?{
+    let selections=preview["selections"].as_array().context("configuration.selections_invalid")?;
+    for entry in &entries{
+        let Some(selected)=selections.iter().find(|selected|selected["entryId"]==entry.id)else{continue};
         if selected["decision"]["action"]=="skip"{continue}
-        let source=text(selected,"entryId")?;let entry=entries.iter().find(|entry|entry.id==source&&entry.domain==selected["domain"]).context("configuration.source_entry_changed")?;
+        let source=text(selected,"entryId")?;ensure!(entry.domain==selected["domain"],"configuration.source_entry_changed");
         let id=private["targets"][source].as_str().context("configuration.target_required")?;
         *counts.entry(entry.domain.clone()).or_default()+=1;
         if entry.domain=="preferences"{

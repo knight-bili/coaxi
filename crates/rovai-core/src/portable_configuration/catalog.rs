@@ -24,11 +24,19 @@ pub(crate) fn targets(connection:&Connection,root:&Path,domain:&str,after:Option
     }
     ensure!(domain=="preferences","configuration.catalog_domain_unknown");
     let entries=[("system_language_settings","语言"),("appearance_mode","主题"),("appearance_zoom_level","缩放"),("system_close_behavior_settings","关闭窗口方式")];let mut items=Vec::new();
+    for(key,field)in preferences::NATIVE_FIELDS{
+        if after.is_some_and(|after|*key<=after){continue}
+        let target=key.split('.').nth(1).context("configuration.catalog_key_invalid")?;
+        if target=="windowClose"&&!cfg!(windows){continue}
+        let current=files::read(root,target)?;
+        if !current[*field].is_null(){items.push(json!({"id":key,"name":key,"revision":1}));}
+    }
     let policy=policies::basis(connection,"delegationPolicy")?;
     for(key,name)in[("delegation.enabled","启用帮手"),("delegation.depth_limit","帮手层数"),("delegation.agent_defaults","帮手程序默认选项"),("delegation.completed_cache_max_mb","帮手缓存上限")]{
         if after.is_none_or(|after|key>after){items.push(json!({"id":key,"name":name,"revision":policy["version"]}));}
     }
     for(key,name)in entries{
+        if key=="system_close_behavior_settings"&&!cfg!(windows){continue}
         if after.is_some_and(|after|key<=after){continue}
         let raw=match key{"system_language_settings"=>"{}","appearance_mode"=>"system","appearance_zoom_level"=>"100",_=>"{}"};
         let(target,patch)=preferences::file_patch(&json!({"key":key,"value":raw}))?;let current=files::read(root,target)?;
