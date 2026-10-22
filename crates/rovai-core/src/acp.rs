@@ -11,6 +11,10 @@ use std::{
     time::{Duration, Instant},
 };
 
+#[path="native_lifecycle/acp_transport.rs"]
+mod native_lifecycle_transport;
+pub(crate) use native_lifecycle_transport::NativeSteerObservation;
+
 #[cfg(unix)]
 use std::fs::OpenOptions;
 
@@ -1391,6 +1395,8 @@ struct ZcodeBackgroundRoute {
 }
 
 pub(crate) struct AcpHost {
+    native_steering_disabled: AtomicBool,
+    native_response_digests: Mutex<HashMap<u64,String>>,
     native_source: Option<rovai_core::runtime_subagent_session::CapturedNativeSource>,
     credential_redactor: Option<rovai_core::runtime_custom_api::CredentialRedactor>,
     adapter_kind: AdapterKind,
@@ -1829,6 +1835,8 @@ impl AcpHost {
             stdout_finished: Notify::new(),
             protocol_violated: AtomicBool::new(false),
             initialize_result: RwLock::new(None),
+            native_steering_disabled: AtomicBool::new(false),
+            native_response_digests: Mutex::new(HashMap::new()),
             trae_permission_mode: (frozen_runtime.adapter_kind == AdapterKind::TraeCnCli).then(
                 || {
                     if permission_semantics == PermissionSemantics::CoreEnforcedV1
@@ -2062,7 +2070,12 @@ impl AcpHost {
                         if message.get("method").is_none()
                             && let Some(id) = message.get("id").and_then(Value::as_u64)
                         {
-                            if let Some(pending) = host.pending.lock().await.remove(&id) {
+                            let pending={host.pending.lock().await.remove(&id)};
+                            if let Some(pending) = pending {
+                                if matches!(&pending,PendingRpc::Response{method,..} if method=="_session/steering"){
+                                    let mut receipts=host.native_response_digests.lock().await;
+                                    if receipts.len()<1024{receipts.insert(id,crate::native_lifecycle::fork::fingerprint(&line));}
+                                }
                                 host.complete_pending(id, pending, message).await;
                             }
                             continue;
