@@ -1,0 +1,14 @@
+{
+  "revision": 1,
+  "confirmedRevision": 1,
+  "confirmationStatus": "confirmed",
+  "confirmedBy": "user",
+  "confirmedAt": "2026-10-22T07:21:57.433315+00:00",
+  "statement": "确认，按自定义智能体接入 r1 实施",
+  "questionRevisionLabel": "自定义智能体接入 r1",
+  "questionItemId": "call_2e6f72af562542579eb236433420b2e1:0",
+  "frozenContractSha256": "237c3ebb71dfb7c3249259f7f319bcc1b060a8d7aac0dfd8e0f57ae914f834f8",
+  "paidModelAuthorization": false,
+  "mainMergeAuthorization": false,
+  "releaseAuthorization": false
+}
