@@ -3,7 +3,7 @@ import SwiftUI
 struct RovaiRuntimeSettingsView: View {
     let model: RovaiWorkspaceModel
     var body: some View {
-        List { ForEach(model.members.filter { $0.text("presence") != "removed" }.map { RovaiRow(value: $0) }) { row in
+        List { NavigationLink("自定义智能体") {RovaiCustomRuntimeSettings(model: model)}; ForEach(model.members.filter { $0.text("presence") != "removed" }.map { RovaiRow(value: $0) }) { row in
             NavigationLink { NativeRuntimeEditor(model: model, member: row.value) } label: { VStack(alignment: .leading, spacing: 6) { Text(row.value.text("displayName")).font(.headline); Text(row.value["runtimeReadiness"]?.text("status") ?? "").font(.caption).foregroundStyle(Theme.textSecondary) } }
         } }.scrollContentBackground(.hidden).navigationTitle("智能体、模型和权限")
     }
