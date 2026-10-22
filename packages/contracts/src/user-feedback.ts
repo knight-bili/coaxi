@@ -14,3 +14,5 @@ export interface FeedbackList {items:Array<{receipt:FeedbackReceipt;text:string;
 export interface FeedbackPreviewRecoveryList {items:Array<{preview:FeedbackPreview;receipt:FeedbackReceipt|null}>;next:string|null}
 export interface FeedbackContinuationReference {schemaVersion:1;feedbackId:string;previewId:string;previewDigest:string}
 export interface FeedbackNormalPreview {preview:FeedbackPreview;reference:FeedbackContinuationReference}
+export interface FeedbackNormalSend {commandId:string;reference:FeedbackContinuationReference;scope:FeedbackScope;agentId:string;body:string;draftRevision?:number;composerScope?:import('./index').SingleChatComposerScope}
+export type FeedbackNormalResult = {state:'unknown'}|{state:'recorded';commandResult:import('./index').StoredCommandResult;replayed:boolean;receipt:FeedbackReceipt}

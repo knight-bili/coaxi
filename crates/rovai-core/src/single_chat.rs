@@ -927,8 +927,12 @@ impl SingleChatService {
                     json!({ "currentDraftRevision": draft_revision }),
                 ));
             }
-            let body = command.body.trim();
+            let feedback_continuation = envelope.payload.feedback_continuation().is_some();
+            let body = if feedback_continuation { command.body.as_str() } else { command.body.trim() };
             let quotes = materials.quotes()?;
+            if feedback_continuation && (!source_attachments.is_empty() || !quotes.is_empty()) {
+                return Ok(rejected("feedback.composer_materials_present", "请先处理普通输入中的材料，再确认反馈续办"));
+            }
             if command.composer_scope.is_some() && !quotes.is_empty() && body.is_empty() {
                 return Ok(rejected(
                     "quote.question_required",

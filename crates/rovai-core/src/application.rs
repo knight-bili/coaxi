@@ -10375,7 +10375,7 @@ impl Core {
             "history.library" => self.history_import(false,request.params.clone()).await,
             "office.watch" => self.office_access(request.params.clone(),&request.client).await,
             "interaction.local" => self.interaction_access(request.params.clone()).await,
-            "feedback.operation" => self.feedback_operation(request.params.clone()).await,
+            "feedback.operation" => self.feedback_operation(request.params.clone(),request.client.clone()).await,
             "computer.local" => self.computer_access(request.params.clone()).await,
             "browser.local.grant" | "browser.local.revoke" | "browser.local.begin" | "browser.local.finish" => self.browser_access(&request.method, request.params.clone()).await,
             "workbench.files.tools" => self.workbench_file_tools(request.params.clone()).await,

@@ -3,6 +3,34 @@ use super::*;
 use chrono::{DateTime,Utc};
 use rusqlite::{params,Connection,Transaction};
 use crate::command::{CommandHandlerResult,CommandResultStatus};
+use crate::command::{sealed,DomainCommand};
+use crate::single_chat::SendSingleChatMessageCommand;
+
+#[derive(Debug,Clone,Serialize)]#[serde(rename_all="camelCase")]
+pub struct PublicCommand{pub reference:Reference,pub message:crate::collaboration::SendUserAutomationThreadMessageCommand}
+impl sealed::Sealed for PublicCommand{}
+impl DomainCommand for PublicCommand{
+    const TYPE:&'static str="camp.feedback.continue";const EXACT_REPLAY:bool=true;
+    fn feedback_continuation(&self)->Option<Input>{Some(Input{reference:self.reference.clone(),scope:Scope{thread_id:self.message.camp_id.clone(),conversation_id:None,scope_kind:"public".into()},agent_id:self.message.agent_id.clone(),body:self.message.body.clone()})}
+}
+macro_rules! private_command{
+    ($name:ident,$kind:literal,$owner:ident,$command_type:literal)=>{
+        #[derive(Debug,Clone,Serialize)]#[serde(rename_all="camelCase")]
+        pub struct $name{pub reference:Reference,pub agent_id:String,pub message:SendSingleChatMessageCommand}
+        impl sealed::Sealed for $name{}
+        impl DomainCommand for $name{
+            const TYPE:&'static str=$command_type;const EXACT_REPLAY:bool=true;
+            fn draft_client(&self)->Option<&crate::draft_client::DraftClient>{Some(&self.message.draft_client)}
+            fn feedback_continuation(&self)->Option<Input>{Some(Input{reference:self.reference.clone(),scope:Scope{thread_id:self.message.camp_id.clone(),conversation_id:Some(self.message.conversation_id.clone()),scope_kind:$kind.into()},agent_id:self.agent_id.clone(),body:self.message.body.clone()})}
+        }
+        impl crate::single_chat::PrivateSendCommand for $name{
+            const OWNER:crate::single_chat_composer::ComposerOwner=crate::single_chat_composer::ComposerOwner::$owner;
+            fn input(&self)->SendSingleChatMessageCommand{self.message.clone()}
+        }
+    }
+}
+private_command!(SingleCommand,"single_chat",SingleChat,"single_chat.feedback.continue");
+private_command!(ChildCommand,"delegation_child",DelegationChild,"delegations.feedback.continue");
 
 #[derive(Debug,Clone,Serialize,Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]
 pub struct Reference{pub schema_version:u32,pub feedback_id:String,pub preview_id:String,pub preview_digest:String}
@@ -39,7 +67,7 @@ pub fn complete(transaction:&Transaction<'_>,input:&Input,command_id:&str,result
     if result.status==CommandResultStatus::Rejected{return Ok(())}
     validate(transaction,input)?;
     let mut receipt=storage::receipt(transaction,&input.reference.feedback_id)?;
-    let message=result.payload["conversationMessageId"].as_str().or_else(||result.payload["messageId"].as_str()).or_else(||result.payload["campMessageId"].as_str());let pending=result.payload["pendingInputId"].as_str();
+    let message=result.payload["conversationMessageId"].as_str().or_else(||result.payload["threadMessageId"].as_str()).or_else(||result.payload["messageId"].as_str()).or_else(||result.payload["campMessageId"].as_str());let pending=result.payload["pendingInputId"].as_str();
     ensure!(message.is_some()||pending.is_some(),"feedback.normal_result_unavailable");
     receipt.status="continued_as_message".into();receipt.delivery_channel="normal_message".into();receipt.continued_message_id=message.map(str::to_string);
     transaction.execute("INSERT INTO ui_feedback_continuation(feedback_id,command_id,preview_id,pending_input_id,message_id,result_json,created_at) VALUES(?1,?2,?3,?4,?5,?6,?7)",params![receipt.feedback_id,command_id,input.reference.preview_id,pending,message,serde_json::to_string(result)?,Utc::now().to_rfc3339()])?;

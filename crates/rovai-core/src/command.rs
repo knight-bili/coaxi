@@ -27,6 +27,11 @@ pub trait DomainCommand: sealed::Sealed + Serialize {
     fn draft_client(&self) -> Option<&crate::draft_client::DraftClient> {
         None
     }
+
+    /// 仅新反馈续办命令选择此事务钩子，旧消息命令不附带反馈状态。
+    fn feedback_continuation(&self) -> Option<crate::ui_feedback::continuation::Input> {
+        None
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -284,8 +289,15 @@ impl DomainCommandGateway {
                 }),
             )
         } else {
+            if let Some(input) = envelope.payload.feedback_continuation() {
+                anyhow::ensure!(matches!(&envelope.actor, ActorRef::User { .. }), "feedback.user_required");
+                crate::ui_feedback::continuation::validate(&transaction, &input)?;
+            }
             handler(&transaction)?
         };
+        if let Some(input) = envelope.payload.feedback_continuation() {
+            crate::ui_feedback::continuation::complete(&transaction, &input, &envelope.command_id, &handler_result)?;
+        }
         let recorded_at = chrono::Utc::now().to_rfc3339();
         let mut stored_result = StoredCommandResult {
             command_id: envelope.command_id.clone(),

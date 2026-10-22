@@ -2630,17 +2630,34 @@ impl CollaborationService {
         database: &mut Database,
         envelope: &CommandEnvelope<SendUserAutomationThreadMessageCommand>,
     ) -> Result<CommandExecution> {
-        if envelope.payload.agent_id.trim().is_empty() {
+        self.send_user_automation_inner(database, envelope, &envelope.payload)
+    }
+
+    pub(crate) fn send_feedback_camp_message(
+        &self,
+        database: &mut Database,
+        envelope: &CommandEnvelope<crate::ui_feedback::continuation::PublicCommand>,
+    ) -> Result<CommandExecution> {
+        self.send_user_automation_inner(database, envelope, &envelope.payload.message)
+    }
+
+    fn send_user_automation_inner<C: DomainCommand>(
+        &self,
+        database: &mut Database,
+        envelope: &CommandEnvelope<C>,
+        input: &SendUserAutomationThreadMessageCommand,
+    ) -> Result<CommandExecution> {
+        if input.agent_id.trim().is_empty() {
             anyhow::bail!("agentId must not be empty");
         }
-        if envelope.payload.body.trim().is_empty() {
+        if input.body.trim().is_empty() {
             anyhow::bail!("body must not be empty");
         }
-        let camp_id = envelope.payload.camp_id.clone();
-        let body = envelope.payload.body.clone();
+        let camp_id = input.camp_id.clone();
+        let body = input.body.clone();
         let content = normalize_content(vec![
             StructuredThreadMessageSegment::MemberMention {
-                agent_id: envelope.payload.agent_id.clone(),
+                agent_id: input.agent_id.clone(),
             },
             StructuredThreadMessageSegment::Text {
                 text: format!(" {body}"),
@@ -2653,7 +2670,7 @@ impl CollaborationService {
             // Automation does not consume Composer authority or attachments.
             // The revision is therefore only a validated inert placeholder.
             draft_revision: 1,
-            execution: envelope.payload.execution.clone(),
+            execution: input.execution.clone(),
         };
         self.execute_user_camp_message(
             database,
@@ -2677,7 +2694,7 @@ impl CollaborationService {
                 let display_name = transaction
                     .query_row(
                         "SELECT display_name FROM agent_profile WHERE id = ?1",
-                        [&envelope.payload.agent_id],
+                        [&input.agent_id],
                         |row| row.get::<_, String>(0),
                     )
                     .optional()?;
@@ -2687,7 +2704,7 @@ impl CollaborationService {
                         "Every Member Mention must identify a present current Camp member",
                     )));
                 };
-                if active_address_target(transaction, &camp_id, &envelope.payload.agent_id)?
+                if active_address_target(transaction, &camp_id, &input.agent_id)?
                     .is_none()
                 {
                     return Ok(Err(rejected(
@@ -2696,10 +2713,10 @@ impl CollaborationService {
                     )));
                 };
                 let rendered_body = render_plain_text(&content, |agent_id| {
-                    (agent_id == envelope.payload.agent_id).then(|| display_name.clone())
+                    (agent_id == input.agent_id).then(|| display_name.clone())
                 })?;
                 let generated_camp_name = generated_camp_name(&content, |agent_id| {
-                    (agent_id == envelope.payload.agent_id).then(|| display_name.clone())
+                    (agent_id == input.agent_id).then(|| display_name.clone())
                 })?;
                 Ok(Ok(ThreadMessageSubmission {
                     body: rendered_body,
@@ -2707,7 +2724,7 @@ impl CollaborationService {
                     source_attachments: Vec::new(),
                     prepared_attachment_ids: Vec::new(),
                     address: ThreadMessageAddress::Explicit {
-                        agent_ids: vec![envelope.payload.agent_id.clone()],
+                        agent_ids: vec![input.agent_id.clone()],
                     },
                     reply_to_camp_message_id: None,
                     generated_camp_name,

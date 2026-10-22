@@ -8,6 +8,11 @@ use tokio::io::{AsyncBufReadExt,AsyncReadExt,AsyncWriteExt,BufReader};
 #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Target{scope:Scope}
 #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Listing{scope:Scope,agent_id:String,after:Option<String>}
 #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct CardTarget{scope:Scope,agent_id:String,message_id:String}
+#[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct NormalSend{
+    command_id:String,reference:feedback::continuation::Reference,scope:Scope,agent_id:String,body:String,
+    #[serde(default)]draft_revision:Option<i64>,
+    #[serde(default)]composer_scope:Option<crate::single_chat_composer_scope::SingleChatComposerScope>,
+}
 impl Core{
     pub(super) async fn feedback_policy_for_run(&self,execution:&AgentRunExecution)->Result<Option<feedback::Policy>>{
         let database=self.database.lock().await;let policy=feedback::storage::policy(database.connection())?;if !policy.enabled(&execution.agent_id){return Ok(None)}
@@ -54,7 +59,7 @@ impl Core{
         });
         let result=(definition,frozen_digest);cache.insert(key,result.clone());Ok(result)
     }
-    pub(super) async fn feedback_operation(&self,value:Value)->Result<Value>{
+    pub(super) async fn feedback_operation(&self,value:Value,client:crate::draft_client::DraftClient)->Result<Value>{
         let request:Request=serde_json::from_value(value)?;
         match request.action.as_str(){
             "policy.get"=>{ensure!(request.payload==json!({}),"feedback.invalid_arguments");let database=self.database.lock().await;Ok(serde_json::to_value(feedback::storage::policy(database.connection())?)?)},
@@ -76,8 +81,43 @@ impl Core{
                 let items=rows.into_iter().map(|(_,raw,id)|Ok(json!({"preview":serde_json::from_str::<Value>(&raw)?,"receipt":id.map(|id|feedback::storage::receipt(database.connection(),&id)).transpose()?}))).collect::<Result<Vec<_>>>()?;Ok(json!({"items":items,"next":next}))
             },
             "normal.preview"=>{#[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Normal{scope:Scope,agent_id:String,feedback_id:String}let input:Normal=serde_json::from_value(request.payload)?;let mut database=self.database.lock().await;feedback::continuation::preview(database.connection_mut(),&input.scope,&input.agent_id,&input.feedback_id)},
+            "normal.send"=>self.feedback_normal_send(serde_json::from_value(request.payload)?,client,false).await,
+            "normal.reconcile"=>self.feedback_normal_send(serde_json::from_value(request.payload)?,client,true).await,
             _=>anyhow::bail!("feedback.invalid_operation")
         }
+    }
+    async fn feedback_normal_send(&self,input:NormalSend,client:crate::draft_client::DraftClient,reconcile:bool)->Result<Value>{
+        use feedback::continuation::{PublicCommand,SingleCommand,ChildCommand};
+        input.scope.validate()?;uuid::Uuid::parse_str(&input.command_id)?;
+        let thread=input.scope.thread_id.clone();let feedback_id=input.reference.feedback_id.clone();
+        let execution=match input.scope.scope_kind.as_str(){
+            "public"=>{
+                ensure!(input.draft_revision.is_none()&&input.composer_scope.is_none(),"feedback.invalid_arguments");
+                let command=PublicCommand{reference:input.reference,message:SendUserAutomationThreadMessageCommand{camp_id:thread.clone(),agent_id:input.agent_id,body:input.body.clone(),execution:Some(ExecutionRequest{task_id:None,purpose:input.body,completion_role:"required".into(),budget:None})}};
+                let envelope=user_camp_command_envelope(input.command_id,thread.clone(),command);let mut database=self.database.lock().await;
+                if reconcile{let Some(execution)=DomainCommandGateway.replay_if_recorded(&database,&envelope)? else{return Ok(json!({"state":"unknown"}))};execution}else{CollaborationService::default().send_feedback_camp_message(&mut database,&envelope)?}
+            },
+            "single_chat"|"delegation_child"=>{
+                let conversation=input.scope.conversation_id.context("scope_changed")?;
+                let message=SendSingleChatMessageCommand{draft_client:client.clone(),camp_id:thread.clone(),conversation_id:conversation,body:input.body,draft_revision:input.draft_revision.context("feedback.draft_revision_required")?,composer_scope:input.composer_scope};
+                if input.scope.scope_kind=="single_chat"{
+                    let envelope=user_camp_command_envelope(input.command_id,thread.clone(),SingleCommand{reference:input.reference,agent_id:input.agent_id,message});
+                    if reconcile{let database=self.database.lock().await;let Some(execution)=DomainCommandGateway.replay_if_recorded(&database,&envelope)? else{return Ok(json!({"state":"unknown"}))};execution}else{private_sources::command(&self.database,&self.private_source_read_capacity,&envelope,|_|Ok(vec![]),|database,prepared|SingleChatService::for_client(client).with_prepared_sources(prepared).send_owned(database,&envelope)).await?}
+                }else{
+                    let envelope=user_camp_command_envelope(input.command_id,thread.clone(),ChildCommand{reference:input.reference,agent_id:input.agent_id,message});
+                    if reconcile{let database=self.database.lock().await;let Some(execution)=DomainCommandGateway.replay_if_recorded(&database,&envelope)? else{return Ok(json!({"state":"unknown"}))};execution}else{private_sources::command(&self.database,&self.private_source_read_capacity,&envelope,|_|Ok(vec![]),|database,prepared|SingleChatService::for_client(client).with_prepared_sources(prepared).send_owned(database,&envelope)).await?}
+                }
+            },
+            _=>anyhow::bail!("scope_changed")
+        };
+        if !reconcile&&execution.result.status!=CommandResultStatus::Rejected{
+            self.request_camp_attachment_projection(&thread);
+            if command_result_has_delivery_work(&execution.result.payload){self.delivery_batch_scheduler_notify.notify_one();self.execution_wake.runs.notify_one();}
+            emit(&self.output,"feedback.changed",json!({"threadId":thread,"feedbackId":feedback_id}));
+            emit(&self.output,"single_chat.changed",json!({"threadId":thread,"result":execution.result}));
+        }
+        let database=self.database.lock().await;let receipt=feedback::storage::receipt(database.connection(),&feedback_id)?;
+        Ok(json!({"state":"recorded","commandResult":execution.result,"replayed":execution.replayed,"receipt":receipt}))
     }
     async fn feedback_ipc(&self,input:IpcRequest)->Result<Value>{
         ensure!(input.schema_version==1,"binding_changed");let binding=self.feedback_tools.authenticate(&input.bridge_instance_id,&input.authorization_token,&input.binding_digest,input.operation=="wrote")?;
