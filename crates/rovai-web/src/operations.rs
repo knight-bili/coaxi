@@ -11,6 +11,16 @@ pub enum Operation {
     NativeSteerPolicySet,
     #[serde(rename="runtime.steer.targets")]
     NativeSteerTargets,
+    #[serde(rename="runtime.steer.materials.prepare")]
+    NativeSteerMaterialsPrepare,
+    #[serde(rename="runtime.steer.preview")]
+    NativeSteerPreview,
+    #[serde(rename="runtime.steer.confirm")]
+    NativeSteerConfirm,
+    #[serde(rename="runtime.steer.receipt")]
+    NativeSteerReceipt,
+    #[serde(rename="runtime.steer.previews")]
+    NativeSteerPreviews,
     #[serde(rename="navigation.projectGroups")]
     NavigationProjectGroups,
     #[serde(rename="extensions.catalog")]
@@ -579,6 +589,10 @@ impl Operation {
             Self::NativeSteerPolicyGet => select_fields(&value,&["schemaVersion","revision","members"]),
             Self::NativeSteerPolicySet => select_fields(&value,&["commandId","commandType","status","code","payload","resultEntity","recordedAt"]),
             Self::NativeSteerTargets => select_fields(&value,&["schemaVersion","targets"]),
+            Self::NativeSteerMaterialsPrepare => select_fields(&value,&["schemaVersion","materials"]),
+            Self::NativeSteerPreview => select_fields(&value,&["schemaVersion","previewId","previewDigest","expiresAt","target","input","inputDigest","capabilityDigest"]),
+            Self::NativeSteerConfirm | Self::NativeSteerReceipt => select_fields(&value,&["schemaVersion","commandId","previewId","target","inputDigest","status","nativeOutcome","nativeReceiptDigest","error"]),
+            Self::NativeSteerPreviews => select_fields(&value,&["schemaVersion","items","next"]),
             Self::NavigationProjectGroups => select_fields(&value,&["schemaVersion","initialized","projectGroupsRevision","projectGroups","projectOrder"]),
             Self::AppInfo => json!({"name":value["name"],"version":value["version"]}),
             Self::ForgeAccountsGet | Self::ForgeAccountsSet => select_fields(&value, &["accounts"]),
@@ -675,6 +689,11 @@ impl Operation {
             Self::NativeSteerPolicyGet => "runtime.steer.policy.get",
             Self::NativeSteerPolicySet => "runtime.steer.policy.set",
             Self::NativeSteerTargets => "runtime.steer.targets",
+            Self::NativeSteerMaterialsPrepare => "runtime.steer.materials.prepare",
+            Self::NativeSteerPreview => "runtime.steer.preview",
+            Self::NativeSteerConfirm => "runtime.steer.confirm",
+            Self::NativeSteerReceipt => "runtime.steer.receipt",
+            Self::NativeSteerPreviews => "runtime.steer.previews",
             Self::ForgeAccountsGet => "forge.accounts.get",
             Self::ForgeAccountsSet => "forge.accounts.set",
             Self::ExtensionCatalog => "extensions.catalog",
