@@ -217,6 +217,7 @@ fn routes(state: WebState) -> Router {
         .route("/request", post(request))
         .route("/configuration/secrets",post(portable_configuration::secret).layer(DefaultBodyLimit::max(2*1024*1024)))
         .route("/configuration/receipt",post(portable_configuration::receipt))
+        .route("/configuration/provider",post(portable_configuration::provider))
         .route("/configuration/archive",post(portable_configuration::archive).layer(DefaultBodyLimit::max(portable_configuration::MAX_ARCHIVE+256*1024)))
         .route("/events", get(events))
         .route("/logout", post(logout))

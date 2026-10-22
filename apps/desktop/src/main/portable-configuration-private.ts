@@ -16,6 +16,7 @@ export class PortableConfigurationPrivate{
     const value=input as Record<string,unknown>
     for(const[id,selection]of this.selections)if(selection.expires<Date.now())this.selections.delete(id)
     if(operation==='secret')return this.core.request('configuration.secrets.prepare',input)
+    if(operation==='edit')return this.core.request('configuration.providers.privateEdit',input)
     if(operation==='receipt')return this.core.request('configuration.archive.receipt',input)
     if(operation==='select'){
       if(Object.keys(value).length||this.selections.size>=128)throw new Error('configuration.selection_limit')

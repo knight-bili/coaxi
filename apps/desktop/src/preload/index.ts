@@ -63,7 +63,7 @@ async function invokeHostWeb<T>(operation: string, input?: unknown): Promise<T> 
 }
 
 const api: RovaiApi = {
-  portableConfiguration:{prepareSecret:input=>ipcRenderer.invoke('rovai:portable-configuration-private','secret',input),archiveReceipt:operationId=>ipcRenderer.invoke('rovai:portable-configuration-private','receipt',{operationId}),selectArchive:()=>ipcRenderer.invoke('rovai:portable-configuration-private','select',{}),importSelected:input=>ipcRenderer.invoke('rovai:portable-configuration-private','import',input)},
+  portableConfiguration:{providerForEdit:reference=>ipcRenderer.invoke('rovai:portable-configuration-private','edit',reference),prepareSecret:input=>ipcRenderer.invoke('rovai:portable-configuration-private','secret',input),archiveReceipt:operationId=>ipcRenderer.invoke('rovai:portable-configuration-private','receipt',{operationId}),selectArchive:()=>ipcRenderer.invoke('rovai:portable-configuration-private','select',{}),importSelected:input=>ipcRenderer.invoke('rovai:portable-configuration-private','import',input)},
   nativePets:{importDirectory:()=>ipcRenderer.invoke('rovai:pets-import'),synchronize:()=>ipcRenderer.invoke('rovai:pets-synchronize'),onChanged:listener=>{const receive=():void=>listener();ipcRenderer.on('rovai:pets-changed',receive);return()=>ipcRenderer.removeListener('rovai:pets-changed',receive)}},
   webdavWorkspace:{request:input=>ipcRenderer.invoke('rovai:webdav-workspace',input)},
   nativeBackups: {

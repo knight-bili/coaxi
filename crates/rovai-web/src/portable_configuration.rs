@@ -28,6 +28,13 @@ pub async fn receipt(State(state):State<WebState>,Extension(session):Extension<A
     let client=DraftClient::verified_web(&session.client_id).expect("Host editor identity");
     call(state,client,"configuration.archive.receipt",input).await
 }
+pub async fn provider(State(state):State<WebState>,Extension(session):Extension<Arc<Session>>,body:std::result::Result<Json<Value>,axum::extract::rejection::JsonRejection>)->Response{
+    let Ok(Json(input))=body else{return error(StatusCode::BAD_REQUEST,"configuration_input_invalid")};
+    let Ok(_permit)=state.requests.clone().try_acquire_owned()else{return error(StatusCode::TOO_MANY_REQUESTS,"request_capacity")};
+    if !state.sessions.is_live(&session){return error(StatusCode::UNAUTHORIZED,"session_required")}
+    let client=DraftClient::verified_web(&session.client_id).expect("Host editor identity");
+    call(state,client,"configuration.providers.privateEdit",input).await
+}
 pub async fn archive(State(state):State<WebState>,Extension(session):Extension<Arc<Session>>,mut form:Multipart)->Response{
     let Ok(permit)=state.uploads.clone().try_acquire_owned()else{return error(StatusCode::TOO_MANY_REQUESTS,"upload_capacity")};
     let mut metadata=None;let mut upload=None;

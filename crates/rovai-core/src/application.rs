@@ -874,6 +874,7 @@ fn request_runs_outside_main_queue(method: &str) -> bool {
             | "configuration.providers.list" | "configuration.providers.upsert" | "configuration.providers.remove" | "configuration.memberConnection.get" | "configuration.memberConnection.set"
             | "configuration.migration.preview" | "configuration.migration.confirm" | "configuration.migration.receipt" | "configuration.migration.undoPreview" | "configuration.migration.undoConfirm"
             | "configuration.secrets.prepare" | "configuration.archive.registerLocal" | "configuration.archive.registerSelected" | "configuration.archive.receipt"
+            | "configuration.providers.privateEdit"
             | "runtime.steer.policy.get" | "runtime.steer.policy.set"
             | "runtime.steer.targets"
             | "runtime.steer.preview" | "runtime.steer.confirm" | "runtime.steer.receipt" | "runtime.steer.previews" | "runtime.steer.materials.prepare"
@@ -10403,6 +10404,7 @@ impl Core {
             "configuration.providers.list" | "configuration.providers.upsert" | "configuration.providers.remove" | "configuration.memberConnection.get" | "configuration.memberConnection.set" => self.portable_configuration_access(&request.method,request.params.clone(),&request.client).await,
             "configuration.migration.preview" | "configuration.migration.confirm" | "configuration.migration.receipt" | "configuration.migration.undoPreview" | "configuration.migration.undoConfirm" => self.portable_configuration_access(&request.method,request.params.clone(),&request.client).await,
             "configuration.secrets.prepare" | "configuration.archive.registerLocal" | "configuration.archive.registerSelected" | "configuration.archive.receipt" => self.portable_configuration_private(&request.method,request.params.clone(),&request.client).await,
+            "configuration.providers.privateEdit" => self.portable_configuration_private(&request.method,request.params.clone(),&request.client).await,
             "history.execution.records" | "runtime.steer.evidence" | "runtime.steer.normal.preview" | "runtime.steer.normal.confirm" | "runtime.steer.normal.receipt" | "history.execution.preview" | "history.execution.confirm" | "history.execution.receipt" | "runtime.steer.policy.get" | "runtime.steer.policy.set" | "runtime.steer.targets" | "runtime.steer.preview" | "runtime.steer.confirm" | "runtime.steer.receipt" | "runtime.steer.previews" | "runtime.steer.materials.prepare" => self.native_lifecycle_access(&request.method,request.params.clone(),request.client.clone()).await,
             "computer.local" => self.computer_access(request.params.clone()).await,
             "browser.local.grant" | "browser.local.revoke" | "browser.local.begin" | "browser.local.finish" => self.browser_access(&request.method, request.params.clone()).await,

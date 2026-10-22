@@ -23,6 +23,7 @@ type CoreInternalMethod =
 
 export type HostWebMethod = 'host.web.token' | 'host.web.status' | 'host.web.start' | 'host.web.stop' | 'host.web.rotate' | 'host.web.loginTicket' | 'host.channels.reply'
   | 'configuration.secrets.prepare' | 'configuration.archive.registerSelected' | 'configuration.archive.receipt'
+  | 'configuration.providers.privateEdit'
   | 'host.upload.observe' | 'host.upload.bind' | 'host.upload.reconcile' | 'host.upload.receipt' | 'host.upload.retry' | 'host.upload.finish'
 
 export type AutomationSchedulerControl = {

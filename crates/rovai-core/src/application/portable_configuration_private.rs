@@ -18,6 +18,10 @@ impl Core{
         if method=="configuration.secrets.prepare"{
             let mut database=self.database.lock().await;return secrets::prepare(&mut database,client.id(),&value)
         }
+        if method=="configuration.providers.privateEdit"{
+            let reference:configuration::PortableConnectionRefV1=serde_json::from_value(value)?;reference.validate()?;
+            let database=self.database.lock().await;return configuration::providers::resolve(database.connection(),&reference,false)
+        }
         if method=="configuration.archive.receipt"{
             #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Input{operation_id:String}
             let input:Input=serde_json::from_value(value)?;let database=self.database.lock().await;
