@@ -3,10 +3,10 @@ document_type: model-context-change
 version: v1.73
 change_id: live-and-card-feedback
 revision: 1
-confirmed_revision: null
-confirmation_status: pending
-confirmed_by: null
-confirmed_at: null
+confirmed_revision: 1
+confirmation_status: confirmed
+confirmed_by: user
+confirmed_at: 2026-10-22T05:03:37.288974+00:00
 authority: proposed-model-input-change-statement
 implementation_status: proposal_only
 last_updated: 2026-10-22

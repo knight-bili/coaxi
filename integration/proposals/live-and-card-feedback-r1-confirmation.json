@@ -1,0 +1,15 @@
+{
+  "revision": 1,
+  "confirmedRevision": 1,
+  "confirmationStatus": "confirmed",
+  "confirmedBy": "user",
+  "confirmedAt": "2026-10-22T05:03:37.288974+00:00",
+  "statement": "ok",
+  "questionRevisionLabel": "文字和卡片反馈 r1",
+  "questionItemId": "call_164d6b3bf1a143d1a96fd3cb8d9ff3ae:0",
+  "interpretation": "用户对是否确认按文字和卡片反馈 r1 实施的完整问题回复 ok，明确同意该具体版本。",
+  "frozenContractSha256": "e04103e73a93124fdc5650a2f9f98b23b9fccc9097483e52eda8ce9c91af08ac",
+  "paidModelAuthorization": false,
+  "mainMergeAuthorization": false,
+  "releaseAuthorization": false
+}
