@@ -4401,6 +4401,24 @@ pub(crate) fn resolve_rebound_runtime_on_connection(
     connection: &Connection,
     frozen: &FrozenAgentRuntimeConfig,
 ) -> Result<std::result::Result<FrozenAgentRuntimeConfig, RuntimeConfigurationBlocker>> {
+    resolve_rebound_runtime_with_native_intent(connection, frozen, frozen.native_steer.clone())
+}
+
+/// 新的帮手用户轮次重新冻结开关；取消后的原轮次恢复仍走原冻结入口。
+pub(crate) fn resolve_rebound_runtime_for_followup_on_connection(
+    connection: &Connection,
+    frozen: &FrozenAgentRuntimeConfig,
+    member: &str,
+) -> Result<std::result::Result<FrozenAgentRuntimeConfig, RuntimeConfigurationBlocker>> {
+    let policy = crate::native_lifecycle::storage::freeze_policy(connection, member)?;
+    resolve_rebound_runtime_with_native_intent(connection, frozen, policy)
+}
+
+fn resolve_rebound_runtime_with_native_intent(
+    connection: &Connection,
+    frozen: &FrozenAgentRuntimeConfig,
+    native_steer: Option<crate::native_lifecycle::FrozenNativeSteerV1>,
+) -> Result<std::result::Result<FrozenAgentRuntimeConfig, RuntimeConfigurationBlocker>> {
     let mut model_options = frozen.model.options.clone();
     if frozen.adapter_kind == AdapterKind::CodexCli
         && frozen.camp_fast.is_some()
@@ -4436,7 +4454,7 @@ pub(crate) fn resolve_rebound_runtime_on_connection(
     // Re-probing may change executable evidence, never the admitted Run's Camp intent.
     rebound.environment = frozen.environment.clone();
     rebound.camp_fast = frozen.camp_fast.clone();
-    crate::native_lifecycle::freeze_intent(&mut rebound,frozen.native_origin.clone(),frozen.native_steer.clone())?;
+    crate::native_lifecycle::freeze_intent(&mut rebound,frozen.native_origin.clone(),native_steer)?;
     if frozen.adapter_kind == AdapterKind::CodexCli
         && frozen.camp_fast.is_some()
         && let Some(tier) = frozen.model.options.get("serviceTier")

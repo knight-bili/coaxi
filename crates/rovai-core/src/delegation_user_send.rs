@@ -130,7 +130,11 @@ pub(crate) fn followup_runtime(
 ) -> Result<std::result::Result<FrozenAgentRuntimeConfig, RuntimeConfigurationBlocker>> {
     let config = original_config(connection, conversation)?;
     let frozen = serde_json::from_value(config["runtime"].clone())?;
-    crate::agent_profile::resolve_rebound_runtime_on_connection(connection, &frozen)
+    let member: String = connection.query_row(
+        "SELECT agent_id FROM conversation WHERE id=?1 AND kind='delegation_child'",
+        [conversation], |row| row.get(0),
+    )?;
+    crate::agent_profile::resolve_rebound_runtime_for_followup_on_connection(connection, &frozen, &member)
 }
 
 pub(crate) fn followup_config(
