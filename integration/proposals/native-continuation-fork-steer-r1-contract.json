@@ -1,0 +1,2289 @@
+{
+  "changeId": "native-continuation-fork-steer",
+  "revision": 1,
+  "confirmationStatus": "pending",
+  "implementationStatus": "proposal_only",
+  "baseline": {
+    "commit": "0c0b5a5d4d92519d8dc914ba7363fa59f53f8d54",
+    "branch": "develop/V1.0.0",
+    "codeg": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+    "rovai": "cc465dda562536b94f23787759e3206324baa29e"
+  },
+  "before": {
+    "FrozenAgentRuntimeConfig": "pub struct FrozenAgentRuntimeConfig {\n    // Historical environment references are ignored, including malformed ones.\n    // The in-memory launch map never participates in Run or Fleet identity.\n    #[serde(skip)]\n    pub environment: Option<crate::member_environment::LaunchEnvironment>,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub custom_api: Option<crate::runtime_custom_api::CustomApiSnapshot>,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub camp_fast: Option<crate::camp_fast::FrozenThreadMemberFast>,\n    pub adapter_kind: AdapterKind,\n    pub installation_id: String,\n    pub installation_generation: i64,\n    pub search_environment_generation: i64,\n    pub executable_path: String,\n    pub auth_scope: String,\n    pub reported_version: Option<String>,\n    pub executable_fingerprint: String,\n    pub capabilities: Vec<String>,\n    pub protocol_version: String,\n    pub model: ResolvedModelSelection,\n    pub permissions: AdapterPermissionConfig,\n    pub native_session_compatibility_key: Option<String>,\n    pub binding_compatibility_digest: String,\n    pub host_config_digest: String,\n    pub config_digest: String,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub custom_runtime: Option<FrozenCustomRuntimeV1>,\n}",
+    "ModelSelection": "pub enum ModelSelection {\n    RuntimeDefault,\n    Explicit {\n        #[serde(rename = \"modelId\")]\n        model_id: String,\n        #[serde(default)]\n        options: Value,\n        #[serde(default, rename = \"dshSource\", skip_serializing_if = \"Option::is_none\")]\n        dsh_source: Option<DshModelSource>,\n    },\n}",
+    "ResolvedModelSelection": "pub struct ResolvedModelSelection {\n    pub source: String,\n    pub model_id: String,\n    pub options: Value,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub dsh_source: Option<DshModelSource>,\n}",
+    "AdapterPermissionConfig": "pub struct AdapterPermissionConfig {\n    pub adapter_kind: AdapterKind,\n    pub schema_version: i64,\n    pub values: Value,\n}"
+  },
+  "after": {
+    "FrozenAgentRuntimeConfig": "pub struct FrozenAgentRuntimeConfig {\n    // Historical environment references are ignored, including malformed ones.\n    // The in-memory launch map never participates in Run or Fleet identity.\n    #[serde(skip)]\n    pub environment: Option<crate::member_environment::LaunchEnvironment>,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub custom_api: Option<crate::runtime_custom_api::CustomApiSnapshot>,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub camp_fast: Option<crate::camp_fast::FrozenThreadMemberFast>,\n    pub adapter_kind: AdapterKind,\n    pub installation_id: String,\n    pub installation_generation: i64,\n    pub search_environment_generation: i64,\n    pub executable_path: String,\n    pub auth_scope: String,\n    pub reported_version: Option<String>,\n    pub executable_fingerprint: String,\n    pub capabilities: Vec<String>,\n    pub protocol_version: String,\n    pub model: ResolvedModelSelection,\n    pub permissions: AdapterPermissionConfig,\n    pub native_session_compatibility_key: Option<String>,\n    pub binding_compatibility_digest: String,\n    pub host_config_digest: String,\n    pub config_digest: String,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub custom_runtime: Option<FrozenCustomRuntimeV1>,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub native_origin: Option<NativeSessionOriginV1>,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub native_steer: Option<FrozenNativeSteerV1>,\n}",
+    "ModelSelection": "pub enum ModelSelection {\n    RuntimeDefault,\n    Explicit {\n        #[serde(rename = \"modelId\")]\n        model_id: String,\n        #[serde(default)]\n        options: Value,\n        #[serde(default, rename = \"dshSource\", skip_serializing_if = \"Option::is_none\")]\n        dsh_source: Option<DshModelSource>,\n    },\n}",
+    "ResolvedModelSelection": "pub struct ResolvedModelSelection {\n    pub source: String,\n    pub model_id: String,\n    pub options: Value,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub dsh_source: Option<DshModelSource>,\n}",
+    "AdapterPermissionConfig": "pub struct AdapterPermissionConfig {\n    pub adapter_kind: AdapterKind,\n    pub schema_version: i64,\n    pub values: Value,\n}",
+    "NativeSessionOriginV1": "pub struct NativeSessionOriginV1 {\n    pub schema_version: u32,\n    pub origin_id: String,\n    pub command_id: String,\n    pub source: NativeSourceReferenceV1,\n    pub mode: NativeContinuationMode,\n    pub point: Option<NativeForkPointV1>,\n    pub workspace_digest: String,\n}",
+    "FrozenNativeSteerV1": "pub struct FrozenNativeSteerV1 {\n    pub schema_version: u32,\n    pub policy_revision: i64,\n    pub enabled: bool,\n}"
+  },
+  "schemas": {
+    "NativeSourceReferenceV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "importId",
+        "importRevision",
+        "provider",
+        "nativeSessionId",
+        "sourceHandleId",
+        "sourceRevision"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1,
+          "type": "integer"
+        },
+        "importId": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "importRevision": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "provider": {
+          "type": "string",
+          "enum": [
+            "codex",
+            "claude",
+            "qoder",
+            "grok",
+            "opencode",
+            "gemini",
+            "openclaw",
+            "cline",
+            "hermes",
+            "codebuddy",
+            "kimi_code",
+            "pi",
+            "cursor",
+            "deepseek",
+            "antigravity"
+          ]
+        },
+        "nativeSessionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "sourceHandleId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "sourceRevision": {
+          "type": "string",
+          "minLength": 71,
+          "maxLength": 71,
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "NativeForkPointV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "selectedTurnId",
+        "messageId",
+        "messageFingerprint",
+        "messageOccurrence"
+      ],
+      "properties": {
+        "selectedTurnId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "messageId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "messageFingerprint": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 71,
+              "maxLength": 71,
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "messageOccurrence": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 4294967295
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "NativeSessionOriginV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "originId",
+        "commandId",
+        "source",
+        "mode",
+        "point",
+        "workspaceDigest"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1,
+          "type": "integer"
+        },
+        "originId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "commandId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schemaVersion",
+            "importId",
+            "importRevision",
+            "provider",
+            "nativeSessionId",
+            "sourceHandleId",
+            "sourceRevision"
+          ],
+          "properties": {
+            "schemaVersion": {
+              "const": 1,
+              "type": "integer"
+            },
+            "importId": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "importRevision": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "provider": {
+              "type": "string",
+              "enum": [
+                "codex",
+                "claude",
+                "qoder",
+                "grok",
+                "opencode",
+                "gemini",
+                "openclaw",
+                "cline",
+                "hermes",
+                "codebuddy",
+                "kimi_code",
+                "pi",
+                "cursor",
+                "deepseek",
+                "antigravity"
+              ]
+            },
+            "nativeSessionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "sourceHandleId": {
+              "type": "string",
+              "minLength": 36,
+              "maxLength": 36,
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            },
+            "sourceRevision": {
+              "type": "string",
+              "minLength": 71,
+              "maxLength": 71,
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            }
+          }
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "continue",
+            "fork_tail",
+            "fork_point"
+          ]
+        },
+        "point": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "selectedTurnId",
+                "messageId",
+                "messageFingerprint",
+                "messageOccurrence"
+              ],
+              "properties": {
+                "selectedTurnId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4096
+                },
+                "messageId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4096
+                },
+                "messageFingerprint": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "minLength": 71,
+                      "maxLength": 71,
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "messageOccurrence": {
+                  "oneOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 4294967295
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "workspaceDigest": {
+          "type": "string",
+          "minLength": 71,
+          "maxLength": 71,
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "FrozenNativeSteerV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "policyRevision",
+        "enabled"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1,
+          "type": "integer"
+        },
+        "policyRevision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "enabled": {
+          "const": true,
+          "type": "boolean"
+        }
+      }
+    },
+    "NativeContinuationPreviewV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "previewId",
+        "previewDigest",
+        "expiresAt",
+        "source",
+        "mode",
+        "point",
+        "sourceThreadId",
+        "newThreadId",
+        "newConversationId",
+        "agentId",
+        "expectedAgentVersion",
+        "runtimeConfigDigest",
+        "workspaceDigest",
+        "title",
+        "historyMessageCount",
+        "capabilityStatus",
+        "reason"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1,
+          "type": "integer"
+        },
+        "previewId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "previewDigest": {
+          "type": "string",
+          "minLength": 71,
+          "maxLength": 71,
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "expiresAt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schemaVersion",
+            "importId",
+            "importRevision",
+            "provider",
+            "nativeSessionId",
+            "sourceHandleId",
+            "sourceRevision"
+          ],
+          "properties": {
+            "schemaVersion": {
+              "const": 1,
+              "type": "integer"
+            },
+            "importId": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "importRevision": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "provider": {
+              "type": "string",
+              "enum": [
+                "codex",
+                "claude",
+                "qoder",
+                "grok",
+                "opencode",
+                "gemini",
+                "openclaw",
+                "cline",
+                "hermes",
+                "codebuddy",
+                "kimi_code",
+                "pi",
+                "cursor",
+                "deepseek",
+                "antigravity"
+              ]
+            },
+            "nativeSessionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "sourceHandleId": {
+              "type": "string",
+              "minLength": 36,
+              "maxLength": 36,
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            },
+            "sourceRevision": {
+              "type": "string",
+              "minLength": 71,
+              "maxLength": 71,
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            }
+          }
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "continue",
+            "fork_tail",
+            "fork_point"
+          ]
+        },
+        "point": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "selectedTurnId",
+                "messageId",
+                "messageFingerprint",
+                "messageOccurrence"
+              ],
+              "properties": {
+                "selectedTurnId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4096
+                },
+                "messageId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4096
+                },
+                "messageFingerprint": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "minLength": 71,
+                      "maxLength": 71,
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "messageOccurrence": {
+                  "oneOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 4294967295
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sourceThreadId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "newThreadId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "newConversationId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "agentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expectedAgentVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "runtimeConfigDigest": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "workspaceDigest": {
+          "type": "string",
+          "minLength": 71,
+          "maxLength": 71,
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "historyMessageCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "capabilityStatus": {
+          "type": "string",
+          "enum": [
+            "available",
+            "requires_acp_program",
+            "unavailable"
+          ]
+        },
+        "reason": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "NativeContinuationConfirmV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "commandId",
+        "previewId",
+        "previewDigest"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1,
+          "type": "integer"
+        },
+        "commandId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "previewId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "previewDigest": {
+          "type": "string",
+          "minLength": 71,
+          "maxLength": 71,
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "NativeContinuationReceiptV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "commandId",
+        "state",
+        "originId",
+        "threadId",
+        "conversationId",
+        "reportedSessionId",
+        "error"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1,
+          "type": "integer"
+        },
+        "commandId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "prepared",
+            "starting",
+            "binding_recorded",
+            "failed",
+            "unknown"
+          ]
+        },
+        "originId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "threadId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "conversationId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "reportedSessionId": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "error": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "NativeSteerScopeV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "threadId",
+        "conversationId",
+        "scopeKind"
+      ],
+      "properties": {
+        "threadId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "conversationId": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "scopeKind": {
+          "type": "string",
+          "enum": [
+            "public",
+            "single_chat",
+            "delegation_child"
+          ]
+        }
+      }
+    },
+    "NativeSteerTargetV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "agentId",
+        "agentRunId",
+        "executionEpoch",
+        "nativeBindingId",
+        "nativeBindingGeneration",
+        "bindingCompatibilityDigest",
+        "activeTurnId"
+      ],
+      "properties": {
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "threadId",
+            "conversationId",
+            "scopeKind"
+          ],
+          "properties": {
+            "threadId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "conversationId": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "scopeKind": {
+              "type": "string",
+              "enum": [
+                "public",
+                "single_chat",
+                "delegation_child"
+              ]
+            }
+          }
+        },
+        "agentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "agentRunId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "executionEpoch": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "nativeBindingId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "nativeBindingGeneration": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "bindingCompatibilityDigest": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "activeTurnId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        }
+      }
+    },
+    "NativeSteerMaterialV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceId",
+        "snapshotDigest",
+        "displayName",
+        "kind",
+        "byteSize"
+      ],
+      "properties": {
+        "sourceId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "snapshotDigest": {
+          "type": "string",
+          "minLength": 71,
+          "maxLength": 71,
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "image",
+            "file",
+            "text_reference"
+          ]
+        },
+        "byteSize": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 20971520
+        }
+      }
+    },
+    "NativeSteerInputV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text",
+        "materials"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 4096
+        },
+        "materials": {
+          "type": "array",
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "sourceId",
+              "snapshotDigest",
+              "displayName",
+              "kind",
+              "byteSize"
+            ],
+            "properties": {
+              "sourceId": {
+                "type": "string",
+                "minLength": 36,
+                "maxLength": 36,
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+              },
+              "snapshotDigest": {
+                "type": "string",
+                "minLength": 71,
+                "maxLength": 71,
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "displayName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "image",
+                  "file",
+                  "text_reference"
+                ]
+              },
+              "byteSize": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 20971520
+              }
+            }
+          }
+        }
+      }
+    },
+    "NativeSteerPreviewV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "previewId",
+        "previewDigest",
+        "expiresAt",
+        "target",
+        "input",
+        "inputDigest",
+        "capabilityDigest"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1,
+          "type": "integer"
+        },
+        "previewId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "previewDigest": {
+          "type": "string",
+          "minLength": 71,
+          "maxLength": 71,
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "expiresAt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "scope",
+            "agentId",
+            "agentRunId",
+            "executionEpoch",
+            "nativeBindingId",
+            "nativeBindingGeneration",
+            "bindingCompatibilityDigest",
+            "activeTurnId"
+          ],
+          "properties": {
+            "scope": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "threadId",
+                "conversationId",
+                "scopeKind"
+              ],
+              "properties": {
+                "threadId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "conversationId": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "scopeKind": {
+                  "type": "string",
+                  "enum": [
+                    "public",
+                    "single_chat",
+                    "delegation_child"
+                  ]
+                }
+              }
+            },
+            "agentId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "agentRunId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "executionEpoch": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "nativeBindingId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "nativeBindingGeneration": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "bindingCompatibilityDigest": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "activeTurnId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          }
+        },
+        "input": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "text",
+            "materials"
+          ],
+          "properties": {
+            "text": {
+              "type": "string",
+              "minLength": 0,
+              "maxLength": 4096
+            },
+            "materials": {
+              "type": "array",
+              "maxItems": 10,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "sourceId",
+                  "snapshotDigest",
+                  "displayName",
+                  "kind",
+                  "byteSize"
+                ],
+                "properties": {
+                  "sourceId": {
+                    "type": "string",
+                    "minLength": 36,
+                    "maxLength": 36,
+                    "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                  },
+                  "snapshotDigest": {
+                    "type": "string",
+                    "minLength": 71,
+                    "maxLength": 71,
+                    "pattern": "^sha256:[0-9a-f]{64}$"
+                  },
+                  "displayName": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "image",
+                      "file",
+                      "text_reference"
+                    ]
+                  },
+                  "byteSize": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 20971520
+                  }
+                }
+              }
+            }
+          }
+        },
+        "inputDigest": {
+          "type": "string",
+          "minLength": 71,
+          "maxLength": 71,
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "capabilityDigest": {
+          "type": "string",
+          "minLength": 71,
+          "maxLength": 71,
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "NativeSteerReceiptV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "commandId",
+        "previewId",
+        "target",
+        "inputDigest",
+        "status",
+        "nativeOutcome",
+        "nativeReceiptDigest",
+        "error"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1,
+          "type": "integer"
+        },
+        "commandId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "previewId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "scope",
+            "agentId",
+            "agentRunId",
+            "executionEpoch",
+            "nativeBindingId",
+            "nativeBindingGeneration",
+            "bindingCompatibilityDigest",
+            "activeTurnId"
+          ],
+          "properties": {
+            "scope": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "threadId",
+                "conversationId",
+                "scopeKind"
+              ],
+              "properties": {
+                "threadId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "conversationId": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "scopeKind": {
+                  "type": "string",
+                  "enum": [
+                    "public",
+                    "single_chat",
+                    "delegation_child"
+                  ]
+                }
+              }
+            },
+            "agentId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "agentRunId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "executionEpoch": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "nativeBindingId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "nativeBindingGeneration": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "bindingCompatibilityDigest": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "activeTurnId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          }
+        },
+        "inputDigest": {
+          "type": "string",
+          "minLength": 71,
+          "maxLength": 71,
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "prepared",
+            "connection_written",
+            "native_acknowledged",
+            "not_consumed",
+            "requires_user_review",
+            "unknown"
+          ]
+        },
+        "nativeOutcome": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "injected",
+                "promptRequired",
+                "startedNewTurn"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nativeReceiptDigest": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 71,
+              "maxLength": 71,
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "error": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "NativeInputDeliveryV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "deliveryId",
+        "commandId",
+        "previewId",
+        "previewDigest",
+        "target",
+        "input",
+        "inputDigest",
+        "nativePromptDigest",
+        "nativeRequestBytes",
+        "status",
+        "nativeOutcome",
+        "nativeReceiptDigest",
+        "createdAt",
+        "updatedAt",
+        "error"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1,
+          "type": "integer"
+        },
+        "deliveryId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "commandId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "previewId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "previewDigest": {
+          "type": "string",
+          "minLength": 71,
+          "maxLength": 71,
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "scope",
+            "agentId",
+            "agentRunId",
+            "executionEpoch",
+            "nativeBindingId",
+            "nativeBindingGeneration",
+            "bindingCompatibilityDigest",
+            "activeTurnId"
+          ],
+          "properties": {
+            "scope": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "threadId",
+                "conversationId",
+                "scopeKind"
+              ],
+              "properties": {
+                "threadId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "conversationId": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "scopeKind": {
+                  "type": "string",
+                  "enum": [
+                    "public",
+                    "single_chat",
+                    "delegation_child"
+                  ]
+                }
+              }
+            },
+            "agentId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "agentRunId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "executionEpoch": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "nativeBindingId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "nativeBindingGeneration": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "bindingCompatibilityDigest": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "activeTurnId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          }
+        },
+        "input": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "text",
+            "materials"
+          ],
+          "properties": {
+            "text": {
+              "type": "string",
+              "minLength": 0,
+              "maxLength": 4096
+            },
+            "materials": {
+              "type": "array",
+              "maxItems": 10,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "sourceId",
+                  "snapshotDigest",
+                  "displayName",
+                  "kind",
+                  "byteSize"
+                ],
+                "properties": {
+                  "sourceId": {
+                    "type": "string",
+                    "minLength": 36,
+                    "maxLength": 36,
+                    "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                  },
+                  "snapshotDigest": {
+                    "type": "string",
+                    "minLength": 71,
+                    "maxLength": 71,
+                    "pattern": "^sha256:[0-9a-f]{64}$"
+                  },
+                  "displayName": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "image",
+                      "file",
+                      "text_reference"
+                    ]
+                  },
+                  "byteSize": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 20971520
+                  }
+                }
+              }
+            }
+          }
+        },
+        "inputDigest": {
+          "type": "string",
+          "minLength": 71,
+          "maxLength": 71,
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "nativePromptDigest": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 71,
+              "maxLength": 71,
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nativeRequestBytes": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 67108864
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "prepared",
+            "connection_written",
+            "native_acknowledged",
+            "not_consumed",
+            "requires_user_review",
+            "unknown"
+          ]
+        },
+        "nativeOutcome": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "injected",
+                "promptRequired",
+                "startedNewTurn"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nativeReceiptDigest": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 71,
+              "maxLength": 71,
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "updatedAt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "error": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "NativeSteerPolicyV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "revision",
+        "members"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1,
+          "type": "integer"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "members": {
+          "type": "array",
+          "maxItems": 4096,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "agentId",
+              "enabled"
+            ],
+            "properties": {
+              "agentId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "NativeSteerPolicySetV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "commandId",
+        "expectedRevision",
+        "members"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1,
+          "type": "integer"
+        },
+        "commandId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "members": {
+          "type": "array",
+          "maxItems": 4096,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "agentId",
+              "enabled"
+            ],
+            "properties": {
+              "agentId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "operations": {
+    "history.execution.preview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "sourceThreadId",
+        "importId",
+        "expectedImportRevision",
+        "agentId",
+        "expectedAgentVersion",
+        "mode",
+        "point",
+        "title"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1,
+          "type": "integer"
+        },
+        "sourceThreadId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "importId": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expectedImportRevision": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "agentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expectedAgentVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "continue",
+            "fork_tail",
+            "fork_point"
+          ]
+        },
+        "point": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "selectedTurnId",
+                "messageId",
+                "messageFingerprint",
+                "messageOccurrence"
+              ],
+              "properties": {
+                "selectedTurnId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4096
+                },
+                "messageId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4096
+                },
+                "messageFingerprint": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "minLength": 71,
+                      "maxLength": 71,
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "messageOccurrence": {
+                  "oneOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 4294967295
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 1024
+        }
+      }
+    },
+    "history.execution.confirm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "commandId",
+        "previewId",
+        "previewDigest"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1,
+          "type": "integer"
+        },
+        "commandId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "previewId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "previewDigest": {
+          "type": "string",
+          "minLength": 71,
+          "maxLength": 71,
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "history.execution.receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "commandId"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1,
+          "type": "integer"
+        },
+        "commandId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        }
+      }
+    },
+    "runtime.steer.policy.get": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {}
+    },
+    "runtime.steer.policy.set": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "commandId",
+        "expectedRevision",
+        "members"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1,
+          "type": "integer"
+        },
+        "commandId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "members": {
+          "type": "array",
+          "maxItems": 4096,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "agentId",
+              "enabled"
+            ],
+            "properties": {
+              "agentId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "runtime.steer.targets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "scope"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1,
+          "type": "integer"
+        },
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "threadId",
+            "conversationId",
+            "scopeKind"
+          ],
+          "properties": {
+            "threadId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "conversationId": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "scopeKind": {
+              "type": "string",
+              "enum": [
+                "public",
+                "single_chat",
+                "delegation_child"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "runtime.steer.preview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "target",
+        "input"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1,
+          "type": "integer"
+        },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "scope",
+            "agentId",
+            "agentRunId",
+            "executionEpoch",
+            "nativeBindingId",
+            "nativeBindingGeneration",
+            "bindingCompatibilityDigest",
+            "activeTurnId"
+          ],
+          "properties": {
+            "scope": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "threadId",
+                "conversationId",
+                "scopeKind"
+              ],
+              "properties": {
+                "threadId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "conversationId": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "scopeKind": {
+                  "type": "string",
+                  "enum": [
+                    "public",
+                    "single_chat",
+                    "delegation_child"
+                  ]
+                }
+              }
+            },
+            "agentId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "agentRunId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "executionEpoch": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "nativeBindingId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "nativeBindingGeneration": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "bindingCompatibilityDigest": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "activeTurnId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          }
+        },
+        "input": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "text",
+            "materials"
+          ],
+          "properties": {
+            "text": {
+              "type": "string",
+              "minLength": 0,
+              "maxLength": 4096
+            },
+            "materials": {
+              "type": "array",
+              "maxItems": 10,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "sourceId",
+                  "snapshotDigest",
+                  "displayName",
+                  "kind",
+                  "byteSize"
+                ],
+                "properties": {
+                  "sourceId": {
+                    "type": "string",
+                    "minLength": 36,
+                    "maxLength": 36,
+                    "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                  },
+                  "snapshotDigest": {
+                    "type": "string",
+                    "minLength": 71,
+                    "maxLength": 71,
+                    "pattern": "^sha256:[0-9a-f]{64}$"
+                  },
+                  "displayName": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "image",
+                      "file",
+                      "text_reference"
+                    ]
+                  },
+                  "byteSize": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 20971520
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "runtime.steer.confirm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "commandId",
+        "previewId",
+        "previewDigest"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1,
+          "type": "integer"
+        },
+        "commandId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "previewId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "previewDigest": {
+          "type": "string",
+          "minLength": 71,
+          "maxLength": 71,
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "runtime.steer.receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "commandId"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1,
+          "type": "integer"
+        },
+        "commandId": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        }
+      }
+    },
+    "runtime.steer.previews": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "scope",
+        "after",
+        "limit"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1,
+          "type": "integer"
+        },
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "threadId",
+            "conversationId",
+            "scopeKind"
+          ],
+          "properties": {
+            "threadId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "conversationId": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "scopeKind": {
+              "type": "string",
+              "enum": [
+                "public",
+                "single_chat",
+                "delegation_child"
+              ]
+            }
+          }
+        },
+        "after": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 36,
+              "maxLength": 36,
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50
+        }
+      }
+    }
+  },
+  "wire": {
+    "acpSteer": {
+      "method": "_session/steering",
+      "params": {
+        "sessionId": "<exact live session>",
+        "prompt": "<same native prompt blocks as the confirmed preview>",
+        "_meta": {
+          "steering": {
+            "idleBehavior": "promptRequired"
+          }
+        }
+      }
+    },
+    "outcomes": [
+      "injected",
+      "promptRequired",
+      "startedNewTurn"
+    ]
+  },
+  "unchangedVersionAxes": {
+    "bootstrap": 5,
+    "formatter": 5,
+    "charter": 22,
+    "directFormatterAndManifest": 29,
+    "publicFormatterAndManifest": 34,
+    "delegationContext": 35,
+    "builtin": 39,
+    "ipc": 3,
+    "envelope": 2,
+    "output": 10,
+    "mcpProjection": 2
+  },
+  "newVersionAxes": {
+    "NativeSourceReference": 1,
+    "NativeSessionOrigin": 1,
+    "NativeForkPoint": 1,
+    "FrozenNativeSteer": 1,
+    "NativeInputDelivery": 1
+  },
+  "softwareReview": false,
+  "softwareTests": false
+}
