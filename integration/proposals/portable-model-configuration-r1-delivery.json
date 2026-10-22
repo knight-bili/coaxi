@@ -1,0 +1,64 @@
+{
+  "changeId": "portable-model-configuration",
+  "revision": 1,
+  "confirmationStatus": "pending",
+  "confirmedRevision": null,
+  "files": {
+    "word": {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\第一期改造\\完整模型配置迁移_r1\\final\\怎样把原来的模型和设置搬进融合工作台_客户确认版_r1.docx",
+      "sha256": "f06d7faf366b5f26e70c96d9a1ef01e4dc8478a7fdba8b8204de6c0106a7005e",
+      "bytes": 27389
+    },
+    "pdf": {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\file\\第一期改造\\完整模型配置迁移_r1\\final\\怎样把原来的模型和设置搬进融合工作台_客户确认版_r1.pdf",
+      "sha256": "40f7a101989128acb8be73b1fb55c0562327b73efee11c4c7322df4948f50be0",
+      "bytes": 684118
+    },
+    "statement": {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\docs\\versions\\v1.73\\model-context-change-portable-model-configuration.md",
+      "sha256": "1869e4ec16c284e5bfccee2105f35d9df236511656862c8156fab32cc4e80192",
+      "bytes": 48400
+    },
+    "proposalContract": {
+      "path": "D:\\soft\\codex\\home\\2026-10-13\\codeg-rovai-ai-rovai-core-codeg\\work\\integration\\integration\\proposals\\portable-model-configuration-r1-contract.json",
+      "sha256": "7f3c3ad22eb4fc701b7ec22795f255dc055a1f72097add00244d0bac2cd01a53",
+      "bytes": 61493
+    }
+  },
+  "documentQA": {
+    "pages": 19,
+    "pagesSeen": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19
+    ],
+    "method": "render_docx.py生成后逐页打开PNG检查",
+    "result": "19页均已目视检查，标题正文源码与页脚无裁切重叠或乱码",
+    "softwareReview": false,
+    "softwareTests": false
+  },
+  "frozenAt": "2026-10-22T12:47:39.762642+00:00",
+  "plannedCases": 44,
+  "authorizationExcludes": [
+    "paid_model_calls",
+    "main_merge",
+    "release"
+  ],
+  "implementation": "proposal_only_no_production_schema_or_contract_change"
+}
