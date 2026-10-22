@@ -8,6 +8,8 @@ pub mod storage;
 pub(crate) mod secrets;
 pub(crate) mod providers;
 pub(crate) mod members;
+pub(crate) mod archive;
+mod codeg_crypto;
 mod model;
 pub use model::*;
 
