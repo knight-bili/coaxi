@@ -184,7 +184,10 @@
     "build:linux:x64": "pnpm core:build:linux:x64 && pnpm build:desktop",
     "package:linux:x64": "pnpm build:linux:x64 && node scripts/package-linux.mjs dir",
     "dist:linux:x64": "pnpm build:linux:x64 && node scripts/package-linux.mjs portable",
-    "dist:linux:deb:x64": "pnpm build:linux:x64 && node scripts/package-linux.mjs deb"
+    "dist:linux:deb:x64": "pnpm build:linux:x64 && node scripts/package-linux.mjs deb",
+    "build:mobile-cards": "node scripts/build-mobile-cards.mjs",
+    "package:mobile:android": "node scripts/package-mobile.mjs --android",
+    "package:mobile:ios": "node scripts/package-mobile.mjs --ios"
   },
   "dependencies": {
     "html-to-image": "1.11.13",
