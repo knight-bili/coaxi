@@ -1396,6 +1396,7 @@ struct ZcodeBackgroundRoute {
 
 pub(crate) struct AcpHost {
     native_steering_disabled: AtomicBool,
+    native_steer_gate: Mutex<()>,
     native_response_digests: Mutex<HashMap<u64,String>>,
     native_source: Option<rovai_core::runtime_subagent_session::CapturedNativeSource>,
     credential_redactor: Option<rovai_core::runtime_custom_api::CredentialRedactor>,
@@ -1836,6 +1837,7 @@ impl AcpHost {
             protocol_violated: AtomicBool::new(false),
             initialize_result: RwLock::new(None),
             native_steering_disabled: AtomicBool::new(false),
+            native_steer_gate: Mutex::new(()),
             native_response_digests: Mutex::new(HashMap::new()),
             trae_permission_mode: (frozen_runtime.adapter_kind == AdapterKind::TraeCnCli).then(
                 || {

@@ -29,6 +29,7 @@ CREATE TABLE native_lifecycle_source_lease (
  state TEXT NOT NULL CHECK(state IN ('reserved','bound','unknown','released')),
  PRIMARY KEY(source_handle_id,provider,native_session_id)
 );
+CREATE UNIQUE INDEX native_lifecycle_intent_preview ON native_lifecycle_intent(preview_id);
 CREATE TABLE native_lifecycle_steer_policy (
  singleton INTEGER PRIMARY KEY NOT NULL CHECK(singleton=1), revision INTEGER NOT NULL CHECK(revision>=0),
  value_json TEXT NOT NULL CHECK(json_valid(value_json) AND length(value_json)<=2097152)

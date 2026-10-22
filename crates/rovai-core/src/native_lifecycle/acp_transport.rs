@@ -17,6 +17,7 @@ impl AcpRuntime{
     }
     /// 参数已由 Core 从受管快照投影；本入口拒绝另一个执行或代次的轮次。
     pub(crate) async fn native_steer(&self,active_turn:&str,expected_capability:&str,blocks:Vec<Value>)->Result<NativeSteerObservation>{
+        let _gate=self.host.native_steer_gate.lock().await;
         ensure!(self.native_steer_capability().await?.as_deref()==Some(expected_capability),"native_lifecycle.capability_changed");
         ensure!(!blocks.is_empty(),"native_lifecycle.empty_input");
         let session=self.session_id().await.context("native_lifecycle.native_session_missing")?;

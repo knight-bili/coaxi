@@ -2,7 +2,7 @@
 use super::*;
 use crate::{draft_client::DraftClient,local_attachment_source::LocalAttachmentSourceRef,single_chat_composer_scope::{PrivateComposerKey,SingleChatComposerScope}};
 use rusqlite::{Connection,OptionalExtension,params};
-use std::{fs,io::Read,path::{Path,PathBuf}};
+use std::{io::Read,path::{Path,PathBuf}};
 use sha2::{Digest,Sha256};
 
 #[derive(Clone)]pub(crate) struct Candidate{pub original_id:String,pub source:PathBuf,pub display_name:String}
