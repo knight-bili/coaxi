@@ -15,6 +15,7 @@ struct RovaiSkillSettingsView: View {
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 12) {
+                NavigationLink("查看原生 Skills") {RovaiNativeSkills(model: model)}
                 if let issue { Text(issue).font(.caption).foregroundStyle(Theme.warning) }
                 EditorSection(title: "技能类别") {
                     Picker("类别", selection: $family) { Text("全部").tag("all"); Text("专家").tag("experts"); Text("科研").tag("science"); Text("Office").tag("office"); Text("交互卡片").tag("ui"); Text("自定义").tag("custom") }
