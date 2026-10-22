@@ -1,6 +1,6 @@
 CREATE TABLE portable_provider_revision (
  id TEXT NOT NULL,revision INTEGER NOT NULL CHECK(revision>0),digest TEXT NOT NULL,
- value_json TEXT NOT NULL CHECK(json_valid(value_json) AND length(value_json)<=2097152),created_at TEXT NOT NULL,
+ value_json TEXT NOT NULL CHECK(json_valid(value_json) AND length(value_json)<=2097152),content_cipher BLOB NOT NULL,created_at TEXT NOT NULL,
  PRIMARY KEY(id,revision),UNIQUE(id,revision,digest)
 );
 CREATE TABLE portable_provider_head (
