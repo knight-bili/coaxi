@@ -9,10 +9,9 @@ pub async fn prepare(runtime:&FrozenAgentRuntimeConfig,source:Option<&LaunchEnvi
     let custom=runtime.custom_runtime.as_ref().context("custom_runtime.frozen_definition_missing")?;ensure!(custom.schema_version==1,"custom_runtime.frozen_version_invalid");let source=source.context("custom_runtime.host_launch_source_missing")?;
     let(lock,environment,payload)={
         let database=source.database.lock().await;let stored=storage::frozen(database.connection(),&custom.reference,&runtime.installation_id)?;
-        ensure!(stored==*custom,"custom_runtime.frozen_definition_changed");let(_,lock)=storage::installed_lock(database.connection(),&custom.reference)?;
+        ensure!(stored==*custom,"custom_runtime.frozen_definition_changed");let(id,lock)=storage::retained_lock(database.connection(),&custom.reference,&runtime.installation_id)?;
         ensure!(text(&lock,"executable")?==runtime.executable_path,"custom_runtime.entrypoint_changed");
         let environment=storage::launch_environment(database.connection(),&custom.resolved_definition,&installer::environment_path(&custom.resolved_definition,installer::platform()?)?)?;
-        let id:String=database.connection().query_row("SELECT operation_id FROM custom_runtime_installation WHERE definition_id=?1 AND definition_revision=?2 AND platform=?3",rusqlite::params![custom.reference.id,custom.reference.definition_revision,installer::platform()?],|r|r.get(0))?;uuid::Uuid::parse_str(&id)?;
         let root=PathBuf::from(database.connection().path().context("custom_runtime.database_path_missing")?).parent().context("custom_runtime.database_parent_missing")?.to_path_buf();
         let payload=root.join("custom-runtimes").join(&custom.reference.id).join(custom.reference.definition_revision.to_string()).join(installer::platform()?).join(id).join("payload");(lock,environment,payload)
     };

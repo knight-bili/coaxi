@@ -43,8 +43,13 @@ pub(crate) fn installed_lock(connection:&Connection,reference:&CustomRuntimeRefV
     let value:Value=serde_json::from_str(&raw)?;validate("launchLock",&value)?;ensure!(value["definition"]==serde_json::to_value(reference)?&&value["platform"]==platform,"custom_runtime.installation_scope_changed");Ok((id,value))
 }
 pub(crate) fn frozen(connection:&Connection,reference:&CustomRuntimeRefV1,installation:&str)->Result<FrozenCustomRuntimeV1>{
-    let definition=resolve(connection,reference,false)?;let(id,lock)=installed_lock(connection,reference)?;ensure!(id==installation,"custom_runtime.installation_scope_changed");
+    let definition=resolve(connection,reference,false)?;let(_,lock)=retained_lock(connection,reference,installation)?;
     Ok(FrozenCustomRuntimeV1{schema_version:1,reference:reference.clone(),registry_id:text(&definition,"registryId")?.into(),source:text(&definition,"source")?.into(),distribution_kind:text(&definition,"distributionKind")?.into(),resolved_definition:definition,launch_lock_digest:digest(&lock)?,declared_mcp:lock["supportsMcpDeclared"].as_bool().context("custom_runtime.mcp_declaration_invalid")?,declared_skill_roots:lock["skillRoots"].as_array().context("custom_runtime.skill_roots_invalid")?.iter().map(|v|v.as_str().map(str::to_owned).context("custom_runtime.skill_root_invalid")).collect::<Result<_>>()?,observed_capabilities_digest:lock["protocolCapabilitiesDigest"].as_str().map(str::to_owned)})
+}
+pub(crate) fn retained_lock(connection:&Connection,reference:&CustomRuntimeRefV1,installation:&str)->Result<(String,Value)>{
+    let platform=super::installer::platform()?;let row:Option<(String,String)>=connection.query_row("SELECT operation_id,lock_json FROM custom_runtime_installation_history WHERE installation_id=?1 AND definition_id=?2 AND definition_revision=?3 AND platform=?4",params![installation,reference.id,reference.definition_revision,platform],|row|Ok((row.get(0)?,row.get(1)?))).optional()?;
+    let(operation,raw)=match row{Some(row)=>row,None=>connection.query_row("SELECT operation_id,lock_json FROM custom_runtime_installation WHERE installation_id=?1 AND definition_id=?2 AND definition_revision=?3 AND platform=?4 AND lock_json IS NOT NULL",params![installation,reference.id,reference.definition_revision,platform],|row|Ok((row.get::<_,String>(0)?,row.get::<_,String>(1)?)))?};
+    uuid::Uuid::parse_str(&operation)?;let lock:Value=serde_json::from_str(&raw)?;validate("launchLock",&lock)?;ensure!(lock["definition"]==serde_json::to_value(reference)?&&lock["platform"]==platform,"custom_runtime.installation_scope_changed");Ok((operation,lock))
 }
 pub fn list(connection:&Connection,after:Option<&str>,limit:u32)->Result<Value>{
     ensure!((1..=100).contains(&limit),"custom_runtime.limit_invalid");
