@@ -8,6 +8,7 @@ pub mod storage;
 pub(crate) mod artifacts;
 pub(crate) mod packages;
 pub(crate) mod installer;
+pub(crate) mod launch;
 mod schema;
 pub const MAX_BYTES:usize=2*1024*1024;
 pub const MAX_DEFINITIONS:i64=4096;

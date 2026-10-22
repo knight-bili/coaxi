@@ -1785,10 +1785,12 @@ impl AcpHost {
             (Box::new(stdin), Box::new(stdout))
         };
         let host = Arc::new(Self {
-            credential_redactor: frozen_runtime
+            credential_redactor: match (frozen_runtime
                 .environment
                 .as_ref()
-                .map(|env| env.redactor()),
+                .map(|env| env.redactor()),crate::custom_runtime::launch::redactor()) {
+                    (Some(base),Some(custom))=>Some(base.extend(custom)),(base,None)=>base,(None,custom)=>custom,
+                },
             adapter_kind: frozen_runtime.adapter_kind,
             reported_version: frozen_runtime.reported_version.clone(),
             opencode_program_identity: if frozen_runtime.adapter_kind == AdapterKind::OpencodeCli {
@@ -6174,12 +6176,14 @@ impl AcpCliRuntimeAdapter {
                     compatibility,
                 },
                 move || async move {
+                    let custom_plan=crate::custom_runtime::launch::prepare(&spawn_frozen_runtime,spawn_environment_source.as_ref()).await?;
                     spawn_frozen_runtime.environment =
                         rovai_core::member_environment::resolve_for_launch(
                             spawn_environment_source,
                             spawn_frozen_runtime.environment,
                         )
                         .await?;
+                    crate::custom_runtime::launch::merge_environment(custom_plan.as_ref(),&mut spawn_frozen_runtime.environment)?;
                     if spawn_frozen_runtime
                         .environment
                         .as_ref()
@@ -6187,7 +6191,7 @@ impl AcpCliRuntimeAdapter {
                     {
                         spawn_frozen_runtime.custom_api = None;
                     }
-                    let host = AcpHost::spawn(
+                    let host = crate::custom_runtime::launch::with_plan(custom_plan,AcpHost::spawn(
                         &spawn_execution_root,
                         &spawn_workspace,
                         permission_semantics,
@@ -6199,7 +6203,7 @@ impl AcpCliRuntimeAdapter {
                         &spawn_external_mcp_servers,
                         &spawn_private_runtime_dir,
                         Some(&spawn_attachment_access_root),
-                    )
+                    ))
                     .await?;
                     Ok(RuntimeProcessHost::Acp(host))
                 },
@@ -6615,6 +6619,13 @@ fn configure_runtime_command(
         .as_object()
         .context("ACP permission configuration must be an object")?;
     match runtime.adapter_kind {
+        AdapterKind::CustomAcp => {
+            anyhow::ensure!(values.is_empty(),"custom_runtime.permission_passthrough_forbidden");
+            anyhow::ensure!(!(permission_semantics==PermissionSemantics::CoreEnforcedV1&&workspace.access=="read_only"),"custom_runtime.native_read_only_not_declared");
+            let custom=runtime.custom_runtime.as_ref().context("custom_runtime.frozen_definition_missing")?;
+            anyhow::ensure!(custom.declared_mcp||external_mcp_servers.is_empty(),"custom_runtime.mcp_not_declared");
+            crate::custom_runtime::launch::configure(command,runtime)?;
+        }
         AdapterKind::OpenClawCli => {} // The paired Gateway prepared the exact ACP endpoint.
         AdapterKind::HermesCli => {
             anyhow::ensure!(
