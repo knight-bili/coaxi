@@ -8,11 +8,14 @@ pub struct Arguments{
     #[arg(long)]file:Option<PathBuf>,
     #[arg(long)]operation_id:Option<String>,
     #[arg(long)]snapshot_id:Option<String>,
+    #[arg(long)]source_dir:Option<PathBuf>,
+    #[arg(long)]expected_digest:Option<String>,
 }
 #[derive(Clone,ValueEnum)]
-enum Operation{Coverage,Create,Inspect,Stage,Apply,Rollback,WebdavList,WebdavProbe,WebdavPush,WebdavPull}
+enum Operation{Coverage,Create,Inspect,Stage,Apply,Rollback,LegacyInspect,LegacyStage,WebdavList,WebdavProbe,WebdavPush,WebdavPull}
 pub fn run(args:Arguments)->Result<()>{
     ensure!(args.data_dir.is_absolute(),"backup.absolute_data_directory_required");
+    if matches!(args.operation,Operation::LegacyInspect|Operation::LegacyStage){let source=args.source_dir.context("migration.source_directory_required")?;let cancel=tokio_util::sync::CancellationToken::new();if matches!(args.operation,Operation::LegacyInspect){println!("{}",serde_json::json!({"preview":rovai_core::backup::legacy::preview(&args.data_dir,&source,&cancel)?}));}else{let expected=args.expected_digest.context("migration.preview_required")?;println!("{}",serde_json::json!({"manifest":rovai_core::backup::legacy::stage(&args.data_dir,&source,&expected,&cancel)?}));}return Ok(())}
     if matches!(args.operation,Operation::Coverage){println!("{}",rovai_core::backup::owned_roots::coverage(&args.data_dir)?);return Ok(())}
     if matches!(args.operation,Operation::Apply){let result=rovai_core::backup::apply_pending(&args.data_dir)?;println!("{}",serde_json::json!({"applied":result.is_some(),"manifest":result}));return Ok(())}
     if matches!(args.operation,Operation::Rollback){rovai_core::backup::rollback(&args.data_dir)?;println!("{}",serde_json::json!({"rolledBack":true}));return Ok(())}

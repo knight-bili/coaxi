@@ -5,6 +5,7 @@ pub mod webdav;
 pub mod owned_roots;
 pub mod light_config;
 pub mod desktop_preferences;
+pub mod legacy;
 use anyhow::{Result,Context,ensure};
 use serde::{Serialize,Deserialize};
 use sha2::{Sha256,Digest};
