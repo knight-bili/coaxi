@@ -737,7 +737,7 @@ fn select_batch_prefix(
             .parent()
             .context("Core data directory is unavailable")?;
             Some(
-                crate::skill_pack_delivery::PreparedMemberSkillPacks::prepare(
+                crate::skill_pack_delivery::PreparedMemberSkillPacks::prepare_with_runtime(
                     transaction,
                     data_dir,
                     agent_id,
@@ -745,6 +745,7 @@ fn select_batch_prefix(
                         .entries
                         .iter()
                         .map(|entry| entry.skill_id.as_str()),
+                    Some(runtime),
                 )?,
             )
         } else {

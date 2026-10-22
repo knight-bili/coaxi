@@ -3,7 +3,7 @@
 use std::{collections::BTreeMap, path::Path};
 
 use anyhow::Result;
-use rusqlite::{Connection,OptionalExtension};
+use rusqlite::Connection;
 use serde_json::json;
 
 use crate::skill_pack_installation::{
@@ -40,9 +40,13 @@ impl PreparedMemberSkillPacks {
         agent_id: &str,
         requested_ids: impl IntoIterator<Item = &'a str>,
     ) -> Result<Self> {
-        let runtime:Option<String>=connection.query_row("SELECT selected_runtime_adapter_kind FROM agent_profile WHERE id=?1 AND profile_status<>'removed'",[agent_id],|row|row.get(0)).optional()?.flatten();
-        let custom_native=if runtime.as_deref()==Some("custom-acp"){
-            let roots=crate::custom_runtime::storage::member_skill_roots(connection,agent_id)?;
+        Self::prepare_with_runtime(connection,data_dir,agent_id,requested_ids,None)
+    }
+    pub(crate) fn prepare_with_runtime<'a>(connection:&Connection,data_dir:&Path,agent_id:&str,requested_ids:impl IntoIterator<Item=&'a str>,runtime:Option<&crate::agent_profile::FrozenAgentRuntimeConfig>)->Result<Self>{
+        let custom_native=if let Some(runtime)=runtime.filter(|runtime|runtime.adapter_kind==crate::agent_profile::AdapterKind::CustomAcp){
+            let custom=runtime.custom_runtime.as_ref().ok_or_else(||anyhow::anyhow!("custom_runtime.reference_required"))?;
+            anyhow::ensure!(crate::custom_runtime::storage::frozen(connection,&custom.reference,&runtime.installation_id)?==*custom,"custom_runtime.frozen_definition_changed");
+            let roots=custom.declared_skill_roots.iter().map(std::path::PathBuf::from).collect::<Vec<_>>();
             let scan=crate::native_skills::NativeSkillDiscovery::default().discover_custom(&roots,false)?;
             Some(scan.skills.into_iter().map(|skill|(skill.id,skill.name)).collect())
         }else{None};

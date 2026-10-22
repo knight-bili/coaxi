@@ -2900,7 +2900,8 @@ fn prepare_run_skill_packs(
     )
     .parent()
     .context("Core data directory is unavailable")?;
-    PreparedMemberSkillPacks::prepare(
+    let runtime=if run_snapshot_adapter_kind(snapshot)?==AdapterKind::CustomAcp{Some(serde_json::from_value::<FrozenAgentRuntimeConfig>(snapshot.effective_config.get("runtime").context("Custom Runtime configuration is missing")?.clone())?)}else{None};
+    PreparedMemberSkillPacks::prepare_with_runtime(
         connection,
         data_dir,
         &snapshot.agent_id,
@@ -2909,6 +2910,7 @@ fn prepare_run_skill_packs(
             .entries
             .iter()
             .map(|entry| entry.skill_id.as_str()),
+        runtime.as_ref(),
     )
     .map(Some)
 }
