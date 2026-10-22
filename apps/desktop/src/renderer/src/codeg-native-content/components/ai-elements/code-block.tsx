@@ -139,6 +139,7 @@ const CodeBlockBody = memo(
 
     return (
       <pre
+        dir="ltr"
         className={cn(
           "dark:!bg-[var(--shiki-dark-bg)] dark:!text-[var(--shiki-dark)] m-0 p-4 text-sm",
           className

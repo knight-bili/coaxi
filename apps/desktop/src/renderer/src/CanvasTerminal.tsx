@@ -152,7 +152,7 @@ export function CanvasTerminal({ row, scope, terminalVersion, disabled = false }
     {state?.outputTruncated && <p className="canvas-terminal-issue"><UiText zh="仅保留最近的终端输出，更早内容已丢弃。" /></p>}
     {current?.issue && <p className="canvas-terminal-issue" role="status"><UiText zh="终端运行或回收出现问题，请核对后重新读取。" /></p>}
     {current?.exitCode != null && <p className="canvas-terminal-issue">{uiAttribute('退出码：{0}', String(current.exitCode))}</p>}
-    <div ref={box} className="canvas-terminal-emulator" />
+    <div ref={box} className="canvas-terminal-emulator" dir="ltr" />
     {showKeys && <div className="canvas-terminal-keys" role="toolbar" aria-label={uiAttribute('终端快捷键')}>
       {(['ctrl', 'alt'] as const).map(key => <button key={key} type="button" aria-pressed={modifiers[key]} onPointerDown={event => event.preventDefault()} onClick={() => { mods.current = { ...mods.current, [key]: !mods.current[key] }; setModifiers(mods.current); terminal.current?.focus() }}>{key === 'ctrl' ? 'Ctrl' : 'Alt'}</button>)}
       {TERMINAL_KEYS.map(([key, label]) => <button key={key} type="button" disabled={busy || !controller?.inputReady()} onPointerDown={event => event.preventDefault()} onClick={() => {

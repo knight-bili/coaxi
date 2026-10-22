@@ -145,6 +145,7 @@ export function ReadonlyCodeViewer({
   return (
     <div
       className="file-preview-code"
+      dir="ltr"
       role="region"
       aria-label={uiAttribute("{0} 内容", String(fileName))}
       tabIndex={0}
