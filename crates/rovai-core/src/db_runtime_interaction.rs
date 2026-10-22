@@ -30,7 +30,7 @@ pub(crate) fn migrate(database: &mut Database) -> Result<()> {
     let tx = database
         .connection
         .transaction_with_behavior(TransactionBehavior::Immediate)?;
-    if matches!(classify_database_contract(&tx)?,DatabaseContractClassification::Current(ref marker)
+    if matches!(classify_database_contract(&tx)?,DatabaseContractClassification::Current(ref marker) | DatabaseContractClassification::SupportedMigrationSource(ref marker)
         if marker.projection_schema_version==161)
     {
         return Ok(());
@@ -44,7 +44,7 @@ pub(crate) fn migrate(database: &mut Database) -> Result<()> {
     tx.execute_batch("INSERT INTO schema_migration VALUES(211,datetime('now'));
         UPDATE rovai_data_contract SET projection_schema_version=161,updated_at=datetime('now') WHERE singleton=1;")?;
     anyhow::ensure!(
-        matches!(classify_database_contract(&tx)?,DatabaseContractClassification::Current(ref marker)
+        matches!(classify_database_contract(&tx)?,DatabaseContractClassification::Current(ref marker) | DatabaseContractClassification::SupportedMigrationSource(ref marker)
         if marker.projection_schema_version==161),
         "Native interaction target admission failed"
     );
