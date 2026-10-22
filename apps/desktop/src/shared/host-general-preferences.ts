@@ -34,6 +34,7 @@ export function withHostConversationPreferences(local: Omit<GeneralPreferencesAp
   return {
     get,
     setInterfaceLanguage: value => localChange(local.setInterfaceLanguage(value)),
+    ...(local.setInterfaceLanguageMode ? { setInterfaceLanguageMode: (mode: 'manual' | 'system') => localChange(local.setInterfaceLanguageMode!(mode)) } : {}),
     setStartupLocationMode: value => localChange(local.setStartupLocationMode(value)),
     setLastSettingsSection: value => localChange(local.setLastSettingsSection(value)),
     setExecutionConsolePlacement: value => localChange(local.setExecutionConsolePlacement(value)),

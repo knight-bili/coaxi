@@ -12,6 +12,7 @@ import { InteractionComputerIndicator } from './interaction-computer-indicator'
 import { KeyboardShortcutsStore } from './keyboard-shortcuts'
 import { WorkbenchEditorRecovery } from './workbench-editor-recovery'
 import { resolveWindowZoomAction } from '../shared/codeg-keyboard-shortcuts'
+import { systemInterfaceLanguage } from '../shared/interface-languages'
 import { creationPreferences, withHostConversationPreferences } from '../shared/host-general-preferences'
 import { createHostChannelHandler } from './host-channels'
 import { FilePreviewFrameNavigation } from './file-preview/file-preview-navigation'
@@ -1097,7 +1098,7 @@ if (primaryInstance) void app.whenReady().then(async () => {
   await executionView.start().catch((error) => {
     console.warn('[rovai] Execution Web service did not start; channel execution remains available.', error)
   })
-  generalPreferences = GeneralPreferencesStore.defaults(generalPreferencesPath)
+  generalPreferences = GeneralPreferencesStore.defaults(generalPreferencesPath, () => systemInterfaceLanguage([app.getLocale()]))
   if (process.platform === 'win32') {
     windowsWindowClose = new WindowsWindowClose({
       preferences: new WindowClosePreferences(join(userDataPath, 'window-close.json')),
@@ -1157,7 +1158,7 @@ if (primaryInstance) void app.whenReady().then(async () => {
     loadedNavigationPreferences,
     loadedCurrentUserProfile
   ] = await Promise.all([
-    GeneralPreferencesStore.load(generalPreferencesPath),
+    GeneralPreferencesStore.load(generalPreferencesPath, () => systemInterfaceLanguage([app.getLocale()])),
     OnboardingStore.load(onboardingPath),
     RestorableLocationStore.load(restorableLocationPath),
     NavigationPreferencesStore.load(navigationPreferencesPath),
@@ -1611,6 +1612,14 @@ ipcMain.handle('rovai:general-preferences-get', () => hostGeneralPreferences().g
 ipcMain.handle('rovai:general-preferences-set-language', (_event, language: unknown) => {
   if (!isInterfaceLanguage(language)) throw new Error('Unsupported interface language')
   return hostGeneralPreferences().setInterfaceLanguage(language)
+})
+
+ipcMain.handle('rovai:general-preferences-set-language-mode', async (event, mode: unknown) => {
+  requireMainWindow(event.sender)
+  if (mode !== 'manual' && mode !== 'system') throw new Error('Unsupported interface language mode')
+  const api = hostGeneralPreferences()
+  if (!api.setInterfaceLanguageMode) throw new Error('Interface language mode unavailable')
+  return api.setInterfaceLanguageMode(mode)
 })
 
 ipcMain.handle('rovai:general-preferences-set-startup', (_event, mode: unknown) => {

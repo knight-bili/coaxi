@@ -10,6 +10,7 @@ import { DEFAULT_GENERAL_PREFERENCES, parseGeneralPreferences } from '../../desk
 import { EMPTY_SNAPSHOT, sanitizeSnapshot, sourceMatchesSupportedSnapshot, registerNavigationProjects, isNavigationThreadReadState } from '../../desktop/src/shared/navigation-preferences-model'
 import { normalizeProjectDisplayName, projectDisplayNameError } from '../../desktop/src/shared/project-display-name'
 import { applyNavigationProjectLayout } from '../../desktop/src/shared/navigation-project-groups'
+import { systemInterfaceLanguage } from '../../desktop/src/shared/interface-languages'
 
 /** Browser presentation preferences only. No drafts, domain facts or credentials enter storage. */
 export function browserPreferences(scope: string, transport: ConsoleClient): {
@@ -22,6 +23,7 @@ export function browserPreferences(scope: string, transport: ConsoleClient): {
   }
   const write = (name: string, value: unknown): void => localStorage.setItem(`${key}:${name}`, JSON.stringify(value))
   let general = { ...(parseGeneralPreferences(read('general', DEFAULT_GENERAL_PREFERENCES)) ?? structuredClone(DEFAULT_GENERAL_PREFERENCES)), newConversationDefaults: null, newConversationDefaultsRequireConfirmation: false, oneClickNewConversationEnabled: false } as GeneralPreferencesSnapshot
+  const generalSnapshot = (): GeneralPreferencesSnapshot => ({ ...structuredClone(general), ...(general.interfaceLanguageMode === 'system' ? { interfaceLanguage: systemInterfaceLanguage(navigator.languages) } : {}) })
   let navigation = sanitizeSnapshot(read('navigation', null))
   const navigationListeners = new Set<(snapshot: NavigationPreferencesSnapshot) => void>()
   const publishNavigation = (): void => { for (const listener of navigationListeners) listener(structuredClone(navigation)) }
@@ -42,7 +44,7 @@ export function browserPreferences(scope: string, transport: ConsoleClient): {
     const next = parseGeneralPreferences({ ...general, ...patch })
     if (!next) throw new Error('界面偏好无效。')
     write('general', next); general = next
-    return structuredClone(next)
+    return generalSnapshot()
   }
   const commitNavigation = async (update: (current: NavigationPreferencesSnapshot) => Partial<NavigationPreferencesSnapshot>): Promise<NavigationPreferencesSnapshot> => {
     const next = await withBrowserPreferenceWrite(key, () => {
@@ -88,8 +90,9 @@ export function browserPreferences(scope: string, transport: ConsoleClient): {
         }
       },
       generalPreferences: withHostConversationPreferences({
-        get: async () => structuredClone(general),
-        setInterfaceLanguage: interfaceLanguage => commitGeneral({ interfaceLanguage }),
+        get: async () => generalSnapshot(),
+        setInterfaceLanguage: interfaceLanguage => commitGeneral({ schemaVersion: 6, interfaceLanguage, interfaceLanguageMode: 'manual' }),
+        setInterfaceLanguageMode: interfaceLanguageMode => commitGeneral({ schemaVersion: 6, interfaceLanguageMode, interfaceLanguage: generalSnapshot().interfaceLanguage }),
         setStartupLocationMode: startupLocationMode => commitGeneral({ startupLocationMode }),
         setLastSettingsSection: lastSettingsSection => commitGeneral({ lastSettingsSection }),
         setExecutionConsolePlacement: executionConsolePlacement => commitGeneral({ executionConsolePlacement }),
