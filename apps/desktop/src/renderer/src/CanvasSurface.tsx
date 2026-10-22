@@ -1,4 +1,6 @@
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { createContext, useCallback,useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { SplitTabDeck,type SplitDeckPlacement } from './SplitTabDeck'
+import { Columns2 } from 'lucide-react'
 import * as Dialog from '@radix-ui/react-dialog'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { Background, BackgroundVariant, Panel, NodeResizer, ReactFlow, ReactFlowProvider,
@@ -261,6 +263,9 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
   const regions = useMemo(() => frozenMembers ? new Map([...liveRegions, ...frozenMembers]) : liveRegions, [liveRegions, frozenMembers])
   const expanded = useMemo(() => new Set(view.expandedRegions), [view.expandedRegions])
   const conversationInstances = props.conversation?.instances ?? EMPTY_CONVERSATIONS
+  const [groupedConversations,setGroupedConversations]=useState(false),[groupedSelected,setGroupedSelected]=useState<string|null>(null),[groupedPlacements,setGroupedPlacements]=useState<SplitDeckPlacement[]>([])
+  const placeGroupedConversations=useCallback((value:SplitDeckPlacement[])=>setGroupedPlacements(value),[])
+  useEffect(()=>{if(!conversationInstances.some(instance=>instance.target.boardId===props.boardId))setGroupedConversations(false)},[conversationInstances,props.boardId])
   // Content elements/visibility reports change without changing any node geometry.
   const conversationLayoutKey = JSON.stringify(conversationInstances.map(item => [item.key, item.target.presentation]))
   const orphanedConversations = conversationInstances.filter(item => item.target.boardId === props.boardId && !rows.some(row => canvasConversationMatches(row, item.target)))
@@ -475,6 +480,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
   }
   // Codeg's board actions stay in a bottom-centred dock; viewport controls own their corner.
   const toolbar = <div className="canvas-toolbar" role="toolbar" aria-label={uiAttribute('画布工具')}>
+    <CanvasIconButton label={uiAttribute(groupedConversations?'回到自由画布':'会话标签与分屏')} disabled={!conversationInstances.some(instance=>instance.target.boardId===props.boardId)||Boolean(props.conversation?.opening||props.conversation?.leaving)} onClick={()=>setGroupedConversations(value=>!value)}><Columns2 size={16}/></CanvasIconButton>
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild><button type="button" className="canvas-icon-button" disabled={blocked} aria-label={uiAttribute('添加节点')} title={uiAttribute('添加节点')}><Plus size={18} /></button></DropdownMenu.Trigger>
       <DropdownMenu.Portal><DropdownMenu.Content className="canvas-card-menu" side="top" align="start" sideOffset={10} collisionPadding={12} loop onCloseAutoFocus={event => event.preventDefault()}>
@@ -604,6 +610,9 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
           {guides.map((guide, i) => <line key={i} x1={guide.axis === 'x' ? guide.at : guide.from} x2={guide.axis === 'x' ? guide.at : guide.to}
             y1={guide.axis === 'y' ? guide.at : guide.from} y2={guide.axis === 'y' ? guide.at : guide.to} vectorEffect="non-scaling-stroke" />)}
         </svg>
+          <div className="canvas-conversation-deck-overlay" hidden={!groupedConversations} style={{left:-viewport.x/viewport.zoom,top:-viewport.y/viewport.zoom,width:stageSize.width,height:Math.max(0,stageSize.height-72),transform:`scale(${1/viewport.zoom})`}}>
+            <SplitTabDeck key={`${props.boardId}:conversations`} scopeKey={`${props.boardId}:conversations`} items={conversationInstances.filter(instance=>instance.target.boardId===props.boardId).map(instance=>({id:instance.key,label:title(instance.target.reference)}))} selected={groupedSelected} onSelect={setGroupedSelected} onClose={key=>{void props.conversation?.close([key])}} disabled={Boolean(props.conversation?.opening||props.conversation?.leaving||props.conversation?.restoring)} renderBody={()=>null} externalBodies onPlacement={placeGroupedConversations}/>
+          </div>
           {conversationInstances.filter(instance => instance.target.boardId === props.boardId).map((instance, index) => {
             const row = rows.find(row => canvasConversationMatches(row, instance.target))
             const flowNode = row && nodes.find(node => node.id === row.id)
@@ -611,9 +620,11 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
               x: flowNode?.position.x ?? row.data.x, y: flowNode?.position.y ?? row.data.y,
               width: flowNode?.width ?? row.data.width, height: flowNode?.height ?? row.data.height
             } : null, viewport, stageSize)
-            return <div key={instance.key} className="canvas-conversation-overlay" style={{ ...geometry,
-              zIndex: row && instance.target.presentation === 'inline' ? flowNode?.zIndex ?? 10 + index : 2010 + index }}>
-              <CanvasConversationFrame bridge={props.conversation!} instance={instance} title={title(instance.target.reference)} orphaned={!row}
+            const placement=groupedPlacements.find(item=>item.id===instance.key),height=Math.max(0,stageSize.height-72)
+            const groupedGeometry=placement?{left:(stageSize.width*placement.rect.x/100-viewport.x)/viewport.zoom,top:(height*placement.rect.y/100+32-viewport.y)/viewport.zoom,width:stageSize.width*placement.rect.w/100,height:Math.max(0,height*placement.rect.h/100-32),transform:`scale(${1/viewport.zoom})`}:geometry
+            return <div key={instance.key} className="canvas-conversation-overlay" hidden={groupedConversations&&(!placement||!placement.visible)} onFocusCapture={()=>{if(groupedConversations)setGroupedSelected(instance.key)}} style={{ ...(groupedConversations?groupedGeometry:geometry),
+              zIndex:groupedConversations?3000:row && instance.target.presentation === 'inline' ? flowNode?.zIndex ?? 10 + index : 2010 + index }}>
+              <CanvasConversationFrame bridge={props.conversation!} instance={instance} title={title(instance.target.reference)} orphaned={!row} grouped={groupedConversations}
                 onOpenWorkspace={() => props.onOpenReference(instance.target.reference)} />
             </div>
           })}
