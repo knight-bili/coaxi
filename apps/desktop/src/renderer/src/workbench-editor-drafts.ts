@@ -86,6 +86,6 @@ export class WorkbenchEditorDrafts {
       this.publish({pending:Boolean(record.pending)||!same(record.latest,this.acknowledged),revision:record.revision})
     }catch(error){this.publish({pending:true,issue:String(error)});throw error}finally{this.publish({saving:false})}
   }
-  dispose():void{this.disposed=true;this.generation++;if(this.timer)clearTimeout(this.timer);this.timer=null;this.listeners.clear();if(this.record)void this.cache().catch(()=>undefined)}
+  dispose():void{this.disposed=true;this.generation++;if(this.timer)clearTimeout(this.timer);this.timer=null;if(this.record)void this.cache().catch(()=>undefined)}
   localDraft():WorkbenchEditorState|null{return this.record?.latest?structuredClone(this.record.latest):null}
 }

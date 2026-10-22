@@ -57,7 +57,7 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
   const [draftCopies,setDraftCopies]=useState<EditorRecoveryCopy[]|null>(null),[draftCopiesNext,setDraftCopiesNext]=useState<string|null>(null)
   const [splitLayout,setSplitLayout]=useState<unknown|null>(null),[restoreToken,setRestoreToken]=useState(0),restoredSplitLayout=useRef<unknown>(null)
   const acceptRestoredDraft=(value:WorkbenchEditorState|null):void=>{const next=value??{documents:[],selected:null,layout:null};setDocuments(next.documents);setSelected(next.selected);setSplitLayout(next.layout);restoredSplitLayout.current=next.layout;setRestoreToken(value=>value+1)}
-  useEffect(()=>{let active=true;hydrated.current=false;setDraftRestoreError('');void editorDrafts.start().then(value=>{if(active){acceptRestoredDraft(value);hydrated.current=true}}).catch(error=>{if(active)setDraftRestoreError(String(error))});return()=>{active=false;hydrated.current=false;editorDrafts.dispose()}},[editorDrafts,draftReadAttempt])
+  useEffect(()=>{if(!open)return;let active=true;hydrated.current=false;setDraftRestoreError('');void editorDrafts.start().then(value=>{if(active){acceptRestoredDraft(value);hydrated.current=true}}).catch(error=>{if(active)setDraftRestoreError(String(error))});return()=>{active=false;hydrated.current=false;editorDrafts.dispose()}},[editorDrafts,draftReadAttempt,open])
   useEffect(()=>{if(hydrated.current&&draftStatus.ready)editorDrafts.update({documents,selected,layout:splitLayout})},[editorDrafts,documents,selected,splitLayout,draftStatus.ready])
   const closedFiles=useRef<string[]>([])
   const [busy, setBusy] = useState(false), [error, setError] = useState<string | null>(null), epoch = useRef(0)
