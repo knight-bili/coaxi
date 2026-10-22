@@ -14,6 +14,14 @@ pub(crate) fn file_patch(entry:&Value)->Result<(&'static str,Value)>{
     let raw=entry["value"].as_str().context("configuration.preference_value_required")?;
     if key.starts_with("rovai."){return native_patch(key,raw)}
     match key{
+        "logging.level"=>{
+            let value:Value=serde_json::from_str(raw).map_err(|_|anyhow::anyhow!("configuration.logging_invalid"))?;
+            ensure!(value.as_object().is_some_and(|value|value.keys().all(|key|["level","targets"].contains(&key.as_str())))&&["off","error","warn","info","debug","trace"].contains(&value["level"].as_str().unwrap_or_default()),"configuration.logging_invalid");
+            let targets=value.get("targets").cloned().unwrap_or(json!([]));let rows=targets.as_array().context("configuration.logging_targets_invalid")?;
+            ensure!(rows.len()<=1024,"configuration.logging_target_limit");let mut seen=std::collections::BTreeSet::new();let pattern=regex::Regex::new(r"^[a-zA-Z0-9_.:-]{1,256}$")?;
+            for row in rows{let name=row["target"].as_str().context("configuration.logging_target_invalid")?;ensure!(row.as_object().is_some_and(|row|row.len()==2)&&pattern.is_match(name)&&seen.insert(name)&&["off","error","warn","info","debug","trace"].contains(&row["level"].as_str().unwrap_or_default()),"configuration.logging_target_invalid");}
+            Ok(("logging",json!({"level":value["level"],"targets":targets})))
+        },
         "appearance_mode"=>{
             let mode=match raw{"system"=>"system","light"=>"day","dark"=>"night",_=>anyhow::bail!("configuration.theme_invalid")};
             Ok(("appearance",json!({"themePreference":mode})))
@@ -53,7 +61,7 @@ pub(crate) const NATIVE_FIELDS:&[(&str,&str)]=&[
 pub(crate) fn merge(target:&str,original:&Value,patch:&Value)->Result<Value>{
     let mut next=if original.is_null(){match target{
         "appearance"=>json!({"schemaVersion":2,"themePreference":"system","chatFontSize":13,"documentFontSize":15,"codeFontSize":14,"readingDensity":"standard","motionPreference":"system","zoomPercentage":100}),
-        "general"=>json!({"schemaVersion":6}),"windowClose"=>json!({"schemaVersion":1,"behavior":"ask"}),"messageLibrary"=>json!({"tags":[],"directoryAliases":[],"quickMessages":[]}),_=>anyhow::bail!("configuration.preference_target_invalid"),
+        "general"=>json!({"schemaVersion":6}),"windowClose"=>json!({"schemaVersion":1,"behavior":"ask"}),"logging"=>json!({"schemaVersion":1,"level":"trace","targets":[]}),"messageLibrary"=>json!({"tags":[],"directoryAliases":[],"quickMessages":[]}),_=>anyhow::bail!("configuration.preference_target_invalid"),
     }}else{original.clone()};
     let object=next.as_object_mut().context("configuration.preference_file_invalid")?;
     for(key,value)in patch.as_object().context("configuration.preference_patch_invalid")?{object.insert(key.clone(),value.clone());}

@@ -8,7 +8,7 @@ import type { CoreClient } from './core-client'
 type Selection={path:string;sourceDigest:string;byteSize:number;expires:number}
 export class PortableConfigurationPrivate{
   private readonly selections=new Map<string,Selection>()
-  constructor(private readonly core:Pick<CoreClient,'request'>,private readonly owner:()=>BrowserWindow|null){}
+  constructor(private readonly core:Pick<CoreClient,'request'>,private readonly owner:()=>BrowserWindow|null,private readonly logging?:(input:unknown)=>Promise<unknown>){}
   async registerDownloaded(event:IpcMainInvokeEvent,path:string,passphrase:string,expectedDigest:string,operationId:string):Promise<unknown>{
     const owner=this.owner()
     if(!owner||owner.isDestroyed()||event.sender!==owner.webContents||event.senderFrame!==owner.webContents.mainFrame)throw new Error('configuration.local_owner_required')
@@ -30,6 +30,7 @@ export class PortableConfigurationPrivate{
     if(operation==='exportPrepare')return this.core.request('configuration.export.prepare',input)
     if(operation==='exportReceipt')return this.core.request('configuration.export.receipt',input)
     if(operation==='sync')return this.core.request('configuration.sync',input)
+    if(operation==='logging'&&this.logging)return this.logging(input)
     if(operation==='exportSave'){
       if(Object.keys(value).length!==1||typeof value.operationId!=='string')throw new Error('configuration.export_input_invalid')
       const result=await this.core.request<{artifactPath:string;encryptedDigest:string;byteSize:number;state:string}>('configuration.export.read',input)

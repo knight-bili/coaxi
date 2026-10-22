@@ -23,7 +23,7 @@ pub(crate) fn targets(connection:&Connection,root:&Path,domain:&str,after:Option
         }).collect::<Vec<_>>();items.sort_by(|left,right|left["id"].as_str().cmp(&right["id"].as_str()));let more=items.len()>limit as usize;items.truncate(limit as usize);let next=more.then(||items.last().and_then(|item|item["id"].as_str()).map(str::to_owned)).flatten();return Ok(json!({"items":items,"next":next}))
     }
     ensure!(domain=="preferences","configuration.catalog_domain_unknown");
-    let entries=[("system_language_settings","语言"),("appearance_mode","主题"),("appearance_zoom_level","缩放"),("system_close_behavior_settings","关闭窗口方式")];let mut items=Vec::new();
+    let entries=[("system_language_settings","语言"),("appearance_mode","主题"),("appearance_zoom_level","缩放"),("system_close_behavior_settings","关闭窗口方式"),("logging.level","日志级别与目标过滤")];let mut items=Vec::new();
     for channel in channel_preferences::portable(root)?{
         let channel_id=channel["sourceAdapterId"].as_str().context("configuration.channel_target_invalid")?;uuid::Uuid::parse_str(channel_id)?;
         for(key,label)in[("chat_command_prefix","命令前缀"),("chat_message_language","消息语言"),("chat_event_filter","事件通知")]{
@@ -45,7 +45,7 @@ pub(crate) fn targets(connection:&Connection,root:&Path,domain:&str,after:Option
     for(key,name)in entries{
         if key=="system_close_behavior_settings"&&!cfg!(windows){continue}
         if after.is_some_and(|after|key<=after){continue}
-        let raw=match key{"system_language_settings"=>"{}","appearance_mode"=>"system","appearance_zoom_level"=>"100",_=>"{}"};
+        let raw=match key{"system_language_settings"=>"{}","appearance_mode"=>"system","appearance_zoom_level"=>"100","logging.level"=>r#"{"level":"info","targets":[]}"#,_=>"{}"};
         let(target,patch)=preferences::file_patch(&json!({"key":key,"value":raw}))?;let current=files::read(root,target)?;
         let fields=preferences::before_fields(&current,&patch);if fields.as_object().is_some_and(|map|map.values().any(|value|!value.is_null())){items.push(json!({"id":key,"name":name,"revision":1}));}
     }

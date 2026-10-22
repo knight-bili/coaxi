@@ -13,7 +13,7 @@ pub(crate) struct Pending{after:Option<Cursor>,limit:u32}
 #[serde(rename_all="camelCase",deny_unknown_fields)]
 pub(crate) struct Acknowledge{command_id:String,domain:String,target_id:String,plan_digest:String,state:String}
 
-fn owned(target:&str)->bool{matches!(target,"appearance"|"general"|"windowClose")}
+fn owned(target:&str)->bool{matches!(target,"appearance"|"general"|"windowClose"|"logging")}
 fn plan(root:&Path,command:&str,domain:&str,target:&str,expected:&str,raw:&str)->Result<Value>{
     ensure!(owned(target),"configuration.owner_target_invalid");
     let value:Value=serde_json::from_str(raw)?;let owner=files::path(root,target)?;
@@ -25,7 +25,7 @@ pub(crate) fn pending(connection:&Connection,root:&Path,input:Pending)->Result<V
     ensure!((1..=4).contains(&input.limit),"configuration.owner_page_invalid");
     let after=input.after.unwrap_or(Cursor{command_id:String::new(),domain:String::new(),target_id:String::new()});
     ensure!(after.command_id.len()<=128&&after.domain.len()<=128&&after.target_id.len()<=128,"configuration.owner_cursor_invalid");
-    let mut query=connection.prepare("SELECT command_id,domain,target_id,expected_digest,value_json FROM configuration_file_outbox WHERE state='pending' AND target_id IN ('appearance','general','windowClose') AND (command_id,domain,target_id)>(?1,?2,?3) ORDER BY command_id,domain,target_id LIMIT ?4")?;
+    let mut query=connection.prepare("SELECT command_id,domain,target_id,expected_digest,value_json FROM configuration_file_outbox WHERE state='pending' AND target_id IN ('appearance','general','windowClose','logging') AND (command_id,domain,target_id)>(?1,?2,?3) ORDER BY command_id,domain,target_id LIMIT ?4")?;
     let rows=query.query_map(params![after.command_id,after.domain,after.target_id,input.limit+1],|row|Ok((row.get::<_,String>(0)?,row.get::<_,String>(1)?,row.get::<_,String>(2)?,row.get::<_,String>(3)?,row.get::<_,String>(4)?)))?.collect::<rusqlite::Result<Vec<_>>>()?;drop(query);
     let more=rows.len()>input.limit as usize;let mut items=Vec::new();let mut cursor=None;
     for(command,domain,target,expected,raw)in rows.into_iter().take(input.limit as usize){

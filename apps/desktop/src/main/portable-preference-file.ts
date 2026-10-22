@@ -4,7 +4,7 @@ import { resolve } from 'node:path'
 import { isDeepStrictEqual } from 'node:util'
 
 export type PortablePreferencePlan = {
-  commandId: string; domain: string; targetId: 'appearance' | 'general' | 'windowClose'
+  commandId: string; domain: string; targetId: 'appearance' | 'general' | 'windowClose' | 'logging'
   ownerPath: string; expectedDigest: string; planDigest: string; before: unknown; after: unknown
 }
 export type PreferenceApplyState = 'applied' | 'conflict'

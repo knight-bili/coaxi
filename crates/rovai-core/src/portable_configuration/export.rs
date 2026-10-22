@@ -31,7 +31,7 @@ pub(crate) fn configuration_digest(connection:&Connection,root:&Path,include_sec
         let value=connection.query_row("SELECT h.revision,r.digest FROM portable_provider_head h JOIN portable_provider_revision r ON r.id=h.id AND r.revision=h.revision WHERE h.id=?1",[&id],|row|Ok(json!({"id":id,"revision":row.get::<_,i64>(0)?,"digest":row.get::<_,String>(1)?})))?;revisions.push(value);
     }
     let mut customs=Vec::new();for id in ids(connection,"SELECT id FROM custom_runtime_head WHERE removed=0 ORDER BY id")?{customs.push(crate::custom_runtime::storage::latest(connection,&id)?.context("configuration.custom_definition_missing")?);}
-    let mut values=serde_json::Map::new();for target in ["appearance","general","windowClose","messageLibrary","taskTemplates","agentSettings"]{if target=="windowClose"&&!cfg!(windows){continue}values.insert(target.into(),files::read(root,target)?);}
+    let mut values=serde_json::Map::new();for target in ["appearance","general","windowClose","logging","messageLibrary","taskTemplates","agentSettings"]{if target=="windowClose"&&!cfg!(windows){continue}values.insert(target.into(),files::read(root,target)?);}
     digest(&json!({"providers":revisions,"customAgents":customs,"files":values,"channelPreferences":channel_preferences::portable(root)?,"delegations":crate::delegation_settings::read(connection)?,"includeSecrets":include_secrets}))
 }
 pub(crate) fn cache_for_sync(root:&Path,snapshot:&Value,id:&str,passphrase:&str,cancel:&tokio_util::sync::CancellationToken)->Result<std::path::PathBuf>{
@@ -98,6 +98,7 @@ pub(crate) fn collect(connection:&Connection,root:&Path,include_secrets:bool)->R
     }
     let delegation=crate::delegation_settings::read(connection)?;
     domains.insert("preferences".into(),json!({"delegation.enabled":serde_json::to_string(&delegation.enabled)?,"delegation.depth_limit":serde_json::to_string(&delegation.depth_limit)?,"delegation.agent_defaults":serde_json::to_string(&delegation.per_runtime_defaults)?,"delegation.completed_cache_max_mb":serde_json::to_string(&delegation.completed_cache_max_mb)?}));
+    let logging=files::read(root,"logging")?;if !logging.is_null(){domains.get_mut("preferences").unwrap()["logging.level"]=json!(serde_json::to_string(&json!({"level":logging["level"],"targets":logging["targets"]}))?);}
     // 成员引用只供接收端人工对照，绝不视作接收端成员主键或自动恢复绑定。
     let mut members=Vec::new();let mut query=connection.prepare("SELECT p.id,p.display_name,c.reference_json FROM portable_member_connection c JOIN agent_profile p ON p.id=c.agent_id WHERE p.profile_status='present' ORDER BY p.id")?;
     for row in query.query_map([],|row|Ok((row.get::<_,String>(0)?,row.get::<_,String>(1)?,row.get::<_,String>(2)?)))?{let(id,name,reference)=row?;members.push(json!({"sourceMemberId":id,"displayName":name,"connection":serde_json::from_str::<Value>(&reference)?}));}

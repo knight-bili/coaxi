@@ -1,4 +1,5 @@
 import { LegacyEnvironmentIssue } from './LegacyEnvironmentIssue'
+import { LocalLoggingSettings } from './LocalLoggingSettings'
 import { useThreadClient, type ThreadClient } from './camp-client'
 import { newCommandId } from '../../shared/command-id'
 import { readErrorMessage } from './error-message'
@@ -247,6 +248,7 @@ export function DiagnosticsCenter({
       />
 
       <div className="diagnostics-body">
+        <LocalLoggingSettings/>
       <details className="settings-disclosure diagnostics-policy"><summary><DiagnosticGlyph name="shield" /><span><UiText zh={"诊断会包含哪些内容？"} /></span><DiagnosticGlyph name="chevron" /></summary><div><p><UiText zh={"只包含检查状态与必要的诊断信息，敏感内容已排除。"} /></p><p><UiText zh={"不包含 Token、Cookie、登录信息、消息与记忆正文、附件内容、工具输出或本机绝对路径。"} /></p><p><UiText zh={"检查只读；修复需逐项点击，不会自动登录或替换智能体。"} /></p></div></details>
 
       {loading && <DiagnosticsLoading />}

@@ -100,6 +100,7 @@ import {
 import { RUNTIME_RENDERER_CORE_METHODS } from './runtime-core-methods'
 import { PortableConfigurationPrivate } from './portable-configuration-private'
 import { PortablePreferenceOwner } from './portable-preference-owner'
+import { LocalLoggingPreferences } from './local-logging-preferences'
 import {
   GeneralPreferencesStore,
   isExecutionConsolePlacement,
@@ -514,6 +515,7 @@ let appUpdates: AppUpdatesService | null = null
 let mainWindow: BrowserWindow | null = null
 const closedFilePreviewSenders = new WeakSet<Electron.WebContents>()
 let appearanceStore: AppearancePreferencesStore | null = null
+let localLoggingPreferences: LocalLoggingPreferences | null = null
 let appearanceFilePath = ''
 let lastDiagnosticsExportPath: string | null = null
 let lastMonitoringExportPath: string | null = null
@@ -1098,6 +1100,8 @@ if (primaryInstance) void app.whenReady().then(async () => {
   desktopBackgroundTimer.unref()
   if(coreDataPath){try{await recoverLocalDataBeforeStores(coreDataPath)}catch(error){core.blockStartup({code:'local_data_recovery_required',message:error instanceof Error?error.message:String(error),retryable:false,details:{safetySnapshotPreserved:true}},'recovering_authority')}}
   const userDataPath = app.getPath('userData')
+  localLoggingPreferences = new LocalLoggingPreferences(join(userDataPath, 'logging.json'))
+  localLoggingPreferences.install()
   appearanceFilePath = join(userDataPath, 'appearance.json')
   const generalPreferencesPath = join(userDataPath, 'general-preferences.json')
   const currentUserProfilePath = join(userDataPath, 'current-user-profile.json')
@@ -1299,7 +1303,14 @@ app.on('before-quit',()=>{void interactionWorkspace.dispose()})
 const webdavWorkspace = new WebdavWorkspace((method,params)=>core.request(method,params),()=>mainWindow,()=>app.getPath('userData'),(event,path,passphrase,kind,digest)=>backupWorkspace.inspectDownloaded(event,path,passphrase,kind,digest),(event,path,passphrase,digest,operationId)=>portableConfigurationPrivate.registerDownloaded(event,path,passphrase,digest,operationId))
 ipcMain.handle('rovai:webdav-workspace',(event,input)=>webdavWorkspace.invoke(event,input))
 const backupWorkspace = new BackupWorkspace(core,()=>coreDataPath,()=>mainWindow,()=>requestRendererQuitPreparation(mainWindow,()=>new MessageChannelMain()),()=>{browserWorkspace.revokeAll();officeWorkspace.closeAll()},()=>{app.relaunch();app.quit()},()=>app.getPath('userData'))
-const portableConfigurationPrivate=new PortableConfigurationPrivate(core,()=>mainWindow)
+const portableConfigurationPrivate=new PortableConfigurationPrivate(core,()=>mainWindow,async input=>{
+  await localStoresLoaded
+  if(!localLoggingPreferences)throw new Error('logging.owner_not_ready')
+  const value=input as Record<string,unknown>
+  if(value.operation==='get'&&Object.keys(value).length===1)return localLoggingPreferences.get()
+  if(value.operation==='set'&&Object.keys(value).length===3&&typeof value.expectedDigest==='string')return localLoggingPreferences.set(value.expectedDigest,value.settings)
+  throw new Error('logging.request_invalid')
+})
 const portablePreferenceOwner = new PortablePreferenceOwner(core, localStoresLoaded, () => app.getPath('userData'), async plan => {
   if (plan.targetId === 'appearance') {
     if (!appearanceStore) return 'pending'
@@ -1322,6 +1333,7 @@ const portablePreferenceOwner = new PortablePreferenceOwner(core, localStoresLoa
     return state
   }
   if (plan.targetId === 'windowClose') return windowsWindowClose ? windowsWindowClose.applyConfiguration(plan) : 'pending'
+  if (plan.targetId === 'logging') return localLoggingPreferences ? localLoggingPreferences.applyConfiguration(plan) : 'pending'
   throw new Error('configuration.owner_target_invalid')
 })
 core.onEvent(event => { if (event.method === 'portableConfiguration.filesChanged') portablePreferenceOwner.wake() })
