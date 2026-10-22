@@ -14,7 +14,7 @@ type Plan={planId:string;provider:Provider;entries:Candidate[]}
 type Imported={id:string;provider:Provider;sourceName:string;summary:{title:string|null};importedAt:string;tags:string[];revision:string;archived:boolean;sharedSourceSnapshot:boolean;linkedThreadId:string}
 // Source import selection + source-native transcript body, without granting
 // execution/file access to paths or subagent ids found inside imported logs.
-export function NativeHistoryWorkbench({threadId}:{threadId:string}):React.JSX.Element{
+export function NativeHistoryWorkbench({threadId,onOpenConversation}:{threadId:string;onOpenConversation?(reference:import('@contracts').CanvasConversationRef):Promise<boolean>}):React.JSX.Element{
   const client=useThreadClient(),t=useUiText(),scope={threadId}
   const [provider,setProvider]=useState<Provider>('codex'),[plan,setPlan]=useState<Plan|null>(null),[entries,setEntries]=useState<Imported[]>([])
   const [selected,setSelected]=useState<Imported|null>(null),[data,setData]=useState<NativeTranscript|null>(null),[filter,setFilter]=useState(''),[tags,setTags]=useState('')
@@ -68,6 +68,6 @@ export function NativeHistoryWorkbench({threadId}:{threadId:string}):React.JSX.E
         <div className="native-session-body">{data?<NativeTranscriptBody data={data} reader={null} target={null} live={false} visible onForkFromTurn={selected&&!selected.archived&&['codex','claude','deepseek'].includes(selected.provider)?selectedTurnId=>setExecution({entry:selected,data,mode:'fork_point',selectedTurnId}):undefined}/>:<div className="workbench-empty">{t(entries.length?'选择会话查看原始消息和工具记录。':'还没有导入的原生会话。')}</div>}</div>
       </div>
     </div>
-    {execution&&<NativeContinuationDialog key={`${execution.entry.id}:${execution.mode}:${execution.selectedTurnId??''}`} threadId={execution.entry.linkedThreadId} entry={execution.entry} data={execution.data} mode={execution.mode} selectedTurnId={execution.selectedTurnId} onClose={()=>setExecution(null)}/>}
+    {execution&&<NativeContinuationDialog key={`${execution.entry.id}:${execution.mode}:${execution.selectedTurnId??''}`} threadId={execution.entry.linkedThreadId} entry={execution.entry} data={execution.data} mode={execution.mode} selectedTurnId={execution.selectedTurnId} onClose={()=>setExecution(null)} onOpen={onOpenConversation?receipt=>onOpenConversation({threadId:receipt.threadId,conversationId:receipt.conversationId}):undefined}/>}
   </div>
 }

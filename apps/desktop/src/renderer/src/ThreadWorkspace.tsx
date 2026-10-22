@@ -1652,7 +1652,7 @@ export function ThreadWorkspace(props: Parameters<typeof ThreadWorkspaceContent>
       onBindWorkbenchQuickMessage={bindWorkbenchQuickMessage}
       workbenchEntry={<WorkspaceWorkbench threadId={props.snapshot.thread.id} projectPath={props.snapshot.thread.projectPath??''}
         members={props.snapshot.members.map(member=>({id:member.agentId,name:props.agents.find(agent=>agent.agentId===member.agentId)?.displayName??member.agentId}))}
-        bindLeaveGuard={bindWorkbenchGuard} onQuickMessage={insertWorkbenchQuickMessage} />} />
+        bindLeaveGuard={bindWorkbenchGuard} onQuickMessage={insertWorkbenchQuickMessage} onOpenNativeConversation={props.onOpenNativeConversation} />} />
   </DelegationViewerHost>
 }
 
@@ -1771,6 +1771,7 @@ function ThreadWorkspaceContent({
   detailEntryHost?: HTMLElement | null
   singleChatVisible?: boolean
   onOpenSingleChat?(): void
+  onOpenNativeConversation?(reference:import('@contracts').CanvasConversationRef):Promise<boolean>
   onCloseSingleChat?(): void
   onCloseInspector?(): void
   onInspectorTabChange?(tab: ThreadInspectorTab): void

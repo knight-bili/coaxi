@@ -3964,6 +3964,7 @@ function BusinessAppContent({
             notificationFocus={notificationFocus}
             onNotificationFocusPresented={completeNotificationNavigation}
             singleChatTarget={singleChatNotificationTarget}
+            onOpenNativeConversation={openCanvasReference}
             onVisibleSingleChatSources={setVisibleSingleChatSources}
             onVisibleNotificationSources={setVisibleNotificationSources}
             runtimeRecovery={runtimeRecovery?.threadId === activeThreadId ? runtimeRecovery : null}
