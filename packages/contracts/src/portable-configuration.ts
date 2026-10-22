@@ -22,7 +22,7 @@ export interface PortableTaskTemplate {id:string;revision:number;name:string;tit
 export type PortableTaskTemplateRequest=
   |{operation:'list';after?:string|null;limit?:number}
   |{operation:'get';id:string}
-  |{operation:'receipt';commandId:string}
+  |{operation:'receipt'|'finish';commandId:string}
   |{operation:'put'|'remove';commandId:string;id:string;expectedRevision:number|null;value?:{name:string;title:string;config:string}}
 export interface PortableTaskTemplateReceipt {commandId:string;state:'unknown'|'recorded';result:import('./index').StoredCommandResult|null;files:Array<{domain:string;targetId:string;state:string;errorCode:string|null}>}
 export interface PortableConfigurationPrivateApi {

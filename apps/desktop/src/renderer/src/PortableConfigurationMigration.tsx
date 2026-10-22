@@ -7,6 +7,7 @@ import {newCommandId} from '../../shared/command-id'
 import {loadPortablePending,savePortablePending,type PortableConfigurationPending} from './portable-configuration-recovery'
 import './portable-configuration.css'
 import {PortableConfigurationExport} from './PortableConfigurationExport'
+import {PortableTaskTemplates} from './PortableTaskTemplates'
 
 const domains:Record<PortableMigrationDomain,string>={modelProviders:'模型服务商',agentSettings:'智能体设置',customAgents:'自定义程序',quickMessages:'快捷语',taskTemplates:'任务模板',preferences:'可迁移偏好'}
 type Archive=PortableArchiveReference&{createdAt?:string}
@@ -72,6 +73,6 @@ export function PortableConfigurationMigration({initialArchive,embedded=false}:{
     {receipt&&<div className="portable-configuration-pending" role="status"><strong>{t(receipt.state==='applied'?'这批配置已提交':receipt.state==='rejected'?'这批配置没有应用':'原结果仍待核对')}</strong><p>{t('历史任务和消息保留。')} {receipt.changedMembers.length} {t('位队员的新任务设置发生变化。')}</p>{receipt.files.map(file=><div key={`${file.domain}:${file.targetId}`}>{t(domains[file.domain as PortableMigrationDomain]??'配置文件')} · {t(file.state==='applied'?'文件已保存':file.state==='pending'?'文件等待保存':file.state==='conflict'?'后续修改冲突，未覆盖':'文件未保存')}</div>)}<div className="portable-provider-actions"><button className="quiet-button" disabled={busy} onClick={()=>void run(async()=>{const value=await client.request<PortableMigrationReceipt>('configuration.migration.receipt',{schemaVersion:1,commandId:receipt.commandId});setReceipt(value)})}>{t('刷新这次结果')}</button><button className="quiet-button" disabled={blocked||receipt.state!=='applied'} onClick={()=>void run(undo)}>{t('预览撤销')}</button></div></div>}
     {error&&<p role="alert" className="inline-error">{error}</p>}
     {archive&&<details><summary>{t('保存这份原配置，包括未支持的字段')}</summary><PortableConfigurationExport sourceArchive={{archiveId:archive.archiveId,sourceDigest:archive.sourceDigest}}/></details>}
-    {!embedded&&<PortableConfigurationExport/>}
+    {!embedded&&<><PortableConfigurationExport/><PortableTaskTemplates/></>}
   </section>
 }

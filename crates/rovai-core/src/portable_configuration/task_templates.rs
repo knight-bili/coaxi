@@ -38,9 +38,12 @@ fn receipt(connection:&Connection,client:&str,command:&str)->Result<Value>{
 pub(crate) fn access(database:&mut Database,root:&Path,client:&DraftClient,input:Value)->Result<Value>{
     match input["operation"].as_str(){
         Some("get"|"list")=>return read(root,serde_json::from_value(input)?),
-        Some("receipt")=>{
+        Some("receipt"|"finish")=>{
             #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Request{operation:String,command_id:String}
-            let request:Request=serde_json::from_value(input)?;ensure!(request.operation=="receipt","configuration.template_operation_invalid");return receipt(database.connection(),client.id(),&request.command_id)
+            let request:Request=serde_json::from_value(input)?;
+            let original=receipt(database.connection(),client.id(),&request.command_id)?;
+            if request.operation=="finish"{ensure!(original["state"]=="recorded","configuration.template_original_result_required");files::drain(database.connection(),root,&request.command_id)?;return receipt(database.connection(),client.id(),&request.command_id)}
+            return Ok(original)
         },
         _=>{},
     }
