@@ -5021,6 +5021,7 @@ export type CoreMethod =
   | 'history.local'
   | 'history.library'
   | 'office.watch'
+  | 'interaction.local'
   | 'computer.local'
   | 'browser.local.grant'
   | 'browser.local.revoke'

@@ -16,6 +16,7 @@ mod workbench;
 mod workbench_file_tools;
 mod workbench_receipts;
 mod browser_access;
+mod interaction_access;
 mod computer_access;
 mod office_access;
 mod history_import;
@@ -2439,6 +2440,7 @@ struct ClaudeInputAcceptanceTarget<'a> {
 }
 
 struct Core {
+    interaction_tools: Arc<crate::interaction_tools::broker::Broker>,
     native_child_readers: crate::runtime_subagent_session::reader::Registry,
     canvas_terminals: Arc<crate::canvas_terminal::manager::Manager>,
     execution_wake: crate::execution_wake::ExecutionWake,
@@ -10361,6 +10363,7 @@ impl Core {
             "history.local" => self.history_import(true,request.params.clone()).await,
             "history.library" => self.history_import(false,request.params.clone()).await,
             "office.watch" => self.office_access(request.params.clone(),&request.client).await,
+            "interaction.local" => self.interaction_access(request.params.clone()).await,
             "computer.local" => self.computer_access(request.params.clone()).await,
             "browser.local.grant" | "browser.local.revoke" | "browser.local.begin" | "browser.local.finish" => self.browser_access(&request.method, request.params.clone()).await,
             "workbench.files.tools" => self.workbench_file_tools(request.params.clone()).await,
@@ -19616,6 +19619,7 @@ async fn run_core(
         planned_shutdown.generation().to_owned(),
     )?;
     let core = Arc::new(Core {
+        interaction_tools: Arc::new(crate::interaction_tools::broker::Broker::new(&data_dir)),
         native_child_readers: crate::runtime_subagent_session::reader::Registry::new(planned_shutdown.generation().to_owned()),
         canvas_terminals,
         execution_wake: database.execution_wake.clone(),
@@ -27826,7 +27830,8 @@ mod tests {
 
         let planned_shutdown = PlannedShutdownCoordinator::new(uuid::Uuid::new_v4().to_string());
         Ok(Core {
-            native_child_readers: crate::runtime_subagent_session::reader::Registry::new(planned_shutdown.generation().to_owned()),
+            interaction_tools: Arc::new(crate::interaction_tools::broker::Broker::new(&data_dir)),
+        native_child_readers: crate::runtime_subagent_session::reader::Registry::new(planned_shutdown.generation().to_owned()),
             canvas_terminals: crate::canvas_terminal::manager::Manager::new(
                 data_dir.clone(),
                 planned_shutdown.generation().to_owned(),

@@ -128,6 +128,17 @@ impl Broker {
         Ok(grant)
     }
     pub fn revoke_grant(&self, id: &str) -> Result<()> { self.locked()?.grants.remove(id); Ok(()) }
+    pub fn cancel_call(&self, bridge_id: &str, id: &str) -> Result<Value> {
+        let mut state = self.locked()?;
+        let ledger = state.ledger.get_mut(id).context("original_request_pending")?;
+        ensure!(ledger.binding["bridgeInstanceId"] == bridge_id, "binding_changed");
+        if matches!(ledger.receipt["state"].as_str(), Some("prepared" | "started")) {
+            ledger.receipt["state"] = json!(if ledger.receipt["state"] == "started" { "unknown" } else { "cancelled" });
+            ledger.receipt["finishedAt"] = json!(Utc::now().to_rfc3339()); self.persist(ledger)?;
+        }
+        Ok(ledger.receipt.clone())
+    }
+    pub fn disconnect(&self, bridge_id: &str) -> Result<()> { self.revoke_locked(&mut self.locked()?, bridge_id) }
     pub fn grants(&self, binding: &Value) -> Result<Vec<Value>> { Ok(self.locked()?.grants.values().filter(|grant| unexpired(grant) && same_scope(grant, binding) && grant["desktopPeerId"] == binding["desktopPeerId"]).cloned().collect()) }
     fn selected_grants(&self, state: &State, binding: &Value, name: &str, arguments: &Value) -> Result<Vec<Value>> {
         if matches!(name, "browser_list_tabs" | "browser_open_tab" | "computer_list_apps" | "computer_list_windows") { return Ok(Vec::new()); }
