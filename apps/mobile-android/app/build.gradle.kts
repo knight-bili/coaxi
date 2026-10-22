@@ -28,6 +28,16 @@ val checkedInThirdPartyLicensesDir = rootProject.layout.projectDirectory.dir("th
 val generatedThirdPartyLicensesDir = layout.buildDirectory.dir("reports/dependency-license")
 val supplementalLicensesDir = rootProject.layout.projectDirectory.dir("config/licenses")
 
+val prepareRovaiCardPreview by tasks.registering(Exec::class) {
+    workingDir(rootProject.projectDir.parentFile.parentFile)
+    commandLine("node", "scripts/build-mobile-cards.mjs", "--android")
+    inputs.dir(rootProject.projectDir.parentFile.parentFile.resolve("apps/desktop/src/renderer/src"))
+    inputs.file(rootProject.projectDir.parentFile.parentFile.resolve("mobile-cards.vite.config.ts"))
+    inputs.file(rootProject.projectDir.parentFile.parentFile.resolve("pnpm-lock.yaml"))
+    outputs.dir(layout.projectDirectory.dir("src/main/assets/card-preview"))
+}
+tasks.named("preBuild").configure {dependsOn(prepareRovaiCardPreview)}
+
 android {
     namespace = "app.codeg.android"
     compileSdk = 36

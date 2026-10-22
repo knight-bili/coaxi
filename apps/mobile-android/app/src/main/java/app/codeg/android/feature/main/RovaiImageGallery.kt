@@ -47,10 +47,13 @@ fun rovaiAttachmentSource(threadId:String,message:JsonObject,attachment:JsonObje
 @Composable
 fun RovaiMessageBody(model:RovaiWorkspaceViewModel,threadId:String,message:JsonObject,conversationId:String?=null,child:Boolean=false){
     val user=message.coreText("authorType")=="user"
+    var card by remember(message.coreText("id")){mutableStateOf(false)}
     @Composable fun pictures(){message["attachments"].coreArray().filter{it.coreText("previewKind")=="image"}.forEach{attachment->key(attachment.coreText("id")){RovaiAttachmentImage(model,rovaiAttachmentSource(threadId,message,attachment,conversationId,child),attachment,user)}}}
     if(user)pictures()
     if(user)RovaiMessageArtifacts(model,threadId,message,conversationId,child)
     MarkdownContent(if(message["withdrawn"]==JsonPrimitive(true))"消息已撤回" else message.coreText("body"))
+    if(message.coreText("authorType")=="agent"&&message["withdrawn"]!=JsonPrimitive(true)&&Regex("(?m)^ {0,3}(`{3,}|~{3,})spec(?:[ \\t].*)?$").containsMatchIn(message.coreText("body")))TextButton(onClick={card=true}){Text("查看交互卡片")}
+    if(card)RovaiGeneratedCard(model,threadId,message,conversationId,child){card=false}
     if(!user){RovaiMessageArtifacts(model,threadId,message,conversationId,child);pictures()}
 }
 @Composable
