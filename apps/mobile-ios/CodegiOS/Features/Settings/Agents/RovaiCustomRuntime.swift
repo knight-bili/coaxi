@@ -40,6 +40,13 @@ private func customBlank() -> JSONValue {.object([
     "spec": .object(["npx": .object(["package": .string(""), "args": .array([.string("--acp")]), "env": .object([:]), "cmd": .null, "nodeRequired": .null]), "uvx": .null, "binary": .object([:])]),
     "iconUrl": .null, "skillsSharedStore": .bool(false), "skillsDir": .null, "source": .string("manual"), "sourceRef": .null, "versionProbe": .null, "supportsMcp": .bool(true), "enabled": .bool(true)
 ])}
+private func customPreferredDistribution(_ entry: JSONValue, _ platform: String) throws -> String {
+    let platforms: [String: [String]] = ["windows-x64": ["windows-x86_64", "x86_64-pc-windows-msvc"], "windows-arm64": ["windows-aarch64", "aarch64-pc-windows-msvc"], "macos-x64": ["darwin-x86_64", "x86_64-apple-darwin"], "macos-arm64": ["darwin-aarch64", "aarch64-apple-darwin"], "linux-x64": ["linux-x86_64", "x86_64-unknown-linux-gnu"], "linux-arm64": ["linux-aarch64", "aarch64-unknown-linux-gnu"]]
+    let source = try customObject(entry["distribution"]), binary = try customObject(source["binary"] ?? .object([:]))
+    if (platforms[platform] ?? []).contains(where: {binary[$0] != nil && binary[$0] != .null}) {return "binary"}
+    if source["npx"] != nil && source["npx"] != .null {return "npx"};if source["uvx"] != nil && source["uvx"] != .null {return "uvx"}
+    guard !binary.isEmpty else {throw RovaiHostFailure(code: "这条记录没有可用的分发方式")};return "binary"
+}
 private func customMasked(_ value: JSONValue) throws -> JSONValue {
     var result = try customObject(value);var spec = try customObject(result["spec"])
     func masked(_ value: JSONValue) throws -> JSONValue {
@@ -199,7 +206,7 @@ private func customMasked(_ value: JSONValue) throws -> JSONValue {
     }
     private func select(_ entry: JSONValue) {
         do {
-            let kind = entry["distribution"]?["npx"] != nil ? "npx" : entry["distribution"]?["uvx"] != nil ? "uvx" : "binary"
+            let kind = try customPreferredDistribution(entry, catalog?.text("platform") ?? "")
             var result = try customObject(customBlank());result["registryId"] = entry["id"];result["name"] = entry["name"];result["description"] = entry["description"] ?? .string("");result["version"] = entry.text("version").isEmpty ? .string("1.0.0") : entry["version"];result["iconUrl"] = entry["icon"] ?? .null
             result["distributionKind"] = .string(kind);result["spec"] = try customRuntimeSpec(entry.prettyString, kind);result["source"] = .string("registry")
             let id = entry.text("id").addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? "";result["sourceRef"] = .string((catalog?.text("registryUrl") ?? "") + "#" + id);choose(.object(result))
