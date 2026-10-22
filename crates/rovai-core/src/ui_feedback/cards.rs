@@ -13,28 +13,20 @@ pub fn source_body(connection:&Connection,scope:&Scope,agent:&str,message:&str)-
     let body=body.context("feedback.card_source_unavailable")?;ensure!(body.len()<=1024*1024,"feedback.card_source_limit");Ok(body)
 }
 
-/// CommonMark 的 fenced code 规则；只定位 spec，其他代码块不会贡献控件。
+/// 沿用 Core 已有的 CommonMark 解析器，正确处理列表、引用和缩进中的围栏。
+/// 来源发布/最终回复的资格由 source_body 核对，不能由 Markdown 字样授予。
 pub fn fences(body:&str)->Result<Vec<String>>{
+    ensure!(body.len()<=1024*1024,"feedback.card_source_limit");
     let body=body.replace("\r\n","\n").replace('\r',"\n");
-    let mut result=Vec::new();let mut active:Option<(char,usize,usize,bool,Vec<String>)>=None;
-    for line in body.split('\n'){
-        let indent=line.chars().take_while(|ch|*ch==' ').count();let text=line.trim_start_matches(' ');
-        if let Some((mark,length,_,_,_))=&active{
-            let closing=text.chars().take_while(|ch|ch==mark).count();
-            if indent<=3&&closing>=*length&&text[closing..].trim().is_empty(){
-                let(_,_,_,spec,lines)=active.take().expect("active fence");
-                if spec{let value=lines.join("\n")+"\n";ensure!(value.len()<=256*1024&&result.len()<128,"feedback.card_source_limit");result.push(value)}
-                continue
+    let arena=comrak::Arena::new();let options=comrak::Options::default();let root=comrak::parse_document(&arena,&body,&options);let mut result=Vec::new();
+    for node in root.descendants(){
+        let data=node.data();
+        if let comrak::nodes::NodeValue::CodeBlock(code)=&data.value{
+            if code.fenced&&code.info.split_whitespace().next()==Some("spec"){
+                ensure!(code.literal.len()<=256*1024&&result.len()<128,"feedback.card_source_limit");result.push(code.literal.clone());
             }
-            if let Some((_,_,opening_indent,_,lines))=&mut active{let remove=indent.min(*opening_indent);lines.push(line[remove..].to_string())}
-            continue
         }
-        if indent>3{continue}
-        let Some(mark)=text.chars().next().filter(|ch|matches!(ch,'`'|'~'))else{continue};let length=text.chars().take_while(|ch|*ch==mark).count();
-        if length<3{continue}let info=text[length..].trim();if mark=='`'&&info.contains('`'){continue}
-        active=Some((mark,length,indent,info.split_whitespace().next()==Some("spec"),Vec::new()));
     }
-    // 未闭合的流式围栏不提供回传资格。
     Ok(result)
 }
 fn pointer(path:&str)->Result<Vec<String>>{

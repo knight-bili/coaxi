@@ -50,7 +50,7 @@ struct RovaiMessageBody: View {
     var conversationId: String? = nil
     var child = false
     @State private var generatedCard = false
-    private var hasCard: Bool {message.text("authorType") == "agent" && message["withdrawn"]?.rvBool != true && message.text("body").range(of: "(?m)^ {0,3}(`{3,}|~{3,})spec(?:[ \\t].*)?$", options: .regularExpression) != nil}
+    private var hasCard: Bool {message.text("authorType") == "agent" && message["withdrawn"]?.rvBool != true && message.text("body").range(of: "(?m)(`{3,}|~{3,})spec(?:[ \\t].*)?$", options: .regularExpression) != nil}
     private var user: Bool { message.text("authorType") == "user" }
     private var pictures: some View { ForEach((message["attachments"]?.rvArray ?? []).filter { $0.text("previewKind") == "image" }.map { RovaiRow(value: $0) }) { row in RovaiAttachmentImage(model: model, source: rovaiAttachmentSource(threadId, message: message, attachment: row.value, conversationId: conversationId, child: child), attachment: row.value, user: user) } }
     var body: some View { VStack(alignment: .leading, spacing: 8) { if user { pictures; RovaiMessageArtifacts(model: model, threadId: threadId, message: message, conversationId: conversationId, child: child) }; MarkdownContent(raw: message["withdrawn"]?.rvBool == true ? "消息已撤回" : message.text("body"));if hasCard {Button("查看交互卡片") {generatedCard = true}.font(.caption)}; if !user { RovaiMessageArtifacts(model: model, threadId: threadId, message: message, conversationId: conversationId, child: child); pictures } }.sheet(isPresented: $generatedCard) {RovaiGeneratedCard(model: model, threadId: threadId, message: message, conversationId: conversationId, child: child)} }
