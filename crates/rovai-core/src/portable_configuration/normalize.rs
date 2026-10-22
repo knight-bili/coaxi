@@ -46,7 +46,7 @@ pub(crate) fn provider(id:&str,entry:&Value)->Result<ProviderNormalization>{
     let source:archive::CodegProvider=serde_json::from_value(entry.clone()).map_err(|_|anyhow::anyhow!("configuration.provider_row_invalid"))?;
     let model=model(&source.agent_type,source.model.as_deref())?;
     super::model::validate_url(&source.api_url)?;
-    let definition=json!({"schemaVersion":1,"id":id,"name":source.name,"agentType":source.agent_type,"apiUrl":source.api_url,"credential":null,"rawAgentTypesJson":source.agent_types_json,"rawModel":source.model,"model":model.value,"enabled":true});
+    let definition=json!({"schemaVersion":1,"id":id,"name":source.name,"agentType":source.agent_type,"apiUrl":source.api_url,"credential":null,"rawAgentTypesJson":source.agent_types_json,"rawModel":source.model,"model":model.value,"enabled":entry["enabled"].as_bool().unwrap_or(true)&&entry["queryRequiresSecret"]!=true});
     validate("ProviderDefinitionV1",&definition)?;
     Ok(ProviderNormalization{definition,credential:(!source.api_key.is_empty()).then_some(source.api_key),warnings:model.warnings})
 }
@@ -65,6 +65,10 @@ pub(crate) fn codex_projection(model:&Value,snapshot:&[Value])->Result<(Value,Ve
 }
 
 pub(crate) fn custom_agent(id:&str,entry:&Value)->Result<Value>{
+    if entry["fusionDefinition"].is_object(){
+        let mut definition=entry["fusionDefinition"].clone();definition["id"]=json!(id);
+        crate::custom_runtime::validate_definition(&definition,true)?;return Ok(definition)
+    }
     let source:archive::CodegCustomAgent=serde_json::from_value(entry.clone()).map_err(|_|anyhow::anyhow!("configuration.custom_agent_invalid"))?;
     let mut spec:Value=serde_json::from_str(&source.spec_json).map_err(|_|anyhow::anyhow!("configuration.custom_spec_invalid"))?;
     let object=spec.as_object_mut().context("configuration.custom_spec_invalid")?;
