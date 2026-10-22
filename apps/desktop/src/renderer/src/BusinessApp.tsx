@@ -174,7 +174,7 @@ import {
   type OnboardingRuntimePhase
 } from './OnboardingFlow'
 import { provisionFirstRun } from './onboarding-provisioning'
-import { UiText, changeInterfaceLanguage, initializeInterfaceLanguage, uiAttribute, useInterfaceLanguage } from './interface-language'
+import { UiText, changeInterfaceLanguage, initializeInterfaceLanguage, uiAttribute, useInterfaceLanguage, useSystemInterfaceLanguage } from './interface-language'
 import {
   currentProjectAccessDecision,
   currentProjectForThread,
@@ -937,6 +937,7 @@ function BusinessAppContent({
     initializeInterfaceLanguage(snapshot)
     setGeneralPreferencesState(snapshot)
   }, [])
+  useSystemInterfaceLanguage(uiPreferences.generalPreferences, generalPreferences?.interfaceLanguageMode, setGeneralPreferences)
   const [currentProject, setCurrentProject] = useState<CurrentProject>(() => readCurrentProject())
   const [currentWorkspaceHint, setCurrentWorkspaceHint] = useState<WorkspaceSelection | null>(null)
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null)

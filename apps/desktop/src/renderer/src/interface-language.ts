@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from 'react'
+import { useEffect, useSyncExternalStore } from 'react'
 import type { GeneralPreferencesApi, GeneralPreferencesSnapshot, InterfaceLanguage } from '@contracts'
 import englishCopy from './locales/en.json'
 import codegCommon from './locales/codeg-common.json'
@@ -34,6 +34,25 @@ export function getInterfaceLanguage(): InterfaceLanguage {
 
 export function useInterfaceLanguage(): InterfaceLanguage {
   return useSyncExternalStore(subscribe, getInterfaceLanguage, getInterfaceLanguage)
+}
+
+/** 系统语言事件只刷新仍处于跟随系统的界面，不改用户已选语言或业务数据。 */
+export function useSystemInterfaceLanguage(api: GeneralPreferencesApi, mode: GeneralPreferencesSnapshot['interfaceLanguageMode'], onSaved: (snapshot: GeneralPreferencesSnapshot) => void): void {
+  useEffect(() => {
+    if (mode !== 'system') return
+    let alive = true
+    const refresh = (): void => {
+      const observed = requestNumber
+      void api.get().then(snapshot => {
+        if (!alive || pendingRequests > 0 || observed !== requestNumber || snapshot.interfaceLanguageMode !== 'system') return
+        savedLanguage = snapshot.interfaceLanguage
+        publish(snapshot.interfaceLanguage)
+        onSaved(snapshot)
+      }).catch(() => undefined)
+    }
+    window.addEventListener('languagechange', refresh)
+    return () => { alive = false; window.removeEventListener('languagechange', refresh) }
+  }, [api, mode, onSaved])
 }
 
 /** Apply the first persisted snapshot without letting a late read undo a user's choice. */
