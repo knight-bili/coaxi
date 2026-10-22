@@ -5514,6 +5514,7 @@ function ThreadWorkspaceContent({
                                     : (
                                         <div className="message-bubble" data-message-quote-body={campMessage.authorType === 'user' || campMessage.authorType === 'agent' ? campMessage.id : undefined} data-quote-owner={`thread:${snapshot.thread.id}`}>
                                           <TruncatedStructuredMessageBody
+                                            feedbackIdentity={campMessage.authorType==='agent'?{scope:{threadId:snapshot.thread.id,conversationId:null,scopeKind:'public'},agentId:campMessage.authorId,messageId:campMessage.id}:undefined}
                                             body={displayBody}
                                             content={campMessage.content}
                                             members={snapshot.members}
@@ -9790,6 +9791,7 @@ function MessageReplyIcon(): JSX.Element {
 }
 
 export function TruncatedStructuredMessageBody({
+  feedbackIdentity,
   body,
   content,
   members,
@@ -9804,6 +9806,7 @@ export function TruncatedStructuredMessageBody({
   onActivateSkillMention,
   onFileReference
 }: {
+  feedbackIdentity?:Omit<FeedbackMessageSource,'cardOrdinal'>
   body: string
   content: StructuredThreadMessageContent | null
   members: ThreadSnapshot['members']
@@ -9834,6 +9837,7 @@ export function TruncatedStructuredMessageBody({
 
   const messageBody = (
     <StructuredMessageBody
+      feedbackIdentity={feedbackIdentity}
       body={displayBody}
       content={displayContent}
       members={members}
@@ -9930,6 +9934,7 @@ export function AgentMessageMarkdownBody({
 }
 
 export function StructuredMessageBody({
+  feedbackIdentity,
   body,
   content,
   members,
@@ -9943,6 +9948,7 @@ export function StructuredMessageBody({
   onActivateSkillMention,
   onFileReference
 }: {
+  feedbackIdentity?:Omit<FeedbackMessageSource,'cardOrdinal'>
   body: string
   content: StructuredThreadMessageContent | null
   members: ThreadSnapshot['members']
@@ -9989,9 +9995,9 @@ export function StructuredMessageBody({
           {markdownBody.length > 0 ? ' ' : ''}
         </span>
         {markdownBody.length > 0 && (
-          <SafeMarkdown className="current-user-markdown-content" onFileReference={onFileReference}>
+          <CoreFeedbackMarkdown identity={feedbackIdentity} className="current-user-markdown-content" onFileReference={onFileReference}>
             {markdownBody}
-          </SafeMarkdown>
+          </CoreFeedbackMarkdown>
         )}
       </div>
     )
@@ -10009,7 +10015,7 @@ export function StructuredMessageBody({
       }
       return token + (index === 0 && content.length > 1 ? ' ' : '')
     }).join('')
-    return <SafeMarkdown onFileReference={onFileReference} inlineContent={inlineContent}>{markdown}</SafeMarkdown>
+    return <CoreFeedbackMarkdown identity={feedbackIdentity} onFileReference={onFileReference} inlineContent={inlineContent}>{markdown}</CoreFeedbackMarkdown>
   }
   const Tag = inline ? 'span' : 'p'
   return (

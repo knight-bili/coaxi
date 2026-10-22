@@ -45,23 +45,23 @@ fn pointer(path:&str)->Result<Vec<String>>{
     }).collect()
 }
 pub fn compile(source:&str)->Result<Value>{super::spec_stream::compile(source)}
-#[derive(Clone)]struct FieldTemplate{name:String,label:Option<String>,path:Vec<String>}
+#[derive(Clone)]struct FieldTemplate{name:Option<String>,label:Option<String>,path:Vec<String>}
 fn templates(spec:&Value)->Result<Vec<FieldTemplate>>{
     fn visit(spec:&Value,key:&str,repeat:&[String],active:&mut BTreeSet<String>,count:&mut usize,result:&mut Vec<FieldTemplate>)->Result<()>{
         *count+=1;ensure!(*count<=4096&&active.len()<64&&active.insert(key.into()),"feedback.card_cycle");
         let element=spec["elements"].get(key).context("feedback.card_element")?;let props=&element["props"];
         if matches!(element["type"].as_str(),Some("Input"|"Textarea"|"Select"|"Checkbox"|"Radio"|"Switch"))&&props["type"].as_str()!=Some("password")&&(!props.get("type").is_some_and(Value::is_object)){
             let binding=if matches!(element["type"].as_str(),Some("Checkbox"|"Switch")){&props["checked"]}else{&props["value"]};
-            let path=if let Some(path)=binding["$bindState"].as_str(){Some(pointer(path)?)}else if let Some(path)=binding["$bindItem"].as_str(){if repeat.is_empty(){None}else{let mut full=repeat.to_vec();if !path.is_empty(){full.extend(pointer(&format!("/{path}"))?)}Some(full)}}else{None};
-            if let(Some(path),Some(name))=(path,props["name"].as_str()){if !path.is_empty(){result.push(FieldTemplate{name:name.into(),label:props["label"].as_str().map(str::to_string),path})}}
+            let path=if let Some(path)=binding["$bindState"].as_str(){Some(pointer(path)?)}else if let Some(path)=binding["$bindItem"].as_str(){if repeat.is_empty(){None}else{let mut full=repeat.to_vec();if !path.is_empty()&&path!="/"{full.extend(pointer(&format!("/{}",path.trim_start_matches('/')))?)}Some(full)}}else{None};
+            if let Some(path)=path{if !path.is_empty()&&(props["name"].is_string()||props["name"].is_object()){result.push(FieldTemplate{name:props["name"].as_str().map(str::to_string),label:props["label"].as_str().map(str::to_string),path})}}
         }
         let mut next_repeat=repeat.to_vec();
         if let Some(repetition)=element.get("repeat"){
             let path=&repetition["statePath"];
-            next_repeat=if let Some(path)=path.as_str(){pointer(path)?}else if let Some(path)=path["$item"].as_str(){ensure!(!repeat.is_empty(),"feedback.card_repeat_scope");let mut full=repeat.to_vec();if !path.is_empty(){full.extend(pointer(&format!("/{path}"))?)}full}else{anyhow::bail!("feedback.card_repeat_path")};next_repeat.push("*".into());
+            next_repeat=if let Some(path)=path.as_str(){pointer(path)?}else if let Some(path)=path["$item"].as_str(){ensure!(!repeat.is_empty(),"feedback.card_repeat_scope");let mut full=repeat.to_vec();if !path.is_empty()&&path!="/"{full.extend(pointer(&format!("/{}",path.trim_start_matches('/')))?)}full}else{anyhow::bail!("feedback.card_repeat_path")};next_repeat.push("*".into());
         }
-        let mut children=element["children"].as_array().cloned().unwrap_or_default();if let Some(slots)=element["slots"].as_object(){for slot in slots.values(){if let Some(items)=slot.as_array(){children.extend(items.iter().cloned())}}}
-        for child in children{if let Some(key)=child.as_str(){visit(spec,key,&next_repeat,active,count,result)?}}
+        for child in element["children"].as_array().into_iter().flatten(){if let Some(key)=child.as_str(){visit(spec,key,&next_repeat,active,count,result)?}}
+        if let Some(slots)=element["slots"].as_object(){for slot in slots.values(){for child in slot.as_array().into_iter().flatten(){if let Some(key)=child.as_str(){visit(spec,key,repeat,active,count,result)?}}}}
         active.remove(key);Ok(())
     }
     let mut result=Vec::new();visit(spec,spec["root"].as_str().context("feedback.card_root")?,&[],&mut BTreeSet::new(),&mut 0,&mut result)?;Ok(result)
@@ -72,6 +72,6 @@ pub fn require_card_fields(connection:&Connection,input:&PreviewRequest,origin:&
     // Markdown 围栏的单个结尾换行可能由原 pre 组件移除；只接受这两个等价呈现入口。
     let source=if digest(&Value::String(raw.clone()))?==origin.source_digest{raw.as_str()}else{let without=raw.strip_suffix('\n').unwrap_or(raw);ensure!(digest(&Value::String(without.into()))?==origin.source_digest,"feedback.card_source_changed");without};
     let spec=compile(source)?;let fields=templates(&spec)?;
-    for field in &input.fields{let actual=pointer(&field.state_path)?;ensure!(fields.iter().any(|candidate|candidate.name==field.name&&candidate.label.as_ref().is_none_or(|label|label==&field.label)&&candidate.path.len()==actual.len()&&candidate.path.iter().zip(&actual).all(|(pattern,part)|pattern==part||pattern=="*"&&part.parse::<usize>().is_ok_and(|index|index<32))),"feedback.field_source_changed")}
+    for field in &input.fields{let actual=pointer(&field.state_path)?;ensure!(fields.iter().any(|candidate|candidate.name.as_ref().is_none_or(|name|name==&field.name)&&candidate.label.as_ref().is_none_or(|label|label==&field.label)&&candidate.path.len()==actual.len()&&candidate.path.iter().zip(&actual).all(|(pattern,part)|pattern==part||pattern=="*"&&part.parse::<usize>().is_ok_and(|index|index<32))),"feedback.field_source_changed")}
     Ok(())
 }

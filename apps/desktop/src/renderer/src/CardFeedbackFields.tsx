@@ -31,7 +31,7 @@ export function feedbackControl<P extends Record<string,unknown>>(Original:Compo
       if(!register||!message||!path||!name||wasPassword.current||input.loading)return
       return register(id,{name,label,statePath:path,read:()=>latest.current.state.get(path),visible:()=>{
         const element=root.current?.querySelector<HTMLElement>('input,textarea,select,[role="combobox"],[role="radio"],[role="switch"],[role="checkbox"]')
-        return Boolean(element&&element.getClientRects().length>0&&getComputedStyle(element).visibility!=='hidden'&&element.getAttribute('type')!=='password'&&element.getAttribute('type')!=='hidden'&&!wasPassword.current)
+        return Boolean(element&&element.getClientRects().length>0&&getComputedStyle(element).visibility!=='hidden'&&element.getAttribute('type')!=='password'&&element.getAttribute('type')!=='hidden'&&!element.matches(':disabled,[readonly],[aria-disabled="true"],[aria-readonly="true"]')&&!wasPassword.current)
       }})
     },[register,message,path,name,label,id,input.loading,password])
     return <span ref={root} style={{display:'contents'}}><Original {...input}/></span>
