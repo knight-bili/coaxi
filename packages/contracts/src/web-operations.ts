@@ -18,6 +18,7 @@ export const WEB_OPERATIONS = [
   'backup.webdav.remote',
   'history.library',
   'history.usage',
+  'feedback.operation',
   'office.watch',
   'forge.accounts.get',
   'forge.accounts.set',

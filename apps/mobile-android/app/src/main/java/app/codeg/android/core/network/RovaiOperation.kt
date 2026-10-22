@@ -191,6 +191,7 @@ enum class RovaiOperation(val wire:String) {
     MONITORING_REPORT("monitoring.report"),
     MONITORING_PRICES("monitoring.prices"),
     HISTORY_USAGE("history.usage"),
+    FEEDBACK_OPERATION("feedback.operation"),
     MONITORING_EXECUTION("monitoring.execution"),
     SKILLS_LIST("skills.list"),
     SKILLS_GET("skills.get"),

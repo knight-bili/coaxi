@@ -191,6 +191,7 @@ enum RovaiOperation: String, Sendable {
     case monitoringReport = "monitoring.report"
     case monitoringPrices = "monitoring.prices"
     case historyUsage = "history.usage"
+    case feedbackOperation = "feedback.operation"
     case monitoringExecution = "monitoring.execution"
     case skillsList = "skills.list"
     case skillsGet = "skills.get"

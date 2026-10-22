@@ -326,6 +326,7 @@ const allowedMethods = new Set<CoreMethod>([
   'backup.webdav.settings',
   'history.library',
   'history.usage',
+  'feedback.operation',
   'history.usage.local',
   'office.watch',
   'forge.accounts.get',

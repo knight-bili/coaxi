@@ -6,6 +6,7 @@ import type { BuiltinMemberAvatarRole } from './member-avatar'
 export * from './member-avatar'
 export * from './current-user-profile'
 export type * from './native-history-usage'
+export type * from './user-feedback'
 
 export interface NativeHistoryUsageReport {
   schemaVersion:1;source:'imported_native_history';report:import('./native-history-usage').TokenUsageReport
