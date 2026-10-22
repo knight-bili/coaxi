@@ -83,6 +83,26 @@ impl CapturedNativeSource {
             AdapterKind::ClaudeCodeCli => get("CLAUDE_CONFIG_DIR")
                 .map(PathBuf::from)
                 .or_else(|| os_home().map(|root| root.join(".claude")))?,
+            AdapterKind::DeepseekHarness => {
+                // 固定 Codeg deepseek.rs：日志目录可独立于 DSH_HOME 重定位。
+                let sessions = if let Some(root) = get("DEEPSEEK_ACP_SESSIONS_ROOT") {
+                    PathBuf::from(root)
+                } else {
+                    let root = match get("DSH_HOME").filter(|value| !value.to_string_lossy().trim().is_empty()) {
+                        Some(value) => {
+                            let text = value.to_str()?;
+                            match os_home() {
+                                Some(home) if text == "~" => home,
+                                Some(home) if text.starts_with("~/") || text.starts_with("~\\") => home.join(&text[2..]),
+                                _ => PathBuf::from(value),
+                            }
+                        }
+                        None => os_home()?.join(".dsh"),
+                    };
+                    root.join("sessions")
+                };
+                lexical_absolute(cwd, &sessions, environment)?
+            }
             AdapterKind::QoderCli => {
                 // Qoder native config behavior: official 1.1.45/1.1.68, Apache-2.0.
                 // See integration/licenses/qoder-native-origin/LICENSE and source inventory.

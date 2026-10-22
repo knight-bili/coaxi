@@ -19,7 +19,7 @@ async fn host(cwd:&Path,runtime:&FrozenAgentRuntimeConfig,origin:&native::Native
     crate::custom_runtime::launch::merge_environment(plan.as_ref(),&mut runtime.environment)?;
     if runtime.environment.as_ref().is_some_and(|value|value.has_overlay()){runtime.custom_api=None;}
     // 来源种类只决定如何核对最终子进程目录，随后仍必须核对真实 initialize 的程序身份。
-    let preparation_kind=match origin.source.provider.as_str(){"claude"=>Some(AdapterKind::ClaudeCodeCli),"codex"=>Some(AdapterKind::CodexCli),_=>None};
+    let preparation_kind=match origin.source.provider.as_str(){"claude"=>Some(AdapterKind::ClaudeCodeCli),"codex"=>Some(AdapterKind::CodexCli),"deepseek"=>Some(AdapterKind::DeepseekHarness),_=>None};
     let workspace=AgentRunWorkspace::runtime_managed_path(cwd.to_string_lossy().into_owned());
     let(incoming,mut receiver)=mpsc::unbounded_channel();
     let host=crate::custom_runtime::launch::with_plan(plan,rovai_core::runtime_discovery::with_launch_environment(runtime.environment.clone(),AcpHost::spawn_in_environment(cwd,&workspace,PermissionSemantics::RuntimeManagedV2,&runtime,incoming,None,CompactionDetectorPolicy::Disabled,false,&BTreeMap::new(),private,None,preparation_kind))).await?;

@@ -39,7 +39,8 @@ pub(crate) fn revision(location:&Location)->Result<String>{
         for entry in fs::read_dir(directory)?{let entry=entry?;visited+=1;ensure!(visited<=50000,"native_lifecycle.source_entry_limit");let path=entry.path();let name=path.strip_prefix(&base)?;if excluded(name){continue}no_link(&path)?;let metadata=fs::metadata(&path)?;
             if metadata.is_dir(){pending.push((path,depth+1));continue}ensure!(metadata.is_file(),"native_lifecycle.source_type_invalid");
             let file=name.file_name().unwrap_or_default().to_string_lossy();let extension=path.extension().and_then(|ext|ext.to_str()).unwrap_or_default().to_ascii_lowercase();
-            if !["json","jsonl","db","sqlite","sqlite3","vscdb","pb","meta","idx"].contains(&extension.as_str())&&!file.ends_with("-wal")&&!file.ends_with("-shm"){continue}
+            let compressed_log=file.starts_with("session")&&file.ends_with(".jsonl.zstd");
+            if !compressed_log&&!["json","jsonl","db","sqlite","sqlite3","vscdb","pb","meta","idx"].contains(&extension.as_str())&&!file.ends_with("-wal")&&!file.ends_with("-shm"){continue}
             let(size,digest)=hash_file(&path)?;bytes=bytes.checked_add(size).context("native_lifecycle.source_size_limit")?;ensure!(bytes<=512*1024*1024,"native_lifecycle.source_size_limit");entries.push((name.to_string_lossy().replace('\\',"/"),size,digest));
         }
     }entries.sort_by(|left,right|left.0.cmp(&right.0));digest(&json!(entries))
