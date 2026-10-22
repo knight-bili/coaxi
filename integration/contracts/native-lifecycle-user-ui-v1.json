@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "authority": "authenticated-user-api-only",
+  "modelToolsAdded": false,
+  "modelInputChangedByThisUserApiRecord": false,
+  "confirmedModelChange": "../proposals/native-continuation-fork-steer-r1-confirmation.json",
+  "threadIdentifierCorrection": {
+    "reason": "r1附录将新Thread用户返回编号误写为裸UUID；Core唯一持久和公开身份始终是已有ThreadId。实现保持Core不变量，不引入UUID别名。",
+    "fields": ["NativeContinuationPreviewV1.newThreadId", "NativeContinuationReceiptV1.threadId"],
+    "type": "string",
+    "minLength": 33,
+    "maxLength": 33,
+    "pattern": "^rvcamp_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$",
+    "unchangedModelShapes": ["NativeSourceReferenceV1", "NativeSessionOriginV1", "NativeForkPointV1", "FrozenNativeSteerV1", "NativeSteerTargetV1", "NativeSteerInputV1", "NativeInputDeliveryV1"],
+    "historicalProposalRewritten": false
+  },
+  "auxiliaryOperations": {
+    "runtime.steer.materials.prepare": {
+      "description": "用户明确勾选当前编辑端和卡片的已有文件引用，冻结为Core快照；不读取未选材料。",
+      "input": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["schemaVersion", "target", "sourceIds", "composerScope"],
+        "properties": {
+          "schemaVersion": {"const": 1},
+          "target": {"schema": "NativeSteerTargetV1"},
+          "sourceIds": {"type": "array", "minItems": 1, "maxItems": 10, "uniqueItems": true, "items": {"type": "string", "format": "uuid"}},
+          "composerScope": {"oneOf": [{"type": "null"}, {"schema": "existing SingleChatComposerScope"}]}
+        }
+      },
+      "output": {"schemaVersion": 1, "materials": "NativeSteerMaterialV1[1..10]"},
+      "actor": "Host authenticated DraftClient",
+      "acceptsPathsOrUrls": false,
+      "startsModelTask": false
+    }
+  },
+  "softwareReview": false,
+  "softwareTests": false
+}

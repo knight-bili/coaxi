@@ -489,9 +489,9 @@
         },
         "newThreadId": {
           "type": "string",
-          "minLength": 36,
-          "maxLength": 36,
-          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          "minLength": 33,
+          "maxLength": 33,
+          "pattern": "^rvcamp_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$"
         },
         "newConversationId": {
           "type": "string",
@@ -629,9 +629,9 @@
         },
         "threadId": {
           "type": "string",
-          "minLength": 36,
-          "maxLength": 36,
-          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          "minLength": 33,
+          "maxLength": 33,
+          "pattern": "^rvcamp_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$"
         },
         "conversationId": {
           "type": "string",
@@ -2221,5 +2221,6 @@
         }
       }
     }
-  }
+  },
+  "userApiCompatibility": "integration/contracts/native-lifecycle-user-ui-v1.json"
 }
