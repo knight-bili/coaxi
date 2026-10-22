@@ -43,11 +43,11 @@ import java.util.UUID
             if(value!=null){
                 if(value.coreLong("cardCount")>1)Row(Modifier.padding(horizontal=12.dp)){TextButton(enabled=index>0,onClick={index--}){Text("上一张")};Text("${index+1}/${value.coreLong("cardCount")}");TextButton(enabled=index+1<value.coreLong("cardCount"),onClick={index++}){Text("下一张")}}
                 key(value){
-                    val channel=remember{UUID.randomUUID().toString()};val previews=remember{mutableSetOf<String>()};val requests=remember{mutableSetOf<String>()};var retired=remember{false}
+                    val channel=remember{UUID.randomUUID().toString()};val previews=remember{mutableSetOf<String>()};val requests=remember{mutableSetOf<String>()};val retired=remember{mutableStateOf(false)}
                     AndroidView(Modifier.fillMaxWidth().weight(1f),factory={nativeContext->WebView(nativeContext).apply{
                         val web=this;val origin="https://rovai-card.local/";val page=origin+"index.html"
                         settings.javaScriptEnabled=true;settings.allowFileAccess=false;settings.allowContentAccess=false;settings.domStorageEnabled=false;settings.mixedContentMode=WebSettings.MIXED_CONTENT_NEVER_ALLOW;settings.setSupportMultipleWindows(false);CookieManager.getInstance().setAcceptThirdPartyCookies(this,false)
-                        fun live()=!retired&&foreground.value&&generation==model.connectionGeneration&&web.url==page
+                        fun live()=!retired.value&&foreground.value&&generation==model.connectionGeneration&&web.url==page
                         addJavascriptInterface(object{
                             @JavascriptInterface fun postMessage(raw:String){if(raw.toByteArray(Charsets.UTF_8).size>65536)return;web.post{if(!live())return@post
                                 val input=runCatching{Json.parseToJsonElement(raw).coreObject()}.getOrNull()?:return@post;val id=input.coreText("requestId");if(input.coreText("channel")!=channel||input.coreLong("schemaVersion")!=1L||runCatching{UUID.fromString(id)}.isFailure||requests.size>=16||!requests.add(id))return@post
@@ -78,7 +78,7 @@ import java.util.UUID
                             }
                             override fun onPageFinished(view:WebView,url:String){if(url!=page||!live())return;val init=buildJsonObject{put("channel",channel);put("card",value);put("dark",(context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK)==android.content.res.Configuration.UI_MODE_NIGHT_YES)};view.evaluateJavascript("window.RovaiCardPage?.mount($init);",null)}
                         };loadUrl(page)
-                    }},onRelease={web->retired=true;web.removeJavascriptInterface("RovaiCardNative");web.stopLoading();web.loadUrl("about:blank");web.destroy();previews.clear();requests.clear()})
+                    }},onRelease={web->retired.value=true;web.removeJavascriptInterface("RovaiCardNative");web.stopLoading();web.loadUrl("about:blank");web.destroy();previews.clear();requests.clear()})
                 }
             }
         }}

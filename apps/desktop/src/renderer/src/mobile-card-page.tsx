@@ -19,6 +19,7 @@ declare global{interface Window{
 }}
 let channel='',root:Root|null=null
 const pending=new Map<string,{resolve(value:unknown):void;reject(error:Error):void;timer:ReturnType<typeof setTimeout>}>()
+function requestId():string{if(typeof crypto.randomUUID==='function')return crypto.randomUUID();const bytes=crypto.getRandomValues(new Uint8Array(16));bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;const hex=Array.from(bytes,value=>value.toString(16).padStart(2,'0')).join('');return hex.slice(0,8)+'-'+hex.slice(8,12)+'-'+hex.slice(12,16)+'-'+hex.slice(16,20)+'-'+hex.slice(20)}
 function dispose():void{for(const item of pending.values()){clearTimeout(item.timer);item.reject(new Error('卡片已关闭，原请求可从反馈记录核对'))}pending.clear();root?.unmount();root=null;channel=''}
 function send(value:unknown):void{
   const raw=JSON.stringify(value);if(new TextEncoder().encode(raw).length>65536)throw new Error('卡片请求超过限制')
@@ -27,11 +28,11 @@ function send(value:unknown):void{
 }
 const request:FeedbackRequest=<T,>(action:string,payload:unknown):Promise<T>=>{
   if(!channel||!['targets','preview','submit'].includes(action)||pending.size>=16)return Promise.reject(new Error('卡片反馈请求不可用'))
-  const requestId=crypto.randomUUID()
+  const id=requestId()
   return new Promise<T>((resolve,reject)=>{
-    const timer=setTimeout(()=>{pending.delete(requestId);reject(new Error('结果待核对，原编号和预览仍保留，请从会话反馈记录查看'))},30000)
-    pending.set(requestId,{resolve:value=>resolve(value as T),reject,timer})
-    try{send({schemaVersion:1,channel,requestId,action,payload})}catch(error){clearTimeout(timer);pending.delete(requestId);reject(error)}
+    const timer=setTimeout(()=>{pending.delete(id);reject(new Error('结果待核对，原编号和预览仍保留，请从会话反馈记录查看'))},30000)
+    pending.set(id,{resolve:value=>resolve(value as T),reject,timer})
+    try{send({schemaVersion:1,channel,requestId:id,action,payload})}catch(error){clearTimeout(timer);pending.delete(id);reject(error)}
   })
 }
 window.RovaiCardPage={
