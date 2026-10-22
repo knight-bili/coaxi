@@ -123,7 +123,7 @@ impl Broker {
         let peer_id = text(&grant, "desktopPeerId")?;
         ensure!(state.peers.get(peer_id).is_some_and(unexpired), "desktop_unavailable");
         let id = text(&grant, "grantId")?.to_owned();
-        if let Some(previous) = state.grants.get(&id) { ensure!(grant["grantGeneration"].as_u64() > previous["grantGeneration"].as_u64() && same_scope(previous, &grant) && previous["desktopPeerId"] == grant["desktopPeerId"] && previous["targetId"] == grant["targetId"], "generation_changed"); }
+        if let Some(previous) = state.grants.get(&id) { if previous == &grant {return Ok(previous.clone());} ensure!(grant["grantGeneration"].as_u64() > previous["grantGeneration"].as_u64() && same_scope(previous, &grant) && previous["desktopPeerId"] == grant["desktopPeerId"] && previous["targetId"] == grant["targetId"], "generation_changed"); }
         state.grants.insert(id, grant.clone());
         Ok(grant)
     }

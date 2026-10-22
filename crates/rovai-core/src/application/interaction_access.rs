@@ -130,6 +130,17 @@ impl Core {
         let broker = &self.interaction_tools;
         let payload = &input.payload;
         match input.action.as_str() {
+            "sharing.targets" => {
+                #[derive(Deserialize)] #[serde(rename_all="camelCase",deny_unknown_fields)] struct Targets {thread_id:String,after:Option<String>}
+                let input:Targets=serde_json::from_value(payload.clone())?;
+                let database=self.database.lock().await;
+                let mut query=database.connection().prepare("SELECT c.id,c.kind,c.agent_id,p.display_name,c.created_at FROM conversation c JOIN camp ON camp.id=c.camp_id JOIN camp_member m ON m.camp_id=camp.id AND m.agent_id=c.agent_id JOIN agent_profile p ON p.id=c.agent_id WHERE camp.id=?1 AND camp.activation_state='active' AND c.ended_at IS NULL AND m.status='active' AND m.leave_requested_at IS NULL AND (?2 IS NULL OR c.id>?2) ORDER BY c.id LIMIT 201")?;
+                let mut rows=query.query_map(rusqlite::params![input.thread_id,input.after],|row|Ok((row.get::<_,String>(0)?,row.get::<_,String>(1)?,row.get::<_,String>(2)?,row.get::<_,String>(3)?,row.get::<_,String>(4)?)))?.collect::<rusqlite::Result<Vec<_>>>()?;
+                let more=rows.len()>200;rows.truncate(200);
+                let after=if more{rows.last().map(|row|row.0.clone())}else{None};
+                let targets=rows.into_iter().map(|(conversation,kind,agent,name,created)|{let public=kind=="camp_member";json!({"id":conversation,"agentId":agent,"displayName":name,"createdAt":created,"scope":{"threadId":input.thread_id,"conversationId":if public{None}else{Some(conversation.as_str())},"scopeKind":if public{"public"}else{kind.as_str()}})}).collect::<Vec<_>>();
+                Ok(json!({"targets":targets,"next":after}))
+            }
             "policy.get" => Ok(serde_json::to_value(broker.policies.read()?)?),
             "policy.replace" => {
                 #[derive(Deserialize)] #[serde(rename_all="camelCase",deny_unknown_fields)] struct Replace { expected_revision:u64, value:tools::Policy }

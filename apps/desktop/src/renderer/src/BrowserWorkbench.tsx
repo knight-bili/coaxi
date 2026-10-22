@@ -1,3 +1,4 @@
+import { InteractionShareControl } from './InteractionShareControl'
 import { useEffect, useState } from 'react'
 import { ArrowLeft, ArrowRight, ExternalLink, Globe, Plus, RefreshCw, ShieldOff, X } from 'lucide-react'
 import type { BrowserWorkspaceView } from '@contracts'
@@ -49,7 +50,8 @@ export function BrowserWorkbench({threadId}:{threadId:string}):React.JSX.Element
         <button type="button" disabled={busy} onClick={()=>void run(()=>control('system'))}>{t('系统浏览器打开')}</button>
         {devtools&&<button type="button" disabled={busy} onClick={()=>void run(()=>control('devtools'))}>{t('开发工具')}</button>}
         <button type="button" disabled={busy} onClick={()=>void run(()=>control('navigate',{url}))}>{t('前往地址')}</button>
-        <select value={current.level} disabled={busy||current.loading} aria-label={t('本会话的页面共享权限')} onChange={event=>void run(()=>control('share',{level:event.target.value,minutes:30}))}>
+        <InteractionShareControl key={current.id} threadId={threadId} targetId={current.id} targetKind="browser_tab" origin={(()=>{try{const url=new URL(current.url);return ['http:','https:'].includes(url.protocol)?url.origin:null}catch{return null}})()} disabled={busy||current.loading}/>
+        <select value={current.level} disabled={busy||current.loading} aria-label={t('本机预览权限')} onChange={event=>void run(()=>control('share',{level:event.target.value,minutes:30}))}>
           <option value="none">{t('未共享')}</option><option value="read">{t('允许本会话查看 · 30分钟')}</option><option value="control">{t('允许本会话操作 · 30分钟')}</option>
         </select>
         <button type="button" disabled={busy||current.level==='none'} onClick={()=>void run(()=>control('share',{level:'none'}))}><ShieldOff size={14}/>{t('收回')}</button>
