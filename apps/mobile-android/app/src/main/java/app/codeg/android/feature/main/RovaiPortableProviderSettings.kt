@@ -88,8 +88,8 @@ fun RovaiPortableProviderSettings(model:RovaiWorkspaceViewModel,onClose:()->Unit
 @Composable
 private fun PortableProviderEditor(original:JsonObject,disabled:Boolean,onClose:()->Unit,onSave:(JsonObject,String,String,String)->Unit){
     var value by remember(original.coreText("id")){mutableStateOf(original)};var key by remember{mutableStateOf("")};var keyMode by remember{mutableStateOf("keep")};var secretOperation by remember{mutableStateOf(UUID.randomUUID().toString())}
-    var discard by remember{mutableStateOf(false)};var issue by remember{mutableStateOf<String?>(null)};var advanced by remember{mutableStateOf(false)};var codexAdvanced by remember{mutableStateOf("")}
-    val dirty=value!=original||key.isNotEmpty()||keyMode!="keep"||codexAdvanced.isNotEmpty()
+    var discard by remember{mutableStateOf(false)};var issue by remember{mutableStateOf<String?>(null)}
+    val dirty=value!=original||key.isNotEmpty()||keyMode!="keep"
     fun close(){if(dirty)discard=true else onClose()}
     val type=value.coreText("agentType");val settings=value["model"].coreObject()
     fun field(name:String,text:String){value=value.withField(name,JsonPrimitive(text))}
@@ -98,7 +98,7 @@ private fun PortableProviderEditor(original:JsonObject,disabled:Boolean,onClose:
     BackHandler{close()}
     AlertDialog(onDismissRequest={if(!disabled)close()},title={Text(if(original.coreLong("revision")==0L)"新增服务商" else "编辑服务商")},text={Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(10.dp)){
         CodegTextField(value.coreText("name"),{field("name",it)},"名称")
-        if(original.coreLong("revision")==0L)Row{portableTypes.forEach{(kind,name)->FilterChip(selected=type==kind,onClick={value=value.withField("agentType",JsonPrimitive(kind)).withField("model",portableModel(kind));codexAdvanced=""},enabled=!disabled,label={Text(name)})}}
+        if(original.coreLong("revision")==0L)Row{portableTypes.forEach{(kind,name)->FilterChip(selected=type==kind,onClick={value=value.withField("agentType",JsonPrimitive(kind)).withField("model",portableModel(kind))},enabled=!disabled,label={Text(name)})}}
         CodegTextField(value.coreText("apiUrl"),{field("apiUrl",it)},"接口地址",mono=true)
         Row{listOf("keep" to "保留密钥","replace" to "替换","clear" to "清空").forEach{(mode,name)->FilterChip(selected=keyMode==mode,onClick={keyMode=mode},enabled=!disabled,label={Text(name)})}}
         if(keyMode=="replace")SecretField(key,{key=it;secretOperation=UUID.randomUUID().toString()},"API密钥")
@@ -113,18 +113,17 @@ private fun PortableProviderEditor(original:JsonObject,disabled:Boolean,onClose:
                     CodegTextField(row.coreText("displayName"),{custom(index,"displayName",JsonPrimitive(it))},"显示名称")
                     CodegTextField(row.coreText("contextWindow"),{custom(index,"contextWindow",if(it.isBlank())JsonNull else it.toLongOrNull()?.let(::JsonPrimitive)?:JsonPrimitive(it))},"上下文窗口（可选）")
                     CodegTextField(row.coreText("base"),{custom(index,"base",JsonPrimitive(it))},"基于官方模型")
+                    RovaiPortableCodexOverrides(row["overrides"].coreObject(),disabled){custom(index,"overrides",it)}
                     TextButton(onClick={modelField("customs",JsonArray(settings["customs"].coreArray().filterIndexed{i,_->i!=index}))},enabled=!disabled){Text("移除此模型")}
                 }
                 TextButton(onClick={modelField("customs",JsonArray(settings["customs"].coreArray()+buildJsonObject{put("slug","");put("displayName","");put("contextWindow",JsonNull);put("base","");put("overrides",buildJsonObject{})}))},enabled=!disabled){Text("添加自定义模型")}
                 CodegTextField(settings["excludedOfficials"]?.jsonArray?.joinToString("\n"){it.jsonPrimitive.content}?:"",{modelField("excludedOfficials",JsonArray(it.lines().map(String::trim).filter(String::isNotEmpty).map(::JsonPrimitive)))},"隐藏的官方模型（每行一个）",singleLine=false)
                 CodegTextField(settings.coreText("default"),{modelField("default",it.takeIf(String::isNotBlank)?.let(::JsonPrimitive)?:JsonNull)},"默认模型（可选）")
-                TextButton(onClick={advanced=!advanced;if(advanced&&codexAdvanced.isEmpty())codexAdvanced=settings.toString()}){Text("高级模型目录覆盖")}
-                if(advanced)CodegTextField(codexAdvanced,{codexAdvanced=it},"完整模型目录（JSON）",mono=true,singleLine=false)
             }
         }
         if(issue!=null)Text(issue!!,color=MaterialTheme.colorScheme.error)
     }},dismissButton={TextButton(onClick={close()},enabled=!disabled){Text("取消")}},confirmButton={TextButton(enabled=!disabled&&value.coreText("name").isNotBlank()&&value.coreText("apiUrl").isNotBlank()&&(keyMode!="replace"||key.isNotBlank()),onClick={
-        try{var candidate=value.filterKeys{it !in setOf("revision","digest","createdAt","updatedAt")}.let(::JsonObject);if(type=="codex"&&advanced){val parsed=Json.parseToJsonElement(codexAdvanced).jsonObject;require(parsed.coreText("kind")=="codex");candidate=candidate.withField("model",parsed)};issue=null;onSave(candidate,keyMode,key,secretOperation)}catch(error:Exception){issue="请检查高级模型目录与数字字段"}
+        try{var candidate=value.filterKeys{it !in setOf("revision","digest","createdAt","updatedAt")}.let(::JsonObject);issue=null;onSave(candidate,keyMode,key,secretOperation)}catch(error:Exception){issue="请检查高级模型目录与数字字段"}
     }){Text("保存")}})
     if(discard)AlertDialog(onDismissRequest={discard=false},title={Text("放弃本次编辑？")},text={Text("未保存的地址、模型和密钥输入会丢弃。")},dismissButton={TextButton(onClick={discard=false}){Text("继续编辑")}},confirmButton={TextButton(onClick=onClose){Text("放弃编辑")}})
 }

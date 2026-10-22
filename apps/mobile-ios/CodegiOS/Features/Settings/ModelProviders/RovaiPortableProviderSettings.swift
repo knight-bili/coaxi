@@ -141,12 +141,12 @@ private struct PortableProviderEditor: View {
     let save: (JSONValue, String, String, String) async throws -> Void
     @State private var value: JSONValue; @State private var key = ""; @State private var keyMode = "keep"
     @State private var secretOperation = UUID().uuidString.lowercased(); @State private var busy = false
-    @State private var issue: String?; @State private var discard = false; @State private var advanced = false; @State private var advancedValue = ""
+    @State private var issue: String?; @State private var discard = false
     @Environment(\.dismiss) private var dismiss
     init(original: JSONValue, blocked: Bool, save: @escaping (JSONValue, String, String, String) async throws -> Void) { self.original = original; self.blocked = blocked; self.save = save; _value = State(initialValue: original) }
     private var type: String { value.text("agentType") }
     private var settings: JSONValue { value["model"] ?? .object([:]) }
-    private var dirty: Bool { value != original || !key.isEmpty || keyMode != "keep" || !advancedValue.isEmpty }
+    private var dirty: Bool { value != original || !key.isEmpty || keyMode != "keep" }
     private func field(_ name: String) -> Binding<String> { Binding(get: { value.text(name) }, set: { value = portableField(value, name, .string($0)) }) }
     private func modelField(_ name: String) -> Binding<String> { Binding(get: { settings.text(name) }, set: { value = portableField(value, "model", portableField(settings, name, $0.isEmpty && ["model", "default"].contains(name) ? .null : .string($0))) }) }
     private func close() { if dirty { discard = true } else { dismiss() } }
@@ -155,7 +155,7 @@ private struct PortableProviderEditor: View {
             Form {
                 Section("服务商") {
                     TextField("名称", text: field("name"))
-                    if original["revision"]?.rvInt == 0 { Picker("类型", selection: Binding(get: { type }, set: { value = portableField(portableField(value, "agentType", .string($0)), "model", portableProviderModel($0)); advancedValue = "" })) { ForEach(portableProviderTypes, id: \.0) { Text($0.1).tag($0.0) } } }
+                    if original["revision"]?.rvInt == 0 { Picker("类型", selection: Binding(get: { type }, set: { value = portableField(portableField(value, "agentType", .string($0)), "model", portableProviderModel($0)) })) { ForEach(portableProviderTypes, id: \.0) { Text($0.1).tag($0.0) } } }
                     TextField("接口地址", text: field("apiUrl")).textInputAutocapitalization(.never).autocorrectionDisabled()
                     Toggle("允许新的选择", isOn: Binding(get: { value["enabled"] == .bool(true) }, set: { value = portableField(value, "enabled", .bool($0)) }))
                 }
@@ -173,7 +173,7 @@ private struct PortableProviderEditor: View {
                 ToolbarItem(placement: .cancellationAction) { Button("取消", action: close).disabled(busy) }
                 ToolbarItem(placement: .confirmationAction) { Button("保存") { Task {
                     busy = true; issue = nil
-                    do { var candidate = value; if type == "codex" && advanced { guard let parsed = JSONValue.parse(advancedValue), parsed.text("kind") == "codex" else { throw RovaiHostFailure(code: "请检查高级模型目录") }; candidate = portableField(candidate, "model", parsed) }; try await save(candidate, keyMode, key, secretOperation); key = ""; dismiss() }
+                    do { var candidate = value; try await save(candidate, keyMode, key, secretOperation); key = ""; dismiss() }
                     catch is CancellationError {} catch { issue = error.localizedDescription }; busy = false
                 } }.disabled(busy || blocked || value.text("name").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || value.text("apiUrl").isEmpty || (keyMode == "replace" && key.isEmpty)) }
             }
@@ -185,13 +185,15 @@ private struct PortableProviderEditor: View {
             ForEach(Array((settings["customs"]?.rvArray ?? []).enumerated()), id: \.offset) { index, row in
                 DisclosureGroup(row.text("displayName").isEmpty ? "自定义模型 \(index + 1)" : row.text("displayName")) {
                     TextField("模型编号", text: customField(index, "slug")); TextField("显示名称", text: customField(index, "displayName")); TextField("基于官方模型", text: customField(index, "base")); TextField("上下文窗口（可选）", text: customField(index, "contextWindow")).keyboardType(.numberPad)
+                    RovaiPortableCodexOverrides(value: row["overrides"] ?? .object([:]), disabled: blocked || busy) { overrides in
+                        var rows = settings["customs"]?.rvArray ?? []; guard rows.indices.contains(index) else { return }; rows[index] = portableField(rows[index], "overrides", overrides); value = portableField(value, "model", portableField(settings, "customs", .array(rows)))
+                    }
                     Button("移除此模型", role: .destructive) { var rows = settings["customs"]?.rvArray ?? []; rows.remove(at: index); value = portableField(value, "model", portableField(settings, "customs", .array(rows))) }
                 }
             }
             Button("添加自定义模型") { var rows = settings["customs"]?.rvArray ?? []; rows.append(.object(["slug": .string(""), "displayName": .string(""), "contextWindow": .null, "base": .string(""), "overrides": .object([:])])); value = portableField(value, "model", portableField(settings, "customs", .array(rows))) }
             TextField("默认模型（可选）", text: modelField("default"))
             TextField("隐藏的官方模型（每行一个）", text: Binding(get: { (settings["excludedOfficials"]?.rvArray ?? []).map { if case .string(let name) = $0 { name } else { "" } }.joined(separator: "\n") }, set: { value = portableField(value, "model", portableField(settings, "excludedOfficials", .array($0.split(separator: "\n").map { .string($0.trimmingCharacters(in: .whitespaces)) }))) }), axis: .vertical)
-            DisclosureGroup("高级模型目录覆盖", isExpanded: $advanced) { TextEditor(text: $advancedValue).font(.system(.caption, design: .monospaced)).frame(minHeight: 180) }.onChange(of: advanced) { _, open in if open && advancedValue.isEmpty { advancedValue = settings.prettyString } }
         }
     }
     private func customField(_ index: Int, _ field: String) -> Binding<String> {
