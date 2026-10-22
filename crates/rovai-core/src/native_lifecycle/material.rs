@@ -25,6 +25,9 @@ pub(crate) fn selected_sources(connection:&Connection,target:&NativeSteerTargetV
             result.push(Candidate{original_id:id.clone(),source:PathBuf::from(&source.source_path),display_name:source.display_name.clone()});continue
         }
         ensure!(scope.scope_kind=="public","native_lifecycle.selected_material_missing");
+        if let Some(source)=crate::web_upload::owned_public_source(connection,client,&scope.thread_id,id)?{
+            result.push(Candidate{original_id:id.clone(),source:source.source_path.into(),display_name:source.display_name});continue
+        }
         let row:Option<(String,String)>=connection.query_row("SELECT storage_path,display_name FROM prepared_attachment WHERE id=?1 AND camp_id=?2 AND client_id=?3 AND state='ready'",params![id,scope.thread_id,client.id()],|row|Ok((row.get(0)?,row.get(1)?))).optional()?;
         let(path,name)=row.context("native_lifecycle.selected_material_missing")?;result.push(Candidate{original_id:id.clone(),source:path.into(),display_name:name});
     }Ok(result)
