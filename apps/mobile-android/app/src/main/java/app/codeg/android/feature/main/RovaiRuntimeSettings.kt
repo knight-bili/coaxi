@@ -24,7 +24,7 @@ fun RovaiRuntimeSettings(model:RovaiWorkspaceViewModel){
     var kind by remember{mutableStateOf("")};var selection by remember{mutableStateOf(buildJsonObject{put("mode","runtime_default")})}
     var permissions by remember{mutableStateOf(buildJsonObject{})};var catalog by remember{mutableStateOf(buildJsonObject{})}
     var advanced by remember{mutableStateOf<Map<String,String>>(emptyMap())};var baseline by remember{mutableStateOf("")};var submitted by remember{mutableStateOf<String?>(null)}
-    var issue by remember{mutableStateOf<String?>(null)};var loading by remember{mutableStateOf(false)};var picker by remember{mutableStateOf(false)};var startup by remember{mutableStateOf(false)};var discard by remember{mutableStateOf(false)}
+    var issue by remember{mutableStateOf<String?>(null)};var loading by remember{mutableStateOf(false)};var picker by remember{mutableStateOf(false)};var startup by remember{mutableStateOf(false)};var discard by remember{mutableStateOf(false)};var custom by remember{mutableStateOf(false)}
     val installation=installations.find{it.coreText("adapterKind")==kind&&it.coreText("installationClass")=="managed_default"&&it.coreText("authScope")=="default"}
     val snapshot=installation?.get("snapshot").coreObject();val defaults=installation?.get("memberRuntimeDefaults").coreObject()
     val disabled=loading||state.busy||state.pending!=null
@@ -37,9 +37,10 @@ fun RovaiRuntimeSettings(model:RovaiWorkspaceViewModel){
     LaunchedEffect(Unit){load()}
     LaunchedEffect(state.lastResult){val receipt=state.lastResult.coreObject()["commandResult"].coreObject().ifEmpty{state.lastResult.coreObject()};if(receipt.coreText("commandId")==submitted){if(receipt.coreText("status")=="applied"){agent=null;submitted=null;load()}else issue=receipt.coreText("code")};if(state.lastCompletedOperation==RovaiOperation.RUNTIME_PRODUCT_CHECK.wire)load()}
     BackHandler(enabled=agent!=null){if(dirty)discard=true else agent=null}
+    if(custom)RovaiCustomRuntimeSettings(model,onClose={custom=false})
     val models=catalog["models"].coreArray().ifEmpty{snapshot["models"].coreArray()};val currentModel=models.find{it.coreText("id")==selection.coreText("modelId")}
     LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
-        item{Row{if(agent!=null)TextButton(onClick={if(dirty)discard=true else agent=null}){Text("返回队员列表")};TextButton(enabled=!disabled,onClick={coroutine.launch{load()}}){Text("刷新")}}}
+        item{Row{if(agent!=null)TextButton(onClick={if(dirty)discard=true else agent=null}){Text("返回队员列表")};TextButton(enabled=!disabled,onClick={coroutine.launch{load()}}){Text("刷新")};TextButton(enabled=!disabled,onClick={custom=true}){Text("自定义智能体")}}}
         issue?.let{item{Text(it,color=CodegTheme.colors.danger)}}
         if(agent==null){items(state.members.filter{it.coreText("presence")!="removed"},key={it.coreText("agentId")}){member->GlassRow(Modifier.fillMaxWidth()){Text(member.coreText("displayName"),style=MaterialTheme.typography.titleMedium);Text(member["runtimeReadiness"].coreObject().coreText("status"),color=CodegTheme.colors.textSecondary);RovaiMemberFeedbackSwitch(model,member.coreText("agentId"));TextButton(enabled=!disabled,onClick={chooseMember(member)}){Text("模型和权限")}}}}
         else{
