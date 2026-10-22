@@ -11,6 +11,7 @@ pub(crate) mod members;
 pub(crate) mod archive;
 mod fusion_archive;
 pub(crate) mod export;
+pub(crate) mod export_artifact;
 mod codeg_crypto;
 pub(crate) mod codex_catalog;
 pub(crate) mod normalize;

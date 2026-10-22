@@ -15,6 +15,16 @@ impl Core{
     }
     async fn portable_configuration_private_inner(&self,method:&str,value:Value,client:&crate::draft_client::DraftClient)->Result<Value>{
         ensure!(serde_json::to_vec(&value)?.len()<=configuration::MAX_REQUEST,"configuration.request_too_large");
+        if method=="configuration.export.prepare"{
+            let input:configuration::export_artifact::Prepare=serde_json::from_value(value)?;
+            let _lock=crate::workbench::MUTATIONS.lock().await;let database=self.database.lock().await;
+            let frozen=configuration::export_artifact::freeze(database.connection(),&self.data_dir,client.id(),input)?;drop(database);
+            return tokio::task::spawn_blocking(move||configuration::export_artifact::finish(frozen)).await.context("configuration.export_worker_unavailable")?
+        }
+        if matches!(method,"configuration.export.receipt"|"configuration.export.read"){
+            let input:configuration::export_artifact::ReadExport=serde_json::from_value(value)?;
+            return configuration::export_artifact::read(&self.data_dir,client.id(),input,method=="configuration.export.read")
+        }
         if matches!(method,"configuration.desktopOwner.register"|"configuration.desktopOwner.pending"|"configuration.desktopOwner.acknowledge"){
             ensure!(client.is_desktop(),"configuration.desktop_owner_required");
             let _lock=crate::workbench::MUTATIONS.lock().await;let database=self.database.lock().await;
