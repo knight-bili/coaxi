@@ -12,5 +12,5 @@ pub fn migrate(database:&mut crate::db::Database)->Result<()>{
     ensure!(matches!(crate::db::classify_native_lifecycle_165_contract(&tx)?,crate::db::DatabaseContractClassification::Current(ref marker) if marker.projection_schema_version==165)&&absent(&tx)?,"configuration.schema_source_invalid");
     tx.execute_batch(include_str!("schema.sql"))?;
     tx.execute_batch("INSERT INTO schema_migration(version,applied_at) VALUES(216,datetime('now'));UPDATE rovai_data_contract SET projection_schema_version=166,updated_at=datetime('now') WHERE singleton=1;")?;
-    ensure!(matches!(crate::db::classify_database_contract(&tx)?,crate::db::DatabaseContractClassification::Current(ref marker) if marker.projection_schema_version==166),"configuration.schema_target_invalid");tx.commit()?;Ok(())
+    ensure!(matches!(crate::db::classify_portable_configuration_166_contract(&tx)?,crate::db::DatabaseContractClassification::Current(ref marker) if marker.projection_schema_version==166),"configuration.schema_target_invalid");tx.commit()?;Ok(())
 }
