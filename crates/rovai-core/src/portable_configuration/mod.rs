@@ -5,6 +5,7 @@ use serde_json::{Value,json};
 use std::sync::LazyLock;
 
 pub mod storage;
+pub(crate) mod secrets;
 mod model;
 pub use model::*;
 
