@@ -79,7 +79,7 @@ export class InteractionWorkspace {
       const peer=this.peer,generation=this.generation
       if(!peer)return
       for(const [id,result] of this.outcomes){
-        if(result.desktopPeerId!==peer.desktopPeerId){this.outcomes.delete(id);continue}
+        if(result.desktopPeerId!==peer.desktopPeerId){await this.request('desktop.archiveLate',result);this.outcomes.delete(id);continue}
         await this.request('desktop.finish',result);this.outcomes.delete(id)
       }
       const page=await this.request<{calls:InteractionWork[]}>('desktop.poll',{schemaVersion:1,desktopPeerId:peer.desktopPeerId,connectionGeneration:peer.connectionGeneration,limit:16})
@@ -98,7 +98,7 @@ export class InteractionWorkspace {
         }catch{result=null;outcome='unknown'}
         const finish:Finish={schemaVersion:1,desktopPeerId:peer.desktopPeerId,connectionGeneration:peer.connectionGeneration,bridgeCallId:work.call.bridgeCallId,bindingDigest:work.receipt.bindingDigest,argumentsDigest:work.call.argumentsDigest,outcome,result}
         this.outcomes.set(work.call.bridgeCallId,finish)
-        try{await this.request('desktop.finish',finish);this.outcomes.delete(work.call.bridgeCallId)}catch{/* 原动作不重做；下一轮只补交这个完整结果。 */}
+        try{await this.request('desktop.finish',finish);this.outcomes.delete(work.call.bridgeCallId)}catch{try{await this.request('desktop.archiveLate',finish);this.outcomes.delete(work.call.bridgeCallId)}catch{/* 原动作不重做；后续只补存原结果。 */}}
       }
     }finally{this.busy=false}
   }

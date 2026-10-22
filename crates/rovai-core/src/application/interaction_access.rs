@@ -178,6 +178,7 @@ impl Core {
             "desktop.targets" => broker.register_targets(payload.clone()),
             "desktop.check" => { let database = self.database.lock().await; broker.check_desktop_call(payload, |binding| require_binding(&database, broker, binding)) }
             "desktop.finish" => { let database = self.database.lock().await; broker.finish(payload, |binding| require_binding(&database, broker, binding)) }
+            "desktop.archiveLate"=>broker.archive_late(payload),
             "pending" => Ok(json!({"items":broker.pending()?})),
             "eval.approve"|"operation.approve" => { broker.approve(string(payload,"bridgeCallId")?,string(payload,"argumentsDigest")?)?; Ok(json!({"approved":true})) }
             "computer.stop"=>broker.stop_computer(),

@@ -71,7 +71,7 @@ impl Broker {
         let mut state = self.locked()?;
         ensure!(!state.bridges.contains_key(&id) && state.bridges.len() < 4096, "interaction.bridge_capacity");
         // 同一 Run/epoch 的旧桥先撤销；旧连接永远不能转绑到新范围。
-        let old: Vec<String> = state.bridges.iter().filter(|(_, bridge)| bridge.binding["agentRunId"] == binding["agentRunId"]).map(|(id, _)| id.clone()).collect();
+        let old: Vec<String> = state.bridges.iter().filter(|(_, bridge)| bridge.binding["agentRunId"] == binding["agentRunId"] || same_scope(&bridge.binding,&binding)).map(|(id, _)| id.clone()).collect();
         for old in old { self.revoke_locked(&mut state, &old)?; }
         state.bridges.insert(id, Bridge { binding, features, secret: secret.clone(), revoked: false });
         Ok(secret)
@@ -299,9 +299,35 @@ impl Broker {
         }
         Ok(())
     }
-    pub fn revoke_run(&self, run: &str) -> Result<()> { let mut state = self.locked()?; let ids: Vec<String> = state.bridges.iter().filter(|(_, bridge)| bridge.binding["agentRunId"] == run).map(|(id, _)| id.clone()).collect(); for id in ids { self.revoke_locked(&mut state, &id)?; } Ok(()) }
+    pub fn revoke_run(&self, run: &str) -> Result<()> {
+        let mut state=self.locked()?;
+        let active:Vec<Value>=state.bridges.values().filter(|bridge|!bridge.revoked&&bridge.binding["agentRunId"]==run).map(|bridge|bridge.binding.clone()).collect();
+        state.grants.retain(|_,grant|!active.iter().any(|binding|same_scope(grant,binding)&&grant["desktopPeerId"]==binding["desktopPeerId"]));
+        let ids:Vec<String>=state.bridges.iter().filter(|(_,bridge)|bridge.binding["agentRunId"]==run).map(|(id,_)|id.clone()).collect();
+        for id in ids{self.revoke_locked(&mut state,&id)?;}Ok(())
+    }
     pub fn revoke_peer(&self, peer: &str) -> Result<()> { let mut state = self.locked()?; state.peers.remove(peer); state.grants.retain(|_, grant| grant["desktopPeerId"] != peer); let ids: Vec<String> = state.bridges.iter().filter(|(_, bridge)| bridge.binding["desktopPeerId"] == peer).map(|(id, _)| id.clone()).collect(); for id in ids { self.revoke_locked(&mut state, &id)?; } Ok(()) }
     pub fn stop_computer(&self)->Result<Value>{let mut state=self.locked()?;state.grants.retain(|_,grant|grant["targetKind"]=="browser_tab");let ids:Vec<String>=state.ledger.iter().filter(|(_,ledger)|ledger.call["toolName"].as_str().is_some_and(|name|name.starts_with("computer_"))&&matches!(ledger.receipt["state"].as_str(),Some("prepared"|"started"))).map(|(id,_)|id.clone()).collect();for id in ids{state.approvals.remove(&id);let ledger=state.ledger.get_mut(&id).context("original_request_pending")?;ledger.receipt["state"]=json!(if ledger.receipt["state"]=="started"{"unknown"}else{"cancelled"});ledger.receipt["finishedAt"]=json!(Utc::now().to_rfc3339());self.persist(ledger)?;}Ok(json!({"revoked":true}))}
     pub fn pending(&self) -> Result<Vec<Value>> { Ok(self.locked()?.ledger.values().filter(|ledger| matches!(ledger.receipt["state"].as_str(), Some("prepared" | "started" | "unknown")) && !ledger.owner_reconciled).map(|ledger| json!({"binding":ledger.binding,"call":ledger.call,"receipt":ledger.receipt})).collect()) }
     pub fn reconcile_unknown(&self, id: &str, expected_digest: &str) -> Result<Value> { let mut state = self.locked()?; let ledger = state.ledger.get_mut(id).context("original_request_pending")?; ensure!(ledger.receipt["state"] == "unknown" && ledger.call["argumentsDigest"] == expected_digest, "original_request_pending"); ledger.owner_reconciled = true; self.persist(ledger)?; Ok(ledger.receipt.clone()) }
+    /// 只有原生 owner 路由可补存失去模型投递资格的晚结果；不恢复执行或模型可读资格。
+    pub fn archive_late(&self,request:&Value)->Result<Value>{
+        validate_shape("desktopFinish",request)?;
+        let mut state=self.locked()?;
+        let id=text(request,"bridgeCallId")?;
+        let ledger=state.ledger.get_mut(id).context("original_request_pending")?;
+        ensure!(ledger.binding["desktopPeerId"]==request["desktopPeerId"]&&ledger.receipt["bindingDigest"]==request["bindingDigest"]&&ledger.call["argumentsDigest"]==request["argumentsDigest"],"binding_changed");
+        ensure!(!matches!(ledger.receipt["state"].as_str(),Some("prepared")),"original_request_pending");
+        if ledger.receipt["state"]=="completed"{return Ok(ledger.receipt.clone())}
+        let value=&request["result"];
+        ensure!(serde_json::to_vec(value)?.len()<=MAX_RESULT_BYTES,"result_too_large");
+        if !value.is_null(){
+            let digest=digest(value)?;
+            if let Some(previous)=ledger.receipt["resultDigest"].as_str(){ensure!(previous==digest,"original_request_pending");return Ok(ledger.receipt.clone())}
+            let directory=self.root.join("restricted-results");crate::platform::private_storage::prepare_private_directory(&directory)?;
+            crate::platform::private_storage::atomic_write_private_json(&directory.join(format!("{id}.json")),value)?;
+            ledger.receipt["resultDigest"]=json!(digest);ledger.receipt["resultLocator"]=json!(format!("interaction-tools/restricted-results/{id}.json"));
+        }
+        ledger.receipt["state"]=json!("unknown");ledger.receipt["delivered"]=json!(false);ledger.receipt["finishedAt"]=json!(Utc::now().to_rfc3339());self.persist(ledger)?;Ok(ledger.receipt.clone())
+    }
 }
