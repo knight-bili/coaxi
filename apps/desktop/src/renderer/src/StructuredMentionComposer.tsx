@@ -1,4 +1,5 @@
 import { useEditingRecovery } from './camp-client'
+import { useKeyboardShortcuts } from './useKeyboardShortcuts'
 import { useMobileLayout } from './MobileLayout'
 import type { ThreadComposerDraftView, ComposerAtom, ComposerDocument, AdapterKind } from '@contracts'
 import { LexicalExtensionComposer } from '@lexical/react/LexicalExtensionComposer'
@@ -291,6 +292,8 @@ function ComposerBridge({
   forwardedRef: ForwardedRef<StructuredMentionComposerHandle>
 }): JSX.Element {
   const [editor] = useLexicalComposerContext()
+  const keyboardShortcuts=useKeyboardShortcuts(),keyboardShortcutsRef=useRef(keyboardShortcuts)
+  keyboardShortcutsRef.current=keyboardShortcuts
   const mobile = useMobileLayout()
   const mobileRef = useRef(mobile)
   mobileRef.current = mobile
@@ -427,6 +430,7 @@ function ComposerBridge({
       sync,
       submit: () => { void callbacks.current.onSubmit() },
       enterInsertsLineBreak: () => callbacks.current.purpose === 'mission' || mobileRef.current,
+      shortcutBindings:()=>keyboardShortcutsRef.current.loaded?keyboardShortcutsRef.current.bindings:null,
       backspaceAtStart: () => { void callbacks.current.onBackspaceAtStart?.() },
       pasteFiles: (files) => callbacks.current.onPasteFiles?.(files),
       plainText: (selection) =>

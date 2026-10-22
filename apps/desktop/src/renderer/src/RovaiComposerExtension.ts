@@ -1,5 +1,6 @@
 import type { ComposerDocument } from '@contracts'
 import { HistoryExtension } from '@lexical/history'
+import { isShortcutRecorderArmed,matchShortcutEvent,type ShortcutSettings } from '../../shared/codeg-keyboard-shortcuts'
 import { PlainTextExtension } from '@lexical/plain-text'
 import {
   $addUpdateTag,
@@ -22,6 +23,7 @@ import {
   KEY_BACKSPACE_COMMAND,
   KEY_DELETE_COMMAND,
   KEY_ENTER_COMMAND,
+  KEY_DOWN_COMMAND,
   PASTE_COMMAND,
   PASTE_TAG,
   CUT_TAG,
@@ -51,6 +53,7 @@ export interface ComposerExtensionRuntime<Result = unknown> {
   sync: ComposerDraftSync<Result>
   submit(): void
   enterInsertsLineBreak?(): boolean
+  shortcutBindings?():Pick<ShortcutSettings,'send_message'|'newline_in_message'>|null
   backspaceAtStart(): void
   pasteFiles(files: File[]): void
   plainText(document: ComposerDocument): string
@@ -172,17 +175,30 @@ export const ComposerCommandExtension = defineExtension({
         if (!editor.isComposing()) $restoreComposerAtomSelection()
         return false
       }, COMMAND_PRIORITY_HIGH),
+      editor.registerCommand(KEY_DOWN_COMMAND, event=>{
+        const runtime=runtimes.get(editor),bindings=runtime?.shortcutBindings?.()
+        if(!runtime||!bindings||event.key==='Enter'||event.isComposing||editor.isComposing()||isShortcutRecorderArmed())return false
+        if(matchShortcutEvent(event,bindings.newline_in_message)){
+          event.preventDefault();$restoreComposerAtomSelection();const selection=$getSelection();if($isRangeSelection(selection))selection.insertNodes([$createLineBreakNode()]);return true
+        }
+        if(matchShortcutEvent(event,bindings.send_message)){event.preventDefault();runtime.submit();return true}
+        return false
+      },COMMAND_PRIORITY_HIGH),
       editor.registerCommand(KEY_ENTER_COMMAND, (event) => {
         const runtime = runtimes.get(editor)
         if (!runtime) return false
         if (editor.isComposing() || event?.isComposing) return true
-        if (event?.shiftKey || runtime.enterInsertsLineBreak?.()) {
+        if(isShortcutRecorderArmed())return true
+        const bindings=runtime.shortcutBindings?.()
+        const lineBreak=runtime.enterInsertsLineBreak?.()||Boolean(event&&(bindings?matchShortcutEvent(event,bindings.newline_in_message):event.shiftKey))
+        if (lineBreak) {
           event?.preventDefault()
           $restoreComposerAtomSelection()
           const selection = $getSelection()
           if ($isRangeSelection(selection)) selection.insertNodes([$createLineBreakNode()])
           return true
         }
+        if(event&&bindings&&!matchShortcutEvent(event,bindings.send_message))return false
         event?.preventDefault()
         runtime.submit()
         return true
