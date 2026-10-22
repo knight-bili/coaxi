@@ -2267,6 +2267,7 @@ mod tests {
                 runtime: FrozenAgentRuntimeConfig {
                     native_origin: None,
                     native_steer: None,
+                    portable_connection: None,
                     custom_runtime: None,
                     environment: None,
                     custom_api: None,
@@ -2462,6 +2463,7 @@ mod tests {
             runtime: FrozenAgentRuntimeConfig {
                 native_origin: None,
                 native_steer: None,
+                portable_connection: None,
                 custom_runtime: None,
                 environment: None,
                 custom_api: None,
@@ -3052,6 +3054,7 @@ echo "Created conversation 0bdd2166-d420-40c6-94be-70b93eb290c5" > "$log_file"
                 runtime: FrozenAgentRuntimeConfig {
                     native_origin: None,
                     native_steer: None,
+                    portable_connection: None,
                     custom_runtime: None,
                     environment: None,
                     custom_api: None,
@@ -3169,6 +3172,7 @@ exec sleep 30
             runtime: FrozenAgentRuntimeConfig {
                 native_origin: None,
                 native_steer: None,
+                portable_connection: None,
                 custom_runtime: None,
                 environment: None,
                 custom_api: None,

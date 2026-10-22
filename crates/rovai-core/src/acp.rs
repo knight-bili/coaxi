@@ -9640,6 +9640,7 @@ mod tests {
         FrozenAgentRuntimeConfig {
             native_origin: None,
             native_steer: None,
+            portable_connection: None,
             custom_runtime: None,
             environment: None,
             custom_api: None,
@@ -9676,6 +9677,7 @@ mod tests {
         FrozenAgentRuntimeConfig {
             native_origin: None,
             native_steer: None,
+            portable_connection: None,
             custom_runtime: None,
             environment: None,
             custom_api: None,
@@ -9712,6 +9714,7 @@ mod tests {
         FrozenAgentRuntimeConfig {
             native_origin: None,
             native_steer: None,
+            portable_connection: None,
             custom_runtime: None,
             environment: None,
             custom_api: None,
@@ -9755,6 +9758,7 @@ mod tests {
         FrozenAgentRuntimeConfig {
             native_origin: None,
             native_steer: None,
+            portable_connection: None,
             custom_runtime: None,
             environment: None,
             custom_api: None,
@@ -9791,6 +9795,7 @@ mod tests {
         FrozenAgentRuntimeConfig {
             native_origin: None,
             native_steer: None,
+            portable_connection: None,
             custom_runtime: None,
             environment: None,
             custom_api: None,

@@ -2394,6 +2394,7 @@ mod tests {
         FrozenAgentRuntimeConfig {
             native_origin: None,
             native_steer: None,
+            portable_connection: None,
             custom_runtime: None,
             environment: None,
             custom_api: None,
@@ -3388,6 +3389,7 @@ for line in sys.stdin:
         let runtime_config = FrozenAgentRuntimeConfig {
             native_origin: None,
             native_steer: None,
+            portable_connection: None,
             custom_runtime: None,
             environment: None,
             custom_api: None,

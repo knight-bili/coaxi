@@ -539,6 +539,8 @@ pub struct FrozenAgentRuntimeConfig {
     pub native_origin: Option<crate::native_lifecycle::NativeSessionOriginV1>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub native_steer: Option<crate::native_lifecycle::FrozenNativeSteerV1>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub portable_connection: Option<crate::portable_configuration::FrozenPortableConnectionV1>,
 }
 
 impl FrozenAgentRuntimeConfig {
@@ -4765,6 +4767,7 @@ fn resolve_frozen_runtime_binding_with_snapshot(
     let mut frozen = FrozenAgentRuntimeConfig {
         native_origin: None,
         native_steer: None,
+        portable_connection: None,
         custom_runtime: None,
         environment: None,
         custom_api,

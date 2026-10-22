@@ -4,10 +4,10 @@ use rusqlite::{Connection,OptionalExtension,Transaction,params};
 
 pub fn migrate(database:&mut crate::db::Database)->Result<()>{
     let tx=database.connection_mut().transaction()?;
-    ensure!(matches!(crate::db::classify_database_contract(&tx)?,crate::db::DatabaseContractClassification::SupportedMigrationSource(ref marker) if marker.projection_schema_version==164)&&absent(&tx)?,"native_lifecycle.schema_source_invalid");
+    ensure!(matches!(crate::db::classify_native_lifecycle_165_contract(&tx)?,crate::db::DatabaseContractClassification::SupportedMigrationSource(ref marker) if marker.projection_schema_version==164)&&absent(&tx)?,"native_lifecycle.schema_source_invalid");
     tx.execute_batch(include_str!("schema.sql"))?;
     tx.execute_batch("INSERT INTO schema_migration(version,applied_at) VALUES(215,datetime('now'));UPDATE rovai_data_contract SET projection_schema_version=165,updated_at=datetime('now') WHERE singleton=1;")?;
-    ensure!(matches!(crate::db::classify_database_contract(&tx)?,crate::db::DatabaseContractClassification::Current(ref marker) if marker.projection_schema_version==165),"native_lifecycle.schema_target_invalid");
+    ensure!(matches!(crate::db::classify_native_lifecycle_165_contract(&tx)?,crate::db::DatabaseContractClassification::Current(ref marker) if marker.projection_schema_version==165),"native_lifecycle.schema_target_invalid");
     tx.commit()?;Ok(())
 }
 fn installed(connection:&Connection)->rusqlite::Result<Vec<(String,String)>>{let mut statement=connection.prepare("SELECT name,sql FROM sqlite_schema WHERE lower(name) GLOB 'native_lifecycle_*' AND sql IS NOT NULL ORDER BY name")?;statement.query_map([],|row|Ok((row.get(0)?,row.get(1)?)))?.collect()}
