@@ -50,12 +50,21 @@ export async function changeInterfaceLanguage(
   language: InterfaceLanguage,
   onSaved?: (snapshot: GeneralPreferencesSnapshot) => void
 ): Promise<void> {
+  return persistLanguageChoice(() => api.setInterfaceLanguage(language), onSaved, language)
+}
+
+export async function followSystemInterfaceLanguage(api: GeneralPreferencesApi, onSaved?: (snapshot: GeneralPreferencesSnapshot) => void): Promise<void> {
+  if (!api.setInterfaceLanguageMode) throw new Error('Interface language mode unavailable')
+  return persistLanguageChoice(() => api.setInterfaceLanguageMode!('system'), onSaved)
+}
+
+async function persistLanguageChoice(save: () => Promise<GeneralPreferencesSnapshot>, onSaved?: (snapshot: GeneralPreferencesSnapshot) => void, optimistic?: InterfaceLanguage): Promise<void> {
   const request = ++requestNumber
   pendingRequests += 1
   latestRequestFailed = false
-  publish(language)
+  if (optimistic) publish(optimistic)
   try {
-    const snapshot = await api.setInterfaceLanguage(language)
+    const snapshot = await save()
     if (request > lastSavedRequest) {
       lastSavedRequest = request
       savedLanguage = snapshot.interfaceLanguage

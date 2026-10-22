@@ -6,7 +6,7 @@ use std::collections::BTreeMap;
 const LIMIT:u64=64*1024*1024;
 const DOMAINS:&[(&str,&str,&[&str])]=&[
     ("appearance","appearance.json",&["preference","chatFontSize","documentFontSize","codeFontSize","readingDensity","motionPreference","zoomPercentage"]),
-    ("general","general-preferences.json",&["interfaceLanguage","startupLocationMode","lastSettingsSection","executionConsolePlacement","worldMapEnabled"]),
+    ("general","general-preferences.json",&["interfaceLanguage","interfaceLanguageMode","startupLocationMode","lastSettingsSection","executionConsolePlacement","worldMapEnabled"]),
     ("windowClose","window-close.json",&["behavior"]),
     ("messageLibrary","workspace-metadata/global-v1.json",&["tags","quickMessages"]),
 ];
@@ -25,6 +25,7 @@ fn validate(id:&str,value:&Value)->Result<()> {
         ("appearance","zoomPercentage")=>ensure!(value.as_u64().is_some_and(|number|(10..=500).contains(&number)),"config_sync.invalid_zoom"),
         ("appearance",_)=>ensure!(value.as_u64().is_some_and(|number|(12..=24).contains(&number)),"config_sync.invalid_font"),
         ("general","interfaceLanguage")=>ensure!(["zh-CN","zh-TW","en","ja","ko","es","de","fr","pt","ar"].contains(&value.as_str().unwrap_or_default()),"config_sync.invalid_language"),
+        ("general","interfaceLanguageMode")=>ensure!(["manual","system"].contains(&value.as_str().unwrap_or_default()),"config_sync.invalid_language_mode"),
         ("general","startupLocationMode")=>ensure!(["last_location","quick_chat"].contains(&value.as_str().unwrap_or_default()),"config_sync.invalid_startup"),
         ("general","executionConsolePlacement")=>ensure!(["right","inspector","bottom"].contains(&value.as_str().unwrap_or_default()),"config_sync.invalid_placement"),
         ("general","worldMapEnabled")=>ensure!(value.is_boolean(),"config_sync.invalid_boolean"),

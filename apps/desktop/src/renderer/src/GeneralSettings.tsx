@@ -31,7 +31,7 @@ import {
 import { MemberAvatar } from './MemberAvatar'
 import { SettingsPageHeader } from './SettingsPageHeader'
 import { resolveNewConversationDefaults } from './new-conversation-preferences'
-import { UiText, changeInterfaceLanguage, uiAttribute, useInterfaceLanguage, useUiText } from './interface-language'
+import { UiText, changeInterfaceLanguage, followSystemInterfaceLanguage, uiAttribute, useInterfaceLanguage, useUiText } from './interface-language'
 
 export const ONE_CLICK_ENTRY_DESCRIPTIONS = [
   '左上角“新对话”',
@@ -165,7 +165,7 @@ export function GeneralSettings({
   }
 
   const setInterfaceLanguage = async (language: InterfaceLanguage): Promise<void> => {
-    if (!preferences || language === interfaceLanguage) return
+    if (!preferences || (language === interfaceLanguage && preferences.interfaceLanguageMode !== 'system')) return
     const request = ++languageRequest.current
     setLanguageError(null)
     try {
@@ -173,6 +173,14 @@ export function GeneralSettings({
     } catch {
       if (request === languageRequest.current) setLanguageError(t('语言偏好未能保存，请重试。'))
     }
+  }
+
+  const setSystemLanguage = async (): Promise<void> => {
+    if (!preferences || preferences.interfaceLanguageMode === 'system') return
+    const request = ++languageRequest.current
+    setLanguageError(null)
+    try { await followSystemInterfaceLanguage(api, acceptPreferences) }
+    catch { if (request === languageRequest.current) setLanguageError(t('语言偏好未能保存，请重试。')) }
   }
 
   const toggleDefaultMember = (agentId: string): void => {
@@ -381,10 +389,14 @@ export function GeneralSettings({
           <div className="section-heading"><div><h2 id="general-language-heading">{t('界面语言')}</h2></div></div>
           <div className="general-section-body">
             <div className="general-language-options" role="radiogroup" aria-labelledby="general-language-heading">
+              <label className={preferences?.interfaceLanguageMode === 'system' ? 'selected' : ''}>
+                <input type="radio" name="interface-language" value="system" checked={preferences?.interfaceLanguageMode === 'system'} disabled={!preferences || !api.setInterfaceLanguageMode} onChange={() => void setSystemLanguage()} />
+                <span>{t('跟随系统')}</span>
+              </label>
               {INTERFACE_LANGUAGE_OPTIONS.map(({id:language,name}) => (
-                <label key={language} className={interfaceLanguage === language ? 'selected' : ''}>
+                <label key={language} className={preferences?.interfaceLanguageMode !== 'system' && interfaceLanguage === language ? 'selected' : ''}>
                   <input type="radio" name="interface-language" value={language}
-                    checked={interfaceLanguage === language} disabled={!preferences}
+                    checked={preferences?.interfaceLanguageMode !== 'system' && interfaceLanguage === language} disabled={!preferences}
                     onChange={() => void setInterfaceLanguage(language)} />
                   <span lang={language}>{name}</span>
                 </label>
