@@ -27,5 +27,5 @@ pub fn cursor_session_candidate(cwd:&str,definition:&McpServerDefinition,native_
     let server=json!({"name":super::SERVER_NAME,"command":command,"args":args,"env":[]});
     let new_params=json!({"cwd":cwd,"mcpServers":[server.clone()]});
     let load_params=if let Some(id)=native_session_id{ensure!(!id.is_empty()&&id.len()<=4096&&!id.contains('\0'),"interaction.invalid_native_session");json!({"sessionId":id,"cwd":cwd,"mcpServers":[server]})}else{Value::Null};
-    Ok(json!({"schemaVersion":1,"adapterKind":"cursor_agent","state":"candidate","activated":false,"sessionNew":new_params,"sessionLoad":load_params,"sharedConfigurationWritten":false,"automaticApproval":false}))
+    Ok(json!({"schemaVersion":1,"adapterKind":AdapterKind::CursorAgent.as_str(),"state":"candidate","activated":false,"sessionNew":new_params,"sessionLoad":load_params,"sharedConfigurationWritten":false,"automaticApproval":false}))
 }

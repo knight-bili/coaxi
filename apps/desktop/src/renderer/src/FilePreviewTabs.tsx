@@ -1,4 +1,7 @@
 import { useThreadClient } from './camp-client'
+import { useShortcutActions } from './useShortcutActions'
+import { NUMBERED_TAB_ACTION_IDS } from '../../shared/codeg-keyboard-shortcuts'
+import type { ShortcutActions } from './shortcut-action-driver'
 import { prefersReducedMotion } from './reduced-motion'
 import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { createPortal } from 'react-dom'
@@ -44,8 +47,10 @@ export function FilePreviewTabs({ compact = false }: { compact?: boolean } = {})
     activate,
     close,
     hidePane,
+    showPane,
     move,
     closeMany,
+    reopenLastClosedFile,
     download,
     openInSystem,
     revealInFolder,
@@ -194,9 +199,18 @@ export function FilePreviewTabs({ compact = false }: { compact?: boolean } = {})
     if (neighbor) focusTab(neighbor.id)
     else focusConversation()
   }
+  const nextShortcutTab=(delta:number):boolean=>{if(!paneVisible||!tabs.length)return false;const index=tabs.findIndex(tab=>tab.id===activeTabId);activate(tabs[(Math.max(index,0)+delta+tabs.length)%tabs.length].id);return true}
+  useShortcutActions({
+    close_current_tab:()=>{if(!paneVisible)return false;const index=tabs.findIndex(tab=>tab.id===activeTabId);if(index>=0)closeAndRestoreFocus(index);return true},
+    close_all_file_tabs:()=>{if(!paneVisible)return false;closeMany(tabs.filter(tab=>tab.kind==='file').map(tab=>tab.id));return true},
+    reopen_last_closed_tab:()=>{void reopenLastClosedFile().then(result=>{if(result?.kind==='error')announce(result.error.message)}).catch(error=>announce(String(error)))},
+    toggle_aux_panel:()=>{if(!tabs.length)return false;if(paneVisible)hidePane();else showPane();return true},
+    next_tab:()=>nextShortcutTab(1),prev_tab:()=>nextShortcutTab(-1),
+    ...Object.fromEntries(NUMBERED_TAB_ACTION_IDS.map((id,index)=>[id,()=>{if(!paneVisible)return false;if(tabs[index])activate(tabs[index].id);return true}])) as ShortcutActions,
+  },{priority:30,active:()=>focusedSurface.current!==false&&!document.querySelector('[role="dialog"][aria-modal="true"], [role="menu"][data-state="open"]')})
 
   useEffect(() => client.onClosePreviewRequested?.(() => {
-    if (!paneVisible) return false
+    if (focusedSurface.current===false||!paneVisible) return false
     const index = tabs.findIndex((tab) => tab.id === activeTabId)
     if (index >= 0) closeAndRestoreFocus(index)
     else {

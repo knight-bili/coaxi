@@ -110,6 +110,7 @@ export interface FilePreviewContextValue {
   move(tabId: string, direction: -1 | 1): void
   close(tabId: string): void
   closeMany(tabIds: string[]): void
+  reopenLastClosedFile():Promise<FilePreviewOpenOutcome|null>
   download(tabId: string): Promise<FilePreviewOperationResult<{ started: true }>>
   openInSystem(tabId: string): Promise<FilePreviewOperationResult<{ opened: true }>>
   revealInFolder(tabId: string): Promise<FilePreviewOperationResult<{ revealed: true }>>
@@ -237,6 +238,7 @@ export function createFilePreviewSession(api: FilePreviewApi, threadId: string, 
   let disposed = false
   let openFeedback: FilePreviewOpenFeedback | null = null
   const retired = new Map<string, { file: ResolvedFilePreview | null; content: FilePreviewContent | null }>()
+  const closedFiles:Array<{request:import('@contracts').RestoreFilePreviewRequest;presentation:FilePreviewPresentation;reading:FilePreviewReadingState|undefined}>=[]
   const refreshDone = new Map<string, () => void>()
   const committedLoads = new Set<symbol>()
   let snapshot: { tabs: PreviewTabModel[]; activeTabId: string | null; paneVisible: boolean; openFeedback: FilePreviewOpenFeedback | null } = { tabs: tabsRef.current, activeTabId: activeTabIdRef.current, paneVisible: paneVisibleRef.current, openFeedback }
@@ -996,6 +998,8 @@ export function createFilePreviewSession(api: FilePreviewApi, threadId: string, 
     const previous = tabsRef.current
     const closing = previous.filter((tab) => ids.has(tab.id))
     if (closing.length === 0) return
+    for(const tab of closing)if(tab.kind==='file'&&tab.sourceRequest){const request=restorableFilePreviewRequest(tab.sourceRequest);if(request)closedFiles.unshift({request:structuredClone(request),presentation:{...tab.presentation},reading:tab.reading?structuredClone(tab.reading):undefined})}
+    closedFiles.splice(50)
     const remaining = previous.filter((tab) => !ids.has(tab.id))
     const currentActiveTabId = activeTabIdRef.current
     const activeIndex = previous.findIndex((tab) => tab.id === currentActiveTabId)
@@ -1022,6 +1026,15 @@ export function createFilePreviewSession(api: FilePreviewApi, threadId: string, 
   }
 
   const close = (tabId: string) => closeMany([tabId])
+  const reopenLastClosedFile=async():Promise<FilePreviewOpenOutcome|null>=>{
+    const original=closedFiles[0];if(!original||disposed||!owner.isCurrent(threadId))return null
+    const outcome=await open(structuredClone(original.request),undefined,{fileName:original.presentation.fileName},{revalidateSource:true})
+    if(outcome.kind==='preview'){
+      if(closedFiles[0]===original)closedFiles.shift()
+      setTabs(tabs=>tabs.map(tab=>tab.id===outcome.tabId?{...tab,reading:original.reading?structuredClone(original.reading):undefined}:tab))
+    }
+    return outcome
+  }
 
   const restoreHandle = async (tab: FilePreviewTabModel): Promise<ResolvedFilePreview | null> => {
     const request = tab.sourceRequest && restorableFilePreviewRequest(tab.sourceRequest)
@@ -1288,7 +1301,7 @@ export function createFilePreviewSession(api: FilePreviewApi, threadId: string, 
     retired,
     cool: () => { scopeGenerationRef.current += 1; committedLoads.clear(); for (const tab of tabsRef.current) session.evict(tab.id); session.id = newCommandId(); bindingPromiseRef.current = owner.sync() },
     setBinding: (binding: Promise<void>) => { bindingPromiseRef.current = binding },
-    actions: { open, openFileChanges, syncFileChanges, openMissionActivity, openExecution, loadChanges, selectChangedFile, showPane, hidePane, activate, move, close, closeMany, download, openInSystem, revealInFolder, copyPath, toggleHtmlSource, reload, reopen, retry, changePage, saveReading, loadHtmlSource, saveHtmlSource, completeHtmlRefresh, displayed },
+    actions: { open, openFileChanges, syncFileChanges, openMissionActivity, openExecution, loadChanges, selectChangedFile, showPane, hidePane, activate, move, close, closeMany, reopenLastClosedFile, download, openInSystem, revealInFolder, copyPath, toggleHtmlSource, reload, reopen, retry, changePage, saveReading, loadHtmlSource, saveHtmlSource, completeHtmlRefresh, displayed },
     ensureActive: () => { if (paneVisibleRef.current && activeTabIdRef.current) restoreTab(activeTabIdRef.current, true) },
     externalUpdate: (previewKeys: string[]) => {
       const changed = new Set(previewKeys)
