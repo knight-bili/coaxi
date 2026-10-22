@@ -53,6 +53,8 @@ pub enum Operation {
     WorkbenchFilesList,
     #[serde(rename = "workbench.files.read")]
     WorkbenchFilesRead,
+    #[serde(rename="workbench.editor")]
+    WorkbenchEditor,
     #[serde(rename = "workbench.files.mutate")]
     WorkbenchFilesMutate,
     #[serde(rename = "workbench.git.read")]
@@ -568,6 +570,7 @@ impl Operation {
             Self::WorkbenchOrganizerGet | Self::WorkbenchOrganizerSet => select_fields(&value, &["value", "digest"]),
             Self::WorkbenchFilesList => select_fields(&value, &["entries", "next"]),
             Self::WorkbenchFilesRead => select_fields(&value, &["path", "text", "digest"]),
+            Self::WorkbenchEditor=>select_fields(&value,&["revision","value","updatedAt"]),
             Self::WorkbenchFilesMutate => select_fields(&value, &["applied", "digest"]),
             Self::WorkbenchGitRead | Self::WorkbenchGitExecute => select_fields(&value, &["success", "exitCode", "output", "error"]),
             Self::WorkbenchGitPreview => select_fields(&value, &["revision", "action", "arguments", "cleanPreview"]),
@@ -659,6 +662,7 @@ impl Operation {
             Self::WorkbenchOrganizerSet => "workbench.organizer.set",
             Self::WorkbenchFilesList => "workbench.files.list",
             Self::WorkbenchFilesRead => "workbench.files.read",
+            Self::WorkbenchEditor=>"workbench.editor",
             Self::WorkbenchFilesMutate => "workbench.files.mutate",
             Self::WorkbenchGitRead => "workbench.git.read",
             Self::WorkbenchGitPreview => "workbench.git.preview",
