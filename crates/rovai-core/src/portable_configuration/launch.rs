@@ -7,6 +7,7 @@ use tokio::io::AsyncReadExt;
 #[derive(Clone)]
 pub(crate) struct Plan{pub environment:LaunchEnvironment,redactor:CredentialRedactor}
 tokio::task_local!{static PLAN:Option<Plan>;}
+static SCOPE_PREPARATION:tokio::sync::Mutex<()>=tokio::sync::Mutex::const_new(());
 pub(crate) async fn with_plan<F:std::future::Future>(plan:Option<Plan>,future:F)->F::Output{PLAN.scope(plan,future).await}
 pub(crate) fn redactor()->Option<CredentialRedactor>{PLAN.try_with(|plan|plan.as_ref().map(|plan|plan.redactor.clone())).ok().flatten()}
 fn remove(values:&mut BTreeMap<String,String>,name:&str){values.retain(|key,_|if cfg!(windows){!key.eq_ignore_ascii_case(name)}else{key!=name});}
@@ -18,7 +19,7 @@ fn clear_routing(values:&mut BTreeMap<String,String>){
     let keys=values.keys().filter(|name|{
         let name=name.to_ascii_uppercase();
         name.starts_with("ANTHROPIC_")||name.starts_with("CLAUDE_CODE_USE_")||name.starts_with("GOOGLE_GENAI_")||[
-            "CLAUDE_CONFIG_DIR","CLAUDE_CODE_OAUTH_TOKEN","CLAUDE_CODE_API_KEY_HELPER_TTL_MS","CODEX_HOME","CODEX_API_KEY","CODEX_BASE_URL","OPENAI_API_KEY","OPENAI_BASE_URL","OPENAI_MODEL","OPENAI_ORGANIZATION","OPENAI_ORG_ID","GEMINI_CLI_HOME","GEMINI_API_KEY","GOOGLE_API_KEY","GOOGLE_GEMINI_BASE_URL","GEMINI_MODEL","GOOGLE_CLOUD_PROJECT","GOOGLE_CLOUD_LOCATION","GOOGLE_APPLICATION_CREDENTIALS",
+            "CLAUDE_CONFIG_DIR","CLAUDE_CODE_OAUTH_TOKEN","CLAUDE_CODE_API_KEY_HELPER_TTL_MS","CODEX_HOME","CODEX_API_KEY","CODEX_BASE_URL","OPENAI_API_KEY","OPENAI_BASE_URL","OPENAI_API_BASE","OPENAI_MODEL","OPENAI_ORGANIZATION","OPENAI_ORGANIZATION_ID","OPENAI_ORG_ID","OPENAI_PROJECT","OPENAI_PROJECT_ID","GEMINI_CLI_HOME","GEMINI_API_KEY","GOOGLE_API_KEY","GOOGLE_GEMINI_BASE_URL","GEMINI_MODEL","GOOGLE_CLOUD_PROJECT","GOOGLE_CLOUD_LOCATION","GOOGLE_APPLICATION_CREDENTIALS","GOOGLE_CLOUD_ACCESS_TOKEN",
         ].contains(&name.as_str())
     }).cloned().collect::<Vec<_>>();for key in keys{values.remove(&key);}
 }
@@ -51,10 +52,12 @@ fn model_id(connection:&FrozenPortableConnectionV1)->Option<&str>{
     match connection.agent_type.as_str(){"claude_code"=>connection.model["main"].as_str(),"codex"=>connection.model["default"].as_str(),"gemini"=>connection.model["model"].as_str(),_=>None}.filter(|value|!value.is_empty())
 }
 async fn write_scope(root:&Path,runtime:&FrozenAgentRuntimeConfig,connection:&FrozenPortableConnectionV1,values:&BTreeMap<String,String>)->Result<PathBuf>{
+    let _preparation=SCOPE_PREPARATION.lock().await;
     let directory=scope(root,&connection.native_scope_id)?;let marker=directory.join("portable-owner-v1.json");
     let identity=json!({"schemaVersion":1,"projectionDigest":connection.projection_digest,"installationId":runtime.installation_id,"installationGeneration":runtime.installation_generation,"executableFingerprint":runtime.executable_fingerprint,"hostPlatform":connection.host_platform});
     if marker.exists(){
         let saved=read_json(&marker,1024*1024)?;ensure!(saved["identity"]==identity,"configuration.native_scope_changed");
+        ensure!(saved["managedFiles"]==managed_files(&directory,&connection.agent_type)?,"configuration.native_managed_files_changed");
         if connection.agent_type=="codex"{let catalog=read_json(&directory.join(codex_catalog::CATALOG_REL),8*1024*1024)?;ensure!(saved["catalogDigest"].as_str()==Some(digest(&catalog)?.as_str()),"configuration.native_catalog_changed");}
         return Ok(directory)
     }
@@ -85,7 +88,19 @@ async fn write_scope(root:&Path,runtime:&FrozenAgentRuntimeConfig,connection:&Fr
         },
         _=>anyhow::bail!("configuration.agent_type_unsupported"),
     }
-    private_storage::atomic_write_private_json(&marker,&json!({"identity":identity,"catalogDigest":catalog_digest}))?;Ok(directory)
+    private_storage::atomic_write_private_json(&marker,&json!({"identity":identity,"catalogDigest":catalog_digest,"managedFiles":managed_files(&directory,&connection.agent_type)?}))?;Ok(directory)
+}
+fn managed_files(directory:&Path,agent:&str)->Result<Value>{
+    use sha2::{Digest,Sha256};
+    let paths=match agent{"claude_code"=>vec!["settings.json"],"codex"=>vec!["config.toml",codex_catalog::CATALOG_REL,codex_catalog::SOURCE_REL],"gemini"=>vec![".gemini/settings.json"],_=>anyhow::bail!("configuration.agent_type_unsupported")};
+    let mut result=serde_json::Map::new();
+    for relative in paths{
+        let path=directory.join(relative);let metadata=std::fs::symlink_metadata(&path)?;
+        ensure!(metadata.is_file()&&!metadata.file_type().is_symlink()&&metadata.len()<=16*1024*1024,"configuration.native_managed_file_invalid");
+        let mut file=private_storage::open_private_read_file(&path)?;let mut bytes=Vec::new();file.by_ref().take(16*1024*1024+1).read_to_end(&mut bytes)?;
+        ensure!(bytes.len()<=16*1024*1024,"configuration.native_managed_file_too_large");result.insert(relative.into(),json!({"bytes":bytes.len(),"sha256":format!("{:x}",Sha256::digest(&bytes))}));
+    }
+    Ok(Value::Object(result))
 }
 pub(crate) async fn prepare(runtime:&FrozenAgentRuntimeConfig,source:Option<&LaunchEnvironmentSource>)->Result<Option<Plan>>{
     let Some(connection)=runtime.portable_connection.as_ref()else{return Ok(None)};connection.validate()?;
@@ -104,6 +119,8 @@ pub(crate) async fn prepare(runtime:&FrozenAgentRuntimeConfig,source:Option<&Lau
     let mut values=crate::runtime_discovery::capture_host_runtime_environment();clear_routing(&mut values);
     for(name,value)in &environment{insert(&mut values,name,value.clone());}
     let mut overlay=environment;
+    // 连接由明确的服务商版本拥有；队员环境不能重新引入另一个认证或路由来源。
+    clear_routing(&mut values);clear_routing(&mut overlay);
     match connection.agent_type.as_str(){
         "claude_code"=>{
             insert(&mut overlay,"ANTHROPIC_BASE_URL",connection.api_url.clone());
