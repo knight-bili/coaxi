@@ -29,16 +29,19 @@ export function NativeSkillsSettings({ agents = [] }: { agents?: AgentProfile[] 
       setSource(next)
       document.getElementById(`${id}-${next}`)?.focus()
     }}>{(['native', 'packages'] as const).map(key => <button key={key} id={`${id}-${key}`} type="button" role="tab" aria-selected={source === key} aria-controls={`${id}-${key}-panel`} tabIndex={source === key ? 0 : -1} onClick={() => setSource(key)}>{key === 'native' ? uiAttribute('原生 Skills') : uiAttribute('技能包')}</button>)}</div>
-    <div id={`${id}-native-panel`} className="skills-source-content" role="tabpanel" aria-labelledby={`${id}-native`} hidden={source !== 'native'}><NativeSkillLibrary /></div>
+    <div id={`${id}-native-panel`} className="skills-source-content" role="tabpanel" aria-labelledby={`${id}-native`} hidden={source !== 'native'}><NativeSkillLibrary agents={agents}/></div>
     <div id={`${id}-packages-panel`} className="skills-source-content" role="tabpanel" aria-labelledby={`${id}-packages`} hidden={source !== 'packages'}><SkillPackSettings agents={agents} /></div>
   </div>
 }
 
-function NativeSkillLibrary(): React.JSX.Element {
+function NativeSkillLibrary({agents}:{agents:AgentProfile[]}): React.JSX.Element {
   const id = useId()
   const { root, compact, separator } = useCapabilitySplitter('rovai.native-skills-list-width.v1', `${id}-list ${id}-detail`)
   const client = useThreadClient()
   const [runtime, setRuntime] = useState<AdapterKind>('codex-cli')
+  const [customAgent,setCustomAgent]=useState('')
+  const customAgents=agents.filter(agent=>agent.presence!=='removed'&&agent.runtimeConfiguration?.adapterKind==='custom-acp')
+  const currentRuntimeLabel=runtime==='custom-acp'?(customAgents.find(agent=>agent.agentId===customAgent)?.displayName??uiAttribute('自定义智能体')):adapterLabel(runtime)
   const [scan, setScan] = useState<NativeSkillScan | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -57,7 +60,8 @@ function NativeSkillLibrary(): React.JSX.Element {
     setLoading(true)
     setError(null)
     try {
-      const next = await client.request<NativeSkillScan>('nativeSkills.list', { adapterKind: runtime, refresh })
+      if(runtime==='custom-acp'&&!customAgents.some(agent=>agent.agentId===customAgent))throw new Error(uiAttribute('请先选择使用自定义程序的队员。'))
+      const next = await client.request<NativeSkillScan>('nativeSkills.list', { adapterKind: runtime, refresh,...(runtime==='custom-acp'?{agentId:customAgent}:{}) })
       if (request !== listRequest.current) return
       setScan(next)
       setSelectedId((current) => next.skills.some((skill) => skill.id === current) ? current : next.skills[0]?.id ?? null)
@@ -69,7 +73,7 @@ function NativeSkillLibrary(): React.JSX.Element {
     } finally {
       if (request === listRequest.current) setLoading(false)
     }
-  }, [client, runtime])
+  }, [client, runtime,customAgent,agents])
   useEffect(() => {
     setScan(null)
     setSelectedId(null)
@@ -97,10 +101,10 @@ function NativeSkillLibrary(): React.JSX.Element {
   return <div className="rebuilt-skills-page">
     <div className="rebuilt-runtime-bar"><span><UiText zh={"智能体"} /></span>
       <Menu.Root>
-        <Menu.Trigger asChild><button className="member-runtime-picker rebuilt-runtime-trigger" type="button" aria-label={uiAttribute("选择智能体，当前为 {0}", String(adapterLabel(runtime)))}><RuntimeGlyph kind={runtime} /><span>{adapterLabel(runtime)}</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg></button></Menu.Trigger>
+        <Menu.Trigger asChild><button className="member-runtime-picker rebuilt-runtime-trigger" type="button" aria-label={uiAttribute("选择智能体，当前为 {0}", String(currentRuntimeLabel))}><RuntimeGlyph kind={runtime} /><span>{currentRuntimeLabel}</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg></button></Menu.Trigger>
         <Menu.Portal><Menu.Content className="runtime-model-picker-menu member-runtime-menu" align="end" sideOffset={5} loop>
-          <Menu.RadioGroup className="runtime-picker-options" value={runtime} onValueChange={(value) => setRuntime(value as AdapterKind)}>
-            <div className="runtime-picker-scroll">{VISIBLE_PRODUCT_RUNTIMES.map((kind) => <Menu.RadioItem key={kind} value={kind} textValue={adapterLabel(kind)} className="runtime-model-picker-item member-runtime-menu-item"><RuntimeGlyph kind={kind} /><span className="runtime-model-picker-copy"><strong>{adapterLabel(kind)}</strong></span><Menu.ItemIndicator className="runtime-model-picker-check">✓</Menu.ItemIndicator></Menu.RadioItem>)}</div>
+          <Menu.RadioGroup className="runtime-picker-options" value={runtime==='custom-acp'?`member:${customAgent}`:runtime} onValueChange={value=>{if(value.startsWith('member:')){setCustomAgent(value.slice(7));setRuntime('custom-acp')}else{setRuntime(value as AdapterKind)}}}>
+            <div className="runtime-picker-scroll">{VISIBLE_PRODUCT_RUNTIMES.map((kind) => <Menu.RadioItem key={kind} value={kind} textValue={adapterLabel(kind)} className="runtime-model-picker-item member-runtime-menu-item"><RuntimeGlyph kind={kind} /><span className="runtime-model-picker-copy"><strong>{adapterLabel(kind)}</strong></span><Menu.ItemIndicator className="runtime-model-picker-check">✓</Menu.ItemIndicator></Menu.RadioItem>)}{customAgents.map(agent=><Menu.RadioItem key={agent.agentId} value={`member:${agent.agentId}`} textValue={agent.displayName} className="runtime-model-picker-item member-runtime-menu-item"><RuntimeGlyph kind="custom-acp"/><span className="runtime-model-picker-copy"><strong>{agent.displayName}</strong><small>{uiAttribute('自定义智能体')} · r{agent.runtimeConfiguration?.customRuntimeRef?.definitionRevision}</small></span><Menu.ItemIndicator className="runtime-model-picker-check">✓</Menu.ItemIndicator></Menu.RadioItem>)}</div>
           </Menu.RadioGroup>
         </Menu.Content></Menu.Portal>
       </Menu.Root>
