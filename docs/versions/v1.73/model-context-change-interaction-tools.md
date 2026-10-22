@@ -3,10 +3,10 @@ document_type: model-context-change
 version: v1.73
 change_id: interaction-tools
 revision: 1
-confirmed_revision: null
-confirmation_status: pending
-confirmed_by: null
-confirmed_at: null
+confirmed_revision: 1
+confirmation_status: confirmed
+confirmed_by: user
+confirmed_at: 2026-10-22T00:26:29.032504+00:00
 authority: proposed-model-input-change-statement
 implementation_status: proposal_only
 last_updated: 2026-10-22
@@ -2417,14 +2417,22 @@ computer_screenshot：Whole-desktop capture requires its own explicit grant.
 ### src-tauri/src/acp/browser_tools.rs　BrowserTabsOutcome
 
 ```rust
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
-pub struct BrowserTabsOutcome {
-    pub tabs: Vec<AgentTabSummary>,
-    /// Why the list is empty, when it is empty for a reason other than "the
-    /// user has no browser tabs open". Without it an agent cannot tell "you
-    /// have nothing open" from "this build has no built-in browser".
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub note: Option<String>,
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+
+pub struct BrowserTabsOutcome {
+
+    pub tabs: Vec<AgentTabSummary>,
+
+    /// Why the list is empty, when it is empty for a reason other than "the
+
+    /// user has no browser tabs open". Without it an agent cannot tell "you
+
+    /// have nothing open" from "this build has no built-in browser".
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub note: Option<String>,
+
 }
 ```
 
@@ -2464,21 +2472,36 @@ pub enum GrantLevel {
 ### src-tauri/src/acp/browser_tools.rs　BrowserSnapshotOutcome
 
 ```rust
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct BrowserSnapshotOutcome {
-    /// Echoed back so a refusal names the tab it is about — the agent quotes
-    /// it to the user when asking them to share it.
-    pub tab_id: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub snapshot: Option<PageSnapshot>,
-    /// One of the `browser_*` slugs above. `None` exactly when `snapshot` is
-    /// `Some`.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub error: Option<String>,
-    /// The refusal in words, for the agent to relay.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub note: Option<String>,
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+
+#[serde(rename_all = "camelCase")]
+
+pub struct BrowserSnapshotOutcome {
+
+    /// Echoed back so a refusal names the tab it is about — the agent quotes
+
+    /// it to the user when asking them to share it.
+
+    pub tab_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub snapshot: Option<PageSnapshot>,
+
+    /// One of the `browser_*` slugs above. `None` exactly when `snapshot` is
+
+    /// `Some`.
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub error: Option<String>,
+
+    /// The refusal in words, for the agent to relay.
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub note: Option<String>,
+
 }
 ```
 
@@ -2520,18 +2543,30 @@ pub struct SnapshotViewport {
 ### src-tauri/src/acp/browser_tools.rs　BrowserActOutcome
 
 ```rust
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct BrowserActOutcome {
-    pub tab_id: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub action: Option<ActionOutcome>,
-    /// One of the `browser_*` slugs above. `None` exactly when `action` is
-    /// `Some`.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub error: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub note: Option<String>,
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+
+#[serde(rename_all = "camelCase")]
+
+pub struct BrowserActOutcome {
+
+    pub tab_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub action: Option<ActionOutcome>,
+
+    /// One of the `browser_*` slugs above. `None` exactly when `action` is
+
+    /// `Some`.
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub error: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub note: Option<String>,
+
 }
 ```
 
@@ -2583,18 +2618,30 @@ pub struct ScrollReport {
 ### src-tauri/src/acp/browser_tools.rs　BrowserConsoleOutcome
 
 ```rust
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct BrowserConsoleOutcome {
-    pub tab_id: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub console: Option<ConsoleReadout>,
-    /// One of the `browser_*` slugs above. `None` exactly when `console` is
-    /// `Some`.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub error: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub note: Option<String>,
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+
+#[serde(rename_all = "camelCase")]
+
+pub struct BrowserConsoleOutcome {
+
+    pub tab_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub console: Option<ConsoleReadout>,
+
+    /// One of the `browser_*` slugs above. `None` exactly when `console` is
+
+    /// `Some`.
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub error: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub note: Option<String>,
+
 }
 ```
 
@@ -2683,18 +2730,30 @@ pub enum ConsoleSource {
 ### src-tauri/src/acp/browser_tools.rs　BrowserCaptureOutcome
 
 ```rust
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct BrowserCaptureOutcome {
-    pub tab_id: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub capture: Option<CaptureOutcome>,
-    /// One of the `browser_*` slugs above. `None` exactly when `capture` is
-    /// `Some`.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub error: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub note: Option<String>,
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+
+#[serde(rename_all = "camelCase")]
+
+pub struct BrowserCaptureOutcome {
+
+    pub tab_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub capture: Option<CaptureOutcome>,
+
+    /// One of the `browser_*` slugs above. `None` exactly when `capture` is
+
+    /// `Some`.
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub error: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub note: Option<String>,
+
 }
 ```
 
@@ -2737,18 +2796,30 @@ pub struct CaptureRegion {
 ### src-tauri/src/acp/browser_tools.rs　BrowserEvalOutcome
 
 ```rust
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct BrowserEvalOutcome {
-    pub tab_id: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub result: Option<EvalOutcome>,
-    /// One of the `browser_*` slugs above. `None` exactly when `result` is
-    /// `Some`.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub error: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub note: Option<String>,
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+
+#[serde(rename_all = "camelCase")]
+
+pub struct BrowserEvalOutcome {
+
+    pub tab_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub result: Option<EvalOutcome>,
+
+    /// One of the `browser_*` slugs above. `None` exactly when `result` is
+
+    /// `Some`.
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub error: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub note: Option<String>,
+
 }
 ```
 
@@ -2776,453 +2847,762 @@ pub struct EvalOutcome {
 ### src-tauri/src/acp/browser_tools.rs　BrowserTabOutcome
 
 ```rust
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct BrowserTabOutcome {
-    /// The tab this is about. Absent only when an open was refused before any
-    /// tab existed.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub tab_id: Option<String>,
-    /// The tab as it stands now. Absent for a close, and for every refusal.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub tab: Option<AgentTabSummary>,
-    /// The tab is showing an error page instead of the address it was sent to,
-    /// and which kind (`dns`, `tls`, `blocked`, `failed`).
-    ///
-    /// Not a refusal — the tab opened, and it is the agent's to retry or close
-    /// — but without it the answer is "this tab has no address and is not
-    /// shared with you", which reads like a permission problem and sends the
-    /// agent to ask the user for something that would not help. A dev server
-    /// that is not up yet is the ordinary shape of this.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub load_error: Option<String>,
-    /// One of the `browser_*` slugs above. `None` exactly when the call did
-    /// what it was asked to.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub error: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub note: Option<String>,
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+
+#[serde(rename_all = "camelCase")]
+
+pub struct BrowserTabOutcome {
+
+    /// The tab this is about. Absent only when an open was refused before any
+
+    /// tab existed.
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub tab_id: Option<String>,
+
+    /// The tab as it stands now. Absent for a close, and for every refusal.
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub tab: Option<AgentTabSummary>,
+
+    /// The tab is showing an error page instead of the address it was sent to,
+
+    /// and which kind (`dns`, `tls`, `blocked`, `failed`).
+
+    ///
+
+    /// Not a refusal — the tab opened, and it is the agent's to retry or close
+
+    /// — but without it the answer is "this tab has no address and is not
+
+    /// shared with you", which reads like a permission problem and sends the
+
+    /// agent to ask the user for something that would not help. A dev server
+
+    /// that is not up yet is the ordinary shape of this.
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub load_error: Option<String>,
+
+    /// One of the `browser_*` slugs above. `None` exactly when the call did
+
+    /// what it was asked to.
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub error: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub note: Option<String>,
+
 }
 ```
 
 ### src-tauri/src/acp/computer_tools.rs　ComputerAppsOutcome
 
 ```rust
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ComputerAppsOutcome {
-    pub apps: Vec<AgentAppSummary>,
-    /// One of the slugs above when the list is empty for a reason.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub error: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub note: Option<String>,
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+
+#[serde(rename_all = "camelCase")]
+
+pub struct ComputerAppsOutcome {
+
+    pub apps: Vec<AgentAppSummary>,
+
+    /// One of the slugs above when the list is empty for a reason.
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub error: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub note: Option<String>,
+
 }
 ```
 
 ### src-tauri/src/computer/types.rs　AgentAppSummary
 
 ```rust
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AgentAppSummary {
-    #[serde(flatten)]
-    pub app: AgentAppRef,
-    /// Whether it is the frontmost application.
-    pub active: bool,
-    /// What it is shared for as a whole application — every window of it,
-    /// its menus and its own shortcuts — when the user shared it so.
-    #[serde(default, skip_serializing_if = "not_shared")]
-    pub level: GrantLevel,
-    /// Why none of its windows can be shared, when that is so — codeg itself,
-    /// or an application on the blocklist.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub note: Option<String>,
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+
+#[serde(rename_all = "camelCase")]
+
+pub struct AgentAppSummary {
+
+    #[serde(flatten)]
+
+    pub app: AgentAppRef,
+
+    /// Whether it is the frontmost application.
+
+    pub active: bool,
+
+    /// What it is shared for as a whole application — every window of it,
+
+    /// its menus and its own shortcuts — when the user shared it so.
+
+    #[serde(default, skip_serializing_if = "not_shared")]
+
+    pub level: GrantLevel,
+
+    /// Why none of its windows can be shared, when that is so — codeg itself,
+
+    /// or an application on the blocklist.
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub note: Option<String>,
+
 }
 ```
 
 ### src-tauri/src/computer/types.rs　AgentAppRef
 
 ```rust
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AgentAppRef {
-    /// The stable name of the application: its bundle identifier on macOS,
-    /// its executable path elsewhere. What a blocklist entry matches.
-    pub key: String,
-    /// What the application calls itself, for a person to recognise.
-    pub name: String,
-    pub pid: u32,
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+
+#[serde(rename_all = "camelCase")]
+
+pub struct AgentAppRef {
+
+    /// The stable name of the application: its bundle identifier on macOS,
+
+    /// its executable path elsewhere. What a blocklist entry matches.
+
+    pub key: String,
+
+    /// What the application calls itself, for a person to recognise.
+
+    pub name: String,
+
+    pub pid: u32,
+
 }
 ```
 
 ### src-tauri/src/acp/computer_tools.rs　ComputerLaunchOutcome
 
 ```rust
-#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ComputerLaunchOutcome {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub app: Option<crate::computer::types::AgentAppRef>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub error: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub note: Option<String>,
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+
+#[serde(rename_all = "camelCase")]
+
+pub struct ComputerLaunchOutcome {
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub app: Option<crate::computer::types::AgentAppRef>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub error: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub note: Option<String>,
+
 }
 ```
 
 ### src-tauri/src/acp/computer_tools.rs　ComputerClipboardOutcome
 
 ```rust
-#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ComputerClipboardOutcome {
-    /// What was read.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub text: Option<String>,
-    /// The text was put on the clipboard.
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-    pub written: bool,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub error: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub note: Option<String>,
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+
+#[serde(rename_all = "camelCase")]
+
+pub struct ComputerClipboardOutcome {
+
+    /// What was read.
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub text: Option<String>,
+
+    /// The text was put on the clipboard.
+
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+
+    pub written: bool,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub error: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub note: Option<String>,
+
 }
 ```
 
 ### src-tauri/src/acp/computer_tools.rs　ComputerWindowsOutcome
 
 ```rust
-#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ComputerWindowsOutcome {
-    pub windows: Vec<AgentWindowSummary>,
-    /// The entire screen, while the user shares it as a whole.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub screen: Option<AgentScreen>,
-    /// How actions reach the windows, as the person has it set now.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub input: Option<InputPolicy>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub error: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub note: Option<String>,
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+
+#[serde(rename_all = "camelCase")]
+
+pub struct ComputerWindowsOutcome {
+
+    pub windows: Vec<AgentWindowSummary>,
+
+    /// The entire screen, while the user shares it as a whole.
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+
+    pub screen: Option<AgentScreen>,
+
+    /// How actions reach the windows, as the person has it set now.
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub input: Option<InputPolicy>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub error: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub note: Option<String>,
+
 }
 ```
 
 ### src-tauri/src/computer/types.rs　AgentWindowSummary
 
 ```rust
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AgentWindowSummary {
-    /// codeg's own name for this window. Stable for as long as the window and
-    /// the process that owns it are the same ones; a new process — even the
-    /// same application relaunched — gets a new id.
-    pub target_id: String,
-    pub app: AgentAppRef,
-    pub bounds: Rect,
-    pub on_screen: bool,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub minimized: Option<bool>,
-    /// Its application is hidden (macOS ⌘H): off the screen as a whole,
-    /// with nothing of the window's own changed.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub hidden: Option<bool>,
-    pub level: GrantLevel,
-    /// Shared with its whole application: its menus and its own shortcuts
-    /// are in reach too.
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-    pub whole_app: bool,
-    /// Shared with the entire screen: its application's menus, and the
-    /// desktop's own shortcuts but locking and logging out, are in reach too.
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-    pub whole_screen: bool,
-    /// Present only from [`GrantLevel::Read`] upwards.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub title: Option<String>,
-    /// Why this window cannot be shared, when that is so.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub note: Option<String>,
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+
+#[serde(rename_all = "camelCase")]
+
+pub struct AgentWindowSummary {
+
+    /// codeg's own name for this window. Stable for as long as the window and
+
+    /// the process that owns it are the same ones; a new process — even the
+
+    /// same application relaunched — gets a new id.
+
+    pub target_id: String,
+
+    pub app: AgentAppRef,
+
+    pub bounds: Rect,
+
+    pub on_screen: bool,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub minimized: Option<bool>,
+
+    /// Its application is hidden (macOS ⌘H): off the screen as a whole,
+
+    /// with nothing of the window's own changed.
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub hidden: Option<bool>,
+
+    pub level: GrantLevel,
+
+    /// Shared with its whole application: its menus and its own shortcuts
+
+    /// are in reach too.
+
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+
+    pub whole_app: bool,
+
+    /// Shared with the entire screen: its application's menus, and the
+
+    /// desktop's own shortcuts but locking and logging out, are in reach too.
+
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+
+    pub whole_screen: bool,
+
+    /// Present only from [`GrantLevel::Read`] upwards.
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub title: Option<String>,
+
+    /// Why this window cannot be shared, when that is so.
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub note: Option<String>,
+
 }
 ```
 
 ### src-tauri/src/computer/types.rs　Rect
 
 ```rust
-#[derive(Debug, Clone, Copy, Default, PartialEq, Serialize, Deserialize)]
-pub struct Rect {
-    pub x: f64,
-    pub y: f64,
-    pub width: f64,
-    pub height: f64,
+#[derive(Debug, Clone, Copy, Default, PartialEq, Serialize, Deserialize)]
+
+pub struct Rect {
+
+    pub x: f64,
+
+    pub y: f64,
+
+    pub width: f64,
+
+    pub height: f64,
+
 }
 ```
 
 ### src-tauri/src/computer/types.rs　AgentScreen
 
 ```rust
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AgentScreen {
-    pub target_id: String,
-    pub level: GrantLevel,
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+
+#[serde(rename_all = "camelCase")]
+
+pub struct AgentScreen {
+
+    pub target_id: String,
+
+    pub level: GrantLevel,
+
 }
 ```
 
 ### src-tauri/src/acp/computer_tools.rs　InputPolicy
 
 ```rust
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct InputPolicy {
-    /// What an action gets when the agent does not ask (`delivery`).
-    pub default: ActDelivery,
-    /// Whether an agent may ask for the front.
-    pub foreground_allowed: bool,
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+
+#[serde(rename_all = "camelCase")]
+
+pub struct InputPolicy {
+
+    /// What an action gets when the agent does not ask (`delivery`).
+
+    pub default: ActDelivery,
+
+    /// Whether an agent may ask for the front.
+
+    pub foreground_allowed: bool,
+
 }
 ```
 
 ### src-tauri/src/computer/types.rs　ActDelivery
 
 ```rust
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum ActDelivery {
-    /// The window is not brought to the front, and the person's own pointer
-    /// and keyboard focus stay where they are.
-    #[default]
-    Background,
-    /// The window is brought to the front for the one action, which then
-    /// goes in as real input, and the window the person was in is brought
-    /// back after it. Some applications take keys and typing no other way —
-    /// on Windows, every one built on Chromium. Only where the person has
-    /// allowed it in the settings.
-    Foreground,
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+
+#[serde(rename_all = "snake_case")]
+
+pub enum ActDelivery {
+
+    /// The window is not brought to the front, and the person's own pointer
+
+    /// and keyboard focus stay where they are.
+
+    #[default]
+
+    Background,
+
+    /// The window is brought to the front for the one action, which then
+
+    /// goes in as real input, and the window the person was in is brought
+
+    /// back after it. Some applications take keys and typing no other way —
+
+    /// on Windows, every one built on Chromium. Only where the person has
+
+    /// allowed it in the settings.
+
+    Foreground,
+
 }
 ```
 
 ### src-tauri/src/acp/computer_tools.rs　ComputerActOutcome
 
 ```rust
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ComputerActOutcome {
-    pub target_id: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub action: Option<ActReport>,
-    /// One of the slugs above. `None` exactly when `action` is `Some`.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub error: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub note: Option<String>,
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+
+#[serde(rename_all = "camelCase")]
+
+pub struct ComputerActOutcome {
+
+    pub target_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub action: Option<ActReport>,
+
+    /// One of the slugs above. `None` exactly when `action` is `Some`.
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub error: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub note: Option<String>,
+
 }
 ```
 
 ### src-tauri/src/computer/types.rs　ActReport
 
 ```rust
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ActReport {
-    pub target_id: String,
-    pub effect: ActEffect,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub route: Option<ActRoute>,
-    pub delivery: ActDelivery,
-    /// For a key pressed more than once: how many presses went out.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub presses: Option<u32>,
-    /// For typing with `submit`: whether return was pressed after it.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub submitted: Option<bool>,
-    /// For typing with `submit` whose return was not pressed: why.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub submit_note: Option<String>,
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+
+#[serde(rename_all = "camelCase")]
+
+pub struct ActReport {
+
+    pub target_id: String,
+
+    pub effect: ActEffect,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub route: Option<ActRoute>,
+
+    pub delivery: ActDelivery,
+
+    /// For a key pressed more than once: how many presses went out.
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub presses: Option<u32>,
+
+    /// For typing with `submit`: whether return was pressed after it.
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub submitted: Option<bool>,
+
+    /// For typing with `submit` whose return was not pressed: why.
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+
+    pub submit_note: Option<String>,
+
 }
 ```
 
 ### src-tauri/src/computer/types.rs　ActEffect
 
 ```rust
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum ActEffect {
-    /// Read back from the window: the value changed, the selection moved.
-    Confirmed,
-    /// Only part of it happened (some of the text was typed).
-    Partial,
-    /// Delivered, and nothing could be read back to prove it landed. Not a
-    /// failure and not a success: look at the window to know.
-    Unverifiable,
-    /// Delivered, and by every sign it did nothing.
-    SuspectedNoop,
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+
+#[serde(rename_all = "snake_case")]
+
+pub enum ActEffect {
+
+    /// Read back from the window: the value changed, the selection moved.
+
+    Confirmed,
+
+    /// Only part of it happened (some of the text was typed).
+
+    Partial,
+
+    /// Delivered, and nothing could be read back to prove it landed. Not a
+
+    /// failure and not a success: look at the window to know.
+
+    Unverifiable,
+
+    /// Delivered, and by every sign it did nothing.
+
+    SuspectedNoop,
+
 }
 ```
 
 ### src-tauri/src/computer/types.rs　ActRoute
 
 ```rust
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum ActRoute {
-    Accessibility,
-    SyntheticEvents,
-    GlobalInput,
-    SystemApi,
-    Dom,
-    TrustedInput,
-    /// A route this codeg does not know by name.
-    #[serde(other)]
-    Other,
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+
+#[serde(rename_all = "snake_case")]
+
+pub enum ActRoute {
+
+    Accessibility,
+
+    SyntheticEvents,
+
+    GlobalInput,
+
+    SystemApi,
+
+    Dom,
+
+    TrustedInput,
+
+    /// A route this codeg does not know by name.
+
+    #[serde(other)]
+
+    Other,
+
 }
 ```
 
 ### src-tauri/src/acp/computer_tools.rs　ComputerCaptureOutcome
 
 ```rust
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ComputerCaptureOutcome {
-    pub target_id: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub capture: Option<WindowCapture>,
-    /// `None` exactly when `capture` is `Some`.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub error: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub note: Option<String>,
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+
+#[serde(rename_all = "camelCase")]
+
+pub struct ComputerCaptureOutcome {
+
+    pub target_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub capture: Option<WindowCapture>,
+
+    /// `None` exactly when `capture` is `Some`.
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub error: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub note: Option<String>,
+
 }
 ```
 
 ### src-tauri/src/computer/types.rs　WindowCapture
 
 ```rust
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WindowCapture {
-    pub target_id: String,
-    /// Names this capture: `<grant epoch>.<read number>`. Coordinates read
-    /// off this image mean something only in this image's pixel space, and
-    /// the actions that arrive later will carry the generation of the image
-    /// their coordinates came from.
-    pub generation: String,
-    /// `image/png`.
-    pub mime: String,
-    /// The image, base64.
-    pub data: String,
-    /// The image's size in pixels — the space coordinates read off it are in.
-    pub width: u32,
-    pub height: u32,
-    /// Where the window was when it was captured, in desktop coordinates.
-    pub window_bounds: Rect,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub title: Option<String>,
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+
+#[serde(rename_all = "camelCase")]
+
+pub struct WindowCapture {
+
+    pub target_id: String,
+
+    /// Names this capture: `<grant epoch>.<read number>`. Coordinates read
+
+    /// off this image mean something only in this image's pixel space, and
+
+    /// the actions that arrive later will carry the generation of the image
+
+    /// their coordinates came from.
+
+    pub generation: String,
+
+    /// `image/png`.
+
+    pub mime: String,
+
+    /// The image, base64.
+
+    pub data: String,
+
+    /// The image's size in pixels — the space coordinates read off it are in.
+
+    pub width: u32,
+
+    pub height: u32,
+
+    /// Where the window was when it was captured, in desktop coordinates.
+
+    pub window_bounds: Rect,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub title: Option<String>,
+
 }
 ```
 
 ### src-tauri/src/acp/computer_tools.rs　ComputerSnapshotOutcome
 
 ```rust
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ComputerSnapshotOutcome {
-    pub target_id: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub snapshot: Option<WindowSnapshot>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub error: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub note: Option<String>,
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+
+#[serde(rename_all = "camelCase")]
+
+pub struct ComputerSnapshotOutcome {
+
+    pub target_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub snapshot: Option<WindowSnapshot>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub error: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub note: Option<String>,
+
 }
 ```
 
 ### src-tauri/src/computer/types.rs　WindowSnapshot
 
 ```rust
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WindowSnapshot {
-    pub target_id: String,
-    /// See [`WindowCapture::generation`].
-    pub generation: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub title: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub window_bounds: Option<Rect>,
-    /// The tree, as indented text, one element per line.
-    pub tree: String,
-    /// How many actionable elements the driver found, before any cut.
-    pub element_count: u64,
-    /// The tree was cut short, by `maxChars` or by the driver's own bounds.
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-    pub truncated: bool,
-    /// Why the tree is empty or partial when the window is not (a canvas, a
-    /// window whose accessibility surface the driver could not resolve), in
-    /// the driver's words.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub degraded: Option<String>,
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+
+#[serde(rename_all = "camelCase")]
+
+pub struct WindowSnapshot {
+
+    pub target_id: String,
+
+    /// See [`WindowCapture::generation`].
+
+    pub generation: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub title: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub window_bounds: Option<Rect>,
+
+    /// The tree, as indented text, one element per line.
+
+    pub tree: String,
+
+    /// How many actionable elements the driver found, before any cut.
+
+    pub element_count: u64,
+
+    /// The tree was cut short, by `maxChars` or by the driver's own bounds.
+
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+
+    pub truncated: bool,
+
+    /// Why the tree is empty or partial when the window is not (a canvas, a
+
+    /// window whose accessibility surface the driver could not resolve), in
+
+    /// the driver's words.
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub degraded: Option<String>,
+
 }
 ```
 
 ### src-tauri/src/acp/computer_tools.rs　ComputerVerifyOutcome
 
 ```rust
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ComputerVerifyOutcome {
-    pub target_id: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub verify: Option<VerifyOutcome>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub error: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub note: Option<String>,
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+
+#[serde(rename_all = "camelCase")]
+
+pub struct ComputerVerifyOutcome {
+
+    pub target_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub verify: Option<VerifyOutcome>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub error: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub note: Option<String>,
+
 }
 ```
 
 ### src-tauri/src/computer/types.rs　VerifyOutcome
 
 ```rust
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct VerifyOutcome {
-    pub target_id: String,
-    pub status: VerifyStatus,
-    pub stable: bool,
-    pub samples: u64,
-    pub elapsed_ms: u64,
-    pub predicates: Vec<PredicateResult>,
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+
+#[serde(rename_all = "camelCase")]
+
+pub struct VerifyOutcome {
+
+    pub target_id: String,
+
+    pub status: VerifyStatus,
+
+    pub stable: bool,
+
+    pub samples: u64,
+
+    pub elapsed_ms: u64,
+
+    pub predicates: Vec<PredicateResult>,
+
 }
 ```
 
 ### src-tauri/src/computer/types.rs　VerifyStatus
 
 ```rust
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum VerifyStatus {
-    Satisfied,
-    Unsatisfied,
-    /// Could not be decided. Never a success: an agent that reads "unknown"
-    /// as "probably fine" is exactly the failure this tool exists to prevent.
-    Unknown,
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+
+#[serde(rename_all = "snake_case")]
+
+pub enum VerifyStatus {
+
+    Satisfied,
+
+    Unsatisfied,
+
+    /// Could not be decided. Never a success: an agent that reads "unknown"
+
+    /// as "probably fine" is exactly the failure this tool exists to prevent.
+
+    Unknown,
+
 }
 ```
 
 ### src-tauri/src/computer/types.rs　PredicateResult
 
 ```rust
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PredicateResult {
-    pub index: u32,
-    pub status: VerifyStatus,
-    /// Why a predicate is `unknown`, in the driver's vocabulary
-    /// (`target_missing`, `stability_unproven`, …).
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub unknown_reason: Option<String>,
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+
+#[serde(rename_all = "camelCase")]
+
+pub struct PredicateResult {
+
+    pub index: u32,
+
+    pub status: VerifyStatus,
+
+    /// Why a predicate is `unknown`, in the driver's vocabulary
+
+    /// (`target_missing`, `stability_unproven`, …).
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+
+    pub unknown_reason: Option<String>,
+
 }
 ```
 
@@ -4079,9 +4459,12 @@ fn computer_input_policy_line(input: &Value) -> &'static str {
 ```
 
 ```rust
-
-fn not_shared(level: &GrantLevel) -> bool {
-    *level == GrantLevel::None
+
+
+fn not_shared(level: &GrantLevel) -> bool {
+
+    *level == GrantLevel::None
+
 }
 ```
 
@@ -4092,3 +4475,8 @@ revision：1；confirmation_status：pending；confirmed_revision：null；confi
 本工程提案基线：b54eef6d698440c9acff26cac0ffba9c8706023f。机器附件：integration/proposals/interaction-tools-r1-contract.json；SHA-256：3dd927be39647658182f26646b935ba7650857400fadb2449e913183d8ee3a77。附录中的全部工具、结构、类型及呈现函数同源生成，不用摘要替代字段合同。
 
 本说明可继续编辑提案；只有用户明确确认“浏览器与电脑工具接线 r1”后，才实施对应模型目录和桥。确认后仍需保留本次正文冻结，实际实现偏离则先提出下一 revision。
+
+
+## 用户确认记录
+
+用户已阅读交付版后明确回复：“确认，按浏览器与电脑工具接线 r1 实施”。确认时间：2026-10-22T00:26:29.032504+00:00。交付正文及机器附件SHA冻结不变；本文附录O保留投递时的pending快照，本段与Front Matter记录后续用户确认。不包含付费模型、main合入或发布。

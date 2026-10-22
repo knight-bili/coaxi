@@ -1,0 +1,12 @@
+{
+  "revision": 1,
+  "confirmedRevision": 1,
+  "confirmationStatus": "confirmed",
+  "confirmedBy": "user",
+  "confirmedAt": "2026-10-22T00:26:29.032504+00:00",
+  "statement": "确认，按浏览器与电脑工具接线 r1 实施",
+  "frozenContractSha256": "3dd927be39647658182f26646b935ba7650857400fadb2449e913183d8ee3a77",
+  "paidModelAuthorization": false,
+  "mainMergeAuthorization": false,
+  "releaseAuthorization": false
+}
