@@ -38,6 +38,7 @@ private struct NativeRuntimeEditor: View {
     private var changed: Bool { model.members.first { $0.text("agentId") == member.text("agentId") }?["version"] != member["version"] }
     var body: some View {
         Form {
+            Section("模型服务商") {RovaiPortableMemberConnection(model: model, agentId: member.text("agentId"), disabled: disabled || dirty || changed)}
             Section("工作中补充") {RovaiMemberFeedbackSwitch(model: model, agentId: member.text("agentId"))}
             Section("原生插话") {RovaiMemberNativeSteerSwitch(model: model, agentId: member.text("agentId"))}
             Section("自定义智能体程序") {RovaiMemberCustomRuntime(model: model, member: member)}
