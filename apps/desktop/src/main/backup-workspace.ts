@@ -1,5 +1,5 @@
 import { BrowserWindow, dialog, type IpcMainInvokeEvent } from 'electron'
-import type { BackupSummary, ConfigurationSnapshotPreview } from '@contracts'
+import type { BackupSummary, ConfigurationSnapshotPreview, LegacyDataPreview } from '@contracts'
 import { spawn } from 'node:child_process'
 import { createReadStream } from 'node:fs'
 import { createHash, randomUUID } from 'node:crypto'
@@ -13,6 +13,7 @@ export class BackupWorkspace{
   private busy=false
   private readonly configSelections=new Map<string,{path:string;digest:string;localDigest:string;preferencesRoot:string;expires:number}>()
   private readonly selections=new Map<string,{path:string;digest:string;expires:number}>()
+  private readonly legacySelections=new Map<string,{source:string;digest:string;expires:number}>()
   constructor(private readonly core:Pick<CoreClient,'shutdown'|'start'>,private readonly dataRoot:()=>string|null,private readonly owner:()=>BrowserWindow|null,private readonly prepare:()=>Promise<void>,private readonly beforeOffline:()=>void,private readonly restartApp:()=>void,private readonly preferencesRoot:()=>string|null=dataRoot){}
   private execute<T={manifest:Manifest}>(operation:string,root:string,file:string|undefined,passphrase:string,event:IpcMainInvokeEvent,command='backup',extra:string[]=[]):Promise<T>{
     return new Promise((resolve,reject)=>{
@@ -74,6 +75,7 @@ export class BackupWorkspace{
     if(!input||typeof input!=='object'||Array.isArray(input))throw new Error('backup.invalid_request')
     const {passphrase,archiveId}=input as {passphrase:string;archiveId?:string}
     if(typeof passphrase!=='string'||passphrase.length>16000)throw new Error('backup.invalid_passphrase')
+    if(operation==='legacy_inspect'||operation==='legacy_stage')return this.invokeLegacy(event,operation,input as {selectionId?:string},owner,root)
     if(typeof operation==='string'&&operation.startsWith('config_'))return this.invokeConfiguration(event,operation,input as {selectionId?:string},owner,root,passphrase)
     this.busy=true;let offline=false,restarting=false
     try{
@@ -102,6 +104,28 @@ export class BackupWorkspace{
       const result=await this.execute(operation==='create'?'create':'stage',root,file,passphrase,event)
       if(operation==='restore'){restarting=true;setImmediate(this.restartApp);return {restoreStaged:true,...summary(result.manifest)}}
       return {path:file,...summary(result.manifest)}
+    }finally{this.busy=false;if(offline&&!restarting)this.core.start()}
+  }
+  private async invokeLegacy(event:IpcMainInvokeEvent,operation:string,input:{selectionId?:string},owner:BrowserWindow,root:string):Promise<unknown>{
+    this.busy=true;let offline=false,restarting=false
+    try{
+      for(const [id,value]of this.legacySelections)if(value.expires<Date.now())this.legacySelections.delete(id)
+      if(operation==='legacy_inspect'){
+        const chosen=await dialog.showOpenDialog(owner,{title:'选择已退出的旧 Rovai Core 数据目录',properties:['openDirectory']})
+        if(chosen.canceled||!chosen.filePaths[0])return null
+        if(this.legacySelections.size>=16)throw new Error('migration.too_many_selections')
+        const value=await this.execute<{preview:Omit<LegacyDataPreview,'selectionId'>}>('legacy-inspect',root,undefined,'',event,'backup',['--source-dir',chosen.filePaths[0]])
+        const id=randomUUID();this.legacySelections.set(id,{source:value.preview.source,digest:value.preview.digest,expires:Date.now()+15*60000})
+        return {selectionId:id,...value.preview}
+      }
+      const selection=input.selectionId?this.legacySelections.get(input.selectionId):null
+      if(!selection||selection.expires<Date.now())throw new Error('migration.preview_expired')
+      await this.prepare();this.beforeOffline()
+      const stopped=await this.core.shutdown();offline=true
+      if(stopped.forcedSignal!==null)throw new Error('backup.core_shutdown_incomplete')
+      const value=await this.execute('legacy-stage',root,undefined,'',event,'backup',['--source-dir',selection.source,'--expected-digest',selection.digest])
+      restarting=true;setImmediate(this.restartApp)
+      return {restoreStaged:true,...summary(value.manifest)}
     }finally{this.busy=false;if(offline&&!restarting)this.core.start()}
   }
 }

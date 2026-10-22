@@ -5130,7 +5130,10 @@ export interface HostWebApi {
 
 export interface BackupSummary {createdAt:string;appVersion:string;fileCount:number;totalBytes:number;formatVersion?:number;roots?:Array<{id:string;kind:string;shared:boolean;present:boolean}>}
 export interface ConfigurationSnapshotPreview {formatVersion:number;appVersion:string;createdAt:string;localDigest:string;changes:Array<{domain:string;before:Record<string,unknown>|null;after:Record<string,unknown>|null}>}
+export interface LegacyDataPreview {selectionId:string;source:string;digest:string;authority:string;fileCount:number;totalBytes:number;externalRoots:Array<{id:string;kind:string;path:string;shared:boolean}>}
 export interface NativeBackupsApi {
+  inspectLegacyData():Promise<LegacyDataPreview|null>
+  importLegacyData(selectionId:string):Promise<BackupSummary&{restoreStaged:true}>
   exportConfiguration(passphrase:string):Promise<{created:boolean;path:string;domains:string[]}|null>
   inspectConfiguration(passphrase:string):Promise<(ConfigurationSnapshotPreview&{selectionId:string})|null>
   applyConfiguration(selectionId:string,passphrase:string):Promise<{applied:boolean;restartRequired:boolean}>
