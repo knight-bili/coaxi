@@ -93,7 +93,7 @@ export class InteractionComputer implements DesktopComputerExecutor{
       grants:all.grants.filter(grant=>grant.targetKind.startsWith('computer_')&&Date.parse(grant.expiresAt)>Date.now()),
       activity:this.activity.map(item=>({...item,...this.scopes.get(item.scopeKey)}))}
   }
-  async clearActivity(before:number):Promise<void>{if(!Number.isSafeInteger(before))throw new Error('invalid_arguments');for(let index=this.activity.length-1;index>=0;index--)if(this.activity[index].at<=before)this.activity.splice(index,1)}
+  async clearActivity(before:number,threadId:string):Promise<void>{if(!Number.isSafeInteger(before)||typeof threadId!=='string')throw new Error('invalid_arguments');for(let index=this.activity.length-1;index>=0;index--)if(this.activity[index].at<=before&&this.scopes.get(this.activity[index].scopeKey)?.scope.threadId===threadId)this.activity.splice(index,1)}
   private async open():Promise<void>{
     await this.ready
     if(this.child)return
@@ -155,7 +155,7 @@ export class InteractionComputer implements DesktopComputerExecutor{
     const owner=this.owner();if(!owner||owner.isDestroyed()||event.sender!==owner.webContents||event.senderFrame!==owner.webContents.mainFrame)throw new Error('computer.local_owner_required')
     await this.ready
     if(method==='monitor')return this.monitor()
-    if(method==='activity.clear'){await this.clearActivity((input as {before:number})?.before);return {cleared:true}}
+    if(method==='activity.clear'){const value=input as {before:number;threadId:string};await this.clearActivity(value?.before,value?.threadId);return {cleared:true}}
     if(method==='preferences.get')return {...this.preferences,lastError:this.lastError}
     if(method==='preferences.set'){
       const value=input as Preferences;this.validate(value);if(value.revision!==this.preferences.revision)throw new Error('computer.preferences_changed')
@@ -163,7 +163,7 @@ export class InteractionComputer implements DesktopComputerExecutor{
       try{await fs.writeFile(temporary,JSON.stringify(next),{encoding:'utf8',mode:0o600,flag:'wx'});await fs.rename(temporary,this.file)}finally{await fs.unlink(temporary).catch(()=>undefined)}
       this.preferences=next;this.failed=false;this.lastError=null;this.updateShortcut();return {...next,lastError:null}
     }
-    if(method==='stop'){await this.core.request('interaction.local',{action:'computer.stop',payload:{}});await this.stop();return {stopped:true}}
+    if(method==='stop'){try{await this.core.request('interaction.local',{action:'computer.stop',payload:{}})}finally{await this.stop()}return {stopped:true}}
     if(method==='picker'||method==='status'){
       const value=input as {scope:InteractionScope;agentId:string}
       if(!value?.scope||typeof value.agentId!=='string')throw new Error('invalid_arguments')

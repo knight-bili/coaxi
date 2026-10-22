@@ -16,3 +16,10 @@
 .interaction-request>header{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px}
 .interaction-request>header>span{color:var(--muted);font-size:12px}
 .interaction-request pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;line-height:1.6;color:var(--ink);background:var(--surface-subtle);border:1px solid var(--line);border-radius:6px;padding:12px}
+.interaction-activity{margin-top:20px;min-width:0}
+.interaction-activity>header{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px}
+.interaction-activity ol{list-style:none;padding:0;margin:0}
+.interaction-activity li{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:12px}
+.interaction-activity li>span:first-child{color:var(--ink);min-width:96px}
+.interaction-activity li>span,.interaction-activity time{color:var(--muted)}
+.interaction-activity time{margin-inline-start:auto}
