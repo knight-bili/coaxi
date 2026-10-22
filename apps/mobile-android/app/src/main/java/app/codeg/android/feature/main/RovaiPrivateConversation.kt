@@ -52,8 +52,15 @@ fun RovaiPrivateConversation(model:RovaiWorkspaceViewModel,threadId:String,child
     }
 
     BackHandler{scope.launch{close()}}
+    var feedback by remember(selected){mutableStateOf(false)}
+    if(feedback&&selected!=null)RovaiUserFeedback(model,threadId,selected,child,snapshot["conversation"].coreObject().coreText("agentId"),normalInput={
+        require(!disabled&&body.isEmpty()){ "请先处理普通输入中的草稿和材料" }
+        val current=model.query(get,buildJsonObject{put("conversationId",selected);put("composerScope",JsonNull)}).coreObject();val draft=current["draft"].coreObject()
+        require(current["conversation"].coreObject().coreText("id")==selected&&draft["attachments"].coreArray().isEmpty()&&draft["quotes"].coreArray().isEmpty()){ "请先处理普通输入中的草稿和材料" }
+        buildJsonObject{put("draftRevision",draft.coreLong("revision"))}
+    }){feedback=false;scope.launch{load()}}
     Column(Modifier.fillMaxSize()){
-        Row(Modifier.fillMaxWidth().padding(horizontal=12.dp)){TextButton(onClick={scope.launch{close()}}){Text("返回对话")};Text(if(child)"独立帮手" else "队员私聊",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(onClick={scope.launch{load();retainedPage()}},enabled=!loading){Text("刷新")}}
+        Row(Modifier.fillMaxWidth().padding(horizontal=12.dp)){TextButton(onClick={scope.launch{close()}}){Text("返回对话")};Text(if(child)"独立帮手" else "队员私聊",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);if(selected!=null)TextButton(onClick={feedback=true}){Text("工作中补充")};TextButton(onClick={scope.launch{load();retainedPage()}},enabled=!loading){Text("刷新")}}
         issue?.let{Text(it,color=CodegTheme.colors.danger,modifier=Modifier.padding(horizontal=16.dp))};if(state.pending!=null)Row(Modifier.padding(horizontal=12.dp)){Text("原操作待核对",Modifier.weight(1f));TextButton(enabled=!state.busy,onClick=model::reconcile){Text("核对")};TextButton(enabled=!state.busy,onClick=model::retry){Text("重试原操作")}}
         if(selected==null){LazyColumn(contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
             items(state.thread?.get("members").coreArray().filter{it.coreText("membershipStatus")=="active"&&it.coreText("profilePresence")=="present"},key={it.coreText("agentId")}){member->GlassRow(Modifier.fillMaxWidth()){Text(member.coreText("displayName"),style=MaterialTheme.typography.titleMedium);TextButton(enabled=state.pending==null&&!state.busy,onClick={run{val id=java.util.UUID.randomUUID().toString();openingCommand=id;model.execute(RovaiOperation.SINGLECHAT_OPEN,buildJsonObject{put("commandId",id);putJsonObject("command"){put("threadId",threadId);put("agentId",member.coreText("agentId"))}})}}){Text("开始私聊")}}}
