@@ -4,6 +4,7 @@ use std::{collections::BTreeSet,fs,path::{Path,PathBuf},sync::Arc,time::Duration
 use tokio_util::sync::CancellationToken;
 use crate::{command::{ActorRef,CommandEnvelope,CommandHandlerResult,DomainCommand,DomainCommandGateway,sealed},db::Database};
 use rusqlite::params;
+use rusqlite::OptionalExtension;
 static MUTATION:LazyLock<Arc<tokio::sync::Mutex<()>>>=LazyLock::new(||Arc::new(tokio::sync::Mutex::new(())));
 static ACTIVE:LazyLock<std::sync::Mutex<BTreeSet<PathBuf>>>=LazyLock::new(Default::default);
 pub fn platform()->Result<&'static str>{match(std::env::consts::OS,std::env::consts::ARCH){("windows","x86_64")=>Ok("windows-x64"),("windows","aarch64")=>Ok("windows-arm64"),("macos","x86_64")=>Ok("macos-x64"),("macos","aarch64")=>Ok("macos-arm64"),("linux","x86_64")=>Ok("linux-x64"),("linux","aarch64")=>Ok("linux-arm64"),_=>anyhow::bail!("custom_runtime.platform_unsupported")}}
@@ -56,6 +57,12 @@ pub async fn start(root:&Path,definition:Value,reference:CustomRuntimeRefV1,requ
     if path.exists(){let result=receipt(root,&id)?;ensure!(result["inputDigest"].as_str()==Some(input_digest.as_str()),"custom_runtime.command_identity_changed");return Ok(result)}
     ensure!(selectable,"custom_runtime.definition_changed");crate::platform::private_storage::prepare_private_directory(path.parent().context("custom_runtime.receipt_parent_missing")?)?;
     let record=json!({"commandId":id,"inputDigest":input_digest,"reference":reference,"platform":requested_platform,"state":"running","startedAt":chrono::Utc::now().to_rfc3339()});crate::platform::private_storage::atomic_write_private_json(&path,&record)?;
+    {
+        let database=database.lock().await;
+        let installed:Option<String>=database.connection().query_row("SELECT lock_json FROM custom_runtime_installation WHERE definition_id=?1 AND definition_revision=?2 AND platform=?3 AND lock_json IS NOT NULL",params![reference.id,reference.definition_revision,requested_platform],|r|r.get(0)).optional()?;
+        if let Some(lock)=installed{let lock:Value=serde_json::from_str(&lock)?;let mut existing=record;existing["state"]=json!("completed");existing["info"]=json!({"reference":reference,"launchLockDigest":digest(&lock)?,"qualification":"not_verified","reusedImmutableInstallation":true});crate::platform::private_storage::atomic_write_private_json(&path,&existing)?;return Ok(existing)}
+        database.connection().execute("INSERT INTO custom_runtime_installation(definition_id,definition_revision,platform,operation_id,status,updated_at) VALUES(?1,?2,?3,?4,'installing',?5) ON CONFLICT(definition_id,definition_revision,platform) DO UPDATE SET operation_id=excluded.operation_id,status=excluded.status,updated_at=excluded.updated_at WHERE custom_runtime_installation.lock_json IS NULL",params![reference.id,reference.definition_revision,requested_platform,id,chrono::Utc::now().to_rfc3339()])?;
+    }
     ACTIVE.lock().map_err(|_|anyhow::anyhow!("custom_runtime.install_lock"))?.insert(path.clone());let root=root.to_path_buf();let returned=record.clone();
     tokio::spawn(async move{let _guard=guard;let log=Log::default();let secrets=crate::runtime_discovery::capture_host_runtime_environment().into_iter().filter(|(key,_)|crate::member_environment::sensitive(key)).map(|(_,value)|value).collect();let redactor=crate::runtime_custom_api::CredentialRedactor::from_values(secrets);
         let result=async{let lock=install(&root,&definition,&reference,&requested_platform,&id,log.clone()).await?;let mut database=database.lock().await;register(&mut database,reference,lock,&id)}.await;
