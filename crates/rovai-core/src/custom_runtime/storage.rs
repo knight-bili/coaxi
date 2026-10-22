@@ -93,11 +93,15 @@ pub fn remove(database:&mut Database,envelope:&CommandEnvelope<Remove>)->Result<
     })
 }
 pub fn migrate(database:&mut Database)->Result<()>{
+    database.connection().execute_batch("PRAGMA foreign_keys=OFF;")?;
+    let result=(||->Result<()>{
     let tx=database.connection_mut().transaction()?;
     ensure!(matches!(crate::db::classify_database_contract(&tx)?,crate::db::DatabaseContractClassification::SupportedMigrationSource(ref marker) if marker.projection_schema_version==163)&&absent(&tx)?,"custom_runtime.schema_source_invalid");
+    crate::db::admit_custom_runtime_kind(&tx)?;
     tx.execute_batch(include_str!("schema.sql"))?;
     tx.execute_batch("INSERT INTO schema_migration(version,applied_at) VALUES(214,datetime('now'));UPDATE rovai_data_contract SET projection_schema_version=164,updated_at=datetime('now') WHERE singleton=1;")?;
     ensure!(matches!(crate::db::classify_database_contract(&tx)?,crate::db::DatabaseContractClassification::Current(ref marker) if marker.projection_schema_version==164),"custom_runtime.schema_target_invalid");tx.commit()?;Ok(())
+    })();let foreign_keys=database.connection().execute_batch("PRAGMA foreign_keys=ON;");result?;foreign_keys?;Ok(())
 }
 fn installed(connection:&Connection)->rusqlite::Result<Vec<(String,String)>>{let mut statement=connection.prepare("SELECT name,sql FROM sqlite_schema WHERE lower(name) GLOB 'custom_runtime_*' AND sql IS NOT NULL ORDER BY name")?;statement.query_map([],|r|Ok((r.get(0)?,r.get(1)?)))?.collect()}
 pub(crate) fn absent(connection:&Connection)->rusqlite::Result<bool>{Ok(installed(connection)?.is_empty())}

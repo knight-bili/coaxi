@@ -5235,6 +5235,19 @@ fn rewrite_gemini_runtime_closed_sets(tx: &Transaction<'_>, reverse: bool) -> Re
     rewrite_added_runtime_closed_sets(tx, reverse, "gemini-cli", "gemini")
 }
 
+/// 自定义程序只扩展 Runtime 闭集，不伪造已实测的内置 Skill 分组。
+pub(crate) fn admit_custom_runtime_kind(tx:&Transaction<'_>)->Result<()>{
+    let triggers={let mut statement=tx.prepare("SELECT name,sql FROM sqlite_schema WHERE type='trigger' AND sql IS NOT NULL ORDER BY name")?;statement.query_map([],|r|Ok((r.get::<_,String>(0)?,r.get::<_,String>(1)?)))?.collect::<rusqlite::Result<Vec<_>>>()?};
+    for(name,_)in &triggers{tx.execute_batch(&format!("DROP TRIGGER \"{}\"",name.replace('"',"\"\"")))?;}
+    for table in DSH_RUNTIME_TABLES{
+        let count:i64=tx.query_row(&format!("SELECT COUNT(*) FROM \"{table}\""),[],|r|r.get(0))?;
+        expand_closed_set(tx,table,"'command-code-cli'","'command-code-cli', 'custom-acp'")?;
+        anyhow::ensure!(tx.query_row(&format!("SELECT COUNT(*) FROM \"{table}\""),[],|r|r.get::<_,i64>(0))?==count,"Custom ACP migration changed existing rows");
+    }
+    for(_,sql)in triggers{tx.execute_batch(&sql)?;}
+    validate_migration_foreign_keys(tx,&DSH_RUNTIME_TABLES)?;Ok(())
+}
+
 fn rewrite_hermes_runtime_closed_sets(tx: &Transaction<'_>, reverse: bool) -> Result<()> {
     rewrite_added_runtime_closed_sets(tx, reverse, "hermes-cli", "hermes")
 }
