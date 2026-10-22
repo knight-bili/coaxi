@@ -50,6 +50,11 @@ pub(super) fn reconcile(
         }};
     }
     match query.operation.as_str() {
+        "configuration.providers.upsert"|"configuration.providers.remove"|"configuration.memberConnection.set"=>{
+            #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Original{command_id:String}
+            let input:Original=serde_json::from_value(query.params)?;
+            crate::command::portable_user_receipt(database.connection(),&query.operation,&input.command_id,client)
+        },
         "runtime.custom.upsert" | "runtime.custom.remove" | "runtime.custom.install" | "runtime.steer.policy.set" => {
             #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Original{command_id:String}
             let input:Original=serde_json::from_value(query.params)?;uuid::Uuid::parse_str(&input.command_id)?;
