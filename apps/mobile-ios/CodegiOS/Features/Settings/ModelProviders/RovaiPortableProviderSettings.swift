@@ -7,7 +7,7 @@ private func portableField(_ value: JSONValue, _ key: String, _ field: JSONValue
     guard case .object(var object) = value else { return value }; object[key] = field; return .object(object)
 }
 private func portableProviderModel(_ type: String) -> JSONValue {
-    if type == "claude_code" { return .object(Dictionary(uniqueKeysWithValues: [("kind", JSONValue.string(type))] + portableClaudeFields.map { ($0.0, .string("")) })) }
+    if type == "claude_code" { return .object(Dictionary(uniqueKeysWithValues: [("kind", JSONValue.string("claude"))] + portableClaudeFields.map { ($0.0, .string("")) })) }
     if type == "codex" { return .object(["kind": .string(type), "customs": .array([]), "excludedOfficials": .array([]), "default": .null]) }
     return .object(["kind": .string("gemini"), "model": .null])
 }

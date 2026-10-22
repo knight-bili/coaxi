@@ -25,7 +25,7 @@ private val portableTypes=listOf("claude_code" to "Claude Code","codex" to "Code
 private val claudeFields=listOf("main" to "主模型","reasoning" to "推理模型","haiku" to "Haiku","sonnet" to "Sonnet","opus" to "Opus","fable" to "Fable","customOption" to "自定义选项","customOptionName" to "选项名称","customOptionDescription" to "选项说明")
 private fun JsonObject.withField(key:String,value:JsonElement)=JsonObject(toMutableMap().apply{put(key,value)})
 private fun portableModel(type:String):JsonObject=when(type){
-    "claude_code"->buildJsonObject{put("kind","claude_code");claudeFields.forEach{put(it.first,"")}}
+    "claude_code"->buildJsonObject{put("kind","claude");claudeFields.forEach{put(it.first,"")}}
     "codex"->buildJsonObject{put("kind","codex");put("customs",JsonArray(emptyList()));put("excludedOfficials",JsonArray(emptyList()));put("default",JsonNull)}
     else->buildJsonObject{put("kind","gemini");put("model",JsonNull)}
 }
