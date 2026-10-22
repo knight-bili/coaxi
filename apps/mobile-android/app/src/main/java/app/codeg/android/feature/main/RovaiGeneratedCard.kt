@@ -76,7 +76,7 @@ import java.util.UUID
                                 val mime=when(path.substringAfterLast('.')){"html"->"text/html";"js"->"text/javascript";"css"->"text/css";"woff2"->"font/woff2";"woff"->"font/woff";"png"->"image/png";"svg"->"image/svg+xml";else->"application/octet-stream"}
                                 return WebResourceResponse(mime,"UTF-8",if(bytes==null)404 else 200,if(bytes==null)"Not Found" else "OK",mapOf("Cache-Control" to "no-store","X-Content-Type-Options" to "nosniff"),ByteArrayInputStream(bytes?:ByteArray(0)))
                             }
-                            override fun onPageFinished(view:WebView,url:String){if(url!=page||!live())return;val init=buildJsonObject{put("channel",channel);put("card",value);put("dark",(context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK)==android.content.res.Configuration.UI_MODE_NIGHT_YES)};view.evaluateJavascript("window.RovaiCardPage?.mount($init);",null)}
+                            override fun onPageFinished(view:WebView,url:String){if(url!=page||!live())return;val init=buildJsonObject{put("channel",channel);put("card",value);put("language",context.resources.configuration.locales[0].toLanguageTag());put("dark",(context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK)==android.content.res.Configuration.UI_MODE_NIGHT_YES)};view.evaluateJavascript("window.RovaiCardPage?.mount($init);",null)}
                         };loadUrl(page)
                     }},onRelease={web->retired.value=true;web.removeJavascriptInterface("RovaiCardNative");web.stopLoading();web.loadUrl("about:blank");web.destroy();previews.clear();requests.clear()})
                 }

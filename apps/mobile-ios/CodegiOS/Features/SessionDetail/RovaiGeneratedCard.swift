@@ -8,6 +8,7 @@ struct RovaiGeneratedCard: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.locale) private var locale
     @State private var index = 0
     @State private var card: JSONValue?, issue: String?, generation: UInt64?
     private var scope: JSONValue {.object(["threadId": .string(threadId), "conversationId": conversationId.map(JSONValue.string) ?? .null, "scopeKind": .string(conversationId == nil ? "public" : child ? "delegation_child" : "single_chat")])}
@@ -16,7 +17,7 @@ struct RovaiGeneratedCard: View {
             if let issue {Text(issue).font(.caption).foregroundStyle(Theme.warning).padding(16)}
             if let card {
                 if (card["cardCount"]?.rvInt ?? 0) > 1 {HStack {Button("上一张") {index -= 1}.disabled(index == 0);Spacer();Text("\(index + 1)/\(card["cardCount"]?.rvInt ?? 0)").font(.caption);Spacer();Button("下一张") {index += 1}.disabled(index + 1 >= (card["cardCount"]?.rvInt ?? 0))}.padding(.horizontal, 16)}
-                RovaiGeneratedCardPage(model: model, card: card, scope: scope, active: scenePhase == .active, dark: colorScheme == .dark, issue: $issue).id(card).frame(maxWidth: .infinity, maxHeight: .infinity)
+                RovaiGeneratedCardPage(model: model, card: card, scope: scope, active: scenePhase == .active, dark: colorScheme == .dark, language: locale.identifier, issue: $issue).id(card).frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if issue == nil {ProgressView("正在读取卡片…").frame(maxWidth: .infinity, maxHeight: .infinity)}
         }.navigationTitle("交互卡片").navigationBarTitleDisplayMode(.inline).toolbar {Button("关闭") {dismiss()}}}
         .task(id: index) {
@@ -30,9 +31,9 @@ struct RovaiGeneratedCard: View {
 }
 
 private struct RovaiGeneratedCardPage: UIViewRepresentable {
-    let model: RovaiWorkspaceModel;let card: JSONValue;let scope: JSONValue;let active: Bool;let dark: Bool
+    let model: RovaiWorkspaceModel;let card: JSONValue;let scope: JSONValue;let active: Bool;let dark: Bool;let language: String
     @Binding var issue: String?
-    func makeCoordinator() -> Coordinator {Coordinator(model: model, card: card, scope: scope, active: active, dark: dark, failure: {issue = $0})}
+    func makeCoordinator() -> Coordinator {Coordinator(model: model, card: card, scope: scope, active: active, dark: dark, language: language, failure: {issue = $0})}
     func makeUIView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration();config.websiteDataStore = .nonPersistent();config.defaultWebpagePreferences.allowsContentJavaScript = true;config.preferences.javaScriptCanOpenWindowsAutomatically = false
         config.userContentController.add(context.coordinator, name: "rovaiCardNative")
@@ -54,14 +55,14 @@ private struct RovaiGeneratedCardPage: UIViewRepresentable {
     }
     @MainActor final class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
         let model: RovaiWorkspaceModel;let card: JSONValue;let scope: JSONValue;let generation: UInt64;let channel = UUID().uuidString.lowercased();let failure: (String) -> Void
-        var active: Bool;var dark: Bool;var retired = false;var page: URL?, ruleId: String?
+        var active: Bool;var dark: Bool;let language: String;var retired = false;var page: URL?, ruleId: String?
         weak var view: WKWebView?
         var previews = Set<String>(), tasks: [String: Task<Void, Never>] = [:]
-        init(model: RovaiWorkspaceModel, card: JSONValue, scope: JSONValue, active: Bool, dark: Bool, failure: @escaping (String) -> Void) {self.model = model;self.card = card;self.scope = scope;self.active = active;self.dark = dark;self.failure = failure;generation = model.connectionGeneration}
+        init(model: RovaiWorkspaceModel, card: JSONValue, scope: JSONValue, active: Bool, dark: Bool, language: String, failure: @escaping (String) -> Void) {self.model = model;self.card = card;self.scope = scope;self.active = active;self.dark = dark;self.language = language;self.failure = failure;generation = model.connectionGeneration}
         private var live: Bool {!retired && active && generation == model.connectionGeneration && page != nil && view?.url == page}
         func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {decisionHandler(!retired && action.targetFrame?.isMainFrame == true && action.request.url == page && action.navigationType == .other ? .allow : .cancel)}
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            guard live else {return};let input = JSONValue.object(["channel": .string(channel), "card": card, "dark": .bool(dark)])
+            guard live else {return};let input = JSONValue.object(["channel": .string(channel), "card": card, "dark": .bool(dark), "language": .string(language)])
             guard let data = try? JSONEncoder().encode(input), let text = String(data: data, encoding: .utf8) else {failure("卡片来源无法显示");return};webView.evaluateJavaScript("window.RovaiCardPage?.mount(\(text));") {_, error in if error != nil {self.failure("卡片页面未能加载")}}
         }
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
