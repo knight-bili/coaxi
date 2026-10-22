@@ -42,12 +42,14 @@ private fun feedbackStatus(value:JsonObject)=when(value.coreText("status")){"pen
 }
 
 /** 独立原生补充面板：普通消息输入及其材料不参与这份反馈。 */
-@Composable fun RovaiUserFeedback(model:RovaiWorkspaceViewModel,threadId:String,conversationId:String?=null,child:Boolean=false,agentId:String?=null,normalInput:(suspend()->JsonObject)?=null,onClose:()->Unit){
+@Composable fun RovaiUserFeedback(model:RovaiWorkspaceViewModel,threadId:String,conversationId:String?=null,child:Boolean=false,agentId:String?=null,normalInput:(suspend()->JsonObject)?=null,nativeMaterials:List<JsonObject>?=null,onClose:()->Unit){
     val coroutine=rememberCoroutineScope();val state=model.state.collectAsState().value;val scope=remember(threadId,conversationId,child){feedbackScope(threadId,conversationId,child)};val generation=remember(scope){model.connectionGeneration}
     val owner="feedback:${scope}";var body by remember(scope){mutableStateOf("")};var selected by remember(scope){mutableStateOf(agentId.orEmpty())};var targets by remember(scope){mutableStateOf<List<JsonObject>>(emptyList())};var run by remember(scope){mutableStateOf("")}
     var records by remember(scope){mutableStateOf<List<JsonObject>>(emptyList())};var previews by remember(scope){mutableStateOf<List<JsonObject>>(emptyList())};var next by remember(scope){mutableStateOf<String?>(null)};var previewNext by remember(scope){mutableStateOf<String?>(null)}
     var packet by remember(scope){mutableStateOf<JsonObject?>(null)};var receipt by remember(scope){mutableStateOf<JsonObject?>(null)};var uncertain by remember(scope){mutableStateOf(false)};var busy by remember(scope){mutableStateOf(false)};var ready by remember(scope){mutableStateOf(false)};var issue by remember(scope){mutableStateOf<String?>(null)}
     val disabled=busy||!ready||state.busy||state.pending!=null||generation!=model.connectionGeneration
+    var nativeOpen by remember(scope){mutableStateOf(false)}
+    if(nativeOpen){RovaiNativeSteer(model,scope,agentId,body,nativeMaterials?:if(conversationId==null)state.thread?.get("composerDraft").coreObject()["attachments"].coreArray()else emptyList()){nativeOpen=false};return}
     suspend fun keep(value:JsonObject?){model.saveBody("$owner:request",value?.toString().orEmpty());packet=value}
     suspend fun read(more:Boolean=false){
         val value=feedbackCall(model,"targets",buildJsonObject{put("scope",scope)});targets=value["targets"].coreArray().filter{agentId==null||it.coreText("agentId")==agentId}
@@ -69,7 +71,7 @@ private fun feedbackStatus(value:JsonObject)=when(value.coreText("status")){"pen
                 item{issue?.let{Text(it,color=CodegTheme.colors.danger)};Text("先预览全文，再交给队员。送到连接不代表模型已阅读。",style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)}
                 if(packet==null){
                     if(agentId==null)item{Text("查看哪位队员的反馈");state.members.filter{member->state.thread?.get("members").coreArray().any{it.coreText("agentId")==member.coreText("agentId")}}.forEach{member->TextButton(enabled=!disabled,onClick={selected=member.coreText("agentId");run=""}){Text((if(selected==member.coreText("agentId"))"✓ " else "")+member.coreText("displayName"))}}}
-                    item{OutlinedTextField(body,{text->body=text;model.rememberBody("$owner:text",text)},Modifier.fillMaxWidth(),label={Text("补充说明")},enabled=!disabled,maxLines=8);Text("${body.codePointCount(0,body.length)}/4096",style=MaterialTheme.typography.bodySmall)}
+                    item{OutlinedTextField(body,{text->body=text;model.rememberBody("$owner:text",text)},Modifier.fillMaxWidth(),label={Text("补充说明")},enabled=!disabled,maxLines=8);Text("${body.codePointCount(0,body.length)}/4096",style=MaterialTheme.typography.bodySmall);TextButton(enabled=!disabled,onClick={nativeOpen=true}){Text("预览原生插话及当前材料")}}
                     items(targets.filter{selected.isEmpty()||it.coreText("agentId")==selected},key={it.coreText("agentRunId")}){target->Row{RadioButton(selected=run==target.coreText("agentRunId"),onClick={run=target.coreText("agentRunId");selected=target.coreText("agentId")},enabled=!disabled);Column{Text(target.coreText("displayName"));Text(target.coreText("agentRunId"),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)}}}
                     item{val target=targets.find{it.coreText("agentRunId")==run};Button(enabled=!disabled&&target?.get("feedbackEnabled")==JsonPrimitive(true)&&target["nativeBindingReady"]==JsonPrimitive(true)&&body.isNotBlank()&&body.codePointCount(0,body.length)<=4096,onClick={work{
                         val request=buildJsonObject{put("schemaVersion",1);put("scope",scope);put("agentId",selected);put("agentRunId",run);put("executionEpoch",target!!["executionEpoch"]!!);putJsonObject("source"){put("kind","live_note")};put("text",body);put("title","");put("fields",JsonArray(emptyList()))}

@@ -58,7 +58,7 @@ fun RovaiPrivateConversation(model:RovaiWorkspaceViewModel,threadId:String,child
         val current=model.query(get,buildJsonObject{put("conversationId",selected);put("composerScope",JsonNull)}).coreObject();val draft=current["draft"].coreObject()
         require(current["conversation"].coreObject().coreText("id")==selected&&draft["attachments"].coreArray().isEmpty()&&draft["quotes"].coreArray().isEmpty()){ "请先处理普通输入中的草稿和材料" }
         buildJsonObject{put("draftRevision",draft.coreLong("revision"))}
-    }){feedback=false;scope.launch{load()}}
+    },nativeMaterials=snapshot["draft"].coreObject()["attachments"].coreArray()){feedback=false;scope.launch{load()}}
     Column(Modifier.fillMaxSize()){
         Row(Modifier.fillMaxWidth().padding(horizontal=12.dp)){TextButton(onClick={scope.launch{close()}}){Text("返回对话")};Text(if(child)"独立帮手" else "队员私聊",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);if(selected!=null)TextButton(onClick={feedback=true}){Text("工作中补充")};TextButton(onClick={scope.launch{load();retainedPage()}},enabled=!loading){Text("刷新")}}
         issue?.let{Text(it,color=CodegTheme.colors.danger,modifier=Modifier.padding(horizontal=16.dp))};if(state.pending!=null)Row(Modifier.padding(horizontal=12.dp)){Text("原操作待核对",Modifier.weight(1f));TextButton(enabled=!state.busy,onClick=model::reconcile){Text("核对")};TextButton(enabled=!state.busy,onClick=model::retry){Text("重试原操作")}}
