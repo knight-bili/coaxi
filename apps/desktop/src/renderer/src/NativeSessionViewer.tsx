@@ -138,11 +138,11 @@ export function NativeTranscriptBody({ data, reader, target, live, visible }: { 
     transcript.current?.querySelector<HTMLElement>(`[data-native-turn-index="${index}"]`)?.scrollIntoView({ block: 'start', behavior: options.smooth ? 'smooth' : 'instant' })
   } }), [])
   const text = useMemo<AdapterMessageText>(() => ({
-    attachedResources: language === 'en' ? 'Attached resources' : '附加资源',
-    toolCallFailed: language === 'en' ? 'Tool call failed' : '工具调用失败',
-    pageHandoffName: handoff => handoff.kind === 'element' ? handoff.label || (language === 'en' ? 'Page element' : '页面元素')
-      : handoff.kind === 'screenshot' ? language === 'en' ? 'Page screenshot' : '页面截图'
-        : language === 'en' ? `${handoff.count} console errors` : `${handoff.count} 条控制台错误`
+    attachedResources: t('附加资源'),
+    toolCallFailed: t('工具调用失败'),
+    pageHandoffName: handoff => handoff.kind === 'element' ? handoff.label || t('页面元素')
+      : handoff.kind === 'screenshot' ? t('页面截图')
+        : t('{0} 条控制台错误', handoff.count)
   }), [language])
   const messages = useMemo(() => adaptNativeMessages(turns, live, text), [turns, live, text])
   const { results } = useMemo(() => nativeToolPairs(turns), [turns])

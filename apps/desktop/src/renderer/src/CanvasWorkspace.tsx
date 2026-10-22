@@ -44,9 +44,9 @@ function BoardCard({ board, summary, name, now, blocked, onOpen, onEdit, onDelet
     const seconds = Math.floor(Math.max(0, now - at) / 1000)
     const [unit, divisor] = seconds >= 86400 ? ['day', 86400] as const : seconds >= 3600 ? ['hour', 3600] as const
       : seconds >= 60 ? ['minute', 60] as const : ['second', 1] as const
-    edited = new Intl.RelativeTimeFormat(language === 'en' ? 'en' : 'zh-CN', { numeric: 'auto' }).format(-Math.floor(seconds / divisor), unit)
+    edited = new Intl.RelativeTimeFormat(language, { numeric: 'auto' }).format(-Math.floor(seconds / divisor), unit)
   }
-  return <article className="canvas-board-item" title={Number.isFinite(at) ? new Date(at).toLocaleString(language === 'en' ? 'en-US' : 'zh-CN') : undefined}
+  return <article className="canvas-board-item" title={Number.isFinite(at) ? new Date(at).toLocaleString(language) : undefined}
     onContextMenu={event => { if ((event.target as HTMLElement).closest('[role="menu"]')) return; event.preventDefault(); openContext(event.clientX, event.clientY) }}>
     <button ref={openButton} className="canvas-board-tile" data-board-id={board.id} type="button" disabled={blocked} aria-label={name} onClick={onOpen}
       onKeyDown={event => { if (event.key === 'ContextMenu' || event.key === 'F10' && event.shiftKey) { event.preventDefault(); event.stopPropagation(); const bounds = event.currentTarget.getBoundingClientRect(); openContext(bounds.left, bounds.bottom) } }} />

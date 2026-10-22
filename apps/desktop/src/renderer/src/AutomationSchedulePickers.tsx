@@ -95,7 +95,7 @@ function localDate(value: string): Date {
 export function automationDateKey(date: Date): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
 }
-const dateLabel = (date: Date): string => new Intl.DateTimeFormat(getInterfaceLanguage() === 'en' ? 'en-US' : 'zh-CN', { year: 'numeric', month: 'long', day: 'numeric' }).format(date)
+const dateLabel = (date: Date): string => new Intl.DateTimeFormat(getInterfaceLanguage(), { calendar: 'gregory', year: 'numeric', month: 'long', day: 'numeric' }).format(date)
 
 export function AutomationDatePicker({ value, onChange, disabled }: {
   value: string
@@ -128,14 +128,14 @@ export function AutomationDatePicker({ value, onChange, disabled }: {
   }} trigger={<button type="button" className="automation-picker automation-schedule-value" aria-label={uiAttribute("日期：{0}", String(value))} disabled={disabled}><AutomationGlyph name="calendar" /><span>{Number.isNaN(selected.getTime()) ? uiAttribute("选择日期") : dateLabel(selected)}</span><AutomationGlyph name="chevron" /></button>} className="automation-date-popover" label={uiAttribute("选择运行日期")} onOpenAutoFocus={(event) => { event.preventDefault(); buttons.current.get(automationDateKey(safeDate))?.focus() }}>
       <div className="automation-calendar-heading">
         <button type="button" aria-label={uiAttribute("上个月")} onClick={() => { const next = new Date(month.getFullYear(), month.getMonth() - 1, 1, 12); setMonth(next); setFocusedDate(automationDateKey(next)) }}><AutomationGlyph name="back" /></button>
-        <strong aria-live="polite">{language === 'en' ? new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long' }).format(month) : <>{month.getFullYear()}<UiText zh={" 年 "} />{month.getMonth() + 1}<UiText zh={" 月"} /></>}</strong>
+        <strong aria-live="polite">{new Intl.DateTimeFormat(language, { calendar: 'gregory', year: 'numeric', month: 'long' }).format(month)}</strong>
         <button type="button" aria-label={uiAttribute("下个月")} onClick={() => { const next = new Date(month.getFullYear(), month.getMonth() + 1, 1, 12); setMonth(next); setFocusedDate(automationDateKey(next)) }}><AutomationGlyph name="back" /></button>
       </div>
-      <div className="automation-calendar-weekdays" aria-hidden="true">{(language === 'en' ? ['M', 'T', 'W', 'T', 'F', 'S', 'S'] : ['一', '二', '三', '四', '五', '六', '日']).map((day, index) => <span key={index}>{day}</span>)}</div>
+      <div className="automation-calendar-weekdays" aria-hidden="true">{Array.from({length:7}, (_, index) => new Intl.DateTimeFormat(language, {weekday:'narrow', timeZone:'UTC'}).format(new Date(Date.UTC(2024, 0, 1 + index)))).map((day, index) => <span key={index}>{day}</span>)}</div>
       <div className="automation-calendar-grid">{days.map((day) => {
         const key = automationDateKey(day)
         return <button ref={(node) => { if (node) buttons.current.set(key, node); else buttons.current.delete(key) }} type="button" key={key} className={`automation-calendar-day ${day.getMonth() !== month.getMonth() ? 'outside' : ''}`} aria-label={dateLabel(day)} aria-pressed={key === value} aria-current={key === today ? 'date' : undefined} tabIndex={key === focusedDate ? 0 : -1} disabled={disabled} onClick={() => { onChange(key); setOpen(false) }} onKeyDown={(event) => {
-          const offsets: Record<string, number> = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7, Home: -(day.getDay() + 6) % 7, End: 6 - (day.getDay() + 6) % 7 }
+          const offsets: Record<string, number> = { ArrowLeft: language === 'ar' ? 1 : -1, ArrowRight: language === 'ar' ? -1 : 1, ArrowUp: -7, ArrowDown: 7, Home: -(day.getDay() + 6) % 7, End: 6 - (day.getDay() + 6) % 7 }
           const offset = offsets[event.key]
           if (offset !== undefined) { event.preventDefault(); const next = new Date(day); next.setDate(next.getDate() + offset); moveFocus(next) }
           else if (event.key === 'PageUp' || event.key === 'PageDown') { event.preventDefault(); const next = new Date(day.getFullYear(), day.getMonth() + (event.key === 'PageUp' ? -1 : 1), 1, 12); moveFocus(next) }
