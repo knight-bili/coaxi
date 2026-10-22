@@ -2773,7 +2773,10 @@ impl AgentProfileService {
             }
             let custom_ref=envelope.payload.custom_runtime_ref.as_ref();
             if (envelope.payload.adapter_kind==AdapterKind::CustomAcp)!=custom_ref.is_some(){return Ok(CommandHandlerResult::rejected("custom_runtime.reference_required",json!({})))}
-            let custom_ready=if let Some(reference)=custom_ref{Some(configurable_custom_runtime(transaction,reference)?)}else{None};
+            let custom_ready=if let Some(reference)=custom_ref{match configurable_custom_runtime(transaction,reference){Ok(runtime)=>Some(runtime),Err(error)=>{
+                if error.chain().any(|cause|cause.downcast_ref::<rusqlite::Error>().is_some_and(|sql|!matches!(sql,rusqlite::Error::QueryReturnedNoRows))){return Err(error)}
+                return Ok(CommandHandlerResult::rejected("custom_runtime.configuration_unavailable",json!({"agentId":envelope.payload.agent_id,"definitionId":reference.id})))
+            }}}else{None};
             let Some(ready) =
                 custom_ready.or(configurable_managed_runtime(transaction, envelope.payload.adapter_kind)?)
             else {
