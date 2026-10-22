@@ -4791,6 +4791,7 @@ export interface ResolveRuntimeInteractionParams {
 }
 
 export type CoreMethod =
+  | 'runtime.custom.registry'
   | 'runtime.custom.list' | 'runtime.custom.upsert' | 'runtime.custom.remove' | 'runtime.custom.install' | 'runtime.custom.inspect'
   | 'commands.reconcile'
   | 'preferences.newConversation.get'

@@ -25,6 +25,7 @@ enum RovaiOperation: String, Sendable {
     case runtimeCustomRemove = "runtime.custom.remove"
     case runtimeCustomInstall = "runtime.custom.install"
     case runtimeCustomInspect = "runtime.custom.inspect"
+    case runtimeCustomRegistry = "runtime.custom.registry"
     case officeWatch = "office.watch"
     case forgeAccountsGet = "forge.accounts.get"
     case forgeAccountsSet = "forge.accounts.set"

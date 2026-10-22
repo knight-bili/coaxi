@@ -25,6 +25,7 @@ enum class RovaiOperation(val wire:String) {
     RUNTIME_CUSTOM_REMOVE("runtime.custom.remove"),
     RUNTIME_CUSTOM_INSTALL("runtime.custom.install"),
     RUNTIME_CUSTOM_INSPECT("runtime.custom.inspect"),
+    RUNTIME_CUSTOM_REGISTRY("runtime.custom.registry"),
     OFFICE_WATCH("office.watch"),
     FORGE_ACCOUNTS_GET("forge.accounts.get"),
     FORGE_ACCOUNTS_SET("forge.accounts.set"),

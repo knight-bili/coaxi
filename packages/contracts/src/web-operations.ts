@@ -24,6 +24,7 @@ export const WEB_OPERATIONS = [
   'runtime.custom.remove',
   'runtime.custom.install',
   'runtime.custom.inspect',
+  'runtime.custom.registry',
   'office.watch',
   'forge.accounts.get',
   'forge.accounts.set',

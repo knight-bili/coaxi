@@ -3,6 +3,11 @@ use crate::custom_runtime::{self as custom,CustomRuntimeRefV1,storage};
 
 impl Core{
     pub(super) async fn custom_runtime_access(&self,method:&str,value:Value)->Result<Value>{
+        if method=="runtime.custom.registry"{
+            #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Request{refresh:bool}
+            let input:Request=serde_json::from_value(value)?;let mut catalog=custom::registry::catalog(input.refresh).await?;
+            let registered={let database=self.database.lock().await;let mut query=database.connection().prepare("SELECT registry_id FROM custom_runtime_head WHERE removed=0 ORDER BY registry_id")?;query.query_map([],|r|r.get::<_,String>(0))?.collect::<rusqlite::Result<Vec<_>>>()?};catalog["registeredIds"]=json!(registered);catalog["platform"]=json!(custom::installer::platform().ok());return Ok(catalog)
+        }
         custom::validate_operation(method,&value)?;
         match method{
             "runtime.custom.list"=>{let database=self.database.lock().await;storage::list(database.connection(),value["after"].as_str(),value["limit"].as_u64().context("custom_runtime.limit_invalid")? as u32)},

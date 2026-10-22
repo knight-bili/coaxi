@@ -51,6 +51,8 @@ pub enum Operation {
     CustomRuntimeInstall,
     #[serde(rename="runtime.custom.inspect")]
     CustomRuntimeInspect,
+    #[serde(rename="runtime.custom.registry")]
+    CustomRuntimeRegistry,
     #[serde(rename="office.watch")]
     OfficeWatch,
     #[serde(rename = "forge.accounts.get")]
@@ -579,6 +581,7 @@ impl Operation {
             Self::CustomRuntimeUpsert | Self::CustomRuntimeRemove => select_fields(&value,&["commandId","commandType","status","code","payload","resultEntity","recordedAt"]),
             Self::CustomRuntimeInstall => select_fields(&value,&["commandId","reference","platform","state","startedAt","completedAt","log","info","error"]),
             Self::CustomRuntimeInspect => select_fields(&value,&["reference","definition","platform","installation"]),
+            Self::CustomRuntimeRegistry => select_fields(&value,&["registryUrl","sourceDigest","fetchedAt","cached","entries","registeredIds","platform"]),
             Self::CustomSkillPrepare => select_fields(&value,&["skillId","sourceRevision"]),
             Self::CustomSkillInstall => select_fields(&value,&["status","code","payload"]),
             Self::OfficeSkillPrepare => select_fields(&value,&["planId","skillId","sourceRevision","content","contentDigest","binaryDigest"]),
@@ -685,6 +688,7 @@ impl Operation {
             Self::CustomRuntimeRemove => "runtime.custom.remove",
             Self::CustomRuntimeInstall => "runtime.custom.install",
             Self::CustomRuntimeInspect => "runtime.custom.inspect",
+            Self::CustomRuntimeRegistry => "runtime.custom.registry",
             Self::OfficeWatch => "office.watch",
             Self::ForgeOperation => "forge.operation",
             Self::WorkbenchOrganizerGet => "workbench.organizer.get",

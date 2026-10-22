@@ -1,0 +1,16 @@
+{
+  "scope": "user_interface_only",
+  "modelVisible": false,
+  "operation": "runtime.custom.registry",
+  "inputSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["refresh"],
+    "properties": {"refresh": {"type": "boolean"}}
+  },
+  "sourceRepository": "codeg",
+  "sourceCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
+  "sourceFile": "src-tauri/src/acp/remote_registry.rs",
+  "url": "https://cdn.agentclientprotocol.com/registry/v1/latest/registry.json",
+  "behavior": "Explicit user catalog read; bounded to 8 MiB and 4096 entries; ten-minute cache; no installation, model invocation or credential projection. The confirmed five management operations and model input shapes remain unchanged."
+}
