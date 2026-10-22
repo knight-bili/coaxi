@@ -1,7 +1,7 @@
 import { useEffect,useRef,useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import type { FeedbackPreview,FeedbackPreviewRequest,FeedbackReceipt,FeedbackScope,FeedbackSubmit,FeedbackTarget } from '@contracts'
-import { useThreadClient } from './camp-client'
+import { useFeedbackRequest } from './FeedbackRequestProvider'
 import { useUiText } from './interface-language'
 import { readErrorMessage } from './error-message'
 import './user-feedback.css'
@@ -10,14 +10,13 @@ export const feedbackStatusText:Record<FeedbackReceipt['status'],string>={pendin
 export type FeedbackDraft=Pick<FeedbackPreviewRequest,'source'|'text'|'title'|'fields'>
 /** 用户看到 Core 冻结的完整文字后才能提交；重试复用同一预览编号作为命令 UUID。 */
 export function FeedbackSubmitDialog({scope,agentId,draft,recovery,onClose,onSubmitted}:{scope:FeedbackScope;agentId?:string;draft?:FeedbackDraft;recovery?:FeedbackPreview;onClose():void;onSubmitted?(receipt:FeedbackReceipt):void}):React.JSX.Element{
-  const client=useThreadClient(),t=useUiText(),lifetime=useRef(0)
+  const request=useFeedbackRequest(),t=useUiText(),lifetime=useRef(0)
   const [targets,setTargets]=useState<FeedbackTarget[]>([]),[selected,setSelected]=useState(''),[preview,setPreview]=useState<FeedbackPreview|null>(recovery??null),[receipt,setReceipt]=useState<FeedbackReceipt|null>(null)
   const [busy,setBusy]=useState(false),[error,setError]=useState(''),[uncertain,setUncertain]=useState(false)
   const scopeKey=JSON.stringify(scope)
-  const request=<T,>(action:string,payload:unknown)=>client.request<T>('feedback.operation',{action,payload})
   useEffect(()=>{const observed=++lifetime.current;if(recovery)return()=>{lifetime.current++};setBusy(true)
     void request<{targets:FeedbackTarget[];truncated:boolean}>('targets',{scope}).then(value=>{if(observed!==lifetime.current)return;const available=value.targets.filter(row=>!agentId||row.agentId===agentId);setTargets(available);if(available.length===1)setSelected(available[0].agentRunId);if(value.truncated)setError(t('任务列表达到读取上限，请在对应私聊中选择队员。'))}).catch(reason=>{if(observed===lifetime.current)setError(readErrorMessage(reason))}).finally(()=>{if(observed===lifetime.current)setBusy(false)});return()=>{lifetime.current++}
-  },[client,scopeKey,agentId,recovery])
+  },[request,scopeKey,agentId,recovery])
   const target=targets.find(row=>row.agentRunId===selected)
   const prepare=async():Promise<void>=>{
     if(!target||!draft||busy)return

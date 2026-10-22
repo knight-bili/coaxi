@@ -83,10 +83,12 @@ export function ThreadClientProvider({ client, children }: {
   return <ThreadClientContext.Provider value={client}>{children}</ThreadClientContext.Provider>
 }
 
+export function useOptionalThreadClient():ThreadClient|null{return useContext(ThreadClientContext)}
+
 export function useThreadClient(): ThreadClient {
   // Existing Desktop mounts retain their real bridge. Browser/review mounts must
   // inject a client; no global window.rovai shim or empty-result fallback is created.
-  const client = useContext(ThreadClientContext)
+  const client = useOptionalThreadClient()
   if (client) return client
   if (typeof window === 'undefined' || window.rovai) return desktopThreadClient
   throw new Error(uiAttribute('共享页面缺少 ThreadClientProvider；浏览器不能使用 Desktop 默认适配。'))
