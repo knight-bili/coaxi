@@ -209,6 +209,7 @@ pub struct NativeSkillDiscoveryRequest<'a> {
 }
 
 impl NativeSkillDiscovery {
+    pub fn discover_custom(&self,roots:&[PathBuf],refresh:bool)->Result<NativeSkillScan>{self.request(refresh).discover_custom(roots)}
     pub fn invalidate_cache(&self) {
         if let Ok(mut cache) = self.cache.lock() {
             cache.entries.clear();
@@ -284,6 +285,15 @@ impl NativeSkillDiscovery {
 }
 
 impl NativeSkillDiscoveryRequest<'_> {
+    /// 只读当前队员锁定的声明目录。专用目录在前，同名技能按先到者保留。
+    pub fn discover_custom(&mut self,roots:&[PathBuf])->Result<NativeSkillScan>{
+        ensure!(roots.len()<=2,"custom_runtime.skill_roots_invalid");let mut scan=NativeSkillScan{skills:Vec::new(),errors:Vec::new()};let mut names=HashSet::new();let mut files=HashSet::new();let mut directories=HashSet::new();
+        for root in roots{ensure!(root.is_absolute(),"custom_runtime.skill_directory_not_absolute");let key=directory_key(root);if !directories.insert(key.clone()){continue}
+            let directory=self.directories.entry(key.clone()).or_insert_with(||self.discovery.ensure_directory(&key,AdapterKind::CustomAcp,self.refresh));scan.errors.extend(directory.errors.iter().cloned());
+            for skill in &directory.skills{if names.contains(&skill.name)||files.contains(&skill.canonical_path){continue}names.insert(skill.name.clone());files.insert(skill.canonical_path.clone());scan.skills.push(NativeSkill{id:skill.id.clone(),name:skill.name.clone(),description:skill.description.clone(),entry_path:root.join(&skill.relative_entry_path).to_string_lossy().into_owned(),canonical_path:skill.canonical_path.clone(),source_scope:"user".into(),adapter_kind:AdapterKind::CustomAcp});}
+        }
+        scan.skills.sort_by(|left,right|left.name.cmp(&right.name).then_with(||left.entry_path.cmp(&right.entry_path)));Ok(scan)
+    }
     pub fn discover(
         &mut self,
         adapter: AdapterKind,
@@ -515,6 +525,7 @@ fn user_roots(
     let agents = home.join(".agents/skills");
     let claude = home.join(".claude/skills");
     match adapter {
+        AdapterKind::CustomAcp => {},
         AdapterKind::CodexCli => {
             paths.push(agents);
             paths.push(
@@ -653,6 +664,7 @@ fn project_roots(adapter: AdapterKind, project: &Path) -> Vec<(&'static str, Pat
         }
     }
     let parts: &[&str] = match adapter {
+        AdapterKind::CustomAcp => &[],
         AdapterKind::CodexCli => &[".agents/skills", ".codex/skills"],
         AdapterKind::ClaudeCodeCli => &[".claude/skills"],
         AdapterKind::Pi => &[".pi/skills", ".agents/skills"],

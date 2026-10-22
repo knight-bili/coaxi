@@ -15,6 +15,12 @@ impl sealed::Sealed for Remove{}
 impl DomainCommand for Remove{const TYPE:&'static str="runtime.custom.remove";const EXACT_REPLAY:bool=true;}
 fn entity(id:&str)->Option<EntityReference>{Some(EntityReference{entity_type:"custom_runtime_definition".into(),entity_id:id.into()})}
 fn reject(code:&str)->CommandHandlerResult{CommandHandlerResult::rejected(code,json!({}))}
+/// 当前队员的具体定义与安装是目录归属真源，不接受前端传入的目录。
+pub fn member_skill_roots(connection:&Connection,agent_id:&str)->Result<Vec<std::path::PathBuf>>{
+    let selected:bool=connection.query_row("SELECT selected_runtime_adapter_kind='custom-acp' AND profile_status<>'removed' FROM agent_profile WHERE id=?1",[agent_id],|row|row.get(0))?;
+    ensure!(selected,"custom_runtime.member_binding_required");let reference=member_reference(connection,agent_id)?.context("custom_runtime.reference_required")?;resolve(connection,&reference,true)?;let(_,lock)=installed_lock(connection,&reference)?;
+    let roots=lock["skillRoots"].as_array().context("custom_runtime.skill_roots_invalid")?;roots.iter().map(|value|{let root=std::path::PathBuf::from(value.as_str().context("custom_runtime.skill_directory_invalid")?);ensure!(root.is_absolute(),"custom_runtime.skill_directory_not_absolute");Ok(root)}).collect()
+}
 pub fn latest(connection:&Connection,id:&str)->Result<Option<Value>>{
     let raw:Option<String>=connection.query_row("SELECT d.value_json FROM custom_runtime_head h JOIN custom_runtime_definition d ON d.id=h.id AND d.revision=h.revision WHERE h.id=?1 AND h.removed=0",[id],|r|r.get(0)).optional()?;
     raw.map(|text|serde_json::from_str(&text).map_err(Into::into)).transpose()

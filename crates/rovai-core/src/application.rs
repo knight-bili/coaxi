@@ -1642,6 +1642,8 @@ struct SkillIdParams {
 struct NativeSkillsListParams {
     adapter_kind: String,
     #[serde(default)]
+    agent_id: Option<String>,
+    #[serde(default)]
     refresh: bool,
 }
 
@@ -9804,6 +9806,7 @@ impl Core {
                 let params: NativeSkillsListParams =
                     serde_json::from_value(request.params.clone())?;
                 let kind: rovai_core::agent_profile::AdapterKind = params.adapter_kind.parse()?;
+                let custom_roots=if kind==AdapterKind::CustomAcp{let agent_id=params.agent_id.as_deref().context("custom_runtime.member_binding_required")?;let database=self.database.lock().await;Some(rovai_core::custom_runtime::storage::member_skill_roots(database.connection(),agent_id)?)}else{anyhow::ensure!(params.agent_id.is_none(),"Native Skill member selection only applies to a custom Runtime");None};
                 let configuration = self
                     .runtime_search_environment
                     .read()
@@ -9811,7 +9814,7 @@ impl Core {
                     .startup_configuration(kind);
                 let discovery = self.native_skill_discovery.clone();
                 let scan = tokio::task::spawn_blocking(move || {
-                    discovery.discover(kind, None, true, params.refresh, &configuration)
+                    if let Some(roots)=custom_roots{discovery.discover_custom(&roots,params.refresh)}else{discovery.discover(kind,None,true,params.refresh,&configuration)}
                 })
                 .await??;
                 let mut database = self.database.lock().await;
@@ -9864,7 +9867,7 @@ impl Core {
             "skills.candidates" => {
                 let params: ThreadSkillCandidatesParams =
                     serde_json::from_value(request.params.clone())?;
-                let (project_path, roster, toolbox_rows, old_projection_paths) = {
+                let (project_path, roster, toolbox_rows, old_projection_paths, custom_skill_roots) = {
                     let database = self.database.lock().await;
                     let project_path: String = database.connection().query_row(
                         "SELECT COALESCE((SELECT working_directory FROM mission_workspace WHERE camp_id = camp.id AND state = 'ready' ORDER BY created_at DESC LIMIT 1), project_path) FROM camp WHERE id = ?1",
@@ -9892,7 +9895,8 @@ impl Core {
                     let old_projection_paths = old
                         .query_map([], |row| row.get::<_, String>(0))?
                         .collect::<rusqlite::Result<BTreeSet<_>>>()?;
-                    (project_path, roster, toolbox_rows, old_projection_paths)
+                    let custom_skill_roots=roster.iter().filter(|(_,kind)|kind.as_deref()==Some("custom-acp")).map(|(id,_)|(id.clone(),rovai_core::custom_runtime::storage::member_skill_roots(database.connection(),id).map_err(|error|error.to_string()))).collect::<BTreeMap<_,_>>();
+                    (project_path, roster, toolbox_rows, old_projection_paths, custom_skill_roots)
                 };
                 let project = PathBuf::from(project_path);
                 let project = project.is_absolute().then_some(project);
@@ -9949,6 +9953,7 @@ impl Core {
                                 .parse::<rovai_core::agent_profile::AdapterKind>()
                                 .map_err(|_| format!("unknown Runtime {kind}"))
                                 .and_then(|kind| {
+                                    if kind==AdapterKind::CustomAcp{return custom_skill_roots.get(&member_id).cloned().unwrap_or_else(||Err("custom_runtime.member_binding_required".into())).and_then(|roots|request.discover_custom(&roots).map_err(|error|error.to_string()))}
                                     request
                                         .discover(
                                             kind,
