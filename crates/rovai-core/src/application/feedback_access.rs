@@ -69,6 +69,12 @@ impl Core{
             "preview"=>{let input:feedback::PreviewRequest=serde_json::from_value(request.payload.clone())?;feedback::validate_shape("previewRequest",&request.payload)?;let mut database=self.database.lock().await;Ok(serde_json::to_value(feedback::storage::preview(database.connection_mut(),input)?)?)},
             "submit"=>{let input:feedback::SubmitRequest=serde_json::from_value(request.payload.clone())?;feedback::validate_shape("submitRequest",&request.payload)?;let mut database=self.database.lock().await;let receipt=feedback::storage::submit(database.connection_mut(),input)?;emit(&self.output,"feedback.changed",json!({"threadId":receipt.scope.thread_id,"feedbackId":receipt.feedback_id}));Ok(serde_json::to_value(receipt)?)},
             "list"=>{let input:Listing=serde_json::from_value(request.payload)?;let database=self.database.lock().await;feedback::storage::list(database.connection(),&input.scope,&input.agent_id,input.after.as_deref())},
+            "previews.list"=>{
+                let input:Listing=serde_json::from_value(request.payload)?;let database=self.database.lock().await;feedback::storage::scope(database.connection(),&input.scope,&input.agent_id)?;if let Some(after)=&input.after{uuid::Uuid::parse_str(after)?;}
+                let mut query=database.connection().prepare("SELECT p.id,p.result_json,e.id FROM ui_feedback_preview p LEFT JOIN ui_feedback_entry e ON e.preview_id=p.id WHERE json_extract(p.request_json,'$.scope.threadId')=?1 AND json_extract(p.request_json,'$.scope.scopeKind')=?2 AND json_extract(p.request_json,'$.scope.conversationId') IS ?3 AND json_extract(p.request_json,'$.agentId')=?4 AND(?5 IS NULL OR(p.created_at,p.id)>(SELECT created_at,id FROM ui_feedback_preview WHERE id=?5)) ORDER BY p.created_at,p.id LIMIT 51")?;
+                let mut rows=query.query_map(rusqlite::params![input.scope.thread_id,input.scope.scope_kind,input.scope.conversation_id,input.agent_id,input.after],|row|Ok((row.get::<_,String>(0)?,row.get::<_,String>(1)?,row.get::<_,Option<String>>(2)?)))?.collect::<rusqlite::Result<Vec<_>>>()?;let more=rows.len()>50;rows.truncate(50);let next=if more{rows.last().map(|row|row.0.clone())}else{None};
+                let items=rows.into_iter().map(|(_,raw,id)|Ok(json!({"preview":serde_json::from_str::<Value>(&raw)?,"receipt":id.map(|id|feedback::storage::receipt(database.connection(),&id)).transpose()?}))).collect::<Result<Vec<_>>>()?;Ok(json!({"items":items,"next":next}))
+            },
             _=>anyhow::bail!("feedback.invalid_operation")
         }
     }
