@@ -14,6 +14,7 @@ pub(crate) mod codex_catalog;
 pub(crate) mod normalize;
 pub(crate) mod archive_store;
 pub(crate) mod migration;
+pub(crate) mod files;
 mod model;
 pub use model::*;
 
