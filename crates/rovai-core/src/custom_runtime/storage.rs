@@ -26,6 +26,16 @@ pub fn resolve(connection:&Connection,reference:&CustomRuntimeRefV1,selectable:b
     if selectable{let head=latest(connection,&reference.id)?.context("custom_runtime.removed")?;ensure!(head["revision"]==value["revision"]&&value["enabled"]==true,"custom_runtime.definition_changed")}
     Ok(value)
 }
+pub(crate) fn member_reference(connection:&Connection,member:&str)->Result<Option<CustomRuntimeRefV1>>{let raw:Option<String>=connection.query_row("SELECT reference_json FROM custom_runtime_member WHERE member_id=?1",[member],|r|r.get(0)).optional()?;raw.map(|raw|serde_json::from_str(&raw).map_err(Into::into)).transpose()}
+pub(crate) fn installed_lock(connection:&Connection,reference:&CustomRuntimeRefV1)->Result<(String,Value)>{
+    reference.validate()?;let platform=super::installer::platform()?;
+    let(id,raw):(String,String)=connection.query_row("SELECT installation_id,lock_json FROM custom_runtime_installation WHERE definition_id=?1 AND definition_revision=?2 AND platform=?3 AND lock_json IS NOT NULL",params![reference.id,reference.definition_revision,platform],|r|Ok((r.get(0)?,r.get(1)?))).context("custom_runtime.installation_missing")?;
+    let value:Value=serde_json::from_str(&raw)?;validate("launchLock",&value)?;ensure!(value["definition"]==serde_json::to_value(reference)?&&value["platform"]==platform,"custom_runtime.installation_scope_changed");Ok((id,value))
+}
+pub(crate) fn frozen(connection:&Connection,reference:&CustomRuntimeRefV1,installation:&str)->Result<FrozenCustomRuntimeV1>{
+    let definition=resolve(connection,reference,false)?;let(id,lock)=installed_lock(connection,reference)?;ensure!(id==installation,"custom_runtime.installation_scope_changed");
+    Ok(FrozenCustomRuntimeV1{schema_version:1,reference:reference.clone(),registry_id:text(&definition,"registryId")?.into(),source:text(&definition,"source")?.into(),distribution_kind:text(&definition,"distributionKind")?.into(),resolved_definition:definition,launch_lock_digest:digest(&lock)?,declared_mcp:lock["supportsMcpDeclared"].as_bool().context("custom_runtime.mcp_declaration_invalid")?,declared_skill_roots:lock["skillRoots"].as_array().context("custom_runtime.skill_roots_invalid")?.iter().map(|v|v.as_str().map(str::to_owned).context("custom_runtime.skill_root_invalid")).collect::<Result<_>>()?,observed_capabilities_digest:lock["protocolCapabilitiesDigest"].as_str().map(str::to_owned)})
+}
 pub fn list(connection:&Connection,after:Option<&str>,limit:u32)->Result<Value>{
     ensure!((1..=100).contains(&limit),"custom_runtime.limit_invalid");
     let mut statement=connection.prepare("SELECT d.value_json FROM custom_runtime_head h JOIN custom_runtime_definition d ON d.id=h.id AND d.revision=h.revision WHERE h.removed=0 AND (?1 IS NULL OR h.id>?1) ORDER BY h.id LIMIT ?2")?;

@@ -2770,8 +2770,11 @@ impl AgentProfileService {
                     json!({ "agentId": envelope.payload.agent_id }),
                 ));
             }
+            let custom_ref=envelope.payload.custom_runtime_ref.as_ref();
+            if (envelope.payload.adapter_kind==AdapterKind::CustomAcp)!=custom_ref.is_some(){return Ok(CommandHandlerResult::rejected("custom_runtime.reference_required",json!({})))}
+            let custom_ready=if let Some(reference)=custom_ref{Some(configurable_custom_runtime(transaction,reference)?)}else{None};
             let Some(ready) =
-                configurable_managed_runtime(transaction, envelope.payload.adapter_kind)?
+                custom_ready.or(configurable_managed_runtime(transaction, envelope.payload.adapter_kind)?)
             else {
                 return Ok(CommandHandlerResult::rejected(
                     "runtime_configuration_unavailable",
@@ -2788,7 +2791,7 @@ impl AgentProfileService {
                 ));
             }
             let mut binding = ResolvedRuntimeBinding {
-                custom_runtime_ref: None,
+                custom_runtime_ref: custom_ref.cloned(),
                 adapter_kind: envelope.payload.adapter_kind,
                 installation_id: ready.installation_id.clone(),
                 model: envelope.payload.model.clone(),
@@ -2853,6 +2856,7 @@ impl AgentProfileService {
                 )?;
             }
             let now = chrono::Utc::now().to_rfc3339();
+            if let Some(reference)=&binding.custom_runtime_ref{transaction.execute("INSERT INTO custom_runtime_member(member_id,reference_json) VALUES(?1,?2) ON CONFLICT(member_id) DO UPDATE SET reference_json=excluded.reference_json",params![envelope.payload.agent_id,serde_json::to_string(reference)?])?;}else{transaction.execute("DELETE FROM custom_runtime_member WHERE member_id=?1",[&envelope.payload.agent_id])?;}
             transaction.execute(
                 r#"
                 UPDATE agent_profile
@@ -2924,6 +2928,7 @@ impl AgentProfileService {
                     envelope.payload.expected_version,
                 ],
             )?;
+            transaction.execute("DELETE FROM custom_runtime_member WHERE member_id=?1",[&envelope.payload.agent_id])?;
             Ok(profile_updated_result(
                 &envelope.payload.agent_id,
                 version + 1,
@@ -3682,7 +3687,7 @@ impl AgentProfileService {
             (None, None, None, None) => None,
             (Some(adapter_kind), Some(installation_id), Some(model), Some(permissions)) => {
                 Some(ResolvedRuntimeBinding {
-                    custom_runtime_ref: None,
+                    custom_runtime_ref: if adapter_kind=="custom-acp"{crate::custom_runtime::storage::member_reference(database.connection(),&raw.id)?}else{None},
                     adapter_kind: AdapterKind::from_str(&adapter_kind)?,
                     installation_id,
                     model: serde_json::from_str(&model)
@@ -3698,7 +3703,7 @@ impl AgentProfileService {
             resolved_runtime_binding
                 .as_ref()
                 .map(|binding| MemberRuntimeConfiguration {
-                    custom_runtime_ref: None,
+                    custom_runtime_ref: binding.custom_runtime_ref.clone(),
                     adapter_kind: binding.adapter_kind,
                     model: binding.model.clone(),
                     permissions: binding.permissions.clone(),
@@ -4198,7 +4203,7 @@ fn provisional_runtime_protocol(adapter_kind: AdapterKind) -> &'static str {
         | AdapterKind::GrokBuild
         | AdapterKind::DeepseekHarness
         | AdapterKind::CommandCodeCli => "acp-v1",
-        AdapterKind::ClineCli => "acp-v1",
+        AdapterKind::ClineCli | AdapterKind::CustomAcp => "acp-v1",
         AdapterKind::ZcodeApp => crate::zcode::PROTOCOL,
     }
 }
@@ -4408,7 +4413,7 @@ pub(crate) fn resolve_rebound_runtime_on_connection(
     let mut rebound = match resolve_frozen_runtime_binding_with_snapshot(
         connection,
         &ResolvedRuntimeBinding {
-            custom_runtime_ref: None,
+            custom_runtime_ref: frozen.custom_runtime.as_ref().map(|custom|custom.reference.clone()),
             adapter_kind: frozen.adapter_kind,
             installation_id: frozen.installation_id.clone(),
             model,
@@ -4532,7 +4537,7 @@ pub fn resolve_frozen_runtime(
     // remain outer errors so a database outage cannot be mistaken for bad input.
     let binding = (|| -> Result<ResolvedRuntimeBinding> {
         Ok(ResolvedRuntimeBinding {
-            custom_runtime_ref: None,
+            custom_runtime_ref: if selected_runtime_adapter_kind=="custom-acp"{crate::custom_runtime::storage::member_reference(transaction,agent_id)?}else{None},
             adapter_kind: AdapterKind::from_str(&selected_runtime_adapter_kind)?,
             installation_id: installation_id.clone(),
             model: serde_json::from_str(&model_json)?,
@@ -4753,6 +4758,14 @@ fn resolve_frozen_runtime_binding_with_snapshot(
         frozen.binding_compatibility_digest = canonical_json_digest(&json!({
             "native": frozen.binding_compatibility_digest, "customApi": identity
         }))?;
+    }
+    if adapter_kind==AdapterKind::CustomAcp{
+        let reference=binding.custom_runtime_ref.as_ref().context("custom_runtime.reference_missing")?;
+        let custom=crate::custom_runtime::storage::frozen(transaction,reference,&frozen.installation_id)?;
+        let identity=crate::custom_runtime::digest(&serde_json::to_value(&custom)?)?;
+        frozen.host_config_digest=canonical_json_digest(&json!({"native":frozen.host_config_digest,"customRuntime":identity}))?;
+        frozen.binding_compatibility_digest=canonical_json_digest(&json!({"native":frozen.binding_compatibility_digest,"customRuntime":identity}))?;
+        frozen.custom_runtime=Some(custom);
     }
     frozen.refresh_config_digest()?;
     Ok(Ok(frozen))
@@ -5057,6 +5070,13 @@ struct ConfigurableManagedRuntime {
     permission_schema_version: i64,
     models_json: String,
     permissions_json: String,
+}
+
+fn configurable_custom_runtime(transaction:&Transaction<'_>,reference:&CustomRuntimeRefV1)->Result<ConfigurableManagedRuntime>{
+    crate::custom_runtime::storage::resolve(transaction,reference,true)?;
+    let(installation_id,_)=crate::custom_runtime::storage::installed_lock(transaction,reference)?;
+    let generation:i64=transaction.query_row("SELECT generation FROM adapter_installation WHERE id=?1 AND adapter_kind='custom-acp' AND enabled=1",[&installation_id],|r|r.get(0))?;
+    Ok(ConfigurableManagedRuntime{installation_id,installation_generation:generation,permission_schema_version:1,models_json:"[]".into(),permissions_json:"[]".into()})
 }
 
 fn configurable_managed_runtime(
