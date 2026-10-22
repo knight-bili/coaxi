@@ -18,6 +18,8 @@ import kotlinx.serialization.json.*
 /** Codeg account/snapshot rows, controlling the connected Host's saved WebDAV connection. */
 @Composable fun RovaiWebdavSettings(model:RovaiWorkspaceViewModel,onClose:()->Unit){
     val scope=rememberCoroutineScope();val generation=model.connectionGeneration
+    var configurationSync by remember{mutableStateOf(false)}
+    if(configurationSync){RovaiConfigurationSyncSettings(model){configurationSync=false};return}
     var saved by remember{mutableStateOf(buildJsonObject{})};var endpoint by remember{mutableStateOf("")};var username by remember{mutableStateOf("")};var password by remember{mutableStateOf("")}
     var clearPassword by remember{mutableStateOf(false)};var insecure by remember{mutableStateOf(false)};var dirty by remember{mutableStateOf(false)}
     var busy by remember{mutableStateOf(false)};var issue by remember{mutableStateOf<String?>(null)};var message by remember{mutableStateOf<String?>(null)}
@@ -36,6 +38,7 @@ import kotlinx.serialization.json.*
     Column(Modifier.fillMaxSize()){
         Row(Modifier.fillMaxWidth().padding(12.dp)){Text("主机WebDAV",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(enabled=!busy,onClick={if(dirty)leaving=true else onClose()}){Text("返回")}}
         LazyColumn(Modifier.weight(1f),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
+            item{TextButton(enabled=!busy&&!dirty,onClick={configurationSync=true}){Text("主机配置自动上传")}}
             item{issue?.let{Text(it,color=CodegTheme.colors.danger)};message?.let{Text(it,color=CodegTheme.colors.textSecondary)}}
             item{GlassRow{
                 Text("连接的主机使用此账号保存加密副本。密码留空保留当前账号密码。",style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)

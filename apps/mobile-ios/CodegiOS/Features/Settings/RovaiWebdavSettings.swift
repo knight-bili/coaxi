@@ -13,6 +13,7 @@ struct RovaiWebdavSettings: View {
     private var connected: Bool {saved["revision"] != nil && saved["revision"] != .null}
     var body: some View {
         Form {
+            Section { NavigationLink("主机配置自动上传") { RovaiConfigurationSyncSettings(model: model) }.disabled(dirty || busy) }
             if let issue {Section {Text(issue).foregroundStyle(Theme.warning)}}
             if let message {Section {Text(message).font(.caption).foregroundStyle(Theme.textSecondary)}}
             account
