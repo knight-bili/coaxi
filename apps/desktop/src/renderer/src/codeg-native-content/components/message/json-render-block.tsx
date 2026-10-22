@@ -46,6 +46,7 @@ import {
   isSpecStream,
 } from "../../lib/json-render/spec"
 import { cn } from "../../ui/source-primitives"
+import { CardFeedbackFieldsProvider,CardFeedbackFooter,feedbackControl } from "../../../../CardFeedbackFields"
 
 /**
  * json-render's Link semantics on Codeg's link: `press` fires first, and an
@@ -121,6 +122,12 @@ function chart(type: ChartType) {
 const { registry } = defineRegistry(jsonRenderCatalog, {
   components: {
     ...shadcnComponents,
+    Input: feedbackControl(shadcnComponents.Input,"Input"),
+    Textarea: feedbackControl(shadcnComponents.Textarea,"Textarea"),
+    Select: feedbackControl(shadcnComponents.Select,"Select"),
+    Checkbox: feedbackControl(shadcnComponents.Checkbox,"Checkbox"),
+    Radio: feedbackControl(shadcnComponents.Radio,"Radio"),
+    Switch: feedbackControl(shadcnComponents.Switch,"Switch"),
     Card,
     Link,
     AreaChart: chart("AreaChart"),
@@ -160,13 +167,14 @@ export default function JsonRenderBlock({
   if (!spec) return <>{fallback}</>
   return (
     <div className="my-3 w-full min-w-0" data-json-render="">
-      <JSONUIProvider registry={registry} initialState={spec.state ?? {}}>
+      <CardFeedbackFieldsProvider><JSONUIProvider registry={registry} initialState={spec.state ?? {}}>
         <Renderer
           spec={spec}
           registry={registry}
           loading={mode === "streaming"}
         />
-      </JSONUIProvider>
+        <CardFeedbackFooter source={source} streaming={mode==="streaming"}/>
+      </JSONUIProvider></CardFeedbackFieldsProvider>
     </div>
   )
 }
