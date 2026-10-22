@@ -2441,6 +2441,7 @@ struct ClaudeInputAcceptanceTarget<'a> {
 
 struct Core {
     interaction_tools: Arc<crate::interaction_tools::broker::Broker>,
+    interaction_bindings: Mutex<HashMap<String,BuiltinToolBindingCredential>>,
     native_child_readers: crate::runtime_subagent_session::reader::Registry,
     canvas_terminals: Arc<crate::canvas_terminal::manager::Manager>,
     execution_wake: crate::execution_wake::ExecutionWake,
@@ -14991,25 +14992,29 @@ impl Core {
     }
 
     async fn prepare_agent_run_mcp_projection(
-        &self,
+        self: &Arc<Self>,
         execution: &AgentRunExecution,
     ) -> Result<PreparedMcpProjection> {
         self.subsystems.require("mcp")?;
         let execution_root = PathBuf::from(&execution.workspace.execution_root);
+        let interaction = if let Some(policy) = self.interaction_policy_for_run(execution).await? {
+            let credential = self.prepare_initial_builtin_tool_binding(execution,execution.native_session_resume_disposition()).await?;
+            Some(self.prepare_interaction_transport(execution,&policy,&credential).await?)
+        } else {None};
         let mut projection = {
             let database = self.database.lock().await;
-            self.mcp_projection.prepare(
-                &database,
-                self.mcp_config()?,
-                &McpProjectionRequest {
-                    agent_run_id: &execution.agent_run_id,
-                    execution_epoch: execution.execution_epoch,
-                    agent_id: &execution.agent_id,
-                    adapter_kind: execution.runtime.adapter_kind,
-                    reported_runtime_version: execution.runtime.reported_version.as_deref(),
-                    execution_root: &execution_root,
-                },
-            )?
+            let request = McpProjectionRequest {
+                agent_run_id: &execution.agent_run_id,
+                execution_epoch: execution.execution_epoch,
+                agent_id: &execution.agent_id,
+                adapter_kind: execution.runtime.adapter_kind,
+                reported_runtime_version: execution.runtime.reported_version.as_deref(),
+                execution_root: &execution_root,
+            };
+            match interaction {
+                Some((definition,digest)) => self.mcp_projection.prepare_interaction(&database,self.mcp_config()?,&request,definition,&digest)?,
+                None => self.mcp_projection.prepare(&database,self.mcp_config()?,&request)?,
+            }
         };
         if execution.runtime.adapter_kind == AdapterKind::GrokBuild
             && !projection.servers.is_empty()
@@ -15241,6 +15246,16 @@ impl Core {
         execution: &AgentRunExecution,
         resume_disposition: NativeSessionResumeDisposition,
     ) -> Result<BuiltinToolBindingCredential> {
+        if self.interaction_policy_for_run(execution).await?.is_some() {
+            let mut cache = self.interaction_bindings.lock().await;
+            let key = format!("{}:{}",execution.agent_run_id,execution.execution_epoch);
+            if let Some(binding) = cache.get(&key) {return Ok(binding.clone());}
+            anyhow::ensure!(cache.len()<4096,"interaction.binding_capacity");
+            let mut database = self.database.lock().await;
+            let binding = TeamToolService::default().prepare_binding_credential(&mut database,&execution.agent_run_id,execution.execution_epoch,true)?;
+            cache.insert(key,binding.clone());
+            return Ok(binding);
+        }
         Ok({
             let mut database = self.database.lock().await;
             let service = TeamToolService::default();
@@ -19622,6 +19637,7 @@ async fn run_core(
         planned_shutdown.generation().to_owned(),
     )?;
     let core = Arc::new(Core {
+        interaction_bindings: Mutex::new(HashMap::new()),
         interaction_tools: Arc::new(crate::interaction_tools::broker::Broker::new(&data_dir)),
         native_child_readers: crate::runtime_subagent_session::reader::Registry::new(planned_shutdown.generation().to_owned()),
         canvas_terminals,
@@ -27833,7 +27849,8 @@ mod tests {
 
         let planned_shutdown = PlannedShutdownCoordinator::new(uuid::Uuid::new_v4().to_string());
         Ok(Core {
-            interaction_tools: Arc::new(crate::interaction_tools::broker::Broker::new(&data_dir)),
+            interaction_bindings: Mutex::new(HashMap::new()),
+        interaction_tools: Arc::new(crate::interaction_tools::broker::Broker::new(&data_dir)),
         native_child_readers: crate::runtime_subagent_session::reader::Registry::new(planned_shutdown.generation().to_owned()),
             canvas_terminals: crate::canvas_terminal::manager::Manager::new(
                 data_dir.clone(),

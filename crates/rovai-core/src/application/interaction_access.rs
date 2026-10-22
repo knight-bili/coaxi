@@ -46,6 +46,85 @@ fn require_binding(database: &Database, broker: &Broker, binding: &Value) -> Res
     Ok(())
 }
 impl Core {
+    pub(super) async fn interaction_policy_for_run(&self, execution: &AgentRunExecution) -> Result<Option<tools::Policy>> {
+        let policy = self.interaction_tools.policies.read()?;
+        if !policy.features(&execution.agent_id).any() { return Ok(None); }
+        let capability = AgentRuntimeAdapterRegistry::default().mcp_projection(execution.runtime.adapter_kind);
+        if capability.external_mcp_projection == crate::agent_runtime_adapter::ExternalMcpProjection::Unsupported || !capability.supports_stdio { return Ok(None); }
+        let database = self.database.lock().await;
+        // 已冻结且原来没配备工具的 Run 不在途中获得新目录。
+        let exposure: Option<String> = database.connection().query_row("SELECT mcp_exposure_json FROM context_manifest WHERE agent_run_id=?1", [&execution.agent_run_id], |row| row.get(0)).optional()?;
+        if let Some(exposure) = exposure {
+            let value: Value = serde_json::from_str(&exposure)?;
+            if !value["servers"].as_array().is_some_and(|servers| servers.iter().any(|entry| entry["serverId"] == tools::SERVER_NAME)) { return Ok(None); }
+        }
+        // 已确认的帮手续接合同要求保留原生绑定；没有隔离续接证据前只保留原能力。
+        if crate::delegation_resume::validate_session(database.connection(), &execution.agent_run_id)?.is_some() { return Ok(None); }
+        Ok(Some(policy))
+    }
+    pub(super) async fn prepare_interaction_transport(
+        self: &Arc<Self>, execution: &AgentRunExecution, policy: &tools::Policy,
+        credential: &BuiltinToolBindingCredential,
+    ) -> Result<(crate::mcp::McpServerDefinition, String)> {
+        use crate::builtin_tool_transport::LocalIpcEndpoint;
+        use crate::platform::private_storage::{prepare_private_directory, atomic_write_private_json};
+        let features = policy.features(&execution.agent_id);
+        let bridge_id = uuid::Uuid::new_v4().to_string();
+        let catalog_digest = digest(&json!({"schemaVersion":1,"tools":features.catalog()}))?;
+        let policy_digest = digest(&serde_json::to_value(policy)?)?;
+        let catalog_policy_digest = digest(&json!({"catalogDigest":catalog_digest,"policyDigest":policy_digest}))?;
+        let database = self.database.lock().await;
+        let (kind, membership): (String,i64) = database.connection().query_row("SELECT c.kind,camp.membership_generation FROM conversation c JOIN camp ON camp.id=c.camp_id WHERE c.id=?1 AND c.agent_id=?2",rusqlite::params![execution.conversation_id,execution.agent_id],|row|Ok((row.get(0)?,row.get(1)?)))?;
+        let scope_kind = match kind.as_str() { "camp_member" => "public", "single_chat" => "single_chat", "delegation_child" => "delegation_child", _ => anyhow::bail!("scope_changed") };
+        let peers = self.interaction_tools.peers()?;
+        // 多个桌面同时在线时要求先由本机窗口确定唯一 peer，不能随机选机器。
+        let usable: Vec<_> = peers.iter().filter(|peer| peer["capabilities"].as_array().is_some_and(|capabilities| (!features.browser || capabilities.iter().any(|capability| capability == "browser")) && (!features.computer || capabilities.iter().any(|capability| capability == "computer")))).collect();
+        ensure!(usable.len() == 1, "desktop_unavailable");
+        let binding = json!({"schemaVersion":1,"bridgeInstanceId":bridge_id,"coreInstanceId":self.interaction_tools.core_instance(),"desktopPeerId":usable[0]["desktopPeerId"],"scope":{"threadId":execution.camp_id,"conversationId":if scope_kind=="public"{None}else{Some(execution.conversation_id.as_str())},"scopeKind":scope_kind},"agentId":execution.agent_id,"agentRunId":execution.agent_run_id,"executionEpoch":execution.execution_epoch,"nativeBindingId":credential.native_binding_id,"nativeBindingGeneration":credential.native_binding_generation,"nativeSessionId":credential.native_session_id,"membershipGeneration":membership,"permissionRevision":policy.revision,"catalogDigest":catalog_digest,"policyDigest":policy_digest,"expiresAt":(Utc::now()+chrono::Duration::minutes(120)).to_rfc3339(),"revocationEpoch":0});
+        require_binding(&database,&self.interaction_tools,&binding)?;
+        let secret = self.interaction_tools.register(binding.clone(),features)?;
+        drop(database);
+        let directory = self.data_dir.join("interaction-tools/bridges").join(&bridge_id);
+        prepare_private_directory(&directory)?;
+        #[cfg(windows)]
+        let endpoint = LocalIpcEndpoint::WindowsNamedPipe { name:format!(r"\\.\pipe\rovai-ai-{}-{}",std::process::id(),uuid::Uuid::new_v4()) };
+        #[cfg(unix)]
+        let endpoint = LocalIpcEndpoint::UnixSocket { path: std::env::temp_dir().join(format!("rvi-{}",uuid::Uuid::new_v4().simple())).join("i").to_string_lossy().into_owned() };
+        #[cfg(not(any(unix,windows)))]
+        anyhow::bail!("runtime_unavailable");
+        let mut listener = LocalIpcListener::bind(&endpoint)?;
+        let config = crate::interaction_tools::stdio::ProcessConfig { schema_version:1,core_endpoint:endpoint.clone(),bridge_instance_id:bridge_id.clone(),secret:secret.clone() };
+        let config_path = directory.join("process.json");
+        atomic_write_private_json(&config_path,&config)?;
+        atomic_write_private_json(&directory.join("binding.json"),&binding)?;
+        let definition = crate::mcp::McpServerDefinition::Stdio { command:std::env::current_exe()?.to_string_lossy().into_owned(),args:vec!["--interaction-mcp".into(),"--config".into(),config_path.to_string_lossy().into_owned()],cwd:Some(execution.workspace.execution_root.clone()),env:Default::default() };
+        let evidence = json!({"schemaVersion":1,"bindingDigest":digest(&binding)?,"catalogDigest":catalog_digest,"configurationDigest":digest(&serde_json::to_value(&definition)?)?,"adapterKind":execution.runtime.adapter_kind.as_str(),"reportedRuntimeVersion":execution.runtime.reported_version,"nativeSessionId":credential.native_session_id,"deliveryKind":"mcp_stdio","state":"candidate","runtimeToolNames":[],"transportEvidenceDigest":null,"realToolCallEvidenceDigest":null,"modelImageInputEvidenceDigest":null,"recordedAt":Utc::now().to_rfc3339()});
+        tools::validate_shape("deliveryEvidence",&evidence)?;
+        atomic_write_private_json(&directory.join("delivery-evidence.json"),&evidence)?;
+        let core = Arc::downgrade(self);
+        tokio::spawn(async move {
+            let capacity = Arc::new(tokio::sync::Semaphore::new(32));
+            let mut tasks = tokio::task::JoinSet::new();
+            loop {
+                while tasks.try_join_next().is_some() {}
+                let Some(core) = core.upgrade() else { break; };
+                if core.interaction_tools.authenticated_binding(&bridge_id,&secret).is_err() { break; }
+                {
+                    let database = core.database.lock().await;
+                    if require_binding(&database,&core.interaction_tools,&binding).is_err() { let _=core.interaction_tools.disconnect(&bridge_id); break; }
+                }
+                let accepted = tokio::time::timeout(std::time::Duration::from_secs(1),listener.accept()).await;
+                let stream = match accepted { Ok(Ok(stream))=>stream, Err(_)=>continue, Ok(Err(_))=>break };
+                let Ok(permit) = capacity.clone().try_acquire_owned() else { drop(stream); continue; };
+                tasks.spawn(async move { let _permit=permit; let _=serve_connection(core,stream).await; });
+            }
+            tasks.abort_all();
+            drop(listener);
+            #[cfg(unix)]
+            if let LocalIpcEndpoint::UnixSocket{path} = endpoint { if let Some(parent)=Path::new(&path).parent(){let _=std::fs::remove_dir(parent);} }
+        });
+        Ok((definition,catalog_policy_digest))
+    }
     pub(super) async fn interaction_access(&self, value: Value) -> Result<Value> {
         let input: Request = serde_json::from_value(value)?;
         let broker = &self.interaction_tools;
