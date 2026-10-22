@@ -19,3 +19,5 @@ pub mod launch_req;
 pub mod spawn;
 #[cfg(target_os="macos")]
 pub mod tcc;
+
+pub mod stop_shortcut;

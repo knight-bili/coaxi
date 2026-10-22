@@ -11,3 +11,7 @@ impl GrantLevel {pub fn allows(self,required:Self)->bool{fn rank(v:GrantLevel)->
 pub struct ComputerSwitch(std::sync::Arc<std::sync::atomic::AtomicBool>);
 impl ComputerSwitch {pub async fn is_enabled(&self)->bool{self.0.load(std::sync::atomic::Ordering::Acquire)} pub fn set(&self,value:bool){self.0.store(value,std::sync::atomic::Ordering::Release)}}
 pub fn current_platform()->String{let os=match std::env::consts::OS{"macos"=>"darwin",v=>v};format!("{os}-{}",std::env::consts::ARCH)}
+
+pub mod model_tools;
+pub mod native_service;
+pub mod native_events;
