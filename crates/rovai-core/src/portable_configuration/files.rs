@@ -8,7 +8,7 @@ fn preferences(root:&Path)->Result<PathBuf>{
     let configured=crate::backup::owned_roots::configured(root)?;
     Ok(configured.into_iter().find(|value|value.id=="desktop_preferences"&&value.kind=="preferences").map(|value|value.path).unwrap_or_else(||root.into()))
 }
-fn path(root:&Path,target:&str)->Result<PathBuf>{
+pub(super) fn path(root:&Path,target:&str)->Result<PathBuf>{
     Ok(match target{
         "messageLibrary"=>root.join("workspace-metadata/global-v1.json"),
         "taskTemplates"=>root.join("portable-configuration/task-templates-v1.json"),
@@ -32,8 +32,8 @@ pub(crate) fn read(root:&Path,target:&str)->Result<Value>{
 pub(crate) fn basis(root:&Path,targets:&[String])->Result<Value>{
     let mut values=serde_json::Map::new();for target in targets{let destination=path(root,target)?;values.insert(target.clone(),json!({"ownerPath":destination,"value":read(root,target)?}));}Ok(Value::Object(values))
 }
-pub(crate) fn enqueue(connection:&Connection,command:&str,domain:&str,target:&str,before:&Value,after:&Value)->Result<()>{
-    let value=json!({"before":before,"after":after});ensure!(serde_json::to_vec(&value)?.len()<=MAX_REQUEST,"configuration.file_outbox_too_large");
+pub(crate) fn enqueue(connection:&Connection,root:&Path,command:&str,domain:&str,target:&str,before:&Value,after:&Value)->Result<()>{
+    let value=json!({"before":before,"after":after,"ownerPath":path(root,target)?});ensure!(serde_json::to_vec(&value)?.len()<=MAX_REQUEST,"configuration.file_outbox_too_large");
     let now=chrono::Utc::now().to_rfc3339();connection.execute("INSERT INTO configuration_file_outbox(command_id,domain,target_id,state,expected_digest,value_json,created_at,updated_at) VALUES(?1,?2,?3,'pending',?4,?5,?6,?6)",params![command,domain,target,digest(before)?,serde_json::to_string(&value)?,now])?;Ok(())
 }
 pub(crate) fn statuses(connection:&Connection,command:&str)->Result<Vec<Value>>{

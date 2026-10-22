@@ -189,7 +189,7 @@ fn undo_on(tx:&Transaction<'_>,root:&Path,command:&str,private:&Value)->Result<V
                 tx.execute("UPDATE agent_profile SET version=version+1,default_model_selection_json=?2,updated_at=?3 WHERE id=?1",params![id,before["modelJson"].as_str(),chrono::Utc::now().to_rfc3339()])?;changed.push(id.to_owned());
             },
             "quickMessages"|"taskTemplates"|"agentSettings"|"preferences"=>{
-                let current=files::read(root,id)?;files::enqueue(tx,command,domain,id,&current,&before["value"])?;
+                let current=files::read(root,id)?;files::enqueue(tx,root,command,domain,id,&current,&before["value"])?;
             },
             _=>anyhow::bail!("configuration.undo_domain_unknown"),
         }
@@ -270,7 +270,7 @@ fn apply_on(tx:&Transaction<'_>,root:&Path,client:&str,command:&str,preview:&Val
     }
     for(target,(domain,after))in file_updates{
         let before=&private["basis"]["files"][&target];let mut after_basis=before.clone();after_basis["value"]=after.clone();
-        files::enqueue(tx,command,&domain,&target,&before["value"],&after)?;remember(tx,command,&domain,&target,before,&after_basis)?;
+        files::enqueue(tx,root,command,&domain,&target,&before["value"],&after)?;remember(tx,command,&domain,&target,before,&after_basis)?;
     }
     Ok(json!({"counts":counts,"changedMembers":changed,"files":files::statuses(tx,command)?}))
 }

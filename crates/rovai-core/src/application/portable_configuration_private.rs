@@ -15,6 +15,17 @@ impl Core{
     }
     async fn portable_configuration_private_inner(&self,method:&str,value:Value,client:&crate::draft_client::DraftClient)->Result<Value>{
         ensure!(serde_json::to_vec(&value)?.len()<=configuration::MAX_REQUEST,"configuration.request_too_large");
+        if matches!(method,"configuration.desktopOwner.pending"|"configuration.desktopOwner.acknowledge"){
+            ensure!(client.is_desktop(),"configuration.desktop_owner_required");
+            let _lock=crate::workbench::MUTATIONS.lock().await;let database=self.database.lock().await;
+            return if method=="configuration.desktopOwner.pending"{
+                configuration::desktop_owner::pending(database.connection(),&self.data_dir,serde_json::from_value(value)?)
+            }else{
+                let command=value["commandId"].as_str().context("configuration.command_required")?.to_owned();
+                let result=configuration::desktop_owner::acknowledge(database.connection(),&self.data_dir,serde_json::from_value(value)?)?;
+                emit(&self.output,"portableConfiguration.filesChanged",json!({"commandId":command,"readReceipt":true}));Ok(result)
+            }
+        }
         if method=="configuration.secrets.prepare"{
             let mut database=self.database.lock().await;return secrets::prepare(&mut database,client.id(),&value)
         }

@@ -15,6 +15,7 @@ pub(crate) mod normalize;
 pub(crate) mod archive_store;
 pub(crate) mod migration;
 pub(crate) mod files;
+pub(crate) mod desktop_owner;
 pub(crate) mod library;
 pub(crate) mod preferences;
 pub(crate) mod launch;
