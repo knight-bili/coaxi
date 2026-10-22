@@ -35,6 +35,14 @@ private fun monitoringMoney(value:JsonElement?):String=value.coreArray().joinToS
 
 /** Ports RuntimeMonitoring's sparse metrics and filters; the page never collects transcripts or bills. */
 @Composable fun RovaiMonitoring(model:RovaiWorkspaceViewModel){
+    var selected by remember{mutableIntStateOf(0)}
+    Column(Modifier.fillMaxSize()){
+        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(6.dp)){listOf("运行监控","用量看板","原生历史用量").forEachIndexed{index,title->FilterChip(selected=selected==index,onClick={selected=index},label={Text(title)})}}
+        Box(Modifier.weight(1f)){when(selected){0->RovaiRuntimeMonitoring(model);1->RovaiUsageDashboard(model,false);else->RovaiUsageDashboard(model,true)}}
+    }
+}
+
+@Composable private fun RovaiRuntimeMonitoring(model:RovaiWorkspaceViewModel){
     val scope=rememberCoroutineScope();val context=LocalContext.current;val lifecycle=LocalLifecycleOwner.current
     val generation=model.connectionGeneration;val gate=remember{Mutex()}
     var range by remember{mutableStateOf("24h")};var runtime by remember{mutableStateOf("")};var provider by remember{mutableStateOf("")};var selectedModel by remember{mutableStateOf("")};var costKind by remember{mutableStateOf("")}
