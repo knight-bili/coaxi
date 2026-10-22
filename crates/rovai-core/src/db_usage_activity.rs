@@ -10,6 +10,7 @@ CREATE TABLE runtime_usage_activity (
     provider_key TEXT NOT NULL,
     model_key TEXT NOT NULL,
     project_root TEXT,
+    partial_observations INTEGER NOT NULL CHECK(partial_observations>=0),
     prompt_input_total_tokens INTEGER CHECK(prompt_input_total_tokens IS NULL OR prompt_input_total_tokens>=0),
     uncached_input_tokens INTEGER CHECK(uncached_input_tokens IS NULL OR uncached_input_tokens>=0),
     cache_read_tokens INTEGER CHECK(cache_read_tokens IS NULL OR cache_read_tokens>=0),
