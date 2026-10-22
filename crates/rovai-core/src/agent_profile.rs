@@ -4092,7 +4092,7 @@ fn merge_persisted_dsh_options(
     Ok(models)
 }
 
-fn upsert_static_capability_snapshot(
+pub(crate) fn upsert_static_capability_snapshot(
     transaction: &Transaction<'_>,
     installation_id: &str,
     snapshot: &AdapterCapabilitySnapshot,

@@ -7,6 +7,7 @@ use std::sync::LazyLock;
 pub mod storage;
 pub(crate) mod artifacts;
 pub(crate) mod packages;
+pub(crate) mod installer;
 mod schema;
 pub const MAX_BYTES:usize=2*1024*1024;
 pub const MAX_DEFINITIONS:i64=4096;
