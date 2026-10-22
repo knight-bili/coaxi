@@ -4583,6 +4583,9 @@ pub fn resolve_frozen_runtime(
     )?;
     if let Ok(runtime) = &mut result {
         crate::camp_fast::freeze(transaction, conversation_id, agent_id, runtime)?;
+        if let Some(prepared)=crate::native_lifecycle::continuation::runtime_for_conversation(transaction,conversation_id,agent_id,runtime)?{
+            *runtime=prepared;
+        }
     }
     Ok(result)
 }

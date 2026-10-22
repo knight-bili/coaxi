@@ -6,6 +6,12 @@ impl Core{
         if method=="runtime.steer.materials.prepare"{return self.native_steer_materials(value,&client).await}
         native::validate_operation(method,&value)?;
         match method{
+            "history.execution.preview"=>self.native_continuation_preview(value,&client).await,
+            "history.execution.confirm"=>self.native_continuation_confirm(value,&client).await,
+            "history.execution.receipt"=>{
+                let command=value["commandId"].as_str().context("native_lifecycle.command_id_required")?;
+                let database=self.database.lock().await;native::continuation::receipt(database.connection(),command,client.id(),self.interaction_tools.core_instance())
+            },
             "runtime.steer.policy.get"=>{let database=self.database.lock().await;storage::policy(database.connection())},
             "runtime.steer.policy.set"=>{
                 let command_id=value["commandId"].as_str().context("native_lifecycle.command_id_required")?.to_owned();

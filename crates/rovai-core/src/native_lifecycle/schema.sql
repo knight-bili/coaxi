@@ -40,6 +40,11 @@ CREATE TABLE native_lifecycle_continuation (
  reported_session_id TEXT,preparation_evidence_json TEXT CHECK(preparation_evidence_json IS NULL OR json_valid(preparation_evidence_json)),
  created_at TEXT NOT NULL,updated_at TEXT NOT NULL
 );
+CREATE TABLE native_lifecycle_continuation_preview (
+ preview_id TEXT PRIMARY KEY NOT NULL REFERENCES native_lifecycle_preview(id),
+ source_snapshot_digest TEXT NOT NULL,initialize_digest TEXT,
+ runtime_json TEXT NOT NULL CHECK(json_valid(runtime_json) AND length(runtime_json)<=2097152)
+);
 CREATE TABLE native_lifecycle_steer_policy (
  singleton INTEGER PRIMARY KEY NOT NULL CHECK(singleton=1), revision INTEGER NOT NULL CHECK(revision>=0),
  value_json TEXT NOT NULL CHECK(json_valid(value_json) AND length(value_json)<=2097152)
