@@ -36,6 +36,7 @@ fun RovaiPortableMemberConnection(model:RovaiWorkspaceViewModel,agentId:String,d
     Column(verticalArrangement=Arrangement.spacedBy(8.dp)){
         Text("模型服务商",style=MaterialTheme.typography.titleSmall)
         Text("明确选择后只用于之后的新任务；原任务保留原服务商版本。",style=MaterialTheme.typography.bodySmall)
+        if(binding["runtime"]==JsonNull)Text("原运行程序在当前主机尚不可用。请先保存上面的本机程序设置，再刷新连接；旧任务保留原连接。",style=MaterialTheme.typography.bodySmall)
         Box{
             val selected=providers.find{it.coreText("id")==choice.coreObject().coreText("id")&&it["revision"]==choice.coreObject()["revision"]}
             OutlinedButton(onClick={menu=true},enabled=!unavailable&&pending==null){Text(if(choice is JsonNull)"使用程序原有配置" else selected?.coreText("name")?:"保留已选历史版本")}

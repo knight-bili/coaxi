@@ -20,6 +20,9 @@ struct RovaiPortableMemberConnection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("明确选择后只用于之后的新任务；原任务保留原服务商版本。").font(.caption).foregroundStyle(Theme.textSecondary)
+            if binding["runtime"] == .null {
+                Text("原运行程序在当前主机尚不可用。请先保存上面的本机程序设置，再刷新连接；旧任务保留原连接。").font(.caption).foregroundStyle(Theme.textSecondary)
+            }
             Picker("服务商", selection: $selected) {
                 Text("使用程序原有配置").tag("default")
                 if original != .null { Text("保留原连接版本").tag("original") }
