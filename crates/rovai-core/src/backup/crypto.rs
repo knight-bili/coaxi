@@ -128,6 +128,12 @@ pub fn encrypt_file(
     passphrase: &str,
     cancel: &CancellationToken,
 ) -> Result<(), AppCommandError> {
+    let reader = BufReader::new(File::open(src).map_err(AppCommandError::io)?);
+    let writer = BufWriter::new(File::create(dest).map_err(AppCommandError::io)?);
+    encrypt_stream(reader, writer, passphrase, cancel)
+}
+
+fn encrypt_stream<R: Read, W: Write>(mut reader: R, mut out: W, passphrase: &str, cancel: &CancellationToken) -> Result<(), AppCommandError> {
     let mut salt = [0u8; SALT_LEN];
     let mut nonce_prefix = [0u8; NONCE_PREFIX_LEN];
     rand::rngs::OsRng.fill_bytes(&mut salt);
@@ -144,11 +150,6 @@ pub fn encrypt_file(
         nonce_prefix_b64: B64.encode(nonce_prefix),
         chunk_size: DEFAULT_CHUNK_SIZE,
     };
-
-    let reader = File::open(src).map_err(AppCommandError::io)?;
-    let mut reader = BufReader::new(reader);
-    let out = File::create(dest).map_err(AppCommandError::io)?;
-    let mut out = BufWriter::new(out);
 
     // Write the cleartext header.
     out.write_all(ENVELOPE_MAGIC).map_err(AppCommandError::io)?;
@@ -195,9 +196,12 @@ pub fn decrypt_file(
     passphrase: &str,
     cancel: &CancellationToken,
 ) -> Result<(), AppCommandError> {
-    let reader = File::open(src).map_err(AppCommandError::io)?;
-    let mut reader = BufReader::new(reader);
+    let reader = BufReader::new(File::open(src).map_err(AppCommandError::io)?);
+    let writer = BufWriter::new(File::create(dest).map_err(AppCommandError::io)?);
+    decrypt_stream(reader, writer, passphrase, cancel)
+}
 
+fn decrypt_stream<R: Read, W: Write>(mut reader: R, mut out: W, passphrase: &str, cancel: &CancellationToken) -> Result<(), AppCommandError> {
     let header = read_header(&mut reader)?;
     // The envelope header is attacker-controlled; validate every field that
     // drives an allocation (chunk_size) or CPU/memory work (Argon2 params)
@@ -222,9 +226,6 @@ pub fn decrypt_file(
         .map_err(|e| AppCommandError::task_execution_failed("Cipher init failed").with_detail(e.to_string()))?;
     let nonce = GenericArray::from_slice(&nonce_prefix);
     let mut dec = DecryptorBE32::from_aead(cipher, nonce);
-
-    let out = File::create(dest).map_err(AppCommandError::io)?;
-    let mut out = BufWriter::new(out);
 
     let block = header.chunk_size + GCM_TAG_LEN;
     let mut cur = read_block(&mut reader, block).map_err(AppCommandError::io)?;
@@ -323,4 +324,31 @@ fn bad_passphrase_error() -> AppCommandError {
 fn corrupt_header_error() -> AppCommandError {
     AppCommandError::invalid_input("Malformed backup envelope header")
         .with_i18n(BACKUP_I18N_KEY_BAD_PASSPHRASE, Default::default())
+}
+
+
+/// 配置迁移沿既有 STREAM 容器读写内存，秘密和导入口令不写明文临时文件。
+pub(crate) fn encrypt_bytes(bytes: &[u8], passphrase: &str, limit: usize) -> Result<Vec<u8>, AppCommandError> {
+    if bytes.len() > limit { return Err(AppCommandError::invalid_input("Configuration exceeds memory limit")); }
+    let mut writer = BoundedConfigurationBytes { bytes: Vec::new(), limit };
+    encrypt_stream(bytes, &mut writer, passphrase, &CancellationToken::new())?;
+    Ok(writer.bytes)
+}
+
+pub(crate) fn decrypt_bytes(bytes: &[u8], passphrase: &str, limit: usize) -> Result<Vec<u8>, AppCommandError> {
+    if bytes.len() > limit { return Err(AppCommandError::invalid_input("Configuration exceeds memory limit")); }
+    let mut writer = BoundedConfigurationBytes { bytes: Vec::new(), limit };
+    decrypt_stream(bytes, &mut writer, passphrase, &CancellationToken::new())?;
+    Ok(writer.bytes)
+}
+
+struct BoundedConfigurationBytes { bytes: Vec<u8>, limit: usize }
+impl Write for BoundedConfigurationBytes {
+    fn write(&mut self, value: &[u8]) -> io::Result<usize> {
+        if self.bytes.len().checked_add(value.len()).is_none_or(|length| length > self.limit) {
+            return Err(io::Error::other("Configuration exceeds memory limit"));
+        }
+        self.bytes.extend_from_slice(value); Ok(value.len())
+    }
+    fn flush(&mut self) -> io::Result<()> { Ok(()) }
 }

@@ -45,6 +45,6 @@ pub(crate) fn retained(connection:&Connection,root:&Path,client:&str,id:&str,exp
     let metadata:Value=serde_json::from_str(&metadata)?;
     ensure!(metadata["contentDigest"].as_str()==Some(digest(&original)?.as_str()),"configuration.archive_content_changed");
     // 已保存的是解密后的完整源 JSON；不保存原导入口令，也不再次询问口令。
-    let mut parsed=archive::parse(&serde_json::to_vec(&original)?,"",None)?;
+    let mut parsed=archive::parse_retained(&serde_json::to_vec(&original)?)?;
     ensure!(parsed.source_kind==kind,"configuration.archive_kind_changed");parsed.source_digest=source;Ok(parsed)
 }

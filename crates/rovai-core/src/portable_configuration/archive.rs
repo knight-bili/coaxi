@@ -53,20 +53,30 @@ fn check_codeg_domain(name:&str,value:&Value)->Result<()>{
     }
 }
 pub(crate) fn parse(bytes:&[u8],passphrase:&str,manifest:Option<&Value>)->Result<ParsedArchive>{
+    parse_inner(bytes,passphrase,manifest,false)
+}
+pub(super) fn parse_retained(bytes:&[u8])->Result<ParsedArchive>{parse_inner(bytes,"",None,true)}
+fn parse_inner(bytes:&[u8],passphrase:&str,manifest:Option<&Value>,retained:bool)->Result<ParsedArchive>{
     ensure!(bytes.len()<=MAX_ARCHIVE,"configuration.archive_too_large");
     let source_digest=format!("sha256:{:x}",Sha256::digest(bytes));
-    let mut value:Value=serde_json::from_slice(bytes).map_err(|_|anyhow::anyhow!("configuration.archive_json_invalid"))?;
-    let encrypted=value.get("codegConfigEncryption").is_some();
+    let binary=bytes.starts_with(crate::backup::crypto::ENVELOPE_MAGIC);
+    let decoded=if binary{Some(crate::backup::crypto::decrypt_bytes(bytes,passphrase,MAX_ARCHIVE).map_err(|_|anyhow::anyhow!("configuration.archive_decryption_failed"))?)}else{None};
+    let mut value:Value=serde_json::from_slice(decoded.as_deref().unwrap_or(bytes)).map_err(|_|anyhow::anyhow!("configuration.archive_json_invalid"))?;
+    let codeg_encrypted=value.get("codegConfigEncryption").is_some();let encrypted=binary||codeg_encrypted;
     if let Some(manifest)=manifest{
         ensure!(serde_json::to_vec(manifest)?.len()<=64*1024&&manifest["schemaVersion"]==1,"configuration.manifest_invalid");
         ensure!(manifest["config"]["size"].as_u64()==Some(bytes.len()as u64)&&manifest["config"]["sha256"].as_str()==Some(source_digest.trim_start_matches("sha256:")),"configuration.manifest_content_changed");
         ensure!(manifest["encryption"].as_str()==Some(if encrypted{"aes-256-gcm"}else{"none"}),"configuration.manifest_encryption_mismatch");
     }
-    if encrypted{let plain=super::codeg_crypto::decrypt(value,passphrase)?;value=serde_json::from_slice(&plain).map_err(|_|anyhow::anyhow!("configuration.archive_json_invalid"))?;}
+    if codeg_encrypted{ensure!(!binary,"configuration.nested_encryption_forbidden");let plain=super::codeg_crypto::decrypt(value,passphrase)?;value=serde_json::from_slice(&plain).map_err(|_|anyhow::anyhow!("configuration.archive_json_invalid"))?;}
     super::bounded(&value,0)?;
     let source_kind=if value["schemaVersion"]==1&&value.get("formatVersion").is_none(){"codeg_v1"}
     else if value["formatVersion"]==1&&value["product"]=="codeg-rovai-config"{"fusion_v1"}
-    else if value["formatVersion"]==2&&value["product"]=="codeg-rovai-config"{validate("ConfigurationArchiveV2",&value)?;"fusion_v2"}
+    else if value["formatVersion"]==2&&value["product"]=="codeg-rovai-config"{
+        validate("ConfigurationArchiveV2",&value)?;
+        ensure!(value["secretsIncluded"]==true||value["secrets"].as_array().is_some_and(Vec::is_empty),"configuration.unexpected_archive_secrets");
+        ensure!(value["secretsIncluded"]!=true||binary||retained,"configuration.secret_archive_requires_encryption");"fusion_v2"
+    }
     else{anyhow::bail!("configuration.archive_version_unsupported")};
     let map=value["domains"].as_object().context("configuration.domains_required")?;ensure!(map.len()<=32,"configuration.too_many_domains");
     let mut total=0usize;
