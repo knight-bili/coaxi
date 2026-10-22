@@ -12,5 +12,12 @@
   "sourceCommit": "aff1e6c278453ed8d0b96a5f664edcdca621aa3f",
   "sourceFile": "src-tauri/src/acp/remote_registry.rs",
   "url": "https://cdn.agentclientprotocol.com/registry/v1/latest/registry.json",
-  "behavior": "Explicit user catalog read; bounded to 8 MiB and 4096 entries; ten-minute cache; no installation, model invocation or credential projection. The confirmed five management operations and model input shapes remain unchanged."
+  "behavior": "Explicit user catalog read; bounded to 8 MiB and 4096 entries; ten-minute cache; no installation, model invocation or credential projection. The confirmed five management operations and model input shapes remain unchanged.",
+  "nativeSkillUserQuery": {
+    "operation": "nativeSkills.list",
+    "scope": "user_interface_only",
+    "modelVisible": false,
+    "inputSchema": {"type":"object","additionalProperties":false,"required":["adapterKind"],"properties":{"adapterKind":{"type":"string"},"refresh":{"type":"boolean","default":false},"agentId":{"type":"string","minLength":1}}},
+    "behavior": "Custom ACP requires agentId; Core derives roots from that member's selected immutable definition and current-platform installation lock. Built-in kinds omit agentId. Paths are never accepted from the client. Existing Skill selection and Context schemas remain unchanged."
+  }
 }
