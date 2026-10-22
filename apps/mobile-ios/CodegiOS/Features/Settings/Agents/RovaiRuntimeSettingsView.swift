@@ -39,6 +39,7 @@ private struct NativeRuntimeEditor: View {
     var body: some View {
         Form {
             Section("工作中补充") {RovaiMemberFeedbackSwitch(model: model, agentId: member.text("agentId"))}
+            Section("原生插话") {RovaiMemberNativeSteerSwitch(model: model, agentId: member.text("agentId"))}
             Section("自定义智能体程序") {RovaiMemberCustomRuntime(model: model, member: member)}
             if let issue { Section { Text(issue).font(.caption).foregroundStyle(Theme.warning) } }
             if changed { Section { Text("队员信息已变化，当前更改保留；请返回后重新打开。").foregroundStyle(Theme.warning) } }

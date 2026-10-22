@@ -41,11 +41,13 @@ struct RovaiUserFeedback: View {
     let model: RovaiWorkspaceModel;let threadId: String
     var conversationId: String? = nil;var child = false;var agentId: String? = nil
     var normalInput: (() async throws -> JSONValue)? = nil
+    var nativeMaterials: [JSONValue]? = nil
     @Environment(\.dismiss) private var dismiss
     @State private var text = "", selected = "", run = ""
     @State private var targets: [JSONValue] = [], records: [JSONValue] = [], previews: [JSONValue] = []
     @State private var next: String?, previewNext: String?, packet: JSONValue?, receipt: JSONValue?, issue: String?, generation: UInt64?
     @State private var busy = false, ready = false, uncertain = false
+    @State private var nativeOpen = false
     private var scope: JSONValue {.object(["threadId": .string(threadId), "conversationId": conversationId.map(JSONValue.string) ?? .null, "scopeKind": .string(conversationId == nil ? "public" : child ? "delegation_child" : "single_chat")])}
     private var owner: String {"feedback:\(threadId):\(conversationId ?? "public"):\(child ? "child" : "member")"}
     private var disabled: Bool {busy || !ready || model.busy || model.pending != nil || generation != model.connectionGeneration}
@@ -61,6 +63,7 @@ struct RovaiUserFeedback: View {
                     Picker("接收补充的当前任务", selection: $run) {Text("选择任务").tag("");ForEach(available, id: \.self) {target in Text(target.text("displayName") + " · " + target.text("agentRunId")).tag(target.text("agentRunId"))}}.disabled(disabled)
                     Button("查看完整内容") {Task {await prepare()}}.disabled(disabled || targets.first {$0.text("agentRunId") == run}?["feedbackEnabled"]?.rvBool != true || targets.first {$0.text("agentRunId") == run}?["nativeBindingReady"]?.rvBool != true || text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || text.unicodeScalars.count > 4096)
                     Button("核对记录") {Task {await refresh()}}.disabled(disabled)
+                    Button("预览原生插话及当前材料") {nativeOpen = true}.disabled(disabled)
                     if targets.isEmpty {Text("当前没有可接收反馈的运行任务。").font(.caption).foregroundStyle(Theme.textSecondary)}
                 } footer: {Text("先预览全文，再交给队员。送到连接不代表模型已阅读。")}
                 Section("原预览") {ForEach(previews.filter {$0["receipt"] == nil || $0["receipt"] == .null}, id: \.self) {row in
@@ -70,6 +73,7 @@ struct RovaiUserFeedback: View {
             }
         }.navigationTitle("工作中补充和反馈记录").navigationBarTitleDisplayMode(.inline).scrollContentBackground(.hidden).toolbar {Button("关闭") {dismiss()}.disabled(busy)}}
         .interactiveDismissDisabled(busy)
+        .sheet(isPresented: $nativeOpen) {RovaiNativeSteer(model: model, scope: scope, text: text, agentId: agentId, materials: nativeMaterials ?? (conversationId == nil ? model.thread?["composerDraft"]?["attachments"]?.rvArray ?? [] : []))}
         .task {
             generation = model.connectionGeneration;selected = agentId ?? "";busy = true;defer {busy = false}
             do {text = try model.readBody(owner + ":text");let raw = try model.readBody(owner + ":request");if !raw.isEmpty {packet = try JSONDecoder().decode(JSONValue.self, from: Data(raw.utf8));uncertain = packet?["original"] != nil};try await read();ready = true} catch {issue = error.localizedDescription}

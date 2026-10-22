@@ -53,7 +53,7 @@ struct RovaiPrivateConversationView: View {
                 let value = try await model.query(get, params: .object(["conversationId": .string(selected), "composerScope": .null]))
                 guard value["conversation"]?.text("id") == selected, (value["draft"]?["attachments"]?.rvArray ?? []).isEmpty, (value["draft"]?["quotes"]?.rvArray ?? []).isEmpty else {throw RovaiHostFailure(code: "请先处理普通输入中的草稿和材料")}
                 return .object(["draftRevision": value["draft"]?["revision"] ?? .number(0)])
-            })
+            }, nativeMaterials: snapshot["draft"]?["attachments"]?.rvArray ?? [])
         }
         .sheet(item: $quoteSelection) {source in RovaiQuoteSelector(model: model, threadId: threadId, messageId: source.id, onChosen: {_ in false}, conversationId: source.conversationId, onSelection: {selection in
             guard !disabled, selected == source.conversationId, snapshot["conversation"]?.text("status") == "active" else {return false}
