@@ -1,4 +1,5 @@
 import { MemberInteractionSettings } from './MemberInteractionSettings'
+import { MemberFeedbackSettings } from './MemberFeedbackSettings'
 import { MemberEnvironmentEditor, useMemberEnvironment } from './MemberEnvironmentEditor'
 import type { MemberEnvironmentEdit } from './member-environment'
 import { MobileBack, useMobileLayout } from './MobileLayout'
@@ -840,6 +841,7 @@ const MemberEditor = forwardRef<
             )}
           </section>
           {selectedAgent && <MemberInteractionSettings key={selectedAgent.agentId} agentId={selectedAgent.agentId} adapterKind={selectedAgent.runtimeConfiguration?.adapterKind} disabled={busy !== null}/>}
+          {selectedAgent && <MemberFeedbackSettings key={`feedback:${selectedAgent.agentId}`} agentId={selectedAgent.agentId} disabled={busy !== null}/>}
         </div>
       </div>
       <Dialog.Root
