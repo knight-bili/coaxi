@@ -44,33 +44,7 @@ fn pointer(path:&str)->Result<Vec<String>>{
         ensure!(!matches!(result.as_str(),"__proto__"|"constructor"|"prototype"),"feedback.field_key_forbidden");Ok(result)
     }).collect()
 }
-fn node<'a>(value:&'a Value,path:&[String])->Result<&'a Value>{let mut current=value;for part in path{current=if let Some(rows)=current.as_array(){rows.get(part.parse::<usize>()?).context("feedback.patch_path")?}else{current.get(part).context("feedback.patch_path")?}}Ok(current)}
-fn parent<'a>(value:&'a mut Value,path:&[String])->Result<&'a mut Value>{let mut current=value;for part in path{current=if let Some(rows)=current.as_array_mut(){rows.get_mut(part.parse::<usize>()?).context("feedback.patch_path")?}else{current.get_mut(part).context("feedback.patch_path")?}}Ok(current)}
-fn add(value:&mut Value,path:&[String],item:Value,replace:bool)->Result<()>{
-    let Some((key,path))=path.split_last()else{*value=item;return Ok(())};let target=parent(value,path)?;
-    if let Some(rows)=target.as_array_mut(){let index=if key=="-"&&!replace{rows.len()}else{key.parse::<usize>()?};if replace{*rows.get_mut(index).context("feedback.patch_path")?=item}else{ensure!(index<=rows.len(),"feedback.patch_path");rows.insert(index,item)}}
-    else{let object=target.as_object_mut().context("feedback.patch_path")?;ensure!(!replace||object.contains_key(key),"feedback.patch_path");object.insert(key.clone(),item);}Ok(())
-}
-fn remove(value:&mut Value,path:&[String])->Result<Value>{let Some((key,path))=path.split_last()else{return Ok(std::mem::replace(value,Value::Null))};let target=parent(value,path)?;if let Some(rows)=target.as_array_mut(){let index=key.parse::<usize>()?;ensure!(index<rows.len(),"feedback.patch_path");Ok(rows.remove(index))}else{target.as_object_mut().context("feedback.patch_path")?.remove(key).context("feedback.patch_path")}}
-pub fn compile(source:&str)->Result<Value>{
-    let mut spec=json!({"root":"","elements":{}});let mut patches=0;
-    for line in source.lines().filter(|line|!line.trim().is_empty()){
-        let Ok(patch)=serde_json::from_str::<Value>(line)else{continue};let Some(op)=patch["op"].as_str()else{continue};let Some(raw_path)=patch["path"].as_str()else{continue};
-        // 与原 Codeg 的防护一致：到达 __proto__ 的整条 patch 跳过。
-        if raw_path.contains("__proto__")||patch["from"].as_str().is_some_and(|from|from.contains("__proto__")){continue}
-        let path=pointer(raw_path)?;patches+=1;ensure!(patches<=4096,"feedback.card_patch_limit");
-        match op{
-            "add"=>add(&mut spec,&path,patch.get("value").context("feedback.patch_value")?.clone(),false)?,
-            "replace"=>add(&mut spec,&path,patch.get("value").context("feedback.patch_value")?.clone(),true)?,
-            "remove"=>{remove(&mut spec,&path)?;},
-            "copy"|"move"=>{let from=pointer(patch["from"].as_str().context("feedback.patch_path")?)?;ensure!(op!="move"||!path.starts_with(&from)||path==from,"feedback.patch_cycle");let item=if op=="move"{remove(&mut spec,&from)?}else{node(&spec,&from)?.clone()};add(&mut spec,&path,item,false)?},
-            "test"=>ensure!(node(&spec,&path)?==patch.get("value").context("feedback.patch_value")?,"feedback.patch_test"),
-            _=>anyhow::bail!("feedback.patch_operation")
-        }
-        ensure!(serde_json::to_vec(&spec)?.len()<=1024*1024,"feedback.card_spec_limit");
-    }
-    ensure!(patches>0&&spec["root"].is_string()&&spec["elements"].is_object(),"feedback.card_spec_unavailable");Ok(spec)
-}
+pub fn compile(source:&str)->Result<Value>{super::spec_stream::compile(source)}
 #[derive(Clone)]struct FieldTemplate{name:String,label:Option<String>,path:Vec<String>}
 fn templates(spec:&Value)->Result<Vec<FieldTemplate>>{
     fn visit(spec:&Value,key:&str,repeat:&[String],active:&mut BTreeSet<String>,count:&mut usize,result:&mut Vec<FieldTemplate>)->Result<()>{

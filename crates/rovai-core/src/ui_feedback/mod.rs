@@ -135,3 +135,5 @@ pub fn render_feedback_result(outcome: &Value) -> Value {
     json!({"content":[{"type":"text","text":text}],"isError":false,
         "structuredContent":{"count":count,"feedback":notes}})
 }
+
+mod spec_stream;
