@@ -4,14 +4,90 @@
   "confirmedModelProposal": "portable-model-configuration-r1",
   "modelFrozenShapeChangedByThisSupplement": false,
   "configuration.memberConnection.get": {
-    "input": {"agentId": "existing_core_agent_id"},
-    "output": {"agentId": "existing_core_agent_id", "agentVersion": "positive_integer", "binding": "PortableMemberBindingV1_or_null"},
+    "input": {
+      "agentId": "existing_core_agent_id"
+    },
+    "output": {
+      "agentId": "existing_core_agent_id",
+      "agentVersion": "positive_integer",
+      "binding": "PortableMemberBindingV1_or_null",
+      "runtime": {
+        "adapterKind": "actual_profile_adapter_kind",
+        "installationId": "actual_enabled_installation_id",
+        "installationGeneration": "actual_installation_generation",
+        "modelSelection": "actual_profile_selection_or_runtime_default"
+      }
+    },
     "absentBinding": "null means no portable selection has been stored; do not invent revision or write a default during reads"
   },
   "configuration.providers.list": {
-    "output": {"items": "masked_PortableProviderV1_array", "next": "uuid_or_null"},
+    "output": {
+      "items": "masked_PortableProviderV1_array",
+      "next": "uuid_or_null"
+    },
     "rawFields": "rawAgentTypesJson and rawModel are placeholders; exact source is retained encrypted for explicit export",
     "apiUrl": "query values are masked; path and origin remain readable"
   },
-  "secrets": "plaintext preparation and archive passphrases are excluded from generic public operation and renderer request recovery"
+  "secrets": "plaintext preparation and archive passphrases are excluded from generic public operation and renderer request recovery",
+  "configuration.migration.archives": {
+    "authority": "authenticated_client_owned_metadata_only",
+    "input": [
+      "after",
+      "limit"
+    ],
+    "output": {
+      "items": "PortableArchiveReference_with_createdAt",
+      "next": "uuid_or_null"
+    },
+    "privateArchiveBodyReturned": false
+  },
+  "configuration.migration.targets": {
+    "authority": "user_selection_metadata_only",
+    "input": [
+      "domain",
+      "after",
+      "limit"
+    ],
+    "output": {
+      "items": "id_name_revision",
+      "next": "id_or_null"
+    },
+    "automaticNameMatching": false
+  },
+  "desktopOwner": {
+    "methods": [
+      "configuration.desktopOwner.register",
+      "configuration.desktopOwner.pending",
+      "configuration.desktopOwner.acknowledge"
+    ],
+    "authority": "trusted_desktop_main_only_not_public_or_model",
+    "owners": [
+      "AppearancePreferencesStore",
+      "GeneralPreferencesStore",
+      "WindowsWindowClose_and_WindowClosePreferences"
+    ],
+    "receipt": "database_applied_and_each_file_state_independent",
+    "recovery": "compare_original_before_or_exact_after_inside_owner_write_queue_then_acknowledge_original_plan_digest"
+  },
+  "export": {
+    "methods": [
+      "configuration.export.prepare",
+      "configuration.export.receipt",
+      "configuration.export.read"
+    ],
+    "authority": "private_authenticated_owner_input_not_generic_recovery_body",
+    "format": "ConfigurationArchiveV2_in_existing_encrypted_STREAM_container",
+    "defaultIncludeSecrets": false,
+    "recovery": "original_operation_id_with_private_input_HMAC_and_encrypted_frozen_snapshot",
+    "privatePath": "trusted_host_only_never_web_response",
+    "clientDownload": "bounded_encrypted_bytes_and_original_digest"
+  },
+  "sync": {
+    "defaultFullConfiguration": false,
+    "defaultIncludeSecrets": false,
+    "autoApplyDownloadedConfiguration": false,
+    "downloadedDesktopCandidate": "same_archive_registration_and_explicit_migration_selection",
+    "dedupeDigest": "stable_owner_revisions_and_content_not_random_archive_aliases"
+  },
+  "sourceStatus": "authored_unreviewed_untested_step_1"
 }
