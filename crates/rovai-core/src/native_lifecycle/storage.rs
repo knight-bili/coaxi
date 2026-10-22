@@ -34,11 +34,11 @@ pub(crate) fn freeze_policy(connection:&Connection,member:&str)->Result<Option<F
     let value=policy(connection)?;let enabled=value["members"].as_array().is_some_and(|members|members.iter().any(|entry|entry["agentId"]==member&&entry["enabled"]==true));
     Ok(enabled.then(||FrozenNativeSteerV1{schema_version:1,policy_revision:value["revision"].as_i64().unwrap_or(0),enabled:true}))
 }
-pub(crate) fn put_preview(tx:&Transaction<'_>,kind:&str,owner:&str,mut value:Value)->Result<Value>{
+pub(crate) fn put_preview(tx:&Transaction<'_>,kind:&str,owner:&str,client:&str,mut value:Value)->Result<Value>{
     let now=Utc::now();let expires=now+chrono::Duration::minutes(10);
     value["previewId"]=json!(uuid::Uuid::new_v4().to_string());value["previewDigest"]=json!("");value["expiresAt"]=json!(expires.to_rfc3339());value["previewDigest"]=json!(digest(&value)?);
     validate_shape(match kind{"continuation"=>"NativeContinuationPreviewV1","steer"=>"NativeSteerPreviewV1",_=>anyhow::bail!("native_lifecycle.preview_kind_invalid")},&value)?;
-    tx.execute("INSERT INTO native_lifecycle_preview(id,kind,owner_thread_id,digest,value_json,expires_at_ms,created_at) VALUES(?1,?2,?3,?4,?5,?6,?7)",params![value["previewId"].as_str(),kind,owner,value["previewDigest"].as_str(),serde_json::to_string(&value)?,expires.timestamp_millis(),now.to_rfc3339()])?;Ok(value)
+    tx.execute("INSERT INTO native_lifecycle_preview(id,kind,owner_thread_id,client_id,digest,value_json,expires_at_ms,created_at) VALUES(?1,?2,?3,?4,?5,?6,?7,?8)",params![value["previewId"].as_str(),kind,owner,client,value["previewDigest"].as_str(),serde_json::to_string(&value)?,expires.timestamp_millis(),now.to_rfc3339()])?;Ok(value)
 }
 pub(crate) fn preview(connection:&Connection,owner:&str,id:&str,expected:&str,kind:&str)->Result<Value>{
     uuid::Uuid::parse_str(id)?;
@@ -50,9 +50,9 @@ pub(crate) fn prior_intent(connection:&Connection,command:&str,owner:&str,kind:&
     let row:Option<(String,String,String,String)>=connection.query_row("SELECT owner_thread_id,kind,input_digest,value_json FROM native_lifecycle_intent WHERE command_id=?1",[command],|row|Ok((row.get(0)?,row.get(1)?,row.get(2)?,row.get(3)?))).optional()?;
     row.map(|(stored_owner,stored_kind,stored_input,raw)|{ensure!(stored_owner==owner&&stored_kind==kind&&stored_input==input,"native_lifecycle.command_payload_changed");Ok(serde_json::from_str(&raw)?)}).transpose()
 }
-pub(crate) fn begin_intent(tx:&Transaction<'_>,command:&str,owner:&str,kind:&str,preview_id:&str,input:&str,record:&Value)->Result<()>{
+pub(crate) fn begin_intent(tx:&Transaction<'_>,command:&str,owner:&str,client:&str,core_instance:&str,kind:&str,preview_id:&str,input:&str,record:&Value)->Result<()>{
     uuid::Uuid::parse_str(command)?;let now=Utc::now().to_rfc3339();
-    tx.execute("INSERT INTO native_lifecycle_intent(command_id,kind,owner_thread_id,preview_id,input_digest,state,value_json,created_at,updated_at) VALUES(?1,?2,?3,?4,?5,'prepared',?6,?7,?7)",params![command,kind,owner,preview_id,input,serde_json::to_string(record)?,now])?;Ok(())
+    tx.execute("INSERT INTO native_lifecycle_intent(command_id,kind,owner_thread_id,client_id,core_instance_id,preview_id,input_digest,state,value_json,created_at,updated_at) VALUES(?1,?2,?3,?4,?5,?6,?7,'prepared',?8,?9,?9)",params![command,kind,owner,client,core_instance,preview_id,input,serde_json::to_string(record)?,now])?;Ok(())
 }
 pub(crate) fn reserve_images(tx:&Transaction<'_>,command:&str,target:&NativeSteerTargetV1,input:&NativeSteerInputV1)->Result<()>{
     validate_shape("NativeSteerTargetV1",&serde_json::to_value(target)?)?;let bytes=input.image_bytes()?;let turn=digest(&serde_json::to_value(target)?)?;

@@ -9,12 +9,14 @@ CREATE TABLE native_lifecycle_source_handle (
 CREATE INDEX native_lifecycle_source_import ON native_lifecycle_source_handle(owner_thread_id,import_id,created_at);
 CREATE TABLE native_lifecycle_preview (
  id TEXT PRIMARY KEY NOT NULL, kind TEXT NOT NULL CHECK(kind IN ('continuation','steer')),
+ client_id TEXT NOT NULL DEFAULT 'desktop',
  owner_thread_id TEXT NOT NULL, digest TEXT NOT NULL,
  value_json TEXT NOT NULL CHECK(json_valid(value_json) AND length(value_json)<=2097152),
  expires_at_ms INTEGER NOT NULL, created_at TEXT NOT NULL
 );
 CREATE TABLE native_lifecycle_intent (
  command_id TEXT PRIMARY KEY NOT NULL, kind TEXT NOT NULL CHECK(kind IN ('continuation','steer')),
+ core_instance_id TEXT NOT NULL,client_id TEXT NOT NULL,
  owner_thread_id TEXT NOT NULL, preview_id TEXT NOT NULL REFERENCES native_lifecycle_preview(id),
  input_digest TEXT NOT NULL, state TEXT NOT NULL,
  value_json TEXT NOT NULL CHECK(json_valid(value_json) AND length(value_json)<=2097152),
