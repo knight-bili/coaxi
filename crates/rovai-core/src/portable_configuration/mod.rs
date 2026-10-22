@@ -15,6 +15,7 @@ pub(crate) mod normalize;
 pub(crate) mod archive_store;
 pub(crate) mod migration;
 pub(crate) mod files;
+pub(crate) mod library;
 mod model;
 pub use model::*;
 
