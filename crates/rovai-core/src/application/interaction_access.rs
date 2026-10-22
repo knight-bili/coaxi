@@ -164,6 +164,7 @@ impl Core {
                 Ok(json!({"grants":broker.grants(payload)?}))
             }
             "desktop.poll" => { let database = self.database.lock().await; broker.poll(payload, |binding| require_binding(&database, broker, binding)) }
+            "desktop.check" => { let database = self.database.lock().await; broker.check_desktop_call(payload, |binding| require_binding(&database, broker, binding)) }
             "desktop.finish" => { let database = self.database.lock().await; broker.finish(payload, |binding| require_binding(&database, broker, binding)) }
             "pending" => Ok(json!({"items":broker.pending()?})),
             "eval.approve" => { broker.approve(string(payload,"bridgeCallId")?,string(payload,"argumentsDigest")?)?; Ok(json!({"approved":true})) }

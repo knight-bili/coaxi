@@ -141,7 +141,10 @@ impl Broker {
     pub fn disconnect(&self, bridge_id: &str) -> Result<()> { self.revoke_locked(&mut self.locked()?, bridge_id) }
     pub fn grants(&self, binding: &Value) -> Result<Vec<Value>> { Ok(self.locked()?.grants.values().filter(|grant| unexpired(grant) && same_scope(grant, binding) && grant["desktopPeerId"] == binding["desktopPeerId"]).cloned().collect()) }
     fn selected_grants(&self, state: &State, binding: &Value, name: &str, arguments: &Value) -> Result<Vec<Value>> {
-        if matches!(name, "browser_list_tabs" | "browser_open_tab" | "computer_list_apps" | "computer_list_windows") { return Ok(Vec::new()); }
+        if name == "browser_open_tab" { return Ok(Vec::new()); }
+        if matches!(name, "browser_list_tabs" | "computer_list_apps" | "computer_list_windows") {
+            return Ok(state.grants.values().filter(|grant| unexpired(grant) && same_scope(grant,binding) && grant["desktopPeerId"] == binding["desktopPeerId"]).cloned().collect());
+        }
         let target = arguments["tabId"].as_str().or(arguments["targetId"].as_str());
         let needed = if mutates(name) { "control" } else { "read" };
         let selected: Vec<Value> = state.grants.values().filter(|grant| {
@@ -191,6 +194,16 @@ impl Broker {
         self.grants_current(&state, ledger)?;
         state.approvals.insert(id.to_owned(), arguments_digest.to_owned());
         Ok(())
+    }
+    pub fn check_desktop_call(&self, request: &Value, authority: impl Fn(&Value) -> Result<()>) -> Result<Value> {
+        let state = self.locked()?;
+        self.peer(&state,text(request,"desktopPeerId")?,&request["connectionGeneration"])?;
+        let ledger = state.ledger.get(text(request,"bridgeCallId")?).context("original_request_pending")?;
+        ensure!(ledger.receipt["state"] == "started" && ledger.binding["desktopPeerId"] == request["desktopPeerId"] && ledger.receipt["bindingDigest"] == request["bindingDigest"] && ledger.call["argumentsDigest"] == request["argumentsDigest"],"binding_changed");
+        authority(&ledger.binding)?;
+        self.current_bridge(&state,text(&ledger.binding,"bridgeInstanceId")?)?;
+        self.grants_current(&state,ledger)?;
+        Ok(json!({"binding":ledger.binding,"call":ledger.call,"grants":ledger.grants,"receipt":ledger.receipt}))
     }
     pub fn poll(&self, request: &Value, authority: impl Fn(&Value) -> Result<()>) -> Result<Value> {
         validate_shape("desktopPoll", request)?;

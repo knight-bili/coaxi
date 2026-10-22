@@ -5157,7 +5157,9 @@ export interface BrowserWorkspaceApi {
 }
 export interface BrowserWorkspaceView { id:string; threadId:string;profileId:string;url:string;title:string;level:'none'|'read'|'control';expiresAt:number|null;loading:boolean;error:string|null }
 
+export interface InteractionWorkspaceApi {request<T>(action:'status'|'stop'|'policy.get'|'policy.replace'|'grant.share'|'grant.revoke'|'grant.list'|'pending'|'eval.approve'|'unknown.reconcile',payload:Record<string,unknown>):Promise<T>}
 export interface RovaiApi {
+  interactionWorkspace?:InteractionWorkspaceApi
   nativeCustomSkills?: {importDirectory<T>(input:{skillId:string;expectedRevision?:string}):Promise<T|null>}
   /** Native local owner surface; intentionally absent from remote Web. */
   nativePets?: { importDirectory():Promise<unknown|null>;synchronize():Promise<void>;onChanged(listener:()=>void):()=>void }
