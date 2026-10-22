@@ -1,0 +1,847 @@
+{
+  "policy": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "schemaVersion",
+      "revision",
+      "members"
+    ],
+    "properties": {
+      "schemaVersion": {
+        "const": 1
+      },
+      "revision": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991
+      },
+      "members": {
+        "type": "array",
+        "maxItems": 4096,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "agentId",
+            "features"
+          ],
+          "properties": {
+            "agentId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "features": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "browser",
+                "browserEval",
+                "computer",
+                "computerLaunch",
+                "computerClipboard"
+              ],
+              "properties": {
+                "browser": {
+                  "type": "boolean"
+                },
+                "browserEval": {
+                  "type": "boolean"
+                },
+                "computer": {
+                  "type": "boolean"
+                },
+                "computerLaunch": {
+                  "type": "boolean"
+                },
+                "computerClipboard": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "binding": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "schemaVersion",
+      "bridgeInstanceId",
+      "coreInstanceId",
+      "desktopPeerId",
+      "scope",
+      "agentId",
+      "agentRunId",
+      "executionEpoch",
+      "nativeBindingId",
+      "nativeBindingGeneration",
+      "nativeSessionId",
+      "membershipGeneration",
+      "permissionRevision",
+      "catalogDigest",
+      "policyDigest",
+      "expiresAt",
+      "revocationEpoch"
+    ],
+    "properties": {
+      "schemaVersion": {
+        "const": 1
+      },
+      "bridgeInstanceId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "coreInstanceId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "desktopPeerId": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "scope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "threadId",
+          "conversationId",
+          "scopeKind"
+        ],
+        "properties": {
+          "threadId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "conversationId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scopeKind": {
+            "enum": [
+              "public",
+              "single_chat",
+              "delegation_child"
+            ]
+          }
+        }
+      },
+      "agentId": {
+        "type": "string",
+        "minLength": 1
+      },
+      "agentRunId": {
+        "type": "string",
+        "minLength": 1
+      },
+      "executionEpoch": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991
+      },
+      "nativeBindingId": {
+        "type": "string",
+        "minLength": 1
+      },
+      "nativeBindingGeneration": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991
+      },
+      "nativeSessionId": {
+        "anyOf": [
+          {
+            "type": "string",
+            "minLength": 1
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "membershipGeneration": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991
+      },
+      "permissionRevision": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991
+      },
+      "catalogDigest": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "policyDigest": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "expiresAt": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "revocationEpoch": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991
+      }
+    }
+  },
+  "bridgeCall": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "schemaVersion",
+      "bridgeInstanceId",
+      "bridgeCallId",
+      "rpcId",
+      "nativeToolCallId",
+      "toolName",
+      "arguments",
+      "argumentsDigest"
+    ],
+    "properties": {
+      "schemaVersion": {
+        "const": 1
+      },
+      "bridgeInstanceId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "bridgeCallId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "rpcId": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "integer"
+          }
+        ]
+      },
+      "nativeToolCallId": {
+        "anyOf": [
+          {
+            "type": "string",
+            "minLength": 1
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "toolName": {
+        "enum": [
+          "browser_list_tabs",
+          "browser_open_tab",
+          "browser_navigate",
+          "browser_close_tab",
+          "browser_snapshot",
+          "browser_console_messages",
+          "browser_screenshot",
+          "browser_click",
+          "browser_hover",
+          "browser_type",
+          "browser_press_key",
+          "browser_select_option",
+          "browser_eval",
+          "computer_list_apps",
+          "computer_list_windows",
+          "computer_launch_app",
+          "computer_screenshot",
+          "computer_snapshot",
+          "computer_verify",
+          "computer_click",
+          "computer_drag",
+          "computer_scroll",
+          "computer_type",
+          "computer_press_key",
+          "computer_hold_key",
+          "computer_set_value",
+          "computer_restore",
+          "computer_invoke_menu",
+          "computer_set_window_frame",
+          "computer_clipboard_read",
+          "computer_clipboard_write"
+        ]
+      },
+      "arguments": {
+        "type": "object"
+      },
+      "argumentsDigest": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      }
+    }
+  },
+  "desktopPeer": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "schemaVersion",
+      "desktopPeerId",
+      "coreInstanceId",
+      "ownerWindowId",
+      "connectionGeneration",
+      "capabilities",
+      "expiresAt"
+    ],
+    "properties": {
+      "schemaVersion": {
+        "const": 1
+      },
+      "desktopPeerId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "coreInstanceId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "ownerWindowId": {
+        "type": "string",
+        "minLength": 1
+      },
+      "connectionGeneration": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991
+      },
+      "capabilities": {
+        "type": "array",
+        "uniqueItems": true,
+        "items": {
+          "enum": [
+            "browser",
+            "computer"
+          ]
+        }
+      },
+      "expiresAt": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "resourceGrant": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "schemaVersion",
+      "grantId",
+      "scope",
+      "agentId",
+      "desktopPeerId",
+      "targetKind",
+      "targetId",
+      "origin",
+      "level",
+      "grantGeneration",
+      "expiresAt"
+    ],
+    "properties": {
+      "schemaVersion": {
+        "const": 1
+      },
+      "grantId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "scope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "threadId",
+          "conversationId",
+          "scopeKind"
+        ],
+        "properties": {
+          "threadId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "conversationId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scopeKind": {
+            "enum": [
+              "public",
+              "single_chat",
+              "delegation_child"
+            ]
+          }
+        }
+      },
+      "agentId": {
+        "type": "string",
+        "minLength": 1
+      },
+      "desktopPeerId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "targetKind": {
+        "enum": [
+          "browser_tab",
+          "computer_window",
+          "computer_app",
+          "computer_desktop"
+        ]
+      },
+      "targetId": {
+        "type": "string",
+        "minLength": 1
+      },
+      "origin": {
+        "anyOf": [
+          {
+            "type": "string",
+            "minLength": 1
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "level": {
+        "enum": [
+          "read",
+          "control"
+        ]
+      },
+      "grantGeneration": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991
+      },
+      "expiresAt": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "receipt": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "schemaVersion",
+      "bridgeCallId",
+      "bridgeInstanceId",
+      "bindingDigest",
+      "toolName",
+      "argumentsDigest",
+      "nativeToolCallId",
+      "state",
+      "resultDigest",
+      "resultLocator",
+      "admittedAt",
+      "finishedAt",
+      "delivered"
+    ],
+    "properties": {
+      "schemaVersion": {
+        "const": 1
+      },
+      "bridgeCallId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "bridgeInstanceId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "bindingDigest": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "toolName": {
+        "type": "string",
+        "minLength": 1
+      },
+      "argumentsDigest": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "nativeToolCallId": {
+        "anyOf": [
+          {
+            "type": "string",
+            "minLength": 1
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "state": {
+        "enum": [
+          "prepared",
+          "started",
+          "completed",
+          "rejected",
+          "cancelled",
+          "unknown"
+        ]
+      },
+      "resultDigest": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "resultLocator": {
+        "anyOf": [
+          {
+            "type": "string",
+            "minLength": 1
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "admittedAt": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "finishedAt": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "delivered": {
+        "type": "boolean"
+      }
+    }
+  },
+  "deliveryEvidence": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "schemaVersion",
+      "bindingDigest",
+      "catalogDigest",
+      "configurationDigest",
+      "adapterKind",
+      "reportedRuntimeVersion",
+      "nativeSessionId",
+      "deliveryKind",
+      "state",
+      "runtimeToolNames",
+      "transportEvidenceDigest",
+      "realToolCallEvidenceDigest",
+      "modelImageInputEvidenceDigest",
+      "recordedAt"
+    ],
+    "properties": {
+      "schemaVersion": {
+        "const": 1
+      },
+      "bindingDigest": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "catalogDigest": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "configurationDigest": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "adapterKind": {
+        "type": "string",
+        "minLength": 1
+      },
+      "reportedRuntimeVersion": {
+        "anyOf": [
+          {
+            "type": "string",
+            "minLength": 1
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "nativeSessionId": {
+        "anyOf": [
+          {
+            "type": "string",
+            "minLength": 1
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "deliveryKind": {
+        "enum": [
+          "none",
+          "mcp_stdio"
+        ]
+      },
+      "state": {
+        "enum": [
+          "candidate",
+          "unsupported",
+          "advertised",
+          "verified",
+          "failed"
+        ]
+      },
+      "runtimeToolNames": {
+        "type": "array",
+        "uniqueItems": true,
+        "items": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "transportEvidenceDigest": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "realToolCallEvidenceDigest": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "modelImageInputEvidenceDigest": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "recordedAt": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "desktopPoll": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "schemaVersion",
+      "desktopPeerId",
+      "connectionGeneration",
+      "limit"
+    ],
+    "properties": {
+      "schemaVersion": {
+        "const": 1
+      },
+      "desktopPeerId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "connectionGeneration": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991
+      },
+      "limit": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 16
+      }
+    }
+  },
+  "desktopFinish": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "schemaVersion",
+      "desktopPeerId",
+      "connectionGeneration",
+      "bridgeCallId",
+      "bindingDigest",
+      "argumentsDigest",
+      "outcome",
+      "result"
+    ],
+    "properties": {
+      "schemaVersion": {
+        "const": 1
+      },
+      "desktopPeerId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "connectionGeneration": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991
+      },
+      "bridgeCallId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "bindingDigest": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "argumentsDigest": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "outcome": {
+        "enum": [
+          "completed",
+          "rejected",
+          "cancelled",
+          "unknown"
+        ]
+      },
+      "result": {
+        "anyOf": [
+          {
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    }
+  },
+  "failureResult": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "content",
+      "isError",
+      "structuredContent"
+    ],
+    "properties": {
+      "content": {
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 1,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "text"
+          ],
+          "properties": {
+            "type": {
+              "const": "text"
+            },
+            "text": {
+              "const": "Interaction tool is unavailable for this run."
+            }
+          }
+        }
+      },
+      "isError": {
+        "const": true
+      },
+      "structuredContent": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schemaVersion",
+          "status",
+          "code"
+        ],
+        "properties": {
+          "schemaVersion": {
+            "const": 1
+          },
+          "status": {
+            "enum": [
+              "unavailable",
+              "rejected",
+              "cancelled",
+              "unknown"
+            ]
+          },
+          "code": {
+            "enum": [
+              "interaction_disabled",
+              "runtime_unavailable",
+              "desktop_unavailable",
+              "scope_changed",
+              "run_not_active",
+              "binding_changed",
+              "membership_changed",
+              "permission_changed",
+              "grant_required",
+              "origin_changed",
+              "target_changed",
+              "generation_changed",
+              "approval_required",
+              "approval_rejected",
+              "cancelled",
+              "result_too_large",
+              "invalid_arguments",
+              "unknown_outcome",
+              "original_request_pending",
+              "transport_failed"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
