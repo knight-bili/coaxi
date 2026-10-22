@@ -6,6 +6,7 @@ import { useThreadClient } from './camp-client'
 import { useUiText } from './interface-language'
 import './interaction-workspace.css'
 
+const localApproval=(name:string):boolean=>['browser_eval','computer_launch_app','computer_clipboard_read','computer_clipboard_write'].includes(name)
 interface Entry {
   binding:{agentRunId:string;agentId:string;scope:{threadId:string;scopeKind:string;conversationId:string|null}};
   call:{bridgeCallId:string;toolName:string;argumentsDigest:string;arguments:Record<string,unknown>};
@@ -23,7 +24,7 @@ export function InteractionActivity({threadId}:{threadId:string}):React.JSX.Elem
   }
   useEffect(()=>{const epoch=++generation.current;setItems([]);setError('');let active=true;const refresh=():void=>{void load(epoch).catch(error=>{if(active&&open)setError(String(error))})};refresh();const timer=window.setInterval(refresh,2000);return()=>{active=false;generation.current++;window.clearInterval(timer)}},[api,threadId,open])
   if(!api)return null
-  const waiting=items.filter(item=>item.call.toolName==='browser_eval'&&item.receipt.state==='prepared'||item.receipt.state==='unknown').length
+  const waiting=items.filter(item=>localApproval(item.call.toolName)&&item.receipt.state==='prepared'||item.receipt.state==='unknown').length
   const run=async(id:string,action:()=>Promise<unknown>):Promise<void>=>{
     if(busy)return
     const epoch=generation.current;setBusy(id);setError('')
@@ -36,10 +37,10 @@ export function InteractionActivity({threadId}:{threadId:string}):React.JSX.Elem
         <div className="interaction-request-list">{items.map(item=>{
           const id=item.call.bridgeCallId,evalRequest=item.call.toolName==='browser_eval',unknown=item.receipt.state==='unknown'
           return <section className="interaction-request" key={id}>
-            <header><strong>{t(evalRequest?'运行网页代码':item.call.toolName.startsWith('browser_')?'浏览器操作':'电脑操作')}</strong><span>{t(item.binding.scope.scopeKind==='public'?'公共会话':item.binding.scope.scopeKind==='single_chat'?'私聊':'独立帮手')} · {new Date(item.receipt.admittedAt).toLocaleTimeString()}</span><span>{t(unknown?'完成情况待核对':item.receipt.state==='started'?'正在执行':evalRequest?'等待你的确认':'等待执行')}</span></header>
+            <header><strong>{t(evalRequest?'运行网页代码':item.call.toolName.startsWith('browser_')?'浏览器操作':'电脑操作')}</strong><span>{t(item.binding.scope.scopeKind==='public'?'公共会话':item.binding.scope.scopeKind==='single_chat'?'私聊':'独立帮手')} · {new Date(item.receipt.admittedAt).toLocaleTimeString()}</span><span>{t(unknown?'完成情况待核对':item.receipt.state==='started'?'正在执行':localApproval(item.call.toolName)?'等待你的确认':'等待执行')}</span></header>
             {evalRequest?<pre>{String(item.call.arguments.code??'')}</pre>:<details><summary>{t('查看原操作')}</summary><pre>{JSON.stringify(item.call.arguments,null,2)}</pre></details>}
             <div className="interaction-actions">
-              {evalRequest&&item.receipt.state==='prepared'&&<button type="button" disabled={Boolean(busy)} onClick={()=>void run(id,()=>api.request('eval.approve',{bridgeCallId:id,argumentsDigest:item.call.argumentsDigest}))}>{t('允许运行这段代码')}</button>}
+              {localApproval(item.call.toolName)&&item.receipt.state==='prepared'&&<button type="button" disabled={Boolean(busy)} onClick={()=>void run(id,()=>api.request('operation.approve',{bridgeCallId:id,argumentsDigest:item.call.argumentsDigest}))}>{t(evalRequest?'允许运行这段代码':item.call.toolName==='computer_launch_app'?'允许这次启动应用':item.call.toolName==='computer_clipboard_read'?'允许这次读取剪贴板':'允许这次写入剪贴板')}</button>}
               {unknown?<button type="button" disabled={Boolean(busy)} onClick={()=>void run(id,()=>api.request('unknown.reconcile',{bridgeCallId:id,argumentsDigest:item.call.argumentsDigest}))}>{t('已核对实际结果，允许继续')}</button>:<button type="button" disabled={Boolean(busy)} onClick={()=>void run(id,()=>api.request('stop',{agentRunId:item.binding.agentRunId}))}><Square size={13}/>{t('停止本轮资源操作')}</button>}
             </div>
           </section>

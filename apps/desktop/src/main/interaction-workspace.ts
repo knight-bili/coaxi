@@ -60,7 +60,7 @@ export class InteractionWorkspace {
       for(const grant of result.grants)this.grants.set(grant.grantId,grant)
       return result
     }
-    if(!['policy.get','policy.replace','sharing.targets','pending','eval.approve','unknown.reconcile'].includes(action))throw new Error('interaction.operation_not_admitted')
+    if(!['policy.get','policy.replace','sharing.targets','pending','eval.approve','operation.approve','unknown.reconcile'].includes(action))throw new Error('interaction.operation_not_admitted')
     return this.request(action,payload)
   }
   private async pump():Promise<void>{

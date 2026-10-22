@@ -24,6 +24,7 @@ export class InteractionComputer implements DesktopComputerExecutor{
   private opening:Promise<void>|null=null
   private buffer=Buffer.alloc(0)
   private stopGeneration=0
+  private catalogSequence=0
   private readonly pending=new Map<string,Pending>()
   private lastError:string|null=null
   private failed=false
@@ -78,6 +79,16 @@ export class InteractionComputer implements DesktopComputerExecutor{
     return new Promise<T>((resolve,reject)=>{const timer=setTimeout(()=>{this.pending.delete(id);reject(new Error('computer.original_request_unknown'))},120000);this.pending.set(id,{resolve:value=>resolve(value as T),reject,timer});void this.send({id,token:this.token,method,params}).catch(error=>{clearTimeout(timer);this.pending.delete(id);reject(error)})})
   }
   private scopeKey(scope:InteractionScope,agentId:string):string{if(!this.peer)throw new Error('desktop_unavailable');return digest({core:this.peer.coreInstanceId,peer:this.peer.desktopPeerId,scope,agentId})}
+  private async registerTargets(windows:NativeWindow[],screenId:string):Promise<void>{
+    if(!this.peer)throw new Error('desktop_unavailable')
+    const targets=new Map<string,{targetId:string;targetKind:string;appId:string|null;shareable:boolean}>()
+    for(const window of windows){
+      targets.set(window.targetId,{targetId:window.targetId,targetKind:'computer_window',appId:window.appId,shareable:window.shareable})
+      if(window.appId){const old=targets.get(window.appId);targets.set(window.appId,{targetId:window.appId,targetKind:'computer_app',appId:null,shareable:Boolean(old?.shareable)||window.shareable})}
+    }
+    if(screenId)targets.set(screenId,{targetId:screenId,targetKind:'computer_desktop',appId:null,shareable:this.preferences.screen&&process.platform!=='linux'})
+    await this.core.request('interaction.local',{action:'desktop.targets',payload:{desktopPeerId:this.peer.desktopPeerId,connectionGeneration:this.peer.connectionGeneration,sequence:++this.catalogSequence,targets:[...targets.values()]}})
+  }
   async execute(work:InteractionWork,assertCurrent:()=>Promise<void>):Promise<unknown>{
     await this.ready;await assertCurrent()
     if(!this.peer||this.peer.desktopPeerId!==work.binding.desktopPeerId)throw new Error('desktop_unavailable')
@@ -88,8 +99,10 @@ export class InteractionComputer implements DesktopComputerExecutor{
     if(policy.revision!==work.binding.permissionRevision||!features?.computer)throw new Error('permission_changed')
     const all=await this.core.request<{grants:InteractionGrant[]}>('interaction.local',{action:'grant.list',payload:{scope:work.binding.scope,agentId:work.binding.agentId,desktopPeerId:this.peer.desktopPeerId}})
     await this.request('configure',{scopeKey,bridgeInstanceId:work.binding.bridgeInstanceId,expectedStopGeneration:this.stopGeneration,enabled:true,launchEnabled:features.computerLaunch&&this.preferences.launch,clipboardEnabled:features.computerClipboard&&this.preferences.clipboard,allowForeground:this.preferences.foreground,screenEnabled:this.preferences.screen,grants:all.grants.filter(grant=>grant.targetKind.startsWith('computer_')).map(grant=>({targetKind:grant.targetKind,targetId:grant.targetId,level:grant.level,expiresAt:grant.expiresAt,grantGeneration:grant.grantGeneration}))})
+    const catalog=await this.request<{windows:NativeWindow[];screenId:string}>('picker',{scopeKey})
+    await this.registerTargets(catalog.windows,catalog.screenId)
     await assertCurrent()
-    const result=await this.request('call',{scopeKey,bridgeInstanceId:work.binding.bridgeInstanceId,expectedStopGeneration:this.stopGeneration,toolName:work.call.toolName,arguments:work.call.arguments})
+    const result=await this.request('call' ,{scopeKey,bridgeInstanceId:work.binding.bridgeInstanceId,expectedStopGeneration:this.stopGeneration,toolName:work.call.toolName,arguments:work.call.arguments})
     await assertCurrent();return result
   }
   async stop():Promise<void>{if(!this.child)return;try{const result=await this.request<{stopGeneration:number}>('stop_all',{});this.stopGeneration=result.stopGeneration}catch(error){this.lastError=String(error);this.end()}}
@@ -104,7 +117,7 @@ export class InteractionComputer implements DesktopComputerExecutor{
       try{await fs.writeFile(temporary,JSON.stringify(next),{encoding:'utf8',mode:0o600,flag:'wx'});await fs.rename(temporary,this.file)}finally{await fs.unlink(temporary).catch(()=>undefined)}
       this.preferences=next;this.failed=false;this.lastError=null;return {...next,lastError:null}
     }
-    if(method==='stop'){await this.stop();return {stopped:true}}
+    if(method==='stop'){await this.core.request('interaction.local',{action:'computer.stop',payload:{}});await this.stop();return {stopped:true}}
     if(method==='picker'||method==='status'){
       const value=input as {scope:InteractionScope;agentId:string}
       if(!value?.scope||typeof value.agentId!=='string')throw new Error('invalid_arguments')
@@ -113,7 +126,9 @@ export class InteractionComputer implements DesktopComputerExecutor{
       const scopeKey=this.scopeKey(value.scope,value.agentId);this.scopes.set(scopeKey,value)
       const pickerKey=digest({peer:this.peer?.desktopPeerId,scope:value.scope,agentId:value.agentId,kind:'local_picker'})
       if(method==='picker')await this.request('configure',{scopeKey:pickerKey,bridgeInstanceId:randomUUID(),expectedStopGeneration:this.stopGeneration,enabled:this.preferences.enabled,launchEnabled:false,clipboardEnabled:false,allowForeground:false,screenEnabled:false,grants:[]})
-      return this.request(method,{scopeKey:pickerKey})
+      const result=await this.request<{windows:NativeWindow[];screenId:string}>(method,{scopeKey:pickerKey})
+      if(method==='picker')await this.registerTargets(result.windows,result.screenId)
+      return result
     }
     throw new Error('computer.operation_not_admitted')
   }
