@@ -7,6 +7,7 @@ import { OfficeWorkspace } from './office-workspace'
 import { BrowserWorkspace } from './browser-workspace'
 import { InteractionWorkspace } from './interaction-workspace'
 import { InteractionComputer } from './interaction-computer'
+import { InteractionResultJournal } from './interaction-result-journal'
 import { creationPreferences, withHostConversationPreferences } from '../shared/host-general-preferences'
 import { createHostChannelHandler } from './host-channels'
 import { FilePreviewFrameNavigation } from './file-preview/file-preview-navigation'
@@ -1266,7 +1267,7 @@ ipcMain.handle('rovai:office-workspace',(event,input)=>officeWorkspace.open(even
 app.on('before-quit',()=>officeWorkspace.closeAll())
 const browserWorkspace = new BrowserWorkspace((method,params)=>core.request(method,params),()=>mainWindow)
 const interactionComputer = new InteractionComputer(core,()=>mainWindow)
-const interactionWorkspace = new InteractionWorkspace(core,browserWorkspace,()=>mainWindow,interactionComputer)
+const interactionWorkspace = new InteractionWorkspace(core,browserWorkspace,()=>mainWindow,interactionComputer,new InteractionResultJournal(app.getPath('userData'),()=>coreDataPath))
 ipcMain.handle('rovai:interaction-computer',(event,method,input)=>interactionComputer.invoke(event,method,input))
 app.on('before-quit',()=>{void interactionComputer.dispose()})
 ipcMain.handle('rovai:interaction-workspace',(event,action,payload)=>interactionWorkspace.invoke(event,action,payload))

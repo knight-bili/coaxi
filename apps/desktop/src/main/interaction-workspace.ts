@@ -3,9 +3,9 @@ import type { BrowserWindow, IpcMainInvokeEvent } from 'electron'
 import type { CoreClient } from './core-client'
 import type { BrowserWorkspace } from './browser-workspace'
 import type { InteractionGrant, InteractionWork } from './interaction-types'
+import { InteractionResultJournal, type InteractionFinish as Finish } from './interaction-result-journal'
 
 type Peer={schemaVersion:1;desktopPeerId:string;coreInstanceId:string;ownerWindowId:string;connectionGeneration:number;capabilities:Array<'browser'|'computer'>;expiresAt:string}
-interface Finish {schemaVersion:1;desktopPeerId:string;connectionGeneration:number;bridgeCallId:string;bindingDigest:string;argumentsDigest:string;outcome:'completed'|'rejected'|'cancelled'|'unknown';result:unknown|null}
 export interface DesktopComputerExecutor {
   attachPeer?(peer:Peer):void
   available():boolean
@@ -23,9 +23,11 @@ export class InteractionWorkspace {
   private readonly ownerId=randomUUID()
   private readonly grants=new Map<string,InteractionGrant>()
   private readonly outcomes=new Map<string,Finish>()
+  private journalLoaded=false
+  private lastError:string|null=null
   private readonly timer:ReturnType<typeof setInterval>
-  constructor(private readonly core:CoreClient,private readonly browser:BrowserWorkspace,private readonly owner:()=>BrowserWindow|null,private readonly computer?:DesktopComputerExecutor){
-    this.timer=setInterval(()=>{void this.pump().catch(()=>undefined)},500)
+  constructor(private readonly core:CoreClient,private readonly browser:BrowserWorkspace,private readonly owner:()=>BrowserWindow|null,private readonly computer?:DesktopComputerExecutor,private readonly journal?:InteractionResultJournal){
+    this.timer=setInterval(()=>{void this.pump().catch(error=>{this.lastError=String(error)})},500)
     this.timer.unref()
     browser.onModelResourceChanged=(id,origin)=>{for(const [grantId,grant] of this.grants){if(grant.targetKind==='browser_tab'&&grant.targetId===id&&(!origin||grant.origin!==origin)){this.grants.delete(grantId);void this.request('grant.revoke',{grantId}).catch(()=>undefined)}}}
   }
@@ -38,7 +40,7 @@ export class InteractionWorkspace {
   async invoke(event:IpcMainInvokeEvent,action:unknown,payload:unknown):Promise<unknown>{
     this.trusted(event)
     if(typeof action!=='string'||!payload||typeof payload!=='object'||Array.isArray(payload)||Buffer.byteLength(JSON.stringify(payload))>1024*1024)throw new Error('invalid_arguments')
-    if(action==='status')return {peer:this.peer,pendingResults:this.outcomes.size,computerAvailable:Boolean(this.computer?.available())}
+    if(action==='status')return {peer:this.peer,pendingResults:this.outcomes.size,computerAvailable:Boolean(this.computer?.available()),lastError:this.lastError}
     if(action==='stop'){
       const input=payload as {agentRunId?:unknown}
       if(typeof input.agentRunId!=='string')throw new Error('invalid_arguments')
@@ -67,6 +69,7 @@ export class InteractionWorkspace {
     if(this.busy||this.disposed)return
     this.busy=true
     try{
+      if(!this.journalLoaded){for(const result of this.journal?.load()??[])this.outcomes.set(result.bridgeCallId,result);this.journalLoaded=true}
       const supervisor=this.core.getSnapshot(),window=this.owner()
       if(!window||window.isDestroyed()||supervisor.fullCoreState!=='ready'){if(this.peer)this.clear();return}
       if(this.peer&&(this.peer.connectionGeneration!==supervisor.generation||this.peerWindow!==window.id||this.peer.capabilities.includes('computer')!==Boolean(this.computer?.available()))){await this.request('peer.detach',{desktopPeerId:this.peer.desktopPeerId}).catch(()=>undefined);this.clear()}
@@ -79,8 +82,11 @@ export class InteractionWorkspace {
       const peer=this.peer,generation=this.generation
       if(!peer)return
       for(const [id,result] of this.outcomes){
-        if(result.desktopPeerId!==peer.desktopPeerId){await this.request('desktop.archiveLate',result);this.outcomes.delete(id);continue}
-        await this.request('desktop.finish',result);this.outcomes.delete(id)
+        try{
+          if(result.desktopPeerId===peer.desktopPeerId)await this.request('desktop.finish',result)
+          else await this.request('desktop.archiveLate',result)
+          this.journal?.remove(id);this.outcomes.delete(id)
+        }catch(error){this.lastError=String(error)}
       }
       const page=await this.request<{calls:InteractionWork[]}>('desktop.poll',{schemaVersion:1,desktopPeerId:peer.desktopPeerId,connectionGeneration:peer.connectionGeneration,limit:16})
       for(const work of page.calls){
@@ -89,6 +95,8 @@ export class InteractionWorkspace {
           await this.request('desktop.check',{schemaVersion:1,desktopPeerId:peer.desktopPeerId,connectionGeneration:peer.connectionGeneration,bridgeCallId:work.call.bridgeCallId,bindingDigest:work.receipt.bindingDigest,argumentsDigest:work.call.argumentsDigest})
         }
         let result:unknown|null=null,outcome:Finish['outcome']='unknown'
+        const intent:Finish={schemaVersion:1,desktopPeerId:peer.desktopPeerId,connectionGeneration:peer.connectionGeneration,bridgeCallId:work.call.bridgeCallId,bindingDigest:work.receipt.bindingDigest,argumentsDigest:work.call.argumentsDigest,outcome:'unknown',result:null}
+        this.journal?.save(intent)
         try{
           await current()
           result=work.call.toolName.startsWith('browser_')?await this.browser.modelExecute(work,current):await this.computer?.execute(work,current)
@@ -98,7 +106,8 @@ export class InteractionWorkspace {
         }catch{result=null;outcome='unknown'}
         const finish:Finish={schemaVersion:1,desktopPeerId:peer.desktopPeerId,connectionGeneration:peer.connectionGeneration,bridgeCallId:work.call.bridgeCallId,bindingDigest:work.receipt.bindingDigest,argumentsDigest:work.call.argumentsDigest,outcome,result}
         this.outcomes.set(work.call.bridgeCallId,finish)
-        try{await this.request('desktop.finish',finish);this.outcomes.delete(work.call.bridgeCallId)}catch{try{await this.request('desktop.archiveLate',finish);this.outcomes.delete(work.call.bridgeCallId)}catch{/* 原动作不重做；后续只补存原结果。 */}}
+        this.journal?.save(finish)
+        try{await this.request('desktop.finish',finish);this.journal?.remove(work.call.bridgeCallId);this.outcomes.delete(work.call.bridgeCallId)}catch{try{await this.request('desktop.archiveLate',finish);this.journal?.remove(work.call.bridgeCallId);this.outcomes.delete(work.call.bridgeCallId)}catch{/* 原动作不重做；后续只补存原结果。 */}}
       }
     }finally{this.busy=false}
   }
