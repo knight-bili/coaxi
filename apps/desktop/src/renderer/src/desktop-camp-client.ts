@@ -10,6 +10,7 @@ export const desktopThreadClient: ThreadClient = {
   get nativeCustomSkills() { return window.rovai.nativeCustomSkills },
   get nativeHistory() { return window.rovai.nativeHistory },
   get officeWorkspace() { return window.rovai.officeWorkspace },
+  get interactionWorkspace() { return window.rovai.interactionWorkspace },
   get browserWorkspace() { return window.rovai.browserWorkspace },
   get privateInputRecovery() { return window.rovai.privateInputRecovery },
   exportMonitoring: async filter => { const path = await window.rovai.exportMonitoring(filter); return { exported: Boolean(path), ...(path ? { path } : {}) } },

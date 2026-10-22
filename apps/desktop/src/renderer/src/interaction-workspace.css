@@ -1,0 +1,18 @@
+/* Codeg SettingCard/SettingRow 的分隔行与开关比例，沿用 Rovai 主题和容器。 */
+.interaction-help{font-size:12px;line-height:1.6;color:var(--muted);margin:8px 0 12px}
+.interaction-setting-rows{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface-subtle)}
+.interaction-setting-row{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:12px 16px}
+.interaction-setting-row+.interaction-setting-row{border-top:1px solid var(--line)}
+.interaction-setting-row>span{min-width:0;display:grid;gap:4px}
+.interaction-setting-row strong{font-size:13px;font-weight:500;color:var(--ink)}
+.interaction-setting-row small{font-size:12px;line-height:1.5;color:var(--muted)}
+.interaction-setting-row input{flex:none;accent-color:var(--accent);width:18px;height:18px}
+.interaction-actions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:12px}
+.interaction-share-body{display:grid;gap:14px}
+.interaction-share-body>label{display:grid;gap:6px;min-width:0;font-size:12px;color:var(--muted)}
+.interaction-share-body select{width:100%;min-width:0}
+.interaction-request-list{display:grid;gap:16px}
+.interaction-request{border-bottom:1px solid var(--line);padding-bottom:16px;min-width:0}
+.interaction-request>header{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px}
+.interaction-request>header>span{color:var(--muted);font-size:12px}
+.interaction-request pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;line-height:1.6;color:var(--ink);background:var(--surface-subtle);border:1px solid var(--line);border-radius:6px;padding:12px}
