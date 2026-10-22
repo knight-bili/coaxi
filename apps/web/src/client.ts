@@ -456,6 +456,8 @@ export class ConsoleClient {
       return receipt as T
     }
     const commandId = params && typeof params === 'object' && 'commandId' in params ? params.commandId : undefined
+    // 自定义定义表单可能含本次环境新值；使用界面专用的编号恢复，不复制进通用请求日志。
+    if(operation.startsWith('runtime.custom.')||operation==='members.runtime.set'&&(params as {command?:{adapterKind?:string}})?.command?.adapterKind==='custom-acp')return this.#rpc<T>(operation,params)
     if (!RECONCILABLE_COMMANDS.has(operation) || typeof commandId !== 'string') return this.#rpc<T>(operation, params)
     if (!this.authenticated) throw new SessionRequired()
     const group = commandGroup(operation, params)

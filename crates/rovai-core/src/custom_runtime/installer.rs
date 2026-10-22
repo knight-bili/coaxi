@@ -53,6 +53,7 @@ fn register(database:&mut Database,reference:CustomRuntimeRefV1,lock:Value,id:&s
 }
 pub async fn start(root:&Path,definition:Value,reference:CustomRuntimeRefV1,requested_platform:String,id:String,selectable:bool,database:Arc<tokio::sync::Mutex<Database>>)->Result<Value>{
     ensure!(requested_platform==platform()?,"custom_runtime.install_requires_current_platform");let path=receipt_path(root,&id)?;let input_digest=digest(&json!({"reference":reference,"platform":requested_platform,"commandId":id}))?;
+    if path.exists(){let result=receipt(root,&id)?;ensure!(result["inputDigest"].as_str()==Some(input_digest.as_str()),"custom_runtime.command_identity_changed");return Ok(result)}
     let guard=MUTATION.clone().try_lock_owned().map_err(|_|anyhow::anyhow!("custom_runtime.install_busy"))?;
     if path.exists(){let result=receipt(root,&id)?;ensure!(result["inputDigest"].as_str()==Some(input_digest.as_str()),"custom_runtime.command_identity_changed");return Ok(result)}
     ensure!(selectable,"custom_runtime.definition_changed");crate::platform::private_storage::prepare_private_directory(path.parent().context("custom_runtime.receipt_parent_missing")?)?;
