@@ -7,6 +7,7 @@ export * from './member-avatar'
 export * from './current-user-profile'
 export type * from './native-history-usage'
 export type * from './user-feedback'
+export type * from './native-lifecycle'
 
 export interface NativeHistoryUsageReport {
   schemaVersion:1;source:'imported_native_history';report:import('./native-history-usage').TokenUsageReport
@@ -4791,6 +4792,7 @@ export interface ResolveRuntimeInteractionParams {
 }
 
 export type CoreMethod =
+  | 'runtime.steer.policy.get' | 'runtime.steer.policy.set' | 'runtime.steer.targets'
   | 'runtime.custom.registry'
   | 'runtime.custom.list' | 'runtime.custom.upsert' | 'runtime.custom.remove' | 'runtime.custom.install' | 'runtime.custom.inspect'
   | 'commands.reconcile'

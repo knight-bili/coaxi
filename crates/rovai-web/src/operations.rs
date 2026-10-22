@@ -5,6 +5,12 @@ use serde::{Deserialize, Serialize};
 /// and the legacy shared draft remain outside the network capability.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum Operation {
+    #[serde(rename="runtime.steer.policy.get")]
+    NativeSteerPolicyGet,
+    #[serde(rename="runtime.steer.policy.set")]
+    NativeSteerPolicySet,
+    #[serde(rename="runtime.steer.targets")]
+    NativeSteerTargets,
     #[serde(rename="navigation.projectGroups")]
     NavigationProjectGroups,
     #[serde(rename="extensions.catalog")]
@@ -570,6 +576,9 @@ impl Operation {
     pub fn project(self, mut value: serde_json::Value) -> serde_json::Value {
         use serde_json::json;
         match self {
+            Self::NativeSteerPolicyGet => select_fields(&value,&["schemaVersion","revision","members"]),
+            Self::NativeSteerPolicySet => select_fields(&value,&["commandId","commandType","status","code","payload","resultEntity","recordedAt"]),
+            Self::NativeSteerTargets => select_fields(&value,&["schemaVersion","targets"]),
             Self::NavigationProjectGroups => select_fields(&value,&["schemaVersion","initialized","projectGroupsRevision","projectGroups","projectOrder"]),
             Self::AppInfo => json!({"name":value["name"],"version":value["version"]}),
             Self::ForgeAccountsGet | Self::ForgeAccountsSet => select_fields(&value, &["accounts"]),
@@ -663,6 +672,9 @@ impl Operation {
 
     pub fn method(self) -> &'static str {
         match self {
+            Self::NativeSteerPolicyGet => "runtime.steer.policy.get",
+            Self::NativeSteerPolicySet => "runtime.steer.policy.set",
+            Self::NativeSteerTargets => "runtime.steer.targets",
             Self::ForgeAccountsGet => "forge.accounts.get",
             Self::ForgeAccountsSet => "forge.accounts.set",
             Self::ExtensionCatalog => "extensions.catalog",

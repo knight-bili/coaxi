@@ -1,5 +1,6 @@
 import { MemberInteractionSettings } from './MemberInteractionSettings'
 import { MemberFeedbackSettings } from './MemberFeedbackSettings'
+import { MemberNativeSteerSettings } from './MemberNativeSteerSettings'
 import { MemberEnvironmentEditor, useMemberEnvironment } from './MemberEnvironmentEditor'
 import type { MemberEnvironmentEdit } from './member-environment'
 import { MobileBack, useMobileLayout } from './MobileLayout'
@@ -844,6 +845,7 @@ const MemberEditor = forwardRef<
           </section>
           {selectedAgent && <MemberInteractionSettings key={selectedAgent.agentId} agentId={selectedAgent.agentId} adapterKind={selectedAgent.runtimeConfiguration?.adapterKind} disabled={busy !== null}/>}
           {selectedAgent && <MemberFeedbackSettings key={`feedback:${selectedAgent.agentId}`} agentId={selectedAgent.agentId} disabled={busy !== null}/>}
+          {selectedAgent && <MemberNativeSteerSettings key={`native-steer:${selectedAgent.agentId}`} agentId={selectedAgent.agentId} disabled={busy !== null}/>}
           {selectedAgent && <MemberCustomRuntime key={`custom:${selectedAgent.agentId}`} agent={selectedAgent} disabled={busy!==null} onSaved={onReload}/>}
         </div>
       </div>

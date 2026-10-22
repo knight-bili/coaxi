@@ -50,7 +50,7 @@ pub(super) fn reconcile(
         }};
     }
     match query.operation.as_str() {
-        "runtime.custom.upsert" | "runtime.custom.remove" | "runtime.custom.install" => {
+        "runtime.custom.upsert" | "runtime.custom.remove" | "runtime.custom.install" | "runtime.steer.policy.set" => {
             #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Original{command_id:String}
             let input:Original=serde_json::from_value(query.params)?;uuid::Uuid::parse_str(&input.command_id)?;
             if query.operation=="runtime.custom.install"{
