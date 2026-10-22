@@ -5,6 +5,16 @@ use serde::{Deserialize, Serialize};
 /// and the legacy shared draft remain outside the network capability.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum Operation {
+    #[serde(rename="configuration.providers.list")]
+    PortableProvidersList,
+    #[serde(rename="configuration.providers.upsert")]
+    PortableProvidersUpsert,
+    #[serde(rename="configuration.providers.remove")]
+    PortableProvidersRemove,
+    #[serde(rename="configuration.memberConnection.get")]
+    PortableMemberConnectionGet,
+    #[serde(rename="configuration.memberConnection.set")]
+    PortableMemberConnectionSet,
     #[serde(rename="history.execution.records")]
     NativeCreationRecords,
     #[serde(rename="runtime.steer.evidence")]
@@ -604,6 +614,9 @@ impl Operation {
         use serde_json::json;
         match self {
             Self::NativeCreationRecords => select_fields(&value,&["schemaVersion","items","next"]),
+            Self::PortableProvidersList=>select_fields(&value,&["items","next"]),
+            Self::PortableProvidersUpsert|Self::PortableProvidersRemove|Self::PortableMemberConnectionSet=>select_fields(&value,&["commandId","commandType","status","code","payload","resultEntity","recordedAt"]),
+            Self::PortableMemberConnectionGet=>select_fields(&value,&["agentId","agentVersion","binding"]),
             Self::NativeSteerEvidence => select_fields(&value,&["schemaVersion","preview","receipt","delivery","normalContinuation"]),
             Self::NativeNormalPreview => select_fields(&value,&["schemaVersion","previewId","previewDigest","sourceCommandId","scope","agentId","input","inputDigest","expiresAt"]),
             Self::NativeNormalConfirm | Self::NativeNormalReceipt => select_fields(&value,&["schemaVersion","commandId","state","commandResult","error"]),
@@ -712,6 +725,11 @@ impl Operation {
             Self::NativeSteerPolicyGet => "runtime.steer.policy.get",
             Self::NativeContinuationPreview => "history.execution.preview",
             Self::NativeCreationRecords => "history.execution.records",
+            Self::PortableProvidersList=>"configuration.providers.list",
+            Self::PortableProvidersUpsert=>"configuration.providers.upsert",
+            Self::PortableProvidersRemove=>"configuration.providers.remove",
+            Self::PortableMemberConnectionGet=>"configuration.memberConnection.get",
+            Self::PortableMemberConnectionSet=>"configuration.memberConnection.set",
             Self::NativeSteerEvidence => "runtime.steer.evidence",
             Self::NativeNormalPreview => "runtime.steer.normal.preview",
             Self::NativeNormalConfirm => "runtime.steer.normal.confirm",

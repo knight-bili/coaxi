@@ -1,6 +1,8 @@
 import type { CoreMethod } from '@contracts'
 
 export const RUNTIME_RENDERER_CORE_METHODS = [
+  'configuration.providers.list', 'configuration.providers.upsert', 'configuration.providers.remove',
+  'configuration.memberConnection.get', 'configuration.memberConnection.set',
   'history.execution.preview', 'history.execution.confirm', 'history.execution.receipt',
   'history.execution.records', 'runtime.steer.evidence',
   'runtime.steer.normal.preview', 'runtime.steer.normal.confirm', 'runtime.steer.normal.receipt',
