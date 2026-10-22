@@ -63,3 +63,21 @@ pub(crate) fn codex_projection(model:&Value,snapshot:&[Value])->Result<(Value,Ve
     }
     Ok((projected,warnings))
 }
+
+pub(crate) fn custom_agent(id:&str,entry:&Value)->Result<Value>{
+    let source:archive::CodegCustomAgent=serde_json::from_value(entry.clone()).map_err(|_|anyhow::anyhow!("configuration.custom_agent_invalid"))?;
+    let mut spec:Value=serde_json::from_str(&source.spec_json).map_err(|_|anyhow::anyhow!("configuration.custom_spec_invalid"))?;
+    let object=spec.as_object_mut().context("configuration.custom_spec_invalid")?;
+    for key in ["npx","uvx"]{object.entry(key.to_owned()).or_insert(Value::Null);}
+    object.entry("binary".to_owned()).or_insert_with(||json!({}));
+    for key in ["npx","uvx"]{
+        if let Some(block)=spec[key].as_object_mut(){
+            block.entry("args".to_owned()).or_insert_with(||json!([]));block.entry("env".to_owned()).or_insert_with(||json!({}));block.entry("cmd".to_owned()).or_insert(Value::Null);
+            for optional in if key=="npx"{vec!["nodeRequired"]}else{vec!["uvRequired","python"]}{block.entry(optional.to_owned()).or_insert(Value::Null);}
+        }
+    }
+    if let Some(platforms)=spec["binary"].as_object_mut(){for block in platforms.values_mut(){if let Some(block)=block.as_object_mut(){for(key,value)in[("args",json!([])),("env",json!({})),("sha256",Value::Null)]{block.entry(key.to_owned()).or_insert(value);}}}}
+    let mut definition=crate::custom_runtime::default_definition();
+    for(key,value)in[("id",json!(id)),("registryId",json!(source.registry_id)),("name",json!(source.name)),("description",json!(source.description)),("version",json!(source.version)),("distributionKind",json!(source.distribution_kind)),("spec",spec),("iconUrl",json!(source.icon_url)),("skillsSharedStore",json!(source.skills_shared_store)),("source",json!(source.source)),("versionProbe",json!(source.version_probe)),("supportsMcp",json!(source.supports_mcp))]{definition[key]=value;}
+    crate::custom_runtime::validate_definition(&definition,true)?;Ok(definition)
+}

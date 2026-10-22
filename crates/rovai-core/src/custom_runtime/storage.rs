@@ -88,12 +88,17 @@ pub(crate) fn launch_environment(connection:&Connection,definition:&Value,path:&
 pub fn upsert(database:&mut Database,envelope:&CommandEnvelope<Upsert>)->Result<CommandExecution>{
     DomainCommandGateway.execute(database,envelope,|tx|{
         if !matches!(&envelope.actor,ActorRef::User{..}){return Ok(reject("custom_runtime.user_required"))}
-        let input=&envelope.payload;let mut value=input.definition.clone();
+        upsert_on(tx,envelope.payload.expected_revision,&envelope.payload.definition)
+    })
+}
+/// 配置迁移复用同一事务写入，不能嵌套提交或连带安装程序。
+pub(crate) fn upsert_on(tx:&rusqlite::Transaction<'_>,expected_revision:i64,definition:&Value)->Result<CommandHandlerResult>{
+        let mut value=definition.clone();
         if normalize_skill_directory(&mut value).is_err(){return Ok(reject("custom_runtime.skill_directory_invalid"))}
-        if validate_definition(&value,true).is_err()||!(0..9_007_199_254_740_991).contains(&input.expected_revision){return Ok(reject("custom_runtime.definition_invalid"))}
+        if validate_definition(&value,true).is_err()||!(0..9_007_199_254_740_991).contains(&expected_revision){return Ok(reject("custom_runtime.definition_invalid"))}
         let id=text(&value,"id")?.to_owned();let previous=latest(tx,&id)?;
         let current:i64=tx.query_row("SELECT COALESCE(MAX(revision),0) FROM custom_runtime_definition WHERE id=?1",[&id],|r|r.get(0))?;
-        if current!=input.expected_revision{return Ok(reject("custom_runtime.definition_changed"))}
+        if current!=expected_revision{return Ok(reject("custom_runtime.definition_changed"))}
         if current==0{let count:i64=tx.query_row("SELECT COUNT(*) FROM custom_runtime_head",[],|r|r.get(0))?;if count>=MAX_DEFINITIONS{return Ok(reject("custom_runtime.definition_capacity"))}}
         let collision:bool=tx.query_row("SELECT EXISTS(SELECT 1 FROM custom_runtime_head WHERE registry_id=?1 AND id<>?2 AND removed=0)",params![text(&value,"registryId")?,id],|r|r.get(0))?;
         if collision{return Ok(reject("custom_runtime.registry_id_conflict"))}
@@ -106,7 +111,6 @@ pub fn upsert(database:&mut Database,envelope:&CommandEnvelope<Upsert>)->Result<
         tx.execute("INSERT INTO custom_runtime_definition(id,revision,digest,value_json) VALUES(?1,?2,?3,?4)",params![id,revision,identity,serde_json::to_string(&value)?])?;
         tx.execute("INSERT INTO custom_runtime_head(id,revision,registry_id,removed) VALUES(?1,?2,?3,0) ON CONFLICT(id) DO UPDATE SET revision=excluded.revision,registry_id=excluded.registry_id,removed=0",params![id,revision,text(&value,"registryId")?])?;
         Ok(CommandHandlerResult::applied("custom_runtime.saved",json!({"id":id,"revision":revision,"definitionDigest":identity}),entity(&id)))
-    })
 }
 pub fn remove(database:&mut Database,envelope:&CommandEnvelope<Remove>)->Result<CommandExecution>{
     DomainCommandGateway.execute(database,envelope,|tx|{
