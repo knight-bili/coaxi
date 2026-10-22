@@ -17,6 +17,7 @@ import {
   classifyAttachmentDisplay
 } from './attachment-presentation'
 import { UiText, uiAttribute } from './interface-language'
+import { TaskTemplateDraftPicker } from './TaskTemplateDraftPicker'
 
 export type MissionDraftAttachment =
   | { kind: 'stored'; attachment: LocalAttachmentSourceView }
@@ -152,6 +153,7 @@ export const MissionWritingPlane = forwardRef<MissionWritingPlaneHandle, {
     onDragOver={event => { if (!withFiles(event)) return; event.preventDefault(); event.dataTransfer.dropEffect = disabled || attachmentsDisabled ? 'none' : 'copy' }}
     onDragLeave={event => { if (!withFiles(event)) return; event.preventDefault(); dragDepth.current = Math.max(0, dragDepth.current - 1); if (!dragDepth.current) setDragging(false) }}
     onDrop={event => { if (!withFiles(event)) return; event.preventDefault(); dragDepth.current = 0; setDragging(false); addFiles(droppedAttachmentInputs(event.dataTransfer)) }}>
+    {!mission&&<TaskTemplateDraftPicker disabled={disabled} memberCount={memberAgentIds.length} materials={attachments.map(value=>value.kind==='local'?{id:value.id,name:value.file.name}:{id:value.attachment.id,name:value.attachment.displayName})} onChooseMaterials={()=>inputRef.current?.click()} onApply={value=>{onTitleChange(value.title);onDescriptionChange(value.description?[{kind:'text',text:value.description}]:[]);onNotify(uiAttribute('模板已填入，尚未创建或运行。'))}}/>}
     <label className="sr-only" htmlFor="mission-editor-title"><UiText zh={"使命名称"} /></label>
     <input ref={titleInputRef} id="mission-editor-title" className="mission-editor-title" aria-label={uiAttribute("使命名称")} placeholder={uiAttribute("使命名称")} autoComplete="off" value={title} disabled={disabled} aria-invalid={!!titleError} onChange={event => onTitleChange(event.target.value)}/>
     {!!attachments.length && <ComposerAttachmentStrip ariaLabel={uiAttribute("使命附件，使用左右方向键浏览")}>
