@@ -129,8 +129,9 @@ pub(crate) fn create_child(
         serde_json::from_value(preset.clone()).context("Invalid delegation Runtime defaults")?;
     let selected =
         crate::delegation_runtime_defaults::configuration(plan.configuration, &defaults)?;
-    let mut base = crate::agent_profile::resolve_frozen_runtime_binding(
+    let mut base = crate::agent_profile::resolve_frozen_runtime_for_member_binding(
         tx,
+        &identity.owner_agent_id,
         &ResolvedRuntimeBinding {
             custom_runtime_ref: selected.custom_runtime_ref.clone(),
             adapter_kind: plan.configuration.adapter_kind,

@@ -4622,6 +4622,23 @@ pub(crate) fn resolve_frozen_runtime_binding(
     resolve_frozen_runtime_binding_with_snapshot(transaction, binding, None, None)
 }
 
+/// 新帮手只在目标程序与队员明确选定的程序相同时使用该队员的独立连接。
+pub(crate) fn resolve_frozen_runtime_for_member_binding(
+    connection:&Connection,
+    member:&str,
+    binding:&ResolvedRuntimeBinding,
+)->Result<std::result::Result<FrozenAgentRuntimeConfig,RuntimeConfigurationBlocker>>{
+    let selected:bool=connection.query_row("SELECT EXISTS(SELECT 1 FROM agent_profile WHERE id=?1 AND selected_runtime_adapter_kind=?2 AND default_runtime_installation_id=?3 AND profile_status='present')",params![member,binding.adapter_kind.as_str(),binding.installation_id],|row|row.get(0))?;
+    let portable=selected&&crate::portable_configuration::members::selected(connection,member)?;
+    if !portable{return resolve_frozen_runtime_binding(connection,binding)}
+    let mut result=resolve_frozen_runtime_binding_with_snapshot(connection,binding,Some(None),None)?;
+    if let Ok(runtime)=&mut result{
+        let portable=crate::portable_configuration::members::freeze_for_member(connection,member,runtime)?;
+        crate::portable_configuration::freeze(runtime,portable)?;
+    }
+    Ok(result)
+}
+
 fn resolve_frozen_runtime_binding_with_snapshot(
     transaction: &Connection,
     binding: &ResolvedRuntimeBinding,
