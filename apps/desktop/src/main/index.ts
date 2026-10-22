@@ -10,6 +10,7 @@ import { InteractionComputer } from './interaction-computer'
 import { InteractionResultJournal } from './interaction-result-journal'
 import { InteractionComputerIndicator } from './interaction-computer-indicator'
 import { KeyboardShortcutsStore } from './keyboard-shortcuts'
+import { WorkbenchEditorRecovery } from './workbench-editor-recovery'
 import { resolveWindowZoomAction } from '../shared/codeg-keyboard-shortcuts'
 import { creationPreferences, withHostConversationPreferences } from '../shared/host-general-preferences'
 import { createHostChannelHandler } from './host-channels'
@@ -1275,6 +1276,8 @@ app.on('before-quit',()=>officeWorkspace.closeAll())
 const browserWorkspace = new BrowserWorkspace((method,params)=>core.request(method,params),()=>mainWindow)
 const interactionComputer = new InteractionComputer(core,()=>mainWindow)
 const keyboardShortcuts = new KeyboardShortcutsStore(()=>app.getPath('userData'))
+const workbenchEditorRecovery = new WorkbenchEditorRecovery(()=>app.getPath('userData'))
+ipcMain.handle('rovai:workbench-editor-recovery',(event,action,input)=>{if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('工程恢复只允许当前桌面窗口使用。');if(action==='get')return workbenchEditorRecovery.get(input?.key);if(action==='put'){workbenchEditorRecovery.put(input);return}if(action==='copies')return workbenchEditorRecovery.copies(input?.key,input?.after??null);throw new Error('工程编辑恢复操作无效。')})
 ipcMain.handle('rovai:keyboard-shortcuts',(event,action,input)=>{if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('shortcuts.local_owner_required');if(action==='get')return keyboardShortcuts.get();if(action==='save')return keyboardShortcuts.save(input);if(action==='recording'&&typeof input==='boolean'){keyboardShortcuts.recording=input;mainWindow.webContents.setIgnoreMenuShortcuts(input);return}throw new Error('shortcuts.operation_not_admitted')})
 const interactionComputerIndicator = new InteractionComputerIndicator(interactionComputer,()=>mainWindow,async()=>{try{await core.request('interaction.local',{action:'computer.stop',payload:{}})}finally{await interactionComputer.stop()}})
 app.once('will-quit',()=>interactionComputerIndicator.dispose())

@@ -5169,6 +5169,7 @@ export interface WorkbenchEditorSnapshot {revision:string|null;value:WorkbenchEd
 export interface NativeShortcutInput {key:string;code?:string;metaKey:boolean;ctrlKey:boolean;altKey:boolean;shiftKey:boolean;isComposing?:boolean}
 export interface KeyboardShortcutsApi {get():Promise<KeyboardShortcutsSnapshot>;save(input:KeyboardShortcutsSnapshot):Promise<KeyboardShortcutsSnapshot>;recording?(value:boolean):Promise<void>;onNativeInput?(listener:(input:NativeShortcutInput)=>void):()=>void}
 export interface RovaiApi {
+  workbenchEditorRecovery?:{get(key:string):Promise<unknown|null>;put(value:unknown):Promise<void>;copies(key:string,after:string|null):Promise<{items:Array<{key:string;documentCount:number;paths:string[]}>;next:string|null}>}
   keyboardShortcuts?:KeyboardShortcutsApi
   interactionWorkspace?:InteractionWorkspaceApi
   interactionComputer?:{request<T>(method:'preferences.get'|'preferences.set'|'picker'|'status'|'stop'|'monitor'|'activity.clear',input:Record<string,unknown>):Promise<T>}

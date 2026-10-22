@@ -83,6 +83,7 @@ const api: RovaiApi = {
   computerWorkspace: { request: (threadId,input)=>ipcRenderer.invoke('rovai:computer-workspace',{threadId,input,commandId:globalThis.crypto.randomUUID()}) },
   interactionComputer:{request:(method,input)=>ipcRenderer.invoke('rovai:interaction-computer',method,input)},
   interactionWorkspace: {request:(action,payload)=>ipcRenderer.invoke('rovai:interaction-workspace',action,payload)},
+  workbenchEditorRecovery:{get:key=>ipcRenderer.invoke('rovai:workbench-editor-recovery','get',{key}),put:value=>ipcRenderer.invoke('rovai:workbench-editor-recovery','put',value),copies:(key,after)=>ipcRenderer.invoke('rovai:workbench-editor-recovery','copies',{key,after})},
   browserWorkspace: {
     preferences: () => ipcRenderer.invoke('rovai:browser-workspace','preferences'),
     updatePreferences: input => ipcRenderer.invoke('rovai:browser-workspace','updatePreferences',input),
