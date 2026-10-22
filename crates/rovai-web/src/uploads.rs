@@ -16,7 +16,7 @@ pub(super) struct TemporaryUpload {
     pub(super) retain: bool,
 }
 impl TemporaryUpload {
-    fn create() -> Result<Self> {
+    pub(super) fn create() -> Result<Self> {
         let directory = std::env::temp_dir().join(format!("rovai-web-upload-{}", new_token()?));
         #[cfg(unix)]
         {
@@ -49,6 +49,9 @@ pub(super) struct ReceivedUpload {
     prefix: Vec<u8>,
 }
 pub(super) async fn receive(mut field: axum::extract::multipart::Field<'_>) -> Result<ReceivedUpload> {
+    receive_bounded(field,MAX_BYTES).await
+}
+pub(super) async fn receive_bounded(mut field: axum::extract::multipart::Field<'_>,limit:usize) -> Result<ReceivedUpload> {
     let temporary = TemporaryUpload::create()?;
     let file = tokio::fs::File::create(temporary.path()).await?;
     let mut file = tokio::io::BufWriter::with_capacity(64 * 1024, file);
@@ -57,7 +60,7 @@ pub(super) async fn receive(mut field: axum::extract::multipart::Field<'_>) -> R
     let mut prefix = Vec::with_capacity(12);
     while let Some(chunk) = field.chunk().await.context("upload_too_large")? {
         size += chunk.len() as u64;
-        ensure!(size <= MAX_BYTES as u64, "upload_too_large");
+        ensure!(size <= limit as u64, "upload_too_large");
         prefix.extend_from_slice(&chunk[..chunk.len().min(12 - prefix.len())]);
         digest.update(&chunk);
         file.write_all(&chunk).await?;
