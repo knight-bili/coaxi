@@ -1,7 +1,7 @@
 import { useEffect,useRef,useState,type CSSProperties,type ReactNode } from 'react'
 import { Columns2,Rows2,PanelLeftClose,RotateCw,X } from 'lucide-react'
 import { GroupSplitHandle } from './CodegGroupSplitHandle'
-import { computeRects,leafIds,makeGroupId,neighborGroupId,removeGroup,resizeSplitAt,ROOT_GROUP_ID,singleGroupLayout,splitGroup,toggleOrientation,type GroupRect,type LayoutNode,type SplitDirection } from '../../shared/codeg-tab-group-layout'
+import { computeRects,isLayoutNode,leafIds,makeGroupId,neighborGroupId,removeGroup,resizeSplitAt,ROOT_GROUP_ID,singleGroupLayout,splitGroup,toggleOrientation,type GroupRect,type LayoutNode,type SplitDirection } from '../../shared/codeg-tab-group-layout'
 import { NUMBERED_TAB_ACTION_IDS } from '../../shared/codeg-keyboard-shortcuts'
 import { useShortcutActions } from './useShortcutActions'
 import type { ShortcutActions } from './shortcut-action-driver'
@@ -12,6 +12,18 @@ export interface SplitDeckItem {id:string;label:string;dirty?:boolean}
 export interface SplitDeckPlacement {id:string;rect:GroupRect;visible:boolean}
 interface Group {tabs:string[];selected:string|null}
 interface State {tree:LayoutNode;groups:Record<string,Group>;active:string}
+function restored(value:unknown):State|null{
+  try{
+    if(!value||typeof value!=='object'||Array.isArray(value)||JSON.stringify(value).length>65536)return null
+    const state=value as State,stack:Array<{value:unknown;depth:number}>=[{value:state.tree,depth:0}];let nodes=0
+    while(stack.length){const row=stack.pop()!;if(++nodes>31||row.depth>8||!row.value||typeof row.value!=='object')return null;const node=row.value as {children?:unknown[]};if(node.children){if(!Array.isArray(node.children))return null;stack.push(...node.children.map(value=>({value,depth:row.depth+1})))}}
+    if(!isLayoutNode(state.tree))return null;const ids=leafIds(state.tree)
+    if(ids.length>8||new Set(ids).size!==ids.length||!ids.includes(state.active)||!state.groups||Object.keys(state.groups).length!==ids.length)return null
+    const seen=new Set<string>()
+    for(const id of ids){const group=state.groups[id];if(!group||!Array.isArray(group.tabs)||group.tabs.length>128||group.tabs.some(tab=>typeof tab!=='string'||tab.length>8192||seen.has(tab)||!seen.add(tab))||group.selected!==null&&!group.tabs.includes(group.selected))return null}
+    return structuredClone(state)
+  }catch{return null}
+}
 const MIME='application/x-codeg-rovai-split-tab'
 function initial():State{return {tree:singleGroupLayout(),groups:{[ROOT_GROUP_ID]:{tabs:[],selected:null}},active:ROOT_GROUP_ID}}
 function project(state:State,items:SplitDeckItem[],selected:string|null):State{
@@ -25,16 +37,21 @@ function project(state:State,items:SplitDeckItem[],selected:string|null):State{
 }
 
 /** Codeg 原分屏树与平铺兄弟节点：移动标签只改变坐标，不重挂编辑器。 */
-export function SplitTabDeck({items,selected,onSelect,onClose,renderBody,disabled=false,scopeKey,externalBodies=false,onPlacement}:{
+export function SplitTabDeck({items,selected,onSelect,onClose,renderBody,disabled=false,scopeKey,externalBodies=false,onPlacement,restoredLayout,restoreToken=0,onLayoutChange}:{
   items:SplitDeckItem[];selected:string|null;onSelect(id:string):void;onClose(id:string):void;
   renderBody(item:SplitDeckItem,visible:boolean):ReactNode;disabled?:boolean;scopeKey:string;
   externalBodies?:boolean;onPlacement?(placements:SplitDeckPlacement[]):void
+  restoredLayout?:unknown;restoreToken?:number;onLayoutChange?(value:unknown):void
 }):React.JSX.Element{
   const t=useUiText(),root=useRef<HTMLDivElement>(null),[state,setState]=useState(initial),drag=useRef<string|null>(null)
+  const restoreRef=useRef(restoredLayout);restoreRef.current=restoredLayout
+  useEffect(()=>{const next=restored(restoreRef.current);if(next)setState(next)},[restoreToken])
   const view=project(state,items,selected),rects=computeRects(view.tree),ids=leafIds(view.tree),active=view.groups[view.active]
   const placements=items.map(item=>{const groupId=ids.find(id=>view.groups[id].tabs.includes(item.id))??view.active;return {id:item.id,rect:rects.groups.get(groupId)!,visible:view.groups[groupId].selected===item.id}}),placementKey=JSON.stringify(placements),placementCallback=useRef(onPlacement)
   placementCallback.current=onPlacement
   useEffect(()=>{placementCallback.current?.(JSON.parse(placementKey)as SplitDeckPlacement[])},[placementKey])
+  const layoutCallback=useRef(onLayoutChange),layoutKey=JSON.stringify(view);layoutCallback.current=onLayoutChange
+  useEffect(()=>{layoutCallback.current?.(JSON.parse(layoutKey))},[layoutKey])
   useEffect(()=>{setState(current=>project(current,items,selected))},[items,selected])
   const select=(groupId:string,id:string):void=>{setState({...view,active:groupId,groups:{...view.groups,[groupId]:{...view.groups[groupId],selected:id}}});onSelect(id)}
   const split=(groupId:string,direction:SplitDirection):void=>{
