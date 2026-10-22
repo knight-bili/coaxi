@@ -9,6 +9,17 @@ private struct MonitoringRequestKey: Hashable {let filter: JSONValue;let active:
 /// Native presentation of the original RuntimeMonitoring snapshot; no inference or collection is launched.
 struct RovaiMonitoring: View {
     let model: RovaiWorkspaceModel
+    @State private var surface = 0
+    var body: some View {
+        VStack(spacing: 0) {
+            Picker("用量视图", selection: $surface) {Text("运行监控").tag(0);Text("用量看板").tag(1);Text("原生历史").tag(2)}.pickerStyle(.segmented).padding(.horizontal).padding(.vertical, 8)
+            if surface == 0 {RovaiRuntimeMonitoring(model: model)} else {RovaiUsageDashboard(model: model, history: surface == 2).id(surface)}
+        }
+    }
+}
+
+private struct RovaiRuntimeMonitoring: View {
+    let model: RovaiWorkspaceModel
     @Environment(\.scenePhase) private var scenePhase
     @State private var range = "24h", runtime = "", provider = "", selectedModel = "", costKind = ""
     @State private var snapshot: JSONValue?, loadedFilter: JSONValue?, issue: String?

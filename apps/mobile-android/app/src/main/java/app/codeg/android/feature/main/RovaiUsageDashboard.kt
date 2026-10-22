@@ -37,10 +37,11 @@ private fun usageNumber(value:JsonElement?):String=(value as?JsonPrimitive)?.dou
     val now=remember(history,refresh){ZonedDateTime.now()};val offset=now.offset.totalSeconds/60
     val query=remember(history,range,bucket,project,runtime,selectedModel,from,to,now){runCatching{
         if(history){
-            val end=if(range=="custom")LocalDate.parse(to).plusDays(1).atStartOfDay(now.zone)else now
-            val start=when(range){"7d"->now.minusDays(7);"30d"->now.minusDays(30);"90d"->now.minusDays(90);"thisMonth"->now.withDayOfMonth(1).toLocalDate().atStartOfDay(now.zone);"thisYear"->now.withDayOfYear(1).toLocalDate().atStartOfDay(now.zone);"custom"->LocalDate.parse(from).atStartOfDay(now.zone);else->null}
+            val tomorrow=now.toLocalDate().plusDays(1).atStartOfDay(now.zone)
+            val end=if(range=="custom")LocalDate.parse(to).plusDays(1).atStartOfDay(now.zone)else tomorrow
+            val start=when(range){"7d"->tomorrow.minusDays(7);"30d"->tomorrow.minusDays(30);"90d"->tomorrow.minusDays(90);"thisMonth"->now.withDayOfMonth(1).toLocalDate().atStartOfDay(now.zone);"thisYear"->now.withDayOfYear(1).toLocalDate().atStartOfDay(now.zone);"custom"->LocalDate.parse(from).atStartOfDay(now.zone);else->null}
             require(start==null||start<end){"开始日期必须早于结束日期"}
-            buildJsonObject{put("operation","report");putJsonObject("filter"){if(start!=null)put("start",start.toInstant().toString());put("end",end.toInstant().toString());put("bucket",bucket);put("tzOffsetMinutes",offset);put("comparePrevious",true);if(runtime.isNotBlank())putJsonArray("agentTypes"){add(runtime)};if(selectedModel.isNotBlank())putJsonArray("models"){add(selectedModel)}};if(project.isNotBlank())putJsonArray("projectRoots"){add(project)}}
+            buildJsonObject{put("operation","report");putJsonObject("filter"){if(start!=null)put("start",start.toInstant().toString());if(range!="all")put("end",end.toInstant().toString());put("bucket",bucket);put("tzOffsetMinutes",offset);put("comparePrevious",true);if(runtime.isNotBlank())putJsonArray("agentTypes"){add(runtime)};if(selectedModel.isNotBlank())putJsonArray("models"){add(selectedModel)}};if(project.isNotBlank())putJsonArray("projectRoots"){add(project)}}
         }else buildJsonObject{put("range",range);put("bucket",bucket);put("tzOffsetMinutes",offset);if(range=="custom"){val a=LocalDate.parse(from);val b=LocalDate.parse(to);require(a<=b){"开始日期不能晚于结束日期"};put("start",a.toString());put("end",b.toString())};if(project.isNotBlank())put("projectRoot",project);if(runtime.isNotBlank())put("runtimeKind",runtime);if(selectedModel.isNotBlank())put("modelKey",selectedModel)}
     }}
     val capturedQuery=query.getOrNull()
