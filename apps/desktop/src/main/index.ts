@@ -6,6 +6,7 @@ import { BackupWorkspace } from './backup-workspace'
 import { OfficeWorkspace } from './office-workspace'
 import { BrowserWorkspace } from './browser-workspace'
 import { InteractionWorkspace } from './interaction-workspace'
+import { InteractionComputer } from './interaction-computer'
 import { creationPreferences, withHostConversationPreferences } from '../shared/host-general-preferences'
 import { createHostChannelHandler } from './host-channels'
 import { FilePreviewFrameNavigation } from './file-preview/file-preview-navigation'
@@ -1264,7 +1265,10 @@ const officeWorkspace = new OfficeWorkspace((method,params)=>core.request(method
 ipcMain.handle('rovai:office-workspace',(event,input)=>officeWorkspace.open(event,input))
 app.on('before-quit',()=>officeWorkspace.closeAll())
 const browserWorkspace = new BrowserWorkspace((method,params)=>core.request(method,params),()=>mainWindow)
-const interactionWorkspace = new InteractionWorkspace(core,browserWorkspace,()=>mainWindow)
+const interactionComputer = new InteractionComputer(core,()=>mainWindow)
+const interactionWorkspace = new InteractionWorkspace(core,browserWorkspace,()=>mainWindow,interactionComputer)
+ipcMain.handle('rovai:interaction-computer',(event,method,input)=>interactionComputer.invoke(event,method,input))
+app.on('before-quit',()=>{void interactionComputer.dispose()})
 ipcMain.handle('rovai:interaction-workspace',(event,action,payload)=>interactionWorkspace.invoke(event,action,payload))
 app.on('before-quit',()=>{void interactionWorkspace.dispose()})
 const webdavWorkspace = new WebdavWorkspace((method,params)=>core.request(method,params),()=>mainWindow,()=>app.getPath('userData'),(event,path,passphrase,kind,digest)=>backupWorkspace.inspectDownloaded(event,path,passphrase,kind,digest))

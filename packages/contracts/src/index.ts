@@ -5160,6 +5160,7 @@ export interface BrowserWorkspaceView { id:string; threadId:string;profileId:str
 export interface InteractionWorkspaceApi {request<T>(action:'status'|'stop'|'policy.get'|'policy.replace'|'grant.share'|'grant.revoke'|'grant.list'|'sharing.targets'|'pending'|'eval.approve'|'unknown.reconcile',payload:Record<string,unknown>):Promise<T>}
 export interface RovaiApi {
   interactionWorkspace?:InteractionWorkspaceApi
+  interactionComputer?:{request<T>(method:'preferences.get'|'preferences.set'|'picker'|'status'|'stop',input:Record<string,unknown>):Promise<T>}
   nativeCustomSkills?: {importDirectory<T>(input:{skillId:string;expectedRevision?:string}):Promise<T|null>}
   /** Native local owner surface; intentionally absent from remote Web. */
   nativePets?: { importDirectory():Promise<unknown|null>;synchronize():Promise<void>;onChanged(listener:()=>void):()=>void }

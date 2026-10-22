@@ -78,6 +78,7 @@ const api: RovaiApi = {
   nativeHistory: {export:(threadId,importId,expectedRevision)=>ipcRenderer.invoke('rovai:native-history','export',{threadId,importId,expectedRevision}),scan:(threadId,provider)=>ipcRenderer.invoke('rovai:native-history','scan',{threadId,provider}),request:(threadId,input)=>ipcRenderer.invoke('rovai:native-history','request',{threadId,input})},
   officeWorkspace: {open:(threadId,path,editable)=>ipcRenderer.invoke('rovai:office-workspace',{threadId,path,editable})},
   computerWorkspace: { request: (threadId,input)=>ipcRenderer.invoke('rovai:computer-workspace',{threadId,input,commandId:globalThis.crypto.randomUUID()}) },
+  interactionComputer:{request:(method,input)=>ipcRenderer.invoke('rovai:interaction-computer',method,input)},
   interactionWorkspace: {request:(action,payload)=>ipcRenderer.invoke('rovai:interaction-workspace',action,payload)},
   browserWorkspace: {
     preferences: () => ipcRenderer.invoke('rovai:browser-workspace','preferences'),

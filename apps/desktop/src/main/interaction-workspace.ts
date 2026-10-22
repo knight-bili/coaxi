@@ -7,6 +7,7 @@ import type { InteractionGrant, InteractionWork } from './interaction-types'
 type Peer={schemaVersion:1;desktopPeerId:string;coreInstanceId:string;ownerWindowId:string;connectionGeneration:number;capabilities:Array<'browser'|'computer'>;expiresAt:string}
 interface Finish {schemaVersion:1;desktopPeerId:string;connectionGeneration:number;bridgeCallId:string;bindingDigest:string;argumentsDigest:string;outcome:'completed'|'rejected'|'cancelled'|'unknown';result:unknown|null}
 export interface DesktopComputerExecutor {
+  attachPeer?(peer:Peer):void
   available():boolean
   execute(work:InteractionWork,assertCurrent:()=>Promise<void>):Promise<unknown>
   stop():Promise<void>
@@ -68,12 +69,12 @@ export class InteractionWorkspace {
     try{
       const supervisor=this.core.getSnapshot(),window=this.owner()
       if(!window||window.isDestroyed()||supervisor.fullCoreState!=='ready'){if(this.peer)this.clear();return}
-      if(this.peer&&(this.peer.connectionGeneration!==supervisor.generation||this.peerWindow!==window.id))this.clear()
+      if(this.peer&&(this.peer.connectionGeneration!==supervisor.generation||this.peerWindow!==window.id||this.peer.capabilities.includes('computer')!==Boolean(this.computer?.available()))){await this.request('peer.detach',{desktopPeerId:this.peer.desktopPeerId}).catch(()=>undefined);this.clear()}
       if(!this.peer||Date.parse(this.peer.expiresAt)-Date.now()<45_000){
         const generation=this.generation
         const peer=await this.request<Peer>('peer.attach',{desktopPeerId:this.peer?.desktopPeerId??null,ownerWindowId:`${window.id}:${this.ownerId}`,connectionGeneration:supervisor.generation,capabilities:this.computer?.available()?['browser','computer']:['browser']})
         if(this.disposed||generation!==this.generation||this.core.getSnapshot().generation!==supervisor.generation||this.owner()!==window)return
-        this.peer=peer;this.peerWindow=window.id
+        this.peer=peer;this.peerWindow=window.id;this.computer?.attachPeer?.(peer)
       }
       const peer=this.peer,generation=this.generation
       if(!peer)return
