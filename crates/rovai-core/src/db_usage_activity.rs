@@ -32,6 +32,6 @@ pub(super) fn migrate(database:&mut Database)->Result<()>{
     anyhow::ensure!(matches!(classify_database_contract(&tx)?,DatabaseContractClassification::SupportedMigrationSource(ref marker) if marker.projection_schema_version==161)&&absent(&tx)?,"Usage activity requires complete schema161");
     tx.execute_batch(SCHEMA)?;
     tx.execute_batch("INSERT INTO schema_migration VALUES(212,datetime('now'));UPDATE rovai_data_contract SET projection_schema_version=162,updated_at=datetime('now') WHERE singleton=1;")?;
-    anyhow::ensure!(matches!(classify_database_contract(&tx)?,DatabaseContractClassification::Current(ref marker) if marker.projection_schema_version==162),"Usage activity target admission failed");
+    anyhow::ensure!(matches!(classify_database_contract(&tx)?,DatabaseContractClassification::Current(ref marker) | DatabaseContractClassification::SupportedMigrationSource(ref marker) if marker.projection_schema_version==162),"Usage activity target admission failed");
     tx.commit()?;Ok(())
 }
