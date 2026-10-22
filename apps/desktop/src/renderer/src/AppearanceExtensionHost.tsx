@@ -10,7 +10,7 @@ export const APPEARANCE_EXTENSIONS_CHANGED='rovai-appearance-extensions-changed'
 export function publishAppearanceExtensions(value:StoredAppearanceExtensions):void{document.dispatchEvent(new CustomEvent(APPEARANCE_EXTENSIONS_CHANGED,{detail:value}))}
 export function AppearanceExtensionHost():null{
   const client=useThreadClient()
-  useShortcutActions({toggle_custom_style:()=>{void client.request<StoredAppearanceExtensions>('appearance.extensions',{operation:'get'}).then(current=>client.request<StoredAppearanceExtensions>('appearance.extensions',{operation:'save',expectedRevision:current.revision,value:{...current.value,customEnabled:!current.value.customEnabled}})).then(publishAppearanceExtensions).catch(()=>undefined)}},{priority:1000,active:()=>true})
+  useShortcutActions({toggle_custom_style:()=>{void client.request<StoredAppearanceExtensions>('appearance.extensions',{operation:'get'}).then(current=>client.request<StoredAppearanceExtensions>('appearance.extensions',{operation:'set',expectedRevision:current.revision,value:{...current.value,customEnabled:!current.value.customEnabled}})).then(publishAppearanceExtensions).catch(()=>undefined)}},{priority:1000,active:()=>true})
   useEffect(()=>{
     const root=document.documentElement;let alive=true,current:StoredAppearanceExtensions|null=null,timer:number|undefined
     const apply=():void=>{

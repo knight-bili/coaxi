@@ -5,6 +5,9 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 import { AppDialogContent, AppDialogHeader } from './AppDialog'
 import { useThreadClient } from './camp-client'
 import { useUiText } from './interface-language'
+import { useShortcutActions } from './useShortcutActions'
+import { NUMBERED_TAB_ACTION_IDS } from '../../shared/codeg-keyboard-shortcuts'
+import type { ShortcutActions } from './shortcut-action-driver'
 import { newCommandId } from '../../shared/command-id'
 import { FileTree, FileTreeFile, FileTreeFolder } from './codeg-workbench/file-tree'
 import {WorkspaceFileMenu,WorkspaceFileActionDialog,WorkspaceFileSearch,WorkspaceTrash,type FileAction} from './WorkspaceFileTools'
@@ -45,6 +48,7 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
   const [officePath,setOfficePath]=useState<string|null>(null)
   const [directories, setDirectories] = useState(new Map<string, Directory>()), [expanded, setExpanded] = useState(new Set<string>())
   const [documents, setDocuments] = useState<Document[]>([]), [selected, setSelected] = useState<string | null>(null)
+  const closedFiles=useRef<string[]>([])
   const [busy, setBusy] = useState(false), [error, setError] = useState<string | null>(null), epoch = useRef(0)
   const [creation, setCreation] = useState<'file' | 'directory' | 'rename' | null>(null), [name, setName] = useState('')
   const [terminalUnsettled,setTerminalUnsettled]=useState(false)
@@ -109,6 +113,7 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
   const closeDocument = (path: string): void => {
     const document = documents.find(item => item.path === path)
     if (busy || document && document.text !== document.saved && !window.confirm(t('放弃这个文件尚未保存的修改？'))) return
+    closedFiles.current=[path,...closedFiles.current.filter(value=>value!==path)].slice(0,100)
     setDocuments(previous => previous.filter(item => item.path !== path))
     if (selected === path) setSelected(documents.find(item => item.path !== path)?.path ?? null)
   }
@@ -118,6 +123,19 @@ export function WorkspaceWorkbench({ threadId, projectPath, members, bindLeaveGu
       : <FileTreeFile key={entry.path} path={entry.path} name={entry.name} depth={depth} actions={<WorkspaceFileMenu path={entry.path} disabled={busy||dirty||entry.link} onAction={setFileAction}/>} aria-disabled={entry.link} onDoubleClick={() => { if (!entry.link) void openFile(entry.path) }} />)}
     {directories.get(path)?.next && <button type="button" className="quiet-button" disabled={busy} onClick={() => void operation(() => loadDirectory(path, directories.get(path)!.next!))}>{t('加载更多')}</button>}
   </>
+  const activeShortcutSurface=():boolean=>{const dialogs=[...document.querySelectorAll('[role="dialog"][data-state="open"]')];return open&&dialogs.at(-1)?.classList.contains('workspace-workbench')===true}
+  const moveTab=(delta:number):void=>{const index=documents.findIndex(row=>row.path===selected);if(documents.length)setSelected(documents[(Math.max(0,index)+delta+documents.length)%documents.length].path)}
+  useShortcutActions({
+    toggle_terminal:()=>{if(organizerDirty||forgeDirty||terminalUnsettled)return true;setOpen(true);setTab(value=>value==='terminals'?'files':'terminals')},
+    toggle_aux_panel:()=>{try{if(open)guard();setOpen(value=>!value)}catch(error){setError(String(error))}},
+  },{priority:25,active:()=>!document.querySelector('[role="dialog"][aria-modal="true"]')||activeShortcutSurface()})
+  useShortcutActions({
+    close_current_tab:()=>{if(tab==='files'&&selected)closeDocument(selected)},
+    close_all_file_tabs:()=>{if(busy)return true;if(documents.some(row=>row.text!==row.saved)&&!window.confirm(t('放弃所有文件尚未保存的修改？')))return true;closedFiles.current=[...documents.map(row=>row.path).reverse(),...closedFiles.current].slice(0,100);setDocuments([]);setSelected(null)},
+    reopen_last_closed_tab:()=>{if(busy)return true;const path=closedFiles.current[0];if(path){closedFiles.current.shift();void openFile(path)}},
+    next_tab:()=>{if(tab!=='files')return false;moveTab(1)},prev_tab:()=>{if(tab!=='files')return false;moveTab(-1)},
+    ...Object.fromEntries(NUMBERED_TAB_ACTION_IDS.map((id,index)=>[id,()=>{if(tab!=='files')return false;const row=documents[index];if(row)setSelected(row.path)}])) as ShortcutActions,
+  },{priority:50,active:activeShortcutSurface})
   const readGit = async (view = gitView): Promise<void> => {
     await operation(async () => setGitResult(await client.request<GitResult>('workbench.git.read', { scope, action: view, paths: paths.split('\n').map(path => path.trim()).filter(Boolean), ...(target ? { target } : {}) })))
   }

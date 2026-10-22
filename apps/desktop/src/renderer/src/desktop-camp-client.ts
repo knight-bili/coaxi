@@ -1,4 +1,5 @@
 import type { ThreadClient } from './camp-client'
+import { dispatchShortcutAction } from './shortcut-action-driver'
 
 /** Lazy Desktop-only compatibility adapter; importing it never accesses Electron. */
 export const desktopThreadClient: ThreadClient = {
@@ -35,7 +36,7 @@ export const desktopThreadClient: ThreadClient = {
   },
   request: (method, params) => window.rovai.request(method, params),
   onEvent: (listener) => window.rovai.onEvent(listener),
-  onClosePreviewRequested: listener => window.rovai.windowControls.onCloseTabRequested(listener),
+  onClosePreviewRequested: listener => window.rovai.windowControls.onCloseTabRequested(()=>dispatchShortcutAction('close_current_tab')||listener()),
   get singleChatAttachments() { return window.rovai.singleChatAttachments },
   get missionAttachments() { return window.rovai.missionAttachments },
   get composerAttachments() { return window.rovai.composerAttachments },
