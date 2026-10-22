@@ -13,6 +13,7 @@ mod codeg_crypto;
 pub(crate) mod codex_catalog;
 pub(crate) mod normalize;
 pub(crate) mod archive_store;
+pub(crate) mod migration;
 mod model;
 pub use model::*;
 

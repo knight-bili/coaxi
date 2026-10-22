@@ -43,3 +43,14 @@ pub(crate) fn retained(connection:&Connection,reference:&SecretRefV1,purpose:&st
     let value:String=crate::member_environment::decrypt(connection,&context,&cipher)?;
     ensure!(value.len()<=1024*1024&&!value.contains('\0'),"configuration.frozen_secret_invalid");Ok(value)
 }
+
+/// 已确认导入事务中的新秘密；失败随整批事务回滚，不产生公开明文回执。
+pub(crate) fn import_on(connection:&Connection,client:&str,purpose:&str,plain:&str)->Result<SecretRefV1>{
+    ensure!(matches!(purpose,"provider_key"|"member_environment")&&plain.len()<=1024*1024&&!plain.contains('\0'),"configuration.secret_invalid");
+    let reference=SecretRefV1{id:uuid::Uuid::new_v4().to_string(),revision:1};
+    let operation=uuid::Uuid::new_v4().to_string();let context=format!("portable-secret:{}:1:{client}:{purpose}",reference.id);
+    let cipher=crate::member_environment::encrypt(connection,&context,&plain)?;
+    let hmac=crate::member_environment::private_input_hmac(connection,&format!("portable-secret:{client}:{purpose}:{operation}"),plain.as_bytes())?;
+    connection.execute("INSERT INTO portable_secret_revision(id,revision,client_id,purpose,context,cipher,operation_id,request_hmac,attached,expires_at_ms,created_at) VALUES(?1,1,?2,?3,?4,?5,?6,?7,1,?8,?9)",params![reference.id,client,purpose,context,cipher,operation,hmac,i64::MAX,Utc::now().to_rfc3339()])?;
+    Ok(reference)
+}
