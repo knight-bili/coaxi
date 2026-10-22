@@ -1,8 +1,8 @@
 import type { WorkbenchEditorSnapshot,WorkbenchEditorState } from '@contracts'
 import type { ThreadClient } from './camp-client'
 import { readCanvasViewScope } from './canvas-view-state'
-import { loadEditorRecovery,saveEditorRecovery,type EditorRecoveryRecord } from './workbench-editor-recovery'
-const canonical=(value:unknown):unknown=>Array.isArray(value)?value.map(canonical):value&&typeof value==='object'?Object.fromEntries(Object.entries(value).sort(([left],[right])=>left.localeCompare(right)).map(([key,value])=>[key,canonical(value)])):value
+import { listEditorCopies,loadEditorRecovery,readEditorCopy,saveEditorRecovery,type EditorRecoveryRecord } from './workbench-editor-recovery'
+const canonical=(value:unknown):unknown=>Array.isArray(value)?value.map(canonical):value&&typeof value==='object'?Object.fromEntries(Object.entries(value).sort(([left],[right])=>left<right?-1:left>right?1:0).map(([key,value])=>[key,canonical(value)])):value
 const same=(left:unknown,right:unknown):boolean=>JSON.stringify(canonical(left))===JSON.stringify(canonical(right))
 export interface EditorDraftStatus {ready:boolean;saving:boolean;pending:boolean;issue:string|null;revision:string|null}
 
@@ -11,6 +11,7 @@ export class WorkbenchEditorDrafts {
   private record:EditorRecoveryRecord|null=null
   private acknowledged:WorkbenchEditorState|null=null
   private disposed=false
+  private generation=0
   private timer:ReturnType<typeof setTimeout>|null=null
   private cacheTail:Promise<void>=Promise.resolve()
   private flight:Promise<void>|null=null
@@ -25,10 +26,11 @@ export class WorkbenchEditorDrafts {
     const value=structuredClone(this.record),write=this.cacheTail.catch(()=>undefined).then(()=>saveEditorRecovery(value));this.cacheTail=write;return write
   }
   async start():Promise<WorkbenchEditorState|null>{
+    const generation=++this.generation;this.disposed=false;this.publish({ready:false,issue:null});await this.cacheTail.catch(()=>undefined)
     const identity=await readCanvasViewScope(this.client);if(!identity)throw new Error('无法确定工程草稿所属主机。')
     const key=JSON.stringify([identity.host,identity.core,this.threadId,this.projectPath]),record=await loadEditorRecovery(key)
     const result=await this.client.request<WorkbenchEditorSnapshot>('workbench.editor',{operation:'get',scope:{threadId:this.threadId},editorId:record.editorId})
-    if(this.disposed)return null
+    if(this.disposed||generation!==this.generation)return null
     if(record.workspaceRoot&&record.workspaceRoot!==result.workspaceRoot)throw new Error('原工程目录已改变，本机原草稿保留，请先恢复原工程。')
     this.record=record;record.workspaceRoot=result.workspaceRoot;this.acknowledged=result.value
     if(record.pending&&same(record.pending.value,result.value)){record.pending=null;record.revision=result.revision}
@@ -55,6 +57,14 @@ export class WorkbenchEditorDrafts {
     record.pending=null;record.latest=host.value?structuredClone(host.value):null;record.revision=host.revision;record.workspaceRoot=host.workspaceRoot;this.acknowledged=host.value;await this.cache()
     this.publish({ready:true,pending:false,saving:false,issue:null,revision:record.revision});return record.latest?structuredClone(record.latest):null
   }
+  async copies(after:string|null=null):ReturnType<typeof listEditorCopies>{if(!this.record)throw new Error('工程草稿尚未读取。');if(after&&!after.startsWith(`${this.record.key}:copy:`))throw new Error('原副本不属于这个工程。');return listEditorCopies(this.record.key,after)}
+  async restoreCopy(key:string):Promise<WorkbenchEditorState>{
+    const record=this.record;if(!record||!key.startsWith(`${record.key}:copy:`)||this.flight)throw new Error('工程副本尚未准备好。')
+    const copy=await readEditorCopy(key),host=await this.readHost()
+    if(copy.editorId!==record.editorId||copy.workspaceRoot!==host.workspaceRoot||!copy.latest)throw new Error('原副本的工程归属已改变。')
+    if(record.latest)await saveEditorRecovery({...structuredClone(record),key:`${record.key}:copy:${crypto.randomUUID()}`})
+    record.latest=structuredClone(copy.latest);record.pending=null;record.revision=host.revision;record.workspaceRoot=host.workspaceRoot;this.acknowledged=host.value;await this.cache();this.publish({ready:true,pending:!same(record.latest,this.acknowledged),issue:null,revision:record.revision});return structuredClone(record.latest)
+  }
   flush():Promise<void>{
     if(this.flight)return this.flight
     const flight:Promise<void>=this.persist().finally(()=>{if(this.flight===flight)this.flight=null;if(!this.disposed&&!this.current.issue&&this.current.pending&&!this.timer)this.timer=setTimeout(()=>{this.timer=null;void this.flush().catch(()=>undefined)},500)})
@@ -76,6 +86,6 @@ export class WorkbenchEditorDrafts {
       this.publish({pending:Boolean(record.pending)||!same(record.latest,this.acknowledged),revision:record.revision})
     }catch(error){this.publish({pending:true,issue:String(error)});throw error}finally{this.publish({saving:false})}
   }
-  dispose():void{this.disposed=true;if(this.timer)clearTimeout(this.timer);this.timer=null;this.listeners.clear();if(this.record)void this.cache().catch(()=>undefined)}
+  dispose():void{this.disposed=true;this.generation++;if(this.timer)clearTimeout(this.timer);this.timer=null;this.listeners.clear();if(this.record)void this.cache().catch(()=>undefined)}
   localDraft():WorkbenchEditorState|null{return this.record?.latest?structuredClone(this.record.latest):null}
 }
