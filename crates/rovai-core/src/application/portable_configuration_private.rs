@@ -15,6 +15,12 @@ impl Core{
     }
     async fn portable_configuration_private_inner(&self,method:&str,value:Value,client:&crate::draft_client::DraftClient)->Result<Value>{
         ensure!(serde_json::to_vec(&value)?.len()<=configuration::MAX_REQUEST,"configuration.request_too_large");
+        if method=="configuration.taskTemplates"{
+            let _lock=crate::workbench::MUTATIONS.lock().await;let mut database=self.database.lock().await;
+            let changed=matches!(value["operation"].as_str(),Some("put"|"remove"));
+            let result=configuration::task_templates::access(&mut database,&self.data_dir,client,value)?;
+            if changed{emit(&self.output,"portableConfiguration.templatesChanged",json!({"readLibrary":true}));}return Ok(result)
+        }
         if method=="configuration.logging"{
             let _lock=crate::workbench::MUTATIONS.lock().await;
             return crate::diagnostic_preferences::access(&self.data_dir,value)

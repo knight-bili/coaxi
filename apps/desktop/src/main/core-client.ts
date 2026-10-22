@@ -26,7 +26,7 @@ export type HostWebMethod = 'host.web.token' | 'host.web.status' | 'host.web.sta
   | 'configuration.providers.privateEdit'
   | 'configuration.desktopOwner.register' | 'configuration.desktopOwner.pending' | 'configuration.desktopOwner.acknowledge'
   | 'configuration.export.prepare' | 'configuration.export.receipt' | 'configuration.export.read'
-  | 'configuration.sync' | 'configuration.logging'
+  | 'configuration.sync' | 'configuration.logging' | 'configuration.taskTemplates'
   | 'host.upload.observe' | 'host.upload.bind' | 'host.upload.reconcile' | 'host.upload.receipt' | 'host.upload.retry' | 'host.upload.finish'
 
 export type AutomationSchedulerControl = {

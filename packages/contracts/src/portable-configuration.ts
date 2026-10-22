@@ -18,7 +18,15 @@ export interface PortableArchiveSelection {selectionId:string;displayName:string
 export interface PortableExportSourceArchive {archiveId:string;sourceDigest:string}
 export interface PortableExportReceipt {operationId:string;state:'unknown'|'prepared'|'ready';archiveId?:string;createdAt?:string;includeSecrets?:boolean;encryptedDigest?:string|null;byteSize?:number|null;sourceArchive?:PortableExportSourceArchive}
 export interface PortableSyncRequest {operation:'get'|'set'|'upload'|'cancel'|'resume'|'archive'|'cache_preview'|'cache_remove'|'cache_status'|'receipt';expectedRevision?:string|null;commandId?:string;enabled?:boolean;autoSync?:boolean;fullConfiguration?:boolean;includeSecrets?:boolean;intervalMinutes?:number;passphrase?:string;clearPassphrase?:boolean;confirmed?:boolean}
+export interface PortableTaskTemplate {id:string;revision:number;name:string;title:string;config:string;needsEnvironment:boolean;automaticExecutionAllowed:false}
+export type PortableTaskTemplateRequest=
+  |{operation:'list';after?:string|null;limit?:number}
+  |{operation:'get';id:string}
+  |{operation:'receipt';commandId:string}
+  |{operation:'put'|'remove';commandId:string;id:string;expectedRevision:number|null;value?:{name:string;title:string;config:string}}
+export interface PortableTaskTemplateReceipt {commandId:string;state:'unknown'|'recorded';result:import('./index').StoredCommandResult|null;files:Array<{domain:string;targetId:string;state:string;errorCode:string|null}>}
 export interface PortableConfigurationPrivateApi {
+  templates<T>(input:PortableTaskTemplateRequest):Promise<T>
   logging?(input:{operation:'get'}|{operation:'set';expectedDigest:string;settings:{level:string;targets:Array<{target:string;level:string}>}}):Promise<{settings:{level:string;targets:Array<{target:string;level:string}>};digest:string;writable?:boolean;scope?:'structuredHost'}>
   sync<T>(input:PortableSyncRequest):Promise<T>
   prepareExport(input:{operationId:string;includeSecrets:boolean;passphrase:string;sourceArchive?:PortableExportSourceArchive}):Promise<PortableExportReceipt>

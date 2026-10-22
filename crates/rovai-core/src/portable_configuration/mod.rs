@@ -20,6 +20,7 @@ pub(crate) mod migration;
 pub(crate) mod files;
 pub(crate) mod desktop_owner;
 pub(crate) mod library;
+pub(crate) mod task_templates;
 pub(crate) mod preferences;
 mod channel_preferences;
 pub(crate) mod policies;
