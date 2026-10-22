@@ -47,6 +47,7 @@ export type ThreadClient = Pick<RovaiApi,
   /** Explicit resource/platform dependencies of the shared management pages. */
   exportMonitoring: (filter: import('@contracts').MonitoringFilter) => Promise<{ exported: boolean; path?: string }>
   exportUsageActivityReport?: (query: import('@contracts').UsageActivityQuery) => Promise<{exported:boolean;path?:string}>
+  usageCard?:import('@contracts').RovaiApi['usageCard']
   revealMonitoringExport: RovaiApi['revealMonitoringExport'] | null
   exportDiagnostics: () => Promise<{ exported: boolean; path?: string }>
   revealDiagnosticsExport: RovaiApi['revealDiagnosticsExport'] | null

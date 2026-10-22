@@ -693,6 +693,10 @@ const api: RovaiApi = {
   exportUsageActivityReport(query) {
     return ipcRenderer.invoke('rovai:export-usage-activity', query)
   },
+  usageCard: {
+    save: dataUrl => ipcRenderer.invoke('rovai:usage-card-save',dataUrl),
+    copy: dataUrl => ipcRenderer.invoke('rovai:usage-card-copy',dataUrl)
+  },
   revealMonitoringExport(path: string) {
     return ipcRenderer.invoke('rovai:reveal-monitoring-export', path)
   },

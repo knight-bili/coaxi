@@ -187,6 +187,7 @@
     "dist:linux:deb:x64": "pnpm build:linux:x64 && node scripts/package-linux.mjs deb"
   },
   "dependencies": {
+    "html-to-image": "1.11.13",
     "@base-ui/react": "1.7.0",
     "@codemirror/language": "6.12.4",
     "@codemirror/language-data": "6.5.2",

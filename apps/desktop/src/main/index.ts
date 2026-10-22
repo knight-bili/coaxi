@@ -11,6 +11,7 @@ import { InteractionResultJournal } from './interaction-result-journal'
 import { InteractionComputerIndicator } from './interaction-computer-indicator'
 import { KeyboardShortcutsStore } from './keyboard-shortcuts'
 import { WorkbenchEditorRecovery } from './workbench-editor-recovery'
+import { installUsageCardExport } from './usage-card-export'
 import { resolveWindowZoomAction } from '../shared/codeg-keyboard-shortcuts'
 import { systemInterfaceLanguage } from '../shared/interface-languages'
 import { creationPreferences, withHostConversationPreferences } from '../shared/host-general-preferences'
@@ -514,6 +515,7 @@ let lastDiagnosticsExportPath: string | null = null
 let lastMonitoringExportPath: string | null = null
 let lastAppearanceSignature = ''
 let generalPreferences: GeneralPreferencesStore | null = null
+installUsageCardExport(() => mainWindow)
 let windowsWindowClose: WindowsWindowClose | null = null
 let currentUserProfile: CurrentUserProfileStore | null = null
 let onboarding: OnboardingStore | null = null
