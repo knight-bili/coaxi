@@ -5,6 +5,18 @@ import type { BuiltinMemberAvatarRole } from './member-avatar'
 
 export * from './member-avatar'
 export * from './current-user-profile'
+export type * from './native-history-usage'
+
+export interface NativeHistoryUsageReport {
+  schemaVersion:1;source:'imported_native_history';report:import('./native-history-usage').TokenUsageReport
+  folderKeys:Array<{id:number;path:string}>;importIds:Record<string,string>;missingIndex:string[]
+  supersededSnapshots:number;sessionsWithoutUsage:number;sessionTotalFallbacks:number
+  nativeCountersAreSourceReported:true;mergedWithCoreUsage:false
+}
+export interface NativeHistoryUsageSync {
+  results:Array<{id:string;indexed:boolean;unchanged?:boolean;facts?:number;error?:string;existingFactsPreserved?:boolean}>
+  next:string|null;totalArchives:number;processedThrough:string|null;source:'imported_native_history';originalsUntouched:true
+}
 export type { NativeAgentReadReference, NativeAgentReadStart, NativeChildReadReference, NativeChildReadStart, NativeChildReadView, NativeChildReadPageRequest, NativeChildReadPage } from './native-child-reads'
 export type { DelegationToolSourceParams, DelegationToolSourceIdentity, DelegationToolSourceView } from './delegation-tool-source'
 
