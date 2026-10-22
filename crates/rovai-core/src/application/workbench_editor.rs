@@ -13,7 +13,7 @@ struct EditorState {documents:Vec<Document>,selected:Option<String>,#[serde(defa
 #[derive(Clone,Deserialize,Serialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]
 struct Record {schema_version:u32,scope:Scope,workspace_root:String,editor_id:String,revision:String,command_id:Option<String>,request_digest:Option<String>,value:EditorState,updated_at:String}
 #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]
-struct Request {operation:String,scope:Scope,editor_id:String,expected_revision:Option<String>,command_id:Option<String>,value:Option<EditorState>}
+struct Request {operation:String,scope:Scope,editor_id:String,workspace_root:Option<String>,expected_revision:Option<String>,command_id:Option<String>,value:Option<EditorState>}
 fn validate(value:&EditorState)->Result<()> {
     ensure!(value.documents.len()<=128&&serde_json::to_vec(value)?.len()<=32*1024*1024,"workbench.editor_limit");
     let mut paths=HashSet::new();
@@ -33,14 +33,15 @@ impl Core {
         let key=crate::command::canonical_json_digest(&json!({"scope":request.scope,"root":root,"editorId":request.editor_id}))?;
         let directory=self.data_dir.join("workspace-editors");let path=directory.join(format!("{key}.json"));let _write=WRITES.lock().await;
         let current:Option<Record>=if path.exists(){let metadata=fs::symlink_metadata(&path)?;ensure!(metadata.is_file()&&!metadata.file_type().is_symlink()&&metadata.len()<=33*1024*1024,"workbench.invalid_editor_record");let record:Record=serde_json::from_slice(&fs::read(&path)?)?;ensure!(record.schema_version==1&&record.editor_id==request.editor_id&&record.workspace_root==root.to_string_lossy()&&serde_json::to_value(&record.scope)?==serde_json::to_value(&request.scope)?,"workbench.editor_owner_changed");validate(&record.value)?;Some(record)}else{None};
-        if request.operation=="get"{return Ok(json!({"revision":current.as_ref().map(|record|&record.revision),"value":current.as_ref().map(|record|&record.value),"updatedAt":current.as_ref().map(|record|&record.updated_at)}))}
+        if request.operation=="get"{return Ok(json!({"revision":current.as_ref().map(|record|&record.revision),"value":current.as_ref().map(|record|&record.value),"updatedAt":current.as_ref().map(|record|&record.updated_at),"workspaceRoot":root}))}
+        ensure!(request.workspace_root.as_deref()==Some(root.to_string_lossy().as_ref()),"workbench.workspace_changed");
         let value=request.value.context("workbench.editor_value_required")?;validate(&value)?;
         let command=request.command_id.context("workbench.command_id_required")?;uuid::Uuid::parse_str(&command)?;
         let request_digest=crate::command::canonical_json_digest(&json!({"expectedRevision":request.expected_revision,"value":value}))?;
-        if let Some(current)=&current{if current.command_id.as_deref()==Some(command.as_str()){ensure!(current.request_digest.as_deref()==Some(request_digest.as_str()),"workbench.command_conflict");return Ok(json!({"revision":current.revision,"value":current.value,"updatedAt":current.updated_at}))}}
+        if let Some(current)=&current{if current.command_id.as_deref()==Some(command.as_str()){ensure!(current.request_digest.as_deref()==Some(request_digest.as_str()),"workbench.command_conflict");return Ok(json!({"revision":current.revision,"value":current.value,"updatedAt":current.updated_at,"workspaceRoot":root}))}}
         ensure!(current.as_ref().map(|record|record.revision.as_str())==request.expected_revision.as_deref(),"workbench.editor_changed");
         let record=Record{schema_version:1,scope:request.scope,workspace_root:root.to_string_lossy().into_owned(),editor_id:request.editor_id,revision:uuid::Uuid::new_v4().to_string(),command_id:Some(command),request_digest:Some(request_digest),value,updated_at:Utc::now().to_rfc3339()};
         crate::platform::private_storage::prepare_private_directory(&directory)?;crate::platform::private_storage::atomic_write_private_json(&path,&record)?;
-        Ok(json!({"revision":record.revision,"value":record.value,"updatedAt":record.updated_at}))
+        Ok(json!({"revision":record.revision,"value":record.value,"updatedAt":record.updated_at,"workspaceRoot":root}))
     }
 }

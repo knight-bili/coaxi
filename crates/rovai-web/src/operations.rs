@@ -570,7 +570,7 @@ impl Operation {
             Self::WorkbenchOrganizerGet | Self::WorkbenchOrganizerSet => select_fields(&value, &["value", "digest"]),
             Self::WorkbenchFilesList => select_fields(&value, &["entries", "next"]),
             Self::WorkbenchFilesRead => select_fields(&value, &["path", "text", "digest"]),
-            Self::WorkbenchEditor=>select_fields(&value,&["revision","value","updatedAt"]),
+            Self::WorkbenchEditor=>select_fields(&value,&["revision","value","updatedAt","workspaceRoot"]),
             Self::WorkbenchFilesMutate => select_fields(&value, &["applied", "digest"]),
             Self::WorkbenchGitRead | Self::WorkbenchGitExecute => select_fields(&value, &["success", "exitCode", "output", "error"]),
             Self::WorkbenchGitPreview => select_fields(&value, &["revision", "action", "arguments", "cleanPreview"]),

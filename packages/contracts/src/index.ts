@@ -5165,7 +5165,7 @@ export interface InteractionWorkspaceApi {request<T>(action:'status'|'stop'|'sup
 export interface KeyboardShortcutsSnapshot {revision:string;bindings:Record<string,string>}
 export interface WorkbenchEditorDocument {path:string;text:string;saved:string;digest:string|null;conflict?:boolean}
 export interface WorkbenchEditorState {documents:WorkbenchEditorDocument[];selected:string|null;layout:unknown|null}
-export interface WorkbenchEditorSnapshot {revision:string|null;value:WorkbenchEditorState|null;updatedAt:string|null}
+export interface WorkbenchEditorSnapshot {revision:string|null;value:WorkbenchEditorState|null;updatedAt:string|null;workspaceRoot:string}
 export interface NativeShortcutInput {key:string;code?:string;metaKey:boolean;ctrlKey:boolean;altKey:boolean;shiftKey:boolean;isComposing?:boolean}
 export interface KeyboardShortcutsApi {get():Promise<KeyboardShortcutsSnapshot>;save(input:KeyboardShortcutsSnapshot):Promise<KeyboardShortcutsSnapshot>;recording?(value:boolean):Promise<void>;onNativeInput?(listener:(input:NativeShortcutInput)=>void):()=>void}
 export interface RovaiApi {
