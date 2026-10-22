@@ -9,7 +9,7 @@ export interface PortableProviderViewV1 {
   credential:PortableSecretRefV1|null;rawAgentTypesJson:string;rawModel:string|null;model:PortableProviderModel;enabled:boolean;createdAt:string;updatedAt:string
 }
 export interface PortableMemberBindingV1 {schemaVersion:1;agentId:string;revision:number;connection:PortableConnectionRefV1|null}
-export interface PortableMemberConnectionView {agentId:string;agentVersion:number;binding:PortableMemberBindingV1|null}
+export interface PortableMemberConnectionView {agentId:string;agentVersion:number;binding:PortableMemberBindingV1|null;runtime:{adapterKind:import('./index').AdapterKind;installationId:string;installationGeneration:number;modelSelection:import('./index').ModelSelection}|null}
 export interface PortableProviderPage {items:PortableProviderViewV1[];next:string|null}
 /** 原文由加密存储和显式导出拥有；普通视图的原文字段为占位提示。 */
 export type PortableProviderDefinitionV1 = Omit<PortableProviderViewV1,'revision'|'digest'|'createdAt'|'updatedAt'>

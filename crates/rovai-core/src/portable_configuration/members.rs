@@ -3,10 +3,12 @@ use crate::{command::{ActorRef,CommandEnvelope,CommandExecution,CommandHandlerRe
 use rusqlite::{Connection,OptionalExtension,Transaction,params};
 
 pub(crate) fn get(connection:&Connection,member:&str)->Result<Value>{
-    let version:i64=connection.query_row("SELECT version FROM agent_profile WHERE id=?1 AND profile_status<>'removed'",[member],|row|row.get(0)).context("configuration.member_missing")?;
+    let(version,kind,installation,model):(i64,Option<String>,Option<String>,Option<String>)=connection.query_row("SELECT version,selected_runtime_adapter_kind,default_runtime_installation_id,default_model_selection_json FROM agent_profile WHERE id=?1 AND profile_status<>'removed'",[member],|row|Ok((row.get(0)?,row.get(1)?,row.get(2)?,row.get(3)?))).context("configuration.member_missing")?;
     let stored:Option<(i64,String)>=connection.query_row("SELECT revision,reference_json FROM portable_member_connection WHERE agent_id=?1",[member],|row|Ok((row.get(0)?,row.get(1)?))).optional()?;
     let binding=stored.map(|(revision,reference)|->Result<_>{let reference:Option<PortableConnectionRefV1>=serde_json::from_str(&reference)?;Ok(PortableMemberBindingV1{schema_version:1,agent_id:member.into(),revision,connection:reference})}).transpose()?;
-    Ok(json!({"agentId":member,"agentVersion":version,"binding":binding}))
+    let generation=installation.as_deref().map(|id|connection.query_row("SELECT generation FROM adapter_installation WHERE id=?1 AND enabled=1",[id],|row|row.get::<_,i64>(0)).optional()).transpose()?.flatten();
+    let runtime=match(kind,installation,generation,model){(Some(kind),Some(id),Some(generation),Some(model))=>Some(json!({"adapterKind":kind,"installationId":id,"installationGeneration":generation,"modelSelection":serde_json::from_str::<Value>(&model)?})),_=>None};
+    Ok(json!({"agentId":member,"agentVersion":version,"binding":binding,"runtime":runtime}))
 }
 
 pub(crate) fn set_on(tx:&Transaction<'_>,member:&str,expected:i64,reference:Option<&PortableConnectionRefV1>)->Result<Value>{

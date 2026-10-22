@@ -632,7 +632,7 @@ impl Operation {
             Self::PortableMigrationConfirm|Self::PortableMigrationUndoConfirm|Self::PortableMigrationReceipt=>select_fields(&value,&["schemaVersion","commandId","previewId","previewDigest","state","counts","changedMembers","errorCode","historyPreserved","files"]),
             Self::PortableMigrationArchives|Self::PortableMigrationTargets|Self::PortableProvidersList=>select_fields(&value,&["items","next"]),
             Self::PortableProvidersUpsert|Self::PortableProvidersRemove|Self::PortableMemberConnectionSet=>select_fields(&value,&["commandId","commandType","status","code","payload","resultEntity","recordedAt"]),
-            Self::PortableMemberConnectionGet=>select_fields(&value,&["agentId","agentVersion","binding"]),
+            Self::PortableMemberConnectionGet=>select_fields(&value,&["agentId","agentVersion","binding","runtime"]),
             Self::NativeSteerEvidence => select_fields(&value,&["schemaVersion","preview","receipt","delivery","normalContinuation"]),
             Self::NativeNormalPreview => select_fields(&value,&["schemaVersion","previewId","previewDigest","sourceCommandId","scope","agentId","input","inputDigest","expiresAt"]),
             Self::NativeNormalConfirm | Self::NativeNormalReceipt => select_fields(&value,&["schemaVersion","commandId","state","commandResult","error"]),
