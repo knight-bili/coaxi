@@ -1,4 +1,5 @@
 import { PetExtensionHost } from './PetExtensionHost'
+import { useShortcutActions } from './useShortcutActions'
 import { AppearanceExtensionHost } from './AppearanceExtensionHost'
 import { CanvasThreadWorkspace } from './CanvasThreadWorkspace'
 import { readCanvasObject, type CanvasObjectTarget } from './canvas-object'
@@ -2922,6 +2923,7 @@ function BusinessAppContent({
       await requestNewConversation(currentProjectWorkspace(displayNavigation, currentProject))
     })
   }
+  useShortcutActions({new_conversation:()=>{if(busy)return false;beginNewConversation()},open_folder:()=>{if(busy)return false;void openProject().catch(error=>notifyError(errorMessage(error)))},open_settings:()=>openSettings()})
 
   const setThreadUnread = async (thread: NavigationThreadItem, unread: boolean): Promise<void> => {
     await saveThreadReadState(thread.id, navigationThreadReadState(thread, unread, threadReadStatesRef.current[thread.id]))

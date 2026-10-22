@@ -8,6 +8,7 @@ import { navigationShortcut } from './desktop-navigation-input'
 import { primaryShortcutLabel } from './renderer-platform'
 import { clampNavigationWidth, navigationDragLayout, navigationMaxWidth, parseNavigationLayout, NAVIGATION_DEFAULT_WIDTH, NAVIGATION_LAYOUT_KEY, NAVIGATION_MIN_WIDTH, type NavigationLayout } from './navigation-layout'
 import { UiText, uiAttribute } from './interface-language'
+import { useShortcutActions } from './useShortcutActions'
 
 const NavigationContext = createContext(false)
 export const useNavigationCollapsed = (): boolean => useContext(NavigationContext)
@@ -67,6 +68,7 @@ export function NavigationShell({ platform, disabled = false, settings = false, 
   const width = collapsed ? 0 : fixedSettings ? NAVIGATION_DEFAULT_WIDTH : clampNavigationWidth(layout.width, maximum)
   const label = collapsed ? uiAttribute('展开导航侧栏') : uiAttribute('收起导航侧栏')
   const toggle = (): void => setLayout(current => fixedSettings && !current.collapsed ? current : { ...current, collapsed: !current.collapsed })
+  useShortcutActions({toggle_sidebar:()=>{if(disabled||mobile||fixedSettings)return false;toggle()}})
   const resizeTo = (value: number): void => setLayout({ width: clampNavigationWidth(value, maximum), collapsed: false })
   const cancelFrame = (): void => { if (frame.current !== null) cancelAnimationFrame(frame.current); frame.current = null }
   const finish = (cancel = false): void => {

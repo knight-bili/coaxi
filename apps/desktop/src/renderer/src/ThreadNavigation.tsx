@@ -1,4 +1,5 @@
 import { useThreadClient } from './camp-client'
+import { useShortcutActions } from './useShortcutActions'
 import { useMobileLayout } from './MobileLayout'
 import { useNavigationPressMenu } from './useNavigationPressMenu'
 import { navigationThreadHasUnread } from './navigation-unread'
@@ -294,17 +295,7 @@ export function ThreadNavigation({
   const quickChatWindow = groupWindow('quick-chat', navigation?.quickChat ?? { recentThreads: [], totalCount: 0 })
   const updateBadge = appUpdateBadgePresentation(updateSnapshot)
 
-  useEffect(() => {
-    if (disabled) return undefined
-    const onKeyDown = (event: KeyboardEvent): void => {
-      if (shouldHandlePrimaryShortcut(platform, event, 'K')) {
-        event.preventDefault()
-        setPaletteOpen((open) => !open)
-      }
-    }
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [disabled, platform])
+  useShortcutActions({toggle_search:()=>{if(disabled)return false;setPaletteOpen(value=>!value)}})
 
   const showMore = async (groupKey: string): Promise<void> => {
     if (loadingGroupsRef.current.has(groupKey)) return
