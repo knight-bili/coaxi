@@ -809,14 +809,35 @@ export class ConsoleClient {
     return this.#json('workspaces', { method: 'POST', body: JSON.stringify({ path, offset }) })
   }
 
-  async #json<T>(path: 'session' | 'session/renew' | 'channels' | 'updates' | 'workspaces' | 'mission-files' | 'uploads' | 'uploads/reconcile' | 'uploads/receipt' | 'uploads/retry' | 'uploads/finish' | 'files' | 'avatars', options: RequestInit = {}): Promise<T> {
+  portableConfiguration():import('@contracts').PortableConfigurationPrivateApi {
+    const privateCall=async<T,>(path:'configuration/secrets'|'configuration/receipt'|'configuration/archive',body:BodyInit):Promise<T>=>{
+      const reply=await this.#json<{result?:T;error?:{code?:string;message?:string}}>(path,{method:'POST',body})
+      if(reply.error)throw new CoreRequestError(reply.error.code??'configuration_input_rejected')
+      if(reply.result===undefined)throw new CoreRequestError('configuration_result_unavailable')
+      return reply.result
+    }
+    return {
+      prepareSecret:input=>privateCall('configuration/secrets',JSON.stringify(input)),
+      archiveReceipt:operationId=>privateCall('configuration/receipt',JSON.stringify({operationId})),
+      uploadArchive:async(operationId,file,passphrase,manifest)=>{
+        if(file.size>64*1024*1024||passphrase.length>16000)throw new Error('配置文件或口令超过限制。')
+        const generation=this.#generation,scope=this.editingScope
+        const digest=await fileDigest(file,this.#lifetime.signal)
+        if(generation!==this.#generation||scope!==this.editingScope)throw new DOMException('Connection replaced','AbortError')
+        const data=new FormData();data.set('metadata',JSON.stringify({operationId,sourceDigest:`sha256:${digest}`,byteSize:file.size,passphrase,manifest:manifest??null}));data.set('file',file)
+        return privateCall('configuration/archive',data)
+      }
+    }
+  }
+
+  async #json<T>(path: 'configuration/secrets'|'configuration/receipt'|'configuration/archive'| 'session' | 'session/renew' | 'channels' | 'updates' | 'workspaces' | 'mission-files' | 'uploads' | 'uploads/reconcile' | 'uploads/receipt' | 'uploads/retry' | 'uploads/finish' | 'files' | 'avatars', options: RequestInit = {}): Promise<T> {
     const generation = this.#generation
     const result = await (await this.#authorized(path, options)).json() as T
     if (generation !== this.#generation) throw new DOMException('Connection replaced', 'AbortError')
     return result
   }
 
-  async #authorized(path: 'session' | 'session/renew' | 'channels' | 'updates' | 'workspaces' | 'mission-files' | 'uploads' | 'uploads/reconcile' | 'uploads/receipt' | 'uploads/retry' | 'uploads/finish' | 'request' | 'events' | 'logout' | 'files' | 'files/bytes' | 'attachments' | 'avatars', options: RequestInit = {}): Promise<Response> {
+  async #authorized(path: 'configuration/secrets'|'configuration/receipt'|'configuration/archive'| 'session' | 'session/renew' | 'channels' | 'updates' | 'workspaces' | 'mission-files' | 'uploads' | 'uploads/reconcile' | 'uploads/receipt' | 'uploads/retry' | 'uploads/finish' | 'request' | 'events' | 'logout' | 'files' | 'files/bytes' | 'attachments' | 'avatars', options: RequestInit = {}): Promise<Response> {
     if (!this.#token) throw new SessionRequired()
     const generation = this.#generation
     if (this.#localExpiry !== null && this.#localExpiry - this.#now() <= this.#renewalWindow && !['session', 'session/renew', 'logout'].includes(path)) await this.renewIfNeeded()

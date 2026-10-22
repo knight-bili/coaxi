@@ -47,6 +47,7 @@ export function createThreadAdapter(transport: ConsoleClient, selectWorkspaceDir
     selectPublicationApprover: (agentId, userId, kind = 'feishu') => transport.channel({ operation: 'selectApprover', agentId, userId, kind })
   }
   const client: ThreadClient = {
+    portableConfiguration:transport.portableConfiguration(),
     presentationScope: transport.presentationScope,
     readAuthority: {
       getSnapshot: () => {
