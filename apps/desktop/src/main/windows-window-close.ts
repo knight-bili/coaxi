@@ -2,11 +2,12 @@ import type { BrowserWindow } from 'electron'
 import type { WindowCloseBehavior, WindowCloseResponse, WindowCloseSnapshot } from '@contracts'
 import type { PreventableQuitEvent } from './app-quit-coordinator'
 import { isWindowCloseBehavior } from '../shared/window-close'
+import type { PortablePreferencePlan, PreferenceApplyState } from './portable-preference-file'
 
 type CloseWindow = Pick<BrowserWindow, 'isDestroyed' | 'isMinimized' | 'restore' | 'show' | 'focus' | 'hide'>
 interface TrayHandle { destroy(): void; isDestroyed(): boolean }
 interface Options {
-  preferences: { get(): WindowCloseBehavior; set(value: WindowCloseBehavior): Promise<void>; loadFailed: boolean }
+  preferences: { get(): WindowCloseBehavior; set(value: WindowCloseBehavior): Promise<void>; loadFailed: boolean; applyConfiguration?(plan: PortablePreferencePlan): Promise<PreferenceApplyState> }
   window(): CloseWindow | null
   createTray(open: () => void, quit: () => void): TrayHandle
   quit(): void
@@ -97,6 +98,35 @@ export class WindowsWindowClose {
   }
 
   /** Explicit quit/update invalidates in-flight hide and pending Renderer responses. */
+  async applyConfiguration(plan: PortablePreferencePlan): Promise<PreferenceApplyState | 'pending'> {
+    if (this.#quitting || this.#operating || this.#snapshot.busy || this.#snapshot.promptId !== null) return 'pending'
+    const apply = this.options.preferences.applyConfiguration
+    if (!apply) throw new Error('configuration.close_owner_unavailable')
+    const behavior = plan.after === null ? 'ask' : (plan.after as Record<string, unknown>)?.behavior
+    if (!isWindowCloseBehavior(behavior)) throw new Error('configuration.close_preferences_invalid')
+    this.#operating = true
+    const hadTray = this.#hasTray()
+    this.#patch({ busy: true, error: null })
+    try {
+      if (behavior === 'tray') this.#ensureTray()
+      const write = apply.call(this.options.preferences, plan)
+      this.#pendingWrite = write.then(() => undefined, () => undefined)
+      const state = await write
+      if (state === 'applied') {
+        this.#patch({ behavior })
+        if (behavior !== 'tray') { this.restore(); this.#removeTray() }
+      } else if (!hadTray) this.#removeTray()
+      return state
+    } catch (error) {
+      if (!hadTray) this.#removeTray()
+      this.#fail('save_failed', false)
+      throw error
+    } finally {
+      this.#operating = false
+      if (!this.#quitting) this.#patch({ busy: false })
+    }
+  }
+
   beginQuit(): void {
     if (this.#quitting) return
     this.#quitting = true

@@ -3693,6 +3693,7 @@ export interface DesktopSessionApi {
 
 export interface GeneralPreferencesApi {
   get(): Promise<GeneralPreferencesSnapshot>
+  onChanged?(listener: (snapshot: GeneralPreferencesSnapshot) => void): () => void
   setInterfaceLanguage(language: InterfaceLanguage): Promise<GeneralPreferencesSnapshot>
   setInterfaceLanguageMode?(mode: 'manual' | 'system'): Promise<GeneralPreferencesSnapshot>
   setStartupLocationMode(mode: StartupLocationMode): Promise<GeneralPreferencesSnapshot>

@@ -104,6 +104,8 @@ export function GeneralSettings({
     }
   }, [acceptPreferences, api])
 
+  useEffect(() => api.onChanged?.(acceptPreferences), [api, acceptPreferences])
+
   const loadResetCapability = useCallback(async (): Promise<void> => {
     if (!windowControls) return
     try {

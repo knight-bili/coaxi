@@ -99,6 +99,7 @@ import {
 } from './project-access-restore'
 import { RUNTIME_RENDERER_CORE_METHODS } from './runtime-core-methods'
 import { PortableConfigurationPrivate } from './portable-configuration-private'
+import { PortablePreferenceOwner } from './portable-preference-owner'
 import {
   GeneralPreferencesStore,
   isExecutionConsolePlacement,
@@ -1299,6 +1300,34 @@ const webdavWorkspace = new WebdavWorkspace((method,params)=>core.request(method
 ipcMain.handle('rovai:webdav-workspace',(event,input)=>webdavWorkspace.invoke(event,input))
 const backupWorkspace = new BackupWorkspace(core,()=>coreDataPath,()=>mainWindow,()=>requestRendererQuitPreparation(mainWindow,()=>new MessageChannelMain()),()=>{browserWorkspace.revokeAll();officeWorkspace.closeAll()},()=>{app.relaunch();app.quit()},()=>app.getPath('userData'))
 const portableConfigurationPrivate=new PortableConfigurationPrivate(core,()=>mainWindow)
+const portablePreferenceOwner = new PortablePreferenceOwner(core, localStoresLoaded, () => app.getPath('userData'), async plan => {
+  if (plan.targetId === 'appearance') {
+    if (!appearanceStore) return 'pending'
+    const state = await appearanceStore.applyConfiguration(plan)
+    if (state === 'applied') {
+      const preferences = appearanceStore.get()
+      nativeTheme.themeSource = nativeThemeSource(preferences.preference)
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.setZoomFactor(pageZoomFactor(preferences.zoomPercentage))
+        mainWindow.webContents.send('rovai:page-zoom-changed', preferences.zoomPercentage)
+      }
+      publishAppearance()
+    }
+    return state
+  }
+  if (plan.targetId === 'general') {
+    const store = requireGeneralPreferences()
+    const state = await store.applyConfiguration(plan)
+    if (state === 'applied') mainWindow?.webContents.send('rovai:general-preferences-changed', store.get())
+    return state
+  }
+  if (plan.targetId === 'windowClose') return windowsWindowClose ? windowsWindowClose.applyConfiguration(plan) : 'pending'
+  throw new Error('configuration.owner_target_invalid')
+})
+core.onEvent(event => { if (event.method === 'portableConfiguration.filesChanged') portablePreferenceOwner.wake() })
+core.onSnapshot(snapshot => { if (snapshot.fullCoreState === 'ready') portablePreferenceOwner.wake() })
+void localStoresLoaded.then(() => portablePreferenceOwner.wake())
+app.on('before-quit', () => portablePreferenceOwner.dispose())
 ipcMain.handle('rovai:portable-configuration-private',(event,operation,input)=>portableConfigurationPrivate.invoke(event,operation,input))
 ipcMain.handle('rovai:backup-workspace',(event,operation,input)=>backupWorkspace.invoke(event,operation,input))
 const petWindow = new PetWindowService((method,params)=>core.request(method,params),()=>mainWindow)

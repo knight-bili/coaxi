@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto'
 import type { AppearancePreferences, ResolvedTheme, StructuredError, ThemePreference } from '@contracts'
 import { DEFAULT_APPEARANCE } from '../shared/appearance'
 import { parseAppearancePatch, isThemePreference } from '../shared/appearance'
+import { applyOwnedPreferenceFile, type PortablePreferencePlan, type PreferenceApplyState } from './portable-preference-file'
 export { parseAppearancePatch, isThemePreference } from '../shared/appearance'
 
 export function readAppearancePreferences(filePath: string): {
@@ -68,6 +69,26 @@ export class AppearancePreferencesStore {
   }
 
   get(): AppearancePreferences { return { ...this.preferences } }
+
+  applyConfiguration(plan: PortablePreferencePlan): Promise<PreferenceApplyState> {
+    const operation = this.queue.then(async () => {
+      if (plan.targetId !== 'appearance') throw new Error('configuration.owner_target_invalid')
+      let next = { ...DEFAULT_APPEARANCE }
+      if (plan.after !== null) {
+        const value = plan.after as Record<string, unknown>
+        if (!value || Array.isArray(value) || value.schemaVersion !== 2) throw new Error('configuration.appearance_invalid')
+        const { schemaVersion: _schema, themePreference, ...reading } = value
+        const patch = parseAppearancePatch({ ...reading, preference: themePreference })
+        if (Object.keys(patch).length !== Object.keys(DEFAULT_APPEARANCE).length) throw new Error('configuration.appearance_incomplete')
+        next = { ...DEFAULT_APPEARANCE, ...patch }
+      }
+      const state = await applyOwnedPreferenceFile(this.filePath, plan, () => writeAppearancePreferences(this.filePath, next))
+      if (state === 'applied') { this.preferences = next; this.loadDegradation = null }
+      return state
+    })
+    this.queue = operation.catch(() => undefined)
+    return operation
+  }
 
   update(value: unknown): Promise<AppearancePreferences> {
     const patch = parseAppearancePatch(value)

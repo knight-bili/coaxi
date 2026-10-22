@@ -15,9 +15,15 @@ impl Core{
     }
     async fn portable_configuration_private_inner(&self,method:&str,value:Value,client:&crate::draft_client::DraftClient)->Result<Value>{
         ensure!(serde_json::to_vec(&value)?.len()<=configuration::MAX_REQUEST,"configuration.request_too_large");
-        if matches!(method,"configuration.desktopOwner.pending"|"configuration.desktopOwner.acknowledge"){
+        if matches!(method,"configuration.desktopOwner.register"|"configuration.desktopOwner.pending"|"configuration.desktopOwner.acknowledge"){
             ensure!(client.is_desktop(),"configuration.desktop_owner_required");
             let _lock=crate::workbench::MUTATIONS.lock().await;let database=self.database.lock().await;
+            if method=="configuration.desktopOwner.register"{
+                #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Input{preferences_root:PathBuf}
+                let input:Input=serde_json::from_value(value)?;
+                crate::backup::owned_roots::register_desktop(&self.data_dir,&input.preferences_root)?;
+                return Ok(json!({"registered":true}))
+            }
             return if method=="configuration.desktopOwner.pending"{
                 configuration::desktop_owner::pending(database.connection(),&self.data_dir,serde_json::from_value(value)?)
             }else{

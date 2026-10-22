@@ -63,6 +63,14 @@ export function initializeInterfaceLanguage(snapshot: Pick<GeneralPreferencesSna
   publish(snapshot.interfaceLanguage)
 }
 
+/** 原设置所有者提交后的通知；进行中的语言选择仍由原保存队列决定。 */
+export function acceptPersistedInterfaceLanguage(snapshot: Pick<GeneralPreferencesSnapshot, 'interfaceLanguage'>): void {
+  if (pendingRequests > 0) return
+  initialized = true
+  savedLanguage = snapshot.interfaceLanguage
+  publish(snapshot.interfaceLanguage)
+}
+
 /** Optimistic display; serialized persistence in the preference store makes the last choice win. */
 export async function changeInterfaceLanguage(
   api: GeneralPreferencesApi,

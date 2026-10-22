@@ -230,6 +230,11 @@ const api: RovaiApi = {
     save: (profile) => ipcRenderer.invoke('rovai:current-user-profile-save', profile)
   },
   generalPreferences: {
+    onChanged(listener) {
+      const receive = (_event: Electron.IpcRendererEvent, snapshot: import('@contracts').GeneralPreferencesSnapshot): void => listener(snapshot)
+      ipcRenderer.on('rovai:general-preferences-changed', receive)
+      return () => ipcRenderer.removeListener('rovai:general-preferences-changed', receive)
+    },
     get() {
       return ipcRenderer.invoke('rovai:general-preferences-get')
     },

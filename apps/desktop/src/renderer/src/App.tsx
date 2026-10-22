@@ -7,7 +7,7 @@ import { CoreSubsystemNotice } from './CoreSubsystemNotice'
 import { ThreadClientProvider } from './camp-client'
 import { desktopThreadClient } from './desktop-camp-client'
 import { desktopBusinessEnvironment } from './desktop-business-environment'
-import { initializeInterfaceLanguage, useInterfaceLanguage } from './interface-language'
+import { initializeInterfaceLanguage, acceptPersistedInterfaceLanguage, useInterfaceLanguage } from './interface-language'
 import { applyAppearanceSnapshot } from './theme'
 import {
   BusinessApp, BootstrapShell, StartupWorkspace, ControlledShutdownOverlay,
@@ -18,6 +18,7 @@ export * from './BusinessApp'
 
 export function App(): React.JSX.Element {
   useInterfaceLanguage()
+  useEffect(() => window.rovai.generalPreferences.onChanged?.(acceptPersistedInterfaceLanguage), [])
   useEffect(()=>window.rovai.keyboardShortcuts?.onNativeInput?.(input=>{if(!input.isComposing)dispatchShortcutInput(input)}),[])
   const [supervisorState, setSupervisorState] = useState<{
     latest: SupervisorSnapshot | null

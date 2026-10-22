@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { mkdir, readFile, rename, unlink, writeFile } from 'node:fs/promises'
 import { dirname } from 'node:path'
+import { applyOwnedPreferenceFile, samePreferenceValue, type PortablePreferencePlan, type PreferenceApplyState } from './portable-preference-file'
 import type {
   ExecutionConsolePlacement,
   GeneralPreferencesSnapshot,
@@ -101,6 +102,17 @@ export class GeneralPreferencesStore {
       await writePrivateJson(this.#filePath, next)
       this.#snapshot = next
       return this.get()
+    })
+  }
+
+  applyConfiguration(plan: PortablePreferencePlan): Promise<PreferenceApplyState> {
+    return this.#enqueue(async () => {
+      if (plan.targetId !== 'general') throw new Error('configuration.owner_target_invalid')
+      const next = plan.after === null ? { ...DEFAULT_GENERAL_PREFERENCES } : parseGeneralPreferences(plan.after)
+      if (plan.after !== null && !samePreferenceValue(next, plan.after)) throw new Error('configuration.general_preferences_invalid')
+      const state = await applyOwnedPreferenceFile(this.#filePath, plan, value => writePrivateJson(this.#filePath, value))
+      if (state === 'applied') this.#snapshot = next
+      return state
     })
   }
 
