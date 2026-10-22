@@ -5,6 +5,7 @@ static ACTIVE:LazyLock<std::sync::Mutex<HashSet<String>>>=LazyLock::new(||std::s
 pub(crate) struct Activity(String);
 impl Activity{pub fn register(command:&str)->Result<Self>{ensure!(ACTIVE.lock().map_err(|_|anyhow::anyhow!("native_lifecycle.activity_unavailable"))?.insert(command.into()),"native_lifecycle.original_request_active");Ok(Self(command.into()))}}
 impl Drop for Activity{fn drop(&mut self){if let Ok(mut active)=ACTIVE.lock(){active.remove(&self.0);}}}
+pub(crate) fn active(command:&str)->bool{ACTIVE.lock().is_ok_and(|active|active.contains(command))}
 
 pub(crate) fn receipt(connection:&Connection,command:&str,client:&str,core_instance:&str)->Result<Value>{
     uuid::Uuid::parse_str(command)?;

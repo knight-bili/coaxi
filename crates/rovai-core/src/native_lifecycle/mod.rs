@@ -13,6 +13,7 @@ pub(crate) mod acp_policy;
 pub(crate) mod target;
 pub(crate) mod material;
 pub(crate) mod steer_delivery;
+pub(crate) mod continuation;
 pub use model::*;
 const MAX_REQUEST_BYTES:usize=2*1024*1024;
 static CONTRACT:LazyLock<Value>=LazyLock::new(||serde_json::from_str(include_str!("contract.json")).expect("confirmed native continuation fork steer r1 contract"));
