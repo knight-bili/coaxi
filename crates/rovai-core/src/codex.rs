@@ -445,6 +445,7 @@ impl CodexHost {
                     .unwrap_or_else(|| {
                         rovai_core::runtime_custom_api::CredentialRedactor::from_values(vec![])
                     })
+                    .extend(crate::portable_configuration::launch::redactor().unwrap_or_else(||rovai_core::runtime_custom_api::CredentialRedactor::from_values(vec![])))
                     .extend(
                         custom_api
                             .as_ref()
@@ -1531,6 +1532,7 @@ impl CodexCliRuntimeAdapter {
         let mut spawn_custom_api = frozen_runtime.custom_api.clone();
         let spawn_environment_source = rovai_core::member_environment::launch_source();
         let spawn_environment = frozen_runtime.environment.clone();
+        let spawn_portable_runtime=frozen_runtime.clone();
         let compatibility = RuntimeCompatibilityKey::member_session(
             camp_id,
             agent_id,
@@ -1552,25 +1554,26 @@ impl CodexCliRuntimeAdapter {
                     compatibility,
                 },
                 move || async move {
-                    let spawn_environment = rovai_core::member_environment::resolve_for_launch(
+                    let portable_plan=crate::portable_configuration::launch::prepare(&spawn_portable_runtime,spawn_environment_source.as_ref()).await?;
+                    let spawn_environment =if let Some(plan)=&portable_plan{Some(plan.environment.clone())}else{rovai_core::member_environment::resolve_for_launch(
                         spawn_environment_source,
                         spawn_environment,
                     )
-                    .await?;
+                    .await?};
                     if spawn_environment
                         .as_ref()
                         .is_some_and(|env| env.has_overlay())
                     {
                         spawn_custom_api = None;
                     }
-                    let host = CodexHost::spawn_uninitialized(
+                    let host = crate::portable_configuration::launch::with_plan(portable_plan,CodexHost::spawn_uninitialized(
                         &spawn_executable,
                         &spawn_cwd,
                         spawn_incoming,
                         Some(spawn_builtin_tools),
                         spawn_custom_api,
                         spawn_environment,
-                    )
+                    ))
                     .await?;
                     Ok(RuntimeProcessHost::Codex(host))
                 },

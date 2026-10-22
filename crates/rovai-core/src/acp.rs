@@ -1807,7 +1807,7 @@ impl AcpHost {
                 .as_ref()
                 .map(|env| env.redactor()),crate::custom_runtime::launch::redactor()) {
                     (Some(base),Some(custom))=>Some(base.extend(custom)),(base,None)=>base,(None,custom)=>custom,
-                },
+                }.map(|base|match crate::portable_configuration::launch::redactor(){Some(portable)=>base.extend(portable),None=>base}),
             adapter_kind: frozen_runtime.adapter_kind,
             reported_version: frozen_runtime.reported_version.clone(),
             opencode_program_identity: if frozen_runtime.adapter_kind == AdapterKind::OpencodeCli {
@@ -6203,12 +6203,13 @@ impl AcpCliRuntimeAdapter {
                 },
                 move || async move {
                     let custom_plan=crate::custom_runtime::launch::prepare(&spawn_frozen_runtime,spawn_environment_source.as_ref()).await?;
-                    spawn_frozen_runtime.environment =
+                    let portable_plan=crate::portable_configuration::launch::prepare(&spawn_frozen_runtime,spawn_environment_source.as_ref()).await?;
+                    spawn_frozen_runtime.environment =if let Some(plan)=&portable_plan{Some(plan.environment.clone())}else{
                         rovai_core::member_environment::resolve_for_launch(
                             spawn_environment_source,
                             spawn_frozen_runtime.environment,
                         )
-                        .await?;
+                        .await?};
                     crate::custom_runtime::launch::merge_environment(custom_plan.as_ref(),&mut spawn_frozen_runtime.environment)?;
                     if spawn_frozen_runtime
                         .environment
@@ -6217,7 +6218,7 @@ impl AcpCliRuntimeAdapter {
                     {
                         spawn_frozen_runtime.custom_api = None;
                     }
-                    let host = crate::custom_runtime::launch::with_plan(custom_plan,AcpHost::spawn(
+                    let host = crate::portable_configuration::launch::with_plan(portable_plan,crate::custom_runtime::launch::with_plan(custom_plan,AcpHost::spawn(
                         &spawn_execution_root,
                         &spawn_workspace,
                         permission_semantics,
@@ -6229,7 +6230,7 @@ impl AcpCliRuntimeAdapter {
                         &spawn_external_mcp_servers,
                         &spawn_private_runtime_dir,
                         Some(&spawn_attachment_access_root),
-                    ))
+                    )))
                     .await?;
                     Ok(RuntimeProcessHost::Acp(host))
                 },

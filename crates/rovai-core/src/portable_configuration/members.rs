@@ -27,9 +27,9 @@ pub(crate) fn set_on(tx:&Transaction<'_>,member:&str,expected:i64,reference:Opti
     Ok(result)
 }
 
-fn scope_id(member:&str,reference:&PortableConnectionRefV1,platform:&str)->Result<String>{
+fn scope_id(member:&str,reference:&PortableConnectionRefV1,platform:&str,environment:&[FrozenPortableEnvironmentV1],runtime:&crate::agent_profile::FrozenAgentRuntimeConfig)->Result<String>{
     use sha2::{Digest,Sha256};
-    let bytes=Sha256::digest(serde_json::to_vec(&json!({"scope":"portable-native-v1","member":member,"reference":reference,"platform":platform}))?);
+    let bytes=Sha256::digest(serde_json::to_vec(&json!({"scope":"portable-native-v1","member":member,"reference":reference,"platform":platform,"environment":environment,"installation":runtime.installation_id,"generation":runtime.installation_generation}))?);
     let mut id=[0u8;16];id.copy_from_slice(&bytes[..16]);id[6]=(id[6]&0x0f)|0x80;id[8]=(id[8]&0x3f)|0x80;Ok(uuid::Uuid::from_bytes(id).to_string())
 }
 
@@ -53,13 +53,14 @@ pub(crate) fn freeze_for_member(connection:&Connection,member:&str,runtime:&crat
     let credential:Option<SecretRefV1>=serde_json::from_value(provider["credential"].clone())?;
     if let Some(reference)=&credential{let _=secrets::retained(connection,reference,"provider_key")?;}
     for entry in &environment{let _=secrets::retained(connection,&entry.secret,"member_environment")?;}
+    let native_scope=scope_id(member,&reference,&platform,&environment,runtime)?;
     let mut frozen=FrozenPortableConnectionV1{
         schema_version:1,reference:reference.clone(),projection_version:1,
         agent_type:provider["agentType"].as_str().context("configuration.agent_type_required")?.into(),
         api_url:provider["apiUrl"].as_str().context("configuration.api_url_required")?.into(),credential,
         model:provider["model"].clone(),environment_digest:digest(&serde_json::to_value(&environment)?)?,catalog_digest:digest(&provider["model"] )?,environment,
         projection_digest:String::new(),installation_id:runtime.installation_id.clone(),installation_generation:runtime.installation_generation,
-        host_platform:platform.clone(),native_scope_id:scope_id(member,&reference,&platform)?,
+        host_platform:platform.clone(),native_scope_id:native_scope,
     };
     frozen.projection_digest=digest(&serde_json::to_value(&frozen)?)?;frozen.validate()?;
     ensure!(frozen.adapter_kind()?==runtime.adapter_kind,"configuration.member_runtime_kind_mismatch");Ok(Some(frozen))
