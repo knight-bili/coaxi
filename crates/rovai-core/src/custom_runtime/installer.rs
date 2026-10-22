@@ -7,6 +7,9 @@ use rusqlite::params;
 use rusqlite::OptionalExtension;
 static MUTATION:LazyLock<Arc<tokio::sync::Mutex<()>>>=LazyLock::new(||Arc::new(tokio::sync::Mutex::new(())));
 static ACTIVE:LazyLock<std::sync::Mutex<BTreeSet<PathBuf>>>=LazyLock::new(Default::default);
+struct ReceiptActivity(PathBuf);
+impl ReceiptActivity{fn begin(path:&Path)->Result<Self>{ACTIVE.lock().map_err(|_|anyhow::anyhow!("custom_runtime.install_lock"))?.insert(path.to_path_buf());Ok(Self(path.to_path_buf()))}}
+impl Drop for ReceiptActivity{fn drop(&mut self){if let Ok(mut active)=ACTIVE.lock(){active.remove(&self.0);}}}
 pub fn platform()->Result<&'static str>{match(std::env::consts::OS,std::env::consts::ARCH){("windows","x86_64")=>Ok("windows-x64"),("windows","aarch64")=>Ok("windows-arm64"),("macos","x86_64")=>Ok("macos-x64"),("macos","aarch64")=>Ok("macos-arm64"),("linux","x86_64")=>Ok("linux-x64"),("linux","aarch64")=>Ok("linux-arm64"),_=>anyhow::bail!("custom_runtime.platform_unsupported")}}
 pub(crate) fn receipt_path(root:&Path,id:&str)->Result<PathBuf>{uuid::Uuid::parse_str(id)?;Ok(root.join("custom-runtime-operations").join(format!("{id}.json")))}
 pub fn receipt(root:&Path,id:&str)->Result<Value>{
@@ -60,17 +63,23 @@ pub async fn start(root:&Path,definition:Value,reference:CustomRuntimeRefV1,requ
     if path.exists(){let result=receipt(root,&id)?;ensure!(result["inputDigest"].as_str()==Some(input_digest.as_str()),"custom_runtime.command_identity_changed");return Ok(result)}
     ensure!(selectable,"custom_runtime.definition_changed");crate::platform::private_storage::prepare_private_directory(path.parent().context("custom_runtime.receipt_parent_missing")?)?;
     let record=json!({"commandId":id,"inputDigest":input_digest,"reference":reference,"platform":requested_platform,"state":"running","startedAt":chrono::Utc::now().to_rfc3339()});crate::platform::private_storage::atomic_write_private_json(&path,&record)?;
+    let activity=ReceiptActivity::begin(&path)?;
+    let installed:Option<(String,String)>={let database=database.lock().await;database.connection().query_row("SELECT operation_id,lock_json FROM custom_runtime_installation WHERE definition_id=?1 AND definition_revision=?2 AND platform=?3 AND lock_json IS NOT NULL",params![reference.id,reference.definition_revision,requested_platform],|row|Ok((row.get(0)?,row.get(1)?))).optional()?};
+    if let Some((operation,raw))=installed{
+        uuid::Uuid::parse_str(&operation)?;let lock:Value=serde_json::from_str(&raw)?;validate("launchLock",&lock)?;
+        let payload=root.join("custom-runtimes").join(&reference.id).join(reference.definition_revision.to_string()).join(&requested_platform).join(operation).join("payload");let executable=PathBuf::from(text(&lock,"executable")?);let expected=text(&lock,"artifactDigest")?.to_owned();
+        let reusable=tokio::task::spawn_blocking(move||artifacts::tree_digest(&payload,&executable).is_ok_and(|observed|observed==expected)).await?;
+        if reusable{let mut existing=record;existing["state"]=json!("completed");existing["completedAt"]=json!(chrono::Utc::now().to_rfc3339());existing["info"]=json!({"reference":reference,"launchLockDigest":digest(&lock)?,"qualification":"not_verified","reusedImmutableInstallation":true});crate::platform::private_storage::atomic_write_private_json(&path,&existing)?;return Ok(existing)}
+    }
     {
         let database=database.lock().await;
-        let installed:Option<String>=database.connection().query_row("SELECT lock_json FROM custom_runtime_installation WHERE definition_id=?1 AND definition_revision=?2 AND platform=?3 AND lock_json IS NOT NULL",params![reference.id,reference.definition_revision,requested_platform],|r|r.get(0)).optional()?;
-        if let Some(lock)=installed{let lock:Value=serde_json::from_str(&lock)?;let mut existing=record;existing["state"]=json!("completed");existing["info"]=json!({"reference":reference,"launchLockDigest":digest(&lock)?,"qualification":"not_verified","reusedImmutableInstallation":true});crate::platform::private_storage::atomic_write_private_json(&path,&existing)?;return Ok(existing)}
         database.connection().execute("INSERT INTO custom_runtime_installation(definition_id,definition_revision,platform,operation_id,status,updated_at) VALUES(?1,?2,?3,?4,'installing',?5) ON CONFLICT(definition_id,definition_revision,platform) DO UPDATE SET operation_id=excluded.operation_id,status=excluded.status,updated_at=excluded.updated_at WHERE custom_runtime_installation.lock_json IS NULL",params![reference.id,reference.definition_revision,requested_platform,id,chrono::Utc::now().to_rfc3339()])?;
     }
-    ACTIVE.lock().map_err(|_|anyhow::anyhow!("custom_runtime.install_lock"))?.insert(path.clone());let root=root.to_path_buf();let returned=record.clone();
-    tokio::spawn(async move{let _guard=guard;let log=Log::default();let secrets=crate::runtime_discovery::capture_host_runtime_environment().into_iter().filter(|(key,_)|crate::member_environment::sensitive(key)).map(|(_,value)|value).collect();let redactor=crate::runtime_custom_api::CredentialRedactor::from_values(secrets);
+    let root=root.to_path_buf();let returned=record.clone();
+    tokio::spawn(async move{let _guard=guard;let _activity=activity;let log=Log::default();let secrets=crate::runtime_discovery::capture_host_runtime_environment().into_iter().filter(|(key,_)|crate::member_environment::sensitive(key)).map(|(_,value)|value).collect();let redactor=crate::runtime_custom_api::CredentialRedactor::from_values(secrets);
         let result=async{let lock=install(&root,&definition,&reference,&requested_platform,&id,log.clone()).await?;let mut database=database.lock().await;register(&mut database,reference,lock,&id)}.await;
         let mut record=record;record["completedAt"]=json!(chrono::Utc::now().to_rfc3339());record["log"]=json!(redactor.text(&String::from_utf8_lossy(&log.lock().await)));
         match result{Ok(info)=>{record["state"]=json!("completed");record["info"]=info},Err(error)=>{record["state"]=json!("failed");record["error"]=json!(redactor.text(&error.to_string()))}}
-        let _=crate::platform::private_storage::atomic_write_private_json(&path,&record);if let Ok(mut active)=ACTIVE.lock(){active.remove(&path);}
+        let _=crate::platform::private_storage::atomic_write_private_json(&path,&record);
     });Ok(returned)
 }
