@@ -84,6 +84,7 @@ struct RovaiNativeSteer: View {
                         if receipt.text("status") == "not_consumed" {Button("预览整份普通下一轮") {normalOpen = true}.disabled(disabled)}
                     }
                     Button(original == nil ? "确认发送完整补充" : "核对原提交") {Task {await submit(preview)}}.disabled(disabled || receipt != nil && original == nil)
+                    if let receipt {RovaiNativeEvidence(model: model, commandId: receipt.text("commandId"))}
                     Text("普通输入和其他材料保留。送到连接不代表模型已阅读。").font(.caption).foregroundStyle(Theme.textSecondary)
                 }
             } else {

@@ -50,12 +50,14 @@ struct RovaiHistoryLibrary: View {
     @State private var readTask: Task<Void, Never>?
     @State private var turnLimit = 50
     @State private var execution: NativeContinuationSelection?
+    @State private var creationRecords = false
     private var filtered: [JSONValue] {entries.filter {search.isEmpty || "\($0["summary"]?.text("title") ?? "") \($0.text("sourceName")) \(($0["tags"]?.rvArray ?? []).compactMap(\.stringValue).joined(separator: " "))".localizedCaseInsensitiveContains(search)}}
     var body: some View {
         List {
             if let issue {Text(issue).font(.caption).foregroundStyle(Theme.warning)}
             if !progress.isEmpty {Text(progress).font(.caption).foregroundStyle(Theme.textSecondary)}
             if let selected {
+                Section {Button("继续与分叉的原创建记录") {creationRecords = true}.disabled(busy)}
                 Section {TextField("逗号分隔标签", text: $tags);HStack {Button("保存标签") {Task {await mutate("tags")}};Spacer();Button(selected["archived"]?.rvBool == true ? "恢复记录" : "归档记录") {confirming = true}}.disabled(busy);Button("导出会话记录") {exporting = true}.disabled(busy || document == nil)}
                 if let document, document.transcript == nil {Text("记录较大，已完整校验并保存为临时文件。请导出查看完整内容，或在桌面打开。").foregroundStyle(Theme.textSecondary)}
                 if let transcript = document?.transcript {
@@ -78,6 +80,7 @@ struct RovaiHistoryLibrary: View {
         .confirmationDialog(selected?["archived"]?.rvBool == true ? "恢复这条记录？" : "归档这条记录？", isPresented: $confirming, titleVisibility: .visible) {Button("确认") {Task {await mutate(selected?["archived"]?.rvBool == true ? "restore" : "archive")}};Button("取消", role: .cancel) {}} message: {Text("只调整导入库中的记录，保留来源资料。")}
         .sheet(isPresented: $exporting) {if let file = document?.file {ImportedHistoryExport(file: file) {exporting = false}}}
         .sheet(item: $execution) {selection in if let selected, let transcript = document?.transcript {RovaiNativeContinuation(model: model, entry: selected, transcript: transcript, selection: selection)}}
+        .sheet(isPresented: $creationRecords) {if let selected {RovaiNativeCreationRecords(model: model, entry: selected)}}
     }
     private func load() async throws {
         let generation = model.connectionGeneration
