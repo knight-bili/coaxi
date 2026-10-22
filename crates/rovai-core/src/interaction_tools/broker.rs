@@ -222,7 +222,8 @@ impl Broker {
         ensure!(ledger.binding["desktopPeerId"] == request["desktopPeerId"] && ledger.receipt["bindingDigest"] == request["bindingDigest"] && ledger.call["argumentsDigest"] == request["argumentsDigest"], "binding_changed");
         if ledger.receipt["state"] != "started" { return Ok(ledger.receipt); }
         let valid = authority(&ledger.binding).and_then(|_| self.current_bridge(&state, text(&ledger.binding, "bridgeInstanceId")?).map(|_| ())).and_then(|_| self.grants_current(&state, &ledger)).is_ok();
-        let result = &request["result"];
+        let normalized = if request["outcome"] == "completed" {super::output::normalize(text(&ledger.call,"toolName")?,request["result"].clone())?} else {request["result"].clone()};
+        let result = &normalized;
         ensure!(serde_json::to_vec(result)?.len() <= MAX_RESULT_BYTES, "result_too_large");
         if !result.is_null() {
             let directory = self.root.join("results");

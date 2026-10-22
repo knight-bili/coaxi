@@ -6,6 +6,7 @@ use serde_json::{json, Value};
 use std::{collections::BTreeSet, path::{Path, PathBuf}, sync::LazyLock};
 pub mod broker;
 pub mod renderers;
+pub mod output;
 pub mod stdio;
 
 pub const SERVER_NAME: &str = "rovai-interaction";
