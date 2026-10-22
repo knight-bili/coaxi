@@ -3,7 +3,7 @@ use anyhow::{Context,Result,ensure};
 use serde::{Deserialize,Serialize};
 use serde_json::{json,Value};
 use sha2::{Digest,Sha256};
-use std::{collections::HashMap,sync::{Arc,atomic::{AtomicU64,Ordering}}};
+use std::{collections::HashMap,sync::{Arc,atomic::{AtomicBool,AtomicU64,Ordering}}};
 use crate::{model_tools::{ComputerToolsConfig,ComputerToolsRuntimeConfig},native_events::ComputerEvents,native_service::{ComputerHost,ComputerService,NativeGrant}};
 
 #[derive(Clone,Deserialize,Serialize)]
@@ -19,7 +19,7 @@ pub struct ScopeConfiguration {
     pub screen_enabled:bool,
     pub grants:Vec<NativeGrant>,
 }
-struct Slot {service:Arc<ComputerService>,configuration:ComputerToolsRuntimeConfig,gate:tokio::sync::Mutex<Option<String>>,binding:std::sync::Mutex<String>}
+struct Slot {service:Arc<ComputerService>,configuration:ComputerToolsRuntimeConfig,gate:tokio::sync::Mutex<Option<String>>,binding:std::sync::Mutex<String>,closed:AtomicBool}
 pub struct NativeRegistry {
     slots:tokio::sync::Mutex<HashMap<String,Arc<Slot>>>,
     stops:AtomicU64,
@@ -37,7 +37,7 @@ impl NativeRegistry {
         let callback=self.callback.clone();let scope=key.to_owned();
         let events=ComputerEvents::new(move |kind,payload|callback(kind,json!({"scopeKey":scope,"payload":payload})));
         let service=ComputerService::start(ComputerHost{events},config.clone());
-        let slot=Arc::new(Slot{service,configuration:config,gate:tokio::sync::Mutex::new(None),binding:std::sync::Mutex::new(String::new())});
+        let slot=Arc::new(Slot{service,configuration:config,gate:tokio::sync::Mutex::new(None),binding:std::sync::Mutex::new(String::new()),closed:AtomicBool::new(false)});
         slots.insert(key.to_owned(),slot.clone());Ok(slot)
     }
     pub async fn configure(&self,config:ScopeConfiguration)->Result<Value>{
@@ -51,6 +51,7 @@ impl NativeRegistry {
         }
         let slot=self.slot(&config.scope_key).await?;
         let mut previous=slot.gate.lock().await;
+        ensure!(!slot.closed.load(Ordering::Acquire),"scope_changed");
         let digest=format!("{:x}",Sha256::digest(serde_json::to_vec(&config)?));
         if previous.as_deref()==Some(digest.as_str()){return Ok(json!({"configured":true,"stopGeneration":self.stop_generation()}))}
         // 绑定或授权改变时，原表先收回代次并释放按键，再重新应用当前批准资源。
@@ -71,6 +72,7 @@ impl NativeRegistry {
         let slot=self.slot(scope).await?;
         ensure!(slot.binding.lock().map_err(|_|anyhow::anyhow!("computer.binding_lock"))?.as_str()==bridge,"binding_changed");
         let _gate=slot.gate.lock().await;
+        ensure!(!slot.closed.load(Ordering::Acquire)&&slot.binding.lock().map_err(|_|anyhow::anyhow!("computer.binding_lock"))?.as_str()==bridge,"binding_changed");
         ensure!(stop==self.stop_generation(),"cancelled");
         let result=slot.service.execute_external(name,arguments).await?;
         ensure!(stop==self.stop_generation(),"cancelled");
@@ -90,6 +92,15 @@ impl NativeRegistry {
         while tasks.join_next().await.is_some(){}
         json!({"stopped":true,"stopGeneration":stop})
     }
+    pub async fn release_scope(&self,scope:&str,expected_bridge:Option<&str>)->Result<Value>{
+        let slot={let mut slots=self.slots.lock().await;let Some(slot)=slots.get(scope).cloned()else{return Ok(json!({"released":true}))};
+            {let mut binding=slot.binding.lock().map_err(|_|anyhow::anyhow!("computer.binding_lock"))?;
+                if expected_bridge.is_some_and(|expected|binding.as_str()!=expected){return Ok(json!({"released":false,"bindingChanged":true}))}
+                slot.closed.store(true,Ordering::Release);binding.clear();}
+            slots.remove(scope);slot};
+        slot.service.stop().await;let mut config=slot.configuration.snapshot().await;config.enabled=false;slot.configuration.set(config).await;
+        *slot.gate.lock().await=None;Ok(json!({"released":true}))
+    }
     pub async fn status(&self,scope:&str)->Result<Value>{let slot=self.slot(scope).await?;Ok(json!({"status":slot.service.local_status().await,"stopGeneration":self.stop_generation()}))}
     pub async fn dispatch(&self,method:&str,params:Value)->Result<Value>{
         let text=|key:&str|params[key].as_str().context("invalid_arguments");
@@ -98,6 +109,7 @@ impl NativeRegistry {
             "picker"=>self.picker(text("scopeKey")?).await,
             "status"=>self.status(text("scopeKey")?).await,
             "stop_scope"=>self.stop_scope(text("scopeKey")?,params["bridgeInstanceId"].as_str()).await,
+            "release_scope"=>self.release_scope(text("scopeKey")?,params["bridgeInstanceId"].as_str()).await,
             "stop_all"=>Ok(self.stop_all().await),
             "call"=>self.call(text("scopeKey")?,text("bridgeInstanceId")?,params["expectedStopGeneration"].as_u64().context("invalid_arguments")?,text("toolName")?,&params["arguments"]).await,
             _=>anyhow::bail!("computer.operation_not_admitted"),

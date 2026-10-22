@@ -35,16 +35,17 @@ async fn serve()->Result<()> {
     let writer=tokio::spawn(async move{let mut output=tokio::io::stdout();while let Some(value)=receiver.recv().await{let bytes=serde_json::to_vec(&value)?;ensure!(bytes.len()<=MAX_OUT,"computer.result_too_large");output.write_all(&(bytes.len()as u32).to_le_bytes()).await?;output.write_all(&bytes).await?;output.flush().await?}Ok::<(),anyhow::Error>(())});
     sender.send(json!({"protocolVersion":1,"ready":true,"desktopPeerId":init.desktop_peer_id,"stopGeneration":0})).await?;
     let mut tasks=tokio::task::JoinSet::new();let capacity=Arc::new(tokio::sync::Semaphore::new(32));
-    while let Some(value)=read(&mut input).await?{
+    let input_result:Result<()>=async{while let Some(value)=read(&mut input).await?{
         while tasks.try_join_next().is_some(){}
         let request:Request=serde_json::from_value(value)?;ensure!(token_matches(&init.token,&request.token),"computer.invalid_authentication");uuid::Uuid::parse_str(&request.id)?;
-        let permit=if matches!(request.method.as_str(),"stop_all"|"stop_scope"){None}else{Some(capacity.clone().try_acquire_owned()?)};
+        let permit=if matches!(request.method.as_str(),"stop_all"|"stop_scope"|"release_scope"){None}else{Some(capacity.clone().try_acquire_owned()?)};
         let sender=sender.clone();let registry=registry.clone();
         tasks.spawn(async move{let _permit=permit;let result=registry.dispatch(&request.method,request.params).await;let response=match result{Ok(result)=>json!({"id":request.id,"ok":true,"result":result}),Err(error)=>json!({"id":request.id,"ok":false,"error":error.to_string()})};let _=sender.send(response).await;});
-    }
+    }Ok(())}.await;
     registry.stop_all().await;
     tasks.abort_all();while tasks.join_next().await.is_some(){}
     drop(registry);drop(sender);
+    input_result?;
     tokio::time::timeout(std::time::Duration::from_secs(5),writer).await???;
     Ok(())
 }
