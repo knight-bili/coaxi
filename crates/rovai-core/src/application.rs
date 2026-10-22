@@ -18,6 +18,7 @@ mod workbench_file_tools;
 mod workbench_receipts;
 mod browser_access;
 mod interaction_access;
+mod feedback_access;
 mod computer_access;
 mod office_access;
 mod history_import;
@@ -862,6 +863,7 @@ fn request_runs_outside_main_queue(method: &str) -> bool {
             | "monitoring.prices"
             | "history.usage"
             | "history.usage.local"
+            | "feedback.operation"
             | "monitoring.execution"
             | "runtime.installations.refresh"
             | "runtime.discovery.rescan"
@@ -2446,6 +2448,8 @@ struct ClaudeInputAcceptanceTarget<'a> {
 }
 
 struct Core {
+    feedback_tools: crate::ui_feedback::broker::Registry,
+    feedback_transports: Mutex<HashMap<String,(crate::mcp::McpServerDefinition,String)>>,
     interaction_tools: Arc<crate::interaction_tools::broker::Broker>,
     interaction_bindings: Mutex<HashMap<String,BuiltinToolBindingCredential>>,
     native_child_readers: crate::runtime_subagent_session::reader::Registry,
@@ -10371,6 +10375,7 @@ impl Core {
             "history.library" => self.history_import(false,request.params.clone()).await,
             "office.watch" => self.office_access(request.params.clone(),&request.client).await,
             "interaction.local" => self.interaction_access(request.params.clone()).await,
+            "feedback.operation" => self.feedback_operation(request.params.clone()).await,
             "computer.local" => self.computer_access(request.params.clone()).await,
             "browser.local.grant" | "browser.local.revoke" | "browser.local.begin" | "browser.local.finish" => self.browser_access(&request.method, request.params.clone()).await,
             "workbench.files.tools" => self.workbench_file_tools(request.params.clone()).await,
@@ -15015,6 +15020,10 @@ impl Core {
             let credential = self.prepare_initial_builtin_tool_binding(execution,execution.native_session_resume_disposition()).await?;
             Some(self.prepare_interaction_transport(execution,&policy,&credential).await?)
         } else {None};
+        let feedback=if let Some(policy)=self.feedback_policy_for_run(execution).await?{
+            let credential=self.prepare_initial_builtin_tool_binding(execution,execution.native_session_resume_disposition()).await?;
+            Some(self.prepare_feedback_transport(execution,&policy,&credential).await?)
+        }else{None};
         let mut projection = {
             let database = self.database.lock().await;
             let request = McpProjectionRequest {
@@ -15025,10 +15034,10 @@ impl Core {
                 reported_runtime_version: execution.runtime.reported_version.as_deref(),
                 execution_root: &execution_root,
             };
-            match interaction {
-                Some((definition,digest)) => self.mcp_projection.prepare_interaction(&database,self.mcp_config()?,&request,definition,&digest)?,
-                None => self.mcp_projection.prepare(&database,self.mcp_config()?,&request)?,
-            }
+            let mut owned=Vec::new();
+            if let Some((definition,digest))=interaction{owned.push((crate::interaction_tools::SERVER_NAME,definition,digest));}
+            if let Some((definition,digest))=feedback{owned.push((crate::ui_feedback::SERVER_NAME,definition,digest));}
+            if owned.is_empty(){self.mcp_projection.prepare(&database,self.mcp_config()?,&request)?}else{self.mcp_projection.prepare_owned_tools(&database,self.mcp_config()?,&request,owned)?}
         };
         if execution.runtime.adapter_kind == AdapterKind::GrokBuild
             && !projection.servers.is_empty()
@@ -15260,7 +15269,7 @@ impl Core {
         execution: &AgentRunExecution,
         resume_disposition: NativeSessionResumeDisposition,
     ) -> Result<BuiltinToolBindingCredential> {
-        if self.interaction_policy_for_run(execution).await?.is_some() {
+        if self.interaction_policy_for_run(execution).await?.is_some() || self.feedback_policy_for_run(execution).await?.is_some() {
             let mut cache = self.interaction_bindings.lock().await;
             let key = format!("{}:{}",execution.agent_run_id,execution.execution_epoch);
             if let Some(binding) = cache.get(&key) {return Ok(binding.clone());}
@@ -19650,7 +19659,10 @@ async fn run_core(
         data_dir.clone(),
         planned_shutdown.generation().to_owned(),
     )?;
+    crate::ui_feedback::delivery::recover_after_restart(database.connection())?;
     let core = Arc::new(Core {
+        feedback_tools: crate::ui_feedback::broker::Registry::default(),
+        feedback_transports: Mutex::new(HashMap::new()),
         interaction_bindings: Mutex::new(HashMap::new()),
         interaction_tools: Arc::new(crate::interaction_tools::broker::Broker::new(&data_dir)),
         native_child_readers: crate::runtime_subagent_session::reader::Registry::new(planned_shutdown.generation().to_owned()),
@@ -27863,6 +27875,8 @@ mod tests {
 
         let planned_shutdown = PlannedShutdownCoordinator::new(uuid::Uuid::new_v4().to_string());
         Ok(Core {
+            feedback_tools: crate::ui_feedback::broker::Registry::default(),
+            feedback_transports: Mutex::new(HashMap::new()),
             interaction_bindings: Mutex::new(HashMap::new()),
         interaction_tools: Arc::new(crate::interaction_tools::broker::Broker::new(&data_dir)),
         native_child_readers: crate::runtime_subagent_session::reader::Registry::new(planned_shutdown.generation().to_owned()),
