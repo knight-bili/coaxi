@@ -6,8 +6,10 @@ import { writePrivateJson } from './general-preferences'
 import type { KeyboardShortcutsSnapshot } from '@contracts'
 
 export class KeyboardShortcutsStore {
+  recording=false
   private saved:KeyboardShortcutsSnapshot|null=null
   private tail:Promise<unknown>=Promise.resolve()
+  private loading:Promise<KeyboardShortcutsSnapshot>|null=null
   constructor(private readonly preferencesRoot:()=>string){}
   private file():string{return join(this.preferencesRoot(),'keyboard-shortcuts-v1.json')}
   private validate(value:KeyboardShortcutsSnapshot):void{
@@ -16,7 +18,9 @@ export class KeyboardShortcutsStore {
     for(const {id}of SHORTCUT_DEFINITIONS){const raw=value.bindings[id];if(typeof raw!=='string'||raw.length>128||(raw!==''&&normalizeShortcut(raw)!==raw))throw new Error('shortcuts.invalid_binding')}
     for(let index=0;index<SHORTCUT_DEFINITIONS.length;index++)for(const other of SHORTCUT_DEFINITIONS.slice(index+1)){const id=SHORTCUT_DEFINITIONS[index].id;if(!canShareShortcut(id,other.id)&&shortcutsConflict(value.bindings[id],value.bindings[other.id]))throw new Error('shortcuts.conflicting_binding')}
   }
-  async get():Promise<KeyboardShortcutsSnapshot>{
+  bindings():ReturnType<typeof normalizeShortcutSettings>{return normalizeShortcutSettings(this.saved?.bindings??DEFAULT_SHORTCUTS)}
+  get():Promise<KeyboardShortcutsSnapshot>{if(this.loading)return this.loading;const load=this.read().finally(()=>{if(this.loading===load)this.loading=null});this.loading=load;return load}
+  private async read():Promise<KeyboardShortcutsSnapshot>{
     if(this.saved)return structuredClone(this.saved)
     try{const file=this.file(),stat=await fs.lstat(file);if(!stat.isFile()||stat.isSymbolicLink()||stat.size>32768)throw new Error('shortcuts.invalid_file');const value=JSON.parse(await fs.readFile(file,'utf8'))as KeyboardShortcutsSnapshot;this.validate(value);this.saved=value}
     catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;const value={revision:randomUUID(),bindings:{...DEFAULT_SHORTCUTS}};await writePrivateJson(this.file(),value);this.saved=value}

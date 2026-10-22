@@ -76,7 +76,7 @@ const api: RovaiApi = {
     restore:(archiveId,passphrase)=>ipcRenderer.invoke('rovai:backup-workspace','restore',{archiveId,passphrase}),
     onProgress:listener=>{const receive=(_event:Electron.IpcRendererEvent,value:{phase:string;done:number;total:number}):void=>listener(value);ipcRenderer.on('rovai:backup-progress',receive);return()=>ipcRenderer.removeListener('rovai:backup-progress',receive)}
   },
-  keyboardShortcuts:{get:()=>ipcRenderer.invoke('rovai:keyboard-shortcuts','get'),save:input=>ipcRenderer.invoke('rovai:keyboard-shortcuts','save',input)},
+  keyboardShortcuts:{get:()=>ipcRenderer.invoke('rovai:keyboard-shortcuts','get'),save:input=>ipcRenderer.invoke('rovai:keyboard-shortcuts','save',input),recording:value=>ipcRenderer.invoke('rovai:keyboard-shortcuts','recording',value),onNativeInput:listener=>{const receive=(_event:Electron.IpcRendererEvent,input:import('@contracts').NativeShortcutInput):void=>listener(input);ipcRenderer.on('rovai:keyboard-input',receive);return()=>ipcRenderer.removeListener('rovai:keyboard-input',receive)}},
   nativeCustomSkills: {importDirectory:input=>ipcRenderer.invoke('rovai:custom-skill-import',input)},
   nativeHistory: {export:(threadId,importId,expectedRevision)=>ipcRenderer.invoke('rovai:native-history','export',{threadId,importId,expectedRevision}),scan:(threadId,provider)=>ipcRenderer.invoke('rovai:native-history','scan',{threadId,provider}),request:(threadId,input)=>ipcRenderer.invoke('rovai:native-history','request',{threadId,input})},
   officeWorkspace: {open:(threadId,path,editable)=>ipcRenderer.invoke('rovai:office-workspace',{threadId,path,editable})},

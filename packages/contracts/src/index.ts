@@ -5162,7 +5162,8 @@ export interface BrowserWorkspaceView { id:string; threadId:string;profileId:str
 
 export interface InteractionWorkspaceApi {request<T>(action:'status'|'stop'|'policy.get'|'policy.replace'|'grant.share'|'grant.revoke'|'grant.list'|'sharing.targets'|'pending'|'eval.approve'|'operation.approve'|'unknown.reconcile',payload:Record<string,unknown>):Promise<T>}
 export interface KeyboardShortcutsSnapshot {revision:string;bindings:Record<string,string>}
-export interface KeyboardShortcutsApi {get():Promise<KeyboardShortcutsSnapshot>;save(input:KeyboardShortcutsSnapshot):Promise<KeyboardShortcutsSnapshot>}
+export interface NativeShortcutInput {key:string;code?:string;metaKey:boolean;ctrlKey:boolean;altKey:boolean;shiftKey:boolean;isComposing?:boolean}
+export interface KeyboardShortcutsApi {get():Promise<KeyboardShortcutsSnapshot>;save(input:KeyboardShortcutsSnapshot):Promise<KeyboardShortcutsSnapshot>;recording?(value:boolean):Promise<void>;onNativeInput?(listener:(input:NativeShortcutInput)=>void):()=>void}
 export interface RovaiApi {
   keyboardShortcuts?:KeyboardShortcutsApi
   interactionWorkspace?:InteractionWorkspaceApi

@@ -10,6 +10,7 @@ import { InteractionComputer } from './interaction-computer'
 import { InteractionResultJournal } from './interaction-result-journal'
 import { InteractionComputerIndicator } from './interaction-computer-indicator'
 import { KeyboardShortcutsStore } from './keyboard-shortcuts'
+import { resolveWindowZoomAction } from '../shared/codeg-keyboard-shortcuts'
 import { creationPreferences, withHostConversationPreferences } from '../shared/host-general-preferences'
 import { createHostChannelHandler } from './host-channels'
 import { FilePreviewFrameNavigation } from './file-preview/file-preview-navigation'
@@ -935,11 +936,13 @@ function createWindow(): void {
       publishPageZoom()
     }, 0)
   }
-  installCloseTabShortcut(window.webContents, process.platform, () => window.close())
+  installCloseTabShortcut(window.webContents, process.platform, () => window.close(),()=>({binding:keyboardShortcuts.bindings().close_current_tab,recording:keyboardShortcuts.recording}))
   installWindowNavigation(window, process.platform)
   window.webContents.on('before-input-event', (event, input) => {
-    const action = pageZoomAction(input, process.platform)
-    if (action === null) return
+    if(input.type!=='keyDown'||input.isComposing||keyboardShortcuts.recording)return
+    const fields={key:input.key,code:input.code,metaKey:input.meta,ctrlKey:input.control,altKey:input.alt,shiftKey:input.shift,isComposing:input.isComposing}
+    const action = resolveWindowZoomAction(fields,keyboardShortcuts.bindings())
+    if (action === null){if(pageZoomAction(input,process.platform)!==null){event.preventDefault();window.webContents.send('rovai:keyboard-input',fields)}return}
 
     event.preventDefault()
     const percentage = nextPageZoomPercentage(window.webContents.getZoomFactor(), action)
@@ -1270,7 +1273,7 @@ app.on('before-quit',()=>officeWorkspace.closeAll())
 const browserWorkspace = new BrowserWorkspace((method,params)=>core.request(method,params),()=>mainWindow)
 const interactionComputer = new InteractionComputer(core,()=>mainWindow)
 const keyboardShortcuts = new KeyboardShortcutsStore(()=>app.getPath('userData'))
-ipcMain.handle('rovai:keyboard-shortcuts',(event,action,input)=>{if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('shortcuts.local_owner_required');if(action==='get')return keyboardShortcuts.get();if(action==='save')return keyboardShortcuts.save(input);throw new Error('shortcuts.operation_not_admitted')})
+ipcMain.handle('rovai:keyboard-shortcuts',(event,action,input)=>{if(!mainWindow||mainWindow.isDestroyed()||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error('shortcuts.local_owner_required');if(action==='get')return keyboardShortcuts.get();if(action==='save')return keyboardShortcuts.save(input);if(action==='recording'&&typeof input==='boolean'){keyboardShortcuts.recording=input;mainWindow.webContents.setIgnoreMenuShortcuts(input);return}throw new Error('shortcuts.operation_not_admitted')})
 const interactionComputerIndicator = new InteractionComputerIndicator(interactionComputer,()=>mainWindow,async()=>{try{await core.request('interaction.local',{action:'computer.stop',payload:{}})}finally{await interactionComputer.stop()}})
 app.once('will-quit',()=>interactionComputerIndicator.dispose())
 const interactionWorkspace = new InteractionWorkspace(core,browserWorkspace,()=>mainWindow,interactionComputer,new InteractionResultJournal(app.getPath('userData'),()=>coreDataPath))
