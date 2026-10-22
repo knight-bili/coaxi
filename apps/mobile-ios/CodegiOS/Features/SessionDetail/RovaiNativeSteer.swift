@@ -66,6 +66,7 @@ struct RovaiNativeSteer: View {
     @State private var targets: [JSONValue] = [], records: [JSONValue] = [], run = "", checked: Set<String> = []
     @State private var packet: JSONValue?, receipt: JSONValue?, next: String?, issue: String?, generation: UInt64?
     @State private var busy = false, ready = false
+    @State private var normalOpen = false
     private var owner: String {"native-steer:\(scope.prettyString):\(agentId ?? "")"}
     private var disabled: Bool {busy || !ready || model.busy || model.pending != nil || generation != model.connectionGeneration}
     private var preview: JSONValue? {packet?["preview"]}
@@ -80,6 +81,7 @@ struct RovaiNativeSteer: View {
                     if let receipt {Text(nativeSteerState(receipt)).font(.caption);Text(receipt.text("commandId")).font(.caption2).textSelection(.enabled)
                         if receipt.text("nativeOutcome") == "startedNewTurn" {Text("输入已被原程序消耗，不要再次排队；该连接的直接插话已停用。").font(.caption)}
                         if receipt.text("status") == "not_consumed" {Text("整份输入仍保存在原预览，作为普通下一轮发送须另外确认。").font(.caption)}
+                        if receipt.text("status") == "not_consumed" {Button("预览整份普通下一轮") {normalOpen = true}.disabled(disabled)}
                     }
                     Button(original == nil ? "确认发送完整补充" : "核对原提交") {Task {await submit(preview)}}.disabled(disabled || receipt != nil && original == nil)
                     Text("普通输入和其他材料保留。送到连接不代表模型已阅读。").font(.caption).foregroundStyle(Theme.textSecondary)
@@ -105,6 +107,7 @@ struct RovaiNativeSteer: View {
             }
         }.navigationTitle("完整原生插话").navigationBarTitleDisplayMode(.inline).scrollContentBackground(.hidden).toolbar {Button("关闭并保留") {dismiss()}.disabled(busy)}}
         .interactiveDismissDisabled(busy)
+        .sheet(isPresented: $normalOpen) {if let receipt {RovaiNativeNormalContinue(model: model, sourceCommandId: receipt.text("commandId"), composerScope: composerScope)}}
         .task(id: scope.prettyString) {
             generation = model.connectionGeneration;busy = true;defer {busy = false}
             do {
