@@ -42,3 +42,6 @@ export interface NativeNormalPreview {
 }
 export interface NativeNormalConfirm {schemaVersion:1;commandId:string;reference:NativeNormalReference;draftRevision?:number;composerScope?:import('./index').SingleChatComposerScope|null}
 export interface NativeNormalReceipt {schemaVersion:1;commandId:string;state:'prepared'|'recorded'|'failed'|'unknown';commandResult:import('./index').StoredCommandResult|null;error:string|null}
+export interface NativePreparationProof {reportedSessionId:string;hostInstanceId:string;initializeDigest:string;nativeRequestDigest:string;nativeReceiptDigest:string}
+export interface NativeCreationHistory {schemaVersion:1;items:Array<{preview:NativeContinuationPreview;receipt:NativeContinuationReceipt|null;preparation:NativePreparationProof|null}>;next:string|null}
+export interface NativeSteerEvidence {schemaVersion:1;preview:NativeSteerPreview;receipt:NativeSteerReceipt;delivery:Record<string,unknown>;normalContinuation:{status:string;code:string;payload:Record<string,unknown>}|null}

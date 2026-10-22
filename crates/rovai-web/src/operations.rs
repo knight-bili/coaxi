@@ -5,6 +5,10 @@ use serde::{Deserialize, Serialize};
 /// and the legacy shared draft remain outside the network capability.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum Operation {
+    #[serde(rename="history.execution.records")]
+    NativeCreationRecords,
+    #[serde(rename="runtime.steer.evidence")]
+    NativeSteerEvidence,
     #[serde(rename="runtime.steer.normal.preview")]
     NativeNormalPreview,
     #[serde(rename="runtime.steer.normal.confirm")]
@@ -599,6 +603,8 @@ impl Operation {
     pub fn project(self, mut value: serde_json::Value) -> serde_json::Value {
         use serde_json::json;
         match self {
+            Self::NativeCreationRecords => select_fields(&value,&["schemaVersion","items","next"]),
+            Self::NativeSteerEvidence => select_fields(&value,&["schemaVersion","preview","receipt","delivery","normalContinuation"]),
             Self::NativeNormalPreview => select_fields(&value,&["schemaVersion","previewId","previewDigest","sourceCommandId","scope","agentId","input","inputDigest","expiresAt"]),
             Self::NativeNormalConfirm | Self::NativeNormalReceipt => select_fields(&value,&["schemaVersion","commandId","state","commandResult","error"]),
             Self::NativeContinuationPreview => select_fields(&value,&["schemaVersion","previewId","previewDigest","expiresAt","source","mode","point","sourceThreadId","newThreadId","newConversationId","agentId","expectedAgentVersion","runtimeConfigDigest","workspaceDigest","title","historyMessageCount","capabilityStatus","reason"]),
@@ -705,6 +711,8 @@ impl Operation {
         match self {
             Self::NativeSteerPolicyGet => "runtime.steer.policy.get",
             Self::NativeContinuationPreview => "history.execution.preview",
+            Self::NativeCreationRecords => "history.execution.records",
+            Self::NativeSteerEvidence => "runtime.steer.evidence",
             Self::NativeNormalPreview => "runtime.steer.normal.preview",
             Self::NativeNormalConfirm => "runtime.steer.normal.confirm",
             Self::NativeNormalReceipt => "runtime.steer.normal.receipt",

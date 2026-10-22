@@ -4794,6 +4794,7 @@ export interface ResolveRuntimeInteractionParams {
 export type CoreMethod =
   | 'runtime.steer.policy.get' | 'runtime.steer.policy.set' | 'runtime.steer.targets'
   | 'history.execution.preview' | 'history.execution.confirm' | 'history.execution.receipt'
+  | 'history.execution.records' | 'runtime.steer.evidence'
   | 'runtime.steer.normal.preview' | 'runtime.steer.normal.confirm' | 'runtime.steer.normal.receipt'
   | 'runtime.steer.materials.prepare' | 'runtime.steer.preview' | 'runtime.steer.confirm' | 'runtime.steer.receipt' | 'runtime.steer.previews'
   | 'runtime.custom.registry'

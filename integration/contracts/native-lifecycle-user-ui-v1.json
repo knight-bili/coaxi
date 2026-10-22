@@ -15,6 +15,18 @@
     "historicalProposalRewritten": false
   },
   "auxiliaryOperations": {
+    "history.execution.records": {
+      "description":"当前编辑端原生继续/分叉预览、原创建回执和实际准备证据的只读分页；包括已失效预览，不启动或重建任何会话。",
+      "input":{"type":"object","additionalProperties":false,"required":["schemaVersion","sourceThreadId","importId","after","limit"],"properties":{"schemaVersion":{"const":1},"sourceThreadId":{"type":"string","format":"Core ThreadId"},"importId":{"oneOf":[{"type":"null"},{"type":"string","pattern":"^[0-9a-f]{64}$"}]},"after":{"oneOf":[{"type":"null"},{"type":"string","format":"uuid"}]},"limit":{"type":"integer","minimum":1,"maximum":50}}},
+      "output":"NativeCreationHistory; private source paths and credentials excluded",
+      "startsModelTask":false
+    },
+    "runtime.steer.evidence": {
+      "description":"当前编辑端的原生插话完整预览、账本、已知/未知原回执及普通续办结果只读核对。",
+      "input":{"type":"object","additionalProperties":false,"required":["schemaVersion","commandId"],"properties":{"schemaVersion":{"const":1},"commandId":{"type":"string","format":"uuid"}}},
+      "output":"NativeSteerEvidence; NativeInputDeliveryV1 frozen model evidence unchanged; no raw material bytes or paths",
+      "startsModelTask":false
+    },
     "runtime.steer.normal.preview": {
       "description": "仅原生promptRequired明确未消耗的完整输入允许用户预览普通消息续办。",
       "input": {"type":"object","additionalProperties":false,"required":["schemaVersion","sourceCommandId"],"properties":{"schemaVersion":{"const":1},"sourceCommandId":{"type":"string","format":"uuid"}}},
