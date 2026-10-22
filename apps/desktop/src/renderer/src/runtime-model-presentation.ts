@@ -3,6 +3,7 @@ import { uiAttribute } from './interface-language'
 
 export function runtimeAdapterLabel(kind: string): string {
   return ({
+    'custom-acp': uiAttribute('自定义智能体'),
     'codex-cli': 'Codex CLI',
     pi: 'Pi Coding Agent',
     'opencode-cli': 'OpenCode',

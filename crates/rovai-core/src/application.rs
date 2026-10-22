@@ -2862,6 +2862,7 @@ fn runtime_diagnostic_checks(
 
 fn runtime_display_name(kind: AdapterKind) -> &'static str {
     match kind {
+        AdapterKind::CustomAcp => "自定义智能体",
         AdapterKind::CodexCli => "Codex CLI",
         AdapterKind::Pi => "Pi",
         AdapterKind::OpencodeCli => "OpenCode",

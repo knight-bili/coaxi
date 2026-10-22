@@ -2748,6 +2748,7 @@ pub fn configure_acp_command(
                 .arg("--acp")
                 .env("CLINE_SESSION_BACKEND_MODE", "local");
         }
+        AdapterKind::CustomAcp => anyhow::bail!("custom_runtime.locked_launch_required"),
         AdapterKind::CodexCli
         | AdapterKind::Pi
         | AdapterKind::ClaudeCodeCli

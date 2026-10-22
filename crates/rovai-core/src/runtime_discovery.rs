@@ -519,6 +519,8 @@ impl RuntimeSearchEnvironment {
         kind: AdapterKind,
         manual_candidates: impl IntoIterator<Item = PathBuf>,
     ) -> Vec<RuntimeExecutableCandidate> {
+        // 自定义程序只由带定义引用的安装锁选路，不借用 PATH、手动覆盖或内置默认安装。
+        if kind==AdapterKind::CustomAcp{return Vec::new()}
         if let Some(configuration) = self.startup_configurations.get(&kind) {
             if let Some(path) = &configuration.program_path {
                 let path = PathBuf::from(path);
