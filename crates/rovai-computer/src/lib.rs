@@ -17,3 +17,6 @@ pub mod native_service;
 pub mod native_events;
 
 pub mod model_dispatch;
+
+pub mod native_registry;
+pub mod native_host;
