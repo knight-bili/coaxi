@@ -15,6 +15,24 @@
     "historicalProposalRewritten": false
   },
   "auxiliaryOperations": {
+    "runtime.steer.normal.preview": {
+      "description": "仅原生promptRequired明确未消耗的完整输入允许用户预览普通消息续办。",
+      "input": {"type":"object","additionalProperties":false,"required":["schemaVersion","sourceCommandId"],"properties":{"schemaVersion":{"const":1},"sourceCommandId":{"type":"string","format":"uuid"}}},
+      "output": "NativeNormalPreview; full original NativeSteerInputV1, no extra model tool or instruction",
+      "startsModelTask": false
+    },
+    "runtime.steer.normal.confirm": {
+      "description": "用户另一次确认后，原普通消息事务提交整份正文和受管材料；当前普通草稿与引用保持原状，原输入只能消费一次。",
+      "input": {"type":"object","additionalProperties":false,"required":["schemaVersion","commandId","reference"],"properties":{"schemaVersion":{"const":1},"commandId":{"type":"string","format":"uuid"},"reference":{"type":"object","additionalProperties":false,"required":["sourceCommandId","previewId","previewDigest"],"properties":{"sourceCommandId":{"type":"string","format":"uuid"},"previewId":{"type":"string","format":"uuid"},"previewDigest":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"}}},"draftRevision":{"type":"integer","minimum":0},"composerScope":{"oneOf":[{"type":"null"},{"schema":"existing SingleChatComposerScope"}]}}},
+      "constraints": ["private scope requires current draftRevision; public omits both private draft fields", "original input must be not_consumed with nativeOutcome promptRequired", "unknown and startedNewTurn cannot enter this path", "same normal command id only returns its original state", "no first-message or paid execution is performed by the development agent"],
+      "output": "NativeNormalReceipt; original command result metadata only",
+      "modelContract": "existing normal Current Input and attachment pipeline; full source selection authorized by native continuation fork steer r1"
+    },
+    "runtime.steer.normal.receipt": {
+      "input":{"type":"object","additionalProperties":false,"required":["schemaVersion","commandId"],"properties":{"schemaVersion":{"const":1},"commandId":{"type":"string","format":"uuid"}}},
+      "output":"NativeNormalReceipt; authenticated client and user command scope checked",
+      "startsModelTask":false
+    },
     "runtime.steer.materials.prepare": {
       "description": "用户明确勾选当前编辑端和卡片的已有文件引用，冻结为Core快照；不读取未选材料。",
       "input": {

@@ -35,3 +35,10 @@ export interface NativeSteerReceipt {
   nativeOutcome:'injected'|'promptRequired'|'startedNewTurn'|null;nativeReceiptDigest:string|null;error:string|null
 }
 export interface NativeSteerRecoveryPage {schemaVersion:1;items:Array<{preview:NativeSteerPreview;receipt:NativeSteerReceipt|null}>;next:string|null}
+export interface NativeNormalReference {sourceCommandId:string;previewId:string;previewDigest:string}
+export interface NativeNormalPreview {
+  schemaVersion:1;previewId:string;previewDigest:string;sourceCommandId:string;scope:NativeSteerScope;agentId:string
+  input:NativeSteerInput;inputDigest:string;expiresAt:string
+}
+export interface NativeNormalConfirm {schemaVersion:1;commandId:string;reference:NativeNormalReference;draftRevision?:number;composerScope?:import('./index').SingleChatComposerScope|null}
+export interface NativeNormalReceipt {schemaVersion:1;commandId:string;state:'prepared'|'recorded'|'failed'|'unknown';commandResult:import('./index').StoredCommandResult|null;error:string|null}

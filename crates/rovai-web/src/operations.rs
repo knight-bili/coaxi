@@ -5,6 +5,12 @@ use serde::{Deserialize, Serialize};
 /// and the legacy shared draft remain outside the network capability.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum Operation {
+    #[serde(rename="runtime.steer.normal.preview")]
+    NativeNormalPreview,
+    #[serde(rename="runtime.steer.normal.confirm")]
+    NativeNormalConfirm,
+    #[serde(rename="runtime.steer.normal.receipt")]
+    NativeNormalReceipt,
     #[serde(rename="history.execution.preview")]
     NativeContinuationPreview,
     #[serde(rename="history.execution.confirm")]
@@ -593,6 +599,8 @@ impl Operation {
     pub fn project(self, mut value: serde_json::Value) -> serde_json::Value {
         use serde_json::json;
         match self {
+            Self::NativeNormalPreview => select_fields(&value,&["schemaVersion","previewId","previewDigest","sourceCommandId","scope","agentId","input","inputDigest","expiresAt"]),
+            Self::NativeNormalConfirm | Self::NativeNormalReceipt => select_fields(&value,&["schemaVersion","commandId","state","commandResult","error"]),
             Self::NativeContinuationPreview => select_fields(&value,&["schemaVersion","previewId","previewDigest","expiresAt","source","mode","point","sourceThreadId","newThreadId","newConversationId","agentId","expectedAgentVersion","runtimeConfigDigest","workspaceDigest","title","historyMessageCount","capabilityStatus","reason"]),
             Self::NativeContinuationConfirm | Self::NativeContinuationReceipt => select_fields(&value,&["schemaVersion","commandId","state","originId","threadId","conversationId","reportedSessionId","error"]),
             Self::NativeSteerPolicyGet => select_fields(&value,&["schemaVersion","revision","members"]),
@@ -697,6 +705,9 @@ impl Operation {
         match self {
             Self::NativeSteerPolicyGet => "runtime.steer.policy.get",
             Self::NativeContinuationPreview => "history.execution.preview",
+            Self::NativeNormalPreview => "runtime.steer.normal.preview",
+            Self::NativeNormalConfirm => "runtime.steer.normal.confirm",
+            Self::NativeNormalReceipt => "runtime.steer.normal.receipt",
             Self::NativeContinuationConfirm => "history.execution.confirm",
             Self::NativeContinuationReceipt => "history.execution.receipt",
             Self::NativeSteerPolicySet => "runtime.steer.policy.set",
