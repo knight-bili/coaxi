@@ -30,6 +30,7 @@ pub(crate) fn set_policy(tx:&Transaction<'_>,expected:i64,members:&Value)->Resul
     tx.execute("INSERT INTO native_lifecycle_steer_policy(singleton,revision,value_json) VALUES(1,?1,?2) ON CONFLICT(singleton) DO UPDATE SET revision=excluded.revision,value_json=excluded.value_json",params![next,serde_json::to_string(&value)?])?;Ok(value)
 }
 pub(crate) fn freeze_policy(connection:&Connection,member:&str)->Result<Option<FrozenNativeSteerV1>>{
+    if absent(connection)?{return Ok(None)}
     let value=policy(connection)?;let enabled=value["members"].as_array().is_some_and(|members|members.iter().any(|entry|entry["agentId"]==member&&entry["enabled"]==true));
     Ok(enabled.then(||FrozenNativeSteerV1{schema_version:1,policy_revision:value["revision"].as_i64().unwrap_or(0),enabled:true}))
 }

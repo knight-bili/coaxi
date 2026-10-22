@@ -5029,6 +5029,12 @@ pub(crate) fn build_admitted_effective_config(
     agent_id: &str,
     runtime: &FrozenAgentRuntimeConfig,
 ) -> Result<(Value, FrozenAgentRuntimeConfig)> {
+    let mut native_runtime=runtime.clone();
+    let native_steer=crate::native_lifecycle::storage::freeze_policy(transaction,agent_id)?;
+    if native_runtime.native_origin.is_none()&&native_runtime.native_steer.is_none(){
+        crate::native_lifecycle::freeze_intent(&mut native_runtime,None,native_steer)?;
+    }
+    let runtime=&native_runtime;
     let policy = crate::delegation_policy::freeze_for_conversation(transaction, conversation_id)?;
     let runtime = match policy {
         Some(policy) => policy.freeze_resolved_runtime(runtime)?,
