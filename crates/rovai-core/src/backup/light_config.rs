@@ -51,7 +51,7 @@ pub fn export(root:&Path,preferences:&Path,destination:&Path,passphrase:&str,can
 pub fn inspect(root:&Path,preferences:&Path,file:&Path,passphrase:&str,cancel:&CancellationToken)->Result<Value>{let root=fs::canonicalize(root)?;let snapshot=read_snapshot(&root,file,passphrase,cancel)?;let(current,digest)=collect(&root,preferences)?;let changes=snapshot.domains.iter().map(|(id,value)|json!({"domain":id,"before":current.domains.get(id),"after":value})).collect::<Vec<_>>();Ok(json!({"formatVersion":snapshot.format_version,"appVersion":snapshot.app_version,"createdAt":snapshot.created_at,"localDigest":digest,"changes":changes}))}
 const PENDING:&str="config-sync-pending-v1.json";
 // 只升级界面偏好外壳；队员、模型、MCP 和原生凭据不属于此同步域。
-fn complete_general_preferences(next:&mut serde_json::Map<String,Value>,incoming:&Value)->Result<()> {
+pub(crate) fn complete_general_preferences(next:&mut serde_json::Map<String,Value>,incoming:&Value)->Result<()> {
     let previous=next.get("schemaVersion").and_then(Value::as_u64).unwrap_or(6);
     ensure!((1..=6).contains(&previous),"config_sync.unsupported_general_preferences");
     let defaults=json!({"interfaceLanguage":"zh-CN","interfaceLanguageMode":"manual","startupLocationMode":"last_location","lastSettingsSection":"general","executionConsolePlacement":"inspector","newConversationDefaults":null,"newConversationDefaultsRequireConfirmation":false,"oneClickNewConversationEnabled":false,"worldMapEnabled":previous<4});

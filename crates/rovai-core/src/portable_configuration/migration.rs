@@ -31,7 +31,7 @@ fn source_name(entry:&archive::Entry)->String{
 fn basis(connection:&Connection,root:&Path,targets:&Value,domains:&Value,members:&[Value])->Result<Value>{
     let mut providers=serde_json::Map::new();let mut customs=serde_json::Map::new();let mut file_targets=BTreeSet::new();
     for(entry,id)in targets.as_object().context("configuration.targets_invalid")?{let id=id.as_str().context("configuration.target_invalid")?;
-        match domains[entry].as_str(){Some("modelProviders")=>{providers.insert(id.into(),provider_basis(connection,id)?);},Some("customAgents")=>{customs.insert(id.into(),custom_basis(connection,id)?);},Some(domain)=>if let Some(target)=library::file_target(domain){file_targets.insert(target.to_owned());},None=>anyhow::bail!("configuration.domain_required")}
+        match domains[entry].as_str(){Some("modelProviders")=>{providers.insert(id.into(),provider_basis(connection,id)?);},Some("customAgents")=>{customs.insert(id.into(),custom_basis(connection,id)?);},Some("preferences")=>{file_targets.insert(id.to_owned());},Some(domain)=>if let Some(target)=library::file_target(domain){file_targets.insert(target.to_owned());},None=>anyhow::bail!("configuration.domain_required")}
     }
     let mut member_values=serde_json::Map::new();for member in members{let id=text(member,"agentId")?;member_values.insert(id.into(),member_basis(connection,id)?);}
     Ok(json!({"providers":providers,"customAgents":customs,"members":member_values,"files":files::basis(root,&file_targets.into_iter().collect::<Vec<_>>())?}))
@@ -82,6 +82,19 @@ pub(crate) fn preview(connection:&Connection,root:&Path,client:&str,input:&Value
                 }else{library::candidate(connection,client,&entry.domain,&target,&entry.value,false)};
                 match converted{Ok(value)=>row["after"]=value,Err(_)=>{row["status"]=json!("unsupported");row["reason"]=json!("此条原配置无法完整转换；原文保留，请补齐字段后重新预览。");}}
                 targets.insert(entry.id.clone(),json!(target));domains.insert(entry.id.clone(),json!(entry.domain));
+            }else if entry.domain=="preferences"{
+                match preferences::file_patch(&entry.value){
+                    Ok((target,patch))=>{
+                        let before=files::read(root,target)?;row["before"]=preferences::before_fields(&before,&patch);row["after"]=patch;
+                        let key=text(&entry.value,"key")?;let existing=row["before"].as_object().is_some_and(|map|map.values().any(|value|!value.is_null()));
+                        let decision=decision.context("configuration.decision_required")?;
+                        if(action=="create"&&(existing||!decision["targetId"].is_null()||!decision["expectedRevision"].is_null()))||(action=="replace"&&(!existing||decision["targetId"]!=key||decision["expectedRevision"]!=1)){
+                            row["status"]=json!("conflict");row["reason"]=json!("请明确选择替换对应偏好，已有值不会按名称自动覆盖。");
+                        }
+                        targets.insert(entry.id.clone(),json!(target));domains.insert(entry.id.clone(),json!(entry.domain));
+                    },
+                    Err(_)=>{row["status"]=json!("unsupported");row["reason"]=json!("原值已保留；此设置需要对应策略或当前主机支持，尚未应用。");},
+                }
             }else{
                 row["status"]=json!("unsupported");row["reason"]=json!("此域的应用接线尚在编写；完整原文已保留，不能标作已应用。");
             }
@@ -141,6 +154,11 @@ fn apply_on(tx:&Transaction<'_>,root:&Path,client:&str,command:&str,preview:&Val
         let source=text(selected,"entryId")?;let entry=entries.iter().find(|entry|entry.id==source&&entry.domain==selected["domain"]).context("configuration.source_entry_changed")?;
         let id=private["targets"][source].as_str().context("configuration.target_required")?;
         *counts.entry(entry.domain.clone()).or_default()+=1;
+        if entry.domain=="preferences"{
+            let(target,patch)=preferences::file_patch(&entry.value)?;ensure!(id==target,"configuration.preference_target_changed");
+            let original=file_updates.get(target).map(|(_,value)|value.clone()).unwrap_or_else(||private["basis"]["files"][target]["value"].clone());
+            let next=preferences::merge(target,&original,&patch)?;file_updates.insert(target.into(),("preferences".into(),next));continue
+        }
         if entry.domain=="customAgents"{
             let before=custom_basis(tx,id)?;let definition=normalize::custom_agent(id,&entry.value)?;
             let saved=crate::custom_runtime::storage::upsert_on(tx,before["revision"].as_i64().unwrap_or(0),&definition)?;

@@ -16,6 +16,7 @@ pub(crate) mod archive_store;
 pub(crate) mod migration;
 pub(crate) mod files;
 pub(crate) mod library;
+pub(crate) mod preferences;
 mod model;
 pub use model::*;
 
