@@ -14,6 +14,9 @@ use std::{
 #[path="native_lifecycle/acp_transport.rs"]
 mod native_lifecycle_transport;
 pub(crate) use native_lifecycle_transport::NativeSteerObservation;
+#[path="native_lifecycle/acp_preparation.rs"]
+mod native_lifecycle_preparation;
+pub(crate) use native_lifecycle_preparation::{NativePreparationFailure,NativePreparationProof,inspect_native_preparation,prepare_native_session};
 
 #[cfg(unix)]
 use std::fs::OpenOptions;
@@ -1741,8 +1744,11 @@ impl AcpHost {
             None
         };
         // From this point a process may exist; its owner handles cleanup.
+        let captured_kind=if frozen_runtime.adapter_kind==AdapterKind::CustomAcp{
+            frozen_runtime.native_origin.as_ref().and_then(|origin|match origin.source.provider.as_str(){"codex"=>Some(AdapterKind::CodexCli),"claude"=>Some(AdapterKind::ClaudeCodeCli),"qoder"=>Some(AdapterKind::QoderCli),"grok"=>Some(AdapterKind::GrokBuild),_=>None}).unwrap_or(frozen_runtime.adapter_kind)
+        }else{frozen_runtime.adapter_kind};
         let native_source = rovai_core::runtime_subagent_session::CapturedNativeSource::capture(
-            frozen_runtime.adapter_kind, spec.environment(), spec.working_directory(), &host_instance_id,
+            captured_kind, spec.environment(), spec.working_directory(), &host_instance_id,
         );
         if let Some(config) = private_config.as_mut() {
             config.preparing = false;
