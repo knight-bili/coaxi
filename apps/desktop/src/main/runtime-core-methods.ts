@@ -1,6 +1,7 @@
 import type { CoreMethod } from '@contracts'
 
 export const RUNTIME_RENDERER_CORE_METHODS = [
+  'runtime.custom.list', 'runtime.custom.upsert', 'runtime.custom.remove', 'runtime.custom.install', 'runtime.custom.inspect',
   'runtime.discovery.rescan',
   'runtime.product.ensure',
   'runtime.product.check',

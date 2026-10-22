@@ -74,6 +74,7 @@ export type AdapterKind =
   | 'cline-cli'
   | 'command-code-cli'
   | 'antigravity-app'
+  | 'custom-acp'
 
 export type RuntimeOptionScope = 'run' | 'session' | 'host'
 
@@ -264,6 +265,7 @@ export interface MemberRuntimeConfiguration {
   adapterKind: AdapterKind
   model: ModelSelection
   permissions: AdapterPermissionConfig
+  customRuntimeRef?: import('./custom-runtime').CustomRuntimeRefV1
 }
 
 export type RuntimeReadinessStatus =
@@ -329,6 +331,7 @@ export interface SetMemberRuntimeConfigurationCommand {
   adapterKind: AdapterKind
   model: ModelSelection
   permissions: AdapterPermissionConfig
+  customRuntimeRef?: import('./custom-runtime').CustomRuntimeRefV1
 }
 
 export interface ClearMemberRuntimeConfigurationCommand {
@@ -4788,6 +4791,7 @@ export interface ResolveRuntimeInteractionParams {
 }
 
 export type CoreMethod =
+  | 'runtime.custom.list' | 'runtime.custom.upsert' | 'runtime.custom.remove' | 'runtime.custom.install' | 'runtime.custom.inspect'
   | 'commands.reconcile'
   | 'preferences.newConversation.get'
   | 'preferences.newConversation.setDefaults'
@@ -5348,3 +5352,5 @@ export interface MissionChangedFile { id: string; path: string; oldPath: string 
 export type CheckoutState = { kind: 'branch'; branch: string; head: string } | { kind: 'detached'; head: string } | { kind: 'unavailable' }
 export interface MissionWorkspaceChangesView { checkoutState: CheckoutState; viewId: string | null; files: MissionChangedFile[] | null; diffError: string | null }
 export interface MissionFileDiff { file: MissionChangedFile; patch: string; hunks: { oldStart: number; newStart: number; lines: { kind: 'addition' | 'deletion' | 'context' | 'metadata'; text: string; oldLine: number | null; newLine: number | null }[] }[] }
+
+export * from './custom-runtime'

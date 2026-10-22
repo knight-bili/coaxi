@@ -41,6 +41,16 @@ pub enum Operation {
     HistoryUsage,
     #[serde(rename="feedback.operation")]
     FeedbackOperation,
+    #[serde(rename="runtime.custom.list")]
+    CustomRuntimeList,
+    #[serde(rename="runtime.custom.upsert")]
+    CustomRuntimeUpsert,
+    #[serde(rename="runtime.custom.remove")]
+    CustomRuntimeRemove,
+    #[serde(rename="runtime.custom.install")]
+    CustomRuntimeInstall,
+    #[serde(rename="runtime.custom.inspect")]
+    CustomRuntimeInspect,
     #[serde(rename="office.watch")]
     OfficeWatch,
     #[serde(rename = "forge.accounts.get")]
@@ -565,6 +575,10 @@ impl Operation {
             Self::ProjectLauncher => select_fields(&value,&["tools","planId","arguments","name","parent","kind","commandId","state","path","partialPath","startedAt","completedAt","log","error"]),
             Self::WorkbenchFileTools => select_fields(&value,&["path","digest","directory","files","bytes","entries","results","next","limited","scanned","applied","trashId","versions"]),
             Self::OfficeCli => select_fields(&value,&["installed","runnable","version","runtimeError","digest","manualUrl","commandId","operation","state","startedAt","completedAt","log","info","error"]),
+            Self::CustomRuntimeList => select_fields(&value,&["items","next"]),
+            Self::CustomRuntimeUpsert | Self::CustomRuntimeRemove => select_fields(&value,&["commandId","commandType","status","code","payload","resultEntity","recordedAt"]),
+            Self::CustomRuntimeInstall => select_fields(&value,&["commandId","reference","platform","state","startedAt","completedAt","log","info","error"]),
+            Self::CustomRuntimeInspect => select_fields(&value,&["reference","definition","platform","installation"]),
             Self::CustomSkillPrepare => select_fields(&value,&["skillId","sourceRevision"]),
             Self::CustomSkillInstall => select_fields(&value,&["status","code","payload"]),
             Self::OfficeSkillPrepare => select_fields(&value,&["planId","skillId","sourceRevision","content","contentDigest","binaryDigest"]),
@@ -666,6 +680,11 @@ impl Operation {
             Self::HistoryLibrary => "history.library",
             Self::HistoryUsage => "history.usage",
             Self::FeedbackOperation => "feedback.operation",
+            Self::CustomRuntimeList => "runtime.custom.list",
+            Self::CustomRuntimeUpsert => "runtime.custom.upsert",
+            Self::CustomRuntimeRemove => "runtime.custom.remove",
+            Self::CustomRuntimeInstall => "runtime.custom.install",
+            Self::CustomRuntimeInspect => "runtime.custom.inspect",
             Self::OfficeWatch => "office.watch",
             Self::ForgeOperation => "forge.operation",
             Self::WorkbenchOrganizerGet => "workbench.organizer.get",
