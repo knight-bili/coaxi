@@ -15,3 +15,5 @@ pub fn current_platform()->String{let os=match std::env::consts::OS{"macos"=>"da
 pub mod model_tools;
 pub mod native_service;
 pub mod native_events;
+
+pub mod model_dispatch;
