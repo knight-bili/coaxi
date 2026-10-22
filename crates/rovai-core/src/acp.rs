@@ -7972,7 +7972,8 @@ pub fn automatically_allows_permission_requests(
         | AdapterKind::ZcodeApp
         | AdapterKind::HermesCli
         | AdapterKind::OpenClawCli
-        | AdapterKind::CommandCodeCli => false,
+        | AdapterKind::CommandCodeCli
+        | AdapterKind::CustomAcp => false,
     }
 }
 
