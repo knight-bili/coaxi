@@ -1,0 +1,6 @@
+CREATE TABLE custom_runtime_definition(id TEXT NOT NULL,revision INTEGER NOT NULL CHECK(revision>=1),digest TEXT NOT NULL,value_json TEXT NOT NULL CHECK(json_valid(value_json)),PRIMARY KEY(id,revision));
+CREATE TABLE custom_runtime_head(id TEXT PRIMARY KEY,revision INTEGER NOT NULL,registry_id TEXT NOT NULL,removed INTEGER NOT NULL DEFAULT 0 CHECK(removed IN(0,1)),FOREIGN KEY(id,revision) REFERENCES custom_runtime_definition(id,revision));
+CREATE UNIQUE INDEX custom_runtime_registry_active ON custom_runtime_head(registry_id) WHERE removed=0;
+CREATE TABLE custom_runtime_secret(id TEXT NOT NULL,revision INTEGER NOT NULL,definition_id TEXT NOT NULL,environment_path TEXT NOT NULL,variable_name TEXT NOT NULL,ciphertext BLOB NOT NULL,PRIMARY KEY(id,revision));
+CREATE TABLE custom_runtime_member(member_id TEXT PRIMARY KEY REFERENCES agent_profile(id),reference_json TEXT NOT NULL CHECK(json_valid(reference_json)));
+CREATE TABLE custom_runtime_installation(definition_id TEXT NOT NULL,definition_revision INTEGER NOT NULL,platform TEXT NOT NULL,installation_id TEXT,operation_id TEXT,lock_json TEXT,status TEXT NOT NULL,updated_at TEXT NOT NULL,PRIMARY KEY(definition_id,definition_revision,platform),FOREIGN KEY(definition_id,definition_revision) REFERENCES custom_runtime_definition(id,revision));

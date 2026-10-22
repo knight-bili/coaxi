@@ -9,6 +9,6 @@ pub(super) fn migrate(database:&mut Database)->Result<()>{
     anyhow::ensure!(matches!(classify_database_contract(&tx)?,DatabaseContractClassification::SupportedMigrationSource(ref marker) if marker.projection_schema_version==162)&&absent(&tx)?,"Feedback requires complete schema162");
     tx.execute_batch(SCHEMA)?;
     tx.execute_batch("INSERT INTO schema_migration VALUES(213,datetime('now'));UPDATE rovai_data_contract SET projection_schema_version=163,updated_at=datetime('now') WHERE singleton=1;")?;
-    anyhow::ensure!(matches!(classify_database_contract(&tx)?,DatabaseContractClassification::Current(ref marker) if marker.projection_schema_version==163),"Feedback target admission failed");
+    anyhow::ensure!(matches!(classify_feedback_163_contract(&tx)?,DatabaseContractClassification::Current(ref marker) if marker.projection_schema_version==163),"Feedback target admission failed");
     tx.commit()?;Ok(())
 }

@@ -410,8 +410,8 @@ impl MainThreadMigrationSource {
 
 const V172_DATA_CONTRACT_VERSION: &str = "v1.72";
 pub(crate) const CURRENT_DATA_CONTRACT_VERSION: &str = "v1.73";
-pub(crate) const CURRENT_PROJECTION_SCHEMA_VERSION: i64 = 163;
-const CURRENT_SCHEMA_MIGRATION_VERSION: i64 = 213;
+pub(crate) const CURRENT_PROJECTION_SCHEMA_VERSION: i64 = 164;
+const CURRENT_SCHEMA_MIGRATION_VERSION: i64 = 214;
 const V147_MIGRATION_SOURCE_DATA_CONTRACT_VERSION: &str = "v1.54";
 const V147_MIGRATION_SOURCE_PROJECTION_SCHEMA_VERSION: i64 = 96;
 const V145_MIGRATION_SOURCE_DATA_CONTRACT_VERSION: &str = "v1.53";
@@ -3396,6 +3396,8 @@ pub(crate) fn classify_delegation_160_contract(
     classify_database_contract_for_target(connection, 160, 210)
 }
 
+pub(crate) fn classify_feedback_163_contract(connection:&Connection)->rusqlite::Result<DatabaseContractClassification>{classify_database_contract_for_target(connection,163,213)}
+
 fn classify_database_contract_for_target(
     connection: &Connection,
     target_projection: i64,
@@ -3459,8 +3461,9 @@ fn classify_database_contract_for_target(
     if marker.projection_schema_version < 162 && !usage_activity::absent(connection)? {
         return Ok(DatabaseContractClassification::Unknown(Some(marker)));
     }
+    if marker.projection_schema_version < 164 && !crate::custom_runtime::storage::absent(connection)? {return Ok(DatabaseContractClassification::Unknown(Some(marker)));}
     let delegation_current = marker.contract_version == CURRENT_DATA_CONTRACT_VERSION
-        && matches!(marker.projection_schema_version, 160 | 161 | 162 | 163);
+        && matches!(marker.projection_schema_version, 160 | 161 | 162 | 163 | 164);
     if delegation_current
         || (marker.contract_version == V172_DATA_CONTRACT_VERSION
             && matches!(
@@ -3482,7 +3485,9 @@ fn classify_database_contract_for_target(
             ))
     {
         let expected_migration = if delegation_current {
-            if marker.projection_schema_version == 163 {
+            if marker.projection_schema_version == 164 {
+                214
+            } else if marker.projection_schema_version == 163 {
                 213
             } else if marker.projection_schema_version == 162 {
                 212
@@ -3517,7 +3522,8 @@ fn classify_database_contract_for_target(
         )?;
         let valid = completed
             && (marker.projection_schema_version < 162 || usage_activity::schema_matches(connection)?)
-            && (marker.projection_schema_version != 163 || ui_feedback::schema_matches(connection)?)
+            && (marker.projection_schema_version < 163 || ui_feedback::schema_matches(connection)?)
+            && (marker.projection_schema_version < 164 || crate::custom_runtime::storage::schema_matches(connection)?)
             && marker.classifier_version == V147_CLASSIFIER_VERSION
             && if marker.projection_schema_version >= 161 {
                 runtime_interactions::schema_matches(connection)?
@@ -9352,6 +9358,9 @@ impl Database {
             if !self.schema_migration_applied(213)? {
                 migration_step!("migration_213", ui_feedback::migrate(self));
             }
+            if !self.schema_migration_applied(214)? {
+                migration_step!("migration_214", crate::custom_runtime::storage::migrate(self));
+            }
             if let Err(error) =
                 crate::notification::maintain_notification_episode_retention(self.connection())
             {
@@ -10213,6 +10222,9 @@ impl Database {
         }
         if !self.schema_migration_applied(213)? {
             migration_step!("migration_213", ui_feedback::migrate(self));
+        }
+        if !self.schema_migration_applied(214)? {
+            migration_step!("migration_214", crate::custom_runtime::storage::migrate(self));
         }
         if let Err(error) =
             crate::notification::maintain_notification_episode_retention(self.connection())

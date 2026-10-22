@@ -146,8 +146,10 @@ fn key(connection: &Connection) -> Result<Vec<u8>> {
             [],
             |r| r.get(0),
         )?;
+        let custom_exists:bool=connection.query_row("SELECT EXISTS(SELECT 1 FROM sqlite_schema WHERE type='table' AND name='custom_runtime_secret')",[],|r|r.get(0))?;
+        let has_custom=custom_exists&&connection.query_row("SELECT EXISTS(SELECT 1 FROM custom_runtime_secret)",[],|r|r.get::<_,bool>(0))?;
         ensure!(
-            !has_values,
+            !has_values&&!has_custom,
             "Private environment key is missing; restore the original Host key"
         );
         let mut bytes = [0u8; 32];
@@ -170,7 +172,7 @@ fn key(connection: &Connection) -> Result<Vec<u8>> {
     ensure!(bytes.len() == 32, "Private environment key is invalid");
     Ok(bytes)
 }
-fn encrypt(connection: &Connection, context: &str, value: &impl Serialize) -> Result<Vec<u8>> {
+pub(crate) fn encrypt(connection: &Connection, context: &str, value: &impl Serialize) -> Result<Vec<u8>> {
     let secret = aead::UnboundKey::new(&aead::AES_256_GCM, &key(connection)?)
         .map_err(|_| anyhow::anyhow!("Private environment encryption failed"))?;
     let mut nonce = [0u8; 12];
@@ -186,7 +188,7 @@ fn encrypt(connection: &Connection, context: &str, value: &impl Serialize) -> Re
         .map_err(|_| anyhow::anyhow!("Private environment encryption failed"))?;
     Ok([nonce.as_slice(), bytes.as_slice()].concat())
 }
-fn decrypt<T: serde::de::DeserializeOwned>(
+pub(crate) fn decrypt<T: serde::de::DeserializeOwned>(
     connection: &Connection,
     context: &str,
     bytes: &[u8],
