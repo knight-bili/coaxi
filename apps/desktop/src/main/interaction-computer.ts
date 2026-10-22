@@ -111,7 +111,9 @@ export class InteractionComputer implements DesktopComputerExecutor{
       const targets=await this.core.request<{targets:Array<{agentId:string;scope:InteractionScope}>}>('interaction.local',{action:'sharing.targets',payload:{threadId:value.scope.threadId,after:null}})
       if(!targets.targets.some(target=>target.agentId===value.agentId&&JSON.stringify(target.scope)===JSON.stringify(value.scope)))throw new Error('scope_changed')
       const scopeKey=this.scopeKey(value.scope,value.agentId);this.scopes.set(scopeKey,value)
-      return this.request(method,{scopeKey})
+      const pickerKey=digest({peer:this.peer?.desktopPeerId,scope:value.scope,agentId:value.agentId,kind:'local_picker'})
+      if(method==='picker')await this.request('configure',{scopeKey:pickerKey,bridgeInstanceId:randomUUID(),expectedStopGeneration:this.stopGeneration,enabled:this.preferences.enabled,launchEnabled:false,clipboardEnabled:false,allowForeground:false,screenEnabled:false,grants:[]})
+      return this.request(method,{scopeKey:pickerKey})
     }
     throw new Error('computer.operation_not_admitted')
   }
