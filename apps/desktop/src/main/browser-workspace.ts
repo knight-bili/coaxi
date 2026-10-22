@@ -6,7 +6,7 @@ import { BrowserDownloads } from './browser-downloads'
 import { BrowserProfiles } from './browser-profiles'
 import { BrowserPreferenceStore } from './browser-preferences'
 import evalRenderer from './codeg-eval-render.js?raw'
-import { sameInteractionScope, type InteractionWork, type InteractionScope, type InteractionGrant } from './interaction-types'
+import { InteractionLateResult, sameInteractionScope, type InteractionWork, type InteractionScope, type InteractionGrant } from './interaction-types'
 
 type Request = <T>(method: CoreMethod, params?: unknown) => Promise<T>
 type Surface = {
@@ -200,8 +200,9 @@ export class BrowserWorkspace {
       // 不传 profileId：沿本机原设置使用隔离临时身份，不借外部浏览器。
       const view=await this.invokeOwned('open',{threadId:binding.scope.threadId,url:address(args.url)}) as BrowserWorkspaceView
       const surface=this.find(view.id);surface.modelOwner={scope:{...binding.scope},agentId:binding.agentId}
-      await assertCurrent()
-      return {tabId:view.id,tab:summary(surface),...(view.error?{loadError:'failed'}:{})}
+      const original={tabId:view.id,tab:summary(surface),...(view.error?{loadError:'failed'}:{})}
+      try{await assertCurrent()}catch{throw new InteractionLateResult(original)}
+      return original
     }
     if(typeof args.tabId!=='string')throw new Error('invalid_arguments')
     const surface=this.find(args.tabId)
@@ -221,8 +222,9 @@ export class BrowserWorkspace {
         if(this.preferences.action(target)!=='builtin')throw new Error('browser.address_rule_requires_other_destination')
         await current();let loadError:string|undefined
         try{await surface.window.loadURL(target)}catch{loadError='failed'}
-        await assertCurrent()
-        return {tabId:surface.view.id,tab:summary(surface),...(loadError?{loadError}:{})}
+        const original={tabId:surface.view.id,tab:summary(surface),...(loadError?{loadError}:{})}
+        try{await assertCurrent()}catch{throw new InteractionLateResult(original)}
+        return original
       }
       let world=surface.modelWorlds.get(binding.bridgeInstanceId)
       if(world===undefined){if(surface.modelWorlds.size>=64)throw new Error('runtime_unavailable');world=WORLD+100+surface.modelWorlds.size;surface.modelWorlds.set(binding.bridgeInstanceId,world)}
@@ -260,8 +262,8 @@ export class BrowserWorkspace {
         const action=await evaluate(`globalThis.__codegAgent.act(${JSON.stringify(args.generation)},${JSON.stringify(args.ref??null)},${JSON.stringify({kind,text:args.text,key:args.key,values:args.values,submit:args.submit,button:args.button,count:args.doubleClick?2:1})})`) as {ok:boolean;url:string;error?:string;detail?:string;scrolled?:unknown}
         result=action.ok?{tabId:surface.view.id,action:{fidelity:'synthetic',url:action.url,...(action.scrolled?{scrolled:action.scrolled}:{})}}:{tabId:surface.view.id,error:`browser_${action.error??'failed'}`,note:action.detail??'Browser action did not complete.'}
       }
-      await current()
       if(Buffer.byteLength(JSON.stringify(result))>32*1024*1024)throw new Error('result_too_large')
+      try{await current()}catch{throw new InteractionLateResult(result)}
       return result
     })
   }

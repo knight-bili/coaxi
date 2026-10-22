@@ -3,6 +3,7 @@ import type { BrowserWindow, IpcMainInvokeEvent } from 'electron'
 import type { CoreClient } from './core-client'
 import type { BrowserWorkspace } from './browser-workspace'
 import type { InteractionGrant, InteractionWork } from './interaction-types'
+import { InteractionLateResult } from './interaction-types'
 import { InteractionResultJournal, type InteractionFinish as Finish } from './interaction-result-journal'
 
 type Peer={schemaVersion:1;desktopPeerId:string;coreInstanceId:string;ownerWindowId:string;connectionGeneration:number;capabilities:Array<'browser'|'computer'>;expiresAt:string}
@@ -32,6 +33,7 @@ export class InteractionWorkspace {
     browser.onModelResourceChanged=(id,origin)=>{for(const [grantId,grant] of this.grants){if(grant.targetKind==='browser_tab'&&grant.targetId===id&&(!origin||grant.origin!==origin)){this.grants.delete(grantId);void this.request('grant.revoke',{grantId}).catch(()=>undefined)}}}
   }
   private async request<T>(action:string,payload:unknown):Promise<T>{return this.core.request<T>('interaction.local',{action,payload})}
+  private async storeOriginal(result:Finish):Promise<void>{const receipt=await this.request<{state:string;resultDigest:string|null}>('desktop.finish',result);if(result.result!==null&&!receipt.resultDigest)await this.request('desktop.archiveLate',result)}
   private trusted(event:IpcMainInvokeEvent):void{
     const window=this.owner()
     if(!window||window.isDestroyed()||event.sender!==window.webContents||event.senderFrame!==window.webContents.mainFrame)throw new Error('interaction.local_owner_required')
@@ -83,7 +85,7 @@ export class InteractionWorkspace {
       if(!peer)return
       for(const [id,result] of this.outcomes){
         try{
-          if(result.desktopPeerId===peer.desktopPeerId)await this.request('desktop.finish',result)
+          if(result.desktopPeerId===peer.desktopPeerId)await this.storeOriginal(result)
           else await this.request('desktop.archiveLate',result)
           this.journal?.remove(id);this.outcomes.delete(id)
         }catch(error){this.lastError=String(error)}
@@ -103,11 +105,11 @@ export class InteractionWorkspace {
           if(result===undefined)throw new Error('runtime_unavailable')
           if(Buffer.byteLength(JSON.stringify(result))>32*1024*1024)throw new Error('result_too_large')
           outcome='completed'
-        }catch{result=null;outcome='unknown'}
+        }catch(error){result=error instanceof InteractionLateResult?error.originalResult:null;outcome='unknown'}
         const finish:Finish={schemaVersion:1,desktopPeerId:peer.desktopPeerId,connectionGeneration:peer.connectionGeneration,bridgeCallId:work.call.bridgeCallId,bindingDigest:work.receipt.bindingDigest,argumentsDigest:work.call.argumentsDigest,outcome,result}
         this.outcomes.set(work.call.bridgeCallId,finish)
         this.journal?.save(finish)
-        try{await this.request('desktop.finish',finish);this.journal?.remove(work.call.bridgeCallId);this.outcomes.delete(work.call.bridgeCallId)}catch{try{await this.request('desktop.archiveLate',finish);this.journal?.remove(work.call.bridgeCallId);this.outcomes.delete(work.call.bridgeCallId)}catch{/* 原动作不重做；后续只补存原结果。 */}}
+        try{await this.storeOriginal(finish);this.journal?.remove(work.call.bridgeCallId);this.outcomes.delete(work.call.bridgeCallId)}catch{try{await this.request('desktop.archiveLate',finish);this.journal?.remove(work.call.bridgeCallId);this.outcomes.delete(work.call.bridgeCallId)}catch{/* 原动作不重做；后续只补存原结果。 */}}
       }
     }finally{this.busy=false}
   }

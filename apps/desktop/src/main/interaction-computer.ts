@@ -7,6 +7,7 @@ import path from 'node:path'
 import { resolveCoreBinary,type CoreClient } from './core-client'
 import type { DesktopComputerExecutor } from './interaction-workspace'
 import type { InteractionGrant,InteractionWork,InteractionScope } from './interaction-types'
+import { InteractionLateResult } from './interaction-types'
 
 interface Preferences{revision:string;enabled:boolean;launch:boolean;clipboard:boolean;foreground:boolean;screen:boolean;stopShortcut:string}
 interface Peer{desktopPeerId:string;coreInstanceId:string;ownerWindowId:string;connectionGeneration:number}
@@ -149,7 +150,7 @@ export class InteractionComputer implements DesktopComputerExecutor{
     this.running.set(work.binding.agentRunId,running)
     let checking=false
     const watcher=setInterval(()=>{if(checking)return;checking=true;void assertCurrent().catch(()=>this.request('stop_scope',running)).catch(()=>undefined).finally(()=>{checking=false})},500);watcher.unref()
-    try{const result=await this.request('call',{...running,expectedStopGeneration:this.stopGeneration,toolName:work.call.toolName,arguments:work.call.arguments});await assertCurrent();return result}
+    try{const result=await this.request('call',{...running,expectedStopGeneration:this.stopGeneration,toolName:work.call.toolName,arguments:work.call.arguments});try{await assertCurrent()}catch{throw new InteractionLateResult(result)}return result}
     finally{clearInterval(watcher)}
   }
   async stop():Promise<void>{const child=this.child;if(!child)return;try{const result=await this.request<{stopGeneration:number}>('stop_all',{});if(this.child===child)this.stopGeneration=result.stopGeneration}catch(error){this.lastError=String(error);if(this.child===child)this.end()}}

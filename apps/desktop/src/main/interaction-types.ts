@@ -19,6 +19,10 @@ export interface InteractionWork {
   binding:InteractionBinding;call:InteractionCall;grants:InteractionGrant[];
   receipt:{bindingDigest:string;argumentsDigest:string;bridgeCallId:string;state:string}
 }
+/** 物理动作已返回，随后失去投递资格；仅允许按原请求补存此结果。 */
+export class InteractionLateResult extends Error {
+  constructor(readonly originalResult:unknown){super('interaction.original_result_requires_archive')}
+}
 export function sameInteractionScope(left:InteractionScope,right:InteractionScope):boolean {
   return left.threadId===right.threadId&&left.conversationId===right.conversationId&&left.scopeKind===right.scopeKind
 }
