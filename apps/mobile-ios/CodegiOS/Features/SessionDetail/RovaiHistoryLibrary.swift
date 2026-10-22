@@ -49,6 +49,7 @@ struct RovaiHistoryLibrary: View {
     @State private var document: ImportedHistoryDocument?
     @State private var readTask: Task<Void, Never>?
     @State private var turnLimit = 50
+    @State private var execution: NativeContinuationSelection?
     private var filtered: [JSONValue] {entries.filter {search.isEmpty || "\($0["summary"]?.text("title") ?? "") \($0.text("sourceName")) \(($0["tags"]?.rvArray ?? []).compactMap(\.stringValue).joined(separator: " "))".localizedCaseInsensitiveContains(search)}}
     var body: some View {
         List {
@@ -59,7 +60,8 @@ struct RovaiHistoryLibrary: View {
                 if let document, document.transcript == nil {Text("记录较大，已完整校验并保存为临时文件。请导出查看完整内容，或在桌面打开。").foregroundStyle(Theme.textSecondary)}
                 if let transcript = document?.transcript {
                     let turns = transcript["turns"]?.rvArray ?? []
-                    ForEach(Array(turns.prefix(turnLimit).enumerated()), id: \.offset) {_, turn in GlassRow(isSelected: turn.text("role") == "user") {VStack(alignment: .leading, spacing: 8) {HStack {Text(turn.text("role") == "user" ? "你" : turn.text("role") == "assistant" ? "队员" : "系统").font(.caption.weight(.semibold));Spacer();Text(turn.text("timestamp")).font(.caption2).foregroundStyle(Theme.textSecondary)};ForEach(Array((turn["blocks"]?.rvArray ?? []).enumerated()), id: \.offset) {_, block in RovaiImportedBlock(block: block)}}}.listRowBackground(Color.clear).listRowSeparator(.hidden)}
+                    if selected["archived"]?.rvBool != true {Section {Button("从原生会话继续") {execution = NativeContinuationSelection(mode: "continue")};Button("从末尾分叉") {execution = NativeContinuationSelection(mode: "fork_tail")}}.disabled(busy)}
+                    ForEach(Array(turns.prefix(turnLimit).enumerated()), id: \.offset) {_, turn in GlassRow(isSelected: turn.text("role") == "user") {VStack(alignment: .leading, spacing: 8) {HStack {Text(turn.text("role") == "user" ? "你" : turn.text("role") == "assistant" ? "队员" : "系统").font(.caption.weight(.semibold));Spacer();Text(turn.text("timestamp")).font(.caption2).foregroundStyle(Theme.textSecondary)};ForEach(Array((turn["blocks"]?.rvArray ?? []).enumerated()), id: \.offset) {_, block in RovaiImportedBlock(block: block)};if selected["archived"]?.rvBool != true, turn.text("role") == "assistant", ["codex", "claude", "deepseek"].contains(selected.text("provider")) {Button("从这条回答分叉") {execution = NativeContinuationSelection(mode: "fork_point", turn: turn.text("id"))}.disabled(busy)}}}.listRowBackground(Color.clear).listRowSeparator(.hidden)}
                     if turns.count > turnLimit {Button("更多消息") {turnLimit += 50}}
                     if (transcript["notes"]?["malformed_records"]?.rvInt ?? 0) > 0 || transcript["notes"]?["incomplete_tail"]?.rvBool == true {Text("原文件含无法解析或尚未写完的记录，已保留可解析部分。").font(.caption).foregroundStyle(Theme.textSecondary)}
                 }
@@ -75,6 +77,7 @@ struct RovaiHistoryLibrary: View {
         .onDisappear {readTask?.cancel();release()}
         .confirmationDialog(selected?["archived"]?.rvBool == true ? "恢复这条记录？" : "归档这条记录？", isPresented: $confirming, titleVisibility: .visible) {Button("确认") {Task {await mutate(selected?["archived"]?.rvBool == true ? "restore" : "archive")}};Button("取消", role: .cancel) {}} message: {Text("只调整导入库中的记录，保留来源资料。")}
         .sheet(isPresented: $exporting) {if let file = document?.file {ImportedHistoryExport(file: file) {exporting = false}}}
+        .sheet(item: $execution) {selection in if let selected, let transcript = document?.transcript {RovaiNativeContinuation(model: model, entry: selected, transcript: transcript, selection: selection)}}
     }
     private func load() async throws {
         let generation = model.connectionGeneration
