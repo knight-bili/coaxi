@@ -49,6 +49,7 @@ import { localizeExecutionEngineTerms } from './product-copy'
 import { SettingsPageHeader } from './SettingsPageHeader'
 import { RuntimeStartupSettings } from './RuntimeStartupSettings'
 import { CustomRuntimeSettings } from './CustomRuntimeSettings'
+import { PortableProviderSettings } from './PortableProviderSettings'
 import { MemberCustomRuntime } from './MemberCustomRuntime'
 import { RuntimeInstallationGuide } from './RuntimeInstallationGuide'
 import { runtimeInstallGuide } from './runtime-install-guide'
@@ -1650,6 +1651,7 @@ export function RuntimeInstallationsPanel({
         )}
       </section>
       <CustomRuntimeSettings />
+      <PortableProviderSettings />
     </>
   )
 }
