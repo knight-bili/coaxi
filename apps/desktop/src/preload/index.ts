@@ -690,6 +690,9 @@ const api: RovaiApi = {
   exportMonitoring(filter) {
     return ipcRenderer.invoke('rovai:export-monitoring', filter)
   },
+  exportUsageActivityReport(query) {
+    return ipcRenderer.invoke('rovai:export-usage-activity', query)
+  },
   revealMonitoringExport(path: string) {
     return ipcRenderer.invoke('rovai:reveal-monitoring-export', path)
   },

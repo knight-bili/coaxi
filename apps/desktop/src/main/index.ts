@@ -2712,6 +2712,19 @@ ipcMain.handle('rovai:reveal-diagnostics-export', (_event, path: unknown) => {
   shell.showItemInFolder(path)
 })
 
+ipcMain.handle('rovai:export-usage-activity', async (event, query: unknown) => {
+  requireMainWindow(event.sender)
+  const owner=mainWindow
+  if(!owner||owner.isDestroyed())throw new Error('导出窗口已关闭。')
+  const report=await core.request<import('@contracts').UsageActivityReport>('monitoring.report',query)
+  const result=await dialog.showSaveDialog(owner,{title:'导出用量看板数据',defaultPath:`codeg-rovai-usage-${new Date().toISOString().slice(0,10)}.json`,filters:[{name:'JSON',extensions:['json']}]})
+  if(result.canceled||!result.filePath||owner.isDestroyed())return null
+  const temporary=`${result.filePath}.rovai-${randomUUID()}.tmp`
+  try{await writeFile(temporary,JSON.stringify(report,null,2)+'\n',{mode:0o600,flag:'wx'});await chmod(temporary,0o600);await rename(temporary,result.filePath);await chmod(result.filePath,0o600)}catch(error){await unlink(temporary).catch(()=>undefined);throw error}
+  lastMonitoringExportPath=result.filePath
+  return result.filePath
+})
+
 ipcMain.handle('rovai:export-monitoring', async (_event, filter: MonitoringFilter) => {
   const result = mainWindow
     ? await dialog.showSaveDialog(mainWindow, {

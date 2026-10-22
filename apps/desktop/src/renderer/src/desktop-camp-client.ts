@@ -18,6 +18,7 @@ export const desktopThreadClient: ThreadClient = {
   get browserWorkspace() { return window.rovai.browserWorkspace },
   get privateInputRecovery() { return window.rovai.privateInputRecovery },
   exportMonitoring: async filter => { const path = await window.rovai.exportMonitoring(filter); return { exported: Boolean(path), ...(path ? { path } : {}) } },
+  exportUsageActivityReport: async query => { const path = await window.rovai.exportUsageActivityReport?.(query); return {exported:Boolean(path),...(path?{path}:{})} },
   revealMonitoringExport: path => window.rovai.revealMonitoringExport(path),
   exportDiagnostics: async () => { const path = await window.rovai.exportDiagnostics(); return { exported: Boolean(path), ...(path ? { path } : {}) } },
   revealDiagnosticsExport: path => window.rovai.revealDiagnosticsExport(path),

@@ -15,6 +15,15 @@ import { SettingsPageHeader } from './SettingsPageHeader'
 import { revealInFileManagerLabel } from './renderer-platform'
 import { UiText, uiAttribute } from './interface-language'
 import { VISIBLE_PRODUCT_RUNTIMES } from './runtime-products'
+import { UsageActivityDashboard } from './UsageActivityDashboard'
+
+export function RuntimeMonitoring({platform='darwin'}:{platform?:NodeJS.Platform}={}):React.JSX.Element {
+  const [surface,setSurface]=useState<'runtime'|'activity'>('runtime')
+  return <div className="runtime-monitoring-switcher"><div className="usage-monitoring-tabs" role="tablist" aria-label={uiAttribute('用量视图')}>
+    <button type="button" role="tab" aria-selected={surface==='runtime'} onClick={()=>setSurface('runtime')}><UiText zh="运行监控"/></button>
+    <button type="button" role="tab" aria-selected={surface==='activity'} onClick={()=>setSurface('activity')}><UiText zh="用量看板"/></button>
+  </div>{surface==='activity'?<UsageActivityDashboard/>:<RovaiRuntimeMonitoring platform={platform}/>}</div>
+}
 
 export const MONITORING_POLL_INTERVAL_MS = 12_000
 export const MONITORING_EVENT_DEBOUNCE_MS = 300
@@ -73,7 +82,7 @@ const SUMMARY_METRICS = [
   ['reasoningOutputTokens', 'Reasoning Output', 'integer']
 ] as const
 
-export function RuntimeMonitoring({
+function RovaiRuntimeMonitoring({
   platform = 'darwin'
 }: {
   platform?: NodeJS.Platform

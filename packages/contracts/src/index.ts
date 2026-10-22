@@ -5293,6 +5293,7 @@ export interface RovaiApi {
   exportDiagnostics(): Promise<string | null>
   revealDiagnosticsExport(path: string): Promise<void>
   exportMonitoring(filter: MonitoringFilter): Promise<string | null>
+  exportUsageActivityReport?(query: UsageActivityQuery): Promise<string | null>
   revealMonitoringExport(path: string): Promise<void>
   platform: NodeJS.Platform
 }
