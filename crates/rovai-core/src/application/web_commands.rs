@@ -50,6 +50,19 @@ pub(super) fn reconcile(
         }};
     }
     match query.operation.as_str() {
+        "runtime.custom.upsert" | "runtime.custom.remove" | "runtime.custom.install" => {
+            #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Original{command_id:String}
+            let input:Original=serde_json::from_value(query.params)?;uuid::Uuid::parse_str(&input.command_id)?;
+            if query.operation=="runtime.custom.install"{
+                let path=crate::custom_runtime::installer::receipt_path(data_dir,&input.command_id)?;
+                return if path.exists(){Ok(json!({"state":"recorded","result":crate::custom_runtime::installer::receipt(data_dir,&input.command_id)?}))}else{Ok(json!({"state":"unknown"}))}
+            }
+            let result=crate::command::load_stored_result(database.connection(),&input.command_id)?;
+            if let Some(result)=result{
+                anyhow::ensure!(result.command_type==query.operation&&result.actor_type=="user"&&result.actor_id=="local_user"&&result.camp_id.is_none()&&result.source_agent_run_id.is_none(),"custom_runtime.receipt_scope_changed");
+                Ok(json!({"state":"recorded","result":result}))
+            }else{Ok(json!({"state":"unknown"}))}
+        },
         "runtime.interactions.resolve" => runtime_interactions::reconcile(database, query.params),
         "delegations.resume" => delegation_queries::reconcile_resume(database, query.params),
         "delegations.settings.update" => delegation_queries::reconcile(database, query.params),
