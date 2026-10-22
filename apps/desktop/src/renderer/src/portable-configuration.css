@@ -22,3 +22,6 @@
 .portable-template-confirm input{flex:none;margin-top:3px}
 .portable-template-material{display:grid;gap:6px;min-width:0;margin-block:10px}
 .portable-template-material select{width:100%;min-width:0}
+
+.portable-codex-overrides{min-width:0;margin-block:10px}.portable-codex-overrides>summary{cursor:pointer;font-size:12px;color:var(--muted)}
+.portable-codex-overrides h4{margin:12px 0 6px;font-size:12px;font-weight:500}.portable-codex-text-override{min-width:0;display:grid;gap:8px}.portable-codex-text-override>label{display:flex;gap:6px;align-items:center}.portable-codex-text-override textarea{resize:vertical;white-space:pre-wrap;overflow-wrap:anywhere}
