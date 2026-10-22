@@ -21,6 +21,10 @@ pub fn member_skill_roots(connection:&Connection,agent_id:&str)->Result<Vec<std:
     ensure!(selected,"custom_runtime.member_binding_required");let reference=member_reference(connection,agent_id)?.context("custom_runtime.reference_required")?;resolve(connection,&reference,true)?;let(_,lock)=installed_lock(connection,&reference)?;
     let roots=lock["skillRoots"].as_array().context("custom_runtime.skill_roots_invalid")?;roots.iter().map(|value|{let root=std::path::PathBuf::from(value.as_str().context("custom_runtime.skill_directory_invalid")?);ensure!(root.is_absolute(),"custom_runtime.skill_directory_not_absolute");Ok(root)}).collect()
 }
+pub(crate) fn installation_reference(connection:&Connection,installation:&str)->Result<CustomRuntimeRefV1>{
+    let reference=connection.query_row("SELECT i.definition_id,i.definition_revision,d.digest FROM custom_runtime_installation i JOIN custom_runtime_definition d ON d.id=i.definition_id AND d.revision=i.definition_revision WHERE i.installation_id=?1 AND i.platform=?2 AND i.lock_json IS NOT NULL",params![installation,super::installer::platform()?],|row|Ok(CustomRuntimeRefV1{id:row.get(0)?,definition_revision:row.get(1)?,definition_digest:row.get(2)?}))?;
+    resolve(connection,&reference,true)?;let(id,_)=installed_lock(connection,&reference)?;ensure!(id==installation,"custom_runtime.installation_scope_changed");Ok(reference)
+}
 pub fn latest(connection:&Connection,id:&str)->Result<Option<Value>>{
     let raw:Option<String>=connection.query_row("SELECT d.value_json FROM custom_runtime_head h JOIN custom_runtime_definition d ON d.id=h.id AND d.revision=h.revision WHERE h.id=?1 AND h.removed=0",[id],|r|r.get(0)).optional()?;
     raw.map(|text|serde_json::from_str(&text).map_err(Into::into)).transpose()
