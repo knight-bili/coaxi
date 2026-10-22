@@ -71,30 +71,43 @@ export class GeneralPreferencesStore {
   private constructor(
     filePath: string,
     snapshot: GeneralPreferencesSnapshot,
-    loadDegradation: StructuredError | null = null
+    loadDegradation: StructuredError | null = null,
+    private readonly resolveSystemLanguage: () => InterfaceLanguage = () => 'en'
   ) {
     this.#filePath = filePath
     this.#snapshot = snapshot
     this.loadDegradation = loadDegradation
   }
 
-  static async load(filePath: string): Promise<GeneralPreferencesStore> {
+  static async load(filePath: string, resolveSystemLanguage?: () => InterfaceLanguage): Promise<GeneralPreferencesStore> {
     const result = await readGeneralPreferencesResult(filePath)
-    return new GeneralPreferencesStore(filePath, result.snapshot, result.degradation)
+    return new GeneralPreferencesStore(filePath, result.snapshot, result.degradation, resolveSystemLanguage)
   }
 
-  static defaults(filePath: string): GeneralPreferencesStore {
-    return new GeneralPreferencesStore(filePath, { ...DEFAULT_GENERAL_PREFERENCES })
+  static defaults(filePath: string, resolveSystemLanguage?: () => InterfaceLanguage): GeneralPreferencesStore {
+    return new GeneralPreferencesStore(filePath, { ...DEFAULT_GENERAL_PREFERENCES }, null, resolveSystemLanguage)
   }
 
   get(): GeneralPreferencesSnapshot {
-    return structuredClone(this.#snapshot)
+    const snapshot = structuredClone(this.#snapshot)
+    if (snapshot.interfaceLanguageMode === 'system') snapshot.interfaceLanguage = this.resolveSystemLanguage()
+    return snapshot
   }
 
   setInterfaceLanguage(language: InterfaceLanguage): Promise<GeneralPreferencesSnapshot> {
     if (!isInterfaceLanguage(language)) return Promise.reject(new Error('Unsupported interface language'))
     return this.#enqueue(async () => {
-      const next = { ...this.#snapshot, interfaceLanguage: language }
+      const next: GeneralPreferencesSnapshot = { ...this.#snapshot, schemaVersion: 6, interfaceLanguage: language, interfaceLanguageMode: 'manual' }
+      await writePrivateJson(this.#filePath, next)
+      this.#snapshot = next
+      return this.get()
+    })
+  }
+
+  setInterfaceLanguageMode(mode: 'manual' | 'system'): Promise<GeneralPreferencesSnapshot> {
+    if (mode !== 'manual' && mode !== 'system') return Promise.reject(new Error('Unsupported interface language mode'))
+    return this.#enqueue(async () => {
+      const next: GeneralPreferencesSnapshot = { ...this.get(), schemaVersion: 6, interfaceLanguageMode: mode }
       await writePrivateJson(this.#filePath, next)
       this.#snapshot = next
       return this.get()

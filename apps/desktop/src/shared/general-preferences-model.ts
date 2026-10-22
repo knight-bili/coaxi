@@ -20,8 +20,9 @@ const SETTINGS_SECTIONS = new Set<SettingsSection>([
 const INTERFACE_LANGUAGES = new Set<InterfaceLanguage>(INTERFACE_LANGUAGE_OPTIONS.map(option=>option.id))
 
 export const DEFAULT_GENERAL_PREFERENCES: GeneralPreferencesSnapshot = {
-  schemaVersion: 5,
+  schemaVersion: 6,
   interfaceLanguage: 'zh-CN',
+  interfaceLanguageMode: 'system',
   startupLocationMode: 'last_location',
   lastSettingsSection: 'general',
   executionConsolePlacement: 'inspector',
@@ -65,6 +66,7 @@ export function parseGeneralPreferences(value: unknown): GeneralPreferencesSnaps
     if (!isSettingsSection(value.lastSettingsSection)) return null
     return {
       ...DEFAULT_GENERAL_PREFERENCES,
+      interfaceLanguageMode: 'manual',
       startupLocationMode: value.startupLocationMode,
       lastSettingsSection: value.lastSettingsSection,
       worldMapEnabled: true
@@ -81,31 +83,35 @@ export function parseGeneralPreferences(value: unknown): GeneralPreferencesSnaps
   const v3Keys = [...v2Keys, 'executionConsolePlacement']
   const v4Keys = [...v3Keys, 'worldMapEnabled']
   const v5Keys = [...v4Keys, 'interfaceLanguage']
+  const v6Keys = [...v5Keys, 'interfaceLanguageMode']
   if (!hasExactKeys(value, v2Keys)
     && !hasExactKeys(value, v3Keys)
     && !hasExactKeys(value, v4Keys)
-    && !hasExactKeys(value, v5Keys)) return null
-  if (value.schemaVersion !== 2 && value.schemaVersion !== 3 && value.schemaVersion !== 4 && value.schemaVersion !== 5) return null
+    && !hasExactKeys(value, v5Keys)
+    && !hasExactKeys(value, v6Keys)) return null
+  if (value.schemaVersion !== 2 && value.schemaVersion !== 3 && value.schemaVersion !== 4 && value.schemaVersion !== 5 && value.schemaVersion !== 6) return null
   if (value.schemaVersion === 2 && !hasExactKeys(value, v2Keys)) return null
   if (value.schemaVersion === 3
     && !hasExactKeys(value, v2Keys)
     && !hasExactKeys(value, v3Keys)) return null
   if (value.schemaVersion === 4 && !hasExactKeys(value, v4Keys)) return null
   if (value.schemaVersion === 5 && !hasExactKeys(value, v5Keys)) return null
+  if (value.schemaVersion === 6 && (!hasExactKeys(value, v6Keys) || !['system', 'manual'].includes(value.interfaceLanguageMode as string))) return null
   if (!isStartupLocationMode(value.startupLocationMode)) return null
   if (!isSettingsSection(value.lastSettingsSection)) return null
   if (value.newConversationDefaults !== null && !isNewConversationDefaults(value.newConversationDefaults)) return null
   if (typeof value.newConversationDefaultsRequireConfirmation !== 'boolean') return null
   if (typeof value.oneClickNewConversationEnabled !== 'boolean') return null
   if (value.schemaVersion >= 4 && typeof value.worldMapEnabled !== 'boolean') return null
-  if (value.schemaVersion === 5 && !isInterfaceLanguage(value.interfaceLanguage)) return null
+  if (value.schemaVersion >= 5 && !isInterfaceLanguage(value.interfaceLanguage)) return null
   if (value.newConversationDefaults === null && (
     value.newConversationDefaultsRequireConfirmation
     || value.oneClickNewConversationEnabled
   )) return null
   return {
-    schemaVersion: 5,
-    interfaceLanguage: value.schemaVersion === 5 ? value.interfaceLanguage as InterfaceLanguage : 'zh-CN',
+    schemaVersion: 6,
+    interfaceLanguage: value.schemaVersion >= 5 ? value.interfaceLanguage as InterfaceLanguage : 'zh-CN',
+    interfaceLanguageMode: value.schemaVersion === 6 ? value.interfaceLanguageMode as 'system' | 'manual' : 'manual',
     startupLocationMode: value.startupLocationMode,
     lastSettingsSection: value.lastSettingsSection,
     executionConsolePlacement: isExecutionConsolePlacement(value.executionConsolePlacement)

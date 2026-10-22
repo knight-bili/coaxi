@@ -3583,8 +3583,9 @@ export interface NewConversationDefaults {
 export type InterfaceLanguage = 'zh-CN' | 'zh-TW' | 'en' | 'ja' | 'ko' | 'es' | 'de' | 'fr' | 'pt' | 'ar'
 
 export interface GeneralPreferencesSnapshot {
-  schemaVersion: 5
+  schemaVersion: 5 | 6
   interfaceLanguage: InterfaceLanguage
+  interfaceLanguageMode?: 'manual' | 'system'
   startupLocationMode: StartupLocationMode
   lastSettingsSection: SettingsSection
   executionConsolePlacement: ExecutionConsolePlacement
@@ -3643,6 +3644,7 @@ export interface DesktopSessionApi {
 export interface GeneralPreferencesApi {
   get(): Promise<GeneralPreferencesSnapshot>
   setInterfaceLanguage(language: InterfaceLanguage): Promise<GeneralPreferencesSnapshot>
+  setInterfaceLanguageMode?(mode: 'manual' | 'system'): Promise<GeneralPreferencesSnapshot>
   setStartupLocationMode(mode: StartupLocationMode): Promise<GeneralPreferencesSnapshot>
   setLastSettingsSection(section: SettingsSection): Promise<GeneralPreferencesSnapshot>
   setExecutionConsolePlacement(placement: ExecutionConsolePlacement): Promise<GeneralPreferencesSnapshot>
