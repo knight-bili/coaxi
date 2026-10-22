@@ -3,10 +3,10 @@ document_type: model-context-change
 version: v1.73
 change_id: conversation-model-tools
 revision: 1
-confirmed_revision: null
-confirmation_status: pending
-authority: proposed-model-input-change-statement
-implementation_status: proposal_only
+confirmed_revision: 1
+confirmation_status: confirmed
+authority: confirmed-model-input-change-statement
+implementation_status: source_in_progress_unreviewed_untested
 last_updated: 2026-10-23
 ---
 
