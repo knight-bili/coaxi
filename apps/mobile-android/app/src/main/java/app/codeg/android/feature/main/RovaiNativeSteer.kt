@@ -77,6 +77,7 @@ internal fun nativeSteerState(receipt:JsonObject)=when(receipt.coreText("status"
                 item{GlassRow(Modifier.fillMaxWidth()){Text("将发送的完整内容",style=MaterialTheme.typography.titleMedium);Text(preview["input"].coreObject().coreText("text"));preview["input"].coreObject()["materials"].coreArray().forEach{material->Text(material.coreText("displayName")+" · "+material.coreLong("byteSize")+" B")};Text("普通输入和其他材料保留。",color=CodegTheme.colors.textSecondary)}}
                 receipt?.let{value->item{Text(nativeSteerState(value));Text(value.coreText("commandId"),style=MaterialTheme.typography.bodySmall);if(value.coreText("nativeOutcome")=="startedNewTurn")Text("输入已被原程序消耗，不要再次排队；该连接的直接插话已停用。");if(value.coreText("status")=="not_consumed")Text("整份输入仍保存在原预览，作为普通下一轮发送须另外确认。")}}
                 if(receipt?.coreText("status")=="not_consumed")item{TextButton(enabled=!disabled,onClick={normalOpen=true}){Text("预览整份普通下一轮")}}
+                receipt?.let{value->item{RovaiNativeEvidence(model,value.coreText("commandId"))}}
                 item{Button(enabled=!disabled&&(receipt==null||original.isNotEmpty()),onClick={work{
                     if(original.isNotEmpty())reconcile(original)else{
                         val request=buildJsonObject{put("schemaVersion",1);put("commandId",UUID.randomUUID().toString());put("previewId",preview.coreText("previewId"));put("previewDigest",preview.coreText("previewDigest"))};keep(buildJsonObject{put("preview",preview);put("original",request)})

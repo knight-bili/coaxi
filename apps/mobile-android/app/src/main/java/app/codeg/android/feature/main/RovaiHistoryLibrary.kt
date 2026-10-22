@@ -48,6 +48,8 @@ private suspend fun readImportedHistory(model:RovaiWorkspaceViewModel,context:Co
     var archived by remember(threadId){mutableStateOf(false)};var search by remember(threadId){mutableStateOf("")};var entries by remember(threadId){mutableStateOf<List<JsonObject>>(emptyList())};var selected by remember(threadId){mutableStateOf<JsonObject?>(null)};var tags by remember{mutableStateOf("")}
     var document by remember{mutableStateOf<HistoryDocument?>(null)};var busy by remember{mutableStateOf(false)};var issue by remember{mutableStateOf<String?>(null)};var progress by remember{mutableStateOf("")};var turnLimit by remember{mutableIntStateOf(50)};var confirm by remember{mutableStateOf(false)}
     var execution by remember(threadId){mutableStateOf<Pair<String,String?>?>(null)}
+    var creationRecords by remember(threadId){mutableStateOf(false)}
+    if(creationRecords&&selected!=null)RovaiNativeCreationRecords(model,selected!!){creationRecords=false}
     execution?.let{request->val row=selected;val transcript=document?.transcript;if(row!=null&&transcript!=null)RovaiNativeContinuation(model,row,transcript,request.first,request.second){execution=null}}
     val export=rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")){uri->val frozen=document;if(uri!=null&&frozen!=null)coroutine.launch{busy=true;try{require(generation==model.connectionGeneration){"工作区已切换"};withContext(Dispatchers.IO){context.contentResolver.openOutputStream(uri,"w")?.use{output->frozen.file.inputStream().use{it.copyTo(output)}}?:error("无法写入导出位置")}}catch(error:Exception){issue=error.message}finally{busy=false}}}
     suspend fun load(){val result=model.query(RovaiOperation.HISTORY_LIBRARY,buildJsonObject{putJsonObject("scope"){put("threadId",threadId)};put("operation","list");put("includeArchived",archived)}).coreObject();require(generation==model.connectionGeneration){"工作区已切换"};entries=result["entries"].coreArray();selected?.let{old->selected=entries.find{it.coreText("id")==old.coreText("id")}}}
@@ -67,6 +69,7 @@ private suspend fun readImportedHistory(model:RovaiWorkspaceViewModel,context:Co
             OutlinedTextField(tags,{tags=it},Modifier.fillMaxWidth().padding(horizontal=12.dp),enabled=!busy,label={Text("逗号分隔标签")})
             Row(Modifier.padding(horizontal=12.dp)){TextButton(enabled=!busy,onClick={mutate("tags")}){Text("保存标签")};TextButton(enabled=!busy,onClick={confirm=true}){Text(if(row["archived"]==JsonPrimitive(true))"恢复记录" else "归档记录")};TextButton(enabled=!busy&&document!=null,onClick={export.launch("imported-${row.coreText("id").take(12)}.json")}){Text("导出会话记录")}}
             val transcript=document?.transcript
+            TextButton(enabled=!busy,onClick={creationRecords=true}){Text("继续与分叉的原创建记录")}
             if(transcript!=null&&row["archived"]!=JsonPrimitive(true))Row(Modifier.padding(horizontal=12.dp)){TextButton(enabled=!busy,onClick={execution="continue" to null}){Text("从原生会话继续")};TextButton(enabled=!busy,onClick={execution="fork_tail" to null}){Text("从末尾分叉")}}
             LazyColumn(Modifier.weight(1f),contentPadding=PaddingValues(12.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
                 if(document!=null&&transcript==null)item{Text("记录较大，已完整校验并保存为临时文件。请导出查看完整内容，或在桌面打开。")}
