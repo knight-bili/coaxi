@@ -2520,6 +2520,7 @@ struct Core {
     kimi_code_cli: AcpCliRuntimeAdapter,
     grok_build: AcpCliRuntimeAdapter,
     deepseek_harness: AcpCliRuntimeAdapter,
+    custom_acp: AcpCliRuntimeAdapter,
     cline_cli: AcpCliRuntimeAdapter,
     command_code_cli: AcpCliRuntimeAdapter,
     zcode_app: AcpCliRuntimeAdapter,
@@ -5948,6 +5949,7 @@ impl Core {
             self.kimi_code_cli.shutdown_all(),
             self.grok_build.shutdown_all(),
             self.deepseek_harness.shutdown_all(),
+            self.custom_acp.shutdown_all(),
             self.command_code_cli.shutdown_all(),
             self.zcode_app.shutdown_all(),
             self.claude_code_cli.shutdown_all(),
@@ -5976,6 +5978,7 @@ impl Core {
                 self.kimi_code_cli.shutdown_all(),
                 self.grok_build.shutdown_all(),
                 self.deepseek_harness.shutdown_all(),
+                self.custom_acp.shutdown_all(),
                 self.command_code_cli.shutdown_all(),
                 self.zcode_app.shutdown_all(),
                 self.claude_code_cli.shutdown_all(),
@@ -5993,6 +5996,7 @@ impl Core {
         kind: rovai_core::agent_profile::AdapterKind,
     ) -> Option<&AcpCliRuntimeAdapter> {
         match kind {
+            AdapterKind::CustomAcp => Some(&self.custom_acp),
             rovai_core::agent_profile::AdapterKind::OpencodeCli => Some(&self.opencode_cli),
             rovai_core::agent_profile::AdapterKind::CopilotCli => Some(&self.copilot_cli),
             rovai_core::agent_profile::AdapterKind::KiroCli => Some(&self.kiro_cli),
@@ -19841,6 +19845,7 @@ async fn run_core(
                 .policy_for(AdapterKind::DeepseekHarness)
                 .unwrap_or(CompactionDetectorPolicy::Disabled),
         ),
+        custom_acp: AcpCliRuntimeAdapter::deferred(AdapterKind::CustomAcp,acp_tx.clone(),data_dir.join("runtime/custom-acp"),runtime_fleet.clone(),CompactionDetectorPolicy::Disabled),
         command_code_cli: AcpCliRuntimeAdapter::deferred(
             rovai_core::agent_profile::AdapterKind::CommandCodeCli,
             acp_tx.clone(),
@@ -28050,6 +28055,7 @@ mod tests {
                     .policy_for(AdapterKind::DeepseekHarness)
                     .unwrap_or(CompactionDetectorPolicy::Disabled),
             )?,
+            custom_acp: AcpCliRuntimeAdapter::new(AdapterKind::CustomAcp,acp_tx.clone(),data_dir.join("runtime/custom-acp"),runtime_fleet.clone(),CompactionDetectorPolicy::Disabled)?,
             command_code_cli: AcpCliRuntimeAdapter::new(
                 AdapterKind::CommandCodeCli,
                 acp_tx.clone(),

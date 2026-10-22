@@ -117,6 +117,7 @@ impl DesiredCompactionDetectorPolicies {
 
 pub const fn release_default_policy(adapter_kind: AdapterKind) -> CompactionDetectorPolicy {
     match adapter_kind {
+        AdapterKind::CustomAcp => CompactionDetectorPolicy::Disabled,
         AdapterKind::CopilotCli
         | AdapterKind::OpencodeCli
         | AdapterKind::KiroCli
@@ -143,6 +144,7 @@ pub const fn release_default_policy(adapter_kind: AdapterKind) -> CompactionDete
 
 pub const fn detector_policy_environment_key(adapter_kind: AdapterKind) -> &'static str {
     match adapter_kind {
+        AdapterKind::CustomAcp => "ROVAI_INTERNAL_UNUSED_COMPACTION_DETECTOR_POLICY",
         AdapterKind::CopilotCli => "ROVAI_INTERNAL_COPILOT_COMPACTION_DETECTOR_POLICY",
         AdapterKind::ClineCli => "ROVAI_INTERNAL_CLINE_COMPACTION_DETECTOR_POLICY",
         AdapterKind::OpencodeCli => "ROVAI_INTERNAL_OPENCODE_COMPACTION_DETECTOR_POLICY",
@@ -939,7 +941,7 @@ fn qualified_admission(
         | AdapterKind::CursorAgent => false,
         AdapterKind::GeminiCli => false,
         AdapterKind::HermesCli => false,
-        AdapterKind::OpenClawCli => false,
+        AdapterKind::OpenClawCli | AdapterKind::CustomAcp => false,
     }
 }
 
