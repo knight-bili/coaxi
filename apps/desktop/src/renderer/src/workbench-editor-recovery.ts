@@ -6,7 +6,7 @@ const DATABASE='codeg-rovai-workbench-editor-v1',STORE='records'
 type NativeRecovery=RovaiApi['workbenchEditorRecovery']
 function record(value:unknown,key:string):EditorRecoveryRecord{
   const row=value as EditorRecoveryRecord
-  if(!row||row.schemaVersion!==1||row.key!==key||typeof row.editorId!=='string'||row.workspaceRoot!==null&&typeof row.workspaceRoot!=='string'||row.revision!==null&&typeof row.revision!=='string')throw new Error('工程编辑恢复记录损坏，原记录仍保留。')
+  if(!row||Object.keys(row).sort().join(',')!=='editorId,key,latest,pending,revision,schemaVersion,workspaceRoot'||row.schemaVersion!==1||row.key!==key||typeof row.editorId!=='string'||row.workspaceRoot!==null&&typeof row.workspaceRoot!=='string'||row.revision!==null&&typeof row.revision!=='string'||row.latest!==null&&(!row.latest||typeof row.latest!=='object')||row.pending!==null&&(!row.pending||typeof row.pending!=='object'))throw new Error('工程编辑恢复记录损坏，原记录仍保留。')
   for(const state of [row.latest,row.pending?.value])if(state){if(!Array.isArray(state.documents)||state.documents.length>128||state.selected!==null&&typeof state.selected!=='string'||state.documents.some(document=>!document||typeof document.path!=='string'||typeof document.text!=='string'||typeof document.saved!=='string'||document.digest!==null&&typeof document.digest!=='string'))throw new Error('工程编辑恢复正文损坏，原记录仍保留。')}
   return structuredClone(row)
 }
