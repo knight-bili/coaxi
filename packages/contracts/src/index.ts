@@ -5045,6 +5045,8 @@ export type CoreMethod =
   | 'backup.storage.desktop.register'
   | 'history.local'
   | 'history.library'
+  | 'history.usage'
+  | 'history.usage.local'
   | 'office.watch'
   | 'interaction.local'
   | 'computer.local'

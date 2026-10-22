@@ -40,7 +40,7 @@ pub(super) fn index(directory:&Path,id:&str,force:bool)->Result<Value>{
     let fallback=DateTime::parse_from_rfc3339(fallback)?.with_timezone(&Utc);
     let facts=aggregate::facts_from_detail(&detail,fallback);ensure!(facts.len()<=100_000,"history.usage_fact_limit");
     let provider=manifest["provider"].as_str().context("history.invalid_provider")?.to_string();
-    let native=checked_json(&directory.join(format!("{id}.native.json")),128*1024*1024).ok();
+    let native=if manifest["snapshotRoot"].is_null(){None}else{checked_json(&directory.join(format!("{id}.native.json")),1024*1024).ok()};
     let identity=if let Some(native)=native.as_ref().filter(|value|value["format"]=="codeg-native-snapshot-v1"){json!({"provider":provider,"session":native["nativeSessionId"],"originalRoot":manifest["originalRoot"]})}else{json!({"provider":provider,"originalRoot":manifest["originalRoot"],"sourceName":manifest["sourceName"]})};
     let cache=Cached{version:CACHE_VERSION,import_id:id.into(),source_digest:manifest["sourceDigest"].as_str().context("history.source_digest_missing")?.into(),transcript_digest:transcript_digest.clone(),source_identity:crate::command::canonical_json_digest(&identity)?,provider,indexed_at:Utc::now().to_rfc3339(),session_total_fallback:facts.iter().any(|fact|fact.turn_key==aggregate::SESSION_TOTAL_TURN_KEY),facts};
     ensure!(crate::command::canonical_json_digest(&checked_json(&transcript_path,128*1024*1024)?)?==transcript_digest&&checked_json(&manifest_path,1024*1024)?==manifest,"history.usage_source_changed");

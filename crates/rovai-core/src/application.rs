@@ -858,6 +858,8 @@ fn request_runs_outside_main_queue(method: &str) -> bool {
             | "diagnostics.export"
             | "monitoring.snapshot"
             | "monitoring.report"
+            | "history.usage"
+            | "history.usage.local"
             | "monitoring.execution"
             | "runtime.installations.refresh"
             | "runtime.discovery.rescan"
@@ -12151,6 +12153,8 @@ impl Core {
                 )?)
             }
             "diagnostics.check" => Ok(serde_json::to_value(self.diagnostics_report().await)?),
+            "history.usage" => self.history_usage(false, request.params.clone()).await,
+            "history.usage.local" => self.history_usage(true, request.params.clone()).await,
             "monitoring.report" => {
                 let mut database = self.database.lock().await;
                 MonitoringService::report(&mut database, request.params.clone())

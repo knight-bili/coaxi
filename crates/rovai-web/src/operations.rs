@@ -37,6 +37,8 @@ pub enum Operation {
     WebdavRemote,
     #[serde(rename="history.library")]
     HistoryLibrary,
+    #[serde(rename="history.usage")]
+    HistoryUsage,
     #[serde(rename="office.watch")]
     OfficeWatch,
     #[serde(rename = "forge.accounts.get")]
@@ -658,6 +660,7 @@ impl Operation {
             Self::WebdavSettings => "backup.webdav.settings",
             Self::WebdavRemote => "backup.webdav.remote",
             Self::HistoryLibrary => "history.library",
+            Self::HistoryUsage => "history.usage",
             Self::OfficeWatch => "office.watch",
             Self::ForgeOperation => "forge.operation",
             Self::WorkbenchOrganizerGet => "workbench.organizer.get",

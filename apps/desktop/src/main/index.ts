@@ -323,6 +323,8 @@ const allowedMethods = new Set<CoreMethod>([
   'appearance.extensions',
   'backup.webdav.settings',
   'history.library',
+  'history.usage',
+  'history.usage.local',
   'office.watch',
   'forge.accounts.get',
   'forge.accounts.set',

@@ -90,6 +90,7 @@ impl Core{
         crate::platform::private_storage::atomic_write_private_bytes(&source_path,&bytes)?;
         crate::platform::private_storage::atomic_write_private_json(&directory.join(format!("{id}.transcript.json")),&transcript)?;
         crate::platform::private_storage::atomic_write_private_json(&manifest_path,&json!({"id":id,"provider":provider,"sourceName":name,"originalRoot":origin,"sourceDigest":digest,"summary":transcript["summary"],"notes":transcript["notes"],"importedAt":Utc::now().to_rfc3339(),"linkedThreadId":request.scope.thread_id,"snapshotRoot":snapshot_root,"snapshotDigest":snapshot_digest,"tags":[],"archived":false}))?;
-        Ok(json!({"importId":id,"duplicate":false}))
+        let usage_index=usage::index(&directory,&id,false).map(|result|json!({"available":true,"result":result})).unwrap_or_else(|error|json!({"available":false,"error":error.to_string(),"historyPreserved":true}));
+        Ok(json!({"importId":id,"duplicate":false,"usageIndex":usage_index}))
     }
 }
