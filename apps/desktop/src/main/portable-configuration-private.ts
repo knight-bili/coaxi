@@ -29,6 +29,7 @@ export class PortableConfigurationPrivate{
     if(operation==='receipt')return this.core.request('configuration.archive.receipt',input)
     if(operation==='exportPrepare')return this.core.request('configuration.export.prepare',input)
     if(operation==='exportReceipt')return this.core.request('configuration.export.receipt',input)
+    if(operation==='filesFinish')return this.core.request('configuration.files.finish',input)
     if(operation==='templates')return this.core.request('configuration.taskTemplates',input)
     if(operation==='sync')return this.core.request('configuration.sync',input)
     if(operation==='logging'&&this.logging)return this.logging(input)

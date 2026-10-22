@@ -878,7 +878,7 @@ fn request_runs_outside_main_queue(method: &str) -> bool {
             | "configuration.providers.privateEdit"
             | "configuration.desktopOwner.register" | "configuration.desktopOwner.pending" | "configuration.desktopOwner.acknowledge"
             | "configuration.export.prepare" | "configuration.export.receipt" | "configuration.export.read"
-            | "configuration.sync" | "configuration.logging" | "configuration.taskTemplates"
+            | "configuration.sync" | "configuration.logging" | "configuration.taskTemplates" | "configuration.files.finish"
             | "runtime.steer.policy.get" | "runtime.steer.policy.set"
             | "runtime.steer.targets"
             | "runtime.steer.preview" | "runtime.steer.confirm" | "runtime.steer.receipt" | "runtime.steer.previews" | "runtime.steer.materials.prepare"
@@ -10412,7 +10412,7 @@ impl Core {
             "configuration.providers.privateEdit" => self.portable_configuration_private(&request.method,request.params.clone(),&request.client).await,
             "configuration.desktopOwner.register" | "configuration.desktopOwner.pending" | "configuration.desktopOwner.acknowledge" => self.portable_configuration_private(&request.method,request.params.clone(),&request.client).await,
             "configuration.export.prepare" | "configuration.export.receipt" | "configuration.export.read" => self.portable_configuration_private(&request.method,request.params.clone(),&request.client).await,
-            "configuration.sync" | "configuration.logging" | "configuration.taskTemplates" => self.portable_configuration_private(&request.method,request.params.clone(),&request.client).await,
+            "configuration.sync" | "configuration.logging" | "configuration.taskTemplates" | "configuration.files.finish" => self.portable_configuration_private(&request.method,request.params.clone(),&request.client).await,
             "history.execution.records" | "runtime.steer.evidence" | "runtime.steer.normal.preview" | "runtime.steer.normal.confirm" | "runtime.steer.normal.receipt" | "history.execution.preview" | "history.execution.confirm" | "history.execution.receipt" | "runtime.steer.policy.get" | "runtime.steer.policy.set" | "runtime.steer.targets" | "runtime.steer.preview" | "runtime.steer.confirm" | "runtime.steer.receipt" | "runtime.steer.previews" | "runtime.steer.materials.prepare" => self.native_lifecycle_access(&request.method,request.params.clone(),request.client.clone()).await,
             "computer.local" => self.computer_access(request.params.clone()).await,
             "browser.local.grant" | "browser.local.revoke" | "browser.local.begin" | "browser.local.finish" => self.browser_access(&request.method, request.params.clone()).await,

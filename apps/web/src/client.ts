@@ -810,13 +810,14 @@ export class ConsoleClient {
   }
 
   portableConfiguration():import('@contracts').PortableConfigurationPrivateApi {
-    const privateCall=async<T,>(path:'configuration/provider'|'configuration/secrets'|'configuration/receipt'|'configuration/archive'|'configuration/export'|'configuration/export-receipt'|'configuration/export-download'|'configuration/sync'|'configuration/logging'|'configuration/templates',body:BodyInit):Promise<T>=>{
+    const privateCall=async<T,>(path:'configuration/provider'|'configuration/secrets'|'configuration/receipt'|'configuration/archive'|'configuration/export'|'configuration/export-receipt'|'configuration/export-download'|'configuration/sync'|'configuration/logging'|'configuration/templates'|'configuration/files-finish',body:BodyInit):Promise<T>=>{
       const reply=await this.#json<{result?:T;error?:{code?:string;message?:string}}>(path,{method:'POST',body})
       if(reply.error)throw new CoreRequestError(reply.error.code??'configuration_input_rejected')
       if(reply.result===undefined)throw new CoreRequestError('configuration_result_unavailable')
       return reply.result
     }
     return {
+      finishMigrationFiles:commandId=>privateCall('configuration/files-finish',JSON.stringify({commandId})),
       templates:input=>privateCall('configuration/templates',JSON.stringify(input)),
       logging:input=>privateCall('configuration/logging',JSON.stringify(input)),
       sync:input=>privateCall('configuration/sync',JSON.stringify(input)),
@@ -850,14 +851,14 @@ export class ConsoleClient {
     }
   }
 
-  async #json<T>(path: 'configuration/provider'|'configuration/secrets'|'configuration/receipt'|'configuration/archive'|'configuration/export'|'configuration/export-receipt'|'configuration/export-download'|'configuration/sync'|'configuration/logging'|'configuration/templates'| 'session' | 'session/renew' | 'channels' | 'updates' | 'workspaces' | 'mission-files' | 'uploads' | 'uploads/reconcile' | 'uploads/receipt' | 'uploads/retry' | 'uploads/finish' | 'files' | 'avatars', options: RequestInit = {}): Promise<T> {
+  async #json<T>(path: 'configuration/provider'|'configuration/secrets'|'configuration/receipt'|'configuration/archive'|'configuration/export'|'configuration/export-receipt'|'configuration/export-download'|'configuration/sync'|'configuration/logging'|'configuration/templates'|'configuration/files-finish'| 'session' | 'session/renew' | 'channels' | 'updates' | 'workspaces' | 'mission-files' | 'uploads' | 'uploads/reconcile' | 'uploads/receipt' | 'uploads/retry' | 'uploads/finish' | 'files' | 'avatars', options: RequestInit = {}): Promise<T> {
     const generation = this.#generation
     const result = await (await this.#authorized(path, options)).json() as T
     if (generation !== this.#generation) throw new DOMException('Connection replaced', 'AbortError')
     return result
   }
 
-  async #authorized(path: 'configuration/provider'|'configuration/secrets'|'configuration/receipt'|'configuration/archive'|'configuration/export'|'configuration/export-receipt'|'configuration/export-download'|'configuration/sync'|'configuration/logging'|'configuration/templates'| 'session' | 'session/renew' | 'channels' | 'updates' | 'workspaces' | 'mission-files' | 'uploads' | 'uploads/reconcile' | 'uploads/receipt' | 'uploads/retry' | 'uploads/finish' | 'request' | 'events' | 'logout' | 'files' | 'files/bytes' | 'attachments' | 'avatars', options: RequestInit = {}): Promise<Response> {
+  async #authorized(path: 'configuration/provider'|'configuration/secrets'|'configuration/receipt'|'configuration/archive'|'configuration/export'|'configuration/export-receipt'|'configuration/export-download'|'configuration/sync'|'configuration/logging'|'configuration/templates'|'configuration/files-finish'| 'session' | 'session/renew' | 'channels' | 'updates' | 'workspaces' | 'mission-files' | 'uploads' | 'uploads/reconcile' | 'uploads/receipt' | 'uploads/retry' | 'uploads/finish' | 'request' | 'events' | 'logout' | 'files' | 'files/bytes' | 'attachments' | 'avatars', options: RequestInit = {}): Promise<Response> {
     if (!this.#token) throw new SessionRequired()
     const generation = this.#generation
     if (this.#localExpiry !== null && this.#localExpiry - this.#now() <= this.#renewalWindow && !['session', 'session/renew', 'logout'].includes(path)) await this.renewIfNeeded()

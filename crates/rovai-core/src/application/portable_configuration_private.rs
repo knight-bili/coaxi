@@ -15,6 +15,17 @@ impl Core{
     }
     async fn portable_configuration_private_inner(&self,method:&str,value:Value,client:&crate::draft_client::DraftClient)->Result<Value>{
         ensure!(serde_json::to_vec(&value)?.len()<=configuration::MAX_REQUEST,"configuration.request_too_large");
+        if method=="configuration.files.finish"{
+            #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Input{command_id:String}
+            let input:Input=serde_json::from_value(value)?;
+            let _lock=crate::workbench::MUTATIONS.lock().await;let database=self.database.lock().await;
+            let original=configuration::migration::receipt(database.connection(),client.id(),&input.command_id)?;
+            ensure!(original["state"]=="applied","configuration.original_database_result_required");
+            // 只接续已提交的原文件计划，不能重新导入或重试已经冲突、失败的计划。
+            configuration::files::drain(database.connection(),&self.data_dir,&input.command_id)?;
+            let result=configuration::migration::receipt(database.connection(),client.id(),&input.command_id)?;
+            emit(&self.output,"portableConfiguration.filesChanged",json!({"commandId":input.command_id,"readReceipt":true}));return Ok(result)
+        }
         if method=="configuration.taskTemplates"{
             let _lock=crate::workbench::MUTATIONS.lock().await;let mut database=self.database.lock().await;
             let changed=matches!(value["operation"].as_str(),Some("put"|"remove"));

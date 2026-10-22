@@ -128,6 +128,7 @@ fun RovaiPortableConfigurationMigration(model:RovaiWorkspaceViewModel,onClose:()
             Text("原结果 · ${receipt!!.coreText("state")}",style=MaterialTheme.typography.titleMedium);Text("历史任务和消息保留。数据库提交与文件保存分别列出。")
             receipt!!["files"].coreArray().forEach{file->Text("${file.coreText("targetId")} · ${file.coreText("state")}")}
             TextButton(enabled=!disabled&&last!=null,onClick={work{readReceipt(last!!)}}){Text("刷新文件状态")}
+            if(last!=null&&receipt!!.coreText("state")=="applied"&&receipt!!["files"].coreArray().any{it.coreText("state")=="pending"})TextButton(enabled=!disabled&&pending==null,onClick={work{model.privateConfiguration("files-finish",buildJsonObject{put("commandId",last!!["commandId"]!!)});current();readReceipt(last!!)}}){Text("继续保存原配置文件")}
             TextButton(enabled=!disabled&&pending==null&&receipt!!.coreText("state")=="applied"&&last?.coreText("operation")=="configuration.migration.confirm"&&receipt!!["files"].coreArray().all{it.coreText("state")=="applied"},onClick={work{val value=model.query(RovaiOperation.CONFIGURATION_MIGRATION_UNDOPREVIEW,buildJsonObject{put("schemaVersion",1);put("originalCommandId",last!!["commandId"]!!)}).coreObject();current();preview=value;rows=value["rows"].coreArray();undo=true;visible=50;if(archive==null)archive=buildJsonObject{put("archiveId",value["archiveId"]?:JsonNull);put("sourceDigest",value["sourceDigest"]?:JsonNull)}}){Text("预览撤销这次导入")}
         }}
         if(issue!=null)item{Text(issue!!,color=MaterialTheme.colorScheme.error)}

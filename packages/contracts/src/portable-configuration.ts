@@ -27,6 +27,7 @@ export type PortableTaskTemplateRequest=
 export interface PortableTaskTemplateReceipt {commandId:string;state:'unknown'|'recorded';result:import('./index').StoredCommandResult|null;files:Array<{domain:string;targetId:string;state:string;errorCode:string|null}>}
 export interface PortableConfigurationPrivateApi {
   templates<T>(input:PortableTaskTemplateRequest):Promise<T>
+  finishMigrationFiles(commandId:string):Promise<PortableMigrationReceipt>
   logging?(input:{operation:'get'}|{operation:'set';expectedDigest:string;settings:{level:string;targets:Array<{target:string;level:string}>}}):Promise<{settings:{level:string;targets:Array<{target:string;level:string}>};digest:string;writable?:boolean;scope?:'structuredHost'}>
   sync<T>(input:PortableSyncRequest):Promise<T>
   prepareExport(input:{operationId:string;includeSecrets:boolean;passphrase:string;sourceArchive?:PortableExportSourceArchive}):Promise<PortableExportReceipt>

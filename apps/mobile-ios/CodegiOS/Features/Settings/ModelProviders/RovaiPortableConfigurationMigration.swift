@@ -19,6 +19,7 @@ private final class PortableMigrationController {
     private var owner: String { "portable-migration/" + identity }
     var selected: [JSONValue] { choices.keys.sorted().compactMap { choices[$0] }.filter { $0["decision"]?.text("action") != "skip" } }
     var canPreview: Bool { !busy && pending == nil && archive != nil && !selected.isEmpty && !selected.contains { $0["decision"]?.text("action") == "replace" && $0["decision"]?["targetId"] == .null } && !mappings.values.contains { $0.text("providerEntryId").isEmpty } }
+    func finishFiles() async throws { guard let original = last else { return }; _ = try await model.privateConfiguration("files-finish", params: .object(["commandId": original["commandId"] ?? .null])); try await current(); try await readReceipt(original) }
     func stop() { active = false; source = nil; passphrase = "" }
     private func current() async throws { guard active, !identity.isEmpty, try await model.presentationIdentity() == identity else { throw CancellationError() } }
     func work(_ action: () async throws -> Void) async {
@@ -164,6 +165,7 @@ struct RovaiPortableConfigurationMigration: View {
                 Section("原结果 · " + receipt.text("state")) {
                     Text("历史任务和消息保留。数据库提交与文件保存分别列出。").font(.caption)
                     ForEach(receipt["files"]?.rvArray ?? [], id: \.self) { file in LabeledContent(file.text("targetId"), value: file.text("state")) }
+                    if controller.last != nil, receipt.text("state") == "applied", (receipt["files"]?.rvArray ?? []).contains(where: { $0.text("state") == "pending" }) { Button("继续保存原配置文件") { Task { await controller.work { try await controller.finishFiles() } } }.disabled(controller.pending != nil) }
                     if let last = controller.last { Button("刷新文件状态") { Task { await controller.work { try await controller.readReceipt(last) } } }.disabled(controller.pending != nil) }
                     if receipt.text("state") == "applied", controller.last?.text("operation") == "configuration.migration.confirm" { Button("预览撤销这次导入") { Task { await controller.work { try await controller.undoPreview() } } }.disabled(controller.pending != nil || !(receipt["files"]?.rvArray ?? []).allSatisfy { $0.text("state") == "applied" }) }
                 }
