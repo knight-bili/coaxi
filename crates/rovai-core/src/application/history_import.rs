@@ -5,6 +5,8 @@ use super::*;
 mod formats;
 #[path="history_export.rs"]
 mod export;
+#[path="history_usage/mod.rs"]
+mod usage;
 use anyhow::ensure;
 use serde::{Serialize,Deserialize};
 use sha2::{Digest,Sha256};
