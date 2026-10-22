@@ -329,6 +329,7 @@ const allowedMethods = new Set<CoreMethod>([
   'extensions.catalog',
   'workbench.organizer.set',
   'workbench.files.read',
+  'workbench.editor',
   'workbench.files.mutate',
   'workbench.git.read',
   'workbench.git.preview',
