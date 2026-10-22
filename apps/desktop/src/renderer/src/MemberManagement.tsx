@@ -50,6 +50,7 @@ import { SettingsPageHeader } from './SettingsPageHeader'
 import { RuntimeStartupSettings } from './RuntimeStartupSettings'
 import { CustomRuntimeSettings } from './CustomRuntimeSettings'
 import { PortableProviderSettings } from './PortableProviderSettings'
+import { PortableMemberConnection } from './PortableMemberConnection'
 import { MemberCustomRuntime } from './MemberCustomRuntime'
 import { RuntimeInstallationGuide } from './RuntimeInstallationGuide'
 import { runtimeInstallGuide } from './runtime-install-guide'
@@ -1406,6 +1407,7 @@ export const MemberRuntimeForm = forwardRef<
         )}
 
         {selectedKind && <MemberEnvironmentEditor environment={environment} disabled={(busy !== null || submitting) || !runtimeMutationAllowed}/> }
+        {agent.runtimeConfiguration&&<PortableMemberConnection agentId={agent.agentId} disabled={dirty||busy!==null||submitting||!runtimeMutationAllowed} onSaved={onReload}/>}
 
         {conflict && (
           <div className="member-runtime-conflict" role="alert">

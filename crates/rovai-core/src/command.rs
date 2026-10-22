@@ -233,7 +233,7 @@ impl Error for CommandGatewayError {}
 pub struct DomainCommandGateway;
 
 /// 配置管理恢复只持原命令编号；不要求把地址、原模型文本或秘密重新发来。
-pub(crate) fn portable_user_receipt(connection:&Connection,operation:&str,id:&str,client:&crate::draft_client::DraftClient)->Result<Value>{
+pub(crate) fn portable_user_receipt(connection:&rusqlite::Connection,operation:&str,id:&str,client:&crate::draft_client::DraftClient)->Result<Value>{
     anyhow::ensure!(matches!(operation,"configuration.providers.upsert"|"configuration.providers.remove"|"configuration.memberConnection.set"),"configuration.receipt_operation_invalid");
     uuid::Uuid::parse_str(id)?;
     let Some(result)=load_stored_result(connection,id)?else{return Ok(serde_json::json!({"state":"unknown"}))};
