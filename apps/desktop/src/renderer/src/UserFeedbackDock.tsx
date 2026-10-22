@@ -4,13 +4,15 @@ import { useThreadClient } from './camp-client'
 import { useUiText } from './interface-language'
 import { readErrorMessage } from './error-message'
 import { FeedbackSubmitDialog,feedbackStatusText,type FeedbackDraft } from './FeedbackSubmitDialog'
+import { FeedbackNormalContinueDialog,type FeedbackPrivateInput } from './FeedbackNormalContinueDialog'
 import './user-feedback.css'
 
 /** 工作中补充及原反馈记录是独立输入，不读取或清空普通消息的附件和草稿。 */
-export function UserFeedbackDock({scope,members,agentId}:{scope:FeedbackScope;members:Array<{agentId:string;displayName:string}>;agentId?:string}):React.JSX.Element{
+export function UserFeedbackDock({scope,members,agentId,getPrivateInput,onContinued}:{scope:FeedbackScope;members:Array<{agentId:string;displayName:string}>;agentId?:string;getPrivateInput?():FeedbackPrivateInput;onContinued?():void}):React.JSX.Element{
   const client=useThreadClient(),t=useUiText(),generation=useRef(0)
   const [open,setOpen]=useState(false),[text,setText]=useState(''),[selected,setSelected]=useState(agentId??''),[records,setRecords]=useState<FeedbackList>({items:[],next:null}),[previews,setPreviews]=useState<FeedbackPreviewRecoveryList>({items:[],next:null})
   const [draft,setDraft]=useState<FeedbackDraft|null>(null),[recovery,setRecovery]=useState<FeedbackPreview|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState(''),[refresh,setRefresh]=useState(0)
+  const [continuation,setContinuation]=useState<string|null>(null)
   const scopeKey=JSON.stringify(scope),target=agentId??selected
   useEffect(()=>{setText('');setDraft(null);setRecovery(null);setRecords({items:[],next:null});setPreviews({items:[],next:null});setSelected(agentId??'')},[scopeKey,agentId])
   const read=async(more=false):Promise<void>=>{
@@ -31,7 +33,7 @@ export function UserFeedbackDock({scope,members,agentId}:{scope:FeedbackScope;me
     <p className="feedback-help">{t('先预览完整内容，再提交。队员检查反馈时才会收到；普通输入框继续按原排队规则处理。')}</p>
     {error&&<p className="feedback-error" role="alert">{error}</p>}
     {previews.items.filter(row=>!row.receipt).map(row=><div className="feedback-history-item" key={row.preview.previewId}><strong>{t('有一份原预览可以继续核对')}</strong><pre>{row.preview.text}</pre><button className="quiet-button" type="button" onClick={()=>setRecovery(row.preview)}>{t('查看原预览')}</button></div>)}
-    {records.items.map(row=><div className="feedback-history-item" key={row.receipt.feedbackId}><strong>{t(feedbackStatusText[row.receipt.status])}</strong><span> · {new Date(row.createdAt).toLocaleString()}</span><pre>{row.text}</pre><small>{t('编号：{0}',row.receipt.feedbackId)}</small>{(row.receipt.status==='unknown'||row.receipt.status==='response_prepared')&&<p>{t('原结果尚未确定，不会自动重复发送或转给新任务。')}</p>}{row.receipt.status==='requires_user_review'&&<p>{t('原任务已经变化；原文保留，普通消息续办需要重新确认。')}</p>}</div>)}
+    {records.items.map(row=><div className="feedback-history-item" key={row.receipt.feedbackId}><strong>{t(feedbackStatusText[row.receipt.status])}</strong><span> · {new Date(row.createdAt).toLocaleString()}</span><pre>{row.text}</pre><small>{t('编号：{0}',row.receipt.feedbackId)}</small>{(row.receipt.status==='unknown'||row.receipt.status==='response_prepared')&&<p>{t('原结果尚未确定，不会自动重复发送或转给新任务。')}</p>}{row.receipt.status==='requires_user_review'&&<p>{t('原任务已经变化；原文保留，普通消息续办需要重新确认。')}</p>}{['pending','requires_user_review'].includes(row.receipt.status)&&row.receipt.deliveryChannel==='none'&&!row.receipt.bridgeInstanceId&&!row.receipt.resultDigest&&<button type="button" className="quiet-button" disabled={scope.scopeKind!=='public'&&!getPrivateInput} onClick={()=>setContinuation(row.receipt.feedbackId)}>{t('预览普通消息续办')}</button>}</div>)}
     {(records.next||previews.next)&&<button className="quiet-button" type="button" disabled={busy} onClick={()=>void read(true)}>{t('更多记录')}</button>}
-  </div>{(draft||recovery)&&<FeedbackSubmitDialog scope={scope} agentId={target||undefined} draft={draft??undefined} recovery={recovery??undefined} onClose={()=>{setDraft(null);setRecovery(null);setRefresh(value=>value+1)}} onSubmitted={()=>{if(draft?.source.kind==='live_note')setText(current=>current===draft.text?'':current);setRefresh(value=>value+1)}}/>}</details>
+  </div>{(draft||recovery)&&<FeedbackSubmitDialog scope={scope} agentId={target||undefined} draft={draft??undefined} recovery={recovery??undefined} onClose={()=>{setDraft(null);setRecovery(null);setRefresh(value=>value+1)}} onSubmitted={()=>{if(draft?.source.kind==='live_note')setText(current=>current===draft.text?'':current);setRefresh(value=>value+1)}}/>}{continuation&&<FeedbackNormalContinueDialog key={continuation} scope={scope} agentId={target} feedbackId={continuation} getPrivateInput={getPrivateInput} onClose={()=>{setContinuation(null);setRefresh(value=>value+1)}} onContinued={()=>{setRefresh(value=>value+1);onContinued?.()}}/>}</details>
 }

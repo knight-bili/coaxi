@@ -1805,7 +1805,11 @@ export function SingleChatPanel({
         ownerKey={`${conversationKind}:${currentSnapshot.conversation.id}`} messages={currentSnapshot.messages}
         disabled={!visible || sending || quoteBusy || returningPending || preparingAttachments.some((item) => !item.error)}
         onAdd={(selection) => mutateDraftQuote({ type: 'add', selection })} />}
-      {currentSnapshot&&<UserFeedbackDock key={`feedback:${currentSnapshot.conversation.id}`} scope={{threadId,conversationId:currentSnapshot.conversation.id,scopeKind:conversationKind}} agentId={currentSnapshot.conversation.agentId} members={members}/>}
+      {currentSnapshot&&<UserFeedbackDock key={`feedback:${currentSnapshot.conversation.id}`} scope={{threadId,conversationId:currentSnapshot.conversation.id,scopeKind:conversationKind}} agentId={currentSnapshot.conversation.agentId} members={members}
+        getPrivateInput={()=>{
+          if(!sharedDraftState.ready||sharedDraftState.error||draft.length||sending||returningPending||ending||quoteBusy||inputState.pending||uploadBusy||leaving||preparingAttachments.length||currentSnapshot.draft.attachments.length||(currentSnapshot.draft.quotes?.length??0))throw new Error(uiAttribute('请先处理普通输入中的草稿和材料，再确认反馈续办。'))
+          return {draftRevision:currentSnapshot.draft.revision,...(input?.origin.scope?{composerScope:input.origin.scope}:{})}
+        }} onContinued={()=>{void refreshCurrent()}}/>}
       <form className="composer single-chat-composer" onSubmit={(event) => void send(event)}>
         <div className={`composer-box single-chat-composer-box${activeRun ? ' is-running' : ''}`}>
           <div className="composer-input">
