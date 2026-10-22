@@ -73,7 +73,7 @@ struct RovaiUserFeedback: View {
             }
         }.navigationTitle("工作中补充和反馈记录").navigationBarTitleDisplayMode(.inline).scrollContentBackground(.hidden).toolbar {Button("关闭") {dismiss()}.disabled(busy)}}
         .interactiveDismissDisabled(busy)
-        .sheet(isPresented: $nativeOpen) {RovaiNativeSteer(model: model, scope: scope, text: text, agentId: agentId, materials: nativeMaterials ?? (conversationId == nil ? model.thread?["composerDraft"]?["attachments"]?.rvArray ?? [] : []))}
+        .sheet(isPresented: $nativeOpen) {RovaiNativeSteer(model: model, scope: scope, text: text, agentId: agentId, materials: nativeMaterials ?? (conversationId == nil ? model.publicSources : []))}
         .task {
             generation = model.connectionGeneration;selected = agentId ?? "";busy = true;defer {busy = false}
             do {text = try model.readBody(owner + ":text");let raw = try model.readBody(owner + ":request");if !raw.isEmpty {packet = try JSONDecoder().decode(JSONValue.self, from: Data(raw.utf8));uncertain = packet?["original"] != nil};try await read();ready = true} catch {issue = error.localizedDescription}

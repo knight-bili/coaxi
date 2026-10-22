@@ -49,7 +49,7 @@ private fun feedbackStatus(value:JsonObject)=when(value.coreText("status")){"pen
     var packet by remember(scope){mutableStateOf<JsonObject?>(null)};var receipt by remember(scope){mutableStateOf<JsonObject?>(null)};var uncertain by remember(scope){mutableStateOf(false)};var busy by remember(scope){mutableStateOf(false)};var ready by remember(scope){mutableStateOf(false)};var issue by remember(scope){mutableStateOf<String?>(null)}
     val disabled=busy||!ready||state.busy||state.pending!=null||generation!=model.connectionGeneration
     var nativeOpen by remember(scope){mutableStateOf(false)}
-    if(nativeOpen){RovaiNativeSteer(model,scope,agentId,body,nativeMaterials?:if(conversationId==null)state.thread?.get("composerDraft").coreObject()["attachments"].coreArray()else emptyList()){nativeOpen=false};return}
+    if(nativeOpen){RovaiNativeSteer(model,scope,agentId,body,nativeMaterials?:if(conversationId==null)state.publicSources else emptyList()){nativeOpen=false};return}
     suspend fun keep(value:JsonObject?){model.saveBody("$owner:request",value?.toString().orEmpty());packet=value}
     suspend fun read(more:Boolean=false){
         val value=feedbackCall(model,"targets",buildJsonObject{put("scope",scope)});targets=value["targets"].coreArray().filter{agentId==null||it.coreText("agentId")==agentId}

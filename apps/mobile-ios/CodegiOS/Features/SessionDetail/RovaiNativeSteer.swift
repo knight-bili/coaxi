@@ -90,7 +90,7 @@ struct RovaiNativeSteer: View {
                 Section("接收完整补充的当前任务") {
                     Picker("队员和任务", selection: $run) {Text("选择任务").tag("");ForEach(targets, id: \.self) {target in Text(target.text("agentId") + " · " + target.text("agentRunId")).tag(target.text("agentRunId"))}}.disabled(disabled)
                     Text(text).textSelection(.enabled)
-                    ForEach(materials, id: \.self) {material in Toggle(material.text("displayName"), isOn: Binding(get: {checked.contains(material.text("id"))}, set: {value in if value {checked.insert(material.text("id"))} else {checked.remove(material.text("id"))}})).disabled(disabled || material.text("kind") != "file" || material.text("availability") != "available")}
+                    ForEach(materials, id: \.self) {material in Toggle(material.text("displayName"), isOn: Binding(get: {checked.contains(material.text("id"))}, set: {value in if value {checked.insert(material.text("id"))} else {checked.remove(material.text("id"))}})).disabled(disabled || material.text("kind") != "file" || !["", "unknown", "available"].contains(material.text("availability")))}
                     Button("预览整份文字和材料") {Task {await prepare()}}.disabled(disabled || targets.first {$0.text("agentRunId") == run} == nil || text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && checked.isEmpty || text.unicodeScalars.count > 4096)
                     if targets.isEmpty {Text("当前没有实际支持原生插话且已启用的任务。").font(.caption).foregroundStyle(Theme.textSecondary)}
                 }
