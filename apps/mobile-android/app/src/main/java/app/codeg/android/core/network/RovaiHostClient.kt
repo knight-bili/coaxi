@@ -87,7 +87,7 @@ class RovaiHostClient(rawBaseUrl:String,private val administratorToken:String,
 
     /** 密钥只经专用入口发送；不进入普通命令持久队列或错误正文。 */
     suspend fun privateConfiguration(action:String,input:JsonObject):JsonObject {
-        require(action in listOf("provider","secrets","receipt")){"配置私有操作无效"}
+        require(action in listOf("provider","secrets","receipt","export","export-receipt")){"配置私有操作无效"}
         require(input.toString().toByteArray(Charsets.UTF_8).size<=2*1024*1024){"配置输入过大"}
         val current=connect();val generation=lifetime.get()
         val envelope=try{post("configuration/$action",input,current.token).jsonObject}
@@ -124,6 +124,24 @@ class RovaiHostClient(rawBaseUrl:String,private val administratorToken:String,
         val envelope=json.parseToJsonElement(text).jsonObject
         if(envelope["error"]?.let{it !is JsonNull}==true)throw RovaiHostFailure("configuration.archive_rejected")
         envelope["result"]?.jsonObject?:throw RovaiHostFailure("configuration.archive_response_invalid")
+    }
+
+    suspend fun downloadConfigurationExport(receipt:JsonObject,destination:File):Unit=withContext(Dispatchers.IO){
+        val size=receipt["byteSize"]?.jsonPrimitive?.longOrNull?:throw RovaiHostFailure("configuration.export_not_ready")
+        val expected=receipt["encryptedDigest"]?.jsonPrimitive?.contentOrNull?:throw RovaiHostFailure("configuration.export_not_ready")
+        require(receipt["state"]?.jsonPrimitive?.contentOrNull=="ready"&&size in 0..64L*1024*1024&&!destination.exists()){"配置副本尚未准备好或保存位置已被占用"}
+        val current=connect();val generation=lifetime.get();var created=false
+        try{
+            val response=http.post("$baseUrl/api/v1/configuration/export-download"){header(HttpHeaders.Authorization,"Bearer ${current.token}");header(HttpHeaders.CacheControl,"no-store");contentType(ContentType.Application.Json);setBody(buildJsonObject{put("operationId",receipt["operationId"]?:JsonNull)}.toString())}
+            if(response.status.value !in 200..299){if(response.status.value==401){denied=true;deadline=0};throw RovaiHostFailure("configuration.download_unavailable")}
+            if(generation!=lifetime.get())throw CancellationException("Host lifetime changed")
+            require(destination.createNewFile()){"保存位置已被占用"};created=true;destination.setReadable(false,false);destination.setWritable(false,false);destination.setReadable(true,true);destination.setWritable(true,true)
+            val hash=java.security.MessageDigest.getInstance("SHA-256");var observed=0L
+            destination.outputStream().use{output->val channel=response.bodyAsChannel();val buffer=ByteArray(64*1024);while(true){val count=channel.readAvailable(buffer,0,buffer.size);if(count<0)break;if(count==0)continue;observed+=count;if(observed>size)throw RovaiHostFailure("configuration.export_changed");hash.update(buffer,0,count);output.write(buffer,0,count)}}
+            val digest="sha256:"+hash.digest().joinToString(""){"%02x".format(it.toInt() and 255)}
+            if(observed!=size||digest!=expected)throw RovaiHostFailure("configuration.export_changed")
+            if(generation!=lifetime.get())throw CancellationException("Host lifetime changed")
+        }catch(error:Exception){if(created)destination.delete();throw error}
     }
     fun officePreviewUrl(port:Int,cap:String):String{require(port in 1..65535&&cap.length in 32..256&&cap.all{it.isLetterOrDigit()&&it.code<128||it=='_'||it=='-'}){"预览授权无效"};return "$baseUrl/api/office-watch-proxy/$port/?cap=$cap"}
     suspend fun fileBytes(action:String,request:JsonObject):RovaiFileBytes {

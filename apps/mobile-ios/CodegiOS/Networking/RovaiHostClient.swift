@@ -90,7 +90,7 @@ actor RovaiHostClient {
 
     /// 私有内容不进入普通命令恢复正文；失败只显示固定原因，未知结果核对原编号。
     func privateConfiguration(_ action: String, input: JSONValue) async throws -> JSONValue {
-        guard ["provider", "secrets", "receipt"].contains(action), try JSONEncoder().encode(input).count <= 2 * 1024 * 1024 else { throw RovaiHostFailure(code: "配置私有操作无效") }
+        guard ["provider", "secrets", "receipt", "export", "export-receipt"].contains(action), try JSONEncoder().encode(input).count <= 2 * 1024 * 1024 else { throw RovaiHostFailure(code: "配置私有操作无效") }
         let current = try await connect(); let lifetime = generation
         let envelope: JSONValue
         do { envelope = try await post("configuration/" + action, body: input, bearer: current.token) }
@@ -121,6 +121,21 @@ actor RovaiHostClient {
         let envelope = try JSONDecoder().decode(JSONValue.self, from: reply)
         if let error = envelope["error"], error != .null { throw RovaiHostFailure(code: "configuration.archive_rejected") }
         return envelope["result"] ?? .null
+    }
+
+    func downloadConfigurationExport(_ receipt: JSONValue) async throws -> Data {
+        guard receipt.text("state") == "ready", let size = receipt["byteSize"]?.rvInt, (0...64 * 1024 * 1024).contains(size) else { throw RovaiHostFailure(code: "配置副本尚未准备好") }
+        let current = try await connect(); let lifetime = generation
+        var request = URLRequest(url: endpoint("configuration/export-download")); request.httpMethod = "POST"; request.setValue("Bearer " + current.token, forHTTPHeaderField: "Authorization"); request.setValue("application/json", forHTTPHeaderField: "Content-Type"); request.setValue("no-store", forHTTPHeaderField: "Cache-Control"); request.httpBody = try JSONEncoder().encode(JSONValue.object(["operationId": receipt["operationId"] ?? .null]))
+        let (url, response) = try await session.download(for: request); defer { try? FileManager.default.removeItem(at: url) }
+        guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else { if (response as? HTTPURLResponse)?.statusCode == 401 { denied = true; deadline = 0 }; throw RovaiHostFailure(code: "configuration.download_unavailable") }
+        guard lifetime == generation else { throw CancellationError() }
+        let attributes = try FileManager.default.attributesOfItem(atPath: url.path)
+        guard (attributes[.size] as? NSNumber)?.intValue == size else { throw RovaiHostFailure(code: "配置副本大小已变化") }
+        let data = try Data(contentsOf: url, options: .mappedIfSafe)
+        let digest = "sha256:" + SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+        guard data.count == size, digest == receipt.text("encryptedDigest") else { throw RovaiHostFailure(code: "配置副本摘要不同") }
+        guard lifetime == generation else { throw CancellationError() }; return data
     }
     func officePreviewURL(port: Int, cap: String) throws -> URL { guard (1...65535).contains(port), (32...256).contains(cap.utf8.count), cap.utf8.allSatisfy({ ($0 >= 48 && $0 <= 57) || ($0 >= 65 && $0 <= 90) || ($0 >= 97 && $0 <= 122) || $0 == 95 || $0 == 45 }), var parts = URLComponents(url: baseURL.appendingPathComponent("api/office-watch-proxy/\(port)/"), resolvingAgainstBaseURL: false) else { throw RovaiHostFailure(code: "预览授权无效") }; parts.queryItems = [URLQueryItem(name: "cap", value: cap)]; guard let url = parts.url else { throw RovaiHostFailure(code: "预览地址无效") }; return url }
     func fileBytes(_ action: String, request value: JSONValue) async throws -> RovaiFileBytes {
