@@ -3,7 +3,7 @@ import {LegacyDataSettings} from './LegacyDataSettings'
 import { useEffect, useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Archive, Download, Lock, RotateCcw } from 'lucide-react'
-import type { BackupSummary } from '@contracts'
+import type { BackupSummary, NativeBackupsApi } from '@contracts'
 import { AppDialogContent, AppDialogHeader } from './AppDialog'
 import { useThreadClient } from './camp-client'
 import { useUiText } from './interface-language'
@@ -14,6 +14,10 @@ export function BackupSettings():React.JSX.Element{
   const [mode,setMode]=useState<'create'|'inspect'|null>(null),[passphrase,setPassphrase]=useState(''),[repeat,setRepeat]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState<string|null>(null)
   const [selected,setSelected]=useState<(BackupSummary&{archiveId:string})|null>(null),[created,setCreated]=useState<(BackupSummary&{path:string})|null>(null),[restore,setRestore]=useState(false),[confirmation,setConfirmation]=useState('')
   const [progress,setProgress]=useState<{phase:string;done:number;total:number}|null>(null)
+  const [environment,setEnvironment]=useState<Awaited<ReturnType<NonNullable<NativeBackupsApi['restoreEnvironment']>>>|null>(null)
+  const [environmentBusy,setEnvironmentBusy]=useState(false)
+  const readEnvironment=async():Promise<void>=>{if(!api?.restoreEnvironment||environmentBusy)return;setEnvironmentBusy(true);try{setEnvironment(await api.restoreEnvironment())}catch{setEnvironment({status:'unreadable',unresolvedCount:0,items:[],truncated:false,automaticExecutionAllowed:false})}finally{setEnvironmentBusy(false)}}
+  useEffect(()=>{let active=true;if(api?.restoreEnvironment)void api.restoreEnvironment().then(value=>{if(active)setEnvironment(value)},()=>{if(active)setEnvironment({status:'unreadable',unresolvedCount:0,items:[],truncated:false,automaticExecutionAllowed:false})});return()=>{active=false}},[api])
   useEffect(()=>api?.onProgress(setProgress),[api])
   const reset=():void=>{setPassphrase('');setRepeat('');setError(null);setProgress(null);setConfirmation('')}
   const submit=async():Promise<void>=>{
@@ -28,6 +32,7 @@ export function BackupSettings():React.JSX.Element{
     {api?<><div className="workbench-toolbar"><button disabled={busy} onClick={()=>{reset();setMode('create')}}><Download size={14}/>{t('创建加密备份')}</button><button disabled={busy} onClick={()=>{reset();setMode('inspect')}}><RotateCcw size={14}/>{t('选择备份并预览')}</button></div>
       {created&&<p role="status">{t('已保存备份')}: {created.path}<br/>{description(created)}</p>}{created&&roots(created)}
       {selected&&<div className="backup-preview-summary"><strong>{t('所选备份')}</strong><p>{description(selected)}</p><p>{t('来源版本')}: {selected.appVersion}</p>{roots(selected)}<button disabled={busy} onClick={()=>{reset();setRestore(true)}}>{t('恢复这个备份…')}</button></div>}
+      {environment&&environment.status!=='none'&&<div className="backup-preview-summary" role="status"><strong>{t('恢复后的程序环境')}</strong><p>{t(environment.status==='unreadable'?'环境待补记录暂时无法读取，请保留备份并检查当前主机。':'有 {0} 个程序链接仍需本机环境支持；原安装锁和会话历史保留。',environment.unresolvedCount)}</p><p>{t('没有自动运行或重新安装程序。请到自定义智能体设置检查程序、解释器和权限，再明确选择后续操作。')}</p>{environment.items.length>0&&<details><summary>{t('查看待补的程序文件')}</summary><ul>{environment.items.map(item=><li key={item.path}><code>{item.path}</code><span> · {t(item.reason==='external_or_absolute_target_requires_environment_repair'?'原链接依赖外部或绝对路径':item.reason==='host_link_creation_unavailable'?'本机暂时不能创建此链接':'链接目标不存在或超出原安装包')}</span></li>)}</ul>{environment.truncated&&<p>{t('当前列出前100项，完整记录保留在本机恢复目录。')}</p>}</details>}<button type="button" disabled={busy||environmentBusy} onClick={()=>void readEnvironment()}>{t(environmentBusy?'读取中…':'重新读取环境记录')}</button></div>}
     </>:<p>{t('请在数据所在主机的桌面设置中创建或恢复备份；独立服务器也提供离线备份命令。')}</p>}
     <Dialog.Root open={mode!==null||restore} onOpenChange={open=>{if(!open&&!busy){setMode(null);setRestore(false);reset()}}}>
       <Dialog.Portal><Dialog.Overlay className="dialog-overlay"/><AppDialogContent tone={restore?'danger':'neutral'} width="compact"><AppDialogHeader title={t(restore?'恢复并重启应用':mode==='create'?'创建加密备份':'预览加密备份')} description={t(restore?'当前数据会先保留为安全副本，随后恢复所选备份。恢复完成后应用重新启动。':mode==='create'?'工作区会短暂停止，备份保存后自动恢复运行。':'输入口令后选择备份。预览不会更改当前工作区。')} closeDisabled={busy}/>

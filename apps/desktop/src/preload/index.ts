@@ -66,6 +66,7 @@ const api: RovaiApi = {
   nativePets:{importDirectory:()=>ipcRenderer.invoke('rovai:pets-import'),synchronize:()=>ipcRenderer.invoke('rovai:pets-synchronize'),onChanged:listener=>{const receive=():void=>listener();ipcRenderer.on('rovai:pets-changed',receive);return()=>ipcRenderer.removeListener('rovai:pets-changed',receive)}},
   webdavWorkspace:{request:input=>ipcRenderer.invoke('rovai:webdav-workspace',input)},
   nativeBackups: {
+    restoreEnvironment:()=>ipcRenderer.invoke('rovai:backup-workspace','restore_environment',{}),
     inspectLegacyData:()=>ipcRenderer.invoke('rovai:backup-workspace','legacy_inspect',{passphrase:''}),
     importLegacyData:selectionId=>ipcRenderer.invoke('rovai:backup-workspace','legacy_stage',{passphrase:'',selectionId}),
     exportConfiguration:passphrase=>ipcRenderer.invoke('rovai:backup-workspace','config_export',{passphrase}),

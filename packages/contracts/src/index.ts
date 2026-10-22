@@ -5195,6 +5195,7 @@ export interface BackupSummary {createdAt:string;appVersion:string;fileCount:num
 export interface ConfigurationSnapshotPreview {formatVersion:number;appVersion:string;createdAt:string;localDigest:string;changes:Array<{domain:string;before:Record<string,unknown>|null;after:Record<string,unknown>|null}>}
 export interface LegacyDataPreview {selectionId:string;source:string;digest:string;authority:string;fileCount:number;totalBytes:number;externalRoots:Array<{id:string;kind:string;path:string;shared:boolean}>}
 export interface NativeBackupsApi {
+  restoreEnvironment?():Promise<{status:'none'|'needs_environment'|'unreadable';unresolvedCount:number;items:Array<{path:string;reason:string}>;truncated:boolean;automaticExecutionAllowed:false}>
   inspectLegacyData():Promise<LegacyDataPreview|null>
   importLegacyData(selectionId:string):Promise<BackupSummary&{restoreStaged:true}>
   exportConfiguration(passphrase:string):Promise<{created:boolean;path:string;domains:string[]}|null>

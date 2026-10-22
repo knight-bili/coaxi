@@ -1,7 +1,9 @@
 import { BrowserWindow, dialog, type IpcMainInvokeEvent } from 'electron'
-import type { BackupSummary, ConfigurationSnapshotPreview, LegacyDataPreview } from '@contracts'
+import type { BackupSummary, ConfigurationSnapshotPreview, LegacyDataPreview, NativeBackupsApi } from '@contracts'
 import { spawn } from 'node:child_process'
-import { createReadStream } from 'node:fs'
+import { constants, createReadStream } from 'node:fs'
+import { lstat, open } from 'node:fs/promises'
+import { join } from 'node:path'
 import { createHash, randomUUID } from 'node:crypto'
 import { resolveCoreBinary, type CoreClient } from './core-client'
 type Manifest={formatVersion:number;product:string;appVersion:string;createdAt:string;entries:Array<{rootId?:string;path:string;size:number;sha256:string}>;roots?:NonNullable<BackupSummary['roots']>;runtimeLinks?:Array<{path:string;target:string;directory:boolean}>;fileModes?:Record<string,number>}
@@ -15,6 +17,30 @@ export class BackupWorkspace{
   private readonly selections=new Map<string,{path:string;digest:string;expires:number}>()
   private readonly legacySelections=new Map<string,{source:string;digest:string;expires:number}>()
   constructor(private readonly core:Pick<CoreClient,'shutdown'|'start'>,private readonly dataRoot:()=>string|null,private readonly owner:()=>BrowserWindow|null,private readonly prepare:()=>Promise<void>,private readonly beforeOffline:()=>void,private readonly restartApp:()=>void,private readonly preferencesRoot:()=>string|null=dataRoot){}
+  private async restoredEnvironment(root:string):Promise<Awaited<ReturnType<NonNullable<NativeBackupsApi['restoreEnvironment']>>>>{
+    const empty={status:'none' as const,unresolvedCount:0,items:[],truncated:false,automaticExecutionAllowed:false as const}
+    let handle:Awaited<ReturnType<typeof open>>|undefined
+    try{
+      const path=join(root,'custom-runtime-restore-needs-environment-v1.json'),before=await lstat(path)
+      if(!before.isFile()||before.isSymbolicLink()||before.size>4*1024*1024)throw new Error('backup.restore_environment_invalid')
+      handle=await open(path,constants.O_RDONLY|(constants.O_NOFOLLOW??0));const observed=await handle.stat()
+      if(!observed.isFile()||observed.size!==before.size||observed.ino!==before.ino||observed.dev!==before.dev)throw new Error('backup.restore_environment_changed')
+      const bytes=Buffer.alloc(4*1024*1024+1);let count=0
+      while(count<bytes.length){const read=await handle.read(bytes,count,bytes.length-count,null);if(!read.bytesRead)break;count+=read.bytesRead}
+      if(count>4*1024*1024)throw new Error('backup.restore_environment_too_large')
+      const value=JSON.parse(bytes.subarray(0,count).toString('utf8')) as {schemaVersion?:unknown;unresolvedLinks?:unknown;automaticExecutionAllowed?:unknown}
+      if(value.schemaVersion!==1||!Array.isArray(value.unresolvedLinks)||value.unresolvedLinks.length>200000||value.automaticExecutionAllowed!==false)throw new Error('backup.restore_environment_invalid')
+      const reasons=new Set(['external_or_absolute_target_requires_environment_repair','host_link_creation_unavailable','target_missing_or_outside_owned_payload'])
+      const items=value.unresolvedLinks.slice(0,100).map((item:unknown)=>{
+        if(!item||typeof item!=='object'||Array.isArray(item))throw new Error('backup.restore_environment_invalid')
+        const row=item as {link?:{path?:unknown};reason?:unknown},path=row.link?.path
+        if(typeof path!=='string'||path.length>16384||!path.startsWith('custom-runtimes/')||path.includes('\0')||path.split('/').some(part=>part==='.'||part==='..')||typeof row.reason!=='string'||!reasons.has(row.reason))throw new Error('backup.restore_environment_invalid')
+        return {path,reason:row.reason}
+      })
+      return {...empty,status:value.unresolvedLinks.length?'needs_environment':'none',unresolvedCount:value.unresolvedLinks.length,items,truncated:value.unresolvedLinks.length>items.length}
+    }catch(failure){if((failure as NodeJS.ErrnoException)?.code==='ENOENT')return empty;return {...empty,status:'unreadable'}}
+    finally{await handle?.close()}
+  }
   private execute<T={manifest:Manifest}>(operation:string,root:string,file:string|undefined,passphrase:string,event:IpcMainInvokeEvent,command='backup',extra:string[]=[]):Promise<T>{
     return new Promise((resolve,reject)=>{
       const env:NodeJS.ProcessEnv={LANG:'C.UTF-8',LC_ALL:'C.UTF-8'};for(const key of ['PATH','SystemRoot','WINDIR','HOME','USERPROFILE','TEMP','TMP','LOCALAPPDATA'])if(process.env[key])env[key]=process.env[key]
@@ -73,6 +99,10 @@ export class BackupWorkspace{
     if(!owner||owner.isDestroyed()||event.sender!==owner.webContents||event.senderFrame!==owner.webContents.mainFrame||!root)throw new Error('backup.local_owner_required')
     if(this.busy)throw new Error('backup.operation_in_progress')
     if(!input||typeof input!=='object'||Array.isArray(input))throw new Error('backup.invalid_request')
+    if(operation==='restore_environment'){
+      if(Object.keys(input).length)throw new Error('backup.invalid_request')
+      return this.restoredEnvironment(root)
+    }
     const {passphrase,archiveId}=input as {passphrase:string;archiveId?:string}
     if(typeof passphrase!=='string'||passphrase.length>16000)throw new Error('backup.invalid_passphrase')
     if(operation==='legacy_inspect'||operation==='legacy_stage')return this.invokeLegacy(event,operation,input as {selectionId?:string},owner,root)
