@@ -27,14 +27,15 @@ private fun customPackage(raw:JsonObject,kind:String):JsonObject{
         if(kind=="npx")put("nodeRequired",raw["nodeRequired"]?:raw["node_required"]?:JsonNull)
         else{put("uvRequired",raw["uvRequired"]?:raw["uv_required"]?:JsonNull);put("python",raw["python"]?:JsonNull)}}
 }
-/** 原版手动表单接受 distribution 或整条注册表记录；只冻结明确选择的分发方式。 */
+/** 原版手动表单接受 distribution 或整条注册表记录；保留全部渠道，启动只选指定渠道。 */
 internal fun customRuntimeSpec(text:String,kind:String):JsonObject{
     require(text.toByteArray(Charsets.UTF_8).size<=2*1024*1024){"配置超过2MB"}
     val raw=customObject(Json.parseToJsonElement(text));if("distribution" in raw)customKeys(raw,setOf("id","name","description","version","website","repository","license","icon","distribution"))
     val channels=customObject(raw["distribution"]?:raw);customKeys(channels,setOf("npx","uvx","binary"))
     require(kind in setOf("npx","uvx","binary")){"请选择分发方式"}
-    return buildJsonObject{put("npx",if(kind=="npx")customPackage(customObject(channels[kind]),kind)else JsonNull);put("uvx",if(kind=="uvx")customPackage(customObject(channels[kind]),kind)else JsonNull)
-        put("binary",if(kind!="binary")buildJsonObject{} else buildJsonObject{val binaries=customObject(channels["binary"]);require(binaries.isNotEmpty()){"缺少平台下载配置"};binaries.forEach{(platform,value)->val item=customObject(value);customKeys(item,setOf("archive","url","cmd","args","env","sha256"));require(!("archive" in item&&"url" in item)){"下载地址不能重复填写"};put(platform,buildJsonObject{put("archive",item["archive"]?:item["url"]?:JsonNull);put("cmd",item["cmd"]?:JsonPrimitive(""));put("args",item["args"]?:JsonArray(emptyList()));put("env",item["env"]?:buildJsonObject{});put("sha256",item["sha256"]?:JsonNull)})}})}
+    require(channels[kind] is JsonObject&&(kind!="binary"||channels[kind].coreObject().isNotEmpty())){"所选分发方式不在这份配置中"}
+    return buildJsonObject{put("npx",if(channels["npx"] is JsonObject)customPackage(customObject(channels["npx"]),"npx")else JsonNull);put("uvx",if(channels["uvx"] is JsonObject)customPackage(customObject(channels["uvx"]),"uvx")else JsonNull)
+        put("binary",if(channels["binary"]==null)buildJsonObject{} else buildJsonObject{val binaries=customObject(channels["binary"]);binaries.forEach{(platform,value)->val item=customObject(value);customKeys(item,setOf("archive","url","cmd","args","env","sha256"));require(!("archive" in item&&"url" in item)){"下载地址不能重复填写"};put(platform,buildJsonObject{put("archive",item["archive"]?:item["url"]?:JsonNull);put("cmd",item["cmd"]?:JsonPrimitive(""));put("args",item["args"]?:JsonArray(emptyList()));put("env",item["env"]?:buildJsonObject{});put("sha256",item["sha256"]?:JsonNull)})}})}
 }
 internal fun customRuntimeBlank()=buildJsonObject{
     put("schemaVersion",1);put("id",UUID.randomUUID().toString());put("registryId","");put("name","");put("description","");put("version","1.0.0");put("distributionKind","npx")

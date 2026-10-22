@@ -16,23 +16,24 @@ private func customPackage(_ value: JSONValue?, _ kind: String) throws -> JSONVa
     else {item["uvRequired"] = raw["uvRequired"] ?? raw["uv_required"] ?? .null;item["python"] = raw["python"] ?? .null}
     return .object(item)
 }
-/// 原版 distribution 或注册表整条记录；只冻结用户明确选择的一种分发方式。
+/// 原版 distribution 或注册表整条记录；保留全部渠道，启动只选指定渠道。
 func customRuntimeSpec(_ text: String, _ kind: String) throws -> JSONValue {
     guard text.utf8.count <= 2 * 1024 * 1024, let parsed = JSONValue.parse(text) else {throw RovaiHostFailure(code: "配置 JSON 无效或超过2MB")}
     let raw = try customObject(parsed)
     if raw["distribution"] != nil {try customKeys(raw, ["id", "name", "description", "version", "website", "repository", "license", "icon", "distribution"])}
     let channels = try customObject(raw["distribution"] ?? parsed);try customKeys(channels, ["npx", "uvx", "binary"])
     guard ["npx", "uvx", "binary"].contains(kind) else {throw RovaiHostFailure(code: "请选择分发方式")}
+    let selected = try customObject(channels[kind]);guard kind != "binary" || !selected.isEmpty else {throw RovaiHostFailure(code: "缺少平台下载配置")}
     var binary: [String: JSONValue] = [:]
-    if kind == "binary" {
-        let entries = try customObject(channels["binary"]);guard !entries.isEmpty else {throw RovaiHostFailure(code: "缺少平台下载配置")}
+    if let binaries = channels["binary"] {
+        let entries = try customObject(binaries)
         for (platform, value) in entries {
             let item = try customObject(value);try customKeys(item, ["archive", "url", "cmd", "args", "env", "sha256"])
             guard !(item["archive"] != nil && item["url"] != nil) else {throw RovaiHostFailure(code: "下载地址不能重复填写")}
             binary[platform] = .object(["archive": item["archive"] ?? item["url"] ?? .null, "cmd": item["cmd"] ?? .string(""), "args": item["args"] ?? .array([]), "env": item["env"] ?? .object([:]), "sha256": item["sha256"] ?? .null])
         }
     }
-    return .object(["npx": kind == "npx" ? try customPackage(channels[kind], kind) : .null, "uvx": kind == "uvx" ? try customPackage(channels[kind], kind) : .null, "binary": .object(binary)])
+    return .object(["npx": channels["npx"] != nil && channels["npx"] != .null ? try customPackage(channels["npx"], "npx") : .null, "uvx": channels["uvx"] != nil && channels["uvx"] != .null ? try customPackage(channels["uvx"], "uvx") : .null, "binary": .object(binary)])
 }
 private func customBlank() -> JSONValue {.object([
     "schemaVersion": .number(1), "id": .string(UUID().uuidString.lowercased()), "registryId": .string(""), "name": .string(""), "description": .string(""), "version": .string("1.0.0"), "distributionKind": .string("npx"),
