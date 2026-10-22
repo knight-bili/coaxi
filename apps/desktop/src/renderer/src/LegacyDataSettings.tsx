@@ -5,6 +5,7 @@ import type { LegacyDataPreview } from '@contracts'
 import { AppDialogBody,AppDialogContent,AppDialogFooter,AppDialogHeader } from './AppDialog'
 import { useThreadClient } from './camp-client'
 import { useUiText } from './interface-language'
+import './interaction-workspace.css'
 
 /** 沿用原版备份页的先预览、再明确替换与重启。 */
 export function LegacyDataSettings():React.JSX.Element|null{

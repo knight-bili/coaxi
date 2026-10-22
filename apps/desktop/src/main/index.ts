@@ -1129,6 +1129,7 @@ if (primaryInstance) void app.whenReady().then(async () => {
       console.warn('[rovai] Channel Host transition failed; the App will remain available.', error)
     })
   })
+  await keyboardShortcuts.get().catch(error=>console.warn('[shortcuts] saved settings unavailable',String(error)))
   createWindow()
   console.info(
     `[startup] stage=window_created elapsed_ms=${(performance.now() - mainStartupStartedAt).toFixed(1)}`

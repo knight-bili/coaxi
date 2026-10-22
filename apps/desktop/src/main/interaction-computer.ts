@@ -102,7 +102,7 @@ export class InteractionComputer implements DesktopComputerExecutor{
     if(!this.available()||!this.peer)throw new Error('runtime_unavailable')
     const peer=this.peer
     let child:ChildProcessWithoutNullStreams|null=null
-    const opening=(async()=>{
+    const opening:Promise<void>=(async()=>{
       const processChild=spawn(resolveCoreBinary(),['--interaction-desktop'],{stdio:['pipe','pipe','pipe'],windowsHide:true,env:{...process.env}})
       child=processChild;this.child=processChild;this.buffer=Buffer.alloc(0);this.token=randomBytes(32).toString('hex')
       await new Promise<void>((resolve,reject)=>{

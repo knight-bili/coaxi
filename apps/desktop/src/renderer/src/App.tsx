@@ -1,4 +1,5 @@
 import { WindowCloseDialog } from './WindowCloseSettings'
+import { dispatchShortcutInput } from './shortcut-action-driver'
 import { useEffect, useRef, useState } from 'react'
 import type { CoreEvent, DesktopStartupSnapshot, SupervisorSnapshot, AppearanceSnapshot } from '@contracts'
 import { CurrentUserProfileProvider } from './CurrentUserProfile'
@@ -17,6 +18,7 @@ export * from './BusinessApp'
 
 export function App(): React.JSX.Element {
   useInterfaceLanguage()
+  useEffect(()=>window.rovai.keyboardShortcuts?.onNativeInput?.(input=>{if(!input.isComposing)dispatchShortcutInput(input)}),[])
   const [supervisorState, setSupervisorState] = useState<{
     latest: SupervisorSnapshot | null
     lastNonShutdown: SupervisorSnapshot | null
