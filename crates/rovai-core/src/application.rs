@@ -868,6 +868,7 @@ fn request_runs_outside_main_queue(method: &str) -> bool {
             | "feedback.operation"
             | "runtime.custom.list" | "runtime.custom.upsert" | "runtime.custom.remove" | "runtime.custom.install" | "runtime.custom.inspect" | "runtime.custom.registry"
             | "runtime.steer.policy.get" | "runtime.steer.policy.set"
+            | "runtime.steer.targets"
             | "monitoring.execution"
             | "runtime.installations.refresh"
             | "runtime.discovery.rescan"
@@ -10391,7 +10392,7 @@ impl Core {
             "interaction.local" => self.interaction_access(request.params.clone()).await,
             "feedback.operation" => self.feedback_operation(request.params.clone(),request.client.clone()).await,
             "runtime.custom.list" | "runtime.custom.upsert" | "runtime.custom.remove" | "runtime.custom.install" | "runtime.custom.inspect" | "runtime.custom.registry" => self.custom_runtime_access(&request.method,request.params.clone()).await,
-            "runtime.steer.policy.get" | "runtime.steer.policy.set" => self.native_lifecycle_access(&request.method,request.params.clone()).await,
+            "runtime.steer.policy.get" | "runtime.steer.policy.set" | "runtime.steer.targets" => self.native_lifecycle_access(&request.method,request.params.clone()).await,
             "computer.local" => self.computer_access(request.params.clone()).await,
             "browser.local.grant" | "browser.local.revoke" | "browser.local.begin" | "browser.local.finish" => self.browser_access(&request.method, request.params.clone()).await,
             "workbench.files.tools" => self.workbench_file_tools(request.params.clone()).await,

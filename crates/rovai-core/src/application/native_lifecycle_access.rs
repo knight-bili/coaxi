@@ -13,6 +13,17 @@ impl Core{
                 let execution=native::policy::set(&mut database,&user_command_envelope(command_id,input))?;
                 let result=serde_json::to_value(execution.result)?;emit(&self.output,"nativeLifecycle.changed",json!({"reason":"policy_saved"}));Ok(result)
             },
+            "runtime.steer.targets"=>{
+                let scope:native::NativeSteerScopeV1=serde_json::from_value(value["scope"].clone())?;
+                let candidates={let database=self.database.lock().await;native::target::candidates(database.connection(),&scope)?};
+                let mut targets=Vec::new();
+                for mut target in candidates{
+                    let Some(runtime)=self.custom_acp.get_agent_run(&target.agent_run_id,target.execution_epoch).await else{continue};
+                    if runtime.native_steer_capability().await?.is_none(){continue}
+                    let Some(turn)=runtime.prompt_id().await else{continue};target.active_turn_id=turn;
+                    let database=self.database.lock().await;if native::target::require(database.connection(),&target).is_ok(){targets.push(target);}
+                }Ok(json!({"schemaVersion":1,"targets":targets}))
+            },
             _=>anyhow::bail!("native_lifecycle.operation_unknown"),
         }
     }
