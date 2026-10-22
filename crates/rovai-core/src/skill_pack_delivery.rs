@@ -3,7 +3,7 @@
 use std::{collections::BTreeMap, path::Path};
 
 use anyhow::Result;
-use rusqlite::Connection;
+use rusqlite::{Connection,OptionalExtension};
 use serde_json::json;
 
 use crate::skill_pack_installation::{
@@ -30,6 +30,7 @@ struct PackObservation {
 pub(crate) struct PreparedMemberSkillPacks {
     agent_id: String,
     observations: BTreeMap<String, PackObservation>,
+    custom_native: Option<BTreeMap<String,String>>,
 }
 
 impl PreparedMemberSkillPacks {
@@ -39,6 +40,12 @@ impl PreparedMemberSkillPacks {
         agent_id: &str,
         requested_ids: impl IntoIterator<Item = &'a str>,
     ) -> Result<Self> {
+        let runtime:Option<String>=connection.query_row("SELECT selected_runtime_adapter_kind FROM agent_profile WHERE id=?1 AND profile_status<>'removed'",[agent_id],|row|row.get(0)).optional()?.flatten();
+        let custom_native=if runtime.as_deref()==Some("custom-acp"){
+            let roots=crate::custom_runtime::storage::member_skill_roots(connection,agent_id)?;
+            let scan=crate::native_skills::NativeSkillDiscovery::default().discover_custom(&roots,false)?;
+            Some(scan.skills.into_iter().map(|skill|(skill.id,skill.name)).collect())
+        }else{None};
         let selected = connection.prepare(
             "SELECT choice.skill_id FROM member_skill_pack AS choice \
              JOIN agent_profile AS member ON member.id=choice.agent_id \
@@ -94,6 +101,7 @@ impl PreparedMemberSkillPacks {
         Ok(Self {
             agent_id: agent_id.to_owned(),
             observations,
+            custom_native,
         })
     }
 
@@ -104,6 +112,7 @@ impl PreparedMemberSkillPacks {
         );
         Ok(())
     }
+    pub(crate) fn permits_native(&self,id:&str,name:&str)->bool{self.custom_native.as_ref().is_none_or(|sources|sources.get(id).is_some_and(|found|found==name))}
 
     pub(crate) fn source(&self, id: &str) -> Result<&SkillPackModelSource, PackUnavailable> {
         self.observations

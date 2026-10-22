@@ -838,6 +838,8 @@ fn resolve_source_skills(
                     PackUnavailable::Changed => CurrentInputSkillOmissionReason::PackChanged,
                 }),
             }
+        } else if selected.source==Some(SkillSource::Native)&&packs.is_some_and(|prepared|!prepared.permits_native(&selected.skill_id,&selected.name_at_send)){
+            Err(CurrentInputSkillOmissionReason::SourceMissing)
         } else {
             resolve_v2_source(connection, selected, adapter_kind)?
         };
