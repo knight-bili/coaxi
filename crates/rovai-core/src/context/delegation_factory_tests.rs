@@ -59,6 +59,7 @@ fn assert_initial_child_factory(f: &mut Fixture) {
         .unwrap()
         .to_string();
     let configuration = MemberRuntimeConfiguration {
+        custom_runtime_ref: None,
         adapter_kind: AdapterKind::Pi,
         model: ModelSelection::RuntimeDefault,
         permissions: AdapterPermissionConfig {

@@ -2392,6 +2392,7 @@ mod tests {
 
     fn process_compatibility_runtime(executable: &Path) -> FrozenAgentRuntimeConfig {
         FrozenAgentRuntimeConfig {
+            custom_runtime: None,
             environment: None,
             custom_api: None,
             camp_fast: None,
@@ -3383,6 +3384,7 @@ for line in sys.stdin:
         )
         .unwrap();
         let runtime_config = FrozenAgentRuntimeConfig {
+            custom_runtime: None,
             environment: None,
             custom_api: None,
             camp_fast: None,

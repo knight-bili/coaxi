@@ -26,7 +26,7 @@ fn context_child_in(fixture: &mut Fixture, parent: &str, parent_epoch: i64, task
     let runtime: crate::agent_profile::FrozenAgentRuntimeConfig = serde_json::from_value(value["runtime"].clone()).unwrap();
     let model = if runtime.model.source == "runtime_default" { crate::agent_profile::ModelSelection::RuntimeDefault }
         else { crate::agent_profile::ModelSelection::Explicit {model_id:runtime.model.model_id.clone(),options:runtime.model.options.clone(),dsh_source:runtime.model.dsh_source} };
-    let configuration = crate::agent_profile::MemberRuntimeConfiguration { adapter_kind:runtime.adapter_kind, model, permissions:runtime.permissions.clone() };
+    let configuration = crate::agent_profile::MemberRuntimeConfiguration { custom_runtime_ref: None, adapter_kind:runtime.adapter_kind, model, permissions:runtime.permissions.clone() };
     let typed_workspace = serde_json::from_value(workspace.clone()).unwrap();
     let plan = crate::delegation_factory::ChildRunPlan {
         task,target:&target,installation_id:&runtime.installation_id,configuration:&configuration,workspace:&typed_workspace,

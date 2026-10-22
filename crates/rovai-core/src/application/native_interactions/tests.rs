@@ -314,6 +314,7 @@ async fn native_child_questions_cross_the_core_reader_and_exact_user_reply_then_
             .put_bytes(&mut db, task.as_bytes(), "text/plain", "sensitive")
             .unwrap();
         let configuration = MemberRuntimeConfiguration {
+            custom_runtime_ref: None,
             adapter_kind: AdapterKind::GrokBuild,
             model: ModelSelection::RuntimeDefault,
             permissions: AdapterPermissionConfig {

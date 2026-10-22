@@ -747,7 +747,7 @@ impl AgentRuntimeAdapterRegistry {
     ) -> RuntimePlatformAdmission {
         if matches!(
             kind,
-            AdapterKind::GeminiCli | AdapterKind::HermesCli | AdapterKind::OpenClawCli
+            AdapterKind::GeminiCli | AdapterKind::HermesCli | AdapterKind::OpenClawCli | AdapterKind::CustomAcp
         ) {
             return RuntimePlatformAdmission::not_qualified(
                 kind,
@@ -923,6 +923,7 @@ impl AgentRuntimeAdapterRegistry {
 
     pub fn member_permission_defaults(&self, kind: AdapterKind) -> Value {
         match kind {
+            AdapterKind::CustomAcp => json!({}),
             AdapterKind::CodexCli => json!({
                 "sandbox_mode": "danger-full-access",
                 "approval_policy": "never",
@@ -985,6 +986,7 @@ impl AgentRuntimeAdapterRegistry {
         input: AdapterRuntimeResolutionInput<'_>,
     ) -> Result<AdapterRuntimeProjection> {
         match kind {
+            AdapterKind::CustomAcp => resolve_acp_runtime(kind, input),
             AdapterKind::CodexCli => self.codex_cli.resolve_runtime(input),
             AdapterKind::Pi => resolve_pi_runtime(input),
             AdapterKind::OpencodeCli => self.opencode_cli.resolve_runtime(input),
@@ -1011,6 +1013,7 @@ impl AgentRuntimeAdapterRegistry {
 
     pub fn skill_discovery(&self, kind: AdapterKind) -> SkillDiscoveryCapability {
         match kind {
+            AdapterKind::CustomAcp => native_skill_discovery([], SkillDiscoveryVerification::DocumentationOnly),
             AdapterKind::CommandCodeCli => native_skill_discovery(
                 [SkillDeliveryGroupKey::CommandCode],
                 SkillDiscoveryVerification::DocumentationOnly,
@@ -1085,6 +1088,8 @@ impl AgentRuntimeAdapterRegistry {
 
     pub fn mcp_projection(&self, kind: AdapterKind) -> McpProjectionCapability {
         match kind {
+            // 每个定义的 supportsMcp 还须在冻结和实际握手处核对。
+            AdapterKind::CustomAcp => additive_native_mcp_projection(McpSameNamePolicy::RovaiWins),
             AdapterKind::CodexCli => self.codex_cli.mcp_projection(),
             AdapterKind::Pi => unsupported_external_mcp_projection(),
             AdapterKind::OpencodeCli => self.opencode_cli.mcp_projection(),
@@ -1195,6 +1200,7 @@ impl AgentRuntimeAdapterRegistry {
     /// Shipped permission vocabulary, independent of diagnostic observations.
     pub fn permission_options(&self, kind: AdapterKind) -> Vec<PermissionOptionDescriptor> {
         match kind {
+            AdapterKind::CustomAcp => Vec::new(),
             AdapterKind::CodexCli => codex_permission_options(),
             AdapterKind::Pi => pi_permission_options(),
             AdapterKind::OpencodeCli => opencode_permission_options(),

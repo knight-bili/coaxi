@@ -1,3 +1,4 @@
+use crate::custom_runtime::{CustomRuntimeRefV1,FrozenCustomRuntimeV1};
 use std::{
     collections::{BTreeMap, BTreeSet},
     path::Path,
@@ -57,6 +58,7 @@ pub enum AdapterKind {
     DeepseekHarness,
     ZcodeApp,
     AntigravityApp,
+    CustomAcp,
 }
 
 /// The only two ways a Runtime may publish assistant output into the Camp.
@@ -103,7 +105,7 @@ impl MissingSendRecoveryMode {
 }
 
 impl AdapterKind {
-    pub const ALL: [Self; 21] = [
+    pub const ALL: [Self; 22] = [
         Self::CodexCli,
         Self::Pi,
         Self::OpencodeCli,
@@ -125,6 +127,7 @@ impl AdapterKind {
         Self::GrokBuild,
         Self::DeepseekHarness,
         Self::ZcodeApp,
+        Self::CustomAcp,
     ];
 
     pub fn as_str(self) -> &'static str {
@@ -150,6 +153,7 @@ impl AdapterKind {
             Self::DeepseekHarness => "deepseek-harness",
             Self::ZcodeApp => "zcode-app",
             Self::AntigravityApp => "antigravity-app",
+            Self::CustomAcp => "custom-acp",
         }
     }
 
@@ -176,6 +180,7 @@ impl AdapterKind {
             Self::DeepseekHarness => "dsh",
             Self::ZcodeApp => "ZCode",
             Self::AntigravityApp => "agy",
+            Self::CustomAcp => "custom-acp",
         }
     }
 
@@ -207,6 +212,7 @@ impl AdapterKind {
             Self::OpenClawCli => &["openclaw"],
             Self::TraeCnCli => &["traecli"],
             Self::AntigravityApp => &["agy"],
+            Self::CustomAcp => &[],
         }
     }
 
@@ -233,6 +239,7 @@ impl AdapterKind {
             Self::DeepseekHarness => "DeepSeek Harness",
             Self::ZcodeApp => "ZCode",
             Self::AntigravityApp => "Antigravity",
+            Self::CustomAcp => "自定义智能体",
         }
     }
 
@@ -256,6 +263,7 @@ impl AdapterKind {
                 | Self::GrokBuild
                 | Self::DeepseekHarness
                 | Self::ZcodeApp
+                | Self::CustomAcp
         )
     }
 
@@ -282,6 +290,7 @@ impl AdapterKind {
             Self::DeepseekHarness => "ROVAI_DEEPSEEK_HARNESS_BIN",
             Self::ZcodeApp => "ROVAI_ZCODE_BIN",
             Self::AntigravityApp => "ROVAI_ANTIGRAVITY_BIN",
+            Self::CustomAcp => "ROVAI_CUSTOM_ACP_BIN",
         }
     }
 
@@ -312,7 +321,7 @@ impl AdapterKind {
             | Self::GrokBuild
             | Self::DeepseekHarness
             | Self::ZcodeApp
-            | Self::AntigravityApp => PublicOutputMode::ExplicitSendOnly,
+            | Self::AntigravityApp | Self::CustomAcp => PublicOutputMode::ExplicitSendOnly,
         }
     }
 
@@ -341,7 +350,7 @@ impl AdapterKind {
             | Self::DeepseekHarness
             | Self::ZcodeApp
             | Self::AntigravityApp => MissingSendRecoveryMode::IfNoAcceptedSend,
-            Self::CursorAgent => MissingSendRecoveryMode::Disabled,
+            Self::CursorAgent | Self::CustomAcp => MissingSendRecoveryMode::Disabled,
         }
     }
 }
@@ -372,6 +381,7 @@ impl FromStr for AdapterKind {
             "deepseek-harness" => Ok(Self::DeepseekHarness),
             "zcode-app" => Ok(Self::ZcodeApp),
             "antigravity-app" => Ok(Self::AntigravityApp),
+            "custom-acp" => Ok(Self::CustomAcp),
             _ => anyhow::bail!("unsupported Adapter kind: {value}"),
         }
     }
@@ -472,6 +482,8 @@ pub(crate) struct ResolvedRuntimeBinding {
     pub installation_id: String,
     pub model: ModelSelection,
     pub permissions: AdapterPermissionConfig,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub custom_runtime_ref: Option<CustomRuntimeRefV1>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -480,6 +492,8 @@ pub struct MemberRuntimeConfiguration {
     pub adapter_kind: AdapterKind,
     pub model: ModelSelection,
     pub permissions: AdapterPermissionConfig,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub custom_runtime_ref: Option<CustomRuntimeRefV1>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -519,6 +533,8 @@ pub struct FrozenAgentRuntimeConfig {
     pub binding_compatibility_digest: String,
     pub host_config_digest: String,
     pub config_digest: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub custom_runtime: Option<FrozenCustomRuntimeV1>,
 }
 
 impl FrozenAgentRuntimeConfig {
@@ -945,6 +961,8 @@ pub struct SetMemberRuntimeConfigurationCommand {
     pub adapter_kind: AdapterKind,
     pub model: ModelSelection,
     pub permissions: AdapterPermissionConfig,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub custom_runtime_ref: Option<CustomRuntimeRefV1>,
 }
 
 impl sealed::Sealed for SetMemberRuntimeConfigurationCommand {}
@@ -2770,6 +2788,7 @@ impl AgentProfileService {
                 ));
             }
             let mut binding = ResolvedRuntimeBinding {
+                custom_runtime_ref: None,
                 adapter_kind: envelope.payload.adapter_kind,
                 installation_id: ready.installation_id.clone(),
                 model: envelope.payload.model.clone(),
@@ -3663,6 +3682,7 @@ impl AgentProfileService {
             (None, None, None, None) => None,
             (Some(adapter_kind), Some(installation_id), Some(model), Some(permissions)) => {
                 Some(ResolvedRuntimeBinding {
+                    custom_runtime_ref: None,
                     adapter_kind: AdapterKind::from_str(&adapter_kind)?,
                     installation_id,
                     model: serde_json::from_str(&model)
@@ -3678,6 +3698,7 @@ impl AgentProfileService {
             resolved_runtime_binding
                 .as_ref()
                 .map(|binding| MemberRuntimeConfiguration {
+                    custom_runtime_ref: None,
                     adapter_kind: binding.adapter_kind,
                     model: binding.model.clone(),
                     permissions: binding.permissions.clone(),
@@ -4387,6 +4408,7 @@ pub(crate) fn resolve_rebound_runtime_on_connection(
     let mut rebound = match resolve_frozen_runtime_binding_with_snapshot(
         connection,
         &ResolvedRuntimeBinding {
+            custom_runtime_ref: None,
             adapter_kind: frozen.adapter_kind,
             installation_id: frozen.installation_id.clone(),
             model,
@@ -4510,6 +4532,7 @@ pub fn resolve_frozen_runtime(
     // remain outer errors so a database outage cannot be mistaken for bad input.
     let binding = (|| -> Result<ResolvedRuntimeBinding> {
         Ok(ResolvedRuntimeBinding {
+            custom_runtime_ref: None,
             adapter_kind: AdapterKind::from_str(&selected_runtime_adapter_kind)?,
             installation_id: installation_id.clone(),
             model: serde_json::from_str(&model_json)?,
@@ -4701,6 +4724,7 @@ fn resolve_frozen_runtime_binding_with_snapshot(
         }
     };
     let mut frozen = FrozenAgentRuntimeConfig {
+        custom_runtime: None,
         environment: None,
         custom_api,
         camp_fast: None,
@@ -5361,6 +5385,7 @@ fn model_option_validation_rejects_preserved_effort_after_catalog_refresh() {
         }],
     }];
     let binding = ResolvedRuntimeBinding {
+        custom_runtime_ref: None,
         adapter_kind: AdapterKind::CodexCli,
         installation_id: "test-codex".to_string(),
         model: ModelSelection::Explicit {
@@ -5430,6 +5455,7 @@ fn model_option_validation_rejects_preserved_effort_after_catalog_refresh() {
 
 pub(crate) fn member_runtime_defaults(adapter_kind: AdapterKind) -> MemberRuntimeConfiguration {
     MemberRuntimeConfiguration {
+        custom_runtime_ref: None,
         adapter_kind,
         model: ModelSelection::RuntimeDefault,
         permissions: AdapterPermissionConfig {
@@ -6570,6 +6596,7 @@ mod slow_tests {
                     &user_command(
                         "expired-catalog-runtime-default",
                         SetMemberRuntimeConfigurationCommand {
+                            custom_runtime_ref: None,
                             environment_update: None,
                             agent_id: profile.agent_id.clone(),
                             expected_version: profile.version,
@@ -6595,6 +6622,7 @@ mod slow_tests {
                     &user_command(
                         "expired-catalog-explicit-model",
                         SetMemberRuntimeConfigurationCommand {
+                            custom_runtime_ref: None,
                             environment_update: None,
                             agent_id: configured.agent_id,
                             expected_version: configured.version,
@@ -6859,6 +6887,7 @@ mod slow_tests {
                 &user_command(
                     "set-runtime",
                     SetMemberRuntimeConfigurationCommand {
+                        custom_runtime_ref: None,
                         environment_update: None,
                         agent_id: profile_id.clone(),
                         expected_version: profile.version,
@@ -6925,6 +6954,7 @@ mod slow_tests {
             .expect("configured profile should retain its Runtime")
             .clone();
         let runtime_binding = ResolvedRuntimeBinding {
+            custom_runtime_ref: None,
             adapter_kind: runtime_configuration.adapter_kind,
             installation_id: managed_installation_id.clone(),
             model: runtime_configuration.model.clone(),
@@ -7299,6 +7329,7 @@ mod slow_tests {
                 &user_command(
                     "set-mismatched-runtime",
                     SetMemberRuntimeConfigurationCommand {
+                        custom_runtime_ref: None,
                         environment_update: None,
                         agent_id: profile.agent_id,
                         expected_version: profile.version,
@@ -7353,6 +7384,7 @@ mod slow_tests {
                 &user_command(
                     "explicit-runtime-config",
                     SetMemberRuntimeConfigurationCommand {
+                        custom_runtime_ref: None,
                         environment_update: None,
                         agent_id: profile.agent_id.clone(),
                         expected_version: profile.version,
@@ -7402,6 +7434,7 @@ mod slow_tests {
                 &user_command(
                     "invalid-runtime-config",
                     SetMemberRuntimeConfigurationCommand {
+                        custom_runtime_ref: None,
                         environment_update: None,
                         agent_id: profile.agent_id.clone(),
                         expected_version: configured.version,
@@ -7533,6 +7566,7 @@ mod slow_tests {
                     &user_command(
                         &format!("retain-model-{index}"),
                         SetMemberRuntimeConfigurationCommand {
+                            custom_runtime_ref: None,
                             environment_update: None,
                             agent_id: profile.agent_id.clone(),
                             expected_version: if stale_version { version - 1 } else { version },
@@ -7581,6 +7615,7 @@ mod slow_tests {
                     &user_command(
                         &format!("manual-model-{index}"),
                         SetMemberRuntimeConfigurationCommand {
+                            custom_runtime_ref: None,
                             environment_update: None,
                             agent_id: profile.agent_id.clone(),
                             expected_version: version,
@@ -7622,6 +7657,7 @@ mod slow_tests {
                 &user_command(
                     "select-unresolved-codex",
                     SetMemberRuntimeConfigurationCommand {
+                        custom_runtime_ref: None,
                         environment_update: None,
                         agent_id: profile.agent_id.clone(),
                         expected_version: profile.version,
@@ -7841,6 +7877,7 @@ mod slow_tests {
                     &user_command(
                         "configure-detected",
                         SetMemberRuntimeConfigurationCommand {
+                            custom_runtime_ref: None,
                             environment_update: None,
                             agent_id: profile.agent_id.clone(),
                             expected_version: profile.version,
@@ -7867,6 +7904,7 @@ mod slow_tests {
                             &user_command(
                                 &uuid::Uuid::new_v4().to_string(),
                                 SetMemberRuntimeConfigurationCommand {
+                                    custom_runtime_ref: None,
                                     environment_update: None,
                                     agent_id: profile.agent_id,
                                     expected_version: profile.version,
@@ -7914,6 +7952,7 @@ mod slow_tests {
                                 &user_command(
                                     &uuid::Uuid::new_v4().to_string(),
                                     SetMemberRuntimeConfigurationCommand {
+                                        custom_runtime_ref: None,
                                         environment_update: None,
                                         agent_id: profile.agent_id,
                                         expected_version: profile.version,
@@ -7936,6 +7975,7 @@ mod slow_tests {
                     let frozen = resolve_frozen_runtime_binding(
                         database.connection(),
                         &ResolvedRuntimeBinding {
+                            custom_runtime_ref: None,
                             adapter_kind: kind,
                             installation_id: installation_id.clone(),
                             model: saved,
@@ -7987,6 +8027,7 @@ mod slow_tests {
                         &user_command(
                             "save-after-catalog-failure",
                             SetMemberRuntimeConfigurationCommand {
+                                custom_runtime_ref: None,
                                 environment_update: None,
                                 agent_id: profile.agent_id.clone(),
                                 expected_version: after_failure.version,
@@ -8000,6 +8041,7 @@ mod slow_tests {
                 assert_eq!(saved_again.result.status, CommandResultStatus::Applied);
             }
             let binding = ResolvedRuntimeBinding {
+                custom_runtime_ref: None,
                 adapter_kind: kind,
                 installation_id,
                 model: selected,
@@ -8286,6 +8328,7 @@ mod slow_tests {
                 &user_command(
                     "select-managed-codex",
                     SetMemberRuntimeConfigurationCommand {
+                        custom_runtime_ref: None,
                         environment_update: None,
                         agent_id: profile.agent_id,
                         expected_version: profile.version,
@@ -8547,6 +8590,7 @@ mod slow_tests {
                 &user_command(
                     "configure-light-qwen",
                     SetMemberRuntimeConfigurationCommand {
+                        custom_runtime_ref: None,
                         environment_update: None,
                         agent_id: profile.agent_id.clone(),
                         expected_version: profile.version,
@@ -8569,6 +8613,7 @@ mod slow_tests {
         let frozen = resolve_frozen_runtime_binding(
             database.connection(),
             &ResolvedRuntimeBinding {
+                custom_runtime_ref: None,
                 adapter_kind: AdapterKind::QwenCode,
                 installation_id,
                 model: ModelSelection::RuntimeDefault,

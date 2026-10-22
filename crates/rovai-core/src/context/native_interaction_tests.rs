@@ -76,6 +76,7 @@ fn assert_native_interaction_storage(f: &mut Fixture) {
         .unwrap();
     let installation = installed.result.payload["installationId"].as_str().unwrap();
     let configuration = MemberRuntimeConfiguration {
+        custom_runtime_ref: None,
         adapter_kind: adapter,
         model: ModelSelection::RuntimeDefault,
         permissions: AdapterPermissionConfig {

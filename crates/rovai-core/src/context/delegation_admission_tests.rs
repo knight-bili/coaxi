@@ -264,6 +264,7 @@ fn assert_parent_start_admission(f: &mut Fixture, legacy_private_run: &str) {
     let runtime: crate::agent_profile::FrozenAgentRuntimeConfig =
         serde_json::from_value(config["runtime"].clone()).unwrap();
     let configuration = crate::agent_profile::MemberRuntimeConfiguration {
+        custom_runtime_ref: None,
         adapter_kind: runtime.adapter_kind,
         model: crate::agent_profile::ModelSelection::RuntimeDefault,
         permissions: runtime.permissions.clone(),

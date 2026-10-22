@@ -33608,6 +33608,7 @@ for line in sys.stdin:
             "#!/bin/sh\ntrap '' TERM\nread -r line\nprintf '%s\\n' '{\"id\":1,\"result\":{}}'\nwhile read -r line; do :; done\n",
         );
         let runtime_config = FrozenAgentRuntimeConfig {
+            custom_runtime: None,
             environment: None,
             custom_api: None,
             camp_fast: None,

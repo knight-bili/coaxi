@@ -2885,6 +2885,7 @@ mod tests {
             },
             permission_semantics: PermissionSemantics::RuntimeManagedV2,
             runtime: FrozenAgentRuntimeConfig {
+                custom_runtime: None,
                 environment: None,
                 custom_api: None,
                 camp_fast: None,

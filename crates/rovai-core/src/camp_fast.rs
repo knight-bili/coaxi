@@ -432,6 +432,7 @@ mod tests {
         let runtime = resolve_frozen_runtime_binding(
             database.connection(),
             &ResolvedRuntimeBinding {
+                custom_runtime_ref: None,
                 adapter_kind: initial.adapter_kind,
                 installation_id,
                 model: serde_json::from_str(&model).unwrap(),

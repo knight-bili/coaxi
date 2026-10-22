@@ -344,6 +344,7 @@ mod tests {
 
     fn base(kind: AdapterKind) -> MemberRuntimeConfiguration {
         MemberRuntimeConfiguration {
+            custom_runtime_ref: None,
             adapter_kind: kind,
             model: ModelSelection::RuntimeDefault,
             permissions: AdapterPermissionConfig {

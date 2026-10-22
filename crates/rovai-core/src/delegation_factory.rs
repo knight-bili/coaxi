@@ -132,6 +132,7 @@ pub(crate) fn create_child(
     let base = crate::agent_profile::resolve_frozen_runtime_binding(
         tx,
         &ResolvedRuntimeBinding {
+            custom_runtime_ref: None,
             adapter_kind: plan.configuration.adapter_kind,
             installation_id: plan.installation_id.into(),
             model: selected.model,
