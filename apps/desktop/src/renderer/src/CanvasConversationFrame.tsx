@@ -23,23 +23,24 @@ export interface CanvasConversationBridge {
   prepare(keys: readonly string[]): Promise<ThreadLeavePreparation>
 }
 
-export function CanvasConversationFrame({ bridge, instance, title, orphaned = false, onOpenWorkspace }: {
-  bridge: CanvasConversationBridge; instance: CanvasConversationBridge['instances'][number]; title: string; orphaned?: boolean; onOpenWorkspace(): void
+export function CanvasConversationFrame({ bridge, instance, title, orphaned = false, grouped=false,onOpenWorkspace }: {
+  bridge: CanvasConversationBridge; instance: CanvasConversationBridge['instances'][number]; title: string; orphaned?: boolean;grouped?:boolean;onOpenWorkspace(): void
 }): React.JSX.Element {
   const { target, key, busy } = instance
   const inline = target.presentation === 'inline' && !orphaned
-  return <section className={`canvas-conversation-frame nodrag nowheel nopan${inline ? ' is-inline' : ''}`} data-canvas-conversation-key={key} aria-label={uiAttribute('画布对话：{0}', title)}
+  return <section className={`canvas-conversation-frame nodrag nowheel nopan${inline ? ' is-inline' : ''}${grouped?' is-grouped':''}`} data-canvas-conversation-key={key} aria-label={uiAttribute('画布对话：{0}', title)}
     onKeyDown={event => {
       if (event.key === 'Escape' && !event.defaultPrevented) { event.preventDefault(); void bridge.close([key]) }
       // Preserve document-level conversation shortcuts, while isolating canvas movement/deletion.
       if (['Escape', 'Delete', 'Backspace', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) event.stopPropagation()
     }} onWheel={event => event.stopPropagation()}
     onPointerDown={event => event.stopPropagation()}>
-    {!inline && <header className="canvas-conversation-heading">
+    {!inline&&!grouped && <header className="canvas-conversation-heading">
       <MessageSquare size={16} aria-hidden="true" />
       <strong title={title}>{title}</strong>
       <CanvasConversationActions bridge={bridge} instance={instance} orphaned={orphaned} onOpenWorkspace={onOpenWorkspace} />
     </header>}
+    {grouped&&<div className="canvas-conversation-group-actions"><CanvasConversationActions bridge={bridge} instance={instance} orphaned={orphaned} onOpenWorkspace={onOpenWorkspace}/></div>}
     {orphaned && <p className="canvas-notice" role="status"><UiText zh="原画布卡片已变更，当前对话保留在侧边，请先保存或收起。" /></p>}
     <div className="canvas-conversation-content" inert={busy} aria-busy={busy}>{instance.content}</div>
   </section>
