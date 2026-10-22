@@ -264,6 +264,17 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
   const expanded = useMemo(() => new Set(view.expandedRegions), [view.expandedRegions])
   const conversationInstances = props.conversation?.instances ?? EMPTY_CONVERSATIONS
   const [groupedConversations,setGroupedConversations]=useState(false),[groupedSelected,setGroupedSelected]=useState<string|null>(null),[groupedPlacements,setGroupedPlacements]=useState<SplitDeckPlacement[]>([])
+  const groupedRestoredLayout=useRef<unknown>(null),[groupedRestoreToken,setGroupedRestoreToken]=useState(0)
+  const groupedStorageKey=props.scope?`rovai.canvas.conversation-groups.v1:${JSON.stringify([props.scope.host,props.scope.core,props.boardId])}`:null
+  useEffect(()=>{
+    groupedRestoredLayout.current=null;setGroupedConversations(false);setGroupedSelected(null);setGroupedPlacements([])
+    if(!groupedStorageKey||!storage)return
+    try{const raw=storage.getItem(groupedStorageKey);if(!raw)return;if(raw.length>96000)throw new Error('会话分屏布局过大，原记录保留。');const value=JSON.parse(raw)as {schemaVersion:number;boardId:string;layout:unknown};if(value.schemaVersion!==1||value.boardId!==props.boardId)throw new Error('会话分屏布局归属不一致，原记录保留。');groupedRestoredLayout.current=value.layout}catch(error){setIssue(readErrorMessage(error))}
+  },[groupedStorageKey,storage,props.boardId])
+  const saveGroupedLayout=useCallback((layout:unknown):void=>{
+    if(!groupedConversations||!groupedStorageKey||!storage||props.conversation?.restoring)return
+    try{const value=JSON.stringify({schemaVersion:1,boardId:props.boardId,layout});if(value.length>96000)throw new Error('会话分屏布局过大，当前布局仍在屏幕中。');storage.setItem(groupedStorageKey,value);groupedRestoredLayout.current=layout}catch(error){setIssue(readErrorMessage(error))}
+  },[groupedConversations,groupedStorageKey,storage,props.boardId,props.conversation?.restoring])
   const placeGroupedConversations=useCallback((value:SplitDeckPlacement[])=>setGroupedPlacements(value),[])
   useEffect(()=>{if(!conversationInstances.some(instance=>instance.target.boardId===props.boardId))setGroupedConversations(false)},[conversationInstances,props.boardId])
   // Content elements/visibility reports change without changing any node geometry.
@@ -480,7 +491,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
   }
   // Codeg's board actions stay in a bottom-centred dock; viewport controls own their corner.
   const toolbar = <div className="canvas-toolbar" role="toolbar" aria-label={uiAttribute('画布工具')}>
-    <CanvasIconButton label={uiAttribute(groupedConversations?'回到自由画布':'会话标签与分屏')} disabled={!conversationInstances.some(instance=>instance.target.boardId===props.boardId)||Boolean(props.conversation?.opening||props.conversation?.leaving)} onClick={()=>setGroupedConversations(value=>!value)}><Columns2 size={16}/></CanvasIconButton>
+    <CanvasIconButton label={uiAttribute(groupedConversations?'回到自由画布':'会话标签与分屏')} disabled={!conversationInstances.some(instance=>instance.target.boardId===props.boardId)||Boolean(props.conversation?.opening||props.conversation?.leaving||props.conversation?.restoring)} onClick={()=>{if(!groupedConversations)setGroupedRestoreToken(value=>value+1);setGroupedConversations(value=>!value)}}><Columns2 size={16}/></CanvasIconButton>
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild><button type="button" className="canvas-icon-button" disabled={blocked} aria-label={uiAttribute('添加节点')} title={uiAttribute('添加节点')}><Plus size={18} /></button></DropdownMenu.Trigger>
       <DropdownMenu.Portal><DropdownMenu.Content className="canvas-card-menu" side="top" align="start" sideOffset={10} collisionPadding={12} loop onCloseAutoFocus={event => event.preventDefault()}>
@@ -611,7 +622,7 @@ function CanvasSurfaceContent(props: CanvasSurfaceProps): React.JSX.Element {
             y1={guide.axis === 'y' ? guide.at : guide.from} y2={guide.axis === 'y' ? guide.at : guide.to} vectorEffect="non-scaling-stroke" />)}
         </svg>
           <div className="canvas-conversation-deck-overlay" hidden={!groupedConversations} style={{left:-viewport.x/viewport.zoom,top:-viewport.y/viewport.zoom,width:stageSize.width,height:Math.max(0,stageSize.height-72),transform:`scale(${1/viewport.zoom})`}}>
-            <SplitTabDeck key={`${props.boardId}:conversations`} scopeKey={`${props.boardId}:conversations`} items={conversationInstances.filter(instance=>instance.target.boardId===props.boardId).map(instance=>({id:instance.key,label:title(instance.target.reference)}))} selected={groupedSelected} onSelect={setGroupedSelected} onClose={key=>{void props.conversation?.close([key])}} disabled={Boolean(props.conversation?.opening||props.conversation?.leaving||props.conversation?.restoring)} renderBody={()=>null} externalBodies onPlacement={placeGroupedConversations}/>
+            <SplitTabDeck key={`${props.boardId}:conversations`} scopeKey={`${props.boardId}:conversations`} items={conversationInstances.filter(instance=>instance.target.boardId===props.boardId).map(instance=>({id:instance.key,label:title(instance.target.reference)}))} selected={groupedSelected} onSelect={setGroupedSelected} onClose={key=>{void props.conversation?.close([key])}} disabled={Boolean(props.conversation?.opening||props.conversation?.leaving||props.conversation?.restoring)} renderBody={()=>null} externalBodies onPlacement={placeGroupedConversations} restoredLayout={groupedRestoredLayout.current} restoreToken={groupedRestoreToken} onLayoutChange={saveGroupedLayout}/>
           </div>
           {conversationInstances.filter(instance => instance.target.boardId === props.boardId).map((instance, index) => {
             const row = rows.find(row => canvasConversationMatches(row, instance.target))

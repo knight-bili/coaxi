@@ -44,14 +44,15 @@ export function SplitTabDeck({items,selected,onSelect,onClose,renderBody,disable
   restoredLayout?:unknown;restoreToken?:number;onLayoutChange?(value:unknown):void
 }):React.JSX.Element{
   const t=useUiText(),root=useRef<HTMLDivElement>(null),[state,setState]=useState(initial),drag=useRef<string|null>(null)
+  const skipRestoringLayout=useRef(false)
   const restoreRef=useRef(restoredLayout);restoreRef.current=restoredLayout
-  useEffect(()=>{const next=restored(restoreRef.current);if(next)setState(next)},[restoreToken])
+  useEffect(()=>{skipRestoringLayout.current=true;const next=restored(restoreRef.current);if(next)setState(next)},[restoreToken])
   const view=project(state,items,selected),rects=computeRects(view.tree),ids=leafIds(view.tree),active=view.groups[view.active]
   const placements=items.map(item=>{const groupId=ids.find(id=>view.groups[id].tabs.includes(item.id))??view.active;return {id:item.id,rect:rects.groups.get(groupId)!,visible:view.groups[groupId].selected===item.id}}),placementKey=JSON.stringify(placements),placementCallback=useRef(onPlacement)
   placementCallback.current=onPlacement
   useEffect(()=>{placementCallback.current?.(JSON.parse(placementKey)as SplitDeckPlacement[])},[placementKey])
   const layoutCallback=useRef(onLayoutChange),layoutKey=JSON.stringify(view);layoutCallback.current=onLayoutChange
-  useEffect(()=>{layoutCallback.current?.(JSON.parse(layoutKey))},[layoutKey])
+  useEffect(()=>{if(skipRestoringLayout.current){skipRestoringLayout.current=false;return}layoutCallback.current?.(JSON.parse(layoutKey))},[layoutKey])
   useEffect(()=>{setState(current=>project(current,items,selected))},[items,selected])
   const select=(groupId:string,id:string):void=>{setState({...view,active:groupId,groups:{...view.groups,[groupId]:{...view.groups[groupId],selected:id}}});onSelect(id)}
   const split=(groupId:string,direction:SplitDirection):void=>{
