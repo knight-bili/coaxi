@@ -8,7 +8,7 @@ pub fn prepare(connection:&mut Connection,binding:&Binding,core_instance:&str,rp
     let binding_digest=digest(&serde_json::to_value(binding)?)?;
     validate_shape("privatePrepareRequest",&json!({"schemaVersion":1,"bindingDigest":binding_digest,"transportRpcId":rpc_id,"argumentsDigest":arguments_digest}))?;
     let tx=connection.transaction_with_behavior(TransactionBehavior::Immediate)?;storage::require_binding(&tx,binding,core_instance)?;
-    let guard=storage::run_guard(&tx,&binding.scope,&binding.agent_id,&binding.agent_run_id,binding.execution_epoch)?;
+    let guard=storage::receiving_guard(&tx,&binding.scope,&binding.agent_id,&binding.agent_run_id,binding.execution_epoch)?;
     ensure!(guard["nativeSessionId"].is_string(),"binding_changed");
     let rpc_json=serde_json::to_string(&rpc_id)?;
     let previous:Option<(String,String,String,String,String,String)>=tx.query_row("SELECT id,binding_digest,arguments_digest,feedback_ids_json,result_json,result_digest FROM ui_feedback_attempt WHERE bridge_instance_id=?1 AND rpc_id_json=?2",params![binding.bridge_instance_id,rpc_json],|row|Ok((row.get(0)?,row.get(1)?,row.get(2)?,row.get(3)?,row.get(4)?,row.get(5)?))).optional()?;

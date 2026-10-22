@@ -35,6 +35,13 @@ pub fn run_guard(connection:&Connection,target:&Scope,agent:&str,run:&str,epoch:
     "#,params![run,epoch,target.thread_id,agent,target.scope_kind,target.conversation_id,crate::execution_budget::camp_turn_execution_budget_now().to_rfc3339()],|row|Ok(json!({"nativeBindingId":row.get::<_,Option<String>>(0)?,"nativeBindingGeneration":row.get::<_,i64>(1)?,"nativeSessionId":row.get::<_,Option<String>>(2)?,"membershipGeneration":row.get::<_,i64>(3)?,"memberVersion":row.get::<_,i64>(4)?,"policyRevision":current_policy.revision}))).optional()?;
     guard.context("run_not_active")
 }
+/// 用户确认和实际工具领取必须属于已冻结了反馈服务器的任务。
+/// 工具 catalog 的启动握手仍可早于 ContextManifest，不在该阶段塞入旧任务。
+pub fn receiving_guard(connection:&Connection,target:&Scope,agent:&str,run:&str,epoch:u64)->Result<Value>{
+    let guard=run_guard(connection,target,agent,run,epoch)?;
+    let admitted:bool=connection.query_row("SELECT EXISTS(SELECT 1 FROM context_manifest m,json_each(m.mcp_exposure_json,'$.servers') s WHERE m.agent_run_id=?1 AND json_extract(s.value,'$.serverId')=?2)",params![run,SERVER_NAME],|row|row.get(0))?;
+    ensure!(admitted,"runtime_unavailable");Ok(guard)
+}
 pub fn require_binding(connection:&Connection,binding:&Binding,core_instance:&str)->Result<()>{
     validate_shape("binding",&serde_json::to_value(binding)?)?;
     ensure!(binding.core_instance_id==core_instance&&DateTime::parse_from_rfc3339(&binding.expires_at)?.with_timezone(&Utc)>Utc::now(),"binding_changed");
@@ -48,7 +55,7 @@ pub fn require_binding(connection:&Connection,binding:&Binding,core_instance:&st
 pub fn preview(connection:&mut Connection,input:PreviewRequest)->Result<PreviewResult>{
     let text=preview_text(&input)?;
     let tx=connection.transaction_with_behavior(TransactionBehavior::Immediate)?;
-    let guard=run_guard(&tx,&input.scope,&input.agent_id,&input.agent_run_id,input.execution_epoch)?;
+    let guard=receiving_guard(&tx,&input.scope,&input.agent_id,&input.agent_run_id,input.execution_epoch)?;
     if let Source::GeneratedCard{origin}=&input.source{super::cards::require_card_fields(&tx,&input,origin)?}
     let id=uuid::Uuid::new_v4().to_string(),now=Utc::now(),expires=(now+chrono::Duration::minutes(10)).to_rfc3339();
     let request_json=serde_json::to_string(&input)?;
@@ -68,7 +75,7 @@ pub fn submit(connection:&mut Connection,input:SubmitRequest)->Result<Receipt>{
     let(raw,result,original_guard,expires):(String,String,String,String)=tx.query_row("SELECT request_json,result_json,binding_guard_json,expires_at FROM ui_feedback_preview WHERE id=?1",[&input.preview_id],|row|Ok((row.get(0)?,row.get(1)?,row.get(2)?,row.get(3)?)))?;
     let source:PreviewRequest=serde_json::from_str(&raw)?;let result:PreviewResult=serde_json::from_str(&result)?;
     ensure!(result.preview_digest==input.preview_digest&&DateTime::parse_from_rfc3339(&expires)?.with_timezone(&Utc)>Utc::now(),"feedback.preview_changed");
-    let guard=run_guard(&tx,&source.scope,&source.agent_id,&source.agent_run_id,source.execution_epoch)?;ensure!(serde_json::from_str::<Value>(&original_guard)?==guard,"binding_changed");
+    let guard=receiving_guard(&tx,&source.scope,&source.agent_id,&source.agent_run_id,source.execution_epoch)?;ensure!(serde_json::from_str::<Value>(&original_guard)?==guard,"binding_changed");
     if let Source::GeneratedCard{origin}=&source.source{super::cards::require_card_fields(&tx,&source,origin)?}
     let existing:Option<String>=tx.query_row("SELECT id FROM ui_feedback_entry WHERE preview_id=?1",[&input.preview_id],|row|row.get(0)).optional()?;
     let response=if let Some(id)=existing{receipt(&tx,&id)?}else{
