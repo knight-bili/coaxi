@@ -29,6 +29,7 @@ export class PortableConfigurationPrivate{
     if(operation==='receipt')return this.core.request('configuration.archive.receipt',input)
     if(operation==='exportPrepare')return this.core.request('configuration.export.prepare',input)
     if(operation==='exportReceipt')return this.core.request('configuration.export.receipt',input)
+    if(operation==='sync')return this.core.request('configuration.sync',input)
     if(operation==='exportSave'){
       if(Object.keys(value).length!==1||typeof value.operationId!=='string')throw new Error('configuration.export_input_invalid')
       const result=await this.core.request<{artifactPath:string;encryptedDigest:string;byteSize:number;state:string}>('configuration.export.read',input)

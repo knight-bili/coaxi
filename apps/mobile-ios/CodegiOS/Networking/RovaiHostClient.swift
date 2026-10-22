@@ -90,7 +90,7 @@ actor RovaiHostClient {
 
     /// 私有内容不进入普通命令恢复正文；失败只显示固定原因，未知结果核对原编号。
     func privateConfiguration(_ action: String, input: JSONValue) async throws -> JSONValue {
-        guard ["provider", "secrets", "receipt", "export", "export-receipt"].contains(action), try JSONEncoder().encode(input).count <= 2 * 1024 * 1024 else { throw RovaiHostFailure(code: "配置私有操作无效") }
+        guard ["provider", "secrets", "receipt", "export", "export-receipt", "sync"].contains(action), try JSONEncoder().encode(input).count <= 2 * 1024 * 1024 else { throw RovaiHostFailure(code: "配置私有操作无效") }
         let current = try await connect(); let lifetime = generation
         let envelope: JSONValue
         do { envelope = try await post("configuration/" + action, body: input, bearer: current.token) }

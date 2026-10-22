@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { AppDialogContent, AppDialogHeader } from './AppDialog'
-import { useThreadClient } from './camp-client'
+import { useConfigurationSyncHost } from './configuration-sync-host'
 import { useUiText } from './interface-language'
 import { newCommandId } from '../../shared/command-id'
 
 type Plan = {commandId: string; createdAt: string; items: Array<{id: string; bytes: number; sha256: string; at: string}>; removed: string[]; bytes: number; removedBytes: number; kept?: number; remaining?: number}
 export function ConfigurationCacheCleanup({revision, disabled}: {revision: string | null; disabled: boolean}): React.JSX.Element | null {
-  const native = useThreadClient().webdavWorkspace, t = useUiText()
+  const native = useConfigurationSyncHost(), t = useUiText()
   const [plan, setPlan] = useState<Plan | null>(null), [busy, setBusy] = useState(false), [unknown, setUnknown] = useState(false)
   const [error, setError] = useState<string | null>(null), [notice, setNotice] = useState<string | null>(null)
   useEffect(() => {setPlan(null); setUnknown(false); setError(null); setNotice(null)}, [revision])

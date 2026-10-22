@@ -2,13 +2,13 @@ import {ConfigurationCacheCleanup} from './ConfigurationCacheCleanup'
 import {useEffect,useRef,useState} from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import {AppDialogContent,AppDialogHeader} from './AppDialog'
-import {useThreadClient} from './camp-client'
+import {useConfigurationSyncHost} from './configuration-sync-host'
 import {useUiText} from './interface-language'
 import {newCommandId} from '../../shared/command-id'
 type SyncSettings={revision:string|null;enabled:boolean;autoSync:boolean;fullConfiguration:boolean;includeSecrets:boolean;intervalMinutes:number;passphraseSet:boolean;state:{activeCommandId:string|null;phase:string;lastSyncAt:string|null;lastError:string|null;nextAt:number}}
 const initial:SyncSettings={revision:null,enabled:false,autoSync:false,fullConfiguration:false,includeSecrets:false,intervalMinutes:5,passphraseSet:false,state:{activeCommandId:null,phase:'idle',lastSyncAt:null,lastError:null,nextAt:0}}
 export function ConfigurationSyncSettings({remoteReady}:{remoteReady:boolean}):React.JSX.Element{
-  const native=useThreadClient().webdavWorkspace,t=useUiText();const [saved,setSaved]=useState(initial),[draft,setDraft]=useState(initial),[dirty,setDirty]=useState(false),[secret,setSecret]=useState(''),[clear,setClear]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState<string|null>(null),[notice,setNotice]=useState<string|null>(null),[archive,setArchive]=useState<{id:string;revision:string}|null>(null);const dirtyRef=useRef(false)
+  const native=useConfigurationSyncHost(),t=useUiText();const [saved,setSaved]=useState(initial),[draft,setDraft]=useState(initial),[dirty,setDirty]=useState(false),[secret,setSecret]=useState(''),[clear,setClear]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState<string|null>(null),[notice,setNotice]=useState<string|null>(null),[archive,setArchive]=useState<{id:string;revision:string}|null>(null);const dirtyRef=useRef(false)
   const accept=(value:SyncSettings):void=>{setSaved(value);setDraft(value);setSecret('');setClear(false);dirtyRef.current=false;setDirty(false)}
   const refresh=async():Promise<void>=>{if(!native)return;const value=await native.request<SyncSettings>({operation:'config_get',expectedRevision:null});if(value){setSaved(value);if(!dirtyRef.current)setDraft(value)}}
   useEffect(()=>{if(!native)return;let retired=false;const read=async():Promise<void>=>{try{const value=await native.request<SyncSettings>({operation:'config_get',expectedRevision:null});if(!retired&&value){setSaved(value);if(!dirtyRef.current)setDraft(value)}}catch(failure){if(!retired)setError(String(failure))}};void read();const timer=setInterval(()=>{if(document.visibilityState!=='hidden')void read()},4000);return()=>{retired=true;clearInterval(timer)}},[native])

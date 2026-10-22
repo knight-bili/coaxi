@@ -87,7 +87,7 @@ class RovaiHostClient(rawBaseUrl:String,private val administratorToken:String,
 
     /** 密钥只经专用入口发送；不进入普通命令持久队列或错误正文。 */
     suspend fun privateConfiguration(action:String,input:JsonObject):JsonObject {
-        require(action in listOf("provider","secrets","receipt","export","export-receipt")){"配置私有操作无效"}
+        require(action in listOf("provider","secrets","receipt","export","export-receipt","sync")){"配置私有操作无效"}
         require(input.toString().toByteArray(Charsets.UTF_8).size<=2*1024*1024){"配置输入过大"}
         val current=connect();val generation=lifetime.get()
         val envelope=try{post("configuration/$action",input,current.token).jsonObject}
