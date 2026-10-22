@@ -6,6 +6,7 @@ use std::sync::LazyLock;
 
 mod model;
 mod schema;
+pub mod policy;
 pub mod storage;
 pub use model::*;
 pub const SERVER_NAME:&str="rovai-conversation-tools";
