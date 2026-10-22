@@ -32,6 +32,7 @@ struct RovaiNativeContinuation: View {
     @State private var members: [JSONValue] = [], member = "", title = ""
     @State private var packet: JSONValue?, receipt: JSONValue?, issue: String?, generation: UInt64?
     @State private var ready = false, busy = false
+    @State private var working = false
     private var owner: String {"native-continuation:\(entry.text("linkedThreadId")):\(entry.text("id"))"}
     private var preview: JSONValue? {packet?["preview"]}
     private var original: JSONValue? {packet?["original"]}
@@ -50,7 +51,7 @@ struct RovaiNativeContinuation: View {
                 if let receipt {Section("原创建结果") {
                     Text(nativeCreationState(receipt));Text(receipt.text("commandId")).font(.caption2).textSelection(.enabled)
                     if let error = receipt["error"]?.stringValue {Text(error).font(.caption).foregroundStyle(Theme.warning)}
-                    if receipt.text("state") == "binding_recorded" {Button("打开新会话") {Task {await model.openThread(receipt.text("threadId"));dismiss()}}.disabled(disabled)}
+                    if receipt.text("state") == "binding_recorded" {Button("打开新工作私聊") {working = true}.disabled(disabled)}
                 }}
                 Section {
                     Button(original == nil ? "确认创建，不发送消息" : "核对原创建结果") {Task {await submit(preview)}}.disabled(disabled || original == nil && preview.text("capabilityStatus") != "available")
@@ -66,6 +67,7 @@ struct RovaiNativeContinuation: View {
             }
         }.navigationTitle(selection.mode == "continue" ? "从原生会话继续" : selection.mode == "fork_point" ? "从这条回答分叉" : "从会话末尾分叉").navigationBarTitleDisplayMode(.inline).scrollContentBackground(.hidden).toolbar {Button("关闭并保留") {dismiss()}.disabled(busy)}}
         .interactiveDismissDisabled(busy)
+        .sheet(isPresented: $working) {if let receipt, receipt.text("state") == "binding_recorded" {RovaiPrivateConversationView(model: model, threadId: receipt.text("threadId"), initialConversationId: receipt.text("conversationId"))}}
         .task(id: owner) {
             generation = model.connectionGeneration;busy = true;defer {busy = false}
             do {
