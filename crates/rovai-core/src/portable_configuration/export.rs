@@ -24,6 +24,24 @@ fn model_text(value:&Value)->Result<Option<String>>{
     if value["kind"]=="gemini"{return Ok(value["model"].as_str().map(str::to_owned))}
     let mut model=value.clone();model.as_object_mut().context("configuration.model_invalid")?.remove("kind");Ok(Some(serde_json::to_string(&model)?))
 }
+/// 自动同步比较实际所有者修订，不受每次导出的时间、归档编号和秘密别名影响。
+pub(crate) fn configuration_digest(connection:&Connection,root:&Path,include_secrets:bool)->Result<String>{
+    let mut revisions=Vec::new();
+    for id in ids(connection,"SELECT id FROM portable_provider_head WHERE removed=0 ORDER BY id")?{
+        let value=connection.query_row("SELECT h.revision,r.digest FROM portable_provider_head h JOIN portable_provider_revision r ON r.id=h.id AND r.revision=h.revision WHERE h.id=?1",[&id],|row|Ok(json!({"id":id,"revision":row.get::<_,i64>(0)?,"digest":row.get::<_,String>(1)?})))?;revisions.push(value);
+    }
+    let mut customs=Vec::new();for id in ids(connection,"SELECT id FROM custom_runtime_head WHERE removed=0 ORDER BY id")?{customs.push(crate::custom_runtime::storage::latest(connection,&id)?.context("configuration.custom_definition_missing")?);}
+    let mut values=serde_json::Map::new();for target in ["appearance","general","windowClose","messageLibrary","taskTemplates","agentSettings"]{if target=="windowClose"&&!cfg!(windows){continue}values.insert(target.into(),files::read(root,target)?);}
+    digest(&json!({"providers":revisions,"customAgents":customs,"files":values,"delegations":crate::delegation_settings::read(connection)?,"includeSecrets":include_secrets}))
+}
+pub(crate) fn cache_for_sync(root:&Path,snapshot:&Value,id:&str,passphrase:&str,cancel:&tokio_util::sync::CancellationToken)->Result<std::path::PathBuf>{
+    uuid::Uuid::parse_str(id)?;ensure!(!cancel.is_cancelled()&&passphrase.chars().count()>=8,"configuration.export_cancelled_or_passphrase_invalid");
+    let directory=root.join("config-sync-cache").join(id);let path=directory.join("configuration.rovai-config");
+    ensure!(!path.exists(),"configuration.export_original_cache_exists");
+    let bytes=crate::backup::crypto::encrypt_bytes(&serde_json::to_vec(snapshot)?,passphrase,MAX_ARCHIVE)?;
+    ensure!(!cancel.is_cancelled(),"configuration.export_cancelled");
+    crate::platform::private_storage::prepare_private_directory(&directory)?;crate::platform::private_storage::atomic_write_private_bytes(&path,&bytes)?;Ok(path)
+}
 pub(crate) fn collect(connection:&Connection,root:&Path,include_secrets:bool)->Result<Value>{
     let mut secrets=Secrets{included:include_secrets,rows:Vec::new(),known:BTreeMap::new()};let mut domains=BTreeMap::<String,Value>::new();
     let mut providers=Vec::new();
