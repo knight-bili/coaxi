@@ -4794,6 +4794,7 @@ export interface ResolveRuntimeInteractionParams {
 
 export type CoreMethod =
   | 'configuration.providers.list' | 'configuration.providers.upsert' | 'configuration.providers.remove'
+  | 'configuration.migration.preview' | 'configuration.migration.confirm' | 'configuration.migration.receipt' | 'configuration.migration.undoPreview' | 'configuration.migration.undoConfirm'
   | 'configuration.memberConnection.get' | 'configuration.memberConnection.set'
   | 'runtime.steer.policy.get' | 'runtime.steer.policy.set' | 'runtime.steer.targets'
   | 'history.execution.preview' | 'history.execution.confirm' | 'history.execution.receipt'

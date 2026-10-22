@@ -59,6 +59,10 @@ pub(crate) fn drain(connection:&Connection,root:&Path,command:&str)->Result<Vec<
     let rows=statement.query_map([command],|row|Ok((row.get::<_,String>(0)?,row.get::<_,String>(1)?,row.get::<_,String>(2)?,row.get::<_,String>(3)?)))?.collect::<rusqlite::Result<Vec<_>>>()?;drop(statement);
     ensure!(rows.len()<=128,"configuration.file_target_limit");
     for(domain,target,expected,raw)in rows{
+        // Desktop 偏好由原 Store 拥有，等待 Host 所有者接收；不从 Core 绕过其写队列。
+        if matches!(target.as_str(),"appearance"|"general"|"windowClose"){
+            connection.execute("UPDATE configuration_file_outbox SET error_code='configuration.desktop_owner_required',updated_at=?4 WHERE command_id=?1 AND domain=?2 AND target_id=?3 AND state='pending'",params![command,domain,target,chrono::Utc::now().to_rfc3339()])?;continue
+        }
         let value:Value=serde_json::from_str(&raw)?;
         let(state,error)=match apply_one(root,&target,&expected,&value){Ok("applied")=>("applied",None),Ok(_)=>("conflict",Some("configuration.file_changed")),Err(_)=>("failed",Some("configuration.file_write_failed"))};
         connection.execute("UPDATE configuration_file_outbox SET state=?4,error_code=?5,updated_at=?6 WHERE command_id=?1 AND domain=?2 AND target_id=?3 AND state='pending'",params![command,domain,target,state,error,chrono::Utc::now().to_rfc3339()])?;

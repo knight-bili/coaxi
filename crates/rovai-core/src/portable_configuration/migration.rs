@@ -134,7 +134,7 @@ pub(crate) fn preview(connection:&Connection,root:&Path,client:&str,input:&Value
 
 #[derive(Clone,Serialize,Deserialize)]
 #[serde(rename_all="camelCase",deny_unknown_fields)]
-pub(crate) struct Confirm{#[serde(skip_deserializing,default)]pub client:DraftClient,pub schema_version:u32,pub preview_id:String,pub preview_digest:String,#[serde(skip_deserializing,default)]pub core_instance:String}
+pub(crate) struct Confirm{#[serde(skip_deserializing,default)]pub client:DraftClient,pub schema_version:u32,pub preview_id:String,pub preview_digest:String,#[serde(skip)]pub core_instance:String}
 impl sealed::Sealed for Confirm{}
 impl DomainCommand for Confirm{const TYPE:&'static str="configuration.migration.confirm";const EXACT_REPLAY:bool=true;fn draft_client(&self)->Option<&DraftClient>{Some(&self.client)}}
 pub(crate) fn receipt(connection:&Connection,client:&str,id:&str)->Result<Value>{

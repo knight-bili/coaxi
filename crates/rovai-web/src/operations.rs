@@ -5,6 +5,16 @@ use serde::{Deserialize, Serialize};
 /// and the legacy shared draft remain outside the network capability.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum Operation {
+    #[serde(rename="configuration.migration.preview")]
+    PortableMigrationPreview,
+    #[serde(rename="configuration.migration.confirm")]
+    PortableMigrationConfirm,
+    #[serde(rename="configuration.migration.receipt")]
+    PortableMigrationReceipt,
+    #[serde(rename="configuration.migration.undoPreview")]
+    PortableMigrationUndoPreview,
+    #[serde(rename="configuration.migration.undoConfirm")]
+    PortableMigrationUndoConfirm,
     #[serde(rename="configuration.providers.list")]
     PortableProvidersList,
     #[serde(rename="configuration.providers.upsert")]
@@ -614,6 +624,8 @@ impl Operation {
         use serde_json::json;
         match self {
             Self::NativeCreationRecords => select_fields(&value,&["schemaVersion","items","next"]),
+            Self::PortableMigrationPreview|Self::PortableMigrationUndoPreview=>select_fields(&value,&["schemaVersion","previewId","previewDigest","expiresAt","archiveId","sourceDigest","localDigest","selections","members","rows","canApply"]),
+            Self::PortableMigrationConfirm|Self::PortableMigrationUndoConfirm|Self::PortableMigrationReceipt=>select_fields(&value,&["schemaVersion","commandId","previewId","previewDigest","state","counts","changedMembers","errorCode","historyPreserved","files"]),
             Self::PortableProvidersList=>select_fields(&value,&["items","next"]),
             Self::PortableProvidersUpsert|Self::PortableProvidersRemove|Self::PortableMemberConnectionSet=>select_fields(&value,&["commandId","commandType","status","code","payload","resultEntity","recordedAt"]),
             Self::PortableMemberConnectionGet=>select_fields(&value,&["agentId","agentVersion","binding"]),
@@ -725,6 +737,11 @@ impl Operation {
             Self::NativeSteerPolicyGet => "runtime.steer.policy.get",
             Self::NativeContinuationPreview => "history.execution.preview",
             Self::NativeCreationRecords => "history.execution.records",
+            Self::PortableMigrationPreview=>"configuration.migration.preview",
+            Self::PortableMigrationConfirm=>"configuration.migration.confirm",
+            Self::PortableMigrationReceipt=>"configuration.migration.receipt",
+            Self::PortableMigrationUndoPreview=>"configuration.migration.undoPreview",
+            Self::PortableMigrationUndoConfirm=>"configuration.migration.undoConfirm",
             Self::PortableProvidersList=>"configuration.providers.list",
             Self::PortableProvidersUpsert=>"configuration.providers.upsert",
             Self::PortableProvidersRemove=>"configuration.providers.remove",
