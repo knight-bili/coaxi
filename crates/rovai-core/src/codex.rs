@@ -2392,6 +2392,8 @@ mod tests {
 
     fn process_compatibility_runtime(executable: &Path) -> FrozenAgentRuntimeConfig {
         FrozenAgentRuntimeConfig {
+            native_origin: None,
+            native_steer: None,
             custom_runtime: None,
             environment: None,
             custom_api: None,
@@ -3384,6 +3386,8 @@ for line in sys.stdin:
         )
         .unwrap();
         let runtime_config = FrozenAgentRuntimeConfig {
+            native_origin: None,
+            native_steer: None,
             custom_runtime: None,
             environment: None,
             custom_api: None,

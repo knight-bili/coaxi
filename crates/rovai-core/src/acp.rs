@@ -9612,6 +9612,8 @@ mod tests {
 
     fn frozen_trae_runtime(executable: &Path) -> FrozenAgentRuntimeConfig {
         FrozenAgentRuntimeConfig {
+            native_origin: None,
+            native_steer: None,
             custom_runtime: None,
             environment: None,
             custom_api: None,
@@ -9646,6 +9648,8 @@ mod tests {
 
     fn frozen_kiro_runtime() -> FrozenAgentRuntimeConfig {
         FrozenAgentRuntimeConfig {
+            native_origin: None,
+            native_steer: None,
             custom_runtime: None,
             environment: None,
             custom_api: None,
@@ -9680,6 +9684,8 @@ mod tests {
 
     fn frozen_cursor_runtime(executable: &Path) -> FrozenAgentRuntimeConfig {
         FrozenAgentRuntimeConfig {
+            native_origin: None,
+            native_steer: None,
             custom_runtime: None,
             environment: None,
             custom_api: None,
@@ -9721,6 +9727,8 @@ mod tests {
 
     fn frozen_kimi_runtime(executable: &Path) -> FrozenAgentRuntimeConfig {
         FrozenAgentRuntimeConfig {
+            native_origin: None,
+            native_steer: None,
             custom_runtime: None,
             environment: None,
             custom_api: None,
@@ -9755,6 +9763,8 @@ mod tests {
 
     fn frozen_grok_runtime(executable: &Path) -> FrozenAgentRuntimeConfig {
         FrozenAgentRuntimeConfig {
+            native_origin: None,
+            native_steer: None,
             custom_runtime: None,
             environment: None,
             custom_api: None,

@@ -7643,6 +7643,8 @@ mod tests {
             purpose: "resume safely".to_string(),
             effective_config: json!({}),
             runtime: FrozenAgentRuntimeConfig {
+                native_origin: None,
+                native_steer: None,
                 custom_runtime: None,
                 environment: None,
                 custom_api: None,

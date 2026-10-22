@@ -535,6 +535,10 @@ pub struct FrozenAgentRuntimeConfig {
     pub config_digest: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub custom_runtime: Option<FrozenCustomRuntimeV1>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub native_origin: Option<crate::native_lifecycle::NativeSessionOriginV1>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub native_steer: Option<crate::native_lifecycle::FrozenNativeSteerV1>,
 }
 
 impl FrozenAgentRuntimeConfig {
@@ -4432,6 +4436,7 @@ pub(crate) fn resolve_rebound_runtime_on_connection(
     // Re-probing may change executable evidence, never the admitted Run's Camp intent.
     rebound.environment = frozen.environment.clone();
     rebound.camp_fast = frozen.camp_fast.clone();
+    crate::native_lifecycle::freeze_intent(&mut rebound,frozen.native_origin.clone(),frozen.native_steer.clone())?;
     if frozen.adapter_kind == AdapterKind::CodexCli
         && frozen.camp_fast.is_some()
         && let Some(tier) = frozen.model.options.get("serviceTier")
@@ -4737,6 +4742,8 @@ fn resolve_frozen_runtime_binding_with_snapshot(
         }
     };
     let mut frozen = FrozenAgentRuntimeConfig {
+        native_origin: None,
+        native_steer: None,
         custom_runtime: None,
         environment: None,
         custom_api,

@@ -34,6 +34,7 @@ pub fn text<'a>(value:&'a Value,key:&str)->Result<&'a str>{value[key].as_str().c
 pub fn digest(value:&Value)->Result<String>{Ok(format!("sha256:{}",crate::command::canonical_json_digest(value)?))}
 pub fn validate(name:&str,value:&Value)->Result<()>{ensure!(serde_json::to_vec(value)?.len()<=MAX_BYTES,"custom_runtime.definition_too_large");schema::validate(CONTRACT["schemas"].get(name).context("custom_runtime.shape_unknown")?,value,0)}
 pub fn validate_operation(operation:&str,value:&Value)->Result<()>{ensure!(serde_json::to_vec(value)?.len()<=MAX_BYTES,"custom_runtime.request_too_large");schema::validate(CONTRACT["operations"].get(operation).and_then(|v|v.get("input")).context("custom_runtime.operation_unknown")?,value,0)}
+pub(crate) fn validate_closed_shape(shape:&Value,value:&Value)->Result<()>{schema::validate(shape,value,0)}
 pub fn validate_definition(value:&Value,input:bool)->Result<()>{
     validate(if input{"definitionInput"}else{"definitionView"},value)?;
     let kind=text(value,"distributionKind")?;let spec=&value["spec"];

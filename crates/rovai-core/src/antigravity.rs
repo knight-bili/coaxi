@@ -2265,6 +2265,8 @@ mod tests {
                 },
                 permission_semantics: PermissionSemantics::CoreEnforcedV1,
                 runtime: FrozenAgentRuntimeConfig {
+                    native_origin: None,
+                    native_steer: None,
                     custom_runtime: None,
                     environment: None,
                     custom_api: None,
@@ -2458,6 +2460,8 @@ mod tests {
             },
             permission_semantics: PermissionSemantics::RuntimeManagedV2,
             runtime: FrozenAgentRuntimeConfig {
+                native_origin: None,
+                native_steer: None,
                 custom_runtime: None,
                 environment: None,
                 custom_api: None,
@@ -3046,6 +3050,8 @@ echo "Created conversation 0bdd2166-d420-40c6-94be-70b93eb290c5" > "$log_file"
                 },
                 permission_semantics: PermissionSemantics::RuntimeManagedV2,
                 runtime: FrozenAgentRuntimeConfig {
+                    native_origin: None,
+                    native_steer: None,
                     custom_runtime: None,
                     environment: None,
                     custom_api: None,
@@ -3161,6 +3167,8 @@ exec sleep 30
             },
             permission_semantics: PermissionSemantics::CoreEnforcedV1,
             runtime: FrozenAgentRuntimeConfig {
+                native_origin: None,
+                native_steer: None,
                 custom_runtime: None,
                 environment: None,
                 custom_api: None,
