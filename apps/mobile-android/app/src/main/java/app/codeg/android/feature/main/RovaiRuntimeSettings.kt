@@ -22,6 +22,8 @@ fun RovaiRuntimeSettings(model:RovaiWorkspaceViewModel){
     val state by model.state.collectAsStateWithLifecycle();val coroutine=rememberCoroutineScope()
     var portable by remember{mutableStateOf(false)}
     var migration by remember{mutableStateOf(false)}
+    var logging by remember{mutableStateOf(false)}
+    if(logging){RovaiHostLoggingSettings(model){logging=false};return}
     var export by remember{mutableStateOf(false)}
     if(export){RovaiPortableConfigurationExport(model){export=false};return}
     if(migration){RovaiPortableConfigurationMigration(model){migration=false};return}
@@ -49,6 +51,7 @@ fun RovaiRuntimeSettings(model:RovaiWorkspaceViewModel){
         item{TextButton(enabled=!disabled&&!dirty,onClick={portable=true}){Text("模型服务商")}}
         item{TextButton(enabled=!disabled&&!dirty,onClick={migration=true}){Text("搬入原来的配置")}}
         item{TextButton(enabled=!disabled&&!dirty,onClick={export=true}){Text("导出完整配置")}}
+        item{TextButton(enabled=!disabled&&!dirty,onClick={logging=true}){Text("主机日志输出")}}
         if(agent!=null)item{RovaiPortableMemberConnection(model,agent!!.coreText("agentId"),disabled||dirty||changed)}
         item{Row{if(agent!=null)TextButton(onClick={if(dirty)discard=true else agent=null}){Text("返回队员列表")};TextButton(enabled=!disabled,onClick={coroutine.launch{load()}}){Text("刷新")};TextButton(enabled=!disabled,onClick={custom=true}){Text("自定义智能体")}}}
         issue?.let{item{Text(it,color=CodegTheme.colors.danger)}}
