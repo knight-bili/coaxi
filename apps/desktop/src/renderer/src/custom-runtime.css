@@ -1,0 +1,19 @@
+/* 字段分组沿 Codeg SettingCard/SettingRow；表面及控件使用 Rovai 当前主题。 */
+.custom-runtime-settings .section-heading {align-items:center;flex-wrap:wrap;gap:12px}
+.custom-runtime-settings .section-heading p {margin:4px 0 0;color:var(--workspace-muted);font-size:12px}
+.custom-runtime-toolbar,.custom-runtime-actions {display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.custom-runtime-toolbar {margin-block:12px}.custom-runtime-toolbar input {min-width:0;flex:1}
+.custom-runtime-row .runtime-product-copy {min-width:0}.custom-runtime-row .runtime-product-copy small {white-space:normal;overflow-wrap:anywhere}
+.custom-runtime-actions {justify-content:flex-end}
+.custom-runtime-inspection,.custom-runtime-pending {margin-block:12px;min-width:0}
+.custom-runtime-inspection pre {white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%;font-size:11px;padding:12px;background:var(--surface-secondary);border:1px solid var(--border-subtle);border-radius:8px}
+.custom-runtime-pending {padding:12px;border:1px solid var(--border-subtle);border-radius:8px}.custom-runtime-pending code {display:block;overflow-wrap:anywhere}
+.custom-runtime-dialog {max-height:min(88svh,920px);display:flex;flex-direction:column}
+.custom-runtime-dialog>.app-dialog-body {overflow-y:auto;min-height:0;display:block}
+.custom-runtime-setting-card {border:1px solid var(--border-subtle);border-radius:10px;margin-block:12px;padding:0 14px;background:var(--surface-primary)}
+.custom-runtime-setting-card>label {display:grid;grid-template-columns:minmax(120px,.6fr) minmax(0,1fr);align-items:center;gap:12px;padding-block:12px;border-bottom:1px solid var(--border-subtle);font-size:12px}
+.custom-runtime-setting-card>label:last-child {border-bottom:0}.custom-runtime-setting-card>label.custom-runtime-spec {display:block}.custom-runtime-spec>span {display:block;margin-bottom:8px}
+.custom-runtime-setting-card input:not([type=checkbox]),.custom-runtime-setting-card textarea,.custom-runtime-setting-card select {width:100%;min-width:0;font:inherit}
+.custom-runtime-setting-card textarea {resize:vertical}.custom-runtime-setting-card .custom-runtime-spec textarea {font-family:var(--font-mono,monospace);font-size:11px}
+.custom-runtime-setting-card p {font-size:12px;color:var(--workspace-muted);overflow-wrap:anywhere}.custom-runtime-setting-card input[type=checkbox] {justify-self:end}
+@media(max-width:680px){.custom-runtime-row {grid-template-columns:auto minmax(0,1fr)!important}.custom-runtime-row>.runtime-snapshot-badge,.custom-runtime-row>.custom-runtime-actions {grid-column:2}.custom-runtime-setting-card>label {grid-template-columns:1fr}.custom-runtime-setting-card input[type=checkbox] {justify-self:start}.custom-runtime-dialog {width:calc(100vw - 24px);max-height:calc(100svh - 24px)}}

@@ -47,6 +47,7 @@ import {
 import { localizeExecutionEngineTerms } from './product-copy'
 import { SettingsPageHeader } from './SettingsPageHeader'
 import { RuntimeStartupSettings } from './RuntimeStartupSettings'
+import { CustomRuntimeSettings } from './CustomRuntimeSettings'
 import { RuntimeInstallationGuide } from './RuntimeInstallationGuide'
 import { runtimeInstallGuide } from './runtime-install-guide'
 import { invalidateManagedAvatarObjectUrl } from './managed-avatar-cache'
@@ -1644,6 +1645,7 @@ export function RuntimeInstallationsPanel({
           </div>
         )}
       </section>
+      <CustomRuntimeSettings />
     </>
   )
 }
