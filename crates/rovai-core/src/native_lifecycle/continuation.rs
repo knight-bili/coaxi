@@ -60,7 +60,7 @@ pub(crate) fn member(connection:&Connection,id:&str,expected:i64)->Result<Frozen
         let current=crate::custom_runtime::storage::latest(connection,&reference.id)?;
         ensure!(current.is_some_and(|value|value["enabled"]==true&&value["definitionDigest"]==reference.definition_digest),"native_lifecycle.member_runtime_changed");
     }
-    crate::agent_profile::resolve_frozen_runtime_binding(connection,&binding)?.map_err(|blocker|anyhow::anyhow!("native_lifecycle.runtime_blocked: {}",blocker.code))
+    crate::agent_profile::resolve_frozen_runtime_for_member_binding(connection,id,&binding)?.map_err(|blocker|anyhow::anyhow!("native_lifecycle.runtime_blocked: {}",blocker.code))
 }
 
 /// 同一确认事务中创建唯一工作副本；没有用户消息，也不创建伪造 AgentRun。
