@@ -4,8 +4,8 @@ import { spawn } from 'node:child_process'
 import { createReadStream } from 'node:fs'
 import { createHash, randomUUID } from 'node:crypto'
 import { resolveCoreBinary, type CoreClient } from './core-client'
-type Manifest={formatVersion:number;product:string;appVersion:string;createdAt:string;entries:Array<{path:string;size:number;sha256:string}>;roots?:NonNullable<BackupSummary['roots']>}
-const summary=(manifest:Manifest):BackupSummary=>({formatVersion:manifest.formatVersion,roots:manifest.roots??[],createdAt:manifest.createdAt,appVersion:manifest.appVersion,fileCount:manifest.entries.length,totalBytes:manifest.entries.reduce((sum,entry)=>sum+entry.size,0)})
+type Manifest={formatVersion:number;product:string;appVersion:string;createdAt:string;entries:Array<{rootId?:string;path:string;size:number;sha256:string}>;roots?:NonNullable<BackupSummary['roots']>;runtimeLinks?:Array<{path:string;target:string;directory:boolean}>;fileModes?:Record<string,number>}
+const summary=(manifest:Manifest):BackupSummary=>({formatVersion:manifest.formatVersion,roots:manifest.roots??[],createdAt:manifest.createdAt,appVersion:manifest.appVersion,fileCount:manifest.entries.length,totalBytes:manifest.entries.reduce((sum,entry)=>sum+entry.size,0),runtimeLinkCount:manifest.runtimeLinks?.length??0,executableModeCount:Object.values(manifest.fileModes??{}).filter(mode=>(mode&0o111)!==0).length,runtimeEnvironmentCheckRequired:Boolean(manifest.runtimeLinks?.length||manifest.entries.some(entry=>(!entry.rootId||entry.rootId==='data')&&(entry.path.startsWith('custom-runtimes/')||entry.path==='custom-runtime-restore-needs-environment-v1.json')))})
 export async function backupFileDigest(path:string):Promise<string>{const hash=createHash('sha256');for await(const chunk of createReadStream(path))hash.update(chunk);return hash.digest('hex')}
 /** Offline helper is the sole reader/writer of backup archives. Renderer
  * receives an expiring selection id and a summary, never a passphrase receipt. */

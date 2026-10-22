@@ -5191,7 +5191,7 @@ export interface HostWebApi {
   rotate(): Promise<HostWebStatus & { administratorToken: string }>
 }
 
-export interface BackupSummary {createdAt:string;appVersion:string;fileCount:number;totalBytes:number;formatVersion?:number;roots?:Array<{id:string;kind:string;shared:boolean;present:boolean}>}
+export interface BackupSummary {createdAt:string;appVersion:string;fileCount:number;totalBytes:number;formatVersion?:number;roots?:Array<{id:string;kind:string;shared:boolean;present:boolean}>;runtimeLinkCount?:number;executableModeCount?:number;runtimeEnvironmentCheckRequired?:boolean}
 export interface ConfigurationSnapshotPreview {formatVersion:number;appVersion:string;createdAt:string;localDigest:string;changes:Array<{domain:string;before:Record<string,unknown>|null;after:Record<string,unknown>|null}>}
 export interface LegacyDataPreview {selectionId:string;source:string;digest:string;authority:string;fileCount:number;totalBytes:number;externalRoots:Array<{id:string;kind:string;path:string;shared:boolean}>}
 export interface NativeBackupsApi {
