@@ -3,6 +3,7 @@ import { KeyboardShortcutSettings } from './KeyboardShortcutSettings'
 import { INTERFACE_LANGUAGE_OPTIONS } from '../../shared/interface-languages'
 import { ExtensionCatalogSettings } from './ExtensionCatalogSettings'
 import { BackupSettings } from './BackupSettings'
+import { PortableConfigurationMigration } from './PortableConfigurationMigration'
 import { WindowCloseSettings } from './WindowCloseSettings'
 import { GeneralLeadSelect } from './GeneralLeadSelect'
 import { readErrorMessage } from './error-message'
@@ -382,6 +383,7 @@ export function GeneralSettings({
       <div className="general-settings-body">
         {browserAccess}
         <BackupSettings/>
+        <PortableConfigurationMigration/>
         <KeyboardShortcutSettings/>
         <WebdavSettings/>
         <ExtensionCatalogSettings/>
