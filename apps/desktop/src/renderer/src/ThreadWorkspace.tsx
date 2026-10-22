@@ -169,6 +169,8 @@ import { runtimeEditorInstallation } from './MemberRuntimeParameters'
 import { mentionCandidateRuntime } from './mention-runtime'
 import { SafeMarkdown } from './SafeMarkdown'
 import { UserFeedbackDock } from './UserFeedbackDock'
+import { CoreFeedbackMarkdown } from './CoreFeedbackMarkdown'
+import type { FeedbackMessageSource } from './CardFeedbackFields'
 import { RuntimeInteractionDock } from './RuntimeInteractionDock'
 import { DelegationViewerHost, DelegationChildren } from './DelegationViewer'
 import { NativeSubagentEntries } from './NativeSubagentEntries'
@@ -5488,6 +5490,7 @@ function ThreadWorkspaceContent({
                                     ? (
                                         <div className="final-copy" data-message-quote-body={campMessage.id} data-quote-owner={`thread:${snapshot.thread.id}`}>
                                           <AgentMessageMarkdownBody
+                                            feedbackIdentity={{scope:{threadId:snapshot.thread.id,conversationId:null,scopeKind:'public'},agentId:campMessage.authorId,messageId:campMessage.id}}
                                             body={displayBody}
                                             content={campMessage.content}
                                             members={snapshot.members}
@@ -9868,6 +9871,7 @@ export function TruncatedStructuredMessageBody({
 }
 
 export function AgentMessageMarkdownBody({
+  feedbackIdentity,
   body,
   content,
   members,
@@ -9875,6 +9879,7 @@ export function AgentMessageMarkdownBody({
   onActivateMemberMention,
   onFileReference
 }: {
+  feedbackIdentity?:Omit<FeedbackMessageSource,'cardOrdinal'>
   body: string
   content: StructuredThreadMessageContent | null
   members: ThreadSnapshot['members']
@@ -9893,7 +9898,7 @@ export function AgentMessageMarkdownBody({
     ? structuredThreadContentMarkdownText(content.slice(prefixLength), [...pendingMemberProfiles, ...members])
     : body
   if (!content || prefixLength === 0) {
-    return <SafeMarkdown onFileReference={onFileReference}>{body}</SafeMarkdown>
+    return <CoreFeedbackMarkdown identity={feedbackIdentity} onFileReference={onFileReference}>{body}</CoreFeedbackMarkdown>
   }
 
   const hasBody = markdownBody.trim().length > 0
@@ -9911,14 +9916,14 @@ export function AgentMessageMarkdownBody({
   return (
     <div className="member-mention-markdown-body" data-inline-body={inlineBody}>
       {hasBody ? (
-        <SafeMarkdown
+        <CoreFeedbackMarkdown identity={feedbackIdentity}
           className="member-mention-markdown-content"
           leadingContent={prefix}
           inlineLeadingContent={inlineBody}
           onFileReference={onFileReference}
         >
           {markdownBody}
-        </SafeMarkdown>
+        </CoreFeedbackMarkdown>
       ) : prefix}
     </div>
   )

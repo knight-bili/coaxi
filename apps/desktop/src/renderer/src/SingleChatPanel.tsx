@@ -70,6 +70,7 @@ import { executionPhaseFeedback, executionRunSummary } from './execution-run-sum
 import { ComposerPrimaryAction } from './ComposerPrimaryAction'
 import { SafeMarkdown } from './SafeMarkdown'
 import { UserFeedbackDock } from './UserFeedbackDock'
+import { CoreFeedbackMarkdown } from './CoreFeedbackMarkdown'
 import { shouldSubmitStructuredComposerOnEnter } from './StructuredMentionComposer'
 import { readErrorMessage } from './error-message'
 import {
@@ -467,7 +468,7 @@ export function SingleChatRunHistory({
         </details>
         {finalMessage && <>
           <hr className="single-chat-final-rule" />
-          <div className="single-chat-final" data-agent-run-id={run.id} data-single-chat-message-id={finalMessage.id} data-message-quote-body={finalMessage.id} data-quote-owner={`${conversationKind}:${conversationId}`} data-notification-turn-id={run.threadTurnId}><SafeMarkdown>{finalMessage.body}</SafeMarkdown></div>
+          <div className="single-chat-final" data-agent-run-id={run.id} data-single-chat-message-id={finalMessage.id} data-message-quote-body={finalMessage.id} data-quote-owner={`${conversationKind}:${conversationId}`} data-notification-turn-id={run.threadTurnId}><CoreFeedbackMarkdown identity={{scope:{threadId,conversationId,scopeKind:conversationKind},agentId:finalMessage.authorId,messageId:finalMessage.id}}>{finalMessage.body}</CoreFeedbackMarkdown></div>
         </>}
       </div>
     </section>

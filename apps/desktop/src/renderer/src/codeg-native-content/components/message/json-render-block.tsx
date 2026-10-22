@@ -46,7 +46,7 @@ import {
   isSpecStream,
 } from "../../lib/json-render/spec"
 import { cn } from "../../ui/source-primitives"
-import { CardFeedbackFieldsProvider,CardFeedbackFooter,feedbackControl } from "../../../../CardFeedbackFields"
+import { CardFeedbackFieldsProvider,CardFeedbackFooter,feedbackControl } from "../../../CardFeedbackFields"
 
 /**
  * json-render's Link semantics on Codeg's link: `press` fires first, and an

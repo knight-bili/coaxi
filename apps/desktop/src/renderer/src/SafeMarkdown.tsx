@@ -93,12 +93,20 @@ function markdownHeadingText(children: ReactNode): string {
 
 type MarkdownHeadingTag = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
 
-function markdownCodeBlock(children: ReactNode): { code: string; languageName?: string } | null {
+function markdownCodeBlock(children: ReactNode): { code: string; languageName?: string;cardOrdinal?:number } | null {
   const child = Array.isArray(children) && children.length === 1 ? children[0] : children
-  if (!isValidElement<{ children?: ReactNode; className?: string }>(child)) return null
+  if (!isValidElement<{ children?: ReactNode; className?: string;'data-rovai-card-ordinal'?:unknown }>(child)) return null
   const code = markdownHeadingText(child.props.children)
   const match = /(?:^|\s)language-([^\s]+)/u.exec(child.props.className ?? '')
-  return { code, languageName: match?.[1] }
+  const ordinal=Number(child.props['data-rovai-card-ordinal'])
+  return { code, languageName: match?.[1],...(Number.isSafeInteger(ordinal)&&ordinal>=0?{cardOrdinal:ordinal}:{}) }
+}
+
+function remarkCardOrdinals(): (tree:MarkdownTreeNode)=>void {
+  return tree=>{let ordinal=0;const visit=(node:MarkdownTreeNode):void=>{
+    if(node.type==='code'&&(node as MarkdownTreeNode&{lang?:string}).lang==='spec')node.data={...node.data,hProperties:{...node.data?.hProperties,'data-rovai-card-ordinal':ordinal++}}
+    for(const child of node.children??[])visit(child)
+  };visit(tree)}
 }
 
 function markdownHeadingSlug(value: string): string {
@@ -174,7 +182,7 @@ export function SafeMarkdown({
   localImageUrl?(rawReference: string): string | null
   localImageContent?(rawReference: string): Promise<FilePreviewOperationResult<FilePreviewBinaryContent>>
   renderLocalImage?(reference: string, alt: string): ReactNode
-  renderCodeBlock?(code: string, language?: string): ReactNode
+  renderCodeBlock?(code: string, language?: string,cardOrdinal?:number): ReactNode
   headingTarget?: string
   onHeadingTargetResult?(found: boolean): void
   /** Trusted inline UI, never parsed from the Markdown source. */
@@ -233,6 +241,7 @@ export function SafeMarkdown({
           remarkCjkFriendly,
           [remarkCjkFriendlyStrikethrough, { singleTilde: false }],
           remarkRepairCjkUrlTail,
+          ...(renderCodeBlock?[remarkCardOrdinals]:[]),
           ...(fileReferencesEnabled ? [mode === 'message' ? remarkMessageFileLinks : remarkFileLinks] : []),
           [remarkLeadingContent, { enabled: hasLeadingContent, inline: inlineLeadingContent }]
         ]}
@@ -261,11 +270,11 @@ export function SafeMarkdown({
               </p>
             )
           },
-          ...(mode === 'document' ? {
+          ...(mode === 'document' || renderCodeBlock ? {
             pre({ children: preChildren }) {
               const block = markdownCodeBlock(preChildren)
-              if (block && renderCodeBlock) return renderCodeBlock(block.code, block.languageName)
-              return block
+              if (block && renderCodeBlock) {const rendered=renderCodeBlock(block.code,block.languageName,block.cardOrdinal);if(rendered!==null&&rendered!==undefined)return rendered}
+              return block&&mode==='document'
                 ? <MarkdownCodeBlock code={block.code} languageName={block.languageName} theme={theme} />
                 : <pre>{preChildren}</pre>
             },
