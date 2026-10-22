@@ -36,6 +36,8 @@ fun RovaiPortableConfigurationMigration(model:RovaiWorkspaceViewModel,onClose:()
     var mappings by remember{mutableStateOf<Map<String,JsonObject>>(emptyMap())};var preview by remember{mutableStateOf<JsonObject?>(null)};var undo by remember{mutableStateOf(false)}
     var pending by remember{mutableStateOf<JsonObject?>(null)};var last by remember{mutableStateOf<JsonObject?>(null)};var receipt by remember{mutableStateOf<JsonObject?>(null)}
     var confirm by remember{mutableStateOf(false)};var memberMenu by remember{mutableStateOf(false)}
+    var exportArchive by remember{mutableStateOf<JsonObject?>(null)}
+    if(exportArchive!=null){RovaiPortableConfigurationExport(model,sourceArchive=exportArchive){exportArchive=null};return}
     val disabled=busy||identity.isEmpty();val selected=choices.values.filter{it["decision"].coreObject().coreText("action")!="skip"}
     fun owner()="portable-migration/$identity"
     suspend fun current(){if(identity.isEmpty()||model.presentationIdentity()!=identity)throw CancellationException("工作区已切换")}
@@ -87,6 +89,7 @@ fun RovaiPortableConfigurationMigration(model:RovaiWorkspaceViewModel,onClose:()
         items(archives,key={it.coreText("archiveId")}){value->TextButton(enabled=!disabled&&pending==null,onClick={work{open(value)}}){Text("候选 · ${value.coreText("sourceKind")} · ${value.coreText("createdAt")}")}}
         if(archiveNext!=null)item{TextButton(enabled=!disabled,onClick={work{loadArchives(true)}}){Text("加载更多候选")}}
         if(archive!=null){
+            item{TextButton(enabled=!disabled&&pending==null&&source==null,onClick={exportArchive=buildJsonObject{put("archiveId",archive!!["archiveId"]!!);put("sourceDigest",archive!!["sourceDigest"]!!)}}){Text("保存原配置完整副本（含未支持字段）")}}
             item{Text("选择要搬入的内容",style=MaterialTheme.typography.titleMedium)}
             items(rows.take(visible),key={it.coreText("entryId")}){row->
                 val choice=choices[row.coreText("entryId")];val action=if(undo)row.coreText("action") else choice?.get("decision").coreObject().coreText("action").ifEmpty{"skip"};val domain=row.coreText("domain")

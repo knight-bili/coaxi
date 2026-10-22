@@ -141,6 +141,9 @@ struct RovaiPortableConfigurationMigration: View {
                 ForEach(controller.archives, id: \.self) { value in Button("候选 · \(value.text("sourceKind")) · \(value.text("createdAt"))") { Task { await controller.work { try await controller.open(value) } } }.disabled(controller.pending != nil) }
                 if controller.archiveNext != .null { Button("加载更多候选") { Task { await controller.work { try await controller.loadArchives(more: true) } } } }
             }
+            if let source = controller.archive {
+                Section { NavigationLink("保存原配置完整副本（含未支持字段）") { RovaiPortableConfigurationExport(model: model, sourceArchive: .object(["archiveId": source["archiveId"] ?? .null, "sourceDigest": source["sourceDigest"] ?? .null])) } }.disabled(controller.pending != nil)
+            }
             if controller.archive != nil {
                 Section(controller.undo ? "撤销预览" : "选择要搬入的内容") {
                     ForEach(Array(controller.rows.prefix(controller.visible)), id: \.self) { row in migrationRow(row) }

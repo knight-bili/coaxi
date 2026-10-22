@@ -11,20 +11,21 @@ private struct EncryptedConfigurationDocument: FileDocument {
 
 struct RovaiPortableConfigurationExport: View {
     let model: RovaiWorkspaceModel
+    var sourceArchive: JSONValue? = nil
     @State private var identity = "", passphrase = "", message = ""
     @State private var includeSecrets = false, busy = false, saving = false
     @State private var pending: JSONValue?, receipt: JSONValue?, issue: String?
     @State private var document = EncryptedConfigurationDocument()
-    private var owner: String { "portable-export/" + identity }
+    private var owner: String { "portable-export/" + identity + (sourceArchive.map { "/original/" + $0.text("archiveId") } ?? "") }
     var body: some View {
         Form {
-            Section { Text("保存一份加密副本，到另一台主机再选择要搬入的内容和本机队员。").foregroundStyle(Theme.textSecondary) }
+            Section { Text(sourceArchive == nil ? "保存一份加密副本，到另一台主机再选择要搬入的内容和本机队员。" : "保存这份候选的完整原内容，包括尚不支持的字段；不会启用其中配置。").foregroundStyle(Theme.textSecondary) }
             if receipt?.text("state") != "ready" {
                 Section("副本范围") {
-                    Toggle("同时包含密钥", isOn: $includeSecrets).disabled(pending != nil)
+                    Toggle(sourceArchive == nil ? "同时包含密钥" : "确认原内容和可能包含的密钥一起加密保存", isOn: $includeSecrets).disabled(pending != nil)
                     SecureField("副本加密口令（至少8个字符）", text: $passphrase).textInputAutocapitalization(.never).autocorrectionDisabled()
-                    Text("默认不含密钥。原生登录、服务令牌和本机安装锁不随配置迁移。").font(.caption).foregroundStyle(Theme.textSecondary)
-                    Button(pending == nil ? "准备加密副本" : "继续准备原副本") { work { try await prepare() } }.disabled(identity.isEmpty || passphrase.unicodeScalars.count < 8)
+                    Text(sourceArchive == nil ? "默认不含密钥。原生登录、服务令牌和本机安装锁不随配置迁移。" : "原副本可能包含原应用保存的敏感设置；明确勾选后才能导出，始终加密。").font(.caption).foregroundStyle(Theme.textSecondary)
+                    Button(pending == nil ? "准备加密副本" : "继续准备原副本") { work { try await prepare() } }.disabled(identity.isEmpty || passphrase.unicodeScalars.count < 8 || (sourceArchive != nil && !includeSecrets))
                 }
             }
             if pending != nil { Section { Button("核对原导出") { work { try await refresh() } } } }
@@ -36,7 +37,7 @@ struct RovaiPortableConfigurationExport: View {
                 }
             }
             if !message.isEmpty { Section { Text(message) } }; if let issue { Section { Text(issue).foregroundStyle(.red) } }; if busy { ProgressView() }
-        }.disabled(busy).navigationTitle("导出完整配置")
+        }.disabled(busy).navigationTitle(sourceArchive == nil ? "导出完整配置" : "保留原配置的完整副本")
         .task(id: model.connected) { await start() }.onDisappear { passphrase = "" }
         .fileExporter(isPresented: $saving, document: document, contentType: .data, defaultFilename: "configuration.rovai-config") { result in
             document = EncryptedConfigurationDocument()
@@ -54,7 +55,7 @@ struct RovaiPortableConfigurationExport: View {
         do {
             identity = try await model.presentationIdentity(); let raw = try model.readBody(owner)
             if !raw.isEmpty {
-                guard let value = JSONValue.parse(raw), case .object(let fields) = value, Set(fields.keys) == Set(["operationId", "includeSecrets"]), UUID(uuidString: value.text("operationId")) != nil, case .bool(let included) = value["includeSecrets"] else { throw RovaiHostFailure(code: "原导出恢复记录无效，已保留") }
+                guard let value = JSONValue.parse(raw), case .object(let fields) = value, Set(fields.keys).isSubset(of: Set(["operationId", "includeSecrets", "sourceArchive"])), value["sourceArchive"] == sourceArchive, UUID(uuidString: value.text("operationId")) != nil, case .bool(let included) = value["includeSecrets"] else { throw RovaiHostFailure(code: "原导出恢复记录无效，已保留") }
                 pending = value; includeSecrets = included; try await refresh()
             }
         } catch is CancellationError {} catch { issue = error.localizedDescription }; busy = false
@@ -64,9 +65,14 @@ struct RovaiPortableConfigurationExport: View {
         guard value["operationId"] == pending["operationId"] else { throw RovaiHostFailure(code: "原导出编号不同") }; receipt = value; if value.text("state") == "ready" { passphrase = "" }
     }
     private func prepare() async throws {
-        let original = pending ?? .object(["operationId": .string(UUID().uuidString.lowercased()), "includeSecrets": .bool(includeSecrets)])
+        guard sourceArchive == nil || includeSecrets else { throw RovaiHostFailure(code: "请先确认原文件可能包含的密钥一并加密保存") }
+        var fields: [String: JSONValue] = ["operationId": .string(UUID().uuidString.lowercased()), "includeSecrets": .bool(includeSecrets)]
+        if let sourceArchive { fields["sourceArchive"] = sourceArchive }
+        let original = pending ?? .object(fields)
         if pending == nil { try model.saveBody(owner, body: original.prettyString); pending = original }
-        let value = try await model.privateConfiguration("export", params: .object(["operationId": original["operationId"] ?? .null, "includeSecrets": original["includeSecrets"] ?? .null, "passphrase": .string(passphrase)])); try await current()
+        var request: [String: JSONValue] = ["operationId": original["operationId"] ?? .null, "includeSecrets": original["includeSecrets"] ?? .null, "passphrase": .string(passphrase)]
+        if let source = original["sourceArchive"] { request["sourceArchive"] = source }
+        let value = try await model.privateConfiguration("export", params: .object(request)); try await current()
         guard value["operationId"] == original["operationId"] else { throw RovaiHostFailure(code: "原导出编号不同") }; receipt = value; if value.text("state") == "ready" { passphrase = "" }
     }
 }
