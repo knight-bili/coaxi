@@ -8,6 +8,7 @@ pub mod model;
 pub mod storage;
 pub(crate) mod fork;
 pub mod policy;
+pub(crate) mod source;
 pub use model::*;
 const MAX_REQUEST_BYTES:usize=2*1024*1024;
 static CONTRACT:LazyLock<Value>=LazyLock::new(||serde_json::from_str(include_str!("contract.json")).expect("confirmed native continuation fork steer r1 contract"));
