@@ -68,6 +68,7 @@ export function createThreadAdapter(transport: ConsoleClient, selectWorkspaceDir
     exportDiagnostics: async () => downloadJson(await transport.request('diagnostics.export'), 'rovai-diagnostics.json'),
     exportMonitoring: async filter => downloadJson({ exportedAt: new Date().toISOString(), ...await transport.request<object>('monitoring.snapshot', filter) }, 'rovai-runtime-monitoring.json'),
     exportUsageActivityReport: async query => downloadJson(await transport.request<object>('monitoring.report',query),'codeg-rovai-usage.json'),
+    exportNativeHistoryUsage: async query => downloadJson(await transport.request<object>('history.usage',query),'codeg-rovai-native-usage.json'),
     revealMonitoringExport: null,
     revealDiagnosticsExport: null,
     memberAvatars: browserMemberAvatars(transport),
