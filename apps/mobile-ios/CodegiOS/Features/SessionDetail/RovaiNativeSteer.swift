@@ -28,7 +28,7 @@ struct RovaiMemberNativeSteerSwitch: View {
             do {let raw = try model.readBody(owner);if !raw.isEmpty {original = try JSONDecoder().decode(JSONValue.self, from: Data(raw.utf8))};try await read()} catch {issue = error.localizedDescription}
         }
     }
-    private func read() async throws {policy = try await nativeUserCall(model, .runtimeSteerPolicyGet, .object(["schemaVersion": .number(1)]))}
+    private func read() async throws {policy = try await nativeUserCall(model, .runtimeSteerPolicyGet, .object([:]))}
     private func accept(_ value: JSONValue, _ input: JSONValue) async throws {
         guard value.text("commandId") == input.text("commandId"), value.text("commandType") == "runtime.steer.policy.set", ["applied", "accepted", "rejected"].contains(value.text("status")), let generation, generation == model.connectionGeneration else {throw RovaiHostFailure(code: "原请求尚无确定回执或归属不同")}
         let raw = String(decoding: try JSONEncoder().encode(input), as: UTF8.self)

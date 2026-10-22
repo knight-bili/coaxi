@@ -24,7 +24,7 @@ internal suspend fun nativeUserCall(model:RovaiWorkspaceViewModel,operation:Rova
 @Composable fun RovaiMemberNativeSteerSwitch(model:RovaiWorkspaceViewModel,agentId:String){
     val coroutine=rememberCoroutineScope();val state=model.state.collectAsState().value;val generation=remember(agentId){model.connectionGeneration};val owner="native-steer-policy:$agentId"
     var policy by remember(agentId){mutableStateOf<JsonObject?>(null)};var original by remember(agentId){mutableStateOf<JsonObject?>(null)};var busy by remember(agentId){mutableStateOf(false)};var issue by remember(agentId){mutableStateOf<String?>(null)}
-    suspend fun read(){policy=nativeUserCall(model,RovaiOperation.RUNTIME_STEER_POLICY_GET,buildJsonObject{put("schemaVersion",1)})}
+    suspend fun read(){policy=nativeUserCall(model,RovaiOperation.RUNTIME_STEER_POLICY_GET,buildJsonObject{})}
     suspend fun accept(result:JsonObject,request:JsonObject){
         require(result.coreText("commandId")==request.coreText("commandId")&&result.coreText("commandType")=="runtime.steer.policy.set"){"原回执归属不一致"}
         require(result.coreText("status") in listOf("applied","accepted","rejected")){"原请求尚无确定回执"}
