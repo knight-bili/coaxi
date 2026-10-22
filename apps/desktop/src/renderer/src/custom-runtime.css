@@ -8,6 +8,7 @@
 .custom-runtime-inspection,.custom-runtime-pending {margin-block:12px;min-width:0}
 .custom-runtime-inspection pre {white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%;font-size:11px;padding:12px;background:var(--surface-subtle);border:1px solid var(--line);border-radius:8px}
 .custom-runtime-pending {padding:12px;border:1px solid var(--line);border-radius:8px}.custom-runtime-pending code {display:block;overflow-wrap:anywhere}
+.custom-runtime-source {font-size:11px;color:var(--muted);overflow-wrap:anywhere}
 .custom-runtime-dialog {max-height:min(88svh,920px);display:flex;flex-direction:column}
 .custom-runtime-dialog>.app-dialog-body {overflow-y:auto;min-height:0;display:block}
 .custom-runtime-setting-card {border:1px solid var(--line);border-radius:10px;margin-block:12px;padding:0 14px;background:var(--surface)}
