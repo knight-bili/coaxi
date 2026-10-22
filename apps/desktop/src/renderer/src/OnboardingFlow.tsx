@@ -60,6 +60,7 @@ export type OnboardingRuntimePhase =
 export const ONBOARDING_PRODUCT_RUNTIMES: readonly AdapterKind[] = VISIBLE_PRODUCT_RUNTIMES
 
 const RUNTIME_LOGOS: Record<AdapterKind, string> = {
+  'custom-acp':PRODUCT_RUNTIME_LOGOS['custom-acp'],
   'claude-code-cli': claudeCodeLogo,
   pi: piLogo,
   'codex-cli': codexLogo,
@@ -84,6 +85,7 @@ const RUNTIME_LOGOS: Record<AdapterKind, string> = {
 }
 
 const RUNTIME_LABELS: Record<AdapterKind, string> = {
+  'custom-acp':'自定义智能体',
   'claude-code-cli': 'Claude Code',
   pi: 'Pi Coding Agent',
   'codex-cli': 'Codex CLI',

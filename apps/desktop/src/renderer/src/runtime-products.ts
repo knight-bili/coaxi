@@ -19,6 +19,7 @@ import geminiLogo from './assets/runtime-logos/gemini-cli.svg'
 import hermesLogo from './assets/runtime-logos/hermes-agent.svg'
 import openclawLogo from './assets/runtime-logos/openclaw.svg'
 import traeLogo from './assets/runtime-logos/trae-color.svg'
+import customAcpLogo from './assets/runtime-logos/custom-acp.svg'
 
 const PRODUCT_RUNTIMES: AdapterKind[] = [
   'claude-code-cli',
@@ -50,6 +51,7 @@ export const VISIBLE_PRODUCT_RUNTIMES: AdapterKind[] = PRODUCT_RUNTIMES.filter(
 )
 
 export const PRODUCT_RUNTIME_LOGOS: Record<AdapterKind, string> = {
+  'custom-acp':customAcpLogo,
   'claude-code-cli': claudeCodeLogo,
   pi: piLogo,
   'codex-cli': codexLogo,
@@ -75,6 +77,7 @@ export const PRODUCT_RUNTIME_LOGOS: Record<AdapterKind, string> = {
 
 export function adapterLabel(kind: AdapterKind): string {
   return {
+    'custom-acp':'自定义智能体',
     'codex-cli': 'Codex CLI',
     pi: 'PI',
     'opencode-cli': 'OpenCode',

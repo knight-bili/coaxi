@@ -4554,6 +4554,10 @@ pub fn resolve_frozen_runtime(
             )));
         }
     };
+    if let Some(reference)=binding.custom_runtime_ref.as_ref(){
+        let current=crate::custom_runtime::storage::latest(transaction,&reference.id)?;
+        if !current.as_ref().is_some_and(|value|value["enabled"]==true&&value["definitionDigest"].as_str()==Some(reference.definition_digest.as_str())){return Ok(Err(runtime_blocker("custom_runtime.definition_changed",json!({"agentId":agent_id,"reference":reference}))))}
+    }
     if binding.permissions.adapter_kind != binding.adapter_kind {
         return Ok(Err(runtime_blocker(
             "runtime_configuration_adapter_mismatch",
@@ -5036,6 +5040,11 @@ fn runtime_readiness(
     }
     if binding.permissions.adapter_kind != binding.adapter_kind {
         return Ok(needs_attention("runtime_permission_adapter_mismatch", None));
+    }
+    if binding.adapter_kind==AdapterKind::CustomAcp{
+        let Some(reference)=binding.custom_runtime_ref.as_ref() else{return Ok(needs_attention("custom_runtime.reference_missing",None))};
+        let current=crate::custom_runtime::storage::latest(database.connection(),&reference.id)?;
+        if !current.as_ref().is_some_and(|value|value["enabled"]==true&&value["definitionDigest"].as_str()==Some(reference.definition_digest.as_str())){return Ok(needs_attention("custom_runtime.definition_changed",None))}
     }
     let mut validation = binding.clone();
     validation.model = ModelSelection::RuntimeDefault;
