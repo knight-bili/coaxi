@@ -213,6 +213,7 @@ const allowedMethods = new Set<CoreMethod>([
   'diagnostics.check',
   'monitoring.snapshot',
   'monitoring.report',
+  'monitoring.prices',
   'monitoring.execution',
   ...RUNTIME_RENDERER_CORE_METHODS,
   'members.list',

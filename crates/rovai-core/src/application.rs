@@ -21,6 +21,7 @@ mod interaction_access;
 mod computer_access;
 mod office_access;
 mod history_import;
+mod usage_price_catalog;
 mod webdav_access;
 mod webdav_transfer;
 mod config_sync;
@@ -858,6 +859,7 @@ fn request_runs_outside_main_queue(method: &str) -> bool {
             | "diagnostics.export"
             | "monitoring.snapshot"
             | "monitoring.report"
+            | "monitoring.prices"
             | "history.usage"
             | "history.usage.local"
             | "monitoring.execution"
@@ -12155,6 +12157,7 @@ impl Core {
             "diagnostics.check" => Ok(serde_json::to_value(self.diagnostics_report().await)?),
             "history.usage" => self.history_usage(false, request.params.clone()).await,
             "history.usage.local" => self.history_usage(true, request.params.clone()).await,
+            "monitoring.prices" => self.usage_price_catalog(request.params.clone()).await,
             "monitoring.report" => {
                 let mut database = self.database.lock().await;
                 MonitoringService::report(&mut database, request.params.clone())

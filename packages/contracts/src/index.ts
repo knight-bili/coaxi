@@ -17,6 +17,13 @@ export interface NativeHistoryUsageSync {
   results:Array<{id:string;indexed:boolean;unchanged?:boolean;facts?:number;error?:string;existingFactsPreserved?:boolean}>
   next:string|null;totalArchives:number;processedThrough:string|null;source:'imported_native_history';originalsUntouched:true
 }
+export interface PublicUsagePriceProvider {
+  id:string;name:string;models:Array<{id:string;name:string;cost_in:number|null;cost_out:number|null;cost_cache_read:number|null;cost_cache_write:number|null}>
+}
+export interface PublicUsagePrices {
+  source:'https://models.dev/api.json';available:boolean;fetchedAt:string|null;contentDigest:string|null;originDigest:string|null
+  providers:PublicUsagePriceProvider[];stale:boolean;refreshError:string|null;ratesArePerMillionUsd:true;actualBill:false
+}
 export type { NativeAgentReadReference, NativeAgentReadStart, NativeChildReadReference, NativeChildReadStart, NativeChildReadView, NativeChildReadPageRequest, NativeChildReadPage } from './native-child-reads'
 export type { DelegationToolSourceParams, DelegationToolSourceIdentity, DelegationToolSourceView } from './delegation-tool-source'
 
@@ -4788,6 +4795,7 @@ export type CoreMethod =
   | 'diagnostics.check'
   | 'monitoring.snapshot'
   | 'monitoring.report'
+  | 'monitoring.prices'
   | 'monitoring.execution'
   | 'runtime.discovery.rescan'
   | 'runtime.networkRecovery.wake'
