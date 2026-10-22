@@ -968,6 +968,7 @@ pub struct SetMemberRuntimeConfigurationCommand {
 impl sealed::Sealed for SetMemberRuntimeConfigurationCommand {}
 impl DomainCommand for SetMemberRuntimeConfigurationCommand {
     const TYPE: &'static str = "agent_profile.runtime.set";
+    fn exact_replay(&self)->bool {self.adapter_kind==AdapterKind::CustomAcp||self.custom_runtime_ref.is_some()}
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

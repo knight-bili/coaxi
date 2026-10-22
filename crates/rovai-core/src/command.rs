@@ -22,6 +22,7 @@ pub trait DomainCommand: sealed::Sealed + Serialize {
     const ALLOWED_WHILE_CAMP_DELETING: bool = false;
     // Opt-in only. Existing commands retain their original first-result semantics.
     const EXACT_REPLAY: bool = false;
+    fn exact_replay(&self)->bool {Self::EXACT_REPLAY}
 
     /// Existing private draft commands belong to a Host-verified editor.
     fn draft_client(&self) -> Option<&crate::draft_client::DraftClient> {
@@ -445,11 +446,11 @@ fn replay_or_conflict<C>(
 where
     C: DomainCommand,
 {
-    let exact = if C::EXACT_REPLAY {
-        let stored: (Option<String>, Option<i64>) = connection.query_row(
+    let stored: (Option<String>, Option<i64>) = connection.query_row(
             "SELECT request_digest,request_digest_version FROM event_log WHERE event_type='command.result' AND command_id=?1",
             [&envelope.command_id], |row| Ok((row.get(0)?,row.get(1)?)),
         )?;
+    let exact = if envelope.payload.exact_replay() || stored.0.is_some() {
         stored
             == (
                 Some(canonical_json_digest(&serde_json::to_value(envelope)?)?),
@@ -662,8 +663,8 @@ where
             result_entity_id,
             result.recorded_at,
             result.command_client_id,
-            if C::EXACT_REPLAY { Some(canonical_json_digest(&serde_json::to_value(envelope)?)?) } else { None },
-            if C::EXACT_REPLAY { Some(1_i64) } else { None },
+            if envelope.payload.exact_replay() { Some(canonical_json_digest(&serde_json::to_value(envelope)?)?) } else { None },
+            if envelope.payload.exact_replay() { Some(1_i64) } else { None },
         ],
     )?;
     Ok(())
