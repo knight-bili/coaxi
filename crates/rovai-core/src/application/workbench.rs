@@ -151,7 +151,7 @@ fn git_arguments(request: &GitRequest, write: bool) -> Result<Vec<String>> {
             "tags" => vec!["tag","--list","--format=%(refname:short)%00%(objectname)%00%(subject)%1e"].into_iter().map(String::from).collect(),
             "stash_diff" => vec!["stash".into(),"show".into(),"--no-ext-diff".into(),"--no-textconv".into(),"-p".into(),"--include-untracked".into(),target()?],
             "file_at" => {ensure!(request.paths.len()==1,"workbench.paths_required");vec!["show".into(),format!("{}:{}",target()?,request.paths[0])]},
-            "diff_compare" => {let mut args=vec!["diff".into(),"--no-ext-diff".into(),"--no-textconv".into(),"--binary".into(),target()?,"--".into()];args.extend(request.paths.iter().map(|path|format!(":(literal){path}")));args},
+            "diff_compare" => {let mut args=vec!["diff".into(),"--no-ext-diff".into(),"--no-textconv".into(),"--binary".into(),target()?,"--".into()];args.extend(request.paths.iter().cloned());args},
             "branches" => vec!["for-each-ref", "--format=%(refname)%00%(objectname)%00%(upstream:short)%00%(HEAD)%1e", "refs/heads", "refs/remotes"].into_iter().map(String::from).collect(),
             "stash" => vec!["stash", "list", "--format=%gd%x00%H%x00%gs%x1e"].into_iter().map(String::from).collect(),
             "remotes" => vec!["remote", "-v"].into_iter().map(String::from).collect(),
@@ -217,7 +217,7 @@ fn git_arguments(request: &GitRequest, write: bool) -> Result<Vec<String>> {
         }
     };
     let mut args = args;
-    if matches!(request.action.as_str(), "stage"|"unstage"|"diff"|"diff_staged"|"show"|"clean"|"discard") { args.extend(request.paths.iter().map(|path|format!(":(literal){path}"))); }
+    if matches!(request.action.as_str(), "stage"|"unstage"|"diff"|"diff_staged"|"show"|"clean"|"discard") { args.extend(request.paths.iter().cloned()); }
     Ok(args)
 }
 
