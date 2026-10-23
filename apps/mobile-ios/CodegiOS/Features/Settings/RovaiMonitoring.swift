@@ -2,6 +2,16 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 private let monitoringMetrics: [(String, String)] = [("promptInputTotalTokens", "输入Token"), ("outputTokens", "输出Token"), ("uncachedInputTokens", "未缓存输入"), ("cacheReadTokens", "缓存读取"), ("cacheWriteTokens", "缓存写入"), ("reasoningOutputTokens", "推理输出"), ("cacheReadShare", "缓存读取占比"), ("requestCacheHitRate", "请求缓存命中率")]
+private struct MonitoringCoverageMetric {
+    let key: String
+    let title: String
+}
+
+private let monitoringCoverageMetrics: [MonitoringCoverageMetric] =
+    monitoringMetrics
+        .filter { $0.0 != "cacheReadShare" }
+        .map { MonitoringCoverageMetric(key: $0.0, title: $0.1) }
+        + [MonitoringCoverageMetric(key: "cost", title: "成本")]
 private func monitoringNumber(_ value: JSONValue?, percent: Bool = false) -> String {guard case .number(let number) = value else {return "—"};let format = NumberFormatter();format.numberStyle = percent ? .percent : .decimal;format.maximumFractionDigits = percent ? 1 : 0;return format.string(from: NSNumber(value: number)) ?? "—"}
 private func monitoringMoney(_ value: JSONValue?) -> String {let values = (value?.rvArray ?? []).map {row in let origin = [row.text("kind"), row.text("source")].filter {!$0.isEmpty}.joined(separator: " / ");return row.text("currency") + " " + row.text("amount") + (origin.isEmpty ? "" : "（" + origin + "）")};return values.isEmpty ? "—" : values.joined(separator: " · ")}
 private struct MonitoringRequestKey: Hashable {let filter: JSONValue;let active: Bool;let generation: UInt64}
@@ -52,7 +62,9 @@ private struct RovaiRuntimeMonitoring: View {
                 }
                 Section("用量趋势") {RovaiMonitoringTrend(points: value["trend"]?.rvArray ?? [])}
                 Section("采集覆盖率") {
-                    ForEach(monitoringMetrics.filter {$0.0 != "cacheReadShare"} + [("cost", "成本")], id: \.0) {key, title in let coverage = value["coverage"]?[key];LabeledContent(title, value: "\(coverage?["observedRuns"]?.rvInt ?? 0)/\(coverage?["eligibleRuns"]?.rvInt ?? 0)")}
+                    ForEach(monitoringCoverageMetrics, id: \.key) { metric in
+                        monitoringCoverageRow(metric, value: value)
+                    }
                 } footer: {Text("仅包含已收到的观测。未知不等于零，正常结束也不代表统计完整。")}
                 breakdown("按智能体", rows: value["byRuntime"]?.rvArray ?? [])
                 breakdown("按模型", rows: value["byModel"]?.rvArray ?? [])
@@ -77,6 +89,12 @@ private struct RovaiRuntimeMonitoring: View {
     }
     private func choices(_ group: String, key: String, selected: String) -> [String] {Array(Set((snapshot?[group]?.rvArray ?? []).map {$0.text(key)} + [selected])).filter {!$0.isEmpty}.sorted()}
     private func filterPicker(_ title: String, selection: Binding<String>, choices: [String]) -> some View {Picker(title, selection: selection) {Text("全部").tag("");ForEach(choices, id: \.self) {Text($0).tag($0)}}}
+    private func monitoringCoverageRow(_ metric: MonitoringCoverageMetric, value: JSONValue) -> some View {
+        let coverage = value["coverage"]?[metric.key]
+        let observedRuns = coverage?["observedRuns"]?.rvInt ?? 0
+        let eligibleRuns = coverage?["eligibleRuns"]?.rvInt ?? 0
+        return LabeledContent(metric.title, value: "\(observedRuns)/\(eligibleRuns)")
+    }
     private func metricRows(_ value: JSONValue?) -> some View {ForEach(monitoringMetrics, id: \.0) {key, title in LabeledContent(title, value: monitoringNumber(value?[key], percent: ["cacheReadShare", "requestCacheHitRate"].contains(key)))}}
     private func breakdown(_ title: String, rows: [JSONValue]) -> some View {
         Section(title) {ForEach(Array(rows.enumerated()), id: \.offset) {_, row in DisclosureGroup {
