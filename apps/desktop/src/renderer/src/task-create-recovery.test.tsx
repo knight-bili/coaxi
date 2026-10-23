@@ -85,7 +85,7 @@ describe('TaskPanel 创建恢复', () => {
     )
     const view = render(ownerTree(clientA, refreshA))
     const openCreate = async (): Promise<void> => {
-      if (!view.container.querySelector('form.task-editor')) {
+      if (!view.baseElement.querySelector('form.task-editor')) {
         fireEvent.click(view.getByRole('button', { name: /新建/ }))
       }
       await waitFor(() => expect(view.getByLabelText('标题')).toBeTruthy())
@@ -96,7 +96,7 @@ describe('TaskPanel 创建恢复', () => {
       fireEvent.change(view.getByLabelText('负责人'), { target: { value: 'agent_2' } })
     }
     const submitCreate = (): void => {
-      const form = view.container.querySelector('form.task-editor')
+      const form = view.baseElement.querySelector('form.task-editor')
       if (!form) throw new Error('Task create form is missing')
       fireEvent.submit(form)
     }
