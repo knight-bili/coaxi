@@ -47,7 +47,7 @@ pub(super) fn validate(tree: &Path, data: &Path) -> Result<()> {
     let source = owner["root"].as_str().context("workbench.worktree_owner_mismatch")?;
     let source_path = fs::canonicalize(source)?;
     // The source must remain an ordinary project; no recursive managed-data grant.
-    ensure!(!source_path.starts_with(data) && source_path.parent().is_some()
+    ensure!(source_path.is_dir() && !source_path.starts_with(data) && source_path.parent().is_some()
         && persisted_workspace_path_matches_canonical(Path::new(source), &source_path), "workbench.worktree_owner_mismatch");
     let branch = owner["branch"].as_str().context("workbench.worktree_owner_mismatch")?;
     ensure!(!branch.is_empty() && !branch.starts_with('-') && !branch.contains(['\0', '\r', '\n']), "workbench.worktree_owner_mismatch");
