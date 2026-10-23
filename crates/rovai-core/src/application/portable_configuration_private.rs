@@ -18,7 +18,7 @@ impl Core{
         if method=="configuration.files.finish"{
             #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Input{command_id:String}
             let input:Input=serde_json::from_value(value)?;
-            let _lock=crate::workbench::MUTATIONS.lock().await;let database=self.database.lock().await;
+            let _lock=super::workbench::MUTATIONS.lock().await;let database=self.database.lock().await;
             let original=configuration::migration::receipt(database.connection(),client.id(),&input.command_id)?;
             ensure!(original["state"]=="applied","configuration.original_database_result_required");
             // 只接续已提交的原文件计划，不能重新导入或重试已经冲突、失败的计划。
@@ -27,20 +27,20 @@ impl Core{
             emit(&self.output,"portableConfiguration.filesChanged",json!({"commandId":input.command_id,"readReceipt":true}));return Ok(result)
         }
         if method=="configuration.taskTemplates"{
-            let _lock=crate::workbench::MUTATIONS.lock().await;let mut database=self.database.lock().await;
+            let _lock=super::workbench::MUTATIONS.lock().await;let mut database=self.database.lock().await;
             let changed=matches!(value["operation"].as_str(),Some("put"|"remove"));
             let result=configuration::task_templates::access(&mut database,&self.data_dir,client,value)?;
             if changed{emit(&self.output,"portableConfiguration.templatesChanged",json!({"readLibrary":true}));}return Ok(result)
         }
         if method=="configuration.logging"{
-            let _lock=crate::workbench::MUTATIONS.lock().await;
+            let _lock=super::workbench::MUTATIONS.lock().await;
             return crate::diagnostic_preferences::access(&self.data_dir,value)
         }
         if method=="configuration.sync"{
             if value["operation"]=="receipt"{
                 #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Input{operation:String,command_id:String}
                 let input:Input=serde_json::from_value(value)?;ensure!(input.operation=="receipt","configuration.sync_operation_invalid");
-                let _lock=crate::workbench::MUTATIONS.lock().await;
+                let _lock=super::workbench::MUTATIONS.lock().await;
                 return super::config_sync::original_receipt(&self.data_dir,&input.command_id)
             }
             ensure!(value["operation"].as_str().is_some_and(|operation|["get","set","upload","cancel","resume","archive","cache_preview","cache_remove","cache_status"].contains(&operation)),"configuration.sync_operation_invalid");
@@ -48,7 +48,7 @@ impl Core{
         }
         if method=="configuration.export.prepare"{
             let input:configuration::export_artifact::Prepare=serde_json::from_value(value)?;
-            let _lock=crate::workbench::MUTATIONS.lock().await;let database=self.database.lock().await;
+            let _lock=super::workbench::MUTATIONS.lock().await;let database=self.database.lock().await;
             let frozen=configuration::export_artifact::freeze(database.connection(),&self.data_dir,client.id(),input)?;drop(database);
             return tokio::task::spawn_blocking(move||configuration::export_artifact::finish(frozen)).await.context("configuration.export_worker_unavailable")?
         }
@@ -58,7 +58,7 @@ impl Core{
         }
         if matches!(method,"configuration.desktopOwner.register"|"configuration.desktopOwner.pending"|"configuration.desktopOwner.acknowledge"){
             ensure!(client.is_desktop(),"configuration.desktop_owner_required");
-            let _lock=crate::workbench::MUTATIONS.lock().await;let database=self.database.lock().await;
+            let _lock=super::workbench::MUTATIONS.lock().await;let database=self.database.lock().await;
             if method=="configuration.desktopOwner.register"{
                 #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Input{preferences_root:PathBuf}
                 let input:Input=serde_json::from_value(value)?;
