@@ -24,7 +24,11 @@ fn computer_optional_u32(arguments: &Value, tool: &str, key: &str) -> Result<Opt
         None | Some(Value::Null) => Ok(None),
         Some(v) => v
             .as_u64()
-            .or_else(|| v.as_f64().filter(|f| f.fract() == 0.0 && *f >= 0.0).map(|f| f as u64))
+            .or_else(|| {
+                v.as_f64()
+                    .filter(|f| f.fract() == 0.0 && *f >= 0.0)
+                    .map(|f| f as u64)
+            })
             .and_then(|n| u32::try_from(n).ok())
             .map(Some)
             .ok_or_else(|| format!("{tool}: `{key}` must be a whole non-negative number, not {v}")),
@@ -75,8 +79,9 @@ pub fn computer_verify_request(
             .iter()
             .enumerate()
             .map(|(i, item)| {
-                serde_json::from_value::<VerifyPredicate>(item.clone())
-                    .map_err(|e| format!("{tool}: `expect[{i}]` is not a predicate this tool knows: {e}"))
+                serde_json::from_value::<VerifyPredicate>(item.clone()).map_err(|e| {
+                    format!("{tool}: `expect[{i}]` is not a predicate this tool knows: {e}")
+                })
             })
             .collect::<Result<_, _>>()?,
         _ => {
@@ -133,7 +138,6 @@ fn computer_coordinate(value: &Value, tool: &str) -> Result<(f64, f64), String> 
         )
     })
 }
-
 
 fn computer_generation(arguments: &Value, tool: &str, what: &str) -> Result<String, String> {
     arguments
@@ -338,7 +342,9 @@ fn computer_bool(arguments: &Value, tool: &str, key: &str) -> Result<bool, Strin
     match arguments.get(key) {
         None | Some(Value::Null) => Ok(false),
         Some(Value::Bool(b)) => Ok(*b),
-        Some(other) => Err(format!("{tool}: `{key}` must be true or false, not {other}")),
+        Some(other) => Err(format!(
+            "{tool}: `{key}` must be true or false, not {other}"
+        )),
     }
 }
 
@@ -486,11 +492,12 @@ pub fn computer_act_request(
                      computer_screenshot), with its `generation`"
                 )
             })?;
-            let button = match computer_choice(arguments, tool, "button", &["left", "right", "middle"])? {
-                Some("right") => PointerButton::Right,
-                Some("middle") => PointerButton::Middle,
-                _ => PointerButton::Left,
-            };
+            let button =
+                match computer_choice(arguments, tool, "button", &["left", "right", "middle"])? {
+                    Some("right") => PointerButton::Right,
+                    Some("middle") => PointerButton::Middle,
+                    _ => PointerButton::Left,
+                };
             let count = computer_count(arguments, tool, "count", 1..=2, 1)?;
             if count == 2 && button != PointerButton::Left {
                 return Err(format!(
@@ -682,18 +689,46 @@ pub fn computer_act_request(
     Ok((target_id, request, delivery))
 }
 
-pub async fn dispatch(access:&impl crate::model_tools::ComputerToolAccess,name:&str,arguments:&Value)->anyhow::Result<Value>{
+pub async fn dispatch(
+    access: &impl crate::model_tools::ComputerToolAccess,
+    name: &str,
+    arguments: &Value,
+) -> anyhow::Result<Value> {
     use crate::model_tools::ComputerToolAccess;
-    let parsed=|error:String|anyhow::anyhow!("invalid_arguments: {error}");
-    let value=match name {
-        "computer_list_apps"=>serde_json::to_value(access.list_apps().await)?,
-        "computer_list_windows"=>serde_json::to_value(access.list_windows(computer_optional_u32(arguments,name,"pid").map_err(parsed)?).await)?,
-        "computer_screenshot"=>{let (target,max)=computer_capture_request(arguments).map_err(parsed)?;serde_json::to_value(access.capture(&target,max).await)?},
-        "computer_snapshot"=>{let (target,request)=computer_snapshot_request(arguments).map_err(parsed)?;serde_json::to_value(access.snapshot(&target,request).await)?},
-        "computer_verify"=>{let (target,request)=computer_verify_request(arguments).map_err(parsed)?;serde_json::to_value(access.verify(&target,request).await)?},
-        "computer_launch_app"=>{let (app,key)=computer_launch_arguments(arguments).map_err(parsed)?;serde_json::to_value(access.launch_app(app,key).await)?},
-        "computer_clipboard_read"|"computer_clipboard_write"=>serde_json::to_value(access.clipboard(computer_clipboard_op(name,arguments).map_err(parsed)?).await)?,
-        _=>{let(target,request,delivery)=computer_act_request(name,arguments).map_err(parsed)?;serde_json::to_value(access.act(&target,request,delivery).await)?},
+    let parsed = |error: String| anyhow::anyhow!("invalid_arguments: {error}");
+    let value = match name {
+        "computer_list_apps" => serde_json::to_value(access.list_apps().await)?,
+        "computer_list_windows" => serde_json::to_value(
+            access
+                .list_windows(computer_optional_u32(arguments, name, "pid").map_err(parsed)?)
+                .await,
+        )?,
+        "computer_screenshot" => {
+            let (target, max) = computer_capture_request(arguments).map_err(parsed)?;
+            serde_json::to_value(access.capture(&target, max).await)?
+        }
+        "computer_snapshot" => {
+            let (target, request) = computer_snapshot_request(arguments).map_err(parsed)?;
+            serde_json::to_value(access.snapshot(&target, request).await)?
+        }
+        "computer_verify" => {
+            let (target, request) = computer_verify_request(arguments).map_err(parsed)?;
+            serde_json::to_value(access.verify(&target, request).await)?
+        }
+        "computer_launch_app" => {
+            let (app, key) = computer_launch_arguments(arguments).map_err(parsed)?;
+            serde_json::to_value(access.launch_app(app, key).await)?
+        }
+        "computer_clipboard_read" | "computer_clipboard_write" => serde_json::to_value(
+            access
+                .clipboard(computer_clipboard_op(name, arguments).map_err(parsed)?)
+                .await,
+        )?,
+        _ => {
+            let (target, request, delivery) =
+                computer_act_request(name, arguments).map_err(parsed)?;
+            serde_json::to_value(access.act(&target, request, delivery).await)?
+        }
     };
     Ok(value)
 }

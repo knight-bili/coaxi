@@ -42,4 +42,3 @@ impl std::fmt::Debug for ResolvedAuth {
             .finish()
     }
 }
-

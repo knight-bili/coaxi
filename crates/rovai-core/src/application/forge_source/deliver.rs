@@ -22,4 +22,3 @@ pub struct NewPullRequest<'a> {
     pub body: &'a str,
     pub draft: bool,
 }
-

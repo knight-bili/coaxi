@@ -99,25 +99,46 @@ impl Core {
         let actor = ActorRef::User {
             user_id: CURRENT_USER_ID.into(),
         };
-        let (thread_id, directory) = if let Ok(reference) =
-            self.native_child_readers.agent_reference(&actor, &request.read_id)
+        let (thread_id, directory) = if let Ok(reference) = self
+            .native_child_readers
+            .agent_reference(&actor, &request.read_id)
         {
-            anyhow::ensure!(reference.thread_id == request.thread_id, "native_child.scope_changed");
+            anyhow::ensure!(
+                reference.thread_id == request.thread_id,
+                "native_child.scope_changed"
+            );
             let database = self.database.lock().await;
             let plan = NativeAgentService::prepare(
-                &database, &ManagedBlobStore::new(&self.data_dir), &actor, &reference,
+                &database,
+                &ManagedBlobStore::new(&self.data_dir),
+                &actor,
+                &reference,
             )?;
-            let directory = self.native_child_readers.agent_file_directory(&actor, &request.read_id, &plan)?;
+            let directory =
+                self.native_child_readers
+                    .agent_file_directory(&actor, &request.read_id, &plan)?;
             (reference.thread_id, directory)
         } else {
-            let reference = self.native_child_readers.reference(&actor, &request.read_id)?;
-            anyhow::ensure!(reference.thread_id == request.thread_id, "native_child.scope_changed");
+            let reference = self
+                .native_child_readers
+                .reference(&actor, &request.read_id)?;
+            anyhow::ensure!(
+                reference.thread_id == request.thread_id,
+                "native_child.scope_changed"
+            );
             let database = self.database.lock().await;
             let root = NativeChildSessionService::resolve(
-                &database, &ManagedBlobStore::new(&self.data_dir), &actor, &reference,
+                &database,
+                &ManagedBlobStore::new(&self.data_dir),
+                &actor,
+                &reference,
             )?;
-            let target = self.native_child_readers.file_target(&actor, &request.read_id, &root)?;
-            let directory = target.recorded_working_directory.context("native_child.source_unavailable")?;
+            let target = self
+                .native_child_readers
+                .file_target(&actor, &request.read_id, &root)?;
+            let directory = target
+                .recorded_working_directory
+                .context("native_child.source_unavailable")?;
             (reference.thread_id, directory)
         };
         Ok(serde_json::to_value(

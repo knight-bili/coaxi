@@ -450,9 +450,12 @@ impl SingleChatService {
         {
             return Ok(vec![]);
         }
-        let sources = if let Some(input)=envelope.payload.native_input_continuation(){
-            crate::native_lifecycle::normal::validate(connection,&input)?;input.sources
-        }else{materials.sources()?};
+        let sources = if let Some(input) = envelope.payload.native_input_continuation() {
+            crate::native_lifecycle::normal::validate(connection, &input)?;
+            input.sources
+        } else {
+            materials.sources()?
+        };
         if sources.len() > MAX_PREPARED_ATTACHMENTS {
             return Ok(vec![]);
         }
@@ -2005,7 +2008,12 @@ impl SingleChatService {
             return Ok(None);
         };
         if matches!(owner, ComposerOwner::DelegationChild)
-            && !owner.exists(database.connection(), &conversation.camp_id, conversation_id, false)?
+            && !owner.exists(
+                database.connection(),
+                &conversation.camp_id,
+                conversation_id,
+                false,
+            )?
         {
             anyhow::bail!("delegation.takeover_required");
         }
@@ -2077,8 +2085,12 @@ impl SingleChatService {
             .draft
         };
         let pending_inputs = match owner {
-            ComposerOwner::SingleChat => read_single_chat_pending_inputs(database, conversation_id, &self.client, key)?,
-            ComposerOwner::DelegationChild => read_owned_pending_inputs(database, conversation_id, &self.client, key, owner)?,
+            ComposerOwner::SingleChat => {
+                read_single_chat_pending_inputs(database, conversation_id, &self.client, key)?
+            }
+            ComposerOwner::DelegationChild => {
+                read_owned_pending_inputs(database, conversation_id, &self.client, key, owner)?
+            }
         };
         let agent_runs = {
             let mut statement = database.connection().prepare(
@@ -2853,10 +2865,21 @@ fn admit_single_chat_message(
     } else {
         SINGLE_CHAT_OPERATION_POLICY
     };
-    let mut selected_runtime=runtime.clone();
-    if selected_runtime.conversation_tools.is_none(){crate::conversation_tools::runtime::freeze_for_conversation(transaction,&target.conversation_id,&target.agent_id,&mut selected_runtime)?;}
-    crate::conversation_tools::runtime::select_user_sources(transaction,&mut selected_runtime,body)?;
-    let runtime=&selected_runtime;
+    let mut selected_runtime = runtime.clone();
+    if selected_runtime.conversation_tools.is_none() {
+        crate::conversation_tools::runtime::freeze_for_conversation(
+            transaction,
+            &target.conversation_id,
+            &target.agent_id,
+            &mut selected_runtime,
+        )?;
+    }
+    crate::conversation_tools::runtime::select_user_sources(
+        transaction,
+        &mut selected_runtime,
+        body,
+    )?;
+    let runtime = &selected_runtime;
     let (effective_config, runtime) = if child {
         crate::delegation_user::followup_config(
             transaction,

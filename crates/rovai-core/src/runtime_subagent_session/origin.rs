@@ -37,9 +37,9 @@ impl std::fmt::Debug for CapturedNativeSource {
 
 impl CapturedNativeSource {
     /// 只比较 Core 已选择来源与该子进程最终环境中的原生目录；不把路径投影给客户端。
-    pub(crate) fn contains_selected_root(&self,selected:&Path)->Result<bool>{
-        let home=std::fs::canonicalize(&self.home)?;
-        let selected=std::fs::canonicalize(selected)?;
+    pub(crate) fn contains_selected_root(&self, selected: &Path) -> Result<bool> {
+        let home = std::fs::canonicalize(&self.home)?;
+        let selected = std::fs::canonicalize(selected)?;
         Ok(selected.starts_with(home))
     }
     /// The caller passes ManagedProcessLaunchSpec's FINAL environment and cwd,
@@ -88,12 +88,16 @@ impl CapturedNativeSource {
                 let sessions = if let Some(root) = get("DEEPSEEK_ACP_SESSIONS_ROOT") {
                     PathBuf::from(root)
                 } else {
-                    let root = match get("DSH_HOME").filter(|value| !value.to_string_lossy().trim().is_empty()) {
+                    let root = match get("DSH_HOME")
+                        .filter(|value| !value.to_string_lossy().trim().is_empty())
+                    {
                         Some(value) => {
                             let text = value.to_str()?;
                             match os_home() {
                                 Some(home) if text == "~" => home,
-                                Some(home) if text.starts_with("~/") || text.starts_with("~\\") => home.join(&text[2..]),
+                                Some(home) if text.starts_with("~/") || text.starts_with("~\\") => {
+                                    home.join(&text[2..])
+                                }
                                 _ => PathBuf::from(value),
                             }
                         }

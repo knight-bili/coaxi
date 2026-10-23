@@ -35,8 +35,12 @@ impl WebControl {
         Arc::new(Self {
             channels: desktop
                 .then(|| Arc::new(crate::desktop_channels::DesktopChannels::new(core.clone()))),
-            standalone_channels: (!desktop).then(|| Arc::new(crate::server_channels::ServerChannels::new(core.clone()))),
-            transport_channels: Arc::new(crate::transport_channels::TransportChannels::new(core.clone(), data_dir.clone())),
+            standalone_channels: (!desktop)
+                .then(|| Arc::new(crate::server_channels::ServerChannels::new(core.clone()))),
+            transport_channels: Arc::new(crate::transport_channels::TransportChannels::new(
+                core.clone(),
+                data_dir.clone(),
+            )),
             core,
             data_dir,
             updates,
@@ -48,12 +52,18 @@ impl WebControl {
     }
 
     pub async fn start_transport_adapters(&self) {
-        if self.transport_channels.start().await.is_err() { tracing::warn!("Transport channel inbox is unavailable"); }
+        if self.transport_channels.start().await.is_err() {
+            tracing::warn!("Transport channel inbox is unavailable");
+        }
     }
 
     pub async fn start(&self, config: WebConfig, token: &str) -> anyhow::Result<Value> {
         if let Some(channels) = &self.standalone_channels {
-            if channels.start().await.is_err() { tracing::warn!("Standalone channel package unavailable; Core and Web remain available"); }
+            if channels.start().await.is_err() {
+                tracing::warn!(
+                    "Standalone channel package unavailable; Core and Web remain available"
+                );
+            }
         }
         self.state
             .lock()
@@ -66,7 +76,11 @@ impl WebControl {
                 self.channels
                     .clone()
                     .map(|channels| channels as Arc<dyn rovai_web::ChannelHost>)
-                    .or_else(|| self.standalone_channels.clone().map(|channels| channels as Arc<dyn rovai_web::ChannelHost>)),
+                    .or_else(|| {
+                        self.standalone_channels
+                            .clone()
+                            .map(|channels| channels as Arc<dyn rovai_web::ChannelHost>)
+                    }),
                 self.updates.clone(),
             )
             .await
@@ -79,7 +93,9 @@ impl WebControl {
         }
         drop(state);
         self.transport_channels.shutdown().await;
-        if let Some(channels) = &self.standalone_channels { channels.shutdown().await; }
+        if let Some(channels) = &self.standalone_channels {
+            channels.shutdown().await;
+        }
     }
 
     pub async fn stop(&self) -> anyhow::Result<()> {

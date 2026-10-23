@@ -5,140 +5,140 @@ use serde::{Deserialize, Serialize};
 /// and the legacy shared draft remain outside the network capability.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub enum Operation {
-    #[serde(rename="conversationTools.policy.get")]
+    #[serde(rename = "conversationTools.policy.get")]
     ConversationPolicyGet,
-    #[serde(rename="conversationTools.policy.set")]
+    #[serde(rename = "conversationTools.policy.set")]
     ConversationPolicySet,
-    #[serde(rename="conversationTools.questions.list")]
+    #[serde(rename = "conversationTools.questions.list")]
     ConversationQuestionsList,
-    #[serde(rename="conversationTools.questions.answer")]
+    #[serde(rename = "conversationTools.questions.answer")]
     ConversationQuestionsAnswer,
-    #[serde(rename="conversationTools.questions.decline")]
+    #[serde(rename = "conversationTools.questions.decline")]
     ConversationQuestionsDecline,
-    #[serde(rename="conversationTools.questions.reconcile")]
+    #[serde(rename = "conversationTools.questions.reconcile")]
     ConversationQuestionsReconcile,
-    #[serde(rename="conversationTools.grants.preview")]
+    #[serde(rename = "conversationTools.grants.preview")]
     ConversationGrantsPreview,
-    #[serde(rename="conversationTools.grants.confirm")]
+    #[serde(rename = "conversationTools.grants.confirm")]
     ConversationGrantsConfirm,
-    #[serde(rename="conversationTools.grants.revoke")]
+    #[serde(rename = "conversationTools.grants.revoke")]
     ConversationGrantsRevoke,
-    #[serde(rename="conversationTools.grants.list")]
+    #[serde(rename = "conversationTools.grants.list")]
     ConversationGrantsList,
-    #[serde(rename="conversationTools.requests.get")]
+    #[serde(rename = "conversationTools.requests.get")]
     ConversationRequestsGet,
-    #[serde(rename="conversationTools.requests.resolve")]
+    #[serde(rename = "conversationTools.requests.resolve")]
     ConversationRequestsResolve,
-    #[serde(rename="conversationTools.automationOwner.get")]
+    #[serde(rename = "conversationTools.automationOwner.get")]
     ConversationAutomationOwnerGet,
-    #[serde(rename="conversationTools.automationOwner.set")]
+    #[serde(rename = "conversationTools.automationOwner.set")]
     ConversationAutomationOwnerSet,
 
-    #[serde(rename="configuration.migration.archives")]
+    #[serde(rename = "configuration.migration.archives")]
     PortableMigrationArchives,
-    #[serde(rename="configuration.migration.targets")]
+    #[serde(rename = "configuration.migration.targets")]
     PortableMigrationTargets,
-    #[serde(rename="configuration.migration.preview")]
+    #[serde(rename = "configuration.migration.preview")]
     PortableMigrationPreview,
-    #[serde(rename="configuration.migration.confirm")]
+    #[serde(rename = "configuration.migration.confirm")]
     PortableMigrationConfirm,
-    #[serde(rename="configuration.migration.receipt")]
+    #[serde(rename = "configuration.migration.receipt")]
     PortableMigrationReceipt,
-    #[serde(rename="configuration.migration.undoPreview")]
+    #[serde(rename = "configuration.migration.undoPreview")]
     PortableMigrationUndoPreview,
-    #[serde(rename="configuration.migration.undoConfirm")]
+    #[serde(rename = "configuration.migration.undoConfirm")]
     PortableMigrationUndoConfirm,
-    #[serde(rename="configuration.providers.list")]
+    #[serde(rename = "configuration.providers.list")]
     PortableProvidersList,
-    #[serde(rename="configuration.providers.upsert")]
+    #[serde(rename = "configuration.providers.upsert")]
     PortableProvidersUpsert,
-    #[serde(rename="configuration.providers.remove")]
+    #[serde(rename = "configuration.providers.remove")]
     PortableProvidersRemove,
-    #[serde(rename="configuration.memberConnection.get")]
+    #[serde(rename = "configuration.memberConnection.get")]
     PortableMemberConnectionGet,
-    #[serde(rename="configuration.memberConnection.set")]
+    #[serde(rename = "configuration.memberConnection.set")]
     PortableMemberConnectionSet,
-    #[serde(rename="history.execution.records")]
+    #[serde(rename = "history.execution.records")]
     NativeCreationRecords,
-    #[serde(rename="runtime.steer.evidence")]
+    #[serde(rename = "runtime.steer.evidence")]
     NativeSteerEvidence,
-    #[serde(rename="runtime.steer.normal.preview")]
+    #[serde(rename = "runtime.steer.normal.preview")]
     NativeNormalPreview,
-    #[serde(rename="runtime.steer.normal.confirm")]
+    #[serde(rename = "runtime.steer.normal.confirm")]
     NativeNormalConfirm,
-    #[serde(rename="runtime.steer.normal.receipt")]
+    #[serde(rename = "runtime.steer.normal.receipt")]
     NativeNormalReceipt,
-    #[serde(rename="history.execution.preview")]
+    #[serde(rename = "history.execution.preview")]
     NativeContinuationPreview,
-    #[serde(rename="history.execution.confirm")]
+    #[serde(rename = "history.execution.confirm")]
     NativeContinuationConfirm,
-    #[serde(rename="history.execution.receipt")]
+    #[serde(rename = "history.execution.receipt")]
     NativeContinuationReceipt,
-    #[serde(rename="runtime.steer.policy.get")]
+    #[serde(rename = "runtime.steer.policy.get")]
     NativeSteerPolicyGet,
-    #[serde(rename="runtime.steer.policy.set")]
+    #[serde(rename = "runtime.steer.policy.set")]
     NativeSteerPolicySet,
-    #[serde(rename="runtime.steer.targets")]
+    #[serde(rename = "runtime.steer.targets")]
     NativeSteerTargets,
-    #[serde(rename="runtime.steer.materials.prepare")]
+    #[serde(rename = "runtime.steer.materials.prepare")]
     NativeSteerMaterialsPrepare,
-    #[serde(rename="runtime.steer.preview")]
+    #[serde(rename = "runtime.steer.preview")]
     NativeSteerPreview,
-    #[serde(rename="runtime.steer.confirm")]
+    #[serde(rename = "runtime.steer.confirm")]
     NativeSteerConfirm,
-    #[serde(rename="runtime.steer.receipt")]
+    #[serde(rename = "runtime.steer.receipt")]
     NativeSteerReceipt,
-    #[serde(rename="runtime.steer.previews")]
+    #[serde(rename = "runtime.steer.previews")]
     NativeSteerPreviews,
-    #[serde(rename="navigation.projectGroups")]
+    #[serde(rename = "navigation.projectGroups")]
     NavigationProjectGroups,
-    #[serde(rename="extensions.catalog")]
+    #[serde(rename = "extensions.catalog")]
     ExtensionCatalog,
-    #[serde(rename="channels.adapters")]
+    #[serde(rename = "channels.adapters")]
     ChannelAdapters,
-    #[serde(rename="forge.links")]
+    #[serde(rename = "forge.links")]
     ForgeLinks,
-    #[serde(rename="workbench.projectLauncher")]
+    #[serde(rename = "workbench.projectLauncher")]
     ProjectLauncher,
-    #[serde(rename="workbench.files.tools")]
+    #[serde(rename = "workbench.files.tools")]
     WorkbenchFileTools,
-    #[serde(rename="office.cli")]
+    #[serde(rename = "office.cli")]
     OfficeCli,
-    #[serde(rename="skillPacks.custom.prepare")]
+    #[serde(rename = "skillPacks.custom.prepare")]
     CustomSkillPrepare,
-    #[serde(rename="skillPacks.custom.install")]
+    #[serde(rename = "skillPacks.custom.install")]
     CustomSkillInstall,
-    #[serde(rename="skillPacks.office.prepare")]
+    #[serde(rename = "skillPacks.office.prepare")]
     OfficeSkillPrepare,
-    #[serde(rename="skillPacks.office.install")]
+    #[serde(rename = "skillPacks.office.install")]
     OfficeSkillInstall,
-    #[serde(rename="pets.operation")]
+    #[serde(rename = "pets.operation")]
     PetsOperation,
-    #[serde(rename="appearance.extensions")]
+    #[serde(rename = "appearance.extensions")]
     AppearanceExtensions,
-    #[serde(rename="backup.webdav.settings")]
+    #[serde(rename = "backup.webdav.settings")]
     WebdavSettings,
-    #[serde(rename="backup.webdav.remote")]
+    #[serde(rename = "backup.webdav.remote")]
     WebdavRemote,
-    #[serde(rename="history.library")]
+    #[serde(rename = "history.library")]
     HistoryLibrary,
-    #[serde(rename="history.usage")]
+    #[serde(rename = "history.usage")]
     HistoryUsage,
-    #[serde(rename="feedback.operation")]
+    #[serde(rename = "feedback.operation")]
     FeedbackOperation,
-    #[serde(rename="runtime.custom.list")]
+    #[serde(rename = "runtime.custom.list")]
     CustomRuntimeList,
-    #[serde(rename="runtime.custom.upsert")]
+    #[serde(rename = "runtime.custom.upsert")]
     CustomRuntimeUpsert,
-    #[serde(rename="runtime.custom.remove")]
+    #[serde(rename = "runtime.custom.remove")]
     CustomRuntimeRemove,
-    #[serde(rename="runtime.custom.install")]
+    #[serde(rename = "runtime.custom.install")]
     CustomRuntimeInstall,
-    #[serde(rename="runtime.custom.inspect")]
+    #[serde(rename = "runtime.custom.inspect")]
     CustomRuntimeInspect,
-    #[serde(rename="runtime.custom.registry")]
+    #[serde(rename = "runtime.custom.registry")]
     CustomRuntimeRegistry,
-    #[serde(rename="office.watch")]
+    #[serde(rename = "office.watch")]
     OfficeWatch,
     #[serde(rename = "forge.accounts.get")]
     ForgeAccountsGet,
@@ -154,7 +154,7 @@ pub enum Operation {
     WorkbenchFilesList,
     #[serde(rename = "workbench.files.read")]
     WorkbenchFilesRead,
-    #[serde(rename="workbench.editor")]
+    #[serde(rename = "workbench.editor")]
     WorkbenchEditor,
     #[serde(rename = "workbench.files.mutate")]
     WorkbenchFilesMutate,
@@ -635,7 +635,10 @@ impl Operation {
             Self::ProjectLauncher => 30,
             Self::WorkbenchFileTools => 120,
             Self::OfficeCli => 30,
-            Self::CustomSkillPrepare | Self::CustomSkillInstall | Self::OfficeSkillPrepare | Self::OfficeSkillInstall => 60,
+            Self::CustomSkillPrepare
+            | Self::CustomSkillInstall
+            | Self::OfficeSkillPrepare
+            | Self::OfficeSkillInstall => 60,
             Self::WebdavSettings => 30,
             Self::HistoryLibrary => 30,
             Self::OfficeWatch => 30,
@@ -656,70 +659,566 @@ impl Operation {
     pub fn project(self, mut value: serde_json::Value) -> serde_json::Value {
         use serde_json::json;
         match self {
-            Self::ConversationPolicyGet|Self::ConversationPolicySet=>if value.is_null(){value}else{select_fields(&value,&["schemaVersion","revision","globalFlags","feedbackGate","members"])},
-            Self::ConversationQuestionsList|Self::ConversationGrantsList=>if value.is_null(){value}else{select_fields(&value,&["items","next"])},
-            Self::ConversationQuestionsAnswer|Self::ConversationQuestionsDecline|Self::ConversationQuestionsReconcile|Self::ConversationRequestsGet=>if value.is_null(){value}else{select_fields(&value,&["request_id","state","outcome","note"])},
-            Self::ConversationGrantsPreview=>if value.is_null(){value}else{select_fields(&value,&["previewId","previewDigest","expiresAt","grant"])},
-            Self::ConversationGrantsConfirm=>if value.is_null(){value}else{select_fields(&value,&["grantId","revision","scope","sourceSessionId","sourceKind","sourceDigest","throughSequence","expiresAt","legacySessionId"])},
-            Self::ConversationGrantsRevoke=>if value.is_null(){value}else{select_fields(&value,&["grantId","revoked"])},
-            Self::ConversationRequestsResolve=>if value.is_null(){value}else{select_fields(&value,&["commandId","agentRunId","executionEpoch","revoked","request_id","state","outcome","note"])},
-            Self::ConversationAutomationOwnerGet|Self::ConversationAutomationOwnerSet=>if value.is_null(){value}else{select_fields(&value,&["automationId","revision","automationVersion","action","timezone","sourceRequestId"])},
+            Self::ConversationPolicyGet | Self::ConversationPolicySet => {
+                if value.is_null() {
+                    value
+                } else {
+                    select_fields(
+                        &value,
+                        &[
+                            "schemaVersion",
+                            "revision",
+                            "globalFlags",
+                            "feedbackGate",
+                            "members",
+                        ],
+                    )
+                }
+            }
+            Self::ConversationQuestionsList | Self::ConversationGrantsList => {
+                if value.is_null() {
+                    value
+                } else {
+                    select_fields(&value, &["items", "next"])
+                }
+            }
+            Self::ConversationQuestionsAnswer
+            | Self::ConversationQuestionsDecline
+            | Self::ConversationQuestionsReconcile
+            | Self::ConversationRequestsGet => {
+                if value.is_null() {
+                    value
+                } else {
+                    select_fields(&value, &["request_id", "state", "outcome", "note"])
+                }
+            }
+            Self::ConversationGrantsPreview => {
+                if value.is_null() {
+                    value
+                } else {
+                    select_fields(
+                        &value,
+                        &["previewId", "previewDigest", "expiresAt", "grant"],
+                    )
+                }
+            }
+            Self::ConversationGrantsConfirm => {
+                if value.is_null() {
+                    value
+                } else {
+                    select_fields(
+                        &value,
+                        &[
+                            "grantId",
+                            "revision",
+                            "scope",
+                            "sourceSessionId",
+                            "sourceKind",
+                            "sourceDigest",
+                            "throughSequence",
+                            "expiresAt",
+                            "legacySessionId",
+                        ],
+                    )
+                }
+            }
+            Self::ConversationGrantsRevoke => {
+                if value.is_null() {
+                    value
+                } else {
+                    select_fields(&value, &["grantId", "revoked"])
+                }
+            }
+            Self::ConversationRequestsResolve => {
+                if value.is_null() {
+                    value
+                } else {
+                    select_fields(
+                        &value,
+                        &[
+                            "commandId",
+                            "agentRunId",
+                            "executionEpoch",
+                            "revoked",
+                            "request_id",
+                            "state",
+                            "outcome",
+                            "note",
+                        ],
+                    )
+                }
+            }
+            Self::ConversationAutomationOwnerGet | Self::ConversationAutomationOwnerSet => {
+                if value.is_null() {
+                    value
+                } else {
+                    select_fields(
+                        &value,
+                        &[
+                            "automationId",
+                            "revision",
+                            "automationVersion",
+                            "action",
+                            "timezone",
+                            "sourceRequestId",
+                        ],
+                    )
+                }
+            }
 
-            Self::NativeCreationRecords => select_fields(&value,&["schemaVersion","items","next"]),
-            Self::PortableMigrationPreview|Self::PortableMigrationUndoPreview=>select_fields(&value,&["schemaVersion","previewId","previewDigest","expiresAt","archiveId","sourceDigest","localDigest","selections","members","rows","canApply"]),
-            Self::PortableMigrationConfirm|Self::PortableMigrationUndoConfirm|Self::PortableMigrationReceipt=>select_fields(&value,&["schemaVersion","commandId","previewId","previewDigest","state","counts","changedMembers","errorCode","historyPreserved","files"]),
-            Self::PortableMigrationArchives|Self::PortableMigrationTargets|Self::PortableProvidersList=>select_fields(&value,&["items","next"]),
-            Self::PortableProvidersUpsert|Self::PortableProvidersRemove|Self::PortableMemberConnectionSet=>select_fields(&value,&["commandId","commandType","status","code","payload","resultEntity","recordedAt"]),
-            Self::PortableMemberConnectionGet=>select_fields(&value,&["agentId","agentVersion","binding","runtime"]),
-            Self::NativeSteerEvidence => select_fields(&value,&["schemaVersion","preview","receipt","delivery","normalContinuation"]),
-            Self::NativeNormalPreview => select_fields(&value,&["schemaVersion","previewId","previewDigest","sourceCommandId","scope","agentId","input","inputDigest","expiresAt"]),
-            Self::NativeNormalConfirm | Self::NativeNormalReceipt => select_fields(&value,&["schemaVersion","commandId","state","commandResult","error"]),
-            Self::NativeContinuationPreview => select_fields(&value,&["schemaVersion","previewId","previewDigest","expiresAt","source","mode","point","sourceThreadId","newThreadId","newConversationId","agentId","expectedAgentVersion","runtimeConfigDigest","workspaceDigest","title","historyMessageCount","capabilityStatus","reason"]),
-            Self::NativeContinuationConfirm | Self::NativeContinuationReceipt => select_fields(&value,&["schemaVersion","commandId","state","originId","threadId","conversationId","reportedSessionId","error"]),
-            Self::NativeSteerPolicyGet => select_fields(&value,&["schemaVersion","revision","members"]),
-            Self::NativeSteerPolicySet => select_fields(&value,&["commandId","commandType","status","code","payload","resultEntity","recordedAt"]),
-            Self::NativeSteerTargets => select_fields(&value,&["schemaVersion","targets"]),
-            Self::NativeSteerMaterialsPrepare => select_fields(&value,&["schemaVersion","materials"]),
-            Self::NativeSteerPreview => select_fields(&value,&["schemaVersion","previewId","previewDigest","expiresAt","target","input","inputDigest","capabilityDigest"]),
-            Self::NativeSteerConfirm | Self::NativeSteerReceipt => select_fields(&value,&["schemaVersion","commandId","previewId","target","inputDigest","status","nativeOutcome","nativeReceiptDigest","error"]),
-            Self::NativeSteerPreviews => select_fields(&value,&["schemaVersion","items","next"]),
-            Self::NavigationProjectGroups => select_fields(&value,&["schemaVersion","initialized","projectGroupsRevision","projectGroups","projectOrder"]),
+            Self::NativeCreationRecords => {
+                select_fields(&value, &["schemaVersion", "items", "next"])
+            }
+            Self::PortableMigrationPreview | Self::PortableMigrationUndoPreview => select_fields(
+                &value,
+                &[
+                    "schemaVersion",
+                    "previewId",
+                    "previewDigest",
+                    "expiresAt",
+                    "archiveId",
+                    "sourceDigest",
+                    "localDigest",
+                    "selections",
+                    "members",
+                    "rows",
+                    "canApply",
+                ],
+            ),
+            Self::PortableMigrationConfirm
+            | Self::PortableMigrationUndoConfirm
+            | Self::PortableMigrationReceipt => select_fields(
+                &value,
+                &[
+                    "schemaVersion",
+                    "commandId",
+                    "previewId",
+                    "previewDigest",
+                    "state",
+                    "counts",
+                    "changedMembers",
+                    "errorCode",
+                    "historyPreserved",
+                    "files",
+                ],
+            ),
+            Self::PortableMigrationArchives
+            | Self::PortableMigrationTargets
+            | Self::PortableProvidersList => select_fields(&value, &["items", "next"]),
+            Self::PortableProvidersUpsert
+            | Self::PortableProvidersRemove
+            | Self::PortableMemberConnectionSet => select_fields(
+                &value,
+                &[
+                    "commandId",
+                    "commandType",
+                    "status",
+                    "code",
+                    "payload",
+                    "resultEntity",
+                    "recordedAt",
+                ],
+            ),
+            Self::PortableMemberConnectionGet => {
+                select_fields(&value, &["agentId", "agentVersion", "binding", "runtime"])
+            }
+            Self::NativeSteerEvidence => select_fields(
+                &value,
+                &[
+                    "schemaVersion",
+                    "preview",
+                    "receipt",
+                    "delivery",
+                    "normalContinuation",
+                ],
+            ),
+            Self::NativeNormalPreview => select_fields(
+                &value,
+                &[
+                    "schemaVersion",
+                    "previewId",
+                    "previewDigest",
+                    "sourceCommandId",
+                    "scope",
+                    "agentId",
+                    "input",
+                    "inputDigest",
+                    "expiresAt",
+                ],
+            ),
+            Self::NativeNormalConfirm | Self::NativeNormalReceipt => select_fields(
+                &value,
+                &[
+                    "schemaVersion",
+                    "commandId",
+                    "state",
+                    "commandResult",
+                    "error",
+                ],
+            ),
+            Self::NativeContinuationPreview => select_fields(
+                &value,
+                &[
+                    "schemaVersion",
+                    "previewId",
+                    "previewDigest",
+                    "expiresAt",
+                    "source",
+                    "mode",
+                    "point",
+                    "sourceThreadId",
+                    "newThreadId",
+                    "newConversationId",
+                    "agentId",
+                    "expectedAgentVersion",
+                    "runtimeConfigDigest",
+                    "workspaceDigest",
+                    "title",
+                    "historyMessageCount",
+                    "capabilityStatus",
+                    "reason",
+                ],
+            ),
+            Self::NativeContinuationConfirm | Self::NativeContinuationReceipt => select_fields(
+                &value,
+                &[
+                    "schemaVersion",
+                    "commandId",
+                    "state",
+                    "originId",
+                    "threadId",
+                    "conversationId",
+                    "reportedSessionId",
+                    "error",
+                ],
+            ),
+            Self::NativeSteerPolicyGet => {
+                select_fields(&value, &["schemaVersion", "revision", "members"])
+            }
+            Self::NativeSteerPolicySet => select_fields(
+                &value,
+                &[
+                    "commandId",
+                    "commandType",
+                    "status",
+                    "code",
+                    "payload",
+                    "resultEntity",
+                    "recordedAt",
+                ],
+            ),
+            Self::NativeSteerTargets => select_fields(&value, &["schemaVersion", "targets"]),
+            Self::NativeSteerMaterialsPrepare => {
+                select_fields(&value, &["schemaVersion", "materials"])
+            }
+            Self::NativeSteerPreview => select_fields(
+                &value,
+                &[
+                    "schemaVersion",
+                    "previewId",
+                    "previewDigest",
+                    "expiresAt",
+                    "target",
+                    "input",
+                    "inputDigest",
+                    "capabilityDigest",
+                ],
+            ),
+            Self::NativeSteerConfirm | Self::NativeSteerReceipt => select_fields(
+                &value,
+                &[
+                    "schemaVersion",
+                    "commandId",
+                    "previewId",
+                    "target",
+                    "inputDigest",
+                    "status",
+                    "nativeOutcome",
+                    "nativeReceiptDigest",
+                    "error",
+                ],
+            ),
+            Self::NativeSteerPreviews => select_fields(&value, &["schemaVersion", "items", "next"]),
+            Self::NavigationProjectGroups => select_fields(
+                &value,
+                &[
+                    "schemaVersion",
+                    "initialized",
+                    "projectGroupsRevision",
+                    "projectGroups",
+                    "projectOrder",
+                ],
+            ),
             Self::AppInfo => json!({"name":value["name"],"version":value["version"]}),
             Self::ForgeAccountsGet | Self::ForgeAccountsSet => select_fields(&value, &["accounts"]),
-            Self::ForgeLinks => select_fields(&value,&["revision","repository","links","applied","id"]),
-            Self::ProjectLauncher => select_fields(&value,&["tools","planId","arguments","name","parent","kind","commandId","state","path","partialPath","startedAt","completedAt","log","error"]),
-            Self::WorkbenchFileTools => select_fields(&value,&["path","digest","directory","files","bytes","entries","results","next","limited","scanned","applied","trashId","versions"]),
-            Self::OfficeCli => select_fields(&value,&["installed","runnable","version","runtimeError","digest","manualUrl","commandId","operation","state","startedAt","completedAt","log","info","error"]),
-            Self::CustomRuntimeList => select_fields(&value,&["items","next"]),
-            Self::CustomRuntimeUpsert | Self::CustomRuntimeRemove => select_fields(&value,&["commandId","commandType","status","code","payload","resultEntity","recordedAt"]),
-            Self::CustomRuntimeInstall => select_fields(&value,&["commandId","reference","platform","state","startedAt","completedAt","log","info","error"]),
-            Self::CustomRuntimeInspect => select_fields(&value,&["reference","definition","platform","installation"]),
-            Self::CustomRuntimeRegistry => select_fields(&value,&["registryUrl","sourceDigest","fetchedAt","cached","entries","registeredIds","platform"]),
-            Self::CustomSkillPrepare => select_fields(&value,&["skillId","sourceRevision"]),
-            Self::CustomSkillInstall => select_fields(&value,&["status","code","payload"]),
-            Self::OfficeSkillPrepare => select_fields(&value,&["planId","skillId","sourceRevision","content","contentDigest","binaryDigest"]),
-            Self::OfficeSkillInstall => select_fields(&value,&["status","code","payload"]),
-            Self::PetsOperation => select_fields(&value,&["pets","pet","page","pageSize","total","totalPages","entries","settings","id","displayName","description","spritesheetPath","duplicate","removed","mime","digest","offset","totalBytes","next","bytes","enabled","activeId","scale"]),
-            Self::AppearanceExtensions => select_fields(&value,&["revision","value"]),
-            Self::WebdavSettings => select_fields(&value,&["revision","endpoint","username","passwordSet","allowInsecure"]),
-            Self::HistoryLibrary => select_fields(&value,&["entries","digest","totalBytes","offset","next","bytes","saved","source","commandId","items"]),
-            Self::OfficeWatch => select_fields(&value,&["holdId","port","cap","editable","released","installed","formats"]),
-            Self::ForgeOperation => select_fields(&value, &["provider", "webUrl", "ownerRepo", "repositoryKey", "repository", "success", "status", "data", "missionDraft", "nextPage","totalCount","reachableCount","incomplete","sortSupported","retryAfter"]),
-            Self::WorkbenchOrganizerGet | Self::WorkbenchOrganizerSet => select_fields(&value, &["value", "digest"]),
-            Self::WorkbenchFilesList => select_fields(&value, &["entries", "next", "workspaceRoot"]),
+            Self::ForgeLinks => select_fields(
+                &value,
+                &["revision", "repository", "links", "applied", "id"],
+            ),
+            Self::ProjectLauncher => select_fields(
+                &value,
+                &[
+                    "tools",
+                    "planId",
+                    "arguments",
+                    "name",
+                    "parent",
+                    "kind",
+                    "commandId",
+                    "state",
+                    "path",
+                    "partialPath",
+                    "startedAt",
+                    "completedAt",
+                    "log",
+                    "error",
+                ],
+            ),
+            Self::WorkbenchFileTools => select_fields(
+                &value,
+                &[
+                    "path",
+                    "digest",
+                    "directory",
+                    "files",
+                    "bytes",
+                    "entries",
+                    "results",
+                    "next",
+                    "limited",
+                    "scanned",
+                    "applied",
+                    "trashId",
+                    "versions",
+                ],
+            ),
+            Self::OfficeCli => select_fields(
+                &value,
+                &[
+                    "installed",
+                    "runnable",
+                    "version",
+                    "runtimeError",
+                    "digest",
+                    "manualUrl",
+                    "commandId",
+                    "operation",
+                    "state",
+                    "startedAt",
+                    "completedAt",
+                    "log",
+                    "info",
+                    "error",
+                ],
+            ),
+            Self::CustomRuntimeList => select_fields(&value, &["items", "next"]),
+            Self::CustomRuntimeUpsert | Self::CustomRuntimeRemove => select_fields(
+                &value,
+                &[
+                    "commandId",
+                    "commandType",
+                    "status",
+                    "code",
+                    "payload",
+                    "resultEntity",
+                    "recordedAt",
+                ],
+            ),
+            Self::CustomRuntimeInstall => select_fields(
+                &value,
+                &[
+                    "commandId",
+                    "reference",
+                    "platform",
+                    "state",
+                    "startedAt",
+                    "completedAt",
+                    "log",
+                    "info",
+                    "error",
+                ],
+            ),
+            Self::CustomRuntimeInspect => select_fields(
+                &value,
+                &["reference", "definition", "platform", "installation"],
+            ),
+            Self::CustomRuntimeRegistry => select_fields(
+                &value,
+                &[
+                    "registryUrl",
+                    "sourceDigest",
+                    "fetchedAt",
+                    "cached",
+                    "entries",
+                    "registeredIds",
+                    "platform",
+                ],
+            ),
+            Self::CustomSkillPrepare => select_fields(&value, &["skillId", "sourceRevision"]),
+            Self::CustomSkillInstall => select_fields(&value, &["status", "code", "payload"]),
+            Self::OfficeSkillPrepare => select_fields(
+                &value,
+                &[
+                    "planId",
+                    "skillId",
+                    "sourceRevision",
+                    "content",
+                    "contentDigest",
+                    "binaryDigest",
+                ],
+            ),
+            Self::OfficeSkillInstall => select_fields(&value, &["status", "code", "payload"]),
+            Self::PetsOperation => select_fields(
+                &value,
+                &[
+                    "pets",
+                    "pet",
+                    "page",
+                    "pageSize",
+                    "total",
+                    "totalPages",
+                    "entries",
+                    "settings",
+                    "id",
+                    "displayName",
+                    "description",
+                    "spritesheetPath",
+                    "duplicate",
+                    "removed",
+                    "mime",
+                    "digest",
+                    "offset",
+                    "totalBytes",
+                    "next",
+                    "bytes",
+                    "enabled",
+                    "activeId",
+                    "scale",
+                ],
+            ),
+            Self::AppearanceExtensions => select_fields(&value, &["revision", "value"]),
+            Self::WebdavSettings => select_fields(
+                &value,
+                &[
+                    "revision",
+                    "endpoint",
+                    "username",
+                    "passwordSet",
+                    "allowInsecure",
+                ],
+            ),
+            Self::HistoryLibrary => select_fields(
+                &value,
+                &[
+                    "entries",
+                    "digest",
+                    "totalBytes",
+                    "offset",
+                    "next",
+                    "bytes",
+                    "saved",
+                    "source",
+                    "commandId",
+                    "items",
+                ],
+            ),
+            Self::OfficeWatch => select_fields(
+                &value,
+                &[
+                    "holdId",
+                    "port",
+                    "cap",
+                    "editable",
+                    "released",
+                    "installed",
+                    "formats",
+                ],
+            ),
+            Self::ForgeOperation => select_fields(
+                &value,
+                &[
+                    "provider",
+                    "webUrl",
+                    "ownerRepo",
+                    "repositoryKey",
+                    "repository",
+                    "success",
+                    "status",
+                    "data",
+                    "missionDraft",
+                    "nextPage",
+                    "totalCount",
+                    "reachableCount",
+                    "incomplete",
+                    "sortSupported",
+                    "retryAfter",
+                ],
+            ),
+            Self::WorkbenchOrganizerGet | Self::WorkbenchOrganizerSet => {
+                select_fields(&value, &["value", "digest"])
+            }
+            Self::WorkbenchFilesList => {
+                select_fields(&value, &["entries", "next", "workspaceRoot"])
+            }
             Self::WorkbenchFilesRead => select_fields(&value, &["path", "text", "digest"]),
-            Self::WorkbenchEditor=>select_fields(&value,&["revision","value","updatedAt","workspaceRoot"]),
+            Self::WorkbenchEditor => {
+                select_fields(&value, &["revision", "value", "updatedAt", "workspaceRoot"])
+            }
             Self::WorkbenchFilesMutate => select_fields(&value, &["applied", "digest"]),
-            Self::WorkbenchGitRead => select_fields(&value, &["success", "exitCode", "output", "error"]),
-            Self::WorkbenchGitExecute => select_fields(&value, &["success", "exitCode", "output", "error", "workingDirectory"]),
-            Self::WorkbenchGitPreview => select_fields(&value, &["revision", "action", "arguments", "cleanPreview"]),
-            Self::DelegationSource => select_fields(&value,
-                &["state", "source", "operation", "attemptNo", "detail", "task", "reason", "code"]),
-            Self::NativeAgentReadStart | Self::NativeAgentReadPoll | Self::NativeChildReadStart | Self::NativeChildReadPoll => select_fields(&value,
-                &["readId", "coreGeneration", "state", "snapshotReference", "code"]),
-            Self::NativeAgentReadPage | Self::NativeChildReadPage => select_fields(&value, &["snapshotReference", "projectionDigest", "sourceDigest",
-                "offset", "totalBytes", "fragment", "nextCursor", "complete", "reportedStatus", "live"]),
-            Self::NativeAgentReadClose | Self::NativeChildReadClose => select_fields(&value, &["closed"]),
+            Self::WorkbenchGitRead => {
+                select_fields(&value, &["success", "exitCode", "output", "error"])
+            }
+            Self::WorkbenchGitExecute => select_fields(
+                &value,
+                &["success", "exitCode", "output", "error", "workingDirectory"],
+            ),
+            Self::WorkbenchGitPreview => {
+                select_fields(&value, &["revision", "action", "arguments", "cleanPreview"])
+            }
+            Self::DelegationSource => select_fields(
+                &value,
+                &[
+                    "state",
+                    "source",
+                    "operation",
+                    "attemptNo",
+                    "detail",
+                    "task",
+                    "reason",
+                    "code",
+                ],
+            ),
+            Self::NativeAgentReadStart
+            | Self::NativeAgentReadPoll
+            | Self::NativeChildReadStart
+            | Self::NativeChildReadPoll => select_fields(
+                &value,
+                &[
+                    "readId",
+                    "coreGeneration",
+                    "state",
+                    "snapshotReference",
+                    "code",
+                ],
+            ),
+            Self::NativeAgentReadPage | Self::NativeChildReadPage => select_fields(
+                &value,
+                &[
+                    "snapshotReference",
+                    "projectionDigest",
+                    "sourceDigest",
+                    "offset",
+                    "totalBytes",
+                    "fragment",
+                    "nextCursor",
+                    "complete",
+                    "reportedStatus",
+                    "live",
+                ],
+            ),
+            Self::NativeAgentReadClose | Self::NativeChildReadClose => {
+                select_fields(&value, &["closed"])
+            }
             Self::CanvasTerminalStart | Self::CanvasTerminalSnapshot => {
                 project_terminal_snapshot(value)
             }
@@ -777,36 +1276,36 @@ impl Operation {
 
     pub fn method(self) -> &'static str {
         match self {
-            Self::ConversationPolicyGet=>"conversationTools.policy.get",
-            Self::ConversationPolicySet=>"conversationTools.policy.set",
-            Self::ConversationQuestionsList=>"conversationTools.questions.list",
-            Self::ConversationQuestionsAnswer=>"conversationTools.questions.answer",
-            Self::ConversationQuestionsDecline=>"conversationTools.questions.decline",
-            Self::ConversationQuestionsReconcile=>"conversationTools.questions.reconcile",
-            Self::ConversationGrantsPreview=>"conversationTools.grants.preview",
-            Self::ConversationGrantsConfirm=>"conversationTools.grants.confirm",
-            Self::ConversationGrantsRevoke=>"conversationTools.grants.revoke",
-            Self::ConversationGrantsList=>"conversationTools.grants.list",
-            Self::ConversationRequestsGet=>"conversationTools.requests.get",
-            Self::ConversationRequestsResolve=>"conversationTools.requests.resolve",
-            Self::ConversationAutomationOwnerGet=>"conversationTools.automationOwner.get",
-            Self::ConversationAutomationOwnerSet=>"conversationTools.automationOwner.set",
+            Self::ConversationPolicyGet => "conversationTools.policy.get",
+            Self::ConversationPolicySet => "conversationTools.policy.set",
+            Self::ConversationQuestionsList => "conversationTools.questions.list",
+            Self::ConversationQuestionsAnswer => "conversationTools.questions.answer",
+            Self::ConversationQuestionsDecline => "conversationTools.questions.decline",
+            Self::ConversationQuestionsReconcile => "conversationTools.questions.reconcile",
+            Self::ConversationGrantsPreview => "conversationTools.grants.preview",
+            Self::ConversationGrantsConfirm => "conversationTools.grants.confirm",
+            Self::ConversationGrantsRevoke => "conversationTools.grants.revoke",
+            Self::ConversationGrantsList => "conversationTools.grants.list",
+            Self::ConversationRequestsGet => "conversationTools.requests.get",
+            Self::ConversationRequestsResolve => "conversationTools.requests.resolve",
+            Self::ConversationAutomationOwnerGet => "conversationTools.automationOwner.get",
+            Self::ConversationAutomationOwnerSet => "conversationTools.automationOwner.set",
 
             Self::NativeSteerPolicyGet => "runtime.steer.policy.get",
             Self::NativeContinuationPreview => "history.execution.preview",
             Self::NativeCreationRecords => "history.execution.records",
-            Self::PortableMigrationPreview=>"configuration.migration.preview",
-            Self::PortableMigrationArchives=>"configuration.migration.archives",
-            Self::PortableMigrationTargets=>"configuration.migration.targets",
-            Self::PortableMigrationConfirm=>"configuration.migration.confirm",
-            Self::PortableMigrationReceipt=>"configuration.migration.receipt",
-            Self::PortableMigrationUndoPreview=>"configuration.migration.undoPreview",
-            Self::PortableMigrationUndoConfirm=>"configuration.migration.undoConfirm",
-            Self::PortableProvidersList=>"configuration.providers.list",
-            Self::PortableProvidersUpsert=>"configuration.providers.upsert",
-            Self::PortableProvidersRemove=>"configuration.providers.remove",
-            Self::PortableMemberConnectionGet=>"configuration.memberConnection.get",
-            Self::PortableMemberConnectionSet=>"configuration.memberConnection.set",
+            Self::PortableMigrationPreview => "configuration.migration.preview",
+            Self::PortableMigrationArchives => "configuration.migration.archives",
+            Self::PortableMigrationTargets => "configuration.migration.targets",
+            Self::PortableMigrationConfirm => "configuration.migration.confirm",
+            Self::PortableMigrationReceipt => "configuration.migration.receipt",
+            Self::PortableMigrationUndoPreview => "configuration.migration.undoPreview",
+            Self::PortableMigrationUndoConfirm => "configuration.migration.undoConfirm",
+            Self::PortableProvidersList => "configuration.providers.list",
+            Self::PortableProvidersUpsert => "configuration.providers.upsert",
+            Self::PortableProvidersRemove => "configuration.providers.remove",
+            Self::PortableMemberConnectionGet => "configuration.memberConnection.get",
+            Self::PortableMemberConnectionSet => "configuration.memberConnection.set",
             Self::NativeSteerEvidence => "runtime.steer.evidence",
             Self::NativeNormalPreview => "runtime.steer.normal.preview",
             Self::NativeNormalConfirm => "runtime.steer.normal.confirm",
@@ -852,7 +1351,7 @@ impl Operation {
             Self::WorkbenchOrganizerSet => "workbench.organizer.set",
             Self::WorkbenchFilesList => "workbench.files.list",
             Self::WorkbenchFilesRead => "workbench.files.read",
-            Self::WorkbenchEditor=>"workbench.editor",
+            Self::WorkbenchEditor => "workbench.editor",
             Self::WorkbenchFilesMutate => "workbench.files.mutate",
             Self::WorkbenchGitRead => "workbench.git.read",
             Self::WorkbenchGitPreview => "workbench.git.preview",
@@ -1224,14 +1723,21 @@ mod tests {
         let mut expected = result.clone();
         expected.as_object_mut().unwrap().remove("futureSecret");
         assert_eq!(Operation::WorkbenchGitExecute.project(result), expected);
-        assert!(Operation::WorkbenchGitRead.project(expected).get("workingDirectory").is_none());
+        assert!(
+            Operation::WorkbenchGitRead
+                .project(expected)
+                .get("workingDirectory")
+                .is_none()
+        );
     }
 
     #[test]
     fn file_list_projection_retains_authoritative_mission_workspace_root() {
-        assert_eq!(Operation::WorkbenchFilesList.project(json!({"entries":[],"next":null,
+        assert_eq!(
+            Operation::WorkbenchFilesList.project(json!({"entries":[],"next":null,
             "workspaceRoot":"/fixture/mission-worktree","futureSecret":"private"})),
-            json!({"entries":[],"next":null,"workspaceRoot":"/fixture/mission-worktree"}));
+            json!({"entries":[],"next":null,"workspaceRoot":"/fixture/mission-worktree"})
+        );
     }
 
     // Owns the network projection boundary, not Core's internal MCP model.
@@ -1239,26 +1745,50 @@ mod tests {
     fn public_projection_excludes_mcp_credentials_and_desktop_mutation_actions() {
         let read_view = json!({"readId":"read", "coreGeneration":"generation", "state":"ready",
             "snapshotReference":"signed", "code":null, "futurePath":"private-source", "futureToken":"credential"});
-        for operation in [Operation::NativeAgentReadStart, Operation::NativeAgentReadPoll,Operation::NativeChildReadStart, Operation::NativeChildReadPoll] {
-            assert_eq!(operation.project(read_view.clone()), json!({"readId":"read","coreGeneration":"generation",
-                "state":"ready","snapshotReference":"signed","code":null}));
+        for operation in [
+            Operation::NativeAgentReadStart,
+            Operation::NativeAgentReadPoll,
+            Operation::NativeChildReadStart,
+            Operation::NativeChildReadPoll,
+        ] {
+            assert_eq!(
+                operation.project(read_view.clone()),
+                json!({"readId":"read","coreGeneration":"generation",
+                "state":"ready","snapshotReference":"signed","code":null})
+            );
         }
         let long = "完整中文😀".repeat(8000);
         let source = json!({"state":"bound", "source":{"threadId":"thread","evidenceId":"evidence"},
             "operation":"delegation.resume", "attemptNo":2, "detail":{"delegationId":"child"},
             "task":long,"reason":"  恢复中文😀\n保留空白  ","futurePrivatePath":"private-source"});
         let mut expected_source = source.clone();
-        expected_source.as_object_mut().unwrap().remove("futurePrivatePath");
+        expected_source
+            .as_object_mut()
+            .unwrap()
+            .remove("futurePrivatePath");
         assert_eq!(Operation::DelegationSource.project(source), expected_source);
         let page = Operation::NativeChildReadPage.project(json!({"snapshotReference":"signed","projectionDigest":"projection",
             "sourceDigest":"source","offset":0,"totalBytes":long.len(),"fragment":long,"nextCursor":null,
             "complete":true,"reportedStatus":"completed","live":false,"futurePrivatePath":"private-source"}));
         assert_eq!(page["fragment"], long);
         assert!(page.get("futurePrivatePath").is_none());
-        assert_eq!(Operation::NativeAgentReadPage.project(page.clone()),page);
-        assert!(Operation::NativeAgentReadPage.project(json!({"fragment":long,"futurePrivatePath":"private"})).get("futurePrivatePath").is_none());
-        assert_eq!(Operation::NativeAgentReadClose.project(json!({"closed":true,"futureSecret":"credential"})),json!({"closed":true}));
-        assert_eq!(Operation::NativeChildReadClose.project(json!({"closed":true,"futureSecret":"credential"})), json!({"closed":true}));
+        assert_eq!(Operation::NativeAgentReadPage.project(page.clone()), page);
+        assert!(
+            Operation::NativeAgentReadPage
+                .project(json!({"fragment":long,"futurePrivatePath":"private"}))
+                .get("futurePrivatePath")
+                .is_none()
+        );
+        assert_eq!(
+            Operation::NativeAgentReadClose
+                .project(json!({"closed":true,"futureSecret":"credential"})),
+            json!({"closed":true})
+        );
+        assert_eq!(
+            Operation::NativeChildReadClose
+                .project(json!({"closed":true,"futureSecret":"credential"})),
+            json!({"closed":true})
+        );
         let projected = Operation::Mcp.project(json!({"servers":[{
             "serverId":"fixture", "name":"Example", "enabled":true,
             "transport":"http", "assignedAgentIds":[],
@@ -1307,7 +1837,10 @@ mod tests {
             ("runtime.childReads.page", "runtime.childReads.page"),
             ("runtime.childReads.close", "runtime.childReads.close"),
             ("delegations.composer.get", "delegations.composer.get"),
-            ("delegations.conversation.get", "delegations.conversation.get"),
+            (
+                "delegations.conversation.get",
+                "delegations.conversation.get",
+            ),
             ("delegations.message.send", "delegations.message.send"),
             ("delegations.takeover", "delegations.takeover"),
             ("delegations.cancel", "delegations.cancel"),

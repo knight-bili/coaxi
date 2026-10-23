@@ -1,11 +1,11 @@
 //! 固定 Codeg aff1e6c 的原用量事实选择与聚合，保留逐轮和整会话回退语义。
-use std::collections::{HashMap,HashSet};
-use chrono::{DateTime,Datelike,Duration,NaiveDate,NaiveDateTime,Timelike,Utc};
-use super::{UsageFact,UsageFactRow,NativeUsageDetail};
 use super::models::*;
+use super::{NativeUsageDetail, UsageFact, UsageFactRow};
 use crate::runtime_subagent_session::content::model::MessageTurn;
-const MAX_DENSE_BUCKETS:usize=3000;
-const TOP_CONVERSATIONS:usize=8;
+use chrono::{DateTime, Datelike, Duration, NaiveDate, NaiveDateTime, Timelike, Utc};
+use std::collections::{HashMap, HashSet};
+const MAX_DENSE_BUCKETS: usize = 3000;
+const TOP_CONVERSATIONS: usize = 8;
 fn clamp_i64(v: u64) -> i64 {
     v.min(i64::MAX as u64) as i64
 }
@@ -302,14 +302,15 @@ pub(crate) fn aggregate_report(
             .or_default()
             .add(row);
         by_folder.entry(row.folder_id).or_default().add(row);
-        by_agent
-            .entry(row.agent_type.clone())
-            .or_default()
-            .add(row);
+        by_agent.entry(row.agent_type.clone()).or_default().add(row);
         // A turn whose transcript never named a model still spent tokens, so it
         // is counted under an explicit "unknown" slice rather than dropped.
         by_model
-            .entry(row.model.clone().unwrap_or_else(|| UNKNOWN_MODEL.to_string()))
+            .entry(
+                row.model
+                    .clone()
+                    .unwrap_or_else(|| UNKNOWN_MODEL.to_string()),
+            )
             .or_default()
             .add(row);
 
@@ -380,12 +381,14 @@ pub(crate) fn aggregate_report(
 
     let mut heatmap: Vec<TokenUsageHeatCell> = heat
         .into_iter()
-        .map(|((weekday, hour), (total_tokens, turn_count))| TokenUsageHeatCell {
-            weekday,
-            hour,
-            total_tokens,
-            turn_count,
-        })
+        .map(
+            |((weekday, hour), (total_tokens, turn_count))| TokenUsageHeatCell {
+                weekday,
+                hour,
+                total_tokens,
+                turn_count,
+            },
+        )
         .collect();
     heatmap.sort_by_key(|a| (a.weekday, a.hour));
 
@@ -557,4 +560,3 @@ fn compute_streak(active: &HashSet<NaiveDate>) -> TokenUsageStreak {
 }
 
 // ─── Report command ─────────────────────────────────────────────────────
-

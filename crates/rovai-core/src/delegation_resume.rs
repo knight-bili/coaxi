@@ -189,7 +189,10 @@ fn load_plan(
     crate::runtime::validate_saved_frozen_runtime(connection, &run, &frozen)?;
     // 该服务的桥绑定原Run；独立帮手续接要求原生Session不变，不能自动冷启动。
     ensure!(
-        frozen.conversation_tools.as_ref().is_none_or(|tools|!tools.flags.any()),
+        frozen
+            .conversation_tools
+            .as_ref()
+            .is_none_or(|tools| !tools.flags.any()),
         "delegation.native_session_rebuild_required"
     );
     let bare = crate::agent_profile::resolve_rebound_runtime_on_connection(connection, &frozen)?

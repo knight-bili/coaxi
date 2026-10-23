@@ -6,11 +6,11 @@
 
 pub mod auth;
 pub mod deliver;
+pub mod gitea;
 pub mod github;
 pub mod gitlab;
-pub mod gitea;
-use std::sync::RwLock;
 pub use auth::ResolvedAuth;
+use std::sync::RwLock;
 
 /// The forge a host speaks. Everything provider-specific downstream — REST
 /// base, auth header, the shape of a "pull request", which ref a proposed
@@ -200,7 +200,10 @@ pub enum ForgeError {
     /// pinned-id miss, a missing keyring token or a rejected token stay
     /// [`ForgeError::Auth`]: adding another account fixes none of them.
     #[error("no {} account for host {host}", provider.display_name())]
-    NoAccount { provider: ForgeProvider, host: String },
+    NoAccount {
+        provider: ForgeProvider,
+        host: String,
+    },
     /// The host is not one codeg can read: nothing is configured for it and its
     /// name claims none of the forges. Distinct from [`ForgeError::NoAccount`]
     /// because the advice differs — "add a GitHub account for bitbucket.org"
@@ -214,7 +217,10 @@ pub enum ForgeError {
     /// detection cache has already been corrected by the time this is
     /// returned, so repeating the request routes it to the right client.
     #[error("{host} is a {}, not the forge it was addressed as", detected.display_name())]
-    WrongForge { host: String, detected: ForgeProvider },
+    WrongForge {
+        host: String,
+        detected: ForgeProvider,
+    },
     /// Primary or secondary rate limit; honor `retry_after` when present.
     #[error("forge rate limited")]
     RateLimited { retry_after: Option<u64> },
@@ -260,12 +266,16 @@ pub fn source_key(
     }
     let host = server_host.trim().to_ascii_lowercase();
     if host.is_empty() || host.contains('/') || host.contains(':') {
-        return Err(ForgeError::Invalid(format!("bad server host: {server_host}")));
+        return Err(ForgeError::Invalid(format!(
+            "bad server host: {server_host}"
+        )));
     }
     let repo = normalize_repo(owner_repo)
         .ok_or_else(|| ForgeError::Invalid(format!("bad repository path: {owner_repo}")))?;
     if number <= 0 {
-        return Err(ForgeError::Invalid(format!("bad work item number: {number}")));
+        return Err(ForgeError::Invalid(format!(
+            "bad work item number: {number}"
+        )));
     }
     Ok(format!("{provider}:{host}:{repo}:{kind}:{number}"))
 }
@@ -301,11 +311,7 @@ pub fn normalize_repo(input: &str) -> Option<String> {
                 .chars()
                 .all(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_' | '.'))
     });
-    if ok {
-        Some(trimmed)
-    } else {
-        None
-    }
+    if ok { Some(trimmed) } else { None }
 }
 
 /// `(server_host, owner_repo)` parsed from a git remote URL — the bridge
@@ -320,7 +326,11 @@ pub fn parse_remote_url(url: &str) -> Option<(String, String)> {
     // scp-like SSH: git@host:owner/repo(.git) — no scheme, single colon.
     if !trimmed.contains("://") {
         if let Some((user_host, path)) = trimmed.split_once(':') {
-            let host = user_host.split('@').next_back()?.trim().to_ascii_lowercase();
+            let host = user_host
+                .split('@')
+                .next_back()?
+                .trim()
+                .to_ascii_lowercase();
             if host.is_empty() || host.contains('/') {
                 return None;
             }
@@ -445,11 +455,7 @@ impl ForgeSort {
 
     /// `asc` / `desc` — the spelling both forges share.
     pub fn direction(self) -> &'static str {
-        if self.ascending() {
-            "asc"
-        } else {
-            "desc"
-        }
+        if self.ascending() { "asc" } else { "desc" }
     }
 }
 
@@ -833,7 +839,8 @@ impl ForgeComment {
     /// string in that slot is a blank line where the author goes, not an
     /// anonymous author.
     pub fn author_name(raw: Option<String>) -> Option<String> {
-        raw.map(|name| name.trim().to_string()).filter(|name| !name.is_empty())
+        raw.map(|name| name.trim().to_string())
+            .filter(|name| !name.is_empty())
     }
 }
 
@@ -1212,7 +1219,11 @@ impl NewIssueDraft {
                 "issue title exceeds {MAX_TITLE_CHARS} characters"
             )));
         }
-        let body = self.body.as_deref().map(str::trim).filter(|b| !b.is_empty());
+        let body = self
+            .body
+            .as_deref()
+            .map(str::trim)
+            .filter(|b| !b.is_empty());
         if body.is_some_and(|b| b.chars().count() > MAX_COMMENT_CHARS) {
             return Err(ForgeError::Invalid(format!(
                 "issue body exceeds {MAX_COMMENT_CHARS} characters"
@@ -1633,8 +1644,11 @@ fn origin_of(url: &reqwest::Url) -> (String, Option<String>, Option<u16>) {
 /// time: the proxy URLs and the bypass list. A change to either must rebuild.
 
 pub(crate) fn http_client() -> Result<reqwest::Client, ForgeError> {
-    reqwest::Client::builder().connect_timeout(std::time::Duration::from_secs(10))
+    reqwest::Client::builder()
+        .connect_timeout(std::time::Duration::from_secs(10))
         .timeout(std::time::Duration::from_secs(30))
-        .redirect(reqwest::redirect::Policy::none()).user_agent("Codeg-Rovai-Workbench")
-        .build().map_err(|error| ForgeError::Network(error.to_string()))
+        .redirect(reqwest::redirect::Policy::none())
+        .user_agent("Codeg-Rovai-Workbench")
+        .build()
+        .map_err(|error| ForgeError::Network(error.to_string()))
 }

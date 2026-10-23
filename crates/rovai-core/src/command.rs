@@ -22,7 +22,9 @@ pub trait DomainCommand: sealed::Sealed + Serialize {
     const ALLOWED_WHILE_CAMP_DELETING: bool = false;
     // Opt-in only. Existing commands retain their original first-result semantics.
     const EXACT_REPLAY: bool = false;
-    fn exact_replay(&self)->bool {Self::EXACT_REPLAY}
+    fn exact_replay(&self) -> bool {
+        Self::EXACT_REPLAY
+    }
 
     /// Existing private draft commands belong to a Host-verified editor.
     fn draft_client(&self) -> Option<&crate::draft_client::DraftClient> {
@@ -242,18 +244,68 @@ impl Error for CommandGatewayError {}
 pub struct DomainCommandGateway;
 
 /// 配置管理恢复只持原命令编号；不要求把地址、原模型文本或秘密重新发来。
-pub(crate) fn portable_user_receipt(connection:&rusqlite::Connection,operation:&str,id:&str,client:&crate::draft_client::DraftClient)->Result<Value>{
-    anyhow::ensure!(matches!(operation,"configuration.providers.upsert"|"configuration.providers.remove"|"configuration.memberConnection.set"),"configuration.receipt_operation_invalid");
+pub(crate) fn portable_user_receipt(
+    connection: &rusqlite::Connection,
+    operation: &str,
+    id: &str,
+    client: &crate::draft_client::DraftClient,
+) -> Result<Value> {
+    anyhow::ensure!(
+        matches!(
+            operation,
+            "configuration.providers.upsert"
+                | "configuration.providers.remove"
+                | "configuration.memberConnection.set"
+        ),
+        "configuration.receipt_operation_invalid"
+    );
     uuid::Uuid::parse_str(id)?;
-    let Some(result)=load_stored_result(connection,id)?else{return Ok(serde_json::json!({"state":"unknown"}))};
-    anyhow::ensure!(result.command_type==operation&&result.actor_type=="user"&&result.actor_id=="local_user"&&result.camp_id.is_none()&&result.source_agent_run_id.is_none()&&result.command_client_id.as_deref()==Some(client.id()),"configuration.receipt_not_owned");
+    let Some(result) = load_stored_result(connection, id)? else {
+        return Ok(serde_json::json!({"state":"unknown"}));
+    };
+    anyhow::ensure!(
+        result.command_type == operation
+            && result.actor_type == "user"
+            && result.actor_id == "local_user"
+            && result.camp_id.is_none()
+            && result.source_agent_run_id.is_none()
+            && result.command_client_id.as_deref() == Some(client.id()),
+        "configuration.receipt_not_owned"
+    );
     Ok(serde_json::json!({"state":"recorded","result":result}))
 }
-pub(crate) fn conversation_user_receipt(connection:&rusqlite::Connection,operation:&str,id:&str,client:&crate::draft_client::DraftClient)->Result<Value>{
-    anyhow::ensure!(matches!(operation,"conversationTools.policy.set"|"conversationTools.questions.answer"|"conversationTools.questions.decline"|"conversationTools.grants.confirm"|"conversationTools.grants.revoke"|"conversationTools.requests.resolve"|"conversationTools.automationOwner.set"),"conversation_tools.receipt_operation_invalid");
+pub(crate) fn conversation_user_receipt(
+    connection: &rusqlite::Connection,
+    operation: &str,
+    id: &str,
+    client: &crate::draft_client::DraftClient,
+) -> Result<Value> {
+    anyhow::ensure!(
+        matches!(
+            operation,
+            "conversationTools.policy.set"
+                | "conversationTools.questions.answer"
+                | "conversationTools.questions.decline"
+                | "conversationTools.grants.confirm"
+                | "conversationTools.grants.revoke"
+                | "conversationTools.requests.resolve"
+                | "conversationTools.automationOwner.set"
+        ),
+        "conversation_tools.receipt_operation_invalid"
+    );
     uuid::Uuid::parse_str(id)?;
-    let Some(result)=load_stored_result(connection,id)?else{return Ok(serde_json::json!({"state":"unknown"}))};
-    anyhow::ensure!(result.command_type==operation&&result.actor_type=="user"&&result.actor_id==crate::current_user::CURRENT_USER_ID&&result.camp_id.is_none()&&result.source_agent_run_id.is_none()&&result.command_client_id.as_deref()==Some(client.id()),"conversation_tools.receipt_not_owned");
+    let Some(result) = load_stored_result(connection, id)? else {
+        return Ok(serde_json::json!({"state":"unknown"}));
+    };
+    anyhow::ensure!(
+        result.command_type == operation
+            && result.actor_type == "user"
+            && result.actor_id == crate::current_user::CURRENT_USER_ID
+            && result.camp_id.is_none()
+            && result.source_agent_run_id.is_none()
+            && result.command_client_id.as_deref() == Some(client.id()),
+        "conversation_tools.receipt_not_owned"
+    );
     Ok(serde_json::json!({"state":"recorded","result":result}))
 }
 
@@ -319,20 +371,36 @@ impl DomainCommandGateway {
             )
         } else {
             if let Some(input) = envelope.payload.feedback_continuation() {
-                anyhow::ensure!(matches!(&envelope.actor, ActorRef::User { .. }), "feedback.user_required");
+                anyhow::ensure!(
+                    matches!(&envelope.actor, ActorRef::User { .. }),
+                    "feedback.user_required"
+                );
                 crate::ui_feedback::continuation::validate(&transaction, &input)?;
             }
             if let Some(input) = envelope.payload.native_input_continuation() {
-                anyhow::ensure!(matches!(&envelope.actor, ActorRef::User { .. }),"native_lifecycle.user_required");
-                crate::native_lifecycle::normal::validate(&transaction,&input)?;
+                anyhow::ensure!(
+                    matches!(&envelope.actor, ActorRef::User { .. }),
+                    "native_lifecycle.user_required"
+                );
+                crate::native_lifecycle::normal::validate(&transaction, &input)?;
             }
             handler(&transaction)?
         };
         if let Some(input) = envelope.payload.feedback_continuation() {
-            crate::ui_feedback::continuation::complete(&transaction, &input, &envelope.command_id, &handler_result)?;
+            crate::ui_feedback::continuation::complete(
+                &transaction,
+                &input,
+                &envelope.command_id,
+                &handler_result,
+            )?;
         }
         if let Some(input) = envelope.payload.native_input_continuation() {
-            crate::native_lifecycle::normal::complete(&transaction,&input,&envelope.command_id,&handler_result)?;
+            crate::native_lifecycle::normal::complete(
+                &transaction,
+                &input,
+                &envelope.command_id,
+                &handler_result,
+            )?;
         }
         let recorded_at = chrono::Utc::now().to_rfc3339();
         let mut stored_result = StoredCommandResult {

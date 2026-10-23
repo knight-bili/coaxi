@@ -1,69 +1,239 @@
 //! 仅从 Core 已发布的队员回复定位卡片。前端不提供原消息正文或权限。
 use super::*;
-use rusqlite::{params,Connection,OptionalExtension};
+use rusqlite::{Connection, OptionalExtension, params};
 
-pub fn source_body(connection:&Connection,scope:&Scope,agent:&str,message:&str)->Result<String>{
-    storage::scope(connection,scope,agent)?;
-    let body:Option<String>=if scope.scope_kind=="public"{
-        let publication=crate::camp_message_publication::public_camp_message_publication_cte();
+pub fn source_body(
+    connection: &Connection,
+    scope: &Scope,
+    agent: &str,
+    message: &str,
+) -> Result<String> {
+    storage::scope(connection, scope, agent)?;
+    let body: Option<String> = if scope.scope_kind == "public" {
+        let publication = crate::camp_message_publication::public_camp_message_publication_cte();
         connection.query_row(&format!("WITH {publication} SELECT m.body FROM camp_message m JOIN public_camp_message_publication p ON p.message_id=m.id JOIN agent_run r ON r.id=m.source_agent_run_id WHERE m.id=?1 AND m.camp_id=?2 AND m.author_type='agent' AND m.author_id=?3 AND r.agent_id=m.author_id AND m.tombstoned_at IS NULL AND m.recall_state NOT IN ('recallable','withdrawn')"),params![message,scope.thread_id,agent],|row|row.get(0)).optional()?
-    }else{
+    } else {
         connection.query_row("SELECT m.body FROM conversation_message m JOIN conversation c ON c.id=m.conversation_id JOIN agent_run r ON r.id=m.source_agent_run_id WHERE m.id=?1 AND m.conversation_id=?2 AND c.kind=?3 AND c.camp_id=?4 AND m.author_type='agent' AND m.author_id=?5 AND c.agent_id=m.author_id AND m.source_camp_message_id IS NULL AND m.source_inbox_message_id IS NULL AND r.conversation_id=c.id AND r.agent_id=m.author_id AND r.final_conversation_message_id=m.id AND r.status IN ('succeeded','failed','cancelled')",params![message,scope.conversation_id,scope.scope_kind,scope.thread_id,agent],|row|row.get(0)).optional()?
     };
-    let body=body.context("feedback.card_source_unavailable")?;ensure!(body.len()<=1024*1024,"feedback.card_source_limit");Ok(body)
+    let body = body.context("feedback.card_source_unavailable")?;
+    ensure!(body.len() <= 1024 * 1024, "feedback.card_source_limit");
+    Ok(body)
 }
 
 /// 沿用 Core 已有的 CommonMark 解析器，正确处理列表、引用和缩进中的围栏。
 /// 来源发布/最终回复的资格由 source_body 核对，不能由 Markdown 字样授予。
-pub fn fences(body:&str)->Result<Vec<String>>{
-    ensure!(body.len()<=1024*1024,"feedback.card_source_limit");
-    let body=body.replace("\r\n","\n").replace('\r',"\n");
-    let arena=comrak::Arena::new();let options=comrak::Options::default();let root=comrak::parse_document(&arena,&body,&options);let mut result=Vec::new();
-    for node in root.descendants(){
-        let data=node.data();
-        if let comrak::nodes::NodeValue::CodeBlock(code)=&data.value{
-            if code.fenced&&code.info.split_whitespace().next()==Some("spec"){
-                ensure!(code.literal.len()<=256*1024&&result.len()<128,"feedback.card_source_limit");result.push(code.literal.clone());
+pub fn fences(body: &str) -> Result<Vec<String>> {
+    ensure!(body.len() <= 1024 * 1024, "feedback.card_source_limit");
+    let body = body.replace("\r\n", "\n").replace('\r', "\n");
+    let arena = comrak::Arena::new();
+    let options = comrak::Options::default();
+    let root = comrak::parse_document(&arena, &body, &options);
+    let mut result = Vec::new();
+    for node in root.descendants() {
+        let data = node.data();
+        if let comrak::nodes::NodeValue::CodeBlock(code) = &data.value {
+            if code.fenced && code.info.split_whitespace().next() == Some("spec") {
+                ensure!(
+                    code.literal.len() <= 256 * 1024 && result.len() < 128,
+                    "feedback.card_source_limit"
+                );
+                result.push(code.literal.clone());
             }
         }
     }
     Ok(result)
 }
-fn pointer(path:&str)->Result<Vec<String>>{
-    if path.is_empty(){return Ok(Vec::new())}ensure!(path.starts_with('/')&&path.len()<=512,"feedback.invalid_pointer");
-    path[1..].split('/').map(|part|{
-        let mut result=String::new();let mut chars=part.chars();while let Some(ch)=chars.next(){if ch=='~'{result.push(match chars.next(){Some('0')=>'~',Some('1')=>'/',_=>anyhow::bail!("feedback.invalid_pointer")})}else{result.push(ch)}}
-        ensure!(!matches!(result.as_str(),"__proto__"|"constructor"|"prototype"),"feedback.field_key_forbidden");Ok(result)
-    }).collect()
-}
-pub fn compile(source:&str)->Result<Value>{super::spec_stream::compile(source)}
-#[derive(Clone)]struct FieldTemplate{name:Option<String>,label:Option<String>,path:Vec<String>}
-fn templates(spec:&Value)->Result<Vec<FieldTemplate>>{
-    fn visit(spec:&Value,key:&str,repeat:&[String],active:&mut BTreeSet<String>,count:&mut usize,result:&mut Vec<FieldTemplate>)->Result<()>{
-        *count+=1;ensure!(*count<=4096&&active.len()<64&&active.insert(key.into()),"feedback.card_cycle");
-        let element=spec["elements"].get(key).context("feedback.card_element")?;let props=&element["props"];
-        if matches!(element["type"].as_str(),Some("Input"|"Textarea"|"Select"|"Checkbox"|"Radio"|"Switch"))&&props["type"].as_str()!=Some("password")&&(!props.get("type").is_some_and(Value::is_object)){
-            let binding=if matches!(element["type"].as_str(),Some("Checkbox"|"Switch")){&props["checked"]}else{&props["value"]};
-            let path=if let Some(path)=binding["$bindState"].as_str(){Some(pointer(path)?)}else if let Some(path)=binding["$bindItem"].as_str(){if repeat.is_empty(){None}else{let mut full=repeat.to_vec();if !path.is_empty()&&path!="/"{full.extend(pointer(&format!("/{}",path.trim_start_matches('/')))?)}Some(full)}}else{None};
-            if let Some(path)=path{if !path.is_empty()&&(props["name"].is_string()||props["name"].is_object()){result.push(FieldTemplate{name:props["name"].as_str().map(str::to_string),label:props["label"].as_str().map(str::to_string),path})}}
-        }
-        let mut next_repeat=repeat.to_vec();
-        if let Some(repetition)=element.get("repeat"){
-            let path=&repetition["statePath"];
-            next_repeat=if let Some(path)=path.as_str(){pointer(path)?}else if let Some(path)=path["$item"].as_str(){ensure!(!repeat.is_empty(),"feedback.card_repeat_scope");let mut full=repeat.to_vec();if !path.is_empty()&&path!="/"{full.extend(pointer(&format!("/{}",path.trim_start_matches('/')))?)}full}else{anyhow::bail!("feedback.card_repeat_path")};next_repeat.push("*".into());
-        }
-        for child in element["children"].as_array().into_iter().flatten(){if let Some(key)=child.as_str(){visit(spec,key,&next_repeat,active,count,result)?}}
-        if let Some(slots)=element["slots"].as_object(){for slot in slots.values(){for child in slot.as_array().into_iter().flatten(){if let Some(key)=child.as_str(){visit(spec,key,repeat,active,count,result)?}}}}
-        active.remove(key);Ok(())
+fn pointer(path: &str) -> Result<Vec<String>> {
+    if path.is_empty() {
+        return Ok(Vec::new());
     }
-    let mut result=Vec::new();visit(spec,spec["root"].as_str().context("feedback.card_root")?,&[],&mut BTreeSet::new(),&mut 0,&mut result)?;Ok(result)
+    ensure!(
+        path.starts_with('/') && path.len() <= 512,
+        "feedback.invalid_pointer"
+    );
+    path[1..]
+        .split('/')
+        .map(|part| {
+            let mut result = String::new();
+            let mut chars = part.chars();
+            while let Some(ch) = chars.next() {
+                if ch == '~' {
+                    result.push(match chars.next() {
+                        Some('0') => '~',
+                        Some('1') => '/',
+                        _ => anyhow::bail!("feedback.invalid_pointer"),
+                    })
+                } else {
+                    result.push(ch)
+                }
+            }
+            ensure!(
+                !matches!(result.as_str(), "__proto__" | "constructor" | "prototype"),
+                "feedback.field_key_forbidden"
+            );
+            Ok(result)
+        })
+        .collect()
 }
-pub fn require_card_fields(connection:&Connection,input:&PreviewRequest,origin:&CardOrigin)->Result<()>{
-    ensure!(origin.conversation_id==input.scope.conversation_id&&origin.message_kind==input.scope.scope_kind,"scope_changed");
-    let body=source_body(connection,&input.scope,&input.agent_id,&origin.message_id)?;let sources=fences(&body)?;let raw=sources.get(origin.card_ordinal as usize).context("feedback.card_source_changed")?;
+pub fn compile(source: &str) -> Result<Value> {
+    super::spec_stream::compile(source)
+}
+#[derive(Clone)]
+struct FieldTemplate {
+    name: Option<String>,
+    label: Option<String>,
+    path: Vec<String>,
+}
+fn templates(spec: &Value) -> Result<Vec<FieldTemplate>> {
+    fn visit(
+        spec: &Value,
+        key: &str,
+        repeat: &[String],
+        active: &mut BTreeSet<String>,
+        count: &mut usize,
+        result: &mut Vec<FieldTemplate>,
+    ) -> Result<()> {
+        *count += 1;
+        ensure!(
+            *count <= 4096 && active.len() < 64 && active.insert(key.into()),
+            "feedback.card_cycle"
+        );
+        let element = spec["elements"].get(key).context("feedback.card_element")?;
+        let props = &element["props"];
+        if matches!(
+            element["type"].as_str(),
+            Some("Input" | "Textarea" | "Select" | "Checkbox" | "Radio" | "Switch")
+        ) && props["type"].as_str() != Some("password")
+            && (!props.get("type").is_some_and(Value::is_object))
+        {
+            let binding = if matches!(element["type"].as_str(), Some("Checkbox" | "Switch")) {
+                &props["checked"]
+            } else {
+                &props["value"]
+            };
+            let path = if let Some(path) = binding["$bindState"].as_str() {
+                Some(pointer(path)?)
+            } else if let Some(path) = binding["$bindItem"].as_str() {
+                if repeat.is_empty() {
+                    None
+                } else {
+                    let mut full = repeat.to_vec();
+                    if !path.is_empty() && path != "/" {
+                        full.extend(pointer(&format!("/{}", path.trim_start_matches('/')))?)
+                    }
+                    Some(full)
+                }
+            } else {
+                None
+            };
+            if let Some(path) = path {
+                if !path.is_empty() && (props["name"].is_string() || props["name"].is_object()) {
+                    result.push(FieldTemplate {
+                        name: props["name"].as_str().map(str::to_string),
+                        label: props["label"].as_str().map(str::to_string),
+                        path,
+                    })
+                }
+            }
+        }
+        let mut next_repeat = repeat.to_vec();
+        if let Some(repetition) = element.get("repeat") {
+            let path = &repetition["statePath"];
+            next_repeat = if let Some(path) = path.as_str() {
+                pointer(path)?
+            } else if let Some(path) = path["$item"].as_str() {
+                ensure!(!repeat.is_empty(), "feedback.card_repeat_scope");
+                let mut full = repeat.to_vec();
+                if !path.is_empty() && path != "/" {
+                    full.extend(pointer(&format!("/{}", path.trim_start_matches('/')))?)
+                }
+                full
+            } else {
+                anyhow::bail!("feedback.card_repeat_path")
+            };
+            next_repeat.push("*".into());
+        }
+        for child in element["children"].as_array().into_iter().flatten() {
+            if let Some(key) = child.as_str() {
+                visit(spec, key, &next_repeat, active, count, result)?
+            }
+        }
+        if let Some(slots) = element["slots"].as_object() {
+            for slot in slots.values() {
+                for child in slot.as_array().into_iter().flatten() {
+                    if let Some(key) = child.as_str() {
+                        visit(spec, key, repeat, active, count, result)?
+                    }
+                }
+            }
+        }
+        active.remove(key);
+        Ok(())
+    }
+    let mut result = Vec::new();
+    visit(
+        spec,
+        spec["root"].as_str().context("feedback.card_root")?,
+        &[],
+        &mut BTreeSet::new(),
+        &mut 0,
+        &mut result,
+    )?;
+    Ok(result)
+}
+pub fn require_card_fields(
+    connection: &Connection,
+    input: &PreviewRequest,
+    origin: &CardOrigin,
+) -> Result<()> {
+    ensure!(
+        origin.conversation_id == input.scope.conversation_id
+            && origin.message_kind == input.scope.scope_kind,
+        "scope_changed"
+    );
+    let body = source_body(
+        connection,
+        &input.scope,
+        &input.agent_id,
+        &origin.message_id,
+    )?;
+    let sources = fences(&body)?;
+    let raw = sources
+        .get(origin.card_ordinal as usize)
+        .context("feedback.card_source_changed")?;
     // Markdown 围栏的单个结尾换行可能由原 pre 组件移除；只接受这两个等价呈现入口。
-    let source=if digest(&Value::String(raw.clone()))?==origin.source_digest{raw.as_str()}else{let without=raw.strip_suffix('\n').unwrap_or(raw);ensure!(digest(&Value::String(without.into()))?==origin.source_digest,"feedback.card_source_changed");without};
-    let spec=compile(source)?;let fields=templates(&spec)?;
-    for field in &input.fields{let actual=pointer(&field.state_path)?;ensure!(fields.iter().any(|candidate|candidate.name.as_ref().is_none_or(|name|name==&field.name)&&candidate.label.as_ref().is_none_or(|label|label==&field.label)&&candidate.path.len()==actual.len()&&candidate.path.iter().zip(&actual).all(|(pattern,part)|pattern==part||pattern=="*"&&part.parse::<usize>().is_ok_and(|index|index<32))),"feedback.field_source_changed")}
+    let source = if digest(&Value::String(raw.clone()))? == origin.source_digest {
+        raw.as_str()
+    } else {
+        let without = raw.strip_suffix('\n').unwrap_or(raw);
+        ensure!(
+            digest(&Value::String(without.into()))? == origin.source_digest,
+            "feedback.card_source_changed"
+        );
+        without
+    };
+    let spec = compile(source)?;
+    let fields = templates(&spec)?;
+    for field in &input.fields {
+        let actual = pointer(&field.state_path)?;
+        ensure!(
+            fields.iter().any(|candidate| candidate
+                .name
+                .as_ref()
+                .is_none_or(|name| name == &field.name)
+                && candidate
+                    .label
+                    .as_ref()
+                    .is_none_or(|label| label == &field.label)
+                && candidate.path.len() == actual.len()
+                && candidate
+                    .path
+                    .iter()
+                    .zip(&actual)
+                    .all(|(pattern, part)| pattern == part
+                        || pattern == "*" && part.parse::<usize>().is_ok_and(|index| index < 32))),
+            "feedback.field_source_changed"
+        )
+    }
     Ok(())
 }

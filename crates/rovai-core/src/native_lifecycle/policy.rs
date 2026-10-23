@@ -1,12 +1,28 @@
 use super::*;
-use crate::{command::{ActorRef,CommandEnvelope,CommandExecution,CommandHandlerResult,DomainCommand,DomainCommandGateway,EntityReference,sealed},db::Database};
+use crate::{
+    command::{
+        ActorRef, CommandEnvelope, CommandExecution, CommandHandlerResult, DomainCommand,
+        DomainCommandGateway, EntityReference, sealed,
+    },
+    db::Database,
+};
 
-#[derive(Debug,Clone,Serialize,Deserialize)]
-#[serde(rename_all="camelCase",deny_unknown_fields)]
-pub struct SetPolicy{pub schema_version:u32,pub expected_revision:i64,pub members:Value}
-impl sealed::Sealed for SetPolicy{}
-impl DomainCommand for SetPolicy{const TYPE:&'static str="runtime.steer.policy.set";const EXACT_REPLAY:bool=true;}
-pub fn set(database:&mut Database,envelope:&CommandEnvelope<SetPolicy>)->Result<CommandExecution>{
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct SetPolicy {
+    pub schema_version: u32,
+    pub expected_revision: i64,
+    pub members: Value,
+}
+impl sealed::Sealed for SetPolicy {}
+impl DomainCommand for SetPolicy {
+    const TYPE: &'static str = "runtime.steer.policy.set";
+    const EXACT_REPLAY: bool = true;
+}
+pub fn set(
+    database: &mut Database,
+    envelope: &CommandEnvelope<SetPolicy>,
+) -> Result<CommandExecution> {
     DomainCommandGateway.execute(database,envelope,|tx|{
         if !matches!(&envelope.actor,ActorRef::User{..}){return Ok(CommandHandlerResult::rejected("native_lifecycle.user_required",json!({})))}
         let input=&envelope.payload;

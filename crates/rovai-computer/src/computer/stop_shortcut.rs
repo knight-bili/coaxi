@@ -239,4 +239,3 @@ impl fmt::Display for StopShortcut {
         f.write_str(&self.code)
     }
 }
-

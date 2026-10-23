@@ -166,4 +166,6 @@ pub fn driver_entitlements_ok<S: AsRef<str>>(entitlements: &[S]) -> Result<(), S
     Ok(())
 }
 
-pub use crate::driver_cache::{ensure_driver,forget_cached_driver,installed_driver_versions,cached_driver_path};
+pub use crate::driver_cache::{
+    cached_driver_path, ensure_driver, forget_cached_driver, installed_driver_versions,
+};

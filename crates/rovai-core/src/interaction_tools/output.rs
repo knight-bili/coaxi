@@ -1,7 +1,7 @@
 // Apache-2.0; 固定 Codeg aff1e6c 原输出类型，按客户确认 r1 移植。
-use serde::{Deserialize,Serialize};
-use serde_json::Value;
 use anyhow::Result;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct BrowserTabsOutcome {
@@ -627,7 +627,6 @@ pub enum VerifyStatus {
     Unknown,
 }
 
-
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PredicateResult {
@@ -639,24 +638,36 @@ pub struct PredicateResult {
     pub unknown_reason: Option<String>,
 }
 
-fn not_shared(level: &GrantLevel) -> bool { *level == GrantLevel::None }
-fn canonical<T: for<'de> Deserialize<'de> + Serialize>(value: Value) -> Result<Value> { Ok(serde_json::to_value(serde_json::from_value::<T>(value)?)?) }
+fn not_shared(level: &GrantLevel) -> bool {
+    *level == GrantLevel::None
+}
+fn canonical<T: for<'de> Deserialize<'de> + Serialize>(value: Value) -> Result<Value> {
+    Ok(serde_json::to_value(serde_json::from_value::<T>(value)?)?)
+}
 pub fn normalize(name: &str, value: Value) -> Result<Value> {
     match name {
         "browser_list_tabs" => canonical::<BrowserTabsOutcome>(value),
-        "browser_open_tab" | "browser_navigate" | "browser_close_tab" => canonical::<BrowserTabOutcome>(value),
+        "browser_open_tab" | "browser_navigate" | "browser_close_tab" => {
+            canonical::<BrowserTabOutcome>(value)
+        }
         "browser_snapshot" => canonical::<BrowserSnapshotOutcome>(value),
         "browser_console_messages" => canonical::<BrowserConsoleOutcome>(value),
         "browser_screenshot" => canonical::<BrowserCaptureOutcome>(value),
         "browser_eval" => canonical::<BrowserEvalOutcome>(value),
-        "browser_click" | "browser_hover" | "browser_type" | "browser_press_key" | "browser_select_option" => canonical::<BrowserActOutcome>(value),
+        "browser_click"
+        | "browser_hover"
+        | "browser_type"
+        | "browser_press_key"
+        | "browser_select_option" => canonical::<BrowserActOutcome>(value),
         "computer_list_apps" => canonical::<ComputerAppsOutcome>(value),
         "computer_list_windows" => canonical::<ComputerWindowsOutcome>(value),
         "computer_launch_app" => canonical::<ComputerLaunchOutcome>(value),
         "computer_screenshot" => canonical::<ComputerCaptureOutcome>(value),
         "computer_snapshot" => canonical::<ComputerSnapshotOutcome>(value),
         "computer_verify" => canonical::<ComputerVerifyOutcome>(value),
-        "computer_clipboard_read" | "computer_clipboard_write" => canonical::<ComputerClipboardOutcome>(value),
+        "computer_clipboard_read" | "computer_clipboard_write" => {
+            canonical::<ComputerClipboardOutcome>(value)
+        }
         _ => canonical::<ComputerActOutcome>(value),
     }
 }

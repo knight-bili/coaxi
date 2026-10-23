@@ -19,4 +19,3 @@ pub enum ChatChannelError {
     #[error("{0}")]
     Other(String),
 }
-

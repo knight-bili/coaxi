@@ -147,11 +147,21 @@ fn key(connection: &Connection) -> Result<Vec<u8>> {
             |r| r.get(0),
         )?;
         let custom_exists:bool=connection.query_row("SELECT EXISTS(SELECT 1 FROM sqlite_schema WHERE type='table' AND name='custom_runtime_secret')",[],|r|r.get(0))?;
-        let has_custom=custom_exists&&connection.query_row("SELECT EXISTS(SELECT 1 FROM custom_runtime_secret)",[],|r|r.get::<_,bool>(0))?;
+        let has_custom = custom_exists
+            && connection.query_row(
+                "SELECT EXISTS(SELECT 1 FROM custom_runtime_secret)",
+                [],
+                |r| r.get::<_, bool>(0),
+            )?;
         let portable_exists:bool=connection.query_row("SELECT EXISTS(SELECT 1 FROM sqlite_schema WHERE type='table' AND name='portable_secret_revision')",[],|r|r.get(0))?;
-        let has_portable=portable_exists&&connection.query_row("SELECT EXISTS(SELECT 1 FROM portable_secret_revision)",[],|r|r.get::<_,bool>(0))?;
+        let has_portable = portable_exists
+            && connection.query_row(
+                "SELECT EXISTS(SELECT 1 FROM portable_secret_revision)",
+                [],
+                |r| r.get::<_, bool>(0),
+            )?;
         ensure!(
-            !has_values&&!has_custom&&!has_portable,
+            !has_values && !has_custom && !has_portable,
             "Private environment key is missing; restore the original Host key"
         );
         let mut bytes = [0u8; 32];
@@ -174,7 +184,11 @@ fn key(connection: &Connection) -> Result<Vec<u8>> {
     ensure!(bytes.len() == 32, "Private environment key is invalid");
     Ok(bytes)
 }
-pub(crate) fn encrypt(connection: &Connection, context: &str, value: &impl Serialize) -> Result<Vec<u8>> {
+pub(crate) fn encrypt(
+    connection: &Connection,
+    context: &str,
+    value: &impl Serialize,
+) -> Result<Vec<u8>> {
     let secret = aead::UnboundKey::new(&aead::AES_256_GCM, &key(connection)?)
         .map_err(|_| anyhow::anyhow!("Private environment encryption failed"))?;
     let mut nonce = [0u8; 12];
@@ -191,10 +205,25 @@ pub(crate) fn encrypt(connection: &Connection, context: &str, value: &impl Seria
     Ok([nonce.as_slice(), bytes.as_slice()].concat())
 }
 /// 私有提交幂等只保存主机密钥派生的核对值，避免把短秘密的普通摘要写入数据库。
-pub(crate) fn private_input_hmac(connection:&Connection,context:&str,value:&[u8])->Result<String>{
-    let key=ring::hmac::Key::new(ring::hmac::HMAC_SHA256,&key(connection)?);
-    let mut input=ring::hmac::Context::with_key(&key);input.update(context.as_bytes());input.update(&[0]);input.update(value);
-    Ok(format!("hmac-sha256:{}",input.sign().as_ref().iter().map(|byte|format!("{byte:02x}")).collect::<String>()))
+pub(crate) fn private_input_hmac(
+    connection: &Connection,
+    context: &str,
+    value: &[u8],
+) -> Result<String> {
+    let key = ring::hmac::Key::new(ring::hmac::HMAC_SHA256, &key(connection)?);
+    let mut input = ring::hmac::Context::with_key(&key);
+    input.update(context.as_bytes());
+    input.update(&[0]);
+    input.update(value);
+    Ok(format!(
+        "hmac-sha256:{}",
+        input
+            .sign()
+            .as_ref()
+            .iter()
+            .map(|byte| format!("{byte:02x}"))
+            .collect::<String>()
+    ))
 }
 pub(crate) fn decrypt<T: serde::de::DeserializeOwned>(
     connection: &Connection,

@@ -159,7 +159,7 @@ pub struct MissionRecord {
     #[serde(flatten)]
     pub info: MissionInfo,
     pub description_content: DescriptionContent,
-    #[serde(default,skip_serializing_if="Option::is_none")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub description_limit: Option<usize>,
     pub number: i64,
     #[serde(rename = "threadId", alias = "campId")]
@@ -1031,7 +1031,11 @@ fn load_record(connection: &Connection, id: &str) -> Result<Option<MissionRecord
         crate::mission_workspace::cleanup_projection(connection, &mission_id, &camp_id)?;
     Ok(Some(MissionRecord {
         description_content,
-        description_limit:if mission_description_limit(connection,&mission_id)?>12_000{Some(20_000)}else{None},
+        description_limit: if mission_description_limit(connection, &mission_id)? > 12_000 {
+            Some(20_000)
+        } else {
+            None
+        },
         has_unread,
         number,
         info: MissionInfo {
@@ -1090,32 +1094,87 @@ fn mission_start_available(
         .map_err(Into::into)
 }
 /// 旧表的兼容缓存保持原约束；完整正文始终从mission_description读取。
-fn description_cache(text:&str)->&str{if text.chars().count()<=12_000{text}else{""}}
-fn validate_mission_description(connection:&Connection,id:&str,description:Option<&str>)->Result<()>{
-    let Some(description)=description else{return Ok(())};
-    ensure!(description.chars().count()<=mission_description_limit(connection,id)?,"mission.description_too_long");Ok(())
+fn description_cache(text: &str) -> &str {
+    if text.chars().count() <= 12_000 {
+        text
+    } else {
+        ""
+    }
 }
-fn mission_description_limit(connection:&Connection,id:&str)->Result<usize>{
-    let extended=!crate::conversation_tools::storage::absent(connection)?&&connection.query_row("SELECT EXISTS(SELECT 1 FROM conversation_tool_mission WHERE mission_id=?1)",[id],|row|row.get::<_,bool>(0))?;
-    Ok(if extended{20_000}else{12_000})
+fn validate_mission_description(
+    connection: &Connection,
+    id: &str,
+    description: Option<&str>,
+) -> Result<()> {
+    let Some(description) = description else {
+        return Ok(());
+    };
+    ensure!(
+        description.chars().count() <= mission_description_limit(connection, id)?,
+        "mission.description_too_long"
+    );
+    Ok(())
+}
+fn mission_description_limit(connection: &Connection, id: &str) -> Result<usize> {
+    let extended = !crate::conversation_tools::storage::absent(connection)?
+        && connection.query_row(
+            "SELECT EXISTS(SELECT 1 FROM conversation_tool_mission WHERE mission_id=?1)",
+            [id],
+            |row| row.get::<_, bool>(0),
+        )?;
+    Ok(if extended { 20_000 } else { 12_000 })
 }
 pub(crate) fn create_conversation_tool_mission_in_tx(
-    tx:&Transaction<'_>,authority:&crate::conversation_tools::authoring::CreationAuthority,
-    title:&str,prompt:&str,project_path:&str,binding:ProjectBindingKind,member:&str,
-)->Result<String>{
-    ensure!(!title.trim().is_empty()&&title.chars().count()<=120&&!prompt.trim().is_empty()&&prompt.chars().count()<=20_000,"mission.invalid_conversation_tool_content");
-    let content=mission_description::text_content(prompt);let mission_id=Uuid::new_v4().to_string();let camp_id=ThreadId::new();
-    let created=crate::collaboration::create_conversation_tool_camp_in_tx(tx,authority,&CreateThreadCommand{
-        name:Some(title.trim().chars().take(80).collect()),project_binding_kind:binding,project_path:project_path.into(),
-        member_agent_ids:vec![member.into()],default_lead_agent_id:member.into(),
-        collaboration_mode:ThreadCollaborationMode::Peer,activation_state:ThreadActivationState::Active,
-    },&camp_id)?;
-    ensure!(created.status!=CommandResultStatus::Rejected,"mission.conversation_tool_admission_rejected");
-    tx.execute("INSERT INTO mission_number_sequence DEFAULT VALUES",[])?;let number=tx.last_insert_rowid();let now=chrono::Utc::now().to_rfc3339();
+    tx: &Transaction<'_>,
+    authority: &crate::conversation_tools::authoring::CreationAuthority,
+    title: &str,
+    prompt: &str,
+    project_path: &str,
+    binding: ProjectBindingKind,
+    member: &str,
+) -> Result<String> {
+    ensure!(
+        !title.trim().is_empty()
+            && title.chars().count() <= 120
+            && !prompt.trim().is_empty()
+            && prompt.chars().count() <= 20_000,
+        "mission.invalid_conversation_tool_content"
+    );
+    let content = mission_description::text_content(prompt);
+    let mission_id = Uuid::new_v4().to_string();
+    let camp_id = ThreadId::new();
+    let created = crate::collaboration::create_conversation_tool_camp_in_tx(
+        tx,
+        authority,
+        &CreateThreadCommand {
+            name: Some(title.trim().chars().take(80).collect()),
+            project_binding_kind: binding,
+            project_path: project_path.into(),
+            member_agent_ids: vec![member.into()],
+            default_lead_agent_id: member.into(),
+            collaboration_mode: ThreadCollaborationMode::Peer,
+            activation_state: ThreadActivationState::Active,
+        },
+        &camp_id,
+    )?;
+    ensure!(
+        created.status != CommandResultStatus::Rejected,
+        "mission.conversation_tool_admission_rejected"
+    );
+    tx.execute("INSERT INTO mission_number_sequence DEFAULT VALUES", [])?;
+    let number = tx.last_insert_rowid();
+    let now = chrono::Utc::now().to_rfc3339();
     tx.execute("INSERT INTO mission(id,number,camp_id,title,description,status,tags_json,source_attachments_json,details_version,created_at,updated_at) VALUES(?1,?2,?3,?4,?5,'not_started','[]','[]',1,?6,?6)",params![mission_id,number,camp_id,title,description_cache(prompt),now])?;
-    mission_description::save(tx,&mission_id,&content)?;
+    mission_description::save(tx, &mission_id, &content)?;
     tx.execute("INSERT INTO conversation_tool_mission(mission_id,source_request_id,source_automation_id,created_at) VALUES(?1,?2,?3,?4)",params![mission_id,authority.source_request(),authority.source_automation(),now])?;
-    record_activity(tx,&mission_id,"created",authority.actor(),authority.epoch(),json!({"status":"not_started","sourceRequestId":authority.source_request(),"sourceAutomationId":authority.source_automation()}))?;
+    record_activity(
+        tx,
+        &mission_id,
+        "created",
+        authority.actor(),
+        authority.epoch(),
+        json!({"status":"not_started","sourceRequestId":authority.source_request(),"sourceAutomationId":authority.source_automation()}),
+    )?;
     Ok(mission_id)
 }
 fn validate_content(title: Option<&str>, description: Option<&str>) -> Result<()> {
@@ -1152,14 +1211,46 @@ fn normalize_tags(tags: &[String]) -> Result<Vec<String>> {
 
 /// Bind a Host-frozen upload through the caller's existing command transaction.
 /// Uses the same detail version, attachment validation and activity as Mission update.
-pub(crate) fn bind_uploaded_attachment(tx:&rusqlite::Transaction<'_>,camp_id:&str,mission_id:&str,expected_version:i64,source:LocalAttachmentSourceRef,actor:&ActorRef)->Result<Option<CommandHandlerResult>>{
-    if !matches!(actor,ActorRef::User{..}){return Ok(Some(reject("mission.forbidden")))}
-    let Some(current)=load_record(tx,mission_id)?else{return Ok(Some(reject("mission.not_found")))};
-    if current.camp_id!=camp_id{return Ok(Some(reject("mission.thread_mismatch")))}
-    if current.details_version!=expected_version{return Ok(Some(reject("mission.details_version_conflict")))}
-    let next=apply_attachment_update(&current.source_attachments,&MissionAttachmentUpdate{keep_attachment_ids:current.source_attachments.iter().map(|item|item.id.clone()).collect(),new_source_attachments:vec![source]})?;
+pub(crate) fn bind_uploaded_attachment(
+    tx: &rusqlite::Transaction<'_>,
+    camp_id: &str,
+    mission_id: &str,
+    expected_version: i64,
+    source: LocalAttachmentSourceRef,
+    actor: &ActorRef,
+) -> Result<Option<CommandHandlerResult>> {
+    if !matches!(actor, ActorRef::User { .. }) {
+        return Ok(Some(reject("mission.forbidden")));
+    }
+    let Some(current) = load_record(tx, mission_id)? else {
+        return Ok(Some(reject("mission.not_found")));
+    };
+    if current.camp_id != camp_id {
+        return Ok(Some(reject("mission.thread_mismatch")));
+    }
+    if current.details_version != expected_version {
+        return Ok(Some(reject("mission.details_version_conflict")));
+    }
+    let next = apply_attachment_update(
+        &current.source_attachments,
+        &MissionAttachmentUpdate {
+            keep_attachment_ids: current
+                .source_attachments
+                .iter()
+                .map(|item| item.id.clone())
+                .collect(),
+            new_source_attachments: vec![source],
+        },
+    )?;
     tx.execute("UPDATE mission SET source_attachments_json=?2,details_version=details_version+1,updated_at=?3 WHERE id=?1 AND details_version=?4",params![mission_id,serialize_source_attachments(&next)?,chrono::Utc::now().to_rfc3339(),expected_version])?;
-    record_activity(tx,mission_id,"updated",actor,None,json!({"attachmentsChanged":true}))?;
+    record_activity(
+        tx,
+        mission_id,
+        "updated",
+        actor,
+        None,
+        json!({"attachmentsChanged":true}),
+    )?;
     Ok(None)
 }
 

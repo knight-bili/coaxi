@@ -1,7 +1,7 @@
 // Apache-2.0; adapted from spacering-net/codeg aff1e6c278453ed8d0b96a5f664edcdca621aa3f.
+use serde::{Deserialize, Serialize};
 use std::io;
-use serde::{Serialize,Deserialize};
-use tokio::io::{AsyncReadExt,AsyncWriteExt};
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 pub const MAX_FRAME_BYTES: usize = 16 * 1024 * 1024;
 
 /// Write one length-prefixed JSON frame.
@@ -43,4 +43,3 @@ where
     serde_json::from_slice(&body)
         .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, format!("decode: {e}")))
 }
-

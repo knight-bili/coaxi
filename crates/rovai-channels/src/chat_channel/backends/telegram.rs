@@ -2,7 +2,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use async_trait::async_trait;
-use tokio::sync::{mpsc, Mutex, OnceCell};
+use tokio::sync::{Mutex, OnceCell, mpsc};
 
 use crate::chat_channel::error::ChatChannelError;
 use crate::chat_channel::traits::ChatChannelBackend;
@@ -117,12 +117,9 @@ impl TelegramBackend {
                 ChatChannelError::SendFailed(redact_token(e.to_string(), &self.bot_token))
             })?;
 
-        let result: serde_json::Value = resp
-            .json()
-            .await
-            .map_err(|e| {
-                ChatChannelError::SendFailed(redact_token(e.to_string(), &self.bot_token))
-            })?;
+        let result: serde_json::Value = resp.json().await.map_err(|e| {
+            ChatChannelError::SendFailed(redact_token(e.to_string(), &self.bot_token))
+        })?;
 
         if result.get("ok").and_then(|v| v.as_bool()) != Some(true) {
             let desc = result
@@ -218,12 +215,9 @@ impl ChatChannelBackend for TelegramBackend {
                 ChatChannelError::ConnectionFailed(redact_token(e.to_string(), &self.bot_token))
             })?;
 
-        let me_body: serde_json::Value = resp
-            .json()
-            .await
-            .map_err(|e| {
-                ChatChannelError::ConnectionFailed(redact_token(e.to_string(), &self.bot_token))
-            })?;
+        let me_body: serde_json::Value = resp.json().await.map_err(|e| {
+            ChatChannelError::ConnectionFailed(redact_token(e.to_string(), &self.bot_token))
+        })?;
 
         if me_body.get("ok").and_then(|v| v.as_bool()) != Some(true) {
             *self.status.lock().await = ChannelConnectionStatus::Error;
@@ -340,10 +334,11 @@ impl ChatChannelBackend for TelegramBackend {
                                                 topic_mode,
                                                 message,
                                             );
-                                            let (durable_tx, durable_rx) = tokio::sync::oneshot::channel();
-                                    let send_result = command_tx
+                                            let (durable_tx, durable_rx) =
+                                                tokio::sync::oneshot::channel();
+                                            let send_result = command_tx
                                                 .send(IncomingCommand {
-                                            durable: Some(durable_tx),
+                                                    durable: Some(durable_tx),
                                                     channel_id,
                                                     sender_id,
                                                     command_text: clean_text,
@@ -352,8 +347,10 @@ impl ChatChannelBackend for TelegramBackend {
                                                     metadata: update.clone(),
                                                 })
                                                 .await;
-                                            if send_result.is_ok() && durable_rx.await.is_err() { return; }
-                                    if let Err(e) = send_result {
+                                            if send_result.is_ok() && durable_rx.await.is_err() {
+                                                return;
+                                            }
+                                            if let Err(e) = send_result {
                                                 tracing::error!(
                                                     "[Telegram] command_tx.send failed: {e}"
                                                 );
@@ -403,10 +400,11 @@ impl ChatChannelBackend for TelegramBackend {
                                             topic_mode,
                                             message,
                                         );
-                                        let (durable_tx, durable_rx) = tokio::sync::oneshot::channel();
-                                    let send_result = command_tx
+                                        let (durable_tx, durable_rx) =
+                                            tokio::sync::oneshot::channel();
+                                        let send_result = command_tx
                                             .send(IncomingCommand {
-                                            durable: Some(durable_tx),
+                                                durable: Some(durable_tx),
                                                 channel_id,
                                                 sender_id,
                                                 command_text: data.to_string(),
@@ -415,8 +413,10 @@ impl ChatChannelBackend for TelegramBackend {
                                                 metadata: update.clone(),
                                             })
                                             .await;
-                                        if send_result.is_ok() && durable_rx.await.is_err() { return; }
-                                    if let Err(e) = send_result {
+                                        if send_result.is_ok() && durable_rx.await.is_err() {
+                                            return;
+                                        }
+                                        if let Err(e) = send_result {
                                             tracing::error!(
                                                 "[Telegram] command_tx.send failed: {e}"
                                             );
@@ -518,12 +518,9 @@ impl ChatChannelBackend for TelegramBackend {
             .map_err(|e| {
                 ChatChannelError::SendFailed(redact_token(e.to_string(), &self.bot_token))
             })?;
-        let result: serde_json::Value = resp
-            .json()
-            .await
-            .map_err(|e| {
-                ChatChannelError::SendFailed(redact_token(e.to_string(), &self.bot_token))
-            })?;
+        let result: serde_json::Value = resp.json().await.map_err(|e| {
+            ChatChannelError::SendFailed(redact_token(e.to_string(), &self.bot_token))
+        })?;
         if result.get("ok").and_then(|v| v.as_bool()) != Some(true) {
             let desc = result
                 .get("description")
@@ -576,12 +573,9 @@ impl ChatChannelBackend for TelegramBackend {
             .map_err(|e| {
                 ChatChannelError::SendFailed(redact_token(e.to_string(), &self.bot_token))
             })?;
-        let result: serde_json::Value = resp
-            .json()
-            .await
-            .map_err(|e| {
-                ChatChannelError::SendFailed(redact_token(e.to_string(), &self.bot_token))
-            })?;
+        let result: serde_json::Value = resp.json().await.map_err(|e| {
+            ChatChannelError::SendFailed(redact_token(e.to_string(), &self.bot_token))
+        })?;
         if result.get("ok").and_then(|v| v.as_bool()) == Some(true) {
             Ok(())
         } else {
@@ -603,12 +597,9 @@ impl ChatChannelBackend for TelegramBackend {
                 ChatChannelError::ConnectionFailed(redact_token(e.to_string(), &self.bot_token))
             })?;
 
-        let body: serde_json::Value = resp
-            .json()
-            .await
-            .map_err(|e| {
-                ChatChannelError::ConnectionFailed(redact_token(e.to_string(), &self.bot_token))
-            })?;
+        let body: serde_json::Value = resp.json().await.map_err(|e| {
+            ChatChannelError::ConnectionFailed(redact_token(e.to_string(), &self.bot_token))
+        })?;
 
         if body.get("ok").and_then(|v| v.as_bool()) == Some(true) {
             Ok(())
@@ -899,4 +890,3 @@ fn escape_markdown(text: &str) -> String {
         .replace('.', "\\.")
         .replace('!', "\\!")
 }
-

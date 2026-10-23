@@ -33,7 +33,17 @@ pub const CODEG_BUNDLE_ID: &str = "app.codeg";
 /// for the same reason, where an application has no bundle identifier to
 /// know it by: on Windows, a development build next to the installed one is
 /// otherwise just another executable.
-pub const CODEG_EXECUTABLES: &[&str] = &["codeg.exe", "codeg", "rovai.exe", "rovai", "rovai-ai.exe", "rovai-core", "rovai-core.exe", "rovai-host", "rovai-host.exe"];
+pub const CODEG_EXECUTABLES: &[&str] = &[
+    "codeg.exe",
+    "codeg",
+    "rovai.exe",
+    "rovai",
+    "rovai-ai.exe",
+    "rovai-core",
+    "rovai-core.exe",
+    "rovai-host",
+    "rovai-host.exe",
+];
 
 /// A grant in force on one window.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

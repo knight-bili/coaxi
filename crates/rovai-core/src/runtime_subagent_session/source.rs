@@ -70,20 +70,47 @@ pub(crate) struct NativeDocument {
 
 impl NativeDocuments {
     pub(crate) fn open_recorded(target: &ObservedNativeSessionTarget) -> Result<Self> {
-        Self::open(target.recorded_home.as_deref().context("native_child.origin_unavailable")?, target)
+        Self::open(
+            target
+                .recorded_home
+                .as_deref()
+                .context("native_child.origin_unavailable")?,
+            target,
+        )
     }
     /// Filesystem seam only. Production launch capture/historical binding lookup
     /// must establish `binding_home`; this is not a grant to select arbitrary roots.
     pub(crate) fn open(binding_home: &Path, target: &ObservedNativeSessionTarget) -> Result<Self> {
-        Self::open_cancellable(binding_home, target, &std::sync::atomic::AtomicBool::new(false))
+        Self::open_cancellable(
+            binding_home,
+            target,
+            &std::sync::atomic::AtomicBool::new(false),
+        )
     }
 
-    pub(crate) fn open_recorded_cancellable(target: &ObservedNativeSessionTarget, stop: &std::sync::atomic::AtomicBool) -> Result<Self> {
-        Self::open_cancellable(target.recorded_home.as_deref().context("native_child.origin_unavailable")?, target, stop)
+    pub(crate) fn open_recorded_cancellable(
+        target: &ObservedNativeSessionTarget,
+        stop: &std::sync::atomic::AtomicBool,
+    ) -> Result<Self> {
+        Self::open_cancellable(
+            target
+                .recorded_home
+                .as_deref()
+                .context("native_child.origin_unavailable")?,
+            target,
+            stop,
+        )
     }
 
-    pub(crate) fn open_cancellable(binding_home: &Path, target: &ObservedNativeSessionTarget, stop: &std::sync::atomic::AtomicBool) -> Result<Self> {
-        ensure!(!stop.load(std::sync::atomic::Ordering::Acquire), "native_child.read_cancelled");
+    pub(crate) fn open_cancellable(
+        binding_home: &Path,
+        target: &ObservedNativeSessionTarget,
+        stop: &std::sync::atomic::AtomicBool,
+    ) -> Result<Self> {
+        ensure!(
+            !stop.load(std::sync::atomic::Ordering::Acquire),
+            "native_child.read_cancelled"
+        );
         ensure!(
             binding_home.is_absolute(),
             "native_child.invalid_source_root"
@@ -100,7 +127,10 @@ impl NativeDocuments {
             "grok-build" => grok_documents(&home, target, stop)?,
             _ => bail!("native_child.unsupported_source"),
         };
-        Ok(Self { documents, unavailable_advisories })
+        Ok(Self {
+            documents,
+            unavailable_advisories,
+        })
     }
 }
 
@@ -195,7 +225,10 @@ impl NativeDocument {
     fn header(&mut self, stop: &std::sync::atomic::AtomicBool) -> Result<Value> {
         let mut bytes = Vec::new();
         for index in 0..self.chunk_count().min(HEADER_BYTES as usize / CHUNK_BYTES) {
-            ensure!(!stop.load(std::sync::atomic::Ordering::Acquire), "native_child.read_cancelled");
+            ensure!(
+                !stop.load(std::sync::atomic::Ordering::Acquire),
+                "native_child.read_cancelled"
+            );
             bytes.extend(self.read_chunk(index)?);
             for line in bytes.split(|byte| *byte == b'\n').take(4) {
                 if let Ok(value) = serde_json::from_slice::<Value>(line)
@@ -410,7 +443,12 @@ fn codex_documents(
     stop: &std::sync::atomic::AtomicBool,
 ) -> Result<Vec<NativeDocument>> {
     let mut paths = entries_with_stop(home, &home.join("sessions"), 4, Some(stop))?;
-    paths.extend(entries_with_stop(home, &home.join("archived_sessions"), 1, Some(stop))?);
+    paths.extend(entries_with_stop(
+        home,
+        &home.join("archived_sessions"),
+        1,
+        Some(stop),
+    )?);
     let rollouts: Vec<_> = paths.into_iter().filter_map(Rollout::from_path).collect();
     let mut current = rollouts
         .iter()
@@ -433,7 +471,12 @@ fn codex_documents(
             visited.insert(current.rollout.clone()),
             "native_child.history_cycle"
         );
-        let mut document = NativeDocument::open_with_cancel(home, &current.path, DocumentKind::CodexRollout, Some(stop))?;
+        let mut document = NativeDocument::open_with_cancel(
+            home,
+            &current.path,
+            DocumentKind::CodexRollout,
+            Some(stop),
+        )?;
         let header = document.header(stop)?;
         let payload = &header["payload"];
         ensure!(
@@ -484,30 +527,53 @@ fn grok_session(home: &Path, paths: &[PathBuf], id: &str) -> Result<PathBuf> {
     Ok(path)
 }
 
-fn grok_link(home: &Path, parent: &Path, target: &ObservedNativeSessionTarget, stop: &std::sync::atomic::AtomicBool) -> Result<bool> {
+fn grok_link(
+    home: &Path,
+    parent: &Path,
+    target: &ObservedNativeSessionTarget,
+    stop: &std::sync::atomic::AtomicBool,
+) -> Result<bool> {
     use super::content::records::{JsonRecords, ParseNotes, json_document};
-    let mut parent_updates = NativeDocument::open_with_cancel(home, &parent.join("updates.jsonl"), DocumentKind::GrokUpdates, Some(stop))?;
+    let mut parent_updates = NativeDocument::open_with_cancel(
+        home,
+        &parent.join("updates.jsonl"),
+        DocumentKind::GrokUpdates,
+        Some(stop),
+    )?;
     let mut notes = ParseNotes::default();
     for record in JsonRecords::new(&mut parent_updates, stop, &mut notes) {
         let value = record?;
         let update = &value["params"]["update"];
-        if matches!(update["sessionUpdate"].as_str(), Some("subagent_spawned" | "subagent_finished"))
-            && update["child_session_id"] == target.child_native_session_id
-            && update.get("parent_session_id").is_none_or(|v| v == &target.parent_native_session_id)
+        if matches!(
+            update["sessionUpdate"].as_str(),
+            Some("subagent_spawned" | "subagent_finished")
+        ) && update["child_session_id"] == target.child_native_session_id
+            && update
+                .get("parent_session_id")
+                .is_none_or(|v| v == &target.parent_native_session_id)
         {
             return Ok(true);
         }
     }
     for path in entries_with_stop(home, &parent.join("subagents"), 1, Some(stop))? {
-        if path.file_name().is_none_or(|name| name != "meta.json") { continue; }
-        let mut document = NativeDocument::open_with_cancel(home, &path, DocumentKind::GrokSubagentMetadata, Some(stop))?;
+        if path.file_name().is_none_or(|name| name != "meta.json") {
+            continue;
+        }
+        let mut document = NativeDocument::open_with_cancel(
+            home,
+            &path,
+            DocumentKind::GrokSubagentMetadata,
+            Some(stop),
+        )?;
         let value = match json_document(&mut document, stop) {
             Ok(value) => value,
             Err(error) if error.is::<serde_json::Error>() => continue,
             Err(error) => return Err(error),
         };
         if value["child_session_id"] == target.child_native_session_id
-            && value.get("parent_session_id").is_none_or(|v| v == &target.parent_native_session_id)
+            && value
+                .get("parent_session_id")
+                .is_none_or(|v| v == &target.parent_native_session_id)
         {
             return Ok(true);
         }
@@ -544,12 +610,31 @@ fn grok_documents(
     }
     let summary = child.join("summary.json");
     if summary.try_exists()? {
-        documents.push(NativeDocument::open_with_cancel(home, &summary, DocumentKind::GrokSummary, Some(stop))?);
+        documents.push(NativeDocument::open_with_cancel(
+            home,
+            &summary,
+            DocumentKind::GrokSummary,
+            Some(stop),
+        )?);
     }
     for path in entries_with_stop(home, &child.join("subagents"), 1, Some(stop))? {
-        if path.file_name().is_none_or(|name| name != "meta.json") { continue; }
-        let Some(id) = path.parent().and_then(Path::file_name).and_then(|name| name.to_str()).filter(|id| identity(id)) else { continue; };
-        let mut document = NativeDocument::open_with_cancel(home, &path, DocumentKind::GrokSubagentMetadata, Some(stop))?;
+        if path.file_name().is_none_or(|name| name != "meta.json") {
+            continue;
+        }
+        let Some(id) = path
+            .parent()
+            .and_then(Path::file_name)
+            .and_then(|name| name.to_str())
+            .filter(|id| identity(id))
+        else {
+            continue;
+        };
+        let mut document = NativeDocument::open_with_cancel(
+            home,
+            &path,
+            DocumentKind::GrokSubagentMetadata,
+            Some(stop),
+        )?;
         document.source_label = Some(id.into());
         documents.push(document);
     }
@@ -557,9 +642,14 @@ fn grok_documents(
     // Preserve the original catalogue fallback when absent or unreadable,
     // while still refusing links, non-regular files and paths outside home.
     let mut unavailable_advisories = 0;
-    for (name, kind) in [("models_cache.json", DocumentKind::GrokModelsCache), ("config.toml", DocumentKind::GrokConfig)] {
+    for (name, kind) in [
+        ("models_cache.json", DocumentKind::GrokModelsCache),
+        ("config.toml", DocumentKind::GrokConfig),
+    ] {
         let path = home.join(name);
-        if matches!(path.try_exists(), Ok(false)) { continue; }
+        if matches!(path.try_exists(), Ok(false)) {
+            continue;
+        }
         match NativeDocument::open_with_cancel(home, &path, kind, Some(stop)) {
             Ok(document) => documents.push(document),
             Err(error) if stop.load(std::sync::atomic::Ordering::Acquire) => return Err(error),

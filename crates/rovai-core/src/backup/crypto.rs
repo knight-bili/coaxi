@@ -18,13 +18,13 @@ use aes_gcm::aead::generic_array::GenericArray;
 use aes_gcm::aead::stream::{DecryptorBE32, EncryptorBE32};
 use aes_gcm::{Aes256Gcm, KeyInit};
 use argon2::{Algorithm, Argon2, Params, Version};
-use base64::engine::general_purpose::STANDARD as B64;
 use base64::Engine;
+use base64::engine::general_purpose::STANDARD as B64;
 use rand::RngCore;
 use serde::{Deserialize, Serialize};
 use tokio_util::sync::CancellationToken;
 
-use super::{BackupError as AppCommandError, BACKUP_I18N_KEY_BAD_PASSPHRASE};
+use super::{BACKUP_I18N_KEY_BAD_PASSPHRASE, BackupError as AppCommandError};
 
 use super::cancelled_error;
 
@@ -104,9 +104,14 @@ pub fn is_encrypted(path: &Path) -> Result<bool, AppCommandError> {
     Ok(n >= ENVELOPE_MAGIC.len() && &head[..ENVELOPE_MAGIC.len()] == ENVELOPE_MAGIC)
 }
 
-fn derive_key(passphrase: &str, salt: &[u8], params: &KdfParams) -> Result<[u8; 32], AppCommandError> {
-    let p = Params::new(params.m_cost, params.t_cost, params.p_cost, Some(32))
-        .map_err(|e| AppCommandError::task_execution_failed("Invalid KDF parameters").with_detail(e.to_string()))?;
+fn derive_key(
+    passphrase: &str,
+    salt: &[u8],
+    params: &KdfParams,
+) -> Result<[u8; 32], AppCommandError> {
+    let p = Params::new(params.m_cost, params.t_cost, params.p_cost, Some(32)).map_err(|e| {
+        AppCommandError::task_execution_failed("Invalid KDF parameters").with_detail(e.to_string())
+    })?;
     let version = if params.version == 0x10 {
         Version::V0x10
     } else {
@@ -116,7 +121,10 @@ fn derive_key(passphrase: &str, salt: &[u8], params: &KdfParams) -> Result<[u8; 
     let mut key = [0u8; 32];
     argon2
         .hash_password_into(passphrase.as_bytes(), salt, &mut key)
-        .map_err(|e| AppCommandError::task_execution_failed("Key derivation failed").with_detail(e.to_string()))?;
+        .map_err(|e| {
+            AppCommandError::task_execution_failed("Key derivation failed")
+                .with_detail(e.to_string())
+        })?;
     Ok(key)
 }
 
@@ -129,10 +137,24 @@ pub fn encrypt_file(
     cancel: &CancellationToken,
 ) -> Result<(), AppCommandError> {
     let reader = BufReader::new(File::open(src).map_err(AppCommandError::io)?);
-    encrypt_stream(reader, || File::create(dest).map(BufWriter::new).map_err(AppCommandError::io), passphrase, cancel)
+    encrypt_stream(
+        reader,
+        || {
+            File::create(dest)
+                .map(BufWriter::new)
+                .map_err(AppCommandError::io)
+        },
+        passphrase,
+        cancel,
+    )
 }
 
-fn encrypt_stream<R: Read, W: Write>(mut reader: R, writer: impl FnOnce() -> Result<W, AppCommandError>, passphrase: &str, cancel: &CancellationToken) -> Result<(), AppCommandError> {
+fn encrypt_stream<R: Read, W: Write>(
+    mut reader: R,
+    writer: impl FnOnce() -> Result<W, AppCommandError>,
+    passphrase: &str,
+    cancel: &CancellationToken,
+) -> Result<(), AppCommandError> {
     let mut salt = [0u8; SALT_LEN];
     let mut nonce_prefix = [0u8; NONCE_PREFIX_LEN];
     rand::rngs::OsRng.fill_bytes(&mut salt);
@@ -153,14 +175,19 @@ fn encrypt_stream<R: Read, W: Write>(mut reader: R, writer: impl FnOnce() -> Res
     let mut out = writer()?;
     // Write the cleartext header.
     out.write_all(ENVELOPE_MAGIC).map_err(AppCommandError::io)?;
-    out.write_all(&[ENVELOPE_HEADER_VERSION]).map_err(AppCommandError::io)?;
-    let header_json = serde_json::to_vec(&header)
-        .map_err(|e| AppCommandError::task_execution_failed("Serialize envelope header").with_detail(e.to_string()))?;
-    out.write_all(&(header_json.len() as u32).to_le_bytes()).map_err(AppCommandError::io)?;
+    out.write_all(&[ENVELOPE_HEADER_VERSION])
+        .map_err(AppCommandError::io)?;
+    let header_json = serde_json::to_vec(&header).map_err(|e| {
+        AppCommandError::task_execution_failed("Serialize envelope header")
+            .with_detail(e.to_string())
+    })?;
+    out.write_all(&(header_json.len() as u32).to_le_bytes())
+        .map_err(AppCommandError::io)?;
     out.write_all(&header_json).map_err(AppCommandError::io)?;
 
-    let cipher = Aes256Gcm::new_from_slice(&key)
-        .map_err(|e| AppCommandError::task_execution_failed("Cipher init failed").with_detail(e.to_string()))?;
+    let cipher = Aes256Gcm::new_from_slice(&key).map_err(|e| {
+        AppCommandError::task_execution_failed("Cipher init failed").with_detail(e.to_string())
+    })?;
     let nonce = GenericArray::from_slice(&nonce_prefix);
     let mut enc = EncryptorBE32::from_aead(cipher, nonce);
 
@@ -197,10 +224,24 @@ pub fn decrypt_file(
     cancel: &CancellationToken,
 ) -> Result<(), AppCommandError> {
     let reader = BufReader::new(File::open(src).map_err(AppCommandError::io)?);
-    decrypt_stream(reader, || File::create(dest).map(BufWriter::new).map_err(AppCommandError::io), passphrase, cancel)
+    decrypt_stream(
+        reader,
+        || {
+            File::create(dest)
+                .map(BufWriter::new)
+                .map_err(AppCommandError::io)
+        },
+        passphrase,
+        cancel,
+    )
 }
 
-fn decrypt_stream<R: Read, W: Write>(mut reader: R, writer: impl FnOnce() -> Result<W, AppCommandError>, passphrase: &str, cancel: &CancellationToken) -> Result<(), AppCommandError> {
+fn decrypt_stream<R: Read, W: Write>(
+    mut reader: R,
+    writer: impl FnOnce() -> Result<W, AppCommandError>,
+    passphrase: &str,
+    cancel: &CancellationToken,
+) -> Result<(), AppCommandError> {
     let header = read_header(&mut reader)?;
     // The envelope header is attacker-controlled; validate every field that
     // drives an allocation (chunk_size) or CPU/memory work (Argon2 params)
@@ -221,8 +262,9 @@ fn decrypt_stream<R: Read, W: Write>(mut reader: R, writer: impl FnOnce() -> Res
     }
 
     let key = derive_key(passphrase, &salt, &header.kdf_params)?;
-    let cipher = Aes256Gcm::new_from_slice(&key)
-        .map_err(|e| AppCommandError::task_execution_failed("Cipher init failed").with_detail(e.to_string()))?;
+    let cipher = Aes256Gcm::new_from_slice(&key).map_err(|e| {
+        AppCommandError::task_execution_failed("Cipher init failed").with_detail(e.to_string())
+    })?;
     let nonce = GenericArray::from_slice(&nonce_prefix);
     let mut dec = DecryptorBE32::from_aead(cipher, nonce);
 
@@ -326,29 +368,71 @@ fn corrupt_header_error() -> AppCommandError {
         .with_i18n(BACKUP_I18N_KEY_BAD_PASSPHRASE, Default::default())
 }
 
-
 /// 配置迁移沿既有 STREAM 容器读写内存，秘密和导入口令不写明文临时文件。
-pub(crate) fn encrypt_bytes(bytes: &[u8], passphrase: &str, limit: usize) -> Result<Vec<u8>, AppCommandError> {
-    if bytes.len() > limit { return Err(AppCommandError::invalid_input("Configuration exceeds memory limit")); }
-    let mut writer = BoundedConfigurationBytes { bytes: Vec::new(), limit };
-    encrypt_stream(bytes, || Ok(&mut writer), passphrase, &CancellationToken::new())?;
+pub(crate) fn encrypt_bytes(
+    bytes: &[u8],
+    passphrase: &str,
+    limit: usize,
+) -> Result<Vec<u8>, AppCommandError> {
+    if bytes.len() > limit {
+        return Err(AppCommandError::invalid_input(
+            "Configuration exceeds memory limit",
+        ));
+    }
+    let mut writer = BoundedConfigurationBytes {
+        bytes: Vec::new(),
+        limit,
+    };
+    encrypt_stream(
+        bytes,
+        || Ok(&mut writer),
+        passphrase,
+        &CancellationToken::new(),
+    )?;
     Ok(writer.bytes)
 }
 
-pub(crate) fn decrypt_bytes(bytes: &[u8], passphrase: &str, limit: usize) -> Result<Vec<u8>, AppCommandError> {
-    if bytes.len() > limit { return Err(AppCommandError::invalid_input("Configuration exceeds memory limit")); }
-    let mut writer = BoundedConfigurationBytes { bytes: Vec::new(), limit };
-    decrypt_stream(bytes, || Ok(&mut writer), passphrase, &CancellationToken::new())?;
+pub(crate) fn decrypt_bytes(
+    bytes: &[u8],
+    passphrase: &str,
+    limit: usize,
+) -> Result<Vec<u8>, AppCommandError> {
+    if bytes.len() > limit {
+        return Err(AppCommandError::invalid_input(
+            "Configuration exceeds memory limit",
+        ));
+    }
+    let mut writer = BoundedConfigurationBytes {
+        bytes: Vec::new(),
+        limit,
+    };
+    decrypt_stream(
+        bytes,
+        || Ok(&mut writer),
+        passphrase,
+        &CancellationToken::new(),
+    )?;
     Ok(writer.bytes)
 }
 
-struct BoundedConfigurationBytes { bytes: Vec<u8>, limit: usize }
+struct BoundedConfigurationBytes {
+    bytes: Vec<u8>,
+    limit: usize,
+}
 impl Write for BoundedConfigurationBytes {
     fn write(&mut self, value: &[u8]) -> io::Result<usize> {
-        if self.bytes.len().checked_add(value.len()).is_none_or(|length| length > self.limit) {
+        if self
+            .bytes
+            .len()
+            .checked_add(value.len())
+            .is_none_or(|length| length > self.limit)
+        {
             return Err(io::Error::other("Configuration exceeds memory limit"));
         }
-        self.bytes.extend_from_slice(value); Ok(value.len())
+        self.bytes.extend_from_slice(value);
+        Ok(value.len())
     }
-    fn flush(&mut self) -> io::Result<()> { Ok(()) }
+    fn flush(&mut self) -> io::Result<()> {
+        Ok(())
+    }
 }

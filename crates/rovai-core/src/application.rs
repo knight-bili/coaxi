@@ -1,60 +1,60 @@
 mod execution_drivers;
 use execution_drivers::*;
 use rusqlite::OptionalExtension;
+mod appearance_extensions;
+mod browser_access;
 mod canvas_terminal;
+mod channel_adapter_commands;
+mod channel_adapter_control;
+mod channel_adapter_messages;
+mod channel_adapter_pushes;
+mod channel_adapter_status;
+mod channel_adapters;
+mod computer_access;
 mod config;
+mod config_sync;
+mod config_sync_cleanup;
 mod conversation_preferences;
-mod navigation_groups;
-mod navigation_tags;
+mod conversation_tools_access;
+mod custom_runtime_access;
+mod custom_skills;
 pub(crate) mod delegation_composer;
 pub(crate) mod delegation_control;
 pub(crate) mod delegation_input;
 pub(crate) mod delegation_queries;
+mod extension_catalog;
+mod feedback_access;
+mod forge;
+mod forge_links;
+mod history_import;
+mod interaction_access;
 mod mission;
-mod native_interactions;
 mod native_child_reads;
+mod native_continuation;
+mod native_interactions;
+mod native_lifecycle_access;
+mod native_normal;
+mod navigation_groups;
+mod navigation_tags;
+mod office_access;
+mod office_skills;
+mod pets_access;
+mod portable_configuration_access;
+mod portable_configuration_private;
+pub(crate) mod private_composer;
+mod private_sources;
+mod project_launcher;
+pub(crate) mod runtime_interactions;
+mod transport;
+mod usage_price_catalog;
+mod web_commands;
+mod webdav_access;
+mod webdav_transfer;
 mod workbench;
-mod workbench_scope;
 mod workbench_editor;
 mod workbench_file_tools;
 mod workbench_receipts;
-mod browser_access;
-mod interaction_access;
-mod feedback_access;
-mod custom_runtime_access;
-mod portable_configuration_access;
-mod portable_configuration_private;
-mod conversation_tools_access;
-mod native_lifecycle_access;
-mod native_continuation;
-mod native_normal;
-mod computer_access;
-mod office_access;
-mod history_import;
-mod usage_price_catalog;
-mod webdav_access;
-mod webdav_transfer;
-mod config_sync;
-mod config_sync_cleanup;
-mod appearance_extensions;
-mod pets_access;
-mod office_skills;
-mod custom_skills;
-mod project_launcher;
-mod forge;
-mod forge_links;
-mod channel_adapters;
-mod channel_adapter_messages;
-mod channel_adapter_commands;
-mod channel_adapter_control;
-mod channel_adapter_pushes;
-mod channel_adapter_status;
-mod extension_catalog;
-pub(crate) mod private_composer;
-mod private_sources;
-pub(crate) mod runtime_interactions;
-mod transport;
-mod web_commands;
+mod workbench_scope;
 pub use config::{CoreConfig, RemovedSkillProjectRoots};
 use transport::{CoreInput, OutputTarget};
 pub use transport::{
@@ -84,12 +84,11 @@ use antigravity::{
     AntigravityRunRequest,
 };
 use anyhow::{Context, Result, ensure};
-use chrono::Utc;
-use rovai_core::mission_workspace;
 use builtin_tool_runtime::{
     BuiltinToolLeaseRegistry, BuiltinToolProcessConfig, builtin_tool_endpoint,
     bundled_cli_executable, request_digest,
 };
+use chrono::Utc;
 use claude::{
     ClaudeCodeCliRuntimeAdapter, ClaudeCodeDeliveredFailure, ClaudeCodeInputAccepted,
     ClaudeCodeRunRequest,
@@ -105,6 +104,7 @@ use pi::{
     PiAgentRunRuntimeRequest, PiIncoming, PiPromptImage, PiRpcRuntimeAdapter, PiRuntime,
     PreparedPiPromptImage, prepare_prompt_images,
 };
+use rovai_core::mission_workspace;
 use rovai_core::{
     action::{
         AcknowledgeRuntimeDeliveryCommand, AcquireRuntimeDeliveryCommand, ActionControlMode,
@@ -875,22 +875,61 @@ fn request_runs_outside_main_queue(method: &str) -> bool {
             | "history.usage"
             | "history.usage.local"
             | "feedback.operation"
-            | "conversationTools.policy.get" | "conversationTools.policy.set"
-            | "conversationTools.questions.list" | "conversationTools.questions.answer" | "conversationTools.questions.decline" | "conversationTools.questions.reconcile"
-            | "conversationTools.grants.preview" | "conversationTools.grants.confirm" | "conversationTools.grants.revoke" | "conversationTools.grants.list"
-            | "conversationTools.requests.get" | "conversationTools.requests.resolve" | "conversationTools.automationOwner.get" | "conversationTools.automationOwner.set"
-            | "runtime.custom.list" | "runtime.custom.upsert" | "runtime.custom.remove" | "runtime.custom.install" | "runtime.custom.inspect" | "runtime.custom.registry"
-            | "configuration.providers.list" | "configuration.providers.upsert" | "configuration.providers.remove" | "configuration.memberConnection.get" | "configuration.memberConnection.set"
-            | "configuration.migration.preview" | "configuration.migration.confirm" | "configuration.migration.receipt" | "configuration.migration.undoPreview" | "configuration.migration.undoConfirm"
-            | "configuration.migration.archives" | "configuration.migration.targets"
-            | "configuration.secrets.prepare" | "configuration.archive.registerLocal" | "configuration.archive.registerSelected" | "configuration.archive.receipt"
+            | "conversationTools.policy.get"
+            | "conversationTools.policy.set"
+            | "conversationTools.questions.list"
+            | "conversationTools.questions.answer"
+            | "conversationTools.questions.decline"
+            | "conversationTools.questions.reconcile"
+            | "conversationTools.grants.preview"
+            | "conversationTools.grants.confirm"
+            | "conversationTools.grants.revoke"
+            | "conversationTools.grants.list"
+            | "conversationTools.requests.get"
+            | "conversationTools.requests.resolve"
+            | "conversationTools.automationOwner.get"
+            | "conversationTools.automationOwner.set"
+            | "runtime.custom.list"
+            | "runtime.custom.upsert"
+            | "runtime.custom.remove"
+            | "runtime.custom.install"
+            | "runtime.custom.inspect"
+            | "runtime.custom.registry"
+            | "configuration.providers.list"
+            | "configuration.providers.upsert"
+            | "configuration.providers.remove"
+            | "configuration.memberConnection.get"
+            | "configuration.memberConnection.set"
+            | "configuration.migration.preview"
+            | "configuration.migration.confirm"
+            | "configuration.migration.receipt"
+            | "configuration.migration.undoPreview"
+            | "configuration.migration.undoConfirm"
+            | "configuration.migration.archives"
+            | "configuration.migration.targets"
+            | "configuration.secrets.prepare"
+            | "configuration.archive.registerLocal"
+            | "configuration.archive.registerSelected"
+            | "configuration.archive.receipt"
             | "configuration.providers.privateEdit"
-            | "configuration.desktopOwner.register" | "configuration.desktopOwner.pending" | "configuration.desktopOwner.acknowledge"
-            | "configuration.export.prepare" | "configuration.export.receipt" | "configuration.export.read"
-            | "configuration.sync" | "configuration.logging" | "configuration.taskTemplates" | "configuration.files.finish"
-            | "runtime.steer.policy.get" | "runtime.steer.policy.set"
+            | "configuration.desktopOwner.register"
+            | "configuration.desktopOwner.pending"
+            | "configuration.desktopOwner.acknowledge"
+            | "configuration.export.prepare"
+            | "configuration.export.receipt"
+            | "configuration.export.read"
+            | "configuration.sync"
+            | "configuration.logging"
+            | "configuration.taskTemplates"
+            | "configuration.files.finish"
+            | "runtime.steer.policy.get"
+            | "runtime.steer.policy.set"
             | "runtime.steer.targets"
-            | "runtime.steer.preview" | "runtime.steer.confirm" | "runtime.steer.receipt" | "runtime.steer.previews" | "runtime.steer.materials.prepare"
+            | "runtime.steer.preview"
+            | "runtime.steer.confirm"
+            | "runtime.steer.receipt"
+            | "runtime.steer.previews"
+            | "runtime.steer.materials.prepare"
             | "monitoring.execution"
             | "runtime.installations.refresh"
             | "runtime.discovery.rescan"
@@ -2480,11 +2519,12 @@ struct ClaudeInputAcceptanceTarget<'a> {
 
 struct Core {
     feedback_tools: crate::ui_feedback::broker::Registry,
-    feedback_transports: Mutex<HashMap<String,(crate::mcp::McpServerDefinition,String)>>,
+    feedback_transports: Mutex<HashMap<String, (crate::mcp::McpServerDefinition, String)>>,
     conversation_tools: crate::conversation_tools::broker::Registry,
-    conversation_tools_transports: Mutex<HashMap<String,(crate::mcp::McpServerDefinition,String)>>,
+    conversation_tools_transports:
+        Mutex<HashMap<String, (crate::mcp::McpServerDefinition, String)>>,
     interaction_tools: Arc<crate::interaction_tools::broker::Broker>,
-    interaction_bindings: Mutex<HashMap<String,BuiltinToolBindingCredential>>,
+    interaction_bindings: Mutex<HashMap<String, BuiltinToolBindingCredential>>,
     native_child_readers: crate::runtime_subagent_session::reader::Registry,
     canvas_terminals: Arc<crate::canvas_terminal::manager::Manager>,
     execution_wake: crate::execution_wake::ExecutionWake,
@@ -7661,13 +7701,44 @@ impl Core {
                 Ok(json!({ "released": true }))
             }
             "commands.reconcile" => {
-                if request.params["operation"].as_str().is_some_and(|operation|matches!(operation,"conversationTools.policy.set"|"conversationTools.questions.answer"|"conversationTools.questions.decline"|"conversationTools.grants.confirm"|"conversationTools.grants.revoke"|"conversationTools.requests.resolve"|"conversationTools.automationOwner.set")){
-                    #[derive(Deserialize)]#[serde(deny_unknown_fields)]struct Query{operation:String,params:Identity}
-                    #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Identity{command_id:String}
-                    let input:Query=serde_json::from_value(request.params.clone())?;let database=self.database.lock().await;
-                    return crate::command::conversation_user_receipt(database.connection(),&input.operation,&input.params.command_id,&request.client)
+                if request.params["operation"]
+                    .as_str()
+                    .is_some_and(|operation| {
+                        matches!(
+                            operation,
+                            "conversationTools.policy.set"
+                                | "conversationTools.questions.answer"
+                                | "conversationTools.questions.decline"
+                                | "conversationTools.grants.confirm"
+                                | "conversationTools.grants.revoke"
+                                | "conversationTools.requests.resolve"
+                                | "conversationTools.automationOwner.set"
+                        )
+                    })
+                {
+                    #[derive(Deserialize)]
+                    #[serde(deny_unknown_fields)]
+                    struct Query {
+                        operation: String,
+                        params: Identity,
+                    }
+                    #[derive(Deserialize)]
+                    #[serde(rename_all = "camelCase", deny_unknown_fields)]
+                    struct Identity {
+                        command_id: String,
+                    }
+                    let input: Query = serde_json::from_value(request.params.clone())?;
+                    let database = self.database.lock().await;
+                    return crate::command::conversation_user_receipt(
+                        database.connection(),
+                        &input.operation,
+                        &input.params.command_id,
+                        &request.client,
+                    );
                 }
-                if let Some(result)=self.reconcile_workspace_operation(&request.params).await?{return Ok(result)}
+                if let Some(result) = self.reconcile_workspace_operation(&request.params).await? {
+                    return Ok(result);
+                }
                 let database = self.database.lock().await;
                 web_commands::reconcile(
                     &database,
@@ -7879,7 +7950,11 @@ impl Core {
             "automations.get" => {
                 let params: AutomationGetParams = serde_json::from_value(request.params.clone())?;
                 let database = self.database.lock().await;
-                crate::conversation_tools::user_api::automation_details(&database,&params.automation_id,params.queued_mission_after.as_deref())
+                crate::conversation_tools::user_api::automation_details(
+                    &database,
+                    &params.automation_id,
+                    params.queued_mission_after.as_deref(),
+                )
             }
             "automations.create" => {
                 let params: AutomationMutationParams<CreateAutomationCommand> =
@@ -9601,7 +9676,10 @@ impl Core {
                 Ok(serde_json::to_value(self.skill_library.list(&database)?)?)
             }
             "workbench.projectLauncher" => self.project_launcher(request.params.clone()).await,
-            "office.cli" => crate::office_preview::installer::operation(&self.data_dir,request.params.clone()).await,
+            "office.cli" => {
+                crate::office_preview::installer::operation(&self.data_dir, request.params.clone())
+                    .await
+            }
             "skillPacks.custom.prepare" => self.custom_skill_prepare(request.params.clone()).await,
             "skillPacks.custom.install" => self.custom_skill_install(request.params.clone()).await,
             "skillPacks.custom.local" => self.custom_skill_local(request.params.clone()).await,
@@ -9846,7 +9924,23 @@ impl Core {
                 let params: NativeSkillsListParams =
                     serde_json::from_value(request.params.clone())?;
                 let kind: rovai_core::agent_profile::AdapterKind = params.adapter_kind.parse()?;
-                let custom_roots=if kind==AdapterKind::CustomAcp{let agent_id=params.agent_id.as_deref().context("custom_runtime.member_binding_required")?;let database=self.database.lock().await;Some(rovai_core::custom_runtime::storage::member_skill_roots(database.connection(),agent_id)?)}else{anyhow::ensure!(params.agent_id.is_none(),"Native Skill member selection only applies to a custom Runtime");None};
+                let custom_roots = if kind == AdapterKind::CustomAcp {
+                    let agent_id = params
+                        .agent_id
+                        .as_deref()
+                        .context("custom_runtime.member_binding_required")?;
+                    let database = self.database.lock().await;
+                    Some(rovai_core::custom_runtime::storage::member_skill_roots(
+                        database.connection(),
+                        agent_id,
+                    )?)
+                } else {
+                    anyhow::ensure!(
+                        params.agent_id.is_none(),
+                        "Native Skill member selection only applies to a custom Runtime"
+                    );
+                    None
+                };
                 let configuration = self
                     .runtime_search_environment
                     .read()
@@ -9854,7 +9948,11 @@ impl Core {
                     .startup_configuration(kind);
                 let discovery = self.native_skill_discovery.clone();
                 let scan = tokio::task::spawn_blocking(move || {
-                    if let Some(roots)=custom_roots{discovery.discover_custom(&roots,params.refresh)}else{discovery.discover(kind,None,true,params.refresh,&configuration)}
+                    if let Some(roots) = custom_roots {
+                        discovery.discover_custom(&roots, params.refresh)
+                    } else {
+                        discovery.discover(kind, None, true, params.refresh, &configuration)
+                    }
                 })
                 .await??;
                 let mut database = self.database.lock().await;
@@ -9935,8 +10033,27 @@ impl Core {
                     let old_projection_paths = old
                         .query_map([], |row| row.get::<_, String>(0))?
                         .collect::<rusqlite::Result<BTreeSet<_>>>()?;
-                    let custom_skill_roots=roster.iter().filter(|(_,kind)|kind.as_deref()==Some("custom-acp")).map(|(id,_)|(id.clone(),rovai_core::custom_runtime::storage::member_skill_roots(database.connection(),id).map_err(|error|error.to_string()))).collect::<BTreeMap<_,_>>();
-                    (project_path, roster, toolbox_rows, old_projection_paths, custom_skill_roots)
+                    let custom_skill_roots = roster
+                        .iter()
+                        .filter(|(_, kind)| kind.as_deref() == Some("custom-acp"))
+                        .map(|(id, _)| {
+                            (
+                                id.clone(),
+                                rovai_core::custom_runtime::storage::member_skill_roots(
+                                    database.connection(),
+                                    id,
+                                )
+                                .map_err(|error| error.to_string()),
+                            )
+                        })
+                        .collect::<BTreeMap<_, _>>();
+                    (
+                        project_path,
+                        roster,
+                        toolbox_rows,
+                        old_projection_paths,
+                        custom_skill_roots,
+                    )
                 };
                 let project = PathBuf::from(project_path);
                 let project = project.is_absolute().then_some(project);
@@ -9993,7 +10110,19 @@ impl Core {
                                 .parse::<rovai_core::agent_profile::AdapterKind>()
                                 .map_err(|_| format!("unknown Runtime {kind}"))
                                 .and_then(|kind| {
-                                    if kind==AdapterKind::CustomAcp{return custom_skill_roots.get(&member_id).cloned().unwrap_or_else(||Err("custom_runtime.member_binding_required".into())).and_then(|roots|request.discover_custom(&roots).map_err(|error|error.to_string()))}
+                                    if kind == AdapterKind::CustomAcp {
+                                        return custom_skill_roots
+                                            .get(&member_id)
+                                            .cloned()
+                                            .unwrap_or_else(|| {
+                                                Err("custom_runtime.member_binding_required".into())
+                                            })
+                                            .and_then(|roots| {
+                                                request
+                                                    .discover_custom(&roots)
+                                                    .map_err(|error| error.to_string())
+                                            });
+                                    }
                                     request
                                         .discover(
                                             kind,
@@ -10410,65 +10539,232 @@ impl Core {
                     "blockers": blockers,
                 }))
             }
-            "pets.operation" => self.pets_access(false,request.params.clone()).await,
-            "pets.local" => self.pets_access(true,request.params.clone()).await,
+            "pets.operation" => self.pets_access(false, request.params.clone()).await,
+            "pets.local" => self.pets_access(true, request.params.clone()).await,
             "appearance.extensions" => self.appearance_extensions(request.params.clone()).await,
             "backup.config.local" => self.config_sync_access(request.params.clone()).await,
-            "backup.storage.desktop.register" => {#[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Input{preferences_root:PathBuf}let input:Input=serde_json::from_value(request.params.clone())?;crate::backup::owned_roots::register_desktop(&self.data_dir,&input.preferences_root)?;Ok(json!({"registered":true}))},
-            "backup.webdav.settings" => self.webdav_access(false,request.params.clone()).await,
+            "backup.storage.desktop.register" => {
+                #[derive(Deserialize)]
+                #[serde(rename_all = "camelCase", deny_unknown_fields)]
+                struct Input {
+                    preferences_root: PathBuf,
+                }
+                let input: Input = serde_json::from_value(request.params.clone())?;
+                crate::backup::owned_roots::register_desktop(
+                    &self.data_dir,
+                    &input.preferences_root,
+                )?;
+                Ok(json!({"registered":true}))
+            }
+            "backup.webdav.settings" => self.webdav_access(false, request.params.clone()).await,
             "backup.webdav.remote" => self.webdav_remote_access(request.params.clone()).await,
-            "backup.webdav.local" => self.webdav_access(true,request.params.clone()).await,
-            "history.local" => self.history_import(true,request.params.clone(),&request.client).await,
-            "history.library" => self.history_import(false,request.params.clone(),&request.client).await,
-            "office.watch" => self.office_access(request.params.clone(),&request.client).await,
+            "backup.webdav.local" => self.webdav_access(true, request.params.clone()).await,
+            "history.local" => {
+                self.history_import(true, request.params.clone(), &request.client)
+                    .await
+            }
+            "history.library" => {
+                self.history_import(false, request.params.clone(), &request.client)
+                    .await
+            }
+            "office.watch" => {
+                self.office_access(request.params.clone(), &request.client)
+                    .await
+            }
             "interaction.local" => self.interaction_access(request.params.clone()).await,
-            "feedback.operation" => self.feedback_operation(request.params.clone(),request.client.clone()).await,
-            "runtime.custom.list" | "runtime.custom.upsert" | "runtime.custom.remove" | "runtime.custom.install" | "runtime.custom.inspect" | "runtime.custom.registry" => self.custom_runtime_access(&request.method,request.params.clone()).await,
-            "configuration.providers.list" | "configuration.providers.upsert" | "configuration.providers.remove" | "configuration.memberConnection.get" | "configuration.memberConnection.set" => self.portable_configuration_access(&request.method,request.params.clone(),&request.client).await,
-            "conversationTools.policy.get" | "conversationTools.policy.set"
-            | "conversationTools.questions.list" | "conversationTools.questions.answer" | "conversationTools.questions.decline" | "conversationTools.questions.reconcile"
-            | "conversationTools.grants.preview" | "conversationTools.grants.confirm" | "conversationTools.grants.revoke" | "conversationTools.grants.list"
-            | "conversationTools.requests.get" | "conversationTools.requests.resolve" | "conversationTools.automationOwner.get" | "conversationTools.automationOwner.set"=>self.conversation_tools_access(&request.method,request.params.clone(),&request.client).await,
-            "configuration.migration.preview" | "configuration.migration.confirm" | "configuration.migration.receipt" | "configuration.migration.undoPreview" | "configuration.migration.undoConfirm" => self.portable_configuration_access(&request.method,request.params.clone(),&request.client).await,
-            "configuration.migration.archives" | "configuration.migration.targets" => self.portable_configuration_access(&request.method,request.params.clone(),&request.client).await,
-            "configuration.secrets.prepare" | "configuration.archive.registerLocal" | "configuration.archive.registerSelected" | "configuration.archive.receipt" => self.portable_configuration_private(&request.method,request.params.clone(),&request.client).await,
-            "configuration.providers.privateEdit" => self.portable_configuration_private(&request.method,request.params.clone(),&request.client).await,
-            "configuration.desktopOwner.register" | "configuration.desktopOwner.pending" | "configuration.desktopOwner.acknowledge" => self.portable_configuration_private(&request.method,request.params.clone(),&request.client).await,
-            "configuration.export.prepare" | "configuration.export.receipt" | "configuration.export.read" => self.portable_configuration_private(&request.method,request.params.clone(),&request.client).await,
-            "configuration.sync" | "configuration.logging" | "configuration.taskTemplates" | "configuration.files.finish" => self.portable_configuration_private(&request.method,request.params.clone(),&request.client).await,
-            "history.execution.records" | "runtime.steer.evidence" | "runtime.steer.normal.preview" | "runtime.steer.normal.confirm" | "runtime.steer.normal.receipt" | "history.execution.preview" | "history.execution.confirm" | "history.execution.receipt" | "runtime.steer.policy.get" | "runtime.steer.policy.set" | "runtime.steer.targets" | "runtime.steer.preview" | "runtime.steer.confirm" | "runtime.steer.receipt" | "runtime.steer.previews" | "runtime.steer.materials.prepare" => self.native_lifecycle_access(&request.method,request.params.clone(),request.client.clone()).await,
+            "feedback.operation" => {
+                self.feedback_operation(request.params.clone(), request.client.clone())
+                    .await
+            }
+            "runtime.custom.list"
+            | "runtime.custom.upsert"
+            | "runtime.custom.remove"
+            | "runtime.custom.install"
+            | "runtime.custom.inspect"
+            | "runtime.custom.registry" => {
+                self.custom_runtime_access(&request.method, request.params.clone())
+                    .await
+            }
+            "configuration.providers.list"
+            | "configuration.providers.upsert"
+            | "configuration.providers.remove"
+            | "configuration.memberConnection.get"
+            | "configuration.memberConnection.set" => {
+                self.portable_configuration_access(
+                    &request.method,
+                    request.params.clone(),
+                    &request.client,
+                )
+                .await
+            }
+            "conversationTools.policy.get"
+            | "conversationTools.policy.set"
+            | "conversationTools.questions.list"
+            | "conversationTools.questions.answer"
+            | "conversationTools.questions.decline"
+            | "conversationTools.questions.reconcile"
+            | "conversationTools.grants.preview"
+            | "conversationTools.grants.confirm"
+            | "conversationTools.grants.revoke"
+            | "conversationTools.grants.list"
+            | "conversationTools.requests.get"
+            | "conversationTools.requests.resolve"
+            | "conversationTools.automationOwner.get"
+            | "conversationTools.automationOwner.set" => {
+                self.conversation_tools_access(
+                    &request.method,
+                    request.params.clone(),
+                    &request.client,
+                )
+                .await
+            }
+            "configuration.migration.preview"
+            | "configuration.migration.confirm"
+            | "configuration.migration.receipt"
+            | "configuration.migration.undoPreview"
+            | "configuration.migration.undoConfirm" => {
+                self.portable_configuration_access(
+                    &request.method,
+                    request.params.clone(),
+                    &request.client,
+                )
+                .await
+            }
+            "configuration.migration.archives" | "configuration.migration.targets" => {
+                self.portable_configuration_access(
+                    &request.method,
+                    request.params.clone(),
+                    &request.client,
+                )
+                .await
+            }
+            "configuration.secrets.prepare"
+            | "configuration.archive.registerLocal"
+            | "configuration.archive.registerSelected"
+            | "configuration.archive.receipt" => {
+                self.portable_configuration_private(
+                    &request.method,
+                    request.params.clone(),
+                    &request.client,
+                )
+                .await
+            }
+            "configuration.providers.privateEdit" => {
+                self.portable_configuration_private(
+                    &request.method,
+                    request.params.clone(),
+                    &request.client,
+                )
+                .await
+            }
+            "configuration.desktopOwner.register"
+            | "configuration.desktopOwner.pending"
+            | "configuration.desktopOwner.acknowledge" => {
+                self.portable_configuration_private(
+                    &request.method,
+                    request.params.clone(),
+                    &request.client,
+                )
+                .await
+            }
+            "configuration.export.prepare"
+            | "configuration.export.receipt"
+            | "configuration.export.read" => {
+                self.portable_configuration_private(
+                    &request.method,
+                    request.params.clone(),
+                    &request.client,
+                )
+                .await
+            }
+            "configuration.sync"
+            | "configuration.logging"
+            | "configuration.taskTemplates"
+            | "configuration.files.finish" => {
+                self.portable_configuration_private(
+                    &request.method,
+                    request.params.clone(),
+                    &request.client,
+                )
+                .await
+            }
+            "history.execution.records"
+            | "runtime.steer.evidence"
+            | "runtime.steer.normal.preview"
+            | "runtime.steer.normal.confirm"
+            | "runtime.steer.normal.receipt"
+            | "history.execution.preview"
+            | "history.execution.confirm"
+            | "history.execution.receipt"
+            | "runtime.steer.policy.get"
+            | "runtime.steer.policy.set"
+            | "runtime.steer.targets"
+            | "runtime.steer.preview"
+            | "runtime.steer.confirm"
+            | "runtime.steer.receipt"
+            | "runtime.steer.previews"
+            | "runtime.steer.materials.prepare" => {
+                self.native_lifecycle_access(
+                    &request.method,
+                    request.params.clone(),
+                    request.client.clone(),
+                )
+                .await
+            }
             "computer.local" => self.computer_access(request.params.clone()).await,
-            "browser.local.grant" | "browser.local.revoke" | "browser.local.begin" | "browser.local.finish" => self.browser_access(&request.method, request.params.clone()).await,
+            "browser.local.grant"
+            | "browser.local.revoke"
+            | "browser.local.begin"
+            | "browser.local.finish" => {
+                self.browser_access(&request.method, request.params.clone())
+                    .await
+            }
             "workbench.files.tools" => self.workbench_file_tools(request.params.clone()).await,
-            "workbench.editor"=>self.workbench_editor(request.params.clone()).await,
+            "workbench.editor" => self.workbench_editor(request.params.clone()).await,
             "workbench.files.list" | "workbench.files.read" => {
-                self.workbench_files(&request.method, request.params.clone()).await
+                self.workbench_files(&request.method, request.params.clone())
+                    .await
             }
-            "workbench.files.mutate" => {
-                self.workbench_file_mutate(request.params.clone()).await
-            }
+            "workbench.files.mutate" => self.workbench_file_mutate(request.params.clone()).await,
             "workbench.git.read" | "workbench.git.preview" | "workbench.git.execute" => {
-                self.workbench_git(&request.method, request.params.clone()).await
+                self.workbench_git(&request.method, request.params.clone())
+                    .await
             }
-            "navigation.projectGroups" => self.navigation_project_groups(request.params.clone()).await,
+            "navigation.projectGroups" => {
+                self.navigation_project_groups(request.params.clone()).await
+            }
             "workbench.organizer.get" | "workbench.organizer.set" => {
-                let value = self.workbench_organizer(&request.method, request.params.clone()).await?;
+                let value = self
+                    .workbench_organizer(&request.method, request.params.clone())
+                    .await?;
                 if request.method == "workbench.organizer.set" {
                     emit_navigation_invalidated(&self.output, "workbench.organizer.set", None);
                 }
                 Ok(value)
             }
             "forge.accounts.get" | "forge.accounts.set" => {
-                self.forge_accounts(&request.method, request.params.clone()).await
+                self.forge_accounts(&request.method, request.params.clone())
+                    .await
             }
             "forge.operation" => self.forge_operation(request.params.clone()).await,
             "extensions.catalog" => self.extension_catalog(request.params.clone()).await,
             "forge.links" => self.forge_links(request.params.clone()).await,
-            "channels.adapters" => self.channel_adapter_operation(request.params.clone(), false).await,
-            "channels.adapters.private" => self.channel_adapter_operation(request.params.clone(), true).await,
-            "channels.adapters.inbound" => self.channel_adapter_inbound(request.params.clone()).await,
+            "channels.adapters" => {
+                self.channel_adapter_operation(request.params.clone(), false)
+                    .await
+            }
+            "channels.adapters.private" => {
+                self.channel_adapter_operation(request.params.clone(), true)
+                    .await
+            }
+            "channels.adapters.inbound" => {
+                self.channel_adapter_inbound(request.params.clone()).await
+            }
             "channels.adapters.outbox" => self.channel_adapter_outbox(request.params.clone()).await,
-            "channels.adapters.hostStatus" => self.channel_adapter_host_status(request.params.clone()).await,
+            "channels.adapters.hostStatus" => {
+                self.channel_adapter_host_status(request.params.clone())
+                    .await
+            }
             "workspaces.inspect" => {
                 let params: WorkspaceInspectParams =
                     serde_json::from_value(request.params.clone())?;
@@ -10526,14 +10822,12 @@ impl Core {
                     serde_json::from_value(request.params.clone())?;
                 let value = {
                     let mut database = self.database.lock().await;
-                    serde_json::to_value(
-                    ReadModelService.navigation_snapshot_for_groups(
+                    serde_json::to_value(ReadModelService.navigation_snapshot_for_groups(
                         &mut database,
                         &params.group_limits,
                         params.group_keys.as_deref(),
                         &request.client,
-                    )?,
-                    )?
+                    )?)?
                 };
                 self.navigation_with_tags(value).await
             }
@@ -10556,9 +10850,9 @@ impl Core {
                 let value = {
                     let mut database = self.database.lock().await;
                     serde_json::to_value(ReadModelService.navigation_camps(
-                    &mut database,
-                    &params.camp_ids,
-                    &request.client,
+                        &mut database,
+                        &params.camp_ids,
+                        &request.client,
                     )?)?
                 };
                 self.navigation_with_tags(value).await
@@ -10568,15 +10862,13 @@ impl Core {
                     serde_json::from_value(request.params.clone())?;
                 let value = {
                     let mut database = self.database.lock().await;
-                    serde_json::to_value(
-                    ReadModelService.navigation_group_camps_for_client(
+                    serde_json::to_value(ReadModelService.navigation_group_camps_for_client(
                         &mut database,
                         params.project_path.as_deref(),
                         params.offset.unwrap_or(0),
                         params.limit.unwrap_or(100),
                         &request.client,
-                    )?,
-                    )?
+                    )?)?
                 };
                 self.navigation_with_tags(value).await
             }
@@ -10585,7 +10877,7 @@ impl Core {
                 let value = {
                     let database = self.database.lock().await;
                     serde_json::to_value(
-                    ReadModelService.find_navigation_camp(&database, &params.camp_id)?,
+                        ReadModelService.find_navigation_camp(&database, &params.camp_id)?,
                     )?
                 };
                 self.navigation_with_tags(value).await
@@ -10595,14 +10887,12 @@ impl Core {
                     serde_json::from_value(request.params.clone())?;
                 let value = {
                     let mut database = self.database.lock().await;
-                    serde_json::to_value(
-                    ReadModelService.acknowledge_camp_viewed_for_client(
+                    serde_json::to_value(ReadModelService.acknowledge_camp_viewed_for_client(
                         &mut database,
                         params.camp_id.as_str(),
                         params.through_global_sequence,
                         &request.client,
-                    )?,
-                    )?
+                    )?)?
                 };
                 self.navigation_with_tags(value).await
             }
@@ -10817,11 +11107,19 @@ impl Core {
                 let db = self.database.lock().await;
                 delegation_queries::read(&db, &request.method, request.params.clone())
             }
-            "runtime.agentReads.start" | "runtime.agentReads.poll" | "runtime.agentReads.page" | "runtime.agentReads.close" => {
-                self.native_agent_read(&request.method, request.params.clone()).await
+            "runtime.agentReads.start"
+            | "runtime.agentReads.poll"
+            | "runtime.agentReads.page"
+            | "runtime.agentReads.close" => {
+                self.native_agent_read(&request.method, request.params.clone())
+                    .await
             }
-            "runtime.childReads.start" | "runtime.childReads.poll" | "runtime.childReads.page" | "runtime.childReads.close" => {
-                self.native_child_read(&request.method, request.params.clone()).await
+            "runtime.childReads.start"
+            | "runtime.childReads.poll"
+            | "runtime.childReads.page"
+            | "runtime.childReads.close" => {
+                self.native_child_read(&request.method, request.params.clone())
+                    .await
             }
             "runtime.interactions.list" | "runtime.interactions.get" => {
                 let database = self.database.lock().await;
@@ -10935,7 +11233,9 @@ impl Core {
                 }
                 Ok(reply.result)
             }
-            "delegations.composer.get" | "delegations.composer.recovery" | "delegations.conversation.get" => {
+            "delegations.composer.get"
+            | "delegations.composer.recovery"
+            | "delegations.conversation.get" => {
                 let database = self.database.lock().await;
                 delegation_composer::handle(
                     &database,
@@ -11620,17 +11920,19 @@ impl Core {
                         .from_sequence
                         .context("Execution group range is required")?;
                     if params.projection == Some(ExecutionWindowProjection::DelegationBlocks) {
-                        serde_json::to_value(rovai_core::execution_window::read_delegation_group_changes(
-                            &mut database,
-                            params.camp_id.as_str(),
-                            &params.agent_run_id,
-                            group,
-                            params.after_change_sequence,
-                            from,
-                            params.to_sequence,
-                            params.limit.unwrap_or(96),
-                            params.after_entry_sequence,
-                        )?)?
+                        serde_json::to_value(
+                            rovai_core::execution_window::read_delegation_group_changes(
+                                &mut database,
+                                params.camp_id.as_str(),
+                                &params.agent_run_id,
+                                group,
+                                params.after_change_sequence,
+                                from,
+                                params.to_sequence,
+                                params.limit.unwrap_or(96),
+                                params.after_entry_sequence,
+                            )?,
+                        )?
                     } else {
                         serde_json::to_value(rovai_core::execution_window::read_group_changes(
                             &mut database,
@@ -11644,15 +11946,17 @@ impl Core {
                         )?)?
                     }
                 } else if params.projection == Some(ExecutionWindowProjection::DelegationBlocks) {
-                    serde_json::to_value(rovai_core::execution_window::read_delegation_block_changes(
-                        &mut database,
-                        params.camp_id.as_str(),
-                        &params.agent_run_id,
-                        params.after_change_sequence,
-                        &params.refresh_evidence_ids,
-                        params.limit.unwrap_or(96),
-                        params.after_entry_sequence,
-                    )?)?
+                    serde_json::to_value(
+                        rovai_core::execution_window::read_delegation_block_changes(
+                            &mut database,
+                            params.camp_id.as_str(),
+                            &params.agent_run_id,
+                            params.after_change_sequence,
+                            &params.refresh_evidence_ids,
+                            params.limit.unwrap_or(96),
+                            params.after_entry_sequence,
+                        )?,
+                    )?
                 } else if params.projection.is_some() {
                     serde_json::to_value(rovai_core::execution_window::read_block_changes(
                         &mut database,
@@ -11713,11 +12017,12 @@ impl Core {
                     "Execution blocks and group cursors cannot be combined"
                 );
                 let page = if let Some(group) = params.group_sequence {
-                    let reader = if params.projection == Some(ExecutionWindowProjection::DelegationBlocks) {
-                        rovai_core::execution_window::read_delegation_group_page
-                    } else {
-                        rovai_core::execution_window::read_group_page
-                    };
+                    let reader =
+                        if params.projection == Some(ExecutionWindowProjection::DelegationBlocks) {
+                            rovai_core::execution_window::read_delegation_group_page
+                        } else {
+                            rovai_core::execution_window::read_group_page
+                        };
                     serde_json::to_value(reader(
                         &mut database,
                         params.camp_id.as_str(),
@@ -11906,18 +12211,36 @@ impl Core {
                 }
             }
             "messageQuotes.privateProjection" => {
-                #[derive(Deserialize)] #[serde(rename_all="camelCase",deny_unknown_fields)]
-                struct Projection {thread_id:ThreadId,conversation_id:String,message_id:String}
-                let params:Projection=serde_json::from_value(request.params.clone())?;
-                let database=self.database.lock().await;
-                rovai_core::message_quote::private_quote_projection(database.connection(),params.thread_id.as_str(),&params.conversation_id,&params.message_id)
+                #[derive(Deserialize)]
+                #[serde(rename_all = "camelCase", deny_unknown_fields)]
+                struct Projection {
+                    thread_id: ThreadId,
+                    conversation_id: String,
+                    message_id: String,
+                }
+                let params: Projection = serde_json::from_value(request.params.clone())?;
+                let database = self.database.lock().await;
+                rovai_core::message_quote::private_quote_projection(
+                    database.connection(),
+                    params.thread_id.as_str(),
+                    &params.conversation_id,
+                    &params.message_id,
+                )
             }
             "messageQuotes.projection" => {
-                #[derive(Deserialize)] #[serde(rename_all="camelCase",deny_unknown_fields)]
-                struct Projection {thread_id:ThreadId,message_id:String}
-                let params:Projection=serde_json::from_value(request.params.clone())?;
-                let database=self.database.lock().await;
-                rovai_core::message_quote::public_quote_projection(database.connection(),params.thread_id.as_str(),&params.message_id)
+                #[derive(Deserialize)]
+                #[serde(rename_all = "camelCase", deny_unknown_fields)]
+                struct Projection {
+                    thread_id: ThreadId,
+                    message_id: String,
+                }
+                let params: Projection = serde_json::from_value(request.params.clone())?;
+                let database = self.database.lock().await;
+                rovai_core::message_quote::public_quote_projection(
+                    database.connection(),
+                    params.thread_id.as_str(),
+                    &params.message_id,
+                )
             }
             "messageQuotes.capture" => {
                 let params: CaptureThreadMessageQuoteParams =
@@ -15100,17 +15423,48 @@ impl Core {
         self.subsystems.require("mcp")?;
         let execution_root = PathBuf::from(&execution.workspace.execution_root);
         let interaction = if let Some(policy) = self.interaction_policy_for_run(execution).await? {
-            let credential = self.prepare_initial_builtin_tool_binding(execution,execution.native_session_resume_disposition()).await?;
-            Some(self.prepare_interaction_transport(execution,&policy,&credential).await?)
-        } else {None};
-        let feedback=if let Some(policy)=self.feedback_policy_for_run(execution).await?{
-            let credential=self.prepare_initial_builtin_tool_binding(execution,execution.native_session_resume_disposition()).await?;
-            Some(self.prepare_feedback_transport(execution,&policy,&credential).await?)
-        }else{None};
-        let conversation_tools=if let Some(frozen)=self.conversation_tools_for_run(execution).await?{
-            let credential=self.prepare_initial_builtin_tool_binding(execution,execution.native_session_resume_disposition()).await?;
-            Some(self.prepare_conversation_tools_transport(execution,&frozen,&credential).await?)
-        }else{None};
+            let credential = self
+                .prepare_initial_builtin_tool_binding(
+                    execution,
+                    execution.native_session_resume_disposition(),
+                )
+                .await?;
+            Some(
+                self.prepare_interaction_transport(execution, &policy, &credential)
+                    .await?,
+            )
+        } else {
+            None
+        };
+        let feedback = if let Some(policy) = self.feedback_policy_for_run(execution).await? {
+            let credential = self
+                .prepare_initial_builtin_tool_binding(
+                    execution,
+                    execution.native_session_resume_disposition(),
+                )
+                .await?;
+            Some(
+                self.prepare_feedback_transport(execution, &policy, &credential)
+                    .await?,
+            )
+        } else {
+            None
+        };
+        let conversation_tools =
+            if let Some(frozen) = self.conversation_tools_for_run(execution).await? {
+                let credential = self
+                    .prepare_initial_builtin_tool_binding(
+                        execution,
+                        execution.native_session_resume_disposition(),
+                    )
+                    .await?;
+                Some(
+                    self.prepare_conversation_tools_transport(execution, &frozen, &credential)
+                        .await?,
+                )
+            } else {
+                None
+            };
         let mut projection = {
             let database = self.database.lock().await;
             let request = McpProjectionRequest {
@@ -15121,11 +15475,27 @@ impl Core {
                 reported_runtime_version: execution.runtime.reported_version.as_deref(),
                 execution_root: &execution_root,
             };
-            let mut owned=Vec::new();
-            if let Some((definition,digest))=interaction{owned.push((crate::interaction_tools::SERVER_NAME,definition,digest));}
-            if let Some((definition,digest))=feedback{owned.push((crate::ui_feedback::SERVER_NAME,definition,digest));}
-            if let Some((definition,digest))=conversation_tools{owned.push((crate::conversation_tools::SERVER_NAME,definition,digest));}
-            if owned.is_empty(){self.mcp_projection.prepare(&database,self.mcp_config()?,&request)?}else{self.mcp_projection.prepare_owned_tools(&database,self.mcp_config()?,&request,owned)?}
+            let mut owned = Vec::new();
+            if let Some((definition, digest)) = interaction {
+                owned.push((crate::interaction_tools::SERVER_NAME, definition, digest));
+            }
+            if let Some((definition, digest)) = feedback {
+                owned.push((crate::ui_feedback::SERVER_NAME, definition, digest));
+            }
+            if let Some((definition, digest)) = conversation_tools {
+                owned.push((crate::conversation_tools::SERVER_NAME, definition, digest));
+            }
+            if owned.is_empty() {
+                self.mcp_projection
+                    .prepare(&database, self.mcp_config()?, &request)?
+            } else {
+                self.mcp_projection.prepare_owned_tools(
+                    &database,
+                    self.mcp_config()?,
+                    &request,
+                    owned,
+                )?
+            }
         };
         if execution.runtime.adapter_kind == AdapterKind::GrokBuild
             && !projection.servers.is_empty()
@@ -15357,14 +15727,24 @@ impl Core {
         execution: &AgentRunExecution,
         resume_disposition: NativeSessionResumeDisposition,
     ) -> Result<BuiltinToolBindingCredential> {
-        if self.interaction_policy_for_run(execution).await?.is_some() || self.feedback_policy_for_run(execution).await?.is_some() || self.conversation_tools_for_run(execution).await?.is_some() {
+        if self.interaction_policy_for_run(execution).await?.is_some()
+            || self.feedback_policy_for_run(execution).await?.is_some()
+            || self.conversation_tools_for_run(execution).await?.is_some()
+        {
             let mut cache = self.interaction_bindings.lock().await;
-            let key = format!("{}:{}",execution.agent_run_id,execution.execution_epoch);
-            if let Some(binding) = cache.get(&key) {return Ok(binding.clone());}
-            anyhow::ensure!(cache.len()<4096,"interaction.binding_capacity");
+            let key = format!("{}:{}", execution.agent_run_id, execution.execution_epoch);
+            if let Some(binding) = cache.get(&key) {
+                return Ok(binding.clone());
+            }
+            anyhow::ensure!(cache.len() < 4096, "interaction.binding_capacity");
             let mut database = self.database.lock().await;
-            let binding = TeamToolService::default().prepare_binding_credential(&mut database,&execution.agent_run_id,execution.execution_epoch,true)?;
-            cache.insert(key,binding.clone());
+            let binding = TeamToolService::default().prepare_binding_credential(
+                &mut database,
+                &execution.agent_run_id,
+                execution.execution_epoch,
+                true,
+            )?;
+            cache.insert(key, binding.clone());
             return Ok(binding);
         }
         Ok({
@@ -15456,19 +15836,30 @@ impl Core {
         native_session_id: &str,
     ) -> Result<()> {
         let native_source = match execution.runtime.adapter_kind {
-            AdapterKind::CodexCli => self.codex_cli.get_agent_run(&execution.agent_run_id, execution.execution_epoch)
-                .await.and_then(|runtime| runtime.native_source()),
+            AdapterKind::CodexCli => self
+                .codex_cli
+                .get_agent_run(&execution.agent_run_id, execution.execution_epoch)
+                .await
+                .and_then(|runtime| runtime.native_source()),
             AdapterKind::GrokBuild | AdapterKind::QoderCli => {
                 if let Some(adapter) = self.acp_adapter(execution.runtime.adapter_kind) {
-                    adapter.get_agent_run(&execution.agent_run_id, execution.execution_epoch)
-                        .await.and_then(|runtime| runtime.native_source())
-                } else { None }
+                    adapter
+                        .get_agent_run(&execution.agent_run_id, execution.execution_epoch)
+                        .await
+                        .and_then(|runtime| runtime.native_source())
+                } else {
+                    None
+                }
             }
             _ => None,
         };
         self.bind_prepared_native_session_source(
-            execution, credential, native_session_id, native_source.as_ref(),
-        ).await
+            execution,
+            credential,
+            native_session_id,
+            native_source.as_ref(),
+        )
+        .await
     }
 
     async fn bind_prepared_native_session_source(
@@ -15613,7 +16004,10 @@ impl Core {
         if !target.is_new_session
             && let Err(error) = self
                 .bind_prepared_native_session_source(
-                    execution, credential, &accepted.native_session_id, target.native_source,
+                    execution,
+                    credential,
+                    &accepted.native_session_id,
+                    target.native_source,
                 )
                 .await
         {
@@ -17089,9 +17483,12 @@ impl Core {
         };
         if is_new_session {
             self.bind_prepared_native_session_source(
-                execution, &binding_credential, &native_session_id, native_source.as_ref(),
+                execution,
+                &binding_credential,
+                &native_session_id,
+                native_source.as_ref(),
             )
-                .await?;
+            .await?;
         }
         let delivery = {
             let mut database = self.database.lock().await;
@@ -19435,15 +19832,53 @@ async fn run_core(
         None,
         None,
     )?;
-    let backup_mcp_path=mcp_config_path.clone().map_or_else(McpConfigStore::default_path,Ok);
-    if let Err(error)=backup_mcp_path.and_then(|path|crate::backup::owned_roots::register(data_dir_lease.data_dir(),&skill_library_root,&runtime_camp_files_root,&path)){
-        let _=crate::backup::owned_roots::unavailable(data_dir_lease.data_dir(),&format!("{error:#}"));tracing::warn!("backup owned storage registration unavailable: {error:#}");
+    let backup_mcp_path = mcp_config_path
+        .clone()
+        .map_or_else(McpConfigStore::default_path, Ok);
+    if let Err(error) = backup_mcp_path.and_then(|path| {
+        crate::backup::owned_roots::register(
+            data_dir_lease.data_dir(),
+            &skill_library_root,
+            &runtime_camp_files_root,
+            &path,
+        )
+    }) {
+        let _ = crate::backup::owned_roots::unavailable(
+            data_dir_lease.data_dir(),
+            &format!("{error:#}"),
+        );
+        tracing::warn!("backup owned storage registration unavailable: {error:#}");
     }
-    if let Err(error)=crate::backup::light_config::recover_with_lease(&data_dir_lease){
-        write_startup_frame(&output_target,"blocked",Some("recovering_authority"),json!({"kind":"configuration_recovery_pending"}),Some(structured_startup_error("config_sync_recovery_required",error.to_string(),false,json!({"safetySnapshotPreserved":true}))),None)?;return Ok(());
+    if let Err(error) = crate::backup::light_config::recover_with_lease(&data_dir_lease) {
+        write_startup_frame(
+            &output_target,
+            "blocked",
+            Some("recovering_authority"),
+            json!({"kind":"configuration_recovery_pending"}),
+            Some(structured_startup_error(
+                "config_sync_recovery_required",
+                error.to_string(),
+                false,
+                json!({"safetySnapshotPreserved":true}),
+            )),
+            None,
+        )?;
+        return Ok(());
     }
-    if let Err(error)=crate::backup::apply_pending_with_lease(&data_dir_lease){
-        write_startup_frame(&output_target,"blocked",Some("recovering_authority"),json!({"kind":"restore_pending"}),Some(structured_startup_error("backup_restore_requires_recovery",error.to_string(),false,json!({"safetySnapshotPreserved":true}))),None)?;
+    if let Err(error) = crate::backup::apply_pending_with_lease(&data_dir_lease) {
+        write_startup_frame(
+            &output_target,
+            "blocked",
+            Some("recovering_authority"),
+            json!({"kind":"restore_pending"}),
+            Some(structured_startup_error(
+                "backup_restore_requires_recovery",
+                error.to_string(),
+                false,
+                json!({"safetySnapshotPreserved":true}),
+            )),
+            None,
+        )?;
         return Ok(());
     }
     let assessment_started = Instant::now();
@@ -19749,7 +20184,7 @@ async fn run_core(
         planned_shutdown.generation().to_owned(),
     )?;
     crate::ui_feedback::delivery::recover_after_restart(database.connection())?;
-    crate::conversation_tools::user_api::maintain(&mut database,true)?;
+    crate::conversation_tools::user_api::maintain(&mut database, true)?;
     let core = Arc::new(Core {
         feedback_tools: crate::ui_feedback::broker::Registry::default(),
         feedback_transports: Mutex::new(HashMap::new()),
@@ -19757,7 +20192,9 @@ async fn run_core(
         conversation_tools_transports: Mutex::new(HashMap::new()),
         interaction_bindings: Mutex::new(HashMap::new()),
         interaction_tools: Arc::new(crate::interaction_tools::broker::Broker::new(&data_dir)),
-        native_child_readers: crate::runtime_subagent_session::reader::Registry::new(planned_shutdown.generation().to_owned()),
+        native_child_readers: crate::runtime_subagent_session::reader::Registry::new(
+            planned_shutdown.generation().to_owned(),
+        ),
         canvas_terminals,
         execution_wake: database.execution_wake.clone(),
         delivery_batch_scheduler_notify: database.execution_wake.delivery.clone(),
@@ -19925,7 +20362,13 @@ async fn run_core(
                 .policy_for(AdapterKind::DeepseekHarness)
                 .unwrap_or(CompactionDetectorPolicy::Disabled),
         ),
-        custom_acp: AcpCliRuntimeAdapter::deferred(AdapterKind::CustomAcp,acp_tx.clone(),data_dir.join("runtime/custom-acp"),runtime_fleet.clone(),CompactionDetectorPolicy::Disabled),
+        custom_acp: AcpCliRuntimeAdapter::deferred(
+            AdapterKind::CustomAcp,
+            acp_tx.clone(),
+            data_dir.join("runtime/custom-acp"),
+            runtime_fleet.clone(),
+            CompactionDetectorPolicy::Disabled,
+        ),
         command_code_cli: AcpCliRuntimeAdapter::deferred(
             rovai_core::agent_profile::AdapterKind::CommandCodeCli,
             acp_tx.clone(),
@@ -20074,7 +20517,9 @@ async fn run_core(
         runtime_discovery_core
             .initialize_optional_subsystems()
             .await;
-        runtime_discovery_core.portable_configuration_recover_outbox().await;
+        runtime_discovery_core
+            .portable_configuration_recover_outbox()
+            .await;
         runtime_discovery_core.run_runtime_discovery().await;
         runtime_discovery_core
             .recover_pending_execution_intents()
@@ -27974,8 +28419,10 @@ mod tests {
             conversation_tools: crate::conversation_tools::broker::Registry::default(),
             conversation_tools_transports: Mutex::new(HashMap::new()),
             interaction_bindings: Mutex::new(HashMap::new()),
-        interaction_tools: Arc::new(crate::interaction_tools::broker::Broker::new(&data_dir)),
-        native_child_readers: crate::runtime_subagent_session::reader::Registry::new(planned_shutdown.generation().to_owned()),
+            interaction_tools: Arc::new(crate::interaction_tools::broker::Broker::new(&data_dir)),
+            native_child_readers: crate::runtime_subagent_session::reader::Registry::new(
+                planned_shutdown.generation().to_owned(),
+            ),
             canvas_terminals: crate::canvas_terminal::manager::Manager::new(
                 data_dir.clone(),
                 planned_shutdown.generation().to_owned(),
@@ -28138,7 +28585,13 @@ mod tests {
                     .policy_for(AdapterKind::DeepseekHarness)
                     .unwrap_or(CompactionDetectorPolicy::Disabled),
             )?,
-            custom_acp: AcpCliRuntimeAdapter::new(AdapterKind::CustomAcp,acp_tx.clone(),data_dir.join("runtime/custom-acp"),runtime_fleet.clone(),CompactionDetectorPolicy::Disabled)?,
+            custom_acp: AcpCliRuntimeAdapter::new(
+                AdapterKind::CustomAcp,
+                acp_tx.clone(),
+                data_dir.join("runtime/custom-acp"),
+                runtime_fleet.clone(),
+                CompactionDetectorPolicy::Disabled,
+            )?,
             command_code_cli: AcpCliRuntimeAdapter::new(
                 AdapterKind::CommandCodeCli,
                 acp_tx.clone(),

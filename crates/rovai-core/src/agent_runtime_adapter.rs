@@ -745,7 +745,13 @@ impl AgentRuntimeAdapterRegistry {
         kind: AdapterKind,
         platform: HostPlatformKey,
     ) -> RuntimePlatformAdmission {
-        if kind==AdapterKind::CustomAcp{return RuntimePlatformAdmission::preview(kind,platform,RuntimePlatformAdmissionReasonCode::QualificationEvidenceMissing);}
+        if kind == AdapterKind::CustomAcp {
+            return RuntimePlatformAdmission::preview(
+                kind,
+                platform,
+                RuntimePlatformAdmissionReasonCode::QualificationEvidenceMissing,
+            );
+        }
         if matches!(
             kind,
             AdapterKind::GeminiCli | AdapterKind::HermesCli | AdapterKind::OpenClawCli
@@ -1014,7 +1020,9 @@ impl AgentRuntimeAdapterRegistry {
 
     pub fn skill_discovery(&self, kind: AdapterKind) -> SkillDiscoveryCapability {
         match kind {
-            AdapterKind::CustomAcp => native_skill_discovery([], SkillDiscoveryVerification::DocumentationOnly),
+            AdapterKind::CustomAcp => {
+                native_skill_discovery([], SkillDiscoveryVerification::DocumentationOnly)
+            }
             AdapterKind::CommandCodeCli => native_skill_discovery(
                 [SkillDeliveryGroupKey::CommandCode],
                 SkillDiscoveryVerification::DocumentationOnly,
@@ -1116,8 +1124,20 @@ impl AgentRuntimeAdapterRegistry {
         }
     }
 
-    pub fn mcp_projection_for_runtime(&self,runtime:&crate::agent_profile::FrozenAgentRuntimeConfig)->McpProjectionCapability{
-        if runtime.adapter_kind==AdapterKind::CustomAcp&&!runtime.custom_runtime.as_ref().is_some_and(|custom|custom.declared_mcp){unsupported_external_mcp_projection()}else{self.mcp_projection(runtime.adapter_kind)}
+    pub fn mcp_projection_for_runtime(
+        &self,
+        runtime: &crate::agent_profile::FrozenAgentRuntimeConfig,
+    ) -> McpProjectionCapability {
+        if runtime.adapter_kind == AdapterKind::CustomAcp
+            && !runtime
+                .custom_runtime
+                .as_ref()
+                .is_some_and(|custom| custom.declared_mcp)
+        {
+            unsupported_external_mcp_projection()
+        } else {
+            self.mcp_projection(runtime.adapter_kind)
+        }
     }
 
     pub fn codex_capability_snapshot(

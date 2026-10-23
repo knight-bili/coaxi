@@ -132,9 +132,12 @@ pub(crate) fn followup_runtime(
     let frozen = serde_json::from_value(config["runtime"].clone())?;
     let member: String = connection.query_row(
         "SELECT agent_id FROM conversation WHERE id=?1 AND kind='delegation_child'",
-        [conversation], |row| row.get(0),
+        [conversation],
+        |row| row.get(0),
     )?;
-    crate::agent_profile::resolve_rebound_runtime_for_followup_on_connection(connection, &frozen, &member)
+    crate::agent_profile::resolve_rebound_runtime_for_followup_on_connection(
+        connection, &frozen, &member,
+    )
 }
 
 pub(crate) fn followup_config(

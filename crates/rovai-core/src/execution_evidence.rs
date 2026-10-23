@@ -3992,13 +3992,22 @@ mod tests {
         assert!(!projected.to_string().contains("PRIVATE_GROK"));
         assert!(projected["nativeSubagents"].get("toolCallId").is_none());
         let native_child = crate::runtime_subagent_session::observed_child;
-        assert_eq!(native_child(&projected,"grok-build","grok-parent",0).unwrap(),("grok-child".into(),"running".into()));
-        assert!(native_child(&projected,"grok-build","foreign-parent",0).is_err());
-        assert!(native_child(&projected,"codex-cli","grok-parent",0).is_err());
-        assert!(native_child(&projected,"grok-build","grok-parent",1).is_err());
-        let mut no_session=projected.clone();
-        no_session["nativeSubagents"]["children"][0].as_object_mut().unwrap().remove("nativeSessionId");
-        assert!(native_child(&no_session,"grok-build","grok-parent",0).is_err(),"subagent_id is not a native Session address");
+        assert_eq!(
+            native_child(&projected, "grok-build", "grok-parent", 0).unwrap(),
+            ("grok-child".into(), "running".into())
+        );
+        assert!(native_child(&projected, "grok-build", "foreign-parent", 0).is_err());
+        assert!(native_child(&projected, "codex-cli", "grok-parent", 0).is_err());
+        assert!(native_child(&projected, "grok-build", "grok-parent", 1).is_err());
+        let mut no_session = projected.clone();
+        no_session["nativeSubagents"]["children"][0]
+            .as_object_mut()
+            .unwrap()
+            .remove("nativeSessionId");
+        assert!(
+            native_child(&no_session, "grok-build", "grok-parent", 0).is_err(),
+            "subagent_id is not a native Session address"
+        );
         let mut forged = projected.clone();
         forged["eventId"] = json!("forged-event-id");
         forged["privatePacket"] = json!("PRIVATE_GROK_PACKET");

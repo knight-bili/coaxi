@@ -1,7 +1,3 @@
-#[path = "db_usage_activity.rs"]
-mod usage_activity;
-#[path = "db_ui_feedback.rs"]
-mod ui_feedback;
 #[path = "db_attachment_paths.rs"]
 mod attachment_paths;
 #[path = "db_automation_run_control.rs"]
@@ -40,6 +36,10 @@ pub(crate) mod runtime_interactions;
 mod simplification;
 #[path = "db_skill_pack_context.rs"]
 mod skill_pack_context;
+#[path = "db_ui_feedback.rs"]
+mod ui_feedback;
+#[path = "db_usage_activity.rs"]
+mod usage_activity;
 
 #[cfg(test)]
 pub(crate) fn upgrade_canvas_object_fixture(database: &mut Database) {
@@ -101,7 +101,10 @@ pub(crate) fn downgrade_owned_migration_for_test(
         anyhow::ensure!(objects.is_empty(), "Unreceipted migration objects remain");
         return Ok(());
     }
-    anyhow::ensure!(!objects.is_empty(), "Migration receipt has no owned schema objects");
+    anyhow::ensure!(
+        !objects.is_empty(),
+        "Migration receipt has no owned schema objects"
+    );
     anyhow::ensure!(
         objects.iter().all(|(_, sql)| {
             sql.starts_with("CREATE TABLE ")
@@ -131,11 +134,10 @@ pub(crate) fn downgrade_owned_migration_for_test(
     for (name, sql) in objects {
         if sql.starts_with("CREATE TABLE ") && !allowed_nonempty_tables.contains(&name.as_str()) {
             let quoted = format!("\"{}\"", name.replace('"', "\"\""));
-            let count: i64 = connection.query_row(
-                &format!("SELECT COUNT(*) FROM {quoted}"),
-                [],
-                |row| row.get(0),
-            )?;
+            let count: i64 =
+                connection.query_row(&format!("SELECT COUNT(*) FROM {quoted}"), [], |row| {
+                    row.get(0)
+                })?;
             anyhow::ensure!(count == 0, "Cannot erase migration fixture data: {name}");
         }
     }
@@ -3550,13 +3552,29 @@ pub(crate) fn classify_delegation_160_contract(
     classify_database_contract_for_target(connection, 160, 210)
 }
 
-pub(crate) fn classify_feedback_163_contract(connection:&Connection)->rusqlite::Result<DatabaseContractClassification>{classify_database_contract_for_target(connection,163,213)}
+pub(crate) fn classify_feedback_163_contract(
+    connection: &Connection,
+) -> rusqlite::Result<DatabaseContractClassification> {
+    classify_database_contract_for_target(connection, 163, 213)
+}
 
-pub(crate) fn classify_custom_runtime_164_contract(connection:&Connection)->rusqlite::Result<DatabaseContractClassification>{classify_database_contract_for_target(connection,164,214)}
+pub(crate) fn classify_custom_runtime_164_contract(
+    connection: &Connection,
+) -> rusqlite::Result<DatabaseContractClassification> {
+    classify_database_contract_for_target(connection, 164, 214)
+}
 
-pub(crate) fn classify_native_lifecycle_165_contract(connection:&Connection)->rusqlite::Result<DatabaseContractClassification>{classify_database_contract_for_target(connection,165,215)}
+pub(crate) fn classify_native_lifecycle_165_contract(
+    connection: &Connection,
+) -> rusqlite::Result<DatabaseContractClassification> {
+    classify_database_contract_for_target(connection, 165, 215)
+}
 
-pub(crate) fn classify_portable_configuration_166_contract(connection:&Connection)->rusqlite::Result<DatabaseContractClassification>{classify_database_contract_for_target(connection,166,216)}
+pub(crate) fn classify_portable_configuration_166_contract(
+    connection: &Connection,
+) -> rusqlite::Result<DatabaseContractClassification> {
+    classify_database_contract_for_target(connection, 166, 216)
+}
 
 fn classify_database_contract_for_target(
     connection: &Connection,
@@ -3621,12 +3639,31 @@ fn classify_database_contract_for_target(
     if marker.projection_schema_version < 162 && !usage_activity::absent(connection)? {
         return Ok(DatabaseContractClassification::Unknown(Some(marker)));
     }
-    if marker.projection_schema_version < 164 && !crate::custom_runtime::storage::absent(connection)? {return Ok(DatabaseContractClassification::Unknown(Some(marker)));}
-    if marker.projection_schema_version < 165 && !crate::native_lifecycle::storage::absent(connection)? {return Ok(DatabaseContractClassification::Unknown(Some(marker)));}
-    if marker.projection_schema_version < 166 && !crate::portable_configuration::storage::absent(connection)? {return Ok(DatabaseContractClassification::Unknown(Some(marker)));}
-    if marker.projection_schema_version < 167 && !crate::conversation_tools::storage::absent(connection)? {return Ok(DatabaseContractClassification::Unknown(Some(marker)));}
+    if marker.projection_schema_version < 164
+        && !crate::custom_runtime::storage::absent(connection)?
+    {
+        return Ok(DatabaseContractClassification::Unknown(Some(marker)));
+    }
+    if marker.projection_schema_version < 165
+        && !crate::native_lifecycle::storage::absent(connection)?
+    {
+        return Ok(DatabaseContractClassification::Unknown(Some(marker)));
+    }
+    if marker.projection_schema_version < 166
+        && !crate::portable_configuration::storage::absent(connection)?
+    {
+        return Ok(DatabaseContractClassification::Unknown(Some(marker)));
+    }
+    if marker.projection_schema_version < 167
+        && !crate::conversation_tools::storage::absent(connection)?
+    {
+        return Ok(DatabaseContractClassification::Unknown(Some(marker)));
+    }
     let delegation_current = marker.contract_version == CURRENT_DATA_CONTRACT_VERSION
-        && matches!(marker.projection_schema_version, 160 | 161 | 162 | 163 | 164 | 165 | 166 | 167);
+        && matches!(
+            marker.projection_schema_version,
+            160 | 161 | 162 | 163 | 164 | 165 | 166 | 167
+        );
     if delegation_current
         || (marker.contract_version == V172_DATA_CONTRACT_VERSION
             && matches!(
@@ -3690,12 +3727,17 @@ fn classify_database_contract_for_target(
             |row| row.get(0),
         )?;
         let valid = completed
-            && (marker.projection_schema_version < 162 || usage_activity::schema_matches(connection)?)
+            && (marker.projection_schema_version < 162
+                || usage_activity::schema_matches(connection)?)
             && (marker.projection_schema_version < 163 || ui_feedback::schema_matches(connection)?)
-            && (marker.projection_schema_version < 164 || crate::custom_runtime::storage::schema_matches(connection)?)
-            && (marker.projection_schema_version < 165 || crate::native_lifecycle::storage::schema_matches(connection)?)
-            && (marker.projection_schema_version < 166 || crate::portable_configuration::storage::schema_matches(connection)?)
-            && (marker.projection_schema_version < 167 || crate::conversation_tools::storage::schema_matches(connection)?)
+            && (marker.projection_schema_version < 164
+                || crate::custom_runtime::storage::schema_matches(connection)?)
+            && (marker.projection_schema_version < 165
+                || crate::native_lifecycle::storage::schema_matches(connection)?)
+            && (marker.projection_schema_version < 166
+                || crate::portable_configuration::storage::schema_matches(connection)?)
+            && (marker.projection_schema_version < 167
+                || crate::conversation_tools::storage::schema_matches(connection)?)
             && marker.classifier_version == V147_CLASSIFIER_VERSION
             && if marker.projection_schema_version >= 161 {
                 runtime_interactions::schema_matches(connection)?
@@ -5408,16 +5450,38 @@ fn rewrite_gemini_runtime_closed_sets(tx: &Transaction<'_>, reverse: bool) -> Re
 }
 
 /// 自定义程序只扩展 Runtime 闭集，不伪造已实测的内置 Skill 分组。
-pub(crate) fn admit_custom_runtime_kind(tx:&Transaction<'_>)->Result<()>{
-    let triggers={let mut statement=tx.prepare("SELECT name,sql FROM sqlite_schema WHERE type='trigger' AND sql IS NOT NULL ORDER BY name")?;statement.query_map([],|r|Ok((r.get::<_,String>(0)?,r.get::<_,String>(1)?)))?.collect::<rusqlite::Result<Vec<_>>>()?};
-    for(name,_)in &triggers{tx.execute_batch(&format!("DROP TRIGGER \"{}\"",name.replace('"',"\"\"")))?;}
-    for table in DSH_RUNTIME_TABLES{
-        let count:i64=tx.query_row(&format!("SELECT COUNT(*) FROM \"{table}\""),[],|r|r.get(0))?;
-        expand_closed_set(tx,table,"'command-code-cli'","'command-code-cli', 'custom-acp'")?;
-        anyhow::ensure!(tx.query_row(&format!("SELECT COUNT(*) FROM \"{table}\""),[],|r|r.get::<_,i64>(0))?==count,"Custom ACP migration changed existing rows");
+pub(crate) fn admit_custom_runtime_kind(tx: &Transaction<'_>) -> Result<()> {
+    let triggers = {
+        let mut statement=tx.prepare("SELECT name,sql FROM sqlite_schema WHERE type='trigger' AND sql IS NOT NULL ORDER BY name")?;
+        statement
+            .query_map([], |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?)))?
+            .collect::<rusqlite::Result<Vec<_>>>()?
+    };
+    for (name, _) in &triggers {
+        tx.execute_batch(&format!("DROP TRIGGER \"{}\"", name.replace('"', "\"\"")))?;
     }
-    for(_,sql)in triggers{tx.execute_batch(&sql)?;}
-    validate_migration_foreign_keys(tx,&DSH_RUNTIME_TABLES)?;Ok(())
+    for table in DSH_RUNTIME_TABLES {
+        let count: i64 = tx.query_row(&format!("SELECT COUNT(*) FROM \"{table}\""), [], |r| {
+            r.get(0)
+        })?;
+        expand_closed_set(
+            tx,
+            table,
+            "'command-code-cli'",
+            "'command-code-cli', 'custom-acp'",
+        )?;
+        anyhow::ensure!(
+            tx.query_row(&format!("SELECT COUNT(*) FROM \"{table}\""), [], |r| r
+                .get::<_, i64>(0))?
+                == count,
+            "Custom ACP migration changed existing rows"
+        );
+    }
+    for (_, sql) in triggers {
+        tx.execute_batch(&sql)?;
+    }
+    validate_migration_foreign_keys(tx, &DSH_RUNTIME_TABLES)?;
+    Ok(())
 }
 
 fn rewrite_hermes_runtime_closed_sets(tx: &Transaction<'_>, reverse: bool) -> Result<()> {
@@ -9544,16 +9608,28 @@ impl Database {
                 migration_step!("migration_213", ui_feedback::migrate(self));
             }
             if !self.schema_migration_applied(214)? {
-                migration_step!("migration_214", crate::custom_runtime::storage::migrate(self));
+                migration_step!(
+                    "migration_214",
+                    crate::custom_runtime::storage::migrate(self)
+                );
             }
             if !self.schema_migration_applied(215)? {
-                migration_step!("migration_215", crate::native_lifecycle::storage::migrate(self));
+                migration_step!(
+                    "migration_215",
+                    crate::native_lifecycle::storage::migrate(self)
+                );
             }
             if !self.schema_migration_applied(216)? {
-                migration_step!("migration_216", crate::portable_configuration::storage::migrate(self));
+                migration_step!(
+                    "migration_216",
+                    crate::portable_configuration::storage::migrate(self)
+                );
             }
             if !self.schema_migration_applied(217)? {
-                migration_step!("migration_217", crate::conversation_tools::storage::migrate(self));
+                migration_step!(
+                    "migration_217",
+                    crate::conversation_tools::storage::migrate(self)
+                );
             }
             if let Err(error) =
                 crate::notification::maintain_notification_episode_retention(self.connection())
@@ -10418,16 +10494,28 @@ impl Database {
             migration_step!("migration_213", ui_feedback::migrate(self));
         }
         if !self.schema_migration_applied(214)? {
-            migration_step!("migration_214", crate::custom_runtime::storage::migrate(self));
+            migration_step!(
+                "migration_214",
+                crate::custom_runtime::storage::migrate(self)
+            );
         }
         if !self.schema_migration_applied(215)? {
-            migration_step!("migration_215", crate::native_lifecycle::storage::migrate(self));
+            migration_step!(
+                "migration_215",
+                crate::native_lifecycle::storage::migrate(self)
+            );
         }
         if !self.schema_migration_applied(216)? {
-            migration_step!("migration_216", crate::portable_configuration::storage::migrate(self));
+            migration_step!(
+                "migration_216",
+                crate::portable_configuration::storage::migrate(self)
+            );
         }
         if !self.schema_migration_applied(217)? {
-            migration_step!("migration_217", crate::conversation_tools::storage::migrate(self));
+            migration_step!(
+                "migration_217",
+                crate::conversation_tools::storage::migrate(self)
+            );
         }
         if let Err(error) =
             crate::notification::maintain_notification_episode_retention(self.connection())

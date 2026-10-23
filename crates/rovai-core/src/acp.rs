@@ -11,12 +11,15 @@ use std::{
     time::{Duration, Instant},
 };
 
-#[path="native_lifecycle/acp_transport.rs"]
+#[path = "native_lifecycle/acp_transport.rs"]
 mod native_lifecycle_transport;
 pub(crate) use native_lifecycle_transport::NativeSteerObservation;
-#[path="native_lifecycle/acp_preparation.rs"]
+#[path = "native_lifecycle/acp_preparation.rs"]
 mod native_lifecycle_preparation;
-pub(crate) use native_lifecycle_preparation::{NativePreparationFailure,NativePreparationProof,inspect_native_preparation,prepare_native_session};
+pub(crate) use native_lifecycle_preparation::{
+    NativePreparationFailure, NativePreparationProof, inspect_native_preparation,
+    prepare_native_session,
+};
 
 #[cfg(unix)]
 use std::fs::OpenOptions;
@@ -1400,7 +1403,7 @@ struct ZcodeBackgroundRoute {
 pub(crate) struct AcpHost {
     native_steering_disabled: AtomicBool,
     native_steer_gate: Mutex<()>,
-    native_response_digests: Mutex<HashMap<u64,String>>,
+    native_response_digests: Mutex<HashMap<u64, String>>,
     native_source: Option<rovai_core::runtime_subagent_session::CapturedNativeSource>,
     native_preparation_source: Option<rovai_core::runtime_subagent_session::CapturedNativeSource>,
     credential_redactor: Option<rovai_core::runtime_custom_api::CredentialRedactor>,
@@ -1747,15 +1750,40 @@ impl AcpHost {
             None
         };
         // From this point a process may exist; its owner handles cleanup.
-        let captured_kind=if frozen_runtime.adapter_kind==AdapterKind::CustomAcp{
-            preparation_kind.or_else(||frozen_runtime.native_origin.as_ref().and_then(|origin|match origin.source.provider.as_str(){"codex"=>Some(AdapterKind::CodexCli),"claude"=>Some(AdapterKind::ClaudeCodeCli),"deepseek"=>Some(AdapterKind::DeepseekHarness),"qoder"=>Some(AdapterKind::QoderCli),"grok"=>Some(AdapterKind::GrokBuild),_=>None})).unwrap_or(frozen_runtime.adapter_kind)
-        }else{frozen_runtime.adapter_kind};
+        let captured_kind = if frozen_runtime.adapter_kind == AdapterKind::CustomAcp {
+            preparation_kind
+                .or_else(|| {
+                    frozen_runtime.native_origin.as_ref().and_then(|origin| {
+                        match origin.source.provider.as_str() {
+                            "codex" => Some(AdapterKind::CodexCli),
+                            "claude" => Some(AdapterKind::ClaudeCodeCli),
+                            "deepseek" => Some(AdapterKind::DeepseekHarness),
+                            "qoder" => Some(AdapterKind::QoderCli),
+                            "grok" => Some(AdapterKind::GrokBuild),
+                            _ => None,
+                        }
+                    })
+                })
+                .unwrap_or(frozen_runtime.adapter_kind)
+        } else {
+            frozen_runtime.adapter_kind
+        };
         let native_source = rovai_core::runtime_subagent_session::CapturedNativeSource::capture(
-            frozen_runtime.adapter_kind, spec.environment(), spec.working_directory(), &host_instance_id,
+            frozen_runtime.adapter_kind,
+            spec.environment(),
+            spec.working_directory(),
+            &host_instance_id,
         );
-        let native_preparation_source=if captured_kind!=frozen_runtime.adapter_kind{
-            rovai_core::runtime_subagent_session::CapturedNativeSource::capture(captured_kind,spec.environment(),spec.working_directory(),&host_instance_id)
-        }else{None};
+        let native_preparation_source = if captured_kind != frozen_runtime.adapter_kind {
+            rovai_core::runtime_subagent_session::CapturedNativeSource::capture(
+                captured_kind,
+                spec.environment(),
+                spec.working_directory(),
+                &host_instance_id,
+            )
+        } else {
+            None
+        };
         if let Some(config) = private_config.as_mut() {
             config.preparing = false;
         }
@@ -1804,12 +1832,23 @@ impl AcpHost {
             (Box::new(stdin), Box::new(stdout))
         };
         let host = Arc::new(Self {
-            credential_redactor: match (frozen_runtime
-                .environment
-                .as_ref()
-                .map(|env| env.redactor()),crate::custom_runtime::launch::redactor()) {
-                    (Some(base),Some(custom))=>Some(base.extend(custom)),(base,None)=>base,(None,custom)=>custom,
-                }.map(|base|match crate::portable_configuration::launch::redactor(){Some(portable)=>base.extend(portable),None=>base}),
+            credential_redactor: match (
+                frozen_runtime
+                    .environment
+                    .as_ref()
+                    .map(|env| env.redactor()),
+                crate::custom_runtime::launch::redactor(),
+            ) {
+                (Some(base), Some(custom)) => Some(base.extend(custom)),
+                (base, None) => base,
+                (None, custom) => custom,
+            }
+            .map(
+                |base| match crate::portable_configuration::launch::redactor() {
+                    Some(portable) => base.extend(portable),
+                    None => base,
+                },
+            ),
             adapter_kind: frozen_runtime.adapter_kind,
             reported_version: frozen_runtime.reported_version.clone(),
             opencode_program_identity: if frozen_runtime.adapter_kind == AdapterKind::OpencodeCli {
@@ -2085,11 +2124,17 @@ impl AcpHost {
                         if message.get("method").is_none()
                             && let Some(id) = message.get("id").and_then(Value::as_u64)
                         {
-                            let pending={host.pending.lock().await.remove(&id)};
+                            let pending = { host.pending.lock().await.remove(&id) };
                             if let Some(pending) = pending {
-                                if matches!(&pending,PendingRpc::Response{method,..} if method=="_session/steering"){
-                                    let mut receipts=host.native_response_digests.lock().await;
-                                    if receipts.len()<1024{receipts.insert(id,crate::native_lifecycle::fork::fingerprint(&line));}
+                                if matches!(&pending,PendingRpc::Response{method,..} if method=="_session/steering")
+                                {
+                                    let mut receipts = host.native_response_digests.lock().await;
+                                    if receipts.len() < 1024 {
+                                        receipts.insert(
+                                            id,
+                                            crate::native_lifecycle::fork::fingerprint(&line),
+                                        );
+                                    }
                                 }
                                 host.complete_pending(id, pending, message).await;
                             }
@@ -5852,7 +5897,9 @@ impl AcpRuntime {
         &self.host.host_instance_id
     }
 
-    pub(crate) fn native_source(&self) -> Option<rovai_core::runtime_subagent_session::CapturedNativeSource> {
+    pub(crate) fn native_source(
+        &self,
+    ) -> Option<rovai_core::runtime_subagent_session::CapturedNativeSource> {
         self.host.native_source.clone()
     }
 
@@ -6204,15 +6251,29 @@ impl AcpCliRuntimeAdapter {
                     compatibility,
                 },
                 move || async move {
-                    let custom_plan=crate::custom_runtime::launch::prepare(&spawn_frozen_runtime,spawn_environment_source.as_ref()).await?;
-                    let portable_plan=crate::portable_configuration::launch::prepare(&spawn_frozen_runtime,spawn_environment_source.as_ref()).await?;
-                    spawn_frozen_runtime.environment =if let Some(plan)=&portable_plan{Some(plan.environment.clone())}else{
+                    let custom_plan = crate::custom_runtime::launch::prepare(
+                        &spawn_frozen_runtime,
+                        spawn_environment_source.as_ref(),
+                    )
+                    .await?;
+                    let portable_plan = crate::portable_configuration::launch::prepare(
+                        &spawn_frozen_runtime,
+                        spawn_environment_source.as_ref(),
+                    )
+                    .await?;
+                    spawn_frozen_runtime.environment = if let Some(plan) = &portable_plan {
+                        Some(plan.environment.clone())
+                    } else {
                         rovai_core::member_environment::resolve_for_launch(
                             spawn_environment_source,
                             spawn_frozen_runtime.environment,
                         )
-                        .await?};
-                    crate::custom_runtime::launch::merge_environment(custom_plan.as_ref(),&mut spawn_frozen_runtime.environment)?;
+                        .await?
+                    };
+                    crate::custom_runtime::launch::merge_environment(
+                        custom_plan.as_ref(),
+                        &mut spawn_frozen_runtime.environment,
+                    )?;
                     if spawn_frozen_runtime
                         .environment
                         .as_ref()
@@ -6220,19 +6281,25 @@ impl AcpCliRuntimeAdapter {
                     {
                         spawn_frozen_runtime.custom_api = None;
                     }
-                    let host = crate::portable_configuration::launch::with_plan(portable_plan,crate::custom_runtime::launch::with_plan(custom_plan,AcpHost::spawn(
-                        &spawn_execution_root,
-                        &spawn_workspace,
-                        permission_semantics,
-                        &spawn_frozen_runtime,
-                        spawn_incoming,
-                        Some(spawn_builtin_tools),
-                        spawn_compaction_policy,
-                        true,
-                        &spawn_external_mcp_servers,
-                        &spawn_private_runtime_dir,
-                        Some(&spawn_attachment_access_root),
-                    )))
+                    let host = crate::portable_configuration::launch::with_plan(
+                        portable_plan,
+                        crate::custom_runtime::launch::with_plan(
+                            custom_plan,
+                            AcpHost::spawn(
+                                &spawn_execution_root,
+                                &spawn_workspace,
+                                permission_semantics,
+                                &spawn_frozen_runtime,
+                                spawn_incoming,
+                                Some(spawn_builtin_tools),
+                                spawn_compaction_policy,
+                                true,
+                                &spawn_external_mcp_servers,
+                                &spawn_private_runtime_dir,
+                                Some(&spawn_attachment_access_root),
+                            ),
+                        ),
+                    )
                     .await?;
                     Ok(RuntimeProcessHost::Acp(host))
                 },
@@ -6649,11 +6716,24 @@ fn configure_runtime_command(
         .context("ACP permission configuration must be an object")?;
     match runtime.adapter_kind {
         AdapterKind::CustomAcp => {
-            anyhow::ensure!(values.is_empty(),"custom_runtime.permission_passthrough_forbidden");
-            anyhow::ensure!(!(permission_semantics==PermissionSemantics::CoreEnforcedV1&&workspace.access=="read_only"),"custom_runtime.native_read_only_not_declared");
-            let custom=runtime.custom_runtime.as_ref().context("custom_runtime.frozen_definition_missing")?;
-            anyhow::ensure!(custom.declared_mcp||external_mcp_servers.is_empty(),"custom_runtime.mcp_not_declared");
-            crate::custom_runtime::launch::configure(command,runtime)?;
+            anyhow::ensure!(
+                values.is_empty(),
+                "custom_runtime.permission_passthrough_forbidden"
+            );
+            anyhow::ensure!(
+                !(permission_semantics == PermissionSemantics::CoreEnforcedV1
+                    && workspace.access == "read_only"),
+                "custom_runtime.native_read_only_not_declared"
+            );
+            let custom = runtime
+                .custom_runtime
+                .as_ref()
+                .context("custom_runtime.frozen_definition_missing")?;
+            anyhow::ensure!(
+                custom.declared_mcp || external_mcp_servers.is_empty(),
+                "custom_runtime.mcp_not_declared"
+            );
+            crate::custom_runtime::launch::configure(command, runtime)?;
         }
         AdapterKind::OpenClawCli => {} // The paired Gateway prepared the exact ACP endpoint.
         AdapterKind::HermesCli => {

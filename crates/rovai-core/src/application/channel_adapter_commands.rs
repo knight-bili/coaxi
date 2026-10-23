@@ -1,54 +1,164 @@
 //! Source channel command vocabulary, projected from authorized Core Threads.
 //! Read commands never start a provider turn or widen a channel's bindings.
+use super::channel_adapter_messages::{Inbound, source_id};
+use super::channel_adapters::{Adapter, Binding};
 use super::*;
-use super::channel_adapters::{Adapter,Binding};
-use super::channel_adapter_messages::{Inbound,source_id};
 use anyhow::ensure;
 use rusqlite::OptionalExtension;
-use serde::{Deserialize,Serialize};
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone,Deserialize,Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 #[serde(transparent)]
 pub(super) struct ChannelCommand(pub Inbound);
 impl crate::command::sealed::Sealed for ChannelCommand {}
-impl crate::command::DomainCommand for ChannelCommand { const TYPE: &'static str = "channel.adapter.command"; const EXACT_REPLAY:bool=true; }
-pub(super) fn effective_callback(input:&Inbound,config:&Adapter)->Option<String>{
-    if let Some(value)=&input.callback_data{return Some(value.clone())}
-    let text=input.text.trim();let (command,token)=text.split_once(char::is_whitespace)?;
-    let command=command.strip_prefix(config.command_prefix.as_str())?;
-    match command.split('@').next().unwrap_or(command){"confirm"=>Some(format!("rv:control:{}",token.trim())),"select"=>Some(format!("rv:choose:{}",token.trim())),_=>None}
+impl crate::command::DomainCommand for ChannelCommand {
+    const TYPE: &'static str = "channel.adapter.command";
+    const EXACT_REPLAY: bool = true;
 }
-pub(super) fn sender_scope(input:&Inbound,config:&Adapter)->Result<String>{source_id(&json!({"adapterId":config.id,"senderId":input.sender_id,"chatId":input.target.chat_id.as_deref().unwrap_or(&config.chat_id),"threadKey":input.target.thread_key}))}
-fn target_matches(input:&Inbound,config:&Adapter,binding:&Binding)->bool{binding.chat_id==input.target.chat_id.as_deref().unwrap_or(&config.chat_id)&&binding.thread_key==input.target.thread_key}
-impl Core{
-    pub(super) async fn channel_adapter_command_replay(&self,input:&Inbound,id:&str,camp_id:String)->Result<Value>{
-        let database=self.database.lock().await;let envelope=CommandEnvelope{command_id:id.into(),actor:ActorRef::System{component_id:"channel-adapter".into()},camp_id:Some(camp_id),expected_versions:vec![],execution_epoch:None,payload:ChannelCommand(input.clone())};
-        let execution=DomainCommandGateway.replay_if_recorded(&database,&envelope)?.context("channel_adapter.receipt_missing")?;Ok(serde_json::to_value(execution.result)?)
+pub(super) fn effective_callback(input: &Inbound, config: &Adapter) -> Option<String> {
+    if let Some(value) = &input.callback_data {
+        return Some(value.clone());
     }
-    pub(super) async fn channel_adapter_selected_binding(&self,input:&Inbound,config:&Adapter,default:&Binding)->Result<(Binding,bool)>{
-        let scope=sender_scope(input,config)?;let database=self.database.lock().await;
-        let raw=database.connection().query_row("SELECT result_payload_json FROM event_log WHERE command_type='channel.adapter.command' AND result_status='applied' AND json_extract(result_payload_json,'$.senderScope')=?1 AND json_type(result_payload_json,'$.selection')='object' ORDER BY global_sequence DESC LIMIT 1",[scope],|row|row.get::<_,String>(0)).optional()?;
-        let Some(raw)=raw else{return Ok((default.clone(),false))};let value:Value=serde_json::from_str(&raw)?;let selection=&value["selection"];
-        if value["revision"]!=input.expected_revision{return Ok((default.clone(),true))}
-        let Some(binding)=config.bindings.iter().find(|candidate|target_matches(input,config,candidate)&&selection["threadId"]==candidate.thread_id)else{return Ok((default.clone(),true))};
-        let ids=selection["agentIds"].as_array().context("channel_adapter.invalid_selection")?.iter().map(|id|id.as_str().map(str::to_owned).context("channel_adapter.invalid_selection")).collect::<Result<Vec<_>>>()?;
-        if ids.is_empty()||!ids.iter().all(|id|binding.agent_ids.contains(id)){return Ok((default.clone(),true))}
-        Ok((Binding{agent_ids:ids,..binding.clone()},false))
+    let text = input.text.trim();
+    let (command, token) = text.split_once(char::is_whitespace)?;
+    let command = command.strip_prefix(config.command_prefix.as_str())?;
+    match command.split('@').next().unwrap_or(command) {
+        "confirm" => Some(format!("rv:control:{}", token.trim())),
+        "select" => Some(format!("rv:choose:{}", token.trim())),
+        _ => None,
     }
 }
-fn help(config:&Adapter)->String { "/search 关键词：搜索已绑定对话\n/today：今日活动\n/status：当前对话运行状态\n/folder：可用工程\n/agent：可用队员\n/sessions：可用对话\n/task 内容 或 /do 内容：向当前对话发起任务\n/resume、/cancel、/approve、/deny：会话控制\n/help：命令帮助".replace("/",&config.command_prefix) }
+pub(super) fn sender_scope(input: &Inbound, config: &Adapter) -> Result<String> {
+    source_id(
+        &json!({"adapterId":config.id,"senderId":input.sender_id,"chatId":input.target.chat_id.as_deref().unwrap_or(&config.chat_id),"threadKey":input.target.thread_key}),
+    )
+}
+fn target_matches(input: &Inbound, config: &Adapter, binding: &Binding) -> bool {
+    binding.chat_id == input.target.chat_id.as_deref().unwrap_or(&config.chat_id)
+        && binding.thread_key == input.target.thread_key
+}
 impl Core {
-    pub(super) async fn channel_adapter_command(&self,input:&Inbound,config:&Adapter,binding:&Binding,command_id:&str,selection_expired:bool)->Result<Option<Value>> {
-        let text=input.text.trim();
-        let callback=effective_callback(input,config);
-        let command=if let Some(callback)=callback.as_deref(){
-            match callback { "rv:today"=>"today", "rv:status"=>"status", "rv:sessions"=>"sessions", "rv:help"=>"help", value if value.starts_with("rv:choose:")=>"choose", _=>"expired_callback" }
-        }else if let Some(value)=text.strip_prefix(config.command_prefix.as_str()) { value.split_whitespace().next().unwrap_or("help").split('@').next().unwrap_or("help") } else if selection_expired { "selection_expired" } else { return Ok(None) };
-        let args=text.split_once(char::is_whitespace).map(|(_,value)|value.trim()).unwrap_or("");
-        if matches!(command,"task"|"do") && !args.is_empty() && !selection_expired { return Ok(None) }
-        let envelope=CommandEnvelope{command_id:command_id.into(),actor:ActorRef::System{component_id:"channel-adapter".into()},camp_id:Some(binding.thread_id.clone()),expected_versions:vec![],execution_epoch:None,payload:ChannelCommand(input.clone())};
-        let sender_scope=sender_scope(input,config)?;
-        let mut database=self.database.lock().await;
+    pub(super) async fn channel_adapter_command_replay(
+        &self,
+        input: &Inbound,
+        id: &str,
+        camp_id: String,
+    ) -> Result<Value> {
+        let database = self.database.lock().await;
+        let envelope = CommandEnvelope {
+            command_id: id.into(),
+            actor: ActorRef::System {
+                component_id: "channel-adapter".into(),
+            },
+            camp_id: Some(camp_id),
+            expected_versions: vec![],
+            execution_epoch: None,
+            payload: ChannelCommand(input.clone()),
+        };
+        let execution = DomainCommandGateway
+            .replay_if_recorded(&database, &envelope)?
+            .context("channel_adapter.receipt_missing")?;
+        Ok(serde_json::to_value(execution.result)?)
+    }
+    pub(super) async fn channel_adapter_selected_binding(
+        &self,
+        input: &Inbound,
+        config: &Adapter,
+        default: &Binding,
+    ) -> Result<(Binding, bool)> {
+        let scope = sender_scope(input, config)?;
+        let database = self.database.lock().await;
+        let raw=database.connection().query_row("SELECT result_payload_json FROM event_log WHERE command_type='channel.adapter.command' AND result_status='applied' AND json_extract(result_payload_json,'$.senderScope')=?1 AND json_type(result_payload_json,'$.selection')='object' ORDER BY global_sequence DESC LIMIT 1",[scope],|row|row.get::<_,String>(0)).optional()?;
+        let Some(raw) = raw else {
+            return Ok((default.clone(), false));
+        };
+        let value: Value = serde_json::from_str(&raw)?;
+        let selection = &value["selection"];
+        if value["revision"] != input.expected_revision {
+            return Ok((default.clone(), true));
+        }
+        let Some(binding) = config.bindings.iter().find(|candidate| {
+            target_matches(input, config, candidate) && selection["threadId"] == candidate.thread_id
+        }) else {
+            return Ok((default.clone(), true));
+        };
+        let ids = selection["agentIds"]
+            .as_array()
+            .context("channel_adapter.invalid_selection")?
+            .iter()
+            .map(|id| {
+                id.as_str()
+                    .map(str::to_owned)
+                    .context("channel_adapter.invalid_selection")
+            })
+            .collect::<Result<Vec<_>>>()?;
+        if ids.is_empty() || !ids.iter().all(|id| binding.agent_ids.contains(id)) {
+            return Ok((default.clone(), true));
+        }
+        Ok((
+            Binding {
+                agent_ids: ids,
+                ..binding.clone()
+            },
+            false,
+        ))
+    }
+}
+fn help(config: &Adapter) -> String {
+    "/search 关键词：搜索已绑定对话\n/today：今日活动\n/status：当前对话运行状态\n/folder：可用工程\n/agent：可用队员\n/sessions：可用对话\n/task 内容 或 /do 内容：向当前对话发起任务\n/resume、/cancel、/approve、/deny：会话控制\n/help：命令帮助".replace("/",&config.command_prefix)
+}
+impl Core {
+    pub(super) async fn channel_adapter_command(
+        &self,
+        input: &Inbound,
+        config: &Adapter,
+        binding: &Binding,
+        command_id: &str,
+        selection_expired: bool,
+    ) -> Result<Option<Value>> {
+        let text = input.text.trim();
+        let callback = effective_callback(input, config);
+        let command = if let Some(callback) = callback.as_deref() {
+            match callback {
+                "rv:today" => "today",
+                "rv:status" => "status",
+                "rv:sessions" => "sessions",
+                "rv:help" => "help",
+                value if value.starts_with("rv:choose:") => "choose",
+                _ => "expired_callback",
+            }
+        } else if let Some(value) = text.strip_prefix(config.command_prefix.as_str()) {
+            value
+                .split_whitespace()
+                .next()
+                .unwrap_or("help")
+                .split('@')
+                .next()
+                .unwrap_or("help")
+        } else if selection_expired {
+            "selection_expired"
+        } else {
+            return Ok(None);
+        };
+        let args = text
+            .split_once(char::is_whitespace)
+            .map(|(_, value)| value.trim())
+            .unwrap_or("");
+        if matches!(command, "task" | "do") && !args.is_empty() && !selection_expired {
+            return Ok(None);
+        }
+        let envelope = CommandEnvelope {
+            command_id: command_id.into(),
+            actor: ActorRef::System {
+                component_id: "channel-adapter".into(),
+            },
+            camp_id: Some(binding.thread_id.clone()),
+            expected_versions: vec![],
+            execution_epoch: None,
+            payload: ChannelCommand(input.clone()),
+        };
+        let sender_scope = sender_scope(input, config)?;
+        let mut database = self.database.lock().await;
         let execution=DomainCommandGateway.execute(&mut database,&envelope,|transaction|{
             let mut lines=Vec::<String>::new();let mut selection=Value::Null;let mut choices=Vec::<Value>::new();let mut control_choices=Vec::<Value>::new();
             let candidates=config.bindings.iter().filter(|candidate|target_matches(input,config,candidate)).collect::<Vec<_>>();

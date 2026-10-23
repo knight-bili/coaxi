@@ -2640,8 +2640,12 @@ impl CollaborationService {
     ) -> Result<CommandExecution> {
         self.send_user_automation_inner(database, envelope, &envelope.payload.message)
     }
-    pub(crate) fn send_native_input_camp_message(&self,database:&mut Database,envelope:&CommandEnvelope<crate::native_lifecycle::normal::PublicCommand>)->Result<CommandExecution>{
-        self.send_user_automation_inner(database,envelope,&envelope.payload.message)
+    pub(crate) fn send_native_input_camp_message(
+        &self,
+        database: &mut Database,
+        envelope: &CommandEnvelope<crate::native_lifecycle::normal::PublicCommand>,
+    ) -> Result<CommandExecution> {
+        self.send_user_automation_inner(database, envelope, &envelope.payload.message)
     }
 
     fn send_user_automation_inner<C: DomainCommand>(
@@ -2653,7 +2657,12 @@ impl CollaborationService {
         if input.agent_id.trim().is_empty() {
             anyhow::bail!("agentId must not be empty");
         }
-        if input.body.trim().is_empty() && !envelope.payload.native_input_continuation().is_some_and(|input|!input.sources.is_empty()) {
+        if input.body.trim().is_empty()
+            && !envelope
+                .payload
+                .native_input_continuation()
+                .is_some_and(|input| !input.sources.is_empty())
+        {
             anyhow::bail!("body must not be empty");
         }
         let camp_id = input.camp_id.clone();
@@ -2666,7 +2675,11 @@ impl CollaborationService {
                 text: format!(" {body}"),
             },
         ];
-        let content=if envelope.payload.native_input_continuation().is_some(){segments}else{normalize_content(segments)};
+        let content = if envelope.payload.native_input_continuation().is_some() {
+            segments
+        } else {
+            normalize_content(segments)
+        };
         validate_user_authored_content(&content)?;
         let command = SendUserThreadDraftCommand {
             draft_client: envelope.payload.draft_client().cloned().unwrap_or_default(),
@@ -2708,9 +2721,7 @@ impl CollaborationService {
                         "Every Member Mention must identify a present current Camp member",
                     )));
                 };
-                if active_address_target(transaction, &camp_id, &input.agent_id)?
-                    .is_none()
-                {
+                if active_address_target(transaction, &camp_id, &input.agent_id)?.is_none() {
                     return Ok(Err(rejected(
                         "mention_target_unavailable",
                         "Every Member Mention must identify a present current Camp member",
@@ -2725,7 +2736,10 @@ impl CollaborationService {
                 Ok(Ok(ThreadMessageSubmission {
                     body: rendered_body,
                     structured_content: content,
-                    source_attachments: envelope.payload.native_input_continuation().map_or_else(Vec::new,|input|input.sources),
+                    source_attachments: envelope
+                        .payload
+                        .native_input_continuation()
+                        .map_or_else(Vec::new, |input| input.sources),
                     prepared_attachment_ids: Vec::new(),
                     address: ThreadMessageAddress::Explicit {
                         agent_ids: vec![input.agent_id.clone()],
@@ -3037,7 +3051,13 @@ impl CollaborationService {
             std::result::Result<ThreadMessageSubmission, CommandHandlerResult>,
         >,
     {
-        validate_camp_message_input_with_materials(command,envelope.payload.native_input_continuation().is_some_and(|input|!input.sources.is_empty()))?;
+        validate_camp_message_input_with_materials(
+            command,
+            envelope
+                .payload
+                .native_input_continuation()
+                .is_some_and(|input| !input.sources.is_empty()),
+        )?;
         let camp_message_id = Uuid::new_v4().to_string();
         self.gateway.execute(database, envelope, |transaction| {
             // A rejected command receipt is committed by the gateway. Roll back
@@ -3557,20 +3577,31 @@ pub(crate) fn create_camp_in_tx(
             "Only a User can create a Camp",
         ));
     }
-    create_camp_definition_in_tx(transaction,actor,execution_epoch,command,camp_id)
+    create_camp_definition_in_tx(transaction, actor, execution_epoch, command, camp_id)
 }
 
 pub(crate) fn create_conversation_tool_camp_in_tx(
-    transaction:&Transaction<'_>,authority:&crate::conversation_tools::authoring::CreationAuthority,
-    command:&CreateThreadCommand,camp_id:&ThreadId,
-)->Result<CommandHandlerResult>{
-    create_camp_definition_in_tx(transaction,authority.actor(),authority.epoch(),command,camp_id)
+    transaction: &Transaction<'_>,
+    authority: &crate::conversation_tools::authoring::CreationAuthority,
+    command: &CreateThreadCommand,
+    camp_id: &ThreadId,
+) -> Result<CommandHandlerResult> {
+    create_camp_definition_in_tx(
+        transaction,
+        authority.actor(),
+        authority.epoch(),
+        command,
+        camp_id,
+    )
 }
 
 fn create_camp_definition_in_tx(
-    transaction:&Transaction<'_>,actor:&ActorRef,execution_epoch:Option<i64>,
-    command:&CreateThreadCommand,camp_id:&ThreadId,
-)->Result<CommandHandlerResult>{
+    transaction: &Transaction<'_>,
+    actor: &ActorRef,
+    execution_epoch: Option<i64>,
+    command: &CreateThreadCommand,
+    camp_id: &ThreadId,
+) -> Result<CommandHandlerResult> {
     validate_project_path(&command.project_path)?;
     let normalized_name = normalize_camp_name(command.name.as_deref().unwrap_or(""));
     if normalized_name.chars().count() > CAMP_NAME_MAX_SCALARS {
@@ -4992,9 +5023,12 @@ fn actor_has_capability(
 }
 
 fn validate_camp_message_input(command: &SendUserThreadDraftCommand) -> Result<()> {
-    validate_camp_message_input_with_materials(command,false)
+    validate_camp_message_input_with_materials(command, false)
 }
-fn validate_camp_message_input_with_materials(command: &SendUserThreadDraftCommand,has_independent_materials:bool) -> Result<()> {
+fn validate_camp_message_input_with_materials(
+    command: &SendUserThreadDraftCommand,
+    has_independent_materials: bool,
+) -> Result<()> {
     if command.draft_revision < 1 {
         anyhow::bail!("draftRevision must be a positive Core Revision");
     }
@@ -5051,12 +5085,12 @@ pub(crate) fn build_admitted_effective_config(
     agent_id: &str,
     runtime: &FrozenAgentRuntimeConfig,
 ) -> Result<(Value, FrozenAgentRuntimeConfig)> {
-    let mut native_runtime=runtime.clone();
-    let native_steer=crate::native_lifecycle::storage::freeze_policy(transaction,agent_id)?;
-    if native_runtime.native_origin.is_none()&&native_runtime.native_steer.is_none(){
-        crate::native_lifecycle::freeze_intent(&mut native_runtime,None,native_steer)?;
+    let mut native_runtime = runtime.clone();
+    let native_steer = crate::native_lifecycle::storage::freeze_policy(transaction, agent_id)?;
+    if native_runtime.native_origin.is_none() && native_runtime.native_steer.is_none() {
+        crate::native_lifecycle::freeze_intent(&mut native_runtime, None, native_steer)?;
     }
-    let runtime=&native_runtime;
+    let runtime = &native_runtime;
     let policy = crate::delegation_policy::freeze_for_conversation(transaction, conversation_id)?;
     let runtime = match policy {
         Some(policy) => policy.freeze_resolved_runtime(runtime)?,

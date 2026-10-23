@@ -48,10 +48,15 @@ pub(super) struct ReceivedUpload {
     pub(super) size: u64,
     prefix: Vec<u8>,
 }
-pub(super) async fn receive(mut field: axum::extract::multipart::Field<'_>) -> Result<ReceivedUpload> {
-    receive_bounded(field,MAX_BYTES).await
+pub(super) async fn receive(
+    mut field: axum::extract::multipart::Field<'_>,
+) -> Result<ReceivedUpload> {
+    receive_bounded(field, MAX_BYTES).await
 }
-pub(super) async fn receive_bounded(mut field: axum::extract::multipart::Field<'_>,limit:usize) -> Result<ReceivedUpload> {
+pub(super) async fn receive_bounded(
+    mut field: axum::extract::multipart::Field<'_>,
+    limit: usize,
+) -> Result<ReceivedUpload> {
     let temporary = TemporaryUpload::create()?;
     let file = tokio::fs::File::create(temporary.path()).await?;
     let mut file = tokio::io::BufWriter::with_capacity(64 * 1024, file);

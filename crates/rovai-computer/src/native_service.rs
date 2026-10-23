@@ -53,16 +53,47 @@ use std::sync::Arc;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use serde::{Deserialize, Serialize};
-use serde_json::{json,Value};
-use sha2::{Digest,Sha256};
+use serde_json::{json, Value};
+use sha2::{Digest, Sha256};
 
-#[derive(Debug,thiserror::Error)]
+#[derive(Debug, thiserror::Error)]
 #[error("{0}")]
 pub struct AppCommandError(String);
-impl AppCommandError {fn configuration_invalid(message:impl Into<String>)->Self{Self(message.into())}}
+impl AppCommandError {
+    fn configuration_invalid(message: impl Into<String>) -> Self {
+        Self(message.into())
+    }
+}
 #[cfg(feature = "tauri-runtime")]
 use tauri::{AppHandle, Manager};
 
+use crate::computer::agent::{
+    grantable, visible_title, ActivityOutcome, Blocklist, ComputerAction, ComputerActivityPayload,
+    ComputerGrantPayload, GrantChange, GrantLevel, GrantScope, NotGrantable, SelfIdentity,
+};
+use crate::computer::backend::{
+    ActRefusal, BackendError, BackendStatus, ComputerBackend, SnapshotOptions,
+};
+#[cfg(feature = "tauri-runtime")]
+use crate::computer::indicator::{Indicator, Strip};
+use crate::computer::local::LocalBackend;
+#[cfg(feature = "tauri-runtime")]
+use crate::computer::marker::Marker;
+use crate::computer::procinfo::process_start;
+use crate::computer::protocol::{
+    ClipboardUse, OsPermission, PermissionAsked, PermissionReport, RawAct, ScreenRules,
+};
+#[cfg(feature = "tauri-runtime")]
+use crate::computer::stop_key::StopKey;
+use crate::computer::stop_shortcut::StopKeyStatus;
+use crate::computer::targets::{
+    ActDenied, Aim, AppChange, AppTarget, ReadMark, ReadRefusal, ReadTicket, ShareError, SharedApp,
+    SharedScreen, SharedWindow, Staleness, TargetTable, WindowIdentity, SCREEN_TARGET_ID,
+};
+use crate::computer::types::{
+    ActDelivery, ActReport, AgentAppRef, AgentAppSummary, AgentScreen, ComputerActRequest, Rect,
+    VerifyOutcome, VerifyRequest, WindowCapture, WindowSnapshot, MAX_HOLD_MS, MAX_KEY_REPEAT,
+};
 use crate::model_tools::{
     app_grant_required_note, background_next_step, blocked_note, chord_beyond_note,
     control_required_note, cut_away_note, grant_required_note, no_pointing_note, no_such_ref_note,
@@ -84,34 +115,7 @@ use crate::model_tools::{
     SCREEN_RULES_CHANGED_NOTE, SCREEN_STALE_CAPTURE_NOTE, SECRET_FIELD_NOTE, SESSION_CHORD_NOTE,
     STOPPED_NOTE,
 };
-use crate::computer::agent::{
-    grantable, visible_title, ActivityOutcome, Blocklist, ComputerAction, ComputerActivityPayload,
-    ComputerGrantPayload, GrantChange, GrantLevel, GrantScope, NotGrantable, SelfIdentity,
-};
-use crate::computer::backend::{
-    ActRefusal, BackendError, BackendStatus, ComputerBackend, SnapshotOptions,
-};
 use crate::native_events::ComputerEvents;
-#[cfg(feature = "tauri-runtime")]
-use crate::computer::indicator::{Indicator, Strip};
-use crate::computer::local::LocalBackend;
-#[cfg(feature = "tauri-runtime")]
-use crate::computer::marker::Marker;
-use crate::computer::procinfo::process_start;
-use crate::computer::protocol::{
-    ClipboardUse, OsPermission, PermissionAsked, PermissionReport, RawAct, ScreenRules,
-};
-#[cfg(feature = "tauri-runtime")]
-use crate::computer::stop_key::StopKey;
-use crate::computer::stop_shortcut::StopKeyStatus;
-use crate::computer::targets::{
-    ActDenied, Aim, AppChange, AppTarget, ReadMark, ReadRefusal, ReadTicket, ShareError, SharedApp,
-    SharedScreen, SharedWindow, Staleness, TargetTable, WindowIdentity, SCREEN_TARGET_ID,
-};
-use crate::computer::types::{
-    ActDelivery, ActReport, AgentAppRef, AgentAppSummary, AgentScreen, ComputerActRequest, Rect,
-    VerifyOutcome, VerifyRequest, WindowCapture, WindowSnapshot, MAX_HOLD_MS, MAX_KEY_REPEAT,
-};
 
 /// How often lapsed grants are swept, so the panel shows a window as no
 /// longer shared when its time runs out rather than at the next read.
@@ -500,7 +504,9 @@ struct DesktopUi {
 }
 
 /// Where a computer-use service runs.
-pub struct ComputerHost { pub events: ComputerEvents }
+pub struct ComputerHost {
+    pub events: ComputerEvents,
+}
 
 /// Run `task` on the runtime codeg runs on: Tauri's in the desktop app,
 /// which starts the service before any task of its own runs; the process's
@@ -570,9 +576,12 @@ impl ComputerService {
     /// blocklist or a shorter timeout ends what they now forbid), and ending
     /// grants whose time runs out.
     pub fn start(host: ComputerHost, config: ComputerToolsRuntimeConfig) -> Arc<Self> {
-        let events=host.events;
-        let status_events=events.clone();
-        let backend=Arc::new(LocalBackend::new(move |status:&BackendStatus|status_events.backend_status(status)).with_switch(config.backend_switch()));
+        let events = host.events;
+        let status_events = events.clone();
+        let backend = Arc::new(
+            LocalBackend::new(move |status: &BackendStatus| status_events.backend_status(status))
+                .with_switch(config.backend_switch()),
+        );
         #[cfg(feature = "tauri-runtime")]
         let desktop = match host {
             ComputerHost::Desktop(app) => Some(DesktopUi {
@@ -1223,10 +1232,9 @@ impl ComputerService {
             Err((why, ended)) => {
                 self.announce(&ended.into_iter().collect::<Vec<_>>());
                 Err(match why {
-                    ReadRefusal::NotGrantable(why) => Refusal::refused(
-                        ERROR_BLOCKED,
-                        blocked_note(&ticket.target_id, why.note()),
-                    ),
+                    ReadRefusal::NotGrantable(why) => {
+                        Refusal::refused(ERROR_BLOCKED, blocked_note(&ticket.target_id, why.note()))
+                    }
                     ReadRefusal::NoSuchTarget | ReadRefusal::GrantRequired => refused(),
                 })
             }
@@ -2243,81 +2251,167 @@ impl ComputerToolAccess for McpComputerTools {
     }
 }
 
-
-
-#[derive(Debug,Clone,Serialize)]
-#[serde(rename_all="camelCase")]
-pub struct SharedState {pub shared:Vec<SharedWindow>,pub apps:Vec<SharedApp>,pub screen:Option<SharedScreen>}
-static HOST_TURN:std::sync::LazyLock<Arc<tokio::sync::Mutex<()>>>=std::sync::LazyLock::new(||Arc::new(tokio::sync::Mutex::new(())));
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SharedState {
+    pub shared: Vec<SharedWindow>,
+    pub apps: Vec<SharedApp>,
+    pub screen: Option<SharedScreen>,
+}
+static HOST_TURN: std::sync::LazyLock<Arc<tokio::sync::Mutex<()>>> =
+    std::sync::LazyLock::new(|| Arc::new(tokio::sync::Mutex::new(())));
 
 /// 同一物理窗口在不同隔离范围中的稳定外部名字；内部 refs/代次仍归各自原表。
-#[derive(Clone,Serialize)]
-#[serde(rename_all="camelCase")]
+#[derive(Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct NativeWindow {
-    pub target_id:String,
-    pub app_id:Option<String>,
-    pub app_name:String,
-    pub app_key:Option<String>,
-    pub title:String,
-    pub bounds:Rect,
-    pub shareable:bool,
-    pub identity:WindowIdentity,
-    #[serde(skip)] pub internal_id:String,
+    pub target_id: String,
+    pub app_id: Option<String>,
+    pub app_name: String,
+    pub app_key: Option<String>,
+    pub title: String,
+    pub bounds: Rect,
+    pub shareable: bool,
+    pub identity: WindowIdentity,
+    #[serde(skip)]
+    pub internal_id: String,
 }
-fn identity_name(prefix:&str,identity:&impl Serialize)->anyhow::Result<String>{Ok(format!("{prefix}{:x}",Sha256::digest(serde_json::to_vec(identity)?)))}
-#[derive(Clone,Deserialize,Serialize)]
-#[serde(rename_all="camelCase",deny_unknown_fields)]
-pub struct NativeGrant {pub target_kind:String,pub target_id:String,pub level:GrantLevel,pub expires_at:String,pub grant_generation:u64}
+fn identity_name(prefix: &str, identity: &impl Serialize) -> anyhow::Result<String> {
+    Ok(format!(
+        "{prefix}{:x}",
+        Sha256::digest(serde_json::to_vec(identity)?)
+    ))
+}
+#[derive(Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct NativeGrant {
+    pub target_kind: String,
+    pub target_id: String,
+    pub level: GrantLevel,
+    pub expires_at: String,
+    pub grant_generation: u64,
+}
 impl ComputerService {
-    pub async fn local_picker(&self)->anyhow::Result<Vec<NativeWindow>>{
-        let _turn=self.turn.lock().await;
-        let windows=self.backend.list_windows(None).await.map_err(|error|anyhow::anyhow!(error.to_string()))?;
-        let (entries,_)=self.targets.observe(&windows,None);
-        let config=self.config.snapshot().await;
-        let blocklist=blocklist_of(&config);
+    pub async fn local_picker(&self) -> anyhow::Result<Vec<NativeWindow>> {
+        let _turn = self.turn.lock().await;
+        let windows = self
+            .backend
+            .list_windows(None)
+            .await
+            .map_err(|error| anyhow::anyhow!(error.to_string()))?;
+        let (entries, _) = self.targets.observe(&windows, None);
+        let config = self.config.snapshot().await;
+        let blocklist = blocklist_of(&config);
         entries.into_iter().filter(|entry|entry.worth_listing()).map(|entry|{
             let app_id=crate::computer::targets::AppIdentity::of(&entry).map(|app|identity_name("rvca_",&json!({"pid":app.pid,"startedAt":app.started_at,"key":app.key,"content":app.content}))).transpose()?;
             Ok(NativeWindow{target_id:identity_name("rvcw_",&entry.identity)?,app_id,app_name:entry.app.name.clone(),app_key:entry.app.key().map(String::from),title:entry.title.clone(),bounds:entry.bounds,shareable:grantable(&entry.app,&self.me,&blocklist).is_ok(),identity:entry.identity,internal_id:entry.target_id})
         }).collect()
     }
-    pub fn native_config(&self)->ComputerToolsRuntimeConfig{self.config.clone()}
-    pub async fn apply_native_grants(&self,grants:&[NativeGrant],windows:&[NativeWindow])->anyhow::Result<()> {
-        let stop=self.stop_count();
-        let valid=|grant:&NativeGrant|chrono::DateTime::parse_from_rfc3339(&grant.expires_at).is_ok_and(|expires|expires>chrono::Utc::now());
-        let screen=grants.iter().find(|grant|grant.target_kind=="computer_desktop"&&grant.target_id==SCREEN_TARGET_ID&&valid(grant));
-        if let Some(grant)=screen {self.announce_change(self.share_screen_unless_stopped(grant.level,stop)?);return Ok(())}
-        let mut app_shared=BTreeSet::new();
-        for grant in grants.iter().filter(|grant|grant.target_kind=="computer_app"&&valid(grant)){
-            let window=windows.iter().find(|window|window.app_id.as_deref()==Some(grant.target_id.as_str())).ok_or_else(||anyhow::anyhow!("target_changed"))?;
-            self.announce_change(self.share_app_unless_stopped(AppTarget::Window(&window.internal_id),grant.level,stop)?);
+    pub fn native_config(&self) -> ComputerToolsRuntimeConfig {
+        self.config.clone()
+    }
+    pub async fn apply_native_grants(
+        &self,
+        grants: &[NativeGrant],
+        windows: &[NativeWindow],
+    ) -> anyhow::Result<()> {
+        let stop = self.stop_count();
+        let valid = |grant: &NativeGrant| {
+            chrono::DateTime::parse_from_rfc3339(&grant.expires_at)
+                .is_ok_and(|expires| expires > chrono::Utc::now())
+        };
+        let screen = grants.iter().find(|grant| {
+            grant.target_kind == "computer_desktop"
+                && grant.target_id == SCREEN_TARGET_ID
+                && valid(grant)
+        });
+        if let Some(grant) = screen {
+            self.announce_change(self.share_screen_unless_stopped(grant.level, stop)?);
+            return Ok(());
+        }
+        let mut app_shared = BTreeSet::new();
+        for grant in grants
+            .iter()
+            .filter(|grant| grant.target_kind == "computer_app" && valid(grant))
+        {
+            let window = windows
+                .iter()
+                .find(|window| window.app_id.as_deref() == Some(grant.target_id.as_str()))
+                .ok_or_else(|| anyhow::anyhow!("target_changed"))?;
+            self.announce_change(self.share_app_unless_stopped(
+                AppTarget::Window(&window.internal_id),
+                grant.level,
+                stop,
+            )?);
             app_shared.insert(grant.target_id.as_str());
         }
-        for grant in grants.iter().filter(|grant|grant.target_kind=="computer_window"&&valid(grant)){
-            let window=windows.iter().find(|window|window.target_id==grant.target_id).ok_or_else(||anyhow::anyhow!("target_changed"))?;
-            if window.app_id.as_deref().is_some_and(|id|app_shared.contains(id)){continue}
-            if let Some(change)=self.share_unless_stopped(&window.internal_id,grant.level,stop)?{self.announce(&[change])}
+        for grant in grants
+            .iter()
+            .filter(|grant| grant.target_kind == "computer_window" && valid(grant))
+        {
+            let window = windows
+                .iter()
+                .find(|window| window.target_id == grant.target_id)
+                .ok_or_else(|| anyhow::anyhow!("target_changed"))?;
+            if window
+                .app_id
+                .as_deref()
+                .is_some_and(|id| app_shared.contains(id))
+            {
+                continue;
+            }
+            if let Some(change) =
+                self.share_unless_stopped(&window.internal_id, grant.level, stop)?
+            {
+                self.announce(&[change])
+            }
         }
         Ok(())
     }
-    pub async fn execute_external(self:&Arc<Self>,name:&str,arguments:&Value)->anyhow::Result<Value>{
-        let windows=self.local_picker().await?;
-        let mut request=arguments.clone();
-        if let Some(target)=arguments["targetId"].as_str(){
-            if target!=SCREEN_TARGET_ID {
-                let window=windows.iter().find(|window|window.target_id==target).ok_or_else(||anyhow::anyhow!("target_changed"))?;
-                request["targetId"]=json!(window.internal_id);
+    pub async fn execute_external(
+        self: &Arc<Self>,
+        name: &str,
+        arguments: &Value,
+    ) -> anyhow::Result<Value> {
+        let windows = self.local_picker().await?;
+        let mut request = arguments.clone();
+        if let Some(target) = arguments["targetId"].as_str() {
+            if target != SCREEN_TARGET_ID {
+                let window = windows
+                    .iter()
+                    .find(|window| window.target_id == target)
+                    .ok_or_else(|| anyhow::anyhow!("target_changed"))?;
+                request["targetId"] = json!(window.internal_id);
             }
         }
-        let access=McpComputerTools::new(self.clone());
-        let mut result=crate::model_dispatch::dispatch(&access,name,&request).await?;
-        fn externalize(value:&mut Value,windows:&[NativeWindow]){
+        let access = McpComputerTools::new(self.clone());
+        let mut result = crate::model_dispatch::dispatch(&access, name, &request).await?;
+        fn externalize(value: &mut Value, windows: &[NativeWindow]) {
             match value {
-                Value::Object(object)=>{if let Some(Value::String(id))=object.get_mut("targetId"){if let Some(window)=windows.iter().find(|window|&window.internal_id==id){*id=window.target_id.clone()}}for value in object.values_mut(){externalize(value,windows)}},
-                Value::Array(items)=>for value in items{externalize(value,windows)},_=>{}
+                Value::Object(object) => {
+                    if let Some(Value::String(id)) = object.get_mut("targetId") {
+                        if let Some(window) =
+                            windows.iter().find(|window| &window.internal_id == id)
+                        {
+                            *id = window.target_id.clone()
+                        }
+                    }
+                    for value in object.values_mut() {
+                        externalize(value, windows)
+                    }
+                }
+                Value::Array(items) => {
+                    for value in items {
+                        externalize(value, windows)
+                    }
+                }
+                _ => {}
             }
         }
-        externalize(&mut result,&windows);
+        externalize(&mut result, &windows);
         Ok(result)
     }
-    pub async fn local_status(&self)->Value{json!({"backend":self.backend.status().await,"permissions":self.backend.permissions().await.ok(),"shared":self.shared_state(),"stop":self.stop_count()})}
+    pub async fn local_status(&self) -> Value {
+        json!({"backend":self.backend.status().await,"permissions":self.backend.permissions().await.ok(),"shared":self.shared_state(),"stop":self.stop_count()})
+    }
 }

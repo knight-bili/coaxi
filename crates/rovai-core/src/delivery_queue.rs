@@ -486,13 +486,20 @@ pub fn claim_waiting_delivery_batches(database: &mut Database, limit: i64) -> Re
                 max_payload_bytes,
             )?;
             let selected = &waiting[..selection.count];
-            let mut selected_user_text=String::new();
-            for message in selected{
+            let mut selected_user_text = String::new();
+            for message in selected {
                 let body:Option<String>=transaction.query_row("SELECT body FROM camp_message WHERE id=?1 AND camp_id=?2 AND author_type='user' AND tombstoned_at IS NULL AND recall_state<>'withdrawn'",params![message.message_id,camp_id],|row|row.get(0)).optional()?;
-                if let Some(body)=body{selected_user_text.push_str(&body);selected_user_text.push('\n');}
+                if let Some(body) = body {
+                    selected_user_text.push_str(&body);
+                    selected_user_text.push('\n');
+                }
             }
-            crate::conversation_tools::runtime::select_user_sources(&transaction,&mut runtime,&selected_user_text)?;
-            effective_config["runtime"]=serde_json::to_value(&runtime)?;
+            crate::conversation_tools::runtime::select_user_sources(
+                &transaction,
+                &mut runtime,
+                &selected_user_text,
+            )?;
+            effective_config["runtime"] = serde_json::to_value(&runtime)?;
             if let Some(source_id) = selected[0].continuation_source_run_id.as_deref() {
                 let source =
                     crate::run_continuation::eligible_source(&transaction, &camp_id, source_id)?

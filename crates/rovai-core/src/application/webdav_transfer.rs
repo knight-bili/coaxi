@@ -1,24 +1,152 @@
 //! Nonblocking local transfer jobs; stopped/unknown work resumes only on request.
 use super::*;
-use crate::backup::webdav::{Config,WebDav};
+use crate::backup::webdav::{Config, WebDav};
 use anyhow::ensure;
-use std::{collections::HashMap,fs,path::Path,sync::{Mutex as SyncMutex,OnceLock}};
+use std::{
+    collections::HashMap,
+    fs,
+    path::Path,
+    sync::{Mutex as SyncMutex, OnceLock},
+};
 use tokio_util::sync::CancellationToken;
-fn jobs()->&'static SyncMutex<HashMap<String,CancellationToken>>{static JOBS:OnceLock<SyncMutex<HashMap<String,CancellationToken>>>=OnceLock::new();JOBS.get_or_init(||SyncMutex::new(HashMap::new()))}
-fn key(root:&Path,id:&str)->String{format!("{}:{id}",root.display())}
-pub(super) fn active(root:&Path,id:&str)->bool{jobs().lock().map(|jobs|jobs.contains_key(&key(root,id))).unwrap_or(false)}
-pub(super) fn cancel(root:&Path,id:&str)->Result<Value>{uuid::Uuid::parse_str(id)?;let guard=jobs().lock().map_err(|_|anyhow::anyhow!("webdav.transfer_registry_unavailable"))?;if let Some(token)=guard.get(&key(root,id)){token.cancel();return Ok(json!({"state":"stopping","commandId":id}))}Ok(json!({"state":"unknown","commandId":id,"message":"原传输已不在运行，请核对回执后再选择恢复。"}))}
-pub(super) fn status(root:&Path,id:&str)->Result<Value>{uuid::Uuid::parse_str(id)?;let path=root.join("webdav-operations").join(format!("{id}.json"));ensure!(fs::metadata(&path)?.len()<=1024*1024,"webdav.receipt_limit");let saved:Value=serde_json::from_slice(&fs::read(path)?)?;let state=if saved["state"]=="started"&&!active(root,id){"unknown"}else{saved["state"].as_str().unwrap_or("unknown")};Ok(json!({"commandId":id,"operation":saved["request"]["operation"],"state":state,"result":saved["result"],"message":saved["message"],"at":saved["at"]}))}
-pub(super) fn list(root:&Path)->Result<Value>{let directory=root.join("webdav-operations");if !directory.exists(){return Ok(json!({"items":[]}))}let mut entries=fs::read_dir(directory)?.take(10_001).filter_map(|entry|entry.ok()).filter(|entry|entry.path().extension().is_some_and(|extension|extension=="json")).collect::<Vec<_>>();entries.sort_by_key(|entry|std::cmp::Reverse(entry.metadata().and_then(|value|value.modified()).ok()));let mut items=Vec::new();for entry in entries.into_iter().take(100){let id=entry.path().file_stem().and_then(|value|value.to_str()).unwrap_or_default().to_owned();if uuid::Uuid::parse_str(&id).is_ok(){items.push(status(root,&id)?);}}Ok(json!({"items":items}))}
-pub(super) fn start(root:&Path,config:Config,request:Value,identity:String)->Result<Value>{start_with_token(root,config,request,identity,CancellationToken::new())}
-pub(super) fn start_with_token(root:&Path,config:Config,request:Value,identity:String,cancel:CancellationToken)->Result<Value>{
-    ensure!(!cancel.is_cancelled(),"webdav.cancelled_before_start");
-    let id=request["commandId"].as_str().context("webdav.command_required")?.to_owned();uuid::Uuid::parse_str(&id)?;let selected=PathBuf::from(request["path"].as_str().context("webdav.path_required")?);ensure!(selected.is_absolute(),"webdav.absolute_path_required");let operation=request["operation"].as_str().unwrap_or_default().to_owned();ensure!(["push","pull"].contains(&operation.as_str()),"webdav.operation_not_admitted");
-    let registry_key=key(root,&id);let mut guard=jobs().lock().map_err(|_|anyhow::anyhow!("webdav.transfer_registry_unavailable"))?;ensure!(!guard.contains_key(&registry_key),"webdav.original_transfer_running");let directory=crate::platform::prepare_private_directory(&root.join("webdav-operations"))?;let receipt=directory.join(format!("{id}.json"));
-    crate::platform::private_storage::atomic_write_private_json(&receipt,&json!({"identity":identity,"request":request,"state":"started","at":Utc::now().to_rfc3339()}))?;guard.insert(registry_key.clone(),cancel.clone());drop(guard);
-    let result_id=id.clone();tokio::spawn(async move{
+fn jobs() -> &'static SyncMutex<HashMap<String, CancellationToken>> {
+    static JOBS: OnceLock<SyncMutex<HashMap<String, CancellationToken>>> = OnceLock::new();
+    JOBS.get_or_init(|| SyncMutex::new(HashMap::new()))
+}
+fn key(root: &Path, id: &str) -> String {
+    format!("{}:{id}", root.display())
+}
+pub(super) fn active(root: &Path, id: &str) -> bool {
+    jobs()
+        .lock()
+        .map(|jobs| jobs.contains_key(&key(root, id)))
+        .unwrap_or(false)
+}
+pub(super) fn cancel(root: &Path, id: &str) -> Result<Value> {
+    uuid::Uuid::parse_str(id)?;
+    let guard = jobs()
+        .lock()
+        .map_err(|_| anyhow::anyhow!("webdav.transfer_registry_unavailable"))?;
+    if let Some(token) = guard.get(&key(root, id)) {
+        token.cancel();
+        return Ok(json!({"state":"stopping","commandId":id}));
+    }
+    Ok(
+        json!({"state":"unknown","commandId":id,"message":"原传输已不在运行，请核对回执后再选择恢复。"}),
+    )
+}
+pub(super) fn status(root: &Path, id: &str) -> Result<Value> {
+    uuid::Uuid::parse_str(id)?;
+    let path = root.join("webdav-operations").join(format!("{id}.json"));
+    ensure!(
+        fs::metadata(&path)?.len() <= 1024 * 1024,
+        "webdav.receipt_limit"
+    );
+    let saved: Value = serde_json::from_slice(&fs::read(path)?)?;
+    let state = if saved["state"] == "started" && !active(root, id) {
+        "unknown"
+    } else {
+        saved["state"].as_str().unwrap_or("unknown")
+    };
+    Ok(
+        json!({"commandId":id,"operation":saved["request"]["operation"],"state":state,"result":saved["result"],"message":saved["message"],"at":saved["at"]}),
+    )
+}
+pub(super) fn list(root: &Path) -> Result<Value> {
+    let directory = root.join("webdav-operations");
+    if !directory.exists() {
+        return Ok(json!({"items":[]}));
+    }
+    let mut entries = fs::read_dir(directory)?
+        .take(10_001)
+        .filter_map(|entry| entry.ok())
+        .filter(|entry| {
+            entry
+                .path()
+                .extension()
+                .is_some_and(|extension| extension == "json")
+        })
+        .collect::<Vec<_>>();
+    entries.sort_by_key(|entry| {
+        std::cmp::Reverse(entry.metadata().and_then(|value| value.modified()).ok())
+    });
+    let mut items = Vec::new();
+    for entry in entries.into_iter().take(100) {
+        let id = entry
+            .path()
+            .file_stem()
+            .and_then(|value| value.to_str())
+            .unwrap_or_default()
+            .to_owned();
+        if uuid::Uuid::parse_str(&id).is_ok() {
+            items.push(status(root, &id)?);
+        }
+    }
+    Ok(json!({"items":items}))
+}
+pub(super) fn start(
+    root: &Path,
+    config: Config,
+    request: Value,
+    identity: String,
+) -> Result<Value> {
+    start_with_token(root, config, request, identity, CancellationToken::new())
+}
+pub(super) fn start_with_token(
+    root: &Path,
+    config: Config,
+    request: Value,
+    identity: String,
+    cancel: CancellationToken,
+) -> Result<Value> {
+    ensure!(!cancel.is_cancelled(), "webdav.cancelled_before_start");
+    let id = request["commandId"]
+        .as_str()
+        .context("webdav.command_required")?
+        .to_owned();
+    uuid::Uuid::parse_str(&id)?;
+    let selected = PathBuf::from(request["path"].as_str().context("webdav.path_required")?);
+    ensure!(selected.is_absolute(), "webdav.absolute_path_required");
+    let operation = request["operation"].as_str().unwrap_or_default().to_owned();
+    ensure!(
+        ["push", "pull"].contains(&operation.as_str()),
+        "webdav.operation_not_admitted"
+    );
+    let registry_key = key(root, &id);
+    let mut guard = jobs()
+        .lock()
+        .map_err(|_| anyhow::anyhow!("webdav.transfer_registry_unavailable"))?;
+    ensure!(
+        !guard.contains_key(&registry_key),
+        "webdav.original_transfer_running"
+    );
+    let directory = crate::platform::prepare_private_directory(&root.join("webdav-operations"))?;
+    let receipt = directory.join(format!("{id}.json"));
+    crate::platform::private_storage::atomic_write_private_json(
+        &receipt,
+        &json!({"identity":identity,"request":request,"state":"started","at":Utc::now().to_rfc3339()}),
+    )?;
+    guard.insert(registry_key.clone(), cancel.clone());
+    drop(guard);
+    let result_id = id.clone();
+    tokio::spawn(async move {
         let result=async{let client=WebDav::new(config)?;let expected=request["expectedDigest"].as_str().context("webdav.source_digest_required")?;if operation=="push"{tokio::select!{_ = cancel.cancelled()=>anyhow::bail!("webdav.cancelled_outcome_unknown"),result=client.push_kind(&selected,&id,Some(expected),request["kind"].as_str().unwrap_or("backup"))=>result}}else{let snapshot=request["snapshotId"].as_str().context("webdav.snapshot_required")?;client.pull_resumable(snapshot,&selected,Some(expected),&id,&cancel).await}}.await;
-        let saved=match result{Ok(snapshot)=>json!({"identity":identity,"request":request,"state":"completed","result":{"path":selected,"snapshot":snapshot},"at":Utc::now().to_rfc3339()}),Err(error)=>json!({"identity":identity,"request":request,"state":"unknown","message":format!("{error:#}"),"at":Utc::now().to_rfc3339()})};
-        if let Err(error)=crate::platform::private_storage::atomic_write_private_json(&receipt,&saved){tracing::error!("WebDAV transfer receipt could not be finalized: {error:#}");}if let Ok(mut jobs)=jobs().lock(){jobs.remove(&registry_key);}
-    });Ok(json!({"state":"started","commandId":result_id}))
+        let saved = match result {
+            Ok(snapshot) => {
+                json!({"identity":identity,"request":request,"state":"completed","result":{"path":selected,"snapshot":snapshot},"at":Utc::now().to_rfc3339()})
+            }
+            Err(error) => {
+                json!({"identity":identity,"request":request,"state":"unknown","message":format!("{error:#}"),"at":Utc::now().to_rfc3339()})
+            }
+        };
+        if let Err(error) =
+            crate::platform::private_storage::atomic_write_private_json(&receipt, &saved)
+        {
+            tracing::error!("WebDAV transfer receipt could not be finalized: {error:#}");
+        }
+        if let Ok(mut jobs) = jobs().lock() {
+            jobs.remove(&registry_key);
+        }
+    });
+    Ok(json!({"state":"started","commandId":result_id}))
 }

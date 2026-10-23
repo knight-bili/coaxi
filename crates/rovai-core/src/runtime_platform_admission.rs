@@ -540,10 +540,7 @@ mod tests {
             }
 
             let custom_acp = registry.platform_admission(AdapterKind::CustomAcp, platform);
-            assert_eq!(
-                custom_acp.status(),
-                RuntimePlatformAdmissionStatus::Preview
-            );
+            assert_eq!(custom_acp.status(), RuntimePlatformAdmissionStatus::Preview);
             assert!(custom_acp.allows_runtime_use());
             assert!(!custom_acp.is_qualified());
             assert_eq!(

@@ -887,7 +887,9 @@ impl Default for ComputerToolsRuntimeConfig {
 }
 
 impl ComputerToolsRuntimeConfig {
-    pub fn backend_switch(&self) -> crate::ComputerSwitch {self.backend_switch.clone()}
+    pub fn backend_switch(&self) -> crate::ComputerSwitch {
+        self.backend_switch.clone()
+    }
 
     pub fn new() -> Self {
         Self::default()
@@ -962,4 +964,3 @@ impl ComputerToolsRuntimeConfig {
         self.changes.subscribe()
     }
 }
-

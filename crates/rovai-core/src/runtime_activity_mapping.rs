@@ -22,7 +22,7 @@ pub struct RuntimeActivityMappingDescriptor {
 }
 
 pub const RUNTIME_ACTIVITY_MAPPINGS: [RuntimeActivityMappingDescriptor; AdapterKind::ALL.len()] = [
-    descriptor(AdapterKind::CustomAcp,"acp-v1","run_level","acp"),
+    descriptor(AdapterKind::CustomAcp, "acp-v1", "run_level", "acp"),
     descriptor(
         AdapterKind::CodexCli,
         "codex-app-server",

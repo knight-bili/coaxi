@@ -1,9 +1,9 @@
 // Apache-2.0; spacering-net/codeg aff1e6c278453ed8d0b96a5f664edcdca621aa3f.
-use image::{ImageReader,ImageFormat};
 use super::model::*;
-const MIN_SPRITE_BYTES:usize=1024;
-const MAX_SPRITE_BYTES:usize=16*1024*1024;
-const MAX_SPRITE_ROWS:u32=32;
+use image::{ImageFormat, ImageReader};
+const MIN_SPRITE_BYTES: usize = 1024;
+const MAX_SPRITE_BYTES: usize = 16 * 1024 * 1024;
+const MAX_SPRITE_ROWS: u32 = 32;
 /// Detected sprite-sheet container.
 #[derive(Debug, Clone, Copy)]
 pub enum SpriteFormat {
@@ -45,9 +45,9 @@ pub fn validate_spritesheet(bytes: &[u8]) -> Result<SpriteFormat, anyhow::Error>
     let reader = ImageReader::new(cursor)
         .with_guessed_format()
         .map_err(|e| anyhow::Error::msg(format!("Cannot read sprite header: {e}")))?;
-    let format = reader.format().ok_or_else(|| {
-        anyhow::Error::msg("Spritesheet must be a PNG or WebP image.")
-    })?;
+    let format = reader
+        .format()
+        .ok_or_else(|| anyhow::Error::msg("Spritesheet must be a PNG or WebP image."))?;
     let detected = match format {
         ImageFormat::Png => SpriteFormat::Png,
         ImageFormat::WebP => SpriteFormat::Webp,
@@ -110,9 +110,7 @@ pub fn validate_pet_id(id: &str) -> Result<(), anyhow::Error> {
         return Err(anyhow::Error::msg("Pet id is required."));
     }
     if id.len() > 64 {
-        return Err(anyhow::Error::msg(
-            "Pet id must be at most 64 characters.",
-        ));
+        return Err(anyhow::Error::msg("Pet id must be at most 64 characters."));
     }
     let valid = id
         .chars()
@@ -129,4 +127,3 @@ pub fn validate_pet_id(id: &str) -> Result<(), anyhow::Error> {
     }
     Ok(())
 }
-

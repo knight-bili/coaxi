@@ -282,7 +282,14 @@ async fn execute(args: &[String]) -> Result<u8> {
         [command, action, rest @ ..]
             if matches!(
                 command.as_str(),
-                "runtime" | "member" | "camp" | "agent-run" | "trial" | "trace" | "eval" | "conversation-tools"
+                "runtime"
+                    | "member"
+                    | "camp"
+                    | "agent-run"
+                    | "trial"
+                    | "trace"
+                    | "eval"
+                    | "conversation-tools"
             ) =>
         {
             (command.as_str(), Some(action.as_str()), rest)
@@ -296,7 +303,9 @@ async fn execute(args: &[String]) -> Result<u8> {
     }
     let flags = Flags::parse(rest).map_err(anyhow::Error::new)?;
     let exit_code = match (command, action) {
-        ("conversation-tools", Some(action)) => conversation_tools_user_call(action,&flags).await?,
+        ("conversation-tools", Some(action)) => {
+            conversation_tools_user_call(action, &flags).await?
+        }
         ("status", None) => {
             flags.validate(&[], &["json"]).map_err(anyhow::Error::new)?;
             print_json(&invoke("status", json!({})).await?)?;
@@ -464,7 +473,9 @@ fn print_help() {
 
 fn print_command_help(command: &str, action: Option<&str>) -> Result<()> {
     let usage = match (command, action) {
-        ("conversation-tools", Some(action)) if conversation_user_action(action) => "rovai app conversation-tools <action> --input <private-json-file> [--json]",
+        ("conversation-tools", Some(action)) if conversation_user_action(action) => {
+            "rovai app conversation-tools <action> --input <private-json-file> [--json]"
+        }
         ("status", None) => "rovai app status [--json]",
         ("runtime", Some("list")) => "rovai app runtime list [--ready-only] [--json]",
         ("runtime", Some("check")) => "rovai app runtime check --adapter <adapter> [--json]",
@@ -529,22 +540,50 @@ fn print_command_help(command: &str, action: Option<&str>) -> Result<()> {
     Ok(())
 }
 
-fn conversation_user_action(action:&str)->bool {
-    matches!(action,"policy.get"|"policy.set"|"questions.list"|"questions.answer"|"questions.decline"|"questions.reconcile"|"grants.preview"|"grants.confirm"|"grants.revoke"|"grants.list"|"requests.get"|"requests.resolve"|"automationOwner.get"|"automationOwner.set"|"source.list"|"source.prepare"|"automation.details")
+fn conversation_user_action(action: &str) -> bool {
+    matches!(
+        action,
+        "policy.get"
+            | "policy.set"
+            | "questions.list"
+            | "questions.answer"
+            | "questions.decline"
+            | "questions.reconcile"
+            | "grants.preview"
+            | "grants.confirm"
+            | "grants.revoke"
+            | "grants.list"
+            | "requests.get"
+            | "requests.resolve"
+            | "automationOwner.get"
+            | "automationOwner.set"
+            | "source.list"
+            | "source.prepare"
+            | "automation.details"
+    )
 }
-async fn conversation_tools_user_call(action:&str,flags:&Flags)->Result<u8>{
-    if !conversation_user_action(action){return Err(CliError::new("automation_invalid_input","不支持的会话工具用户操作").into())}
-    flags.validate(&["input"],&["json"])?;
-    let input=fs::File::open(flags.required("input")?)?;
-    let mut bounded=std::io::Read::take(input,128*1024+1);let mut bytes=Vec::new();std::io::Read::read_to_end(&mut bounded,&mut bytes)?;
-    if bytes.len()>128*1024{return Err(CliError::new("automation_invalid_input","输入超过128KiB").into())}
-    let value:Value=serde_json::from_slice(&bytes)?;
-    if !value.is_object(){return Err(CliError::new("automation_invalid_input","输入必须为JSON对象").into())}
-    let method=format!("conversationTools.{action}");
-    if rovai_core::conversation_tools::user_api::OPERATIONS.contains(&method.as_str()){
-        rovai_core::conversation_tools::validate_operation(&method,&value)?;
+async fn conversation_tools_user_call(action: &str, flags: &Flags) -> Result<u8> {
+    if !conversation_user_action(action) {
+        return Err(CliError::new("automation_invalid_input", "不支持的会话工具用户操作").into());
     }
-    print_json(&invoke(&method,value).await?)?;Ok(0)
+    flags.validate(&["input"], &["json"])?;
+    let input = fs::File::open(flags.required("input")?)?;
+    let mut bounded = std::io::Read::take(input, 128 * 1024 + 1);
+    let mut bytes = Vec::new();
+    std::io::Read::read_to_end(&mut bounded, &mut bytes)?;
+    if bytes.len() > 128 * 1024 {
+        return Err(CliError::new("automation_invalid_input", "输入超过128KiB").into());
+    }
+    let value: Value = serde_json::from_slice(&bytes)?;
+    if !value.is_object() {
+        return Err(CliError::new("automation_invalid_input", "输入必须为JSON对象").into());
+    }
+    let method = format!("conversationTools.{action}");
+    if rovai_core::conversation_tools::user_api::OPERATIONS.contains(&method.as_str()) {
+        rovai_core::conversation_tools::validate_operation(&method, &value)?;
+    }
+    print_json(&invoke(&method, value).await?)?;
+    Ok(0)
 }
 
 fn trace_export_params(flags: &Flags) -> Result<rovai_core::execution_trace::TraceExportParams> {
@@ -1550,7 +1589,8 @@ fn load_automation_context() -> Result<AutomationContext> {
     let path = env::var_os(CONTEXT_ENV)
         .map(PathBuf::from)
         .or_else(|| {
-            rovai_core::product_identity::desktop_automation_root().map(|root|root.join("connection-v1.json"))
+            rovai_core::product_identity::desktop_automation_root()
+                .map(|root| root.join("connection-v1.json"))
         })
         .ok_or_else(|| CliError::new("app_not_running", "Rovai Desktop is not running."))?;
     let raw = fs::read(&path)

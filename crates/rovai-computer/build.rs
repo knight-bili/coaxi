@@ -1,2 +1,37 @@
-use sha2::{Digest,Sha256};
-fn main(){fn visit(path:&std::path::Path,hash:&mut Sha256){let mut files=std::fs::read_dir(path).unwrap().map(|e|e.unwrap().path()).collect::<Vec<_>>();files.sort();for file in files{if file.is_dir(){visit(&file,hash)}else{println!("cargo:rerun-if-changed={}",file.display());hash.update(file.strip_prefix("src").unwrap().to_string_lossy().as_bytes());hash.update(std::fs::read(file).unwrap());}}}let mut hash=Sha256::new();visit(std::path::Path::new("src"),&mut hash);println!("cargo:rustc-env=CODEG_COMPUTER_SOURCE={:x}",hash.finalize());for key in ["CODEG_COMPUTER_PEER_REQUIREMENT","CODEG_COMPUTER_HELPER_REQUIREMENT","CODEG_COMPUTER_TEAM_ID"]{println!("cargo:rerun-if-env-changed={key}");}}
+use sha2::{Digest, Sha256};
+fn main() {
+    fn visit(path: &std::path::Path, hash: &mut Sha256) {
+        let mut files = std::fs::read_dir(path)
+            .unwrap()
+            .map(|e| e.unwrap().path())
+            .collect::<Vec<_>>();
+        files.sort();
+        for file in files {
+            if file.is_dir() {
+                visit(&file, hash)
+            } else {
+                println!("cargo:rerun-if-changed={}", file.display());
+                hash.update(
+                    file.strip_prefix("src")
+                        .unwrap()
+                        .to_string_lossy()
+                        .as_bytes(),
+                );
+                hash.update(std::fs::read(file).unwrap());
+            }
+        }
+    }
+    let mut hash = Sha256::new();
+    visit(std::path::Path::new("src"), &mut hash);
+    println!(
+        "cargo:rustc-env=CODEG_COMPUTER_SOURCE={:x}",
+        hash.finalize()
+    );
+    for key in [
+        "CODEG_COMPUTER_PEER_REQUIREMENT",
+        "CODEG_COMPUTER_HELPER_REQUIREMENT",
+        "CODEG_COMPUTER_TEAM_ID",
+    ] {
+        println!("cargo:rerun-if-env-changed={key}");
+    }
+}

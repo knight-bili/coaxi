@@ -1,4 +1,4 @@
-use chrono::{DateTime,Utc};
+use chrono::{DateTime, Utc};
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct UsageFact {
     pub turn_key: String,
@@ -35,4 +35,3 @@ pub struct UsageFactRow {
     pub total_tokens: i64,
     pub duration_ms: i64,
 }
-
