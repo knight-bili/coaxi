@@ -38,7 +38,9 @@ pub(crate) fn prepare_on(tx:&Transaction<'_>,lease:&RunLease,id:&str,target:&Nat
         questions.push(json!({"id":uuid::Uuid::new_v4().to_string(),"spec":question}));
     }
     let now=chrono::Utc::now();
-    let value=json!({"requestId":id,"revision":2,"scope":lease.frozen.scope,"agentId":lease.frozen.agent_id,"agentRunId":lease.run_id,"executionEpoch":lease.epoch,"state":"awaiting_answer","questions":questions,"createdAt":now.to_rfc3339(),"expiresAt":(now+chrono::Duration::seconds(7200)).to_rfc3339()});
+    let expires:i64=tx.query_row("SELECT expires_at_ms FROM conversation_tool_request WHERE id=?1",[id],|row|row.get(0))?;
+    let expires=chrono::DateTime::from_timestamp_millis(expires).context("conversation_tools.expiry_invalid")?;
+    let value=json!({"requestId":id,"revision":2,"scope":lease.frozen.scope,"agentId":lease.frozen.agent_id,"agentRunId":lease.run_id,"executionEpoch":lease.epoch,"state":"awaiting_answer","questions":questions,"createdAt":now.to_rfc3339(),"expiresAt":expires.to_rfc3339()});
     validate("QuestionSetV1",&value)?;
     let question_cipher=crate::member_environment::encrypt(tx,&context(id,"set"),&value)?;
     let target_cipher=crate::member_environment::encrypt(tx,&context(id,"target"),target)?;
@@ -101,4 +103,23 @@ pub(crate) fn list(connection:&Connection,input:&Value)->Result<Value>{
     let mut ids=query.query_map(params![scope.thread_id,scope::kind(&scope.scope_kind),scope.conversation_id,input["after"].as_str(),limit+1],|row|row.get::<_,String>(0))?.collect::<rusqlite::Result<Vec<_>>>()?;
     let more=ids.len()>limit as usize;ids.truncate(limit as usize);let next=if more{ids.last().cloned()}else{None};
     let values=ids.into_iter().map(|id|set_view(connection,&id)).collect::<Result<Vec<_>>>()?;Ok(json!({"items":values,"next":next}))
+}
+/// Core生命周期事务调用；停止与到期只取消投递，不能伪造用户拒答或默认选择。
+pub(crate) fn close_unavailable(connection:&Connection)->Result<usize>{
+    let mut query=connection.prepare(r#"
+        SELECT request.id FROM conversation_tool_request request
+        JOIN conversation_tool_run owned ON owned.agent_run_id=request.agent_run_id AND owned.execution_epoch=request.execution_epoch
+        LEFT JOIN agent_run run ON run.id=request.agent_run_id AND run.execution_epoch=request.execution_epoch
+        WHERE request.tool_name='ask_user_question' AND request.state IN ('awaiting_answer','answered')
+          AND(request.expires_at_ms<=?1 OR owned.revoked_at IS NOT NULL OR run.id IS NULL OR run.status<>'running' OR run.cancel_requested_at IS NOT NULL)
+        ORDER BY request.created_at LIMIT 1000
+    "#)?;
+    let ids=query.query_map([chrono::Utc::now().timestamp_millis()],|row|row.get::<_,String>(0))?.collect::<rusqlite::Result<Vec<_>>>()?;drop(query);
+    let now=chrono::Utc::now().to_rfc3339();
+    for id in &ids{
+        let writing:bool=connection.query_row("SELECT EXISTS(SELECT 1 FROM conversation_tool_delivery WHERE request_id=?1 AND state IN ('claimed','outcome_unknown'))",[id],|row|row.get(0))?;
+        connection.execute("UPDATE conversation_tool_request SET state=?2,revision=revision+1,updated_at=?3 WHERE id=?1 AND state IN ('awaiting_answer','answered')",params![id,if writing{"outcome_unknown"}else{"cancelled"},now])?;
+        connection.execute("UPDATE conversation_tool_delivery SET state=CASE WHEN state='pending' THEN 'cancelled' ELSE 'outcome_unknown' END,updated_at=?2 WHERE request_id=?1 AND state IN ('pending','claimed')",params![id,now])?;
+    }
+    Ok(ids.len())
 }
