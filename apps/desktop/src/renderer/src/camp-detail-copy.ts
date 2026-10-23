@@ -8,7 +8,9 @@ const campDetailCopy = {
   singleChatTitle: '单聊'
 } as const
 
-export function useThreadDetailCopy(): typeof campDetailCopy & { execution: string } {
+type ThreadDetailCopy = Record<keyof typeof campDetailCopy, string> & { execution: string }
+
+export function useThreadDetailCopy(): ThreadDetailCopy {
   const language = useInterfaceLanguage()
   return {
     tasks: translateUi(language, campDetailCopy.tasks),
