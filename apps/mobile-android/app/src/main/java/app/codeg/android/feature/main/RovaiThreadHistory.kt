@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -29,14 +32,14 @@ import kotlinx.serialization.json.*
     LaunchedEffect(threadId,anchor){busy=true;try{if(anchor!=null)around(anchor)else page(9007199254740991)}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message}finally{busy=false}}
     LaunchedEffect(focused,rows){val index=rows.indexOfFirst{it.coreText("id")==focused};if(index>=0)listState.scrollToItem(index+if(before!=null&&before!!>0)1 else 0)}
     Dialog(onDismissRequest=onClose,properties=DialogProperties(usePlatformDefaultWidth=false)){Surface(Modifier.fillMaxSize(),color=CodegTheme.colors.bgElevated){Column(Modifier.fillMaxSize().padding(12.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){
-        Row{Text("消息记录",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(enabled=!busy,onClick={work{rows=emptyList();before=null;focused=null;frozenQuery="";watermark=0;page(9007199254740991)}}){Text("最新")};TextButton(onClick=onClose){Text("关闭")}}
-        Row{OutlinedTextField(query,{query=it},Modifier.weight(1f),label={Text("搜索消息")},singleLine=true);TextButton(enabled=!busy&&query.isNotBlank(),onClick={work{find(query,0)}}){Text("搜索")}}
-        if(frozenQuery.isNotEmpty())Row{Text("${if(total==0)0 else matchIndex+1} / $total",Modifier.weight(1f));TextButton(enabled=!busy&&matchIndex>0,onClick={work{find(frozenQuery,matchIndex-1)}}){Text("上一处")};TextButton(enabled=!busy&&matchIndex+1<total,onClick={work{find(frozenQuery,matchIndex+1)}}){Text("下一处")}}
+        Row{Text(stringResource(R.string.rovai_fusion_d13a766345fcad91),Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(enabled=!busy,onClick={work{rows=emptyList();before=null;focused=null;frozenQuery="";watermark=0;page(9007199254740991)}}){Text(stringResource(R.string.rovai_fusion_569af1a47dbdf053))};TextButton(onClick=onClose){Text(stringResource(R.string.rovai_fusion_3fd47edce45b3603))}}
+        Row{OutlinedTextField(query,{query=it},Modifier.weight(1f),label={Text(stringResource(R.string.rovai_fusion_675cdf65d059a70b))},singleLine=true);TextButton(enabled=!busy&&query.isNotBlank(),onClick={work{find(query,0)}}){Text(stringResource(R.string.rovai_fusion_44ce7ae909bbb28b))}}
+        if(frozenQuery.isNotEmpty())Row{Text("${if(total==0)0 else matchIndex+1} / $total",Modifier.weight(1f));TextButton(enabled=!busy&&matchIndex>0,onClick={work{find(frozenQuery,matchIndex-1)}}){Text(stringResource(R.string.rovai_fusion_b7e4aa2f061b3967))};TextButton(enabled=!busy&&matchIndex+1<total,onClick={work{find(frozenQuery,matchIndex+1)}}){Text(stringResource(R.string.rovai_fusion_72ac8841c5f4b21f))}}
         issue?.let{Text(it,color=CodegTheme.colors.danger)}
         LazyColumn(Modifier.weight(1f),state=listState,verticalArrangement=Arrangement.spacedBy(10.dp)){
-            before?.takeIf{it>0}?.let{cursor->item{TextButton(enabled=!busy,onClick={work{page(cursor)}}){Text("更早的消息")}}}
+            before?.takeIf{it>0}?.let{cursor->item{TextButton(enabled=!busy,onClick={work{page(cursor)}}){Text(stringResource(R.string.rovai_fusion_37781f751fc36540))}}}
             items(rows,key={it.coreText("id")}){message->GlassRow(Modifier.fillMaxWidth(),selected=message.coreText("id")==focused){Text(message.coreText("authorDisplayName").ifEmpty{message.coreText("authorType")},style=MaterialTheme.typography.labelMedium);Text(message.coreText("createdAt"),style=MaterialTheme.typography.labelSmall,color=CodegTheme.colors.textSecondary);RovaiMessageBody(model,threadId,message)}}
-            if(!busy&&rows.isEmpty())item{Text("没有消息记录",color=CodegTheme.colors.textSecondary)}
+            if(!busy&&rows.isEmpty())item{Text(stringResource(R.string.rovai_fusion_35e9e493e85d6aca),color=CodegTheme.colors.textSecondary)}
         }
     }}}
 }

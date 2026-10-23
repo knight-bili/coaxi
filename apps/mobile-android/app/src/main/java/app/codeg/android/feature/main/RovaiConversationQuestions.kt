@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -30,7 +33,7 @@ private fun questionStatus(value:String)=when(value){"awaiting_answer"->"等待�
     if(items.isNotEmpty()||issue!=null)Column(verticalArrangement=Arrangement.spacedBy(10.dp)){
         active.forEach{row->key(row.coreText("requestId")){RovaiConversationQuestion(model,row){coroutine.launch{try{read()}catch(error:Exception){issue=error.message}}}}}
         if(items.size>active.size){TextButton(onClick={history=!history}){Text(if(history)"收起原问题记录" else "查看已结束的问题")};if(history)items.filter{it !in active}.forEach{row->key(row.coreText("requestId")){RovaiConversationQuestion(model,row){coroutine.launch{read()}}}}}
-        if(next!=null)TextButton(onClick={coroutine.launch{try{read(true)}catch(error:Exception){issue=error.message}}}){Text("更多问题记录")}
+        if(next!=null)TextButton(onClick={coroutine.launch{try{read(true)}catch(error:Exception){issue=error.message}}}){Text(stringResource(R.string.rovai_fusion_9051db3a46418dcc))}
         issue?.let{Text(it,color=CodegTheme.colors.danger,style=MaterialTheme.typography.bodySmall)}
     }
 }
@@ -49,8 +52,8 @@ private fun questionStatus(value:String)=when(value){"awaiting_answer"->"等待�
     Column(verticalArrangement=Arrangement.spacedBy(6.dp)){
         Text((model.state.value.members.firstOrNull{it.coreText("agentId")==row.coreText("agentId")}?.coreText("displayName")?:"原队员")+" · "+questionStatus(current),style=MaterialTheme.typography.labelMedium)
         key(id,row.coreLong("revision"),current){AskQuestionCard(questions=specs,onSubmit=::submit,onSkip={submit(QuestionAnswer.dismissed)},readOnly=!ready||busy||pending!=null||current!="awaiting_answer",initialSelections=selections,titleOverride=if(current=="awaiting_answer")"队员需要你的选择" else "原问题记录",subtitleOverride=questionStatus(current))}
-        if(outcome["declined"]==JsonPrimitive(true))Text("你已明确选择不回答。",style=MaterialTheme.typography.bodySmall)
-        Row{TextButton(enabled=!busy,onClick=::reconcile){Text(if(pending!=null)"核对原回答" else "查看原回执")};if(current in listOf("awaiting_answer","outcome_unknown"))TextButton(enabled=!busy,onClick=::cancel){Text("取消剩余投递")}}
+        if(outcome["declined"]==JsonPrimitive(true))Text(stringResource(R.string.rovai_fusion_43c7b60762c11ca5),style=MaterialTheme.typography.bodySmall)
+        Row{TextButton(enabled=!busy,onClick=::reconcile){Text(if(pending!=null)"核对原回答" else "查看原回执")};if(current in listOf("awaiting_answer","outcome_unknown"))TextButton(enabled=!busy,onClick=::cancel){Text(stringResource(R.string.rovai_fusion_aba882395b4545fe))}}
         issue?.let{Text(it,color=CodegTheme.colors.danger,style=MaterialTheme.typography.bodySmall)}
     }
 }

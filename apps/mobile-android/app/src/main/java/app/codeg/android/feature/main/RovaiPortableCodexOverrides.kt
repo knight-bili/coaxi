@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -36,7 +39,7 @@ fun RovaiPortableCodexOverrides(value:JsonObject,disabled:Boolean,onChange:(Json
     fun label(option:JsonElement)=when(option){JsonNull->"不使用";JsonPrimitive(true)->"开启";JsonPrimitive(false)->"关闭";else->option.jsonPrimitive.content}
     TextButton(onClick={expanded=!expanded}){Text(if(expanded)"收起高级设置" else "高级设置")}
     if(expanded)Column(Modifier.fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(8.dp)){
-        Text("继承表示不覆盖基准模型。实际程序仍会核对目录和支持范围。",style=MaterialTheme.typography.bodySmall)
+        Text(stringResource(R.string.rovai_fusion_30109fb43b29941b),style=MaterialTheme.typography.bodySmall)
         portableCodexFields.forEachIndexed{index,field->
             if(index==0||index==3)Text(if(index==0)"协议" else "模型行为",style=MaterialTheme.typography.titleSmall)
             var menu by remember(field.key){mutableStateOf(false)}
@@ -45,12 +48,12 @@ fun RovaiPortableCodexOverrides(value:JsonObject,disabled:Boolean,onChange:(Json
                 val current=value[field.key]
                 OutlinedButton(enabled=!disabled,onClick={menu=true}){Text(if(current==null)"继承基准模型" else if(field.options.contains(current))label(current) else "保留原设置（由原程序核对）")}
                 DropdownMenu(expanded=menu,onDismissRequest={menu=false}){
-                    DropdownMenuItem(text={Text("继承基准模型")},onClick={set(field.key,null);menu=false})
+                    DropdownMenuItem(text={Text(stringResource(R.string.rovai_fusion_7c61147e3fbed0d1))},onClick={set(field.key,null);menu=false})
                     field.options.forEach{option->DropdownMenuItem(text={Text(label(option))},onClick={set(field.key,option);menu=false})}
                 }
             }
         }
-        Text("模型说明",style=MaterialTheme.typography.titleSmall)
+        Text(stringResource(R.string.rovai_fusion_9922bf267d75d312),style=MaterialTheme.typography.titleSmall)
         listOf("description" to "模型说明","base_instructions" to "模型基础说明").forEach{(key,title)->
             Row{Text("覆盖$title",modifier=Modifier.weight(1f));Switch(checked=value.containsKey(key),enabled=!disabled,onCheckedChange={set(key,if(it)JsonPrimitive("")else null)})}
             if(value.containsKey(key))CodegTextField(value.coreText(key),{if(!disabled)set(key,JsonPrimitive(it))},title,singleLine=false)

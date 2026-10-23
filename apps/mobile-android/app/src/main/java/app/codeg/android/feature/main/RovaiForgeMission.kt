@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
@@ -16,7 +19,7 @@ import java.util.UUID
 
 @Composable fun RovaiForgeMission(model:RovaiWorkspaceViewModel,threadId:String,accountId:String,sourceKind:String,number:Long,repository:JsonObject,onSaved:()->Unit){
     var open by remember(threadId,accountId,sourceKind,number){mutableStateOf(false)}
-    TextButton(onClick={open=true},enabled=model.state.collectAsState().value.pending==null){Text("从此记录创建使命")}
+    TextButton(onClick={open=true},enabled=model.state.collectAsState().value.pending==null){Text(stringResource(R.string.rovai_fusion_bf52f518ddcdc457))}
     if(open)key(threadId,accountId,sourceKind,number){RovaiForgeMissionEditor(model,threadId,accountId,sourceKind,number,repository,onClose={open=false},onSaved={open=false;onSaved()})}
 }
 @Composable private fun RovaiForgeMissionEditor(model:RovaiWorkspaceViewModel,threadId:String,accountId:String,sourceKind:String,number:Long,repository:JsonObject,onClose:()->Unit,onSaved:()->Unit){
@@ -37,8 +40,8 @@ import java.util.UUID
         link=linkRequest;model.rememberBody(owner,record());model.saveBody(owner,record());val result=model.query(RovaiOperation.FORGE_LINKS,linkRequest).coreObject();require(result["applied"]==JsonPrimitive(true)&&generation==model.connectionGeneration){"使命已保留，来源关联仍需核对"};model.rememberBody(owner,"");ready=false;model.refreshNow();onSaved()
     }catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message}finally{busy=false}}}
     Dialog(onDismissRequest={if(!busy)onClose()},properties=DialogProperties(usePlatformDefaultWidth=false)){Surface(Modifier.fillMaxSize(),color=CodegTheme.colors.bgElevated){Column(Modifier.fillMaxSize().padding(16.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
-        Row{Text("从仓库记录创建使命",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(enabled=!busy,onClick=onClose){Text("关闭，保留进度")}};Text(sourceUrl,style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary);issue?.let{Text(it,color=CodegTheme.colors.danger)}
-        LazyColumn(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(10.dp)){item{OutlinedTextField(title,{title=it},enabled=ready&&!busy&&sent==null,label={Text("使命名称")},modifier=Modifier.fillMaxWidth())};item{OutlinedTextField(description,{description=it},enabled=ready&&!busy&&sent==null,label={Text("任务说明")},modifier=Modifier.fillMaxWidth(),minLines=5,maxLines=15)};item{Text("当前工程 · $project",style=MaterialTheme.typography.bodySmall)};item{Text("队员与负责人",style=MaterialTheme.typography.titleSmall);members.forEach{member->val id=member.coreText("agentId");Row{Checkbox(checked=id in selected,enabled=ready&&!busy&&sent==null,onCheckedChange={checked->selected=if(checked)selected+id else selected-id;if(lead !in selected)lead=selected.firstOrNull().orEmpty()});TextButton(enabled=ready&&!busy&&sent==null&&id in selected,onClick={lead=id}){Text(member.coreText("displayName")+(if(lead==id)" · 负责人" else ""))}}}};item{Text(if(created.isEmpty())"先保存使命和来源关系，由你决定何时开始。" else "使命已保存，继续核对原来源关联。",color=CodegTheme.colors.textSecondary)}}
+        Row{Text(stringResource(R.string.rovai_fusion_a65c7961075bf328),Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(enabled=!busy,onClick=onClose){Text(stringResource(R.string.rovai_fusion_3dfe7b6b28cb0c80))}};Text(sourceUrl,style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary);issue?.let{Text(it,color=CodegTheme.colors.danger)}
+        LazyColumn(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(10.dp)){item{OutlinedTextField(title,{title=it},enabled=ready&&!busy&&sent==null,label={Text(stringResource(R.string.rovai_fusion_476c7ace3e8f7e4b))},modifier=Modifier.fillMaxWidth())};item{OutlinedTextField(description,{description=it},enabled=ready&&!busy&&sent==null,label={Text(stringResource(R.string.rovai_fusion_a26c64a6aaea9dd8))},modifier=Modifier.fillMaxWidth(),minLines=5,maxLines=15)};item{Text("当前工程 · $project",style=MaterialTheme.typography.bodySmall)};item{Text(stringResource(R.string.rovai_fusion_eec1f8f154144e4f),style=MaterialTheme.typography.titleSmall);members.forEach{member->val id=member.coreText("agentId");Row{Checkbox(checked=id in selected,enabled=ready&&!busy&&sent==null,onCheckedChange={checked->selected=if(checked)selected+id else selected-id;if(lead !in selected)lead=selected.firstOrNull().orEmpty()});TextButton(enabled=ready&&!busy&&sent==null&&id in selected,onClick={lead=id}){Text(member.coreText("displayName")+(if(lead==id)" · 负责人" else ""))}}}};item{Text(if(created.isEmpty())"先保存使命和来源关系，由你决定何时开始。" else "使命已保存，继续核对原来源关联。",color=CodegTheme.colors.textSecondary)}}
         Button(enabled=ready&&!busy&&title.isNotBlank()&&lead in selected&&selected.isNotEmpty(),onClick=::submit,modifier=Modifier.fillMaxWidth()){Text(if(sent==null)"确认保存使命" else "核对原创建和关联")}
     }}}
 }

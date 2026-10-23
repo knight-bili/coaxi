@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -36,8 +39,8 @@ internal suspend fun nativeUserCall(model:RovaiWorkspaceViewModel,operation:Rova
     LaunchedEffect(agentId,generation){busy=true;try{val raw=model.readBody(owner);if(raw.isNotEmpty())original=Json.parseToJsonElement(raw).coreObject();read()}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message}finally{busy=false}}
     val enabled=policy?.get("members").coreArray().any{it.coreText("agentId")==agentId&&it["enabled"]==JsonPrimitive(true)}
     Column(verticalArrangement=Arrangement.spacedBy(6.dp)){
-        Row{Column(Modifier.weight(1f)){Text("原生插话");Text("默认关闭；仅之后的新任务生效，仍需实际连接支持。",style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)};Switch(checked=enabled,enabled=!busy&&policy!=null&&original==null&&!state.busy&&state.pending==null&&generation==model.connectionGeneration,onCheckedChange={checked->val current=policy?:return@Switch;val request=buildJsonObject{put("schemaVersion",1);put("commandId",UUID.randomUUID().toString());put("expectedRevision",current.coreLong("revision"));put("members",JsonArray(current["members"].coreArray().filter{it.coreText("agentId")!=agentId}+buildJsonObject{put("agentId",agentId);put("enabled",checked)}))};work{model.saveBody(owner,request.toString());original=request;accept(nativeUserCall(model,RovaiOperation.RUNTIME_STEER_POLICY_SET,request),request)}})}
-        original?.let{request->TextButton(enabled=!busy&&generation==model.connectionGeneration,onClick={work{val value=nativeUserCall(model,RovaiOperation.COMMANDS_RECONCILE,buildJsonObject{put("operation","runtime.steer.policy.set");putJsonObject("params"){put("commandId",request.coreText("commandId"))}});require(value.coreText("state")=="recorded"){"原请求尚无确定回执，未重复发送"};accept(value["result"].coreObject(),request)}}){Text("核对原保存请求")}}
+        Row{Column(Modifier.weight(1f)){Text(stringResource(R.string.rovai_fusion_727dddcc6ff88721));Text(stringResource(R.string.rovai_fusion_d338da8688d32ec5),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)};Switch(checked=enabled,enabled=!busy&&policy!=null&&original==null&&!state.busy&&state.pending==null&&generation==model.connectionGeneration,onCheckedChange={checked->val current=policy?:return@Switch;val request=buildJsonObject{put("schemaVersion",1);put("commandId",UUID.randomUUID().toString());put("expectedRevision",current.coreLong("revision"));put("members",JsonArray(current["members"].coreArray().filter{it.coreText("agentId")!=agentId}+buildJsonObject{put("agentId",agentId);put("enabled",checked)}))};work{model.saveBody(owner,request.toString());original=request;accept(nativeUserCall(model,RovaiOperation.RUNTIME_STEER_POLICY_SET,request),request)}})}
+        original?.let{request->TextButton(enabled=!busy&&generation==model.connectionGeneration,onClick={work{val value=nativeUserCall(model,RovaiOperation.COMMANDS_RECONCILE,buildJsonObject{put("operation","runtime.steer.policy.set");putJsonObject("params"){put("commandId",request.coreText("commandId"))}});require(value.coreText("state")=="recorded"){"原请求尚无确定回执，未重复发送"};accept(value["result"].coreObject(),request)}}){Text(stringResource(R.string.rovai_fusion_38ec197a5eb4bec8))}}
         issue?.let{Text(it,style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.danger)}
     }
 }
@@ -61,7 +64,7 @@ internal fun nativeSteerState(receipt:JsonObject)=when(receipt.coreText("status"
     }catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message}finally{busy=false}}
     if(normalOpen&&receipt!=null){RovaiNativeNormalContinue(model,receipt!!.coreText("commandId"),composerScope){normalOpen=false};return}
     Dialog(onDismissRequest={if(!busy)onClose()},properties=DialogProperties(usePlatformDefaultWidth=false)){Surface(Modifier.fillMaxWidth().fillMaxHeight(.94f),shape=MaterialTheme.shapes.large){Column(Modifier.padding(16.dp)){
-        Row{Text("完整原生插话",Modifier.weight(1f),style=MaterialTheme.typography.titleLarge);TextButton(enabled=!busy,onClick=onClose){Text("关闭并保留")}}
+        Row{Text(stringResource(R.string.rovai_fusion_31b967e73641122a),Modifier.weight(1f),style=MaterialTheme.typography.titleLarge);TextButton(enabled=!busy,onClick=onClose){Text(stringResource(R.string.rovai_fusion_1b22eb19b0591f21))}}
         issue?.let{Text(it,color=CodegTheme.colors.danger)}
         LazyColumn(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(10.dp)){
             val preview=packet?.get("preview").coreObject();val original=packet?.get("original").coreObject()
@@ -72,11 +75,11 @@ internal fun nativeSteerState(receipt:JsonObject)=when(receipt.coreText("status"
                 item{Button(enabled=!disabled&&targets.any{it.coreText("agentRunId")==run}&&(text.isNotBlank()||checked.isNotEmpty())&&text.codePointCount(0,text.length)<=4096,onClick={work{
                     val target=targets.first{it.coreText("agentRunId")==run};val frozen=if(checked.isEmpty())JsonArray(emptyList())else nativeUserCall(model,RovaiOperation.RUNTIME_STEER_MATERIALS_PREPARE,buildJsonObject{put("schemaVersion",1);put("target",target);put("sourceIds",JsonArray(checked.map(::JsonPrimitive)));put("composerScope",composerScope)})["materials"]?:JsonArray(emptyList())
                     val next=nativeUserCall(model,RovaiOperation.RUNTIME_STEER_PREVIEW,buildJsonObject{put("schemaVersion",1);put("target",target);putJsonObject("input"){put("text",text);put("materials",frozen)}});keep(buildJsonObject{put("preview",next)});receipt=null
-                }}){Text("预览整份文字和材料")};if(targets.isEmpty())Text("当前没有实际支持原生插话且已启用的任务。")}
+                }}){Text(stringResource(R.string.rovai_fusion_72167ff430b9fb80))};if(targets.isEmpty())Text(stringResource(R.string.rovai_fusion_58c48cf531af6ecc))}
             }else{
-                item{GlassRow(Modifier.fillMaxWidth()){Text("将发送的完整内容",style=MaterialTheme.typography.titleMedium);Text(preview["input"].coreObject().coreText("text"));preview["input"].coreObject()["materials"].coreArray().forEach{material->Text(material.coreText("displayName")+" · "+material.coreLong("byteSize")+" B")};Text("普通输入和其他材料保留。",color=CodegTheme.colors.textSecondary)}}
-                receipt?.let{value->item{Text(nativeSteerState(value));Text(value.coreText("commandId"),style=MaterialTheme.typography.bodySmall);if(value.coreText("nativeOutcome")=="startedNewTurn")Text("输入已被原程序消耗，不要再次排队；该连接的直接插话已停用。");if(value.coreText("status")=="not_consumed")Text("整份输入仍保存在原预览，作为普通下一轮发送须另外确认。")}}
-                if(receipt?.coreText("status")=="not_consumed")item{TextButton(enabled=!disabled,onClick={normalOpen=true}){Text("预览整份普通下一轮")}}
+                item{GlassRow(Modifier.fillMaxWidth()){Text(stringResource(R.string.rovai_fusion_1c6fcb0c023ea36d),style=MaterialTheme.typography.titleMedium);Text(preview["input"].coreObject().coreText("text"));preview["input"].coreObject()["materials"].coreArray().forEach{material->Text(material.coreText("displayName")+" · "+material.coreLong("byteSize")+" B")};Text(stringResource(R.string.rovai_fusion_991fac4001d20949),color=CodegTheme.colors.textSecondary)}}
+                receipt?.let{value->item{Text(nativeSteerState(value));Text(value.coreText("commandId"),style=MaterialTheme.typography.bodySmall);if(value.coreText("nativeOutcome")=="startedNewTurn")Text(stringResource(R.string.rovai_fusion_6e0d0e75d4b3beb6));if(value.coreText("status")=="not_consumed")Text(stringResource(R.string.rovai_fusion_900834b050e0493e))}}
+                if(receipt?.coreText("status")=="not_consumed")item{TextButton(enabled=!disabled,onClick={normalOpen=true}){Text(stringResource(R.string.rovai_fusion_ba87dbb6292995e2))}}
                 receipt?.let{value->item{RovaiNativeEvidence(model,value.coreText("commandId"))}}
                 item{Button(enabled=!disabled&&(receipt==null||original.isNotEmpty()),onClick={work{
                     if(original.isNotEmpty())reconcile(original)else{
@@ -85,9 +88,9 @@ internal fun nativeSteerState(receipt:JsonObject)=when(receipt.coreText("status"
                     }
                 }}){Text(if(original.isNotEmpty())"核对原提交"else "确认发送完整补充")}}
             }
-            item{Text("原生插话记录",style=MaterialTheme.typography.titleMedium)}
-            items(history.filter{agentId==null||it["preview"].coreObject()["target"].coreObject().coreText("agentId")==agentId},key={it["preview"].coreObject().coreText("previewId")}){row->GlassRow(Modifier.fillMaxWidth()){Text(row["preview"].coreObject()["input"].coreObject().coreText("text"));Text(nativeSteerState(row["receipt"].coreObject()));TextButton(enabled=!disabled,onClick={work{val old=row["receipt"].coreObject();keep(buildJsonObject{put("preview",row["preview"]!!);if(old.isNotEmpty())put("original",buildJsonObject{put("schemaVersion",1);put("commandId",old.coreText("commandId"));put("previewId",row["preview"].coreObject().coreText("previewId"));put("previewDigest",row["preview"].coreObject().coreText("previewDigest"))})});receipt=old.takeIf{it.isNotEmpty()}}}){Text("查看完整内容和原回执")}}}
-            if(after!=null)item{TextButton(enabled=!disabled,onClick={work{records(true)}}){Text("更多记录")}}
+            item{Text(stringResource(R.string.rovai_fusion_4477f32934f66c3a),style=MaterialTheme.typography.titleMedium)}
+            items(history.filter{agentId==null||it["preview"].coreObject()["target"].coreObject().coreText("agentId")==agentId},key={it["preview"].coreObject().coreText("previewId")}){row->GlassRow(Modifier.fillMaxWidth()){Text(row["preview"].coreObject()["input"].coreObject().coreText("text"));Text(nativeSteerState(row["receipt"].coreObject()));TextButton(enabled=!disabled,onClick={work{val old=row["receipt"].coreObject();keep(buildJsonObject{put("preview",row["preview"]!!);if(old.isNotEmpty())put("original",buildJsonObject{put("schemaVersion",1);put("commandId",old.coreText("commandId"));put("previewId",row["preview"].coreObject().coreText("previewId"));put("previewDigest",row["preview"].coreObject().coreText("previewDigest"))})});receipt=old.takeIf{it.isNotEmpty()}}}){Text(stringResource(R.string.rovai_fusion_2abb31322b98fd9e))}}}
+            if(after!=null)item{TextButton(enabled=!disabled,onClick={work{records(true)}}){Text(stringResource(R.string.rovai_fusion_53cd7722b1efc4c3))}}
         }
     }}}
 }

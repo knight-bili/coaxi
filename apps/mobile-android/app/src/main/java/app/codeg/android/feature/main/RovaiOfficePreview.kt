@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import android.webkit.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -31,8 +34,8 @@ fun RovaiOfficePreview(model:RovaiWorkspaceViewModel,threadId:String,path:String
             while(isActive){delay(30000);model.query(RovaiOperation.OFFICE_WATCH,buildJsonObject{put("scope",scope);if(attachmentLocator!=null)put("attachmentLocator",attachmentLocator);put("operation","heartbeat");put("holdId",id)})}
         }catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message;url=null}finally{url=null;if(generation==model.connectionGeneration)withContext(NonCancellable){runCatching{model.query(RovaiOperation.OFFICE_WATCH,buildJsonObject{put("scope",scope);if(attachmentLocator!=null)put("attachmentLocator",attachmentLocator);put("operation","stop");put("holdId",id)})}}}}
     Dialog(onDismissRequest=onClose,properties=DialogProperties(usePlatformDefaultWidth=false)){Surface(Modifier.fillMaxSize(),color=CodegTheme.colors.bgElevated){Column(Modifier.fillMaxSize().padding(12.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){
-        Row{Text(path.substringAfterLast('/'),Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(onClick=onClose){Text("关闭")}}
-        Row{if(attachmentLocator==null){Checkbox(checked=editable,onCheckedChange={editable=it});Text("允许编辑此文件")}else Text("消息附件只读预览");Spacer(Modifier.weight(1f));TextButton(onClick={retry++}){Text("重新连接")}}
+        Row{Text(path.substringAfterLast('/'),Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(onClick=onClose){Text(stringResource(R.string.rovai_fusion_3fd47edce45b3603))}}
+        Row{if(attachmentLocator==null){Checkbox(checked=editable,onCheckedChange={editable=it});Text(stringResource(R.string.rovai_fusion_b1887b948b3759d3))}else Text(stringResource(R.string.rovai_fusion_428a00a80d4bb1cf));Spacer(Modifier.weight(1f));TextButton(onClick={retry++}){Text(stringResource(R.string.rovai_fusion_68891ab35cab9663))}}
         issue?.let{Text(it,color=CodegTheme.colors.danger)}
         TextButton(onClick={showInstaller=!showInstaller}){Text(if(showInstaller)"收起Office程序管理" else "Office程序管理")}
         if(showInstaller)RovaiOfficeCliSettings(model)

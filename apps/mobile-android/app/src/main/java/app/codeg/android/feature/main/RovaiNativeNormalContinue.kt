@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
@@ -26,12 +29,12 @@ import java.util.UUID
         if(packet==null){val value=nativeUserCall(model,RovaiOperation.RUNTIME_STEER_NORMAL_PREVIEW,buildJsonObject{put("schemaVersion",1);put("sourceCommandId",sourceCommandId)});keep(buildJsonObject{put("preview",value)})};ready=true
     }catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message}finally{busy=false}}
     Dialog(onDismissRequest={if(!busy)onClose()},properties=DialogProperties(usePlatformDefaultWidth=false)){Surface(Modifier.fillMaxWidth().fillMaxHeight(.94f),shape=MaterialTheme.shapes.large){Column(Modifier.padding(16.dp)){
-        Row{Text("整份补充按普通下一轮发送",Modifier.weight(1f),style=MaterialTheme.typography.titleLarge);TextButton(enabled=!busy,onClick=onClose){Text("关闭并保留")}}
+        Row{Text(stringResource(R.string.rovai_fusion_a2f2dc4d85b5d012),Modifier.weight(1f),style=MaterialTheme.typography.titleLarge);TextButton(enabled=!busy,onClick=onClose){Text(stringResource(R.string.rovai_fusion_1b22eb19b0591f21))}}
         issue?.let{Text(it,color=CodegTheme.colors.danger)}
         val preview=packet?.get("preview").coreObject();val original=packet?.get("original").coreObject()
         LazyColumn(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(10.dp)){
-            item{Text("原程序已明确未接收。本次另行确认后按原会话的普通发送和排队规则处理。",color=CodegTheme.colors.textSecondary)}
-            if(preview.isNotEmpty())item{Text(preview["input"].coreObject().coreText("text"));preview["input"].coreObject()["materials"].coreArray().forEach{material->Text(material.coreText("displayName")+" · "+material.coreLong("byteSize")+" B")};Text("当前普通输入框的正文、材料和引用保持原状。本次只发送以上整份输入。",color=CodegTheme.colors.textSecondary)}
+            item{Text(stringResource(R.string.rovai_fusion_2a47e92e8c77448a),color=CodegTheme.colors.textSecondary)}
+            if(preview.isNotEmpty())item{Text(preview["input"].coreObject().coreText("text"));preview["input"].coreObject()["materials"].coreArray().forEach{material->Text(material.coreText("displayName")+" · "+material.coreLong("byteSize")+" B")};Text(stringResource(R.string.rovai_fusion_669199e5a6365a0d),color=CodegTheme.colors.textSecondary)}
             receipt?.let{value->item{val result=value["commandResult"].coreObject();Text(when(value.coreText("state")){"recorded"->if(result.coreText("status")=="rejected")"本次未发送，完整输入保留"else "已按普通消息提交或排队";"failed"->"未完成提交，完整输入保留";"prepared"->"已登记，正在处理原请求";else->"原结果尚未确定，只核对同一编号"});Text(value.coreText("commandId"),style=MaterialTheme.typography.bodySmall);if(result.coreText("status")=="rejected")Text(result.coreText("code"),color=CodegTheme.colors.danger);value.coreText("error").takeIf{it.isNotEmpty()}?.let{Text(it,color=CodegTheme.colors.danger)}}}
         }
         if(receipt?.coreText("state")!in listOf("recorded","failed"))Button(enabled=!disabled&&preview.isNotEmpty(),onClick={work{

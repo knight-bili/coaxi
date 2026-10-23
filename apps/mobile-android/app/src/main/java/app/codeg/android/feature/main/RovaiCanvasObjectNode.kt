@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
@@ -36,11 +39,11 @@ import java.util.UUID
     if(workspace)value?.let{source->if(kind=="task")RovaiTaskEditor(model,threadId,source,projection=taskProjection){workspace=false}else RovaiMissionDetail(model,source,onClose={workspace=false})}
     Dialog(onDismissRequest=onClose,properties=DialogProperties(usePlatformDefaultWidth=false)){
         Surface(Modifier.fillMaxSize(),color=CodegTheme.colors.bgElevated){Column(Modifier.fillMaxSize()){
-            Row(Modifier.fillMaxWidth().padding(12.dp)){Text(when(kind){"task"->"原任务";"mission_diff"->"原使命累计文件变更";else->"原使命"},Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(onClick=onClose){Text("关闭")}}
-            Row(Modifier.padding(horizontal=12.dp)){TextButton(enabled=!busy,onClick={refresh()}){Text("重新读取")};if(kind!="mission_diff")TextButton(enabled=!busy&&value!=null&&state.pending==null,onClick={busy=true;scope.launch{try{load();if(kind=="task"){val snapshot=model.query(RovaiOperation.THREADS_OPEN,buildJsonObject{put("threadId",threadId);put("traceId",UUID.randomUUID().toString())}).coreObject();require(snapshot["thread"].coreObject().coreText("id")==threadId);taskProjection=snapshot};require(generation==model.connectionGeneration);workspace=true}catch(error:Exception){issue=error.message}finally{busy=false}}}){Text("在原工作区操作")}}
+            Row(Modifier.fillMaxWidth().padding(12.dp)){Text(when(kind){"task"->"原任务";"mission_diff"->"原使命累计文件变更";else->"原使命"},Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(onClick=onClose){Text(stringResource(R.string.rovai_fusion_3fd47edce45b3603))}}
+            Row(Modifier.padding(horizontal=12.dp)){TextButton(enabled=!busy,onClick={refresh()}){Text(stringResource(R.string.rovai_fusion_df7392cc96bedc51))};if(kind!="mission_diff")TextButton(enabled=!busy&&value!=null&&state.pending==null,onClick={busy=true;scope.launch{try{load();if(kind=="task"){val snapshot=model.query(RovaiOperation.THREADS_OPEN,buildJsonObject{put("threadId",threadId);put("traceId",UUID.randomUUID().toString())}).coreObject();require(snapshot["thread"].coreObject().coreText("id")==threadId);taskProjection=snapshot};require(generation==model.connectionGeneration);workspace=true}catch(error:Exception){issue=error.message}finally{busy=false}}}){Text(stringResource(R.string.rovai_fusion_4466239862cd54c5))}}
             if(busy)LinearProgressIndicator(Modifier.fillMaxWidth())
             issue?.let{Text(it,color=CodegTheme.colors.danger,modifier=Modifier.padding(12.dp))}
-            if(value!=null&&version!=state.resourceVersion)Text("对象可能已变化，可重新读取。",style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary,modifier=Modifier.padding(horizontal=12.dp))
+            if(value!=null&&version!=state.resourceVersion)Text(stringResource(R.string.rovai_fusion_c4e2b746fdf8e34d),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary,modifier=Modifier.padding(horizontal=12.dp))
             if(kind=="mission_diff"&&value!=null)Box(Modifier.weight(1f)){RovaiCanvasMissionChanges(model,objectId,(target["path"]as?JsonPrimitive)?.contentOrNull,version)}
             else LazyColumn(Modifier.weight(1f),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
                 value?.let{source->item{Text(source.coreText("title"),style=MaterialTheme.typography.titleMedium);MarkdownContent(source.coreText("description"));Text(if(kind=="task")taskStatusName(source.coreText("status"))else missionStatusName(source.coreText("status")))}
@@ -61,10 +64,10 @@ import java.util.UUID
         changes?.let{view->item{if(view.coreText("diffError").isNotEmpty())Text(view.coreText("diffError"),color=CodegTheme.colors.danger);val checkout=view["checkoutState"].coreObject();Text(checkout.coreText("kind")+" · "+checkout.coreText("branch"),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)}
             view["files"].coreArray().filter{path==null||it.coreText("path")==path}.forEach{file->item(key=file.coreText("id")){
                 TextButton(enabled=!busy,onClick={busy=true;scope.launch{try{patch(file,view)}catch(error:Exception){issue=error.message}finally{busy=false}}}){Text(file.coreText("path"))}
-                if(file["binary"]==JsonPrimitive(true))Text("二进制文件")
-                patches[file.coreText("id")]?.let{value->if(value.isEmpty())Text("没有文本行差异")else DiffView(UnifiedDiff.parse(value)?:emptyList())}
+                if(file["binary"]==JsonPrimitive(true))Text(stringResource(R.string.rovai_fusion_4e8c1baac23df745))
+                patches[file.coreText("id")]?.let{value->if(value.isEmpty())Text(stringResource(R.string.rovai_fusion_467b109e0d14f60c))else DiffView(UnifiedDiff.parse(value)?:emptyList())}
             }}
-            if(path==null&&view["files"].coreArray().isEmpty())item{Text("当前没有累计文件变更",color=CodegTheme.colors.textSecondary)}
+            if(path==null&&view["files"].coreArray().isEmpty())item{Text(stringResource(R.string.rovai_fusion_9ec715ee915fdc1c),color=CodegTheme.colors.textSecondary)}
         }
     }
 }

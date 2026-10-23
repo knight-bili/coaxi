@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -60,18 +63,18 @@ fun RovaiPortableProviderSettings(model:RovaiWorkspaceViewModel,onClose:()->Unit
     }
     BackHandler(enabled=editor==null){onClose()}
     LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(12.dp),verticalArrangement=Arrangement.spacedBy(6.dp)){
-        item{Row{TextButton(onClick=onClose,enabled=!busy){Text("返回")};TextButton(onClick={work{load()}},enabled=!busy){Text("刷新")};TextButton(onClick={editor=newPortableProvider()},enabled=!busy&&pending==null&&identity.isNotEmpty()){Text("新增服务商")}}}
-        item{Row(horizontalArrangement=Arrangement.spacedBy(6.dp)){FilterChip(selected=filter.isEmpty(),onClick={filter=""},label={Text("全部")});portableTypes.forEach{(type,name)->FilterChip(selected=filter==type,onClick={filter=type},label={Text(name)})}}}
-        if(pending!=null)item{GlassRow{Text("上次请求尚待核对，未重复发送。");TextButton(onClick={work{val original=pending?:return@work;val result=model.query(RovaiOperation.COMMANDS_RECONCILE,buildJsonObject{put("operation",original["operation"]!!);put("params",buildJsonObject{put("commandId",original["commandId"]!!)})}).coreObject();current();if(result.coreText("state")!="recorded")error("原请求尚无确定回执，请稍后继续核对");accept(result["result"].coreObject())}},enabled=!busy){Text("核对原请求")}}}
+        item{Row{TextButton(onClick=onClose,enabled=!busy){Text(stringResource(R.string.rovai_fusion_572cf45ba43634b3))};TextButton(onClick={work{load()}},enabled=!busy){Text(stringResource(R.string.rovai_fusion_aee88743413144a2))};TextButton(onClick={editor=newPortableProvider()},enabled=!busy&&pending==null&&identity.isNotEmpty()){Text(stringResource(R.string.rovai_fusion_08328eb33ebae59c))}}}
+        item{Row(horizontalArrangement=Arrangement.spacedBy(6.dp)){FilterChip(selected=filter.isEmpty(),onClick={filter=""},label={Text(stringResource(R.string.rovai_fusion_5c55a67935af8f45))});portableTypes.forEach{(type,name)->FilterChip(selected=filter==type,onClick={filter=type},label={Text(name)})}}}
+        if(pending!=null)item{GlassRow{Text(stringResource(R.string.rovai_fusion_916efa5a50693c4f));TextButton(onClick={work{val original=pending?:return@work;val result=model.query(RovaiOperation.COMMANDS_RECONCILE,buildJsonObject{put("operation",original["operation"]!!);put("params",buildJsonObject{put("commandId",original["commandId"]!!)})}).coreObject();current();if(result.coreText("state")!="recorded")error("原请求尚无确定回执，请稍后继续核对");accept(result["result"].coreObject())}},enabled=!busy){Text(stringResource(R.string.rovai_fusion_d027c9aa232e6375))}}}
         if(issue!=null)item{Text(issue!!,color=MaterialTheme.colorScheme.error)}
-        if(providers.isEmpty()&&!busy)item{Text("还没有服务商。新增后，到队员的运行设置中明确选择。",modifier=Modifier.padding(24.dp),color=CodegTheme.colors.textSecondary)}
+        if(providers.isEmpty()&&!busy)item{Text(stringResource(R.string.rovai_fusion_09692c252256f72a),modifier=Modifier.padding(24.dp),color=CodegTheme.colors.textSecondary)}
         items(providers.filter{filter.isEmpty()||it.coreText("agentType")==filter},key={it.coreText("id")}){provider->GlassRow{
             Text(provider.coreText("name"),style=MaterialTheme.typography.titleSmall)
             Text(portableTypes.find{it.first==provider.coreText("agentType")}?.second?:provider.coreText("agentType"),color=CodegTheme.colors.textSecondary)
             Text(provider.coreText("apiUrl"),maxLines=2,color=CodegTheme.colors.textTertiary)
-            Row{TextButton(onClick={work{val original=model.privateConfiguration("provider",buildJsonObject{put("id",provider["id"]!!);put("revision",provider["revision"]!!);put("digest",provider["digest"]!!)});current();editor=original}},enabled=!busy&&pending==null){Text("编辑")};TextButton(onClick={removal=provider},enabled=!busy&&pending==null){Text("移除")}}
+            Row{TextButton(onClick={work{val original=model.privateConfiguration("provider",buildJsonObject{put("id",provider["id"]!!);put("revision",provider["revision"]!!);put("digest",provider["digest"]!!)});current();editor=original}},enabled=!busy&&pending==null){Text(stringResource(R.string.rovai_fusion_051836569928a9f9))};TextButton(onClick={removal=provider},enabled=!busy&&pending==null){Text(stringResource(R.string.rovai_fusion_6135d4159e892541))}}
         }}
-        if(next!=null)item{TextButton(onClick={work{load(true)}},enabled=!busy){Text("加载更多")}}
+        if(next!=null)item{TextButton(onClick={work{load(true)}},enabled=!busy){Text(stringResource(R.string.rovai_fusion_af90a08fec8ee28d))}}
         if(busy)item{LinearProgressIndicator(Modifier.fillMaxWidth())}
     }
     editor?.let{original->PortableProviderEditor(original,busy||pending!=null,onClose={if(!busy)editor=null},onSave={definition,keyMode,key,secretOperation->work{
@@ -82,7 +85,7 @@ fun RovaiPortableProviderSettings(model:RovaiWorkspaceViewModel,onClose:()->Unit
         val command=UUID.randomUUID().toString();rememberPending(buildJsonObject{put("operation","configuration.providers.upsert");put("commandId",command);put("targetId",candidate["id"]!!)})
         val result=model.query(RovaiOperation.CONFIGURATION_PROVIDERS_UPSERT,buildJsonObject{put("schemaVersion",1);put("commandId",command);put("expectedRevision",original.coreLong("revision"));put("definition",candidate)}).coreObject();current();accept(result)
     }})}
-    removal?.let{provider->AlertDialog(onDismissRequest={if(!busy)removal=null},title={Text("移除服务商")},text={Text("移除 ${provider.coreText("name")} 后，不再用于新的选择；历史任务仍保留原版本。")},dismissButton={TextButton(onClick={removal=null},enabled=!busy){Text("取消")}},confirmButton={TextButton(enabled=!busy&&pending==null,onClick={work{val command=UUID.randomUUID().toString();rememberPending(buildJsonObject{put("operation","configuration.providers.remove");put("commandId",command);put("targetId",provider["id"]!!)});val result=model.query(RovaiOperation.CONFIGURATION_PROVIDERS_REMOVE,buildJsonObject{put("schemaVersion",1);put("commandId",command);put("id",provider["id"]!!);put("expectedRevision",provider["revision"]!!)}).coreObject();current();accept(result)}}){Text("移除")}})}
+    removal?.let{provider->AlertDialog(onDismissRequest={if(!busy)removal=null},title={Text(stringResource(R.string.rovai_fusion_4fe918315cb93f73))},text={Text("移除 ${provider.coreText("name")} 后，不再用于新的选择；历史任务仍保留原版本。")},dismissButton={TextButton(onClick={removal=null},enabled=!busy){Text(stringResource(R.string.rovai_fusion_2cd0f3be8738a86c))}},confirmButton={TextButton(enabled=!busy&&pending==null,onClick={work{val command=UUID.randomUUID().toString();rememberPending(buildJsonObject{put("operation","configuration.providers.remove");put("commandId",command);put("targetId",provider["id"]!!)});val result=model.query(RovaiOperation.CONFIGURATION_PROVIDERS_REMOVE,buildJsonObject{put("schemaVersion",1);put("commandId",command);put("id",provider["id"]!!);put("expectedRevision",provider["revision"]!!)}).coreObject();current();accept(result)}}){Text(stringResource(R.string.rovai_fusion_6135d4159e892541))}})}
 }
 
 @Composable
@@ -102,7 +105,7 @@ private fun PortableProviderEditor(original:JsonObject,disabled:Boolean,onClose:
         CodegTextField(value.coreText("apiUrl"),{field("apiUrl",it)},"接口地址",mono=true)
         Row{listOf("keep" to "保留密钥","replace" to "替换","clear" to "清空").forEach{(mode,name)->FilterChip(selected=keyMode==mode,onClick={keyMode=mode},enabled=!disabled,label={Text(name)})}}
         if(keyMode=="replace")SecretField(key,{key=it;secretOperation=UUID.randomUUID().toString()},"API密钥")
-        Row{Text("允许新的选择",modifier=Modifier.weight(1f));Switch(checked=value["enabled"]==JsonPrimitive(true),onCheckedChange={value=value.withField("enabled",JsonPrimitive(it))},enabled=!disabled)}
+        Row{Text(stringResource(R.string.rovai_fusion_b17021e56396dfcc),modifier=Modifier.weight(1f));Switch(checked=value["enabled"]==JsonPrimitive(true),onCheckedChange={value=value.withField("enabled",JsonPrimitive(it))},enabled=!disabled)}
         when(type){
             "claude_code"->claudeFields.forEach{(name,label)->CodegTextField(settings.coreText(name),{modelField(name,JsonPrimitive(it))},label)}
             "gemini"->CodegTextField(settings.coreText("model"),{modelField("model",it.takeIf(String::isNotBlank)?.let(::JsonPrimitive)?:JsonNull)},"模型（可选）")
@@ -114,16 +117,16 @@ private fun PortableProviderEditor(original:JsonObject,disabled:Boolean,onClose:
                     CodegTextField(row.coreText("contextWindow"),{custom(index,"contextWindow",if(it.isBlank())JsonNull else it.toLongOrNull()?.let(::JsonPrimitive)?:JsonPrimitive(it))},"上下文窗口（可选）")
                     CodegTextField(row.coreText("base"),{custom(index,"base",JsonPrimitive(it))},"基于官方模型")
                     RovaiPortableCodexOverrides(row["overrides"].coreObject(),disabled){custom(index,"overrides",it)}
-                    TextButton(onClick={modelField("customs",JsonArray(settings["customs"].coreArray().filterIndexed{i,_->i!=index}))},enabled=!disabled){Text("移除此模型")}
+                    TextButton(onClick={modelField("customs",JsonArray(settings["customs"].coreArray().filterIndexed{i,_->i!=index}))},enabled=!disabled){Text(stringResource(R.string.rovai_fusion_bca0038ea705f998))}
                 }
-                TextButton(onClick={modelField("customs",JsonArray(settings["customs"].coreArray()+buildJsonObject{put("slug","");put("displayName","");put("contextWindow",JsonNull);put("base","");put("overrides",buildJsonObject{})}))},enabled=!disabled){Text("添加自定义模型")}
+                TextButton(onClick={modelField("customs",JsonArray(settings["customs"].coreArray()+buildJsonObject{put("slug","");put("displayName","");put("contextWindow",JsonNull);put("base","");put("overrides",buildJsonObject{})}))},enabled=!disabled){Text(stringResource(R.string.rovai_fusion_97f48676e143269c))}
                 CodegTextField(settings["excludedOfficials"]?.jsonArray?.joinToString("\n"){it.jsonPrimitive.content}?:"",{modelField("excludedOfficials",JsonArray(it.lines().map(String::trim).filter(String::isNotEmpty).map(::JsonPrimitive)))},"隐藏的官方模型（每行一个）",singleLine=false)
                 CodegTextField(settings.coreText("default"),{modelField("default",it.takeIf(String::isNotBlank)?.let(::JsonPrimitive)?:JsonNull)},"默认模型（可选）")
             }
         }
         if(issue!=null)Text(issue!!,color=MaterialTheme.colorScheme.error)
-    }},dismissButton={TextButton(onClick={close()},enabled=!disabled){Text("取消")}},confirmButton={TextButton(enabled=!disabled&&value.coreText("name").isNotBlank()&&value.coreText("apiUrl").isNotBlank()&&(keyMode!="replace"||key.isNotBlank()),onClick={
+    }},dismissButton={TextButton(onClick={close()},enabled=!disabled){Text(stringResource(R.string.rovai_fusion_2cd0f3be8738a86c))}},confirmButton={TextButton(enabled=!disabled&&value.coreText("name").isNotBlank()&&value.coreText("apiUrl").isNotBlank()&&(keyMode!="replace"||key.isNotBlank()),onClick={
         try{var candidate=value.filterKeys{it !in setOf("revision","digest","createdAt","updatedAt")}.let(::JsonObject);issue=null;onSave(candidate,keyMode,key,secretOperation)}catch(error:Exception){issue="请检查高级模型目录与数字字段"}
-    }){Text("保存")}})
-    if(discard)AlertDialog(onDismissRequest={discard=false},title={Text("放弃本次编辑？")},text={Text("未保存的地址、模型和密钥输入会丢弃。")},dismissButton={TextButton(onClick={discard=false}){Text("继续编辑")}},confirmButton={TextButton(onClick=onClose){Text("放弃编辑")}})
+    }){Text(stringResource(R.string.rovai_fusion_a3030bf8f16dc63c))}})
+    if(discard)AlertDialog(onDismissRequest={discard=false},title={Text(stringResource(R.string.rovai_fusion_85a9990cca9a9fa0))},text={Text(stringResource(R.string.rovai_fusion_a46a02c27a7e7adc))},dismissButton={TextButton(onClick={discard=false}){Text(stringResource(R.string.rovai_fusion_fd4b9e3b6c685bae))}},confirmButton={TextButton(onClick=onClose){Text(stringResource(R.string.rovai_fusion_17f1ff1b24ca2d7d))}})
 }

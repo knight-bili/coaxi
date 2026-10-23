@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import android.annotation.SuppressLint
 import android.webkit.*
 import androidx.compose.foundation.layout.*
@@ -36,12 +39,12 @@ import java.util.UUID
     }catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message?:"交互卡片资源尚未准备"}}
     Dialog(onDismissRequest=onClose,properties=DialogProperties(usePlatformDefaultWidth=false)){
         Surface(Modifier.fillMaxSize(),color=CodegTheme.colors.bgElevated){Column(Modifier.fillMaxSize()){
-            Row(Modifier.fillMaxWidth().padding(12.dp)){Text("交互卡片",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(onClick=onClose){Text("关闭")}}
+            Row(Modifier.fillMaxWidth().padding(12.dp)){Text(stringResource(R.string.rovai_fusion_2a63d74963d5ed3d),Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(onClick=onClose){Text(stringResource(R.string.rovai_fusion_3fd47edce45b3603))}}
             issue?.let{Text(it,color=CodegTheme.colors.danger,modifier=Modifier.padding(16.dp))}
             val value=card
             if(value==null&&issue==null)LinearProgressIndicator(Modifier.fillMaxWidth())
             if(value!=null){
-                if(value.coreLong("cardCount")>1)Row(Modifier.padding(horizontal=12.dp)){TextButton(enabled=index>0,onClick={index--}){Text("上一张")};Text("${index+1}/${value.coreLong("cardCount")}");TextButton(enabled=index+1<value.coreLong("cardCount"),onClick={index++}){Text("下一张")}}
+                if(value.coreLong("cardCount")>1)Row(Modifier.padding(horizontal=12.dp)){TextButton(enabled=index>0,onClick={index--}){Text(stringResource(R.string.rovai_fusion_bcf200709dbc7ff4))};Text("${index+1}/${value.coreLong("cardCount")}");TextButton(enabled=index+1<value.coreLong("cardCount"),onClick={index++}){Text(stringResource(R.string.rovai_fusion_dcd4eb0273699416))}}
                 key(value){
                     val channel=remember{UUID.randomUUID().toString()};val previews=remember{mutableSetOf<String>()};val requests=remember{mutableSetOf<String>()};val retired=remember{mutableStateOf(false)}
                     AndroidView(Modifier.fillMaxWidth().weight(1f),factory={nativeContext->WebView(nativeContext).apply{

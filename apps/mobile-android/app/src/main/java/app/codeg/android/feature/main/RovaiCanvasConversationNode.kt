@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import app.codeg.android.core.network.RovaiOperation
@@ -25,5 +28,5 @@ import java.util.UUID
         }
     }catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message}}
     if(ready&&conversationId!=null)RovaiPrivateConversation(model,threadId,initialConversationId=conversationId,onClose=onClose)
-    else AlertDialog(onDismissRequest=onClose,title={Text("打开原会话")},text={Text(issue?:"正在核对卡片绑定和原会话…")},confirmButton={TextButton(onClick=onClose){Text("关闭")}},dismissButton={if(issue!=null)TextButton(onClick={retry++}){Text("重新读取")}})
+    else AlertDialog(onDismissRequest=onClose,title={Text(stringResource(R.string.rovai_fusion_a64437a35f8f6f20))},text={Text(issue?:"正在核对卡片绑定和原会话…")},confirmButton={TextButton(onClick=onClose){Text(stringResource(R.string.rovai_fusion_3fd47edce45b3603))}},dismissButton={if(issue!=null)TextButton(onClick={retry++}){Text(stringResource(R.string.rovai_fusion_df7392cc96bedc51))}})
 }

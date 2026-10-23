@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -38,12 +41,12 @@ private fun emptyConversationFlags()=buildJsonObject{conversationFeatures.forEac
     val global=policy?.get("globalFlags").coreObject();val flags=policy?.get("members").coreArray().firstOrNull{it.coreText("agentId")==agentId}?.get("flags").coreObject().ifEmpty{emptyConversationFlags()}
     val enabled=!busy&&policy!=null&&pending==null&&!state.busy&&state.pending==null&&generation==model.connectionGeneration
     Column(verticalArrangement=Arrangement.spacedBy(6.dp)){
-        Text("提问与后续工作",style=MaterialTheme.typography.titleSmall)
+        Text(stringResource(R.string.rovai_fusion_cbe5cfa033e39df4),style=MaterialTheme.typography.titleSmall)
         TextButton(onClick={expanded=!expanded}){Text(if(expanded)"收起全局工具开关" else "全局工具开关")}
-        if(expanded){conversationFeatures.forEach{(key,label)->Row{Text("允许分配：$label",Modifier.weight(1f));Switch(checked=global[key]==JsonPrimitive(true),enabled=enabled,onCheckedChange={checked->save(global=buildJsonObject{global.forEach{(name,value)->put(name,value)};put(key,checked)})})}};Text("文字与卡片反馈总开关",style=MaterialTheme.typography.labelMedium);listOf("沿用原反馈设置" to JsonNull,"新执行关闭反馈" to JsonPrimitive(false),"允许原已开启队员" to JsonPrimitive(true)).forEach{(label,value)->FilterChip(selected=(policy?.get("feedbackGate")?:JsonNull)==value,onClick={save(feedback=value)},enabled=enabled,label={Text(label)})}}
-        conversationFeatures.forEach{(key,label)->Row{Column(Modifier.weight(1f)){Text(label);if(global[key]!=JsonPrimitive(true))Text("总开关当前关闭",style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)};Switch(checked=flags[key]==JsonPrimitive(true),enabled=enabled,onCheckedChange={checked->save(memberFlags=buildJsonObject{flags.forEach{(name,value)->put(name,value)};put(key,checked)})})}}
-        Text("总开关与此队员分配同时开启才生效，仍需程序支持。只影响新任务；原Rovai内置工具继续使用自己的授权。",style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)
-        pending?.let{original->TextButton(enabled=!busy&&generation==model.connectionGeneration,onClick={work{val value=nativeUserCall(model,RovaiOperation.COMMANDS_RECONCILE,buildJsonObject{put("operation","conversationTools.policy.set");putJsonObject("params"){put("commandId",original.coreText("commandId"))}});require(value.coreText("state")=="recorded"){"原设置还没有确定回执，没有重复保存"};accept(value["result"].coreObject(),original)}}){Text("核对原保存请求")}}
+        if(expanded){conversationFeatures.forEach{(key,label)->Row{Text("允许分配：$label",Modifier.weight(1f));Switch(checked=global[key]==JsonPrimitive(true),enabled=enabled,onCheckedChange={checked->save(global=buildJsonObject{global.forEach{(name,value)->put(name,value)};put(key,checked)})})}};Text(stringResource(R.string.rovai_fusion_df527163c81d0aa6),style=MaterialTheme.typography.labelMedium);listOf("沿用原反馈设置" to JsonNull,"新执行关闭反馈" to JsonPrimitive(false),"允许原已开启队员" to JsonPrimitive(true)).forEach{(label,value)->FilterChip(selected=(policy?.get("feedbackGate")?:JsonNull)==value,onClick={save(feedback=value)},enabled=enabled,label={Text(label)})}}
+        conversationFeatures.forEach{(key,label)->Row{Column(Modifier.weight(1f)){Text(label);if(global[key]!=JsonPrimitive(true))Text(stringResource(R.string.rovai_fusion_685678c3e11f69a3),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)};Switch(checked=flags[key]==JsonPrimitive(true),enabled=enabled,onCheckedChange={checked->save(memberFlags=buildJsonObject{flags.forEach{(name,value)->put(name,value)};put(key,checked)})})}}
+        Text(stringResource(R.string.rovai_fusion_2f9bc0b7f206d70d),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)
+        pending?.let{original->TextButton(enabled=!busy&&generation==model.connectionGeneration,onClick={work{val value=nativeUserCall(model,RovaiOperation.COMMANDS_RECONCILE,buildJsonObject{put("operation","conversationTools.policy.set");putJsonObject("params"){put("commandId",original.coreText("commandId"))}});require(value.coreText("state")=="recorded"){"原设置还没有确定回执，没有重复保存"};accept(value["result"].coreObject(),original)}}){Text(stringResource(R.string.rovai_fusion_38ec197a5eb4bec8))}}
         issue?.let{Text(it,style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.danger)}
     }
 }

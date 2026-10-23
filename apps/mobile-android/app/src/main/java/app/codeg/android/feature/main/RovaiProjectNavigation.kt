@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -36,14 +39,14 @@ fun RovaiProjectNavigation(model:RovaiWorkspaceViewModel){
     if(managing)RovaiProjectGroups(model){managing=false;refresh++}
     val sections=projectNavigationSections(snapshot,state.navigation["projects"].coreArray(),folders)
     LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
-        item{Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Text("项目与对话",style=MaterialTheme.typography.titleSmall);TextButton(onClick={managing=true}){Text("管理分组")}};issue?.let{Text(it,color=CodegTheme.colors.danger);TextButton(onClick={refresh++}){Text("重新读取分组")}}}
-        val quick=state.navigation["quickChat"].coreObject()["recentThreads"].coreArray();if(quick.isNotEmpty()){item{Text("快速对话",style=MaterialTheme.typography.titleSmall)};items(quick,key={"quick:"+it.coreText("id")}){RovaiThreadRow(it){model.openThread(it.coreText("id"))}}}
+        item{Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Text(stringResource(R.string.rovai_fusion_797eba09d6beb579),style=MaterialTheme.typography.titleSmall);TextButton(onClick={managing=true}){Text(stringResource(R.string.rovai_fusion_25c3aad45894871b))}};issue?.let{Text(it,color=CodegTheme.colors.danger);TextButton(onClick={refresh++}){Text(stringResource(R.string.rovai_fusion_c4dab4b4f78a8fdf))}}}
+        val quick=state.navigation["quickChat"].coreObject()["recentThreads"].coreArray();if(quick.isNotEmpty()){item{Text(stringResource(R.string.rovai_fusion_7b0df27853e6f545),style=MaterialTheme.typography.titleSmall)};items(quick,key={"quick:"+it.coreText("id")}){RovaiThreadRow(it){model.openThread(it.coreText("id"))}}}
         sections.forEach{section->val groupId=section.groupId
             if(groupId!=null)item(key=section.id){Row(Modifier.fillMaxWidth().clickable(enabled=ready){toggle(groupId)}.padding(vertical=8.dp),horizontalArrangement=Arrangement.spacedBy(8.dp)){Icon(if(groupId in collapsed)Icons.Outlined.ChevronRight else Icons.Outlined.ExpandMore,if(groupId in collapsed)"展开分组"else"收起分组");Icon(Icons.Outlined.Folder,null);Text(section.name,Modifier.weight(1f),style=MaterialTheme.typography.titleSmall);Text(section.projects.size.toString(),color=CodegTheme.colors.textSecondary)}}
             if(groupId==null||groupId !in collapsed){
-                if(groupId!=null&&section.projects.isEmpty())item{Text("分组中暂无已登记的工程",color=CodegTheme.colors.textSecondary,modifier=Modifier.padding(start=24.dp))}
+                if(groupId!=null&&section.projects.isEmpty())item{Text(stringResource(R.string.rovai_fusion_6fdc62b6d1f2b2cf),color=CodegTheme.colors.textSecondary,modifier=Modifier.padding(start=24.dp))}
                 section.projects.forEach{project->val path=project.coreText("projectPath");val inset=if(groupId!=null)24.dp else 0.dp
-                    item(key="project:$path"){Column(Modifier.padding(start=inset)){Text(project.coreText("name"),style=MaterialTheme.typography.titleSmall);if(folders[path]?.complete==false)Text("工作树关系待核对",style=MaterialTheme.typography.labelSmall,color=CodegTheme.colors.textSecondary)}}
+                    item(key="project:$path"){Column(Modifier.padding(start=inset)){Text(project.coreText("name"),style=MaterialTheme.typography.titleSmall);if(folders[path]?.complete==false)Text(stringResource(R.string.rovai_fusion_f9c44816dfbff147),style=MaterialTheme.typography.labelSmall,color=CodegTheme.colors.textSecondary)}}
                     items(project["recentThreads"].coreArray(),key={"$path:"+it.coreText("id")}){thread->Box(Modifier.padding(start=inset)){RovaiThreadRow(thread){model.openThread(thread.coreText("id"))}}}
                     item(key="more:$path"){Box(Modifier.padding(start=inset)){RovaiMoreThreads(model,path,project.coreLong("totalCount").toInt(),project["recentThreads"].coreArray().map{it.coreText("id")}.toSet())}}
                 }

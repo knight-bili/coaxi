@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -37,11 +40,11 @@ fun RovaiSkillSettings(model:RovaiWorkspaceViewModel){
     val disabled=state.pending!=null||state.busy||loading
     fun localized(value:JsonElement?):String{val objectValue=value.coreObject();return objectValue.coreText("zh-CN").ifEmpty{objectValue.coreText("zh").ifEmpty{objectValue.coreText("en")}}}
     LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
-        item{TextButton(onClick={native=true}){Text("查看原生 Skills")}}
-        item{Row(Modifier.fillMaxWidth()){if(selected!=null)TextButton(onClick={selected=null}){Text("返回技能库")};TextButton(onClick={scope.launch{load()}},enabled=!disabled){Text("刷新")}}}
+        item{TextButton(onClick={native=true}){Text(stringResource(R.string.rovai_fusion_a7e6636d42fc542c))}}
+        item{Row(Modifier.fillMaxWidth()){if(selected!=null)TextButton(onClick={selected=null}){Text(stringResource(R.string.rovai_fusion_8bf997158c7a5b04))};TextButton(onClick={scope.launch{load()}},enabled=!disabled){Text(stringResource(R.string.rovai_fusion_aee88743413144a2))}}}
         issue?.let{item{Text(it,color=CodegTheme.colors.danger)}}
         if(entry==null){
-            item{OutlinedTextField(value=query,onValueChange={query=it},label={Text("搜索技能")},modifier=Modifier.fillMaxWidth())}
+            item{OutlinedTextField(value=query,onValueChange={query=it},label={Text(stringResource(R.string.rovai_fusion_43b9d66b88a87f61))},modifier=Modifier.fillMaxWidth())}
             item{Row(horizontalArrangement=Arrangement.spacedBy(4.dp)){listOf("all" to "全部","experts" to "专家","science" to "科研").forEach{(id,title)->FilterChip(selected=family==id,onClick={family=id},label={Text(title)})}}}
             item{Row(horizontalArrangement=Arrangement.spacedBy(4.dp)){listOf("office" to "Office","ui" to "交互卡片","custom" to "自定义").forEach{(id,title)->FilterChip(selected=family==id,onClick={family=id},label={Text(title)})}}}
             items(catalog["entries"].coreArray().filter{(family=="all"||it.coreText("family")==family)&&("${it.coreText("id")} ${localized(it["displayName"])} ${localized(it["description"])}").contains(query,true)},key={it.coreText("id")}){skill->
@@ -52,23 +55,23 @@ fun RovaiSkillSettings(model:RovaiWorkspaceViewModel){
             item{GlassRow(Modifier.fillMaxWidth()){
                 Text(localized(entry["displayName"]).ifEmpty{entry.coreText("id")},style=MaterialTheme.typography.titleLarge);Text(localized(entry["description"]),color=CodegTheme.colors.textSecondary)
                 Text("来源：${entry.coreText("sourceUrl")}\n版本：${catalog.coreText("commit").take(12)}",style=MaterialTheme.typography.bodySmall)
-                if((entry["needsKey"] as? JsonPrimitive)?.booleanOrNull==true)Text("需要外部服务凭据。")
-                if((entry["needsEnv"] as? JsonPrimitive)?.booleanOrNull==true)Text("可能需要额外环境；安装技能不会自动安装依赖。")
+                if((entry["needsKey"] as? JsonPrimitive)?.booleanOrNull==true)Text(stringResource(R.string.rovai_fusion_b5f91f44318cc189))
+                if((entry["needsEnv"] as? JsonPrimitive)?.booleanOrNull==true)Text(stringResource(R.string.rovai_fusion_b50f3ec00854d77d))
                 Row(horizontalArrangement=Arrangement.spacedBy(10.dp)){
                     if(entry.coreText("contentSource") in listOf("embedded","custom"))Button(enabled=!disabled,onClick={val custom=entry.coreText("contentSource")=="custom";model.command(if(custom)RovaiOperation.SKILLPACKS_CUSTOM_INSTALL else RovaiOperation.SKILLPACKS_INSTALL,buildJsonObject{put("skillId",entry.coreText("id"));put("expectedVersion",installed?.coreText("version")?:"absent");put("sourceRevision",if(custom)entry.coreText("loadId") else catalog.coreText("commit"))})}){Text(if(installed?.coreText("status")=="installed")"更新安装" else "安装")}
-                    if(installed?.coreText("status")=="installed")TextButton(enabled=!disabled,onClick={remove=installed}){Text("卸载")}
+                    if(installed?.coreText("status")=="installed")TextButton(enabled=!disabled,onClick={remove=installed}){Text(stringResource(R.string.rovai_fusion_06bc14b60f3598a3))}
                 }
             }}
             if((members?.get("installed") as? JsonPrimitive)?.booleanOrNull==true){
-                item{Text("谁可以使用",style=MaterialTheme.typography.titleMedium);Text("用于队员的新任务；取消选择不改写旧任务。",color=CodegTheme.colors.textSecondary)}
+                item{Text(stringResource(R.string.rovai_fusion_bd37181b53c2715d),style=MaterialTheme.typography.titleMedium);Text(stringResource(R.string.rovai_fusion_3122a69b1fdfd0eb),color=CodegTheme.colors.textSecondary)}
                 items(state.members.filter{it.coreText("presence")!="removed"},key={it.coreText("agentId")}){member->val picked=(members?.get("memberIds") as? JsonArray)?.mapNotNull{(it as? JsonPrimitive)?.contentOrNull}?.toSet()?:emptySet();val id=member.coreText("agentId")
                     GlassRow(Modifier.fillMaxWidth()){Row{Text(member.coreText("displayName"),Modifier.weight(1f));Checkbox(checked=id in picked,enabled=!disabled,onCheckedChange={checked->model.command(RovaiOperation.SKILLPACKS_MEMBERS_SET,buildJsonObject{put("skillId",selected);put("expectedVersion",members!!.coreText("version"));put("memberIds",JsonArray((if(checked)picked+id else picked-id).sorted().map(::JsonPrimitive)))})})}}
                 }
             }
-            item{Text("附带文件",style=MaterialTheme.typography.titleMedium)}
+            item{Text(stringResource(R.string.rovai_fusion_9d48c251f55a113b),style=MaterialTheme.typography.titleMedium)}
             items(content["files"].coreArray(),key={it.coreText("path")}){file->TextButton(onClick={path=file.coreText("path")}){Text(file.coreText("path"))}}
             item{if(content.coreText("status")=="text")MarkdownContent(content.coreText("content"))else if(content.coreText("status").isNotEmpty())Text(if(content.coreText("status")=="binary")"该文件不是文本文件。" else "文件较大，暂不支持正文预览。")}
         }
     }
-    remove?.let{target->AlertDialog(onDismissRequest={if(!disabled)remove=null},title={Text("卸载技能包")},text={Text("保留文件和历史版本；重新安装后不会自动恢复队员选择。")},confirmButton={TextButton(enabled=!disabled,onClick={model.command(RovaiOperation.SKILLPACKS_UNINSTALL,buildJsonObject{put("skillId",target.coreText("skillId"));put("expectedVersion",target.coreText("version"))});remove=null}){Text("确认卸载")}},dismissButton={TextButton(enabled=!disabled,onClick={remove=null}){Text("取消")}})}
+    remove?.let{target->AlertDialog(onDismissRequest={if(!disabled)remove=null},title={Text(stringResource(R.string.rovai_fusion_f34442ed97ee0e38))},text={Text(stringResource(R.string.rovai_fusion_54caaf8cf78cccee))},confirmButton={TextButton(enabled=!disabled,onClick={model.command(RovaiOperation.SKILLPACKS_UNINSTALL,buildJsonObject{put("skillId",target.coreText("skillId"));put("expectedVersion",target.coreText("version"))});remove=null}){Text(stringResource(R.string.rovai_fusion_4fec200ac3f7fc85))}},dismissButton={TextButton(enabled=!disabled,onClick={remove=null}){Text(stringResource(R.string.rovai_fusion_2cd0f3be8738a86c))}})}
 }

@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
@@ -24,9 +27,9 @@ fun RovaiNotificationSettings(model:RovaiWorkspaceViewModel){
     val disabled=loading||state.busy||state.pending!=null||preference==null;val enabled=preference?.get("headsUpEnabled")==JsonPrimitive(true)
     fun update(key:String,value:JsonElement){val current=preference?:return;model.command(RovaiOperation.NOTIFICATIONS_PREFERENCE_UPDATE,buildJsonObject{put("expectedVersion",current["version"]!!);(listOf("headsUpEnabled")+reminderGroups.flatMap{it.second.map{it.first}}+listOf("missionStatuses","taskStatuses")).forEach{name->put(name,if(name==key)value else current[name]?:JsonNull)}})}
     LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
-        item{Row{Text("提醒",Modifier.weight(1f),style=MaterialTheme.typography.titleLarge);TextButton(enabled=!disabled,onClick={scope.launch{load()}}){Text("刷新")}}}
+        item{Row{Text(stringResource(R.string.rovai_fusion_8f29b3132ccf2182),Modifier.weight(1f),style=MaterialTheme.typography.titleLarge);TextButton(enabled=!disabled,onClick={scope.launch{load()}}){Text(stringResource(R.string.rovai_fusion_aee88743413144a2))}}}
         issue?.let{item{Text(it,color=CodegTheme.colors.danger)}}
-        item{GlassRow(Modifier.fillMaxWidth()){Row{Text("应用内提醒",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);Switch(checked=enabled,onCheckedChange={update("headsUpEnabled",JsonPrimitive(it))},enabled=!disabled)}}}
+        item{GlassRow(Modifier.fillMaxWidth()){Row{Text(stringResource(R.string.rovai_fusion_bfb8c9d2e1dc9d43),Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);Switch(checked=enabled,onCheckedChange={update("headsUpEnabled",JsonPrimitive(it))},enabled=!disabled)}}}
         reminderGroups.forEach{(title,categories)->item{GlassRow(Modifier.fillMaxWidth()){Text(title,style=MaterialTheme.typography.titleMedium);categories.forEach{(key,label)->Row{Text(label,Modifier.weight(1f));Switch(checked=preference?.get(key)==JsonPrimitive(true),onCheckedChange={update(key,JsonPrimitive(it))},enabled=!disabled&&enabled)}};val filter=when(title){"使命"->"missionStatuses";"任务"->"taskStatuses";else->null};if(filter!=null){val selected=(preference?.get(filter) as? JsonArray)?.mapNotNull{(it as? JsonPrimitive)?.contentOrNull}?.toSet()?:emptySet();reminderStatuses[filter].orEmpty().forEach{(id,label)->Row{Checkbox(checked=id in selected,onCheckedChange={checked->update(filter,JsonArray(reminderStatuses[filter].orEmpty().filter{if(it.first==id)checked else it.first in selected}.map{JsonPrimitive(it.first)}))},enabled=!disabled&&enabled&&preference?.get(if(filter=="missionStatuses")"missionStatusHeadsUpEnabled" else "taskStatusHeadsUpEnabled")==JsonPrimitive(true));Text(label)}}}}}}
     }
 }

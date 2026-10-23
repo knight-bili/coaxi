@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,31 +33,31 @@ fun RovaiHostLoggingSettings(model:RovaiWorkspaceViewModel,onClose:()->Unit){
     LaunchedEffect(generation){busy=true;try{identity=model.presentationIdentity();read()}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message?:"无法读取主机日志设置"}finally{busy=false}}
     BackHandler{if(!busy){if(dirty)leaving=true else onClose()}}
     LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(12.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
-        item{TextButton(enabled=!busy,onClick={if(dirty)leaving=true else onClose()}){Text("返回")};Text("主机日志输出",style=MaterialTheme.typography.titleLarge)}
-        if(!writable)item{Text("这台主机的日志设置由桌面程序管理，请在主机桌面设置中修改。")}
+        item{TextButton(enabled=!busy,onClick={if(dirty)leaving=true else onClose()}){Text(stringResource(R.string.rovai_fusion_572cf45ba43634b3))};Text(stringResource(R.string.rovai_fusion_bd2fa279cb38bfc0),style=MaterialTheme.typography.titleLarge)}
+        if(!writable)item{Text(stringResource(R.string.rovai_fusion_2901ae7659287b03))}
         else{
-            item{Text("调整独立主机结构化诊断日志的详细程度。原始故障记录、运行状态、审批和操作回执照常保留。")}
-            item{GlassRow{Text("默认级别");HostLogLevelPicker(draft.coreText("level"),!busy&&saved!=null){setField("level",JsonPrimitive(it))}}}
+            item{Text(stringResource(R.string.rovai_fusion_80edc20e0e499452))}
+            item{GlassRow{Text(stringResource(R.string.rovai_fusion_4356a2dd08a4fd69));HostLogLevelPicker(draft.coreText("level"),!busy&&saved!=null){setField("level",JsonPrimitive(it))}}}
             val targets=draft["targets"].coreArray()
             items(targets.size){index->val row=targets[index].coreObject();GlassRow{
                 CodegTextField(value=row.coreText("target"),onValueChange={if(!busy)setTarget(index,"target",it)},label="日志目标")
                 HostLogLevelPicker(row.coreText("level"),!busy){setTarget(index,"level",it)}
-                TextButton(enabled=!busy,onClick={setField("targets",JsonArray(targets.filterIndexed{at,_->at!=index}))}){Text("移除目标")}
+                TextButton(enabled=!busy,onClick={setField("targets",JsonArray(targets.filterIndexed{at,_->at!=index}))}){Text(stringResource(R.string.rovai_fusion_ffd1cbb10f4682cf))}
             }}
-            item{TextButton(enabled=!busy&&saved!=null&&targets.size<1024,onClick={setField("targets",JsonArray(targets+buildJsonObject{put("target","");put("level","info")}))}){Text("添加日志目标")}}
+            item{TextButton(enabled=!busy&&saved!=null&&targets.size<1024,onClick={setField("targets",JsonArray(targets+buildJsonObject{put("target","");put("level","info")}))}){Text(stringResource(R.string.rovai_fusion_21a6243d5b17165e))}}
             item{Row{
                 TextButton(enabled=!busy&&saved!=null&&dirty,onClick={work{
                     val names=draft["targets"].coreArray().map{it.coreObject().coreText("target")};require(names.all{Regex("^[a-zA-Z0-9_.:-]{1,256}$").matches(it)}&&names.distinct().size==names.size){"请填写有效且不重复的日志目标名称"}
                     val value=model.privateConfiguration("logging",buildJsonObject{put("operation","set");put("expectedDigest",saved!!["digest"]!!);put("settings",draft)});current();saved=value;draft=value["settings"].coreObject()
-                }}){Text("保存日志设置")}
-                TextButton(enabled=!busy&&dirty,onClick={draft=saved!!["settings"].coreObject()}){Text("放弃修改")}
+                }}){Text(stringResource(R.string.rovai_fusion_9c4430e41a593e39))}
+                TextButton(enabled=!busy&&dirty,onClick={draft=saved!!["settings"].coreObject()}){Text(stringResource(R.string.rovai_fusion_9b7824cefa1e8b16))}
             }}
         }
-        item{TextButton(enabled=!busy&&!dirty,onClick={work{read()}}){Text("重新读取已保存设置")}}
+        item{TextButton(enabled=!busy&&!dirty,onClick={work{read()}}){Text(stringResource(R.string.rovai_fusion_7cc968ec89a878db))}}
         if(issue!=null)item{Text(issue!!,color=MaterialTheme.colorScheme.error)}
         if(busy)item{LinearProgressIndicator(Modifier.fillMaxWidth())}
     }
-    if(leaving)AlertDialog(onDismissRequest={leaving=false},title={Text("放弃未保存的日志修改？")},confirmButton={TextButton(onClick={leaving=false;onClose()}){Text("放弃并返回")}},dismissButton={TextButton(onClick={leaving=false}){Text("继续编辑")}})
+    if(leaving)AlertDialog(onDismissRequest={leaving=false},title={Text(stringResource(R.string.rovai_fusion_dc6a4d4a9d744f6a))},confirmButton={TextButton(onClick={leaving=false;onClose()}){Text(stringResource(R.string.rovai_fusion_02106a70a2eb370b))}},dismissButton={TextButton(onClick={leaving=false}){Text(stringResource(R.string.rovai_fusion_fd4b9e3b6c685bae))}})
 }
 @Composable
 private fun HostLogLevelPicker(value:String,enabled:Boolean,onChange:(String)->Unit){

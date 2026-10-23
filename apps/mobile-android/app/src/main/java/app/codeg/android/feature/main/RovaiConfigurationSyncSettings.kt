@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -36,34 +39,34 @@ fun RovaiConfigurationSyncSettings(model:RovaiWorkspaceViewModel,onClose:()->Uni
     val active=saved["state"].coreObject().coreText("activeCommandId");val phase=saved["state"].coreObject().coreText("phase")
     val blocked=busy||identity.isEmpty();val interval=(draft["intervalMinutes"] as? JsonPrimitive)?.intOrNull?:0
     LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(12.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
-        item{Row{TextButton(enabled=!busy,onClick={close()}){Text("返回")};TextButton(enabled=!blocked,onClick={work{refresh()}}){Text("刷新主机状态")}};Text("主机配置自动上传",style=MaterialTheme.typography.titleLarge);Text("默认仅上传界面偏好。完整配置和密钥分别选择；另一台主机下载后仍须逐项选择，不自动工作。")}
+        item{Row{TextButton(enabled=!busy,onClick={close()}){Text(stringResource(R.string.rovai_fusion_572cf45ba43634b3))};TextButton(enabled=!blocked,onClick={work{refresh()}}){Text(stringResource(R.string.rovai_fusion_bf2dc5f5d85c6f67))}};Text(stringResource(R.string.rovai_fusion_01afdad9f555e416),style=MaterialTheme.typography.titleLarge);Text(stringResource(R.string.rovai_fusion_a45b62d1ff56d74e))}
         item{GlassRow{
             listOf("enabled" to "启用这台主机的配置上传","autoSync" to "自动上传有变化的配置","fullConfiguration" to "同时上传完整的模型、智能体和模板配置","includeSecrets" to "完整加密副本中包含密钥").forEach{(name,label)->Row{Text(label,modifier=Modifier.weight(1f));Switch(checked=draft[name]==JsonPrimitive(true),onCheckedChange={field(name,JsonPrimitive(it))},enabled=!blocked&&active.isEmpty()&&(name!="includeSecrets"||draft["fullConfiguration"]==JsonPrimitive(true)))}}
-            OutlinedTextField(value=draft.coreText("intervalMinutes"),onValueChange={field("intervalMinutes",it.toIntOrNull()?.let(::JsonPrimitive)?:JsonPrimitive(it))},label={Text("检查间隔（1至1440分钟）")},enabled=!blocked&&active.isEmpty())
+            OutlinedTextField(value=draft.coreText("intervalMinutes"),onValueChange={field("intervalMinutes",it.toIntOrNull()?.let(::JsonPrimitive)?:JsonPrimitive(it))},label={Text(stringResource(R.string.rovai_fusion_f852f9271d9e9650))},enabled=!blocked&&active.isEmpty())
             SecretField(passphrase,{passphrase=it;dirty=true},if(saved["passphraseSet"]==JsonPrimitive(true))"新加密口令（留空保留原口令）" else "配置加密口令（至少8个字符）")
-            Row{Checkbox(checked=clear,onCheckedChange={clear=it;dirty=true},enabled=!blocked&&active.isEmpty());Text("清除已存的加密口令")}
+            Row{Checkbox(checked=clear,onCheckedChange={clear=it;dirty=true},enabled=!blocked&&active.isEmpty());Text(stringResource(R.string.rovai_fusion_e9617b6edb077a3c))}
             Row{
-                TextButton(enabled=!blocked&&active.isEmpty()&&dirty&&interval in 1..1440,onClick={work{val value=call("set",buildJsonObject{put("expectedRevision",draft["revision"]?:JsonNull);for(name in listOf("enabled","autoSync","fullConfiguration","includeSecrets","intervalMinutes"))put(name,draft[name]?:if(name=="intervalMinutes")JsonPrimitive(5) else JsonPrimitive(false));put("passphrase",passphrase);put("clearPassphrase",clear)});accept(value);message="配置同步设置已保存"}}){Text("保存设置")}
-                TextButton(enabled=!blocked&&dirty,onClick={accept(saved)}){Text("放弃未保存修改")}
+                TextButton(enabled=!blocked&&active.isEmpty()&&dirty&&interval in 1..1440,onClick={work{val value=call("set",buildJsonObject{put("expectedRevision",draft["revision"]?:JsonNull);for(name in listOf("enabled","autoSync","fullConfiguration","includeSecrets","intervalMinutes"))put(name,draft[name]?:if(name=="intervalMinutes")JsonPrimitive(5) else JsonPrimitive(false));put("passphrase",passphrase);put("clearPassphrase",clear)});accept(value);message="配置同步设置已保存"}}){Text(stringResource(R.string.rovai_fusion_c8550237ba701f64))}
+                TextButton(enabled=!blocked&&dirty,onClick={accept(saved)}){Text(stringResource(R.string.rovai_fusion_498256ff6143dd42))}
             }
         }}
         item{GlassRow{
             Text(if(active.isEmpty())"主机当前没有活动上传" else "原上传 · $phase")
             saved["state"].coreObject().coreText("lastSyncAt").takeIf(String::isNotEmpty)?.let{Text("上次实际上传 · $it",style=MaterialTheme.typography.bodySmall)}
-            if(pending!=null){Text("本次原请求已保留，不自动另建上传。");TextButton(enabled=!blocked,onClick={work{reconcile()}}){Text("核对原上传")}}
+            if(pending!=null){Text(stringResource(R.string.rovai_fusion_4911138876419838));TextButton(enabled=!blocked,onClick={work{reconcile()}}){Text(stringResource(R.string.rovai_fusion_b3dd3ae13e166196))}}
             TextButton(enabled=!blocked&&!dirty&&active.isEmpty()&&saved["enabled"]==JsonPrimitive(true)&&saved["passphraseSet"]==JsonPrimitive(true),onClick={work{val original=pending?:buildJsonObject{put("commandId",UUID.randomUUID().toString());put("expectedRevision",saved["revision"]?:JsonNull)};if(pending==null)remember(original);call("upload",original);refresh()}}){Text(if(pending==null)"立即上传当前配置" else "继续原编号上传")}
             if(active.isNotEmpty())Row{
-                TextButton(enabled=!blocked,onClick={work{call("cancel",buildJsonObject{put("expectedRevision",saved["revision"]?:JsonNull);put("commandId",active)});refresh()}}){Text("停止原任务")}
-                if(phase=="unknown")TextButton(enabled=!blocked,onClick={work{call("resume",buildJsonObject{put("expectedRevision",saved["revision"]?:JsonNull);put("commandId",active)});refresh()}}){Text("恢复原上传")}
+                TextButton(enabled=!blocked,onClick={work{call("cancel",buildJsonObject{put("expectedRevision",saved["revision"]?:JsonNull);put("commandId",active)});refresh()}}){Text(stringResource(R.string.rovai_fusion_2b40d74cfe21d3a5))}
+                if(phase=="unknown")TextButton(enabled=!blocked,onClick={work{call("resume",buildJsonObject{put("expectedRevision",saved["revision"]?:JsonNull);put("commandId",active)});refresh()}}){Text(stringResource(R.string.rovai_fusion_a23f523b64481bd7))}
             }
-            if((phase=="unknown"||pending!=null)&&!dirty)TextButton(enabled=!blocked,onClick={archive=true}){Text("保留未决记录后另建上传…")}
+            if((phase=="unknown"||pending!=null)&&!dirty)TextButton(enabled=!blocked,onClick={archive=true}){Text(stringResource(R.string.rovai_fusion_356775b0cc806da0))}
             saved["state"].coreObject().coreText("lastError").takeIf(String::isNotEmpty)?.let{Text(it,color=MaterialTheme.colorScheme.error)}
         }}
         if(message.isNotEmpty())item{Text(message)};if(issue!=null)item{Text(issue!!,color=MaterialTheme.colorScheme.error)};if(busy)item{LinearProgressIndicator(Modifier.fillMaxWidth())}
     }
-    if(leaving)AlertDialog(onDismissRequest={leaving=false},title={Text("放弃未保存修改？")},dismissButton={TextButton(onClick={leaving=false}){Text("继续编辑")}},confirmButton={TextButton(onClick=onClose){Text("放弃并返回")}})
-    if(archive)AlertDialog(onDismissRequest={if(!busy)archive=false},title={Text("保留原记录并继续新上传")},text={Text("会保留原任务的未决记录，之后的上传使用新编号。远端可能已有原副本；正在运行的任务不能直接跳过。")},dismissButton={TextButton(enabled=!busy,onClick={archive=false}){Text("返回")}},confirmButton={TextButton(enabled=!blocked,onClick={archive=false;work{
+    if(leaving)AlertDialog(onDismissRequest={leaving=false},title={Text(stringResource(R.string.rovai_fusion_46c8da8a29de16cf))},dismissButton={TextButton(onClick={leaving=false}){Text(stringResource(R.string.rovai_fusion_fd4b9e3b6c685bae))}},confirmButton={TextButton(onClick=onClose){Text(stringResource(R.string.rovai_fusion_02106a70a2eb370b))}})
+    if(archive)AlertDialog(onDismissRequest={if(!busy)archive=false},title={Text(stringResource(R.string.rovai_fusion_ec3ea8eb597c68f3))},text={Text(stringResource(R.string.rovai_fusion_afdc06b09d609c38))},dismissButton={TextButton(enabled=!busy,onClick={archive=false}){Text(stringResource(R.string.rovai_fusion_572cf45ba43634b3))}},confirmButton={TextButton(enabled=!blocked,onClick={archive=false;work{
         if(active.isNotEmpty())call("archive",buildJsonObject{put("expectedRevision",saved["revision"]?:JsonNull);put("commandId",active);put("confirmed",true)})
         pending?.let{model.saveBody(owner()+"/archived/"+it.coreText("commandId"),it.toString())};remember(null);accept(call("get"));message="未决记录已保留，可明确开始下一次上传"
-    }}){Text("确认保留记录并继续")}})
+    }}){Text(stringResource(R.string.rovai_fusion_4f0b0bcf5a0d7df1))}})
 }

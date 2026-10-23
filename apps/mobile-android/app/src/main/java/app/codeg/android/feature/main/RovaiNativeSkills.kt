@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -33,18 +36,18 @@ import kotlinx.serialization.json.*
     LaunchedEffect(current?.coreText("id"),path){val selected=current?:return@LaunchedEffect;busy=true;content=buildJsonObject{};try{content=call(RovaiOperation.NATIVESKILLS_READ,buildJsonObject{put("skillId",selected.coreText("id"));put("path",path)}).coreObject();issue=null}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message}finally{busy=false}}
     BackHandler{if(current!=null){current=null;content=buildJsonObject{}}else onClose()}
     Dialog(onDismissRequest=onClose,properties=DialogProperties(usePlatformDefaultWidth=false)){Surface(Modifier.fillMaxSize(),color=CodegTheme.colors.bg){LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
-        item{Row{TextButton(onClick={if(current!=null){current=null;content=buildJsonObject{}}else onClose()}){Text("返回")};if(current==null)TextButton(enabled=!disabled,onClick={picker=true}){Text(label)};TextButton(enabled=!disabled,onClick={work{if(current==null)load(true)else content=call(RovaiOperation.NATIVESKILLS_READ,buildJsonObject{put("skillId",current!!.coreText("id"));put("path",path)}).coreObject()}}){Text("刷新")}};Text(current?.coreText("name")?:"原生 Skills",style=MaterialTheme.typography.titleLarge)}
+        item{Row{TextButton(onClick={if(current!=null){current=null;content=buildJsonObject{}}else onClose()}){Text(stringResource(R.string.rovai_fusion_572cf45ba43634b3))};if(current==null)TextButton(enabled=!disabled,onClick={picker=true}){Text(label)};TextButton(enabled=!disabled,onClick={work{if(current==null)load(true)else content=call(RovaiOperation.NATIVESKILLS_READ,buildJsonObject{put("skillId",current!!.coreText("id"));put("path",path)}).coreObject()}}){Text(stringResource(R.string.rovai_fusion_aee88743413144a2))}};Text(current?.coreText("name")?:"原生 Skills",style=MaterialTheme.typography.titleLarge)}
         issue?.let{item{Text(it,color=CodegTheme.colors.danger)}}
         if(current==null){
-            item{OutlinedTextField(query,{query=it},label={Text("搜索 Skill")},modifier=Modifier.fillMaxWidth());Text("只读当前执行端的目录；自定义程序按队员保存的具体版本读取。",style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)}
+            item{OutlinedTextField(query,{query=it},label={Text(stringResource(R.string.rovai_fusion_adb3dcb1d5e3221e))},modifier=Modifier.fillMaxWidth());Text(stringResource(R.string.rovai_fusion_8490e3ebbb62faf0),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)}
             items((scan["errors"] as? JsonArray).orEmpty()){item->Text((item as? JsonPrimitive)?.content.orEmpty(),color=CodegTheme.colors.danger)}
-            items(scan["skills"].coreArray().filter{(it.coreText("name")+" "+it.coreText("description")).contains(query,true)},key={it.coreText("id")}){skill->GlassRow(Modifier.fillMaxWidth()){Text(skill.coreText("name"),style=MaterialTheme.typography.titleMedium);Text(skill.coreText("description"),color=CodegTheme.colors.textSecondary);TextButton(enabled=!disabled,onClick={path="SKILL.md";raw=false;current=skill}){Text("查看内容")}}}
-            if(!busy&&scan["skills"].coreArray().isEmpty())item{Text("这个智能体尚未发现 Skills。")}
+            items(scan["skills"].coreArray().filter{(it.coreText("name")+" "+it.coreText("description")).contains(query,true)},key={it.coreText("id")}){skill->GlassRow(Modifier.fillMaxWidth()){Text(skill.coreText("name"),style=MaterialTheme.typography.titleMedium);Text(skill.coreText("description"),color=CodegTheme.colors.textSecondary);TextButton(enabled=!disabled,onClick={path="SKILL.md";raw=false;current=skill}){Text(stringResource(R.string.rovai_fusion_393dd8a7f29e2844))}}}
+            if(!busy&&scan["skills"].coreArray().isEmpty())item{Text(stringResource(R.string.rovai_fusion_6babebf5562e0b3e))}
         }else{
-            item{Text(current!!.coreText("entryPath"),style=MaterialTheme.typography.bodySmall);Row{Text("原文",Modifier.weight(1f));Switch(raw,{raw=it})}}
+            item{Text(current!!.coreText("entryPath"),style=MaterialTheme.typography.bodySmall);Row{Text(stringResource(R.string.rovai_fusion_354b28c853334568),Modifier.weight(1f));Switch(raw,{raw=it})}}
             items(content["files"].coreArray(),key={it.coreText("path")}){file->TextButton(enabled=!disabled,onClick={path=file.coreText("path")}){Text(file.coreText("path"))}}
             item{if(content.coreText("status")=="text"){if(raw)Text(content.coreText("content"))else MarkdownContent(raw=content.coreText("content"))}else if(!busy)Text(if(content.coreText("status")=="binary")"该文件不是文本文件。" else "正文暂不可读或超过预览上限。")}
         }
     }}}
-    if(picker)AlertDialog(onDismissRequest={picker=false},title={Text("选择智能体")},text={LazyColumn{items(runtimes){kind->TextButton(onClick={target=kind;picker=false;work{load(false)}}){Text(kind)}};items(custom,key={it.coreText("agentId")}){member->TextButton(onClick={target="member:"+member.coreText("agentId");picker=false;work{load(false)}}){Text(member.coreText("displayName")+" · 自定义智能体")}}}},confirmButton={TextButton(onClick={picker=false}){Text("关闭")}})
+    if(picker)AlertDialog(onDismissRequest={picker=false},title={Text(stringResource(R.string.rovai_fusion_b81826c3ba1f03b2))},text={LazyColumn{items(runtimes){kind->TextButton(onClick={target=kind;picker=false;work{load(false)}}){Text(kind)}};items(custom,key={it.coreText("agentId")}){member->TextButton(onClick={target="member:"+member.coreText("agentId");picker=false;work{load(false)}}){Text(member.coreText("displayName")+" · 自定义智能体")}}}},confirmButton={TextButton(onClick={picker=false}){Text(stringResource(R.string.rovai_fusion_3fd47edce45b3603))}})
 }

@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -44,7 +47,7 @@ fun RovaiPortableConfigurationExport(model:RovaiWorkspaceViewModel,sourceArchive
     }}
     BackHandler{if(!busy)onClose()}
     LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(12.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
-        item{TextButton(enabled=!busy,onClick=onClose){Text("返回")};Text(if(sourceArchive==null)"导出完整配置" else "保留原配置的完整副本",style=MaterialTheme.typography.titleLarge);Text(if(sourceArchive==null)"保存一份加密副本，到另一台主机再选择要搬入的内容和本机队员。" else "保存这份候选的完整原内容，包括尚不支持的字段；不会启用其中配置。")}
+        item{TextButton(enabled=!busy,onClick=onClose){Text(stringResource(R.string.rovai_fusion_572cf45ba43634b3))};Text(if(sourceArchive==null)"导出完整配置" else "保留原配置的完整副本",style=MaterialTheme.typography.titleLarge);Text(if(sourceArchive==null)"保存一份加密副本，到另一台主机再选择要搬入的内容和本机队员。" else "保存这份候选的完整原内容，包括尚不支持的字段；不会启用其中配置。")}
         if(receipt?.coreText("state")!="ready")item{GlassRow{
             Row{Text(if(sourceArchive==null)"同时包含密钥" else "确认原内容和可能包含的密钥一起加密保存",modifier=Modifier.weight(1f));Switch(checked=includeSecrets,onCheckedChange={includeSecrets=it},enabled=!busy&&pending==null)}
             SecretField(passphrase,{passphrase=it},"副本加密口令（至少8个字符）")
@@ -55,11 +58,11 @@ fun RovaiPortableConfigurationExport(model:RovaiWorkspaceViewModel,sourceArchive
                 val value=model.privateConfiguration("export",buildJsonObject{put("operationId",original["operationId"]!!);put("includeSecrets",original["includeSecrets"]!!);put("passphrase",passphrase);original["sourceArchive"]?.let{put("sourceArchive",it)}});current();require(value["operationId"]==original["operationId"]){"原导出编号不同"};receipt=value;if(value.coreText("state")=="ready")passphrase=""
             }}){Text(if(pending==null)"准备加密副本" else "继续准备原副本")}
         }}
-        if(pending!=null)item{TextButton(enabled=!busy,onClick={work{refresh()}}){Text("核对原导出")}}
+        if(pending!=null)item{TextButton(enabled=!busy,onClick={work{refresh()}}){Text(stringResource(R.string.rovai_fusion_25b0aab87380edb2))}}
         if(receipt!=null)item{Text(when(receipt!!.coreText("state")){"ready"->"副本已准备好";"prepared"->"原副本仍待完成，请使用原口令继续";else->"尚未查到原导出结果，未自动重发"})}
         if(receipt?.coreText("state")=="ready")item{Row{
-            TextButton(enabled=!busy,onClick={save.launch("configuration.rovai-config")}){Text("保存加密副本")}
-            TextButton(enabled=!busy,onClick={work{model.saveBody(owner(),"");current();pending=null;receipt=null;includeSecrets=false;passphrase="";message=""}}){Text("另建一份副本")}
+            TextButton(enabled=!busy,onClick={save.launch("configuration.rovai-config")}){Text(stringResource(R.string.rovai_fusion_ca2bb0533ee48041))}
+            TextButton(enabled=!busy,onClick={work{model.saveBody(owner(),"");current();pending=null;receipt=null;includeSecrets=false;passphrase="";message=""}}){Text(stringResource(R.string.rovai_fusion_a691179eb0c04403))}
         }}
         if(message.isNotEmpty())item{Text(message)}
         if(issue!=null)item{Text(issue!!,color=MaterialTheme.colorScheme.error)}

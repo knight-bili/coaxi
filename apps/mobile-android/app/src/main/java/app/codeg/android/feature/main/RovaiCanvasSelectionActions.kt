@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
@@ -23,16 +26,16 @@ import java.util.UUID
     fun submit(mutation:JsonObject){if(blocked||stale)return;val commandId=UUID.randomUUID().toString();val body=mutation.toString();sentId=commandId;busy=true;scope.launch{try{model.saveBody(owner,body);model.rememberBody(owner,body);require(generation==model.connectionGeneration);model.executeOwned(RovaiOperation.CANVAS_NODES_APPLY,buildJsonObject{put("commandId",commandId);putJsonObject("command"){put("boardId",boardId);put("expectedRevision",revision);put("mutation",mutation)}},owner,body)}catch(error:Exception){issue=error.message}finally{busy=false}}}
     LaunchedEffect(state.lastResult){val receipt=state.lastResult.coreObject()["commandResult"].coreObject().ifEmpty{state.lastResult.coreObject()};if(state.lastInputOwner==owner&&receipt.coreText("commandId")==sentId){if(receipt.coreText("status")in listOf("applied","accepted"))onClose()else if(receipt.coreText("status")=="rejected")issue=receipt.coreText("code")}}
     Dialog(onDismissRequest={if(!busy)onClose()},properties=DialogProperties(usePlatformDefaultWidth=false,dismissOnClickOutside=false)){Surface(Modifier.fillMaxSize(),color=CodegTheme.colors.bgElevated){Column{
-        Row(Modifier.fillMaxWidth().padding(12.dp)){Text("已选 ${nodes.size} 张卡片",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(enabled=!busy,onClick=onClose){Text("关闭")}}
+        Row(Modifier.fillMaxWidth().padding(12.dp)){Text("已选 ${nodes.size} 张卡片",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(enabled=!busy,onClick=onClose){Text(stringResource(R.string.rovai_fusion_3fd47edce45b3603))}}
         LazyColumn(Modifier.weight(1f),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
-            item{issue?.let{Text(it,color=CodegTheme.colors.danger)};if(stale)Text("画布已更新；关闭后核对最新卡片，再重新操作。",color=CodegTheme.colors.danger);if(state.pending!=null)Text("原请求待核对，当前选择保留。",color=CodegTheme.colors.textSecondary)}
+            item{issue?.let{Text(it,color=CodegTheme.colors.danger)};if(stale)Text(stringResource(R.string.rovai_fusion_7ee7ed047066bed9),color=CodegTheme.colors.danger);if(state.pending!=null)Text(stringResource(R.string.rovai_fusion_bf9578664719ce2f),color=CodegTheme.colors.textSecondary)}
             nodes.forEach{node->item(key=node.coreText("id")){val data=node["data"].coreObject();Text(data.coreText("title").ifEmpty{rovaiCanvasKindNames[data.coreText("kind")]?:"卡片"})}}
             item{RovaiCanvasChoice("目标分组",target,listOf("" to "新建自定义分组")+graph["nodes"].coreArray().filter{it["data"].coreObject().coreText("kind")=="custom"}.map{it.coreText("id") to it["data"].coreObject().coreText("title").ifEmpty{"自定义分组"}},!blocked){target=it}
                 Button(enabled=!blocked&&!stale&&groupable,onClick={val references=nodes.map{it["data"].coreObject()["conversation"].coreObject()}.distinctBy{RovaiCanvasReferenceChoice(it,"").key};fun n(node:JsonObject,key:String)=(node["data"].coreObject()[key]as?JsonPrimitive)?.doubleOrNull?:0.0;val count=(references.size+1)/2;submit(buildJsonObject{put("type","group");put("targetNodeId",if(target.isEmpty())JsonNull else JsonPrimitive(target));put("newRegion",if(target.isNotEmpty())JsonNull else buildJsonObject{put("kind","custom");put("x",nodes.minOf{n(it,"x")}-12);put("y",nodes.minOf{n(it,"y")}-52);put("width",484);put("height",64+count*132+(count-1).coerceAtLeast(0)*12)});put("conversations",JsonArray(references));put("consumeNodeIds",JsonArray(nodes.map{JsonPrimitive(it.coreText("id"))}))})}){Text(if(target.isEmpty())"归为新分组"else"归入已有分组")}
-                if(!groupable)Text("归组请选择最多200张普通会话卡；使命、任务、文件、终端和便签保留各自的对象类型。",color=CodegTheme.colors.textSecondary)
+                if(!groupable)Text(stringResource(R.string.rovai_fusion_bdb39e069e23d7b3),color=CodegTheme.colors.textSecondary)
             }
-            item{TextButton(enabled=!blocked&&!stale&&nodes.isNotEmpty(),onClick={confirm=buildJsonObject{put("type","move");put("moves",canvasPackedMoves(nodes))}}){Text("整理所选卡片")};TextButton(enabled=!blocked&&!stale&&nodes.isNotEmpty(),onClick={confirm=buildJsonObject{put("type","delete");put("nodeIds",JsonArray(nodes.map{JsonPrimitive(it.coreText("id"))}))}}){Text("删除所选卡片",color=CodegTheme.colors.danger)}}
+            item{TextButton(enabled=!blocked&&!stale&&nodes.isNotEmpty(),onClick={confirm=buildJsonObject{put("type","move");put("moves",canvasPackedMoves(nodes))}}){Text(stringResource(R.string.rovai_fusion_c8b6fc5c52191014))};TextButton(enabled=!blocked&&!stale&&nodes.isNotEmpty(),onClick={confirm=buildJsonObject{put("type","delete");put("nodeIds",JsonArray(nodes.map{JsonPrimitive(it.coreText("id"))}))}}){Text(stringResource(R.string.rovai_fusion_e6d7c2665e984459),color=CodegTheme.colors.danger)}}
         }
     }}}
-    confirm?.let{mutation->val deletion=mutation.coreText("type")=="delete";AlertDialog(onDismissRequest={confirm=null},title={Text(if(deletion)"删除所选卡片？"else"整理所选卡片？")},text={Text(if(deletion)"仅移除画布引用，原会话、使命、任务和文件保留。所选便签的正文会删除，所选运行中终端会关闭。"else"按原版排布规则调整所选卡片位置，其他卡片位置保留。")},confirmButton={TextButton(enabled=!blocked&&!stale,onClick={submit(mutation);confirm=null}){Text(if(deletion)"删除卡片"else"整理位置")}},dismissButton={TextButton(onClick={confirm=null}){Text("取消")}})}
+    confirm?.let{mutation->val deletion=mutation.coreText("type")=="delete";AlertDialog(onDismissRequest={confirm=null},title={Text(if(deletion)"删除所选卡片？"else"整理所选卡片？")},text={Text(if(deletion)"仅移除画布引用，原会话、使命、任务和文件保留。所选便签的正文会删除，所选运行中终端会关闭。"else"按原版排布规则调整所选卡片位置，其他卡片位置保留。")},confirmButton={TextButton(enabled=!blocked&&!stale,onClick={submit(mutation);confirm=null}){Text(if(deletion)"删除卡片"else"整理位置")}},dismissButton={TextButton(onClick={confirm=null}){Text(stringResource(R.string.rovai_fusion_2cd0f3be8738a86c))}})}
 }

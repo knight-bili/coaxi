@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
@@ -61,7 +64,7 @@ private fun monitoringMoney(value:JsonElement?):String=value.coreArray().joinToS
     val exporter=rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")){uri->val bytes=exportBytes;exportBytes=null;if(uri!=null&&bytes!=null)scope.launch{try{withContext(Dispatchers.IO){context.contentResolver.openOutputStream(uri,"wt")?.use{it.write(bytes)}?:error("无法写入导出位置")}}catch(error:Exception){issue=error.message}}}
     val visible=snapshot.takeIf{loadedFilter==filter}
     LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
-        item{Row{Text("运行监控",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(enabled=!busy&&active,onClick={scope.launch{load()}}){Text(if(busy)"正在读取…" else "刷新")};TextButton(enabled=visible!=null&&exportBytes==null,onClick={val captured=visible?:return@TextButton;exportBytes=buildJsonObject{put("filter",filter);put("snapshot",captured)}.toString().toByteArray(Charsets.UTF_8);exporter.launch("Codeg-Rovai-usage.json")}){Text("导出")}}}
+        item{Row{Text(stringResource(R.string.rovai_fusion_65e09e4dfa428480),Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(enabled=!busy&&active,onClick={scope.launch{load()}}){Text(if(busy)"正在读取…" else "刷新")};TextButton(enabled=visible!=null&&exportBytes==null,onClick={val captured=visible?:return@TextButton;exportBytes=buildJsonObject{put("filter",filter);put("snapshot",captured)}.toString().toByteArray(Charsets.UTF_8);exporter.launch("Codeg-Rovai-usage.json")}){Text(stringResource(R.string.rovai_fusion_76420433f22d1c80))}}}
         item{Row(Modifier.horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(8.dp)){listOf("24h" to "24小时","7d" to "7天","30d" to "30天").forEach{(id,label)->FilterChip(selected=range==id,onClick={range=id},label={Text(label)})}}}
         item{Row(Modifier.horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(8.dp)){
             MonitoringFilter("智能体",runtime,(snapshot?.get("byRuntime").coreArray().map{it.coreText("runtimeKind")}+runtime).filter{it.isNotEmpty()}.distinct()){runtime=it}
@@ -75,10 +78,10 @@ private fun monitoringMoney(value:JsonElement?):String=value.coreArray().joinToS
             item{Text("${value["range"].coreObject().coreText("from")} — ${value["range"].coreObject().coreText("to")}",style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)}
             item{GlassRow(Modifier.fillMaxWidth()){
                 val summary=value["summary"].coreObject();monitoringMetrics.forEach{(key,label)->Row(Modifier.fillMaxWidth()){Text(label,Modifier.weight(1f));Text(monitoringNumber(summary[key],key in listOf("cacheReadShare","requestCacheHitRate")))}}
-                Text("最佳可用成本 · "+monitoringMoney(summary["cost"].coreObject()["run"]),style=MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.rovai_fusion_cbc87f47c67378d0)+monitoringMoney(summary["cost"].coreObject()["run"]),style=MaterialTheme.typography.bodySmall)
             }}
             item{RovaiUsageTrend(value["trend"].coreArray())}
-            item{Text("采集覆盖率",style=MaterialTheme.typography.titleSmall);Text("数值仅包含已收到的观测。未知不等于零，正常结束也不代表统计完整。",style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary);GlassRow{(monitoringMetrics.filter{it.first!="cacheReadShare"}+listOf("cost" to "成本")).forEach{(key,label)->val coverage=value["coverage"].coreObject()[key].coreObject();Row{Text(label,Modifier.weight(1f));Text("${coverage.coreLong("observedRuns")}/${coverage.coreLong("eligibleRuns")}")}}}}
+            item{Text(stringResource(R.string.rovai_fusion_ebefc591a101b140),style=MaterialTheme.typography.titleSmall);Text(stringResource(R.string.rovai_fusion_01bbdc2f71904ea6),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary);GlassRow{(monitoringMetrics.filter{it.first!="cacheReadShare"}+listOf("cost" to "成本")).forEach{(key,label)->val coverage=value["coverage"].coreObject()[key].coreObject();Row{Text(label,Modifier.weight(1f));Text("${coverage.coreLong("observedRuns")}/${coverage.coreLong("eligibleRuns")}")}}}}
             listOf("byRuntime" to "按智能体","byModel" to "按模型").forEach{(key,label)->
                 item{Text(label,style=MaterialTheme.typography.titleSmall)}
                 itemsIndexed(value[key].coreArray()){_,row->GlassRow(Modifier.fillMaxWidth()){
@@ -88,20 +91,20 @@ private fun monitoringMoney(value:JsonElement?):String=value.coreArray().joinToS
                 }}
             }
             val cost=value["summary"].coreObject()["cost"]as?JsonObject
-            if(cost!=null)item{GlassRow(Modifier.fillMaxWidth()){Text("Provider成本对账",style=MaterialTheme.typography.titleSmall);Text("Run · "+monitoringMoney(cost["run"]));Text("Provider · "+monitoringMoney(cost["reconciliation"]));Text("差额 · "+monitoringMoney(cost["difference"]));Text("对账截止 · "+cost.coreText("latestReconciledAt").ifEmpty{"—"});Text("Provider聚合账单与Run成本分开展示，不把聚合账单分摊成单次运行费用。",style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)}}
-            item{Text("采集开始 · "+value["collection"].coreObject().coreText("startedAt"),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)}
+            if(cost!=null)item{GlassRow(Modifier.fillMaxWidth()){Text(stringResource(R.string.rovai_fusion_50b0f11ab55c7e34),style=MaterialTheme.typography.titleSmall);Text("Run · "+monitoringMoney(cost["run"]));Text("Provider · "+monitoringMoney(cost["reconciliation"]));Text(stringResource(R.string.rovai_fusion_246c88ad5c14dda3)+monitoringMoney(cost["difference"]));Text(stringResource(R.string.rovai_fusion_cf2c4c620589f4a7)+cost.coreText("latestReconciledAt").ifEmpty{"—"});Text(stringResource(R.string.rovai_fusion_9f6806f424c4f915),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)}}
+            item{Text(stringResource(R.string.rovai_fusion_8a151f46d42d67cf)+value["collection"].coreObject().coreText("startedAt"),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)}
         }
     }
 }
 
-@Composable private fun MonitoringFilter(label:String,value:String,options:List<String>,onChange:(String)->Unit){var open by remember{mutableStateOf(false)};Box{OutlinedButton(onClick={open=true}){Text(label+" · "+value.ifEmpty{"全部"})};DropdownMenu(expanded=open,onDismissRequest={open=false}){DropdownMenuItem(text={Text("全部")},onClick={onChange("");open=false});options.sorted().forEach{option->DropdownMenuItem(text={Text(option)},onClick={onChange(option);open=false})}}}}
+@Composable private fun MonitoringFilter(label:String,value:String,options:List<String>,onChange:(String)->Unit){var open by remember{mutableStateOf(false)};Box{OutlinedButton(onClick={open=true}){Text(label+" · "+value.ifEmpty{"全部"})};DropdownMenu(expanded=open,onDismissRequest={open=false}){DropdownMenuItem(text={Text(stringResource(R.string.rovai_fusion_5c55a67935af8f45))},onClick={onChange("");open=false});options.sorted().forEach{option->DropdownMenuItem(text={Text(option)},onClick={onChange(option);open=false})}}}}
 
 @Composable private fun RovaiUsageTrend(points:List<JsonObject>){
     var metric by remember{mutableStateOf("promptInputTotalTokens")};var index by remember(points){mutableStateOf((points.size-1).coerceAtLeast(0))}
     val choices=monitoringMetrics.filter{it.first in listOf("promptInputTotalTokens","outputTokens","cacheReadTokens","cacheWriteTokens")}
     val accent=CodegTheme.colors.accent;val grid=CodegTheme.colors.hairline
     Column(verticalArrangement=Arrangement.spacedBy(8.dp)){
-        Text("用量趋势",style=MaterialTheme.typography.titleSmall)
+        Text(stringResource(R.string.rovai_fusion_6a81178c663f5b3c),style=MaterialTheme.typography.titleSmall)
         Row(Modifier.horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(6.dp)){choices.forEach{(key,label)->FilterChip(selected=metric==key,onClick={metric=key},label={Text(label)})}}
         val selected=points.getOrNull(index)
         Text((selected?.coreText("bucketStartAt")?:"暂无时间点")+" · "+monitoringNumber(selected?.get(metric)),style=MaterialTheme.typography.bodySmall)
@@ -113,6 +116,6 @@ private fun monitoringMoney(value:JsonElement?):String=value.coreArray().joinToS
             drawPath(path,accent,style=Stroke(2.dp.toPx()))
         }
         if(points.size>1)Slider(value=index.toFloat(),onValueChange={index=it.toInt().coerceIn(points.indices)},valueRange=0f..(points.size-1).toFloat(),modifier=Modifier.semantics{contentDescription="趋势时间点"})
-        Text("缺失观测保留断点；明确的0显示在基线。",style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)
+        Text(stringResource(R.string.rovai_fusion_107af4daf34aa1da),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)
     }
 }

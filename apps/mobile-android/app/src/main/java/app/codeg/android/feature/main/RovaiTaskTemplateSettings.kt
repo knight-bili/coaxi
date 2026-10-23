@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -48,24 +51,24 @@ fun RovaiTaskTemplateSettings(model:RovaiWorkspaceViewModel,onClose:()->Unit){
     }catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message?:"模板恢复失败，原记录已保留"}finally{busy=false}}
     BackHandler{if(!busy){if(dirty)leaving=true else onClose()}}
     LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(12.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
-        item{TextButton(enabled=!busy,onClick={if(dirty)leaving=true else onClose()}){Text("返回")};Text("任务模板",style=MaterialTheme.typography.titleLarge);Text("保存模板不会启动任务。原程序设置和材料随模板保留，使用时在本次使命里核对。")}
-        item{Row{TextButton(enabled=ready&&!busy&&pending==null&&!dirty,onClick={config=buildJsonObject{put("config_values",buildJsonObject{})};draft=buildJsonObject{put("id",UUID.randomUUID().toString());put("revision",JsonNull);put("name","");put("title","");put("body","")};baseline=""}){Text("新建模板")};TextButton(enabled=!busy&&!dirty,onClick={work{list()}}){Text("刷新")}}}
+        item{TextButton(enabled=!busy,onClick={if(dirty)leaving=true else onClose()}){Text(stringResource(R.string.rovai_fusion_572cf45ba43634b3))};Text(stringResource(R.string.rovai_fusion_f46ec7482cc2e783),style=MaterialTheme.typography.titleLarge);Text(stringResource(R.string.rovai_fusion_44031b1982299aad))}
+        item{Row{TextButton(enabled=ready&&!busy&&pending==null&&!dirty,onClick={config=buildJsonObject{put("config_values",buildJsonObject{})};draft=buildJsonObject{put("id",UUID.randomUUID().toString());put("revision",JsonNull);put("name","");put("title","");put("body","")};baseline=""}){Text(stringResource(R.string.rovai_fusion_55da24dbf2b7b680))};TextButton(enabled=!busy&&!dirty,onClick={work{list()}}){Text(stringResource(R.string.rovai_fusion_aee88743413144a2))}}}
         items(rows.size){index->val row=rows[index];TextButton(enabled=!busy&&pending==null&&!dirty,onClick={work{open(row.coreText("id"))}}){Text(row.coreText("name"))}}
-        if(next!=null)item{TextButton(enabled=!busy,onClick={work{list(true)}}){Text("更多模板")}}
+        if(next!=null)item{TextButton(enabled=!busy,onClick={work{list(true)}}){Text(stringResource(R.string.rovai_fusion_410c5dec4344d34a))}}
         draft?.let{value->item{GlassRow{
             CodegTextField(value.coreText("name"),{if(!busy&&pending==null)field("name",it)},"模板名称")
             CodegTextField(value.coreText("title"),{if(!busy&&pending==null)field("title",it)},"任务标题")
             CodegTextField(value.coreText("body"),{if(!busy&&pending==null)field("body",it)},"任务说明",singleLine=false)
-            Text("只修改上述内容，其余原高级设置和非文字材料完整保留。",style=MaterialTheme.typography.bodySmall)
-            Row{TextButton(enabled=!busy&&pending==null&&dirty,onClick={work{mutate("put")}}){Text("保存模板")};TextButton(enabled=!busy&&pending==null,onClick={draft=null;baseline="";removing=false}){Text("放弃编辑")};if(value["revision"]!=JsonNull)TextButton(enabled=!busy&&pending==null,onClick={removing=true}){Text("删除模板")}}
+            Text(stringResource(R.string.rovai_fusion_d06b45a2e94cb5f2),style=MaterialTheme.typography.bodySmall)
+            Row{TextButton(enabled=!busy&&pending==null&&dirty,onClick={work{mutate("put")}}){Text(stringResource(R.string.rovai_fusion_87080fe7a6d4d477))};TextButton(enabled=!busy&&pending==null,onClick={draft=null;baseline="";removing=false}){Text(stringResource(R.string.rovai_fusion_17f1ff1b24ca2d7d))};if(value["revision"]!=JsonNull)TextButton(enabled=!busy&&pending==null,onClick={removing=true}){Text(stringResource(R.string.rovai_fusion_f5a3ec56b46fd6d4))}}
         }}}
         if(pending!=null)item{GlassRow{Text(if(receipt?.coreText("state")=="unknown")"尚未查到原结果，未自动重发。" else "原操作和文件结果分别保留。")
-            TextButton(enabled=!busy,onClick={work{settle(call(buildJsonObject{put("operation","receipt");put("commandId",pending!!["commandId"]!!)}))}}){Text("核对原模板操作")}
-            if(receipt?.coreText("state")=="recorded"&&receipt!!["files"].coreArray().any{it.coreText("state")=="pending"})TextButton(enabled=!busy,onClick={work{settle(call(buildJsonObject{put("operation","finish");put("commandId",pending!!["commandId"]!!)}))}}){Text("继续保存原模板文件")}
-            if(receipt?.coreText("state")=="recorded"&&receipt!!["files"].coreArray().any{it.coreText("state") in listOf("conflict","failed")})TextButton(enabled=!busy,onClick={work{remember(null)}}){Text("保留原结果并重新编辑")}
+            TextButton(enabled=!busy,onClick={work{settle(call(buildJsonObject{put("operation","receipt");put("commandId",pending!!["commandId"]!!)}))}}){Text(stringResource(R.string.rovai_fusion_1b060e1d3cccd66e))}
+            if(receipt?.coreText("state")=="recorded"&&receipt!!["files"].coreArray().any{it.coreText("state")=="pending"})TextButton(enabled=!busy,onClick={work{settle(call(buildJsonObject{put("operation","finish");put("commandId",pending!!["commandId"]!!)}))}}){Text(stringResource(R.string.rovai_fusion_d243953ec0012188))}
+            if(receipt?.coreText("state")=="recorded"&&receipt!!["files"].coreArray().any{it.coreText("state") in listOf("conflict","failed")})TextButton(enabled=!busy,onClick={work{remember(null)}}){Text(stringResource(R.string.rovai_fusion_4d847e48e12480cd))}
         }}
         if(issue!=null)item{Text(issue!!,color=MaterialTheme.colorScheme.error)};if(busy)item{LinearProgressIndicator(Modifier.fillMaxWidth())}
     }
-    if(removing)AlertDialog(onDismissRequest={removing=false},title={Text("删除这份模板？")},text={Text("已创建的任务、历史消息和原导入归档继续保留。")},confirmButton={TextButton(enabled=!busy,onClick={work{mutate("remove")}}){Text("确认删除")}},dismissButton={TextButton(enabled=!busy,onClick={removing=false}){Text("取消")}})
-    if(leaving)AlertDialog(onDismissRequest={leaving=false},title={Text("放弃未保存的模板修改？")},confirmButton={TextButton(onClick=onClose){Text("放弃并返回")}},dismissButton={TextButton(onClick={leaving=false}){Text("继续编辑")}})
+    if(removing)AlertDialog(onDismissRequest={removing=false},title={Text(stringResource(R.string.rovai_fusion_3a8af94d724fef97))},text={Text(stringResource(R.string.rovai_fusion_a91222be219770ab))},confirmButton={TextButton(enabled=!busy,onClick={work{mutate("remove")}}){Text(stringResource(R.string.rovai_fusion_a3ea3c17b401bd2f))}},dismissButton={TextButton(enabled=!busy,onClick={removing=false}){Text(stringResource(R.string.rovai_fusion_2cd0f3be8738a86c))}})
+    if(leaving)AlertDialog(onDismissRequest={leaving=false},title={Text(stringResource(R.string.rovai_fusion_a5af2d502db2078a))},confirmButton={TextButton(onClick=onClose){Text(stringResource(R.string.rovai_fusion_02106a70a2eb370b))}},dismissButton={TextButton(onClick={leaving=false}){Text(stringResource(R.string.rovai_fusion_fd4b9e3b6c685bae))}})
 }

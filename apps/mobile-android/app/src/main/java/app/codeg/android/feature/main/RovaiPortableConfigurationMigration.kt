@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -72,10 +75,10 @@ fun RovaiPortableConfigurationMigration(model:RovaiWorkspaceViewModel,onClose:()
     val picker=rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()){uri->if(uri!=null)work{val value=prepareRovaiConfiguration(context,uri);try{current();release();source=value;sourceRef.set(value)}catch(error:Exception){releaseRovaiConfiguration(context,value);throw error}}}
     BackHandler(enabled=!busy){onClose()}
     LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(12.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){
-        item{Row{TextButton(onClick=onClose,enabled=!busy){Text("返回")};TextButton(onClick={work{loadArchives()}},enabled=!disabled){Text("刷新候选")}};Text("搬入原来的配置",style=MaterialTheme.typography.titleLarge);Text("先选文件，再逐项选择。不会自动运行、安装程序或绑定同名队员。",style=MaterialTheme.typography.bodySmall)}
+        item{Row{TextButton(onClick=onClose,enabled=!busy){Text(stringResource(R.string.rovai_fusion_572cf45ba43634b3))};TextButton(onClick={work{loadArchives()}},enabled=!disabled){Text(stringResource(R.string.rovai_fusion_3b105bd177b17ddf))}};Text(stringResource(R.string.rovai_fusion_a3fe615f2784baaf),style=MaterialTheme.typography.titleLarge);Text(stringResource(R.string.rovai_fusion_94b166989d99fd88),style=MaterialTheme.typography.bodySmall)}
         if(pending!=null)item{GlassRow{
-            Text("原请求尚待核对，未自动重复发送。")
-            TextButton(enabled=!disabled,onClick={work{val original=pending?:return@work;if(original.coreText("operation")=="configuration.archive.register"){val result=model.privateConfiguration("receipt",buildJsonObject{put("operationId",original["commandId"]!!)});val saved=result["archive"].coreObject();if(saved.isEmpty())error("尚未查到原文件登记，请稍后核对");registered(saved,original)}else readReceipt(original)}}){Text("核对原请求")}
+            Text(stringResource(R.string.rovai_fusion_312e15c753920199))
+            TextButton(enabled=!disabled,onClick={work{val original=pending?:return@work;if(original.coreText("operation")=="configuration.archive.register"){val result=model.privateConfiguration("receipt",buildJsonObject{put("operationId",original["commandId"]!!)});val saved=result["archive"].coreObject();if(saved.isEmpty())error("尚未查到原文件登记，请稍后核对");registered(saved,original)}else readReceipt(original)}}){Text(stringResource(R.string.rovai_fusion_d027c9aa232e6375))}
         }}
         item{GlassRow{
             TextButton(enabled=!disabled&&(pending==null||pending?.coreText("operation")=="configuration.archive.register"),onClick={picker.launch(arrayOf("application/json","application/octet-stream","*/*"))}){Text(source?.displayName?:"选择原来的配置文件")}
@@ -87,24 +90,24 @@ fun RovaiPortableConfigurationMigration(model:RovaiWorkspaceViewModel,onClose:()
             }}){Text(if(pending?.coreText("operation")=="configuration.archive.register")"继续登记原文件" else "读取为迁移候选")}
         }}
         items(archives,key={it.coreText("archiveId")}){value->TextButton(enabled=!disabled&&pending==null,onClick={work{open(value)}}){Text("候选 · ${value.coreText("sourceKind")} · ${value.coreText("createdAt")}")}}
-        if(archiveNext!=null)item{TextButton(enabled=!disabled,onClick={work{loadArchives(true)}}){Text("加载更多候选")}}
+        if(archiveNext!=null)item{TextButton(enabled=!disabled,onClick={work{loadArchives(true)}}){Text(stringResource(R.string.rovai_fusion_136e66cc37ff7d47))}}
         if(archive!=null){
-            item{TextButton(enabled=!disabled&&pending==null&&source==null,onClick={exportArchive=buildJsonObject{put("archiveId",archive!!["archiveId"]!!);put("sourceDigest",archive!!["sourceDigest"]!!)}}){Text("保存原配置完整副本（含未支持字段）")}}
-            item{Text("选择要搬入的内容",style=MaterialTheme.typography.titleMedium)}
+            item{TextButton(enabled=!disabled&&pending==null&&source==null,onClick={exportArchive=buildJsonObject{put("archiveId",archive!!["archiveId"]!!);put("sourceDigest",archive!!["sourceDigest"]!!)}}){Text(stringResource(R.string.rovai_fusion_7c4da3d6bab9b375))}}
+            item{Text(stringResource(R.string.rovai_fusion_9c9c4eb88f694660),style=MaterialTheme.typography.titleMedium)}
             items(rows.take(visible),key={it.coreText("entryId")}){row->
                 val choice=choices[row.coreText("entryId")];val action=if(undo)row.coreText("action") else choice?.get("decision").coreObject().coreText("action").ifEmpty{"skip"};val domain=row.coreText("domain")
                 GlassRow{Text(row.coreText("name"),style=MaterialTheme.typography.titleSmall);Text(migrationDomains[domain]?:"原值仅保留，尚无应用入口",style=MaterialTheme.typography.bodySmall)
                     if(domain in migrationDomains&&!undo)Row{listOf("skip" to "跳过","create" to "新增","replace" to "替换").forEach{(kind,label)->FilterChip(selected=action==kind,enabled=!disabled&&pending==null,onClick={decision(row,kind);if(kind=="replace"&&targets[domain]==null)work{loadTargets(domain)}},label={Text(label)})}}
                     if(action=="replace"&&!undo){
                         PortableMigrationChoice("选择准确的本机目标",targets[domain].orEmpty(),choice?.get("decision").coreObject().coreText("targetId"),!disabled&&pending==null){target->decision(row,"replace",target)}
-                        if(targetNext[domain]!=null)TextButton(enabled=!disabled,onClick={work{loadTargets(domain,true)}}){Text("加载更多目标")}
+                        if(targetNext[domain]!=null)TextButton(enabled=!disabled,onClick={work{loadTargets(domain,true)}}){Text(stringResource(R.string.rovai_fusion_bef53ff8bd0c07b1))}
                     }
                     val checked=preview?.get("rows").coreArray().find{it["entryId"]==row["entryId"]}
-                    if(checked!=null&&action!="skip"){Text(checked.coreText("status"));if(checked.coreText("reason").isNotEmpty())Text(checked.coreText("reason"),color=MaterialTheme.colorScheme.error);var details by remember(row.coreText("entryId")){mutableStateOf(false)};TextButton(onClick={details=!details}){Text("原值与将保存的内容")};if(details){Text("原值\n${checked["before"]}",style=MaterialTheme.typography.bodySmall);Text("将保存\n${checked["after"]}",style=MaterialTheme.typography.bodySmall)}}
+                    if(checked!=null&&action!="skip"){Text(checked.coreText("status"));if(checked.coreText("reason").isNotEmpty())Text(checked.coreText("reason"),color=MaterialTheme.colorScheme.error);var details by remember(row.coreText("entryId")){mutableStateOf(false)};TextButton(onClick={details=!details}){Text(stringResource(R.string.rovai_fusion_bdbc894fb7b67568))};if(details){Text("原值\n${checked["before"]}",style=MaterialTheme.typography.bodySmall);Text("将保存\n${checked["after"]}",style=MaterialTheme.typography.bodySmall)}}
                 }
             }
-            if(visible<rows.size)item{TextButton(onClick={visible+=50}){Text("显示更多条目")}}
-            if(!undo)item{Text("明确分配给本机队员（可选）",style=MaterialTheme.typography.titleMedium);Box{TextButton(enabled=!disabled&&pending==null,onClick={memberMenu=true}){Text("添加队员映射")};DropdownMenu(expanded=memberMenu,onDismissRequest={memberMenu=false}){state.members.filter{it.coreText("presence")=="present"&&it.coreText("agentId") !in mappings}.forEach{member->DropdownMenuItem(text={Text(member.coreText("displayName"))},onClick={memberMenu=false;work{
+            if(visible<rows.size)item{TextButton(onClick={visible+=50}){Text(stringResource(R.string.rovai_fusion_c56bfa115708896e))}}
+            if(!undo)item{Text(stringResource(R.string.rovai_fusion_6964264a2426dc58),style=MaterialTheme.typography.titleMedium);Box{TextButton(enabled=!disabled&&pending==null,onClick={memberMenu=true}){Text(stringResource(R.string.rovai_fusion_64247e8d19205dc7))};DropdownMenu(expanded=memberMenu,onDismissRequest={memberMenu=false}){state.members.filter{it.coreText("presence")=="present"&&it.coreText("agentId") !in mappings}.forEach{member->DropdownMenuItem(text={Text(member.coreText("displayName"))},onClick={memberMenu=false;work{
                 val id=member.coreText("agentId");val actual=model.query(RovaiOperation.CONFIGURATION_MEMBERCONNECTION_GET,buildJsonObject{put("schemaVersion",1);put("agentId",id)}).coreObject();current();val runtime=actual["runtime"].coreObject();require(runtime.isNotEmpty()){"请先为这位队员选择可用的程序"};val selection=runtime["modelSelection"]?:buildJsonObject{put("mode","runtime_default")}
                 mappings=mappings+(id to buildJsonObject{put("agentId",id);put("expectedVersion",actual["agentVersion"]!!);put("installationId",runtime["installationId"]!!);put("expectedInstallationGeneration",runtime["installationGeneration"]!!);put("providerEntryId","");put("environmentEntryId",JsonNull);put("modelSelection",selection);put("originalSelection",selection)})
             }})}}}}
@@ -114,30 +117,30 @@ fun RovaiPortableConfigurationMigration(model:RovaiWorkspaceViewModel,onClose:()
                 val candidates=rows.filter{it.coreText("domain")=="modelProviders"&&choices[it.coreText("entryId")]?.get("decision").coreObject().coreText("action") in listOf("create","replace")}.map{buildJsonObject{put("id",it["entryId"]!!);put("name",it["name"]!!)}}
                 PortableMigrationChoice("选择已勾选的服务商来源",candidates,mapping.coreText("providerEntryId"),!disabled&&pending==null){changed("providerEntryId",it["id"]!!)}
                 PortableMigrationChoice("环境设置：留空或选准确来源",listOf(buildJsonObject{put("id","");put("name","不迁入环境值")})+rows.filter{it.coreText("domain")=="agentSettings"}.map{buildJsonObject{put("id",it["entryId"]!!);put("name",it["name"]!!)}},mapping.coreText("environmentEntryId"),!disabled&&pending==null){changed("environmentEntryId",it.coreText("id").takeIf(String::isNotEmpty)?.let(::JsonPrimitive)?:JsonNull)}
-                Row{FilterChip(selected=mapping["modelSelection"]==mapping["originalSelection"],enabled=!disabled,onClick={changed("modelSelection",mapping["originalSelection"]!!)},label={Text("保留队员模型选择")});FilterChip(selected=mapping["modelSelection"].coreObject().coreText("mode")=="runtime_default",enabled=!disabled,onClick={changed("modelSelection",buildJsonObject{put("mode","runtime_default")})},label={Text("程序默认模型")})}
-                TextButton(enabled=!disabled,onClick={mappings=mappings-id;preview=null}){Text("移除此队员映射")}
+                Row{FilterChip(selected=mapping["modelSelection"]==mapping["originalSelection"],enabled=!disabled,onClick={changed("modelSelection",mapping["originalSelection"]!!)},label={Text(stringResource(R.string.rovai_fusion_fd860924a3da2d26))});FilterChip(selected=mapping["modelSelection"].coreObject().coreText("mode")=="runtime_default",enabled=!disabled,onClick={changed("modelSelection",buildJsonObject{put("mode","runtime_default")})},label={Text(stringResource(R.string.rovai_fusion_cd4677d7431b4397))})}
+                TextButton(enabled=!disabled,onClick={mappings=mappings-id;preview=null}){Text(stringResource(R.string.rovai_fusion_b4796755677ce470))}
             }}
             item{Row{
                 if(!undo)TextButton(enabled=!disabled&&pending==null&&selected.isNotEmpty()&&selected.none{it["decision"].coreObject().coreText("action")=="replace"&&it["decision"].coreObject()["targetId"] is JsonNull}&&mappings.values.none{it.coreText("providerEntryId").isEmpty()},onClick={work{
                     val value=model.query(RovaiOperation.CONFIGURATION_MIGRATION_PREVIEW,buildJsonObject{put("schemaVersion",1);put("archiveId",archive!!["archiveId"]!!);put("sourceDigest",archive!!["sourceDigest"]!!);put("selections",JsonArray(selected));put("members",JsonArray(mappings.values.map{JsonObject(it.filterKeys{key->key!="originalSelection"})}))}).coreObject();current();preview=value;undo=false
-                }}){Text("生成完整预览")}
+                }}){Text(stringResource(R.string.rovai_fusion_d66e8f934e64ac8f))}
                 TextButton(enabled=!disabled&&pending==null&&preview?.get("canApply")==JsonPrimitive(true),onClick={confirm=true}){Text(if(undo)"确认撤销" else "确认搬入")}
             }}
         }
         if(receipt!=null)item{GlassRow{
-            Text("原结果 · ${receipt!!.coreText("state")}",style=MaterialTheme.typography.titleMedium);Text("历史任务和消息保留。数据库提交与文件保存分别列出。")
+            Text("原结果 · ${receipt!!.coreText("state")}",style=MaterialTheme.typography.titleMedium);Text(stringResource(R.string.rovai_fusion_475ce8a6b14f7f94))
             receipt!!["files"].coreArray().forEach{file->Text("${file.coreText("targetId")} · ${file.coreText("state")}")}
-            TextButton(enabled=!disabled&&last!=null,onClick={work{readReceipt(last!!)}}){Text("刷新文件状态")}
-            if(last!=null&&receipt!!.coreText("state")=="applied"&&receipt!!["files"].coreArray().any{it.coreText("state")=="pending"})TextButton(enabled=!disabled&&pending==null,onClick={work{model.privateConfiguration("files-finish",buildJsonObject{put("commandId",last!!["commandId"]!!)});current();readReceipt(last!!)}}){Text("继续保存原配置文件")}
-            TextButton(enabled=!disabled&&pending==null&&receipt!!.coreText("state")=="applied"&&last?.coreText("operation")=="configuration.migration.confirm"&&receipt!!["files"].coreArray().all{it.coreText("state")=="applied"},onClick={work{val value=model.query(RovaiOperation.CONFIGURATION_MIGRATION_UNDOPREVIEW,buildJsonObject{put("schemaVersion",1);put("originalCommandId",last!!["commandId"]!!)}).coreObject();current();preview=value;rows=value["rows"].coreArray();undo=true;visible=50;if(archive==null)archive=buildJsonObject{put("archiveId",value["archiveId"]?:JsonNull);put("sourceDigest",value["sourceDigest"]?:JsonNull)}}){Text("预览撤销这次导入")}
+            TextButton(enabled=!disabled&&last!=null,onClick={work{readReceipt(last!!)}}){Text(stringResource(R.string.rovai_fusion_66f98bd9b1149ef5))}
+            if(last!=null&&receipt!!.coreText("state")=="applied"&&receipt!!["files"].coreArray().any{it.coreText("state")=="pending"})TextButton(enabled=!disabled&&pending==null,onClick={work{model.privateConfiguration("files-finish",buildJsonObject{put("commandId",last!!["commandId"]!!)});current();readReceipt(last!!)}}){Text(stringResource(R.string.rovai_fusion_e26fac1811e18695))}
+            TextButton(enabled=!disabled&&pending==null&&receipt!!.coreText("state")=="applied"&&last?.coreText("operation")=="configuration.migration.confirm"&&receipt!!["files"].coreArray().all{it.coreText("state")=="applied"},onClick={work{val value=model.query(RovaiOperation.CONFIGURATION_MIGRATION_UNDOPREVIEW,buildJsonObject{put("schemaVersion",1);put("originalCommandId",last!!["commandId"]!!)}).coreObject();current();preview=value;rows=value["rows"].coreArray();undo=true;visible=50;if(archive==null)archive=buildJsonObject{put("archiveId",value["archiveId"]?:JsonNull);put("sourceDigest",value["sourceDigest"]?:JsonNull)}}){Text(stringResource(R.string.rovai_fusion_c7258de16fde624e))}
         }}
         if(issue!=null)item{Text(issue!!,color=MaterialTheme.colorScheme.error)}
         if(busy)item{LinearProgressIndicator(Modifier.fillMaxWidth())}
     }
-    if(confirm)AlertDialog(onDismissRequest={if(!busy)confirm=false},title={Text(if(undo)"撤销这次配置导入？" else "搬入已预览的配置？")},text={Text("只处理当前预览明确选择的条目；有后续修改会拒绝覆盖。历史任务保留，也不会自动开始工作。")},dismissButton={TextButton(enabled=!busy,onClick={confirm=false}){Text("返回预览")}},confirmButton={TextButton(enabled=!disabled&&pending==null&&preview?.get("canApply")==JsonPrimitive(true),onClick={confirm=false;work{
+    if(confirm)AlertDialog(onDismissRequest={if(!busy)confirm=false},title={Text(if(undo)"撤销这次配置导入？" else "搬入已预览的配置？")},text={Text(stringResource(R.string.rovai_fusion_8d099a6c6e9675a5))},dismissButton={TextButton(enabled=!busy,onClick={confirm=false}){Text(stringResource(R.string.rovai_fusion_c568c3012a5e0f77))}},confirmButton={TextButton(enabled=!disabled&&pending==null&&preview?.get("canApply")==JsonPrimitive(true),onClick={confirm=false;work{
         val frozen=preview?:error("请重新预览");val operation=if(undo)"configuration.migration.undoConfirm" else "configuration.migration.confirm";val command=buildJsonObject{put("operation",operation);put("commandId",UUID.randomUUID().toString());put("previewId",frozen["previewId"]!!);put("previewDigest",frozen["previewDigest"]!!)};remember(command)
         val value=model.query(if(undo)RovaiOperation.CONFIGURATION_MIGRATION_UNDOCONFIRM else RovaiOperation.CONFIGURATION_MIGRATION_CONFIRM,buildJsonObject{put("schemaVersion",1);put("commandId",command["commandId"]!!);put("previewId",frozen["previewId"]!!);put("previewDigest",frozen["previewDigest"]!!)}).coreObject();current();require(value["commandId"]==command["commandId"]){"原回执编号不同"};readReceipt(command)
-    }}){Text("确认")}})
+    }}){Text(stringResource(R.string.rovai_fusion_36f33adaf0942634))}})
 }
 
 @Composable

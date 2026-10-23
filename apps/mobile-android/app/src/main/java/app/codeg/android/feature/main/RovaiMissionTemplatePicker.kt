@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -34,21 +37,21 @@ fun RovaiMissionTemplatePicker(model:RovaiWorkspaceViewModel,disabled:Boolean,me
                     require(config["prompt_blocks"].coreArray().all{it is JsonObject}&&config["prompt_blocks"].coreArray().size<=8192&&config["prompt_blocks"].coreArray().count{it.coreObject().coreText("type")!="text"}<=128){"原模板材料无法读取或数量超过限制"}
                     selected=value;configuration=config;mappings=emptyMap();confirmed=false
                 }}){Text(row.coreText("name"))}}
-                if(next!=null)TextButton(enabled=!disabled&&!busy,onClick={work{list(true)}}){Text("更多模板")}
-                if(!busy&&rows.isEmpty())Text("还没有模板，可在主机配置迁移与模板设置中创建或搬入。")
+                if(next!=null)TextButton(enabled=!disabled&&!busy,onClick={work{list(true)}}){Text(stringResource(R.string.rovai_fusion_410c5dec4344d34a))}
+                if(!busy&&rows.isEmpty())Text(stringResource(R.string.rovai_fusion_0fe9e89826005c15))
             }else{
                 Text(selected!!.coreText("title").ifBlank{selected!!.coreText("name")},style=MaterialTheme.typography.titleSmall)
-                if(settings){Row{Checkbox(confirmed,{confirmed=it},enabled=!disabled&&!busy);Text("改用当前工程、分支和已选择队员的运行设置，原模板继续保留。",Modifier.weight(1f))};if(memberCount==0)Text("请先选择使命执行队员。")}
+                if(settings){Row{Checkbox(confirmed,{confirmed=it},enabled=!disabled&&!busy);Text(stringResource(R.string.rovai_fusion_85f6521c27e529e9),Modifier.weight(1f))};if(memberCount==0)Text(stringResource(R.string.rovai_fusion_fedbf290cd2f1c48))}
                 if(required.isNotEmpty()){
-                    Text("旧材料路径不会直接读取。先添加本次材料，再逐项对应。")
-                    TextButton(enabled=!disabled&&!busy,onClick=onChooseMaterials){Text("选择本次材料")}
+                    Text(stringResource(R.string.rovai_fusion_119b968464bb0e6d))
+                    TextButton(enabled=!disabled&&!busy,onClick=onChooseMaterials){Text(stringResource(R.string.rovai_fusion_062bab78ef8b5dc2))}
                     required.forEach{row->var expanded by remember(row.index){mutableStateOf(false)};val name=row.value.coreObject().coreText("name").ifEmpty{"原材料 ${row.index+1}"};Box{
                         TextButton(enabled=!disabled&&!busy,onClick={expanded=true}){Text(name+" · "+(materials.find{it.first==mappings[row.index]}?.second?:"选择已加入的材料"))}
                         DropdownMenu(expanded,onDismissRequest={expanded=false}){materials.forEach{(id,label)->DropdownMenuItem(text={Text(label)},onClick={expanded=false;mappings=mappings+(row.index to id)})}}
                     }}
                 }
-                Text("填入会替换当前标题和说明；确认创建使命前不会启动。",style=MaterialTheme.typography.bodySmall)
-                Row{TextButton(enabled=canApply,onClick={val config=configuration!!;val body=config["display_text"]?.jsonPrimitive?.contentOrNull?:blocks.filter{it.coreObject().coreText("type")=="text"}.joinToString("\n"){it.coreObject().coreText("text")};onApply(selected!!.coreText("title"),body);open=false;selected=null;configuration=null}){Text("填入标题和说明")};TextButton(enabled=!busy,onClick={selected=null;configuration=null}){Text("返回列表")}}
+                Text(stringResource(R.string.rovai_fusion_6cfcd503a3fc0732),style=MaterialTheme.typography.bodySmall)
+                Row{TextButton(enabled=canApply,onClick={val config=configuration!!;val body=config["display_text"]?.jsonPrimitive?.contentOrNull?:blocks.filter{it.coreObject().coreText("type")=="text"}.joinToString("\n"){it.coreObject().coreText("text")};onApply(selected!!.coreText("title"),body);open=false;selected=null;configuration=null}){Text(stringResource(R.string.rovai_fusion_d163fb0aabf2929f))};TextButton(enabled=!busy,onClick={selected=null;configuration=null}){Text(stringResource(R.string.rovai_fusion_e9d5ca6c140665da))}}
             }
             if(issue!=null)Text(issue!!,color=MaterialTheme.colorScheme.error)
             if(busy)LinearProgressIndicator(Modifier.fillMaxWidth())

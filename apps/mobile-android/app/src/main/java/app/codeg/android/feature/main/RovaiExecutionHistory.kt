@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -28,10 +31,10 @@ fun RovaiExecutionHistory(model:RovaiWorkspaceViewModel,threadId:String,run:Json
     val source=if(page!=null)page!!["evidence"].coreArray()+page!!["activeEvidence"].coreArray()else observed
     val groups=source.filter{it.coreText("agentRunId")==runId&&it.coreLong("executionEpoch")==epoch&&it.coreText("kind")!="reasoning_summary"}.sortedBy{it.coreLong("sequence")}.groupBy{it["canonical"].coreObject().coreText("operationId").ifEmpty{it.coreText("operationId").ifEmpty{it.coreText("id")}}}
     Column(verticalArrangement=Arrangement.spacedBy(8.dp)){
-        Row{TextButton(onClick={expanded=!expanded}){Text((if(expanded)"收起过程" else "查看过程")+" · "+run.coreText("status"))};if(expanded&&before!=null)TextButton(enabled=!busy,onClick={scope.launch{load()}}){Text("返回最新")}}
+        Row{TextButton(onClick={expanded=!expanded}){Text((if(expanded)"收起过程" else "查看过程")+" · "+run.coreText("status"))};if(expanded&&before!=null)TextButton(enabled=!busy,onClick={scope.launch{load()}}){Text(stringResource(R.string.rovai_fusion_8367d15e3204dc62))}}
         if(expanded){
             issue?.let{Text(it,color=CodegTheme.colors.danger)}
-            if(page?.get("hasMore")==JsonPrimitive(true))TextButton(enabled=!busy,onClick={val cursor=(page?.get("nextBeforeSequence") as? JsonPrimitive)?.longOrNull;if(cursor!=null)scope.launch{load(cursor)}}){Text("更早的过程")}
+            if(page?.get("hasMore")==JsonPrimitive(true))TextButton(enabled=!busy,onClick={val cursor=(page?.get("nextBeforeSequence") as? JsonPrimitive)?.longOrNull;if(cursor!=null)scope.launch{load(cursor)}}){Text(stringResource(R.string.rovai_fusion_71d5cd6c800c841b))}
             groups.values.forEach{versions->val evidence=versions.maxWithOrNull(compareBy<JsonObject>{it.coreLong("revision")}.thenBy{it.coreLong("changeSequence")}.thenBy{it.coreLong("sequence")})?:return@forEach
                 key(evidence.coreText("id")){
                     val payload=full[evidence.coreText("id")]?:evidence["payload"].coreObject();val canonical=evidence["canonical"].coreObject();val kind=evidence.coreText("kind")
@@ -47,8 +50,8 @@ fun RovaiExecutionHistory(model:RovaiWorkspaceViewModel,threadId:String,run:Json
                         ToolCallCard(ToolCallVM.of(evidence.coreText("id"),canonical.coreText("toolName").ifEmpty{payload.coreText("title").ifEmpty{item.coreText("tool").ifEmpty{canonical.coreText("presentationHint").ifEmpty{kind}}}},if(canonical.coreText("activityDomain")=="shell")"execute" else payload.coreText("kind"),if(running)ToolCallState.RUNNING else if(failed)ToolCallState.ERROR else ToolCallState.DONE,input,output,diff,failed))
                         if(outcome in listOf("unknown","unsettled","cancelled","not_executed","denied"))Text(when(outcome){"cancelled"->"已停止";"not_executed"->"未执行";"denied"->"已拒绝";else->"结果尚未确定"},style=MaterialTheme.typography.labelSmall,color=CodegTheme.colors.textSecondary)
                     }
-                    if(evidence["outputTruncated"]==JsonPrimitive(true))Text("结果过长，部分内容已永久省略。",style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)
-                    if(evidence["contentBlobId"]!=null&&evidence["contentBlobId"]!=JsonNull&&full[evidence.coreText("id")]==null)TextButton(enabled=!busy,onClick={scope.launch{busy=true;try{val value=model.query(RovaiOperation.AGENTRUNEVIDENCE_GETCONTENT,buildJsonObject{put("threadId",threadId);put("evidenceId",evidence.coreText("id"))}).coreObject();val payload=value["payload"].coreObject();require(payload.toString().length<=4*1024*1024){"完整结果较大，请在工程中查看产物"};full=mapOf(evidence.coreText("id") to payload)}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message}finally{busy=false}}}){Text("读取完整输入和输出")}
+                    if(evidence["outputTruncated"]==JsonPrimitive(true))Text(stringResource(R.string.rovai_fusion_655e6ed3e412389e),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)
+                    if(evidence["contentBlobId"]!=null&&evidence["contentBlobId"]!=JsonNull&&full[evidence.coreText("id")]==null)TextButton(enabled=!busy,onClick={scope.launch{busy=true;try{val value=model.query(RovaiOperation.AGENTRUNEVIDENCE_GETCONTENT,buildJsonObject{put("threadId",threadId);put("evidenceId",evidence.coreText("id"))}).coreObject();val payload=value["payload"].coreObject();require(payload.toString().length<=4*1024*1024){"完整结果较大，请在工程中查看产物"};full=mapOf(evidence.coreText("id") to payload)}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message}finally{busy=false}}}){Text(stringResource(R.string.rovai_fusion_fa96b64068fddf27))}
                 }
             }
             if(busy)LinearProgressIndicator(Modifier.fillMaxWidth())

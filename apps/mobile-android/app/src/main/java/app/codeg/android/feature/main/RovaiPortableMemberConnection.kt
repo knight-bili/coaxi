@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -34,25 +37,25 @@ fun RovaiPortableMemberConnection(model:RovaiWorkspaceViewModel,agentId:String,d
     fun work(action:suspend()->Unit){if(busy)return;busy=true;issue=null;scope.launch{try{action()}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message?:"连接设置未完成"}finally{busy=false}}}
     LaunchedEffect(agentId){busy=true;try{identity=model.presentationIdentity();val raw=model.readBody(owner());if(raw.isNotBlank()){val value=Json.parseToJsonElement(raw).coreObject();require(value.keys==setOf("operation","commandId","targetId")&&value.coreText("operation")=="configuration.memberConnection.set"&&value.coreText("targetId")==agentId);UUID.fromString(value.coreText("commandId"));pending=value};load()}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue="队员连接或原请求恢复失败"}finally{busy=false}}
     Column(verticalArrangement=Arrangement.spacedBy(8.dp)){
-        Text("模型服务商",style=MaterialTheme.typography.titleSmall)
-        Text("明确选择后只用于之后的新任务；原任务保留原服务商版本。",style=MaterialTheme.typography.bodySmall)
-        if(binding["runtime"]==JsonNull)Text("原运行程序在当前主机尚不可用。请先保存上面的本机程序设置，再刷新连接；旧任务保留原连接。",style=MaterialTheme.typography.bodySmall)
+        Text(stringResource(R.string.rovai_fusion_e0e9874451748a8d),style=MaterialTheme.typography.titleSmall)
+        Text(stringResource(R.string.rovai_fusion_c1ef3207a40d928c),style=MaterialTheme.typography.bodySmall)
+        if(binding["runtime"]==JsonNull)Text(stringResource(R.string.rovai_fusion_bd2be4a7549b7531),style=MaterialTheme.typography.bodySmall)
         Box{
             val selected=providers.find{it.coreText("id")==choice.coreObject().coreText("id")&&it["revision"]==choice.coreObject()["revision"]}
             OutlinedButton(onClick={menu=true},enabled=!unavailable&&pending==null){Text(if(choice is JsonNull)"使用程序原有配置" else selected?.coreText("name")?:"保留已选历史版本")}
             DropdownMenu(expanded=menu,onDismissRequest={menu=false}){
-                DropdownMenuItem(text={Text("使用程序原有配置")},onClick={choice=JsonNull;menu=false})
-                if(original !is JsonNull)DropdownMenuItem(text={Text("保留原连接版本")},onClick={choice=original;menu=false})
+                DropdownMenuItem(text={Text(stringResource(R.string.rovai_fusion_db17c81000e2049b))},onClick={choice=JsonNull;menu=false})
+                if(original !is JsonNull)DropdownMenuItem(text={Text(stringResource(R.string.rovai_fusion_284251c01f0d666d))},onClick={choice=original;menu=false})
                 providers.filter{it.coreText("agentType")==kind&&it["enabled"]==JsonPrimitive(true)}.forEach{provider->DropdownMenuItem(text={Text(provider.coreText("name"))},onClick={choice=buildJsonObject{put("id",provider["id"]!!);put("revision",provider["revision"]!!);put("digest",provider["digest"]!!)};menu=false})}
             }
         }
         Row{
-            TextButton(onClick={work{load()}},enabled=!unavailable&&pending==null){Text("刷新")}
-            if(next!=null)TextButton(onClick={work{load(true)}},enabled=!unavailable&&pending==null){Text("加载更多服务商")}
-            TextButton(enabled=!unavailable&&pending==null&&choice!=original,onClick={work{current();val command=UUID.randomUUID().toString();remember(buildJsonObject{put("operation","configuration.memberConnection.set");put("commandId",command);put("targetId",agentId)});val result=model.query(RovaiOperation.CONFIGURATION_MEMBERCONNECTION_SET,buildJsonObject{put("schemaVersion",1);put("commandId",command);put("agentId",agentId);put("expectedVersion",binding["agentVersion"]?:JsonNull);put("connection",choice)}).coreObject();current();accept(result)}}){Text("保存连接")}
+            TextButton(onClick={work{load()}},enabled=!unavailable&&pending==null){Text(stringResource(R.string.rovai_fusion_aee88743413144a2))}
+            if(next!=null)TextButton(onClick={work{load(true)}},enabled=!unavailable&&pending==null){Text(stringResource(R.string.rovai_fusion_d91f4b6fa02fd05c))}
+            TextButton(enabled=!unavailable&&pending==null&&choice!=original,onClick={work{current();val command=UUID.randomUUID().toString();remember(buildJsonObject{put("operation","configuration.memberConnection.set");put("commandId",command);put("targetId",agentId)});val result=model.query(RovaiOperation.CONFIGURATION_MEMBERCONNECTION_SET,buildJsonObject{put("schemaVersion",1);put("commandId",command);put("agentId",agentId);put("expectedVersion",binding["agentVersion"]?:JsonNull);put("connection",choice)}).coreObject();current();accept(result)}}){Text(stringResource(R.string.rovai_fusion_f5dede740ee08b61))}
         }
-        if(pending!=null){Text("原请求待核对，未重复发送。");TextButton(enabled=!busy,onClick={work{val original=pending?:return@work;val value=model.query(RovaiOperation.COMMANDS_RECONCILE,buildJsonObject{put("operation","configuration.memberConnection.set");put("params",buildJsonObject{put("commandId",original["commandId"]!!)})}).coreObject();current();if(value.coreText("state")!="recorded")error("原请求尚无确定回执");accept(value["result"].coreObject())}}){Text("核对原请求")}}
-        if(disabled)Text("请先保存或取消上面的运行设置。",style=MaterialTheme.typography.bodySmall)
+        if(pending!=null){Text(stringResource(R.string.rovai_fusion_4a94d16197812038));TextButton(enabled=!busy,onClick={work{val original=pending?:return@work;val value=model.query(RovaiOperation.COMMANDS_RECONCILE,buildJsonObject{put("operation","configuration.memberConnection.set");put("params",buildJsonObject{put("commandId",original["commandId"]!!)})}).coreObject();current();if(value.coreText("state")!="recorded")error("原请求尚无确定回执");accept(value["result"].coreObject())}}){Text(stringResource(R.string.rovai_fusion_d027c9aa232e6375))}}
+        if(disabled)Text(stringResource(R.string.rovai_fusion_ad10aebe4e5fee5b),style=MaterialTheme.typography.bodySmall)
         if(issue!=null)Text(issue!!,color=MaterialTheme.colorScheme.error)
         if(busy)LinearProgressIndicator(Modifier.fillMaxWidth())
     }

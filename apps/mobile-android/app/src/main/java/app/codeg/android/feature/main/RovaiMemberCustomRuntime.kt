@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -33,15 +36,15 @@ import java.util.UUID
     }
     LaunchedEffect(id){busy=true;try{val raw=model.readBody(owner);if(raw.isNotEmpty()){val parsed=Json.parseToJsonElement(raw).coreObject();require(parsed["command"].coreObject().coreText("agentId")==id){"原请求队员归属不同"};original=parsed};load()}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message}finally{busy=false}}
     Column(verticalArrangement=Arrangement.spacedBy(6.dp)){
-        Text("自定义智能体程序",style=MaterialTheme.typography.titleSmall);Text("从已添加的具体版本中选择。先在智能体设置中安装此版本。",style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)
+        Text(stringResource(R.string.rovai_fusion_cc4a09ee1b3966b6),style=MaterialTheme.typography.titleSmall);Text(stringResource(R.string.rovai_fusion_9e14caaf5070d3ff),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)
         rows.forEach{definition->FilterChip(selected=selected==definition.coreText("id"),onClick={selected=definition.coreText("id")},enabled=!disabled&&original==null&&definition["enabled"]==JsonPrimitive(true),label={Text("${definition.coreText("name")} · ${definition.coreText("version")} · r${definition.coreLong("revision")}")})}
-        if(next!=null)TextButton(enabled=!disabled,onClick={work{load(true)}}){Text("更多程序")}
+        if(next!=null)TextButton(enabled=!disabled,onClick={work{load(true)}}){Text(stringResource(R.string.rovai_fusion_ac09edc833c947fe))}
         if(saved.isNotEmpty())Text("当前保存：${saved.coreText("id")} · r${saved.coreLong("definitionRevision")}",style=MaterialTheme.typography.bodySmall)
-        if(current!=null){Row{Text("指定模型",Modifier.weight(1f));Switch(explicit,{explicit=it},enabled=!disabled&&original==null)}
-            if(explicit){OutlinedTextField(modelId,{modelId=it},label={Text("原程序模型标识")},enabled=!disabled&&original==null,modifier=Modifier.fillMaxWidth());OutlinedTextField(options,{options=it},label={Text("模型参数 JSON")},minLines=3,enabled=!disabled&&original==null,modifier=Modifier.fillMaxWidth())}
-            Text("保存只影响之后的任务。模型和参数由真实智能体会话核对，失败会保留原因，不自动换模型。",style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)}
+        if(current!=null){Row{Text(stringResource(R.string.rovai_fusion_1172c2c1e1066678),Modifier.weight(1f));Switch(explicit,{explicit=it},enabled=!disabled&&original==null)}
+            if(explicit){OutlinedTextField(modelId,{modelId=it},label={Text(stringResource(R.string.rovai_fusion_457eefa1ba44a166))},enabled=!disabled&&original==null,modifier=Modifier.fillMaxWidth());OutlinedTextField(options,{options=it},label={Text(stringResource(R.string.rovai_fusion_c4b003c388bf5f4f))},minLines=3,enabled=!disabled&&original==null,modifier=Modifier.fillMaxWidth())}
+            Text(stringResource(R.string.rovai_fusion_2fcd14ac0bcd4a2d),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)}
         issue?.let{Text(it,color=CodegTheme.colors.danger)}
-        if(original!=null){Text(original!!.coreText("commandId"),style=MaterialTheme.typography.bodySmall);TextButton(enabled=!disabled,onClick={work{apply(true)}}){Text("核对原配置请求")}}
-        else TextButton(enabled=!disabled&&current?.get("enabled")==JsonPrimitive(true),onClick={work{apply(false)}}){Text("使用所选程序")}
+        if(original!=null){Text(original!!.coreText("commandId"),style=MaterialTheme.typography.bodySmall);TextButton(enabled=!disabled,onClick={work{apply(true)}}){Text(stringResource(R.string.rovai_fusion_cb5b16f6ecaa36fa))}}
+        else TextButton(enabled=!disabled&&current?.get("enabled")==JsonPrimitive(true),onClick={work{apply(false)}}){Text(stringResource(R.string.rovai_fusion_b0502b2b524859e9))}
     }
 }

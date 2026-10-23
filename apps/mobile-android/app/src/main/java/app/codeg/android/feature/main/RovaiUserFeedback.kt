@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -32,12 +35,12 @@ private fun feedbackStatus(value:JsonObject)=when(value.coreText("status")){"pen
     LaunchedEffect(agentId){busy=true;try{val raw=model.readBody(owner);if(raw.isNotEmpty())original=Json.parseToJsonElement(raw).coreObject();read()}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message}finally{busy=false}}
     val enabled=policy?.get("members").coreArray().find{it.coreText("agentId")==agentId}?.get("enabled")==JsonPrimitive(true)
     Column(verticalArrangement=Arrangement.spacedBy(6.dp)){
-        Row{Column(Modifier.weight(1f)){Text("工作中接收补充");Text("默认关闭；开启后从新任务生效，队员主动检查时才会收到。",style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)};Switch(enabled=!busy&&policy!=null&&original==null&&!state.busy&&state.pending==null&&generation==model.connectionGeneration,checked=enabled,onCheckedChange={selected->
+        Row{Column(Modifier.weight(1f)){Text(stringResource(R.string.rovai_fusion_d6035842167465ae));Text(stringResource(R.string.rovai_fusion_e64072d892a6508d),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)};Switch(enabled=!busy&&policy!=null&&original==null&&!state.busy&&state.pending==null&&generation==model.connectionGeneration,checked=enabled,onCheckedChange={selected->
             val current=policy?:return@Switch;val members=current["members"].coreArray().filter{it.coreText("agentId")!=agentId}+buildJsonObject{put("agentId",agentId);put("enabled",selected)}
             val input=buildJsonObject{put("schemaVersion",1);put("expectedRevision",current.coreLong("revision"));put("members",JsonArray(members))};original=input;coroutine.launch{save(input)}
         })}
         issue?.let{Text(it,style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.danger)}
-        original?.let{pending->TextButton(enabled=!busy&&generation==model.connectionGeneration,onClick={coroutine.launch{save(pending)}}){Text("核对原设置")}}
+        original?.let{pending->TextButton(enabled=!busy&&generation==model.connectionGeneration,onClick={coroutine.launch{save(pending)}}){Text(stringResource(R.string.rovai_fusion_beb24f0853f091f3))}}
     }
 }
 
@@ -66,29 +69,29 @@ private fun feedbackStatus(value:JsonObject)=when(value.coreText("status")){"pen
     LaunchedEffect(selected){if(ready)work{read()}}
     Dialog(onDismissRequest={if(!busy)onClose()},properties=DialogProperties(usePlatformDefaultWidth=false,dismissOnClickOutside=false)){
         Surface(Modifier.fillMaxSize(),color=CodegTheme.colors.bgElevated){Column(Modifier.fillMaxSize()){
-            Row(Modifier.fillMaxWidth().padding(12.dp)){Text("工作中补充和反馈记录",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(enabled=!busy,onClick=onClose){Text("关闭")}}
+            Row(Modifier.fillMaxWidth().padding(12.dp)){Text(stringResource(R.string.rovai_fusion_d223a7cd3f8dbb4b),Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(enabled=!busy,onClick=onClose){Text(stringResource(R.string.rovai_fusion_3fd47edce45b3603))}}
             LazyColumn(Modifier.weight(1f),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
-                item{issue?.let{Text(it,color=CodegTheme.colors.danger)};Text("先预览全文，再交给队员。送到连接不代表模型已阅读。",style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)}
+                item{issue?.let{Text(it,color=CodegTheme.colors.danger)};Text(stringResource(R.string.rovai_fusion_8284702086eca39f),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)}
                 if(packet==null){
-                    if(agentId==null)item{Text("查看哪位队员的反馈");state.members.filter{member->state.thread?.get("members").coreArray().any{it.coreText("agentId")==member.coreText("agentId")}}.forEach{member->TextButton(enabled=!disabled,onClick={selected=member.coreText("agentId");run=""}){Text((if(selected==member.coreText("agentId"))"✓ " else "")+member.coreText("displayName"))}}}
-                    item{OutlinedTextField(body,{text->body=text;model.rememberBody("$owner:text",text)},Modifier.fillMaxWidth(),label={Text("补充说明")},enabled=!disabled,maxLines=8);Text("${body.codePointCount(0,body.length)}/4096",style=MaterialTheme.typography.bodySmall);TextButton(enabled=!disabled,onClick={nativeOpen=true}){Text("预览原生插话及当前材料")}}
+                    if(agentId==null)item{Text(stringResource(R.string.rovai_fusion_892de0f32f55bf61));state.members.filter{member->state.thread?.get("members").coreArray().any{it.coreText("agentId")==member.coreText("agentId")}}.forEach{member->TextButton(enabled=!disabled,onClick={selected=member.coreText("agentId");run=""}){Text((if(selected==member.coreText("agentId"))"✓ " else "")+member.coreText("displayName"))}}}
+                    item{OutlinedTextField(body,{text->body=text;model.rememberBody("$owner:text",text)},Modifier.fillMaxWidth(),label={Text(stringResource(R.string.rovai_fusion_6f3ebd2d3e876212))},enabled=!disabled,maxLines=8);Text("${body.codePointCount(0,body.length)}/4096",style=MaterialTheme.typography.bodySmall);TextButton(enabled=!disabled,onClick={nativeOpen=true}){Text(stringResource(R.string.rovai_fusion_083f2ae3011d9e4a))}}
                     items(targets.filter{selected.isEmpty()||it.coreText("agentId")==selected},key={it.coreText("agentRunId")}){target->Row{RadioButton(selected=run==target.coreText("agentRunId"),onClick={run=target.coreText("agentRunId");selected=target.coreText("agentId")},enabled=!disabled);Column{Text(target.coreText("displayName"));Text(target.coreText("agentRunId"),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)}}}
                     item{val target=targets.find{it.coreText("agentRunId")==run};Button(enabled=!disabled&&target?.get("feedbackEnabled")==JsonPrimitive(true)&&target["nativeBindingReady"]==JsonPrimitive(true)&&body.isNotBlank()&&body.codePointCount(0,body.length)<=4096,onClick={work{
                         val request=buildJsonObject{put("schemaVersion",1);put("scope",scope);put("agentId",selected);put("agentRunId",run);put("executionEpoch",target!!["executionEpoch"]!!);putJsonObject("source"){put("kind","live_note")};put("text",body);put("title","");put("fields",JsonArray(emptyList()))}
                         val preview=feedbackCall(model,"preview",request);keep(buildJsonObject{put("kind","feedback");put("preview",preview)});receipt=null;uncertain=false
-                    }}){Text("查看完整内容")};if(targets.isEmpty())Text("当前没有可接收反馈的运行任务。",style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary);TextButton(enabled=!disabled,onClick={work{read()}}){Text("核对记录")}}
-                    items(previews.filter{it["receipt"]==null||it["receipt"]==JsonNull},key={it["preview"].coreObject().coreText("previewId")}){row->GlassRow(Modifier.fillMaxWidth()){Text("原预览仍保留");Text(row["preview"].coreObject().coreText("text"));TextButton(enabled=!disabled,onClick={work{keep(buildJsonObject{put("kind","feedback");put("preview",row["preview"]!!)});receipt=null;uncertain=false}}){Text("继续核对原预览")}}}
+                    }}){Text(stringResource(R.string.rovai_fusion_a41eb6b5a2385645))};if(targets.isEmpty())Text(stringResource(R.string.rovai_fusion_08bd46885e9f4914),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary);TextButton(enabled=!disabled,onClick={work{read()}}){Text(stringResource(R.string.rovai_fusion_1a84303f79155e88))}}
+                    items(previews.filter{it["receipt"]==null||it["receipt"]==JsonNull},key={it["preview"].coreObject().coreText("previewId")}){row->GlassRow(Modifier.fillMaxWidth()){Text(stringResource(R.string.rovai_fusion_746ace299ab8b7bc));Text(row["preview"].coreObject().coreText("text"));TextButton(enabled=!disabled,onClick={work{keep(buildJsonObject{put("kind","feedback");put("preview",row["preview"]!!)});receipt=null;uncertain=false}}){Text(stringResource(R.string.rovai_fusion_b3a3385e3a691009))}}}
                     items(records,key={it["receipt"].coreObject().coreText("feedbackId")}){row->val record=row["receipt"].coreObject();GlassRow(Modifier.fillMaxWidth()){
                         Text(feedbackStatus(record));Text(row.coreText("text"));Text(record.coreText("feedbackId"),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)
-                        if(record.coreText("status")in listOf("pending","requires_user_review")&&record.coreText("deliveryChannel")=="none"&&(conversationId==null||normalInput!=null))TextButton(enabled=!disabled,onClick={work{val value=feedbackCall(model,"normal.preview",buildJsonObject{put("scope",scope);put("agentId",record.coreText("agentId"));put("feedbackId",record.coreText("feedbackId"))});keep(buildJsonObject{put("kind","normal");put("preview",value["preview"]!!);put("reference",value["reference"]!!)});receipt=null;uncertain=false}}){Text("预览普通消息续办")}
-                        if(record.coreText("status")in listOf("unknown","response_prepared"))Text("原结果尚未确定，不重复发送或改投其他任务。",style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)
+                        if(record.coreText("status")in listOf("pending","requires_user_review")&&record.coreText("deliveryChannel")=="none"&&(conversationId==null||normalInput!=null))TextButton(enabled=!disabled,onClick={work{val value=feedbackCall(model,"normal.preview",buildJsonObject{put("scope",scope);put("agentId",record.coreText("agentId"));put("feedbackId",record.coreText("feedbackId"))});keep(buildJsonObject{put("kind","normal");put("preview",value["preview"]!!);put("reference",value["reference"]!!)});receipt=null;uncertain=false}}){Text(stringResource(R.string.rovai_fusion_3eb525d527efa944))}
+                        if(record.coreText("status")in listOf("unknown","response_prepared"))Text(stringResource(R.string.rovai_fusion_72531fbb3c6a0229),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)
                     }}
-                    if(next!=null||previewNext!=null)item{TextButton(enabled=!disabled,onClick={work{read(true)}}){Text("更多记录")}}
+                    if(next!=null||previewNext!=null)item{TextButton(enabled=!disabled,onClick={work{read(true)}}){Text(stringResource(R.string.rovai_fusion_53cd7722b1efc4c3))}}
                 }else item{
                     val frozen=packet!!;val preview=frozen["preview"].coreObject();val normal=frozen.coreText("kind")=="normal"
                     Text(if(normal)"确认按普通消息继续" else "将交给队员的完整内容",style=MaterialTheme.typography.titleSmall);Text(preview.coreText("text"));Text(preview.coreText("agentRunId"),style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary)
-                    receipt?.let{Text(feedbackStatus(it))};if(uncertain)Text("提交结果待核对；原文和编号保留。",color=CodegTheme.colors.textSecondary)
-                    Row{TextButton(enabled=!disabled,onClick={work{keep(null);receipt=null;uncertain=false;read()}}){Text("返回并保留原文")};Button(enabled=!disabled&&receipt==null,onClick={work{
+                    receipt?.let{Text(feedbackStatus(it))};if(uncertain)Text(stringResource(R.string.rovai_fusion_2ed98fd04e17ac0b),color=CodegTheme.colors.textSecondary)
+                    Row{TextButton(enabled=!disabled,onClick={work{keep(null);receipt=null;uncertain=false;read()}}){Text(stringResource(R.string.rovai_fusion_8838379a3406da31))};Button(enabled=!disabled&&receipt==null,onClick={work{
                         val prior=frozen["original"]as?JsonObject
                         val original=prior?:if(normal)buildJsonObject{put("commandId",preview.coreText("previewId"));put("scope",scope);put("agentId",preview.coreText("agentId"));put("reference",frozen["reference"]!!);put("body",preview.coreText("text"));if(conversationId!=null){val input=normalInput?.invoke()?:error("请先处理普通输入中的材料");input.forEach{(key,value)->put(key,value)}}}else buildJsonObject{put("schemaVersion",1);put("commandId",preview.coreText("previewId"));put("previewId",preview.coreText("previewId"));put("previewDigest",preview.coreText("previewDigest"))}
                         keep(JsonObject(frozen.toMutableMap().apply{put("original",original)}));uncertain=true

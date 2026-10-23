@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -63,11 +66,11 @@ private data class MissionDescriptionDocument(val text:String,val mentions:List<
     fun commit(doc:MissionDescriptionDocument,cursor:Int){document=doc;field=TextFieldValue(annotate(doc),TextRange(cursor.coerceIn(0,doc.text.length)));onChange(doc.content())}
     LaunchedEffect(value,names){try{val next=MissionDescriptionDocument.read(value,names);if(next!=document){document=next;field=TextFieldValue(annotate(next),TextRange(next.snap(field.selection.end)))}}catch(error:Exception){issue=error.message}}
     Column(verticalArrangement=Arrangement.spacedBy(6.dp)){
-        OutlinedTextField(value=field,onValueChange={next->if(next.text==document.text){field=next.copy(annotatedString=annotate(document),selection=TextRange(document.snap(next.selection.start),document.snap(next.selection.end)))}else{val (changed,cursor)=document.edit(next.text);document=changed;field=if(changed.text==next.text)next.copy(annotatedString=annotate(changed),selection=TextRange(changed.snap(next.selection.start),changed.snap(next.selection.end)))else TextFieldValue(annotate(changed),TextRange(cursor));onChange(changed.content())}},modifier=Modifier.fillMaxWidth(),label={Text("使命描述")},enabled=!disabled&&issue==null,minLines=3,maxLines=8)
-        TextButton(enabled=!disabled&&issue==null,onClick={picker=true}){Text("提及队员")}
+        OutlinedTextField(value=field,onValueChange={next->if(next.text==document.text){field=next.copy(annotatedString=annotate(document),selection=TextRange(document.snap(next.selection.start),document.snap(next.selection.end)))}else{val (changed,cursor)=document.edit(next.text);document=changed;field=if(changed.text==next.text)next.copy(annotatedString=annotate(changed),selection=TextRange(changed.snap(next.selection.start),changed.snap(next.selection.end)))else TextFieldValue(annotate(changed),TextRange(cursor));onChange(changed.content())}},modifier=Modifier.fillMaxWidth(),label={Text(stringResource(R.string.rovai_fusion_96a28af327e29417))},enabled=!disabled&&issue==null,minLines=3,maxLines=8)
+        TextButton(enabled=!disabled&&issue==null,onClick={picker=true}){Text(stringResource(R.string.rovai_fusion_1e2d3d2a02fb53e8))}
         issue?.let{Text(it,color=CodegTheme.colors.danger,style=MaterialTheme.typography.bodySmall)}
     }
-    if(picker)AlertDialog(onDismissRequest={picker=false},title={Text("提及队员")},text={LazyColumn(Modifier.heightIn(max=360.dp)){items(members.filter{it.coreText("presence")=="present"},key={it.coreText("agentId")}){member->TextButton(enabled=!disabled,onClick={val (changed,cursor)=document.insert(field.selection,member.coreText("agentId"),member.coreText("displayName"));commit(changed,cursor);picker=false}){Text(member.coreText("displayName"))}}}},confirmButton={TextButton(onClick={picker=false}){Text("关闭")}})
+    if(picker)AlertDialog(onDismissRequest={picker=false},title={Text(stringResource(R.string.rovai_fusion_1e2d3d2a02fb53e8))},text={LazyColumn(Modifier.heightIn(max=360.dp)){items(members.filter{it.coreText("presence")=="present"},key={it.coreText("agentId")}){member->TextButton(enabled=!disabled,onClick={val (changed,cursor)=document.insert(field.selection,member.coreText("agentId"),member.coreText("displayName"));commit(changed,cursor);picker=false}){Text(member.coreText("displayName"))}}}},confirmButton={TextButton(onClick={picker=false}){Text(stringResource(R.string.rovai_fusion_3fd47edce45b3603))}})
 }
 
 fun missionDescriptionMemberIds(value:JsonArray):Set<String> =value.map{it.coreObject()}.filter{it.coreText("kind")=="member_mention"}.map{it.coreText("agentId")}.toSet()

@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
@@ -77,7 +80,7 @@ fun canvasRegionHeight(data:JsonObject,resolution:RovaiCanvasRegionResolution,ex
                 }else{
                     if(data.coreText("content").isNotEmpty())Text(data.coreText("content"),Modifier.padding(12.dp),maxLines=8,overflow=TextOverflow.Ellipsis,color=colors.textSecondary)
                     if(data.coreText("path").isNotEmpty())Text(data.coreText("path"),Modifier.padding(12.dp),maxLines=2,overflow=TextOverflow.Ellipsis,color=colors.textSecondary)
-                    if(data["objectReference"]is JsonObject){val ref=data["objectReference"].coreObject();Text(ref.coreText("taskId").ifEmpty{ref.coreText("missionId")},Modifier.padding(12.dp),style=MaterialTheme.typography.bodySmall);TextButton(onClick=onOpen){Text("读取详情")}}
+                    if(data["objectReference"]is JsonObject){val ref=data["objectReference"].coreObject();Text(ref.coreText("taskId").ifEmpty{ref.coreText("missionId")},Modifier.padding(12.dp),style=MaterialTheme.typography.bodySmall);TextButton(onClick=onOpen){Text(stringResource(R.string.rovai_fusion_e4c16a6055c3f3bd))}}
                 }
                 Spacer(Modifier.weight(1f))
                 if(isSelected&&kind!="conversation")Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.End){Text("↘",Modifier.size(32.dp).pointerInput(id,disabled,zoom,width,height){detectDragGestures(onDragStart={resizeRevision=if(disabled)null else latestRevision},onDragCancel={resize=Offset.Zero;resizeRevision=null},onDragEnd={val revision=resizeRevision;if(!disabled&&revision!=null)onMutation(buildJsonObject{put("type","update");put("nodeId",id);putJsonObject("patch"){put("width",(width+resize.x).coerceIn(minWidth,20000f));put("height",(height+resize.y).coerceIn(minHeight,20000f))}},revision);resize=Offset.Zero;resizeRevision=null}){change,delta->if(resizeRevision!=null){change.consume();resize+=delta/(density*zoom)}}}.padding(6.dp),color=colors.textSecondary)}

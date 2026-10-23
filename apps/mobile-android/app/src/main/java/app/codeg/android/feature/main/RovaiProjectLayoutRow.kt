@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -15,9 +18,9 @@ import kotlinx.serialization.json.*
     Column(Modifier.fillMaxWidth().padding(start=if(location.groupId==null)0.dp else 20.dp)){
         Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(6.dp)){
             Text(if(project)entry.target else groups.firstOrNull{it.coreText("id")==entry.target}?.coreText("name")?:"原分组暂不可用",Modifier.weight(1f),maxLines=2,overflow=TextOverflow.Ellipsis,style=if(project)MaterialTheme.typography.bodySmall else MaterialTheme.typography.titleSmall)
-            TextButton(enabled=!disabled&&location.index>0,onClick={onMove(entry,location.copy(index=location.index-1))}){Text("上移")}
-            TextButton(enabled=!disabled&&location.index<count-1,onClick={onMove(entry,location.copy(index=location.index+1))}){Text("下移")}
+            TextButton(enabled=!disabled&&location.index>0,onClick={onMove(entry,location.copy(index=location.index-1))}){Text(stringResource(R.string.rovai_fusion_f853a70b120418be))}
+            TextButton(enabled=!disabled&&location.index<count-1,onClick={onMove(entry,location.copy(index=location.index+1))}){Text(stringResource(R.string.rovai_fusion_e75e8b4e5c971227))}
         }
-        if(project){RovaiCanvasChoice("所属分组",location.groupId.orEmpty(),listOf("" to "顶层")+groups.map{it.coreText("id") to it.coreText("name")},!disabled){target->if(target!=location.groupId.orEmpty())onMove(entry,RovaiProjectLayoutLocation(target.takeIf{it.isNotEmpty()},if(target.isEmpty())layout.top.size else layout.members[target].orEmpty().size))};if(relation?.parentPath!=null)Text("此工作树跟随主工程归组。",style=MaterialTheme.typography.labelSmall,color=CodegTheme.colors.textSecondary)}
+        if(project){RovaiCanvasChoice("所属分组",location.groupId.orEmpty(),listOf("" to "顶层")+groups.map{it.coreText("id") to it.coreText("name")},!disabled){target->if(target!=location.groupId.orEmpty())onMove(entry,RovaiProjectLayoutLocation(target.takeIf{it.isNotEmpty()},if(target.isEmpty())layout.top.size else layout.members[target].orEmpty().size))};if(relation?.parentPath!=null)Text(stringResource(R.string.rovai_fusion_82fe0ebc9fe245c1),style=MaterialTheme.typography.labelSmall,color=CodegTheme.colors.textSecondary)}
     }
 }

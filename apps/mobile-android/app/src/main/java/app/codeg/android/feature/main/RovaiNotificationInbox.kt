@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -29,8 +32,8 @@ fun RovaiNotificationInbox(model:RovaiWorkspaceViewModel,onClose:()->Unit){
     suspend fun load(after:String?=null){if(busy)return;busy=true;try{val value=model.query(RovaiOperation.NOTIFICATIONS_INBOX,buildJsonObject{put("filter",if(unread)"unread" else "all");put("limit",50);if(after!=null)put("cursor",after)}).coreObject();require(value.coreLong("schemaVersion")==9L){"提醒收件箱格式不兼容"};page=value;cursor=after;issue=null}catch(cancelled:CancellationException){throw cancelled}catch(error:Exception){issue=error.message}finally{busy=false}}
     LaunchedEffect(unread){load()};LaunchedEffect(state.lastResult){if(state.lastCompletedOperation==RovaiOperation.NOTIFICATIONS_ACKNOWLEDGE.wire)load(cursor)}
     Column(Modifier.fillMaxSize()){
-        Row(Modifier.fillMaxWidth().padding(12.dp)){TextButton(onClick=onClose){Text("关闭")};Text("提醒 · ${page.coreLong("unreadCount")} 未读",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(enabled=!busy,onClick={scope.launch{load()}}){Text("最新")}}
-        Row(Modifier.padding(horizontal=16.dp)){FilterChip(selected=unread,onClick={unread=!unread},enabled=!busy,label={Text("只看未读")})}
+        Row(Modifier.fillMaxWidth().padding(12.dp)){TextButton(onClick=onClose){Text(stringResource(R.string.rovai_fusion_3fd47edce45b3603))};Text("提醒 · ${page.coreLong("unreadCount")} 未读",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium);TextButton(enabled=!busy,onClick={scope.launch{load()}}){Text(stringResource(R.string.rovai_fusion_569af1a47dbdf053))}}
+        Row(Modifier.padding(horizontal=16.dp)){FilterChip(selected=unread,onClick={unread=!unread},enabled=!busy,label={Text(stringResource(R.string.rovai_fusion_1bc6f7932763f901))})}
         issue?.let{Text(it,color=CodegTheme.colors.danger,modifier=Modifier.padding(16.dp))}
         LazyColumn(Modifier.weight(1f),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
             items(page["items"].coreArray(),key={it.coreText("id")}){episode->GlassRow(Modifier.fillMaxWidth(),selected=episode["unread"]==JsonPrimitive(true)){
@@ -40,7 +43,7 @@ fun RovaiNotificationInbox(model:RovaiWorkspaceViewModel,onClose:()->Unit){
                     if((action["acknowledgementId"] as? JsonPrimitive)?.contentOrNull!=null)TextButton(enabled=state.pending==null&&!state.busy,onClick={model.command(RovaiOperation.NOTIFICATIONS_ACKNOWLEDGE,buildJsonObject{put("episodeId",episode.coreText("id"));put("observedEpisodeVersion",action.coreLong("observedEpisodeVersion"));put("acknowledgementId",action.coreText("acknowledgementId"))})}){Text(if(action.coreText("kind")=="acknowledge_only")"知道了" else "标记此条提醒已读")}
                 }}
             }}
-            (page["nextCursor"] as? JsonPrimitive)?.contentOrNull?.let{after->item{TextButton(enabled=!busy,onClick={scope.launch{load(after)}}){Text("更早的提醒")}}}
+            (page["nextCursor"] as? JsonPrimitive)?.contentOrNull?.let{after->item{TextButton(enabled=!busy,onClick={scope.launch{load(after)}}){Text(stringResource(R.string.rovai_fusion_5dc6dc14f222769a))}}}
         }
     }
     source?.let{action->Dialog(onDismissRequest={source=null},properties=DialogProperties(usePlatformDefaultWidth=false,dismissOnBackPress=false,dismissOnClickOutside=false)){Surface(Modifier.fillMaxSize(),color=CodegTheme.colors.bgElevated){val single=action["singleChat"].coreObject();if(action.coreText("kind")=="open_single_chat"&&single.coreText("conversationId").isNotEmpty())RovaiPrivateConversation(model,action.coreText("threadId"),initialConversationId=single.coreText("conversationId")){source=null}else RovaiNotificationSource(model,action){source=null}}}}
@@ -57,11 +60,11 @@ fun RovaiNotificationInbox(model:RovaiWorkspaceViewModel,onClose:()->Unit){
     LaunchedEffect(action.coreText("actionId")){while(isActive){if(lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED))load();delay(2000)}}
     LaunchedEffect(state.lastResult){load()}
     Column(Modifier.fillMaxSize()){
-        Row(Modifier.padding(12.dp)){TextButton(onClick=onClose){Text("返回提醒")};Text(snapshot["thread"].coreObject().coreText("title"),style=MaterialTheme.typography.titleMedium)}
-        if(state.pending!=null)Row(Modifier.padding(12.dp)){Text("原操作待核对",Modifier.weight(1f));TextButton(onClick=model::reconcile,enabled=!state.busy){Text("核对")};TextButton(onClick=model::retry,enabled=!state.busy){Text("重试原操作")}}
+        Row(Modifier.padding(12.dp)){TextButton(onClick=onClose){Text(stringResource(R.string.rovai_fusion_d1a5243cf0d98b00))};Text(snapshot["thread"].coreObject().coreText("title"),style=MaterialTheme.typography.titleMedium)}
+        if(state.pending!=null)Row(Modifier.padding(12.dp)){Text(stringResource(R.string.rovai_fusion_5a692cd92a0632c9),Modifier.weight(1f));TextButton(onClick=model::reconcile,enabled=!state.busy){Text(stringResource(R.string.rovai_fusion_2e81b3dff5809023))};TextButton(onClick=model::retry,enabled=!state.busy){Text(stringResource(R.string.rovai_fusion_04a02c897ac919f0))}}
         LazyColumn(Modifier.weight(1f),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
             issue?.let{item{Text(it,color=CodegTheme.colors.danger)}}
-            message?.let{value->item{GlassRow(Modifier.fillMaxWidth(),selected=true){Text("来源消息",style=MaterialTheme.typography.titleSmall);if(value["withdrawn"]==JsonPrimitive(true))Text("消息已撤回")else MarkdownContent(value.coreText("body"))}}}
+            message?.let{value->item{GlassRow(Modifier.fillMaxWidth(),selected=true){Text(stringResource(R.string.rovai_fusion_e3862fc0f5732a3f),style=MaterialTheme.typography.titleSmall);if(value["withdrawn"]==JsonPrimitive(true))Text(stringResource(R.string.rovai_fusion_fc409edf321be712))else MarkdownContent(value.coreText("body"))}}}
             val subject=action["subject"].coreObject();if(subject.isNotEmpty())item{GlassRow(Modifier.fillMaxWidth()){Text(subject.coreText("title"),style=MaterialTheme.typography.titleMedium);Text(subject.coreText("status"),color=CodegTheme.colors.textSecondary)}}
             if(snapshot.isNotEmpty())item{RovaiThreadControls(model,state.copy(selectedThread=threadId,thread=snapshot))}
             items(snapshot["agentRuns"].coreArray().filter{action.coreText("agentRunId").isEmpty()||it.coreText("id")==action.coreText("agentRunId")},key={it.coreText("id")}){run->RovaiExecutionHistory(model,threadId,run,snapshot["executionEvidence"].coreArray())}

@@ -1,5 +1,8 @@
 package app.codeg.android.feature.main
 
+import androidx.compose.ui.res.stringResource
+import app.codeg.android.R
+
 import android.net.Uri
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -19,7 +22,7 @@ fun canvasFileSource(node:JsonObject):JsonObject{
 
 @Composable fun RovaiCanvasFileNode(model:RovaiWorkspaceViewModel,node:JsonObject,onClose:()->Unit){
     val value=remember(node){runCatching{canvasFileSource(node)}};val source=value.getOrNull()
-    if(source==null)AlertDialog(onDismissRequest=onClose,title={Text("文件暂不可用")},text={Text(value.exceptionOrNull()?.message?:"原文件引用无法读取；卡片保留。")},confirmButton={TextButton(onClick=onClose){Text("关闭")}})
+    if(source==null)AlertDialog(onDismissRequest=onClose,title={Text(stringResource(R.string.rovai_fusion_efd002826bc5437a))},text={Text(value.exceptionOrNull()?.message?:"原文件引用无法读取；卡片保留。")},confirmButton={TextButton(onClick=onClose){Text(stringResource(R.string.rovai_fusion_3fd47edce45b3603))}})
     else if(rovaiOfficeFile(node["data"].coreObject().coreText("path")))RovaiOfficePreview(model,source.coreText("threadId"),node["data"].coreObject().coreText("path"),onClose)
     else RovaiFilePreview(model,source,onClose)
 }
