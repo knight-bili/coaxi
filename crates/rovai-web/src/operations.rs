@@ -706,7 +706,7 @@ impl Operation {
             Self::OfficeWatch => select_fields(&value,&["holdId","port","cap","editable","released","installed","formats"]),
             Self::ForgeOperation => select_fields(&value, &["provider", "webUrl", "ownerRepo", "repositoryKey", "repository", "success", "status", "data", "missionDraft", "nextPage","totalCount","reachableCount","incomplete","sortSupported","retryAfter"]),
             Self::WorkbenchOrganizerGet | Self::WorkbenchOrganizerSet => select_fields(&value, &["value", "digest"]),
-            Self::WorkbenchFilesList => select_fields(&value, &["entries", "next"]),
+            Self::WorkbenchFilesList => select_fields(&value, &["entries", "next", "workspaceRoot"]),
             Self::WorkbenchFilesRead => select_fields(&value, &["path", "text", "digest"]),
             Self::WorkbenchEditor=>select_fields(&value,&["revision","value","updatedAt","workspaceRoot"]),
             Self::WorkbenchFilesMutate => select_fields(&value, &["applied", "digest"]),
@@ -1225,6 +1225,13 @@ mod tests {
         expected.as_object_mut().unwrap().remove("futureSecret");
         assert_eq!(Operation::WorkbenchGitExecute.project(result), expected);
         assert!(Operation::WorkbenchGitRead.project(expected).get("workingDirectory").is_none());
+    }
+
+    #[test]
+    fn file_list_projection_retains_authoritative_mission_workspace_root() {
+        assert_eq!(Operation::WorkbenchFilesList.project(json!({"entries":[],"next":null,
+            "workspaceRoot":"/fixture/mission-worktree","futureSecret":"private"})),
+            json!({"entries":[],"next":null,"workspaceRoot":"/fixture/mission-worktree"}));
     }
 
     // Owns the network projection boundary, not Core's internal MCP model.
