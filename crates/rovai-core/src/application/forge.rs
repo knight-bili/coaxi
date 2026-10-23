@@ -49,6 +49,18 @@ struct ForgeRequest {
 fn origin()->String{"origin".into()}
 fn first_page()->u32{1}
 
+fn same_host(left:&reqwest::Url,right:&reqwest::Url)->bool{
+    left.host_str().zip(right.host_str()).is_some_and(|(left,right)|left.eq_ignore_ascii_case(right))
+}
+
+fn remote_matches_account(remote:&reqwest::Url,base:&reqwest::Url,explicit:bool)->bool{
+    match remote.scheme(){
+        "http"|"https"=>remote.scheme()==base.scheme()&&same_host(remote,base)&&remote.port_or_known_default()==base.port_or_known_default(),
+        "ssh"=>explicit&&same_host(remote,base),
+        _=>false,
+    }
+}
+
 fn public_accounts(accounts:&[Account])->Value {
     json!({"accounts":accounts.iter().map(|a|json!({"id":a.id,"provider":a.provider,"baseUrl":a.base_url,"hasToken":!a.token.is_empty()})).collect::<Vec<_>>()})
 }
@@ -114,12 +126,22 @@ impl Core {
             reqwest::Url::parse(&format!("ssh://{}/{}",host,path))?
         };
         let host=parsed.host_str().context("forge.invalid_remote")?;
+        ensure!(["http","https","ssh"].contains(&parsed.scheme()),"forge.unsupported_remote");
         let path=self.data_dir.join("forge-accounts.json");
         let accounts:Vec<Account>=if path.exists(){serde_json::from_slice(&fs::read(path)?)?}else{Vec::new()};
-        let account=accounts.into_iter().find(|a|request.account_id.as_ref().is_none_or(|id|id==&a.id)&&reqwest::Url::parse(&a.base_url).ok().is_some_and(|base|base.host_str().is_some_and(|h|h.eq_ignore_ascii_case(host))));
+        let explicit=request.account_id.is_some();
+        let account=accounts.into_iter().find(|a|request.account_id.as_ref().is_none_or(|id|id==&a.id)&&reqwest::Url::parse(&a.base_url).ok().is_some_and(|base|remote_matches_account(&parsed,&base,explicit)));
         let account=match account{
             Some(account)=>account,
-            None=>{ensure!(request.account_id.is_none(),"forge.account_unavailable");Account{id:String::new(),provider:if host.eq_ignore_ascii_case("github.com"){"github"}else if host.eq_ignore_ascii_case("gitlab.com"){"gitlab"}else{anyhow::bail!("forge.account_required")}.into(),base_url:format!("https://{host}"),token:String::new()}}
+            None=>{
+                ensure!(request.account_id.is_none(),"forge.account_unavailable");
+                let provider=if host.eq_ignore_ascii_case("github.com"){Some("github")}else if host.eq_ignore_ascii_case("gitlab.com"){Some("gitlab")}else{None};
+                let provider=provider.context("forge.account_required")?;
+                let base_url=format!("https://{host}");
+                let base=reqwest::Url::parse(&base_url)?;
+                ensure!(remote_matches_account(&parsed,&base,false),"forge.account_required");
+                Account{id:String::new(),provider:provider.into(),base_url,token:String::new()}
+            }
         };
         let web=reqwest::Url::parse(&account.base_url)?;
         let prefix=web.path().trim_matches('/');
