@@ -38,7 +38,7 @@ struct RovaiCanvasNodeProperties: View {
             Section("属性") {
                 TextField("名称", text: changed($title))
                 if kind == "note" {TextField("便签内容（支持Markdown）", text: changed($content), axis: .vertical).lineLimit(8...24)}
-                Picker("颜色", selection: changed($color)) {ForEach(rovaiCanvasColors, id: \.0) {value, label in HStack {Circle().fill(rovaiCanvasTint(value) ?? Theme.textSecondary).frame(width: 12, height: 12).accessibilityHidden(true);Text(label)}.tag(value)}}
+                Picker("颜色", selection: changed($color)) {ForEach(rovaiCanvasColors, id: \.0) {option in colorOption(option)}}
                 Toggle("折叠卡片", isOn: changed($collapsed))
             }.disabled(blocked)
             if region {Section("区域网格") {
@@ -74,6 +74,12 @@ struct RovaiCanvasNodeProperties: View {
         }
     }
     private func changed<T>(_ binding: Binding<T>) -> Binding<T> {Binding(get: {binding.wrappedValue}, set: {binding.wrappedValue = $0;persist()})}
+    private func colorOption(_ option: (String, String)) -> some View {
+        let value: String = option.0
+        let label: String = option.1
+        let tint: Color = rovaiCanvasTint(value) ?? Theme.textSecondary
+        return HStack {Circle().fill(tint).frame(width: 12, height: 12).accessibilityHidden(true);Text(label)}.tag(value)
+    }
     private func document() throws -> String {let value = JSONValue.object(["version": .number(1), "boardId": .string(boardId), "nodeId": node["id"] ?? .null, "title": .string(title), "content": .string(content), "color": .string(color), "gridColumns": .number(Double(columns)), "gridRows": .number(Double(rows)), "collapsed": .bool(collapsed), "revision": .number(Double(revision)), "commandId": .string(commandId)]);let encoder = JSONEncoder();encoder.outputFormatting = [.sortedKeys];return String(decoding: try encoder.encode(value), as: UTF8.self)}
     private func persist() {guard ready, generation == model.connectionGeneration else {return};do {try model.saveBody(owner, body: document())} catch {issue = error.localizedDescription}}
     private func restore() {
