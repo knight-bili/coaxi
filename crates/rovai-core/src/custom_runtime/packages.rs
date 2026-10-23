@@ -24,8 +24,14 @@ pub(crate) async fn install_npx(root:&Path,spec:&Value,log:Log,cancel:Cancellati
     ensure!(dependencies.len()==1,"custom_runtime.npm_root_ambiguous");let package=dependencies.keys().next().context("custom_runtime.npm_package_missing")?;
     let directory=child_directory(&root.join("node_modules"),package)?;let metadata:Value=serde_json::from_slice(&fs::read(directory.join("package.json"))?)?;
     let version=text(&metadata,"version")?.to_owned();ensure!(lock["packages"][format!("node_modules/{package}")]["version"].as_str()==Some(version.as_str()),"custom_runtime.npm_lock_version_mismatch");
-    let selected=spec["cmd"].as_str().unwrap_or_else(||package.rsplit('/').next().unwrap_or(package));
-    let relative=if let Some(path)=metadata["bin"].as_str(){ensure!(selected==package.rsplit('/').next().unwrap_or(package),"custom_runtime.npm_command_missing");path}else{metadata["bin"][selected].as_str().context("custom_runtime.npm_command_missing")?};
+    let short_name=package.rsplit('/').next().unwrap_or(package);
+    let relative=if let Some(path)=metadata["bin"].as_str(){
+        ensure!(spec["cmd"].as_str().map_or(true,|command|command==short_name),"custom_runtime.npm_command_missing");path
+    }else{
+        let commands=metadata["bin"].as_object().context("custom_runtime.npm_command_missing")?;
+        let selected=if let Some(command)=spec["cmd"].as_str(){command}else if commands.contains_key(short_name){short_name}else if commands.len()==1{commands.keys().next().context("custom_runtime.npm_command_missing")?}else{anyhow::bail!("custom_runtime.npm_command_missing")};
+        commands.get(selected).and_then(Value::as_str).context("custom_runtime.npm_command_missing")?
+    };
     let script=child_file(&directory,relative)?;let mut args=vec![script.to_string_lossy().into_owned()];args.extend(arguments(spec)?);
     Ok(PackageEntry{executable:node,arguments:args,package:Some(package.clone()),version})
 }
