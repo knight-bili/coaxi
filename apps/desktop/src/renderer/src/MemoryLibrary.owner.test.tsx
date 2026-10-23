@@ -82,8 +82,8 @@ describe('memory library owner lifetime', () => {
     await screen.findByRole('button', { name: /Core A memory/ })
     await waitFor(() => expect(invalidated).toBeTypeOf('function'))
     fireEvent.click(screen.getByRole('button', { name: '新增记忆' }))
-    fireEvent.change(await screen.findByLabelText('正文'), { target: { value: 'Core A 私有草稿' } })
-    fireEvent.change(screen.getByLabelText('Retrieval Keys'), { target: { value: '旧词' } })
+    fireEvent.change(await screen.findByRole('textbox', { name: /^正文/ }), { target: { value: 'Core A 私有草稿' } })
+    fireEvent.change(screen.getByRole('textbox', { name: /Retrieval Keys/ }), { target: { value: '旧词' } })
     const save = await screen.findByRole('button', { name: '保存记忆' })
     await waitFor(() => expect(save).not.toBeDisabled())
     fireEvent.click(save)
@@ -99,7 +99,7 @@ describe('memory library owner lifetime', () => {
     expect(screen.queryByRole('dialog')).toBeNull()
 
     fireEvent.click(screen.getByRole('button', { name: '新增记忆' }))
-    const newDraft = await screen.findByLabelText('正文') as HTMLTextAreaElement
+    const newDraft = await screen.findByRole('textbox', { name: /^正文/ }) as HTMLTextAreaElement
     expect(newDraft.value).toBe('')
 
     await act(async () => {
@@ -109,7 +109,7 @@ describe('memory library owner lifetime', () => {
 
     await waitFor(() => expect(screen.getByRole('dialog')).toBeTruthy())
     expect(screen.getByRole('dialog')).toBeTruthy()
-    expect(screen.getByLabelText('正文')).toHaveValue('')
+    expect(screen.getByRole('textbox', { name: /^正文/ })).toHaveValue('')
     expect((stored.get(oldKey) as { pending: { request: { commandId: string } } }).pending.request.commandId)
       .toBe(oldRecord.pending.request.commandId)
     expect(request.mock.calls.filter(([method]) => method === 'memory.create')).toHaveLength(1)
