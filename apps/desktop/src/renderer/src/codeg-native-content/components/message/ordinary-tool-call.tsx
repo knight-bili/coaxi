@@ -186,9 +186,7 @@ function unwrapQuotedCommand(command: string): string {
   if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
     return trimmed
       .slice(1, -1)
-      .replace(/\\"/g, '"')
-      .replace(/\\n/g, "\n")
-      .replace(/\\\\/g, "\\")
+      .replace(/\\(["\\$`])/g, "$1")
   }
 
   return trimmed
@@ -211,7 +209,7 @@ function simplifyShellCommand(command: string): string {
   return current
 }
 
-function extractDisplayCommandFromToolInput(
+export function extractDisplayCommandFromToolInput(
   input: string | null | undefined
 ): string | null {
   if (!input) return null
