@@ -178,6 +178,60 @@ try {
     committedContentMatched: true
   })
 
+  stage = 'issue_63_managed_worktree_workspace_admission'
+  git('branch', 'review-managed-worktree')
+  const addWorktreeRequest = {
+    scope, action: 'worktree_add', target: 'review-managed-worktree', commandId: randomUUID()
+  }
+  const worktreePreview = await call('workbench.git.preview', addWorktreeRequest)
+  const worktreeCreated = await call('workbench.git.execute', {
+    ...addWorktreeRequest, expectedRevision: worktreePreview.revision, confirmed: true
+  })
+  assert.equal(worktreeCreated.success, true, worktreeCreated.error)
+  const worktreePath = worktreeCreated.workingDirectory
+  assert(path.isAbsolute(worktreePath), 'Core 创建的受管工作树应返回绝对路径')
+  const worktreeInspection = await call('workspaces.inspect', { path: worktreePath })
+  const worktreeSelection = await call('workspaces.validate', { path: worktreePath })
+  assert.equal(worktreeSelection.projectPath, worktreeInspection.projectPath)
+  const worktreeThread = await call('threads.create', {
+    commandId: randomUUID(),
+    name: '受管工作树工程会话',
+    workspace: { projectPath: worktreeInspection.projectPath },
+    memberAgentIds: preflight.presentMembers.map(member => member.agentId),
+    defaultLeadAgentId: preflight.initialLeadAgentId,
+    collaborationMode: 'peer',
+    activationState: 'active'
+  })
+  assert.equal(worktreeThread.status, 'applied')
+  const worktreeFiles = await call('workbench.files.list', {
+    scope: { threadId: worktreeThread.payload.threadId }, path: ''
+  })
+  assert(worktreeFiles.entries.some(entry => entry.name === 'README.md'))
+
+  const ordinaryDataChild = path.join(dataDir, 'ordinary-unregistered-workspace')
+  await mkdir(ordinaryDataChild, { recursive: true })
+  const ordinaryRefusal = await response('workspaces.inspect', { path: ordinaryDataChild })
+  assert(ordinaryRefusal.error, 'Core dataDir 普通子目录仍须拒绝作为工程')
+  const fakeOwnerKey = 'b'.repeat(64)
+  const treesDirectory = path.join(dataDir, 'workspace-trees')
+  const fakeTreePath = path.join(treesDirectory, fakeOwnerKey)
+  await mkdir(fakeTreePath, { recursive: true })
+  await writeFile(path.join(treesDirectory, `${fakeOwnerKey}.json`), JSON.stringify({
+    root: workspace.projectPath,
+    branch: 'review-forged-owner',
+    path: fakeTreePath
+  }))
+  const fakeOwnerRefusal = await response('workspaces.inspect', { path: fakeTreePath })
+  assert(fakeOwnerRefusal.error, '伪造 owner 记录且未登记的目录须拒绝')
+  record('issue_63_registered_worktree_opens_as_workspace_and_unregistered_data_is_refused', {
+    worktreePath,
+    inspectAndValidateAccepted: true,
+    newThreadCreated: true,
+    workbenchFilesReadable: true,
+    ordinaryDataChildRefused: true,
+    forgedOwnerRefused: true
+  })
+
   finalResult = {
     status: 'passed',
     scope: 'real_host_core_isolated_git_fixture_no_model_execution',
