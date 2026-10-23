@@ -1998,6 +1998,14 @@ mod tests {
     }
 
     #[test]
+    fn runtime_adapter_parser_accepts_pi_and_rejects_unknown_adapters() {
+        let supported = Flags::parse(&["--adapter".into(), "pi".into()]).unwrap();
+        assert_eq!(adapter_kind(&supported, "adapter").unwrap(), "pi");
+        let unknown = Flags::parse(&["--adapter".into(), "unknown-runtime".into()]).unwrap();
+        assert!(adapter_kind(&unknown, "adapter").is_err());
+    }
+
+    #[test]
     fn trace_export_parses_offset_window_and_closed_scope_without_connecting() {
         let args = [
             "--since",
