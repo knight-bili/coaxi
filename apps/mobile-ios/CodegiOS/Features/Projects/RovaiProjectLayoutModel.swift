@@ -6,7 +6,7 @@ struct RovaiProjectLayout: Equatable {
     var top: [RovaiProjectLayoutItem]
     var members: [String:[String]]
     func value() -> JSONValue {.object(["top": .array(top.map {.object(["kind": .string($0.kind),$0.kind == "group" ? "groupId" : "projectPath": .string($0.target)])}),"members": .object(members.mapValues {.array($0.map(JSONValue.string))})])}
-    func entries() -> [JSONValue] {top.flatMap {item in if item.kind == "project" {return [.object(["kind": .string("project"),"projectPath": .string(item.target),"groupId": .null])]};return [.object(["kind": .string("group"),"groupId": .string(item.target)])]+(members[item.target] ?? []).map {.object(["kind": .string("project"),"projectPath": .string($0),"groupId": .string(item.target)])}}}
+    func entries() -> [JSONValue] {top.flatMap {item -> [JSONValue] in if item.kind == "project" {return [.object(["kind": .string("project"),"projectPath": .string(item.target),"groupId": .null])]};return [.object(["kind": .string("group"),"groupId": .string(item.target)])]+(members[item.target] ?? []).map {.object(["kind": .string("project"),"projectPath": .string($0),"groupId": .string(item.target)])}}}
     func locate(_ item: RovaiProjectLayoutItem) -> RovaiProjectLayoutLocation? {
         if let index = top.firstIndex(of: item) {return .init(groupId: nil,index: index)}
         if item.kind == "project" {for (id,paths) in members {if let index = paths.firstIndex(of: item.target) {return .init(groupId: id,index: index)}}}
