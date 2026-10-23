@@ -290,6 +290,11 @@ impl UpdateHost for ServerUpdates {
             if matches!(request, UpdateRequest::Get {}) {
                 return Ok(self.snapshot());
             }
+            if matches!(request, UpdateRequest::Download { .. } | UpdateRequest::Install { .. })
+                && std::env::var("ROVAI_SERVER_UPDATE_MODE").ok().as_deref() == Some("container-image")
+            {
+                return Err("updates_unsupported");
+            }
             let mut state = self.0.state.lock().unwrap();
             let status = state.snapshot["status"].as_str().unwrap_or("idle");
             if matches!(status, "checking" | "downloading" | "installing") {

@@ -26,7 +26,7 @@ pub(crate) async fn request(
     State(state): State<WebState>,
     body: Result<Json<UpdateRequest>, axum::extract::rejection::JsonRejection>,
 ) -> Response {
-    if state.channels.is_some() {
+    if state.channels.as_ref().is_some_and(|host| host.deployment() != "server") {
         return error(StatusCode::NOT_IMPLEMENTED, "updates_unsupported");
     }
     let Some(host) = &state.updates else {
