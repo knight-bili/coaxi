@@ -177,7 +177,7 @@ import type { FeedbackMessageSource } from './CardFeedbackFields'
 import { RuntimeInteractionDock } from './RuntimeInteractionDock'
 import { DelegationViewerHost, DelegationChildren } from './DelegationViewer'
 import { NativeSubagentEntries } from './NativeSubagentEntries'
-import { WorkspaceWorkbench } from './WorkspaceWorkbench'
+import { WorkspaceWorkbenchEntry } from './WorkspaceWorkbenchEntry'
 import { FilePreviewPane } from './FilePreviewPane'
 import { FilePreviewResizeHandle, FilePreviewWorkspace, useInitializeFilePreviewMinimumWidth, useOptionalFilePreviewLayout } from './FilePreviewLayout'
 import { useExecutionPreviewHost, useOptionalFilePreview } from './FilePreviewContext'
@@ -1653,7 +1653,7 @@ export function ThreadWorkspace(props: Parameters<typeof ThreadWorkspaceContent>
     busy={props.busy} onResolveApproval={props.onResolveApproval} onNotify={props.onNotify}>
     <ThreadWorkspaceContent {...props} onThreadLeaveGuardChange={bindWorkspaceGuard}
       onBindWorkbenchQuickMessage={bindWorkbenchQuickMessage}
-      workbenchEntry={<WorkspaceWorkbench threadId={props.snapshot.thread.id} projectPath={props.snapshot.thread.projectPath??''}
+      workbenchEntry={<WorkspaceWorkbenchEntry key={`${props.snapshot.thread.id}:${props.snapshot.thread.missionId??''}`} threadId={props.snapshot.thread.id} missionId={props.snapshot.thread.missionId} projectPath={props.snapshot.thread.projectPath??''}
         members={props.snapshot.members.map(member=>({id:member.agentId,name:props.agents.find(agent=>agent.agentId===member.agentId)?.displayName??member.agentId}))}
         bindLeaveGuard={bindWorkbenchGuard} onQuickMessage={insertWorkbenchQuickMessage} onOpenNativeConversation={props.onOpenNativeConversation} />} />
   </DelegationViewerHost>

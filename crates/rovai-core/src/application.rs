@@ -14,6 +14,7 @@ mod mission;
 mod native_interactions;
 mod native_child_reads;
 mod workbench;
+mod workbench_scope;
 mod workbench_editor;
 mod workbench_file_tools;
 mod workbench_receipts;

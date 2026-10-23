@@ -673,20 +673,9 @@ impl Core {
     }
 
     pub(super) async fn workbench_root(&self, scope: &Scope) -> Result<PathBuf> {
-        let persisted: String = {
-            let database = self.database.lock().await;
-            let thread: String = database.connection().query_row(
-                "SELECT project_path FROM camp WHERE id=?1", [&scope.thread_id], |row| row.get(0),
-            ).context("workbench.thread_unavailable")?;
-            if let Some(mission) = &scope.mission_id {
-                database.connection().query_row(
-                    "SELECT working_directory FROM mission_workspace WHERE mission_id=?1 AND camp_id=?2 AND state='ready'",
-                    rusqlite::params![mission, scope.thread_id], |row| row.get(0),
-                ).context("workbench.mission_unavailable")?
-            } else { thread }
-        };
+        let persisted = self.workbench_directory(scope).await?;
         let path = Path::new(&persisted);
-        let root = match git::validate_workspace_directory(path, &self.data_dir, false) {
+        let root = match git::validate_workspace_directory(path, &self.data_dir, true) {
             Ok(root) => root,
             Err(error) => match self.managed_workbench_root(path).await {
                 Ok(root) => root,
@@ -772,7 +761,7 @@ impl Core {
                 entries.sort_by(|a,b| a.0.cmp(&b.0));
                 let next = (entries.len() > 500).then(|| entries[499].0.clone());
                 entries.truncate(500);
-                Ok(json!({"entries":entries.into_iter().map(|(_,v)|v).collect::<Vec<_>>(), "next":next}))
+                Ok(json!({"entries":entries.into_iter().map(|(_,v)|v).collect::<Vec<_>>(), "next":next, "workspaceRoot":root}))
             }
             "workbench.files.read" => {
                 ensure!(path.is_file(), "workbench.file_required");
