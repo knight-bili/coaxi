@@ -43,7 +43,8 @@ import java.util.UUID
     val parsedTags=tags.split(',','，','\n').map(String::trim).filter(String::isNotEmpty).distinct()
     val rendered=missionDescriptionDisplay(content,state.members)
     val changed=title.trim()!=baseline.coreText("title")||content!=contentOf(baseline)||JsonArray(parsedTags.map(::JsonPrimitive))!=baseline["tags"]||sources.isNotEmpty()||kept!=baseline["attachments"].coreArray().map{it.coreText("id")}
-    val valid=title.isNotBlank()&&title.trim().codePointCount(0,title.trim().length)<=200&&rendered.codePointCount(0,rendered.length)<=12000&&parsedTags.size<=30&&parsedTags.all{it.codePointCount(0,it.length)<=24}&&kept.size+sources.size<=10
+    val descriptionLimit=if(baseline.coreLong("descriptionLimit")==20000L)20000 else 12000
+    val valid=title.isNotBlank()&&title.trim().codePointCount(0,title.trim().length)<=200&&rendered.codePointCount(0,rendered.length)<=descriptionLimit&&parsedTags.size<=30&&parsedTags.all{it.codePointCount(0,it.length)<=24}&&kept.size+sources.size<=10
     fun document()=buildJsonObject{
         put("version",2);put("title",title);put("description",rendered);put("structuredDescription",content);put("tags",tags);put("baseline",baseline)
         put("kept",JsonArray(kept.map(::JsonPrimitive)));put("sources",JsonArray(sources));put("commandId",commandId);put("sent",legacySent?:JsonNull)

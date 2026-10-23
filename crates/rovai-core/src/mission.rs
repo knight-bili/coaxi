@@ -159,6 +159,8 @@ pub struct MissionRecord {
     #[serde(flatten)]
     pub info: MissionInfo,
     pub description_content: DescriptionContent,
+    #[serde(default,skip_serializing_if="Option::is_none")]
+    pub description_limit: Option<usize>,
     pub number: i64,
     #[serde(rename = "threadId", alias = "campId")]
     pub camp_id: String,
@@ -1029,6 +1031,7 @@ fn load_record(connection: &Connection, id: &str) -> Result<Option<MissionRecord
         crate::mission_workspace::cleanup_projection(connection, &mission_id, &camp_id)?;
     Ok(Some(MissionRecord {
         description_content,
+        description_limit:if mission_description_limit(connection,&mission_id)?>12_000{Some(20_000)}else{None},
         has_unread,
         number,
         info: MissionInfo {
@@ -1090,8 +1093,11 @@ fn mission_start_available(
 fn description_cache(text:&str)->&str{if text.chars().count()<=12_000{text}else{""}}
 fn validate_mission_description(connection:&Connection,id:&str,description:Option<&str>)->Result<()>{
     let Some(description)=description else{return Ok(())};
+    ensure!(description.chars().count()<=mission_description_limit(connection,id)?,"mission.description_too_long");Ok(())
+}
+fn mission_description_limit(connection:&Connection,id:&str)->Result<usize>{
     let extended=!crate::conversation_tools::storage::absent(connection)?&&connection.query_row("SELECT EXISTS(SELECT 1 FROM conversation_tool_mission WHERE mission_id=?1)",[id],|row|row.get::<_,bool>(0))?;
-    ensure!(description.chars().count()<=if extended{20_000}else{12_000},"mission.description_too_long");Ok(())
+    Ok(if extended{20_000}else{12_000})
 }
 pub(crate) fn create_conversation_tool_mission_in_tx(
     tx:&Transaction<'_>,authority:&crate::conversation_tools::authoring::CreationAuthority,

@@ -21,7 +21,7 @@ struct RovaiMissionEdit: View {
     private var rendered: String {missionDescriptionDisplay(content, members: model.members)}
     private var parsedTags: [String] {var seen = Set<String>();return tags.components(separatedBy: CharacterSet(charactersIn: ",，\n")).map {$0.trimmingCharacters(in: .whitespacesAndNewlines)}.filter {!$0.isEmpty && seen.insert($0).inserted}}
     private var changed: Bool {title.trimmingCharacters(in: .whitespacesAndNewlines) != baseline.text("title") || content != contentOf(baseline) || parsedTags != (baseline["tags"]?.rvArray ?? []).compactMap(\.stringValue) || kept != (baseline["attachments"]?.rvArray ?? []).map {$0.text("id")} || !sources.isEmpty}
-    private var valid: Bool {!title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && title.trimmingCharacters(in: .whitespacesAndNewlines).unicodeScalars.count <= 200 && rendered.unicodeScalars.count <= 12000 && parsedTags.count <= 30 && parsedTags.allSatisfy {$0.unicodeScalars.count <= 24} && kept.count + sources.count <= 10}
+    private var valid: Bool {!title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && title.trimmingCharacters(in: .whitespacesAndNewlines).unicodeScalars.count <= 200 && rendered.unicodeScalars.count <= (baseline["descriptionLimit"]?.rvInt == 20000 ? 20000 : 12000) && parsedTags.count <= 30 && parsedTags.allSatisfy {$0.unicodeScalars.count <= 24} && kept.count + sources.count <= 10}
     private func contentOf(_ value: JSONValue) -> [JSONValue] {value["descriptionContent"]?.rvArray ?? [.object(["kind": .string("text"), "text": .string(value.text("description"))])]}
     var body: some View {
         NavigationStack {Form {

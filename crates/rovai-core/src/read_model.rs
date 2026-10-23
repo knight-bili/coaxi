@@ -2578,7 +2578,7 @@ fn hydrate_message_views(
             } else {
                 None
             };
-            let mission_start=transaction.query_row("SELECT s.mission_id,m.title,m.description FROM mission_start s JOIN mission m ON m.id=s.mission_id WHERE s.message_id=?1",[&row.id],|r|Ok(serde_json::json!({"missionId":r.get::<_,String>(0)?,"title":r.get::<_,String>(1)?,"description":r.get::<_,String>(2)?}))).optional()?;
+            let mission_start=transaction.query_row("SELECT s.mission_id,m.title,m.description FROM mission_start s JOIN mission m ON m.id=s.mission_id WHERE s.message_id=?1",[&row.id],|r|Ok((r.get::<_,String>(0)?,r.get::<_,String>(1)?,r.get::<_,String>(2)?))).optional()?.map(|(id,title,legacy)|->Result<Value>{let content=crate::mission_description::load(transaction,&id,&legacy)?;let description=crate::mission_description::render(transaction,&content)?;Ok(serde_json::json!({"missionId":id,"title":title,"description":description}))}).transpose()?;
             Ok(ThreadMessageView {
                 mission_start,
                 runtime_model: models_by_message_id.remove(&row.id),

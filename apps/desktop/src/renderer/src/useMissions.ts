@@ -28,7 +28,7 @@ export function missionError(error: unknown): string {
     'mission.details_version_required': uiAttribute('使命内容版本缺失，请刷新后重试。'),
     'mission.details_version_conflict': uiAttribute('使命内容刚刚发生变化，请基于最新内容重新编辑。'),
     'mission.invalid_title': uiAttribute('使命标题需要 1 至 200 个字符。'),
-    'mission.description_too_long': uiAttribute('使命描述最多 12000 个字符。')
+    'mission.description_too_long': uiAttribute('使命描述超过当前使命允许的长度。')
   }
   return Object.entries(reasons).find(([code]) => message.includes(code))?.[1] ?? message
 }

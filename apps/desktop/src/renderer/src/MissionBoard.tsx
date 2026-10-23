@@ -250,7 +250,8 @@ function MissionEdit({ mission, projects, agents, installations, catalog, onSave
   const changed = normalizedTitle !== baseline.title || JSON.stringify(descriptionContent) !== JSON.stringify(baseline.description)
     || tags.join('\n') !== baseline.tags.join('\n') || attachmentsChanged
   const titleError = !normalizedTitle ? uiAttribute('请填写使命标题。') : [...normalizedTitle].length > 200 ? uiAttribute('使命标题最多 200 个字符。') : ''
-  const descriptionError = unavailableIds.length ? uiAttribute('提及的队员已不可用，请移除提及或选择其他队员。') : [...description].length > 12000 ? uiAttribute('使命描述最多 12,000 个字符。') : ''
+  const descriptionLimit = mission.descriptionLimit === 20000 ? 20000 : 12000
+  const descriptionError = unavailableIds.length ? uiAttribute('提及的队员已不可用，请移除提及或选择其他队员。') : [...description].length > descriptionLimit ? uiAttribute(descriptionLimit === 20000 ? '此使命描述最多 20,000 个字符。' : '使命描述最多 12,000 个字符。') : ''
   const invalid = !!titleError || !!descriptionError
   async function save() {
     if (!changed || invalid || saving.current) return
