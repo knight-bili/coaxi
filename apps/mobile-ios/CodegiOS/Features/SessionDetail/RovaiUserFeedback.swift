@@ -70,7 +70,7 @@ struct RovaiUserFeedback: View {
         NavigationStack {List {
             if let issue {Section {Text(issue).font(.caption).foregroundStyle(Theme.warning)}}
             if let packet {previewSection(packet)} else {
-                Section("补充说明") {
+                Section {
                     if agentId == nil {Picker("查看哪位队员的反馈", selection: $selected) {Text("选择队员").tag("");ForEach((model.thread?["members"]?.rvArray ?? []).map {RovaiRow(value: $0)}) {row in Text(row.value.text("displayName")).tag(row.value.text("agentId"))}}}
                     TextField("例如：按钮用蓝色，先不要加动画。", text: $text, axis: .vertical).lineLimit(3...8).disabled(disabled)
                     Text("\(text.unicodeScalars.count)/4096").font(.caption).foregroundStyle(Theme.textSecondary)
@@ -79,7 +79,7 @@ struct RovaiUserFeedback: View {
                     Button("核对记录") {Task {await refresh()}}.disabled(disabled)
                     Button("预览原生插话及当前材料") {nativeOpen = true}.disabled(disabled)
                     if targets.isEmpty {Text("当前没有可接收反馈的运行任务。").font(.caption).foregroundStyle(Theme.textSecondary)}
-                } footer: {Text("先预览全文，再交给队员。送到连接不代表模型已阅读。")}
+                } header: {Text("补充说明")} footer: {Text("先预览全文，再交给队员。送到连接不代表模型已阅读。")}
                 Section("原预览") {ForEach(previews.filter {$0["receipt"] == nil || $0["receipt"] == .null}, id: \.self) {row in
                     VStack(alignment: .leading, spacing: 8) {Text(row["preview"]?.text("text") ?? "").textSelection(.enabled);Button("继续核对原预览") {do {try keep(.object(["kind": .string("feedback"), "preview": row["preview"] ?? .null]));receipt = nil;uncertain = false} catch {issue = error.localizedDescription}}.disabled(disabled)}
                 }}
