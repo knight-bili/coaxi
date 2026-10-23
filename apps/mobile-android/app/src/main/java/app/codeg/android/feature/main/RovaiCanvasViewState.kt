@@ -6,7 +6,35 @@ import kotlin.math.*
 /** Advisory UI state only, under the authenticated Host/editor and Core board UUID. */
 data class RovaiCanvasViewport(val x:Float=0f,val y:Float=0f,val zoom:Float=1f,val minimap:Boolean=true,val expandedRegions:List<String> = emptyList()){
     fun document(board:String)=buildJsonObject{put("version",1);put("boardId",board);putJsonObject("viewport"){put("x",x);put("y",y);put("zoom",zoom)};put("minimap",minimap);put("expandedRegions",JsonArray(expandedRegions.filter{it.isNotBlank()}.distinct().map(::JsonPrimitive)))}.toString()
-    companion object{fun parse(raw:String,board:String):RovaiCanvasViewport{if(raw.isEmpty())return RovaiCanvasViewport();val value=Json.parseToJsonElement(raw).coreObject();require(value["version"]==JsonPrimitive(1)&&value.coreText("boardId")==board){"原画布视图记录无法读取"};val viewport=value["viewport"].coreObject();fun number(key:String):Float=(viewport[key]as?JsonPrimitive)?.takeUnless{it.isString}?.floatOrNull?.takeIf{it.isFinite()}?:error("原画布视图位置无效");return RovaiCanvasViewport(number("x"),number("y"),number("zoom").coerceIn(.1f,2f),value["minimap"]!=JsonPrimitive(false),(value["expandedRegions"]as?JsonArray)?.mapNotNull{(it as?JsonPrimitive)?.contentOrNull?.takeIf{it.isNotBlank()}}?.distinct().orEmpty())}}
+    companion object {
+        fun parse(raw: String, board: String): RovaiCanvasViewport {
+            if (raw.isEmpty()) return RovaiCanvasViewport()
+
+            val value = Json.parseToJsonElement(raw).coreObject()
+            require(value["version"] == JsonPrimitive(1) && value.coreText("boardId") == board) {
+                "原画布视图记录无法读取"
+            }
+            val viewport = value["viewport"].coreObject()
+
+            fun number(key: String): Float =
+                (viewport[key] as? JsonPrimitive)
+                    ?.takeUnless { it.isString }
+                    ?.floatOrNull
+                    ?.takeIf { it.isFinite() }
+                    ?: error("原画布视图位置无效")
+
+            return RovaiCanvasViewport(
+                x = number("x"),
+                y = number("y"),
+                zoom = number("zoom").coerceIn(0.1f, 2f),
+                minimap = value["minimap"] != JsonPrimitive(false),
+                expandedRegions = (value["expandedRegions"] as? JsonArray)
+                    ?.mapNotNull { item -> (item as? JsonPrimitive)?.contentOrNull?.takeIf { it.isNotBlank() } }
+                    ?.distinct()
+                    .orEmpty()
+            )
+        }
+    }
 }
 data class RovaiCanvasBounds(val left:Float,val top:Float,val right:Float,val bottom:Float){val width:Float get()=max(1f,right-left);val height:Float get()=max(1f,bottom-top)}
 fun canvasBounds(nodes:List<JsonObject>):RovaiCanvasBounds{
