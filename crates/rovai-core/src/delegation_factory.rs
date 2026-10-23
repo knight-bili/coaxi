@@ -145,9 +145,10 @@ pub(crate) fn create_child(
     crate::native_lifecycle::freeze_intent(&mut base,None,native_steer)?;
     // Resolve afresh through the actual Registry. A previously child-tagged parent
     // binding, Session, evidence, lease or recovery state never enters this Run.
-    let runtime = plan.policy.freeze_resolved_runtime(&base)?;
     tx.execute("INSERT INTO conversation(id,camp_id,agent_id,kind,created_at,updated_at,last_message_sequence)
         VALUES(?1,?2,?3,'delegation_child',?4,?4,1)",params![identity.child_conversation_id,identity.camp_id,identity.owner_agent_id,at])?;
+    crate::conversation_tools::runtime::freeze_for_conversation(tx,&identity.child_conversation_id,&identity.owner_agent_id,&mut base)?;
+    let runtime = plan.policy.freeze_resolved_runtime(&base)?;
     let mut config = crate::collaboration::build_effective_config(
         tx,
         &identity.child_conversation_id,
