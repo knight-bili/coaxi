@@ -37,13 +37,14 @@ impl Core{
         let private=self.data_dir.join("native-lifecycle").join("preparation").join(&origin.origin_id);
         let environment=crate::member_environment::LaunchEnvironmentSource{database:self.database.clone(),member_id:agent.clone(),kind:runtime.adapter_kind};
         let matching_program=runtime.adapter_kind==AdapterKind::CustomAcp||(runtime.adapter_kind==AdapterKind::CodexCli&&origin.source.provider=="codex"&&origin.mode==native::NativeContinuationMode::Continue);
-        let inspected=if matching_program{
+        let tools_require_new_session={let database=self.database.lock().await;crate::conversation_tools::policy::get(database.connection())?.member_flags(&agent).any()};
+        let inspected=if matching_program&&!tools_require_new_session{
             crate::member_environment::with_launch_source(environment,with_runtime_configuration(runtime.adapter_kind,&search,async{
                 inspection_runtime.environment=crate::member_environment::load_for_launch().await?;
                 if runtime.adapter_kind==AdapterKind::CodexCli{codex::inspect_native_preparation(&workspace,&inspection_runtime,&origin,&source.location).await}else{acp::inspect_native_preparation(&workspace,&inspection_runtime,&origin,&source.location,&private).await}
             })).await
         }else{Err(anyhow::anyhow!("native_lifecycle.explicit_matching_program_required"))};
-        let(status,reason,initialize)=match inspected{Ok(digest)=>("available",None,Some(digest)),Err(_)=>(if matching_program{"unavailable"}else{"requires_acp_program"},Some(if matching_program{"所选程序未能确认同一来源或所需恢复能力；保留导入记录，请核对程序和环境"}else{"请选择你已添加、与来源相同且支持恢复的 ACP 程序；不会自动换程序或安装"}),None)};
+        let(status,reason,initialize)=match inspected{Ok(digest)=>("available",None,Some(digest)),Err(_)=>(if matching_program{"unavailable"}else{"requires_acp_program"},Some(if tools_require_new_session{"该队员启用的可选会话工具需要新的原生会话。要继续或分叉原历史，请先关闭该队员的四项会话工具再重新预览；原记录与设置保留"}else if matching_program{"所选程序未能确认同一来源或所需恢复能力；保留导入记录，请核对程序和环境"}else{"请选择你已添加、与来源相同且支持恢复的 ACP 程序；不会自动换程序或安装"}),None)};
         let mut database=self.database.lock().await;let tx=database.connection_mut().transaction()?;
         let current=continuation::member(&tx,&agent,version)?;anyhow::ensure!(current.config_digest==runtime.config_digest,"native_lifecycle.member_runtime_changed");
         let(_,current_workspace)=continuation::workspace(&tx,&owner)?;anyhow::ensure!(current_workspace==workspace_digest,"native_lifecycle.project_changed");
@@ -79,6 +80,7 @@ impl Core{
         if let Some(prior)=continuation_prior(&tx,&command,client.id(),&input_digest,&instance)?{return Ok(prior)}
         storage::preview(&tx,&owner,preview["previewId"].as_str().context("native_lifecycle.preview_required")?,preview["previewDigest"].as_str().context("native_lifecycle.preview_digest_required")?,"continuation")?;
         let current=continuation::member(&tx,&member,expected)?;anyhow::ensure!(preview["runtimeConfigDigest"]==current.config_digest,"native_lifecycle.member_runtime_changed");
+        anyhow::ensure!(!crate::conversation_tools::policy::get(&tx)?.member_flags(&member).any(),"native_lifecycle.optional_tools_require_new_session");
         continuation::release_closed(&tx)?;
         let(thread,conversation)=continuation::create_working_copy(&tx,&preview,client)?;
         let mut runtime=crate::agent_profile::resolve_frozen_runtime(&tx,&conversation,&member)?.map_err(|blocker|anyhow::anyhow!("native_lifecycle.runtime_blocked: {}",blocker.code))?;
