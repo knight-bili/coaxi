@@ -28,6 +28,61 @@ fn snapshot(root:&Path)->Result<(String,Vec<Entry>)>{
     entries.sort_by(|a,b|a.path.cmp(&b.path));Ok((crate::command::canonical_json_digest(&json!(entries))?,entries))
 }
 fn trash_root(root:&Path)->Result<PathBuf>{let parent=root.parent().context("workbench.workspace_parent_required")?;let key=format!("{:x}",Sha256::digest(root.to_string_lossy().as_bytes()));Ok(parent.join(format!(".rovai-trash-{}",&key[..16])))}
+fn prepare_trash_root(root:&Path,create:bool)->Result<Option<PathBuf>>{
+    let path=trash_root(root)?;
+    match fs::symlink_metadata(&path){
+        Ok(metadata)=>ensure!(!is_link(&metadata)&&metadata.is_dir(),"workbench.trash_root_invalid"),
+        Err(error) if error.kind()==std::io::ErrorKind::NotFound&&!create=>return Ok(None),
+        Err(error) if error.kind()==std::io::ErrorKind::NotFound=>{
+            #[cfg(unix)]{
+                use std::os::unix::fs::DirBuilderExt;
+                let mut builder=fs::DirBuilder::new();builder.mode(0o700);
+                match builder.create(&path){Ok(())=>{},Err(error) if error.kind()==std::io::ErrorKind::AlreadyExists=>{},Err(error)=>return Err(error.into())}
+            }
+            #[cfg(not(unix))]{crate::platform::private_storage::prepare_private_directory(&path)?;}
+            let metadata=fs::symlink_metadata(&path)?;
+            ensure!(!is_link(&metadata)&&metadata.is_dir(),"workbench.trash_root_invalid");
+        }
+        Err(error)=>return Err(error.into()),
+    }
+    let metadata=fs::symlink_metadata(&path)?;
+    ensure!(!is_link(&metadata)&&metadata.is_dir(),"workbench.trash_root_invalid");
+    #[cfg(unix)]{
+        use std::os::unix::fs::PermissionsExt;
+        ensure!((metadata.permissions().mode()&0o077)==0,"workbench.trash_root_invalid");
+    }
+    let parent=fs::canonicalize(path.parent().context("workbench.workspace_parent_required")?)?;
+    let resolved=fs::canonicalize(&path)?;
+    ensure!(resolved.parent()==Some(parent.as_path()),"workbench.trash_root_invalid");
+    Ok(Some(resolved))
+}
+fn create_trash_entry(trash:&Path,id:&str)->Result<PathBuf>{
+    let path=trash.join(id);
+    #[cfg(unix)]{
+        use std::os::unix::fs::DirBuilderExt;
+        let mut builder=fs::DirBuilder::new();builder.mode(0o700);builder.create(&path)?;
+    }
+    #[cfg(windows)]{
+        match fs::symlink_metadata(&path){
+            Ok(_)=>anyhow::bail!("workbench.trash_entry_exists"),
+            Err(error) if error.kind()==std::io::ErrorKind::NotFound=>{},
+            Err(error)=>return Err(error.into()),
+        }
+        crate::platform::private_storage::prepare_private_directory(&path)?;
+    }
+    let metadata=fs::symlink_metadata(&path)?;
+    ensure!(!is_link(&metadata)&&metadata.is_dir(),"workbench.trash_entry_invalid");
+    let resolved=fs::canonicalize(&path)?;
+    ensure!(resolved.parent()==Some(trash),"workbench.trash_entry_invalid");
+    Ok(resolved)
+}
+fn existing_trash_entry(trash:&Path,id:&str)->Result<PathBuf>{
+    let path=trash.join(id);let metadata=fs::symlink_metadata(&path)?;
+    ensure!(!is_link(&metadata)&&metadata.is_dir(),"workbench.trash_entry_invalid");
+    let resolved=fs::canonicalize(&path)?;
+    ensure!(resolved.parent()==Some(trash),"workbench.trash_entry_invalid");
+    Ok(resolved)
+}
 fn copy_tree(source:&Path,destination:&Path,expected:&str)->Result<()> {
     let (before,entries)=snapshot(source)?;ensure!(before==expected,"workbench.file_changed");
     ensure!(!destination.exists()&&!destination.starts_with(source),"workbench.destination_exists");
@@ -77,8 +132,7 @@ impl Core{
             let links=workspace_links(&root,&data_dir)?;
             if request.operation=="versions"{let paths=request.paths.as_ref().context("workbench.paths_required")?;ensure!(paths.len()<=64,"workbench.path_limit");let mut versions=Vec::new();for path in paths{let target=resolve_workspace_path(&root,&links,path,true)?.path;let value=if target.is_file(){let metadata=fs::metadata(&target)?;if metadata.len()>16*1024*1024{json!({"path":path,"state":"too_large"})}else{json!({"path":path,"state":"present","digest":crate::backup::file_digest(&target)?.1})}}else{json!({"path":path,"state":"missing"})};versions.push(value)}return Ok(json!({"versions":versions}))}
             if request.operation=="inspect"{let path=resolve_workspace_path(&root,&links,&request.path,false)?.path;let (digest,entries)=snapshot(&path)?;return Ok(json!({"path":request.path,"digest":digest,"directory":path.is_dir(),"files":entries.len(),"bytes":entries.iter().map(|entry|entry.bytes).sum::<u64>()}))}
-            let trash=trash_root(&root)?;
-            if request.operation=="trash_list"{let mut entries=Vec::new();if trash.exists(){crate::platform::private_storage::prepare_private_directory(&trash)?;for entry in fs::read_dir(&trash)?.take(10001){let entry=entry?;if !entry.file_type()?.is_dir(){continue}let metadata=entry.path().join("entry.json");if metadata.is_file(){let value:Value=serde_json::from_slice(&fs::read(metadata)?)?;if value["root"]==json!(root)&&entry.path().join("content").exists(){entries.push(value)}}}}return Ok(json!({"entries":entries}))}
+            if request.operation=="trash_list"{let mut entries=Vec::new();if let Some(trash)=prepare_trash_root(&root,false)?{for entry in fs::read_dir(&trash)?.take(10001){let entry=entry?;let directory=entry.path();let directory_metadata=fs::symlink_metadata(&directory)?;if is_link(&directory_metadata)||!directory_metadata.is_dir(){continue}let directory=fs::canonicalize(directory)?;if directory.parent()!=Some(trash.as_path()){continue}let metadata_path=directory.join("entry.json");let metadata_fs=match fs::symlink_metadata(&metadata_path){Ok(metadata)=>metadata,Err(error) if error.kind()==std::io::ErrorKind::NotFound=>continue,Err(error)=>return Err(error.into())};if is_link(&metadata_fs)||!metadata_fs.is_file(){continue}let content=directory.join("content");let content_fs=match fs::symlink_metadata(&content){Ok(metadata)=>metadata,Err(error) if error.kind()==std::io::ErrorKind::NotFound=>continue,Err(error)=>return Err(error.into())};if is_link(&content_fs)||!(content_fs.is_file()||content_fs.is_dir()){continue}let value:Value=serde_json::from_slice(&fs::read(metadata_path)?)?;if value["root"]==json!(root){entries.push(value)}}}return Ok(json!({"entries":entries}))}
             ensure!(matches!(request.operation.as_str(),"copy"|"trash"|"restore"|"move"),"workbench.operation_not_admitted");
             let id=request.command_id.as_deref().context("workbench.command_id_required")?;uuid::Uuid::parse_str(id)?;
             let receipts=data_dir.join("workspace-operations");crate::platform::private_storage::prepare_private_directory(&receipts)?;let receipt=receipts.join(format!("{id}.json"));let identity=crate::command::canonical_json_digest(&json!({"root":root,"request":value}))?;
@@ -87,9 +141,9 @@ impl Core{
             let resolved=resolve_workspace_path(&root,&links,&request.path,request.operation=="restore")?;let path=resolved.path;ensure!(path!=root&&!resolved.alias_root,"workbench.root_immutable");
             crate::platform::private_storage::atomic_write_private_json(&receipt,&json!({"identity":identity,"state":"started"}))?;
             let result=(||->Result<Value>{
-                if request.operation=="restore"{ensure!(resolved.boundary==root,"workbench.invalid_destination");let trash_id=request.trash_id.as_deref().context("workbench.trash_id_required")?;uuid::Uuid::parse_str(trash_id)?;let source=trash.join(trash_id);let metadata:Value=serde_json::from_slice(&fs::read(source.join("entry.json"))?)?;ensure!(metadata["root"]==json!(root)&&metadata["path"]==request.path,"workbench.trash_identity_changed");ensure!(!path.exists(),"workbench.destination_exists");let (digest,_)=snapshot(&source.join("content"))?;ensure!(metadata["digest"]==digest,"workbench.trash_changed");fs::rename(source.join("content"),&path)?;return Ok(json!({"applied":true,"path":request.path}))}
+                if request.operation=="restore"{ensure!(resolved.boundary==root,"workbench.invalid_destination");let trash_id=request.trash_id.as_deref().context("workbench.trash_id_required")?;uuid::Uuid::parse_str(trash_id)?;let trash=prepare_trash_root(&root,false)?.context("workbench.trash_entry_missing")?;let source=existing_trash_entry(&trash,trash_id)?;let entry_path=source.join("entry.json");let entry_metadata=fs::symlink_metadata(&entry_path)?;ensure!(!is_link(&entry_metadata)&&entry_metadata.is_file(),"workbench.trash_entry_invalid");let metadata:Value=serde_json::from_slice(&fs::read(entry_path)?)?;ensure!(metadata["root"]==json!(root)&&metadata["path"]==request.path,"workbench.trash_identity_changed");ensure!(!path.exists(),"workbench.destination_exists");let content=source.join("content");let content_metadata=fs::symlink_metadata(&content)?;ensure!(!is_link(&content_metadata)&&(content_metadata.is_file()||content_metadata.is_dir()),"workbench.trash_entry_invalid");let (digest,_)=snapshot(&content)?;ensure!(metadata["digest"]==digest,"workbench.trash_changed");fs::rename(content,&path)?;return Ok(json!({"applied":true,"path":request.path}))}
                 let (digest,_)=snapshot(&path)?;ensure!(request.expected_digest.as_deref()==Some(digest.as_str()),"workbench.file_changed");
-                if request.operation=="trash"{ensure!(resolved.boundary==root,"workbench.invalid_destination");crate::platform::private_storage::prepare_private_directory(&trash)?;let directory=trash.join(id);crate::platform::private_storage::prepare_private_directory(&directory)?;crate::platform::private_storage::atomic_write_private_json(&directory.join("entry.json"),&json!({"root":root,"path":request.path,"digest":digest,"trashId":id,"deletedAt":Utc::now().to_rfc3339()}))?;fs::rename(&path,directory.join("content"))?;Ok(json!({"applied":true,"trashId":id}))}
+                if request.operation=="trash"{ensure!(resolved.boundary==root,"workbench.invalid_destination");let trash=prepare_trash_root(&root,true)?.context("workbench.trash_root_invalid")?;let directory=create_trash_entry(&trash,id)?;crate::platform::private_storage::atomic_write_private_json(&directory.join("entry.json"),&json!({"root":root,"path":request.path,"digest":digest,"trashId":id,"deletedAt":Utc::now().to_rfc3339()}))?;fs::rename(&path,directory.join("content"))?;Ok(json!({"applied":true,"trashId":id}))}
                 else{let destination=resolve_workspace_path(&root,&links,request.destination.as_deref().context("workbench.destination_required")?,true)?;ensure!(destination.path!=root&&!destination.alias_root&&destination.boundary==resolved.boundary&&!destination.path.exists()&&!destination.path.starts_with(&path),"workbench.invalid_destination");if request.operation=="copy"{copy_tree(&path,&destination.path,&digest)?}else{ensure!(snapshot(&path)?.0==digest,"workbench.file_changed");fs::rename(&path,&destination.path)?;}Ok(json!({"applied":true}))}
             })();
             match result{Ok(result)=>{crate::platform::private_storage::atomic_write_private_json(&receipt,&json!({"identity":identity,"state":"applied","result":result}))?;Ok(result)},Err(error)=>{crate::platform::private_storage::atomic_write_private_json(&receipt,&json!({"identity":identity,"state":"failed","error":error.to_string()}))?;Err(error)}}
