@@ -37,6 +37,7 @@ final class RovaiWorkspaceModel {
     @ObservationIgnored private var profile: ServerProfile?
     @ObservationIgnored private var account = ""
     @ObservationIgnored private var generation: UInt64 = 0
+    @ObservationIgnored private var eventGeneration: UInt64 = 0
     @ObservationIgnored private var terminals: [String: RovaiTerminalController] = [:]
     @ObservationIgnored private var events: Task<Void, Never>?
     @ObservationIgnored private var active = true
@@ -58,11 +59,51 @@ final class RovaiWorkspaceModel {
         do { _ = try await client.connect(authenticate: true); guard lifetime == generation else { return }; connected = true; await refresh(); listen() } catch { if lifetime == generation { failure(error) } }
     }
     func foreground(_ value: Bool) {
-        active = value; events?.cancel(); if value && connected { Task { await refresh(); listen() } }
+        active = value; if !value { eventGeneration &+= 1 }; events?.cancel(); if value && connected { Task { await refresh(); listen() } }
     }
     private func listen() {
-        events?.cancel(); guard active, let client else { return }; let lifetime = generation
-        events = Task { do { let stream = try await client.invalidations(); var last = ContinuousClock.now; for try await _ in stream { try Task.checkCancellation(); guard lifetime == self.generation else { return }; self.resourceVersion &+= 1; let elapsed = last.duration(to: .now); if elapsed < .milliseconds(250) { try await Task.sleep(for: .milliseconds(250)) }; await self.refresh(); last = .now } } catch is CancellationError {} catch { if lifetime == self.generation { self.failure(error) } } }
+        let previous = events
+        previous?.cancel()
+        guard active, connected, let client else { return }
+        eventGeneration &+= 1; let listener = eventGeneration; let lifetime = generation
+        events = Task {
+            if let previous { await previous.value }
+            guard !Task.isCancelled, listener == self.eventGeneration, lifetime == self.generation, self.active, self.connected else { return }
+            var retryDelayMilliseconds: Int64 = 500
+            var last = ContinuousClock.now
+            while !Task.isCancelled && listener == self.eventGeneration && lifetime == self.generation && self.active && self.connected {
+                var openedAt: ContinuousClock.Instant?
+                do {
+                    let stream = try await client.invalidations()
+                    for try await _ in stream {
+                        try Task.checkCancellation()
+                        guard listener == self.eventGeneration, lifetime == self.generation, self.active, self.connected else { return }
+                        if openedAt == nil { openedAt = .now }
+                        self.resourceVersion &+= 1
+                        let elapsed = last.duration(to: .now)
+                        if elapsed < .milliseconds(250) { try await Task.sleep(for: .milliseconds(250)) }
+                        guard listener == self.eventGeneration, lifetime == self.generation, self.active, self.connected else { return }
+                        await self.refresh()
+                        last = .now
+                    }
+                    try Task.checkCancellation()
+                } catch is CancellationError {
+                    return
+                } catch {
+                    guard !Task.isCancelled, listener == self.eventGeneration, lifetime == self.generation, self.active, self.connected else { return }
+                    if let failure = error as? RovaiHostFailure,
+                       failure.code == "host.unauthorized" || failure.code == "host.login_required" {
+                        self.failure(error)
+                        return
+                    }
+                    self.issue = error.localizedDescription
+                }
+                guard !Task.isCancelled, listener == self.eventGeneration, lifetime == self.generation, self.active, self.connected else { return }
+                if let openedAt, openedAt.duration(to: .now) >= .seconds(30) { retryDelayMilliseconds = 500 }
+                do { try await Task.sleep(for: .milliseconds(retryDelayMilliseconds)) } catch { return }
+                retryDelayMilliseconds = min(retryDelayMilliseconds * 2, 30_000)
+            }
+        }
     }
     func refresh() async {
         guard let client, !refreshing else { return }; refreshing = true; let lifetime = generation; let selected = threadId
@@ -259,7 +300,7 @@ final class RovaiWorkspaceModel {
         let controller = RovaiTerminalController(client: client, boardId: boardId, nodeId: nodeId)
         terminals[key] = controller; return controller
     }
-    func logout() async { events?.cancel(); terminals.values.forEach { $0.retire() }; terminals.removeAll(); do { try await client?.logout(); connected = false } catch { failure(error) } }
+    func logout() async { eventGeneration &+= 1; events?.cancel(); terminals.values.forEach { $0.retire() }; terminals.removeAll(); do { try await client?.logout(); connected = false } catch { failure(error) } }
     private func failure(_ error: Error) { issue = error.localizedDescription; if issue?.contains("unauthorized") == true || issue?.contains("login_required") == true { connected = false; events?.cancel() } }
 }
 private extension Optional where Wrapped == String {
