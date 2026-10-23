@@ -3,7 +3,7 @@ use super::*;
 use anyhow::ensure;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use std::{fs, io::Write, path::Component};
+use std::{collections::HashMap, fs, io::Write, path::Component};
 
 pub(super) static MUTATIONS: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
 
@@ -223,6 +223,176 @@ fn git_target(value: Option<&str>) -> Result<String> {
         "workbench.invalid_git_target"
     );
     Ok(value.into())
+}
+
+#[derive(Debug, PartialEq, Eq)]
+struct GitFileMetadata {
+    path: String,
+    original_path: Option<String>,
+    kind: &'static str,
+    binary: bool,
+}
+
+fn git_nul_fields(bytes: &[u8]) -> Result<Vec<&[u8]>> {
+    if bytes.is_empty() {
+        return Ok(Vec::new());
+    }
+    ensure!(
+        bytes.last() == Some(&0),
+        "workbench.git_files_metadata_invalid"
+    );
+    Ok(bytes[..bytes.len() - 1]
+        .split(|byte| *byte == 0)
+        .collect())
+}
+
+fn git_metadata_path(bytes: &[u8]) -> Result<String> {
+    ensure!(!bytes.is_empty(), "workbench.git_files_metadata_invalid");
+    String::from_utf8(bytes.to_vec()).context("workbench.git_files_metadata_non_utf8")
+}
+
+fn parse_git_name_status(bytes: &[u8]) -> Result<Vec<GitFileMetadata>> {
+    let fields = git_nul_fields(bytes)?;
+    let mut changes = Vec::new();
+    let mut index = 0;
+    while index < fields.len() {
+        let status = fields[index];
+        index += 1;
+        let code = *status
+            .first()
+            .context("workbench.git_files_metadata_invalid")?;
+        let (kind, original_path) = match code {
+            b'A' if status.len() == 1 => ("added", None),
+            b'D' if status.len() == 1 => ("deleted", None),
+            b'M' | b'T' if status.len() == 1 => ("modified", None),
+            b'R' if status.len() > 1 && status[1..].iter().all(|byte| byte.is_ascii_digit()) => {
+                ensure!(
+                    index + 1 < fields.len(),
+                    "workbench.git_files_metadata_invalid"
+                );
+                let original_path = git_metadata_path(fields[index])?;
+                index += 1;
+                ("renamed", Some(original_path))
+            }
+            _ => anyhow::bail!("workbench.git_files_metadata_invalid"),
+        };
+        ensure!(index < fields.len(), "workbench.git_files_metadata_invalid");
+        let path = git_metadata_path(fields[index])?;
+        index += 1;
+        changes.push(GitFileMetadata {
+            path,
+            original_path,
+            kind,
+            binary: false,
+        });
+    }
+    Ok(changes)
+}
+
+fn parse_git_numstat(bytes: &[u8]) -> Result<HashMap<String, bool>> {
+    let fields = git_nul_fields(bytes)?;
+    let mut binaries = HashMap::new();
+    let mut index = 0;
+    while index < fields.len() {
+        let record = fields[index];
+        index += 1;
+        let added_end = record
+            .iter()
+            .position(|byte| *byte == b'\t')
+            .context("workbench.git_files_metadata_invalid")?;
+        let deleted_start = added_end + 1;
+        let deleted_end = deleted_start
+            + record[deleted_start..]
+                .iter()
+                .position(|byte| *byte == b'\t')
+                .context("workbench.git_files_metadata_invalid")?;
+        let added = &record[..added_end];
+        let deleted = &record[deleted_start..deleted_end];
+        let path = &record[deleted_end + 1..];
+        let valid_count = |value: &[u8]| {
+            value == b"-" || (!value.is_empty() && value.iter().all(|byte| byte.is_ascii_digit()))
+        };
+        ensure!(
+            valid_count(added)
+                && valid_count(deleted)
+                && (added == b"-") == (deleted == b"-"),
+            "workbench.git_files_metadata_invalid"
+        );
+        let path = if path.is_empty() {
+            ensure!(
+                index + 1 < fields.len(),
+                "workbench.git_files_metadata_invalid"
+            );
+            git_metadata_path(fields[index])?;
+            let path = git_metadata_path(fields[index + 1])?;
+            index += 2;
+            path
+        } else {
+            git_metadata_path(path)?
+        };
+        ensure!(
+            binaries.insert(path, added == b"-").is_none(),
+            "workbench.git_files_metadata_invalid"
+        );
+    }
+    Ok(binaries)
+}
+
+fn parse_git_file_metadata(
+    name_status: &crate::runtime_probe_process::BoundedCapture,
+    numstat: &crate::runtime_probe_process::BoundedCapture,
+) -> Result<Vec<GitFileMetadata>> {
+    ensure!(
+        !name_status.truncated && !numstat.truncated,
+        "workbench.git_files_metadata_truncated"
+    );
+    let mut binaries = parse_git_numstat(&numstat.bytes)?;
+    let mut files = parse_git_name_status(&name_status.bytes)?;
+    for file in &mut files {
+        file.binary = binaries
+            .remove(&file.path)
+            .context("workbench.git_files_metadata_mismatch")?;
+    }
+    ensure!(
+        binaries.is_empty(),
+        "workbench.git_files_metadata_mismatch"
+    );
+    Ok(files)
+}
+
+fn git_file_metadata_arguments(request: &GitRequest, numstat: bool) -> Result<Vec<String>> {
+    let format = if numstat { "--numstat" } else { "--name-status" };
+    let target = git_target(request.target.as_deref())?;
+    let arguments = match request.action.as_str() {
+        "show" => vec![
+            "show".into(),
+            "--no-ext-diff".into(),
+            "--no-textconv".into(),
+            "--format=".into(),
+            format.into(),
+            "-z".into(),
+            "-M".into(),
+            "--diff-merges=first-parent".into(),
+            target,
+            "--".into(),
+        ],
+        "diff_compare" => {
+            let mut arguments = vec![
+                "diff".into(),
+                "--no-ext-diff".into(),
+                "--no-textconv".into(),
+                format.into(),
+                "-z".into(),
+                "-M".into(),
+                target,
+                "--".into(),
+            ];
+            arguments.extend(request.paths.iter().cloned());
+            arguments
+        }
+        _ => anyhow::bail!("workbench.git_files_metadata_invalid"),
+    };
+    Ok(arguments)
 }
 
 fn git_arguments(request: &GitRequest, write: bool) -> Result<Vec<String>> {
@@ -1218,9 +1388,27 @@ impl Core {
             }
             let arguments = git_arguments(&request, false)?;
             let output = git.workbench_output(&root, &arguments).await?;
-            return Ok(
-                json!({"success":output.status.success(),"exitCode":output.status.code(),"output":String::from_utf8(output.stdout.bytes).context("workbench.git_non_utf8")?,"error":output.stderr.lossy_text()}),
-            );
+            let success = output.status.success();
+            let exit_code = output.status.code();
+            let stdout = String::from_utf8(output.stdout.bytes)
+                .context("workbench.git_non_utf8")?;
+            let error = output.stderr.lossy_text();
+            let mut result = json!({
+                "success": success,
+                "exitCode": exit_code,
+                "output": stdout,
+                "error": error
+            });
+            if success && matches!(request.action.as_str(), "show" | "diff_compare") {
+                match self
+                    .workbench_git_file_metadata(&git, &root, &request)
+                    .await
+                {
+                    Ok(files) => result["files"] = json!(files),
+                    Err(error) => result["filesError"] = json!(error.to_string()),
+                }
+            }
+            return Ok(result);
         }
         let execute = method == "workbench.git.execute";
         if execute {
@@ -1345,6 +1533,44 @@ impl Core {
             &json!({"identity":identity,"state":"finished","result":result}),
         )?;
         Ok(result)
+    }
+
+    async fn workbench_git_file_metadata(
+        &self,
+        git: &crate::mission_workspace::MissionGit,
+        root: &Path,
+        request: &GitRequest,
+    ) -> Result<Vec<Value>> {
+        let name_status_arguments = git_file_metadata_arguments(request, false)?;
+        let name_status = git
+            .workbench_output(root, &name_status_arguments)
+            .await
+            .context("workbench.git_files_metadata_command_failed")?;
+        ensure!(
+            name_status.status.success(),
+            "workbench.git_files_metadata_command_failed"
+        );
+        let numstat_arguments = git_file_metadata_arguments(request, true)?;
+        let numstat = git
+            .workbench_output(root, &numstat_arguments)
+            .await
+            .context("workbench.git_files_metadata_command_failed")?;
+        ensure!(
+            numstat.status.success(),
+            "workbench.git_files_metadata_command_failed"
+        );
+        parse_git_file_metadata(&name_status.stdout, &numstat.stdout).map(|files| {
+            files
+                .into_iter()
+                .map(|file| {
+                    let mut value = json!({"path":file.path,"kind":file.kind,"binary":file.binary});
+                    if let Some(original_path) = file.original_path {
+                        value["originalPath"] = json!(original_path);
+                    }
+                    value
+                })
+                .collect()
+        })
     }
 
     pub(super) async fn workbench_root(&self, scope: &Scope) -> Result<PathBuf> {
@@ -1506,5 +1732,135 @@ impl Core {
         };
         crate::platform::private_storage::atomic_write_private_json(&receipt, &saved)?;
         result
+    }
+}
+
+#[cfg(test)]
+mod git_file_metadata_tests {
+    use super::{parse_git_file_metadata, GitFileMetadata};
+    use crate::runtime_probe_process::BoundedCapture;
+
+    fn capture(bytes: &[u8], truncated: bool) -> BoundedCapture {
+        BoundedCapture {
+            bytes: bytes.to_vec(),
+            truncated,
+        }
+    }
+
+    #[test]
+    fn parses_space_unicode_and_tab_paths_from_nul_fields() {
+        let name_status = [
+            b"M\0space name.txt\0".as_slice(),
+            "A\0目录/带\t制表符.txt\0".as_bytes(),
+        ]
+        .concat();
+        let numstat = [
+            b"2\t1\tspace name.txt\0".as_slice(),
+            "0\t0\t目录/带\t制表符.txt\0".as_bytes(),
+        ]
+        .concat();
+
+        let files = parse_git_file_metadata(
+            &capture(&name_status, false),
+            &capture(&numstat, false),
+        )
+        .unwrap();
+
+        assert_eq!(
+            files,
+            vec![
+                GitFileMetadata {
+                    path: "space name.txt".into(),
+                    original_path: None,
+                    kind: "modified",
+                    binary: false,
+                },
+                GitFileMetadata {
+                    path: "目录/带\t制表符.txt".into(),
+                    original_path: None,
+                    kind: "added",
+                    binary: false,
+                },
+            ]
+        );
+    }
+
+    #[test]
+    fn parses_rename_paths_with_spaces_and_tabs() {
+        let name_status = [
+            b"R100\0old\t name [record].txt\0".as_slice(),
+            "new\t 名 [记录].txt\0".as_bytes(),
+        ]
+        .concat();
+        let numstat = [
+            b"3\t1\t\0old\t name [record].txt\0".as_slice(),
+            "new\t 名 [记录].txt\0".as_bytes(),
+        ]
+        .concat();
+
+        let files = parse_git_file_metadata(
+            &capture(&name_status, false),
+            &capture(&numstat, false),
+        )
+        .unwrap();
+
+        assert_eq!(
+            files,
+            vec![GitFileMetadata {
+                path: "new\t 名 [记录].txt".into(),
+                original_path: Some("old\t name [record].txt".into()),
+                kind: "renamed",
+                binary: false,
+            }]
+        );
+    }
+
+    #[test]
+    fn parses_binary_deletions() {
+        let files = parse_git_file_metadata(
+            &capture(b"D\0deleted binary.bin\0", false),
+            &capture(b"-\t-\tdeleted binary.bin\0", false),
+        )
+        .unwrap();
+
+        assert_eq!(
+            files,
+            vec![GitFileMetadata {
+                path: "deleted binary.bin".into(),
+                original_path: None,
+                kind: "deleted",
+                binary: true,
+            }]
+        );
+    }
+
+    #[test]
+    fn empty_metadata_returns_no_files() {
+        assert!(parse_git_file_metadata(&capture(b"", false), &capture(b"", false))
+            .unwrap()
+            .is_empty());
+    }
+
+    #[test]
+    fn truncated_metadata_is_rejected() {
+        assert!(parse_git_file_metadata(
+            &capture(b"M\0partial.txt\0", true),
+            &capture(b"1\t0\tpartial.txt\0", false),
+        )
+        .is_err());
+        assert!(parse_git_file_metadata(
+            &capture(b"M\0partial.txt\0", false),
+            &capture(b"1\t0\tpartial.txt\0", true),
+        )
+        .is_err());
+    }
+
+    #[test]
+    fn non_utf8_paths_are_rejected() {
+        assert!(parse_git_file_metadata(
+            &capture(b"M\0\xff\0", false),
+            &capture(b"1\t0\t\xff\0", false),
+        )
+        .is_err());
     }
 }

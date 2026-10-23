@@ -418,11 +418,42 @@ try {
   const renamedFile = await historicalRead(renamedCommit, 'renamed history [record].txt')
   assert.equal(renamedFile.success, true, renamedFile.error)
   assert.equal(renamedFile.output, originalHistoryText)
+  const renamedShow = await call('workbench.git.read', {
+    scope, action: 'show', target: renamedCommit
+  })
+  assert.equal(renamedShow.success, true, renamedShow.error)
+  assert.equal(renamedShow.filesError, undefined, renamedShow.filesError)
+  assert.deepEqual(renamedShow.files, [{
+    path: 'renamed history [record].txt',
+    originalPath: 'old history [record].txt',
+    kind: 'renamed',
+    binary: false
+  }])
   git('rm', '--', 'renamed history [record].txt')
   gitCommit('删除历史记录文件')
   const deletedCommit = git('rev-parse', 'HEAD').trim()
   const deletedFile = await historicalRead(deletedCommit, 'renamed history [record].txt')
   assert.equal(deletedFile.success, false, '删除版本不应返回已不存在文件的内容')
+  const deletedShow = await call('workbench.git.read', {
+    scope, action: 'show', target: deletedCommit
+  })
+  assert.equal(deletedShow.success, true, deletedShow.error)
+  assert.equal(deletedShow.filesError, undefined, deletedShow.filesError)
+  assert.deepEqual(deletedShow.files, [{
+    path: 'renamed history [record].txt', kind: 'deleted', binary: false
+  }])
+
+  await writeFile(path.join(repository, 'binary sample.bin'), Buffer.from([0, 255, 1, 128]))
+  gitCommit('添加二进制历史文件')
+  const binaryCommit = git('rev-parse', 'HEAD').trim()
+  const binaryShow = await call('workbench.git.read', {
+    scope, action: 'show', target: binaryCommit
+  })
+  assert.equal(binaryShow.success, true, binaryShow.error)
+  assert.equal(binaryShow.filesError, undefined, binaryShow.filesError)
+  assert.deepEqual(binaryShow.files, [{
+    path: 'binary sample.bin', kind: 'added', binary: true
+  }])
 
   await writeFile(path.join(repository, 'main-only.txt'), 'main baseline\n')
   gitCommit('建立合并第一父提交基线')
@@ -442,13 +473,30 @@ try {
   assert.equal(mergeParentDiff.success, true, mergeParentDiff.error)
   assert(mergeParentDiff.output.includes('feature-only.txt'), '与第一父提交比较应显示第二父提交带来的文件')
   assert(!mergeParentDiff.output.includes('first-parent-only.txt'), '第一父提交已有的改动不应伪装成第二父差异')
+  assert.equal(mergeParentDiff.filesError, undefined, mergeParentDiff.filesError)
+  assert.deepEqual(mergeParentDiff.files, [{
+    path: 'feature-only.txt', kind: 'added', binary: false
+  }])
+  const mergeShow = await call('workbench.git.read', {
+    scope, action: 'show', target: mergeCommit
+  })
+  assert.equal(mergeShow.success, true, mergeShow.error)
+  assert.equal(mergeShow.filesError, undefined, mergeShow.filesError)
+  assert.deepEqual(mergeShow.files, [{
+    path: 'feature-only.txt', kind: 'added', binary: false
+  }])
   record('issue_78_file_history_is_complete_and_merge_diff_uses_second_parent_changes', {
     baseCommit: historyBaseCommit,
     renamedCommit,
     deletedCommit,
+    binaryCommit,
     mergeCommit,
     parentCount: 2,
     historicalTextBytes: Buffer.byteLength(originalHistoryText),
+    structuredRename: true,
+    structuredDelete: true,
+    structuredBinary: true,
+    mergeMetadataUsesFirstParent: true,
     secondParentChangeVisible: true
   })
 
