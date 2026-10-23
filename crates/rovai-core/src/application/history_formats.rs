@@ -128,6 +128,9 @@ fn snapshot(root: &Path, target: &Path) -> Result<String> {
                     rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY
                         | rusqlite::OpenFlags::SQLITE_OPEN_NO_MUTEX,
                 )?;
+                drop(crate::platform::private_storage::create_private_new_file(
+                    &destination,
+                )?);
                 connection.backup(rusqlite::MAIN_DB, &destination, None)?;
             } else {
                 let bytes = fs::read(&path)?;
@@ -142,7 +145,6 @@ fn snapshot(root: &Path, target: &Path) -> Result<String> {
                     "history.source_changed_during_snapshot"
                 );
             }
-            crate::platform::private_storage::repair_private_file(&destination)?;
             files.push((
                 relative.to_string_lossy().replace('\\', "/"),
                 crate::backup::file_digest(&destination)?,

@@ -80,11 +80,7 @@ pub(super) fn export(
     }
     let stage = directory.join(format!("export-{}.zip", uuid::Uuid::new_v4()));
     let result = (|| -> Result<Value> {
-        let file = fs::OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .open(&stage)?;
-        crate::platform::private_storage::repair_private_file(&stage)?;
+        let file = crate::platform::private_storage::create_private_new_file(&stage)?;
         let mut zip = zip::ZipWriter::new(file);
         let options = zip::write::SimpleFileOptions::default()
             .compression_method(zip::CompressionMethod::Deflated)
@@ -111,11 +107,13 @@ pub(super) fn export(
         zip.write_all(&serde_json::to_vec_pretty(&json!({"format":"rovai-native-history-export","formatVersion":1,"entry":public,"sharedSourceSnapshot":shared.is_some(),"notice":if shared.is_some(){"Source is a shared native storage snapshot and can contain other sessions."}else{"Source contains the selected native log."},"files":inventory}))?)?;
         zip.finish()?.sync_all()?;
         let digest = crate::backup::file_digest(&stage)?;
-        let mut output = fs::OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .open(destination)?;
+        let mut options = fs::OpenOptions::new();
+        options.write(true).create_new(true);
+        #[cfg(unix)]
+        std::os::unix::fs::OpenOptionsExt::mode(&mut options, 0o600);
+        let mut output = options.open(destination)?;
         let copied = (|| -> Result<()> {
+            #[cfg(windows)]
             crate::platform::private_storage::repair_private_file(destination)?;
             std::io::copy(&mut fs::File::open(&stage)?, &mut output)?;
             output.sync_all()?;
