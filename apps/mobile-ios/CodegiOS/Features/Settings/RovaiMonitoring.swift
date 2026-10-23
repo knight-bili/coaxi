@@ -61,19 +61,19 @@ private struct RovaiRuntimeMonitoring: View {
                     LabeledContent("最佳可用成本", value: monitoringMoney(value["summary"]?["cost"]?["run"]))
                 }
                 Section("用量趋势") {RovaiMonitoringTrend(points: value["trend"]?.rvArray ?? [])}
-                Section("采集覆盖率") {
+                Section {
                     ForEach(monitoringCoverageMetrics, id: \.key) { metric in
                         monitoringCoverageRow(metric, value: value)
                     }
-                } footer: {Text("仅包含已收到的观测。未知不等于零，正常结束也不代表统计完整。")}
+                } header: {Text("采集覆盖率")} footer: {Text("仅包含已收到的观测。未知不等于零，正常结束也不代表统计完整。")}
                 breakdown("按智能体", rows: value["byRuntime"]?.rvArray ?? [])
                 breakdown("按模型", rows: value["byModel"]?.rvArray ?? [])
-                if let cost = value["summary"]?["cost"], cost != .null {Section("Provider成本对账") {
+                if let cost = value["summary"]?["cost"], cost != .null {Section {
                     LabeledContent("Run最佳可用成本", value: monitoringMoney(cost["run"]))
                     LabeledContent("Provider对账成本", value: monitoringMoney(cost["reconciliation"]))
                     LabeledContent("差额（Provider − Run）", value: monitoringMoney(cost["difference"]))
                     LabeledContent("对账截止", value: cost["latestReconciledAt"]?.stringValue ?? "—")
-                } footer: {Text("Provider聚合账单与Run成本分开保存，不分摊为单次运行费用。")}}
+                } header: {Text("Provider成本对账")} footer: {Text("Provider聚合账单与Run成本分开保存，不分摊为单次运行费用。")}}
                 Section {Text("采集开始 · \(value["collection"]?.text("startedAt") ?? "")").font(.caption).foregroundStyle(Theme.textSecondary)}
             } else {Section {if busy {ProgressView("正在汇总已保存的用量…")} else {Text("暂无可显示的数据").foregroundStyle(Theme.textSecondary)}}}
         }.navigationTitle("运行监控").navigationBarTitleDisplayMode(.inline)
