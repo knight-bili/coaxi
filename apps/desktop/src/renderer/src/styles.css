@@ -465,6 +465,11 @@ html[lang="en"] .settings-app-update-badge svg { display: none; }
 .command-palette-item .truncate { flex: 1 1 auto; }
 .command-palette-item small { flex: 0 0 auto; margin-left: auto; color: var(--faint); font: 10px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace; }
 .command-palette-empty { margin: 0; padding: 16px 14px; color: var(--faint); font-size: 12px; text-align: center; }
+.navigation-tag-filter { display: flex; align-items: center; gap: 8px; padding: 6px 14px; color: var(--muted); font-size: 11px; }
+.navigation-tag-filter select { min-width: 0; flex: 1; }
+.navigation-thread-tags { display: inline-flex; align-items: center; gap: 4px; min-width: 0; max-width: 40%; color: var(--muted); font-size: 10px; line-height: 1.4; }
+.navigation-thread-tags > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
+.navigation-thread-tags > small { flex-shrink: 0; }
 .navigation-scroll {
   min-height: 0;
   flex: 1 1 auto;

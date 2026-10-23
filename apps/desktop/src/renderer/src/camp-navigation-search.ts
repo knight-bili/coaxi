@@ -12,15 +12,18 @@ export function navigationThreadSearch(
   if (isThreadId(trimmed)) return { kind: 'id', threadId: trimmed }
 
   const text = query.trim().toLowerCase()
+  const tag = text.startsWith('#') ? text.slice(1) : null
   return {
     kind: 'text',
     threads: (text ? threads.filter((thread) => {
+      if (tag !== null) return (thread.tags ?? []).some(label => label.toLowerCase() === tag)
       const projectName = thread.projectBindingKind === 'directory'
         ? projectNameByPath.get(thread.projectPath) ?? ''
         : uiAttribute('快速对话')
       return formatThreadTitle(thread, firstRunThreadId).toLowerCase().includes(text)
         || thread.title.toLowerCase().includes(text)
         || projectName.toLowerCase().includes(text)
+        || (thread.tags ?? []).some(label => label.toLowerCase().includes(text))
     }) : threads).slice(0, 12)
   }
 }

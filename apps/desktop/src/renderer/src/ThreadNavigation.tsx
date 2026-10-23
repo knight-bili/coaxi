@@ -865,6 +865,7 @@ function CommandPalette({
     [navigation]
   )
   const threads = useMemo(() => navigation ? allNavigationThreads(navigation) : [], [navigation])
+  const tags = useMemo(() => [...new Set(threads.flatMap(thread => thread.tags ?? []))].sort(), [threads])
   const search = navigationThreadSearch(query, threads, projectNameByPath, firstRunThreadId)
   const threadId = search.kind === 'id' ? search.threadId : null
   const [lookup, setLookup] = useState<NavigationThreadLookup | null>(null)
@@ -921,6 +922,12 @@ function CommandPalette({
               }
             }}
           />
+          {tags.length > 0 && <label className="navigation-tag-filter"><UiText zh="按标签筛选已加载对话" />
+            <select aria-label={uiAttribute('按标签筛选已加载对话')} value={query.startsWith('#') && tags.includes(query.slice(1)) ? query.slice(1) : ''}
+              onChange={event => { setQuery(event.target.value ? `#${event.target.value}` : ''); setActiveIndex(0) }}>
+              <option value="">{uiAttribute('全部标签')}</option>{tags.map(tag => <option key={tag} value={tag}>{tag}</option>)}
+            </select>
+          </label>}
           <div className="command-palette-list" aria-label={uiAttribute("匹配的对话")} aria-busy={loading}>
             {visible.map((thread, index) => (
               <button
@@ -931,6 +938,7 @@ function CommandPalette({
                 onMouseEnter={() => setActiveIndex(index)}
               >
                 <span className="truncate" title={formatThreadTitle(thread, firstRunThreadId)}>{formatThreadTitle(thread, firstRunThreadId)}</span>
+                <NavigationThreadTags tags={thread.tags} />
                 <small>{thread.projectBindingKind === 'directory' ? projectNameByPath.get(thread.projectPath) ?? uiAttribute('项目') : uiAttribute("快速对话")}</small>
               </button>
             ))}
@@ -1154,6 +1162,13 @@ function ThreadGroup({
   )
 }
 
+function NavigationThreadTags({tags = []}: {tags?: string[]}): JSX.Element | null {
+  if (!tags.length) return null
+  return <span className="navigation-thread-tags" title={tags.join(' · ')} aria-label={uiAttribute('标签：{0}', tags.join('、'))}>
+    <span>{tags[0]}</span>{tags.length > 1 && <small>+{tags.length - 1}</small>}
+  </span>
+}
+
 function ThreadRow({
   thread,
   readState,
@@ -1233,6 +1248,7 @@ function ThreadRow({
       >
         {pinned && <span className="pinned-camp-icon" aria-hidden="true"><NavigationIcon name="messages" /></span>}
         <span className="truncate">{title}</span>
+        <NavigationThreadTags tags={thread.tags} />
         {thread.activationState === 'pending' && <span className="camp-draft-badge"><UiText zh={"草稿"} /></span>}
         <span className="camp-status-cluster" data-status={status} aria-hidden="true">
           {hasNewReply && <span className="camp-status-slot"><i className="camp-unread-dot" /></span>}

@@ -5,6 +5,7 @@ mod canvas_terminal;
 mod config;
 mod conversation_preferences;
 mod navigation_groups;
+mod navigation_tags;
 pub(crate) mod delegation_composer;
 pub(crate) mod delegation_control;
 pub(crate) mod delegation_input;
@@ -10448,7 +10449,11 @@ impl Core {
             }
             "navigation.projectGroups" => self.navigation_project_groups(request.params.clone()).await,
             "workbench.organizer.get" | "workbench.organizer.set" => {
-                self.workbench_organizer(&request.method, request.params.clone()).await
+                let value = self.workbench_organizer(&request.method, request.params.clone()).await?;
+                if request.method == "workbench.organizer.set" {
+                    emit_navigation_invalidated(&self.output, "workbench.organizer.set", None);
+                }
+                Ok(value)
             }
             "forge.accounts.get" | "forge.accounts.set" => {
                 self.forge_accounts(&request.method, request.params.clone()).await
@@ -10516,15 +10521,18 @@ impl Core {
             "navigation.snapshot" => {
                 let params: NavigationSnapshotParams =
                     serde_json::from_value(request.params.clone())?;
-                let mut database = self.database.lock().await;
-                Ok(serde_json::to_value(
+                let value = {
+                    let mut database = self.database.lock().await;
+                    serde_json::to_value(
                     ReadModelService.navigation_snapshot_for_groups(
                         &mut database,
                         &params.group_limits,
                         params.group_keys.as_deref(),
                         &request.client,
                     )?,
-                )?)
+                    )?
+                };
+                self.navigation_with_tags(value).await
             }
             "navigation.activity" => {
                 let params: NavigationActivityParams =
@@ -10542,18 +10550,22 @@ impl Core {
             "navigation.camps" => {
                 let params: NavigationThreadsParams =
                     serde_json::from_value(request.params.clone())?;
-                let mut database = self.database.lock().await;
-                Ok(serde_json::to_value(ReadModelService.navigation_camps(
+                let value = {
+                    let mut database = self.database.lock().await;
+                    serde_json::to_value(ReadModelService.navigation_camps(
                     &mut database,
                     &params.camp_ids,
                     &request.client,
-                )?)?)
+                    )?)?
+                };
+                self.navigation_with_tags(value).await
             }
             "navigation.groupCamps" => {
                 let params: NavigationGroupThreadsParams =
                     serde_json::from_value(request.params.clone())?;
-                let mut database = self.database.lock().await;
-                Ok(serde_json::to_value(
+                let value = {
+                    let mut database = self.database.lock().await;
+                    serde_json::to_value(
                     ReadModelService.navigation_group_camps_for_client(
                         &mut database,
                         params.project_path.as_deref(),
@@ -10561,27 +10573,35 @@ impl Core {
                         params.limit.unwrap_or(100),
                         &request.client,
                     )?,
-                )?)
+                    )?
+                };
+                self.navigation_with_tags(value).await
             }
             "navigation.findCamp" => {
                 let params: ThreadIdParams = serde_json::from_value(request.params.clone())?;
-                let database = self.database.lock().await;
-                Ok(serde_json::to_value(
+                let value = {
+                    let database = self.database.lock().await;
+                    serde_json::to_value(
                     ReadModelService.find_navigation_camp(&database, &params.camp_id)?,
-                )?)
+                    )?
+                };
+                self.navigation_with_tags(value).await
             }
             "navigation.campViewed" => {
                 let params: AcknowledgeThreadViewedParams =
                     serde_json::from_value(request.params.clone())?;
-                let mut database = self.database.lock().await;
-                Ok(serde_json::to_value(
+                let value = {
+                    let mut database = self.database.lock().await;
+                    serde_json::to_value(
                     ReadModelService.acknowledge_camp_viewed_for_client(
                         &mut database,
                         params.camp_id.as_str(),
                         params.through_global_sequence,
                         &request.client,
                     )?,
-                )?)
+                    )?
+                };
+                self.navigation_with_tags(value).await
             }
             "missions.workspace.cleanup"
             | "missions.cleanup.list"

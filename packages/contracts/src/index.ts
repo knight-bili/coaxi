@@ -1308,6 +1308,8 @@ export type ThreadChannelSource =
 export interface NavigationThreadItem {
   id: string
   title: string
+  /** Core-owned labels assigned to this Thread; older clients may omit them. */
+  tags?: string[]
   channelSource?: ThreadChannelSource | null
   activationState: ThreadActivationState
   projectBindingKind: ProjectBindingKind
@@ -1323,7 +1325,7 @@ export interface NavigationThreadItem {
 }
 
 export type NavigationThreadTarget = Pick<NavigationThreadItem,
-  'id' | 'title' | 'channelSource' | 'activationState' | 'projectBindingKind' | 'projectPath'>
+  'id' | 'title' | 'tags' | 'channelSource' | 'activationState' | 'projectBindingKind' | 'projectPath'>
 
 export interface NavigationThreadGroup {
   totalCount: number

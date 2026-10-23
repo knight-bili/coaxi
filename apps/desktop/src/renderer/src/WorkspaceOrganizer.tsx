@@ -3,6 +3,7 @@ import { ChevronUp, ChevronDown, Plus, Save, Tag, Trash2 } from 'lucide-react'
 import { newCommandId } from '../../shared/command-id'
 import { useThreadClient } from './camp-client'
 import { useUiText } from './interface-language'
+import { WorkspaceTagChoices } from './WorkspaceTagChoices'
 
 type Organizer = { tags:string[]; directoryAliases:Array<{path:string;name:string;group:string}>; quickMessages:Array<{id:string;title:string;text:string}> }
 const empty = ():Organizer=>({tags:[],directoryAliases:[],quickMessages:[]})
@@ -14,6 +15,7 @@ export function WorkspaceOrganizer({threadId,onDirtyChange,onUseMessage,onDirect
   const [value,setValue]=useState<Organizer>(empty),[saved,setSaved]=useState<Organizer>(empty),[digest,setDigest]=useState<string|null>(null)
   const [level,setLevel]=useState<'global'|'project'|'thread'>('thread')
   const [busy,setBusy]=useState(false),[error,setError]=useState<string|null>(null),[tag,setTag]=useState('')
+  const [renaming,setRenaming]=useState<{from:string;value:string}|null>(null)
   const dirty=JSON.stringify(value)!==JSON.stringify(saved)
   useEffect(()=>{onDirtyChange(dirty)},[dirty,onDirtyChange])
   useEffect(()=>{
@@ -34,7 +36,9 @@ export function WorkspaceOrganizer({threadId,onDirtyChange,onUseMessage,onDirect
   return <section className="workbench-organizer">
     <div className="workbench-toolbar"><strong>{t('会话整理')}</strong><label>{t('适用范围')}<select aria-label={t('适用范围')} disabled={busy||dirty} value={level} onChange={event=>setLevel(event.target.value as typeof level)}><option value="global">{t('全局')}</option><option value="project">{t('当前工程')}</option><option value="thread">{t('当前对话与原有内容')}</option></select></label><button type="button" disabled={busy||!dirty||!digest} onClick={()=>void save()}><Save size={14}/>{t('保存')}</button><button type="button" disabled={busy||!dirty} onClick={()=>{setValue(saved);setError(null)}}>{t('放弃更改')}</button></div>
     {error&&<p className="workbench-error" role="alert">{error}</p>}
-    <fieldset disabled={busy}><legend>{t('标签')}</legend><div className="workbench-tags">{value.tags.map(label=><span key={label}><Tag size={12}/>{label}<button type="button" aria-label={t('移除标签')} onClick={()=>setValue(current=>({...current,tags:current.tags.filter(item=>item!==label)}))}>×</button></span>)}</div>
+    <fieldset disabled={busy}><legend>{t(level==='thread'?'当前对话标签':'可供对话选择的标签')}</legend><div className="workbench-tags">{value.tags.map(label=><span key={label}><Tag size={12}/><button type="button" aria-label={t('重命名标签')} onClick={()=>setRenaming({from:label,value:label})}>{label}</button><button type="button" aria-label={t('移除标签')} onClick={()=>{setValue(current=>({...current,tags:current.tags.filter(item=>item!==label)}));if(renaming?.from===label)setRenaming(null)}}>×</button></span>)}</div>
+      {renaming&&<form className="workbench-toolbar" onSubmit={event=>{event.preventDefault();const next=renaming.value.trim();if(!next||next!==renaming.from&&value.tags.includes(next)){setError(t('标签名称不能为空或重复。'));return}setValue(current=>({...current,tags:current.tags.map(tag=>tag===renaming.from?next:tag)}));setRenaming(null);setError(null)}}><input aria-label={t('新的标签名称')} value={renaming.value} onChange={event=>setRenaming(current=>current?{...current,value:event.target.value}:null)}/><button type="submit">{t('确认重命名')}</button><button type="button" onClick={()=>setRenaming(null)}>{t('取消')}</button></form>}
+      {level==='thread'&&<WorkspaceTagChoices threadId={threadId} selected={value.tags} disabled={busy} onChoose={tag=>setValue(current=>current.tags.includes(tag)?current:{...current,tags:[...current.tags,tag]})}/>}
       <form className="workbench-toolbar" onSubmit={event=>{event.preventDefault();const next=tag.trim();if(next&&!value.tags.includes(next))setValue(current=>({...current,tags:[...current.tags,next]}));setTag('')}}><input aria-label={t('标签名称')} value={tag} onChange={event=>setTag(event.target.value)}/><button type="submit" disabled={!tag.trim()}><Plus size={14}/>{t('添加')}</button></form>
     </fieldset>
     <fieldset disabled={busy}><legend>{t('关联目录、别名与分组')}</legend>
