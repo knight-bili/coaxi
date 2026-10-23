@@ -81,7 +81,7 @@ struct RovaiWorkspaceRoot: View {
             }.navigationSplitViewColumnWidth(min: 340, ideal: 400, max: 520)
         } detail: {
             NavigationStack {
-                if model.connected, let detailRoute { switch detailRoute { case .thread(let id): RovaiThreadDetail(model: model, id: id).id(id); case .canvas(let id): RovaiCanvasView(model: model, id: id, onOpenThread: {detailRoute = .thread($0)}).id(id) } }
+                if model.connected, let detailRoute { switch detailRoute { case .thread(let id): RovaiThreadDetail(model: model, id: id).id(id); case .canvas(let id): RovaiCanvasView(model: model, id: id, onOpenThread: {self.detailRoute = .thread($0)}).id(id) } }
                 else { ContentUnavailableView("选择对话或画布", systemImage: "sidebar.left", description: Text("从列表打开内容，在此查看并继续工作。")) }
             }
         }.navigationSplitViewStyle(.balanced)
