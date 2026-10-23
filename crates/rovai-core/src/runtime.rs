@@ -617,6 +617,9 @@ impl AgentRunExecution {
     pub fn native_session_resume_disposition(&self) -> NativeSessionResumeDisposition {
         if self.native_session_id.is_none()
             || self.native_adapter_kind != Some(self.runtime.adapter_kind)
+            // 此stdio连接绑定确切Run/epoch；当前Adapter没有把旧MCP调用重绑定到新Run的证明。
+            // 保留Core历史并新建原生会话，不能让旧桥把请求写入另一轮。
+            || self.runtime.conversation_tools.as_ref().is_some_and(|frozen|frozen.flags.question||frozen.flags.session_info||frozen.flags.automations||frozen.flags.work_tasks)
         {
             return NativeSessionResumeDisposition::New;
         }
