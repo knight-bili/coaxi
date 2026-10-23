@@ -16,7 +16,7 @@ CREATE TABLE conversation_tool_run (
 CREATE TABLE conversation_tool_source (
  id TEXT PRIMARY KEY NOT NULL,owner_thread_id TEXT NOT NULL,source_kind TEXT NOT NULL CHECK(source_kind IN ('public','single_chat','delegation_child','imported')),
  conversation_id TEXT,import_id TEXT,import_revision TEXT,legacy_session_id INTEGER,
- locator_cipher BLOB NOT NULL,created_at TEXT NOT NULL,
+ locator_cipher BLOB NOT NULL,descriptor_json TEXT CHECK(descriptor_json IS NULL OR(json_valid(descriptor_json) AND length(descriptor_json)<=4096)),created_at TEXT NOT NULL,
  CHECK((source_kind='imported' AND import_id IS NOT NULL AND import_revision IS NOT NULL AND conversation_id IS NULL)
     OR (source_kind<>'imported' AND conversation_id IS NOT NULL AND import_id IS NULL AND import_revision IS NULL))
 );

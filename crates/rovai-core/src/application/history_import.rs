@@ -20,7 +20,7 @@ struct Entry{id:String,name:String,bytes:u64,modified:u64,#[serde(default)]nativ
 struct Plan{root:PathBuf,provider:String,created_at:String,entries:Vec<Entry>,#[serde(default)]source_root:Option<PathBuf>,#[serde(default)]helper:bool,#[serde(default)]snapshot_digest:Option<String>}
 #[derive(Deserialize)]
 #[serde(rename_all="camelCase",deny_unknown_fields)]
-struct Request{scope:workbench::Scope,operation:String,#[serde(default)]root:Option<PathBuf>,#[serde(default)]provider:Option<String>,#[serde(default)]plan_id:Option<String>,#[serde(default)]entry_id:Option<String>,#[serde(default)]expected_digest:Option<String>,#[serde(default)]import_id:Option<String>,#[serde(default)]offset:usize,#[serde(default)]tags:Option<Vec<String>>,#[serde(default)]include_archived:bool,#[serde(default)]expected_revision:Option<String>,#[serde(default)]destination:Option<PathBuf>}
+struct Request{scope:workbench::Scope,operation:String,#[serde(default)]root:Option<PathBuf>,#[serde(default)]provider:Option<String>,#[serde(default)]plan_id:Option<String>,#[serde(default)]entry_id:Option<String>,#[serde(default)]expected_digest:Option<String>,#[serde(default)]import_id:Option<String>,#[serde(default)]offset:usize,#[serde(default)]tags:Option<Vec<String>>,#[serde(default)]include_archived:bool,#[serde(default)]expected_revision:Option<String>,#[serde(default)]destination:Option<PathBuf>,#[serde(default)]command_id:Option<String>,#[serde(default)]target_scope:Option<crate::conversation_tools::ScopeV1>,#[serde(default)]after:Option<String>,#[serde(default)]limit:Option<u32>}
 fn library_entry(mut value:Value)->Result<Value>{
     let revision=crate::command::canonical_json_digest(&value)?;
     if let Some(object)=value.as_object_mut(){object.remove("originalRoot");object.remove("nativeSessionId");let shared=object.remove("snapshotRoot").is_some_and(|value|!value.is_null());object.insert("sharedSourceSnapshot".into(),json!(shared));object.insert("revision".into(),json!(revision));object.entry("archived".to_string()).or_insert(json!(false));}
@@ -43,9 +43,23 @@ fn scan(root:PathBuf,provider:String)->Result<Plan>{
     entries.sort_by(|a,b|b.modified.cmp(&a.modified).then(a.name.cmp(&b.name)));Ok(Plan{root,provider,created_at:Utc::now().to_rfc3339(),entries,source_root:None,helper:false,snapshot_digest:None})
 }
 impl Core{
-    pub(super) async fn history_import(&self,local:bool,value:Value)->Result<Value>{
+    pub(super) async fn history_import(&self,local:bool,value:Value,client:&crate::draft_client::DraftClient)->Result<Value>{
         let request:Request=serde_json::from_value(value)?;
         let _root=self.workbench_root(&request.scope).await?;
+        if request.operation=="sources"{
+            let scope=request.target_scope.context("conversation_tools.scope_required")?;
+            ensure!(scope.thread_id==request.scope.thread_id,"conversation_tools.scope_changed");
+            let database=self.database.lock().await;
+            return crate::conversation_tools::user_sources::list(database.connection(),&scope,request.after.as_deref(),request.limit.unwrap_or(50))
+        }
+        if request.operation=="source.prepare"{
+            let id=request.command_id.context("conversation_tools.command_required")?;uuid::Uuid::parse_str(&id)?;
+            let command=crate::conversation_tools::user_sources::PrepareImport{client:client.clone(),thread_id:request.scope.thread_id,import_id:request.import_id.context("history.import_required")?,expected_revision:request.expected_revision.context("history.revision_required")?};
+            let mut database=self.database.lock().await;
+            let execution=crate::conversation_tools::user_sources::prepare_import(&mut database,&self.data_dir,&user_command_envelope(id,command))?;
+            ensure!(execution.result.status!=CommandResultStatus::Rejected,"conversation_tools.source_changed");
+            return Ok(json!({"source":execution.result.payload,"commandId":execution.result.command_id,"saved":true}))
+        }
         let directory=self.data_dir.join("imported-history");
         crate::platform::private_storage::prepare_private_directory(&directory)?;
         if request.operation=="list"{

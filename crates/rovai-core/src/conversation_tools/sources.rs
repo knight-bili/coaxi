@@ -23,6 +23,12 @@ pub(crate) fn load(connection:&Connection,id:&str)->Result<Source>{
     Ok(Source{id:id.into(),owner_thread_id:owner,source_kind:kind,legacy_session_id:legacy,locator})
 }
 /// live 来源复用 Core 已签发的 Conversation UUID，不接受客户端提供目录或来源种类。
+pub(crate) fn live_record(connection:&Connection,id:&str)->Result<Source>{
+    uuid::Uuid::parse_str(id)?;
+    let(owner,kind):(String,String)=connection.query_row("SELECT c.camp_id,c.kind FROM conversation c JOIN camp ON camp.id=c.camp_id WHERE c.id=?1 AND camp.deletion_operation_id IS NULL",[id],|row|Ok((row.get(0)?,row.get(1)?))).context("conversation_tools.source_unavailable")?;
+    let source_kind=match kind.as_str(){"camp_member"=>"public","single_chat"=>"single_chat","delegation_child"=>"delegation_child",_=>anyhow::bail!("conversation_tools.source_kind_unavailable")};
+    Ok(Source{id:id.into(),owner_thread_id:owner,source_kind:source_kind.into(),legacy_session_id:None,locator:Locator::Live{conversation_id:id.into()}})
+}
 pub(crate) fn register_live(connection:&Connection,id:&str)->Result<Source>{
     uuid::Uuid::parse_str(id)?;
     let(owner,kind):(String,String)=connection.query_row("SELECT c.camp_id,c.kind FROM conversation c JOIN camp ON camp.id=c.camp_id WHERE c.id=?1 AND camp.deletion_operation_id IS NULL",[id],|row|Ok((row.get(0)?,row.get(1)?))).context("conversation_tools.source_unavailable")?;

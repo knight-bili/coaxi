@@ -75,11 +75,11 @@ pub(crate) fn imported(root:&Path,source:&Source,through:Option<i64>)->Result<Sn
     }
     let summary=&transcript["summary"];
     let mut metadata=json!({"stats":imported_stats(&transcript,through==maximum),"note":"仅返回原导入中可见的文字与工具名称；图片、思考、工具参数和原生日志定位不随本次查询返回。原日志统计只按可核对字段列示。"});
-    for(key,source_key,max)in[("title","title",4096),("model","model",512),("git_branch","git_branch",1024),("workspace_name","folder_name",1024)]{
+    if through==maximum{for(key,source_key,max)in[("title","title",4096),("model","model",512),("git_branch","git_branch",1024),("workspace_name","folder_name",1024)]{
         if let Some(text)=summary[source_key].as_str(){metadata[key]=json!(limited(text,max));}
-    }
+    }}else if let Some(text)=turns.iter().take(through as usize).filter(|turn|turn["role"]=="user").filter_map(|turn|turn["blocks"].as_array()).flatten().find_map(|block|if block["type"]=="text"{block["text"].as_str()}else{None}){metadata["title"]=json!(limited(text,120));}
     if let Some(provider)=manifest["provider"].as_str(){metadata["agent_type"]=json!(limited(provider,128));}
-    for(key,source_key)in[("created_at","started_at"),("updated_at","ended_at")]{if let Some(text)=summary[source_key].as_str().filter(|text|chrono::DateTime::parse_from_rfc3339(text).is_ok()){metadata[key]=json!(text);}}
+    if through==maximum{for(key,source_key)in[("created_at","started_at"),("updated_at","ended_at")]{if let Some(text)=summary[source_key].as_str().filter(|text|chrono::DateTime::parse_from_rfc3339(text).is_ok()){metadata[key]=json!(text);}}}
     finish(source,through,total,items,metadata,text_truncated)
 }
 pub(crate) fn read(connection:&Connection,root:&Path,source:&Source,through:Option<i64>)->Result<Snapshot>{match &source.locator{Locator::Live{..}=>live(connection,source,through),Locator::Imported{..}=>imported(root,source,through)}}

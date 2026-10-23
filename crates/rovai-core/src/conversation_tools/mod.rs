@@ -22,6 +22,7 @@ pub mod user_api;
 pub mod runtime;
 pub mod broker;
 pub mod stdio;
+pub mod user_sources;
 pub const MAX_FRAME:usize=8*1024*1024;
 pub mod storage;
 pub use model::*;

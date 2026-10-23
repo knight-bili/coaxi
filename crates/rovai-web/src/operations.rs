@@ -702,7 +702,7 @@ impl Operation {
             Self::PetsOperation => select_fields(&value,&["pets","pet","page","pageSize","total","totalPages","entries","settings","id","displayName","description","spritesheetPath","duplicate","removed","mime","digest","offset","totalBytes","next","bytes","enabled","activeId","scale"]),
             Self::AppearanceExtensions => select_fields(&value,&["revision","value"]),
             Self::WebdavSettings => select_fields(&value,&["revision","endpoint","username","passwordSet","allowInsecure"]),
-            Self::HistoryLibrary => select_fields(&value,&["entries","digest","totalBytes","offset","next","bytes","saved"]),
+            Self::HistoryLibrary => select_fields(&value,&["entries","digest","totalBytes","offset","next","bytes","saved","source","commandId","items"]),
             Self::OfficeWatch => select_fields(&value,&["holdId","port","cap","editable","released","installed","formats"]),
             Self::ForgeOperation => select_fields(&value, &["provider", "webUrl", "ownerRepo", "repositoryKey", "repository", "success", "status", "data", "missionDraft", "nextPage","totalCount","reachableCount","incomplete","sortSupported","retryAfter"]),
             Self::WorkbenchOrganizerGet | Self::WorkbenchOrganizerSet => select_fields(&value, &["value", "digest"]),
