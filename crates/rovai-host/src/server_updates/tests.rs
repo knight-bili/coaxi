@@ -61,7 +61,7 @@ async fn update_pipeline_keeps_the_running_program_until_verified_and_durably_se
     let version = "999.0.0";
     let current_version = env!("CARGO_PKG_VERSION");
     let old = format!(
-        "schema=1\nversion={}\ntarget={target}\n",
+        "schema=1\nproduct=codeg-rovai-workbench\nversion={}\ntarget={target}\n",
         env!("CARGO_PKG_VERSION")
     );
     fs::write(root.join("package-info"), &old).unwrap();
@@ -87,7 +87,7 @@ async fn update_pipeline_keeps_the_running_program_until_verified_and_durably_se
     fs::write(data.join("sentinel"), "retained data").unwrap();
     fs::write(
         package.join("package-info"),
-        format!("schema=1\nversion={version}\ntarget={target}\n"),
+        format!("schema=1\nproduct=codeg-rovai-workbench\nversion={version}\ntarget={target}\n"),
     )
     .unwrap();
     fs::write(package.join("web-ui/index.html"), "new matching UI").unwrap();
