@@ -64,7 +64,7 @@ impl Query {
     }
     fn where_sql(&self,epoch:&str,bounds:&Bounds)->(String,Vec<SqlValue>){
         let mut sql=String::from("collection_epoch=? AND bucket_start_at>=? AND bucket_start_at<?");
-        let mut params=vec![epoch.into(),bounds.from.to_rfc3339().into(),bounds.to.to_rfc3339().into()];
+        let mut params=vec![epoch.to_owned().into(),bounds.from.to_rfc3339().into(),bounds.to.to_rfc3339().into()];
         let runtime=self.runtime_kind.map(|value|value.as_str().to_string());
         for (column,value)in [("runtime_kind",&runtime),("provider_key",&self.provider_key),("model_key",&self.model_key),("project_root",&self.project_root)]{
             if let Some(value)=value{sql.push_str(&format!(" AND {column}=?"));params.push(value.clone().into());}
