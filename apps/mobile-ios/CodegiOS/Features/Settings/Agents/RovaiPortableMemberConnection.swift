@@ -27,11 +27,11 @@ struct RovaiPortableMemberConnection: View {
                 Text("使用程序原有配置").tag("default")
                 if original != .null { Text("保留原连接版本").tag("original") }
                 ForEach(available.map { RovaiRow(value: $0) }) { row in Text(row.value.text("name")).tag(row.value.text("id")) }
-            }.disabled(disabled || busy || pending != nil || kind.isEmpty())
+            }.disabled(disabled || busy || pending != nil || kind.isEmpty)
             HStack {
                 Button("刷新") { work { try await load() } }.disabled(busy || disabled || pending != nil)
                 if next != .null { Button("加载更多") { work { try await load(more: true) } }.disabled(busy || disabled || pending != nil) }
-                Button("保存连接") { work { try await save() } }.disabled(busy || disabled || pending != nil || connection == original || kind.isEmpty())
+                Button("保存连接") { work { try await save() } }.disabled(busy || disabled || pending != nil || connection == original || kind.isEmpty)
             }
             if pending != nil { Text("原请求待核对，未重复发送。").font(.caption); Button("核对原请求") { work { try await reconcile() } }.disabled(busy) }
             if disabled { Text("请先保存或取消上面的运行设置。").font(.caption).foregroundStyle(Theme.textSecondary) }
@@ -69,7 +69,7 @@ struct RovaiPortableMemberConnection: View {
         try await load(); await model.refresh()
     }
     private func save() async throws {
-        try await current(); guard pending == nil, !disabled, !kind.isEmpty() else { throw RovaiHostFailure(code: "请先处理原请求或运行设置") }
+        try await current(); guard pending == nil, !disabled, !kind.isEmpty else { throw RovaiHostFailure(code: "请先处理原请求或运行设置") }
         let command = UUID().uuidString.lowercased(), selectedConnection = connection
         try await remember(.object(["operation": .string("configuration.memberConnection.set"), "commandId": .string(command), "targetId": .string(agentId)]))
         let result = try await model.query(.configurationMemberConnectionSet, params: .object(["schemaVersion": .number(1), "commandId": .string(command), "agentId": .string(agentId), "expectedVersion": binding["agentVersion"] ?? .null, "connection": selectedConnection]))
