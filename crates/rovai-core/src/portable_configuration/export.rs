@@ -32,7 +32,7 @@ pub(crate) fn configuration_digest(connection:&Connection,root:&Path,include_sec
     }
     let mut customs=Vec::new();for id in ids(connection,"SELECT id FROM custom_runtime_head WHERE removed=0 ORDER BY id")?{customs.push(crate::custom_runtime::storage::latest(connection,&id)?.context("configuration.custom_definition_missing")?);}
     let mut values=serde_json::Map::new();for target in ["appearance","general","windowClose","logging","messageLibrary","taskTemplates","agentSettings"]{if target=="windowClose"&&!cfg!(windows){continue}values.insert(target.into(),files::read(root,target)?);}
-    digest(&json!({"providers":revisions,"customAgents":customs,"files":values,"sourceMemberMappings":member_mappings(connection)?,"channelPreferences":channel_preferences::portable(root)?,"delegations":crate::delegation_settings::read(connection)?,"includeSecrets":include_secrets}))
+    digest(&json!({"providers":revisions,"customAgents":customs,"files":values,"sourceMemberMappings":member_mappings(connection)?,"channelPreferences":channel_preferences::portable(root)?,"delegations":crate::delegation_settings::read(connection)?,"conversationTools":policies::basis(connection,"conversationToolsPolicy")?["value"],"includeSecrets":include_secrets}))
 }
 pub(crate) fn cache_for_sync(root:&Path,snapshot:&Value,id:&str,passphrase:&str,cancel:&tokio_util::sync::CancellationToken)->Result<std::path::PathBuf>{
     uuid::Uuid::parse_str(id)?;ensure!(!cancel.is_cancelled()&&passphrase.chars().count()>=8,"configuration.export_cancelled_or_passphrase_invalid");
@@ -98,6 +98,8 @@ pub(crate) fn collect(connection:&Connection,root:&Path,include_secrets:bool)->R
     }
     let delegation=crate::delegation_settings::read(connection)?;
     domains.insert("preferences".into(),json!({"delegation.enabled":serde_json::to_string(&delegation.enabled)?,"delegation.depth_limit":serde_json::to_string(&delegation.depth_limit)?,"delegation.agent_defaults":serde_json::to_string(&delegation.per_runtime_defaults)?,"delegation.completed_cache_max_mb":serde_json::to_string(&delegation.completed_cache_max_mb)?}));
+    let conversation=policies::basis(connection,"conversationToolsPolicy")?;
+    for(key,field,_)in policies::CONVERSATION_FIELDS{let value=&conversation["value"][*field];if !value.is_null(){domains.get_mut("preferences").context("configuration.preferences_missing")?[*key]=json!(serde_json::to_string(value)?);}}
     let logging=files::read(root,"logging")?;if !logging.is_null(){domains.get_mut("preferences").unwrap()["logging.level"]=json!(serde_json::to_string(&json!({"level":logging["level"],"targets":logging["targets"]}))?);}
     // 成员引用只供接收端人工对照，绝不视作接收端成员主键或自动恢复绑定。
     domains.insert("sourceMemberMappings".into(),json!(member_mappings(connection)?));

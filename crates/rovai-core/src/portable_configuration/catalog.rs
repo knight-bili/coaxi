@@ -39,6 +39,8 @@ pub(crate) fn targets(connection:&Connection,root:&Path,domain:&str,after:Option
         if !current[*field].is_null(){items.push(json!({"id":key,"name":key,"revision":1}));}
     }
     let policy=policies::basis(connection,"delegationPolicy")?;
+    let conversation=policies::basis(connection,"conversationToolsPolicy")?;
+    for(key,_,name)in policies::CONVERSATION_FIELDS{if after.is_none_or(|after|*key>after){items.push(json!({"id":key,"name":name,"revision":conversation["version"]}));}}
     for(key,name)in[("delegation.enabled","启用帮手"),("delegation.depth_limit","帮手层数"),("delegation.agent_defaults","帮手程序默认选项"),("delegation.completed_cache_max_mb","帮手缓存上限")]{
         if after.is_none_or(|after|key>after){items.push(json!({"id":key,"name":name,"revision":policy["version"]}));}
     }

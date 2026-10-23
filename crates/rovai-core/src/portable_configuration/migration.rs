@@ -246,7 +246,7 @@ fn apply_on(tx:&Transaction<'_>,root:&Path,client:&str,command:&str,preview:&Val
             if let Some((target,patch))=policies::patch(&entry.value)?{
                 ensure!(id==target,"configuration.preference_target_changed");
                 let original=policy_updates.get(target).cloned().unwrap_or_else(||private["basis"]["policies"][target]["value"].clone());
-                policy_updates.insert(target.into(),policies::merge(&original,&patch)?);continue
+                policy_updates.insert(target.into(),policies::merge(target,&original,&patch)?);continue
             }
             let(target,patch)=preferences::selected_patch(&entry.value,&selected["decision"])?;ensure!(id==target.as_str(),"configuration.preference_target_changed");
             let original=file_updates.get(&target).map(|(_,value)|value.clone()).unwrap_or_else(||private["basis"]["files"][target.as_str()]["value"].clone());
