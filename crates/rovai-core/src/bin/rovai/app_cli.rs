@@ -23,8 +23,9 @@ const REQUEST_TIMEOUT: Duration = Duration::from_secs(60);
 const POLL_INTERVAL: Duration = Duration::from_millis(300);
 const SETTLEMENT_GRACE: Duration = Duration::from_secs(5);
 const CONTEXT_ENV: &str = "ROVAI_APP_AUTOMATION_CONTEXT";
-const ADAPTER_KINDS: [&str; 15] = [
+const ADAPTER_KINDS: [&str; 16] = [
     "codex-cli",
+    "pi",
     "opencode-cli",
     "copilot-cli",
     "claude-code-cli",
