@@ -6,7 +6,7 @@ revision: 1
 confirmed_revision: 1
 confirmation_status: confirmed
 confirmed_by: user
-confirmed_at: 2026-10-22T07:21:57.433315+00:00
+confirmed_at: 2026-10-22T07:21:57+00:00
 authority: proposed-model-input-change-statement
 implementation_status: proposal_only
 last_updated: 2026-10-22
@@ -62,7 +62,7 @@ Codeg 与 Rovai 第一期融合 客户确认版 r1 待确认
 
 本次只增加一个 Core 受管的自定义 ACP 适配类别。每个定义仍是同一 Core 成员配置和执行系统中的数据，不新增一套任务、记忆、消息、审批或调度引擎。注册表内容属于待核对的数据，不能作为产品开发指令。
 
-## 精确变更前
+## 变更前
 
 当前不存在自定义 ACP 的通用适配类别、定义引用或受管启动锁。下面保留本次基线的完整相关类型；ModelSelection、ResolvedModelSelection 与 AdapterPermissionConfig 不修改。
 
@@ -191,7 +191,7 @@ pub struct SetMemberRuntimeConfigurationCommand {
 }
 ```
 
-## 精确变更后
+## 变更后
 
 AdapterKind 增加 serde 名称 custom-acp，对应的 ALL 列表从二十一项扩展为二十二项。三个配置类型只增加可省略的 customRuntimeRef；冻结运行类型只增加可省略的 customRuntime。内置程序的新字段均不出现，旧 JSON 继续按原方式读取。
 
@@ -676,3 +676,16 @@ CA30 触发 读取定义和冻结运行来源。通过判据 只返回秘密引�
 基线提交 c5d17165a8d27065789d693ea557d928cd57e67e，分支 develop/V1.0.0。本文 revision 为 1，confirmed_revision、confirmed_by 和 confirmed_at 均为空；当前未确认。本提案自审只审查方案、字段对照及文档排版，不是提前开始软件统一 Review。
 
 当前批准边界仅适用于这份自定义智能体接入 r1。原生会话继续、分叉、原生插话和完整模型配置迁移不包含在内。软件用户层验收仍在 I12 之后；方案审核不会变成客户逐项技术测试。main 合入、发布和付费模型调用均需原有授权条件满足后再执行。
+
+
+## 明确不变
+
+本次仅整理既有 r1 确认记录与章节索引。正文中既有模型输入、字段、省略规则、权限、冻结、恢复及版本轴约定全部保留；此次不新增模型工具或改变输入语义。完整不变范围仍以本页已确认正文及原冻结附件为准。
+
+## 二次确认
+
+当前会话用户阅读对应客户版后明确回复：“确认，按自定义智能体接入 r1 实施”。原确认时间 2026-10-22T07:21:57.433315+00:00，Front Matter 只去除秒后的小数以兼容既有文档校验器，保留同一确认时刻到秒。revision 与 confirmed_revision 继续为 1，不重新代用户确认。投递时的 pending 快照保留，后续用户确认以本节及既有确认记录为准。
+
+## 验证
+
+既有正文的全部验证点继续有效。本轮整包编译、回归与跨平台结果由统一修复 PR 记录；未实际执行或缺少环境的项目继续标为待验证。编译通过、组件测试通过及最终真实用户验收分别记录，不将本节视为通过证明。

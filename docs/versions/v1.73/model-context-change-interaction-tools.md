@@ -6,7 +6,7 @@ revision: 1
 confirmed_revision: 1
 confirmation_status: confirmed
 confirmed_by: user
-confirmed_at: 2026-10-22T00:26:29.032504+00:00
+confirmed_at: 2026-10-22T00:26:29+00:00
 authority: proposed-model-input-change-statement
 implementation_status: proposal_only
 last_updated: 2026-10-22
@@ -66,7 +66,7 @@ Codeg × Rovai 第一期融合　客户确认版 r1　待确认
 
 # 研发附录
 
-## A　变更前
+## 变更前
 
 当前融合工程没有向模型投递下述 31 项工具，模型工具集合在这一范围内为 []。本地浏览器和电脑界面已有生产源码；本地所有者操作不等于模型调用已获准。
 
@@ -74,7 +74,7 @@ Codeg × Rovai 第一期融合　客户确认版 r1　待确认
 
 原版输入来源固定为 spacering-net/codeg 的 aff1e6c278453ed8d0b96a5f664edcdca621aa3f。附录给出完整工具定义、输出类型及结果呈现函数。机器附件保存本工程基线和变更前源文件摘要，可复现这一比较。
 
-## B　变更后与投递选择
+## 变更后与投递选择
 
 新增私有 stdio MCP 服务 rovai-interaction，仅提供本附录 31 个原名工具。原 name、inputSchema 完整保留；description 保留原文并追加本方案完整授权说明，明确新增会话隔离规则优先于原文的默认共享、空页签和默认用户浏览器假设。追加文本和最终完整 description 都在 L 节逐项给出，不靠模型自行猜测优先级。不增加其他 Codeg 的委派、任务、反馈或自动化工具。Provider 自身加的 MCP 服务名前缀原样记入实际投递证据。
 
@@ -4480,3 +4480,16 @@ revision：1；confirmation_status：pending；confirmed_revision：null；confi
 ## 用户确认记录
 
 用户已阅读交付版后明确回复：“确认，按浏览器与电脑工具接线 r1 实施”。确认时间：2026-10-22T00:26:29.032504+00:00。交付正文及机器附件SHA冻结不变；本文附录O保留投递时的pending快照，本段与Front Matter记录后续用户确认。不包含付费模型、main合入或发布。
+
+
+## 明确不变
+
+本次仅整理既有 r1 确认记录与章节索引。正文中既有模型输入、字段、省略规则、权限、冻结、恢复及版本轴约定全部保留；此次不新增模型工具或改变输入语义。完整不变范围仍以本页已确认正文及原冻结附件为准。
+
+## 二次确认
+
+当前会话用户阅读对应客户版后明确回复：“确认，按浏览器与电脑工具接线 r1 实施”。原确认时间 2026-10-22T00:26:29.032504+00:00，Front Matter 只去除秒后的小数以兼容既有文档校验器，保留同一确认时刻到秒。revision 与 confirmed_revision 继续为 1，不重新代用户确认。投递时的 pending 快照保留，后续用户确认以本节及既有确认记录为准。
+
+## 验证
+
+既有正文的全部验证点继续有效。本轮整包编译、回归与跨平台结果由统一修复 PR 记录；未实际执行或缺少环境的项目继续标为待验证。编译通过、组件测试通过及最终真实用户验收分别记录，不将本节视为通过证明。

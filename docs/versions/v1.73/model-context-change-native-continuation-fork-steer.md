@@ -6,7 +6,7 @@ revision: 1
 confirmed_revision: 1
 confirmation_status: confirmed
 confirmed_by: user
-confirmed_at: 2026-10-22T09:53:51.621558+00:00
+confirmed_at: 2026-10-22T09:53:51+00:00
 authority: proposed-model-input-change-statement
 implementation_status: proposal_only
 last_updated: 2026-10-22
@@ -705,3 +705,16 @@ NC36 触发 首次消息和付费边界。通过判据 确认来源本身不隐�
 # 确认与执行边界
 
 revision 1；confirmation_status pending；confirmed_revision null。这份说明只属于独立原生继续分叉插话改动，不能借用任何其他r1的确认。确认后按七步执行规则继续生产源码，小功能中文commit，完整步骤结束才push。未确认时只调查和编辑方案，不改受保护实现、Schema、当前合同或执行clean break。
+
+
+## 明确不变
+
+本次仅整理既有 r1 确认记录与章节索引。正文中既有模型输入、字段、省略规则、权限、冻结、恢复及版本轴约定全部保留；此次不新增模型工具或改变输入语义。完整不变范围仍以本页已确认正文及原冻结附件为准。
+
+## 二次确认
+
+当前会话用户阅读对应客户版后明确回复：“确认，按原生继续分叉插话 r1 实施”。原确认时间 2026-10-22T09:53:51.621558+00:00，Front Matter 只去除秒后的小数以兼容既有文档校验器，保留同一确认时刻到秒。revision 与 confirmed_revision 继续为 1，不重新代用户确认。投递时的 pending 快照保留，后续用户确认以本节及既有确认记录为准。
+
+## 验证
+
+既有正文的全部验证点继续有效。本轮整包编译、回归与跨平台结果由统一修复 PR 记录；未实际执行或缺少环境的项目继续标为待验证。编译通过、组件测试通过及最终真实用户验收分别记录，不将本节视为通过证明。

@@ -5,6 +5,8 @@ change_id: conversation-model-tools
 revision: 1
 confirmed_revision: 1
 confirmation_status: confirmed
+confirmed_by: user
+confirmed_at: 2026-10-22T18:34:10+00:00
 authority: confirmed-model-input-change-statement
 implementation_status: source_in_progress_unreviewed_untested
 last_updated: 2026-10-23
@@ -51,13 +53,13 @@ last_updated: 2026-10-23
 
 下面保留完整研发约定和字段。客户主要判断前三页的场景是否符合预期；源码、工程验证和修复由我承担。以下全部为待确认提案，尚未修改这部分生产实现、Schema 或当前合同，也没有执行软件测试。
 
-## 来源与变更前
+## 变更前
 
 固定 Codeg aff1e6c 的 src-tauri/src/acp/delegation/tool_schema.json 定义四个工具；question.rs 定义最多4问、每问2到4选项、标签12字符和问题4096字符；session_info.rs 定义最多200条近期文字；chat_authoring.rs 定义标题120字符和说明20000字符。对应生产服务在 commands/question.rs、session_info.rs 和 chat_authoring.rs。原问答卡、工具卡以及设置交互继续参考固定原组件。
 
 当前融合 Core 已有原生 Runtime 问答、rovai-interaction、rovai-ui-feedback、内置 automation.create 和 Mission/Task 业务；它们不等于这四个 Codeg MCP 入口已经接通。变更前不包含 rovai-conversation-tools，也没有下列新增 optional frozen 字段、14个 User 操作、授权表或问答记录表。不能把源码里已有只读历史卡或工具名称解析当作可交互实现。
 
-## 完整变更后
+## 变更后
 
 新增可选 MCP server rovai-conversation-tools，仅列出本次冻结允许且实际 Runtime 支持的四类入口。保留四个原工具名字。提问和两种创建入口新增必填 request_id，并提供 operation=status 分支，供核对原请求；缺编号的旧历史调用不重放。它不是新的系统提示词，也不把任意 User RPC 转成模型能力。
 
@@ -368,3 +370,16 @@ Runtime Launch 合同拟60，新增字段完整 shape 见 FrozenConversationTool
 按现有单分支与七步执行规则继续：小功能中文 commit，整个大阶段结束才 push；本次确认后先写对应源码，其余未完成源码同步推进，不提前执行软件 Review、测试、构建或 Actions。客户不负责阶段技术验收，I12工程完成后才进行真实软件使用验收。
 
 需要明确确认的依据是仓库 docs/development/model-context-change-governance.md 第49至56行，原文为“未取得确认时可以继续调查和编辑提案文档，但不得修改实现、Schema、当前合同或执行 clean break”。收到“确认，按会话模型工具补齐 r1 实施”后才实施本提案；这不是重新确认完整模型配置迁移 r1。
+
+
+## 明确不变
+
+本次仅整理既有 r1 确认记录与章节索引。正文中既有模型输入、字段、省略规则、权限、冻结、恢复及版本轴约定全部保留；此次不新增模型工具或改变输入语义。完整不变范围仍以本页已确认正文及原冻结附件为准。
+
+## 二次确认
+
+当前会话用户阅读对应客户版后明确回复：“确认，按会话模型工具补齐 r1 实施”。原确认时间 2026-10-22T18:34:10.177770+00:00，Front Matter 只去除秒后的小数以兼容既有文档校验器，保留同一确认时刻到秒。revision 与 confirmed_revision 继续为 1，不重新代用户确认。投递时的 pending 快照保留，后续用户确认以本节及既有确认记录为准。
+
+## 验证
+
+既有正文的全部验证点继续有效。本轮整包编译、回归与跨平台结果由统一修复 PR 记录；未实际执行或缺少环境的项目继续标为待验证。编译通过、组件测试通过及最终真实用户验收分别记录，不将本节视为通过证明。
