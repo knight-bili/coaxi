@@ -5,51 +5,8 @@ import {useUiText} from './interface-language'
 import {UnifiedDiffPreview} from './codeg-native-content/components/diff/unified-diff-preview'
 import {WorkspaceGitFileAt} from './WorkspaceGitFileAt'
 import {parseWorkspaceStatus,parseWorkspaceLog,parseWorkspaceBranches,parseWorkspaceStashes,parseWorkspaceTrees,type GitChange} from './workspace-git-records'
-type Result={success:boolean;output:string;error:string}
+type Result={success:boolean;output:string;error:string;files?:CommitFile[];filesError?:string}
 type CommitFile={path:string;originalPath?:string;kind:'added'|'deleted'|'renamed'|'modified';binary:boolean}
-
-function readGitPathToken(value:string,offset=0):{path:string;next:number}{
-  while(value[offset]===' ')offset++
-  if(value[offset]!=='"'){const end=value.indexOf(' ',offset);return{path:value.slice(offset,end<0?value.length:end),next:end<0?value.length:end}}
-  const bytes:number[]=[],encoder=new TextEncoder()
-  const append=(character:string):void=>{bytes.push(...encoder.encode(character))}
-  for(let index=offset+1;index<value.length;index++){
-    const character=value[index]!
-    if(character==='"')return{path:new TextDecoder().decode(Uint8Array.from(bytes)),next:index+1}
-    if(character!=='\\'){
-      if(character.charCodeAt(0)>=0xd800&&character.charCodeAt(0)<=0xdbff&&value.charCodeAt(index+1)>=0xdc00&&value.charCodeAt(index+1)<=0xdfff){append(value.slice(index,index+2));index++}else append(character)
-      continue
-    }
-    const escaped=value[++index]
-    if(escaped===undefined)break
-    if(/[0-7]/u.test(escaped)){let octal=escaped;while(octal.length<3&&/[0-7]/u.test(value[index+1]??''))octal+=value[++index];bytes.push(Number.parseInt(octal,8));continue}
-    const decoded=({a:'\x07',b:'\b',t:'\t',n:'\n',v:'\x0b',f:'\f',r:'\r','\\':'\\','"':'"'} as Record<string,string>)[escaped]
-    append(decoded??escaped)
-  }
-  return{path:'',next:value.length}
-}
-
-function parseCommitFiles(output:string):CommitFile[]{
-  const files:CommitFile[]=[]
-  let current:CommitFile|null=null
-  const finish=():void=>{if(current?.path)files.push(current);current=null}
-  for(const line of output.split('\n')){
-    if(line.startsWith('diff --git ')){
-      finish()
-      const left=readGitPathToken(line,'diff --git '.length),right=readGitPathToken(line,left.next)
-      if(!left.path.startsWith('a/')||!right.path.startsWith('b/'))continue
-      current={path:right.path.slice(2),kind:'modified',binary:false}
-    }else if(current){
-      if(line.startsWith('new file mode '))current.kind='added'
-      else if(line.startsWith('deleted file mode '))current.kind='deleted'
-      else if(line.startsWith('rename from ')){current.originalPath=readGitPathToken(line,'rename from '.length).path;current.kind='renamed'}
-      else if(line.startsWith('rename to ')){current.path=readGitPathToken(line,'rename to '.length).path;current.kind='renamed'}
-      else if(line.startsWith('GIT binary patch')||line.startsWith('Binary files '))current.binary=true
-    }
-  }
-  finish()
-  return files
-}
 
 function isSafeCommitPath(path:string):boolean{return!!path&&!path.startsWith('/')&&!/[\\:\0\r\n]/u.test(path)&&path.split('/').every(part=>part!==''&&part!=='.'&&part!=='..')}
 
@@ -65,10 +22,11 @@ export function WorkspaceGitViews({threadId,view,result,disabled,onAction,onDirt
   if(!result.success)return <pre className="workbench-git-output">{result.error||result.output}</pre>
   if(view==='status')return <div className="workbench-git-records"><aside><header className="workbench-git-branch"><GitBranch size={15}/><strong>{status.branch||t('尚无提交')}</strong><small>↑{status.ahead} ↓{status.behind}</small></header>{section('已暂存',status.changes.filter(entry=>!entry.untracked&&!entry.conflict&&entry.index!=='.'),true)}{section('未暂存',status.changes.filter(entry=>!entry.untracked&&!entry.conflict&&entry.worktree!=='.'),false)}{section('未跟踪',status.changes.filter(entry=>entry.untracked),false)}{section('冲突',status.changes.filter(entry=>entry.conflict),false)}<div className="workbench-commit-compose"><textarea aria-label={t('提交说明')} placeholder={t('提交说明')} value={message} onChange={event=>setMessage(event.target.value)}/><button disabled={disabled||!message.trim()} onClick={()=>onAction('commit',{message})}><GitCommitHorizontal size={14}/>{t('预览提交')}</button></div></aside>{detail}</div>
   if(view==='log'){
-    const commitFiles=diff?.success&&/^[a-f0-9]{40,64}$/u.test(selected)?parseCommitFiles(diff.output):[]
+    const selectedCommit=/^[a-f0-9]{40,64}$/u.test(selected),hasCommitFiles=Array.isArray(diff?.files),commitFiles=diff?.success&&selectedCommit&&hasCommitFiles?diff.files:undefined
+    const filesUnavailable=selectedCommit&&!!diff&&(!hasCommitFiles||!!diff.filesError)
     return <div className="workbench-git-records"><aside>{parseWorkspaceLog(result.output).map(commit=><button className={`workbench-history-row ${selected===commit.sha?'is-active':''}`} key={commit.sha} onClick={()=>void show(commit.parents.length>1?'diff_compare':'show',{target:commit.parents.length>1?`${commit.parents[0]}...${commit.sha}`:commit.sha},commit.sha)}><strong>{commit.message.split('\n')[0]}</strong><small><GitCommitHorizontal size={12}/>{commit.sha.slice(0,8)} · {commit.author}</small><time>{new Date(commit.date).toLocaleString()}</time><span className="workbench-history-actions"><span role="button" tabIndex={0} onClick={event=>{event.stopPropagation();onAction('cherry_pick',{target:commit.sha})}}>{t('拣选')}</span><span role="button" tabIndex={0} onClick={event=>{event.stopPropagation();onAction('revert',{target:commit.sha})}}>{t('撤销')}</span><span role="button" tabIndex={0} onClick={event=>{event.stopPropagation();onAction('reset',{target:commit.sha,mode:'mixed'})}}>{t('重置到此处')}</span></span></button>)}</aside><div className="workbench-git-detail">
-      {commitFiles.length>0&&<section className="workbench-git-group"><header><strong>{t('提交文件')}</strong><span>{commitFiles.length}</span><button type="button" aria-expanded={filesOpen} onClick={()=>setFilesOpen(value=>!value)}>{filesOpen?t('收起'):t('展开')}</button></header>{filesOpen&&commitFiles.map(file=><div className={`workbench-change-row ${historyFile?.path===file.path?'is-active':''}`} key={`${file.path}:${file.originalPath??''}`}><button type="button" title={file.path} disabled={!isSafeCommitPath(file.path)} onClick={()=>setHistoryFile(file)}><strong>{file.path}</strong>{file.originalPath&&<small>← {file.originalPath}</small>}<small>{t(file.kind==='added'?'新增':file.kind==='deleted'?'已删除':file.kind==='renamed'?'已重命名':'已修改')}{file.binary?` · ${t('二进制')}`:''}</small></button></div>)}</section>}
-      {historyFile?<><header className="workbench-git-branch"><strong title={historyFile.path}>{historyFile.path}</strong><button type="button" onClick={()=>setHistoryFile(null)}>{t('返回提交差异')}</button></header>{!isSafeCommitPath(historyFile.path)?<p role="alert">{t('此文件路径不允许读取。')}</p>:<WorkspaceGitFileAt key={`${selected}:${historyFile.path}`} threadId={threadId} commit={selected} path={historyFile.path} deleted={historyFile.kind==='deleted'} binary={historyFile.binary}/>}</>:detail}
+      {commitFiles!==undefined&&<section className="workbench-git-group"><header><strong>{t('提交文件')}</strong><span>{commitFiles.length}</span><button type="button" aria-expanded={filesOpen} onClick={()=>setFilesOpen(value=>!value)}>{filesOpen?t('收起'):t('展开')}</button></header>{filesOpen&&commitFiles.map(file=><div className={`workbench-change-row ${historyFile?.path===file.path?'is-active':''}`} key={`${file.path}:${file.originalPath??''}`}><button type="button" title={file.path} disabled={!isSafeCommitPath(file.path)} onClick={()=>setHistoryFile(file)}><strong>{file.path}</strong>{file.originalPath&&<small>← {file.originalPath}</small>}<small>{t(file.kind==='added'?'新增':file.kind==='deleted'?'已删除':file.kind==='renamed'?'已重命名':'已修改')}{file.binary?` · ${t('二进制')}`:''}</small></button></div>)}</section>}
+      {filesUnavailable&&<p role={diff?.filesError?'alert':'status'}>{t('提交文件')}：{t('暂不可用')}{diff?.filesError?'：'+diff.filesError:''}</p>}{historyFile?<><header className="workbench-git-branch"><strong title={historyFile.path}>{historyFile.path}</strong><button type="button" onClick={()=>setHistoryFile(null)}>{t('返回提交差异')}</button></header>{!isSafeCommitPath(historyFile.path)?<p role="alert">{t('此文件路径不允许读取。')}</p>:<WorkspaceGitFileAt key={`${selected}:${historyFile.path}`} threadId={threadId} commit={selected} path={historyFile.path} deleted={historyFile.kind==='deleted'} binary={historyFile.binary}/>}</>:detail}
     </div></div>
   }
   if(view==='branches')return <div className="workbench-git-records"><div className="workbench-git-cards" style={selected?{flex:'0 0 40%'}:undefined}>{parseWorkspaceBranches(result.output).map(branch=><section key={branch.ref}><header><GitBranch size={15}/><strong>{branch.ref.replace(/^refs\/(heads|remotes)\//u,'')}</strong>{branch.current&&<span>{t('当前')}</span>}</header><small>{branch.sha.slice(0,8)}{branch.upstream?` → ${branch.upstream}`:''}</small><div className="workbench-toolbar"><button disabled={disabled||branch.current} onClick={()=>onAction('checkout',{target:branch.ref.replace(/^refs\/heads\//u,'')})}>{t('切换')}</button><button disabled={disabled||branch.current} onClick={()=>void show('diff_compare',{target:`HEAD...${branch.ref}`},`compare:${branch.ref}`)}>{t('比较差异')}</button><button disabled={disabled} onClick={()=>onAction('merge',{target:branch.ref})}><GitMerge size={13}/>{t('合并到当前')}</button><button disabled={disabled||branch.current} onClick={()=>onAction('worktree_add',{target:branch.ref.replace(/^refs\/heads\//u,'')})}>{t('创建独立工作目录')}</button></div></section>)}</div>{selected&&<div className="workbench-git-detail">{detail}</div>}</div>
