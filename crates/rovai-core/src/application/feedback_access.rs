@@ -134,7 +134,7 @@ impl Core{
         }
     }
 }
-async fn serve_connection(core:Arc<Core>,stream:crate::platform::local_ipc::LocalIpcServerStream)->Result<()>{
+async fn serve_connection(core:Arc<Core>,stream:crate::platform::local_ipc::LocalIpcStream)->Result<()>{
     let(reader,mut writer)=tokio::io::split(stream);let mut reader=BufReader::new(reader.take(feedback::MAX_FRAME_BYTES as u64+1));let mut frame=Vec::new();tokio::time::timeout(Duration::from_secs(30),reader.read_until(b'\n',&mut frame)).await??;
     ensure!(frame.last()==Some(&b'\n')&&frame.len()<=feedback::MAX_FRAME_BYTES,"transport_failed");let request:IpcRequest=serde_json::from_slice(&frame)?;
     let response=match core.feedback_ipc(request).await{Ok(result)=>json!({"schemaVersion":1,"ok":true,"result":result}),Err(error)=>{let message=error.to_string();let code=match message.as_str(){"feature_disabled"|"runtime_unavailable"|"scope_changed"|"run_not_active"|"epoch_changed"|"binding_changed"|"member_changed"|"policy_changed"|"result_too_large"|"original_request_pending"|"feedback_unknown"=>message.as_str(),_=>"transport_failed"};json!({"schemaVersion":1,"ok":false,"code":code})}};

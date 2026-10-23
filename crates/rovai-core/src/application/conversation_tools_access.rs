@@ -64,7 +64,7 @@ impl Core{
         Ok(result)
     }
 }
-async fn serve_conversation_connection(core:Arc<Core>,stream:crate::platform::local_ipc::LocalIpcServerStream)->Result<()>{
+async fn serve_conversation_connection(core:Arc<Core>,stream:crate::platform::local_ipc::LocalIpcStream)->Result<()>{
     let(reader,mut writer)=tokio::io::split(stream);let mut reader=BufReader::new(reader.take(conversation_tools::MAX_FRAME as u64+1));let mut frame=Vec::new();
     tokio::time::timeout(Duration::from_secs(30),reader.read_until(b'\n',&mut frame)).await??;
     ensure!(frame.last()==Some(&b'\n')&&frame.len()<=conversation_tools::MAX_FRAME,"conversation_tools.invalid_input");let request:IpcRequest=serde_json::from_slice(&frame)?;
