@@ -507,7 +507,7 @@ impl MissionService {
             input.description.is_none() || input.description_content.is_none(),
             "mission.ambiguous_description"
         );
-        validate_content(input.title.as_deref(), input.description.as_deref())?;
+        validate_content(input.title.as_deref(), None)?;
         let content = input
             .description_content
             .as_deref()
@@ -519,6 +519,7 @@ impl MissionService {
             if !can_edit(tx, envelope, &current)? || ((tags.is_some() || input.source_attachment_update.is_some() || content.is_some()) && !matches!(envelope.actor, ActorRef::User { .. })) {
                 return Ok(reject("mission.forbidden"));
             }
+            validate_mission_description(tx,&input.mission_id,input.description.as_deref())?;
             let edits_details = input.title.is_some() || input.description.is_some() || content.is_some() || input.source_attachment_update.is_some();
             if edits_details && matches!(envelope.actor, ActorRef::User { .. }) {
                 let Some(expected) = input.expected_details_version else {
@@ -540,7 +541,7 @@ impl MissionService {
                 if let Some(rejection) = validate_description_members(tx, &next_content, Some(&current.camp_id))? { return Ok(rejection); }
             }
             let description = mission_description::render(tx, &next_content)?;
-            validate_content(None, Some(&description))?;
+            validate_mission_description(tx,&input.mission_id,Some(&description))?;
             let description_changed = next_content != current.description_content;
             let next_tags = tags.as_ref().unwrap_or(&current.tags);
             let next_source_attachments = match &input.source_attachment_update {
@@ -578,7 +579,7 @@ impl MissionService {
             if changes.is_empty() { return Ok(mutation(&input.mission_id, false)); }
             let details_changed = title != current.info.title || description_changed || next_source_attachments != current.source_attachments;
             tx.execute("UPDATE mission SET title=?2,description=?3,tags_json=?4,source_attachments_json=?5,details_version=details_version+?6,updated_at=?7 WHERE id=?1",
-                params![input.mission_id,title,description,serde_json::to_string(next_tags)?,serialize_source_attachments(&next_source_attachments)?,i64::from(details_changed),chrono::Utc::now().to_rfc3339()])?;
+                params![input.mission_id,title,description_cache(&description),serde_json::to_string(next_tags)?,serialize_source_attachments(&next_source_attachments)?,i64::from(details_changed),chrono::Utc::now().to_rfc3339()])?;
             mission_description::save(tx, &input.mission_id, &next_content)?;
             if changes.contains_key("titleChanged") {
             tx.execute("UPDATE camp SET title=?2,name_origin='user',version=version+1,updated_at=?3 WHERE id=?1",
@@ -1084,6 +1085,32 @@ fn mission_start_available(
             |row| row.get(0),
         )
         .map_err(Into::into)
+}
+/// 旧表的兼容缓存保持原约束；完整正文始终从mission_description读取。
+fn description_cache(text:&str)->&str{if text.chars().count()<=12_000{text}else{""}}
+fn validate_mission_description(connection:&Connection,id:&str,description:Option<&str>)->Result<()>{
+    let Some(description)=description else{return Ok(())};
+    let extended=!crate::conversation_tools::storage::absent(connection)?&&connection.query_row("SELECT EXISTS(SELECT 1 FROM conversation_tool_mission WHERE mission_id=?1)",[id],|row|row.get::<_,bool>(0))?;
+    ensure!(description.chars().count()<=if extended{20_000}else{12_000},"mission.description_too_long");Ok(())
+}
+pub(crate) fn create_conversation_tool_mission_in_tx(
+    tx:&Transaction<'_>,authority:&crate::conversation_tools::authoring::CreationAuthority,
+    title:&str,prompt:&str,project_path:&str,binding:ProjectBindingKind,member:&str,
+)->Result<String>{
+    ensure!(!title.trim().is_empty()&&title.chars().count()<=120&&!prompt.trim().is_empty()&&prompt.chars().count()<=20_000,"mission.invalid_conversation_tool_content");
+    let content=mission_description::text_content(prompt);let mission_id=Uuid::new_v4().to_string();let camp_id=ThreadId::new();
+    let created=crate::collaboration::create_conversation_tool_camp_in_tx(tx,authority,&CreateThreadCommand{
+        name:Some(title.trim().chars().take(80).collect()),project_binding_kind:binding,project_path:project_path.into(),
+        member_agent_ids:vec![member.into()],default_lead_agent_id:member.into(),
+        collaboration_mode:ThreadCollaborationMode::Peer,activation_state:ThreadActivationState::Active,
+    },&camp_id)?;
+    ensure!(created.status!=CommandResultStatus::Rejected,"mission.conversation_tool_admission_rejected");
+    tx.execute("INSERT INTO mission_number_sequence DEFAULT VALUES",[])?;let number=tx.last_insert_rowid();let now=chrono::Utc::now().to_rfc3339();
+    tx.execute("INSERT INTO mission(id,number,camp_id,title,description,status,tags_json,source_attachments_json,details_version,created_at,updated_at) VALUES(?1,?2,?3,?4,?5,'not_started','[]','[]',1,?6,?6)",params![mission_id,number,camp_id,title,description_cache(prompt),now])?;
+    mission_description::save(tx,&mission_id,&content)?;
+    tx.execute("INSERT INTO conversation_tool_mission(mission_id,source_request_id,source_automation_id,created_at) VALUES(?1,?2,?3,?4)",params![mission_id,authority.source_request(),authority.source_automation(),now])?;
+    record_activity(tx,&mission_id,"created",authority.actor(),authority.epoch(),json!({"status":"not_started","sourceRequestId":authority.source_request(),"sourceAutomationId":authority.source_automation()}))?;
+    Ok(mission_id)
 }
 fn validate_content(title: Option<&str>, description: Option<&str>) -> Result<()> {
     if let Some(title) = title {

@@ -79,7 +79,7 @@ pub fn revoke_grant(database:&mut crate::db::Database,envelope:&CommandEnvelope<
         crate::collaboration::append_domain_event(tx,"conversationTools.grantChanged",None,Some(("conversation_tool_source_grant",&p.grant_id)),&envelope.actor,None,&json!({"grantId":p.grant_id,"revoked":true}))?;Ok(applied(value))
     })
 }
-#[derive(Clone,Serialize,Deserialize)]
+#[derive(Clone,Copy,Serialize,Deserialize)]
 #[serde(rename_all="snake_case")]
 pub enum Resolution{CancelRemaining,RevokeRun}
 #[derive(Clone,Serialize,Deserialize)]
@@ -108,7 +108,7 @@ pub fn resolve(database:&mut crate::db::Database,envelope:&CommandEnvelope<Resol
                 let lease=scope::retained_run(tx,run,epoch)?;
                 ensure!(p.scope.as_ref()==Some(&lease.frozen.scope),"conversation_tools.scope_changed");
                 question_delivery::revoke(tx,&lease)?;
-                json!({"agentRunId":run,"executionEpoch":epoch,"revoked":true})
+                json!({"commandId":envelope.command_id,"agentRunId":run,"executionEpoch":epoch,"revoked":true})
             }
         };
         crate::collaboration::append_domain_event(tx,"conversationTools.authorizationChanged",None,None,&envelope.actor,None,&json!({"action":p.action,"requestId":p.request_id,"agentRunId":p.agent_run_id}))?;Ok(applied(value))

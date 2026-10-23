@@ -3551,13 +3551,28 @@ pub(crate) fn create_camp_in_tx(
     camp_id: &ThreadId,
 ) -> Result<CommandHandlerResult> {
     validate_project_path(&command.project_path)?;
-    let normalized_name = normalize_camp_name(command.name.as_deref().unwrap_or(""));
     if !matches!(actor, ActorRef::User { .. }) {
         return Ok(rejected(
             "camp.user_required",
             "Only a User can create a Camp",
         ));
     }
+    create_camp_definition_in_tx(transaction,actor,execution_epoch,command,camp_id)
+}
+
+pub(crate) fn create_conversation_tool_camp_in_tx(
+    transaction:&Transaction<'_>,authority:&crate::conversation_tools::authoring::CreationAuthority,
+    command:&CreateThreadCommand,camp_id:&ThreadId,
+)->Result<CommandHandlerResult>{
+    create_camp_definition_in_tx(transaction,authority.actor(),authority.epoch(),command,camp_id)
+}
+
+fn create_camp_definition_in_tx(
+    transaction:&Transaction<'_>,actor:&ActorRef,execution_epoch:Option<i64>,
+    command:&CreateThreadCommand,camp_id:&ThreadId,
+)->Result<CommandHandlerResult>{
+    validate_project_path(&command.project_path)?;
+    let normalized_name = normalize_camp_name(command.name.as_deref().unwrap_or(""));
     if normalized_name.chars().count() > CAMP_NAME_MAX_SCALARS {
         return Ok(rejected(
             "camp.name_too_long",

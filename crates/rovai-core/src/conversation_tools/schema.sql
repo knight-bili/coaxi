@@ -71,6 +71,11 @@ CREATE TABLE conversation_tool_automation_owner (
  action TEXT NOT NULL CHECK(action IN ('launch_session','enqueue_task')),timezone TEXT NOT NULL,
  source_request_id TEXT NOT NULL UNIQUE REFERENCES conversation_tool_request(id),created_at TEXT NOT NULL,updated_at TEXT NOT NULL
 );
+CREATE TABLE conversation_tool_mission (
+ mission_id TEXT PRIMARY KEY NOT NULL REFERENCES mission(id) ON DELETE CASCADE,
+ source_request_id TEXT NOT NULL REFERENCES conversation_tool_request(id),
+ source_automation_id TEXT,created_at TEXT NOT NULL
+);
 CREATE TABLE conversation_tool_automation_fire (
  automation_id TEXT NOT NULL REFERENCES conversation_tool_automation_owner(automation_id),scheduled_at_utc TEXT NOT NULL,
  command_id TEXT NOT NULL UNIQUE,state TEXT NOT NULL CHECK(state IN ('prepared','applied','cancelled','outcome_unknown')),

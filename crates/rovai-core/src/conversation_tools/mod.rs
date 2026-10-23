@@ -15,6 +15,7 @@ pub(crate) mod grants;
 pub(crate) mod questions;
 pub(crate) mod question_delivery;
 pub mod user_commands;
+pub(crate) mod authoring;
 pub mod storage;
 pub use model::*;
 pub const SERVER_NAME:&str="rovai-conversation-tools";
