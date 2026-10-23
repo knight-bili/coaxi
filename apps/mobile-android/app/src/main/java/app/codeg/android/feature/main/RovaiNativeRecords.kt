@@ -41,7 +41,31 @@ import kotlinx.serialization.json.*
             item{TextButton(enabled=!busy,onClick={work{read()}}){Text(stringResource(R.string.rovai_fusion_67fdc15fc7d8d754))}}
             items(rows,key={it["preview"].coreObject().coreText("previewId")}){row->val preview=row["preview"].coreObject();val receipt=row["receipt"].coreObject();GlassRow(Modifier.fillMaxWidth()){
                 Text(preview.coreText("title"),style=MaterialTheme.typography.titleMedium);Text(when(preview.coreText("mode")){"continue"->stringResource(R.string.rovai_fusion_bd40b8c3902012e9);"fork_point"->stringResource(R.string.rovai_fusion_642c8fa5c6d600cb);else->stringResource(R.string.rovai_fusion_fca7e85d378b4e7e)});Text(if(receipt.isEmpty())stringResource(R.string.rovai_fusion_6154742a3bf6d139)else nativeCreationState(receipt));preview.coreText("reason").takeIf{it.isNotEmpty()}?.let{Text(it,color=CodegTheme.colors.textSecondary)}
-                if(receipt.isNotEmpty()){SelectionContainer{Text(receipt.coreText("commandId"),style=MaterialTheme.typography.bodySmall)};receipt.coreText("reportedSessionId").takeIf{it.isNotEmpty()}?.let{SelectionContainer{Text(stringResource(R.string.rovai_fusion_37c177cb42b7a570)+it,style=MaterialTheme.typography.bodySmall)}};receipt.coreText("error").takeIf{it.isNotEmpty()}?.let{Text(it,color=CodegTheme.colors.danger)};TextButton(enabled=!busy&&generation==model.connectionGeneration,onClick={work{val result=nativeUserCall(model,RovaiOperation.HISTORY_EXECUTION_RECEIPT,buildJsonObject{put("schemaVersion",1);put("commandId",receipt.coreText("commandId"))});require(result.coreText("commandId")==receipt.coreText("commandId")){"原回执归属不一致"};rows=rows.map{old->if(old["preview"].coreObject().coreText("previewId")==preview.coreText("previewId"))JsonObject(old+mapOf("receipt"to result))else old}}){Text(stringResource(R.string.rovai_fusion_6ca6d7ced54750dc))}}
+                if (receipt.isNotEmpty()) {
+                    SelectionContainer { Text(receipt.coreText("commandId"), style = MaterialTheme.typography.bodySmall) }
+                    receipt.coreText("reportedSessionId").takeIf { it.isNotEmpty() }?.let { sessionId ->
+                        SelectionContainer {
+                            Text(stringResource(R.string.rovai_fusion_37c177cb42b7a570) + sessionId, style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                    receipt.coreText("error").takeIf { it.isNotEmpty() }?.let { Text(it, color = CodegTheme.colors.danger) }
+                    TextButton(enabled = !busy && generation == model.connectionGeneration, onClick = {
+                        work {
+                            val result = nativeUserCall(model, RovaiOperation.HISTORY_EXECUTION_RECEIPT, buildJsonObject {
+                                put("schemaVersion", 1)
+                                put("commandId", receipt.coreText("commandId"))
+                            })
+                            require(result.coreText("commandId") == receipt.coreText("commandId")) { "原回执归属不一致" }
+                            rows = rows.map { old ->
+                                if (old["preview"].coreObject().coreText("previewId") == preview.coreText("previewId")) {
+                                    JsonObject(old + mapOf("receipt" to result))
+                                } else {
+                                    old
+                                }
+                            }
+                        }
+                    }) { Text(stringResource(R.string.rovai_fusion_6ca6d7ced54750dc)) }
+                }
                 if(receipt.coreText("state")=="binding_recorded")TextButton(enabled=!busy&&!state.busy&&state.pending==null&&generation==model.connectionGeneration,onClick={working=receipt}){Text(stringResource(R.string.rovai_fusion_7dcca1fa2d8a79aa))}
             }}
             if(rows.isEmpty()&&!busy)item{Text(stringResource(R.string.rovai_fusion_c38fa291bbe03d6e),color=CodegTheme.colors.textSecondary)}
