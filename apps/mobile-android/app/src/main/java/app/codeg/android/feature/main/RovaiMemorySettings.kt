@@ -64,8 +64,7 @@ fun RovaiMemorySettings(model:RovaiWorkspaceViewModel){
 @Composable
 private fun RovaiMemoryEditor(model:RovaiWorkspaceViewModel,mode:String,original:JsonObject?,onSaved:()->Unit,onClose:()->Unit){
     val state by model.state.collectAsStateWithLifecycle();val coroutine=rememberCoroutineScope();var authority by remember{mutableStateOf(original)}
-    var scope by remember{mutableStateOf(original?.coreText("scope").orEmpty().ifEmpty{"hearth"})};var kind by remember{mutableStateOf(original?.coreText("kind").orEmpty().ifEmpty{"preference"})};var body by remember{mutableStateOf(original?.coreText(if(mode=="review")"candidateBody"else"currentBody")?:"")};var keys by remember{mutableStateOf(original?.stringList(if(mode=="review")"candidateRetrievalKeys"else"currentRetrievalKeys")?.joinToString("
-")?:"")}
+    var scope by remember{mutableStateOf(original?.coreText("scope").orEmpty().ifEmpty{"hearth"})};var kind by remember{mutableStateOf(original?.coreText("kind").orEmpty().ifEmpty{"preference"})};var body by remember{mutableStateOf(original?.coreText(if(mode=="review")"candidateBody"else"currentBody")?:"")};var keys by remember{mutableStateOf(original?.stringList(if(mode=="review")"candidateRetrievalKeys"else"currentRetrievalKeys")?.joinToString("\n")?:"")}
     var first by remember{mutableStateOf(original?.coreText("companionAgentId")?:"")};var second by remember{mutableStateOf("")};var directed by remember{mutableStateOf(false)};var actor by remember{mutableStateOf("")};var reviewAt by remember{mutableStateOf(original?.coreText("reviewAfter")?:"")};var sent by remember{mutableStateOf<String?>(null)};var issue by remember{mutableStateOf<String?>(null)}
     val blocked=state.pending!=null||state.busy
     var leaving by remember{mutableStateOf(false)}
