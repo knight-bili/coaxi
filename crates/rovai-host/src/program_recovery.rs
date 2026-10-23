@@ -73,11 +73,11 @@ fn current(root:&Path)->Result<PathBuf>{
     no_link(&path)?;Ok(path)
 }
 fn holding(id:&str)->String{format!(".previous-{}-{}-{}-{}-{}",&id[..8],&id[8..12],&id[12..16],&id[16..20],&id[20..32])}
-fn store(root:&Path,value:&Pending)->Result<()>{rovai_core::platform::private_storage::atomic_write_private_json(&root.join("program-recovery-pending-v1.json"),value)}
+fn store(root:&Path,value:&Pending)->Result<()>{rovai_core::platform::atomic_write_private_bytes(&root.join("program-recovery-pending-v1.json"),&serde_json::to_vec_pretty(value)?)}
 fn finish(root:&Path,value:&Pending,outcome:&str)->Result<Value>{
-    let directory=root.join("program-recovery-history");rovai_core::platform::private_storage::prepare_private_directory(&directory)?;
+    let directory=root.join("program-recovery-history");rovai_core::platform::prepare_private_directory(&directory)?;
     let result=json!({"operationId":value.id,"outcome":outcome,"snapshot":value.selected,"businessDataChanged":false,"requiresCompatibleCoreSchema":true});
-    rovai_core::platform::private_storage::atomic_write_private_json(&directory.join(format!("{}.json",value.id)),&result)?;
+    rovai_core::platform::atomic_write_private_bytes(&directory.join(format!("{}.json",value.id)),&serde_json::to_vec_pretty(&result)?)?;
     fs::remove_file(root.join("program-recovery-pending-v1.json"))?;Ok(result)
 }
 fn recover(root:&Path)->Result<Value>{
