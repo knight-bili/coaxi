@@ -28,7 +28,7 @@ export const desktopThreadClient: ThreadClient = {
   revealMonitoringExport: path => window.rovai.revealMonitoringExport(path),
   exportDiagnostics: async () => { const path = await window.rovai.exportDiagnostics(); return { exported: Boolean(path), ...(path ? { path } : {}) } },
   revealDiagnosticsExport: path => window.rovai.revealDiagnosticsExport(path),
-  get memberAvatars() { return desktopBridge()?.memberAvatars },
+  get memberAvatars() { return window.rovai.memberAvatars },
   selectSkillImportDirectory: () => window.rovai.selectSkillImportDirectory(),
   selectRuntimeExecutable: () => window.rovai.selectRuntimeExecutable(),
   revealMcpConfig: () => window.rovai.revealMcpConfig(),
@@ -45,9 +45,9 @@ export const desktopThreadClient: ThreadClient = {
   request: (method, params) => window.rovai.request(method, params),
   onEvent: (listener) => window.rovai.onEvent(listener),
   onClosePreviewRequested: listener => window.rovai.windowControls.onCloseTabRequested(()=>dispatchShortcutAction('close_current_tab')||listener()),
-  get singleChatAttachments() { return desktopBridge()?.singleChatAttachments },
-  get missionAttachments() { return desktopBridge()?.missionAttachments },
-  get composerAttachments() { return desktopBridge()?.composerAttachments },
+  get singleChatAttachments() { return window.rovai.singleChatAttachments },
+  get missionAttachments() { return desktopBridge()?.missionAttachments ?? null },
+  get composerAttachments() { return window.rovai.composerAttachments },
   attachmentLocation: async locator => {
     if (locator.owner === 'composer') {
       const path = await window.rovai.composerAttachments.location?.(locator)
@@ -60,5 +60,5 @@ export const desktopThreadClient: ThreadClient = {
     open: locator => window.rovai.attachments.open(locator),
     reveal: locator => window.rovai.attachments.reveal(locator)
   },
-  get platform() { return desktopBridge()?.platform }
+  get platform() { return window.rovai.platform }
 }
