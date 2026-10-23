@@ -361,6 +361,53 @@ try {
     externalFixtureOnly: true
   })
 
+  stage = 'issue_78_history_rename_delete_and_merge_parent_diff'
+  const historicalRead = async (target, filePath) => call('workbench.git.read', {
+    scope, action: 'file_at', target, paths: [filePath]
+  })
+  const baseFile = await historicalRead(historyBaseCommit, 'old history [record].txt')
+  assert.equal(baseFile.success, true, baseFile.error)
+  assert.equal(baseFile.output, originalHistoryText, '历史全文应完整返回，不能截断')
+  git('mv', '--', 'old history [record].txt', 'renamed history [record].txt')
+  gitCommit('重命名历史记录文件')
+  const renamedCommit = git('rev-parse', 'HEAD').trim()
+  const renamedFile = await historicalRead(renamedCommit, 'renamed history [record].txt')
+  assert.equal(renamedFile.success, true, renamedFile.error)
+  assert.equal(renamedFile.output, originalHistoryText)
+  git('rm', '--', 'renamed history [record].txt')
+  gitCommit('删除历史记录文件')
+  const deletedCommit = git('rev-parse', 'HEAD').trim()
+  const deletedFile = await historicalRead(deletedCommit, 'renamed history [record].txt')
+  assert.equal(deletedFile.success, false, '删除版本不应返回已不存在文件的内容')
+
+  await writeFile(path.join(repository, 'main-only.txt'), 'main baseline\n')
+  gitCommit('建立合并第一父提交基线')
+  git('switch', '-c', 'review-merge-feature')
+  await writeFile(path.join(repository, 'feature-only.txt'), 'second parent change\n')
+  gitCommit('建立合并第二父提交改动')
+  git('switch', 'main')
+  await writeFile(path.join(repository, 'first-parent-only.txt'), 'first parent baseline\n')
+  gitCommit('建立合并第一父提交改动')
+  const firstParent = git('rev-parse', 'HEAD').trim()
+  git('merge', '--no-ff', '-m', '建立第二父提交差异', 'review-merge-feature')
+  const mergeCommit = git('rev-parse', 'HEAD').trim()
+  assert.equal(git('show', '-s', '--format=%P', mergeCommit).trim().split(/\s+/).length, 2)
+  const mergeParentDiff = await call('workbench.git.read', {
+    scope, action: 'diff_compare', target: `${firstParent}...${mergeCommit}`
+  })
+  assert.equal(mergeParentDiff.success, true, mergeParentDiff.error)
+  assert(mergeParentDiff.output.includes('feature-only.txt'), '与第一父提交比较应显示第二父提交带来的文件')
+  assert(!mergeParentDiff.output.includes('first-parent-only.txt'), '第一父提交已有的改动不应伪装成第二父差异')
+  record('issue_78_file_history_is_complete_and_merge_diff_uses_second_parent_changes', {
+    baseCommit: historyBaseCommit,
+    renamedCommit,
+    deletedCommit,
+    mergeCommit,
+    parentCount: 2,
+    historicalTextBytes: Buffer.byteLength(originalHistoryText),
+    secondParentChangeVisible: true
+  })
+
   finalResult = {
     status: 'passed',
     scope: 'real_host_core_isolated_git_fixture_no_model_execution',
