@@ -9,9 +9,24 @@ import kotlinx.serialization.json.*
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.io.InputStream
 import java.nio.file.Files
 import java.security.MessageDigest
 import java.util.UUID
+
+internal const val ROVAI_UPLOAD_MAX_BYTES=20*1024*1024
+
+internal fun readBoundedUploadBytes(input:InputStream):ByteArray{
+    val output=ByteArrayOutputStream();val buffer=ByteArray(64*1024)
+    while(output.size()<ROVAI_UPLOAD_MAX_BYTES+1){
+        val remaining=ROVAI_UPLOAD_MAX_BYTES+1-output.size();val count=input.read(buffer,0,minOf(buffer.size,remaining))
+        if(count<0)break
+        if(count==0)continue
+        output.write(buffer,0,count)
+    }
+    require(output.size()<=ROVAI_UPLOAD_MAX_BYTES){"上传文件超过限制"}
+    return output.toByteArray()
+}
 
 /** Frozen app-private bytes survive picker revocation and process death until a receipt settles. */
 object RovaiUploadSource {
@@ -30,19 +45,9 @@ object RovaiUploadSource {
     internal fun frozenFile(context:Context,request:JsonObject):File=file(context,request)
     private fun file(context:Context,request:JsonObject):File{val id=request["intent"]!!.jsonObject["commandId"]!!.jsonPrimitive.content;require(UUID.fromString(id).toString()==id);val expected=File(directory(context),"$id.bin");require(expected.absolutePath==request["sourceFile"]?.jsonPrimitive?.content&&!Files.isSymbolicLink(expected.toPath())&&expected.canonicalFile.parentFile==directory(context).canonicalFile){"上传来源记录无效"};return expected}
     suspend fun bytes(context:Context,request:JsonObject):ByteArray=withContext(Dispatchers.IO){
-        val source=file(context,request);val limit=20*1024*1024
-        require(source.length()<=limit.toLong()){"上传文件超过限制"}
-        source.inputStream().use{input->
-            val output=ByteArrayOutputStream();val buffer=ByteArray(64*1024)
-            while(output.size()<limit+1){
-                val remaining=limit+1-output.size();val count=input.read(buffer,0,minOf(buffer.size,remaining))
-                if(count<0)break
-                if(count==0)continue
-                output.write(buffer,0,count)
-            }
-            require(output.size()<=limit){"上传文件超过限制"}
-            output.toByteArray()
-        }
+        val source=file(context,request)
+        require(source.length()<=ROVAI_UPLOAD_MAX_BYTES.toLong()){"上传文件超过限制"}
+        source.inputStream().use{input->readBoundedUploadBytes(input)}
     }
     suspend fun remove(context:Context,request:JsonObject)=withContext(Dispatchers.IO){file(context,request).delete();Unit}
 }
