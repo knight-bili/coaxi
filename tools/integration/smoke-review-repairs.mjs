@@ -405,6 +405,7 @@ try {
     })
   }
 
+  gitCommit('保存目录关联回归基线')
   stage = 'issue_78_history_rename_delete_and_merge_parent_diff'
   const historicalRead = async (target, filePath) => call('workbench.git.read', {
     scope, action: 'file_at', target, paths: [filePath]
