@@ -58,10 +58,14 @@ fun AskQuestionCard(
     onSubmit: (QuestionAnswer) -> Unit,
     onSkip: () -> Unit,
     modifier: Modifier = Modifier,
+    readOnly: Boolean = false,
+    initialSelections: Map<String,List<String>> = emptyMap(),
+    titleOverride: String? = null,
+    subtitleOverride: String? = null,
 ) {
     val colors = CodegTheme.colors
-    val selections = remember(questions) { mutableStateMapOf<String, Set<String>>() }
-    val otherText = remember(questions) { mutableStateMapOf<String, String>() }
+    val selections = remember(questions,initialSelections) { mutableStateMapOf<String, Set<String>>().also{values->questions.forEach{question->val labels=initialSelections[question.id].orEmpty();val known=question.options.map{it.label}.toSet();values[question.id]=labels.filter{it in known}.toSet()+if(labels.any{it !in known})setOf(OTHER_KEY)else emptySet()}} }
+    val otherText = remember(questions,initialSelections) { mutableStateMapOf<String, String>().also{values->questions.forEach{question->val known=question.options.map{it.label}.toSet();values[question.id]=initialSelections[question.id].orEmpty().filter{it !in known}.joinToString("\n")}} }
     var submitting by remember(questions) { mutableStateOf(false) }
 
     fun answered(q: QuestionSpec): Boolean {
@@ -84,13 +88,13 @@ fun AskQuestionCard(
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Icon(Icons.Rounded.Forum, contentDescription = null, tint = colors.accent, modifier = Modifier.size(20.dp))
             Column(Modifier.weight(1f)) {
-                Text(stringResource(R.string.ask_needs_input_title), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = colors.textPrimary)
-                Text(stringResource(R.string.ask_needs_input_subtitle), fontSize = 12.sp, color = colors.textSecondary)
+                Text(titleOverride?:stringResource(R.string.ask_needs_input_title), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = colors.textPrimary)
+                Text(subtitleOverride?:stringResource(R.string.ask_needs_input_subtitle), fontSize = 12.sp, color = colors.textSecondary)
             }
         }
 
         Column(
-            Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState()),
+            if(readOnly)Modifier else Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             for (q in questions) {
@@ -99,6 +103,7 @@ fun AskQuestionCard(
                     showHeader = questions.size > 1,
                     selected = selections[q.id].orEmpty(),
                     otherText = otherText[q.id].orEmpty(),
+                    enabled = !readOnly&&!submitting,
                     onToggle = { label ->
                         val cur = selections[q.id].orEmpty()
                         selections[q.id] = if (q.multiSelect) {
@@ -112,7 +117,7 @@ fun AskQuestionCard(
             }
         }
 
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        if(!readOnly)Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
             TextButton(onClick = onSkip, enabled = !submitting) {
                 Text(stringResource(R.string.ask_skip), color = colors.textSecondary)
             }
@@ -146,6 +151,7 @@ private fun QuestionBlock(
     showHeader: Boolean,
     selected: Set<String>,
     otherText: String,
+    enabled: Boolean,
     onToggle: (String) -> Unit,
     onOtherText: (String) -> Unit,
 ) {
@@ -174,6 +180,7 @@ private fun QuestionBlock(
                 description = option.description,
                 checked = option.label in selected,
                 multi = question.multiSelect,
+                enabled = enabled,
                 onClick = { onToggle(option.label) },
             )
         }
@@ -183,6 +190,7 @@ private fun QuestionBlock(
             description = "",
             checked = OTHER_KEY in selected,
             multi = question.multiSelect,
+            enabled = enabled,
             onClick = { onToggle(OTHER_KEY) },
         )
         if (OTHER_KEY in selected) {
@@ -196,6 +204,7 @@ private fun QuestionBlock(
             ) {
                 if (otherText.isEmpty()) Text(stringResource(R.string.ask_other_placeholder), color = colors.textTertiary, fontSize = 13.sp)
                 BasicTextField(
+                    enabled = enabled,
                     value = otherText,
                     onValueChange = onOtherText,
                     textStyle = TextStyle(color = colors.textPrimary, fontSize = 13.sp),
@@ -208,7 +217,7 @@ private fun QuestionBlock(
 }
 
 @Composable
-private fun OptionRow(label: String, description: String, checked: Boolean, multi: Boolean, onClick: () -> Unit) {
+private fun OptionRow(label: String, description: String, checked: Boolean, multi: Boolean, enabled: Boolean, onClick: () -> Unit) {
     val colors = CodegTheme.colors
     Row(
         Modifier
@@ -216,7 +225,7 @@ private fun OptionRow(label: String, description: String, checked: Boolean, mult
             .clip(RoundedCornerShape(8.dp))
             .background(if (checked) colors.accent.copy(alpha = 0.12f) else colors.textPrimary.copy(alpha = 0.02f))
             .border(0.5.dp, if (checked) colors.accent.copy(alpha = 0.4f) else colors.hairline, RoundedCornerShape(8.dp))
-            .clickable { onClick() }
+            .clickable(enabled=enabled) { onClick() }
             .padding(horizontal = 10.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
