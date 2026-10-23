@@ -5,6 +5,9 @@ use std::{collections::BTreeMap,path::PathBuf};
 tokio::task_local!{static PLAN:Option<Plan>;}
 pub async fn with_plan<F:std::future::Future>(plan:Option<Plan>,future:F)->F::Output{PLAN.scope(plan,future).await}
 pub async fn prepare(runtime:&FrozenAgentRuntimeConfig,source:Option<&LaunchEnvironmentSource>)->Result<Option<Plan>>{
+    prepare_original(runtime,source).await.map_err(|error|if runtime.adapter_kind==AdapterKind::CustomAcp{super::launch_failure::public(runtime,error)}else{error})
+}
+async fn prepare_original(runtime:&FrozenAgentRuntimeConfig,source:Option<&LaunchEnvironmentSource>)->Result<Option<Plan>>{
     if runtime.adapter_kind!=AdapterKind::CustomAcp{ensure!(runtime.custom_runtime.is_none(),"custom_runtime.kind_mismatch");return Ok(None)}
     let custom=runtime.custom_runtime.as_ref().context("custom_runtime.frozen_definition_missing")?;ensure!(custom.schema_version==1,"custom_runtime.frozen_version_invalid");let source=source.context("custom_runtime.host_launch_source_missing")?;
     let(lock,environment,payload)={

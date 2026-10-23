@@ -9,6 +9,7 @@ pub(crate) mod artifacts;
 pub(crate) mod packages;
 pub(crate) mod installer;
 pub(crate) mod launch;
+mod launch_failure;
 pub(crate) mod registry;
 mod schema;
 pub const MAX_BYTES:usize=2*1024*1024;
