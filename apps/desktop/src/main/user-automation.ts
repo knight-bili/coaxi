@@ -348,6 +348,27 @@ export async function dispatchUserAutomation(
     input[current] = input[old]; delete input[old]
   }
   switch (operation) {
+    case 'conversationTools.policy.get':
+    case 'conversationTools.policy.set':
+    case 'conversationTools.questions.list':
+    case 'conversationTools.questions.answer':
+    case 'conversationTools.questions.decline':
+    case 'conversationTools.questions.reconcile':
+    case 'conversationTools.grants.preview':
+    case 'conversationTools.grants.confirm':
+    case 'conversationTools.grants.revoke':
+    case 'conversationTools.grants.list':
+    case 'conversationTools.requests.get':
+    case 'conversationTools.requests.resolve':
+    case 'conversationTools.automationOwner.get':
+    case 'conversationTools.automationOwner.set':
+      return dependencies.core.request(operation, input)
+    case 'conversationTools.source.list':
+      return dependencies.core.request('history.library', { ...input, operation: 'sources' })
+    case 'conversationTools.source.prepare':
+      return dependencies.core.request('history.library', { ...input, operation: 'source.prepare' })
+    case 'conversationTools.automation.details':
+      return dependencies.core.request('automations.get', input)
     case 'status': {
       const core = await dependencies.core.request<RecordValue>('app.info')
       return {
