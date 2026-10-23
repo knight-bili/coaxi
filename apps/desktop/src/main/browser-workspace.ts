@@ -179,7 +179,7 @@ export class BrowserWorkspace {
         outcome='completed'
       }catch(error){result={error:String(error)};outcome='unknown'}
       const receipt=await this.request<{deliverResult:boolean}>('browser.local.finish',{...envelope,outcome,resultDigest:digest(result)})
-      if(!receipt.deliverResult||surface.view.level==='none'||surface.window.isDestroyed()||surface.window.webContents.mainFrame.routingId.toString()!==document||new URL(surface.window.webContents.getURL()).origin!==origin)throw new Error('browser.authority_or_document_changed')
+      if(!receipt.deliverResult||!['read','control'].includes(surface.view.level)||surface.window.isDestroyed()||surface.window.webContents.mainFrame.routingId.toString()!==document||new URL(surface.window.webContents.getURL()).origin!==origin)throw new Error('browser.authority_or_document_changed')
       if(outcome!=='completed')throw new Error('browser.outcome_unknown: '+String((result as {error:string}).error))
       return result
     })
