@@ -1,7 +1,6 @@
 // @vitest-environment jsdom
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
-import { useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { NativeContinuationPreview, NativeContinuationReceipt } from '@contracts'
 import type { ThreadClient } from './camp-client'
@@ -53,40 +52,35 @@ describe('native continuation dialog ownership', () => {
     } as unknown as ThreadClient
     const openRequest = deferred<boolean>()
     const onOpen = vi.fn(() => openRequest.promise)
-    const oldClose = vi.fn()
+    const onClose = vi.fn()
     const oldExecution = { entry: oldEntry }
+    const newExecution = { entry: newEntry }
 
-    function Harness(): React.JSX.Element {
-      const [execution, setExecution] = useState<{ entry: typeof oldEntry } | null>(oldExecution)
-      if (!execution) return <button onClick={() => setExecution({ entry: newEntry })}>恢复执行</button>
-      const close = execution === oldExecution
-        ? oldClose.mockImplementation(() => setExecution((current) => current === oldExecution ? null : current))
-        : () => setExecution((current) => current === execution ? null : current)
+    function Harness({ execution }: { execution: typeof oldExecution }): React.JSX.Element {
       return <ThreadClientProvider client={client}>
-        <button onClick={() => setExecution({ entry: newEntry })}>打开新执行</button>
         <NativeContinuationDialog
           key={execution.entry.id}
           threadId="source-thread"
           entry={execution.entry}
           data={{ turns: [] } as unknown as NativeTranscript}
           mode="continue"
-          onClose={close}
+          onClose={onClose}
           onOpen={onOpen}
         />
       </ThreadClientProvider>
     }
 
-    render(<Harness />)
+    const view = render(<Harness execution={oldExecution} />)
     const openButton = await screen.findByRole('button', { name: '打开新工作私聊' })
     await waitFor(() => expect(openButton).not.toBeDisabled())
     fireEvent.click(openButton)
     expect(onOpen).toHaveBeenCalledTimes(1)
-    fireEvent.click(screen.getByRole('button', { name: '打开新执行' }))
+    view.rerender(<Harness execution={newExecution} />)
     expect(await screen.findByText(/新来源/)).toBeTruthy()
 
     await act(async () => { openRequest.resolve(true); await openRequest.promise })
 
-    expect(oldClose).not.toHaveBeenCalled()
+    expect(onClose).not.toHaveBeenCalled()
     expect(screen.getByRole('dialog')).toBeTruthy()
     expect(screen.getByText(/新来源/)).toBeTruthy()
   })
