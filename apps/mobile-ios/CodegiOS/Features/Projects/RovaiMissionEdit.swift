@@ -26,6 +26,15 @@ struct RovaiMissionEdit: View {
     private var blocked: Bool {!ready || busy || model.busy || model.pending != nil || generation != model.connectionGeneration}
     private var locked: Bool {blocked || legacySent != nil}
     private var rendered: String {missionDescriptionDisplay(content, members: model.members)}
+    private var memberNames: String {
+        let ids: [String] = (baseline["memberAgentIds"]?.rvArray ?? []).compactMap(\.stringValue)
+        let members: [JSONValue] = model.members
+        let names: [String] = ids.map { id -> String in
+            guard let member = members.first(where: { (candidate: JSONValue) -> Bool in candidate.text("agentId") == id }) else {return "已不可用队员"}
+            return member.text("displayName")
+        }
+        return names.joined(separator: "、")
+    }
     private var parsedTags: [String] {var seen = Set<String>();return tags.components(separatedBy: CharacterSet(charactersIn: ",，\n")).map {$0.trimmingCharacters(in: .whitespacesAndNewlines)}.filter {!$0.isEmpty && seen.insert($0).inserted}}
     private var changed: Bool {title.trimmingCharacters(in: .whitespacesAndNewlines) != baseline.text("title") || content != contentOf(baseline) || parsedTags != (baseline["tags"]?.rvArray ?? []).compactMap(\.stringValue) || kept != (baseline["attachments"]?.rvArray ?? []).map {$0.text("id")} || !sources.isEmpty}
     private var valid: Bool {!title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && title.trimmingCharacters(in: .whitespacesAndNewlines).unicodeScalars.count <= 200 && rendered.unicodeScalars.count <= (baseline["descriptionLimit"]?.rvInt == 20000 ? 20000 : 12000) && parsedTags.count <= 30 && parsedTags.allSatisfy {$0.unicodeScalars.count <= 24} && kept.count + sources.count <= 10}
@@ -41,8 +50,7 @@ struct RovaiMissionEdit: View {
             }.disabled(locked)
             Section("工作目录与队伍") {
                 Text(baseline.text("projectPath").isEmpty ? "快速对话" : baseline.text("projectPath"))
-                let ids = (baseline["memberAgentIds"]?.rvArray ?? []).compactMap(\.stringValue)
-                Text(ids.map {id in model.members.first {$0.text("agentId") == id}?.text("displayName") ?? "已不可用队员"}.joined(separator: "、"))
+                Text(memberNames)
             } footer: {Text("队伍与队长由原管理入口调整。保存描述中的新提及会邀请对应队员；移除提及保留原成员。")}
             Section("附件 · \(kept.count + sources.count)/10") {
                 ForEach(baseline["attachments"]?.rvArray ?? [], id: \.self) {attachment in
