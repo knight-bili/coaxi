@@ -169,6 +169,7 @@ import { runtimeEditorInstallation } from './MemberRuntimeParameters'
 import { mentionCandidateRuntime } from './mention-runtime'
 import { SafeMarkdown } from './SafeMarkdown'
 import { UserFeedbackDock } from './UserFeedbackDock'
+import { ConversationQuestionsDock } from './ConversationQuestionsDock'
 import { CoreFeedbackMarkdown } from './CoreFeedbackMarkdown'
 import type { FeedbackMessageSource } from './CardFeedbackFields'
 import { RuntimeInteractionDock } from './RuntimeInteractionDock'
@@ -5884,6 +5885,7 @@ function ThreadWorkspaceContent({
           )}
 
           <UserFeedbackDock key={`feedback:${snapshot.thread.id}`} scope={{threadId:snapshot.thread.id,conversationId:null,scopeKind:'public'}} members={snapshot.members} materials={composerDraft?.attachments??[]}/>
+          <ConversationQuestionsDock key={`questions:${snapshot.thread.id}`} scope={{threadId:snapshot.thread.id,conversationId:null,scopeKind:'public'}} members={snapshot.members}/>
           <form
         className={[
           'composer',

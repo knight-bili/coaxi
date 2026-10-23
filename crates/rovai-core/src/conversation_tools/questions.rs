@@ -98,7 +98,11 @@ pub(crate) fn answer_on(tx:&Transaction<'_>,lease:&RunLease,client:&str,command:
 }
 pub(crate) fn list(connection:&Connection,input:&Value)->Result<Value>{
     validate_operation("conversationTools.questions.list",input)?;let scope:ScopeV1=serde_json::from_value(input["scope"].clone())?;scope::require_retained_scope(connection,&scope)?;
-    let mut query=connection.prepare("SELECT q.request_id FROM conversation_tool_question q JOIN conversation_tool_request r ON r.id=q.request_id JOIN conversation_tool_run owned ON owned.agent_run_id=r.agent_run_id AND owned.execution_epoch=r.execution_epoch WHERE owned.thread_id=?1 AND owned.scope_kind=?2 AND owned.conversation_id IS ?3 AND (?4 IS NULL OR q.request_id>?4) ORDER BY q.request_id LIMIT ?5")?;
+    if let Some(after)=input["after"].as_str(){
+        let owned:bool=connection.query_row("SELECT EXISTS(SELECT 1 FROM conversation_tool_question q JOIN conversation_tool_request r ON r.id=q.request_id JOIN conversation_tool_run run ON run.agent_run_id=r.agent_run_id AND run.execution_epoch=r.execution_epoch WHERE q.request_id=?1 AND run.thread_id=?2 AND run.scope_kind=?3 AND run.conversation_id IS ?4)",params![after,scope.thread_id,scope::kind(&scope.scope_kind),scope.conversation_id],|row|row.get(0))?;
+        ensure!(owned,"conversation_tools.question_cursor_changed");
+    }
+    let mut query=connection.prepare("SELECT q.request_id FROM conversation_tool_question q JOIN conversation_tool_request r ON r.id=q.request_id JOIN conversation_tool_run owned ON owned.agent_run_id=r.agent_run_id AND owned.execution_epoch=r.execution_epoch WHERE owned.thread_id=?1 AND owned.scope_kind=?2 AND owned.conversation_id IS ?3 AND (?4 IS NULL OR(q.created_at,q.request_id)<(SELECT created_at,request_id FROM conversation_tool_question WHERE request_id=?4)) ORDER BY q.created_at DESC,q.request_id DESC LIMIT ?5")?;
     let limit=input["limit"].as_u64().context("conversation_tools.limit_required")?;
     let mut ids=query.query_map(params![scope.thread_id,scope::kind(&scope.scope_kind),scope.conversation_id,input["after"].as_str(),limit+1],|row|row.get::<_,String>(0))?.collect::<rusqlite::Result<Vec<_>>>()?;
     let more=ids.len()>limit as usize;ids.truncate(limit as usize);let next=if more{ids.last().cloned()}else{None};

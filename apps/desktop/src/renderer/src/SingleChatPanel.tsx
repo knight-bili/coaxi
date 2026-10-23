@@ -70,6 +70,7 @@ import { executionPhaseFeedback, executionRunSummary } from './execution-run-sum
 import { ComposerPrimaryAction } from './ComposerPrimaryAction'
 import { SafeMarkdown } from './SafeMarkdown'
 import { UserFeedbackDock } from './UserFeedbackDock'
+import { ConversationQuestionsDock } from './ConversationQuestionsDock'
 import { CoreFeedbackMarkdown } from './CoreFeedbackMarkdown'
 import { shouldSubmitStructuredComposerOnEnter } from './StructuredMentionComposer'
 import { readErrorMessage } from './error-message'
@@ -1805,6 +1806,7 @@ export function SingleChatPanel({
         ownerKey={`${conversationKind}:${currentSnapshot.conversation.id}`} messages={currentSnapshot.messages}
         disabled={!visible || sending || quoteBusy || returningPending || preparingAttachments.some((item) => !item.error)}
         onAdd={(selection) => mutateDraftQuote({ type: 'add', selection })} />}
+      {currentSnapshot&&<ConversationQuestionsDock key={`questions:${currentSnapshot.conversation.id}`} scope={{threadId,conversationId:currentSnapshot.conversation.id,scopeKind:conversationKind}} members={members}/>}
       {currentSnapshot&&<UserFeedbackDock key={`feedback:${currentSnapshot.conversation.id}`} scope={{threadId,conversationId:currentSnapshot.conversation.id,scopeKind:conversationKind}} agentId={currentSnapshot.conversation.agentId} members={members}
         materials={currentSnapshot.draft.attachments} composerScope={input?.origin.scope??null}
         getPrivateInput={()=>{
