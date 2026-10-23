@@ -58,7 +58,7 @@ private struct RovaiSkillDetailView: View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 18) {
                 if let issue { Text(issue).font(.caption).foregroundStyle(Theme.warning) }
-                EditorSection(title: label(entry["displayName"])) {
+                EditorSection(title: LocalizedStringKey(label(entry["displayName"]))) {
                     Text(label(entry["description"])).font(.subheadline).foregroundStyle(Theme.textSecondary)
                     Text("来源：\(entry.text("sourceUrl"))").font(.caption).textSelection(.enabled)
                     Text("版本：\(sourceRevision.prefix(12))").font(.caption)
