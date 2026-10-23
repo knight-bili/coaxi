@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
-import { mkdir, mkdtemp, realpath, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, realpath, symlink, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { DatabaseSync } from 'node:sqlite'
@@ -324,42 +324,62 @@ try {
   await mkdir(externalDirectory)
   await writeFile(path.join(externalDirectory, 'guide.txt'), 'SAFE_EXTERNAL_ALIAS_MARKER\n')
   assert(!path.resolve(externalDirectory).startsWith(path.resolve(repository)))
-  const organizerBeforeAlias = await call('workbench.organizer.get', {
-    scope: organizerScope, level: 'thread'
-  })
-  const aliasSaved = await call('workbench.organizer.set', {
-    scope: organizerScope,
-    level: 'thread',
-    expectedDigest: organizerBeforeAlias.digest,
-    value: {
-      ...organizerBeforeAlias.value,
-      directoryAliases: [{ path: externalDirectory, name: 'external-specs', group: 'acceptance' }]
+  const symlinkProbe = path.join(fixture, 'directory-link-capability-probe')
+  let directoryLinksAvailable = true
+  try {
+    await symlink(externalDirectory, symlinkProbe, 'dir')
+  } catch (error) {
+    if (process.platform === 'win32' && ['EPERM', 'EACCES'].includes(error?.code)) {
+      directoryLinksAvailable = false
+    } else {
+      throw error
     }
-  })
-  assert.equal(aliasSaved.value.directoryAliases[0].name, 'external-specs')
-  const linkedEntries = await call('workbench.files.list', { scope: organizerScope, path: '' })
-  const linkedDirectory = linkedEntries.entries.find(entry => entry.name === 'external-specs')
-  assert.equal(linkedDirectory?.managedAlias, true)
-  assert.equal(linkedDirectory?.directory, true)
-  const aliasedFile = await call('workbench.files.read', {
-    scope: organizerScope, path: 'external-specs/guide.txt'
-  })
-  assert.equal(aliasedFile.text, 'SAFE_EXTERNAL_ALIAS_MARKER\n')
-  const search = await call('workbench.files.tools', {
-    scope: organizerScope,
-    operation: 'search',
-    path: 'external-specs',
-    query: 'SAFE_EXTERNAL_ALIAS_MARKER',
-    content: true,
-    caseSensitive: true
-  })
-  assert(search.results.some(item => item.path === 'external-specs/guide.txt'))
-  record('issue_77_external_alias_is_scoped_and_searchable_from_isolated_fixture', {
-    aliasPath: externalDirectory,
-    aliasReadMatched: true,
-    searchMatched: true,
-    externalFixtureOnly: true
-  })
+  }
+  if (directoryLinksAvailable) await unlink(symlinkProbe)
+  if (!directoryLinksAvailable) {
+    record('issue_77_external_alias_is_scoped_and_searchable_from_isolated_fixture', {
+      status: 'skipped',
+      reason: 'Windows 当前用户没有创建目录符号链接的权限',
+      externalFixtureOnly: true
+    }, 'skipped')
+  } else {
+    const organizerBeforeAlias = await call('workbench.organizer.get', {
+      scope: organizerScope, level: 'thread'
+    })
+    const aliasSaved = await call('workbench.organizer.set', {
+      scope: organizerScope,
+      level: 'thread',
+      expectedDigest: organizerBeforeAlias.digest,
+      value: {
+        ...organizerBeforeAlias.value,
+        directoryAliases: [{ path: externalDirectory, name: 'external-specs', group: 'acceptance' }]
+      }
+    })
+    assert.equal(aliasSaved.value.directoryAliases[0].name, 'external-specs')
+    const linkedEntries = await call('workbench.files.list', { scope: organizerScope, path: '' })
+    const linkedDirectory = linkedEntries.entries.find(entry => entry.name === 'external-specs')
+    assert.equal(linkedDirectory?.managedAlias, true)
+    assert.equal(linkedDirectory?.directory, true)
+    const aliasedFile = await call('workbench.files.read', {
+      scope: organizerScope, path: 'external-specs/guide.txt'
+    })
+    assert.equal(aliasedFile.text, 'SAFE_EXTERNAL_ALIAS_MARKER\n')
+    const search = await call('workbench.files.tools', {
+      scope: organizerScope,
+      operation: 'search',
+      path: 'external-specs',
+      query: 'SAFE_EXTERNAL_ALIAS_MARKER',
+      content: true,
+      caseSensitive: true
+    })
+    assert(search.results.some(item => item.path === 'external-specs/guide.txt'))
+    record('issue_77_external_alias_is_scoped_and_searchable_from_isolated_fixture', {
+      aliasPath: externalDirectory,
+      aliasReadMatched: true,
+      searchMatched: true,
+      externalFixtureOnly: true
+    })
+  }
 
   stage = 'issue_78_history_rename_delete_and_merge_parent_diff'
   const historicalRead = async (target, filePath) => call('workbench.git.read', {
