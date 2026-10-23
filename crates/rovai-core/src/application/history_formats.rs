@@ -18,7 +18,7 @@ fn snapshot(root:&Path,target:&Path)->Result<String>{
             let destination=target.join(relative);crate::platform::private_storage::prepare_private_directory(destination.parent().context("history.invalid_path")?)?;
             let mut header=[0u8;16];let count=fs::File::open(&path)?.read(&mut header)?;
             if count==16&&header==*b"SQLite format 3\0"{
-                let connection=rusqlite::Connection::open_with_flags(&path,rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY|rusqlite::OpenFlags::SQLITE_OPEN_NO_MUTEX)?;connection.backup(rusqlite::DatabaseName::Main,&destination,None)?;
+                let connection=rusqlite::Connection::open_with_flags(&path,rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY|rusqlite::OpenFlags::SQLITE_OPEN_NO_MUTEX)?;connection.backup(rusqlite::MAIN_DB,&destination,None)?;
             }else{
                 let bytes=fs::read(&path)?;ensure!(bytes.len()as u64<=128*1024*1024,"history.source_too_large");let before=hash(&bytes);crate::platform::private_storage::atomic_write_private_bytes(&destination,&bytes)?;ensure!(hash(&fs::read(&path)?)==before,"history.source_changed_during_snapshot");
             }
