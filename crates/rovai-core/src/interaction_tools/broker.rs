@@ -100,12 +100,22 @@ impl Broker {
         ensure!(peer["coreInstanceId"] == self.core_instance && unexpired(&peer), "desktop_unavailable");
         let id = text(&peer, "desktopPeerId")?.to_owned();
         let mut state = self.locked()?;
+        self.expire_peers_locked(&mut state)?;
         if let Some(previous) = state.peers.get(&id) { ensure!(previous["ownerWindowId"] == peer["ownerWindowId"] && previous["connectionGeneration"] == peer["connectionGeneration"] && previous["capabilities"] == peer["capabilities"], "desktop_unavailable"); }
         else { ensure!(state.peers.len() < 16, "interaction.peer_capacity"); }
         state.peers.insert(id, peer.clone());
         Ok(peer)
     }
-    pub fn peers(&self) -> Result<Vec<Value>> { Ok(self.locked()?.peers.values().filter(|peer| unexpired(peer)).cloned().collect()) }
+    pub fn peers(&self) -> Result<Vec<Value>> {
+        let mut state = self.locked()?;
+        self.expire_peers_locked(&mut state)?;
+        Ok(state.peers.values().cloned().collect())
+    }
+    fn expire_peers_locked(&self, state:&mut State) -> Result<()> {
+        let expired:Vec<String> = state.peers.iter().filter(|(_,peer)|!unexpired(peer)).map(|(id,_)|id.clone()).collect();
+        for id in expired { self.revoke_peer_locked(state,&id)?; }
+        Ok(())
+    }
     pub fn register_targets(&self,value:Value)->Result<Value>{
         #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Catalog{desktop_peer_id:String,connection_generation:u64,sequence:u64,targets:Vec<Target>}
         #[derive(Deserialize)]#[serde(rename_all="camelCase",deny_unknown_fields)]struct Target{target_id:String,target_kind:String,app_id:Option<String>,shareable:bool}
@@ -297,6 +307,7 @@ impl Broker {
         for ledger in state.ledger.values_mut().filter(|ledger| ledger.call["bridgeInstanceId"] == id && matches!(ledger.receipt["state"].as_str(), Some("prepared" | "started"))) {
             ledger.receipt["state"] = json!(if ledger.receipt["state"] == "started" { "unknown" } else { "cancelled" }); ledger.receipt["finishedAt"] = json!(Utc::now().to_rfc3339()); self.persist(ledger)?;
         }
+        state.bridges.remove(id);
         Ok(())
     }
     pub fn revoke_run(&self, run: &str) -> Result<()> {
@@ -306,7 +317,15 @@ impl Broker {
         let ids:Vec<String>=state.bridges.iter().filter(|(_,bridge)|bridge.binding["agentRunId"]==run).map(|(id,_)|id.clone()).collect();
         for id in ids{self.revoke_locked(&mut state,&id)?;}Ok(())
     }
-    pub fn revoke_peer(&self, peer: &str) -> Result<()> { let mut state = self.locked()?; state.peers.remove(peer); state.grants.retain(|_, grant| grant["desktopPeerId"] != peer); let ids: Vec<String> = state.bridges.iter().filter(|(_, bridge)| bridge.binding["desktopPeerId"] == peer).map(|(id, _)| id.clone()).collect(); for id in ids { self.revoke_locked(&mut state, &id)?; } Ok(()) }
+    fn revoke_peer_locked(&self,state:&mut State,peer:&str)->Result<()> {
+        state.peers.remove(peer);
+        state.targets.remove(peer);
+        state.grants.retain(|_,grant|grant["desktopPeerId"]!=peer);
+        let ids:Vec<String>=state.bridges.iter().filter(|(_,bridge)|bridge.binding["desktopPeerId"]==peer).map(|(id,_)|id.clone()).collect();
+        for id in ids { self.revoke_locked(state,&id)?; }
+        Ok(())
+    }
+    pub fn revoke_peer(&self, peer: &str) -> Result<()> { self.revoke_peer_locked(&mut self.locked()?,peer) }
     pub fn stop_computer(&self)->Result<Value>{let mut state=self.locked()?;state.grants.retain(|_,grant|grant["targetKind"]=="browser_tab");let ids:Vec<String>=state.ledger.iter().filter(|(_,ledger)|ledger.call["toolName"].as_str().is_some_and(|name|name.starts_with("computer_"))&&matches!(ledger.receipt["state"].as_str(),Some("prepared"|"started"))).map(|(id,_)|id.clone()).collect();for id in ids{state.approvals.remove(&id);let ledger=state.ledger.get_mut(&id).context("original_request_pending")?;ledger.receipt["state"]=json!(if ledger.receipt["state"]=="started"{"unknown"}else{"cancelled"});ledger.receipt["finishedAt"]=json!(Utc::now().to_rfc3339());self.persist(ledger)?;}Ok(json!({"revoked":true}))}
     pub fn pending(&self) -> Result<Vec<Value>> { Ok(self.locked()?.ledger.values().filter(|ledger| matches!(ledger.receipt["state"].as_str(), Some("prepared" | "started" | "unknown")) && !ledger.owner_reconciled).map(|ledger| json!({"binding":ledger.binding,"call":ledger.call,"receipt":ledger.receipt})).collect()) }
     pub fn reconcile_unknown(&self, id: &str, expected_digest: &str) -> Result<Value> { let mut state = self.locked()?; let ledger = state.ledger.get_mut(id).context("original_request_pending")?; ensure!(ledger.receipt["state"] == "unknown" && ledger.call["argumentsDigest"] == expected_digest, "original_request_pending"); ledger.owner_reconciled = true; self.persist(ledger)?; Ok(ledger.receipt.clone()) }

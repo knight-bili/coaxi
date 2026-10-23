@@ -119,6 +119,12 @@ impl Core {
                 tasks.spawn(async move { let _permit=permit; let _=serve_connection(core,stream).await; });
             }
             tasks.abort_all();
+            if let Some(core) = core.upgrade() {
+                let _ = core.interaction_tools.disconnect(&bridge_id);
+                emit(&core.output,"interaction.run.revoked",json!({"agentRunId":binding["agentRunId"],"bridgeInstanceId":bridge_id}));
+            }
+            // 原请求和受限晚回执保留，只回收这个桥的临时认证。
+            let _ = std::fs::remove_file(&config_path);
             drop(listener);
             #[cfg(unix)]
             if let LocalIpcEndpoint::UnixSocket{path} = endpoint { if let Some(parent)=Path::new(&path).parent(){let _=std::fs::remove_dir(parent);} }
