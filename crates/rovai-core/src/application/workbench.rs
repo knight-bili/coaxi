@@ -308,14 +308,39 @@ impl Core {
     pub(super) async fn workbench_git(&self, method: &str, value: Value) -> Result<Value> {
         let request: GitRequest = serde_json::from_value(value.clone())?;
         let root = self.workbench_root(&request.scope).await?;
-        for path in &request.paths { ensure!(!path.is_empty(), "workbench.paths_required"); relative(&root, path, true)?; }
         let git = self.mission_git().await?;
         if method == "workbench.git.read" {
+            for path in &request.paths { ensure!(!path.is_empty(), "workbench.paths_required"); relative(&root, path, true)?; }
             let arguments = git_arguments(&request, false)?;
             let output = git.workbench_output(&root, &arguments).await?;
             return Ok(json!({"success":output.status.success(),"exitCode":output.status.code(),"output":String::from_utf8(output.stdout.bytes).context("workbench.git_non_utf8")?,"error":output.stderr.lossy_text()}));
         }
+        let execute = method == "workbench.git.execute";
+        if execute {
+            ensure!(request.confirmed, "workbench.confirmation_required");
+        } else {
+            ensure!(method == "workbench.git.preview", "workbench.operation_not_admitted");
+        }
         let mut arguments = git_arguments(&request, true)?;
+        let _write = if execute { Some(MUTATIONS.lock().await) } else { None };
+        let receipt = if execute {
+            let id = request.command_id.as_deref().context("workbench.command_id_required")?;
+            uuid::Uuid::parse_str(id).context("workbench.invalid_command_id")?;
+            let identity = crate::command::canonical_json_digest(&json!({"root":root,"request":value}))?;
+            let receipts = self.data_dir.join("workspace-operations");
+            crate::platform::private_storage::prepare_private_directory(&receipts)?;
+            let receipt = receipts.join(format!("{id}.json"));
+            if receipt.exists() {
+                let saved: Value = serde_json::from_slice(&fs::read(&receipt)?)?;
+                ensure!(saved["identity"] == identity, "workbench.command_conflict");
+                ensure!(saved["state"] == "finished", "workbench.operation_unknown_check_state");
+                return Ok(saved["result"].clone());
+            }
+            Some((receipt, identity))
+        } else {
+            None
+        };
+        for path in &request.paths { ensure!(!path.is_empty(), "workbench.paths_required"); relative(&root, path, true)?; }
         let mut managed_tree=None;
         if matches!(request.action.as_str(),"worktree_add"|"worktree_remove"){
             let branch=git_target(request.target.as_deref())?;let key=crate::command::canonical_json_digest(&json!({"root":root,"branch":branch}))?;let directory=self.data_dir.join("workspace-trees");crate::platform::private_storage::prepare_private_directory(&directory)?;let tree=directory.join(&key);let owner=directory.join(format!("{key}.json"));
@@ -323,29 +348,16 @@ impl Core {
             managed_tree=Some((tree,owner,branch));
         }
         if request.action=="clone"{let destination=relative(&root,&request.paths[0],true)?;ensure!(!destination.exists(),"workbench.destination_exists");}
-        let _write = MUTATIONS.lock().await;
         let revision = if matches!(request.action.as_str(),"init"|"clone"){crate::command::canonical_json_digest(&json!({"root":root,"destination":request.paths,"exists":request.paths.iter().map(|path|root.join(path).exists()).collect::<Vec<_>>()}))?}else{self.workbench_git_revision(&git,&root).await?};
-        if method == "workbench.git.preview" {
+        if !execute {
             let clean = if request.action == "clean" {
                 let mut preview = arguments.clone(); preview[1]="-n".into();
                 Some(git.workbench_output(&root, &preview).await?.stdout.lossy_text())
             } else { None };
             return Ok(json!({"revision":revision,"action":request.action,"arguments":arguments,"cleanPreview":clean}));
         }
-        ensure!(method == "workbench.git.execute" && request.confirmed, "workbench.confirmation_required");
-        let id = request.command_id.as_deref().context("workbench.command_id_required")?;
-        uuid::Uuid::parse_str(id).context("workbench.invalid_command_id")?;
-        let identity = crate::command::canonical_json_digest(&json!({"root":root,"request":value}))?;
-        let receipts = self.data_dir.join("workspace-operations");
-        crate::platform::private_storage::prepare_private_directory(&receipts)?;
-        let receipt = receipts.join(format!("{id}.json"));
-        if receipt.exists() {
-            let saved: Value = serde_json::from_slice(&fs::read(&receipt)?)?;
-            ensure!(saved["identity"] == identity, "workbench.command_conflict");
-            ensure!(saved["state"] == "finished", "workbench.operation_unknown_check_state");
-            return Ok(saved["result"].clone());
-        }
         ensure!(request.expected_revision.as_deref() == Some(revision.as_str()), "workbench.git_changed_refresh_preview");
+        let (receipt, identity) = receipt.context("workbench.command_receipt_required")?;
         crate::platform::private_storage::atomic_write_private_json(&receipt, &json!({"identity":identity,"state":"started"}))?;
         let output = git.workbench_output(&root, &arguments).await?;
         if output.status.success(){if let Some((tree,owner,branch))=&managed_tree {if request.action=="worktree_add"{crate::platform::private_storage::atomic_write_private_json(owner,&json!({"root":root,"branch":branch,"path":tree,"createdAt":Utc::now().to_rfc3339()}))?;}else{let _=fs::remove_file(owner);}}}
