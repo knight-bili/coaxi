@@ -7129,7 +7129,7 @@ impl Core {
                             resolve_automation_project(&database, &authenticated_run.camp_id, value)
                         })
                         .transpose()?;
-                    serde_json::to_value(AutomationService::default().list(
+                    let page=AutomationService::default().list(
                         &database,
                         &AutomationListQuery {
                             status: input.status,
@@ -7138,8 +7138,9 @@ impl Core {
                             cursor: input.cursor,
                             limit: input.limit,
                         },
-                    )?)
-                    .map_err(Into::into)
+                    )?;
+                    if page.automations.iter().any(|view|!crate::automation::legacy_view_compatible(view)){return Err(automation_tool_error("automation.user_editor_required","此页包含完整名称超出旧工具合同的计划，请在用户自动化设置中读取；没有截断或隐藏条目。"));}
+                    serde_json::to_value(page).map_err(Into::into)
                 }
                 AUTOMATION_GET_TOOL_NAME => {
                     let input = serde_json::from_value::<AutomationGetToolInput>(request.input)
@@ -7162,6 +7163,7 @@ impl Core {
                                 "Automation does not exist",
                             )
                         })?;
+                    if !crate::automation::legacy_view_compatible(&view){return Err(automation_tool_error("automation.user_editor_required","此计划需要在用户自动化设置中读取完整名称。"));}
                     serde_json::to_value(view).map_err(Into::into)
                 }
                 AUTOMATION_CREATE_TOOL_NAME => {

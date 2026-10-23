@@ -399,7 +399,7 @@ export function AutomationWorkspace({
       })
       if (result.status === 'rejected') throw new Error(String(result.payload.message ?? uiAttribute('任务未能开始。')))
       const status = String(result.payload.status ?? '')
-      onNotify(status === 'skipped'
+      onNotify(status === 'enqueued' ? uiAttribute('已生成使命，等待你在使命板启动') : status === 'skipped'
         ? uiAttribute('已有一次运行正在进行，本次已跳过')
         : status === 'failed' ? uiAttribute('任务未能开始，请查看运行状态') : uiAttribute('任务已开始运行'))
       await refresh(true)

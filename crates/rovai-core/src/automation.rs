@@ -85,7 +85,7 @@ pub enum AutomationWeekday {
 }
 
 impl AutomationWeekday {
-    const fn number_from_monday(self) -> u32 {
+    pub(crate) const fn number_from_monday(self) -> u32 {
         match self {
             Self::Monday => 1,
             Self::Tuesday => 2,
@@ -686,6 +686,9 @@ impl AutomationService {
             if matches!(&envelope.actor,ActorRef::Agent{..})&&crate::conversation_tools::calendar::requires_aware_edit(transaction,&command.automation_id)?{
                 return Ok(rejected("timezone_aware_edit_required","请在自动化设置中保留并核对时区和执行动作。"));
             }
+            if matches!(&envelope.actor,ActorRef::Agent{..})&&legacy_name_requires_user(transaction,&command.automation_id)?{
+                return Ok(rejected("automation.user_editor_required","此计划需要在用户自动化设置中保留完整名称。"));
+            }
             let Some(current) = load_automation_record(transaction, &command.automation_id)? else {
                 return Ok(rejected(
                     "automation.not_found",
@@ -788,6 +791,9 @@ impl AutomationService {
     ) -> Result<CommandExecution> {
         let command = envelope.payload.clone();
         self.gateway.execute(database, envelope, |transaction| {
+            if matches!(&envelope.actor,ActorRef::Agent{..})&&legacy_name_requires_user(transaction,&command.automation_id)?{
+                return Ok(rejected("automation.user_editor_required","此计划需要在用户自动化设置中保留完整名称。"));
+            }
             if !management_actor(&envelope.actor) {
                 return Ok(rejected(
                     "automation.actor_forbidden",
@@ -867,6 +873,9 @@ impl AutomationService {
     ) -> Result<CommandExecution> {
         let command = envelope.payload.clone();
         self.gateway.execute(database, envelope, |transaction| {
+            if matches!(&envelope.actor,ActorRef::Agent{..})&&crate::conversation_tools::calendar::requires_enqueue_user(transaction,&command.automation_id)?{
+                return Ok(rejected("timezone_aware_edit_required","此计划生成未启动使命，请在用户自动化设置中明确执行。"));
+            }
             if !management_actor(&envelope.actor) {
                 return Ok(rejected(
                     "automation.actor_forbidden",
@@ -892,7 +901,7 @@ impl AutomationService {
             Ok(CommandHandlerResult::accepted(
                 "automation.run_requested",
                 occurrence.payload(),
-                Some(entity("automation_run", &occurrence.run_id)),
+                Some(if let Some(mission)=&occurrence.mission_id{entity("mission",mission)}else{entity("automation_run", &occurrence.run_id)}),
             ))
         })
     }
@@ -2416,6 +2425,12 @@ fn notification_target(
         .optional()
         .map_err(Into::into)
 }
+
+fn legacy_name_requires_user(connection:&rusqlite::Connection,id:&str)->Result<bool>{
+    let name:Option<String>=connection.query_row("SELECT name FROM automation WHERE id=?1",[id],|row|row.get(0)).optional()?;
+    Ok(name.is_some_and(|name|name.chars().count()>MAX_NAME_SCALARS))
+}
+pub(crate) fn legacy_view_compatible(view:&AutomationView)->bool{view.name.chars().count()<=MAX_NAME_SCALARS}
 
 fn load_automation_record(
     connection: &rusqlite::Connection,
