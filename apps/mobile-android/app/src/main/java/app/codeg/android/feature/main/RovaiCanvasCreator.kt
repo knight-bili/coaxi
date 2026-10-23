@@ -25,10 +25,61 @@ fun canvasReferenceChoices(rows:List<JsonObject>):List<RovaiCanvasReferenceChoic
         RovaiCanvasReferenceChoice(buildJsonObject{put("threadId",id);put("conversationId",private.coreText("conversationId"))},title+" · "+(member?.coreText("displayName")?:"队员")+"私聊"+if(runtime.isEmpty())""else" · $runtime")
     }
 }
-@Composable fun RovaiCanvasChoice(label:String,value:String,choices:List<Pair<String,String>>,enabled:Boolean=true,onChange:(String)->Unit){
-    var open by remember{mutableStateOf(false)};var search by remember{mutableStateOf("")}
-    TextButton(enabled=enabled,onClick={open=true}){Text(label+" · "+(choices.firstOrNull{it.first==value}?.second?:if(value.isEmpty())"请选择"else"原选择暂不可用"))}
-    if(open)AlertDialog(onDismissRequest={open=false},title={Text(label)},text={Column{OutlinedTextField(search,{search=it},Modifier.fillMaxWidth(),label={Text(stringResource(R.string.rovai_fusion_44ce7ae909bbb28b))});LazyColumn(Modifier.heightIn(max=400.dp)){choices.filter{search.isBlank()||it.second.contains(search,true)}.forEach{(id,title)->item(key=id){TextButton(onClick={onChange(id);open=false}){Text((if(id==value)"✓ "else"")+title)}}}}},confirmButton={TextButton(onClick={open=false}){Text(stringResource(R.string.rovai_fusion_3fd47edce45b3603))}})
+@Composable
+fun RovaiCanvasChoice(
+    label: String,
+    value: String,
+    choices: List<Pair<String, String>>,
+    enabled: Boolean = true,
+    onChange: (String) -> Unit
+) {
+    var open by remember { mutableStateOf(false) }
+    var search by remember { mutableStateOf("") }
+
+    TextButton(
+        enabled = enabled,
+        onClick = { open = true }
+    ) {
+        val selectedLabel = choices.firstOrNull { it.first == value }?.second
+            ?: if (value.isEmpty()) "请选择" else "原选择暂不可用"
+        Text("$label · $selectedLabel")
+    }
+
+    if (open) {
+        AlertDialog(
+            onDismissRequest = { open = false },
+            title = { Text(label) },
+            text = {
+                Column {
+                    OutlinedTextField(
+                        value = search,
+                        onValueChange = { search = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text(stringResource(R.string.rovai_fusion_44ce7ae909bbb28b)) }
+                    )
+                    LazyColumn(Modifier.heightIn(max = 400.dp)) {
+                        choices
+                            .filter { search.isBlank() || it.second.contains(search, ignoreCase = true) }
+                            .forEach { (id, title) ->
+                                item(key = id) {
+                                    TextButton(onClick = {
+                                        onChange(id)
+                                        open = false
+                                    }) {
+                                        Text((if (id == value) "✓ " else "") + title)
+                                    }
+                                }
+                            }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { open = false }) {
+                    Text(stringResource(R.string.rovai_fusion_3fd47edce45b3603))
+                }
+            }
+        )
+    }
 }
 
 /** CanvasNodeEditor + CanvasObjectPicker, using original bindings, sizes and captured board revision. */
