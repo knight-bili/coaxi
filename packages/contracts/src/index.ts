@@ -5091,6 +5091,7 @@ export type CoreMethod =
   | 'history.local'
   | 'history.library'
   | 'feedback.operation'
+  | 'skillPacks.custom.local'
   | 'history.usage'
   | 'history.usage.local'
   | 'office.watch'
