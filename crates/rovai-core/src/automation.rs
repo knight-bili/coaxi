@@ -1433,10 +1433,13 @@ fn enqueue_mission_occurrence_in_tx(transaction:&Transaction<'_>,record:&Automat
     Ok(Some(ClaimedOccurrence{run_id:command,status:"enqueued",reason:None,camp_id:None,mission_id:Some(mission)}))
 }
 /// 供User自动化工作区补充展示；不拼入旧Agent工具结果。
-pub(crate) fn queued_missions(connection:&rusqlite::Connection,id:&str)->Result<Vec<Value>>{
-    if crate::conversation_tools::storage::absent(connection)?{return Ok(vec![])}
-    let mut statement=connection.prepare("SELECT f.command_id,f.scheduled_at_utc,f.target_id,m.title,f.created_at FROM conversation_tool_automation_fire f JOIN mission m ON m.id=f.target_id JOIN camp ON camp.id=m.camp_id WHERE f.automation_id=?1 AND f.state='applied' AND camp.deletion_operation_id IS NULL ORDER BY f.scheduled_at_utc DESC LIMIT 50")?;
-    statement.query_map([id],|row|Ok(json!({"occurrenceId":row.get::<_,String>(0)?,"scheduledAtUtc":row.get::<_,String>(1)?,"missionId":row.get::<_,String>(2)?,"title":row.get::<_,String>(3)?,"createdAt":row.get::<_,String>(4)?})))?.collect::<rusqlite::Result<Vec<_>>>().map_err(Into::into)
+pub(crate) fn queued_missions(connection:&rusqlite::Connection,id:&str,after:Option<&str>)->Result<Value>{
+    if crate::conversation_tools::storage::absent(connection)?{return Ok(json!({"items":[],"next":null}))}
+    let boundary=after.map(|cursor|->Result<String>{Uuid::parse_str(cursor)?;connection.query_row("SELECT scheduled_at_utc FROM conversation_tool_automation_fire WHERE automation_id=?1 AND command_id=?2",params![id,cursor],|row|row.get(0)).map_err(Into::into)}).transpose()?;
+    let mut statement=connection.prepare("SELECT f.command_id,f.scheduled_at_utc,f.target_id,m.title,f.created_at,m.camp_id FROM conversation_tool_automation_fire f JOIN mission m ON m.id=f.target_id JOIN camp ON camp.id=m.camp_id WHERE f.automation_id=?1 AND f.state='applied' AND camp.deletion_operation_id IS NULL AND (?2 IS NULL OR f.scheduled_at_utc<?2 OR(f.scheduled_at_utc=?2 AND f.command_id<?3)) ORDER BY f.scheduled_at_utc DESC,f.command_id DESC LIMIT 51")?;
+    let mut rows=statement.query_map(params![id,boundary,after],|row|Ok(json!({"occurrenceId":row.get::<_,String>(0)?,"scheduledAtUtc":row.get::<_,String>(1)?,"missionId":row.get::<_,String>(2)?,"title":row.get::<_,String>(3)?,"createdAt":row.get::<_,String>(4)?,"threadId":row.get::<_,String>(5)?})))?.collect::<rusqlite::Result<Vec<_>>>()?;
+    let more=rows.len()>50;rows.truncate(50);let next=if more{rows.last().map(|row|row["occurrenceId"].clone()).unwrap_or(Value::Null)}else{Value::Null};
+    Ok(json!({"items":rows,"next":next}))
 }
 struct ClaimedOccurrence {
     run_id: String,

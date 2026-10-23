@@ -15,7 +15,8 @@ export interface ConversationRequestStatus { request_id: string; state: 'not_see
 export interface ConversationGrantPreview { previewId: string; previewDigest: string; expiresAt: string; grant: ConversationSourceGrant }
 export interface ConversationRunRevocation { commandId: string; agentRunId: string; executionEpoch: number; revoked: boolean }
 export interface ConversationAutomationOwner { automationId: string; revision: number; automationVersion: number; action: 'launch_session' | 'enqueue_task'; timezone: string; sourceRequestId: string }
-export interface ConversationQueuedMission { occurrenceId: string; scheduledAtUtc: string; missionId: string; title: string; createdAt: string }
+export interface ConversationQueuedMission { occurrenceId: string; scheduledAtUtc: string; missionId: string; threadId: string; title: string; createdAt: string }
+export interface ConversationAutomationDetails { conversationToolOwner?: ConversationAutomationOwner; queuedMissions?: { items: ConversationQueuedMission[]; next: string | null } }
 export interface ConversationToolsInputs {
   'conversationTools.policy.get': Record<string, never>
   'conversationTools.policy.set': { commandId: string; expectedRevision: number; globalFlags: ConversationToolFlags; feedbackGate: boolean | null; members: ConversationToolMemberPolicy[] }

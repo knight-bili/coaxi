@@ -42,7 +42,17 @@ pub fn call(database:&mut crate::db::Database,root:&Path,method:&str,mut value:V
     };
     validate_operation_output(method,&result)?;Ok(result)
 }
-pub fn queued_missions(database:&crate::db::Database,id:&str)->Result<Vec<Value>>{crate::automation::queued_missions(database.connection(),id)}
+pub fn automation_details(database:&crate::db::Database,id:&str,after:Option<&str>)->Result<Value>{
+    let Some(view)=crate::automation::AutomationService::default().get(database,id)? else{return Ok(Value::Null)};
+    let mut value=serde_json::to_value(view)?;
+    if uuid::Uuid::parse_str(id).is_ok(){
+        if let Some(owner)=automation_owner::get(database.connection(),id)?{
+            value["conversationToolOwner"]=owner;
+            value["queuedMissions"]=crate::automation::queued_missions(database.connection(),id,after)?;
+        }
+    }
+    Ok(value)
+}
 pub fn maintain(database:&mut crate::db::Database,restarted:bool)->Result<usize>{
     let tx=database.connection_mut().transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
     if restarted{question_delivery::recover_after_restart(&tx)?;}

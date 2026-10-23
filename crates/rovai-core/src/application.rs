@@ -1860,6 +1860,8 @@ struct SendUserAutomationThreadMessageParams {
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 struct AutomationGetParams {
     automation_id: String,
+    #[serde(default)]
+    queued_mission_after: Option<String>,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
@@ -7871,9 +7873,7 @@ impl Core {
             "automations.get" => {
                 let params: AutomationGetParams = serde_json::from_value(request.params.clone())?;
                 let database = self.database.lock().await;
-                Ok(serde_json::to_value(
-                    AutomationService::default().get(&database, &params.automation_id)?,
-                )?)
+                crate::conversation_tools::user_api::automation_details(&database,&params.automation_id,params.queued_mission_after.as_deref())
             }
             "automations.create" => {
                 let params: AutomationMutationParams<CreateAutomationCommand> =
