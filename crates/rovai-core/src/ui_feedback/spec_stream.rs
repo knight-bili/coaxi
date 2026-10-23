@@ -1,6 +1,8 @@
 //! 固定 @json-render/core 0.21 的补丁语义。节点编号保留 copy 的对象引用关系。
 //! 仅用于核对卡片字段；不执行脚本、表达式、动作或文件访问。
 use super::*;
+use anyhow::bail;
+use std::collections::BTreeMap;
 
 type Id=usize;
 #[derive(Clone)]enum Node{Undefined,Scalar(Value),Array(Vec<Id>),Object(BTreeMap<String,Id>)}
@@ -46,7 +48,7 @@ impl Graph{
     }
     fn value(&self,id:Id,active:&mut BTreeSet<Id>,count:&mut usize)->Result<Value>{
         *count+=1;ensure!(*count<=131_072&&active.len()<128&&active.insert(id),"feedback.card_cycle");
-        let value=match &self.nodes[id]{Node::Undefined=>Value::Null,Node::Scalar(value)=>value.clone(),Node::Array(rows)=>Value::Array(rows.iter().map(|id|self.value(*id,active,count)).collect::<Result<Vec<_>>>()?),Node::Object(rows)=>{let mut map=serde_json::Map::new();for(key,id)in rows{if !matches!(self.nodes[*id],Node::Undefined){map.insert(key.clone(),self.value(*id,active,count)?);}}Value::Object(map)}};
+        let value=match &self.nodes[id]{Node::Undefined=>Value::Null,Node::Scalar(value)=>value.clone(),Node::Array(rows)=>Value::Array(rows.iter().map(|id|self.value(*id,active,count)).collect::<Result<Vec<_>>>()?),Node::Object(rows)=>{let mut map:serde_json::Map<String,Value>=serde_json::Map::new();for(key,id)in rows{if !matches!(self.nodes[*id],Node::Undefined){map.insert(key.clone(),self.value(*id,active,count)?);}}Value::Object(map)}};
         active.remove(&id);Ok(value)
     }
     fn export(&self,id:Id)->Result<Value>{self.value(id,&mut BTreeSet::new(),&mut 0)}
