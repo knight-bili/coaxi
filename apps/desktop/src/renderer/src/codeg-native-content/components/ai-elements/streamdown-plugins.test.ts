@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 // Fixed Codeg aff1e6c; Apache-2.0, integration/licenses/codeg/LICENSE.
 import { act, renderHook, waitFor } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest"
