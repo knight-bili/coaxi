@@ -114,11 +114,11 @@ async function verifyUpdateArtifacts() {
   }
   const packagedUpdateInfo = parseYaml(await readFile(packagedUpdateInfoPath, 'utf8'))
   if (packagedUpdateInfo?.provider !== 'github'
-      || packagedUpdateInfo.owner !== 'murray17'
-      || packagedUpdateInfo.repo !== 'rovai-ai') {
+      || packagedUpdateInfo.owner !== 'knight-bili'
+      || packagedUpdateInfo.repo !== 'codeg-rovai-workbench') {
     throw new Error('packaged app-update.yml does not target the official GitHub release channel')
   }
-  report.push('Packaged updater channel: github/murray17/rovai-ai')
+  report.push('Packaged updater channel: github/knight-bili/codeg-rovai-workbench')
   if (unpackedOnly) return null
 
   if (!existsSync(installerBlockmap)) {
