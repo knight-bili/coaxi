@@ -53,8 +53,19 @@ fn python_distribution_version(root:&Path,package:&str)->Result<String>{
     anyhow::bail!("custom_runtime.python_version_missing")
 }
 /// 仅把显式版本探测拆成 argv；不交给 cmd、PowerShell 或 sh 解释。
+/// 双引号内仅按连续反斜杠后接引号的规则转义，普通 Windows 路径反斜杠原样保留。
 pub(crate) fn words(input:&str)->Result<Vec<String>>{
-    let mut result=Vec::new();let mut value=String::new();let mut quote=None;let mut active=false;let mut escaped=false;
-    for character in input.chars(){if escaped{value.push(character);escaped=false;active=true;continue}if character=='\\'&&quote==Some('"'){escaped=true;continue}if let Some(expected)=quote{if character==expected{quote=None}else{value.push(character)}active=true}else if character=='\''||character=='"'{quote=Some(character);active=true}else if character.is_whitespace(){if active{result.push(std::mem::take(&mut value));active=false}}else{value.push(character);active=true}}
-    ensure!(quote.is_none()&&!escaped,"custom_runtime.version_probe_quotes_invalid");if active{result.push(value)}ensure!(!result.is_empty()&&result.len()<=128,"custom_runtime.version_probe_invalid");Ok(result)
+    let mut result=Vec::new();let mut value=String::new();let mut quote=None;let mut active=false;let mut characters=input.chars().peekable();
+    while let Some(character)=characters.next(){
+        if character=='\\'&&quote==Some('"'){
+            let mut slashes=1;while characters.peek().copied()==Some('\\'){characters.next();slashes+=1}
+            if characters.peek().copied()==Some('"'){
+                characters.next();for _ in 0..slashes/2{value.push('\\')}
+                if slashes%2==1{value.push('"')}else{quote=None}
+            }else{for _ in 0..slashes{value.push('\\')}}
+            active=true;continue
+        }
+        if let Some(expected)=quote{if character==expected{quote=None}else{value.push(character)}active=true}else if character=='\''||character=='"'{quote=Some(character);active=true}else if character.is_whitespace(){if active{result.push(std::mem::take(&mut value));active=false}}else{value.push(character);active=true}
+    }
+    ensure!(quote.is_none(),"custom_runtime.version_probe_quotes_invalid");if active{result.push(value)}ensure!(!result.is_empty()&&result.len()<=128,"custom_runtime.version_probe_invalid");Ok(result)
 }
