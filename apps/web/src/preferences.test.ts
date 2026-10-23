@@ -131,7 +131,17 @@ it('persists local unread intent, preserves it across other tab writes, and publ
   await other.setThreadReadState(id, { manualUnread: false, readThroughGlobalSequence: 8 })
   const event = new Event('storage')
   Object.assign(event, { storageArea: storage, key: 'rovai.presentation:host-a:navigation' })
+  const changed = new Promise<NavigationPreferencesSnapshot>((resolve) => {
+    let unsubscribeChanged: () => void = () => {}
+    unsubscribeChanged = first.onChanged(snapshot => {
+      if (snapshot.threadReadStates[id]?.manualUnread !== false) return
+      unsubscribeChanged()
+      resolve(snapshot)
+    })
+  })
   events.dispatchEvent(event)
+  const delivered = await changed
+  expect(delivered.threadReadStates[id]).toEqual({ manualUnread: false, readThroughGlobalSequence: 12 })
   expect(seen.at(-1)?.threadReadStates[id]).toEqual({ manualUnread: false, readThroughGlobalSequence: 12 })
   await first.get()
   const count = seen.length
