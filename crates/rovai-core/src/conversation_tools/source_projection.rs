@@ -1,7 +1,7 @@
 //! 会话查询只投影可见文字和工具名称；原日志块、附件、思考及主机定位不会序列化。
 use super::*;
 use super::sources::{Source,Locator};
-use rusqlite::{Connection,params};
+use rusqlite::{Connection,OptionalExtension,params};
 use std::path::Path;
 
 pub(crate) struct Snapshot{
@@ -44,15 +44,23 @@ pub(crate) fn live(connection:&Connection,source:&Source,through:Option<i64>)->R
     let maximum:i64=connection.query_row(&format!("{prefix}SELECT COALESCE(MAX(m.sequence),0) FROM {from} WHERE {scope}"),[owner],|row|row.get(0))?;
     let through=through.unwrap_or(maximum);ensure!(through>=0&&through<=maximum,"conversation_tools.source_boundary_changed");
     let total:i64=connection.query_row(&format!("{prefix}SELECT COUNT(*) FROM {from} WHERE {scope} AND m.sequence<=?2"),params![owner,through],|row|row.get(0))?;
-    let mut query=connection.prepare(&format!("{prefix}SELECT m.author_type,substr(m.body,1,4096),length(m.body),m.created_at FROM {from} WHERE {scope} AND m.sequence<=?2 ORDER BY m.sequence DESC,m.id DESC LIMIT 200"))?;
-    let mut rows=query.query_map(params![owner,through],|row|Ok((row.get::<_,String>(0)?,row.get::<_,String>(1)?,row.get::<_,i64>(2)?,row.get::<_,String>(3)?)))?.collect::<rusqlite::Result<Vec<_>>>()?;
+    let run=if public{"m.source_agent_run_id"}else{"COALESCE(m.agent_run_id,m.source_agent_run_id)"};
+    let mut query=connection.prepare(&format!("{prefix}SELECT m.author_type,substr(m.body,1,4096),length(m.body),m.created_at,{run} FROM {from} WHERE {scope} AND m.sequence<=?2 ORDER BY m.sequence DESC,m.id DESC LIMIT 200"))?;
+    let mut rows=query.query_map(params![owner,through],|row|Ok((row.get::<_,String>(0)?,row.get::<_,String>(1)?,row.get::<_,i64>(2)?,row.get::<_,String>(3)?,row.get::<_,Option<String>>(4)?)))?.collect::<rusqlite::Result<Vec<_>>>()?;
     rows.reverse();let text_truncated=rows.iter().any(|row|row.2>4096);
     let updated=rows.last().map(|row|row.3.clone());
-    let items=rows.into_iter().map(|(role,text,_,_)|json!({"role":if role=="agent"{"assistant"}else if role=="user"{"user"}else{"system"},"text":limited(&text,4096),"tools":[]})).collect();
-    let mut metadata=json!({"title":limited(&title,4096),"stats":stats_unavailable(),"note":"本次来源投影包含已发布的消息文字；工具名称需使用对应原运行的可见证据核对。"});
+    let mut tool_truncated=false;let mut items=Vec::new();
+    for(role,text,_,at,run)in rows{let(tools,cut)=if role=="agent"{live_evidence::tools(connection,source,run.as_deref(),&at)?}else{(vec![],false)};tool_truncated|=cut;items.push(json!({"role":if role=="agent"{"assistant"}else if role=="user"{"user"}else{"system"},"text":limited(&text,4096),"tools":tools}));}
+    let run_scope=if public{"r.camp_id=m.camp_id AND c.kind='camp_member'"}else{"r.conversation_id=m.conversation_id"};
+    let mut run_query=connection.prepare(&format!("{prefix}SELECT r.id,MAX(m.created_at) FROM {from} JOIN agent_run r ON r.id={run} JOIN conversation c ON c.id=r.conversation_id WHERE {scope} AND m.sequence<=?2 AND m.author_type='agent' AND {run_scope} GROUP BY r.id ORDER BY MAX(m.sequence) DESC,r.id DESC LIMIT 513"))?;
+    let mut runs=run_query.query_map(params![owner,through],|row|Ok((row.get::<_,String>(0)?,row.get::<_,String>(1)?)))?.collect::<rusqlite::Result<Vec<_>>>()?;
+    let stats_cut=runs.len()>512;runs.truncate(512);
+    let mut metadata=json!({"title":limited(&title,4096),"stats":live_evidence::stats(connection,&runs)?,"note":"工具名称只来自已发布消息原运行在该消息时刻之前的可见工具证据，单条最多512份证据和128个名称；统计只汇总最近512个已发布运行中已结束且未越过消息边界的实际计数，覆盖率为部分或不可用。"});
+    if tool_truncated||stats_cut{metadata["note"]=json!("已达到工具证据或统计范围上限：名称和计数只覆盖最近的有界证据，不能视为完整历史统计。");}
+    if through<maximum{let first:Option<String>=connection.query_row(&format!("{prefix}SELECT substr(m.body,1,120) FROM {from} WHERE {scope} AND m.sequence<=?2 AND m.author_type='user' ORDER BY m.sequence,m.id LIMIT 1"),params![owner,through],|row|row.get(0)).optional()?;metadata["title"]=json!(first.map(|text|limited(&text,120)).unwrap_or_else(||"旧讨论".into()));}
     if chrono::DateTime::parse_from_rfc3339(&created).is_ok(){metadata["created_at"]=json!(created);}
     if let Some(updated)=updated.filter(|updated|chrono::DateTime::parse_from_rfc3339(updated).is_ok()){metadata["updated_at"]=json!(updated);}
-    finish(source,through,total,items,metadata,text_truncated)
+    finish(source,through,total,items,metadata,text_truncated||tool_truncated)
 }
 pub(crate) fn imported(root:&Path,source:&Source,through:Option<i64>)->Result<Snapshot>{
     let(manifest,transcript)=sources::import_transcript(root,source)?;
