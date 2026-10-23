@@ -25,6 +25,7 @@ pub(crate) fn begin(connection:&mut Connection,lease:&RunLease,name:&str,input:&
         ensure!(run==lease.run_id&&epoch==lease.epoch&&tool==name&&stored==input_digest,"conversation_tools.request_payload_changed");
         return status(&tx,lease,id)
     }
+    questions::close_unavailable(&tx)?;
     let blocked:bool=tx.query_row("SELECT EXISTS(SELECT 1 FROM conversation_tool_request WHERE agent_run_id=?1 AND execution_epoch=?2 AND tool_name=?3 AND (state IN ('prepared','outcome_unknown') OR (?3='ask_user_question' AND state IN ('awaiting_answer','answered'))))",params![lease.run_id,lease.epoch,name],|row|row.get(0))?;
     ensure!(!blocked,"conversation_tools.original_request_unresolved");
     let cipher=crate::member_environment::encrypt(&tx,&context(id,"input"),input)?;
