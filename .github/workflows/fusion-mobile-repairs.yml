@@ -1,0 +1,100 @@
+name: Fusion mobile repair checks
+
+on:
+  pull_request:
+    branches: [develop/V1.0.0]
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'apps/mobile-ios/**'
+      - 'apps/mobile-android/**'
+      - 'scripts/build-mobile-cards.mjs'
+      - 'mobile-cards.vite.config.ts'
+      - '.github/workflows/fusion-mobile-repairs.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fusion-mobile-repairs-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      GRADLE_USER_HOME: ${{ runner.temp }}/fusion-mobile-gradle
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: 24
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
+        with:
+          version: 11.20.0
+          run_install: false
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Install locked shared renderer dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Compile integrated Android and run unit tests
+        working-directory: apps/mobile-android
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon --console=plain :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
+      - name: Preserve Android test reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: fusion-android-repair-reports
+          path: |
+            apps/mobile-android/app/build/test-results/testDebugUnitTest
+            apps/mobile-android/app/build/reports/lint-results-debug.*
+          if-no-files-found: warn
+          retention-days: 1
+  ios:
+    if: github.event.pull_request.draft == false
+    runs-on: macos-26
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: 24
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
+        with:
+          version: 11.20.0
+          run_install: false
+      - name: Install locked shared renderer dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Build shared native card resources
+        run: node scripts/build-mobile-cards.mjs --ios
+      - name: Generate integrated iOS project
+        working-directory: apps/mobile-ios
+        run: |
+          brew list xcodegen >/dev/null 2>&1 || brew install xcodegen
+          xcodebuild -version
+          xcodegen generate
+      - name: Compile integrated iOS simulator app without signing
+        working-directory: apps/mobile-ios
+        run: |
+          set -o pipefail
+          xcodebuild -project CodegiOS.xcodeproj -scheme CodegiOS -configuration Debug -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' -derivedDataPath "$RUNNER_TEMP/fusion-ios-derived" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY= build 2>&1 | tee "$RUNNER_TEMP/fusion-ios-compile.log"
+          test -d "$RUNNER_TEMP/fusion-ios-derived/Build/Products/Debug-iphonesimulator/RovaiWorkbench.app"
+      - name: Preserve iOS compilation log
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: fusion-ios-repair-log
+          path: ${{ runner.temp }}/fusion-ios-compile.log
+          if-no-files-found: warn
+          retention-days: 1
