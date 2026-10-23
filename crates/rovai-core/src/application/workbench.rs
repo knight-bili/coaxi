@@ -696,7 +696,8 @@ fn verify_directory_link(root: &Path, link: &ManagedDirectoryLink) -> Result<boo
     ensure!(is_link(&metadata), "workbench.directory_link_changed");
     let actual = fs::read_link(&path)?;
     ensure!(
-        actual.is_absolute() && actual == Path::new(&link.target),
+        actual.is_absolute()
+            && git::persisted_workspace_path_matches_canonical(&actual, Path::new(&link.target)),
         "workbench.directory_link_changed"
     );
     match fs::canonicalize(&path) {
