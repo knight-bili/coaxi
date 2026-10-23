@@ -1994,7 +1994,7 @@ mod tests {
     #[cfg(windows)]
     use super::atomic_write_private_json;
     use super::{
-        Flags, camp_create_params, command_result_exit_code, event_belongs_to_run,
+        Flags, adapter_kind, camp_create_params, command_result_exit_code, event_belongs_to_run,
         launch_result_exit_code, member_create_params, member_runtime_set_params,
         parse_duration_seconds, terminal_exit_code, terminal_status, trace_export_params,
     };
