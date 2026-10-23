@@ -10,6 +10,7 @@ pub mod policy;
 pub(crate) mod scope;
 pub(crate) mod requests;
 pub(crate) mod sources;
+pub(crate) mod source_projection;
 pub mod storage;
 pub use model::*;
 pub const SERVER_NAME:&str="rovai-conversation-tools";
