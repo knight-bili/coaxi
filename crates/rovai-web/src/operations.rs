@@ -1166,7 +1166,21 @@ impl Operation {
             }
             Self::WorkbenchFilesMutate => select_fields(&value, &["applied", "digest"]),
             Self::WorkbenchGitRead => {
-                select_fields(&value, &["success", "exitCode", "output", "error"])
+                let mut projected = select_fields(
+                    &value,
+                    &["success", "exitCode", "output", "error", "filesError"],
+                );
+                if let Some(files) = value.get("files").and_then(serde_json::Value::as_array) {
+                    projected["files"] = serde_json::Value::Array(
+                        files
+                            .iter()
+                            .map(|file| {
+                                select_fields(file, &["path", "originalPath", "kind", "binary"])
+                            })
+                            .collect(),
+                    );
+                }
+                projected
             }
             Self::WorkbenchGitExecute => select_fields(
                 &value,
@@ -1715,6 +1729,27 @@ fn filter_actions(value: &mut serde_json::Value, task_updates: bool) {
 mod tests {
     use super::Operation;
     use serde_json::json;
+
+    #[test]
+    fn git_read_projection_retains_history_metadata_without_private_fields() {
+        let files = json!([{"path":"新 文件.txt","originalPath":"old name.txt",
+            "kind":"renamed","binary":false}]);
+        let mut internal_files = files.clone();
+        internal_files[0]["internalAbsolutePath"] = json!("/private/root/file");
+        assert_eq!(
+            Operation::WorkbenchGitRead.project(json!({"success":true,"exitCode":0,
+                "output":"patch","error":"","files":internal_files,"futureSecret":"private"})),
+            json!({"success":true,"exitCode":0,"output":"patch","error":"","files":files})
+        );
+        let unavailable = json!({"success":true,"exitCode":0,"output":"patch","error":"",
+            "filesError":"workbench.git_files_metadata_truncated"});
+        assert_eq!(
+            Operation::WorkbenchGitRead.project(unavailable.clone()),
+            unavailable
+        );
+        let legacy = json!({"success":true,"exitCode":0,"output":"patch","error":""});
+        assert_eq!(Operation::WorkbenchGitRead.project(legacy.clone()), legacy);
+    }
 
     #[test]
     fn worktree_command_projection_retains_owned_working_directory() {
