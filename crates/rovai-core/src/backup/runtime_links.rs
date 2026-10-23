@@ -59,7 +59,7 @@ pub(super) fn restore_mode(path:&Path,mode:Option<u32>)->Result<()>{
     Ok(())
 }
 pub(super) fn restore(staging:&Path,manifest:&Manifest)->Result<()>{
-    validate(manifest)?;let data=staging.join("data");let mut unresolved=Vec::new();let mut created=Vec::new();
+    validate(manifest)?;let data=staging.to_path_buf();let mut unresolved=Vec::new();let mut created=Vec::new();
     for link in &manifest.runtime_links{
         let Some(_)=relative_target(link)?else{unresolved.push(serde_json::json!({"link":link,"reason":"external_or_absolute_target_requires_environment_repair"}));continue};
         let destination=data.join(&link.path);ensure!(!destination.exists()&&fs::symlink_metadata(&destination).is_err(),"backup.runtime_link_destination_exists");

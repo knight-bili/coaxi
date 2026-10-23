@@ -22,6 +22,6 @@ pub(crate) async fn inspect(root:&Path,reference:&CustomRuntimeRefV1,platform:&s
     tokio::task::spawn_blocking(move||{
         let count=match unresolved(&root,&prefix){Ok(count)=>count,Err(_)=>return json!({"status":"unreadable","unresolvedLinkCount":null,"qualification":"not_verified"})};
         let current=artifacts::tree_digest(&payload,Path::new(lock["executable"].as_str().unwrap_or_default())).is_ok_and(|observed|lock["artifactDigest"]==observed);
-        json!({"status":if current&&count==0{"artifacts_current"}else{"needs_environment"},"unresolvedLinkCount":count,"qualification":"not_verified"})
+        json!({"status":if current{"artifacts_current"}else{"needs_environment"},"unresolvedLinkCount":if current{0}else{count},"qualification":"not_verified"})
     }).await.map_err(Into::into)
 }
