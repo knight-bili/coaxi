@@ -12,11 +12,15 @@ pub struct Binding{
 }
 impl Binding{
     pub fn validate(&self)->Result<()>{
+        self.validate_retained(false)
+    }
+    fn validate_retained(&self,receipt:bool)->Result<()>{
         ensure!(self.schema_version==1&&self.execution_epoch>=0&&self.native_binding_generation>=0,"conversation_tools.binding_changed");
         for id in [&self.core_instance_id,&self.bridge_instance_id,&self.agent_run_id,&self.native_binding_id]{uuid::Uuid::parse_str(id)?;}
         for digest in [&self.frozen_digest,&self.catalog_digest]{ensure!(digest.len()==71&&digest.starts_with("sha256:")&&digest[7..].bytes().all(|byte|byte.is_ascii_hexdigit()&& !byte.is_ascii_uppercase()),"conversation_tools.binding_changed");}
         let expires=chrono::DateTime::parse_from_rfc3339(&self.expires_at)?.with_timezone(&chrono::Utc);
-        ensure!(expires>chrono::Utc::now()&&expires<=chrono::Utc::now()+chrono::Duration::seconds(7201),"conversation_tools.binding_expired");Ok(())
+        let now=chrono::Utc::now();
+        ensure!(expires<=now+chrono::Duration::seconds(7201)&&if receipt{now<=expires+chrono::Duration::seconds(30)}else{expires>now},"conversation_tools.binding_expired");Ok(())
     }
 }
 #[derive(Clone)]struct Entry{binding:Binding,token:String,revoked:bool}
@@ -41,7 +45,7 @@ impl Registry{
         ensure!(input.schema_version==1&&input.authorization_token.len()==64,"conversation_tools.binding_changed");
         let entry=self.entries.lock().map_err(|_|anyhow::anyhow!("conversation_tools.binding_lock"))?.get(&input.bridge_instance_id).cloned().context("conversation_tools.binding_changed")?;
         let diff=entry.token.as_bytes().iter().zip(input.authorization_token.as_bytes()).fold(0u8,|diff,(a,b)|diff|(a^b));
-        ensure!(diff==0&&entry.token.len()==input.authorization_token.len()&&(!entry.revoked||receipt)&&entry.binding.core_instance_id==core_instance&&digest(&serde_json::to_value(&entry.binding)?)?==input.binding_digest,"conversation_tools.binding_changed");entry.binding.validate()?;
+        ensure!(diff==0&&entry.token.len()==input.authorization_token.len()&&(!entry.revoked||receipt)&&entry.binding.core_instance_id==core_instance&&digest(&serde_json::to_value(&entry.binding)?)?==input.binding_digest,"conversation_tools.binding_changed");entry.binding.validate_retained(receipt)?;
         let lease=if receipt{scope::retained_run(connection,&entry.binding.agent_run_id,entry.binding.execution_epoch)?}else{scope::require_run(connection,&entry.binding.agent_run_id,entry.binding.execution_epoch)?};
         ensure!(digest(&serde_json::to_value(&lease.frozen)?)?==entry.binding.frozen_digest,"conversation_tools.binding_changed");
         if !receipt{native_current(connection,&entry.binding)?;}
