@@ -41,11 +41,14 @@ final class RovaiWorkspaceModel {
     @ObservationIgnored private var terminals: [String: RovaiTerminalController] = [:]
     @ObservationIgnored private var events: Task<Void, Never>?
     @ObservationIgnored private var active = true
-    @ObservationIgnored private var refreshing = false
+    @ObservationIgnored private var refreshEpoch: UInt64 = 0
+    @ObservationIgnored private var refreshOwner: UUID?
+    @ObservationIgnored private var refreshOwnerEpoch: UInt64?
+    @ObservationIgnored private var refreshAgainEpoch: UInt64?
     @ObservationIgnored private var writing = false
     func bind(_ profile: ServerProfile?, store: ServerStore) async {
         terminals.values.forEach { $0.retire() }; terminals.removeAll()
-        generation &+= 1; events?.cancel(); client = nil; self.profile = profile; connected = false; thread = nil; threadId = nil; navigation = .object([:]); members = []; missions = []; boards = []; boardSummaries = []; issue = nil; pending = nil; lastResult = nil; lastInputOwner = nil; lastInputBody = nil; lastOperation = nil; lastUploadResult = nil; publicSources = []; publicSourcesReady = false
+        generation &+= 1; refreshEpoch &+= 1; refreshAgainEpoch = nil; events?.cancel(); client = nil; self.profile = profile; connected = false; thread = nil; threadId = nil; navigation = .object([:]); members = []; missions = []; boards = []; boardSummaries = []; issue = nil; pending = nil; lastResult = nil; lastInputOwner = nil; lastInputBody = nil; lastOperation = nil; lastUploadResult = nil; publicSources = []; publicSourcesReady = false
         guard let profile, let token = store.token(for: profile), let baseURL = profile.baseURL else { return }
         account = "pending:" + RovaiSecureSession.account(baseURL: baseURL, administratorToken: token)
         if let data = RovaiSecureSession.load(profile: profile.id, account: account) { pending = try? JSONDecoder().decode(JSONValue.self, from: data) }
@@ -59,6 +62,7 @@ final class RovaiWorkspaceModel {
         do { _ = try await client.connect(authenticate: true); guard lifetime == generation else { return }; connected = true; await refresh(); listen() } catch { if lifetime == generation { failure(error) } }
     }
     func foreground(_ value: Bool) {
+        if active != value { refreshEpoch &+= 1; refreshAgainEpoch = nil }
         active = value; if !value { eventGeneration &+= 1 }; events?.cancel(); if value && connected { Task { await refresh(); listen() } }
     }
     private func listen() {
@@ -106,18 +110,39 @@ final class RovaiWorkspaceModel {
         }
     }
     func refresh() async {
-        guard let client, !refreshing else { return }; refreshing = true; let lifetime = generation; let selected = threadId
-        defer { refreshing = false }
-        do {
-            async let nav = client.request(.navigationSnapshot)
-            async let profiles = client.request(.membersList)
-            async let missionList = client.request(.missionsList)
-            async let canvasList = client.request(.canvasBoardsList)
-            let (navValue, profileValue, missionValue, canvasValue) = try await (nav, profiles, missionList, canvasList)
-            let opened = try await selected.asyncMap { try await client.request(.threadsOpen, params: .object(["threadId": .string($0), "traceId": .string(UUID().uuidString.lowercased())])) }
-            guard lifetime == generation else { return }
-            navigation = navValue; members = profileValue.rvArray; missions = missionValue.rvArray; boards = canvasValue["boards"]?.rvArray ?? []; boardSummaries = canvasValue["summaries"]?.rvArray ?? []; if selected == threadId { thread = opened }; issue = nil
-        } catch is CancellationError {} catch { if lifetime == generation { failure(error) } }
+        guard active, let client else { return }
+        let lifetime = generation, refreshLifetime = refreshEpoch
+        if refreshOwnerEpoch == refreshLifetime { refreshAgainEpoch = refreshLifetime; return }
+        let owner = UUID(); refreshOwner = owner; refreshOwnerEpoch = refreshLifetime
+        defer {
+            if refreshOwner == owner {
+                refreshOwner = nil; refreshOwnerEpoch = nil
+                if refreshAgainEpoch == refreshLifetime { refreshAgainEpoch = nil }
+            }
+        }
+        while lifetime == generation && refreshLifetime == refreshEpoch && active && !Task.isCancelled {
+            if refreshAgainEpoch == refreshLifetime { refreshAgainEpoch = nil }
+            let selected = threadId
+            do {
+                async let nav = client.request(.navigationSnapshot)
+                async let profiles = client.request(.membersList)
+                async let missionList = client.request(.missionsList)
+                async let canvasList = client.request(.canvasBoardsList)
+                let (navValue, profileValue, missionValue, canvasValue) = try await (nav, profiles, missionList, canvasList)
+                let opened = try await selected.asyncMap { try await client.request(.threadsOpen, params: .object(["threadId": .string($0), "traceId": .string(UUID().uuidString.lowercased())])) }
+                guard lifetime == generation, refreshLifetime == refreshEpoch, active, !Task.isCancelled else { return }
+                navigation = navValue; members = profileValue.rvArray; missions = missionValue.rvArray; boards = canvasValue["boards"]?.rvArray ?? []; boardSummaries = canvasValue["summaries"]?.rvArray ?? []; if selected == threadId { thread = opened }; issue = nil
+            } catch is CancellationError {
+                return
+            } catch {
+                guard lifetime == generation, refreshLifetime == refreshEpoch, active, !Task.isCancelled else { return }
+                failure(error)
+                if !connected { return }
+            }
+            if refreshOwner == owner, refreshAgainEpoch == refreshLifetime { refreshAgainEpoch = nil; continue }
+            if refreshOwner == owner { refreshOwner = nil; refreshOwnerEpoch = nil }
+            return
+        }
     }
     func open(_ threadId: String?) async { self.threadId = threadId; thread = nil; publicSources = []; publicSourcesReady = false; if let threadId { do { guard let profile else { return }; publicSources = try readPublicSources(threadId, profile: profile, account: account); publicSourcesReady = true; await refresh() } catch { issue = error.localizedDescription } } }
     private func sourceAccount(_ threadId: String, account: String) -> String { "body:" + account + ":" + SHA256.hash(data: Data(("public-attachments:" + threadId).utf8)).map { String(format: "%02x", $0) }.joined() }
