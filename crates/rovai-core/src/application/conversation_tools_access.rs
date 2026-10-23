@@ -27,7 +27,7 @@ impl Core{
         let path=directory.join("process.json");crate::platform::private_storage::atomic_write_private_json(&path,&config)?;
         let definition=crate::mcp::McpServerDefinition::Stdio{command:std::env::current_exe()?.to_string_lossy().into_owned(),args:vec!["--conversation-tools-mcp".into(),"--config".into(),path.to_string_lossy().into_owned()],cwd:Some(execution.workspace.execution_root.clone()),env:Default::default()};
         crate::platform::private_storage::atomic_write_private_json(&directory.join("delivery-evidence.json"),&json!({"schemaVersion":1,"bindingDigest":config.binding_digest,"catalogDigest":frozen.catalog_digest,"configurationDigest":conversation_tools::digest(&serde_json::to_value(&definition)?)?,"adapterKind":execution.runtime.adapter_kind.as_str(),"state":"source_prepared_unverified","realToolCallEvidenceDigest":null,"recordedAt":Utc::now().to_rfc3339()}))?;
-        let weak=Arc::downgrade(self);
+        let weak=Arc::downgrade(self);let cache_key=key.clone();
         tokio::spawn(async move{
             let mut tasks=tokio::task::JoinSet::new();let capacity=Arc::new(tokio::sync::Semaphore::new(16));let mut revoked=None;
             loop{
@@ -41,6 +41,7 @@ impl Core{
                 tasks.spawn(async move{let _permit=permit;let _=serve_conversation_connection(core,stream).await;});
             }
             tasks.abort_all();drop(listener);
+            if let Some(core)=weak.upgrade(){core.conversation_tools_transports.lock().await.remove(&cache_key);let _=core.conversation_tools.remove(&bridge);}
             #[cfg(unix)]if let Some(parent)=Path::new(&endpoint).parent(){let _=std::fs::remove_dir(parent);}
         });
         let result=(definition,frozen_digest);cache.insert(key,result.clone());Ok(result)
