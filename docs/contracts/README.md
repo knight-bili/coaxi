@@ -17,6 +17,10 @@ Architecture 解释组件如何组成，Version 概览记录交付范围；它�
 
 一期新增Runtime合同见[Gemini Runtime v1](gemini-runtime-v1.md)、[Hermes Runtime v1](hermes-runtime-v1.md)与[OpenClaw Runtime v1](openclaw-runtime-v1.md)；实现和真实资格按融合执行证据核实。
 
+## 可选会话模型工具
+
+- [会话模型工具 v1（当前）](conversation-model-tools-v1.md)：四工具、14项User API、明确资料授权、原问题回答通道和原调度器；已批准r1，源码编写不代表可用或验证通过。
+
 ## 用户主动继续
 
 - [AgentRun Continuation v3（当前）](agent-run-continuation-v3.md)：续做新请求只入内部队列，不新增消息或公开序号；既有记录、原输入及锚点保留。
@@ -119,7 +123,8 @@ Architecture 解释组件如何组成，Version 概览记录交付范围；它�
 | [Camp Open Projection v10（历史）](camp-open-projection-v10.md) | main Snapshot 34/Open 6；Open 不读取 event_log，移除 timeline/coverage.timeline，保留 high-water 与业务卡片 |
 | [Camp Open Projection v10（渠道分支历史）](camp-open-projection-channel-v10.md) | v9 保留；Camp/Navigation 增加可选 channelSource，原始 title 不变；合并时保留原文以区分同号合同 |
 | [Camp Open Projection v9（历史）](camp-open-projection-v9.md) | v8 保留；Snapshot 34/Open 5 增加可选 member.fast，仅查询安全缓存 |
-| [Runtime Launch and Verification v60（当前）](runtime-launch-and-verification-v60.md) | 同类 CLI 优先原 ID 恢复、Adapter 证据限定一次降级、历史上下文不阻断新输入 |
+| [Runtime Launch and Verification v61（当前）](runtime-launch-and-verification-v61.md) | 继承v60；可选会话工具的冻结目录、原回答通道与安全恢复，未选择保持原行为 |
+| [Runtime Launch and Verification v60（历史）](runtime-launch-and-verification-v60.md) | 同类 CLI 优先原 ID 恢复、Adapter 证据限定一次降级、历史上下文不阻断新输入 |
 | [Runtime Launch and Verification v59（历史）](runtime-launch-and-verification-v59.md) | 启动时读取队员环境、Warm 保持、快照退役与单任务失败隔离 |
 | [Runtime Launch and Verification v58（历史）](runtime-launch-and-verification-v58.md) | 配置透传、队员会话创建时固定、显式重置及 Camp/队员/会话进程归属 |
 | [Runtime Launch and Verification v57（历史）](runtime-launch-and-verification-v57.md) | 队员私有 JSON 环境、冻结计划和兼容复用；Agents 旧环境停用与人工迁移 |

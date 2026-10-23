@@ -61,3 +61,8 @@ last_updated: 2026-10-12
 | [Runtime File Change Observation](runtime-file-change-observation.md) | Runtime 文件操作、Command Diff、每 AgentRun/epoch 的版本化文件变化归约、exact managed-output exclusion、Managed Blob、迟到事实重算、恢复与授权读取边界；不扫描工作区或依赖 Git |
 | [消息选文引用](message-quotes.md) | 正文选择、owner 隔离与 Context 投影 |
 <!-- architecture-index:end -->
+
+
+## 可选会话模型工具
+
+[架构](conversation-model-tools.md)连接原User输入、问题卡、独立stdio和唯一Core Mission/自动化权威；字段及版本由[当前合同](../contracts/conversation-model-tools-v1.md)拥有，工程资格按后续实际证据确认。

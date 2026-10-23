@@ -341,7 +341,7 @@ last_updated: 2026-10-18
 - 同一 Run 的既有 Bootstrap 原字节恢复；新 Run 的公开执行使用当前模板，Single Chat 专用模板保持。旧历史材料不成为新输入的恢复门槛。`agent_v1`／`agent_v2` 分别验证旧／新投影，Skill 在原路径同步。精确规则见 [User Naming v1](../contracts/user-naming-v1.md)。
 
 - 同一 Camp、队员和当前 Conversation，未重置且 AdapterKind 相同，优先把当前绑定的原生 ID 交给 Adapter 恢复。历史配置、安装记录、版本、指纹、兼容 key 或上下文摘要不否决资格；切换 CLI 类型不传递旧 ID。当前权限、工具、工作目录、进程归属与执行防重继续检查。恢复目标与业务输入接收是不同权威。
-- Adapter 在恢复调用处提供结论；只有能力不支持、针对恢复请求的结构化拒绝或已有精确目标核验才允许一次新建。认证、网络、锁、初始化、模型、MCP、取消和超时等不能从报错文本推断旧历史失效。新建成功并绑定后才切换目标和提示，失败保留旧目标；完整行为见 [Runtime Launch v60](../contracts/runtime-launch-and-verification-v60.md)。
+- Adapter 在恢复调用处提供结论；只有能力不支持、针对恢复请求的结构化拒绝或已有精确目标核验才允许一次新建。认证、网络、锁、初始化、模型、MCP、取消和超时等不能从报错文本推断旧历史失效。新建成功并绑定后才切换目标和提示，失败保留旧目标；完整行为见 [Runtime Launch v61](../contracts/runtime-launch-and-verification-v61.md)。
 - Bootstrap、章程和上下文格式变化不触发 Session rotation。新 Run 按现有装配方式生成当前 Bootstrap；旧原生历史允许保留旧说明。`SESSION_CHARTER → MEMBER_IDENTITY → ROVAI_PLATFORM_SKILLS → MEMORY_ENTRYPOINT?` 的结构及公开/Single Chat 输入区别不变。
 - 同一 Run/Binding/generation 的 Bootstrap 与 Manifest bytes 保持冻结。历史 Bootstrap 不作为下一个 Run 的必读材料，损坏或缺失不挡续聊；现有 Evidence 表保留每次准备结果和旧 Blob 引用。是否投递仍由 Adapter delivery mode、Charter digest、redelivery requirement 和 accepted Input 门禁决定；不重复业务输入，也不伪造已接受事实。
 - Session Charter 只拥有稳定产品合同、工具/Skill 进入方法与协作纪律，不复制 operation schema；文案及格式版本不构成原生历史有效性的证明。

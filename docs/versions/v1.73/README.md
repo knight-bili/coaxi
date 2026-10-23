@@ -86,3 +86,9 @@ User 查询与设置的后端及 Native/Web 接线见[查询设置分项记录](
 原生富内容接续：固定来源纯适配层及原计划清单、提案/模式、目标卡片已接产品只读页，182项定向与17组受控运输Renderer检查通过；原图片混合正文、未配对多图及统计保持完整。原NativeDialog/adapter和本批组件参考已运行，但内容路由及部分宿主原语有明确边界，完整原富内容/App与真实Core链路仍待。详见[分项结果](../../../integration/execution/i04-native-rich-content-result.json)及[来源清单](../../../integration/inventory/native-content-ui-port.json)。
 
 原生工具原语接续：原工具外壳、命令输出、JSON/代码展示与完整折叠原语已接产品只读页，修复JSON路径串状态及代码中间内容旧缓存；40项定向、24组实际产品窗口检查通过。这里只资格原语和受控运输UI，完整专用卡片、Core链路及许可文件缺口仍待，I04不提前收口。见[本批记录](../../../integration/execution/i04-native-tool-primitives-result.json)。
+
+
+## 会话模型工具补齐r1：源码编写
+
+客户已明确确认[具体r1](model-context-change-conversation-model-tools.md)。当前生产源码连接四模型工具、14项User接口、原问题卡、四端总开关/资料选择/计划时区与使命记录，以及明确配置迁移；仍有运行接线和兼容源码待补，未Review、编译、测试或宣称模型可调用。
+当前权威见[架构](../../architecture/conversation-model-tools.md)、[合同](../../contracts/conversation-model-tools-v1.md)、[Runtime Launch v61](../../contracts/runtime-launch-and-verification-v61.md)与[开发入口](../../development/conversation-model-tools.md)。现存Runtime60保留；将批准增量登记为下一版61，不覆盖历史合同，不修改批准提案字节。
