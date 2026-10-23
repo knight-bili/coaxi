@@ -147,6 +147,37 @@ try {
     replayCreatedCommit: false
   })
 
+  stage = 'issue_74_literal_git_path'
+  const literalFile = process.platform === 'win32' ? '-literal [group] entry.txt' : '-literal [group]: entry.txt'
+  const literalContent = '按 Git 路径参数原样暂存和提交，不拆分空格、方括号或冒号。\n'
+  await writeFile(path.join(repository, literalFile), literalContent)
+  const stageRequest = { scope, action: 'stage', paths: [literalFile], commandId: randomUUID() }
+  const stagePreview = await call('workbench.git.preview', stageRequest)
+  const staged = await call('workbench.git.execute', {
+    ...stageRequest, expectedRevision: stagePreview.revision, confirmed: true
+  })
+  assert.equal(staged.success, true, staged.error)
+  const status = await call('workbench.git.read', { scope, action: 'status' })
+  assert.equal(status.success, true, status.error)
+  assert(status.output.includes(literalFile), '暂存状态应保留完整字面路径')
+  const commitRequest = { scope, action: 'commit', message: '提交含特殊字符的字面路径', commandId: randomUUID() }
+  const commitPreview = await call('workbench.git.preview', commitRequest)
+  const committed = await call('workbench.git.execute', {
+    ...commitRequest, expectedRevision: commitPreview.revision, confirmed: true
+  })
+  assert.equal(committed.success, true, committed.error)
+  const historicalFile = await call('workbench.git.read', {
+    scope, action: 'file_at', target: 'HEAD', paths: [literalFile]
+  })
+  assert.equal(historicalFile.success, true, historicalFile.error)
+  assert.equal(historicalFile.output, literalContent)
+  record('issue_74_git_preserves_literal_leading_dash_spaces_brackets_and_platform_colon', {
+    path: literalFile,
+    colon: process.platform === 'win32' ? 'skipped_win32_filename_not_supported' : 'tested',
+    staged: true,
+    committedContentMatched: true
+  })
+
   finalResult = {
     status: 'passed',
     scope: 'real_host_core_isolated_git_fixture_no_model_execution',
