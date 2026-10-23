@@ -189,6 +189,7 @@ try {
   })
   assert.equal(worktreeCreated.success, true, worktreeCreated.error)
   const worktreePath = worktreeCreated.workingDirectory
+  await writeFile(path.join(evidence, 'managed-worktree-result.json'), JSON.stringify(worktreeCreated, null, 2))
   assert(path.isAbsolute(worktreePath), 'Core 创建的受管工作树应返回绝对路径')
   const worktreeInspection = await call('workspaces.inspect', { path: worktreePath })
   const worktreeSelection = await call('workspaces.validate', { path: worktreePath })
@@ -458,7 +459,7 @@ try {
     checks
   }
 } catch (error) {
-  const errorText = error instanceof Error ? String(error) : JSON.stringify(error)
+  const errorText = error instanceof Error ? (error.stack ?? String(error)) : JSON.stringify(error)
   await writeFile(path.join(evidence, 'failure.json'), JSON.stringify({ stage, error: errorText, checks }, null, 2))
   console.log(JSON.stringify({ status: 'failed', stage, evidence, error: errorText.slice(0, 1200) }))
   process.exitCode = 1
