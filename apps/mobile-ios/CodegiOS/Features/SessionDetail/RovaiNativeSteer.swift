@@ -8,7 +8,10 @@ import SwiftUI
 }
 struct RovaiMemberNativeSteerSwitch: View {
     let model: RovaiWorkspaceModel;let agentId: String
-    @State private var policy: JSONValue?, original: JSONValue?, issue: String?, generation: UInt64?
+    @State private var policy: JSONValue?
+    @State private var original: JSONValue?
+    @State private var issue: String?
+    @State private var generation: UInt64?
     @State private var busy = false
     private var owner: String {"native-steer-policy:\(agentId)"}
     private var enabled: Bool {(policy?["members"]?.rvArray ?? []).contains {$0.text("agentId") == agentId && $0["enabled"]?.rvBool == true}}
@@ -63,9 +66,17 @@ struct RovaiNativeSteer: View {
     let model: RovaiWorkspaceModel;let scope: JSONValue;let text: String
     var agentId: String? = nil;var materials: [JSONValue] = [];var composerScope: JSONValue = .null
     @Environment(\.dismiss) private var dismiss
-    @State private var targets: [JSONValue] = [], records: [JSONValue] = [], run = "", checked: Set<String> = []
-    @State private var packet: JSONValue?, receipt: JSONValue?, next: String?, issue: String?, generation: UInt64?
-    @State private var busy = false, ready = false
+    @State private var targets: [JSONValue] = []
+    @State private var records: [JSONValue] = []
+    @State private var run = ""
+    @State private var checked: Set<String> = []
+    @State private var packet: JSONValue?
+    @State private var receipt: JSONValue?
+    @State private var next: String?
+    @State private var issue: String?
+    @State private var generation: UInt64?
+    @State private var busy = false
+    @State private var ready = false
     @State private var normalOpen = false
     private var owner: String {"native-steer:\(scope.prettyString):\(agentId ?? "")"}
     private var disabled: Bool {busy || !ready || model.busy || model.pending != nil || generation != model.connectionGeneration}

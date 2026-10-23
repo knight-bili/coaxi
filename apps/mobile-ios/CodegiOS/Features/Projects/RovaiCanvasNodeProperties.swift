@@ -9,11 +9,20 @@ struct RovaiCanvasNodeProperties: View {
     let node: JSONValue
     let graph: JSONValue
     @Environment(\.dismiss) private var dismiss
-    @State private var title = "", content = "", color = ""
-    @State private var columns = 0, rows = 0, revision = 0
-    @State private var collapsed = false, ready = false, busy = false, removal = false
+    @State private var title = ""
+    @State private var content = ""
+    @State private var color = ""
+    @State private var columns = 0
+    @State private var rows = 0
+    @State private var revision = 0
+    @State private var collapsed = false
+    @State private var ready = false
+    @State private var busy = false
+    @State private var removal = false
     @State private var commandId = UUID().uuidString.lowercased()
-    @State private var generation: UInt64?, issue: String?, latest: JSONValue?
+    @State private var generation: UInt64?
+    @State private var issue: String?
+    @State private var latest: JSONValue?
     private var data: JSONValue {node["data"] ?? .null}
     private var kind: String {data.text("kind")}
     private var owner: String {"canvas-node:\(boardId):\(node.text("id"))"}

@@ -4,9 +4,11 @@ struct RovaiHostLoggingSettings: View {
     let model: RovaiWorkspaceModel
     @Environment(\.dismiss) private var dismiss
     @State private var identity = ""
-    @State private var saved: JSONValue?, issue: String?
+    @State private var saved: JSONValue?
+    @State private var issue: String?
     @State private var draft: JSONValue = .object(["level": .string("info"), "targets": .array([])])
-    @State private var busy = false, leaving = false
+    @State private var busy = false
+    @State private var leaving = false
     private let levels = [("off", "关闭"), ("error", "错误"), ("warn", "警告"), ("info", "信息"), ("debug", "调试"), ("trace", "追踪")]
     private var dirty: Bool { saved != nil && draft != saved?["settings"] }
     private var writable: Bool { saved?["writable"] != .bool(false) }

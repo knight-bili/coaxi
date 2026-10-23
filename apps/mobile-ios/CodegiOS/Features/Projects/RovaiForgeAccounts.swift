@@ -10,9 +10,14 @@ private struct RovaiForgeAccountSettings: View {
     let model: RovaiWorkspaceModel
     @Environment(\.dismiss) private var dismiss
     @State private var accounts: [JSONValue] = []
-    @State private var selected: JSONValue?, removing: JSONValue?
-    @State private var creating = false, busy = false
-    @State private var id = "", provider = "github", base = "https://github.com", token = ""
+    @State private var selected: JSONValue?
+    @State private var removing: JSONValue?
+    @State private var creating = false
+    @State private var busy = false
+    @State private var id = ""
+    @State private var provider = "github"
+    @State private var base = "https://github.com"
+    @State private var token = ""
     @State private var issue: String?
     var body: some View {
         NavigationStack {Form {

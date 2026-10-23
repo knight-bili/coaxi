@@ -5,11 +5,16 @@ struct RovaiWebdavRetention: View {
     let revision: String
     let disabled: Bool
     let onChanged: () -> Void
-    @State private var backups = "10", configurations = "20"
-    @State private var busy = false, ready = false
-    @State private var saved: JSONValue?, confirm: JSONValue?
+    @State private var backups = "10"
+    @State private var configurations = "20"
+    @State private var busy = false
+    @State private var ready = false
+    @State private var saved: JSONValue?
+    @State private var confirm: JSONValue?
     @State private var cleanup: [JSONValue] = []
-    @State private var cursor: String?, issue: String?, message: String?
+    @State private var cursor: String?
+    @State private var issue: String?
+    @State private var message: String?
     private let owner = "webdav-retention-plan"
     var body: some View {
         Section("远端副本保留") {

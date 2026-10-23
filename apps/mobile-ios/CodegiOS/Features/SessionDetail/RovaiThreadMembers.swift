@@ -5,7 +5,10 @@ struct RovaiThreadMembers: View {
     let model: RovaiWorkspaceModel
     let threadId: String
     @Environment(\.dismiss) private var dismiss
-    @State private var snapshot: JSONValue?, confirmation: JSONValue?, issue: String?, submitted: String?
+    @State private var snapshot: JSONValue?
+    @State private var confirmation: JSONValue?
+    @State private var issue: String?
+    @State private var submitted: String?
     @State private var busy = false
     @State private var generation: UInt64?
     @State private var search = ""

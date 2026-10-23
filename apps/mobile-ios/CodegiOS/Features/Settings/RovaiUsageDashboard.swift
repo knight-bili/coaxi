@@ -10,10 +10,20 @@ struct RovaiUsageDashboard: View {
     let model: RovaiWorkspaceModel
     let history: Bool
     @Environment(\.scenePhase) private var scenePhase
-    @State private var range = "30d", bucket = "day", project = "", runtime = "", selectedModel = ""
-    @State private var from = Date(), to = Date(), now = Date()
-    @State private var snapshot: JSONValue?, loadedQuery: JSONValue?, issue: String?
-    @State private var busy = false, exporting = false, refresh = 0
+    @State private var range = "30d"
+    @State private var bucket = "day"
+    @State private var project = ""
+    @State private var runtime = ""
+    @State private var selectedModel = ""
+    @State private var from = Date()
+    @State private var to = Date()
+    @State private var now = Date()
+    @State private var snapshot: JSONValue?
+    @State private var loadedQuery: JSONValue?
+    @State private var issue: String?
+    @State private var busy = false
+    @State private var exporting = false
+    @State private var refresh = 0
     @State private var exportDocument: ActivityDocument?
     private var calendar: Calendar {var value = Calendar(identifier: .gregorian);value.timeZone = .current;return value}
     private var query: JSONValue {

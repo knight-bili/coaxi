@@ -3,8 +3,16 @@ import SwiftUI
 /// 沿原模型设置的默认/指定切换；保存具体定义引用，原请求只读核对。
 @MainActor struct RovaiMemberCustomRuntime: View {
     let model: RovaiWorkspaceModel, member: JSONValue
-    @State private var rows: [JSONValue] = [], next: String?, selected = "", modelId = "", options = "{}"
-    @State private var explicit = false, busy = false, issue: String?, generation: UInt64?, original: JSONValue?
+    @State private var rows: [JSONValue] = []
+    @State private var next: String?
+    @State private var selected = ""
+    @State private var modelId = ""
+    @State private var options = "{}"
+    @State private var explicit = false
+    @State private var busy = false
+    @State private var issue: String?
+    @State private var generation: UInt64?
+    @State private var original: JSONValue?
     private var id: String {member.text("agentId")}
     private var owner: String {"custom-member-runtime:" + id}
     private var saved: JSONValue {member["runtimeConfiguration"]?["customRuntimeRef"] ?? .object([:])}

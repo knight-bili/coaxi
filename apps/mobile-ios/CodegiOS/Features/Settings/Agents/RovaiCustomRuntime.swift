@@ -74,9 +74,18 @@ private func customMasked(_ value: JSONValue) throws -> JSONValue {
 /// 原 AgentsSettingsView 的原生列表与设置详情，连接端始终使用 Core 为真源。
 @MainActor struct RovaiCustomRuntimeSettings: View {
     let model: RovaiWorkspaceModel
-    @State private var rows: [JSONValue] = [], next: String?, search = "", busy = false, issue: String?
-    @State private var original: JSONValue?, editing: JSONValue?, removing: JSONValue?, inspection: JSONValue?, receipt: JSONValue?
-    @State private var registry = false, generation: UInt64?
+    @State private var rows: [JSONValue] = []
+    @State private var next: String?
+    @State private var search = ""
+    @State private var busy = false
+    @State private var issue: String?
+    @State private var original: JSONValue?
+    @State private var editing: JSONValue?
+    @State private var removing: JSONValue?
+    @State private var inspection: JSONValue?
+    @State private var receipt: JSONValue?
+    @State private var registry = false
+    @State private var generation: UInt64?
     private let owner = "custom-runtime-commands"
     private var disabled: Bool {busy || model.busy || model.pending != nil || generation != model.connectionGeneration}
     private var filtered: [JSONValue] {rows.filter {search.isEmpty || [$0.text("name"), $0.text("registryId"), $0.text("description")].contains {$0.localizedCaseInsensitiveContains(search)}}}
@@ -164,9 +173,22 @@ private func customMasked(_ value: JSONValue) throws -> JSONValue {
     let value: JSONValue, disabled: Bool, pending: Bool, issue: String?
     let reconcile: () -> Void, save: (JSONValue) -> Void
     @Environment(\.dismiss) private var dismiss
-    @State private var name = "", registryId = "", description = "", version = "", kind = "npx", distribution = "", icon = "", skillsDir = "", versionProbe = ""
-    @State private var shared = false, mcp = true, enabled = true, initialized = false, discard = false
-    @State private var preview: JSONValue?, error: String?
+    @State private var name = ""
+    @State private var registryId = ""
+    @State private var description = ""
+    @State private var version = ""
+    @State private var kind = "npx"
+    @State private var distribution = ""
+    @State private var icon = ""
+    @State private var skillsDir = ""
+    @State private var versionProbe = ""
+    @State private var shared = false
+    @State private var mcp = true
+    @State private var enabled = true
+    @State private var initialized = false
+    @State private var discard = false
+    @State private var preview: JSONValue?
+    @State private var error: String?
     private var fields: [String] {[name, registryId, description, version, kind, distribution, icon, skillsDir, versionProbe, String(shared), String(mcp), String(enabled)]}
     var body: some View {
         Form {
@@ -196,7 +218,12 @@ private func customMasked(_ value: JSONValue) throws -> JSONValue {
 @MainActor private struct RovaiCustomRuntimeRegistry: View {
     let model: RovaiWorkspaceModel, choose: (JSONValue) -> Void
     @Environment(\.dismiss) private var dismiss
-    @State private var catalog: JSONValue?, search = "", limit = 100, busy = false, issue: String?, generation: UInt64?
+    @State private var catalog: JSONValue?
+    @State private var search = ""
+    @State private var limit = 100
+    @State private var busy = false
+    @State private var issue: String?
+    @State private var generation: UInt64?
     private var entries: [JSONValue] {(catalog?["entries"]?.rvArray ?? []).filter {search.isEmpty || [$0.text("id"), $0.text("name"), $0.text("description")].contains {$0.localizedCaseInsensitiveContains(search)}}}
     var body: some View {
         List {

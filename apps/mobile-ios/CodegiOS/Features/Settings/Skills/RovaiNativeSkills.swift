@@ -3,8 +3,13 @@ import SwiftUI
 /// 原生列表和文件阅读区；注册表、安装与模型输入不在这个只读页面发生。
 @MainActor struct RovaiNativeSkills: View {
     let model: RovaiWorkspaceModel
-    @State private var runtimes = ["codex-cli"], target = "codex-cli", search = "", busy = false
-    @State private var scan: JSONValue = .object([:]), issue: String?, generation: UInt64?
+    @State private var runtimes = ["codex-cli"]
+    @State private var target = "codex-cli"
+    @State private var search = ""
+    @State private var busy = false
+    @State private var scan: JSONValue = .object([:])
+    @State private var issue: String?
+    @State private var generation: UInt64?
     private var custom: [JSONValue] {model.members.filter {$0.text("presence") != "removed" && $0["runtimeConfiguration"]?.text("adapterKind") == "custom-acp"}}
     private var skills: [JSONValue] {(scan["skills"]?.rvArray ?? []).filter {search.isEmpty || ($0.text("name") + " " + $0.text("description")).localizedCaseInsensitiveContains(search)}}
     var body: some View {
@@ -36,7 +41,13 @@ import SwiftUI
 
 @MainActor private struct RovaiNativeSkillReader: View {
     let model: RovaiWorkspaceModel, skill: JSONValue
-    @State private var content: JSONValue = .object([:]), files: [JSONValue] = [], path = "SKILL.md", raw = false, busy = false, issue: String?, generation: UInt64?
+    @State private var content: JSONValue = .object([:])
+    @State private var files: [JSONValue] = []
+    @State private var path = "SKILL.md"
+    @State private var raw = false
+    @State private var busy = false
+    @State private var issue: String?
+    @State private var generation: UInt64?
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 12) {

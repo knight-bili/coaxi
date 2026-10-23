@@ -10,7 +10,10 @@ private struct ConversationQuestionRow: Identifiable {let value: JSONValue;var i
 /// 原会话容器中的原Codeg问题卡；消息草稿与回答分别保存。
 struct RovaiConversationQuestions: View {
     let model: RovaiWorkspaceModel;let threadId: String;var conversationId: String? = nil;var child = false
-    @State private var rows: [JSONValue] = [], next: String?, issue: String?, generation: UInt64?
+    @State private var rows: [JSONValue] = []
+    @State private var next: String?
+    @State private var issue: String?
+    @State private var generation: UInt64?
     @State private var history = false
     private var scope: JSONValue {conversationScope(threadId, conversationId, child)}
     private var active: [JSONValue] {rows.filter {["awaiting_answer", "answered", "outcome_unknown"].contains($0.text("state"))}}
@@ -30,8 +33,12 @@ struct RovaiConversationQuestions: View {
 }
 private struct RovaiConversationQuestion: View {
     let model: RovaiWorkspaceModel;let value: JSONValue;let onChanged: () -> Void
-    @State private var original: JSONValue?, result: JSONValue?, issue: String?, generation: UInt64?
-    @State private var ready = false, busy = false
+    @State private var original: JSONValue?
+    @State private var result: JSONValue?
+    @State private var issue: String?
+    @State private var generation: UInt64?
+    @State private var ready = false
+    @State private var busy = false
     private var id: String {value.text("requestId")}
     private var owner: String {"conversation-question:" + id}
     private var state: String {["delivered", "cancelled", "outcome_unknown"].contains(value.text("state")) ? value.text("state") : result?.text("state").isEmpty == false ? result!.text("state") : value.text("state")}

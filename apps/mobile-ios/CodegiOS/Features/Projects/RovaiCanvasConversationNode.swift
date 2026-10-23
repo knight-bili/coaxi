@@ -8,7 +8,8 @@ struct RovaiCanvasConversationNode: View {
     let onOpenThread: (String) -> Void
     var memberReference: JSONValue? = nil
     @Environment(\.dismiss) private var dismiss
-    @State private var ready = false, retry = 0
+    @State private var ready = false
+    @State private var retry = 0
     @State private var issue: String?
     private var data: JSONValue {memberReference.map {JSONValue.object(["kind": .string("conversation"), "conversation": $0])} ?? node["data"] ?? .null}
     private var reference: JSONValue {data["conversation"] ?? .null}

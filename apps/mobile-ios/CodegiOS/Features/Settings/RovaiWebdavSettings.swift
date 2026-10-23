@@ -4,11 +4,20 @@ struct RovaiWebdavSettings: View {
     let model: RovaiWorkspaceModel
     @Environment(\.dismiss) private var dismiss
     @State private var saved: JSONValue = .object([:])
-    @State private var endpoint = "", username = "", password = ""
-    @State private var clearPassword = false, insecure = false, dirty = false, busy = false, leaving = false
-    @State private var snapshots: [JSONValue] = [], transfers: [JSONValue] = [], removals: [JSONValue] = []
+    @State private var endpoint = ""
+    @State private var username = ""
+    @State private var password = ""
+    @State private var clearPassword = false
+    @State private var insecure = false
+    @State private var dirty = false
+    @State private var busy = false
+    @State private var leaving = false
+    @State private var snapshots: [JSONValue] = []
+    @State private var transfers: [JSONValue] = []
+    @State private var removals: [JSONValue] = []
     @State private var confirm: JSONValue?
-    @State private var issue: String?, message: String?
+    @State private var issue: String?
+    @State private var message: String?
     private let owner = "webdav-remote-removals"
     private var connected: Bool {saved["revision"] != nil && saved["revision"] != .null}
     var body: some View {

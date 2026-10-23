@@ -21,9 +21,16 @@ struct RovaiMonitoring: View {
 private struct RovaiRuntimeMonitoring: View {
     let model: RovaiWorkspaceModel
     @Environment(\.scenePhase) private var scenePhase
-    @State private var range = "24h", runtime = "", provider = "", selectedModel = "", costKind = ""
-    @State private var snapshot: JSONValue?, loadedFilter: JSONValue?, issue: String?
-    @State private var busy = false, exporting = false
+    @State private var range = "24h"
+    @State private var runtime = ""
+    @State private var provider = ""
+    @State private var selectedModel = ""
+    @State private var costKind = ""
+    @State private var snapshot: JSONValue?
+    @State private var loadedFilter: JSONValue?
+    @State private var issue: String?
+    @State private var busy = false
+    @State private var exporting = false
     @State private var exportDocument: RovaiMonitoringDocument?
     private var filter: JSONValue {var fields: [String: JSONValue] = ["range": .string(range)];if !runtime.isEmpty {fields["runtimeKind"] = .string(runtime)};if !provider.isEmpty {fields["providerKey"] = .string(provider)};if !selectedModel.isEmpty {fields["modelKey"] = .string(selectedModel)};if !costKind.isEmpty {fields["costKind"] = .string(costKind)};return .object(fields)}
     private var visible: JSONValue? {loadedFilter == filter ? snapshot : nil}

@@ -7,14 +7,21 @@ struct RovaiMissionEdit: View {
     let mission: JSONValue
     @Environment(\.dismiss) private var dismiss
     @State private var baseline: JSONValue = .null
-    @State private var title = "", tags = ""
+    @State private var title = ""
+    @State private var tags = ""
     @State private var content: [JSONValue] = []
     @State private var kept: [String] = []
     @State private var sources: [JSONValue] = []
     @State private var commandId = UUID().uuidString.lowercased()
-    @State private var legacySent: JSONValue?, latest: JSONValue?, preview: JSONValue?, issue: String?
-    @State private var ready = false, busy = false, picking = false
-    @State private var generation: UInt64?, pickerGeneration: UInt64?
+    @State private var legacySent: JSONValue?
+    @State private var latest: JSONValue?
+    @State private var preview: JSONValue?
+    @State private var issue: String?
+    @State private var ready = false
+    @State private var busy = false
+    @State private var picking = false
+    @State private var generation: UInt64?
+    @State private var pickerGeneration: UInt64?
     private var owner: String {"mission-edit:\(mission.text("missionId"))"}
     private var blocked: Bool {!ready || busy || model.busy || model.pending != nil || generation != model.connectionGeneration}
     private var locked: Bool {blocked || legacySent != nil}

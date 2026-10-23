@@ -64,8 +64,12 @@ struct RovaiCanvasCard: View {
     var onMember: (JSONValue) -> Void = {_ in}
     var onDetach: (JSONValue) -> Void = {_ in}
     var onMemberMove: (JSONValue,Double,Double,Int) -> Void = {_,_,_,_ in}
-    @GestureState private var drag = CGSize.zero,resizing = CGSize.zero
-    @State private var moveBase: CGPoint?,sizeBase: CGSize?,moveRevision: Int?,sizeRevision: Int?
+    @GestureState private var drag = CGSize.zero
+    @GestureState private var resizing = CGSize.zero
+    @State private var moveBase: CGPoint?
+    @State private var sizeBase: CGSize?
+    @State private var moveRevision: Int?
+    @State private var sizeRevision: Int?
     private var data: JSONValue {value["data"] ?? .null}
     private var kind: String {data.text("kind")}
     private var region: Bool {["folder","group","agent","custom"].contains(kind)}
@@ -138,7 +142,9 @@ private struct RovaiCanvasDraggableMember: View {
     let onDetach: () -> Void
     let onMove: (Double,Double,Int) -> Void
     @GestureState private var translation = CGSize.zero
-    @State private var captured: Int?,start: CGPoint?,startZoom: CGFloat = 1
+    @State private var captured: Int?
+    @State private var start: CGPoint?
+    @State private var startZoom: CGFloat = 1
     private var dragging: some Gesture {
         LongPressGesture(minimumDuration: 0.35).sequenced(before: DragGesture(coordinateSpace: .global)).onChanged {value in
             guard !disabled else {return}

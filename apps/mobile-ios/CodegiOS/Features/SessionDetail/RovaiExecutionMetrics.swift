@@ -9,9 +9,12 @@ struct RovaiExecutionMetrics: View {
     let threadId: String
     let projection: JSONValue
     @Environment(\.scenePhase) private var scenePhase
-    @State private var expanded = false, visible = false, busy = false
+    @State private var expanded = false
+    @State private var visible = false
+    @State private var busy = false
     @State private var count = 50
-    @State private var metrics: JSONValue?, issue: String?
+    @State private var metrics: JSONValue?
+    @State private var issue: String?
     private var all: [JSONValue] {projection["agentRuns"]?.rvArray ?? []}
     private var rows: [JSONValue] {Array(all.suffix(count))}
     private var selected: [JSONValue] {var seen = Set<String>();return Array((rows + all.filter {["running", "waiting"].contains($0.text("status"))}).filter {seen.insert($0.text("id")).inserted}.suffix(500))}

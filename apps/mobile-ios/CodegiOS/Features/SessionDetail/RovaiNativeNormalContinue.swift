@@ -3,8 +3,12 @@ import SwiftUI
 struct RovaiNativeNormalContinue: View {
     let model: RovaiWorkspaceModel;let sourceCommandId: String;var composerScope: JSONValue = .null
     @Environment(\.dismiss) private var dismiss
-    @State private var packet: JSONValue?, receipt: JSONValue?, issue: String?, generation: UInt64?
-    @State private var busy = false, ready = false
+    @State private var packet: JSONValue?
+    @State private var receipt: JSONValue?
+    @State private var issue: String?
+    @State private var generation: UInt64?
+    @State private var busy = false
+    @State private var ready = false
     private var owner: String {"native-normal:\(sourceCommandId)"}
     private var preview: JSONValue? {packet?["preview"]}
     private var original: JSONValue? {packet?["original"]}

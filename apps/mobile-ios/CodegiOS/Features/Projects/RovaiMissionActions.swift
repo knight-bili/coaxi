@@ -4,8 +4,13 @@ struct RovaiMissionActions: View {
     let model: RovaiWorkspaceModel
     let mission: JSONValue
     let onDeleted: () -> Void
-    @State private var editing = false, lead = false, busy = false, cleanup = false
-    @State private var confirmation: Confirmation?, delivery: JSONValue?, issue: String?
+    @State private var editing = false
+    @State private var lead = false
+    @State private var busy = false
+    @State private var cleanup = false
+    @State private var confirmation: Confirmation?
+    @State private var delivery: JSONValue?
+    @State private var issue: String?
     private struct Confirmation: Identifiable {let id = UUID();let kind: String}
     private var blocked: Bool {model.pending != nil || model.busy || busy}
     private var id: String {mission.text("missionId")}

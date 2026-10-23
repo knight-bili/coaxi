@@ -16,11 +16,14 @@ struct RovaiCanvasView: View {
     @State private var selected: RovaiCanvasSelection?
     @State private var properties: RovaiCanvasSelection?
     @State private var newNote = false
-    @State private var selecting = false, bulk = false
+    @State private var selecting = false
+    @State private var bulk = false
     @State private var chosen = Set<String>()
     @State private var bulkGraph: JSONValue?
-    @State private var viewOwner: String?, viewGeneration: UInt64?
-    @State private var viewReady = false, minimap = true
+    @State private var viewOwner: String?
+    @State private var viewGeneration: UInt64?
+    @State private var viewReady = false
+    @State private var minimap = true
     @State private var stageSize = CGSize.zero
     @State private var packPlan: JSONValue?
     private var viewState: RovaiCanvasViewport {RovaiCanvasViewport(x: Double(offset.width),y: Double(offset.height),zoom: Double(zoom),minimap: minimap,expandedRegions: expandedRegions.sorted())}

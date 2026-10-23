@@ -6,7 +6,8 @@ func missionStatusName(_ value: String) -> String {rovaiMissionStatuses.first {$
 struct RovaiMissionBoard: View {
     let model: RovaiWorkspaceModel
     let onOpen: (String) -> Void
-    @State private var status = "", search = ""
+    @State private var status = ""
+    @State private var search = ""
     @State private var selected: Selection?
     private struct Selection: Identifiable {let value: JSONValue;var id: String {value.text("missionId")}}
     private var rows: [JSONValue] {model.missions.filter {(status.isEmpty || $0.text("status") == status) && (search.isEmpty || "\($0.text("title")) \($0.text("description")) \(($0["tags"]?.rvArray ?? []).compactMap(\.stringValue).joined(separator: " ")) \($0.text("projectPath"))".localizedCaseInsensitiveContains(search))}}
@@ -31,11 +32,15 @@ struct RovaiMissionDetail: View {
     let model: RovaiWorkspaceModel
     let initial: JSONValue
     @Environment(\.dismiss) private var dismiss
-    @State private var tab = 0, refresh = 0
-    @State private var delivery: JSONValue?, changes: JSONValue?, source: JSONValue?
+    @State private var tab = 0
+    @State private var refresh = 0
+    @State private var delivery: JSONValue?
+    @State private var changes: JSONValue?
+    @State private var source: JSONValue?
     @State private var history: [JSONValue] = []
     @State private var patches: [String: String] = [:]
-    @State private var busy = false, more = false
+    @State private var busy = false
+    @State private var more = false
     @State private var issue: String?
     private var id: String {initial.text("missionId")}
     private var mission: JSONValue {model.missions.first {$0.text("missionId") == id} ?? initial}

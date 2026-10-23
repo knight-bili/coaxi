@@ -4,12 +4,20 @@ import SwiftUI
 struct RovaiProjectGroups: View {
     let model: RovaiWorkspaceModel
     @Environment(\.dismiss) private var dismiss
-    @State private var source: JSONValue?,editor: JSONValue?,pending: JSONValue?,removal: JSONValue?
+    @State private var source: JSONValue?
+    @State private var editor: JSONValue?
+    @State private var pending: JSONValue?
+    @State private var removal: JSONValue?
     @State private var folders: [String:RovaiCanvasFolderRelation] = [:]
-    @State private var generation: UInt64?,issue: String?
-    @State private var busy = false,ready = false,useCurrent = false
-    @State private var arranging = false,replaceLayout = false
-    @State private var layout: RovaiProjectLayout?,initialLayout: RovaiProjectLayout?
+    @State private var generation: UInt64?
+    @State private var issue: String?
+    @State private var busy = false
+    @State private var ready = false
+    @State private var useCurrent = false
+    @State private var arranging = false
+    @State private var replaceLayout = false
+    @State private var layout: RovaiProjectLayout?
+    @State private var initialLayout: RovaiProjectLayout?
     @State private var layoutRevision = 0
     private let layoutOwner = "project-groups:layout"
     private let draftOwner = "project-groups:editor",pendingOwner = "project-groups:pending"

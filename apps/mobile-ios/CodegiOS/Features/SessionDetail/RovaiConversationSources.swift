@@ -35,10 +35,17 @@ private struct RovaiConversationSourcePicker: View {
     let enabled: Bool
     let onInsert: (String) throws -> Void
     @Environment(\.dismiss) private var dismiss
-    @State private var rows: [JSONValue] = [], imports: [JSONValue] = [], grants: [JSONValue] = []
-    @State private var next: String?, grantNext: String?
-    @State private var selected: JSONValue?, preview: JSONValue?, confirmed: JSONValue?, pending: JSONValue?
-    @State private var busy = false, ready = false
+    @State private var rows: [JSONValue] = []
+    @State private var imports: [JSONValue] = []
+    @State private var grants: [JSONValue] = []
+    @State private var next: String?
+    @State private var grantNext: String?
+    @State private var selected: JSONValue?
+    @State private var preview: JSONValue?
+    @State private var confirmed: JSONValue?
+    @State private var pending: JSONValue?
+    @State private var busy = false
+    @State private var ready = false
     @State private var issue: String?
     @State private var generation: UInt64 = 0
     @State private var importLimit = 25

@@ -5,10 +5,15 @@ struct RovaiForgeMerge: View {
     let threadId: String, accountId: String
     let number: Int, repository: JSONValue, detail: JSONValue
     let onChanged: () -> Void
-    @State private var open = false, busy = false
+    @State private var open = false
+    @State private var busy = false
     @State private var methods: [String] = []
-    @State private var method = "merge", head = "", strategy = "", commandId = ""
-    @State private var sent: JSONValue?, issue: String?
+    @State private var method = "merge"
+    @State private var head = ""
+    @State private var strategy = ""
+    @State private var commandId = ""
+    @State private var sent: JSONValue?
+    @State private var issue: String?
     private var owner: String {"forge-merge:\(threadId):\(accountId):\(number)"}
     private var record: JSONValue {.object(["repositoryKey": repository["repositoryKey"] ?? .null, "head": .string(head), "method": .string(method), "methods": .array(methods.map(JSONValue.string)), "strategy": .string(strategy), "commandId": .string(commandId), "sent": sent ?? .null])}
     var body: some View {

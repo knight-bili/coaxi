@@ -12,7 +12,10 @@ private func feedbackStatus(_ value: JSONValue) -> String {
 /// 使用原模型设置的原生表单，保存原请求后才交给 Host。
 struct RovaiMemberFeedbackSwitch: View {
     let model: RovaiWorkspaceModel;let agentId: String
-    @State private var policy: JSONValue?, original: JSONValue?, issue: String?, generation: UInt64?
+    @State private var policy: JSONValue?
+    @State private var original: JSONValue?
+    @State private var issue: String?
+    @State private var generation: UInt64?
     @State private var busy = false
     private var owner: String {"feedback-policy:" + agentId}
     private var enabled: Bool {(policy?["members"]?.rvArray ?? []).first {$0.text("agentId") == agentId}?["enabled"]?.rvBool == true}
@@ -43,10 +46,21 @@ struct RovaiUserFeedback: View {
     var normalInput: (() async throws -> JSONValue)? = nil
     var nativeMaterials: [JSONValue]? = nil
     @Environment(\.dismiss) private var dismiss
-    @State private var text = "", selected = "", run = ""
-    @State private var targets: [JSONValue] = [], records: [JSONValue] = [], previews: [JSONValue] = []
-    @State private var next: String?, previewNext: String?, packet: JSONValue?, receipt: JSONValue?, issue: String?, generation: UInt64?
-    @State private var busy = false, ready = false, uncertain = false
+    @State private var text = ""
+    @State private var selected = ""
+    @State private var run = ""
+    @State private var targets: [JSONValue] = []
+    @State private var records: [JSONValue] = []
+    @State private var previews: [JSONValue] = []
+    @State private var next: String?
+    @State private var previewNext: String?
+    @State private var packet: JSONValue?
+    @State private var receipt: JSONValue?
+    @State private var issue: String?
+    @State private var generation: UInt64?
+    @State private var busy = false
+    @State private var ready = false
+    @State private var uncertain = false
     @State private var nativeOpen = false
     private var scope: JSONValue {.object(["threadId": .string(threadId), "conversationId": conversationId.map(JSONValue.string) ?? .null, "scopeKind": .string(conversationId == nil ? "public" : child ? "delegation_child" : "single_chat")])}
     private var owner: String {"feedback:\(threadId):\(conversationId ?? "public"):\(child ? "child" : "member")"}
