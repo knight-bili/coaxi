@@ -33,7 +33,7 @@ describe('general preferences', () => {
     const malformed = '{broken'
     await writeFile(filePath, malformed)
     expect(await readGeneralPreferences(filePath)).toEqual(DEFAULT_GENERAL_PREFERENCES)
-    const store = await GeneralPreferencesStore.load(filePath)
+    const store = await GeneralPreferencesStore.load(filePath, () => 'zh-CN')
     expect(store.get()).toEqual(DEFAULT_GENERAL_PREFERENCES)
     expect(store.loadDegradation?.code).toBe('general_preferences_unreadable')
     expect(await readFile(filePath, 'utf8')).toBe(malformed)
@@ -298,7 +298,7 @@ describe('general preferences', () => {
   it('saves the selected team and enables one-click together, preserving other preferences', async () => {
     const directory = await temporaryDirectory()
     const filePath = join(directory, 'general-preferences.json')
-    const store = await GeneralPreferencesStore.load(filePath)
+    const store = await GeneralPreferencesStore.load(filePath, () => 'zh-CN')
     const defaults = { memberAgentIds: ['agent-a', 'agent-b'], defaultLeadAgentId: 'agent-b' }
     const saving = store.setNewConversationDefaults(defaults, true)
     defaults.memberAgentIds.push('agent-c')
@@ -310,14 +310,14 @@ describe('general preferences', () => {
       newConversationDefaults: { memberAgentIds: ['agent-a', 'agent-b'], defaultLeadAgentId: 'agent-b' },
       oneClickNewConversationEnabled: true
     })
-    expect((await GeneralPreferencesStore.load(filePath)).get()).toEqual(store.get())
+    expect((await GeneralPreferencesStore.load(filePath, () => 'zh-CN')).get()).toEqual(store.get())
     await store.setNewConversationDefaults({ memberAgentIds: ['agent-a'], defaultLeadAgentId: 'agent-a' }, false)
     expect(store.get().oneClickNewConversationEnabled).toBe(true)
   })
 
   it('rejects invalid atomic updates without enabling one-click or changing the team', async () => {
     const directory = await temporaryDirectory()
-    const store = await GeneralPreferencesStore.load(join(directory, 'general-preferences.json'))
+    const store = await GeneralPreferencesStore.load(join(directory, 'general-preferences.json'), () => 'zh-CN')
     await expect(store.setNewConversationDefaults({ memberAgentIds: ['agent-a'], defaultLeadAgentId: 'agent-b' }, true)).rejects.toThrow()
     await expect(store.setNewConversationDefaults(
       { memberAgentIds: ['agent-a'], defaultLeadAgentId: 'agent-a' },
@@ -351,7 +351,7 @@ describe('general preferences', () => {
     const directory = await temporaryDirectory()
     const filePath = join(directory, 'general-preferences.json')
     await mkdir(filePath)
-    const store = await GeneralPreferencesStore.load(filePath)
+    const store = await GeneralPreferencesStore.load(filePath, () => 'zh-CN')
 
     await expect(store.setExecutionConsolePlacement('bottom')).rejects.toBeInstanceOf(Error)
     expect(store.get()).toEqual(DEFAULT_GENERAL_PREFERENCES)
