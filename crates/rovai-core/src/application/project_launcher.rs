@@ -50,6 +50,7 @@ impl Core{
         let stage=parent.join(format!(".rovai-project-{id}"));crate::platform::private_storage::prepare_private_directory(&stage)?;
         let record=json!({"root":root,"commandId":id,"planId":plan_id,"state":"running","path":destination,"partialPath":stage,"startedAt":Utc::now().to_rfc3339()});crate::platform::private_storage::atomic_write_private_json(&receipt,&record)?;
         let cancel=CancellationToken::new();let log=Arc::new(tokio::sync::Mutex::new(Vec::new()));ACTIVE.lock().await.insert(id.clone(),Active{root:root.clone(),cancel:cancel.clone(),log:log.clone()});
+        let started=json!({"commandId":id,"state":"running"});
         tokio::spawn(async move{
             let result=async{
                 let mut command=crate::office_preview::tokio_command(&plan.program);command.current_dir(&stage).args(&plan.arguments);for key in ["APPDATA","XDG_CACHE_HOME","XDG_CONFIG_HOME","USER","USERNAME","SHELL","ComSpec","COMSPEC"]{if let Some(value)=std::env::var_os(key){command.env(key,value);}}
@@ -58,6 +59,6 @@ impl Core{
             }.await;
             let mut record=record;record["completedAt"]=json!(Utc::now().to_rfc3339());record["log"]=json!(String::from_utf8_lossy(&log.lock().await).into_owned());match result{Ok(())=>{record["state"]=json!("completed");record["partialPath"]=Value::Null},Err(error)=>{record["state"]=json!("failed");record["error"]=json!(error.to_string())}}let _=crate::platform::private_storage::atomic_write_private_json(&receipt,&record);ACTIVE.lock().await.remove(&id);
         });
-        Ok(json!({"commandId":id,"state":"running"}))
+        Ok(started)
     }
 }
