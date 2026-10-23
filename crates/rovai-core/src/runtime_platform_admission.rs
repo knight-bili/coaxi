@@ -414,6 +414,16 @@ mod tests {
                     Some(DSH_WINDOWS_X64_EVIDENCE_REVISION)
                 );
                 assert_eq!(admission.blocker_code(), None);
+            } else if runtime_kind == AdapterKind::CustomAcp {
+                assert_eq!(admission.status(), RuntimePlatformAdmissionStatus::Preview);
+                assert!(admission.allows_runtime_use());
+                assert!(!admission.is_qualified());
+                assert_eq!(
+                    admission.reason_code(),
+                    Some(RuntimePlatformAdmissionReasonCode::QualificationEvidenceMissing)
+                );
+                assert_eq!(admission.evidence_revision(), None);
+                assert_eq!(admission.blocker_code(), None);
             } else if !matches!(
                 runtime_kind,
                 AdapterKind::CursorAgent
@@ -491,6 +501,7 @@ mod tests {
                     | AdapterKind::GrokBuild
                     | AdapterKind::ZcodeApp
                     | AdapterKind::DeepseekHarness
+                    | AdapterKind::CustomAcp
             )
         }) {
             for platform in [HostPlatformKey::MacosArm64, HostPlatformKey::MacosX64] {
@@ -527,6 +538,20 @@ mod tests {
                 );
                 assert_eq!(admission.evidence_revision(), None);
             }
+
+            let custom_acp = registry.platform_admission(AdapterKind::CustomAcp, platform);
+            assert_eq!(
+                custom_acp.status(),
+                RuntimePlatformAdmissionStatus::Preview
+            );
+            assert!(custom_acp.allows_runtime_use());
+            assert!(!custom_acp.is_qualified());
+            assert_eq!(
+                custom_acp.reason_code(),
+                Some(RuntimePlatformAdmissionReasonCode::QualificationEvidenceMissing)
+            );
+            assert_eq!(custom_acp.evidence_revision(), None);
+            assert_eq!(custom_acp.blocker_code(), None);
 
             let pi = registry.platform_admission(AdapterKind::Pi, platform);
             assert_eq!(pi.status(), RuntimePlatformAdmissionStatus::Qualified);
