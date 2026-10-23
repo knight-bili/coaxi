@@ -841,6 +841,7 @@ async fn managed_native_gateway_freezes_routes_and_reaps_its_process_tree() {
         native_origin: None,
         native_steer: None,
         portable_connection: None,
+        conversation_tools: None,
         custom_runtime: None,
         environment: Some(LaunchEnvironment {
             values: Some(native_environment),

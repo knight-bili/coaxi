@@ -113,7 +113,7 @@ pub struct PreparedMcpProjection {
 
 impl PreparedMcpProjection {
     pub fn require_interaction_name_available(&self, native: &BTreeSet<String>) -> Result<()> {
-        for reserved in [crate::interaction_tools::SERVER_NAME,crate::ui_feedback::SERVER_NAME] {
+        for reserved in [crate::interaction_tools::SERVER_NAME,crate::ui_feedback::SERVER_NAME,crate::conversation_tools::SERVER_NAME] {
             if self.servers.contains_key(reserved)&&native.iter().any(|name|name.eq_ignore_ascii_case(reserved)) {
                 anyhow::bail!("interaction.reserved_mcp_name_conflict");
             }
@@ -210,9 +210,10 @@ impl McpProjectionService {
         &self,database:&Database,config_store:&McpConfigStore,request:&McpProjectionRequest<'_>,
         definitions:Vec<(&str,McpServerDefinition,String)>,
     )->Result<PreparedMcpProjection>{
-        anyhow::ensure!(!definitions.is_empty()&&definitions.len()<=2,"runtime_unavailable");
+        let conversation=definitions.iter().any(|(name,_,_)|*name==crate::conversation_tools::SERVER_NAME);
+        anyhow::ensure!(!definitions.is_empty()&&definitions.len()<=if conversation{3}else{2},"runtime_unavailable");
         let mut names=BTreeSet::new();
-        for(name,_,_)in &definitions{anyhow::ensure!(matches!(*name,crate::interaction_tools::SERVER_NAME|crate::ui_feedback::SERVER_NAME)&&names.insert(*name),"interaction.reserved_mcp_name_conflict")}
+        for(name,_,_)in &definitions{anyhow::ensure!(matches!(*name,crate::interaction_tools::SERVER_NAME|crate::ui_feedback::SERVER_NAME|crate::conversation_tools::SERVER_NAME)&&names.insert(*name),"interaction.reserved_mcp_name_conflict")}
         validate_request(request)?;
         validate_child_run_request(database, request)?;
         let capability = request_capability(database,request)?;
@@ -242,6 +243,7 @@ impl McpProjectionService {
             projection
         };
         for(name,definition,_)in definitions{projection.servers.insert(name.into(),definition);}
+        if conversation{projection.schema_version=3;projection.exposure.schema_version=3;}
         validate_projection(&projection, frozen.as_ref())?;
         self.publish_projection(request, &projection)?;
         self.load_and_validate(&target, request, frozen.as_ref())
@@ -908,7 +910,8 @@ fn load_frozen_projection(
 fn parse_projection(bytes: &[u8], request: &McpProjectionRequest<'_>) -> Result<ProjectionFile> {
     let projection: ProjectionFile =
         serde_json::from_slice(bytes).context("private MCP projection is invalid")?;
-    if projection.schema_version != MCP_PROJECTION_SCHEMA_VERSION
+    let conversation=projection.servers.contains_key(crate::conversation_tools::SERVER_NAME);
+    if projection.schema_version != if conversation{3}else{MCP_PROJECTION_SCHEMA_VERSION}
         || projection.agent_run_id != request.agent_run_id
         || projection.adapter_kind != request.adapter_kind
     {
@@ -921,7 +924,8 @@ fn validate_projection(
     projection: &ProjectionFile,
     frozen: Option<&McpExposureSnapshot>,
 ) -> Result<()> {
-    if projection.exposure.schema_version != MCP_PROJECTION_SCHEMA_VERSION {
+    let conversation=projection.servers.contains_key(crate::conversation_tools::SERVER_NAME);
+    if projection.schema_version!=if conversation{3}else{MCP_PROJECTION_SCHEMA_VERSION}||projection.exposure.schema_version!=projection.schema_version {
         anyhow::bail!("private MCP exposure schema is unsupported");
     }
     if let Some(frozen) = frozen {

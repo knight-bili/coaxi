@@ -7646,6 +7646,7 @@ mod tests {
                 native_origin: None,
                 native_steer: None,
                 portable_connection: None,
+                conversation_tools: None,
                 custom_runtime: None,
                 environment: None,
                 custom_api: None,

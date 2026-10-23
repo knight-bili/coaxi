@@ -19,6 +19,7 @@ pub(crate) mod authoring;
 pub(crate) mod calendar;
 pub mod automation_owner;
 pub mod user_api;
+pub mod runtime;
 pub mod storage;
 pub use model::*;
 pub const SERVER_NAME:&str="rovai-conversation-tools";

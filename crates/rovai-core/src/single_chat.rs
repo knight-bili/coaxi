@@ -2853,6 +2853,10 @@ fn admit_single_chat_message(
     } else {
         SINGLE_CHAT_OPERATION_POLICY
     };
+    let mut selected_runtime=runtime.clone();
+    if selected_runtime.conversation_tools.is_none(){crate::conversation_tools::runtime::freeze_for_conversation(transaction,&target.conversation_id,&target.agent_id,&mut selected_runtime)?;}
+    crate::conversation_tools::runtime::select_user_sources(transaction,&mut selected_runtime,body)?;
+    let runtime=&selected_runtime;
     let (effective_config, runtime) = if child {
         crate::delegation_user::followup_config(
             transaction,
