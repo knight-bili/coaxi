@@ -232,6 +232,39 @@ try {
     forgedOwnerRefused: true
   })
 
+  stage = 'issue_73_unready_mission_scope_refusal'
+  const missionCreated = await call('missions.create', {
+    commandId: randomUUID(),
+    command: {
+      title: '未启动 Git Mission 隔离回归',
+      description: '验证旧客户端缺少 missionId 时不回落到源工程。',
+      projectPath: workspace.projectPath,
+      projectBindingKind: 'directory',
+      memberAgentIds: preflight.presentMembers.map(member => member.agentId),
+      defaultLeadAgentId: preflight.initialLeadAgentId,
+      tags: []
+    }
+  })
+  assert.equal(missionCreated.status, 'applied')
+  const missionThreadId = missionCreated.payload.threadId
+  const missionId = missionCreated.payload.missionId
+  const mission = await call('missions.get', { missionId })
+  assert.equal(mission.workspaceEverCreated, false)
+  await expectCoreError('workbench.files.list', {
+    scope: { threadId: missionThreadId }, path: ''
+  }, 'workbench.mission_unavailable')
+  await expectCoreError('workbench.files.list', {
+    scope: { threadId: missionThreadId, missionId: 'wrong-mission-owner' }, path: ''
+  }, 'workbench.mission_owner_changed')
+  record('issue_73_unstarted_git_mission_never_falls_back_to_source_directory', {
+    missionId,
+    missionThreadId,
+    workspaceEverCreated: mission.workspaceEverCreated,
+    oldClientWithoutMissionIdRefused: true,
+    wrongMissionOwnerRefused: true,
+    readyWorktreePositivePath: 'not_covered_without_starting_a_real_Mission_Runtime'
+  })
+
   finalResult = {
     status: 'passed',
     scope: 'real_host_core_isolated_git_fixture_no_model_execution',
