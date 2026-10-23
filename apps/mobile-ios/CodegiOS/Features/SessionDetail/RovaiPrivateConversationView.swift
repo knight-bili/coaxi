@@ -86,7 +86,7 @@ struct RovaiPrivateConversationView: View {
                 if let cursor { Button("更多保留输入") { Task { await readRetained(after: cursor) } } }
                 RovaiComposerQuotes(quotes: snapshot["draft"]?["quotes"]?.rvArray ?? [], enabled: !disabled && snapshot["conversation"]?.text("status") == "active") {id in removedQuoteId = id;Task {await model.command(mutate, value: mutation(.object(["type": .string("quote"), "action": .object(["type": .string("remove"), "quoteId": .string(id)])])))}}
                 if let removedQuoteId {Button("撤销移除引用") {Task {await model.command(mutate, value: mutation(.object(["type": .string("quote"), "action": .object(["type": .string("restore"), "quoteId": .string(removedQuoteId)])])))};self.removedQuoteId = nil}.font(.caption).disabled(disabled || snapshot["conversation"]?.text("status") != "active")}
-                ForEach(snapshot["draft"]?["attachments"]?.rvArray ?? [], id: \.self) { attachment in HStack { Text("附件 · \(attachment.text("displayName"))").font(.caption); Spacer(); Button("移除") { Task { await model.command(mutate, value: mutation(.object(["type": .string("remove_attachment"), "attachmentRefId": attachment["id"] ?? .null]))) } }.disabled(disabled) }
+                ForEach(snapshot["draft"]?["attachments"]?.rvArray ?? [], id: \.self) { attachment in HStack { Text("附件 · \(attachment.text("displayName"))").font(.caption); Spacer(); Button("移除") { Task { await model.command(mutate, value: mutation(.object(["type": .string("remove_attachment"), "attachmentRefId": attachment["id"] ?? .null]))) } }.disabled(disabled) } }
             }.padding(16)
         }
     }
