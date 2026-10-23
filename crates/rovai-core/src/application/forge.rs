@@ -61,6 +61,14 @@ fn remote_matches_account(remote:&reqwest::Url,base:&reqwest::Url,explicit:bool)
     }
 }
 
+fn repository_path_for_account(remote:&reqwest::Url,base:&reqwest::Url)->Option<String>{
+    let prefix=base.path().trim_matches('/');
+    let raw=remote.path().trim_start_matches('/');
+    let path=if prefix.is_empty(){raw}else{raw.strip_prefix(&format!("{prefix}/"))?}.trim_end_matches('/');
+    let repository=path.strip_suffix(".git").unwrap_or(path);
+    (!repository.is_empty()).then(||repository.to_owned())
+}
+
 fn public_accounts(accounts:&[Account])->Value {
     json!({"accounts":accounts.iter().map(|a|json!({"id":a.id,"provider":a.provider,"baseUrl":a.base_url,"hasToken":!a.token.is_empty()})).collect::<Vec<_>>()})
 }
@@ -130,23 +138,34 @@ impl Core {
         let path=self.data_dir.join("forge-accounts.json");
         let accounts:Vec<Account>=if path.exists(){serde_json::from_slice(&fs::read(path)?)?}else{Vec::new()};
         let explicit=request.account_id.is_some();
-        let account=accounts.into_iter().find(|a|request.account_id.as_ref().is_none_or(|id|id==&a.id)&&reqwest::Url::parse(&a.base_url).ok().is_some_and(|base|remote_matches_account(&parsed,&base,explicit)));
-        let account=match account{
-            Some(account)=>account,
-            None=>{
+        let mut candidates=accounts.into_iter().filter_map(|account|{
+            if request.account_id.as_ref().is_some_and(|id|id!=&account.id){return None}
+            let base=reqwest::Url::parse(&account.base_url).ok()?;
+            if !remote_matches_account(&parsed,&base,explicit){return None}
+            let owner_repo=repository_path_for_account(&parsed,&base)?;
+            Some((account,owner_repo,base.path().trim_matches('/').len()))
+        }).collect::<Vec<_>>();
+        let (account,owner_repo)=match candidates.len(){
+            1=>{let (account,owner_repo,_)=candidates.remove(0);(account,owner_repo)}
+            0=>{
                 ensure!(request.account_id.is_none(),"forge.account_unavailable");
                 let provider=if host.eq_ignore_ascii_case("github.com"){Some("github")}else if host.eq_ignore_ascii_case("gitlab.com"){Some("gitlab")}else{None};
                 let provider=provider.context("forge.account_required")?;
                 let base_url=format!("https://{host}");
                 let base=reqwest::Url::parse(&base_url)?;
                 ensure!(remote_matches_account(&parsed,&base,false),"forge.account_required");
-                Account{id:String::new(),provider:provider.into(),base_url,token:String::new()}
+                let owner_repo=repository_path_for_account(&parsed,&base).context("forge.account_required")?;
+                (Account{id:String::new(),provider:provider.into(),base_url,token:String::new()},owner_repo)
+            }
+            _=>{
+                let longest=candidates.iter().map(|(_,_,depth)|*depth).max().context("forge.account_required")?;
+                let mut best=candidates.into_iter().filter(|(_,_,depth)|*depth==longest);
+                let (account,owner_repo,_)=best.next().context("forge.account_required")?;
+                ensure!(best.next().is_none(),"forge.account_ambiguous");
+                (account,owner_repo)
             }
         };
         let web=reqwest::Url::parse(&account.base_url)?;
-        let prefix=web.path().trim_matches('/');
-        let raw=parsed.path().trim_start_matches('/');
-        let owner_repo=if prefix.is_empty(){raw}else{raw.strip_prefix(&format!("{prefix}/")).context("forge.remote_base_mismatch")?}.trim_end_matches('/').strip_suffix(".git").unwrap_or(if prefix.is_empty(){raw}else{raw.strip_prefix(&format!("{prefix}/")).unwrap_or(raw)}).trim_end_matches('/').to_owned();
         ensure!(owner_repo.split('/').count()>=2&&!owner_repo.split('/').any(|s|s.is_empty()||s=="."||s==".."),"forge.invalid_repository");
         if account.provider!="gitlab"{ensure!(owner_repo.split('/').count()==2,"forge.invalid_repository");}
         let api_base=match account.provider.as_str(){
