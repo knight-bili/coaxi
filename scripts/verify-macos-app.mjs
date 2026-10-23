@@ -6,8 +6,8 @@ const root = resolve(fileURLToPath(new URL('..', import.meta.url)))
 const arch = process.argv[2]
 const appPath = resolve(process.argv[3] ?? (
   arch === 'x64'
-    ? `${root}/dist/mac/Rovai AI.app`
-    : `${root}/dist/mac-arm64/Rovai AI.app`
+    ? `${root}/dist/mac/Coaxi.app`
+    : `${root}/dist/mac-arm64/Coaxi.app`
 ))
 
 if (arch !== 'arm64' && arch !== 'x64') {

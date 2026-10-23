@@ -13,7 +13,7 @@ import {
 } from './release-notes.mjs'
 
 const VERSION = '0.0.3'
-const NOTES = '# Rovai AI v0.0.3\n\n## Fixed\n\n- Reliable updates\n'
+const NOTES = '# Coaxi v0.0.3\n\n## Fixed\n\n- Reliable updates\n'
 
 test('repository release notes are present and bound to the package version', async () => {
   const root = resolve(import.meta.dirname, '../..')
@@ -78,11 +78,11 @@ test('rejects empty, oversized, and stale-version release notes', () => {
     /exceeds/
   )
   assert.throws(
-    () => validateReleaseNotesSource('# Rovai AI v0.0.2\n', VERSION),
-    /Rovai AI v0\.0\.3/
+    () => validateReleaseNotesSource('# Coaxi v0.0.2\n', VERSION),
+    /Coaxi v0\.0\.3/
   )
   assert.throws(
-    () => validateReleaseNotesSource('# Rovai AI v0.0.3\n', VERSION),
+    () => validateReleaseNotesSource('# Coaxi v0.0.3\n', VERSION),
     /include content/
   )
 })

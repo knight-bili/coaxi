@@ -11,7 +11,7 @@ const releaseVersion = releaseMetadata.version
 const releaseNotes = await readFile(join(root, 'build', 'release-notes.md'), 'utf8')
 const releaseSummary = selectReleaseNotesLanguage(releaseNotes, 'zh-CN').split('\n')
   .find((line) => line.trim() && !line.startsWith('#'))
-const appPath = resolve(process.argv[2] ?? join(root, 'dist', 'mac-arm64', 'Rovai AI.app'))
+const appPath = resolve(process.argv[2] ?? join(root, 'dist', 'mac-arm64', 'Coaxi.app'))
 const fixtureRoot = process.env.ROVAI_APP_UPDATES_ACCEPT_FIXTURE_ROOT
   ?? await mkdtemp(join(tmpdir(), 'rovai-app-updates-ui-accept-'))
 const dataDir = join(fixtureRoot, 'user-data')
@@ -197,7 +197,7 @@ async function setTheme(cdp, preference) {
 }
 
 async function launchApp(width, height) {
-  const executable = join(appPath, 'Contents', 'MacOS', 'Rovai AI')
+  const executable = join(appPath, 'Contents', 'MacOS', 'Coaxi')
   const stderr = []
   const child = spawn(executable, [
     '--no-sandbox',

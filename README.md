@@ -2,7 +2,10 @@
 
 <div align="center">
 
-# Rovai AI
+# Coaxi
+
+Coaxi integrates Codeg and Rovai into one workspace. Upstream copyrights and licenses are retained.
+
 
 ### Assemble a team of agents that grows together.
 
@@ -11,8 +14,8 @@ Bring your installed Agents into shared conversations, divide the work,<br>
 inspect execution and file changes, and keep useful knowledge for the next task.
 
 <p>
-  <a href="https://github.com/murray17/rovai-ai/releases"><img src="https://img.shields.io/badge/macOS-arm64%20%2B%20x64-111111?logo=apple&logoColor=white" alt="macOS arm64 + x64"></a>
-  <a href="https://github.com/murray17/rovai-ai/releases"><img src="https://img.shields.io/badge/Windows-x64-0078D4?logo=windows11&logoColor=white" alt="Windows x64"></a>
+  <a href="https://github.com/knight-bili/coaxi/releases"><img src="https://img.shields.io/badge/macOS-arm64%20%2B%20x64-111111?logo=apple&logoColor=white" alt="macOS arm64 + x64"></a>
+  <a href="https://github.com/knight-bili/coaxi/releases"><img src="https://img.shields.io/badge/Windows-x64-0078D4?logo=windows11&logoColor=white" alt="Windows x64"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4b8f77" alt="MIT License"></a>
   <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/Rust-1.85%2B-000000?logo=rust&logoColor=white" alt="Rust 1.85+"></a>
   <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-24%2B-339933?logo=node.js&logoColor=white" alt="Node.js 24+"></a>
@@ -23,7 +26,7 @@ inspect execution and file changes, and keep useful knowledge for the next task.
   <a href="https://rovai.dev/"><strong>Website</strong></a>
   · <a href="https://rovai.dev/download/"><strong>Download</strong></a>
   · <a href="https://rovai.dev/docs/"><strong>Docs</strong></a>
-  · <a href="https://github.com/murray17/rovai-ai/releases"><strong>Releases</strong></a>
+  · <a href="https://github.com/knight-bili/coaxi/releases"><strong>Releases</strong></a>
 </p>
 
 <p><strong>English</strong> | <a href="README.zh-CN.md">简体中文</a></p>
@@ -105,7 +108,7 @@ Rovai keeps the team's collaboration state and coordinates execution. The coding
 
 Desktop and standalone Server share the Host implementation. Each instance has its own data and environment; connecting through a browser does not migrate or synchronize them. Channel integration is provided by Desktop.
 
-[How work moves through Rovai](https://rovai.dev/docs/mechanism.html) · [Engineering architecture](https://github.com/murray17/rovai-ai/blob/main/docs/architecture/README.md)
+[How work moves through Rovai](https://rovai.dev/docs/mechanism.html) · [Engineering architecture](https://github.com/knight-bili/coaxi/blob/main/docs/architecture/README.md)
 
 ## Documentation and development
 
@@ -114,26 +117,26 @@ Desktop and standalone Server share the Host implementation. Each instance has i
 | Learn to use Rovai | [English documentation](https://rovai.dev/docs/) · [中文文档](https://rovai.dev/zh/docs/) |
 | Configure your tools | [Agents](https://rovai.dev/docs/agents.html) · [Skills](https://rovai.dev/docs/skills.html) · [MCP](https://rovai.dev/docs/mcp.html) |
 | Connect another device | [Desktop Web](https://rovai.dev/docs/desktop-web.html) · [Server installation](https://rovai.dev/docs/server-install.html) · [Connection options](https://rovai.dev/docs/remote.html) |
-| Build from source or contribute | [Developer guide](https://github.com/murray17/rovai-ai/blob/main/docs/development/README.md) · [Architecture](https://github.com/murray17/rovai-ai/blob/main/docs/architecture/README.md) · [Compatibility evidence](https://github.com/murray17/rovai-ai/blob/main/docs/runtime-compatibility.md) |
+| Build from source or contribute | [Developer guide](https://github.com/knight-bili/coaxi/blob/main/docs/development/README.md) · [Architecture](https://github.com/knight-bili/coaxi/blob/main/docs/architecture/README.md) · [Compatibility evidence](https://github.com/knight-bili/coaxi/blob/main/docs/runtime-compatibility.md) |
 
 The engineering guides are primarily in Chinese. Start with the developer guide for environment setup and isolated development data, then:
 
 ```sh
-git clone https://github.com/murray17/rovai-ai.git
-cd rovai-ai
+git clone https://github.com/knight-bili/coaxi.git
+cd coaxi
 pnpm install --frozen-lockfile
 pnpm dev
 ```
 
 ## Contributing
 
-[Issues](https://github.com/murray17/rovai-ai/issues) and [pull requests](https://github.com/murray17/rovai-ai/pulls) are welcome. Include the Rovai version, host platform, and steps to reproduce when reporting a problem.
+[Issues](https://github.com/knight-bili/coaxi/issues) and [pull requests](https://github.com/knight-bili/coaxi/pulls) are welcome. Include the Coaxi version, host platform, and steps to reproduce when reporting a problem.
 
 Rovai connects coding agents through native protocols and ACP. See [Agent integration](contributing/agent-integrations.md) for existing adapters, implementation notes, and current gaps.
 
 ## License
 
-[MIT](https://github.com/murray17/rovai-ai/blob/main/LICENSE) — free to use, modify, distribute, and use commercially.
+[MIT](https://github.com/knight-bili/coaxi/blob/main/LICENSE) — free to use, modify, distribute, and use commercially.
 
 ## Community
 

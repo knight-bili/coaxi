@@ -106,17 +106,17 @@ test('rejects a non-App destructive target before verification or copy', (contex
   assert.equal(copyCount, 0)
   if (process.platform === 'win32') {
     // A Windows drive path is never an admitted macOS installation target.
-    assert.throws(() => assertAdmittedDailyInstallTarget('/Applications/Rovai AI.app'), /admitted daily App target/)
+    assert.throws(() => assertAdmittedDailyInstallTarget('/Applications/Coaxi.app'), /admitted daily App target/)
   } else {
     assert.equal(
-      assertAdmittedDailyInstallTarget('/Applications/Rovai AI.app'),
-      '/Applications/Rovai AI.app'
+      assertAdmittedDailyInstallTarget('/Applications/Coaxi.app'),
+      '/Applications/Coaxi.app'
     )
   }
   assert.throws(() => assertAdmittedDailyInstallTarget('/'), /admitted daily App target/)
   assert.throws(() => assertAdmittedDailyInstallTarget('/Applications'), /admitted daily App target/)
   assert.throws(
-    () => assertAdmittedDailyInstallTarget(join(directory, 'dist', 'Rovai AI.app')),
+    () => assertAdmittedDailyInstallTarget(join(directory, 'dist', 'Coaxi.app')),
     /admitted daily App target/
   )
 })

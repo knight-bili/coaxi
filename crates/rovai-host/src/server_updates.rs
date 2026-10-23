@@ -14,9 +14,9 @@ use std::{
 };
 use tokio::{io::AsyncWriteExt, sync::Notify};
 
-const CHANNEL: &str = "https://raw.githubusercontent.com/knight-bili/codeg-rovai-workbench/main/scripts/server-release-tag.txt";
-const RELEASES: &str = "https://github.com/knight-bili/codeg-rovai-workbench/releases/download";
-const API: &str = "https://api.github.com/repos/knight-bili/codeg-rovai-workbench/releases/tags";
+const CHANNEL: &str = "https://raw.githubusercontent.com/knight-bili/coaxi/main/scripts/server-release-tag.txt";
+const RELEASES: &str = "https://github.com/knight-bili/coaxi/releases/download";
+const API: &str = "https://api.github.com/repos/knight-bili/coaxi/releases/tags";
 const MAX_ARCHIVE: u64 = 1024 * 1024 * 1024;
 
 #[derive(Clone)]

@@ -10,7 +10,7 @@ import {
 const TEAM_ID = 'ABCDE12345'
 const validDetails = [
   'CodeDirectory v=20500 size=433 flags=0x10000(runtime) hashes=3+7 location=embedded',
-  'Authority=Developer ID Application: Rovai AI (ABCDE12345)',
+  'Authority=Developer ID Application: Coaxi (ABCDE12345)',
   'Authority=Developer ID Certification Authority',
   'Authority=Apple Root CA',
   'Timestamp=Sep 28, 2026 at 00:00:00',
@@ -42,7 +42,7 @@ test('accepts only ad-hoc signatures for local daily installation', () => {
   assert.throws(() => assertAdhocMacosSignature('App', {
     details: [
       'Signature=adhoc',
-      `Authority=${MACOS_SIGNING_POLICY.authorityPrefix} Rovai AI (${TEAM_ID})`
+      `Authority=${MACOS_SIGNING_POLICY.authorityPrefix} Coaxi (${TEAM_ID})`
     ].join('\n'),
     designatedRequirement: 'designated => cdhash H"1234"'
   }), /certificate authority/)

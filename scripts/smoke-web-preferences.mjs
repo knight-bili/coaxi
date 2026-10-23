@@ -18,7 +18,7 @@ console.log(JSON.stringify({ channel: 'packaged_acceptance', userData, skillLibr
 const env = { ...process.env, ROVAI_ALLOW_ISOLATED_INSTANCE: '1', ROVAI_DISABLE_AUTO_UPDATE_CHECKS: '1' }; delete env.ELECTRON_RUN_AS_NODE
 let app, browser
 try {
-  app = await launchAcceptanceBrowser({ executable: join(root, 'dist/mac-arm64/Rovai AI.app/Contents/MacOS/Rovai AI'), args: ['--no-sandbox', '--remote-debugging-port=0', `--user-data-dir=${userData}`], env })
+  app = await launchAcceptanceBrowser({ executable: join(root, 'dist/mac-arm64/Coaxi.app/Contents/MacOS/Rovai AI'), args: ['--no-sandbox', '--remote-debugging-port=0', `--user-data-dir=${userData}`], env })
   console.log('stage: Core readiness')
   await app.send('Page.bringToFront')
   await app.wait(`window.rovai?.supervisor && window.rovai.supervisor.getSnapshot().then(s=>s.fullCoreState==='ready')`, 60_000)

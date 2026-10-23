@@ -18,7 +18,7 @@ const root = resolve(import.meta.dirname, '..')
 const cliArguments = process.argv.slice(2)
 const suppliedAppPath = cliArguments.find((argument) => !argument.startsWith('--'))
 const appPath = resolve(
-  suppliedAppPath ?? join(root, 'dist', 'mac-arm64', 'Rovai AI.app')
+  suppliedAppPath ?? join(root, 'dist', 'mac-arm64', 'Coaxi.app')
 )
 const suppliedFixtureRoot = process.env.ROVAI_STRUCTURED_MENTIONS_ACCEPT_DATA_DIR
 const fixtureRoot = suppliedFixtureRoot
@@ -139,7 +139,7 @@ const acceptancePermissionOptions = JSON.stringify([
   }
 ])
 
-await access(join(appPath, 'Contents', 'MacOS', 'Rovai AI'))
+await access(join(appPath, 'Contents', 'MacOS', 'Coaxi'))
 await mkdir(dataDir, { recursive: true })
 seedCompletedOnboardingForAcceptance(dataDir)
 await mkdir(acceptanceHome, { recursive: true })
@@ -2115,7 +2115,7 @@ async function removeDirectoryWithRetry(path) {
 
 async function launchApp(userDataDir, port, width, height) {
   const stderr = []
-  const child = spawn(join(appPath, 'Contents', 'MacOS', 'Rovai AI'), [
+  const child = spawn(join(appPath, 'Contents', 'MacOS', 'Coaxi'), [
     ...(process.env.ROVAI_STRUCTURED_MENTIONS_ACCEPT_DISABLE_SANDBOX === '1'
       ? ['--no-sandbox']
       : []),

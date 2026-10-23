@@ -14,15 +14,15 @@ if(platform==='--android'){
   const folder=resolve(root,'apps/mobile-android')
   if(process.platform==='win32')await run('cmd.exe',['/d','/c','gradlew.bat','--no-daemon',':app:assembleDebug'],folder)
   else await run('bash',['gradlew','--no-daemon',':app:assembleDebug'],folder)
-  input=resolve(folder,'app/build/outputs/apk/debug/app-debug.apk');packagePath=resolve(output,'RovaiWorkbench-V1.0.0-android-debug.apk');await cp(input,packagePath)
+  input=resolve(folder,'app/build/outputs/apk/debug/app-debug.apk');packagePath=resolve(output,'Coaxi-V1.0.0-android-debug.apk');await cp(input,packagePath)
 }else{
   if(process.platform!=='darwin')throw new Error('iOS packaging requires a macOS build host')
   await run(process.execPath,[resolve(root,'scripts/build-mobile-cards.mjs'),'--ios'])
   const folder=resolve(root,'apps/mobile-ios'),derived=resolve(root,'out/mobile-ios')
   await run('xcodegen',['generate'],folder)
   await run('xcodebuild',['-project','CodegiOS.xcodeproj','-scheme','CodegiOS','-configuration','Debug','-sdk','iphonesimulator','-destination','generic/platform=iOS Simulator','-derivedDataPath',derived,'CODE_SIGNING_ALLOWED=NO','build'],folder)
-  input=resolve(derived,'Build/Products/Debug-iphonesimulator/RovaiWorkbench.app');await stat(input)
-  packagePath=resolve(output,'RovaiWorkbench-V1.0.0-ios-simulator.app.zip');await run('ditto',['-c','-k','--sequesterRsrc','--keepParent',input,packagePath])
+  input=resolve(derived,'Build/Products/Debug-iphonesimulator/Coaxi.app');await stat(input)
+  packagePath=resolve(output,'Coaxi-V1.0.0-ios-simulator.app.zip');await run('ditto',['-c','-k','--sequesterRsrc','--keepParent',input,packagePath])
 }
 const bytes=await readFile(packagePath),revision=execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),dirty=Boolean(execFileSync('git',['status','--porcelain'],{cwd:root,encoding:'utf8'}).trim())
 await writeFile(packagePath+'.json',JSON.stringify({schemaVersion:1,productId:'codeg-rovai-workbench',targetVersion:'V1.0.0',sourceRevision:revision,dirty,platform:platform.slice(2),kind:platform==='--ios'?'unsigned_simulator':'debug_apk',sha256:createHash('sha256').update(bytes).digest('hex'),bytes:bytes.length,builtAt:new Date().toISOString(),runtimeStarted:false,modelStarted:false,realDeviceVerified:false},null,2)+'\n')

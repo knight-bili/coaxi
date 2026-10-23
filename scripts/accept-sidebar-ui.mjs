@@ -5,7 +5,7 @@ import { execFileSync, spawn } from 'node:child_process'
 import { seedCompletedOnboardingForAcceptance } from './lib/dev-desktop.mjs'
 
 const root = resolve(import.meta.dirname, '..')
-const appPath = resolve(process.argv[2] ?? join(root, 'dist', 'mac-arm64', 'Rovai AI.app'))
+const appPath = resolve(process.argv[2] ?? join(root, 'dist', 'mac-arm64', 'Coaxi.app'))
 const acceptanceScope = process.env.ROVAI_SIDEBAR_ACCEPT_SCOPE ?? 'all'
 if (!['all', 'navigation-windows', 'deletion-latency'].includes(acceptanceScope)) throw new Error('Unknown sidebar acceptance scope')
 const fixtureRoot = process.env.ROVAI_SIDEBAR_ACCEPT_FIXTURE_ROOT
@@ -1434,7 +1434,7 @@ async function setTheme(cdp, preference) {
 }
 
 async function launchApp(port, width, height, reducedMotion) {
-  const executable = join(appPath, 'Contents', 'MacOS', 'Rovai AI')
+  const executable = join(appPath, 'Contents', 'MacOS', 'Coaxi')
   const stderr = []
   const child = spawn(executable, [
     `--remote-debugging-port=${port}`,

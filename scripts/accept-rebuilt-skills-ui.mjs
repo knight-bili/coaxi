@@ -7,7 +7,7 @@ import { assertUserDataIsIsolated, seedCompletedOnboardingForAcceptance } from '
 const appPath = process.argv[2]
 const outputDirectory = process.argv[3] && resolve(process.argv[3])
 if (!appPath || !outputDirectory) {
-  throw new Error('Usage: ROVAI_CAPTURE_USER_DATA_DIR=<isolated path> node scripts/accept-rebuilt-skills-ui.mjs <Rovai AI.app> <output-directory>')
+  throw new Error('Usage: ROVAI_CAPTURE_USER_DATA_DIR=<isolated path> node scripts/accept-rebuilt-skills-ui.mjs <Coaxi.app> <output-directory>')
 }
 const userDataDirectory = assertUserDataIsIsolated(process.env.ROVAI_CAPTURE_USER_DATA_DIR)
 const theme = process.env.ROVAI_CAPTURE_THEME ?? 'day'
@@ -37,7 +37,7 @@ for (const [directory, name] of [['.agents', 'shared-user-skill'], ['.qoder', 'q
 seedCompletedOnboardingForAcceptance(userDataDirectory)
 
 const port = await freePort()
-const app = spawn(join(appPath, 'Contents', 'MacOS', 'Rovai AI'), [
+const app = spawn(join(appPath, 'Contents', 'MacOS', 'Coaxi'), [
   `--remote-debugging-port=${port}`,
   `--user-data-dir=${userDataDirectory}`
 ], {

@@ -1,10 +1,11 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { dirname, join, relative, resolve } from 'node:path'
+import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { JSDOM } from 'jsdom'
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)))
 const dist = join(root, 'site', '.vitepress', 'dist')
+const siteOrigin = new URL(process.env.COAXI_SITE_ORIGIN || 'http://localhost:4173').origin
 const htmlFiles = []
 const problems = []
 
@@ -17,7 +18,10 @@ function walk(dir) {
 }
 
 walk(dist)
-const pageCount = htmlFiles.filter(path => !path.includes('/examples/') && !path.endsWith('/404.html')).length
+const pageCount = htmlFiles.filter(path => {
+  const normalized = path.replaceAll('\\', '/')
+  return !normalized.includes('/examples/') && !normalized.endsWith('/404.html')
+}).length
 if (pageCount !== 80) problems.push(`Expected 80 published pages, found ${pageCount}`)
 
 for (const path of htmlFiles) {
@@ -31,10 +35,11 @@ for (const path of htmlFiles) {
     for (const name of ['href', 'src', 'data-image']) {
       const value = element.getAttribute(name)
       if (!value || value.startsWith('data:') || value.startsWith('mailto:')) continue
-      const url = new URL(value, `https://rovai.dev${route}`)
-      if (url.origin !== 'https://rovai.dev') continue
+      const url = new URL(value, `${siteOrigin}${route}`)
+      if (url.origin !== siteOrigin) continue
       const target = resolve(dist, '.' + url.pathname, url.pathname.endsWith('/') ? 'index.html' : '')
-      if (!target.startsWith(dist + '/') && target !== dist) {
+      const insidePath = relative(dist, target)
+      if (insidePath === '..' || insidePath.startsWith('..' + sep) || isAbsolute(insidePath)) {
         problems.push(`${route}: link escapes the site: ${value}`)
       } else if (!existsSync(target)) {
         problems.push(`${route}: missing ${name} target ${value}`)
@@ -50,7 +55,7 @@ for (const lang of ['', '/zh']) {
   const home = new JSDOM(readFileSync(join(dist, lang, 'index.html'), 'utf8')).window.document
   const download = readFileSync(join(dist, lang, 'download', 'index.html'), 'utf8')
   if (!home.querySelector('.hero-figure img')) problems.push(`${lang || '/'}: hero product image is missing`)
-  for (const asset of ['Rovai-AI-0.4.8-arm64.dmg', 'Rovai-AI-0.4.8-x64.dmg', 'Rovai-AI-0.4.8-x64.exe']) {
+  for (const asset of ['Coaxi-0.4.8-arm64.dmg', 'Coaxi-0.4.8-x64.dmg', 'Coaxi-0.4.8-x64.exe']) {
     if (!download.includes(`/releases/download/v0.4.8/${asset}`)) problems.push(`${lang}/download: missing ${asset}`)
   }
   for (const target of ['linux-x64.tar.gz','macos-arm64.tar.gz','macos-x64.tar.gz','windows-x64.zip']) {

@@ -286,9 +286,9 @@
     'Publish a teammate bot from the desktop App, then verify one small request from your own Feishu chat.',
     '从桌面应用发布队员机器人，再用自己的飞书聊天验证一条小范围请求。',[
     P('Prepare the account and host','准备账号与主机',
-      ['Use the Feishu identity and tenant that will own the application. That identity needs access to the Feishu developer console and the ability to create and publish an internal application; some tenants require an administrator to approve publication or permissions. Confirm that approval route before setup.','Keep Rovai Desktop and the teammate’s configured Agent running on the execution host. Complete a small local conversation first. This tutorial uses an already published teammate bot. A private text test was followed by a dedicated demonstration group containing only the owner and that bot.','Feishu and Lark are separate providers. Choose the tenant’s actual provider; a Feishu connection is not a Lark connection.'],
+      ['Use the Feishu identity and tenant that will own the application. That identity needs access to the Feishu developer console and the ability to create and publish an internal application; some tenants require an administrator to approve publication or permissions. Confirm that approval route before setup.','Keep Coaxi Desktop and the teammate’s configured Agent running on the execution host. Complete a small local conversation first. This tutorial uses an already published teammate bot. A private text test was followed by a dedicated demonstration group containing only the owner and that bot.','Feishu and Lark are separate providers. Choose the tenant’s actual provider; a Feishu connection is not a Lark connection.'],
       ['使用准备持有应用的飞书身份和租户。该身份需要能访问开放平台并创建、发布企业自建应用；部分租户需要管理员审核发布或权限，配置前先确认审核方式。','保持执行主机上的 Rovai 桌面应用与队员智能体可用，先在本地完成一条简单会话。本教程先用已发布队员机器人测试所有者私聊，再建立仅含所有者和该机器人的专用演示群。','飞书与 Lark 是不同平台，请选择租户实际所属的平台；飞书连接不能等同于 Lark 连接。']),
-    S('Sign in from Rovai Desktop','从 Rovai 桌面端登录',
+    S('Sign in from Coaxi Desktop','从 Rovai 桌面端登录',
       ['Open Settings → Channels and select Feishu. Start the developer-account sign-in from the native desktop App.','Use your Feishu client to complete the platform login. On the confirmation screen, inspect the account and tenant you are authorizing. Never share the live QR code in a tutorial or support message.','Return to Channels and check the displayed developer identity. Signing in establishes the account context; it does not itself publish every teammate.'],
       ['打开“设置 → 渠道”，选择飞书，在桌面端发起开发者账号登录。','用飞书客户端完成平台登录，在确认界面核对授权身份与租户。有效登录二维码不要放进教程或支持消息。','回到渠道页，确认显示的开发者身份。登录只是建立账号上下文，不会自动发布全部队员。']),
     S('Publish the intended teammate','发布选定队员',
@@ -422,7 +422,7 @@
       'Mac 用户从 v0.4.0 或更早版本升级到 v0.4.1 时，由于签名身份变更，需要手动覆盖安装一次。完成手头工作并退出 Rovai，下载对应芯片的 DMG，拖入“应用程序”并选择“替换”；重新打开后检查会话与设置。不要卸载旧版或清理用户数据。'
     ]},
     {kind:'links',title:['Release details','版本说明'],links:[
-      {url:'https://github.com/murray17/rovai-ai/releases/tag/v0.4.1',label:['Read the v0.4.1 upgrade notes','查看 v0.4.1 升级说明']}
+      {url:'https://github.com/knight-bili/coaxi/releases/tag/v0.4.1',label:['Read the v0.4.1 upgrade notes','查看 v0.4.1 升级说明']}
     ]}
   );
   for(const [id,ids] of Object.entries({

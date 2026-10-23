@@ -1,6 +1,9 @@
 <div align="center">
 
-# Rovai AI
+# Coaxi
+
+基于 Codeg 与 Rovai 融合的工作台。保留两个上游项目的许可证、版权和来源记录。
+
 
 ### 组建一支会一起成长的 Agent 队伍。
 
@@ -9,8 +12,8 @@
 并保留下一次工作仍用得上的经验。
 
 <p>
-  <a href="https://github.com/murray17/rovai-ai/releases"><img src="https://img.shields.io/badge/macOS-arm64%20%2B%20x64-111111?logo=apple&logoColor=white" alt="macOS arm64 + x64"></a>
-  <a href="https://github.com/murray17/rovai-ai/releases"><img src="https://img.shields.io/badge/Windows-x64-0078D4?logo=windows11&logoColor=white" alt="Windows x64"></a>
+  <a href="https://github.com/knight-bili/coaxi/releases"><img src="https://img.shields.io/badge/macOS-arm64%20%2B%20x64-111111?logo=apple&logoColor=white" alt="macOS arm64 + x64"></a>
+  <a href="https://github.com/knight-bili/coaxi/releases"><img src="https://img.shields.io/badge/Windows-x64-0078D4?logo=windows11&logoColor=white" alt="Windows x64"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4b8f77" alt="MIT License"></a>
   <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/Rust-1.85%2B-000000?logo=rust&logoColor=white" alt="Rust 1.85+"></a>
   <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-24%2B-339933?logo=node.js&logoColor=white" alt="Node.js 24+"></a>
@@ -21,7 +24,7 @@
   <a href="https://rovai.dev/zh/"><strong>官网</strong></a>
   · <a href="https://rovai.dev/zh/download/"><strong>下载</strong></a>
   · <a href="https://rovai.dev/zh/docs/"><strong>使用文档</strong></a>
-  · <a href="https://github.com/murray17/rovai-ai/releases"><strong>更新日志</strong></a>
+  · <a href="https://github.com/knight-bili/coaxi/releases"><strong>更新日志</strong></a>
 </p>
 
 <p><a href="README.md">English</a> | <strong>简体中文</strong></p>
@@ -103,7 +106,7 @@ Rovai 保存队伍的协作状态并协调执行。编程智能体使用各自�
 
 Desktop 与独立 Server 复用 Host 实现，各自拥有数据和运行环境。通过浏览器连接不会迁移或同步两个实例；渠道接入由 Desktop 提供。
 
-[工作机制](https://rovai.dev/zh/docs/mechanism.html) · [工程架构](https://github.com/murray17/rovai-ai/blob/main/docs/architecture/README.md)
+[工作机制](https://rovai.dev/zh/docs/mechanism.html) · [工程架构](https://github.com/knight-bili/coaxi/blob/main/docs/architecture/README.md)
 
 ## 文档与开发
 
@@ -112,26 +115,26 @@ Desktop 与独立 Server 复用 Host 实现，各自拥有数据和运行环境�
 | 学习使用 Rovai | [中文文档](https://rovai.dev/zh/docs/) · [English documentation](https://rovai.dev/docs/) |
 | 配置智能体与工具 | [智能体](https://rovai.dev/zh/docs/agents.html) · [Skills](https://rovai.dev/zh/docs/skills.html) · [MCP](https://rovai.dev/zh/docs/mcp.html) |
 | 从另一台设备访问 | [Desktop Web](https://rovai.dev/zh/docs/desktop-web.html) · [Server 安装](https://rovai.dev/zh/docs/server-install.html) · [连接方式](https://rovai.dev/zh/docs/remote.html) |
-| 从源码运行或参与开发 | [开发者指南](https://github.com/murray17/rovai-ai/blob/main/docs/development/README.md) · [系统架构](https://github.com/murray17/rovai-ai/blob/main/docs/architecture/README.md) · [兼容性实测](https://github.com/murray17/rovai-ai/blob/main/docs/runtime-compatibility.md) |
+| 从源码运行或参与开发 | [开发者指南](https://github.com/knight-bili/coaxi/blob/main/docs/development/README.md) · [系统架构](https://github.com/knight-bili/coaxi/blob/main/docs/architecture/README.md) · [兼容性实测](https://github.com/knight-bili/coaxi/blob/main/docs/runtime-compatibility.md) |
 
 先按开发者指南准备环境与隔离的开发数据，再运行：
 
 ```sh
-git clone https://github.com/murray17/rovai-ai.git
-cd rovai-ai
+git clone https://github.com/knight-bili/coaxi.git
+cd coaxi
 pnpm install --frozen-lockfile
 pnpm dev
 ```
 
 ## 参与贡献
 
-欢迎提交 [Issue](https://github.com/murray17/rovai-ai/issues) 或 [Pull Request](https://github.com/murray17/rovai-ai/pulls)。反馈问题时，请附上 Rovai 版本、主机平台和复现步骤。
+欢迎提交 [Issue](https://github.com/knight-bili/coaxi/issues) 或 [Pull Request](https://github.com/knight-bili/coaxi/pulls)。反馈问题时，请附上 Coaxi 版本、主机平台和复现步骤。
 
 Rovai 通过原生协议和 ACP 连接不同的编程智能体。已有适配、实现方式与待完善项见[智能体接入](contributing/agent-integrations.zh-CN.md)。
 
 ## 许可证
 
-[MIT](https://github.com/murray17/rovai-ai/blob/main/LICENSE) — 允许自由使用、修改、分发和商业使用。
+[MIT](https://github.com/knight-bili/coaxi/blob/main/LICENSE) — 允许自由使用、修改、分发和商业使用。
 
 ## 社区
 

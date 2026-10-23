@@ -102,6 +102,7 @@ try {
     [System.IO.Path]::DirectorySeparatorChar
   $managedNames = @(
     $ExecutableName,
+  'Codeg Rovai Workbench.exe', # Previous product name; still constrained to this installation path.
     'rovai-host.exe',
     'rovai-core.exe',
     'rovai.exe'

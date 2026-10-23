@@ -1,6 +1,6 @@
 {
-  "name": "codeg-rovai-workbench",
-  "productName": "Codeg Rovai Workbench",
+  "name": "coaxi",
+  "productName": "Coaxi",
   "version": "0.4.8",
   "private": true,
   "type": "module",
@@ -286,7 +286,7 @@
   },
   "build": {
     "appId": "app.codegrovai.workbench.desktop",
-    "productName": "Codeg Rovai Workbench",
+    "productName": "Coaxi",
     "asar": true,
     "directories": {
       "output": "dist",
@@ -301,7 +301,7 @@
       {
         "provider": "github",
         "owner": "knight-bili",
-        "repo": "codeg-rovai-workbench",
+        "repo": "coaxi",
         "releaseType": "draft"
       }
     ],
@@ -374,7 +374,7 @@
       "entitlements": "build/entitlements.mac.plist",
       "entitlementsInherit": "build/entitlements.mac.plist",
       "extendInfo": {
-        "CFBundleDisplayName": "Codeg Rovai Workbench",
+        "CFBundleDisplayName": "Coaxi",
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": false,
           "NSAllowsLocalNetworking": true
@@ -387,11 +387,11 @@
         "dmg",
         "zip"
       ],
-      "artifactName": "Codeg-Rovai-Workbench-${version}-${arch}.${ext}"
+      "artifactName": "Coaxi-${version}-${arch}.${ext}"
     },
     "win": {
       "icon": "build/icon.png",
-      "executableName": "Codeg Rovai Workbench",
+      "executableName": "Coaxi",
       "target": [
         {
           "target": "nsis",
@@ -458,7 +458,7 @@
           "to": "workbench/product-release.json"
         }
       ],
-      "artifactName": "Codeg-Rovai-Workbench-${version}-${arch}.${ext}"
+      "artifactName": "Coaxi-${version}-${arch}.${ext}"
     },
     "nsis": {
       "oneClick": false,
@@ -472,7 +472,7 @@
       "warningsAsErrors": true
     },
     "dmg": {
-      "title": "Codeg Rovai Workbench ${version}",
+      "title": "Coaxi ${version}",
       "window": {
         "width": 540,
         "height": 380
@@ -492,7 +492,7 @@
     },
     "linux": {
       "icon": "build/icon.png",
-      "executableName": "codeg-rovai-workbench",
+      "executableName": "coaxi",
       "category": "Development",
       "target": [
         "AppImage",
@@ -552,12 +552,13 @@
           "to": "workbench/product-release.json"
         }
       ],
-      "artifactName": "Codeg-Rovai-Workbench-${version}-linux-${arch}.${ext}"
+      "artifactName": "Coaxi-${version}-linux-${arch}.${ext}"
     },
     "protocols": [
       {
-        "name": "Codeg Rovai Workbench",
+        "name": "Coaxi",
         "schemes": [
+          "coaxi",
           "rovai"
         ]
       }

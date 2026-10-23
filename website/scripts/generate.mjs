@@ -7,7 +7,7 @@ import MarkdownIt from 'markdown-it'
 const root = dirname(dirname(fileURLToPath(import.meta.url)))
 const source = join(root, 'scripts', 'source')
 const site = join(root, 'site')
-const origin = 'https://rovai.dev'
+const origin = process.env.COAXI_SITE_ORIGIN || 'http://localhost:4173'
 const scripts = Object.fromEntries(await Promise.all(
   ['docs-content.js', 'docs-details.js', 'docs-tutorials.js', 'docs-deployment.js', 'site.js'].map(async name =>
     [name, await readFile(join(source, name), 'utf8')]
@@ -142,13 +142,13 @@ async function generate(page, lang, topic = '') {
   const localized = pair => pair?.[lang === 'zh' ? 1 : 0] || ''
   const topicData = topic ? data.topics[topic] : null
   const title = topicData ? localized(topicData.title) : page === 'home'
-    ? (lang === 'zh' ? 'Rovai AI — 组建一支长期协作的 Agent 队伍' : 'Rovai AI — Your Agents. One lasting team.')
-    : page === 'download' ? (lang === 'zh' ? '下载 Rovai AI' : 'Download Rovai AI')
-      : (lang === 'zh' ? 'Rovai AI 文档' : 'Rovai AI documentation')
+    ? (lang === 'zh' ? 'Coaxi — 组建一支长期协作的 Agent 队伍' : 'Coaxi — Your Agents. One lasting team.')
+    : page === 'download' ? (lang === 'zh' ? '下载 Coaxi' : 'Download Coaxi')
+      : (lang === 'zh' ? 'Coaxi 文档' : 'Coaxi documentation')
   const description = topicData ? localized(topicData.description || topicData.lead) : page === 'home'
     ? (lang === 'zh' ? '把编程智能体带到同一个桌面工作台，组织长期队员、会话和任务。' : 'Bring your coding Agents together in a desktop workspace for lasting teammates, conversations and tasks.')
-    : page === 'download' ? (lang === 'zh' ? '下载 Rovai Desktop，或为自己的主机安装独立 Rovai Server。' : 'Download Rovai Desktop or install standalone Rovai Server on your own host.')
-      : (lang === 'zh' ? '了解 Rovai AI 的队员、协作、执行、扩展和设置。' : 'Learn how to use teammates, collaboration, execution, extensions and settings in Rovai AI.')
+    : page === 'download' ? (lang === 'zh' ? '下载 Coaxi Desktop，或为自己的主机安装独立 Coaxi Server。' : 'Download Coaxi Desktop or install standalone Coaxi Server on your own host.')
+      : (lang === 'zh' ? '了解 Coaxi 的队员、协作、执行、扩展和设置。' : 'Learn how to use teammates, collaboration, execution, extensions and settings in Coaxi.')
   const app = doc.getElementById('app')
   // Encode preformatted line breaks after serialization: assigning entities to
   // innerHTML decodes them again before the outer whitespace removal runs.

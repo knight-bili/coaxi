@@ -12,7 +12,7 @@ if (process.platform !== 'darwin') {
 }
 
 const root = resolve(import.meta.dirname, '..')
-const appPath = resolve(process.argv[2] ?? join(root, 'dist', 'mac-arm64', 'Rovai AI.app'))
+const appPath = resolve(process.argv[2] ?? join(root, 'dist', 'mac-arm64', 'Coaxi.app'))
 const requestedFixtureRoot = resolve(process.env.ROVAI_BOOTSTRAP_ACCEPT_FIXTURE_ROOT
   ?? await mkdtemp(join(tmpdir(), 'rovai-bootstrap-shell-ui-accept-')))
 await mkdir(requestedFixtureRoot, { recursive: true })
@@ -498,7 +498,7 @@ async function setTheme(cdp, preference) {
 }
 
 async function launchApp(userData = dataDir) {
-  const executable = join(appPath, 'Contents', 'MacOS', 'Rovai AI')
+  const executable = join(appPath, 'Contents', 'MacOS', 'Coaxi')
   const stderr = []
   const child = spawn(executable, [
     '--no-sandbox',

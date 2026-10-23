@@ -7,7 +7,7 @@ import { seedCompletedOnboardingForAcceptance } from './lib/dev-desktop.mjs'
 import { coreDataDirectoryArguments } from './lib/runtime-camp-files-root.mjs'
 
 const root = resolve(import.meta.dirname, '..')
-const appPath = resolve(process.argv[2] ?? join(root, 'dist', 'mac-arm64', 'Rovai AI.app'))
+const appPath = resolve(process.argv[2] ?? join(root, 'dist', 'mac-arm64', 'Coaxi.app'))
 const fixtureRoot = process.env.ROVAI_TASK_CARD_ACCEPT_FIXTURE_ROOT
   ?? await mkdtemp(join(tmpdir(), 'rovai-task-card-ui-accept-'))
 const dataDir = join(fixtureRoot, 'user-data')
@@ -729,7 +729,7 @@ async function setTheme(cdp, preference) {
 }
 
 async function launchApp(port, width, height, reducedMotion) {
-  const executable = join(appPath, 'Contents', 'MacOS', 'Rovai AI')
+  const executable = join(appPath, 'Contents', 'MacOS', 'Coaxi')
   const stderr = []
   const child = spawn(executable, [
     `--remote-debugging-port=${port}`,

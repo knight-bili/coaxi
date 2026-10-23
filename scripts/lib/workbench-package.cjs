@@ -7,9 +7,9 @@ function recordWorkbenchPackage(context){
   const repository=context.packager.projectDir,platform=context.electronPlatformName
   const resources=platform==='darwin'?join(context.appOutDir,`${context.packager.appInfo.productFilename}.app`,'Contents/Resources'):join(context.appOutDir,'resources')
   const identity=JSON.parse(readFileSync(join(resources,'workbench/product-release.json'),'utf8'))
-  if(identity.productId!=='codeg-rovai-workbench'||identity.repository!=='https://github.com/knight-bili/codeg-rovai-workbench')throw new Error('Fusion package identity is missing or belongs to another product')
+  if(identity.productId!=='codeg-rovai-workbench'||identity.repository!=='https://github.com/knight-bili/coaxi')throw new Error('Fusion package identity is missing or belongs to another product')
   const source=JSON.parse(readFileSync(join(resources,'workbench/sources.lock.json'),'utf8'))
-  if(source.repository!=='knight-bili/codeg-rovai-workbench')throw new Error('Fusion source lock mismatch')
+  if(source.repository!=='knight-bili/coaxi')throw new Error('Fusion source lock mismatch')
   const suffix=platform==='win32'?'.exe':''
   const binaries=['rovai-core','rovai-host','rovai','rovai-native-history'].map(name=>`bin/${name}${suffix}`)
   const documents=['licenses/rovai-LICENSE','licenses/THIRD_PARTY_NOTICES.md','licenses/integration/codeg/LICENSE','licenses/integration/rovai-ai/LICENSE','workbench/sources.lock.json','workbench/product-release.json']

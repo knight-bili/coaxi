@@ -95,7 +95,7 @@ test('phone workbench uses shared navigation, schedules and per-tab drafts', { t
     await browser.wait(`document.documentElement.dataset.mobileWeb==='true' && document.querySelector('[aria-label="打开主菜单"]')!==null`)
     await browser.click(byLabel('打开主菜单'))
     await browser.wait(`document.querySelector('.camp-nav-open')!==null`)
-    assert.equal(await browser.evaluate('document.title'), 'Rovai AI')
+    assert.equal(await browser.evaluate('document.title'), 'Coaxi')
     stage = 'wide Web pinned navigation'
     await browser.send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 920, deviceScaleFactor: 1, mobile: false })
     await browser.send('Emulation.setTouchEmulationEnabled', { enabled: false })

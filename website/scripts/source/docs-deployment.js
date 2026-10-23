@@ -13,8 +13,8 @@
   const link=(id,en,zh)=>({id,label:[en,zh]});
   const ext=(url,en,zh)=>({url,label:[en,zh]});
   const T=(en,zh,e,z,sections)=>({title:[en,zh],lead:[e,z],sections});
-  const release='https://github.com/murray17/rovai-ai/releases/tag/v0.4.8';
-  const releaseFiles='https://github.com/murray17/rovai-ai/releases/download/v0.4.8/';
+  const release='https://github.com/knight-bili/coaxi/releases/tag/v0.4.8';
+  const releaseFiles='https://github.com/knight-bili/coaxi/releases/download/v0.4.8/';
   const related=ids=>L('Continue reading','接着阅读',ids.map(id=>({id,label:topics[id].title})));
   for(const group of groups)group.ids=group.ids.filter(id=>id!=='remote');
   groups.splice(groups.findIndex(g=>g.ids.includes('compatibility')),0,{
@@ -79,8 +79,8 @@
     'Open your existing Desktop workspace in another browser. This guide describes Desktop 0.4.8.',
     '从另一个浏览器打开已有桌面工作台。本页按 Desktop 0.4.8 编写。',[
     S('Enable the service on your desktop host','在桌面主机开启服务',
-      ['Finish installing and opening Rovai Desktop on the computer that owns your project. Confirm that the original conversation works there.', 'Open Settings → Remote connection. Keep the default port 8766 if it is free; otherwise choose an unused port. Port changes take effect when you enable the service again.', 'Turn on remote access. Check that the status becomes running and that the page lists an address. The Desktop listener accepts connections on the host’s network interfaces.', 'For a first check on this computer, open its local address. For a phone, choose an address belonging to the network the phone can reach.', 'Copy the login Token from the same settings page and enter it into the browser login form. Keep the Token out of URLs, screenshots and shared notes.'],
-      ['在保存项目的电脑上安装并打开 Rovai Desktop，先确认原会话可以正常工作。','进入“设置 → 远程连接”。8766 未被占用时保留默认值；否则选择空闲端口。修改端口后，需要重新开启服务才生效。','开启远程访问，确认状态变为运行中且页面列出地址。Desktop 会在主机的网络接口上接受连接。','先在这台电脑用本机地址检查；手机应选择手机所在网络能够访问的主机地址。','从同一设置页复制登录 Token，填入浏览器登录表单。不要把 Token 放进 URL、截图或共享笔记。']),
+      ['Finish installing and opening Coaxi Desktop on the computer that owns your project. Confirm that the original conversation works there.', 'Open Settings → Remote connection. Keep the default port 8766 if it is free; otherwise choose an unused port. Port changes take effect when you enable the service again.', 'Turn on remote access. Check that the status becomes running and that the page lists an address. The Desktop listener accepts connections on the host’s network interfaces.', 'For a first check on this computer, open its local address. For a phone, choose an address belonging to the network the phone can reach.', 'Copy the login Token from the same settings page and enter it into the browser login form. Keep the Token out of URLs, screenshots and shared notes.'],
+      ['在保存项目的电脑上安装并打开 Coaxi Desktop，先确认原会话可以正常工作。','进入“设置 → 远程连接”。8766 未被占用时保留默认值；否则选择空闲端口。修改端口后，需要重新开启服务才生效。','开启远程访问，确认状态变为运行中且页面列出地址。Desktop 会在主机的网络接口上接受连接。','先在这台电脑用本机地址检查；手机应选择手机所在网络能够访问的主机地址。','从同一设置页复制登录 Token，填入浏览器登录表单。不要把 Token 放进 URL、截图或共享笔记。']),
     I('Settings and running address','设置入口与运行地址',['desktop-web-settings-en.jpg','desktop-web-settings-zh.jpg'],
       'An isolated Desktop 0.4.1 instance. The example uses port 18766 because 8766 was occupied; the product default remains 8766. This crop shows the toggle, port and local address; the host’s private network address and credentials are outside the crop.',
       '隔离的 Desktop 0.4.1 实例。截图因 8766 已被占用而使用 18766；产品默认仍为 8766。截取开关、端口与本机地址，主机私网地址和凭据不进入公开画面。'),
@@ -106,7 +106,7 @@
       ['主机需要保持唤醒、联网，Desktop 持续运行；所选智能体应已安装、登录，并能访问模型服务。关闭浏览器标签页不会停止已经接收的执行。','关闭 Web 访问会结束浏览器会话，不等于撤销 Desktop 中的工作。退出 Desktop 或关闭主机可能中断执行。App 重启后，要回远程连接重新开启 Web。','跨网络访问阅读 Tailscale 教程。Desktop 0.4.8 设置无法配置外部 HTTPS 来源；需要 Serve HTTPS 或公网域名时，使用独立 Server 配方。'])
   ]);
 
-  topics['server-install']=T('Install and run Rovai Server','安装与启动 Rovai Server',
+  topics['server-install']=T('Install and run Coaxi Server','安装与启动 Coaxi Server',
     'Install the published native package, start one independent workspace, and open it in a browser. No source build is required.',
     '安装已发布的原生包，启动独立工作台，再从浏览器进入。普通安装不需要源码构建。',[
     P('Server 0.4.8 unified release','Server 0.4.8 同版发布',
@@ -193,8 +193,8 @@ sh install-server.sh --version 0.4.8`),
       ['Replace the IP with your host’s actual address. On macOS 0.4.0, replace rovai-server with "$HOME/.local/share/rovai-server/current/rovai-server" as described in the installation guide. On Windows PowerShell, place the arguments on one line instead of using the shell continuation character above.', 'The flag acknowledges unencrypted HTTP on a trusted network; it does not turn off login. Do not forward this port from your Internet router or permit it from every public address.'],
       ['把 IP 替换为真实主机地址。macOS 0.4.0 按安装页把 rovai-server 替换为 "$HOME/.local/share/rovai-server/current/rovai-server"。Windows PowerShell 请把参数放在同一行，不使用上方 shell 续行符。','该参数确认在可信网络使用未加密 HTTP，不会关闭登录认证。不要把此端口通过路由器映射到公网，也不要允许全部公网来源访问。']),
     S('Allow only the required local traffic','只放行所需局域网流量',
-      ['If the host firewall blocks the listener, add an inbound rule for the selected TCP port and your trusted local subnet. Keep the firewall enabled.', 'On macOS, review the firewall’s application permission for Rovai Desktop or the Server executable. On Windows, limit an inbound rule to the Private profile and the local subnet; do not change an untrusted network to Private just to connect.', 'On Ubuntu using UFW, the example below allows a /24 LAN to port 8767. Substitute your real subnet and use port 8766 only for Desktop. It adds a rule; it does not enable or disable UFW.', 'Open http://192.168.1.50:8767/ for Server, or http://192.168.1.50:8766/ for Desktop, on the other device. Enter that instance’s Token and open the intended conversation.'],
-      ['若主机防火墙阻止连接，为所选 TCP 端口和可信局域网网段增加入站规则，保持防火墙开启。','macOS 检查 Rovai Desktop 或 Server 程序的防火墙应用许可。Windows 将入站规则限定为专用网络和本地子网，不要为连接方便把不可信网络改成专用。','Ubuntu 使用 UFW 时，下方示例允许一个 /24 局域网访问 8767。替换真实网段；Desktop 才使用 8766。命令仅添加规则，不会启停 UFW。','在另一台设备打开 Server 的 http://192.168.1.50:8767/，或 Desktop 的 http://192.168.1.50:8766/。输入对应实例 Token，进入目标会话。']),
+      ['If the host firewall blocks the listener, add an inbound rule for the selected TCP port and your trusted local subnet. Keep the firewall enabled.', 'On macOS, review the firewall’s application permission for Coaxi Desktop or the Server executable. On Windows, limit an inbound rule to the Private profile and the local subnet; do not change an untrusted network to Private just to connect.', 'On Ubuntu using UFW, the example below allows a /24 LAN to port 8767. Substitute your real subnet and use port 8766 only for Desktop. It adds a rule; it does not enable or disable UFW.', 'Open http://192.168.1.50:8767/ for Server, or http://192.168.1.50:8766/ for Desktop, on the other device. Enter that instance’s Token and open the intended conversation.'],
+      ['若主机防火墙阻止连接，为所选 TCP 端口和可信局域网网段增加入站规则，保持防火墙开启。','macOS 检查 Coaxi Desktop 或 Server 程序的防火墙应用许可。Windows 将入站规则限定为专用网络和本地子网，不要为连接方便把不可信网络改成专用。','Ubuntu 使用 UFW 时，下方示例允许一个 /24 局域网访问 8767。替换真实网段；Desktop 才使用 8766。命令仅添加规则，不会启停 UFW。','在另一台设备打开 Server 的 http://192.168.1.50:8767/，或 Desktop 的 http://192.168.1.50:8766/。输入对应实例 Token，进入目标会话。']),
     C('Ubuntu UFW · example scoped rule','Ubuntu UFW · 限定来源的示例规则',
 `sudo ufw allow from 192.168.1.0/24 to any port 8767 proto tcp
 sudo ufw status`),
@@ -222,7 +222,7 @@ sudo ufw status`),
       ext('https://tailscale.com/download','Install Tailscale on both devices','在两端安装 Tailscale'),
       ext('https://tailscale.com/docs/how-to/set-up-https-certificates','MagicDNS, HTTPS and certificate names','MagicDNS、HTTPS 与证书名称')]),
     S('Server · prepare the HTTPS entrance','Server · 准备 HTTPS 入口',
-      ['On the host, inspect tailscale serve status first. Use an available HTTPS port; do not replace an existing unrelated Serve/Funnel configuration.', 'Create the Serve mapping below. On a platform where the CLI already has the required rights, omit sudo. Follow any setup link Tailscale prints to enable HTTPS.', 'Read the exact https://…ts.net address from tailscale serve status. The sample orbit-host.example-tailnet.ts.net below is a placeholder.', 'Stop any foreground Rovai Server using this data directory. Start it on loopback with --public-origin set to that exact HTTPS origin (scheme, host and any non-default port; no path or query).'],
+      ['On the host, inspect tailscale serve status first. Use an available HTTPS port; do not replace an existing unrelated Serve/Funnel configuration.', 'Create the Serve mapping below. On a platform where the CLI already has the required rights, omit sudo. Follow any setup link Tailscale prints to enable HTTPS.', 'Read the exact https://…ts.net address from tailscale serve status. The sample orbit-host.example-tailnet.ts.net below is a placeholder.', 'Stop any foreground Coaxi Server using this data directory. Start it on loopback with --public-origin set to that exact HTTPS origin (scheme, host and any non-default port; no path or query).'],
       ['先在主机运行 tailscale serve status。选择空闲 HTTPS 端口，不覆盖无关 Serve / Funnel 配置。','创建下方 Serve 转发。CLI 已具备所需权限的平台可省略 sudo。若打印启用 HTTPS 的设置链接，按 Tailscale 流程完成。','从 tailscale serve status 读取真实 https://…ts.net 地址；下方 orbit-host.example-tailnet.ts.net 是占位值。','先停止使用该数据目录的原前台 Server，再以回环地址启动，将 --public-origin 设置为真实 HTTPS 来源（协议、主机及非默认端口，不带路径或查询参数）。']),
     C('On the host · configure Serve','在主机配置 Serve',
 `tailscale serve status
@@ -331,7 +331,7 @@ rovai-server --data-dir "$HOME/.rovai-server" token`),
       ['安装器不建立系统服务。确定一个进程归属账号和一种启动方式。服务管理器环境不是交互 shell，应显式设置包含智能体程序的 PATH，并保留它的主目录与认证环境。','以下 Linux 示例假设普通账号叫 rovai，默认程序位于 /home/rovai，数据根目录为 /home/rovai/.rovai-server。先选择或创建该账号，并以它安装和登录；所有路径要一致替换。','Restart=no 避免启动失败后反复拉起进程；systemctl enable 设置开机启动，不代表中断请求会自动完成。主机网络与智能体依赖仍需可用。']),
     C('Linux · /etc/systemd/system/rovai-server.service','Linux · /etc/systemd/system/rovai-server.service',
 `[Unit]
-Description=Rovai Server
+Description=Coaxi Server
 Wants=network-online.target
 After=network-online.target
 

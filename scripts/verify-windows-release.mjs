@@ -115,10 +115,10 @@ async function verifyUpdateArtifacts() {
   const packagedUpdateInfo = parseYaml(await readFile(packagedUpdateInfoPath, 'utf8'))
   if (packagedUpdateInfo?.provider !== 'github'
       || packagedUpdateInfo.owner !== 'knight-bili'
-      || packagedUpdateInfo.repo !== 'codeg-rovai-workbench') {
+      || packagedUpdateInfo.repo !== 'coaxi') {
     throw new Error('packaged app-update.yml does not target the official GitHub release channel')
   }
-  report.push('Packaged updater channel: github/knight-bili/codeg-rovai-workbench')
+  report.push('Packaged updater channel: github/knight-bili/coaxi')
   if (unpackedOnly) return null
 
   if (!existsSync(installerBlockmap)) {

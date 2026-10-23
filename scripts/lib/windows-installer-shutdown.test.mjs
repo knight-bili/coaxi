@@ -66,17 +66,17 @@ test('Windows installer coordinator targets an exact installation tree', {
   skip: process.platform !== 'win32'
 }, async (context) => {
   const fixtureRoot = await mkdtemp(join(tmpdir(), 'rovai-installer-process-'))
-  const installDirectory = join(fixtureRoot, 'Rovai AI')
-  const siblingDirectory = join(fixtureRoot, 'Rovai AI-old')
+  const installDirectory = join(fixtureRoot, 'Coaxi')
+  const siblingDirectory = join(fixtureRoot, 'Coaxi-old')
   await Promise.all([
     mkdir(installDirectory),
     mkdir(siblingDirectory)
   ])
 
   const systemPing = join(process.env.SystemRoot ?? 'C:\\Windows', 'System32', 'ping.exe')
-  const installedExecutable = join(installDirectory, 'Rovai-ai.exe')
+  const installedExecutable = join(installDirectory, 'Codeg Rovai Workbench.exe')
   const unrelatedExecutable = join(installDirectory, 'unrelated.exe')
-  const siblingExecutable = join(siblingDirectory, 'Rovai-ai.exe')
+  const siblingExecutable = join(siblingDirectory, 'Codeg Rovai Workbench.exe')
   await Promise.all([
     copyFile(systemPing, installedExecutable),
     copyFile(systemPing, unrelatedExecutable),
@@ -145,7 +145,7 @@ function runCoordinator(action, installDirectory, timeoutMilliseconds = null) {
     '-InstallDirectory',
     `${installDirectory}\\.`,
     '-ExecutableName',
-    'Rovai-ai.exe',
+    'Coaxi.exe',
     '-ExcludeProcessId',
     '0'
   ]

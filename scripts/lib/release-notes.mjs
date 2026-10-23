@@ -23,7 +23,7 @@ export function validateReleaseNotesSource(releaseNotes, version) {
   const lines = releaseNotes.split('\n')
   const headingIndex = lines.findIndex((line) => line.trim().length > 0)
   const firstNonEmptyLine = lines[headingIndex]
-  const expectedHeading = `# Rovai AI v${version}`
+  const expectedHeading = `# Coaxi v${version}`
   if (firstNonEmptyLine !== expectedHeading) {
     throw new Error(`release notes must begin with ${JSON.stringify(expectedHeading)}`)
   }

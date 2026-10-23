@@ -13,15 +13,15 @@ import { verifyAdhocMacosApp } from './macos-app-verification.mjs'
 test('verifies an ad-hoc App, Host, Core, and CLI with the expected architecture and bundle ID', (context) => {
   const root = mkdtempSync(join(tmpdir(), 'rovai-adhoc-verification-'))
   context.after(() => rmSync(root, { recursive: true, force: true }))
-  const appPath = join(root, 'Rovai AI.app')
-  const appBinary = join(appPath, 'Contents', 'MacOS', 'Rovai AI')
+  const appPath = join(root, 'Coaxi.app')
+  const appBinary = join(appPath, 'Contents', 'MacOS', 'Coaxi')
   const resources = join(appPath, 'Contents', 'Resources', 'bin')
 
   mkdirSync(join(appPath, 'Contents', 'MacOS'), { recursive: true })
   mkdirSync(resources, { recursive: true })
   writeFileSync(join(root, 'package.json'), JSON.stringify({
     build: {
-      productName: 'Rovai AI',
+      productName: 'Coaxi',
       mac: {}
     }
   }))
@@ -54,15 +54,15 @@ test('verifies an ad-hoc App, Host, Core, and CLI with the expected architecture
 test('rejects any packaged DingTalk DWS artifact', (context) => {
   const root = mkdtempSync(join(tmpdir(), 'rovai-dws-verification-'))
   context.after(() => rmSync(root, { recursive: true, force: true }))
-  const appPath = join(root, 'Rovai AI.app')
-  const appBinary = join(appPath, 'Contents', 'MacOS', 'Rovai AI')
+  const appPath = join(root, 'Coaxi.app')
+  const appBinary = join(appPath, 'Contents', 'MacOS', 'Coaxi')
   const resources = join(appPath, 'Contents', 'Resources', 'bin')
 
   mkdirSync(join(appPath, 'Contents', 'MacOS'), { recursive: true })
   mkdirSync(resources, { recursive: true })
   writeFileSync(join(root, 'package.json'), JSON.stringify({
     build: {
-      productName: 'Rovai AI',
+      productName: 'Coaxi',
       mac: {}
     }
   }))

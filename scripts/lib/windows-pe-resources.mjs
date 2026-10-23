@@ -34,11 +34,11 @@ export async function stampWindowsExecutable(executable, {
     'file-version': resourceVersion,
     'product-version': resourceVersion,
     'version-string': {
-      CompanyName: 'Rovai AI',
+      CompanyName: 'Coaxi',
       FileDescription: description,
       InternalFilename: originalFilename.replace(/\.exe$/i, ''),
       OriginalFilename: originalFilename,
-      ProductName: 'Rovai AI'
+      ProductName: 'Coaxi'
     },
     ...(iconPath ? { icon: iconPath } : {})
   })

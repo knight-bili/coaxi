@@ -7,7 +7,7 @@ import { seedCompletedOnboardingForAcceptance } from './lib/dev-desktop.mjs'
 
 const root = resolve(import.meta.dirname, '..')
 const appPath = resolve(
-  process.argv[2] ?? join(root, 'dist', 'mac-arm64', 'Rovai AI.app')
+  process.argv[2] ?? join(root, 'dist', 'mac-arm64', 'Coaxi.app')
 )
 const fixtureRoot = process.env.ROVAI_MEMBER_LIFECYCLE_ACCEPT_DATA_DIR
   ?? await mkdtemp(join(tmpdir(), 'rovai-member-lifecycle-ui-accept-'))
@@ -2049,7 +2049,7 @@ async function launchApp(dataDir, port, width, height) {
   const acceptanceOnlyFlags = process.env.ROVAI_MEMBER_LIFECYCLE_ACCEPT_NO_SANDBOX === '1'
     ? ['--no-sandbox']
     : []
-  const child = spawn(join(appPath, 'Contents', 'MacOS', 'Rovai AI'), [
+  const child = spawn(join(appPath, 'Contents', 'MacOS', 'Coaxi'), [
     `--remote-debugging-port=${port}`,
     `--user-data-dir=${dataDir}`,
     ...acceptanceOnlyFlags
