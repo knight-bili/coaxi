@@ -202,6 +202,15 @@ pub struct StoredCommandResult {
     camp_id: Option<String>,
 }
 
+impl StoredCommandResult {
+    pub(crate) fn is_local_user_scoped(&self) -> bool {
+        self.actor_type == "user"
+            && self.actor_id == "local_user"
+            && self.camp_id.is_none()
+            && self.source_agent_run_id.is_none()
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct CommandExecution {
     pub result: StoredCommandResult,

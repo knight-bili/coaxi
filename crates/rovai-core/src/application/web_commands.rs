@@ -64,7 +64,7 @@ pub(super) fn reconcile(
             }
             let result=crate::command::load_stored_result(database.connection(),&input.command_id)?;
             if let Some(result)=result{
-                anyhow::ensure!(result.command_type==query.operation&&result.actor_type=="user"&&result.actor_id=="local_user"&&result.camp_id.is_none()&&result.source_agent_run_id.is_none(),"custom_runtime.receipt_scope_changed");
+                anyhow::ensure!(result.command_type==query.operation&&result.is_local_user_scoped(),"custom_runtime.receipt_scope_changed");
                 Ok(json!({"state":"recorded","result":result}))
             }else{Ok(json!({"state":"unknown"}))}
         },
