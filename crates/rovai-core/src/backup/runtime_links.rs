@@ -80,3 +80,50 @@ pub(super) fn restore(staging:&Path,manifest:&Manifest)->Result<()>{
     if !unresolved.is_empty(){atomic_write_private_json(&data.join("custom-runtime-restore-needs-environment-v1.json"),&serde_json::json!({"schemaVersion":1,"unresolvedLinks":unresolved,"historicalLocksRetained":true,"automaticExecutionAllowed":false}))?;}
     Ok(())
 }
+
+#[cfg(all(test, unix))]
+mod tests {
+    use super::*;
+    use std::os::unix::fs::symlink;
+
+    fn payload(root: &Path) -> PathBuf {
+        root.join("custom-runtimes")
+            .join("00000000-0000-4000-8000-000000000001")
+            .join("1")
+            .join("fixture")
+            .join("00000000-0000-4000-8000-000000000002")
+            .join("payload")
+    }
+
+    fn signature(root: &Path) -> Vec<(String, String, bool)> {
+        scan(root, &[])
+            .unwrap()
+            .1
+            .into_iter()
+            .map(|link| (link.path, link.target, link.directory))
+            .collect()
+    }
+
+    #[test]
+    fn backup_rescan_detects_added_removed_and_retargeted_runtime_links() {
+        let directory = tempfile::tempdir().unwrap();
+        let payload = payload(directory.path());
+        let binaries = payload.join("bin");
+        std::fs::create_dir_all(&binaries).unwrap();
+        let original = binaries.join("runner");
+        symlink("../first.js", &original).unwrap();
+        let before = signature(directory.path());
+
+        let added = binaries.join("extra");
+        symlink("../first.js", &added).unwrap();
+        let with_added_link = signature(directory.path());
+        assert_ne!(before, with_added_link);
+
+        std::fs::remove_file(&added).unwrap();
+        assert_eq!(before, signature(directory.path()));
+
+        std::fs::remove_file(&original).unwrap();
+        symlink("../second.js", &original).unwrap();
+        assert_ne!(before, signature(directory.path()));
+    }
+}
