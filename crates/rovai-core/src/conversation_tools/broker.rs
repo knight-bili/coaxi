@@ -52,7 +52,8 @@ impl Registry{
         Ok((entry.binding,lease))
     }
     pub fn valid(&self,connection:&Connection,core_instance:&str,binding:&Binding)->bool{
-        binding.validate().is_ok()&&binding.core_instance_id==core_instance&&native_current(connection,binding).is_ok()&&scope::require_run(connection,&binding.agent_run_id,binding.execution_epoch).is_ok()
+        let registered=self.entries.lock().is_ok_and(|entries|entries.get(&binding.bridge_instance_id).is_some_and(|entry|!entry.revoked&&entry.binding.core_instance_id==core_instance&&entry.binding.agent_run_id==binding.agent_run_id&&entry.binding.execution_epoch==binding.execution_epoch&&entry.binding.frozen_digest==binding.frozen_digest));
+        registered&&binding.validate().is_ok()&&binding.core_instance_id==core_instance&&native_current(connection,binding).is_ok()&&scope::require_run(connection,&binding.agent_run_id,binding.execution_epoch).is_ok()
     }
     pub fn revoke(&self,connection:&Connection,binding:&Binding)->Result<()>{
         if let Some(entry)=self.entries.lock().map_err(|_|anyhow::anyhow!("conversation_tools.binding_lock"))?.get_mut(&binding.bridge_instance_id){entry.revoked=true;}
