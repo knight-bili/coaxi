@@ -664,9 +664,14 @@ impl Core {
         }
         ensure!(request.expected_revision.as_deref() == Some(revision.as_str()), "workbench.git_changed_refresh_preview");
         let (receipt, identity) = receipt.context("workbench.command_receipt_required")?;
+        if let Some((tree, owner, branch)) = &managed_tree {
+            if request.action == "worktree_add" {
+                crate::platform::private_storage::atomic_write_private_json(owner, &json!({"root":root,"branch":branch,"path":tree,"createdAt":Utc::now().to_rfc3339()}))?;
+            }
+        }
         crate::platform::private_storage::atomic_write_private_json(&receipt, &json!({"identity":identity,"state":"started"}))?;
         let output = git.workbench_output(&root, &arguments).await?;
-        if output.status.success(){if let Some((tree,owner,branch))=&managed_tree {if request.action=="worktree_add"{crate::platform::private_storage::atomic_write_private_json(owner,&json!({"root":root,"branch":branch,"path":tree,"createdAt":Utc::now().to_rfc3339()}))?;}else{let _=fs::remove_file(owner);}}}
+        if output.status.success(){if let Some((_,owner,_))=&managed_tree {if request.action=="worktree_remove"{let _=fs::remove_file(owner);}}}
         let result = json!({"success":output.status.success(),"exitCode":output.status.code(),"output":output.stdout.lossy_text(),"error":output.stderr.lossy_text(),"workingDirectory":managed_tree.as_ref().map(|(tree,_,_)|tree)});
         crate::platform::private_storage::atomic_write_private_json(&receipt, &json!({"identity":identity,"state":"finished","result":result}))?;
         Ok(result)
