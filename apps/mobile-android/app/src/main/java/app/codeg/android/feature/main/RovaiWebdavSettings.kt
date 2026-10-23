@@ -59,7 +59,35 @@ import kotlinx.serialization.json.*
                 TextButton(enabled=!busy,onClick={confirm=frozen}){Text(stringResource(R.string.rovai_fusion_5a66cdc8a4bc8ccb))}
             }}}
             items(snapshots,key={it.coreText("id")}){snapshot->GlassRow{Text(if(snapshot.coreText("kind")=="configuration")"配置快照" else "完整备份",style=MaterialTheme.typography.titleSmall);Text(snapshot.coreText("createdAt"));Text("${snapshot.coreLong("bytes")} 字节",style=MaterialTheme.typography.bodySmall,color=CodegTheme.colors.textSecondary);TextButton(enabled=!busy&&!dirty,onClick={work{val preview=remote("removal_preview",buildJsonObject{put("snapshotId",snapshot.coreText("id"));put("expectedDigest",snapshot.coreText("sha256"))});confirm=buildJsonObject{put("operation","remove");put("expectedRevision",saved["revision"]?:JsonNull);put("snapshotId",snapshot.coreText("id"));put("expectedDigest",snapshot.coreText("sha256"));put("expectedIndexEtag",preview.coreText("indexEtag"));put("confirmed",true)}}}){Text(stringResource(R.string.rovai_fusion_e5338e1e51152703))}}}
-            items(transfers,key={it.coreText("commandId")}){transfer->GlassRow{Text((if(transfer.coreText("operation")=="push")"上传" else "下载")+" · "+transfer.coreText("state"));if(transfer.coreText("message").isNotEmpty())Text(transfer.coreText("message"),style=MaterialTheme.typography.bodySmall);Row{TextButton(enabled=!busy,onClick={work{val value=remote("status",buildJsonObject{put("commandId",transfer.coreText("commandId"))});transfers=transfers.map{if(it.coreText("commandId")==transfer.coreText("commandId"))value else it}}){Text(stringResource(R.string.rovai_fusion_aca2df8feb90ba8a))};if(transfer.coreText("state")in listOf("started","stopping"))TextButton(enabled=!busy,onClick={confirm=buildJsonObject{put("operation","cancel");put("expectedRevision",saved["revision"]?:JsonNull);put("commandId",transfer.coreText("commandId"))}}){Text(stringResource(R.string.rovai_fusion_97319c6b91e3ac45))}}}}
+            items(transfers, key = { it.coreText("commandId") }) { transfer ->
+                GlassRow {
+                    Text((if (transfer.coreText("operation") == "push") "上传" else "下载") + " · " + transfer.coreText("state"))
+                    if (transfer.coreText("message").isNotEmpty()) {
+                        Text(transfer.coreText("message"), style = MaterialTheme.typography.bodySmall)
+                    }
+                    Row {
+                        TextButton(enabled = !busy, onClick = {
+                            work {
+                                val value = remote("status", buildJsonObject {
+                                    put("commandId", transfer.coreText("commandId"))
+                                })
+                                transfers = transfers.map { old ->
+                                    if (old.coreText("commandId") == transfer.coreText("commandId")) value else old
+                                }
+                            }
+                        }) { Text(stringResource(R.string.rovai_fusion_aca2df8feb90ba8a)) }
+                        if (transfer.coreText("state") in listOf("started", "stopping")) {
+                            TextButton(enabled = !busy, onClick = {
+                                confirm = buildJsonObject {
+                                    put("operation", "cancel")
+                                    put("expectedRevision", saved["revision"] ?: JsonNull)
+                                    put("commandId", transfer.coreText("commandId"))
+                                }
+                            }) { Text(stringResource(R.string.rovai_fusion_97319c6b91e3ac45)) }
+                        }
+                    }
+                }
+            }
         }
     }
     confirm?.let{frozen->AlertDialog(onDismissRequest={if(!busy)confirm=null},title={Text(when(frozen.coreText("operation")){"set"->"保存到连接的主机？";"remove"->"移除此远端副本？";else->"停止原传输？"})},text={Text(when(frozen.coreText("operation")){"set"->"以打开此页时的账号版本保存。其他端修改过时拒绝覆盖。";"remove"->"按刚才预览的远端索引版本移除；保留本地数据与已下载文件。结果未知时继续核对同一请求。";else->"停止不代表远端操作已经撤销，随后核对原任务。"})},confirmButton={TextButton(enabled=!busy,onClick={work{when(frozen.coreText("operation")){"set"->{accept(request(RovaiOperation.BACKUP_WEBDAV_SETTINGS,frozen));message="主机连接已保存"};"remove"->remove(frozen);else->{request(RovaiOperation.BACKUP_WEBDAV_REMOTE,frozen);transfers=remote("transfers")["items"].coreArray()}};confirm=null}}){Text(stringResource(R.string.rovai_fusion_36f33adaf0942634))}},dismissButton={TextButton(enabled=!busy,onClick={confirm=null}){Text(stringResource(R.string.rovai_fusion_2cd0f3be8738a86c))}})}
